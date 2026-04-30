@@ -56,6 +56,7 @@
 | HLS 只保存 m3u8 仍不能播放 | 缺 key、segments、base URL、AES 解密或 remux。 | 分開抓 playlist/key/segments，最後用 `ffprobe` / `ffmpeg` 驗證。 |
 | `apkanalyzer` 報無法定位 build tools；或 PATH 沒有 `aapt` | 只有 platform-tools 在 PATH，或 SDK 配置不完整。 | 改用 `$ANDROID_HOME/build-tools/<version>/aapt dump badging`（見下）。 |
 | `aapt dump badging` 沒有 `launchable-activity` | manifest 較複雜或工具輸出差異。 | 裝置已安裝該 App 時用 `cmd package resolve-activity --brief`；僅有 APK 時用 `aapt dump xmltree` / apktool。 |
+| Wi‑Fi 代理 MITM 幾乎沒有業務流量，但全機 pcap 仍有 TLS／App 功能正常 | **內建 TUN／sing-box／embedded VPN** 等可能繞過系統 HTTP 代理。 | 字串搜 `singbox`/`MethodChannel`；改看 **pcap SNI**／**Frida hook 高語意 client**；不要先歸因 pinning。 |
 
 ## 命令模板
 
