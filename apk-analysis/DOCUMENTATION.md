@@ -160,7 +160,7 @@ Java OkHttp hook installed successfully, but no target host/path appeared while 
 
 ## 技巧回饋文件要給人讀
 
-寫入 **`feedback_history/YYYY-MM-DD-<slug>.md`**（規則見 `FEEDBACK.md`）時，請避免只有工具名與短結論。每條技巧都應包含：
+寫入 **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**（規則見 `FEEDBACK.md`）時，請避免只有工具名與短結論。每條技巧都應包含：
 
 - `One-line Summary`：一句話講重點。
 - `Human Explanation`：給人看的背景與誤判風險。

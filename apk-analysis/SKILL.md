@@ -91,7 +91,7 @@ Use placeholders:
 
 If analysis discovers a new reusable idea:
 
-1. Create **`feedback_history/YYYY-MM-DD-<slug>.md`** as a dated lesson **proactively** (same session as the discovery unless blocked by missing evidence). Follow [FEEDBACK.md](FEEDBACK.md) naming rules.
+1. Create **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** as a dated lesson **proactively** (same session as the discovery unless blocked by missing evidence). Follow [FEEDBACK.md](FEEDBACK.md) naming rules (`HHMMSS` = local 24h time).
 2. Generalize it so it is not tied to one APK.
 3. Add evidence and validation criteria.
 4. Promote it into `WORKFLOW.md`, `TOOLS.md`, or `DOCUMENTATION.md` only after it has been validated or is clearly labeled as experimental in the lesson file.

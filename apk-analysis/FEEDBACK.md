@@ -9,14 +9,16 @@
 | 內容 | 位置 |
 | --- | --- |
 | **撰寫規範、模板、索引說明** | **`FEEDBACK.md`**（本檔） |
-| **每一條獨立 lesson**（候選／已驗證／已 promoted 備份） | **`feedback_history/YYYY-MM-DD-<slug>.md`** |
+| **每一條獨立 lesson**（候選／已驗證／已 promoted 備份） | **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
 | **條目總覽表**（可選，方便人類掃一眼） | **`feedback_history/README.md`** |
 
-### 檔名規則（`<slug>`）
+### 檔名規則（時間 + `<slug>`）
 
-- 使用 **`YYYY-MM-DD-<slug>.md`**，日期為 lesson **首次寫入**或你認定的主題日。
-- `<slug>` 建議 **短英文 kebab-case** 或 **有意義的英數縮寫**（例：`proxy-two-layer-tls.md`、`aapt-resolve-activity.md`）；中文標題可保留但不宜過長。
-- **同一日多條**：保留不同 `<slug>` 即可，勿覆寫既有檔。
+- 使用 **`YYYY-MM-DD_HHMMSS-<slug>.md`**：
+  - **`YYYY-MM-DD`**：建立 lesson 的日期（本機）。
+  - **`HHMMSS`**：**24 小時制**本機時間（6 位數字，例：`143052` = 14:30:52）。含時間可避免同日多檔碰撞、也方便依檔名排序。
+- `<slug>` 建議 **短英文 kebab-case** 或 **有意義的英數縮寫**（例：`proxy-two-layer-tls`、`aapt-resolve-activity`）；中文標題可保留但不宜過長。
+- **同一秒多條**：微調秒數或改 `<slug>`，勿覆寫既有檔。
 - **修改既有 lesson**：在原檔 **追加修訂說明**（簡短段落）或建新檔並在舊檔頂部標 `deprecated → 見 xxx.md`；不要默默刪除歷史。
 
 ## 回饋原則
@@ -33,7 +35,7 @@
 
 每一條 lesson 都要讓沒參與當次分析的人也看得懂。建議結構見下方模板（One-line Summary / Human Explanation / Agent Action …）。
 
-## 新 lesson 模板（複製到新檔 `feedback_history/YYYY-MM-DD-<slug>.md`）
+## 新 lesson 模板（複製到新檔 `feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`）
 
 ```markdown
 ### YYYY-MM-DD - [short title]
@@ -90,4 +92,4 @@ Status: candidate | validated | deprecated | promoted | experimental
 
 - **索引**：維護者可定期更新 **`feedback_history/README.md`**（表格：檔名、Status、標題、一句話摘要）；agent 新增檔案後**可選**追加表格列。
 - **Git**：`feedback_history/` 與 `FEEDBACK.md` 一併版本控制；不要提交含機密的原始 log。
-- **已搬遷**：既有長篇 lesson 已拆至 **`feedback_history/*.md`**；請自此新增檔案而非往舊版單檔底部堆疊。
+- **已搬遷**：既有長篇 lesson 已拆至 **`feedback_history/*.md`**（歷史批次檔名時間戳為 **`120000`–`120010`** 僅供排序，新建請用**當下** `HHMMSS`）；請自此新增檔案而非往舊版單檔底部堆疊。

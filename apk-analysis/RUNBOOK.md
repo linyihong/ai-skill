@@ -27,7 +27,7 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
 
 ```text
 <AI_SKILL_REPO>/apk-analysis/FEEDBACK.md          # 撰寫規則與模板（精簡）
-<AI_SKILL_REPO>/apk-analysis/feedback_history/   # 每一條 lesson 獨立檔（YYYY-MM-DD-<slug>.md）
+<AI_SKILL_REPO>/apk-analysis/feedback_history/   # 每一條 lesson 獨立檔（YYYY-MM-DD_HHMMSS-<slug>.md）
 ```
 
 驗證後同步更新：

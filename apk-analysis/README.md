@@ -51,7 +51,7 @@
 分析完成後：
 
 1. 把 target-specific API / schema / endpoint 結論寫回專案對應 API 文件。
-2. 把可重用方法寫成 **`feedback_history/YYYY-MM-DD-<slug>.md`**（規則見 `FEEDBACK.md`）。
+2. 把可重用方法寫成 **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**（規則見 `FEEDBACK.md`）。
 3. 如果方法已驗證，整理進 `WORKFLOW.md` 或 `TOOLS.md`。
 4. 若專案有 SDK 或 client，將解碼規則補成 fixture / contract test。
 
