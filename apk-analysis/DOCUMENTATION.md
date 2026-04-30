@@ -160,7 +160,7 @@ Java OkHttp hook installed successfully, but no target host/path appeared while 
 
 ## 技巧回饋文件要給人讀
 
-寫入 `FEEDBACK.md` 時，請避免只有工具名與短結論。每條技巧都應包含：
+寫入 **`feedback_history/YYYY-MM-DD-<slug>.md`**（規則見 `FEEDBACK.md`）時，請避免只有工具名與短結論。每條技巧都應包含：
 
 - `One-line Summary`：一句話講重點。
 - `Human Explanation`：給人看的背景與誤判風險。
@@ -193,4 +193,4 @@ Agent Action:
 - 目標 API 結論回填專案 API 文件。
 - 解碼規則回填協議/解密文件。
 - SDK 或 client 行為回填 BDD / tests。
-- 通用技巧回填 `FEEDBACK.md`，驗證後再整理到本 skill 的主文件。
+- 通用技巧回填 **`feedback_history/`**（新檔），驗證後再整理到本 skill 的主文件。

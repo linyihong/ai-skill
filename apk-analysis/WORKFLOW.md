@@ -196,4 +196,4 @@ response decode hook:
 - 若有加密，有解碼點或下一步定位計畫。
 - 有去敏樣本或 fixture。
 - 有文件回填位置。
-- 有新的 reusable lesson 時，已寫入 `FEEDBACK.md`。
+- 有新的 reusable lesson 時，已在 **`feedback_history/`** 新增對應檔案（規則見 `FEEDBACK.md`）。

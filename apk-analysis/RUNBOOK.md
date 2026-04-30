@@ -26,7 +26,8 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
 新技巧回饋到：
 
 ```text
-<AI_SKILL_REPO>/apk-analysis/FEEDBACK.md
+<AI_SKILL_REPO>/apk-analysis/FEEDBACK.md          # 撰寫規則與模板（精簡）
+<AI_SKILL_REPO>/apk-analysis/feedback_history/   # 每一條 lesson 獨立檔（YYYY-MM-DD-<slug>.md）
 ```
 
 驗證後同步更新：
@@ -50,7 +51,7 @@ docs/skills/apk-analysis/
 ```text
 請先閱讀 docs/skills/apk-analysis/SKILL.md，
 並依照 WORKFLOW.md / TOOLS.md / DOCUMENTATION.md 分析這個 APK。
-如果過程中學到可重用技巧，請用 FEEDBACK.md 的格式回饋。
+如果過程中學到可重用技巧，請依 FEEDBACK.md 規則在 feedback_history/ 新增檔案回饋。
 ```
 
 ### 2. 當作 Cursor project skill 使用
@@ -83,7 +84,7 @@ docs/skills/apk-analysis/
 - 不要一開始假設是 pinning。
 - 先做 localhost / pcap / proxy / Java hook / native or Flutter 判斷。
 - 所有 token、device id、私密 host、個資都要去敏。
-- 如果發現新技巧，請**主動**寫回 docs/skills/apk-analysis/FEEDBACK.md（不要等使用者說「記得回饋」），且要讓人類也看得懂；可同步更新 TOOLS/WORKFLOW 如已驗證。
+- 如果發現新技巧，請**主動**在 docs/skills/apk-analysis/feedback_history/ **新增 lesson 檔**（格式見 FEEDBACK.md；不要等使用者說「記得回饋」），且要讓人類也看得懂；可同步更新 TOOLS/WORKFLOW 如已驗證。
 
 目前材料：
 - APK:
@@ -134,7 +135,7 @@ docs/skills/apk-analysis/
    - 去敏後才保存樣本
 
 6. 回饋 skill：
-   - 新技巧寫入 `FEEDBACK.md`
+   - 新技巧寫入 `feedback_history/`（見 `FEEDBACK.md` 命名規則）
    - 已驗證技巧再同步進 `WORKFLOW.md` / `TOOLS.md` / `DOCUMENTATION.md`
 
 ## 回饋規則
@@ -164,9 +165,9 @@ docs/skills/apk-analysis/
 
 ```text
 每次你發現新的可重用 APK 分析技巧時，請不要只在對話裡說明；也請不要等使用者提醒「記得回饋」。
-請依 <AI_SKILL_REPO>/apk-analysis/FEEDBACK.md 的格式在同一輪對話追加一條 lesson。
+請依 <AI_SKILL_REPO>/apk-analysis/FEEDBACK.md 的規則，在同一輪對話於 feedback_history/ **新增一個** lesson 檔。
 如果 lesson 已經被驗證，也請同步更新 WORKFLOW.md、TOOLS.md 或 DOCUMENTATION.md。
-注意：FEEDBACK.md 要讓人類也能看懂，不只給 AI 看。
+注意：lesson 內容要讓人類也能看懂，不只給 AI 看。
 完成後請在 <AI_SKILL_REPO> commit 並 push。
 ```
 

@@ -33,7 +33,8 @@
 | `WORKFLOW.md` | 人類與 agent 都可讀的分析決策流程。 |
 | `TOOLS.md` | 常用工具、前置條件、適用情境與失敗判讀。 |
 | `DOCUMENTATION.md` | 分析結果如何寫成可重現文件。 |
-| `FEEDBACK.md` | 新技巧、新失敗模式、新驗證規則的回饋模板與待提升清單。 |
+| `FEEDBACK.md` | **如何**撰寫回饋、命名規則、lesson 模板（本檔保持精簡）。 |
+| `feedback_history/` | 每一條獨立 lesson 的 Markdown；必要時見 `README.md` 索引表。 |
 | `RUNBOOK.md` | 新 APK 專案第一天如何套用 skill，以及如何把新經驗回饋回本包。 |
 
 ## 使用方式
@@ -50,7 +51,7 @@
 分析完成後：
 
 1. 把 target-specific API / schema / endpoint 結論寫回專案對應 API 文件。
-2. 把可重用方法寫入 `FEEDBACK.md`。
+2. 把可重用方法寫成 **`feedback_history/YYYY-MM-DD-<slug>.md`**（規則見 `FEEDBACK.md`）。
 3. 如果方法已驗證，整理進 `WORKFLOW.md` 或 `TOOLS.md`。
 4. 若專案有 SDK 或 client，將解碼規則補成 fixture / contract test。
 
@@ -73,4 +74,4 @@
 - 證據：pcap、hook log、MITM export、反編譯搜尋結果或 sanitized excerpt。
 - 結論：哪些路徑有效、哪些被排除、下一步如何驗證。
 - 去敏規則：哪些值被遮蔽，哪些文件不能提交。
-- 可重用 lesson：寫入 `FEEDBACK.md`。
+- 可重用 lesson：新增檔於 **`feedback_history/`**。
