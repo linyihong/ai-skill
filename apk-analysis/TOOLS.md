@@ -57,6 +57,7 @@
 | `apkanalyzer` 報無法定位 build tools；或 PATH 沒有 `aapt` | 只有 platform-tools 在 PATH，或 SDK 配置不完整。 | 改用 `$ANDROID_HOME/build-tools/<version>/aapt dump badging`（見下）。 |
 | `aapt dump badging` 沒有 `launchable-activity` | manifest 較複雜或工具輸出差異。 | 裝置已安裝該 App 時用 `cmd package resolve-activity --brief`；僅有 APK 時用 `aapt dump xmltree` / apktool。 |
 | Wi‑Fi 代理 MITM 幾乎沒有業務流量，但全機 pcap 仍有 TLS／App 功能正常 | **內建 TUN／sing-box／embedded VPN** 等可能繞過系統 HTTP 代理。 | 字串搜 `singbox`/`MethodChannel`；改看 **pcap SNI**／**Frida hook 高語意 client**；不要先歸因 pinning。 |
+| Wi‑Fi MITM 空，但 **logcat** 有 **`ProxyServer`**／對 **`127.0.0.1:<port>`** 轉發至 `https://<api-host>` | **本機 loopback 中介**先於對外連線。 | `adb logcat` 搜尋 `ProxyServer`／handler；勿將含標頭的原始 log 提交公開 repo。 |
 
 ## 命令模板
 
