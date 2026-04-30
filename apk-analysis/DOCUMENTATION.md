@@ -12,6 +12,12 @@
 | 專案結論 | 目標 App 的 API、host、endpoint、schema、媒體規則。 | 不放 skill，放專案 API / reference docs。 |
 | 原始證據 | pcap、MITM export、Frida log、raw response、decrypted fixture。 | 不放 skill；放 gitignored 或專案指定位置，文件只引用去敏摘要。 |
 
+### 專案進展何時寫入本 skill（apk-analysis）
+
+- **不必等「全部測完」**：只要套路已 **重複驗證**、可一般化（例如 Frida 17 下 **`Process.getModuleByName('libc.so').findExportByName`**、`getaddrinfo` 對照 MITM 的路徑判斷），即可透過 **`feedback_history/`** 或 **本資料夾小幅修訂** 納入 skill。
+- **仍須區分**：**目標 App 專屬 host／輪替節點／未結案假設** 留在 **專案 repo**（API 筆記／baseline）；skill 只收 **方法論**，不收產品機密。
+- **文件中標狀態**：假設仍會變時，專案端請標 **日期或「進行中」**；避免把 **過早的單案結論** 抄進 skill 當永久真理。
+
 ## 單次分析筆記模板
 
 ```markdown
