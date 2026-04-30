@@ -54,6 +54,8 @@
 | Token 重新簽了仍失敗 | token 本身失效，不是簽章問題。 | 還原 App 的 login/device-login/session refresh 流程。 |
 | Login too frequently | 短時間 tight-loop、device/session/IP/app fingerprint 風控。 | 停止重試、重用 session、記錄 login attempt metadata。 |
 | HLS 只保存 m3u8 仍不能播放 | 缺 key、segments、base URL、AES 解密或 remux。 | 分開抓 playlist/key/segments，最後用 `ffprobe` / `ffmpeg` 驗證。 |
+| `apkanalyzer` 報無法定位 build tools；或 PATH 沒有 `aapt` | 只有 platform-tools 在 PATH，或 SDK 配置不完整。 | 改用 `$ANDROID_HOME/build-tools/<version>/aapt dump badging`（見下）。 |
+| `aapt dump badging` 沒有 `launchable-activity` | manifest 較複雜或工具輸出差異。 | 裝置已安裝該 App 時用 `cmd package resolve-activity --brief`；僅有 APK 時用 `aapt dump xmltree` / apktool。 |
 
 ## 命令模板
 
@@ -61,6 +63,19 @@
 
 ```bash
 aapt dump badging app.apk
+```
+
+若 shell 找不到 `aapt`，但已安裝 Android SDK（環境變數 `ANDROID_HOME` 或標準 SDK 根目錄存在 `build-tools/<version>/aapt`）：
+
+```bash
+# 將 <version> 換成已存在的 build-tools 目錄（通常選最新版）
+"$ANDROID_HOME/build-tools/<version>/aapt" dump badging app.apk
+```
+
+在裝置上查預設 launcher component（便於 `am start -n`，比 `monkey` 易重現）：
+
+```bash
+adb -s <device-serial> shell cmd package resolve-activity --brief <package-name>
 ```
 
 查裝置與 App PID：

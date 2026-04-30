@@ -83,7 +83,7 @@ docs/skills/apk-analysis/
 - 不要一開始假設是 pinning。
 - 先做 localhost / pcap / proxy / Java hook / native or Flutter 判斷。
 - 所有 token、device id、私密 host、個資都要去敏。
-- 如果發現新技巧，請寫回 docs/skills/apk-analysis/FEEDBACK.md，且要讓人類也看得懂。
+- 如果發現新技巧，請**主動**寫回 docs/skills/apk-analysis/FEEDBACK.md（不要等使用者說「記得回饋」），且要讓人類也看得懂；可同步更新 TOOLS/WORKFLOW 如已驗證。
 
 目前材料：
 - APK:
@@ -163,8 +163,8 @@ docs/skills/apk-analysis/
 在新專案中可以加這句：
 
 ```text
-每次你發現新的可重用 APK 分析技巧時，請不要只在對話裡說明。
-請依 <AI_SKILL_REPO>/apk-analysis/FEEDBACK.md 的格式追加一條 lesson。
+每次你發現新的可重用 APK 分析技巧時，請不要只在對話裡說明；也請不要等使用者提醒「記得回饋」。
+請依 <AI_SKILL_REPO>/apk-analysis/FEEDBACK.md 的格式在同一輪對話追加一條 lesson。
 如果 lesson 已經被驗證，也請同步更新 WORKFLOW.md、TOOLS.md 或 DOCUMENTATION.md。
 注意：FEEDBACK.md 要讓人類也能看懂，不只給 AI 看。
 完成後請在 <AI_SKILL_REPO> commit 並 push。

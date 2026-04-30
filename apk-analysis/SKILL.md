@@ -29,6 +29,11 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Offline decoders or fixtures.
    - API/schema docs.
    - Contract tests where the project has an SDK or client implementation.
+6. **Automatic skill feedback (agents)**:
+   - Whenever you learn a **new reusable** technique, failure pattern, or validation rule during analysis, **write it into this skill in the same session**—do **not** wait for the user to say「記得回饋」.
+   - Append a new lesson to [FEEDBACK.md](FEEDBACK.md) using the template there (generalized, sanitized, with evidence and applicability).
+   - If the lesson is already credible from evidence in this session, also patch [TOOLS.md](TOOLS.md), [WORKFLOW.md](WORKFLOW.md), or [DOCUMENTATION.md](DOCUMENTATION.md) as appropriate; label uncertain items `experimental` in `FEEDBACK.md` instead of promoting prematurely.
+   - Target-specific hosts, endpoints, tokens, or one-off product conclusions stay in the **project** docs, not in reusable skill files.
 
 ## Default Workflow
 
@@ -38,7 +43,7 @@ Use [TOOLS.md](TOOLS.md) when preparing an environment or choosing between adb, 
 
 Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing human-readable results.
 
-Use [FEEDBACK.md](FEEDBACK.md) when a new technique, failure pattern, or validation rule should be added back into this skill.
+Use [FEEDBACK.md](FEEDBACK.md) when a new technique, failure pattern, or validation rule should be added back into this skill. **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §6** and **Feedback Loop** below.
 
 Use [RUNBOOK.md](RUNBOOK.md) when starting a new APK project or when the user asks how to apply this skill to another product.
 
@@ -86,9 +91,11 @@ Use placeholders:
 
 If analysis discovers a new reusable idea:
 
-1. Add it to `FEEDBACK.md` as a dated candidate lesson.
+1. Add it to `FEEDBACK.md` as a dated candidate lesson **proactively** (same session as the discovery unless blocked by missing evidence).
 2. Generalize it so it is not tied to one APK.
 3. Add evidence and validation criteria.
 4. Promote it into `WORKFLOW.md`, `TOOLS.md`, or `DOCUMENTATION.md` only after it has been validated or is clearly labeled as experimental.
 
 Do not silently overwrite prior lessons. Append, compare, and explain why the new rule supersedes or narrows the old one.
+
+**Agent checklist before ending an APK-analysis task:** Did any **new generalized lesson** emerge? If yes → `FEEDBACK.md` updated (minimum); optional promotion to `TOOLS.md` / `WORKFLOW.md` / `DOCUMENTATION.md` when justified. If nothing new → no forced entry.
