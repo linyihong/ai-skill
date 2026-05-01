@@ -20,7 +20,27 @@
 - 把第三方或非目標流量當成分析資料。
 - 把單一 App 的私有 host / secret 寫進 reusable skill。
 
-## 1. 先判斷流量在哪一層
+## 1. 建立 UI 架構地圖
+
+當可以控制裝置或 emulator 時，先把 App 的可見結構文件化，讓後續 API 分析能回到具體操作，而不是只留 endpoint 清單。
+
+記錄：
+
+- 入口與登入狀態：冷啟動、已登入、未登入、權限彈窗、地區/語言。
+- 可見 navigation：bottom tabs、top tabs、drawer、profile/menu、search、detail page、player/media page。
+- 每個主要 screen 的 screenshot evidence：去敏後保存路徑、時間戳、screen label。
+- 操作序列：`Home > Tab: Discover > item tap > Detail` 這類可重放路徑。
+- 捕獲時間窗：操作開始/結束時間、對應 pcap/MITM/Frida log window。
+- API 關聯：每個操作觸發的 method/path、response schema、cache/local-only 判斷。
+
+判斷原則：
+
+- 截圖只能證明可見 UI，不直接證明 API；必須用同窗 request/response、pcap timing 或 hook sequence 對齊。
+- 同一個 endpoint 可能被多個 screen 共用；文件要保留多個 UI path，不要硬塞單一來源。
+- 啟動畫面、快取、預載與背景同步要標清楚，避免把 startup/cache JSON 誤寫成使用者操作 API。
+- 若可用 `uiautomator` hierarchy、accessibility labels 或 route/logcat 線索，應與 screenshot 互相校正 tab 名稱與 screen label。
+
+## 2. 先判斷流量在哪一層
 
 不要一開始就假設是 certificate pinning。先回答這些問題：
 
@@ -49,7 +69,7 @@ native backtrace 落在哪裡？
 - Java hook 沒命中，不代表沒有 HTTP；Flutter/Dart、Cronet、native client 可能繞過 Java HTTP stack。
 - 看到 proxy CONNECT 後 TLS 失敗，才進入 CA / pinning / custom trust 排查。
 
-## 2. 選擇主線
+## 3. 選擇主線
 
 | 證據 | 優先主線 |
 | --- | --- |
@@ -61,7 +81,7 @@ native backtrace 落在哪裡？
 | MITM CONNECT 成功但 handshake failed | CA trust、network security config、pinning 排查 |
 | 只有 pcap host/timing | 反編譯搜尋 host/path/header，再找高語意 hook 點 |
 
-## 3. 找高語意 hook 點
+## 4. 找高語意 hook 點
 
 優先找已組裝完成的業務物件：
 
@@ -81,7 +101,7 @@ native backtrace 落在哪裡？
 
 低層 hook 事件多、容易造成卡頓，也需要自己重組協議。只有在高語意點找不到時才降層。
 
-## 4. Flutter / Dart AOT 常見流程
+## 5. Flutter / Dart AOT 常見流程
 
 如果 evidence 指向 Flutter：
 
@@ -110,7 +130,7 @@ response decode hook:
   decrypted JSON/string
 ```
 
-## 5. MITM / Proxy 判斷流程
+## 6. MITM / Proxy 判斷流程
 
 先分兩層：
 
@@ -151,7 +171,7 @@ response decode hook:
 - `connect <api-host>:443`：仍是直連，優先查注入時機、proxy host/port、client 是否已初始化。
 - proxy 有 CONNECT 但無 HTTPS 明文：導流與 TLS 要分開查，不要直接回到「Proxyman 沒用」的結論。
 
-## 6. Response 解碼與離線化
+## 7. Response 解碼與離線化
 
 遇到 outer response 包 encrypted `data` 時：
 
@@ -167,7 +187,7 @@ response decode hook:
 
 離線化完成後，後續不應每次依賴 Frida 才能跑測試。
 
-## 7. Session / Token 重新取得
+## 8. Session / Token 重新取得
 
 遇到 token 過期、no token、invalid token，不要先假設有標準 refresh-token。應還原 App 的真實流程：
 
@@ -185,7 +205,7 @@ response decode hook:
 - 遇到 login too frequently，先停止 tight-loop，再分析 server-side bucket 可能維度。
 - 不要在沒有證據時假設旋轉單一欄位可以解限流。
 
-## 8. 媒體 / HLS 分析
+## 9. 媒體 / HLS 分析
 
 影片與音訊資源要分控制面與資料面：
 
@@ -199,11 +219,12 @@ response decode hook:
 
 不要只看副檔名判斷格式。應用 magic bytes、container probe 或 frame count 驗證。例如 WebP 動圖、靜態 GIF、animated GIF 都要分清楚。
 
-## 9. 分析結束定義
+## 10. 分析結束定義
 
 一次分析可以收斂時，應具備：
 
 - 清楚知道核心流量走哪個 stack。
+- 有 UI architecture map，能說明主要 tabs/screens 與已測操作。
 - 有 request metadata 或已證明拿不到的原因。
 - 有 response outer shape。
 - 若有加密，有解碼點或下一步定位計畫。

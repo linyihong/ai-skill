@@ -7,6 +7,8 @@
 | 工具 | 用途 | 何時使用 |
 | --- | --- | --- |
 | `adb` | 安裝、啟動、logcat、pull/push、查 PID、操作裝置。 | 每次分析都需要。 |
+| `adb screencap` / `screenrecord` | 保存去敏 screenshot 或短影片，建立 UI/tab/操作證據。 | 需要把 API 對應回具體畫面與操作時。 |
+| `uiautomator dump` | 匯出目前畫面的 view hierarchy、text/resource-id/content-desc。 | screenshot label 不清楚、需要確認 tab/screen 元素時。 |
 | `apktool` | 解 resources、manifest、network security config、smali。 | 需要看 manifest、res、smali 或重打包時。 |
 | `jadx` | Java/Kotlin 反編譯、搜尋 class/method/string。 | Java stack、OkHttp、WebView、加密 helper。 |
 | `aapt` / `apkanalyzer` | APK metadata、package、version、permissions。 | 開始前盤點。 |
@@ -46,6 +48,8 @@
 
 | 現象 | 可能原因 | 下一步 |
 | --- | --- | --- |
+| 抓到 API 但不知道是哪個操作觸發 | 沒有建立 UI 操作時間窗，或 startup/preload/background sync 混在一起。 | 先補 screenshot/UI hierarchy 與 operation id；每次只操作一個 screen/action，將時間窗對齊 pcap/MITM/Frida sequence。 |
+| 截圖看起來是某個 tab，但 API timing 對不上 | tab 預載、快取、背景同步、或同 endpoint 被多個 screen 共用。 | 標成 trigger confidence low/medium；用冷啟動、清 cache、單步操作或 hook sequence 重新驗證。 |
 | Proxyman 沒有核心 API | client 不走系統代理、attach 太晚、流程沒觸發。 | pcap 確認 host；用 cold-start injection 或高語意 hook。 |
 | PC 代理正在監聽但完全沒流量 | 裝置未設 proxy、`adb reverse`/port forward 未建立、Wi-Fi/global proxy 狀態與預期不符。 | 先查裝置 proxy 狀態與 reverse，再冷啟動做短窗驗證。 |
 | MITM 有校時／三方流量但沒有業務 host | 只有部分 stack 尊重系統代理；業務可能走 Dart/native/local proxy/TUN 類路由。 | 同窗跑 native `getaddrinfo`/`connect` 或 pcap/SNI；分開記錄「proxy 可用」與「業務是否進 proxy」。 |
@@ -95,6 +99,23 @@ adb -s <device-serial> shell cmd package resolve-activity --brief <package-name>
 ```bash
 adb devices
 adb -s <device-serial> shell pidof <package-name>
+```
+
+建立 UI architecture map 的 screenshot 與 hierarchy evidence：
+
+```bash
+adb -s <device-serial> shell screencap -p /sdcard/screen.png
+adb -s <device-serial> pull /sdcard/screen.png ./evidence/ui/<operation-id>.png
+adb -s <device-serial> shell uiautomator dump /sdcard/window.xml
+adb -s <device-serial> pull /sdcard/window.xml ./evidence/ui/<operation-id>.xml
+```
+
+用 `adb` 做可重放的單步操作時，將操作前後時間戳寫進分析筆記，方便對齊 pcap/MITM/Frida log：
+
+```bash
+date -u +"%Y-%m-%dT%H:%M:%SZ"
+adb -s <device-serial> shell input tap <x> <y>
+date -u +"%Y-%m-%dT%H:%M:%SZ"
 ```
 
 抓全機 pcap：

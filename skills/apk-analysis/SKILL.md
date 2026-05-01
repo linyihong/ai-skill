@@ -23,15 +23,19 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Check whether system proxy/MITM is actually used.
    - Check Java HTTP hooks only if evidence suggests Java networking.
    - For Flutter apps, inspect Dart AOT/native paths early.
-4. Prefer high-semantic hooks:
+4. Build a UI architecture map when the device/app can be operated:
+   - Capture sanitized screenshots and list visible tabs, drawers, bottom navigation items, routes, and key screens.
+   - Record the exact UI path and action window for each network capture so APIs can be tied back to user operations.
+5. Prefer high-semantic hooks:
    - Request object hooks are better than raw socket hooks.
    - Response interceptor/decode hooks are better than trying to reconstruct TLS bytes.
-5. Convert dynamic results into durable assets:
+6. Convert dynamic results into durable assets:
+   - UI architecture map and operation-to-API matrix.
    - Redacted request/response samples.
    - Offline decoders or fixtures.
    - API/schema docs.
    - Contract tests where the project has an SDK or client implementation.
-6. **Automatic skill feedback (agents)**:
+7. **Automatic skill feedback (agents)**:
    - Whenever you learn a **new reusable** technique, failure pattern, or validation rule during analysis, **write it into this skill in the same session**—do **not** wait for the user to say「記得回饋」.
    - Add **one new Markdown file** under [`feedback_history/`](feedback_history/) using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming + template (generalized, sanitized, with evidence and applicability). Optionally add a row to [`feedback_history/README.md`](feedback_history/README.md).
    - If the lesson is already credible from evidence in this session, also patch [TOOLS.md](TOOLS.md), [WORKFLOW.md](WORKFLOW.md), or [DOCUMENTATION.md](DOCUMENTATION.md) as appropriate; label uncertain items `experimental` in that lesson file instead of promoting prematurely.
@@ -46,7 +50,7 @@ Use [TOOLS.md](TOOLS.md) when preparing an environment or choosing between adb, 
 
 Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing human-readable results.
 
-Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) for **how** to write feedback; put each lesson in [`feedback_history/`](feedback_history/). **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §6** and **Feedback Loop** below.
+Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) for **how** to write feedback; put each lesson in [`feedback_history/`](feedback_history/). **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §7** and **Feedback Loop** below.
 
 Use [`app-security-hardening`](../app-security-hardening/) when analysis findings should become secure app development guidance, PR/release checklists, or validation tests.
 

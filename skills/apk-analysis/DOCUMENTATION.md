@@ -50,6 +50,7 @@
 | pcap | `<path>` | |
 | hook log | `<path>` | |
 | static search | `<path or command>` | |
+| screenshot / UI hierarchy | `<path>` | |
 
 ## Findings
 
@@ -72,6 +73,49 @@
 - User data removed:
 ```
 
+## UI 架構地圖模板
+
+用 screenshot、UI hierarchy 與可重放操作，把 App 的可見架構先寫成地圖。這份文件放專案分析文件，不放 reusable skill，skill 只保留模板與方法。
+
+```markdown
+## App Architecture Map
+
+### Navigation Summary
+
+| Area | Visible label | Entry point | Screenshot | Notes |
+| --- | --- | --- | --- | --- |
+| bottom tab | Home | cold start / bottom nav | `<screenshot-path>` | |
+| bottom tab | Search | bottom nav | `<screenshot-path>` | |
+| drawer/menu | Profile | avatar/menu tap | `<screenshot-path>` | |
+
+### Screen Inventory
+
+| Screen ID | UI path | Screenshot | Key visible elements | State / Preconditions |
+| --- | --- | --- | --- | --- |
+| `home.feed` | `Home` | `<screenshot-path>` | feed list, banner | logged in |
+| `item.detail` | `Home > item tap` | `<screenshot-path>` | title, action buttons | item available |
+
+### Operation To API Matrix
+
+| Operation ID | UI path / action | Capture window | Method / Path | Source | Response shape | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `open-home` | cold start -> Home | `<start-end>` | `GET /<path>` | hook / pcap / MITM | top-level keys only | may include preload/cache |
+| `open-detail` | `Home > item tap` | `<start-end>` | `POST /<path>` | hook | schema-only summary | |
+
+### Unknown / Untested Navigation
+
+- Screen or tab not yet opened:
+- Operation that produced no network:
+- API seen without confirmed UI trigger:
+```
+
+文件要求：
+
+- Screenshot 要去敏；不要保留帳號、頭像、電話、email、訂單、私訊或個資。
+- Capture window 要能對齊 pcap/MITM/Frida log 的時間戳或 sequence id。
+- API 關聯要寫 `Source`，例如 hook、pcap timing、MITM、replay；只靠 screenshot 不足以證明 API 來源。
+- 若某個 API 是 startup/preload/background sync，要在 `Notes` 標明，避免誤判為當前點擊觸發。
+
 ## API / Schema 文件模板
 
 ```markdown
@@ -83,6 +127,9 @@
 | Path | `/path` |
 | Auth | Required / Optional |
 | Source | pcap / MITM / hook / replay |
+| UI path | `Tab > Screen > Action` |
+| Operation ID | `open-home` / `open-detail` |
+| Trigger confidence | high / medium / low |
 
 ### Request
 
