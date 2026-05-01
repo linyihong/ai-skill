@@ -6,6 +6,22 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# 若在 repo 內誤建了「與父資料夾同名」的 symlink（例：`skills/apk-analysis/apk-analysis`），
+# 會指回自己，IDE 會顯示無限巢狀；與 cursor-sync.md / .gitignore 約定相衝，每次同步時順便移除。
+if [[ -L "${REPO_ROOT}/shared-rules/shared-rules" ]]; then
+  echo "Note: removing erroneous symlink ${REPO_ROOT}/shared-rules/shared-rules"
+  rm -f "${REPO_ROOT}/shared-rules/shared-rules"
+fi
+while IFS= read -r -d '' dir; do
+  name="$(basename "${dir}")"
+  nested="${dir%/}/${name}"
+  if [[ -L "${nested}" ]]; then
+    echo "Note: removing erroneous symlink ${nested}"
+    rm -f "${nested}"
+  fi
+done < <(find "${REPO_ROOT}/skills" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null || true)
+
 BUNDLE_SKILLS="${HOME}/.cursor/bundles/ai-skill"
 BUNDLE_RULES="${HOME}/.cursor/bundles/shared-rules"
 CURSOR_SHARED="${HOME}/.cursor/shared-rules"
