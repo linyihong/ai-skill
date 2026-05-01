@@ -10,3 +10,10 @@ Use this directory for mobile-specific guidance.
 | `react-native.md` | React Native bridge, JS bundle exposure, native modules, release checks. |
 
 Cross-platform controls still live in `../../controls/`.
+
+Buildable mobile implementation patterns live in `../../implementation/mobile/`:
+
+- [`android.md`](../../implementation/mobile/android.md)
+- [`ios.md`](../../implementation/mobile/ios.md)
+- [`flutter.md`](../../implementation/mobile/flutter.md)
+- [`react-native.md`](../../implementation/mobile/react-native.md)

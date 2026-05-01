@@ -10,3 +10,5 @@ Use this directory for review checklists. Keep them short enough to run during r
 | `api-security-review.md` | When mobile/web clients depend on API security properties. |
 
 The top-level [`../CHECKLIST.md`](../CHECKLIST.md) is the quick index and release-gate summary.
+
+Checklist items must stay linked to the implementation docs they ask reviewers to verify. When adding a check, update or verify [`../implementation/`](../implementation/) and the relevant control docs in the same change.

@@ -7,4 +7,4 @@ Use this for Android Kotlin/Java implementation details.
 - Prefer platform-backed storage for secrets and avoid custom crypto wrappers unless justified.
 - Treat OkHttp/HTTP client configuration as auditable release behavior.
 
-See [`../platforms/mobile/android.md`](../platforms/mobile/android.md) for Android platform guidance.
+See [`../platforms/mobile/android.md`](../platforms/mobile/android.md) for Android platform guidance and [`../implementation/mobile/android.md`](../implementation/mobile/android.md) for buildable implementation notes.

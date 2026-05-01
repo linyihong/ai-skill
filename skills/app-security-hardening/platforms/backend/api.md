@@ -22,3 +22,6 @@ See also:
 - [`../../controls/api-transport.md`](../../controls/api-transport.md)
 - [`../../controls/auth-session.md`](../../controls/auth-session.md)
 - [`../../controls/anti-tamper-risk.md`](../../controls/anti-tamper-risk.md)
+- [`../../implementation/backend/api-replay-defense.md`](../../implementation/backend/api-replay-defense.md)
+- [`../../implementation/backend/request-signing.md`](../../implementation/backend/request-signing.md)
+- [`../../implementation/backend/token-session.md`](../../implementation/backend/token-session.md)

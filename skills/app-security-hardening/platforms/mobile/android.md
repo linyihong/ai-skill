@@ -22,3 +22,4 @@ See also:
 - [`../../controls/api-transport.md`](../../controls/api-transport.md)
 - [`../../controls/local-storage.md`](../../controls/local-storage.md)
 - [`../../controls/release-build.md`](../../controls/release-build.md)
+- [`../../implementation/mobile/android.md`](../../implementation/mobile/android.md)

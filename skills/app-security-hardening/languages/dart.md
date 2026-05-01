@@ -7,4 +7,4 @@ Use this for Dart and Flutter-specific implementation details.
 - Review packages that touch storage, networking, analytics, crash reporting, or device identifiers.
 - Use release build checks for debug logging, staging endpoints, and symbol handling.
 
-See [`../platforms/mobile/flutter.md`](../platforms/mobile/flutter.md) for Flutter platform guidance.
+See [`../platforms/mobile/flutter.md`](../platforms/mobile/flutter.md) for Flutter platform guidance and [`../implementation/mobile/flutter.md`](../implementation/mobile/flutter.md) for buildable implementation notes.

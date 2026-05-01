@@ -10,6 +10,11 @@ Use this folder when the question is "how do we implement it?" rather than "what
 | `mobile/` | Android, iOS, Flutter, React Native implementation patterns. |
 | `examples/` | Cross-cutting implementation patterns and snippets in pseudocode. |
 
+Start with the sub-indexes:
+
+- [`backend/README.md`](backend/README.md)
+- [`mobile/README.md`](mobile/README.md)
+
 ## Required Linked Updates
 
 Implementation docs are not standalone. Follow [`../../../shared-rules/linked-updates.md`](../../../shared-rules/linked-updates.md). When adding or changing an implementation pattern, you **must** update or verify the linked guidance:
