@@ -159,9 +159,10 @@ response decode hook:
 2. 記錄輸入格式：base64、prefix/salt、ciphertext、version field。
 3. 記錄演算法：KDF、AES mode、padding、MAC、compression。
 4. 用 hook 取得 decrypted output。
-5. 寫離線 decoder。
-6. 建立 raw encrypted -> decrypted fixture。
-7. 用 fixture 驗證 SDK/client mapping。
+5. 若 decrypt return 是 wrapper / Future / Map 而非可直接讀的 String，改 hook `jsonDecode`、`JsonDecoder.convert` 或 app 的 parse/decode helper，先輸出 schema-only 摘要（length/hash/top-level keys/types，不印 values）。
+6. 寫離線 decoder。
+7. 建立 raw encrypted -> decrypted fixture。
+8. 用 fixture 驗證 SDK/client mapping。
 
 離線化完成後，後續不應每次依賴 Frida 才能跑測試。
 

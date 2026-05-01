@@ -129,6 +129,7 @@
 - path shape。
 - query key 名稱。
 - response top-level schema。
+- schema-only JSON 摘要：字串 length/hash、top-level keys、key type；不要保留 value。
 - 已去敏的 fixture。
 - magic bytes、容器格式、演算法步驟。
 
