@@ -22,6 +22,22 @@ For each HTTP API, write project documentation that includes:
 
 Screenshots can support UI trigger attribution, but they do not replace HTTP header/request/response field analysis.
 
+## API Documentation Flow
+
+When an API has been observed or decoded, do not stop at the endpoint name. Document at least:
+
+| Area | Required Notes |
+| --- | --- |
+| Identity | Method, host/path shape, auth conditions, evidence source, UI path if confirmed. |
+| Request headers | Header name, purpose, required/optional, source, sensitivity, token/sign/device/session involvement. |
+| Request query/body | Field type, meaning, required/optional, example shape, sensitivity, signing/encryption participation. |
+| Response headers | Status behavior, content type, cache/rate-limit/session headers; if invisible, state why. |
+| Response wrapper | `status`, `code`, `message`, `data`, `error`, and other outer fields with type and meaning. |
+| Inner payload | Field type, meaning, nullability, list item shape, media/source fields, derived values. |
+| Validation | Replay, fixture, contract test, or hook/pcap/MITM sequence proving request/response alignment. |
+
+If UI binding is not done yet, write `UI path: unknown` and `Trigger confidence: low`; later use screenshots and operation windows to raise confidence.
+
 ## Related Lessons
 
 - `../../feedback_history/2026-05-01_171500-json-shape-before-query-shape.md`

@@ -109,9 +109,7 @@ native backtrace 落在哪裡？
 - response wrapper：status、outer JSON、raw bytes。
 - response decoder / interceptor：解密後 inner JSON。
 - token/session provider：刷新流程、device identity、header provider。
-- local proxy handler：若 App 內有 `ProxyServer` / Netty / loopback server，優先 hook handler 的 `FullHttpRequest` + resolved `URI`，確認本機請求如何映射到上游 API。
-  - 若 `FullHttpRequest` 直接讀不到 method/path，先 cast 到 Netty `HttpRequest` / `FullHttpRequest` interface，再讀 `method/getMethod`、`uri/getUri`，並預設去敏 query。
-  - 若 method/path 已可見但 `headers()` / `content()` 讀不到，可用實際 Java request 物件的 `toString()` 做 fallback；raw output 可能含完整 header，僅放私有 capture，文件只寫去敏結構。
+- local proxy handler：若 App 內有 `ProxyServer` / Netty / loopback server，先轉讀 `techniques/local-proxy/`。
 
 避免一開始就 hook：
 
@@ -121,34 +119,18 @@ native backtrace 落在哪裡？
 
 低層 hook 事件多、容易造成卡頓，也需要自己重組協議。只有在高語意點找不到時才降層。
 
-## 5. Flutter / Dart AOT 常見流程
+## 5. 分類技巧深入
 
-如果 evidence 指向 Flutter：
+當第 3 節已有明確證據後，只讀對應分類：
 
-1. 解 APK，確認 `lib/<arch>/libapp.so` 與 `libflutter.so`。
-2. 用 Dart AOT 分析工具產生 pseudo source、object pool、function offsets；若 `blutter` 識別 snapshot 後 SIGSEGV，改用 `unflutter` 等 static parser 先拿 function map／call edges／string refs。
-3. 搜尋：
-   - host / base URL。
-   - `Dio`、`HttpClient`、`RequestOptions`、`Interceptor`。
-   - `encrypt`、`decrypt`、`AES`、`base64`、`hash`、`ResponseInterceptor`。
-4. 用 Frida hook request options；若已取得 AOT function PC，可用 `libapp.so` base + PC 對少量 `RequestInterceptor`／sign／encrypt/decrypt 函式做 native offset hook。`call_edges` 裡 caller 內部的 `BL` 位址只當導航線索，不要預設可直接 `Interceptor.attach()`。
-5. 用 Frida hook response decode/decrypt return value。
-6. 若 Dart String decoder 失敗，先在私有 capture 限量 hexdump 物件推導 layout（例如 OneByteString raw length/data offset），修好後關閉 hexdump。
-7. 把 raw wrapper + decrypted payload 對齊成 fixture。
+| 分類 | 深入文件 |
+| --- | --- |
+| Flutter / Dart AOT | `techniques/flutter-dart-aot/` |
+| HTTP API 文件化 / UI binding | `techniques/http-api/` |
+| Local proxy / loopback / Netty | `techniques/local-proxy/` |
+| Media / HLS | `techniques/media-hls/` |
 
-避免把全域 Dart runtime/collection helper（例如 `LinkedHashMap._set`、常見 string helper）當第一個 hook 點；這些 helper 高頻且噪音大，可能讓 App 卡頓或提前結束。若一定要觀察內部 helper，先用短窗、嚴格 filter，或改用 Stalker／更高語意邊界驗證。
-
-若 local proxy/Netty hook 已看到自訂加密／簽名 header，但同窗 Java plugin/helper hook（例如 AES/RC2/getNMKey/query map）沒有命中，應把 Java plugin 視為橋接或設定層，轉向 `libapp.so` Dart AOT interceptor 字串、object pool xref、blutter/offset hook；不要在 Java helper 層無限加 hook。
-
-成功特徵：
-
-```text
-request hook:
-  method / baseUrl / path / headers / query
-
-response decode hook:
-  decrypted JSON/string
-```
+若尚未知道分類，不要預讀所有技巧；回到第 2 節補證據。
 
 ## 6. MITM / Proxy 判斷流程
 
@@ -160,7 +142,7 @@ response decode hook:
   是 -> 再看 TLS trust / CA / pinning
 ```
 
-如果需要讓 Flutter/Dart client 進 proxy，常見策略是冷啟動前注入 proxy env 或修改 debug network behavior。驗收不是「代理工具有沒有明文」，而是先看 connect target 是否變成 `<proxy-host>:<proxy-port>`。
+如果需要讓特定 runtime client 進 proxy，先確認該 runtime 是否尊重系統 proxy；runtime-specific 做法放在對應 `techniques/`。
 
 不要把「PC 端代理正在監聽」當成裝置已導流。先記錄裝置 proxy 狀態（例如 global proxy、Wi-Fi proxy、reverse/port forward），再看是否有任何流量進代理；最後才驗證**業務 host** 是否也進同一條 proxy。若代理已收到校時／統計／第三方流量，但 native `getaddrinfo`／pcap 同窗顯示業務 host 直連外部 IP，應判讀為**核心業務路由繞過 PC MITM**，不要直接歸因 pinning。
 
@@ -207,21 +189,7 @@ response decode hook:
 
 離線化完成後，後續不應每次依賴 Frida 才能跑測試。
 
-## 8. API 文件化
-
-當 API 已經可觀測或可解碼時，不要只留下 endpoint 名稱。若是 HTTP/HTTPS 流程，專案文件至少要能說明：
-
-- Method、host/path shape、auth 條件、來源證據與 UI path（若已確認）。
-- Request headers：header 名稱、用途、是否必要、來源、是否由 token/sign/device/session 產生。
-- Request query/body：每個字段的 type、meaning、required、example shape、敏感性、簽章/加密參與情況。
-- Response headers：狀態碼、content-type、cache/rate-limit/session 相關 header；沒有可見 header 時寫明原因。
-- Response wrapper：status/code/message/data/error 等 outer field 的 type 與語意。
-- Decrypted / inner payload：每個字段的 type、meaning、nullable/optional、列表 item shape、media/source 欄位等。
-- Validation：replay、fixture、contract test、或至少用 hook/pcap/MITM 時序證明 request/response 對齊。
-
-若 UI binding 尚未完成，可先把 `UI path` 標為 unknown、`Trigger confidence` 標為 low，等核心 API 文件穩定後再用截圖/操作時間窗補強。截圖是輔助理解操作來源，不取代 header/request/response 的字段分析。
-
-## 9. Session / Token 重新取得
+## 8. Session / Token 重新取得
 
 遇到 token 過期、no token、invalid token，不要先假設有標準 refresh-token。應還原 App 的真實流程：
 
@@ -239,21 +207,7 @@ response decode hook:
 - 遇到 login too frequently，先停止 tight-loop，再分析 server-side bucket 可能維度。
 - 不要在沒有證據時假設旋轉單一欄位可以解限流。
 
-## 10. 媒體 / HLS 分析
-
-影片與音訊資源要分控制面與資料面：
-
-| 層 | 例子 | 文件要記錄 |
-| --- | --- | --- |
-| 詳情 API | 回 title、cover、source path | API path、必要 auth、source field |
-| playlist | HLS `.m3u8` | key URI、segment count、duration、base URL |
-| key | AES key endpoint 或 key file | key 長度、取得條件、是否需要 auth |
-| segments | `.ts` / chunk / signed URL | segment URL 是否短效、query 意義、下載順序 |
-| final media | mp4/mp3/image/webp/gif | 解密、解碼、remux、`ffprobe`/header 驗證 |
-
-不要只看副檔名判斷格式。應用 magic bytes、container probe 或 frame count 驗證。例如 WebP 動圖、靜態 GIF、animated GIF 都要分清楚。
-
-## 11. 分析結束定義
+## 9. 分析結束定義
 
 一次分析可以收斂時，應具備：
 

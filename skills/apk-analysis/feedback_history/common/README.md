@@ -15,3 +15,4 @@ Cross-cutting APK analysis lessons that apply before a runtime/API family is kno
 | `../2026-05-01_101500-doh-dns-query-param-side-channel-from-okhttp-log.md` | validated | DoH 的 `dns=` 參數可作為 MITM 業務 host 空白時的側信道 | Common network side-channel triage. |
 | `../2026-05-01_112900-proxy-config-vs-business-route.md` | validated | Proxy config is not business route proof | Common proxy route proof rule. |
 | `../2026-05-01_174100-technique-category-routing.md` | promoted | Technique category routing | Repo organization/category routing rule. |
+| `2026-05-01_175500-workflow-as-routing-not-technique-dump.md` | promoted | Workflow as routing, not technique dump | Keep `WORKFLOW.md` common and move category details into `techniques/<category>/`. |

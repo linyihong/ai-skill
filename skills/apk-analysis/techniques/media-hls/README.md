@@ -16,6 +16,18 @@ Use this category when the target flow involves video, audio, images, playlists,
 - HLS is not complete until playlist, key/IV if needed, segments, decryption, merge/remux, and playback/container validation are handled.
 - Redact URLs that can directly replay private or paid content.
 
+## Media Chain
+
+| Layer | Example | Document |
+| --- | --- | --- |
+| Detail/control API | title, cover, source path | API path, required auth, source field meaning. |
+| Playlist | HLS `.m3u8` | key URI, segment count, duration, base URL, expiration behavior. |
+| Key | AES key endpoint or key file | key length, retrieval conditions, auth requirement, IV handling. |
+| Segments | `.ts` / chunk / signed URL | URL lifetime, query meaning, download order, sequence gaps. |
+| Final media | mp4/mp3/image/webp/gif | decryption, decode, remux, `ffprobe`/header validation. |
+
+Use magic bytes, container probes, or frame counts to distinguish static image, animated WebP/GIF, audio, and video containers.
+
 ## Related Lessons
 
 - `../../feedback_history/2026-04-30_120007-媒體播放鏈要分控制面-金鑰與資料面.md`

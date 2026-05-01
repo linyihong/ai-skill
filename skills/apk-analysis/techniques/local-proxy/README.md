@@ -17,6 +17,19 @@ Use this category when app traffic first goes through a local loopback bridge, l
 - For Netty requests, cast to `HttpRequest` / `FullHttpRequest` before reading method/URI.
 - If headers/body accessors fail, use `toString()` only for private capture; public docs should keep header names and structure, not raw values.
 
+## Handler Hook Flow
+
+1. Confirm loopback evidence with pcap/logcat/MITM timing, such as `127.0.0.1:<port>`, `ProxyServer`, or Netty handler logs.
+2. Identify handler methods and request object types rather than adding broad socket hooks.
+3. Hook the handler argument that represents the local request, such as `FullHttpRequest` plus any resolved `URI` argument.
+4. If `FullHttpRequest` does not expose method/path directly in Frida, cast to `io.netty.handler.codec.http.HttpRequest` or `FullHttpRequest`, then read `method/getMethod` and `uri/getUri`.
+5. Redact query values by default; keep path shape, method, and header names.
+6. If method/path are visible but `headers()` or `content()` fail, call the actual Java request object's `toString()` only in private capture. Public docs should summarize structure and `content-length`, not raw sensitive values.
+
+## Attribution
+
+Use local proxy metadata to map local UI/client calls to upstream APIs. If the upstream request is built by Flutter/Dart after the local handler, route into `../flutter-dart-aot/` only after evidence points there.
+
 ## Related Lessons
 
 - `../../feedback_history/2026-04-30_120010-本機-loopback-proxyserver-轉發會讓-wi-fi-http-mitm-看不到業務-connect.md`
