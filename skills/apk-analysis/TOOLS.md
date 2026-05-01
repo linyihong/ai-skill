@@ -46,6 +46,8 @@
 | 現象 | 可能原因 | 下一步 |
 | --- | --- | --- |
 | Proxyman 沒有核心 API | client 不走系統代理、attach 太晚、流程沒觸發。 | pcap 確認 host；用 cold-start injection 或高語意 hook。 |
+| PC 代理正在監聽但完全沒流量 | 裝置未設 proxy、`adb reverse`/port forward 未建立、Wi-Fi/global proxy 狀態與預期不符。 | 先查裝置 proxy 狀態與 reverse，再冷啟動做短窗驗證。 |
+| MITM 有校時／三方流量但沒有業務 host | 只有部分 stack 尊重系統代理；業務可能走 Dart/native/local proxy/TUN 類路由。 | 同窗跑 native `getaddrinfo`/`connect` 或 pcap/SNI；分開記錄「proxy 可用」與「業務是否進 proxy」。 |
 | 有 CONNECT 但 SSL handshake failed | CA 不被信任、Android user CA 不生效、custom trust、pinning。 | 先 pass-through 保 App 可用；再處理 CA/system trust/pinning。 |
 | Java hook 沒命中 | 流量不在 Java HTTP stack。 | native connect trace；查 Flutter/Cronet/native client。 |
 | Frida 只有 banner 沒輸出 | hook 未命中、script 沒載入、sandbox/權限、attach 時機錯。 | 最小 hook 測試；spawn；降低 hook 數量。 |

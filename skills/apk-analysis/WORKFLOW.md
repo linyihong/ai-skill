@@ -114,6 +114,8 @@ response decode hook:
 
 如果需要讓 Flutter/Dart client 進 proxy，常見策略是冷啟動前注入 proxy env 或修改 debug network behavior。驗收不是「代理工具有沒有明文」，而是先看 connect target 是否變成 `<proxy-host>:<proxy-port>`。
 
+不要把「PC 端代理正在監聽」當成裝置已導流。先記錄裝置 proxy 狀態（例如 global proxy、Wi-Fi proxy、reverse/port forward），再看是否有任何流量進代理；最後才驗證**業務 host** 是否也進同一條 proxy。若代理已收到校時／統計／第三方流量，但 native `getaddrinfo`／pcap 同窗顯示業務 host 直連外部 IP，應判讀為**核心業務路由繞過 PC MITM**，不要直接歸因 pinning。
+
 如果代理工具顯示 `SSL Handshake Failed`：
 
 - 導流可能已成功。
