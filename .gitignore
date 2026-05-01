@@ -1,0 +1,3 @@
+# 勿在 repo 內對 ~/.cursor 做「反向」連結：會與 bundles 指回 repo 形成循環，IDE 會像無限巢狀。
+shared-rules/shared-rules
+skills/apk-analysis/apk-analysis

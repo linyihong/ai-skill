@@ -34,7 +34,9 @@ Cursor 會掃描特定路徑下的 skill；把中央庫 **`skills/apk-analysis/`
 | `<PROJECT_ROOT>/.cursor/skills/apk-analysis/` | **專案內**：只有這個 repo 開工作區時也會載入；可進業務專案 git（若以複製方式放入，要記得與中央庫同步策略）。 |
 | `~/.cursor/skills/apk-analysis/` | **本機共用**：所有專案共用一份，不必每個專案複製；適合單人固定一台機器開發。 |
 
-**資料從哪來：**從中央庫的 **`skills/apk-analysis/`** **整包複製**過去，或對該目錄做 **symbolic link** 指到 `<AI_SKILL_REPO>/skills/apk-analysis`。另請依 [`shared-rules/cursor-sync.md`](shared-rules/cursor-sync.md) 把 **`shared-rules/`** 複製到例如 `<PROJECT_ROOT>/.cursor/shared-rules/`（與 `.cursor/skills/` 並列），Agent 才讀得到分類後的共用規則。
+**本機若想「共用規則與 skill 都放在 `bundles/`」**（與 `~/.cursor` 其他內容分流）：用 **`~/.cursor/bundles/shared-rules`**（連到本庫 `shared-rules/`）與 **`~/.cursor/bundles/ai-skill/`**（各 skill），再讓 `~/.cursor/shared-rules`、`~/.cursor/skills/*` 指向上述路徑；本庫提供 **`scripts/sync-cursor-bundle.sh`**（見 [`scripts/README.md`](scripts/README.md) 與 [`shared-rules/cursor-sync.md`](shared-rules/cursor-sync.md)）。
+
+**資料從哪來：**從中央庫的 **`skills/apk-analysis/`** **整包複製**過去，或對該目錄做 **symbolic link** 指到 `<AI_SKILL_REPO>/skills/apk-analysis`。另請依 [`shared-rules/cursor-sync.md`](shared-rules/cursor-sync.md) 把 **`shared-rules/`** 一併部署（專案內可放 `<PROJECT_ROOT>/.cursor/shared-rules/`；本機建議搭配 bundle 腳本），Agent 才讀得到分類後的共用規則。
 
 若**只複製部分 skill 檔案**，仍須帶上 **`SKILL.md`** 並另外同步 **`shared-rules/`**（至少含索引與 [`feedback-lessons.md`](shared-rules/feedback-lessons.md)），否則缺共用底線。
 

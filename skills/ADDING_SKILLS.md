@@ -69,12 +69,28 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 
 ## 6. 同步到本機 `~/.cursor`（可選）
 
-與 [`shared-rules/cursor-sync.md`](../shared-rules/cursor-sync.md) 相同精神：
+與 [`shared-rules/cursor-sync.md`](../shared-rules/cursor-sync.md) 相同精神：**`shared-rules/`** 與各 **skill** 要成對出現。
 
-1. **`shared-rules/`** → `~/.cursor/shared-rules`（複製或 symlink）
-2. **`skills/<name>/`** → `~/.cursor/skills/<name>/`（複製或 symlink）
+### 建議（共用資產放在 `bundles/` 並列）：`bundles/shared-rules` + `bundles/ai-skill`
 
-範例（**symlink**，改路徑為你的 clone 位置）：
+避免 `~/.cursor` 底下其他規則或工具與這套資產混在一起，本機優先使用：
+
+- **`~/.cursor/bundles/shared-rules`** → 本庫 **`shared-rules/`**（單一 symlink）
+- **`~/.cursor/bundles/ai-skill/<skill>/`** → 本庫 **`skills/<skill>/`**（每個 skill 一個 symlink）
+- **`~/.cursor/shared-rules`** → `bundles/shared-rules`
+- **`~/.cursor/skills/<skill>`** → `bundles/ai-skill/<skill>`
+
+一鍵同步（在本庫根目錄）：
+
+```bash
+./scripts/sync-cursor-bundle.sh
+```
+
+腳本會掃描 `skills/` 下含 **`SKILL.md`** 的目錄（略過 `_template`）。若 **`~/.cursor/shared-rules`** 已是「真實資料夾」而非 symlink，腳本會先**移到** `*.bak.<隨機>` 再建立連結。
+
+### 簡易做法（直接連到 repo）
+
+仍可直接連到 clone（較短，但與「bundle 隔離」精神不同）：
 
 ```bash
 ln -sf "${AI_SKILL_REPO}/shared-rules" "${HOME}/.cursor/shared-rules"
