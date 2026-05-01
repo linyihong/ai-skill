@@ -36,8 +36,10 @@ Use this skill when APK analysis, mobile API review, or app development work rev
    - Core security control: `controls/`.
    - Platform/app type detail: `platforms/`.
    - Language/runtime-specific trap: `languages/`.
+   - Concrete implementation pattern: `implementation/`.
    - Repeatable review step: `checklists/`.
-6. If the lesson is reusable but not yet mature, add it to `feedback_history/` first; promote it into the structured folders when validated.
+6. Apply required linked updates: when a control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
+7. If the lesson is reusable but not yet mature, add it to `feedback_history/` first; promote it into the structured folders when validated.
 
 ## Default Workflow
 
@@ -49,6 +51,8 @@ Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing reusable security guidance
 
 Use [`controls/`](controls/) as the primary home for cross-platform guidance, then link to [`platforms/`](platforms/) or [`languages/`](languages/) for implementation details.
 
+Use [`implementation/`](implementation/) when the user asks how to build or implement a hardening control.
+
 ## Output Style
 
 When producing hardening guidance, include:
@@ -56,7 +60,9 @@ When producing hardening guidance, include:
 - Observed risk or failure mode.
 - Why it matters for app development.
 - Recommended control and the layer that owns it.
+- Implementation path or linked implementation doc, when applicable.
 - Validation method.
+- Required linked updates, if the change affects multiple folders.
 - What not to overclaim.
 
 ## Feedback Loop
@@ -66,6 +72,7 @@ If a reusable app-security lesson emerges:
 1. Create `feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md` using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md).
 2. Generalize the lesson so it is not tied to one APK or company.
 3. Include evidence and validation criteria, but redact secrets and target-specific details.
-4. Promote validated guidance into `controls/`, `platforms/`, `languages/`, `checklists/`, `WORKFLOW.md`, `CHECKLIST.md`, or `DOCUMENTATION.md` as appropriate.
+4. Promote validated guidance into `controls/`, `platforms/`, `languages/`, `implementation/`, `checklists/`, `WORKFLOW.md`, `CHECKLIST.md`, or `DOCUMENTATION.md` as appropriate.
+5. If the promotion creates linked updates, those updates are mandatory; do not leave related docs stale.
 
 **Cross-skill link:** if the lesson came from APK analysis, keep analysis mechanics in [`apk-analysis`](../apk-analysis/) and put development hardening guidance here.

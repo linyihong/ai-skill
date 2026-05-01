@@ -9,6 +9,8 @@ For focused checklists, use:
 - [`checklists/mobile-release-review.md`](checklists/mobile-release-review.md)
 - [`checklists/api-security-review.md`](checklists/api-security-review.md)
 
+When a checklist item changes because of a new control or implementation pattern, the linked `controls/` and `implementation/` docs must be updated or explicitly verified in the same change.
+
 ## API And Transport
 
 - Sensitive flows use HTTPS only; cleartext traffic is disabled in release builds.

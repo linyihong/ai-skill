@@ -37,6 +37,7 @@ What this does not solve.
 | Cross-platform security principle | `controls/`. |
 | Platform or app-type implementation detail | `platforms/`. |
 | Language/runtime-specific pitfall | `languages/`. |
+| Concrete buildable implementation pattern | `implementation/`. |
 | Repeatable review process | `checklists/`. |
 | Reusable development principle not yet promoted | `feedback_history/`. |
 | APK analysis method or hook technique | [`apk-analysis`](../apk-analysis/). |
@@ -44,6 +45,20 @@ What this does not solve.
 | Shared sanitization or feedback rules | [`shared-rules`](../../shared-rules/README.md). |
 
 Use [`templates/hardening-note.md`](templates/hardening-note.md) for reusable guidance and [`templates/threat-model-lite.md`](templates/threat-model-lite.md) for quick feature reviews.
+
+## Required Linked Update Statement
+
+Every reusable note that affects multiple folders must include a short linked-update statement:
+
+```markdown
+#### Required Linked Updates
+
+- `controls/...`: updated or checked because ...
+- `implementation/...`: updated or checked because ...
+- `checklists/...`: updated or checked because ...
+```
+
+If linked updates are not needed, state why. This makes it clear that related docs are required to stay in sync, not optional follow-ups.
 
 ## Good Guidance
 

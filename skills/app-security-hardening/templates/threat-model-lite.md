@@ -29,6 +29,16 @@ Use this for quick feature reviews.
 | Risk | Control | Owner | Validation |
 | --- | --- | --- | --- |
 
+## Required Linked Updates
+
+- Controls:
+- Implementation:
+- Platforms:
+- Languages:
+- Checklists:
+
+If any linked update is not needed, explain why.
+
 ## Residual Risk
 
 - Known limitations:

@@ -26,6 +26,16 @@ client | API | backend | build | monitoring | product/security
 
 How to prove the guidance is implemented or fails safely.
 
+## Required Linked Updates
+
+- `controls/...`: updated or checked because ...
+- `implementation/...`: updated or checked because ...
+- `platforms/...`: updated or checked because ...
+- `languages/...`: updated or checked because ...
+- `checklists/...`: updated or checked because ...
+
+If a linked update is not needed, state why.
+
 ## Limits
 
 What this guidance does not solve.

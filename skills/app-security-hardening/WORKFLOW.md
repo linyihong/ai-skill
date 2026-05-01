@@ -67,13 +67,29 @@ Classify the outcome before writing docs:
 | Security property that applies across stacks | `controls/` |
 | Mobile, web, backend, or OS-specific implementation | `platforms/` |
 | Dart, Kotlin/Java, Swift, TypeScript, or runtime-specific pitfalls | `languages/` |
+| Concrete buildable pattern or how-to | `implementation/` |
 | A repeated design, PR, release, or API review step | `checklists/` |
 | A reusable but still emerging lesson | `feedback_history/` |
 | A copyable documentation shape | `templates/` |
 
 Prefer linking between folders over duplicating the same guidance.
 
-## 6. Validate
+## 6. Apply Required Linked Updates
+
+Before finishing a change, check whether the update affects related folders. If yes, those linked updates are **required** in the same change:
+
+| Changed area | Must update or verify |
+| --- | --- |
+| `controls/` | Relevant `implementation/`, `platforms/`, `languages/`, and `checklists/` docs. |
+| `implementation/` | Relevant `controls/`, `platforms/`, `languages/`, and `checklists/` docs. |
+| `platforms/` | Relevant `controls/`, `implementation/`, language notes, and checklists. |
+| `languages/` | Relevant platform and implementation docs. |
+| `checklists/` | Relevant controls and implementation docs. |
+| `templates/` | `DOCUMENTATION.md` and any docs that instruct users to copy the template. |
+
+If no linked update is needed, state why. Do not call linked updates optional when they are required for consistency.
+
+## 7. Validate
 
 Use at least one validation method:
 
@@ -83,7 +99,7 @@ Use at least one validation method:
 - Manual review with evidence.
 - Runtime or backend telemetry query.
 
-## 7. Feed Back Reusable Lessons
+## 8. Feed Back Reusable Lessons
 
 If a lesson generalizes beyond one product:
 

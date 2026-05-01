@@ -45,6 +45,7 @@ Capture practical guidance for:
 | `platforms/` | Platform or app-type implementation guidance such as mobile, web, and backend API. |
 | `languages/` | Language/runtime-specific pitfalls only. |
 | `checklists/` | Focused design, PR, release, and API review checklists. |
+| `implementation/` | Concrete implementation patterns for backend and mobile teams. |
 | `templates/` | Copyable templates for hardening notes and lightweight threat models. |
 | `FEEDBACK.md` | Short entry pointing to shared feedback rules. |
 | `feedback_history/` | One reusable lesson per Markdown file. |
@@ -56,10 +57,23 @@ When adding new guidance:
 1. Put the core security property in [`controls/`](controls/) first.
 2. Add platform details in [`platforms/`](platforms/) only when the implementation differs by app type or OS.
 3. Add language notes in [`languages/`](languages/) only for language/runtime-specific traps.
-4. Put repeatable review steps in [`checklists/`](checklists/).
-5. Put draft reusable lessons in [`feedback_history/`](feedback_history/) before promoting them into the structured folders.
+4. Put concrete implementation patterns in [`implementation/`](implementation/) when engineers need buildable steps.
+5. Put repeatable review steps in [`checklists/`](checklists/).
+6. Put draft reusable lessons in [`feedback_history/`](feedback_history/) before promoting them into the structured folders.
 
 This keeps the skill readable as it grows across mobile, web, backend, and future app types.
+
+## Required Linked Updates
+
+Some changes must move together. If a change touches a control, platform, language, checklist, implementation pattern, or template, the related files **must** be updated or explicitly checked in the same change.
+
+Examples:
+
+- New replay-defense implementation -> update or verify `controls/api-transport.md`, `platforms/backend/api.md`, and `checklists/api-security-review.md`.
+- New Flutter storage implementation -> update or verify `platforms/mobile/flutter.md`, `languages/dart.md`, `controls/local-storage.md`, and the relevant checklist.
+- New review checklist item -> update or verify the matching `controls/` and `implementation/` docs.
+
+Do not describe these updates as optional. If they are relevant, they are required.
 
 ## Minimum Useful Output
 
