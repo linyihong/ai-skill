@@ -72,6 +72,7 @@ ln -sf "${REPO_ROOT}/shared-rules" "${BUNDLE_RULES}"
 rm -f "${CURSOR_SHARED}"
 ln -sf "${BUNDLE_RULES}" "${CURSOR_SHARED}"
 
+synced_skills=()
 while IFS= read -r -d '' dir; do
   name="$(basename "${dir}")"
   case "${name}" in _template) continue ;; esac
@@ -81,6 +82,7 @@ while IFS= read -r -d '' dir; do
   ln -sf "${dir}" "${BUNDLE_SKILLS}/${name}"
   rm -f "${HOME}/.cursor/skills/${name}"
   ln -sf "${BUNDLE_SKILLS}/${name}" "${HOME}/.cursor/skills/${name}"
+  synced_skills+=("${name}")
 done < <(find -P "${REPO_ROOT}/skills" -mindepth 1 -maxdepth 1 -type d -print0)
 
 _strip_repo_loop_symlinks
@@ -88,6 +90,9 @@ _strip_repo_loop_symlinks
 echo "Synced bundles:"
 echo "  ${BUNDLE_RULES} -> ${REPO_ROOT}/shared-rules"
 echo "  ${CURSOR_SHARED} -> ${BUNDLE_RULES}"
-echo "  ${BUNDLE_SKILLS}/<name>/ -> ${REPO_ROOT}/skills/<name>/"
-echo "  ~/.cursor/skills/<name> -> ${BUNDLE_SKILLS}/<name>"
+echo "  Skills (${#synced_skills[@]}):"
+for name in "${synced_skills[@]}"; do
+  echo "    ${BUNDLE_SKILLS}/${name} -> ${REPO_ROOT}/skills/${name}"
+  echo "    ${HOME}/.cursor/skills/${name} -> ${BUNDLE_SKILLS}/${name}"
+done
 echo "Reload Cursor (Developer: Reload Window) if skills do not refresh."
