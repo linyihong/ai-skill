@@ -86,15 +86,15 @@ native backtrace 落在哪裡？
 如果 evidence 指向 Flutter：
 
 1. 解 APK，確認 `lib/<arch>/libapp.so` 與 `libflutter.so`。
-2. 用 Dart AOT 分析工具產生 pseudo source、object pool、function offsets。
+2. 用 Dart AOT 分析工具產生 pseudo source、object pool、function offsets；若 `blutter` 識別 snapshot 後 SIGSEGV，改用 `unflutter` 等 static parser 先拿 function map／call edges／string refs。
 3. 搜尋：
    - host / base URL。
    - `Dio`、`HttpClient`、`RequestOptions`、`Interceptor`。
    - `encrypt`、`decrypt`、`AES`、`base64`、`hash`、`ResponseInterceptor`。
-   - 自訂 header 名稱、`sign metadata`、`sign result`、`package:<app>/...interceptor...dart` 與 `_generate...@<hash>` 類函式名。
-4. 用 Frida hook request options。
+4. 用 Frida hook request options；若已取得 AOT function PC，可用 `libapp.so` base + PC 對少量 `RequestInterceptor`／sign／encrypt/decrypt 函式做 native offset hook。
 5. 用 Frida hook response decode/decrypt return value。
-6. 把 raw wrapper + decrypted payload 對齊成 fixture。
+6. 若 Dart String decoder 失敗，先在私有 capture 限量 hexdump 物件推導 layout（例如 OneByteString raw length/data offset），修好後關閉 hexdump。
+7. 把 raw wrapper + decrypted payload 對齊成 fixture。
 
 若 local proxy/Netty hook 已看到自訂加密／簽名 header，但同窗 Java plugin/helper hook（例如 AES/RC2/getNMKey/query map）沒有命中，應把 Java plugin 視為橋接或設定層，轉向 `libapp.so` Dart AOT interceptor 字串、object pool xref、blutter/offset hook；不要在 Java helper 層無限加 hook。
 

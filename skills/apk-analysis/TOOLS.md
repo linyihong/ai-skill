@@ -27,7 +27,8 @@
 
 | 工具 | 用途 | 注意 |
 | --- | --- | --- |
-| blutter | 分析 Flutter AOT `libapp.so`，產生 pseudo source、object pool、offset、Frida decoder。 | 對 Flutter release APK 很有用。 |
+| blutter | 分析 Flutter AOT `libapp.so`，產生 pseudo source、object pool、offset、Frida decoder。 | 對 Flutter release APK 很有用；若可識別 Dart 版本但 SIGSEGV，保留失敗證據後改用替代 parser。 |
+| unflutter | 不嵌入 Dart VM 的 Flutter/Dart AOT static parser，輸出 function map、call edges、string refs、metadata。 | 適合 `blutter` crash 或需要快速取得 function PC 以做 Frida native offset hook。 |
 | reFlutter 類工具 | 改 Flutter engine / dump dart traffic 的路線。 | 侵入性較高，需評估是否符合授權範圍。 |
 | IDA / Ghidra / radare2 | native disassembly、function offset、xref。 | 用於補足自動工具看不到的邏輯。 |
 
@@ -64,6 +65,8 @@
 | `aapt dump badging` 沒有 `launchable-activity` | manifest 較複雜或工具輸出差異。 | 裝置已安裝該 App 時用 `cmd package resolve-activity --brief`；僅有 APK 時用 `aapt dump xmltree` / apktool。 |
 | Wi‑Fi 代理 MITM 幾乎沒有業務流量，但全機 pcap 仍有 TLS／App 功能正常 | **內建 TUN／sing-box／embedded VPN** 等可能繞過系統 HTTP 代理。 | 字串搜 `singbox`/`MethodChannel`；改看 **pcap SNI**／**Frida hook 高語意 client**；不要先歸因 pinning。 |
 | Wi‑Fi MITM 空，但 **logcat** 有 **`ProxyServer`**／對 **`127.0.0.1:<port>`** 轉發至 `https://<api-host>` | **本機 loopback 中介**先於對外連線。 | `adb logcat` 搜尋 `ProxyServer`／handler；勿將含標頭的原始 log 提交公開 repo。 |
+| `blutter` 能偵測 Dart version/snapshot，但 full 或 `--no-analysis` SIGSEGV | Dart VM introspection 路線對該 snapshot/tool 版本不穩。 | 改用 `unflutter` 等 static parser 產生 `functions.jsonl`/`call_edges.jsonl`/`string_refs.jsonl`；再 hook 少量高語意 Dart function PC。 |
+| Dart AOT offset hook 命中，但 Dart String 解碼全是空或亂碼 | String layout 假設錯，尤其 Dart 3.x compressed pointer OneByteString 可能使用 raw byte length + inline bytes。 | 私有 capture 中限量 hexdump 物件，驗證 length/data offset；常見候選包含 untagged `+0x08` raw length、`+0x10` data；修好 decoder 後關閉 hexdump。 |
 
 ## 命令模板
 
