@@ -101,3 +101,5 @@ If analysis discovers a new reusable idea:
 Do not silently overwrite prior lesson files. Add new files or add a short deprecation note in an older file pointing to the replacement.
 
 **Agent checklist before ending an APK-analysis task:** Did any **new generalized lesson** emerge? If yes → **`feedback_history/`** has a new file (minimum); optional promotion to `TOOLS.md` / `WORKFLOW.md` / `DOCUMENTATION.md` when justified. If nothing new → no forced entry.
+
+**Git（本 repository）：**若在**同一工作區**修改了 `<AI_SKILL_REPO>` 底下的 `skills/apk-analysis/`、`shared-rules/` 等（含新建 `feedback_history/` 檔），**除非使用者明講不要提交**，否則在結束任務前應於 `<AI_SKILL_REPO>` 根目錄執行 `git status`，將相關變更 **`git add` → `git commit`**（訊息清楚）→ **`git push`**；需要權限時應向使用者申請（例如 git_write／網路）。僅「Reload Window」或重讀 skill **不會**自動完成這一步。
