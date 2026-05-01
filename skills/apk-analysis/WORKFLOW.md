@@ -69,6 +69,7 @@ native backtrace 落在哪裡？
 - response wrapper：status、outer JSON、raw bytes。
 - response decoder / interceptor：解密後 inner JSON。
 - token/session provider：刷新流程、device identity、header provider。
+- local proxy handler：若 App 內有 `ProxyServer` / Netty / loopback server，優先 hook handler 的 `FullHttpRequest` + resolved `URI`，確認本機請求如何映射到上游 API。
 
 避免一開始就 hook：
 
