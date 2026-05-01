@@ -6,3 +6,4 @@ Follow [`shared-rules/feedback-lessons.md`](../../../shared-rules/feedback-lesso
 
 | File | Status | Topic | Summary |
 | --- | --- | --- | --- |
+| `2026-05-01_142100-client-encrypted-header-not-boundary.md` | promoted | Client encrypted header is not a security boundary | Client-side encrypted or signed headers are recoverable from shipped apps; backend authorization, replay protection, token hygiene, and monitoring must provide the real boundary. |
