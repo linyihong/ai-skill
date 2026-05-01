@@ -91,9 +91,12 @@ native backtrace 落在哪裡？
    - host / base URL。
    - `Dio`、`HttpClient`、`RequestOptions`、`Interceptor`。
    - `encrypt`、`decrypt`、`AES`、`base64`、`hash`、`ResponseInterceptor`。
+   - 自訂 header 名稱、`sign metadata`、`sign result`、`package:<app>/...interceptor...dart` 與 `_generate...@<hash>` 類函式名。
 4. 用 Frida hook request options。
 5. 用 Frida hook response decode/decrypt return value。
 6. 把 raw wrapper + decrypted payload 對齊成 fixture。
+
+若 local proxy/Netty hook 已看到自訂加密／簽名 header，但同窗 Java plugin/helper hook（例如 AES/RC2/getNMKey/query map）沒有命中，應把 Java plugin 視為橋接或設定層，轉向 `libapp.so` Dart AOT interceptor 字串、object pool xref、blutter/offset hook；不要在 Java helper 層無限加 hook。
 
 成功特徵：
 
