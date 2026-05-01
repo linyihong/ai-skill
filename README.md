@@ -11,11 +11,12 @@
 | Skill | 用途 |
 | --- | --- |
 | `skills/apk-analysis/` | 授權 APK 流量分析、動態抓包、Flutter/Dart AOT、response 解碼、文件化與 `feedback_history/` 技巧條目。 |
+| `skills/app-security-hardening/` | 將 APK／行動 App 分析得到的通用攻防觀察，轉成未來開發自家 App 可用的安全設計、檢查清單與驗證方法。 |
 
 **目錄約定：**  
-- **`skills/`**：各 skill 技巧包（目前為 `apk-analysis/`）；之後新增 skill 放在 `skills/<name>/`，步驟見 [`skills/ADDING_SKILLS.md`](skills/ADDING_SKILLS.md)。  
+- **`skills/`**：各 skill 技巧包；之後新增 skill 放在 `skills/<name>/`，步驟見 [`skills/ADDING_SKILLS.md`](skills/ADDING_SKILLS.md)。  
 - **`shared-rules/`**：**共用規則**（依主題分檔：授權、去敏、內容分層、**feedback 檔名／模板／agent 行為**、Cursor 同步等）；索引為 [`shared-rules/README.md`](shared-rules/README.md)，feedback 流程與模板集中在 [`feedback-lessons.md`](shared-rules/feedback-lessons.md)。各 skill 目錄下 **`FEEDBACK.md`** 若存在，僅為**一行入口**，不必重複維護正文。  
-- **每一則 `feedback_history`**：**不要**重複貼上共用規則全文，頂部引用 `shared-rules/` 即可。**同步到 `.cursor`** 時：先複製 **`shared-rules/`** 整包，再同步 **`skills/apk-analysis/`**（見 [`shared-rules/cursor-sync.md`](shared-rules/cursor-sync.md)）。
+- **每一則 `feedback_history`**：**不要**重複貼上共用規則全文，頂部引用 `shared-rules/` 即可。**同步到 `.cursor`** 時：先複製 **`shared-rules/`** 整包，再同步需要的 **`skills/<name>/`**（見 [`shared-rules/cursor-sync.md`](shared-rules/cursor-sync.md)）。
 
 ## 新專案啟用 apk-analysis（Cursor）
 

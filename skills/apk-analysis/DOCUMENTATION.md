@@ -158,6 +158,20 @@
 Java OkHttp hook installed successfully, but no target host/path appeared while pcap showed TLS traffic to the API host. This rules out the Java OkHttp path for the tested flow and shifts the next step to native/Flutter analysis.
 ```
 
+## Developer Hardening Notes（可選）
+
+若分析結果能轉成「未來開發自家 App 時應採取的安全做法」，可在專案分析文件加一小節：
+
+```markdown
+## Developer Hardening Notes
+
+| Observation | Development Guidance | Owner | Validation |
+| --- | --- | --- | --- |
+| 已去敏觀察 | 可重用的安全建議 | client / API / backend / build / monitoring | 測試或 review 方法 |
+```
+
+這一節只寫已去敏、可泛化的開發啟發。成熟後把開發防護 guidance 回饋到 [`app-security-hardening`](../app-security-hardening/)；本 `apk-analysis` skill 只保留分析方法、證據鏈與工具判斷。
+
 ## 技巧回饋文件要給人讀
 
 寫入 **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**（規則與模板見 [`../../shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)）時，請避免只有工具名與短結論。每條技巧都應包含：
@@ -194,3 +208,4 @@ Agent Action:
 - 解碼規則回填協議/解密文件。
 - SDK 或 client 行為回填 BDD / tests。
 - 通用技巧回填 **`feedback_history/`**（新檔），驗證後再整理到本 skill 的主文件。
+- 開發防護建議回填 [`app-security-hardening`](../app-security-hardening/)；不要把產品安全 checklist 長期堆在 `apk-analysis`。

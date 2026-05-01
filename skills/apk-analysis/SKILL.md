@@ -35,6 +35,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Whenever you learn a **new reusable** technique, failure pattern, or validation rule during analysis, **write it into this skill in the same session**—do **not** wait for the user to say「記得回饋」.
    - Add **one new Markdown file** under [`feedback_history/`](feedback_history/) using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming + template (generalized, sanitized, with evidence and applicability). Optionally add a row to [`feedback_history/README.md`](feedback_history/README.md).
    - If the lesson is already credible from evidence in this session, also patch [TOOLS.md](TOOLS.md), [WORKFLOW.md](WORKFLOW.md), or [DOCUMENTATION.md](DOCUMENTATION.md) as appropriate; label uncertain items `experimental` in that lesson file instead of promoting prematurely.
+   - If the reusable lesson is about how to build **your own future apps** more safely, write the development guidance in [`app-security-hardening`](../app-security-hardening/) and keep only the APK-analysis method here.
    - Target-specific hosts, endpoints, tokens, or one-off product conclusions stay in the **project** docs, not in reusable skill files.
 
 ## Default Workflow
@@ -46,6 +47,8 @@ Use [TOOLS.md](TOOLS.md) when preparing an environment or choosing between adb, 
 Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing human-readable results.
 
 Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) for **how** to write feedback; put each lesson in [`feedback_history/`](feedback_history/). **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §6** and **Feedback Loop** below.
+
+Use [`app-security-hardening`](../app-security-hardening/) when analysis findings should become secure app development guidance, PR/release checklists, or validation tests.
 
 Use [RUNBOOK.md](RUNBOOK.md) when starting a new APK project or when the user asks how to apply this skill to another product.
 

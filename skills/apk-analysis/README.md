@@ -56,6 +56,7 @@
 2. 把可重用方法寫成 **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**（規則見 [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)）。
 3. 如果方法已驗證，整理進 `WORKFLOW.md` 或 `TOOLS.md`。
 4. 若專案有 SDK 或 client，將解碼規則補成 fixture / contract test。
+5. 若得到的是「未來開發自家 App 時可用的安全防護」而非分析方法，寫入 [`app-security-hardening`](../app-security-hardening/)；本包只保留分析證據與方法。
 
 ## 核心原則
 
@@ -65,6 +66,7 @@
 - 低層 socket / TLS hook 只作補證據或最後手段。
 - 動態 hook 只是過渡；最終要沉澱成離線解碼器、fixture、schema 與測試。
 - 文件要分離「方法」與「目標 App 的結論」。
+- 安全開發建議要分離到 [`app-security-hardening`](../app-security-hardening/)，避免把分析方法與產品防護 checklist 混在一起。
 - 新發現要回饋到 skill，但必須去敏、泛化、可驗證。
 
 ## 最小產出
@@ -77,3 +79,4 @@
 - 結論：哪些路徑有效、哪些被排除、下一步如何驗證。
 - 去敏規則：哪些值被遮蔽，哪些文件不能提交。
 - 可重用 lesson：新增檔於 **`feedback_history/`**。
+- 可選的 Developer Hardening Notes：若對自家 App 開發有安全啟發，連到或回饋至 **`app-security-hardening/`**。
