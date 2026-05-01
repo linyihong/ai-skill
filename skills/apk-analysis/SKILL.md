@@ -23,21 +23,25 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Check whether system proxy/MITM is actually used.
    - Check Java HTTP hooks only if evidence suggests Java networking.
    - For Flutter apps, inspect Dart AOT/native paths early.
-4. Build a UI architecture map when the device/app can be operated:
+4. Route into a technique category only after evidence points there:
+   - Use [`techniques/`](techniques/) as the category index.
+   - Do not read every category by default; Flutter/Dart, local proxy, media, and HTTP API docs are separate routes.
+   - If the APK type is still unknown, stay in the common workflow until traffic/runtime evidence narrows it.
+5. Build a UI architecture map when the device/app can be operated:
    - Start lightweight: capture only enough sanitized screenshots/UI hierarchy to understand major tabs, drawers, routes, and key screens.
    - Adapt the order if screenshots or device control make the app slow: solve core API/decode first, then bind important APIs back to UI actions.
    - Record the exact UI path and action window only for flows that need API attribution.
-5. Prefer high-semantic hooks:
+6. Prefer high-semantic hooks:
    - Request object hooks are better than raw socket hooks.
    - Response interceptor/decode hooks are better than trying to reconstruct TLS bytes.
-6. Convert dynamic results into durable assets:
+7. Convert dynamic results into durable assets:
    - UI architecture map and operation-to-API matrix.
    - Redacted HTTP/API docs with headers, request fields, response fields, and per-field meaning/type notes.
    - Redacted request/response samples.
    - Offline decoders or fixtures.
    - API/schema docs.
    - Contract tests where the project has an SDK or client implementation.
-7. **Automatic skill feedback (agents)**:
+8. **Automatic skill feedback (agents)**:
    - Whenever you learn a **new reusable** technique, failure pattern, or validation rule during analysis, **write it into this skill in the same session**—do **not** wait for the user to say「記得回饋」.
    - Add **one new Markdown file** under [`feedback_history/`](feedback_history/) using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming + template (generalized, sanitized, with evidence and applicability). Optionally add a row to [`feedback_history/README.md`](feedback_history/README.md).
    - If the lesson is already credible from evidence in this session, also patch [TOOLS.md](TOOLS.md), [WORKFLOW.md](WORKFLOW.md), or [DOCUMENTATION.md](DOCUMENTATION.md) as appropriate; label uncertain items `experimental` in that lesson file instead of promoting prematurely.
@@ -52,7 +56,9 @@ Use [TOOLS.md](TOOLS.md) when preparing an environment or choosing between adb, 
 
 Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing human-readable results.
 
-Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) for **how** to write feedback; put each lesson in [`feedback_history/`](feedback_history/). **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §7** and **Feedback Loop** below.
+Use [`techniques/`](techniques/) after common triage identifies a category. Only read the matching category folder unless the evidence crosses categories.
+
+Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) for **how** to write feedback; put each lesson in [`feedback_history/`](feedback_history/). **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §8** and **Feedback Loop** below.
 
 Use [`app-security-hardening`](../app-security-hardening/) when analysis findings should become secure app development guidance, PR/release checklists, or validation tests.
 

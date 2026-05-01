@@ -35,9 +35,23 @@
 | `WORKFLOW.md` | 人類與 agent 都可讀的分析決策流程。 |
 | `TOOLS.md` | 常用工具、前置條件、適用情境與失敗判讀。 |
 | `DOCUMENTATION.md` | 分析結果如何寫成可重現文件。 |
+| `techniques/` | 依 runtime / traffic family 拆分的技術分類；例如 Flutter/Dart AOT、HTTP API、local proxy、media/HLS。 |
 | `FEEDBACK.md` | 入口：指向全庫共用的 [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md)。 |
 | `feedback_history/` | 每一條獨立 lesson 的 Markdown；必要時見 `README.md` 索引表。 |
 | `RUNBOOK.md` | 新 APK 專案第一天如何套用 skill，以及如何把新經驗回饋回本包。 |
+
+## 技術分類
+
+`apk-analysis` 的主文件只保留共通流程與路由規則。特定 app/runtime/API family 的技巧放到 [`techniques/`](techniques/)：
+
+| 分類 | 何時讀 |
+| --- | --- |
+| [`techniques/flutter-dart-aot/`](techniques/flutter-dart-aot/) | 證據指向 Flutter、Dart AOT、`libapp.so`、Dio/interceptor 或 Dart decode。 |
+| [`techniques/http-api/`](techniques/http-api/) | 已觀測到 HTTP API，需要文件化 headers、request、response、fixture 或 replay。 |
+| [`techniques/local-proxy/`](techniques/local-proxy/) | 證據指向 loopback、Netty/local proxy、embedded TUN/VPN 或本機轉發。 |
+| [`techniques/media-hls/`](techniques/media-hls/) | 分析 HLS、key、segments、媒體下載、容器或圖片/音訊/影片格式。 |
+
+原則：不要一開始讀完所有分類。先用 `WORKFLOW.md` 判斷流量與 runtime，再只讀相關分類；若是 A 類分析，就避免把 B 類文件放進上下文。
 
 ## 使用方式
 
@@ -47,8 +61,9 @@
 2. 建立本次分析筆記位置。
 3. 新專案第一天先讀 `RUNBOOK.md`。
 4. 讀 `WORKFLOW.md`，先做流量路徑判斷，不要直接假設是 pinning 或加密。
-5. 依 `TOOLS.md` 選最低干擾工具。
-6. 依 `DOCUMENTATION.md` 記錄證據鏈。
+5. 證據明確後，只讀 [`techniques/`](techniques/) 中對應分類。
+6. 依 `TOOLS.md` 選最低干擾工具。
+7. 依 `DOCUMENTATION.md` 記錄證據鏈。
 
 分析完成後：
 

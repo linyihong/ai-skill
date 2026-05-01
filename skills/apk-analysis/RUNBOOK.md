@@ -36,6 +36,7 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
 <AI_SKILL_REPO>/skills/apk-analysis/WORKFLOW.md
 <AI_SKILL_REPO>/skills/apk-analysis/TOOLS.md
 <AI_SKILL_REPO>/skills/apk-analysis/DOCUMENTATION.md
+<AI_SKILL_REPO>/skills/apk-analysis/techniques/<category>/README.md
 ```
 
 ### 1. 當作專案文件使用
@@ -129,15 +130,23 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
    - response decoder / decryptor
    - token/session provider
 
-5. 文件化：
+5. 分類路由：
+   - 先用共通流程判斷 runtime / traffic family。
+   - 證據指向 Flutter/Dart AOT 才讀 `techniques/flutter-dart-aot/`。
+   - 證據指向 local proxy / loopback 才讀 `techniques/local-proxy/`。
+   - 目標是 HTTP API 文件化才讀 `techniques/http-api/`。
+   - 目標是 HLS/media 才讀 `techniques/media-hls/`。
+   - 不要在分類未明時一次讀完所有 technique folders。
+
+6. 文件化：
    - 失敗路徑也要寫
    - 成功證據要可重現
    - API 結論和方法論要分開
    - 去敏後才保存樣本
 
-6. 回饋 skill：
+7. 回饋 skill：
    - 新技巧寫入 `feedback_history/`（見 `shared-rules/feedback-lessons.md` 命名規則）
-   - 已驗證技巧再同步進 `WORKFLOW.md` / `TOOLS.md` / `DOCUMENTATION.md`
+   - 已驗證技巧再同步進 `WORKFLOW.md` / `TOOLS.md` / `DOCUMENTATION.md` 或對應 `techniques/<category>/`
 
 ## 回饋規則
 
