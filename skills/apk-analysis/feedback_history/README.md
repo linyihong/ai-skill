@@ -27,3 +27,4 @@
 | `2026-05-01_151551-schema-only-jsondecode-hook.md` | validated | Schema-only jsonDecode Hook | 回包明文只在 Dart decode 階段出現時，hook `jsonDecode` input 並只輸出 length/hash/top-level keys/types，避免落 raw JSON value。 |
 | `2026-05-01_153437-sequence-jsondecode-before-api-response.md` | validated | Sequence jsonDecode Before Calling It API Response | `jsonDecode` hook 看到的 schema 不一定是 API response；必須用 request/decrypt sequence 證明它發生在業務 response 路徑上。 |
 | `2026-05-01_155200-dart-compressed-response-fields.md` | candidate | Dart AOT compressed response fields | 讀 Dart/Dio response handoff object field 時，要依 tagged object field load 還原 compressed pointer，避免誤判為 `0x800...` 假指標。 |
+| `2026-05-01_164741-dart-inline-onebyte-string-smi-length.md` | validated | Dart inline one-byte string Smi length | Dart AOT inline one-byte string 可能用 Smi length；raw32 讀法會把有效 JSON/path/base64 字串誤判為 undecoded。 |
