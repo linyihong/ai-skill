@@ -19,4 +19,5 @@
 | `2026-05-01_112900-proxy-config-vs-business-route.md` | validated | Proxy config is not business route proof | PC 代理正在監聽不代表裝置已導流；即使部分流量進 proxy，也不能推出核心業務主線一定進 proxy。 |
 | `2026-05-01_114300-local-proxy-handler-uri-hook.md` | validated | Hook local proxy handler URI, not just OkHttp | App 內建 loopback ProxyServer 時，hook handler 的 `FullHttpRequest` + `URI` 參數可直接確認上游業務 host。 |
 | `2026-05-01_131000-cast-netty-request-for-handler-route.md` | validated | Cast Netty request interfaces for handler routes | Frida hook 到 Netty request 參數時，先 cast 到 `HttpRequest` / `FullHttpRequest` 再讀 method/URI，可取得去敏 method/path。 |
+| `2026-05-01_132400-netty-aggregated-request-tostring-headers.md` | validated | Netty aggregated request toString can expose headers | Netty request accessor 讀不到 headers/body 時，Java `toString()` 仍可暴露 request line、headers 與 `content-length` 結構。 |
 | `2026-05-01_142000-exhaustive-java-okhttp-hooks-may-still-miss-flutter-business-http.md` | validated | 廣覆蓋 Java OkHttp 仍無業務 host 時應轉 Dart／native／pcap | 同時 hook **`newCall`／`Builder.url`／`enqueue`** 並延遲重試後，若使用者操作下仍無業務 URL，視為 **Java OkHttp 非主路徑**；改 **Dart／native TLS／pcap SNI** 或 **MITM**。 |

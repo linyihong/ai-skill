@@ -52,6 +52,7 @@
 | Java hook 沒命中 | 流量不在 Java HTTP stack。 | native connect trace；查 Flutter/Cronet/native client。 |
 | 只看到 `127.0.0.1:<port>` loopback，沒有上游 API path | App 內建 local ProxyServer/Netty handler 先接本機請求，再由 handler 選上游。 | 反射/Frida 探測 `ProxyServerHandler` 方法；優先 hook `FullHttpRequest` + `URI` 類參數，只記去敏 route metadata。 |
 | Netty `FullHttpRequest` hook 到了但 method/path 是空或讀取失敗 | Frida 參數未直接暴露 interface 方法，或 Netty 版本有 `method/getMethod`、`uri/getUri` 差異。 | `Java.cast` 到 `io.netty.handler.codec.http.HttpRequest` / `FullHttpRequest` 後再讀 method/URI；query 值預設去敏。 |
+| Netty request method/path 可見，但 headers/body accessor 讀不到 | Frida wrapper/interface dispatch 失敗，或 headers/content 不易直接取出。 | 對實際 Java request 物件呼叫 `toString()`；raw 僅放私有 capture，用去敏摘要判斷 header 名稱與 `content-length`。 |
 | Frida 只有 banner 沒輸出 | hook 未命中、script 沒載入、sandbox/權限、attach 時機錯。 | 最小 hook 測試；spawn；降低 hook 數量。 |
 | App 卡住或 ANR | hook 太低層、輸出太多、代理 TLS 卡住。 | 限制輸出、pass-through、改高語意 hook。 |
 | 解密結果亂碼 | key/IV/KDF/padding/壓縮順序錯。 | hook decrypt return value 建對照 fixture。 |

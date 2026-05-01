@@ -71,6 +71,7 @@ native backtrace 落在哪裡？
 - token/session provider：刷新流程、device identity、header provider。
 - local proxy handler：若 App 內有 `ProxyServer` / Netty / loopback server，優先 hook handler 的 `FullHttpRequest` + resolved `URI`，確認本機請求如何映射到上游 API。
   - 若 `FullHttpRequest` 直接讀不到 method/path，先 cast 到 Netty `HttpRequest` / `FullHttpRequest` interface，再讀 `method/getMethod`、`uri/getUri`，並預設去敏 query。
+  - 若 method/path 已可見但 `headers()` / `content()` 讀不到，可用實際 Java request 物件的 `toString()` 做 fallback；raw output 可能含完整 header，僅放私有 capture，文件只寫去敏結構。
 
 避免一開始就 hook：
 
