@@ -6,7 +6,7 @@
 
 | 情況 | 建議 |
 | --- | --- |
-| 內容仍是 APK／流量／Frida／Flutter AOT 等同家族 | 擴充現有 **`apk-analysis/`**，用 `feedback_history/` 與 WORKFLOW／TOOLS 收斂 |
+| 內容仍是 APK／流量／Frida／Flutter AOT 等同家族 | 擴充現有 **`apk-analysis/`**，用 `feedback_history/<category>/` 與 WORKFLOW／TOOLS／techniques 收斂 |
 | 新領域（例：iOS 靜態流程、另一種合規測試方法論）且會長期累積 | 新建 **`skills/<name>/`** |
 
 Skill **資料夾名稱**建議 **kebab-case**、簡短、穩定（例：`apk-analysis`，之後如 `ios-ipa-analysis`）。
@@ -18,7 +18,7 @@ Skill **資料夾名稱**建議 **kebab-case**、簡短、穩定（例：`apk-an
 ```text
 skills/<skill-name>/
   SKILL.md              # 必填：YAML frontmatter + 給 Agent 的入口正文
-  feedback_history/     # 強烈建議：每條 lesson 一檔（見 shared-rules/feedback-lessons.md）
+  feedback_history/     # 強烈建議：每條 lesson 一檔；若 skill 有分類，使用 feedback_history/<category>/（見 shared-rules/feedback-lessons.md）
 ```
 
 常見擴充（依需求增量建立）：
@@ -105,7 +105,7 @@ ln -sf "${AI_SKILL_REPO}/skills/my-skill" "${HOME}/.cursor/skills/my-skill"
 
 - [ ] `SKILL.md` 有合法 `name` / `description` frontmatter
 - [ ] 正文有連到 `shared-rules` 與 `feedback-lessons`
-- [ ] 已建立 `feedback_history/`（可先要 `README.md` 索引）
+- [ ] 已建立 `feedback_history/`（可先要 `README.md` 索引；若 skill 有分類，同步建立 `feedback_history/<category>/README.md`）
 - [ ] 根目錄 `README.md` 與 `skills/README.md` 已更新
 - [ ] 已依 `shared-rules/linked-updates.md` 完成或明確檢查必要連動更新
 - [ ] 無真實本機絕對路徑、無機密寫入將 commit 的檔案

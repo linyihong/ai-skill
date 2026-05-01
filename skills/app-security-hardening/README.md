@@ -48,7 +48,7 @@ Capture practical guidance for:
 | `implementation/` | Concrete implementation patterns for backend and mobile teams. |
 | `templates/` | Copyable templates for hardening notes and lightweight threat models. |
 | `FEEDBACK.md` | Short entry pointing to shared feedback rules. |
-| `feedback_history/` | One reusable lesson per Markdown file. |
+| `feedback_history/` | Reusable lessons, categorized by the same primary folders when applicable. |
 
 ## Classification Rules
 
@@ -59,7 +59,7 @@ When adding new guidance:
 3. Add language notes in [`languages/`](languages/) only for language/runtime-specific traps.
 4. Put concrete implementation patterns in [`implementation/`](implementation/) when engineers need buildable steps.
 5. Put repeatable review steps in [`checklists/`](checklists/).
-6. Put draft reusable lessons in [`feedback_history/`](feedback_history/) before promoting them into the structured folders.
+6. Put draft reusable lessons in the matching [`feedback_history/<category>/`](feedback_history/) folder before promoting them into the structured folders; use `feedback_history/common/` for cross-cutting lessons.
 
 This keeps the skill readable as it grows across mobile, web, backend, and future app types.
 

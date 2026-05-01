@@ -39,7 +39,7 @@ What this does not solve.
 | Language/runtime-specific pitfall | `languages/`. |
 | Concrete buildable implementation pattern | `implementation/`. |
 | Repeatable review process | `checklists/`. |
-| Reusable development principle not yet promoted | `feedback_history/`. |
+| Reusable development principle not yet promoted | Matching `feedback_history/<category>/`, or `feedback_history/common/` for cross-cutting lessons. |
 | APK analysis method or hook technique | [`apk-analysis`](../apk-analysis/). |
 | Product-specific API host, endpoint, schema, or token detail | Project repository docs. |
 | Shared sanitization or feedback rules | [`shared-rules`](../../shared-rules/README.md). |

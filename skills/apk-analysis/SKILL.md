@@ -43,7 +43,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Contract tests where the project has an SDK or client implementation.
 8. **Automatic skill feedback (agents)**:
    - Whenever you learn a **new reusable** technique, failure pattern, or validation rule during analysis, **write it into this skill in the same session**—do **not** wait for the user to say「記得回饋」.
-   - Add **one new Markdown file** under [`feedback_history/`](feedback_history/) using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming + template (generalized, sanitized, with evidence and applicability). Optionally add a row to [`feedback_history/README.md`](feedback_history/README.md).
+   - Add **one new Markdown file** under the matching [`feedback_history/<category>/`](feedback_history/) folder using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming + template (generalized, sanitized, with evidence and applicability). Use `feedback_history/common/` for cross-category rules. Optionally add a row to [`feedback_history/README.md`](feedback_history/README.md).
    - If the lesson is already credible from evidence in this session, also patch [TOOLS.md](TOOLS.md), [WORKFLOW.md](WORKFLOW.md), or [DOCUMENTATION.md](DOCUMENTATION.md) as appropriate; label uncertain items `experimental` in that lesson file instead of promoting prematurely.
    - If the reusable lesson is about how to build **your own future apps** more safely, write the development guidance in [`app-security-hardening`](../app-security-hardening/) and keep only the APK-analysis method here.
    - Target-specific hosts, endpoints, tokens, or one-off product conclusions stay in the **project** docs, not in reusable skill files.
@@ -58,7 +58,7 @@ Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing human-readable results.
 
 Use [`techniques/`](techniques/) after common triage identifies a category. Only read the matching category folder unless the evidence crosses categories.
 
-Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) for **how** to write feedback; put each lesson in [`feedback_history/`](feedback_history/). **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §8** and **Feedback Loop** below.
+Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) for **how** to write feedback; put each lesson in the matching [`feedback_history/<category>/`](feedback_history/) folder. **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §8** and **Feedback Loop** below.
 
 Use [`app-security-hardening`](../app-security-hardening/) when analysis findings should become secure app development guidance, PR/release checklists, or validation tests.
 
@@ -108,13 +108,13 @@ Use placeholders:
 
 If analysis discovers a new reusable idea:
 
-1. Create **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** as a dated lesson **proactively** (same session as the discovery unless blocked by missing evidence). Follow [feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming rules (`HHMMSS` = local 24h time).
+1. Create **`feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`** as a dated lesson **proactively** (same session as the discovery unless blocked by missing evidence). Use `common/` when the lesson is cross-category. Follow [feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming rules (`HHMMSS` = local 24h time).
 2. Generalize it so it is not tied to one APK.
 3. Add evidence and validation criteria.
 4. Promote it into `WORKFLOW.md`, `TOOLS.md`, or `DOCUMENTATION.md` only after it has been validated or is clearly labeled as experimental in the lesson file.
 
 Do not silently overwrite prior lesson files. Add new files or add a short deprecation note in an older file pointing to the replacement.
 
-**Agent checklist before ending an APK-analysis task:** Did any **new generalized lesson** emerge? If yes → **`feedback_history/`** has a new file (minimum); optional promotion to `TOOLS.md` / `WORKFLOW.md` / `DOCUMENTATION.md` when justified. If nothing new → no forced entry.
+**Agent checklist before ending an APK-analysis task:** Did any **new generalized lesson** emerge? If yes → **`feedback_history/<category>/`** or **`feedback_history/common/`** has a new file (minimum); optional promotion to `TOOLS.md` / `WORKFLOW.md` / `DOCUMENTATION.md` / `techniques/<category>/` when justified. If nothing new → no forced entry.
 
 **Git（本 repository）：**若在**同一工作區**修改了 `<AI_SKILL_REPO>` 底下的 `skills/apk-analysis/`、`shared-rules/` 等（含新建 `feedback_history/` 檔），**除非使用者明講不要提交**，否則在結束任務前**必須**於 `<AI_SKILL_REPO>` 根目錄執行 `git status`，將相關變更 **`git add` → `git commit`**（訊息清楚）→ **`git push`**；需要權限時**必須**向使用者申請（例如 git_write／網路）。僅「Reload Window」或重讀 skill **不會**自動完成這一步。**若本機用 `sync-cursor-bundle.sh` 連到 `~/.cursor/bundles`**：改動 `shared-rules/` 或 `skills/` 後還**必須**執行 `./scripts/sync-cursor-bundle.sh`（使用者若已設定 `core.hooksPath` 指向 `scripts/git-hooks`，則 commit 後會自動跑）；需要 shell 權限時一併申請。

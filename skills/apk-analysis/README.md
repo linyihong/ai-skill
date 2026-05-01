@@ -68,7 +68,7 @@
 分析完成後：
 
 1. 把 target-specific API / schema / endpoint 結論寫回專案對應 API 文件。
-2. 把可重用方法寫成 **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**（規則見 [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)）。
+2. 把可重用方法寫成 **`feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`**；跨分類用 `feedback_history/common/`（規則見 [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)）。
 3. 如果方法已驗證，整理進 `WORKFLOW.md` 或 `TOOLS.md`。
 4. 若專案有 SDK 或 client，將解碼規則補成 fixture / contract test。
 5. 若得到的是「未來開發自家 App 時可用的安全防護」而非分析方法，寫入 [`app-security-hardening`](../app-security-hardening/)；本包只保留分析證據與方法。
@@ -93,5 +93,5 @@
 - 證據：pcap、hook log、MITM export、反編譯搜尋結果或 sanitized excerpt。
 - 結論：哪些路徑有效、哪些被排除、下一步如何驗證。
 - 去敏規則：哪些值被遮蔽，哪些文件不能提交。
-- 可重用 lesson：新增檔於 **`feedback_history/`**。
+- 可重用 lesson：新增檔於 **`feedback_history/<category>/`** 或 **`feedback_history/common/`**。
 - 可選的 Developer Hardening Notes：若對自家 App 開發有安全啟發，連到或回饋至 **`app-security-hardening/`**。

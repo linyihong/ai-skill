@@ -2,12 +2,12 @@
 
 「怎麼寫回饋、檔名怎麼取、模板長怎樣」**全部**在本檔維護；各 skill **不再**另存一份 `FEEDBACK.md` 正文（`apk-analysis` 目錄下僅保留極短入口檔，指向本檔）。
 
-**每一條 lesson 全文**放在對應 skill 的 **`feedback_history/`**（例如 `skills/apk-analysis/feedback_history/`），**不要**把長篇堆進任何說明檔。
+**每一條 lesson 全文**放在對應 skill 的 **`feedback_history/`** 之下（未分類 skill 可直接放根層；已分類 skill 放 `<category>/` 或 `common/`），**不要**把長篇堆進任何說明檔。
 
 ## 原則
 
 - **不要**在每條 lesson 裡重複貼上 [sanitization.md](sanitization.md)、[authorization-scope.md](authorization-scope.md) 等全文；條目頂部用一行**引用** [README.md](README.md) 或**本檔**即可。
-- **Cursor agent：** 在授權分析過程中一旦得到可重用技巧／失敗模式／驗證規則，應**主動**在同一輪對話內於該 skill 的 **`feedback_history/`** 新增檔案（依下方**檔名規則**與**模板**），**不要**等使用者提醒。
+- **Cursor agent：** 在授權分析過程中一旦得到可重用技巧／失敗模式／驗證規則，應**主動**在同一輪對話內於該 skill 的 **`feedback_history/`** 對應位置新增檔案（依下方**分類規則**、**檔名規則**與**模板**），**不要**等使用者提醒。
 - 只寫**通用方法**，不寫特定 App 的私有結論；必須去敏；必須說明證據與適用／不適用條件；不確定標 `experimental`。
 - 不得寫入本機絕對路徑、使用者名稱、私有工作目錄、clone 位置；用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 等 placeholder。
 
@@ -17,12 +17,24 @@
 | --- | --- |
 | **共用政策（全庫）** | [`shared-rules/README.md`](README.md) |
 | **本檔** | 命名規則、模板、索引與 Git 約定（**唯一正文**） |
-| **每一條獨立 lesson** | **`<skill>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
-| **條目總覽表**（可選） | **`<skill>/feedback_history/README.md`** |
+| **每一條獨立 lesson（未分類 skill）** | **`<skill>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
+| **每一條獨立 lesson（已有分類的 skill）** | **`<skill>/feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`** |
+| **條目總覽表**（可選） | **`<skill>/feedback_history/README.md`** 與必要的 **`<skill>/feedback_history/<category>/README.md`** |
 
-範例：`skills/apk-analysis/feedback_history/`。
+範例：`skills/apk-analysis/feedback_history/`；若 skill 已有 `techniques/flutter-dart-aot/` 這類分類，對應 lesson 應放在 `skills/apk-analysis/feedback_history/flutter-dart-aot/`，跨分類或全域規則放 `skills/apk-analysis/feedback_history/common/`。
 
 成熟後可將 lesson 整理進該 skill 的 `WORKFLOW.md`、`TOOLS.md` 或 `DOCUMENTATION.md`（見模板中 **Promotion Target**）。
+
+## 分類規則
+
+當某個 skill 內部已經開始按 runtime、platform、control、technique、checklist 等方式分類時，`feedback_history/` 也要跟著分類，避免所有 lesson 混在同一層：
+
+- 新 lesson 優先放到 **`feedback_history/<category>/`**，其中 `<category>` 應對應該 skill 內既有分類名稱，例如 `flutter-dart-aot`、`http-api`、`controls`、`platforms`。
+- 跨分類、全域適用或分類尚未明確的 lesson 放到 **`feedback_history/common/`**。
+- 若一條 lesson 會 promote 到多個分類，放在主要分類，並在 lesson 的 **Promotion Target** / **Required Linked Updates** 寫出其他同步更新位置。
+- `feedback_history/README.md` 應是總索引，列出 category folders；每個 category folder 可有自己的 `README.md` 表格。
+- 既有歷史 lesson 若已被外部文件連結，可以先保留原路徑，並用 category README 索引清楚；若真的搬移，必須同一個 change 更新所有相對連結與索引。
+- 不要為了分類而重複複製 lesson 內容；一條 lesson 只保留一份全文，其他地方用連結。
 
 ## 檔名規則（時間 + `<slug>`）
 
@@ -35,7 +47,12 @@
 
 ## 新 lesson 模板
 
-複製到新檔 **`<skill>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**（以下引用路徑以檔案位於 `feedback_history/` 內為準）：
+複製到新檔：
+
+- 未分類 skill：**`<skill>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**
+- 已分類 skill：**`<skill>/feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`**
+
+注意：以下引用路徑以檔案位於 `feedback_history/` 內為準；若檔案在 `feedback_history/<category>/`，共用規則連結要多上一層，改成 `../../../../shared-rules/...`。
 
 ```markdown
 > 遵守 [共用規則索引](../../../shared-rules/README.md) 與 [feedback-lessons](../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
@@ -96,7 +113,7 @@ Status: candidate | validated | deprecated | promoted | experimental
 
 ## 同步與索引
 
-- **索引**：維護者可定期整理 **`<skill>/feedback_history/README.md`**（表格：檔名、Status、標題、一句話摘要）；若該 skill 已有索引，agent 新增 lesson 檔後**必須**追加表格列或明確說明為何暫不更新。
+- **索引**：維護者可定期整理 **`<skill>/feedback_history/README.md`**（表格：檔名、Status、標題、一句話摘要，或 category index）；若該 skill 已有索引，agent 新增 lesson 檔後**必須**追加表格列或明確說明為何暫不更新。已分類 skill 同時更新對應 **`feedback_history/<category>/README.md`**。
 - **Git**：**`feedback_history/`** 版本控制；不要提交含機密的原始 log。
 - **歷史**：既有長篇 lesson 應已拆至各 `feedback_history/*.md`（若見批次時間戳如 `120000`–`120010` 僅供排序，新建請用**當下** `HHMMSS`）；請自此新增檔案而非往舊版單檔底部堆疊。
 

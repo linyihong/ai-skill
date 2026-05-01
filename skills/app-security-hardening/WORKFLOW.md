@@ -69,7 +69,7 @@ Classify the outcome before writing docs:
 | Dart, Kotlin/Java, Swift, TypeScript, or runtime-specific pitfalls | `languages/` |
 | Concrete buildable pattern or how-to | `implementation/` |
 | A repeated design, PR, release, or API review step | `checklists/` |
-| A reusable but still emerging lesson | `feedback_history/` |
+| A reusable but still emerging lesson | `feedback_history/<category>/` or `feedback_history/common/` |
 | A copyable documentation shape | `templates/` |
 
 Prefer linking between folders over duplicating the same guidance.
@@ -103,7 +103,7 @@ Use at least one validation method:
 
 If a lesson generalizes beyond one product:
 
-1. Add a file under `feedback_history/`.
+1. Add a file under the matching `feedback_history/<category>/`, or `feedback_history/common/` if it is cross-cutting.
 2. Link shared rules instead of duplicating them.
 3. Promote validated guidance into the structured folders, [CHECKLIST.md](CHECKLIST.md), or this workflow.
 

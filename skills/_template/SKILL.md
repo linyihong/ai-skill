@@ -35,7 +35,7 @@ description: <英文：Agent 如何辨識何時套用此 skill。寫觸發情境
 
 ## 回饋與技巧沉澱
 
-- 新 lesson：`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`（規則見 [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)）
+- 新 lesson：未分類 skill 用 `feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`；已分類 skill 用 `feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`，跨分類用 `feedback_history/common/`（規則見 [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)）
 - 可選入口：[FEEDBACK.md](FEEDBACK.md)（僅連到上述檔）
 
 ## 新專案／Runbook（可選）

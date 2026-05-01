@@ -27,7 +27,7 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
 
 ```text
 <AI_SKILL_REPO>/shared-rules/feedback-lessons.md         # 檔名規則與 lesson 模板（全庫共用）
-<AI_SKILL_REPO>/skills/apk-analysis/feedback_history/   # 每一條 lesson 獨立檔（YYYY-MM-DD_HHMMSS-<slug>.md）
+<AI_SKILL_REPO>/skills/apk-analysis/feedback_history/<category>/   # 每一條 lesson 獨立檔（YYYY-MM-DD_HHMMSS-<slug>.md）
 ```
 
 驗證後同步更新：
@@ -52,7 +52,7 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
 ```text
 請先閱讀 <AI_SKILL_REPO>/skills/apk-analysis/SKILL.md，
 並依照 WORKFLOW.md / TOOLS.md / DOCUMENTATION.md 分析這個 APK。
-如果過程中學到可重用技巧，請依 shared-rules/feedback-lessons.md 在 feedback_history/ 新增檔案回饋。
+如果過程中學到可重用技巧，請依 shared-rules/feedback-lessons.md 在 feedback_history/<category>/ 新增檔案回饋；跨分類用 feedback_history/common/。
 ```
 
 ### 2. 當作 Cursor project skill 使用
@@ -86,7 +86,7 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
 - 不要一開始假設是 pinning。
 - 先做 localhost / pcap / proxy / Java hook / native or Flutter 判斷。
 - 所有 token、device id、私密 host、個資都要去敏。
-- 如果發現新技巧，請**主動**在 <AI_SKILL_REPO>/skills/apk-analysis/feedback_history/ **新增 lesson 檔**（格式見 <AI_SKILL_REPO>/shared-rules/feedback-lessons.md；不要等使用者說「記得回饋」），且要讓人類也看得懂；可同步更新 TOOLS/WORKFLOW 如已驗證。
+- 如果發現新技巧，請**主動**在 <AI_SKILL_REPO>/skills/apk-analysis/feedback_history/<category>/ **新增 lesson 檔**（跨分類用 common/；格式見 <AI_SKILL_REPO>/shared-rules/feedback-lessons.md；不要等使用者說「記得回饋」），且要讓人類也看得懂；可同步更新 TOOLS/WORKFLOW/techniques 如已驗證。
 
 目前材料：
 - APK:
@@ -145,7 +145,7 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
    - 去敏後才保存樣本
 
 7. 回饋 skill：
-   - 新技巧寫入 `feedback_history/`（見 `shared-rules/feedback-lessons.md` 命名規則）
+   - 新技巧寫入 `feedback_history/<category>/` 或 `feedback_history/common/`（見 `shared-rules/feedback-lessons.md` 命名規則）
    - 已驗證技巧再同步進 `WORKFLOW.md` / `TOOLS.md` / `DOCUMENTATION.md` 或對應 `techniques/<category>/`
 
 ## 回饋規則
@@ -175,7 +175,7 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
 
 ```text
 每次你發現新的可重用 APK 分析技巧時，請不要只在對話裡說明；也請不要等使用者提醒「記得回饋」。
-請依 <AI_SKILL_REPO>/shared-rules/feedback-lessons.md，在同一輪對話於 feedback_history/ **新增一個** lesson 檔。
+請依 <AI_SKILL_REPO>/shared-rules/feedback-lessons.md，在同一輪對話於 feedback_history/<category>/ 或 feedback_history/common/ **新增一個** lesson 檔。
 如果 lesson 已經被驗證，也請同步更新 WORKFLOW.md、TOOLS.md 或 DOCUMENTATION.md。
 注意：lesson 內容要讓人類也能看懂，不只給 AI 看。
 完成後請在 <AI_SKILL_REPO> commit 並 push。

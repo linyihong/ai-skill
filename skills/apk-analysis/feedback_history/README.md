@@ -2,6 +2,20 @@
 
 下列為條目檔名與摘要；完整內容請開啟對應 `.md`。檔名格式：**`YYYY-MM-DD_HHMMSS-<slug>.md`**（`HHMMSS` 為 24 小時制本機時間）。
 
+## 分類索引
+
+此 skill 已拆分 `techniques/`，因此 feedback 也按分類索引。既有歷史 lesson 目前保留原路徑，分類 README 負責標明歸屬；新 lesson 若屬於特定分類，應優先放入 `feedback_history/<category>/`。
+
+| 分類 | 用途 |
+| --- | --- |
+| [`common/`](common/) | 跨分類、共通路由、工具健康檢查、proxy/session 等通用分析規則。 |
+| [`flutter-dart-aot/`](flutter-dart-aot/) | Flutter、Dart AOT、Dart object/string/offset hook 技巧。 |
+| [`http-api/`](http-api/) | HTTP API 文件化、request/response schema、UI-to-API binding。 |
+| [`local-proxy/`](local-proxy/) | loopback、Netty/local proxy、embedded route/TUN 類技巧。 |
+| [`media-hls/`](media-hls/) | HLS、playlist/key/segments、媒體容器與下載驗證。 |
+
+## 歷史平面索引
+
 | 檔案 | Status | 標題 | 一句話摘要 |
 | --- | --- | --- | --- |
 | `2026-04-30_120000-proxy-failure-要先拆成導流與-tls-兩層.md` | promoted | Proxy failure 要先拆成導流與 TLS 兩層 | 代理看不到明文時，先確認「有沒有進代理」，再談憑證或 pinning。 |

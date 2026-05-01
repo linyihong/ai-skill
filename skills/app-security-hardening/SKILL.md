@@ -39,7 +39,7 @@ Use this skill when APK analysis, mobile API review, or app development work rev
    - Concrete implementation pattern: `implementation/`.
    - Repeatable review step: `checklists/`.
 6. Apply required linked updates from [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md): when a control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
-7. If the lesson is reusable but not yet mature, add it to `feedback_history/` first; promote it into the structured folders when validated.
+7. If the lesson is reusable but not yet mature, add it to the matching `feedback_history/<category>/` folder first; use `feedback_history/common/` for cross-cutting lessons. Promote it into the structured folders when validated.
 
 ## Default Workflow
 
@@ -69,7 +69,7 @@ When producing hardening guidance, include:
 
 If a reusable app-security lesson emerges:
 
-1. Create `feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md` using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md).
+1. Create `feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md` using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md); use `common/` when no single category owns it.
 2. Generalize the lesson so it is not tied to one APK or company.
 3. Include evidence and validation criteria, but redact secrets and target-specific details.
 4. Promote validated guidance into `controls/`, `platforms/`, `languages/`, `implementation/`, `checklists/`, `WORKFLOW.md`, `CHECKLIST.md`, or `DOCUMENTATION.md` as appropriate.

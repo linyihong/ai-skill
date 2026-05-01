@@ -98,7 +98,7 @@ native backtrace 落在哪裡？
 分類原則：
 
 - 主流程只負責路由；進入某分類後，優先讀該分類資料夾，不要把所有 runtime/API family 都載入上下文。
-- 新技巧若只適用某分類，先寫入 `feedback_history/`，驗證後再整理到對應 `techniques/<category>/`。
+- 新技巧若只適用某分類，先寫入 `feedback_history/<category>/`，驗證後再整理到對應 `techniques/<category>/`。
 - 若同一分析跨分類，例如 Flutter app 內建 local proxy，再依證據讀多個分類；不要為了保險而預設全讀。
 
 ## 4. 找高語意 hook 點
@@ -265,4 +265,4 @@ response decode hook:
 - 若有加密，有解碼點或下一步定位計畫。
 - 有去敏樣本或 fixture。
 - 有文件回填位置。
-- 有新的 reusable lesson 時，已在 **`feedback_history/`** 新增對應檔案（規則見 `shared-rules/feedback-lessons.md`）。
+- 有新的 reusable lesson 時，已在 **`feedback_history/<category>/`** 或 **`feedback_history/common/`** 新增對應檔案（規則見 `shared-rules/feedback-lessons.md`）。
