@@ -67,6 +67,7 @@
 | Wi‑Fi MITM 空，但 **logcat** 有 **`ProxyServer`**／對 **`127.0.0.1:<port>`** 轉發至 `https://<api-host>` | **本機 loopback 中介**先於對外連線。 | `adb logcat` 搜尋 `ProxyServer`／handler；勿將含標頭的原始 log 提交公開 repo。 |
 | `blutter` 能偵測 Dart version/snapshot，但 full 或 `--no-analysis` SIGSEGV | Dart VM introspection 路線對該 snapshot/tool 版本不穩。 | 改用 `unflutter` 等 static parser 產生 `functions.jsonl`/`call_edges.jsonl`/`string_refs.jsonl`；再 hook 少量高語意 Dart function PC。 |
 | Dart AOT offset hook 命中，但 Dart String 解碼全是空或亂碼 | String layout 假設錯，尤其 Dart 3.x compressed pointer OneByteString 可能使用 raw byte length + inline bytes。 | 私有 capture 中限量 hexdump 物件，驗證 length/data offset；常見候選包含 untagged `+0x08` raw length、`+0x10` data；修好 decoder 後關閉 hexdump。 |
+| Dart AOT `call_edges` 指向的 caller 內部 `BL` 位址無法 Frida attach，或全域 Map/string helper hook 後 App 不穩 | callsite 不是函式入口；全域 runtime/helper 太熱且噪音大。 | 把 callsite 當靜態導航線索；優先 hook app-owned function PC 或更高語意 Java/native boundary。必要時才用 Stalker／短窗低層 instrumentation。 |
 
 ## 命令模板
 

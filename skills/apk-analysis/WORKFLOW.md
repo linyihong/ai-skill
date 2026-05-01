@@ -91,10 +91,12 @@ native backtrace 落在哪裡？
    - host / base URL。
    - `Dio`、`HttpClient`、`RequestOptions`、`Interceptor`。
    - `encrypt`、`decrypt`、`AES`、`base64`、`hash`、`ResponseInterceptor`。
-4. 用 Frida hook request options；若已取得 AOT function PC，可用 `libapp.so` base + PC 對少量 `RequestInterceptor`／sign／encrypt/decrypt 函式做 native offset hook。
+4. 用 Frida hook request options；若已取得 AOT function PC，可用 `libapp.so` base + PC 對少量 `RequestInterceptor`／sign／encrypt/decrypt 函式做 native offset hook。`call_edges` 裡 caller 內部的 `BL` 位址只當導航線索，不要預設可直接 `Interceptor.attach()`。
 5. 用 Frida hook response decode/decrypt return value。
 6. 若 Dart String decoder 失敗，先在私有 capture 限量 hexdump 物件推導 layout（例如 OneByteString raw length/data offset），修好後關閉 hexdump。
 7. 把 raw wrapper + decrypted payload 對齊成 fixture。
+
+避免把全域 Dart runtime/collection helper（例如 `LinkedHashMap._set`、常見 string helper）當第一個 hook 點；這些 helper 高頻且噪音大，可能讓 App 卡頓或提前結束。若一定要觀察內部 helper，先用短窗、嚴格 filter，或改用 Stalker／更高語意邊界驗證。
 
 若 local proxy/Netty hook 已看到自訂加密／簽名 header，但同窗 Java plugin/helper hook（例如 AES/RC2/getNMKey/query map）沒有命中，應把 Java plugin 視為橋接或設定層，轉向 `libapp.so` Dart AOT interceptor 字串、object pool xref、blutter/offset hook；不要在 Java helper 層無限加 hook。
 
