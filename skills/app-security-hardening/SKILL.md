@@ -32,15 +32,22 @@ Use this skill when APK analysis, mobile API review, or app development work rev
    - Build/release configuration.
    - Monitoring or fraud signal.
 4. Add a concrete validation method: unit test, integration test, release checklist item, fixture, or manual review step.
-5. If the lesson is reusable, add it to `feedback_history/` and promote it into `WORKFLOW.md`, `CHECKLIST.md`, or `DOCUMENTATION.md` when validated.
+5. Classify the guidance:
+   - Core security control: `controls/`.
+   - Platform/app type detail: `platforms/`.
+   - Language/runtime-specific trap: `languages/`.
+   - Repeatable review step: `checklists/`.
+6. If the lesson is reusable but not yet mature, add it to `feedback_history/` first; promote it into the structured folders when validated.
 
 ## Default Workflow
 
 Read [WORKFLOW.md](WORKFLOW.md) to translate analysis evidence into hardening requirements.
 
-Use [CHECKLIST.md](CHECKLIST.md) for development, PR, and release review.
+Use [CHECKLIST.md](CHECKLIST.md) for the checklist index and [`checklists/`](checklists/) for focused design, PR, release, and API reviews.
 
 Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing reusable security guidance or project-specific hardening notes.
+
+Use [`controls/`](controls/) as the primary home for cross-platform guidance, then link to [`platforms/`](platforms/) or [`languages/`](languages/) for implementation details.
 
 ## Output Style
 
@@ -59,6 +66,6 @@ If a reusable app-security lesson emerges:
 1. Create `feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md` using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md).
 2. Generalize the lesson so it is not tied to one APK or company.
 3. Include evidence and validation criteria, but redact secrets and target-specific details.
-4. Promote validated guidance into `WORKFLOW.md`, `CHECKLIST.md`, or `DOCUMENTATION.md`.
+4. Promote validated guidance into `controls/`, `platforms/`, `languages/`, `checklists/`, `WORKFLOW.md`, `CHECKLIST.md`, or `DOCUMENTATION.md` as appropriate.
 
 **Cross-skill link:** if the lesson came from APK analysis, keep analysis mechanics in [`apk-analysis`](../apk-analysis/) and put development hardening guidance here.

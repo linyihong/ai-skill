@@ -34,10 +34,16 @@ What this does not solve.
 
 | Content | Put it in |
 | --- | --- |
-| Reusable development principle | This skill. |
+| Cross-platform security principle | `controls/`. |
+| Platform or app-type implementation detail | `platforms/`. |
+| Language/runtime-specific pitfall | `languages/`. |
+| Repeatable review process | `checklists/`. |
+| Reusable development principle not yet promoted | `feedback_history/`. |
 | APK analysis method or hook technique | [`apk-analysis`](../apk-analysis/). |
 | Product-specific API host, endpoint, schema, or token detail | Project repository docs. |
 | Shared sanitization or feedback rules | [`shared-rules`](../../shared-rules/README.md). |
+
+Use [`templates/hardening-note.md`](templates/hardening-note.md) for reusable guidance and [`templates/threat-model-lite.md`](templates/threat-model-lite.md) for quick feature reviews.
 
 ## Good Guidance
 

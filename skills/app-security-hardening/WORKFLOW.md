@@ -58,7 +58,22 @@ Validation: Integration test replays the same signed request and expects rejecti
 Residual risk: Device compromise can still steal valid sessions; monitoring remains required.
 ```
 
-## 5. Validate
+## 5. File The Guidance
+
+Classify the outcome before writing docs:
+
+| If the lesson is about... | Put it in |
+| --- | --- |
+| Security property that applies across stacks | `controls/` |
+| Mobile, web, backend, or OS-specific implementation | `platforms/` |
+| Dart, Kotlin/Java, Swift, TypeScript, or runtime-specific pitfalls | `languages/` |
+| A repeated design, PR, release, or API review step | `checklists/` |
+| A reusable but still emerging lesson | `feedback_history/` |
+| A copyable documentation shape | `templates/` |
+
+Prefer linking between folders over duplicating the same guidance.
+
+## 6. Validate
 
 Use at least one validation method:
 
@@ -68,12 +83,12 @@ Use at least one validation method:
 - Manual review with evidence.
 - Runtime or backend telemetry query.
 
-## 6. Feed Back Reusable Lessons
+## 7. Feed Back Reusable Lessons
 
 If a lesson generalizes beyond one product:
 
 1. Add a file under `feedback_history/`.
 2. Link shared rules instead of duplicating them.
-3. Promote validated guidance into [CHECKLIST.md](CHECKLIST.md) or this workflow.
+3. Promote validated guidance into the structured folders, [CHECKLIST.md](CHECKLIST.md), or this workflow.
 
 If the lesson came from APK analysis, keep the analysis method in [`apk-analysis`](../apk-analysis/) and the development action here.

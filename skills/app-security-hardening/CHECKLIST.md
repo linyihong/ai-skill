@@ -2,6 +2,13 @@
 
 Use this checklist during design review, PR review, and release review. It is intentionally high level: project-specific requirements should live in the product repository.
 
+For focused checklists, use:
+
+- [`checklists/mobile-design-review.md`](checklists/mobile-design-review.md)
+- [`checklists/mobile-pr-review.md`](checklists/mobile-pr-review.md)
+- [`checklists/mobile-release-review.md`](checklists/mobile-release-review.md)
+- [`checklists/api-security-review.md`](checklists/api-security-review.md)
+
 ## API And Transport
 
 - Sensitive flows use HTTPS only; cleartext traffic is disabled in release builds.
