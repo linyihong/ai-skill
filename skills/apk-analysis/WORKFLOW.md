@@ -199,7 +199,21 @@ response decode hook:
 
 離線化完成後，後續不應每次依賴 Frida 才能跑測試。
 
-## 8. Session / Token 重新取得
+## 8. API 文件化
+
+當 API 已經可觀測或可解碼時，不要只留下 endpoint 名稱。若是 HTTP/HTTPS 流程，專案文件至少要能說明：
+
+- Method、host/path shape、auth 條件、來源證據與 UI path（若已確認）。
+- Request headers：header 名稱、用途、是否必要、來源、是否由 token/sign/device/session 產生。
+- Request query/body：每個字段的 type、meaning、required、example shape、敏感性、簽章/加密參與情況。
+- Response headers：狀態碼、content-type、cache/rate-limit/session 相關 header；沒有可見 header 時寫明原因。
+- Response wrapper：status/code/message/data/error 等 outer field 的 type 與語意。
+- Decrypted / inner payload：每個字段的 type、meaning、nullable/optional、列表 item shape、media/source 欄位等。
+- Validation：replay、fixture、contract test、或至少用 hook/pcap/MITM 時序證明 request/response 對齊。
+
+若 UI binding 尚未完成，可先把 `UI path` 標為 unknown、`Trigger confidence` 標為 low，等核心 API 文件穩定後再用截圖/操作時間窗補強。截圖是輔助理解操作來源，不取代 header/request/response 的字段分析。
+
+## 9. Session / Token 重新取得
 
 遇到 token 過期、no token、invalid token，不要先假設有標準 refresh-token。應還原 App 的真實流程：
 
@@ -217,7 +231,7 @@ response decode hook:
 - 遇到 login too frequently，先停止 tight-loop，再分析 server-side bucket 可能維度。
 - 不要在沒有證據時假設旋轉單一欄位可以解限流。
 
-## 9. 媒體 / HLS 分析
+## 10. 媒體 / HLS 分析
 
 影片與音訊資源要分控制面與資料面：
 
@@ -231,7 +245,7 @@ response decode hook:
 
 不要只看副檔名判斷格式。應用 magic bytes、container probe 或 frame count 驗證。例如 WebP 動圖、靜態 GIF、animated GIF 都要分清楚。
 
-## 10. 分析結束定義
+## 11. 分析結束定義
 
 一次分析可以收斂時，應具備：
 
@@ -239,6 +253,7 @@ response decode hook:
 - 有 UI architecture map，能說明主要 tabs/screens 與已測操作。
 - 有 request metadata 或已證明拿不到的原因。
 - 有 response outer shape。
+- HTTP/API 文件已寫清 headers、request fields、response fields，且逐字段分析 type/meaning/required/source。
 - 若有加密，有解碼點或下一步定位計畫。
 - 有去敏樣本或 fixture。
 - 有文件回填位置。

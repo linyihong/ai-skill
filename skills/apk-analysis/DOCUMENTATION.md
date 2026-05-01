@@ -143,26 +143,44 @@
 | Operation ID | `open-home` / `open-detail` |
 | Trigger confidence | high / medium / low |
 
-### Request
+### HTTP Request Headers
 
-| Parameter / Header | Meaning | Required | Notes |
-| --- | --- | --- | --- |
+| Header | Type / Shape | Meaning | Required | Source | Sensitive | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `Authorization` | bearer / custom / none | session auth | yes/no | token provider | yes | value redacted |
+| `User-Agent` | string shape only | client identity | yes/no | app/runtime | no | |
+
+### Request Query / Path Parameters
+
+| Field | Type / Shape | Meaning | Required | Source | Sensitive | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+
+### Request Body
+
+| Field | Type / Shape | Meaning | Required | Source | Sensitive | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
 
 ### Response Wrapper
 
-| Field | Type | Notes |
-| --- | --- | --- |
+| Field | Type / Shape | Meaning | Required / Optional | Notes |
+| --- | --- | --- | --- | --- |
 
 ### Decrypted / Inner Payload
 
-| Field | Type | Notes |
-| --- | --- | --- |
+| Field | Type / Shape | Meaning | Required / Optional | Source / Derived From | Notes |
+| --- | --- | --- | --- | --- | --- |
+
+### Response Headers
+
+| Header | Type / Shape | Meaning | Notes |
+| --- | --- | --- | --- |
 
 ### Evidence
 
 - Sanitized log:
 - Fixture:
 - UI path:
+- Screenshot / UI evidence:
 
 ### Validation
 
@@ -170,6 +188,14 @@
 - Contract test:
 - Manual verification:
 ```
+
+API 文件要求：
+
+- 分析完 API 後要回填專案文件；不要只把 endpoint 留在暫存 log。
+- HTTP/HTTPS API 必須記錄可見的 headers、request、response；看不到的部分要寫明是 MITM 不可見、hook 未到位、加密包裹、或尚未驗證。
+- 每個 request/response 字段都要逐欄位分析 type/shape、meaning、required/optional、source/derived-from、敏感性與備註。
+- Header 名稱、path shape、query key、schema 可以保留；header value、token、cookie、device id、個資與可重放 URL 必須去敏。
+- 截圖可用來輔助說明 UI path、tab、screen 與操作，但不能取代 HTTP header/request/response 的字段分析。
 
 ## 去敏規則
 

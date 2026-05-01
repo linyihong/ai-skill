@@ -32,6 +32,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Response interceptor/decode hooks are better than trying to reconstruct TLS bytes.
 6. Convert dynamic results into durable assets:
    - UI architecture map and operation-to-API matrix.
+   - Redacted HTTP/API docs with headers, request fields, response fields, and per-field meaning/type notes.
    - Redacted request/response samples.
    - Offline decoders or fixtures.
    - API/schema docs.

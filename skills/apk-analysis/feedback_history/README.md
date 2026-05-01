@@ -30,3 +30,4 @@
 | `2026-05-01_164741-dart-inline-onebyte-string-smi-length.md` | validated | Dart inline one-byte string Smi length | Dart AOT inline one-byte string 可能用 Smi length；raw32 讀法會把有效 JSON/path/base64 字串誤判為 undecoded。 |
 | `2026-05-01_171500-json-shape-before-query-shape.md` | validated | JSON Shape Before Query Shape | Schema-only response logging should classify JSON before query extraction and gate query parsing to request-like strings, otherwise embedded URLs or binary pipe payloads can be mistaken for request query evidence. |
 | `2026-05-01_171650-ui-architecture-map-from-screenshots.md` | promoted | UI architecture map from screenshots | 在可控制裝置時，用輕量 screenshot/UI hierarchy 建立 App 架構地圖；若截圖造成卡頓，可先解 API 再對關鍵流程補 UI binding。 |
+| `2026-05-01_173800-api-field-documentation-after-analysis.md` | promoted | API field documentation after analysis | 分析完 API 後要文件化 HTTP headers、request、response，並逐字段說明 type、meaning、required/source；截圖只作為 UI 觸發輔助證據。 |
