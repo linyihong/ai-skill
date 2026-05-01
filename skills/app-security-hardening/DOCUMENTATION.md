@@ -48,7 +48,7 @@ Use [`templates/hardening-note.md`](templates/hardening-note.md) for reusable gu
 
 ## Required Linked Update Statement
 
-Every reusable note that affects multiple folders must include a short linked-update statement:
+Every reusable note that affects multiple folders must follow [`../../shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md) and include a short linked-update statement:
 
 ```markdown
 #### Required Linked Updates

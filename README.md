@@ -16,6 +16,7 @@
 **目錄約定：**  
 - **`skills/`**：各 skill 技巧包；之後新增 skill 放在 `skills/<name>/`，步驟見 [`skills/ADDING_SKILLS.md`](skills/ADDING_SKILLS.md)。  
 - **`shared-rules/`**：**共用規則**（依主題分檔：授權、去敏、內容分層、**feedback 檔名／模板／agent 行為**、Cursor 同步等）；索引為 [`shared-rules/README.md`](shared-rules/README.md)，feedback 流程與模板集中在 [`feedback-lessons.md`](shared-rules/feedback-lessons.md)。各 skill 目錄下 **`FEEDBACK.md`** 若存在，僅為**一行入口**，不必重複維護正文。  
+- **連動更新**：若改動會影響其他文件、索引、skill 入口、同步流程或分類文件，相關檔案**必須**依 [`shared-rules/linked-updates.md`](shared-rules/linked-updates.md) 同步更新或明確檢查，不得說成「可選」。  
 - **每一則 `feedback_history`**：**不要**重複貼上共用規則全文，頂部引用 `shared-rules/` 即可。**同步到 `.cursor`** 時：先複製 **`shared-rules/`** 整包，再同步需要的 **`skills/<name>/`**（見 [`shared-rules/cursor-sync.md`](shared-rules/cursor-sync.md)）。
 
 ## 新專案啟用 apk-analysis（Cursor）
@@ -98,13 +99,14 @@ Cursor 會掃描特定路徑下的 skill；把中央庫對應的 **`skills/<name
 
 1. 在 `<AI_SKILL_REPO>`：`git pull`（若與他人共用或換機）。
 2. **只在本庫**編輯：`shared-rules/` 內各分類檔（含 `feedback-lessons.md`）、`skills/apk-analysis/SKILL.md`、`RUNBOOK.md`、`DOCUMENTATION.md` 等（遵守上方回饋規則）。
-3. 依你選的策略：
+3. 檢查 **連動更新**：依 [`shared-rules/linked-updates.md`](shared-rules/linked-updates.md)，若本次改動影響其他文件、索引、skill 入口、同步流程或分類文件，相關檔案**必須**在同一次變更中同步更新或明確檢查。
+4. 依你選的策略：
    - **參照**：通常不需改 `.cursor`；若新增「必讀檔案路徑」或專案特例，才改業務專案 `.cursor/rules` 補一句。
    - **符號連結**：確認連結仍指向正確本庫路徑；本庫 commit 後無須再複製檔案。
    - **複製**：從本庫**單向**同步到 `.cursor`（永遠以本庫為準覆寫快照，避免在複製品上長期單獨編輯）。
    - **`~/.cursor/bundles`（[`sync-cursor-bundle.sh`](scripts/sync-cursor-bundle.sh)）**：每次在本庫改過 **`shared-rules/`** 或 **`skills/`** 後，於 `<AI_SKILL_REPO>` 執行 `./scripts/sync-cursor-bundle.sh`，讓 `~/.cursor/shared-rules` 與 `~/.cursor/skills/<name>` 的連結與目錄列表跟上（必要時 Reload Cursor）。可選：在本 repo 根目錄執行一次 `git config core.hooksPath scripts/git-hooks`，之後每次 **`git commit`** 會自動跑同步（見 [`scripts/README.md`](scripts/README.md)）。
-4. 在 `<AI_SKILL_REPO>`：`git add` → `commit` → `push`。
-5. 若業務專案的 `.cursor` 有變更（規則文字或複製內容）：在該專案 git **另行** `commit`／`push`。
+5. 在 `<AI_SKILL_REPO>`：`git add` → `commit` → `push`。
+6. 若業務專案的 `.cursor` 有變更（規則文字或複製內容）：在該專案 git **另行** `commit`／`push`。
 
 若要讓「複製策略」也能追蹤是否落後，可在同步後於 `.cursor` 內保留一行註記（例如同步日期或本庫 `git rev-parse --short HEAD` 的輸出）；真正的一致性仍靠流程與單向同步，無法只靠 Cursor 自動完成。
 

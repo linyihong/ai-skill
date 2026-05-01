@@ -12,7 +12,7 @@ Use this folder when the question is "how do we implement it?" rather than "what
 
 ## Required Linked Updates
 
-Implementation docs are not standalone. When adding or changing an implementation pattern, you **must** update or verify the linked guidance:
+Implementation docs are not standalone. Follow [`../../../shared-rules/linked-updates.md`](../../../shared-rules/linked-updates.md). When adding or changing an implementation pattern, you **must** update or verify the linked guidance:
 
 1. `controls/` for the security principle.
 2. `platforms/` for platform-specific behavior, if relevant.

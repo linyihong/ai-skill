@@ -38,7 +38,7 @@ Use this skill when APK analysis, mobile API review, or app development work rev
    - Language/runtime-specific trap: `languages/`.
    - Concrete implementation pattern: `implementation/`.
    - Repeatable review step: `checklists/`.
-6. Apply required linked updates: when a control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
+6. Apply required linked updates from [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md): when a control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
 7. If the lesson is reusable but not yet mature, add it to `feedback_history/` first; promote it into the structured folders when validated.
 
 ## Default Workflow

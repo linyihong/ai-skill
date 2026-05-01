@@ -65,7 +65,7 @@ This keeps the skill readable as it grows across mobile, web, backend, and futur
 
 ## Required Linked Updates
 
-Some changes must move together. If a change touches a control, platform, language, checklist, implementation pattern, or template, the related files **must** be updated or explicitly checked in the same change.
+Repo-wide rule: [`../../shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md). Some changes must move together. If a change touches a control, platform, language, checklist, implementation pattern, or template, the related files **must** be updated or explicitly checked in the same change.
 
 Examples:
 

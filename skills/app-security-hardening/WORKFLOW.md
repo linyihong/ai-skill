@@ -76,7 +76,7 @@ Prefer linking between folders over duplicating the same guidance.
 
 ## 6. Apply Required Linked Updates
 
-Before finishing a change, check whether the update affects related folders. If yes, those linked updates are **required** in the same change:
+Before finishing a change, follow the repo-wide rule in [`../../shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md). If the update affects related folders, those linked updates are **required** in the same change:
 
 | Changed area | Must update or verify |
 | --- | --- |

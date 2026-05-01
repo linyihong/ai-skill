@@ -58,6 +58,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 ## 4. 與共用規則的關係
 
 - **授權、去敏、路徑占位、feedback 檔名與模板**：一律只維護在 **`shared-rules/`**，各 skill **不要**複製長文。
+- **連動更新規則**：一律只維護在 **[`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md)**；新增 skill 或修改 skill 結構時，受影響的索引、入口、同步文件、分類文件**必須**同步更新或明確檢查。
 - 各 skill 的 **`FEEDBACK.md`**（若需要）：維持與 [`apk-analysis/FEEDBACK.md`](apk-analysis/FEEDBACK.md) 相同模式——**幾行連結**到 [`shared-rules/feedback-lessons.md`](../shared-rules/feedback-lessons.md)。
 - 每一則 lesson 頂部引用 `shared-rules`（路徑依檔案深度調整 `../../../shared-rules/...`）。
 
@@ -65,7 +66,8 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 
 1. 編輯根目錄 [**`README.md`**](../README.md) 的「現有 Skills」表格，加一行 `skills/<name>/` 與簡短說明。
 2. 編輯 [**`skills/README.md`**](README.md) 的表格，同步列出。
-3. `git add` → `commit` → `push`。
+3. 依 [`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md) 檢查是否還需要同步更新 `RUNBOOK.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、同步腳本或 cross-link。
+4. `git add` → `commit` → `push`。
 
 ## 6. 同步到本機 `~/.cursor`（可選）
 
@@ -105,6 +107,7 @@ ln -sf "${AI_SKILL_REPO}/skills/my-skill" "${HOME}/.cursor/skills/my-skill"
 - [ ] 正文有連到 `shared-rules` 與 `feedback-lessons`
 - [ ] 已建立 `feedback_history/`（可先要 `README.md` 索引）
 - [ ] 根目錄 `README.md` 與 `skills/README.md` 已更新
+- [ ] 已依 `shared-rules/linked-updates.md` 完成或明確檢查必要連動更新
 - [ ] 無真實本機絕對路徑、無機密寫入將 commit 的檔案
 
 ← [回到 skills 索引](README.md)

@@ -88,11 +88,15 @@ Status: candidate | validated | deprecated | promoted | experimental
 - `TOOLS.md`
 - `DOCUMENTATION.md`
 - `SKILL.md`
+
+#### Required Linked Updates
+
+- 依 [`linked-updates.md`](linked-updates.md) 列出必須同步更新或已檢查的相關文件；若無需連動更新，寫明原因。
 ```
 
 ## 同步與索引
 
-- **索引**：維護者可定期更新 **`<skill>/feedback_history/README.md`**（表格：檔名、Status、標題、一句話摘要）；agent 新增檔案後**可選**追加表格列。
+- **索引**：維護者可定期整理 **`<skill>/feedback_history/README.md`**（表格：檔名、Status、標題、一句話摘要）；若該 skill 已有索引，agent 新增 lesson 檔後**必須**追加表格列或明確說明為何暫不更新。
 - **Git**：**`feedback_history/`** 版本控制；不要提交含機密的原始 log。
 - **歷史**：既有長篇 lesson 應已拆至各 `feedback_history/*.md`（若見批次時間戳如 `120000`–`120010` 僅供排序，新建請用**當下** `HHMMSS`）；請自此新增檔案而非往舊版單檔底部堆疊。
 
