@@ -54,6 +54,7 @@ native backtrace 落在哪裡？
 | 證據 | 優先主線 |
 | --- | --- |
 | WebView / OkHttp / HttpURLConnection 命中 | Java hook + MITM + request/response logging |
+| 已對 **`OkHttpClient.newCall`**／**`Request$Builder.url`**／**`RealCall.enqueue`** 廣覆蓋（含延遲重試），**使用者操作下仍無業務 host／path** | **勿**再假設「只有時間不夠」；升級為 **Flutter／Dart `dart:io`**、**native `connect`／pcap SNI**，或 **MITM（僅在流量進代理時有效）** |
 | Flutter / Dart AOT native path | blutter / reFlutter 類工具 + Frida Dart object hook |
 | Native C/C++ custom client | native symbol/string/disassembly + connect/send/recv 輔助 hook |
 | Cronet / QUIC | Cronet hooks、flags、HTTP/2/QUIC telemetry、必要時停用 QUIC |
