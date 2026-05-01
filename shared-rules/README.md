@@ -8,6 +8,7 @@
 2. **撰寫或新增 `feedback_history` lesson、或任何「回饋／沉澱技巧」行為前**，必須已讀過 **[feedback-lessons.md](feedback-lessons.md)** 與 **[sanitization.md](sanitization.md)**；若涉及授權邊界，另讀 **[authorization-scope.md](authorization-scope.md)**。
 3. 索引與各分檔中的 **Markdown 連結**視為規則的一部分；請**循連結讀取**，直到該任務需要的條文都已載入為止。
 4. **Git：**若你改動的是 **Ai-skill 這個 git repository**（`shared-rules/`、`skills/`、根目錄 README 等），**除非使用者明講不要提交**，否則應在該 repo 根目錄完成 **`git add` → `git commit` → `git push`**；請自行申請所需工具權限。重新載入 Cursor **不取代**這一步。
+5. **本機 `~/.cursor/bundles`：**若使用者以 [`scripts/sync-cursor-bundle.sh`](../scripts/sync-cursor-bundle.sh) 佈署，每次改動 **`shared-rules/`** 或 **`skills/`** 後應執行該腳本（或在 repo 設定 `git config core.hooksPath scripts/git-hooks` 讓 commit 後自動跑）；必要時請使用者 Reload Cursor。**Agent** 在有權執行 shell 時應代為執行同步腳本，除非使用者表示不要動 `~/.cursor`。
 
 | 分類 | 檔案 | 內容摘要 |
 | --- | --- | --- |

@@ -101,6 +101,7 @@ Cursor 會掃描特定路徑下的 skill；把中央庫 **`skills/apk-analysis/`
    - **參照**：通常不需改 `.cursor`；若新增「必讀檔案路徑」或專案特例，才改業務專案 `.cursor/rules` 補一句。
    - **符號連結**：確認連結仍指向正確本庫路徑；本庫 commit 後無須再複製檔案。
    - **複製**：從本庫**單向**同步到 `.cursor`（永遠以本庫為準覆寫快照，避免在複製品上長期單獨編輯）。
+   - **`~/.cursor/bundles`（[`sync-cursor-bundle.sh`](scripts/sync-cursor-bundle.sh)）**：每次在本庫改過 **`shared-rules/`** 或 **`skills/`** 後，於 `<AI_SKILL_REPO>` 執行 `./scripts/sync-cursor-bundle.sh`，讓 `~/.cursor/shared-rules` 與 `~/.cursor/skills/<name>` 的連結與目錄列表跟上（必要時 Reload Cursor）。可選：在本 repo 根目錄執行一次 `git config core.hooksPath scripts/git-hooks`，之後每次 **`git commit`** 會自動跑同步（見 [`scripts/README.md`](scripts/README.md)）。
 4. 在 `<AI_SKILL_REPO>`：`git add` → `commit` → `push`。
 5. 若業務專案的 `.cursor` 有變更（規則文字或複製內容）：在該專案 git **另行** `commit`／`push`。
 

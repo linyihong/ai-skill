@@ -41,6 +41,10 @@
 
 本庫提供可重複執行的腳本：**[`scripts/sync-cursor-bundle.sh`](../scripts/sync-cursor-bundle.sh)**（見 [`scripts/README.md`](../scripts/README.md)）。
 
+## 改動 `shared-rules/` 或 `skills/` 之後
+
+凡編輯過這兩處且希望 **本機 Cursor** 立刻經 `~/.cursor/bundles` 跟上時，請在 `<AI_SKILL_REPO>` 執行 `./scripts/sync-cursor-bundle.sh`（可重複執行、無害）。可選：於 repo 根目錄 `git config core.hooksPath scripts/git-hooks`，則每次 **`git commit`** 後會自動跑該腳本。若 skill 清單仍未更新，再 **Developer: Reload Window**。
+
 ## 為什麼會看到「兩個」shared-rules？
 
 **沒有兩份內容。**真實檔案只在 **`<AI_SKILL_REPO>/shared-rules/`** 這一處。
