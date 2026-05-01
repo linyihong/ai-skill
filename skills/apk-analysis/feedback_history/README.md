@@ -25,3 +25,4 @@
 | `2026-05-01_142000-exhaustive-java-okhttp-hooks-may-still-miss-flutter-business-http.md` | validated | 廣覆蓋 Java OkHttp 仍無業務 host 時應轉 Dart／native／pcap | 同時 hook **`newCall`／`Builder.url`／`enqueue`** 並延遲重試後，若使用者操作下仍無業務 URL，視為 **Java OkHttp 非主路徑**；改 **Dart／native TLS／pcap SNI** 或 **MITM**。 |
 | `2026-05-01_145948-dart-aot-callsite-hooks-are-not-function-hooks.md` | validated | Dart AOT Callsite Hooks Are Not Function Hooks | Dart AOT call edge 裡的 caller 內部 `BL` 位址只適合導航；Frida 動態驗證應優先 hook function entry 或高語意邊界。 |
 | `2026-05-01_151551-schema-only-jsondecode-hook.md` | validated | Schema-only jsonDecode Hook | 回包明文只在 Dart decode 階段出現時，hook `jsonDecode` input 並只輸出 length/hash/top-level keys/types，避免落 raw JSON value。 |
+| `2026-05-01_153437-sequence-jsondecode-before-api-response.md` | validated | Sequence jsonDecode Before Calling It API Response | `jsonDecode` hook 看到的 schema 不一定是 API response；必須用 request/decrypt sequence 證明它發生在業務 response 路徑上。 |

@@ -160,6 +160,7 @@ response decode hook:
 3. 記錄演算法：KDF、AES mode、padding、MAC、compression。
 4. 用 hook 取得 decrypted output。
 5. 若 decrypt return 是 wrapper / Future / Map 而非可直接讀的 String，改 hook `jsonDecode`、`JsonDecoder.convert` 或 app 的 parse/decode helper，先輸出 schema-only 摘要（length/hash/top-level keys/types，不印 values）。
+   - 同時記錄 request/decrypt/json 的 sequence/timestamp；`jsonDecode` 若出現在第一個業務 request 前，先標成 local/cache/startup schema，不要寫成 API response。
 6. 寫離線 decoder。
 7. 建立 raw encrypted -> decrypted fixture。
 8. 用 fixture 驗證 SDK/client mapping。
