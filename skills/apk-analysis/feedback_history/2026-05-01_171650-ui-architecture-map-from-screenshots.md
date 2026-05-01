@@ -14,6 +14,10 @@ Status: promoted
 
 常見誤判是看到某個畫面後，就把同一時間出現的所有 request 都歸因給這個 screen。啟動預載、背景同步、快取刷新與多 screen 共用 endpoint 都可能混在同一段流量裡，所以文件要保留 trigger confidence 與 unknowns。
 
+Revision 2026-05-01:
+
+UI map 不一定要先做完整截圖或完整遍歷。若 screenshot、screenrecord、UI dump 或自動操作導致 App、裝置、proxy、hook 變慢，應改成輕量架構盤點，或先解核心 API/response/token，再回頭只對高價值 endpoint 補 UI binding。
+
 #### Trigger
 
 遇到以下情境時應使用：
@@ -38,6 +42,8 @@ APK traffic analysis should include a UI architecture map whenever the app can b
 下次 agent 進行授權 APK 分析時，如果能控制裝置或使用者提供 app 截圖，應先建立 `App Architecture Map`：
 
 - 盤點 bottom tabs、top tabs、drawer/menu、主要列表、詳情頁、播放器/媒體頁與設定頁。
+- 先決定 capture strategy：`lightweight overview`、`API-first then bind` 或 `full operation map`。
+- 若截圖或 UI 遍歷造成卡頓，暫停批量截圖，保留 API hook/pcap 主線。
 - 為每個操作建立 stable operation id 與 UI path。
 - 每次只操作一個 screen/action，記錄操作前後時間戳。
 - 將 request/response 依 operation id 回填到 `Operation To API Matrix`。

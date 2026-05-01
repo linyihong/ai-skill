@@ -48,6 +48,7 @@
 
 | 現象 | 可能原因 | 下一步 |
 | --- | --- | --- |
+| UI map / 截圖流程讓 App 或分析環境變卡 | 截圖、錄影、UI dump、自動遍歷、hook logging 同時進行，I/O 與主執行緒壓力太高。 | 降成 lightweight overview：只截主要 tabs/關鍵 screen；先停錄影與批量 dump，保留 API hook/pcap 主線，等核心 API 穩定後再補 UI binding。 |
 | 抓到 API 但不知道是哪個操作觸發 | 沒有建立 UI 操作時間窗，或 startup/preload/background sync 混在一起。 | 先補 screenshot/UI hierarchy 與 operation id；每次只操作一個 screen/action，將時間窗對齊 pcap/MITM/Frida sequence。 |
 | 截圖看起來是某個 tab，但 API timing 對不上 | tab 預載、快取、背景同步、或同 endpoint 被多個 screen 共用。 | 標成 trigger confidence low/medium；用冷啟動、清 cache、單步操作或 hook sequence 重新驗證。 |
 | Proxyman 沒有核心 API | client 不走系統代理、attach 太晚、流程沒觸發。 | pcap 確認 host；用 cold-start injection 或高語意 hook。 |
@@ -101,7 +102,7 @@ adb devices
 adb -s <device-serial> shell pidof <package-name>
 ```
 
-建立 UI architecture map 的 screenshot 與 hierarchy evidence：
+建立 UI architecture map 的 screenshot 與 hierarchy evidence。先用少量代表性畫面，不要一開始批量遍歷整個 App：
 
 ```bash
 adb -s <device-serial> shell screencap -p /sdcard/screen.png

@@ -24,8 +24,9 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Check Java HTTP hooks only if evidence suggests Java networking.
    - For Flutter apps, inspect Dart AOT/native paths early.
 4. Build a UI architecture map when the device/app can be operated:
-   - Capture sanitized screenshots and list visible tabs, drawers, bottom navigation items, routes, and key screens.
-   - Record the exact UI path and action window for each network capture so APIs can be tied back to user operations.
+   - Start lightweight: capture only enough sanitized screenshots/UI hierarchy to understand major tabs, drawers, routes, and key screens.
+   - Adapt the order if screenshots or device control make the app slow: solve core API/decode first, then bind important APIs back to UI actions.
+   - Record the exact UI path and action window only for flows that need API attribution.
 5. Prefer high-semantic hooks:
    - Request object hooks are better than raw socket hooks.
    - Response interceptor/decode hooks are better than trying to reconstruct TLS bytes.

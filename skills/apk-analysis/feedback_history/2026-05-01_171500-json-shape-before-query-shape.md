@@ -49,6 +49,10 @@ When building sanitized payload loggers, order classifiers from highest semantic
 
 After applying the rule, request plaintext still reports expected request keys and service hashes, while decrypted JSON response lines keep only JSON keys/types/nested shape and no longer emit request-oriented query metadata from embedded URL fields.
 
+#### Revision - 2026-05-01
+
+Binary-like or pipe-separated decrypted payloads can also contain incidental `&` / `=` characters and produce fake query keys. The safer generalized rule is: run request-oriented query extraction only on strings that first look like request material, such as containing `service=` or an API path marker. Do not treat arbitrary non-JSON strings with `&` / `=` as request evidence.
+
 #### Promotion Target
 
 - `WORKFLOW.md`

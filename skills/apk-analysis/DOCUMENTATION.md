@@ -75,10 +75,19 @@
 
 ## UI 架構地圖模板
 
-用 screenshot、UI hierarchy 與可重放操作，把 App 的可見架構先寫成地圖。這份文件放專案分析文件，不放 reusable skill，skill 只保留模板與方法。
+用 screenshot、UI hierarchy 與可重放操作，把 App 的可見架構寫成地圖。這份文件放專案分析文件，不放 reusable skill，skill 只保留模板與方法。若截圖太多會拖慢裝置或干擾 hook/pcap 時，先做輕量盤點，等核心 API 解完後再補關鍵 UI 綁定。
 
 ```markdown
 ## App Architecture Map
+
+### Capture Strategy
+
+| Field | Value |
+| --- | --- |
+| Mode | lightweight overview / API-first then bind / full operation map |
+| Capture budget | main tabs only / key flows only / exhaustive |
+| Reason | avoid device lag / core API unknown / documentation completeness |
+| Deferred binding | endpoints or screens to revisit later |
 
 ### Navigation Summary
 
@@ -97,24 +106,27 @@
 
 ### Operation To API Matrix
 
-| Operation ID | UI path / action | Capture window | Method / Path | Source | Response shape | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| `open-home` | cold start -> Home | `<start-end>` | `GET /<path>` | hook / pcap / MITM | top-level keys only | may include preload/cache |
-| `open-detail` | `Home > item tap` | `<start-end>` | `POST /<path>` | hook | schema-only summary | |
+| Operation ID | UI path / action | Binding phase | Capture window | Method / Path | Source | Response shape | Confidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `open-home` | cold start -> Home | initial map | `<start-end>` | `GET /<path>` | hook / pcap / MITM | top-level keys only | medium | may include preload/cache |
+| `open-detail` | `Home > item tap` | after API decoded | `<start-end>` | `POST /<path>` | hook | schema-only summary | high | |
 
 ### Unknown / Untested Navigation
 
 - Screen or tab not yet opened:
 - Operation that produced no network:
 - API seen without confirmed UI trigger:
+- Binding deferred because screenshots/UI traversal were too heavy:
 ```
 
 文件要求：
 
 - Screenshot 要去敏；不要保留帳號、頭像、電話、email、訂單、私訊或個資。
+- 先記主要 tabs/screens 即可；只有高價值流程或需要 attribution 的 API 才補完整操作截圖。
 - Capture window 要能對齊 pcap/MITM/Frida log 的時間戳或 sequence id。
 - API 關聯要寫 `Source`，例如 hook、pcap timing、MITM、replay；只靠 screenshot 不足以證明 API 來源。
 - 若某個 API 是 startup/preload/background sync，要在 `Notes` 標明，避免誤判為當前點擊觸發。
+- 若採 API-first，先在 API 文件標 `UI path: unknown` / `Trigger confidence: low`，等核心 API 穩定後再回填 UI binding。
 
 ## API / Schema 文件模板
 
