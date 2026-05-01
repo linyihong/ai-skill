@@ -7,6 +7,8 @@ description: Guides authorized APK traffic analysis, dynamic capture, Flutter/Da
 
 Use this skill for authorized APK analysis only. The goal is to recover how an app communicates, captures, decodes, and validates data in a reproducible way, then turn findings into documentation and reusable tests without leaking secrets or target-specific private details.
 
+**Shared policy (do not duplicate in every lesson):** read [`shared-rules` index](../../shared-rules/README.md) once (or [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md) for feedback-specific rules). Per-technique files in `feedback_history/` should **reference** those files, not paste the full common rules.
+
 ## Quick Start
 
 1. Confirm scope and authorization:
@@ -31,7 +33,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Contract tests where the project has an SDK or client implementation.
 6. **Automatic skill feedback (agents)**:
    - Whenever you learn a **new reusable** technique, failure pattern, or validation rule during analysis, **write it into this skill in the same session**—do **not** wait for the user to say「記得回饋」.
-   - Add **one new Markdown file** under [`feedback_history/`](feedback_history/) using the template in [FEEDBACK.md](FEEDBACK.md) (generalized, sanitized, with evidence and applicability). Optionally add a row to [`feedback_history/README.md`](feedback_history/README.md).
+   - Add **one new Markdown file** under [`feedback_history/`](feedback_history/) using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming + template (generalized, sanitized, with evidence and applicability). Optionally add a row to [`feedback_history/README.md`](feedback_history/README.md).
    - If the lesson is already credible from evidence in this session, also patch [TOOLS.md](TOOLS.md), [WORKFLOW.md](WORKFLOW.md), or [DOCUMENTATION.md](DOCUMENTATION.md) as appropriate; label uncertain items `experimental` in that lesson file instead of promoting prematurely.
    - Target-specific hosts, endpoints, tokens, or one-off product conclusions stay in the **project** docs, not in reusable skill files.
 
@@ -43,7 +45,7 @@ Use [TOOLS.md](TOOLS.md) when preparing an environment or choosing between adb, 
 
 Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing human-readable results.
 
-Use [FEEDBACK.md](FEEDBACK.md) for **how** to write feedback; put each lesson in [`feedback_history/`](feedback_history/). **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §6** and **Feedback Loop** below.
+Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) for **how** to write feedback; put each lesson in [`feedback_history/`](feedback_history/). **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §6** and **Feedback Loop** below.
 
 Use [RUNBOOK.md](RUNBOOK.md) when starting a new APK project or when the user asks how to apply this skill to another product.
 
@@ -91,7 +93,7 @@ Use placeholders:
 
 If analysis discovers a new reusable idea:
 
-1. Create **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** as a dated lesson **proactively** (same session as the discovery unless blocked by missing evidence). Follow [FEEDBACK.md](FEEDBACK.md) naming rules (`HHMMSS` = local 24h time).
+1. Create **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** as a dated lesson **proactively** (same session as the discovery unless blocked by missing evidence). Follow [feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming rules (`HHMMSS` = local 24h time).
 2. Generalize it so it is not tied to one APK.
 3. Add evidence and validation criteria.
 4. Promote it into `WORKFLOW.md`, `TOOLS.md`, or `DOCUMENTATION.md` only after it has been validated or is clearly labeled as experimental in the lesson file.

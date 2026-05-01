@@ -1,5 +1,7 @@
 # APK 分析 Skill 與人類指南
 
+本包位於 **`skills/apk-analysis/`**（與其他 skill 並列於 [`skills/`](../README.md)）。**全庫共用政策與 feedback 寫作底線**見 [`../../shared-rules/README.md`](../../shared-rules/README.md)。
+
 這個資料夾是可持續強化的 APK 分析知識包。它同時服務兩種讀者：
 
 - AI / Claude / Cursor agent：讀 `SKILL.md`，知道遇到 APK 分析、動態抓包、解密定位、Frida hook、Flutter/Dart AOT 分析時要怎麼做。
@@ -33,7 +35,7 @@
 | `WORKFLOW.md` | 人類與 agent 都可讀的分析決策流程。 |
 | `TOOLS.md` | 常用工具、前置條件、適用情境與失敗判讀。 |
 | `DOCUMENTATION.md` | 分析結果如何寫成可重現文件。 |
-| `FEEDBACK.md` | **如何**撰寫回饋、命名規則、lesson 模板（本檔保持精簡）。 |
+| `FEEDBACK.md` | 入口：指向全庫共用的 [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md)。 |
 | `feedback_history/` | 每一條獨立 lesson 的 Markdown；必要時見 `README.md` 索引表。 |
 | `RUNBOOK.md` | 新 APK 專案第一天如何套用 skill，以及如何把新經驗回饋回本包。 |
 
@@ -51,7 +53,7 @@
 分析完成後：
 
 1. 把 target-specific API / schema / endpoint 結論寫回專案對應 API 文件。
-2. 把可重用方法寫成 **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**（規則見 `FEEDBACK.md`）。
+2. 把可重用方法寫成 **`feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**（規則見 [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)）。
 3. 如果方法已驗證，整理進 `WORKFLOW.md` 或 `TOOLS.md`。
 4. 若專案有 SDK 或 client，將解碼規則補成 fixture / contract test。
 
