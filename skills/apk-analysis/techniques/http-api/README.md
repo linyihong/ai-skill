@@ -40,6 +40,6 @@ If UI binding is not done yet, write `UI path: unknown` and `Trigger confidence:
 
 ## Related Lessons
 
-- `../../feedback_history/2026-05-01_171500-json-shape-before-query-shape.md`
-- `../../feedback_history/2026-05-01_171650-ui-architecture-map-from-screenshots.md`
-- `../../feedback_history/2026-05-01_173800-api-field-documentation-after-analysis.md`
+- `../../feedback_history/http-api/2026-05-01_171500-json-shape-before-query-shape.md`
+- `../../feedback_history/http-api/2026-05-01_171650-ui-architecture-map-from-screenshots.md`
+- `../../feedback_history/http-api/2026-05-01_173800-api-field-documentation-after-analysis.md`

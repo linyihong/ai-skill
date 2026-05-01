@@ -30,4 +30,4 @@ Use magic bytes, container probes, or frame counts to distinguish static image, 
 
 ## Related Lessons
 
-- `../../feedback_history/2026-04-30_120007-媒體播放鏈要分控制面-金鑰與資料面.md`
+- `../../feedback_history/media-hls/2026-04-30_120007-媒體播放鏈要分控制面-金鑰與資料面.md`

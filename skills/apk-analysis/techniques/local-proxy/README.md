@@ -32,7 +32,7 @@ Use local proxy metadata to map local UI/client calls to upstream APIs. If the u
 
 ## Related Lessons
 
-- `../../feedback_history/2026-04-30_120010-本機-loopback-proxyserver-轉發會讓-wi-fi-http-mitm-看不到業務-connect.md`
-- `../../feedback_history/2026-05-01_114300-local-proxy-handler-uri-hook.md`
-- `../../feedback_history/2026-05-01_131000-cast-netty-request-for-handler-route.md`
-- `../../feedback_history/2026-05-01_132400-netty-aggregated-request-tostring-headers.md`
+- `../../feedback_history/local-proxy/2026-04-30_120010-本機-loopback-proxyserver-轉發會讓-wi-fi-http-mitm-看不到業務-connect.md`
+- `../../feedback_history/local-proxy/2026-05-01_114300-local-proxy-handler-uri-hook.md`
+- `../../feedback_history/local-proxy/2026-05-01_131000-cast-netty-request-for-handler-route.md`
+- `../../feedback_history/local-proxy/2026-05-01_132400-netty-aggregated-request-tostring-headers.md`

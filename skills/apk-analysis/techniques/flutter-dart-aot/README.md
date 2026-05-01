@@ -52,10 +52,10 @@ response decode hook:
 
 ## Related Lessons
 
-- `../../feedback_history/2026-05-01_133900-dart-aot-interceptor-strings-after-java-helper-miss.md`
-- `../../feedback_history/2026-05-01_140900-unflutter-aot-offset-hook-after-blutter-crash.md`
-- `../../feedback_history/2026-05-01_145948-dart-aot-callsite-hooks-are-not-function-hooks.md`
-- `../../feedback_history/2026-05-01_151551-schema-only-jsondecode-hook.md`
-- `../../feedback_history/2026-05-01_153437-sequence-jsondecode-before-api-response.md`
-- `../../feedback_history/2026-05-01_155200-dart-compressed-response-fields.md`
-- `../../feedback_history/2026-05-01_164741-dart-inline-onebyte-string-smi-length.md`
+- `../../feedback_history/flutter-dart-aot/2026-05-01_133900-dart-aot-interceptor-strings-after-java-helper-miss.md`
+- `../../feedback_history/flutter-dart-aot/2026-05-01_140900-unflutter-aot-offset-hook-after-blutter-crash.md`
+- `../../feedback_history/flutter-dart-aot/2026-05-01_145948-dart-aot-callsite-hooks-are-not-function-hooks.md`
+- `../../feedback_history/flutter-dart-aot/2026-05-01_151551-schema-only-jsondecode-hook.md`
+- `../../feedback_history/flutter-dart-aot/2026-05-01_153437-sequence-jsondecode-before-api-response.md`
+- `../../feedback_history/flutter-dart-aot/2026-05-01_155200-dart-compressed-response-fields.md`
+- `../../feedback_history/flutter-dart-aot/2026-05-01_164741-dart-inline-onebyte-string-smi-length.md`
