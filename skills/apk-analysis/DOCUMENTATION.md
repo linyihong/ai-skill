@@ -35,6 +35,8 @@
 
 若分析目標是讓後續 agent 能用 [`app-development-guidance`](../app-development-guidance/) 重新做出同等功能，專案分析文件不能只列 endpoint。它必須把 UI 行為、資料模型、API 合約、狀態轉移、錯誤處理與驗證證據串成可交接規格。
 
+若使用者要用分析文件做出 app 相關工具、SDK、client、mock API、fixture-driven implementation、contract test 或重建功能，agent 必須自動讀取並套用 [`app-development-guidance/SKILL.md`](../app-development-guidance/SKILL.md)。`apk-analysis` 只負責提供去敏證據、UI/API attribution、schema、fixture 與 confidence；開發文件、BDD、Domain Model Contract、API / Interface Contract、Error Handling Contract、implementation slices、tests 與 blocker questions 由 `app-development-guidance` 接手。
+
 每個重要功能至少要留下：
 
 | 面向 | 必填內容 | 交給 app-development-guidance 時的用途 |
@@ -98,6 +100,7 @@
 - Draft Error Handling Contract:
 - Required fixtures or tests:
 - Open questions for implementation:
+- app-development-guidance activated: yes/no
 ```
 
 規則：
@@ -107,6 +110,7 @@
 - 若只有 API、沒有 UI 來源，仍要寫 `UI path: unknown`、`Trigger confidence: low`，並說明可用哪些操作補證。
 - 若只有 UI、沒有 API 明文，仍要寫可見行為與未知 API 合約，不要假造 request/response。
 - 交給 `app-development-guidance` 的內容必須是已去敏、可泛化的功能/合約描述；target-specific host、token、帳號資料與 raw response 留在專案受控位置。
+- 若 output 目標包含 app 工具、SDK、client、mock、fixture-driven implementation、contract test 或重建功能，不能只輸出 APK 分析文件；必須同輪啟用 `app-development-guidance` 產出或更新開發文件需求與 blocker questions。
 
 ## 單次分析筆記模板
 
@@ -425,7 +429,7 @@ Java OkHttp hook installed successfully, but no target host/path appeared while 
 | 已去敏觀察 | 可重用的開發建議 | client / API / backend / build / monitoring | 測試或 review 方法 |
 ```
 
-這一節只寫已去敏、可泛化的開發啟發。成熟後把 App 開發 guidance 回饋到 [`app-development-guidance`](../app-development-guidance/)；本 `apk-analysis` skill 只保留分析方法、證據鏈與工具判斷。
+這一節只寫已去敏、可泛化的開發啟發。成熟後把 App 開發 guidance 回饋到 [`app-development-guidance`](../app-development-guidance/)；本 `apk-analysis` skill 只保留分析方法、證據鏈與工具判斷。若使用者要用這些文件實作 app 工具、SDK 或 client，必須立即套用 `app-development-guidance`，不要在 `apk-analysis` 文件裡直接展開產品開發流程。
 
 ## 技巧回饋文件要給人讀
 
@@ -463,5 +467,6 @@ Agent Action:
 - 目標 API 結論回填專案 API 文件。
 - 解碼規則回填協議/解密文件。
 - SDK 或 client 行為回填 BDD / tests。
+- 若分析文件要用來做 app 工具、SDK、client、mock、fixture-driven implementation、contract test 或重建功能，同輪自動啟用 [`app-development-guidance`](../app-development-guidance/) 並交出 Feature Reconstruction Handoff；不要讓開發規格停留在 APK 分析文件內。
 - 通用技巧回填 **`feedback_history/<category>/`** 或 **`feedback_history/common/`**（新檔），驗證後再整理到本 skill 的主文件或對應 `techniques/<category>/`。
 - App 開發 guidance 回填 [`app-development-guidance`](../app-development-guidance/)；不要把產品開發 checklist 長期堆在 `apk-analysis`。

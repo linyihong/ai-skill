@@ -72,10 +72,12 @@ Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) f
 
 Use [`app-development-guidance`](../app-development-guidance/) when analysis findings should become app development guidance, implementation patterns, PR/release checklists, or validation tests.
 
-When the user wants a feature rebuilt from APK findings, use this cross-skill handoff:
+Automatically read and apply [`app-development-guidance/SKILL.md`](../app-development-guidance/SKILL.md) when the user wants APK analysis documents to produce an app-related tool, SDK, client, mock API, fixture-driven implementation, contract test, or rebuilt feature. Do this before drafting implementation plans so missing BDD, contract, error-handling, storage, security, ownership, or test questions are surfaced by `app-development-guidance` instead of being invented inside `apk-analysis`.
+
+When the user wants a feature rebuilt from APK findings or wants analysis docs turned into app tools / SDK work, use this cross-skill handoff:
 
 - Target skill: [`app-development-guidance`](../app-development-guidance/).
-- Trigger: APK findings must become rebuildable app behavior, API/interface contracts, implementation slices, or tests.
+- Trigger: APK findings must become rebuildable app behavior, app-related tools, SDK/client behavior, API/interface contracts, implementation slices, fixtures, mocks, or tests.
 - Handoff artifact: Feature Reconstruction Handoff with sanitized behavior, domain, API/interface, state/error, data lifecycle, fixture, and open-question detail.
 - Ownership boundary: `apk-analysis` owns evidence recovery, traffic/UI attribution, schema notes, fixtures, and confidence labels; `app-development-guidance` owns BDD, Domain Model Contract, API / Interface Contract, Error Handling Contract, implementation guidance, checklists, and tests.
 - Sanitization boundary: target-specific hosts, tokens, raw responses, accounts, and private business conclusions stay in project docs.

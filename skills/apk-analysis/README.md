@@ -74,6 +74,7 @@
 4. 若專案有 SDK 或 client，將解碼規則補成 fixture / contract test。
 5. 若得到的是「未來開發自家 App 時可用的設計、實作或防護 guidance」而非分析方法，寫入 [`app-development-guidance`](../app-development-guidance/)；本包只保留分析證據與方法。
 6. 若目標是重新做出同等功能，專案分析文件必須包含 Feature Reconstruction Handoff，讓 [`app-development-guidance`](../app-development-guidance/) 可以接手產生 BDD、Domain Model Contract、API / Interface Contract、Error Handling Contract、implementation slices 與 tests。
+7. 若分析文件要用來做 app 相關工具、SDK、client、mock API、fixture-driven implementation、contract test 或重建功能，agent 必須自動讀取並套用 [`app-development-guidance/SKILL.md`](../app-development-guidance/SKILL.md)，不要只在 `apk-analysis` 內寫實作計畫。
 
 ## 核心原則
 
@@ -85,6 +86,7 @@
 - 文件要分離「方法」與「目標 App 的結論」。
 - 分析文件要保留足夠的功能語意，不只保存 endpoint；重要 API 要能回到 capability、operation、domain concept、state/error behavior 與 fixture。
 - App 開發 guidance 要分離到 [`app-development-guidance`](../app-development-guidance/)，避免把分析方法與產品開發 checklist 混在一起。
+- 用 APK 分析文件產生工具、SDK、client、mock、contract test 或重建功能時，`app-development-guidance` 必須同輪接手開發文件與 blocker questions。
 - 新發現要回饋到 skill，但必須去敏、泛化、可驗證。
 
 ## 最小產出
@@ -97,5 +99,6 @@
 - 結論：哪些路徑有效、哪些被排除、下一步如何驗證。
 - 功能重建交接：capability、screen/route/operation、domain concept candidates、API/interface contract、state/error handling、data lifecycle、fixtures、open questions。
 - 去敏規則：哪些值被遮蔽，哪些文件不能提交。
+- app-development-guidance handoff：若目標包含 app 工具、SDK、client 或重建功能，要記錄已啟用該 skill 與交接文件位置。
 - 可重用 lesson：新增檔於 **`feedback_history/<category>/`** 或 **`feedback_history/common/`**。
 - 可選的 Developer Guidance Notes：若對自家 App 開發有設計、實作或安全啟發，連到或回饋至 **`app-development-guidance/`**。

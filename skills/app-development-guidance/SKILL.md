@@ -15,6 +15,7 @@ Use this skill when APK analysis, app/API review, or app development work reveal
 
 - Turning APK analysis findings into practical development guidance.
 - Turning observed app/API techniques into buildable patterns for your own app.
+- Turning APK analysis documents into app-related tools, SDKs, clients, mocks, fixture-driven implementations, contract tests, or rebuilt features.
 - Turning product briefs into BDD, Domain Model Contracts, API Contracts, implementation slices, and tests.
 - Backfilling missing development documents for existing, already implemented projects; Product Brief gaps can be marked unknown, but BDD behavior must be completed from observed implementation evidence.
 - Reviewing app/API design for replay resistance, token safety, transport security, local storage, logging, and release hardening.
@@ -94,4 +95,4 @@ If a reusable app development lesson emerges:
 
 **Cross-skill link:** if the lesson came from APK analysis, keep analysis mechanics in [`apk-analysis`](../apk-analysis/) and put development guidance, implementation patterns, and validation checklists here.
 
-When consuming a Feature Reconstruction Handoff from [`apk-analysis`](../apk-analysis/), this skill owns the development conversion: BDD, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, fixtures, tests, and review checklists. Keep raw APK evidence, target-specific hosts, tokens, accounts, and private product conclusions in the project analysis docs.
+When consuming a Feature Reconstruction Handoff from [`apk-analysis`](../apk-analysis/), this skill owns the development conversion: BDD, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, fixtures, tests, and review checklists. If the requested output is an app-related tool, SDK, client, mock, fixture-driven implementation, contract test, or rebuilt feature, apply this skill before implementation planning and surface blocker questions. Keep raw APK evidence, target-specific hosts, tokens, accounts, and private product conclusions in the project analysis docs.
