@@ -35,6 +35,7 @@ Do not assume every project has a frontend/backend split. Pick contracts that ma
 | Library / SDK | Public API contract, type/schema contract, examples, compatibility tests. |
 | Event-driven / worker | Event schema, command/event contract, idempotency and retry behavior. |
 | Embedded / firmware / hardware product | Datasheet or protocol contract, hardware context contract, driver/service/application boundary, BDD, host fixtures, hardware-in-loop checks. |
+| Static analysis / IDE extension / developer tool | Rule catalog, diagnostic or command contract, pure kernel/adapter boundary, fixture pairs, editor/CLI integration tests. |
 
 ## Initial Documentation Pack
 
@@ -68,6 +69,57 @@ Before any code change driven by this skill, inspect the project's 企劃書, pr
 | Security / hardening change | Confirm threat or failure mode, owner layer, required control, validation method, and whether behavior/API/contracts/checklists must change. |
 
 If there is no planning artifact, create a lightweight change brief before implementation. If the request is a new requirement, missing planning docs are blockers; ask the user and fill BDD/contracts before writing code.
+
+## Contract Governance Gate
+
+Every project with multiple docs must define which artifact wins when documents disagree. Use this default precedence unless the project has a stronger local rule:
+
+1. Governance / framework contract: repository-wide invariants, required update rules, dependency direction, naming, build/run constraints.
+2. Product plan / accepted brief: product intent, scope, non-goals, canceled requirements, and business language.
+3. BDD behavior: observable user/system behavior and acceptance criteria.
+4. Domain, architecture, API/interface, error handling, hardware, or command contracts.
+5. Implementation and generated clients.
+6. Tests, fixtures, and examples.
+
+If lower layers reveal the higher layer is wrong, do not silently "fix" code only. Classify the conflict as one of:
+
+| Conflict type | Required action |
+| --- | --- |
+| Product intent changed | Update product brief or plan, then BDD/contracts/tests. |
+| BDD missing or stale | Backfill or revise BDD from evidence and link impacted tests. |
+| Contract stale | Update the contract and all consumers, mocks, generated clients, fixtures, and tests in the same change. |
+| Implementation bug | Keep docs stable, add or update regression tests, then fix code. |
+| Test or fixture stale | Update tests/fixtures to the current contract and cite the source. |
+
+Document canceled, deferred, out-of-scope, and not-tool-enforceable items explicitly. Do not leave them as invisible absences that future agents may reintroduce.
+
+## Traceability Gate
+
+When a project was implemented first and docs are being backfilled, require traceability in both directions:
+
+| Link | Purpose |
+| --- | --- |
+| Product or rule ID -> BDD | Shows which behavior proves the requirement. |
+| BDD -> code refs | Shows where the behavior is implemented. |
+| BDD -> test refs | Shows how the behavior is verified or what gap remains. |
+| Contract operation / command / diagnostic -> fixture | Shows provider/consumer compatibility and edge cases. |
+| Generated client or SDK method -> API/OpenAPI/source contract | Prevents hand-copied endpoints and drift. |
+
+Stable IDs can be feature IDs, rule IDs, operation IDs, route names, command names, diagnostic codes, event names, or scenario tags. If a behavior is intentionally documented but not implemented, mark it as `TBD`, `noop`, `not enforceable by tool`, `manual-only`, or `out of scope`, with the reason and owner.
+
+## BDD Execution Closure
+
+Narrative BDD is acceptable during backfill, but it must not be treated as finished test coverage. For each critical scenario, record one of these statuses:
+
+| Status | Meaning | Required next step |
+| --- | --- | --- |
+| `automated` | Scenario is covered by unit, contract, API, integration, E2E, fixture, or runner test. | Link the test path/name. |
+| `fixture-backed` | Scenario is proven by checked-in input/output fixtures but not a full runner. | Link fixture and assertion owner. |
+| `manual-evidence` | Scenario requires manual, UI, bench, or external service evidence. | Record run steps, evidence, and limits. |
+| `pending-runner` | Gherkin exists but no runner/step definition is wired. | Add runner choice or map to an executable test type. |
+| `not-automatable` | Tooling cannot enforce it directly. | State the manual review or release checklist item. |
+
+BDD closure does not require every scenario to use a Cucumber-style runner. It does require every critical scenario to have an explicit validation path and no ambiguous "documented but untested" state.
 
 ## Test Strategy Gate
 
@@ -142,6 +194,17 @@ When this skill is opened for a project that is already fully or mostly implemen
 | Error Handling Contract | Backfill observed error taxonomy, retry rules, user messages, logging/redaction behavior, security-sensitive failures, and gaps. |
 | Test Plan | Map existing tests to behavior/contracts and list required tests for uncovered BDD scenarios, invariants, contracts, and integration paths. |
 
+For implemented-first projects, also recover the delivery pipeline:
+
+| Pipeline artifact | Backfill rule |
+| --- | --- |
+| Plan index / product radar | Map source product docs, PDFs, tickets, screenshots, or legacy notes to modules, controllers, screens, commands, or packages. Mark canceled or superseded requirements. |
+| Contract taxonomy | List which documents govern build/run, HTTP/API shape, auth/tenant/session, persistence, domain layering, frontend/backend integration, third-party integration, testing, and documentation sync. |
+| Minimum doc sync matrix | For each change type, state the minimum docs/tests to update: API, permission, database, UI flow, generated client, vendor integration, CLI command, diagnostic rule, release setting. |
+| OpenAPI / schema / generated client | Verify the generated consumer code comes from the source contract and does not hand-copy endpoints or DTOs. |
+| Vendor / third-party integration | Separate raw vendor docs from sanitized integration excerpts, request/response contracts, fixture examples, live-test gates, and secret handling. |
+| Tooling / extension rule catalog | Map catalog order, rule IDs, diagnostics/commands, fixtures, and tests; mark process-only or non-enforceable rules explicitly. |
+
 Backfill order for existing projects:
 
 1. Inventory existing docs, source folders, tests, schemas, API specs, fixtures, release notes, and observed behavior.
@@ -159,6 +222,7 @@ Backfill order for existing projects:
 - Architecture Contract owns dependency direction, runtime boundaries, data ownership, and allowed integration paths.
 - API Contract owns integration shape: request, response, error, auth/session, versioning, and compatibility.
 - Error Handling Contract owns failure taxonomy, retry policy, user messaging, logging, and security redaction.
+- Contract Governance owns document precedence, conflict handling, canceled/deferred scope, and minimum linked updates.
 - New requirements must update planning docs, BDD, contracts, implementation slices, and tests before code starts.
 - Bug fixes must identify expected vs actual behavior and the regression test before code starts.
 - New or AI-generated code must be validated with tests that target the changed behavior, not only total project coverage.
@@ -166,6 +230,8 @@ Backfill order for existing projects:
 - Embedded changes must distinguish datasheet/protocol truth, hardware context, driver/service/application ownership, host-testable logic, and target-only evidence.
 - Implementation can run in parallel only when the shared contracts are versioned enough for mock, stub, or schema-first work.
 - If a contract changes, update BDD, implementation, mocks, and tests in the same change or explicitly record why not.
+- If an API/schema contract changes, regenerate typed clients or SDKs from the source contract; do not hand-copy routes, DTOs, or operation names.
+- If a third-party integration changes, update sanitized integration docs, fixtures, live-test gates, and secret/redaction notes without copying private vendor or account details into reusable guidance.
 - For already implemented projects, BDD becomes the required behavioral recovery document. Product Brief may contain unknowns, but BDD must be filled from observable product behavior and implementation evidence.
 - Any missing information that changes behavior, contracts, ownership, error handling, storage, security, or tests blocks development until it is answered or explicitly scoped out.
 

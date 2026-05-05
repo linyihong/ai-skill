@@ -8,6 +8,7 @@ For focused checklists, use:
 - [`checklists/mobile-pr-review.md`](checklists/mobile-pr-review.md)
 - [`checklists/mobile-release-review.md`](checklists/mobile-release-review.md)
 - [`checklists/api-security-review.md`](checklists/api-security-review.md)
+- [`checklists/contract-governance-review.md`](checklists/contract-governance-review.md)
 - [`checklists/embedded-firmware-review.md`](checklists/embedded-firmware-review.md)
 
 When a checklist item changes because of a new control or implementation pattern, the linked `controls/` and `implementation/` docs must be updated or explicitly verified in the same change.
@@ -56,6 +57,18 @@ When a checklist item changes because of a new control or implementation pattern
 - Domain Model, Architecture, API / Interface, and Error Handling Contracts are backfilled from observed behavior and implementation evidence.
 - Every critical BDD scenario maps to existing test coverage or a required test gap.
 - Any gap that cannot be backfilled from evidence and affects behavior or contracts is asked before implementation proceeds.
+- Document precedence is defined so agents know which artifact wins when docs disagree.
+- Stable IDs link product/rule/operation/command/diagnostic entries to BDD, code refs, fixtures, and tests.
+- BDD scenarios are marked `automated`, `fixture-backed`, `manual-evidence`, `pending-runner`, or `not-automatable`.
+- Canceled, deferred, process-only, noop, manual-only, and out-of-scope items are explicitly labeled.
+
+## Contract Governance
+
+- Governance/framework contract, product plan, BDD, domain/API/interface/error contracts, implementation, and tests have a clear precedence order.
+- Minimum doc-sync matrix exists for API, permission, database, UI flow, generated client, vendor integration, CLI command, diagnostic rule, and release setting changes when those surfaces exist.
+- OpenAPI/schema/API contract changes regenerate typed clients, SDKs, mocks, fixtures, or schema packages.
+- Vendor integration docs separate raw vendor sources from sanitized integration excerpts, fixtures, live-test gates, and secret handling.
+- Tooling/extension rule catalogs map stable IDs to diagnostics/commands, fixtures, tests, and explicit non-enforceable entries.
 
 ## Embedded / Hardware Product Review
 
@@ -78,6 +91,8 @@ When a checklist item changes because of a new control or implementation pattern
 - Replay-sensitive requests have server-side timestamp, nonce, idempotency, or risk checks.
 - Request signing, if used, signs the right fields and does not rely on a static client secret.
 - Error responses avoid leaking stack traces, internal hostnames, or sensitive business rules.
+- Generated clients and SDKs come from the current API/schema contract; consumers do not hand-copy routes, DTOs, or response envelopes.
+- Third-party webhooks/callbacks validate signature, timestamp, body binding, idempotency, and replay behavior.
 
 ## Auth, Tokens, And Sessions
 

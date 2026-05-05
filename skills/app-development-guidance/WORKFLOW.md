@@ -21,6 +21,7 @@ Before code work, run change intake:
 | Is this a bug fix? | Confirm expected vs actual behavior, reproduction/evidence, affected BDD or missing scenario, impacted contracts/errors, and regression test. |
 | Is this a refactor? | Confirm no behavior or public contract change; otherwise reclassify. |
 | Is this hardening? | Confirm threat/failure mode, owner layer, validation, and linked checklist/control updates. |
+| Does this change conflict with existing docs? | Apply document precedence: governance/framework contract, product plan, BDD, contracts, implementation, tests. Update the owning document instead of silently fixing only code. |
 
 If no planning artifact exists and the request changes behavior, create a lightweight change brief and ask blocker questions before implementation.
 
@@ -44,8 +45,11 @@ If the project is already implemented and documentation is missing, start with a
 | BDD Behavior | Required. Complete from observable UI, API, code, tests, logs, fixtures, and manual verification. |
 | Contracts | Backfill Domain Model, Architecture, API / Interface, Error Handling, and Test Plan from implemented behavior and evidence. |
 | Embedded/hardware evidence | Backfill datasheet/protocol references, hardware context, driver/service/application boundary, host fixtures, and bring-up evidence from code, logs, wiring notes, and tests. |
+| Traceability | Link product/rule IDs to BDD, BDD to code refs, BDD to tests, API/command/diagnostic contracts to fixtures, and generated clients to source contracts. |
 
 Do not let a missing product brief block BDD backfill for an already implemented product.
+
+For implemented-first projects, also recover the delivery pipeline: source product docs or plan radar, document precedence, minimum doc-sync matrix, OpenAPI/schema/codegen flow, vendor integration excerpts, and explicit canceled/deferred/out-of-scope decisions.
 
 Missing information that affects behavior, domain invariants, API/interface shape, error handling, security, storage, ownership, or tests is a blocker. Ask the user or request evidence, update the docs with the answer, and only then continue development planning or implementation. Non-blocking unknowns must be labeled with why they do not change behavior or contracts.
 
@@ -63,6 +67,9 @@ Write the risk in developer terms:
 | App relies on hidden client logic for authorization | Server may be trusting client state that attackers can modify. |
 | Local storage contains recoverable secrets | Device compromise or backups can expose credentials. |
 | Release build exposes symbols, debug flags, or test endpoints | Reverse engineering cost is unnecessarily low. |
+| Generated client diverges from OpenAPI/schema | Frontend, SDK, or tool consumers may call stale routes or deserialize wrong shapes. |
+| Gherkin exists without executable linkage | The team may believe behavior is tested when it is only documented. |
+| Vendor docs are copied directly into product flow | Secrets, irrelevant fields, or unstable third-party assumptions can leak into implementation and reusable docs. |
 
 ## 3. Choose The Owner Layer
 
@@ -72,6 +79,9 @@ Prefer controls owned by the strongest layer:
 | --- | --- |
 | Backend/API | Authorization, replay defense, rate limits, fraud signals, token rotation, audit logs. |
 | Client app | Safe storage, secure defaults, pinning where justified, UX friction for risky flows, telemetry hygiene. |
+| Full-stack contract | OpenAPI/schema generation, typed clients, provider/consumer fixtures, contract tests, compatibility rules. |
+| Tooling / extension | Pure rule engine or command kernel, adapter boundary, diagnostics/commands, fixture-backed rules, editor/CLI integration tests. |
+| Third-party integration | Sanitized vendor excerpt, credentials boundary, live-test gate, replay/idempotency/webhook/settlement behavior, audit logs. |
 | Embedded/firmware | Sensor/protocol parsing, hardware context injection, driver/service/application boundary, RTOS/task ownership, host fixtures, hardware-in-loop checks. |
 | Build/release | Obfuscation, symbol stripping, debug flag enforcement, dependency review, secret scanning. |
 | Monitoring | Anomaly detection, device risk signals, abuse pattern alerts. |
@@ -116,6 +126,9 @@ Classify the outcome before writing docs:
 | Change intake before code | `process/` and the current planning document |
 | Test strategy for new or AI-generated code | `process/`, `CHECKLIST.md`, and the current planning document |
 | Embedded/hardware product flow | `platforms/embedded/`, `implementation/embedded/`, `process/`, and hardware-aware checklists |
+| OpenAPI/schema/codegen or full-stack provider/consumer contract | `implementation/backend/`, `process/`, `CHECKLIST.md`, and relevant API checklists |
+| Tool, CLI, IDE extension, linter, or static-analysis architecture | `implementation/tooling/`, `process/`, and relevant review checklists |
+| Vendor or third-party API integration | `implementation/backend/`, `controls/`, `checklists/`, and project-specific sanitized docs |
 
 Prefer linking between folders over duplicating the same guidance.
 
@@ -131,6 +144,7 @@ Before finishing a change, follow the repo-wide rule in [`../../shared-rules/lin
 | `languages/` | Relevant platform and implementation docs. |
 | `checklists/` | Relevant controls and implementation docs. |
 | `templates/` | `templates/README.md`, `DOCUMENTATION.md`, and any docs that instruct users to copy the template. |
+| `process/` governance or backfill rules | `templates/`, `CHECKLIST.md`, `WORKFLOW.md`, and relevant `implementation/` docs. |
 
 If no linked update is needed, state why. Do not call linked updates optional when they are required for consistency.
 
@@ -144,10 +158,11 @@ Use at least one validation method:
 - Manual review with evidence.
 - Runtime or backend telemetry query.
 - Host-side fixture test, simulator test, bench log, or hardware-in-loop run for embedded/hardware behavior.
+- Provider/consumer contract test, generated-client compile check, fixture pair, diagnostic snapshot, or gated live integration test.
 
 Before validating implementation, verify there are no unresolved blocker questions that affect behavior, contracts, error handling, security, storage, ownership, or tests.
 
-Validation should distinguish "old behavior remains guarded" from "new code is proven". Prefer BDD/TDD plus changed-code tests; add mutation, property-based, contract, database-backed, host-side fixture, or hardware-in-loop tests when examples alone do not prove the rule.
+Validation should distinguish "old behavior remains guarded" from "new code is proven". Prefer BDD/TDD plus changed-code tests; add mutation, property-based, contract, database-backed, generated-client, fixture-backed, host-side fixture, or hardware-in-loop tests when examples alone do not prove the rule.
 
 ## 8. Feed Back Reusable Lessons
 

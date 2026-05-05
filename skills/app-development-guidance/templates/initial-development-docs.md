@@ -31,6 +31,18 @@ Use this section before code changes.
 | Regression or validation test | |
 | Blocker questions | |
 
+## Contract Governance
+
+Use this section when the project has multiple docs or was implemented before specs were backfilled.
+
+| Field | Notes |
+| --- | --- |
+| Document precedence | Governance/framework contract -> product plan -> BDD -> contracts -> implementation -> tests, or project-specific order |
+| Stable ID scheme | feature ID / rule ID / operation ID / route / command / diagnostic / scenario tag |
+| Minimum doc-sync matrix | What docs/tests change for API, permission, DB, UI, generated client, vendor, CLI/tooling, release changes |
+| Canceled / deferred / out-of-scope items | |
+| Not-tool-enforceable / manual-only rules | |
+
 ## Test Strategy
 
 | Field | Notes |
@@ -45,6 +57,8 @@ Use this section before code changes.
 | Property or invariant tests | |
 | Database / persistence fixtures | |
 | Contract tests | |
+| Generated client / SDK compile check | |
+| Fixture-backed validation | |
 | Host fixture tests | |
 | Hardware-in-loop / target evidence | |
 | AI-generated code review focus | intent / edge cases / security / ownership / error handling |
@@ -64,6 +78,7 @@ Use this section when the project is already implemented and documents are missi
 | Hardware / Firmware Contract | | | | |
 | Error Handling Contract | | | | |
 | Test Plan | | | | |
+| Contract Governance / Traceability | | | | |
 
 Product Brief gaps may remain `unknown` if original intent is unavailable. BDD Behavior must be completed from observable implementation evidence.
 
@@ -89,6 +104,13 @@ Scenario:
   When
   Then
 ```
+
+Traceability:
+
+| Scenario / rule ID | Product source | Code refs | Test refs | Validation status |
+| --- | --- | --- | --- | --- |
+
+Validation status: `automated` / `fixture-backed` / `manual-evidence` / `pending-runner` / `not-automatable`.
 
 ## Domain Model Contract
 
@@ -145,6 +167,24 @@ Contract format:
 - Versioning:
 - Compatibility rule:
 - Mock / fixture source:
+- Generated client / SDK command:
+- Generated output checked in: yes/no:
+
+## Vendor / Third-Party Integration Contract
+
+Use this section only when an external provider is involved.
+
+| Field | Notes |
+| --- | --- |
+| Vendor source doc location | Raw vendor docs stay in the project repository, not reusable skills |
+| Sanitized integration excerpt | Operations actually used, without secrets or account-specific details |
+| Auth / signing / credential boundary | |
+| Idempotency / replay / retry / timeout | |
+| Webhook / callback verification | Signature, timestamp, body binding, source, dedupe |
+| Sandbox vs live differences | |
+| Fixture source | |
+| Live test gate | Environment/config required to run |
+| Logging / redaction | |
 
 ## Error Handling Contract
 

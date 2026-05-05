@@ -15,8 +15,12 @@ Capture practical guidance for:
 - App/API and transport security.
 - Embedded, firmware, sensor, protocol, and hardware context development flow.
 - Product brief to contract-first development flow.
+- Implemented-first project governance: document precedence, traceability, BDD closure, and minimum doc-sync matrices.
 - Change intake before code: classify new requirements, bug fixes, refactors, hardening, and docs-only work from planning artifacts.
 - Test strategy that separates legacy regression protection from new-code validation with BDD/TDD, changed-code coverage, mutation/property/contract/database tests, and human review.
+- OpenAPI/schema/codegen flows for typed clients, SDKs, mocks, fixtures, and provider/consumer tests.
+- Vendor and third-party API integration docs, fixtures, live-test gates, webhook/idempotency checks, and secret-safe boundaries.
+- Developer tooling patterns for IDE extensions, CLIs, linters, static analyzers, rule catalogs, kernels, adapters, diagnostics, and fixtures.
 - Existing project documentation gap backfill, with complete BDD recovery from implemented behavior.
 - Token, session, and replay handling.
 - Local storage and secret exposure risks.
@@ -33,6 +37,8 @@ Capture practical guidance for:
 - Rules for reviewing planning artifacts before code and deciding whether work is a new requirement or bug fix.
 - Rules for validating new or AI-generated code beyond total project coverage.
 - Documentation backfill rules for already implemented projects, especially when original planning documents are missing.
+- Rules for document precedence, traceability, BDD execution closure, and explicit canceled/deferred/out-of-scope decisions.
+- Reusable implementation patterns for generated clients, vendor integrations, and developer tools.
 - High-level controls that can be implemented by app, API, backend, or release engineering teams.
 - Checklists that help prevent repeat mistakes.
 - Guidance that clearly names validation steps and limitations.
@@ -56,7 +62,7 @@ Capture practical guidance for:
 | `controls/` | Cross-platform security controls; use this as the primary home for core guidance. |
 | `platforms/` | Platform or product-type implementation guidance such as mobile, web, backend API, and embedded/firmware. |
 | `languages/` | Language/runtime-specific pitfalls only. |
-| `checklists/` | Focused design, PR, release, and API review checklists. |
+| `checklists/` | Focused design, PR, release, API, contract governance, embedded, and tooling review checklists. |
 | `implementation/` | Concrete implementation patterns for app, backend, and platform teams. |
 | `templates/` | Copyable templates for initial development docs, guidance notes, and lightweight threat models; start with [`templates/README.md`](templates/README.md). |
 | `FEEDBACK.md` | Short entry pointing to shared feedback rules. |
@@ -76,11 +82,15 @@ When adding new guidance:
 
 For existing implemented projects, use [`process/`](process/) to audit and backfill missing documents. Product Brief gaps can remain `unknown`; BDD behavior must be completed from observable behavior and implementation evidence.
 
+For implemented-first projects, also recover document precedence, stable IDs, traceability links, BDD validation status, minimum doc-sync matrix, generated-client flow, vendor integration excerpts, and explicit canceled/deferred/out-of-scope items.
+
 Before code work, use [`process/`](process/) to review the planning artifact and classify the change. New requirements must update planning docs, BDD, contracts, implementation slices, and tests before implementation starts. Bug fixes must document expected vs actual behavior and regression tests first.
 
 When planning tests, separate old behavior from new code. Existing tests guard regressions; new or AI-generated code needs BDD/TDD and changed-code validation. Use mutation, property-based, contract, or database-backed tests when ordinary example tests do not prove the rule.
 
 For embedded or hardware-backed products, use [`platforms/embedded/`](platforms/embedded/) and [`implementation/embedded/`](implementation/embedded/) to capture datasheet/protocol truth, electrical/hardware context, firmware architecture, driver/service/application ownership, host-side fixtures, target/hardware-in-loop checks, and bring-up evidence.
+
+For full-stack API work, use [`implementation/backend/contract-codegen.md`](implementation/backend/contract-codegen.md) to keep OpenAPI/schema/source contracts, generated clients, SDKs, mocks, fixtures, and provider/consumer tests aligned. Use [`implementation/backend/vendor-integration.md`](implementation/backend/vendor-integration.md) for third-party integrations. Use [`implementation/tooling/`](implementation/tooling/) for IDE extensions, CLIs, linters, static analyzers, and code generators.
 
 This keeps the skill readable as it grows across mobile, web, backend, and future app types.
 
@@ -96,6 +106,9 @@ Examples:
 - New contract-first process guidance -> update or verify `process/`, `checklists/`, `templates/`, and relevant implementation docs.
 - New initial planning template -> update or verify `templates/README.md`, `process/README.md`, `DOCUMENTATION.md`, and `CHECKLIST.md`.
 - New existing-project backfill rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, and `WORKFLOW.md`.
+- New implemented-first governance rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, `implementation/`, and `checklists/contract-governance-review.md`.
+- New generated-client or vendor-integration rule -> update or verify `implementation/backend/`, `platforms/backend/api.md`, `checklists/api-security-review.md`, `process/README.md`, and `CHECKLIST.md`.
+- New tooling/extension rule -> update or verify `implementation/tooling/`, `process/README.md`, `CHECKLIST.md`, and relevant templates.
 - New change-intake rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.
 - New test-strategy rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.
 - New embedded/hardware flow -> update or verify `platforms/embedded/`, `implementation/embedded/`, `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.

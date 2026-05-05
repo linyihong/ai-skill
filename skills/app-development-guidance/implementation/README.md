@@ -16,6 +16,7 @@ When work starts from the contract-first process in [`../process/`](../process/)
 | `backend/` | Server/API implementation patterns that mobile and web clients depend on. |
 | `mobile/` | Android, iOS, Flutter, React Native implementation patterns. |
 | `embedded/` | Firmware, sensor/protocol, hardware context, driver/service/application, and bring-up implementation patterns. |
+| `tooling/` | IDE extensions, CLIs, linters, static analyzers, code generators, and internal automation. |
 | `examples/` | Cross-cutting implementation patterns and snippets in pseudocode. |
 
 Start with the sub-indexes:
@@ -23,6 +24,7 @@ Start with the sub-indexes:
 - [`backend/README.md`](backend/README.md)
 - [`embedded/README.md`](embedded/README.md)
 - [`mobile/README.md`](mobile/README.md)
+- [`tooling/README.md`](tooling/README.md)
 
 ## Required Linked Updates
 

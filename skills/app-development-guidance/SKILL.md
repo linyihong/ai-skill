@@ -18,6 +18,10 @@ Use this skill when APK analysis, app/API review, embedded/firmware review, or p
 - Turning APK analysis documents into app-related tools, SDKs, clients, mocks, fixture-driven implementations, contract tests, or rebuilt features.
 - Turning product briefs into BDD, Domain Model Contracts, API Contracts, implementation slices, and tests.
 - Turning hardware, sensor, protocol, firmware, or embedded product specs into datasheet/protocol contracts, hardware context contracts, firmware BDD, driver/service/application boundaries, host/target tests, and bring-up validation.
+- Backfilling implemented-first projects with document precedence, product/rule traceability, BDD-to-test closure, minimum doc-sync matrices, generated-client checks, and explicit canceled/deferred/out-of-scope decisions.
+- Turning OpenAPI/schema contracts into typed clients, SDKs, mocks, fixtures, and provider/consumer tests without hand-copied endpoints.
+- Turning vendor or third-party API integrations into sanitized integration excerpts, fixture tests, live-test gates, webhook/idempotency checks, and secret-safe docs.
+- Turning IDE extensions, CLIs, linters, static analyzers, code generators, and internal tools into rule catalogs, pure kernels, adapters, diagnostics/commands, fixtures, and integration tests.
 - Classifying app changes as new requirements, bug fixes, refactors, or hardening work before code; new requirements must update planning docs before implementation.
 - Separating legacy regression protection from new-code validation, including BDD/TDD, changed-code coverage, mutation tests, property-based tests, contract tests, database regression tests, and human review.
 - Backfilling missing development documents for existing, already implemented projects; Product Brief gaps can be marked unknown, but BDD behavior must be completed from observed implementation evidence.
@@ -39,12 +43,15 @@ Use this skill when APK analysis, app/API review, embedded/firmware review, or p
 4. If it is a bug fix, confirm expected vs actual behavior, reproduction/evidence, affected or missing BDD scenario, impacted contract/error handling, and regression test plan before code.
 5. Define the test strategy before production code: distinguish existing-regression coverage from changed/new-code validation; prefer BDD first, then failing unit/contract/property/integration tests for new behavior before implementation.
 6. If starting from a product brief, use [`process/`](process/) to draft or discuss the initial development docs: Bounded Contexts, BDD behavior, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests.
-7. If opening this skill on an existing implemented project, audit missing documents and backfill them. Missing Product Brief fields may be marked `unknown` / `open question`, but BDD behavior must be completed from UI, API, code, tests, logs, fixtures, or observed behavior.
-8. If anything required for behavior, domain invariants, API/interface shape, error handling, security, storage, tests, or ownership is missing, ask the user or request evidence before continuing. Do not proceed with development while blocker questions remain unresolved.
+7. If opening this skill on an existing implemented project, audit missing documents and backfill them. Missing Product Brief fields may be marked `unknown` / `open question`, but BDD behavior must be completed from UI, API, code, tests, logs, fixtures, or observed behavior. Recover document precedence, traceability, BDD validation status, generated-client flow, vendor excerpts, and canceled/out-of-scope decisions.
+8. If anything required for behavior, domain invariants, API/interface shape, error handling, security, storage, tests, ownership, document precedence, generated clients, vendor integration, or tool diagnostics is missing, ask the user or request evidence before continuing. Do not proceed with development while blocker questions remain unresolved.
 9. Convert analysis findings into a developer-facing risk statement or implementation opportunity.
 10. Choose the control layer:
    - API/server contract.
    - App runtime behavior.
+   - Full-stack schema/codegen or provider/consumer contract.
+   - Tooling, IDE extension, CLI, linter, or static-analysis kernel/adapter behavior.
+   - Vendor or third-party API integration behavior.
    - Embedded firmware, hardware context, sensor/protocol driver, or board bring-up behavior.
    - Build/release configuration.
    - Monitoring or fraud signal.
@@ -83,6 +90,9 @@ When producing development guidance, include:
 - Why it matters for app development.
 - Change classification: new requirement, bug fix, refactor, hardening, or docs-only; include planning artifact reviewed.
 - Test strategy: existing behavior guarded by regression tests, new/changed code validated by BDD/TDD and changed-code tests; mention mutation/property/contract/database tests when relevant.
+- Document precedence and traceability for implemented-first projects, including BDD-to-test status.
+- Generated-client, SDK, fixture, or schema sync status when API/interface contracts are involved.
+- Vendor/third-party integration boundaries, live-test gates, and secret-safe documentation when external providers are involved.
 - Missing questions that must be answered before implementation, if starting from a product brief.
 - Existing-project documentation gaps and how they were backfilled; BDD must be complete when observable behavior exists.
 - Blocker questions for any missing behavior, contract, error, security, storage, ownership, or test requirement; do not continue development until these are answered or explicitly scoped out.
