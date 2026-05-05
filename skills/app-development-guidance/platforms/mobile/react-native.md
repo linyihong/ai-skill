@@ -1,6 +1,6 @@
 # React Native Hardening Notes
 
-Use this for React Native mobile app hardening.
+Use this for React Native app hardening.
 
 ## Focus Areas
 

@@ -39,8 +39,10 @@
 - 入口與登入狀態：冷啟動、已登入、未登入、權限彈窗、地區/語言。
 - 可見 navigation：bottom tabs、top tabs、drawer、profile/menu、search、detail page、player/media page。
 - 每個主要 screen 的 screenshot evidence：去敏後保存路徑、時間戳、screen label。
+- Screen reachability：從哪個入口或前置狀態開始、經過哪些 tap/swipe、最後到哪個 screen。
+- Destination scope：最後是否仍在 App 內；若跳到系統設定、瀏覽器、支付、分享、第三方 App 或外部 intent，要備註 external transition。
 - 頁面互動屬性：是否可滑動、滑動方向、主要可點擊元素、點擊後進入哪個 screen/action。
-- 操作序列：`Home > Tab: Discover > item tap > Detail` 這類可重放路徑。
+- 操作序列：`Home > Tab: Discover > item tap > Detail` 這類可重放路徑，並分解成 step-by-step recipe。
 - Automation script：可選；只對關鍵 flow 建立最小 adb/uiautomator 腳本，明確記錄 `tap` / `swipe` 步驟，避免自動遍歷整個 App。
 - 捕獲時間窗：操作開始/結束時間、對應 pcap/MITM/Frida log window。
 - API 關聯：每個操作觸發的 method/path、response schema、cache/local-only 判斷。
@@ -52,6 +54,8 @@
 - 截圖與 UI dump 要限量；先抓主要 navigation 與關鍵流程，不要一開始自動截完整 App 全站。
 - 滑動頁面只需記代表性 scroll depth，例如 top / mid / bottom；不要無限制滑到列表盡頭。
 - 點擊頁面要記點擊目標的可見 label、resource-id/content-desc 或座標來源，避免之後腳本點錯。
+- 到頁路徑要和 screen id / operation id 綁定；後續 API capture、人工重現、automation script 都引用同一份 recipe。
+- 腳本地圖只處理 App 內頁面；跳出 App 後停止自動化路徑延伸，改記 external target、觸發點、是否需人工操作與可觀測 API window。
 - 自動化操作要可中止、限量、避開登入重試、付款、刪除、發文、下單等高風險動作；只在授權範圍內重放。
 - 自動化腳本要輸出 operation id、開始/結束 timestamp，讓 API log 可以對齊。
 - 截圖只能證明可見 UI，不直接證明 API；必須用同窗 request/response、pcap timing 或 hook sequence 對齊。
@@ -220,9 +224,11 @@ native backtrace 落在哪裡？
 
 - 清楚知道核心流量走哪個 stack。
 - 有 UI architecture map，能說明主要 tabs/screens 與已測操作。
+- 重要功能有 Feature Reconstruction Handoff：功能目標、screen/route/operation、BDD 候選、domain concept、API/interface contract、狀態與錯誤行為、資料生命週期、fixtures、open questions。
 - 有 request metadata 或已證明拿不到的原因。
 - 有 response outer shape。
 - HTTP/API 文件已寫清 headers、request fields、response fields，且逐字段分析 type/meaning/required/source。
+- 高價值 API 已標明 capability、operation id、domain concept candidates、state impact、error/empty behavior 與 fixture/test 需求，足以交給 [`app-development-guidance`](../app-development-guidance/) 草擬 BDD、Domain Model Contract、API / Interface Contract 與 Error Handling Contract。
 - 若有加密，有解碼點或下一步定位計畫。
 - 有去敏樣本或 fixture。
 - 有文件回填位置。

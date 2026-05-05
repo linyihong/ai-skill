@@ -1,0 +1,12 @@
+---
+description: Keep Ai-skill Markdown docs split into focused indexed files
+globs: "**/*.md"
+alwaysApply: false
+---
+
+# Document Sizing
+
+- For Ai-skill docs, avoid growing one Markdown file into a mixed topic dump.
+- When a file becomes large or one rule expands into many steps, exceptions, templates, or examples, split it into a folder with a `README.md` index and focused child files.
+- Use `shared-rules/document-sizing.md` as the source of truth for project-wide splitting rules.
+- Keep shared policy text in `shared-rules/`; skill docs should link to it instead of duplicating it.

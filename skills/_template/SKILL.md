@@ -5,7 +5,7 @@ description: <英文：Agent 如何辨識何時套用此 skill。寫觸發情境
 
 # <Skill 標題（可中英並列）>
 
-**共用政策：**先讀 [`shared-rules` 索引](../../shared-rules/README.md) 與 [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md)。`feedback_history/` 內各 lesson 只引用、不重複貼全文。
+**共用政策：**先讀 [`shared-rules` 索引](../../shared-rules/README.md)、[`feedback-lessons.md`](../../shared-rules/feedback-lessons.md)、[`document-sizing.md`](../../shared-rules/document-sizing.md) 與 [`cross-skill-references.md`](../../shared-rules/cross-skill-references.md)。`feedback_history/` 內各 lesson 只引用、不重複貼全文；文件變大時改成資料夾與 `README.md` 目錄拆分。若本 skill 需要引用另一個 skill 的規範、模板或交接產物，只寫觸發條件、交接 artifact 與 ownership boundary，不複製對方全文。
 
 ## 何時使用本 skill
 
@@ -24,6 +24,11 @@ description: <英文：Agent 如何辨識何時套用此 skill。寫觸發情境
 ## 預設流程
 
 - 詳見 [WORKFLOW.md](WORKFLOW.md)（若尚未建立，可先在本節寫精簡步驟，日後再拆檔）
+- 若某段流程開始變長或分出多個分類，依 `shared-rules/document-sizing.md` 拆成子資料夾與目錄索引
+
+## Cross-Skill References（可選）
+
+- 若需要引用其他 skill，依 [`shared-rules/cross-skill-references.md`](../../shared-rules/cross-skill-references.md) 寫清楚：target skill、觸發條件、交接 artifact、ownership boundary、去敏邊界與 linked updates。
 
 ## 工具與環境
 

@@ -8,6 +8,6 @@ Prefer `controls/` for cross-platform principles, then link here for platform di
 | --- | --- |
 | `mobile/` | Android, iOS, Flutter, React Native, and mobile release concerns. |
 | `web/` | Browser/frontend app hardening. |
-| `backend/` | API/server controls that mobile apps depend on. |
+| `backend/` | API/server controls that apps depend on. |
 
 Implementation patterns live in [`../implementation/`](../implementation/) and must stay linked with the relevant platform docs.

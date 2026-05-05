@@ -130,25 +130,35 @@ set -euo pipefail
 DEVICE="${DEVICE:-<device-serial>}"
 PACKAGE="<package-name>"
 OPERATION_ID="open-detail"
+ROUTE_ID="launch-authenticated>open-detail"
 
 ts() { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
+current_focus() {
+  adb -s "$DEVICE" shell dumpsys window | sed -n 's/.*mCurrentFocus=.*{\([^}]*\)}.*/\1/p' | tr -d '\r'
+}
 
 echo "operation=${OPERATION_ID} phase=start ts=$(ts)"
 adb -s "$DEVICE" shell am force-stop "$PACKAGE"
 adb -s "$DEVICE" shell monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1 >/dev/null
 sleep 3
+echo "operation=${OPERATION_ID} route=${ROUTE_ID} focus=$(current_focus) ts=$(ts)"
 
+# Step 1: follow the documented route recipe from the UI architecture map.
 # Replace coordinates with values from a sanitized screenshot or UI hierarchy.
+echo "operation=${OPERATION_ID} route=${ROUTE_ID} step=1 type=tap target=<documented-entry> ts=$(ts)"
 adb -s "$DEVICE" shell input tap <x> <y>
 sleep 2
 
 # Optional: sample scrollable pages at bounded depths only.
+echo "operation=${OPERATION_ID} route=${ROUTE_ID} step=2 type=swipe target=<documented-scroll-region> ts=$(ts)"
 adb -s "$DEVICE" shell input swipe <x1> <y1> <x2> <y2> <duration-ms>
 sleep 2
 
 # Tap a documented clickable entry point.
+echo "operation=${OPERATION_ID} route=${ROUTE_ID} step=3 type=tap target=<documented-entry> ts=$(ts)"
 adb -s "$DEVICE" shell input tap <x> <y>
 sleep 3
+echo "operation=${OPERATION_ID} route=${ROUTE_ID} focus=$(current_focus) ts=$(ts)"
 
 adb -s "$DEVICE" shell screencap -p "/sdcard/${OPERATION_ID}.png"
 adb -s "$DEVICE" pull "/sdcard/${OPERATION_ID}.png" "./evidence/ui/${OPERATION_ID}.png" >/dev/null
@@ -160,6 +170,7 @@ echo "operation=${OPERATION_ID} phase=end ts=$(ts)"
 - 不要把帳密、token、個資、付款、刪除、發文、下單、私訊等高風險操作寫入無保護自動化腳本。
 - 滑動頁面要限制 scroll count / scroll depth，例如最多 top/mid/bottom 三段；不要無限捲動列表。
 - 點擊目標要來自去敏 screenshot 或 `uiautomator dump` 的 bounds/label；不要用未驗證座標盲點。
+- 腳本地圖只延伸 App 內頁面；若 foreground package 已切到系統設定、瀏覽器、支付、分享、第三方 App 或其他外部畫面，停止後續自動步驟並在文件標記 external transition。
 - 先用測試帳號與授權範圍確認可自動重放。
 - 若腳本會觸發登入或限流，先停止 tight-loop，改用已建立 session 或人工單步操作。
 

@@ -9,6 +9,8 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
 
 **Shared policy (do not duplicate in every lesson):** read [`shared-rules` index](../../shared-rules/README.md) once (or [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md) for feedback-specific rules). Per-technique files in `feedback_history/` should **reference** those files, not paste the full common rules.
 
+**Cross-skill references:** follow [`cross-skill-references.md`](../../shared-rules/cross-skill-references.md). `apk-analysis` may reference another skill when analysis output must be consumed by that skill, but it must name the trigger, handoff artifact, ownership boundary, and sanitization boundary instead of copying the target skill's full workflow.
+
 ## Quick Start
 
 1. Confirm scope and authorization:
@@ -30,6 +32,8 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
 5. Build a UI architecture map when the device/app can be operated:
    - Start lightweight: capture only enough sanitized screenshots/UI hierarchy to understand major tabs, drawers, routes, and key screens.
    - Mark which screens are scrollable and which visible elements are clickable entry points.
+   - Document how to reach each important screen, including entry state, tap/swipe steps, expected destination, and reusable operation id.
+   - Keep operation maps scoped to in-app pages; if a step opens another app, system screen, browser, or external intent, document the transition instead of treating it as an app screen.
    - For key flows, optionally create a small replayable app-operation script so API capture can be repeated with stable timing.
    - Adapt the order if screenshots or device control make the app slow: solve core API/decode first, then bind important APIs back to UI actions.
    - Record the exact UI path and action window only for flows that need API attribution.
@@ -39,6 +43,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
 7. Convert dynamic results into durable assets:
    - UI architecture map and operation-to-API matrix.
    - Redacted HTTP/API docs with headers, request fields, response fields, and per-field meaning/type notes.
+   - Feature reconstruction handoff: capability, behavior scenarios, candidate domain concepts, API/interface contracts, state/error handling, data lifecycle, fixtures, and open questions.
    - Redacted request/response samples.
    - Offline decoders or fixtures.
    - API/schema docs.
@@ -47,7 +52,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Whenever you learn a **new reusable** technique, failure pattern, or validation rule during analysis, **write it into this skill in the same session**—do **not** wait for the user to say「記得回饋」.
    - Add **one new Markdown file** under the matching [`feedback_history/<category>/`](feedback_history/) folder using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming + template (generalized, sanitized, with evidence and applicability). Use `feedback_history/common/` for cross-category rules. Optionally add a row to [`feedback_history/README.md`](feedback_history/README.md).
    - If the lesson is already credible from evidence in this session, also patch [TOOLS.md](TOOLS.md), [WORKFLOW.md](WORKFLOW.md), or [DOCUMENTATION.md](DOCUMENTATION.md) as appropriate; label uncertain items `experimental` in that lesson file instead of promoting prematurely.
-   - If the reusable lesson is about how to build **your own future apps** more safely, write the development guidance in [`app-security-hardening`](../app-security-hardening/) and keep only the APK-analysis method here.
+   - If the reusable lesson is about how to build **your own future apps** more safely, write the development guidance in [`app-development-guidance`](../app-development-guidance/) and keep only the APK-analysis method here.
    - Target-specific hosts, endpoints, tokens, or one-off product conclusions stay in the **project** docs, not in reusable skill files.
 
 ## Default Workflow
@@ -62,7 +67,15 @@ Use [`techniques/`](techniques/) after common triage identifies a category. Only
 
 Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) for **how** to write feedback; put each lesson in the matching [`feedback_history/<category>/`](feedback_history/) folder. **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §8** and **Feedback Loop** below.
 
-Use [`app-security-hardening`](../app-security-hardening/) when analysis findings should become secure app development guidance, PR/release checklists, or validation tests.
+Use [`app-development-guidance`](../app-development-guidance/) when analysis findings should become app development guidance, implementation patterns, PR/release checklists, or validation tests.
+
+When the user wants a feature rebuilt from APK findings, use this cross-skill handoff:
+
+- Target skill: [`app-development-guidance`](../app-development-guidance/).
+- Trigger: APK findings must become rebuildable app behavior, API/interface contracts, implementation slices, or tests.
+- Handoff artifact: Feature Reconstruction Handoff with sanitized behavior, domain, API/interface, state/error, data lifecycle, fixture, and open-question detail.
+- Ownership boundary: `apk-analysis` owns evidence recovery, traffic/UI attribution, schema notes, fixtures, and confidence labels; `app-development-guidance` owns BDD, Domain Model Contract, API / Interface Contract, Error Handling Contract, implementation guidance, checklists, and tests.
+- Sanitization boundary: target-specific hosts, tokens, raw responses, accounts, and private business conclusions stay in project docs.
 
 Use [RUNBOOK.md](RUNBOOK.md) when starting a new APK project or when the user asks how to apply this skill to another product.
 
@@ -81,6 +94,7 @@ When documenting a new finding, include:
 - Trigger or UI path.
 - Tool and command summary.
 - Evidence file path or sanitized excerpt.
+- Feature/capability mapping and operation id when the finding supports functional reconstruction.
 - Generalized lesson.
 - Follow-up validation.
 

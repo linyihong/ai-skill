@@ -4,6 +4,13 @@ This directory explains how to turn hardening guidance into buildable patterns.
 
 Use this folder when the question is "how do we implement it?" rather than "what security property do we need?"
 
+When work starts from the contract-first process in [`../process/`](../process/), use implementation docs to turn contracts into build slices:
+
+1. Map each Domain Model invariant to provider-side code and unit tests.
+2. Map each API, event, command, or public interface contract to provider/consumer fixtures, mocks, or schema checks.
+3. Map each Error Handling Contract entry to implementation behavior, logging redaction, and tests.
+4. Keep implementation slices linked to the latest contract before teams or agents build in parallel.
+
 | Directory | Scope |
 | --- | --- |
 | `backend/` | Server/API implementation patterns that mobile and web clients depend on. |

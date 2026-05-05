@@ -12,6 +12,83 @@
 | 專案結論 | 目標 App 的 API、host、endpoint、schema、媒體規則。 | 不放 skill，放專案 API / reference docs。 |
 | 原始證據 | pcap、MITM export、Frida log、raw response、decrypted fixture。 | 不放 skill；放 gitignored 或專案指定位置，文件只引用去敏摘要。 |
 
+## 功能重建交接規範
+
+若分析目標是讓後續 agent 能用 [`app-development-guidance`](../app-development-guidance/) 重新做出同等功能，專案分析文件不能只列 endpoint。它必須把 UI 行為、資料模型、API 合約、狀態轉移、錯誤處理與驗證證據串成可交接規格。
+
+每個重要功能至少要留下：
+
+| 面向 | 必填內容 | 交給 app-development-guidance 時的用途 |
+| --- | --- | --- |
+| Feature / Capability | 功能名稱、使用者目標、入口 screen、非目標或未知限制。 | 形成 Product Brief、BDD scenario 與 bounded context。 |
+| UI Behavior | screen id、route id、operation id、前置狀態、tap/swipe/input 步驟、可見結果。 | 形成行為規格、consumer flow、E2E 測試。 |
+| Domain Concepts | 從 UI 文案、response fields、狀態碼推得的 entity、value object、state、command、event；信心等級。 | 形成 Domain Model Contract；低信心項目標為 open question。 |
+| API / Interface Contract | method/path shape、headers、query/body、response wrapper、inner payload、auth/session、pagination、cache、idempotency。 | 形成 API / Interface Contract 與 mock/fixture。 |
+| State And Error Handling | loading/empty/error/success 狀態、錯誤碼、重試、登入過期、權限不足、限流、離線或快取行為。 | 形成 Error Handling Contract 與測試案例。 |
+| Data Lifecycle | 欄位來源、derived-from、local cache/storage、刷新時機、敏感性、保留/過期行為。 | 形成 architecture/data ownership 與 storage guidance。 |
+| Validation Evidence | pcap/MITM/hook/replay/fixture/screenshot/UI hierarchy/automation script 的去敏引用。 | 支援 contract test、integration test 與風險判斷。 |
+| Unknowns / Assumptions | 未觸發流程、低信心 mapping、缺少樣本、未驗證 edge case。 | 形成開發前提問清單，不讓 agent 編造缺失。 |
+
+可直接放在專案分析文件的交接段落：
+
+```markdown
+## Feature Reconstruction Handoff
+
+| Field | Value |
+| --- | --- |
+| Feature ID | `<feature-id>` |
+| Capability | |
+| User goal | |
+| Entry screens | `screen.id` / `route.id` |
+| Primary operations | `operation.id` |
+| Confidence | high / medium / low |
+| Open questions | |
+
+### Behavior Scenarios
+
+| Scenario | Given | When | Then | Evidence |
+| --- | --- | --- | --- | --- |
+
+### Domain Model Candidates
+
+| Concept | Type | Evidence source | Invariants / state | Confidence | Notes |
+| --- | --- | --- | --- | --- | --- |
+
+### API / Interface Contracts
+
+| Operation | Method / Path or Interface | Request shape | Response shape | Auth/session | Errors | Fixture / evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+
+### State And Error Handling
+
+| State / Error | Trigger | User-visible behavior | API evidence | Retry / recovery | Logging / redaction |
+| --- | --- | --- | --- | --- | --- |
+
+### Data Lifecycle
+
+| Field / Data | Source | Stored locally | Refresh / expiry | Sensitive | Derived from | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+
+### App Development Guidance Bridge
+
+- Suggested bounded contexts:
+- Draft BDD scenarios:
+- Draft Domain Model Contract:
+- Draft Architecture / ownership notes:
+- Draft API / Interface Contract:
+- Draft Error Handling Contract:
+- Required fixtures or tests:
+- Open questions for implementation:
+```
+
+規則：
+
+- 不確定的 domain 名稱、欄位意義、狀態轉移要標 `candidate` 或 `low confidence`，不要改寫成確定事實。
+- 若同一 endpoint 支援多個功能或多個 screen，要在交接文件保留多個 operation mapping。
+- 若只有 API、沒有 UI 來源，仍要寫 `UI path: unknown`、`Trigger confidence: low`，並說明可用哪些操作補證。
+- 若只有 UI、沒有 API 明文，仍要寫可見行為與未知 API 合約，不要假造 request/response。
+- 交給 `app-development-guidance` 的內容必須是已去敏、可泛化的功能/合約描述；target-specific host、token、帳號資料與 raw response 留在專案受控位置。
+
 ## 單次分析筆記模板
 
 ```markdown
@@ -57,6 +134,20 @@
 - Finding 1.
 - Finding 2.
 
+## Feature Reconstruction Handoff
+
+- Feature ID:
+- Capability:
+- User goal:
+- Entry screens:
+- Primary operations:
+- Candidate domain concepts:
+- API / interface contracts:
+- State and error handling:
+- Data lifecycle:
+- Fixtures / validation:
+- Open questions for app-development-guidance:
+
 ## Unknowns
 
 - Unknown 1.
@@ -100,10 +191,19 @@
 
 ### Screen Inventory
 
-| Screen ID | UI path | Screenshot | Scrollable | Clickable entries | Key visible elements | State / Preconditions |
+| Screen ID | Canonical route | Screenshot | Scrollable | Clickable entries | Key visible elements | State / Preconditions |
 | --- | --- | --- | --- | --- | --- | --- |
-| `home.feed` | `Home` | `<screenshot-path>` | vertical list: top/mid/bottom sampled | item card, banner, tab buttons | feed list, banner | logged in |
-| `item.detail` | `Home > item tap` | `<screenshot-path>` | no / yes | play button, favorite, related item | title, action buttons | item available |
+| `home.feed` | `launch-authenticated -> home.feed` | `<screenshot-path>` | vertical list: top/mid/bottom sampled | item card, banner, tab buttons | feed list, banner | logged in |
+| `item.detail` | `launch-authenticated -> home.feed -> open-detail` | `<screenshot-path>` | no / yes | play button, favorite, related item | title, action buttons | item available |
+
+### Screen Reachability / Operation Recipe
+
+| Route ID | Target screen | Destination scope | Start state | Step order | Step type | Target / Gesture | Selector or coordinate source | Expected result | External transition | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `launch-authenticated` | `home.feed` | in-app | logged-in cold start | 1 | launch | open package | package name | `home.feed` visible | none | may trigger preload APIs |
+| `open-detail` | `item.detail` | in-app | `home.feed` top | 1 | tap | first item card | visible title / hierarchy bounds | `item.detail` visible | none | item must be available |
+| `reach-feed-bottom` | `home.feed` bottom sample | in-app | `home.feed` top | 1 | swipe | vertical swipe up | screenshot coordinates | feed mid visible | none | bounded scroll |
+| `open-external-help` | none | external | `profile.menu` | 1 | tap | Help / Support | label / hierarchy bounds | browser or external WebView opens | browser/custom tab; stop app screen mapping | document trigger only |
 
 ### Interaction Inventory
 
@@ -114,11 +214,11 @@
 
 ### Operation To API Matrix
 
-| Operation ID | UI path / action | Automation script | Binding phase | Capture window | Method / Path | Source | Response shape | Confidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `open-home` | cold start -> Home | `<script or manual>` | initial map | `<start-end>` | `GET /<path>` | hook / pcap / MITM | top-level keys only | medium | may include preload/cache |
-| `open-detail` | `Home > item tap` | `scripts/ui/open-detail.sh` (`tap`) | after API decoded | `<start-end>` | `POST /<path>` | hook | schema-only summary | high | |
-| `scroll-feed` | `Home > swipe feed` | `scripts/ui/scroll-feed.sh` (`swipe`) | UI binding | `<start-end>` | `GET /<path>` | hook / pcap | list page shape | medium | may be pagination/preload |
+| Operation ID | Route ID | UI path / action | Automation script | Binding phase | Capture window | Method / Path | Source | Response shape | Confidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `open-home` | `launch-authenticated` | cold start -> Home | `<script or manual>` | initial map | `<start-end>` | `GET /<path>` | hook / pcap / MITM | top-level keys only | medium | may include preload/cache |
+| `open-detail` | `open-detail` | `Home > item tap` | `scripts/ui/open-detail.sh` (`tap`) | after API decoded | `<start-end>` | `POST /<path>` | hook | schema-only summary | high | |
+| `scroll-feed` | `reach-feed-bottom` | `Home > swipe feed` | `scripts/ui/scroll-feed.sh` (`swipe`) | UI binding | `<start-end>` | `GET /<path>` | hook / pcap | list page shape | medium | may be pagination/preload |
 
 ### Unknown / Untested Navigation
 
@@ -132,6 +232,10 @@
 
 - Screenshot 要去敏；不要保留帳號、頭像、電話、email、訂單、私訊或個資。
 - 先記主要 tabs/screens 即可；只有高價值流程或需要 attribution 的 API 才補完整操作截圖。
+- 每個重要 screen 都要有可引用的 route id；route id 記「怎麼到頁面」，screen id 記「頁面是什麼」。
+- Reachability recipe 要能被人工照做，也能被 automation script 改寫成 tap/swipe/launch 步驟。
+- UI 架構地圖只把 app 內頁面列入 screen inventory；外部跳轉要寫在 route recipe 的 `Destination scope` / `External transition`，不要繼續當成本 app screen 展開。
+- 若跳到系統設定、瀏覽器、支付、分享、第三方 App、外部 intent 或不可控 Web 流程，記錄觸發點、外部目的地類型、是否需要人工接手，以及同窗 API capture window。
 - 每個 screen 要標記是否可滑動；滑動頁面只保存代表性 top/mid/bottom 或關鍵分頁，不做無限制全量截圖。
 - 每個 clickable entry 要記 target、selector/resource-id/content-desc 或座標來源，以及預期跳轉/操作結果。
 - Automation script 只記可重放操作與時間窗；不要把帳密、token、付款、刪除、發文、下單等高風險動作寫成無保護腳本。
@@ -154,6 +258,9 @@
 | UI path | `Tab > Screen > Action` |
 | Operation ID | `open-home` / `open-detail` |
 | Trigger confidence | high / medium / low |
+| Capability / feature | user-visible function this API supports |
+| Domain concept candidates | entity/value object/state names inferred from evidence |
+| State impact | creates / reads / updates / deletes / refreshes / paginates / authenticates |
 
 ### HTTP Request Headers
 
@@ -199,6 +306,15 @@
 - Replay:
 - Contract test:
 - Manual verification:
+
+### Reconstruction Notes
+
+- BDD scenario candidate:
+- Domain Model Contract candidates:
+- API / Interface Contract notes:
+- Error Handling Contract notes:
+- Fixtures needed for rebuild:
+- Open questions:
 ```
 
 API 文件要求：
@@ -206,6 +322,7 @@ API 文件要求：
 - 分析完 API 後要回填專案文件；不要只把 endpoint 留在暫存 log。
 - HTTP/HTTPS API 必須記錄可見的 headers、request、response；看不到的部分要寫明是 MITM 不可見、hook 未到位、加密包裹、或尚未驗證。
 - 每個 request/response 字段都要逐欄位分析 type/shape、meaning、required/optional、source/derived-from、敏感性與備註。
+- 每個高價值 API 都要標明支援哪個 capability、對應 operation id、可能的 domain concept、狀態影響、錯誤/空狀態與 fixture；這些欄位是後續用 `app-development-guidance` 重建功能的輸入。
 - Header 名稱、path shape、query key、schema 可以保留；header value、token、cookie、device id、個資與可重放 URL 必須去敏。
 - 截圖可用來輔助說明 UI path、tab、screen 與操作，但不能取代 HTTP header/request/response 的字段分析。
 
@@ -256,19 +373,19 @@ API 文件要求：
 Java OkHttp hook installed successfully, but no target host/path appeared while pcap showed TLS traffic to the API host. This rules out the Java OkHttp path for the tested flow and shifts the next step to native/Flutter analysis.
 ```
 
-## Developer Hardening Notes（可選）
+## Developer Guidance Notes（可選）
 
-若分析結果能轉成「未來開發自家 App 時應採取的安全做法」，可在專案分析文件加一小節：
+若分析結果能轉成「未來開發自家 App 時可採取的設計、實作或安全做法」，可在專案分析文件加一小節：
 
 ```markdown
-## Developer Hardening Notes
+## Developer Guidance Notes
 
 | Observation | Development Guidance | Owner | Validation |
 | --- | --- | --- | --- |
-| 已去敏觀察 | 可重用的安全建議 | client / API / backend / build / monitoring | 測試或 review 方法 |
+| 已去敏觀察 | 可重用的開發建議 | client / API / backend / build / monitoring | 測試或 review 方法 |
 ```
 
-這一節只寫已去敏、可泛化的開發啟發。成熟後把開發防護 guidance 回饋到 [`app-security-hardening`](../app-security-hardening/)；本 `apk-analysis` skill 只保留分析方法、證據鏈與工具判斷。
+這一節只寫已去敏、可泛化的開發啟發。成熟後把 App 開發 guidance 回饋到 [`app-development-guidance`](../app-development-guidance/)；本 `apk-analysis` skill 只保留分析方法、證據鏈與工具判斷。
 
 ## 技巧回饋文件要給人讀
 
@@ -306,4 +423,4 @@ Agent Action:
 - 解碼規則回填協議/解密文件。
 - SDK 或 client 行為回填 BDD / tests。
 - 通用技巧回填 **`feedback_history/<category>/`** 或 **`feedback_history/common/`**（新檔），驗證後再整理到本 skill 的主文件或對應 `techniques/<category>/`。
-- 開發防護建議回填 [`app-security-hardening`](../app-security-hardening/)；不要把產品安全 checklist 長期堆在 `apk-analysis`。
+- App 開發 guidance 回填 [`app-development-guidance`](../app-development-guidance/)；不要把產品開發 checklist 長期堆在 `apk-analysis`。

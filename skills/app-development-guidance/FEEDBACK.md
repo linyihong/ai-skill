@@ -1,4 +1,4 @@
-# app-security-hardening feedback entry
+# app-development-guidance feedback entry
 
 Reusable lessons belong in this directory's matching **`feedback_history/<category>/`** folder; use **`feedback_history/common/`** for cross-cutting lessons.
 

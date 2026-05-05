@@ -1,6 +1,6 @@
-# Documenting App Security Hardening Notes
+# Documenting App Development Guidance Notes
 
-Use this guide when turning an APK analysis lesson or design review into reusable development guidance.
+Use this guide when turning an APK analysis lesson, implementation observation, or design review into reusable development guidance.
 
 ## Reusable Note Structure
 
@@ -17,7 +17,7 @@ What pattern was observed, without target-specific secrets.
 
 Why this matters when building our own app or API.
 
-#### Recommended Control
+#### Recommended Implementation / Control
 
 What to implement, and which layer owns it.
 
@@ -44,7 +44,7 @@ What this does not solve.
 | Product-specific API host, endpoint, schema, or token detail | Project repository docs. |
 | Shared sanitization or feedback rules | [`shared-rules`](../../shared-rules/README.md). |
 
-Use [`templates/hardening-note.md`](templates/hardening-note.md) for reusable guidance and [`templates/threat-model-lite.md`](templates/threat-model-lite.md) for quick feature reviews.
+Start with [`templates/README.md`](templates/README.md) when choosing a copyable documentation shape. Use [`templates/initial-development-docs.md`](templates/initial-development-docs.md) when starting from a product brief, [`templates/hardening-note.md`](templates/hardening-note.md) for reusable guidance, and [`templates/threat-model-lite.md`](templates/threat-model-lite.md) for quick feature reviews.
 
 ## Required Linked Update Statement
 
@@ -62,10 +62,11 @@ If linked updates are not needed, state why. This makes it clear that related do
 
 ## Good Guidance
 
-Good hardening guidance is:
+Good development guidance is:
 
 - Actionable by an engineer.
 - Explicit about the owner layer.
+- Clear enough to turn into code, configuration, tests, or review checklist items.
 - Testable.
 - Honest about residual risk.
 - Sanitized and free of target-specific details.

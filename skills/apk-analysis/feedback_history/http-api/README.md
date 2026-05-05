@@ -13,3 +13,4 @@ Lessons for HTTP/API documentation, request/response schema classification, UI-t
 | `2026-05-05_185921-scroll-depth-before-api-conclusion.md` | validated | Scroll depth before API conclusion | Capture top/mid/deep positions before deciding a scrollable page's API source. |
 | `2026-05-05_190838-richtext-html-images-are-api-resources.md` | validated | RichText HTML images are API resources | Parse rich text `<img src>` resources, not only structured image arrays. |
 | `2026-05-05_192012-infinite-scroll-needs-pagination-proof.md` | validated | Infinite scroll needs pagination proof | Prove page/cursor changes, `hasNext`, and tool pagination behavior for scrollable feeds. |
+| `2026-05-05_195200-feature-reconstruction-handoff.md` | promoted | Feature reconstruction handoff | Preserve feature, behavior, domain, API, state/error, fixture, and unknown details so `app-development-guidance` can rebuild the functionality. |

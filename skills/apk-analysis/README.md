@@ -18,6 +18,7 @@
 - 如何找高語意 hook 點。
 - 如何把動態樣本變成離線 fixture、schema 與測試。
 - 如何撰寫可重現、可去敏、可回顧的分析文件。
+- 如何把 APK 觀察整理成可交給 `app-development-guidance` 的功能重建交接規格。
 - 新想法如何回饋到 skill，讓後續 agent 更強。
 
 這裡不應該收：
@@ -71,7 +72,8 @@
 2. 把可重用方法寫成 **`feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`**；跨分類用 `feedback_history/common/`（規則見 [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)）。
 3. 如果方法已驗證，整理進 `WORKFLOW.md` 或 `TOOLS.md`。
 4. 若專案有 SDK 或 client，將解碼規則補成 fixture / contract test。
-5. 若得到的是「未來開發自家 App 時可用的安全防護」而非分析方法，寫入 [`app-security-hardening`](../app-security-hardening/)；本包只保留分析證據與方法。
+5. 若得到的是「未來開發自家 App 時可用的設計、實作或防護 guidance」而非分析方法，寫入 [`app-development-guidance`](../app-development-guidance/)；本包只保留分析證據與方法。
+6. 若目標是重新做出同等功能，專案分析文件必須包含 Feature Reconstruction Handoff，讓 [`app-development-guidance`](../app-development-guidance/) 可以接手產生 BDD、Domain Model Contract、API / Interface Contract、Error Handling Contract、implementation slices 與 tests。
 
 ## 核心原則
 
@@ -81,7 +83,8 @@
 - 低層 socket / TLS hook 只作補證據或最後手段。
 - 動態 hook 只是過渡；最終要沉澱成離線解碼器、fixture、schema 與測試。
 - 文件要分離「方法」與「目標 App 的結論」。
-- 安全開發建議要分離到 [`app-security-hardening`](../app-security-hardening/)，避免把分析方法與產品防護 checklist 混在一起。
+- 分析文件要保留足夠的功能語意，不只保存 endpoint；重要 API 要能回到 capability、operation、domain concept、state/error behavior 與 fixture。
+- App 開發 guidance 要分離到 [`app-development-guidance`](../app-development-guidance/)，避免把分析方法與產品開發 checklist 混在一起。
 - 新發現要回饋到 skill，但必須去敏、泛化、可驗證。
 
 ## 最小產出
@@ -92,6 +95,7 @@
 - 流量路徑判斷：localhost、whole-device pcap、proxy/MITM、Java hook、native/Dart 路徑。
 - 證據：pcap、hook log、MITM export、反編譯搜尋結果或 sanitized excerpt。
 - 結論：哪些路徑有效、哪些被排除、下一步如何驗證。
+- 功能重建交接：capability、screen/route/operation、domain concept candidates、API/interface contract、state/error handling、data lifecycle、fixtures、open questions。
 - 去敏規則：哪些值被遮蔽，哪些文件不能提交。
 - 可重用 lesson：新增檔於 **`feedback_history/<category>/`** 或 **`feedback_history/common/`**。
-- 可選的 Developer Hardening Notes：若對自家 App 開發有安全啟發，連到或回饋至 **`app-security-hardening/`**。
+- 可選的 Developer Guidance Notes：若對自家 App 開發有設計、實作或安全啟發，連到或回饋至 **`app-development-guidance/`**。

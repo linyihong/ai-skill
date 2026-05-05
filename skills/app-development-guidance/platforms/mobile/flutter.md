@@ -1,6 +1,6 @@
 # Flutter Hardening Notes
 
-Use this for Flutter and Dart-specific mobile app hardening.
+Use this for Flutter and Dart-specific app hardening.
 
 ## Focus Areas
 

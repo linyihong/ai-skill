@@ -1,6 +1,6 @@
 # API And Transport Controls
 
-Use this for controls that protect mobile app communication and backend API contracts.
+Use this for controls that protect app communication and backend API contracts.
 
 ## Core Guidance
 

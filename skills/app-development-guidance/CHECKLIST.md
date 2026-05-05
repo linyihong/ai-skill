@@ -1,4 +1,4 @@
-# App Security Hardening Checklist
+# App Development Guidance Checklist
 
 Use this checklist during design review, PR review, and release review. It is intentionally high level: project-specific requirements should live in the product repository.
 
@@ -10,6 +10,19 @@ For focused checklists, use:
 - [`checklists/api-security-review.md`](checklists/api-security-review.md)
 
 When a checklist item changes because of a new control or implementation pattern, the linked `controls/` and `implementation/` docs must be updated or explicitly verified in the same change.
+
+## Product To Contract Flow
+
+- Product brief names goals, users, scope, non-goals, assumptions, and constraints.
+- Bounded Contexts or modules are split by domain responsibility and integration boundary.
+- Critical behavior is written as BDD scenarios before implementation.
+- Domain Model Contract defines entities, value objects, commands, events, and invariants.
+- Architecture Contract defines dependency direction, data ownership, runtime boundaries, and allowed integrations.
+- API, event, command, or public interface contract is defined before parallel implementation.
+- Error Handling Contract defines error taxonomy, retry rules, user messaging, logging, and redaction.
+- If there is no frontend/backend split, producer and consumer roles are still named.
+- Mock APIs, fixtures, schemas, or stubs are generated from the latest contract.
+- Unit, BDD, contract, and integration test responsibilities are assigned before build work starts.
 
 ## API And Transport
 

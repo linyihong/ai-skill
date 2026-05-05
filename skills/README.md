@@ -9,5 +9,5 @@
 | 子資料夾 | 說明 |
 | --- | --- |
 | `apk-analysis/` | 授權 APK 流量分析、抓包、Frida、Flutter/Dart AOT、文件化與 `feedback_history/` lesson。 |
-| `app-security-hardening/` | 將行動 App 分析觀察轉成安全開發 guidance、實作模式、檢查清單與驗證方法。 |
+| `app-development-guidance/` | 將 App 分析觀察轉成開發 guidance、實作模式、檢查清單與驗證方法。 |
 | `_template/` | 新增 skill 時複製用範本（非正式 skill）。 |

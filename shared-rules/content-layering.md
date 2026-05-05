@@ -6,6 +6,11 @@
 | 全庫**連動更新規則**（改一處會影響多處時要同步改哪些） | **[`linked-updates.md`](linked-updates.md)**（全庫唯一正文） |
 | 可重用的**單一技巧、lesson 全文** | 未分類 skill 放 `skills/<skill-name>/feedback_history/`；已分類 skill 放 `skills/<skill-name>/feedback_history/<category>/` 或 `common/`；成熟後可整理進該 skill 的 `WORKFLOW.md` / `TOOLS.md` / `DOCUMENTATION.md` / 分類資料夾 |
 | **如何**下筆、命名、模板 | **[`feedback-lessons.md`](feedback-lessons.md)**（全庫唯一）；各 skill 可選保留一行入口 `FEEDBACK.md` 指向該檔 |
+| **某 skill 需要引用另一個 skill 的規範或交接產物** | 在 referring skill 寫短 cross-link 與觸發條件；規則見 **[`cross-skill-references.md`](cross-skill-references.md)**；不要複製 target skill 的全文 |
 | 特定 App 的 host、一次性結論、專屬實作 | **業務專案**文件，不進可重用 skill |
+
+## 文件變大時
+
+若任何 skill、技巧分類、shared rule、模板或寫作規範開始變大，不要把所有內容繼續堆在同一個 Markdown 檔。依 [`document-sizing.md`](document-sizing.md) 拆成「資料夾 + `README.md` 目錄 + 多個子檔」，讓 agent 只讀與任務相關的子文件。
 
 ← [回到共用規則索引](README.md)

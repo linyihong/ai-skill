@@ -1,6 +1,6 @@
-# App Security Hardening Workflow
+# App Development Guidance Workflow
 
-Use this workflow to convert analysis observations into development guidance without overclaiming what client-side defenses can guarantee.
+Use this workflow to convert analysis observations into development guidance and buildable implementation patterns without overclaiming what client-side defenses can guarantee.
 
 ## 1. Start From Evidence
 
@@ -16,7 +16,7 @@ Do not copy target-specific endpoints, tokens, secrets, device IDs, or raw user 
 
 Write the risk in developer terms:
 
-| Observation | Developer risk |
+| Observation | Developer takeaway |
 | --- | --- |
 | Request can be replayed with the same body and token | Backend contract may lack nonce, timestamp, idempotency, or risk scoring. |
 | Token is long-lived and broadly scoped | Account takeover blast radius is too large if token leaks. |
@@ -40,7 +40,7 @@ Client-side hardening raises cost and improves signal quality, but it must not b
 
 ## 4. Define Controls
 
-For each risk, define:
+For each risk or useful implementation lesson, define:
 
 - Required control.
 - Owner.
@@ -85,7 +85,7 @@ Before finishing a change, follow the repo-wide rule in [`../../shared-rules/lin
 | `platforms/` | Relevant `controls/`, `implementation/`, language notes, and checklists. |
 | `languages/` | Relevant platform and implementation docs. |
 | `checklists/` | Relevant controls and implementation docs. |
-| `templates/` | `DOCUMENTATION.md` and any docs that instruct users to copy the template. |
+| `templates/` | `templates/README.md`, `DOCUMENTATION.md`, and any docs that instruct users to copy the template. |
 
 If no linked update is needed, state why. Do not call linked updates optional when they are required for consistency.
 

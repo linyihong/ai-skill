@@ -15,14 +15,16 @@
 | 改動位置 | 必須同步更新或檢查 |
 | --- | --- |
 | `shared-rules/README.md` 或新增 shared rule | 根 `README.md`、相關 skill 的入口說明、`feedback_history` 模板引用。 |
+| `shared-rules/cross-skill-references.md` 或新增 cross-skill 關係 | referring skill 的 `SKILL.md` / `README.md` / `WORKFLOW.md` / `DOCUMENTATION.md`、target skill 的入口或接收格式、必要時 `skills/_template/SKILL.md` 與 `skills/ADDING_SKILLS.md`。 |
 | `shared-rules/feedback-lessons.md` | 各 skill 的 `FEEDBACK.md`、`feedback_history/README.md`、新增 lesson 模板。 |
 | `shared-rules/cursor-sync.md` 或 `scripts/sync-cursor-bundle.sh` | 根 `README.md`、`scripts/README.md`、Agents 必讀規則、實際執行同步。 |
 | 新增 skill | 根 `README.md`、`skills/README.md`、`scripts/sync-cursor-bundle.sh` 實際同步結果。 |
 | 修改 `skills/<name>/SKILL.md` 觸發條件或流程 | 該 skill 的 `README.md`、`RUNBOOK.md`、`WORKFLOW.md`、相關 cross-link。 |
 | 新增 `feedback_history` lesson | 該 skill 的 `feedback_history/README.md`，必要時 `WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md` 或分類文件。 |
-| 修改 `app-security-hardening/controls/` | 相關 `implementation/`、`platforms/`、`languages/`、`checklists/`。 |
-| 修改 `app-security-hardening/implementation/` | 相關 `controls/`、`platforms/`、`languages/`、`checklists/`。 |
-| 修改 `app-security-hardening/templates/` | `DOCUMENTATION.md` 與引用該模板的文件。 |
+| 修改 `app-development-guidance/controls/` | 相關 `implementation/`、`platforms/`、`languages/`、`checklists/`。 |
+| 修改 `app-development-guidance/process/` | 相關 `checklists/`、`templates/`、`implementation/`、`WORKFLOW.md`。 |
+| 修改 `app-development-guidance/implementation/` | 相關 `controls/`、`platforms/`、`languages/`、`checklists/`。 |
+| 修改 `app-development-guidance/templates/` | `templates/README.md`、`DOCUMENTATION.md`、`process/`、`CHECKLIST.md` 與引用該模板的文件。 |
 
 ## 語氣規則
 

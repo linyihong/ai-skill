@@ -32,6 +32,8 @@ skills/<skill-name>/
   FEEDBACK.md           # 可選：極短入口，連到 shared-rules/feedback-lessons.md
 ```
 
+若單一文件開始過大，或一句規則展開成多個步驟、例外、模板、範例，依 [`shared-rules/document-sizing.md`](../shared-rules/document-sizing.md) 改成資料夾包裝：父層 `README.md` 做目錄與讀取路由，子檔保存具體內容。不要把不同技巧分類、寫作規範、工具教學和 feedback lesson 全堆在同一檔。
+
 可直接複製範本（在 `<AI_SKILL_REPO>` 根目錄執行，將 `my-skill` 改成你的名稱）：
 
 ```bash
@@ -58,7 +60,9 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 ## 4. 與共用規則的關係
 
 - **授權、去敏、路徑占位、feedback 檔名與模板**：一律只維護在 **`shared-rules/`**，各 skill **不要**複製長文。
+- **Cross-skill reference**：若某 skill 需要引用另一個 skill 的規範、模板、檢查清單或交接產物，依 **[`shared-rules/cross-skill-references.md`](../shared-rules/cross-skill-references.md)** 寫短引用，包含 target skill、觸發條件、交接 artifact、ownership boundary、去敏邊界與 linked updates；不要複製 target skill 的全文。
 - **連動更新規則**：一律只維護在 **[`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md)**；新增 skill 或修改 skill 結構時，受影響的索引、入口、同步文件、分類文件**必須**同步更新或明確檢查。
+- **文件大小與拆分規則**：一律只維護在 **[`shared-rules/document-sizing.md`](../shared-rules/document-sizing.md)**；skill、技巧分類與寫作規範變大時，用資料夾與 `README.md` 目錄拆分。
 - 各 skill 的 **`FEEDBACK.md`**（若需要）：維持與 [`apk-analysis/FEEDBACK.md`](apk-analysis/FEEDBACK.md) 相同模式——**幾行連結**到 [`shared-rules/feedback-lessons.md`](../shared-rules/feedback-lessons.md)。
 - 每一則 lesson 頂部引用 `shared-rules`（路徑依檔案深度調整 `../../../shared-rules/...`）。
 
@@ -105,6 +109,8 @@ ln -sf "${AI_SKILL_REPO}/skills/my-skill" "${HOME}/.cursor/skills/my-skill"
 
 - [ ] `SKILL.md` 有合法 `name` / `description` frontmatter
 - [ ] 正文有連到 `shared-rules` 與 `feedback-lessons`
+- [ ] 若引用其他 skill，已依 `shared-rules/cross-skill-references.md` 寫明 trigger、artifact、ownership boundary 與 linked updates
+- [ ] 若文件開始變大，已依 `shared-rules/document-sizing.md` 拆成資料夾、目錄與子檔
 - [ ] 已建立 `feedback_history/`（可先要 `README.md` 索引；若 skill 有分類，同步建立 `feedback_history/<category>/README.md`）
 - [ ] 根目錄 `README.md` 與 `skills/README.md` 已更新
 - [ ] 已依 `shared-rules/linked-updates.md` 完成或明確檢查必要連動更新
