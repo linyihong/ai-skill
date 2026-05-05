@@ -100,17 +100,25 @@
 
 ### Screen Inventory
 
-| Screen ID | UI path | Screenshot | Key visible elements | State / Preconditions |
-| --- | --- | --- | --- | --- |
-| `home.feed` | `Home` | `<screenshot-path>` | feed list, banner | logged in |
-| `item.detail` | `Home > item tap` | `<screenshot-path>` | title, action buttons | item available |
+| Screen ID | UI path | Screenshot | Scrollable | Clickable entries | Key visible elements | State / Preconditions |
+| --- | --- | --- | --- | --- | --- | --- |
+| `home.feed` | `Home` | `<screenshot-path>` | vertical list: top/mid/bottom sampled | item card, banner, tab buttons | feed list, banner | logged in |
+| `item.detail` | `Home > item tap` | `<screenshot-path>` | no / yes | play button, favorite, related item | title, action buttons | item available |
+
+### Interaction Inventory
+
+| Interaction ID | Screen ID | Type | Target / Gesture | Selector or coordinate source | Expected result | API capture needed |
+| --- | --- | --- | --- | --- | --- | --- |
+| `home-scroll-mid` | `home.feed` | swipe | vertical swipe up once | screenshot coordinates / hierarchy bounds | feed mid-page visible | yes/no |
+| `open-detail` | `home.feed` | tap | first item card | visible label / bounds / coordinates | `item.detail` | yes |
 
 ### Operation To API Matrix
 
 | Operation ID | UI path / action | Automation script | Binding phase | Capture window | Method / Path | Source | Response shape | Confidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `open-home` | cold start -> Home | `<script or manual>` | initial map | `<start-end>` | `GET /<path>` | hook / pcap / MITM | top-level keys only | medium | may include preload/cache |
-| `open-detail` | `Home > item tap` | `scripts/ui/open-detail.sh` | after API decoded | `<start-end>` | `POST /<path>` | hook | schema-only summary | high | |
+| `open-detail` | `Home > item tap` | `scripts/ui/open-detail.sh` (`tap`) | after API decoded | `<start-end>` | `POST /<path>` | hook | schema-only summary | high | |
+| `scroll-feed` | `Home > swipe feed` | `scripts/ui/scroll-feed.sh` (`swipe`) | UI binding | `<start-end>` | `GET /<path>` | hook / pcap | list page shape | medium | may be pagination/preload |
 
 ### Unknown / Untested Navigation
 
@@ -124,6 +132,8 @@
 
 - Screenshot 要去敏；不要保留帳號、頭像、電話、email、訂單、私訊或個資。
 - 先記主要 tabs/screens 即可；只有高價值流程或需要 attribution 的 API 才補完整操作截圖。
+- 每個 screen 要標記是否可滑動；滑動頁面只保存代表性 top/mid/bottom 或關鍵分頁，不做無限制全量截圖。
+- 每個 clickable entry 要記 target、selector/resource-id/content-desc 或座標來源，以及預期跳轉/操作結果。
 - Automation script 只記可重放操作與時間窗；不要把帳密、token、付款、刪除、發文、下單等高風險動作寫成無保護腳本。
 - Capture window 要能對齊 pcap/MITM/Frida log 的時間戳或 sequence id。
 - API 關聯要寫 `Source`，例如 hook、pcap timing、MITM、replay；只靠 screenshot 不足以證明 API 來源。

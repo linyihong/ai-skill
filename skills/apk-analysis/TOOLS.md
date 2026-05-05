@@ -117,6 +117,7 @@ adb -s <device-serial> pull /sdcard/window.xml ./evidence/ui/<operation-id>.xml
 ```bash
 date -u +"%Y-%m-%dT%H:%M:%SZ"
 adb -s <device-serial> shell input tap <x> <y>
+adb -s <device-serial> shell input swipe <x1> <y1> <x2> <y2> <duration-ms>
 date -u +"%Y-%m-%dT%H:%M:%SZ"
 ```
 
@@ -140,6 +141,12 @@ sleep 3
 # Replace coordinates with values from a sanitized screenshot or UI hierarchy.
 adb -s "$DEVICE" shell input tap <x> <y>
 sleep 2
+
+# Optional: sample scrollable pages at bounded depths only.
+adb -s "$DEVICE" shell input swipe <x1> <y1> <x2> <y2> <duration-ms>
+sleep 2
+
+# Tap a documented clickable entry point.
 adb -s "$DEVICE" shell input tap <x> <y>
 sleep 3
 
@@ -151,6 +158,8 @@ echo "operation=${OPERATION_ID} phase=end ts=$(ts)"
 安全邊界：
 
 - 不要把帳密、token、個資、付款、刪除、發文、下單、私訊等高風險操作寫入無保護自動化腳本。
+- 滑動頁面要限制 scroll count / scroll depth，例如最多 top/mid/bottom 三段；不要無限捲動列表。
+- 點擊目標要來自去敏 screenshot 或 `uiautomator dump` 的 bounds/label；不要用未驗證座標盲點。
 - 先用測試帳號與授權範圍確認可自動重放。
 - 若腳本會觸發登入或限流，先停止 tight-loop，改用已建立 session 或人工單步操作。
 

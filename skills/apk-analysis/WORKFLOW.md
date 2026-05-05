@@ -39,8 +39,9 @@
 - 入口與登入狀態：冷啟動、已登入、未登入、權限彈窗、地區/語言。
 - 可見 navigation：bottom tabs、top tabs、drawer、profile/menu、search、detail page、player/media page。
 - 每個主要 screen 的 screenshot evidence：去敏後保存路徑、時間戳、screen label。
+- 頁面互動屬性：是否可滑動、滑動方向、主要可點擊元素、點擊後進入哪個 screen/action。
 - 操作序列：`Home > Tab: Discover > item tap > Detail` 這類可重放路徑。
-- Automation script：可選；只對關鍵 flow 建立最小 adb/uiautomator 腳本，避免自動遍歷整個 App。
+- Automation script：可選；只對關鍵 flow 建立最小 adb/uiautomator 腳本，明確記錄 `tap` / `swipe` 步驟，避免自動遍歷整個 App。
 - 捕獲時間窗：操作開始/結束時間、對應 pcap/MITM/Frida log window。
 - API 關聯：每個操作觸發的 method/path、response schema、cache/local-only 判斷。
 - Capture budget：本輪要完整綁定、只粗略盤點，或等 API 解完再補綁定。
@@ -49,6 +50,8 @@
 
 - UI map 是輔助 API 分析，不應阻塞核心流量定位、解密、token/session 還原。
 - 截圖與 UI dump 要限量；先抓主要 navigation 與關鍵流程，不要一開始自動截完整 App 全站。
+- 滑動頁面只需記代表性 scroll depth，例如 top / mid / bottom；不要無限制滑到列表盡頭。
+- 點擊頁面要記點擊目標的可見 label、resource-id/content-desc 或座標來源，避免之後腳本點錯。
 - 自動化操作要可中止、限量、避開登入重試、付款、刪除、發文、下單等高風險動作；只在授權範圍內重放。
 - 自動化腳本要輸出 operation id、開始/結束 timestamp，讓 API log 可以對齊。
 - 截圖只能證明可見 UI，不直接證明 API；必須用同窗 request/response、pcap timing 或 hook sequence 對齊。

@@ -43,11 +43,14 @@ If UI binding is not done yet, write `UI path: unknown` and `Trigger confidence:
 For high-value flows, a small operation script can make API capture repeatable:
 
 1. Give each flow a stable `operation_id`.
-2. Keep each script to one UI path or action group, such as `open-home`, `open-detail`, or `start-playback`.
-3. Print UTC start/end timestamps before and after the operation.
-4. Run pcap/MITM/Frida capture in the same window.
-5. Save one sanitized screenshot or UI hierarchy at the end of the operation.
-6. Fill the operation-to-API matrix with method/path, source, response shape, and trigger confidence.
+2. Classify each screen as scrollable or not, and record clickable entry points before writing a script.
+3. Keep each script to one UI path or action group, such as `open-home`, `scroll-feed`, `open-detail`, or `start-playback`.
+4. For scrollable screens, use bounded sampling such as top/mid/bottom rather than crawling to the end.
+5. For clickable screens, use labels, resource IDs, content descriptions, hierarchy bounds, or verified coordinates.
+6. Print UTC start/end timestamps before and after the operation.
+7. Run pcap/MITM/Frida capture in the same window.
+8. Save one sanitized screenshot or UI hierarchy at the end of the operation.
+9. Fill the operation-to-API matrix with method/path, source, response shape, and trigger confidence.
 
 Use automation to stabilize capture, not to crawl the whole app. Avoid scripts that perform login loops, payment, destructive actions, posting, messaging, account changes, or any flow outside authorization.
 
