@@ -12,3 +12,4 @@ Lessons for HTTP/API documentation, request/response schema classification, UI-t
 | `2026-05-05_184218-playable-list-item-still-needs-detail-api.md` | validated | Playable list item still needs detail API | Do not skip item-tap detail capture just because list items already contain playable URLs. |
 | `2026-05-05_185921-scroll-depth-before-api-conclusion.md` | validated | Scroll depth before API conclusion | Capture top/mid/deep positions before deciding a scrollable page's API source. |
 | `2026-05-05_190838-richtext-html-images-are-api-resources.md` | validated | RichText HTML images are API resources | Parse rich text `<img src>` resources, not only structured image arrays. |
+| `2026-05-05_192012-infinite-scroll-needs-pagination-proof.md` | validated | Infinite scroll needs pagination proof | Prove page/cursor changes, `hasNext`, and tool pagination behavior for scrollable feeds. |
