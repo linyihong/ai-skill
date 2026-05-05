@@ -54,6 +54,19 @@ These documents can start as lightweight Markdown drafts. If the project is smal
 
 Use [`../templates/initial-development-docs.md`](../templates/initial-development-docs.md) for the first draft. Use [`../templates/README.md`](../templates/README.md) to choose between initial planning, reusable guidance notes, and quick threat-model reviews.
 
+## Missing Information Gate
+
+Before development planning or implementation continues, missing information must be handled explicitly:
+
+| Missing item type | Required action |
+| --- | --- |
+| Can be recovered from evidence | Backfill it and cite the evidence source. |
+| Product intent not recoverable | Mark `unknown` / `open question`, ask the user, and do not invent intent. |
+| Affects BDD behavior, domain invariants, API/interface shape, error handling, security, storage, or tests | Treat as a blocker: ask the user or request evidence before continuing implementation. |
+| Nice-to-have context that does not change behavior or contracts | Record as non-blocking open question and state why it does not block. |
+
+Do not continue development with unresolved blockers. The agent must list missing items as questions, wait for answers or evidence, then update the documents before proceeding.
+
 ## Existing Project Documentation Backfill
 
 When this skill is opened for a project that is already fully or mostly implemented, first audit the existing documents and backfill any missing development documents. Do not skip the process because implementation already exists.
@@ -76,7 +89,8 @@ Backfill order for existing projects:
 3. Backfill BDD Behavior first when product brief is missing, because implemented behavior is the strongest available source of truth.
 4. Backfill Domain Model, Architecture, API / Interface, and Error Handling Contracts from the completed behavior and implementation evidence.
 5. Mark unknown product intent separately from observed behavior. Unknown intent does not block BDD completion.
-6. Add tests or test TODOs for any critical BDD scenario that lacks coverage.
+6. If BDD cannot be completed from available evidence, stop and ask for the missing behavior, screen/API examples, logs, test cases, or user decisions before continuing development.
+7. Add tests or test TODOs for any critical BDD scenario that lacks coverage.
 
 ## Contract-First Rules
 
@@ -88,6 +102,7 @@ Backfill order for existing projects:
 - Implementation can run in parallel only when the shared contracts are versioned enough for mock, stub, or schema-first work.
 - If a contract changes, update BDD, implementation, mocks, and tests in the same change or explicitly record why not.
 - For already implemented projects, BDD becomes the required behavioral recovery document. Product Brief may contain unknowns, but BDD must be filled from observable product behavior and implementation evidence.
+- Any missing information that changes behavior, contracts, ownership, error handling, storage, security, or tests blocks development until it is answered or explicitly scoped out.
 
 ## When Frontend And Backend Do Not Both Exist
 
@@ -118,6 +133,7 @@ Before implementation starts, the feature should have:
 - API, event, command, or public interface contract for integrations.
 - Error Handling Contract for expected failures and recovery behavior.
 - Test plan covering unit, behavior, contract, and integration levels.
+- No unresolved blocker questions that affect implementation behavior or contracts.
 
 For an already implemented project, "ready" means the missing-document audit is complete and BDD covers the implemented critical behavior, even if original product intent remains partly unknown.
 

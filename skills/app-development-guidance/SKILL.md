@@ -32,22 +32,23 @@ Use this skill when APK analysis, app/API review, or app development work reveal
 1. Identify the source: product brief, observed weakness, reverse-engineering lesson, or app/API design question.
 2. If starting from a product brief, use [`process/`](process/) to draft or discuss the initial development docs: Bounded Contexts, BDD behavior, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests.
 3. If opening this skill on an existing implemented project, audit missing documents and backfill them. Missing Product Brief fields may be marked `unknown` / `open question`, but BDD behavior must be completed from UI, API, code, tests, logs, fixtures, or observed behavior.
-4. Convert analysis findings into a developer-facing risk statement or implementation opportunity.
-5. Choose the control layer:
+4. If anything required for behavior, domain invariants, API/interface shape, error handling, security, storage, tests, or ownership is missing, ask the user or request evidence before continuing. Do not proceed with development while blocker questions remain unresolved.
+5. Convert analysis findings into a developer-facing risk statement or implementation opportunity.
+6. Choose the control layer:
    - API/server contract.
    - App runtime behavior.
    - Build/release configuration.
    - Monitoring or fraud signal.
-6. Add a concrete validation method: unit test, BDD scenario, API contract test, integration test, release checklist item, fixture, or manual review step.
-7. Classify the guidance:
+7. Add a concrete validation method: unit test, BDD scenario, API contract test, integration test, release checklist item, fixture, or manual review step.
+8. Classify the guidance:
    - Core security control: `controls/`.
    - Platform/app type detail: `platforms/`.
    - Language/runtime-specific trap: `languages/`.
    - Concrete implementation pattern: `implementation/`.
    - Product-to-contract development flow: `process/`.
    - Repeatable review step: `checklists/`.
-8. Apply required linked updates from [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md): when a process, control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
-9. If the lesson is reusable but not yet mature, add it to the matching `feedback_history/<category>/` folder first; use `feedback_history/common/` for cross-cutting lessons. Promote it into the structured folders when validated.
+9. Apply required linked updates from [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md): when a process, control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
+10. If the lesson is reusable but not yet mature, add it to the matching `feedback_history/<category>/` folder first; use `feedback_history/common/` for cross-cutting lessons. Promote it into the structured folders when validated.
 
 ## Default Workflow
 
@@ -73,6 +74,7 @@ When producing development guidance, include:
 - Why it matters for app development.
 - Missing questions that must be answered before implementation, if starting from a product brief.
 - Existing-project documentation gaps and how they were backfilled; BDD must be complete when observable behavior exists.
+- Blocker questions for any missing behavior, contract, error, security, storage, ownership, or test requirement; do not continue development until these are answered or explicitly scoped out.
 - Draft documents or document sections that are ready to copy into the project repository.
 - Recommended control and the layer that owns it.
 - Implementation path or linked implementation doc, when applicable.

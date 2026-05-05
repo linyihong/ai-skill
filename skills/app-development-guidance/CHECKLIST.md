@@ -23,6 +23,7 @@ When a checklist item changes because of a new control or implementation pattern
 - If there is no frontend/backend split, producer and consumer roles are still named.
 - Mock APIs, fixtures, schemas, or stubs are generated from the latest contract.
 - Unit, BDD, contract, and integration test responsibilities are assigned before build work starts.
+- Missing behavior, domain, API/interface, error handling, security, storage, ownership, or test requirements are asked as blocker questions before development continues.
 
 ## Existing Project Documentation Backfill
 
@@ -32,6 +33,7 @@ When a checklist item changes because of a new control or implementation pattern
 - BDD scenarios cite evidence from UI behavior, API behavior, code paths, tests, logs, fixtures, or manual verification.
 - Domain Model, Architecture, API / Interface, and Error Handling Contracts are backfilled from observed behavior and implementation evidence.
 - Every critical BDD scenario maps to existing test coverage or a required test gap.
+- Any gap that cannot be backfilled from evidence and affects behavior or contracts is asked before implementation proceeds.
 
 ## API And Transport
 
@@ -82,5 +84,6 @@ When a checklist item changes because of a new control or implementation pattern
 ## Release Gate
 
 - A reviewer can point to tests, build checks, or documented evidence for every required control.
+- No unresolved blocker questions remain for behavior, contracts, errors, security, storage, ownership, or tests.
 - Known residual risks are documented in the project repository.
 - Reusable lessons are generalized into this skill only after sanitization.

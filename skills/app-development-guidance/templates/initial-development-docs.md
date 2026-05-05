@@ -17,18 +17,25 @@ Use this template when turning a product brief into an implementation plan. Keep
 
 Use this section when the project is already implemented and documents are missing.
 
-| Document | Status (`exists` / `partial` / `missing` / `unknown`) | Evidence source | Backfill action |
-| --- | --- | --- | --- |
-| Product Brief | | | |
-| Bounded Context Map | | | |
-| BDD Behavior | | | |
-| Domain Model Contract | | | |
-| Architecture Contract | | | |
-| API / Interface Contract | | | |
-| Error Handling Contract | | | |
-| Test Plan | | | |
+| Document | Status (`exists` / `partial` / `missing` / `unknown`) | Evidence source | Backfill action | Blocker questions |
+| --- | --- | --- | --- | --- |
+| Product Brief | | | | |
+| Bounded Context Map | | | | |
+| BDD Behavior | | | | |
+| Domain Model Contract | | | | |
+| Architecture Contract | | | | |
+| API / Interface Contract | | | | |
+| Error Handling Contract | | | | |
+| Test Plan | | | | |
 
 Product Brief gaps may remain `unknown` if original intent is unavailable. BDD Behavior must be completed from observable implementation evidence.
+
+## Blocker Questions
+
+List every missing item that affects behavior, contracts, ownership, security, storage, error handling, or tests. Do not continue implementation until each blocker is answered, backed by evidence, or explicitly scoped out.
+
+| Question | Blocks | Asked to | Answer / decision | Status |
+| --- | --- | --- | --- | --- |
 
 ## Bounded Context Map
 

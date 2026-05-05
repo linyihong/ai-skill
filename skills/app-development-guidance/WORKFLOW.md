@@ -22,6 +22,8 @@ If the project is already implemented and documentation is missing, start with a
 
 Do not let a missing product brief block BDD backfill for an already implemented product.
 
+Missing information that affects behavior, domain invariants, API/interface shape, error handling, security, storage, ownership, or tests is a blocker. Ask the user or request evidence, update the docs with the answer, and only then continue development planning or implementation. Non-blocking unknowns must be labeled with why they do not change behavior or contracts.
+
 ## 2. Translate To Risk
 
 Write the risk in developer terms:
@@ -82,6 +84,7 @@ Classify the outcome before writing docs:
 | A reusable but still emerging lesson | `feedback_history/<category>/` or `feedback_history/common/` |
 | A copyable documentation shape | `templates/` |
 | Missing development documents in an implemented project | `process/` and `templates/initial-development-docs.md` |
+| Blocker questions for missing requirements or contracts | `process/` and the current planning document |
 
 Prefer linking between folders over duplicating the same guidance.
 
@@ -109,6 +112,8 @@ Use at least one validation method:
 - Static scan or build assertion.
 - Manual review with evidence.
 - Runtime or backend telemetry query.
+
+Before validating implementation, verify there are no unresolved blocker questions that affect behavior, contracts, error handling, security, storage, ownership, or tests.
 
 ## 8. Feed Back Reusable Lessons
 
