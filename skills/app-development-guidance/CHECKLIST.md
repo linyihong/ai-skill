@@ -24,6 +24,15 @@ When a checklist item changes because of a new control or implementation pattern
 - Mock APIs, fixtures, schemas, or stubs are generated from the latest contract.
 - Unit, BDD, contract, and integration test responsibilities are assigned before build work starts.
 
+## Existing Project Documentation Backfill
+
+- Existing project docs are inventoried and marked `exists`, `partial`, `missing`, or `unknown`.
+- Missing Product Brief fields are reconstructed only from evidence; unavailable original intent is marked `unknown` or `open question`.
+- BDD behavior is complete for implemented critical happy paths, failure paths, permissions, empty states, edge cases, and cross-context flows.
+- BDD scenarios cite evidence from UI behavior, API behavior, code paths, tests, logs, fixtures, or manual verification.
+- Domain Model, Architecture, API / Interface, and Error Handling Contracts are backfilled from observed behavior and implementation evidence.
+- Every critical BDD scenario maps to existing test coverage or a required test gap.
+
 ## API And Transport
 
 - Sensitive flows use HTTPS only; cleartext traffic is disabled in release builds.

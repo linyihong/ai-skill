@@ -13,6 +13,23 @@ Use this template when turning a product brief into an implementation plan. Keep
 | Assumptions | |
 | Open questions | |
 
+## Existing Project Documentation Gap Audit
+
+Use this section when the project is already implemented and documents are missing.
+
+| Document | Status (`exists` / `partial` / `missing` / `unknown`) | Evidence source | Backfill action |
+| --- | --- | --- | --- |
+| Product Brief | | | |
+| Bounded Context Map | | | |
+| BDD Behavior | | | |
+| Domain Model Contract | | | |
+| Architecture Contract | | | |
+| API / Interface Contract | | | |
+| Error Handling Contract | | | |
+| Test Plan | | | |
+
+Product Brief gaps may remain `unknown` if original intent is unavailable. BDD Behavior must be completed from observable implementation evidence.
+
 ## Bounded Context Map
 
 | Context / Module | Responsibility | Owns | Depends on | Does not own |

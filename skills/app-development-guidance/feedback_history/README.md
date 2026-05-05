@@ -18,4 +18,5 @@ This skill already separates promoted guidance into `controls/`, `platforms/`, `
 | File | Status | Topic | Summary |
 | --- | --- | --- | --- |
 | `common/2026-05-05_194400-contract-first-development-flow.md` | promoted | Contract-first development flow | Start from product brief, split bounded contexts, write BDD, define Domain, Architecture, API/Interface, and Error Handling Contracts, then build and test provider/consumer sides. |
+| `common/2026-05-05_200500-existing-project-doc-backfill-bdd-required.md` | promoted | Existing project doc backfill requires complete BDD | Existing projects must audit and backfill missing development docs; Product Brief gaps can be unknown, but BDD must be completed from observable implementation evidence. |
 | `controls/2026-05-01_142100-client-encrypted-header-not-boundary.md` | promoted | Client encrypted header is not a security boundary | Client-side encrypted or signed headers are recoverable from shipped apps; backend authorization, replay protection, token hygiene, and monitoring must provide the real boundary. |

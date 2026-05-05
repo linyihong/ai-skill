@@ -12,6 +12,16 @@ Record the reusable observation:
 
 Do not copy target-specific endpoints, tokens, secrets, device IDs, or raw user data into this skill.
 
+If the project is already implemented and documentation is missing, start with a document gap audit before proposing new guidance:
+
+| Document | Backfill requirement |
+| --- | --- |
+| Product Brief | Backfill only evidence-supported goal, users, scope, constraints, and assumptions; mark unavailable intent as `unknown` or `open question`. |
+| BDD Behavior | Required. Complete from observable UI, API, code, tests, logs, fixtures, and manual verification. |
+| Contracts | Backfill Domain Model, Architecture, API / Interface, Error Handling, and Test Plan from implemented behavior and evidence. |
+
+Do not let a missing product brief block BDD backfill for an already implemented product.
+
 ## 2. Translate To Risk
 
 Write the risk in developer terms:
@@ -71,6 +81,7 @@ Classify the outcome before writing docs:
 | A repeated design, PR, release, or API review step | `checklists/` |
 | A reusable but still emerging lesson | `feedback_history/<category>/` or `feedback_history/common/` |
 | A copyable documentation shape | `templates/` |
+| Missing development documents in an implemented project | `process/` and `templates/initial-development-docs.md` |
 
 Prefer linking between folders over duplicating the same guidance.
 

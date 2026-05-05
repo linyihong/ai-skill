@@ -16,6 +16,7 @@ Use this skill when APK analysis, app/API review, or app development work reveal
 - Turning APK analysis findings into practical development guidance.
 - Turning observed app/API techniques into buildable patterns for your own app.
 - Turning product briefs into BDD, Domain Model Contracts, API Contracts, implementation slices, and tests.
+- Backfilling missing development documents for existing, already implemented projects; Product Brief gaps can be marked unknown, but BDD behavior must be completed from observed implementation evidence.
 - Reviewing app/API design for replay resistance, token safety, transport security, local storage, logging, and release hardening.
 - Creating PR/release checklists for mobile, web, backend/API, and future app types.
 - Deciding what should be validated by tests, fixtures, runtime checks, or server-side controls.
@@ -30,28 +31,29 @@ Use this skill when APK analysis, app/API review, or app development work reveal
 
 1. Identify the source: product brief, observed weakness, reverse-engineering lesson, or app/API design question.
 2. If starting from a product brief, use [`process/`](process/) to draft or discuss the initial development docs: Bounded Contexts, BDD behavior, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests.
-3. Convert analysis findings into a developer-facing risk statement or implementation opportunity.
-4. Choose the control layer:
+3. If opening this skill on an existing implemented project, audit missing documents and backfill them. Missing Product Brief fields may be marked `unknown` / `open question`, but BDD behavior must be completed from UI, API, code, tests, logs, fixtures, or observed behavior.
+4. Convert analysis findings into a developer-facing risk statement or implementation opportunity.
+5. Choose the control layer:
    - API/server contract.
    - App runtime behavior.
    - Build/release configuration.
    - Monitoring or fraud signal.
-5. Add a concrete validation method: unit test, BDD scenario, API contract test, integration test, release checklist item, fixture, or manual review step.
-6. Classify the guidance:
+6. Add a concrete validation method: unit test, BDD scenario, API contract test, integration test, release checklist item, fixture, or manual review step.
+7. Classify the guidance:
    - Core security control: `controls/`.
    - Platform/app type detail: `platforms/`.
    - Language/runtime-specific trap: `languages/`.
    - Concrete implementation pattern: `implementation/`.
    - Product-to-contract development flow: `process/`.
    - Repeatable review step: `checklists/`.
-7. Apply required linked updates from [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md): when a process, control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
-8. If the lesson is reusable but not yet mature, add it to the matching `feedback_history/<category>/` folder first; use `feedback_history/common/` for cross-cutting lessons. Promote it into the structured folders when validated.
+8. Apply required linked updates from [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md): when a process, control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
+9. If the lesson is reusable but not yet mature, add it to the matching `feedback_history/<category>/` folder first; use `feedback_history/common/` for cross-cutting lessons. Promote it into the structured folders when validated.
 
 ## Default Workflow
 
 Read [WORKFLOW.md](WORKFLOW.md) to translate analysis evidence into development requirements and implementation guidance.
 
-Use [`process/`](process/) when starting from a product brief or planning a feature from BDD through Domain Model, Architecture, API / Interface, Error Handling, implementation, and tests.
+Use [`process/`](process/) when starting from a product brief, planning a feature from BDD through Domain Model, Architecture, API / Interface, Error Handling, implementation, and tests, or backfilling missing documents for an existing implemented project.
 
 Use [`templates/`](templates/) to choose a copyable template. Use [`templates/initial-development-docs.md`](templates/initial-development-docs.md) when the user wants the first draft of the development documents or when requirements are still being clarified through discussion.
 
@@ -70,6 +72,7 @@ When producing development guidance, include:
 - Observed risk or failure mode.
 - Why it matters for app development.
 - Missing questions that must be answered before implementation, if starting from a product brief.
+- Existing-project documentation gaps and how they were backfilled; BDD must be complete when observable behavior exists.
 - Draft documents or document sections that are ready to copy into the project repository.
 - Recommended control and the layer that owns it.
 - Implementation path or linked implementation doc, when applicable.

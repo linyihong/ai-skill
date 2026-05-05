@@ -54,6 +54,30 @@ These documents can start as lightweight Markdown drafts. If the project is smal
 
 Use [`../templates/initial-development-docs.md`](../templates/initial-development-docs.md) for the first draft. Use [`../templates/README.md`](../templates/README.md) to choose between initial planning, reusable guidance notes, and quick threat-model reviews.
 
+## Existing Project Documentation Backfill
+
+When this skill is opened for a project that is already fully or mostly implemented, first audit the existing documents and backfill any missing development documents. Do not skip the process because implementation already exists.
+
+| Missing document | Backfill rule |
+| --- | --- |
+| Product Brief | Reconstruct only what evidence supports: visible goals, users/actors, scope, non-goals, assumptions, and constraints. If original intent is unavailable, mark fields as `unknown` or `open question`; do not invent business rationale. |
+| Bounded Context Map | Infer modules from code ownership, runtime boundaries, database tables, API groups, UI areas, queues, SDK/public APIs, and deployment units. |
+| BDD Behavior | **Must be completed.** Reconstruct critical happy paths, failure paths, permissions, empty states, edge cases, and cross-context flows from the implemented product, tests, UI, API behavior, and logs. |
+| Domain Model Contract | Infer entities, value objects, commands, events, invariants, and state transitions from code, schemas, storage, UI states, and tests; mark uncertain vocabulary as candidate. |
+| Architecture Contract | Document actual dependency direction, data ownership, side-effect boundaries, integrations, runtime/deployment shape, and known violations. |
+| API / Interface Contract | Extract actual request/response schemas, public methods, events, commands, auth/session behavior, versioning, compatibility, fixtures, and consumers. |
+| Error Handling Contract | Backfill observed error taxonomy, retry rules, user messages, logging/redaction behavior, security-sensitive failures, and gaps. |
+| Test Plan | Map existing tests to behavior/contracts and list required tests for uncovered BDD scenarios, invariants, contracts, and integration paths. |
+
+Backfill order for existing projects:
+
+1. Inventory existing docs, source folders, tests, schemas, API specs, fixtures, release notes, and observed behavior.
+2. Create a documentation gap table with status: `exists`, `partial`, `missing`, or `unknown`.
+3. Backfill BDD Behavior first when product brief is missing, because implemented behavior is the strongest available source of truth.
+4. Backfill Domain Model, Architecture, API / Interface, and Error Handling Contracts from the completed behavior and implementation evidence.
+5. Mark unknown product intent separately from observed behavior. Unknown intent does not block BDD completion.
+6. Add tests or test TODOs for any critical BDD scenario that lacks coverage.
+
 ## Contract-First Rules
 
 - BDD describes behavior; it should not lock in framework or database choices.
@@ -63,6 +87,7 @@ Use [`../templates/initial-development-docs.md`](../templates/initial-developmen
 - Error Handling Contract owns failure taxonomy, retry policy, user messaging, logging, and security redaction.
 - Implementation can run in parallel only when the shared contracts are versioned enough for mock, stub, or schema-first work.
 - If a contract changes, update BDD, implementation, mocks, and tests in the same change or explicitly record why not.
+- For already implemented projects, BDD becomes the required behavioral recovery document. Product Brief may contain unknowns, but BDD must be filled from observable product behavior and implementation evidence.
 
 ## When Frontend And Backend Do Not Both Exist
 
@@ -93,6 +118,8 @@ Before implementation starts, the feature should have:
 - API, event, command, or public interface contract for integrations.
 - Error Handling Contract for expected failures and recovery behavior.
 - Test plan covering unit, behavior, contract, and integration levels.
+
+For an already implemented project, "ready" means the missing-document audit is complete and BDD covers the implemented critical behavior, even if original product intent remains partly unknown.
 
 ## Minimum Definition Of Done
 

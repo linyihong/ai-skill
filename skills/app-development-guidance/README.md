@@ -14,6 +14,7 @@ Capture practical guidance for:
 - App implementation patterns learned from analysis.
 - App/API and transport security.
 - Product brief to contract-first development flow.
+- Existing project documentation gap backfill, with complete BDD recovery from implemented behavior.
 - Token, session, and replay handling.
 - Local storage and secret exposure risks.
 - Mobile, web, backend/API, and release hardening.
@@ -24,6 +25,7 @@ Capture practical guidance for:
 ## What Belongs Here
 
 - Reusable development patterns learned from APK analysis, app/API review, or product development.
+- Documentation backfill rules for already implemented projects, especially when original planning documents are missing.
 - High-level controls that can be implemented by app, API, backend, or release engineering teams.
 - Checklists that help prevent repeat mistakes.
 - Guidance that clearly names validation steps and limitations.
@@ -65,6 +67,8 @@ When adding new guidance:
 6. Put repeatable review steps in [`checklists/`](checklists/).
 7. Put draft reusable lessons in the matching [`feedback_history/<category>/`](feedback_history/) folder before promoting them into the structured folders; use `feedback_history/common/` for cross-cutting lessons.
 
+For existing implemented projects, use [`process/`](process/) to audit and backfill missing documents. Product Brief gaps can remain `unknown`; BDD behavior must be completed from observable behavior and implementation evidence.
+
 This keeps the skill readable as it grows across mobile, web, backend, and future app types.
 
 ## Required Linked Updates
@@ -78,6 +82,7 @@ Examples:
 - New review checklist item -> update or verify the matching `controls/` and `implementation/` docs.
 - New contract-first process guidance -> update or verify `process/`, `checklists/`, `templates/`, and relevant implementation docs.
 - New initial planning template -> update or verify `templates/README.md`, `process/README.md`, `DOCUMENTATION.md`, and `CHECKLIST.md`.
+- New existing-project backfill rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, and `WORKFLOW.md`.
 
 Do not describe these updates as optional. If they are relevant, they are required.
 
