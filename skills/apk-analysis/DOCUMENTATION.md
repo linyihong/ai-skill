@@ -86,6 +86,7 @@
 | --- | --- |
 | Mode | lightweight overview / API-first then bind / full operation map |
 | Capture budget | main tabs only / key flows only / exhaustive |
+| Automation mode | none / adb single-flow / uiautomator / manual replay |
 | Reason | avoid device lag / core API unknown / documentation completeness |
 | Deferred binding | endpoints or screens to revisit later |
 
@@ -106,10 +107,10 @@
 
 ### Operation To API Matrix
 
-| Operation ID | UI path / action | Binding phase | Capture window | Method / Path | Source | Response shape | Confidence | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `open-home` | cold start -> Home | initial map | `<start-end>` | `GET /<path>` | hook / pcap / MITM | top-level keys only | medium | may include preload/cache |
-| `open-detail` | `Home > item tap` | after API decoded | `<start-end>` | `POST /<path>` | hook | schema-only summary | high | |
+| Operation ID | UI path / action | Automation script | Binding phase | Capture window | Method / Path | Source | Response shape | Confidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `open-home` | cold start -> Home | `<script or manual>` | initial map | `<start-end>` | `GET /<path>` | hook / pcap / MITM | top-level keys only | medium | may include preload/cache |
+| `open-detail` | `Home > item tap` | `scripts/ui/open-detail.sh` | after API decoded | `<start-end>` | `POST /<path>` | hook | schema-only summary | high | |
 
 ### Unknown / Untested Navigation
 
@@ -123,6 +124,7 @@
 
 - Screenshot 要去敏；不要保留帳號、頭像、電話、email、訂單、私訊或個資。
 - 先記主要 tabs/screens 即可；只有高價值流程或需要 attribution 的 API 才補完整操作截圖。
+- Automation script 只記可重放操作與時間窗；不要把帳密、token、付款、刪除、發文、下單等高風險動作寫成無保護腳本。
 - Capture window 要能對齊 pcap/MITM/Frida log 的時間戳或 sequence id。
 - API 關聯要寫 `Source`，例如 hook、pcap timing、MITM、replay；只靠 screenshot 不足以證明 API 來源。
 - 若某個 API 是 startup/preload/background sync，要在 `Notes` 標明，避免誤判為當前點擊觸發。

@@ -29,6 +29,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - If the APK type is still unknown, stay in the common workflow until traffic/runtime evidence narrows it.
 5. Build a UI architecture map when the device/app can be operated:
    - Start lightweight: capture only enough sanitized screenshots/UI hierarchy to understand major tabs, drawers, routes, and key screens.
+   - For key flows, optionally create a small replayable app-operation script so API capture can be repeated with stable timing.
    - Adapt the order if screenshots or device control make the app slow: solve core API/decode first, then bind important APIs back to UI actions.
    - Record the exact UI path and action window only for flows that need API attribution.
 6. Prefer high-semantic hooks:

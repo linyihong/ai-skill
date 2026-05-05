@@ -32,6 +32,7 @@
 | App 容易卡、截圖很多、hook/pcap 正在關鍵窗口 | 先解核心 API、response decode 或 token/session，再回頭只對關鍵 API 補 UI binding。 |
 | 只需要知道大概架構 | 只截首頁、主要 tabs/drawer、代表性列表/詳情頁；暫不逐頁綁 API。 |
 | 已有 API 清單但缺少操作來源 | 以 API 為主線，挑高價值 endpoint 做最小操作重現與 screenshot。 |
+| 需要穩定重複抓同一批 API | 為少量關鍵 flow 建立可重放操作腳本，搭配 pcap/MITM/Frida 時間窗。 |
 
 記錄：
 
@@ -39,6 +40,7 @@
 - 可見 navigation：bottom tabs、top tabs、drawer、profile/menu、search、detail page、player/media page。
 - 每個主要 screen 的 screenshot evidence：去敏後保存路徑、時間戳、screen label。
 - 操作序列：`Home > Tab: Discover > item tap > Detail` 這類可重放路徑。
+- Automation script：可選；只對關鍵 flow 建立最小 adb/uiautomator 腳本，避免自動遍歷整個 App。
 - 捕獲時間窗：操作開始/結束時間、對應 pcap/MITM/Frida log window。
 - API 關聯：每個操作觸發的 method/path、response schema、cache/local-only 判斷。
 - Capture budget：本輪要完整綁定、只粗略盤點，或等 API 解完再補綁定。
@@ -47,6 +49,8 @@
 
 - UI map 是輔助 API 分析，不應阻塞核心流量定位、解密、token/session 還原。
 - 截圖與 UI dump 要限量；先抓主要 navigation 與關鍵流程，不要一開始自動截完整 App 全站。
+- 自動化操作要可中止、限量、避開登入重試、付款、刪除、發文、下單等高風險動作；只在授權範圍內重放。
+- 自動化腳本要輸出 operation id、開始/結束 timestamp，讓 API log 可以對齊。
 - 截圖只能證明可見 UI，不直接證明 API；必須用同窗 request/response、pcap timing 或 hook sequence 對齊。
 - 同一個 endpoint 可能被多個 screen 共用；文件要保留多個 UI path，不要硬塞單一來源。
 - 啟動畫面、快取、預載與背景同步要標清楚，避免把 startup/cache JSON 誤寫成使用者操作 API。

@@ -38,6 +38,19 @@ When an API has been observed or decoded, do not stop at the endpoint name. Docu
 
 If UI binding is not done yet, write `UI path: unknown` and `Trigger confidence: low`; later use screenshots and operation windows to raise confidence.
 
+## UI Automation For API Capture
+
+For high-value flows, a small operation script can make API capture repeatable:
+
+1. Give each flow a stable `operation_id`.
+2. Keep each script to one UI path or action group, such as `open-home`, `open-detail`, or `start-playback`.
+3. Print UTC start/end timestamps before and after the operation.
+4. Run pcap/MITM/Frida capture in the same window.
+5. Save one sanitized screenshot or UI hierarchy at the end of the operation.
+6. Fill the operation-to-API matrix with method/path, source, response shape, and trigger confidence.
+
+Use automation to stabilize capture, not to crawl the whole app. Avoid scripts that perform login loops, payment, destructive actions, posting, messaging, account changes, or any flow outside authorization.
+
 ## Related Lessons
 
 - `../../feedback_history/http-api/2026-05-01_171500-json-shape-before-query-shape.md`

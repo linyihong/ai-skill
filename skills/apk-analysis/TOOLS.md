@@ -49,6 +49,7 @@
 | 現象 | 可能原因 | 下一步 |
 | --- | --- | --- |
 | UI map / 截圖流程讓 App 或分析環境變卡 | 截圖、錄影、UI dump、自動遍歷、hook logging 同時進行，I/O 與主執行緒壓力太高。 | 降成 lightweight overview：只截主要 tabs/關鍵 screen；先停錄影與批量 dump，保留 API hook/pcap 主線，等核心 API 穩定後再補 UI binding。 |
+| 自動化操作抓 API 時結果不穩 | 操作未等待畫面穩定、背景預載/cache 混入、同一腳本含多個 action。 | 每個 operation script 只做一個 flow；輸出開始/結束 timestamp；必要時先 force-stop/冷啟動並加入短等待。 |
 | 抓到 API 但不知道是哪個操作觸發 | 沒有建立 UI 操作時間窗，或 startup/preload/background sync 混在一起。 | 先補 screenshot/UI hierarchy 與 operation id；每次只操作一個 screen/action，將時間窗對齊 pcap/MITM/Frida sequence。 |
 | 截圖看起來是某個 tab，但 API timing 對不上 | tab 預載、快取、背景同步、或同 endpoint 被多個 screen 共用。 | 標成 trigger confidence low/medium；用冷啟動、清 cache、單步操作或 hook sequence 重新驗證。 |
 | Proxyman 沒有核心 API | client 不走系統代理、attach 太晚、流程沒觸發。 | pcap 確認 host；用 cold-start injection 或高語意 hook。 |
@@ -118,6 +119,40 @@ date -u +"%Y-%m-%dT%H:%M:%SZ"
 adb -s <device-serial> shell input tap <x> <y>
 date -u +"%Y-%m-%dT%H:%M:%SZ"
 ```
+
+最小 UI operation script 範例。每個腳本只負責一個可重放 flow，方便同窗抓 pcap/MITM/Frida API log：
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEVICE="${DEVICE:-<device-serial>}"
+PACKAGE="<package-name>"
+OPERATION_ID="open-detail"
+
+ts() { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
+
+echo "operation=${OPERATION_ID} phase=start ts=$(ts)"
+adb -s "$DEVICE" shell am force-stop "$PACKAGE"
+adb -s "$DEVICE" shell monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1 >/dev/null
+sleep 3
+
+# Replace coordinates with values from a sanitized screenshot or UI hierarchy.
+adb -s "$DEVICE" shell input tap <x> <y>
+sleep 2
+adb -s "$DEVICE" shell input tap <x> <y>
+sleep 3
+
+adb -s "$DEVICE" shell screencap -p "/sdcard/${OPERATION_ID}.png"
+adb -s "$DEVICE" pull "/sdcard/${OPERATION_ID}.png" "./evidence/ui/${OPERATION_ID}.png" >/dev/null
+echo "operation=${OPERATION_ID} phase=end ts=$(ts)"
+```
+
+安全邊界：
+
+- 不要把帳密、token、個資、付款、刪除、發文、下單、私訊等高風險操作寫入無保護自動化腳本。
+- 先用測試帳號與授權範圍確認可自動重放。
+- 若腳本會觸發登入或限流，先停止 tight-loop，改用已建立 session 或人工單步操作。
 
 抓全機 pcap：
 
