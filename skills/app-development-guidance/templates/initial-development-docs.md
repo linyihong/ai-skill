@@ -31,6 +31,22 @@ Use this section before code changes.
 | Regression or validation test | |
 | Blocker questions | |
 
+## Test Strategy
+
+| Field | Notes |
+| --- | --- |
+| Existing behavior to guard | |
+| New / changed behavior to prove | |
+| BDD scenarios written before code | yes/no |
+| Failing tests or executable specs before code | unit / contract / property / integration / none with reason |
+| Changed/new-code coverage target | |
+| Total coverage context | |
+| Mutation / negative checks | |
+| Property or invariant tests | |
+| Database / persistence fixtures | |
+| Contract tests | |
+| AI-generated code review focus | intent / edge cases / security / ownership / error handling |
+
 ## Existing Project Documentation Gap Audit
 
 Use this section when the project is already implemented and documents are missing.

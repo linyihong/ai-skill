@@ -67,6 +67,27 @@ Before any code change driven by this skill, inspect the project's 企劃書, pr
 
 If there is no planning artifact, create a lightweight change brief before implementation. If the request is a new requirement, missing planning docs are blockers; ask the user and fill BDD/contracts before writing code.
 
+## Test Strategy Gate
+
+Separate "guarding old behavior" from "validating new code" before implementation. High total coverage can prove old behavior is protected, but it does not prove newly generated or newly written code is correct.
+
+| Target | Purpose | Required validation |
+| --- | --- | --- |
+| Existing / legacy behavior | Prevent regressions and protect known contracts. | Run existing unit, BDD, contract, integration, and regression tests that cover impacted behavior. |
+| New requirement or new code | Prove the new behavior is correct, safe, and aligned with docs. | Write or update BDD first, then add failing tests or executable specs before production code when feasible. Track changed/new-code coverage separately from whole-project coverage. |
+| AI-generated code | Compensate for plausible but wrong code. | Require BDD scenario, unit/contract tests, and human review focused on intent, edge cases, and security/ownership boundaries. |
+| Business rules / algorithms | Catch examples that pass but rules that are wrong. | Add property-based tests, invariant tests, or table-driven edge cases. |
+| Critical conditionals / validation logic | Prove tests fail when logic is wrong. | Add mutation testing where practical, or manually test negative cases that would fail if guards were removed. |
+| Database / persistence behavior | Protect real state transitions and migrations. | Add fixture-backed repository tests, migration tests, or integration tests against representative data. |
+
+Recommended order for new requirements:
+
+1. BDD scenarios.
+2. Failing unit, contract, property, or integration tests for the new behavior.
+3. Production code.
+4. Mutation/negative checks for critical rules.
+5. Human review with the planning docs, BDD, and tests side by side.
+
 ## Missing Information Gate
 
 Before development planning or implementation continues, missing information must be handled explicitly:
@@ -114,6 +135,8 @@ Backfill order for existing projects:
 - Error Handling Contract owns failure taxonomy, retry policy, user messaging, logging, and security redaction.
 - New requirements must update planning docs, BDD, contracts, implementation slices, and tests before code starts.
 - Bug fixes must identify expected vs actual behavior and the regression test before code starts.
+- New or AI-generated code must be validated with tests that target the changed behavior, not only total project coverage.
+- Use mutation, property-based, contract, or database-backed tests when ordinary examples do not prove the rule.
 - Implementation can run in parallel only when the shared contracts are versioned enough for mock, stub, or schema-first work.
 - If a contract changes, update BDD, implementation, mocks, and tests in the same change or explicitly record why not.
 - For already implemented projects, BDD becomes the required behavioral recovery document. Product Brief may contain unknowns, but BDD must be filled from observable product behavior and implementation evidence.
@@ -148,6 +171,7 @@ Before implementation starts, the feature should have:
 - API, event, command, or public interface contract for integrations.
 - Error Handling Contract for expected failures and recovery behavior.
 - Test plan covering unit, behavior, contract, and integration levels.
+- Test strategy that distinguishes existing-regression coverage from changed/new-code validation.
 - No unresolved blocker questions that affect implementation behavior or contracts.
 
 For an already implemented project, "ready" means the missing-document audit is complete and BDD covers the implemented critical behavior, even if original product intent remains partly unknown.

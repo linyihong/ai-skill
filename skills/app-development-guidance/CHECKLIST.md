@@ -20,6 +20,16 @@ When a checklist item changes because of a new control or implementation pattern
 - Refactors are confirmed to have no behavior or public contract change; otherwise they are reclassified.
 - Blocker questions are answered, backed by evidence, or explicitly scoped out before implementation.
 
+## Test Strategy
+
+- Existing/legacy behavior has regression coverage for the affected paths.
+- New or changed behavior has BDD scenarios before production code.
+- New code has failing unit, contract, property, integration, or executable spec coverage before implementation when feasible.
+- Changed/new-code coverage is checked separately from total project coverage.
+- Mutation testing, property-based testing, invariant tests, or negative cases cover rule-heavy or safety-sensitive logic.
+- Database, repository, migration, or persistence behavior is verified with fixtures or integration tests when state matters.
+- AI-generated code receives human review against planning docs, BDD, contracts, edge cases, and security/ownership boundaries.
+
 ## Product To Contract Flow
 
 - Product brief names goals, users, scope, non-goals, assumptions, and constraints.

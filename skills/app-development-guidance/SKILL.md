@@ -18,6 +18,7 @@ Use this skill when APK analysis, app/API review, or app development work reveal
 - Turning APK analysis documents into app-related tools, SDKs, clients, mocks, fixture-driven implementations, contract tests, or rebuilt features.
 - Turning product briefs into BDD, Domain Model Contracts, API Contracts, implementation slices, and tests.
 - Classifying app changes as new requirements, bug fixes, refactors, or hardening work before code; new requirements must update planning docs before implementation.
+- Separating legacy regression protection from new-code validation, including BDD/TDD, changed-code coverage, mutation tests, property-based tests, contract tests, database regression tests, and human review.
 - Backfilling missing development documents for existing, already implemented projects; Product Brief gaps can be marked unknown, but BDD behavior must be completed from observed implementation evidence.
 - Reviewing app/API design for replay resistance, token safety, transport security, local storage, logging, and release hardening.
 - Creating PR/release checklists for mobile, web, backend/API, and future app types.
@@ -35,25 +36,26 @@ Use this skill when APK analysis, app/API review, or app development work reveal
 2. Before code changes, inspect the project's 企劃書, product brief, planning docs, issue, ticket, PRD, design note, BDD, API contract, or equivalent artifact. Classify the request as new requirement, bug fix, refactor, hardening, or documentation-only.
 3. If it is a new requirement or behavior change, update or create planning docs first: change brief, BDD scenarios, impacted Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests. Do not start code until blocker questions are resolved.
 4. If it is a bug fix, confirm expected vs actual behavior, reproduction/evidence, affected or missing BDD scenario, impacted contract/error handling, and regression test plan before code.
-5. If starting from a product brief, use [`process/`](process/) to draft or discuss the initial development docs: Bounded Contexts, BDD behavior, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests.
-6. If opening this skill on an existing implemented project, audit missing documents and backfill them. Missing Product Brief fields may be marked `unknown` / `open question`, but BDD behavior must be completed from UI, API, code, tests, logs, fixtures, or observed behavior.
-7. If anything required for behavior, domain invariants, API/interface shape, error handling, security, storage, tests, or ownership is missing, ask the user or request evidence before continuing. Do not proceed with development while blocker questions remain unresolved.
-8. Convert analysis findings into a developer-facing risk statement or implementation opportunity.
-9. Choose the control layer:
+5. Define the test strategy before production code: distinguish existing-regression coverage from changed/new-code validation; prefer BDD first, then failing unit/contract/property/integration tests for new behavior before implementation.
+6. If starting from a product brief, use [`process/`](process/) to draft or discuss the initial development docs: Bounded Contexts, BDD behavior, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests.
+7. If opening this skill on an existing implemented project, audit missing documents and backfill them. Missing Product Brief fields may be marked `unknown` / `open question`, but BDD behavior must be completed from UI, API, code, tests, logs, fixtures, or observed behavior.
+8. If anything required for behavior, domain invariants, API/interface shape, error handling, security, storage, tests, or ownership is missing, ask the user or request evidence before continuing. Do not proceed with development while blocker questions remain unresolved.
+9. Convert analysis findings into a developer-facing risk statement or implementation opportunity.
+10. Choose the control layer:
    - API/server contract.
    - App runtime behavior.
    - Build/release configuration.
    - Monitoring or fraud signal.
-10. Add a concrete validation method: unit test, BDD scenario, API contract test, integration test, release checklist item, fixture, or manual review step.
-11. Classify the guidance:
+11. Add a concrete validation method: unit test, BDD scenario, API contract test, integration test, release checklist item, fixture, mutation/property check, or manual review step.
+12. Classify the guidance:
    - Core security control: `controls/`.
    - Platform/app type detail: `platforms/`.
    - Language/runtime-specific trap: `languages/`.
    - Concrete implementation pattern: `implementation/`.
    - Product-to-contract development flow: `process/`.
    - Repeatable review step: `checklists/`.
-12. Apply required linked updates from [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md): when a process, control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
-13. If the lesson is reusable but not yet mature, add it to the matching `feedback_history/<category>/` folder first; use `feedback_history/common/` for cross-cutting lessons. Promote it into the structured folders when validated.
+13. Apply required linked updates from [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md): when a process, control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
+14. If the lesson is reusable but not yet mature, add it to the matching `feedback_history/<category>/` folder first; use `feedback_history/common/` for cross-cutting lessons. Promote it into the structured folders when validated.
 
 ## Default Workflow
 
@@ -78,6 +80,7 @@ When producing development guidance, include:
 - Observed risk or failure mode.
 - Why it matters for app development.
 - Change classification: new requirement, bug fix, refactor, hardening, or docs-only; include planning artifact reviewed.
+- Test strategy: existing behavior guarded by regression tests, new/changed code validated by BDD/TDD and changed-code tests; mention mutation/property/contract/database tests when relevant.
 - Missing questions that must be answered before implementation, if starting from a product brief.
 - Existing-project documentation gaps and how they were backfilled; BDD must be complete when observable behavior exists.
 - Blocker questions for any missing behavior, contract, error, security, storage, ownership, or test requirement; do not continue development until these are answered or explicitly scoped out.
