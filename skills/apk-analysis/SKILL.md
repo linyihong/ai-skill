@@ -7,7 +7,7 @@ description: Guides authorized APK traffic analysis, dynamic capture, Flutter/Da
 
 Use this skill for authorized APK analysis only. The goal is to recover how an app communicates, captures, decodes, and validates data in a reproducible way, then turn findings into documentation and reusable tests without leaking secrets or target-specific private details.
 
-**Shared policy (do not duplicate in every lesson):** read [`shared-rules` index](../../shared-rules/README.md) once (or [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md) for feedback-specific rules). Per-technique files in `feedback_history/` should **reference** those files, not paste the full common rules.
+**Shared policy (do not duplicate in every lesson):** read [`shared-rules` index](../../shared-rules/README.md) once (or [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md) for feedback-specific rules), and apply [`neutral-language.md`](../../shared-rules/neutral-language.md) when naming or summarizing docs. Per-technique files in `feedback_history/` should **reference** those files, not paste the full common rules.
 
 **Cross-skill references:** follow [`cross-skill-references.md`](../../shared-rules/cross-skill-references.md). `apk-analysis` may reference another skill when analysis output must be consumed by that skill, but it must name the trigger, handoff artifact, ownership boundary, and sanitization boundary instead of copying the target skill's full workflow.
 
