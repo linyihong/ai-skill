@@ -12,6 +12,18 @@ Record the reusable observation:
 
 Do not copy target-specific endpoints, tokens, secrets, device IDs, or raw user data into this skill.
 
+Before code work, run change intake:
+
+| Question | Required action |
+| --- | --- |
+| What planning artifact exists? | Read the 企劃書, product brief, planning doc, issue, ticket, PRD, design note, BDD, API contract, or equivalent. |
+| Is this a new requirement or behavior change? | Update planning docs, BDD, contracts, implementation slices, and tests before code. |
+| Is this a bug fix? | Confirm expected vs actual behavior, reproduction/evidence, affected BDD or missing scenario, impacted contracts/errors, and regression test. |
+| Is this a refactor? | Confirm no behavior or public contract change; otherwise reclassify. |
+| Is this hardening? | Confirm threat/failure mode, owner layer, validation, and linked checklist/control updates. |
+
+If no planning artifact exists and the request changes behavior, create a lightweight change brief and ask blocker questions before implementation.
+
 If the project is already implemented and documentation is missing, start with a document gap audit before proposing new guidance:
 
 | Document | Backfill requirement |
@@ -85,6 +97,7 @@ Classify the outcome before writing docs:
 | A copyable documentation shape | `templates/` |
 | Missing development documents in an implemented project | `process/` and `templates/initial-development-docs.md` |
 | Blocker questions for missing requirements or contracts | `process/` and the current planning document |
+| Change intake before code | `process/` and the current planning document |
 
 Prefer linking between folders over duplicating the same guidance.
 

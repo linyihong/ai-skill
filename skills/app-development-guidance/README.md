@@ -14,6 +14,7 @@ Capture practical guidance for:
 - App implementation patterns learned from analysis.
 - App/API and transport security.
 - Product brief to contract-first development flow.
+- Change intake before code: classify new requirements, bug fixes, refactors, hardening, and docs-only work from planning artifacts.
 - Existing project documentation gap backfill, with complete BDD recovery from implemented behavior.
 - Token, session, and replay handling.
 - Local storage and secret exposure risks.
@@ -25,6 +26,7 @@ Capture practical guidance for:
 ## What Belongs Here
 
 - Reusable development patterns learned from APK analysis, app/API review, or product development.
+- Rules for reviewing planning artifacts before code and deciding whether work is a new requirement or bug fix.
 - Documentation backfill rules for already implemented projects, especially when original planning documents are missing.
 - High-level controls that can be implemented by app, API, backend, or release engineering teams.
 - Checklists that help prevent repeat mistakes.
@@ -69,6 +71,8 @@ When adding new guidance:
 
 For existing implemented projects, use [`process/`](process/) to audit and backfill missing documents. Product Brief gaps can remain `unknown`; BDD behavior must be completed from observable behavior and implementation evidence.
 
+Before code work, use [`process/`](process/) to review the planning artifact and classify the change. New requirements must update planning docs, BDD, contracts, implementation slices, and tests before implementation starts. Bug fixes must document expected vs actual behavior and regression tests first.
+
 This keeps the skill readable as it grows across mobile, web, backend, and future app types.
 
 ## Required Linked Updates
@@ -83,6 +87,7 @@ Examples:
 - New contract-first process guidance -> update or verify `process/`, `checklists/`, `templates/`, and relevant implementation docs.
 - New initial planning template -> update or verify `templates/README.md`, `process/README.md`, `DOCUMENTATION.md`, and `CHECKLIST.md`.
 - New existing-project backfill rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, and `WORKFLOW.md`.
+- New change-intake rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.
 
 Do not describe these updates as optional. If they are relevant, they are required.
 

@@ -54,6 +54,19 @@ These documents can start as lightweight Markdown drafts. If the project is smal
 
 Use [`../templates/initial-development-docs.md`](../templates/initial-development-docs.md) for the first draft. Use [`../templates/README.md`](../templates/README.md) to choose between initial planning, reusable guidance notes, and quick threat-model reviews.
 
+## Change Intake Gate
+
+Before any code change driven by this skill, inspect the project's 企劃書, product brief, planning docs, issue, ticket, PRD, design note, BDD, API contract, or equivalent project artifact. Classify the request before implementation:
+
+| Change type | Required before code |
+| --- | --- |
+| New requirement / feature / behavior change | Update or create planning docs first: Product Brief or change brief, BDD scenarios, impacted Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests. Do not start code until blocker questions are resolved. |
+| Bug fix | Confirm expected behavior vs actual behavior, reproduction or evidence, affected BDD scenario or missing scenario, impacted contract/error handling, and regression test plan. If the fix changes intended behavior or public contract, treat it as a new requirement too. |
+| Refactor / internal cleanup | Confirm no behavior or public contract change. If behavior, data ownership, API, error handling, security, storage, or tests change, reclassify as new requirement or bug. |
+| Security / hardening change | Confirm threat or failure mode, owner layer, required control, validation method, and whether behavior/API/contracts/checklists must change. |
+
+If there is no planning artifact, create a lightweight change brief before implementation. If the request is a new requirement, missing planning docs are blockers; ask the user and fill BDD/contracts before writing code.
+
 ## Missing Information Gate
 
 Before development planning or implementation continues, missing information must be handled explicitly:
@@ -99,6 +112,8 @@ Backfill order for existing projects:
 - Architecture Contract owns dependency direction, runtime boundaries, data ownership, and allowed integration paths.
 - API Contract owns integration shape: request, response, error, auth/session, versioning, and compatibility.
 - Error Handling Contract owns failure taxonomy, retry policy, user messaging, logging, and security redaction.
+- New requirements must update planning docs, BDD, contracts, implementation slices, and tests before code starts.
+- Bug fixes must identify expected vs actual behavior and the regression test before code starts.
 - Implementation can run in parallel only when the shared contracts are versioned enough for mock, stub, or schema-first work.
 - If a contract changes, update BDD, implementation, mocks, and tests in the same change or explicitly record why not.
 - For already implemented projects, BDD becomes the required behavioral recovery document. Product Brief may contain unknowns, but BDD must be filled from observable product behavior and implementation evidence.

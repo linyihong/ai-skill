@@ -11,6 +11,15 @@ For focused checklists, use:
 
 When a checklist item changes because of a new control or implementation pattern, the linked `controls/` and `implementation/` docs must be updated or explicitly verified in the same change.
 
+## Change Intake
+
+- The project's 企劃書, product brief, planning doc, issue, ticket, PRD, design note, BDD, API contract, or equivalent artifact was reviewed before code.
+- The change is classified as new requirement, bug fix, refactor, hardening, or documentation-only.
+- New requirements update planning docs, BDD, affected contracts, implementation slices, and test plan before code starts.
+- Bug fixes document expected vs actual behavior, reproduction/evidence, affected BDD scenario or missing scenario, impacted contracts/errors, and regression test plan.
+- Refactors are confirmed to have no behavior or public contract change; otherwise they are reclassified.
+- Blocker questions are answered, backed by evidence, or explicitly scoped out before implementation.
+
 ## Product To Contract Flow
 
 - Product brief names goals, users, scope, non-goals, assumptions, and constraints.

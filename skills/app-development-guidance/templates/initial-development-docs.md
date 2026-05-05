@@ -13,6 +13,24 @@ Use this template when turning a product brief into an implementation plan. Keep
 | Assumptions | |
 | Open questions | |
 
+## Change Intake
+
+Use this section before code changes.
+
+| Field | Notes |
+| --- | --- |
+| Planning artifact reviewed | 企劃書 / product brief / issue / ticket / PRD / design note / BDD / API contract / other |
+| Change type | new requirement / bug fix / refactor / hardening / documentation-only |
+| New requirement summary | |
+| Bug expected behavior | |
+| Bug actual behavior | |
+| Reproduction / evidence | |
+| Affected BDD scenarios | |
+| Affected contracts | Domain Model / Architecture / API / Interface / Error Handling / Test Plan |
+| Required planning updates before code | |
+| Regression or validation test | |
+| Blocker questions | |
+
 ## Existing Project Documentation Gap Audit
 
 Use this section when the project is already implemented and documents are missing.
