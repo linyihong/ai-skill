@@ -33,6 +33,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Start lightweight: capture only enough sanitized screenshots/UI hierarchy to understand major tabs, drawers, routes, and key screens.
    - Mark which screens are scrollable and which visible elements are clickable entry points.
    - Document how to reach each important screen, including entry state, tap/swipe steps, expected destination, and reusable operation id.
+   - When the user asks to analyze a named page/tab/module, create or update a project-level page map artifact (for example `docs/UI架構地圖/<page>.md`) instead of leaving the UI-to-API findings only inside API docs, tool docs, or chat.
    - Keep operation maps scoped to in-app pages; if a step opens another app, system screen, browser, or external intent, document the transition instead of treating it as an app screen.
    - For key flows, optionally create a small replayable app-operation script so API capture can be repeated with stable timing.
    - Adapt the order if screenshots or device control make the app slow: solve core API/decode first, then bind important APIs back to UI actions.
@@ -95,6 +96,7 @@ When documenting a new finding, include:
 - Tool and command summary.
 - Evidence file path or sanitized excerpt.
 - Feature/capability mapping and operation id when the finding supports functional reconstruction.
+- Page-level UI map path when the task targets a named page/tab/module and UI/API mapping was established.
 - Generalized lesson.
 - Follow-up validation.
 

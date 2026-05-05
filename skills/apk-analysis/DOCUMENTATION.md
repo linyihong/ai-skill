@@ -168,6 +168,27 @@
 
 用 screenshot、UI hierarchy 與可重放操作，把 App 的可見架構寫成地圖。這份文件放專案分析文件，不放 reusable skill，skill 只保留模板與方法。若截圖太多會拖慢裝置或干擾 hook/pcap 時，先做輕量盤點，等核心 API 解完後再補關鍵 UI 綁定。
 
+### Page-level artifact rule
+
+當使用者要求分析某個具名 page、tab、module 或功能入口，且本次工作已建立 UI/API 對照時，必須在專案 docs 產出或更新一份 page-level 輕量 UI 架構地圖，例如：
+
+```text
+docs/UI架構地圖/<page-name>.md
+```
+
+不要只把結論寫進 endpoint 文件、工具使用說明或 chat。endpoint 文件回答「API 長什麼樣」，page map 回答「使用者怎麼到這頁、每個 UI 區塊用哪條 API、哪些格式和分頁已驗證、SDK/測試要怎麼覆蓋」。
+
+最小章節：
+
+1. Entry path：從 cold start 或主要 navigation 到此頁的路徑。
+2. UI block map：tab、卡片、feed、詳情、評論、廣告或未知區塊。
+3. Scroll / pagination：是否可滑動、如何取樣、`pageNumber` / cursor / `hasNext`。
+4. Detail formats：至少列已見內容格式與缺口。
+5. API chain：入口、列表、詳情、tag、評論、媒體或下載 API。
+6. SDK/client mapping：對外欄位、resource order、fallback 與 raw JSON。
+7. Validation evidence：final output、test、截圖、UI hierarchy 或去敏 API docs。
+8. Follow-up template：下一個類似頁面要照什麼步驟補。
+
 ```markdown
 ## App Architecture Map
 
