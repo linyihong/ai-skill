@@ -11,7 +11,7 @@
 | Skill | 用途 |
 | --- | --- |
 | `skills/apk-analysis/` | 授權 APK 流量分析、動態抓包、Flutter/Dart AOT、response 解碼、文件化與 `feedback_history/` 技巧條目。 |
-| `skills/app-development-guidance/` | 將授權 App 分析觀察轉成 App 開發 guidance、實作模式、控制項、檢查清單與驗證方法。 |
+| `skills/app-development-guidance/` | 將授權 App/API/embedded/firmware/hardware-product 觀察轉成開發 guidance、實作模式、控制項、檢查清單與驗證方法。 |
 
 **目錄約定：**  
 - **`skills/`**：各 skill 技巧包；之後新增 skill 放在 `skills/<name>/`，步驟見 [`skills/ADDING_SKILLS.md`](skills/ADDING_SKILLS.md)。  

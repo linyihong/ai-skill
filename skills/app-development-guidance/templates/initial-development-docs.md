@@ -45,6 +45,8 @@ Use this section before code changes.
 | Property or invariant tests | |
 | Database / persistence fixtures | |
 | Contract tests | |
+| Host fixture tests | |
+| Hardware-in-loop / target evidence | |
 | AI-generated code review focus | intent / edge cases / security / ownership / error handling |
 
 ## Existing Project Documentation Gap Audit
@@ -59,6 +61,7 @@ Use this section when the project is already implemented and documents are missi
 | Domain Model Contract | | | | |
 | Architecture Contract | | | | |
 | API / Interface Contract | | | | |
+| Hardware / Firmware Contract | | | | |
 | Error Handling Contract | | | | |
 | Test Plan | | | | |
 
@@ -109,6 +112,27 @@ Runtime / deployment constraints:
 - Auth/session:
 - Background jobs/events:
 - Observability:
+- Embedded target / board / sensor constraints:
+- Task / ISR / queue / timing constraints:
+
+## Hardware / Firmware Contract
+
+Use this section for embedded, firmware, sensor, board, protocol, or hardware-backed products.
+
+| Field | Notes |
+| --- | --- |
+| Datasheet / vendor spec source | |
+| Protocol / electrical interface | UART / I2C / SPI / BLE / CAN / GPIO / other |
+| Board / module / sensor version | |
+| Hardware context | Pins, bus, baud/rate, buffers, power, timing, injected config |
+| Driver layer owns | |
+| Service / parser layer owns | |
+| Domain model owns | |
+| Application layer owns | |
+| Must not cross boundary | |
+| Host fixture source | Vendor example / captured log / synthetic fixture / other |
+| Hardware-in-loop evidence needed | |
+| Bring-up notes | Board, wiring, firmware, flash command, logs, measurements, deviations |
 
 ## API / Interface Contract
 

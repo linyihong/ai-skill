@@ -34,6 +34,7 @@ Do not assume every project has a frontend/backend split. Pick contracts that ma
 | CLI / desktop / tool | Command contract, input/output schema, domain model, fixture-based tests. |
 | Library / SDK | Public API contract, type/schema contract, examples, compatibility tests. |
 | Event-driven / worker | Event schema, command/event contract, idempotency and retry behavior. |
+| Embedded / firmware / hardware product | Datasheet or protocol contract, hardware context contract, driver/service/application boundary, BDD, host fixtures, hardware-in-loop checks. |
 
 ## Initial Documentation Pack
 
@@ -48,6 +49,7 @@ When this skill is opened for a new feature or project, the agent should help pr
 | Architecture Contract | Layers, dependencies, ownership, runtime constraints | Which layer owns data, side effects, security, persistence, and external calls? |
 | API / Interface Contract | Requests, responses, events, commands, public methods | Who consumes this contract, how is compatibility tested, and how are versions handled? |
 | Error Handling Contract | Error types, recovery, user messaging, logging | Which errors are retryable, user-fixable, fatal, or security-sensitive? |
+| Hardware / Firmware Contract | Datasheet/protocol truth, electrical interface, pin/context injection, driver/service/application boundary, target constraints | What hardware facts are fixed, what is injected per board, and how are host/target tests run? |
 | Test Plan | Unit, BDD, contract, integration tests | What proves the behavior, invariants, and integration contract? |
 
 These documents can start as lightweight Markdown drafts. If the project is small, keep them in one planning file; if they grow, split them into a folder with `README.md` and focused child files.
@@ -87,6 +89,30 @@ Recommended order for new requirements:
 3. Production code.
 4. Mutation/negative checks for critical rules.
 5. Human review with the planning docs, BDD, and tests side by side.
+
+## Embedded / Hardware Product Flow
+
+Use this flow when the project involves firmware, sensors, boards, UART/I2C/SPI/BLE/CAN/GPIO, RTOS tasks, hardware bring-up, or host/target validation:
+
+| Layer | Contract | Notes |
+| --- | --- | --- |
+| Datasheet / vendor spec | Electrical interface, protocol bytes, timing, default parameters, valid ranges, errata. | Treat vendor docs as the protocol truth; record observed deviations separately. |
+| Protocol Parsing Contract | Frame format, state machine, length/checksum rules, command/ACK/report shapes, fixtures, invalid frames. | Keep byte-level parsing separate from product meaning. |
+| BDD Behavior | User/system behavior, device states, setup/config flows, fault handling, target events. | BDD uses domain terms, not raw registers or UART calls. |
+| Domain Model Contract | Pure DTOs, units, ranges, invariants, timestamps, validity windows. | Keep HAL/RTOS types out of domain objects. |
+| Hardware Context Contract | Board-specific pins, UART/I2C/SPI bus, baud/rates, buffers, interrupts, power modes, injected configuration. | Board changes should change context/config, not protocol/domain logic. |
+| Embedded Architecture Contract | Driver/service/application layering, task/ISR boundaries, queues, ownership, concurrency, lifecycle, error escalation. | Drivers handle bytes; services parse; applications decide product behavior. |
+| Public API / Interface Contract | Context lifecycle, callbacks/subscriptions, commands, errors, consumer ownership, multi-device rules. | Avoid parallel second context APIs unless contracts are revised first. |
+| Test Plan | Host unit tests, protocol fixtures, negative cases, property/invariant tests, simulator/mocks, hardware-in-loop, bring-up log evidence. | Separate host-repeatable proof from bench-only evidence. |
+
+Before firmware code:
+
+1. Read the datasheet/protocol spec and project contracts.
+2. Confirm hardware context is injectable per board and not hard-coded as the only source of truth.
+3. Write or update BDD and protocol/domain/API contracts.
+4. Add host-side fixtures for protocol parsing and negative cases.
+5. Define target or hardware-in-loop validation only for evidence that cannot be proven on host.
+6. Record bring-up evidence: board revision, wiring, pins, bus settings, firmware version, logs, and known deviations.
 
 ## Missing Information Gate
 
@@ -137,6 +163,7 @@ Backfill order for existing projects:
 - Bug fixes must identify expected vs actual behavior and the regression test before code starts.
 - New or AI-generated code must be validated with tests that target the changed behavior, not only total project coverage.
 - Use mutation, property-based, contract, or database-backed tests when ordinary examples do not prove the rule.
+- Embedded changes must distinguish datasheet/protocol truth, hardware context, driver/service/application ownership, host-testable logic, and target-only evidence.
 - Implementation can run in parallel only when the shared contracts are versioned enough for mock, stub, or schema-first work.
 - If a contract changes, update BDD, implementation, mocks, and tests in the same change or explicitly record why not.
 - For already implemented projects, BDD becomes the required behavioral recovery document. Product Brief may contain unknowns, but BDD must be filled from observable product behavior and implementation evidence.

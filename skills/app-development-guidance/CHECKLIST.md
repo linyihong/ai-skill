@@ -8,6 +8,7 @@ For focused checklists, use:
 - [`checklists/mobile-pr-review.md`](checklists/mobile-pr-review.md)
 - [`checklists/mobile-release-review.md`](checklists/mobile-release-review.md)
 - [`checklists/api-security-review.md`](checklists/api-security-review.md)
+- [`checklists/embedded-firmware-review.md`](checklists/embedded-firmware-review.md)
 
 When a checklist item changes because of a new control or implementation pattern, the linked `controls/` and `implementation/` docs must be updated or explicitly verified in the same change.
 
@@ -28,6 +29,7 @@ When a checklist item changes because of a new control or implementation pattern
 - Changed/new-code coverage is checked separately from total project coverage.
 - Mutation testing, property-based testing, invariant tests, or negative cases cover rule-heavy or safety-sensitive logic.
 - Database, repository, migration, or persistence behavior is verified with fixtures or integration tests when state matters.
+- Embedded or hardware-backed behavior distinguishes host-repeatable tests from target-only or hardware-in-loop evidence.
 - AI-generated code receives human review against planning docs, BDD, contracts, edge cases, and security/ownership boundaries.
 
 ## Product To Contract Flow
@@ -39,6 +41,7 @@ When a checklist item changes because of a new control or implementation pattern
 - Architecture Contract defines dependency direction, data ownership, runtime boundaries, and allowed integrations.
 - API, event, command, or public interface contract is defined before parallel implementation.
 - Error Handling Contract defines error taxonomy, retry rules, user messaging, logging, and redaction.
+- Embedded products define datasheet/protocol truth, hardware context, driver/service/application ownership, target constraints, and bring-up validation.
 - If there is no frontend/backend split, producer and consumer roles are still named.
 - Mock APIs, fixtures, schemas, or stubs are generated from the latest contract.
 - Unit, BDD, contract, and integration test responsibilities are assigned before build work starts.
@@ -53,6 +56,19 @@ When a checklist item changes because of a new control or implementation pattern
 - Domain Model, Architecture, API / Interface, and Error Handling Contracts are backfilled from observed behavior and implementation evidence.
 - Every critical BDD scenario maps to existing test coverage or a required test gap.
 - Any gap that cannot be backfilled from evidence and affects behavior or contracts is asked before implementation proceeds.
+
+## Embedded / Hardware Product Review
+
+- Datasheet, vendor protocol, errata, and observed deviations are documented separately from product behavior.
+- Hardware context records board revision, pins, bus/UART/I2C/SPI/BLE/CAN settings, buffers, timing, and power assumptions.
+- Board-specific wiring and pin choices are injected through context/config rather than hard-coded as the only production path.
+- Driver, service, domain, and application layers have clear ownership; raw bytes/registers do not leak into product behavior code.
+- BDD uses domain behavior and device states, not raw UART/register operations.
+- Protocol fixtures include positive examples, invalid length/shape, resynchronization or checksum failures, and boundary values from the spec.
+- Host-repeatable tests cover parsing, domain invariants, command/API contracts, and error mapping before relying on bench-only checks.
+- Hardware-in-loop or manual bring-up records firmware version, board/wiring, test command, logs, measurement evidence, and known limitations.
+- Safety-related behavior defines fail-safe state, timeout, debounce/cooldown, retry, and recovery rules.
+- Release gate covers target build, flashing path, config defaults, secrets, debug logs, calibration/version notes, and rollback or recovery path.
 
 ## API And Transport
 

@@ -8,6 +8,7 @@ Use this directory for review checklists. Keep them short enough to run during r
 | `mobile-pr-review.md` | During code review. |
 | `mobile-release-review.md` | Before shipping a mobile release. |
 | `api-security-review.md` | When mobile/web clients depend on API security properties. |
+| `embedded-firmware-review.md` | When firmware, sensors, boards, protocols, or hardware-in-loop validation are involved. |
 
 The top-level [`../CHECKLIST.md`](../CHECKLIST.md) is the quick index and release-gate summary.
 

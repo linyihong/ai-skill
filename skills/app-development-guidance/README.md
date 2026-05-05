@@ -1,11 +1,11 @@
 # App Development Guidance Skill
 
-This skill turns authorized app analysis findings into reusable development guidance for better, safer apps.
+This skill turns authorized app, API, embedded, firmware, and hardware-product findings into reusable development guidance for better, safer products.
 
 It complements [`apk-analysis`](../apk-analysis/):
 
 - `apk-analysis` asks: "How does this APK behave, communicate, protect, or fail?"
-- `app-development-guidance` asks: "What should we build, test, or avoid in our own apps because of that lesson?"
+- `app-development-guidance` asks: "What should we build, test, or avoid in our own apps, SDKs, firmware, APIs, or hardware-backed products because of that lesson?"
 
 ## Goals
 
@@ -13,6 +13,7 @@ Capture practical guidance for:
 
 - App implementation patterns learned from analysis.
 - App/API and transport security.
+- Embedded, firmware, sensor, protocol, and hardware context development flow.
 - Product brief to contract-first development flow.
 - Change intake before code: classify new requirements, bug fixes, refactors, hardening, and docs-only work from planning artifacts.
 - Test strategy that separates legacy regression protection from new-code validation with BDD/TDD, changed-code coverage, mutation/property/contract/database tests, and human review.
@@ -20,6 +21,7 @@ Capture practical guidance for:
 - Token, session, and replay handling.
 - Local storage and secret exposure risks.
 - Mobile, web, backend/API, and release hardening.
+- Hardware bring-up, host/target tests, protocol fixtures, and firmware release gates.
 - Sensitive logging and telemetry hygiene.
 - Anti-tamper signals without false confidence.
 - Developer checklists, buildable patterns, and validation tests.
@@ -27,6 +29,7 @@ Capture practical guidance for:
 ## What Belongs Here
 
 - Reusable development patterns learned from APK analysis, app/API review, or product development.
+- Reusable development patterns for embedded or hardware-backed products, including datasheet/protocol contracts, hardware context, driver/service/application layering, and validation.
 - Rules for reviewing planning artifacts before code and deciding whether work is a new requirement or bug fix.
 - Rules for validating new or AI-generated code beyond total project coverage.
 - Documentation backfill rules for already implemented projects, especially when original planning documents are missing.
@@ -51,7 +54,7 @@ Capture practical guidance for:
 | `CHECKLIST.md` | Development, PR, and release checklist. |
 | `DOCUMENTATION.md` | How to document reusable development guidance. |
 | `controls/` | Cross-platform security controls; use this as the primary home for core guidance. |
-| `platforms/` | Platform or app-type implementation guidance such as mobile, web, and backend API. |
+| `platforms/` | Platform or product-type implementation guidance such as mobile, web, backend API, and embedded/firmware. |
 | `languages/` | Language/runtime-specific pitfalls only. |
 | `checklists/` | Focused design, PR, release, and API review checklists. |
 | `implementation/` | Concrete implementation patterns for app, backend, and platform teams. |
@@ -64,7 +67,7 @@ Capture practical guidance for:
 When adding new guidance:
 
 1. Put the core security property in [`controls/`](controls/) first.
-2. Add platform details in [`platforms/`](platforms/) only when the implementation differs by app type or OS.
+2. Add platform details in [`platforms/`](platforms/) only when the implementation differs by app type, OS, firmware runtime, board, sensor, or hardware interface.
 3. Add language notes in [`languages/`](languages/) only for language/runtime-specific traps.
 4. Put concrete implementation patterns in [`implementation/`](implementation/) when engineers need buildable steps.
 5. Put development process and contract-first flow guidance in [`process/`](process/).
@@ -76,6 +79,8 @@ For existing implemented projects, use [`process/`](process/) to audit and backf
 Before code work, use [`process/`](process/) to review the planning artifact and classify the change. New requirements must update planning docs, BDD, contracts, implementation slices, and tests before implementation starts. Bug fixes must document expected vs actual behavior and regression tests first.
 
 When planning tests, separate old behavior from new code. Existing tests guard regressions; new or AI-generated code needs BDD/TDD and changed-code validation. Use mutation, property-based, contract, or database-backed tests when ordinary example tests do not prove the rule.
+
+For embedded or hardware-backed products, use [`platforms/embedded/`](platforms/embedded/) and [`implementation/embedded/`](implementation/embedded/) to capture datasheet/protocol truth, electrical/hardware context, firmware architecture, driver/service/application ownership, host-side fixtures, target/hardware-in-loop checks, and bring-up evidence.
 
 This keeps the skill readable as it grows across mobile, web, backend, and future app types.
 
@@ -93,6 +98,7 @@ Examples:
 - New existing-project backfill rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, and `WORKFLOW.md`.
 - New change-intake rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.
 - New test-strategy rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.
+- New embedded/hardware flow -> update or verify `platforms/embedded/`, `implementation/embedded/`, `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.
 
 Do not describe these updates as optional. If they are relevant, they are required.
 

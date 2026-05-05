@@ -1,6 +1,6 @@
 # Documenting App Development Guidance Notes
 
-Use this guide when turning an APK analysis lesson, implementation observation, or design review into reusable development guidance.
+Use this guide when turning an APK analysis lesson, implementation observation, embedded/firmware observation, hardware-product lesson, or design review into reusable development guidance.
 
 ## Reusable Note Structure
 
@@ -15,7 +15,7 @@ What pattern was observed, without target-specific secrets.
 
 #### Development Consequence
 
-Why this matters when building our own app or API.
+Why this matters when building our own app, API, SDK, firmware, or hardware-backed product.
 
 #### Recommended Implementation / Control
 
@@ -35,12 +35,13 @@ What this does not solve.
 | Content | Put it in |
 | --- | --- |
 | Cross-platform security principle | `controls/`. |
-| Platform or app-type implementation detail | `platforms/`. |
+| Platform, app-type, embedded, firmware, or hardware-product implementation detail | `platforms/`. |
 | Language/runtime-specific pitfall | `languages/`. |
 | Concrete buildable implementation pattern | `implementation/`. |
 | Repeatable review process | `checklists/`. |
 | Reusable development principle not yet promoted | Matching `feedback_history/<category>/`, or `feedback_history/common/` for cross-cutting lessons. |
 | APK analysis method or hook technique | [`apk-analysis`](../apk-analysis/). |
+| Project-specific board wiring, calibration logs, firmware dumps, bench measurements, device identifiers, or target hardware conclusions | Project repository docs. |
 | Product-specific API host, endpoint, schema, or token detail | Project repository docs. |
 | Shared sanitization or feedback rules | [`shared-rules`](../../shared-rules/README.md). |
 

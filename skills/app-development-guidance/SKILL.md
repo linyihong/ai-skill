@@ -1,11 +1,11 @@
 ---
 name: app-development-guidance
-description: Convert authorized app analysis findings into practical app development guidance. Use when reverse-engineering lessons should become buildable app/API patterns, security controls, token and session handling, request signing, TLS and certificate pinning decisions, release checks, local storage guidance, logging hygiene, anti-tamper signals, and review checklists across mobile, web, backend, and future app types.
+description: Convert authorized app, API, embedded, firmware, and hardware-product findings into practical development guidance. Use when reverse-engineering lessons, product briefs, or hardware/firmware specs should become buildable app/API/SDK/firmware patterns, contracts, BDD/TDD plans, validation tests, release checks, and review checklists across mobile, web, backend, embedded, and future product types.
 ---
 
 # App Development Guidance
 
-Use this skill when APK analysis, app/API review, or app development work reveals a reusable lesson that can improve future apps. The goal is to translate observed app behavior, attack paths, failure modes, and implementation tricks into practical development requirements, buildable patterns, checklists, and validation tests.
+Use this skill when APK analysis, app/API review, embedded/firmware review, or product development work reveals a reusable lesson that can improve future apps or hardware-backed products. The goal is to translate observed behavior, attack paths, failure modes, implementation tricks, hardware constraints, and protocol contracts into practical development requirements, buildable patterns, checklists, and validation tests.
 
 **Shared policy:** read [`shared-rules` index](../../shared-rules/README.md) and [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md). Lessons in `feedback_history/` should reference those files, not duplicate shared rules.
 
@@ -17,6 +17,7 @@ Use this skill when APK analysis, app/API review, or app development work reveal
 - Turning observed app/API techniques into buildable patterns for your own app.
 - Turning APK analysis documents into app-related tools, SDKs, clients, mocks, fixture-driven implementations, contract tests, or rebuilt features.
 - Turning product briefs into BDD, Domain Model Contracts, API Contracts, implementation slices, and tests.
+- Turning hardware, sensor, protocol, firmware, or embedded product specs into datasheet/protocol contracts, hardware context contracts, firmware BDD, driver/service/application boundaries, host/target tests, and bring-up validation.
 - Classifying app changes as new requirements, bug fixes, refactors, or hardening work before code; new requirements must update planning docs before implementation.
 - Separating legacy regression protection from new-code validation, including BDD/TDD, changed-code coverage, mutation tests, property-based tests, contract tests, database regression tests, and human review.
 - Backfilling missing development documents for existing, already implemented projects; Product Brief gaps can be marked unknown, but BDD behavior must be completed from observed implementation evidence.
@@ -34,7 +35,7 @@ Use this skill when APK analysis, app/API review, or app development work reveal
 
 1. Identify the source: product brief, observed weakness, reverse-engineering lesson, or app/API design question.
 2. Before code changes, inspect the project's 企劃書, product brief, planning docs, issue, ticket, PRD, design note, BDD, API contract, or equivalent artifact. Classify the request as new requirement, bug fix, refactor, hardening, or documentation-only.
-3. If it is a new requirement or behavior change, update or create planning docs first: change brief, BDD scenarios, impacted Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests. Do not start code until blocker questions are resolved.
+3. If it is a new requirement or behavior change, update or create planning docs first: change brief, BDD scenarios, impacted Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests. For embedded/hardware work, also update datasheet/protocol references, hardware context, driver/service/application ownership, fixture or hardware-in-loop validation, and bring-up notes. Do not start code until blocker questions are resolved.
 4. If it is a bug fix, confirm expected vs actual behavior, reproduction/evidence, affected or missing BDD scenario, impacted contract/error handling, and regression test plan before code.
 5. Define the test strategy before production code: distinguish existing-regression coverage from changed/new-code validation; prefer BDD first, then failing unit/contract/property/integration tests for new behavior before implementation.
 6. If starting from a product brief, use [`process/`](process/) to draft or discuss the initial development docs: Bounded Contexts, BDD behavior, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests.
@@ -44,6 +45,7 @@ Use this skill when APK analysis, app/API review, or app development work reveal
 10. Choose the control layer:
    - API/server contract.
    - App runtime behavior.
+   - Embedded firmware, hardware context, sensor/protocol driver, or board bring-up behavior.
    - Build/release configuration.
    - Monitoring or fraud signal.
 11. Add a concrete validation method: unit test, BDD scenario, API contract test, integration test, release checklist item, fixture, mutation/property check, or manual review step.

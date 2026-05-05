@@ -25,6 +25,7 @@
 | 修改 `app-development-guidance/process/` | 相關 `checklists/`、`templates/`、`implementation/`、`WORKFLOW.md`。 |
 | 修改 `app-development-guidance/implementation/` | 相關 `controls/`、`platforms/`、`languages/`、`checklists/`。 |
 | 修改 `app-development-guidance/templates/` | `templates/README.md`、`DOCUMENTATION.md`、`process/`、`CHECKLIST.md` 與引用該模板的文件。 |
+| 修改 `app-development-guidance/platforms/embedded/` 或 `implementation/embedded/` | `process/README.md`、`WORKFLOW.md`、`CHECKLIST.md`、`checklists/embedded-firmware-review.md`、`templates/initial-development-docs.md`。 |
 
 ## 語氣規則
 
