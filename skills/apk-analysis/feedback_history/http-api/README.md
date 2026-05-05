@@ -10,3 +10,4 @@ Lessons for HTTP/API documentation, request/response schema classification, UI-t
 | `2026-05-05_183400-ui-automation-operation-scripts-for-api-capture.md` | promoted | UI automation operation scripts for API capture | Use small replayable operation scripts with timestamps to stabilize UI-to-API capture. |
 | `2026-05-05_183700-scrollable-clickable-screen-mapping.md` | promoted | Scrollable and clickable screen mapping | Classify scrollable regions and clickable entry points before writing UI automation scripts. |
 | `2026-05-05_184218-playable-list-item-still-needs-detail-api.md` | validated | Playable list item still needs detail API | Do not skip item-tap detail capture just because list items already contain playable URLs. |
+| `2026-05-05_185921-scroll-depth-before-api-conclusion.md` | validated | Scroll depth before API conclusion | Capture top/mid/deep positions before deciding a scrollable page's API source. |
