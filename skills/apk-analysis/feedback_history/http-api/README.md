@@ -4,6 +4,7 @@ Lessons for HTTP/API documentation, request/response schema classification, UI-t
 
 | File | Status | Topic | Notes |
 | --- | --- | --- | --- |
+| `2026-05-05_205500-ui-behavior-backfill-finish-gate.md` | promoted | UI Behavior backfill as finish gate | Analysis is not complete until observed UI behavior is backfilled into the project UI behavior/page-map docs or marked as a documented gap. |
 | `2026-05-01_171500-json-shape-before-query-shape.md` | validated | JSON Shape Before Query Shape | Avoid treating embedded URLs or binary-like payloads as request query evidence. |
 | `2026-05-01_171650-ui-architecture-map-from-screenshots.md` | promoted | UI architecture map from screenshots | Use lightweight UI maps and bind key APIs to operations. |
 | `2026-05-01_173800-api-field-documentation-after-analysis.md` | promoted | API field documentation after analysis | Document headers, request fields, response fields, and field meanings. |

@@ -223,7 +223,7 @@ native backtrace 落在哪裡？
 一次分析可以收斂時，應具備：
 
 - 清楚知道核心流量走哪個 stack。
-- 有 UI architecture map，能說明主要 tabs/screens 與已測操作。
+- 有 UI Behavior / UI architecture map 回填到專案文件，能說明主要 tabs/screens、已測操作、App 可見排序文字、tap/swipe/input 步驟、資料來源、證據與未知項；若尚未抓 UI，必須在專案文件標 `needs capture` / `Trigger confidence: low`，不能省略。
 - 重要功能有 Feature Reconstruction Handoff：功能目標、screen/route/operation、BDD 候選、domain concept、API/interface contract、狀態與錯誤行為、資料生命週期、fixtures、open questions。
 - 有 request metadata 或已證明拿不到的原因。
 - 有 response outer shape。

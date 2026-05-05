@@ -19,6 +19,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
 2. Separate method from target facts:
    - Put reusable techniques in this skill folder.
    - Put target-specific endpoints, hosts, schemas, and findings in the project’s API/reference docs.
+   - Keep target-specific analysis documents scoped to the observed behavior of the APK under analysis. Do not mix in implementation plans, product design, self-built app architecture, clone behavior, or facts from other apps. If findings need to become development guidance, put them in a clearly separate handoff / guidance document and label them as derived guidance.
 3. Start with network path triage:
    - Check localhost traffic.
    - Check whole-device pcap for external TLS/SNI/host timing.
@@ -34,6 +35,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Mark which screens are scrollable and which visible elements are clickable entry points.
    - Document how to reach each important screen, including entry state, tap/swipe steps, expected destination, and reusable operation id.
    - When the user asks to analyze a named page/tab/module, create or update a project-level page map artifact (for example `docs/UI架構地圖/<page>.md`) instead of leaving the UI-to-API findings only inside API docs, tool docs, or chat.
+   - Before reporting the analysis complete, force a UI Behavior backfill: update the project's UI Behavior entry/index and the relevant page-level map with observed App actions, visible sort labels, tap/swipe steps, data source mapping, evidence, and unknowns. If UI behavior was not captured, explicitly mark `needs capture` / `Trigger confidence: low` in the project docs rather than omitting the section.
    - Keep operation maps scoped to in-app pages; if a step opens another app, system screen, browser, or external intent, document the transition instead of treating it as an app screen.
    - For key flows, optionally create a small replayable app-operation script so API capture can be repeated with stable timing.
    - Adapt the order if screenshots or device control make the app slow: solve core API/decode first, then bind important APIs back to UI actions.

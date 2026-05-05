@@ -12,6 +12,25 @@
 | 專案結論 | 目標 App 的 API、host、endpoint、schema、媒體規則。 | 不放 skill，放專案 API / reference docs。 |
 | 原始證據 | pcap、MITM export、Frida log、raw response、decrypted fixture。 | 不放 skill；放 gitignored 或專案指定位置，文件只引用去敏摘要。 |
 
+## Target APK 行為邊界
+
+專案內由 `apk-analysis` 產出的分析文件，只能描述「本次授權分析的目標 APK」已觀察或可重現的行為。這條規則適用於 UI 地圖、API 文件、動態抓包記錄、靜態分析記錄、cache / db schema、HLS / 媒體流程與所有 project-level target docs。
+
+可以寫：
+
+- 目標 APK 的可見 UI、入口路徑、點擊 / 滑動 / 播放 / 評論等 App 操作。
+- 目標 APK 實際發出的 request chain、endpoint、query/body/header 名稱、response schema 與欄位語意。
+- 來自靜態分析、hook、pcap、MITM、adb、sqlite、cache、fixture 或 replay 的證據。
+- 已確認的播放鏈、本機資料行為、錯誤碼與缺口。
+
+不要寫：
+
+- 其他作品、clone、自研 App、外部產品或未分析 APK 的行為 / 架構 / UI / API 設計。
+- 要如何實作、重構、封裝 SDK、規劃資料模型、設計產品或安排工程 TODO。
+- 沒有目標 APK 證據的 fallback、相似產品慣例或推測流程。
+
+若 APK findings 要轉成開發建議，請放在清楚分離的 handoff / guidance / plan / SDK 文件，並標示為 derived guidance；APK 行為文件只保留證據、觀察、欄位語意與 `needs capture` / `needs replay` / `needs static confirmation` 等缺口狀態。
+
 ## 功能重建交接規範
 
 若分析目標是讓後續 agent 能用 [`app-development-guidance`](../app-development-guidance/) 重新做出同等功能，專案分析文件不能只列 endpoint。它必須把 UI 行為、資料模型、API 合約、狀態轉移、錯誤處理與驗證證據串成可交接規格。
@@ -440,6 +459,7 @@ Agent Action:
 
 每次分析完成後：
 
+- UI Behavior 必須回填專案 UI 行為入口或 page-level map（例如 `docs/UI-Behavior.md`、`docs/UI架構地圖/<page>.md` 或專案等價位置）：記錄 entry path、可見 UI blocks、App sort label、tap/swipe/input 操作、API/data source 對照、截圖/UI hierarchy/live replay/hook 證據與 unknowns。若沒有 UI 證據，明確標 `needs capture`、`needs replay` 或 `Trigger confidence: low`。
 - 目標 API 結論回填專案 API 文件。
 - 解碼規則回填協議/解密文件。
 - SDK 或 client 行為回填 BDD / tests。
