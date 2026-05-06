@@ -9,7 +9,8 @@
 3. 若改動會影響 Cursor 可讀到的 skill 或 rules，**必須**執行 [`scripts/sync-cursor-bundle.sh`](../scripts/sync-cursor-bundle.sh)（除非使用者明講不要動本機 `~/.cursor`）。
 4. 若改動 Ai-skill repo，除非使用者明講不要提交，**必須** `git add` → `commit` → `push`。
 5. Commit/push 與必要的 bundle sync 完成後，**必須**依 [`dependency-reading.md`](dependency-reading.md) 重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，確認 agent context 已載入最新版。
-6. 回覆使用者時要說明已做了哪些連動更新；如果某些相關文件不用改，也要簡短說明原因。
+6. 最終回覆前必須再次執行 `git status --short --branch`；若仍有 modified/untracked/staged changes，或 branch ahead/behind remote，不得回覆「完成」，必須處理到乾淨或明確說明阻塞。
+7. 回覆使用者時要說明已做了哪些連動更新；如果某些相關文件不用改，也要簡短說明原因。
 
 ## 常見連動關係
 

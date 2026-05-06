@@ -41,6 +41,8 @@
 
 Tab / category / filter strip coverage rule：當頁面有 top tabs、category chips、search result tabs、carousel-like tabs 或任何看起來可水平滑動的分類列時，要先記錄 first viewport 的可見項、hierarchy 暴露的總數（例如「第 X 个标签，共 N 个」）、左右滑動後新增項，以及每個 reachable tab 的 `captured` / `needs capture` / `no-network-observed` 狀態。只測可見 tab 不能宣稱完整 tab 面 API 覆蓋。
 
+UI evidence package validation rule：每個 screenshot / hierarchy 用於 UI-to-API 對齊前，必須驗證 foreground package / activity 屬於目標 App。若 XML package 變成 launcher、browser、Google/search、settings、permission page 或其他外部 App，該 window 要標 `external` / `invalid for target UI`，automation 應中止或記錄明確轉場；Frida 仍命中目標 PID 只能證明目標進程內事件，不能自動證明是該 UI step 觸發。
+
 文件中要把 API 標為 `startup/preload`、`navigation`、`feature-triggered`、`cache-hydration` 或 `background/ambiguous`，避免把啟動期或預載 request 誤判成當前點擊觸發。
 
 ## 1. 先判斷流量在哪一層

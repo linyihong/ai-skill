@@ -25,6 +25,23 @@
 4. 若依賴文件不存在，記錄為 `not applicable`；若存在但未讀，不可宣稱已完成檢查。
 5. 回覆或提交前，說明依賴讀取與連動更新的驗證方式。
 6. 完成 `git commit`、`git push` 與必要的 bundle sync 後，必須重新讀取本次更新過的 skill/shared-rule 入口文件與主要依賴文件，確認目前 agent context 已載入最新版；不可只依賴提交前讀過的內容。
+7. 最終回覆前必須執行 `git status --short --branch`。若 `Ai-skill` repo 仍有 modified/untracked/staged changes，或 branch 仍 ahead/behind remote，不得回覆「已完成」；必須先完成驗證、sync、commit、push、讀回，或明確說明被什麼阻塞。
+
+## Ai-skill 回寫完成門檻
+
+只要 agent 在本庫回寫任何 `shared-rules/`、`skills/`、`.cursor/rules/`、模板、feedback lessons、README 或同步腳本，最終回覆前必須完成整個更新閉環：
+
+1. `git status --short --branch` 檢查變更。
+2. `git diff` 檢查將提交的內容，不得包含 secrets、raw tokens、私人 host、個資或本機絕對路徑。
+3. 執行適用的 lints / Markdown link check / required linked updates 檢查。
+4. 若影響 Cursor 可讀到的 skills/rules，執行 `./scripts/sync-cursor-bundle.sh`。
+5. `git add` 相關檔案。
+6. `git commit`。
+7. `git push`。
+8. Push 後重新讀取更新過的入口與主要依賴文件。
+9. 再跑 `git status --short --branch`，必須看到沒有未提交變更，且 branch 不再 ahead/behind remote。
+
+若第 9 步不乾淨，agent 必須回到第 1 步處理剩餘變更。不可在 dirty tree 或未 push 狀態下回覆「完成」。
 
 ## Commit / Push 後讀回 Gate
 

@@ -12,3 +12,4 @@ alwaysApply: true
 - If a dependent file does not exist, mark it as not applicable; do not claim it was checked.
 - Before finishing, state the dependency read and validation method: diff review, lints, link check, required linked updates, and bundle sync when relevant.
 - After `git commit`, `git push`, and any required bundle sync, re-read the updated skill/shared-rule entry files and main dependencies so the current agent context reflects the pushed version before the final response.
+- Before any final response after writing to this repo, run `git status --short --branch`; if there are modified/untracked/staged files or the branch is ahead/behind remote, do not say the Ai-skill update is complete. Finish validation, sync, commit, push, reread, and confirm clean status first, or explicitly report the blocker.
