@@ -8,7 +8,7 @@ The sequence is contract-first: clarify behavior and domain language before team
 
 | Step | Output | Notes |
 | --- | --- | --- |
-| 1. 企劃書 / product brief | Goals, users, scope, non-goals, constraints | Keep assumptions explicit; mark unknowns instead of inventing certainty. |
+| 1. 企劃書 / product brief | Goals, users, scope, non-goals, constraints, validation evidence | Keep assumptions explicit; validate product intent before treating it as implementation input; mark unknowns instead of inventing certainty. |
 | 2. AI analysis + module split | Bounded Context map, module ownership, integration points | Split by domain responsibility, not by UI pages or database tables only. |
 | 3. BDD behavior | Feature files or scenario tables | Describe user/system behavior in domain language. |
 | 4. Domain Model Contract | Entities, value objects, commands, events, invariants | This is the core contract; define what must always be true. |
@@ -56,6 +56,36 @@ When this skill is opened for a new feature or project, the agent should help pr
 These documents can start as lightweight Markdown drafts. If the project is small, keep them in one planning file; if they grow, split them into a folder with `README.md` and focused child files.
 
 Use [`../templates/initial-development-docs.md`](../templates/initial-development-docs.md) for the first draft. Use [`../templates/README.md`](../templates/README.md) to choose between initial planning, reusable guidance notes, and quick threat-model reviews.
+
+## Product Brief Validation Gate
+
+企劃書 / Product Brief is not automatically trusted just because it exists. Before using it as the source for BDD, contracts, estimates, implementation slices, or tests, validate it as its own artifact.
+
+| Brief item | Validation question | Acceptable evidence |
+| --- | --- | --- |
+| Goal / problem | Is the problem real, specific, and tied to a user/system outcome? | User request, stakeholder decision, support ticket, observed workflow, metric, analysis finding, or explicit assumption. |
+| Users / actors | Are the actors named and do they map to permissions, roles, devices, systems, or external services? | Existing accounts/roles, UI/API behavior, domain docs, org decision, or open question. |
+| Scope | Can we tell what will be built now? | BDD scenario list, module/context map, accepted feature list, API/interface list. |
+| Non-goals | Are excluded behaviors explicit enough to prevent accidental implementation? | Canceled/deferred/out-of-scope table, issue decision, stakeholder answer. |
+| Assumptions | Are assumptions testable, time-bounded, or marked as risk? | Evidence link, validation plan, owner, expiry/review date. |
+| Success criteria | Can a test, review, metric, or demo prove it worked? | BDD acceptance criteria, contract tests, release checklist, analytics/telemetry query, manual evidence. |
+| Constraints | Are legal, security, privacy, platform, hardware, budget, schedule, compatibility, and operational constraints named? | Policy, platform docs, architecture contract, risk review, hardware/vendor docs. |
+| Dependencies | Are external services, vendors, teams, generated clients, migrations, data, or hardware dependencies identified? | Integration contract, API docs, schema, vendor excerpt, migration plan, owner confirmation. |
+| Risks | Are abuse, failure, safety, privacy, replay, data loss, and operational risks named with controls or blockers? | Threat model, hardening note, controls/checklists, open blocker questions. |
+
+If any brief item affects behavior, domain invariants, API/interface shape, error handling, security, storage, ownership, tests, schedule, or release gate and cannot be validated, it is a blocker. Ask the user, request evidence, or explicitly scope the item out before development continues.
+
+For implemented-first projects, validate the backfilled Product Brief against observable evidence. Product intent that cannot be recovered may stay `unknown`, but every implemented behavior still needs BDD, contract, and test evidence.
+
+Use this status for each major brief claim:
+
+| Status | Meaning | Required action |
+| --- | --- | --- |
+| `validated` | Supported by evidence or explicit user/stakeholder decision. | Link evidence or decision. |
+| `assumption` | Plausible but not proven. | Add owner, validation plan, and impact if false. |
+| `open question` | Needed before implementation can proceed. | Ask and block impacted work. |
+| `scoped out` | Explicitly not part of current work. | Record non-goal and prevent accidental implementation. |
+| `invalidated` | Evidence contradicts the brief. | Revise brief, BDD, contracts, and tests before code. |
 
 ## Change Intake Gate
 

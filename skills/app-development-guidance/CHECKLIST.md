@@ -16,6 +16,8 @@ When a checklist item changes because of a new control or implementation pattern
 ## Change Intake
 
 - The project's 企劃書, product brief, planning doc, issue, ticket, PRD, design note, BDD, API contract, or equivalent artifact was reviewed before code.
+- Major Product Brief claims are validated or labeled: goal, users, scope, non-goals, assumptions, success criteria, constraints, dependencies, and risks.
+- Unvalidated Product Brief claims that affect behavior, contracts, risk, ownership, tests, schedule, or release gates are blocker questions.
 - The change is classified as new requirement, bug fix, refactor, hardening, or documentation-only.
 - New requirements update planning docs, BDD, affected contracts, implementation slices, and test plan before code starts.
 - Bug fixes document expected vs actual behavior, reproduction/evidence, affected BDD scenario or missing scenario, impacted contracts/errors, and regression test plan.
@@ -36,6 +38,9 @@ When a checklist item changes because of a new control or implementation pattern
 ## Product To Contract Flow
 
 - Product brief names goals, users, scope, non-goals, assumptions, and constraints.
+- Product brief claims have evidence, explicit decision, validation plan, or `open question` status before they drive BDD or implementation.
+- Success criteria can be proven by BDD, test, metric, demo, release checklist, or manual evidence.
+- Assumptions have owners, validation plan, and impact if false.
 - Bounded Contexts or modules are split by domain responsibility and integration boundary.
 - Critical behavior is written as BDD scenarios before implementation.
 - Domain Model Contract defines entities, value objects, commands, events, and invariants.
@@ -52,6 +57,7 @@ When a checklist item changes because of a new control or implementation pattern
 
 - Existing project docs are inventoried and marked `exists`, `partial`, `missing`, or `unknown`.
 - Missing Product Brief fields are reconstructed only from evidence; unavailable original intent is marked `unknown` or `open question`.
+- Backfilled Product Brief claims are not treated as validated unless supported by UI, API, code, tests, logs, fixtures, user decision, or other evidence.
 - BDD behavior is complete for implemented critical happy paths, failure paths, permissions, empty states, edge cases, and cross-context flows.
 - BDD scenarios cite evidence from UI behavior, API behavior, code paths, tests, logs, fixtures, or manual verification.
 - Domain Model, Architecture, API / Interface, and Error Handling Contracts are backfilled from observed behavior and implementation evidence.

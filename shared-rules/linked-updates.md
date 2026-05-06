@@ -27,6 +27,7 @@
 | 修改 `app-development-guidance/process/` | 相關 `checklists/`、`templates/`、`implementation/`、`WORKFLOW.md`。 |
 | 修改 `app-development-guidance/implementation/` | 相關 `controls/`、`platforms/`、`languages/`、`checklists/`。 |
 | 修改 `app-development-guidance/templates/` | `templates/README.md`、`DOCUMENTATION.md`、`process/`、`CHECKLIST.md` 與引用該模板的文件。 |
+| 修改 `app-development-guidance` 的 Product Brief / 企劃書驗證規則 | `process/README.md`、`WORKFLOW.md`、`CHECKLIST.md`、`templates/initial-development-docs.md`、`templates/README.md`、`DOCUMENTATION.md`、`SKILL.md`。 |
 | 修改 `app-development-guidance/platforms/embedded/` 或 `implementation/embedded/` | `process/README.md`、`WORKFLOW.md`、`CHECKLIST.md`、`checklists/embedded-firmware-review.md`、`templates/initial-development-docs.md`。 |
 | 修改 `app-development-guidance/implementation/backend/contract-codegen.md` 或 `vendor-integration.md` | `platforms/backend/api.md`、`checklists/api-security-review.md`、`process/README.md`、`WORKFLOW.md`、`CHECKLIST.md`、相關 `controls/`。 |
 | 修改 `app-development-guidance/implementation/tooling/` | `process/README.md`、`WORKFLOW.md`、`CHECKLIST.md`、`checklists/contract-governance-review.md`、`templates/initial-development-docs.md`。 |

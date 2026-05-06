@@ -45,10 +45,10 @@ What this does not solve.
 | Product-specific API host, endpoint, schema, or token detail | Project repository docs. |
 | Raw vendor documents, account-specific terms, credentials, sandbox/live hosts, private webhook payloads, or real customer data | Project repository docs with sanitization and access control. |
 | Generated clients, SDKs, fixtures, and provider/consumer contract checks | `implementation/` and the project repository. |
-| Document precedence, traceability, and BDD closure process | `process/`, templates, and checklists. |
+| Product Brief validation, document precedence, traceability, and BDD closure process | `process/`, templates, and checklists. |
 | Shared sanitization or feedback rules | [`shared-rules`](../../shared-rules/README.md). |
 
-Start with [`templates/README.md`](templates/README.md) when choosing a copyable documentation shape. Use [`templates/initial-development-docs.md`](templates/initial-development-docs.md) when starting from a product brief, [`templates/hardening-note.md`](templates/hardening-note.md) for reusable guidance, and [`templates/threat-model-lite.md`](templates/threat-model-lite.md) for quick feature reviews.
+Start with [`templates/README.md`](templates/README.md) when choosing a copyable documentation shape. Use [`templates/initial-development-docs.md`](templates/initial-development-docs.md) when starting from or validating a product brief, [`templates/hardening-note.md`](templates/hardening-note.md) for reusable guidance, and [`templates/threat-model-lite.md`](templates/threat-model-lite.md) for quick feature reviews.
 
 ## Required Linked Update Statement
 

@@ -18,6 +18,7 @@ Before code work, run change intake:
 | Question | Required action |
 | --- | --- |
 | What planning artifact exists? | Read the 企劃書, product brief, planning doc, issue, ticket, PRD, design note, BDD, API contract, or equivalent. |
+| Has the product brief itself been validated? | Check goal, users, scope, non-goals, assumptions, constraints, dependencies, risks, and success criteria against evidence or explicit decisions. Mark each major claim `validated`, `assumption`, `open question`, `scoped out`, or `invalidated`. |
 | Is this a new requirement or behavior change? | Update planning docs, BDD, contracts, implementation slices, and tests before code. |
 | Is this a bug fix? | Confirm expected vs actual behavior, reproduction/evidence, affected BDD or missing scenario, impacted contracts/errors, and regression test. |
 | Is this a refactor? | Confirm no behavior or public contract change; otherwise reclassify. |
@@ -25,6 +26,8 @@ Before code work, run change intake:
 | Does this change conflict with existing docs? | Apply document precedence: governance/framework contract, product plan, BDD, contracts, implementation, tests. Update the owning document instead of silently fixing only code. |
 
 If no planning artifact exists and the request changes behavior, create a lightweight change brief and ask blocker questions before implementation.
+
+If the product brief exists but has unvalidated claims that affect behavior, contracts, risks, tests, ownership, schedule, or release gates, treat those claims as blockers before implementation. For pure planning answers, cite the reference source or reasoning boundary instead of pretending the brief is validated.
 
 Then define the test strategy:
 

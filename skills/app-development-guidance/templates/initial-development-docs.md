@@ -4,14 +4,26 @@ Use this template when turning a product brief into an implementation plan. Keep
 
 ## Product Brief
 
-| Field | Notes |
-| --- | --- |
-| Goal | |
-| Users / actors | |
-| Scope | |
-| Non-goals | |
-| Assumptions | |
-| Open questions | |
+| Field | Notes | Validation status | Evidence / reference source |
+| --- | --- | --- | --- |
+| Goal | | validated / assumption / open question / scoped out / invalidated | |
+| Users / actors | | validated / assumption / open question / scoped out / invalidated | |
+| Scope | | validated / assumption / open question / scoped out / invalidated | |
+| Non-goals | | validated / assumption / open question / scoped out / invalidated | |
+| Assumptions | Include owner, validation plan, and impact if false | validated / assumption / open question / scoped out / invalidated | |
+| Success criteria | Test / metric / demo / release checklist / manual evidence | validated / assumption / open question / scoped out / invalidated | |
+| Constraints | Security / privacy / platform / hardware / budget / schedule / compatibility | validated / assumption / open question / scoped out / invalidated | |
+| Dependencies | External services / vendors / teams / generated clients / data / hardware | validated / assumption / open question / scoped out / invalidated | |
+| Risks | Abuse / failure / safety / privacy / replay / data loss / operation | validated / assumption / open question / scoped out / invalidated | |
+| Open questions | | open question | |
+
+Validation status:
+
+- `validated`: supported by evidence or explicit decision.
+- `assumption`: plausible but not proven; needs owner and validation plan.
+- `open question`: blocks impacted implementation until answered or scoped out.
+- `scoped out`: explicitly not part of current work.
+- `invalidated`: contradicted by evidence; revise brief before using it.
 
 ## Change Intake
 
@@ -20,6 +32,7 @@ Use this section before code changes.
 | Field | Notes |
 | --- | --- |
 | Planning artifact reviewed | 企劃書 / product brief / issue / ticket / PRD / design note / BDD / API contract / other |
+| Product brief validation result | validated / has assumptions / has blockers / not applicable |
 | Change type | new requirement / bug fix / refactor / hardening / documentation-only |
 | New requirement summary | |
 | Bug expected behavior | |

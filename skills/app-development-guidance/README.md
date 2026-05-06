@@ -15,6 +15,7 @@ Capture practical guidance for:
 - App/API and transport security.
 - Embedded, firmware, sensor, protocol, and hardware context development flow.
 - Product brief to contract-first development flow.
+- Product Brief validation before implementation: goals, users, scope, non-goals, assumptions, success criteria, constraints, dependencies, risks, and blocker questions.
 - Implemented-first project governance: document precedence, traceability, BDD closure, and minimum doc-sync matrices.
 - Change intake before code: classify new requirements, bug fixes, refactors, hardening, and docs-only work from planning artifacts.
 - Test strategy that separates legacy regression protection from new-code validation with BDD/TDD, changed-code coverage, mutation/property/contract/database tests, and human review.
@@ -34,7 +35,7 @@ Capture practical guidance for:
 
 - Reusable development patterns learned from APK analysis, app/API review, or product development.
 - Reusable development patterns for embedded or hardware-backed products, including datasheet/protocol contracts, hardware context, driver/service/application layering, and validation.
-- Rules for reviewing planning artifacts before code and deciding whether work is a new requirement or bug fix.
+- Rules for validating planning artifacts before code and deciding whether work is a new requirement or bug fix.
 - Rules for validating new or AI-generated code beyond total project coverage.
 - Documentation backfill rules for already implemented projects, especially when original planning documents are missing.
 - Rules for document precedence, traceability, BDD execution closure, and explicit canceled/deferred/out-of-scope decisions.
@@ -84,7 +85,7 @@ For existing implemented projects, use [`process/`](process/) to audit and backf
 
 For implemented-first projects, also recover document precedence, stable IDs, traceability links, BDD validation status, minimum doc-sync matrix, generated-client flow, vendor integration excerpts, and explicit canceled/deferred/out-of-scope items.
 
-Before code work, use [`process/`](process/) to review the planning artifact and classify the change. New requirements must update planning docs, BDD, contracts, implementation slices, and tests before implementation starts. Bug fixes must document expected vs actual behavior and regression tests first.
+Before code work, use [`process/`](process/) to validate the planning artifact and classify the change. Product Brief claims that affect behavior, contracts, risk, ownership, tests, schedule, or release gates must be supported by evidence, explicit decision, validation plan, or blocker status before implementation starts. New requirements must update planning docs, BDD, contracts, implementation slices, and tests before implementation starts. Bug fixes must document expected vs actual behavior and regression tests first.
 
 When planning tests, separate old behavior from new code. Existing tests guard regressions; new or AI-generated code needs BDD/TDD and changed-code validation. Use mutation, property-based, contract, or database-backed tests when ordinary example tests do not prove the rule.
 
@@ -104,6 +105,7 @@ Examples:
 - New Flutter storage implementation -> update or verify `platforms/mobile/flutter.md`, `languages/dart.md`, `controls/local-storage.md`, and the relevant checklist.
 - New review checklist item -> update or verify the matching `controls/` and `implementation/` docs.
 - New contract-first process guidance -> update or verify `process/`, `checklists/`, `templates/`, and relevant implementation docs.
+- New Product Brief validation rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.
 - New initial planning template -> update or verify `templates/README.md`, `process/README.md`, `DOCUMENTATION.md`, and `CHECKLIST.md`.
 - New existing-project backfill rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, and `WORKFLOW.md`.
 - New implemented-first governance rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, `implementation/`, and `checklists/contract-governance-review.md`.
