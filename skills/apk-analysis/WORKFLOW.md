@@ -121,6 +121,8 @@ native backtrace 落在哪裡？
 5. 用 Frida hook response decode/decrypt return value。
 6. 把 raw wrapper + decrypted payload 對齊成 fixture。
 
+Dart AOT offset hook 注意：dump 檔名尾碼不一定是函式 entry offset。建立 `base.add(offset)` hook 前，先讀 asm 第一行的完整函式地址，並用 runtime probe 確認該地址落在 executable range、bytes 與 prologue 對齊；若 `Interceptor.attach` 失敗且地址落在 `r--`，先修正 offset / load bias，不要先 debug 參數解析。
+
 若 local proxy/Netty hook 已看到自訂加密／簽名 header，但同窗 Java plugin/helper hook（例如 AES/RC2/getNMKey/query map）沒有命中，應把 Java plugin 視為橋接或設定層，轉向 `libapp.so` Dart AOT interceptor 字串、object pool xref、blutter/offset hook；不要在 Java helper 層無限加 hook。
 
 成功特徵：

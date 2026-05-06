@@ -26,3 +26,4 @@ Cross-cutting APK analysis lessons that apply before a runtime/API family is kno
 | `2026-05-06_105026-state-reset-baseline-feature-capture.md` | promoted | State reset baseline before feature capture | App-start-to-feature API analysis should record reset/cache/session baseline so startup, navigation, and feature APIs are not conflated. |
 | `2026-05-06_110749-scrollable-tab-strip-coverage.md` | promoted | Scrollable tab strip coverage | Tab/category/result strips need horizontal swipe coverage before claiming complete feature API coverage. |
 | `2026-05-06_111558-foreground-package-validation.md` | promoted | Foreground package validation | UI evidence must prove the foreground package is the target app before API/UI alignment claims. |
+| `2026-05-06_113302-dart-aot-offset-from-asm-address.md` | promoted | Dart AOT offset from ASM address | Use the first asm-line function address, not the output filename suffix, as the Frida hook offset. |
