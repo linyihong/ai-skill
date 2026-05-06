@@ -45,6 +45,8 @@
 
 凡編輯過這兩處且希望 **本機 Cursor** 立刻經 `~/.cursor/bundles` 跟上時，請在 `<AI_SKILL_REPO>` 執行 `./scripts/sync-cursor-bundle.sh`（可重複執行、無害）。可選：於 repo 根目錄 `git config core.hooksPath scripts/git-hooks`，則每次 **`git commit`** 後會自動跑該腳本。若 skill 清單仍未更新，再 **Developer: Reload Window**。
 
+同步與 `git push` 完成後，agent 還必須重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件。`sync-cursor-bundle.sh` 只更新檔案路徑，不會自動更新 agent 已載入的上下文；讀回 gate 依 [`dependency-reading.md`](dependency-reading.md) 執行。
+
 ## 為什麼會看到「兩個」shared-rules？
 
 **沒有兩份內容。**真實檔案只在 **`<AI_SKILL_REPO>/shared-rules/`** 這一處。

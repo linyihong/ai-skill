@@ -11,3 +11,4 @@ alwaysApply: true
 - For skill changes, read the skill entry plus related README, workflow, documentation, checklist, templates, feedback indexes, and linked shared rules when they exist.
 - If a dependent file does not exist, mark it as not applicable; do not claim it was checked.
 - Before finishing, state the dependency read and validation method: diff review, lints, link check, required linked updates, and bundle sync when relevant.
+- After `git commit`, `git push`, and any required bundle sync, re-read the updated skill/shared-rule entry files and main dependencies so the current agent context reflects the pushed version before the final response.

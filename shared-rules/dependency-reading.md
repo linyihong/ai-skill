@@ -24,6 +24,24 @@
 3. 若看到文件有 cross-link、promotion target、required linked updates、template reference、feedback index，就循連結讀到任務所需的規則載入完成。
 4. 若依賴文件不存在，記錄為 `not applicable`；若存在但未讀，不可宣稱已完成檢查。
 5. 回覆或提交前，說明依賴讀取與連動更新的驗證方式。
+6. 完成 `git commit`、`git push` 與必要的 bundle sync 後，必須重新讀取本次更新過的 skill/shared-rule 入口文件與主要依賴文件，確認目前 agent context 已載入最新版；不可只依賴提交前讀過的內容。
+
+## Commit / Push 後讀回 Gate
+
+當本庫變更已完成 `git commit`、`git push`，且改動涉及 `shared-rules/`、`skills/`、`.cursor/rules/`、模板或 feedback lessons 時，agent 必須在最終回覆前做一次讀回：
+
+| 更新類型 | Commit / push 後必須重新讀取 |
+| --- | --- |
+| `shared-rules/` | 更新過的 shared rule、`shared-rules/README.md`、`shared-rules/linked-updates.md`；若有 Cursor rule，也讀對應 `.cursor/rules/*.mdc`。 |
+| `skills/<name>/` | 該 skill 的 `SKILL.md`，以及本次更新過的 workflow / documentation / checklist / template / feedback index。 |
+| `.cursor/rules/` | 更新過的 `.mdc`，以及對應的 shared rule 正文。 |
+| template 或 feedback lesson | 更新過的 template/lesson、索引 README、promotion target 或引用它的 workflow/documentation。 |
+
+讀回目的：
+
+- 確認提交後工作樹、bundle sync 與 agent context 沒有停在舊版本。
+- 讓同一輪最終回覆能基於最新規則，而不是 commit 前暫存理解。
+- 若下一個 agent 接手，最終回覆要明確說明已讀回哪些入口文件；若未能讀回，必須列為未完成驗證。
 
 ## 與連動更新的關係
 

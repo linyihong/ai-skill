@@ -58,6 +58,8 @@ git commit -m "Update apk analysis skill"
 git push
 ```
 
+Commit/push 與必要的 `./scripts/sync-cursor-bundle.sh` 完成後，agent 還要重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，避免使用 commit 前的舊上下文。
+
 不要把專案私有資料、抓包原始檔或未去敏樣本 commit 到這裡。
 
 `.cursor` 的變更若屬於業務專案目錄，請勿誤把該專案才有的機密或絕對路徑抄進本庫；本庫維持泛化與 `<AI_SKILL_REPO>` / `<PROJECT_ROOT>` 等占位符。
