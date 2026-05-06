@@ -1,6 +1,6 @@
 # APK 分析文件寫法
 
-分析文件的目標是讓人和 AI 都能重現推理，而不是只留下最後答案。每個重要分析段落都要依 [`goal-action-validation.md`](../../shared-rules/goal-action-validation.md) 交代目標、執行、驗證；若是純判斷或暫時無法驗證，必須附參考來源、推論邊界與 open questions。
+分析文件的目標是讓人和 AI 都能重現推理，而不是只留下最後答案。
 
 ## 文件分層
 
@@ -126,6 +126,7 @@
 - 若同一 endpoint 支援多個功能或多個 screen，要在交接文件保留多個 operation mapping。
 - 若只有 API、沒有 UI 來源，仍要寫 `UI path: unknown`、`Trigger confidence: low`，並說明可用哪些操作補證。
 - 若只有 UI、沒有 API 明文，仍要寫可見行為與未知 API 合約，不要假造 request/response。
+- 解析 UI hierarchy / accessibility XML 時，`text`、`content-desc`、可點擊節點描述可能直接含 raw 標題、搜尋詞、聊天室文字、留言或個資；可重用或公開文件只寫 selector、bounds、通用 block 名、tab label、schema key 與 evidence path。若必須保留原文，只能放在專案受控原始 capture，不得搬進 skill lesson 或 shared docs。
 - 交給 `app-development-guidance` 的內容必須是已去敏、可泛化的功能/合約描述；target-specific host、token、帳號資料與 raw response 留在專案受控位置。
 - 若 output 目標包含 app 工具、SDK、client、mock、fixture-driven implementation、contract test 或重建功能，不能只輸出 APK 分析文件；必須同輪啟用 `app-development-guidance` 產出或更新開發文件需求與 blocker questions。
 
