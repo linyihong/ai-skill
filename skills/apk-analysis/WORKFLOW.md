@@ -222,6 +222,8 @@ response decode hook:
 
 不要只看副檔名判斷格式。應用 magic bytes、container probe 或 frame count 驗證。例如 WebP 動圖、靜態 GIF、animated GIF 都要分清楚。
 
+HLS `#EXT-X-KEY` URI 不一定就是最終 segment 解密 key。若用 playlist key bytes + IV 解 `.ts` 後沒有 MPEG-TS sync byte 或 container probe 失敗，先回查控制 API / model 是否有 `encrypted_key`、`decrypt_key`、`customKey`、`videoId` 等 key material，並 hook App 端 unwrap helper（例如 base64/AES helper、`getDecryptionKey`、player wrapper）取得私有 key 樣本；最終仍以 segment 解密後 `0x47` sync / `ffprobe` 驗證為準。
+
 ## 9. 分析結束定義
 
 一次分析可以收斂時，應具備：
