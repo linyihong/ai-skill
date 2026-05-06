@@ -27,6 +27,27 @@
 6. 完成 `git commit`、`git push` 與必要的 bundle sync 後，必須重新讀取本次更新過的 skill/shared-rule 入口文件與主要依賴文件，確認目前 agent context 已載入最新版；不可只依賴提交前讀過的內容。
 7. 最終回覆前必須執行 `git status --short --branch`。若 `Ai-skill` repo 仍有 modified/untracked/staged changes，或 branch 仍 ahead/behind remote，不得回覆「已完成」；必須先完成驗證、sync、commit、push、讀回，或明確說明被什麼阻塞。
 
+## Ai-skill Writeback Transaction Guard
+
+只要 agent 第一次寫入 `<AI_SKILL_REPO>/shared-rules/`、`<AI_SKILL_REPO>/skills/`、`.cursor/rules/`、模板、feedback lesson、同步腳本，或透過同步路徑（例如 `~/.cursor/shared-rules`、`~/.cursor/skills/<name>`）改到同一套內容，就必須立即把這件事視為一個尚未關閉的 **Ai-skill writeback transaction**，而不是等最終回覆才想起。
+
+交易開始時必須：
+
+1. 立刻建立或口頭標記一個明確的 close-loop 項目，例如 `Ai-skill close loop`。
+2. 記錄 canonical repo 位置與本次 touched paths；若是從同步路徑讀寫，仍以 `<AI_SKILL_REPO>` 的 `git status --short --branch` 為準。
+3. 在切回專案分析、長時間動態測試、或回覆「完成」前，先關閉這個 transaction。
+
+交易關閉條件：
+
+1. `git status --short --branch` 與 `git diff` 已檢查。
+2. 必要的 linked updates 已同步或明確寫出不適用理由。
+3. 必要的 bundle sync 已執行。
+4. 相關檔案已 `git add`、`git commit`、`git push`。
+5. Push 後已重新讀取更新過的入口、主要依賴、索引與 promotion target。
+6. 最後一次 `git status --short --branch` 顯示 clean，且 branch 沒有 ahead/behind。
+
+若 transaction 未關閉，agent 不得把注意力長時間切回業務專案，也不得把「已更新 skill」當作完成。可以繼續工作的唯一例外是：使用者明確要求暫停 Ai-skill close-loop；此時必須說明目前 dirty/ahead 狀態與下一步。
+
 ## Ai-skill 回寫完成門檻
 
 只要 agent 在本庫回寫任何 `shared-rules/`、`skills/`、`.cursor/rules/`、模板、feedback lessons、README 或同步腳本，最終回覆前必須完成整個更新閉環：

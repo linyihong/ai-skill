@@ -6,7 +6,7 @@
 | 全庫**連動更新規則**（改一處會影響多處時要同步改哪些） | **[`linked-updates.md`](linked-updates.md)**（全庫唯一正文） |
 | 全庫**文件用語規則**（中性、低爭議、避免 AI/搜尋誤判的標題、slug、摘要與正文） | **[`neutral-language.md`](neutral-language.md)**（全庫唯一正文） |
 | 全庫**工作驗證流程**（目標、執行、驗證；純判斷題用參考來源） | **[`goal-action-validation.md`](goal-action-validation.md)**（全庫唯一正文） |
-| 全庫**依賴讀取鐵則**（發現 skill/rule/template/lesson 更新時必須讀相關依賴） | **[`dependency-reading.md`](dependency-reading.md)**（全庫唯一正文） |
+| 全庫**依賴讀取鐵則與 writeback transaction gate**（發現 skill/rule/template/lesson 更新時必須讀相關依賴，寫入 Ai-skill 時必須完成 sync/commit/push/readback/clean status） | **[`dependency-reading.md`](dependency-reading.md)**（全庫唯一正文） |
 | 可重用的**單一技巧、lesson 全文** | 未分類 skill 放 `skills/<skill-name>/feedback_history/`；已分類 skill 放 `skills/<skill-name>/feedback_history/<category>/` 或 `common/`；成熟後可整理進該 skill 的 `WORKFLOW.md` / `TOOLS.md` / `DOCUMENTATION.md` / 分類資料夾 |
 | **如何**下筆、命名、模板 | **[`feedback-lessons.md`](feedback-lessons.md)**（全庫唯一）；各 skill 可選保留一行入口 `FEEDBACK.md` 指向該檔 |
 | **某 skill 需要引用另一個 skill 的規範或交接產物** | 在 referring skill 寫短 cross-link 與觸發條件；規則見 **[`cross-skill-references.md`](cross-skill-references.md)**；不要複製 target skill 的全文 |

@@ -74,7 +74,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 1. 編輯根目錄 [**`README.md`**](../README.md) 的「現有 Skills」表格，加一行 `skills/<name>/` 與簡短說明。
 2. 編輯 [**`skills/README.md`**](README.md) 的表格，同步列出。
 3. 依 [`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md) 檢查是否還需要同步更新 `RUNBOOK.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、同步腳本或 cross-link。
-4. `git add` → `commit` → `push`。
+4. 依 `shared-rules/dependency-reading.md` 關閉 Ai-skill writeback transaction：檢查 diff / linked updates，執行必要 sync，`git add` → `commit` → `push`，push 後讀回並確認 clean。
 
 ## 6. 同步到本機 `~/.cursor`（可選）
 
