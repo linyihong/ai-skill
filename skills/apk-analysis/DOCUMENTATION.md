@@ -37,6 +37,23 @@
 
 若使用者要用分析文件做出 app 相關工具、SDK、client、mock API、fixture-driven implementation、contract test 或重建功能，agent 必須自動讀取並套用 [`app-development-guidance/SKILL.md`](../app-development-guidance/SKILL.md)。`apk-analysis` 只負責提供去敏證據、UI/API attribution、schema、fixture 與 confidence；開發文件、BDD、Domain Model Contract、API / Interface Contract、Error Handling Contract、implementation slices、tests 與 blocker questions 由 `app-development-guidance` 接手。
 
+### Feature handoff finish gate
+
+當某個具名 feature / tab / module 已經被分析到「核心 UI 操作與主要 API flow 可說明」的程度時，必須在同一輪對話補齊或更新 project-level feature handoff / architecture 文件。這是 completion gate，不是可選整理。
+
+觸發條件包含任一項：
+
+- 核心 flows 已從 `Candidate` 升到 `Confirmed`。
+- agent 已能回答此功能的 entry path、主要 UI 區塊、API request keys / response schema、狀態與缺口。
+- 使用者問「有沒有 API 文件」、「能不能重建」、「架構是什麼」、「繼續分析某功能」且本輪已形成穩定理解。
+
+要求：
+
+- 不要只更新 `schemas.md`、`endpoint-correlation.md`、hook 腳本、chat 總結或 page map；要有一份 feature-level 文件把 UI 行為、domain concepts、API contracts、state/error、data lifecycle、validation evidence、unknowns 串起來。
+- 若資料仍不足，也要建立 skeleton，將缺口標成 `needs capture` / `candidate` / `low confidence`，不要等完全確認才寫。
+- 若專案已有 `docs/feature-handoff-<feature>.md`、`docs/features/<feature>.md` 或類似文件，更新既有文件；沒有就新建一份。
+- 完成回答前，回查該 feature 文件是否已連回 page map、operation map、API summary/schema/correlation 文件。
+
 每個重要功能至少要留下：
 
 | 面向 | 必填內容 | 交給 app-development-guidance 時的用途 |

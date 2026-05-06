@@ -47,6 +47,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - UI architecture map and operation-to-API matrix.
    - Redacted HTTP/API docs with headers, request fields, response fields, and per-field meaning/type notes.
    - Feature reconstruction handoff: capability, behavior scenarios, candidate domain concepts, API/interface contracts, state/error handling, data lifecycle, fixtures, and open questions.
+   - **Feature handoff finish gate:** once a named feature/module is understood well enough to mark core flows `Confirmed` or to answer implementation-style questions, create or update a project-level feature handoff / architecture document in the same session. Do not leave the understanding only in API tables, hook logs, chat, or page maps.
    - Redacted request/response samples.
    - Offline decoders or fixtures.
    - API/schema docs.
