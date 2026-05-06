@@ -12,7 +12,7 @@
 | --- | --- |
 | 任一 `skills/<name>/SKILL.md` | 該 skill 的 `README.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、`CHECKLIST.md`、`FEEDBACK.md`、相關 `feedback_history/README.md`，以及 `shared-rules/README.md`。不存在的檔案可標記為不適用。 |
 | 任一 skill 子文件 | 該 skill 的 `SKILL.md`、最近的目錄 `README.md`、相關 workflow/checklist/template、`shared-rules/linked-updates.md`。 |
-| 任一 `shared-rules/*.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、受影響 skill 的 `SKILL.md` 或模板。 |
+| 任一 `shared-rules/*.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`shared-rules/reusable-guidance-boundary.md`（若涉及 reusable guidance / incident / feedback）、受影響 skill 的 `SKILL.md` 或模板。 |
 | 任一 `.cursor/rules/*.mdc` | 對應的 shared rule 正文、`shared-rules/README.md`、`shared-rules/cursor-sync.md`，以及受影響的 skill 入口。 |
 | 任一 template | 模板目錄 `README.md`、引用該模板的 workflow/documentation/checklist、`shared-rules/linked-updates.md`。 |
 | 任一 feedback lesson | 該分類 `README.md`、skill 的 `feedback_history/README.md`、`shared-rules/feedback-lessons.md`，以及 promotion target。 |
@@ -21,7 +21,7 @@
 
 1. 先讀 `shared-rules/README.md`，再依任務讀相關 shared rule 全文。
 2. 若任務碰到 skill，讀該 skill 入口與依賴文件；不要只依賴 `description` 或單一段落。
-3. 若看到文件有 cross-link、promotion target、required linked updates、template reference、feedback index，就循連結讀到任務所需的規則載入完成。
+3. 若看到文件有 cross-link、promotion target、required linked updates、template reference、feedback index，或 reusable guidance / project incident 邊界，就循連結讀到任務所需的規則載入完成。
 4. 若依賴文件不存在，記錄為 `not applicable`；若存在但未讀，不可宣稱已完成檢查。
 5. 回覆或提交前，說明依賴讀取與連動更新的驗證方式。
 6. 完成 `git commit`、`git push` 與必要的 bundle sync 後，必須重新讀取本次更新過的 skill/shared-rule 入口文件與主要依賴文件，確認目前 agent context 已載入最新版；不可只依賴提交前讀過的內容。

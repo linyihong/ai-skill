@@ -48,6 +48,17 @@ What this does not solve.
 | Product Brief validation, document precedence, traceability, and BDD closure process | `process/`, templates, and checklists. |
 | Shared sanitization or feedback rules | [`shared-rules`](../../shared-rules/README.md). |
 
+## Reusable Guidance Boundary
+
+This section applies the global rule in [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md).
+
+Skill documentation should describe the reusable reason, failure mode, decision rule, and validation method. Do not promote a project incident by copying its app name, module name, endpoint path, sample payload, class name, local path, host, or live-data quirk into the skill.
+
+If an incident teaches a useful lesson, split it:
+
+- **Skill:** generalized rule, such as "SDK bugs reported against a live service should be reproduced through the SDK public surface and then pinned with behavior specs and regression tests."
+- **Project docs:** concrete reproduction target, affected feature, sample IDs, live environment notes, BDD file names, test class names, and execution results.
+
 Start with [`templates/README.md`](templates/README.md) when choosing a copyable documentation shape. Use [`templates/initial-development-docs.md`](templates/initial-development-docs.md) when starting from or validating a product brief, [`templates/hardening-note.md`](templates/hardening-note.md) for reusable guidance, and [`templates/threat-model-lite.md`](templates/threat-model-lite.md) for quick feature reviews.
 
 ## Required Linked Update Statement

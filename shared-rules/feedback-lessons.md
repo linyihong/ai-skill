@@ -8,7 +8,7 @@
 
 - **不要**在每條 lesson 裡重複貼上 [sanitization.md](sanitization.md)、[dependency-reading.md](dependency-reading.md)、[neutral-language.md](neutral-language.md)、[goal-action-validation.md](goal-action-validation.md)、[authorization-scope.md](authorization-scope.md) 等全文；條目頂部用一行**引用** [README.md](README.md) 或**本檔**即可。
 - **Cursor agent：** 在授權分析過程中一旦得到可重用技巧／失敗模式／驗證規則，應**主動**在同一輪對話內於該 skill 的 **`feedback_history/`** 對應位置新增檔案（依下方**分類規則**、**檔名規則**與**模板**），**不要**等使用者提醒。
-- 只寫**通用方法**，不寫特定 App 的私有結論；必須去敏；發現 skill/rule/template/lesson 更新時依 [dependency-reading.md](dependency-reading.md) 讀取依賴；標題、slug、摘要與正文必須依 [neutral-language.md](neutral-language.md) 使用中性低爭議用語；每個重要結論必須依 [goal-action-validation.md](goal-action-validation.md) 說明目標、執行、驗證或參考來源；必須說明證據與適用／不適用條件；不確定標 `experimental`。
+- 只寫**通用方法**，不寫特定 App / project incident 的私有結論或具體證據；必須依 [reusable-guidance-boundary.md](reusable-guidance-boundary.md) 先抽象化原因、規則與驗證，再依 [sanitization.md](sanitization.md) 去敏；發現 skill/rule/template/lesson 更新時依 [dependency-reading.md](dependency-reading.md) 讀取依賴；標題、slug、摘要與正文必須依 [neutral-language.md](neutral-language.md) 使用中性低爭議用語；每個重要結論必須依 [goal-action-validation.md](goal-action-validation.md) 說明目標、執行、驗證或參考來源；必須說明證據與適用／不適用條件；不確定標 `experimental`。
 - 不得寫入本機絕對路徑、使用者名稱、私有工作目錄、clone 位置；用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 等 placeholder。
 
 ## 條目放哪裡
@@ -76,8 +76,8 @@ Status: candidate | validated | deprecated | promoted | experimental
 #### Evidence
 
 - Tool:
-- Sanitized excerpt:
-- Evidence path:
+- Sanitized excerpt: 只寫可公開、不可識別單一專案或使用者的摘要；具體 project incident 證據留在專案文件。
+- Evidence path: 使用 `<PROJECT_ROOT>` 等 placeholder，或引用 project docs 的相對位置；不要寫本機實體路徑。
 
 #### Generalized Lesson
 
@@ -115,6 +115,7 @@ Status: candidate | validated | deprecated | promoted | experimental
 #### Required Linked Updates
 
 - 依 [`linked-updates.md`](linked-updates.md) 列出必須同步更新或已檢查的相關文件；若無需連動更新，寫明原因。
+- 若 lesson 來自 project incident，列出已依 [`reusable-guidance-boundary.md`](reusable-guidance-boundary.md) 檢查：skill 只保留 generalized lesson，具體證據留 project docs。
 ```
 
 ## 同步與索引

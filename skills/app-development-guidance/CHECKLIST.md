@@ -21,6 +21,7 @@ When a checklist item changes because of a new control or implementation pattern
 - The change is classified as new requirement, bug fix, refactor, hardening, or documentation-only.
 - New requirements update planning docs, BDD, affected contracts, implementation slices, and test plan before code starts.
 - Bug fixes document expected vs actual behavior, reproduction/evidence, affected BDD scenario or missing scenario, impacted contracts/errors, and regression test plan.
+- Bug fixes that change **observable** behavior update affected contracts, BDD/traceability, and integration or live-test notes **in the same work session** as the code fix (not only after merge); deferral requires an explicit tracked follow-up, not silent drift.
 - Refactors are confirmed to have no behavior or public contract change; otherwise they are reclassified.
 - Blocker questions are answered, backed by evidence, or explicitly scoped out before implementation.
 
@@ -75,6 +76,14 @@ When a checklist item changes because of a new control or implementation pattern
 - OpenAPI/schema/API contract changes regenerate typed clients, SDKs, mocks, fixtures, or schema packages.
 - Vendor integration docs separate raw vendor sources from sanitized integration excerpts, fixtures, live-test gates, and secret handling.
 - Tooling/extension rule catalogs map stable IDs to diagnostics/commands, fixtures, tests, and explicit non-enforceable entries.
+
+## Reusable Guidance Boundary
+
+- Apply the global rule in [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md).
+- Reusable skill guidance states the generalized failure mode, decision rule, owner layer, and validation method.
+- Project names, local paths, hosts, endpoint strings, payload fragments, sample IDs, class names, live-data quirks, and execution results stay in the project repository, not the reusable skill.
+- Incident-derived lessons are split: generalized method in the skill; concrete reproduction evidence and BDD/test file names in project docs.
+- After editing this skill, search the changed skill folder for project-specific strings and remove or relocate any matches.
 
 ## Embedded / Hardware Product Review
 

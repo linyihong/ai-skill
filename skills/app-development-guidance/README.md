@@ -16,7 +16,7 @@ Capture practical guidance for:
 - Embedded, firmware, sensor, protocol, and hardware context development flow.
 - Product brief to contract-first development flow.
 - Product Brief validation before implementation: goals, users, scope, non-goals, assumptions, success criteria, constraints, dependencies, risks, and blocker questions.
-- Implemented-first project governance: document precedence, traceability, BDD closure, and minimum doc-sync matrices.
+- Implemented-first project governance: document precedence, traceability, BDD closure, minimum doc-sync matrices, and **same-session closure** when code changes observable behavior (see `WORKFLOW.md`, `CHECKLIST.md`).
 - Change intake before code: classify new requirements, bug fixes, refactors, hardening, and docs-only work from planning artifacts.
 - Test strategy that separates legacy regression protection from new-code validation with BDD/TDD, changed-code coverage, mutation/property/contract/database tests, and human review.
 - OpenAPI/schema/codegen flows for typed clients, SDKs, mocks, fixtures, and provider/consumer tests.
@@ -43,12 +43,14 @@ Capture practical guidance for:
 - High-level controls that can be implemented by app, API, backend, or release engineering teams.
 - Checklists that help prevent repeat mistakes.
 - Guidance that clearly names validation steps and limitations.
+- Generalized incident lessons that explain the reusable cause, decision rule, and validation method without preserving the triggering project's concrete details; follow [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md).
 
 ## What Does Not Belong Here
 
 - Target-specific API hosts, endpoints, tokens, device identifiers, or private response schemas.
 - Raw request/response data.
 - One-off product conclusions that do not generalize.
+- Project names, module names, local paths, sample IDs, class names, live environment quirks, execution results, or BDD/test file names from a single incident.
 - Advice that relies only on client-side secrecy.
 
 ## Files
@@ -80,6 +82,7 @@ When adding new guidance:
 5. Put development process and contract-first flow guidance in [`process/`](process/).
 6. Put repeatable review steps in [`checklists/`](checklists/).
 7. Put draft reusable lessons in the matching [`feedback_history/<category>/`](feedback_history/) folder before promoting them into the structured folders; use `feedback_history/common/` for cross-cutting lessons.
+8. When the source is a project incident, split the generalized method into this skill and keep concrete reproduction evidence in the project repository, per [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md).
 
 For existing implemented projects, use [`process/`](process/) to audit and backfill missing documents. Product Brief gaps can remain `unknown`; BDD behavior must be completed from observable behavior and implementation evidence.
 

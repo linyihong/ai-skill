@@ -18,6 +18,7 @@
 | 改動位置 | 必須同步更新或檢查 |
 | --- | --- |
 | `shared-rules/README.md` 或新增 shared rule | 根 `README.md`、相關 skill 的入口說明、`feedback_history` 模板引用。 |
+| `shared-rules/reusable-guidance-boundary.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/feedback-lessons.md`、`shared-rules/sanitization.md`、`shared-rules/goal-action-validation.md`、相關 skill 的 `SKILL.md` / `README.md` / `DOCUMENTATION.md` / `CHECKLIST.md`，以及已新增 lesson 的 promotion target 與 index。 |
 | `shared-rules/dependency-reading.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`.cursor/rules/` 的 always-apply agent rule、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的 `SKILL.md` 入口與根 `README.md`。 |
 | `shared-rules/neutral-language.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/feedback-lessons.md`、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的 `SKILL.md` 入口與根 `README.md`。 |
 | `shared-rules/goal-action-validation.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/feedback-lessons.md`、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的 `SKILL.md` 入口與根 `README.md`；若某 skill 有 `DOCUMENTATION.md` 或 `WORKFLOW.md` 的輸出格式，也需同步更新或明確檢查。 |
@@ -36,6 +37,17 @@
 | 修改 `app-development-guidance/implementation/backend/contract-codegen.md` 或 `vendor-integration.md` | `platforms/backend/api.md`、`checklists/api-security-review.md`、`process/README.md`、`WORKFLOW.md`、`CHECKLIST.md`、相關 `controls/`。 |
 | 修改 `app-development-guidance/implementation/tooling/` | `process/README.md`、`WORKFLOW.md`、`CHECKLIST.md`、`checklists/contract-governance-review.md`、`templates/initial-development-docs.md`。 |
 | 修改 `app-development-guidance` 的 implemented-first governance / traceability / BDD closure 規則 | `process/README.md`、`WORKFLOW.md`、`CHECKLIST.md`、`checklists/contract-governance-review.md`、`templates/initial-development-docs.md`、`SKILL.md`。 |
+
+## 閉環不完整時的強制補救
+
+若使用者或 review 指出「更新閉環不完整」，agent 必須先分析漏掉的原因，再補規則與連動更新。常見原因與補救：
+
+| 漏洞原因 | 必須補強 |
+| --- | --- |
+| 只修改了單一 skill / 單一檔案，沒有判斷是否屬於全庫規則 | 依 [`reusable-guidance-boundary.md`](reusable-guidance-boundary.md) 與本檔判斷正確層級；若是全庫行為，補 `shared-rules/`。 |
+| 新增 lesson 後沒有推廣到 promotion target 或 checklist | 回到 lesson 的 **Promotion Target** / **Required Linked Updates**，逐一更新或明確寫不適用理由。 |
+| 寫完 reusable docs 後沒有搜尋專案特例殘留 | 搜尋 skill/shared docs 中的 project name、host、endpoint、payload、class/test 名稱、sample ID、本機路徑等，移回 project docs。 |
+| 只描述「改了什麼」，沒有描述「為什麼會漏」與「如何防止重犯」 | 補原因分析、決策規則、驗證步驟，並依 [`goal-action-validation.md`](goal-action-validation.md) 寫明目標、執行、驗證。 |
 
 ## 語氣規則
 

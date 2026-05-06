@@ -27,6 +27,7 @@
 | 制定計畫 | 說明計畫目標、依據、風險、完成後如何驗證。 |
 | 回答「是否需要改」 | 說明判斷目標、檢查了哪些文件/證據、為什麼足夠或不足。 |
 | 新增 feedback lesson 或 shared rule | 說明要沉澱的目標、推廣到哪些文件、連動更新與驗證。 |
+| 使用者指出閉環不完整 | 說明漏掉的原因、已補強的 shared/skill 規則、連動更新清單，以及如何驗證不會再只修局部。 |
 
 ## 建議輸出形狀
 
@@ -68,12 +69,14 @@
 - 不要把參考來源寫成空泛的「依經驗」；至少列出文件、程式碼、規格、證據或使用者條件。
 - 不要為了滿足格式而產生冗長流水帳；重點是每個可見結論都能被反查。
 - 若驗證失敗，應回到目標與執行重新修正，直到驗證通過、被明確標為 blocker，或被使用者決定 scope out。
+- 若 reusable guidance 更新被指出混入 project incident 或漏做 linked updates，不可只修文字；必須依 [`reusable-guidance-boundary.md`](reusable-guidance-boundary.md) 分析原因並補強規則層。
 
 ## 與其他規則的關係
 
 - 去敏與敏感資料處理依 [`sanitization.md`](sanitization.md)。
 - 文件用語依 [`neutral-language.md`](neutral-language.md)。
 - 文件放置位置依 [`content-layering.md`](content-layering.md)。
+- 可重用規則與專案證據邊界依 [`reusable-guidance-boundary.md`](reusable-guidance-boundary.md)。
 - 連動更新依 [`linked-updates.md`](linked-updates.md)。
 
 ← [回到共用規則索引](README.md)

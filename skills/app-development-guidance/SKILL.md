@@ -7,7 +7,7 @@ description: Convert authorized app, API, embedded, firmware, and hardware-produ
 
 Use this skill when APK analysis, app/API review, embedded/firmware review, or product development work reveals a reusable lesson that can improve future apps or hardware-backed products. The goal is to translate observed behavior, attack paths, failure modes, implementation tricks, hardware constraints, and protocol contracts into practical development requirements, buildable patterns, checklists, and validation tests.
 
-**Shared policy:** read [`shared-rules` index](../../shared-rules/README.md), [`dependency-reading.md`](../../shared-rules/dependency-reading.md), [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md), apply [`neutral-language.md`](../../shared-rules/neutral-language.md) when naming or summarizing docs, and apply [`goal-action-validation.md`](../../shared-rules/goal-action-validation.md) so important conclusions include a goal, action, validation, or reference source. If this skill or a related rule/template/lesson has changed, read the dependent docs before concluding, and close the Ai-skill writeback transaction before returning to project work. Lessons in `feedback_history/` should reference those files, not duplicate shared rules.
+**Shared policy:** read [`shared-rules` index](../../shared-rules/README.md), [`dependency-reading.md`](../../shared-rules/dependency-reading.md), [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md), [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md), apply [`neutral-language.md`](../../shared-rules/neutral-language.md) when naming or summarizing docs, and apply [`goal-action-validation.md`](../../shared-rules/goal-action-validation.md) so important conclusions include a goal, action, validation, or reference source. If this skill or a related rule/template/lesson has changed, read the dependent docs before concluding, and close the Ai-skill writeback transaction before returning to project work. Lessons in `feedback_history/` should reference those files, not duplicate shared rules.
 
 **Cross-skill references:** follow [`cross-skill-references.md`](../../shared-rules/cross-skill-references.md). When another skill hands off sanitized analysis artifacts, this skill consumes the development-relevant contract, risk, validation, and open-question details without copying the source skill's analysis workflow.
 
@@ -42,7 +42,7 @@ Use this skill when APK analysis, app/API review, embedded/firmware review, or p
 2. Before code changes, inspect and validate the project's 企劃書, product brief, planning docs, issue, ticket, PRD, design note, BDD, API contract, or equivalent artifact. Major Product Brief claims must be marked `validated`, `assumption`, `open question`, `scoped out`, or `invalidated` before they drive implementation.
 3. Classify the request as new requirement, bug fix, refactor, hardening, or documentation-only.
 4. If it is a new requirement or behavior change, update or create planning docs first: change brief, BDD scenarios, impacted Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests. For embedded/hardware work, also update datasheet/protocol references, hardware context, driver/service/application ownership, fixture or hardware-in-loop validation, and bring-up notes. Do not start code until blocker questions are resolved.
-5. If it is a bug fix, confirm expected vs actual behavior, reproduction/evidence, affected or missing BDD scenario, impacted contract/error handling, and regression test plan before code.
+5. If it is a bug fix, confirm expected vs actual behavior, reproduction/evidence, affected or missing BDD scenario, impacted contract/error handling, and regression test plan before code. **After code**, if the fix changes **observable** behavior (including integration-visible semantics), update owning contracts, BDD, and project Linked Updates **in the same work session** before declaring the task complete—green tests alone are not sufficient Definition of Done when durable docs still describe the old behavior. See [WORKFLOW.md](WORKFLOW.md) § *Same-session closure*.
 6. Define the test strategy before production code: distinguish existing-regression coverage from changed/new-code validation; prefer BDD first, then failing unit/contract/property/integration tests for new behavior before implementation.
 7. If starting from a product brief, use [`process/`](process/) to draft or discuss the initial development docs: Product Brief validation, Bounded Contexts, BDD behavior, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests.
 8. If opening this skill on an existing implemented project, audit missing documents and backfill them. Missing Product Brief fields may be marked `unknown` / `open question`, but BDD behavior must be completed from UI, API, code, tests, logs, fixtures, or observed behavior. Recover document precedence, traceability, BDD validation status, generated-client flow, vendor excerpts, and canceled/out-of-scope decisions.
@@ -70,7 +70,9 @@ Use this skill when APK analysis, app/API review, embedded/firmware review, or p
 
 ## Default Workflow
 
-Read [WORKFLOW.md](WORKFLOW.md) to translate analysis evidence into development requirements and implementation guidance.
+Read [WORKFLOW.md](WORKFLOW.md) to translate analysis evidence into development requirements and implementation guidance. For repositories that use Gherkin or another public behavior spec, follow the **Docs-first BDD closure loop** in [WORKFLOW.md](WORKFLOW.md) § *Docs-first BDD closure loop* and the project's own governance docs so contracts, behavior specs, executable tests, and code move in the same batch.
+
+**SDK defect closure (production-facing):** When someone reports a suspected bug in **SDK behavior** against a production-like host or vendor service, do **not** stop at narrative analysis. Follow [WORKFLOW.md](WORKFLOW.md) § *SDK defect closure loop*: reproduce through the SDK's supported public surfaces, record the outcome in the project's integration-test notes or equivalent traceability artifact, then—if the behavior is confirmed or must be pinned—add behavior specs, executable tests, and regression coverage in the **same work batch**. This closes the loop between field reports and durable specs without embedding project-specific incidents in this reusable skill.
 
 Use [`process/`](process/) when starting from a product brief, planning a feature from BDD through Domain Model, Architecture, API / Interface, Error Handling, implementation, and tests, or backfilling missing documents for an existing implemented project.
 
@@ -105,6 +107,7 @@ When producing development guidance, include:
 - Implementation path or linked implementation doc, when applicable.
 - Validation method.
 - Required linked updates, if the change affects multiple folders.
+- **Same-session closure:** list which contracts/BDD/integration notes were updated (or explicitly deferred with tracker) when behavior changed.
 - What not to overclaim.
 
 ## Feedback Loop
@@ -115,7 +118,9 @@ If a reusable app development lesson emerges:
 2. Generalize the lesson so it is not tied to one APK or company.
 3. Include evidence and validation criteria, but redact secrets and target-specific details.
 4. Promote validated guidance into `controls/`, `platforms/`, `languages/`, `implementation/`, `checklists/`, `WORKFLOW.md`, `CHECKLIST.md`, or `DOCUMENTATION.md` as appropriate.
-5. If the promotion creates linked updates, those updates are mandatory; do not leave related docs stale.
+5. If the lesson came from a project incident, follow [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md): keep project names, local paths, endpoints, payload fragments, sample IDs, class names, live environment quirks, execution results, and BDD/test file names in the project repository; the skill should contain only the generalized rule and validation method.
+6. After editing skill documentation, search the skill folder for project-specific strings and relocate any matches before finishing.
+7. If the promotion creates linked updates, those updates are mandatory; do not leave related docs stale.
 
 **Cross-skill link:** if the lesson came from APK analysis, keep analysis mechanics in [`apk-analysis`](../apk-analysis/) and put development guidance, implementation patterns, and validation checklists here.
 

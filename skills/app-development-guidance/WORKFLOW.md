@@ -11,7 +11,7 @@ Record the reusable observation:
 - Which layer exposed it: client code, transport, API contract, storage, logs, build config, firmware, hardware context, protocol, or runtime behavior?
 - Is the issue confirmed, suspected, or only a risk pattern?
 
-Do not copy target-specific endpoints, tokens, secrets, device IDs, or raw user data into this skill.
+Do not copy target-specific endpoints, tokens, secrets, device IDs, raw user data, or project incident details into this skill. Apply [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md) before promoting observations into reusable guidance.
 
 Before code work, run change intake:
 
@@ -28,6 +28,48 @@ Before code work, run change intake:
 If no planning artifact exists and the request changes behavior, create a lightweight change brief and ask blocker questions before implementation.
 
 If the product brief exists but has unvalidated claims that affect behavior, contracts, risks, tests, ownership, schedule, or release gates, treat those claims as blockers before implementation. For pure planning answers, cite the reference source or reasoning boundary instead of pretending the brief is validated.
+
+### Docs-first BDD closure loop
+
+When working in a repository where behavior is governed by human-readable specs plus executable tests, keep the artifacts synchronized before changing observable behavior:
+
+| Step | Action |
+| --- | --- |
+| 1 | Update the **owning contract** (architecture, API/interface, domain model, error handling, product brief, or equivalent) and resolve or label open questions before code. |
+| 2 | Add or edit the **human-readable behavior spec** in the project's designated location. |
+| 3 | Mirror the same scenarios in the project's **executable behavior tests**; keep written scenarios and runnable checks in lockstep. |
+| 4 | Implement step definitions, adapters, fixtures, and production code. |
+| 5 | **Definition of done:** the aggregate executable behavior suite or equivalent verification passes in the same change, and any status tables or traceability docs are updated. |
+
+Do not merge observable behavior or shared-contract changes with **only** unit tests and no behavior-spec alignment unless the team has explicitly scoped the missing spec work in a traceable change record.
+
+For project-specific paths, test runners, and status tables, use the application repository's own governance docs; do not copy those details into this reusable skill.
+
+### SDK defect closure loop (live reproduction + BDD regression)
+
+Use this when a report concerns **SDK-observable behavior** against a production-like environment or vendor service. Goal: **verify with the same code paths integrators use**, then **lock the generalized behavior** in docs and tests—not only chat conclusions or one-off debugging notes.
+
+| Step | Action |
+| --- | --- |
+| 1 | **Reproduce** using the application's live or integration-test harness, calling **supported SDK public surfaces only**; do not inject captured authorization material or hand-built HTTP outside the SDK unless the project explicitly defines that as the surface under test. |
+| 2 | **Record** pass/fail, instability, environment constraints, and sanitized failure class in the project's integration-test notes or equivalent traceability artifact. Capture the cause category, not private host names, tokens, user data, or one-off sample IDs. |
+| 3 | If behavior is wrong or must be documented as contract: update the project's human-readable behavior spec, mirror executable behavior tests, and add or extend fixture-backed and/or live regression coverage. |
+| 4 | Apply **same-session closure**: owning contracts and Linked updates move with code/docs in one batch. |
+
+Stable composition, mapping, decoding, and error semantics usually belong in **fixture-backed behavior tests**; remote service availability and edge protection may remain **live-only** with documented flakiness and fallback validation.
+
+### Same-session closure (code + durable docs)
+
+Implementation work often stalls after **tests pass**. That leaves contracts, BDD, and integration notes describing obsolete behavior—especially when the task was framed as “fix the bug” or “adjust the SDK” without mentioning documentation.
+
+| Root cause | Mitigation |
+| --- | --- |
+| Task framed as code-only | Classify the change anyway; if **observable** behavior changed, linked specs must move in the **same batch** as production code. |
+| User message omitted “update docs” | Skill still applies: bug fixes that change semantics **are** behavior changes for governance purposes. |
+| Definition of Done = green CI | Expand DoD: owning contract/BDD rows updated, or an explicit **scoped** docs debt ticket ID recorded in the change brief. |
+| Project Linked Updates live only in repo README | Follow that matrix when touching the listed surfaces; agents should read it when editing those packages. |
+
+**Before marking complete:** verify durable artifacts match the new runtime truth—at minimum the project’s Architecture/API/Error/Test contracts that apply, Gherkin or executable specs for affected flows, and live-test or integration notes when public semantics shift.
 
 Then define the test strategy:
 
