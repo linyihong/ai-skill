@@ -45,7 +45,9 @@ UI evidence package validation rule：每個 screenshot / hierarchy 用於 UI-to
 
 Checkpoint replay runner rule：同一 feature/page 需要反覆測 Frida、media、tab sweep 或 reset baseline 時，將已確認路徑固化成 replay script，並為 `launch`、目標 tab、列表、詳情、媒體區等節點提供 `--target` / checkpoint 停點。每個 checkpoint 都應截圖、dump XML、驗證 target package；如果跑歪，先修 selector、fallback coordinate、wait 或 scroll，再把後續 capture 當證據。
 
-文件中要把 API 標為 `startup/preload`、`navigation`、`feature-triggered`、`cache-hydration` 或 `background/ambiguous`，避免把啟動期或預載 request 誤判成當前點擊觸發。
+Post-reset window split rule：`clear app data` / reinstall 後同時需要 session recovery 與 feature API attribution 時，優先拆成「reset + startup/session recovery」與「已驗證導航後 attach feature hooks」兩個 capture window。若 Frida-from-launch 的長窗口導致外部 App、錯頁、公告、更新、WebView 或 timing drift，不要把 feature 操作硬接在同一窗口；先用 package / feature-context guard 證明 session recovery 成功，再從目標 feature checkpoint attach 低負載 hook 取得 feature API 證據。
+
+文件中要把 API 標為 `startup/preload`、`session-recovery`、`navigation`、`feature-triggered`、`cache-hydration` 或 `background/ambiguous`，避免把啟動期或預載 request 誤判成當前點擊觸發。
 
 ## 1. 先判斷流量在哪一層
 
@@ -113,17 +115,17 @@ native backtrace 落在哪裡？
 如果 evidence 指向 Flutter：
 
 1. 解 APK，確認 `lib/<arch>/libapp.so` 與 `libflutter.so`。
-2. 用 Dart AOT 分析工具產生 pseudo source、object pool、function offsets。
+2. 用 Dart AOT 分析工具產生 pseudo source、object pool、function offsets；若 `blutter` 識別 snapshot 後 SIGSEGV，改用 `unflutter` 等 static parser 先拿 function map／call edges／string refs。
 3. 搜尋：
    - host / base URL。
    - `Dio`、`HttpClient`、`RequestOptions`、`Interceptor`。
    - `encrypt`、`decrypt`、`AES`、`base64`、`hash`、`ResponseInterceptor`。
-   - 自訂 header 名稱、`sign metadata`、`sign result`、`package:<app>/...interceptor...dart` 與 `_generate...@<hash>` 類函式名。
-4. 用 Frida hook request options。
+4. 用 Frida hook request options；若已取得 AOT function PC，可用 `libapp.so` base + PC 對少量 `RequestInterceptor`／sign／encrypt/decrypt 函式做 native offset hook。`call_edges` 裡 caller 內部的 `BL` 位址只當導航線索，不要預設可直接 `Interceptor.attach()`。
 5. 用 Frida hook response decode/decrypt return value。
-6. 把 raw wrapper + decrypted payload 對齊成 fixture。
+6. 若 Dart String decoder 失敗，先在私有 capture 限量 hexdump 物件推導 layout（例如 OneByteString raw length/data offset），修好後關閉 hexdump。
+7. 把 raw wrapper + decrypted payload 對齊成 fixture。
 
-Dart AOT offset hook 注意：dump 檔名尾碼不一定是函式 entry offset。建立 `base.add(offset)` hook 前，先讀 asm 第一行的完整函式地址，並用 runtime probe 確認該地址落在 executable range、bytes 與 prologue 對齊；若 `Interceptor.attach` 失敗且地址落在 `r--`，先修正 offset / load bias，不要先 debug 參數解析。
+避免把全域 Dart runtime/collection helper（例如 `LinkedHashMap._set`、常見 string helper）當第一個 hook 點；這些 helper 高頻且噪音大，可能讓 App 卡頓或提前結束。若一定要觀察內部 helper，先用短窗、嚴格 filter，或改用 Stalker／更高語意邊界驗證。
 
 若 local proxy/Netty hook 已看到自訂加密／簽名 header，但同窗 Java plugin/helper hook（例如 AES/RC2/getNMKey/query map）沒有命中，應把 Java plugin 視為橋接或設定層，轉向 `libapp.so` Dart AOT interceptor 字串、object pool xref、blutter/offset hook；不要在 Java helper 層無限加 hook。
 
@@ -186,9 +188,11 @@ response decode hook:
 2. 記錄輸入格式：base64、prefix/salt、ciphertext、version field。
 3. 記錄演算法：KDF、AES mode、padding、MAC、compression。
 4. 用 hook 取得 decrypted output。
-5. 寫離線 decoder。
-6. 建立 raw encrypted -> decrypted fixture。
-7. 用 fixture 驗證 SDK/client mapping。
+5. 若 decrypt return 是 wrapper / Future / Map 而非可直接讀的 String，改 hook `jsonDecode`、`JsonDecoder.convert` 或 app 的 parse/decode helper，先輸出 schema-only 摘要（length/hash/top-level keys/types，不印 values）。
+   - 同時記錄 request/decrypt/json 的 sequence/timestamp；`jsonDecode` 若出現在第一個業務 request 前，先標成 local/cache/startup schema，不要寫成 API response。
+6. 寫離線 decoder。
+7. 建立 raw encrypted -> decrypted fixture。
+8. 用 fixture 驗證 SDK/client mapping。
 
 離線化完成後，後續不應每次依賴 Frida 才能跑測試。
 
@@ -231,7 +235,7 @@ HLS `#EXT-X-KEY` URI 不一定就是最終 segment 解密 key。若用 playlist 
 一次分析可以收斂時，應具備：
 
 - 清楚知道核心流量走哪個 stack。
-- 若使用者要求完整 app-start-to-feature 流程，已記錄 reset/cache/session baseline，並把 reset、startup、navigation、feature API windows 分開回填。
+- 若使用者要求完整 app-start-to-feature 流程，已記錄 reset/cache/session baseline，並把 reset、startup/session-recovery、navigation、feature API windows 分開回填。
 - 有 request metadata 或已證明拿不到的原因。
 - 有 response outer shape。
 - 若有加密，有解碼點或下一步定位計畫。
