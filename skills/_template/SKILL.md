@@ -5,7 +5,7 @@ description: <英文：Agent 如何辨識何時套用此 skill。寫觸發情境
 
 # <Skill 標題（可中英並列）>
 
-**共用政策：**先讀 [`shared-rules` 索引](../../shared-rules/README.md)、[`feedback-lessons.md`](../../shared-rules/feedback-lessons.md)、[`neutral-language.md`](../../shared-rules/neutral-language.md)、[`goal-action-validation.md`](../../shared-rules/goal-action-validation.md)、[`document-sizing.md`](../../shared-rules/document-sizing.md) 與 [`cross-skill-references.md`](../../shared-rules/cross-skill-references.md)。`feedback_history/` 內各 lesson 只引用、不重複貼全文；文件標題、檔名、slug、索引與摘要使用中性低爭議用語；每個重要工作單元要能反查目標、執行、驗證或參考來源；文件變大時改成資料夾與 `README.md` 目錄拆分。若本 skill 需要引用另一個 skill 的規範、模板或交接產物，只寫觸發條件、交接 artifact 與 ownership boundary，不複製對方全文。
+**共用政策：**先讀 [`shared-rules` 索引](../../shared-rules/README.md)、[`dependency-reading.md`](../../shared-rules/dependency-reading.md)、[`feedback-lessons.md`](../../shared-rules/feedback-lessons.md)、[`neutral-language.md`](../../shared-rules/neutral-language.md)、[`goal-action-validation.md`](../../shared-rules/goal-action-validation.md)、[`document-sizing.md`](../../shared-rules/document-sizing.md) 與 [`cross-skill-references.md`](../../shared-rules/cross-skill-references.md)。`feedback_history/` 內各 lesson 只引用、不重複貼全文；發現 skill/rule/template/lesson 更新時先讀依賴文件；文件標題、檔名、slug、索引與摘要使用中性低爭議用語；每個重要工作單元要能反查目標、執行、驗證或參考來源；文件變大時改成資料夾與 `README.md` 目錄拆分。若本 skill 需要引用另一個 skill 的規範、模板或交接產物，只寫觸發條件、交接 artifact 與 ownership boundary，不複製對方全文。
 
 ## 何時使用本 skill
 

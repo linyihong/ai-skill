@@ -1,0 +1,13 @@
+---
+description: Require agents to read dependent Ai-skill docs when skills or rules change
+alwaysApply: true
+---
+
+# Dependency Reading
+
+- When working in this repository, first treat `shared-rules/README.md` as the index, not the full rule text.
+- If a skill, shared rule, Cursor rule, template, or feedback lesson has changed, will be changed, or affects the task, read the relevant dependent files before concluding or editing.
+- Always include `shared-rules/` in that dependency read, especially `shared-rules/dependency-reading.md` and `shared-rules/linked-updates.md`.
+- For skill changes, read the skill entry plus related README, workflow, documentation, checklist, templates, feedback indexes, and linked shared rules when they exist.
+- If a dependent file does not exist, mark it as not applicable; do not claim it was checked.
+- Before finishing, state the dependency read and validation method: diff review, lints, link check, required linked updates, and bundle sync when relevant.
