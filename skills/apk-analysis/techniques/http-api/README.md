@@ -10,6 +10,8 @@ Use this category when the current task is to document, replay, validate, or map
 
 ## Core Output
 
+For API-list or API-reference tasks, create or update a project-level API Catalog instead of leaving endpoints only in logs, chat, or one flat table. A good catalog has a total API entry, grouped indexes, per-operation detail files, coverage/gap status, UI/API mapping, SDK/client field usage, evidence, and validation.
+
 For each HTTP API, write project documentation that includes:
 
 - Method and path shape.
@@ -23,6 +25,20 @@ For each HTTP API, write project documentation that includes:
 - Evidence and validation: hook/MITM/pcap/replay/fixture, plus UI path or screenshot only when it helps attribution.
 
 Screenshots can support UI trigger attribution, but they do not replace HTTP header/request/response field analysis.
+
+## API Catalog Shape
+
+Use the project naming convention, but keep these artifacts explicit:
+
+| Artifact | Required content |
+| --- | --- |
+| API entry | Hosts/base URLs, traffic families, wrapper/decode rules, shared headers, links to coverage, UI map, SDK/client notes, and grouped indexes. |
+| Group index | API grouped by path prefix, domain, feature, or protocol family; each row links to per-API detail. |
+| Per-API detail | Request, response, field meaning, behavior, evidence, validation, open questions. |
+| Coverage / gap matrix | Static candidates, observed APIs, replayed APIs, decoded APIs, UI-bound APIs, tested APIs, missing parameters, untriggered flows, scope-out decisions. |
+| SDK/client mapping | Fields actually consumed, compatibility expectations, raw JSON strategy, fixtures/tests. |
+
+If a high-value endpoint has only a row in a table, create a per-API detail skeleton and mark missing sections as `needs capture`, `needs replay`, `meaning unknown`, or `low confidence`.
 
 ## API Documentation Flow
 
@@ -39,10 +55,23 @@ When an API has been observed or decoded, do not stop at the endpoint name. Docu
 | Inner payload | Field type, meaning, nullability, list item shape, media/source fields, derived values. |
 | Functional contract | Candidate domain concepts, commands/events, state impact, empty/error behavior, pagination/cache semantics, and open questions. |
 | Validation | Replay, fixture, contract test, or hook/pcap/MITM sequence proving request/response alignment. |
+| Catalog status | grouped, per-API detail exists, coverage status, SDK/client mapping status when relevant. |
 
 If UI binding is not done yet, write `UI path: unknown` and `Trigger confidence: low`; later use screenshots and operation windows to raise confidence.
 
 When the goal is to rebuild a feature, API docs should be ready for [`app-development-guidance`](../../../app-development-guidance/) to turn into BDD, Domain Model Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests. Mark uncertain field meaning or domain vocabulary as `candidate` instead of inventing final product language.
+
+## API Catalog Finish Gate
+
+Before reporting an API-list task complete, check:
+
+- Every observed or decoded API is in a group index or a coverage/gap file.
+- High-value APIs have per-operation detail, not only method/path rows.
+- Each per-operation detail includes request fields, response fields, field meaning, evidence, validation, and open questions.
+- Shared headers, wrapper/decode behavior, auth/session, and sensitivity rules are documented once and linked from API details.
+- UI/API mapping records operation id, capture window, trigger confidence, and startup/preload/background status.
+- SDK/client/tool usage records consumed fields and fixture/test status when the API is used for implementation.
+- Unverified APIs are explicitly marked `candidate`, `needs capture`, `needs replay`, `meaning unknown`, `low confidence`, `out of scope`, or `not observed`.
 
 ## UI Automation For API Capture
 

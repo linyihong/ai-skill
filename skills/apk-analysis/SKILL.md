@@ -46,6 +46,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
 7. Convert dynamic results into durable assets:
    - UI architecture map and operation-to-API matrix.
    - Redacted HTTP/API docs with headers, request fields, response fields, and per-field meaning/type notes.
+   - **API Catalog / API list finish gate:** when the task needs an API reference, SDK/client input, mock API, contract test, or rebuildable feature, create or update a project-level API Catalog with total API entry, grouped indexes, per-API detail files, coverage/gap status, UI/API mapping, SDK/client field usage, evidence, validation, and open questions. Do not leave confirmed APIs only in schema catalogs, correlation tables, hook logs, or chat.
    - Feature reconstruction handoff: capability, behavior scenarios, candidate domain concepts, API/interface contracts, state/error handling, data lifecycle, fixtures, and open questions.
    - **Feature handoff finish gate:** once a named feature/module is understood well enough to mark core flows `Confirmed` or to answer implementation-style questions, create or update a project-level feature handoff / architecture document in the same session. Do not leave the understanding only in API tables, hook logs, chat, or page maps.
    - Redacted request/response samples.

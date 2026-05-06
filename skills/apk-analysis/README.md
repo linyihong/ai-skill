@@ -17,6 +17,7 @@
 - 什麼時候用 pcap、MITM、Frida、靜態分析或 Dart AOT。
 - 如何找高語意 hook 點。
 - 如何把動態樣本變成離線 fixture、schema 與測試。
+- 如何把 API 整理成可維護的 API Catalog：總入口、分組索引、逐支 API 詳細文件、coverage/gap、UI 對照、SDK/client 欄位用途與驗證。
 - 如何撰寫可重現、可去敏、可回顧的分析文件。
 - 如何把 APK 觀察整理成可交給 `app-development-guidance` 的功能重建交接規格。
 - 新想法如何回饋到 skill，讓後續 agent 更強。
@@ -85,6 +86,7 @@
 - 動態 hook 只是過渡；最終要沉澱成離線解碼器、fixture、schema 與測試。
 - 文件要分離「方法」與「目標 App 的結論」。
 - 分析文件要保留足夠的功能語意，不只保存 endpoint；重要 API 要能回到 capability、operation、domain concept、state/error behavior 與 fixture。
+- API 列表不是只列 method/path；需要 API Catalog、分組、逐支 API 欄位語意、抓取來源、覆蓋率缺口、UI/API 對照與 SDK/client 欄位用途。
 - App 開發 guidance 要分離到 [`app-development-guidance`](../app-development-guidance/)，避免把分析方法與產品開發 checklist 混在一起。
 - 用 APK 分析文件產生工具、SDK、client、mock、contract test 或重建功能時，`app-development-guidance` 必須同輪接手開發文件與 blocker questions。
 - 新發現要回饋到 skill，但必須去敏、泛化、可驗證。
@@ -98,6 +100,7 @@
 - 證據：pcap、hook log、MITM export、反編譯搜尋結果或 sanitized excerpt。
 - 結論：哪些路徑有效、哪些被排除、下一步如何驗證。
 - 功能重建交接：capability、screen/route/operation、domain concept candidates、API/interface contract、state/error handling、data lifecycle、fixtures、open questions。
+- API Catalog：API 總入口、分組索引、逐支 API 詳細文件、coverage/gap、UI/API mapping、SDK/client 欄位用途與 validation/open questions。
 - 去敏規則：哪些值被遮蔽，哪些文件不能提交。
 - app-development-guidance handoff：若目標包含 app 工具、SDK、client 或重建功能，要記錄已啟用該 skill 與交接文件位置。
 - 可重用 lesson：新增檔於 **`feedback_history/<category>/`** 或 **`feedback_history/common/`**。

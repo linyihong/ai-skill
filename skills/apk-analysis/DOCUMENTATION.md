@@ -1,6 +1,6 @@
 # APK 分析文件寫法
 
-分析文件的目標是讓人和 AI 都能重現推理，而不是只留下最後答案。
+分析文件的目標是讓人和 AI 都能重現推理，而不是只留下最後答案。每個重要分析段落都要依 [`goal-action-validation.md`](../../shared-rules/goal-action-validation.md) 交代目標、執行、驗證；若是純判斷或暫時無法驗證，必須附參考來源、推論邊界與 open questions。
 
 ## 文件分層
 
@@ -30,6 +30,42 @@
 - 沒有目標 APK 證據的 fallback、相似產品慣例或推測流程。
 
 若 APK findings 要轉成開發建議，請放在清楚分離的 handoff / guidance / plan / SDK 文件，並標示為 derived guidance；APK 行為文件只保留證據、觀察、欄位語意與 `needs capture` / `needs replay` / `needs static confirmation` 等缺口狀態。
+
+## 詳細 API request / response 文件規範
+
+API 分析不能只停在 `schemas.md`、endpoint correlation 表、chat summary 或 feature handoff 的 API 欄位摘要。當某支 API / endpoint / service flow 已達 `Confirmed`，必須在同一輪建立或更新 project-level API list 文件，讓後續 agent 能直接查「這支 API 怎麼請求、回什麼、欄位做什麼」。
+
+建議結構：
+
+```text
+api/API列表.md
+api/API列表/README.md
+api/API列表/<group>/README.md
+api/API列表/<group>/<api-name>.md
+```
+
+若專案已有既定命名（例如 `docs/API列表/`），沿用專案既有位置；否則使用上述結構。
+
+每支 API 至少要留下：
+
+| 區塊 | 必填內容 |
+| --- | --- |
+| API 條目 | Method / path family、service/endpoint identifier（可用 hash/placeholder）、controller / hook、用途、confidence。 |
+| Request shape | path/query/body/header/signing material 的 key、型別/形貌、是否必要、欄位用途；敏感值只留欄位名與語意。 |
+| Sanitized request example | 可重放形狀或 placeholder JSON；不得包含 token、raw sign、device id、raw `service=` 或 private query value。 |
+| Response wrapper | raw wrapper 或 decrypted wrapper 的 top-level 欄位、狀態碼/訊息欄位、是否需解密。 |
+| Inner response schema | 業務 payload、陣列 item、巢狀 object 欄位、型別、用途、下游銜接。 |
+| Sanitized response example | 只用 placeholder value；若 raw value 是內容/個資/媒體 URL，寫 `<redacted>`。 |
+| Evidence | Frida log、pcap/MITM export、UI operation、fixture/replay output、schema/correlation 文件。 |
+| Gaps | `needs capture` / `Candidate` / `value redacted` / `field meaning unknown`。 |
+
+升格規則：
+
+- `Confirmed` API 不可只留在 `endpoint-correlation.md`；必須有單支 API 詳細文件或清楚的分組文件段落。
+- `Candidate+` 可以先建 skeleton，明確標示缺少 direct replay / feature hook / repeated sample。
+- 若協議只暴露 public gateway（例如 raw service name 不可公開），文件可用 `path family + serviceHash + request keys` 代表 endpoint；不要猜 raw service 名。
+- 若 response 只取得 schema shape，仍要寫 wrapper / item 欄位用途與缺口，不要編造完整 raw sample。
+- API list 要從 feature summary、UI map、operation map、schema catalog、endpoint correlation 互相連回。
 
 ## 功能重建交接規範
 
@@ -305,6 +341,75 @@ docs/UI架構地圖/<page-name>.md
 - API 關聯要寫 `Source`，例如 hook、pcap timing、MITM、replay；只靠 screenshot 不足以證明 API 來源。
 - 若某個 API 是 startup/preload/background sync，要在 `Notes` 標明，避免誤判為當前點擊觸發。
 - 若採 API-first，先在 API 文件標 `UI path: unknown` / `Trigger confidence: low`，等核心 API 穩定後再回填 UI binding。
+
+## API Catalog / API 列表規範
+
+當分析目標包含「整理 API 列表、SDK/client 對照、mock API、contract test、功能重建、或長期 API reference」時，不要只產出零散 endpoint 表格。專案文件應建立一組可維護的 API Catalog / API 列表，讓人和 agent 能從總入口找到分組、逐支 API、schema、抓取來源、UI 對照、覆蓋率與缺口。
+
+建議專案結構：
+
+```text
+docs/API.md                         # API / host / traffic family 總入口
+docs/API/<group>/README.md          # 依 path 第一段、domain、feature 或 protocol family 分組
+docs/API/<group>/<operation>.md      # 單支 API 詳細文件
+docs/API/coverage.md                # 已觀測、已 replay、已解密、待補與不適用清單
+docs/API/supplement/<topic>.md      # HLS、media、local bridge、SDK call order 等跨 API 主題
+```
+
+若專案已有等價命名，例如 `docs/API列表/`、`docs/api-reference/`、`docs/http/`，沿用既有命名即可；重點是結構與欄位完整，不是固定資料夾名稱。
+
+### Catalog minimum
+
+API Catalog 至少要包含：
+
+| Artifact | 必填內容 |
+| --- | --- |
+| API 總入口 | 已知 host/base、traffic family、response wrapper、auth/session/header 共用規則、解密/解碼入口、覆蓋率文件、UI map 入口、SDK/client 入口。 |
+| 分組索引 | 分組依據、每支 API 的 method/path、request 摘要、response 用途、目前用途/結論、詳細文件連結。 |
+| 單支 API 文件 | Method/path、host/base、auth/session、headers、query/path/body、response wrapper、inner payload、item schema、error/empty behavior、pagination/cache、field meaning、sensitivity、evidence、validation。 |
+| Coverage / gap matrix | 靜態枚舉、動態觀測、MITM、pcap、hook、replay、decrypted fixture、contract test、UI binding、缺參、未觸發、暫不測、scope out。 |
+| UI/API 對照 | UI map、route id、operation id、trigger confidence、capture window、startup/preload/background 標記。 |
+| SDK/client 欄位用途 | SDK/client 實際讀取或轉換的欄位、相容性範圍、raw JSON 保留策略、fixture/test 對照。 |
+| Cross-flow docs | 播放鏈、media chain、login/session、local bridge、vendor/service split、分頁與排序等跨多支 API 的流程。 |
+| Sanitization | 哪些值已遮蔽、哪些 raw evidence 留在受控位置、哪些文件可 commit。 |
+
+### Per-API detail requirements
+
+單支 API 文件不要只記 endpoint 名稱。每支 API 至少要能回答：
+
+| Area | Required detail |
+| --- | --- |
+| Identity | Method、host/base、path shape、operation id、分組、狀態：candidate / observed / replayed / decoded / validated / deprecated / out of scope。 |
+| Request | headers、path/query/body 欄位、型別/shape、用途、必填/選填、來源、敏感性、是否參與 signing/encryption。 |
+| Response | raw wrapper、decrypted/inner payload、list item schema、欄位型別、nullable/optional、欄位語意、derived-from、下游 API key。 |
+| Behavior | capability、UI trigger、startup/preload/background 判斷、state impact、empty/error behavior、pagination/cache/sort semantics。 |
+| Evidence | hook/MITM/pcap/replay/fixture/screenshot/UI hierarchy/automation script 的去敏引用。 |
+| Validation | replay result、decoder fixture、schema assertion、SDK/client test、contract test、manual evidence，或明確標 `needs capture` / `needs replay`。 |
+| Open questions | 缺少樣本、低信心 field meaning、未驗證 edge case、需要使用者或更多操作證據的 blocker。 |
+
+### Field meaning rule
+
+Schema 不只是型別表。欄位要盡量寫出用途：
+
+- 哪些欄位會成為下一支 API 的 request key。
+- 哪些欄位控制 UI 顯示、分頁停止、排序、播放、下載、收藏、權限或錯誤狀態。
+- 哪些欄位只是樣本中出現但用途未知，必須標 `meaning unknown` / `candidate`。
+- 哪些欄位是 SDK/client 已使用欄位，變動會破壞相容性。
+
+不要把推測寫成確認規格。若只有少量 live/replay 樣本，使用 `candidate`、`sample only`、`needs more samples` 或 `low confidence`。
+
+### Catalog completion gate
+
+當使用者問「API 列表是否完整」、「能不能做 SDK/client/mock」、「能不能重建功能」、「這個 module API 大概有哪些」時，完成回覆前要檢查：
+
+- API 總入口是否連到分組、coverage/gap、UI map、解碼/共用 wrapper、SDK/client 文件。
+- 已觀測 API 是否都落到分組索引；未落地的 endpoint 是否在 coverage/gap 裡標狀態。
+- 高價值 API 是否有單支詳細文件，而不是只在總表留一行。
+- 每支 API 是否有 request、response、field meaning、evidence、validation/open questions。
+- UI trigger 若未確認，是否標 `UI path: unknown` / `Trigger confidence: low`，而不是空白。
+- 若已用於 SDK/client/tool，是否寫明欄位用途與測試/fixture 對照。
+
+如果資料不足，也要建立 skeleton 與 gap 狀態；不要等完全確認才建立 API Catalog。
 
 ## API / Schema 文件模板
 

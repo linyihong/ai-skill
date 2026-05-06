@@ -228,6 +228,7 @@ native backtrace 落在哪裡？
 - 有 request metadata 或已證明拿不到的原因。
 - 有 response outer shape。
 - HTTP/API 文件已寫清 headers、request fields、response fields，且逐字段分析 type/meaning/required/source。
+- API 列表任務已建立或更新 API Catalog：總入口、分組索引、逐支 API 詳細文件、coverage/gap、UI/API 對照、SDK/client 欄位用途、evidence、validation 與 open questions。
 - 高價值 API 已標明 capability、operation id、domain concept candidates、state impact、error/empty behavior 與 fixture/test 需求，足以交給 [`app-development-guidance`](../app-development-guidance/) 草擬 BDD、Domain Model Contract、API / Interface Contract 與 Error Handling Contract。
 - 若使用者要把分析文件用於 app 工具、SDK、client、mock、fixture-driven implementation、contract test 或重建功能，已自動讀取並套用 [`app-development-guidance/SKILL.md`](../app-development-guidance/SKILL.md)，並把缺失需求交給該 skill 的 blocker question 流程。
 - 若有加密，有解碼點或下一步定位計畫。
