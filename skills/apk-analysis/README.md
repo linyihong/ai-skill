@@ -18,6 +18,7 @@
 - 如何找高語意 hook 點。
 - 如何把動態樣本變成離線 fixture、schema 與測試。
 - 如何把 API 整理成可維護的 API Catalog：總入口、分組索引、逐支 API 詳細文件、coverage/gap、UI 對照、SDK/client 欄位用途與驗證。
+- **如何把「能連線拿到真寫」的前提寫進專案：** Domain／執行環境基線（host family、session／opaque 參數、分頁真實語意、簽章／gateway 前置，皆去敏）與 API Catalog **互鏈**，見 `DOCUMENTATION.md` § Domain／執行環境基線。
 - 如何撰寫可重現、可去敏、可回顧的分析文件。
 - 如何把 APK 觀察整理成可交給 `app-development-guidance` 的功能重建交接規格。
 - 新想法如何回饋到 skill，讓後續 agent 更強。

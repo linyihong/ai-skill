@@ -46,6 +46,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
 7. Convert dynamic results into durable assets:
    - UI architecture map and operation-to-API matrix.
    - Redacted HTTP/API docs with headers, request fields, response fields, and per-field meaning/type notes.
+   - **Domain / runtime baseline（實取數據門檻）:** API 條目與 schema **不足以**讓 SDK、client 或回放工具自動連線。必須在**專案**內另有一份 **domain／執行環境基線**（見 [`DOCUMENTATION.md`](DOCUMENTATION.md) § *Domain／執行環境基線*）：host／path family 與環境維度（去敏占位）、TLS／代理／內嵌通道假設、**session／登入／裝置身分**對列表資料的依存、必填 **opaque query**（例如 session 標量）從哪些操作或 response 衍生、簽章或 gateway 前置條件（不留 secret）、分頁**地面真相**（明確旗標 vs 長度推斷）、限流／錯誤恢復、`service`/`serviceHash` 與公開端點的對應表（值可 placeholder）。並以表格 **連回** API Catalog 條目與 UI operation id。可新建 `docs/domain-baseline.md`、`api/domain-environment.md` 或附在現有 inventory；**不放進**可重用 skill 正文。
    - **API Catalog / API list finish gate:** when the task needs an API reference, SDK/client input, mock API, contract test, or rebuildable feature, create or update a project-level API Catalog with total API entry, grouped indexes, per-API detail files, coverage/gap status, UI/API mapping, SDK/client field usage, evidence, validation, and open questions. Do not leave confirmed APIs only in schema catalogs, correlation tables, hook logs, or chat.
    - Feature reconstruction handoff: capability, behavior scenarios, candidate domain concepts, API/interface contracts, state/error handling, data lifecycle, fixtures, and open questions.
    - **Feature handoff finish gate:** once a named feature/module is understood well enough to mark core flows `Confirmed` or to answer implementation-style questions, create or update a project-level feature handoff / architecture document in the same session. Do not leave the understanding only in API tables, hook logs, chat, or page maps.
@@ -104,6 +105,7 @@ When documenting a new finding, include:
 - Evidence file path or sanitized excerpt.
 - Feature/capability mapping and operation id when the finding supports functional reconstruction.
 - Page-level UI map path when the task targets a named page/tab/module and UI/API mapping was established.
+- **Domain／執行環境基線**更新點（若影響 host 族、session、opaque 欄位、分頁或簽章前置）：指向專案內 baseline 檔或小節錨點。
 - Generalized lesson.
 - Follow-up validation.
 

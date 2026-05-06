@@ -67,6 +67,37 @@ api/API列表/<group>/<api-name>.md
 - 若 response 只取得 schema shape，仍要寫 wrapper / item 欄位用途與缺口，不要編造完整 raw sample。
 - API list 要從 feature summary、UI map、operation map、schema catalog、endpoint correlation 互相連回。
 
+## Domain／執行環境基線（實取數據必備）
+
+**問題：**只做「逐支 API 的 request/response shape」時，外包裝/SDK 仍可無法連線：**不知道連哪個環境**、缺哪個 **opaque 參數**、列表是否**強依賴前置登入／裝置態**、分頁是**旗標**還是**推測**。這類資訊屬於 **domain／執行環境（runtime baseline）**，與 entity 級 **Domain Concepts**（feature handoff 表格）互補但層級不同。
+
+**規則：**
+
+| 規則 | 說明 |
+| --- | --- |
+| 存放位置 | 僅 **專案**內：`docs/domain-baseline.md`、`api/domain-environment.md`、或並入既有 `inventory.md`／`endpoint-correlation.md` 之 **獨立章節**（需可查表與_anchor） |
+| 與 skill 分界 | skill 不放目標 host、真 token、`service=` 明文；baseline 也用 **占位符**（`<api-host>`、`serviceHash`、欄位名） |
+| 與 API Catalog | 每條 baseline 列應 **連回** `API列表/<group>/<api>.md` 或條目 id；Catalog 內可互鏈「見 domain baseline §…」 |
+| 與 SDK handoff | 若下游要寫 `GossipHttpExchange`、device login、簽章 client，baseline 必須回答：**誰產生 opaque 參數**、**何時失效**、**最少重放路徑** |
+
+**建議章節（可依專案刪減）：**
+
+| 章節 | 內容（去敏） |
+| --- | --- |
+| 環境維度 | 觀察到的 host family、path family、是否多 CDN／多 gateway、與 build／地區是否相關（不寫內網祕密 host） |
+| 連線路徑 | App 是否走系統代理、內建 TUN、local proxy、直连；與 capture 工具相容性（影響重放） |
+| Session／身分 | 列表 API 是否在 **未登入** 下可用；若否，登入／裝置／device id 與列表欄位（如 `l`）的 **因果鏈**（引用 hook 或 UI 操作，不寫 secret） |
+| Opaque／衍生參數 | 哪些 query 由 **前序 response**、**WebView**、**搜尋 session** 或 **固定 app 常數** 提供；標 `confirmed` / `candidate` / `unknown` |
+| 簽章與 gateway | `service`／hash、header 名稱集合、canonical path 規則、是否與 body 排序有關（**不**寫演算法材料與 key） |
+| 分頁地面真相 | 是否有 `has_next` 類欄位；若無，記錄 **啟發式** 與反例風險 |
+| 錯誤與限流 | 影響重試的 code、冷卻、與 session 刷新關係 |
+| 重放檢查清單 | 人工或腳本重放同一列表的 **最小步驟**（reset 層級、operation id、期望觀察的 request keys） |
+
+**Finish gate（與 SDK／client／回放相關任務）：**
+
+- 若本輪目標包含「可程式化拉取真實資料」「接 SDK transport」「寫 integration test」之一，而專案尚無 baseline 或僅有 API 條目：必須在**同一工作單**建立 **skeleton baseline**，並把 **open** 項寫成可驗證問題（不可留空「待之後再說」而無追蹤列）。
+- baseline 與 feature handoff 的 **Domain Concepts** 應交叉引用：entity 級與 runtime 級不要混成同一張表而漏掉環境依存。
+
 ## 功能重建交接規範
 
 若分析目標是讓後續 agent 能用 [`app-development-guidance`](../app-development-guidance/) 重新做出同等功能，專案分析文件不能只列 endpoint。它必須把 UI 行為、資料模型、API 合約、狀態轉移、錯誤處理與驗證證據串成可交接規格。

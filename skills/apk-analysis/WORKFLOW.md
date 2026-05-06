@@ -241,4 +241,5 @@ HLS `#EXT-X-KEY` URI 不一定就是最終 segment 解密 key。若用 playlist 
 - 若有加密，有解碼點或下一步定位計畫。
 - 有去敏樣本或 fixture。
 - 有文件回填位置。
+- **若下游要程式化取數／接 SDK／寫 integration：** 專案內已有或可指向的 **Domain／執行環境基線**（`DOCUMENTATION.md` § Domain／執行環境基線）：環境維度、session 對列表參數的依存、opaque 參數由來、分頁地面真相、簽章／gateway 前置（均去敏），並連回 API Catalog 條目。缺則視為收口不完整，只可標 `baseline: skeleton` + 明示 open 項。
 - 有新的 reusable lesson 時，已在 **`feedback_history/`** 新增對應檔案（規則見 `shared-rules/feedback-lessons.md`）。

@@ -26,6 +26,12 @@ Use this checklist when a project has multiple planning, BDD, contract, implemen
 - Missing runner or step-definition work has an owner or alternative executable test type.
 - Manual-only scenarios have review or release-gate evidence.
 
+## Same-session sync (avoid implementation–documentation drift)
+
+- A coding task is not closed while tests pass but contracts or BDD still describe superseded behavior—unless docs were verified unchanged or deferral is explicitly recorded.
+- Bug fixes and refactors are explicitly classified; refactors with accidental behavior change are reclassified and trigger contract/BDD updates in the **same change batch**.
+- Project-specific **Linked updates** matrices (often in `docs/development/README.md` or architecture contracts) are consulted when touching listed modules.
+
 ## Contract Sync
 
 - API/schema changes regenerate typed clients, SDKs, mocks, fixtures, or schema packages.
