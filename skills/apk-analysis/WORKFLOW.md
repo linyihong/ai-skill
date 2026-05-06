@@ -39,52 +39,11 @@
 4. Feature operations：列表、分類/filter、搜尋、分頁/scroll、詳情、評論/媒體/action 等。
 5. Documentation closure：page map、operation map、API list、schema/correlation、feature handoff、unknowns。
 
+Tab / category / filter strip coverage rule：當頁面有 top tabs、category chips、search result tabs、carousel-like tabs 或任何看起來可水平滑動的分類列時，要先記錄 first viewport 的可見項、hierarchy 暴露的總數（例如「第 X 个标签，共 N 个」）、左右滑動後新增項，以及每個 reachable tab 的 `captured` / `needs capture` / `no-network-observed` 狀態。只測可見 tab 不能宣稱完整 tab 面 API 覆蓋。
+
 文件中要把 API 標為 `startup/preload`、`navigation`、`feature-triggered`、`cache-hydration` 或 `background/ambiguous`，避免把啟動期或預載 request 誤判成當前點擊觸發。
 
-## 1. 建立輕量 UI 架構地圖
-
-當可以控制裝置或 emulator 時，先把 App 的可見結構文件化，讓後續 API 分析能回到具體操作，而不是只留 endpoint 清單。這一步要保持輕量：大量截圖、錄影、UI dump 或自動遍歷可能讓裝置、App、代理或 hook 流程變慢，甚至造成卡頓。
-
-順序可以依情況調整：
-
-| 情境 | 建議順序 |
-| --- | --- |
-| App 穩定、畫面少、目標是完整產品/API 文件 | 先做輕量 UI map，再逐步操作並綁定 API。 |
-| App 容易卡、截圖很多、hook/pcap 正在關鍵窗口 | 先解核心 API、response decode 或 token/session，再回頭只對關鍵 API 補 UI binding。 |
-| 只需要知道大概架構 | 只截首頁、主要 tabs/drawer、代表性列表/詳情頁；暫不逐頁綁 API。 |
-| 已有 API 清單但缺少操作來源 | 以 API 為主線，挑高價值 endpoint 做最小操作重現與 screenshot。 |
-| 需要穩定重複抓同一批 API | 為少量關鍵 flow 建立可重放操作腳本，搭配 pcap/MITM/Frida 時間窗。 |
-
-記錄：
-
-- 入口與登入狀態：冷啟動、已登入、未登入、權限彈窗、地區/語言。
-- 可見 navigation：bottom tabs、top tabs、drawer、profile/menu、search、detail page、player/media page。
-- 每個主要 screen 的 screenshot evidence：去敏後保存路徑、時間戳、screen label。
-- Screen reachability：從哪個入口或前置狀態開始、經過哪些 tap/swipe、最後到哪個 screen。
-- Destination scope：最後是否仍在 App 內；若跳到系統設定、瀏覽器、支付、分享、第三方 App 或外部 intent，要備註 external transition。
-- 頁面互動屬性：是否可滑動、滑動方向、主要可點擊元素、點擊後進入哪個 screen/action。
-- 操作序列：`Home > Tab: Discover > item tap > Detail` 這類可重放路徑，並分解成 step-by-step recipe。
-- Automation script：可選；只對關鍵 flow 建立最小 adb/uiautomator 腳本，明確記錄 `tap` / `swipe` 步驟，避免自動遍歷整個 App。
-- 捕獲時間窗：操作開始/結束時間、對應 pcap/MITM/Frida log window。
-- API 關聯：每個操作觸發的 method/path、response schema、cache/local-only 判斷。
-- Capture budget：本輪要完整綁定、只粗略盤點，或等 API 解完再補綁定。
-
-判斷原則：
-
-- UI map 是輔助 API 分析，不應阻塞核心流量定位、解密、token/session 還原。
-- 截圖與 UI dump 要限量；先抓主要 navigation 與關鍵流程，不要一開始自動截完整 App 全站。
-- 滑動頁面只需記代表性 scroll depth，例如 top / mid / bottom；不要無限制滑到列表盡頭。
-- 點擊頁面要記點擊目標的可見 label、resource-id/content-desc 或座標來源，避免之後腳本點錯。
-- 到頁路徑要和 screen id / operation id 綁定；後續 API capture、人工重現、automation script 都引用同一份 recipe。
-- 腳本地圖只處理 App 內頁面；跳出 App 後停止自動化路徑延伸，改記 external target、觸發點、是否需人工操作與可觀測 API window。
-- 自動化操作要可中止、限量、避開登入重試、付款、刪除、發文、下單等高風險動作；只在授權範圍內重放。
-- 自動化腳本要輸出 operation id、開始/結束 timestamp，讓 API log 可以對齊。
-- 截圖只能證明可見 UI，不直接證明 API；必須用同窗 request/response、pcap timing 或 hook sequence 對齊。
-- 同一個 endpoint 可能被多個 screen 共用；文件要保留多個 UI path，不要硬塞單一來源。
-- 啟動畫面、快取、預載與背景同步要標清楚，避免把 startup/cache JSON 誤寫成使用者操作 API。
-- 若可用 `uiautomator` hierarchy、accessibility labels 或 route/logcat 線索，應與 screenshot 互相校正 tab 名稱與 screen label。
-
-## 2. 先判斷流量在哪一層
+## 1. 先判斷流量在哪一層
 
 不要一開始就假設是 certificate pinning。先回答這些問題：
 
@@ -113,27 +72,19 @@ native backtrace 落在哪裡？
 - Java hook 沒命中，不代表沒有 HTTP；Flutter/Dart、Cronet、native client 可能繞過 Java HTTP stack。
 - 看到 proxy CONNECT 後 TLS 失敗，才進入 CA / pinning / custom trust 排查。
 
-## 3. 選擇主線
+## 2. 選擇主線
 
 | 證據 | 優先主線 |
 | --- | --- |
-| WebView / OkHttp / HttpURLConnection 命中 | Java hook + MITM + request/response logging；若目標是 API 文件，讀 `techniques/http-api/` |
-| 已對 **`OkHttpClient.newCall`**／**`Request$Builder.url`**／**`RealCall.enqueue`** 廣覆蓋（含延遲重試），**使用者操作下仍無業務 host／path** | **勿**再假設「只有時間不夠」；升級為 **Flutter／Dart `dart:io`**、**native `connect`／pcap SNI**，或 **MITM（僅在流量進代理時有效）**；證據指向 Flutter 時讀 `techniques/flutter-dart-aot/` |
-| Flutter / Dart AOT native path | 讀 `techniques/flutter-dart-aot/`，再用 blutter / unflutter 類工具 + Frida Dart/native offset hook |
-| Native C/C++ custom client | native symbol/string/disassembly + connect/send/recv 輔助 hook；未分類前不要讀 Flutter 專用文件 |
+| WebView / OkHttp / HttpURLConnection 命中 | Java hook + MITM + request/response logging |
+| 已對 **`OkHttpClient.newCall`**／**`Request$Builder.url`**／**`RealCall.enqueue`** 廣覆蓋（含延遲重試），**使用者操作下仍無業務 host／path** | **勿**再假設「只有時間不夠」；升級為 **Flutter／Dart `dart:io`**、**native `connect`／pcap SNI**，或 **MITM（僅在流量進代理時有效）** |
+| Flutter / Dart AOT native path | blutter / reFlutter 類工具 + Frida Dart object hook |
+| Native C/C++ custom client | native symbol/string/disassembly + connect/send/recv 輔助 hook |
 | Cronet / QUIC | Cronet hooks、flags、HTTP/2/QUIC telemetry、必要時停用 QUIC |
 | MITM CONNECT 成功但 handshake failed | CA trust、network security config、pinning 排查 |
-| 只有 pcap host/timing | 反編譯搜尋 host/path/header，再找高語意 hook 點；分類未明前只讀共通文件 |
-| `127.0.0.1:<port>`、Netty/local handler、ProxyServer、embedded TUN/VPN | 讀 `techniques/local-proxy/` |
-| HLS/media URL、playlist/key/segments、圖片/音訊/影片容器 | 讀 `techniques/media-hls/` |
+| 只有 pcap host/timing | 反編譯搜尋 host/path/header，再找高語意 hook 點 |
 
-分類原則：
-
-- 主流程只負責路由；進入某分類後，優先讀該分類資料夾，不要把所有 runtime/API family 都載入上下文。
-- 新技巧若只適用某分類，先寫入 `feedback_history/<category>/`，驗證後再整理到對應 `techniques/<category>/`。
-- 若同一分析跨分類，例如 Flutter app 內建 local proxy，再依證據讀多個分類；不要為了保險而預設全讀。
-
-## 4. 找高語意 hook 點
+## 3. 找高語意 hook 點
 
 優先找已組裝完成的業務物件：
 
@@ -141,7 +92,9 @@ native backtrace 落在哪裡？
 - response wrapper：status、outer JSON、raw bytes。
 - response decoder / interceptor：解密後 inner JSON。
 - token/session provider：刷新流程、device identity、header provider。
-- local proxy handler：若 App 內有 `ProxyServer` / Netty / loopback server，先轉讀 `techniques/local-proxy/`。
+- local proxy handler：若 App 內有 `ProxyServer` / Netty / loopback server，優先 hook handler 的 `FullHttpRequest` + resolved `URI`，確認本機請求如何映射到上游 API。
+  - 若 `FullHttpRequest` 直接讀不到 method/path，先 cast 到 Netty `HttpRequest` / `FullHttpRequest` interface，再讀 `method/getMethod`、`uri/getUri`，並預設去敏 query。
+  - 若 method/path 已可見但 `headers()` / `content()` 讀不到，可用實際 Java request 物件的 `toString()` 做 fallback；raw output 可能含完整 header，僅放私有 capture，文件只寫去敏結構。
 
 避免一開始就 hook：
 
@@ -151,20 +104,34 @@ native backtrace 落在哪裡？
 
 低層 hook 事件多、容易造成卡頓，也需要自己重組協議。只有在高語意點找不到時才降層。
 
-## 5. 分類技巧深入
+## 4. Flutter / Dart AOT 常見流程
 
-當第 3 節已有明確證據後，只讀對應分類：
+如果 evidence 指向 Flutter：
 
-| 分類 | 深入文件 |
-| --- | --- |
-| Flutter / Dart AOT | `techniques/flutter-dart-aot/` |
-| HTTP API 文件化 / UI binding | `techniques/http-api/` |
-| Local proxy / loopback / Netty | `techniques/local-proxy/` |
-| Media / HLS | `techniques/media-hls/` |
+1. 解 APK，確認 `lib/<arch>/libapp.so` 與 `libflutter.so`。
+2. 用 Dart AOT 分析工具產生 pseudo source、object pool、function offsets。
+3. 搜尋：
+   - host / base URL。
+   - `Dio`、`HttpClient`、`RequestOptions`、`Interceptor`。
+   - `encrypt`、`decrypt`、`AES`、`base64`、`hash`、`ResponseInterceptor`。
+   - 自訂 header 名稱、`sign metadata`、`sign result`、`package:<app>/...interceptor...dart` 與 `_generate...@<hash>` 類函式名。
+4. 用 Frida hook request options。
+5. 用 Frida hook response decode/decrypt return value。
+6. 把 raw wrapper + decrypted payload 對齊成 fixture。
 
-若尚未知道分類，不要預讀所有技巧；回到第 2 節補證據。
+若 local proxy/Netty hook 已看到自訂加密／簽名 header，但同窗 Java plugin/helper hook（例如 AES/RC2/getNMKey/query map）沒有命中，應把 Java plugin 視為橋接或設定層，轉向 `libapp.so` Dart AOT interceptor 字串、object pool xref、blutter/offset hook；不要在 Java helper 層無限加 hook。
 
-## 6. MITM / Proxy 判斷流程
+成功特徵：
+
+```text
+request hook:
+  method / baseUrl / path / headers / query
+
+response decode hook:
+  decrypted JSON/string
+```
+
+## 5. MITM / Proxy 判斷流程
 
 先分兩層：
 
@@ -174,7 +141,7 @@ native backtrace 落在哪裡？
   是 -> 再看 TLS trust / CA / pinning
 ```
 
-如果需要讓特定 runtime client 進 proxy，先確認該 runtime 是否尊重系統 proxy；runtime-specific 做法放在對應 `techniques/`。
+如果需要讓 Flutter/Dart client 進 proxy，常見策略是冷啟動前注入 proxy env 或修改 debug network behavior。驗收不是「代理工具有沒有明文」，而是先看 connect target 是否變成 `<proxy-host>:<proxy-port>`。
 
 不要把「PC 端代理正在監聽」當成裝置已導流。先記錄裝置 proxy 狀態（例如 global proxy、Wi-Fi proxy、reverse/port forward），再看是否有任何流量進代理；最後才驗證**業務 host** 是否也進同一條 proxy。若代理已收到校時／統計／第三方流量，但 native `getaddrinfo`／pcap 同窗顯示業務 host 直連外部 IP，應判讀為**核心業務路由繞過 PC MITM**，不要直接歸因 pinning。
 
@@ -205,7 +172,7 @@ native backtrace 落在哪裡？
 - `connect <api-host>:443`：仍是直連，優先查注入時機、proxy host/port、client 是否已初始化。
 - proxy 有 CONNECT 但無 HTTPS 明文：導流與 TLS 要分開查，不要直接回到「Proxyman 沒用」的結論。
 
-## 7. Response 解碼與離線化
+## 6. Response 解碼與離線化
 
 遇到 outer response 包 encrypted `data` 時：
 
@@ -213,15 +180,13 @@ native backtrace 落在哪裡？
 2. 記錄輸入格式：base64、prefix/salt、ciphertext、version field。
 3. 記錄演算法：KDF、AES mode、padding、MAC、compression。
 4. 用 hook 取得 decrypted output。
-5. 若 decrypt return 是 wrapper / Future / Map 而非可直接讀的 String，改 hook `jsonDecode`、`JsonDecoder.convert` 或 app 的 parse/decode helper，先輸出 schema-only 摘要（length/hash/top-level keys/types，不印 values）。
-   - 同時記錄 request/decrypt/json 的 sequence/timestamp；`jsonDecode` 若出現在第一個業務 request 前，先標成 local/cache/startup schema，不要寫成 API response。
-6. 寫離線 decoder。
-7. 建立 raw encrypted -> decrypted fixture。
-8. 用 fixture 驗證 SDK/client mapping。
+5. 寫離線 decoder。
+6. 建立 raw encrypted -> decrypted fixture。
+7. 用 fixture 驗證 SDK/client mapping。
 
 離線化完成後，後續不應每次依賴 Frida 才能跑測試。
 
-## 8. Session / Token 重新取得
+## 7. Session / Token 重新取得
 
 遇到 token 過期、no token、invalid token，不要先假設有標準 refresh-token。應還原 App 的真實流程：
 
@@ -239,21 +204,29 @@ native backtrace 落在哪裡？
 - 遇到 login too frequently，先停止 tight-loop，再分析 server-side bucket 可能維度。
 - 不要在沒有證據時假設旋轉單一欄位可以解限流。
 
+## 8. 媒體 / HLS 分析
+
+影片與音訊資源要分控制面與資料面：
+
+| 層 | 例子 | 文件要記錄 |
+| --- | --- | --- |
+| 詳情 API | 回 title、cover、source path | API path、必要 auth、source field |
+| playlist | HLS `.m3u8` | key URI、segment count、duration、base URL |
+| key | AES key endpoint 或 key file | key 長度、取得條件、是否需要 auth |
+| segments | `.ts` / chunk / signed URL | segment URL 是否短效、query 意義、下載順序 |
+| final media | mp4/mp3/image/webp/gif | 解密、解碼、remux、`ffprobe`/header 驗證 |
+
+不要只看副檔名判斷格式。應用 magic bytes、container probe 或 frame count 驗證。例如 WebP 動圖、靜態 GIF、animated GIF 都要分清楚。
+
 ## 9. 分析結束定義
 
 一次分析可以收斂時，應具備：
 
 - 清楚知道核心流量走哪個 stack。
 - 若使用者要求完整 app-start-to-feature 流程，已記錄 reset/cache/session baseline，並把 reset、startup、navigation、feature API windows 分開回填。
-- 有 UI Behavior / UI architecture map 回填到專案文件，能說明主要 tabs/screens、已測操作、App 可見排序文字、tap/swipe/input 步驟、資料來源、證據與未知項；若尚未抓 UI，必須在專案文件標 `needs capture` / `Trigger confidence: low`，不能省略。
-- 重要功能有 Feature Reconstruction Handoff：功能目標、screen/route/operation、BDD 候選、domain concept、API/interface contract、狀態與錯誤行為、資料生命週期、fixtures、open questions。
 - 有 request metadata 或已證明拿不到的原因。
 - 有 response outer shape。
-- HTTP/API 文件已寫清 headers、request fields、response fields，且逐字段分析 type/meaning/required/source。
-- API 列表任務已建立或更新 API Catalog：總入口、分組索引、逐支 API 詳細文件、coverage/gap、UI/API 對照、SDK/client 欄位用途、evidence、validation 與 open questions。
-- 高價值 API 已標明 capability、operation id、domain concept candidates、state impact、error/empty behavior 與 fixture/test 需求，足以交給 [`app-development-guidance`](../app-development-guidance/) 草擬 BDD、Domain Model Contract、API / Interface Contract 與 Error Handling Contract。
-- 若使用者要把分析文件用於 app 工具、SDK、client、mock、fixture-driven implementation、contract test 或重建功能，已自動讀取並套用 [`app-development-guidance/SKILL.md`](../app-development-guidance/SKILL.md)，並把缺失需求交給該 skill 的 blocker question 流程。
 - 若有加密，有解碼點或下一步定位計畫。
 - 有去敏樣本或 fixture。
 - 有文件回填位置。
-- 有新的 reusable lesson 時，已在 **`feedback_history/<category>/`** 或 **`feedback_history/common/`** 新增對應檔案（規則見 `shared-rules/feedback-lessons.md`）。
+- 有新的 reusable lesson 時，已在 **`feedback_history/`** 新增對應檔案（規則見 `shared-rules/feedback-lessons.md`）。

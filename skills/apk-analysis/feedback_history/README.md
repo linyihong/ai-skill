@@ -32,3 +32,4 @@
 | `2026-05-06_090100-frida-17-jailed-android-gadget-gate.md` | validated | Frida 17 / jailed Android Gadget gate | Frida 17 CLI flag compatibility and jailed Android Gadget/frida-server transport failures must be separated from hook correctness. |
 | `http-api/2026-05-06_104300-api-catalog-finish-gate.md` | promoted | API Catalog finish gate | API list work needs grouped indexes, per-API detail, coverage gaps, UI/API mapping, SDK/client field usage, evidence, and validation. |
 | `common/2026-05-06_105026-state-reset-baseline-feature-capture.md` | promoted | State reset baseline before feature capture | App-start-to-feature API analysis should record reset/cache/session baseline so startup, navigation, and feature APIs are not conflated. |
+| `common/2026-05-06_110749-scrollable-tab-strip-coverage.md` | promoted | Scrollable tab strip coverage | Tab/category/result strips need horizontal swipe coverage before claiming complete feature API coverage. |
