@@ -20,6 +20,27 @@
 - 把第三方或非目標流量當成分析資料。
 - 把單一 App 的私有 host / secret 寫進 reusable skill。
 
+### 0.1 Reset baseline / 起始狀態
+
+當目標是「從 App 開始到某個具名功能的完整 API 流程」時，開始 capture 前先決定並記錄起始狀態，不要讓 warm cache 或已登入畫面變成隱藏前提：
+
+| Reset level | 用途 | 注意事項 |
+| --- | --- | --- |
+| `force-stop only` | 保留帳號/session，只重新啟動 App 與網路 client。 | 適合避免 login/rate limit，同時觀察冷啟動與導航流程。 |
+| `clear cache` | 減少資源/cache 對列表或詳情的干擾。 | 不一定清掉 DB/session；需記錄是否仍有本機資料。 |
+| `clear app data` | 還原 first-run / session recovery / onboarding 狀態。 | 可能移除測試 session、觸發登入或限流；需使用授權測試帳號並記錄邊界。 |
+| `reinstall` | 驗證安裝後首輪 bootstrap / permission / migration。 | 成本最高；不要在不需要 first-run 行為時使用。 |
+
+每個 reset-to-feature capture 應拆成可反查的 window：
+
+1. Reset / state preparation：`force-stop`、可選 data/cache clear、權限、proxy、Frida/MITM/pcap 狀態。
+2. Cold start / bootstrap：launch、公告/ onboarding / login / session recovery、startup/background APIs。
+3. Navigation：從 launcher/home 到目標 page/tab/module 的 tap/swipe/input。
+4. Feature operations：列表、分類/filter、搜尋、分頁/scroll、詳情、評論/媒體/action 等。
+5. Documentation closure：page map、operation map、API list、schema/correlation、feature handoff、unknowns。
+
+文件中要把 API 標為 `startup/preload`、`navigation`、`feature-triggered`、`cache-hydration` 或 `background/ambiguous`，避免把啟動期或預載 request 誤判成當前點擊觸發。
+
 ## 1. 建立輕量 UI 架構地圖
 
 當可以控制裝置或 emulator 時，先把 App 的可見結構文件化，讓後續 API 分析能回到具體操作，而不是只留 endpoint 清單。這一步要保持輕量：大量截圖、錄影、UI dump 或自動遍歷可能讓裝置、App、代理或 hook 流程變慢，甚至造成卡頓。
@@ -223,6 +244,7 @@ native backtrace 落在哪裡？
 一次分析可以收斂時，應具備：
 
 - 清楚知道核心流量走哪個 stack。
+- 若使用者要求完整 app-start-to-feature 流程，已記錄 reset/cache/session baseline，並把 reset、startup、navigation、feature API windows 分開回填。
 - 有 UI Behavior / UI architecture map 回填到專案文件，能說明主要 tabs/screens、已測操作、App 可見排序文字、tap/swipe/input 步驟、資料來源、證據與未知項；若尚未抓 UI，必須在專案文件標 `needs capture` / `Trigger confidence: low`，不能省略。
 - 重要功能有 Feature Reconstruction Handoff：功能目標、screen/route/operation、BDD 候選、domain concept、API/interface contract、狀態與錯誤行為、資料生命週期、fixtures、open questions。
 - 有 request metadata 或已證明拿不到的原因。
