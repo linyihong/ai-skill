@@ -27,3 +27,5 @@ Cross-cutting APK analysis lessons that apply before a runtime/API family is kno
 | `2026-05-06_110749-scrollable-tab-strip-coverage.md` | promoted | Scrollable tab strip coverage | Tab/category/result strips need horizontal swipe coverage before claiming complete feature API coverage. |
 | `2026-05-06_111558-foreground-package-validation.md` | promoted | Foreground package validation | UI evidence must prove the foreground package is the target app before API/UI alignment claims. |
 | `2026-05-06_113302-dart-aot-offset-from-asm-address.md` | promoted | Dart AOT offset from ASM address | Use the first asm-line function address, not the output filename suffix, as the Frida hook offset. |
+| `2026-05-06_122900-checkpoint-replay-runner.md` | promoted | Checkpoint replay runner | Stable UI/API recapture should use checkpointed replay scripts with package validation and target stops. |
+| `2026-05-06_130300-feature-context-validation.md` | promoted | Feature context validation | Package-correct UI evidence can still be the wrong in-app screen; add target feature anchors to checkpoint guards. |
