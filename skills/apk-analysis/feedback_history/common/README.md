@@ -16,3 +16,7 @@ Cross-cutting APK analysis lessons that apply before a runtime/API family is kno
 | `2026-05-01_112900-proxy-config-vs-business-route.md` | validated | Proxy config is not business route proof | Common proxy route proof rule. |
 | `2026-05-01_174100-technique-category-routing.md` | promoted | Technique category routing | Repo organization/category routing rule. |
 | `2026-05-01_175500-workflow-as-routing-not-technique-dump.md` | promoted | Workflow as routing, not technique dump | Keep `WORKFLOW.md` common and move category details into `techniques/<category>/`. |
+| `2026-05-06_090100-frida-17-jailed-android-gadget-gate.md` | validated | Frida 17 / jailed Android Gadget gate | Distinguish CLI compatibility and injection transport failures from hook correctness. |
+| `2026-05-06_092200-frida-server-version-alignment.md` | validated | Frida server version alignment before attach debugging | If `frida-ps` works but attach closes globally, align local/device server versions before changing hooks. |
+| `2026-05-06_094200-frida-heavy-window-ui-control-comparison.md` | validated | Frida-heavy window UI control comparison | When Frida-heavy captures trigger retry/spinner states, compare no-Frida and attach-after-load controls before blaming backend timeout. |
+| `2026-05-06_101000-in-app-search-suggestion-before-ime-submit.md` | validated | In-app search suggestions before IME submit | Use app-owned suggestion chips/result tabs to validate search flows before typed/IME submit that may leave the app. |
