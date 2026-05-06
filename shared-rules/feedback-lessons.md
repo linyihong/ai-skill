@@ -6,9 +6,9 @@
 
 ## 原則
 
-- **不要**在每條 lesson 裡重複貼上 [sanitization.md](sanitization.md)、[neutral-language.md](neutral-language.md)、[authorization-scope.md](authorization-scope.md) 等全文；條目頂部用一行**引用** [README.md](README.md) 或**本檔**即可。
+- **不要**在每條 lesson 裡重複貼上 [sanitization.md](sanitization.md)、[neutral-language.md](neutral-language.md)、[goal-action-validation.md](goal-action-validation.md)、[authorization-scope.md](authorization-scope.md) 等全文；條目頂部用一行**引用** [README.md](README.md) 或**本檔**即可。
 - **Cursor agent：** 在授權分析過程中一旦得到可重用技巧／失敗模式／驗證規則，應**主動**在同一輪對話內於該 skill 的 **`feedback_history/`** 對應位置新增檔案（依下方**分類規則**、**檔名規則**與**模板**），**不要**等使用者提醒。
-- 只寫**通用方法**，不寫特定 App 的私有結論；必須去敏；標題、slug、摘要與正文必須依 [neutral-language.md](neutral-language.md) 使用中性低爭議用語；必須說明證據與適用／不適用條件；不確定標 `experimental`。
+- 只寫**通用方法**，不寫特定 App 的私有結論；必須去敏；標題、slug、摘要與正文必須依 [neutral-language.md](neutral-language.md) 使用中性低爭議用語；每個重要結論必須依 [goal-action-validation.md](goal-action-validation.md) 說明目標、執行、驗證或參考來源；必須說明證據與適用／不適用條件；不確定標 `experimental`。
 - 不得寫入本機絕對路徑、使用者名稱、私有工作目錄、clone 位置；用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 等 placeholder。
 
 ## 條目放哪裡
@@ -55,7 +55,7 @@
 注意：以下引用路徑以檔案位於 `feedback_history/` 內為準；若檔案在 `feedback_history/<category>/`，共用規則連結要多上一層，改成 `../../../../shared-rules/...`。
 
 ```markdown
-> 遵守 [共用規則索引](../../../shared-rules/README.md)、[neutral-language](../../../shared-rules/neutral-language.md) 與 [feedback-lessons](../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+> 遵守 [共用規則索引](../../../shared-rules/README.md)、[neutral-language](../../../shared-rules/neutral-language.md)、[goal-action-validation](../../../shared-rules/goal-action-validation.md) 與 [feedback-lessons](../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 
 ### YYYY-MM-DD - [short title]
 
@@ -86,6 +86,12 @@ Status: candidate | validated | deprecated | promoted | experimental
 #### Agent Action
 
 下次 agent 看到類似情境時，應該先做什麼、不要做什麼？
+
+#### Goal / Action / Validation
+
+- Goal:
+- Action:
+- Validation or reference source:
 
 #### Applies When
 

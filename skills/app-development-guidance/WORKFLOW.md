@@ -6,6 +6,7 @@ Use this workflow to convert analysis observations into development guidance and
 
 Record the reusable observation:
 
+- What is the goal of this work unit, what action was taken, and how was it validated? If validation is not executable, cite the reference source and reasoning boundary.
 - What behavior was observed?
 - Which layer exposed it: client code, transport, API contract, storage, logs, build config, firmware, hardware context, protocol, or runtime behavior?
 - Is the issue confirmed, suspected, or only a risk pattern?

@@ -1,6 +1,6 @@
 # APK 分析文件寫法
 
-分析文件的目標是讓人和 AI 都能重現推理，而不是只留下最後答案。
+分析文件的目標是讓人和 AI 都能重現推理，而不是只留下最後答案。每個重要分析段落都要依 [`goal-action-validation.md`](../../shared-rules/goal-action-validation.md) 交代目標、執行、驗證；若是純判斷或暫時無法驗證，必須附參考來源、推論邊界與 open questions。
 
 ## 文件分層
 

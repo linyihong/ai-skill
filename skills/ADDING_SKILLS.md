@@ -59,11 +59,12 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 
 ## 4. 與共用規則的關係
 
-- **授權、去敏、中性低爭議用語、路徑占位、feedback 檔名與模板**：一律只維護在 **`shared-rules/`**，各 skill **不要**複製長文。
+- **授權、去敏、中性低爭議用語、目標/執行/驗證流程、路徑占位、feedback 檔名與模板**：一律只維護在 **`shared-rules/`**，各 skill **不要**複製長文。
 - **Cross-skill reference**：若某 skill 需要引用另一個 skill 的規範、模板、檢查清單或交接產物，依 **[`shared-rules/cross-skill-references.md`](../shared-rules/cross-skill-references.md)** 寫短引用，包含 target skill、觸發條件、交接 artifact、ownership boundary、去敏邊界與 linked updates；不要複製 target skill 的全文。
 - **連動更新規則**：一律只維護在 **[`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md)**；新增 skill 或修改 skill 結構時，受影響的索引、入口、同步文件、分類文件**必須**同步更新或明確檢查。
 - **文件大小與拆分規則**：一律只維護在 **[`shared-rules/document-sizing.md`](../shared-rules/document-sizing.md)**；skill、技巧分類與寫作規範變大時，用資料夾與 `README.md` 目錄拆分。
 - **中性與低爭議用語**：一律只維護在 **[`shared-rules/neutral-language.md`](../shared-rules/neutral-language.md)**；新增 skill 的標題、description、檔名、slug、索引與摘要都要避免高風險或容易造成 AI/搜尋誤判的詞，改用授權、合規、契約、風險控制等中性語境。
+- **目標、執行、驗證流程**：一律只維護在 **[`shared-rules/goal-action-validation.md`](../shared-rules/goal-action-validation.md)**；新增 skill 的輸出格式、workflow、documentation 規則要能讓重要結論反查目標、執行、驗證，純判斷題則附參考來源與推論邊界。
 - 各 skill 的 **`FEEDBACK.md`**（若需要）：維持與 [`apk-analysis/FEEDBACK.md`](apk-analysis/FEEDBACK.md) 相同模式——**幾行連結**到 [`shared-rules/feedback-lessons.md`](../shared-rules/feedback-lessons.md)。
 - 每一則 lesson 頂部引用 `shared-rules`（路徑依檔案深度調整 `../../../shared-rules/...`）。
 
@@ -111,6 +112,7 @@ ln -sf "${AI_SKILL_REPO}/skills/my-skill" "${HOME}/.cursor/skills/my-skill"
 - [ ] `SKILL.md` 有合法 `name` / `description` frontmatter
 - [ ] 正文有連到 `shared-rules` 與 `feedback-lessons`
 - [ ] 標題、description、檔名、slug、索引與摘要已依 `shared-rules/neutral-language.md` 使用中性低爭議用語
+- [ ] 輸出格式已依 `shared-rules/goal-action-validation.md` 要求重要工作單元包含目標、執行、驗證或參考來源
 - [ ] 若引用其他 skill，已依 `shared-rules/cross-skill-references.md` 寫明 trigger、artifact、ownership boundary 與 linked updates
 - [ ] 若文件開始變大，已依 `shared-rules/document-sizing.md` 拆成資料夾、目錄與子檔
 - [ ] 已建立 `feedback_history/`（可先要 `README.md` 索引；若 skill 有分類，同步建立 `feedback_history/<category>/README.md`）

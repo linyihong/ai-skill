@@ -7,7 +7,7 @@ description: Convert authorized app, API, embedded, firmware, and hardware-produ
 
 Use this skill when APK analysis, app/API review, embedded/firmware review, or product development work reveals a reusable lesson that can improve future apps or hardware-backed products. The goal is to translate observed behavior, attack paths, failure modes, implementation tricks, hardware constraints, and protocol contracts into practical development requirements, buildable patterns, checklists, and validation tests.
 
-**Shared policy:** read [`shared-rules` index](../../shared-rules/README.md), [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md), and apply [`neutral-language.md`](../../shared-rules/neutral-language.md) when naming or summarizing docs. Lessons in `feedback_history/` should reference those files, not duplicate shared rules.
+**Shared policy:** read [`shared-rules` index](../../shared-rules/README.md), [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md), apply [`neutral-language.md`](../../shared-rules/neutral-language.md) when naming or summarizing docs, and apply [`goal-action-validation.md`](../../shared-rules/goal-action-validation.md) so important conclusions include a goal, action, validation, or reference source. Lessons in `feedback_history/` should reference those files, not duplicate shared rules.
 
 **Cross-skill references:** follow [`cross-skill-references.md`](../../shared-rules/cross-skill-references.md). When another skill hands off sanitized analysis artifacts, this skill consumes the development-relevant contract, risk, validation, and open-question details without copying the source skill's analysis workflow.
 
@@ -86,6 +86,7 @@ Use [`implementation/`](implementation/) when the user asks how to build or impl
 
 When producing development guidance, include:
 
+- Goal, action, and validation or reference source for each important work unit or conclusion.
 - Observed risk or failure mode.
 - Why it matters for app development.
 - Change classification: new requirement, bug fix, refactor, hardening, or docs-only; include planning artifact reviewed.
