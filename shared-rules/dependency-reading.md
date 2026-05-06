@@ -26,6 +26,7 @@
 5. 回覆或提交前，說明依賴讀取與連動更新的驗證方式。
 6. 完成 `git commit`、`git push` 與必要的 bundle sync 後，必須重新讀取本次更新過的 skill/shared-rule 入口文件與主要依賴文件，確認目前 agent context 已載入最新版；不可只依賴提交前讀過的內容。
 7. 最終回覆前必須執行 `git status --short --branch`。若 `Ai-skill` repo 仍有 modified/untracked/staged changes，或 branch 仍 ahead/behind remote，不得回覆「已完成」；必須先完成驗證、sync、commit、push、讀回，或明確說明被什麼阻塞。
+8. 若使用者未明確要求 push / merge，而更新後發現 `Ai-skill` 有尚未推送、尚未合併、ahead/behind、或其他 pending commit 狀態，最終回覆必須主動提醒使用者目前狀態與下一步（例如需要 push、pull/rebase、或處理既有 dirty changes），不可讓使用者以為規則已完全進入遠端主線。
 
 ## Ai-skill Writeback Transaction Guard
 
@@ -46,7 +47,7 @@
 5. Push 後已重新讀取更新過的入口、主要依賴、索引與 promotion target。
 6. 最後一次 `git status --short --branch` 顯示 clean，且 branch 沒有 ahead/behind。
 
-若 transaction 未關閉，agent 不得把注意力長時間切回業務專案，也不得把「已更新 skill」當作完成。可以繼續工作的唯一例外是：使用者明確要求暫停 Ai-skill close-loop；此時必須說明目前 dirty/ahead 狀態與下一步。
+若 transaction 未關閉，agent 不得把注意力長時間切回業務專案，也不得把「已更新 skill」當作完成。可以繼續工作的唯一例外是：使用者明確要求暫停 Ai-skill close-loop；此時必須說明目前 dirty/ahead/behind/unmerged 狀態與下一步。
 
 ## Ai-skill 回寫完成門檻
 
@@ -62,7 +63,7 @@
 8. Push 後重新讀取更新過的入口與主要依賴文件。
 9. 再跑 `git status --short --branch`，必須看到沒有未提交變更，且 branch 不再 ahead/behind remote。
 
-若第 9 步不乾淨，agent 必須回到第 1 步處理剩餘變更。不可在 dirty tree 或未 push 狀態下回覆「完成」。
+若第 9 步不乾淨，agent 必須回到第 1 步處理剩餘變更。不可在 dirty tree 或未 push 狀態下回覆「完成」。若使用者沒有授權 push 或 merge，必須明確提醒「本地已提交但尚未推送 / 合併」以及需要使用者決定下一步。
 
 ## Commit / Push 後讀回 Gate
 

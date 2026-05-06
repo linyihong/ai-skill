@@ -12,6 +12,7 @@
 6. Commit/push 與必要的 bundle sync 完成後，**必須**依 [`dependency-reading.md`](dependency-reading.md) 重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，確認 agent context 已載入最新版。
 7. 最終回覆前必須再次執行 `git status --short --branch`；若仍有 modified/untracked/staged changes，或 branch ahead/behind remote，不得回覆「完成」，必須處理到乾淨或明確說明阻塞。
 8. 回覆使用者時要說明已做了哪些連動更新；如果某些相關文件不用改，也要簡短說明原因。
+9. 若發現 Ai-skill 有尚未推送、尚未合併、ahead/behind、或其他 pending commit 狀態，且使用者未明確要求 push / merge，最終回覆必須主動提醒目前狀態與下一步，不可只說「已更新」。
 
 ## 常見連動關係
 
@@ -48,6 +49,7 @@
 | 新增 lesson 後沒有推廣到 promotion target 或 checklist | 回到 lesson 的 **Promotion Target** / **Required Linked Updates**，逐一更新或明確寫不適用理由。 |
 | 寫完 reusable docs 後沒有搜尋專案特例殘留 | 搜尋 skill/shared docs 中的 project name、host、endpoint、payload、class/test 名稱、sample ID、本機路徑等，移回 project docs。 |
 | 只描述「改了什麼」，沒有描述「為什麼會漏」與「如何防止重犯」 | 補原因分析、決策規則、驗證步驟，並依 [`goal-action-validation.md`](goal-action-validation.md) 寫明目標、執行、驗證。 |
+| 更新完 skill / shared rules 後沒有提醒 repo 仍有 pending commit / ahead / behind 狀態 | 最終回覆必須列出 `git status --short --branch` 的關鍵狀態、哪些是本輪提交、哪些是既有 dirty changes，以及需要 push / merge / 清理的下一步。 |
 
 ## 語氣規則
 
