@@ -26,6 +26,7 @@
 | `shared-rules/cross-skill-references.md` 或新增 cross-skill 關係 | referring skill 的 `SKILL.md` / `README.md` / `WORKFLOW.md` / `DOCUMENTATION.md`、target skill 的入口或接收格式、必要時 `skills/_template/SKILL.md` 與 `skills/ADDING_SKILLS.md`。 |
 | `shared-rules/feedback-lessons.md` | 各 skill 的 `FEEDBACK.md`、`feedback_history/README.md`、新增 lesson 模板。 |
 | `shared-rules/cursor-sync.md` 或 `scripts/sync-cursor-bundle.sh` | 根 `README.md`、`scripts/README.md`、Agents 必讀規則、實際執行同步。 |
+| `scripts/ai-skill-close-loop.sh` | `scripts/README.md`、根 `README.md`、`shared-rules/dependency-reading.md`、本檔；若改變 lock / commit / push 條件，也需同步相關 skill close-loop 說明。 |
 | 新增 skill | 根 `README.md`、`skills/README.md`、`scripts/sync-cursor-bundle.sh` 實際同步結果。 |
 | 修改 `skills/<name>/SKILL.md` 觸發條件或流程 | 該 skill 的 `README.md`、`RUNBOOK.md`、`WORKFLOW.md`、相關 cross-link。 |
 | 新增 `feedback_history` lesson | 該 skill 的 `feedback_history/README.md`，必要時 `WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md` 或分類文件。 |
@@ -50,6 +51,7 @@
 | 寫完 reusable docs 後沒有搜尋專案特例殘留 | 搜尋 skill/shared docs 中的 project name、host、endpoint、payload、class/test 名稱、sample ID、本機路徑等，移回 project docs。 |
 | 只描述「改了什麼」，沒有描述「為什麼會漏」與「如何防止重犯」 | 補原因分析、決策規則、驗證步驟，並依 [`goal-action-validation.md`](goal-action-validation.md) 寫明目標、執行、驗證。 |
 | 更新完 skill / shared rules 後沒有提醒 repo 仍有 pending commit / ahead / behind 狀態 | 最終回覆必須列出 `git status --short --branch` 的關鍵狀態、哪些是本輪提交、哪些是既有 dirty changes，以及需要 push / merge / 清理的下一步。 |
+| 有多個 dirty owner group 卻混成單一 commit | 沒有 active lock 時使用 `scripts/ai-skill-close-loop.sh --commit` 或手動依 shared-rules、scripts、各 skill owner 分開 commit；有 active lock 時停止並提醒，不得更新。 |
 
 ## 語氣規則
 

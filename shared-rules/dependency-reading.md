@@ -36,7 +36,15 @@
 
 1. 立刻建立或口頭標記一個明確的 close-loop 項目，例如 `Ai-skill close loop`。
 2. 記錄 canonical repo 位置與本次 touched paths；若是從同步路徑讀寫，仍以 `<AI_SKILL_REPO>` 的 `git status --short --branch` 為準。
-3. 在切回專案分析、長時間動態測試、或回覆「完成」前，先關閉這個 transaction。
+3. 檢查是否已有 active close-loop lock；若其他 agent / user 正在操作，不得自動 commit、push 或清理其變更，只能回報 lock owner、狀態與下一步。
+4. 在切回專案分析、長時間動態測試、或回覆「完成」前，先關閉這個 transaction。
+
+可使用 `scripts/ai-skill-close-loop.sh` 執行保守自動化：
+
+- 預設 dry-run：只列出 dirty 檔案分組與 lock 狀態，不提交。
+- `--commit`：在沒有 active lock、沒有 merge/rebase/cherry-pick、且所有 dirty path 可歸屬明確 group 時，按 group 分開提交。
+- `--push`：僅在 `--commit` 成功後推送目前 branch。
+- 若偵測到 active lock 或 unknown dirty path，腳本必須停止，不得猜測或混合提交。
 
 交易關閉條件：
 
@@ -57,13 +65,14 @@
 2. `git diff` 檢查將提交的內容，不得包含 secrets、raw tokens、私人 host、個資或本機絕對路徑。
 3. 執行適用的 lints / Markdown link check / required linked updates 檢查。
 4. 若影響 Cursor 可讀到的 skills/rules，執行 `./scripts/sync-cursor-bundle.sh`。
-5. `git add` 相關檔案。
-6. `git commit`。
-7. `git push`。
-8. Push 後重新讀取更新過的入口與主要依賴文件。
-9. 再跑 `git status --short --branch`，必須看到沒有未提交變更，且 branch 不再 ahead/behind remote。
+5. 若有多個 owner group，優先使用 `./scripts/ai-skill-close-loop.sh --commit` 分組提交；若手動提交，仍需按 shared-rules、scripts、各 skill owner 分開提交，避免把不相干內容混成一包。
+6. `git add` 相關檔案。
+7. `git commit`。
+8. `git push`。
+9. Push 後重新讀取更新過的入口與主要依賴文件。
+10. 再跑 `git status --short --branch`，必須看到沒有未提交變更，且 branch 不再 ahead/behind remote。
 
-若第 9 步不乾淨，agent 必須回到第 1 步處理剩餘變更。不可在 dirty tree 或未 push 狀態下回覆「完成」。若使用者沒有授權 push 或 merge，必須明確提醒「本地已提交但尚未推送 / 合併」以及需要使用者決定下一步。
+若第 10 步不乾淨，agent 必須回到第 1 步處理剩餘變更。不可在 dirty tree 或未 push 狀態下回覆「完成」。若使用者沒有授權 push 或 merge，必須明確提醒「本地已提交但尚未推送 / 合併」以及需要使用者決定下一步。
 
 ## Commit / Push 後讀回 Gate
 

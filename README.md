@@ -52,13 +52,14 @@
 
 ```bash
 cd <AI_SKILL_REPO>
-git status
-git add .
-git commit -m "Update apk analysis skill"
-git push
+./scripts/ai-skill-close-loop.sh          # dry-run：檢查 lock 與分組
+./scripts/ai-skill-close-loop.sh --commit # 沒有 active lock 時分組提交
+./scripts/ai-skill-close-loop.sh --commit --push
 ```
 
 Commit/push 與必要的 `./scripts/sync-cursor-bundle.sh` 完成後，agent 還要重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，避免使用 commit 前的舊上下文。
+
+若偵測到其他 agent / user 的 active close-loop lock，停止自動 commit / push，回報目前 owner 與下一步；不要混合提交他人的變更。
 
 不要把專案私有資料、抓包原始檔或未去敏樣本 commit 到這裡。
 
