@@ -13,3 +13,4 @@ Lessons for Flutter, Dart AOT, `libapp.so`, Dart object decoding, and Dart/nativ
 | `2026-05-01_155200-dart-compressed-response-fields.md` | candidate | Dart AOT compressed response fields | Restore compressed pointers before field reads. |
 | `2026-05-01_164741-dart-inline-onebyte-string-smi-length.md` | validated | Dart inline one-byte string Smi length | Decode Dart inline one-byte strings correctly. |
 | `2026-05-07_135100-entry-boundary-before-unstable-aot-hooks.md` | candidate | Entry boundary before unstable AOT hooks | Prefer stable function-entry boundaries plus static strings/asm before relying on rejected callsite hooks or crash-prone broad collection hooks. |
+| `2026-05-07_135900-dio-requestoptions-uri-keyset-probe.md` | candidate | Dio RequestOptions URI keyset probe | Hook URI encode/parse helpers behind a flag to prove whether query keys existed before or after interceptor normalization. |
