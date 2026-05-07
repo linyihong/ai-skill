@@ -13,6 +13,7 @@ Capture the minimum frame before planning:
 - Style: slow travel, food, nature, hiking, hot springs, city, photography, shopping, family, budget, luxury, 車中泊, camping, or event-focused.
 - Must-do and must-avoid items.
 - Budget and reservation tolerance.
+- Cost preference: fastest, cheapest, fewest transfers, scenic route, luggage-friendly, child-friendly, or low walking load.
 - Weather tolerance: rain, wind, heat, cold, snow, low visibility, sea conditions, or mountain conditions.
 - Country/region-specific needs: navigation format, toll rules, driving side, parking constraints, permits, or local payment methods.
 
@@ -26,7 +27,10 @@ Classify every important recommendation:
 | --- | --- |
 | Opening hours, closing days, last entry | Official facility page, official SNS, booking page, or tourism board page. |
 | Transit schedule, ferry, bus, train | Operator timetable or official route planner. |
+| Transport fare and pass value | Operator fare table, official reservation page, pass page, fare calculator, or booking platform. |
+| Required transport booking | Operator reservation page, seat availability page, ferry/flight/bus booking page, rail pass seat rule, or timed-ticket page. |
 | Road conditions, winter closure, tolls | Road authority, highway operator, local government, or official map. |
+| Driving cost | Route distance, fuel/energy price source, toll calculator, parking operator, ferry/bridge operator, rental-car contract, or charging network. |
 | Event dates and crowd risk | Official event page, venue page, tourism board, or local government. |
 | Weather-sensitive activity | Weather agency, mountain/weather service, facility notice, or operator notice. |
 | 車中泊 permission | Facility official page, RV Park listing, 道の駅 page, local notice, or recent rule notice. |
@@ -49,7 +53,29 @@ Use weather as a planning input, not an afterthought:
 
 When weather could affect safety, transport, or road access, do not merely add a note. Reorder the itinerary, downgrade the activity, or add a concrete alternative.
 
-## 4. Country and Region Specific Checks
+## 4. Transport Mode Decision
+
+Before route details, decide whether the plan is non-driving, self-drive, or mixed.
+
+For non-driving plans:
+
+1. Optimize by the user's priority: fastest, cheapest, fewest transfers, luggage-friendly, scenery, late-start, or low walking.
+2. Build each travel leg with departure time, arrival time, transfer station/stop, buffer, platform/terminal risk when known, and last-return option.
+3. Identify required bookings: limited express/reserved seats, highway bus, ferry, flight, airport transfer, event shuttle, ropeway/cable car slot, timed attraction ticket, taxi, or luggage service.
+4. Record when to book: now, after lodging is fixed, same day, day-before, or no reservation needed.
+5. Estimate fare per person and total group fare. Compare passes only when the break-even route is clear; do not recommend a pass just because it is popular.
+6. Flag fragile legs: last bus, sparse rural route, short transfer, weather-cancelable ferry, sold-out seat risk, cash-only bus, or luggage-heavy transfer.
+
+For self-drive plans:
+
+1. Estimate rough driving cost before claiming driving is better than public transport.
+2. Include distance, fuel economy or EV efficiency, fuel/charging unit price, tolls, paid parking, ferry/bridge fees, snow-chain or winter tire needs, and rental-car add-ons when relevant.
+3. Provide a range when prices depend on route, vehicle, discount pass, ETC, day, season, or parking duration.
+4. Compare time/cost tradeoffs against non-driving options when both are plausible.
+
+For mixed plans, separate each leg and cost source so the user can see which parts require a car and which can be booked as transit.
+
+## 5. Country and Region Specific Checks
 
 Apply local driving and navigation rules before finalizing route order.
 
@@ -64,7 +90,7 @@ For Japan self-drive plans:
 
 For other countries or regions, identify equivalent local requirements before planning: navigation identifiers, low-emission zones, toll systems, vignette/permit needs, parking restrictions, road permits, ferry reservations, or seasonal access rules.
 
-## 5. Feasibility Build
+## 6. Feasibility Build
 
 Plan from constraints outward:
 
@@ -82,7 +108,7 @@ Use conservative buffers:
 - Popular restaurants and attractions: account for queues, reservation checks, or sold-out risk.
 - 車中泊: arrive before dark when rules, toilets, or parking layout are uncertain.
 
-## 6. 車中泊 / Road Trip Checks
+## 7. 車中泊 / Road Trip Checks
 
 For each overnight candidate, verify:
 
@@ -104,7 +130,7 @@ For comfort planning, group support stops into the route:
 - Recovery: late food, convenience store, supermarket, fuel/charging, toilet, trash rule, and dry indoor rest option.
 - Timing: choose support stops with enough buffer before closing; avoid plans that require late-night bathing or laundry unless hours are confirmed.
 
-## 7. Recommendation Pass
+## 8. Recommendation Pass
 
 Before finalizing, check:
 
@@ -112,6 +138,8 @@ Before finalizing, check:
 - Is the order optimized for forecast, daylight, and weather-sensitive activities?
 - Are opening hours and travel times compatible with the user's dates?
 - Are closures, seasonal access, holidays, and maintenance notices checked?
+- If not driving, are departure times, transfer buffers, last-return options, required reservations, and fare estimates listed?
+- If driving, is rough transport cost estimated with distance, fuel/charging, tolls, parking, ferry/bridge, and rental assumptions?
 - For Japan self-drive, does each drive-to stop include Mapcode or fallback navigation input, and is parking ordinary visitor parking rather than 月極 or private-only parking?
 - Are food and rest breaks realistic?
 - Are rainy-day, heat, snow, wind, transport, and closure backups close enough to use?
@@ -119,7 +147,7 @@ Before finalizing, check:
 - Are all uncertain claims labeled?
 - Are next actions specific: reserve, call, check official notice, buy pass, download offline map, or prepare cash?
 
-## 8. Final Verification
+## 9. Final Verification
 
 For every important conclusion, provide:
 

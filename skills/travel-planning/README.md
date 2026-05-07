@@ -1,6 +1,6 @@
 # Travel Planning Skill
 
-This skill supports source-backed travel planning: itinerary design, current opening-hour checks, weather-aware route ordering, seasonal feasibility, transport timing, lodging or car-stay routing, country-specific driving checks, road-trip support stops, and backup planning.
+This skill supports source-backed travel planning: itinerary design, current opening-hour checks, weather-aware route ordering, seasonal feasibility, public-transport optimization, fare and driving-cost estimates, lodging or car-stay routing, country-specific driving checks, road-trip support stops, and backup planning.
 
 ## Goals
 
@@ -8,15 +8,17 @@ This skill supports source-backed travel planning: itinerary design, current ope
 - Verify time-sensitive details before recommending a stop.
 - Separate confirmed facts from assumptions and open questions.
 - Use weather forecasts to choose better route order and realistic backup plans.
+- Optimize non-driving routes with transport schedules, transfer buffers, booking needs, and fare estimates.
 - Apply country- and region-specific requirements, such as Mapcode and visitor parking checks for Japan self-drive routes.
+- Estimate rough self-drive costs from distance, fuel/charging, tolls, parking, ferries, bridges, and rental-car add-ons.
 - Use community sources for discovery while grounding decisions in official or current sources.
 - Make car-stay and road-trip plans realistic: legal overnight status, toilets, bathing, laundry, trash rules, noise rules, weather, road conditions, and backup lodging.
 
 ## What Belongs Here
 
 - Reusable workflows for planning trips.
-- Source hierarchy, country-specific checks, and verification rules.
-- Output templates for itineraries, weather/backup logic, support-stop tables, source tables, and day-before checklists.
+- Source hierarchy, transport booking/cost checks, country-specific checks, and verification rules.
+- Output templates for itineraries, transport plans, cost estimates, weather/backup logic, support-stop tables, source tables, and day-before checklists.
 - Reusable lessons about travel planning quality, not private trip details.
 
 ## What Does Not Belong Here
@@ -42,7 +44,8 @@ This skill supports source-backed travel planning: itinerary design, current ope
 1. Start from the user's destination, dates, style, and constraints.
 2. Gather official and current sources for every time-sensitive recommendation.
 3. Check weather and local disruption risks before locking route order.
-4. Apply country-specific navigation, access, parking, and driving checks.
-5. Plan route order with buffers, backups, and support stops.
-6. Mark confidence and unresolved checks clearly.
-7. Convert new reusable planning lessons into `feedback_history/` when they generalize.
+4. If not driving, optimize transport routes and list booking/ticket requirements with fare estimates.
+5. If driving, estimate rough transport costs and apply country-specific navigation, access, parking, and driving checks.
+6. Plan route order with buffers, backups, and support stops.
+7. Mark confidence and unresolved checks clearly.
+8. Convert new reusable planning lessons into `feedback_history/` when they generalize.

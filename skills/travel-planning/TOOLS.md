@@ -6,8 +6,8 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 
 | Priority | Source Type | Use For |
 | --- | --- | --- |
-| 1 | Official facility, operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, and facility access pages | Confirming facts that affect feasibility. |
-| 2 | Official reservation platforms, ticketing pages, RV Park listings, transit operators, airline/ferry/bus companies, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access. |
+| 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, and facility access pages | Confirming facts that affect feasibility. |
+| 2 | Official reservation platforms, ticketing pages, RV Park listings, transit operators, rail/bus/ferry/airline companies, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, cost. |
 | 3 | Current map services, Mapcode lookup services, and review platforms | Discovery, rough location, navigation identifiers, parking/access notes, recent user signals; verify key claims elsewhere. |
 | 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
 
@@ -17,9 +17,9 @@ Use official or operator pages first:
 
 - Facility official websites and official social accounts.
 - Local tourism association pages.
-- Train, bus, ferry, ropeway, highway bus, and airport operators.
+- Train, bus, ferry, ropeway, highway bus, airport operators, official route planners, fare tables, reservation pages, seat rules, and pass pages.
 - Japan Meteorological Agency or reputable weather services; for islands, coasts, ferries, mountains, or snow routes, also check marine, wind, wave, snowfall, or road-condition sources.
-- Highway and road authority pages for closures, snow, tolls, and rest areas.
+- Highway and road authority pages for closures, snow, tolls, ETC/pass options, and rest areas.
 - National park, prefecture, city, and 道の駅 official pages.
 - RV Park, campground, and booking sites for overnight rules and reservations.
 - Mapcode lookup services and facility access pages for self-drive navigation. If Mapcode is unavailable, capture fallback navigation input: official name, address, phone number, or map link.
@@ -38,6 +38,24 @@ For 車中泊 discovery, a user may provide community maps such as `https://syac
 | Hiking/nature | Trail status, weather, daylight, transport return, facility closure, gear and emergency limits. |
 | Ferry/island | Sailing schedule, weather cancellation, vehicle reservation, last return, port access. |
 | Seasonal events | Official event dates, ticketing, crowd control, special transit, road restrictions. |
+
+## Transport Booking and Cost Sources
+
+For non-driving plans, use official or operator-backed sources for:
+
+- Timetable: train, bus, ferry, flight, shuttle, ropeway/cable car, airport transfer, or taxi reservation window.
+- Required booking: reserved seat, highway bus, ferry vehicle/passenger booking, flight, airport transfer, event shuttle, timed attraction entry, luggage delivery, or taxi.
+- Fare: base fare, seat fee, limited express fee, bus/ferry fare, pass price, local day pass, child fare, luggage/bicycle fee, and cancellation/change rules when important.
+- Final-leg risk: last bus/train, sparse rural service, weather-cancelable ferry, cash-only bus, sold-out seat, and transfer buffer.
+
+For driving plans, estimate with:
+
+- Distance and time from a route planner.
+- Fuel economy or EV efficiency assumptions.
+- Fuel price, charging rate, toll calculator, ferry/bridge fee, parking fee, rental-car fee, insurance/add-ons, winter tire or chain fee when relevant.
+- Range or caveat when ETC discounts, vehicle class, seasonal rates, parking duration, or detours can change the number.
+
+Cost estimates should be labeled as rough unless all operator prices and route choices are fixed.
 
 ## Country-Specific Driving Sources
 
@@ -102,6 +120,8 @@ When citing a time-sensitive source, record:
 - A place described as 車中泊-friendly without explicit overnight, parking, or toilet details.
 - Japan self-drive stops without Mapcode or fallback navigation input.
 - Parking candidates labeled 月極, resident-only, staff-only, permit-only, apartment parking, or unclear private lot.
+- Non-driving itineraries that omit required reservation timing, last-return risk, or fare estimate.
+- Driving itineraries that compare routes without fuel/charging, toll, parking, ferry/bridge, or rental-cost assumptions.
 - A bath, shower, or laundromat stop placed after its last entry or likely closing time.
 - Winter, typhoon, heavy rain, wildfire, landslide, or road restriction risk.
 - Ferry, ropeway, mountain road, or viewpoint plans that ignore wind, visibility, snow, or wave forecasts.

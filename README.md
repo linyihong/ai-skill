@@ -12,7 +12,7 @@
 | --- | --- |
 | `skills/apk-analysis/` | 授權 APK 流量分析、動態抓包、Flutter/Dart AOT、response 解碼、文件化與 `feedback_history/` 技巧條目。 |
 | `skills/app-development-guidance/` | 將授權 App/API/embedded/firmware/hardware-product 觀察轉成開發 guidance、實作模式、控制項、檢查清單與驗證方法。 |
-| `skills/travel-planning/` | 依目的地、日期、交通與玩法查證營業時間、天氣/道路風險、國家/地區自駕條件（如日本 Mapcode 與遊客停車場）、住宿或車中泊選項，安排備案與洗澡/洗衣等補給點。 |
+| `skills/travel-planning/` | 依目的地、日期、交通與玩法查證營業時間、天氣/道路風險、交通訂票與票價/自駕成本、國家/地區自駕條件（如日本 Mapcode 與遊客停車場）、住宿或車中泊選項與備案。 |
 
 **目錄約定：**  
 - **`skills/`**：各 skill 技巧包；之後新增 skill 放在 `skills/<name>/`，步驟見 [`skills/ADDING_SKILLS.md`](skills/ADDING_SKILLS.md)。  

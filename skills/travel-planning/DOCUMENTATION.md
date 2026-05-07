@@ -11,6 +11,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Dates:
 - Party:
 - Transport:
+- Transport priority:
 - Pace:
 - Must-do:
 - Constraints:
@@ -35,6 +36,8 @@ Use these templates when producing trip plans or documenting reusable planning w
 ### Notes
 
 - Reservations:
+- Transport booking:
+- Fare / cost:
 - Tickets / passes:
 - Food / rest:
 - Weather or seasonal risk:
@@ -67,6 +70,46 @@ Use these templates when producing trip plans or documenting reusable planning w
 | --- | --- | --- | --- | --- | --- |
 | <place> | <official page / operator / map / community source> | <date TZ> | <hours / rule / schedule> | confirmed / likely / needs day-before check / unknown | <reserve / call / recheck> |
 ```
+
+## Non-Driving Transport Plan
+
+Use this when the trip does not use a car, or when a day has public-transport legs.
+
+```markdown
+| Leg | Recommended Transport | Depart / Arrive | Transfer Buffer | Booking Needed | Fare Estimate | Risk / Backup |
+| --- | --- | --- | --- | --- | --- | --- |
+| <A to B> | <train / bus / ferry / flight / taxi> | <time window> | <minutes / station note> | <reserve by when / no reservation> | <per person / group> | <last return / weather / sold out / backup> |
+```
+
+Transport summary:
+
+- Optimization reason: fastest / cheapest / fewer transfers / luggage-friendly / scenic / low walking.
+- Tickets or passes to buy:
+- Booking timing:
+- Last-return or disruption risk:
+- Total estimated transport cost:
+
+## Driving Cost Estimate
+
+Use this when the trip uses a rental car, private car, camper, or EV.
+
+```markdown
+| Cost Item | Assumption | Estimate | Source / Confidence |
+| --- | --- | --- | --- |
+| Distance | <km / route> | <km> | <route planner / estimated> |
+| Fuel / charging | <fuel economy or kWh/km, unit price> | <amount> | confirmed / rough |
+| Toll / expressway | <route / vehicle class / ETC or not> | <amount> | confirmed / rough |
+| Parking | <stops and expected duration> | <amount> | confirmed / rough |
+| Ferry / bridge | <route> | <amount> | confirmed / not needed |
+| Rental add-ons | <insurance / winter tires / one-way / child seat> | <amount> | confirmed / unknown |
+| Total | <range> | <amount range> | rough / confirmed |
+```
+
+Driving-cost notes:
+
+- State vehicle and fuel/energy assumptions.
+- Use a range when route, vehicle class, ETC discount, fuel price, parking duration, ferry weather, or rental add-ons are not fixed.
+- Do not compare driving against transit without showing the major cost assumptions.
 
 ## Country-Specific Driving Table
 
@@ -111,6 +154,8 @@ Parking note:
 - Weather risk:
 - Weather-based route swap:
 - Country-specific navigation / parking risk:
+- Transport booking / fare risk:
+- Driving cost uncertainty:
 - Crowd / event risk:
 - Transport risk:
 - Overnight-stay risk:
@@ -125,8 +170,9 @@ When replying to the user, keep the plan readable:
 
 1. State the assumptions.
 2. Give the recommended itinerary and explain weather-aware ordering.
-3. List key source-backed checks and confidence.
-4. Call out reservations, support stops, and day-before checks.
-5. Offer 1-2 meaningful alternatives when the current plan has weather, closure, or availability uncertainty.
+3. List the transport plan: booking needs, fare/cost estimates, and key transfer or driving assumptions.
+4. List key source-backed checks and confidence.
+5. Call out reservations, support stops, and day-before checks.
+6. Offer 1-2 meaningful alternatives when the current plan has weather, closure, transport, or availability uncertainty.
 
 Do not bury blockers. If a core attraction, transport leg, or overnight candidate is unverified, say that before the detailed schedule.
