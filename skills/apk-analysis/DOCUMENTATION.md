@@ -367,6 +367,7 @@ docs/UI架構地圖/<page-name>.md
 - Reachability recipe 要能被人工照做，也能被 automation script 改寫成 tap/swipe/launch 步驟。
 - UI 架構地圖只把 app 內頁面列入 screen inventory；外部跳轉要寫在 route recipe 的 `Destination scope` / `External transition`，不要繼續當成本 app screen 展開。
 - 若跳到系統設定、瀏覽器、支付、分享、第三方 App、外部 intent 或不可控 Web 流程，記錄觸發點、外部目的地類型、是否需要人工接手，以及同窗 API capture window。
+- 若分析主線不是 UI 地圖（例如 provider、session、signing、pagination、storage），但動態操作新發現了 app 內 route、settings screen、global menu、dialog、tab 或可重放操作，完成前仍要回填或建立對應 `docs/UI架構地圖/<route-or-area>.md`，並從本輪更新過的 operation map、runtime baseline、API docs 或 feature map 連回去。不要只把新 UI 路線寫在 hook log、runtime baseline、operation map 或 chat summary。
 - 每個 screen 要標記是否可滑動；滑動頁面只保存代表性 top/mid/bottom 或關鍵分頁，不做無限制全量截圖。
 - 每個 clickable entry 要記 target、selector/resource-id/content-desc 或座標來源，以及預期跳轉/操作結果。
 - Automation script 只記可重放操作與時間窗；不要把帳密、token、付款、刪除、發文、下單等高風險動作寫成無保護腳本。
