@@ -6,6 +6,6 @@
 
 | 工具 | 文件 | 用途 |
 | --- | --- | --- |
-| Cursor | [cursor.md](cursor.md) | Cursor 如何啟用 apk-analysis、同步 `.cursor`、維持中央庫一致性。 |
+| Cursor | [cursor.md](cursor.md) | Cursor 如何啟用 apk-analysis、同步 `.cursor`、維持中央庫一致性，並以工具中立 `.agent-goals/` 做對話目標閉環提醒。 |
 
 ← [回到根目錄](../README.md)

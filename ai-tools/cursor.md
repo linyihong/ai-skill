@@ -79,4 +79,84 @@ Cursor 會掃描特定路徑下的 skill；把中央庫對應的 `skills/<name>/
 - 多裝置：Cursor/VSCode Settings Sync 不會同步這份 git 知識庫；內容仍靠 `git pull` / `git push`。
 - `.cursor` 與本庫一致：可重用技巧以 `skills/`、共用政策以 `shared-rules/` 為真相來源；`.cursor` 應參照或同步該來源。
 
+## Cursor 與對話目標閉環
+
+工具中立規則見 [`shared-rules/conversation-goal-ledger.md`](../shared-rules/conversation-goal-ledger.md)。Cursor 只是其中一種操作環境；goal ledger 的真相來源仍是業務專案本地的 `<PROJECT_ROOT>/.agent-goals/`，不要放在 `.cursor/`，也不要把 goal 檔 commit。
+
+### 建議操作
+
+在 Cursor 開始可中斷、可拆解或多目標工作時：
+
+1. 讀取 `<PROJECT_ROOT>/.agent-goals/`，確認是否已有 active / blocked / needs-validation goal。
+2. 若沒有 ledger，使用本庫 helper 初始化：
+
+   ```bash
+   <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> init
+   ```
+
+3. 建立或更新本輪主要目標：
+
+   ```bash
+   <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> start \
+     --id P1-short-goal \
+     --title "Short goal title" \
+     --source "User request summary" \
+     --next "Next concrete action" \
+     --criteria "Observable completion condition"
+   ```
+
+4. 若使用者轉移目標，先 `pause` 或 `update --status superseded` 舊 goal，再建立新的 `P1`。
+5. 若發現需要拆小目標，使用 `split` 或在 goal 檔的 `Subgoals` 區塊記錄。
+6. 在回覆完成前，只有完成條件與驗證都成立時才 `complete --validated`；否則保留 goal，讓下一個 agent 可接手。
+
+### Cursor hooks 範本方向
+
+Cursor hook 可以輔助提醒，但不應成為唯一真相。可選的 project hook：
+
+| Event | 用途 | 行為 |
+| --- | --- | --- |
+| `sessionStart` | 開局提醒 | 檢查 `.agent-goals/goals/*.md`，若有 active goal，回傳 additional context / user-facing reminder。 |
+| `preCompact` | 壓縮前檢查 | 若有 active goal，提醒 agent 先更新 `Next Action`、`Progress`、`Validation`。 |
+| `stop` | 停止前檢查 | 若 goal 未完成，提醒保留或更新；不要自動刪除。 |
+
+Hook 建議使用 command hook，fail-open，避免 hook 故障阻塞正常工作。若要建立專案 hook，放在：
+
+```text
+<PROJECT_ROOT>/.cursor/hooks.json
+<PROJECT_ROOT>/.cursor/hooks/goal-ledger-reminder.sh
+```
+
+範例 `hooks.json` 方向：
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": ".cursor/hooks/goal-ledger-reminder.sh",
+        "timeout": 5,
+        "failClosed": false
+      }
+    ],
+    "preCompact": [
+      {
+        "command": ".cursor/hooks/goal-ledger-reminder.sh",
+        "timeout": 5,
+        "failClosed": false
+      }
+    ],
+    "stop": [
+      {
+        "command": ".cursor/hooks/goal-ledger-reminder.sh",
+        "timeout": 5,
+        "failClosed": false
+      }
+    ]
+  }
+}
+```
+
+Hook script 只應讀 `.agent-goals/` 並提醒，除非團隊明確要求自動修改 goal 檔。若 hook 需要修改 goal，仍要遵守 `conversation-goal-ledger.md` 的 lock、TTL、完成驗證與刪除條件。
+
 ← [回到 AI 工具索引](README.md)
