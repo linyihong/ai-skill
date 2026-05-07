@@ -28,7 +28,7 @@ Classify every important recommendation:
 | Opening hours, closing days, last entry | Official facility page, official SNS, booking page, or tourism board page. |
 | Travel agency tour / package tour / model course | Travel agency itinerary page, official tourism model course, operator tour page, brochure page, booking itinerary, price page, cancellation terms, or included/excluded items page. |
 | Exact place identity | Google Maps place link or coordinate pin, official facility page, official address, map service, or facility access page. |
-| What to do, local food, restaurants | Official tourism page, facility page, local tourism board, restaurant page, market page, recent map listing, or local guide. |
+| What to do, local food, restaurants | Official tourism page, facility page, local tourism board, restaurant page, market page, recent map listing, local guide, country-appropriate restaurant review/rating site, or reservation platform. |
 | Transit schedule, ferry, bus, train | Operator timetable or official route planner. |
 | Long-distance transport comparison | Airline page, airport access page, Shinkansen/rail operator, limited express route, highway bus operator, ferry operator, rental-car company, toll/fuel/parking calculator, or route planner. |
 | Transport fare and pass value | Operator fare table, official reservation page, pass page, fare calculator, or booking platform. |
@@ -83,8 +83,10 @@ For each recommended stop, give the user enough context to know what to do there
 2. List 1-3 concrete things to do, not only the place name.
 3. Estimate time needed: quick photo stop, 30-60 minutes, half day, meal stop, or overnight base.
 4. Add food ideas when relevant: local specialty, market, restaurant/cafe candidate, roadside station food, convenience fallback, opening/last-order risk, and reservation need.
-5. Align food stops with route timing; avoid recommending lunch after a restaurant's last order or dinner after rural closing time.
-6. If a recommended stop has no clear activity value, mark it as a support stop rather than a sightseeing stop.
+5. For restaurants, use review/rating platforms common in the destination country, plus Google Maps when available. For Japan, cross-check Google Maps with 食べログ when practical; compare rating, review count, review recency, price range, reservation availability, last order, queue risk, parking/access, and whether the restaurant fits the route time block.
+6. Do not select only by numeric rating. Prefer a restaurant that fits the cuisine goal, route, opening window, parking/transit access, and backup needs over a higher-rated but impractical detour.
+7. Align food stops with route timing; avoid recommending lunch after a restaurant's last order or dinner after rural closing time.
+8. If a recommended stop has no clear activity value, mark it as a support stop rather than a sightseeing stop.
 
 ## 6. Weather and Backup Pass
 
@@ -188,7 +190,7 @@ Use conservative buffers:
 
 - Urban transit or walking transfers: at least 10-20 minutes for unfamiliar places.
 - Rural driving: add time for parking, narrow roads, fuel, snow, or mountain routes.
-- Popular restaurants and attractions: account for queues, reservation checks, or sold-out risk.
+- Popular restaurants and attractions: account for queues, reservation checks, last order, review recency, parking/access, and sold-out risk.
 - 車中泊: arrive before dark when rules, toilets, or parking layout are uncertain.
 
 ## 13. Schedule Feasibility Check
@@ -242,6 +244,7 @@ Before finalizing, check:
 - For 2+ hour or cross-region transfers, did the plan compare plausible long-distance transport modes by door-to-door time, total cost, luggage/transfer burden, and delay/weather risk?
 - Is each day schedule `comfortable`, `tight`, or `too packed`, and were overloaded days simplified?
 - For each key stop, does the plan say what to do, how long to stay, and whether there is a food/local-specialty recommendation or support-stop role?
+- For restaurant recommendations, did the plan use country-appropriate rating/review tools, cross-check timing and route fit, and include a nearby backup when sellout, queue, closure, or parking risk is material?
 - Does each recommended place have an exact Google Maps place link or precise pin, and are any ambiguous locations clearly marked?
 - If the trip includes overnight stays, is each lodging area/candidate placed for route logic, check-in timing, parking/transit access, and next-day flow?
 - Does the route avoid A→B→middle-point backtracking? If not, is there a `backtracking warning`, reason, and shorter alternative?

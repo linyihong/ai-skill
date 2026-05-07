@@ -23,6 +23,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Lodging / overnight base:
 - Route shape:
 - Activity / food focus:
+- Restaurant screening:
 - Fuel / charging assumptions:
 - Schedule pressure:
 - Planning assumptions:
@@ -50,6 +51,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Food / rest:
 - What to do:
 - Local food / restaurant:
+- Rating / review source:
 - Weather or seasonal risk:
 - Exact location / Google Maps:
 - Navigation / parking:
@@ -106,15 +108,32 @@ Benchmark note:
 Use this for key sightseeing, food, and support stops.
 
 ```markdown
-| Stop | Why Stop | What To Do | Suggested Time | Food / Local Specialty | Backup / Nearby Alternative | Confidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| <place> | <scenery / food / hot spring / route support> | <1-3 concrete actions> | <duration> | <restaurant / market / specialty / fallback> | <nearby option> | confirmed / needs confirmation |
+| Stop | Why Stop | What To Do | Suggested Time | Food / Local Specialty | Restaurant Screening | Backup / Nearby Alternative | Confidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| <place> | <scenery / food / hot spring / route support> | <1-3 concrete actions> | <duration> | <restaurant / market / specialty / fallback> | <Google Maps / local rating tool / reservation / route fit> | <nearby option> | confirmed / needs confirmation |
 ```
 
 Stop note:
 
 - If a stop is mainly for fuel, toilet, laundry, parking, or rest, label it as a support stop.
 - Do not list food that is closed at the planned time or far off-route without explaining the detour.
+- Use restaurant rating/review tools appropriate to the country. For Japan, include Google Maps and 食べログ when practical, plus official or reservation pages for hours and booking.
+
+## Restaurant Recommendation Table
+
+Use this when meal stops materially affect the trip, the user asks for restaurant filtering, or the area has popular restaurants with queues, reservations, limited hours, or parking constraints.
+
+```markdown
+| Meal / Area | Candidate | Cuisine / Specialty | Google Maps Signal | Local Rating Tool Signal | Hours / Last Order | Reservation / Queue | Access / Parking | Route Fit | Backup | Confidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| <lunch / dinner / area> | <restaurant> | <local food> | <rating + review count / recent signal> | <Tabelog or local equivalent rating + review count / not available> | <hours / last order / closed day> | <book now / likely queue / walk-in> | <station / visitor parking / not 月極> | on-route / detour / optional | <nearby fallback> | confirmed / needs day-before check |
+```
+
+Restaurant note:
+
+- Do not select only by numeric score. Explain the tradeoff among cuisine fit, review quality, review volume, recency, opening window, price, reservation/queue risk, and route efficiency.
+- For Japan, use 食べログ as a local screening source when available and Google Maps for exact place/access/recent practical signals; note meaningful disagreements.
+- For self-drive meal stops, include visitor-usable parking or a practical nearby paid parking option.
 
 ## Exact Location Table
 
@@ -289,6 +308,7 @@ Quietness note:
 ## Risks and Backups
 
 - Closure risk:
+- Restaurant / meal risk:
 - Location ambiguity risk:
 - Lodging/check-in risk:
 - Route backtracking risk:

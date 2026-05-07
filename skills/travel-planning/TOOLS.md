@@ -7,8 +7,8 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 | Priority | Source Type | Use For |
 | --- | --- | --- |
 | 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, official address, and facility access pages | Confirming facts that affect feasibility and identity. |
-| 2 | Official reservation platforms, travel agency tour pages, package-tour price pages, airline pages, airport access pages, Shinkansen/rail operator pages, highway bus pages, ferry pages, lodging/guesthouse booking pages, ticketing pages, restaurant pages, local market pages, RV Park listings, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, package price, total transport cost, route benchmark, food planning. |
-| 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, and review platforms | Discovery, exact location identity, navigation identifiers, parking/access notes, recent user signals; verify key claims elsewhere. |
+| 2 | Official reservation platforms, travel agency tour pages, package-tour price pages, airline pages, airport access pages, Shinkansen/rail operator pages, highway bus pages, ferry pages, lodging/guesthouse booking pages, ticketing pages, restaurant pages, reservation platforms, local market pages, RV Park listings, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, package price, total transport cost, route benchmark, food planning. |
+| 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, country-appropriate restaurant review/rating platforms, and map review platforms | Discovery, exact location identity, navigation identifiers, parking/access notes, restaurant screening, recent user signals; verify key claims elsewhere. |
 | 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
 
 ## Japan Travel Sources
@@ -24,7 +24,7 @@ Use official or operator pages first:
 - Japan Meteorological Agency or reputable weather services; for islands, coasts, ferries, mountains, or snow routes, also check marine, wind, wave, snowfall, or road-condition sources.
 - Highway and road authority pages for closures, snow, tolls, ETC/pass options, and rest areas.
 - National park, prefecture, city, and 道の駅 official pages.
-- Local food guides, restaurant official pages, market pages, roadside station food pages, and tourism-board specialty pages.
+- Local food guides, restaurant official pages, market pages, roadside station food pages, tourism-board specialty pages, Google Maps restaurant listings, 食べログ, and reservation platforms such as TableCheck or restaurant booking pages when relevant.
 - RV Park, campground, and booking sites for overnight rules and reservations.
 - Mapcode lookup services and facility access pages for self-drive navigation. If Mapcode is unavailable, capture fallback navigation input: official name, address, phone number, Google Maps exact place link, or coordinate pin.
 - Onsen, sento, super sento, public bath, coin shower, campground shower, laundromat, fuel, EV charging, and grocery pages or map listings for support-stop planning.
@@ -64,6 +64,28 @@ For each key stop, verify or describe:
 - Whether the stop is a destination or just a support stop.
 
 Do not overfill an itinerary with food recommendations that are off-route or closed at the planned time.
+
+## Restaurant Rating and Review Sources
+
+Use the destination country's common restaurant discovery tools instead of applying one global rating rule.
+
+General checks:
+
+- Cross-check at least one map/review source with the restaurant's official page, reservation page, or current listing when timing matters.
+- Consider rating, review count, review recency, price range, queue risk, reservation availability, cuisine fit, local specialty fit, last order, closure days, payment, parking/transit access, and route timing.
+- Prefer restaurants that are reachable inside the day's route and meal window. A higher-rated restaurant that causes a long detour, missed last order, or uncertain parking should be downgraded or listed as optional.
+- Include a nearby backup for rural areas, popular restaurants, closed-day risk, sold-out menus, bad weather, or car-stay late arrivals.
+- Do not claim a restaurant is open, reservable, or has parking from old reviews alone.
+
+Japan checks:
+
+- Use Google Maps for exact place identity, recent reviews, photos, access, and practical route fit.
+- Use 食べログ when practical for local restaurant screening, genre, rating, budget, review volume, reservation links, lunch/dinner distinction, and closure/seat notes.
+- Treat Google Maps and 食べログ as complementary signals. If ratings diverge, explain the practical choice instead of hiding the mismatch.
+- Cross-check official restaurant pages, mall/market pages, or reservation pages for hours, last order, closed days, temporary closures, price, and booking rules.
+- For self-drive trips, check facility parking or nearby visitor-usable paid parking; do not use 月極 or unclear private parking as the restaurant parking solution.
+
+For other countries, identify local equivalents before recommending restaurants, such as the dominant map platform, reservation platform, food guide, tourism-board food page, or local review site.
 
 ## Lodging and Overnight Sources
 
@@ -164,6 +186,8 @@ Location red flags:
 - A strongly recommended detour lacks time/cost tradeoff and a shorter alternative.
 - Recommended sightseeing stops have no explanation of what to do there or how long to stay.
 - Food recommendations are off-route, closed at the planned time, or listed without backup in rural areas.
+- Restaurant choices rely only on a single numeric rating without review count, recency, opening/last-order check, reservation/queue risk, route fit, or local platform context.
+- Japan restaurant recommendations omit 食べログ or another local screening source when the user asks for local rating tools and enough current information is available.
 - Rural, mountain, island, night, or winter driving legs omit last/next reliable fuel or charging points.
 
 ## Weather-Aware Planning Sources
@@ -243,6 +267,7 @@ When citing a time-sensitive source, record:
 - 車中泊 candidate lacks quietness/sleep-quality assessment or backup when noisy/unknown.
 - Overloaded days with no schedule pressure label or simplification.
 - A bath, shower, or laundromat stop placed after its last entry or likely closing time.
+- A meal stop placed after last order, before opening, on a regular closed day, or where self-drive parking is only 月極/unclear private parking.
 - Winter, typhoon, heavy rain, wildfire, landslide, or road restriction risk.
 - Ferry, ropeway, mountain road, or viewpoint plans that ignore wind, visibility, snow, or wave forecasts.
 - Last-entry time too close to arrival.
