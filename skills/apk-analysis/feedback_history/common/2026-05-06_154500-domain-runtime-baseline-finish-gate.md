@@ -14,9 +14,11 @@ Maintain a **project-level domain / runtime baseline** (separate from entity-lev
 
 **Finish gate:** if the outcome includes SDK/client/replay/integration, baseline must exist or be an explicit skeleton with tracked open questions in the same work unit.
 
+**Development gate:** if development is about to start for a live-facing SDK/client/app tool, the baseline must be more than a skeleton. It must answer the minimum runnable factors (endpoint/path family, route/service mapping or adapter strategy, session/bootstrap dependency, opaque parameter source/lifetime, signing/gateway prerequisites, response decrypt/unwrap boundary, pagination truth, error/session recovery, replay checklist). Missing factors block live-facing implementation unless explicitly scoped out. Skeleton baselines may only support offline parser, fixture, mock transport, or documentation work.
+
 ## Validation
 
-Concrete baseline shape and checklist: [`../../DOCUMENTATION.md`](../../DOCUMENTATION.md) § *Domain／執行環境基線*. Skill entry updated in [`../../SKILL.md`](../../SKILL.md) Quick Start §7.
+Concrete baseline shape and checklist: [`../../DOCUMENTATION.md`](../../DOCUMENTATION.md) § *Domain／執行環境基線*. Skill entry updated in [`../../SKILL.md`](../../SKILL.md) Quick Start §7 and Default Workflow handoff.
 
 ## Applicability
 

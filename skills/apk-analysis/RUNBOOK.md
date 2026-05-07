@@ -143,6 +143,7 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
    - 成功證據要可重現
    - API 結論和方法論要分開
    - 去敏後才保存樣本
+   - 若下一步是 SDK/client/app tool/live integration 開發，先補 project-level domain/runtime baseline 的最小可跑因素；缺項要列 blocker，不要直接進 live-facing code
 
 7. 回饋 skill：
    - 新技巧寫入 `feedback_history/<category>/` 或 `feedback_history/common/`（見 `shared-rules/feedback-lessons.md` 命名規則）
@@ -191,4 +192,5 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
 - 初步 request metadata 或下一步 hook 計畫。
 - response wrapper 或解密定位計畫。
 - 去敏規則與文件位置。
+- 若目標包含 SDK/client/replay/live integration：domain/runtime baseline 已回答最小可跑因素，或缺口已列 blocker / scoped out；僅 skeleton 時不得宣稱可開始 live-facing 開發。
 - 是否有新 lesson 回饋到 skill。

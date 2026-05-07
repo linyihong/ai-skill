@@ -96,6 +96,8 @@ api/API列表/<group>/<api-name>.md
 **Finish gate（與 SDK／client／回放相關任務）：**
 
 - 若本輪目標包含「可程式化拉取真實資料」「接 SDK transport」「寫 integration test」之一，而專案尚無 baseline 或僅有 API 條目：必須在**同一工作單**建立 **skeleton baseline**，並把 **open** 項寫成可驗證問題（不可留空「待之後再說」而無追蹤列）。
+- 若本輪要**開始開發** SDK、client、app tool、live integration 或任何會連真實服務的 transport，baseline 不能只停在 skeleton。必須先檢查並記錄最小可跑因素：endpoint/path family、route/service 對照或 adapter 策略、session/bootstrap 依存、opaque 參數來源與時效、簽章／gateway 前置、response decrypt/unwrap 邊界、分頁地面真相、錯誤／session 恢復、重放檢查清單。缺任一項時，該缺口必須成為開發 blocker 或被明確 scoped out；不得一邊缺 runtime 因素一邊實作 live-facing code。
+- 只有不需要真實服務的工作（離線 parser、fixture、mock transport、文件 skeleton、純 schema mapping）可以在 skeleton baseline 下繼續，但文件必須明確標示「不具備 live/replay readiness」。
 - baseline 與 feature handoff 的 **Domain Concepts** 應交叉引用：entity 級與 runtime 級不要混成同一張表而漏掉環境依存。
 
 ## 功能重建交接規範
