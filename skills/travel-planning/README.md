@@ -1,20 +1,21 @@
 # Travel Planning Skill
 
-This skill supports source-backed travel planning: itinerary design, current opening-hour checks, seasonal feasibility, transport timing, lodging or car-stay routing, and backup planning.
+This skill supports source-backed travel planning: itinerary design, current opening-hour checks, weather-aware route ordering, seasonal feasibility, transport timing, lodging or car-stay routing, road-trip support stops, and backup planning.
 
 ## Goals
 
 - Turn a destination and date range into a practical route.
 - Verify time-sensitive details before recommending a stop.
 - Separate confirmed facts from assumptions and open questions.
+- Use weather forecasts to choose better route order and realistic backup plans.
 - Use community sources for discovery while grounding decisions in official or current sources.
-- Make car-stay and road-trip plans realistic: legal overnight status, toilets, bathing, trash rules, noise rules, weather, road conditions, and backup lodging.
+- Make car-stay and road-trip plans realistic: legal overnight status, toilets, bathing, laundry, trash rules, noise rules, weather, road conditions, and backup lodging.
 
 ## What Belongs Here
 
 - Reusable workflows for planning trips.
 - Source hierarchy and verification rules.
-- Output templates for itineraries, source tables, and day-before checklists.
+- Output templates for itineraries, weather/backup logic, support-stop tables, source tables, and day-before checklists.
 - Reusable lessons about travel planning quality, not private trip details.
 
 ## What Does Not Belong Here
@@ -39,6 +40,7 @@ This skill supports source-backed travel planning: itinerary design, current ope
 
 1. Start from the user's destination, dates, style, and constraints.
 2. Gather official and current sources for every time-sensitive recommendation.
-3. Plan route order with buffers and backups.
-4. Mark confidence and unresolved checks clearly.
-5. Convert new reusable planning lessons into `feedback_history/` when they generalize.
+3. Check weather and local disruption risks before locking route order.
+4. Plan route order with buffers, backups, and support stops.
+5. Mark confidence and unresolved checks clearly.
+6. Convert new reusable planning lessons into `feedback_history/` when they generalize.

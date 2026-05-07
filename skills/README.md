@@ -10,5 +10,5 @@
 | --- | --- |
 | `apk-analysis/` | 授權 APK 流量分析、抓包、Frida、Flutter/Dart AOT、文件化與 `feedback_history/` lesson。 |
 | `app-development-guidance/` | 將 App/API/embedded/firmware/hardware-product 觀察轉成開發 guidance、實作模式、檢查清單與驗證方法。 |
-| `travel-planning/` | 依目的地、日期、交通與玩法查證營業時間、交通可行性、天氣/道路風險、住宿或車中泊選項，產出有來源依據的旅程規劃。 |
+| `travel-planning/` | 依目的地、日期、交通與玩法查證營業時間、交通可行性、天氣/道路風險、住宿或車中泊選項，安排備案與洗澡/洗衣等補給點，產出有來源依據的旅程規劃。 |
 | `_template/` | 新增 skill 時複製用範本（非正式 skill）。 |
