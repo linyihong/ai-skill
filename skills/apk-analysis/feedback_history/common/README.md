@@ -36,3 +36,4 @@ Cross-cutting APK analysis lessons that apply before a runtime/API family is kno
 | `2026-05-07_144300-ui-route-backfill-after-runtime-probe.md` | candidate | UI route backfill after runtime probe | Backfill UI architecture maps when runtime/API probes discover new in-app routes. |
 | `2026-05-07_145500-sensitive-provider-fingerprint-diagnostic.md` | candidate | Sensitive provider fingerprint diagnostic | Compare sensitive provider values with short disabled-by-default length/hash or equality diagnostics. |
 | `2026-05-07_161400-sdk-live-self-generation-audit.md` | candidate | SDK live self-generation audit | Distinguish "only authorized identity material remains" SDK readiness from private-adapter-required live gates. |
+| `2026-05-07_171900-provider-read-negative-matrix.md` | candidate | Provider read negative matrix | Prefer disabled-by-default no-writeback provider-read overrides over final query-map mutation when classifying bad/empty opaque provider behavior. |
