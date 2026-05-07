@@ -15,6 +15,7 @@ Use this template when turning a product brief into an implementation plan. Keep
 | Constraints | Security / privacy / platform / hardware / budget / schedule / compatibility | validated / assumption / open question / scoped out / invalidated | |
 | Dependencies | External services / vendors / teams / generated clients / data / hardware | validated / assumption / open question / scoped out / invalidated | |
 | Risks | Abuse / failure / safety / privacy / replay / data loss / operation | validated / assumption / open question / scoped out / invalidated | |
+| Performance expectations | Latency / throughput / resource / startup / batch / concurrency / operational capacity | validated / assumption / open question / scoped out / invalidated | |
 | Open questions | | open question | |
 
 Validation status:
@@ -42,6 +43,7 @@ Use this section before code changes.
 | Affected contracts | Domain Model / Architecture / API / Interface / Error Handling / Test Plan |
 | Required planning updates before code | |
 | Regression or validation test | |
+| Performance impact | none expected / load / stress / spike / soak / smoke check needed |
 | Blocker questions | |
 
 ## Contract Governance
@@ -72,6 +74,9 @@ Use this section when the project has multiple docs or was implemented before sp
 | Contract tests | |
 | Generated client / SDK compile check | |
 | Fixture-backed validation | |
+| Performance budget | P95/P99 latency / throughput / error rate / resource ceiling |
+| Performance test type | load / stress / spike / soak / CI smoke / not applicable with reason |
+| Performance evidence location | CI run / report / dashboard / release checklist / manual note |
 | Host fixture tests | |
 | Hardware-in-loop / target evidence | |
 | AI-generated code review focus | intent / edge cases / security / ownership / error handling |

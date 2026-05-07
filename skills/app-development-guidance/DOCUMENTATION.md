@@ -46,7 +46,9 @@ What this does not solve.
 | Raw vendor documents, account-specific terms, credentials, sandbox/live hosts, private webhook payloads, or real customer data | Project repository docs with sanitization and access control. |
 | Generated clients, SDKs, fixtures, and provider/consumer contract checks | `implementation/` and the project repository. |
 | Product Brief validation, document precedence, traceability, and BDD closure process | `process/`, templates, and checklists. |
+| Performance budgets, load/stress/spike/soak strategy, CI smoke checks, and release evidence | `process/`, `CHECKLIST.md`, templates, and the project repository's test or release notes. |
 | Shared sanitization or feedback rules | [`shared-rules`](../../shared-rules/README.md). |
+| Local-only scratch notes, credentials, or ephemeral process artifacts | Project repository only: **gitignored** paths with **neutral** directory naming; configuration via env vars and optional untracked files; keep tracked READMEs free of filesystem tours and internal codenames. |
 
 ## Reusable Guidance Boundary
 
@@ -85,10 +87,13 @@ Good development guidance is:
 - Testable.
 - Honest about residual risk.
 - Sanitized and free of target-specific details.
+- Explicit when performance evidence is required, including the metric, budget, environment, runner, and release gate.
 
 ## Avoid
 
+- Tracked markdown that maps unpublished workflow to evocative directory names, lists developer-machine paths, or repeats internal investigation stories—those belong in local-only notes under gitignore, not in the default-branch narrative.
 - "Use obfuscation" without naming what it protects and what it does not.
+- "Performance is fine" based only on functional tests or average latency, without P95/P99, throughput, error-rate, resource, baseline, or environment context.
 - "Add pinning" without a rotation plan or threat model.
 - "Detect root" as a hard authorization decision.
 - "Hide the secret in the app" as a durable security control.

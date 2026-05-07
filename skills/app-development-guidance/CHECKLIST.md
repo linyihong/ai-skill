@@ -23,6 +23,7 @@ When a checklist item changes because of a new control or implementation pattern
 - Bug fixes document expected vs actual behavior, reproduction/evidence, affected BDD scenario or missing scenario, impacted contracts/errors, and regression test plan.
 - Bug fixes that change **observable** behavior update affected contracts, BDD/traceability, and integration or live-test notes **in the same work session** as the code fix (not only after merge); deferral requires an explicit tracked follow-up, not silent drift.
 - Refactors are confirmed to have no behavior or public contract change; otherwise they are reclassified.
+- Changes that can affect latency, throughput, resource usage, startup, background work, database access, batching, caching, concurrency, or external-call volume define a performance budget and test type before code.
 - Blocker questions are answered, backed by evidence, or explicitly scoped out before implementation.
 
 ## Test Strategy
@@ -33,14 +34,27 @@ When a checklist item changes because of a new control or implementation pattern
 - Changed/new-code coverage is checked separately from total project coverage.
 - Mutation testing, property-based testing, invariant tests, or negative cases cover rule-heavy or safety-sensitive logic.
 - Database, repository, migration, or persistence behavior is verified with fixtures or integration tests when state matters.
+- Performance-sensitive changes include load, stress, spike, soak, or smoke-size performance evidence appropriate to the risk.
+- Performance evidence reports P95/P99 latency, throughput, error rate, and resource usage; average latency alone is not treated as sufficient.
 - Embedded or hardware-backed behavior distinguishes host-repeatable tests from target-only or hardware-in-loop evidence.
 - AI-generated code receives human review against planning docs, BDD, contracts, edge cases, and security/ownership boundaries.
+
+## Performance Test Strategy
+
+- Performance testing is part of the release gate when user experience, operating cost, reliability, capacity, or external dependency load can change.
+- Load tests cover expected steady demand and compare results against the agreed latency, throughput, error-rate, and resource budgets.
+- Stress tests identify saturation behavior and confirm the system degrades predictably instead of failing silently.
+- Spike tests cover sudden traffic, job, queue, retry, cache, or external-call bursts.
+- Soak tests cover long-running memory, connection, cache, file-handle, queue, database, or resource drift.
+- CI/CD includes at least a small performance smoke check for critical paths when full suites are too expensive for every commit.
+- Performance baselines are versioned or recorded so reviewers can tell whether a change is faster, slower, or still within budget.
 
 ## Product To Contract Flow
 
 - Product brief names goals, users, scope, non-goals, assumptions, and constraints.
 - Product brief claims have evidence, explicit decision, validation plan, or `open question` status before they drive BDD or implementation.
 - Success criteria can be proven by BDD, test, metric, demo, release checklist, or manual evidence.
+- Performance success criteria include explicit budgets when relevant: P95/P99 latency, throughput, error rate, and resource ceiling.
 - Assumptions have owners, validation plan, and impact if false.
 - Bounded Contexts or modules are split by domain responsibility and integration boundary.
 - Critical behavior is written as BDD scenarios before implementation.

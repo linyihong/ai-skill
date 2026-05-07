@@ -19,7 +19,8 @@ The sequence is contract-first: clarify behavior and domain language before team
 | 9. Backend / service implementation | Behavior + domain + API contract implementation | If no backend exists, replace with local service, library, worker, or platform implementation. |
 | 10. Frontend / client implementation | Mock API, schema-first client, UI behavior | If no frontend exists, replace with CLI, SDK, mobile screen, job runner, or consumer integration. |
 | 11. Automated tests | Unit, BDD, API contract, schema tests | Tests should prove domain invariants and contract compatibility. |
-| 12. Integration test | End-to-end or component integration evidence | Verify real adapters, auth/session, error paths, and cross-context flows. |
+| 12. Performance test plan | Load, stress, spike, or soak scope, metric budget, runner, and evidence location | Required when latency, throughput, resource usage, concurrency, startup, background jobs, database access, external-call volume, caching, or batching can change. |
+| 13. Integration test | End-to-end or component integration evidence | Verify real adapters, auth/session, error paths, performance-sensitive paths, and cross-context flows. |
 
 ## Required Contracts
 
@@ -68,7 +69,7 @@ Use [`../templates/initial-development-docs.md`](../templates/initial-developmen
 | Scope | Can we tell what will be built now? | BDD scenario list, module/context map, accepted feature list, API/interface list. |
 | Non-goals | Are excluded behaviors explicit enough to prevent accidental implementation? | Canceled/deferred/out-of-scope table, issue decision, stakeholder answer. |
 | Assumptions | Are assumptions testable, time-bounded, or marked as risk? | Evidence link, validation plan, owner, expiry/review date. |
-| Success criteria | Can a test, review, metric, or demo prove it worked? | BDD acceptance criteria, contract tests, release checklist, analytics/telemetry query, manual evidence. |
+| Success criteria | Can a test, review, metric, performance budget, or demo prove it worked? | BDD acceptance criteria, contract tests, P95/P99 latency budget, throughput target, error-rate budget, release checklist, analytics/telemetry query, manual evidence. |
 | Constraints | Are legal, security, privacy, platform, hardware, budget, schedule, compatibility, and operational constraints named? | Policy, platform docs, architecture contract, risk review, hardware/vendor docs. |
 | Dependencies | Are external services, vendors, teams, generated clients, migrations, data, or hardware dependencies identified? | Integration contract, API docs, schema, vendor excerpt, migration plan, owner confirmation. |
 | Risks | Are abuse, failure, safety, privacy, replay, data loss, and operational risks named with controls or blockers? | Threat model, hardening note, controls/checklists, open blocker questions. |
@@ -163,6 +164,7 @@ Separate "guarding old behavior" from "validating new code" before implementatio
 | Business rules / algorithms | Catch examples that pass but rules that are wrong. | Add property-based tests, invariant tests, or table-driven edge cases. |
 | Critical conditionals / validation logic | Prove tests fail when logic is wrong. | Add mutation testing where practical, or manually test negative cases that would fail if guards were removed. |
 | Database / persistence behavior | Protect real state transitions and migrations. | Add fixture-backed repository tests, migration tests, or integration tests against representative data. |
+| Performance-sensitive behavior | Prevent functionally correct code from exceeding latency, throughput, error-rate, or resource budgets. | Add load, stress, spike, or soak tests based on risk; track P95/P99 latency, throughput, error rate, CPU, memory, disk, network, database connections, queue depth, and external-call volume where relevant. |
 
 Recommended order for new requirements:
 
@@ -170,7 +172,19 @@ Recommended order for new requirements:
 2. Failing unit, contract, property, or integration tests for the new behavior.
 3. Production code.
 4. Mutation/negative checks for critical rules.
-5. Human review with the planning docs, BDD, and tests side by side.
+5. Performance smoke or targeted scenario when the change can affect latency, throughput, or resources.
+6. Human review with the planning docs, BDD, tests, and performance evidence side by side.
+
+For performance testing, pick the smallest test that proves the release risk:
+
+| Test type | Required when |
+| --- | --- |
+| Load test | Expected traffic, job volume, or batch size is known and must stay inside a budget. |
+| Stress test | The limit, saturation point, or degradation behavior is unknown. |
+| Spike test | Sudden bursts, queue pressure, retries, cache misses, or external-call fan-out are plausible. |
+| Soak test | Long-running memory, connection, cache, file-handle, queue, or database drift is plausible. |
+
+Do not accept average latency alone as performance evidence. Record percentile latency, throughput, error rate, and resource usage with the environment and dataset size.
 
 ## Embedded / Hardware Product Flow
 
@@ -295,6 +309,7 @@ Before implementation starts, the feature should have:
 - Error Handling Contract for expected failures and recovery behavior.
 - Test plan covering unit, behavior, contract, and integration levels.
 - Test strategy that distinguishes existing-regression coverage from changed/new-code validation.
+- Performance budget and test type when latency, throughput, resource usage, concurrency, startup, background jobs, database access, or external-call volume can change.
 - No unresolved blocker questions that affect implementation behavior or contracts.
 
 For an already implemented project, "ready" means the missing-document audit is complete and BDD covers the implemented critical behavior, even if original product intent remains partly unknown.
@@ -307,6 +322,7 @@ Before shipping or merging:
 - Contract tests pass for provider and consumer.
 - Mocks/fixtures match the latest contract.
 - Integration test covers at least the critical happy path and one important failure path.
+- Performance-sensitive changes have recorded load, stress, spike, soak, or smoke-size performance evidence against the agreed budget.
 - Residual unknowns or deferred behavior are documented in the project repository.
 
 ← [Back to App Development Guidance](../README.md)

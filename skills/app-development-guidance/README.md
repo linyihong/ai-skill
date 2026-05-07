@@ -19,6 +19,7 @@ Capture practical guidance for:
 - Implemented-first project governance: document precedence, traceability, BDD closure, minimum doc-sync matrices, and **same-session closure** when code changes observable behavior (see `WORKFLOW.md`, `CHECKLIST.md`).
 - Change intake before code: classify new requirements, bug fixes, refactors, hardening, and docs-only work from planning artifacts.
 - Test strategy that separates legacy regression protection from new-code validation with BDD/TDD, changed-code coverage, mutation/property/contract/database tests, and human review.
+- Performance test strategy that treats latency, throughput, error rate, resource usage, load, stress, spike, and soak evidence as release inputs when the change can affect capacity or responsiveness.
 - OpenAPI/schema/codegen flows for typed clients, SDKs, mocks, fixtures, and provider/consumer tests.
 - Vendor and third-party API integration docs, fixtures, live-test gates, webhook/idempotency checks, and secret-safe boundaries.
 - Developer tooling patterns for IDE extensions, CLIs, linters, static analyzers, rule catalogs, kernels, adapters, diagnostics, and fixtures.
@@ -90,7 +91,7 @@ For implemented-first projects, also recover document precedence, stable IDs, tr
 
 Before code work, use [`process/`](process/) to validate the planning artifact and classify the change. Product Brief claims that affect behavior, contracts, risk, ownership, tests, schedule, or release gates must be supported by evidence, explicit decision, validation plan, or blocker status before implementation starts. New requirements must update planning docs, BDD, contracts, implementation slices, and tests before implementation starts. Bug fixes must document expected vs actual behavior and regression tests first.
 
-When planning tests, separate old behavior from new code. Existing tests guard regressions; new or AI-generated code needs BDD/TDD and changed-code validation. Use mutation, property-based, contract, or database-backed tests when ordinary example tests do not prove the rule.
+When planning tests, separate old behavior from new code. Existing tests guard regressions; new or AI-generated code needs BDD/TDD and changed-code validation. Use mutation, property-based, contract, database-backed, or performance tests when ordinary example tests do not prove the rule. For performance-sensitive changes, define a budget and choose load, stress, spike, soak, or smoke-size CI validation.
 
 For embedded or hardware-backed products, use [`platforms/embedded/`](platforms/embedded/) and [`implementation/embedded/`](implementation/embedded/) to capture datasheet/protocol truth, electrical/hardware context, firmware architecture, driver/service/application ownership, host-side fixtures, target/hardware-in-loop checks, and bring-up evidence.
 
@@ -116,6 +117,7 @@ Examples:
 - New tooling/extension rule -> update or verify `implementation/tooling/`, `process/README.md`, `CHECKLIST.md`, and relevant templates.
 - New change-intake rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.
 - New test-strategy rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.
+- New performance-test strategy rule -> update or verify `process/README.md`, `templates/initial-development-docs.md`, `templates/README.md`, `CHECKLIST.md`, `WORKFLOW.md`, `DOCUMENTATION.md`, and `SKILL.md`.
 - New embedded/hardware flow -> update or verify `platforms/embedded/`, `implementation/embedded/`, `process/README.md`, `templates/initial-development-docs.md`, `CHECKLIST.md`, `WORKFLOW.md`, and `SKILL.md`.
 
 Do not describe these updates as optional. If they are relevant, they are required.

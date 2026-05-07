@@ -25,6 +25,7 @@ Use this skill when APK analysis, app/API review, embedded/firmware review, or p
 - Turning IDE extensions, CLIs, linters, static analyzers, code generators, and internal tools into rule catalogs, pure kernels, adapters, diagnostics/commands, fixtures, and integration tests.
 - Classifying app changes as new requirements, bug fixes, refactors, or hardening work before code; new requirements must update planning docs before implementation.
 - Separating legacy regression protection from new-code validation, including BDD/TDD, changed-code coverage, mutation tests, property-based tests, contract tests, database regression tests, and human review.
+- Adding performance testing to development and release gates when changes can affect latency, throughput, resource usage, startup, background work, database access, batching, caching, concurrency, or external-call volume.
 - Backfilling missing development documents for existing, already implemented projects; Product Brief gaps can be marked unknown, but BDD behavior must be completed from observed implementation evidence.
 - Reviewing app/API design for replay resistance, token safety, transport security, local storage, logging, and release hardening.
 - Creating PR/release checklists for mobile, web, backend/API, and future app types.
@@ -43,7 +44,7 @@ Use this skill when APK analysis, app/API review, embedded/firmware review, or p
 3. Classify the request as new requirement, bug fix, refactor, hardening, or documentation-only.
 4. If it is a new requirement or behavior change, update or create planning docs first: change brief, BDD scenarios, impacted Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests. For embedded/hardware work, also update datasheet/protocol references, hardware context, driver/service/application ownership, fixture or hardware-in-loop validation, and bring-up notes. Do not start code until blocker questions are resolved.
 5. If it is a bug fix, confirm expected vs actual behavior, reproduction/evidence, affected or missing BDD scenario, impacted contract/error handling, and regression test plan before code. **After code**, if the fix changes **observable** behavior (including integration-visible semantics), update owning contracts, BDD, and project Linked Updates **in the same work session** before declaring the task complete—green tests alone are not sufficient Definition of Done when durable docs still describe the old behavior. See [WORKFLOW.md](WORKFLOW.md) § *Same-session closure*.
-6. Define the test strategy before production code: distinguish existing-regression coverage from changed/new-code validation; prefer BDD first, then failing unit/contract/property/integration tests for new behavior before implementation.
+6. Define the test strategy before production code: distinguish existing-regression coverage from changed/new-code validation; prefer BDD first, then failing unit/contract/property/integration tests for new behavior before implementation. If performance can change, define a budget and choose load, stress, spike, soak, or smoke-size performance validation.
 7. If starting from a product brief, use [`process/`](process/) to draft or discuss the initial development docs: Product Brief validation, Bounded Contexts, BDD behavior, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests.
 8. If opening this skill on an existing implemented project, audit missing documents and backfill them. Missing Product Brief fields may be marked `unknown` / `open question`, but BDD behavior must be completed from UI, API, code, tests, logs, fixtures, or observed behavior. Recover document precedence, traceability, BDD validation status, generated-client flow, vendor excerpts, and canceled/out-of-scope decisions.
 9. If anything required for behavior, domain invariants, API/interface shape, error handling, security, storage, tests, ownership, document precedence, generated clients, vendor integration, or tool diagnostics is missing, ask the user or request evidence before continuing. Do not proceed with development while blocker questions remain unresolved.
@@ -96,6 +97,7 @@ When producing development guidance, include:
 - Why it matters for app development.
 - Change classification: new requirement, bug fix, refactor, hardening, or docs-only; include planning artifact reviewed.
 - Test strategy: existing behavior guarded by regression tests, new/changed code validated by BDD/TDD and changed-code tests; mention mutation/property/contract/database tests when relevant.
+- Performance strategy when relevant: budget, test type, P95/P99 latency, throughput, error rate, resource usage, baseline, and CI/release gate status.
 - Document precedence and traceability for implemented-first projects, including BDD-to-test status.
 - Generated-client, SDK, fixture, or schema sync status when API/interface contracts are involved.
 - Vendor/third-party integration boundaries, live-test gates, and secret-safe documentation when external providers are involved.
@@ -109,6 +111,8 @@ When producing development guidance, include:
 - Required linked updates, if the change affects multiple folders.
 - **Same-session closure:** list which contracts/BDD/integration notes were updated (or explicitly deferred with tracker) when behavior changed.
 - What not to overclaim.
+
+When authoring or reviewing **tracked** onboarding and README material for a project repository, apply ordinary **commit-facing documentation hygiene**: prefer neutral gitignore targets for local-only trees (for example directories whose names read as generic local state, not as invitations to hunt for unpublished material); avoid embedding one-off investigation narratives, absolute host paths, internal meeting shorthand, or secret-naming templates in markdown that is merged to the default branch; describe setup through environment variables, optional untracked config files, and brief pointers to templates rather than meta-commentary about what was excluded from version control.
 
 ## Feedback Loop
 
