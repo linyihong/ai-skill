@@ -35,6 +35,8 @@ Classify every important recommendation:
 | Driving cost | Route distance, fuel/energy price source, toll calculator, parking operator, ferry/bridge operator, rental-car contract, or charging network. |
 | Lodging, minshuku, guesthouse, campground, RV Park | Official lodging page, booking platform, tourism board, map listing, campground/RV Park listing, or direct facility page. |
 | Route shape and backtracking | Map/route planner, transport timetable, drive route, day-by-day stop order, and next-day base logic. |
+| Schedule feasibility | Opening hours, last entry, visit duration, transfer/drive time, check-in deadline, meal hours, sunset/sunrise, and fatigue risk. |
+| 車中泊 quietness | Recent reviews, map context, road/truck traffic, idling risk, nearby facilities, lighting, late-night activity, and official quiet-hour rules. |
 | Event dates and crowd risk | Official event page, venue page, tourism board, or local government. |
 | Weather-sensitive activity | Weather agency, mountain/weather service, facility notice, or operator notice. |
 | 車中泊 permission | Facility official page, RV Park listing, 道の駅 page, local notice, or recent rule notice. |
@@ -162,12 +164,24 @@ Use conservative buffers:
 - Popular restaurants and attractions: account for queues, reservation checks, or sold-out risk.
 - 車中泊: arrive before dark when rules, toilets, or parking layout are uncertain.
 
-## 11. 車中泊 / Road Trip Checks
+## 11. Schedule Feasibility Check
+
+Before finalizing time blocks, make sure the day can be followed in practice.
+
+1. For each stop, estimate minimum and comfortable visit duration.
+2. Add movement buffers: parking search, walking from parking/station, ticketing, bathroom, luggage, fuel/charging, and rural road delays.
+3. Check hard time limits: last entry, last order, last bus/train/ferry, check-in deadline, sunset, winter road closure, and bath/laundry closing time.
+4. Flag fatigue risk when driving hours, walking load, early starts, late arrivals, or consecutive long days stack up.
+5. If the day is too packed, downgrade lower-priority stops, move food/support stops, split the day, or suggest an overnight base change.
+6. Label schedule pressure as `comfortable`, `tight`, `too packed`, or `needs day-before check`.
+
+## 12. 車中泊 / Road Trip Checks
 
 For each overnight candidate, verify:
 
 - Overnight stay is allowed or at least not explicitly prohibited by current official rules.
 - Parking access hours, gates, height limits, fees, quiet hours, and vehicle size limits.
+- Quietness and sleep quality: distance from major roads, truck parking/idling, late-night traffic, nearby convenience store/restaurant activity, lighting, train/port noise, event/crowd risk, and early-morning activity.
 - Toilet availability overnight.
 - Bathing or shower option nearby and its closing time.
 - Laundromat or washing option when the trip spans multiple nights, includes hiking/beach/snow activities, or the user asks for light packing.
@@ -178,6 +192,13 @@ For each overnight candidate, verify:
 
 Do not describe a place as safe or permitted for 車中泊 unless the source supports it. Use `candidate` or `needs confirmation` when relying on community maps.
 
+For quietness, use practical labels:
+
+- `quiet`: low traffic/activity, no obvious truck/idling concentration, suitable for sleep.
+- `moderate`: some traffic, lighting, or facilities nearby; usable with caveats.
+- `noisy`: road/truck/late-night activity likely affects sleep; prefer only if necessary.
+- `unknown`: insufficient recent evidence; add a quieter backup.
+
 For comfort planning, group support stops into the route:
 
 - Bathing: onsen, sento, super sento, day-use hotel bath, campground shower, or coin shower.
@@ -185,11 +206,12 @@ For comfort planning, group support stops into the route:
 - Recovery: late food, convenience store, supermarket, fuel/charging, toilet, trash rule, and dry indoor rest option.
 - Timing: choose support stops with enough buffer before closing; avoid plans that require late-night bathing or laundry unless hours are confirmed.
 
-## 12. Recommendation Pass
+## 13. Recommendation Pass
 
 Before finalizing, check:
 
 - Does each day have a clear theme and realistic pace?
+- Is each day schedule `comfortable`, `tight`, or `too packed`, and were overloaded days simplified?
 - For each key stop, does the plan say what to do, how long to stay, and whether there is a food/local-specialty recommendation or support-stop role?
 - Does each recommended place have an exact Google Maps place link or precise pin, and are any ambiguous locations clearly marked?
 - If the trip includes overnight stays, is each lodging area/candidate placed for route logic, check-in timing, parking/transit access, and next-day flow?
@@ -204,10 +226,11 @@ Before finalizing, check:
 - Are food and rest breaks realistic?
 - Are rainy-day, heat, snow, wind, transport, and closure backups close enough to use?
 - For road trips or 車中泊, are bathing, laundry, fuel/charging, groceries, and backup lodging covered?
+- For 車中泊, is quietness/sleep quality labeled and is there a quieter backup if the main candidate is noisy or unknown?
 - Are all uncertain claims labeled?
 - Are next actions specific: reserve, call, check official notice, buy pass, download offline map, or prepare cash?
 
-## 13. Final Verification
+## 14. Final Verification
 
 For every important conclusion, provide:
 

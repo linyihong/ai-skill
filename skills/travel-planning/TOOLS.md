@@ -36,7 +36,7 @@ For 車中泊 discovery, a user may provide community maps such as `https://syac
 | --- | --- |
 | City trip | Opening days, last entry, restaurant reservations, transit pass value, crowd/event calendar. |
 | Rural road trip | Drive time, fuel, parking, road closure, weather, limited food hours, backup lodging. |
-| 車中泊 | Overnight permission, toilets, bath/shower, laundry, trash/cooking/idling rules, safety, backup lodging. |
+| 車中泊 | Overnight permission, quietness, toilets, bath/shower, laundry, trash/cooking/idling rules, safety, backup lodging. |
 | Hiking/nature | Trail status, weather, daylight, transport return, facility closure, gear and emergency limits. |
 | Ferry/island | Sailing schedule, weather cancellation, vehicle reservation, last return, port access. |
 | Seasonal events | Official event dates, ticketing, crowd control, special transit, road restrictions. |
@@ -162,6 +162,28 @@ For car-stay or long driving days, search and verify:
 | Fuel / charging | Fuel station, EV charger, roadside station, service area | Hours, charger type, payment app/card, rural gaps, last/next reliable point. |
 | Rest / toilet | 道の駅, service area, park, public toilet, bath facility | Overnight access, cleanliness recency, gates, lighting. |
 
+## Schedule Feasibility Sources
+
+Check the timing assumptions behind the day:
+
+- Opening hours, last entry, last order, check-in deadline, transport last departure, sunset/sunrise, and seasonal road access.
+- Travel time plus buffer for parking, walking from station/parking, ticketing, toilets, fuel/charging, luggage, and queues.
+- Walking distance, driving hours, and consecutive long-day fatigue.
+- Whether a stop is a quick support stop, ordinary visit, meal stop, or half-day destination.
+
+Mark days as `comfortable`, `tight`, `too packed`, or `needs day-before check`.
+
+## 車中泊 Quietness Sources
+
+When evaluating car-stay candidates, check:
+
+- Map context: major road, highway service area, truck route, port, station, train line, nightlife, convenience store, event site, or industrial area.
+- Recent reviews mentioning quiet, noisy, idling, trucks, motorcycles, crowds, lighting, toilets, safety, or early-morning traffic.
+- Official quiet-hour, idling, camping, parking, and overnight-use rules.
+- Distance from toilets/facilities versus quietness. Closer is convenient but may be noisier.
+
+Use labels: `quiet`, `moderate`, `noisy`, or `unknown`. If quietness is `noisy` or `unknown`, include a quieter backup when possible.
+
 ## Source Note Format
 
 When citing a time-sensitive source, record:
@@ -188,6 +210,8 @@ When citing a time-sensitive source, record:
 - Driving itineraries through sparse areas without a refuel/charge recommendation before the low-supply segment.
 - Overnight plans that omit lodging-area rationale, access/check-in constraints, or next-day flow.
 - Itineraries with hidden backtracking or no route-shape warning for A to B then back toward the middle.
+- 車中泊 candidate lacks quietness/sleep-quality assessment or backup when noisy/unknown.
+- Overloaded days with no schedule pressure label or simplification.
 - A bath, shower, or laundromat stop placed after its last entry or likely closing time.
 - Winter, typhoon, heavy rain, wildfire, landslide, or road restriction risk.
 - Ferry, ropeway, mountain road, or viewpoint plans that ignore wind, visibility, snow, or wave forecasts.

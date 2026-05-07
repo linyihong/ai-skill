@@ -22,6 +22,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Route shape:
 - Activity / food focus:
 - Fuel / charging assumptions:
+- Schedule pressure:
 - Planning assumptions:
 
 ## Recommendation
@@ -52,6 +53,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Navigation / parking:
 - Lodging / overnight base:
 - Route shape:
+- Schedule pressure:
 - Bathing / laundry / fuel / charging:
 - Day-before check:
 ```
@@ -163,6 +165,16 @@ Use this for rural, mountain, island, night, winter, or long-distance self-drive
 | <A to B> | low / medium / high | <station / charger / service area> | <place + hours> | <place + hours> | <alternate / carry margin / reroute> | confirmed / needs day-before check |
 ```
 
+## Schedule Feasibility Table
+
+Use this when a day has many stops, long drives, tight transport, or strict closing times.
+
+```markdown
+| Day | Pressure | Tight Point | Buffer / Fix | Decision |
+| --- | --- | --- | --- | --- |
+| <day> | comfortable / tight / too packed / needs day-before check | <last entry / meal / check-in / drive / sunset> | <buffer or adjustment> | keep / shorten / move / drop |
+```
+
 ## Lodging and Overnight Base Table
 
 Use this when the plan includes overnight stays.
@@ -213,10 +225,15 @@ Parking note:
 ## 車中泊 Candidate Table
 
 ```markdown
-| Candidate | Overnight Status | Toilet | Bath / Shower | Laundry | Rules / Fees | Risk | Backup | Confidence |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| <place> | allowed / listed / unclear / not allowed | <hours> | <nearby option> | <coin laundry / none / unknown> | <quiet hours / trash / cooking / gate> | <weather / safety / noise> | <legal backup> | confirmed / needs confirmation |
+| Candidate | Overnight Status | Quietness | Toilet | Bath / Shower | Laundry | Rules / Fees | Risk | Backup | Confidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| <place> | allowed / listed / unclear / not allowed | quiet / moderate / noisy / unknown | <hours> | <nearby option> | <coin laundry / none / unknown> | <quiet hours / trash / cooking / gate> | <weather / safety / noise> | <legal backup> | confirmed / needs confirmation |
 ```
+
+Quietness note:
+
+- Check road/truck/idling/crowd/light/early-morning noise risk.
+- If quietness is `noisy` or `unknown`, include a quieter backup when possible.
 
 ## Road-Trip Support Table
 
@@ -237,6 +254,7 @@ Parking note:
 - Location ambiguity risk:
 - Lodging/check-in risk:
 - Route backtracking risk:
+- Schedule pressure risk:
 - Weather risk:
 - Weather-based route swap:
 - Country-specific navigation / parking risk:
@@ -245,6 +263,7 @@ Parking note:
 - Crowd / event risk:
 - Transport risk:
 - Overnight-stay risk:
+- 車中泊 quietness risk:
 - Bathing / laundry support risk:
 - Backup route:
 - What to check the day before:
