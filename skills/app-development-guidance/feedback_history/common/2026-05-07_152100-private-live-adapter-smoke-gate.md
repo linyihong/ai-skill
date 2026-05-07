@@ -6,7 +6,7 @@ Status: candidate
 
 #### One-line Summary
 
-When analysis supports SDK core design but live replay needs private service, session, signing, or decrypt material, create a private adapter smoke gate before live-facing development starts.
+When analysis supports SDK core design but live replay needs private host, service, session, signing, or decrypt material, create a private adapter smoke gate before live-facing development starts.
 
 #### Human Explanation
 
@@ -14,7 +14,7 @@ It is common for reverse-engineering or integration analysis to identify routes,
 
 #### Trigger
 
-- Project docs say the SDK can model routes and response schemas, but raw `service`, tokens, device material, signing headers, decrypt keys, or equivalent private materials are absent.
+- Project docs say the SDK can model routes and response schemas, but raw base endpoints, route `service`, tokens, device material, signing headers, decrypt keys, or equivalent private materials are absent.
 - A live-facing client, SDK, CLI, backend job, or automation is about to be implemented against a production-like service.
 - The team wants to keep public docs sanitized while still making private implementation verifiable.
 
@@ -26,7 +26,7 @@ It is common for reverse-engineering or integration analysis to identify routes,
 
 #### Generalized Lesson
 
-Separate "SDK core ready" from "live adapter ready." The core may own typed queries, parsers, mock transport, fixtures, pagination semantics, and redacted logging. A private adapter must own raw route binding, session/device values, locale/opaque providers, signing, decrypt, and any negative error matrix. Do not start live-facing code until the missing private adapter capabilities are either provided, scoped out, or represented as setup-failure behavior.
+Separate "SDK core ready" from "live adapter ready." The core may own typed queries, parsers, mock transport, fixtures, pagination semantics, and redacted logging. A private adapter must own base endpoint or host rotation, raw route binding, session/device values, locale/opaque providers, signing, decrypt, and any negative error matrix. Do not start live-facing code until the missing private adapter capabilities are either provided, scoped out, or represented as setup-failure behavior.
 
 #### Agent Action
 
@@ -46,7 +46,7 @@ Separate "SDK core ready" from "live adapter ready." The core may own typed quer
 
 - Building an SDK, client, mock API, fixture-driven parser, backend integration, or automation from APK/API analysis.
 - Public documentation intentionally omits secrets or private replay material.
-- The live service requires signing, opaque request parameters, session/device identity, encrypted headers, or response decrypt.
+- The live service requires private host/base endpoint selection, signing, opaque request parameters, session/device identity, encrypted headers, or response decrypt.
 
 #### Does Not Apply When
 
