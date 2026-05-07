@@ -7,7 +7,7 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 | Priority | Source Type | Use For |
 | --- | --- | --- |
 | 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, official address, and facility access pages | Confirming facts that affect feasibility and identity. |
-| 2 | Official reservation platforms, travel agency tour pages, lodging/guesthouse booking pages, ticketing pages, restaurant pages, local market pages, RV Park listings, transit operators, rail/bus/ferry/airline companies, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, cost, route benchmark, food planning. |
+| 2 | Official reservation platforms, travel agency tour pages, package-tour price pages, lodging/guesthouse booking pages, ticketing pages, restaurant pages, local market pages, RV Park listings, transit operators, rail/bus/ferry/airline companies, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, package price, cost, route benchmark, food planning. |
 | 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, and review platforms | Discovery, exact location identity, navigation identifiers, parking/access notes, recent user signals; verify key claims elsewhere. |
 | 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
 
@@ -33,12 +33,13 @@ For 車中泊 discovery, a user may provide community maps such as `https://syac
 
 ## Travel Agency and Model-Course Sources
 
-Use agency tours and official model courses to benchmark, not to finalize:
+Use agency tours and official model courses either as benchmarks or direct package options:
 
 - Good for: route order, typical travel time, popular stop combinations, seasonal highlights, lunch timing, base areas, tour duration, and booking/ticket patterns.
+- Direct package option checks: package price, per-person/group basis, included transport/meals/tickets/lodging, excluded costs, cancellation/change terms, booking deadline, meeting point, departure/return time, and minimum participants.
 - Must re-check: exact Google Maps pin, opening hours, closure days, current price, parking, public transport, weather suitability, lodging availability, car-stay rules, and whether the route fits the user's pace.
 - Watch for: agency-specific shortcuts, charter bus assumptions, group-only meals, omitted free time, commercial stops, sponsored shopping, and routes that do not work for self-drive or public transit.
-- Record what was borrowed from the agency route and what was changed.
+- Record whether the agency item is a `direct package option` or `benchmark only`, what was borrowed, what was changed, and what the user should verify before booking.
 
 ## Checks By Travel Type
 
@@ -142,6 +143,7 @@ Location red flags:
 - Attraction pin is correct but the practical navigation target should be the visitor parking lot, shuttle stop, pier, trailhead, or reception.
 - Map listing is user-generated and the official page gives a different address or access route.
 - Agency/package-tour route copied without verifying official hours, exact locations, parking, transport, or weather.
+- Direct package option shown without price, included/excluded items, cancellation terms, or user-facing caveats.
 - Agency tour timing reused without adjusting for self-drive, public transit, individual meals, parking, or user pace.
 - Overnight lodging is chosen by price/name only, without route-base logic or check-in/access checks.
 - Route goes A to B and then returns to an intermediate point without a warning or strong reason.

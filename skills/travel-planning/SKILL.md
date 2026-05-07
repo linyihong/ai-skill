@@ -1,6 +1,6 @@
 ---
 name: travel-planning
-description: Plan evidence-based travel itineraries with current operating hours, exact Google Maps place links, what to do at each stop, local food recommendations, travel agency itinerary benchmarking, seasonal closures, transport timing, schedule feasibility checks, booking needs, fare estimates, lodging or car-stay options, lodging/guesthouse recommendations, anti-backtracking route checks, weather-driven route choices, backup plans, bathing and laundry stops, fuel/charging gap planning, car-stay quietness checks, country-specific driving checks such as Japan Mapcode and visitor parking, driving cost estimates, local risk checks, and source-backed recommendations. Use when the user asks where to travel, what to do on specific dates, whether places are open, how to arrange a trip, travel agency tour, package tour, model course, Google Maps, map pin, food, restaurant, local specialty, fuel, gas station, charging, public transport, train, bus, ferry, ticket booking, fare, hotel, guesthouse, minshuku, lodging, route optimization, road trip, Japan travel, Mapcode, parking, quiet overnight, car camping, overnight parking, RV Park, michi-no-eki, bathhouse, laundromat, or 車中泊 planning.
+description: Plan evidence-based travel itineraries with current operating hours, exact Google Maps place links, what to do at each stop, local food recommendations, travel agency itinerary benchmarking or direct package-tour adoption, package prices and included/excluded costs, seasonal closures, transport timing, schedule feasibility checks, booking needs, fare estimates, lodging or car-stay options, lodging/guesthouse recommendations, anti-backtracking route checks, weather-driven route choices, backup plans, bathing and laundry stops, fuel/charging gap planning, car-stay quietness checks, country-specific driving checks such as Japan Mapcode and visitor parking, driving cost estimates, local risk checks, and source-backed recommendations. Use when the user asks where to travel, what to do on specific dates, whether places are open, how to arrange a trip, travel agency tour, package tour, tour price, model course, Google Maps, map pin, food, restaurant, local specialty, fuel, gas station, charging, public transport, train, bus, ferry, ticket booking, fare, hotel, guesthouse, minshuku, lodging, route optimization, road trip, Japan travel, Mapcode, parking, quiet overnight, car camping, overnight parking, RV Park, michi-no-eki, bathhouse, laundromat, or 車中泊 planning.
 ---
 
 # Travel Planning
@@ -12,7 +12,7 @@ Use this skill when a user wants a practical trip plan that depends on dates, pl
 ## When To Use
 
 - Planning trips from destination, date range, budget, travel style, or constraints.
-- Benchmarking travel agency tours, package tours, official model courses, and local tourism itineraries to discover realistic route order, common stop duration, seasonal highlights, meal stops, and booking needs.
+- Benchmarking or directly recommending travel agency tours, package tours, official model courses, and local tourism itineraries when they fit the user's needs.
 - Checking whether attractions, restaurants, parking areas, campgrounds, RV Parks, hot springs, events, ferries, or transit are open on planned dates.
 - Recommending what to do at each stop, expected visit duration, nearby highlights, local food, restaurants, cafes, markets, or regional specialties.
 - Marking exact locations with Google Maps place links, coordinates, or precise pins rather than ambiguous search-result links.
@@ -41,7 +41,9 @@ Use this skill when a user wants a practical trip plan that depends on dates, pl
 1. Clarify the trip frame: destination, dates, party size, transport, pace, budget, must-do interests, dietary/accessibility needs, lodging style, and tolerance for long drives or early starts.
 2. Identify time-sensitive checks: operating days, reservation windows, seasonal closures, event crowding, weather forecast, road/weather constraints, parking rules, public transport schedules, and last-entry times.
 3. Use current web sources. Prefer official facility, tourism board, transit operator, weather, road authority, and reservation pages; use community maps or blogs for discovery, then verify details elsewhere.
-4. Search travel agency tours, package tours, and official model courses for the same area/date/season when helpful. Use them as benchmarks, not as proof: extract route order, stop duration, seasonal highlights, meal/transport patterns, and hidden constraints, then verify each claim against official/current sources.
+4. Search travel agency tours, package tours, and official model courses for the same area/date/season when helpful. They may be used either as benchmarks or as direct recommended options, but the user must be told when a plan is based on an agency/package itinerary.
+   - For direct package recommendations, show price, what is included/excluded, booking/cancellation notes, meeting/departure point, transport assumptions, and why it may be easier or safer than self-planning.
+   - For benchmark use, extract route order, stop duration, seasonal highlights, meal/transport patterns, and hidden constraints, then verify each claim against official/current sources.
 5. Verify exact location identity. Prefer a Google Maps place link or coordinate pin that opens one exact place; avoid generic search URLs that return many possible points. Cross-check the map pin against official name/address and, for Japan self-drive, Mapcode when available.
 6. For each recommended stop, add what to do there, why it is worth stopping, expected stay time, nearby alternatives, and food or local-specialty options when relevant.
 7. Build a feasible route with travel buffers and weather-aware ordering. Move outdoor, scenic, ferry, mountain, and walking-heavy plans into the best weather windows when possible.
@@ -71,7 +73,7 @@ When producing a plan, include:
 
 - Trip assumptions: dates, area, transport, party, pace, and constraints.
 - A day-by-day itinerary with time blocks, travel time, opening hours, last entry, reservation status, and backup options.
-- Travel agency / model-course benchmark notes when used: source, matching season/area, what was borrowed, and what was changed after verification.
+- Travel agency / model-course notes when used: source, matching season/area, whether it is a direct package option or benchmark only, price, included/excluded items, what was borrowed, and what was changed after verification.
 - Schedule feasibility notes: visit duration, movement buffers, meal timing, sunset/last-entry/check-in constraints, fatigue risk, and what was shortened or moved.
 - Stop-level recommendations: what to do, why it is worth it, expected visit duration, local food/restaurant ideas, and nearby alternatives.
 - Source-backed validation for time-sensitive claims.

@@ -89,14 +89,15 @@ Use these templates when producing trip plans or documenting reusable planning w
 Use this when agency tours, package tours, bus tours, or official model courses inform the route.
 
 ```markdown
-| Source | Matching Conditions | Borrowed Idea | Verification Needed | Change Made |
-| --- | --- | --- | --- | --- |
-| <agency/model course> | <season / area / days / transport> | <route order / lunch / stop duration / base area> | <hours / pin / parking / ticket / weather> | <adapted for user pace / self-drive / weather / no backtracking> |
+| Source | Use Type | Price | Included / Excluded | Borrowed Idea | Verification Needed | Change Made / Caveat |
+| --- | --- | --- | --- | --- | --- | --- |
+| <agency/model course> | direct package option / benchmark only | <per person / group / unknown> | <transport / meal / ticket / lodging included; exclusions> | <route order / lunch / stop duration / base area> | <hours / pin / parking / ticket / weather / cancellation> | <adapted for user pace / self-drive / weather / no backtracking / user warning> |
 ```
 
 Benchmark note:
 
-- Do not treat an agency itinerary as proof that a stop is open, reachable, or suitable today.
+- Direct package options must show price, included/excluded items, booking/cancellation notes, and user-facing caveats.
+- Do not treat an agency itinerary as proof that a stop is open, reachable, or suitable today unless independently verified.
 - Explain when an agency route assumes charter buses, group meals, shopping stops, or faster group movement.
 
 ## Stop Experience Table

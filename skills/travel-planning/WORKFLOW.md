@@ -26,7 +26,7 @@ Classify every important recommendation:
 | Claim Type | Required Source |
 | --- | --- |
 | Opening hours, closing days, last entry | Official facility page, official SNS, booking page, or tourism board page. |
-| Travel agency tour / package tour / model course | Travel agency itinerary page, official tourism model course, operator tour page, brochure page, or booking itinerary. |
+| Travel agency tour / package tour / model course | Travel agency itinerary page, official tourism model course, operator tour page, brochure page, booking itinerary, price page, cancellation terms, or included/excluded items page. |
 | Exact place identity | Google Maps place link or coordinate pin, official facility page, official address, map service, or facility access page. |
 | What to do, local food, restaurants | Official tourism page, facility page, local tourism board, restaurant page, market page, recent map listing, or local guide. |
 | Transit schedule, ferry, bus, train | Operator timetable or official route planner. |
@@ -47,16 +47,19 @@ Classify every important recommendation:
 
 Prefer current official sources. If only community information exists, label it `needs confirmation` and provide a safer backup.
 
-## 3. Travel Agency and Model-Course Benchmark
+## 3. Travel Agency and Model-Course Benchmark / Direct Option
 
-Use travel agency tours and official model courses as planning references when they match the region, season, transport mode, or trip length.
+Use travel agency tours and official model courses as planning references, or as direct recommended options when they match the region, season, transport mode, budget, or trip length.
 
 1. Search agency tours, package tours, bus tours, self-drive model courses, and tourism-board model routes for the target area.
-2. Extract useful structure: route order, common base areas, typical stop duration, lunch/meal placement, seasonal highlights, transport mode, booking/ticket requirements, and how long operators allocate between stops.
-3. Do not treat agency content as verified fact. Re-check all opening hours, access, map pins, parking, weather suitability, ticket rules, and current availability through official/current sources.
-4. Do not copy a tour wholesale. Adapt it to the user's pace, transport mode, budget, lodging style, car-stay needs, weather, and backtracking constraints.
-5. If agency routes skip a place the user wants, check whether the skip is due to time, access, parking, season, or route inefficiency.
-6. Record what was borrowed and what was changed.
+2. If recommending a package directly, show the package price, price basis (per person / group / vehicle), what is included, what is excluded, cancellation/change conditions, meeting point, departure/return time, and booking deadline.
+3. Warn the user that a package tour may assume charter buses, fixed group movement, group meals, shopping stops, reduced free time, and agency-controlled timing.
+4. Compare the package against self-planning when possible: likely cheaper/easier/safer, what flexibility is lost, and which costs remain outside the package.
+5. If using the agency route as a benchmark only, extract useful structure: route order, common base areas, typical stop duration, lunch/meal placement, seasonal highlights, transport mode, booking/ticket requirements, and how long operators allocate between stops.
+6. Do not treat agency content as verified fact. Re-check all opening hours, access, map pins, parking, weather suitability, ticket rules, and current availability through official/current sources.
+7. Do not copy a tour wholesale unless the user chooses the package as the plan. Adapt benchmarked routes to the user's pace, transport mode, budget, lodging style, car-stay needs, weather, and backtracking constraints.
+8. If agency routes skip a place the user wants, check whether the skip is due to time, access, parking, season, or route inefficiency.
+9. Record whether the agency item is a `direct package option` or `benchmark only`, and what was changed.
 
 ## 4. Exact Location Verification
 
@@ -223,7 +226,7 @@ For comfort planning, group support stops into the route:
 Before finalizing, check:
 
 - Does each day have a clear theme and realistic pace?
-- If agency/model-course references were used, did the plan state what was borrowed and what was changed after verification?
+- If agency/model-course references were used, did the plan state whether each source is a direct package option or benchmark only, price/inclusions when direct, and what was borrowed or changed after verification?
 - Is each day schedule `comfortable`, `tight`, or `too packed`, and were overloaded days simplified?
 - For each key stop, does the plan say what to do, how long to stay, and whether there is a food/local-specialty recommendation or support-stop role?
 - Does each recommended place have an exact Google Maps place link or precise pin, and are any ambiguous locations clearly marked?
