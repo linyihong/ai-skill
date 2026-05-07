@@ -32,3 +32,4 @@ Cross-cutting APK analysis lessons that apply before a runtime/API family is kno
 | `2026-05-06_133600-post-reset-window-split.md` | promoted | Post-reset window split | Split reset/session recovery and feature-checkpoint attach windows when launch-time hooks or first-run UI can pollute attribution. |
 | `2026-05-07_124100-ui-fast-path-bounded-scroll.md` | candidate | UI fast path and bounded scroll | Compare app-owned shortcut controls against generic tap paths, and use bounded scroll convergence when scroll extent is unavailable. |
 | `2026-05-07_131000-highest-leverage-analysis-path.md` | candidate | Highest leverage analysis path | Choose the analysis route with the best time-to-evidence ratio instead of continuing a fixed technique sequence. |
+| `2026-05-07_143800-stateful-setting-probe-restore.md` | candidate | Stateful setting probe restore | Restore app settings changed during dynamic probes and record both probe and restoration evidence. |
