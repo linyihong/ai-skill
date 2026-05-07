@@ -243,4 +243,4 @@ HLS `#EXT-X-KEY` URI 不一定就是最終 segment 解密 key。若用 playlist 
 - 有文件回填位置。
 - **若下游要程式化取數／接 SDK／寫 integration：** 專案內已有或可指向的 **Domain／執行環境基線**（`DOCUMENTATION.md` § Domain／執行環境基線）：環境維度、session 對列表參數的依存、opaque 參數由來、分頁地面真相、簽章／gateway 前置（均去敏），並連回 API Catalog 條目。缺則視為收口不完整，只可標 `baseline: skeleton` + 明示 open 項。
 - **若要開始開發 live-facing SDK/client/app tool：** 上述 baseline 必須通過 development readiness gate，至少回答 endpoint/path family、route/service mapping 或 adapter strategy、session/bootstrap、opaque 參數來源與時效、signing/gateway、decrypt/unwrap、pagination、error/session recovery、replay checklist。缺口未解或未 scoped out 時，不得宣稱分析已足以開發；只能做離線 parser、fixture、mock 或文件補齊。
-- 有新的 reusable lesson 時，已在 **`feedback_history/`** 新增對應檔案（規則見 `shared-rules/feedback-lessons.md`）。
+- 有新的 reusable lesson，或使用者 / reviewer 提出可泛化改進時，已在 **`feedback_history/`** 新增對應檔案；若尚未驗證，標 `candidate` / `experimental` 並寫 validation criteria（規則見 `shared-rules/feedback-lessons.md`）。
