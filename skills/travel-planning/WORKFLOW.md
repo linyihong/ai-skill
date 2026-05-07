@@ -68,10 +68,11 @@ Before route optimization, make sure each recommended place points to the intend
 
 1. Prefer Google Maps links that open a single exact place, or a coordinate/map pin for the exact entrance, parking lot, bath, laundromat, station, pier, trailhead, or overnight base.
 2. Avoid generic Google search or map search URLs when they return multiple branches, similarly named facilities, broad areas, or uncertain pins.
-3. Cross-check the Google Maps pin with official facility name, official address, official access page, and map listing details.
-4. For Japan self-drive, cross-check Mapcode against Google Maps and official address/access details. If the Mapcode points to parking while Google Maps points to the attraction entrance, state that difference explicitly.
-5. If the location is a large area, choose the practical target pin: visitor parking, ticket office, trailhead, ferry terminal, station exit, campground reception, RV Park entrance, bath entrance, laundromat, or viewpoint parking.
-6. Mark ambiguity as `location needs confirmation` when multiple pins remain plausible, the official page lacks address detail, Mapcode and Google Maps disagree, or reviews suggest the pin is wrong.
+3. For driving routes, choose the practical arrival pin first: nearest confirmed visitor-usable parking lot, official designated parking, facility parking, public parking, or coin parking. Do not use 月極, resident-only, staff-only, apartment, permit-only, or unclear private lots as the driving point.
+4. Cross-check the Google Maps pin with official facility name, official address, official access page, and map listing details.
+5. For Japan self-drive, cross-check Mapcode against Google Maps and official address/access details. If the Mapcode points to parking while Google Maps points to the attraction entrance, state that difference explicitly.
+6. If the location is a large area, choose the practical target pin: visitor parking, ticket office, trailhead, ferry terminal, station exit, campground reception, RV Park entrance, bath entrance, laundromat, or viewpoint parking.
+7. Mark ambiguity as `location needs confirmation` when multiple pins remain plausible, the official page lacks address detail, Mapcode and Google Maps disagree, the nearest visitor parking is unclear, or reviews suggest the pin is wrong.
 
 Do not hide location ambiguity inside the itinerary. If the user could navigate to the wrong place, put the concern next to the stop and add a safer fallback pin or verification action.
 
@@ -165,12 +166,13 @@ Apply local driving and navigation rules before finalizing route order.
 For Japan self-drive plans:
 
 1. For each drive-to destination, search for a Mapcode when available. If unavailable, provide a phone number, address, official facility name, or map link as fallback navigation input.
-2. Cross-check Mapcode, Google Maps exact place/pin, official address, and parking/access page. If they point to different entrances or lots, describe the difference and choose the best navigation target for the route.
-3. Prefer attractions, restaurants, baths, laundromats, viewpoints, and overnight bases with ordinary visitor parking, public parking, facility parking, 道の駅 parking, service-area parking, or clearly listed paid coin parking.
-4. Do not count 月極 parking, resident-only lots, staff-only lots, apartment parking, permit-only lots, or unclear private lots as usable visitor parking.
-5. If parking is unclear, either downgrade the stop, add a nearby confirmed visitor parking option, or mark it `parking needs confirmation`.
-6. Include parking caveats for narrow streets, height limits, winter closure, event restrictions, shuttle-only access, and popular lots that fill early.
-7. When a stop is chosen mainly because it has reliable parking, say so in the itinerary.
+2. For each drive-to stop, make the Google Maps driving point the nearest confirmed visitor-usable parking lot or official designated parking when that differs from the attraction, restaurant, trailhead, shrine/temple, bath, or facility entrance.
+3. Cross-check Mapcode, Google Maps exact place/pin, official address, and parking/access page. If they point to different entrances or lots, describe the difference and choose the best parking/navigation target for the route.
+4. Prefer attractions, restaurants, baths, laundromats, viewpoints, and overnight bases with ordinary visitor parking, public parking, facility parking, 道の駅 parking, service-area parking, or clearly listed paid coin parking.
+5. Do not count 月極 parking, resident-only lots, staff-only lots, apartment parking, permit-only lots, or unclear private lots as usable visitor parking.
+6. If parking is unclear, either downgrade the stop, add a nearby confirmed visitor parking option, or mark it `parking needs confirmation`.
+7. Include parking caveats for walking distance from lot to destination, narrow streets, height limits, winter closure, event restrictions, shuttle-only access, and popular lots that fill early.
+8. When a stop is chosen mainly because it has reliable parking, say so in the itinerary.
 
 For other countries or regions, identify equivalent local requirements before planning: navigation identifiers, low-emission zones, toll systems, vignette/permit needs, parking restrictions, road permits, ferry reservations, or seasonal access rules.
 
@@ -254,7 +256,7 @@ Before finalizing, check:
 - If not driving, are departure times, transfer buffers, last-return options, required reservations, and fare estimates listed?
 - If driving, is rough transport cost estimated with distance, fuel/charging, tolls, parking, ferry/bridge, and rental assumptions?
 - If driving through sparse areas, are fuel/charging gaps identified with recommended refuel/charge points and backups?
-- For Japan self-drive, does each drive-to stop include Mapcode or fallback navigation input, has it been cross-checked against Google Maps and official address/access details, and is parking ordinary visitor parking rather than 月極 or private-only parking?
+- For Japan self-drive, does each drive-to stop include Mapcode or fallback navigation input, has it been cross-checked against Google Maps and official address/access details, and is the driving Google Maps point the nearest confirmed visitor-usable parking/official parking rather than the attraction entrance, 月極, or private-only parking?
 - Are food and rest breaks realistic?
 - Are rainy-day, heat, snow, wind, transport, and closure backups close enough to use?
 - For road trips or 車中泊, are bathing, laundry, fuel/charging, groceries, and backup lodging covered?

@@ -1,6 +1,6 @@
 # Travel Planning Skill
 
-This skill supports source-backed travel planning: itinerary design, travel agency itinerary benchmarking or direct package-tour adoption, package price comparison, long-distance transport comparison, stop-level activity and food recommendations, country-appropriate restaurant rating/review screening, exact location verification, current opening-hour checks, schedule feasibility checks, weather-aware route ordering, seasonal feasibility, public-transport optimization, fare and driving-cost estimates, lodging or guesthouse recommendations, car-stay routing, car-stay quietness checks, anti-backtracking route checks, fuel/charging gap planning, country-specific driving checks, road-trip support stops, and backup planning.
+This skill supports source-backed travel planning: itinerary design, travel agency itinerary benchmarking or direct package-tour adoption, package price comparison, long-distance transport comparison, stop-level activity and food recommendations, country-appropriate restaurant rating/review screening, exact location verification, driving Google Maps pins that target usable visitor parking, current opening-hour checks, schedule feasibility checks, weather-aware route ordering, seasonal feasibility, public-transport optimization, fare and driving-cost estimates, lodging or guesthouse recommendations, car-stay routing, car-stay quietness checks, anti-backtracking route checks, fuel/charging gap planning, country-specific driving checks, road-trip support stops, and backup planning.
 
 ## Goals
 
@@ -12,6 +12,7 @@ This skill supports source-backed travel planning: itinerary design, travel agen
 - Filter restaurant candidates with the destination country's commonly used review/rating tools, such as Google Maps plus 食べログ for Japan when practical.
 - Keep daily schedules realistic with stop-duration, travel-buffer, meal, check-in, last-entry, sunset, and fatigue checks.
 - Mark places with exact Google Maps place links, coordinate pins, or precise map URLs instead of ambiguous search-result links.
+- For self-drive routes, use the nearest confirmed visitor-usable parking lot or official designated parking as the Google Maps navigation point when it differs from the attraction, restaurant, trailhead, or facility entrance.
 - Verify time-sensitive details before recommending a stop.
 - Separate confirmed facts from assumptions and open questions.
 - Use weather forecasts to choose better route order and realistic backup plans.
@@ -28,7 +29,7 @@ This skill supports source-backed travel planning: itinerary design, travel agen
 ## What Belongs Here
 
 - Reusable workflows for planning trips.
-- Source hierarchy, travel agency/model-course benchmark or direct-package checks, package price comparison, long-distance transport comparison, stop-level activity/food checks, country-specific restaurant rating/review checks, exact-location checks, schedule-feasibility checks, lodging/base checks, car-stay quietness checks, anti-backtracking route checks, transport booking/cost checks, fuel/charging checks, country-specific checks, and verification rules.
+- Source hierarchy, travel agency/model-course benchmark or direct-package checks, package price comparison, long-distance transport comparison, stop-level activity/food checks, country-specific restaurant rating/review checks, exact-location and driving-parking-pin checks, schedule-feasibility checks, lodging/base checks, car-stay quietness checks, anti-backtracking route checks, transport booking/cost checks, fuel/charging checks, country-specific checks, and verification rules.
 - Output templates for itineraries, agency/model-course comparison, package price comparison, long-distance transport comparison, stop recommendations, schedule feasibility, lodging candidates, route-shape warnings, quietness notes, transport plans, cost estimates, weather/backup logic, support-stop tables, source tables, and day-before checklists.
 - Reusable lessons about travel planning quality, not private trip details.
 
@@ -55,7 +56,7 @@ This skill supports source-backed travel planning: itinerary design, travel agen
 1. Start from the user's destination, dates, style, and constraints.
 2. Gather official and current sources for every time-sensitive recommendation.
 3. Check travel agency tours, package tours, and official model courses when useful. Either benchmark them or list them as direct options with price, inclusions/exclusions, booking conditions, and user-facing caveats.
-4. Verify exact place identity with Google Maps and official name/address; cross-check Mapcode when relevant.
+4. Verify exact place identity with Google Maps and official name/address; for driving, choose the nearest confirmed visitor parking/official parking pin as the practical navigation target and cross-check Mapcode when relevant.
 5. Add what to do, expected stay time, and food/local-specialty ideas for key stops. Screen restaurant candidates with local review/rating platforms and route/timing constraints.
 6. For cross-city, inter-prefecture, island, airport, or 2+ hour transfers, compare long-distance transport options by time, money, baggage burden, and booking risk.
 7. Check weather and local disruption risks before locking route order.

@@ -17,7 +17,7 @@ Use official or operator pages first:
 
 - Facility official websites and official social accounts.
 - Travel agency tour pages, package-tour itineraries, bus-tour routes, and official tourism model courses for route benchmarking.
-- Google Maps exact place links or coordinate pins; avoid generic search-result links when they can open many similarly named places.
+- Google Maps exact place links or coordinate pins; avoid generic search-result links when they can open many similarly named places. For self-drive stops, prefer the nearest confirmed visitor parking or official designated parking pin as the driving navigation target.
 - Local tourism association pages.
 - Train, bus, ferry, ropeway, highway bus, airport operators, official route planners, fare tables, reservation pages, seat rules, and pass pages.
 - Airline, Shinkansen, limited express, highway bus, ferry, rental-car, toll, fuel/charging, parking, airport access, and station access pages for long-distance transport comparison.
@@ -28,7 +28,7 @@ Use official or operator pages first:
 - RV Park, campground, and booking sites for overnight rules and reservations.
 - Mapcode lookup services and facility access pages for self-drive navigation. If Mapcode is unavailable, capture fallback navigation input: official name, address, phone number, Google Maps exact place link, or coordinate pin.
 - Onsen, sento, super sento, public bath, coin shower, campground shower, laundromat, fuel, EV charging, and grocery pages or map listings for support-stop planning.
-- Parking operator pages, official facility access pages, and map listings for visitor parking. Prefer ordinary visitor parking, public parking, facility parking, coin parking, 道の駅 parking, or service-area parking. Exclude 月極 parking, resident-only parking, staff-only parking, apartment parking, permit-only parking, and unclear private lots.
+- Parking operator pages, official facility access pages, and map listings for visitor parking. Prefer ordinary visitor parking, public parking, facility parking, coin parking, 道の駅 parking, or service-area parking closest to the actual stop. Exclude 月極 parking, resident-only parking, staff-only parking, apartment parking, permit-only parking, and unclear private lots.
 
 For 車中泊 discovery, a user may provide community maps such as `https://syachuhaku.fxtec.info/`. Treat these as discovery sources, then verify overnight rules, toilets, gates, fees, and recent notices through official pages, RV Park listings, local pages, or direct contact when needed.
 
@@ -149,7 +149,7 @@ When the trip uses a car, check whether the destination country has local naviga
 For every drive-to stop, try to record:
 
 - Mapcode for car navigation when available.
-- Google Maps exact place link or coordinate pin.
+- Google Maps exact place link or coordinate pin for the practical driving target, usually the nearest confirmed visitor parking or official designated parking rather than the attraction entrance.
 - Fallback navigation input: official facility name, address, phone number, or map link.
 - Parking type: visitor/facility/public/coin/RV Park/道の駅/service area, or `unclear`.
 - Parking caveats: fee, hours, height limit, distance to destination, event restrictions, shuttle-only access, winter closure, or fills-early risk.
@@ -161,6 +161,7 @@ Parking source handling:
 - Map listings and reviews can help discover parking, but verify whether the lot is visitor-usable.
 - Treat 月極, resident-only, staff-only, apartment, permit-only, and unclear private lots as unavailable unless an official source says visitors can use them.
 - If no reliable visitor parking exists, choose a different stop, suggest public transport/taxi for that segment, or add a confirmed nearby paid parking lot.
+- When Google Maps shows a correct attraction pin but the user is driving, also provide or replace with the nearest confirmed visitor parking pin; state walking distance or shuttle requirement when material.
 
 ## Exact Location Sources
 
@@ -168,6 +169,7 @@ Use precise location sources when marking stops:
 
 - Google Maps place URLs that open one exact facility, not a search results page.
 - Coordinate pins when the practical destination is an entrance, trailhead, parking lot, pier, station exit, or viewpoint instead of the facility's general address.
+- For driving, exact location means the best usable arrival point for the vehicle. Prefer nearest confirmed visitor parking, official parking, public parking, coin parking, or facility parking; exclude 月極 and unclear private lots.
 - Official address and access pages to confirm the map pin.
 - Mapcode for Japan self-drive, cross-checked against the Google Maps pin and official address/access page.
 
@@ -177,6 +179,8 @@ Location red flags:
 - Multiple facilities with the same or similar name.
 - Google Maps pin, Mapcode, and official address point to different roads, entrances, lots, or nearby towns.
 - Attraction pin is correct but the practical navigation target should be the visitor parking lot, shuttle stop, pier, trailhead, or reception.
+- Driving itinerary uses an attraction/restaurant Google Maps pin while nearby visitor parking is the actual arrival point.
+- Nearest parking found on a map is 月極, resident-only, staff-only, apartment, permit-only, or unclear private parking.
 - Map listing is user-generated and the official page gives a different address or access route.
 - Agency/package-tour route copied without verifying official hours, exact locations, parking, transport, or weather.
 - Direct package option shown without price, included/excluded items, cancellation terms, or user-facing caveats.

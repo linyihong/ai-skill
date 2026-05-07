@@ -54,6 +54,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Rating / review source:
 - Weather or seasonal risk:
 - Exact location / Google Maps:
+- Driving parking pin:
 - Navigation / parking:
 - Lodging / overnight base:
 - Route shape:
@@ -140,15 +141,16 @@ Restaurant note:
 Use this for every meaningful stop when location identity matters.
 
 ```markdown
-| Stop | Google Maps Exact Place / Pin | Official Name / Address Check | Mapcode Check | Practical Navigation Target | Location Confidence | Concern |
-| --- | --- | --- | --- | --- | --- | --- |
-| <place> | <place URL / coordinate pin, not broad search> | match / mismatch / not found | match / different / unavailable / not needed | entrance / visitor parking / station exit / pier / trailhead / reception | confirmed / needs confirmation | <ambiguity or none> |
+| Stop | Google Maps Exact Place / Pin | Driving Parking Pin | Official Name / Address Check | Mapcode Check | Practical Navigation Target | Location Confidence | Concern |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| <place> | <place URL / coordinate pin, not broad search> | <nearest visitor/official parking URL or not driving> | match / mismatch / not found | match / different / unavailable / not needed | entrance / visitor parking / station exit / pier / trailhead / reception | confirmed / needs confirmation | <ambiguity or none> |
 ```
 
 Location note:
 
 - Prefer exact Google Maps place links or coordinate pins that open one location.
 - Avoid generic search links when many results can appear.
+- For driving, the practical Google Maps target should be the nearest confirmed visitor-usable parking or official designated parking when available, not 月極 or unclear private parking.
 - If Google Maps, Mapcode, official address, and practical parking/entrance point differ, explain which one should be used for navigation and why.
 
 ## Non-Driving Transport Plan
@@ -268,16 +270,16 @@ Route note:
 Use this when a trip uses a car and the country has local navigation or access requirements. For Japan self-drive plans, include this table unless the user explicitly says Mapcode is unnecessary.
 
 ```markdown
-| Stop | Google Maps Exact Place / Pin | Mapcode / Navigation Input | Parking Type | Parking Source | Caveat | Confidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| <place> | <place URL / coordinate pin> | <Mapcode / phone / address / map link> | visitor / facility / public / coin / RV Park / 道の駅 / service area / unclear | <official access / parking operator / map listing> | <fee / hours / height / fills early / not 月極 / pin mismatch> | confirmed / needs confirmation |
+| Stop | Google Maps Exact Place / Pin | Driving Parking Pin | Mapcode / Navigation Input | Parking Type | Parking Source | Caveat | Confidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| <place> | <place URL / coordinate pin> | <nearest visitor/official parking URL> | <Mapcode / phone / address / map link> | visitor / facility / public / coin / RV Park / 道の駅 / service area / unclear | <official access / parking operator / map listing> | <fee / hours / height / walking distance / fills early / not 月極 / pin mismatch> | confirmed / needs confirmation |
 ```
 
 Parking note:
 
 - Prefer stops with ordinary visitor parking, facility parking, public parking, coin parking, RV Park, 道の駅, or service-area parking.
 - Do not use 月極 parking, resident-only lots, staff-only lots, apartment parking, permit-only lots, or unclear private lots as the plan's parking solution.
-- Cross-check Mapcode, Google Maps exact place/pin, official address, and access page. If Mapcode is unavailable, provide fallback navigation input and mark the source. If they disagree, explain the concern.
+- Cross-check Mapcode, Google Maps exact place/pin, driving parking pin, official address, and access page. If Mapcode is unavailable, provide fallback navigation input and mark the source. If they disagree, explain the concern and which pin should be used for driving.
 
 ## 車中泊 Candidate Table
 
