@@ -73,7 +73,9 @@ git config core.hooksPath scripts/git-hooks
   --title "Example goal" \
   --source "User asked for the example outcome" \
   --next "Read the relevant files" \
-  --criteria "User-visible outcome is complete and validated"
+  --criteria "User-visible outcome is complete and validated" \
+  --plan "docs/implementation-plan.md#example" \
+  --todo "implement-example"
 ```
 
 更新、拆解、暫停與完成：
@@ -88,5 +90,7 @@ git config core.hooksPath scripts/git-hooks
 安全條件：
 
 - `complete` 只有在傳入 `--validated` 時才會刪除 goal 檔；否則會保留並標成 `needs-validation`。
+- `.agent-goals/README.md` 會自動刷新成主目標表，連到 `goals/*.md`，並顯示 plan/todo links、下一步與更新時間。
+- `start`、`update`、`split` 可重複使用 `--plan` 與 `--todo`，把 planning 文件章節、TodoWrite ID、checklist item 或 issue ID 連到 goal。
 - 每個 goal 更新時會使用 `.agent-goals/locks/<goal-id>.lock/` 防止多 agent 同時寫入。
 - Stale lock 可用 `cleanup` 清理；TTL 預設 30 分鐘，可用 `AGENT_GOALS_LOCK_TTL_SECONDS` 覆寫。

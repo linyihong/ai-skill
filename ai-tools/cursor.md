@@ -106,8 +106,9 @@ Cursor 會掃描特定路徑下的 skill；把中央庫對應的 `skills/<name>/
    ```
 
 4. 若使用者轉移目標，先 `pause` 或 `update --status superseded` 舊 goal，再建立新的 `P1`。
-5. 若發現需要拆小目標，使用 `split` 或在 goal 檔的 `Subgoals` 區塊記錄。
-6. 在回覆完成前，只有完成條件與驗證都成立時才 `complete --validated`；否則保留 goal，讓下一個 agent 可接手。
+5. 若有 planning 文件或 TodoWrite todo，使用 `--plan` / `--todo` 連到 goal，並讓 `.agent-goals/README.md` 的主目標表可快速跳回該 goal。
+6. 若發現需要拆小目標，使用 `split` 或在 goal 檔的 `Subgoals` 區塊記錄。
+7. 在回覆完成前，只有完成條件與驗證都成立時才 `complete --validated`；否則保留 goal，讓下一個 agent 可接手。
 
 ### Cursor hooks 範本方向
 
@@ -115,7 +116,7 @@ Cursor hook 可以輔助提醒，但不應成為唯一真相。可選的 project
 
 | Event | 用途 | 行為 |
 | --- | --- | --- |
-| `sessionStart` | 開局提醒 | 檢查 `.agent-goals/goals/*.md`，若有 active goal，回傳 additional context / user-facing reminder。 |
+| `sessionStart` | 開局提醒 | 檢查 `.agent-goals/README.md` 與 `.agent-goals/goals/*.md`，若有 active goal，回傳 additional context / user-facing reminder。 |
 | `preCompact` | 壓縮前檢查 | 若有 active goal，提醒 agent 先更新 `Next Action`、`Progress`、`Validation`。 |
 | `stop` | 停止前檢查 | 若 goal 未完成，提醒保留或更新；不要自動刪除。 |
 

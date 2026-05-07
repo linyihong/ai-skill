@@ -19,6 +19,7 @@ The ledger must answer:
 | Source | User request or instruction that created the goal. |
 | Scope | In scope, out of scope, and affected project/repo. |
 | Subgoals | Child goals or checklist items when the goal is decomposed. |
+| Planning / todo links | Planning document path, plan section, TodoWrite IDs, checklist items, or external issue links related to this goal. |
 | Dependencies | Required user answer, external command, file, agent, or upstream goal. |
 | Next action | The next concrete step a new agent should take. |
 | Completion criteria | What must be true before the file can be deleted. |
@@ -30,7 +31,7 @@ Store ledgers in the project being worked on:
 
 ```text
 <PROJECT_ROOT>/.agent-goals/
-  README.md
+  README.md              # main goal table / quick locator
   goals/
     P1-<slug>.md
   locks/
@@ -82,6 +83,12 @@ project: <PROJECT_ROOT or project label>
 ## Subgoals
 - [ ] <subgoal>
 
+## Planning / Todo Links
+| Type | Reference | Status / Note |
+| --- | --- | --- |
+| plan | <path#section or none> | <why it matters> |
+| todo | <todo id / checklist item / issue> | <pending / in_progress / completed / blocked> |
+
 ## Dependencies
 - <none / user answer / external state / parent goal>
 
@@ -102,6 +109,32 @@ project: <PROJECT_ROOT or project label>
 ```
 
 Do not write secrets, tokens, raw private data, reservation codes, personal addresses, or private host details into the ledger. Use redacted labels or project-local references.
+
+## Main Goal Table
+
+Keep `<PROJECT_ROOT>/.agent-goals/README.md` as the primary locator for active goals. It should contain a compact table that links to each goal file:
+
+```markdown
+| Priority | Status | Goal | Planning / Todo Links | Next Action | Updated |
+| --- | --- | --- | --- | --- | --- |
+| P1 | active | [Short title](goals/P1-short-slug.md) | plan: docs/plan.md#section; todo: implement-api | Run validation | 2026-05-08T00:00:00Z |
+```
+
+The main table is for quick recovery. It should not replace the detail in each goal file.
+
+Update the table when a goal is created, paused, split, linked to a todo, or completed. When a goal file is deleted after validation, remove it from the table.
+
+## Planning And Todo Links
+
+When a planning document, checklist, or tool-level todo list exists, connect it to the goal ledger:
+
+1. Put the goal ID next to the relevant plan section, checklist item, or todo when practical.
+2. Record the plan path, section anchor, TodoWrite ID, checklist item, or issue ID under `Planning / Todo Links` in the goal file.
+3. If a todo becomes a separate resumable work item, either add it as a subgoal or split it into a child goal.
+4. When a todo is completed, update the goal progress and validation notes before deleting the goal.
+5. If a todo is cancelled because the user changed direction, mark the linked goal `paused` or `superseded` and record the reason.
+
+The goal ledger tracks user-facing intent; todo tools track execution steps. Keep both connected so a future agent can jump from a high-level goal to the exact plan/todo item and back.
 
 ## Priority Rules
 
