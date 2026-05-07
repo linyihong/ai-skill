@@ -6,9 +6,9 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 
 | Priority | Source Type | Use For |
 | --- | --- | --- |
-| 1 | Official facility, operator, event, park, campground, tourism board, local government, weather, marine, mountain, and road authority pages | Confirming facts that affect feasibility. |
-| 2 | Official reservation platforms, ticketing pages, RV Park listings, transit operators, airline/ferry/bus companies, bath/shower facilities, laundromats, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules. |
-| 3 | Current map services and review platforms | Discovery, rough location, access notes, recent user signals; verify key claims elsewhere. |
+| 1 | Official facility, operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, and facility access pages | Confirming facts that affect feasibility. |
+| 2 | Official reservation platforms, ticketing pages, RV Park listings, transit operators, airline/ferry/bus companies, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access. |
+| 3 | Current map services, Mapcode lookup services, and review platforms | Discovery, rough location, navigation identifiers, parking/access notes, recent user signals; verify key claims elsewhere. |
 | 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
 
 ## Japan Travel Sources
@@ -22,7 +22,9 @@ Use official or operator pages first:
 - Highway and road authority pages for closures, snow, tolls, and rest areas.
 - National park, prefecture, city, and 道の駅 official pages.
 - RV Park, campground, and booking sites for overnight rules and reservations.
+- Mapcode lookup services and facility access pages for self-drive navigation. If Mapcode is unavailable, capture fallback navigation input: official name, address, phone number, or map link.
 - Onsen, sento, super sento, public bath, coin shower, campground shower, laundromat, fuel, EV charging, and grocery pages or map listings for support-stop planning.
+- Parking operator pages, official facility access pages, and map listings for visitor parking. Prefer ordinary visitor parking, public parking, facility parking, coin parking, 道の駅 parking, or service-area parking. Exclude 月極 parking, resident-only parking, staff-only parking, apartment parking, permit-only parking, and unclear private lots.
 
 For 車中泊 discovery, a user may provide community maps such as `https://syachuhaku.fxtec.info/`. Treat these as discovery sources, then verify overnight rules, toilets, gates, fees, and recent notices through official pages, RV Park listings, local pages, or direct contact when needed.
 
@@ -36,6 +38,26 @@ For 車中泊 discovery, a user may provide community maps such as `https://syac
 | Hiking/nature | Trail status, weather, daylight, transport return, facility closure, gear and emergency limits. |
 | Ferry/island | Sailing schedule, weather cancellation, vehicle reservation, last return, port access. |
 | Seasonal events | Official event dates, ticketing, crowd control, special transit, road restrictions. |
+
+## Country-Specific Driving Sources
+
+When the trip uses a car, check whether the destination country has local navigation or access conventions.
+
+### Japan self-drive
+
+For every drive-to stop, try to record:
+
+- Mapcode for car navigation when available.
+- Fallback navigation input: official facility name, address, phone number, or map link.
+- Parking type: visitor/facility/public/coin/RV Park/道の駅/service area, or `unclear`.
+- Parking caveats: fee, hours, height limit, distance to destination, event restrictions, shuttle-only access, winter closure, or fills-early risk.
+
+Parking source handling:
+
+- Prefer official facility access pages and parking operator pages.
+- Map listings and reviews can help discover parking, but verify whether the lot is visitor-usable.
+- Treat 月極, resident-only, staff-only, apartment, permit-only, and unclear private lots as unavailable unless an official source says visitors can use them.
+- If no reliable visitor parking exists, choose a different stop, suggest public transport/taxi for that segment, or add a confirmed nearby paid parking lot.
 
 ## Weather-Aware Planning Sources
 
@@ -78,6 +100,8 @@ When citing a time-sensitive source, record:
 - Opening hours shown only on a map listing, with no official confirmation.
 - Community reports older than the current season.
 - A place described as 車中泊-friendly without explicit overnight, parking, or toilet details.
+- Japan self-drive stops without Mapcode or fallback navigation input.
+- Parking candidates labeled 月極, resident-only, staff-only, permit-only, apartment parking, or unclear private lot.
 - A bath, shower, or laundromat stop placed after its last entry or likely closing time.
 - Winter, typhoon, heavy rain, wildfire, landslide, or road restriction risk.
 - Ferry, ropeway, mountain road, or viewpoint plans that ignore wind, visibility, snow, or wave forecasts.

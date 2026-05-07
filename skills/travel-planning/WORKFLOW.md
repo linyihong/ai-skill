@@ -14,6 +14,7 @@ Capture the minimum frame before planning:
 - Must-do and must-avoid items.
 - Budget and reservation tolerance.
 - Weather tolerance: rain, wind, heat, cold, snow, low visibility, sea conditions, or mountain conditions.
+- Country/region-specific needs: navigation format, toll rules, driving side, parking constraints, permits, or local payment methods.
 
 If key details are missing, make a clearly labeled draft assumption and ask only blocker questions that affect feasibility.
 
@@ -30,6 +31,7 @@ Classify every important recommendation:
 | Weather-sensitive activity | Weather agency, mountain/weather service, facility notice, or operator notice. |
 | 車中泊 permission | Facility official page, RV Park listing, 道の駅 page, local notice, or recent rule notice. |
 | Bathing, shower, laundry, fuel, charging | Facility official page, map listing, operator page, review recency, or local service page. |
+| Country-specific navigation and parking | Official tourism/facility page, parking operator, map service, Mapcode lookup, local road authority, rental-car guidance, or facility access page. |
 | Discovery idea | Maps, community map, blog, video, review site, or user-provided source; verify before treating as confirmed. |
 
 Prefer current official sources. If only community information exists, label it `needs confirmation` and provide a safer backup.
@@ -47,7 +49,22 @@ Use weather as a planning input, not an afterthought:
 
 When weather could affect safety, transport, or road access, do not merely add a note. Reorder the itinerary, downgrade the activity, or add a concrete alternative.
 
-## 4. Feasibility Build
+## 4. Country and Region Specific Checks
+
+Apply local driving and navigation rules before finalizing route order.
+
+For Japan self-drive plans:
+
+1. For each drive-to destination, search for a Mapcode when available. If unavailable, provide a phone number, address, official facility name, or map link as fallback navigation input.
+2. Prefer attractions, restaurants, baths, laundromats, viewpoints, and overnight bases with ordinary visitor parking, public parking, facility parking, 道の駅 parking, service-area parking, or clearly listed paid coin parking.
+3. Do not count 月極 parking, resident-only lots, staff-only lots, apartment parking, permit-only lots, or unclear private lots as usable visitor parking.
+4. If parking is unclear, either downgrade the stop, add a nearby confirmed visitor parking option, or mark it `parking needs confirmation`.
+5. Include parking caveats for narrow streets, height limits, winter closure, event restrictions, shuttle-only access, and popular lots that fill early.
+6. When a stop is chosen mainly because it has reliable parking, say so in the itinerary.
+
+For other countries or regions, identify equivalent local requirements before planning: navigation identifiers, low-emission zones, toll systems, vignette/permit needs, parking restrictions, road permits, ferry reservations, or seasonal access rules.
+
+## 5. Feasibility Build
 
 Plan from constraints outward:
 
@@ -65,7 +82,7 @@ Use conservative buffers:
 - Popular restaurants and attractions: account for queues, reservation checks, or sold-out risk.
 - 車中泊: arrive before dark when rules, toilets, or parking layout are uncertain.
 
-## 5. 車中泊 / Road Trip Checks
+## 6. 車中泊 / Road Trip Checks
 
 For each overnight candidate, verify:
 
@@ -87,7 +104,7 @@ For comfort planning, group support stops into the route:
 - Recovery: late food, convenience store, supermarket, fuel/charging, toilet, trash rule, and dry indoor rest option.
 - Timing: choose support stops with enough buffer before closing; avoid plans that require late-night bathing or laundry unless hours are confirmed.
 
-## 6. Recommendation Pass
+## 7. Recommendation Pass
 
 Before finalizing, check:
 
@@ -95,13 +112,14 @@ Before finalizing, check:
 - Is the order optimized for forecast, daylight, and weather-sensitive activities?
 - Are opening hours and travel times compatible with the user's dates?
 - Are closures, seasonal access, holidays, and maintenance notices checked?
+- For Japan self-drive, does each drive-to stop include Mapcode or fallback navigation input, and is parking ordinary visitor parking rather than 月極 or private-only parking?
 - Are food and rest breaks realistic?
 - Are rainy-day, heat, snow, wind, transport, and closure backups close enough to use?
 - For road trips or 車中泊, are bathing, laundry, fuel/charging, groceries, and backup lodging covered?
 - Are all uncertain claims labeled?
 - Are next actions specific: reserve, call, check official notice, buy pass, download offline map, or prepare cash?
 
-## 7. Final Verification
+## 8. Final Verification
 
 For every important conclusion, provide:
 

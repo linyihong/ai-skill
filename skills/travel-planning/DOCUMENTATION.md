@@ -15,6 +15,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Must-do:
 - Constraints:
 - Weather assumptions:
+- Country / region rules:
 - Planning assumptions:
 
 ## Recommendation
@@ -37,6 +38,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Tickets / passes:
 - Food / rest:
 - Weather or seasonal risk:
+- Navigation / parking:
 - Bathing / laundry / fuel / charging:
 - Day-before check:
 ```
@@ -66,6 +68,22 @@ Use these templates when producing trip plans or documenting reusable planning w
 | <place> | <official page / operator / map / community source> | <date TZ> | <hours / rule / schedule> | confirmed / likely / needs day-before check / unknown | <reserve / call / recheck> |
 ```
 
+## Country-Specific Driving Table
+
+Use this when a trip uses a car and the country has local navigation or access requirements. For Japan self-drive plans, include this table unless the user explicitly says Mapcode is unnecessary.
+
+```markdown
+| Stop | Mapcode / Navigation Input | Parking Type | Parking Source | Caveat | Confidence |
+| --- | --- | --- | --- | --- | --- |
+| <place> | <Mapcode / phone / address / map link> | visitor / facility / public / coin / RV Park / 道の駅 / service area / unclear | <official access / parking operator / map listing> | <fee / hours / height / fills early / not 月極> | confirmed / needs confirmation |
+```
+
+Parking note:
+
+- Prefer stops with ordinary visitor parking, facility parking, public parking, coin parking, RV Park, 道の駅, or service-area parking.
+- Do not use 月極 parking, resident-only lots, staff-only lots, apartment parking, permit-only lots, or unclear private lots as the plan's parking solution.
+- If Mapcode is unavailable, provide fallback navigation input and mark the source.
+
 ## 車中泊 Candidate Table
 
 ```markdown
@@ -92,6 +110,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Closure risk:
 - Weather risk:
 - Weather-based route swap:
+- Country-specific navigation / parking risk:
 - Crowd / event risk:
 - Transport risk:
 - Overnight-stay risk:
