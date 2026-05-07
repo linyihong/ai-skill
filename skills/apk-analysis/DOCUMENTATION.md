@@ -93,15 +93,15 @@ api/API列表/<group>/<api-name>.md
 | 錯誤與限流 | 影響重試的 code、冷卻、與 session 刷新關係 |
 | 重放檢查清單 | 人工或腳本重放同一列表的 **最小步驟**（reset 層級、operation id、期望觀察的 request keys） |
 
-### SDK live self-generation audit（目標：只剩 device id 或帳號材料）
+### SDK live self-generation audit（目標：只剩授權身分材料）
 
-當使用者的目標是「像某些既有 SDK 一樣，除了 device id / 授權帳號外，其餘 host、路由、簽章、session、decrypt 都能由 SDK 自行生成」時，不能只寫 private adapter gate。必須在專案 baseline 或 SDK-readiness 文件加一張 **runtime factor classification** 表，逐項標明：
+當使用者的目標是「像某些既有 SDK 一樣，除了呼叫方合法提供的 **授權身分材料** 外，其餘 host、路由、簽章、session、decrypt 都能由 SDK 自行生成」時，不能只寫 private adapter gate。授權身分材料（authorized identity material）包含 device id、install id、授權測試帳號、使用者提供的 session seed、或必須由合法裝置初始化的一次性身分；它是分類名稱，不是指每個 APK 都只會剩 device id。必須在專案 baseline 或 SDK-readiness 文件加一張 **runtime factor classification** 表，逐項標明：
 
 | Classification | 意義 | 可開始 live SDK self-generation? |
 | --- | --- | --- |
 | `sdk-generatable` | 可由公開 SDK 程式、常數、演算法、穩定 public config 或已去敏規則自行生成；不需要私有 runtime bridge。 | 是 |
-| `device-bound` | 需要真機／授權帳號／device id／install id 等個別材料，但取得、儲存、更新方式已明確；SDK 只需注入或初始化這一類材料。 | 可，若這是唯一剩餘未知或唯一使用者提供項 |
-| `private-adapter-required` | 需要 raw service、私有 host 選擇、簽章 key、decrypt key、in-app bridge、未公開 provider，或只能靠 app runtime 生成。 | 否，這不是「只剩 device id」狀態 |
+| `identity-material-bound` | 需要授權方提供或初始化的身分材料，例如 device id、install id、授權帳號、session seed、合法裝置初始化結果；取得、儲存、更新與重置界線已明確。 | 可，若這是唯一剩餘未知或唯一使用者提供項 |
+| `private-adapter-required` | 需要 raw service、私有 host 選擇、簽章 key、decrypt key、in-app bridge、未公開 provider，或只能靠 app runtime 生成。 | 否，這不是「只剩授權身分材料」狀態 |
 | `unknown` | 還不知道來源、時效、錯誤行為或是否可重建。 | 否 |
 | `scoped-out` | 不屬於本 SDK live scope（例如 media download、write actions）。 | 不阻塞該 scope，但必須明寫 |
 
@@ -111,7 +111,7 @@ api/API列表/<group>/<api-name>.md
 | --- | --- |
 | Base endpoint / host | SDK 能否從固定 fallback、public config、DNS/config API 自行選擇？還是必須 private host table / app storage？ |
 | Route binding / service | raw route id/service 是否可由 SDK deterministic 生成？若只知道 hash/placeholder，仍是 private-adapter-required。 |
-| Device identity | 是否只剩 device id / install id 需要注入？產生、持久化、重置、風控界線是否明確？ |
+| Authorized identity material | 是否只剩 device id / install id / 授權帳號 / session seed 等呼叫方身分材料需要注入？產生、持久化、重置、風控界線是否明確？ |
 | Session/bootstrap | guest/device login 是否可由 SDK 生成？是否仍需要 app-only token、captcha、human login 或私有 WebView state？ |
 | Opaque query/header | 每個 opaque 欄位是 app 常數、locale、device/session 派生，還是 response/session 私有值？ |
 | Signing/gateway | canonicalization、排序、hash/HMAC/AES、timestamp/random 來源是否可重建且已 fixture 驗證？ |
@@ -124,18 +124,18 @@ api/API列表/<group>/<api-name>.md
 
 ```text
 Live SDK self-generation verdict:
-- ready except device-bound materials: yes/no
+- ready except authorized identity material: yes/no
 - remaining non-device blockers: <factor list>
 - allowed next work: live SDK implementation / private adapter only / offline parser only
 ```
 
-**判讀規則：**只要仍有 `private-adapter-required` 或 `unknown` 的 base host、route service、signing、decrypt、session bootstrap、opaque provider，就不能說「只剩 device id」。此時只能說「SDK core + private adapter gate」。
+**判讀規則：**只要仍有 `private-adapter-required` 或 `unknown` 的 base host、route service、signing、decrypt、session bootstrap、opaque provider，就不能說「只剩授權身分材料」。此時只能說「SDK core + private adapter gate」。
 
 **Finish gate（與 SDK／client／回放相關任務）：**
 
 - 若本輪目標包含「可程式化拉取真實資料」「接 SDK transport」「寫 integration test」之一，而專案尚無 baseline 或僅有 API 條目：必須在**同一工作單**建立 **skeleton baseline**，並把 **open** 項寫成可驗證問題（不可留空「待之後再說」而無追蹤列）。
 - 若本輪要**開始開發** SDK、client、app tool、live integration 或任何會連真實服務的 transport，baseline 不能只停在 skeleton。必須先檢查並記錄最小可跑因素：endpoint/path family、route/service 對照或 adapter 策略、session/bootstrap 依存、opaque 參數來源與時效、簽章／gateway 前置、response decrypt/unwrap 邊界、分頁地面真相、錯誤／session 恢復、重放檢查清單。缺任一項時，該缺口必須成為開發 blocker 或被明確 scoped out；不得一邊缺 runtime 因素一邊實作 live-facing code。
-- 若使用者明確要求「分析到只剩 device id / 帳號材料」等級，必須補上 **SDK live self-generation audit**；不能把 `private-adapter-required` 寫成已接近可自動生成。
+- 若使用者明確要求「分析到只剩 device id / 帳號材料 / 授權身分材料」等級，必須補上 **SDK live self-generation audit**；不能把 `private-adapter-required` 寫成已接近可自動生成。
 - 只有不需要真實服務的工作（離線 parser、fixture、mock transport、文件 skeleton、純 schema mapping）可以在 skeleton baseline 下繼續，但文件必須明確標示「不具備 live/replay readiness」。
 - baseline 與 feature handoff 的 **Domain Concepts** 應交叉引用：entity 級與 runtime 級不要混成同一張表而漏掉環境依存。
 
