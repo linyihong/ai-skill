@@ -32,6 +32,8 @@ Classify every important recommendation:
 | Required transport booking | Operator reservation page, seat availability page, ferry/flight/bus booking page, rail pass seat rule, or timed-ticket page. |
 | Road conditions, winter closure, tolls | Road authority, highway operator, local government, or official map. |
 | Driving cost | Route distance, fuel/energy price source, toll calculator, parking operator, ferry/bridge operator, rental-car contract, or charging network. |
+| Lodging, minshuku, guesthouse, campground, RV Park | Official lodging page, booking platform, tourism board, map listing, campground/RV Park listing, or direct facility page. |
+| Route shape and backtracking | Map/route planner, transport timetable, drive route, day-by-day stop order, and next-day base logic. |
 | Event dates and crowd risk | Official event page, venue page, tourism board, or local government. |
 | Weather-sensitive activity | Weather agency, mountain/weather service, facility notice, or operator notice. |
 | 車中泊 permission | Facility official page, RV Park listing, 道の駅 page, local notice, or recent rule notice. |
@@ -89,7 +91,29 @@ For self-drive plans:
 
 For mixed plans, separate each leg and cost source so the user can see which parts require a car and which can be booked as transit.
 
-## 6. Country and Region Specific Checks
+## 6. Overnight Base and Lodging Planning
+
+When the trip spans overnight stays, choose the overnight base as part of the route logic, not as an afterthought.
+
+1. Decide the best overnight area from the route shape: near the last stop, near the next morning's first stop, near a transport hub, near reliable parking, or near bathing/laundry/food support.
+2. Provide lodging options when useful: hotel, guesthouse, minshuku, ryokan, campground, RV Park, cabin, hostel, or business hotel. Match them to budget, parking/transit access, check-in time, luggage, family needs, and next-day route.
+3. Prefer lodging that reduces next-day detours and avoids returning to an already-passed area.
+4. Include basic booking checks: availability window, check-in deadline, parking or station access, cancellation risk, bath/laundry availability, breakfast timing, and late-arrival rules.
+5. If the best lodging area is not the cheapest or most famous area, explain the route reason.
+6. If no lodging candidate is verified yet, recommend a lodging area/base and mark specific lodging as `needs availability check`.
+
+## 7. Route Shape and Backtracking Check
+
+Before finalizing each day, inspect the route shape:
+
+1. Prefer one-way progression, clean loops, or hub-and-spoke days with short local returns.
+2. Watch for avoidable backtracking: going from A to B, then returning to a point between A and B, or passing a stop and visiting it later without a reason.
+3. If backtracking appears, first try to reorder stops, move the overnight base, or split the day differently.
+4. If the backtrack remains, label it `backtracking warning` and explain why: strong recommendation, fixed opening hours, weather window, transport timetable, sold-out lodging, sunset timing, or better parking/road access.
+5. For strongly recommended points that create detours, state the tradeoff in time/cost and give a shorter alternative.
+6. Do not hide route inefficiency inside a polished schedule; the user should be able to follow the flow without surprise returns.
+
+## 8. Country and Region Specific Checks
 
 Apply local driving and navigation rules before finalizing route order.
 
@@ -105,16 +129,17 @@ For Japan self-drive plans:
 
 For other countries or regions, identify equivalent local requirements before planning: navigation identifiers, low-emission zones, toll systems, vignette/permit needs, parking restrictions, road permits, ferry reservations, or seasonal access rules.
 
-## 7. Feasibility Build
+## 9. Feasibility Build
 
 Plan from constraints outward:
 
 1. Anchor immovable items: flights, booked lodging, event times, reservation slots, sunset/sunrise, ferry or bus times.
 2. Add must-do stops with opening windows and last-entry times.
 3. Calculate travel time using the user's transport mode and add buffers.
-4. Place meals, fuel, toilet, bathing, shower, laundry, charging, groceries, and rest stops where they naturally fit.
-5. Add backups near the same route instead of far detours.
-6. Remove or downgrade items that depend on perfect timing or unverified access.
+4. Place overnight base candidates where they reduce same-day and next-day friction.
+5. Place meals, fuel, toilet, bathing, shower, laundry, charging, groceries, and rest stops where they naturally fit.
+6. Add backups near the same route instead of far detours.
+7. Remove or downgrade items that depend on perfect timing, unverified access, or inefficient backtracking.
 
 Use conservative buffers:
 
@@ -123,7 +148,7 @@ Use conservative buffers:
 - Popular restaurants and attractions: account for queues, reservation checks, or sold-out risk.
 - 車中泊: arrive before dark when rules, toilets, or parking layout are uncertain.
 
-## 8. 車中泊 / Road Trip Checks
+## 10. 車中泊 / Road Trip Checks
 
 For each overnight candidate, verify:
 
@@ -145,12 +170,14 @@ For comfort planning, group support stops into the route:
 - Recovery: late food, convenience store, supermarket, fuel/charging, toilet, trash rule, and dry indoor rest option.
 - Timing: choose support stops with enough buffer before closing; avoid plans that require late-night bathing or laundry unless hours are confirmed.
 
-## 9. Recommendation Pass
+## 11. Recommendation Pass
 
 Before finalizing, check:
 
 - Does each day have a clear theme and realistic pace?
 - Does each recommended place have an exact Google Maps place link or precise pin, and are any ambiguous locations clearly marked?
+- If the trip includes overnight stays, is each lodging area/candidate placed for route logic, check-in timing, parking/transit access, and next-day flow?
+- Does the route avoid A→B→middle-point backtracking? If not, is there a `backtracking warning`, reason, and shorter alternative?
 - Is the order optimized for forecast, daylight, and weather-sensitive activities?
 - Are opening hours and travel times compatible with the user's dates?
 - Are closures, seasonal access, holidays, and maintenance notices checked?
@@ -163,7 +190,7 @@ Before finalizing, check:
 - Are all uncertain claims labeled?
 - Are next actions specific: reserve, call, check official notice, buy pass, download offline map, or prepare cash?
 
-## 10. Final Verification
+## 12. Final Verification
 
 For every important conclusion, provide:
 

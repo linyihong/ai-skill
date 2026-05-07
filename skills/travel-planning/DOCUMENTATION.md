@@ -18,6 +18,8 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Weather assumptions:
 - Country / region rules:
 - Location verification:
+- Lodging / overnight base:
+- Route shape:
 - Planning assumptions:
 
 ## Recommendation
@@ -44,6 +46,8 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Weather or seasonal risk:
 - Exact location / Google Maps:
 - Navigation / parking:
+- Lodging / overnight base:
+- Route shape:
 - Bathing / laundry / fuel / charging:
 - Day-before check:
 ```
@@ -129,6 +133,37 @@ Driving-cost notes:
 - Use a range when route, vehicle class, ETC discount, fuel price, parking duration, ferry weather, or rental add-ons are not fixed.
 - Do not compare driving against transit without showing the major cost assumptions.
 
+## Lodging and Overnight Base Table
+
+Use this when the plan includes overnight stays.
+
+```markdown
+| Night | Recommended Base / Area | Lodging Candidate | Why This Base Fits | Access / Parking | Check-in / Meal Notes | Confidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| <night> | <area> | <hotel / guesthouse / minshuku / RV Park / campground> | <near last stop / near next morning / avoids backtracking / transport hub> | <station / parking / shuttle / Mapcode if driving> | <check-in deadline / breakfast / bath / laundry> | confirmed / needs availability check |
+```
+
+Lodging note:
+
+- Recommend lodging candidates when useful, but do not imply availability without checking.
+- If exact lodging is not checked, recommend the base area and list candidate types.
+- Prefer bases that reduce next-day travel and avoid returning to already-passed areas.
+
+## Route Shape Check
+
+Use this before finalizing the itinerary.
+
+```markdown
+| Day | Route Shape | Backtracking Check | Reason If Backtracking Remains | Shorter Alternative |
+| --- | --- | --- | --- | --- |
+| <day> | one-way / loop / hub-and-spoke / backtracking | clear / warning | <strong recommendation / opening hours / weather / lodging / transport> | <skip / reorder / different base> |
+```
+
+Route note:
+
+- Avoid A→B→middle-point routes unless the detour is justified.
+- If a strongly recommended stop creates backtracking, state the time/cost tradeoff and provide a shorter version.
+
 ## Country-Specific Driving Table
 
 Use this when a trip uses a car and the country has local navigation or access requirements. For Japan self-drive plans, include this table unless the user explicitly says Mapcode is unnecessary.
@@ -170,6 +205,8 @@ Parking note:
 
 - Closure risk:
 - Location ambiguity risk:
+- Lodging/check-in risk:
+- Route backtracking risk:
 - Weather risk:
 - Weather-based route swap:
 - Country-specific navigation / parking risk:
@@ -189,9 +226,11 @@ When replying to the user, keep the plan readable:
 
 1. State the assumptions.
 2. Give the recommended itinerary and explain weather-aware ordering.
-3. List the transport plan: booking needs, fare/cost estimates, and key transfer or driving assumptions.
-4. List key source-backed checks and confidence.
-5. Call out reservations, support stops, and day-before checks.
-6. Offer 1-2 meaningful alternatives when the current plan has weather, closure, transport, or availability uncertainty.
+3. Explain lodging/base choices when overnighting and note if availability still needs checking.
+4. List the route-shape check, including any backtracking warning or strongly recommended detour.
+5. List the transport plan: booking needs, fare/cost estimates, and key transfer or driving assumptions.
+6. List key source-backed checks and confidence.
+7. Call out reservations, support stops, and day-before checks.
+8. Offer 1-2 meaningful alternatives when the current plan has weather, closure, transport, route, lodging, or availability uncertainty.
 
 Do not bury blockers. If a core attraction, transport leg, or overnight candidate is unverified, say that before the detailed schedule.

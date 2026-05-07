@@ -7,7 +7,7 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 | Priority | Source Type | Use For |
 | --- | --- | --- |
 | 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, official address, and facility access pages | Confirming facts that affect feasibility and identity. |
-| 2 | Official reservation platforms, ticketing pages, RV Park listings, transit operators, rail/bus/ferry/airline companies, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, cost. |
+| 2 | Official reservation platforms, lodging/guesthouse booking pages, ticketing pages, RV Park listings, transit operators, rail/bus/ferry/airline companies, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, cost. |
 | 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, and review platforms | Discovery, exact location identity, navigation identifiers, parking/access notes, recent user signals; verify key claims elsewhere. |
 | 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
 
@@ -39,6 +39,27 @@ For 車中泊 discovery, a user may provide community maps such as `https://syac
 | Hiking/nature | Trail status, weather, daylight, transport return, facility closure, gear and emergency limits. |
 | Ferry/island | Sailing schedule, weather cancellation, vehicle reservation, last return, port access. |
 | Seasonal events | Official event dates, ticketing, crowd control, special transit, road restrictions. |
+
+## Lodging and Overnight Sources
+
+When an itinerary includes overnight stays, use current sources for:
+
+- Availability and price: official lodging page or booking platform.
+- Access: nearest station/bus stop, shuttle, parking, check-in route, late-arrival rule, and winter/night access.
+- Fit: room type, family capacity, luggage, meals, bath/shower, laundry, breakfast time, cancellation rules, and payment method.
+- Route value: whether the lodging area reduces next-day travel or prevents backtracking.
+
+Lodging candidates can include hotels, guesthouses, minshuku, ryokan, hostels, business hotels, campgrounds, cabins, RV Parks, and car-stay bases. If exact availability is not checked, recommend the area/base first and mark specific candidates `needs availability check`.
+
+## Route Shape Sources
+
+Use route planners and maps to inspect whether the order is efficient:
+
+- Map the stop order visually or by route planner legs.
+- Check if a later stop lies between two earlier stops.
+- Check if overnight base selection forces returning to already-passed areas.
+- Compare one-way progression, loop route, and hub-based route.
+- Add time/cost impact for any intentional detour or strongly recommended stop.
 
 ## Transport Booking and Cost Sources
 
@@ -96,6 +117,9 @@ Location red flags:
 - Google Maps pin, Mapcode, and official address point to different roads, entrances, lots, or nearby towns.
 - Attraction pin is correct but the practical navigation target should be the visitor parking lot, shuttle stop, pier, trailhead, or reception.
 - Map listing is user-generated and the official page gives a different address or access route.
+- Overnight lodging is chosen by price/name only, without route-base logic or check-in/access checks.
+- Route goes A to B and then returns to an intermediate point without a warning or strong reason.
+- A strongly recommended detour lacks time/cost tradeoff and a shorter alternative.
 
 ## Weather-Aware Planning Sources
 
@@ -144,6 +168,8 @@ When citing a time-sensitive source, record:
 - Parking candidates labeled 月極, resident-only, staff-only, permit-only, apartment parking, or unclear private lot.
 - Non-driving itineraries that omit required reservation timing, last-return risk, or fare estimate.
 - Driving itineraries that compare routes without fuel/charging, toll, parking, ferry/bridge, or rental-cost assumptions.
+- Overnight plans that omit lodging-area rationale, access/check-in constraints, or next-day flow.
+- Itineraries with hidden backtracking or no route-shape warning for A to B then back toward the middle.
 - A bath, shower, or laundromat stop placed after its last entry or likely closing time.
 - Winter, typhoon, heavy rain, wildfire, landslide, or road restriction risk.
 - Ferry, ropeway, mountain road, or viewpoint plans that ignore wind, visibility, snow, or wave forecasts.
