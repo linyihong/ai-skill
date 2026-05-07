@@ -26,6 +26,7 @@ Classify every important recommendation:
 | Claim Type | Required Source |
 | --- | --- |
 | Opening hours, closing days, last entry | Official facility page, official SNS, booking page, or tourism board page. |
+| Travel agency tour / package tour / model course | Travel agency itinerary page, official tourism model course, operator tour page, brochure page, or booking itinerary. |
 | Exact place identity | Google Maps place link or coordinate pin, official facility page, official address, map service, or facility access page. |
 | What to do, local food, restaurants | Official tourism page, facility page, local tourism board, restaurant page, market page, recent map listing, or local guide. |
 | Transit schedule, ferry, bus, train | Operator timetable or official route planner. |
@@ -46,7 +47,18 @@ Classify every important recommendation:
 
 Prefer current official sources. If only community information exists, label it `needs confirmation` and provide a safer backup.
 
-## 3. Exact Location Verification
+## 3. Travel Agency and Model-Course Benchmark
+
+Use travel agency tours and official model courses as planning references when they match the region, season, transport mode, or trip length.
+
+1. Search agency tours, package tours, bus tours, self-drive model courses, and tourism-board model routes for the target area.
+2. Extract useful structure: route order, common base areas, typical stop duration, lunch/meal placement, seasonal highlights, transport mode, booking/ticket requirements, and how long operators allocate between stops.
+3. Do not treat agency content as verified fact. Re-check all opening hours, access, map pins, parking, weather suitability, ticket rules, and current availability through official/current sources.
+4. Do not copy a tour wholesale. Adapt it to the user's pace, transport mode, budget, lodging style, car-stay needs, weather, and backtracking constraints.
+5. If agency routes skip a place the user wants, check whether the skip is due to time, access, parking, season, or route inefficiency.
+6. Record what was borrowed and what was changed.
+
+## 4. Exact Location Verification
 
 Before route optimization, make sure each recommended place points to the intended location.
 
@@ -59,7 +71,7 @@ Before route optimization, make sure each recommended place points to the intend
 
 Do not hide location ambiguity inside the itinerary. If the user could navigate to the wrong place, put the concern next to the stop and add a safer fallback pin or verification action.
 
-## 4. Stop Experience and Food Planning
+## 5. Stop Experience and Food Planning
 
 For each recommended stop, give the user enough context to know what to do there.
 
@@ -70,7 +82,7 @@ For each recommended stop, give the user enough context to know what to do there
 5. Align food stops with route timing; avoid recommending lunch after a restaurant's last order or dinner after rural closing time.
 6. If a recommended stop has no clear activity value, mark it as a support stop rather than a sightseeing stop.
 
-## 5. Weather and Backup Pass
+## 6. Weather and Backup Pass
 
 Use weather as a planning input, not an afterthought:
 
@@ -83,7 +95,7 @@ Use weather as a planning input, not an afterthought:
 
 When weather could affect safety, transport, or road access, do not merely add a note. Reorder the itinerary, downgrade the activity, or add a concrete alternative.
 
-## 6. Transport Mode Decision
+## 7. Transport Mode Decision
 
 Before route details, decide whether the plan is non-driving, self-drive, or mixed.
 
@@ -107,7 +119,7 @@ For self-drive plans:
 
 For mixed plans, separate each leg and cost source so the user can see which parts require a car and which can be booked as transit.
 
-## 7. Overnight Base and Lodging Planning
+## 8. Overnight Base and Lodging Planning
 
 When the trip spans overnight stays, choose the overnight base as part of the route logic, not as an afterthought.
 
@@ -118,7 +130,7 @@ When the trip spans overnight stays, choose the overnight base as part of the ro
 5. If the best lodging area is not the cheapest or most famous area, explain the route reason.
 6. If no lodging candidate is verified yet, recommend a lodging area/base and mark specific lodging as `needs availability check`.
 
-## 8. Route Shape and Backtracking Check
+## 9. Route Shape and Backtracking Check
 
 Before finalizing each day, inspect the route shape:
 
@@ -129,7 +141,7 @@ Before finalizing each day, inspect the route shape:
 5. For strongly recommended points that create detours, state the tradeoff in time/cost and give a shorter alternative.
 6. Do not hide route inefficiency inside a polished schedule; the user should be able to follow the flow without surprise returns.
 
-## 9. Country and Region Specific Checks
+## 10. Country and Region Specific Checks
 
 Apply local driving and navigation rules before finalizing route order.
 
@@ -145,7 +157,7 @@ For Japan self-drive plans:
 
 For other countries or regions, identify equivalent local requirements before planning: navigation identifiers, low-emission zones, toll systems, vignette/permit needs, parking restrictions, road permits, ferry reservations, or seasonal access rules.
 
-## 10. Feasibility Build
+## 11. Feasibility Build
 
 Plan from constraints outward:
 
@@ -164,7 +176,7 @@ Use conservative buffers:
 - Popular restaurants and attractions: account for queues, reservation checks, or sold-out risk.
 - 車中泊: arrive before dark when rules, toilets, or parking layout are uncertain.
 
-## 11. Schedule Feasibility Check
+## 12. Schedule Feasibility Check
 
 Before finalizing time blocks, make sure the day can be followed in practice.
 
@@ -175,7 +187,7 @@ Before finalizing time blocks, make sure the day can be followed in practice.
 5. If the day is too packed, downgrade lower-priority stops, move food/support stops, split the day, or suggest an overnight base change.
 6. Label schedule pressure as `comfortable`, `tight`, `too packed`, or `needs day-before check`.
 
-## 12. 車中泊 / Road Trip Checks
+## 13. 車中泊 / Road Trip Checks
 
 For each overnight candidate, verify:
 
@@ -206,11 +218,12 @@ For comfort planning, group support stops into the route:
 - Recovery: late food, convenience store, supermarket, fuel/charging, toilet, trash rule, and dry indoor rest option.
 - Timing: choose support stops with enough buffer before closing; avoid plans that require late-night bathing or laundry unless hours are confirmed.
 
-## 13. Recommendation Pass
+## 14. Recommendation Pass
 
 Before finalizing, check:
 
 - Does each day have a clear theme and realistic pace?
+- If agency/model-course references were used, did the plan state what was borrowed and what was changed after verification?
 - Is each day schedule `comfortable`, `tight`, or `too packed`, and were overloaded days simplified?
 - For each key stop, does the plan say what to do, how long to stay, and whether there is a food/local-specialty recommendation or support-stop role?
 - Does each recommended place have an exact Google Maps place link or precise pin, and are any ambiguous locations clearly marked?
@@ -230,7 +243,7 @@ Before finalizing, check:
 - Are all uncertain claims labeled?
 - Are next actions specific: reserve, call, check official notice, buy pass, download offline map, or prepare cash?
 
-## 14. Final Verification
+## 15. Final Verification
 
 For every important conclusion, provide:
 

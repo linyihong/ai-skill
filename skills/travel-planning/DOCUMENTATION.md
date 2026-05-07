@@ -17,6 +17,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Constraints:
 - Weather assumptions:
 - Country / region rules:
+- Travel agency / model-course references:
 - Location verification:
 - Lodging / overnight base:
 - Route shape:
@@ -82,6 +83,21 @@ Use these templates when producing trip plans or documenting reusable planning w
 | --- | --- | --- | --- | --- | --- |
 | <place> | <official page / operator / map / community source> | <date TZ> | <hours / rule / schedule> | confirmed / likely / needs day-before check / unknown | <reserve / call / recheck> |
 ```
+
+## Travel Agency / Model-Course Benchmark
+
+Use this when agency tours, package tours, bus tours, or official model courses inform the route.
+
+```markdown
+| Source | Matching Conditions | Borrowed Idea | Verification Needed | Change Made |
+| --- | --- | --- | --- | --- |
+| <agency/model course> | <season / area / days / transport> | <route order / lunch / stop duration / base area> | <hours / pin / parking / ticket / weather> | <adapted for user pace / self-drive / weather / no backtracking> |
+```
+
+Benchmark note:
+
+- Do not treat an agency itinerary as proof that a stop is open, reachable, or suitable today.
+- Explain when an agency route assumes charter buses, group meals, shopping stops, or faster group movement.
 
 ## Stop Experience Table
 

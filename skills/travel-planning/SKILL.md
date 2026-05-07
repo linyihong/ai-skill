@@ -1,6 +1,6 @@
 ---
 name: travel-planning
-description: Plan evidence-based travel itineraries with current operating hours, exact Google Maps place links, what to do at each stop, local food recommendations, seasonal closures, transport timing, schedule feasibility checks, booking needs, fare estimates, lodging or car-stay options, lodging/guesthouse recommendations, anti-backtracking route checks, weather-driven route choices, backup plans, bathing and laundry stops, fuel/charging gap planning, car-stay quietness checks, country-specific driving checks such as Japan Mapcode and visitor parking, driving cost estimates, local risk checks, and source-backed recommendations. Use when the user asks where to travel, what to do on specific dates, whether places are open, how to arrange a trip, Google Maps, map pin, food, restaurant, local specialty, fuel, gas station, charging, public transport, train, bus, ferry, ticket booking, fare, hotel, guesthouse, minshuku, lodging, route optimization, road trip, Japan travel, Mapcode, parking, quiet overnight, car camping, overnight parking, RV Park, michi-no-eki, bathhouse, laundromat, or 車中泊 planning.
+description: Plan evidence-based travel itineraries with current operating hours, exact Google Maps place links, what to do at each stop, local food recommendations, travel agency itinerary benchmarking, seasonal closures, transport timing, schedule feasibility checks, booking needs, fare estimates, lodging or car-stay options, lodging/guesthouse recommendations, anti-backtracking route checks, weather-driven route choices, backup plans, bathing and laundry stops, fuel/charging gap planning, car-stay quietness checks, country-specific driving checks such as Japan Mapcode and visitor parking, driving cost estimates, local risk checks, and source-backed recommendations. Use when the user asks where to travel, what to do on specific dates, whether places are open, how to arrange a trip, travel agency tour, package tour, model course, Google Maps, map pin, food, restaurant, local specialty, fuel, gas station, charging, public transport, train, bus, ferry, ticket booking, fare, hotel, guesthouse, minshuku, lodging, route optimization, road trip, Japan travel, Mapcode, parking, quiet overnight, car camping, overnight parking, RV Park, michi-no-eki, bathhouse, laundromat, or 車中泊 planning.
 ---
 
 # Travel Planning
@@ -12,6 +12,7 @@ Use this skill when a user wants a practical trip plan that depends on dates, pl
 ## When To Use
 
 - Planning trips from destination, date range, budget, travel style, or constraints.
+- Benchmarking travel agency tours, package tours, official model courses, and local tourism itineraries to discover realistic route order, common stop duration, seasonal highlights, meal stops, and booking needs.
 - Checking whether attractions, restaurants, parking areas, campgrounds, RV Parks, hot springs, events, ferries, or transit are open on planned dates.
 - Recommending what to do at each stop, expected visit duration, nearby highlights, local food, restaurants, cafes, markets, or regional specialties.
 - Marking exact locations with Google Maps place links, coordinates, or precise pins rather than ambiguous search-result links.
@@ -40,18 +41,19 @@ Use this skill when a user wants a practical trip plan that depends on dates, pl
 1. Clarify the trip frame: destination, dates, party size, transport, pace, budget, must-do interests, dietary/accessibility needs, lodging style, and tolerance for long drives or early starts.
 2. Identify time-sensitive checks: operating days, reservation windows, seasonal closures, event crowding, weather forecast, road/weather constraints, parking rules, public transport schedules, and last-entry times.
 3. Use current web sources. Prefer official facility, tourism board, transit operator, weather, road authority, and reservation pages; use community maps or blogs for discovery, then verify details elsewhere.
-4. Verify exact location identity. Prefer a Google Maps place link or coordinate pin that opens one exact place; avoid generic search URLs that return many possible points. Cross-check the map pin against official name/address and, for Japan self-drive, Mapcode when available.
-5. For each recommended stop, add what to do there, why it is worth stopping, expected stay time, nearby alternatives, and food or local-specialty options when relevant.
-6. Build a feasible route with travel buffers and weather-aware ordering. Move outdoor, scenic, ferry, mountain, and walking-heavy plans into the best weather windows when possible.
-7. If the user is not driving, optimize transport by schedule reliability, total travel time, transfer risk, operating hours, reservation needs, fare, and last-return options. Identify which trains, buses, ferries, flights, passes, seats, or timed tickets need booking and by when.
-8. If the user is driving, estimate rough transport costs and plan refuel/charging: distance-based fuel or charging, tolls, parking, ferry/bridge fees, rental-car fees when relevant, uncertainty ranges, sparse-fuel areas, and recommended fuel/charging stops.
-9. If the trip requires overnight stays, recommend lodging bases or accommodation candidates that reduce next-day travel, avoid route backtracking, and match the user's budget/style. Include why each base fits the route.
-10. Check route shape for unnecessary backtracking. If a plan goes from A to B and then returns to a point between A and B, either reorder the day, move the overnight base, or explicitly flag the backtrack and explain why it is still worth it.
-11. Check schedule feasibility. If the day is too packed, move, shorten, or downgrade stops and explain the tradeoff.
-12. Add fallback plans for rain, wind, heat, snow, closures, full parking lots, sold-out meals, and transport disruption.
-13. Apply country/region-specific checks. For Japan self-drive plans, include Mapcode where available and prefer destinations or stops with ordinary visitor parking; do not treat 月極 parking, resident-only parking, staff parking, or unclear private lots as usable parking.
-14. For 車中泊 or road trips, verify overnight permission, quietness, toilets, opening hours, noise rules, bathing options, laundry options, trash rules, winter road conditions, and nearby backup lodging.
-15. Provide an itinerary with sources, confidence labels, assumptions, alternatives, what needs reservation, location confidence, schedule-risk notes, route-shape warnings, lodging rationale, recommended activities/food, fuel/charging plan, and cost estimates with assumptions.
+4. Search travel agency tours, package tours, and official model courses for the same area/date/season when helpful. Use them as benchmarks, not as proof: extract route order, stop duration, seasonal highlights, meal/transport patterns, and hidden constraints, then verify each claim against official/current sources.
+5. Verify exact location identity. Prefer a Google Maps place link or coordinate pin that opens one exact place; avoid generic search URLs that return many possible points. Cross-check the map pin against official name/address and, for Japan self-drive, Mapcode when available.
+6. For each recommended stop, add what to do there, why it is worth stopping, expected stay time, nearby alternatives, and food or local-specialty options when relevant.
+7. Build a feasible route with travel buffers and weather-aware ordering. Move outdoor, scenic, ferry, mountain, and walking-heavy plans into the best weather windows when possible.
+8. If the user is not driving, optimize transport by schedule reliability, total travel time, transfer risk, operating hours, reservation needs, fare, and last-return options. Identify which trains, buses, ferries, flights, passes, seats, or timed tickets need booking and by when.
+9. If the user is driving, estimate rough transport costs and plan refuel/charging: distance-based fuel or charging, tolls, parking, ferry/bridge fees, rental-car fees when relevant, uncertainty ranges, sparse-fuel areas, and recommended fuel/charging stops.
+10. If the trip requires overnight stays, recommend lodging bases or accommodation candidates that reduce next-day travel, avoid route backtracking, and match the user's budget/style. Include why each base fits the route.
+11. Check route shape for unnecessary backtracking. If a plan goes from A to B and then returns to a point between A and B, either reorder the day, move the overnight base, or explicitly flag the backtrack and explain why it is still worth it.
+12. Check schedule feasibility. If the day is too packed, move, shorten, or downgrade stops and explain the tradeoff.
+13. Add fallback plans for rain, wind, heat, snow, closures, full parking lots, sold-out meals, and transport disruption.
+14. Apply country/region-specific checks. For Japan self-drive plans, include Mapcode where available and prefer destinations or stops with ordinary visitor parking; do not treat 月極 parking, resident-only parking, staff parking, or unclear private lots as usable parking.
+15. For 車中泊 or road trips, verify overnight permission, quietness, toilets, opening hours, noise rules, bathing options, laundry options, trash rules, winter road conditions, and nearby backup lodging.
+16. Provide an itinerary with sources, confidence labels, assumptions, alternatives, what needs reservation, location confidence, schedule-risk notes, route-shape warnings, lodging rationale, recommended activities/food, fuel/charging plan, agency/model-course benchmark notes, and cost estimates with assumptions.
 
 ## Default Workflow
 
@@ -69,6 +71,7 @@ When producing a plan, include:
 
 - Trip assumptions: dates, area, transport, party, pace, and constraints.
 - A day-by-day itinerary with time blocks, travel time, opening hours, last entry, reservation status, and backup options.
+- Travel agency / model-course benchmark notes when used: source, matching season/area, what was borrowed, and what was changed after verification.
 - Schedule feasibility notes: visit duration, movement buffers, meal timing, sunset/last-entry/check-in constraints, fatigue risk, and what was shortened or moved.
 - Stop-level recommendations: what to do, why it is worth it, expected visit duration, local food/restaurant ideas, and nearby alternatives.
 - Source-backed validation for time-sensitive claims.
