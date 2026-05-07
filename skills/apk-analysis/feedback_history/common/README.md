@@ -34,3 +34,4 @@ Cross-cutting APK analysis lessons that apply before a runtime/API family is kno
 | `2026-05-07_131000-highest-leverage-analysis-path.md` | candidate | Highest leverage analysis path | Choose the analysis route with the best time-to-evidence ratio instead of continuing a fixed technique sequence. |
 | `2026-05-07_143800-stateful-setting-probe-restore.md` | candidate | Stateful setting probe restore | Restore app settings changed during dynamic probes and record both probe and restoration evidence. |
 | `2026-05-07_144300-ui-route-backfill-after-runtime-probe.md` | candidate | UI route backfill after runtime probe | Backfill UI architecture maps when runtime/API probes discover new in-app routes. |
+| `2026-05-07_145500-sensitive-provider-fingerprint-diagnostic.md` | candidate | Sensitive provider fingerprint diagnostic | Compare sensitive provider values with short disabled-by-default length/hash or equality diagnostics. |
