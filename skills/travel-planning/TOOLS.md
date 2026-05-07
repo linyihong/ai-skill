@@ -6,9 +6,9 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 
 | Priority | Source Type | Use For |
 | --- | --- | --- |
-| 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, and facility access pages | Confirming facts that affect feasibility. |
+| 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, official address, and facility access pages | Confirming facts that affect feasibility and identity. |
 | 2 | Official reservation platforms, ticketing pages, RV Park listings, transit operators, rail/bus/ferry/airline companies, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, cost. |
-| 3 | Current map services, Mapcode lookup services, and review platforms | Discovery, rough location, navigation identifiers, parking/access notes, recent user signals; verify key claims elsewhere. |
+| 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, and review platforms | Discovery, exact location identity, navigation identifiers, parking/access notes, recent user signals; verify key claims elsewhere. |
 | 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
 
 ## Japan Travel Sources
@@ -16,13 +16,14 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 Use official or operator pages first:
 
 - Facility official websites and official social accounts.
+- Google Maps exact place links or coordinate pins; avoid generic search-result links when they can open many similarly named places.
 - Local tourism association pages.
 - Train, bus, ferry, ropeway, highway bus, airport operators, official route planners, fare tables, reservation pages, seat rules, and pass pages.
 - Japan Meteorological Agency or reputable weather services; for islands, coasts, ferries, mountains, or snow routes, also check marine, wind, wave, snowfall, or road-condition sources.
 - Highway and road authority pages for closures, snow, tolls, ETC/pass options, and rest areas.
 - National park, prefecture, city, and 道の駅 official pages.
 - RV Park, campground, and booking sites for overnight rules and reservations.
-- Mapcode lookup services and facility access pages for self-drive navigation. If Mapcode is unavailable, capture fallback navigation input: official name, address, phone number, or map link.
+- Mapcode lookup services and facility access pages for self-drive navigation. If Mapcode is unavailable, capture fallback navigation input: official name, address, phone number, Google Maps exact place link, or coordinate pin.
 - Onsen, sento, super sento, public bath, coin shower, campground shower, laundromat, fuel, EV charging, and grocery pages or map listings for support-stop planning.
 - Parking operator pages, official facility access pages, and map listings for visitor parking. Prefer ordinary visitor parking, public parking, facility parking, coin parking, 道の駅 parking, or service-area parking. Exclude 月極 parking, resident-only parking, staff-only parking, apartment parking, permit-only parking, and unclear private lots.
 
@@ -66,9 +67,11 @@ When the trip uses a car, check whether the destination country has local naviga
 For every drive-to stop, try to record:
 
 - Mapcode for car navigation when available.
+- Google Maps exact place link or coordinate pin.
 - Fallback navigation input: official facility name, address, phone number, or map link.
 - Parking type: visitor/facility/public/coin/RV Park/道の駅/service area, or `unclear`.
 - Parking caveats: fee, hours, height limit, distance to destination, event restrictions, shuttle-only access, winter closure, or fills-early risk.
+- Cross-check status: Mapcode, Google Maps, official address, and access/parking page match or have noted differences.
 
 Parking source handling:
 
@@ -76,6 +79,23 @@ Parking source handling:
 - Map listings and reviews can help discover parking, but verify whether the lot is visitor-usable.
 - Treat 月極, resident-only, staff-only, apartment, permit-only, and unclear private lots as unavailable unless an official source says visitors can use them.
 - If no reliable visitor parking exists, choose a different stop, suggest public transport/taxi for that segment, or add a confirmed nearby paid parking lot.
+
+## Exact Location Sources
+
+Use precise location sources when marking stops:
+
+- Google Maps place URLs that open one exact facility, not a search results page.
+- Coordinate pins when the practical destination is an entrance, trailhead, parking lot, pier, station exit, or viewpoint instead of the facility's general address.
+- Official address and access pages to confirm the map pin.
+- Mapcode for Japan self-drive, cross-checked against the Google Maps pin and official address/access page.
+
+Location red flags:
+
+- Search URL or broad area link instead of a specific place.
+- Multiple facilities with the same or similar name.
+- Google Maps pin, Mapcode, and official address point to different roads, entrances, lots, or nearby towns.
+- Attraction pin is correct but the practical navigation target should be the visitor parking lot, shuttle stop, pier, trailhead, or reception.
+- Map listing is user-generated and the official page gives a different address or access route.
 
 ## Weather-Aware Planning Sources
 
@@ -116,6 +136,8 @@ When citing a time-sensitive source, record:
 ## Red Flags
 
 - Opening hours shown only on a map listing, with no official confirmation.
+- Itinerary stop has only a generic Google Maps search link or broad area link.
+- Mapcode and Google Maps pin disagree without a note explaining which navigation target to use.
 - Community reports older than the current season.
 - A place described as 車中泊-friendly without explicit overnight, parking, or toilet details.
 - Japan self-drive stops without Mapcode or fallback navigation input.

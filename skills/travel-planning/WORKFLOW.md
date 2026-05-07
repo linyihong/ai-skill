@@ -26,6 +26,7 @@ Classify every important recommendation:
 | Claim Type | Required Source |
 | --- | --- |
 | Opening hours, closing days, last entry | Official facility page, official SNS, booking page, or tourism board page. |
+| Exact place identity | Google Maps place link or coordinate pin, official facility page, official address, map service, or facility access page. |
 | Transit schedule, ferry, bus, train | Operator timetable or official route planner. |
 | Transport fare and pass value | Operator fare table, official reservation page, pass page, fare calculator, or booking platform. |
 | Required transport booking | Operator reservation page, seat availability page, ferry/flight/bus booking page, rail pass seat rule, or timed-ticket page. |
@@ -40,7 +41,20 @@ Classify every important recommendation:
 
 Prefer current official sources. If only community information exists, label it `needs confirmation` and provide a safer backup.
 
-## 3. Weather and Backup Pass
+## 3. Exact Location Verification
+
+Before route optimization, make sure each recommended place points to the intended location.
+
+1. Prefer Google Maps links that open a single exact place, or a coordinate/map pin for the exact entrance, parking lot, bath, laundromat, station, pier, trailhead, or overnight base.
+2. Avoid generic Google search or map search URLs when they return multiple branches, similarly named facilities, broad areas, or uncertain pins.
+3. Cross-check the Google Maps pin with official facility name, official address, official access page, and map listing details.
+4. For Japan self-drive, cross-check Mapcode against Google Maps and official address/access details. If the Mapcode points to parking while Google Maps points to the attraction entrance, state that difference explicitly.
+5. If the location is a large area, choose the practical target pin: visitor parking, ticket office, trailhead, ferry terminal, station exit, campground reception, RV Park entrance, bath entrance, laundromat, or viewpoint parking.
+6. Mark ambiguity as `location needs confirmation` when multiple pins remain plausible, the official page lacks address detail, Mapcode and Google Maps disagree, or reviews suggest the pin is wrong.
+
+Do not hide location ambiguity inside the itinerary. If the user could navigate to the wrong place, put the concern next to the stop and add a safer fallback pin or verification action.
+
+## 4. Weather and Backup Pass
 
 Use weather as a planning input, not an afterthought:
 
@@ -53,7 +67,7 @@ Use weather as a planning input, not an afterthought:
 
 When weather could affect safety, transport, or road access, do not merely add a note. Reorder the itinerary, downgrade the activity, or add a concrete alternative.
 
-## 4. Transport Mode Decision
+## 5. Transport Mode Decision
 
 Before route details, decide whether the plan is non-driving, self-drive, or mixed.
 
@@ -75,22 +89,23 @@ For self-drive plans:
 
 For mixed plans, separate each leg and cost source so the user can see which parts require a car and which can be booked as transit.
 
-## 5. Country and Region Specific Checks
+## 6. Country and Region Specific Checks
 
 Apply local driving and navigation rules before finalizing route order.
 
 For Japan self-drive plans:
 
 1. For each drive-to destination, search for a Mapcode when available. If unavailable, provide a phone number, address, official facility name, or map link as fallback navigation input.
-2. Prefer attractions, restaurants, baths, laundromats, viewpoints, and overnight bases with ordinary visitor parking, public parking, facility parking, 道の駅 parking, service-area parking, or clearly listed paid coin parking.
-3. Do not count 月極 parking, resident-only lots, staff-only lots, apartment parking, permit-only lots, or unclear private lots as usable visitor parking.
-4. If parking is unclear, either downgrade the stop, add a nearby confirmed visitor parking option, or mark it `parking needs confirmation`.
-5. Include parking caveats for narrow streets, height limits, winter closure, event restrictions, shuttle-only access, and popular lots that fill early.
-6. When a stop is chosen mainly because it has reliable parking, say so in the itinerary.
+2. Cross-check Mapcode, Google Maps exact place/pin, official address, and parking/access page. If they point to different entrances or lots, describe the difference and choose the best navigation target for the route.
+3. Prefer attractions, restaurants, baths, laundromats, viewpoints, and overnight bases with ordinary visitor parking, public parking, facility parking, 道の駅 parking, service-area parking, or clearly listed paid coin parking.
+4. Do not count 月極 parking, resident-only lots, staff-only lots, apartment parking, permit-only lots, or unclear private lots as usable visitor parking.
+5. If parking is unclear, either downgrade the stop, add a nearby confirmed visitor parking option, or mark it `parking needs confirmation`.
+6. Include parking caveats for narrow streets, height limits, winter closure, event restrictions, shuttle-only access, and popular lots that fill early.
+7. When a stop is chosen mainly because it has reliable parking, say so in the itinerary.
 
 For other countries or regions, identify equivalent local requirements before planning: navigation identifiers, low-emission zones, toll systems, vignette/permit needs, parking restrictions, road permits, ferry reservations, or seasonal access rules.
 
-## 6. Feasibility Build
+## 7. Feasibility Build
 
 Plan from constraints outward:
 
@@ -108,7 +123,7 @@ Use conservative buffers:
 - Popular restaurants and attractions: account for queues, reservation checks, or sold-out risk.
 - 車中泊: arrive before dark when rules, toilets, or parking layout are uncertain.
 
-## 7. 車中泊 / Road Trip Checks
+## 8. 車中泊 / Road Trip Checks
 
 For each overnight candidate, verify:
 
@@ -130,24 +145,25 @@ For comfort planning, group support stops into the route:
 - Recovery: late food, convenience store, supermarket, fuel/charging, toilet, trash rule, and dry indoor rest option.
 - Timing: choose support stops with enough buffer before closing; avoid plans that require late-night bathing or laundry unless hours are confirmed.
 
-## 8. Recommendation Pass
+## 9. Recommendation Pass
 
 Before finalizing, check:
 
 - Does each day have a clear theme and realistic pace?
+- Does each recommended place have an exact Google Maps place link or precise pin, and are any ambiguous locations clearly marked?
 - Is the order optimized for forecast, daylight, and weather-sensitive activities?
 - Are opening hours and travel times compatible with the user's dates?
 - Are closures, seasonal access, holidays, and maintenance notices checked?
 - If not driving, are departure times, transfer buffers, last-return options, required reservations, and fare estimates listed?
 - If driving, is rough transport cost estimated with distance, fuel/charging, tolls, parking, ferry/bridge, and rental assumptions?
-- For Japan self-drive, does each drive-to stop include Mapcode or fallback navigation input, and is parking ordinary visitor parking rather than 月極 or private-only parking?
+- For Japan self-drive, does each drive-to stop include Mapcode or fallback navigation input, has it been cross-checked against Google Maps and official address/access details, and is parking ordinary visitor parking rather than 月極 or private-only parking?
 - Are food and rest breaks realistic?
 - Are rainy-day, heat, snow, wind, transport, and closure backups close enough to use?
 - For road trips or 車中泊, are bathing, laundry, fuel/charging, groceries, and backup lodging covered?
 - Are all uncertain claims labeled?
 - Are next actions specific: reserve, call, check official notice, buy pass, download offline map, or prepare cash?
 
-## 9. Final Verification
+## 10. Final Verification
 
 For every important conclusion, provide:
 
