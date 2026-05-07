@@ -12,6 +12,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Party:
 - Transport:
 - Transport priority:
+- Long-distance transport comparison:
 - Pace:
 - Must-do:
 - Constraints:
@@ -148,6 +149,26 @@ Transport summary:
 - Booking timing:
 - Last-return or disruption risk:
 - Total estimated transport cost:
+
+## Long-Distance Transport Comparison
+
+Use this for cross-city, inter-prefecture, island, airport, or 2+ hour transfers.
+
+```markdown
+| Option | Door-to-Door Time | Total Cost | Booking / Cancellation | Luggage / Transfer Burden | Weather / Delay Risk | Destination Mobility | Decision |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Flight | <time> | <amount> | <deadline / change fee> | <baggage / airport access> | <risk> | <rental car / transit needed> | recommended / viable / backup / not recommended |
+| Shinkansen / rail / limited express | <time> | <amount> | <reserved seat / pass> | <transfers / luggage> | <risk> | <local transit / car needed> | recommended / viable / backup / not recommended |
+| Highway bus | <time> | <amount> | <reservation / cancellation> | <boarding point / luggage> | <traffic risk> | <local transit needed> | recommended / viable / backup / not recommended |
+| Ferry | <time> | <amount> | <vehicle/passenger booking> | <port access> | <weather cancellation> | <car/transit at port> | recommended / viable / backup / not recommended |
+| Self-drive / rental car | <time> | <amount> | <rental / toll / parking> | <fatigue / luggage easy> | <road/weather risk> | <car available> | recommended / viable / backup / not recommended |
+| Mixed mode | <time> | <amount> | <rail/flight + rental> | <transfer burden> | <risk> | <local car/transit> | recommended / viable / backup / not recommended |
+```
+
+Decision note:
+
+- Explain why the chosen option wins on time, money, comfort, luggage, reliability, or destination mobility.
+- If the chosen option is not the cheapest or fastest, state the tradeoff.
 
 ## Driving Cost Estimate
 

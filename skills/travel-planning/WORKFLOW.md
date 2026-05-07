@@ -30,6 +30,7 @@ Classify every important recommendation:
 | Exact place identity | Google Maps place link or coordinate pin, official facility page, official address, map service, or facility access page. |
 | What to do, local food, restaurants | Official tourism page, facility page, local tourism board, restaurant page, market page, recent map listing, or local guide. |
 | Transit schedule, ferry, bus, train | Operator timetable or official route planner. |
+| Long-distance transport comparison | Airline page, airport access page, Shinkansen/rail operator, limited express route, highway bus operator, ferry operator, rental-car company, toll/fuel/parking calculator, or route planner. |
 | Transport fare and pass value | Operator fare table, official reservation page, pass page, fare calculator, or booking platform. |
 | Required transport booking | Operator reservation page, seat availability page, ferry/flight/bus booking page, rail pass seat rule, or timed-ticket page. |
 | Road conditions, winter closure, tolls | Road authority, highway operator, local government, or official map. |
@@ -98,7 +99,18 @@ Use weather as a planning input, not an afterthought:
 
 When weather could affect safety, transport, or road access, do not merely add a note. Reorder the itinerary, downgrade the activity, or add a concrete alternative.
 
-## 7. Transport Mode Decision
+## 7. Long-Distance Transport Comparison Gate
+
+Apply this gate for cross-city, inter-prefecture, island, airport, or any transfer expected to take 2+ hours.
+
+1. Compare all plausible modes: flight, Shinkansen, limited express/train, highway bus, ferry, rental car, full self-drive, and mixed options such as `rail + local rental car`.
+2. Use door-to-door time, not just in-vehicle time. Include home/hotel to station/airport, check-in/security, transfer wait, luggage pickup, local transit, parking, and rental-car pickup/return.
+3. Use total cost, not just ticket fare. Include seat/reservation fees, airport access, baggage fees, local transit, taxi, rental car, tolls, fuel/charging, parking, ferry vehicle fare, and cancellation/change fees when relevant.
+4. Compare practical burden: luggage, walking, transfers, missed-connection risk, weather/delay risk, late-night arrival, car fatigue, and whether the destination still needs a car.
+5. Mark each option as `recommended`, `viable`, `backup`, or `not recommended`, with the reason.
+6. If the recommended option is not cheapest or fastest, explain the tradeoff.
+
+## 8. Transport Mode Decision
 
 Before route details, decide whether the plan is non-driving, self-drive, or mixed.
 
@@ -122,7 +134,7 @@ For self-drive plans:
 
 For mixed plans, separate each leg and cost source so the user can see which parts require a car and which can be booked as transit.
 
-## 8. Overnight Base and Lodging Planning
+## 9. Overnight Base and Lodging Planning
 
 When the trip spans overnight stays, choose the overnight base as part of the route logic, not as an afterthought.
 
@@ -133,7 +145,7 @@ When the trip spans overnight stays, choose the overnight base as part of the ro
 5. If the best lodging area is not the cheapest or most famous area, explain the route reason.
 6. If no lodging candidate is verified yet, recommend a lodging area/base and mark specific lodging as `needs availability check`.
 
-## 9. Route Shape and Backtracking Check
+## 10. Route Shape and Backtracking Check
 
 Before finalizing each day, inspect the route shape:
 
@@ -144,7 +156,7 @@ Before finalizing each day, inspect the route shape:
 5. For strongly recommended points that create detours, state the tradeoff in time/cost and give a shorter alternative.
 6. Do not hide route inefficiency inside a polished schedule; the user should be able to follow the flow without surprise returns.
 
-## 10. Country and Region Specific Checks
+## 11. Country and Region Specific Checks
 
 Apply local driving and navigation rules before finalizing route order.
 
@@ -160,7 +172,7 @@ For Japan self-drive plans:
 
 For other countries or regions, identify equivalent local requirements before planning: navigation identifiers, low-emission zones, toll systems, vignette/permit needs, parking restrictions, road permits, ferry reservations, or seasonal access rules.
 
-## 11. Feasibility Build
+## 12. Feasibility Build
 
 Plan from constraints outward:
 
@@ -179,7 +191,7 @@ Use conservative buffers:
 - Popular restaurants and attractions: account for queues, reservation checks, or sold-out risk.
 - 車中泊: arrive before dark when rules, toilets, or parking layout are uncertain.
 
-## 12. Schedule Feasibility Check
+## 13. Schedule Feasibility Check
 
 Before finalizing time blocks, make sure the day can be followed in practice.
 
@@ -190,7 +202,7 @@ Before finalizing time blocks, make sure the day can be followed in practice.
 5. If the day is too packed, downgrade lower-priority stops, move food/support stops, split the day, or suggest an overnight base change.
 6. Label schedule pressure as `comfortable`, `tight`, `too packed`, or `needs day-before check`.
 
-## 13. 車中泊 / Road Trip Checks
+## 14. 車中泊 / Road Trip Checks
 
 For each overnight candidate, verify:
 
@@ -221,12 +233,13 @@ For comfort planning, group support stops into the route:
 - Recovery: late food, convenience store, supermarket, fuel/charging, toilet, trash rule, and dry indoor rest option.
 - Timing: choose support stops with enough buffer before closing; avoid plans that require late-night bathing or laundry unless hours are confirmed.
 
-## 14. Recommendation Pass
+## 15. Recommendation Pass
 
 Before finalizing, check:
 
 - Does each day have a clear theme and realistic pace?
 - If agency/model-course references were used, did the plan state whether each source is a direct package option or benchmark only, price/inclusions when direct, and what was borrowed or changed after verification?
+- For 2+ hour or cross-region transfers, did the plan compare plausible long-distance transport modes by door-to-door time, total cost, luggage/transfer burden, and delay/weather risk?
 - Is each day schedule `comfortable`, `tight`, or `too packed`, and were overloaded days simplified?
 - For each key stop, does the plan say what to do, how long to stay, and whether there is a food/local-specialty recommendation or support-stop role?
 - Does each recommended place have an exact Google Maps place link or precise pin, and are any ambiguous locations clearly marked?
@@ -246,7 +259,7 @@ Before finalizing, check:
 - Are all uncertain claims labeled?
 - Are next actions specific: reserve, call, check official notice, buy pass, download offline map, or prepare cash?
 
-## 15. Final Verification
+## 16. Final Verification
 
 For every important conclusion, provide:
 

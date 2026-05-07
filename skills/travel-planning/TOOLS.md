@@ -7,7 +7,7 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 | Priority | Source Type | Use For |
 | --- | --- | --- |
 | 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, official address, and facility access pages | Confirming facts that affect feasibility and identity. |
-| 2 | Official reservation platforms, travel agency tour pages, package-tour price pages, lodging/guesthouse booking pages, ticketing pages, restaurant pages, local market pages, RV Park listings, transit operators, rail/bus/ferry/airline companies, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, package price, cost, route benchmark, food planning. |
+| 2 | Official reservation platforms, travel agency tour pages, package-tour price pages, airline pages, airport access pages, Shinkansen/rail operator pages, highway bus pages, ferry pages, lodging/guesthouse booking pages, ticketing pages, restaurant pages, local market pages, RV Park listings, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, package price, total transport cost, route benchmark, food planning. |
 | 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, and review platforms | Discovery, exact location identity, navigation identifiers, parking/access notes, recent user signals; verify key claims elsewhere. |
 | 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
 
@@ -20,6 +20,7 @@ Use official or operator pages first:
 - Google Maps exact place links or coordinate pins; avoid generic search-result links when they can open many similarly named places.
 - Local tourism association pages.
 - Train, bus, ferry, ropeway, highway bus, airport operators, official route planners, fare tables, reservation pages, seat rules, and pass pages.
+- Airline, Shinkansen, limited express, highway bus, ferry, rental-car, toll, fuel/charging, parking, airport access, and station access pages for long-distance transport comparison.
 - Japan Meteorological Agency or reputable weather services; for islands, coasts, ferries, mountains, or snow routes, also check marine, wind, wave, snowfall, or road-condition sources.
 - Highway and road authority pages for closures, snow, tolls, ETC/pass options, and rest areas.
 - National park, prefecture, city, and 道の駅 official pages.
@@ -103,6 +104,19 @@ For driving plans, estimate with:
 - Range or caveat when ETC discounts, vehicle class, seasonal rates, parking duration, or detours can change the number.
 
 Cost estimates should be labeled as rough unless all operator prices and route choices are fixed.
+
+## Long-Distance Transport Comparison Sources
+
+When transfer time is 2+ hours or crosses major regions, compare:
+
+- Flight: airfare, airport access time/cost, check-in/security, baggage, airport-to-destination transfer, delay/weather risk.
+- Shinkansen / rail / limited express: base fare, seat fee, transfers, luggage rules, station access, last train, pass value.
+- Highway bus: fare, reservation deadline, boarding point, arrival point, rest stops, cancellation, luggage, delay risk.
+- Ferry: passenger/vehicle fare, sailing schedule, weather cancellation, port access, vehicle reservation, boarding buffer.
+- Rental car / self-drive: rental fee, tolls, fuel/charging, parking, fatigue, weather/road risk, destination parking.
+- Mixed mode: rail/flight plus local rental car, taxi, bus, or ferry.
+
+Always compare door-to-door time and total cost. Ticket price alone is not enough.
 
 ## Country-Specific Driving Sources
 
@@ -221,6 +235,7 @@ When citing a time-sensitive source, record:
 - Japan self-drive stops without Mapcode or fallback navigation input.
 - Parking candidates labeled 月極, resident-only, staff-only, permit-only, apartment parking, or unclear private lot.
 - Non-driving itineraries that omit required reservation timing, last-return risk, or fare estimate.
+- Long-distance transfer chosen without comparing flight/Shinkansen/rail/bus/ferry/car or without door-to-door time and total cost.
 - Driving itineraries that compare routes without fuel/charging, toll, parking, ferry/bridge, or rental-cost assumptions.
 - Driving itineraries through sparse areas without a refuel/charge recommendation before the low-supply segment.
 - Overnight plans that omit lodging-area rationale, access/check-in constraints, or next-day flow.
