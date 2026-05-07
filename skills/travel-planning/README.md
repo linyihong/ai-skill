@@ -1,10 +1,11 @@
 # Travel Planning Skill
 
-This skill supports source-backed travel planning: itinerary design, exact location verification, current opening-hour checks, weather-aware route ordering, seasonal feasibility, public-transport optimization, fare and driving-cost estimates, lodging or guesthouse recommendations, car-stay routing, anti-backtracking route checks, country-specific driving checks, road-trip support stops, and backup planning.
+This skill supports source-backed travel planning: itinerary design, stop-level activity and food recommendations, exact location verification, current opening-hour checks, weather-aware route ordering, seasonal feasibility, public-transport optimization, fare and driving-cost estimates, lodging or guesthouse recommendations, car-stay routing, anti-backtracking route checks, fuel/charging gap planning, country-specific driving checks, road-trip support stops, and backup planning.
 
 ## Goals
 
 - Turn a destination and date range into a practical route.
+- Explain what to do at each recommended stop, how long to stay, and what local food or restaurants to consider.
 - Mark places with exact Google Maps place links, coordinate pins, or precise map URLs instead of ambiguous search-result links.
 - Verify time-sensitive details before recommending a stop.
 - Separate confirmed facts from assumptions and open questions.
@@ -14,14 +15,15 @@ This skill supports source-backed travel planning: itinerary design, exact locat
 - Avoid inefficient route shapes, especially going from A to B and then returning to an intermediate point unless clearly justified.
 - Apply country- and region-specific requirements, such as Mapcode and visitor parking checks for Japan self-drive routes.
 - Estimate rough self-drive costs from distance, fuel/charging, tolls, parking, ferries, bridges, and rental-car add-ons.
+- Plan fuel or EV charging stops when the route crosses rural, mountain, island, night, winter, or long-distance areas with sparse supply.
 - Use community sources for discovery while grounding decisions in official or current sources.
 - Make car-stay and road-trip plans realistic: legal overnight status, toilets, bathing, laundry, trash rules, noise rules, weather, road conditions, and backup lodging.
 
 ## What Belongs Here
 
 - Reusable workflows for planning trips.
-- Source hierarchy, exact-location checks, lodging/base checks, anti-backtracking route checks, transport booking/cost checks, country-specific checks, and verification rules.
-- Output templates for itineraries, lodging candidates, route-shape warnings, transport plans, cost estimates, weather/backup logic, support-stop tables, source tables, and day-before checklists.
+- Source hierarchy, stop-level activity/food checks, exact-location checks, lodging/base checks, anti-backtracking route checks, transport booking/cost checks, fuel/charging checks, country-specific checks, and verification rules.
+- Output templates for itineraries, stop recommendations, lodging candidates, route-shape warnings, transport plans, cost estimates, weather/backup logic, support-stop tables, source tables, and day-before checklists.
 - Reusable lessons about travel planning quality, not private trip details.
 
 ## What Does Not Belong Here
@@ -47,10 +49,11 @@ This skill supports source-backed travel planning: itinerary design, exact locat
 1. Start from the user's destination, dates, style, and constraints.
 2. Gather official and current sources for every time-sensitive recommendation.
 3. Verify exact place identity with Google Maps and official name/address; cross-check Mapcode when relevant.
-4. Check weather and local disruption risks before locking route order.
-5. If not driving, optimize transport routes and list booking/ticket requirements with fare estimates.
-6. If driving, estimate rough transport costs and apply country-specific navigation, access, parking, and driving checks.
-7. If overnighting, recommend lodging bases or candidates that reduce next-day friction and fit the route.
-8. Plan route order with buffers, backups, support stops, and anti-backtracking checks.
-9. Mark confidence and unresolved checks clearly.
-10. Convert new reusable planning lessons into `feedback_history/` when they generalize.
+4. Add what to do, expected stay time, and food/local-specialty ideas for key stops.
+5. Check weather and local disruption risks before locking route order.
+6. If not driving, optimize transport routes and list booking/ticket requirements with fare estimates.
+7. If driving, estimate rough transport costs, apply country-specific navigation/access/parking checks, and plan fuel/charging stops.
+8. If overnighting, recommend lodging bases or candidates that reduce next-day friction and fit the route.
+9. Plan route order with buffers, backups, support stops, and anti-backtracking checks.
+10. Mark confidence and unresolved checks clearly.
+11. Convert new reusable planning lessons into `feedback_history/` when they generalize.

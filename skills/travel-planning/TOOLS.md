@@ -7,7 +7,7 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 | Priority | Source Type | Use For |
 | --- | --- | --- |
 | 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, official address, and facility access pages | Confirming facts that affect feasibility and identity. |
-| 2 | Official reservation platforms, lodging/guesthouse booking pages, ticketing pages, RV Park listings, transit operators, rail/bus/ferry/airline companies, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, cost. |
+| 2 | Official reservation platforms, lodging/guesthouse booking pages, ticketing pages, restaurant pages, local market pages, RV Park listings, transit operators, rail/bus/ferry/airline companies, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, cost, food planning. |
 | 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, and review platforms | Discovery, exact location identity, navigation identifiers, parking/access notes, recent user signals; verify key claims elsewhere. |
 | 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
 
@@ -22,6 +22,7 @@ Use official or operator pages first:
 - Japan Meteorological Agency or reputable weather services; for islands, coasts, ferries, mountains, or snow routes, also check marine, wind, wave, snowfall, or road-condition sources.
 - Highway and road authority pages for closures, snow, tolls, ETC/pass options, and rest areas.
 - National park, prefecture, city, and 道の駅 official pages.
+- Local food guides, restaurant official pages, market pages, roadside station food pages, and tourism-board specialty pages.
 - RV Park, campground, and booking sites for overnight rules and reservations.
 - Mapcode lookup services and facility access pages for self-drive navigation. If Mapcode is unavailable, capture fallback navigation input: official name, address, phone number, Google Maps exact place link, or coordinate pin.
 - Onsen, sento, super sento, public bath, coin shower, campground shower, laundromat, fuel, EV charging, and grocery pages or map listings for support-stop planning.
@@ -39,6 +40,18 @@ For 車中泊 discovery, a user may provide community maps such as `https://syac
 | Hiking/nature | Trail status, weather, daylight, transport return, facility closure, gear and emergency limits. |
 | Ferry/island | Sailing schedule, weather cancellation, vehicle reservation, last return, port access. |
 | Seasonal events | Official event dates, ticketing, crowd control, special transit, road restrictions. |
+
+## Stop Experience and Food Sources
+
+For each key stop, verify or describe:
+
+- Main activity: viewpoint, short walk, museum, hot spring, shrine/temple, market, seasonal event, shopping street, local experience, or rest/support stop.
+- Visit duration and best timing.
+- Local food: regional specialty, restaurant/cafe candidate, market, roadside station item, food street, or convenience fallback.
+- Food constraints: opening day, last order, reservation, cash-only, queue risk, parking, dietary fit, and nearby backup.
+- Whether the stop is a destination or just a support stop.
+
+Do not overfill an itinerary with food recommendations that are off-route or closed at the planned time.
 
 ## Lodging and Overnight Sources
 
@@ -75,6 +88,7 @@ For driving plans, estimate with:
 - Distance and time from a route planner.
 - Fuel economy or EV efficiency assumptions.
 - Fuel price, charging rate, toll calculator, ferry/bridge fee, parking fee, rental-car fee, insurance/add-ons, winter tire or chain fee when relevant.
+- Last reliable fuel/charging point before rural, mountain, island, night, or winter routes; next reliable point after the sparse segment.
 - Range or caveat when ETC discounts, vehicle class, seasonal rates, parking duration, or detours can change the number.
 
 Cost estimates should be labeled as rough unless all operator prices and route choices are fixed.
@@ -120,6 +134,9 @@ Location red flags:
 - Overnight lodging is chosen by price/name only, without route-base logic or check-in/access checks.
 - Route goes A to B and then returns to an intermediate point without a warning or strong reason.
 - A strongly recommended detour lacks time/cost tradeoff and a shorter alternative.
+- Recommended sightseeing stops have no explanation of what to do there or how long to stay.
+- Food recommendations are off-route, closed at the planned time, or listed without backup in rural areas.
+- Rural, mountain, island, night, or winter driving legs omit last/next reliable fuel or charging points.
 
 ## Weather-Aware Planning Sources
 
@@ -142,7 +159,7 @@ For car-stay or long driving days, search and verify:
 | Bathing / shower | Onsen, sento, super sento, day-use bath, coin shower, campground shower | Hours, last entry, closed days, towel rental, parking, tattoo policy when relevant, crowd risk. |
 | Laundry | Coin laundry, campground laundry, hotel day-use laundry when available | Hours, parking, machine count if known, detergent, drying time, nearby food/bath stop. |
 | Food / groceries | Supermarket, convenience store, local market, late restaurant | Closing time, parking, rest-day risk, cash/card. |
-| Fuel / charging | Fuel station, EV charger, roadside station, service area | Hours, charger type, payment app/card, rural gaps. |
+| Fuel / charging | Fuel station, EV charger, roadside station, service area | Hours, charger type, payment app/card, rural gaps, last/next reliable point. |
 | Rest / toilet | 道の駅, service area, park, public toilet, bath facility | Overnight access, cleanliness recency, gates, lighting. |
 
 ## Source Note Format
@@ -168,6 +185,7 @@ When citing a time-sensitive source, record:
 - Parking candidates labeled 月極, resident-only, staff-only, permit-only, apartment parking, or unclear private lot.
 - Non-driving itineraries that omit required reservation timing, last-return risk, or fare estimate.
 - Driving itineraries that compare routes without fuel/charging, toll, parking, ferry/bridge, or rental-cost assumptions.
+- Driving itineraries through sparse areas without a refuel/charge recommendation before the low-supply segment.
 - Overnight plans that omit lodging-area rationale, access/check-in constraints, or next-day flow.
 - Itineraries with hidden backtracking or no route-shape warning for A to B then back toward the middle.
 - A bath, shower, or laundromat stop placed after its last entry or likely closing time.

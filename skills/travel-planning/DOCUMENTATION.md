@@ -20,6 +20,8 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Location verification:
 - Lodging / overnight base:
 - Route shape:
+- Activity / food focus:
+- Fuel / charging assumptions:
 - Planning assumptions:
 
 ## Recommendation
@@ -43,6 +45,8 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Fare / cost:
 - Tickets / passes:
 - Food / rest:
+- What to do:
+- Local food / restaurant:
 - Weather or seasonal risk:
 - Exact location / Google Maps:
 - Navigation / parking:
@@ -76,6 +80,21 @@ Use these templates when producing trip plans or documenting reusable planning w
 | --- | --- | --- | --- | --- | --- |
 | <place> | <official page / operator / map / community source> | <date TZ> | <hours / rule / schedule> | confirmed / likely / needs day-before check / unknown | <reserve / call / recheck> |
 ```
+
+## Stop Experience Table
+
+Use this for key sightseeing, food, and support stops.
+
+```markdown
+| Stop | Why Stop | What To Do | Suggested Time | Food / Local Specialty | Backup / Nearby Alternative | Confidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| <place> | <scenery / food / hot spring / route support> | <1-3 concrete actions> | <duration> | <restaurant / market / specialty / fallback> | <nearby option> | confirmed / needs confirmation |
+```
+
+Stop note:
+
+- If a stop is mainly for fuel, toilet, laundry, parking, or rest, label it as a support stop.
+- Do not list food that is closed at the planned time or far off-route without explaining the detour.
 
 ## Exact Location Table
 
@@ -130,8 +149,19 @@ Use this when the trip uses a rental car, private car, camper, or EV.
 Driving-cost notes:
 
 - State vehicle and fuel/energy assumptions.
+- For sparse areas, state the last reliable fuel/charging point before the segment and the next reliable point after it.
 - Use a range when route, vehicle class, ETC discount, fuel price, parking duration, ferry weather, or rental add-ons are not fixed.
 - Do not compare driving against transit without showing the major cost assumptions.
+
+## Fuel / Charging Gap Table
+
+Use this for rural, mountain, island, night, winter, or long-distance self-drive routes.
+
+```markdown
+| Segment | Supply Risk | Recommended Fuel / Charge Stop | Last Reliable Point | Next Reliable Point | Backup | Confidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| <A to B> | low / medium / high | <station / charger / service area> | <place + hours> | <place + hours> | <alternate / carry margin / reroute> | confirmed / needs day-before check |
+```
 
 ## Lodging and Overnight Base Table
 
