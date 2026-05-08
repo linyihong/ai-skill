@@ -65,6 +65,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 - **文件大小與拆分規則**：一律只維護在 **[`shared-rules/document-sizing.md`](../shared-rules/document-sizing.md)**；skill、技巧分類與寫作規範變大時，用資料夾與 `README.md` 目錄拆分。
 - **中性與低爭議用語**：一律只維護在 **[`shared-rules/neutral-language.md`](../shared-rules/neutral-language.md)**；新增 skill 的標題、description、檔名、slug、索引與摘要都要避免高風險或容易造成 AI/搜尋誤判的詞，改用授權、合規、契約、風險控制等中性語境。
 - **工具中立文件**：一律只維護在 **[`shared-rules/tool-neutral-documentation.md`](../shared-rules/tool-neutral-documentation.md)**；新增 skill 的 README / SKILL / workflow / template 預設不寫特定工具路徑、hook、UI 或同步細節，具體工具做法放到 [`ai-tools/`](../ai-tools/README.md)。
+- **文件 TODO**：一律只維護在 **[`shared-rules/document-todo-list.md`](../shared-rules/document-todo-list.md)**；若新增 skill 文件仍有未完成、待決策、待補強或待驗證項目，在文件前段放 `Document TODO` 表並連到相關章節或 goal。
 - **目標、執行、驗證流程**：一律只維護在 **[`shared-rules/goal-action-validation.md`](../shared-rules/goal-action-validation.md)**；新增 skill 的輸出格式、workflow、documentation 規則要能讓重要結論反查目標、執行、驗證，純判斷題則附參考來源與推論邊界。
 - **依賴文件讀取鐵則**：一律只維護在 **[`shared-rules/dependency-reading.md`](../shared-rules/dependency-reading.md)**；新增或修改 skill 時，必須讀 skill 入口、相關 README/workflow/checklist/template、shared-rules 與 linked updates，不能只讀單一檔案。
 - 各 skill 的 **`FEEDBACK.md`**（若需要）：維持與 [`apk-analysis/FEEDBACK.md`](apk-analysis/FEEDBACK.md) 相同模式——**幾行連結**到 [`shared-rules/feedback-lessons.md`](../shared-rules/feedback-lessons.md)。
@@ -89,6 +90,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 - [ ] 正文有連到 `shared-rules` 與 `feedback-lessons`
 - [ ] 標題、description、檔名、slug、索引與摘要已依 `shared-rules/neutral-language.md` 使用中性低爭議用語
 - [ ] 文件已依 `shared-rules/tool-neutral-documentation.md` 保持工具中立；工具專屬路徑、hook、UI、同步步驟已放 `ai-tools/`
+- [ ] 若文件尚有未完成、待決策、待補強或待驗證項目，已依 `shared-rules/document-todo-list.md` 在前段加入 TODO 表並連到相關章節/goal
 - [ ] 輸出格式已依 `shared-rules/goal-action-validation.md` 要求重要工作單元包含目標、執行、驗證或參考來源
 - [ ] 已依 `shared-rules/dependency-reading.md` 讀取或明確檢查相關依賴文件
 - [ ] 若引用其他 skill，已依 `shared-rules/cross-skill-references.md` 寫明 trigger、artifact、ownership boundary 與 linked updates

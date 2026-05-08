@@ -4,6 +4,8 @@ This rule defines a tool-neutral temporary ledger for active conversation goals.
 
 The ledger is for project-local state, not reusable knowledge. It should live under the current project, be excluded from git, and be deleted when the goal is fully complete.
 
+The goal ledger gives humans and agents an immediate overview after a long conversation: what is still unfinished, what needs a decision, what should be prioritized next, and what needs more work before it can be considered complete.
+
 ## Purpose
 
 Use a goal ledger when a conversation has work that spans more than one action, includes multiple goals, can be interrupted, or needs clear completion criteria.
@@ -20,6 +22,7 @@ The ledger must answer:
 | Scope | In scope, out of scope, and affected project/repo. |
 | Subgoals | Child goals or checklist items when the goal is decomposed. |
 | Planning / todo links | Planning document path, plan section, TodoWrite IDs, checklist items, or external issue links related to this goal. |
+| Open work / decisions | What is not done yet, what decision is needed, or what needs strengthening. |
 | Dependencies | Required user answer, external command, file, agent, or upstream goal. |
 | Next action | The next concrete step a new agent should take. |
 | Completion criteria | What must be true before the file can be deleted. |
@@ -89,6 +92,11 @@ project: <PROJECT_ROOT or project label>
 | plan | <path#section or none> | <why it matters> |
 | todo | <todo id / checklist item / issue> | <pending / in_progress / completed / blocked> |
 
+## Open Work / Decisions
+- Missing work:
+- Decision needed:
+- Needs strengthening:
+
 ## Dependencies
 - <none / user answer / external state / parent goal>
 
@@ -135,6 +143,8 @@ When a planning document, checklist, or tool-level todo list exists, connect it 
 5. If a todo is cancelled because the user changed direction, mark the linked goal `paused` or `superseded` and record the reason.
 
 The goal ledger tracks user-facing intent; todo tools track execution steps. Keep both connected so a future agent can jump from a high-level goal to the exact plan/todo item and back.
+
+Document-level TODO lists are local to a file and should appear near the top of that file. See [`document-todo-list.md`](document-todo-list.md). When a document TODO is part of a larger user goal, link it from `Planning / Todo Links` or `Open Work / Decisions`.
 
 ## Priority Rules
 

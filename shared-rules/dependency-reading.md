@@ -14,6 +14,7 @@
 | 任一 skill 子文件 | 該 skill 的 `SKILL.md`、最近的目錄 `README.md`、相關 workflow/checklist/template、`shared-rules/linked-updates.md`。 |
 | 任一 `shared-rules/*.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`shared-rules/reusable-guidance-boundary.md`（若涉及 reusable guidance / incident / feedback）、受影響 skill 的 `SKILL.md` 或模板。 |
 | `shared-rules/tool-neutral-documentation.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、根 `README.md`、`skills/README.md`、`skills/ADDING_SKILLS.md`、各 skill 入口/README、`ai-tools/README.md` 與受影響工具文件。 |
+| `shared-rules/document-todo-list.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`shared-rules/conversation-goal-ledger.md`、`skills/ADDING_SKILLS.md`、相關模板與 documentation/checklist 文件。 |
 | `shared-rules/conversation-goal-ledger.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`scripts/README.md`、相關 goal helper script、`ai-tools/` 中受影響工具文件；若同時改 tool-specific hook/rule，讀對應 hook/rule 文件。 |
 | 任一工具專用規則檔 | 對應的 shared rule 正文、`shared-rules/README.md`、受影響工具文件，以及受影響的 skill 入口。 |
 | 任一 template | 模板目錄 `README.md`、引用該模板的 workflow/documentation/checklist、`shared-rules/linked-updates.md`。 |
@@ -76,6 +77,15 @@
 - 工具專屬路徑、hook、同步命令、UI 操作、reload 步驟，放在 `ai-tools/<tool>.md`、工具設定檔或工具專用腳本文件。
 - 若 generic rule 需要提同步，用「configured tool sync」等中立詞，再連到 `ai-tools/` 取得具體工具做法。
 - Commit/push 後讀回時，也要確認沒有把工具專屬段落誤放進 root README、skill README、shared rule index 或 reusable lesson。
+
+## Document TODO List Boundary
+
+[`document-todo-list.md`](document-todo-list.md) 管的是文件本身的未完成、待決策、待補強與待驗證項目；[`conversation-goal-ledger.md`](conversation-goal-ledger.md) 管的是跨文件、跨工具或跨對話的使用者目標。兩者需要互相連結：
+
+- 修改文件時若留下未完成內容，應在文件前段加入或更新 `Document TODO`。
+- 如果 TODO 變成跨文件或 user-facing 目標，應連到 `.agent-goals/` goal。
+- 不能因為 goal ledger 已記錄，就把文件內明顯未完成的 TODO 藏在對話裡。
+- Commit/push 前若宣稱文件完成，應檢查該文件的 TODO 表沒有未處理的 `pending`、`blocked` 或 `needs-validation` 項目。
 
 ## Ai-skill 回寫完成門檻
 

@@ -59,7 +59,7 @@ git config core.hooksPath scripts/git-hooks
 ./scripts/agent-goals.sh --project <PROJECT_ROOT> init
 ```
 
-查看目前 active goals 與 locks：
+查看目前 active goals 與 locks。`.agent-goals/README.md` 是給人類與 AI 一開始判斷「還沒做什麼、要先做哪個、哪裡還要補強」的主表：
 
 ```bash
 ./scripts/agent-goals.sh --project <PROJECT_ROOT> status
@@ -82,6 +82,7 @@ git config core.hooksPath scripts/git-hooks
 
 ```bash
 ./scripts/agent-goals.sh --project <PROJECT_ROOT> update --id P1-example-goal --note "Read dependencies" --next "Implement the change"
+./scripts/agent-goals.sh --project <PROJECT_ROOT> update --id P1-example-goal --missing "Validation examples are not written" --decision "Choose whether this remains P1" --strengthen "Add stronger completion criteria"
 ./scripts/agent-goals.sh --project <PROJECT_ROOT> split --parent P1-example-goal --id P2-child-goal --title "Child goal"
 ./scripts/agent-goals.sh --project <PROJECT_ROOT> pause --id P1-example-goal --reason "User changed priority"
 ./scripts/agent-goals.sh --project <PROJECT_ROOT> complete --id P1-example-goal --validated --note "Validation passed"
@@ -90,7 +91,8 @@ git config core.hooksPath scripts/git-hooks
 安全條件：
 
 - `complete` 只有在傳入 `--validated` 時才會刪除 goal 檔；否則會保留並標成 `needs-validation`。
-- `.agent-goals/README.md` 會自動刷新成主目標表，連到 `goals/*.md`，並顯示 plan/todo links、下一步與更新時間。
+- `.agent-goals/README.md` 會自動刷新成主目標表，連到 `goals/*.md`，並顯示 open work / decisions、plan/todo links、下一步與更新時間。
 - `start`、`update`、`split` 可重複使用 `--plan` 與 `--todo`，把 planning 文件章節、TodoWrite ID、checklist item 或 issue ID 連到 goal。
+- `update` 可用 `--missing`、`--decision`、`--strengthen` 把未完成、待決策與待補強項目放進主表。
 - 每個 goal 更新時會使用 `.agent-goals/locks/<goal-id>.lock/` 防止多 agent 同時寫入。
 - Stale lock 可用 `cleanup` 清理；TTL 預設 30 分鐘，可用 `AGENT_GOALS_LOCK_TTL_SECONDS` 覆寫。
