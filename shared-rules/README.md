@@ -25,10 +25,11 @@
 | 4 | [conversation-goal-ledger.md](conversation-goal-ledger.md) | 對話目標閉環、owner/lock、parallelization mode、完成刪除。 |
 | 5 | [tool-neutral-documentation.md](tool-neutral-documentation.md) | 可重用文件保持工具中立，工具差異放 adapter/tool docs。 |
 | 6 | [document-todo-list.md](document-todo-list.md) | 文件前段 TODO 表與 goal/章節連結。 |
-| 7 | [goal-action-validation.md](goal-action-validation.md) | 重要工作單元的目標、執行、驗證。 |
-| 8 | [neutral-language.md](neutral-language.md) | 文件標題、摘要與正文的中性低爭議用語。 |
+| 7 | [document-sizing.md](document-sizing.md) | 文件大小、拆分時機、資料夾與索引結構。 |
+| 8 | [goal-action-validation.md](goal-action-validation.md) | 重要工作單元的目標、執行、驗證。 |
+| 9 | [neutral-language.md](neutral-language.md) | 文件標題、摘要與正文的中性低爭議用語。 |
 
-Bootstrap 不是「全部規則已讀」。完成 bootstrap 後，仍必須依任務讀相關全文，例如 feedback、sanitization、authorization、document sizing、cross-skill references、skill-specific workflow / tools / documentation。
+Bootstrap 不是「全部規則已讀」。完成 bootstrap 後，仍必須依任務讀相關全文，例如 feedback、sanitization、authorization、cross-skill references、skill-specific workflow / tools / documentation。
 
 | 分類 | 檔案 | 內容摘要 |
 | --- | --- | --- |

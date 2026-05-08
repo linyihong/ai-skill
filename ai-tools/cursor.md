@@ -16,10 +16,11 @@
 - `shared-rules/conversation-goal-ledger.md`
 - `shared-rules/tool-neutral-documentation.md`
 - `shared-rules/document-todo-list.md`
+- `shared-rules/document-sizing.md`
 - `shared-rules/goal-action-validation.md`
 - `shared-rules/neutral-language.md`
 
-Bootstrap 後仍要依任務讀 skill-specific README / WORKFLOW / TOOLS / DOCUMENTATION / CHECKLIST，以及 feedback、sanitization、authorization、document-sizing、cross-skill 等任務相關規則。
+Bootstrap 後仍要依任務讀 skill-specific README / WORKFLOW / TOOLS / DOCUMENTATION / CHECKLIST，以及 feedback、sanitization、authorization、cross-skill 等任務相關規則。
 
 ### 1. 中央庫先行
 

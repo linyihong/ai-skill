@@ -29,6 +29,7 @@
 <AI_SKILL_REPO>/shared-rules/conversation-goal-ledger.md
 <AI_SKILL_REPO>/shared-rules/tool-neutral-documentation.md
 <AI_SKILL_REPO>/shared-rules/document-todo-list.md
+<AI_SKILL_REPO>/shared-rules/document-sizing.md
 <AI_SKILL_REPO>/shared-rules/goal-action-validation.md
 <AI_SKILL_REPO>/shared-rules/neutral-language.md
 <AI_SKILL_REPO>/skills/<skill-name>/SKILL.md
