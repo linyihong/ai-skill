@@ -8,7 +8,7 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 | --- | --- | --- |
 | 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, official address, and facility access pages | Confirming facts that affect feasibility and identity. |
 | 2 | Official reservation platforms, travel agency tour pages, package-tour price pages, airline pages, airport access pages, Shinkansen/rail operator pages, highway bus pages, ferry pages, lodging/guesthouse booking pages, ticketing pages, restaurant pages, reservation platforms, local market pages, RV Park listings, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, package price, total transport cost, route benchmark, food planning. |
-| 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, country-appropriate restaurant review/rating platforms, and map review platforms | Discovery, exact location identity, navigation identifiers, parking/access notes, restaurant screening, recent user signals; verify key claims elsewhere. |
+| 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, country-appropriate restaurant review/rating platforms, map review platforms, calendar/reminder fields, notes app structure, travel planning app fields, and offline-map needs | Discovery, exact location identity, navigation identifiers, parking/access notes, restaurant screening, app-ready organization, recent user signals; verify key claims elsewhere. |
 | 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
 
 ## Japan Travel Sources
@@ -52,6 +52,7 @@ Use agency tours and official model courses either as benchmarks or direct packa
 | Hiking/nature | Trail status, weather, daylight, transport return, facility closure, gear and emergency limits. |
 | Ferry/island | Sailing schedule, weather cancellation, vehicle reservation, last return, port access. |
 | Seasonal events | Official event dates, ticketing, crowd control, special transit, road restrictions. |
+| Calendar / app use | Stable time blocks, timezone, map pins, reminder timing, reservation notes, day grouping, offline-map and backup-save needs. |
 
 ## Stop Experience and Food Sources
 
@@ -228,6 +229,24 @@ Check the timing assumptions behind the day:
 - Whether a stop is a quick support stop, ordinary visit, meal stop, or half-day destination.
 
 Mark days as `comfortable`, `tight`, `too packed`, or `needs day-before check`.
+
+## Calendar And App-Ready Sources
+
+Use these when the output should be easy to add to a calendar, map list, reminder app, notes app, or travel planning app:
+
+- Calendar fields: event title, start/end time, time zone, location, URL, notes, and reminder offset.
+- Map-list fields: day, route segment, category, exact place/pin, parking pin, backup flag, and offline-save priority.
+- Reminder fields: booking deadline, day-before weather check, departure time, last entry, last order, check-in, fuel/charging before sparse areas, and ferry/train/flight boarding buffer.
+- Notes fields: reservation number placeholder, source link, confidence, cash/card caveat, language note, and emergency/backup contact when relevant.
+- Offline support: offline map area, screenshots, reservation PDFs, route notes, emergency contacts, and backup lodging/support stops.
+
+Calendar/app red flags:
+
+- Import-ready events include unverified times, unknown timezone, uncertain location, or weather-dependent choices without a `needs recheck` label.
+- Calendar location uses the attraction pin for self-drive when the practical arrival point is a separate parking lot.
+- Reminder times ignore travel buffers, last entry, last order, check-in, or boarding deadlines.
+- Map list mixes primary stops and backups without labels.
+- App-ready output implies a generated export file when only structured text was provided.
 
 ## 車中泊 Quietness Sources
 

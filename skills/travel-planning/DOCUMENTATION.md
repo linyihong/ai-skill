@@ -24,6 +24,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Route shape:
 - Activity / food focus:
 - Restaurant screening:
+- Calendar / app output:
 - Fuel / charging assumptions:
 - Schedule pressure:
 - Planning assumptions:
@@ -55,6 +56,7 @@ Use these templates when producing trip plans or documenting reusable planning w
 - Weather or seasonal risk:
 - Exact location / Google Maps:
 - Driving parking pin:
+- Calendar / app fields:
 - Navigation / parking:
 - Lodging / overnight base:
 - Route shape:
@@ -86,6 +88,34 @@ Use these templates when producing trip plans or documenting reusable planning w
 | Item | Source | Checked | Claim | Confidence | Follow-up |
 | --- | --- | --- | --- | --- | --- |
 | <place> | <official page / operator / map / community source> | <date TZ> | <hours / rule / schedule> | confirmed / likely / needs day-before check / unknown | <reserve / call / recheck> |
+```
+
+## Calendar / App-Ready Table
+
+Use this when the user wants to add the itinerary to a calendar, reminders, map list, notes app, travel planning app, or offline map.
+
+```markdown
+| Day / Time | Event Title | Start / End | Time Zone | Location / Pin | Notes | Reminder | App / Map Group | Import Status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| <day + time> | <short title> | <start-end> | <TZ> | <exact place / driving parking pin / station> | <reservation / source / caveat> | <when to alert> | <Day 1 sightseeing / food / backup / support> | ready / needs recheck / do not import yet |
+```
+
+Calendar/app notes:
+
+- Use stable, short event titles that make sense on a phone lock screen.
+- For self-drive, put the practical parking pin in the location field when it differs from the attraction entrance.
+- Mark weather-dependent, reservation-pending, unverified, or backup-only items as `needs recheck` or `do not import yet`.
+- Group map pins by day and category: sightseeing, food, lodging, parking, support stops, backups.
+- Include reminder offsets for departure, booking, last entry, last order, check-in, fuel/charging, and day-before weather checks.
+
+## Offline / Save-Before-Departure Checklist
+
+```markdown
+| Item | Save / Prepare | Why | Confidence |
+| --- | --- | --- | --- |
+| Offline map | <area / route> | <low signal / rural / overseas> | confirmed / recommended |
+| Reservation | <ticket / hotel / ferry / restaurant> | <check-in / boarding / proof> | confirmed / needs booking |
+| Route backup | <screenshot / note / phone number> | <bad signal / late arrival / closure> | recommended |
 ```
 
 ## Travel Agency / Model-Course Benchmark
@@ -318,6 +348,7 @@ Quietness note:
 - Weather risk:
 - Weather-based route swap:
 - Country-specific navigation / parking risk:
+- Calendar / app import risk:
 - Transport booking / fare risk:
 - Driving cost uncertainty:
 - Crowd / event risk:

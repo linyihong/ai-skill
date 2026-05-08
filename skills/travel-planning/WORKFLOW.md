@@ -38,6 +38,7 @@ Classify every important recommendation:
 | Lodging, minshuku, guesthouse, campground, RV Park | Official lodging page, booking platform, tourism board, map listing, campground/RV Park listing, or direct facility page. |
 | Route shape and backtracking | Map/route planner, transport timetable, drive route, day-by-day stop order, and next-day base logic. |
 | Schedule feasibility | Opening hours, last entry, visit duration, transfer/drive time, check-in deadline, meal hours, sunset/sunrise, and fatigue risk. |
+| Calendar / app-ready output | Final itinerary time blocks, time zone, exact location or parking pin, reservation references, reminder timing, map-list grouping, and items safe to import versus needing recheck. |
 | 車中泊 quietness | Recent reviews, map context, road/truck traffic, idling risk, nearby facilities, lighting, late-night activity, and official quiet-hour rules. |
 | Event dates and crowd risk | Official event page, venue page, tourism board, or local government. |
 | Weather-sensitive activity | Weather agency, mountain/weather service, facility notice, or operator notice. |
@@ -206,7 +207,19 @@ Before finalizing time blocks, make sure the day can be followed in practice.
 5. If the day is too packed, downgrade lower-priority stops, move food/support stops, split the day, or suggest an overnight base change.
 6. Label schedule pressure as `comfortable`, `tight`, `too packed`, or `needs day-before check`.
 
-## 14. 車中泊 / Road Trip Checks
+## 14. Calendar / App-Ready Output Pass
+
+When the user may follow the itinerary on a phone, calendar, map app, notes app, travel planning app, or offline map, prepare practical output fields.
+
+1. For calendar-style events, include a stable event title, start time, end time, time zone, practical location, map link, and notes.
+2. Put only stable items into import-ready form. Mark weather-dependent, unverified, or reservation-pending items as `needs recheck before import`.
+3. Add reminder suggestions: booking deadline, departure buffer, last entry, restaurant last order, check-in deadline, ferry/train/flight boarding buffer, fuel/charging before sparse segments, and day-before weather check.
+4. For map/list apps, group pins by day or route segment and separate sightseeing, food, lodging, parking, support stops, and backups.
+5. For driving, use the driving parking pin as the event/map location when it differs from the attraction entrance.
+6. For offline use, identify what should be saved before departure: offline maps, route screenshots, reservation PDFs, emergency contacts, cash-only notes, and backup lodging/support stops.
+7. Do not imply direct import support when no file is generated. Provide structured fields the user can paste into a calendar/app, or state that a separate export file would need to be generated.
+
+## 15. 車中泊 / Road Trip Checks
 
 For each overnight candidate, verify:
 
@@ -237,7 +250,7 @@ For comfort planning, group support stops into the route:
 - Recovery: late food, convenience store, supermarket, fuel/charging, toilet, trash rule, and dry indoor rest option.
 - Timing: choose support stops with enough buffer before closing; avoid plans that require late-night bathing or laundry unless hours are confirmed.
 
-## 15. Recommendation Pass
+## 16. Recommendation Pass
 
 Before finalizing, check:
 
@@ -252,6 +265,7 @@ Before finalizing, check:
 - Does the route avoid A→B→middle-point backtracking? If not, is there a `backtracking warning`, reason, and shorter alternative?
 - Is the order optimized for forecast, daylight, and weather-sensitive activities?
 - Are opening hours and travel times compatible with the user's dates?
+- If the user may use a calendar, map, reminder, or travel app, are event titles, times, locations, notes, reminders, and map-list groupings included?
 - Are closures, seasonal access, holidays, and maintenance notices checked?
 - If not driving, are departure times, transfer buffers, last-return options, required reservations, and fare estimates listed?
 - If driving, is rough transport cost estimated with distance, fuel/charging, tolls, parking, ferry/bridge, and rental assumptions?
@@ -264,7 +278,7 @@ Before finalizing, check:
 - Are all uncertain claims labeled?
 - Are next actions specific: reserve, call, check official notice, buy pass, download offline map, or prepare cash?
 
-## 16. Final Verification
+## 17. Final Verification
 
 For every important conclusion, provide:
 
