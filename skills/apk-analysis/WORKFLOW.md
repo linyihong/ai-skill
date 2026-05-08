@@ -211,6 +211,8 @@ response decode hook:
 5. request signing 的 canonical path 是否正確。
 6. 成功後 token 如何寫回。
 
+若這條流程要支撐 SDK、client、automation 或 live integration，還必須補一張 identity material self-generation audit：逐一判斷 device/install/account/session seed/vendor attestation/server-issued session 相關 key group 是否 `sdk-generatable`，若能，寫 sanitized generation recipe 與驗證矩陣；若不能，標明 `caller-provided`、`server-issued`、`trusted-bridge`、`private-adapter-required` 或 `unknown`，並把缺口列為 live development blocker 或 private adapter scope。
+
 如果 live 測試需要登入：
 
 - 同一輪測試優先重用 session/context。

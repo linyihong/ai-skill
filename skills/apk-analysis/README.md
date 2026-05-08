@@ -18,8 +18,8 @@
 - 如何找高語意 hook 點。
 - 如何把動態樣本變成離線 fixture、schema 與測試。
 - 如何把 API 整理成可維護的 API Catalog：總入口、分組索引、逐支 API 詳細文件、coverage/gap、UI 對照、SDK/client 欄位用途與驗證。
-- **如何把「能連線拿到真實資料」的前提寫進專案：** Domain／執行環境基線（host family、session／opaque 參數、分頁真實語意、簽章／gateway 前置，皆去敏）與 API Catalog **互鏈**，見 `DOCUMENTATION.md` § Domain／執行環境基線。
-- 如何判斷 APK findings 是否已足夠開始 SDK/client/app tool 開發：若會連真實服務或跑 live integration，必須先通過 development readiness gate；缺最小可跑因素時先補分析文件或列 blocker，不得從 API shape 直接開發 live-facing code。
+- **如何把「能連線拿到真實資料」的前提寫進專案：** Domain／執行環境基線（host family、session／opaque 參數、authorized identity material self-generation audit、分頁真實語意、簽章／gateway 前置，皆去敏）與 API Catalog **互鏈**，見 `DOCUMENTATION.md` § Domain／執行環境基線。
+- 如何判斷 APK findings 是否已足夠開始 SDK/client/app tool 開發：若會連真實服務或跑 live integration，必須先通過 development readiness gate；若需要裝置、帳號、session、vendor attestation 或 server-issued material，還必須分析到每個 key group 能否自生成、怎麼生成或由誰提供；缺最小可跑因素時先補分析文件或列 blocker，不得從 API shape 直接開發 live-facing code。
 - 如何撰寫可重現、可去敏、可回顧的分析文件。
 - 如何把 APK 觀察整理成可交給 `app-development-guidance` 的功能重建交接規格。
 - 新想法如何回饋到 skill，讓後續 agent 更強。
@@ -91,7 +91,7 @@
 - API 列表不是只列 method/path；需要 API Catalog、分組、逐支 API 欄位語意、抓取來源、覆蓋率缺口、UI/API 對照與 SDK/client 欄位用途。
 - App 開發 guidance 要分離到 [`app-development-guidance`](../app-development-guidance/)，避免把分析方法與產品開發 checklist 混在一起。
 - 用 APK 分析文件產生工具、SDK、client、mock、contract test 或重建功能時，`app-development-guidance` 必須同輪接手開發文件與 blocker questions。
-- 開始 live-facing SDK/client/app tool 開發前，必須先確認 project docs 已具備最小可跑因素；缺 runtime baseline 的工作只能落在離線 parser、fixture、mock 或文件補齊範圍。
+- 開始 live-facing SDK/client/app tool 開發前，必須先確認 project docs 已具備最小可跑因素；若 runtime 需要授權身分材料，還必須有 self-generation audit，回答「能否自生成、怎麼生成、不能時誰提供、reset/cooldown/error 如何驗證」。缺 runtime baseline 的工作只能落在離線 parser、fixture、mock 或文件補齊範圍。
 - 新發現要回饋到 skill，但必須去敏、泛化、可驗證。
 
 ## 最小產出
@@ -104,7 +104,7 @@
 - 結論：哪些路徑有效、哪些被排除、下一步如何驗證。
 - 功能重建交接：capability、screen/route/operation、domain concept candidates、API/interface contract、state/error handling、data lifecycle、fixtures、open questions。
 - API Catalog：API 總入口、分組索引、逐支 API 詳細文件、coverage/gap、UI/API mapping、SDK/client 欄位用途與 validation/open questions。
-- Development readiness gate：若要開始 live-facing SDK/client/app tool，專案文件已回答最小可跑因素，或把缺口列為 blocker / scoped out；若只具 skeleton baseline，僅允許離線 parser、fixture、mock 或文件工作。
+- Development readiness gate：若要開始 live-facing SDK/client/app tool，專案文件已回答最小可跑因素，包括必要時的 authorized identity material self-generation audit，或把缺口列為 blocker / scoped out；若只具 skeleton baseline，僅允許離線 parser、fixture、mock 或文件工作。
 - 去敏規則：哪些值被遮蔽，哪些文件不能提交。
 - app-development-guidance handoff：若目標包含 app 工具、SDK、client 或重建功能，要記錄已啟用該 skill 與交接文件位置。
 - 可重用 lesson：新增檔於 **`feedback_history/<category>/`** 或 **`feedback_history/common/`**。

@@ -86,7 +86,7 @@ api/API列表/<group>/<api-name>.md
 | --- | --- |
 | 環境維度 | 觀察到的 host family、path family、是否多 CDN／多 gateway、與 build／地區是否相關（不寫內網祕密 host） |
 | 連線路徑 | App 是否走系統代理、內建 TUN、local proxy、直连；與 capture 工具相容性（影響重放） |
-| Session／身分 | 列表 API 是否在 **未登入** 下可用；若否，登入／裝置／device id 與列表欄位（如 `l`）的 **因果鏈**（引用 hook 或 UI 操作，不寫 secret） |
+| Session／身分 | 列表 API 是否在 **未登入** 下可用；若否，登入／裝置／device id 與列表欄位（如 `l`）的 **因果鏈**（引用 hook 或 UI 操作，不寫 secret）；若後續要做 live SDK/client，還要補 authorized identity material self-generation audit。 |
 | Opaque／衍生參數 | 哪些 query 由 **前序 response**、**WebView**、**搜尋 session** 或 **固定 app 常數** 提供；標 `confirmed` / `candidate` / `unknown` |
 | 簽章與 gateway | `service`／hash、header 名稱集合、canonical path 規則、是否與 body 排序有關（**不**寫演算法材料與 key） |
 | 分頁地面真相 | 是否有 `has_next` 類欄位；若無，記錄 **啟發式** 與反例風險 |
@@ -111,7 +111,7 @@ api/API列表/<group>/<api-name>.md
 | --- | --- |
 | Base endpoint / host | SDK 能否從固定 fallback、public config、DNS/config API 自行選擇？還是必須 private host table / app storage？ |
 | Route binding / service | raw route id/service 是否可由 SDK deterministic 生成？若只知道 hash/placeholder，仍是 private-adapter-required。 |
-| Authorized identity material | 是否只剩 device id / install id / 授權帳號 / session seed 等呼叫方身分材料需要注入？產生、持久化、重置、風控界線是否明確？ |
+| Authorized identity material | 是否只剩 device id / install id / 授權帳號 / session seed 等呼叫方身分材料需要注入？每個 key group 能否由 SDK/tool 自行生成或初始化？若能，生成 recipe、持久化、重置、冷卻、風控與驗證矩陣是否明確？若不能，誰提供以及為何不是 SDK-generatable？ |
 | Session/bootstrap | guest/device login 是否可由 SDK 生成？是否仍需要 app-only token、captcha、human login 或私有 WebView state？ |
 | Opaque query/header | 每個 opaque 欄位是 app 常數、locale、device/session 派生，還是 response/session 私有值？ |
 | Signing/gateway | canonicalization、排序、hash/HMAC/AES、timestamp/random 來源是否可重建且已 fixture 驗證？ |
@@ -131,10 +131,36 @@ Live SDK self-generation verdict:
 
 **判讀規則：**只要仍有 `private-adapter-required` 或 `unknown` 的 base host、route service、signing、decrypt、session bootstrap、opaque provider，就不能說「只剩授權身分材料」。此時只能說「SDK core + private adapter gate」。
 
+### Authorized identity material self-generation audit
+
+當 runtime 需要 device / install / account / session seed / vendor attestation / server-issued session 類材料時，分析不能只列「授權身分材料」。若下游目標是 SDK、client、automation、live integration 或 replay tool，必須逐 key group 回答「能否自生成」與「怎麼生成」。推薦用 **identity material self-generation audit** 作為文件標題，因為它同時包含可生成性、生成方式與不可生成時的 adapter 邊界。
+
+最低表格：
+
+| Field | 必填內容 |
+| --- | --- |
+| Key group / surface | 欄位名稱群、storage key 名、request key 名或 provider function boundary；只寫 name/shape，不寫 raw value。 |
+| Role in live access | 它是 app/build constant、device/install material、account material、guest/session seed、vendor attestation、server-issued session、locale/opaque provider，還是其它 runtime factor。 |
+| Self-generation verdict | `sdk-generatable` / `caller-provided` / `server-issued` / `trusted-bridge` / `private-adapter-required` / `unknown` / `scoped-out`。 |
+| Generation recipe or provider boundary | 若 `sdk-generatable`，寫 sanitized recipe：inputs、algorithm family、canonical order、storage key name、refresh trigger、validation fixture；若不能，寫由 caller、server response、trusted bridge 或 private adapter 提供。 |
+| Lifecycle and reset behavior | first install、cold start、guest/login、preserved session、logout、`clear app data`、reinstall、token expiry 時如何建立、重用、更新或清除。 |
+| Cooldown / risk controls | 是否會觸發 rate limit、device health、attestation check、account lock、captcha/human step；只寫 status/error class，不寫可濫用細節。 |
+| Error / negative matrix | missing、empty、stale、bad-fixed、bad-signature、expired-session 等情況的 wrapper/UI/recovery class；若未驗證，標 `pending`。 |
+| Validation evidence | 去敏 hook summary、static provider trace、fixture、replay parity、unit/contract test；不得保存 raw token、device id、account、vendor payload、signature 或 host。 |
+
+判斷規則：
+
+- `sdk-generatable` 需要可重跑的生成 recipe 或測試，不能只因為值看起來像 UUID、hash、locale、random 就宣稱可生成。
+- `caller-provided` 仍需定義 lifecycle、reset/cooldown、health/error 行為；否則是 `unknown` 或 `private-adapter-required`。
+- `server-issued` 可以由 SDK 建模 storage/refresh boundary，但 raw material 來自授權 server response；不要把它寫成 SDK locally generated。
+- `trusted-bridge` / `private-adapter-required` 可以讓 private live smoke 成立，但不能支撐「standalone self-generating SDK」宣稱。
+- 若任何 live-required identity key group 的 generation recipe、provider boundary、reset/cooldown 或 error matrix 是 `unknown`，live-facing development 只能繼續在 private adapter / bridge scope，或退回 offline parser / fixture / mock scope。
+
 **Finish gate（與 SDK／client／回放相關任務）：**
 
 - 若本輪目標包含「可程式化拉取真實資料」「接 SDK transport」「寫 integration test」之一，而專案尚無 baseline 或僅有 API 條目：必須在**同一工作單**建立 **skeleton baseline**，並把 **open** 項寫成可驗證問題（不可留空「待之後再說」而無追蹤列）。
 - 若本輪要**開始開發** SDK、client、app tool、live integration 或任何會連真實服務的 transport，baseline 不能只停在 skeleton。必須先檢查並記錄最小可跑因素：endpoint/path family、route/service 對照或 adapter 策略、session/bootstrap 依存、opaque 參數來源與時效、簽章／gateway 前置、response decrypt/unwrap 邊界、分頁地面真相、錯誤／session 恢復、重放檢查清單。缺任一項時，該缺口必須成為開發 blocker 或被明確 scoped out；不得一邊缺 runtime 因素一邊實作 live-facing code。
+- 若 live flow 需要 device/install/account/session/vendor/server-issued material，必須先補 **authorized identity material self-generation audit**。沒有「能否自生成 + 怎麼生成 / 誰提供 + lifecycle/reset/cooldown/error matrix」時，不得把 live SDK work 標成最低開發需求已滿足。
 - 若使用者明確要求「分析到只剩 device id / 帳號材料 / 授權身分材料」等級，必須補上 **SDK live self-generation audit**；不能把 `private-adapter-required` 寫成已接近可自動生成。
 - 只有不需要真實服務的工作（離線 parser、fixture、mock transport、文件 skeleton、純 schema mapping）可以在 skeleton baseline 下繼續，但文件必須明確標示「不具備 live/replay readiness」。
 - baseline 與 feature handoff 的 **Domain Concepts** 應交叉引用：entity 級與 runtime 級不要混成同一張表而漏掉環境依存。

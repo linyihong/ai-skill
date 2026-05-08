@@ -128,7 +128,7 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
    - 成功證據要可重現
    - API 結論和方法論要分開
    - 去敏後才保存樣本
-   - 若下一步是 SDK/client/app tool/live integration 開發，先補 project-level domain/runtime baseline 的最小可跑因素；缺項要列 blocker，不要直接進 live-facing code
+   - 若下一步是 SDK/client/app tool/live integration 開發，先補 project-level domain/runtime baseline 的最小可跑因素；若需要 device/install/account/session/vendor/server-issued material，補 authorized identity material self-generation audit，回答能否自生成、怎麼生成或由誰提供、reset/cooldown/error 如何驗證；缺項要列 blocker，不要直接進 live-facing code
 
 7. 回饋 skill：
    - 新技巧寫入 `feedback_history/<category>/` 或 `feedback_history/common/`（見 `shared-rules/feedback-lessons.md` 命名規則）
