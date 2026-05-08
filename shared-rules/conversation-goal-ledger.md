@@ -47,16 +47,31 @@ The `.agent-goals/` directory is temporary project state and should not be commi
 
 ## When To Create Or Update
 
+Before substantive work, first run or perform the equivalent of:
+
+```text
+<AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> status
+```
+
+If the ledger does not exist and any trigger below applies, initialize it before continuing:
+
+```text
+<AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> init
+```
+
 Create or update a goal file when:
 
 - A user asks for implementation, analysis, planning, review, debugging, or repository updates that can span more than one tool call.
 - A task has multiple goals or priorities.
+- The agent observes modified, staged, untracked, or otherwise dirty project files and intends to continue work in that project.
+- The agent creates a tool-level todo list or resumes a previous todo list whose items are not all complete.
+- The user says to continue a prior multi-step task, especially after context compaction, interruption, or a different side quest.
 - A task is paused, blocked, superseded, or waiting for user input.
 - A goal is decomposed into smaller goals.
 - An agent is about to stop, compact context, switch mode, launch subagents, or hand off.
 - A user changes priority, adds a new target, or redirects the conversation.
 
-For very small one-message answers, the ledger is optional. If any work remains after the response, it is no longer optional.
+For very small one-message answers, the ledger is optional. If any work remains after the response, if files were changed, or if the working tree is dirty for the active task, it is no longer optional. Do not treat the tool todo list as a substitute for this project-local ledger; todos track execution steps, while `.agent-goals/` tracks user-visible goals and handoff state.
 
 ## Goal File Template
 

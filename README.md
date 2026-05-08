@@ -31,7 +31,7 @@
 
 ## 對話目標閉環
 
-若工作可能中斷、跨多輪、被多 agent 接手或拆成多個子目標，依 [`shared-rules/conversation-goal-ledger.md`](shared-rules/conversation-goal-ledger.md) 在業務專案本地維護 `<PROJECT_ROOT>/.agent-goals/`。這是暫存狀態，不進 git；目標完成並驗證後刪除。可用 [`scripts/agent-goals.sh`](scripts/agent-goals.sh) 建立、更新、拆解、暫停與完成刪除 goal。
+若工作可能中斷、跨多輪、被多 agent 接手、拆成多個子目標、已建立 TodoWrite、使用者要求繼續前一個多步驟任務，或 agent 已看到 active project 有 modified / staged / untracked files，依 [`shared-rules/conversation-goal-ledger.md`](shared-rules/conversation-goal-ledger.md) 在業務專案本地先檢查或維護 `<PROJECT_ROOT>/.agent-goals/`。這是暫存狀態，不進 git；目標完成並驗證後刪除。可用 [`scripts/agent-goals.sh`](scripts/agent-goals.sh) 建立、更新、拆解、暫停與完成刪除 goal。
 
 ## 回饋規則
 

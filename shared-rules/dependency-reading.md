@@ -81,6 +81,7 @@
 [`conversation-goal-ledger.md`](conversation-goal-ledger.md) 管的是使用者對話目標是否完成；本檔的 Ai-skill writeback transaction 管的是本知識庫改動是否完成 sync / commit / push / reread / clean status。兩者不可互相取代：
 
 - `.agent-goals/` 是專案本地暫存狀態，不應 commit。
+- 當目前任務會跨多個 tool call、已建立 TodoWrite、使用者要求「繼續」前一個多步驟任務，或 agent 已看到 active project 有 modified / staged / untracked files 時，必須先檢查或初始化 `.agent-goals/`，再長時間繼續專案工作。
 - Ai-skill writeback transaction 是本 repository 的 git 閉環，必須 commit / push。
 - 當使用者目標是「修改 Ai-skill 規則或 skill」時，agent 可能需要同時維護 `.agent-goals/` 中的 user goal，並完成本檔要求的 Ai-skill writeback transaction。
 - 不可因為 `.agent-goals/` 目標刪除了，就跳過本庫的 diff review、linked updates、bundle sync、commit、push、讀回與 clean status。

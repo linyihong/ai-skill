@@ -85,10 +85,10 @@ Cursor 會掃描特定路徑下的 skill；把中央庫對應的 `skills/<name>/
 
 ### 建議操作
 
-在 Cursor 開始可中斷、可拆解或多目標工作時：
+在 Cursor 開始可中斷、可拆解或多目標工作時，或已看到 active project 有 modified / staged / untracked files、已建立 TodoWrite、使用者說「繼續」前一個多步驟任務時：
 
 1. 讀取 `<PROJECT_ROOT>/.agent-goals/`，確認是否已有 active / blocked / needs-validation goal。
-2. 若沒有 ledger，使用本庫 helper 初始化：
+2. 若沒有 ledger 且任務不是單一回覆即可完成，使用本庫 helper 初始化；不要因為已有 TodoWrite 就跳過 goal ledger：
 
    ```bash
    <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> init

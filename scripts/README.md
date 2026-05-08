@@ -51,18 +51,18 @@ git config core.hooksPath scripts/git-hooks
 
 ## Conversation goal ledger helper
 
-規則正文見 [`shared-rules/conversation-goal-ledger.md`](../shared-rules/conversation-goal-ledger.md)。Goal ledger 是專案本地暫存狀態，放在 `<PROJECT_ROOT>/.agent-goals/`，用來在 agent 中斷、轉移目標、多 agent 操作或 context compact 後回溯目前目標，不取代 git / issue tracker / Ai-skill writeback transaction。
+規則正文見 [`shared-rules/conversation-goal-ledger.md`](../shared-rules/conversation-goal-ledger.md)。Goal ledger 是專案本地暫存狀態，放在 `<PROJECT_ROOT>/.agent-goals/`，用來在 agent 中斷、轉移目標、多 agent 操作、context compact、已有 TodoWrite 或看到 dirty files 後回溯目前目標，不取代 git / issue tracker / Ai-skill writeback transaction。
 
-初始化目前專案的 goal ledger，並把 `.agent-goals/` 寫入 `.git/info/exclude`：
-
-```bash
-./scripts/agent-goals.sh --project <PROJECT_ROOT> init
-```
-
-查看目前 active goals 與 locks。`.agent-goals/README.md` 是給人類與 AI 一開始判斷「還沒做什麼、要先做哪個、哪裡還要補強」的主表：
+進入多步驟工作、使用者要求「繼續」前一個任務、或已看到 active project 有 modified / staged / untracked files 時，先檢查：
 
 ```bash
 ./scripts/agent-goals.sh --project <PROJECT_ROOT> status
+```
+
+若尚未建立 ledger 且任務不是單一回覆即可完成，先初始化：
+
+```bash
+./scripts/agent-goals.sh --project <PROJECT_ROOT> init
 ```
 
 建立目前主要目標：
@@ -71,9 +71,9 @@ git config core.hooksPath scripts/git-hooks
 ./scripts/agent-goals.sh --project <PROJECT_ROOT> start \
   --id P1-example-goal \
   --title "Example goal" \
-  --source "User asked for the example outcome" \
-  --next "Read the relevant files" \
-  --criteria "User-visible outcome is complete and validated" \
+  --source "User request summary" \
+  --next "Next concrete action" \
+  --criteria "Observable completion condition" \
   --plan "docs/implementation-plan.md#example" \
   --todo "implement-example"
 ```
