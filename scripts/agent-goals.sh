@@ -306,6 +306,13 @@ acquire_lock() {
   trap 'rm -rf "${AGENT_GOAL_ACTIVE_LOCK}"' EXIT
 }
 
+release_lock() {
+  [[ -n "${AGENT_GOAL_ACTIVE_LOCK}" ]] || return 0
+  rm -rf "${AGENT_GOAL_ACTIVE_LOCK}"
+  AGENT_GOAL_ACTIVE_LOCK=""
+  trap - EXIT
+}
+
 append_progress() {
   local file="$1"
   local note="$2"
@@ -327,7 +334,7 @@ note = sys.argv[4]
 text = path.read_text(encoding="utf-8")
 row = f"| {kind} | {reference} | {note} |\n"
 marker = "\n## Planning / Todo Links\n"
-end_marker = "\n## Dependencies\n"
+end_marker = "\n## Owner / Lock Decision\n" if "\n## Owner / Lock Decision\n" in text else "\n## Dependencies\n"
 if marker not in text:
     insert_at = text.index(end_marker)
     section = (
@@ -496,10 +503,15 @@ ${source}
 | Type | Reference | Status / Note |
 | --- | --- | --- |
 
+## Owner / Lock Decision
+- Owner: ${USER:-unknown}@$(hostname 2>/dev/null || echo unknown)
+- Lock: unlocked between helper operations
+- Parallelization: ${parallelization}
+
 ## Open Work / Decisions
-- Missing work:
-- Decision needed:
-- Needs strengthening:
+- Missing work: none
+- Decision needed: none
+- Needs strengthening: none
 
 ## Dependencies
 - none
@@ -526,6 +538,7 @@ EOF
   for link in "${todo_links[@]+"${todo_links[@]}"}"; do
     insert_planning_link "${file}" "todo" "${link}" "linked at creation"
   done
+  release_lock
   refresh_index
   echo "Started goal: ${file}"
 }
@@ -587,6 +600,7 @@ PY
   replace_bullet_value "${file}" "Open Work / Decisions" "Decision needed" "${decision}"
   replace_bullet_value "${file}" "Open Work / Decisions" "Needs strengthening" "${strengthen}"
   append_progress "${file}" "${note:-Goal updated.}"
+  release_lock
   refresh_index
   echo "Updated goal: ${file}"
 }
@@ -660,6 +674,7 @@ cmd_complete() {
   file="$(goal_path "${id}")"
   [[ -f "${file}" ]] || die "Goal not found: ${id}"
   rm -f "${file}"
+  release_lock
   refresh_index
   echo "Deleted completed goal: ${id}"
 }

@@ -17,9 +17,9 @@ The ledger must answer:
 | Goal | What user-visible outcome is being pursued. |
 | Priority | `P0`, `P1`, `P2`, or `P3`. |
 | Status | `active`, `paused`, `blocked`, `needs-validation`, `superseded`, or `complete-pending-delete`. |
+| Parallelization mode | `parallelizable`, `single-owner`, or `non-parallelizable`, with a short reason when overlap is unsafe. |
 | Owner | Current agent/tool owner and timestamp. |
-| Parallelization | Whether this goal is `parallelizable`, `single-owner`, or `non-parallelizable`. |
-| Lock state | Whether another active agent appears to be editing this goal. |
+| Owner / lock decision | Whether the current agent may edit, must acquire/refresh a lock, or must stop because another owner/lock overlaps. |
 | Source | User request or instruction that created the goal. |
 | Scope | In scope, out of scope, and affected project/repo. |
 | Subgoals | Child goals or checklist items when the goal is decomposed. |
@@ -55,6 +55,15 @@ Before substantive work, first run or perform the equivalent of:
 <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> status
 ```
 
+Then read `<PROJECT_ROOT>/.agent-goals/README.md` and any relevant active goal file before editing. Confirm:
+
+- Active / blocked / needs-validation goals.
+- Priority and whether another active `P1` conflicts with the user's latest request.
+- Owner and lock state.
+- Parallelization mode and whether overlapping work is allowed.
+- Existing planning / todo links.
+- Open missing work, decisions, and needs-strengthening items.
+
 If the ledger does not exist and any trigger below applies, initialize it before continuing:
 
 ```text
@@ -75,6 +84,14 @@ Create or update a goal file when:
 
 For very small one-message answers, the ledger is optional. If any work remains after the response, if files were changed, or if the working tree is dirty for the active task, it is no longer optional. Do not treat the tool todo list as a substitute for this project-local ledger; todos track execution steps, while `.agent-goals/` tracks user-visible goals and handoff state.
 
+Before changing files for a ledger-tracked task, the current goal must have enough structure for handoff:
+
+- `parallelization` in frontmatter or an explicit parallelization line in the body.
+- Owner / lock decision recorded or implied by an unlocked current-owner goal.
+- Planning / todo links when a plan, checklist, TodoWrite item, or issue exists.
+- `Missing work`, `Decision needed`, and `Needs strengthening` populated with real content or `none`.
+- Next action and completion criteria that are concrete enough for a future agent to validate.
+
 ## Goal File Template
 
 Use Markdown so any tool can read it:
@@ -84,8 +101,8 @@ Use Markdown so any tool can read it:
 id: P1-short-slug
 priority: P1
 status: active
+parallelization: single-owner
 owner: <agent/tool/session>
-parallelization: parallelizable
 created: <ISO-8601 timestamp>
 updated: <ISO-8601 timestamp>
 project: <PROJECT_ROOT or project label>
@@ -110,10 +127,15 @@ project: <PROJECT_ROOT or project label>
 | plan | <path#section or none> | <why it matters> |
 | todo | <todo id / checklist item / issue> | <pending / in_progress / completed / blocked> |
 
+## Owner / Lock Decision
+- Owner: <current agent/tool/session>
+- Lock: <unlocked / lock acquired / blocked by owner>
+- Parallelization: <parallelizable / single-owner / non-parallelizable> because <reason>
+
 ## Open Work / Decisions
-- Missing work:
-- Decision needed:
-- Needs strengthening:
+- Missing work: <none / concrete unfinished work>
+- Decision needed: <none / decision required>
+- Needs strengthening: <none / weak rule / validation / docs>
 
 ## Dependencies
 - <none / user answer / external state / parent goal>
@@ -143,60 +165,12 @@ Keep `<PROJECT_ROOT>/.agent-goals/README.md` as the primary locator for active g
 ```markdown
 | Priority | Status | Mode | Owner | Lock | Goal | Open Work / Decisions | Planning / Todo Links | Next Action | Updated |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| P1 | active | single-owner | agent@host | locked by agent@host | [Short title](goals/P1-short-slug.md) | decision: choose route | plan: docs/plan.md#section; todo: implement-api | Run validation | 2026-05-08T00:00:00Z |
+| P1 | active | single-owner | agent/session | unlocked | [Short title](goals/P1-short-slug.md) | decision: choose live gate | plan: docs/plan.md#section; todo: implement-api | Run validation | 2026-05-08T00:00:00Z |
 ```
 
 The main table is for quick recovery. It should not replace the detail in each goal file.
 
-Update the table when a goal is created, paused, split, linked to a todo, or completed. When a goal file is deleted after validation, remove it from the table.
-
-## Multi-Conversation Interference Control
-
-Different conversations may work in the same project at the same time. The ledger reduces interference by making ownership and lock state visible, and by requiring agents to stop when work overlaps.
-
-Before changing files, an agent must:
-
-1. Read `.agent-goals/README.md`.
-2. Check whether an existing active goal overlaps the new request.
-3. Check whether the overlapping goal is locked.
-4. Check whether the workflow is marked `single-owner` or `non-parallelizable`.
-
-Stop and prompt the user when:
-
-- The same goal has an active lock owned by another agent/session.
-- A new request overlaps an active goal but uses a different goal id.
-- The goal is `single-owner` and another owner is already recorded.
-- The goal or workflow is `non-parallelizable`.
-- The agent cannot tell whether two goals overlap but the same files, git branch, database, release, or shared state are involved.
-
-The prompt should include:
-
-- Existing goal id and title.
-- Owner and lock age, when available.
-- Affected files/resources.
-- Why parallel work is risky.
-- Proposed options: wait, take over with user approval, split into a child goal, or create a separate non-overlapping goal.
-
-Do not silently proceed just because the file system allows writes.
-
-## Parallelization Modes
-
-Use these modes:
-
-| Mode | Meaning | Required behavior |
-| --- | --- | --- |
-| `parallelizable` | Work can be split safely by subgoal or file area. | Use separate goals or child goals; avoid editing the same files at the same time. |
-| `single-owner` | Work may be resumable by another agent, but only one owner should edit it at a time. | If another owner/lock is present, stop and ask before taking over. |
-| `non-parallelizable` | Work should not be split across conversations. | Stop and ask the user to serialize the work. |
-
-Mark a goal `non-parallelizable` for workflows such as:
-
-- Git history operations, merge conflict resolution, release tagging, deploys, or migration sequencing.
-- Shared rule / skill writeback transactions that require one coherent diff, sync, commit, push, and readback.
-- Data migrations, destructive operations, credential rotation, production configuration, or irreversible cleanup.
-- Any task where two agents editing independently could invalidate validation, duplicate commits, or produce contradictory user-facing decisions.
-
-If a workflow starts as `parallelizable` but later becomes risky, update the goal to `single-owner` or `non-parallelizable` and record the reason under `Open Work / Decisions`.
+Update the table when a goal is created, paused, split, linked to a todo, owner/lock state changes, parallelization mode changes, or completed. When a goal file is deleted after validation, remove it from the table.
 
 ## Planning And Todo Links
 
@@ -235,6 +209,24 @@ When a goal becomes too broad, split it:
 4. Promote a child goal to `P1` only when it is the current work focus.
 
 Do not hide a discovered subgoal only in chat. If it affects completion, record it in the ledger.
+
+## Owner, Lock, And Parallelization
+
+Before modifying files under an active goal, decide and record how work can overlap:
+
+| Mode | Meaning | Required behavior |
+| --- | --- | --- |
+| `parallelizable` | Independent files or clearly separated subgoals can be handled concurrently. | Split child goals or todos, record ownership, and avoid editing the same files without a lock. |
+| `single-owner` | Work can continue across sessions, but only one active owner should edit at a time. | Check lock state before editing; update owner and next action when handing off. |
+| `non-parallelizable` | Shared state, secrets, live captures, migrations, or fragile workflows make overlap unsafe. | Acquire/refresh a lock or stop and ask if another owner/lock is present. |
+
+If `.agent-goals/README.md` shows another active lock for overlapping work, stop before editing. Report the lock owner, age, affected goal, and the intended next step. Do not assume a lock is stale just because the current chat has context; use the configured cleanup rule or ask the user.
+
+Also stop and prompt the user when a new request overlaps an active goal with a different id, the recorded owner differs on a `single-owner` goal, the workflow is `non-parallelizable`, or the agent cannot tell whether two goals overlap but the same files, git branch, database, release, or shared state are involved. The prompt should include the existing goal id/title, owner and lock age when available, affected files or resources, why parallel work is risky, and concrete options such as wait, take over with approval, split into a child goal, or create a separate non-overlapping goal.
+
+Mark a goal `non-parallelizable` for workflows such as git history operations, merge conflict resolution, release tagging, deploys, migration sequencing, shared rule / skill writeback transactions, data migrations, destructive operations, credential rotation, production configuration, or any task where two agents editing independently could invalidate validation, duplicate commits, or produce contradictory user-facing decisions.
+
+When the user redirects the work, changes priority, or asks to continue after a side task, update owner/lock/parallelization along with `Missing work`, `Decision needed`, `Needs strengthening`, `Planning / Todo Links`, and `Next Action` before substantial edits.
 
 ## Goal Transfer
 

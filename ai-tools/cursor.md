@@ -6,6 +6,21 @@
 
 目標：新開業務專案時，讓 Cursor 容易辨識並套用 `apk-analysis`。
 
+## 預設載入 shared rules
+
+在 Cursor 中建議用 always-apply rule 或 sessionStart hook 先提醒 agent 載入 `shared-rules/README.md` 的 Default Bootstrap：
+
+- `shared-rules/README.md`
+- `shared-rules/dependency-reading.md`
+- `shared-rules/linked-updates.md`
+- `shared-rules/conversation-goal-ledger.md`
+- `shared-rules/tool-neutral-documentation.md`
+- `shared-rules/document-todo-list.md`
+- `shared-rules/goal-action-validation.md`
+- `shared-rules/neutral-language.md`
+
+Bootstrap 後仍要依任務讀 skill-specific README / WORKFLOW / TOOLS / DOCUMENTATION / CHECKLIST，以及 feedback、sanitization、authorization、document-sizing、cross-skill 等任務相關規則。
+
 ### 1. 中央庫先行
 
 在新專案開始前或開始時，在本機中央庫目錄執行 `git pull`，確保 `skills/`、`shared-rules/` 與遠端一致。
@@ -87,7 +102,7 @@ Cursor 會掃描特定路徑下的 skill；把中央庫對應的 `skills/<name>/
 
 在 Cursor 開始可中斷、可拆解或多目標工作時，或已看到 active project 有 modified / staged / untracked files、已建立 TodoWrite、使用者說「繼續」前一個多步驟任務時：
 
-1. 讀取 `<PROJECT_ROOT>/.agent-goals/`，確認是否已有 active / blocked / needs-validation goal。
+1. 讀取 `<PROJECT_ROOT>/.agent-goals/`，確認是否已有 active / blocked / needs-validation goal，以及 priority、owner、lock、parallelization mode、plan/todo links、missing/decision/strengthen。
 2. 若沒有 ledger 且任務不是單一回覆即可完成，使用本庫 helper 初始化；不要因為已有 TodoWrite 就跳過 goal ledger：
 
    ```bash
@@ -101,13 +116,14 @@ Cursor 會掃描特定路徑下的 skill；把中央庫對應的 `skills/<name>/
      --id P1-short-goal \
      --title "Short goal title" \
      --source "User request summary" \
+     --parallelization single-owner \
      --next "Next concrete action" \
      --criteria "Observable completion condition"
    ```
 
 4. 若使用者轉移目標，先 `pause` 或 `update --status superseded` 舊 goal，再建立新的 `P1`。
 5. 若有 planning 文件或 TodoWrite todo，使用 `--plan` / `--todo` 連到 goal，並讓 `.agent-goals/README.md` 的主目標表可快速跳回該 goal。
-6. 若發現需要拆小目標，使用 `split` 或在 goal 檔的 `Subgoals` 區塊記錄。
+6. 若發現需要拆小目標，使用 `split` 或在 goal 檔的 `Subgoals` 區塊記錄；若發現不能分工或需單一 owner，使用 `--parallelization single-owner|non-parallelizable` 更新。
 7. 在回覆完成前，只有完成條件與驗證都成立時才 `complete --validated`；否則保留 goal，讓下一個 agent 可接手。
 
 ### Cursor hooks 範本方向
@@ -116,7 +132,7 @@ Cursor hook 可以輔助提醒，但不應成為唯一真相。可選的 project
 
 | Event | 用途 | 行為 |
 | --- | --- | --- |
-| `sessionStart` | 開局提醒 | 檢查 `.agent-goals/README.md` 與 `.agent-goals/goals/*.md`，若有 active goal，提醒目前未完成項、待決策、owner/lock、優先順序與需要補強的地方。 |
+| `sessionStart` | 開局提醒 | 檢查 `.agent-goals/README.md` 與 `.agent-goals/goals/*.md`，若有 active goal，提醒目前未完成項、待決策、owner/lock、parallelization mode、優先順序與需要補強的地方。 |
 | `preCompact` | 壓縮前檢查 | 若有 active goal，提醒 agent 先更新 `Next Action`、`Progress`、`Validation`。 |
 | `stop` | 停止前檢查 | 若 goal 未完成，提醒保留或更新；不要自動刪除。若發現重疊 goal 被其他 owner/lock 處理，停止並請使用者決定。 |
 

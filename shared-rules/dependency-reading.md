@@ -23,7 +23,7 @@
 
 ## Agent 行為
 
-1. 先讀 `shared-rules/README.md`，再依任務讀相關 shared rule 全文。
+1. 先讀 `shared-rules/README.md` 的 **Default Bootstrap**，並載入 bootstrap 表列出的最小必讀集合；再依任務讀相關 shared rule 全文。
 2. 若任務碰到 skill，讀該 skill 入口與依賴文件；不要只依賴 `description`、`SKILL.md` 單檔或單一段落。
 3. 若看到文件有 cross-link、promotion target、required linked updates、template reference、feedback index，或 reusable guidance / project incident 邊界，就循連結讀到任務所需的規則載入完成。
 4. 若依賴文件不存在，記錄為 `not applicable`；若存在但未讀，不可宣稱已完成檢查。
@@ -46,6 +46,30 @@
 | Validation | 連動更新檢查、diff review、sync、commit/push/readback 或純判斷的參考來源。 |
 
 若 ledger 顯示最低讀取範圍仍有缺口，agent 不得宣稱「已按更新後 skill 執行」或長時間切回專案分析；必須先補讀、標 `not applicable`，或明確向使用者說明阻塞。
+
+## Default Bootstrap Boundary
+
+Default bootstrap 是每次 agent/session 開始時的最低共用上下文，不等於所有規則全文都已讀。
+
+啟動時先讀 [`README.md`](README.md) 的 Default Bootstrap，至少載入：
+
+- `shared-rules/README.md`
+- `shared-rules/dependency-reading.md`
+- `shared-rules/linked-updates.md`
+- `shared-rules/conversation-goal-ledger.md`
+- `shared-rules/tool-neutral-documentation.md`
+- `shared-rules/document-todo-list.md`
+- `shared-rules/goal-action-validation.md`
+- `shared-rules/neutral-language.md`
+
+之後按任務補讀：
+
+- 寫 feedback / lesson 時補讀 `feedback-lessons.md`、`reusable-guidance-boundary.md`、`sanitization.md`，必要時 `authorization-scope.md`。
+- 文件變大或新增結構時補讀 `document-sizing.md`。
+- 引用其他 skill 時補讀 `cross-skill-references.md`。
+- 修改 skill 時補讀該 skill 的 README / WORKFLOW / TOOLS / DOCUMENTATION / CHECKLIST / FEEDBACK / feedback index。
+
+工具可用 hook、always-apply rule 或固定提示詞自動提醒 bootstrap；但工具提醒不取代實際讀取與 dependency read ledger。
 
 ## Ai-skill Writeback Transaction Guard
 

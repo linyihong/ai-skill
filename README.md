@@ -29,9 +29,13 @@
 | --- | --- | --- |
 | Tool integrations | [`ai-tools/`](ai-tools/README.md) | 各工具如何讀取、同步與套用本知識庫；工具專屬內容集中在此。 |
 
+## 預設 shared rules 載入
+
+每次開啟 agent、新 session 或接手長對話時，先讀 [`shared-rules/README.md`](shared-rules/README.md) 的 **Default Bootstrap**。它只載入索引與必讀規則；後續仍依任務讀 skill-specific workflow、tools、documentation 與其他 shared rules。
+
 ## 對話目標閉環
 
-若工作可能中斷、跨多輪、被多 agent 接手、拆成多個子目標、已建立 TodoWrite、使用者要求繼續前一個多步驟任務，或 agent 已看到 active project 有 modified / staged / untracked files，依 [`shared-rules/conversation-goal-ledger.md`](shared-rules/conversation-goal-ledger.md) 在業務專案本地先檢查或維護 `<PROJECT_ROOT>/.agent-goals/`。這是暫存狀態，不進 git；目標完成並驗證後刪除。可用 [`scripts/agent-goals.sh`](scripts/agent-goals.sh) 建立、更新、拆解、暫停與完成刪除 goal。
+若工作可能中斷、跨多輪、被多 agent 接手、拆成多個子目標、已建立 TodoWrite、使用者要求繼續前一個多步驟任務，或 agent 已看到 active project 有 modified / staged / untracked files，依 [`shared-rules/conversation-goal-ledger.md`](shared-rules/conversation-goal-ledger.md) 在業務專案本地先檢查或維護 `<PROJECT_ROOT>/.agent-goals/`。Goal 需要明確列出 priority、parallelization mode、owner/lock 決策、plan/todo links、missing/decision/strengthen、next action、completion criteria 與 validation。這是暫存狀態，不進 git；目標完成並驗證後刪除。可用 [`scripts/agent-goals.sh`](scripts/agent-goals.sh) 建立、更新、拆解、暫停與完成刪除 goal。
 
 ## 回饋規則
 
