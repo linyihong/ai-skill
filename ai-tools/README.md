@@ -6,6 +6,8 @@
 
 通用 shared rules、skills、templates 與根 README 應保持工具中立；工具專屬路徑、hook、UI、reload、設定與同步命令放在本目錄對應工具文件中。
 
+若某個 skill 對某工具有必要的特殊執行策略，skill 內可用 `skills/<skill>/tool-adapters/<tool>.md` 記錄差異；本目錄仍只放該工具的全域設定、同步與操作方式。
+
 | 工具 | 文件 | 用途 |
 | --- | --- | --- |
 | Cursor | [cursor.md](cursor.md) | Cursor 如何啟用 apk-analysis、同步 `.cursor`、維持中央庫一致性，並以工具中立 `.agent-goals/` 做對話目標閉環提醒。 |

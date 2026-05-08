@@ -29,6 +29,7 @@ skills/<skill-name>/
   WORKFLOW.md           # 決策流程
   TOOLS.md              # 工具與環境
   DOCUMENTATION.md      # 產出格式
+  tool-adapters/        # 可選：只有在某 AI 工具有 skill-specific 執行差異時建立
   FEEDBACK.md           # 可選：極短入口，連到 shared-rules/feedback-lessons.md
 ```
 
@@ -64,7 +65,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 - **連動更新規則**：一律只維護在 **[`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md)**；新增 skill 或修改 skill 結構時，受影響的索引、入口、同步文件、分類文件**必須**同步更新或明確檢查。
 - **文件大小與拆分規則**：一律只維護在 **[`shared-rules/document-sizing.md`](../shared-rules/document-sizing.md)**；skill、技巧分類與寫作規範變大時，用資料夾與 `README.md` 目錄拆分。
 - **中性與低爭議用語**：一律只維護在 **[`shared-rules/neutral-language.md`](../shared-rules/neutral-language.md)**；新增 skill 的標題、description、檔名、slug、索引與摘要都要避免高風險或容易造成 AI/搜尋誤判的詞，改用授權、合規、契約、風險控制等中性語境。
-- **工具中立文件**：一律只維護在 **[`shared-rules/tool-neutral-documentation.md`](../shared-rules/tool-neutral-documentation.md)**；新增 skill 的 README / SKILL / workflow / template 預設不寫特定工具路徑、hook、UI 或同步細節，具體工具做法放到 [`ai-tools/`](../ai-tools/README.md)。
+- **工具中立文件**：一律只維護在 **[`shared-rules/tool-neutral-documentation.md`](../shared-rules/tool-neutral-documentation.md)**；新增 skill 的 README / SKILL / workflow / template 預設不寫特定工具路徑、hook、UI 或同步細節。工具全域做法放到 [`ai-tools/`](../ai-tools/README.md)；若某 skill 對某工具有必要的執行差異，用 Strategy-style adapter 放 `skills/<skill>/tool-adapters/<tool>.md`，只寫差異並連回核心 workflow。
 - **文件 TODO**：一律只維護在 **[`shared-rules/document-todo-list.md`](../shared-rules/document-todo-list.md)**；若新增 skill 文件仍有未完成、待決策、待補強或待驗證項目，在文件前段放 `Document TODO` 表並連到相關章節或 goal。
 - **目標、執行、驗證流程**：一律只維護在 **[`shared-rules/goal-action-validation.md`](../shared-rules/goal-action-validation.md)**；新增 skill 的輸出格式、workflow、documentation 規則要能讓重要結論反查目標、執行、驗證，純判斷題則附參考來源與推論邊界。
 - **依賴文件讀取鐵則**：一律只維護在 **[`shared-rules/dependency-reading.md`](../shared-rules/dependency-reading.md)**；新增或修改 skill 時，必須讀 skill 入口、相關 README/workflow/checklist/template、shared-rules 與 linked updates，不能只讀單一檔案。
@@ -84,12 +85,33 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 
 具體工具部署、symlink、bundle、hook、reload 或設定方式放在 [`ai-tools/`](../ai-tools/README.md)。新增或修改 skill 後，依你使用的工具文件執行必要同步。
 
-## 7. 檢查清單（新建完成前）
+## 7. 工具 Strategy adapter（可選）
+
+只有在某個 AI 工具對這個 skill 有真實執行差異時才建立 adapter，例如 tool event、hook、prompt injection、上下文載入順序、輸出限制或失敗模式不同。
+
+建議結構：
+
+```text
+skills/<skill-name>/tool-adapters/
+  README.md
+  <tool>.md
+```
+
+寫法：
+
+- 核心 `README.md` / `WORKFLOW.md` 保持工具中立，像 strategy interface。
+- Adapter 只寫該工具的 execution strategy，不複製核心 workflow。
+- Adapter 必須連回核心 workflow / tools / documentation 的相關章節。
+- 工具全域設定仍放 `ai-tools/<tool>.md`；adapter 只放「這個 skill 對該工具」的差異。
+- 若多個 adapter 重複同一段內容，抽回核心 skill 或 shared rule。
+
+## 8. 檢查清單（新建完成前）
 
 - [ ] `SKILL.md` 有合法 `name` / `description` frontmatter
 - [ ] 正文有連到 `shared-rules` 與 `feedback-lessons`
 - [ ] 標題、description、檔名、slug、索引與摘要已依 `shared-rules/neutral-language.md` 使用中性低爭議用語
 - [ ] 文件已依 `shared-rules/tool-neutral-documentation.md` 保持工具中立；工具專屬路徑、hook、UI、同步步驟已放 `ai-tools/`
+- [ ] 若建立 `tool-adapters/<tool>.md`，內容只包含 skill-specific 工具差異，並已連回核心 workflow；工具全域設定仍留在 `ai-tools/<tool>.md`
 - [ ] 若文件尚有未完成、待決策、待補強或待驗證項目，已依 `shared-rules/document-todo-list.md` 在前段加入 TODO 表並連到相關章節/goal
 - [ ] 輸出格式已依 `shared-rules/goal-action-validation.md` 要求重要工作單元包含目標、執行、驗證或參考來源
 - [ ] 已依 `shared-rules/dependency-reading.md` 讀取或明確檢查相關依賴文件
