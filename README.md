@@ -16,10 +16,10 @@
 
 **目錄約定：**  
 - **`skills/`**：各 skill 技巧包；之後新增 skill 放在 `skills/<name>/`，步驟見 [`skills/ADDING_SKILLS.md`](skills/ADDING_SKILLS.md)。  
-- **`shared-rules/`**：**共用規則**（依主題分檔：授權、去敏、中性低爭議文件用語、目標/執行/驗證流程、對話目標閉環、依賴文件讀取、內容分層、文件大小與拆分、cross-skill reference、**feedback 檔名／模板／agent 行為**、Cursor 同步等）；索引為 [`shared-rules/README.md`](shared-rules/README.md)，feedback 流程與模板集中在 [`feedback-lessons.md`](shared-rules/feedback-lessons.md)。各 skill 目錄下 **`FEEDBACK.md`** 若存在，僅為**一行入口**，不必重複維護正文。
-- **`ai-tools/`**：各 AI coding / agent 工具如何讀取、參照或同步本知識庫；Cursor 詳見 [`ai-tools/cursor.md`](ai-tools/cursor.md)，其他工具日後在此補檔。  
+- **`shared-rules/`**：**共用規則**（依主題分檔：授權、去敏、中性低爭議文件用語、工具中立文件、目標/執行/驗證流程、對話目標閉環、依賴文件讀取、內容分層、文件大小與拆分、cross-skill reference、**feedback 檔名／模板／agent 行為**、工具同步等）；索引為 [`shared-rules/README.md`](shared-rules/README.md)，feedback 流程與模板集中在 [`feedback-lessons.md`](shared-rules/feedback-lessons.md)。各 skill 目錄下 **`FEEDBACK.md`** 若存在，僅為**一行入口**，不必重複維護正文。
+- **`ai-tools/`**：各 AI coding / agent 工具如何讀取、參照或同步本知識庫；工具專屬路徑、hook、UI 與同步細節都放在這裡，不寫進通用 skill / shared rule 正文。
 - **連動更新**：若改動會影響其他文件、索引、skill 入口、同步流程或分類文件，相關檔案**必須**依 [`shared-rules/linked-updates.md`](shared-rules/linked-updates.md) 同步更新或明確檢查，不得說成「可選」。  
-- **每一則 `feedback_history`**：**不要**重複貼上共用規則全文，頂部引用 `shared-rules/` 即可。**同步到 `.cursor`** 時：先複製 **`shared-rules/`** 整包，再同步需要的 **`skills/<name>/`**（見 [`shared-rules/cursor-sync.md`](shared-rules/cursor-sync.md)）。
+- **每一則 `feedback_history`**：**不要**重複貼上共用規則全文，頂部引用 `shared-rules/` 即可。工具端同步與部署方式請看 [`ai-tools/`](ai-tools/README.md)。
 
 ## AI 工具使用說明
 
@@ -27,7 +27,7 @@
 
 | 工具 | 文件 | 用途 |
 | --- | --- | --- |
-| Cursor | [`ai-tools/cursor.md`](ai-tools/cursor.md) | 啟用 apk-analysis、同步 `.cursor`、維持中央庫一致性。 |
+| Tool integrations | [`ai-tools/`](ai-tools/README.md) | 各工具如何讀取、同步與套用本知識庫；工具專屬內容集中在此。 |
 
 ## 對話目標閉環
 
@@ -62,10 +62,10 @@ cd <AI_SKILL_REPO>
 ./scripts/ai-skill-close-loop.sh --commit --push
 ```
 
-Commit/push 與必要的 `./scripts/sync-cursor-bundle.sh` 完成後，agent 還要重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，避免使用 commit 前的舊上下文。
+Commit/push 與必要的工具同步完成後，agent 還要重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，避免使用 commit 前的舊上下文。
 
 若偵測到其他 agent / user 的 active close-loop lock，停止自動 commit / push，回報目前 owner 與下一步；不要混合提交他人的變更。
 
 不要把專案私有資料、抓包原始檔或未去敏樣本 commit 到這裡。
 
-`.cursor` 的變更若屬於業務專案目錄，請勿誤把該專案才有的機密或絕對路徑抄進本庫；本庫維持泛化與 `<AI_SKILL_REPO>` / `<PROJECT_ROOT>` 等占位符。
+工具設定目錄的變更若屬於業務專案，請勿誤把該專案才有的機密或絕對路徑抄進本庫；本庫維持泛化與 `<AI_SKILL_REPO>` / `<PROJECT_ROOT>` 等占位符。

@@ -38,7 +38,7 @@ Store ledgers in the project being worked on:
     <goal-id>.lock/
 ```
 
-Do not store the canonical ledger in `.cursor/`, because this workflow must work across Cursor and other agent tools. Cursor may read or remind about this directory, but it is not the source of truth.
+Do not store the canonical ledger in a tool-specific configuration directory, because this workflow must work across different agent tools. A tool may read or remind about this directory, but it is not the source of truth.
 
 The `.agent-goals/` directory is temporary project state and should not be committed. Prefer excluding it through `.git/info/exclude` so business repositories do not receive policy churn. A project may add `.agent-goals/` to `.gitignore` only when the team wants that convention tracked.
 
@@ -204,7 +204,7 @@ If the goal was superseded, keep it until the user accepts the new direction or 
 This ledger is separate from the Ai-skill writeback transaction in [`dependency-reading.md`](dependency-reading.md).
 
 - Conversation goal ledger: project-local, temporary, not committed, tracks user goals and handoff state.
-- Ai-skill writeback transaction: repository-specific, committed/pushed, tracks changes to this knowledge base and synced Cursor bundles.
+- Ai-skill writeback transaction: repository-specific, committed/pushed, tracks changes to this knowledge base and configured tool sync/mirrors.
 
 When updating this repository, both may apply: the project goal ledger tracks the user-facing task, while the Ai-skill transaction must still close through diff review, linked updates, sync, commit, push, reread, and clean status.
 
@@ -212,6 +212,6 @@ When updating this repository, both may apply: the project goal ledger tracks th
 
 Tools may automate ledger checks, but automation is advisory unless it can deterministically validate the goal. A hook or script should remind, create, or inspect goals; it should not silently mark goals complete without the completion criteria and validation evidence.
 
-For Cursor-specific handling, see the Cursor documentation under `ai-tools/`.
+For tool-specific handling, see the matching documentation under `ai-tools/`.
 
 ← [Back to shared rules index](README.md)

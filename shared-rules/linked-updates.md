@@ -6,8 +6,8 @@
 
 1. 改任何 `shared-rules/`、`skills/`、根 `README.md`、同步腳本或模板前，先判斷是否有連動文件。
 2. 若有連動文件，**必須**同步修改或明確寫下「已檢查，無需更新」的理由。
-3. 第一次寫入 Ai-skill 或其 `~/.cursor` 同步路徑時，依 [`dependency-reading.md`](dependency-reading.md) 開啟 writeback transaction；連動更新、sync、commit、push、讀回與 clean status 都完成後才可關閉。
-4. 若改動會影響 Cursor 可讀到的 skill 或 rules，**必須**執行 [`scripts/sync-cursor-bundle.sh`](../scripts/sync-cursor-bundle.sh)（除非使用者明講不要動本機 `~/.cursor`）。
+3. 第一次寫入 Ai-skill 或其工具同步路徑時，依 [`dependency-reading.md`](dependency-reading.md) 開啟 writeback transaction；連動更新、sync、commit、push、讀回與 clean status 都完成後才可關閉。
+4. 若改動會影響本機工具可讀到的 skill 或 rules，**必須**執行已設定的 tool sync；具體工具命令放在 [`ai-tools/`](../ai-tools/README.md)。
 5. 若改動 Ai-skill repo，除非使用者明講不要提交，**必須** `git add` → `commit` → `push`。
 6. Commit/push 與必要的 bundle sync 完成後，**必須**依 [`dependency-reading.md`](dependency-reading.md) 重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，確認 agent context 已載入最新版。
 7. 最終回覆前必須再次執行 `git status --short --branch`；若仍有 modified/untracked/staged changes，或 branch ahead/behind remote，不得回覆「完成」，必須處理到乾淨或明確說明阻塞。
@@ -20,15 +20,16 @@
 | --- | --- |
 | `shared-rules/README.md` 或新增 shared rule | 根 `README.md`、相關 skill 的入口說明、`feedback_history` 模板引用。 |
 | `shared-rules/reusable-guidance-boundary.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/feedback-lessons.md`、`shared-rules/sanitization.md`、`shared-rules/goal-action-validation.md`、相關 skill 的 `SKILL.md` / `README.md` / `DOCUMENTATION.md` / `CHECKLIST.md`，以及已新增 lesson 的 promotion target 與 index。 |
-| `shared-rules/dependency-reading.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`.cursor/rules/` 的 always-apply agent rule、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的 `SKILL.md` 入口與根 `README.md`。 |
+| `shared-rules/dependency-reading.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、工具專用 always-apply agent rule、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的 `SKILL.md` 入口與根 `README.md`。 |
 | `shared-rules/neutral-language.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/feedback-lessons.md`、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的 `SKILL.md` 入口與根 `README.md`。 |
+| `shared-rules/tool-neutral-documentation.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`shared-rules/dependency-reading.md`、根 `README.md`、`skills/README.md`、`skills/ADDING_SKILLS.md`、各 skill 的入口/README、`ai-tools/README.md` 與受影響工具文件。 |
 | `shared-rules/goal-action-validation.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/feedback-lessons.md`、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的 `SKILL.md` 入口與根 `README.md`；若某 skill 有 `DOCUMENTATION.md` 或 `WORKFLOW.md` 的輸出格式，也需同步更新或明確檢查。 |
-| `shared-rules/conversation-goal-ledger.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/dependency-reading.md`、`scripts/README.md`、相關 helper script、`ai-tools/` 中各工具整合文件；若 Cursor hook / rule 實作變更，也需同步 `.cursor/rules/` 或 hook 文件。 |
+| `shared-rules/conversation-goal-ledger.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/dependency-reading.md`、`scripts/README.md`、相關 helper script、`ai-tools/` 中各工具整合文件；若 tool-specific hook / rule 實作變更，也需同步對應工具規則或 hook 文件。 |
 | `shared-rules/cross-skill-references.md` 或新增 cross-skill 關係 | referring skill 的 `SKILL.md` / `README.md` / `WORKFLOW.md` / `DOCUMENTATION.md`、target skill 的入口或接收格式、必要時 `skills/_template/SKILL.md` 與 `skills/ADDING_SKILLS.md`。 |
 | `shared-rules/feedback-lessons.md` | 各 skill 的 `FEEDBACK.md`、`feedback_history/README.md`、新增 lesson 模板。 |
-| `shared-rules/cursor-sync.md` 或 `scripts/sync-cursor-bundle.sh` | 根 `README.md`、`scripts/README.md`、Agents 必讀規則、實際執行同步。 |
+| 工具同步文件或同步腳本 | 根 `README.md`、`scripts/README.md`、`ai-tools/` 對應工具文件、Agents 必讀規則、實際執行同步。 |
 | `scripts/ai-skill-close-loop.sh` | `scripts/README.md`、根 `README.md`、`shared-rules/dependency-reading.md`、本檔；若改變 lock / commit / push 條件，也需同步相關 skill close-loop 說明。 |
-| 新增 skill | 根 `README.md`、`skills/README.md`、`scripts/sync-cursor-bundle.sh` 實際同步結果。 |
+| 新增 skill | 根 `README.md`、`skills/README.md`、必要 tool sync 實際同步結果。 |
 | 修改 `skills/<name>/SKILL.md` 觸發條件或流程 | 該 skill 的 `README.md`、`RUNBOOK.md`、`WORKFLOW.md`、相關 cross-link。 |
 | 新增 `feedback_history` lesson | 該 skill 的 `feedback_history/README.md`，必要時 `WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md` 或分類文件。 |
 | 修改 `app-development-guidance/controls/` | 相關 `implementation/`、`platforms/`、`languages/`、`checklists/`。 |

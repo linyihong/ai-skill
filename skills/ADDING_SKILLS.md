@@ -1,6 +1,6 @@
 # 如何新增 Skill（方法與模板）
 
-目標：在本 repository 的 **`skills/<skill-name>/`** 新增一個可被 Cursor／Agent 讀取的技巧包，並與 **`shared-rules/`** 對齊（不重複維護共用政策）。
+目標：在本 repository 的 **`skills/<skill-name>/`** 新增一個可被 agent 工具讀取的技巧包，並與 **`shared-rules/`** 對齊（不重複維護共用政策）。
 
 ## 1. 要不要開新 skill？
 
@@ -44,7 +44,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 # 可選：touch skills/my-skill/feedback_history/README.md 做索引表
 ```
 
-## 3. `SKILL.md` 必填欄位（Cursor／Agent）
+## 3. `SKILL.md` 必填欄位（Agent）
 
 檔案**開頭**使用 YAML frontmatter（與 `apk-analysis` 相同風格）：
 
@@ -64,6 +64,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 - **連動更新規則**：一律只維護在 **[`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md)**；新增 skill 或修改 skill 結構時，受影響的索引、入口、同步文件、分類文件**必須**同步更新或明確檢查。
 - **文件大小與拆分規則**：一律只維護在 **[`shared-rules/document-sizing.md`](../shared-rules/document-sizing.md)**；skill、技巧分類與寫作規範變大時，用資料夾與 `README.md` 目錄拆分。
 - **中性與低爭議用語**：一律只維護在 **[`shared-rules/neutral-language.md`](../shared-rules/neutral-language.md)**；新增 skill 的標題、description、檔名、slug、索引與摘要都要避免高風險或容易造成 AI/搜尋誤判的詞，改用授權、合規、契約、風險控制等中性語境。
+- **工具中立文件**：一律只維護在 **[`shared-rules/tool-neutral-documentation.md`](../shared-rules/tool-neutral-documentation.md)**；新增 skill 的 README / SKILL / workflow / template 預設不寫特定工具路徑、hook、UI 或同步細節，具體工具做法放到 [`ai-tools/`](../ai-tools/README.md)。
 - **目標、執行、驗證流程**：一律只維護在 **[`shared-rules/goal-action-validation.md`](../shared-rules/goal-action-validation.md)**；新增 skill 的輸出格式、workflow、documentation 規則要能讓重要結論反查目標、執行、驗證，純判斷題則附參考來源與推論邊界。
 - **依賴文件讀取鐵則**：一律只維護在 **[`shared-rules/dependency-reading.md`](../shared-rules/dependency-reading.md)**；新增或修改 skill 時，必須讀 skill 入口、相關 README/workflow/checklist/template、shared-rules 與 linked updates，不能只讀單一檔案。
 - 各 skill 的 **`FEEDBACK.md`**（若需要）：維持與 [`apk-analysis/FEEDBACK.md`](apk-analysis/FEEDBACK.md) 相同模式——**幾行連結**到 [`shared-rules/feedback-lessons.md`](../shared-rules/feedback-lessons.md)。
@@ -76,43 +77,18 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 3. 依 [`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md) 檢查是否還需要同步更新 `RUNBOOK.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、同步腳本或 cross-link。
 4. 依 `shared-rules/dependency-reading.md` 關閉 Ai-skill writeback transaction：檢查 diff / linked updates，執行必要 sync，`git add` → `commit` → `push`，push 後讀回並確認 clean。
 
-## 6. 同步到本機 `~/.cursor`（可選）
+## 6. 同步到本機工具（可選）
 
-與 [`shared-rules/cursor-sync.md`](../shared-rules/cursor-sync.md) 相同精神：**`shared-rules/`** 與各 **skill** 要成對出現。
+**`shared-rules/`** 與各 **skill** 要成對出現：任何工具若只看到 skill 而看不到 shared rules，就會缺少授權、去敏、依賴讀取與 linked updates 底線。
 
-### 建議（共用資產放在 `bundles/` 並列）：`bundles/shared-rules` + `bundles/ai-skill`
-
-避免 `~/.cursor` 底下其他規則或工具與這套資產混在一起，本機優先使用：
-
-- **`~/.cursor/bundles/shared-rules`** → 本庫 **`shared-rules/`**（單一 symlink）
-- **`~/.cursor/bundles/ai-skill/<skill>/`** → 本庫 **`skills/<skill>/`**（每個 skill 一個 symlink）
-- **`~/.cursor/shared-rules`** → `bundles/shared-rules`
-- **`~/.cursor/skills/<skill>`** → `bundles/ai-skill/<skill>`
-
-一鍵同步（在本庫根目錄）：
-
-```bash
-./scripts/sync-cursor-bundle.sh
-```
-
-腳本會掃描 `skills/` 下含 **`SKILL.md`** 的目錄（略過 `_template`）。若 **`~/.cursor/shared-rules`** 已是「真實資料夾」而非 symlink，腳本會先**移到** `*.bak.<隨機>` 再建立連結。
-
-### 簡易做法（直接連到 repo）
-
-仍可直接連到 clone（較短，但與「bundle 隔離」精神不同）：
-
-```bash
-ln -sf "${AI_SKILL_REPO}/shared-rules" "${HOME}/.cursor/shared-rules"
-ln -sf "${AI_SKILL_REPO}/skills/my-skill" "${HOME}/.cursor/skills/my-skill"
-```
-
-新增 skill 後建議在 Cursor **`⌘⇧P` → Developer: Reload Window** 重載一次。
+具體工具部署、symlink、bundle、hook、reload 或設定方式放在 [`ai-tools/`](../ai-tools/README.md)。新增或修改 skill 後，依你使用的工具文件執行必要同步。
 
 ## 7. 檢查清單（新建完成前）
 
 - [ ] `SKILL.md` 有合法 `name` / `description` frontmatter
 - [ ] 正文有連到 `shared-rules` 與 `feedback-lessons`
 - [ ] 標題、description、檔名、slug、索引與摘要已依 `shared-rules/neutral-language.md` 使用中性低爭議用語
+- [ ] 文件已依 `shared-rules/tool-neutral-documentation.md` 保持工具中立；工具專屬路徑、hook、UI、同步步驟已放 `ai-tools/`
 - [ ] 輸出格式已依 `shared-rules/goal-action-validation.md` 要求重要工作單元包含目標、執行、驗證或參考來源
 - [ ] 已依 `shared-rules/dependency-reading.md` 讀取或明確檢查相關依賴文件
 - [ ] 若引用其他 skill，已依 `shared-rules/cross-skill-references.md` 寫明 trigger、artifact、ownership boundary 與 linked updates

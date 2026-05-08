@@ -51,6 +51,6 @@ When a cross-skill reference is added or changed:
 - Update the referring skill's `SKILL.md` and any relevant `README.md`, `WORKFLOW.md`, `DOCUMENTATION.md`, or technique file.
 - Update the target skill's entry point if it needs to recognize the incoming handoff.
 - Update [`linked-updates.md`](linked-updates.md) if the relationship becomes a recurring repo-wide rule.
-- Run the Cursor bundle sync when the changed files live under `shared-rules/` or `skills/`.
+- Run the configured tool sync when the changed files live under `shared-rules/` or `skills/`; concrete tool commands live under `ai-tools/`.
 
 ← [回到共用規則索引](README.md)

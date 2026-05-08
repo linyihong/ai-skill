@@ -4,7 +4,7 @@
 **全庫共用的政策與寫作底線**不在此重複維護，請見上一層的 [`shared-rules/`](../shared-rules/README.md)。
 
 - **新建 skill 流程與檢查清單：**[`ADDING_SKILLS.md`](ADDING_SKILLS.md)  
-- **可複製的最小檔案：**[`_template/`](_template/)（勿把 `_template` 本身接到 `~/.cursor/skills/`）
+- **可複製的最小檔案：**[`_template/`](_template/)（勿把 `_template` 本身接到任何工具的正式 skill 目錄）
 
 | 子資料夾 | 說明 |
 | --- | --- |

@@ -55,24 +55,9 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
 如果過程中學到可重用技巧，請依 shared-rules/feedback-lessons.md 在 feedback_history/<category>/ 新增檔案回饋；跨分類用 feedback_history/common/。
 ```
 
-### 2. 當作 Cursor project skill 使用
+### 2. 當作工具可讀 skill 使用
 
-放在：
-
-```text
-.cursor/skills/apk-analysis/
-.cursor/shared-rules/    # 請自中央庫複製整包 shared-rules（見 shared-rules/cursor-sync.md）
-```
-
-這樣 Cursor agent 較容易在你提到 APK 分析、抓包、Frida、Proxyman、Dart AOT、解密時自動套用 skill；共用規則另放在 `.cursor/shared-rules/` 與 skill 並列。
-
-如果未來要跨專案共用，也可以放到個人技能資料夾：
-
-```text
-~/.cursor/skills/apk-analysis/
-```
-
-不要放到 Cursor 內建技能資料夾。
+將 `skills/apk-analysis/` 與 `shared-rules/` 成對部署到你使用的 AI / agent 工具，或在工具提示中明確指定 `<AI_SKILL_REPO>` 內的路徑。工具專屬部署方式請看 [`../../ai-tools/`](../../ai-tools/README.md)，不要把工具專屬路徑寫進本 skill 的通用流程。
 
 ## 開場提示詞
 

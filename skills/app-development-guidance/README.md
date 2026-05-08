@@ -58,7 +58,7 @@ Capture practical guidance for:
 
 | File | Purpose |
 | --- | --- |
-| `SKILL.md` | Cursor/agent entry point. |
+| `SKILL.md` | Agent entry point. |
 | `WORKFLOW.md` | Translate observations into development requirements and validation steps. |
 | `process/` | Product brief to BDD, Domain Model, Architecture, API / Interface, Error Handling, implementation, and test flow. |
 | `CHECKLIST.md` | Development, PR, and release checklist. |

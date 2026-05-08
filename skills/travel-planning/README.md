@@ -44,7 +44,7 @@ This skill supports source-backed travel planning: itinerary design, travel agen
 
 | File | Purpose |
 | --- | --- |
-| `SKILL.md` | Cursor/agent entry point and trigger rules. |
+| `SKILL.md` | Agent entry point and trigger rules. |
 | `WORKFLOW.md` | Planning and verification workflow. |
 | `TOOLS.md` | Source categories and preferred lookup strategy. |
 | `DOCUMENTATION.md` | Itinerary, source table, risk, and checklist templates. |

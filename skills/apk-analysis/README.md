@@ -4,7 +4,7 @@
 
 這個資料夾是可持續強化的 APK 分析知識包。它同時服務兩種讀者：
 
-- AI / Claude / Cursor agent：讀 `SKILL.md`，知道遇到 APK 分析、動態抓包、解密定位、Frida hook、Flutter/Dart AOT 分析時要怎麼做。
+- AI / agent 工具：讀 `SKILL.md`，知道遇到 APK 分析、動態抓包、解密定位、Frida hook、Flutter/Dart AOT 分析時要怎麼做。
 - 人類分析者：讀本 README、`WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md`，快速理解分析順序、必要工具、記錄格式與回饋方式。
 
 ## 目標

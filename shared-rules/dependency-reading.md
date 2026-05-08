@@ -1,10 +1,10 @@
 # 依賴文件讀取鐵則
 
-本規則適用於所有 agent 使用、修改或檢查 `shared-rules/`、`skills/`、`.cursor/rules/`、模板、feedback lessons、同步腳本與根索引時。目的不是增加形式流程，而是避免 agent 只讀單一文件，卻忽略已更新的依賴規則。
+本規則適用於所有 agent 使用、修改或檢查 `shared-rules/`、`skills/`、工具專用規則、模板、feedback lessons、同步腳本與根索引時。目的不是增加形式流程，而是避免 agent 只讀單一文件，卻忽略已更新的依賴規則。
 
 ## 核心規則
 
-只要發現某個 skill、shared rule、Cursor rule、模板或 feedback lesson 已更新、將被更新、或可能影響目前任務，agent 必須讀取它的相關依賴文件後才能下結論或繼續修改。
+只要發現某個 skill、shared rule、tool-specific rule、模板或 feedback lesson 已更新、將被更新、或可能影響目前任務，agent 必須讀取它的相關依賴文件後才能下結論或繼續修改。
 
 最低讀取範圍：
 
@@ -13,8 +13,9 @@
 | 任一 `skills/<name>/SKILL.md` | 該 skill 的 `README.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、`CHECKLIST.md`、`FEEDBACK.md`、相關 `feedback_history/README.md`，以及 `shared-rules/README.md`。不存在的檔案可標記為不適用。 |
 | 任一 skill 子文件 | 該 skill 的 `SKILL.md`、最近的目錄 `README.md`、相關 workflow/checklist/template、`shared-rules/linked-updates.md`。 |
 | 任一 `shared-rules/*.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`shared-rules/reusable-guidance-boundary.md`（若涉及 reusable guidance / incident / feedback）、受影響 skill 的 `SKILL.md` 或模板。 |
-| `shared-rules/conversation-goal-ledger.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`scripts/README.md`、相關 goal helper script、`ai-tools/` 中受影響工具文件；若同時改 Cursor hook/rule，讀對應 hook/rule 文件。 |
-| 任一 `.cursor/rules/*.mdc` | 對應的 shared rule 正文、`shared-rules/README.md`、`shared-rules/cursor-sync.md`，以及受影響的 skill 入口。 |
+| `shared-rules/tool-neutral-documentation.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、根 `README.md`、`skills/README.md`、`skills/ADDING_SKILLS.md`、各 skill 入口/README、`ai-tools/README.md` 與受影響工具文件。 |
+| `shared-rules/conversation-goal-ledger.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`scripts/README.md`、相關 goal helper script、`ai-tools/` 中受影響工具文件；若同時改 tool-specific hook/rule，讀對應 hook/rule 文件。 |
+| 任一工具專用規則檔 | 對應的 shared rule 正文、`shared-rules/README.md`、受影響工具文件，以及受影響的 skill 入口。 |
 | 任一 template | 模板目錄 `README.md`、引用該模板的 workflow/documentation/checklist、`shared-rules/linked-updates.md`。 |
 | 任一 feedback lesson | 該分類 `README.md`、skill 的 `feedback_history/README.md`、`shared-rules/feedback-lessons.md`，以及 promotion target。 |
 
@@ -31,7 +32,7 @@
 
 ## Ai-skill Writeback Transaction Guard
 
-只要 agent 第一次寫入 `<AI_SKILL_REPO>/shared-rules/`、`<AI_SKILL_REPO>/skills/`、`.cursor/rules/`、模板、feedback lesson、同步腳本，或透過同步路徑（例如 `~/.cursor/shared-rules`、`~/.cursor/skills/<name>`）改到同一套內容，就必須立即把這件事視為一個尚未關閉的 **Ai-skill writeback transaction**，而不是等最終回覆才想起。
+只要 agent 第一次寫入 `<AI_SKILL_REPO>/shared-rules/`、`<AI_SKILL_REPO>/skills/`、工具專用規則、模板、feedback lesson、同步腳本，或透過工具同步路徑改到同一套內容，就必須立即把這件事視為一個尚未關閉的 **Ai-skill writeback transaction**，而不是等最終回覆才想起。
 
 交易開始時必須：
 
@@ -67,14 +68,23 @@
 - 當使用者目標是「修改 Ai-skill 規則或 skill」時，agent 可能需要同時維護 `.agent-goals/` 中的 user goal，並完成本檔要求的 Ai-skill writeback transaction。
 - 不可因為 `.agent-goals/` 目標刪除了，就跳過本庫的 diff review、linked updates、bundle sync、commit、push、讀回與 clean status。
 
+## Tool-Neutral Documentation Boundary
+
+[`tool-neutral-documentation.md`](tool-neutral-documentation.md) 要求可重用文件預設保持工具中立。新增或修改 shared rule、skill、template、README、lesson 時：
+
+- 先寫通用 agent/tool 行為，不把單一 IDE、CLI 或 agent 產品寫成預設需求。
+- 工具專屬路徑、hook、同步命令、UI 操作、reload 步驟，放在 `ai-tools/<tool>.md`、工具設定檔或工具專用腳本文件。
+- 若 generic rule 需要提同步，用「configured tool sync」等中立詞，再連到 `ai-tools/` 取得具體工具做法。
+- Commit/push 後讀回時，也要確認沒有把工具專屬段落誤放進 root README、skill README、shared rule index 或 reusable lesson。
+
 ## Ai-skill 回寫完成門檻
 
-只要 agent 在本庫回寫任何 `shared-rules/`、`skills/`、`.cursor/rules/`、模板、feedback lessons、README 或同步腳本，最終回覆前必須完成整個更新閉環：
+只要 agent 在本庫回寫任何 `shared-rules/`、`skills/`、工具專用規則、模板、feedback lessons、README 或同步腳本，最終回覆前必須完成整個更新閉環：
 
 1. `git status --short --branch` 檢查變更。
 2. `git diff` 檢查將提交的內容，不得包含 secrets、raw tokens、私人 host、個資或本機絕對路徑。
 3. 執行適用的 lints / Markdown link check / required linked updates 檢查。
-4. 若影響 Cursor 可讀到的 skills/rules，執行 `./scripts/sync-cursor-bundle.sh`。
+4. 若影響本機工具可讀到的 skills/rules，執行已設定的 tool sync；具體工具命令見 `ai-tools/`。
 5. 若有多個 owner group，優先使用 `./scripts/ai-skill-close-loop.sh --commit` 分組提交；若手動提交，仍需按 shared-rules、scripts、各 skill owner 分開提交，避免把不相干內容混成一包。
 6. `git add` 相關檔案。
 7. `git commit`。
@@ -86,13 +96,13 @@
 
 ## Commit / Push 後讀回 Gate
 
-當本庫變更已完成 `git commit`、`git push`，且改動涉及 `shared-rules/`、`skills/`、`.cursor/rules/`、模板或 feedback lessons 時，agent 必須在最終回覆前做一次讀回：
+當本庫變更已完成 `git commit`、`git push`，且改動涉及 `shared-rules/`、`skills/`、工具專用規則、模板或 feedback lessons 時，agent 必須在最終回覆前做一次讀回：
 
 | 更新類型 | Commit / push 後必須重新讀取 |
 | --- | --- |
-| `shared-rules/` | 更新過的 shared rule、`shared-rules/README.md`、`shared-rules/linked-updates.md`；若有 Cursor rule，也讀對應 `.cursor/rules/*.mdc`。 |
+| `shared-rules/` | 更新過的 shared rule、`shared-rules/README.md`、`shared-rules/linked-updates.md`；若有工具專用規則，也讀對應工具規則檔。 |
 | `skills/<name>/` | 該 skill 的 `SKILL.md`，以及本次更新過的 workflow / documentation / checklist / template / feedback index。 |
-| `.cursor/rules/` | 更新過的 `.mdc`，以及對應的 shared rule 正文。 |
+| 工具專用規則 | 更新過的工具規則檔，以及對應的 shared rule 正文。 |
 | template 或 feedback lesson | 更新過的 template/lesson、索引 README、promotion target 或引用它的 workflow/documentation。 |
 
 讀回目的：
@@ -107,7 +117,7 @@
 
 - 沒有讀依賴，就不能可靠判斷是否需要連動更新。
 - 已讀依賴但發現需要同步，就必須依 `linked-updates.md` 更新或說明無需更新的理由。
-- 若改動會影響 Cursor 可讀到的 rules 或 skills，必須同步 bundle。
+- 若改動會影響本機工具可讀到的 rules 或 skills，必須執行已設定的 tool sync。
 
 ## 驗證
 
