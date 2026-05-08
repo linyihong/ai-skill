@@ -116,9 +116,9 @@ Cursor hook 可以輔助提醒，但不應成為唯一真相。可選的 project
 
 | Event | 用途 | 行為 |
 | --- | --- | --- |
-| `sessionStart` | 開局提醒 | 檢查 `.agent-goals/README.md` 與 `.agent-goals/goals/*.md`，若有 active goal，提醒目前未完成項、待決策、優先順序與需要補強的地方。 |
+| `sessionStart` | 開局提醒 | 檢查 `.agent-goals/README.md` 與 `.agent-goals/goals/*.md`，若有 active goal，提醒目前未完成項、待決策、owner/lock、優先順序與需要補強的地方。 |
 | `preCompact` | 壓縮前檢查 | 若有 active goal，提醒 agent 先更新 `Next Action`、`Progress`、`Validation`。 |
-| `stop` | 停止前檢查 | 若 goal 未完成，提醒保留或更新；不要自動刪除。 |
+| `stop` | 停止前檢查 | 若 goal 未完成，提醒保留或更新；不要自動刪除。若發現重疊 goal 被其他 owner/lock 處理，停止並請使用者決定。 |
 
 Hook 建議使用 command hook，fail-open，避免 hook 故障阻塞正常工作。若要建立專案 hook，放在：
 

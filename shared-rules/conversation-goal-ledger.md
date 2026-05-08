@@ -18,6 +18,8 @@ The ledger must answer:
 | Priority | `P0`, `P1`, `P2`, or `P3`. |
 | Status | `active`, `paused`, `blocked`, `needs-validation`, `superseded`, or `complete-pending-delete`. |
 | Owner | Current agent/tool owner and timestamp. |
+| Parallelization | Whether this goal is `parallelizable`, `single-owner`, or `non-parallelizable`. |
+| Lock state | Whether another active agent appears to be editing this goal. |
 | Source | User request or instruction that created the goal. |
 | Scope | In scope, out of scope, and affected project/repo. |
 | Subgoals | Child goals or checklist items when the goal is decomposed. |
@@ -83,6 +85,7 @@ id: P1-short-slug
 priority: P1
 status: active
 owner: <agent/tool/session>
+parallelization: parallelizable
 created: <ISO-8601 timestamp>
 updated: <ISO-8601 timestamp>
 project: <PROJECT_ROOT or project label>
@@ -138,14 +141,62 @@ Do not write secrets, tokens, raw private data, reservation codes, personal addr
 Keep `<PROJECT_ROOT>/.agent-goals/README.md` as the primary locator for active goals. It should contain a compact table that links to each goal file:
 
 ```markdown
-| Priority | Status | Goal | Planning / Todo Links | Next Action | Updated |
-| --- | --- | --- | --- | --- | --- |
-| P1 | active | [Short title](goals/P1-short-slug.md) | plan: docs/plan.md#section; todo: implement-api | Run validation | 2026-05-08T00:00:00Z |
+| Priority | Status | Mode | Owner | Lock | Goal | Open Work / Decisions | Planning / Todo Links | Next Action | Updated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| P1 | active | single-owner | agent@host | locked by agent@host | [Short title](goals/P1-short-slug.md) | decision: choose route | plan: docs/plan.md#section; todo: implement-api | Run validation | 2026-05-08T00:00:00Z |
 ```
 
 The main table is for quick recovery. It should not replace the detail in each goal file.
 
 Update the table when a goal is created, paused, split, linked to a todo, or completed. When a goal file is deleted after validation, remove it from the table.
+
+## Multi-Conversation Interference Control
+
+Different conversations may work in the same project at the same time. The ledger reduces interference by making ownership and lock state visible, and by requiring agents to stop when work overlaps.
+
+Before changing files, an agent must:
+
+1. Read `.agent-goals/README.md`.
+2. Check whether an existing active goal overlaps the new request.
+3. Check whether the overlapping goal is locked.
+4. Check whether the workflow is marked `single-owner` or `non-parallelizable`.
+
+Stop and prompt the user when:
+
+- The same goal has an active lock owned by another agent/session.
+- A new request overlaps an active goal but uses a different goal id.
+- The goal is `single-owner` and another owner is already recorded.
+- The goal or workflow is `non-parallelizable`.
+- The agent cannot tell whether two goals overlap but the same files, git branch, database, release, or shared state are involved.
+
+The prompt should include:
+
+- Existing goal id and title.
+- Owner and lock age, when available.
+- Affected files/resources.
+- Why parallel work is risky.
+- Proposed options: wait, take over with user approval, split into a child goal, or create a separate non-overlapping goal.
+
+Do not silently proceed just because the file system allows writes.
+
+## Parallelization Modes
+
+Use these modes:
+
+| Mode | Meaning | Required behavior |
+| --- | --- | --- |
+| `parallelizable` | Work can be split safely by subgoal or file area. | Use separate goals or child goals; avoid editing the same files at the same time. |
+| `single-owner` | Work may be resumable by another agent, but only one owner should edit it at a time. | If another owner/lock is present, stop and ask before taking over. |
+| `non-parallelizable` | Work should not be split across conversations. | Stop and ask the user to serialize the work. |
+
+Mark a goal `non-parallelizable` for workflows such as:
+
+- Git history operations, merge conflict resolution, release tagging, deploys, or migration sequencing.
+- Shared rule / skill writeback transactions that require one coherent diff, sync, commit, push, and readback.
+- Data migrations, destructive operations, credential rotation, production configuration, or irreversible cleanup.
+- Any task where two agents editing independently could invalidate validation, duplicate commits, or produce contradictory user-facing decisions.
+
+If a workflow starts as `parallelizable` but later becomes risky, update the goal to `single-owner` or `non-parallelizable` and record the reason under `Open Work / Decisions`.
 
 ## Planning And Todo Links
 

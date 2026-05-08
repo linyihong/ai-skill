@@ -58,6 +58,8 @@ APK 分析範例：
 - Claude 不一定會自動探索整個 repo。提示時請列出入口檔與必要依賴，而不是只貼資料夾名。
 - Claude 若只能看到單一專案，請同時提供 `<AI_SKILL_REPO>` 的可讀路徑，或把必要 skill/shared-rules 以工具支援的方式同步成可讀上下文。
 - 如果 Claude 已經長時間對話，請先要求它讀 `<PROJECT_ROOT>/.agent-goals/README.md`，確認未完成項、待決策、優先順序與待補強內容。
+- 如果 `.agent-goals/README.md` 顯示重疊目標已有其他 owner 或 active lock，要求 Claude 停止修改並提示使用者決定：等待、接手、拆成子目標或另開非重疊 goal。
+- 如果 goal 標示 `single-owner` 或 `non-parallelizable`，不要讓 Claude 和其他 agent 分工同一流程；先取得使用者確認。
 - 若 Claude 產生修改計畫，讓它把計畫 TODO 連到 `.agent-goals` 或文件前段的 `Document TODO`。
 - 若 Claude 要改本庫，提醒它不要只更新文件；還要跑驗證、tool sync、commit、push、讀回和 clean status。
 
