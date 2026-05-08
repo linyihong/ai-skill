@@ -24,13 +24,28 @@
 ## Agent 行為
 
 1. 先讀 `shared-rules/README.md`，再依任務讀相關 shared rule 全文。
-2. 若任務碰到 skill，讀該 skill 入口與依賴文件；不要只依賴 `description` 或單一段落。
+2. 若任務碰到 skill，讀該 skill 入口與依賴文件；不要只依賴 `description`、`SKILL.md` 單檔或單一段落。
 3. 若看到文件有 cross-link、promotion target、required linked updates、template reference、feedback index，或 reusable guidance / project incident 邊界，就循連結讀到任務所需的規則載入完成。
 4. 若依賴文件不存在，記錄為 `not applicable`；若存在但未讀，不可宣稱已完成檢查。
 5. 回覆或提交前，說明依賴讀取與連動更新的驗證方式。
 6. 完成 `git commit`、`git push` 與必要的 bundle sync 後，必須重新讀取本次更新過的 skill/shared-rule 入口文件與主要依賴文件，確認目前 agent context 已載入最新版；不可只依賴提交前讀過的內容。
 7. 最終回覆前必須執行 `git status --short --branch`。若 `Ai-skill` repo 仍有 modified/untracked/staged changes，或 branch 仍 ahead/behind remote，不得回覆「已完成」；必須先完成驗證、sync、commit、push、讀回，或明確說明被什麼阻塞。
 8. 若使用者未明確要求 push / merge，而更新後發現 `Ai-skill` 有尚未推送、尚未合併、ahead/behind、或其他 pending commit 狀態，最終回覆必須主動提醒使用者目前狀態與下一步（例如需要 push、pull/rebase、或處理既有 dirty changes），不可讓使用者以為規則已完全進入遠端主線。
+
+### Dependency Read Ledger
+
+當使用者要求「重新讀 skill」、指出「shared rules / shared skill 是否漏讀」、或 agent 自己發現某個 skill/rule 已更新時，必須在繼續業務專案前建立一個簡短的 dependency read ledger（可在回覆、todo 或工作筆記中呈現），至少列：
+
+| 欄位 | 必填內容 |
+| --- | --- |
+| Trigger | 例如 `skills/<name>/SKILL.md changed`、user asked to reload skill、shared rule changed。 |
+| Required set | 依本檔「最低讀取範圍」列出應讀文件。 |
+| Read | 實際已讀文件。 |
+| Not applicable | 不存在的檔案，例如該 skill 沒有 `CHECKLIST.md`；必須明寫，不可假裝已讀。 |
+| Deferred / blocked | 因權限、缺檔、衝突或使用者決策而未讀的項目。 |
+| Validation | 連動更新檢查、diff review、sync、commit/push/readback 或純判斷的參考來源。 |
+
+若 ledger 顯示最低讀取範圍仍有缺口，agent 不得宣稱「已按更新後 skill 執行」或長時間切回專案分析；必須先補讀、標 `not applicable`，或明確向使用者說明阻塞。
 
 ## Ai-skill Writeback Transaction Guard
 

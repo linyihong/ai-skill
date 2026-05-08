@@ -62,7 +62,7 @@ cd <AI_SKILL_REPO>
 ./scripts/ai-skill-close-loop.sh --commit --push
 ```
 
-Commit/push 與必要的工具同步完成後，agent 還要重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，避免使用 commit 前的舊上下文。
+Commit/push 與必要的工具同步完成後，agent 還要重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，並依 `shared-rules/dependency-reading.md` 留下 dependency read ledger（已讀、缺檔不適用、阻塞項與驗證），避免使用 commit 前的舊上下文。
 
 若偵測到其他 agent / user 的 active close-loop lock，停止自動 commit / push，回報目前 owner 與下一步；不要混合提交他人的變更。
 

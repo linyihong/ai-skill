@@ -5,7 +5,7 @@
 ## Agents（必讀）
 
 1. **本檔是指索引，不是全文。**請先讀此 README，再依你將要做的行為，**打開並讀完下方表格中所有相關連結的全文**（不得只讀本頁摘要就當已遵守規則）。
-2. **依賴讀取鐵則：**只要發現某個 skill、shared rule、tool-specific rule、模板或 feedback lesson 已更新、將被更新、或會影響目前任務，必須依 **[dependency-reading.md](dependency-reading.md)** 讀取相關依賴文件；包含 `shared-rules/` 本身，不可只讀單一 skill 檔。
+2. **依賴讀取鐵則：**只要發現某個 skill、shared rule、tool-specific rule、模板或 feedback lesson 已更新、將被更新、或會影響目前任務，必須依 **[dependency-reading.md](dependency-reading.md)** 讀取相關依賴文件；包含 `shared-rules/` 本身，不可只讀單一 skill 檔。若使用者要求「重新讀 skill」或指出 shared rules 可能漏讀，必須先建立 dependency read ledger，列出已讀、缺檔不適用與仍阻塞項目。
 3. **撰寫或新增 `feedback_history` lesson、或任何「回饋／沉澱技巧」行為前**，必須已讀過 **[feedback-lessons.md](feedback-lessons.md)**、**[reusable-guidance-boundary.md](reusable-guidance-boundary.md)**、**[sanitization.md](sanitization.md)**、**[neutral-language.md](neutral-language.md)** 與 **[goal-action-validation.md](goal-action-validation.md)**；若涉及授權邊界，另讀 **[authorization-scope.md](authorization-scope.md)**。
 4. 索引與各分檔中的 **Markdown 連結**視為規則的一部分；請**循連結讀取**，直到該任務需要的條文都已載入為止。
 5. **Git：**若你改動的是 **Ai-skill 這個 git repository**（`shared-rules/`、`skills/`、根目錄 README 等），**除非使用者明講不要提交**，否則**必須**在該 repo 根目錄完成 **`git add` → `git commit` → `git push`**；請自行申請所需工具權限。重新載入或重啟任一工具**不取代**這一步。第一次寫入 Ai-skill 或其工具同步路徑時，必須依 [dependency-reading.md](dependency-reading.md) 立刻開啟 writeback transaction；在切回專案分析或回覆完成前關閉 transaction。Commit/push 與必要 tool sync 完成後，還必須重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，並用 `git status --short --branch` 確認工作樹乾淨且沒有 ahead/behind。若使用者未授權 push / merge 而 repo 仍有 pending commit、ahead/behind 或未合併狀態，最終回覆必須主動提醒使用者。
@@ -21,7 +21,7 @@
 | 文件 TODO | [document-todo-list.md](document-todo-list.md) | 文件有未完成、待決策、待補強或待驗證內容時，在前段放可掃描 TODO 表並連到相關章節、goal 或 issue。 |
 | 目標、執行、驗證 | [goal-action-validation.md](goal-action-validation.md) | 每個重要工作單元要能反查目標、執行內容與驗證方式；純判斷題用參考來源與推論邊界。 |
 | 對話目標閉環 | [conversation-goal-ledger.md](conversation-goal-ledger.md) | 使用專案本地 `.agent-goals/` 暫存帳本追蹤 active goals、優先權、拆解、轉移、multi-agent lock、完成驗證與刪除條件。 |
-| 依賴文件讀取 | [dependency-reading.md](dependency-reading.md) | 發現 skill/shared rule/tool-specific rule/template/lesson 更新時，必須讀相關依賴文件，包含 shared-rules。 |
+| 依賴文件讀取 | [dependency-reading.md](dependency-reading.md) | 發現 skill/shared rule/tool-specific rule/template/lesson 更新時，必須讀相關依賴文件，包含 shared-rules，並用 dependency read ledger 防止漏讀。 |
 | 內容分層 | [content-layering.md](content-layering.md) | 共用規則／技巧／業務專案各自放哪。 |
 | 可重用規則與專案證據邊界 | [reusable-guidance-boundary.md](reusable-guidance-boundary.md) | 技巧只沉澱通用原因、規則與驗證；專案 incident 證據留在專案文件；指出閉環不完整時必須分析原因並強化規則。 |
 | 文件大小與拆分 | [document-sizing.md](document-sizing.md) | 文件變大時改成目錄、分類資料夾與多檔，避免單檔堆疊。 |

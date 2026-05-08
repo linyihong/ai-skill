@@ -12,6 +12,8 @@ alwaysApply: true
 - For conversation goal tracking, use `shared-rules/conversation-goal-ledger.md`: active user goals belong in project-local `.agent-goals/` temporary state and do not replace the Ai-skill git writeback transaction.
 - For skill changes, read the skill entry plus related README, workflow, documentation, checklist, templates, feedback indexes, and linked shared rules when they exist.
 - If a dependent file does not exist, mark it as not applicable; do not claim it was checked.
+- When a user asks to reload a skill or points out that shared rules may have been missed, create a dependency read ledger before returning to project work: trigger, required set, files read, not-applicable files, deferred/blocked items, and validation method.
+- Do not claim the updated skill has been applied while the ledger still has unread required files that are neither read nor explicitly marked not applicable.
 - Before finishing, state the dependency read and validation method: diff review, lints, link check, required linked updates, and bundle sync when relevant.
 - After `git commit`, `git push`, and any required bundle sync, re-read the updated skill/shared-rule entry files and main dependencies so the current agent context reflects the pushed version before the final response.
 - On the first write to `shared-rules/`, `skills/`, `.cursor/rules/`, templates, feedback lessons, sync scripts, or their `~/.cursor` synced paths, immediately open an Ai-skill writeback transaction. Do not return to project work or claim completion until diff review, linked updates, bundle sync, commit, push, reread, and clean `git status --short --branch` have closed it.

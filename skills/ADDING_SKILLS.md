@@ -68,7 +68,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 - **工具中立文件**：一律只維護在 **[`shared-rules/tool-neutral-documentation.md`](../shared-rules/tool-neutral-documentation.md)**；新增 skill 的 README / SKILL / workflow / template 預設不寫特定工具路徑、hook、UI 或同步細節。工具全域做法放到 [`ai-tools/`](../ai-tools/README.md)；若某 skill 對某工具有必要的執行差異，用 Strategy-style adapter 放 `skills/<skill>/tool-adapters/<tool>.md`，只寫差異並連回核心 workflow。
 - **文件 TODO**：一律只維護在 **[`shared-rules/document-todo-list.md`](../shared-rules/document-todo-list.md)**；若新增 skill 文件仍有未完成、待決策、待補強或待驗證項目，在文件前段放 `Document TODO` 表並連到相關章節或 goal。
 - **目標、執行、驗證流程**：一律只維護在 **[`shared-rules/goal-action-validation.md`](../shared-rules/goal-action-validation.md)**；新增 skill 的輸出格式、workflow、documentation 規則要能讓重要結論反查目標、執行、驗證，純判斷題則附參考來源與推論邊界。
-- **依賴文件讀取鐵則**：一律只維護在 **[`shared-rules/dependency-reading.md`](../shared-rules/dependency-reading.md)**；新增或修改 skill 時，必須讀 skill 入口、相關 README/workflow/checklist/template、shared-rules 與 linked updates，不能只讀單一檔案。
+- **依賴文件讀取鐵則**：一律只維護在 **[`shared-rules/dependency-reading.md`](../shared-rules/dependency-reading.md)**；新增、修改或重新讀取 skill 時，必須建立 dependency read ledger，讀 skill 入口、相關 README/workflow/checklist/template、shared-rules 與 linked updates，並把不存在的檔案標成 `not applicable`，不能只讀單一檔案。
 - 各 skill 的 **`FEEDBACK.md`**（若需要）：維持與 [`apk-analysis/FEEDBACK.md`](apk-analysis/FEEDBACK.md) 相同模式——**幾行連結**到 [`shared-rules/feedback-lessons.md`](../shared-rules/feedback-lessons.md)。
 - 每一則 lesson 頂部引用 `shared-rules`（路徑依檔案深度調整 `../../../shared-rules/...`）。
 
@@ -114,7 +114,7 @@ skills/<skill-name>/tool-adapters/
 - [ ] 若建立 `tool-adapters/<tool>.md`，內容只包含 skill-specific 工具差異，並已連回核心 workflow；工具全域設定仍留在 `ai-tools/<tool>.md`
 - [ ] 若文件尚有未完成、待決策、待補強或待驗證項目，已依 `shared-rules/document-todo-list.md` 在前段加入 TODO 表並連到相關章節/goal
 - [ ] 輸出格式已依 `shared-rules/goal-action-validation.md` 要求重要工作單元包含目標、執行、驗證或參考來源
-- [ ] 已依 `shared-rules/dependency-reading.md` 讀取或明確檢查相關依賴文件
+- [ ] 已依 `shared-rules/dependency-reading.md` 建立 dependency read ledger，讀取或明確檢查相關依賴文件，並標示缺檔不適用項
 - [ ] 若引用其他 skill，已依 `shared-rules/cross-skill-references.md` 寫明 trigger、artifact、ownership boundary 與 linked updates
 - [ ] 若文件開始變大，已依 `shared-rules/document-sizing.md` 拆成資料夾、目錄與子檔
 - [ ] 已建立 `feedback_history/`（可先要 `README.md` 索引；若 skill 有分類，同步建立 `feedback_history/<category>/README.md`）
