@@ -28,6 +28,7 @@
 <AI_SKILL_REPO>/shared-rules/linked-updates.md
 <AI_SKILL_REPO>/shared-rules/conversation-goal-ledger.md
 <AI_SKILL_REPO>/shared-rules/tool-neutral-documentation.md
+<AI_SKILL_REPO>/shared-rules/decision-efficiency.md
 <AI_SKILL_REPO>/shared-rules/document-todo-list.md
 <AI_SKILL_REPO>/shared-rules/document-sizing.md
 <AI_SKILL_REPO>/shared-rules/goal-action-validation.md

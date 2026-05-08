@@ -80,6 +80,8 @@ native backtrace 落在哪裡？
 
 ## 2. 選擇主線
 
+通用決策原則見 [`../../shared-rules/decision-efficiency.md`](../../shared-rules/decision-efficiency.md)：先界定當前未知，依 time-to-evidence、語意距離、安全/可回退性、驗證信號、context cost 與 user value 選下一步；不要一次讀完所有分類或把低收益路線硬跑到底。
+
 先做「最高收益路線」檢查：預設工作流是 routing aid，不是固定順序。每個 checkpoint 先用一句話寫出當前未知，再比較可用路線的 **time-to-evidence**、證據語意距離、安全性、可回退性與驗證信號。若已有 App-owned boundary、read-only API replay、高語意 hook 或靜態 xref 能更直接回答問題，主力應轉向該路線；UI / MITM / pcap / broad hooks 等較慢路線可保留作 attribution、對照或 fallback，不要因為一開始選了某種分法就硬跑到底。
 
 | 證據 | 優先主線 |

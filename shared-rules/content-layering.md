@@ -6,6 +6,7 @@
 | 全庫**連動更新規則**（改一處會影響多處時要同步改哪些） | **[`linked-updates.md`](linked-updates.md)**（全庫唯一正文） |
 | 全庫**文件用語規則**（中性、低爭議、避免 AI/搜尋誤判的標題、slug、摘要與正文） | **[`neutral-language.md`](neutral-language.md)**（全庫唯一正文） |
 | 全庫**工具中立文件規則**（可重用 docs 不綁單一 IDE/agent；工具路徑、hook、UI、同步步驟放工具文件） | **[`tool-neutral-documentation.md`](tool-neutral-documentation.md)**（全庫唯一正文）；具體工具操作放 `ai-tools/<tool>.md` 或工具設定檔 |
+| 全庫**決策效率與 context 控制規則**（先界定未知、用最高收益路線決策、避免無關讀取與 token 浪費） | **[`decision-efficiency.md`](decision-efficiency.md)**（全庫唯一正文）；skill 可保留領域專用路由表並連回此規則 |
 | 全庫**文件 TODO 規則**（文件前段列出未完成、待決策、待補強、待驗證項並連回章節/goal） | **[`document-todo-list.md`](document-todo-list.md)**（全庫唯一正文）；跨文件或跨對話目標再連到 `.agent-goals/` |
 | 全庫**工作驗證流程**（目標、執行、驗證；純判斷題用參考來源） | **[`goal-action-validation.md`](goal-action-validation.md)**（全庫唯一正文） |
 | 全工具**對話目標閉環規則**（active goals、優先權、parallelization mode、owner/lock 決策、plan/todo links、missing/decision/strengthen、拆解、轉移、multi-agent lock、完成後刪除；多步驟 / todo / dirty files / 繼續前任務時先 status/init） | **[`conversation-goal-ledger.md`](conversation-goal-ledger.md)**（全庫唯一正文）；每個專案的暫存狀態放 `<PROJECT_ROOT>/.agent-goals/`，不進 git |
