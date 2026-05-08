@@ -64,6 +64,8 @@ Cursor 會掃描特定路徑下的 skill；把中央庫對應的 `skills/<name>/
 
 核心問題：若把 skill 複製進業務專案的 `.cursor`，複製品不會自動知道外層 repository 已更新。Cursor 也不會替你比對兩份檔案；除非你改成只維護一份實體，或固定重跑同步步驟。
 
+**硬規則：** 使用者要求「同步 skill repo」、「回饋到 skill repo」或修正可重用 skill / shared rule 時，先定位並修改 `<AI_SKILL_REPO>` 這個 git repository。`~/.cursor/skills*`、`~/.cursor/shared-rules`、`~/.cursor/bundles/*` 與專案 `.cursor/` 都是 Cursor 可讀的部署 / mirror 路徑；除非已確認它們是 symlink 指回 `<AI_SKILL_REPO>`，否則不能把這些路徑當成 source repo，也不能只改這些路徑就回覆「已同步」。
+
 建議先決定單一真相來源：
 
 | 策略 | 做法 | 優點 | 注意 |

@@ -67,6 +67,6 @@
 
 ## 疑義時
 
-以本庫 **`shared-rules/`** 與 **`skills/`** 為準；`.cursor` 內皆為同步產物。
+以本庫 **`shared-rules/`** 與 **`skills/`** 為準；`.cursor` 內皆為同步產物。若使用者要求更新或同步 skill repo，先在 `<AI_SKILL_REPO>` 確認 `git rev-parse --show-toplevel` 與 `git status --short --branch`，再修改 source；`~/.cursor/skills*` 或 bundles 只能在 source 更新後由同步流程處理。
 
 ← [回到共用規則索引](README.md)

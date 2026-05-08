@@ -10,7 +10,7 @@
 | 全庫**文件 TODO 規則**（文件前段列出未完成、待決策、待補強、待驗證項並連回章節/goal） | **[`document-todo-list.md`](document-todo-list.md)**（全庫唯一正文）；跨文件或跨對話目標再連到 `.agent-goals/` |
 | 全庫**工作驗證流程**（目標、執行、驗證；純判斷題用參考來源） | **[`goal-action-validation.md`](goal-action-validation.md)**（全庫唯一正文） |
 | 全工具**對話目標閉環規則**（active goals、優先權、parallelization mode、owner/lock 決策、plan/todo links、missing/decision/strengthen、拆解、轉移、multi-agent lock、完成後刪除；多步驟 / todo / dirty files / 繼續前任務時先 status/init） | **[`conversation-goal-ledger.md`](conversation-goal-ledger.md)**（全庫唯一正文）；每個專案的暫存狀態放 `<PROJECT_ROOT>/.agent-goals/`，不進 git |
-| 全庫**依賴讀取鐵則、dependency read ledger 與 writeback transaction gate**（發現 skill/rule/template/lesson 更新時必須讀相關依賴，重讀 skill 時列出已讀/不適用/阻塞項，寫入 Ai-skill 時必須完成 sync/commit/push/readback/clean status） | **[`dependency-reading.md`](dependency-reading.md)**（全庫唯一正文） |
+| 全庫**依賴讀取鐵則、dependency read ledger 與 writeback transaction gate**（發現 skill/rule/template/lesson 更新時必須讀相關依賴，重讀 skill 時列出已讀/不適用/阻塞項，寫入 Ai-skill 時必須先定位 canonical repo，不把工具 mirror 當 source，並完成 sync/commit/push/readback/clean status） | **[`dependency-reading.md`](dependency-reading.md)**（全庫唯一正文） |
 | 全庫**可重用規則與專案證據邊界**（incident 只能抽象成通用原因、規則與驗證；具體證據留專案） | **[`reusable-guidance-boundary.md`](reusable-guidance-boundary.md)**（全庫唯一正文） |
 | 可重用的**單一技巧、lesson 全文** | 未分類 skill 放 `skills/<skill-name>/feedback_history/`；已分類 skill 放 `skills/<skill-name>/feedback_history/<category>/` 或 `common/`；成熟後可整理進該 skill 的 `WORKFLOW.md` / `TOOLS.md` / `DOCUMENTATION.md` / 分類資料夾 |
 | 某 skill 的**工具策略 adapter**（同一 skill 在某 AI 工具上的執行差異） | `skills/<skill-name>/tool-adapters/<tool>.md`；只寫該工具差異並連回核心 workflow，工具全域設定仍放 `ai-tools/<tool>.md` |

@@ -4,7 +4,7 @@
 
 未來不同專案需要 APK 分析、抓包、Frida、Proxyman、Dart AOT、解密或分析方法沉澱時，優先從這裡讀 skill，並把新的可重用技巧回饋回這裡。
 
-**路徑約定：**在本機上，中央庫位置就是你心裡的 `<AI_SKILL_REPO>`（clone 所在目錄）。**請勿把真實本機絕對路徑寫進本庫任何會 commit 的文件**（含 `feedback_history`、`shared-rules`、規則範本）；對外一律用占位符 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`。
+**路徑約定：**在本機上，中央庫位置就是你心裡的 `<AI_SKILL_REPO>`（clone 所在目錄），且必須是本 repository 的 git root。`~/.cursor/skills*`、`~/.cursor/shared-rules`、`~/.cursor/bundles/*` 或專案 `.cursor/` 是工具部署 / mirror 路徑，不能取代 source repo。**請勿把真實本機絕對路徑寫進本庫任何會 commit 的文件**（含 `feedback_history`、`shared-rules`、規則範本）；對外一律用占位符 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`。
 
 ## 現有 Skills
 
