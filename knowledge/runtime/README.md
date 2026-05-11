@@ -13,6 +13,7 @@
 - [`../../scripts/generate-knowledge-runtime-report.rb`](../../scripts/generate-knowledge-runtime-report.rb)：從 runtime surfaces 產生 deterministic report。
 - [`../../scripts/generate-model-context-report.rb`](../../scripts/generate-model-context-report.rb)：從 routing registry 的 model 欄位產生 context loading report。
 - [`../../scripts/refresh-knowledge-runtime.rb`](../../scripts/refresh-knowledge-runtime.rb)：一鍵重建 reports、SQLite index 並執行 validators。
+- [`../../scripts/query-knowledge-graph.rb`](../../scripts/query-knowledge-graph.rb)：低成本查詢 graph edges，輔助 dependency / promotion / routing lookup。
 
 ## Runtime Inputs
 
@@ -59,6 +60,7 @@ Runtime view 應回答：
 - 任何會修改 canonical source 或需要 close-loop 的任務，都必須使用 `source-backed` 或更高讀取深度。
 - Source 變更後，必須依 `refresh-policy.yaml` 判斷 summaries、graphs、routing registry 是 refresh、revalidate、downgrade 或 no update needed。
 - SQLite / FTS 只能是 generated lookup cache；查詢結果只作 candidate list，不取代 canonical Markdown / YAML。
+- Graph query 結果只作 candidate edge list；需要修改或高信心判斷時仍讀 graph YAML 與 canonical source。
 - 修改 registry、summaries、graphs 或 refresh policy 後，重新執行 `ruby scripts/generate-knowledge-runtime-report.rb --write`。
 - 修改 registry model 欄位、model profiles 或 compression strategy 後，重新執行 `ruby scripts/generate-model-context-report.rb --write`。
 - 修改任何 generated runtime surface 或 SQLite source inputs 後，可先執行 `ruby scripts/refresh-knowledge-runtime.rb`。

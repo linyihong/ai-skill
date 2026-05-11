@@ -35,6 +35,7 @@
 - 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 registry generation tooling；validation helper 與 runtime report generator 已建立。
 - Multi-model routing / compression strategy 已有第一版，並已建立第一個 model-aware context report；尚未建立 per-model prompt / checklist artifact generator。
 - SQLite / FTS runtime index prototype 已可生成、查詢與驗證；query ranking、layer/type/status filtering、source checksum stale validation 與一鍵 runtime refresh orchestration 已完成。
+- Knowledge graph edges 已可用 `scripts/query-knowledge-graph.rb` 低成本查詢；尚未自動生成完整 graph records。
 - Cold feedback lessons 的 archive 策略已納入 `governance/lifecycle/README.md`：Markdown 仍是 canonical source，SQLite / FTS 與 generated summaries 只作低 token lookup。
 
 ## 核心問題
@@ -561,6 +562,7 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P1 | done | 建立 SQLite / FTS runtime index prototype | `knowledge/runtime/sqlite/README.md`, `scripts/generate-runtime-sqlite-index.rb`, `scripts/query-runtime-index.rb`, `scripts/validate-runtime-sqlite-index.rb` | 已完成本機 generated lookup cache、ranked query helper、filtering 與 stale checksum validator | SQLite 作為 generated lookup cache，不提交 DB binary；feedback lessons 只被索引，不搬離 `feedback_history/` |
 | P1 | done | 定義 cold feedback lesson archive lifecycle | `governance/lifecycle/README.md`, `knowledge/runtime/sqlite/README.md`, `feedback/README.md`, `memory/README.md` | 已完成冷資料觸發門檻與 source-of-truth 邊界 | Lesson 超過門檻時先使用 generated summary / SQLite FTS 查候選；Markdown 仍是 canonical source |
 | P1 | done | 建立 knowledge runtime refresh orchestrator | `scripts/refresh-knowledge-runtime.rb`, `knowledge/runtime/README.md`, `governance/validation/README.md` | 已完成一鍵重建 reports / SQLite index 並執行 validators | Generated runtime surfaces 可用單一命令重建與驗證，降低 stale cache 風險 |
+| P1 | done | 建立 knowledge graph query helper | `scripts/query-knowledge-graph.rb`, `knowledge/graphs/README.md`, `knowledge/runtime/README.md` | 已完成 source / target / type / keyword graph edge 查詢 | Graph query 只回傳候選 edge list；修改或高信心判斷仍讀 graph YAML 與 canonical source |
 
 ## 最終目標
 
