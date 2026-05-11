@@ -128,7 +128,7 @@ Cursor 會掃描特定路徑下的 skill；把中央庫對應的 `skills/<name>/
 4. 若使用者轉移目標，先 `pause` 或 `update --status superseded` 舊 goal，再建立新的 `P1`。
 5. 若有 planning 文件或 TodoWrite todo，使用 `--plan` / `--todo` 連到 goal，並讓 `.agent-goals/README.md` 的主目標表可快速跳回該 goal。
 6. 若發現需要拆小目標，使用 `split` 或在 goal 檔的 `Subgoals` 區塊記錄；若發現不能分工或需單一 owner，使用 `--parallelization single-owner|non-parallelizable` 更新。
-7. 在回覆完成前，只有完成條件與驗證都成立時才 `complete --validated`；否則保留 goal，讓下一個 agent 可接手。
+7. 在回覆完成前，只有完成條件與驗證都成立時才 `complete --validated`；條件已成立時必須同輪刪除 goal 並刷新 `.agent-goals/README.md`，不要把 `completed` row 留在 active 表。否則保留 goal，讓下一個 agent 可接手。
 
 ### Cursor hooks 範本方向
 

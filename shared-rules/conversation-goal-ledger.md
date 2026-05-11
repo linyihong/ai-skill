@@ -263,6 +263,8 @@ Delete a goal file only when all are true:
 3. No child goal remains active, blocked, or needs validation.
 4. The final answer or handoff states the outcome.
 
+When all deletion conditions are true, deletion is required in the same close-out turn: remove the goal file and refresh `<PROJECT_ROOT>/.agent-goals/README.md` so completed work does not remain in the active recovery table. Do not leave a `completed` row as a long-term memory or archive; durable lessons belong in project docs, commits, issues, or reusable skill feedback, not in `.agent-goals/`.
+
 If the work is done but validation is missing, set status to `needs-validation` rather than deleting it.
 
 If the goal was superseded, keep it until the user accepts the new direction or the reason is clear enough for a future agent. Then it may be deleted or archived according to project preference.
