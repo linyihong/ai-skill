@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Ai-skill：每次在本 repo commit 後，刷新本機 ~/.cursor bundles（略過失敗以免擋 commit）
+# Ai-skill：可選的 Cursor bundle refresh；reference-only 不需要同步。
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 SCRIPT="${ROOT}/scripts/sync-cursor-bundle.sh"
-[[ -x "${SCRIPT}" ]] && "${SCRIPT}" || true
+if [[ "${AI_SKILL_SYNC_CURSOR_BUNDLE:-0}" == "1" && -x "${SCRIPT}" ]]; then
+  "${SCRIPT}" || true
+fi

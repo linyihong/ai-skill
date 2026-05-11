@@ -3,6 +3,7 @@
 #
 # Default mode is dry-run: inspect status, detect active lock, and print commit groups.
 # Use --commit to create grouped commits. Use --push with --commit to push after commits.
+# Cursor bundle sync is opt-in via AI_SKILL_SYNC_CURSOR_BUNDLE=1.
 set -euo pipefail
 
 COMMIT=0
@@ -111,6 +112,7 @@ ensure_no_git_operation_in_progress() {
 group_for_path() {
   local path="$1"
   case "${path}" in
+    .cursor/rules/*|ai-tools/*) echo "tooling" ;;
     shared-rules/*|README.md) echo "shared" ;;
     scripts/*) echo "scripts" ;;
     skills/apk-analysis/*) echo "apk-analysis" ;;
@@ -129,6 +131,7 @@ commit_message_for_group() {
   case "$1" in
     shared) echo "docs(shared): close skill update loop" ;;
     scripts) echo "chore(scripts): update skill close-loop automation" ;;
+    tooling) echo "docs(tools): update skill tool integration guidance" ;;
     apk-analysis) echo "docs(apk): close skill guidance updates" ;;
     app-development-guidance) echo "docs(app): close guidance updates" ;;
     skill-*) echo "docs(${1#skill-}): close skill updates" ;;
@@ -216,7 +219,11 @@ main() {
     git commit -m "$(commit_message_for_group "${group}")"
   done
 
-  ./scripts/sync-cursor-bundle.sh
+  if [[ "${AI_SKILL_SYNC_CURSOR_BUNDLE:-0}" == "1" ]]; then
+    ./scripts/sync-cursor-bundle.sh
+  else
+    echo "Skipping Cursor bundle sync (reference-only default). Set AI_SKILL_SYNC_CURSOR_BUNDLE=1 to sync local Cursor bundles."
+  fi
 
   if [[ "${PUSH}" -eq 1 ]]; then
     git push origin "$(git branch --show-current)"

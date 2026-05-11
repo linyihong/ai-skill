@@ -2,12 +2,12 @@
 
 | 檔案 | 用途 |
 | --- | --- |
-| [`sync-cursor-bundle.sh`](sync-cursor-bundle.sh) | 把本庫同步到 **`~/.cursor/bundles/shared-rules`**（共用規則）與 **`~/.cursor/bundles/ai-skill/`**（各 skill），再讓 `~/.cursor/shared-rules`、`~/.cursor/skills/<name>` 指向 bundle（與其他 `.cursor` 內容分流）。 |
+| [`sync-cursor-bundle.sh`](sync-cursor-bundle.sh) | 可選的 Cursor symlink / bundle bridge：把本庫同步到 **`~/.cursor/bundles/shared-rules`**（共用規則）與 **`~/.cursor/bundles/ai-skill/`**（各 skill），再讓 `~/.cursor/shared-rules`、`~/.cursor/skills/<name>` 指向 bundle（與其他 `.cursor` 內容分流）。Reference-only 不需要執行。 |
 | [`ai-skill-close-loop.sh`](ai-skill-close-loop.sh) | 保守收尾工具：偵測 active close-loop lock、列出 dirty 檔案 owner group；預設 dry-run，`--commit` 才分組提交，`--push` 才推遠端。 |
 | [`agent-goals.sh`](agent-goals.sh) | 工具中立的專案暫存 goal ledger helper：在 `<PROJECT_ROOT>/.agent-goals/` 建立、更新、拆解、暫停、完成刪除對話目標；不提交 goal 檔。 |
-| [`git-hooks/post-commit`](git-hooks/post-commit) | **可選。**在本 repo 設定 `git config core.hooksPath scripts/git-hooks` 後，每次 **`git commit`** 會自動執行 `sync-cursor-bundle.sh`。 |
+| [`git-hooks/post-commit`](git-hooks/post-commit) | **可選。**在本 repo 設定 `git config core.hooksPath scripts/git-hooks` 且 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 時，**`git commit`** 後會執行 `sync-cursor-bundle.sh`。 |
 
-**規則：**只要改過 **`shared-rules/`** 或 **`skills/`** 且本機用 bundles 佈署，就應跑 `sync-cursor-bundle.sh`（或依賴上述 hook）。
+**規則：**reference-only 是預設，不需要跑 bundle sync。只有本機明確用 Cursor symlink / bundle / copy mirror 佈署，且希望 mirror 立刻跟上時，才跑 `sync-cursor-bundle.sh`（或以 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 啟用上述 hook / close-loop helper 同步）。
 
 在本庫根目錄執行：
 
@@ -20,6 +20,7 @@ chmod +x scripts/sync-cursor-bundle.sh   # 只需做一次
 
 ```bash
 git config core.hooksPath scripts/git-hooks
+export AI_SKILL_SYNC_CURSOR_BUNDLE=1
 ```
 
 ## Close-loop automation
@@ -30,10 +31,16 @@ git config core.hooksPath scripts/git-hooks
 ./scripts/ai-skill-close-loop.sh
 ```
 
-沒有人正在操作、所有 dirty path 都可歸屬時，依 owner 分組提交：
+沒有人正在操作、所有 dirty path 都可歸屬時，依 owner 分組提交。預設不跑 Cursor bundle sync：
 
 ```bash
 ./scripts/ai-skill-close-loop.sh --commit
+```
+
+若本機 Cursor bundle / mirror 需要跟上，明確啟用同步：
+
+```bash
+AI_SKILL_SYNC_CURSOR_BUNDLE=1 ./scripts/ai-skill-close-loop.sh --commit
 ```
 
 提交後也推送目前 branch：
@@ -46,7 +53,7 @@ git config core.hooksPath scripts/git-hooks
 
 - 若 `.git/ai-skill-agent.lock` 顯示其他 agent / user 仍活躍，腳本會停止，不 commit、不 push。
 - 若存在 merge / rebase / cherry-pick 狀態，腳本會停止。
-- 若 dirty path 無法歸到 `shared-rules`、`scripts` 或某個 `skills/<name>` owner，腳本會停止。
+- 若 dirty path 無法歸到 `shared-rules`、`scripts`、`ai-tools`、`.cursor/rules` 或某個 `skills/<name>` owner，腳本會停止。
 - 預設只 dry-run；必須明確加 `--commit` / `--push` 才會寫入 git。
 
 ## Conversation goal ledger helper
