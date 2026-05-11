@@ -1,0 +1,165 @@
+{
+  "description": "Discovery map for AI agents - automatic rule and dependency routing",
+  "version": "1.0",
+  "last_updated": "2026-05-11",
+
+  "architectural_layers": {
+    "knowledge": {
+      "path": "knowledge/",
+      "entry_point": "knowledge/indexes/README.md",
+      "registry": "knowledge/runtime/routing-registry.yaml",
+      "purpose": "Task intent routing and knowledge navigation",
+      "read_when": [
+        "Planning a new task or determining which files to read",
+        "Need to understand task-to-knowledge mapping",
+        "Routing between different skill or workflow layers"
+      ]
+    },
+    "metadata": {
+      "path": "metadata/",
+      "schema": "metadata/schema.md",
+      "ranking": "metadata/ranking/README.md",
+      "confidence": "metadata/confidence/README.md",
+      "compatibility": "metadata/compatibility/README.md",
+      "purpose": "Knowledge atom schema, ranking, confidence, and runtime metadata",
+      "read_when": [
+        "Creating or evaluating a new knowledge atom",
+        "Need to check schema consistency",
+        "Understanding metadata structure and validation"
+      ]
+    },
+    "governance": {
+      "path": "governance/",
+      "lifecycle": "governance/lifecycle/README.md",
+      "validation": "governance/validation/README.md",
+      "purpose": "Knowledge lifecycle, validation gates, and deprecation rules",
+      "read_when": [
+        "Deciding if a rule or skill should be promoted, deprecated, or retired",
+        "Understanding validation and sign-off requirements",
+        "Managing breaking changes or migrations"
+      ]
+    },
+    "intelligence": {
+      "path": "intelligence/",
+      "entry": "intelligence/README.md",
+      "purpose": "Engineering decision, trade-off, anti-pattern, and domain knowledge",
+      "read_when": [
+        "Making architectural or design decisions",
+        "Evaluating trade-offs",
+        "Identifying anti-patterns or common pitfalls"
+      ]
+    },
+    "workflow": {
+      "path": "workflow/",
+      "entry": "workflow/README.md",
+      "purpose": "Planning, decomposition, review, orchestration, and handoff flow",
+      "read_when": [
+        "Planning a complex multi-step task",
+        "Understanding execution flow or orchestration",
+        "Designing handoff between agents or phases"
+      ]
+    },
+    "feedback": {
+      "path": "feedback/",
+      "entry": "shared-rules/feedback-lessons.md",
+      "promotion": "feedback/promotion/README.md",
+      "purpose": "Lesson extraction, refinement, promotion, and feedback loop",
+      "read_when": [
+        "Extracting learnings from a task or failure",
+        "Need to promote a lesson to shared rules or workflow",
+        "Understanding failure learning system"
+      ]
+    },
+    "memory": {
+      "path": "memory/",
+      "entry": "memory/README.md",
+      "purpose": "Episodic, project, and failure memory abstraction",
+      "read_when": [
+        "Need to understand long-term memory design",
+        "Storing or retrieving task history",
+        "Replaying past episodes or decisions"
+      ]
+    }
+  },
+
+  "discovery_rules": {
+    "when_starting_task": [
+      "1. Read: knowledge/indexes/README.md (task routing)",
+      "2. Identify: Primary source from task routing table",
+      "3. Read: Primary source + related sources",
+      "4. Check: metadata/schema.md if creating new knowledge atom",
+      "5. Validate: shared-rules/dependency-reading.md for dependencies"
+    ],
+    "when_defining_rules": [
+      "1. Read: shared-rules/rule-weight.md (priority if conflicts)",
+      "2. Consult: shared-rules/linked-updates.md (affected files)",
+      "3. Check: metadata/schema.md (consistency)",
+      "4. Validate: governance/validation/README.md (gates)"
+    ],
+    "when_evaluating_promotion": [
+      "1. Read: governance/lifecycle/README.md",
+      "2. Read: feedback/promotion/README.md",
+      "3. Check: shared-rules/failure-learning-system.md",
+      "4. Determine: Target layer (intelligence/, shared-rules/, etc.)"
+    ],
+    "when_making_architecture_decision": [
+      "1. Read: intelligence/README.md (domain knowledge)",
+      "2. Consult: knowledge/summaries/ (high-level patterns)",
+      "3. Check: shared-rules/rule-weight.md (priority rules)",
+      "4. Validate: architecture/next-stage-upgrade-plan.md (roadmap)"
+    ],
+    "when_stuck_or_uncertain": [
+      "1. Check: knowledge/indexes/README.md (find similar tasks)",
+      "2. Read: shared-rules/failure-learning-system.md (failure patterns)",
+      "3. Consult: intelligence/engineering/ (domain anti-patterns)",
+      "4. Ask: user or document TODO in .agent-goals/"
+    ]
+  },
+
+  "critical_files": {
+    "always_bootstrap": [
+      "README.md",
+      "shared-rules/README.md"
+    ],
+    "project_specific": [
+      ".claude/settings.json",
+      ".claude/discovery-map.json"
+    ],
+    "validation_gates": [
+      "shared-rules/dependency-reading.md",
+      "shared-rules/linked-updates.md",
+      "shared-rules/rule-weight.md"
+    ]
+  },
+
+  "anti_patterns": {
+    "dont_do_this": [
+      "❌ Assume you know what file to read - consult knowledge/indexes first",
+      "❌ Create new rules without checking shared-rules/linked-updates.md",
+      "❌ Skip dependency reading when files might have changed",
+      "❌ Propose changes to shared-rules/ without validating against rule-weight.md",
+      "❌ Forget to check .claude/discovery-map.json before exploring"
+    ]
+  },
+
+  "how_this_helps_ai": {
+    "description": "This discovery map enables 'smart exploration' without explicit instructions",
+    "examples": [
+      {
+        "scenario": "AI encounters a new task",
+        "without_discovery": "AI might guess or ask what to do",
+        "with_discovery": "AI reads knowledge/indexes/README.md and finds the routing automatically"
+      },
+      {
+        "scenario": "AI needs to create a rule",
+        "without_discovery": "AI might forget about linked updates",
+        "with_discovery": "AI checks discovery_rules.when_defining_rules and validates automatically"
+      },
+      {
+        "scenario": "AI is uncertain about next step",
+        "without_discovery": "AI gets stuck or asks user",
+        "with_discovery": "AI consults discovery_rules.when_stuck_or_uncertain for options"
+      }
+    ]
+  }
+}

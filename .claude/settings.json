@@ -46,6 +46,43 @@
       "Bash(jq *)"
     ]
   },
+  "discovery": {
+    "description": "Architectural layer discovery - help AI find and apply rules automatically",
+    "map_file": ".claude/discovery-map.json",
+    "auto_discover": true,
+    "key_layers": [
+      {
+        "layer": "knowledge",
+        "path": "knowledge/",
+        "entry": "knowledge/indexes/README.md",
+        "purpose": "Task intent routing and knowledge navigation"
+      },
+      {
+        "layer": "metadata",
+        "path": "metadata/",
+        "entry": "metadata/schema.md",
+        "purpose": "Knowledge atom schema and runtime metadata"
+      },
+      {
+        "layer": "governance",
+        "path": "governance/",
+        "entry": "governance/lifecycle/README.md",
+        "purpose": "Knowledge lifecycle and deprecation"
+      },
+      {
+        "layer": "intelligence",
+        "path": "intelligence/",
+        "entry": "intelligence/README.md",
+        "purpose": "Engineering decision, trade-off, and domain knowledge"
+      },
+      {
+        "layer": "workflow",
+        "path": "workflow/",
+        "entry": "workflow/README.md",
+        "purpose": "Planning, decomposition, review, and orchestration"
+      }
+    ]
+  },
   "rules": {
     "reference_first": true,
     "commit_branch": "claude/review-dev-rules-ndnTH",
