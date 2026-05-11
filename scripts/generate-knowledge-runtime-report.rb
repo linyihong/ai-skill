@@ -95,6 +95,7 @@ def build_report
   lines << "| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | #{routes.length} records |"
   lines << "| Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | #{policy["status"] || "unknown"} |"
   lines << "| Model context report | [`model-context-report.md`](model-context-report.md) | generated view |"
+  lines << "| SQLite runtime index | [`sqlite/`](sqlite/) | planned lookup cache |"
   lines << "| Summaries | [`../summaries/`](../summaries/) | #{summaries.length} files |"
   lines << "| Graph records | [`../graphs/`](../graphs/) | #{graphs.length} files |"
   lines << ""
