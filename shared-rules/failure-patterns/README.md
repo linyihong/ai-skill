@@ -10,6 +10,7 @@
 | [Entrypoint positioning drift](entrypoint-positioning-drift.md) | `validation-gap` | validated | 防止 agent 在命名或架構變更後，只更新次要連結或段落，卻留下 root title、opening paragraph 或主要入口 framing 過期。 |
 | [Skill-local feedback bypass](skill-local-feedback-bypass.md) | `dependency-miss` / `validation-gap` | validated | 防止 agent 只補單一 skill 的 feedback lesson，卻沒有讀取全庫 failure-learning system 並沉澱 cross-skill prevention gate。 |
 | [Source / mirror write drift](source-mirror-write-drift.md) | `source-mirror-drift` | validated | 防止 agent 更新 project-local tool mirrors 或 runtime copies，而不是 canonical source repo。 |
+| [Tool config design without rule check](tool-config-design-without-rule-check.md) | `tool-strategy-gap` | candidate | 防止 agent 設計新工具配置時漏讀 `ai-tools/<tool>.md` 的現有規則，導致重複或邊界混淆。 |
 
 ## 維護
 
