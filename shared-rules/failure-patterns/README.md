@@ -6,6 +6,7 @@ Read this index when [`failure-learning-system.md`](../failure-learning-system.m
 
 | Pattern | Class | Status | Summary |
 | --- | --- | --- | --- |
+| [Entrypoint positioning drift](entrypoint-positioning-drift.md) | `validation-gap` | validated | Prevent agents from updating secondary links or sections while leaving the root title, opening paragraph, or primary entrypoint framing stale after naming or architecture changes. |
 | [Source / mirror write drift](source-mirror-write-drift.md) | `source-mirror-drift` | validated | Prevent agents from updating project-local tool mirrors or runtime copies instead of the canonical Ai-skill source repo. |
 
 ## Maintenance
