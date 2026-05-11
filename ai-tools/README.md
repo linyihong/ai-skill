@@ -6,7 +6,7 @@
 
 通用 shared rules、skills、templates 與根 README 應保持工具中立；工具專屬路徑、hook、UI、reload、設定與同步命令放在本目錄對應工具文件中。
 
-Repo-level 載入與同步方向見 [`architecture/ai-native-operating-system.md`](../architecture/ai-native-operating-system.md)：reference-first 是預設，工具 mirror / bundle / copy snapshot 是相容層。
+Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating-system.md`](../architecture/ai-native-knowledge-operating-system.md)：reference-first 是預設，工具 mirror / bundle / copy snapshot 是相容層。
 
 若某個 skill 對某工具有必要的特殊執行策略，skill 內可用 `skills/<skill>/tool-adapters/<tool>.md` 記錄差異；本目錄仍只放該工具的全域設定、同步與操作方式。
 
