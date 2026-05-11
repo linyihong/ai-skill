@@ -77,6 +77,19 @@ surfaces:
       - report links 失效
       - report profile / compression 分組與 registry 不一致
 
+  model_checklists:
+    path: knowledge/runtime/model-checklists.md
+    refresh_when:
+      - routing registry 的 model.profile、compression_level、required_dependencies 或 validation_signal 改變
+      - models/profiles/README.md 或 models/compression/README.md 改變
+    revalidate_when:
+      - routing registry 只有非 model / dependency 欄位措辭修正
+      - checklist links 需要重新檢查但 profile / route 分組未改變
+    downgrade_when:
+      - model checklist 未由 current generator 重新產生
+      - checklist links 失效
+      - checklist required dependencies 與 registry 不一致
+
   sqlite_runtime_index:
     path: knowledge/runtime/sqlite/
     refresh_when:
@@ -102,6 +115,7 @@ validation:
     - Knowledge runtime refresh orchestrator when generated surfaces may be stale
     - Runtime report generation when generated surfaces change
     - Model context report generation when routing model fields change
+    - Model checklist generation when routing model fields or dependencies change
     - SQLite runtime index regeneration when cache tooling exists
     - YAML parse for generated YAML surfaces
     - Knowledge runtime validation helper for registry, summaries and graph records

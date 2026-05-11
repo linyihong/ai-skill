@@ -33,7 +33,7 @@
 - 尚未建立上述分層的完整子目錄；`apk-analysis` 已有第一個 intelligence 示範遷移內容。
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
 - 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 registry generation tooling；validation helper 與 runtime report generator 已建立。
-- Multi-model routing / compression strategy 已有第一版，並已建立第一個 model-aware context report；尚未建立 per-model prompt / checklist artifact generator。
+- Multi-model routing / compression strategy 已有第一版，並已建立 model-aware context report 與 per-model checklist artifact generator；尚未建立 task-specific prompt artifact generator。
 - SQLite / FTS runtime index prototype 已可生成、查詢與驗證；query ranking、layer/type/status filtering、source checksum stale validation 與一鍵 runtime refresh orchestration 已完成。
 - Knowledge graph edges 已可用 `scripts/query-knowledge-graph.rb` 低成本查詢；尚未自動生成完整 graph records。
 - Cold feedback lessons 的 archive 策略已納入 `governance/lifecycle/README.md`：Markdown 仍是 canonical source，SQLite / FTS 與 generated summaries 只作低 token lookup。
@@ -563,6 +563,7 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P1 | done | 定義 cold feedback lesson archive lifecycle | `governance/lifecycle/README.md`, `knowledge/runtime/sqlite/README.md`, `feedback/README.md`, `memory/README.md` | 已完成冷資料觸發門檻與 source-of-truth 邊界 | Lesson 超過門檻時先使用 generated summary / SQLite FTS 查候選；Markdown 仍是 canonical source |
 | P1 | done | 建立 knowledge runtime refresh orchestrator | `scripts/refresh-knowledge-runtime.rb`, `knowledge/runtime/README.md`, `governance/validation/README.md` | 已完成一鍵重建 reports / SQLite index 並執行 validators | Generated runtime surfaces 可用單一命令重建與驗證，降低 stale cache 風險 |
 | P1 | done | 建立 knowledge graph query helper | `scripts/query-knowledge-graph.rb`, `knowledge/graphs/README.md`, `knowledge/runtime/README.md` | 已完成 source / target / type / keyword graph edge 查詢 | Graph query 只回傳候選 edge list；修改或高信心判斷仍讀 graph YAML 與 canonical source |
+| P1 | done | 建立 model checklist generator | `scripts/generate-model-checklists.rb`, `knowledge/runtime/model-checklists.md`, `models/README.md` | 已完成 per-model context-loading checklist artifact | Checklist 由 routing registry 生成；需要修改或高信心判斷仍讀 model docs 與 canonical source |
 
 ## 最終目標
 

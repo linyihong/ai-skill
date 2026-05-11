@@ -9,6 +9,7 @@
 | Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 8 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
+| Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
 | SQLite runtime index | [`sqlite/`](sqlite/) | generated lookup cache prototype |
 | Summaries | [`../summaries/`](../summaries/) | 6 files |
 | Graph records | [`../graphs/`](../graphs/) | 5 files |

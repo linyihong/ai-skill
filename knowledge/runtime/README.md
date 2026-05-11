@@ -8,6 +8,7 @@
 - [`refresh-policy.yaml`](refresh-policy.yaml)：generated summaries、graphs 與 routing registry 的 refresh / revalidate / downgrade 規則。
 - [`runtime-report.md`](runtime-report.md)：由 generator 產生的目前 routes、summaries、graphs 與 refresh decisions 概覽。
 - [`model-context-report.md`](model-context-report.md)：由 generator 產生的 model profile / compression loading view。
+- [`model-checklists.md`](model-checklists.md)：由 generator 產生的 per-model context-loading checklist。
 - [`sqlite/`](sqlite/README.md)：SQLite / FTS generated lookup cache prototype，用於低 token 搜尋 candidate sources。
 - [`../../scripts/validate-knowledge-runtime.rb`](../../scripts/validate-knowledge-runtime.rb)：檢查 generated surfaces 的 YAML / Markdown 格式、必要欄位與 canonical path。
 - [`../../scripts/generate-knowledge-runtime-report.rb`](../../scripts/generate-knowledge-runtime-report.rb)：從 runtime surfaces 產生 deterministic report。
@@ -24,6 +25,7 @@
 | Generated refresh policy | `knowledge/runtime/refresh-policy.yaml` |
 | Generated runtime report | `knowledge/runtime/runtime-report.md` |
 | Generated model context report | `knowledge/runtime/model-context-report.md` |
+| Generated model checklists | `knowledge/runtime/model-checklists.md` |
 | SQLite lookup cache | `knowledge/runtime/sqlite/README.md` |
 | Atom metadata | `metadata/schema.md` |
 | Ranking rules | `metadata/ranking/README.md` |
@@ -63,6 +65,7 @@ Runtime view 應回答：
 - Graph query 結果只作 candidate edge list；需要修改或高信心判斷時仍讀 graph YAML 與 canonical source。
 - 修改 registry、summaries、graphs 或 refresh policy 後，重新執行 `ruby scripts/generate-knowledge-runtime-report.rb --write`。
 - 修改 registry model 欄位、model profiles 或 compression strategy 後，重新執行 `ruby scripts/generate-model-context-report.rb --write`。
+- 修改 registry model 欄位或 model docs 後，重新執行 `ruby scripts/generate-model-checklists.rb --write`。
 - 修改任何 generated runtime surface 或 SQLite source inputs 後，可先執行 `ruby scripts/refresh-knowledge-runtime.rb`。
 - 修改 registry、refresh policy、summaries 或 graphs 後，執行 `ruby scripts/validate-knowledge-runtime.rb`，再做 lints、Markdown link check、close-loop dry run 與 commit / push / readback。
 
@@ -73,6 +76,6 @@ Runtime view 應回答：
 - Machine-readable registry 的自動生成工具。
 - SQLite / FTS lookup cache 的 schema 擴充、query ranking 與 stale checksum 深化。
 - Generated refresh 的變更偵測與 selective execution。
-- Model-aware compression output 的更細粒度生成。
+- Model-aware compression output 的 selective / task-specific generation。
 
 這些項目會在 governance、metadata 與 routing surfaces 穩定後再推進。

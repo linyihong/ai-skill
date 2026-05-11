@@ -14,6 +14,7 @@
 | Generated refresh | Source 變更時，確認 summaries、graphs、registry records 是否需要 refresh、revalidate 或 downgrade。 | Source-of-truth 文件、metadata、routing registry、summaries、graphs 變更。 |
 | Runtime report generation | 執行 `ruby scripts/generate-knowledge-runtime-report.rb --write` 產生 deterministic runtime report。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
 | Model context report generation | 執行 `ruby scripts/generate-model-context-report.rb --write` 產生 model-aware context loading report。 | Routing registry model 欄位、model profiles 或 compression strategy 變更。 |
+| Model checklist generation | 執行 `ruby scripts/generate-model-checklists.rb --write` 產生 per-model context-loading checklist。 | Routing registry model 欄位、required dependencies 或 model docs 變更。 |
 | SQLite runtime index boundary | 執行 `ruby scripts/validate-runtime-sqlite-index.rb`，確認 SQLite / FTS 只作 generated lookup cache，DB 可重建、被 git ignore、source checksum 未 stale，且不取代 canonical source。 | SQLite generator、query helper、feedback lesson index 或 runtime lookup cache 變更。 |
 | Runtime refresh orchestration | 執行 `ruby scripts/refresh-knowledge-runtime.rb` 一鍵重建 reports / SQLite index 並跑 validators。 | 多個 generated runtime surfaces 可能同時 stale 時。 |
 | Knowledge runtime helper | 執行 `ruby scripts/validate-knowledge-runtime.rb` 檢查 generated surfaces。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
@@ -77,6 +78,7 @@ Validation:
 - Runtime refresh orchestrator:
 - Runtime report regenerated:
 - Model context report regenerated:
+- Model checklist regenerated:
 - SQLite runtime index regenerated or marked not implemented:
 - YAML parse:
 - Knowledge runtime helper:
