@@ -17,7 +17,7 @@
 **目錄約定：**  
 - **`skills/`**：各 skill 技巧包；之後新增 skill 放在 `skills/<name>/`，步驟見 [`skills/ADDING_SKILLS.md`](skills/ADDING_SKILLS.md)。  
 - **`shared-rules/`**：**共用規則**（依主題分檔：授權、去敏、中性低爭議文件用語、工具中立文件、目標/執行/驗證流程、對話目標閉環、失效學習系統、依賴文件讀取、內容分層、文件大小與拆分、cross-skill reference、**feedback 檔名／模板／agent 行為**、工具同步等）；索引為 [`shared-rules/README.md`](shared-rules/README.md)，feedback 流程與模板集中在 [`feedback-lessons.md`](shared-rules/feedback-lessons.md)。各 skill 目錄下 **`FEEDBACK.md`** 若存在，僅為**一行入口**，不必重複維護正文。
-- **`architecture/`**：repo-level 架構與 roadmap，不是可執行 shared rule；目前方向見 [`architecture/ai-native-operating-system.md`](architecture/ai-native-operating-system.md)。
+- **`architecture/`**：repo-level 架構與 roadmap，不是可執行 shared rule；目前方向見 [`architecture/ai-native-knowledge-operating-system.md`](architecture/ai-native-knowledge-operating-system.md)。
 - **`ai-tools/`**：各 AI coding / agent 工具如何讀取、參照或同步本知識庫；工具專屬路徑、hook、UI 與同步細節都放在這裡，不寫進通用 skill / shared rule 正文。
 - **連動更新**：若改動會影響其他文件、索引、skill 入口、同步流程或分類文件，相關檔案**必須**依 [`shared-rules/linked-updates.md`](shared-rules/linked-updates.md) 同步更新或明確檢查，不得說成「可選」。  
 - **每一則 `feedback_history`**：**不要**重複貼上共用規則全文，頂部引用 `shared-rules/` 即可。工具端同步與部署方式請看 [`ai-tools/`](ai-tools/README.md)。
@@ -34,9 +34,9 @@
 
 每次開啟 agent、新 session 或接手長對話時，先讀 [`shared-rules/README.md`](shared-rules/README.md) 的 **Default Bootstrap**。它只載入索引與必讀規則；後續仍依任務讀 skill-specific workflow、tools、documentation 與其他 shared rules。
 
-## AI Native Operating System
+## AI-native Knowledge Operating System
 
-長期架構方向是 **AI Native Operating System**：以 `<AI_SKILL_REPO>` 為單一真相來源，讓 agent 直接 reference 中央庫，並以 shared rules、skills、tool adapters、goal ledger、failure learning 與 close-loop automation 組成可驗證的操作層。同步、bundle 或 copy snapshot 只是工具相容層，不是預設模型。詳見 [`architecture/ai-native-operating-system.md`](architecture/ai-native-operating-system.md)。
+長期架構方向是 **AI-native Knowledge Operating System**：以 `<AI_SKILL_REPO>` 為單一真相來源，讓 agent 直接 reference 中央庫，並以 shared rules、skills、tool adapters、goal ledger、failure learning 與 close-loop automation 組成可驗證的操作層。同步、bundle 或 copy snapshot 只是工具相容層，不是預設模型。詳見 [`architecture/ai-native-knowledge-operating-system.md`](architecture/ai-native-knowledge-operating-system.md)。
 
 ## 對話目標閉環
 
