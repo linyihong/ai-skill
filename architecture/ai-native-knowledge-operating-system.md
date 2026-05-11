@@ -1,137 +1,137 @@
 # AI-native Knowledge Operating System
 
-This document defines the repository-level architecture direction for the AI-native Knowledge Operating System. It is a roadmap and boundary document, not an executable shared rule. Operational policies still live in `shared-rules/`; tool-specific setup still lives in `ai-tools/`.
+本文件定義 AI-native Knowledge Operating System 的 repository-level architecture direction。它是 roadmap 與 boundary document，不是 executable shared rule。可執行政策仍放在 `shared-rules/`；工具專屬設定仍放在 `ai-tools/`。
 
-## Purpose
+## 目的
 
-The AI-native Knowledge Operating System is the layer that lets agents reliably load knowledge, track goals, improve reusable guidance, validate changes, and close git writeback loops without treating any one AI tool or local mirror as the source of truth.
+AI-native Knowledge Operating System 是讓 agents 能可靠載入知識、追蹤 goals、改善 reusable guidance、驗證變更，並關閉 git writeback loops 的操作層；它不把任何單一 AI tool 或 local mirror 當成 source of truth。
 
-Its default model is **reference-first**:
+預設模型是 **reference-first**：
 
-1. Agents read the canonical `<AI_SKILL_REPO>` directly.
-2. `shared-rules/` provides the operating rules.
-3. `skills/` provides capability modules.
-4. `ai-tools/` and tool config provide adapters for specific tools.
-5. `.agent-goals/` records temporary project-local execution state.
-6. Scripts support validation, goal tracking, commit/push/readback, and optional tool sync.
+1. Agents 直接讀 canonical `<AI_SKILL_REPO>`。
+2. `shared-rules/` 提供 operating rules。
+3. `skills/` 提供 capability modules。
+4. `ai-tools/` 與 tool config 提供特定工具 adapters。
+5. `.agent-goals/` 記錄 project-local temporary execution state。
+6. Scripts 支援 validation、goal tracking、commit/push/readback 與 optional tool sync。
 
-Symlink, bundle, and copy snapshot flows remain compatibility layers for tools that need native scanning or offline snapshots. They are not the default architecture and should not replace direct reads from the canonical repository.
+`symlink`、`bundle` 與 `copy snapshot` flows 仍是 compatibility layers，用於需要 native scanning 或 offline snapshots 的工具。它們不是 default architecture，也不能取代直接讀 canonical repository。
 
-## Layers
+## 層級
 
-| Layer | Location | Responsibility |
+| 層級 | 位置 | 職責 |
 | --- | --- | --- |
-| Source of truth | `<AI_SKILL_REPO>` git repository | Canonical rules, skills, templates, scripts, and architecture docs. |
-| Operating rules | `shared-rules/` | Cross-skill policy, dependency reading, linked updates, goal ledger rules, failure learning, validation, and documentation boundaries. |
-| Capability modules | `skills/` | Domain-specific workflows, checklists, documentation templates, techniques, and feedback lessons. |
-| Tool adapters | `ai-tools/`, tool config, optional skill adapters | Tool-specific paths, hooks, UI behavior, sync strategy, and troubleshooting. |
-| Temporary execution state | `<PROJECT_ROOT>/.agent-goals/` | Active user goals, owner/lock decisions, open work, next actions, and completion validation. |
-| Close-loop automation | `scripts/` | Conservative helpers for goal ledger operations, grouped commits, push, readback support, and optional tool sync. |
+| Source of truth | `<AI_SKILL_REPO>` git repository | Canonical rules、skills、templates、scripts 與 architecture docs。 |
+| Operating rules | `shared-rules/` | Cross-skill policy、dependency reading、linked updates、goal ledger rules、failure learning、validation 與 documentation boundaries。 |
+| Capability modules | `skills/` | Domain-specific workflows、checklists、documentation templates、techniques 與 feedback lessons。 |
+| Tool adapters | `ai-tools/`、tool config、optional skill adapters | Tool-specific paths、hooks、UI behavior、sync strategy 與 troubleshooting。 |
+| Temporary execution state | `<PROJECT_ROOT>/.agent-goals/` | Active user goals、owner/lock decisions、open work、next actions 與 completion validation。 |
+| Close-loop automation | `scripts/` | Goal ledger operations、grouped commits、push、readback support 與 optional tool sync 的保守 helpers。 |
 
-## Reference-First Loading
+## Reference-first 載入
 
-Reference-first means an agent is expected to load the central repo by path instead of relying on a copied skill package inside each project.
+`reference-first` 表示 agent 應以路徑載入中央 repo，而不是依賴每個專案內複製的 skill package。
 
-Minimum startup shape:
+最小啟動形狀：
 
 ```text
 <AI_SKILL_REPO>/shared-rules/README.md
 <AI_SKILL_REPO>/skills/<skill-name>/SKILL.md
 ```
 
-After the shared-rule bootstrap, the agent follows dependency routing to read only the skill workflows, tool adapters, feedback lessons, templates, or architecture docs needed for the current task.
+完成 shared-rule bootstrap 後，agent 依 dependency routing 只讀目前任務需要的 skill workflows、tool adapters、feedback lessons、templates 或 architecture docs。
 
-This keeps updates simple:
+這讓更新流程保持簡單：
 
-- Update the canonical repo.
-- Validate linked updates.
-- Commit and push.
-- Re-read updated entries after push.
-- Let future sessions read the canonical repo instead of refreshing copied packages.
+- 更新 canonical repo。
+- 驗證 linked updates。
+- Commit 並 push。
+- Push 後讀回更新入口。
+- 讓未來 sessions 直接讀 canonical repo，而不是刷新 copied packages。
 
-## Compatibility Layers
+## 相容層
 
-Use compatibility layers only when the active tool cannot reliably reference the central repo or needs native scan behavior.
+只有 active tool 無法可靠 reference central repo，或需要 native scan behavior 時，才使用 compatibility layers。
 
-| Strategy | When to use | Close-loop rule |
+| Strategy | 使用時機 | Close-loop rule |
 | --- | --- | --- |
-| Reference-first | Default for normal agent work. | No tool mirror sync required. Confirm the canonical repo is current and readable. |
-| Symlink / bundle bridge | A tool needs native skill discovery, but local paths can point back to `<AI_SKILL_REPO>`. | Sync only when this bridge is intentionally in use or explicitly requested. |
-| Copy snapshot | The tool cannot read the central repo, cannot use symlinks, or needs an offline snapshot. | Record source commit/date and refresh intentionally; do not treat the copy as source. |
+| Reference-first | 一般 agent work 的預設。 | 不需要 tool mirror sync；確認 canonical repo 是最新且可讀。 |
+| Symlink / bundle bridge | 工具需要 native skill discovery，但 local paths 可指回 `<AI_SKILL_REPO>`。 | 只有此 bridge 被有意使用或使用者明確要求時才 sync。 |
+| Copy snapshot | 工具不能讀 central repo、不能用 symlink，或需要 offline snapshot。 | 記錄 source commit/date，並有意識地 refresh；不可把 copy 當成 source。 |
 
-Tool-specific details belong in `ai-tools/`. Generic rules should say "configured tool sync" or "optional tool sync" instead of naming a single tool as the default.
+Tool-specific details 屬於 `ai-tools/`。Generic rules 應使用「configured tool sync」或「optional tool sync」，不要把單一工具寫成 default。
 
 ## Current Compatibility Inventory
 
-This inventory records the remaining compatibility surfaces that intentionally mention native scan, symlink, bundle, or copy snapshot behavior.
+本 inventory 記錄目前仍有意提到 native scan、symlink、bundle 或 copy snapshot 行為的 compatibility surfaces。
 
-| Surface | Current role | Keep while | Removal or deprecation signal |
+| Surface | 目前角色 | 保留條件 | 移除或 deprecation 信號 |
 | --- | --- | --- | --- |
-| `shared-rules/cursor-sync.md` | Cursor-specific reference/symlink/bundle/copy strategy guide. | Cursor users still need concrete setup and troubleshooting for local mirrors. | Move details fully to `ai-tools/cursor.md` or archive once Cursor workflows no longer need mirror setup guidance. |
-| `ai-tools/cursor.md` | Cursor adapter for reference-first loading, optional native skill scanning, and project/global `.cursor` paths. | Cursor remains an active tool adapter. | Keep as tool adapter; only remove copy/bundle sections when no Cursor workflow needs them. |
-| `scripts/sync-cursor-bundle.sh` | Optional symlink/bundle bridge for `~/.cursor/bundles` and `~/.cursor/skills`. | Any local setup needs Cursor native scan or bundle paths. | Deprecate when native scan workflows have a documented reference-first or symlink-free replacement. |
-| `scripts/git-hooks/post-commit` with `AI_SKILL_SYNC_CURSOR_BUNDLE=1` | Optional post-commit mirror refresh for users who explicitly opt in. | Users want automatic local mirror refresh after commits. | Remove after `sync-cursor-bundle.sh` is deprecated or no active setup exports the opt-in flag. |
-| Source/mirror guardrails in `dependency-reading.md`, `linked-updates.md`, `failure-learning-system.md`, and `failure-patterns/source-mirror-write-drift.md` | Prevent updates to `.cursor`, `~/.cursor`, bundles, or generated copies from being mistaken for source updates. | Any mirror, runtime copy, or tool deployment surface exists. | Keep even after bundle scripts are removed if any tool adapter can create runtime copies. |
+| `shared-rules/cursor-sync.md` | Cursor-specific reference/symlink/bundle/copy strategy guide。 | Cursor users 仍需要 local mirrors 的具體 setup 與 troubleshooting。 | 當 Cursor workflows 不再需要 mirror setup guidance 時，將細節完全移到 `ai-tools/cursor.md` 或 archive。 |
+| `ai-tools/cursor.md` | Cursor adapter，說明 reference-first loading、optional native skill scanning 與 project/global `.cursor` paths。 | Cursor 仍是 active tool adapter。 | 保留作為 tool adapter；只有沒有 Cursor workflow 需要 copy/bundle sections 時才移除那些段落。 |
+| `scripts/sync-cursor-bundle.sh` | `~/.cursor/bundles` 與 `~/.cursor/skills` 的 optional symlink/bundle bridge。 | 任何 local setup 仍需要 Cursor native scan 或 bundle paths。 | 當 native scan workflows 有 documented reference-first 或 symlink-free replacement 時 deprecate。 |
+| `scripts/git-hooks/post-commit` with `AI_SKILL_SYNC_CURSOR_BUNDLE=1` | 明確 opt in 的 post-commit mirror refresh。 | Users 想在 commits 後自動 refresh local mirror。 | `sync-cursor-bundle.sh` deprecated 後，或沒有 active setup export 該 opt-in flag 時移除。 |
+| `dependency-reading.md`、`linked-updates.md`、`failure-learning-system.md` 與 `failure-patterns/source-mirror-write-drift.md` 中的 source/mirror guardrails | 防止 `.cursor`、`~/.cursor`、bundles 或 generated copies 被誤認為 source updates。 | 任何 mirror、runtime copy 或 tool deployment surface 仍存在。 | 即使 bundle scripts 移除，只要 tool adapter 仍可能建立 runtime copies，就保留。 |
 
-Inventory rule: compatibility surfaces may remain, but each must say why it exists, when it is used, and that reference-first remains the default.
+Inventory rule：compatibility surfaces 可以保留，但每一項都必須說明存在原因、使用時機，並維持 `reference-first` 是預設。
 
-## Migration Roadmap
+## 遷移 Roadmap
 
-### Phase 1: Reference-First Default
+### Phase 1: Reference-first default
 
-- Keep `shared-rules/README.md` as the bootstrap index.
-- Keep tool docs clear that reference-first does not require copying or bundle sync.
-- Keep close-loop automation conservative: commit/push/readback is mandatory for canonical repository changes; tool sync is conditional.
-- Keep compatibility scripts available for users who still need symlink, bundle, or copy snapshot workflows.
+- 保持 `shared-rules/README.md` 作為 bootstrap index。
+- Tool docs 必須清楚說明 `reference-first` 不需要 copying 或 bundle sync。
+- Close-loop automation 保持保守：canonical repository changes 必須 commit/push/readback；tool sync 是條件式。
+- 保留 compatibility scripts，供仍需要 symlink、bundle 或 copy snapshot workflows 的 users 使用。
 
 ### Phase 2: Compatibility Inventory
 
-- Maintain the current compatibility inventory above when native scan, bundle, symlink, or copy snapshot references change.
-- Identify any active workflows that still depend on native tool scanning or copied skill directories.
-- Document each remaining compatibility case in the relevant `ai-tools/` file.
-- Prefer symlink or reference strategies over copy snapshots when the tool allows it.
-- Update stale docs when they make copy or bundle sync sound like the default path.
+- 當 native scan、bundle、symlink 或 copy snapshot references 改變時，維護上方 current compatibility inventory。
+- 辨識仍依賴 native tool scanning 或 copied skill directories 的 active workflows。
+- 在相關 `ai-tools/` 文件記錄每個剩餘 compatibility case。
+- 工具允許時，優先使用 symlink 或 reference strategies，而不是 copy snapshots。
+- 當 stale docs 讓 copy 或 bundle sync 看似 default path 時，更新文件。
 
 ### Phase 3: Deprecation Readiness
 
-Copy and bundle flows can be deprecated when all are true:
+所有條件成立時，copy 與 bundle flows 才可 deprecated：
 
-- Active tool docs point to reference-first as the normal path.
-- No active project workflow requires copied skill packages for day-to-day use.
-- Remaining native-scan needs are covered by symlink/reference adapters or explicitly documented exceptions.
-- Close-loop validation no longer depends on mirror refresh checks except for compatibility tests requested by the user.
-- A deprecation note and migration path exist before scripts or docs are removed.
+- Active tool docs 指向 `reference-first` 作為 normal path。
+- 沒有 active project workflow 在日常使用中需要 copied skill packages。
+- 剩餘 native-scan needs 已由 symlink/reference adapters 或明確例外處理。
+- Close-loop validation 不再依賴 mirror refresh checks，除非使用者要求 compatibility tests。
+- 移除 scripts 或 docs 前，已有 deprecation note 與 migration path。
 
 ### Phase 3 Deprecation Checklist
 
-Use this checklist before removing or archiving copy, bundle, or native-scan compatibility paths:
+移除或封存 copy、bundle 或 native-scan compatibility paths 前，使用此 checklist：
 
-| Gate | Check | Evidence |
+| Gate | 檢查 | 證據 |
 | --- | --- | --- |
-| Scope | Identify the exact surface being deprecated: copy snapshot docs, bundle sync script, post-commit hook, native-scan setup, or tool mirror path. | Affected files and owner group are listed before edits. |
-| Search | Search for required/default usage of the surface across root docs, `shared-rules/`, `ai-tools/`, `skills/`, scripts, tool rules, and failure patterns. | Search results show no required/default usage remains, or each remaining reference is explicitly compatibility-only. |
-| Replacement | Document the reference-first, symlink, or manual snapshot replacement for every remaining user workflow. | `ai-tools/` or architecture docs point to the replacement. |
-| Source boundary | Confirm no replacement treats `.cursor`, `~/.cursor`, bundles, generated files, or snapshots as canonical source. | Source/mirror guardrails remain linked from `dependency-reading.md` and failure patterns. |
-| Script behavior | If removing a script, update script docs, hooks, close-loop automation, and any environment variable examples. | `scripts/README.md` and relevant tool docs no longer reference removed commands as active paths. |
-| Validation | Run link checks, stale wording search, diff review, and close-loop dry run before commit. | Validation output or final response states what passed. |
-| Rollback | Keep enough history or migration notes for users who still need a manual compatibility path. | Deprecation note or release note explains what to use instead. |
+| Scope | 辨識要 deprecated 的確切 surface：copy snapshot docs、bundle sync script、post-commit hook、native-scan setup 或 tool mirror path。 | 編輯前列出 affected files 與 owner group。 |
+| Search | 搜尋 root docs、`shared-rules/`、`ai-tools/`、`skills/`、scripts、tool rules 與 failure patterns 中是否仍有 required/default usage。 | 搜尋結果顯示沒有 required/default usage；或剩餘引用都明確標為 compatibility-only。 |
+| Replacement | 為每個剩餘 user workflow 記錄 reference-first、symlink 或 manual snapshot replacement。 | `ai-tools/` 或 architecture docs 指向 replacement。 |
+| Source boundary | 確認 replacement 不把 `.cursor`、`~/.cursor`、bundles、generated files 或 snapshots 當成 canonical source。 | Source/mirror guardrails 仍從 `dependency-reading.md` 與 failure patterns 連到。 |
+| Script behavior | 若移除 script，同步更新 script docs、hooks、close-loop automation 與 env var examples。 | `scripts/README.md` 與相關 tool docs 不再把 removed commands 當成 active paths。 |
+| Validation | Commit 前跑 link checks、stale wording search、diff review 與 close-loop dry run。 | Validation output 或 final response 說明哪些檢查通過。 |
+| Rollback | 保留足夠 history 或 migration notes，讓仍需 manual compatibility path 的 users 可回退。 | Deprecation note 或 release note 說明替代方案。 |
 
-## Removal Criteria For Copy And Bundle Sync
+## Copy And Bundle Sync Removal Criteria
 
-Do not remove compatibility scripts solely because reference-first exists. Remove or archive them only after:
+不要只因為 `reference-first` 存在就移除 compatibility scripts。只有在下列條件完成後，才移除或 archive：
 
-1. A search confirms no required workflow instructs agents to run them by default.
-2. Tool-specific docs list any replacement strategy.
-3. Users who depend on native scanning have a symlink/reference path or an acknowledged manual snapshot path.
-4. `shared-rules/dependency-reading.md` and `shared-rules/linked-updates.md` still explain how to handle necessary tool sync without making it universal.
-5. The close-loop process has been validated without accidental source/mirror drift.
+1. 搜尋確認沒有 required workflow 預設要求 agents 執行它們。
+2. Tool-specific docs 記錄 replacement strategy。
+3. 依賴 native scanning 的 users 有 symlink/reference path，或明確承認 manual snapshot path。
+4. `shared-rules/dependency-reading.md` 與 `shared-rules/linked-updates.md` 仍說明如何處理必要 tool sync，但不把它 universal 化。
+5. Close-loop process 已驗證不會發生 accidental source/mirror drift。
 
-## Relationship To Existing Documents
+## 與既有文件的關係
 
-- `shared-rules/` remains the executable policy layer.
-- `skills/` remains the capability layer.
-- `ai-tools/` remains the tool adapter layer.
-- `scripts/` remains helper automation, not the architecture itself.
-- `.agent-goals/` remains temporary project state and is deleted when goals complete.
+- `shared-rules/` 仍是 executable policy layer。
+- `skills/` 仍是 capability layer。
+- `ai-tools/` 仍是 tool adapter layer。
+- `scripts/` 仍是 helper automation，不是 architecture 本身。
+- `.agent-goals/` 仍是 temporary project state，完成後刪除。
 
-This architecture document should be updated when the repo changes how agents load rules, how skills are discovered, how goal state is tracked, or how source/mirror boundaries are enforced.
+當 repository 改變 agent 如何載入 rules、skills 如何被 discover、goal state 如何追蹤，或 source/mirror boundaries 如何 enforcement 時，更新本 architecture document。
