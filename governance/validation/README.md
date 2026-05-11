@@ -12,6 +12,7 @@
 | Metadata | 引入或 promotion Knowledge Atom 時，確認 `metadata/schema.md` 欄位已存在。 | Candidate atom、validated atom、promoted atom。 |
 | Navigation | 應可發現新路徑時，確認 `knowledge/indexes/README.md` 可 route 到該路徑。 | Routing surfaces 與 promoted reference paths。 |
 | Generated refresh | Source 變更時，確認 summaries、graphs、registry records 是否需要 refresh、revalidate 或 downgrade。 | Source-of-truth 文件、metadata、routing registry、summaries、graphs 變更。 |
+| Knowledge runtime helper | 執行 `ruby scripts/validate-knowledge-runtime.rb` 檢查 generated surfaces。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
 | Link check | 解析 touched docs 的 Markdown links。 | Documentation changes。 |
 | Lints | 執行 touched files 可用的 lints。 | Documentation 或 code changes。 |
 | Diff review | 檢查 secrets、private hostnames、raw evidence、local absolute paths 與 unrelated changes。 | Commit 前。 |
@@ -70,6 +71,7 @@ Decision:
 
 Validation:
 - YAML parse:
+- Knowledge runtime helper:
 - Markdown links:
 - Source paths still canonical:
 - Old entrypoints still reachable:

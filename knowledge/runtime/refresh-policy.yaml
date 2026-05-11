@@ -58,6 +58,7 @@ decision_values:
 validation:
   required_checks:
     - YAML parse for generated YAML surfaces
+    - Knowledge runtime validation helper for registry, summaries and graph records
     - Markdown link check for touched docs
     - canonical source path check
     - old entrypoint reachability check when compatibility state is old-entrypoint-active

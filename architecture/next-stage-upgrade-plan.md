@@ -16,7 +16,8 @@
 - `metadata/schema.md` 已建立 Knowledge Atom metadata schema v1，可套用到第一批 atom candidates。
 - `apk-analysis` pilot migration map 已建立，並新增 `analysis/apk/`、`workflow/apk-analysis/`、`intelligence/engineering/apk-analysis/` 候選目的地。
 - 新分層流程優先策略已建立：`governance/lifecycle/`、`governance/validation/`、metadata 子規則、`runtime/routing/`、`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/`。
-- `knowledge/runtime/routing-registry.yaml` 已建立第一版 machine-readable routing registry，包含 5 筆 sample routing records。
+- `knowledge/runtime/routing-registry.yaml` 已建立第一版 machine-readable routing registry，包含 6 筆 sample routing records。
+- `scripts/validate-knowledge-runtime.rb` 已建立 deterministic validation helper，檢查 routing registry、refresh policy、summaries 與 graph records。
 - `knowledge/summaries/` 已建立第一批 4 個 Knowledge Atom summaries，覆蓋 root bootstrap、metadata schema、apk-analysis pilot 與 goal ledger boundary。
 - `knowledge/graphs/` 已建立第一批 3 個 graph records：source-boundary、metadata-navigation、apk-analysis-pilot。
 - `knowledge/runtime/refresh-policy.yaml` 已建立 generated summaries / graphs / registry refresh 流程，定義 refresh、revalidate、downgrade 與 no update needed。
@@ -25,7 +26,7 @@
 
 - 尚未建立上述分層的完整子目錄與示範遷移內容；summary / graph / runtime navigation 目前只有格式與責任邊界。
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
-- 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 registry generation / validation tooling。
+- 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 registry generation tooling；validation helper 已建立。
 - 尚未定義 multi-model routing / compression strategy。
 
 ## 核心問題
@@ -510,11 +511,12 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P2 | done | 遷移第一個 skill 作為示範 | `architecture/apk-analysis-pilot-migration.md`, `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/apk-analysis/` | 已完成 pilot map；未 bulk migrate | 舊入口仍可用，新路徑可被 reference-first 找到 |
 | P1 | done | 建立新分層運作流程 | `governance/`, `metadata/`, `runtime/routing/`, `knowledge/` | 已完成第一版流程與格式 | 舊 `skills/` 維持 source of truth，新分層可作 routing / promotion / validation surface |
 | P1 | done | 規範 active goal 與 durable roadmap 邊界 | `shared-rules/conversation-goal-ledger.md`, `shared-rules/content-layering.md`, `governance/lifecycle/README.md` | 已完成 | `.agent-goals/` 不作長期 archive；刪除 active goal 前需回寫 durable planning |
-| P1 | done | 建立 machine-readable routing registry | `knowledge/runtime/routing-registry.yaml`, `runtime/routing/README.md` | 已完成第一版 registry 與 5 筆 sample routing records | Runtime 可用結構化資料從 task intent 找到 primary source、dependencies、candidate summaries 與 validation signal |
+| P1 | done | 建立 machine-readable routing registry | `knowledge/runtime/routing-registry.yaml`, `runtime/routing/README.md` | 已完成第一版 registry 與 6 筆 sample routing records | Runtime 可用結構化資料從 task intent 找到 primary source、dependencies、candidate summaries 與 validation signal |
 | P1 | done | 建立第一批 Knowledge Atom summaries | `knowledge/summaries/` | 已完成 root bootstrap、metadata schema、apk-analysis pilot、goal ledger boundary summaries | Summaries 指向 canonical source，且不取代 source-of-truth 文件 |
 | P2 | done | 建立初版 knowledge graph records | `knowledge/graphs/` | 已完成 source-boundary、metadata-navigation、apk-analysis-pilot 三個 graph records | Graph records 描述 depends / related / preserves_entrypoint，不使用 replacement semantics |
 | P2 | done | 建立 model-aware routing / compression strategy | `models/profiles/`, `models/compression/`, `runtime/routing/README.md` | 已完成 small / large / specialized profiles 與 compression levels | Model profile 可被 runtime routing 與 summaries 引用 |
 | P2 | done | 設計 generated summaries / graph refresh 流程 | `governance/validation/`, `knowledge/runtime/refresh-policy.yaml` | 已完成 refresh / revalidate / downgrade / no update needed 流程 | Source 變更時有明確 revalidation / downgrade path |
+| P1 | done | 建立 registry / refresh validation helper | `scripts/validate-knowledge-runtime.rb`, `governance/validation/README.md`, `knowledge/runtime/README.md` | 已完成 deterministic helper | Helper 可檢查 registry、refresh policy、summaries、graphs 的必要欄位、YAML / Markdown 格式與 canonical paths |
 
 ## 最終目標
 
