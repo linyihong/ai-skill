@@ -55,6 +55,8 @@ Read-only argument override rule：若要驗證分頁、排序、語言、filter
 
 Redacted sample-targeting classifier rule：若 UI 盲抽樣本低收益，但 decrypted response 裡有可判斷樣本可用性的欄位（例如 count、availability、status、type），可新增 disabled-by-default classifier，只輸出 value class 與 item index（例如 `zero/nonzero/missing/other`），再用 UI replay 點擊候選項。不要輸出 raw id、title、body、comment、user、URL、token、完整 count 或其他內容值；文件要標明此 classifier 只是 sample targeting aid，不是資料擷取或 standalone replay parity。
 
+Articles-first live adapter smoke rule：當 APK 分析輸出要接 SDK/private adapter 並驗證真實 read-only 資料時，先選一條核心 read route 做最小 smoke（通常是 list/page 1），只把 base endpoint、該 route binding、opaque/session provider、identity readiness、signing、decrypt/plaintext boundary 設為必填。分類、詳情、留言、媒體、next-page 等 secondary routes 應是 optional follow-up，除非當前目標明確是 full route parity；不要讓 secondary binding 缺失阻塞第一條 live proof。
+
 ## 1. 先判斷流量在哪一層
 
 不要一開始就假設是 certificate pinning。先回答這些問題：
