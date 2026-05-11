@@ -33,6 +33,8 @@ Bootstrap 後仍要依任務讀 skill-specific README / WORKFLOW / TOOLS / DOCUM
 
 預設策略改成 **reference-first**：專案 `.cursor` 先放短規則或提示，要求 Agent 直接讀 `<AI_SKILL_REPO>` 裡的 shared rules 與 skill 入口。這不需要把 skill 複製進每個專案，只要該中央庫路徑對目前 Cursor 工作區可讀即可。
 
+這符合 repo-level 的 [`AI Native Operating System`](../architecture/ai-native-operating-system.md) 方向：Cursor bundle / copy snapshot 是相容層，不是預設模型。
+
 若你還需要 Cursor 的原生 skill 掃描或本機全域載入，再把中央庫對應的 `skills/<name>/`（內含 `SKILL.md` 等）用 symlink 或同步腳本放到下列其一：
 
 | 位置 | 用途 |
