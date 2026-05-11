@@ -29,6 +29,10 @@ records:
       confidence: high
       context_cost: medium
       compatibility_state: old-entrypoint-active
+    model:
+      profile: large
+      compression_level: source-backed
+      reason: Ai-skill bootstrap 和 repository close-loop 需要完整 source 與 required dependencies。
 
   - id: route.governance.durable-goal-boundary
     task_intent: 維護 active goal 與 durable roadmap goal 邊界
@@ -50,6 +54,10 @@ records:
       confidence: high
       context_cost: medium
       compatibility_state: old-entrypoint-active
+    model:
+      profile: large
+      compression_level: source-backed
+      reason: Goal 刪除與 durable planning gate 會影響 long-term state，需讀 shared rule source。
 
   - id: route.runtime.context-loading
     task_intent: 決定 runtime context loading 路線
@@ -71,6 +79,10 @@ records:
       confidence: medium
       context_cost: low
       compatibility_state: dual-reference
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: routing decision 可先用 registry、index、summary；修改 source 時再升級。
 
   - id: route.metadata.knowledge-atom-schema
     task_intent: 設計或評估 Knowledge Atom metadata
@@ -94,6 +106,10 @@ records:
       confidence: high
       context_cost: medium
       compatibility_state: new-layer-promoted
+    model:
+      profile: large
+      compression_level: source-backed
+      reason: 建立或修改 atom metadata 時需讀 schema 與子規則全文。
 
   - id: route.skill.apk-analysis
     task_intent: 執行授權 APK analysis 能力
@@ -118,3 +134,31 @@ records:
       confidence: medium
       context_cost: high
       compatibility_state: old-entrypoint-active
+    model:
+      profile: specialized
+      compression_level: source-backed
+      reason: APK analysis 需要 skill entrypoint、workflow 與 domain-specific technique routing。
+
+  - id: route.models.model-aware-routing
+    task_intent: 建立或使用 model-aware routing / compression strategy
+    primary_source: models/profiles/README.md
+    required_dependencies:
+      - models/compression/README.md
+      - runtime/routing/README.md
+      - metadata/ranking/README.md
+      - knowledge/summaries/README.md
+    candidate_sources:
+      - knowledge/runtime/README.md
+      - metadata/schema.md
+    source_of_truth_gate: design-layer-only
+    ranking_reason: models/profiles 定義 small / large / specialized 的 context loading 深度，models/compression 定義 compression levels 與 escalation rules。
+    validation_signal: Profile、compression level、primary source、deferred sources 與 validation signal 可被記錄。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost: low
+      compatibility_state: dual-reference
+    model:
+      profile: large
+      compression_level: source-backed
+      reason: 修改 model strategy 會影響 runtime routing，需讀 profiles、compression 與 routing source。

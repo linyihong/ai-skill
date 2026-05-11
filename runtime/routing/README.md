@@ -10,6 +10,7 @@ task intent
   -> knowledge/runtime/routing-registry.yaml
   -> metadata/schema.md fields
   -> metadata/ranking + confidence + compatibility
+  -> models/profiles + compression strategy
   -> source-of-truth gate
   -> selected primary source
   -> validation and readback
@@ -48,6 +49,16 @@ task intent
 5. Optional background references。
 
 使用 `../../metadata/confidence/README.md`，避免把 low-confidence candidates 當成 stable behavior。
+
+## Step 3.5: Apply Model Profile
+
+使用 `../../models/profiles/README.md` 與 `../../models/compression/README.md` 決定 context loading 深度：
+
+- `small` profile 優先使用 index、registry、summary、checklist，但不能跳過 required dependencies。
+- `large` profile 預設使用 source-backed loading，適合跨層規劃、規則更新、migration 與 close-loop 任務。
+- `specialized` profile 在 domain / tool / data format 任務中使用，但仍需遵守 shared-rule bootstrap 與 source-of-truth gate。
+
+若任務要修改 canonical source、commit / push / readback、處理 conflict、promotion 或 deprecation，必須升級到 `source-backed` 或 `graph-assisted`。
 
 ## Step 4: Apply Compatibility Gate
 

@@ -4,7 +4,7 @@
 
 ## 目前入口
 
-- [`routing-registry.yaml`](routing-registry.yaml)：第一版 machine-readable routing registry，包含 5 筆 sample routing records。
+- [`routing-registry.yaml`](routing-registry.yaml)：第一版 machine-readable routing registry，包含 6 筆 sample routing records。
 
 ## Runtime Inputs
 
@@ -16,6 +16,8 @@
 | Ranking rules | `metadata/ranking/README.md` |
 | Confidence rules | `metadata/confidence/README.md` |
 | Compatibility rules | `metadata/compatibility/README.md` |
+| Model profiles | `models/profiles/README.md` |
+| Compression strategy | `models/compression/README.md` |
 | Lifecycle and validation gates | `governance/lifecycle/README.md`, `governance/validation/README.md` |
 | Runtime routing design | `runtime/routing/README.md` |
 
@@ -31,6 +33,8 @@ Runtime view 應回答：
 | `candidate_sources` | 可選的 maps、summaries 或 atoms。 |
 | `source_of_truth_gate` | 舊 entrypoint 是否仍勝過 candidate new-layer path。 |
 | `ranking_reason` | 為什麼此 source 排第一。 |
+| `model_profile` | 建議使用 `small`、`large` 或 `specialized` profile。 |
+| `compression_level` | 建議使用 `index-only`、`summary-first`、`checklist-first`、`source-backed` 或 `graph-assisted`。 |
 | `validation_signal` | 如何確認這條 route 可安全使用。 |
 
 ## Runtime Rules
@@ -40,12 +44,13 @@ Runtime view 應回答：
 - 低成本 summary 只有在連回 canonical source 時，才可優先使用。
 - Tool mirrors 是 deployment surfaces，不是 source paths。
 - 故意延後的 sources 必須記錄為 deferred，而不是假裝不需要。
+- 任何會修改 canonical source 或需要 close-loop 的任務，都必須使用 `source-backed` 或更高讀取深度。
 
 ## 尚未實作
 
 - Automatic graph construction。
 - Generated summaries。
 - Machine-readable registry 的自動生成或驗證工具。
-- Model-aware compression output。
+- Model-aware compression output 的自動生成。
 
 這些項目會在 governance、metadata 與 routing surfaces 穩定後再推進。

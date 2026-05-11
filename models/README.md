@@ -2,6 +2,11 @@
 
 `models/` 負責「不同模型如何協作」。本層保存 model capability profile、routing strategy、compression strategy 與 prompt adaptation 的工具中立設計。
 
+## 目前入口
+
+- [`profiles/`](profiles/README.md)：定義 `small`、`large`、`specialized` model profiles 與 context loading 深度。
+- [`compression/`](compression/README.md)：定義 index-only、summary-first、checklist-first、source-backed、graph-assisted 等壓縮層級。
+
 ## 放什麼
 
 - Model capability profile 與適用任務類型。
