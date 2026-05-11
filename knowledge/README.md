@@ -7,7 +7,7 @@
 - [`indexes/`](indexes/README.md)：第一版 task intent routing table 與 navigation index format。
 - [`summaries/`](summaries/README.md)：未來 Knowledge Atom 與 source-of-truth 文件摘要格式；目前只定義格式。
 - [`graphs/`](graphs/README.md)：未來 atom、source、dependency、conflict、promotion 關係圖格式；目前只定義格式。
-- [`runtime/`](runtime/README.md)：未來 runtime-facing knowledge view 格式與邊界；目前不實作自動 runtime。
+- [`runtime/`](runtime/README.md)：runtime-facing knowledge view 格式、邊界與第一版 machine-readable routing registry。
 
 ## 放什麼
 

@@ -1,0 +1,111 @@
+registry_version: knowledge-routing/v1
+status: candidate
+owner_layer: knowledge/runtime
+source_of_truth_policy: old-entrypoint-active
+description: >
+  第一版 machine-readable routing registry。此檔只描述 routing，不取代
+  shared-rules、skills 或其他 canonical source。Agent 仍需依 required_dependencies
+  讀取必要入口與驗證規則。
+
+records:
+  - id: route.bootstrap.ai-skill
+    task_intent: 啟動或接手 Ai-skill work
+    primary_source: README.md
+    required_dependencies:
+      - shared-rules/README.md
+      - shared-rules/dependency-reading.md
+      - shared-rules/linked-updates.md
+      - shared-rules/conversation-goal-ledger.md
+    candidate_sources:
+      - knowledge/indexes/README.md
+      - runtime/routing/README.md
+    source_of_truth_gate: root-readme-and-shared-rules-active
+    ranking_reason: Root README 與 shared-rules bootstrap 是所有 Ai-skill 工作的最低共同入口。
+    validation_signal: Bootstrap required set 已讀，且 git status 已檢查。
+    metadata:
+      priority: P1
+      confidence: high
+      context_cost: medium
+      compatibility_state: old-entrypoint-active
+
+  - id: route.governance.durable-goal-boundary
+    task_intent: 維護 active goal 與 durable roadmap goal 邊界
+    primary_source: shared-rules/conversation-goal-ledger.md
+    required_dependencies:
+      - shared-rules/content-layering.md
+      - governance/lifecycle/README.md
+    candidate_sources:
+      - scripts/README.md
+      - ai-tools/cursor.md
+      - ai-tools/claude.md
+    source_of_truth_gate: shared-rule-active
+    ranking_reason: active goal 刪除條件與 durable follow-up gate 由 conversation-goal-ledger 定義。
+    validation_signal: 長期狀態已落到 durable planning 文件，且 active goal 完成後才刪除。
+    metadata:
+      priority: P1
+      confidence: high
+      context_cost: medium
+      compatibility_state: old-entrypoint-active
+
+  - id: route.runtime.context-loading
+    task_intent: 決定 runtime context loading 路線
+    primary_source: runtime/routing/README.md
+    required_dependencies:
+      - knowledge/indexes/README.md
+      - metadata/ranking/README.md
+      - metadata/confidence/README.md
+      - metadata/compatibility/README.md
+    candidate_sources:
+      - knowledge/runtime/README.md
+      - knowledge/summaries/README.md
+    source_of_truth_gate: design-layer-only
+    ranking_reason: runtime/routing 描述 task intent 到 primary source 的載入流程，metadata 子規則決定排序、信心與相容性。
+    validation_signal: Primary source、deferred sources、source-of-truth gate 與 validation signal 已可被記錄。
+    metadata:
+      priority: P1
+      confidence: medium
+      context_cost: low
+      compatibility_state: dual-reference
+
+  - id: route.metadata.knowledge-atom-schema
+    task_intent: 設計或評估 Knowledge Atom metadata
+    primary_source: metadata/schema.md
+    required_dependencies:
+      - metadata/rules/README.md
+      - metadata/ranking/README.md
+      - metadata/confidence/README.md
+      - metadata/compatibility/README.md
+    candidate_sources:
+      - knowledge/runtime/README.md
+      - knowledge/summaries/README.md
+      - knowledge/graphs/README.md
+    source_of_truth_gate: metadata-schema-active
+    ranking_reason: metadata/schema.md 定義 atom 必填欄位與 YAML 範本，子規則定義欄位如何用於 runtime routing。
+    validation_signal: 欄位可套用到第一批 atom candidates，且 Markdown links 可解析。
+    metadata:
+      priority: P2
+      confidence: high
+      context_cost: medium
+      compatibility_state: new-layer-promoted
+
+  - id: route.skill.apk-analysis
+    task_intent: 執行授權 APK analysis 能力
+    primary_source: skills/apk-analysis/SKILL.md
+    required_dependencies:
+      - skills/apk-analysis/README.md
+      - skills/apk-analysis/WORKFLOW.md
+      - shared-rules/README.md
+      - shared-rules/dependency-reading.md
+    candidate_sources:
+      - architecture/apk-analysis-pilot-migration.md
+      - analysis/apk/README.md
+      - workflow/apk-analysis/README.md
+      - intelligence/engineering/apk-analysis/README.md
+    source_of_truth_gate: old-skill-entrypoint-active
+    ranking_reason: apk-analysis 仍以 skill entrypoint 作為工具觸發與授權邊界；新分層目前只作候選目的地與 mapping。
+    validation_signal: 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost: high
+      compatibility_state: old-entrypoint-active

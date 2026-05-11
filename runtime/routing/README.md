@@ -1,12 +1,13 @@
 # Runtime Routing
 
-`runtime/routing/` defines how an agent should choose which Ai-skill knowledge to load for a task. It is a routing design layer, not executable policy.
+`runtime/routing/` 定義 agent 如何為任務選擇要載入的 Ai-skill knowledge。這是 routing design layer，不是 executable policy。
 
 ## Routing Pipeline
 
 ```text
 task intent
   -> knowledge/indexes/README.md
+  -> knowledge/runtime/routing-registry.yaml
   -> metadata/schema.md fields
   -> metadata/ranking + confidence + compatibility
   -> source-of-truth gate
@@ -16,7 +17,7 @@ task intent
 
 ## Step 1: Identify Task Intent
 
-Classify the task into a small intent before loading deep context:
+載入深層 context 前，先把任務分類成小型 intent：
 
 - Bootstrap / session takeover.
 - Skill execution.
@@ -25,50 +26,50 @@ Classify the task into a small intent before loading deep context:
 - Governance, validation, or close-loop work.
 - Tool adapter or compatibility work.
 
-If the task maps to an active `.agent-goals/` entry, use that goal as the current user-visible objective. Do not let stale goals override the latest user request.
+若任務對應 active `.agent-goals/` entry，以該 goal 作為目前 user-visible objective。不要讓 stale goal 覆蓋最新 user request。
 
 ## Step 2: Use The Knowledge Index
 
-Read `../../knowledge/indexes/README.md` and find the closest `Task intent` row.
+讀取 `../../knowledge/indexes/README.md`，找到最接近的 `Task intent` row。若需要結構化路由資料，再讀 `../../knowledge/runtime/routing-registry.yaml`。
 
-- Load `Primary source` first.
-- Load `Related sources` only when the task needs them.
-- If no row matches, fall back to root `README.md`, `shared-rules/README.md`, and the relevant layer README.
-- If the row points to a candidate path, also load the old source-of-truth entrypoint.
+- 先載入 `Primary source`。
+- 只有任務需要時才載入 `Related sources`。
+- 若沒有符合的 row，fallback 到 root `README.md`、`shared-rules/README.md` 與相關 layer README。
+- 若 row 指向 candidate path，也要載入舊 source-of-truth entrypoint。
 
 ## Step 3: Apply Metadata Ranking
 
-Use `../../metadata/ranking/README.md` to decide read order:
+使用 `../../metadata/ranking/README.md` 決定讀取順序：
 
-1. Required shared rules and safety/source/validation gates.
-2. Current source-of-truth entrypoint.
-3. Validated or stable atoms.
-4. Candidate maps and summaries.
-5. Optional background references.
+1. Required shared rules 與 safety / source / validation gates。
+2. 目前 source-of-truth entrypoint。
+3. Validated 或 stable atoms。
+4. Candidate maps 與 summaries。
+5. Optional background references。
 
-Use `../../metadata/confidence/README.md` to avoid treating low-confidence candidates as stable behavior.
+使用 `../../metadata/confidence/README.md`，避免把 low-confidence candidates 當成 stable behavior。
 
 ## Step 4: Apply Compatibility Gate
 
-Use `../../metadata/compatibility/README.md` and `../../governance/lifecycle/README.md`:
+使用 `../../metadata/compatibility/README.md` 與 `../../governance/lifecycle/README.md`：
 
-- If old `skills/` or `shared-rules/` source remains active, it wins over candidate new-layer content.
-- If a new layer path is only a candidate map, it can guide discovery but cannot override behavior.
-- If a promoted atom exists, confirm old links still resolve before relying on it as a replacement.
+- 若舊 `skills/` 或 `shared-rules/` source 仍 active，它優先於 candidate new-layer content。
+- 若 new layer path 只是 candidate map，它可引導 discovery，但不可覆蓋 behavior。
+- 若已有 promoted atom，依賴它作 replacement 前，先確認 old links 仍可解析。
 
 ## Step 5: Validate The Route
 
-Before acting on a routed source, confirm:
+依 routed source 行動前，確認：
 
-- The source is canonical, not a tool mirror.
-- Required dependencies have been read or marked not applicable.
-- The old entrypoint is preserved when migration is in progress.
-- The selected source gives a clear validation signal.
-- The final response or commit can explain what was loaded and what was deferred.
+- Source 是 canonical，不是 tool mirror。
+- Required dependencies 已讀，或已標 not applicable。
+- Migration 進行中時，old entrypoint 仍被保留。
+- 選定 source 提供清楚 validation signal。
+- Final response 或 commit 能說明載入了什麼、延後了什麼。
 
 ## Runtime Output Shape
 
-For important routing decisions, report briefly:
+重要 routing decision 可簡短回報：
 
 ```text
 Task intent:
@@ -81,10 +82,10 @@ Validation signal:
 
 ## Stop Conditions
 
-Stop loading more sources when:
+符合下列情況時停止載入更多 sources：
 
-- The primary source answers the current decision.
-- More context would duplicate the same source-of-truth.
-- A candidate path would conflict with an active skill entrypoint.
-- Required validation fails.
-- The user changes the task priority.
+- Primary source 已回答目前決策。
+- 更多 context 只會重複同一 source-of-truth。
+- Candidate path 會與 active skill entrypoint 衝突。
+- Required validation 失敗。
+- User 改變任務優先序。

@@ -1,12 +1,17 @@
 # Knowledge Runtime Surfaces
 
-`knowledge/runtime/` defines the future runtime-facing view of knowledge indexes, summaries, graphs, and metadata. During the current phase, this directory defines format and boundaries only; no automated runtime is implemented here.
+`knowledge/runtime/` 定義給 runtime 使用的 knowledge view：如何從 task intent 找到 primary source、required dependencies、candidate sources、source-of-truth gate 與 validation signal。本層目前仍是文件與 registry surface，不是自動化 runtime。
+
+## 目前入口
+
+- [`routing-registry.yaml`](routing-registry.yaml)：第一版 machine-readable routing registry，包含 5 筆 sample routing records。
 
 ## Runtime Inputs
 
 | Input | Source |
 | --- | --- |
 | Task intent routing | `knowledge/indexes/README.md` |
+| Machine-readable routing registry | `knowledge/runtime/routing-registry.yaml` |
 | Atom metadata | `metadata/schema.md` |
 | Ranking rules | `metadata/ranking/README.md` |
 | Confidence rules | `metadata/confidence/README.md` |
@@ -16,31 +21,31 @@
 
 ## Runtime View Format
 
-Future runtime views should answer:
+Runtime view 應回答：
 
 | Field | Purpose |
 | --- | --- |
-| `task_intent` | What the agent is trying to do. |
-| `primary_source` | First canonical source to read. |
-| `required_dependencies` | Required shared rules, skill entries, or metadata. |
-| `candidate_sources` | Optional maps, summaries, or atoms. |
-| `source_of_truth_gate` | Whether old entrypoint still wins. |
-| `ranking_reason` | Why this source is first. |
-| `validation_signal` | How to confirm the route is safe. |
+| `task_intent` | Agent 正在嘗試完成的任務意圖。 |
+| `primary_source` | 第一個應讀的 canonical source。 |
+| `required_dependencies` | 必讀的 shared rules、skill entrypoints 或 metadata。 |
+| `candidate_sources` | 可選的 maps、summaries 或 atoms。 |
+| `source_of_truth_gate` | 舊 entrypoint 是否仍勝過 candidate new-layer path。 |
+| `ranking_reason` | 為什麼此 source 排第一。 |
+| `validation_signal` | 如何確認這條 route 可安全使用。 |
 
 ## Runtime Rules
 
-- Runtime views cannot skip required shared-rule bootstrap.
-- Runtime views cannot replace old skill behavior unless lifecycle promotion gates pass.
-- Runtime views should prefer low-cost summaries only when they link to canonical sources.
-- Runtime views must treat tool mirrors as deployment surfaces, not source paths.
-- Runtime views should record deferred sources when context is intentionally not loaded.
+- Runtime view 不得跳過 required shared-rule bootstrap。
+- Lifecycle promotion gates 通過前，runtime view 不得取代舊 skill behavior。
+- 低成本 summary 只有在連回 canonical source 時，才可優先使用。
+- Tool mirrors 是 deployment surfaces，不是 source paths。
+- 故意延後的 sources 必須記錄為 deferred，而不是假裝不需要。
 
-## Not Implemented Yet
+## 尚未實作
 
-- Automatic graph construction.
-- Generated summaries.
-- Machine-readable routing registry.
-- Model-aware compression output.
+- Automatic graph construction。
+- Generated summaries。
+- Machine-readable registry 的自動生成或驗證工具。
+- Model-aware compression output。
 
-These remain future work after the governance, metadata, and routing surfaces stabilize.
+這些項目會在 governance、metadata 與 routing surfaces 穩定後再推進。

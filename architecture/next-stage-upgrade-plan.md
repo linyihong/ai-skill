@@ -16,12 +16,13 @@
 - `metadata/schema.md` 已建立 Knowledge Atom metadata schema v1，可套用到第一批 atom candidates。
 - `apk-analysis` pilot migration map 已建立，並新增 `analysis/apk/`、`workflow/apk-analysis/`、`intelligence/engineering/apk-analysis/` 候選目的地。
 - 新分層流程優先策略已建立：`governance/lifecycle/`、`governance/validation/`、metadata 子規則、`runtime/routing/`、`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/`。
+- `knowledge/runtime/routing-registry.yaml` 已建立第一版 machine-readable routing registry，包含 5 筆 sample routing records。
 
 尚未完成的下一階段：
 
 - 尚未建立上述分層的完整子目錄與示範遷移內容；summary / graph / runtime navigation 目前只有格式與責任邊界。
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
-- 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 machine-readable routing registry。
+- 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 registry generation / validation tooling。
 - 尚未定義 multi-model routing / compression strategy。
 
 ## 核心問題
@@ -473,7 +474,7 @@ Status: `architecture/apk-analysis-pilot-migration.md` 已建立 mapping plan；
 
 ### Phase 5：Runtime / Models
 
-Status: `runtime/routing/README.md` 已建立 context routing 流程；models profile 與 model-aware compression 尚未建立。
+Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledge/runtime/routing-registry.yaml` 已建立第一版 machine-readable registry；models profile 與 model-aware compression 尚未建立。
 
 定義：
 
@@ -506,7 +507,7 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；models pr
 | P2 | done | 遷移第一個 skill 作為示範 | `architecture/apk-analysis-pilot-migration.md`, `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/apk-analysis/` | 已完成 pilot map；未 bulk migrate | 舊入口仍可用，新路徑可被 reference-first 找到 |
 | P1 | done | 建立新分層運作流程 | `governance/`, `metadata/`, `runtime/routing/`, `knowledge/` | 已完成第一版流程與格式 | 舊 `skills/` 維持 source of truth，新分層可作 routing / promotion / validation surface |
 | P1 | done | 規範 active goal 與 durable roadmap 邊界 | `shared-rules/conversation-goal-ledger.md`, `shared-rules/content-layering.md`, `governance/lifecycle/README.md` | 已完成 | `.agent-goals/` 不作長期 archive；刪除 active goal 前需回寫 durable planning |
-| P1 | pending | 建立 machine-readable routing registry | `knowledge/runtime/` 或 `runtime/routing/` | 定義第一版 registry 格式與 3-5 筆 sample routing records | Runtime 可用結構化資料從 task intent 找到 primary source、dependencies、candidate summaries 與 validation signal |
+| P1 | done | 建立 machine-readable routing registry | `knowledge/runtime/routing-registry.yaml`, `runtime/routing/README.md` | 已完成第一版 registry 與 5 筆 sample routing records | Runtime 可用結構化資料從 task intent 找到 primary source、dependencies、candidate summaries 與 validation signal |
 | P1 | pending | 建立第一批 Knowledge Atom summaries | `knowledge/summaries/` | 選 root bootstrap、metadata schema、apk-analysis pilot、goal ledger boundary 作 sample summaries | Summaries 指向 canonical source，且不取代 source-of-truth 文件 |
 | P2 | pending | 建立初版 knowledge graph records | `knowledge/graphs/` | 先建立 source-boundary、metadata-navigation、apk-analysis-pilot 三個 graph records | Graph records 描述 depends / related / preserves_entrypoint，不使用 replacement semantics |
 | P2 | pending | 建立 model-aware routing / compression strategy | `models/`, `runtime/` | 定義 small / large model 的 context loading 深度與壓縮策略 | Model profile 可被 runtime routing 與 summaries 引用 |
