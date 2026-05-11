@@ -22,6 +22,7 @@
 - `shared-rules/failure-learning-system.md` 與 `shared-rules/feedback-lessons.md` 仍是可執行規則。
 - `intelligence/` 承接成熟的工程智慧。
 - `governance/` 定義 promotion、deprecation 與 validation lifecycle。
+- `knowledge/runtime/sqlite/` 可索引冷 feedback lessons，協助低 token 查找；lesson 全文仍留在 `skills/*/feedback_history/`。
 
 ## 目前入口
 

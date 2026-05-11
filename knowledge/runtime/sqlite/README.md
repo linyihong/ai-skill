@@ -62,6 +62,16 @@ SQLite records 至少保留：
 - SQLite query helper 預設只輸出 top candidates，不輸出大量全文。
 - 若 SQLite index stale，agent 必須回到 canonical sources，並依 `refresh-policy.yaml` 判斷是否 regenerate。
 
+## Cold Data Archive Role
+
+SQLite / FTS 是 cold feedback lesson 與 runtime navigation 的查找層。當 lesson 數量增加、或 agent 只需要候選列表而不需要讀全文時，先查 SQLite：
+
+```bash
+ruby scripts/query-runtime-index.rb "<keyword>" --limit 5
+```
+
+查詢結果仍只是 candidate list。需要 promotion、debug、failure learning、修改 lesson 或高信心判斷時，必須讀回 `source_path` 指向的 Markdown / YAML。
+
 ## Tooling
 
 | Tool | Role |

@@ -41,6 +41,40 @@ Before deleting an active `.agent-goals/` entry, confirm that any remaining road
 | `promoted` | New layer becomes a supported reference path. | Old entrypoint links to promoted atom, index routes to both when needed. | Deleting compatibility path without deprecation. |
 | `deprecated` | Old path is being retired with a replacement. | Deprecation note, replacement link, validation record. | Breaking existing links or tool loading. |
 
+## Cold Data Archive
+
+Cold data archive 是 lifecycle / runtime compression 策略，不是把知識搬離 Markdown。當 lesson、summary 或 graph 數量成長到 agent 每次都需要掃大量冷資料時，應先建立 generated summary、SQLite / FTS lookup cache 或 report view，讓 agent 先查候選 source，再按需讀全文。
+
+### Trigger Thresholds
+
+符合任一條件時，應啟動 cold-data archive / generated lookup 檢查：
+
+| Trigger | Action |
+| --- | --- |
+| 單一 skill 的 `feedback_history/` 超過約 50 條 lesson，或單一 category 超過約 20 條。 | 產生或更新 category index、summary rows 與 SQLite / FTS index。 |
+| Agent 為了找 lesson 需要讀多個 `feedback_history` README 或大量 lesson 全文。 | 先用 SQLite / FTS query 找候選 `source_path`，再讀 1-3 個 canonical files。 |
+| 某批 lesson 長期未修改，但仍可能被 routing / promotion 使用。 | 標為 cold lookup candidate，保留 Markdown source，產生短 summary / tags / validation signal。 |
+| feedback lesson 被 promotion 到 `workflow/`、`intelligence/`、`shared-rules/` 或 runtime route。 | 保留原 lesson，更新 summary / graph / registry / SQLite lookup。 |
+| 查詢成本高於判斷成本，例如只需要知道「有哪些相關 lesson」。 | 使用 generated report / SQLite index，不讀全文。 |
+
+### Rules
+
+- Canonical source 仍是 `skills/*/feedback_history/*.md`、`shared-rules/`、`knowledge/summaries/`、`knowledge/graphs/` 與 routing registry。
+- SQLite / FTS、generated summaries、runtime reports 都是 generated lookup views；可刪除、可重建，不作唯一來源。
+- Cold archive 不等於 deprecated。冷資料仍可能有效，只是預設不讀全文。
+- 需要修改、promotion、debug、failure learning 或高信心判斷時，必須回到 canonical Markdown / YAML。
+- 若 generated lookup 與 source 不一致，降級 lookup confidence 並重新產生，不要改 source 去迎合 cache。
+
+### Validation
+
+Cold-data archive 啟用或更新後，至少驗證：
+
+1. Generated lookup 可從 clean checkout 重建。
+2. Generated DB 或 cache 不進 git，除非另有明確 governance 決策。
+3. Query result 包含 `source_path`、summary、status / confidence 與 validation signal。
+4. Query result 只作 candidate list，不跳過 source-of-truth gate。
+5. Runtime reports、SQLite counts 與 canonical summary / graph / registry counts 可交叉檢查。
+
 ## Promotion Gates
 
 A candidate can be promoted only when all gates pass:

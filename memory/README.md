@@ -22,6 +22,7 @@
 - `skills/*/feedback_history/` 仍保存 skill-specific lesson，成熟後可抽象成 memory 或 intelligence。
 - `knowledge/` 管導航與 atom；本層管記憶類型、回放與保存邊界。
 - `governance/` 管記憶 lifecycle、deprecation 與清理。
+- 冷資料查找由 `knowledge/runtime/sqlite/` 這類 generated lookup cache 處理；本層只定義哪些 historical context 值得長期保留與回放。
 
 ## 第一批候選遷移來源
 
