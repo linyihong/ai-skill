@@ -113,6 +113,7 @@ group_for_path() {
   local path="$1"
   case "${path}" in
     .cursor/rules/*|ai-tools/*) echo "tooling" ;;
+    architecture/*) echo "architecture" ;;
     shared-rules/*|README.md) echo "shared" ;;
     scripts/*) echo "scripts" ;;
     skills/apk-analysis/*) echo "apk-analysis" ;;
@@ -132,6 +133,7 @@ commit_message_for_group() {
     shared) echo "docs(shared): close skill update loop" ;;
     scripts) echo "chore(scripts): update skill close-loop automation" ;;
     tooling) echo "docs(tools): update skill tool integration guidance" ;;
+    architecture) echo "docs(architecture): define AI native operating system" ;;
     apk-analysis) echo "docs(apk): close skill guidance updates" ;;
     app-development-guidance) echo "docs(app): close guidance updates" ;;
     skill-*) echo "docs(${1#skill-}): close skill updates" ;;
@@ -141,10 +143,15 @@ commit_message_for_group() {
 
 changed_paths() {
   git status --porcelain=v1 | while IFS= read -r line; do
-    local path
+    local status path
+    status="${line:0:2}"
     path="${line:3}"
     if [[ "${path}" == *" -> "* ]]; then
       path="${path##* -> }"
+    fi
+    if [[ "${status}" == "??" && -d "${path}" ]]; then
+      git ls-files --others --exclude-standard -- "${path}"
+      continue
     fi
     printf '%s\n' "${path}"
   done
