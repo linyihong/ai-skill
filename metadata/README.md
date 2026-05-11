@@ -2,6 +2,10 @@
 
 `metadata/` 負責「知識控制系統」。本層保存 Knowledge Atom schema、ranking、confidence、compatibility 與 runtime control metadata，讓知識能被選擇、壓縮、排序、衝突仲裁與治理。
 
+## 目前入口
+
+- [`schema.md`](schema.md)：Knowledge Atom metadata schema v1，包含 required / optional fields、controlled values、YAML template 與 example atom。
+
 ## 放什麼
 
 - Knowledge Atom schema 與 required / optional fields。
@@ -26,5 +30,5 @@
 ## 第一批候選遷移來源
 
 - `architecture/next-stage-upgrade-plan.md` 的 Knowledge Atom metadata 欄位草案
-- 後續 `metadata/schema.md`
+- `metadata/schema.md`
 - `shared-rules/rule-weight.md`、`decision-efficiency.md` 中可抽象為 metadata 欄位的概念

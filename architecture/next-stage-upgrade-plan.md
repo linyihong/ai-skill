@@ -13,12 +13,13 @@
 - `.agent-goals/` 已作為 project-local active goal ledger 使用，完成後刪除，不進 git。
 - Cursor / Claude tool docs 已指向 central repository 與 shared-rule bootstrap。
 - `knowledge/indexes/README.md` 已建立第一版 task intent routing table 與索引格式。
+- `metadata/schema.md` 已建立 Knowledge Atom metadata schema v1，可套用到第一批 atom candidates。
 
 尚未完成的下一階段：
 
-- 尚未建立上述分層的完整子目錄、metadata schema、summary / graph / runtime navigation layer 與示範遷移內容。
+- 尚未建立上述分層的完整子目錄、summary / graph / runtime navigation layer 與示範遷移內容。
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
-- 尚未建立 Knowledge Atom metadata schema。
+- 尚未建立 ranking、confidence、compatibility 等 metadata 子規則。
 - 尚未建立可供 runtime 使用的 indexes、summaries、graphs 與 routing metadata。
 - 尚未定義 multi-model routing / compression strategy。
 
@@ -428,6 +429,8 @@ metadata/
 - 第一批候選遷移來源。
 
 ### Phase 2：Metadata System
+
+Status: `metadata/schema.md` 已建立 Knowledge Atom schema v1；`metadata/rules/`、`metadata/ranking/`、`metadata/confidence/`、`metadata/compatibility/` 尚未建立。
 
 新增：
 

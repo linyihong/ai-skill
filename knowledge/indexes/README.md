@@ -6,7 +6,7 @@
 
 1. 先用任務意圖對照 [任務路由索引](#任務路由索引)。
 2. 讀取 `Primary source`，再依需要讀 `Related sources`。
-3. 若索引指向 `metadata/schema.md` 尚未完成的欄位，先使用本檔的輕量欄位，不阻塞 navigation。
+3. 若任務需要建立或評估 Knowledge Atom，使用 [`../../metadata/schema.md`](../../metadata/schema.md) 的欄位與 controlled values。
 4. 若路由產生新候選知識，先記錄在對應 source 層或 `.agent-goals/`，不要直接搬移大量內容。
 
 ## 索引欄位
@@ -31,7 +31,7 @@
 | 產出 app/API/embedded development guidance | [`../../skills/app-development-guidance/SKILL.md`](../../skills/app-development-guidance/SKILL.md) | [`../../skills/app-development-guidance/README.md`](../../skills/app-development-guidance/README.md), [`../../intelligence/README.md`](../../intelligence/README.md), [`../../workflow/README.md`](../../workflow/README.md) | `workflow/`, `intelligence/` | 使用者要把觀察、規格或反向工程成果轉成 buildable guidance 時 | BDD、contract、validation 與 checklist closure 可反查 |
 | 規劃 evidence-based travel itinerary | [`../../skills/travel-planning/SKILL.md`](../../skills/travel-planning/SKILL.md) | [`../../skills/travel-planning/README.md`](../../skills/travel-planning/README.md), [`../../workflow/README.md`](../../workflow/README.md) | `workflow/`, `intelligence/` | 使用者要求旅遊路線、交通、餐飲、住宿或行程 app 欄位時 | Current source links、營業時間、交通與可行性檢查可反查 |
 | 沉澱或修正 feedback lesson | [`../../shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md) | [`../../shared-rules/failure-learning-system.md`](../../shared-rules/failure-learning-system.md), [`../../feedback/README.md`](../../feedback/README.md), [`../../memory/README.md`](../../memory/README.md) | `feedback/`, `memory/`, `intelligence/` | 使用者指出可重用 lesson、agent failure 或需要 promotion 時 | Promotion target、linked updates、sanitization 與 validation 已檢查 |
-| 設計 Knowledge Atom metadata | [`../../metadata/README.md`](../../metadata/README.md) | [`../../architecture/next-stage-upgrade-plan.md`](../../architecture/next-stage-upgrade-plan.md), [`../README.md`](../README.md) | `metadata/`, `knowledge/` | 建立 schema、index、summary、graph 或 runtime metadata 時 | Schema 欄位能套用到第一批 atom candidates |
+| 設計 Knowledge Atom metadata | [`../../metadata/schema.md`](../../metadata/schema.md) | [`../../metadata/README.md`](../../metadata/README.md), [`../../architecture/next-stage-upgrade-plan.md`](../../architecture/next-stage-upgrade-plan.md), [`../README.md`](../README.md) | `metadata/`, `knowledge/` | 建立 schema、index、summary、graph 或 runtime metadata 時 | Schema 欄位能套用到第一批 atom candidates |
 
 ## 維護規則
 
