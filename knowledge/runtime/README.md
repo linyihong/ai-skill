@@ -5,6 +5,7 @@
 ## 目前入口
 
 - [`routing-registry.yaml`](routing-registry.yaml)：第一版 machine-readable routing registry，包含 6 筆 sample routing records。
+- [`refresh-policy.yaml`](refresh-policy.yaml)：generated summaries、graphs 與 routing registry 的 refresh / revalidate / downgrade 規則。
 
 ## Runtime Inputs
 
@@ -12,6 +13,7 @@
 | --- | --- |
 | Task intent routing | `knowledge/indexes/README.md` |
 | Machine-readable routing registry | `knowledge/runtime/routing-registry.yaml` |
+| Generated refresh policy | `knowledge/runtime/refresh-policy.yaml` |
 | Atom metadata | `metadata/schema.md` |
 | Ranking rules | `metadata/ranking/README.md` |
 | Confidence rules | `metadata/confidence/README.md` |
@@ -45,12 +47,14 @@ Runtime view 應回答：
 - Tool mirrors 是 deployment surfaces，不是 source paths。
 - 故意延後的 sources 必須記錄為 deferred，而不是假裝不需要。
 - 任何會修改 canonical source 或需要 close-loop 的任務，都必須使用 `source-backed` 或更高讀取深度。
+- Source 變更後，必須依 `refresh-policy.yaml` 判斷 summaries、graphs、routing registry 是 refresh、revalidate、downgrade 或 no update needed。
 
 ## 尚未實作
 
 - Automatic graph construction。
 - Generated summaries。
 - Machine-readable registry 的自動生成或驗證工具。
+- Generated refresh 的自動執行工具。
 - Model-aware compression output 的自動生成。
 
 這些項目會在 governance、metadata 與 routing surfaces 穩定後再推進。

@@ -60,3 +60,4 @@ status: candidate
 - Graph record 不可包含 secrets、project incident evidence、本機絕對路徑或 tool mirror source。
 - 若 source 改動，graph record 需要 revalidate 或降級 confidence。
 - Graph 只描述關係；可執行規則仍以 `shared-rules/` 與 active source-of-truth 文件為準。
+- Source、summary、registry 或 lifecycle state 改動時，依 [`../runtime/refresh-policy.yaml`](../runtime/refresh-policy.yaml) 判斷是否 refresh、revalidate 或 downgrade。

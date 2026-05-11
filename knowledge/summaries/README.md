@@ -56,3 +56,4 @@ Summaries 用來協助 agent：
 - Summary 不得包含 secrets、raw evidence、private hosts、tokens 或 local absolute paths。
 - Summary 不可把 candidate path 升格成 replacement path。
 - Source 有實質變更時，必須 revalidate 或 downgrade summary confidence。
+- Source、metadata、registry 或 graph 改動時，依 [`../runtime/refresh-policy.yaml`](../runtime/refresh-policy.yaml) 判斷是否 refresh、revalidate 或 downgrade。

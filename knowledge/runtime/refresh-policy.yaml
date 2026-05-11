@@ -1,0 +1,80 @@
+policy_version: knowledge-refresh/v1
+status: candidate
+owner_layer: knowledge/runtime
+description: >
+  定義 generated summaries、graph records 與 routing registry records 的 refresh /
+  revalidate / downgrade 規則。此政策不自動修改 source，只提供 agent close-loop
+  時的判斷與驗證格式。
+
+surfaces:
+  summaries:
+    path: knowledge/summaries/
+    refresh_when:
+      - canonical source 的責任邊界、觸發條件或 validation signal 改變
+      - summary 指向的 source path 改名、移動或 deprecated
+      - metadata confidence / lifecycle 狀態改變
+    revalidate_when:
+      - source 只有措辭修正，summary meaning 未改變
+      - links、metadata 或 roadmap 狀態更新但 source 行為不變
+    downgrade_when:
+      - source 變更後 summary 尚未重讀
+      - summary 與 source-of-truth entrypoint 出現不一致
+      - validation signal 不再可重現
+
+  graphs:
+    path: knowledge/graphs/
+    refresh_when:
+      - source / target path 新增、移除、改名或 lifecycle state 改變
+      - dependency、related、conflict、promotion 或 compatibility 關係改變
+      - graph edge type 需要從 candidate map 升級或降級
+    revalidate_when:
+      - graph target 內容更新但關係未改變
+      - routing registry 或 summary 新增 reference，但 graph 主關係仍成立
+    downgrade_when:
+      - old entrypoint 不再可讀
+      - graph 使用 replacement semantics 但 promotion gate 未通過
+      - edge validation 失敗或 target path 失效
+
+  routing_registry:
+    path: knowledge/runtime/routing-registry.yaml
+    refresh_when:
+      - knowledge/indexes/README.md 新增或修改 routing row
+      - primary source、required dependencies、candidate sources 或 source_of_truth_gate 改變
+      - model profile 或 compression strategy 改變
+    revalidate_when:
+      - candidate source 新增 summary 或 graph，但 primary source 不變
+      - roadmap status 改變但 routing decision 不變
+    downgrade_when:
+      - registry 指向 stale summary / graph
+      - required dependency 不存在或未讀
+      - YAML parse 或 schema validation 失敗
+
+decision_values:
+  - refresh_now
+  - revalidate_only
+  - downgrade_confidence
+  - no_update_needed
+
+validation:
+  required_checks:
+    - YAML parse for generated YAML surfaces
+    - Markdown link check for touched docs
+    - canonical source path check
+    - old entrypoint reachability check when compatibility state is old-entrypoint-active
+    - roadmap or durable status update when lifecycle state changes
+  close_loop:
+    - diff review
+    - close-loop dry run
+    - commit
+    - push
+    - readback
+    - clean git status
+
+output_shape:
+  changed_source:
+  affected_summaries: []
+  affected_graphs: []
+  affected_registry_records: []
+  decision:
+  validation_signal:
+  deferred_items: []

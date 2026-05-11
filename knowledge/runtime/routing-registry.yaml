@@ -6,6 +6,7 @@ description: >
   第一版 machine-readable routing registry。此檔只描述 routing，不取代
   shared-rules、skills 或其他 canonical source。Agent 仍需依 required_dependencies
   讀取必要入口與驗證規則。
+refresh_policy: knowledge/runtime/refresh-policy.yaml
 
 records:
   - id: route.bootstrap.ai-skill

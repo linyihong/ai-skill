@@ -1,25 +1,26 @@
 # Knowledge Validation Gates
 
-`governance/validation/` defines validation gates for new AI-native layer changes. It complements executable rules in `shared-rules/`; it does not replace them.
+`governance/validation/` 定義新 AI-native 分層變更的 validation gates。它補充 `shared-rules/` 的可執行規則，但不取代 shared rules。
 
-## Required Gates
+## 必要 Gates
 
-| Gate | Required check | Applies when |
+| Gate | 必要檢查 | 適用時機 |
 | --- | --- | --- |
-| Source boundary | Confirm canonical repository paths are edited, not tool mirrors or runtime copies. | Every Ai-skill writeback. |
-| Old entrypoint | Confirm old `skills/`, `shared-rules/`, `ai-tools/`, or `scripts/` entrypoints remain reachable. | Candidate maps, atom promotions, migrations. |
-| Linked updates | Check affected README, roadmap, index, metadata, and source entry files. | Any new layer path or routing change. |
-| Metadata | Confirm `metadata/schema.md` fields exist when a Knowledge Atom is introduced or promoted. | Candidate atom, validated atom, promoted atom. |
-| Navigation | Confirm `knowledge/indexes/README.md` can route to the new path when it should be discoverable. | Routing surfaces and promoted reference paths. |
-| Link check | Resolve Markdown links in touched docs. | Documentation changes. |
-| Lints | Run available lints for touched files. | Documentation or code changes. |
-| Diff review | Review for secrets, private hostnames, raw evidence, local absolute paths, and unrelated changes. | Before commit. |
-| Close-loop dry run | Run `./scripts/ai-skill-close-loop.sh` to verify dirty path grouping. | Before commit. |
-| Commit / push / readback | Commit, push, reread changed entries, and confirm clean `git status --short --branch`. | Ai-skill repository updates. |
+| Source boundary | 確認編輯的是 canonical repository paths，不是 tool mirrors 或 runtime copies。 | 每次 Ai-skill writeback。 |
+| Old entrypoint | 確認舊 `skills/`、`shared-rules/`、`ai-tools/` 或 `scripts/` entrypoints 仍可到達。 | Candidate maps、atom promotions、migrations。 |
+| Linked updates | 檢查受影響 README、roadmap、index、metadata 與 source entry files。 | 任何新 layer path 或 routing change。 |
+| Metadata | 引入或 promotion Knowledge Atom 時，確認 `metadata/schema.md` 欄位已存在。 | Candidate atom、validated atom、promoted atom。 |
+| Navigation | 應可發現新路徑時，確認 `knowledge/indexes/README.md` 可 route 到該路徑。 | Routing surfaces 與 promoted reference paths。 |
+| Generated refresh | Source 變更時，確認 summaries、graphs、registry records 是否需要 refresh、revalidate 或 downgrade。 | Source-of-truth 文件、metadata、routing registry、summaries、graphs 變更。 |
+| Link check | 解析 touched docs 的 Markdown links。 | Documentation changes。 |
+| Lints | 執行 touched files 可用的 lints。 | Documentation 或 code changes。 |
+| Diff review | 檢查 secrets、private hostnames、raw evidence、local absolute paths 與 unrelated changes。 | Commit 前。 |
+| Close-loop dry run | 執行 `./scripts/ai-skill-close-loop.sh` 確認 dirty path grouping。 | Commit 前。 |
+| Commit / push / readback | Commit、push、讀回 changed entries，並確認 `git status --short --branch` clean。 | Ai-skill repository updates。 |
 
 ## Migration Validation Checklist
 
-Use this checklist for any move from old `skills/` content into a new layer:
+任何從舊 `skills/` content 移到新分層的工作，都使用此 checklist：
 
 ```text
 Goal:
@@ -46,17 +47,47 @@ Validation:
 - Clean status:
 ```
 
+## Generated Refresh Checklist
+
+當 source-of-truth 文件、metadata、summary、graph 或 routing registry 變更時，檢查：
+
+```text
+Changed source:
+- Path:
+- Change type: source / metadata / summary / graph / registry / roadmap
+
+Generated surfaces:
+- Summaries affected:
+- Graph records affected:
+- Registry records affected:
+- Runtime docs affected:
+
+Decision:
+- Refresh now:
+- Revalidate only:
+- Downgrade confidence:
+- No update needed because:
+
+Validation:
+- YAML parse:
+- Markdown links:
+- Source paths still canonical:
+- Old entrypoints still reachable:
+- Roadmap / durable status updated:
+```
+
 ## Pass / Block Rules
 
-- If old entrypoints break, the change is blocked.
-- If metadata is missing for a promoted atom, the change remains `candidate-map` or `candidate-atom`.
-- If links fail, fix links before commit.
-- If validation cannot be run, record the blocker and do not mark the lifecycle state as promoted.
-- If a change is reference-only and no tool mirror was used, tool sync is not applicable.
+- 若 old entrypoints 失效，變更 blocked。
+- 若 promoted atom 缺 metadata，變更仍只能是 `candidate-map` 或 `candidate-atom`。
+- 若 links 失敗，commit 前必須修正。
+- 若 validation 無法執行，記錄 blocker，且不可將 lifecycle state 標為 promoted。
+- 若 generated summary / graph / registry 可能 stale，必須 refresh、revalidate 或 downgrade confidence；不可假裝仍 current。
+- 若變更是 reference-only 且未使用 tool mirror，tool sync 不適用。
 
-## Relationship To Shared Rules
+## 與 Shared Rules 的關係
 
-- Dependency reading, canonical writeback, commit / push / readback, and clean status remain governed by `shared-rules/dependency-reading.md`.
-- Linked update requirements remain governed by `shared-rules/linked-updates.md`.
-- Rule priority remains governed by `shared-rules/rule-weight.md`.
-- This file provides architecture-layer validation shape for the new knowledge system.
+- Dependency reading、canonical writeback、commit / push / readback 與 clean status 仍由 `shared-rules/dependency-reading.md` 管理。
+- Linked update requirements 仍由 `shared-rules/linked-updates.md` 管理。
+- Rule priority 仍由 `shared-rules/rule-weight.md` 管理。
+- 本檔提供新 knowledge system 的 architecture-layer validation shape。
