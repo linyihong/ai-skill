@@ -38,6 +38,17 @@ If the agent cannot determine which rule has higher weight:
 3. Choose the path that preserves safety, canonical source, validation, and the latest user goal.
 4. Ask the user only when the conflict affects scope, permissions, destructive action, or incompatible outcomes.
 
+## Common Examples
+
+| Situation | Higher-weight rule | Correct action |
+| --- | --- | --- |
+| A tool adapter says to sync a local bundle, but the current setup is reference-first. | P1 canonical writeback and P3 conditional compatibility. | Do not run bundle sync by default. Commit/push/readback the canonical repo and mark tool sync not applicable. |
+| Decision efficiency suggests reading less context, but `dependency-reading.md` requires a specific dependency. | P1 validation gate over P3 efficiency. | Read the required dependency or mark it blocked/not applicable; do not skip it for speed. |
+| A stale `.agent-goals/` entry points to old work, but the latest user message redirects the task. | P1 latest user request over stale goal context. | Update, pause, or complete the old goal and follow the latest request. |
+| A skill workflow suggests a convenient shortcut, but shared rules require sanitization or source/mirror checks. | P0 safety/source integrity over P2 skill workflow. | Apply the shared rule first; adapt the skill workflow around it. |
+| A user asks for a destructive git action while repository rules prohibit it without explicit confirmation. | P0 destructive-action safety over P1 user goal until confirmed. | Ask for explicit confirmation and explain the risk before proceeding. |
+| A compatibility script exists and is executable, but no active workflow depends on native scan or local mirrors. | P3 compatibility stays conditional. | Leave the script unused; document that reference-first is sufficient. |
+
 ## Validation
 
 Before closing work that involved rule conflicts, verify:
