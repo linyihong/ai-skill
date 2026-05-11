@@ -6,31 +6,31 @@
 
 **路徑約定：**在本機上，中央庫位置就是你心裡的 `<AI_SKILL_REPO>`（clone 所在目錄），且必須是本 repository 的 git root。`~/.cursor/skills*`、`~/.cursor/shared-rules`、`~/.cursor/bundles/*` 或專案 `.cursor/` 是工具部署 / mirror 路徑，不能取代 source repo。**請勿把真實本機絕對路徑寫進本庫任何會 commit 的文件**（含 `feedback_history`、`shared-rules`、規則範本）；對外一律用占位符 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`。
 
-## Operating Layers
+## 作業層
 
-| Layer | Path | Purpose |
+| 層級 | 路徑 | 用途 |
 | --- | --- | --- |
-| Architecture direction | [`architecture/`](architecture/) | Defines the AI-native Knowledge Operating System roadmap, compatibility inventory, and migration criteria. |
-| Shared operating rules | [`shared-rules/`](shared-rules/README.md) | Cross-skill policies for dependency reading, linked updates, validation, goal ledgers, failure learning, neutral language, and documentation boundaries. |
-| Capability modules | [`skills/`](skills/README.md) | Reusable agent capabilities, workflows, checklists, documentation templates, techniques, and feedback lessons. |
-| Tool adapters | [`ai-tools/`](ai-tools/README.md) | Tool-specific reference, symlink, bundle, hook, UI, and troubleshooting guidance. |
-| Close-loop automation | [`scripts/`](scripts/README.md) | Goal ledger helpers, conservative grouped commit/push automation, and optional tool sync bridges. |
-| Temporary goal state | `.agent-goals/` | Project-local active goal ledger; never committed and deleted after validated completion. |
+| 架構方向 | [`architecture/`](architecture/) | 定義 AI-native Knowledge Operating System roadmap、相容層盤點與遷移條件。 |
+| 共用作業規則 | [`shared-rules/`](shared-rules/README.md) | 跨 skill 的依賴讀取、連動更新、驗證、goal ledger、failure learning、語言用語與文件邊界規則。 |
+| 能力模組 | [`skills/`](skills/README.md) | 可重用 agent 能力、workflow、checklist、文件模板、techniques 與 feedback lessons。 |
+| 工具 adapter | [`ai-tools/`](ai-tools/README.md) | 工具專屬 reference、symlink、bundle、hook、UI 與 troubleshooting 指引。 |
+| 閉環自動化 | [`scripts/`](scripts/README.md) | goal ledger helper、保守分組 commit/push automation，以及可選 tool sync bridge。 |
+| 暫存目標狀態 | `.agent-goals/` | 專案本地 active goal ledger；不提交，完成並驗證後刪除。 |
 
-## Agent Operating Flow
+## Agent 作業流程
 
-1. Read this `README.md` to understand the OS layout.
-2. Load the shared-rule bootstrap from [`shared-rules/README.md`](shared-rules/README.md).
-3. Read only the task-relevant skill entry and dependencies.
-4. Track resumable work in `<PROJECT_ROOT>/.agent-goals/` when the task spans multiple steps.
-5. Edit canonical source files in `<AI_SKILL_REPO>`, not tool mirrors.
-6. Validate linked updates, commit, push, reread changed entries, and confirm clean status.
+1. 讀取本 `README.md`，先理解 OS layout。
+2. 從 [`shared-rules/README.md`](shared-rules/README.md) 載入 shared-rule bootstrap。
+3. 只讀取任務相關的 skill 入口與依賴文件。
+4. 任務跨多步驟時，在 `<PROJECT_ROOT>/.agent-goals/` 追蹤可恢復目標。
+5. 可重用知識只編輯 `<AI_SKILL_REPO>` 的 canonical source，不改 tool mirror。
+6. 驗證 linked updates，commit、push、讀回更新入口，並確認 clean status。
 
-Reference-first is the default: agents read this repository directly. Symlink, bundle, and copy snapshot flows are compatibility layers for tools that cannot reliably reference the central repo.
+`reference-first` 是預設：agent 直接讀本 repository。`symlink`、`bundle`、`copy snapshot` 只是在工具無法穩定 reference 中央庫時使用的相容層。
 
-## New Project Quickstart
+## 新專案 Quickstart
 
-Use this prompt when starting an agent in a new project:
+新專案啟動 agent 時，可直接使用這段 prompt：
 
 ```text
 Use the AI-native Knowledge Operating System.
@@ -64,9 +64,9 @@ For reusable knowledge updates, edit the canonical repository only, not .cursor,
 For repository changes, validate linked updates, commit, push, reread changed entries, and confirm clean git status.
 ```
 
-Reference-first is enough for normal use. Use symlink, bundle, or copy snapshot setup only when the active tool cannot reliably read `<AI_SKILL_REPO>` directly; tool-specific setup lives in [`ai-tools/`](ai-tools/README.md).
+一般情境只需要 `reference-first`。只有目前工具無法穩定直接讀 `<AI_SKILL_REPO>` 時，才使用 `symlink`、`bundle` 或 `copy snapshot`；工具專屬設定放在 [`ai-tools/`](ai-tools/README.md)。
 
-## Capability Modules
+## 能力模組
 
 | Skill | 用途 |
 | --- | --- |
@@ -88,15 +88,15 @@ Reference-first is enough for normal use. Use symlink, bundle, or copy snapshot 
 
 | 工具 | 文件 | 用途 |
 | --- | --- | --- |
-| Tool integrations | [`ai-tools/`](ai-tools/README.md) | 各工具如何讀取、同步與套用本知識庫；工具專屬內容集中在此。 |
+| 工具整合 | [`ai-tools/`](ai-tools/README.md) | 各工具如何讀取、同步與套用本知識庫；工具專屬內容集中在此。 |
 
 ## 預設 shared rules 載入
 
 每次開啟 agent、新 session 或接手長對話時，先讀 [`shared-rules/README.md`](shared-rules/README.md) 的 **Default Bootstrap**。它只載入索引與必讀規則；後續仍依任務讀 skill-specific workflow、tools、documentation 與其他 shared rules。
 
-## Architecture Roadmap
+## 架構 Roadmap
 
-The detailed roadmap, compatibility inventory, and removal criteria for copy/bundle sync live in [`architecture/ai-native-knowledge-operating-system.md`](architecture/ai-native-knowledge-operating-system.md). Keep executable policy in `shared-rules/`; keep tool-specific setup in `ai-tools/`.
+詳細 roadmap、相容層盤點與 copy/bundle sync 移除條件放在 [`architecture/ai-native-knowledge-operating-system.md`](architecture/ai-native-knowledge-operating-system.md)。可執行政策保留在 `shared-rules/`；工具專屬設定保留在 `ai-tools/`。
 
 ## 對話目標閉環
 
