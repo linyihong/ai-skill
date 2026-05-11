@@ -12,6 +12,7 @@
 - [`../../scripts/validate-knowledge-runtime.rb`](../../scripts/validate-knowledge-runtime.rb)：檢查 generated surfaces 的 YAML / Markdown 格式、必要欄位與 canonical path。
 - [`../../scripts/generate-knowledge-runtime-report.rb`](../../scripts/generate-knowledge-runtime-report.rb)：從 runtime surfaces 產生 deterministic report。
 - [`../../scripts/generate-model-context-report.rb`](../../scripts/generate-model-context-report.rb)：從 routing registry 的 model 欄位產生 context loading report。
+- [`../../scripts/refresh-knowledge-runtime.rb`](../../scripts/refresh-knowledge-runtime.rb)：一鍵重建 reports、SQLite index 並執行 validators。
 
 ## Runtime Inputs
 
@@ -60,6 +61,7 @@ Runtime view 應回答：
 - SQLite / FTS 只能是 generated lookup cache；查詢結果只作 candidate list，不取代 canonical Markdown / YAML。
 - 修改 registry、summaries、graphs 或 refresh policy 後，重新執行 `ruby scripts/generate-knowledge-runtime-report.rb --write`。
 - 修改 registry model 欄位、model profiles 或 compression strategy 後，重新執行 `ruby scripts/generate-model-context-report.rb --write`。
+- 修改任何 generated runtime surface 或 SQLite source inputs 後，可先執行 `ruby scripts/refresh-knowledge-runtime.rb`。
 - 修改 registry、refresh policy、summaries 或 graphs 後，執行 `ruby scripts/validate-knowledge-runtime.rb`，再做 lints、Markdown link check、close-loop dry run 與 commit / push / readback。
 
 ## 尚未實作
@@ -68,7 +70,7 @@ Runtime view 應回答：
 - Generated summaries。
 - Machine-readable registry 的自動生成工具。
 - SQLite / FTS lookup cache 的 schema 擴充、query ranking 與 stale checksum 深化。
-- Generated refresh 的自動執行工具。
+- Generated refresh 的變更偵測與 selective execution。
 - Model-aware compression output 的更細粒度生成。
 
 這些項目會在 governance、metadata 與 routing surfaces 穩定後再推進。

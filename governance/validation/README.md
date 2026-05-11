@@ -15,6 +15,7 @@
 | Runtime report generation | 執行 `ruby scripts/generate-knowledge-runtime-report.rb --write` 產生 deterministic runtime report。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
 | Model context report generation | 執行 `ruby scripts/generate-model-context-report.rb --write` 產生 model-aware context loading report。 | Routing registry model 欄位、model profiles 或 compression strategy 變更。 |
 | SQLite runtime index boundary | 執行 `ruby scripts/validate-runtime-sqlite-index.rb`，確認 SQLite / FTS 只作 generated lookup cache，DB 可重建、被 git ignore、source checksum 未 stale，且不取代 canonical source。 | SQLite generator、query helper、feedback lesson index 或 runtime lookup cache 變更。 |
+| Runtime refresh orchestration | 執行 `ruby scripts/refresh-knowledge-runtime.rb` 一鍵重建 reports / SQLite index 並跑 validators。 | 多個 generated runtime surfaces 可能同時 stale 時。 |
 | Knowledge runtime helper | 執行 `ruby scripts/validate-knowledge-runtime.rb` 檢查 generated surfaces。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
 | Link check | 解析 touched docs 的 Markdown links。 | Documentation changes。 |
 | Lints | 執行 touched files 可用的 lints。 | Documentation 或 code changes。 |
@@ -73,6 +74,7 @@ Decision:
 - No update needed because:
 
 Validation:
+- Runtime refresh orchestrator:
 - Runtime report regenerated:
 - Model context report regenerated:
 - SQLite runtime index regenerated or marked not implemented:

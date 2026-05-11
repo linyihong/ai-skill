@@ -99,6 +99,7 @@ decision_values:
 
 validation:
   required_checks:
+    - Knowledge runtime refresh orchestrator when generated surfaces may be stale
     - Runtime report generation when generated surfaces change
     - Model context report generation when routing model fields change
     - SQLite runtime index regeneration when cache tooling exists
