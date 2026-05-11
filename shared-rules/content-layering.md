@@ -7,6 +7,7 @@
 | 全庫**連動更新規則**（改一處會影響多處時要同步改哪些） | **[`linked-updates.md`](linked-updates.md)**（全庫唯一正文） |
 | 全庫**文件用語規則**（中性、低爭議、避免 AI/搜尋誤判的標題、slug、摘要與正文） | **[`neutral-language.md`](neutral-language.md)**（全庫唯一正文） |
 | 全庫**工具中立文件規則**（可重用 docs 不綁單一 IDE/agent；工具路徑、hook、UI、同步步驟放工具文件） | **[`tool-neutral-documentation.md`](tool-neutral-documentation.md)**（全庫唯一正文）；具體工具操作放 `ai-tools/<tool>.md` 或工具設定檔 |
+| 全庫**規則權重與衝突優先序**（安全/source/validation/user-goal/tool adapter/效率規則彼此衝突時如何排序） | **[`rule-weight.md`](rule-weight.md)**（全庫唯一正文） |
 | 全庫**決策效率與 context 控制規則**（先界定未知、用最高收益路線決策、避免無關讀取與 token 浪費） | **[`decision-efficiency.md`](decision-efficiency.md)**（全庫唯一正文）；skill 可保留領域專用路由表並連回此規則 |
 | 全庫**失效學習系統**（將 agent 失效分類、記錄、推廣成防呆規則與 validation gate） | **[`failure-learning-system.md`](failure-learning-system.md)**（流程正文）；可重用跨 skill 失效模式放 **[`failure-patterns/`](failure-patterns/README.md)** |
 | 全庫**文件 TODO 規則**（文件前段列出未完成、待決策、待補強、待驗證項並連回章節/goal） | **[`document-todo-list.md`](document-todo-list.md)**（全庫唯一正文）；跨文件或跨對話目標再連到 `.agent-goals/` |
