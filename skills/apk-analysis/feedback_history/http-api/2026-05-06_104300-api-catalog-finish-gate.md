@@ -49,7 +49,7 @@ API Catalog artifacts should include:
 
 - Goal: Make API list output usable for future analysis, SDK/client work, mocks, contract tests, and feature reconstruction.
 - Action: Promote API Catalog structure into `DOCUMENTATION.md`, `techniques/http-api/README.md`, `WORKFLOW.md`, `README.md`, and `SKILL.md`.
-- Validation or reference source: Compare against project-level API catalog patterns and require lints, Markdown link check, diff review, and bundle sync.
+- Validation or reference source: Compare against project-level API catalog patterns and require lints, Markdown link check, diff review, and necessary tool sync; reference-only tool usage does not require bundle sync.
 
 #### Applies When
 
