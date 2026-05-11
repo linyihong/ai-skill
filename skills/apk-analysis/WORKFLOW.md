@@ -41,6 +41,8 @@
 
 Tab / category / filter strip coverage rule：當頁面有 top tabs、category chips、search result tabs、carousel-like tabs 或任何看起來可水平滑動的分類列時，要先記錄 first viewport 的可見項、hierarchy 暴露的總數（例如「第 X 个标签，共 N 个」）、左右滑動後新增項，以及每個 reachable tab 的 `captured` / `needs capture` / `no-network-observed` 狀態。只測可見 tab 不能宣稱完整 tab 面 API 覆蓋。
 
+Post-selection lazy-load rule：選中 tab、category、filter、grid label 或 chip 後若短窗口沒有新增 feature API，不要直接判定該 UI action 沒有 API。先在已驗證 target package / feature context 下補一個低風險後續 gesture（例如列表 scroll、refresh 或 bounded wait），並把結果分成 `selection-only`、`post-selection-triggered`、`no-network-after-follow-up`。這類 replay knob 或 trigger pattern 一旦可重用，必須立即走 feedback lesson 檢查，不等專案收尾。
+
 UI evidence package validation rule：每個 screenshot / hierarchy 用於 UI-to-API 對齊前，必須驗證 foreground package / activity 屬於目標 App。若 XML package 變成 launcher、browser、Google/search、settings、permission page 或其他外部 App，該 window 要標 `external` / `invalid for target UI`，automation 應中止或記錄明確轉場；Frida 仍命中目標 PID 只能證明目標進程內事件，不能自動證明是該 UI step 觸發。對重要 feature checkpoint，package 正確後還要驗證目標 feature context（例如穩定 tab label、page title、section heading、selected tab 或 route anchor）；同 package 但跑到充值、活動、WebView 或其它 module 的 window 要標 `wrong in-app screen` / `invalid for target feature`，不可當作該 feature evidence。
 
 Checkpoint replay runner rule：同一 feature/page 需要反覆測 Frida、media、tab sweep 或 reset baseline 時，將已確認路徑固化成 replay script，並為 `launch`、目標 tab、列表、詳情、媒體區等節點提供 `--target` / checkpoint 停點。每個 checkpoint 都應截圖、dump XML、驗證 target package；如果跑歪，先修 selector、fallback coordinate、wait 或 scroll，再把後續 capture 當證據。
@@ -48,6 +50,8 @@ Checkpoint replay runner rule：同一 feature/page 需要反覆測 Frida、medi
 Post-reset window split rule：`clear app data` / reinstall 後同時需要 session recovery 與 feature API attribution 時，優先拆成「reset + startup/session recovery」與「已驗證導航後 attach feature hooks」兩個 capture window。若 Frida-from-launch 的長窗口導致外部 App、錯頁、公告、更新、WebView 或 timing drift，不要把 feature 操作硬接在同一窗口；先用 package / feature-context guard 證明 session recovery 成功，再從目標 feature checkpoint attach 低負載 hook 取得 feature API 證據。
 
 文件中要把 API 標為 `startup/preload`、`session-recovery`、`navigation`、`feature-triggered`、`cache-hydration` 或 `background/ambiguous`，避免把啟動期或預載 request 誤判成當前點擊觸發。
+
+Read-only argument override rule：若要驗證分頁、排序、語言、filter 這類 read-only 行為，但完整 UI 很難自然觸發下一頁或邊界值，優先選擇高語意函式參數覆寫的短窗口，並保留 App 自己的 session、signing、gateway 與 decrypt path。覆寫腳本必須預設短窗、輸出 schema/hash/key set，不輸出 raw token、raw signature、raw service 或 raw response value；文件要標 `app-owned signing/decrypt preserved`，不能把結果當成 standalone replay parity。
 
 ## 1. 先判斷流量在哪一層
 

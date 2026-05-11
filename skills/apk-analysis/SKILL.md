@@ -58,6 +58,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
    - Contract tests where the project has an SDK or client implementation.
 8. **Automatic skill feedback (agents)**:
    - Whenever you learn a **new reusable** technique, failure pattern, or validation rule during analysis, **write it into this skill in the same session**—do **not** wait for the user to say「記得回饋」.
+   - A project-specific implementation can still reveal a reusable technique. Treat any newly added replay-runner option, hook flag, short-window override, response-shape classifier, validation matrix row, or evidence-attribution pattern as a feedback-trigger candidate before returning to long project work or committing the project-only evidence slice.
    - Treat a user's improvement idea, reviewer comment, or question such as「這個能不能加入技巧」/「為什麼沒有觸發閉環」as an immediate feedback-trigger check. First decide whether the idea generalizes beyond the current APK; if yes, open an Ai-skill writeback transaction before continuing long project work.
    - Do not require the idea to be fully validated before writing it down. If it is plausible but not yet replay-proven, create a `candidate` or `experimental` lesson with clear validation criteria and defer promotion until evidence exists.
    - Add **one new Markdown file** under the matching [`feedback_history/<category>/`](feedback_history/) folder using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) naming + template (generalized, sanitized, with evidence and applicability). Use `feedback_history/common/` for cross-category rules. Optionally add a row to [`feedback_history/README.md`](feedback_history/README.md).
@@ -145,6 +146,8 @@ If analysis discovers a new reusable idea, or a user/reviewer suggests an improv
 4. Promote it into `WORKFLOW.md`, `TOOLS.md`, or `DOCUMENTATION.md` only after it has been validated or is clearly labeled as experimental in the lesson file.
 
 **Root-cause check when feedback did not trigger:** before patching only the missed lesson, identify whether the trigger was too implicit, the idea was wrongly treated as project-only, validation uncertainty blocked a `candidate` lesson, or the Ai-skill writeback transaction was not opened. Strengthen the correct trigger/checklist text in this skill or shared rules, then complete sync/commit/push before returning to long-running APK analysis.
+
+If the miss happened after multiple project commits, first stop the project loop, open the Ai-skill writeback transaction in the canonical source repo, and record the missed trigger class in the new lesson or rule text. Do not continue adding project captures until the reusable feedback gap is closed or explicitly deferred by the user.
 
 Do not silently overwrite prior lesson files. Add new files or add a short deprecation note in an older file pointing to the replacement.
 
