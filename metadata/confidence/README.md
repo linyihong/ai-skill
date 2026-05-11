@@ -1,56 +1,56 @@
 # Metadata Confidence
 
-`metadata/confidence/` defines how to label evidence strength for Knowledge Atoms and routing surfaces.
+`metadata/confidence/` 定義 Knowledge Atoms 與 routing surfaces 的證據強度標記方式。
 
-## Confidence Values
+## 信心值
 
-| Value | Meaning | Allowed use |
+| 值 | 意義 | 可用情境 |
 | --- | --- | --- |
-| `low` | Plausible but not yet validated in use. | Candidate maps, early summaries, untested atom proposals. |
-| `medium` | Supported by source review, link validation, or one successful use. | Navigation rows, candidate atoms, pilot maps. |
-| `high` | Repeatedly used or reviewed, with clear validation evidence. | Validated atoms, stable routing, promoted guidance. |
+| `low` | 合理但尚未在使用中驗證。 | Candidate maps、早期 summaries、尚未測試的 atom proposals。 |
+| `medium` | 已有 source review、link validation 或一次成功使用支撐。 | Navigation rows、candidate atoms、pilot maps。 |
+| `high` | 已重複使用或 review，且有清楚 validation evidence。 | Validated atoms、stable routing、promoted guidance。 |
 
-## Status Relationship
+## 與狀態的關係
 
-| Lifecycle status | Minimum confidence | Notes |
+| Lifecycle status | 最低 confidence | 備註 |
 | --- | --- | --- |
-| `temporary` | `low` | Short-lived or project-local; do not index as durable. |
-| `candidate` | `low` | Can be routed if labeled as candidate. |
-| `validated` | `medium` | Requires a real use, review, or explicit validation record. |
-| `stable` | `high` | Requires repeated use or strong review evidence. |
-| `deprecated` | any | Must include replacement or reason. |
+| `temporary` | `low` | 短期或 project-local；不要當作 durable knowledge 索引。 |
+| `candidate` | `low` | 可被 routing 使用，但必須標明 candidate。 |
+| `validated` | `medium` | 需要真實使用、review 或明確 validation record。 |
+| `stable` | `high` | 需要重複使用或強 review evidence。 |
+| `deprecated` | any | 必須附 replacement 或 reason。 |
 
-## Evidence Signals
+## 證據信號
 
-Confidence can increase when:
+符合下列情況時，confidence 可以提高：
 
-- Markdown links and source paths resolve.
-- The atom was used in a completed task.
-- A reviewer or user accepted the guidance.
-- A test, fixture, lint, link check, or close-loop validation passed.
-- The atom remains aligned with old source-of-truth entrypoints after a skill update.
+- Markdown links 與 source paths 可解析。
+- Atom 已在完成的任務中使用。
+- Reviewer 或 user 接受此 guidance。
+- Test、fixture、lint、link check 或 close-loop validation 通過。
+- 舊 source-of-truth entrypoints 更新後，此 atom 仍保持對齊。
 
-Confidence should stay low when:
+符合下列情況時，confidence 應保持低：
 
-- The atom is only a planning guess.
-- The old skill is still changing and no synchronization rule exists.
-- Validation is missing or blocked.
-- The guidance depends on project-specific evidence that has not been generalized.
+- Atom 只是 planning guess。
+- 舊 skill 仍在變動，且尚無 synchronization rule。
+- Validation 缺失或 blocked。
+- Guidance 依賴尚未泛化的 project-specific evidence。
 
-## Downgrade Conditions
+## 降級條件
 
-Downgrade or mark stale when:
+符合下列情況時，降級或標示 stale：
 
-- Old `skills/` source changes and the atom has not been rechecked.
-- Links break.
-- A conflict appears with `shared-rules/` or source-of-truth skill behavior.
-- A candidate path is mistaken for a replacement path.
+- 舊 `skills/` source 已變更，而 atom 尚未重新檢查。
+- Links 失效。
+- 與 `shared-rules/` 或 source-of-truth skill behavior 出現衝突。
+- Candidate path 被誤認為 replacement path。
 
-## Validation
+## 驗證
 
-Every atom with `confidence: high` should include or link to:
+每個 `confidence: high` 的 atom 應包含或連到：
 
-- The source path.
-- The validation method.
-- The last known lifecycle state.
-- Any compatibility or deprecation note.
+- Source path。
+- Validation method。
+- Last known lifecycle state。
+- Compatibility 或 deprecation note。

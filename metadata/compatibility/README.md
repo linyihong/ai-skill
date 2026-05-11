@@ -1,50 +1,50 @@
 # Metadata Compatibility
 
-`metadata/compatibility/` defines how new knowledge layers preserve existing skill, shared-rule, tool, and script behavior while migration is in progress.
+`metadata/compatibility/` 定義 migration 進行中時，新知識分層如何保留既有 skill、shared-rule、tool 與 script 行為。
 
-## Compatibility Fields
+## 相容性欄位
 
-Use these `metadata/schema.md` fields to express compatibility:
+使用 `metadata/schema.md` 的下列欄位描述相容性：
 
-| Field | Use |
+| 欄位 | 用途 |
 | --- | --- |
-| `source_path` | Canonical old source path that remains authoritative. |
-| `depends` | Required old entrypoints or shared rules. |
-| `related` | Candidate new layer paths or supporting references. |
-| `replaces` | Only set after promotion or deprecation approval. |
-| `conflicts` | Potential rule or entrypoint conflicts that require resolution. |
-| `governance_notes` | Migration state, compatibility notes, or deprecation requirements. |
+| `source_path` | 仍具權威性的 canonical old source path。 |
+| `depends` | 必須先讀的 old entrypoints 或 shared rules。 |
+| `related` | Candidate new layer paths 或 supporting references。 |
+| `replaces` | 只有 promotion 或 deprecation approval 後才可填寫。 |
+| `conflicts` | 需要解決的潛在 rule 或 entrypoint conflicts。 |
+| `governance_notes` | Migration state、compatibility notes 或 deprecation requirements。 |
 
-## Compatibility States
+## 相容性狀態
 
-| State | Meaning |
+| 狀態 | 意義 |
 | --- | --- |
-| `old-entrypoint-active` | Existing `skills/` or `shared-rules/` source remains active. |
-| `dual-reference` | Old entrypoint and new layer path are both linked for discovery. |
-| `new-layer-promoted` | New layer path is supported, but old path still resolves. |
-| `deprecation-planned` | Old path has replacement and deprecation note, but still exists. |
-| `old-entrypoint-retired` | Old path is removed or archived after validation and replacement. |
+| `old-entrypoint-active` | 既有 `skills/` 或 `shared-rules/` source 仍是 active。 |
+| `dual-reference` | Old entrypoint 與 new layer path 都已連結，供 discovery 使用。 |
+| `new-layer-promoted` | New layer path 已受支援，但 old path 仍可解析。 |
+| `deprecation-planned` | Old path 已有 replacement 與 deprecation note，但仍存在。 |
+| `old-entrypoint-retired` | Old path 在 validation 與 replacement 後已移除或封存。 |
 
-## Required Compatibility Notes
+## 必要相容性備註
 
-For any candidate map or promoted atom, record:
+任何 candidate map 或 promoted atom 都要記錄：
 
-- Old entrypoint.
-- New reference path.
-- Whether old entrypoint remains active.
-- Whether tool-specific discovery still depends on the old path.
-- What validation proves links and routing still work.
+- Old entrypoint。
+- New reference path。
+- Old entrypoint 是否仍 active。
+- Tool-specific discovery 是否仍依賴 old path。
+- 哪些 validation 證明 links 與 routing 仍可運作。
 
-## Blocking Conditions
+## 阻塞條件
 
-Do not promote or deprecate when:
+符合下列情況時，不可 promote 或 deprecate：
 
-- A tool still loads only the old skill path and no adapter exists.
-- The old entrypoint was not read after the change.
-- `knowledge/indexes/README.md` points only to a candidate path and omits the active source.
-- A shared rule says the old source is canonical and no rule update has been made.
-- Link check or close-loop validation fails.
+- 某工具仍只能載入 old skill path，且沒有 adapter。
+- 變更後尚未讀回 old entrypoint。
+- `knowledge/indexes/README.md` 只指向 candidate path，卻漏掉 active source。
+- Shared rule 指明 old source 是 canonical，且未同步更新規則。
+- Link check 或 close-loop validation 失敗。
 
-## Reference-First Default
+## Reference-First 預設
 
-Compatibility metadata should prefer direct canonical repository references. Tool mirrors, bundles, copied snapshots, and local runtime paths are deployment surfaces, not source paths.
+Compatibility metadata 應優先使用 direct canonical repository references。Tool mirrors、bundles、copied snapshots 與 local runtime paths 都是部署面，不是 source paths。

@@ -1,54 +1,54 @@
 # Metadata Ranking
 
-`metadata/ranking/` defines how agents should prioritize candidate Knowledge Atoms and source files during context loading.
+`metadata/ranking/` 定義 agent 在 context loading 時，如何排序 candidate Knowledge Atoms 與 source files。
 
-## Ranking Inputs
+## 排序輸入
 
-Use these fields from `metadata/schema.md`:
+使用 `metadata/schema.md` 的下列欄位：
 
-| Field | Ranking effect |
+| 欄位 | 排序效果 |
 | --- | --- |
-| `priority` | Higher priority loads first: `P0`, `P1`, `P2`, `P3`. |
-| `status` | Prefer `stable` and `validated` over `candidate`; avoid `deprecated` unless needed for compatibility. |
-| `confidence` | Prefer `high`, then `medium`, then `low` when the task allows choice. |
-| `context_cost` | Prefer lower cost when two sources answer the same question. |
-| `depends` | Load required dependencies before the atom. |
-| `conflicts` | Pause and resolve conflict when ranking would load incompatible atoms. |
-| `when_to_read` | Only rank an atom after its trigger condition matches the task. |
+| `priority` | 高優先序先載入：`P0`、`P1`、`P2`、`P3`。 |
+| `status` | 優先 `stable` 與 `validated`，其次 `candidate`；除非為了相容性，避免載入 `deprecated`。 |
+| `confidence` | 任務允許選擇時，優先 `high`，再來 `medium`，最後 `low`。 |
+| `context_cost` | 兩個來源能回答同一問題時，優先低成本來源。 |
+| `depends` | Atom 使用前必須先載入的依賴。 |
+| `conflicts` | 若排序會載入不相容 atom，先暫停並解決衝突。 |
+| `when_to_read` | 只有觸發條件符合任務時，才把 atom 納入排序。 |
 
-## Default Ranking Order
+## 預設排序
 
-1. Required safety, source-of-truth, dependency reading, and validation rules.
-2. Latest user goal and active `.agent-goals/` state.
-3. Current source-of-truth entrypoints, especially `shared-rules/` and `skills/<name>/SKILL.md`.
-4. Validated or stable Knowledge Atoms that directly match the task intent.
-5. Candidate maps and summaries that help navigate without replacing source behavior.
-6. Examples, background references, and optional optimization notes.
+1. 必要的 safety、source-of-truth、dependency reading 與 validation rules。
+2. 最新 user goal 與 active `.agent-goals/` state。
+3. 目前 source-of-truth entrypoints，尤其是 `shared-rules/` 與 `skills/<name>/SKILL.md`。
+4. 直接符合 task intent 的 `validated` 或 `stable` Knowledge Atoms。
+5. 能協助導航、但不取代 source 行為的 candidate maps 與 summaries。
+6. Examples、background references 與 optional optimization notes。
 
-## Tie Breakers
+## 同分排序
 
-When multiple sources appear relevant:
+多個來源都相關時：
 
-- Prefer the source with the lowest semantic distance to the current decision.
-- Prefer the source that gives a concrete validation signal.
-- Prefer canonical repository paths over tool mirrors.
-- Prefer a short index or summary first only if it points to the canonical source.
-- Do not skip required dependencies to save context.
+- 優先選擇與目前決策語意距離最低的來源。
+- 優先選擇能提供具體 validation signal 的來源。
+- 優先選擇 canonical repository paths，而不是 tool mirrors。
+- 只有短 index 或 summary 指向 canonical source 時，才優先先讀短內容。
+- 不可為了節省 context 跳過 required dependencies。
 
-## Stop Conditions
+## 停止條件
 
-Stop loading more context when:
+符合下列情況時，停止載入更多 context：
 
-- The current source answers the decision point.
-- Additional sources are lower confidence or duplicate the same guidance.
-- A conflict requires rule-weight or user decision.
-- A candidate map says the old skill remains source of truth and no promotion is in scope.
+- 目前來源已回答決策點。
+- 額外來源信心更低，或只是重複同一 guidance。
+- 衝突需要 rule-weight 或 user decision。
+- Candidate map 顯示舊 skill 仍是 source of truth，且本次不在 promotion scope。
 
-## Validation
+## 驗證
 
-A ranked route is valid when the final answer or commit can state:
+排序路線有效時，final answer 或 commit 應能說明：
 
-- Which source was loaded first.
-- Which dependencies were required.
-- Which sources were deferred and why.
-- What validation signal confirmed the selected source was sufficient.
+- 先載入哪個 source。
+- 哪些 dependencies 是必讀。
+- 哪些 sources 被延後，以及原因。
+- 哪個 validation signal 證明所選 source 已足夠。

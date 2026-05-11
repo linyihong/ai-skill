@@ -13,74 +13,74 @@
 | Owner layer | `metadata/` |
 | Primary consumers | `knowledge/indexes/`, `runtime/`, `governance/` |
 
-## Required Fields
+## 必填欄位
 
 每個 Knowledge Atom candidate 至少要能填寫下列欄位。
 
-| Field | Type | Required | Purpose |
+| 欄位 | 型別 | 必填 | 用途 |
 | --- | --- | --- | --- |
-| `id` | string | yes | Stable identifier, using lowercase kebab-case. Prefer `<layer>.<domain>.<short-name>`. |
-| `title` | string | yes | Human-readable title. |
-| `type` | enum | yes | Atom type: `rule`, `workflow`, `analysis-method`, `intelligence`, `template`, `checklist`, `index`, `schema`, `tool-adapter`, `failure-pattern`, `reference`. |
-| `layer` | enum | yes | Primary layer: `analysis`, `intelligence`, `workflow`, `runtime`, `memory`, `feedback`, `models`, `governance`, `knowledge`, `metadata`, `shared-rules`, `skills`, `ai-tools`, `scripts`, `architecture`. |
-| `source_path` | string | yes | Canonical repository-relative path to the source file or directory. |
-| `summary` | string | yes | One or two sentences explaining what the atom gives an agent. |
-| `domains` | string array | yes | Domains or capabilities this atom applies to, for example `apk-analysis`, `app-development`, `travel-planning`, `repo-governance`. |
-| `tags` | string array | yes | Retrieval tags. Use lowercase kebab-case. |
-| `status` | enum | yes | Lifecycle status: `temporary`, `candidate`, `validated`, `stable`, `deprecated`. |
-| `priority` | enum | yes | Loading priority: `P0`, `P1`, `P2`, `P3`. Use the same vocabulary as goal ledger priorities. |
-| `confidence` | enum | yes | Evidence confidence: `low`, `medium`, `high`. |
-| `stability` | enum | yes | Expected change rate: `experimental`, `evolving`, `stable`, `legacy`. |
-| `context_cost` | enum | yes | Approximate read cost: `low`, `medium`, `high`. |
-| `when_to_read` | string | yes | Trigger condition for loading this atom. |
-| `validation` | string | yes | How an agent can verify the atom is current and safe to use. |
+| `id` | string | yes | 穩定識別碼，使用小寫 kebab-case；優先採 `<layer>.<domain>.<short-name>`。 |
+| `title` | string | yes | 給人讀的標題。 |
+| `type` | enum | yes | Atom 類型：`rule`、`workflow`、`analysis-method`、`intelligence`、`template`、`checklist`、`index`、`schema`、`tool-adapter`、`failure-pattern`、`reference`。 |
+| `layer` | enum | yes | 主要歸屬層：`analysis`、`intelligence`、`workflow`、`runtime`、`memory`、`feedback`、`models`、`governance`、`knowledge`、`metadata`、`shared-rules`、`skills`、`ai-tools`、`scripts`、`architecture`。 |
+| `source_path` | string | yes | canonical repository-relative source 檔案或資料夾路徑。 |
+| `summary` | string | yes | 一到兩句說明此 atom 提供 agent 什麼能力或判斷。 |
+| `domains` | string array | yes | 此 atom 適用的 domain 或 capability，例如 `apk-analysis`、`app-development`、`travel-planning`、`repo-governance`。 |
+| `tags` | string array | yes | 檢索標籤；使用小寫 kebab-case。 |
+| `status` | enum | yes | lifecycle 狀態：`temporary`、`candidate`、`validated`、`stable`、`deprecated`。 |
+| `priority` | enum | yes | 載入優先序：`P0`、`P1`、`P2`、`P3`，沿用 goal ledger vocabulary。 |
+| `confidence` | enum | yes | 證據信心：`low`、`medium`、`high`。 |
+| `stability` | enum | yes | 預期變動速度：`experimental`、`evolving`、`stable`、`legacy`。 |
+| `context_cost` | enum | yes | 近似閱讀成本：`low`、`medium`、`high`。 |
+| `when_to_read` | string | yes | 載入此 atom 的觸發條件。 |
+| `validation` | string | yes | agent 如何確認此 atom 仍然最新且可安全使用。 |
 
-## Optional Fields
+## 選填欄位
 
-Use optional fields when they improve routing, conflict handling, or model-aware loading.
+當欄位能改善 routing、衝突處理或 model-aware loading 時才填寫。
 
-| Field | Type | Purpose |
+| 欄位 | 型別 | 用途 |
 | --- | --- | --- |
-| `complexity` | enum | `low`, `medium`, `high`; helps model routing and compression strategy. |
-| `depends` | string array | Atom IDs or paths that must be read first. |
-| `related` | string array | Atom IDs or paths that may be useful but are not required. |
-| `conflicts` | string array | Atom IDs, paths, or rule categories that may conflict. |
-| `replaces` | string array | Deprecated or superseded atom IDs / paths. |
-| `models` | object | Model suitability notes, for example `small`, `large`, `specialized`. |
-| `checklist` | string array | Short checklist for low-context or small-model usage. |
-| `runtime_notes` | string | Notes for dynamic loading, compression, or orchestration. |
-| `governance_notes` | string | Lifecycle, review cadence, ownership, or deprecation notes. |
+| `complexity` | enum | `low`、`medium`、`high`；支援 model routing 與 compression strategy。 |
+| `depends` | string array | 使用此 atom 前必須先讀的 atom ID 或路徑。 |
+| `related` | string array | 可能有幫助但非必讀的 atom ID 或路徑。 |
+| `conflicts` | string array | 可能衝突的 atom ID、路徑或規則類別。 |
+| `replaces` | string array | 已 deprecated 或被取代的 atom ID / 路徑。 |
+| `models` | object | 模型適用性備註，例如 `small`、`large`、`specialized`。 |
+| `checklist` | string array | 低 context 或小模型使用的短檢查清單。 |
+| `runtime_notes` | string | dynamic loading、compression 或 orchestration 備註。 |
+| `governance_notes` | string | lifecycle、review cadence、ownership 或 deprecation 備註。 |
 
-## Controlled Values
+## 受控值
 
 ### `type`
 
-- `rule`: executable policy or operating rule.
-- `workflow`: task execution flow.
-- `analysis-method`: observation, decomposition, or extraction method.
-- `intelligence`: engineering judgment, trade-off, anti-pattern, or reusable domain knowledge.
-- `template`: reusable document or prompt template.
-- `checklist`: validation or review checklist.
-- `index`: navigation or routing index.
-- `schema`: metadata or contract schema.
-- `tool-adapter`: tool-specific execution guidance.
-- `failure-pattern`: reusable prevention pattern for known agent failures.
-- `reference`: roadmap, architecture note, or background reference.
+- `rule`：可執行政策或操作規則。
+- `workflow`：任務執行流程。
+- `analysis-method`：觀察、拆解或 extraction method。
+- `intelligence`：工程判斷、trade-off、anti-pattern 或可重用 domain knowledge。
+- `template`：可重用文件或 prompt template。
+- `checklist`：驗證或 review checklist。
+- `index`：navigation 或 routing index。
+- `schema`：metadata 或 contract schema。
+- `tool-adapter`：工具專屬執行差異。
+- `failure-pattern`：已知 agent failure 的可重用 prevention pattern。
+- `reference`：roadmap、architecture note 或背景 reference。
 
 ### `priority`
 
-- `P0`: safety, secrets, source-of-truth, data-loss, or destructive-action control.
-- `P1`: active goal closure, required bootstrap, canonical writeback, or validation gate.
-- `P2`: task-relevant workflow, domain intelligence, or migration guidance.
-- `P3`: optional optimization, cleanup, examples, or background context.
+- `P0`：safety、secrets、source-of-truth、data-loss 或 destructive-action control。
+- `P1`：active goal closure、required bootstrap、canonical writeback 或 validation gate。
+- `P2`：task-relevant workflow、domain intelligence 或 migration guidance。
+- `P3`：optional optimization、cleanup、examples 或 background context。
 
 ### `context_cost`
 
-- `low`: quick index, checklist, or short rule.
-- `medium`: focused workflow or single-purpose reference.
-- `high`: broad document, multi-section workflow, or source that should be read only when strongly relevant.
+- `low`：快速 index、checklist 或短規則。
+- `medium`：聚焦 workflow 或單一用途 reference。
+- `high`：寬泛文件、多段 workflow，或只有高度相關時才應讀取的 source。
 
-## YAML Template
+## YAML 範本
 
 ```yaml
 id:
@@ -113,7 +113,7 @@ runtime_notes:
 governance_notes:
 ```
 
-## Example Atom
+## Atom 範例
 
 ```yaml
 id: knowledge.indexes.task-routing
@@ -122,7 +122,7 @@ schema_version: knowledge-atom/v1
 type: index
 layer: knowledge
 source_path: knowledge/indexes/README.md
-summary: Routes task intents to the first canonical source an agent should read, with related sources and validation signals.
+summary: 將 task intent 導向 agent 應先讀取的 canonical source，並提供 related sources 與 validation signals。
 domains:
   - repo-governance
   - knowledge-navigation
@@ -135,8 +135,8 @@ priority: P2
 confidence: medium
 stability: evolving
 context_cost: low
-when_to_read: Use when an agent needs to find task-relevant Ai-skill knowledge without loading every skill or shared rule.
-validation: Links resolve, primary sources remain canonical, and roadmap status matches current repository structure.
+when_to_read: 當 agent 需要找到 task-relevant Ai-skill knowledge，但不應載入所有 skill 或 shared rule 時使用。
+validation: Links 可解析、primary sources 仍為 canonical，且 roadmap status 符合目前 repository structure。
 complexity: low
 depends:
   - README.md
@@ -146,20 +146,20 @@ related:
   - architecture/next-stage-upgrade-plan.md
 conflicts: []
 models:
-  small: Use the task routing table and validation signal only.
-  large: Read related sources when the task spans multiple layers.
+  small: 只使用 task routing table 與 validation signal。
+  large: 任務跨多個 layer 時讀取 related sources。
 checklist:
-  - Match task intent to a row.
-  - Read primary source first.
-  - Load related sources only when needed.
-runtime_notes: Suitable as a low-cost routing atom before deeper context loading.
-governance_notes: Update when new top-level layers, skills, or canonical entrypoints are added.
+  - 將 task intent 對應到索引列。
+  - 先讀 primary source。
+  - 只在需要時載入 related sources。
+runtime_notes: 適合作為 deeper context loading 前的低成本 routing atom。
+governance_notes: 新增 top-level layers、skills 或 canonical entrypoints 時同步更新。
 ```
 
-## Validation Rules
+## 驗證規則
 
-- `source_path` must point to a canonical repository path, not a local tool mirror.
-- `depends`, `related`, `conflicts`, and `replaces` should use atom IDs when available; repository-relative paths are acceptable during migration.
-- `summary`, `when_to_read`, and `validation` must be specific enough for an agent to decide whether to load the atom.
-- Do not use metadata to override executable shared rules. If a rule conflict exists, follow `shared-rules/rule-weight.md`.
-- Do not mark an atom `stable` until it has survived at least one real use or review with validation evidence.
+- `source_path` 必須指向 canonical repository path，不可指向 local tool mirror。
+- `depends`、`related`、`conflicts`、`replaces` 有 atom ID 時優先使用 atom ID；migration 期間可使用 repository-relative path。
+- `summary`、`when_to_read`、`validation` 必須足夠具體，讓 agent 能判斷是否需要載入此 atom。
+- 不可用 metadata 覆蓋可執行 shared rules；若規則衝突，依 `shared-rules/rule-weight.md`。
+- Atom 至少經過一次真實使用或 review，且有 validation evidence 後，才可標記為 `stable`。
