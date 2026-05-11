@@ -17,6 +17,23 @@
 | 閉環自動化 | [`scripts/`](scripts/README.md) | goal ledger helper、保守分組 commit/push automation，以及可選 tool sync bridge。 |
 | 暫存目標狀態 | `.agent-goals/` | 專案本地 active goal ledger；不提交，完成並驗證後刪除。 |
 
+## 下一階段正式分層
+
+這些 top-level directories 先定義 AI-native Knowledge Operating System 的責任邊界；目前不代表既有 `skills/`、`shared-rules/` 或 `ai-tools/` 已完成遷移。
+
+| 層級 | 路徑 | 目前用途 |
+| --- | --- | --- |
+| 分析方法 | [`analysis/`](analysis/README.md) | 觀察、拆解、pattern extraction 與分析路線。 |
+| 工程智慧 | [`intelligence/`](intelligence/README.md) | Engineering decision、trade-off、anti-pattern 與 reusable domain knowledge。 |
+| 執行流程 | [`workflow/`](workflow/README.md) | Planning、decomposition、review、orchestration 與 handoff flow。 |
+| Runtime 設計 | [`runtime/`](runtime/README.md) | Dynamic loading、context routing、context pruning 與 coordination design。 |
+| 長期記憶 | [`memory/`](memory/README.md) | Episodic/project/failure memory 的抽象化與 replay 邊界。 |
+| Feedback 演化 | [`feedback/`](feedback/README.md) | Lesson extraction、refinement、promotion 與 feedback loop。 |
+| Model 協作 | [`models/`](models/README.md) | Model capability profile、routing、compression 與 prompt adaptation。 |
+| 知識治理 | [`governance/`](governance/README.md) | Lifecycle、cleanup、splitting、validation 與 dependency maintenance design。 |
+| 知識導航 | [`knowledge/`](knowledge/README.md) | Knowledge atoms、indexes、summaries、graphs 與 runtime navigation。 |
+| 控制資料 | [`metadata/`](metadata/README.md) | Knowledge Atom schema、ranking、confidence、compatibility 與 runtime metadata。 |
+
 ## Agent 作業流程
 
 1. 讀取本 `README.md`，先理解 OS layout。
