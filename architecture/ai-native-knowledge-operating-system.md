@@ -61,6 +61,20 @@ Use compatibility layers only when the active tool cannot reliably reference the
 
 Tool-specific details belong in `ai-tools/`. Generic rules should say "configured tool sync" or "optional tool sync" instead of naming a single tool as the default.
 
+## Current Compatibility Inventory
+
+This inventory records the remaining compatibility surfaces that intentionally mention native scan, symlink, bundle, or copy snapshot behavior.
+
+| Surface | Current role | Keep while | Removal or deprecation signal |
+| --- | --- | --- | --- |
+| `shared-rules/cursor-sync.md` | Cursor-specific reference/symlink/bundle/copy strategy guide. | Cursor users still need concrete setup and troubleshooting for local mirrors. | Move details fully to `ai-tools/cursor.md` or archive once Cursor workflows no longer need mirror setup guidance. |
+| `ai-tools/cursor.md` | Cursor adapter for reference-first loading, optional native skill scanning, and project/global `.cursor` paths. | Cursor remains an active tool adapter. | Keep as tool adapter; only remove copy/bundle sections when no Cursor workflow needs them. |
+| `scripts/sync-cursor-bundle.sh` | Optional symlink/bundle bridge for `~/.cursor/bundles` and `~/.cursor/skills`. | Any local setup needs Cursor native scan or bundle paths. | Deprecate when native scan workflows have a documented reference-first or symlink-free replacement. |
+| `scripts/git-hooks/post-commit` with `AI_SKILL_SYNC_CURSOR_BUNDLE=1` | Optional post-commit mirror refresh for users who explicitly opt in. | Users want automatic local mirror refresh after commits. | Remove after `sync-cursor-bundle.sh` is deprecated or no active setup exports the opt-in flag. |
+| Source/mirror guardrails in `dependency-reading.md`, `linked-updates.md`, `failure-learning-system.md`, and `failure-patterns/source-mirror-write-drift.md` | Prevent updates to `.cursor`, `~/.cursor`, bundles, or generated copies from being mistaken for source updates. | Any mirror, runtime copy, or tool deployment surface exists. | Keep even after bundle scripts are removed if any tool adapter can create runtime copies. |
+
+Inventory rule: compatibility surfaces may remain, but each must say why it exists, when it is used, and that reference-first remains the default.
+
 ## Migration Roadmap
 
 ### Phase 1: Reference-First Default
@@ -72,6 +86,7 @@ Tool-specific details belong in `ai-tools/`. Generic rules should say "configure
 
 ### Phase 2: Compatibility Inventory
 
+- Maintain the current compatibility inventory above when native scan, bundle, symlink, or copy snapshot references change.
 - Identify any active workflows that still depend on native tool scanning or copied skill directories.
 - Document each remaining compatibility case in the relevant `ai-tools/` file.
 - Prefer symlink or reference strategies over copy snapshots when the tool allows it.
