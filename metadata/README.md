@@ -16,6 +16,7 @@
 - Ranking、priority、confidence、stability、complexity 與 context cost 規則。
 - Compatibility、model suitability、depends、related 與 conflicts metadata。
 - Runtime loading、promotion、cleanup 與 graph construction 所需的控制資料。
+- SQLite / FTS runtime index 的欄位來源，例如 `source_path`、`tags`、`priority`、`confidence`、`context_cost`、`when_to_read` 與 `validation`。
 
 ## 不放什麼
 
@@ -29,6 +30,7 @@
 - `shared-rules/rule-weight.md` 仍是目前規則衝突的可執行 policy。
 - `runtime/` 會使用本層資料做 dynamic loading 與 routing。
 - `knowledge/` 會引用本層 schema 讓 atoms 可搜尋、可排序、可治理。
+- `knowledge/runtime/sqlite/` 應從本層 schema 取得索引欄位，不另創不相容欄位語意。
 - `governance/` 使用 metadata 判斷 lifecycle、cleanup 與 validation。
 
 ## 第一批候選遷移來源

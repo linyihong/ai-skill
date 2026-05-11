@@ -77,6 +77,20 @@ surfaces:
       - report links 失效
       - report profile / compression 分組與 registry 不一致
 
+  sqlite_runtime_index:
+    path: knowledge/runtime/sqlite/
+    refresh_when:
+      - summaries、graphs、routing registry 或 feedback lesson indexes 改變
+      - metadata/schema.md 的索引欄位語意改變
+      - source_path、tags、priority、confidence、context_cost 或 validation signal 改變
+    revalidate_when:
+      - docs wording 改變但 source_path / metadata / summary meaning 未改變
+      - SQLite generator 未改變但需要確認 DB 可由 clean checkout 重建
+    downgrade_when:
+      - SQLite DB 是 stale generated cache
+      - DB row count、source path、checksum 或 FTS query result 與 canonical sources 不一致
+      - Agent 嘗試把 SQLite row 當成 canonical source
+
 decision_values:
   - refresh_now
   - revalidate_only
@@ -87,6 +101,7 @@ validation:
   required_checks:
     - Runtime report generation when generated surfaces change
     - Model context report generation when routing model fields change
+    - SQLite runtime index regeneration when cache tooling exists
     - YAML parse for generated YAML surfaces
     - Knowledge runtime validation helper for registry, summaries and graph records
     - Markdown link check for touched docs

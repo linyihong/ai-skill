@@ -8,6 +8,7 @@
 - [`summaries/`](summaries/README.md)：未來 Knowledge Atom 與 source-of-truth 文件摘要格式；目前只定義格式。
 - [`graphs/`](graphs/README.md)：未來 atom、source、dependency、conflict、promotion 關係圖格式；目前只定義格式。
 - [`runtime/`](runtime/README.md)：runtime-facing knowledge view 格式、邊界與第一版 machine-readable routing registry。
+  - [`runtime/sqlite/`](runtime/sqlite/README.md)：SQLite / FTS generated lookup cache 規劃；用於低 token 搜尋候選 source，不作 source-of-truth。
 
 ## 放什麼
 
@@ -28,6 +29,7 @@
 - `skills/` 與 `shared-rules/` 仍是目前可直接讀取的主要內容來源。
 - `metadata/` 定義 knowledge atom 的控制欄位。
 - `runtime/` 使用本層 index、summary 與 graph 做 context routing。
+- SQLite / FTS index 屬於 runtime lookup cache，應由 canonical Markdown / YAML 產生並可重建。
 - `governance/` 定義知識 lifecycle、清理與 validation。
 
 ## 第一批候選遷移來源

@@ -26,6 +26,7 @@
 - `knowledge/summaries/` 已新增 APK highest-leverage route selection summary。
 - `knowledge/graphs/` 已建立 5 個 graph records：source-boundary、metadata-navigation、apk-analysis-pilot、apk-highest-leverage-analysis、feedback-promotion-pipeline。
 - `knowledge/runtime/refresh-policy.yaml` 已建立 generated summaries / graphs / registry refresh 流程，定義 refresh、revalidate、downgrade 與 no update needed。
+- `knowledge/runtime/sqlite/README.md` 已規劃 SQLite / FTS generated lookup cache，作為低 token 搜尋候選 source 的 runtime index，不作 source-of-truth。
 
 尚未完成的下一階段：
 
@@ -33,6 +34,7 @@
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
 - 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 registry generation tooling；validation helper 與 runtime report generator 已建立。
 - Multi-model routing / compression strategy 已有第一版，並已建立第一個 model-aware context report；尚未建立 per-model prompt / checklist artifact generator。
+- 尚未實作 SQLite / FTS runtime index generator、query helper 與 stale validation；但 source-of-truth 邊界與 schema 原則已先規劃，避免後續導入時改動 feedback / knowledge / metadata 放置策略。
 
 ## 核心問題
 
@@ -342,6 +344,33 @@ knowledge/runtime/
 
 真正重要的不是知識量，而是 AI 能否找到正確知識。
 
+### SQLite / FTS Runtime Index（planned）
+
+SQLite 適合導入為 generated runtime lookup cache，用來降低 agent 在大型 Markdown / YAML repository 中的初始讀取成本。它不保存 canonical truth；只保存可重建的 index rows，讓 agent 先用 task intent、keyword、tag、layer、priority、confidence 或 context cost 找到少量 candidate sources。
+
+原則：
+
+- Canonical source 仍是 Markdown / YAML：`skills/*/feedback_history/`、`shared-rules/`、`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/routing-registry.yaml`。
+- SQLite DB 不預設 commit；commit schema、generator、query helper 與 validation tests。
+- Query result 只回傳少量 `source_path`、summary、tags、score 與 validation signal；需要執行、修改、promotion 或高信心結論時仍讀全文。
+- Feedback lessons 可以被 index，但 lesson 全文仍留在 skill-local `feedback_history/`，直到 migration policy 明確改變。
+- SQLite schema 應由 `metadata/schema.md` 與 runtime registry 控制，避免另創一套欄位語意。
+
+第一版 tooling 應規劃：
+
+```text
+knowledge/runtime/sqlite/README.md
+scripts/generate-runtime-sqlite-index.*
+scripts/query-runtime-index.*
+scripts/validate-runtime-sqlite-index.*
+```
+
+預期效益：
+
+- 用 SQLite / FTS 先縮小候選集，再讀 source，可降低 token 消耗。
+- Feedback lessons、summaries、graphs、routing registry 可用同一套 lookup path 查詢。
+- 因 DB 可重建，未來不會把 generated cache 和 canonical source 混在一起。
+
 ## Intelligence Feedback Loop
 
 系統應形成閉環：
@@ -526,6 +555,7 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P1 | done | 建立 model-aware context report generator | `scripts/generate-model-context-report.rb`, `knowledge/runtime/model-context-report.md`, `models/README.md` | 已完成 deterministic model context report | Report 可依 routing registry 的 model profile / compression level 重新產生，並通過 runtime validator 與 Markdown link check |
 | P1 | done | 建立第一個 APK engineering intelligence atom | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md`, `knowledge/summaries/apk-highest-leverage-analysis.md`, `knowledge/graphs/apk-highest-leverage-analysis.yaml` | 已完成最高收益路線 candidate intelligence atom | Old skill entrypoint remains active；runtime registry、summary、graph 與 knowledge index 可 route 到此 atom |
 | P1 | done | 建立 feedback promotion pipeline surface | `feedback/promotion/README.md`, `knowledge/summaries/feedback-promotion-pipeline.md`, `knowledge/graphs/feedback-promotion-pipeline.yaml` | 已完成 promotion / downgrade design surface | Lesson source 保留於 `feedback_history/`；runtime registry、summary、graph 與 knowledge index 可 route 到 promotion pipeline |
+| P1 | planned | 規劃 SQLite / FTS runtime index | `knowledge/runtime/sqlite/README.md`, `architecture/next-stage-upgrade-plan.md` | 已規劃 source-of-truth 邊界與 schema 原則；尚未實作 generator | SQLite 作為 generated lookup cache，不提交 DB binary；feedback lessons 只被索引，不搬離 `feedback_history/` |
 
 ## 最終目標
 
