@@ -98,6 +98,8 @@ For repository changes, validate linked updates, commit, push, reread changed en
 
 詳細 roadmap、相容層盤點與 copy/bundle sync 移除條件放在 [`architecture/ai-native-knowledge-operating-system.md`](architecture/ai-native-knowledge-operating-system.md)。可執行政策保留在 `shared-rules/`；工具專屬設定保留在 `ai-tools/`。
 
+下一階段完整升級規劃放在 [`architecture/next-stage-upgrade-plan.md`](architecture/next-stage-upgrade-plan.md)，用來規劃 `analysis/`、`intelligence/`、`workflow/`、`runtime/`、`memory/`、`feedback/`、`models/`、`governance/`、`knowledge/`、`metadata/` 等正式分層。
+
 ## 對話目標閉環
 
 若工作可能中斷、跨多輪、被多 agent 接手、拆成多個子目標、已建立 TodoWrite、使用者要求繼續前一個多步驟任務，或 agent 已看到 active project 有 modified / staged / untracked files，依 [`shared-rules/conversation-goal-ledger.md`](shared-rules/conversation-goal-ledger.md) 在業務專案本地先檢查或維護 `<PROJECT_ROOT>/.agent-goals/`。Goal 需要明確列出 priority、parallelization mode、owner/lock 決策、plan/todo links、missing/decision/strengthen、next action、completion criteria 與 validation。這是暫存狀態，不進 git；目標完成並驗證後刪除。可用 [`scripts/agent-goals.sh`](scripts/agent-goals.sh) 建立、更新、拆解、暫停與完成刪除 goal。
