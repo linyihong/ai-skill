@@ -11,6 +11,7 @@
 | [`generate-runtime-sqlite-index.rb`](generate-runtime-sqlite-index.rb) | 從 summaries、routing registry、graphs 與 feedback lessons 產生本機 SQLite / FTS lookup cache。 |
 | [`query-runtime-index.rb`](query-runtime-index.rb) | 用 keyword 查詢本機 SQLite runtime index，依 rank / priority / confidence / context cost 回傳少量 candidate source paths。 |
 | [`validate-runtime-sqlite-index.rb`](validate-runtime-sqlite-index.rb) | 驗證 SQLite runtime index 的 integrity、row counts、source paths、FTS、source checksum 與 git ignore 邊界。 |
+| [`query-knowledge-graph.rb`](query-knowledge-graph.rb) | 查詢 graph edges，支援 source / target / type / keyword filters。 |
 | [`refresh-knowledge-runtime.rb`](refresh-knowledge-runtime.rb) | 一鍵重建 model/runtime reports、SQLite index，並執行 runtime validators。 |
 | [`git-hooks/post-commit`](git-hooks/post-commit) | **可選。**在本 repo 設定 `git config core.hooksPath scripts/git-hooks` 且 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 時，**`git commit`** 後會執行 `sync-cursor-bundle.sh`。 |
 
@@ -136,6 +137,7 @@ ruby scripts/generate-runtime-sqlite-index.rb
 ruby scripts/validate-runtime-sqlite-index.rb
 ruby scripts/query-runtime-index.rb feedback --limit 5
 ruby scripts/query-runtime-index.rb feedback --layer feedback --limit 5
+ruby scripts/query-knowledge-graph.rb --type depends_on --limit 5
 ```
 
 `generate-knowledge-runtime-report.rb --write` 會更新 `knowledge/runtime/runtime-report.md`，讓 agent 可快速檢視目前 routes、summaries、graphs 與 refresh decisions。
