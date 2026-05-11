@@ -19,6 +19,7 @@ Summaries 用來協助 agent：
 | `metadata.schema.knowledge-atom` | Knowledge Atom metadata schema v1。 | [`metadata-schema.md`](metadata-schema.md) |
 | `architecture.apk-analysis-pilot` | `apk-analysis` 分層 pilot migration map。 | [`apk-analysis-pilot.md`](apk-analysis-pilot.md) |
 | `intelligence.apk-highest-leverage-analysis` | APK 分析 highest-leverage route selection engineering intelligence。 | [`apk-highest-leverage-analysis.md`](apk-highest-leverage-analysis.md) |
+| `feedback.promotion.pipeline` | Feedback lesson promotion / downgrade pipeline。 | [`feedback-promotion-pipeline.md`](feedback-promotion-pipeline.md) |
 | `governance.goal-ledger-boundary` | Active conversation goal 與 durable roadmap goal 邊界。 | [`goal-ledger-boundary.md`](goal-ledger-boundary.md) |
 
 ## Summary 格式

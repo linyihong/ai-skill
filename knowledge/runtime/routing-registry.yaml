@@ -165,6 +165,34 @@ records:
       compression_level: source-backed
       reason: APK route selection 需要 domain workflow、feedback source 與 intelligence judgment 一起判斷。
 
+  - id: route.feedback.promotion-pipeline
+    task_intent: 規劃 feedback lesson promotion 或 downgrade
+    primary_source: feedback/promotion/README.md
+    required_dependencies:
+      - shared-rules/feedback-lessons.md
+      - shared-rules/reusable-guidance-boundary.md
+      - shared-rules/sanitization.md
+      - shared-rules/failure-learning-system.md
+      - governance/lifecycle/README.md
+      - governance/validation/README.md
+    candidate_sources:
+      - knowledge/summaries/feedback-promotion-pipeline.md
+      - knowledge/graphs/feedback-promotion-pipeline.yaml
+      - feedback/README.md
+      - knowledge/runtime/refresh-policy.yaml
+    source_of_truth_gate: shared-rule-active
+    ranking_reason: feedback/promotion 描述 lesson promotion 的 durable target selection；可執行 lesson 寫作規則仍由 shared-rules/feedback-lessons.md 管理。
+    validation_signal: 原 lesson source 保留、promotion target 明確、runtime surfaces 與 close-loop validation 已同步。
+    metadata:
+      priority: P1
+      confidence: medium
+      context_cost: medium
+      compatibility_state: dual-reference
+    model:
+      profile: large
+      compression_level: source-backed
+      reason: Promotion / downgrade 會影響 shared rules、skill history、intelligence 與 runtime surfaces，需要讀 full source 與 validation gates。
+
   - id: route.models.model-aware-routing
     task_intent: 建立或使用 model-aware routing / compression strategy
     primary_source: models/profiles/README.md

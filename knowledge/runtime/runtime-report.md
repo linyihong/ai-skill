@@ -6,11 +6,11 @@
 
 | Surface | Path | Count / Status |
 | --- | --- | --- |
-| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 7 records |
+| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 8 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
-| Summaries | [`../summaries/`](../summaries/) | 5 files |
-| Graph records | [`../graphs/`](../graphs/) | 4 files |
+| Summaries | [`../summaries/`](../summaries/) | 6 files |
+| Graph records | [`../graphs/`](../graphs/) | 5 files |
 
 ## Routing Records
 
@@ -22,6 +22,7 @@
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `large` | `source-backed` | 欄位可套用到第一批 atom candidates，且 Markdown links 可解析。 |
 | `route.skill.apk-analysis` | `skills/apk-analysis/SKILL.md` | `specialized` | `source-backed` | 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。 |
 | `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md` | `specialized` | `source-backed` | 已比較可用 routes、選定 evidence-to-cost ratio 最高路線、記錄 fallback 與 attribution 回補條件。 |
+| `route.feedback.promotion-pipeline` | `feedback/promotion/README.md` | `large` | `source-backed` | 原 lesson source 保留、promotion target 明確、runtime surfaces 與 close-loop validation 已同步。 |
 | `route.models.model-aware-routing` | `models/profiles/README.md` | `large` | `source-backed` | Profile、compression level、primary source、deferred sources 與 validation signal 可被記錄。 |
 
 ## Summary Records
@@ -30,6 +31,7 @@
 | --- | --- | --- | --- |
 | `architecture.apk-analysis-pilot` | `candidate` | [`apk-analysis-pilot.md`](../summaries/apk-analysis-pilot.md) | `apk-analysis` 作為第一個 Workflow / Analysis / Intelligence 分離 pilot 的 migration map。它建立新 reference-first 候選目的地，但保留 `skills/apk-analysis/SKILL.md` 作為 active skill entrypoint。 |
 | `intelligence.apk-highest-leverage-analysis` | `candidate` | [`apk-highest-leverage-analysis.md`](../summaries/apk-highest-leverage-analysis.md) | APK 分析 checkpoint 應先界定未知，再依 time-to-evidence、語意距離、安全性與 validation clarity 選擇最高收益路線。 |
+| `feedback.promotion.pipeline` | `candidate` | [`feedback-promotion-pipeline.md`](../summaries/feedback-promotion-pipeline.md) | 定義 feedback lesson 從 skill-local history 推進到 workflow、intelligence、shared-rules、memory 或 runtime surfaces 的 promotion / downgrade gate。 |
 | `governance.goal-ledger-boundary` | `validated` | [`goal-ledger-boundary.md`](../summaries/goal-ledger-boundary.md) | `.agent-goals/` 只保存 active conversation goals；長期 roadmap、phase、migration、promotion、deprecation 與治理狀態必須落到 durable planning 文件。 |
 | `metadata.schema.knowledge-atom` | `validated` | [`metadata-schema.md`](../summaries/metadata-schema.md) | Knowledge Atom metadata schema v1，定義 atom 的必填欄位、選填欄位、受控值、YAML 範本與驗證規則。 |
 | `root.bootstrap.ai-skill` | `validated` | [`root-bootstrap.md`](../summaries/root-bootstrap.md) | Ai-skill 工作的 bootstrap 入口。Root README 定義 repository layout 與 reference-first 工作流；shared-rules README 定義 Default Bootstrap 與依任務補讀規則。 |
@@ -40,6 +42,7 @@
 | --- | --- | --- | --- | --- |
 | `graph.apk-analysis-pilot` | `architecture/apk-analysis-pilot-migration.md` | `candidate` | 6 | [`apk-analysis-pilot.yaml`](../graphs/apk-analysis-pilot.yaml) |
 | `graph.apk-highest-leverage-analysis` | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md` | `candidate` | 5 | [`apk-highest-leverage-analysis.yaml`](../graphs/apk-highest-leverage-analysis.yaml) |
+| `graph.feedback-promotion-pipeline` | `feedback/promotion/README.md` | `candidate` | 6 | [`feedback-promotion-pipeline.yaml`](../graphs/feedback-promotion-pipeline.yaml) |
 | `graph.metadata-navigation` | `metadata/schema.md` | `candidate` | 7 | [`metadata-navigation.yaml`](../graphs/metadata-navigation.yaml) |
 | `graph.source-boundary` | `governance/lifecycle/README.md` | `candidate` | 6 | [`source-boundary.yaml`](../graphs/source-boundary.yaml) |
 

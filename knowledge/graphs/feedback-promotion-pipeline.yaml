@@ -1,0 +1,36 @@
+id: graph.feedback-promotion-pipeline
+source: feedback/promotion/README.md
+status: candidate
+summary: >
+  連接 feedback promotion pipeline、shared feedback rules、failure learning、
+  governance lifecycle、summary 與 runtime registry route。
+edges:
+  - type: depends_on
+    target: shared-rules/feedback-lessons.md
+    reason: Lesson 命名、模板、索引與 agent 行為的 source-of-truth。
+    validation: shared-rules/feedback-lessons.md 保留可執行 feedback 寫作規則。
+  - type: depends_on
+    target: shared-rules/failure-learning-system.md
+    reason: Agent failure 或 close-loop gap 需要 failure taxonomy 與 promotion decision。
+    validation: failure-learning-system 定義 storage rules 與 promotion targets。
+  - type: depends_on
+    target: governance/lifecycle/README.md
+    reason: Promotion / downgrade 需要 lifecycle states 與 promotion gates。
+    validation: lifecycle doc 定義 candidate、validated、promoted、deprecated gates。
+  - type: related_to
+    target: governance/validation/README.md
+    reason: Promotion 後需要 validation gates、generated refresh、commit / push / readback。
+    validation: validation doc 包含 generated refresh checklist 與 close-loop gates。
+  - type: related_to
+    target: knowledge/summaries/feedback-promotion-pipeline.md
+    reason: Summary 提供 promotion pipeline 的低成本 preview。
+    validation: summary 指向 canonical feedback/promotion source。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 提供 route.feedback.promotion-pipeline record。
+    validation: registry record primary_source 指向 feedback/promotion/README.md。
+metadata:
+  priority: P1
+  confidence: medium
+  compatibility_state: dual-reference
+  last_checked: 2026-05-11

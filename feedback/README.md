@@ -23,6 +23,10 @@
 - `intelligence/` 承接成熟的工程智慧。
 - `governance/` 定義 promotion、deprecation 與 validation lifecycle。
 
+## 目前入口
+
+- [`promotion/`](promotion/README.md)：定義 feedback lesson 如何從 skill-local history 推進到 workflow、intelligence、shared rules、memory 或 runtime surfaces。
+
 ## 第一批候選遷移來源
 
 - `shared-rules/failure-learning-system.md`

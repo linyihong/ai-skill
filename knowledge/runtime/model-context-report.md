@@ -19,6 +19,7 @@
 | `route.bootstrap.ai-skill` | `README.md` | `source-backed` | Ai-skill bootstrap 和 repository close-loop 需要完整 source 與 required dependencies。 |
 | `route.governance.durable-goal-boundary` | `shared-rules/conversation-goal-ledger.md` | `source-backed` | Goal 刪除與 durable planning gate 會影響 long-term state，需讀 shared rule source。 |
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `source-backed` | 建立或修改 atom metadata 時需讀 schema 與子規則全文。 |
+| `route.feedback.promotion-pipeline` | `feedback/promotion/README.md` | `source-backed` | Promotion / downgrade 會影響 shared rules、skill history、intelligence 與 runtime surfaces，需要讀 full source 與 validation gates。 |
 | `route.models.model-aware-routing` | `models/profiles/README.md` | `source-backed` | 修改 model strategy 會影響 runtime routing，需讀 profiles、compression 與 routing source。 |
 
 ### `small`
@@ -38,7 +39,7 @@
 
 | Compression level | Routes | Escalation note |
 | --- | --- | --- |
-| `source-backed` | `route.bootstrap.ai-skill`, `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.skill.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.models.model-aware-routing` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
+| `source-backed` | `route.bootstrap.ai-skill`, `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.skill.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
 | `summary-first` | `route.runtime.context-loading` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
 
 ## Agent Output Shape
