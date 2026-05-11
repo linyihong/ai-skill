@@ -1,10 +1,10 @@
-# AI Native Operating System
+# AI-native Knowledge Operating System
 
 This document defines the repository-level architecture direction for Ai-skill. It is a roadmap and boundary document, not an executable shared rule. Operational policies still live in `shared-rules/`; tool-specific setup still lives in `ai-tools/`.
 
 ## Purpose
 
-The AI Native Operating System is the layer that lets agents reliably load knowledge, track goals, improve reusable guidance, validate changes, and close git writeback loops without treating any one AI tool or local mirror as the source of truth.
+The AI-native Knowledge Operating System is the layer that lets agents reliably load knowledge, track goals, improve reusable guidance, validate changes, and close git writeback loops without treating any one AI tool or local mirror as the source of truth.
 
 Its default model is **reference-first**:
 
