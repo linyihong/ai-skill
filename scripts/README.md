@@ -53,7 +53,7 @@ AI_SKILL_SYNC_CURSOR_BUNDLE=1 ./scripts/ai-skill-close-loop.sh --commit
 
 - 若 `.git/ai-skill-agent.lock` 顯示其他 agent / user 仍活躍，腳本會停止，不 commit、不 push。
 - 若存在 merge / rebase / cherry-pick 狀態，腳本會停止。
-- 若 dirty path 無法歸到 `architecture`、`shared-rules`、`scripts`、`ai-tools`、`.cursor/rules` 或某個 `skills/<name>` owner，腳本會停止。
+- 若 dirty path 無法歸到 `architecture`（含下一階段 top-level 分層）、`shared-rules`、`scripts`、`ai-tools`、`.cursor/rules` 或某個 `skills/<name>` owner，腳本會停止。
 - 預設只 dry-run；必須明確加 `--commit` / `--push` 才會寫入 git。
 
 ## Conversation goal ledger helper

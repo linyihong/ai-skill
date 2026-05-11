@@ -113,7 +113,7 @@ group_for_path() {
   local path="$1"
   case "${path}" in
     .cursor/rules/*|ai-tools/*) echo "tooling" ;;
-    architecture/*) echo "architecture" ;;
+    architecture/*|analysis/*|intelligence/*|workflow/*|runtime/*|memory/*|feedback/*|models/*|governance/*|knowledge/*|metadata/*) echo "architecture" ;;
     shared-rules/*|README.md) echo "shared" ;;
     scripts/*) echo "scripts" ;;
     skills/apk-analysis/*) echo "apk-analysis" ;;
