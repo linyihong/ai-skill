@@ -2,6 +2,11 @@
 
 `governance/` 負責「知識治理與系統維護」。本層保存 cleanup、splitting、lifecycle、validation 與 dependency maintenance 的架構設計，支援知識長期可維護。
 
+## 目前入口
+
+- [`lifecycle/`](lifecycle/README.md)：定義舊 `skills/` 與新分層之間的 lifecycle、promotion gates 與 source-of-truth 保護。
+- [`validation/`](validation/README.md)：定義新分層變更的 validation gates、migration checklist 與 pass / block rules。
+
 ## 放什麼
 
 - Knowledge lifecycle、deprecation、archive 與 cleanup strategy。

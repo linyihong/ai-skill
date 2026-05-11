@@ -15,13 +15,13 @@
 - `knowledge/indexes/README.md` 已建立第一版 task intent routing table 與索引格式。
 - `metadata/schema.md` 已建立 Knowledge Atom metadata schema v1，可套用到第一批 atom candidates。
 - `apk-analysis` pilot migration map 已建立，並新增 `analysis/apk/`、`workflow/apk-analysis/`、`intelligence/engineering/apk-analysis/` 候選目的地。
+- 新分層流程優先策略已建立：`governance/lifecycle/`、`governance/validation/`、metadata 子規則、`runtime/routing/`、`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/`。
 
 尚未完成的下一階段：
 
-- 尚未建立上述分層的完整子目錄、summary / graph / runtime navigation layer 與示範遷移內容。
+- 尚未建立上述分層的完整子目錄與示範遷移內容；summary / graph / runtime navigation 目前只有格式與責任邊界。
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
-- 尚未建立 ranking、confidence、compatibility 等 metadata 子規則。
-- 尚未建立可供 runtime 使用的 indexes、summaries、graphs 與 routing metadata。
+- 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 machine-readable routing registry。
 - 尚未定義 multi-model routing / compression strategy。
 
 ## 核心問題
@@ -431,7 +431,7 @@ metadata/
 
 ### Phase 2：Metadata System
 
-Status: `metadata/schema.md` 已建立 Knowledge Atom schema v1；`metadata/rules/`、`metadata/ranking/`、`metadata/confidence/`、`metadata/compatibility/` 尚未建立。
+Status: `metadata/schema.md` 已建立 Knowledge Atom schema v1；`metadata/rules/`、`metadata/ranking/`、`metadata/confidence/`、`metadata/compatibility/` 已建立第一版操作規則。
 
 新增：
 
@@ -447,7 +447,7 @@ metadata/compatibility/
 
 ### Phase 3：Knowledge Navigation
 
-Status: `knowledge/indexes/README.md` 已建立第一版 routing index；summaries、graphs 與 runtime navigation layer 尚未建立。
+Status: `knowledge/indexes/README.md` 已建立第一版 routing index；`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/` 已建立格式與責任邊界，尚未生成大量內容。
 
 新增：
 
@@ -472,6 +472,8 @@ Status: `architecture/apk-analysis-pilot-migration.md` 已建立 mapping plan；
 - `intelligence/engineering/architecture/`：抽取架構與 trade-off lessons。
 
 ### Phase 5：Runtime / Models
+
+Status: `runtime/routing/README.md` 已建立 context routing 流程；models profile 與 model-aware compression 尚未建立。
 
 定義：
 

@@ -5,6 +5,10 @@
 ## 目前入口
 
 - [`schema.md`](schema.md)：Knowledge Atom metadata schema v1，包含 required / optional fields、controlled values、YAML template 與 example atom。
+- [`rules/`](rules/README.md)：metadata 子規則索引，連到 ranking、confidence 與 compatibility。
+- [`ranking/`](ranking/README.md)：用 priority、status、confidence、context cost 與 depends/conflicts 排定讀取順序。
+- [`confidence/`](confidence/README.md)：定義 low / medium / high 信心與 lifecycle state 的關係。
+- [`compatibility/`](compatibility/README.md)：記錄 old entrypoint 與 new layer path 的相容狀態。
 
 ## 放什麼
 

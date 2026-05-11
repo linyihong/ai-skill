@@ -2,6 +2,10 @@
 
 `runtime/` 負責「AI 系統如何運作」。本層保存 dynamic loading、context routing、context pruning、agent coordination 與 orchestration 的設計，不取代可執行 shared rules。
 
+## 目前入口
+
+- [`routing/`](routing/README.md)：定義 task intent → knowledge index → metadata → source-of-truth gate 的 context loading 流程。
+
 ## 放什麼
 
 - Context routing 與 dynamic loading 規則的設計。
