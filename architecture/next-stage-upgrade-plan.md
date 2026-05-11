@@ -18,6 +18,7 @@
 - 新分層流程優先策略已建立：`governance/lifecycle/`、`governance/validation/`、metadata 子規則、`runtime/routing/`、`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/`。
 - `knowledge/runtime/routing-registry.yaml` 已建立第一版 machine-readable routing registry，包含 5 筆 sample routing records。
 - `knowledge/summaries/` 已建立第一批 4 個 Knowledge Atom summaries，覆蓋 root bootstrap、metadata schema、apk-analysis pilot 與 goal ledger boundary。
+- `knowledge/graphs/` 已建立第一批 3 個 graph records：source-boundary、metadata-navigation、apk-analysis-pilot。
 
 尚未完成的下一階段：
 
@@ -510,7 +511,7 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P1 | done | 規範 active goal 與 durable roadmap 邊界 | `shared-rules/conversation-goal-ledger.md`, `shared-rules/content-layering.md`, `governance/lifecycle/README.md` | 已完成 | `.agent-goals/` 不作長期 archive；刪除 active goal 前需回寫 durable planning |
 | P1 | done | 建立 machine-readable routing registry | `knowledge/runtime/routing-registry.yaml`, `runtime/routing/README.md` | 已完成第一版 registry 與 5 筆 sample routing records | Runtime 可用結構化資料從 task intent 找到 primary source、dependencies、candidate summaries 與 validation signal |
 | P1 | done | 建立第一批 Knowledge Atom summaries | `knowledge/summaries/` | 已完成 root bootstrap、metadata schema、apk-analysis pilot、goal ledger boundary summaries | Summaries 指向 canonical source，且不取代 source-of-truth 文件 |
-| P2 | pending | 建立初版 knowledge graph records | `knowledge/graphs/` | 先建立 source-boundary、metadata-navigation、apk-analysis-pilot 三個 graph records | Graph records 描述 depends / related / preserves_entrypoint，不使用 replacement semantics |
+| P2 | done | 建立初版 knowledge graph records | `knowledge/graphs/` | 已完成 source-boundary、metadata-navigation、apk-analysis-pilot 三個 graph records | Graph records 描述 depends / related / preserves_entrypoint，不使用 replacement semantics |
 | P2 | pending | 建立 model-aware routing / compression strategy | `models/`, `runtime/` | 定義 small / large model 的 context loading 深度與壓縮策略 | Model profile 可被 runtime routing 與 summaries 引用 |
 | P2 | pending | 設計 generated summaries / graph refresh 流程 | `governance/validation/`, `knowledge/runtime/` | 定義何時重建、如何驗證、如何避免 stale summaries | Source 變更時有明確 revalidation / downgrade path |
 

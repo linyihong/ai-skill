@@ -1,0 +1,40 @@
+id: graph.metadata-navigation
+source: metadata/schema.md
+status: candidate
+summary: >
+  描述 Knowledge Atom schema、metadata 子規則、knowledge index、runtime registry
+  與 summary / graph surfaces 之間的導航關係。
+edges:
+  - type: depends_on
+    target: metadata/rules/README.md
+    reason: metadata 子規則索引定義 schema 欄位如何被 routing、governance、summaries 與 graph surfaces 使用。
+    validation: metadata/rules/README.md 連到 ranking、confidence、compatibility。
+  - type: depends_on
+    target: metadata/ranking/README.md
+    reason: Runtime context loading 需要 ranking 規則決定 primary source 與 deferred sources。
+    validation: ranking rule 定義 priority、status、confidence、context_cost、depends、conflicts、when_to_read 的排序效果。
+  - type: depends_on
+    target: metadata/confidence/README.md
+    reason: Candidate summaries 與 atoms 需要 confidence 判斷是否可視為 validated 或 stable。
+    validation: confidence rule 定義 low / medium / high 與 lifecycle 狀態關係。
+  - type: depends_on
+    target: metadata/compatibility/README.md
+    reason: 新分層和舊 entrypoint 並存時，需要 compatibility state 保護 source-of-truth。
+    validation: compatibility rule 定義 old-entrypoint-active、dual-reference、new-layer-promoted 等狀態。
+  - type: routes_to
+    target: knowledge/indexes/README.md
+    reason: Knowledge index 以 task intent 導向 metadata schema 與 runtime registry。
+    validation: index 中有設計 Knowledge Atom metadata 的 routing row。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 提供 route.metadata.knowledge-atom-schema record。
+    validation: registry record 的 primary_source 為 metadata/schema.md。
+  - type: related_to
+    target: knowledge/summaries/metadata-schema.md
+    reason: Summary 提供 metadata schema 的低成本 routing preview。
+    validation: summary 指向 canonical metadata/schema.md，且標明不可覆蓋 shared rules。
+metadata:
+  priority: P2
+  confidence: high
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-11
