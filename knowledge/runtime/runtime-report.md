@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 6 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
+| Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Summaries | [`../summaries/`](../summaries/) | 4 files |
 | Graph records | [`../graphs/`](../graphs/) | 3 files |
 

@@ -6,6 +6,7 @@
 
 - [`profiles/`](profiles/README.md)：定義 `small`、`large`、`specialized` model profiles 與 context loading 深度。
 - [`compression/`](compression/README.md)：定義 index-only、summary-first、checklist-first、source-backed、graph-assisted 等壓縮層級。
+- [`../knowledge/runtime/model-context-report.md`](../knowledge/runtime/model-context-report.md)：由 routing registry 產生的 model-aware context loading view。
 
 ## 放什麼
 
@@ -27,6 +28,7 @@
 - `runtime/` 會使用本層 profile 做 task routing 與 context loading。
 - `workflow/` 可引用本層策略，定義大模型與小模型的不同讀取深度。
 - `ai-tools/` 保存工具如何實際選用或設定模型。
+- `knowledge/runtime/model-context-report.md` 可用來快速檢視目前 route 分別採用的 profile 與 compression level；它是 generated view，不取代 profiles / compression source。
 
 ## 第一批候選遷移來源
 

@@ -63,6 +63,20 @@ surfaces:
       - runtime report links 失效
       - report count 與 registry / summaries / graphs 不一致
 
+  model_context_report:
+    path: knowledge/runtime/model-context-report.md
+    refresh_when:
+      - routing registry 的 model.profile、compression_level 或 reason 改變
+      - models/profiles/README.md 或 models/compression/README.md 改變
+      - 新增、刪除或改名 routing registry records
+    revalidate_when:
+      - routing registry 只有非 model 欄位措辭修正
+      - report links 需要重新檢查但 profile / compression 分組未改變
+    downgrade_when:
+      - model context report 未由 current generator 重新產生
+      - report links 失效
+      - report profile / compression 分組與 registry 不一致
+
 decision_values:
   - refresh_now
   - revalidate_only
@@ -72,6 +86,7 @@ decision_values:
 validation:
   required_checks:
     - Runtime report generation when generated surfaces change
+    - Model context report generation when routing model fields change
     - YAML parse for generated YAML surfaces
     - Knowledge runtime validation helper for registry, summaries and graph records
     - Markdown link check for touched docs

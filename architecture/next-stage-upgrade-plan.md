@@ -19,6 +19,7 @@
 - `knowledge/runtime/routing-registry.yaml` 已建立第一版 machine-readable routing registry，包含 6 筆 sample routing records。
 - `scripts/validate-knowledge-runtime.rb` 已建立 deterministic validation helper，檢查 routing registry、refresh policy、summaries 與 graph records。
 - `scripts/generate-knowledge-runtime-report.rb` 已建立第一版 generated runtime report 工具，產出 `knowledge/runtime/runtime-report.md`。
+- `scripts/generate-model-context-report.rb` 已建立第一版 model-aware context report 工具，產出 `knowledge/runtime/model-context-report.md`。
 - `knowledge/summaries/` 已建立第一批 4 個 Knowledge Atom summaries，覆蓋 root bootstrap、metadata schema、apk-analysis pilot 與 goal ledger boundary。
 - `knowledge/graphs/` 已建立第一批 3 個 graph records：source-boundary、metadata-navigation、apk-analysis-pilot。
 - `knowledge/runtime/refresh-policy.yaml` 已建立 generated summaries / graphs / registry refresh 流程，定義 refresh、revalidate、downgrade 與 no update needed。
@@ -28,7 +29,7 @@
 - 尚未建立上述分層的完整子目錄與示範遷移內容；summary / graph / runtime navigation 目前只有格式與責任邊界。
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
 - 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 registry generation tooling；validation helper 與 runtime report generator 已建立。
-- Multi-model routing / compression strategy 已有第一版，尚未建立自動產出的 model-aware compressed views。
+- Multi-model routing / compression strategy 已有第一版，並已建立第一個 model-aware context report；尚未建立 per-model prompt / checklist artifact generator。
 
 ## 核心問題
 
@@ -519,6 +520,7 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P2 | done | 設計 generated summaries / graph refresh 流程 | `governance/validation/`, `knowledge/runtime/refresh-policy.yaml` | 已完成 refresh / revalidate / downgrade / no update needed 流程 | Source 變更時有明確 revalidation / downgrade path |
 | P1 | done | 建立 registry / refresh validation helper | `scripts/validate-knowledge-runtime.rb`, `governance/validation/README.md`, `knowledge/runtime/README.md` | 已完成 deterministic helper | Helper 可檢查 registry、refresh policy、summaries、graphs 的必要欄位、YAML / Markdown 格式與 canonical paths |
 | P1 | done | 建立 runtime report generator | `scripts/generate-knowledge-runtime-report.rb`, `knowledge/runtime/runtime-report.md` | 已完成 deterministic report generator | Report 可由 registry、refresh policy、summaries、graphs 重新產生，並通過 runtime validator 與 Markdown link check |
+| P1 | done | 建立 model-aware context report generator | `scripts/generate-model-context-report.rb`, `knowledge/runtime/model-context-report.md`, `models/README.md` | 已完成 deterministic model context report | Report 可依 routing registry 的 model profile / compression level 重新產生，並通過 runtime validator 與 Markdown link check |
 
 ## 最終目標
 

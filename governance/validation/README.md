@@ -13,6 +13,7 @@
 | Navigation | 應可發現新路徑時，確認 `knowledge/indexes/README.md` 可 route 到該路徑。 | Routing surfaces 與 promoted reference paths。 |
 | Generated refresh | Source 變更時，確認 summaries、graphs、registry records 是否需要 refresh、revalidate 或 downgrade。 | Source-of-truth 文件、metadata、routing registry、summaries、graphs 變更。 |
 | Runtime report generation | 執行 `ruby scripts/generate-knowledge-runtime-report.rb --write` 產生 deterministic runtime report。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
+| Model context report generation | 執行 `ruby scripts/generate-model-context-report.rb --write` 產生 model-aware context loading report。 | Routing registry model 欄位、model profiles 或 compression strategy 變更。 |
 | Knowledge runtime helper | 執行 `ruby scripts/validate-knowledge-runtime.rb` 檢查 generated surfaces。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
 | Link check | 解析 touched docs 的 Markdown links。 | Documentation changes。 |
 | Lints | 執行 touched files 可用的 lints。 | Documentation 或 code changes。 |
@@ -72,6 +73,7 @@ Decision:
 
 Validation:
 - Runtime report regenerated:
+- Model context report regenerated:
 - YAML parse:
 - Knowledge runtime helper:
 - Markdown links:
