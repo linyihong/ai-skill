@@ -64,6 +64,8 @@ Then read `<PROJECT_ROOT>/.agent-goals/README.md` and any relevant active goal f
 - Existing planning / todo links.
 - Open missing work, decisions, and needs-strengthening items.
 
+The ledger is a recovery aid, not an automatic task switcher. The newest user request, the current accepted plan, and any in-progress tool todo list define the active task for the turn. If the user says "continue" and more than one plausible goal exists, or if the ledger's active row points to a different project than the latest conversation/task, stop and ask which goal to continue before reading or acting on the other project. Do not pivot from an SDK/task-specific thread to a different active ledger row solely because it is still marked `active`.
+
 If the ledger does not exist and any trigger below applies, initialize it before continuing:
 
 ```text
