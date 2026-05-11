@@ -7,6 +7,10 @@
 - AI / agent 工具：讀 `SKILL.md`，知道遇到 APK 分析、動態抓包、解密定位、Frida hook、Flutter/Dart AOT 分析時要怎麼做。
 - 人類分析者：讀本 README、`WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md`，快速理解分析順序、必要工具、記錄格式與回饋方式。
 
+## 下一階段 migration note
+
+`skills/apk-analysis/` 目前仍是 active skill entrypoint。下一階段分層的 pilot map 見 [`../../architecture/apk-analysis-pilot-migration.md`](../../architecture/apk-analysis-pilot-migration.md)；候選 reference-first 目的地為 [`../../analysis/apk/`](../../analysis/apk/)、[`../../workflow/apk-analysis/`](../../workflow/apk-analysis/) 與 [`../../intelligence/engineering/apk-analysis/`](../../intelligence/engineering/apk-analysis/)。Pilot 期間不搬移大量內容，既有入口與連結維持可用。
+
 ## 目標
 
 把一次次 APK 分析中真正可重用的「方法」沉澱下來，而不是保存某個目標 App 的私有結論。
