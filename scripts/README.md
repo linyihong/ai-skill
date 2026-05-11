@@ -11,6 +11,7 @@
 | [`generate-runtime-sqlite-index.rb`](generate-runtime-sqlite-index.rb) | 從 summaries、routing registry、graphs 與 feedback lessons 產生本機 SQLite / FTS lookup cache。 |
 | [`query-runtime-index.rb`](query-runtime-index.rb) | 用 keyword 查詢本機 SQLite runtime index，依 rank / priority / confidence / context cost 回傳少量 candidate source paths。 |
 | [`validate-runtime-sqlite-index.rb`](validate-runtime-sqlite-index.rb) | 驗證 SQLite runtime index 的 integrity、row counts、source paths、FTS、source checksum 與 git ignore 邊界。 |
+| [`refresh-knowledge-runtime.rb`](refresh-knowledge-runtime.rb) | 一鍵重建 model/runtime reports、SQLite index，並執行 runtime validators。 |
 | [`git-hooks/post-commit`](git-hooks/post-commit) | **可選。**在本 repo 設定 `git config core.hooksPath scripts/git-hooks` 且 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 時，**`git commit`** 後會執行 `sync-cursor-bundle.sh`。 |
 
 **規則：**reference-only 是預設，不需要跑 bundle sync。只有本機明確用 Cursor symlink / bundle / copy mirror 佈署，且希望 mirror 立刻跟上時，才跑 `sync-cursor-bundle.sh`（或以 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 啟用上述 hook / close-loop helper 同步）。
@@ -120,6 +121,12 @@ AI_SKILL_SYNC_CURSOR_BUNDLE=1 ./scripts/ai-skill-close-loop.sh --commit
 ## Knowledge runtime validation
 
 產生並檢查 generated knowledge surfaces：
+
+```bash
+ruby scripts/refresh-knowledge-runtime.rb
+```
+
+或逐步執行：
 
 ```bash
 ruby scripts/generate-knowledge-runtime-report.rb --write
