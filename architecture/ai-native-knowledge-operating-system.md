@@ -2,6 +2,8 @@
 
 本文件定義 AI-native Knowledge Operating System 的 repository-level architecture direction。它是 roadmap 與 boundary document，不是 executable shared rule。可執行政策仍放在 `shared-rules/`；工具專屬設定仍放在 `ai-tools/`。
 
+下一階段完整升級規劃見 [`next-stage-upgrade-plan.md`](next-stage-upgrade-plan.md)。
+
 ## 目的
 
 AI-native Knowledge Operating System 是讓 agents 能可靠載入知識、追蹤 goals、改善 reusable guidance、驗證變更，並關閉 git writeback loops 的操作層；它不把任何單一 AI tool 或 local mirror 當成 source of truth。
