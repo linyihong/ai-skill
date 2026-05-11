@@ -1,0 +1,30 @@
+# Memory
+
+`memory/` 負責「長期記憶」。本層保存可重用、可回放、可治理的歷史脈絡設計與記憶分類，不保存專案私有 raw evidence 或 active conversation state。
+
+## 放什麼
+
+- Long-term memory、episodic memory 與 experience replay 的設計。
+- 可重用 historical context 的分類、使用條件與 validation 方法。
+- Failure memory 與 project memory 的抽象化邊界。
+- 記憶如何被 `runtime/` 與 `metadata/` 載入的策略。
+
+## 不放什麼
+
+- Active goal、owner、lock、next action；放到 `.agent-goals/`。
+- 專案 incident raw logs、tokens、host、private evidence；留在業務專案。
+- Feedback lesson 的 promotion workflow；放到 `feedback/`。
+- 可執行 shared policy；放到 `shared-rules/`。
+
+## 與既有層的關係
+
+- `shared-rules/failure-learning-system.md` 仍定義 failure learning 的可執行流程。
+- `skills/*/feedback_history/` 仍保存 skill-specific lesson，成熟後可抽象成 memory 或 intelligence。
+- `knowledge/` 管導航與 atom；本層管記憶類型、回放與保存邊界。
+- `governance/` 管記憶 lifecycle、deprecation 與清理。
+
+## 第一批候選遷移來源
+
+- `shared-rules/failure-learning-system.md` 中的 storage 與 promotion 概念
+- `shared-rules/failure-patterns/`
+- `skills/*/feedback_history/` 中可抽象成長期記憶類型的經驗

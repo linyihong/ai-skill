@@ -9,12 +9,13 @@
 - Root `README.md` 已是 AI-native Knowledge Operating System dashboard。
 - `shared-rules/` 已建立 dependency reading、linked updates、conversation goal ledger、failure learning、rule weight、language consistency 等 operating rules。
 - `architecture/ai-native-knowledge-operating-system.md` 已定義 reference-first、compatibility inventory、Phase 3 deprecation checklist。
+- `analysis/`、`intelligence/`、`workflow/`、`runtime/`、`memory/`、`feedback/`、`models/`、`governance/`、`knowledge/`、`metadata/` 已建立第一版 README skeleton，定義責任邊界。
 - `.agent-goals/` 已作為 project-local active goal ledger 使用，完成後刪除，不進 git。
 - Cursor / Claude tool docs 已指向 central repository 與 shared-rule bootstrap。
 
 尚未完成的下一階段：
 
-- 尚未建立 `analysis/`、`intelligence/`、`workflow/`、`runtime/`、`memory/`、`feedback/`、`models/`、`governance/`、`knowledge/`、`metadata/` 等正式目錄。
+- 尚未建立上述分層的第一批子目錄、metadata schema、navigation index 與示範遷移內容。
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
 - 尚未建立 Knowledge Atom metadata schema。
 - 尚未建立可供 runtime 使用的 indexes、summaries、graphs 與 routing metadata。
@@ -399,6 +400,8 @@ deprecated/
 - Phase 3 deprecation checklist。
 
 ### Phase 1：建立新架構目錄
+
+Status: top-level README skeletons 已建立；尚未開始 bulk content migration。
 
 建立下列目錄與 README：
 
