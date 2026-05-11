@@ -30,6 +30,8 @@ Bootstrap 後仍要依任務讀 skill-specific README / WORKFLOW / TOOLS / DOCUM
 
 在新專案開始前或開始時，在本機中央庫目錄執行 `git pull`，確保 `skills/`、`shared-rules/` 與遠端一致。
 
+通用開場提示先用根 [`README.md`](../README.md) 的 **New Project Quickstart**；本檔只補 Cursor 的工具差異。
+
 ### 2. 讓 Cursor 看得到 skill
 
 預設策略改成 **reference-first**：專案 `.cursor` 先放短規則或提示，要求 Agent 直接讀 `<AI_SKILL_REPO>` 裡的 shared rules 與 skill 入口。這不需要把 skill 複製進每個專案，只要該中央庫路徑對目前 Cursor 工作區可讀即可。
