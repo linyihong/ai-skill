@@ -16,6 +16,36 @@
     "shared-rules/goal-action-validation.md",
     "shared-rules/neutral-language.md"
   ],
+  "workflow_preferences": {
+    "response_style": "concise",
+    "explain_what_not_why": false,
+    "avoid_repetition": true,
+    "batch_operations": true,
+    "avoid_reread_files": true
+  },
+  "token_optimization": {
+    "minimize_system_prompts": true,
+    "use_limited_file_reads": true,
+    "batch_git_commands": true,
+    "merge_sequential_operations": true,
+    "skip_redundant_explanations": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git show *)",
+      "Bash(git status *)",
+      "Bash(git branch *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh issue view *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(jq *)"
+    ]
+  },
   "rules": {
     "reference_first": true,
     "commit_branch": "claude/review-dev-rules-ndnTH",
