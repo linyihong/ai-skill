@@ -72,6 +72,7 @@ APK 分析範例：
 - 如果 goal 標示 `single-owner` 或 `non-parallelizable`，不要讓 Claude 和其他 agent 分工同一流程；先取得使用者確認。
 - 若 Claude 產生修改計畫，讓它把計畫 TODO 連到 `.agent-goals` 或文件前段的 `Document TODO`。
 - 若 Claude 要改本庫，提醒它不要只更新文件；還要跑驗證、tool sync、commit、push、讀回和 clean status。
+- 若 Claude 完成 `.agent-goals/` goal 後仍留下長期 roadmap、phase、migration、promotion、deprecation 或治理狀態，要求它先回寫到 durable planning 文件，再刪除 active goal；不要把 completed goal row 當長期記憶。
 
 ## 與 Tool Adapter 的關係
 
