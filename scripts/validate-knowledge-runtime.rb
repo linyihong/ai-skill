@@ -273,6 +273,7 @@ validate_refresh_policy
 validate_summaries
 validate_graphs
 check_markdown_links("knowledge/runtime/README.md")
+check_markdown_links("knowledge/runtime/runtime-report.md") if (ROOT + "knowledge/runtime/runtime-report.md").exist?
 check_markdown_links("runtime/routing/README.md")
 check_markdown_links("knowledge/indexes/README.md")
 
