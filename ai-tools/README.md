@@ -8,6 +8,8 @@
 
 Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating-system.md`](../architecture/ai-native-knowledge-operating-system.md)：reference-first 是預設，工具 mirror / bundle / copy snapshot 是相容層。
 
+若工具文件、skill workflow、使用者目標或 shared rules 看似衝突，依 [`shared-rules/rule-weight.md`](../shared-rules/rule-weight.md) 判斷權重；工具 adapter 不得覆蓋 safety、source-of-truth、validation 或最新使用者目標。
+
 若某個 skill 對某工具有必要的特殊執行策略，skill 內可用 `skills/<skill>/tool-adapters/<tool>.md` 記錄差異；本目錄仍只放該工具的全域設定、同步與操作方式。
 
 | 工具 | 文件 | 用途 |

@@ -15,6 +15,7 @@
 - `shared-rules/linked-updates.md`
 - `shared-rules/conversation-goal-ledger.md`
 - `shared-rules/tool-neutral-documentation.md`
+- `shared-rules/rule-weight.md`
 - `shared-rules/decision-efficiency.md`
 - `shared-rules/failure-learning-system.md`
 - `shared-rules/document-todo-list.md`

@@ -6,7 +6,7 @@ alwaysApply: true
 # Dependency Reading
 
 - When working in this repository, first treat `shared-rules/README.md` as the index, not the full rule text.
-- At session start or when taking over a task, load the Default Bootstrap from `shared-rules/README.md`: the index plus `dependency-reading.md`, `linked-updates.md`, `conversation-goal-ledger.md`, `tool-neutral-documentation.md`, `decision-efficiency.md`, `failure-learning-system.md`, `document-todo-list.md`, `document-sizing.md`, `goal-action-validation.md`, and `neutral-language.md`; then read task-specific rules as needed.
+- At session start or when taking over a task, load the Default Bootstrap from `shared-rules/README.md`: the index plus `dependency-reading.md`, `linked-updates.md`, `conversation-goal-ledger.md`, `tool-neutral-documentation.md`, `rule-weight.md`, `decision-efficiency.md`, `failure-learning-system.md`, `document-todo-list.md`, `document-sizing.md`, `goal-action-validation.md`, and `neutral-language.md`; then read task-specific rules as needed.
 - If a skill, shared rule, Cursor rule, template, or feedback lesson has changed, will be changed, or affects the task, read the relevant dependent files before concluding or editing.
 - Always include `shared-rules/` in that dependency read, especially `shared-rules/dependency-reading.md` and `shared-rules/linked-updates.md`.
 - For reusable docs, follow `shared-rules/tool-neutral-documentation.md`: keep root/shared/skill docs tool-neutral and place Cursor-specific paths, hooks, UI, and sync details in `ai-tools/cursor.md` or `.cursor/rules/`.
