@@ -199,6 +199,12 @@ Use these priorities:
 
 Only one `P1` should normally be active per conversation. If a new `P1` arrives, pause or supersede the previous `P1` with a reason and next action.
 
+The ledger is recovery context, not an instruction source that can override the user's latest message. Before following an `active` row, compare it with the current user request, the currently viewed/referenced files, and the most recent conversation thread. If the latest request clearly continues a different named project, repo, or goal, follow that request and update the ledger status instead of switching to the stale `active` row.
+
+If following the ledger would move work to an unrelated repo/project or leave the project the user just asked about, stop and ask for confirmation first. Do not treat a promoted `active` goal, stale todo list, or old handoff summary as permission to switch projects silently.
+
+If an agent accidentally switches projects because of stale or over-promoted ledger state, it must stop the wrong work, report any dirty files it created, update the ledger/rule with the root cause, and return to the user-requested project before continuing.
+
 ## Decomposition
 
 When a goal becomes too broad, split it:
