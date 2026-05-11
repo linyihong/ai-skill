@@ -32,12 +32,13 @@
 | Route | Primary source | Compression | Reason |
 | --- | --- | --- | --- |
 | `route.skill.apk-analysis` | `skills/apk-analysis/SKILL.md` | `source-backed` | APK analysis 需要 skill entrypoint、workflow 與 domain-specific technique routing。 |
+| `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md` | `source-backed` | APK route selection 需要 domain workflow、feedback source 與 intelligence judgment 一起判斷。 |
 
 ## Compression View
 
 | Compression level | Routes | Escalation note |
 | --- | --- | --- |
-| `source-backed` | `route.bootstrap.ai-skill`, `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.skill.apk-analysis`, `route.models.model-aware-routing` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
+| `source-backed` | `route.bootstrap.ai-skill`, `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.skill.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.models.model-aware-routing` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
 | `summary-first` | `route.runtime.context-loading` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
 
 ## Agent Output Shape

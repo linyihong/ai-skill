@@ -18,6 +18,7 @@ Summaries 用來協助 agent：
 | `root.bootstrap.ai-skill` | Root bootstrap 與 shared-rules 啟動入口。 | [`root-bootstrap.md`](root-bootstrap.md) |
 | `metadata.schema.knowledge-atom` | Knowledge Atom metadata schema v1。 | [`metadata-schema.md`](metadata-schema.md) |
 | `architecture.apk-analysis-pilot` | `apk-analysis` 分層 pilot migration map。 | [`apk-analysis-pilot.md`](apk-analysis-pilot.md) |
+| `intelligence.apk-highest-leverage-analysis` | APK 分析 highest-leverage route selection engineering intelligence。 | [`apk-highest-leverage-analysis.md`](apk-highest-leverage-analysis.md) |
 | `governance.goal-ledger-boundary` | Active conversation goal 與 durable roadmap goal 邊界。 | [`goal-ledger-boundary.md`](goal-ledger-boundary.md) |
 
 ## Summary 格式

@@ -140,6 +140,31 @@ records:
       compression_level: source-backed
       reason: APK analysis 需要 skill entrypoint、workflow 與 domain-specific technique routing。
 
+  - id: route.intelligence.apk-highest-leverage-path
+    task_intent: 選擇 APK 分析最高收益路線
+    primary_source: intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md
+    required_dependencies:
+      - skills/apk-analysis/SKILL.md
+      - skills/apk-analysis/WORKFLOW.md
+      - skills/apk-analysis/feedback_history/common/2026-05-07_131000-highest-leverage-analysis-path.md
+    candidate_sources:
+      - knowledge/summaries/apk-highest-leverage-analysis.md
+      - knowledge/graphs/apk-highest-leverage-analysis.yaml
+      - runtime/routing/README.md
+      - shared-rules/decision-efficiency.md
+    source_of_truth_gate: old-skill-entrypoint-active
+    ranking_reason: 此 intelligence atom 抽象化已進入 WORKFLOW 的 route selection judgment，但 APK 分析授權與完整 workflow 仍由 skill entrypoint 管理。
+    validation_signal: 已比較可用 routes、選定 evidence-to-cost ratio 最高路線、記錄 fallback 與 attribution 回補條件。
+    metadata:
+      priority: P1
+      confidence: medium
+      context_cost: medium
+      compatibility_state: dual-reference
+    model:
+      profile: specialized
+      compression_level: source-backed
+      reason: APK route selection 需要 domain workflow、feedback source 與 intelligence judgment 一起判斷。
+
   - id: route.models.model-aware-routing
     task_intent: 建立或使用 model-aware routing / compression strategy
     primary_source: models/profiles/README.md

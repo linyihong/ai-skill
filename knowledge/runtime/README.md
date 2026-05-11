@@ -4,7 +4,7 @@
 
 ## 目前入口
 
-- [`routing-registry.yaml`](routing-registry.yaml)：第一版 machine-readable routing registry，包含 6 筆 sample routing records。
+- [`routing-registry.yaml`](routing-registry.yaml)：第一版 machine-readable routing registry，包含 7 筆 sample routing records。
 - [`refresh-policy.yaml`](refresh-policy.yaml)：generated summaries、graphs 與 routing registry 的 refresh / revalidate / downgrade 規則。
 - [`runtime-report.md`](runtime-report.md)：由 generator 產生的目前 routes、summaries、graphs 與 refresh decisions 概覽。
 - [`model-context-report.md`](model-context-report.md)：由 generator 產生的 model profile / compression loading view。

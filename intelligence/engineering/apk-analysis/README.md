@@ -1,22 +1,28 @@
 # APK Analysis Engineering Intelligence
 
-`intelligence/engineering/apk-analysis/` is the candidate home for stable engineering judgment extracted from APK analysis work. During the pilot, lesson history remains in `skills/apk-analysis/feedback_history/`; this directory only maps what should eventually be promoted.
+`intelligence/engineering/apk-analysis/` 是 `apk-analysis` pilot 中用來保存穩定工程判斷的候選位置。Pilot 期間，lesson history 仍保留在 `skills/apk-analysis/feedback_history/`；本目錄只保存已抽象成 engineering intelligence 的判斷與 promotion map。
+
+## 目前 intelligence atoms
+
+| Atom | Status | Source |
+| --- | --- | --- |
+| [`highest-leverage-analysis-path.md`](highest-leverage-analysis-path.md) | `candidate-intelligence` | `skills/apk-analysis/feedback_history/common/2026-05-07_131000-highest-leverage-analysis-path.md` |
 
 ## Scope
 
-This layer owns:
+本層負責：
 
-- Stable engineering lessons from repeated APK analysis work.
-- Anti-patterns and trade-offs, such as when not to keep adding broad hooks or when API shape is insufficient for live SDK work.
-- Reusable decision guidance that is broader than a single technique file.
-- Promotion targets for validated lessons that should influence future workflows or runtime routing.
+- 從重複 APK 分析工作中抽出的穩定工程判斷。
+- Anti-pattern 與 trade-off，例如何時不應繼續加 broad hooks，或何時 API shape 不足以支援 live SDK work。
+- 比單一 technique file 更高層的 reusable decision guidance。
+- 會影響未來 workflow 或 runtime routing 的 validated lesson promotion targets。
 
-This layer does not own:
+本層不負責：
 
-- Raw project evidence, hosts, endpoints, tokens, device IDs, or private run logs.
-- Step-by-step capture workflow; use `workflow/apk-analysis/`.
-- Traffic/runtime observation methods; use `analysis/apk/`.
-- Skill-specific lesson archive; keep history in `skills/apk-analysis/feedback_history/` until promotion.
+- Raw project evidence、hosts、endpoints、tokens、device IDs 或 private run logs。
+- Step-by-step capture workflow；使用 `workflow/apk-analysis/`。
+- Traffic/runtime observation methods；使用 `analysis/apk/`。
+- Skill-specific lesson archive；在 promotion 前保留於 `skills/apk-analysis/feedback_history/`。
 
 ## Candidate Intelligence Areas
 

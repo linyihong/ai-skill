@@ -9,6 +9,7 @@
 | [`source-boundary.yaml`](source-boundary.yaml) | 連接 active goal / durable roadmap 邊界、content layering 與 governance lifecycle。 | `candidate` |
 | [`metadata-navigation.yaml`](metadata-navigation.yaml) | 連接 metadata schema、metadata 子規則、knowledge index、runtime registry 與 summaries。 | `candidate` |
 | [`apk-analysis-pilot.yaml`](apk-analysis-pilot.yaml) | 連接 `skills/apk-analysis/` 舊入口與 analysis / workflow / intelligence 候選目的地。 | `candidate` |
+| [`apk-highest-leverage-analysis.yaml`](apk-highest-leverage-analysis.yaml) | 連接 APK analysis 最高收益路線 intelligence、原 feedback lesson、workflow 與 runtime route。 | `candidate` |
 
 ## Graph 目的
 

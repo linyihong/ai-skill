@@ -5,6 +5,7 @@
 ## 目前入口
 
 - [`engineering/apk-analysis/`](engineering/apk-analysis/README.md)：`apk-analysis` pilot 的 engineering intelligence 候選目的地；目前只保存 promotion map，不搬移 lesson history。
+  - [`highest-leverage-analysis-path.md`](engineering/apk-analysis/highest-leverage-analysis-path.md)：第一個實際 promoted candidate intelligence atom，整理 APK 分析最高收益路線判斷。
 
 ## 放什麼
 
