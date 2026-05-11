@@ -16,6 +16,20 @@ New layer files under `analysis/`, `workflow/`, `intelligence/`, `runtime/`, `me
 
 They must not silently replace old skill behavior before promotion.
 
+## Durable Goal Boundary
+
+Long-term lifecycle states belong in durable planning files, not in `.agent-goals/`.
+
+| Goal type | Durable location |
+| --- | --- |
+| Repository roadmap, phase, migration sequence | `architecture/` |
+| Layer responsibility, candidate destinations, promotion targets | Layer README files |
+| Knowledge lifecycle, validation and deprecation rules | `governance/` |
+| Routing, metadata and atom discovery | `knowledge/`, `metadata/`, `runtime/` |
+| Active implementation work for the current conversation | `.agent-goals/` only until completion |
+
+Before deleting an active `.agent-goals/` entry, confirm that any remaining roadmap, lifecycle, migration, promotion, deprecation or follow-up state has been written to the durable location above.
+
 ## Lifecycle States
 
 | State | Meaning | Allowed content | Not allowed |
@@ -37,7 +51,8 @@ A candidate can be promoted only when all gates pass:
 4. The owning layer README links the new path.
 5. Validation is documented in `governance/validation/`.
 6. Diff review confirms no project-specific evidence, secrets, local absolute paths, or tool mirror paths were introduced.
-7. Commit, push, readback, and clean status have completed.
+7. Any durable roadmap or lifecycle state has been updated outside `.agent-goals/`.
+8. Commit, push, readback, and clean status have completed.
 
 ## Update Strategy While Skills Still Change
 
