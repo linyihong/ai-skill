@@ -9,6 +9,7 @@ ROOT = Pathname.new(__dir__).parent.realpath
 
 COMMANDS = [
   ["ruby", "scripts/generate-model-context-report.rb", "--write"],
+  ["ruby", "scripts/generate-model-checklists.rb", "--write"],
   ["ruby", "scripts/generate-knowledge-runtime-report.rb", "--write"],
   ["ruby", "scripts/generate-runtime-sqlite-index.rb"],
   ["ruby", "scripts/validate-runtime-sqlite-index.rb"],

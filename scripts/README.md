@@ -8,6 +8,7 @@
 | [`validate-knowledge-runtime.rb`](validate-knowledge-runtime.rb) | 驗證 knowledge runtime generated surfaces：routing registry、refresh policy、summaries 與 graph records 的 YAML / Markdown 格式、必要欄位與 canonical path。 |
 | [`generate-knowledge-runtime-report.rb`](generate-knowledge-runtime-report.rb) | 從 routing registry、summaries、graphs 與 refresh policy 產生 deterministic runtime report。 |
 | [`generate-model-context-report.rb`](generate-model-context-report.rb) | 從 routing registry 的 model 欄位產生 model-aware context loading report。 |
+| [`generate-model-checklists.rb`](generate-model-checklists.rb) | 從 routing registry 產生 per-model context-loading checklist artifact。 |
 | [`generate-runtime-sqlite-index.rb`](generate-runtime-sqlite-index.rb) | 從 summaries、routing registry、graphs 與 feedback lessons 產生本機 SQLite / FTS lookup cache。 |
 | [`query-runtime-index.rb`](query-runtime-index.rb) | 用 keyword 查詢本機 SQLite runtime index，依 rank / priority / confidence / context cost 回傳少量 candidate source paths。 |
 | [`validate-runtime-sqlite-index.rb`](validate-runtime-sqlite-index.rb) | 驗證 SQLite runtime index 的 integrity、row counts、source paths、FTS、source checksum 與 git ignore 邊界。 |
@@ -132,6 +133,7 @@ ruby scripts/refresh-knowledge-runtime.rb
 ```bash
 ruby scripts/generate-knowledge-runtime-report.rb --write
 ruby scripts/generate-model-context-report.rb --write
+ruby scripts/generate-model-checklists.rb --write
 ruby scripts/validate-knowledge-runtime.rb
 ruby scripts/generate-runtime-sqlite-index.rb
 ruby scripts/validate-runtime-sqlite-index.rb
@@ -142,6 +144,7 @@ ruby scripts/query-knowledge-graph.rb --type depends_on --limit 5
 
 `generate-knowledge-runtime-report.rb --write` 會更新 `knowledge/runtime/runtime-report.md`，讓 agent 可快速檢視目前 routes、summaries、graphs 與 refresh decisions。
 `generate-model-context-report.rb --write` 會更新 `knowledge/runtime/model-context-report.md`，依 profile 與 compression level 整理 model-aware loading view。
+`generate-model-checklists.rb --write` 會更新 `knowledge/runtime/model-checklists.md`，依 profile 產生可執行的 context-loading checklist。
 `generate-runtime-sqlite-index.rb` 會產生被 git ignore 的本機 `knowledge/runtime/sqlite/runtime-index.sqlite`；query helper 只輸出候選來源，不取代 canonical Markdown / YAML。
 
 此 helper 目前驗證：
