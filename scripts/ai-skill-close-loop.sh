@@ -133,7 +133,7 @@ commit_message_for_group() {
     shared) echo "docs(shared): close skill update loop" ;;
     scripts) echo "chore(scripts): update skill close-loop automation" ;;
     tooling) echo "docs(tools): update skill tool integration guidance" ;;
-    architecture) echo "docs(architecture): define AI native operating system" ;;
+    architecture) echo "docs(architecture): define AI-native knowledge operating system" ;;
     apk-analysis) echo "docs(apk): close skill guidance updates" ;;
     app-development-guidance) echo "docs(app): close guidance updates" ;;
     skill-*) echo "docs(${1#skill-}): close skill updates" ;;
