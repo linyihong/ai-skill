@@ -1,8 +1,8 @@
-# Ai-skill
+# Ai-skill: AI-native Knowledge Operating System
 
-這個 repository 是**專業共用**的 AI skill 知識庫，一般透過 **Git 與遠端同步**（與團隊或跨機器共用流程一致）。
+這個 repository 是 **AI-native Knowledge Operating System** 的中央知識庫：以 Git 維護單一真相來源，讓 agent 直接 reference `<AI_SKILL_REPO>` 讀取 shared rules、skills、tool adapters、goal ledger 規則、failure learning 與 close-loop automation。
 
-未來不同專案需要 APK 分析、抓包、Frida、Proxyman、Dart AOT、解密或分析方法沉澱時，優先從這裡讀 skill，並把新的可重用技巧回饋回這裡。
+未來不同專案需要 APK 分析、app/API/embedded development guidance、旅行規劃或其他可重用 agent 能力時，優先從這裡讀 skill；新的可重用技巧、規則與架構方向也回寫到這裡。工具端的 symlink、bundle 或 copy snapshot 只是相容層，不取代本 repository。
 
 **路徑約定：**在本機上，中央庫位置就是你心裡的 `<AI_SKILL_REPO>`（clone 所在目錄），且必須是本 repository 的 git root。`~/.cursor/skills*`、`~/.cursor/shared-rules`、`~/.cursor/bundles/*` 或專案 `.cursor/` 是工具部署 / mirror 路徑，不能取代 source repo。**請勿把真實本機絕對路徑寫進本庫任何會 commit 的文件**（含 `feedback_history`、`shared-rules`、規則範本）；對外一律用占位符 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`。
 
