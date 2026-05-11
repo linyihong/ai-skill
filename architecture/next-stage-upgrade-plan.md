@@ -493,17 +493,24 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；models pr
 - validation gates。
 - deprecation / archive process。
 
-## `.agent-goals` 拆解
+## Durable Roadmap Goals
 
-下一階段應建立並追蹤以下 goals：
+`.agent-goals/` 只追蹤目前對話的 active implementation task；長期 phase、未完成能力、migration / promotion / deprecation 狀態保留在本表與相關 layer 文件。當本表某項被拉進本輪工作時，才建立 `.agent-goals/` entry；完成驗證後刪除 active goal，並把 durable 狀態回寫到本表或對應文件。
 
-| Priority | Goal | Next action | Completion criteria |
-| --- | --- | --- | --- |
-| P1 | 建立 next-stage upgrade plan | 本文件完成並連到入口文件 | 規劃書 commit/push/readback，root/architecture 入口可找到 |
-| P1 | 建立 top-level architecture directories | 建立 10 個目錄與 README skeleton | 每個目錄責任邊界清楚，不搬移大量內容 |
-| P2 | 設計 metadata schema | 建立 `metadata/schema.md` | Schema 可套用到第一批 Knowledge Atom |
-| P2 | 建立 knowledge navigation index | 建立 `knowledge/indexes/README.md` 與初版索引格式 | Agent 能從 index 找到 task-relevant knowledge |
-| P2 | 遷移第一個 skill 作為示範 | 選 `apk-analysis` 拆出 analysis/workflow/intelligence | 舊入口仍可用，新路徑可被 reference-first 找到 |
+| Priority | Status | Goal | Durable location | Next action | Completion criteria |
+| --- | --- | --- | --- | --- | --- |
+| P1 | done | 建立 next-stage upgrade plan | `architecture/next-stage-upgrade-plan.md` | 已完成 | 規劃書 commit/push/readback，root/architecture 入口可找到 |
+| P1 | done | 建立 top-level architecture directories | `analysis/`, `intelligence/`, `workflow/`, `runtime/`, `memory/`, `feedback/`, `models/`, `governance/`, `knowledge/`, `metadata/` | 已完成 | 每個目錄責任邊界清楚，不搬移大量內容 |
+| P2 | done | 設計 metadata schema | `metadata/schema.md` | 已完成 | Schema 可套用到第一批 Knowledge Atom |
+| P2 | done | 建立 knowledge navigation index | `knowledge/indexes/README.md` | 已完成 | Agent 能從 index 找到 task-relevant knowledge |
+| P2 | done | 遷移第一個 skill 作為示範 | `architecture/apk-analysis-pilot-migration.md`, `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/apk-analysis/` | 已完成 pilot map；未 bulk migrate | 舊入口仍可用，新路徑可被 reference-first 找到 |
+| P1 | done | 建立新分層運作流程 | `governance/`, `metadata/`, `runtime/routing/`, `knowledge/` | 已完成第一版流程與格式 | 舊 `skills/` 維持 source of truth，新分層可作 routing / promotion / validation surface |
+| P1 | done | 規範 active goal 與 durable roadmap 邊界 | `shared-rules/conversation-goal-ledger.md`, `shared-rules/content-layering.md`, `governance/lifecycle/README.md` | 已完成 | `.agent-goals/` 不作長期 archive；刪除 active goal 前需回寫 durable planning |
+| P1 | pending | 建立 machine-readable routing registry | `knowledge/runtime/` 或 `runtime/routing/` | 定義第一版 registry 格式與 3-5 筆 sample routing records | Runtime 可用結構化資料從 task intent 找到 primary source、dependencies、candidate summaries 與 validation signal |
+| P1 | pending | 建立第一批 Knowledge Atom summaries | `knowledge/summaries/` | 選 root bootstrap、metadata schema、apk-analysis pilot、goal ledger boundary 作 sample summaries | Summaries 指向 canonical source，且不取代 source-of-truth 文件 |
+| P2 | pending | 建立初版 knowledge graph records | `knowledge/graphs/` | 先建立 source-boundary、metadata-navigation、apk-analysis-pilot 三個 graph records | Graph records 描述 depends / related / preserves_entrypoint，不使用 replacement semantics |
+| P2 | pending | 建立 model-aware routing / compression strategy | `models/`, `runtime/` | 定義 small / large model 的 context loading 深度與壓縮策略 | Model profile 可被 runtime routing 與 summaries 引用 |
+| P2 | pending | 設計 generated summaries / graph refresh 流程 | `governance/validation/`, `knowledge/runtime/` | 定義何時重建、如何驗證、如何避免 stale summaries | Source 變更時有明確 revalidation / downgrade path |
 
 ## 最終目標
 
