@@ -40,7 +40,7 @@ Bootstrap 後仍要依任務讀 skill-specific README / WORKFLOW / TOOLS / DOCUM
 | `<PROJECT_ROOT>/.cursor/skills/<name>/` | 專案內：只有這個 repo 開工作區時也會載入；若是 symlink，可避免每次複製。 |
 | `~/.cursor/skills/<name>/` | 本機共用：所有專案共用一份；建議指向中央庫或 bundle，不維護第二份正文。 |
 
-本機若想把共用規則與 skill 都放在 `bundles/`，使用 `~/.cursor/bundles/shared-rules`（連到本庫 `shared-rules/`）與 `~/.cursor/bundles/ai-skill/`（各 skill），再讓 `~/.cursor/shared-rules`、`~/.cursor/skills/*` 指向上述路徑。本庫提供 [`scripts/sync-cursor-bundle.sh`](../scripts/sync-cursor-bundle.sh)。
+本機若想把共用規則與 skill 都放在 `bundles/`，使用 `~/.cursor/bundles/shared-rules`（連到本庫 `shared-rules/`）與 `~/.cursor/bundles/ai-skill/`（各 skill），再讓 `~/.cursor/shared-rules`、`~/.cursor/skills/*` 指向上述路徑。本庫提供可選的 [`scripts/sync-cursor-bundle.sh`](../scripts/sync-cursor-bundle.sh) 建立這些 symlink；reference-only 時不需要執行。
 
 資料來源優先順序：先用 `.cursor` 規則參照 `<AI_SKILL_REPO>`；需要原生掃描時用 symbolic link 指到 `<AI_SKILL_REPO>/skills/<name>` 與 `<AI_SKILL_REPO>/shared-rules`；只有在無法讀取中央庫或需要離線快照時才複製。另請依 [`shared-rules/cursor-sync.md`](../shared-rules/cursor-sync.md) 選擇 reference、symlink 或 copy snapshot，避免把 mirror 當成 source repo。
 
