@@ -1,95 +1,18 @@
 {
-  "description": "Ai-skill Knowledge Operating System configuration for Claude Code",
+  "description": "Claude Code configuration entry point - reference only",
   "ai_skill_repo": "/home/user/Ai-skill",
-  "default_bootstrap": [
-    "README.md",
-    "shared-rules/README.md",
-    "shared-rules/dependency-reading.md",
-    "shared-rules/linked-updates.md",
-    "shared-rules/conversation-goal-ledger.md",
-    "shared-rules/tool-neutral-documentation.md",
-    "shared-rules/rule-weight.md",
-    "shared-rules/decision-efficiency.md",
-    "shared-rules/failure-learning-system.md",
-    "shared-rules/document-todo-list.md",
-    "shared-rules/document-sizing.md",
-    "shared-rules/goal-action-validation.md",
-    "shared-rules/neutral-language.md"
-  ],
-  "workflow_preferences": {
-    "response_style": "concise",
-    "explain_what_not_why": false,
-    "avoid_repetition": true,
-    "batch_operations": true,
-    "avoid_reread_files": true
+
+  "reference": {
+    "claude_usage": "ai-tools/claude.md",
+    "bootstrap_rules": "shared-rules/README.md",
+    "task_routing": "knowledge/indexes/README.md",
+    "goal_tracking": ".agent-goals/",
+    "failure_learning": "shared-rules/failure-learning-system.md"
   },
-  "token_optimization": {
-    "minimize_system_prompts": true,
-    "use_limited_file_reads": true,
-    "batch_git_commands": true,
-    "merge_sequential_operations": true,
-    "skip_redundant_explanations": true
-  },
-  "permissions": {
-    "allow": [
-      "Bash(git log *)",
-      "Bash(git diff *)",
-      "Bash(git show *)",
-      "Bash(git status *)",
-      "Bash(git branch *)",
-      "Bash(gh pr view *)",
-      "Bash(gh pr list *)",
-      "Bash(gh issue view *)",
-      "Bash(find *)",
-      "Bash(grep *)",
-      "Bash(rg *)",
-      "Bash(jq *)"
-    ]
-  },
-  "discovery": {
-    "description": "Architectural layer discovery - help AI find and apply rules automatically",
-    "map_file": ".claude/discovery-map.json",
-    "auto_discover": true,
-    "key_layers": [
-      {
-        "layer": "knowledge",
-        "path": "knowledge/",
-        "entry": "knowledge/indexes/README.md",
-        "purpose": "Task intent routing and knowledge navigation"
-      },
-      {
-        "layer": "metadata",
-        "path": "metadata/",
-        "entry": "metadata/schema.md",
-        "purpose": "Knowledge atom schema and runtime metadata"
-      },
-      {
-        "layer": "governance",
-        "path": "governance/",
-        "entry": "governance/lifecycle/README.md",
-        "purpose": "Knowledge lifecycle and deprecation"
-      },
-      {
-        "layer": "intelligence",
-        "path": "intelligence/",
-        "entry": "intelligence/README.md",
-        "purpose": "Engineering decision, trade-off, and domain knowledge"
-      },
-      {
-        "layer": "workflow",
-        "path": "workflow/",
-        "entry": "workflow/README.md",
-        "purpose": "Planning, decomposition, review, and orchestration"
-      }
-    ]
-  },
-  "rules": {
-    "reference_first": true,
+
+  "git": {
     "commit_branch": "claude/review-dev-rules-ndnTH",
-    "git_operations": {
-      "push_format": "git push -u origin {branch}",
-      "commit_required": true,
-      "verify_clean_status": true
-    }
+    "push_format": "git push -u origin {branch}",
+    "verify_clean_status": true
   }
 }

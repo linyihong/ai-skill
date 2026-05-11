@@ -4,13 +4,75 @@
 
 ## 自動配置
 
-本專案已在 `.claude/settings.json` 配置了 Ai-skill 規則的自動加載。Claude Code 啟動時會自動讀取：
+本專案在 `.claude/settings.json` 配置了 Claude Code 的規則加載入口。Claude Code 啟動時會自動讀取配置並指向：
 
-- **AI_SKILL_REPO**: `/home/user/Ai-skill`（中央知識庫位置）
-- **Default Bootstrap**: 12 個必讀規則檔案清單
-- **Git 規則**: 開發分支、commit 與 push 要求
+- **Default Bootstrap 規則**: 見 [`shared-rules/README.md`](../shared-rules/README.md)（12-13 個必讀規則檔案）
+- **架構層級導航**: 見 [`knowledge/indexes/README.md`](../knowledge/indexes/README.md)（任務路由索引）
+- **Git 開發規則**: 自動指向開發分支 `claude/review-dev-rules-ndnTH`
 
 Claude 不需要每次都被手動提示；只要打開此專案，配置會自動生效。
+
+---
+
+## 配置思想與邊界定義
+
+### `.claude/settings.json` 的角色
+
+`.claude/settings.json` 是一個**薄配置層**，只保留：
+- 中央庫位置（`ai-skill_repo`）
+- 指向規則的引用（rules、bootstrap、architecture）
+- Git 操作配置（branch、push format）
+
+**不在這裡存放**：
+- Detailed bootstrap 清單（由 `shared-rules/README.md` 管理）
+- 發現機制詳情（見本檔案下方）
+- 工作流偏好（見 `.claude/settings.json` 的 `workflow_preferences`）
+
+### 責任邊界
+
+| 層級 | 位置 | 內容 |
+|------|------|------|
+| **通用 Claude 規則** | `ai-tools/claude.md` | 使用說明、操作注意、配置思想 |
+| **Claude Code 配置入口** | `.claude/settings.json` | 配置項 + 指向規則的引用 |
+| **Default Bootstrap** | `shared-rules/README.md` | 12-13 個必讀規則清單 |
+| **架構層級導航** | `knowledge/indexes/README.md` | 任務意圖路由表 |
+
+---
+
+## 🔍 規則發現機制
+
+### 核心概念
+
+AI 在不同情境下應該讀什麼文件？
+
+```
+情境 → 查詢發現規則 → 找到對應文件 → 讀取並執行
+```
+
+### 發現規則（Situational Router）
+
+| 情境 | 查詢 | 讀取 |
+|------|------|------|
+| **啟動/接手任務** | 什麼是這個知識庫？ | `README.md`、`shared-rules/README.md` |
+| **規劃新任務** | 任務應該讀什麼？ | `knowledge/indexes/README.md`（任務路由）|
+| **定義新規則** | 規則之間的依賴？ | `shared-rules/linked-updates.md` |
+| **評估推廣/淘汰** | 生命週期如何管理？ | `governance/lifecycle/README.md` |
+| **做架構決策** | 工程智慧與 trade-off？ | `intelligence/README.md` |
+| **規劃複雜任務** | 流程如何分解？ | `workflow/README.md` |
+| **提取教訓** | 失效如何學習？ | `shared-rules/failure-learning-system.md` |
+| **不知道該怎辦** | 有沒有類似情況？ | `shared-rules/failure-patterns/` |
+
+### 架構層級快速參考
+
+| 層級 | 檔案 | 用途 |
+|------|------|------|
+| **knowledge** | `knowledge/indexes/README.md` | 任務意圖 → 文件對應 |
+| **metadata** | `metadata/schema.md` | 知識原子結構與驗證 |
+| **governance** | `governance/lifecycle/README.md` | 知識生命週期管理 |
+| **intelligence** | `intelligence/README.md` | 工程決策與智慧 |
+| **workflow** | `workflow/README.md` | 任務分解與流程 |
+| **feedback** | `feedback/promotion/README.md` | 教訓推廣管道 |
+| **memory** | `memory/README.md` | 長期記憶設計 |
 
 ## 何時使用
 

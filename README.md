@@ -2,12 +2,17 @@
 
 ## 🚀 Claude Code 快速開始
 
-此專案已配置 Claude Code 自動規則加載（見 [`.claude/settings.json`](.claude/settings.json)）。Claude 啟動時會自動讀取：
-- **共用規則入口**：[`shared-rules/README.md`](shared-rules/README.md)
-- **Default Bootstrap**：12 個必讀規則檔案
-- **Git 流程**：自動指向開發分支 `claude/review-dev-rules-ndnTH`
+此專案已配置 Claude Code 自動規則加載。詳細說明見：
 
-詳見 [`ai-tools/claude.md`](ai-tools/claude.md)。
+→ **完整指南**：[`ai-tools/claude.md`](ai-tools/claude.md)
+
+包含：
+- Claude Code 自動配置方式
+- Default Bootstrap 規則（見 [`shared-rules/README.md`](shared-rules/README.md)）
+- 規則發現機制與架構層級導航
+- 操作注意事項與驗證方法
+
+Claude 啟動時會自動讀取 `.claude/settings.json` 中的配置，並指向相應規則文檔。
 
 ## 🛠️ AI 工具配置與注意事項
 
