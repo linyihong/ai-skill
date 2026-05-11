@@ -2,6 +2,10 @@
 
 `workflow/` 負責「AI 如何執行工作」。本層保存 agent 可照著執行的 planning flow、task decomposition、review flow、orchestration flow 與 handoff flow。
 
+## 目前入口
+
+- [`apk-analysis/`](apk-analysis/README.md)：`apk-analysis` pilot 的 tool-neutral workflow 候選目的地；目前仍保留 `skills/apk-analysis/SKILL.md` 作為 active skill entrypoint。
+
 ## 放什麼
 
 - Skill 或任務類型的執行流程。

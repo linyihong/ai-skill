@@ -14,6 +14,7 @@
 - Cursor / Claude tool docs 已指向 central repository 與 shared-rule bootstrap。
 - `knowledge/indexes/README.md` 已建立第一版 task intent routing table 與索引格式。
 - `metadata/schema.md` 已建立 Knowledge Atom metadata schema v1，可套用到第一批 atom candidates。
+- `apk-analysis` pilot migration map 已建立，並新增 `analysis/apk/`、`workflow/apk-analysis/`、`intelligence/engineering/apk-analysis/` 候選目的地。
 
 尚未完成的下一階段：
 
@@ -460,6 +461,8 @@ knowledge/runtime/
 先做 index 與 summary，不急著做完整 graph runtime。
 
 ### Phase 4：Workflow / Intelligence 分離
+
+Status: `architecture/apk-analysis-pilot-migration.md` 已建立 mapping plan；候選 reference-first 目的地已建立，尚未 bulk migrate skill content。
 
 第一個示範對象建議使用 `apk-analysis`：
 

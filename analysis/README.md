@@ -2,6 +2,10 @@
 
 `analysis/` 負責「如何觀察與拆解」。本層保存可重用的分析方法、觀察框架、問題拆解方式與 pattern extraction 路線，讓 agent 先知道如何取得證據，再決定是否沉澱成 workflow 或 intelligence。
 
+## 目前入口
+
+- [`apk/`](apk/README.md)：`apk-analysis` pilot 的分析方法候選目的地；目前仍 reference `skills/apk-analysis/`，不搬移大量內容。
+
 ## 放什麼
 
 - 授權情境下的技術觀察與拆解方法。

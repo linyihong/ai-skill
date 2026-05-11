@@ -2,6 +2,10 @@
 
 `intelligence/` 負責「沉澱工程智慧與領域知識」。本層保存從 analysis、workflow 執行與 feedback 中抽出的可重用判斷，讓 agent 能引用工程 decision、trade-off、anti-pattern 與 domain knowledge。
 
+## 目前入口
+
+- [`engineering/apk-analysis/`](engineering/apk-analysis/README.md)：`apk-analysis` pilot 的 engineering intelligence 候選目的地；目前只保存 promotion map，不搬移 lesson history。
+
 ## 放什麼
 
 - 工程決策原則、trade-off 與架構 lesson。
