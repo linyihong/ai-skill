@@ -9,6 +9,22 @@
 
 詳見 [`ai-tools/claude.md`](ai-tools/claude.md)。
 
+## 🛠️ AI 工具配置與注意事項
+
+各工具（Claude Code、Cursor 等）的配置、自動化、同步規則放在工具專屬文件：
+
+→ **工具配置入口**：[`ai-tools/`](ai-tools/README.md)
+
+| 工具 | 配置與說明 | 包含內容 |
+|------|----------|---------|
+| **Claude Code** | [`ai-tools/claude.md`](ai-tools/claude.md) | 自動配置、使用規範、操作注意事項 |
+| **Cursor** | [`ai-tools/cursor.md`](ai-tools/cursor.md) | 技巧啟用、同步策略、整合指南 |
+
+⚠️ **重要邊界定義**：
+- **通用規則 & skills** → 保持工具中立（不含工具特定細節）
+- **工具特定配置** → 放在 `ai-tools/`（路徑、hook、同步方式）
+- **Skill 特定適配** → 放在 `skills/<name>/tool-adapters/`
+
 ---
 
 這個 repository 是 AI-native Knowledge Operating System 的中央知識庫：以 Git 維護單一真相來源，讓 agent 直接 reference `<AI_SKILL_REPO>` 讀取 rules、skills、tool adapters、goal state guidance、failure learning 與 close-loop automation。
