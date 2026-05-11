@@ -1,22 +1,23 @@
-# 同步到 Cursor
+# Cursor 參照與同步
 
 ## 本庫結構（記憶用）
 
 - **`shared-rules/`**：分類後的共用規則（正本）。
 - **`skills/<name>/`**：各 skill（例如 `skills/apk-analysis/` 內含 `SKILL.md`、`feedback_history/` 等）。
 
-## 建議佈署順序
+## 建議策略順序
 
-部署到 `<PROJECT_ROOT>/.cursor/` 時：
+Cursor 不一定需要每次複製本庫內容。優先順序如下：
 
-1. **複製整個** `shared-rules/` → `<PROJECT_ROOT>/.cursor/shared-rules/`（或你與團隊約定的固定路徑，與 skill 並列即可）。
-2. 再將 **`skills/apk-analysis/`** 複製或 symbolic link 到 **`<PROJECT_ROOT>/.cursor/skills/apk-analysis/`**（Cursor 慣用 skill 掃描路徑）。
+1. **參照中央庫（預設）**：在專案 `.cursor` 規則或開場提示裡要求 Agent 直接讀 `<AI_SKILL_REPO>/shared-rules/README.md` 與需要的 `skills/<name>/SKILL.md`。這不建立第二份正文，也不需要每次同步。
+2. **Symlink / bundle（需要原生掃描時）**：若要讓 Cursor 慣用 skill 路徑看到 skill，使用 symlink 指回 `<AI_SKILL_REPO>`，或用本庫同步腳本維護 `~/.cursor/bundles/`。
+3. **Copy snapshot（退路）**：只有在不能讀中央庫、不能 symlink、或需要離線快照時才複製整包；快照要重新同步，最好保留來源 commit hash 或同步日期。
 
-這樣 Agent 同時讀得到「分類後共用規則」與「apk-analysis 技巧包」，無須把共用條文拆進每一則技巧檔。
+無論哪個策略，Agent 都必須同時讀得到「分類後共用規則」與「skill 技巧包」，無須把共用條文拆進每一則技巧檔。
 
 ## Symbolic link 注意
 
-若 `.cursor/skills/apk-analysis` 連結到本庫的 `skills/apk-analysis`，**仍須**另行同步 **`shared-rules/`**（連結不會自動包含上一層的共用目錄）。
+若 `.cursor/skills/apk-analysis` 連結到本庫的 `skills/apk-analysis`，**仍須**讓 Agent 能讀到 **`shared-rules/`**。可用 `.cursor` 規則直接參照 `<AI_SKILL_REPO>/shared-rules/README.md`，或另行 symlink / bundle `shared-rules/`；skill 連結不會自動包含上一層共用目錄。
 
 ## 本機共用：建議用 `bundles/` 並列放（與其他規則隔離）
 
@@ -43,6 +44,8 @@
 
 ## 改動 `shared-rules/` 或 `skills/` 之後
 
+若使用 **reference-only**，改動後不需要複製或同步；確認 `<AI_SKILL_REPO>` 已 `git pull` / `git push` 到正確版本，並在新的對話或提示中要求 Agent 讀中央庫即可。
+
 凡編輯過這兩處且希望 **本機 Cursor** 立刻經 `~/.cursor/bundles` 跟上時，請在 `<AI_SKILL_REPO>` 執行 `./scripts/sync-cursor-bundle.sh`（可重複執行、無害）。可選：於 repo 根目錄 `git config core.hooksPath scripts/git-hooks`，則每次 **`git commit`** 後會自動跑該腳本。若 skill 清單仍未更新，再 **Developer: Reload Window**。
 
 同步與 `git push` 完成後，agent 還必須重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件。`sync-cursor-bundle.sh` 只更新檔案路徑，不會自動更新 agent 已載入的上下文；讀回 gate 依 [`dependency-reading.md`](dependency-reading.md) 執行。
@@ -67,6 +70,6 @@
 
 ## 疑義時
 
-以本庫 **`shared-rules/`** 與 **`skills/`** 為準；`.cursor` 內皆為同步產物。若使用者要求更新或同步 skill repo，先在 `<AI_SKILL_REPO>` 確認 `git rev-parse --show-toplevel` 與 `git status --short --branch`，再修改 source；`~/.cursor/skills*` 或 bundles 只能在 source 更新後由同步流程處理。
+以本庫 **`shared-rules/`** 與 **`skills/`** 為準；`.cursor` 內的規則可以是參照、symlink 或同步快照，但不能取代 source。若使用者要求更新或同步 skill repo，先在 `<AI_SKILL_REPO>` 確認 `git rev-parse --show-toplevel` 與 `git status --short --branch`，再修改 source；`~/.cursor/skills*` 或 bundles 只能在 source 更新後由同步流程處理。
 
 ← [回到共用規則索引](README.md)

@@ -29,22 +29,24 @@ Bootstrap 後仍要依任務讀 skill-specific README / WORKFLOW / TOOLS / DOCUM
 
 ### 2. 讓 Cursor 看得到 skill
 
-Cursor 會掃描特定路徑下的 skill；把中央庫對應的 `skills/<name>/`（內含 `SKILL.md` 等）放到下列其一：
+預設策略改成 **reference-first**：專案 `.cursor` 先放短規則或提示，要求 Agent 直接讀 `<AI_SKILL_REPO>` 裡的 shared rules 與 skill 入口。這不需要把 skill 複製進每個專案，只要該中央庫路徑對目前 Cursor 工作區可讀即可。
+
+若你還需要 Cursor 的原生 skill 掃描或本機全域載入，再把中央庫對應的 `skills/<name>/`（內含 `SKILL.md` 等）用 symlink 或同步腳本放到下列其一：
 
 | 位置 | 用途 |
 | --- | --- |
-| `<PROJECT_ROOT>/.cursor/skills/<name>/` | 專案內：只有這個 repo 開工作區時也會載入；可進業務專案 git。 |
-| `~/.cursor/skills/<name>/` | 本機共用：所有專案共用一份，不必每個專案複製。 |
+| `<PROJECT_ROOT>/.cursor/skills/<name>/` | 專案內：只有這個 repo 開工作區時也會載入；若是 symlink，可避免每次複製。 |
+| `~/.cursor/skills/<name>/` | 本機共用：所有專案共用一份；建議指向中央庫或 bundle，不維護第二份正文。 |
 
 本機若想把共用規則與 skill 都放在 `bundles/`，使用 `~/.cursor/bundles/shared-rules`（連到本庫 `shared-rules/`）與 `~/.cursor/bundles/ai-skill/`（各 skill），再讓 `~/.cursor/shared-rules`、`~/.cursor/skills/*` 指向上述路徑。本庫提供 [`scripts/sync-cursor-bundle.sh`](../scripts/sync-cursor-bundle.sh)。
 
-資料來源：從中央庫的 `skills/<name>/` 整包複製過去，或對該目錄做 symbolic link 指到 `<AI_SKILL_REPO>/skills/<name>`。另請依 [`shared-rules/cursor-sync.md`](../shared-rules/cursor-sync.md) 把 `shared-rules/` 一併部署，Agent 才讀得到分類後的共用規則。
+資料來源優先順序：先用 `.cursor` 規則參照 `<AI_SKILL_REPO>`；需要原生掃描時用 symbolic link 指到 `<AI_SKILL_REPO>/skills/<name>` 與 `<AI_SKILL_REPO>/shared-rules`；只有在無法讀取中央庫或需要離線快照時才複製。另請依 [`shared-rules/cursor-sync.md`](../shared-rules/cursor-sync.md) 選擇 reference、symlink 或 copy snapshot，避免把 mirror 當成 source repo。
 
 若只複製部分 skill 檔案，仍須帶上 `SKILL.md` 並另外同步 `shared-rules/`（至少含索引與 [`feedback-lessons.md`](../shared-rules/feedback-lessons.md)），否則缺共用底線。
 
 ### 3. 最穩用法
 
-僅把檔案放在 `skills/` 目錄不等於 Agent 永遠會依你想要的順序執行。請明講要使用 `apk-analysis`，並指定讀中央庫的流程檔：
+僅把檔案放在 `skills/` 目錄不等於 Agent 永遠會依你想要的順序執行。最穩是讓專案 `.cursor` 或開場提示明講要使用哪個 skill，並指定讀中央庫的流程檔：
 
 ```text
 使用 apk-analysis skill。請先閱讀共用規則索引、feedback 格式與 skill 入口：
@@ -70,9 +72,9 @@ Cursor 會掃描特定路徑下的 skill；把中央庫對應的 `skills/<name>/
 
 | 策略 | 做法 | 優點 | 注意 |
 | --- | --- | --- | --- |
-| 參照（建議） | `.cursor` 裡只放短規則：要求 Agent 一律先讀 `<AI_SKILL_REPO>/shared-rules/README.md`、`skills/apk-analysis/SKILL.md`（及 RUNBOOK 等）。工作區用多資料夾同時打開業務專案與本 repo。 | 永遠讀到同一份檔案；`git pull` 本庫即更新技巧與共用規則。 | 必須能開到本庫路徑。 |
-| 符號連結 | 將 `.cursor/skills/apk-analysis` 連結到本庫的 `skills/apk-analysis`；另將 `.cursor/shared-rules` 連結或複製自本庫 `shared-rules`。 | skill 與共用規則可依連結各別處理。 | `shared-rules` 與 `skills` 通常要分開佈署。 |
-| 複製 | `shared-rules/` 整包到 `.cursor/shared-rules/`；`skills/apk-analysis/` 整包到 `.cursor/skills/apk-analysis/`。 | 離線快照可行。 | 每次 `pull` 後需重跑同步；否則 `.cursor` 過期。 |
+| 參照（預設） | `.cursor` 裡只放短規則：要求 Agent 一律先讀 `<AI_SKILL_REPO>/shared-rules/README.md`、`skills/apk-analysis/SKILL.md`（及 RUNBOOK 等）。工作區用多資料夾同時打開業務專案與本 repo。 | 永遠讀到同一份檔案；`git pull` 本庫即更新技巧與共用規則；不需每個專案複製。 | 必須能開到本庫路徑；若換機，先 clone / pull 中央庫並更新 `<AI_SKILL_REPO>` 指向。 |
+| 符號連結 | 將 `.cursor/skills/apk-analysis` 連結到本庫的 `skills/apk-analysis`；另將 `.cursor/shared-rules` 連結到本庫 `shared-rules` 或 bundle。 | Cursor 原生掃描可看到 skill，同時仍只有一份正文。 | `shared-rules` 與 `skills` 通常要分開佈署；避免在 repo 內建立反向 symlink。 |
+| 複製快照 | `shared-rules/` 整包到 `.cursor/shared-rules/`；`skills/apk-analysis/` 整包到 `.cursor/skills/apk-analysis/`。 | 離線、不能 symlink、或工具限制時可行。 | 每次 `pull` 後需重跑同步；最好記錄來源 commit hash，否則 `.cursor` 容易過期。 |
 
 ## 公用更新流程
 
@@ -81,7 +83,7 @@ Cursor 會掃描特定路徑下的 skill；把中央庫對應的 `skills/<name>/
 1. 在 `<AI_SKILL_REPO>` 執行 `git pull`（若與他人共用或換機）。
 2. 只在本庫編輯 `shared-rules/`、`skills/apk-analysis/SKILL.md`、`RUNBOOK.md`、`DOCUMENTATION.md` 等。
 3. 依 [`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md) 檢查連動更新。
-4. 依你選的策略同步或參照 `.cursor`。
+4. 依你選的策略處理 `.cursor`：reference-only 不必複製，只需確認 `<AI_SKILL_REPO>` 可讀；symlink / copy snapshot 才需要同步。
 5. 在 `<AI_SKILL_REPO>` 執行 `git add`、`git commit`、`git push`。
 6. 若業務專案的 `.cursor` 有變更，在該專案 git 另行 commit / push。
 
