@@ -2,6 +2,7 @@
 
 | 內容 | 放哪裡 |
 | --- | --- |
+| Repo-level **架構方向、roadmap、遷移階段與移除條件** | **`architecture/`**；例如 [`../architecture/ai-native-operating-system.md`](../architecture/ai-native-operating-system.md)。這類文件不是 executable shared rule，不放 `shared-rules/` 正文。 |
 | 全 skill **共用政策**（授權、去敏、路徑、feedback 原則） | **`shared-rules/`** 各分類檔（本目錄） |
 | 全庫**連動更新規則**（改一處會影響多處時要同步改哪些） | **[`linked-updates.md`](linked-updates.md)**（全庫唯一正文） |
 | 全庫**文件用語規則**（中性、低爭議、避免 AI/搜尋誤判的標題、slug、摘要與正文） | **[`neutral-language.md`](neutral-language.md)**（全庫唯一正文） |
