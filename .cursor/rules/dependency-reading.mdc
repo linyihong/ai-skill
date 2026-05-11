@@ -6,7 +6,7 @@ alwaysApply: true
 # Dependency Reading
 
 - When working in this repository, first treat `shared-rules/README.md` as the index, not the full rule text.
-- At session start or when taking over a task, load the Default Bootstrap from `shared-rules/README.md`: the index plus `dependency-reading.md`, `linked-updates.md`, `conversation-goal-ledger.md`, `tool-neutral-documentation.md`, `decision-efficiency.md`, `document-todo-list.md`, `document-sizing.md`, `goal-action-validation.md`, and `neutral-language.md`; then read task-specific rules as needed.
+- At session start or when taking over a task, load the Default Bootstrap from `shared-rules/README.md`: the index plus `dependency-reading.md`, `linked-updates.md`, `conversation-goal-ledger.md`, `tool-neutral-documentation.md`, `decision-efficiency.md`, `error-learning-system.md`, `document-todo-list.md`, `document-sizing.md`, `goal-action-validation.md`, and `neutral-language.md`; then read task-specific rules as needed.
 - If a skill, shared rule, Cursor rule, template, or feedback lesson has changed, will be changed, or affects the task, read the relevant dependent files before concluding or editing.
 - Always include `shared-rules/` in that dependency read, especially `shared-rules/dependency-reading.md` and `shared-rules/linked-updates.md`.
 - For reusable docs, follow `shared-rules/tool-neutral-documentation.md`: keep root/shared/skill docs tool-neutral and place Cursor-specific paths, hooks, UI, and sync details in `ai-tools/cursor.md` or `.cursor/rules/`.
@@ -14,6 +14,7 @@ alwaysApply: true
 - For skill changes, read the skill entry plus related README, workflow, documentation, checklist, templates, feedback indexes, and linked shared rules when they exist.
 - If a dependent file does not exist, mark it as not applicable; do not claim it was checked.
 - When a user asks to reload a skill or points out that shared rules may have been missed, create a dependency read ledger before returning to project work: trigger, required set, files read, not-applicable files, deferred/blocked items, and validation method.
+- When a user points out a repeated agent mistake, wrong source/mirror update, missed validation, or incomplete close loop, follow `shared-rules/error-learning-system.md`: classify the error, update the durable prevention target, and validate the new guardrail.
 - Do not claim the updated skill has been applied while the ledger still has unread required files that are neither read nor explicitly marked not applicable.
 - Before finishing, state the dependency read and validation method: diff review, lints, link check, required linked updates, and bundle sync when relevant.
 - After `git commit`, `git push`, and any required bundle sync, re-read the updated skill/shared-rule entry files and main dependencies so the current agent context reflects the pushed version before the final response.

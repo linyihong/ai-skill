@@ -16,8 +16,9 @@
 
 1. **原因分析**：說明為什麼漏掉閉環，例如只更新局部 skill、沒有查 promotion target、沒有依 `linked-updates.md` 檢查、沒有搜尋殘留專案字串。
 2. **規則強化**：把防止重犯的規則補到正確層級。若是全庫行為，放 `shared-rules/`；若是單一 skill 行為，才放 skill 文件。
-3. **連動更新**：依 [`linked-updates.md`](linked-updates.md) 同步 README、入口、checklist、templates、feedback index 或受影響 skill。
-4. **驗證**：搜尋 reusable docs 是否仍含專案特例；反查新規則是否可從 shared rule index 與相關 skill 入口找到。
+3. **錯誤學習**：若該問題可能重複發生，依 [`error-learning-system.md`](error-learning-system.md) 分類錯誤，必要時新增或更新 `shared-rules/error-patterns/` 或對應 skill 的 `feedback_history/`。
+4. **連動更新**：依 [`linked-updates.md`](linked-updates.md) 同步 README、入口、checklist、templates、feedback index 或受影響 skill。
+5. **驗證**：搜尋 reusable docs 是否仍含專案特例；反查新規則是否可從 shared rule index 與相關 skill 入口找到。
 
 ## 寫作檢查
 
@@ -36,6 +37,7 @@
 - 去敏與 placeholder 依 [`sanitization.md`](sanitization.md)。
 - 內容放置位置依 [`content-layering.md`](content-layering.md)。
 - 新增或推廣 lesson 依 [`feedback-lessons.md`](feedback-lessons.md)。
+- 重複 agent 錯誤的分類與 prevention gate 依 [`error-learning-system.md`](error-learning-system.md)。
 - 任何跨文件影響依 [`linked-updates.md`](linked-updates.md)。
 - 每個重要結論需有目標、執行與驗證，依 [`goal-action-validation.md`](goal-action-validation.md)。
 

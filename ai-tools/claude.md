@@ -29,6 +29,7 @@
 <AI_SKILL_REPO>/shared-rules/conversation-goal-ledger.md
 <AI_SKILL_REPO>/shared-rules/tool-neutral-documentation.md
 <AI_SKILL_REPO>/shared-rules/decision-efficiency.md
+<AI_SKILL_REPO>/shared-rules/error-learning-system.md
 <AI_SKILL_REPO>/shared-rules/document-todo-list.md
 <AI_SKILL_REPO>/shared-rules/document-sizing.md
 <AI_SKILL_REPO>/shared-rules/goal-action-validation.md
@@ -39,6 +40,7 @@
 若某依賴檔不存在，請明確標示 not applicable，不要說已讀。
 
 若本輪工作可能中斷或有多個目標，請依 conversation-goal-ledger 規則在 <PROJECT_ROOT>/.agent-goals/ 維護暫存目標，並明列 priority、parallelization mode、owner/lock、plan/todo links、missing/decision/strengthen。
+若使用者指出你反覆犯錯、更新到 tool mirror / project copy、漏讀依賴或漏做驗證，請依 error-learning-system 分類錯誤，將可重用 lesson 推廣到 shared rule / error pattern / skill feedback，並驗證防呆規則可被下次 agent 讀到。
 完成 Ai-skill repo 變更時，請依 dependency-reading 完成 diff review、linked updates、tool sync、commit、push、讀回與 clean status。
 ```
 
