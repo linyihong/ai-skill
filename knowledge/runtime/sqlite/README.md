@@ -77,8 +77,8 @@ ruby scripts/query-runtime-index.rb "<keyword>" --limit 5
 | Tool | Role |
 | --- | --- |
 | `scripts/generate-runtime-sqlite-index.rb` | 從 summaries、graphs、registry、feedback lessons 產生本機 SQLite DB。 |
-| `scripts/query-runtime-index.rb` | 用 keyword 查候選 source，輸出少量 rows。 |
-| `scripts/validate-runtime-sqlite-index.rb` | 檢查 DB integrity、row counts、source path existence、FTS availability 與 git ignore 邊界。 |
+| `scripts/query-runtime-index.rb` | 用 keyword 查候選 source，依 FTS rank、priority、confidence、context cost 排序，並可用 layer / type / status 過濾。 |
+| `scripts/validate-runtime-sqlite-index.rb` | 檢查 DB integrity、row counts、source path existence、FTS availability、source checksum stale 狀態與 git ignore 邊界。 |
 
 ## Usage
 
@@ -86,6 +86,7 @@ ruby scripts/query-runtime-index.rb "<keyword>" --limit 5
 ruby scripts/generate-runtime-sqlite-index.rb
 ruby scripts/validate-runtime-sqlite-index.rb
 ruby scripts/query-runtime-index.rb feedback --limit 5
+ruby scripts/query-runtime-index.rb feedback --layer feedback --limit 5
 ```
 
 預設 DB 路徑：
@@ -103,5 +104,7 @@ knowledge/runtime/sqlite/runtime-index.sqlite
 - SQLite schema 可建立。
 - Generated DB 不進 git status。
 - Query 能用 keyword / tag 找到 feedback lesson、summary、graph route。
+- Query ranking 能依 FTS score、priority、confidence 與 context cost 排序，並支援 layer / type / status 過濾。
 - Query result 只作候選，不跳過 source-of-truth gate。
+- Validator 能重算 source checksum，偵測 SQLite index 是否 stale。
 - Runtime reports、routing registry、summary / graph counts 與 SQLite counts 可交叉檢查。

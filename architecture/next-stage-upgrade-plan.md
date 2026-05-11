@@ -34,7 +34,7 @@
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
 - 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 registry generation tooling；validation helper 與 runtime report generator 已建立。
 - Multi-model routing / compression strategy 已有第一版，並已建立第一個 model-aware context report；尚未建立 per-model prompt / checklist artifact generator。
-- SQLite / FTS runtime index prototype 已可生成、查詢與驗證；尚未深化 query ranking、stale checksum policy 與自動 refresh orchestration。
+- SQLite / FTS runtime index prototype 已可生成、查詢與驗證；query ranking、layer/type/status filtering 與 source checksum stale validation 已完成，尚未深化自動 refresh orchestration。
 - Cold feedback lessons 的 archive 策略已納入 `governance/lifecycle/README.md`：Markdown 仍是 canonical source，SQLite / FTS 與 generated summaries 只作低 token lookup。
 
 ## 核心問題
@@ -558,7 +558,7 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P1 | done | 建立 model-aware context report generator | `scripts/generate-model-context-report.rb`, `knowledge/runtime/model-context-report.md`, `models/README.md` | 已完成 deterministic model context report | Report 可依 routing registry 的 model profile / compression level 重新產生，並通過 runtime validator 與 Markdown link check |
 | P1 | done | 建立第一個 APK engineering intelligence atom | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md`, `knowledge/summaries/apk-highest-leverage-analysis.md`, `knowledge/graphs/apk-highest-leverage-analysis.yaml` | 已完成最高收益路線 candidate intelligence atom | Old skill entrypoint remains active；runtime registry、summary、graph 與 knowledge index 可 route 到此 atom |
 | P1 | done | 建立 feedback promotion pipeline surface | `feedback/promotion/README.md`, `knowledge/summaries/feedback-promotion-pipeline.md`, `knowledge/graphs/feedback-promotion-pipeline.yaml` | 已完成 promotion / downgrade design surface | Lesson source 保留於 `feedback_history/`；runtime registry、summary、graph 與 knowledge index 可 route 到 promotion pipeline |
-| P1 | done | 建立 SQLite / FTS runtime index prototype | `knowledge/runtime/sqlite/README.md`, `scripts/generate-runtime-sqlite-index.rb`, `scripts/query-runtime-index.rb`, `scripts/validate-runtime-sqlite-index.rb` | 已完成本機 generated lookup cache、query helper 與 validator | SQLite 作為 generated lookup cache，不提交 DB binary；feedback lessons 只被索引，不搬離 `feedback_history/` |
+| P1 | done | 建立 SQLite / FTS runtime index prototype | `knowledge/runtime/sqlite/README.md`, `scripts/generate-runtime-sqlite-index.rb`, `scripts/query-runtime-index.rb`, `scripts/validate-runtime-sqlite-index.rb` | 已完成本機 generated lookup cache、ranked query helper、filtering 與 stale checksum validator | SQLite 作為 generated lookup cache，不提交 DB binary；feedback lessons 只被索引，不搬離 `feedback_history/` |
 | P1 | done | 定義 cold feedback lesson archive lifecycle | `governance/lifecycle/README.md`, `knowledge/runtime/sqlite/README.md`, `feedback/README.md`, `memory/README.md` | 已完成冷資料觸發門檻與 source-of-truth 邊界 | Lesson 超過門檻時先使用 generated summary / SQLite FTS 查候選；Markdown 仍是 canonical source |
 
 ## 最終目標
