@@ -7,6 +7,7 @@
 | [`agent-goals.sh`](agent-goals.sh) | 工具中立的專案暫存 goal ledger helper：在 `<PROJECT_ROOT>/.agent-goals/` 建立、更新、拆解、暫停、完成刪除對話目標；不提交 goal 檔。 |
 | [`validate-knowledge-runtime.rb`](validate-knowledge-runtime.rb) | 驗證 knowledge runtime generated surfaces：routing registry、refresh policy、summaries 與 graph records 的 YAML / Markdown 格式、必要欄位與 canonical path。 |
 | [`generate-knowledge-runtime-report.rb`](generate-knowledge-runtime-report.rb) | 從 routing registry、summaries、graphs 與 refresh policy 產生 deterministic runtime report。 |
+| [`generate-model-context-report.rb`](generate-model-context-report.rb) | 從 routing registry 的 model 欄位產生 model-aware context loading report。 |
 | [`git-hooks/post-commit`](git-hooks/post-commit) | **可選。**在本 repo 設定 `git config core.hooksPath scripts/git-hooks` 且 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 時，**`git commit`** 後會執行 `sync-cursor-bundle.sh`。 |
 
 **規則：**reference-only 是預設，不需要跑 bundle sync。只有本機明確用 Cursor symlink / bundle / copy mirror 佈署，且希望 mirror 立刻跟上時，才跑 `sync-cursor-bundle.sh`（或以 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 啟用上述 hook / close-loop helper 同步）。
@@ -119,10 +120,12 @@ AI_SKILL_SYNC_CURSOR_BUNDLE=1 ./scripts/ai-skill-close-loop.sh --commit
 
 ```bash
 ruby scripts/generate-knowledge-runtime-report.rb --write
+ruby scripts/generate-model-context-report.rb --write
 ruby scripts/validate-knowledge-runtime.rb
 ```
 
 `generate-knowledge-runtime-report.rb --write` 會更新 `knowledge/runtime/runtime-report.md`，讓 agent 可快速檢視目前 routes、summaries、graphs 與 refresh decisions。
+`generate-model-context-report.rb --write` 會更新 `knowledge/runtime/model-context-report.md`，依 profile 與 compression level 整理 model-aware loading view。
 
 此 helper 目前驗證：
 
@@ -130,6 +133,6 @@ ruby scripts/validate-knowledge-runtime.rb
 - `knowledge/runtime/refresh-policy.yaml` 的 surfaces、decision values 與 validation / close-loop 欄位。
 - `knowledge/summaries/*.md` 的必要 summary table 欄位、source links，以及 `knowledge/summaries/README.md` 是否列出 summary。
 - `knowledge/graphs/*.yaml` 的 source、edge types、edge targets 與 metadata 欄位。
-- `knowledge/runtime/runtime-report.md` 的 Markdown links。
+- `knowledge/runtime/runtime-report.md` 與 `knowledge/runtime/model-context-report.md` 的 Markdown links。
 
 這個 helper 只做 deterministic validation；它不自動修改 summaries、graphs 或 registry。若檢查失敗，先修 source / generated surface，再執行 lints、Markdown link check、close-loop dry run 與 commit / push / readback。
