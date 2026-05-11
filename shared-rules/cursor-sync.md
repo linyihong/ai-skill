@@ -40,13 +40,13 @@ Cursor 不一定需要每次複製本庫內容。優先順序如下：
 
 這樣 **共用規則**與 **skill 包**在 `bundles/` 裡**並列、語意分開**，比較不容易被「同一個資料夾裡混了別種連結」搞混；`~/.cursor/` 其他設定仍獨立在外。
 
-本庫提供可重複執行的腳本：**[`scripts/sync-cursor-bundle.sh`](../scripts/sync-cursor-bundle.sh)**（見 [`scripts/README.md`](../scripts/README.md)）。
+本庫提供可重複執行的可選腳本：**[`scripts/sync-cursor-bundle.sh`](../scripts/sync-cursor-bundle.sh)**（見 [`scripts/README.md`](../scripts/README.md)）。它是 Cursor symlink / bundle bridge，不是 reference-only 的必要步驟。
 
 ## 改動 `shared-rules/` 或 `skills/` 之後
 
 若使用 **reference-only**，改動後不需要複製或同步；確認 `<AI_SKILL_REPO>` 已 `git pull` / `git push` 到正確版本，並在新的對話或提示中要求 Agent 讀中央庫即可。
 
-凡編輯過這兩處且希望 **本機 Cursor** 立刻經 `~/.cursor/bundles` 跟上時，請在 `<AI_SKILL_REPO>` 執行 `./scripts/sync-cursor-bundle.sh`（可重複執行、無害）。可選：於 repo 根目錄 `git config core.hooksPath scripts/git-hooks`，則每次 **`git commit`** 後會自動跑該腳本。若 skill 清單仍未更新，再 **Developer: Reload Window**。
+凡編輯過這兩處且希望 **本機 Cursor** 立刻經 `~/.cursor/bundles` 跟上時，請在 `<AI_SKILL_REPO>` 執行 `./scripts/sync-cursor-bundle.sh`（可重複執行、無害）。若採用 reference-only，不要跑此腳本；下一輪只要讓 Agent 讀 `<AI_SKILL_REPO>` 即可。可選：於 repo 根目錄 `git config core.hooksPath scripts/git-hooks`，且設定 `AI_SKILL_SYNC_CURSOR_BUNDLE=1`，則每次 **`git commit`** 後會自動跑該腳本。若 skill 清單仍未更新，再 **Developer: Reload Window**。
 
 同步與 `git push` 完成後，agent 還必須重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件。`sync-cursor-bundle.sh` 只更新檔案路徑，不會自動更新 agent 已載入的上下文；讀回 gate 依 [`dependency-reading.md`](dependency-reading.md) 執行。
 

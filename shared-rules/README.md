@@ -10,7 +10,7 @@
 4. **撰寫或新增 `feedback_history` lesson、或任何「回饋／沉澱技巧」行為前**，必須已讀過 **[feedback-lessons.md](feedback-lessons.md)**、**[reusable-guidance-boundary.md](reusable-guidance-boundary.md)**、**[sanitization.md](sanitization.md)**、**[neutral-language.md](neutral-language.md)** 與 **[goal-action-validation.md](goal-action-validation.md)**；若涉及授權邊界，另讀 **[authorization-scope.md](authorization-scope.md)**。
 5. 索引與各分檔中的 **Markdown 連結**視為規則的一部分；請**循連結讀取**，直到該任務需要的條文都已載入為止。
 6. **Git：**若你改動的是 **Ai-skill 這個 git repository**（`shared-rules/`、`skills/`、根目錄 README 等），**除非使用者明講不要提交**，否則**必須**在該 repo 根目錄完成 **`git add` → `git commit` → `git push`**；請自行申請所需工具權限。重新載入或重啟任一工具**不取代**這一步。第一次寫入 Ai-skill 或其工具同步路徑時，必須依 [dependency-reading.md](dependency-reading.md) 先定位 canonical `<AI_SKILL_REPO>` git repo，再開啟 writeback transaction；`~/.cursor/skills*`、bundles、專案 `.cursor/` 等工具部署路徑不可當成 source repo 完成回寫。在切回專案分析或回覆完成前關閉 transaction。Commit/push 與必要 tool sync 完成後，還必須重新讀取本次更新過的 skill/shared-rule 入口與主要依賴文件，並用 `git status --short --branch` 確認工作樹乾淨且沒有 ahead/behind。若使用者未授權 push / merge 而 repo 仍有 pending commit、ahead/behind 或未合併狀態，最終回覆必須主動提醒使用者。
-7. **工具同步：**若本機使用任何工具特定的 skill/rule 同步或 mirror，每次改動 **`shared-rules/`** 或 **`skills/`** 後**必須**執行已設定的同步流程；具體工具路徑與命令放在 [`ai-tools/`](../ai-tools/README.md)。**Agent** 在有權執行 shell 時必須代為執行已設定同步，除非使用者表示不要動本機工具設定。
+7. **工具同步：**預設 reference-first 時不需要同步工具 mirror。只有本機明確使用工具特定的 symlink / bundle / copy mirror，且希望該 mirror 立即跟上時，才執行對應同步流程；具體工具路徑與命令放在 [`ai-tools/`](../ai-tools/README.md)。**Agent** 不得因為改了 `shared-rules/` 或 `skills/` 就自動跑工具同步，除非使用者要求、環境變數啟用，或目前任務就是維護該 mirror。
 8. **連動更新：**任何會影響其他文件、索引、skill 入口、同步流程或分類文件的改動，都**必須**依 [linked-updates.md](linked-updates.md) 同步更新或明確檢查；不得把必要連動說成「可選」。
 
 ## Default Bootstrap
