@@ -101,6 +101,7 @@ AI_SKILL_SYNC_CURSOR_BUNDLE=1 ./scripts/ai-skill-close-loop.sh --commit
 
 - `complete` 只有在傳入 `--validated` 時才會刪除 goal 檔；否則會保留並標成 `needs-validation`。
 - 完成條件、驗證與 final/handoff 都成立時，同一輪必須執行 `complete --validated` 或手動刪除 goal 並刷新主表；不要把 `completed` row 長期留在 `.agent-goals/README.md`。
+- 若 goal 完成後仍代表長期 roadmap、phase、未完成能力、migration / promotion / deprecation 狀態或治理決策，先把該狀態回寫到 `architecture/`、layer README、`governance/`、`knowledge/`、`metadata/`、正式 project docs 或 issue，再執行 `complete --validated`。`.agent-goals/` 只保存 active conversation goal，不保存長期目標 archive。
 - `.agent-goals/README.md` 會自動刷新成主目標表，連到 `goals/*.md`，並顯示 mode、owner、lock、open work / decisions、plan/todo links、下一步與更新時間。
 - `start`、`update`、`split` 可重複使用 `--plan` 與 `--todo`，把 planning 文件章節、TodoWrite ID、checklist item 或 issue ID 連到 goal。
 - `start`、`update`、`split` 可用 `--parallelization parallelizable|single-owner|non-parallelizable`，讓主表顯示目前是否能分工。
