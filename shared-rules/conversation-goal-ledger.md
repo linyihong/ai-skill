@@ -1,38 +1,38 @@
-# Conversation Goal Ledger
+# 對話目標帳本
 
-This rule defines a tool-neutral temporary ledger for active conversation goals. It helps a later agent recover unfinished work after an interrupted session, context compaction, model switch, or multi-agent handoff.
+本規則定義工具中立的 temporary ledger，用來追蹤 active conversation goals。它讓後續 agent 能在中斷、context compaction、model switch 或 multi-agent handoff 後恢復未完成工作。
 
-The ledger is for project-local state, not reusable knowledge. It should live under the current project, be excluded from git, and be deleted when the goal is fully complete.
+Goal ledger 是 project-local state，不是 reusable knowledge。它應放在目前 project 底下、排除於 git 之外，並在目標完成且驗證後刪除。
 
-The goal ledger gives humans and agents an immediate overview after a long conversation: what is still unfinished, what needs a decision, what should be prioritized next, and what needs more work before it can be considered complete.
+Goal ledger 讓人和 agent 在長對話後快速知道：哪些工作未完成、哪些決策待確認、下一步優先做什麼、哪些內容仍需補強才能算完成。
 
-## Purpose
+## 目的
 
-Use a goal ledger when a conversation has work that spans more than one action, includes multiple goals, can be interrupted, or needs clear completion criteria.
+當 conversation work 跨越一個以上 action、包含多個 goals、可能被中斷，或需要明確 completion criteria 時，使用 goal ledger。
 
-The ledger must answer:
+Ledger 必須回答：
 
-| Field | Required content |
+| 欄位 | 必填內容 |
 | --- | --- |
-| Goal | What user-visible outcome is being pursued. |
-| Priority | `P0`, `P1`, `P2`, or `P3`. |
-| Status | `active`, `paused`, `blocked`, `needs-validation`, `superseded`, or `complete-pending-delete`. |
-| Parallelization mode | `parallelizable`, `single-owner`, or `non-parallelizable`, with a short reason when overlap is unsafe. |
-| Owner | Current agent/tool owner and timestamp. |
-| Owner / lock decision | Whether the current agent may edit, must acquire/refresh a lock, or must stop because another owner/lock overlaps. |
-| Source | User request or instruction that created the goal. |
-| Scope | In scope, out of scope, and affected project/repo. |
-| Subgoals | Child goals or checklist items when the goal is decomposed. |
-| Planning / todo links | Planning document path, plan section, TodoWrite IDs, checklist items, or external issue links related to this goal. |
-| Open work / decisions | What is not done yet, what decision is needed, or what needs strengthening. |
-| Dependencies | Required user answer, external command, file, agent, or upstream goal. |
-| Next action | The next concrete step a new agent should take. |
-| Completion criteria | What must be true before the file can be deleted. |
-| Validation | How completion was or will be verified. |
+| Goal | 正在追求的 user-visible outcome。 |
+| Priority | `P0`、`P1`、`P2` 或 `P3`。 |
+| Status | `active`、`paused`、`blocked`、`needs-validation`、`superseded` 或 `complete-pending-delete`。 |
+| Parallelization mode | `parallelizable`、`single-owner` 或 `non-parallelizable`；若重疊工作不安全，附簡短原因。 |
+| Owner | 目前 agent/tool owner 與 timestamp。 |
+| Owner / lock decision | 目前 agent 是否可編輯、需 acquire/refresh lock，或因其他 owner/lock 重疊而必須停止。 |
+| Source | 建立 goal 的使用者要求或指令。 |
+| Scope | In scope、out of scope、affected project/repo。 |
+| Subgoals | 目標拆解後的 child goals 或 checklist items。 |
+| Planning / todo links | 相關 planning document path、plan section、TodoWrite IDs、checklist items 或 external issue links。 |
+| Open work / decisions | 尚未完成內容、需要的 decision、或需 strengthening 的項目。 |
+| Dependencies | 所需 user answer、external command、file、agent 或 upstream goal。 |
+| Next action | 新 agent 應採取的下一個具體步驟。 |
+| Completion criteria | 刪除 goal file 前必須成立的條件。 |
+| Validation | 完成狀態如何驗證，或之後要如何驗證。 |
 
-## Location
+## 位置
 
-Store ledgers in the project being worked on:
+在正在工作的 project 內保存 ledger：
 
 ```text
 <PROJECT_ROOT>/.agent-goals/
@@ -43,60 +43,60 @@ Store ledgers in the project being worked on:
     <goal-id>.lock/
 ```
 
-Do not store the canonical ledger in a tool-specific configuration directory, because this workflow must work across different agent tools. A tool may read or remind about this directory, but it is not the source of truth.
+不要把 canonical ledger 放在工具專屬設定目錄；此 workflow 必須可跨不同 agent tools 使用。工具可以讀取或提醒此目錄，但它不是 source of truth。
 
-The `.agent-goals/` directory is temporary project state and should not be committed. Prefer excluding it through `.git/info/exclude` so business repositories do not receive policy churn. A project may add `.agent-goals/` to `.gitignore` only when the team wants that convention tracked.
+`.agent-goals/` 是 temporary project state，不應 commit。優先用 `.git/info/exclude` 排除，避免業務 repo 產生 policy churn。只有團隊希望追蹤此慣例時，才將 `.agent-goals/` 加入 `.gitignore`。
 
-## When To Create Or Update
+## 何時建立或更新
 
-Before substantive work, first run or perform the equivalent of:
+實質工作前，先執行或等效完成：
 
 ```text
 <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> status
 ```
 
-Then read `<PROJECT_ROOT>/.agent-goals/README.md` and any relevant active goal file before editing. Confirm:
+接著讀 `<PROJECT_ROOT>/.agent-goals/README.md` 與相關 active goal file，確認：
 
-- Active / blocked / needs-validation goals.
-- Priority and whether another active `P1` conflicts with the user's latest request.
-- Owner and lock state.
-- Parallelization mode and whether overlapping work is allowed.
-- Existing planning / todo links.
-- Open missing work, decisions, and needs-strengthening items.
+- Active / blocked / needs-validation goals。
+- Priority，以及另一個 active `P1` 是否與最新使用者要求衝突。
+- Owner 與 lock state。
+- Parallelization mode，以及是否允許重疊工作。
+- 既有 planning / todo links。
+- Open missing work、decisions 與 needs-strengthening items。
 
-The ledger is a recovery aid, not an automatic task switcher. The newest user request, the current accepted plan, and any in-progress tool todo list define the active task for the turn. If the user says "continue" and more than one plausible goal exists, or if the ledger's active row points to a different project than the latest conversation/task, stop and ask which goal to continue before reading or acting on the other project. Do not pivot from an SDK/task-specific thread to a different active ledger row solely because it is still marked `active`.
+Ledger 是 recovery aid，不是自動切換任務的來源。最新使用者要求、目前 accepted plan、以及進行中的 tool todo list 才定義本輪 active task。若使用者說「continue」但有多個合理 goal，或 ledger active row 指向與最新 task 不同的 project，先詢問要繼續哪個 goal，不要讀取或操作無關 project。
 
-If the ledger does not exist and any trigger below applies, initialize it before continuing:
+若 ledger 不存在，且符合下列任一 trigger，先初始化：
 
 ```text
 <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> init
 ```
 
-Create or update a goal file when:
+建立或更新 goal file 的情境：
 
-- A user asks for implementation, analysis, planning, review, debugging, or repository updates that can span more than one tool call.
-- A task has multiple goals or priorities.
-- The agent observes modified, staged, untracked, or otherwise dirty project files and intends to continue work in that project.
-- The agent creates a tool-level todo list or resumes a previous todo list whose items are not all complete.
-- The user says to continue a prior multi-step task, especially after context compaction, interruption, or a different side quest.
-- A task is paused, blocked, superseded, or waiting for user input.
-- A goal is decomposed into smaller goals.
-- An agent is about to stop, compact context, switch mode, launch subagents, or hand off.
-- A user changes priority, adds a new target, or redirects the conversation.
+- 使用者要求 implementation、analysis、planning、review、debugging 或 repository updates，且可能跨多個 tool call。
+- 任務有多個 goals 或 priorities。
+- Agent 看到 active project 有 modified、staged、untracked 或其他 dirty files，且打算繼續工作。
+- Agent 建立 tool-level todo list，或恢復未完成 todo list。
+- 使用者要求繼續 prior multi-step task，尤其在 context compaction、中斷或 side quest 後。
+- 任務 paused、blocked、superseded 或等待使用者輸入。
+- Goal 被拆成小目標。
+- Agent 即將停止、compact context、switch mode、launch subagents 或 hand off。
+- 使用者改變 priority、新增 target 或重導對話。
 
-For very small one-message answers, the ledger is optional. If any work remains after the response, if files were changed, or if the working tree is dirty for the active task, it is no longer optional. Do not treat the tool todo list as a substitute for this project-local ledger; todos track execution steps, while `.agent-goals/` tracks user-visible goals and handoff state.
+非常小的一次性回答可不建立 ledger。只要回覆後仍有工作、已有檔案變更，或 active task 的 working tree 是 dirty，ledger 就不再是 optional。不要把 tool todo list 當成 ledger 替代品；todo 追蹤執行步驟，`.agent-goals/` 追蹤 user-visible goals 與 handoff state。
 
-Before changing files for a ledger-tracked task, the current goal must have enough structure for handoff:
+修改 ledger-tracked task 的檔案前，目前 goal 必須有足夠 handoff 結構：
 
-- `parallelization` in frontmatter or an explicit parallelization line in the body.
-- Owner / lock decision recorded or implied by an unlocked current-owner goal.
-- Planning / todo links when a plan, checklist, TodoWrite item, or issue exists.
-- `Missing work`, `Decision needed`, and `Needs strengthening` populated with real content or `none`.
-- Next action and completion criteria that are concrete enough for a future agent to validate.
+- frontmatter 中有 `parallelization`，或正文有明確 parallelization line。
+- Owner / lock decision 已記錄，或由 unlocked current-owner goal 可推導。
+- 若有 plan、checklist、TodoWrite item 或 issue，已連到 Planning / Todo Links。
+- `Missing work`、`Decision needed`、`Needs strengthening` 有實際內容或 `none`。
+- Next action 與 completion criteria 具體到 future agent 可驗證。
 
-## Goal File Template
+## Goal file 範本
 
-Use Markdown so any tool can read it:
+使用 Markdown，讓任何工具都能讀：
 
 ```markdown
 ---
@@ -158,11 +158,11 @@ project: <PROJECT_ROOT or project label>
 <Risks, blockers, assumptions, and recovery hints.>
 ```
 
-Do not write secrets, tokens, raw private data, reservation codes, personal addresses, or private host details into the ledger. Use redacted labels or project-local references.
+不要把 secrets、tokens、raw private data、reservation codes、personal addresses 或 private host details 寫入 ledger。使用 redacted labels 或 project-local references。
 
-## Main Goal Table
+## 主要 goal 表格
 
-Keep `<PROJECT_ROOT>/.agent-goals/README.md` as the primary locator for active goals. It should contain a compact table that links to each goal file:
+`<PROJECT_ROOT>/.agent-goals/README.md` 是 active goals 的主要 locator，應包含連到各 goal file 的 compact table：
 
 ```markdown
 | Priority | Status | Mode | Owner | Lock | Goal | Open Work / Decisions | Planning / Todo Links | Next Action | Updated |
@@ -170,86 +170,86 @@ Keep `<PROJECT_ROOT>/.agent-goals/README.md` as the primary locator for active g
 | P1 | active | single-owner | agent/session | unlocked | [Short title](goals/P1-short-slug.md) | decision: choose live gate | plan: docs/plan.md#section; todo: implement-api | Run validation | 2026-05-08T00:00:00Z |
 ```
 
-The main table is for quick recovery. It should not replace the detail in each goal file.
+Main table 用於快速恢復，不取代各 goal file 的 detail。
 
-Update the table when a goal is created, paused, split, linked to a todo, owner/lock state changes, parallelization mode changes, or completed. When a goal file is deleted after validation, remove it from the table.
+當 goal 被建立、暫停、拆分、連到 todo、owner/lock state 改變、parallelization mode 改變或完成時，更新 main table。Goal file 在驗證後刪除時，也從表格移除。
 
-## Planning And Todo Links
+## Planning 與 Todo 連結
 
-When a planning document, checklist, or tool-level todo list exists, connect it to the goal ledger:
+若存在 planning document、checklist 或 tool-level todo list，將它們連到 goal ledger：
 
-1. Put the goal ID next to the relevant plan section, checklist item, or todo when practical.
-2. Record the plan path, section anchor, TodoWrite ID, checklist item, or issue ID under `Planning / Todo Links` in the goal file.
-3. If a todo becomes a separate resumable work item, either add it as a subgoal or split it into a child goal.
-4. When a todo is completed, update the goal progress and validation notes before deleting the goal.
-5. If a todo is cancelled because the user changed direction, mark the linked goal `paused` or `superseded` and record the reason.
+1. 可行時，在相關 plan section、checklist item 或 todo 旁標出 goal ID。
+2. 在 goal file 的 `Planning / Todo Links` 記錄 plan path、section anchor、TodoWrite ID、checklist item 或 issue ID。
+3. 若 todo 變成獨立可恢復工作，將它加入 subgoal，或拆成 child goal。
+4. Todo 完成時，先更新 goal progress 與 validation notes，再刪除 goal。
+5. Todo 因使用者改變方向而取消時，將 linked goal 標成 `paused` 或 `superseded`，並記錄原因。
 
-The goal ledger tracks user-facing intent; todo tools track execution steps. Keep both connected so a future agent can jump from a high-level goal to the exact plan/todo item and back.
+Goal ledger 追蹤 user-facing intent；todo tools 追蹤 execution steps。兩者要互相連結，讓 future agent 能從高層 goal 跳到具體 plan/todo item，再回到 goal。
 
-Document-level TODO lists are local to a file and should appear near the top of that file. See [`document-todo-list.md`](document-todo-list.md). When a document TODO is part of a larger user goal, link it from `Planning / Todo Links` or `Open Work / Decisions`.
+Document-level TODO lists 屬於單一文件，應出現在該文件前段。見 [`document-todo-list.md`](document-todo-list.md)。當 document TODO 屬於更大 user goal 時，從 `Planning / Todo Links` 或 `Open Work / Decisions` 連回。
 
-## Priority Rules
+## Priority 規則
 
-Use these priorities:
+使用下列 priorities：
 
-| Priority | Meaning |
+| Priority | 意義 |
 | --- | --- |
-| `P0` | User-blocking, safety/secret risk, data-loss risk, or explicit urgent request. |
-| `P1` | Current primary user goal. |
-| `P2` | Important follow-up or validation needed after the primary path. |
-| `P3` | Nice-to-have cleanup, optional refactor, or low-risk follow-up. |
+| `P0` | User-blocking、safety/secret risk、data-loss risk，或明確 urgent request。 |
+| `P1` | 目前主要 user goal。 |
+| `P2` | Primary path 後重要 follow-up 或 validation。 |
+| `P3` | Nice-to-have cleanup、optional refactor 或 low-risk follow-up。 |
 
-Only one `P1` should normally be active per conversation. If a new `P1` arrives, pause or supersede the previous `P1` with a reason and next action.
+通常一個 conversation 只應有一個 active `P1`。若新的 `P1` 到來，將前一個 `P1` pause 或 supersede，並記錄原因與 next action。
 
-The ledger is recovery context, not an instruction source that can override the user's latest message. Before following an `active` row, compare it with the current user request, the currently viewed/referenced files, and the most recent conversation thread. If the latest request clearly continues a different named project, repo, or goal, follow that request and update the ledger status instead of switching to the stale `active` row.
+Ledger 是 recovery context，不可覆蓋最新 user message。遵循 `active` row 前，先比對目前 user request、目前 viewed/referenced files 與最近 conversation thread。若最新要求清楚延續另一個 project、repo 或 goal，跟隨最新要求並更新 ledger，而不是切到 stale active row。
 
-If following the ledger would move work to an unrelated repo/project or leave the project the user just asked about, stop and ask for confirmation first. Do not treat a promoted `active` goal, stale todo list, or old handoff summary as permission to switch projects silently.
+如果照 ledger 會移動到無關 repo/project，或離開使用者剛詢問的 project，先停下來確認。不要把 promoted `active` goal、stale todo list 或舊 handoff summary 視為 silent project switch 的許可。
 
-If an agent accidentally switches projects because of stale or over-promoted ledger state, it must stop the wrong work, report any dirty files it created, update the ledger/rule with the root cause, and return to the user-requested project before continuing.
+若 agent 因 stale 或 over-promoted ledger state 切錯 project，必須停止錯誤工作、回報它建立的 dirty files、更新 ledger/rule 記錄 root cause，並回到 user-requested project。
 
 ## Decomposition
 
-When a goal becomes too broad, split it:
+Goal 太大時拆分：
 
-1. Keep a parent goal with the user-facing outcome.
-2. Add child goals or checklist items for independently resumable work.
-3. Record dependencies between child goals.
-4. Promote a child goal to `P1` only when it is the current work focus.
+1. 保留 parent goal，代表 user-facing outcome。
+2. 為可獨立恢復的工作加入 child goals 或 checklist items。
+3. 記錄 child goals 之間的 dependencies。
+4. 只有當 child goal 是目前工作焦點時，才提升為 `P1`。
 
-Do not hide a discovered subgoal only in chat. If it affects completion, record it in the ledger.
+不要只在 chat 裡隱藏 discovered subgoal。若它影響完成條件，就記錄在 ledger。
 
-## Owner, Lock, And Parallelization
+## Owner、Lock 與 Parallelization
 
-Before modifying files under an active goal, decide and record how work can overlap:
+修改 active goal 相關檔案前，決定並記錄工作如何重疊：
 
-| Mode | Meaning | Required behavior |
+| Mode | 意義 | 必要行為 |
 | --- | --- | --- |
-| `parallelizable` | Independent files or clearly separated subgoals can be handled concurrently. | Split child goals or todos, record ownership, and avoid editing the same files without a lock. |
-| `single-owner` | Work can continue across sessions, but only one active owner should edit at a time. | Check lock state before editing; update owner and next action when handing off. |
-| `non-parallelizable` | Shared state, secrets, live captures, migrations, or fragile workflows make overlap unsafe. | Acquire/refresh a lock or stop and ask if another owner/lock is present. |
+| `parallelizable` | 獨立檔案或清楚分離的 subgoals 可並行。 | 拆 child goals 或 todos，記錄 ownership，避免沒有 lock 就編輯同一檔。 |
+| `single-owner` | 可跨 session 延續，但同一時間只應有一個 active owner 編輯。 | 編輯前檢查 lock state；handoff 時更新 owner 與 next action。 |
+| `non-parallelizable` | Shared state、secrets、live captures、migrations 或 fragile workflows 讓重疊工作不安全。 | Acquire/refresh lock；若有其他 owner/lock，停止並詢問。 |
 
-If `.agent-goals/README.md` shows another active lock for overlapping work, stop before editing. Report the lock owner, age, affected goal, and the intended next step. Do not assume a lock is stale just because the current chat has context; use the configured cleanup rule or ask the user.
+若 `.agent-goals/README.md` 顯示重疊工作有其他 active lock，編輯前停止。回報 lock owner、age、affected goal 與預計 next step。不要只因為目前 chat 有上下文就假設 lock stale；使用設定好的 cleanup rule 或詢問使用者。
 
-Also stop and prompt the user when a new request overlaps an active goal with a different id, the recorded owner differs on a `single-owner` goal, the workflow is `non-parallelizable`, or the agent cannot tell whether two goals overlap but the same files, git branch, database, release, or shared state are involved. The prompt should include the existing goal id/title, owner and lock age when available, affected files or resources, why parallel work is risky, and concrete options such as wait, take over with approval, split into a child goal, or create a separate non-overlapping goal.
+當新要求與不同 id 的 active goal 重疊、`single-owner` goal 的 recorded owner 不同、workflow 是 `non-parallelizable`，或 agent 無法判斷兩個 goals 是否重疊但涉及同一 files、git branch、database、release 或 shared state 時，也要停止並詢問使用者。詢問應包含 existing goal id/title、owner 與 lock age（若有）、affected files/resources、平行工作風險，以及等待、接手、拆 child goal 或建立非重疊 goal 等具體選項。
 
-Mark a goal `non-parallelizable` for workflows such as git history operations, merge conflict resolution, release tagging, deploys, migration sequencing, shared rule / skill writeback transactions, data migrations, destructive operations, credential rotation, production configuration, or any task where two agents editing independently could invalidate validation, duplicate commits, or produce contradictory user-facing decisions.
+下列 workflow 應標為 `non-parallelizable`：git history operations、merge conflict resolution、release tagging、deploys、migration sequencing、shared rule / skill writeback transactions、data migrations、destructive operations、credential rotation、production configuration，或任何兩個 agents 獨立編輯可能讓 validation 失效、重複 commit 或產生矛盾 user-facing decisions 的任務。
 
-When the user redirects the work, changes priority, or asks to continue after a side task, update owner/lock/parallelization along with `Missing work`, `Decision needed`, `Needs strengthening`, `Planning / Todo Links`, and `Next Action` before substantial edits.
+當使用者重導工作、改 priority，或在 side task 後要求繼續時，實質編輯前同步更新 owner/lock/parallelization、`Missing work`、`Decision needed`、`Needs strengthening`、`Planning / Todo Links` 與 `Next Action`。
 
-## Goal Transfer
+## Goal 轉移
 
-When the user redirects the task:
+使用者重導任務時：
 
-1. Update the old goal to `paused` or `superseded`.
-2. Record why it was paused and what would resume it.
-3. Create or promote the new goal with the correct priority.
-4. Make the final response clear about which goal is now active.
+1. 將舊 goal 更新為 `paused` 或 `superseded`。
+2. 記錄暫停原因與恢復條件。
+3. 建立或提升新 goal，給正確 priority。
+4. Final response 明確說明目前 active goal。
 
-If the new goal conflicts with a high-risk unfinished goal, flag the conflict before switching.
+若新 goal 與高風險未完成 goal 衝突，切換前先標出衝突。
 
-## Multi-Agent Safety
+## Multi-agent Safety
 
-Agents must coordinate through lock directories:
+Agents 必須透過 lock directories 協調：
 
 ```text
 <PROJECT_ROOT>/.agent-goals/locks/<goal-id>.lock/
@@ -258,38 +258,38 @@ Agents must coordinate through lock directories:
   startedAt
 ```
 
-Use atomic directory creation for locks. If another active lock exists, do not modify that goal. Report the owner, age, and intended next step. A stale lock may be removed only after checking the recorded PID/session is no longer active or after user approval.
+使用 atomic directory creation 建立 locks。若另一個 active lock 存在，不要修改該 goal。回報 owner、age 與預計 next step。只有在檢查 recorded PID/session 已不再 active，或取得使用者同意後，才移除 stale lock。
 
-Recommended default TTL: 30 minutes. A tool may override TTL when a legitimate long-running task is active.
+建議 default TTL：30 minutes。工具可在合法 long-running task active 時覆寫 TTL。
 
-## Completion And Deletion
+## 完成與刪除
 
-Delete a goal file only when all are true:
+只有全部成立時才刪除 goal file：
 
-1. The completion criteria are met.
-2. Validation has run or the user explicitly accepts the result.
-3. No child goal remains active, blocked, or needs validation.
-4. The final answer or handoff states the outcome.
+1. Completion criteria 已滿足。
+2. Validation 已執行，或使用者明確接受結果。
+3. 沒有 child goal 仍為 active、blocked 或 needs validation。
+4. Final answer 或 handoff 已說明 outcome。
 
-When all deletion conditions are true, deletion is required in the same close-out turn: remove the goal file and refresh `<PROJECT_ROOT>/.agent-goals/README.md` so completed work does not remain in the active recovery table. Do not leave a `completed` row as a long-term memory or archive; durable lessons belong in project docs, commits, issues, or reusable skill feedback, not in `.agent-goals/`.
+當所有刪除條件成立時，必須在同一 close-out turn 刪除 goal file，並刷新 `<PROJECT_ROOT>/.agent-goals/README.md`，避免 completed work 長期留在 active recovery table。不要把 `completed` row 當成長期記憶或 archive；durable lessons 應放在 project docs、commits、issues 或 reusable skill feedback，不放 `.agent-goals/`。
 
-If the work is done but validation is missing, set status to `needs-validation` rather than deleting it.
+如果工作完成但 validation 缺失，設為 `needs-validation`，不要刪除。
 
-If the goal was superseded, keep it until the user accepts the new direction or the reason is clear enough for a future agent. Then it may be deleted or archived according to project preference.
+若 goal 被 superseded，保留到使用者接受新方向，或原因足夠清楚讓 future agent 接手。之後可依 project preference 刪除或歸檔。
 
-## Relationship To Ai-skill Writeback Transactions
+## 與 Canonical Repository Writeback Transactions 的關係
 
-This ledger is separate from the Ai-skill writeback transaction in [`dependency-reading.md`](dependency-reading.md).
+本 ledger 與 [`dependency-reading.md`](dependency-reading.md) 中的 canonical repository writeback transaction 是不同機制。
 
-- Conversation goal ledger: project-local, temporary, not committed, tracks user goals and handoff state.
-- Ai-skill writeback transaction: repository-specific, committed/pushed, tracks changes to this knowledge base and configured tool sync/mirrors.
+- Conversation goal ledger：project-local、temporary、不提交，追蹤 user goals 與 handoff state。
+- Canonical repository writeback transaction：repository-specific、需 commit/push，追蹤本 knowledge OS 的變更與 configured tool sync/mirrors。
 
-When updating this repository, both may apply: the project goal ledger tracks the user-facing task, while the Ai-skill transaction must still close through diff review, linked updates, sync, commit, push, reread, and clean status.
+更新本 repository 時，兩者可能同時適用：project goal ledger 追蹤 user-facing task，而 repository transaction 仍必須完成 diff review、linked updates、sync、commit、push、reread 與 clean status。
 
 ## Tool Integration
 
-Tools may automate ledger checks, but automation is advisory unless it can deterministically validate the goal. A hook or script should remind, create, or inspect goals; it should not silently mark goals complete without the completion criteria and validation evidence.
+工具可自動化 ledger checks，但除非能 deterministic validate goal，否則 automation 只能作為提醒。Hook 或 script 可以提醒、建立或檢查 goals；沒有 completion criteria 與 validation evidence 時，不應 silently mark goals complete。
 
-For tool-specific handling, see the matching documentation under `ai-tools/`.
+工具專屬處理見 `ai-tools/` 中對應文件。
 
 ← [Back to shared rules index](README.md)

@@ -1,19 +1,19 @@
-# Failure Patterns
+# 失效模式 Patterns
 
-This directory stores reusable cross-skill agent failure patterns. Each pattern records a generalized failure mode, trigger, required action, prevention gate, and validation method.
+本目錄存放跨 skill 可重用的 agent failure patterns。每個 pattern 記錄泛化後的 failure mode、trigger、required action、prevention gate 與 validation method。
 
-Read this index when [`failure-learning-system.md`](../failure-learning-system.md) tells you to promote or look up a reusable failure pattern.
+當 [`failure-learning-system.md`](../failure-learning-system.md) 要求 promote 或查找 reusable failure pattern 時，先讀本索引。
 
-| Pattern | Class | Status | Summary |
+| Pattern | Class | Status | 摘要 |
 | --- | --- | --- | --- |
-| [Entrypoint positioning drift](entrypoint-positioning-drift.md) | `validation-gap` | validated | Prevent agents from updating secondary links or sections while leaving the root title, opening paragraph, or primary entrypoint framing stale after naming or architecture changes. |
-| [Source / mirror write drift](source-mirror-write-drift.md) | `source-mirror-drift` | validated | Prevent agents from updating project-local tool mirrors or runtime copies instead of the canonical Ai-skill source repo. |
+| [Entrypoint positioning drift](entrypoint-positioning-drift.md) | `validation-gap` | validated | 防止 agent 在命名或架構變更後，只更新次要連結或段落，卻留下 root title、opening paragraph 或主要入口 framing 過期。 |
+| [Source / mirror write drift](source-mirror-write-drift.md) | `source-mirror-drift` | validated | 防止 agent 更新 project-local tool mirrors 或 runtime copies，而不是 canonical source repo。 |
 
-## Maintenance
+## 維護
 
-- Keep project-specific evidence out of this directory.
-- Add a new pattern when a failure mode can recur across projects, tools, skills, or agents.
-- If a pattern becomes skill-specific, move the lesson to that skill's `feedback_history/` and link back here only if the cross-skill trigger remains useful.
-- If a pattern becomes long, split examples into separate pattern files instead of expanding the index.
+- 不要把 project-specific evidence 放進本目錄。
+- 當 failure mode 可能跨 projects、tools、skills 或 agents 重演時，新增 pattern。
+- 若 pattern 變成 skill-specific，把 lesson 移到該 skill 的 `feedback_history/`；只有 cross-skill trigger 仍有價值時，才從這裡連回。
+- 若 pattern 變長，拆出獨立 examples，不要膨脹索引。
 
 ← [Back to shared rules index](../README.md)

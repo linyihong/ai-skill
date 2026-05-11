@@ -1,42 +1,42 @@
-# Entrypoint Positioning Drift
+# Entrypoint Positioning Drift（入口定位漂移）
 
 Status: validated
 Class: validation-gap
 
 ## Trigger
 
-When a repository, skill, shared rule, architecture document, or tool adapter is renamed, re-scoped, or promoted to a new top-level concept.
+當 repository、skill、shared rule、architecture document 或 tool adapter 被 rename、re-scope，或提升成新的 top-level concept 時，使用此 pattern。
 
 ## Failure Mode
 
-The agent updates secondary references, mid-document sections, links, or filenames but misses the primary entrypoint positioning: the root title, opening paragraph, index summary, or first screen a future reader will see.
+Agent 更新了 secondary references、mid-document sections、links 或 filenames，卻漏掉 primary entrypoint positioning：root title、opening paragraph、index summary，或 future reader 第一眼會看到的 framing。
 
 ## Risk
 
-Users and future agents see stale framing first, even though deeper links point to the new concept. This creates confusion about the source of truth, weakens architecture adoption, and can make a completed update look incomplete.
+即使 deeper links 已指向新概念，使用者與 future agents 仍會先看到 stale framing。這會混淆 source of truth、削弱 architecture adoption，並讓已完成的更新看起來不完整。
 
 ## Required Agent Action
 
-For naming, branding, architecture, or top-level scope changes:
+針對 naming、branding、architecture 或 top-level scope changes：
 
-1. Identify the primary entrypoint files before editing.
-2. Update the title and opening positioning, not only links or mid-document sections.
-3. Search for old names, old slugs, and old framing after edits.
-4. Re-read the entrypoint as a user would see it from the top.
-5. If a user points out the drift, run the failure learning loop immediately instead of only patching the missed line.
+1. 編輯前先辨識 primary entrypoint files。
+2. 更新 title 與 opening positioning，不只更新 links 或 mid-document sections。
+3. 編輯後搜尋 old names、old slugs 與 old framing。
+4. 從第一行開始重讀 entrypoint，模擬使用者看到的順序。
+5. 若使用者指出 drift，立刻跑 failure learning loop，而不是只補漏掉的那一行。
 
 ## Prevention Gate
 
-Before claiming completion, answer:
+宣稱完成前，回答：
 
-- Does the first heading use the new canonical name?
-- Does the first paragraph describe the new role/scope?
-- Do root indexes and architecture/tool indexes point to the new canonical file?
-- Does a search for old names and old slugs return only intentional historical references?
+- 第一個 heading 是否使用新的 canonical name？
+- 第一段是否描述新的 role/scope？
+- Root indexes 與 architecture/tool indexes 是否指向新的 canonical file？
+- 搜尋 old names 與 old slugs 時，是否只剩 intentional historical references？
 
-## Validation
+## 驗證
 
-Read back the root entrypoint and the changed architecture/tool/shared indexes from line 1. Run an exact search for the old name and old slug. Confirm `git status --short --branch` is clean after commit/push/readback.
+從第 1 行讀回 root entrypoint 與已變更的 architecture/tool/shared indexes。對 old name 與 old slug 做 exact search。Commit/push/readback 後確認 `git status --short --branch` 乾淨。
 
 ## Linked Rules
 

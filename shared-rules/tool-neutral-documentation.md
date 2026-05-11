@@ -1,59 +1,59 @@
-# Tool-Neutral Documentation
+# 工具中立文件
 
-Reusable rules, skills, templates, indexes, and feedback lessons should be tool-neutral by default. Tool-specific setup, paths, hooks, commands, UI labels, and synchronization details belong under `ai-tools/` or the tool's own configuration files.
+可重用規則、skills、templates、索引與 feedback lessons 預設應保持工具中立。工具專屬設定、路徑、hook、命令、UI 標籤與同步細節，應放在 `ai-tools/` 或該工具自己的設定檔。
 
-## Core Rule
+## 核心規則
 
-When writing reusable documentation:
+撰寫可重用文件時：
 
-1. Describe the portable behavior, decision rule, workflow, or artifact first.
-2. Use generic terms such as `agent`, `AI tool`, `tool-specific adapter`, `local tool mirror`, `project tool config`, and `<PROJECT_ROOT>`.
-3. Do not make a specific tool sound required unless the rule truly only applies to that tool.
-4. Use a Strategy-style adapter when behavior differs by tool: keep the common contract in the skill/shared rule, and isolate only the tool-specific execution details.
-5. Put tool-wide setup instructions in the matching `ai-tools/<tool>.md` file.
-6. Put skill-specific tool execution differences in a small skill-local adapter document only when the difference belongs to that skill.
-7. Link from reusable docs to `ai-tools/` or the skill-local adapter when users need concrete setup steps.
+1. 先描述可攜的行為、決策規則、workflow 或 artifact。
+2. 使用通用詞彙，例如 `agent`、`AI tool`、`tool-specific adapter`、`local tool mirror`、`project tool config` 與 `<PROJECT_ROOT>`。
+3. 除非規則確實只適用於單一工具，否則不要讓特定工具聽起來像必要條件。
+4. 工具行為不同時，使用 Strategy-style adapter：核心 skill/shared rule 保留共同契約，工具專屬執行差異獨立放置。
+5. 工具層級設定放在對應的 `ai-tools/<tool>.md`。
+6. skill-specific 工具執行差異只在確實屬於該 skill 時，放入小型 skill-local adapter 文件。
+7. 使用者需要具體設定步驟時，從可重用文件連到 `ai-tools/` 或 skill-local adapter。
 
-## Allowed Tool-Specific Locations
+## 允許工具專屬內容的位置
 
-Tool names, paths, and UI instructions may appear in:
+工具名稱、路徑與 UI 操作可出現在：
 
-| Location | Allowed content |
+| 位置 | 允許內容 |
 | --- | --- |
-| `ai-tools/<tool>.md` | Tool setup, sync paths, UI steps, hooks, settings, and troubleshooting. |
-| `skills/<skill>/tool-adapters/<tool>.md` | Skill-specific execution differences for one tool, when the core skill remains tool-neutral. |
-| Tool config files such as `.cursor/rules/*.mdc` | Rules loaded by that tool. |
-| Tool-specific scripts or script docs | Commands that exist only for that tool, with a link from generic docs when needed. |
-| Project-local tool files | Project-specific adapter configuration, if it is safe to commit in that project. |
+| `ai-tools/<tool>.md` | 工具設定、同步路徑、UI 步驟、hooks、settings 與 troubleshooting。 |
+| `skills/<skill>/tool-adapters/<tool>.md` | 單一工具的 skill-specific 執行差異；核心 skill 仍保持工具中立。 |
+| `.cursor/rules/*.mdc` 等工具設定檔 | 該工具載入的規則。 |
+| 工具專屬 scripts 或 script docs | 只屬於該工具的命令；必要時從通用 docs 連過去。 |
+| Project-local tool files | 若可安全提交到該專案，可放專案專屬 adapter 設定。 |
 
-## Avoid In Reusable Docs
+## 可重用文件中應避免
 
-Avoid tool-specific wording in these places unless the section is explicitly about tool integration:
+除非章節明確討論工具整合，否則下列位置避免工具專屬措辭：
 
-- Root `README.md`.
-- `shared-rules/README.md` index summaries.
-- Skill `README.md`, `SKILL.md`, `WORKFLOW.md`, `TOOLS.md`, `DOCUMENTATION.md`.
-- Skill templates and `skills/ADDING_SKILLS.md`.
-- Feedback lessons and reusable checklists.
+- Root `README.md`。
+- `shared-rules/README.md` 索引摘要。
+- Skill `README.md`、`SKILL.md`、`WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md`。
+- Skill templates 與 `skills/ADDING_SKILLS.md`。
+- Feedback lessons 與可重用 checklists。
 
-Examples:
+範例：
 
-| Less portable | Prefer |
+| 較不通用的寫法 | 優先寫法 |
 | --- | --- |
 | `Cursor agent entry point` | `Agent entry point` |
 | `Reload Cursor` | `Reload or refresh the active tool if it caches skills/rules` |
 | `copy to .cursor/skills` | `deploy to the active tool's skill/rule location; see ai-tools/` |
-| `run sync-cursor-bundle.sh` in a generic rule | `run the configured tool sync; Cursor details live in ai-tools/cursor.md` |
+| generic rule 中寫 `run sync-cursor-bundle.sh` | `run the configured tool sync; Cursor details live in ai-tools/cursor.md` |
 
-## Relationship To Existing Tool Files
+## 與既有工具文件的關係
 
-This repository currently includes Cursor-specific documentation and helper scripts. They are still valid, but references to them should be centralized in `ai-tools/cursor.md`, `shared-rules/cursor-sync.md`, `.cursor/rules/`, and script docs when the script itself is tool-specific.
+本 repository 目前包含 Cursor-specific 文件與 helper scripts。它們仍然有效，但引用應集中在 `ai-tools/cursor.md`、`shared-rules/cursor-sync.md`、`.cursor/rules/` 與 script docs；如果 script 本身是工具專屬，也可在 script docs 說明。
 
-Reusable docs may mention a tool only as an example, not as the default requirement, unless the file is already inside that tool's documentation area.
+可重用文件可以把工具當作範例提及，但不可把工具寫成預設要求；除非該文件本來就在該工具的文件區域內。
 
-## Strategy-Style Tool Adapters
+## Strategy-style Tool Adapters
 
-Use this pattern when a skill has real execution differences across AI tools:
+當某個 skill 在不同 AI tools 中有實際執行差異時，使用此模式：
 
 ```text
 skills/<skill>/
@@ -64,40 +64,40 @@ skills/<skill>/
     <tool>.md               # only the execution differences for that tool
 ```
 
-The core skill document acts like the strategy interface:
+核心 skill 文件像 strategy interface：
 
-- Trigger conditions.
-- Inputs and outputs.
-- Required evidence and validation.
-- Safety, sanitization, and handoff rules.
-- Tool-neutral workflow and terminology.
+- Trigger conditions。
+- Inputs and outputs。
+- Required evidence and validation。
+- Safety、sanitization 與 handoff rules。
+- Tool-neutral workflow 與 terminology。
 
-Each tool adapter acts like one strategy implementation:
+每個 tool adapter 像一個 strategy implementation：
 
-- Which tool events, commands, hooks, prompts, or settings are used.
-- What the tool can automate versus what remains manual.
-- Tool-specific failure modes and validation.
-- Links back to the exact core workflow steps it implements.
+- 使用哪些工具事件、命令、hooks、prompts 或 settings。
+- 工具可以自動化什麼，哪些仍需人工處理。
+- 工具專屬 failure modes 與 validation。
+- 連回它實作的核心 workflow 步驟。
 
-Do not copy the full core workflow into each adapter. If a tool-specific adapter needs to restate common behavior, move that behavior back to the core skill/shared rule and link to it.
+不要把完整核心 workflow 複製到每個 adapter。若 tool-specific adapter 需要重述共同行為，應把共同內容移回核心 skill/shared rule，再由 adapter 連回去。
 
-Choose placement by scope:
+依 scope 選擇放置位置：
 
-| Scope | Placement |
+| Scope | 放置位置 |
 | --- | --- |
-| Tool-wide setup, sync, global hooks, UI, settings | `ai-tools/<tool>.md` |
-| Skill-specific execution details for one tool | `skills/<skill>/tool-adapters/<tool>.md` |
-| Project-specific tool config | Project docs or project tool config |
+| Tool-wide setup、sync、global hooks、UI、settings | `ai-tools/<tool>.md` |
+| 單一工具的 skill-specific 執行差異 | `skills/<skill>/tool-adapters/<tool>.md` |
+| Project-specific tool config | Project docs 或 project tool config |
 | Reusable cross-tool policy | `shared-rules/` |
 
 ## Review Checklist
 
-Before finishing a reusable documentation change, check:
+完成可重用文件變更前，檢查：
 
-- Does the root or skill-level wording depend on a single IDE or agent product?
-- Are tool-specific paths such as `.cursor/` or `~/.cursor/` only in tool docs, tool config, or explicitly tool-specific scripts?
-- Does a generic rule say "configured tool sync" first and link to `ai-tools/` for concrete commands?
-- If a skill needs tool-specific behavior, is it isolated in `tool-adapters/<tool>.md` and linked back to the core workflow?
-- Did any new skill or shared rule accidentally copy a tool-specific setup section instead of linking to it?
+- Root 或 skill-level 文字是否依賴單一 IDE 或 agent 產品？
+- `.cursor/` 或 `~/.cursor/` 等工具專屬路徑是否只出現在 tool docs、tool config 或明確工具專屬 scripts？
+- Generic rule 是否先使用「configured tool sync」，並連到 `ai-tools/` 取得具體命令？
+- 如果 skill 需要 tool-specific 行為，是否隔離在 `tool-adapters/<tool>.md`，並連回核心 workflow？
+- 新增的 skill 或 shared rule 是否誤複製工具專屬設定章節，而不是連到工具文件？
 
 ← [Back to shared rules index](README.md)

@@ -1,56 +1,56 @@
-# Source / Mirror Write Drift
+# Source / Mirror Write Drift（source / mirror 寫入漂移）
 
 Status: validated
 Class: `source-mirror-drift`
 
 ## Trigger
 
-Use this pattern when a user asks an agent to update rules, skills, tool setup, feedback lessons, templates, or Ai-skill guidance, especially when the visible file is under a project `.cursor`, `~/.cursor`, generated bundle, runtime copy, or other tool mirror.
+當使用者要求 agent 更新 rules、skills、tool setup、feedback lessons、templates 或 OS guidance，且可見檔案位於 project `.cursor`、`~/.cursor`、generated bundle、runtime copy 或其他 tool mirror 時，使用此 pattern。
 
 ## Failure Mode
 
-The agent edits the copy that the current tool can see instead of editing the canonical `<AI_SKILL_REPO>` source repository. The result looks fixed in the current session, but the reusable knowledge does not reliably persist, sync, commit, or propagate to other projects and tools.
+Agent 編輯目前工具看得到的 copy，而不是 canonical `<AI_SKILL_REPO>` source repository。當前 session 看起來已修好，但 reusable knowledge 不會可靠 persist、sync、commit，或傳播到其他 projects 和 tools。
 
 ## Risk
 
-- The next agent reads stale canonical rules and repeats the same mistake.
-- A project-local `.cursor` copy diverges from the shared knowledge base.
-- Tool sync, commit, push, and readback gates are skipped because the agent thinks the mirror is the source.
-- Private project paths or tool-local details can leak into reusable docs.
+- 下一個 agent 讀到 stale canonical rules，並重複同一錯誤。
+- Project-local `.cursor` copy 與 shared knowledge base 分歧。
+- Agent 誤以為 mirror 是 source，跳過 tool sync、commit、push 與 readback gates。
+- Private project paths 或 tool-local details 可能洩漏進 reusable docs。
 
 ## Required Agent Action
 
-1. Stop broad editing as soon as source/mirror confusion is suspected.
-2. Locate `<AI_SKILL_REPO>` and confirm it is the git root.
-3. Check `git status --short --branch` in `<AI_SKILL_REPO>`.
-4. Apply the reusable change in the canonical source file.
-5. Treat project `.cursor`, `~/.cursor/skills*`, `~/.cursor/shared-rules`, `~/.cursor/bundles/*`, and generated bundles as deployment or runtime surfaces.
-6. Run the configured tool sync only after source changes are correct.
-7. Commit, push, reread updated entries, and confirm clean status before claiming completion.
+1. 一旦懷疑 source/mirror confusion，停止廣泛編輯。
+2. 定位 `<AI_SKILL_REPO>`，並確認它是 git root。
+3. 在 `<AI_SKILL_REPO>` 檢查 `git status --short --branch`。
+4. 在 canonical source file 套用 reusable change。
+5. 將 project `.cursor`、`~/.cursor/skills*`、`~/.cursor/shared-rules`、`~/.cursor/bundles/*` 與 generated bundles 視為 deployment 或 runtime surfaces。
+6. 只有 source changes 正確後，才執行 configured tool sync。
+7. 宣稱完成前，commit、push、reread updated entries，並確認 clean status。
 
 ## Prevention Gate
 
-Before the first write to rules, skills, templates, feedback lessons, or tool deployment paths, the agent must be able to answer:
+第一次寫入 rules、skills、templates、feedback lessons 或 tool deployment paths 前，agent 必須能回答：
 
 | Check | Required answer |
 | --- | --- |
-| Canonical repo | Which path is `<AI_SKILL_REPO>` and is it the git root? |
-| Current file role | Is this file source, project config, tool mirror, runtime copy, or generated output? |
-| Source edit | Which canonical source file will be edited first? |
-| Sync strategy | Is this reference-only, symlink/bundle, or copy snapshot? |
-| Close loop | What diff review, sync, commit, push, readback, and clean-status checks will run? |
+| Canonical repo | 哪個路徑是 `<AI_SKILL_REPO>`，且它是否為 git root？ |
+| Current file role | 目前檔案是 source、project config、tool mirror、runtime copy，還是 generated output？ |
+| Source edit | 會先編輯哪個 canonical source file？ |
+| Sync strategy | 目前是 reference-only、symlink/bundle，還是 copy snapshot？ |
+| Close loop | 會跑哪些 diff review、sync、commit、push、readback 與 clean-status checks？ |
 
-If any answer is unknown, do not edit the mirror. Read [`dependency-reading.md`](../dependency-reading.md), [`cursor-sync.md`](../cursor-sync.md), and the relevant `ai-tools/` document first.
+若任何答案未知，不要編輯 mirror。先讀 [`dependency-reading.md`](../dependency-reading.md)、[`cursor-sync.md`](../cursor-sync.md) 與相關 `ai-tools/` 文件。
 
-## Validation
+## 驗證
 
-This pattern is validated when:
+符合下列條件時，此 pattern 已被驗證：
 
-- The canonical source file contains the reusable change.
-- Mirror or runtime paths are either unchanged, symlinked to source, or updated only by the configured sync.
-- `git diff` and `git status --short --branch` were checked in `<AI_SKILL_REPO>`.
-- The change was committed, pushed, and read back when it affects Ai-skill.
-- The final response names any project-local mirror changes separately from the Ai-skill source update.
+- Canonical source file 包含 reusable change。
+- Mirror 或 runtime paths 未變更、symlinked to source，或只由 configured sync 更新。
+- 已在 `<AI_SKILL_REPO>` 檢查 `git diff` 與 `git status --short --branch`。
+- 變更影響 repository 時，已 commit、push、read back。
+- Final response 將 project-local mirror changes 與 source update 分開命名。
 
 ## Linked Rules
 

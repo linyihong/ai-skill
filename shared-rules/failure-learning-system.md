@@ -1,60 +1,60 @@
-# Failure Learning System
+# 失效學習系統
 
-This rule turns repeated agent mistakes into durable prevention. It connects failure capture, classification, reusable pattern records, linked updates, and validation so the same failure mode is less likely to recur.
+本規則把重複 agent 錯誤轉成 durable prevention。它連接 failure capture、classification、reusable pattern records、linked updates 與 validation，讓同類失效模式較不容易重演。
 
-Use this when a user points out an agent mistake, a close-loop gap, wrong source/mirror update, missed dependency, incomplete validation, forgotten goal, unsafe parallel work, or any repeated behavior that should become part of the Ai-skill operating system.
+當使用者指出 agent mistake、close-loop gap、wrong source/mirror update、missed dependency、incomplete validation、forgotten goal、unsafe parallel work，或任何應成為 AI-native Knowledge Operating System 一部分的重複行為時，使用本規則。
 
-## Core Rule
+## 核心規則
 
-When a failure is discovered, do not only fix the immediate file. Run the failure learning loop:
+發現 failure 時，不要只修當下檔案。必須跑 failure learning loop：
 
-1. **Capture** the failure in the current work context: what went wrong, where it was detected, and what user-facing risk it created.
-2. **Classify** the failure mode using the taxonomy below.
-3. **Contain** the current risk before broad work continues.
-4. **Promote** the reusable lesson to the right durable location.
-5. **Strengthen** the rule, workflow, checklist, tool adapter, or validation gate that would have prevented it.
-6. **Validate** that the prevention can be found and applied by a future agent.
+1. **Capture**：在目前工作脈絡記錄發生什麼、在哪裡被發現、造成什麼 user-facing risk。
+2. **Classify**：用下方 taxonomy 分類失效模式。
+3. **Contain**：繼續廣泛工作前先控制當前風險。
+4. **Promote**：把可重用 lesson 放到正確 durable location。
+5. **Strengthen**：補強原本可防止它的 rule、workflow、checklist、tool adapter 或 validation gate。
+6. **Validate**：確認未來 agent 找得到並能套用這個 prevention。
 
-The goal is not to archive blame. The goal is to convert an observed failure into a reusable guardrail with a clear trigger and validation method.
+目標不是歸檔責任，而是把已觀察到的 failure 轉成有明確 trigger 與 validation method 的 reusable guardrail。
 
 ## Failure Taxonomy
 
-| Class | Meaning | Common prevention |
+| Class | 意義 | 常見 prevention |
 | --- | --- | --- |
-| `source-mirror-drift` | Agent updated a local tool mirror, project `.cursor`, runtime copy, or generated bundle instead of the canonical source repository. | Require canonical repo check, source-first edit, then tool sync. |
-| `dependency-miss` | Agent changed or used a rule/skill without reading required linked dependencies. | Add or strengthen dependency read ledger and linked updates. |
-| `goal-ledger-miss` | Multi-step or resumable user goal was not recorded, updated, split, paused, or completed correctly. | Update `.agent-goals/` before continuing and link todos/plans. |
-| `validation-gap` | Agent claimed completion without diff review, lints, tests, link check, source check, sync, push, readback, or clean status. | Add a concrete validation gate and report what ran. |
-| `scope-drift` | Agent mixed unrelated changes, project incident details, or local absolute paths into reusable docs. | Apply reusable guidance boundary and sanitization. |
-| `handoff-gap` | Agent left unclear next actions, blockers, owner/lock state, or remaining decisions. | Update goal ledger, Document TODO, or handoff notes. |
-| `tool-strategy-gap` | A reusable rule assumed one tool's behavior instead of isolating tool-specific execution. | Move tool-specific details to `ai-tools/` or a skill adapter. |
-| `parallelization-risk` | Multiple agents could edit shared state, git history, migrations, release steps, or rules independently. | Mark non-parallelizable or single-owner and stop on conflicting locks. |
+| `source-mirror-drift` | Agent 更新了 local tool mirror、project `.cursor`、runtime copy 或 generated bundle，而不是 canonical source repository。 | 要求 canonical repo check、source-first edit，再做 tool sync。 |
+| `dependency-miss` | Agent 修改或使用 rule/skill 時沒有讀 required linked dependencies。 | 補強 dependency read ledger 與 linked updates。 |
+| `goal-ledger-miss` | Multi-step 或可恢復 user goal 沒有正確記錄、更新、拆分、暫停或完成。 | 繼續前更新 `.agent-goals/`，並連到 todos/plans。 |
+| `validation-gap` | Agent 未做 diff review、lints、tests、link check、source check、sync、push、readback 或 clean status 就宣稱完成。 | 加入具體 validation gate，並回報實際跑了什麼。 |
+| `scope-drift` | Agent 把無關變更、project incident details 或 local absolute paths 混進 reusable docs。 | 套用 reusable guidance boundary 與 sanitization。 |
+| `handoff-gap` | Agent 留下不清楚的 next actions、blockers、owner/lock state 或 remaining decisions。 | 更新 goal ledger、Document TODO 或 handoff notes。 |
+| `tool-strategy-gap` | Reusable rule 假設單一工具行為，而沒有隔離 tool-specific execution。 | 將工具細節移到 `ai-tools/` 或 skill adapter。 |
+| `parallelization-risk` | 多個 agents 可能獨立編輯 shared state、git history、migrations、release steps 或 rules。 | 標記 `non-parallelizable` 或 `single-owner`，遇到衝突 lock 就停止。 |
 
-If a failure does not fit a class, add a new class only after checking whether an existing class can describe it clearly.
+若 failure 不符合現有 class，先檢查能否用既有 class 清楚描述；只有必要時才新增 class。
 
 ## Storage Rules
 
-| Content | Durable location |
+| 內容 | Durable location |
 | --- | --- |
-| Current unfinished fix, owner, lock, next action | `<PROJECT_ROOT>/.agent-goals/` |
-| Reusable cross-skill failure pattern | `shared-rules/failure-patterns/` |
-| Skill-specific technique or failure lesson | `skills/<skill>/feedback_history/` |
-| Tool-specific reminder, hook, prompt, or UI detail | `ai-tools/<tool>.md` or tool config |
-| Project incident evidence, raw logs, exact private paths, hosts, tokens | Project docs, issue tracker, or private evidence, not reusable docs |
+| 當前未完成修復、owner、lock、next action | `<PROJECT_ROOT>/.agent-goals/` |
+| 跨 skill 可重用 failure pattern | `shared-rules/failure-patterns/` |
+| Skill-specific technique 或 failure lesson | `skills/<skill>/feedback_history/` |
+| Tool-specific reminder、hook、prompt 或 UI detail | `ai-tools/<tool>.md` 或 tool config |
+| Project incident evidence、raw logs、exact private paths、hosts、tokens | Project docs、issue tracker 或 private evidence，不進 reusable docs |
 
-Do not store secrets, real tokens, raw private data, or local absolute paths in failure patterns. Use placeholders such as `<AI_SKILL_REPO>`, `<PROJECT_ROOT>`, `<tool-mirror>`, and `<runtime-copy>`.
+不要把 secrets、real tokens、raw private data 或 local absolute paths 寫進 failure patterns。使用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<tool-mirror>`、`<runtime-copy>` 等 placeholders。
 
 ## Failure Pattern Record
 
-Create or update a reusable pattern when the same failure could recur across projects, agents, tools, or skills.
+當同一 failure 可能跨 projects、agents、tools 或 skills 重演時，建立或更新 reusable pattern。
 
-Recommended file:
+建議檔案：
 
 ```text
 shared-rules/failure-patterns/<short-slug>.md
 ```
 
-Recommended shape:
+建議格式：
 
 ```markdown
 # <Pattern Title>
@@ -77,53 +77,53 @@ What must the agent do next time?
 ## Prevention Gate
 What check would have stopped the mistake?
 
-## Validation
+## 驗證
 How to confirm the prevention worked?
 
 ## Linked Rules
 - <shared rule / skill / tool doc links>
 ```
 
-Keep pattern records short. If a pattern becomes long, split examples into smaller pattern files and keep `failure-patterns/README.md` as the index.
+Pattern records 要短。若 pattern 變長，將 examples 拆成較小 pattern files，並讓 `failure-patterns/README.md` 保持索引功能。
 
 ## Promotion Decision
 
-After classifying a failure, choose the smallest durable promotion target that prevents recurrence:
+分類 failure 後，選擇能防止重犯的最小 durable promotion target：
 
 | Failure scope | Promotion target |
 | --- | --- |
-| One active conversation only | `.agent-goals/` progress or handoff note |
-| One reusable document has an open local gap | Document TODO near the top of that document |
-| Cross-document or cross-agent workflow failure | `shared-rules/failure-patterns/` plus the relevant shared rule |
-| Skill-specific repeated mistake | The skill's `feedback_history/` and, when mature, its workflow/checklist |
-| Tool-specific execution failure | `ai-tools/<tool>.md`, tool config, or skill tool adapter |
+| 只影響單一 active conversation | `.agent-goals/` progress 或 handoff note |
+| 單一 reusable document 有局部 open gap | 該文件前段的 Document TODO |
+| Cross-document 或 cross-agent workflow failure | `shared-rules/failure-patterns/` 加上相關 shared rule |
+| Skill-specific repeated mistake | 該 skill 的 `feedback_history/`，成熟後再推進 workflow/checklist |
+| Tool-specific execution failure | `ai-tools/<tool>.md`、tool config 或 skill tool adapter |
 
-Do not promote a project incident directly into reusable docs. First generalize the cause, trigger, required action, and validation.
+不要把 project incident 直接推進 reusable docs。必須先泛化 cause、trigger、required action 與 validation。
 
 ## Source And Mirror Failures
 
-`source-mirror-drift` is a high-priority failure class for this repository.
+`source-mirror-drift` 是本 repository 的高優先失效類別。
 
-When a user asks to update rules, skills, feedback lessons, templates, or Ai-skill guidance, the agent must:
+當使用者要求更新 rules、skills、feedback lessons、templates 或 OS guidance 時，agent 必須：
 
-1. Locate the canonical `<AI_SKILL_REPO>` git root.
-2. Confirm `git status --short --branch` in that repo.
-3. Edit the canonical source files first.
-4. Treat `.cursor`, `~/.cursor/skills*`, `~/.cursor/shared-rules`, `~/.cursor/bundles/*`, generated bundles, and project-local mirrors as deployment surfaces.
-5. Sync mirrors only after the source repo change is complete.
-6. Commit, push, read back, and confirm clean status before claiming the update is complete.
+1. 定位 canonical `<AI_SKILL_REPO>` git root。
+2. 在該 repo 確認 `git status --short --branch`。
+3. 先編輯 canonical source files。
+4. 將 `.cursor`、`~/.cursor/skills*`、`~/.cursor/shared-rules`、`~/.cursor/bundles/*`、generated bundles 與 project-local mirrors 視為 deployment/runtime surfaces。
+5. Source repo change 完成後才同步 mirrors。
+6. Commit、push、read back，並確認 clean status 後才宣稱完成。
 
-Reference-first tool setup helps because it reduces duplicate copies, but it does not replace the source check. An agent can still write the wrong place unless this gate is explicit.
+Reference-first tool setup 可減少 duplicate copies，但不取代 source check。若沒有明確 gate，agent 仍可能寫錯地方。
 
-## Validation
+## 驗證
 
-Before closing a failure-learning update, verify:
+關閉 failure-learning update 前，確認：
 
-- The immediate issue is contained or explicitly recorded as still open.
-- The failure class is named.
-- The durable location is correct.
-- The prevention gate is written where future agents will read it.
-- Linked updates have been checked.
-- If Ai-skill changed, tool sync, commit, push, readback, and clean status are complete.
+- Immediate issue 已被控制，或明確記錄仍 open。
+- Failure class 已命名。
+- Durable location 正確。
+- Prevention gate 已寫在未來 agent 會讀到的位置。
+- Linked updates 已檢查。
+- 若 canonical repository 有變更，tool sync、commit、push、readback 與 clean status 已完成；reference-first 時 tool sync 可標 not applicable。
 
 ← [Back to shared rules index](README.md)

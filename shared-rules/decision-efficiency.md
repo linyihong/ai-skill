@@ -1,83 +1,83 @@
-# Decision Efficiency
+# 決策效率
 
-Use this rule to choose the next useful action without overloading context, tools, or the user. The goal is to preserve decision quality while reducing unnecessary reading, broad exploration, duplicate work, and token-heavy context.
+本規則用來在不過度消耗 context、工具或使用者注意力的前提下，選擇下一個有用行動。目標是在降低無關閱讀、廣泛探索、重複工作與 token-heavy context 的同時，維持決策品質。
 
-This rule generalizes the decision routing pattern used in technical skills such as APK analysis: start from the current unknown, compare evidence paths, choose the highest-yield route, and load only the documents needed for that route.
+本規則泛化了 APK analysis 等技術 skill 的決策路由模式：先界定目前未知，再比較證據路徑，選擇最高收益路線，只載入該路線需要的文件。
 
-## Core Rule
+## 核心規則
 
-Before doing substantial work, state the current decision point in one sentence:
+做實質工作前，用一句話說明目前決策點：
 
 ```text
 Current unknown: <what must be learned or decided next>
 ```
 
-Then choose the next action by comparing:
+接著依下列標準選擇下一步：
 
-| Criterion | Question |
+| 標準 | 問題 |
 | --- | --- |
-| Time to evidence | Which path can answer the unknown fastest? |
-| Semantic distance | Which source is closest to the real decision, not just noisy symptoms? |
-| Safety / reversibility | Which action is least destructive and easiest to roll back? |
-| Validation signal | Which path gives a clear pass/fail or confidence update? |
-| Context cost | Which files/tools are actually needed, and which can wait? |
-| User value | Which result best advances the user's goal or removes a blocker? |
+| Time to evidence | 哪條路最快回答目前未知？ |
+| Semantic distance | 哪個來源最接近真正決策，而不是只看雜訊症狀？ |
+| Safety / reversibility | 哪個行動最不具破壞性、最容易回退？ |
+| Validation signal | 哪條路能提供清楚的 pass/fail 或信心更新？ |
+| Context cost | 哪些檔案/工具是真的需要，哪些可以等？ |
+| User value | 哪個結果最能推進使用者目標或移除 blocker？ |
 
-Prefer the route with the best evidence-to-cost ratio, not the route that happens to be first in a checklist.
+優先選 evidence-to-cost ratio 最高的路線，而不是第一個出現在 checklist 裡的路線。
 
 ## Context Loading
 
-Load context in layers:
+分層載入 context：
 
-1. **Bootstrap:** read the shared-rule bootstrap set.
-2. **Task frame:** read the user request, active `.agent-goals/` entry, and directly relevant open files.
-3. **Skill entry:** read the matching `SKILL.md` and its routing guidance.
-4. **Route-specific docs:** read only the workflow/tools/docs category needed for the current route.
-5. **Deep references:** read examples, techniques, feedback lessons, or source files only after evidence says they matter.
+1. **Bootstrap：**讀取 shared-rule bootstrap set。
+2. **Task frame：**讀取使用者要求、active `.agent-goals/` entry，以及直接相關的開啟檔案。
+3. **Skill entry：**讀取符合任務的 `SKILL.md` 與其 routing guidance。
+4. **Route-specific docs：**只讀目前路線需要的 workflow/tools/docs 分類。
+5. **Deep references：**只有證據顯示必要時，才讀 examples、techniques、feedback lessons 或 source files。
 
-Do not read every category or every technique by default. If a broad read seems necessary, explain why broad context is required and what decision it supports.
+不要預設讀完每個分類或每個 technique。若需要廣泛讀取，說明為什麼需要廣泛 context，以及它支援哪個決策。
 
 ## Decision Routing
 
-Use workflows as routing aids, not rigid scripts. When a workflow has many branches:
+把 workflow 當作 routing aid，不是僵硬腳本。當 workflow 有多個分支時：
 
-- Start with the highest-level triage.
-- Stop once evidence clearly points to a branch.
-- Read only that branch's detailed docs.
-- Keep other branches as fallbacks, not active context.
-- Re-route when evidence contradicts the current branch.
+- 從最高層 triage 開始。
+- 證據清楚指向某分支時就停止擴散。
+- 只讀該分支的詳細文件。
+- 其他分支保留為 fallback，不放進 active context。
+- 證據推翻目前分支時再重新路由。
 
-If an action has already answered the decision point, do not keep running broader or lower-level checks just because they are available.
+如果某個行動已回答決策點，不要只因為有工具或 checklist 就繼續跑更廣或更低層的檢查。
 
 ## Token And Noise Reduction
 
-Reduce context and output load by:
+降低 context 與輸出負擔：
 
-- Summarizing large evidence before expanding it.
-- Reading indexes before child files.
-- Using exact search for known names and semantic search only for broader discovery.
-- Keeping raw logs, large payloads, screenshots, and generated dumps in project artifacts, then citing paths or sanitized excerpts.
-- Recording open questions instead of reading unrelated files to fill speculative gaps.
-- Moving reusable but lengthy material into focused child files per [`document-sizing.md`](document-sizing.md).
+- 先摘要大型證據，再決定是否展開。
+- 先讀索引，再讀子檔。
+- 已知名稱用 exact search；廣泛探索才用 semantic search。
+- raw logs、大 payload、screenshots、generated dumps 放在專案 artifacts，回答中引用路徑或去敏摘錄。
+- 記錄 open questions，而不是為了填補推測缺口讀無關檔案。
+- 可重用但冗長的材料，依 [`document-sizing.md`](document-sizing.md) 移到聚焦子檔。
 
-Do not use token reduction as an excuse to skip required dependencies. If a dependency is required by [`dependency-reading.md`](dependency-reading.md), read it or mark it blocked / not applicable.
+不得用 token reduction 當作跳過 required dependencies 的理由。若 [`dependency-reading.md`](dependency-reading.md) 要求某依賴，必須讀取，或標為 blocked / not applicable。
 
 ## Stop Conditions
 
-Stop the current route and reassess when:
+遇到下列情況時，停止目前路線並重新評估：
 
-- The current route produced enough evidence to answer the unknown.
-- The route is generating noise without improving confidence.
-- The route becomes destructive, unstable, or too slow compared with an available alternative.
-- A higher-semantic source appears.
-- A user priority or blocker changes the goal.
-- Another active goal/owner/lock makes the work unsafe to continue in parallel.
+- 目前路線已產生足夠證據回答未知。
+- 路線產生雜訊但沒有提高信心。
+- 路線相較可用替代方案變得破壞性高、不穩或太慢。
+- 出現更高語意距離的來源。
+- 使用者優先順序或 blocker 改變目標。
+- 另一個 active goal/owner/lock 讓平行工作不安全。
 
-When stopping, record the reason in the answer, active goal, or document TODO if the decision affects future work.
+停止時，若該決策影響未來工作，需在回答、active goal 或 document TODO 記錄原因。
 
 ## Output Shape
 
-For important decisions, report:
+重要決策回報：
 
 ```text
 Current unknown:
@@ -88,13 +88,13 @@ What was deferred:
 Validation signal:
 ```
 
-Keep this short. The purpose is to make the route choice auditable, not to produce a long reasoning dump.
+保持簡短。目的在於讓路由選擇可稽核，不是產生冗長推理 dump。
 
-## Relationship To Other Rules
+## 與其他規則的關係
 
-- Use [`dependency-reading.md`](dependency-reading.md) for required dependency scope.
-- Use [`document-sizing.md`](document-sizing.md) when decision guidance grows too large or route-specific.
-- Use [`goal-action-validation.md`](goal-action-validation.md) for goal/action/validation closure.
-- Use [`conversation-goal-ledger.md`](conversation-goal-ledger.md) when route changes create new goals, blockers, or handoffs.
+- Required dependency scope 依 [`dependency-reading.md`](dependency-reading.md)。
+- 決策指引變長或變成路線專屬時，依 [`document-sizing.md`](document-sizing.md)。
+- 目標/執行/驗證閉環依 [`goal-action-validation.md`](goal-action-validation.md)。
+- 路線變更產生新 goal、blocker 或 handoff 時，依 [`conversation-goal-ledger.md`](conversation-goal-ledger.md)。
 
 ← [Back to shared rules index](README.md)
