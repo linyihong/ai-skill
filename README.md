@@ -28,6 +28,44 @@
 
 Reference-first is the default: agents read this repository directly. Symlink, bundle, and copy snapshot flows are compatibility layers for tools that cannot reliably reference the central repo.
 
+## New Project Quickstart
+
+Use this prompt when starting an agent in a new project:
+
+```text
+Use the AI-native Knowledge Operating System.
+
+Canonical repository:
+<AI_SKILL_REPO>
+
+Project:
+<PROJECT_ROOT>
+
+First read:
+<AI_SKILL_REPO>/README.md
+<AI_SKILL_REPO>/shared-rules/README.md
+
+Load the Default Bootstrap from shared-rules/README.md, including:
+- dependency-reading.md
+- linked-updates.md
+- conversation-goal-ledger.md
+- tool-neutral-documentation.md
+- rule-weight.md
+- decision-efficiency.md
+- failure-learning-system.md
+- document-todo-list.md
+- document-sizing.md
+- goal-action-validation.md
+- neutral-language.md
+
+Then choose the task-relevant skill from <AI_SKILL_REPO>/skills/.
+If the task spans multiple steps, first read or initialize <PROJECT_ROOT>/.agent-goals/.
+For reusable knowledge updates, edit the canonical repository only, not .cursor, ~/.cursor, bundles, or copied snapshots.
+For repository changes, validate linked updates, commit, push, reread changed entries, and confirm clean git status.
+```
+
+Reference-first is enough for normal use. Use symlink, bundle, or copy snapshot setup only when the active tool cannot reliably read `<AI_SKILL_REPO>` directly; tool-specific setup lives in [`ai-tools/`](ai-tools/README.md).
+
 ## Capability Modules
 
 | Skill | 用途 |
