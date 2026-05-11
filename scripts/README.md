@@ -5,6 +5,7 @@
 | [`sync-cursor-bundle.sh`](sync-cursor-bundle.sh) | 可選的 Cursor symlink / bundle bridge：把本庫同步到 **`~/.cursor/bundles/shared-rules`**（共用規則）與 **`~/.cursor/bundles/ai-skill/`**（各 skill），再讓 `~/.cursor/shared-rules`、`~/.cursor/skills/<name>` 指向 bundle（與其他 `.cursor` 內容分流）。Reference-only 不需要執行。 |
 | [`ai-skill-close-loop.sh`](ai-skill-close-loop.sh) | 保守收尾工具：偵測 active close-loop lock、列出 dirty 檔案 owner group；預設 dry-run，`--commit` 才分組提交，`--push` 才推遠端。 |
 | [`agent-goals.sh`](agent-goals.sh) | 工具中立的專案暫存 goal ledger helper：在 `<PROJECT_ROOT>/.agent-goals/` 建立、更新、拆解、暫停、完成刪除對話目標；不提交 goal 檔。 |
+| [`validate-knowledge-runtime.rb`](validate-knowledge-runtime.rb) | 驗證 knowledge runtime generated surfaces：routing registry、refresh policy、summaries 與 graph records 的 YAML / Markdown 格式、必要欄位與 canonical path。 |
 | [`git-hooks/post-commit`](git-hooks/post-commit) | **可選。**在本 repo 設定 `git config core.hooksPath scripts/git-hooks` 且 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 時，**`git commit`** 後會執行 `sync-cursor-bundle.sh`。 |
 
 **規則：**reference-only 是預設，不需要跑 bundle sync。只有本機明確用 Cursor symlink / bundle / copy mirror 佈署，且希望 mirror 立刻跟上時，才跑 `sync-cursor-bundle.sh`（或以 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 啟用上述 hook / close-loop helper 同步）。
@@ -110,3 +111,20 @@ AI_SKILL_SYNC_CURSOR_BUNDLE=1 ./scripts/ai-skill-close-loop.sh --commit
 - 若主表或 `status` 顯示重疊 goal 已被其他 owner/lock 處理，停止修改並提示使用者決定：等待、接手、拆子目標或另開非重疊 goal。
 - 對 git 合併/發版、Ai-skill writeback transaction、資料遷移、credential rotation、破壞性操作等不可分工流程，將 goal 標成 `non-parallelizable`。
 - Stale lock 可用 `cleanup` 清理；TTL 預設 30 分鐘，可用 `AGENT_GOALS_LOCK_TTL_SECONDS` 覆寫。
+
+## Knowledge runtime validation
+
+檢查 generated knowledge surfaces：
+
+```bash
+ruby scripts/validate-knowledge-runtime.rb
+```
+
+此 helper 目前驗證：
+
+- `knowledge/runtime/routing-registry.yaml` 的 records、required dependencies、candidate sources、model profile 與 metadata 欄位。
+- `knowledge/runtime/refresh-policy.yaml` 的 surfaces、decision values 與 validation / close-loop 欄位。
+- `knowledge/summaries/*.md` 的必要 summary table 欄位、source links，以及 `knowledge/summaries/README.md` 是否列出 summary。
+- `knowledge/graphs/*.yaml` 的 source、edge types、edge targets 與 metadata 欄位。
+
+這個 helper 只做 deterministic validation；它不自動修改 summaries、graphs 或 registry。若檢查失敗，先修 source / generated surface，再執行 lints、Markdown link check、close-loop dry run 與 commit / push / readback。
