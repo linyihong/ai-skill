@@ -49,6 +49,20 @@ surfaces:
       - required dependency 不存在或未讀
       - YAML parse 或 schema validation 失敗
 
+  runtime_report:
+    path: knowledge/runtime/runtime-report.md
+    refresh_when:
+      - routing registry records 新增、刪除或內容改變
+      - summary 或 graph records 新增、刪除或 lifecycle / status 改變
+      - refresh policy decision values 改變
+    revalidate_when:
+      - source 只有措辭或 link 修正，report count 與 routing decision 未改變
+      - generator script 未改變但 touched docs 需要重新檢查 links
+    downgrade_when:
+      - runtime report 未由 current generator 重新產生
+      - runtime report links 失效
+      - report count 與 registry / summaries / graphs 不一致
+
 decision_values:
   - refresh_now
   - revalidate_only
@@ -57,6 +71,7 @@ decision_values:
 
 validation:
   required_checks:
+    - Runtime report generation when generated surfaces change
     - YAML parse for generated YAML surfaces
     - Knowledge runtime validation helper for registry, summaries and graph records
     - Markdown link check for touched docs

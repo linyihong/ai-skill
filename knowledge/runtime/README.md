@@ -6,7 +6,9 @@
 
 - [`routing-registry.yaml`](routing-registry.yaml)：第一版 machine-readable routing registry，包含 6 筆 sample routing records。
 - [`refresh-policy.yaml`](refresh-policy.yaml)：generated summaries、graphs 與 routing registry 的 refresh / revalidate / downgrade 規則。
+- [`runtime-report.md`](runtime-report.md)：由 generator 產生的目前 routes、summaries、graphs 與 refresh decisions 概覽。
 - [`../../scripts/validate-knowledge-runtime.rb`](../../scripts/validate-knowledge-runtime.rb)：檢查 generated surfaces 的 YAML / Markdown 格式、必要欄位與 canonical path。
+- [`../../scripts/generate-knowledge-runtime-report.rb`](../../scripts/generate-knowledge-runtime-report.rb)：從 runtime surfaces 產生 deterministic report。
 
 ## Runtime Inputs
 
@@ -15,6 +17,7 @@
 | Task intent routing | `knowledge/indexes/README.md` |
 | Machine-readable routing registry | `knowledge/runtime/routing-registry.yaml` |
 | Generated refresh policy | `knowledge/runtime/refresh-policy.yaml` |
+| Generated runtime report | `knowledge/runtime/runtime-report.md` |
 | Atom metadata | `metadata/schema.md` |
 | Ranking rules | `metadata/ranking/README.md` |
 | Confidence rules | `metadata/confidence/README.md` |
@@ -49,6 +52,7 @@ Runtime view 應回答：
 - 故意延後的 sources 必須記錄為 deferred，而不是假裝不需要。
 - 任何會修改 canonical source 或需要 close-loop 的任務，都必須使用 `source-backed` 或更高讀取深度。
 - Source 變更後，必須依 `refresh-policy.yaml` 判斷 summaries、graphs、routing registry 是 refresh、revalidate、downgrade 或 no update needed。
+- 修改 registry、summaries、graphs 或 refresh policy 後，重新執行 `ruby scripts/generate-knowledge-runtime-report.rb --write`。
 - 修改 registry、refresh policy、summaries 或 graphs 後，執行 `ruby scripts/validate-knowledge-runtime.rb`，再做 lints、Markdown link check、close-loop dry run 與 commit / push / readback。
 
 ## 尚未實作
