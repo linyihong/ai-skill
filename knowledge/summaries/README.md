@@ -1,49 +1,58 @@
 # Knowledge Summaries
 
-`knowledge/summaries/` will hold compact summaries of Knowledge Atoms and source-of-truth documents. During the current phase, this directory defines summary format only; it does not replace old skills or shared rules.
+`knowledge/summaries/` 保存 Knowledge Atoms 與 source-of-truth 文件的 compact summaries。本層協助 agent 降低 context loading cost，但不取代舊 skills、shared rules 或 canonical source。
 
-## Summary Purpose
+## Summary 目的
 
-Summaries help agents:
+Summaries 用來協助 agent：
 
-- Decide whether a source is relevant before reading the full file.
-- Reduce context loading cost.
-- Preserve source-of-truth links.
-- Support small-model or checklist-first routing.
+- 在讀完整文件前判斷 source 是否相關。
+- 降低 context loading cost。
+- 保留 source-of-truth links。
+- 支援 small-model 或 checklist-first routing。
 
-## Summary Format
+## 目前 summaries
 
-Use this shape for future summaries:
-
-| Field | Required | Purpose |
+| Atom ID | Summary | Source path |
 | --- | --- | --- |
-| `Atom ID` | yes | Metadata ID from `metadata/schema.md`. |
-| `Source path` | yes | Canonical repository-relative source path. |
-| `Lifecycle` | yes | `candidate`, `validated`, `stable`, or `deprecated`. |
-| `Summary` | yes | One or two sentences describing the source. |
-| `When to read` | yes | Trigger condition for loading the full source. |
-| `Do not use for` | yes | Boundaries and non-goals. |
-| `Validation signal` | yes | How to confirm the summary is still aligned with source. |
-| `Last checked` | optional | Date or commit if a summary becomes stable. |
+| `root.bootstrap.ai-skill` | Root bootstrap 與 shared-rules 啟動入口。 | [`root-bootstrap.md`](root-bootstrap.md) |
+| `metadata.schema.knowledge-atom` | Knowledge Atom metadata schema v1。 | [`metadata-schema.md`](metadata-schema.md) |
+| `architecture.apk-analysis-pilot` | `apk-analysis` 分層 pilot migration map。 | [`apk-analysis-pilot.md`](apk-analysis-pilot.md) |
+| `governance.goal-ledger-boundary` | Active conversation goal 與 durable roadmap goal 邊界。 | [`goal-ledger-boundary.md`](goal-ledger-boundary.md) |
 
-## Example
+## Summary 格式
+
+未來新增 summary 時使用下列形狀：
+
+| 欄位 | 必填 | 用途 |
+| --- | --- | --- |
+| `Atom ID` | yes | 依 `metadata/schema.md` 命名的 metadata ID。 |
+| `Source path` | yes | Canonical repository-relative source path。 |
+| `Lifecycle` | yes | `candidate`、`validated`、`stable` 或 `deprecated`。 |
+| `Summary` | yes | 一到兩句描述 source。 |
+| `When to read` | yes | 載入完整 source 的觸發條件。 |
+| `Do not use for` | yes | 邊界與非目標。 |
+| `Validation signal` | yes | 如何確認 summary 仍與 source 對齊。 |
+| `Last checked` | optional | Summary 進入 stable 後可記錄日期或 commit。 |
+
+## 範例
 
 ```markdown
 ## knowledge.indexes.task-routing
 
-| Field | Value |
+| 欄位 | 值 |
 | --- | --- |
 | Source path | `knowledge/indexes/README.md` |
 | Lifecycle | `candidate` |
-| Summary | Routes task intents to canonical primary sources and related references. |
-| When to read | Use before loading deep skill or shared-rule context. |
-| Do not use for | Replacing required dependency reading or old skill entrypoints. |
-| Validation signal | Links resolve and routing rows still point to canonical sources. |
+| Summary | 將 task intents 導向 canonical primary sources 與 related references。 |
+| When to read | 載入深層 skill 或 shared-rule context 前使用。 |
+| Do not use for | 不可取代 required dependency reading 或 old skill entrypoints。 |
+| Validation signal | Links 可解析，且 routing rows 仍指向 canonical sources。 |
 ```
 
-## Rules
+## 規則
 
-- A summary must link to its source path.
-- A summary must not contain secrets, raw evidence, private hosts, tokens, or local absolute paths.
-- A summary cannot promote a candidate path into a replacement path.
-- If the source changes materially, revalidate or downgrade the summary confidence.
+- Summary 必須連到 source path。
+- Summary 不得包含 secrets、raw evidence、private hosts、tokens 或 local absolute paths。
+- Summary 不可把 candidate path 升格成 replacement path。
+- Source 有實質變更時，必須 revalidate 或 downgrade summary confidence。

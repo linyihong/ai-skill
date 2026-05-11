@@ -19,6 +19,7 @@ records:
     candidate_sources:
       - knowledge/indexes/README.md
       - runtime/routing/README.md
+      - knowledge/summaries/root-bootstrap.md
     source_of_truth_gate: root-readme-and-shared-rules-active
     ranking_reason: Root README 與 shared-rules bootstrap 是所有 Ai-skill 工作的最低共同入口。
     validation_signal: Bootstrap required set 已讀，且 git status 已檢查。
@@ -38,6 +39,7 @@ records:
       - scripts/README.md
       - ai-tools/cursor.md
       - ai-tools/claude.md
+      - knowledge/summaries/goal-ledger-boundary.md
     source_of_truth_gate: shared-rule-active
     ranking_reason: active goal 刪除條件與 durable follow-up gate 由 conversation-goal-ledger 定義。
     validation_signal: 長期狀態已落到 durable planning 文件，且 active goal 完成後才刪除。
@@ -79,6 +81,7 @@ records:
       - knowledge/runtime/README.md
       - knowledge/summaries/README.md
       - knowledge/graphs/README.md
+      - knowledge/summaries/metadata-schema.md
     source_of_truth_gate: metadata-schema-active
     ranking_reason: metadata/schema.md 定義 atom 必填欄位與 YAML 範本，子規則定義欄位如何用於 runtime routing。
     validation_signal: 欄位可套用到第一批 atom candidates，且 Markdown links 可解析。
@@ -101,6 +104,7 @@ records:
       - analysis/apk/README.md
       - workflow/apk-analysis/README.md
       - intelligence/engineering/apk-analysis/README.md
+      - knowledge/summaries/apk-analysis-pilot.md
     source_of_truth_gate: old-skill-entrypoint-active
     ranking_reason: apk-analysis 仍以 skill entrypoint 作為工具觸發與授權邊界；新分層目前只作候選目的地與 mapping。
     validation_signal: 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。
