@@ -16,14 +16,14 @@
 - `shared-rules/conversation-goal-ledger.md`
 - `shared-rules/tool-neutral-documentation.md`
 - `shared-rules/decision-efficiency.md`
-- `shared-rules/error-learning-system.md`
+- `shared-rules/failure-learning-system.md`
 - `shared-rules/document-todo-list.md`
 - `shared-rules/document-sizing.md`
 - `shared-rules/goal-action-validation.md`
 - `shared-rules/neutral-language.md`
 
 Bootstrap 後仍要依任務讀 skill-specific README / WORKFLOW / TOOLS / DOCUMENTATION / CHECKLIST，以及 feedback、sanitization、authorization、cross-skill 等任務相關規則。
-若使用者指出 agent 反覆犯錯、更新到錯誤路徑、漏做 close-loop 或驗證不足，依 `error-learning-system.md` 分類並沉澱成 error pattern 或對應 skill lesson。
+若使用者指出 agent 反覆失誤、更新到錯誤路徑、漏做 close-loop 或驗證不足，依 `failure-learning-system.md` 分類失效模式並沉澱成 failure pattern 或對應 skill lesson。
 
 ### 1. 中央庫先行
 

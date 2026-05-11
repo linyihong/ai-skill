@@ -8,7 +8,7 @@
 
 - **不要**在每條 lesson 裡重複貼上 [sanitization.md](sanitization.md)、[dependency-reading.md](dependency-reading.md)、[neutral-language.md](neutral-language.md)、[goal-action-validation.md](goal-action-validation.md)、[authorization-scope.md](authorization-scope.md) 等全文；條目頂部用一行**引用** [README.md](README.md) 或**本檔**即可。
 - **Agent 行為：** 在授權分析過程中一旦得到可重用技巧／失敗模式／驗證規則，應**主動**在同一輪對話內於該 skill 的 **`feedback_history/`** 對應位置新增檔案（依下方**分類規則**、**檔名規則**與**模板**），**不要**等使用者提醒。
-- 只寫**通用方法**，不寫特定 App / project incident 的私有結論或具體證據；必須依 [reusable-guidance-boundary.md](reusable-guidance-boundary.md) 先抽象化原因、規則與驗證，再依 [sanitization.md](sanitization.md) 去敏；若 lesson 來自 agent 失誤或閉環不完整，另依 [error-learning-system.md](error-learning-system.md) 分類錯誤並判斷是否需要 `shared-rules/error-patterns/`；發現 skill/rule/template/lesson 更新時依 [dependency-reading.md](dependency-reading.md) 讀取依賴；標題、slug、摘要與正文必須依 [neutral-language.md](neutral-language.md) 使用中性低爭議用語；每個重要結論必須依 [goal-action-validation.md](goal-action-validation.md) 說明目標、執行、驗證或參考來源；必須說明證據與適用／不適用條件；不確定標 `experimental`。
+- 只寫**通用方法**，不寫特定 App / project incident 的私有結論或具體證據；必須依 [reusable-guidance-boundary.md](reusable-guidance-boundary.md) 先抽象化原因、規則與驗證，再依 [sanitization.md](sanitization.md) 去敏；若 lesson 來自 agent 失誤或閉環不完整，另依 [failure-learning-system.md](failure-learning-system.md) 分類失效模式並判斷是否需要 `shared-rules/failure-patterns/`；發現 skill/rule/template/lesson 更新時依 [dependency-reading.md](dependency-reading.md) 讀取依賴；標題、slug、摘要與正文必須依 [neutral-language.md](neutral-language.md) 使用中性低爭議用語；每個重要結論必須依 [goal-action-validation.md](goal-action-validation.md) 說明目標、執行、驗證或參考來源；必須說明證據與適用／不適用條件；不確定標 `experimental`。
 - 不得寫入本機絕對路徑、使用者名稱、私有工作目錄、clone 位置；用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 等 placeholder。
 
 ## 條目放哪裡

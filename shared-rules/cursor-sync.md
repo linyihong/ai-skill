@@ -72,6 +72,6 @@ Cursor 不一定需要每次複製本庫內容。優先順序如下：
 
 以本庫 **`shared-rules/`** 與 **`skills/`** 為準；`.cursor` 內的規則可以是參照、symlink 或同步快照，但不能取代 source。若使用者要求更新或同步 skill repo，先在 `<AI_SKILL_REPO>` 確認 `git rev-parse --show-toplevel` 與 `git status --short --branch`，再修改 source；`~/.cursor/skills*` 或 bundles 只能在 source 更新後由同步流程處理。
 
-若發現 agent 已經更新到 project `.cursor`、`~/.cursor` 或 bundle mirror，而沒有先更新 `<AI_SKILL_REPO>`，依 [`error-learning-system.md`](error-learning-system.md) 的 `source-mirror-drift` 分類補救，並反查 [`error-patterns/source-mirror-write-drift.md`](error-patterns/source-mirror-write-drift.md)。
+若發現 agent 已經更新到 project `.cursor`、`~/.cursor` 或 bundle mirror，而沒有先更新 `<AI_SKILL_REPO>`，依 [`failure-learning-system.md`](failure-learning-system.md) 的 `source-mirror-drift` 分類補救，並反查 [`failure-patterns/source-mirror-write-drift.md`](failure-patterns/source-mirror-write-drift.md)。
 
 ← [回到共用規則索引](README.md)

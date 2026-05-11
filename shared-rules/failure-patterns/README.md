@@ -1,8 +1,8 @@
-# Error Patterns
+# Failure Patterns
 
-This directory stores reusable cross-skill agent error patterns. Each pattern records a generalized failure mode, trigger, required action, prevention gate, and validation method.
+This directory stores reusable cross-skill agent failure patterns. Each pattern records a generalized failure mode, trigger, required action, prevention gate, and validation method.
 
-Read this index when [`error-learning-system.md`](../error-learning-system.md) tells you to promote or look up a reusable error pattern.
+Read this index when [`failure-learning-system.md`](../failure-learning-system.md) tells you to promote or look up a reusable failure pattern.
 
 | Pattern | Class | Status | Summary |
 | --- | --- | --- | --- |

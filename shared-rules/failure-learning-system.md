@@ -1,14 +1,14 @@
-# Error Learning System
+# Failure Learning System
 
-This rule turns repeated agent mistakes into durable prevention. It connects error capture, classification, reusable pattern records, linked updates, and validation so the same failure mode is less likely to recur.
+This rule turns repeated agent mistakes into durable prevention. It connects failure capture, classification, reusable pattern records, linked updates, and validation so the same failure mode is less likely to recur.
 
 Use this when a user points out an agent mistake, a close-loop gap, wrong source/mirror update, missed dependency, incomplete validation, forgotten goal, unsafe parallel work, or any repeated behavior that should become part of the Ai-skill operating system.
 
 ## Core Rule
 
-When an error is discovered, do not only fix the immediate file. Run the error learning loop:
+When a failure is discovered, do not only fix the immediate file. Run the failure learning loop:
 
-1. **Capture** the error in the current work context: what went wrong, where it was detected, and what user-facing risk it created.
+1. **Capture** the failure in the current work context: what went wrong, where it was detected, and what user-facing risk it created.
 2. **Classify** the failure mode using the taxonomy below.
 3. **Contain** the current risk before broad work continues.
 4. **Promote** the reusable lesson to the right durable location.
@@ -17,7 +17,7 @@ When an error is discovered, do not only fix the immediate file. Run the error l
 
 The goal is not to archive blame. The goal is to convert an observed failure into a reusable guardrail with a clear trigger and validation method.
 
-## Error Taxonomy
+## Failure Taxonomy
 
 | Class | Meaning | Common prevention |
 | --- | --- | --- |
@@ -37,21 +37,21 @@ If a failure does not fit a class, add a new class only after checking whether a
 | Content | Durable location |
 | --- | --- |
 | Current unfinished fix, owner, lock, next action | `<PROJECT_ROOT>/.agent-goals/` |
-| Reusable cross-skill error pattern | `shared-rules/error-patterns/` |
+| Reusable cross-skill failure pattern | `shared-rules/failure-patterns/` |
 | Skill-specific technique or failure lesson | `skills/<skill>/feedback_history/` |
 | Tool-specific reminder, hook, prompt, or UI detail | `ai-tools/<tool>.md` or tool config |
 | Project incident evidence, raw logs, exact private paths, hosts, tokens | Project docs, issue tracker, or private evidence, not reusable docs |
 
-Do not store secrets, real tokens, raw private data, or local absolute paths in error patterns. Use placeholders such as `<AI_SKILL_REPO>`, `<PROJECT_ROOT>`, `<tool-mirror>`, and `<runtime-copy>`.
+Do not store secrets, real tokens, raw private data, or local absolute paths in failure patterns. Use placeholders such as `<AI_SKILL_REPO>`, `<PROJECT_ROOT>`, `<tool-mirror>`, and `<runtime-copy>`.
 
-## Error Pattern Record
+## Failure Pattern Record
 
-Create or update a reusable pattern when the same error could recur across projects, agents, tools, or skills.
+Create or update a reusable pattern when the same failure could recur across projects, agents, tools, or skills.
 
 Recommended file:
 
 ```text
-shared-rules/error-patterns/<short-slug>.md
+shared-rules/failure-patterns/<short-slug>.md
 ```
 
 Recommended shape:
@@ -63,7 +63,7 @@ Status: candidate | validated | promoted | deprecated
 Class: <taxonomy class>
 
 ## Trigger
-When should an agent suspect this error?
+When should an agent suspect this failure?
 
 ## Failure Mode
 What goes wrong in generalized terms?
@@ -84,25 +84,25 @@ How to confirm the prevention worked?
 - <shared rule / skill / tool doc links>
 ```
 
-Keep pattern records short. If a pattern becomes long, split examples into smaller pattern files and keep `error-patterns/README.md` as the index.
+Keep pattern records short. If a pattern becomes long, split examples into smaller pattern files and keep `failure-patterns/README.md` as the index.
 
 ## Promotion Decision
 
-After classifying an error, choose the smallest durable promotion target that prevents recurrence:
+After classifying a failure, choose the smallest durable promotion target that prevents recurrence:
 
-| Error scope | Promotion target |
+| Failure scope | Promotion target |
 | --- | --- |
 | One active conversation only | `.agent-goals/` progress or handoff note |
 | One reusable document has an open local gap | Document TODO near the top of that document |
-| Cross-document or cross-agent workflow failure | `shared-rules/error-patterns/` plus the relevant shared rule |
+| Cross-document or cross-agent workflow failure | `shared-rules/failure-patterns/` plus the relevant shared rule |
 | Skill-specific repeated mistake | The skill's `feedback_history/` and, when mature, its workflow/checklist |
 | Tool-specific execution failure | `ai-tools/<tool>.md`, tool config, or skill tool adapter |
 
 Do not promote a project incident directly into reusable docs. First generalize the cause, trigger, required action, and validation.
 
-## Source And Mirror Errors
+## Source And Mirror Failures
 
-`source-mirror-drift` is a high-priority error class for this repository.
+`source-mirror-drift` is a high-priority failure class for this repository.
 
 When a user asks to update rules, skills, feedback lessons, templates, or Ai-skill guidance, the agent must:
 
@@ -117,10 +117,10 @@ Reference-first tool setup helps because it reduces duplicate copies, but it doe
 
 ## Validation
 
-Before closing an error-learning update, verify:
+Before closing a failure-learning update, verify:
 
 - The immediate issue is contained or explicitly recorded as still open.
-- The error class is named.
+- The failure class is named.
 - The durable location is correct.
 - The prevention gate is written where future agents will read it.
 - Linked updates have been checked.

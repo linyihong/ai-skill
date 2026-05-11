@@ -54,10 +54,10 @@ This pattern is validated when:
 
 ## Linked Rules
 
-- [`error-learning-system.md`](../error-learning-system.md)
+- [`failure-learning-system.md`](../failure-learning-system.md)
 - [`dependency-reading.md`](../dependency-reading.md)
 - [`cursor-sync.md`](../cursor-sync.md)
 - [`tool-neutral-documentation.md`](../tool-neutral-documentation.md)
 - [`linked-updates.md`](../linked-updates.md)
 
-← [Back to error patterns](README.md)
+← [Back to failure patterns](README.md)

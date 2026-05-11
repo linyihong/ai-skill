@@ -16,7 +16,7 @@
 
 **目錄約定：**  
 - **`skills/`**：各 skill 技巧包；之後新增 skill 放在 `skills/<name>/`，步驟見 [`skills/ADDING_SKILLS.md`](skills/ADDING_SKILLS.md)。  
-- **`shared-rules/`**：**共用規則**（依主題分檔：授權、去敏、中性低爭議文件用語、工具中立文件、目標/執行/驗證流程、對話目標閉環、錯誤學習系統、依賴文件讀取、內容分層、文件大小與拆分、cross-skill reference、**feedback 檔名／模板／agent 行為**、工具同步等）；索引為 [`shared-rules/README.md`](shared-rules/README.md)，feedback 流程與模板集中在 [`feedback-lessons.md`](shared-rules/feedback-lessons.md)。各 skill 目錄下 **`FEEDBACK.md`** 若存在，僅為**一行入口**，不必重複維護正文。
+- **`shared-rules/`**：**共用規則**（依主題分檔：授權、去敏、中性低爭議文件用語、工具中立文件、目標/執行/驗證流程、對話目標閉環、失效學習系統、依賴文件讀取、內容分層、文件大小與拆分、cross-skill reference、**feedback 檔名／模板／agent 行為**、工具同步等）；索引為 [`shared-rules/README.md`](shared-rules/README.md)，feedback 流程與模板集中在 [`feedback-lessons.md`](shared-rules/feedback-lessons.md)。各 skill 目錄下 **`FEEDBACK.md`** 若存在，僅為**一行入口**，不必重複維護正文。
 - **`ai-tools/`**：各 AI coding / agent 工具如何讀取、參照或同步本知識庫；工具專屬路徑、hook、UI 與同步細節都放在這裡，不寫進通用 skill / shared rule 正文。
 - **連動更新**：若改動會影響其他文件、索引、skill 入口、同步流程或分類文件，相關檔案**必須**依 [`shared-rules/linked-updates.md`](shared-rules/linked-updates.md) 同步更新或明確檢查，不得說成「可選」。  
 - **每一則 `feedback_history`**：**不要**重複貼上共用規則全文，頂部引用 `shared-rules/` 即可。工具端同步與部署方式請看 [`ai-tools/`](ai-tools/README.md)。
@@ -37,9 +37,9 @@
 
 若工作可能中斷、跨多輪、被多 agent 接手、拆成多個子目標、已建立 TodoWrite、使用者要求繼續前一個多步驟任務，或 agent 已看到 active project 有 modified / staged / untracked files，依 [`shared-rules/conversation-goal-ledger.md`](shared-rules/conversation-goal-ledger.md) 在業務專案本地先檢查或維護 `<PROJECT_ROOT>/.agent-goals/`。Goal 需要明確列出 priority、parallelization mode、owner/lock 決策、plan/todo links、missing/decision/strengthen、next action、completion criteria 與 validation。這是暫存狀態，不進 git；目標完成並驗證後刪除。可用 [`scripts/agent-goals.sh`](scripts/agent-goals.sh) 建立、更新、拆解、暫停與完成刪除 goal。
 
-## 錯誤學習系統
+## 失效學習系統
 
-若使用者指出 agent 反覆犯錯、寫錯 source/mirror、漏讀依賴、忘記目標、漏做驗證或閉環不完整，依 [`shared-rules/error-learning-system.md`](shared-rules/error-learning-system.md) 分類錯誤並選擇 promotion target。可重用跨 skill 的錯誤模式放在 [`shared-rules/error-patterns/`](shared-rules/error-patterns/README.md)；skill-specific lesson 仍放對應 skill 的 `feedback_history/`；專案 incident 證據留在專案文件，不進 reusable docs。
+若使用者指出 agent 反覆失誤、寫錯 source/mirror、漏讀依賴、忘記目標、漏做驗證或閉環不完整，依 [`shared-rules/failure-learning-system.md`](shared-rules/failure-learning-system.md) 分類失效模式並選擇 promotion target。可重用跨 skill 的失效模式放在 [`shared-rules/failure-patterns/`](shared-rules/failure-patterns/README.md)；skill-specific lesson 仍放對應 skill 的 `feedback_history/`；專案 incident 證據留在專案文件，不進 reusable docs。
 
 ## 回饋規則
 
