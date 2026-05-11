@@ -1,5 +1,16 @@
 # AI-native Knowledge Operating System
 
+## 🚀 Claude Code 快速開始
+
+此專案已配置 Claude Code 自動規則加載（見 [`.claude/settings.json`](.claude/settings.json)）。Claude 啟動時會自動讀取：
+- **共用規則入口**：[`shared-rules/README.md`](shared-rules/README.md)
+- **Default Bootstrap**：12 個必讀規則檔案
+- **Git 流程**：自動指向開發分支 `claude/review-dev-rules-ndnTH`
+
+詳見 [`ai-tools/claude.md`](ai-tools/claude.md)。
+
+---
+
 這個 repository 是 AI-native Knowledge Operating System 的中央知識庫：以 Git 維護單一真相來源，讓 agent 直接 reference `<AI_SKILL_REPO>` 讀取 rules、skills、tool adapters、goal state guidance、failure learning 與 close-loop automation。
 
 未來不同專案需要 APK 分析、app/API/embedded development guidance、旅行規劃或其他可重用 agent 能力時，優先從這裡讀 skill；新的可重用技巧、規則與架構方向也回寫到這裡。工具端的 symlink、bundle 或 copy snapshot 只是相容層，不取代本 repository。

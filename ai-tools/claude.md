@@ -2,6 +2,16 @@
 
 本檔說明在 Claude 類工具中如何讓 Ai-skill 技巧穩定生效。核心原則與其他工具相同：中央庫是唯一真相來源，Claude 端只讀取、參照或同步快照。
 
+## 自動配置
+
+本專案已在 `.claude/settings.json` 配置了 Ai-skill 規則的自動加載。Claude Code 啟動時會自動讀取：
+
+- **AI_SKILL_REPO**: `/home/user/Ai-skill`（中央知識庫位置）
+- **Default Bootstrap**: 12 個必讀規則檔案清單
+- **Git 規則**: 開發分支、commit 與 push 要求
+
+Claude 不需要每次都被手動提示；只要打開此專案，配置會自動生效。
+
 ## 何時使用
 
 當你希望 Claude 使用本庫的某個 skill 時，不要只說「照技巧做」。請明確給 Claude：

@@ -1,0 +1,28 @@
+{
+  "description": "Ai-skill Knowledge Operating System configuration for Claude Code",
+  "ai_skill_repo": "/home/user/Ai-skill",
+  "default_bootstrap": [
+    "README.md",
+    "shared-rules/README.md",
+    "shared-rules/dependency-reading.md",
+    "shared-rules/linked-updates.md",
+    "shared-rules/conversation-goal-ledger.md",
+    "shared-rules/tool-neutral-documentation.md",
+    "shared-rules/rule-weight.md",
+    "shared-rules/decision-efficiency.md",
+    "shared-rules/failure-learning-system.md",
+    "shared-rules/document-todo-list.md",
+    "shared-rules/document-sizing.md",
+    "shared-rules/goal-action-validation.md",
+    "shared-rules/neutral-language.md"
+  ],
+  "rules": {
+    "reference_first": true,
+    "commit_branch": "claude/review-dev-rules-ndnTH",
+    "git_operations": {
+      "push_format": "git push -u origin {branch}",
+      "commit_required": true,
+      "verify_clean_status": true
+    }
+  }
+}
