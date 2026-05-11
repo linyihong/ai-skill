@@ -1,6 +1,6 @@
 # AI-native Knowledge Operating System
 
-This document defines the repository-level architecture direction for Ai-skill. It is a roadmap and boundary document, not an executable shared rule. Operational policies still live in `shared-rules/`; tool-specific setup still lives in `ai-tools/`.
+This document defines the repository-level architecture direction for the AI-native Knowledge Operating System. It is a roadmap and boundary document, not an executable shared rule. Operational policies still live in `shared-rules/`; tool-specific setup still lives in `ai-tools/`.
 
 ## Purpose
 
@@ -81,7 +81,7 @@ Inventory rule: compatibility surfaces may remain, but each must say why it exis
 
 - Keep `shared-rules/README.md` as the bootstrap index.
 - Keep tool docs clear that reference-first does not require copying or bundle sync.
-- Keep close-loop automation conservative: commit/push/readback is mandatory for Ai-skill changes; tool sync is conditional.
+- Keep close-loop automation conservative: commit/push/readback is mandatory for canonical repository changes; tool sync is conditional.
 - Keep compatibility scripts available for users who still need symlink, bundle, or copy snapshot workflows.
 
 ### Phase 2: Compatibility Inventory
