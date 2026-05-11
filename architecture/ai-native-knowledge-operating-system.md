@@ -102,6 +102,20 @@ Copy and bundle flows can be deprecated when all are true:
 - Close-loop validation no longer depends on mirror refresh checks except for compatibility tests requested by the user.
 - A deprecation note and migration path exist before scripts or docs are removed.
 
+### Phase 3 Deprecation Checklist
+
+Use this checklist before removing or archiving copy, bundle, or native-scan compatibility paths:
+
+| Gate | Check | Evidence |
+| --- | --- | --- |
+| Scope | Identify the exact surface being deprecated: copy snapshot docs, bundle sync script, post-commit hook, native-scan setup, or tool mirror path. | Affected files and owner group are listed before edits. |
+| Search | Search for required/default usage of the surface across root docs, `shared-rules/`, `ai-tools/`, `skills/`, scripts, tool rules, and failure patterns. | Search results show no required/default usage remains, or each remaining reference is explicitly compatibility-only. |
+| Replacement | Document the reference-first, symlink, or manual snapshot replacement for every remaining user workflow. | `ai-tools/` or architecture docs point to the replacement. |
+| Source boundary | Confirm no replacement treats `.cursor`, `~/.cursor`, bundles, generated files, or snapshots as canonical source. | Source/mirror guardrails remain linked from `dependency-reading.md` and failure patterns. |
+| Script behavior | If removing a script, update script docs, hooks, close-loop automation, and any environment variable examples. | `scripts/README.md` and relevant tool docs no longer reference removed commands as active paths. |
+| Validation | Run link checks, stale wording search, diff review, and close-loop dry run before commit. | Validation output or final response states what passed. |
+| Rollback | Keep enough history or migration notes for users who still need a manual compatibility path. | Deprecation note or release note explains what to use instead. |
+
 ## Removal Criteria For Copy And Bundle Sync
 
 Do not remove compatibility scripts solely because reference-first exists. Remove or archive them only after:
