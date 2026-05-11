@@ -53,6 +53,8 @@ Post-reset window split rule：`clear app data` / reinstall 後同時需要 sess
 
 Read-only argument override rule：若要驗證分頁、排序、語言、filter 這類 read-only 行為，但完整 UI 很難自然觸發下一頁或邊界值，優先選擇高語意函式參數覆寫的短窗口，並保留 App 自己的 session、signing、gateway 與 decrypt path。覆寫腳本必須預設短窗、輸出 schema/hash/key set，不輸出 raw token、raw signature、raw service 或 raw response value；文件要標 `app-owned signing/decrypt preserved`，不能把結果當成 standalone replay parity。
 
+Redacted sample-targeting classifier rule：若 UI 盲抽樣本低收益，但 decrypted response 裡有可判斷樣本可用性的欄位（例如 count、availability、status、type），可新增 disabled-by-default classifier，只輸出 value class 與 item index（例如 `zero/nonzero/missing/other`），再用 UI replay 點擊候選項。不要輸出 raw id、title、body、comment、user、URL、token、完整 count 或其他內容值；文件要標明此 classifier 只是 sample targeting aid，不是資料擷取或 standalone replay parity。
+
 ## 1. 先判斷流量在哪一層
 
 不要一開始就假設是 certificate pinning。先回答這些問題：
