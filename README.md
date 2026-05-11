@@ -1,12 +1,34 @@
 # AI-native Knowledge Operating System
 
-這個 repository 是 AI-native Knowledge Operating System 的中央知識庫：以 Git 維護單一真相來源，讓 agent 直接 reference `<AI_SKILL_REPO>` 讀取 shared rules、skills、tool adapters、goal ledger 規則、failure learning 與 close-loop automation。
+這個 repository 是 AI-native Knowledge Operating System 的中央知識庫：以 Git 維護單一真相來源，讓 agent 直接 reference `<AI_SKILL_REPO>` 讀取 rules、skills、tool adapters、goal state guidance、failure learning 與 close-loop automation。
 
 未來不同專案需要 APK 分析、app/API/embedded development guidance、旅行規劃或其他可重用 agent 能力時，優先從這裡讀 skill；新的可重用技巧、規則與架構方向也回寫到這裡。工具端的 symlink、bundle 或 copy snapshot 只是相容層，不取代本 repository。
 
 **路徑約定：**在本機上，中央庫位置就是你心裡的 `<AI_SKILL_REPO>`（clone 所在目錄），且必須是本 repository 的 git root。`~/.cursor/skills*`、`~/.cursor/shared-rules`、`~/.cursor/bundles/*` 或專案 `.cursor/` 是工具部署 / mirror 路徑，不能取代 source repo。**請勿把真實本機絕對路徑寫進本庫任何會 commit 的文件**（含 `feedback_history`、`shared-rules`、規則範本）；對外一律用占位符 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`。
 
-## 現有 Skills
+## Operating Layers
+
+| Layer | Path | Purpose |
+| --- | --- | --- |
+| Architecture direction | [`architecture/`](architecture/) | Defines the AI-native Knowledge Operating System roadmap, compatibility inventory, and migration criteria. |
+| Shared operating rules | [`shared-rules/`](shared-rules/README.md) | Cross-skill policies for dependency reading, linked updates, validation, goal ledgers, failure learning, neutral language, and documentation boundaries. |
+| Capability modules | [`skills/`](skills/README.md) | Reusable agent capabilities, workflows, checklists, documentation templates, techniques, and feedback lessons. |
+| Tool adapters | [`ai-tools/`](ai-tools/README.md) | Tool-specific reference, symlink, bundle, hook, UI, and troubleshooting guidance. |
+| Close-loop automation | [`scripts/`](scripts/README.md) | Goal ledger helpers, conservative grouped commit/push automation, and optional tool sync bridges. |
+| Temporary goal state | `.agent-goals/` | Project-local active goal ledger; never committed and deleted after validated completion. |
+
+## Agent Operating Flow
+
+1. Read this `README.md` to understand the OS layout.
+2. Load the shared-rule bootstrap from [`shared-rules/README.md`](shared-rules/README.md).
+3. Read only the task-relevant skill entry and dependencies.
+4. Track resumable work in `<PROJECT_ROOT>/.agent-goals/` when the task spans multiple steps.
+5. Edit canonical source files in `<AI_SKILL_REPO>`, not tool mirrors.
+6. Validate linked updates, commit, push, reread changed entries, and confirm clean status.
+
+Reference-first is the default: agents read this repository directly. Symlink, bundle, and copy snapshot flows are compatibility layers for tools that cannot reliably reference the central repo.
+
+## Capability Modules
 
 | Skill | 用途 |
 | --- | --- |
@@ -34,9 +56,9 @@
 
 每次開啟 agent、新 session 或接手長對話時，先讀 [`shared-rules/README.md`](shared-rules/README.md) 的 **Default Bootstrap**。它只載入索引與必讀規則；後續仍依任務讀 skill-specific workflow、tools、documentation 與其他 shared rules。
 
-## AI-native Knowledge Operating System
+## Architecture Roadmap
 
-長期架構方向是 **AI-native Knowledge Operating System**：以 `<AI_SKILL_REPO>` 為單一真相來源，讓 agent 直接 reference 中央庫，並以 shared rules、skills、tool adapters、goal ledger、failure learning 與 close-loop automation 組成可驗證的操作層。同步、bundle 或 copy snapshot 只是工具相容層，不是預設模型。詳見 [`architecture/ai-native-knowledge-operating-system.md`](architecture/ai-native-knowledge-operating-system.md)。
+The detailed roadmap, compatibility inventory, and removal criteria for copy/bundle sync live in [`architecture/ai-native-knowledge-operating-system.md`](architecture/ai-native-knowledge-operating-system.md). Keep executable policy in `shared-rules/`; keep tool-specific setup in `ai-tools/`.
 
 ## 對話目標閉環
 
