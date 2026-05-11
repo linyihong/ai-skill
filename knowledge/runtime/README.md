@@ -8,7 +8,7 @@
 - [`refresh-policy.yaml`](refresh-policy.yaml)：generated summaries、graphs 與 routing registry 的 refresh / revalidate / downgrade 規則。
 - [`runtime-report.md`](runtime-report.md)：由 generator 產生的目前 routes、summaries、graphs 與 refresh decisions 概覽。
 - [`model-context-report.md`](model-context-report.md)：由 generator 產生的 model profile / compression loading view。
-- [`sqlite/`](sqlite/README.md)：規劃 SQLite / FTS generated lookup cache，用於低 token 搜尋 candidate sources。
+- [`sqlite/`](sqlite/README.md)：SQLite / FTS generated lookup cache prototype，用於低 token 搜尋 candidate sources。
 - [`../../scripts/validate-knowledge-runtime.rb`](../../scripts/validate-knowledge-runtime.rb)：檢查 generated surfaces 的 YAML / Markdown 格式、必要欄位與 canonical path。
 - [`../../scripts/generate-knowledge-runtime-report.rb`](../../scripts/generate-knowledge-runtime-report.rb)：從 runtime surfaces 產生 deterministic report。
 - [`../../scripts/generate-model-context-report.rb`](../../scripts/generate-model-context-report.rb)：從 routing registry 的 model 欄位產生 context loading report。
@@ -22,7 +22,7 @@
 | Generated refresh policy | `knowledge/runtime/refresh-policy.yaml` |
 | Generated runtime report | `knowledge/runtime/runtime-report.md` |
 | Generated model context report | `knowledge/runtime/model-context-report.md` |
-| Planned SQLite lookup cache | `knowledge/runtime/sqlite/README.md` |
+| SQLite lookup cache | `knowledge/runtime/sqlite/README.md` |
 | Atom metadata | `metadata/schema.md` |
 | Ranking rules | `metadata/ranking/README.md` |
 | Confidence rules | `metadata/confidence/README.md` |
@@ -67,7 +67,7 @@ Runtime view 應回答：
 - Automatic graph construction。
 - Generated summaries。
 - Machine-readable registry 的自動生成工具。
-- SQLite / FTS lookup cache generator 與 query helper。
+- SQLite / FTS lookup cache 的 schema 擴充、query ranking 與 stale checksum 深化。
 - Generated refresh 的自動執行工具。
 - Model-aware compression output 的更細粒度生成。
 

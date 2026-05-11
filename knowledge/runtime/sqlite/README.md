@@ -62,13 +62,29 @@ SQLite records 至少保留：
 - SQLite query helper 預設只輸出 top candidates，不輸出大量全文。
 - 若 SQLite index stale，agent 必須回到 canonical sources，並依 `refresh-policy.yaml` 判斷是否 regenerate。
 
-## Planned Tooling
+## Tooling
 
 | Tool | Role |
 | --- | --- |
-| `scripts/generate-runtime-sqlite-index.*` | 從 summaries、graphs、registry、feedback indexes 產生 SQLite DB。 |
-| `scripts/query-runtime-index.*` | 用 task intent、keyword、tag 或 layer 查候選 source。 |
-| `scripts/validate-runtime-sqlite-index.*` | 檢查 DB row count、source path existence、FTS availability、stale checksum。 |
+| `scripts/generate-runtime-sqlite-index.rb` | 從 summaries、graphs、registry、feedback lessons 產生本機 SQLite DB。 |
+| `scripts/query-runtime-index.rb` | 用 keyword 查候選 source，輸出少量 rows。 |
+| `scripts/validate-runtime-sqlite-index.rb` | 檢查 DB integrity、row counts、source path existence、FTS availability 與 git ignore 邊界。 |
+
+## Usage
+
+```bash
+ruby scripts/generate-runtime-sqlite-index.rb
+ruby scripts/validate-runtime-sqlite-index.rb
+ruby scripts/query-runtime-index.rb feedback --limit 5
+```
+
+預設 DB 路徑：
+
+```text
+knowledge/runtime/sqlite/runtime-index.sqlite
+```
+
+此 DB 由 `.gitignore` 排除，應可在 clean checkout 由 generator 重建。
 
 ## Validation
 

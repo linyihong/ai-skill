@@ -26,7 +26,7 @@
 - `knowledge/summaries/` 已新增 APK highest-leverage route selection summary。
 - `knowledge/graphs/` 已建立 5 個 graph records：source-boundary、metadata-navigation、apk-analysis-pilot、apk-highest-leverage-analysis、feedback-promotion-pipeline。
 - `knowledge/runtime/refresh-policy.yaml` 已建立 generated summaries / graphs / registry refresh 流程，定義 refresh、revalidate、downgrade 與 no update needed。
-- `knowledge/runtime/sqlite/README.md` 已規劃 SQLite / FTS generated lookup cache，作為低 token 搜尋候選 source 的 runtime index，不作 source-of-truth。
+- `knowledge/runtime/sqlite/README.md` 與 `scripts/generate-runtime-sqlite-index.rb` / `query-runtime-index.rb` / `validate-runtime-sqlite-index.rb` 已建立 SQLite / FTS runtime index prototype，作為低 token 搜尋候選 source 的 generated cache，不作 source-of-truth。
 
 尚未完成的下一階段：
 
@@ -34,7 +34,7 @@
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
 - 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 registry generation tooling；validation helper 與 runtime report generator 已建立。
 - Multi-model routing / compression strategy 已有第一版，並已建立第一個 model-aware context report；尚未建立 per-model prompt / checklist artifact generator。
-- 尚未實作 SQLite / FTS runtime index generator、query helper 與 stale validation；但 source-of-truth 邊界與 schema 原則已先規劃，避免後續導入時改動 feedback / knowledge / metadata 放置策略。
+- SQLite / FTS runtime index prototype 已可生成、查詢與驗證；尚未深化 query ranking、stale checksum policy 與自動 refresh orchestration。
 
 ## 核心問題
 
@@ -555,7 +555,7 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P1 | done | 建立 model-aware context report generator | `scripts/generate-model-context-report.rb`, `knowledge/runtime/model-context-report.md`, `models/README.md` | 已完成 deterministic model context report | Report 可依 routing registry 的 model profile / compression level 重新產生，並通過 runtime validator 與 Markdown link check |
 | P1 | done | 建立第一個 APK engineering intelligence atom | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md`, `knowledge/summaries/apk-highest-leverage-analysis.md`, `knowledge/graphs/apk-highest-leverage-analysis.yaml` | 已完成最高收益路線 candidate intelligence atom | Old skill entrypoint remains active；runtime registry、summary、graph 與 knowledge index 可 route 到此 atom |
 | P1 | done | 建立 feedback promotion pipeline surface | `feedback/promotion/README.md`, `knowledge/summaries/feedback-promotion-pipeline.md`, `knowledge/graphs/feedback-promotion-pipeline.yaml` | 已完成 promotion / downgrade design surface | Lesson source 保留於 `feedback_history/`；runtime registry、summary、graph 與 knowledge index 可 route 到 promotion pipeline |
-| P1 | planned | 規劃 SQLite / FTS runtime index | `knowledge/runtime/sqlite/README.md`, `architecture/next-stage-upgrade-plan.md` | 已規劃 source-of-truth 邊界與 schema 原則；尚未實作 generator | SQLite 作為 generated lookup cache，不提交 DB binary；feedback lessons 只被索引，不搬離 `feedback_history/` |
+| P1 | done | 建立 SQLite / FTS runtime index prototype | `knowledge/runtime/sqlite/README.md`, `scripts/generate-runtime-sqlite-index.rb`, `scripts/query-runtime-index.rb`, `scripts/validate-runtime-sqlite-index.rb` | 已完成本機 generated lookup cache、query helper 與 validator | SQLite 作為 generated lookup cache，不提交 DB binary；feedback lessons 只被索引，不搬離 `feedback_history/` |
 
 ## 最終目標
 
