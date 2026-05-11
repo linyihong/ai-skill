@@ -2,6 +2,10 @@
 
 `knowledge/` 負責「知識導航與知識圖譜」。本層保存 Knowledge Atom、indexes、summaries、graphs 與 runtime navigation 的結構，讓 agent 能找到 task-relevant knowledge。
 
+## 目前入口
+
+- [`indexes/`](indexes/README.md)：第一版 task intent routing table 與 navigation index format。
+
 ## 放什麼
 
 - Knowledge Atom 的放置與索引策略。
@@ -27,4 +31,4 @@
 
 - `architecture/next-stage-upgrade-plan.md` 的 Knowledge Navigation System
 - `skills/README.md` 與各 skill README 中可抽成全庫索引的入口資訊
-- 後續 `knowledge/indexes/README.md` 的 navigation index 初版
+- `knowledge/indexes/README.md` 的 navigation index 初版

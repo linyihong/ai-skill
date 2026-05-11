@@ -12,10 +12,11 @@
 - `analysis/`、`intelligence/`、`workflow/`、`runtime/`、`memory/`、`feedback/`、`models/`、`governance/`、`knowledge/`、`metadata/` 已建立第一版 README skeleton，定義責任邊界。
 - `.agent-goals/` 已作為 project-local active goal ledger 使用，完成後刪除，不進 git。
 - Cursor / Claude tool docs 已指向 central repository 與 shared-rule bootstrap。
+- `knowledge/indexes/README.md` 已建立第一版 task intent routing table 與索引格式。
 
 尚未完成的下一階段：
 
-- 尚未建立上述分層的第一批子目錄、metadata schema、navigation index 與示範遷移內容。
+- 尚未建立上述分層的完整子目錄、metadata schema、summary / graph / runtime navigation layer 與示範遷移內容。
 - 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
 - 尚未建立 Knowledge Atom metadata schema。
 - 尚未建立可供 runtime 使用的 indexes、summaries、graphs 與 routing metadata。
@@ -441,6 +442,8 @@ metadata/compatibility/
 定義 Knowledge Atom schema 與 required/optional 欄位。
 
 ### Phase 3：Knowledge Navigation
+
+Status: `knowledge/indexes/README.md` 已建立第一版 routing index；summaries、graphs 與 runtime navigation layer 尚未建立。
 
 新增：
 
