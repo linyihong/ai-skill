@@ -31,13 +31,49 @@
 | `priority` | enum | yes | 載入優先序：`P0`、`P1`、`P2`、`P3`，沿用 goal ledger vocabulary。 |
 | `confidence` | enum | yes | 證據信心：`low`、`medium`、`high`。 |
 | `stability` | enum | yes | 預期變動速度：`experimental`、`evolving`、`stable`、`legacy`。 |
-| `context_cost` | enum | yes | 近似閱讀成本：`low`、`medium`、`high`。 |
+| `context_cost` | object | yes | 閱讀成本與載入策略（見下方詳細定義）。 |
 | `when_to_read` | string | yes | 載入此 atom 的觸發條件。 |
 | `validation` | string | yes | agent 如何確認此 atom 仍然最新且可安全使用。 |
 
+## `context_cost` 詳細定義
+
+`context_cost` 是 object，包含以下子欄位：
+
+| 欄位 | 型別 | 必填 | 用途 |
+| --- | --- | --- | --- |
+| `estimated_tokens` | integer | yes | 精確 token 估算（整數）。 |
+| `load_strategy` | enum | yes | 載入策略：`preload`（每個 session 必讀）、`lazy`（依條件 activate）、`on_demand`（使用者要求才讀）。 |
+| `cacheable` | boolean | yes | 是否可在 session/conversation 內 cache。 |
+| `ttl` | object | no | Context TTL 設定（見下方）。 |
+| `breakdown` | object | no | 成本細項，例如 `header_and_navigation`、`core_content`、`examples`、`validation`。 |
+
+### `context_cost.ttl` 子欄位
+
+| 欄位 | 型別 | 用途 |
+| --- | --- | --- |
+| `session` | integer | 活幾個 session（預設 1）。 |
+| `task` | integer | 活幾個 task。 |
+| `conversation` | boolean | 是否活整個對話。 |
+
+### `context_cost` 範例
+
+```yaml
+context_cost:
+  estimated_tokens: 1200
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+  breakdown:
+    header_and_navigation: 200
+    core_content: 700
+    examples: 200
+    validation: 100
+```
+
 ## 選填欄位
 
-當欄位能改善 routing、衝突處理或 model-aware loading 時才填寫。
+當欄位能改善 routing、衝突處理、model-aware loading 或 cost-aware routing 時才填寫。
 
 | 欄位 | 型別 | 用途 |
 | --- | --- | --- |
@@ -48,7 +84,7 @@
 | `replaces` | string array | 已 deprecated 或被取代的 atom ID / 路徑。 |
 | `models` | object | 模型適用性備註，例如 `small`、`large`、`specialized`。 |
 | `checklist` | string array | 低 context 或小模型使用的短檢查清單。 |
-| `runtime_notes` | string | dynamic loading、compression 或 orchestration 備註。 |
+| `runtime_notes` | string | dynamic loading、compression、orchestration 或 TTL 備註。 |
 | `governance_notes` | string | lifecycle、review cadence、ownership 或 deprecation 備註。 |
 
 ## 受控值
