@@ -588,7 +588,17 @@ rules:
 9. 建立 Anti-patterns → [`anti-patterns/README.md`](../anti-patterns/README.md)
 10. 升級 Skills Metadata v2 → [`skills-index.yaml`](../skills-index.yaml)（weight、domains、dependencies、conflicts、priority.runtime）
 
-### Step 7：建立 Semantic Retrieval（長期）
+### Step 7：建立 Runtime Pipeline（已實作）
+
+將所有 Runtime Quality & Safety 元件串接成可執行的 orchestration flow：
+
+1. 建立 Pipeline 概覽 → [`runtime/pipeline/README.md`](../runtime/pipeline/README.md) — 元件接線圖、跨階段通訊表（10 個觸發事件）
+2. 建立 Session Lifecycle → [`runtime/pipeline/session-lifecycle.yaml`](../runtime/pipeline/session-lifecycle.yaml) — 4 階段（bootstrap → routing → execution → close-loop），每階段有 token budget、guard chain、進入/離開條件
+3. 建立 Progressive Context Expansion → [`runtime/pipeline/context-flow.yaml`](../runtime/pipeline/context-flow.yaml) — 4 層級（summary → module summary → detailed source → raw source），每層有 cache policy、entry/exit conditions
+4. 建立 Guard Chain → [`runtime/pipeline/guard-chain.yaml`](../runtime/pipeline/guard-chain.yaml) — 每 stage 的 guard 執行順序（ordered by severity）、檢查頻率（per_tool_call / per_task / per_edit）、中斷行為
+5. 建立 Skill Relevance Engine → [`runtime/pipeline/relevance-engine.yaml`](../runtime/pipeline/relevance-engine.yaml) — 3 維度 scoring（trigger_match 0.5 + domain_match 0.3 + weight 0.2）、threshold 0.5、conflict penalty ×0.5
+
+### Step 8：建立 Semantic Retrieval（長期）
 
 1. 深化 SQLite / FTS runtime index
 2. 加入 embedding-based retrieval

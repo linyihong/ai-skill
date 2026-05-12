@@ -61,6 +61,16 @@
 - **Anti-patterns**：[`anti-patterns/README.md`](../anti-patterns/README.md) + 5 patterns（context-explosion、recursive-tool-loop、hallucination-loop、stale-summary、skill-pollution）。
 - **Skills Metadata v2**：[`skills-index.yaml`](../skills-index.yaml) 升級至 v2，所有 13 skills 加入 weight、domains、dependencies、conflicts、priority.runtime。
 
+### ✅ 已完成：Runtime Pipeline（Phase 3）
+
+將所有 Runtime Quality & Safety 元件串接成可執行的 orchestration flow：
+
+- **Pipeline 概覽**：[`runtime/pipeline/README.md`](../runtime/pipeline/README.md) — 元件接線圖（bootstrap → routing → execution → close-loop）、跨階段通訊表（10 個觸發事件，如 Token usage > 90% → Context Pollution auto-archive、Recursive depth > 4 → Force close-loop）
+- **Session Lifecycle**：[`runtime/pipeline/session-lifecycle.yaml`](../runtime/pipeline/session-lifecycle.yaml) — 4 階段定義：Bootstrap（2000 tokens, 2 guards）、Routing（2500 tokens, 3 guards）、Execution（100000 tokens, 11 guards）、Close-loop（1000 tokens, 1 guard）
+- **Progressive Context Expansion**：[`runtime/pipeline/context-flow.yaml`](../runtime/pipeline/context-flow.yaml) — 4 層級（summary ~500 → module summary ~1500 → detailed source ~4500 → raw source ~10000 tokens），每層有 cache policy（session/task TTL）、entry/exit conditions、no-skip-levels rule
+- **Guard Chain**：[`runtime/pipeline/guard-chain.yaml`](../runtime/pipeline/guard-chain.yaml) — 每 stage 的 guard 執行順序（ordered by severity）、檢查頻率（per_tool_call / per_task / per_edit）、layered violation 行為（critical → halt, high/medium → warn）
+- **Skill Relevance Engine**：[`runtime/pipeline/relevance-engine.yaml`](../runtime/pipeline/relevance-engine.yaml) — 3 維度 scoring（trigger_match 0.5 + domain_match 0.3 + weight 0.2）、threshold 0.5、conflict penalty ×0.5、dependency_missing penalty ×0.8、3 個 scoring examples
+
 尚未完成的下一階段：
 
 - 尚未建立上述分層的完整子目錄；`apk-analysis` 已有第一個 intelligence 示範遷移內容。
