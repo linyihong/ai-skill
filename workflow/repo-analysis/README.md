@@ -28,8 +28,16 @@
 
 ## 第一批候選遷移來源
 
-- `skills/app-development-guidance/process/` 中偏 repo discovery 的內容。
+- `skills/app-development-guidance/process/README.md` — 已提取 Existing Project Documentation Backfill 到 `analysis/repo/documentation-backfill.md`。
 - `architecture/next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明。
+
+## 已提取內容
+
+| 來源 | 目標 | 內容 |
+| --- | --- | --- |
+| `skills/app-development-guidance/process/README.md` §Existing Project Documentation Backfill | `analysis/repo/documentation-backfill.md` | 已實作專案的文件恢復方法（8 種文件、6 種 pipeline artifact、7 步順序） |
+| `skills/app-development-guidance/process/README.md` §Traceability Gate | `analysis/repo/traceability-gate.md` | 文件追溯性建立方法（5 種連結、stable ID、未實作標記） |
+| `skills/app-development-guidance/process/README.md` §Contract Governance Gate | `analysis/repo/contract-governance.md` | 文件優先順序與衝突處理規則 |
 
 ## 建議 Workflow 流程
 
@@ -70,6 +78,22 @@
 4. 產出影響範圍矩陣。
 5. 建議遷移順序與 rollback 計畫。
 ```
+
+### Documentation Backfill Flow
+
+當分析一個已實作完成的 repository 時，使用以下流程恢復缺失的開發文件：
+
+```
+1. Inventory 現有 docs、source folders、tests、schemas、API specs、fixtures、release notes。
+2. 建立 documentation gap table（exists / partial / missing / unknown）。
+3. 先恢復 BDD Behavior（從 UI、API、code、tests、logs 恢復）。
+4. 恢復 Domain Model、Architecture、API/Interface、Error Handling Contracts。
+5. 分開標記 unknown product intent 與 observed behavior。
+6. 若 BDD 無法完成，停止並要求 missing evidence。
+7. 對缺乏 coverage 的 critical BDD scenario 新增 tests 或 test TODOs。
+```
+
+詳細分析方法參見 [`analysis/repo/documentation-backfill.md`](../analysis/repo/documentation-backfill.md)。
 
 ## 產出格式
 

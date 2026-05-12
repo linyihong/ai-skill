@@ -122,6 +122,20 @@
   - `techniques/local-proxy/README.md` → `analysis/apk/techniques/local-proxy.md`：When To Use、Core Guidance、Handler Hook Flow、Attribution
   - `techniques/media-hls/README.md` → `analysis/apk/techniques/media-hls.md`：When To Use、Core Guidance、Media Chain（5-layer model）
 
+### ✅ 已完成：Phase 22 — Repo Analysis 內容提取
+
+- **Phase 22：Repository Analysis 內容提取** — 從 `skills/app-development-guidance/process/README.md` 提取 repo-discovery 相關內容到新分層：
+  - `process/README.md` §Existing Project Documentation Backfill → `analysis/repo/documentation-backfill.md`：8 種文件恢復規則、6 種 pipeline artifact 恢復方法、7 步恢復順序
+  - `process/README.md` §Traceability Gate → `analysis/repo/traceability-gate.md`：5 種追溯連結、stable ID 類型、未實作行為標記
+  - `process/README.md` §Contract Governance Gate → `analysis/repo/contract-governance.md`：6 級文件優先順序、5 種衝突處理規則
+  - 更新 `analysis/repo/README.md`：加入 3 個新分析方法、已提取內容表、擴充產出格式
+  - 更新 `workflow/repo-analysis/README.md`：加入已提取內容表、Documentation Backfill Flow
+  - `techniques/README.md` → `analysis/apk/techniques/README.md`：routing rules（4 categories）、category rules、migration notes
+  - `techniques/flutter-dart-aot/README.md` → `analysis/apk/techniques/flutter-dart-aot.md`：When To Use、Core Guidance、Common Flow、Success Shape、Pitfalls
+  - `techniques/http-api/README.md` → `analysis/apk/techniques/http-api.md`：When To Use、Core Output、API Catalog Shape、API Documentation Flow、Finish Gate、UI Automation
+  - `techniques/local-proxy/README.md` → `analysis/apk/techniques/local-proxy.md`：When To Use、Core Guidance、Handler Hook Flow、Attribution
+  - `techniques/media-hls/README.md` → `analysis/apk/techniques/media-hls.md`：When To Use、Core Guidance、Media Chain（5-layer model）
+
 ### 尚未完成的下一階段
 
 - **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `RUNBOOK.md`、`SKILL.md` 仍為 skill-local。

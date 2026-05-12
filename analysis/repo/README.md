@@ -9,20 +9,11 @@
 - Codebase 心智模型建立（entrypoint、核心抽象、資料流）。
 - 技術債與品質評估（測試覆蓋、lint 狀態、dead code）。
 - 遷移或重構前的影響範圍分析。
+- **已實作專案的文件恢復**：從現有程式碼反向恢復缺失的開發文件。
+- **文件追溯性建立**：建立需求、實作、測試之間的雙向連結。
+- **契約治理**：定義文件優先順序與衝突處理規則。
 
-## 與其他層的關係
-
-- `workflow/` 可引用本層的分析步驟，但不複製分析方法細節。
-- `intelligence/engineering/architecture/` 承接從 repo 分析中萃取的架構判斷。
-- `intelligence/engineering/domain/` 承接從 repo 分析中萃取的領域模型理解。
-- `skills/` 目前仍是相容入口；本層只承接逐步抽出的分析方法。
-
-## 第一批候選遷移來源
-
-- `skills/app-development-guidance/process/` 中偏 repo discovery 的內容。
-- `architecture/next-stage-upgrade-plan.md` 中 `analysis/` 的分層說明。
-
-## 建議分析方法
+## 分析方法
 
 ### 1. 靜態結構分析
 
@@ -65,6 +56,33 @@
 5. 檢查建置與部署流程（Dockerfile、deployment script、migration）。
 ```
 
+### 5. 已實作專案文件恢復
+
+參見 [`documentation-backfill.md`](documentation-backfill.md)。從現有程式碼、tests、schemas、API specs、fixtures 系統化恢復缺失的開發文件。
+
+### 6. 文件追溯性建立
+
+參見 [`traceability-gate.md`](traceability-gate.md)。建立 Product/rule ID → BDD → code → test 的雙向追溯連結。
+
+### 7. 契約治理
+
+參見 [`contract-governance.md`](contract-governance.md)。定義文件優先順序與衝突處理規則。
+
+## 已提取內容
+
+| 來源 | 目標 | 內容 |
+| --- | --- | --- |
+| `skills/app-development-guidance/process/README.md` §Existing Project Documentation Backfill | [`documentation-backfill.md`](documentation-backfill.md) | 8 種文件恢復規則、6 種 pipeline artifact 恢復方法、7 步恢復順序 |
+| `skills/app-development-guidance/process/README.md` §Traceability Gate | [`traceability-gate.md`](traceability-gate.md) | 5 種追溯連結、stable ID 類型、未實作行為標記 |
+| `skills/app-development-guidance/process/README.md` §Contract Governance Gate | [`contract-governance.md`](contract-governance.md) | 6 級文件優先順序、5 種衝突處理規則、取消/延後記錄方法 |
+
+## 與其他層的關係
+
+- `workflow/repo-analysis/` 可引用本層的分析步驟，但不複製分析方法細節。
+- `intelligence/engineering/architecture/` 承接從 repo 分析中萃取的架構判斷。
+- `intelligence/engineering/domain/` 承接從 repo 分析中萃取的領域模型理解。
+- `skills/app-development-guidance/process/README.md` 是原始來源，仍為 active entrypoint。
+
 ## 產出格式
 
 每次 repo 分析應產出：
@@ -73,3 +91,5 @@
 - **依賴圖重點**（≤200 tokens）：關鍵外部依賴、內部模組依賴、circular dependency 風險。
 - **技術債清單**（≤200 tokens）：需要關注的品質問題與優先順序。
 - **影響範圍分析**（≤200 tokens）：如果修改 X，哪些檔案會受影響。
+- **文件恢復狀態**（≤200 tokens）：已恢復的文件與仍缺失的文件。
+- **追溯性矩陣**（≤200 tokens）：需求 → BDD → code → test 的對應狀態。
