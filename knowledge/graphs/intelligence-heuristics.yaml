@@ -2,14 +2,15 @@ id: graph.intelligence-heuristics
 source: intelligence/engineering/heuristics/README.md
 status: candidate
 summary: >
-  連接 engineering heuristics 層的所有 atoms：premature-optimization、abstraction-threshold、
-  retry-smell、single-responsibility-heuristic、test-driven-heuristic。
-  每個 atom 是獨立 intelligence，但共享 heuristics 目錄的 README 索引與技能路由。
+   連接 engineering heuristics 層的所有 atoms：premature-optimization、abstraction-threshold、
+   retry-smell、single-responsibility-heuristic、test-driven-heuristic、
+   field-confidence-judgment、magic-bytes-reference。
+   每個 atom 是獨立 intelligence，但共享 heuristics 目錄的 README 索引與技能路由。
 edges:
   - type: depends_on
     target: intelligence/engineering/heuristics/README.md
     reason: Heuristics README 提供目錄索引、atom 清單與各 atom 的簡要說明。
-    validation: README 列出所有 5 個 atoms 及其核心原則。
+    validation: README 列出所有 7 個 atoms 及其核心原則。
   - type: related_to
     target: intelligence/engineering/heuristics/premature-optimization.md
     reason: 過早最佳化經驗法則 — 除非有數據證明瓶頸，否則不最佳化。
@@ -30,6 +31,14 @@ edges:
     target: intelligence/engineering/heuristics/test-driven-heuristic.md
     reason: 測試驅動經驗法則 — 測試是設計工具不是驗證工具。
     validation: atom 定義 TDD 的正確心態與常見誤用。
+  - type: related_to
+    target: intelligence/engineering/heuristics/field-confidence-judgment.md
+    reason: 欄位信心判斷經驗法則 — 在不確定時使用明確標記，不要 invent 不存在的資訊。
+    validation: atom 定義 8 種信心狀態（confirmed/candidate/needs capture/meaning unknown 等）與判斷流程。
+  - type: related_to
+    target: intelligence/engineering/heuristics/magic-bytes-reference.md
+    reason: Magic Bytes 參考表 — 檔案 extension 不可信，magic bytes 是判斷容器類型的最可靠方式。
+    validation: atom 定義 9 種格式的 magic bytes、靜態 vs 動畫判斷、ffprobe 指令。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.intelligence.heuristics record。
