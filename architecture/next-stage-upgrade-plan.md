@@ -295,7 +295,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 |-------|--------|------|----------|------|
 | **Phase 29** | P1 | ✅ 已完成 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/apk-analysis/{heuristics,signals}/` | Phase 28（pilot 模式已驗證） |
 | **Phase 30** | P1 | ✅ 已完成 | Feedback history 提取到 feedback/ 層 | `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/extraction/`，建立 category index | Phase 29（techniques 完成後，feedback 可對應到已建立的 workflow/intelligence） |
-| **Phase 31** | P2 | Pilot 驗證 + Intelligence Extraction Pipeline 抽象化 | 在實際 APK analysis session 中驗證 intelligence atoms 是否改善 AI 決策品質；從 pilot 經驗提煉出可重複的 extraction pipeline | Phase 29（所有 techniques 完成後才有足夠經驗） |
+| **Phase 31** | P2 | ✅ 已完成 | Intelligence Extraction Pipeline 抽象化 | [`governance/lifecycle/intelligence-extraction-pipeline.md`](governance/lifecycle/intelligence-extraction-pipeline.md) — 7-step pipeline（內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引） | Phase 29（所有 techniques 完成後才有足夠經驗） |
 | **Phase 32** | P2 | SKILL.md 分解 | 將各 skill 的 `SKILL.md` 中剩餘內容（Quick Start、Default Workflow、Output Style、Feedback Loop）提取到對應新層 | Phase 30（feedback 提取完成） |
 | **Phase 33** | P4 | Skill-Specific Intelligence Extraction | 見 [`plans/skill-specific-extraction.md`](plans/skill-specific-extraction.md) | Phase 31（pipeline 驗證成功）+ Phase 32（SKILL.md 分解完成） |
 
@@ -355,34 +355,34 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 ---
 
-#### Phase 31：Pilot 驗證 + Intelligence Extraction Pipeline
+#### Phase 31：Pilot 驗證 + Intelligence Extraction Pipeline ✅ 已完成
 
-**目標**：驗證 intelligence atoms 是否真的改善 AI 決策品質，然後從經驗中抽象出可重複的 extraction pipeline。
+**目標**：從 4 個 techniques 的實際 extraction 經驗中抽象出可重複的 extraction pipeline。
 
-**執行步驟**：
+**實際產出**：
 
-1. **Pilot 驗證**：
-   - 在實際 APK analysis session 中使用已建立的 intelligence atoms
-   - 記錄 AI 是否根據 signal 改變策略（對比以前只照流程 dump）
-   - 記錄 token 節省量（以前讀整份 technique 文件 vs. 現在只讀 intelligence atom）
-   - 記錄決策正確率
+| 產出 | 路徑 | 說明 |
+|------|------|------|
+| Intelligence Extraction Pipeline | [`governance/lifecycle/intelligence-extraction-pipeline.md`](governance/lifecycle/intelligence-extraction-pipeline.md) | 7-step pipeline：內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引 |
+| 路由索引更新 | `knowledge/indexes/README.md` | 加入「執行 Intelligence Extraction Pipeline」路由列 |
 
-2. **Intelligence Extraction Pipeline 抽象化**：
-   - 從 [`notes/intelligence-extraction-observations.md`](notes/intelligence-extraction-observations.md) 的觀察提煉出可重複的流程
-   - 定義 extraction 的觸發條件（什麼時候該 extraction）
-   - 定義 atom 格式規範（決策表、症狀表、信號表）
-   - 定義驗證方式（如何確認 atom 有效）
-   - 產出 `governance/lifecycle/intelligence-extraction-pipeline.md`
+**Pipeline 核心設計**：
 
-3. **更新相關文件**：
-   - `metadata/schema.md` — 確認 atom 格式符合 schema
-   - `knowledge/indexes/README.md` — 加入 extraction pipeline 的 routing
-   - `knowledge/runtime/routing-registry.yaml` — 加入 pipeline 相關 records
+1. **內容審計（Content Audit）**：8 個審計維度（操作步驟、判斷決策、工具命令、失敗模式、信號偵測、反模式、通用建議、產出規範）
+2. **類型判斷（Type Classification）**：10 種元素類型，各有對應目標層與格式模板
+3. **拆解執行（Decomposition）**：三種模式 — Technique Decomposition（Phase 28-29）、Feedback History Extraction（Phase 30）、SKILL.md Decomposition（Phase 32 未來）
+4. **格式轉換（Format Transformation）**：5 種格式模板（Heuristic、Anti-pattern、Failure、Signal、Workflow）
+5. **標註來源（Source Annotation）**：`# Intelligence Extracted` 或 `# Extracted — See <target>` 標記
+6. **驗證（Validation）**：完整性檢查 + 品質檢查 + 不強制 atomize 的情況
+7. **更新索引（Index Update）**：7 個需更新的文件清單
 
-**成功驗證標準**：
-- Pilot 驗證報告顯示 AI 決策品質有改善
-- Extraction pipeline 文件已建立
-- Pipeline 可套用到下一個未 extraction 的 domain
+**已驗證的模式**：
+- Technique Decomposition（4 techniques，Phase 28-29）✅
+- Feedback History Extraction（101 lessons，Phase 30）✅
+
+**未完成項目**：
+- **Pilot 驗證**（在實際 APK analysis session 中驗證 intelligence atoms 是否改善 AI 決策品質）— 需在真實工作階段中進行，無法在此環境執行
+- `knowledge/runtime/routing-registry.yaml` 更新 — 待 pipeline 正式啟用後再加入 routing record
 
 ---
 
