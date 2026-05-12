@@ -1,0 +1,306 @@
+# Skill Index
+# Agent 先比對 task intent 與 triggers，找到對應 skill 後再讀 entrypoint。
+# 不掃描整個 skills/ 目錄。
+
+skills_index_version: v1
+status: candidate
+owner_layer: knowledge/indexes
+description: >
+  Skill routing index。讓 AI 先路由 skill，而不是掃整個 repo。
+  每個 skill 定義 triggers、cost、entrypoint 與 summary path。
+
+skills:
+  - id: apk-analysis
+    name: APK Analysis
+    description: 授權 APK 流量分析、動態抓包、Flutter/Dart AOT、response 解碼、文件化
+    triggers:
+      - apk
+      - mitm
+      - flutter
+      - frida
+      - traffic-analysis
+      - proxy
+      - reverse-engineering
+      - network-capture
+      - dart-aot
+      - hls
+      - media-streaming
+    cost:
+      estimated_tokens: 4500
+      context_load: high
+    entrypoint: skills/apk-analysis/SKILL.md
+    summary: knowledge/summaries/apk-analysis-pilot.md
+    related:
+      - architecture/apk-analysis-pilot-migration.md
+      - analysis/apk/README.md
+      - workflow/apk-analysis/README.md
+      - intelligence/engineering/apk-analysis/README.md
+
+  - id: app-development-guidance
+    name: App/API/Embedded Development Guidance
+    description: 將授權 App/API/Embedded/Firmware 觀察轉成開發 guidance、實作模式、控制項、檢查清單
+    triggers:
+      - api
+      - backend
+      - architecture
+      - mobile
+      - security
+      - firmware
+      - embedded
+      - flutter
+      - react-native
+      - ios
+      - android
+      - kotlin
+      - swift
+      - typescript
+      - dart
+      - contract
+      - codegen
+      - signing
+      - session
+      - anti-tamper
+    cost:
+      estimated_tokens: 3500
+      context_load: medium
+    entrypoint: skills/app-development-guidance/SKILL.md
+    summary: null
+    related:
+      - skills/app-development-guidance/README.md
+      - skills/app-development-guidance/checklists/README.md
+      - skills/app-development-guidance/controls/README.md
+
+  - id: travel-planning
+    name: Travel Planning
+    description: 依目的地、日期、交通與玩法規劃行程，包含營業時間查證、交通比較、住宿與備案
+    triggers:
+      - travel
+      - itinerary
+      - route
+      - transportation
+      - accommodation
+      - sightseeing
+      - trip
+      - vacation
+    cost:
+      estimated_tokens: 2800
+      context_load: medium
+    entrypoint: skills/travel-planning/SKILL.md
+    summary: null
+    related:
+      - skills/travel-planning/README.md
+
+  - id: repo-governance
+    name: Repository Governance
+    description: AI-native Knowledge Operating System 本身的維護、升級、遷移與治理
+    triggers:
+      - governance
+      - migration
+      - architecture-upgrade
+      - repo-maintenance
+      - cleanup
+      - deprecation
+      - lifecycle
+      - validation
+      - metadata
+      - schema
+    cost:
+      estimated_tokens: 2000
+      context_load: medium
+    entrypoint: governance/README.md
+    summary: null
+    related:
+      - architecture/next-stage-upgrade-plan.md
+      - architecture/context-cost-optimization-plan.md
+      - metadata/schema.md
+      - knowledge/runtime/routing-registry.yaml
+
+  - id: knowledge-navigation
+    name: Knowledge Navigation
+    description: 知識導航、索引、摘要、圖譜與 runtime routing
+    triggers:
+      - navigation
+      - routing
+      - index
+      - summary
+      - knowledge-graph
+      - context-loading
+      - runtime
+    cost:
+      estimated_tokens: 1500
+      context_load: low
+    entrypoint: knowledge/README.md
+    summary: null
+    related:
+      - knowledge/indexes/README.md
+      - knowledge/summaries/README.md
+      - knowledge/graphs/README.md
+      - knowledge/runtime/README.md
+
+  - id: feedback-promotion
+    name: Feedback & Promotion
+    description: Feedback lesson 管理、promotion pipeline、failure learning
+    triggers:
+      - feedback
+      - lesson
+      - promotion
+      - failure-learning
+      - close-loop
+    cost:
+      estimated_tokens: 1800
+      context_load: medium
+    entrypoint: feedback/README.md
+    summary: knowledge/summaries/feedback-promotion-pipeline.md
+    related:
+      - shared-rules/feedback-lessons.md
+      - shared-rules/failure-learning-system.md
+      - feedback/promotion/README.md
+
+  - id: model-routing
+    name: Model-aware Routing
+    description: 多模型協作、capability profile、compression strategy
+    triggers:
+      - model
+      - routing
+      - compression
+      - profile
+      - multi-model
+      - token-optimization
+    cost:
+      estimated_tokens: 1200
+      context_load: low
+    entrypoint: models/README.md
+    summary: null
+    related:
+      - models/profiles/README.md
+      - models/compression/README.md
+      - knowledge/runtime/model-context-report.md
+
+  - id: runtime-operations
+    name: Runtime Operations
+    description: Context routing、dynamic loading、context pruning、orchestration
+    triggers:
+      - runtime
+      - context
+      - orchestration
+      - scheduler
+      - agent-coordination
+      - ttl
+    cost:
+      estimated_tokens: 1600
+      context_load: medium
+    entrypoint: runtime/README.md
+    summary: null
+    related:
+      - runtime/routing/README.md
+      - knowledge/runtime/routing-registry.yaml
+      - knowledge/runtime/README.md
+
+  - id: memory-operations
+    name: Memory Operations
+    description: 長期記憶、情節記憶、short-term memory、failure memory
+    triggers:
+      - memory
+      - episodic
+      - long-term
+      - short-term
+      - experience-replay
+    cost:
+      estimated_tokens: 1000
+      context_load: low
+    entrypoint: memory/README.md
+    summary: null
+    related: []
+
+  - id: analysis-methods
+    name: Analysis Methods
+    description: 觀察、拆解、reverse engineering、pattern extraction 方法
+    triggers:
+      - analysis
+      - reverse-engineering
+      - pattern-extraction
+      - observation
+      - decomposition
+    cost:
+      estimated_tokens: 1400
+      context_load: low
+    entrypoint: analysis/README.md
+    summary: null
+    related:
+      - analysis/apk/README.md
+
+  - id: intelligence-engineering
+    name: Engineering Intelligence
+    description: 工程決策、trade-off、anti-pattern、可重用 domain knowledge
+    triggers:
+      - intelligence
+      - engineering-decision
+      - trade-off
+      - anti-pattern
+      - domain-knowledge
+      - architecture-lesson
+    cost:
+      estimated_tokens: 2000
+      context_load: medium
+    entrypoint: intelligence/README.md
+    summary: null
+    related:
+      - intelligence/engineering/apk-analysis/README.md
+
+  - id: workflow-execution
+    name: Workflow Execution
+    description: Planning flow、task decomposition、review flow、orchestration flow
+    triggers:
+      - workflow
+      - planning
+      - task-decomposition
+      - review
+      - orchestration
+      - execution-flow
+    cost:
+      estimated_tokens: 1800
+      context_load: medium
+    entrypoint: workflow/README.md
+    summary: null
+    related: []
+
+  - id: tool-adapters
+    name: Tool Adapters
+    description: AI 工具（Claude Code、Cursor 等）的配置、同步、使用方式
+    triggers:
+      - tool
+      - claude
+      - cursor
+      - adapter
+      - sync
+      - config
+      - hook
+    cost:
+      estimated_tokens: 1200
+      context_load: low
+    entrypoint: ai-tools/README.md
+    summary: null
+    related:
+      - ai-tools/claude.md
+      - ai-tools/cursor.md
+
+  - id: scripts-automation
+    name: Scripts & Automation
+    description: 閉環自動化腳本、knowledge runtime refresh、validation
+    triggers:
+      - script
+      - automation
+      - close-loop
+      - refresh
+      - validate
+      - generate
+      - query
+    cost:
+      estimated_tokens: 1000
+      context_load: low
+    entrypoint: scripts/README.md
+    summary: null
+    related:
+      - scripts/refresh-knowledge-runtime.rb
+      - scripts/validate-knowledge-runtime.rb
+      - scripts/query-knowledge-graph.rb

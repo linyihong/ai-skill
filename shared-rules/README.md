@@ -88,25 +88,5 @@
 | 工具同步 / 參照 | [tool-neutral-documentation.md](tool-neutral-documentation.md) / [`ai-tools`](../ai-tools/README.md) | 通用規則保持工具中立；具體工具參照、symlink、同步、hook、UI 與路徑放在 `ai-tools/` 或工具設定檔。 | lazy (P2/P3) |
 | Cursor 同步 | [cursor-sync.md](cursor-sync.md) | Cursor 專屬同步策略與注意事項。 | lazy (P3) |
 
-| 分類 | 檔案 | 內容摘要 |
-| --- | --- | --- |
-| 授權與範圍 | [authorization-scope.md](authorization-scope.md) | 僅在授權範圍內分析、資料邊界。 |
-| 去敏與占位符 | [sanitization.md](sanitization.md) | 什麼不可寫進可重用文件、占位符約定。 |
-| 中性、低爭議與語言一致性 | [neutral-language.md](neutral-language.md) | 文件標題、檔名、摘要與正文避免高風險或爭議詞；可重用文件正文預設繁體中文，必要英文保留給路徑、指令、API 欄位與專有名詞。 |
-| 工具中立文件 | [tool-neutral-documentation.md](tool-neutral-documentation.md) | 可重用文件預設保持工具中立；工具專屬路徑、hook、同步與 UI 步驟放到 `ai-tools/` 或工具設定檔。 |
-| 規則權重與衝突優先序 | [rule-weight.md](rule-weight.md) | 當 shared rules、skill workflow、tool adapter、使用者目標或效率規則看似衝突時，依安全/source/validation/user-goal/tool adapter/效率的權重排序處理。 |
-| 決策效率 | [decision-efficiency.md](decision-efficiency.md) | 先界定未知，再依 time-to-evidence、語意距離、風險、驗證信號與 context 成本選下一步。 |
-| 失效學習系統 | [failure-learning-system.md](failure-learning-system.md) / [failure-patterns](failure-patterns/README.md) | 使用 failure taxonomy、pattern records、promotion targets 與 validation gate，將重複 agent 失效模式沉澱成可重用防呆規則；例如 source/mirror 寫入漂移。 |
-| 文件 TODO | [document-todo-list.md](document-todo-list.md) | 文件有未完成、待決策、待補強或待驗證內容時，在前段放可掃描 TODO 表並連到相關章節、goal 或 issue。 |
-| 目標、執行、驗證 | [goal-action-validation.md](goal-action-validation.md) | 每個重要工作單元要能反查目標、執行內容與驗證方式；純判斷題用參考來源與推論邊界。 |
-| 對話目標閉環 | [conversation-goal-ledger.md](conversation-goal-ledger.md) | 使用專案本地 `.agent-goals/` 暫存帳本追蹤 active goals、優先權、parallelization mode、owner/lock 決策、plan/todo links、missing/decision/strengthen、拆解、轉移、完成驗證與刪除條件；多步驟、已有 todo、使用者要求繼續或看到 dirty files 時要先 status/init；長期 roadmap / lifecycle 狀態必須落到 durable planning 文件，不保存在 completed goal row。 |
-| 依賴文件讀取 | [dependency-reading.md](dependency-reading.md) | 發現 skill/shared rule/tool-specific rule/template/lesson 更新時，必須讀相關依賴文件，包含 shared-rules，並用 dependency read ledger 防止漏讀。 |
-| 內容分層 | [content-layering.md](content-layering.md) | 共用規則／技巧／業務專案各自放哪。 |
-| 可重用規則與專案證據邊界 | [reusable-guidance-boundary.md](reusable-guidance-boundary.md) | 技巧只沉澱通用原因、規則與驗證；專案 incident 證據留在專案文件；指出閉環不完整時必須分析原因並強化規則。 |
-| 文件大小與拆分 | [document-sizing.md](document-sizing.md) | 文件變大時改成目錄、分類資料夾與多檔，避免單檔堆疊。 |
-| Cross-skill references | [cross-skill-references.md](cross-skill-references.md) | 一個 skill 需要引用另一個 skill 的規範、模板、交接產物或驗證流程時怎麼寫。 |
-| 連動更新 | [linked-updates.md](linked-updates.md) | 全庫必須連動更新規則：改一處影響多處時，相關文件必須同步更新或明確檢查。 |
-| Feedback 與技巧條目 | [feedback-lessons.md](feedback-lessons.md) | **檔名規則、模板、agent 行為、索引**（唯一正文）；各 skill 目錄僅保留 `feedback_history/` 與可選的極短 `FEEDBACK.md` 入口。 |
-| 工具同步 / 參照 | [tool-neutral-documentation.md](tool-neutral-documentation.md) / [`ai-tools`](../ai-tools/README.md) | 通用規則保持工具中立；具體工具參照、symlink、同步、hook、UI 與路徑放在 `ai-tools/` 或工具設定檔。 |
 
 **單一真相來源：**只在本庫 **`shared-rules/`** 維護共用規則正文；部署到工具或專案時優先參照中央庫或 symlink，需要離線快照時才複製整個 `shared-rules/` 資料夾。
