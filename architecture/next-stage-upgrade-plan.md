@@ -136,10 +136,22 @@
   - `techniques/local-proxy/README.md` → `analysis/apk/techniques/local-proxy.md`：When To Use、Core Guidance、Handler Hook Flow、Attribution
   - `techniques/media-hls/README.md` → `analysis/apk/techniques/media-hls.md`：When To Use、Core Guidance、Media Chain（5-layer model）
 
+### ✅ 已完成：Phase 24 — Intelligence Atoms for app-development-guidance + travel-planning + repo-analysis
+
+為新提取的 3 個領域建立工程智慧 atoms：
+
+| 領域 | 新 atoms | 位置 |
+|------|----------|------|
+| **app-development-guidance** | docs-first-bdd-closure、risk-translation-heuristic、contract-governance-heuristic | `intelligence/engineering/app-development-guidance/` |
+| **travel-planning** | source-triage-heuristic、feasibility-build-heuristic | `intelligence/travel/` |
+| **repo-analysis** | documentation-backfill-heuristic、traceability-heuristic | `intelligence/engineering/repo-analysis/` |
+
+同時建立對應的 graph records（`intelligence-app-development-guidance.yaml`、`intelligence-repo-analysis.yaml`），並更新 `intelligence-travel.yaml` 加入新 atom edges。
+
 ### 尚未完成的下一階段
 
 - **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `RUNBOOK.md`、`SKILL.md` 仍為 skill-local。
-- **更多 skill 內容可提取**：`skills/repo-analysis/` 等 skill 的內容尚未提取到對應的 `workflow/` 與 `analysis/` 層。
+- **更多 skill 內容可提取**：`skills/apk-analysis/RUNBOOK.md` 等內容尚未提取到對應的 `runtime/` 或 `workflow/` 層。
 - **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建，但更多 skill 內容需要提取到新分層。
 
 ## 核心問題

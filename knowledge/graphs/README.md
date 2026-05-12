@@ -26,8 +26,10 @@
 | [`intelligence-anti-patterns.yaml`](intelligence-anti-patterns.yaml) | 連接 generic-repository-overuse atom 與相關 architecture、domain、根目錄 anti-patterns。 | `candidate` |
 | [`intelligence-distributed-systems.yaml`](intelligence-distributed-systems.yaml) | 連接 eventual-consistency-patterns atom 與相關 failure、tradeoffs、architecture。 | `candidate` |
 | [`intelligence-business.yaml`](intelligence-business.yaml) | 連接 saas-pricing-heuristics atom 與 business intelligence 層。 | `candidate` |
-| [`intelligence-travel.yaml`](intelligence-travel.yaml) | 連接 japan-roadtrip-fatigue atom 與 travel workflow。 | `candidate` |
+| [`intelligence-travel.yaml`](intelligence-travel.yaml) | 連接 japan-roadtrip-fatigue、source-triage-heuristic、feasibility-build-heuristic atoms 與 travel workflow。 | `candidate` |
 | [`intelligence-apk-analysis-atoms.yaml`](intelligence-apk-analysis-atoms.yaml) | 連接 evidence-first-routing、live-readiness-gates atoms 與 skill、workflow、analysis。 | `candidate` |
+| [`intelligence-app-development-guidance.yaml`](intelligence-app-development-guidance.yaml) | 連接 docs-first-bdd-closure、risk-translation-heuristic、contract-governance-heuristic atoms 與 workflow、analysis 來源。 | `candidate` |
+| [`intelligence-repo-analysis.yaml`](intelligence-repo-analysis.yaml) | 連接 documentation-backfill-heuristic、traceability-heuristic atoms 與 analysis/repo/、workflow 來源。 | `candidate` |
 
 ### Runtime & Pipeline（Phase 14）
 

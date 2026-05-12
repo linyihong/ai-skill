@@ -1,0 +1,40 @@
+id: graph.intelligence-app-development-guidance
+source: intelligence/engineering/app-development-guidance/README.md
+edges:
+  - type: depends_on
+    target: intelligence/engineering/app-development-guidance/README.md
+    reason: 索引檔案，列出所有 app-development-guidance intelligence atoms
+    validation: 確認 README 存在且 atoms 列表正確
+  - type: related_to
+    target: intelligence/engineering/app-development-guidance/docs-first-bdd-closure.md
+    reason: BDD 優先閉環原則：observable behavior 變更前必須先更新管轄契約
+    validation: 確認 atom 存在且格式正確
+  - type: related_to
+    target: intelligence/engineering/app-development-guidance/risk-translation-heuristic.md
+    reason: 風險轉譯原則：將攻擊者視角的觀察轉譯為開發者行動
+    validation: 確認 atom 存在且格式正確
+  - type: related_to
+    target: intelligence/engineering/app-development-guidance/contract-governance-heuristic.md
+    reason: 契約治理原則：文件衝突時的優先順序與解決方法
+    validation: 確認 atom 存在且格式正確
+  - type: promotes_from
+    target: workflow/app-development-guidance/execution-flow.md
+    reason: docs-first-bdd-closure 與 risk-translation 從 execution-flow 萃取原則
+    validation: 確認 execution-flow.md 包含對應章節
+  - type: promotes_from
+    target: analysis/app-development-guidance/risk-translation.md
+    reason: risk-translation-heuristic 從 risk-translation.md 萃取原則
+    validation: 確認 risk-translation.md 包含對應內容
+  - type: promotes_from
+    target: analysis/repo/contract-governance.md
+    reason: contract-governance-heuristic 從 contract-governance.md 萃取原則
+    validation: 確認 contract-governance.md 包含對應內容
+  - type: preserves_entrypoint
+    target: skills/app-development-guidance/SKILL.md
+    reason: skills/app-development-guidance/ 仍為 active entrypoint
+    validation: 確認 SKILL.md 存在
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: 透過 runtime routing 可被任務路由發現
+    validation: 確認 routing-registry.yaml 存在
+status: candidate

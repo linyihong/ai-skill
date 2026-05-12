@@ -1,0 +1,40 @@
+id: graph.intelligence-repo-analysis
+source: intelligence/engineering/repo-analysis/README.md
+edges:
+  - type: depends_on
+    target: intelligence/engineering/repo-analysis/README.md
+    reason: 索引檔案，列出所有 repo-analysis intelligence atoms
+    validation: 確認 README 存在且 atoms 列表正確
+  - type: related_to
+    target: intelligence/engineering/repo-analysis/documentation-backfill-heuristic.md
+    reason: 文件回填原則：從已實作程式碼系統化恢復缺失的開發文件
+    validation: 確認 atom 存在且格式正確
+  - type: related_to
+    target: intelligence/engineering/repo-analysis/traceability-heuristic.md
+    reason: 文件追溯性原則：建立需求、實作、測試之間的雙向追溯
+    validation: 確認 atom 存在且格式正確
+  - type: promotes_from
+    target: analysis/repo/documentation-backfill.md
+    reason: documentation-backfill-heuristic 從 documentation-backfill.md 萃取原則
+    validation: 確認 documentation-backfill.md 包含對應內容
+  - type: promotes_from
+    target: analysis/repo/traceability-gate.md
+    reason: traceability-heuristic 從 traceability-gate.md 萃取原則
+    validation: 確認 traceability-gate.md 包含對應內容
+  - type: promotes_from
+    target: analysis/repo/contract-governance.md
+    reason: 追溯性原則引用契約治理概念
+    validation: 確認 contract-governance.md 包含對應內容
+  - type: related_to
+    target: workflow/repo-analysis/README.md
+    reason: repo-analysis workflow 引用這些分析方法
+    validation: 確認 workflow/repo-analysis/README.md 存在
+  - type: preserves_entrypoint
+    target: skills/app-development-guidance/SKILL.md
+    reason: skills/app-development-guidance/ 仍為 active entrypoint（process/README.md 的來源）
+    validation: 確認 SKILL.md 存在
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: 透過 runtime routing 可被任務路由發現
+    validation: 確認 routing-registry.yaml 存在
+status: candidate

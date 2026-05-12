@@ -1,15 +1,27 @@
 id: graph.intelligence-travel
-source: intelligence/travel/japan-roadtrip-fatigue.md
+source: intelligence/travel/README.md
 status: candidate
 summary: >
-  連接 travel intelligence atom（japan-roadtrip-fatigue）與相關的 workflow、
-  business 層，以及 runtime routing。Travel intelligence 是 personal domain
-  intelligence，與 engineering 層無直接依賴。
+  連接 travel intelligence atoms（japan-roadtrip-fatigue、source-triage-heuristic、
+  feasibility-build-heuristic）與相關的 workflow、business 層，以及 runtime routing。
+  Travel intelligence 是 personal domain intelligence，與 engineering 層無直接依賴。
 edges:
   - type: depends_on
     target: intelligence/travel/README.md
     reason: Travel README 提供目錄索引與 scope 定義。
     validation: README 說明 travel intelligence 的範圍與邊界。
+  - type: related_to
+    target: intelligence/travel/japan-roadtrip-fatigue.md
+    reason: 長途駕駛疲勞經驗法則
+    validation: 確認 atom 存在且格式正確
+  - type: related_to
+    target: intelligence/travel/source-triage-heuristic.md
+    reason: 旅行資訊來源分級經驗法則
+    validation: 確認 atom 存在且格式正確
+  - type: related_to
+    target: intelligence/travel/feasibility-build-heuristic.md
+    reason: 旅行可行性建構經驗法則
+    validation: 確認 atom 存在且格式正確
   - type: related_to
     target: workflow/travel-planning/README.md
     reason: Travel planning workflow 在規劃行程時應引用 travel intelligence atoms。
