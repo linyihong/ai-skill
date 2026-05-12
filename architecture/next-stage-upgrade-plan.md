@@ -80,15 +80,24 @@
 - **Promotion Workflow**：[`feedback/pipeline/promotion-workflow.yaml`](../feedback/pipeline/promotion-workflow.yaml) — 5 階段 workflow（assess-lesson → prepare-content → write-target → update-linked → validate-close-loop）、每階段有 entry/exit conditions、steps、output、rollback-on-validation-failure rule
 - **Lifecycle Automation**：[`feedback/pipeline/lifecycle-automation.yaml`](../feedback/pipeline/lifecycle-automation.yaml) — 4 種 automation（auto-archive-cold 180 days no references score<0.4、auto-downgrade-stale 90 days no re-validation、periodic-promotion-check weekly recalculate score、cold-data-threshold-monitor 50 lessons per category trigger index）、完整 state machine（new → experimental → candidate → validated → promoted → archived）、6 條 automation rules
 
-尚未完成的下一階段：
+### 已完成：子目錄擴充（Phase 6-11）
 
-- 尚未建立上述分層的完整子目錄；`apk-analysis` 已有第一個 intelligence 示範遷移內容。
-- 既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons。
-- 尚未建立可供 runtime 自動消費的 generated summaries、graphs 與 registry generation tooling；validation helper 與 runtime report generator 已建立。
-- Multi-model routing / compression strategy 已有第一版，並已建立 model-aware context report 與 per-model checklist artifact generator；尚未建立 task-specific prompt artifact generator。
-- SQLite / FTS runtime index prototype 已可生成、查詢與驗證；query ranking、layer/type/status filtering、source checksum stale validation 與一鍵 runtime refresh orchestration 已完成。
-- Knowledge graph edges 已可用 `scripts/query-knowledge-graph.rb` 低成本查詢；尚未自動生成完整 graph records。
-- Cold feedback lessons 的 archive 策略已納入 `governance/lifecycle/README.md`：Markdown 仍是 canonical source，SQLite / FTS 與 generated summaries 只作低 token lookup。
+以下為後續補齊的各層子目錄與內容：
+
+- **Phase 6：Governance 子目錄** — `governance/cleanup/README.md`（5 種 duplicate 類型、splitting 規則、ownership boundary）、`governance/dependency/README.md`（graph 更新時機、edge type controlled vocabulary、validation checklist）
+- **Phase 7：Analysis 子目錄** — `analysis/repo/README.md`（4 種分析方法）、`analysis/production/README.md`（5 種生產分析）、`analysis/issue/README.md`（5 種 issue 分類與 priority 計算）
+- **Phase 8：Feedback 子目錄** — `feedback/replay/README.md`（5 種 trigger conditions、replay flow）、`feedback/extraction/README.md`（extraction threshold table、intelligence type mapping）、`feedback/refinement/README.md`（6 種 trigger、5 種 problem types、version management）
+- **Phase 9：Workflow 子目錄** — `workflow/app-development-guidance/README.md`（5 種 review types）、`workflow/repo-analysis/README.md`（5 種 analysis types）、`workflow/travel-planning/README.md`（6 種 planning types）
+- **Phase 10：Memory 子目錄** — `memory/episodic/README.md`（情境記憶）、`memory/project/README.md`（專案記憶）、`memory/failure/README.md`（失效記憶），memory/ 完整 6 子層
+- **Phase 11：Decisions ADR** — 5 筆實際 ADR（Reference-First Migration Strategy、Intelligence vs Knowledge Separation、Three-Layer Architecture、Feedback Promotion Pipeline、Memory Architecture）
+
+### 尚未完成的下一階段
+
+- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。
+- **Intelligence atoms 尚未大量填充**：`intelligence/engineering/heuristics/` 已有 5 個 candidate atoms，但其餘 8 個子目錄（architecture、domain、failure、anti-patterns、tradeoffs、distributed-systems、business、travel）尚無實際 atoms。
+- **Task-specific prompt artifact generator 尚未建立**：model-aware context report 與 per-model checklist 已可生成，但尚未根據 task intent 自動組合 prompt artifact。
+- **Knowledge graph records 尚未自動生成**：graph edges 可用 `scripts/query-knowledge-graph.rb` 低成本查詢，但完整 graph records 仍需手動維護。
+- **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建，但更多 skill 內容需要提取到新分層。
 
 ## 核心問題
 
