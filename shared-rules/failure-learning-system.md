@@ -97,6 +97,23 @@ Pattern records 要短。若 pattern 變長，將 examples 拆成較小 pattern 
 | Cross-document 或 cross-agent workflow failure | `shared-rules/failure-patterns/` 加上相關 shared rule |
 | Skill-specific repeated mistake | 該 skill 的 `feedback_history/`，成熟後再推進 workflow/checklist |
 | Tool-specific execution failure | `ai-tools/<tool>.md`、tool config 或 skill tool adapter |
+| **AI 系統面執行錯誤**（routing 錯誤、heuristic 誤用、forbidden route 被選中） | **`validation/scenarios/failure-derived/`** — 建立 stateless scenario，未來可自動驗證同類錯誤是否重演 |
+
+### Failure → Validation Scenario 條件
+
+當 failure 符合以下所有條件時，應 promotion 為 validation scenario：
+
+1. **可 stateless 重現**：不需要前文提示或 conversation memory，給定相同 signals 應產出相同決策
+2. **有明確的 expected/forbidden route**：可以定義「應該走哪條路」和「不該走哪條路」
+3. **有 prevention 價值**：未來模型升級、架構變更或 routing 調整後，可能再次發生
+4. **不是一次性事件**：同類 signals 組合可能在真實任務中再次出現
+
+建立 scenario 後，在 failure pattern 或 feedback lesson 中標註對應的 scenario ID：
+
+```markdown
+## Validation Scenario
+- [`validation/scenarios/failure-derived/<id>.yaml`](../../validation/scenarios/failure-derived/<id>.yaml)
+```
 
 不要把 project incident 直接推進 reusable docs。必須先泛化 cause、trigger、required action 與 validation。
 

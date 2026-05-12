@@ -586,6 +586,8 @@ records:
       - validation/scenarios/apk-analysis/flutter-aot-hooking-v1.yaml
       - validation/scenarios/apk-analysis/local-proxy-vs-pinning-v1.yaml
       - validation/scenarios/apk-analysis/early-hook-prevention-v1.yaml
+      - validation/scenarios/failure-derived/entrypoint-drift-v1.yaml
+      - validation/scenarios/failure-derived/source-mirror-write-v1.yaml
     candidate_sources:
       - validation/rules/heuristics/runtime-first-hooking.yaml
       - validation/rules/heuristics/local-proxy-diagnosis.yaml
@@ -593,8 +595,9 @@ records:
       - validation/traces/template.yaml
       - validation/evaluations/template.yaml
       - plans/ai-decision-contract-testing.md
+      - shared-rules/failure-learning-system.md
     source_of_truth_gate: validation-readme-active
-    ranking_reason: validation/ 提供 stateless scenario-based 驗證框架，可在架構變更或模型升級後確認決策品質未退化。
+    ranking_reason: validation/ 提供 stateless scenario-based 驗證框架，可在架構變更或模型升級後確認決策品質未退化。failure-derived scenarios 從實際 AI 錯誤提煉，形成 Failure → Scenario 閉環。
     validation_signal: Scenario 的 expected_route 與 actual trace 可比對；forbidden_routes 未被使用。
     metadata:
       priority: P2

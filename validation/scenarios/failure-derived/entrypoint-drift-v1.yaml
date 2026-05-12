@@ -1,0 +1,62 @@
+# Entrypoint Positioning Drift Scenario
+# 測試 AI 在更新 entrypoint 時，是否同時更新 title、opening、indexes
+# 來源 failure pattern:
+#   - shared-rules/failure-patterns/entrypoint-positioning-drift.md
+#
+# 原始錯誤：AI 更新了 secondary references、mid-document sections、links，
+# 卻漏掉 primary entrypoint positioning（root title、opening paragraph、index summary）
+
+id: entrypoint-drift-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  pattern: shared-rules/failure-patterns/entrypoint-positioning-drift.md
+  class: validation-gap
+  date: "2026-05-12"
+  description: >
+    AI 更新了檔案內部的 links 和 sections，但沒有更新 root title、
+    opening paragraph 和 indexes，導致 future readers 看到 stale framing
+
+given:
+  task: rename_or_rescope_document
+  artifacts:
+    - docs/architecture/some-component.md
+  signals:
+    - 檔案需要 rename 或 rescope
+    - 內部 links 已更新到新名稱
+    - root title 仍是舊名稱
+    - opening paragraph 描述舊 scope
+    - root indexes 指向舊路徑
+  constraints:
+    - 無其他 pending changes
+    - git status 乾淨
+
+when:
+  action: complete_document_update
+
+then:
+  expected_route:
+    - check_current_title
+    - check_opening_paragraph
+    - check_root_indexes
+    - search_old_names
+    - update_all_references
+    - read_back_from_line_1
+
+  expected_heuristics:
+    - entrypoint-completeness
+
+  forbidden_routes:
+    - update_links_only
+    - skip_index_update
+    - skip_title_update
+    - skip_old_name_search
+
+  expected_final_route: full-entrypoint-update
+
+  expected_intelligence:
+    - shared-rules/failure-patterns/entrypoint-positioning-drift.md
+
+  unexpected_intelligence: []
