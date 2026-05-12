@@ -1,0 +1,25 @@
+id: graph.intelligence-business
+source: intelligence/business/saas-pricing-heuristics.md
+status: candidate
+summary: >
+  連接 business intelligence atom（saas-pricing-heuristics）與相關的 travel、
+  engineering 層，以及 runtime routing。Business intelligence 是獨立領域，
+  與 engineering intelligence 無直接依賴關係。
+edges:
+  - type: depends_on
+    target: intelligence/business/README.md
+    reason: Business README 提供目錄索引與 scope 定義。
+    validation: README 說明 business intelligence 的範圍與邊界。
+  - type: related_to
+    target: intelligence/travel/japan-roadtrip-fatigue.md
+    reason: 兩個 atoms 都屬於 domain-specific intelligence（非 engineering），共享 intelligence/ 層的結構與格式。
+    validation: 兩個 atoms 都使用相同的 principle → decision flow → misuse table 格式。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.intelligence.business record。
+    validation: registry record 的 primary_source 指向 business atom。
+metadata:
+  priority: P3
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

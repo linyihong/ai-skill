@@ -1,0 +1,44 @@
+id: graph.analysis-layers
+source: analysis/README.md
+status: candidate
+summary: >
+  連接 analysis 層的所有子目錄：apk、repo、production、issue，
+  以及相關的 workflow、intelligence 層。
+edges:
+  - type: depends_on
+    target: analysis/README.md
+    reason: Analysis README 提供層的定義、scope 與各子目錄的關係。
+    validation: README 說明 analysis 層的放什麼/不放什麼。
+  - type: related_to
+    target: analysis/apk/README.md
+    reason: APK 分析方法 — traffic/runtime triage、pattern extraction。
+    validation: README 定義 scope、current source references 與 read order。
+  - type: related_to
+    target: analysis/repo/README.md
+    reason: Repository 分析方法 — 靜態結構分析、依賴分析、entrypoint 追蹤。
+    validation: README 定義 repo analysis 的具體方法。
+  - type: related_to
+    target: analysis/production/README.md
+    reason: Production 分析方法 — production 問題的系統化分析。
+    validation: README 定義 production analysis 的 scope 與方法。
+  - type: related_to
+    target: analysis/issue/README.md
+    reason: Issue 分析方法 — issue 的系統化分析與根因追蹤。
+    validation: README 定義 issue analysis 的 scope 與方法。
+  - type: related_to
+    target: workflow/apk-analysis/README.md
+    reason: Workflow 引用 analysis/ 的技術方法，analysis/ 提供 workflow 所需的技術細節。
+    validation: workflow/apk-analysis/README.md 說明 reference analysis/apk/。
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/README.md
+    reason: Intelligence 提供判斷力，analysis 提供技術方法，兩者互補。
+    validation: intelligence/apk-analysis/README.md 說明與 analysis 層的關係。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.analysis.layers record。
+    validation: registry record 的 primary_source 指向 analysis/README.md。
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

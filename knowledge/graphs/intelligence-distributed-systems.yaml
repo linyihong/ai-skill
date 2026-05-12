@@ -1,0 +1,32 @@
+id: graph.intelligence-distributed-systems
+source: intelligence/engineering/distributed-systems/eventual-consistency-patterns.md
+status: candidate
+summary: >
+  連接 distributed-systems intelligence atom（eventual-consistency-patterns）與相關的
+  failure、tradeoffs、architecture 層，以及 runtime routing。
+edges:
+  - type: depends_on
+    target: intelligence/engineering/distributed-systems/README.md
+    reason: Distributed-systems README 提供目錄索引與 scope 定義。
+    validation: README 說明 distributed-systems intelligence 的範圍與邊界。
+  - type: related_to
+    target: intelligence/engineering/failure/connection-leak-patterns.md
+    reason: 分散式系統中的 connection management 與 eventual consistency 的可靠性要求相關。
+    validation: 兩個 atoms 都涉及分散式系統的可靠性模式。
+  - type: related_to
+    target: intelligence/engineering/tradeoffs/postgres-vs-mongodb.md
+    reason: 資料庫的 consistency model（strong vs eventual）是 tradeoffs 的核心。
+    validation: postgres-vs-mongodb atom 討論 consistency model 的取捨。
+  - type: related_to
+    target: intelligence/engineering/architecture/modular-monolith-vs-microservices.md
+    reason: Microservices 架構中 eventual consistency 是常見的設計模式。
+    validation: architecture atom 討論 microservices 中的資料一致性挑戰。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.intelligence.distributed-systems record。
+    validation: registry record 的 primary_source 指向 distributed-systems atom。
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

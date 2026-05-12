@@ -1,0 +1,45 @@
+id: graph.intelligence-apk-analysis-atoms
+source: intelligence/engineering/apk-analysis/README.md
+status: candidate
+summary: >
+  連接 APK analysis intelligence atoms（evidence-first-routing、live-readiness-gates、
+  highest-leverage-analysis-path）與相關的 workflow、analysis、skill 層，
+  以及 runtime routing。highest-leverage-analysis-path 已有獨立 graph record。
+edges:
+  - type: depends_on
+    target: intelligence/engineering/apk-analysis/README.md
+    reason: APK analysis intelligence README 提供目錄索引、scope 與 candidate intelligence areas。
+    validation: README 列出所有 atoms 及其狀態。
+  - type: depends_on
+    target: skills/apk-analysis/SKILL.md
+    reason: APK analysis intelligence atoms 從 skill feedback_history 抽取而來，仍依賴 skill entrypoint。
+    validation: old skill entrypoint remains active。
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/evidence-first-routing.md
+    reason: 以證據驅動分析路線選擇 — 根據 time-to-evidence、語意距離、安全性選擇主線。
+    validation: atom 定義決策表與 token 影響。
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/live-readiness-gates.md
+    reason: 實作就緒門檻 — 判斷 SDK/client 是否已準備好進行 live capture。
+    validation: atom 定義 identity material self-generation audit 與 verdict 格式。
+  - type: related_to
+    target: knowledge/graphs/apk-highest-leverage-analysis.yaml
+    reason: highest-leverage-analysis-path 已有獨立 graph record，此處建立關聯。
+    validation: 兩個 graph records 共享相同的 skill 與 workflow 依賴。
+  - type: related_to
+    target: workflow/apk-analysis/execution-flow.md
+    reason: APK analysis workflow 引用 intelligence atoms 來輔助執行流程中的判斷。
+    validation: workflow 提及引用 intelligence/engineering/apk-analysis/。
+  - type: related_to
+    target: analysis/apk/README.md
+    reason: APK analysis methods 與 intelligence atoms 互補 — methods 提供技術細節，intelligence 提供判斷力。
+    validation: analysis/apk/README.md 說明與 intelligence 層的關係。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.intelligence.apk-analysis-atoms record。
+    validation: registry record 的 primary_source 指向 apk-analysis intelligence README。
+metadata:
+  priority: P1
+  confidence: medium
+  compatibility_state: dual-reference
+  last_checked: 2026-05-12

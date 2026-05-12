@@ -1,0 +1,32 @@
+id: graph.intelligence-tradeoffs
+source: intelligence/engineering/tradeoffs/postgres-vs-mongodb.md
+status: candidate
+summary: >
+  連接 tradeoffs intelligence atom（postgres-vs-mongodb）與相關的 architecture、
+  domain、anti-patterns 層，以及 runtime routing。
+edges:
+  - type: depends_on
+    target: intelligence/engineering/tradeoffs/README.md
+    reason: Tradeoffs README 提供目錄索引與 scope 定義。
+    validation: README 說明 tradeoffs intelligence 的範圍與邊界。
+  - type: related_to
+    target: intelligence/engineering/architecture/modular-monolith-vs-microservices.md
+    reason: 資料庫選擇是架構決策的一部分，資料庫類型影響架構風格。
+    validation: 兩個 atoms 都涉及技術選型的判斷。
+  - type: related_to
+    target: intelligence/engineering/domain/aggregate-boundary-heuristics.md
+    reason: 資料庫選擇影響 aggregate 邊界的設計（document vs relational）。
+    validation: MongoDB 的 document model 與 PostgreSQL 的 relational model 對 aggregate 邊界有不同影響。
+  - type: related_to
+    target: intelligence/engineering/distributed-systems/eventual-consistency-patterns.md
+    reason: 資料庫的 consistency model 影響分散式系統的設計。
+    validation: MongoDB 的 eventual consistency 與 PostgreSQL 的 strong consistency 是關鍵取捨。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.intelligence.tradeoffs record。
+    validation: registry record 的 primary_source 指向 tradeoffs atom。
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

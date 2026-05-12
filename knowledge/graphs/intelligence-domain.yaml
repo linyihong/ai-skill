@@ -1,0 +1,32 @@
+id: graph.intelligence-domain
+source: intelligence/engineering/domain/aggregate-boundary-heuristics.md
+status: candidate
+summary: >
+  連接 domain intelligence atom（aggregate-boundary-heuristics）與相關的 architecture、
+  tradeoffs、anti-patterns 層，以及 runtime routing。
+edges:
+  - type: depends_on
+    target: intelligence/engineering/domain/README.md
+    reason: Domain README 提供目錄索引與 scope 定義。
+    validation: README 說明 domain intelligence 的範圍與邊界。
+  - type: related_to
+    target: intelligence/engineering/architecture/modular-monolith-vs-microservices.md
+    reason: Aggregate 邊界設計直接影響 microservices 的拆分粒度。
+    validation: 錯誤的 aggregate 邊界會導致 microservices 間的頻繁溝通。
+  - type: related_to
+    target: intelligence/engineering/tradeoffs/postgres-vs-mongodb.md
+    reason: 資料庫的 document/relational model 影響 aggregate 的實作方式。
+    validation: MongoDB 的 embedded document 適合某些 aggregate pattern。
+  - type: related_to
+    target: intelligence/engineering/anti-patterns/generic-repository-overuse.md
+    reason: 泛型 Repository 常導致 aggregate 邊界模糊，違反 DDD 原則。
+    validation: generic-repository-overuse atom 討論 Repository 模式的正確使用。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.intelligence.domain record。
+    validation: registry record 的 primary_source 指向 domain atom。
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

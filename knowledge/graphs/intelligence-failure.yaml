@@ -1,0 +1,32 @@
+id: graph.intelligence-failure
+source: intelligence/engineering/failure/connection-leak-patterns.md
+status: candidate
+summary: >
+  連接 failure intelligence atom（connection-leak-patterns）與相關的 heuristics、
+  anti-patterns、distributed-systems 層，以及 runtime routing。
+edges:
+  - type: depends_on
+    target: intelligence/engineering/failure/README.md
+    reason: Failure README 提供目錄索引與 scope 定義。
+    validation: README 說明 failure intelligence 的範圍與邊界。
+  - type: related_to
+    target: intelligence/engineering/heuristics/retry-smell.md
+    reason: Connection leak 常與錯誤的 retry 策略共同出現，retry smell 提供 retry 的正確使用時機。
+    validation: retry-smell atom 定義 retry 的 misuse 與 correct 用法。
+  - type: related_to
+    target: intelligence/engineering/distributed-systems/eventual-consistency-patterns.md
+    reason: 分散式系統中的 connection pool 管理與 eventual consistency 的 idempotency 要求相關。
+    validation: 兩個 atoms 都涉及分散式系統的可靠性。
+  - type: related_to
+    target: shared-rules/failure-learning-system.md
+    reason: Failure learning system 提供 failure taxonomy 與 promotion decision。
+    validation: failure-learning-system 定義 storage rules 與 promotion targets。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.intelligence.failure record。
+    validation: registry record 的 primary_source 指向 failure atom。
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

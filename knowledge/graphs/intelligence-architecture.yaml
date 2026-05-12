@@ -1,0 +1,32 @@
+id: graph.intelligence-architecture
+source: intelligence/engineering/architecture/modular-monolith-vs-microservices.md
+status: candidate
+summary: >
+  連接 architecture intelligence atom（modular-monolith-vs-microservices）與相關的
+  workflow、analysis、anti-patterns 層，以及 runtime routing。
+edges:
+  - type: depends_on
+    target: intelligence/engineering/architecture/README.md
+    reason: Architecture README 提供目錄索引與 scope 定義。
+    validation: README 說明 architecture intelligence 的範圍與邊界。
+  - type: related_to
+    target: workflow/repo-analysis/README.md
+    reason: Repo analysis workflow 在架構評估時可能引用此 atom 的判斷規則。
+    validation: workflow/repo-analysis/README.md 提及引用 intelligence/engineering/architecture/。
+  - type: related_to
+    target: intelligence/engineering/anti-patterns/generic-repository-overuse.md
+    reason: 泛型 Repository 過度使用是 modular monolith 中常見的架構錯誤。
+    validation: 兩個 atoms 都涉及架構設計判斷，可互補使用。
+  - type: related_to
+    target: intelligence/engineering/tradeoffs/postgres-vs-mongodb.md
+    reason: 資料庫選擇是架構決策的一部分，與 monolith/microservices 選擇相關。
+    validation: 兩個 atoms 都屬於 engineering 層的架構判斷。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.intelligence.architecture record。
+    validation: registry record 的 primary_source 指向 architecture atom。
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

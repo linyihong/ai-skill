@@ -1,0 +1,52 @@
+id: graph.workflow-layers
+source: workflow/README.md
+status: candidate
+summary: >
+  連接 workflow 層的所有子目錄：apk-analysis、app-development-guidance、
+  repo-analysis、travel-planning，以及相關的 intelligence、analysis、skills 層。
+edges:
+  - type: depends_on
+    target: workflow/README.md
+    reason: Workflow README 提供層的定義、scope 與各子目錄的關係。
+    validation: README 說明 workflow 層的放什麼/不放什麼。
+  - type: related_to
+    target: workflow/apk-analysis/README.md
+    reason: APK analysis workflow — 授權 APK 分析的執行流程。
+    validation: README 定義 scope、current source references 與 workflow shape。
+  - type: related_to
+    target: workflow/apk-analysis/execution-flow.md
+    reason: APK analysis 的具體執行步驟與輸出定義。
+    validation: execution-flow.md 定義開始前確認、quick start、分析結束定義。
+  - type: related_to
+    target: workflow/apk-analysis/artifact-gates.md
+    reason: APK analysis 的產出閘門定義。
+    validation: artifact-gates.md 定義 UI map、API catalog、runtime baseline 等閘門。
+  - type: related_to
+    target: workflow/app-development-guidance/README.md
+    reason: App 開發審查與指引的執行流程。
+    validation: README 定義 design/code/release/security/contract-governance review flows。
+  - type: related_to
+    target: workflow/repo-analysis/README.md
+    reason: Repository 分析的執行流程。
+    validation: README 定義 onboarding/deep-analysis/migration-impact/tech-debt/security-audit flows。
+  - type: related_to
+    target: workflow/travel-planning/README.md
+    reason: 旅遊規劃的執行流程。
+    validation: README 定義 itinerary/transportation/accommodation/activity/budget flows。
+  - type: related_to
+    target: analysis/apk/README.md
+    reason: Workflow 引用 analysis/ 的技術方法，不重複技術細節。
+    validation: workflow/apk-analysis/README.md 說明 reference analysis/apk/。
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/README.md
+    reason: Workflow 引用 intelligence/ 的工程智慧輔助判斷。
+    validation: workflow/apk-analysis/README.md 說明 reference intelligence/。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.workflow.layers record。
+    validation: registry record 的 primary_source 指向 workflow/README.md。
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

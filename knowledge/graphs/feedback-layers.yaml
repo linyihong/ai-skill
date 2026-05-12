@@ -1,0 +1,48 @@
+id: graph.feedback-layers
+source: feedback/README.md
+status: candidate
+summary: >
+  連接 feedback 層的所有子目錄：extraction、refinement、replay、promotion、pipeline，
+  以及相關的 governance、shared-rules 層。feedback-promotion-pipeline 已有獨立 graph record。
+edges:
+  - type: depends_on
+    target: feedback/README.md
+    reason: Feedback README 提供層的定義、scope 與各子目錄的關係。
+    validation: README 說明 feedback 層的放什麼/不放什麼。
+  - type: related_to
+    target: feedback/extraction/README.md
+    reason: Feedback extraction — 從 conversation 中提取可重用的 lesson。
+    validation: README 定義 extraction 的 scope 與方法。
+  - type: related_to
+    target: feedback/refinement/README.md
+    reason: Feedback refinement — 將 raw lesson 精煉為可用的 feedback。
+    validation: README 定義 refinement 的 scope 與方法。
+  - type: related_to
+    target: feedback/replay/README.md
+    reason: Feedback replay — 重播 feedback 以驗證其有效性。
+    validation: README 定義 replay 的 scope 與方法。
+  - type: related_to
+    target: feedback/promotion/README.md
+    reason: Feedback promotion — 將 validated lesson promotion 到目標層。
+    validation: README 定義 promotion targets、checklist 與 downgrade rules。
+  - type: related_to
+    target: feedback/pipeline/README.md
+    reason: Feedback pipeline — promotion pipeline 的 YAML 定義。
+    validation: pipeline 目錄包含 lifecycle-automation、promotion-engine、promotion-workflow。
+  - type: related_to
+    target: knowledge/graphs/feedback-promotion-pipeline.yaml
+    reason: Feedback promotion pipeline graph 已涵蓋 promotion 的核心關係。
+    validation: feedback-promotion-pipeline.yaml 的 edges 包含 shared-rules 與 governance。
+  - type: related_to
+    target: shared-rules/feedback-lessons.md
+    reason: Feedback lessons 的格式、模板與索引規則。
+    validation: shared-rules/feedback-lessons.md 定義 lesson 的完整格式。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.feedback.layers record。
+    validation: registry record 的 primary_source 指向 feedback/README.md。
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

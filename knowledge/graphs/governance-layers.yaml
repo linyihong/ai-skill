@@ -1,0 +1,44 @@
+id: graph.governance-layers
+source: governance/README.md
+status: candidate
+summary: >
+  連接 governance 層的所有子目錄：lifecycle、validation、cleanup、dependency，
+  以及相關的 feedback、runtime 層。
+edges:
+  - type: depends_on
+    target: governance/README.md
+    reason: Governance README 提供層的定義、scope 與各子目錄的關係。
+    validation: README 說明 governance 層的放什麼/不放什麼。
+  - type: depends_on
+    target: governance/lifecycle/README.md
+    reason: Knowledge lifecycle 定義 candidate → validated → promoted → deprecated 狀態與 promotion gates。
+    validation: lifecycle README 定義 lifecycle states、promotion gates 與 deletion rules。
+  - type: depends_on
+    target: governance/validation/README.md
+    reason: Validation gates 定義 knowledge atom 的驗證規則與 migration checklist。
+    validation: validation README 定義必要 gates、migration checklist 與 pass/block rules。
+  - type: related_to
+    target: governance/cleanup/README.md
+    reason: Cleanup 規則定義 deprecated atoms 的清理策略。
+    validation: cleanup README 定義 cleanup 的觸發條件與執行規則。
+  - type: related_to
+    target: governance/dependency/README.md
+    reason: Dependency 規則定義 atoms 之間的依賴管理。
+    validation: dependency README 定義 dependency 的宣告與驗證規則。
+  - type: related_to
+    target: feedback/promotion/README.md
+    reason: Feedback promotion pipeline 使用 governance lifecycle 的 promotion gates。
+    validation: feedback/promotion/README.md 說明 promotion 需要 lifecycle states。
+  - type: related_to
+    target: knowledge/graphs/feedback-promotion-pipeline.yaml
+    reason: Feedback promotion graph 也引用 governance lifecycle 與 validation。
+    validation: feedback-promotion-pipeline.yaml 的 edges 包含 governance/lifecycle 與 governance/validation。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.governance.layers record。
+    validation: registry record 的 primary_source 指向 governance/README.md。
+metadata:
+  priority: P1
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

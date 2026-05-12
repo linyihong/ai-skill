@@ -1,0 +1,32 @@
+id: graph.intelligence-anti-patterns
+source: intelligence/engineering/anti-patterns/generic-repository-overuse.md
+status: candidate
+summary: >
+  連接 anti-patterns intelligence atom（generic-repository-overuse）與相關的 architecture、
+  domain、根目錄 anti-patterns 層，以及 runtime routing。
+edges:
+  - type: depends_on
+    target: intelligence/engineering/anti-patterns/README.md
+    reason: Anti-patterns README 提供目錄索引、scope 定義與根目錄 anti-patterns 的邊界說明。
+    validation: README 說明 intelligence/engineering/anti-patterns/ 與根目錄 anti-patterns/ 的差異。
+  - type: related_to
+    target: anti-patterns/README.md
+    reason: 根目錄 anti-patterns/ 保存 Agent 操作層的 anti-patterns（context explosion、recursive tool loop 等）。
+    validation: 根目錄 anti-patterns/README.md 定義 Agent 操作層的 anti-patterns。
+  - type: related_to
+    target: intelligence/engineering/domain/aggregate-boundary-heuristics.md
+    reason: 泛型 Repository 常導致 aggregate 邊界模糊。
+    validation: aggregate-boundary-heuristics atom 討論正確的 aggregate 邊界設計。
+  - type: related_to
+    target: intelligence/engineering/architecture/modular-monolith-vs-microservices.md
+    reason: 泛型 Repository 在 modular monolith 中可能導致不必要的抽象層。
+    validation: architecture atom 討論 modular monolith 的正確抽象層級。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.intelligence.anti-patterns record。
+    validation: registry record 的 primary_source 指向 anti-patterns atom。
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

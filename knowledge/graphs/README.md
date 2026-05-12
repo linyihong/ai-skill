@@ -1,8 +1,10 @@
 # Knowledge Graphs
 
-`knowledge/graphs/` 描述 Knowledge Atoms、source files、skills、shared rules 與 runtime routing surfaces 之間的關係。目前本目錄保存 graph record 格式與第一批 candidate records，不生成完整自動 graph。
+`knowledge/graphs/` 描述 Knowledge Atoms、source files、skills、shared rules 與 runtime routing surfaces 之間的關係。本目錄保存 graph record 格式與所有 atoms 的 graph records。
 
 ## 目前 graph records
+
+### 既有 records（Phase 12）
 
 | Graph record | 用途 | 狀態 |
 | --- | --- | --- |
@@ -11,6 +13,38 @@
 | [`apk-analysis-pilot.yaml`](apk-analysis-pilot.yaml) | 連接 `skills/apk-analysis/` 舊入口與 analysis / workflow / intelligence 候選目的地。 | `candidate` |
 | [`apk-highest-leverage-analysis.yaml`](apk-highest-leverage-analysis.yaml) | 連接 APK analysis 最高收益路線 intelligence、原 feedback lesson、workflow 與 runtime route。 | `candidate` |
 | [`feedback-promotion-pipeline.yaml`](feedback-promotion-pipeline.yaml) | 連接 feedback promotion pipeline、shared feedback rules、failure learning 與 runtime route。 | `candidate` |
+
+### Intelligence Atoms（Phase 13）
+
+| Graph record | 用途 | 狀態 |
+| --- | --- | --- |
+| [`intelligence-heuristics.yaml`](intelligence-heuristics.yaml) | 連接 5 個 heuristics atoms（premature-optimization、abstraction-threshold、retry-smell、single-responsibility、test-driven）與 README 索引。 | `candidate` |
+| [`intelligence-architecture.yaml`](intelligence-architecture.yaml) | 連接 modular-monolith-vs-microservices atom 與相關 workflow、anti-patterns、tradeoffs。 | `candidate` |
+| [`intelligence-tradeoffs.yaml`](intelligence-tradeoffs.yaml) | 連接 postgres-vs-mongodb atom 與相關 architecture、domain、distributed-systems。 | `candidate` |
+| [`intelligence-failure.yaml`](intelligence-failure.yaml) | 連接 connection-leak-patterns atom 與相關 heuristics、distributed-systems、failure-learning。 | `candidate` |
+| [`intelligence-domain.yaml`](intelligence-domain.yaml) | 連接 aggregate-boundary-heuristics atom 與相關 architecture、tradeoffs、anti-patterns。 | `candidate` |
+| [`intelligence-anti-patterns.yaml`](intelligence-anti-patterns.yaml) | 連接 generic-repository-overuse atom 與相關 architecture、domain、根目錄 anti-patterns。 | `candidate` |
+| [`intelligence-distributed-systems.yaml`](intelligence-distributed-systems.yaml) | 連接 eventual-consistency-patterns atom 與相關 failure、tradeoffs、architecture。 | `candidate` |
+| [`intelligence-business.yaml`](intelligence-business.yaml) | 連接 saas-pricing-heuristics atom 與 business intelligence 層。 | `candidate` |
+| [`intelligence-travel.yaml`](intelligence-travel.yaml) | 連接 japan-roadtrip-fatigue atom 與 travel workflow。 | `candidate` |
+| [`intelligence-apk-analysis-atoms.yaml`](intelligence-apk-analysis-atoms.yaml) | 連接 evidence-first-routing、live-readiness-gates atoms 與 skill、workflow、analysis。 | `candidate` |
+
+### Runtime & Pipeline（Phase 14）
+
+| Graph record | 用途 | 狀態 |
+| --- | --- | --- |
+| [`runtime-pipeline.yaml`](runtime-pipeline.yaml) | 連接 pipeline 所有元件（session-lifecycle、context-flow、guard-chain、relevance-engine）與 budget、health、guards。 | `candidate` |
+| [`runtime-prompt-artifacts.yaml`](runtime-prompt-artifacts.yaml) | 連接 prompt artifact generator（artifact-templates、composition-rules）與 workflow、intelligence、pipeline。 | `candidate` |
+
+### Workflow / Analysis / Governance / Feedback / Decisions
+
+| Graph record | 用途 | 狀態 |
+| --- | --- | --- |
+| [`workflow-layers.yaml`](workflow-layers.yaml) | 連接 workflow 所有子目錄（apk-analysis、app-development-guidance、repo-analysis、travel-planning）。 | `candidate` |
+| [`analysis-layers.yaml`](analysis-layers.yaml) | 連接 analysis 所有子目錄（apk、repo、production、issue）。 | `candidate` |
+| [`governance-layers.yaml`](governance-layers.yaml) | 連接 governance 所有子目錄（lifecycle、validation、cleanup、dependency）。 | `candidate` |
+| [`feedback-layers.yaml`](feedback-layers.yaml) | 連接 feedback 所有子目錄（extraction、refinement、replay、promotion、pipeline）。 | `candidate` |
+| [`decisions-adr.yaml`](decisions-adr.yaml) | 連接所有 ADR records（ADR-001 到 ADR-005）與 architecture、memory。 | `candidate` |
 
 ## Graph 目的
 
