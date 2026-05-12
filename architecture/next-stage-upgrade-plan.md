@@ -680,7 +680,26 @@ Status: `apk-analysis` pilot 已完成 content extraction（6 個新檔案）；
 
 ### Phase 5：Runtime / Models
 
-Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledge/runtime/routing-registry.yaml` 已建立第一版 machine-readable registry；models profile 與 model-aware compression 尚未建立。
+Status: ✅ **已完成**。所有子項目已實作完畢。
+
+已實作項目：
+
+- `runtime/routing/README.md` — context routing 流程（7 步驟路由決策表）。
+- `knowledge/runtime/routing-registry.yaml` — machine-readable routing registry。
+- `models/profiles/README.md` — small / large / specialized 三種 profile，含 routing rules 與 metadata mapping。
+- `models/compression/README.md` — 5 層 compression（index-only / summary-first / checklist-first / source-backed / graph-assisted），含 profile defaults 與 escalation rules。
+- `runtime/budget/token-budget.yaml` — Token Budget System（120K default、per-model budgets、per-layer allocation、70%/90% thresholds）。
+- `runtime/health/context-health-score.yaml` — Context Health Score（4 維度 composite score、healthy/warning/critical thresholds）。
+- `runtime/guards/circuit-breaker.yaml` — Circuit Breaker（5 guards：recursive depth、tool calls、context growth、hallucination risk、conflict rules）。
+- `runtime/guards/context-pollution.yaml` — Context Pollution Detection（5 signals、composite pollution score、auto-archive on critical）。
+- `tools/metadata/README.md` + `tools/routing/README.md` — Tool Metadata & Lazy Activation（tool cost/risk/activation schema、explosion detection）。
+- `tools/compression/README.md` — Tool Output Compression（4-level compression、per-output-type strategies）。
+- `memory/working/README.md` + `memory/summary/README.md` + `memory/decision/README.md` — Memory Architecture 3 子層。
+- `decisions/README.md` — Decision System（ADR lifecycle、naming convention）。
+- `anti-patterns/README.md` + 5 patterns — Anti-patterns。
+- `skills-index.yaml` — Skills Metadata v2（weight/domains/dependencies/conflicts/priority.runtime）。
+- `runtime/pipeline/README.md` — Runtime Pipeline（7 階段 pipeline 架構與元件間通訊）。
+- `runtime/context/README.md` — Context TTL & Pruning（session/task/conversation TTL 類型與 prune 策略）。
 
 定義：
 
@@ -691,6 +710,16 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 - small-model / large-model 使用策略。
 
 ### Phase 6：Lifecycle / Governance
+
+Status: ✅ **已完成**。所有子項目已實作完畢。
+
+已實作項目：
+
+- `governance/lifecycle/README.md` — Knowledge Lifecycle（6 階段 lifecycle states：source-of-truth / candidate-map / candidate-atom / validated-atom / promoted / deprecated；promotion gates；cold data archive；update strategy；deletion rule）。
+- `governance/validation/README.md` — Knowledge Validation Gates（必要 gates 表、migration validation checklist、generated refresh checklist、pass / block rules）。
+- `governance/cleanup/README.md` — Duplicate Cleanup & Splitting（5 種 duplicate 類型、偵測流程、splitting 規則與門檻、ownership boundary 表、清理執行流程）。
+- `governance/dependency/README.md` — Dependency Graph Maintenance（graph 更新時機表、graph record 維護流程、edge type controlled vocabulary、依賴變更連動更新表、graph validation 檢查項目）。
+- `governance/README.md` — 整體 governance surface，已連結所有 4 個子目錄。
 
 定義：
 
