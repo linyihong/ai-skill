@@ -20,6 +20,6 @@
 
 | Atom | 說明 | 來源 | 跨領域推廣 |
 |------|------|------|-----------|
-| [`hook-selection.md`](hook-selection.md) | Hook 策略選擇啟發式 — 根據 signal（Flutter/Dart AOT、Java OkHttp、Socket）選擇 hook 策略的決策表 | `skills/apk-analysis/techniques/flutter-dart-aot/README.md` | — |
-| [`api-documentation-completeness.md`](api-documentation-completeness.md) | API 文件完整性啟發式 — 何時開始 API Catalog、何時完成、Field Confidence 判斷的決策表 | `skills/apk-analysis/techniques/http-api/README.md` | Field Confidence 判斷表已提取到 [`intelligence/engineering/heuristics/field-confidence-judgment.md`](../../heuristics/field-confidence-judgment.md) |
-| [`local-proxy-routing-diagnosis.md`](local-proxy-routing-diagnosis.md) | Local Proxy vs TLS Pinning 診斷 — 根據 signal 判斷流量走 local proxy 還是 TLS pinning 的決策表 | `skills/apk-analysis/techniques/local-proxy/README.md` | — |
+| [`hook-selection.md`](hook-selection.md) | Hook 策略選擇啟發式 — 根據 signal（Flutter/Dart AOT、Java OkHttp、Socket）選擇 hook 策略的決策表 | `skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除） | — |
+| [`api-documentation-completeness.md`](api-documentation-completeness.md) | API 文件完整性啟發式 — 何時開始 API Catalog、何時完成、Field Confidence 判斷的決策表 | `skills/apk-analysis/techniques/http-api/`（已刪除） | Field Confidence 判斷表已提取到 [`intelligence/engineering/heuristics/field-confidence-judgment.md`](../../heuristics/field-confidence-judgment.md) |
+| [`local-proxy-routing-diagnosis.md`](local-proxy-routing-diagnosis.md) | Local Proxy vs TLS Pinning 診斷 — 根據 signal 判斷流量走 local proxy 還是 TLS pinning 的決策表 | `skills/apk-analysis/techniques/local-proxy/`（已刪除） | — |

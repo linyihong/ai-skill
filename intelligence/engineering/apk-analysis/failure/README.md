@@ -20,4 +20,4 @@
 
 | Atom | 說明 | 來源 |
 |------|------|------|
-| [`frida-spawn-race.md`](frida-spawn-race.md) | Frida spawn race condition — Frida 在 spawn 模式下的 race condition 診斷與緩解策略 | `skills/apk-analysis/techniques/flutter-dart-aot/README.md` |
+| [`frida-spawn-race.md`](frida-spawn-race.md) | Frida spawn race condition — Frida 在 spawn 模式下的 race condition 診斷與緩解策略 | `skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除） |

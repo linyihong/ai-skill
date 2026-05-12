@@ -483,7 +483,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 ### 尚未完成的下一階段
 
-- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。所有內容已提取到新分層，舊檔案已標註提取狀態。舊 skills 的清理時間線定義於 [`governance/lifecycle/README.md`](governance/lifecycle/README.md) 的 Skills Deprecation Timeline（Phase A→D），目前處於 Phase B（techniques 已標註 deprecated，保留檔案供 tool adapter 載入）。
+- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。所有內容已提取到新分層，舊檔案已標註提取狀態。舊 skills 的清理時間線定義於 [`governance/lifecycle/README.md`](governance/lifecycle/README.md) 的 Skills Deprecation Timeline（Phase A→D），目前處於 Phase C（techniques 已刪除，`skills/apk-analysis/techniques/` 和 `analysis/apk/techniques/` 已清空）。
 - **Runtime surfaces 更新**：✅ 已完成（2026-05-12）。`knowledge/runtime/routing-registry.yaml` 新增 5 條路由（app-development-guidance、travel-planning、onboarding、apk-workflows、apk-intelligence-atoms）。`knowledge/indexes/README.md` 新增 3 條索引列（onboarding、workflows、intelligence atoms）。generated summaries、reports、SQLite index 已可一鍵重建。
 - **Intelligence Extraction Pipeline 實戰驗證（P2）**：✅ 已完成（Phase 32-33 已實際執行 pipeline 的 3 種模式，pipeline 文件已更新狀態表，遺漏的 index 更新已補齊）
 - **Skills Deprecation（Phase B）**：✅ 已完成（2026-05-12）。所有 8 個 techniques 檔案（4 skills/ + 4 analysis/）已從 `# Intelligence Extracted` 升級為 `# Deprecated — see <new path>`。詳細時間線見 [`governance/lifecycle/README.md`](governance/lifecycle/README.md)。
@@ -495,6 +495,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 - **跨 skill intelligence promotion（app-development-guidance → heuristics）**：✅ 已完成（2026-05-12）。從 `intelligence/engineering/app-development-guidance/` 提取 1 個 proven generalized atom 到 `intelligence/engineering/heuristics/`：
   - `contract-governance-heuristic.md` → `document-priority-hierarchy.md`（文件優先順序階層：6 層優先級、衝突分類流程、常見誤用表）
   - 原始 atom 已加入 `# Cross-Domain Promotion` 標註
+- **Skills Deprecation（Phase C）**：✅ 已完成（2026-05-12）。已刪除 10 個舊 technique 檔案（`skills/apk-analysis/techniques/` 的 4 個子目錄 + 1 個 README，`analysis/apk/techniques/` 的 4 個 .md + 1 個 README）。刪除前已確認 Phase C 檢查清單 7 項條件全部滿足。15+ 個引用舊路徑的檔案已更新為指向新路徑。
 
 ### 下一階段 Phase 規劃（29-33）
 
@@ -1229,6 +1230,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P2 | done | 跨層一致性檢查 | `analysis/apk/workflows/README.md`, `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/README.md` | 已完成所有 README 的 atom/workflow 表格檢查，無遺漏 | 每個 README 的表格與實際檔案一致 |
 | P2 | done | 跨 skill intelligence promotion（apk-analysis → heuristics） | `intelligence/engineering/heuristics/field-confidence-judgment.md`, `intelligence/engineering/heuristics/magic-bytes-reference.md` | 已完成 2 個 proven generalized atoms 從 apk-analysis 提升到跨領域 heuristics 層 | 原始 atoms 有 `# Cross-Domain Promotion` 標註，新 atoms 有 `# Source` 指向原始 domain atom |
 | P2 | done | 跨 skill intelligence promotion（app-development-guidance → heuristics） | `intelligence/engineering/heuristics/document-priority-hierarchy.md` | 已完成 1 個 proven generalized atom 從 app-development-guidance 提升到跨領域 heuristics 層 | 原始 atom 有 `# Cross-Domain Promotion` 標註，新 atom 有 `# Source` 指向原始 domain atom |
+| P2 | done | Skills Deprecation（Phase C） | `governance/lifecycle/README.md`, `skills/apk-analysis/techniques/`, `analysis/apk/techniques/` | 已完成 10 個舊 technique 檔案刪除（4 個子目錄 + 1 個 README 在 skills/，4 個 .md + 1 個 README 在 analysis/），更新 15+ 個引用舊路徑的檔案 | Phase C 檢查清單 7 項條件全部滿足，刪除後可 git revert rollback |
 
 ## 最終目標
 

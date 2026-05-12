@@ -1,6 +1,6 @@
 # Frida Hook Flow（Frida Hook 操作流程）
 
-`analysis/apk/workflows/frida-hook-flow.md` 是從 `skills/apk-analysis/techniques/flutter-dart-aot/` 拆解出的 **HOW TO DO** 操作流程。決策智慧（何時該用哪個步驟）請見 `intelligence/engineering/apk-analysis/`。
+`analysis/apk/workflows/frida-hook-flow.md` 是從 `skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除）拆解出的 **HOW TO DO** 操作流程。決策智慧（何時該用哪個步驟）請見 `intelligence/engineering/apk-analysis/`。
 
 > **Intelligence Extracted**
 > See:

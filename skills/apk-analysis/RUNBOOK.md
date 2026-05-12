@@ -36,7 +36,7 @@ canonical skill repository 是你本機 clone 的 `Ai-skill` repository。下文
 <AI_SKILL_REPO>/skills/apk-analysis/WORKFLOW.md
 <AI_SKILL_REPO>/skills/apk-analysis/TOOLS.md
 <AI_SKILL_REPO>/skills/apk-analysis/DOCUMENTATION.md
-<AI_SKILL_REPO>/skills/apk-analysis/techniques/<category>/README.md
+<AI_SKILL_REPO>/analysis/apk/workflows/<workflow>.md（原 skills/apk-analysis/techniques/ 已刪除，見 analysis/apk/workflows/）
 ```
 
 ### 1. 當作專案文件使用

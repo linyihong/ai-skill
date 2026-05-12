@@ -30,7 +30,7 @@ skills/apk-analysis/feedback_history/<category>/              # 每一條 lesson
 skills/apk-analysis/WORKFLOW.md
 skills/apk-analysis/TOOLS.md
 skills/apk-analysis/DOCUMENTATION.md
-skills/apk-analysis/techniques/<category>/README.md
+analysis/apk/workflows/<workflow>.md（原 skills/apk-analysis/techniques/ 已刪除，見 analysis/apk/workflows/）
 ```
 
 ### 2. 當作專案文件使用

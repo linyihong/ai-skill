@@ -38,10 +38,10 @@ This layer does not own:
 | Tool choice and failure interpretation | `../../skills/apk-analysis/TOOLS.md` | ✅ extracted to `tools-and-failures.md` |
 | Media verification tools | `../../skills/apk-analysis/TOOLS.md` | ✅ extracted to `tools-and-failures.md` |
 | Automation script safety boundary | `../../skills/apk-analysis/TOOLS.md` | ✅ extracted to `tools-and-failures.md` |
-| Flutter / Dart AOT methods | `../../skills/apk-analysis/techniques/flutter-dart-aot/` | ⏳ decomposing: workflow → `workflows/`, intelligence → `intelligence/engineering/apk-analysis/` |
-| HTTP API documentation methods | `../../skills/apk-analysis/techniques/http-api/` | keep skill-local, reference here |
-| Local proxy / loopback methods | `../../skills/apk-analysis/techniques/local-proxy/` | keep skill-local, reference here |
-| Media / HLS methods | `../../skills/apk-analysis/techniques/media-hls/` | keep skill-local, reference here |
+| Flutter / Dart AOT methods | `../../skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除） | ✅ workflow → `workflows/frida-hook-flow.md`, intelligence → `intelligence/engineering/apk-analysis/` |
+| HTTP API documentation methods | `../../skills/apk-analysis/techniques/http-api/`（已刪除） | ✅ workflow → `workflows/http-api-documentation-flow.md`, intelligence → `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md` |
+| Local proxy / loopback methods | `../../skills/apk-analysis/techniques/local-proxy/`（已刪除） | ✅ workflow → `workflows/local-proxy-hook-flow.md`, intelligence → `intelligence/engineering/apk-analysis/` |
+| Media / HLS methods | `../../skills/apk-analysis/techniques/media-hls/`（已刪除） | ✅ workflow → `workflows/media-hls-analysis-flow.md`, intelligence → `intelligence/engineering/apk-analysis/signals/media-type-detection.md` |
 
 ## Read Order
 

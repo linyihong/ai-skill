@@ -42,7 +42,7 @@ This layer does not own:
 
 1. Confirm authorization, scope, APK version, device/emulator, and allowed actions.
 2. Route through `analysis/apk/` to identify the traffic/runtime path.
-3. Load only the matching technique category from `skills/apk-analysis/techniques/`.
+3. Load the matching workflow from `analysis/apk/workflows/` and intelligence atoms from `intelligence/engineering/apk-analysis/`.
 4. Produce sanitized project artifacts: UI map, operation-to-API matrix, API catalog, runtime baseline, fixtures, and open questions as applicable.
 5. If findings must become app/API/SDK implementation guidance, hand off to `skills/app-development-guidance/` with a sanitized Feature Reconstruction Handoff.
 6. If a reusable lesson emerges, keep the lesson in `skills/apk-analysis/feedback_history/` until promotion rules move it into intelligence or feedback layers.

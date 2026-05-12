@@ -58,6 +58,15 @@
 - 完成於 Phase 33
 - 實際執行內容見下方各 skill 詳細記錄
 
+### Phase E：Skills Deprecation Phase C ✅
+
+- 完成於 Phase 35（2026-05-12）
+- 已刪除 10 個舊 technique 檔案：
+  - `skills/apk-analysis/techniques/`：4 個子目錄（flutter-dart-aot/、http-api/、local-proxy/、media-hls/）+ 1 個 README.md
+  - `analysis/apk/techniques/`：4 個 .md（flutter-dart-aot.md、http-api.md、local-proxy.md、media-hls.md）+ 1 個 README.md
+- 刪除前已確認 Phase C 檢查清單 7 項條件全部滿足
+- 15+ 個引用舊路徑的檔案已更新為指向新路徑
+
 ---
 
 ## 各 Skill 最終狀態

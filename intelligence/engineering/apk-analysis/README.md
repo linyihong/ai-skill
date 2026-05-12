@@ -23,10 +23,10 @@ intelligence/engineering/apk-analysis/
 | [`evidence-first-routing.md`](evidence-first-routing.md) | `validated` | `skills/apk-analysis/feedback_history/common/` |
 | [`highest-leverage-analysis-path.md`](highest-leverage-analysis-path.md) | `candidate-intelligence` | `skills/apk-analysis/feedback_history/common/2026-05-07_131000-highest-leverage-analysis-path.md` |
 | [`live-readiness-gates.md`](live-readiness-gates.md) | `validated` | `skills/apk-analysis/feedback_history/common/` |
-| [`heuristics/`](heuristics/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/` |
-| [`anti-patterns/`](anti-patterns/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/` |
-| [`failure/`](failure/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/` |
-| [`signals/`](signals/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/` |
+| [`heuristics/`](heuristics/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/`（已刪除） |
+| [`anti-patterns/`](anti-patterns/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/`（已刪除） |
+| [`failure/`](failure/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/`（已刪除） |
+| [`signals/`](signals/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/`（已刪除） |
 
 ## Scope
 
@@ -52,9 +52,9 @@ intelligence/engineering/apk-analysis/
 | --- | --- | --- |
 | Evidence-first route selection | `../../../skills/apk-analysis/WORKFLOW.md`, `../../../skills/apk-analysis/feedback_history/common/` | decision guidance for high-leverage analysis routing |
 | API catalog and runtime baseline readiness | `../../../skills/apk-analysis/DOCUMENTATION.md`, `../../../skills/apk-analysis/feedback_history/http-api/`, `../../../skills/apk-analysis/feedback_history/common/` | engineering guidance for live SDK / client readiness |
-| Flutter / Dart AOT anti-patterns | `../../../skills/apk-analysis/techniques/flutter-dart-aot/`, `../../../skills/apk-analysis/feedback_history/flutter-dart-aot/` | stable failure patterns and hook-selection trade-offs |
-| Local proxy and routing ambiguity | `../../../skills/apk-analysis/techniques/local-proxy/`, `../../../skills/apk-analysis/feedback_history/local-proxy/` | guidance for separating routing, proxy, TLS, and attribution |
-| Media chain completeness | `../../../skills/apk-analysis/techniques/media-hls/`, `../../../skills/apk-analysis/feedback_history/media-hls/` | control-plane / data-plane and validation heuristics |
+| Flutter / Dart AOT anti-patterns | `../../../skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除）, `../../../skills/apk-analysis/feedback_history/flutter-dart-aot/` | stable failure patterns and hook-selection trade-offs |
+| Local proxy and routing ambiguity | `../../../skills/apk-analysis/techniques/local-proxy/`（已刪除）, `../../../skills/apk-analysis/feedback_history/local-proxy/` | guidance for separating routing, proxy, TLS, and attribution |
+| Media chain completeness | `../../../skills/apk-analysis/techniques/media-hls/`（已刪除）, `../../../skills/apk-analysis/feedback_history/media-hls/` | control-plane / data-plane and validation heuristics |
 
 ## Promotion Rule
 
@@ -71,4 +71,4 @@ A lesson can be promoted here when:
 - Do not delete or rewrite existing feedback lessons during the pilot.
 - Use this directory to point agents toward reusable judgment; use `skills/apk-analysis/feedback_history/` for historical lesson records.
 - If an insight becomes a cross-skill or all-repo prevention gate, promote it to `shared-rules/` or `shared-rules/failure-patterns/` instead of keeping it only here.
-- Old `skills/apk-analysis/techniques/` and `analysis/apk/techniques/` remain active during pilot. Intelligence atoms here are extracted (not moved) from those sources.
+- Old `skills/apk-analysis/techniques/` and `analysis/apk/techniques/` have been deleted (Phase C). Intelligence atoms here were extracted from those sources.

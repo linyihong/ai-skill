@@ -7,11 +7,11 @@
 | 欄位 | 值 |
 | --- | --- |
 | Pilot skill | `skills/apk-analysis/` |
-| 狀態 | `content-extracted` |
+| 狀態 | `techniques-deleted` |
 | 舊入口 | `skills/apk-analysis/SKILL.md` 仍為 active skill entrypoint |
 | 新參考路徑 | `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/apk-analysis/` |
-| 大量搬移 | 尚未開始 — 舊檔案保留原位；新檔案為 reference targets |
-| 已提取檔案 | `workflow/apk-analysis/execution-flow.md`, `workflow/apk-analysis/artifact-gates.md`, `analysis/apk/traffic-triage.md`, `analysis/apk/tools-and-failures.md`, `analysis/apk/techniques/README.md`, `analysis/apk/techniques/flutter-dart-aot.md`, `analysis/apk/techniques/http-api.md`, `analysis/apk/techniques/local-proxy.md`, `analysis/apk/techniques/media-hls.md`, `intelligence/engineering/apk-analysis/evidence-first-routing.md`, `intelligence/engineering/apk-analysis/live-readiness-gates.md` |
+| 大量搬移 | Phase C 已完成 — `skills/apk-analysis/techniques/` 和 `analysis/apk/techniques/` 已刪除。新檔案為 canonical source。 |
+| 已提取檔案 | `workflow/apk-analysis/execution-flow.md`, `workflow/apk-analysis/artifact-gates.md`, `analysis/apk/traffic-triage.md`, `analysis/apk/tools-and-failures.md`, `analysis/apk/workflows/frida-hook-flow.md`, `analysis/apk/workflows/http-api-documentation-flow.md`, `analysis/apk/workflows/local-proxy-hook-flow.md`, `analysis/apk/workflows/media-hls-analysis-flow.md`, `intelligence/engineering/apk-analysis/evidence-first-routing.md`, `intelligence/engineering/apk-analysis/live-readiness-gates.md`, `intelligence/engineering/apk-analysis/heuristics/hook-selection.md`, `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`, `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`, `intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md`, `intelligence/engineering/apk-analysis/failure/frida-spawn-race.md`, `intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md`, `intelligence/engineering/apk-analysis/signals/local-proxy-detection.md`, `intelligence/engineering/apk-analysis/signals/media-type-detection.md` |
 | 索引已更新 | `knowledge/indexes/README.md` — 新增 4 條 routing entries |
 
 ## 相容性規則
