@@ -222,14 +222,14 @@ intelligence/
 
 負責「AI 如何執行工作」。
 
-建議結構：
+目前結構：
 
 ```text
 workflow/
-  app-development-guidance/
-  apk-analysis/
-  repo-analysis/
-  travel-planning/
+  apk-analysis/              ← APK 分析執行流程（pilot migrated）
+  app-development-guidance/  ← App 開發審查與指引執行流程
+  repo-analysis/             ← Repository 分析執行流程
+  travel-planning/           ← 旅遊規劃執行流程
 ```
 
 核心責任：
@@ -239,6 +239,9 @@ workflow/
 - review flow。
 - orchestration flow。
 - execution flow。
+- App 開發審查流程（design review、code review、release review、security review）。
+- Repository 分析流程（onboarding、deep analysis、migration impact、tech debt assessment）。
+- 旅遊規劃流程（itinerary planning、transportation research、budget planning）。
 
 `workflow/` 應 reference `intelligence/`，而不是內嵌大量知識。
 
