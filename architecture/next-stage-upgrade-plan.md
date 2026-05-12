@@ -1231,6 +1231,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P2 | done | 跨 skill intelligence promotion（apk-analysis → heuristics） | `intelligence/engineering/heuristics/field-confidence-judgment.md`, `intelligence/engineering/heuristics/magic-bytes-reference.md` | 已完成 2 個 proven generalized atoms 從 apk-analysis 提升到跨領域 heuristics 層 | 原始 atoms 有 `# Cross-Domain Promotion` 標註，新 atoms 有 `# Source` 指向原始 domain atom |
 | P2 | done | 跨 skill intelligence promotion（app-development-guidance → heuristics） | `intelligence/engineering/heuristics/document-priority-hierarchy.md` | 已完成 1 個 proven generalized atom 從 app-development-guidance 提升到跨領域 heuristics 層 | 原始 atom 有 `# Cross-Domain Promotion` 標註，新 atom 有 `# Source` 指向原始 domain atom |
 | P2 | done | Skills Deprecation（Phase C） | `governance/lifecycle/README.md`, `skills/apk-analysis/techniques/`, `analysis/apk/techniques/` | 已完成 10 個舊 technique 檔案刪除（4 個子目錄 + 1 個 README 在 skills/，4 個 .md + 1 個 README 在 analysis/），更新 15+ 個引用舊路徑的檔案 | Phase C 檢查清單 7 項條件全部滿足，刪除後可 git revert rollback |
+| P2 | done | Bootstrap flow 修正 — primary_entrypoint 優先 | `skills-index.yaml`, `CORE_BOOTSTRAP.md`, `shared-rules/dependency-reading.md` | 已完成 3 個 skill 新增 primary_entrypoint 指向新分層路徑，CORE_BOOTSTRAP.md 啟動流程加入 primary_entrypoint 優先規則，dependency-reading.md 加入 primary_entrypoint 優先規則 | AI 啟動時優先讀 primary_entrypoint 指向的新分層路徑，不再被舊 entrypoint 導向舊 skills/ |
 
 ## 最終目標
 

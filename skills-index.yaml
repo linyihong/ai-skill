@@ -42,6 +42,7 @@ skills:
       context_load: high
     priority:
       runtime: high
+    primary_entrypoint: workflow/apk-analysis/execution-flow.md
     entrypoint: skills/apk-analysis/SKILL.md
     summary: knowledge/summaries/apk-analysis-pilot.md
     related:
@@ -90,6 +91,7 @@ skills:
       context_load: medium
     priority:
       runtime: high
+    primary_entrypoint: workflow/app-development-guidance/execution-flow.md
     entrypoint: skills/app-development-guidance/SKILL.md
     summary: knowledge/summaries/app-development-guidance.md
     related:
@@ -124,6 +126,7 @@ skills:
       context_load: medium
     priority:
       runtime: medium
+    primary_entrypoint: workflow/travel-planning/execution-flow.md
     entrypoint: skills/travel-planning/SKILL.md
     summary: knowledge/summaries/travel-planning.md
     related:
