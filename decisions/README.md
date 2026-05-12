@@ -27,9 +27,11 @@ proposed → accepted → deprecated → superseded
 
 | ADR | Title | Status | Date |
 | --- | --- | --- | --- |
-| — | — | — | — |
-
-（尚無正式 ADR。請從 `memory/decision/`  promotion 或新決策開始建立。）
+| [ADR-001](ADR-001-reference-first-migration-strategy.md) | Reference-First Migration Strategy | accepted | 2026-05-12 |
+| [ADR-002](ADR-002-intelligence-vs-knowledge-separation.md) | Intelligence vs Knowledge Separation | accepted | 2026-05-12 |
+| [ADR-003](ADR-003-three-layer-architecture.md) | Three-Layer Architecture（Knowledge / Skills / Intelligence） | accepted | 2026-05-12 |
+| [ADR-004](ADR-004-feedback-promotion-pipeline.md) | Feedback Promotion Pipeline | accepted | 2026-05-12 |
+| [ADR-005](ADR-005-memory-architecture.md) | Memory Architecture（6 子層記憶模型） | accepted | 2026-05-12 |
 
 ## 格式
 

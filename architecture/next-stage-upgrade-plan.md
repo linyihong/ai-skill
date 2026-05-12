@@ -326,12 +326,16 @@ memory/
 
 負責「架構決策記錄（ADR）」。
 
-建議結構：
+目前結構：
 
 ```text
 decisions/
-  README.md        ← ADR 系統說明
-  ADR-001-*.md     ← 第一筆 ADR（future）
+  README.md                                    ← ADR 系統說明
+  ADR-001-reference-first-migration-strategy.md ← Reference-First 遷移策略
+  ADR-002-intelligence-vs-knowledge-separation.md ← Intelligence vs Knowledge 分離
+  ADR-003-three-layer-architecture.md          ← Three-Layer Architecture
+  ADR-004-feedback-promotion-pipeline.md       ← Feedback Promotion Pipeline
+  ADR-005-memory-architecture.md               ← Memory Architecture（6 子層）
 ```
 
 核心責任：
@@ -340,6 +344,16 @@ decisions/
 - ADR lifecycle（proposed → accepted → deprecated → superseded）。
 - 避免重複討論相同決策。
 - 提供決策歷史追溯。
+
+現有 ADR：
+
+| ADR | 決策 | 狀態 |
+| --- | --- | --- |
+| ADR-001 | Reference-First Migration Strategy — 保留 `skills/` 為 source of truth，新分層只建立 reference/summary/index | accepted |
+| ADR-002 | Intelligence vs Knowledge Separation — `intelligence/` 獨立於 `knowledge/`，兩者為平行層 | accepted |
+| ADR-003 | Three-Layer Architecture — knowledge（事實）/ skills（流程）/ intelligence（判斷）三層平行 | accepted |
+| ADR-004 | Feedback Promotion Pipeline — replay → extraction → refinement → promotion 五階段 pipeline | accepted |
+| ADR-005 | Memory Architecture — 6 子層記憶模型（working/summary/decision/episodic/project/failure） | accepted |
 
 ### `anti-patterns/`
 
@@ -777,7 +791,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 建立 Tool Metadata & Lazy Activation | `tools/metadata/README.md`, `tools/routing/README.md` | 已完成 tool cost/risk/activation schema、explosion detection | 工具層級 token 消耗可預測與控制 |
 | P1 | done | 建立 Tool Output Compression | `tools/compression/README.md` | 已完成 4-level compression、per-output-type strategies | 工具輸出 token 減少 50-95% |
 | P1 | done | 建立 Memory Architecture 子層 | `memory/working/README.md`, `memory/summary/README.md`, `memory/decision/README.md`, `memory/episodic/README.md`, `memory/project/README.md`, `memory/failure/README.md` | 已完成 6 子層（working/summary/decision/episodic/project/failure） | 記憶管理精準，不再單一 memory 層 |
-| P1 | done | 建立 Decision System（ADR） | `decisions/README.md` | 已完成 ADR lifecycle、naming convention | 架構決策有記錄，避免重複討論 |
+| P1 | done | 建立 Decision System（ADR） | `decisions/README.md`, `decisions/ADR-001-reference-first-migration-strategy.md`, `decisions/ADR-002-intelligence-vs-knowledge-separation.md`, `decisions/ADR-003-three-layer-architecture.md`, `decisions/ADR-004-feedback-promotion-pipeline.md`, `decisions/ADR-005-memory-architecture.md` | 已完成 ADR lifecycle、naming convention、5 筆實際 ADR | 架構決策有記錄，避免重複討論 |
 | P1 | done | 建立 Anti-patterns | `anti-patterns/README.md` + 5 patterns | 已完成 5 個 anti-pattern 文件 | 失效模式可主動辨識與避免 |
 | P1 | done | 升級 Skills Metadata v2 | `skills-index.yaml` | 已完成所有 13 skills 加入 weight/domains/dependencies/conflicts/priority.runtime | Skill relevance scoring 與 conflict detection 可運作 |
 | P1 | done | 重建 intelligence/ 為專家智慧層 | `intelligence/README.md`, `intelligence/engineering/{architecture,domain,failure,heuristics,anti-patterns,tradeoffs,distributed-systems}/`, `intelligence/business/`, `intelligence/travel/` | 已完成 9 子目錄結構與 scope 定義，尚未填充實際 atoms | 每個子目錄有 README.md 定義核心、範例內容、與其他層的關係；與根 `anti-patterns/` 邊界已明確定義 |
