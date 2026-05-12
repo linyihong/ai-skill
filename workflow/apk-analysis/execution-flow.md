@@ -97,6 +97,8 @@
 - **若要開始開發 live-facing SDK/client/app tool：** baseline 必須通過 development readiness gate。
 - 有新的 reusable lesson，或使用者/reviewer 提出可泛化改進時，已在 `feedback_history/` 新增對應檔案。
 
+詳細完成門檻請參考 [`runtime/onboarding/apk-analysis-completion.md`](../../runtime/onboarding/apk-analysis-completion.md)。
+
 ## 4. Required Output Style
 
 回報分析進度時，包含：

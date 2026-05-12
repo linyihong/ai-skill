@@ -5,6 +5,7 @@
 ## 目前入口
 
 - [`routing/`](routing/README.md)：定義 task intent → knowledge index → metadata → source-of-truth gate 的 context loading 流程。
+- [`onboarding/`](onboarding/README.md)：新專案或新任務的初始設定指引、開場提示詞模板、完成門檻定義。
 
 ## 放什麼
 

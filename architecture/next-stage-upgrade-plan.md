@@ -148,11 +148,21 @@
 
 同時建立對應的 graph records（`intelligence-app-development-guidance.yaml`、`intelligence-repo-analysis.yaml`），並更新 `intelligence-travel.yaml` 加入新 atom edges。
 
+### ✅ 已完成：Phase 25 — Extract RUNBOOK.md to runtime/onboarding/
+
+從 `skills/apk-analysis/RUNBOOK.md` 提取內容到新 `runtime/onboarding/` 層：
+
+| 新文件 | 提取內容 |
+|--------|----------|
+| [`runtime/onboarding/apk-analysis-setup.md`](runtime/onboarding/apk-analysis-setup.md) | 放置位置、開場提示詞、自動回饋提示 |
+| [`runtime/onboarding/apk-analysis-completion.md`](runtime/onboarding/apk-analysis-completion.md) | 完成定義、第一輪分析順序 |
+| [`runtime/onboarding/README.md`](runtime/onboarding/README.md) | 目錄索引與 scope 定義 |
+
 ### 尚未完成的下一階段
 
-- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `RUNBOOK.md`、`SKILL.md` 仍為 skill-local。
-- **更多 skill 內容可提取**：`skills/apk-analysis/RUNBOOK.md` 等內容尚未提取到對應的 `runtime/` 或 `workflow/` 層。
+- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `SKILL.md` 仍為 skill-local。
 - **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建，但更多 skill 內容需要提取到新分層。
+- **更多 skill 內容可提取**：`skills/app-development-guidance/` 的 `implementation/`、`platforms/`、`languages/`、`controls/`、`checklists/` 子目錄尚未提取到對應的 `analysis/` 或 `intelligence/` 層。
 
 ## 核心問題
 
