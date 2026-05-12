@@ -23,9 +23,18 @@ This layer does not own:
 | Workflow concern | Current source | Pilot target status |
 | --- | --- | --- |
 | Skill trigger and authorization boundary | `../../skills/apk-analysis/SKILL.md` | remains active |
-| Default decision tree | `../../skills/apk-analysis/WORKFLOW.md` | candidate for workflow extraction |
-| Environment and tool preparation | `../../skills/apk-analysis/TOOLS.md` | reference from workflow; do not duplicate |
-| Documentation and artifact gates | `../../skills/apk-analysis/DOCUMENTATION.md` | candidate for workflow extraction |
+| Default decision tree | `../../skills/apk-analysis/WORKFLOW.md` | ✅ extracted to `execution-flow.md` |
+| Capture window detailed rules | `../../skills/apk-analysis/WORKFLOW.md` | ✅ extracted to `execution-flow.md` |
+| Environment and tool preparation | `../../skills/apk-analysis/TOOLS.md` | reference from `analysis/apk/`; do not duplicate |
+| Documentation and artifact gates | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
+| SDK live self-generation audit | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
+| Identity material self-generation audit | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
+| UI architecture map template | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
+| API catalog detail requirements | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
+| Sanitization rules | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
+| Developer guidance notes | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
+| Feedback lesson writing tips | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
+| Backfill rules | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
 | First-day project runbook | `../../skills/apk-analysis/RUNBOOK.md` | candidate for onboarding workflow |
 | Development guidance handoff | `../../skills/app-development-guidance/` | referenced only when trigger applies |
 
@@ -41,5 +50,6 @@ This layer does not own:
 ## Compatibility Notes
 
 - Existing tools should still load `skills/apk-analysis/SKILL.md`.
-- This directory is safe to read as a high-level workflow map, but it is not yet a replacement for the skill files.
+- This directory is now a substantial reference-first workflow layer. Most content from `WORKFLOW.md` and `DOCUMENTATION.md` has been extracted here.
+- The original skill files still contain the authoritative content; this directory provides a reference-first view.
 - Future extraction should preserve old links, update `knowledge/indexes/README.md`, and attach `metadata/schema.md` metadata to each atom.

@@ -138,6 +138,32 @@ adb -s <device-serial> shell am force-stop <package-name>
 frida -D <device-serial> -f <package-name> -l hook.js
 ```
 
+## 媒體驗證工具
+
+檢查圖片 magic bytes：
+
+```bash
+xxd -l 16 output.bin
+```
+
+檢查影片 / GIF / WebP 容器：
+
+```bash
+ffprobe -v error -show_entries format=format_name,duration -of default=noprint_wrappers=1 output.mp4
+ffprobe -v error -select_streams v:0 -count_frames -show_entries stream=codec_name,nb_read_frames,nb_frames,duration output.gif
+```
+
+HLS 下載後若要提供給一般使用者播放，通常要把 segments 依 playlist/key/IV 解密合併，再 remux 成常見容器，例如 MP4。只保存 m3u8 不等於完成播放檔驗證。
+
+## 自動化腳本安全邊界
+
+- 不要把帳密、token、個資、付款、刪除、發文、下單、私訊等高風險操作寫入無保護自動化腳本。
+- 滑動頁面要限制 scroll count / scroll depth，例如最多 top/mid/bottom 三段；不要無限捲動列表。
+- 點擊目標要來自去敏 screenshot 或 `uiautomator dump` 的 bounds/label；不要用未驗證座標盲點。
+- 腳本地圖只延伸 App 內頁面；若 foreground package 已切到系統設定、瀏覽器、支付、分享、第三方 App 或其他外部畫面，停止後續自動步驟並在文件標記 external transition。
+- 先用測試帳號與授權範圍確認可自動重放。
+- 若腳本會觸發登入或限流，先停止 tight-loop，改用已建立 session 或人工單步操作。
+
 ---
 
 ← [回到 analysis/apk/](README.md)

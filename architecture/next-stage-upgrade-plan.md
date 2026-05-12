@@ -91,12 +91,20 @@
 - **Phase 10：Memory 子目錄** — `memory/episodic/README.md`（情境記憶）、`memory/project/README.md`（專案記憶）、`memory/failure/README.md`（失效記憶），memory/ 完整 6 子層
 - **Phase 11：Decisions ADR** — 5 筆實際 ADR（Reference-First Migration Strategy、Intelligence vs Knowledge Separation、Three-Layer Architecture、Feedback Promotion Pipeline、Memory Architecture）
 
+### 已完成：Phase 13-16
+
+- **Phase 13：Intelligence atoms 填充** — 在全部 8 個子目錄（architecture、tradeoffs、failure、domain、anti-patterns、distributed-systems、business、travel）各建立 1 個 candidate intelligence atom，遵循 principle → rationale → when to apply → decision flow → common misuse → token impact 格式。
+- **Phase 14：Task-specific prompt artifact generator** — 建立 `runtime/prompt-artifacts/` 層，含 7 個 task type templates（apk-analysis、app-development-guidance、repo-analysis、travel-planning、repo-governance、knowledge-navigation、feedback-promotion）與 4 個 composition rules（workflow-steps、intelligence-atoms、analysis-methods、knowledge-summary），支援 priority-based culling 與 conflict resolution。
+- **Phase 15：Knowledge graph records** — 建立 17 個完整 graph records：10 個 intelligence atom graphs、2 個 runtime graphs（pipeline、prompt-artifacts）、5 個 layer subdirectory graphs（workflow、analysis、governance、feedback、decisions），含 edges、validation、metadata。
+- **Phase 16：Skill content extraction** — 從 `skills/apk-analysis/` 提取以下內容到新分層：
+  - `TOOLS.md` → `analysis/apk/tools-and-failures.md`：媒體驗證工具、自動化腳本安全邊界
+  - `WORKFLOW.md` → `workflow/apk-analysis/execution-flow.md`：8 條 capture window 詳細規則（tab coverage、lazy-load、evidence validation、replay runner、window split、read-only override、classifier、smoke）
+  - `DOCUMENTATION.md` → `workflow/apk-analysis/artifact-gates.md`：SDK live self-generation audit、identity material audit、UI architecture map template、API catalog detail requirements、sanitization rules、developer guidance notes、feedback lesson writing tips、backfill rules
+
 ### 尚未完成的下一階段
 
-- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。
-- **Intelligence atoms 尚未大量填充**：`intelligence/engineering/heuristics/` 已有 5 個 candidate atoms，但其餘 8 個子目錄（architecture、domain、failure、anti-patterns、tradeoffs、distributed-systems、business、travel）尚無實際 atoms。
-- **Task-specific prompt artifact generator 尚未建立**：model-aware context report 與 per-model checklist 已可生成，但尚未根據 task intent 自動組合 prompt artifact。
-- **Knowledge graph records 尚未自動生成**：graph edges 可用 `scripts/query-knowledge-graph.rb` 低成本查詢，但完整 graph records 仍需手動維護。
+- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `RUNBOOK.md`、`SKILL.md`、`techniques/` 子目錄仍為 skill-local。
+- **更多 skill 內容可提取**：`skills/app-development-guidance/`、`skills/repo-analysis/`、`skills/travel-planning/` 等 skill 的內容尚未提取到對應的 `workflow/` 與 `analysis/` 層。
 - **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建，但更多 skill 內容需要提取到新分層。
 
 ## 核心問題

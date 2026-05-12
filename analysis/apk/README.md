@@ -22,8 +22,10 @@ This layer does not own:
 
 | Topic | Current source | Pilot target status |
 | --- | --- | --- |
-| Common traffic/runtime triage | `../../skills/apk-analysis/WORKFLOW.md` | candidate for extraction |
-| Tool choice and failure interpretation | `../../skills/apk-analysis/TOOLS.md` | candidate for extraction |
+| Common traffic/runtime triage | `../../skills/apk-analysis/WORKFLOW.md` | ✅ extracted to `traffic-triage.md` |
+| Tool choice and failure interpretation | `../../skills/apk-analysis/TOOLS.md` | ✅ extracted to `tools-and-failures.md` |
+| Media verification tools | `../../skills/apk-analysis/TOOLS.md` | ✅ extracted to `tools-and-failures.md` |
+| Automation script safety boundary | `../../skills/apk-analysis/TOOLS.md` | ✅ extracted to `tools-and-failures.md` |
 | Flutter / Dart AOT methods | `../../skills/apk-analysis/techniques/flutter-dart-aot/` | keep skill-local, reference here |
 | HTTP API documentation methods | `../../skills/apk-analysis/techniques/http-api/` | keep skill-local, reference here |
 | Local proxy / loopback methods | `../../skills/apk-analysis/techniques/local-proxy/` | keep skill-local, reference here |
@@ -33,11 +35,13 @@ This layer does not own:
 
 1. Start with `../../skills/apk-analysis/SKILL.md` when a tool needs the active skill trigger.
 2. Use this file to understand the analysis-layer boundary.
-3. Read `../../skills/apk-analysis/WORKFLOW.md` for the current decision tree.
-4. Read only the matching `../../skills/apk-analysis/techniques/<category>/` folder after evidence identifies a route.
+3. Read `traffic-triage.md` for traffic/runtime path triage.
+4. Read `tools-and-failures.md` for tool choice, failure interpretation, and command templates.
+5. Read only the matching `../../skills/apk-analysis/techniques/<category>/` folder after evidence identifies a route.
 
 ## Migration Notes
 
-- Do not duplicate technique content here until a specific Knowledge Atom is selected.
+- Traffic triage, tool choice, failure interpretation, media verification, and safety boundary have been extracted from `skills/apk-analysis/` into this directory.
+- The original skill files still contain the authoritative content; this directory provides a reference-first view.
 - When a technique is extracted, create metadata with `../../metadata/schema.md` and update `../../knowledge/indexes/README.md`.
 - Preserve links from `skills/apk-analysis/` until the new path has been validated in real use.
