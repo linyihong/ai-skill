@@ -15,8 +15,20 @@ edges:
     validation: README 定義 scope、current source references 與 read order。
   - type: related_to
     target: analysis/repo/README.md
-    reason: Repository 分析方法 — 靜態結構分析、依賴分析、entrypoint 追蹤。
-    validation: README 定義 repo analysis 的具體方法。
+    reason: Repository 分析方法 — 靜態結構分析、依賴分析、entrypoint 追蹤、文件恢復、追溯性建立、契約治理。
+    validation: README 定義 7 個分析方法與 extracted content 表。
+  - type: related_to
+    target: analysis/repo/documentation-backfill.md
+    reason: 已實作專案的文件恢復方法 — 8 種文件恢復規則、6 種 pipeline artifact 恢復方法。
+    validation: documentation-backfill.md 從 skills/app-development-guidance/process/README.md 提取。
+  - type: related_to
+    target: analysis/repo/traceability-gate.md
+    reason: 文件追溯性建立方法 — 5 種追溯連結、stable ID 類型。
+    validation: traceability-gate.md 從 skills/app-development-guidance/process/README.md 提取。
+  - type: related_to
+    target: analysis/repo/contract-governance.md
+    reason: 文件優先順序與衝突處理規則 — 6 級優先順序、5 種衝突處理類型。
+    validation: contract-governance.md 從 skills/app-development-guidance/process/README.md 提取。
   - type: related_to
     target: analysis/production/README.md
     reason: Production 分析方法 — production 問題的系統化分析。

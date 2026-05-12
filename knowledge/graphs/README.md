@@ -40,8 +40,11 @@
 
 | Graph record | 用途 | 狀態 |
 | --- | --- | --- |
-| [`workflow-layers.yaml`](workflow-layers.yaml) | 連接 workflow 所有子目錄（apk-analysis、app-development-guidance、repo-analysis、travel-planning）。 | `candidate` |
-| [`analysis-layers.yaml`](analysis-layers.yaml) | 連接 analysis 所有子目錄（apk、repo、production、issue）。 | `candidate` |
+| [`workflow-layers.yaml`](workflow-layers.yaml) | 連接 workflow 所有子目錄（apk-analysis、app-development-guidance、repo-analysis、travel-planning）及其子檔案。 | `candidate` |
+| [`workflow-app-development-guidance.yaml`](workflow-app-development-guidance.yaml) | 連接 app-development-guidance workflow 的 execution-flow、artifact-gates 與 skills、analysis 來源。 | `candidate` |
+| [`workflow-travel-planning.yaml`](workflow-travel-planning.yaml) | 連接 travel-planning workflow 的 execution-flow、artifact-gates 與 skills、intelligence 來源。 | `candidate` |
+| [`analysis-layers.yaml`](analysis-layers.yaml) | 連接 analysis 所有子目錄（apk、repo、production、issue）及其子檔案。 | `candidate` |
+| [`analysis-repo-methods.yaml`](analysis-repo-methods.yaml) | 連接 analysis/repo/ 的 7 個分析方法（靜態結構、依賴、entrypoint、技術債、文件恢復、追溯性、契約治理）與 skills 來源。 | `candidate` |
 | [`governance-layers.yaml`](governance-layers.yaml) | 連接 governance 所有子目錄（lifecycle、validation、cleanup、dependency）。 | `candidate` |
 | [`feedback-layers.yaml`](feedback-layers.yaml) | 連接 feedback 所有子目錄（extraction、refinement、replay、promotion、pipeline）。 | `candidate` |
 | [`decisions-adr.yaml`](decisions-adr.yaml) | 連接所有 ADR records（ADR-001 到 ADR-005）與 architecture、memory。 | `candidate` |
