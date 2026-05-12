@@ -2,54 +2,56 @@
 
 本文件定義 `apk-analysis` 作為下一階段 Workflow / Analysis / Intelligence 分離的 pilot。目標是先建立 reference-first 目的地與 mapping，不搬移大量內容、不破壞既有 `skills/apk-analysis/` 入口。
 
-## Migration Status
+## 遷移狀態
 
-| Field | Value |
+| 欄位 | 值 |
 | --- | --- |
 | Pilot skill | `skills/apk-analysis/` |
-| Status | `candidate-map` |
-| Old entrypoint | `skills/apk-analysis/SKILL.md` remains the active skill entrypoint |
-| New reference paths | `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/apk-analysis/` |
-| Bulk migration | Not started |
+| 狀態 | `content-extracted` |
+| 舊入口 | `skills/apk-analysis/SKILL.md` 仍為 active skill entrypoint |
+| 新參考路徑 | `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/apk-analysis/` |
+| 大量搬移 | 尚未開始 — 舊檔案保留原位；新檔案為 reference targets |
+| 已提取檔案 | `workflow/apk-analysis/execution-flow.md`, `workflow/apk-analysis/artifact-gates.md`, `analysis/apk/traffic-triage.md`, `analysis/apk/tools-and-failures.md`, `intelligence/engineering/apk-analysis/evidence-first-routing.md`, `intelligence/engineering/apk-analysis/live-readiness-gates.md` |
+| 索引已更新 | `knowledge/indexes/README.md` — 新增 4 條 routing entries |
 
-## Compatibility Rules
+## 相容性規則
 
-- `skills/apk-analysis/SKILL.md` remains the canonical trigger for tools that load skills.
-- New top-level layer paths are reference targets, not replacements, until content has been copied, validated, indexed, and linked back.
-- Do not move or delete existing `skills/apk-analysis/` files during the pilot.
-- Any future move must preserve old links with redirect notes or index rows.
-- Target-specific APK hosts, endpoints, raw responses, tokens, device identifiers, and private run evidence stay in project docs.
+- `skills/apk-analysis/SKILL.md` 仍為 tools 載入 skill 的 canonical trigger。
+- 新 top-level layer 路徑在內容被複製、驗證、索引並連結回舊入口之前，僅為 reference targets，非 replacement。
+- Pilot 期間不得搬移或刪除既有 `skills/apk-analysis/` 檔案。
+- 未來任何搬移必須保留舊連結，以 redirect notes 或 index rows 標示。
+- 特定 APK hosts、endpoints、raw responses、tokens、device identifiers 與 private run evidence 留在 project docs。
 
-## Source To Target Map
+## 來源到目標對應表
 
-| Existing source | Current role | Candidate target | Migration action | Status |
+| 既有來源 | 目前角色 | 候選目標 | 遷移動作 | 狀態 |
 | --- | --- | --- | --- | --- |
-| `skills/apk-analysis/SKILL.md` | Tool skill trigger, authorization boundary, output style, cross-skill handoff | `workflow/apk-analysis/` | Keep as active entrypoint; later extract tool-neutral execution flow into workflow while retaining skill trigger | candidate |
-| `skills/apk-analysis/WORKFLOW.md` | Evidence-first traffic/runtime decision tree | `analysis/apk/` + `workflow/apk-analysis/` | Split observation / triage methods into analysis; keep execution sequencing in workflow | candidate |
-| `skills/apk-analysis/TOOLS.md` | Tool choice, command templates, failure interpretation | `analysis/apk/` + `workflow/apk-analysis/` | Move tool-selection reasoning to analysis; keep setup steps as workflow references or tool docs if tool-specific | candidate |
-| `skills/apk-analysis/DOCUMENTATION.md` | Project artifact templates and documentation gates | `workflow/apk-analysis/` + `intelligence/engineering/apk-analysis/` | Keep artifact production flow in workflow; extract stable engineering lessons into intelligence | candidate |
-| `skills/apk-analysis/techniques/` | Route-specific analysis methods | `analysis/apk/` | Keep categories as-is during pilot; future analysis layer can reference or gradually absorb category summaries | candidate |
-| `skills/apk-analysis/feedback_history/` | Lesson history and validated/candidate learning | `intelligence/engineering/apk-analysis/` + `feedback/` + `memory/` | Keep lesson files in skill history; promote stable conclusions by reference, not bulk copy | candidate |
-| Cross-skill handoff to `app-development-guidance` | Boundary between evidence recovery and development guidance | `workflow/apk-analysis/` | Preserve handoff artifact and ownership boundary | candidate |
+| `skills/apk-analysis/SKILL.md` | Tool skill trigger、authorization boundary、output style、cross-skill handoff | `workflow/apk-analysis/` | 保留為 active entrypoint；後續將 tool-neutral execution flow 提取到 workflow，同時保留 skill trigger | candidate |
+| `skills/apk-analysis/WORKFLOW.md` | Evidence-first traffic/runtime decision tree | `analysis/apk/` + `workflow/apk-analysis/` | 將 observation / triage methods 拆分到 analysis；execution sequencing 保留在 workflow | candidate |
+| `skills/apk-analysis/TOOLS.md` | 工具選擇、命令模板、失敗判讀 | `analysis/apk/` + `workflow/apk-analysis/` | 將 tool-selection reasoning 移到 analysis；setup steps 保留為 workflow references 或 tool docs | candidate |
+| `skills/apk-analysis/DOCUMENTATION.md` | 專案 artifact templates 與 documentation gates | `workflow/apk-analysis/` + `intelligence/engineering/apk-analysis/` | Artifact production flow 保留在 workflow；stable engineering lessons 提取到 intelligence | candidate |
+| `skills/apk-analysis/techniques/` | Route-specific analysis methods | `analysis/apk/` | Pilot 期間保留 categories 原狀；未來 analysis layer 可參考或逐步吸收 category summaries | candidate |
+| `skills/apk-analysis/feedback_history/` | Lesson history 與 validated/candidate learning | `intelligence/engineering/apk-analysis/` + `feedback/` + `memory/` | Lesson files 保留在 skill history；stable conclusions 以 reference 方式 promotion，非 bulk copy | candidate |
+| Cross-skill handoff 到 `app-development-guidance` | Evidence recovery 與 development guidance 之間的邊界 | `workflow/apk-analysis/` | 保留 handoff artifact 與 ownership boundary | candidate |
 
-## First Reference-First Paths
+## 首批 Reference-First 路徑
 
-| Task intent | New path | Still read |
+| 任務意圖 | 新路徑 | 仍需讀取 |
 | --- | --- | --- |
-| Decide how to observe an APK traffic/runtime path | `analysis/apk/README.md` | `skills/apk-analysis/WORKFLOW.md`, relevant `skills/apk-analysis/techniques/` category |
-| Execute an APK analysis session or handoff | `workflow/apk-analysis/README.md` | `skills/apk-analysis/SKILL.md`, `WORKFLOW.md`, `DOCUMENTATION.md` |
-| Reuse engineering lessons from APK analysis | `intelligence/engineering/apk-analysis/README.md` | `skills/apk-analysis/feedback_history/README.md`, validated lesson files |
+| 決定如何觀察 APK traffic/runtime 路徑 | `analysis/apk/README.md` | `skills/apk-analysis/WORKFLOW.md`、相關 `skills/apk-analysis/techniques/` category |
+| 執行 APK analysis session 或 handoff | `workflow/apk-analysis/README.md` | `skills/apk-analysis/SKILL.md`、`WORKFLOW.md`、`DOCUMENTATION.md` |
+| 重複使用 APK analysis 的工程經驗 | `intelligence/engineering/apk-analysis/README.md` | `skills/apk-analysis/feedback_history/README.md`、validated lesson files |
 
-## Completion Criteria For Future Migration
+## 未來遷移的完成條件
 
-- Each moved atom has metadata using `metadata/schema.md`.
-- `knowledge/indexes/README.md` routes task intents to the new path and the old skill entrypoint.
-- Old `skills/apk-analysis/` links still resolve.
-- Shared rules and skill dependencies remain readable from the old entrypoint.
-- Validation includes Markdown link check, diff review, close-loop dry run, commit, push, readback, and clean status.
+- 每個被搬移的 atom 使用 `metadata/schema.md` 定義 metadata。
+- `knowledge/indexes/README.md` 能將 task intents 路由到新路徑與舊 skill entrypoint。
+- 舊 `skills/apk-analysis/` 連結仍可解析。
+- Shared rules 與 skill dependencies 仍可從舊 entrypoint 讀取。
+- 驗證包含 Markdown link check、diff review、close-loop dry run、commit、push、readback 與 clean status。
 
-## Open Follow-Ups
+## 待辦事項
 
-- Decide whether technique category summaries should live under `analysis/apk/<category>/` or remain skill-local with metadata atoms.
-- Create Knowledge Atom candidates for the highest-value `apk-analysis` workflow and technique entries.
-- Define when a feedback lesson graduates from `skills/apk-analysis/feedback_history/` into `intelligence/engineering/apk-analysis/`.
+- 決定 technique category summaries 應放在 `analysis/apk/<category>/` 還是保留 skill-local 搭配 metadata atoms。
+- 為最高價值的 `apk-analysis` workflow 與 technique entries 建立 Knowledge Atom candidates。
+- 定義 feedback lesson 何時從 `skills/apk-analysis/feedback_history/` 畢業到 `intelligence/engineering/apk-analysis/`。
