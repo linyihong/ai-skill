@@ -35,5 +35,6 @@ Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating
 | --- | --- | --- |
 | Claude | [claude.md](claude.md) | Claude 類工具如何明確讀取 shared rules、skill 入口、依賴文件、goal ledger 與 Ai-skill writeback 流程。 |
 | Cursor | [cursor.md](cursor.md) | Cursor 如何啟用 apk-analysis、參照或同步 `.cursor`、維持中央庫一致性，並以工具中立 `.agent-goals/` 做對話目標閉環提醒。 |
+| Roo Code | [roo.md](roo.md) | Roo Code（VS Code AI extension）如何設定 custom instructions、modes、file restrictions，以及與 runtime pipeline 的整合。 |
 
 ← [回到根目錄](../README.md)
