@@ -170,11 +170,19 @@
 | [`analysis/app-development-guidance/languages-catalog.md`](../analysis/app-development-guidance/languages-catalog.md) | `analysis/` | `skills/app-development-guidance/languages/` | 4 類語言陷阱（Dart、Kotlin/Java、Swift、TypeScript） |
 | [`workflow/app-development-guidance/review-checklists.md`](../workflow/app-development-guidance/review-checklists.md) | `workflow/` | `skills/app-development-guidance/checklists/` | 6 種審查 checklist（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
 
+### ✅ 已完成：Phase 27 — Extract process/ to workflow/app-development-guidance/
+
+從 `skills/app-development-guidance/process/README.md` 提取 contract-first 開發流程到 `workflow/app-development-guidance/development-process.md`：
+
+| 新文件 | 目標層 | 原始來源 | 說明 |
+|--------|--------|----------|------|
+| [`workflow/app-development-guidance/development-process.md`](../workflow/app-development-guidance/development-process.md) | `workflow/` | `skills/app-development-guidance/process/README.md` | Contract-first 開發流程：Default Flow、Required Contracts、Initial Documentation Pack、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill、Contract-First Rules、Definition of Ready/Done |
+
 ### 尚未完成的下一階段
 
 - **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `SKILL.md` 仍為 skill-local。
 - **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建，但更多 skill 內容需要提取到新分層。
-- **更多 skill 內容可提取**：`skills/app-development-guidance/` 的 `process/` 子目錄尚未提取。`skills/apk-analysis/` 的 `techniques/` 子目錄已提取 catalog 至 `analysis/apk/techniques/`，但個別 technique 文件尚未提取。
+- **更多 skill 內容可提取**：`skills/apk-analysis/` 的 `techniques/` 子目錄已提取 catalog 至 `analysis/apk/techniques/`，但個別 technique 文件尚未提取。`skills/app-development-guidance/` 和 `skills/apk-analysis/` 的 `feedback_history/` 子目錄尚未提取到 `feedback/` 層。
 
 ## 核心問題
 

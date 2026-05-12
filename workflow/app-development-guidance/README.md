@@ -1,10 +1,16 @@
 # App Development Guidance Workflow
 
-`workflow/app-development-guidance/` 負責「App 開發審查與指引的執行流程」。本目錄保存 agent 在進行 app 開發審查時可照著執行的 planning flow、review flow、handoff flow 與 review checklists，讓審查過程可重複、可驗證。
+`workflow/app-development-guidance/` 負責「App 開發審查與指引的執行流程」。本目錄保存 agent 在進行 app 開發審查時可照著執行的 planning flow、review flow、handoff flow、review checklists 與 contract-first 開發流程，讓開發與審查過程可重複、可驗證。
 
 ## Scope
 
-本 workflow 涵蓋以下審查類型：
+本 workflow 涵蓋以下流程與審查類型：
+
+### 開發流程
+
+- **Contract-First Development Process**：從企劃書到實作的完整開發流程，包含 Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill 等。
+
+### 審查類型
 
 - **Design Review**：在實作前審查設計文件、API contract 與架構決策。
 - **Code Review**：審查實作程式碼的正確性、安全性與效能。
@@ -24,6 +30,7 @@
 
 - `skills/app-development-guidance/` 目前仍是 active skill entrypoint；本層只承接逐步抽出的通用執行流程。
 - `skills/app-development-guidance/WORKFLOW.md` 是目前的 workflow source of truth。
+- `skills/app-development-guidance/process/README.md` 提供 contract-first 開發流程（已提取至本層）。
 - `skills/app-development-guidance/checklists/` 提供各審查類型的 checklist 正文（已提取 catalog 至本層）。
 - `skills/app-development-guidance/controls/` 提供各安全控制的評估標準（已提取 catalog 至 `analysis/app-development-guidance/`）。
 - `analysis/repo/` 可被本 workflow 引用來分析 repository 結構。
@@ -33,7 +40,7 @@
 ## 第一批候選遷移來源
 
 - `skills/app-development-guidance/WORKFLOW.md` — ✅ 已提取（execution-flow.md, artifact-gates.md, analysis/app-development-guidance/risk-translation.md）
-- `skills/app-development-guidance/process/` — 候選
+- `skills/app-development-guidance/process/` — ✅ 已提取（development-process.md）
 - `skills/app-development-guidance/checklists/` — ✅ 已提取（review-checklists.md）
 
 ## 已提取內容
@@ -44,6 +51,7 @@
 | [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md` | Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria |
 | [`analysis/app-development-guidance/risk-translation.md`](../analysis/app-development-guidance/risk-translation.md) | `WORKFLOW.md` §2-5 | Risk Translation Table、Owner Layer Selection、Control Definition、Guidance Classification、Linked Updates |
 | [`review-checklists.md`](review-checklists.md) | `skills/app-development-guidance/checklists/` | 6 種審查 checklist 的 catalog（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
+| [`development-process.md`](development-process.md) | `skills/app-development-guidance/process/README.md` | Contract-first 開發流程：Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill、Contract-First Rules、Definition of Ready/Done |
 
 ## 建議 Workflow 流程
 
