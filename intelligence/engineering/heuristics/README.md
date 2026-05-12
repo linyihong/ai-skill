@@ -6,11 +6,15 @@
 
 資深工程師直覺。
 
-## 範例內容
+## 目前 atoms
 
-- `premature-optimization.md` — If performance issue is not measured, optimization is likely harmful.
-- `abstraction-threshold.md` — If abstraction removes more clarity than duplication, do not abstract.
-- `retry-smell.md` — More than 3 retries often indicates architectural failure, not transient instability.
+| Atom | 原則 | 狀態 |
+|------|------|------|
+| [`premature-optimization.md`](premature-optimization.md) | If performance issue is not measured, optimization is likely harmful. | `candidate-intelligence` |
+| [`abstraction-threshold.md`](abstraction-threshold.md) | If abstraction removes more clarity than duplication, do not abstract. | `candidate-intelligence` |
+| [`retry-smell.md`](retry-smell.md) | More than 3 retries often indicates architectural failure, not transient instability. | `candidate-intelligence` |
+| [`single-responsibility-heuristic.md`](single-responsibility-heuristic.md) | If you can't describe what a module does without using "and", it has too many responsibilities. | `candidate-intelligence` |
+| [`test-driven-heuristic.md`](test-driven-heuristic.md) | If writing a test for a function is difficult, the function's design is likely wrong. | `candidate-intelligence` |
 
 ## 與其他層的關係
 
