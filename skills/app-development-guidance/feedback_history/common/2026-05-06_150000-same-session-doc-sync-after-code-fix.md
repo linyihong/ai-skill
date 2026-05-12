@@ -1,4 +1,5 @@
 # Same-session doc/BDD sync after code fixes
+# Extracted — See [`workflow/app-development-guidance/execution-flow.md`](../../../../workflow/app-development-guidance/execution-flow.md)
 
 **Goal:** Close governance gaps when implementation fixes land before durable specs.
 

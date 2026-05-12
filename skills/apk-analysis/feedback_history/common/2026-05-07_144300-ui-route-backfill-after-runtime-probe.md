@@ -1,4 +1,5 @@
 > Follow [shared rules](../../../../shared-rules/README.md), [dependency-reading](../../../../shared-rules/dependency-reading.md), [neutral-language](../../../../shared-rules/neutral-language.md), [goal-action-validation](../../../../shared-rules/goal-action-validation.md), and [feedback-lessons](../../../../shared-rules/feedback-lessons.md). This lesson records only generalized guidance.
+# Extracted — See [`workflow/apk-analysis/artifact-gates.md`](../../../../workflow/apk-analysis/artifact-gates.md)
 
 ### 2026-05-07 - UI Route Backfill After Runtime Probe
 

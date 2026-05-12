@@ -1,3 +1,5 @@
+# Extracted — See [`analysis/apk/tools-and-failures.md`](../../../../analysis/apk/tools-and-failures.md) (Frida 健康檢查) and [`workflow/apk-analysis/execution-flow.md`](../../../../workflow/apk-analysis/execution-flow.md)
+
 ### 2026-04-30 - Frida 只有 banner 時先做最小 hook 健康檢查
 
 Status: validated

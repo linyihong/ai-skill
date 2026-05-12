@@ -1,4 +1,5 @@
 # Embedded hardware product flow belongs in app development guidance
+# Extracted — See [`workflow/app-development-guidance/execution-flow.md`](../../../../workflow/app-development-guidance/execution-flow.md)
 
 Status: promoted
 

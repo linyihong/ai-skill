@@ -1,3 +1,5 @@
+# Extracted — See [`workflow/apk-analysis/execution-flow.md`](../../../../workflow/apk-analysis/execution-flow.md) (Section 1: 開始前確認, MITM/proxy triage)
+
 ### 2026-04-30 - Proxy failure 要先拆成導流與 TLS 兩層
 
 Status: promoted

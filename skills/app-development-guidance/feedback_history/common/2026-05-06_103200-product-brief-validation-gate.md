@@ -1,4 +1,5 @@
 > 遵守 [共用規則索引](../../../../shared-rules/README.md)、[feedback-lessons](../../../../shared-rules/feedback-lessons.md)、[neutral-language](../../../../shared-rules/neutral-language.md)、[goal-action-validation](../../../../shared-rules/goal-action-validation.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+# Extracted — See [`workflow/app-development-guidance/development-process.md`](../../../../workflow/app-development-guidance/development-process.md)
 
 ### 2026-05-06 - Product Brief validation gate
 

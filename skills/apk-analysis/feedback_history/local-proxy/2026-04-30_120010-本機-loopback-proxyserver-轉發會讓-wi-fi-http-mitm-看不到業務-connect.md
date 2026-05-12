@@ -1,4 +1,5 @@
 ### 2026-04-30 - 本機 loopback「ProxyServer」轉發會讓 Wi‑Fi HTTP MITM 看不到業務 CONNECT
+# Extracted — See [`analysis/apk/tools-and-failures.md`](../../../../analysis/apk/tools-and-failures.md)
 
 Status: candidate
 

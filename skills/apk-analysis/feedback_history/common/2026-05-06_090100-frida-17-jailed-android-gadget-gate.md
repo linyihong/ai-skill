@@ -1,3 +1,5 @@
+# Extracted — See [`analysis/apk/tools-and-failures.md`](../../../../analysis/apk/tools-and-failures.md) (Frida 健康檢查) and [`workflow/apk-analysis/execution-flow.md`](../../../../workflow/apk-analysis/execution-flow.md)
+
 ### 2026-05-06 - Frida 17 / jailed Android Gadget gate
 
 Status: validated

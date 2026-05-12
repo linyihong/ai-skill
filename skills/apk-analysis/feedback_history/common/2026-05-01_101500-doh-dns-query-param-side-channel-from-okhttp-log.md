@@ -1,5 +1,7 @@
 > 遵守 [共用規則索引](../../../../shared-rules/README.md) 與 [feedback-lessons](../../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 
+# Extracted — See [`workflow/apk-analysis/execution-flow.md`](../../../../workflow/apk-analysis/execution-flow.md) (Section 1: MITM/proxy triage) and [`intelligence/engineering/apk-analysis/signals/`](../../../../intelligence/engineering/apk-analysis/signals/)
+
 ### 2026-05-01 - DoH 的 `dns=` 參數可作為「MITM 業務 host 空白」時的側信道
 
 Status: validated

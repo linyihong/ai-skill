@@ -1,5 +1,7 @@
 > 遵守 [共用規則索引](../../../../shared-rules/README.md) 與 [feedback-lessons](../../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 
+# Extracted — See [`shared-rules/cross-skill-references.md`](../../../../shared-rules/cross-skill-references.md)
+
 ### 2026-05-01 - Workflow as routing, not technique dump
 
 Status: promoted

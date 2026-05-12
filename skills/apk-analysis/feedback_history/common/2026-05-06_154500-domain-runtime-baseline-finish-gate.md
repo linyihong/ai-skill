@@ -1,4 +1,5 @@
 # Domain／執行環境基線 — 取數門檻
+# Extracted — See [`workflow/apk-analysis/artifact-gates.md`](../../../../workflow/apk-analysis/artifact-gates.md) (Domain/Runtime Baseline)
 
 **Date:** 2026-05-06  
 **Category:** common  

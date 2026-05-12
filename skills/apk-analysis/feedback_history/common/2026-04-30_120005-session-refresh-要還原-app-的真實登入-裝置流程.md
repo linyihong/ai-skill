@@ -1,3 +1,5 @@
+# Extracted — See [`workflow/apk-analysis/execution-flow.md`](../../../../workflow/apk-analysis/execution-flow.md) (Section 1: 開始前確認, session recovery)
+
 ### 2026-04-30 - Session refresh 要還原 App 的真實登入/裝置流程
 
 Status: validated

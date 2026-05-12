@@ -1,3 +1,5 @@
+# Extracted — See [`analysis/apk/tools-and-failures.md`](../../../../analysis/apk/tools-and-failures.md) (基礎工具)
+
 ### 2026-04-30 - APK metadata：`aapt` 不在 PATH 時走 SDK build-tools；launcher 用 `resolve-activity`
 
 Status: validated

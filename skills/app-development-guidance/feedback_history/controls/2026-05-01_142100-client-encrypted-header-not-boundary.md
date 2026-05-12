@@ -1,4 +1,5 @@
 > Follow [shared rules](../../../../shared-rules/README.md) and [feedback-lessons](../../../../shared-rules/feedback-lessons.md). This lesson is generalized and contains no target-specific hosts, endpoints, tokens, or user data.
+# Extracted — See [`analysis/app-development-guidance/controls-catalog.md`](../../../../analysis/app-development-guidance/controls-catalog.md)
 
 ### 2026-05-01 - Client Encrypted Header Is Not A Security Boundary
 

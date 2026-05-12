@@ -182,6 +182,18 @@
 
 ---
 
+### ✅ 已完成：Phase 30 — Feedback History 提取
+
+**目標**：將 `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/` 層。
+
+**實際執行結果**：
+- 建立 `feedback/extraction/apk-analysis-index.md`（61 lessons，6 個目標層）
+- 建立 `feedback/extraction/app-development-guidance-index.md`（40 lessons，6 個目標層）
+- 101/101 個 lesson 檔案已加入 `# Extracted — See <target>` 標記
+- 100% lessons 已對應到目標層（workflow/、intelligence/、analysis/、shared-rules/）
+
+---
+
 ### ✅ 已完成：Phase 29 — 其餘 3 個 Techniques Decomposition
 
 **目標**：將 http-api、local-proxy、media-hls 三個 technique 比照 flutter-dart-aot 模式拆解。
@@ -282,7 +294,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 | Phase | 優先級 | 目標 | 主要產出 | 依賴 |
 |-------|--------|------|----------|------|
 | **Phase 29** | P1 | ✅ 已完成 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/apk-analysis/{heuristics,signals}/` | Phase 28（pilot 模式已驗證） |
-| **Phase 30** | P1 | Feedback history 提取到 feedback/ 層 | `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/extraction/`，建立 category index | Phase 29（techniques 完成後，feedback 可對應到已建立的 workflow/intelligence） |
+| **Phase 30** | P1 | ✅ 已完成 | Feedback history 提取到 feedback/ 層 | `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/extraction/`，建立 category index | Phase 29（techniques 完成後，feedback 可對應到已建立的 workflow/intelligence） |
 | **Phase 31** | P2 | Pilot 驗證 + Intelligence Extraction Pipeline 抽象化 | 在實際 APK analysis session 中驗證 intelligence atoms 是否改善 AI 決策品質；從 pilot 經驗提煉出可重複的 extraction pipeline | Phase 29（所有 techniques 完成後才有足夠經驗） |
 | **Phase 32** | P2 | SKILL.md 分解 | 將各 skill 的 `SKILL.md` 中剩餘內容（Quick Start、Default Workflow、Output Style、Feedback Loop）提取到對應新層 | Phase 30（feedback 提取完成） |
 | **Phase 33** | P4 | Skill-Specific Intelligence Extraction | 見 [`plans/skill-specific-extraction.md`](plans/skill-specific-extraction.md) | Phase 31（pipeline 驗證成功）+ Phase 32（SKILL.md 分解完成） |
@@ -305,35 +317,41 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 ---
 
-#### Phase 30：Feedback History 提取
+#### Phase 30：Feedback History 提取 ✅ 已完成
 
 **目標**：將 `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/` 層。
 
-**背景**：
-- `skills/apk-analysis/feedback_history/` 有約 40 條 lessons（common/ 約 30 條、local-proxy/ 約 5 條、media-hls/ 約 3 條）
-- `skills/app-development-guidance/feedback_history/` 有約 18 條 lessons（全部在 common/）
-- 目前 lessons 仍以原始 Markdown 存在 skill-local 目錄，尚未被 `feedback/` 層索引
+**實際數據**：
+- `skills/apk-analysis/feedback_history/`：61 條 lessons（common/ 38 條、flutter-dart-aot/ 13 條、http-api/ 22 條、local-proxy/ 5 條、media-hls/ 3 條）
+- `skills/app-development-guidance/feedback_history/`：40 條 lessons（common/ 20 條、controls/ 1 條）
+- **總計 101 條 lessons，100% 已提取**
 
-**執行步驟**：
+**實際產出**：
 
-1. **建立 feedback category index**：
-   - 分析所有 lessons 的 `Promotion Target` 欄位
-   - 分類到對應的目標層（workflow/、intelligence/、shared-rules/、skill-doc/、archive/）
-   - 建立 `feedback/extraction/apk-analysis-index.md` 和 `feedback/extraction/app-development-guidance-index.md`
+| 產出 | 路徑 | 說明 |
+|------|------|------|
+| APK Analysis Index | `feedback/extraction/apk-analysis-index.md` | 61 lessons 分類到 6 個目標層 |
+| App Development Guidance Index | `feedback/extraction/app-development-guidance-index.md` | 40 lessons 分類到 6 個目標層 |
+| 已標註 lessons | `skills/*/feedback_history/*/*.md` | 101/101 檔案加入 `# Extracted — See <target>` 標記 |
 
-2. **提取已明確對應的 lessons**：
-   - 對應到已建立的 workflow → 更新 `workflow/apk-analysis/execution-flow.md` 或 `workflow/app-development-guidance/execution-flow.md`
-   - 對應到已建立的 intelligence atoms → 更新對應的 `intelligence/` 檔案
-   - 對應到 shared-rules → 更新 `shared-rules/` 對應檔案
+**提取策略**：
+- Feedback history lessons 已是「已提取產品」（從真實經驗提煉的泛化 lesson），不需重新提取內容
+- 策略是：**建立索引 + 標註提取狀態**，而非重新提取內容到目標層
+- 每個 lesson 的 `# Extracted — See <target>` 指向其 `Promotion Target` 對應的新架構檔案
 
-3. **標註已提取的 lessons**：
-   - 在 lesson 檔案開頭加入 `# Extracted — See <target path>`
-   - 保留原始 lesson 檔案（reference-first）
+**目標層分佈**：
 
-**成功驗證標準**：
-- `feedback/extraction/` 下有 category index 檔案
-- 至少 50% 的 lessons 已對應到目標層
-- 已提取的 lessons 有 `# Extracted` 標註
+| 目標層 | apk-analysis | app-development-guidance |
+|--------|:-----------:|:-----------------------:|
+| `workflow/*/execution-flow.md` | 29 | 18 |
+| `intelligence/engineering/apk-analysis/` | 9 | — |
+| `analysis/*/workflows/` | 12 | — |
+| `analysis/*/tools-and-failures.md` | 3 | — |
+| `workflow/*/artifact-gates.md` | 4 | 3 |
+| `shared-rules/` | 4 | 2 |
+| `workflow/*/development-process.md` | — | 10 |
+| `analysis/*/controls-catalog.md` | — | 1 |
+| `analysis/*/implementation-catalog.md` | — | 6 |
 
 ---
 

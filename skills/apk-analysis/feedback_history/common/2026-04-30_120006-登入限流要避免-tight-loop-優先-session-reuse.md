@@ -1,3 +1,5 @@
+# Extracted — See [`workflow/apk-analysis/execution-flow.md`](../../../../workflow/apk-analysis/execution-flow.md) (Section 1: Safety and Sanitization)
+
 ### 2026-04-30 - 登入限流要避免 tight-loop，優先 session reuse
 
 Status: validated

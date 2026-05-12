@@ -1,4 +1,5 @@
 > Follow [shared rules](../../../../shared-rules/README.md), [feedback lessons](../../../../shared-rules/feedback-lessons.md), and [goal/action/validation](../../../../shared-rules/goal-action-validation.md). This lesson is generalized and avoids project-specific details.
+# Extracted — See [`shared-rules/reusable-guidance-boundary.md`](../../../../shared-rules/reusable-guidance-boundary.md)
 
 ### 2026-05-07 - Keep Project Incidents Out Of Skills
 

@@ -1,4 +1,5 @@
 > Follow [shared rules](../../../../shared-rules/README.md), [dependency-reading](../../../../shared-rules/dependency-reading.md), [neutral-language](../../../../shared-rules/neutral-language.md), [goal-action-validation](../../../../shared-rules/goal-action-validation.md), and [feedback-lessons](../../../../shared-rules/feedback-lessons.md). This lesson records only generalized guidance.
+# Extracted — See [`analysis/apk/workflows/frida-hook-flow.md`](../../../../analysis/apk/workflows/frida-hook-flow.md)
 
 ### 2026-05-07 - Entry Boundary Before Unstable AOT Hooks
 

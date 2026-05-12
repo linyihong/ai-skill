@@ -1,4 +1,5 @@
 # SDK live self-generation audit
+# Extracted — See [`workflow/apk-analysis/execution-flow.md`](../../../../workflow/apk-analysis/execution-flow.md)
 
 Status: candidate
 

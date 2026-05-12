@@ -1,4 +1,5 @@
 # Implemented-first projects need contract governance and BDD closure
+# Extracted — See [`workflow/app-development-guidance/execution-flow.md`](../../../../workflow/app-development-guidance/execution-flow.md)
 
 Status: promoted
 
