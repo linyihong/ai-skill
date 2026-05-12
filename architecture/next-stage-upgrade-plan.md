@@ -361,14 +361,15 @@ anti-patterns/
 
 負責「系統如何持續演化」。
 
-建議結構：
+目前結構：
 
 ```text
 feedback/
-  replay/
-  extraction/
-  refinement/
-  promotion/
+  replay/        ← 經驗重播（從過往 session 與 failure 提取教訓）
+  extraction/    ← 智慧抽取（從 feedback 提煉 intelligence atom）
+  refinement/    ← 流程精煉（持續改進 workflow）
+  promotion/     ← 推廣管道（lesson 推進到各層）
+  pipeline/      ← 自動化 pipeline YAML（lifecycle、promotion engine、workflow）
 ```
 
 核心責任：
@@ -377,6 +378,9 @@ feedback/
 - intelligence extraction。
 - lesson replay。
 - knowledge evolution。
+- 經驗重播的觸發條件、流程與結果格式。
+- Intelligence atom 的抽取門檻、流程與必備欄位。
+- Workflow 的持續改進流程、觸發條件與版本管理。
 
 ### `models/`
 

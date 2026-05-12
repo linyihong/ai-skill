@@ -26,6 +26,9 @@
 
 ## 目前入口
 
+- [`replay/`](replay/README.md)：定義經驗重播的系統設計（從過往 session、failure 與成功經驗中提取可重複使用的教訓）。
+- [`extraction/`](extraction/README.md)：定義智慧抽取的系統設計（從 feedback lesson、replay 結果中提煉 intelligence atom）。
+- [`refinement/`](refinement/README.md)：定義流程精煉的系統設計（從實作經驗中持續改進 workflow）。
 - [`promotion/`](promotion/README.md)：定義 feedback lesson 如何從 skill-local history 推進到 workflow、intelligence、shared rules、memory 或 runtime surfaces。
 
 ## 第一批候選遷移來源
