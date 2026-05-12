@@ -30,9 +30,17 @@
 
 ## 第一批候選遷移來源
 
-- `skills/app-development-guidance/WORKFLOW.md`
-- `skills/app-development-guidance/process/`
-- `skills/app-development-guidance/checklists/`
+- `skills/app-development-guidance/WORKFLOW.md` — ✅ 已提取（execution-flow.md, artifact-gates.md, analysis/app-development-guidance/risk-translation.md）
+- `skills/app-development-guidance/process/` — 候選
+- `skills/app-development-guidance/checklists/` — 候選
+
+## 已提取內容
+
+| 檔案 | 來源 | 說明 |
+|------|------|------|
+| [`execution-flow.md`](execution-flow.md) | `WORKFLOW.md` §1, §5-8 | Start From Evidence、Change Intake、BDD Closure Loop、SDK Defect Closure、Same-Session Closure、Performance Gate、Backfill Rules、Validate |
+| [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md` | Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria |
+| [`analysis/app-development-guidance/risk-translation.md`](../analysis/app-development-guidance/risk-translation.md) | `WORKFLOW.md` §2-5 | Risk Translation Table、Owner Layer Selection、Control Definition、Guidance Classification、Linked Updates |
 
 ## 建議 Workflow 流程
 

@@ -101,10 +101,31 @@
   - `WORKFLOW.md` → `workflow/apk-analysis/execution-flow.md`：8 條 capture window 詳細規則（tab coverage、lazy-load、evidence validation、replay runner、window split、read-only override、classifier、smoke）
   - `DOCUMENTATION.md` → `workflow/apk-analysis/artifact-gates.md`：SDK live self-generation audit、identity material audit、UI architecture map template、API catalog detail requirements、sanitization rules、developer guidance notes、feedback lesson writing tips、backfill rules
 
+### ✅ 已完成：Phase 17-19
+
+- **Phase 17：App Development Guidance 內容提取** — 從 `skills/app-development-guidance/` 提取以下內容到新分層：
+  - `WORKFLOW.md` → `workflow/app-development-guidance/execution-flow.md`：8 個 workflow sections（Start From Evidence + Change Intake、Docs-first BDD closure loop、SDK defect closure loop、Same-session closure、Performance test gate、Backfill rules、Validate、Feed Back Reusable Lessons）
+  - `DOCUMENTATION.md` → `workflow/app-development-guidance/artifact-gates.md`：6 個 artifact sections（Reusable Note Structure、Keep Separate、Reusable Guidance Boundary、Required Linked Update Statement、Good Guidance、Avoid）
+  - `WORKFLOW.md` §2-5 → `analysis/app-development-guidance/risk-translation.md`：5 個 analysis methods（Translate To Risk、Choose The Owner Layer、Define Controls、File The Guidance、Apply Required Linked Updates）
+  - 建立 `analysis/app-development-guidance/README.md` 定義 scope 與 4 個 analysis methods
+  - 更新 `workflow/app-development-guidance/README.md` 加入 extracted content table
+
+- **Phase 18：Travel Planning 內容提取** — 從 `skills/travel-planning/` 提取以下內容到新分層：
+  - `WORKFLOW.md` → `workflow/travel-planning/execution-flow.md`：17 個 workflow sections（Intake、Source Triage、Agency Benchmark、Location Verification、Stop Planning、Weather、Transport、Lodging、Route Shape、Country Checks、Feasibility、Schedule、Calendar Output、車中泊、Recommendation Pass、Final Verification）
+  - `DOCUMENTATION.md` → `workflow/travel-planning/artifact-gates.md`：14 個 output templates（Itinerary Summary、Day Plan、Weather-Aware Options、Source Table、Calendar/App-Ready Table、Offline Checklist、Agency Benchmark、Stop Experience、Restaurant、Exact Location、Non-Driving Transport、Self-Drive Cost、車中泊 Quietness、Final Verification Checklist）
+  - 更新 `workflow/travel-planning/README.md` 加入 extracted content table 與 4 個 workflow flows
+
+- **Phase 19：APK Analysis Techniques 提取** — 從 `skills/apk-analysis/techniques/` 提取以下內容到 `analysis/apk/techniques/`：
+  - `techniques/README.md` → `analysis/apk/techniques/README.md`：routing rules（4 categories）、category rules、migration notes
+  - `techniques/flutter-dart-aot/README.md` → `analysis/apk/techniques/flutter-dart-aot.md`：When To Use、Core Guidance、Common Flow、Success Shape、Pitfalls
+  - `techniques/http-api/README.md` → `analysis/apk/techniques/http-api.md`：When To Use、Core Output、API Catalog Shape、API Documentation Flow、Finish Gate、UI Automation
+  - `techniques/local-proxy/README.md` → `analysis/apk/techniques/local-proxy.md`：When To Use、Core Guidance、Handler Hook Flow、Attribution
+  - `techniques/media-hls/README.md` → `analysis/apk/techniques/media-hls.md`：When To Use、Core Guidance、Media Chain（5-layer model）
+
 ### 尚未完成的下一階段
 
-- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `RUNBOOK.md`、`SKILL.md`、`techniques/` 子目錄仍為 skill-local。
-- **更多 skill 內容可提取**：`skills/app-development-guidance/`、`skills/repo-analysis/`、`skills/travel-planning/` 等 skill 的內容尚未提取到對應的 `workflow/` 與 `analysis/` 層。
+- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `RUNBOOK.md`、`SKILL.md` 仍為 skill-local。
+- **更多 skill 內容可提取**：`skills/repo-analysis/` 等 skill 的內容尚未提取到對應的 `workflow/` 與 `analysis/` 層。
 - **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建，但更多 skill 內容需要提取到新分層。
 
 ## 核心問題

@@ -36,9 +36,9 @@ README.md + shared-rules/README.md + Default Bootstrap
 
 ---
 
-## Phase 1：立即省錢（第一優先）
+## Phase 1：立即省錢（第一優先）✅ 已實作
 
-### 1.1 Bootstrap 極小化
+### 1.1 Bootstrap 極小化 ✅ 已實作
 
 **現狀**：Default Bootstrap 載入 12 條完整規則，形成高密度 instruction graph。
 
@@ -74,7 +74,7 @@ CORE_BOOTSTRAP.md
 
 **預期效益**：Token 減少 40-60%。
 
-### 1.2 README 拆分
+### 1.2 README 拆分 ✅ 已實作
 
 **現狀**：根 `README.md` 196 行，接近 Operating System Specification，每次 session 重讀。
 
@@ -87,7 +87,7 @@ CORE_BOOTSTRAP.md
 | `ARCHITECTURE.md` | 深度設計與 roadmap | 不限 |
 | `GOVERNANCE.md` | 管理規範與貢獻指南 | 不限 |
 
-### 1.3 Rule Lazy-load 機制
+### 1.3 Rule Lazy-load 機制 ✅ 已實作
 
 **現狀**：`shared-rules/README.md` 的 Default Bootstrap 要求每次載入 12 條規則。
 
@@ -107,7 +107,7 @@ rule:
 
 Agent 不預設讀 lazy-load rules，只在符合 `activation.when` 條件時才 activate。
 
-### 1.4 Knowledge Summary Layer
+### 1.4 Knowledge Summary Layer ✅ 已實作
 
 **現狀**：`knowledge/summaries/` 已有 6 個 summaries，但尚未成為 agent 的預設載入策略。
 
@@ -138,9 +138,9 @@ Agent 不預設讀 lazy-load rules，只在符合 `activation.when` 條件時才
 
 ---
 
-## Phase 2：架構升級（第二優先）
+## Phase 2：架構升級（第二優先）✅ 已實作
 
-### 2.1 Runtime Context Router
+### 2.1 Runtime Context Router ✅ 已實作
 
 **現狀**：`runtime/` 目錄偏向設計文件，`knowledge/runtime/routing-registry.yaml` 已有 8 筆 records 但尚未成為真正的 runtime router。
 
@@ -196,7 +196,7 @@ activation_rules:
       estimated_tokens: 600
 ```
 
-### 2.2 Context Cost Metadata
+### 2.2 Context Cost Metadata ✅ 已實作
 
 **現狀**：`metadata/schema.md` 已有 `context_cost` 欄位（low/medium/high），但缺乏精確的 token 估算與 load strategy。
 
@@ -232,7 +232,7 @@ runtime_behavior:
   deferrable: true               # 是否可延後載入
 ```
 
-### 2.3 Skill Index
+### 2.3 Skill Index ✅ 已實作
 
 **現狀**：Agent 掃描 `skills/` 目錄尋找相關 skill，缺乏結構化索引。
 
@@ -291,7 +291,7 @@ skills:
     summary: null
 ```
 
-### 2.4 Context TTL System
+### 2.4 Context TTL System ✅ 已實作
 
 **現狀**：Context 一旦載入就永久留在 context graph，導致 Agent 越來越肥。
 
@@ -338,9 +338,9 @@ rules:
 
 ---
 
-## Phase 3：真正 AI OS（第三優先）
+## Phase 3：真正 AI OS（第三優先）⏳ 待實作
 
-### 3.1 Semantic Retrieval
+### 3.1 Semantic Retrieval ⏳ 待實作
 
 建立語意檢索層，讓 agent 用自然語言查詢知識，而不是依賴目錄掃描：
 
@@ -348,7 +348,7 @@ rules:
 - 加入 embedding-based retrieval（future）
 - Query ranking 與 context-aware scoring
 
-### 3.2 Episodic Memory
+### 3.2 Episodic Memory ⏳ 待實作
 
 建立情節記憶層，讓 agent 記住「過去怎麼解決類似問題」：
 
@@ -356,7 +356,7 @@ rules:
 - 每個 episodic record 包含：context、decision、outcome、token cost
 - 支援 similarity-based retrieval
 
-### 3.3 Runtime Orchestration
+### 3.3 Runtime Orchestration ⏳ 待實作
 
 建立 runtime orchestration layer，自動管理 context loading、pruning 與 TTL：
 
@@ -364,7 +364,7 @@ rules:
 - 自動根據 task intent 選擇 model profile
 - 自動 prune 過期 context
 
-### 3.4 Multi-model Routing
+### 3.4 Multi-model Routing ⏳ 待實作
 
 根據 task 複雜度自動選擇模型：
 
@@ -544,32 +544,32 @@ rules:
 
 ## 遷移路徑
 
-### Step 1：建立 Core Bootstrap（立即）
+### Step 1：建立 Core Bootstrap（立即）✅ 已實作
 
 1. 建立 [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md) — 只含 rule-weight、dependency-reading、goal-ledger
 2. 更新 `shared-rules/README.md` — 加入 runtime activation model
 3. 更新根 `README.md` — 縮短為超短入口
 
-### Step 2：建立 Skills Index（立即）
+### Step 2：建立 Skills Index（立即）✅ 已實作
 
 1. 建立 [`skills-index.yaml`](../skills-index.yaml)
 2. 更新 `knowledge/indexes/README.md` 引用 skills index
 
-### Step 3：擴充 Summary Layer（1-2 週）
+### Step 3：擴充 Summary Layer（1-2 週）✅ 已實作
 
 1. 為每個 shared rule 建立 summary
 2. 為每個 skill 建立 summary
 3. 為每個 architecture 文件建立 summary
 4. 在 summary 中加入 context_cost 與 estimated_tokens
 
-### Step 4：建立 Runtime Router（2-3 週）
+### Step 4：建立 Runtime Router（2-3 週）✅ 已實作
 
 1. 建立 `runtime/router/activation-rules.yaml`
 2. 建立 `runtime/router/cost-budget.yaml`
 3. 建立 `runtime/context/ttl-policy.yaml`
 4. 更新 `knowledge/runtime/routing-registry.yaml` 加入 cost metadata
 
-### Step 5：全面導入 Context Cost Metadata（3-4 週）
+### Step 5：全面導入 Context Cost Metadata（3-4 週）✅ 已實作
 
 1. 更新 `metadata/schema.md` 加入 context_cost、load_strategy、ttl 欄位
 2. 為所有 Knowledge Atoms 補上 cost metadata
@@ -607,7 +607,7 @@ rules:
 3. 建立 Promotion Workflow → [`feedback/pipeline/promotion-workflow.yaml`](../feedback/pipeline/promotion-workflow.yaml) — 5 階段 workflow（assess → prepare → write → update → validate）、每階段有 entry/exit conditions、steps、output
 4. 建立 Lifecycle Automation → [`feedback/pipeline/lifecycle-automation.yaml`](../feedback/pipeline/lifecycle-automation.yaml) — 4 種 automation（auto-archive cold 180 days、auto-downgrade stale 90 days、periodic promotion check weekly、cold data threshold monitor）、完整 state machine（new → experimental → candidate → validated → promoted → archived）
 
-### Step 9：建立 Semantic Retrieval（長期）
+### Step 9：建立 Semantic Retrieval（長期）⏳ 待實作
 
 1. 深化 SQLite / FTS runtime index
 2. 加入 embedding-based retrieval

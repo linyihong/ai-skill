@@ -1,109 +1,98 @@
 # Travel Planning Workflow
 
-`workflow/travel-planning/` 負責「旅遊規劃的執行流程」。本目錄保存 agent 在規劃旅遊行程時可照著執行的 planning flow、research flow 與 handoff flow，讓規劃過程系統化且可重複。
+`workflow/travel-planning/` 負責「旅行規劃的執行流程」。本目錄保存 agent 在規劃旅行時可照著執行的 intake、source triage、route optimization、feasibility check 與 output formatting 流程。
 
 ## Scope
 
 本 workflow 涵蓋以下規劃類型：
 
-- **Itinerary planning**：從目的地選擇到每日行程的完整規劃流程。
-- **Transportation research**：航班、鐵路、自駕的路線與成本分析。
-- **Accommodation research**：住宿選擇的評估與比較。
-- **Activity & dining research**：景點、餐廳、活動的篩選與預訂。
-- **Budget planning**：旅遊預算的估算與分配。
-- **Packing & preparation**：行李打包與行前準備檢查清單。
+- **Itinerary Planning**：從使用者需求到完整行程的端到端流程。
+- **Transportation Research**：長距離交通比較、非自駕/自駕/混合模式決策。
+- **Budget Planning**：費用估算（交通、住宿、餐飲、停車、燃料）。
+- **Accommodation Planning**：住宿區域選擇與 lodging candidate 推薦。
+- **Route Optimization**：路線形狀檢查、避免 backtracking、天氣驅動的順序調整。
+- **車中泊 / Road Trip Planning**：過夜許可、安靜度評估、支援站點規劃。
 
 ## 核心原則
 
-1. **規劃是迭代不是線性**。先建立粗略框架，再逐步細化，而不是一次完成所有細節。
-2. **預算與時間是硬約束**。所有規劃決策應在預算與時間限制內進行。
-3. **備案是必要不是選項**。每個關鍵環節（交通、住宿）應有至少一個備案。
-4. **個人偏好優先於通用建議**。規劃應基於使用者的具體偏好（預算等級、旅遊風格、飲食限制），而不是通用「最佳」建議。
+1. **Source-backed planning**：每個重要推薦必須有官方或當前來源支撐。
+2. **Exact location first**：每個推薦地點必須有精確的 Google Maps place link 或 coordinate pin。
+3. **Feasibility over ambition**：行程必須在實際時間限制內可執行。
+4. **Weather-aware ordering**：戶外活動應放在最佳天氣窗口。
+5. **Transparent uncertainty**：所有不確定的聲明必須標註 confidence label。
 
 ## 與既有層的關係
 
 - `skills/travel-planning/` 目前仍是 active skill entrypoint；本層只承接逐步抽出的通用執行流程。
 - `skills/travel-planning/WORKFLOW.md` 是目前的 workflow source of truth。
-- `intelligence/travel/` 可承接從旅遊經驗中萃取的領域智慧（如黃金週避開、疲勞管理）。
-- `analysis/` 可被本 workflow 引用來分析路線、成本或時間資料。
+- `skills/travel-planning/DOCUMENTATION.md` 是目前的 artifact template source of truth。
+- `intelligence/travel/` 可被本 workflow 引用來輔助規劃判斷。
 
 ## 第一批候選遷移來源
 
-- `skills/travel-planning/WORKFLOW.md`
-- `skills/travel-planning/TOOLS.md`
-- `intelligence/travel/README.md` 中定義的 domain intelligence scope
+- `skills/travel-planning/WORKFLOW.md` — ✅ 已提取（execution-flow.md）
+- `skills/travel-planning/DOCUMENTATION.md` — ✅ 已提取（artifact-gates.md）
+
+## 已提取內容
+
+| 檔案 | 來源 | 說明 |
+|------|------|------|
+| [`execution-flow.md`](execution-flow.md) | `WORKFLOW.md` §1-17 | 完整 17 步驟執行流程：Intake、Source Triage、Agency Benchmark、Location Verification、Stop Planning、Weather、Transport、Lodging、Route Shape、Country Checks、Feasibility、Schedule、Calendar Output、車中泊、Recommendation Pass、Final Verification |
+| [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md` | 14 個產出模板與 final verification checklist：Itinerary Summary、Day Plan、Weather Strategy、Source Table、Calendar/App Table、Offline Checklist、Agency Benchmark Table、Stop Experience Table、Restaurant Table、Location Table、Transport Plan、Cost Estimate、車中泊 Quietness Table、Verification Checklist |
 
 ## 建議 Workflow 流程
 
 ### Itinerary Planning Flow
 
 ```
-1. 確認規劃範圍：
-   ├─ 目的地（城市 / 區域 / 多城市）。
-   ├─ 日期（出發日、回程日、天數）。
-   ├─ 人數與組成（成人 / 兒童 / 長者）。
-   ├─ 預算範圍（總預算 / 每日預算）。
-   └─ 旅遊風格（悠閒 / 緊湊 / 冒險 / 文化 / 美食）。
-
-2. 建立粗略框架：
-   ├─ 分配每日主要活動區域。
-   ├─ 標記不可調整的固定行程（已預訂住宿、交通）。
-   └─ 標記彈性時間與緩衝日。
-
-3. 細化每日行程：
-   ├─ 上午活動（景點、文化體驗）。
-   ├─ 午餐（餐廳推薦、預算）。
-   ├─ 下午活動（景點、購物、休息）。
-   ├─ 晚餐（餐廳推薦、預算）。
-   └─ 晚間活動（夜景、酒吧、表演）。
-
-4. 驗證可行性：
-   ├─ 交通時間是否合理（點到點移動時間）。
-   ├─ 行程是否過於緊湊（需要緩衝）。
-   ├─ 預算是否在範圍內。
-   └─ 是否有備案（天氣、排隊、臨時關閉）。
+1. Intake → capture trip frame (destination, dates, party, transport, pace).
+2. Source triage → classify every important claim by required source type.
+3. Agency/model-course benchmark → search and compare package tours.
+4. Exact location verification → Google Maps place links, parking pins, Mapcode.
+5. Stop experience and food planning → what to do, how long, what to eat.
+6. Weather and backup pass → weather-aware ordering, concrete alternatives.
+7. Long-distance transport comparison gate → for 2+ hour transfers.
+8. Transport mode decision → non-driving / self-drive / mixed.
+9. Overnight base and lodging planning → route-logic-driven base selection.
+10. Route shape and backtracking check → avoid A→B→middle-point returns.
+11. Country/region specific checks → Mapcode, visitor parking, local rules.
+12. Feasibility build → anchor immovable items, add buffers, place support stops.
+13. Schedule feasibility check → label each day comfortable/tight/too packed.
+14. Calendar/app-ready output pass → structured fields for import.
+15. 車中泊 / road trip checks → permission, quietness, support stops.
+16. Recommendation pass → 30+ point checklist before finalizing.
+17. Final verification → goal, action, validation for every conclusion.
 ```
 
 ### Transportation Research Flow
 
 ```
-1. 列出所有需要交通的區段（出發地→目的地、城市間移動、每日移動）。
-2. 對每個區段評估選項：
-   ├─ 航班（直飛 / 轉機、航空公司、價格、時間）。
-   ├─ 鐵路（速度、價格、車站位置、班次頻率）。
-   ├─ 自駕（租車成本、油錢、停車、路況）。
-   └─ 大眾運輸（地鐵、公車、計程車、共享單車）。
-3. 比較成本與時間，選擇最佳方案。
-4. 記錄預訂資訊（訂位代碼、時間、地點）。
-5. 建立備案（替代交通方式、彈性時間）。
+1. Identify all plausible modes for each 2+ hour transfer.
+2. Compare door-to-door time and total cost.
+3. Evaluate practical burden: luggage, transfers, delay risk.
+4. Mark each option: recommended / viable / backup / not recommended.
+5. For non-driving: build legs with departure/arrival/transfer/booking.
+6. For self-drive: estimate cost, check fuel/charging gaps.
 ```
 
 ### Budget Planning Flow
 
 ```
-1. 列出所有支出類別：
-   ├─ 交通（航班、鐵路、租車、油錢、停車、大眾運輸）。
-   ├─ 住宿（飯店、民宿、青年旅館）。
-   ├─ 餐飲（餐廳、超市、路邊攤）。
-   ├─ 活動（門票、導覽、體驗活動）。
-   ├─ 購物（紀念品、伴手禮）。
-   └─ 其他（保險、簽證、網路、緊急預備金）。
-
-2. 對每個類別估算預算：
-   ├─ 最低預算（節省模式）。
-   ├─ 中等預算（舒適模式）。
-   └─ 最高預算（奢華模式）。
-
-3. 分配總預算到各類別。
-4. 追蹤實際支出 vs 預算。
-5. 保留 10-15% 緊急預備金。
+1. Long-distance transport: compare fares across modes.
+2. Daily transport: local transit, tolls, parking.
+3. Lodging: per-night estimates for recommended areas.
+4. Food: per-meal budget based on area and style.
+5. Fuel/charging: distance × efficiency × unit price.
+6. Activities: entry fees, tickets, reservations.
+7. Provide range when prices depend on season, booking time, or route.
 ```
 
 ## 產出格式
 
-每次旅遊規劃應產出：
+每次規劃應產出：
 
-- **行程摘要**（≤300 tokens）：每日主要活動、交通方式、住宿。
-- **預算表**（≤200 tokens）：各類別預算分配與實際支出。
-- **關鍵預訂資訊**（≤200 tokens）：已預訂的交通、住宿、活動。
-- **備案清單**（≤200 tokens）：每個關鍵環節的備案方案。
+- **Trip Frame**（≤100 tokens）：目的地、日期、人數、交通、步調。
+- **Day-by-day Itinerary**（每 day ≤500 tokens）：時間區塊、地點、交通、驗證、備案。
+- **Source Table**（≤300 tokens）：每個重要聲明的來源、檢查時間、信心標籤。
+- **Calendar/App-ready Fields**（可選）：事件標題、時間、時區、位置、提醒。
+- **Final Verification**（≤100 tokens）：確認所有檢查點通過。
