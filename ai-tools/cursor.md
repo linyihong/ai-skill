@@ -6,22 +6,23 @@
 
 目標：新開業務專案時，讓 Cursor 容易辨識並套用 `apk-analysis`。
 
-## 預設載入 shared rules
+## 預設載入（Core Bootstrap）
 
-在 Cursor 中建議用 always-apply rule 或 sessionStart hook 先提醒 agent 載入 `shared-rules/README.md` 的 Default Bootstrap：
+在 Cursor 中，`.cursor/rules/dependency-reading.mdc`（`alwaysApply: true`）已實作 **Core Bootstrap 自動載入流程**，取代舊的 Default Bootstrap（12 條規則）：
 
-- `shared-rules/README.md`
-- `shared-rules/dependency-reading.md`
-- `shared-rules/linked-updates.md`
-- `shared-rules/conversation-goal-ledger.md`
-- `shared-rules/tool-neutral-documentation.md`
-- `shared-rules/rule-weight.md`
-- `shared-rules/decision-efficiency.md`
-- `shared-rules/failure-learning-system.md`
-- `shared-rules/document-todo-list.md`
-- `shared-rules/document-sizing.md`
-- `shared-rules/goal-action-validation.md`
-- `shared-rules/neutral-language.md`
+```text
+1. 讀 CORE_BOOTSTRAP.md → 3 條必讀核心規則（~800 tokens）
+   - shared-rules/rule-weight.md
+   - shared-rules/dependency-reading.md
+   - shared-rules/conversation-goal-ledger.md
+2. 讀 README.md → OS layout
+3. 依 task intent 查 skills-index.yaml → 找到對應 skill
+4. 依 runtime/router/activation-rules.yaml → 決定 lazy-load rules
+5. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
+6. 需要時才展開完整 source
+```
+
+**設定一次 repo 即可**：只要 clone 本 repo，Cursor 啟動時自動套用 `dependency-reading.mdc`（alwaysApply），不需要每次手動指定載入哪些規則。
 
 Bootstrap 後仍要依任務讀 skill-specific README / WORKFLOW / TOOLS / DOCUMENTATION / CHECKLIST，以及 feedback、sanitization、authorization、cross-skill 等任務相關規則。
 若使用者指出 agent 反覆失誤、更新到錯誤路徑、漏做 close-loop 或驗證不足，依 `failure-learning-system.md` 分類失效模式並沉澱成 failure pattern 或對應 skill lesson。

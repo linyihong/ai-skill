@@ -2,12 +2,29 @@
   "description": "Claude Code configuration entry point - reference only",
   "ai_skill_repo": "/home/user/Ai-skill",
 
+  "bootstrap": {
+    "core": "CORE_BOOTSTRAP.md",
+    "layout": "README.md",
+    "skill_index": "skills-index.yaml",
+    "activation_rules": "runtime/router/activation-rules.yaml"
+  },
+
   "reference": {
     "claude_usage": "ai-tools/claude.md",
     "bootstrap_rules": "shared-rules/README.md",
     "task_routing": "knowledge/indexes/README.md",
     "goal_tracking": ".agent-goals/",
-    "failure_learning": "shared-rules/failure-learning-system.md"
+    "failure_learning": "shared-rules/failure-learning-system.md",
+    "token_budget": "runtime/budget/token-budget.yaml",
+    "context_health": "runtime/health/context-health-score.yaml",
+    "circuit_breaker": "runtime/guards/circuit-breaker.yaml",
+    "tool_metadata": "tools/metadata/README.md",
+    "tool_compression": "tools/compression/README.md",
+    "memory_working": "memory/working/README.md",
+    "memory_summary": "memory/summary/README.md",
+    "memory_decision": "memory/decision/README.md",
+    "decisions": "decisions/README.md",
+    "anti_patterns": "anti-patterns/README.md"
   },
 
   "git": {

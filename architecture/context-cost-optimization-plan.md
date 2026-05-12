@@ -378,6 +378,170 @@ rules:
 
 ---
 
+## Phase 4：Runtime Quality & Safety（已實作）
+
+以下為根據外部 review 建議，優先於 Phase 3 實作的 **Runtime Quality & Safety** 層。這些元件直接控制 token 用量、context 健康度與系統穩定性。
+
+### 4.1 Token Budget System
+
+**檔案**：[`runtime/budget/token-budget.yaml`](../runtime/budget/token-budget.yaml)
+
+**目的**：為每個 session 設定 token 預算上限，防止 token 爆炸。
+
+**核心機制**：
+
+| 元件 | 值 | 說明 |
+| --- | --- | --- |
+| Default max_tokens | 120,000 | 跨模型預設上限 |
+| Warning threshold | 70% | 觸發 prune 建議 |
+| Hard stop threshold | 90% | 強制 halt + prune |
+| Per-layer budget | bootstrap/skill_index/activation_rules/summaries/full_source/tool_output/conversation | 每層分配 token 配額 |
+
+**預期效益**：Token 使用量可預測，不再因深度 reasoning 爆 token。
+
+### 4.2 Context Health Score
+
+**檔案**：[`runtime/health/context-health-score.yaml`](../runtime/health/context-health-score.yaml)
+
+**目的**：量化 context 健康度，在 context 品質惡化前主動介入。
+
+**4 個維度**：
+
+| 維度 | 權重 | 說明 |
+| --- | --- | --- |
+| Relevance | 0.35 | 當前 context 與 task 的相關性 |
+| Duplication | 0.20 | 重複內容比例 |
+| Staleness | 0.25 | 過期 context 比例 |
+| Conflict | 0.20 | 規則衝突比例 |
+
+**複合分數公式**：`relevance × 0.35 + (1 - duplication) × 0.20 + (1 - staleness) × 0.25 + (1 - conflict) × 0.20`
+
+**門檻**：healthy ≥ 0.75, warning ≥ 0.50, critical < 0.50
+
+### 4.3 Circuit Breaker
+
+**檔案**：[`runtime/guards/circuit-breaker.yaml`](../runtime/guards/circuit-breaker.yaml)
+
+**目的**：防止 agent 陷入無限迴圈、工具爆炸、context 失控。
+
+**5 個 Guards**：
+
+| Guard | 門檻 | 行為 |
+| --- | --- | --- |
+| Recursive depth | max 4 | 超過則 halt |
+| Tool calls | 20/task, 100/session, 15/5min | 超過則 warn + suggest decomposition |
+| Context growth | 30%/task, 80%/session | 超過則 force prune |
+| Hallucination risk | 4 factors, threshold 0.7 | 超過則 halt + suggest source read |
+| Conflict rules | 偵測到衝突 | warn + suggest resolution |
+
+### 4.4 Context Pollution Detection
+
+**檔案**：[`runtime/guards/context-pollution.yaml`](../runtime/guards/context-pollution.yaml)
+
+**目的**：偵測 context 污染訊號，在 context 品質嚴重惡化前自動歸檔。
+
+**5 個訊號**：
+
+| 訊號 | 門檻 | 說明 |
+| --- | --- | --- |
+| Conversation length | 50 turns | 對話過長 |
+| Repetitive edits | 5 edits | 同一檔案反覆修改 |
+| Module count | 20 modules | 載入過多模組 |
+| Cross-reference depth | 5 layers | 依賴鏈過深 |
+| Token utilization | 85% | 接近 token 上限 |
+
+**Critical 時**：halt agent + auto-archive session 到 `memory/working/session-archive-{timestamp}.md`
+
+### 4.5 Tool Metadata & Lazy Activation
+
+**檔案**：[`tools/metadata/README.md`](../tools/metadata/README.md)、[`tools/routing/README.md`](../tools/routing/README.md)
+
+**目的**：為每個工具標註 cost、risk、activation strategy，實現工具層級的 lazy loading 與爆炸偵測。
+
+**Tool Metadata 欄位**：
+
+| 欄位 | 說明 |
+| --- | --- |
+| cost.avg_input_tokens | 平均輸入 token |
+| cost.avg_output_tokens | 平均輸出 token |
+| cost.risk | recursive_expansion / side_effects |
+| contexts | 工具使用的 context 類型 |
+| activation | preload / lazy / on_demand |
+| compression | 支援的 compression level |
+
+**Tool Explosion Detection**：recursive_search、repetitive_read、tool_chain_too_long、output_too_large
+
+### 4.6 Tool Output Compression
+
+**檔案**：[`tools/compression/README.md`](../tools/compression/README.md)
+
+**目的**：根據 context 健康度動態壓縮工具輸出，減少 token 消耗。
+
+**4 個 Compression Levels**：
+
+| Level | 壓縮率 | 適用情境 |
+| --- | --- | --- |
+| raw | 1.0x | Context 健康度高 |
+| summary | 0.2-0.3x | Context 健康度 warning |
+| structured | 0.1-0.2x | Context 健康度 critical |
+| minimal | 0.05-0.1x | Token budget 接近 hard stop |
+
+**Per-output-type 策略**：stack trace（top 5 frames）、JSON（relevant fields only）、Git diff（file list + top 3 lines）、Log（ERROR/WARN only）、Search results（top 5）、File content（summary-first）
+
+### 4.7 Memory Architecture（子層拆分）
+
+**檔案**：[`memory/working/README.md`](../memory/working/README.md)、[`memory/summary/README.md`](../memory/summary/README.md)、[`memory/decision/README.md`](../memory/decision/README.md)
+
+**目的**：將單一 memory 層拆分為三個子層，各自有不同的生命週期與 token 策略。
+
+| 子層 | 生命週期 | Token 策略 | 用途 |
+| --- | --- | --- | --- |
+| Working | Session-local, discardable | 不保留 | 當前 session 的工作記憶 |
+| Summary | Compressed, ≤500 tokens | 低 | 壓縮的 session 歷史 |
+| Decision | Immutable, numbered | 極低 | 輕量 ADR（架構決策記錄） |
+
+### 4.8 Decision System（ADR）
+
+**檔案**：[`decisions/README.md`](../decisions/README.md)
+
+**目的**：建立 Architecture Decision Records（ADR）系統，記錄關鍵架構決策，避免重複討論。
+
+**ADR Lifecycle**：proposed → accepted → deprecated → superseded
+
+**ADR 命名**：`ADR-{number}-{short-title}.md`
+
+### 4.9 Anti-patterns
+
+**檔案**：[`anti-patterns/README.md`](../anti-patterns/README.md) + 5 個 anti-pattern 文件
+
+**目的**：記錄已知失效模式，讓 agent 快速辨識並避免。
+
+| Anti-pattern | Severity | 說明 |
+| --- | --- | --- |
+| Context Explosion | critical | Context 無限制增長 |
+| Recursive Tool Loop | critical | 工具反覆呼叫無進展 |
+| Hallucination Loop | critical | 無 canonical source 時過度推理 |
+| Stale Summary | high | Summary 與 source 不同步 |
+| Skill Pollution | high | 不相關 skill 浪費 token |
+
+### 4.10 Skills Metadata v2
+
+**檔案**：[`skills-index.yaml`](../skills-index.yaml)（version: v2）
+
+**目的**：為每個 skill 加入 weight、domains、dependencies、conflicts、priority.runtime，支援 runtime relevance scoring 與 conflict detection。
+
+**新增欄位**：
+
+| 欄位 | 說明 |
+| --- | --- |
+| weight | 0.0-1.0，relevance scoring 權重 |
+| domains | 領域標籤，用於 domain-based routing |
+| dependencies | 依賴文件路徑 |
+| conflicts | 衝突 skill ID |
+| priority.runtime | high / medium / low，runtime 載入優先序 |
+
+---
+
 ## 遷移路徑
 
 ### Step 1：建立 Core Bootstrap（立即）
@@ -411,7 +575,20 @@ rules:
 2. 為所有 Knowledge Atoms 補上 cost metadata
 3. 更新 validation scripts 檢查 cost metadata
 
-### Step 6：建立 Semantic Retrieval（長期）
+### Step 6：建立 Runtime Quality & Safety（已實作）
+
+1. 建立 Token Budget System → [`runtime/budget/token-budget.yaml`](../runtime/budget/token-budget.yaml)
+2. 建立 Context Health Score → [`runtime/health/context-health-score.yaml`](../runtime/health/context-health-score.yaml)
+3. 建立 Circuit Breaker → [`runtime/guards/circuit-breaker.yaml`](../runtime/guards/circuit-breaker.yaml)
+4. 建立 Context Pollution Detection → [`runtime/guards/context-pollution.yaml`](../runtime/guards/context-pollution.yaml)
+5. 建立 Tool Metadata & Lazy Activation → [`tools/metadata/README.md`](../tools/metadata/README.md)、[`tools/routing/README.md`](../tools/routing/README.md)
+6. 建立 Tool Output Compression → [`tools/compression/README.md`](../tools/compression/README.md)
+7. 建立 Memory Architecture 子層 → [`memory/working/README.md`](../memory/working/README.md)、[`memory/summary/README.md`](../memory/summary/README.md)、[`memory/decision/README.md`](../memory/decision/README.md)
+8. 建立 Decision System（ADR）→ [`decisions/README.md`](../decisions/README.md)
+9. 建立 Anti-patterns → [`anti-patterns/README.md`](../anti-patterns/README.md)
+10. 升級 Skills Metadata v2 → [`skills-index.yaml`](../skills-index.yaml)（weight、domains、dependencies、conflicts、priority.runtime）
+
+### Step 7：建立 Semantic Retrieval（長期）
 
 1. 深化 SQLite / FTS runtime index
 2. 加入 embedding-based retrieval
@@ -429,6 +606,11 @@ rules:
 | 知識載入決策 | 無成本資訊 | cost-aware routing | **可控** |
 | Context 生命週期 | 永久保留 | TTL 管理 | **可預測** |
 | Max mode 爆 token 風險 | 高 | 低（分階段載入） | **顯著降低** |
+| Token 用量控制 | 無預算管理 | Token Budget + Health Score | **可預測** |
+| 工具輸出浪費 | 原始輸出全量載入 | 4-level compression | **-50~95%** |
+| 記憶管理 | 單一 memory 層 | 3 子層（working/summary/decision） | **精準控制** |
+| 架構決策重複 | 無記錄 | ADR 系統 | **避免重複** |
+| 失效模式辨識 | 被動發現 | Anti-pattern 目錄 | **主動預防** |
 
 ## 與現有架構的關係
 
@@ -442,6 +624,14 @@ rules:
 | Runtime Router | `runtime/`, `knowledge/runtime/` | 將設計文件轉為可執行 routing |
 | Context Cost Metadata | `metadata/schema.md` | 擴充現有 schema |
 | Context TTL | `runtime/context/` | 新增子層 |
+| Token Budget System | `runtime/budget/` | 新增子層 |
+| Context Health Score | `runtime/health/` | 新增子層 |
+| Circuit Breaker / Guards | `runtime/guards/` | 新增子層 |
+| Tool Metadata / Routing / Compression | `tools/` | 新增層 |
+| Memory 子層 | `memory/working/`, `memory/summary/`, `memory/decision/` | 拆分現有 memory 層 |
+| Decision System | `decisions/` | 新增層 |
+| Anti-patterns | `anti-patterns/` | 新增層 |
+| Skills Metadata v2 | `skills-index.yaml` | 升級現有 index |
 | Semantic Retrieval | `knowledge/runtime/sqlite/` | 深化現有 prototype |
 
 ## 風險與緩解
@@ -453,3 +643,6 @@ rules:
 | TTL 過短導致重複載入 | TTL 可設定 conversation-level cache；summary 層輕量可頻繁載入 |
 | 遷移期間相容性 | 舊 entrypoint 維持 active；新路徑逐步取代 |
 | Agent 不遵守 activation rules | Activation rules 寫入 Core Bootstrap，確保每個 session 都讀到 |
+| Token Budget hard stop 中斷工作 | Warning threshold 設 70%，預留緩衝空間；auto-archive 保留工作進度 |
+| Circuit breaker 誤判 | 每個 guard 有獨立 threshold，可依模型/任務調整 |
+| Compression 遺失關鍵資訊 | Raw level 保留完整資訊；summary/structured/minimal 僅用於非關鍵輸出 |

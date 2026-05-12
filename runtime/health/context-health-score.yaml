@@ -1,0 +1,88 @@
+# Context Health Score
+# 評估目前 context 的健康狀態，低於門檻時觸發清理或 halt。
+# Agent 在 task boundary 或 token threshold 接近時執行此檢查。
+
+context_health_version: v1
+status: candidate
+owner_layer: runtime/health
+
+# Health dimensions
+dimensions:
+  - name: relevance
+    description: 目前 context 與當前 task 的相關性
+    weight: 0.35
+    signals:
+      - type: task_intent_match
+        source: skills-index.yaml
+      - type: activation_rule_match
+        source: runtime/router/activation-rules.yaml
+    scoring:
+      0.0-0.3: critical（多數 context 與 task 無關）
+      0.3-0.6: warning（部分 context 過期）
+      0.6-1.0: healthy
+
+  - name: duplication
+    description: Context 中重複知識的比例
+    weight: 0.20
+    signals:
+      - type: cross_reference_overlap
+      - type: summary_source_duplicate
+    scoring:
+      0.0-0.2: healthy
+      0.2-0.5: warning（有可合併的 context）
+      0.5-1.0: critical（大量重複）
+
+  - name: staleness
+    description: Context 中過期知識的比例
+    weight: 0.25
+    signals:
+      - type: ttl_expired
+        source: runtime/context/ttl-policy.yaml
+      - type: refresh_needed
+        source: knowledge/runtime/refresh-policy.yaml
+    scoring:
+      0.0-0.2: healthy
+      0.2-0.4: warning（部分 context 需 refresh）
+      0.4-1.0: critical（大量過期 context）
+
+  - name: conflict
+    description: Context 中規則衝突的比例
+    weight: 0.20
+    signals:
+      - type: rule_conflict
+        source: shared-rules/rule-weight.md
+      - type: source_mirror_drift
+        source: shared-rules/failure-patterns/source-mirror-write-drift.md
+    scoring:
+      0.0-0.1: healthy
+      0.1-0.3: warning（有可解決的衝突）
+      0.3-1.0: critical（需人工介入）
+
+# Composite score
+composite:
+  formula: "relevance * 0.35 + (1 - duplication) * 0.20 + (1 - staleness) * 0.25 + (1 - conflict) * 0.20"
+  thresholds:
+    healthy: ">= 0.75"
+    warning: ">= 0.50"
+    critical: "< 0.50"
+
+# Actions per threshold
+actions:
+  healthy:
+    - action: continue
+      message: "✅ Context health score: {score}. No action needed."
+
+  warning:
+    - action: suggest_prune
+      message: "⚠️ Context health score: {score}. 建議 prune 低 relevance / 過期 context。"
+    - action: suggest_refresh
+      message: "建議 refresh stale summaries 與 routing registry。"
+
+  critical:
+    - action: halt_agent
+      message: "⛔ Context health score: {score}. Agent halted. 建議建立新 session。"
+    - action: force_prune
+      strategy: aggressive
+      preserve:
+        - core-bootstrap
+        - agent-goals

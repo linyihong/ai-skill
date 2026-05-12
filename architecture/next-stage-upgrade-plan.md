@@ -45,6 +45,22 @@
 - **Summary Layer 擴充**：新增 8 個 summaries（app-development-guidance、travel-planning、repo-governance、knowledge-navigation、runtime-operations、model-routing、memory-operations、context-cost-optimization），總數從 6 → 14。
 - **Knowledge Index 更新**：`knowledge/indexes/README.md` 加入 `skills-index.yaml` 作為首要路由。
 
+### ✅ 已完成：Runtime Quality & Safety（Phase 2）
+
+以下為根據外部 review 建議，優先實作的 **Runtime Quality & Safety** 層：
+
+- **Token Budget System**：[`runtime/budget/token-budget.yaml`](../runtime/budget/token-budget.yaml) — 120K default max_tokens、per-model budgets、per-layer budget allocation、70% warning / 90% hard stop thresholds。
+- **Context Health Score**：[`runtime/health/context-health-score.yaml`](../runtime/health/context-health-score.yaml) — 4 維度（relevance 0.35、duplication 0.20、staleness 0.25、conflict 0.20）、composite score、healthy/warning/critical thresholds。
+- **Circuit Breaker**：[`runtime/guards/circuit-breaker.yaml`](../runtime/guards/circuit-breaker.yaml) — 5 guards（recursive depth max 4、tool calls 20/task、context growth 30%/task、hallucination risk 4 factors、conflict rules）。
+- **Context Pollution Detection**：[`runtime/guards/context-pollution.yaml`](../runtime/guards/context-pollution.yaml) — 5 signals（conversation length 50 turns、repetitive edits 5 edits、module count 20 modules、cross-reference depth 5 layers、token utilization 85%）。
+- **Tool Metadata**：[`tools/metadata/README.md`](../tools/metadata/README.md) — 每個工具標註 cost（avg_input_tokens、avg_output_tokens）、risk、contexts、activation strategy、compression support。
+- **Tool Lazy Activation**：[`tools/routing/README.md`](../tools/routing/README.md) — 5-step activation flow、tool explosion detection（recursive_search、repetitive_read、tool_chain_too_long、output_too_large）。
+- **Tool Output Compression**：[`tools/compression/README.md`](../tools/compression/README.md) — 4 levels（raw 1.0x、summary 0.2-0.3x、structured 0.1-0.2x、minimal 0.05-0.1x）、per-output-type strategies。
+- **Memory Architecture 子層**：[`memory/working/README.md`](../memory/working/README.md)、[`memory/summary/README.md`](../memory/summary/README.md)、[`memory/decision/README.md`](../memory/decision/README.md) — 3 子層（working session-local、summary ≤500 tokens、decision immutable numbered）。
+- **Decision System（ADR）**：[`decisions/README.md`](../decisions/README.md) — ADR lifecycle（proposed → accepted → deprecated → superseded）、naming convention `ADR-{number}-{short-title}.md`。
+- **Anti-patterns**：[`anti-patterns/README.md`](../anti-patterns/README.md) + 5 patterns（context-explosion、recursive-tool-loop、hallucination-loop、stale-summary、skill-pollution）。
+- **Skills Metadata v2**：[`skills-index.yaml`](../skills-index.yaml) 升級至 v2，所有 13 skills 加入 weight、domains、dependencies、conflicts、priority.runtime。
+
 尚未完成的下一階段：
 
 - 尚未建立上述分層的完整子目錄；`apk-analysis` 已有第一個 intelligence 示範遷移內容。
@@ -184,6 +200,9 @@ runtime/
   routing/
   orchestration/
   context/
+  budget/          ← 新增：Token Budget System
+  health/          ← 新增：Context Health Score
+  guards/          ← 新增：Circuit Breaker + Context Pollution Detection
 ```
 
 核心責任：
@@ -194,6 +213,29 @@ runtime/
 - task routing。
 - context pruning。
 - agent coordination。
+- **token budget management**（`runtime/budget/token-budget.yaml`）。
+- **context health scoring**（`runtime/health/context-health-score.yaml`）。
+- **circuit breaker & guards**（`runtime/guards/circuit-breaker.yaml`、`runtime/guards/context-pollution.yaml`）。
+
+### `tools/`
+
+負責「AI 工具如何被管理與優化」。
+
+建議結構：
+
+```text
+tools/
+  metadata/        ← 工具成本、風險、activation strategy
+  routing/         ← 工具 lazy activation、explosion detection
+  compression/     ← 工具輸出壓縮（4 levels）
+```
+
+核心責任：
+
+- 工具成本標註（avg_input_tokens、avg_output_tokens、risk）。
+- 工具 lazy activation（preload / lazy / on_demand）。
+- 工具爆炸偵測（recursive_search、repetitive_read、tool_chain_too_long、output_too_large）。
+- 工具輸出壓縮（raw / summary / structured / minimal）。
 
 ### `memory/`
 
@@ -203,10 +245,12 @@ runtime/
 
 ```text
 memory/
-  short-term/
-  episodic/
-  project/
-  failure/
+  working/         ← Session-local, discardable 工作記憶
+  summary/         ← 壓縮 session 歷史（≤500 tokens）
+  decision/        ← 輕量 ADR（immutable, numbered）
+  episodic/        ← 情節記憶（future）
+  project/         ← 專案記憶（future）
+  failure/         ← 失效記憶（future）
 ```
 
 核心責任：
@@ -214,6 +258,50 @@ memory/
 - experience replay。
 - long-term memory。
 - historical context。
+- **session-local working memory**（`memory/working/README.md`）。
+- **compressed session summaries**（`memory/summary/README.md`）。
+- **architecture decision records**（`memory/decision/README.md`）。
+
+### `decisions/`
+
+負責「架構決策記錄（ADR）」。
+
+建議結構：
+
+```text
+decisions/
+  README.md        ← ADR 系統說明
+  ADR-001-*.md     ← 第一筆 ADR（future）
+```
+
+核心責任：
+
+- 記錄關鍵架構決策。
+- ADR lifecycle（proposed → accepted → deprecated → superseded）。
+- 避免重複討論相同決策。
+- 提供決策歷史追溯。
+
+### `anti-patterns/`
+
+負責「已知失效模式記錄」。
+
+建議結構：
+
+```text
+anti-patterns/
+  README.md                    ← 索引
+  context-explosion.md         ← Context 無限制增長
+  recursive-tool-loop.md       ← 工具反覆呼叫無進展
+  hallucination-loop.md        ← 無 canonical source 時過度推理
+  stale-summary.md             ← Summary 與 source 不同步
+  skill-pollution.md           ← 不相關 skill 浪費 token
+```
+
+核心責任：
+
+- 記錄已知失效模式。
+- 提供 detection signal 與 prevention strategy。
+- 讓 agent 快速辨識並避免。
 
 ### `feedback/`
 
@@ -581,6 +669,16 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P1 | done | 建立 knowledge runtime refresh orchestrator | `scripts/refresh-knowledge-runtime.rb`, `knowledge/runtime/README.md`, `governance/validation/README.md` | 已完成一鍵重建 reports / SQLite index 並執行 validators | Generated runtime surfaces 可用單一命令重建與驗證，降低 stale cache 風險 |
 | P1 | done | 建立 knowledge graph query helper | `scripts/query-knowledge-graph.rb`, `knowledge/graphs/README.md`, `knowledge/runtime/README.md` | 已完成 source / target / type / keyword graph edge 查詢 | Graph query 只回傳候選 edge list；修改或高信心判斷仍讀 graph YAML 與 canonical source |
 | P1 | done | 建立 model checklist generator | `scripts/generate-model-checklists.rb`, `knowledge/runtime/model-checklists.md`, `models/README.md` | 已完成 per-model context-loading checklist artifact | Checklist 由 routing registry 生成；需要修改或高信心判斷仍讀 model docs 與 canonical source |
+| P1 | done | 建立 Token Budget System | `runtime/budget/token-budget.yaml` | 已完成 120K default max_tokens、per-model budgets、per-layer allocation、70%/90% thresholds | Token 用量可預測，不再因深度 reasoning 爆 token |
+| P1 | done | 建立 Context Health Score | `runtime/health/context-health-score.yaml` | 已完成 4 維度 composite score、healthy/warning/critical thresholds | Context 健康度可量化，在惡化前主動介入 |
+| P1 | done | 建立 Circuit Breaker | `runtime/guards/circuit-breaker.yaml` | 已完成 5 guards（recursive depth、tool calls、context growth、hallucination risk、conflict rules） | Agent 不再陷入無限迴圈或工具爆炸 |
+| P1 | done | 建立 Context Pollution Detection | `runtime/guards/context-pollution.yaml` | 已完成 5 signals、composite pollution score、auto-archive on critical | Context 污染可自動偵測與歸檔 |
+| P1 | done | 建立 Tool Metadata & Lazy Activation | `tools/metadata/README.md`, `tools/routing/README.md` | 已完成 tool cost/risk/activation schema、explosion detection | 工具層級 token 消耗可預測與控制 |
+| P1 | done | 建立 Tool Output Compression | `tools/compression/README.md` | 已完成 4-level compression、per-output-type strategies | 工具輸出 token 減少 50-95% |
+| P1 | done | 建立 Memory Architecture 子層 | `memory/working/README.md`, `memory/summary/README.md`, `memory/decision/README.md` | 已完成 3 子層（working/summary/decision） | 記憶管理精準，不再單一 memory 層 |
+| P1 | done | 建立 Decision System（ADR） | `decisions/README.md` | 已完成 ADR lifecycle、naming convention | 架構決策有記錄，避免重複討論 |
+| P1 | done | 建立 Anti-patterns | `anti-patterns/README.md` + 5 patterns | 已完成 5 個 anti-pattern 文件 | 失效模式可主動辨識與避免 |
+| P1 | done | 升級 Skills Metadata v2 | `skills-index.yaml` | 已完成所有 13 skills 加入 weight/domains/dependencies/conflicts/priority.runtime | Skill relevance scoring 與 conflict detection 可運作 |
 
 ## 最終目標
 

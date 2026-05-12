@@ -2,17 +2,29 @@
 # Agent 先比對 task intent 與 triggers，找到對應 skill 後再讀 entrypoint。
 # 不掃描整個 skills/ 目錄。
 
-skills_index_version: v1
+skills_index_version: v2
 status: candidate
 owner_layer: knowledge/indexes
 description: >
-  Skill routing index。讓 AI 先路由 skill，而不是掃整個 repo。
-  每個 skill 定義 triggers、cost、entrypoint 與 summary path。
+  Skill routing index v2。讓 AI 先路由 skill，而不是掃整個 repo。
+  每個 skill 定義 triggers、cost、weight、domains、dependencies、conflicts、
+  entrypoint 與 summary path。Runtime 使用 weight 做 relevance scoring，
+  domains/dependencies/conflicts 做 dynamic loading 與 conflict detection。
 
 skills:
   - id: apk-analysis
     name: APK Analysis
     description: 授權 APK 流量分析、動態抓包、Flutter/Dart AOT、response 解碼、文件化
+    weight: 0.9
+    domains:
+      - mobile-security
+      - reverse-engineering
+      - network-analysis
+    dependencies:
+      - shared-rules/rule-weight.md
+      - shared-rules/dependency-reading.md
+    conflicts:
+      - app-development-guidance  # 分析 vs 開發，不同目標
     triggers:
       - apk
       - mitm
@@ -28,6 +40,8 @@ skills:
     cost:
       estimated_tokens: 4500
       context_load: high
+    priority:
+      runtime: high
     entrypoint: skills/apk-analysis/SKILL.md
     summary: knowledge/summaries/apk-analysis-pilot.md
     related:
@@ -39,6 +53,17 @@ skills:
   - id: app-development-guidance
     name: App/API/Embedded Development Guidance
     description: 將授權 App/API/Embedded/Firmware 觀察轉成開發 guidance、實作模式、控制項、檢查清單
+    weight: 0.8
+    domains:
+      - mobile-development
+      - api-design
+      - embedded-systems
+      - security-hardening
+    dependencies:
+      - shared-rules/rule-weight.md
+      - shared-rules/dependency-reading.md
+    conflicts:
+      - apk-analysis  # 開發 vs 分析，不同目標
     triggers:
       - api
       - backend
@@ -63,6 +88,8 @@ skills:
     cost:
       estimated_tokens: 3500
       context_load: medium
+    priority:
+      runtime: high
     entrypoint: skills/app-development-guidance/SKILL.md
     summary: knowledge/summaries/app-development-guidance.md
     related:
@@ -73,6 +100,13 @@ skills:
   - id: travel-planning
     name: Travel Planning
     description: 依目的地、日期、交通與玩法規劃行程，包含營業時間查證、交通比較、住宿與備案
+    weight: 0.5
+    domains:
+      - travel
+      - itinerary-planning
+      - logistics
+    dependencies: []
+    conflicts: []
     triggers:
       - travel
       - itinerary
@@ -85,6 +119,8 @@ skills:
     cost:
       estimated_tokens: 2800
       context_load: medium
+    priority:
+      runtime: medium
     entrypoint: skills/travel-planning/SKILL.md
     summary: knowledge/summaries/travel-planning.md
     related:
@@ -93,6 +129,16 @@ skills:
   - id: repo-governance
     name: Repository Governance
     description: AI-native Knowledge Operating System 本身的維護、升級、遷移與治理
+    weight: 0.7
+    domains:
+      - repo-maintenance
+      - architecture-governance
+      - metadata-management
+    dependencies:
+      - shared-rules/rule-weight.md
+      - shared-rules/dependency-reading.md
+      - shared-rules/linked-updates.md
+    conflicts: []
     triggers:
       - governance
       - migration
@@ -107,6 +153,8 @@ skills:
     cost:
       estimated_tokens: 2000
       context_load: medium
+    priority:
+      runtime: high
     entrypoint: governance/README.md
     summary: knowledge/summaries/repo-governance.md
     related:
@@ -118,6 +166,14 @@ skills:
   - id: knowledge-navigation
     name: Knowledge Navigation
     description: 知識導航、索引、摘要、圖譜與 runtime routing
+    weight: 0.8
+    domains:
+      - knowledge-management
+      - information-retrieval
+      - runtime-routing
+    dependencies:
+      - shared-rules/rule-weight.md
+    conflicts: []
     triggers:
       - navigation
       - routing
@@ -129,6 +185,8 @@ skills:
     cost:
       estimated_tokens: 1500
       context_load: low
+    priority:
+      runtime: high
     entrypoint: knowledge/README.md
     summary: knowledge/summaries/knowledge-navigation.md
     related:
@@ -140,6 +198,15 @@ skills:
   - id: feedback-promotion
     name: Feedback & Promotion
     description: Feedback lesson 管理、promotion pipeline、failure learning
+    weight: 0.7
+    domains:
+      - feedback-management
+      - lesson-extraction
+      - knowledge-evolution
+    dependencies:
+      - shared-rules/feedback-lessons.md
+      - shared-rules/failure-learning-system.md
+    conflicts: []
     triggers:
       - feedback
       - lesson
@@ -149,6 +216,8 @@ skills:
     cost:
       estimated_tokens: 1800
       context_load: medium
+    priority:
+      runtime: medium
     entrypoint: feedback/README.md
     summary: knowledge/summaries/feedback-promotion-pipeline.md
     related:
@@ -159,6 +228,15 @@ skills:
   - id: model-routing
     name: Model-aware Routing
     description: 多模型協作、capability profile、compression strategy
+    weight: 0.6
+    domains:
+      - multi-model
+      - model-profiles
+      - compression
+    dependencies:
+      - models/profiles/README.md
+      - models/compression/README.md
+    conflicts: []
     triggers:
       - model
       - routing
@@ -169,6 +247,8 @@ skills:
     cost:
       estimated_tokens: 1200
       context_load: low
+    priority:
+      runtime: medium
     entrypoint: models/README.md
     summary: knowledge/summaries/model-routing.md
     related:
@@ -179,6 +259,15 @@ skills:
   - id: runtime-operations
     name: Runtime Operations
     description: Context routing、dynamic loading、context pruning、orchestration
+    weight: 0.8
+    domains:
+      - runtime-orchestration
+      - context-management
+      - agent-coordination
+    dependencies:
+      - shared-rules/rule-weight.md
+      - shared-rules/dependency-reading.md
+    conflicts: []
     triggers:
       - runtime
       - context
@@ -189,6 +278,8 @@ skills:
     cost:
       estimated_tokens: 1600
       context_load: medium
+    priority:
+      runtime: high
     entrypoint: runtime/README.md
     summary: knowledge/summaries/runtime-operations.md
     related:
@@ -199,6 +290,14 @@ skills:
   - id: memory-operations
     name: Memory Operations
     description: 長期記憶、情節記憶、short-term memory、failure memory
+    weight: 0.6
+    domains:
+      - memory-management
+      - experience-replay
+      - session-persistence
+    dependencies:
+      - runtime/README.md
+    conflicts: []
     triggers:
       - memory
       - episodic
@@ -208,6 +307,8 @@ skills:
     cost:
       estimated_tokens: 1000
       context_load: low
+    priority:
+      runtime: medium
     entrypoint: memory/README.md
     summary: knowledge/summaries/memory-operations.md
     related: []
@@ -215,6 +316,15 @@ skills:
   - id: analysis-methods
     name: Analysis Methods
     description: 觀察、拆解、reverse engineering、pattern extraction 方法
+    weight: 0.7
+    domains:
+      - reverse-engineering
+      - pattern-extraction
+      - technical-analysis
+    dependencies:
+      - shared-rules/dependency-reading.md
+    conflicts:
+      - app-development-guidance  # 分析 vs 開發，不同目標
     triggers:
       - analysis
       - reverse-engineering
@@ -224,6 +334,8 @@ skills:
     cost:
       estimated_tokens: 1400
       context_load: low
+    priority:
+      runtime: medium
     entrypoint: analysis/README.md
     summary: null
     related:
@@ -232,6 +344,15 @@ skills:
   - id: intelligence-engineering
     name: Engineering Intelligence
     description: 工程決策、trade-off、anti-pattern、可重用 domain knowledge
+    weight: 0.8
+    domains:
+      - engineering-intelligence
+      - architecture-decision
+      - anti-pattern
+    dependencies:
+      - shared-rules/rule-weight.md
+      - shared-rules/dependency-reading.md
+    conflicts: []
     triggers:
       - intelligence
       - engineering-decision
@@ -242,6 +363,8 @@ skills:
     cost:
       estimated_tokens: 2000
       context_load: medium
+    priority:
+      runtime: high
     entrypoint: intelligence/README.md
     summary: null
     related:
@@ -250,6 +373,14 @@ skills:
   - id: workflow-execution
     name: Workflow Execution
     description: Planning flow、task decomposition、review flow、orchestration flow
+    weight: 0.7
+    domains:
+      - workflow-orchestration
+      - task-decomposition
+      - execution-flow
+    dependencies:
+      - shared-rules/dependency-reading.md
+    conflicts: []
     triggers:
       - workflow
       - planning
@@ -260,6 +391,8 @@ skills:
     cost:
       estimated_tokens: 1800
       context_load: medium
+    priority:
+      runtime: medium
     entrypoint: workflow/README.md
     summary: null
     related: []
@@ -267,6 +400,13 @@ skills:
   - id: tool-adapters
     name: Tool Adapters
     description: AI 工具（Claude Code、Cursor 等）的配置、同步、使用方式
+    weight: 0.5
+    domains:
+      - tool-configuration
+      - ide-integration
+      - sync-management
+    dependencies: []
+    conflicts: []
     triggers:
       - tool
       - claude
@@ -278,6 +418,8 @@ skills:
     cost:
       estimated_tokens: 1200
       context_load: low
+    priority:
+      runtime: low
     entrypoint: ai-tools/README.md
     summary: null
     related:
@@ -287,6 +429,14 @@ skills:
   - id: scripts-automation
     name: Scripts & Automation
     description: 閉環自動化腳本、knowledge runtime refresh、validation
+    weight: 0.5
+    domains:
+      - automation
+      - scripting
+      - ci-cd
+    dependencies:
+      - shared-rules/dependency-reading.md
+    conflicts: []
     triggers:
       - script
       - automation
@@ -298,6 +448,8 @@ skills:
     cost:
       estimated_tokens: 1000
       context_load: low
+    priority:
+      runtime: low
     entrypoint: scripts/README.md
     summary: null
     related:

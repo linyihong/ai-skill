@@ -6,16 +6,46 @@
 
 ### 自動載入入口：`CLAUDE.md`
 
-Claude Code 啟動時會自動讀取根目錄的 `CLAUDE.md`。本庫的 `CLAUDE.md` 只有一行，指向 `README.md`。後續導航由 `README.md` → `shared-rules/README.md` 的結構負責，不在 `CLAUDE.md` 重複任何規則內容。
+Claude Code 啟動時會自動讀取根目錄的 `CLAUDE.md`。本庫的 `CLAUDE.md` 現在實作 **Core Bootstrap 自動載入流程**：
+
+```text
+1. 讀 CORE_BOOTSTRAP.md → 3 條必讀核心規則（~800 tokens）
+2. 讀 README.md → OS layout
+3. 依 task intent 查 skills-index.yaml → 找到對應 skill
+4. 依 activation-rules.yaml → 決定 lazy-load rules
+5. 先讀 knowledge/summaries/ 對應 summary → 需要時才展開全文
+```
+
+這取代了舊的「CLAUDE.md → README.md → shared-rules/README.md (12 rules)」鏈，token 消耗從 ~5000 降至 ~800。
 
 ### 工具配置：`.claude/settings.json`
 
-`.claude/settings.json` 只放 Claude Code 工具本身的設定：
+`.claude/settings.json` 現在包含完整的 bootstrap 與 reference 路徑：
 
-- **permissions**：允許或拒絕的工具權限
-- **hooks**：事件觸發的 shell 命令
+```json
+{
+  "bootstrap": {
+    "core": "CORE_BOOTSTRAP.md",
+    "layout": "README.md",
+    "skill_index": "skills-index.yaml",
+    "activation_rules": "runtime/router/activation-rules.yaml"
+  },
+  "reference": {
+    "token_budget": "runtime/budget/token-budget.yaml",
+    "context_health": "runtime/health/context-health-score.yaml",
+    "circuit_breaker": "runtime/guards/circuit-breaker.yaml",
+    "tool_metadata": "tools/metadata/README.md",
+    "tool_compression": "tools/compression/README.md",
+    "memory_working": "memory/working/README.md",
+    "memory_summary": "memory/summary/README.md",
+    "memory_decision": "memory/decision/README.md",
+    "decisions": "decisions/README.md",
+    "anti_patterns": "anti-patterns/README.md"
+  }
+}
+```
 
-**不放在這裡：** bootstrap 規則清單、情境路由、架構層級、任何規則參照或引用。這些由 `README.md` 與 `shared-rules/README.md` 管理。
+**設定一次 repo 即可**：只要 clone 本 repo，Claude Code 啟動時自動讀 `CLAUDE.md` → Core Bootstrap → skills-index.yaml，不需要每次手動指定。
 
 ## Claude 操作注意
 

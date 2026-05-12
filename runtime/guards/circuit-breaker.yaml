@@ -1,0 +1,79 @@
+# AI Runtime Circuit Breaker
+# 防止 agent 陷入遞迴循環、tool explosion、context 失控。
+# Agent 在每個 action 前檢查 breaker 狀態。
+
+circuit_breaker_version: v1
+status: candidate
+owner_layer: runtime/guards
+
+# --- Recursive Depth Guard ---
+recursive_depth:
+  description: 防止 agent 在同一 task 中無限遞迴
+  max_depth: 4                # 最多 4 層遞迴
+  reset_condition: task_completed
+  on_exceed:
+    - action: halt_agent
+      message: "⛔ Recursive depth exceeded ({depth}/{max_depth}). Agent halted."
+    - action: suggest_decomposition
+      message: "建議將目前 task 拆解為更小的子任務，使用 .agent-goals/ 管理。"
+
+# --- Tool Call Guard ---
+tool_calls:
+  description: 防止 tool 呼叫爆炸（search → search → search loop）
+  max_calls_per_task: 20      # 每個 task 最多 20 次 tool call
+  max_calls_per_session: 100  # 每個 session 最多 100 次 tool call
+  window_minutes: 5           # 在 5 分鐘內檢查呼叫頻率
+  max_calls_per_window: 15    # 5 分鐘內最多 15 次
+  on_exceed:
+    - action: warn
+      message: "⚠️ Tool call rate high ({calls}/{max_calls_per_window} in {window_minutes}m). 請確認是否陷入 tool loop。"
+    - action: suggest_consolidate
+      message: "建議合併多個 tool call 為一次綜合查詢。"
+
+# --- Context Growth Guard ---
+context_growth:
+  description: 防止 context 在單一 task 中快速膨脹
+  max_growth_per_task: 0.3    # 單一 task 最多成長 30%
+  max_growth_per_session: 0.8 # 整個 session 最多成長 80%
+  check_interval: task_boundary
+  on_exceed:
+    - action: warn
+      message: "⚠️ Context growth exceeded ({growth}/{max_growth}). 建議 prune 或建立新 session。"
+    - action: force_prune
+      strategy: moderate
+
+# --- Hallucination Risk Guard ---
+hallucination_risk:
+  description: 偵測高 hallucination 風險情境
+  risk_factors:
+    - factor: stale_summary
+      weight: 0.3
+      signal: summary 與 source 不一致
+    - factor: conflicting_rules
+      weight: 0.3
+      signal: 多條規則對同一情境有不同指示
+    - factor: insufficient_source
+      weight: 0.2
+      signal: 未讀 canonical source 就做出結論
+    - factor: tool_output_truncated
+      weight: 0.2
+      signal: tool output 被截斷但 agent 仍做判斷
+  risk_threshold: 0.7
+  on_exceed:
+    - action: halt_agent
+      message: "⛔ Hallucination risk score: {score}. Agent halted. 請先讀取 canonical source 再繼續。"
+    - action: suggest_source_reading
+      message: "建議先讀取以下 canonical source：{sources}"
+
+# --- Conflict Rules Guard ---
+conflict_rules:
+  description: 偵測目前 context 中的規則衝突
+  check_on: task_start
+  sources:
+    - shared-rules/rule-weight.md
+    - shared-rules/README.md
+  on_conflict:
+    - action: warn
+      message: "⚠️ 偵測到規則衝突。依 rule-weight.md 判斷優先序。"
+    - action: suggest_resolution
+      message: "P0（安全/source）> P1（validation）> P2（user goal）> P3（tool adapter）> P4（efficiency）"
