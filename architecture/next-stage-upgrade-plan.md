@@ -180,6 +180,56 @@
 
 ### ✅ 已完成：Phase 28 — Technique → Intelligence Pilot（flutter-dart-aot）
 
+---
+
+### ✅ 已完成：Phase 29 — 其餘 3 個 Techniques Decomposition
+
+**目標**：將 http-api、local-proxy、media-hls 三個 technique 比照 flutter-dart-aot 模式拆解。
+
+**實際執行結果**：
+
+1. **http-api decomposition**：
+   - Workflow → `analysis/apk/workflows/http-api-documentation-flow.md`（7 步驟操作流程：API Entry → Group Index → Per-API Detail → Coverage/Gap Matrix → SDK Mapping → Finish Gate → UI Automation）
+   - Intelligence → `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`（何時開始、何時完成、Field Confidence 判斷）
+   - 舊檔案已標註：`skills/apk-analysis/techniques/http-api/README.md`、`analysis/apk/techniques/http-api.md`
+
+2. **local-proxy decomposition**：
+   - Workflow → `analysis/apk/workflows/local-proxy-hook-flow.md`（6 步驟操作流程：確認證據 → 識別 Handler → Hook → Cast Netty → 去敏 → 歸因）
+   - Intelligence → `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`（Local Proxy vs TLS Pinning 判斷表）
+   - Intelligence → `intelligence/engineering/apk-analysis/signals/local-proxy-detection.md`（主要/次要/排除信號表）
+   - 舊檔案已標註：`skills/apk-analysis/techniques/local-proxy/README.md`、`analysis/apk/techniques/local-proxy.md`
+
+3. **media-hls decomposition**：
+   - Workflow → `analysis/apk/workflows/media-hls-analysis-flow.md`（7 步驟操作流程：分離控制面/資料面 → Playlist → Key → Segments → 合併 → 容器驗證）
+   - Intelligence → `intelligence/engineering/apk-analysis/signals/media-type-detection.md`（Magic Bytes 參考表、靜態 vs 動畫判斷、Container Probe 指令）
+   - 舊檔案已標註：`skills/apk-analysis/techniques/media-hls/README.md`、`analysis/apk/techniques/media-hls.md`
+
+**成功驗證標準**：
+- ✅ 每個 technique 至少有 1 個 workflow 檔案 + 1-2 個 intelligence atoms
+- ✅ 舊 technique 檔案已標註 `# Intelligence Extracted`
+- ✅ `analysis/apk/README.md` 和 `intelligence/engineering/apk-analysis/README.md` 待更新
+- ⏳ `knowledge/indexes/README.md` 和 `knowledge/runtime/routing-registry.yaml` 待更新
+
+**新增檔案**（7 個）：
+- `analysis/apk/workflows/http-api-documentation-flow.md`
+- `analysis/apk/workflows/local-proxy-hook-flow.md`
+- `analysis/apk/workflows/media-hls-analysis-flow.md`
+- `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`
+- `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`
+- `intelligence/engineering/apk-analysis/signals/local-proxy-detection.md`
+- `intelligence/engineering/apk-analysis/signals/media-type-detection.md`
+
+**更新檔案**（6 個）：
+- `skills/apk-analysis/techniques/http-api/README.md`
+- `skills/apk-analysis/techniques/local-proxy/README.md`
+- `skills/apk-analysis/techniques/media-hls/README.md`
+- `analysis/apk/techniques/http-api.md`
+- `analysis/apk/techniques/local-proxy.md`
+- `analysis/apk/techniques/media-hls.md`
+
+---
+
+
 Phase 28 是策略轉折點：從「搬遷內容」轉為「拆解 techniques，workflow 進 analysis/，intelligence 進 intelligence/」。
 
 #### 策略摘要
@@ -231,7 +281,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 | Phase | 優先級 | 目標 | 主要產出 | 依賴 |
 |-------|--------|------|----------|------|
-| **Phase 29** | P1 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/` | Phase 28（pilot 模式已驗證） |
+| **Phase 29** | P1 | ✅ 已完成 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/apk-analysis/{heuristics,signals}/` | Phase 28（pilot 模式已驗證） |
 | **Phase 30** | P1 | Feedback history 提取到 feedback/ 層 | `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/extraction/`，建立 category index | Phase 29（techniques 完成後，feedback 可對應到已建立的 workflow/intelligence） |
 | **Phase 31** | P2 | Pilot 驗證 + Intelligence Extraction Pipeline 抽象化 | 在實際 APK analysis session 中驗證 intelligence atoms 是否改善 AI 決策品質；從 pilot 經驗提煉出可重複的 extraction pipeline | Phase 29（所有 techniques 完成後才有足夠經驗） |
 | **Phase 32** | P2 | SKILL.md 分解 | 將各 skill 的 `SKILL.md` 中剩餘內容（Quick Start、Default Workflow、Output Style、Feedback Loop）提取到對應新層 | Phase 30（feedback 提取完成） |
@@ -239,38 +289,19 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 ---
 
-#### Phase 29：其餘 3 個 Techniques Decomposition
+#### Phase 29：其餘 3 個 Techniques Decomposition ✅ 已完成
 
 **目標**：將 http-api、local-proxy、media-hls 三個 technique 比照 flutter-dart-aot 模式拆解。
 
-**執行步驟**：
+**實際產出**：
 
-1. **http-api decomposition**：
-   - 分析 `skills/apk-analysis/techniques/http-api/README.md` 和 `analysis/apk/techniques/http-api.md`
-   - 拆出 workflow 部分 → `analysis/apk/workflows/http-api-flow.md`（API 文件化流程、UI automation、finish gate）
-   - 拆出 intelligence 部分 → `intelligence/engineering/apk-analysis/heuristics/api-documentation-heuristic.md`（何時該用 UI automation vs. manual capture）
-   - 拆出 failure 部分 → `intelligence/engineering/apk-analysis/failure/api-catalog-incomplete.md`（API catalog 不完整的診斷方式）
-   - 在舊 technique 檔案標註 `# Intelligence Extracted`
+| Technique | Workflow | Intelligence Atoms |
+|-----------|----------|-------------------|
+| http-api | `analysis/apk/workflows/http-api-documentation-flow.md` | `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md` |
+| local-proxy | `analysis/apk/workflows/local-proxy-hook-flow.md` | `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md` + `intelligence/engineering/apk-analysis/signals/local-proxy-detection.md` |
+| media-hls | `analysis/apk/workflows/media-hls-analysis-flow.md` | `intelligence/engineering/apk-analysis/signals/media-type-detection.md` |
 
-2. **local-proxy decomposition**：
-   - 分析 `skills/apk-analysis/techniques/local-proxy/README.md` 和 `analysis/apk/techniques/local-proxy.md`
-   - 拆出 workflow 部分 → `analysis/apk/workflows/local-proxy-flow.md`（proxy 設定、handler hook flow、冷啟動導流）
-   - 拆出 intelligence 部分 → `intelligence/engineering/apk-analysis/heuristics/proxy-routing-heuristic.md`（何時該用 local proxy vs. global VPN vs. WiFi proxy）
-   - 拆出 failure 部分 → `intelligence/engineering/apk-analysis/failure/proxy-tls-handshake-failure.md`（TLS handshake 失敗的診斷）
-   - 在舊 technique 檔案標註 `# Intelligence Extracted`
-
-3. **media-hls decomposition**：
-   - 分析 `skills/apk-analysis/techniques/media-hls/README.md` 和 `analysis/apk/techniques/media-hls.md`
-   - 拆出 workflow 部分 → `analysis/apk/workflows/media-hls-flow.md`（媒體鏈分析流程、控制面/金鑰面/資料面）
-   - 拆出 intelligence 部分 → `intelligence/engineering/apk-analysis/heuristics/media-chain-heuristic.md`（媒體鏈完整性判斷）
-   - 拆出 failure 部分 → `intelligence/engineering/apk-analysis/failure/media-stream-decoding-failure.md`（媒體串流解碼失敗診斷）
-   - 在舊 technique 檔案標註 `# Intelligence Extracted`
-
-**成功驗證標準**：
-- 每個 technique 至少有 1 個 workflow 檔案 + 1-2 個 intelligence atoms
-- 舊 technique 檔案已標註 `# Intelligence Extracted`
-- `analysis/apk/README.md` 和 `intelligence/engineering/apk-analysis/README.md` 已更新
-- `knowledge/indexes/README.md` 和 `knowledge/runtime/routing-registry.yaml` 可 route 到新路徑
+**注意**：http-api 和 media-hls 的決策智慧較少，未產生獨立的 failure atom；local-proxy 因涉及 routing 判斷，產生了 2 個 intelligence atoms（heuristic + signals）。
 
 ---
 
@@ -1115,7 +1146,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 建立 Anti-patterns | `anti-patterns/README.md` + 5 patterns | 已完成 5 個 anti-pattern 文件 | 失效模式可主動辨識與避免 |
 | P1 | done | 升級 Skills Metadata v2 | `skills-index.yaml` | 已完成所有 13 skills 加入 weight/domains/dependencies/conflicts/priority.runtime | Skill relevance scoring 與 conflict detection 可運作 |
 | P1 | done | 重建 intelligence/ 為專家智慧層 | `intelligence/README.md`, `intelligence/engineering/{architecture,domain,failure,heuristics,anti-patterns,tradeoffs,distributed-systems}/`, `intelligence/business/`, `intelligence/travel/` | 已完成 9 子目錄結構與 scope 定義，尚未填充實際 atoms | 每個子目錄有 README.md 定義核心、範例內容、與其他層的關係；與根 `anti-patterns/` 邊界已明確定義 |
-| P1 | pending | Phase 29：其餘 3 個 techniques decomposition | `analysis/apk/workflows/`, `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/` | 比照 flutter-dart-aot 模式拆解 http-api、local-proxy、media-hls | 每個 technique 有 workflow + 1-2 intelligence atoms，舊檔案已標註 |
+| P1 | done | Phase 29：其餘 3 個 techniques decomposition | `analysis/apk/workflows/`, `intelligence/engineering/apk-analysis/{heuristics,signals}/` | 已完成 http-api、local-proxy、media-hls 拆解（3 workflows + 4 intelligence atoms） | 每個 technique 有 workflow + 1-2 intelligence atoms，舊檔案已標註 |
 | P1 | pending | Phase 30：Feedback history 提取 | `feedback/extraction/` | 將 apk-analysis 和 app-development-guidance 的 feedback_history 提取到 feedback/ 層 | Category index 已建立，至少 50% lessons 已對應到目標層 |
 | P2 | pending | Phase 31：Pilot 驗證 + Intelligence Extraction Pipeline | `governance/lifecycle/intelligence-extraction-pipeline.md` | 驗證 intelligence atoms 改善決策品質，抽象出可重複的 extraction pipeline | Pilot 驗證報告 + pipeline 文件已建立 |
 | P2 | pending | Phase 32：SKILL.md 分解 | `runtime/onboarding/`, `workflow/`, `feedback/` | 將 apk-analysis 和 app-development-guidance 的 SKILL.md 拆解到對應層 | SKILL.md 中所有內容已對應到目標層，舊檔案已標註 |

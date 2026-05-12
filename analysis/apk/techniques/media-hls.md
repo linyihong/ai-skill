@@ -1,5 +1,10 @@
 # Media / HLS Techniques
 
+> **Intelligence Extracted**
+> See:
+> - `analysis/apk/workflows/media-hls-analysis-flow.md`（HOW TO DO 操作流程）
+> - `intelligence/engineering/apk-analysis/signals/media-type-detection.md`（媒體類型偵測信號）
+
 Use this category when the target flow involves video, audio, images, playlists, media keys, segments, or container validation.
 
 > **相容性規則**：`skills/apk-analysis/techniques/media-hls/` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。

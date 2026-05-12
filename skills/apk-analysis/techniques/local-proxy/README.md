@@ -1,5 +1,11 @@
 # Local Proxy / Loopback Techniques
 
+> **Intelligence Extracted**
+> See:
+> - `analysis/apk/workflows/local-proxy-hook-flow.md`（HOW TO DO 操作流程）
+> - `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`（路由診斷啟發式）
+> - `intelligence/engineering/apk-analysis/signals/local-proxy-detection.md`（本機代理偵測信號）
+
 Use this category when app traffic first goes through a local loopback bridge, local proxy server, Netty handler, embedded TUN/VPN route, or similar in-app routing layer.
 
 ## When To Use

@@ -1,5 +1,10 @@
 # HTTP API Documentation Techniques
 
+> **Intelligence Extracted**
+> See:
+> - `analysis/apk/workflows/http-api-documentation-flow.md`（HOW TO DO 操作流程）
+> - `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`（API 文件完整性啟發式）
+
 Use this category when the current task is to document, replay, validate, or map HTTP/HTTPS APIs. It applies whether the API was observed through MITM, Frida hooks, local proxy handlers, Flutter/Dart interceptors, or offline fixtures.
 
 > **相容性規則**：`skills/apk-analysis/techniques/http-api/` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
