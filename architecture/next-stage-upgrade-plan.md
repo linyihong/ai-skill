@@ -158,11 +158,23 @@
 | [`runtime/onboarding/apk-analysis-completion.md`](runtime/onboarding/apk-analysis-completion.md) | 完成定義、第一輪分析順序 |
 | [`runtime/onboarding/README.md`](runtime/onboarding/README.md) | 目錄索引與 scope 定義 |
 
+### ✅ 已完成：Phase 26 — Extract app-development-guidance subdirectories
+
+從 `skills/app-development-guidance/` 的 `implementation/`、`platforms/`、`languages/`、`controls/`、`checklists/` 子目錄提取內容到對應的新分層：
+
+| 新文件 | 目標層 | 原始來源 | 說明 |
+|--------|--------|----------|------|
+| [`analysis/app-development-guidance/controls-catalog.md`](../analysis/app-development-guidance/controls-catalog.md) | `analysis/` | `skills/app-development-guidance/controls/` | 6 種跨平台安全控制（API Transport、Auth & Session、Local Storage、Logging & Telemetry、Anti-Tamper、Release Build） |
+| [`analysis/app-development-guidance/implementation-catalog.md`](../analysis/app-development-guidance/implementation-catalog.md) | `analysis/` | `skills/app-development-guidance/implementation/` | 5 類實作模式（Backend、Mobile、Embedded、Tooling、Examples）與 contract-to-implementation 映射流程 |
+| [`analysis/app-development-guidance/platforms-catalog.md`](../analysis/app-development-guidance/platforms-catalog.md) | `analysis/` | `skills/app-development-guidance/platforms/` | 4 類平台指引（Mobile、Web、Backend、Embedded） |
+| [`analysis/app-development-guidance/languages-catalog.md`](../analysis/app-development-guidance/languages-catalog.md) | `analysis/` | `skills/app-development-guidance/languages/` | 4 類語言陷阱（Dart、Kotlin/Java、Swift、TypeScript） |
+| [`workflow/app-development-guidance/review-checklists.md`](../workflow/app-development-guidance/review-checklists.md) | `workflow/` | `skills/app-development-guidance/checklists/` | 6 種審查 checklist（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
+
 ### 尚未完成的下一階段
 
 - **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `SKILL.md` 仍為 skill-local。
 - **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建，但更多 skill 內容需要提取到新分層。
-- **更多 skill 內容可提取**：`skills/app-development-guidance/` 的 `implementation/`、`platforms/`、`languages/`、`controls/`、`checklists/` 子目錄尚未提取到對應的 `analysis/` 或 `intelligence/` 層。
+- **更多 skill 內容可提取**：`skills/app-development-guidance/` 的 `process/` 子目錄尚未提取。`skills/apk-analysis/` 的 `techniques/` 子目錄已提取 catalog 至 `analysis/apk/techniques/`，但個別 technique 文件尚未提取。
 
 ## 核心問題
 
