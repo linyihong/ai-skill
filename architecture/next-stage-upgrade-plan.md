@@ -2,6 +2,8 @@
 
 本文件是下一階段架構升級規劃書。它承接 [`ai-native-knowledge-operating-system.md`](ai-native-knowledge-operating-system.md) 的 reference-first、goal ledger、failure learning、rule weight 與 close-loop 基礎，規劃如何從現有 skill-centered repository 演進成 AI Knowledge Runtime System。
 
+> **⚠️ 成本優化補充規劃**：本文件專注於架構分層與遷移路徑。關於 **token 成本優化、Bootstrap 極小化、Rule lazy-load、Summary layer、Context TTL** 等立即省錢措施，請見獨立的 [`context-cost-optimization-plan.md`](context-cost-optimization-plan.md)。兩份文件互補，建議先讀成本優化規劃再讀本文件。
+
 ## 目前走到哪裡
 
 已完成的基礎層：
