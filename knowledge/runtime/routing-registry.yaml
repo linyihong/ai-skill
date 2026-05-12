@@ -364,6 +364,38 @@ records:
       compression_level: index-only
       reason: Router flow 是設計文件，需要 routing 決策時才讀。
 
+  - id: route.intelligence.engineering.heuristics
+    task_intent: 套用通用工程經驗法則（field confidence、magic bytes、premature optimization 等）
+    primary_source: intelligence/engineering/heuristics/README.md
+    required_dependencies:
+      - intelligence/engineering/README.md
+    candidate_sources:
+      - intelligence/engineering/heuristics/field-confidence-judgment.md
+      - intelligence/engineering/heuristics/magic-bytes-reference.md
+      - intelligence/engineering/heuristics/premature-optimization.md
+      - intelligence/engineering/heuristics/abstraction-threshold.md
+      - intelligence/engineering/heuristics/retry-smell.md
+      - intelligence/engineering/heuristics/single-responsibility-heuristic.md
+      - intelligence/engineering/heuristics/test-driven-heuristic.md
+      - knowledge/graphs/intelligence-heuristics.yaml
+    source_of_truth_gate: design-layer-only
+    ranking_reason: 通用工程 heuristics 不依賴特定 skill entrypoint，可直接從 intelligence 層載入。
+    validation_signal: 各 atom 有明確原則與決策表，可反查驗證。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 1500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: 通用 heuristics 在需要對應判斷時才讀取完整 atom。
+
   - id: route.runtime.context-ttl-doc
     task_intent: 了解 context TTL 與 prune 策略
     primary_source: runtime/context/README.md

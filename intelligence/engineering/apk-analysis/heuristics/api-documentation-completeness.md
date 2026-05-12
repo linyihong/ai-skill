@@ -1,5 +1,7 @@
 # API Documentation Completeness Heuristic（API 文件完整性啟發式）
 
+> **Cross-Domain Promotion**: Field Confidence 判斷表（confirmed/candidate/needs capture/meaning unknown 等 8 種狀態）已提取到 [`intelligence/engineering/heuristics/field-confidence-judgment.md`](../../heuristics/field-confidence-judgment.md)，適用於任何需要記錄觀測結果的任務。
+
 ## 問題
 
 HTTP API 分析中，何時該開始建立正式 API Catalog？何時可以回報 API-list 任務完成？如何判斷一個 API field 的信心水準？
