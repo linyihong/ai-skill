@@ -18,4 +18,6 @@
 
 ## 目前 atoms
 
-（pilot 階段逐步建立）
+| Atom | 說明 | 來源 |
+|------|------|------|
+| [`early-hook-instability.md`](early-hook-instability.md) | 過早 hook 導致不穩定 — 在 app 初始化完成前 hook 導致 crash 的症狀表與診斷方法 | `skills/apk-analysis/techniques/flutter-dart-aot/README.md` |

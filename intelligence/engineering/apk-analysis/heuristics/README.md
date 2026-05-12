@@ -18,4 +18,8 @@
 
 ## 目前 atoms
 
-（pilot 階段逐步建立）
+| Atom | 說明 | 來源 |
+|------|------|------|
+| [`hook-selection.md`](hook-selection.md) | Hook 策略選擇啟發式 — 根據 signal（Flutter/Dart AOT、Java OkHttp、Socket）選擇 hook 策略的決策表 | `skills/apk-analysis/techniques/flutter-dart-aot/README.md` |
+| [`api-documentation-completeness.md`](api-documentation-completeness.md) | API 文件完整性啟發式 — 何時開始 API Catalog、何時完成、Field Confidence 判斷的決策表 | `skills/apk-analysis/techniques/http-api/README.md` |
+| [`local-proxy-routing-diagnosis.md`](local-proxy-routing-diagnosis.md) | Local Proxy vs TLS Pinning 診斷 — 根據 signal 判斷流量走 local proxy 還是 TLS pinning 的決策表 | `skills/apk-analysis/techniques/local-proxy/README.md` |

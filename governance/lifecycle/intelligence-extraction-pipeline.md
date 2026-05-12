@@ -147,17 +147,30 @@ Step 7: 更新索引（Index Update）
 3. **標註提取狀態**：在每個 lesson 檔案加入 `# Extracted — See <target path>` 標記
 4. **不重新提取內容**：lesson 的內容已經在目標層存在或 lesson 本身就是最終形式
 
-### 3.3 SKILL.md Decomposition（未來 Phase 32）
+### 3.3 SKILL.md Decomposition（Phase 32 ✅ 已驗證）
 
 將 SKILL.md 中的 Quick Start、Default Workflow、Output Style、Feedback Loop 提取到對應新層。
 
-**預計執行步驟**：
+**執行步驟**：
 
 1. Quick Start → `runtime/onboarding/<skill>-quickstart.md`
 2. Default Workflow → 補齊 `workflow/<domain>/execution-flow.md`
 3. Output Style → `workflow/<domain>/artifact-gates.md`
 4. Feedback Loop → `feedback/` 層
 5. SKILL.md 瘦身為純 routing 文件
+
+**實際案例對照**：
+
+| SKILL.md | Quick Start 產出 | Output Style 產出 | 瘦身比例 |
+|----------|-----------------|-------------------|---------|
+| apk-analysis | `runtime/onboarding/apk-analysis-quickstart.md`（步驟 5+7） | `workflow/apk-analysis/artifact-gates.md`（既有） | ~65%（158→55 行） |
+| app-development-guidance | `runtime/onboarding/app-development-guidance-quickstart.md`（15 步驟） | `workflow/app-development-guidance/artifact-gates.md`（既有） | ~51%（132→65 行） |
+| travel-planning | `runtime/onboarding/travel-planning-quickstart.md`（18 步驟） | `workflow/travel-planning/artifact-gates.md`（**新建**） | ~46%（102→55 行） |
+
+**關鍵發現**：
+- `travel-planning` 缺少 `workflow/travel-planning/artifact-gates.md`，需先建立才能提取 Output Style
+- `apk-analysis` 的 Quick Start 步驟 1-4 是 routing（保留），步驟 5+7 是操作內容（提取），步驟 6 是 heuristic（保留），步驟 8 是 feedback（提取）
+- 瘦身後 SKILL.md 保留：header metadata、Shared Policy、When To Use、Out Of Scope、Default Workflow（純 routing）
 
 ---
 
@@ -381,15 +394,16 @@ Extraction 完成後需要更新以下文件：
 |------|---------|-------|------|
 | Technique Decomposition | `skills/*/techniques/*/` | 28-29 | ✅ 已驗證（4 techniques） |
 | Feedback History Extraction | `skills/*/feedback_history/*/` | 30 | ✅ 已驗證（101 lessons） |
-| SKILL.md Decomposition | `skills/*/SKILL.md` | 32（未來） | ⏳ 待執行 |
+| SKILL.md Decomposition | `skills/*/SKILL.md` | 32 | ✅ 已驗證（3 skills） |
+| Skill-Specific Extraction | `skills/*/{CHECKLIST.md,TOOLS.md,README.md}` | 33 | ✅ 已驗證（3 files） |
 
 ### 未來可能擴充的模式
 
 | 模式 | 適用來源 | 預計 Phase | 備註 |
 |------|---------|-----------|------|
-| DOCUMENTATION.md Extraction | `skills/*/DOCUMENTATION.md` | 未來 | 產出規範 → artifact-gates.md |
-| WORKFLOW.md Extraction | `skills/*/WORKFLOW.md` | 未來 | 執行流程 → workflow/execution-flow.md |
-| TOOLS.md Extraction | `skills/*/TOOLS.md` | 未來 | 工具參考 → analysis/tools-and-failures.md |
+| DOCUMENTATION.md Extraction | `skills/*/DOCUMENTATION.md` | 未來 | 產出規範 → artifact-gates.md（travel-planning 已完成） |
+| WORKFLOW.md Extraction | `skills/*/WORKFLOW.md` | 未來 | 執行流程 → workflow/execution-flow.md（apk-analysis + app-development-guidance + travel-planning 已完成） |
+| TOOLS.md Extraction | `skills/*/TOOLS.md` | 未來 | 工具參考 → analysis/tools-and-failures.md（apk-analysis TOOLS.md 尚未提取） |
 | FEEDBACK.md Extraction | `skills/*/FEEDBACK.md` | 未來 | 反饋規則 → feedback/ |
 
 ---

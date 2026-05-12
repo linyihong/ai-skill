@@ -18,4 +18,8 @@
 
 ## 目前 atoms
 
-（pilot 階段逐步建立）
+| Atom | 說明 | 來源 |
+|------|------|------|
+| [`flutter-dart-aot-detection.md`](flutter-dart-aot-detection.md) | Flutter/Dart AOT 辨識信號 — 主要/次要/排除信號表與判斷流程 | `skills/apk-analysis/techniques/flutter-dart-aot/README.md` |
+| [`local-proxy-detection.md`](local-proxy-detection.md) | Local Proxy 偵測信號 — 主要/次要/排除信號表與判斷流程 | `skills/apk-analysis/techniques/local-proxy/README.md` |
+| [`media-type-detection.md`](media-type-detection.md) | 媒體類型偵測信號 — Magic Bytes 參考表、靜態 vs 動畫判斷、Container Probe 指令 | `skills/apk-analysis/techniques/media-hls/README.md` |

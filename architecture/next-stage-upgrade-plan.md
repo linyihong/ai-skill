@@ -485,7 +485,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 - **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。所有內容已提取到新分層，舊檔案已標註提取狀態。舊 skills 的清理時間線定義於 [`governance/lifecycle/README.md`](governance/lifecycle/README.md) 的 Skills Deprecation Timeline（Phase A→D），目前處於 Phase A（不刪除）。
 - **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建。
-- **Intelligence Extraction Pipeline** 已建立（Phase 31），但尚未在實際工作階段中驗證 intelligence atoms 是否改善 AI 決策品質。
+- **Intelligence Extraction Pipeline 實戰驗證（P2）**：✅ 已完成（Phase 32-33 已實際執行 pipeline 的 3 種模式，pipeline 文件已更新狀態表，遺漏的 index 更新已補齊）
 - **Skills Deprecation（遠期）**：所有 3 個 skills 的內容已全部提取到新分層，可考慮進入 Phase B（標記 deprecated）。詳細時間線見 [`governance/lifecycle/README.md`](governance/lifecycle/README.md) 和 [`plans/skill-specific-extraction.md`](plans/skill-specific-extraction.md)。
 
 ### 下一階段 Phase 規劃（29-33）
