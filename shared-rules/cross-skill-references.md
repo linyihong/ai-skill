@@ -48,7 +48,7 @@ Use `../target-skill/` when <specific trigger>. The current skill owns <current 
 
 新增或修改 cross-skill reference 時：
 
-- 更新 referring skill 的 `SKILL.md`，以及相關 `README.md`、`WORKFLOW.md`、`DOCUMENTATION.md` 或 technique file。
+- 更新 referring skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`），以及相關 `README.md`。
 - 若 target skill 需要辨識 incoming handoff，更新 target skill 的入口。
 - 如果該關係變成 recurring repo-wide rule，更新 [`linked-updates.md`](linked-updates.md)。
 - 變更位於 `shared-rules/` 或 `skills/` 時，依 configured tool sync 處理；具體工具命令放在 `ai-tools/`。

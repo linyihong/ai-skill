@@ -24,7 +24,7 @@
 
 範例：`skills/apk-analysis/feedback_history/`；若 skill 已有 `techniques/flutter-dart-aot/` 這類分類，對應 lesson 應放在 `skills/apk-analysis/feedback_history/flutter-dart-aot/`，跨分類或全域規則放 `skills/apk-analysis/feedback_history/common/`。
 
-成熟後可將 lesson 整理進該 skill 的 `WORKFLOW.md`、`TOOLS.md` 或 `DOCUMENTATION.md`（見模板中 **Promotion Target**）。
+成熟後可將 lesson 整理進該 skill 的 `workflow/<domain>/execution-flow.md`、`analysis/<domain>/` 或 `intelligence/<domain>/`（見模板中 **Promotion Target**）。舊結構保留 `WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md` 作為向後相容。
 
 ## 分類規則
 
@@ -108,10 +108,12 @@ Status: candidate | validated | deprecated | promoted | experimental
 
 #### Promotion Target
 
-- `WORKFLOW.md`
-- `TOOLS.md`
-- `DOCUMENTATION.md`
-- `SKILL.md`
+- `workflow/<domain>/execution-flow.md`（新分層）
+- `analysis/<domain>/`（新分層）
+- `intelligence/<domain>/`（新分層）
+- `skills/<name>/WORKFLOW.md`（舊結構，向後相容）
+- `skills/<name>/TOOLS.md`（舊結構，向後相容）
+- `skills/<name>/DOCUMENTATION.md`（舊結構，向後相容）
 
 #### Required Linked Updates
 

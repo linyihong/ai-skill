@@ -21,7 +21,7 @@
 | 位置 | 允許內容 |
 | --- | --- |
 | `ai-tools/<tool>.md` | 工具設定、同步路徑、UI 步驟、hooks、settings 與 troubleshooting。 |
-| `skills/<skill>/tool-adapters/<tool>.md` | 單一工具的 skill-specific 執行差異；核心 skill 仍保持工具中立。 |
+| `tools/adapters/<tool>.md`（新分層）或 `skills/<skill>/tool-adapters/<tool>.md`（舊結構，向後相容） | 單一工具的 skill-specific 執行差異；核心 workflow 仍保持工具中立。 |
 | `.cursor/rules/*.mdc` 等工具設定檔 | 該工具載入的規則。 |
 | 工具專屬 scripts 或 script docs | 只屬於該工具的命令；必要時從通用 docs 連過去。 |
 | Project-local tool files | 若可安全提交到該專案，可放專案專屬 adapter 設定。 |
@@ -32,7 +32,8 @@
 
 - Root `README.md`。
 - `shared-rules/README.md` 索引摘要。
-- Skill `README.md`、`SKILL.md`、`WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md`。
+- 新分層：`workflow/<domain>/`、`analysis/<domain>/`、`intelligence/<domain>/` 下的所有文件。
+- 舊結構（向後相容）：Skill `README.md`、`SKILL.md`、`WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md`。
 - Skill templates 與 `skills/ADDING_SKILLS.md`。
 - Feedback lessons 與可重用 checklists。
 
@@ -56,6 +57,18 @@
 當某個 skill 在不同 AI tools 中有實際執行差異時，使用此模式：
 
 ```text
+# 新分層（優先）
+<domain>/
+  README.md                 # tool-neutral overview
+  execution-flow.md         # tool-neutral workflow
+tools/
+  adapters/
+    README.md               # index of supported adapters
+    <tool>.md               # only the execution differences for that tool
+```
+
+```text
+# 舊結構（向後相容）
 skills/<skill>/
   README.md                 # tool-neutral overview
   WORKFLOW.md               # tool-neutral workflow
@@ -64,7 +77,7 @@ skills/<skill>/
     <tool>.md               # only the execution differences for that tool
 ```
 
-核心 skill 文件像 strategy interface：
+核心 workflow 文件像 strategy interface：
 
 - Trigger conditions。
 - Inputs and outputs。
@@ -86,7 +99,7 @@ skills/<skill>/
 | Scope | 放置位置 |
 | --- | --- |
 | Tool-wide setup、sync、global hooks、UI、settings | `ai-tools/<tool>.md` |
-| 單一工具的 skill-specific 執行差異 | `skills/<skill>/tool-adapters/<tool>.md` |
+| 單一工具的 skill-specific 執行差異 | 新分層：`tools/adapters/<tool>.md`；舊結構：`skills/<skill>/tool-adapters/<tool>.md`（向後相容） |
 | Project-specific tool config | Project docs 或 project tool config |
 | Reusable cross-tool policy | `shared-rules/` |
 

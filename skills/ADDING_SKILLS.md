@@ -13,6 +13,32 @@ Skill **資料夾名稱**建議 **kebab-case**、簡短、穩定（例：`apk-an
 
 ## 2. 目錄結構（建議）
 
+### 新分層結構（優先）
+
+若專案使用三層分離架構，建議：
+
+```text
+workflow/<domain>/
+  README.md             # 給人類的導讀
+  execution-flow.md     # 決策流程
+  artifact-gates.md     # 產出格式與完成定義
+analysis/<domain>/
+  README.md             # 分析方法
+  workflows/            # 操作細節流程
+intelligence/<domain>/
+  README.md             # 決策智慧
+  heuristics/           # 經驗法則
+  anti-patterns/        # 反模式
+  signals/              # 信號偵測
+  failure/              # 失效模式
+tools/
+  adapters/             # 工具策略 adapter（可選）
+feedback/
+  extraction/           # feedback 提取索引
+```
+
+### 舊結構（向後相容）
+
 最小可運作組合：
 
 ```text
@@ -65,7 +91,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 - **連動更新規則**：一律只維護在 **[`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md)**；新增 skill 或修改 skill 結構時，受影響的索引、入口、同步文件、分類文件**必須**同步更新或明確檢查。
 - **文件大小與拆分規則**：一律只維護在 **[`shared-rules/document-sizing.md`](../shared-rules/document-sizing.md)**；skill、技巧分類與寫作規範變大時，用資料夾與 `README.md` 目錄拆分。
 - **中性與低爭議用語**：一律只維護在 **[`shared-rules/neutral-language.md`](../shared-rules/neutral-language.md)**；新增 skill 的標題、description、檔名、slug、索引與摘要都要避免高風險或容易造成 AI/搜尋誤判的詞，改用授權、合規、契約、風險控制等中性語境。
-- **工具中立文件**：一律只維護在 **[`shared-rules/tool-neutral-documentation.md`](../shared-rules/tool-neutral-documentation.md)**；新增 skill 的 README / SKILL / workflow / template 預設不寫特定工具路徑、hook、UI 或同步細節。工具全域做法放到 [`ai-tools/`](../ai-tools/README.md)；若某 skill 對某工具有必要的執行差異，用 Strategy-style adapter 放 `skills/<skill>/tool-adapters/<tool>.md`，只寫差異並連回核心 workflow。
+- **工具中立文件**：一律只維護在 **[`shared-rules/tool-neutral-documentation.md`](../shared-rules/tool-neutral-documentation.md)**；新增 skill 的 README / SKILL / workflow / template 預設不寫特定工具路徑、hook、UI 或同步細節。工具全域做法放到 [`ai-tools/`](../ai-tools/README.md)；若某 skill 對某工具有必要的執行差異，用 Strategy-style adapter 放 `skills/<skill>/tool-adapters/<tool>.md`（舊結構）或 `tools/adapters/<tool>.md`（新分層），只寫差異並連回核心 workflow。
 - **文件 TODO**：一律只維護在 **[`shared-rules/document-todo-list.md`](../shared-rules/document-todo-list.md)**；若新增 skill 文件仍有未完成、待決策、待補強或待驗證項目，在文件前段放 `Document TODO` 表並連到相關章節或 goal。
 - **目標、執行、驗證流程**：一律只維護在 **[`shared-rules/goal-action-validation.md`](../shared-rules/goal-action-validation.md)**；新增 skill 的輸出格式、workflow、documentation 規則要能讓重要結論反查目標、執行、驗證，純判斷題則附參考來源與推論邊界。
 - **依賴文件讀取鐵則**：一律只維護在 **[`shared-rules/dependency-reading.md`](../shared-rules/dependency-reading.md)**；新增、修改或重新讀取 skill 時，必須建立 dependency read ledger，讀 skill 入口、相關 README/workflow/checklist/template、shared-rules 與 linked updates，並把不存在的檔案標成 `not applicable`，不能只讀單一檔案。
@@ -92,6 +118,14 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 建議結構：
 
 ```text
+# 新分層（優先）
+tools/adapters/
+  README.md
+  <tool>.md
+```
+
+```text
+# 舊結構（向後相容）
 skills/<skill-name>/tool-adapters/
   README.md
   <tool>.md

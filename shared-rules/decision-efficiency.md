@@ -31,8 +31,8 @@ Current unknown: <what must be learned or decided next>
 
 1. **Bootstrap：**讀取 shared-rule bootstrap set。
 2. **Task frame：**讀取使用者要求、active `.agent-goals/` entry，以及直接相關的開啟檔案。
-3. **Skill entry：**讀取符合任務的 `SKILL.md` 與其 routing guidance。
-4. **Route-specific docs：**只讀目前路線需要的 workflow/tools/docs 分類。
+3. **Skill entry：**讀取符合任務的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）與其 routing guidance。
+4. **Route-specific docs：**只讀目前路線需要的 workflow/analysis/intelligence 分類。
 5. **Deep references：**只有證據顯示必要時，才讀 examples、techniques、feedback lessons 或 source files。
 
 不要預設讀完每個分類或每個 technique。若需要廣泛讀取，說明為什麼需要廣泛 context，以及它支援哪個決策。

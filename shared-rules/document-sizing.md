@@ -1,6 +1,6 @@
-# 文件大小與拆分
+# 文件大小與拆分（通用規則）
 
-本規則適用於整個 Ai-skill repository：`shared-rules/`、`skills/`、各 skill 的 `techniques/`、`feedback_history/`、模板與新增 skill 教學。目標是讓 agent 只讀到任務相關內容，避免單一 Markdown 檔累積成難維護的大雜燴。
+本規則適用於本庫所有文件，也**可跨專案通用**。目標是讓 agent 只讀到任務相關內容，避免單一 Markdown 檔累積成難維護的大雜燴。無論專案使用何種目錄結構，拆分原則與建議結構皆可直接套用。
 
 ## 原則
 
@@ -19,18 +19,66 @@
 - 寫 skill 的規範、工具教學、工作流、文件模板、feedback lesson 開始互相混在一起。
 - agent 每次都需要讀大量無關內容才能找到當前任務的規則。
 
-## 建議結構
+## 建議結構（通用）
+
+任何主題或類別，建議拆分為：
 
 ```text
-topic-or-category/
+<domain>/
   README.md        # 目錄、路由、何時讀哪個子檔
-  workflow.md      # 流程或決策樹
-  tools.md         # 工具、命令、環境
-  templates.md     # 文件模板
-  examples.md      # 範例，必要時再分類
+  execution-flow.md      # 流程或決策樹
+  artifact-gates.md      # 產出格式與完成定義
+  quickstart.md          # 快速入門（選用）
 ```
 
-對 skill 來說，常見模式：
+若該主題需要更細的分類，可再往下分：
+
+```text
+<domain>/
+  README.md
+  <sub-category>/
+    README.md
+    <specific-flow>.md
+```
+
+### 本庫實際分層範例（可作為其他專案參考）
+
+本庫使用三層分離架構，各層獨立拆分：
+
+```text
+# 操作流程層（HOW TO DO）
+workflow/<domain>/
+  README.md
+  execution-flow.md
+  artifact-gates.md
+
+# 分析方法層（HOW TO DO 的細節）
+analysis/<domain>/
+  README.md
+  workflows/
+    README.md
+    <specific-flow>.md
+
+# 決策智慧層（HOW TO THINK）
+intelligence/<domain>/
+  README.md
+  heuristics/
+    README.md
+    <heuristic>.md
+  anti-patterns/
+    README.md
+    <anti-pattern>.md
+  signals/
+    README.md
+    <signal>.md
+  failure/
+    README.md
+    <failure>.md
+```
+
+### 舊結構（向後相容參考）
+
+若專案仍使用傳統 skill 結構，常見模式：
 
 ```text
 skills/<skill-name>/
