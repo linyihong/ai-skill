@@ -10,7 +10,7 @@
 
 | 發現或修改的項目 | 必須讀取或明確檢查 |
 | --- | --- |
-| 任一 `skills/<name>/SKILL.md` | 該 skill 的 `README.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、`CHECKLIST.md`、`FEEDBACK.md`、相關 `feedback_history/README.md`，以及 `shared-rules/README.md`。不存在的檔案可標記為不適用。 |
+| 任一 `skills/<name>/SKILL.md` | **新分層路徑優先**：先讀對應的 `workflow/<name>/README.md`、`analysis/<name>/README.md`、`intelligence/<domain>/<name>/README.md`（若存在）。再讀舊路徑 `README.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、`CHECKLIST.md`、`FEEDBACK.md`、相關 `feedback_history/README.md`，以及 `shared-rules/README.md`。不存在的檔案可標記為不適用。 |
 | 任一 skill 子文件 | 該 skill 的 `SKILL.md`、最近的目錄 `README.md`、相關 workflow/checklist/template、`shared-rules/linked-updates.md`。 |
 | 任一 `shared-rules/*.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、`shared-rules/rule-weight.md`（若涉及規則衝突、優先序或 default bootstrap）、`shared-rules/reusable-guidance-boundary.md`（若涉及 reusable guidance / incident / feedback）、受影響 skill 的 `SKILL.md` 或模板。 |
 | `shared-rules/tool-neutral-documentation.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、根 `README.md`、`skills/README.md`、`skills/ADDING_SKILLS.md`、各 skill 入口/README、`skills/*/tool-adapters/` 索引、`ai-tools/README.md` 與受影響工具文件。 |
