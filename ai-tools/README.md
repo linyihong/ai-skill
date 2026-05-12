@@ -10,9 +10,28 @@
 |------|------|------|
 | **自動載入入口** | 工具專屬入口檔（如 `CLAUDE.md`、`.cursorrules`） | 一行，指向 `README.md` |
 | **工具配置** | 工具配置檔（如 `.claude/settings.json`） | 僅放 permissions、hooks 等工具特定設定 |
-| **工具使用說明** | `ai-tools/<tool>.md` | 此工具的配置實作與 Claude 特殊操作注意 |
+| **工具使用說明** | `ai-tools/<tool>.md` | 此工具的配置實作與特殊操作注意 |
 | **共用規則** | `shared-rules/` | 所有規則本體，集中管理 |
 | **知識庫入口** | `README.md` | OS layout 與導航，所有工具的共同起點 |
+
+### 工具文件不得重複中央庫內容
+
+`ai-tools/<tool>.md` **只能記錄該工具特有的差異**，不得包含以下已在中央庫可發現的內容：
+
+| ❌ 不應放入工具文件 | ✅ 已在何處 |
+|---|---|
+| Core Bootstrap 流程（讀 CORE_BOOTSTRAP.md → README.md → skills-index.yaml → ...） | [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md) |
+| Pipeline 階段（Bootstrap → Routing → Execution → Close-loop） | [`runtime/pipeline/`](../runtime/pipeline/) |
+| Context expansion 層級（Summary → Module → Detailed → Raw） | [`runtime/pipeline/context-flow.yaml`](../runtime/pipeline/context-flow.yaml) |
+| Relevance scoring 邏輯 | [`runtime/pipeline/relevance-engine.yaml`](../runtime/pipeline/relevance-engine.yaml) |
+| Guard chain 執行順序 | [`runtime/pipeline/guard-chain.yaml`](../runtime/pipeline/guard-chain.yaml) |
+| Token budget 分配表 | [`runtime/budget/token-budget.yaml`](../runtime/budget/token-budget.yaml) |
+| 知識庫路徑對照表（CORE_BOOTSTRAP.md → README.md → skills-index.yaml → ...） | [`README.md`](../README.md) OS layout |
+| 共用規則清單 | [`shared-rules/README.md`](../shared-rules/README.md) |
+| Goal ledger 操作流程 | [`shared-rules/conversation-goal-ledger.md`](../shared-rules/conversation-goal-ledger.md) |
+| Close-loop 流程（commit/push/readback） | [`shared-rules/dependency-reading.md`](../shared-rules/dependency-reading.md) |
+
+**原則**：每個工具文件應假設 reader 已讀過 `README.md` 的 OS layout 與 `CORE_BOOTSTRAP.md` 的啟動流程。工具文件只回答：「這個工具跟其他工具有什麼不同？它的入口檔、配置檔、特殊操作要注意什麼？」
 
 **不應放在工具配置或工具說明中的內容：**
 - Bootstrap 規則清單（由 `shared-rules/README.md` 管理）
@@ -31,10 +50,10 @@ Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating
 
 若某個 skill 對某工具有必要的特殊執行策略，skill 內可用 `skills/<skill>/tool-adapters/<tool>.md` 記錄差異；本目錄仍只放該工具的全域設定、同步與操作方式。
 
-| 工具 | 文件 | 用途 |
+| 工具 | 文件 | 用途（僅記錄該工具特有差異） |
 | --- | --- | --- |
-| Claude | [claude.md](claude.md) | Claude 類工具如何明確讀取 shared rules、skill 入口、依賴文件、goal ledger 與 Ai-skill writeback 流程。 |
-| Cursor | [cursor.md](cursor.md) | Cursor 如何啟用 apk-analysis、參照或同步 `.cursor`、維持中央庫一致性，並以工具中立 `.agent-goals/` 做對話目標閉環提醒。 |
-| Roo Code | [roo.md](roo.md) | Roo Code（VS Code AI extension）如何設定 custom instructions、modes、file restrictions，以及與 runtime pipeline 的整合。 |
+| Claude | [claude.md](claude.md) | `CLAUDE.md` 自動載入入口、`.claude/settings.json` 工具配置、tool adapter 機制。 |
+| Cursor | [cursor.md](cursor.md) | `.cursor/rules/*.mdc` 自動載入、reference/symlink/copy 三種同步策略、`.cursor/hooks.json` 設定、`.agent-goals/` 閉環提醒。 |
+| Roo Code | [roo.md](roo.md) | Custom instructions 手動設定、多 modes 與 file restrictions、`.roomodes` 自訂 mode 定義、VS Code 多資料夾工作區協作。 |
 
 ← [回到根目錄](../README.md)
