@@ -661,14 +661,22 @@ knowledge/runtime/
 
 ### Phase 4：Workflow / Intelligence 分離
 
-Status: `architecture/apk-analysis-pilot-migration.md` 已建立 mapping plan；候選 reference-first 目的地已建立，尚未 bulk migrate skill content。
+Status: `apk-analysis` pilot 已完成 content extraction（6 個新檔案）；`intelligence/` 已重建為 9 個子目錄的專家智慧層；舊 `skills/apk-analysis/` 仍為 active entrypoint，未搬移或刪除。
 
-第一個示範對象建議使用 `apk-analysis`：
+已完成項目：
 
-- `analysis/apk/`：保留觀察、拆解、traffic/runtime 分析方法。
-- `workflow/apk-analysis/`：保留 agent 執行流程、task decomposition、review flow。
-- `intelligence/engineering/failure/`：抽取反覆失效模式與 anti-pattern。
-- `intelligence/engineering/architecture/`：抽取架構與 trade-off lessons。
+- `analysis/apk/`：已提取 traffic triage 與 tools/failures 兩份分析文件。
+- `workflow/apk-analysis/`：已提取 execution flow 與 artifact gates 兩份工作流程文件。
+- `intelligence/engineering/apk-analysis/`：已提取 evidence-first-routing 與 live-readiness-gates 兩個 validated-intelligence atoms。
+- `intelligence/` 重建為 9 個子目錄（architecture、domain、failure、heuristics、anti-patterns、tradeoffs、distributed-systems、business、travel），每個有 README.md 定義 scope。
+- `knowledge/indexes/README.md`：新增 4 條 routing entries 指向新提取檔案。
+- `architecture/apk-analysis-pilot-migration.md`：狀態更新為 `content-extracted`。
+
+尚未完成：
+
+- 將 `skills/apk-analysis/` 中更多內容（techniques/、feedback_history/）逐步提取到對應新層。
+- 將 `skills/app-development-guidance/` 的 implementation 與 controls 提取到 intelligence。
+- 將 `shared-rules/failure-patterns/` 中偏工程判斷的 pattern 摘要提取到 intelligence。
 
 ### Phase 5：Runtime / Models
 
@@ -702,7 +710,7 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P1 | done | 建立 top-level architecture directories | `analysis/`, `intelligence/`, `workflow/`, `runtime/`, `memory/`, `feedback/`, `models/`, `governance/`, `knowledge/`, `metadata/` | 已完成 | 每個目錄責任邊界清楚，不搬移大量內容 |
 | P2 | done | 設計 metadata schema | `metadata/schema.md` | 已完成 | Schema 可套用到第一批 Knowledge Atom |
 | P2 | done | 建立 knowledge navigation index | `knowledge/indexes/README.md` | 已完成 | Agent 能從 index 找到 task-relevant knowledge |
-| P2 | done | 遷移第一個 skill 作為示範 | `architecture/apk-analysis-pilot-migration.md`, `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/apk-analysis/` | 已完成 pilot map；未 bulk migrate | 舊入口仍可用，新路徑可被 reference-first 找到 |
+| P2 | done | 遷移第一個 skill 作為示範 | `architecture/apk-analysis-pilot-migration.md`, `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/apk-analysis/` | 已完成 content extraction（6 files），舊入口仍 active | 舊入口仍可用，新路徑可被 reference-first 找到 |
 | P1 | done | 建立新分層運作流程 | `governance/`, `metadata/`, `runtime/routing/`, `knowledge/` | 已完成第一版流程與格式 | 舊 `skills/` 維持 source of truth，新分層可作 routing / promotion / validation surface |
 | P1 | done | 規範 active goal 與 durable roadmap 邊界 | `shared-rules/conversation-goal-ledger.md`, `shared-rules/content-layering.md`, `governance/lifecycle/README.md` | 已完成 | `.agent-goals/` 不作長期 archive；刪除 active goal 前需回寫 durable planning |
 | P1 | done | 建立 machine-readable routing registry | `knowledge/runtime/routing-registry.yaml`, `runtime/routing/README.md` | 已完成第一版 registry 與 8 筆 sample routing records | Runtime 可用結構化資料從 task intent 找到 primary source、dependencies、candidate summaries 與 validation signal |
@@ -730,6 +738,7 @@ Status: `runtime/routing/README.md` 已建立 context routing 流程；`knowledg
 | P1 | done | 建立 Decision System（ADR） | `decisions/README.md` | 已完成 ADR lifecycle、naming convention | 架構決策有記錄，避免重複討論 |
 | P1 | done | 建立 Anti-patterns | `anti-patterns/README.md` + 5 patterns | 已完成 5 個 anti-pattern 文件 | 失效模式可主動辨識與避免 |
 | P1 | done | 升級 Skills Metadata v2 | `skills-index.yaml` | 已完成所有 13 skills 加入 weight/domains/dependencies/conflicts/priority.runtime | Skill relevance scoring 與 conflict detection 可運作 |
+| P1 | done | 重建 intelligence/ 為專家智慧層 | `intelligence/README.md`, `intelligence/engineering/{architecture,domain,failure,heuristics,anti-patterns,tradeoffs,distributed-systems}/`, `intelligence/business/`, `intelligence/travel/` | 已完成 9 子目錄結構與 scope 定義，尚未填充實際 atoms | 每個子目錄有 README.md 定義核心、範例內容、與其他層的關係；與根 `anti-patterns/` 邊界已明確定義 |
 
 ## 最終目標
 
