@@ -335,3 +335,57 @@ records:
       profile: large
       compression_level: source-backed
       reason: 修改 model strategy 會影響 runtime routing，需讀 profiles、compression 與 routing source。
+
+  - id: route.runtime.router-flow
+    task_intent: 了解 context routing 決策流程
+    primary_source: runtime/router/README.md
+    required_dependencies:
+      - runtime/router/activation-rules.yaml
+      - runtime/context/ttl-policy.yaml
+    candidate_sources:
+      - skills-index.yaml
+      - knowledge/summaries/runtime-operations.md
+      - knowledge/runtime/README.md
+    source_of_truth_gate: design-layer-only
+    ranking_reason: runtime/router/README.md 定義完整的 routing decision flow（Bootstrap → Layout → Skill routing → Rule activation → Summary → Full source）。
+    validation_signal: Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 400
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: Router flow 是設計文件，需要 routing 決策時才讀。
+
+  - id: route.runtime.context-ttl-doc
+    task_intent: 了解 context TTL 與 prune 策略
+    primary_source: runtime/context/README.md
+    required_dependencies:
+      - runtime/context/ttl-policy.yaml
+    candidate_sources:
+      - knowledge/summaries/runtime-operations.md
+      - knowledge/runtime/README.md
+    source_of_truth_gate: design-layer-only
+    ranking_reason: runtime/context/README.md 定義 TTL 類型、prune 策略與觸發條件。
+    validation_signal: TTL policy 已套用，prune strategy 已理解。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 300
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: TTL doc 是設計文件，需要 prune context 時才讀。

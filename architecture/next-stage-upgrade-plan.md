@@ -30,6 +30,21 @@
 - `knowledge/runtime/refresh-policy.yaml` 已建立 generated summaries / graphs / registry refresh 流程，定義 refresh、revalidate、downgrade 與 no update needed。
 - `knowledge/runtime/sqlite/README.md` 與 `scripts/generate-runtime-sqlite-index.rb` / `query-runtime-index.rb` / `validate-runtime-sqlite-index.rb` 已建立 SQLite / FTS runtime index prototype，作為低 token 搜尋候選 source 的 generated cache，不作 source-of-truth。
 
+### ✅ 已完成：Context Cost Optimization（Phase 1）
+
+以下為 [`context-cost-optimization-plan.md`](context-cost-optimization-plan.md) 中已完成的項目：
+
+- **Bootstrap 極小化**：`CORE_BOOTSTRAP.md` 建立（3 rules, ~800 tokens），取代舊 Default Bootstrap（12 rules, ~5000 tokens）。
+- **README 拆分**：根 `README.md` 縮短為 ~80 行超短入口。
+- **Rule Lazy-load 機制**：`shared-rules/README.md` 引入 Runtime Activation Model，15 條 lazy-load rules 定義觸發條件。
+- **Skill Index**：`skills-index.yaml` 建立（13 skills，含 triggers、cost metadata、entrypoint、summary path）。
+- **Runtime Router**：`runtime/router/activation-rules.yaml`（15 activation rules）、`runtime/router/README.md`（routing decision flow）。
+- **Context TTL**：`runtime/context/ttl-policy.yaml`（20 context types）、`runtime/context/README.md`（prune strategy）。
+- **Context Cost Metadata**：`metadata/schema.md` 的 `context_cost` 升級為 object（estimated_tokens、load_strategy、cacheable、ttl）。
+- **Routing Registry 升級**：`knowledge/runtime/routing-registry.yaml` 升級 v2，所有 records 含 cost metadata。
+- **Summary Layer 擴充**：新增 8 個 summaries（app-development-guidance、travel-planning、repo-governance、knowledge-navigation、runtime-operations、model-routing、memory-operations、context-cost-optimization），總數從 6 → 14。
+- **Knowledge Index 更新**：`knowledge/indexes/README.md` 加入 `skills-index.yaml` 作為首要路由。
+
 尚未完成的下一階段：
 
 - 尚未建立上述分層的完整子目錄；`apk-analysis` 已有第一個 intelligence 示範遷移內容。

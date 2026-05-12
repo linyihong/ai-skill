@@ -64,7 +64,7 @@ skills:
       estimated_tokens: 3500
       context_load: medium
     entrypoint: skills/app-development-guidance/SKILL.md
-    summary: null
+    summary: knowledge/summaries/app-development-guidance.md
     related:
       - skills/app-development-guidance/README.md
       - skills/app-development-guidance/checklists/README.md
@@ -86,7 +86,7 @@ skills:
       estimated_tokens: 2800
       context_load: medium
     entrypoint: skills/travel-planning/SKILL.md
-    summary: null
+    summary: knowledge/summaries/travel-planning.md
     related:
       - skills/travel-planning/README.md
 
@@ -108,7 +108,7 @@ skills:
       estimated_tokens: 2000
       context_load: medium
     entrypoint: governance/README.md
-    summary: null
+    summary: knowledge/summaries/repo-governance.md
     related:
       - architecture/next-stage-upgrade-plan.md
       - architecture/context-cost-optimization-plan.md
@@ -130,7 +130,7 @@ skills:
       estimated_tokens: 1500
       context_load: low
     entrypoint: knowledge/README.md
-    summary: null
+    summary: knowledge/summaries/knowledge-navigation.md
     related:
       - knowledge/indexes/README.md
       - knowledge/summaries/README.md
@@ -170,7 +170,7 @@ skills:
       estimated_tokens: 1200
       context_load: low
     entrypoint: models/README.md
-    summary: null
+    summary: knowledge/summaries/model-routing.md
     related:
       - models/profiles/README.md
       - models/compression/README.md
@@ -190,7 +190,7 @@ skills:
       estimated_tokens: 1600
       context_load: medium
     entrypoint: runtime/README.md
-    summary: null
+    summary: knowledge/summaries/runtime-operations.md
     related:
       - runtime/routing/README.md
       - knowledge/runtime/routing-registry.yaml
@@ -209,7 +209,7 @@ skills:
       estimated_tokens: 1000
       context_load: low
     entrypoint: memory/README.md
-    summary: null
+    summary: knowledge/summaries/memory-operations.md
     related: []
 
   - id: analysis-methods
