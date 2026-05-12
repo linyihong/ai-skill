@@ -21,6 +21,16 @@ edges:
     validation: artifact-gates.md 定義 6 個 artifact sections，從 skills/app-development-guidance/DOCUMENTATION.md 提取。
 
   - type: related_to
+    target: workflow/app-development-guidance/development-process.md
+    reason: Contract-first 開發流程 — Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Test Strategy Gate、Definition of Ready/Done。
+    validation: development-process.md 定義 14 個流程階段，從 skills/app-development-guidance/process/README.md 提取。
+
+  - type: related_to
+    target: workflow/app-development-guidance/review-checklist.md
+    reason: 審查檢查清單 — Change Intake、Test Strategy、Performance Test、Product To Contract、Documentation Backfill、Contract Governance、Embedded/Hardware Review、API And Transport、Auth/Tokens/Sessions、Local Storage、Flutter/Android Build、Logging/Telemetry、Anti-Tamper/Risk、Release Gate。
+    validation: review-checklist.md 定義 15 個審查類別，從 skills/app-development-guidance/CHECKLIST.md 提取。
+
+  - type: related_to
     target: analysis/app-development-guidance/README.md
     reason: Analysis 層提供 risk translation、owner layer selection、control definition 等方法，workflow 引用這些方法。
     validation: analysis/app-development-guidance/README.md 定義 scope 與 4 個 analysis methods。

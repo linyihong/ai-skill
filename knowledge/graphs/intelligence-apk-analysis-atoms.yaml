@@ -27,6 +27,46 @@ edges:
     reason: highest-leverage-analysis-path 已有獨立 graph record，此處建立關聯。
     validation: 兩個 graph records 共享相同的 skill 與 workflow 依賴。
   - type: related_to
+    target: intelligence/engineering/apk-analysis/heuristics/hook-selection.md
+    reason: Hook 策略選擇啟發式 — 根據 signal（Flutter/Dart AOT、Java OkHttp、Socket）選擇 hook 策略的決策表。
+    validation: atom 定義問題、原則、決策表、不建議的做法、Token 影響。
+
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md
+    reason: 過早 hook 導致不穩定 — 在 app 初始化完成前 hook 導致 crash 的症狀表與診斷方法。
+    validation: atom 定義症狀表、可能原因、診斷方法。
+
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/failure/frida-spawn-race.md
+    reason: Frida spawn race condition — Frida 在 spawn 模式下的 race condition 診斷與緩解策略。
+    validation: atom 定義問題、症狀、診斷方法、緩解策略。
+
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md
+    reason: Flutter/Dart AOT 辨識信號 — 主要/次要/排除信號表與判斷流程。
+    validation: atom 定義主要信號（高可信度）、次要信號（中等可信度）、排除信號、判斷流程。
+
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md
+    reason: API 文件完整性啟發式 — 何時開始 API Catalog、何時完成、Field Confidence 判斷的決策表。
+    validation: atom 定義問題、原則、決策表、Token 影響。
+
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md
+    reason: Local Proxy vs TLS Pinning 診斷 — 根據 signal 判斷流量走 local proxy 還是 TLS pinning 的決策表。
+    validation: atom 定義問題、原則、決策表、不建議的做法。
+
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/signals/local-proxy-detection.md
+    reason: Local Proxy 偵測信號 — 主要/次要/排除信號表與判斷流程。
+    validation: atom 定義主要信號、次要信號、排除信號、判斷流程。
+
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/signals/media-type-detection.md
+    reason: 媒體類型偵測信號 — Magic Bytes 參考表、靜態 vs 動畫判斷、Container Probe 指令。
+    validation: atom 定義 Magic Bytes 參考表、靜態 vs 動畫判斷、Container Probe 指令。
+
+  - type: related_to
     target: workflow/apk-analysis/execution-flow.md
     reason: APK analysis workflow 引用 intelligence atoms 來輔助執行流程中的判斷。
     validation: workflow 提及引用 intelligence/engineering/apk-analysis/。

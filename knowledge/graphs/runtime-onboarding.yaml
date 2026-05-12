@@ -1,0 +1,78 @@
+id: graph.runtime-onboarding
+source: runtime/onboarding/README.md
+status: candidate
+summary: >
+  連接 runtime/onboarding/ 的所有 quickstart 檔案：apk-analysis-setup、
+  apk-analysis-completion、apk-analysis-quickstart、app-development-guidance-quickstart、
+  travel-planning-quickstart，以及相關的 skills、workflow 層。
+edges:
+  - type: depends_on
+    target: runtime/onboarding/README.md
+    reason: Onboarding README 提供目錄索引、scope 與各 quickstart 的關係。
+    validation: README 定義 onboarding 層的放什麼/不放什麼。
+
+  - type: related_to
+    target: runtime/onboarding/apk-analysis-setup.md
+    reason: APK 分析 onboarding 與 setup — 放置位置、開場提示詞、自動回饋提示。
+    validation: apk-analysis-setup.md 從 skills/apk-analysis/RUNBOOK.md 提取。
+
+  - type: related_to
+    target: runtime/onboarding/apk-analysis-completion.md
+    reason: APK 分析完成定義 — 初步分析完成定義、第一輪分析順序。
+    validation: apk-analysis-completion.md 從 skills/apk-analysis/RUNBOOK.md 提取。
+
+  - type: related_to
+    target: runtime/onboarding/apk-analysis-quickstart.md
+    reason: APK 分析 Quick Start 操作步驟 — UI 架構地圖（Page-level artifact rule、Capture Strategy、Navigation Summary、Screen Inventory、Screen Reachability、Interaction Inventory、Operation To API Matrix、Unknown Navigation）與持久化資產轉換。
+    validation: apk-analysis-quickstart.md 從 skills/apk-analysis/SKILL.md Quick Start 步驟 5+7 提取。
+
+  - type: related_to
+    target: runtime/onboarding/app-development-guidance-quickstart.md
+    reason: App Development Guidance Quick Start 15 步驟 — 從 Change Intake 到 Feed Back Reusable Lessons 的完整操作流程。
+    validation: app-development-guidance-quickstart.md 從 skills/app-development-guidance/SKILL.md Quick Start 提取。
+
+  - type: related_to
+    target: runtime/onboarding/travel-planning-quickstart.md
+    reason: Travel Planning Quick Start 18 步驟 — 從 Intake 到 Final Verification 的完整操作流程。
+    validation: travel-planning-quickstart.md 從 skills/travel-planning/SKILL.md Quick Start 提取。
+
+  - type: promotes_from
+    target: skills/apk-analysis/SKILL.md
+    reason: apk-analysis-quickstart.md 從 SKILL.md Quick Start 步驟 5+7 提取。
+    validation: apk-analysis-quickstart.md 的 compatibility notes 標明舊入口維持 active。
+
+  - type: promotes_from
+    target: skills/app-development-guidance/SKILL.md
+    reason: app-development-guidance-quickstart.md 從 SKILL.md Quick Start 提取。
+    validation: app-development-guidance-quickstart.md 的 compatibility notes 標明舊入口維持 active。
+
+  - type: promotes_from
+    target: skills/travel-planning/SKILL.md
+    reason: travel-planning-quickstart.md 從 SKILL.md Quick Start 提取。
+    validation: travel-planning-quickstart.md 的 compatibility notes 標明舊入口維持 active。
+
+  - type: preserves_entrypoint
+    target: skills/apk-analysis/SKILL.md
+    reason: SKILL.md 仍為 tools 載入 skill 的 canonical trigger。
+    validation: runtime/onboarding/README.md 說明舊入口維持 active。
+
+  - type: preserves_entrypoint
+    target: skills/app-development-guidance/SKILL.md
+    reason: SKILL.md 仍為 tools 載入 skill 的 canonical trigger。
+    validation: runtime/onboarding/README.md 說明舊入口維持 active。
+
+  - type: preserves_entrypoint
+    target: skills/travel-planning/SKILL.md
+    reason: SKILL.md 仍為 tools 載入 skill 的 canonical trigger。
+    validation: runtime/onboarding/README.md 說明舊入口維持 active。
+
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.runtime.onboarding record。
+    validation: registry record 的 primary_source 指向 runtime/onboarding/README.md。
+
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

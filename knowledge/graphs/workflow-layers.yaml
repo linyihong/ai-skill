@@ -49,6 +49,16 @@ edges:
     target: workflow/travel-planning/artifact-gates.md
     reason: Travel planning 的產出閘門定義（14 個 output templates）。
     validation: artifact-gates.md 從 skills/travel-planning/DOCUMENTATION.md 提取。
+
+  - type: related_to
+    target: workflow/app-development-guidance/development-process.md
+    reason: Contract-first 開發流程 — Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Test Strategy Gate、Definition of Ready/Done。
+    validation: development-process.md 從 skills/app-development-guidance/process/README.md 提取。
+
+  - type: related_to
+    target: workflow/app-development-guidance/review-checklist.md
+    reason: 審查檢查清單 — 15 個審查類別（Change Intake、Test Strategy、Performance Test、Product To Contract、Documentation Backfill、Contract Governance、Embedded/Hardware Review、API And Transport、Auth/Tokens/Sessions、Local Storage、Flutter/Android Build、Logging/Telemetry、Anti-Tamper/Risk、Release Gate）。
+    validation: review-checklist.md 從 skills/app-development-guidance/CHECKLIST.md 提取。
   - type: related_to
     target: analysis/apk/README.md
     reason: Workflow 引用 analysis/ 的技術方法，不重複技術細節。
