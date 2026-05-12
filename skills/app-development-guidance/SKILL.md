@@ -37,37 +37,12 @@ Use this skill when APK analysis, app/API review, embedded/firmware review, or p
 - Storing target-specific hosts, secrets, endpoints, tokens, real user data, or private business conclusions in this reusable skill.
 - Treating client-side hardening as a replacement for server-side authorization, rate limits, fraud controls, or audit logs.
 
-## Quick Start
+## Quick Start（Routing）
 
-1. Identify the source: product brief, observed weakness, reverse-engineering lesson, or app/API design question.
-2. Before code changes, inspect and validate the project's 企劃書, product brief, planning docs, issue, ticket, PRD, design note, BDD, API contract, or equivalent artifact. Major Product Brief claims must be marked `validated`, `assumption`, `open question`, `scoped out`, or `invalidated` before they drive implementation.
-3. Classify the request as new requirement, bug fix, refactor, hardening, or documentation-only.
-4. If it is a new requirement or behavior change, update or create planning docs first: change brief, BDD scenarios, impacted Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests. For embedded/hardware work, also update datasheet/protocol references, hardware context, driver/service/application ownership, fixture or hardware-in-loop validation, and bring-up notes. Do not start code until blocker questions are resolved.
-5. If it is a bug fix, confirm expected vs actual behavior, reproduction/evidence, affected or missing BDD scenario, impacted contract/error handling, and regression test plan before code. **After code**, if the fix changes **observable** behavior (including integration-visible semantics), update owning contracts, BDD, and project Linked Updates **in the same work session** before declaring the task complete—green tests alone are not sufficient Definition of Done when durable docs still describe the old behavior. See [WORKFLOW.md](WORKFLOW.md) § *Same-session closure*.
-6. Define the test strategy before production code: distinguish existing-regression coverage from changed/new-code validation; prefer BDD first, then failing unit/contract/property/integration tests for new behavior before implementation. If performance can change, define a budget and choose load, stress, spike, soak, or smoke-size performance validation.
-7. If starting from a product brief, use [`process/`](process/) to draft or discuss the initial development docs: Product Brief validation, Bounded Contexts, BDD behavior, Domain Model Contract, Architecture Contract, API / Interface Contract, Error Handling Contract, implementation slices, and tests.
-8. If opening this skill on an existing implemented project, audit missing documents and backfill them. Missing Product Brief fields may be marked `unknown` / `open question`, but BDD behavior must be completed from UI, API, code, tests, logs, fixtures, or observed behavior. Recover document precedence, traceability, BDD validation status, generated-client flow, vendor excerpts, and canceled/out-of-scope decisions.
-9. If anything required for behavior, domain invariants, API/interface shape, error handling, security, storage, tests, ownership, document precedence, generated clients, vendor integration, or tool diagnostics is missing, ask the user or request evidence before continuing. Do not proceed with development while blocker questions remain unresolved.
-10. Convert analysis findings into a developer-facing risk statement or implementation opportunity.
-11. Choose the control layer:
-   - API/server contract.
-   - App runtime behavior.
-   - Full-stack schema/codegen or provider/consumer contract.
-   - Tooling, IDE extension, CLI, linter, or static-analysis kernel/adapter behavior.
-   - Vendor or third-party API integration behavior.
-   - Embedded firmware, hardware context, sensor/protocol driver, or board bring-up behavior.
-   - Build/release configuration.
-   - Monitoring or fraud signal.
-12. Add a concrete validation method: brief evidence check, unit test, BDD scenario, API contract test, integration test, release checklist item, fixture, mutation/property check, or manual review step.
-13. Classify the guidance:
-   - Core security control: `controls/`.
-   - Platform/app type detail: `platforms/`.
-   - Language/runtime-specific trap: `languages/`.
-   - Concrete implementation pattern: `implementation/`.
-   - Product-to-contract development flow: `process/`.
-   - Repeatable review step: `checklists/`.
-14. Apply required linked updates from [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md): when a process, control, platform, language, checklist, implementation pattern, or template is affected, update or explicitly verify the related files in the same change.
-15. If the lesson is reusable but not yet mature, add it to the matching `feedback_history/<category>/` folder first; use `feedback_history/common/` for cross-cutting lessons. Promote it into the structured folders when validated.
+See [`runtime/onboarding/app-development-guidance-quickstart.md`](../../runtime/onboarding/app-development-guidance-quickstart.md) for the full 15-step quick start.
+
+Routing summary:
+1. Identify source → 2. Validate planning docs → 3. Classify request → 4. New req: planning docs first → 5. Bug fix: before/after code rules → 6. Test strategy before code → 7. Product brief → `process/` → 8. Existing project: backfill → 9. Blocker questions → 10. Risk statement → 11. Choose control layer → 12. Validation method → 13. Classify guidance → 14. Linked updates → 15. Immature lesson → `feedback_history/`.
 
 ## Default Workflow
 
@@ -87,44 +62,13 @@ Use [`controls/`](controls/) as the primary home for cross-platform guidance, th
 
 Use [`implementation/`](implementation/) when the user asks how to build or implement a hardening control.
 
-## Output Style
+## Output Style & Artifact Gates
 
-When producing development guidance, include:
-
-- Goal, action, and validation or reference source for each important work unit or conclusion.
-- Product Brief validation status when planning docs are used as implementation input.
-- Observed risk or failure mode.
-- Why it matters for app development.
-- Change classification: new requirement, bug fix, refactor, hardening, or docs-only; include planning artifact reviewed.
-- Test strategy: existing behavior guarded by regression tests, new/changed code validated by BDD/TDD and changed-code tests; mention mutation/property/contract/database tests when relevant.
-- Performance strategy when relevant: budget, test type, P95/P99 latency, throughput, error rate, resource usage, baseline, and CI/release gate status.
-- Document precedence and traceability for implemented-first projects, including BDD-to-test status.
-- Generated-client, SDK, fixture, or schema sync status when API/interface contracts are involved.
-- Vendor/third-party integration boundaries, live-test gates, and secret-safe documentation when external providers are involved.
-- Missing questions that must be answered before implementation, if starting from a product brief.
-- Existing-project documentation gaps and how they were backfilled; BDD must be complete when observable behavior exists.
-- Blocker questions for any missing behavior, contract, error, security, storage, ownership, or test requirement; do not continue development until these are answered or explicitly scoped out.
-- Draft documents or document sections that are ready to copy into the project repository.
-- Recommended control and the layer that owns it.
-- Implementation path or linked implementation doc, when applicable.
-- Validation method.
-- Required linked updates, if the change affects multiple folders.
-- **Same-session closure:** list which contracts/BDD/integration notes were updated (or explicitly deferred with tracker) when behavior changed.
-- What not to overclaim.
-
-When authoring or reviewing **tracked** onboarding and README material for a project repository, apply ordinary **commit-facing documentation hygiene**: prefer neutral gitignore targets for local-only trees (for example directories whose names read as generic local state, not as invitations to hunt for unpublished material); avoid embedding one-off investigation narratives, absolute host paths, internal meeting shorthand, or secret-naming templates in markdown that is merged to the default branch; describe setup through environment variables, optional untracked config files, and brief pointers to templates rather than meta-commentary about what was excluded from version control.
+See [`workflow/app-development-guidance/artifact-gates.md`](../../workflow/app-development-guidance/artifact-gates.md) for output format and quality gates.
 
 ## Feedback Loop
 
-If a reusable app development lesson emerges:
-
-1. Create `feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md` using [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md); use `common/` when no single category owns it.
-2. Generalize the lesson so it is not tied to one APK or company.
-3. Include evidence and validation criteria, but redact secrets and target-specific details.
-4. Promote validated guidance into `controls/`, `platforms/`, `languages/`, `implementation/`, `checklists/`, `WORKFLOW.md`, `CHECKLIST.md`, or `DOCUMENTATION.md` as appropriate.
-5. If the lesson came from a project incident, follow [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md): keep project names, local paths, endpoints, payload fragments, sample IDs, class names, live environment quirks, execution results, and BDD/test file names in the project repository; the skill should contain only the generalized rule and validation method.
-6. After editing skill documentation, search the skill folder for project-specific strings and relocate any matches before finishing.
-7. If the promotion creates linked updates, those updates are mandatory; do not leave related docs stale.
+See [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md) for the feedback lesson template and workflow. See [`feedback/`](../../feedback/) for the feedback promotion pipeline.
 
 **Cross-skill link:** if the lesson came from APK analysis, keep analysis mechanics in [`apk-analysis`](../apk-analysis/) and put development guidance, implementation patterns, and validation checklists here.
 

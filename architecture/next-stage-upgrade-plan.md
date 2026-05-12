@@ -386,36 +386,50 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 ---
 
-#### Phase 32：SKILL.md 分解
+#### ✅ 已完成：Phase 32 — SKILL.md 分解
 
 **目標**：將各 skill 的 `SKILL.md` 中剩餘內容提取到對應新層。
 
-**背景**：
-- 每個 skill 的 `SKILL.md` 仍包含：When To Use、Quick Start、Default Workflow、Output Style、Feedback Loop
-- 這些內容大部分已被提取到 `workflow/`、`analysis/`、`runtime/onboarding/` 等層
-- 但 `SKILL.md` 仍為 tool adapter 的主要載入入口
+**執行摘要**：
 
-**執行步驟**：
+| 子步驟 | 內容 | 狀態 |
+|--------|------|------|
+| 32a | 分析 3 個 SKILL.md 的剩餘內容 | ✅ |
+| 32b | 建立 `workflow/travel-planning/artifact-gates.md`（travel-planning 缺少此文件） | ✅ |
+| 32c | 提取 apk-analysis SKILL.md Quick Start 步驟 5+7 → `runtime/onboarding/apk-analysis-quickstart.md` | ✅ |
+| 32d | 提取 app-development-guidance SKILL.md Quick Start → `runtime/onboarding/app-development-guidance-quickstart.md` | ✅ |
+| 32e | 提取 travel-planning SKILL.md Quick Start → `runtime/onboarding/travel-planning-quickstart.md` | ✅ |
+| 32f | 瘦身 3 個 SKILL.md 為純 routing 文件 | ✅ |
+| 32g | 更新 `runtime/onboarding/README.md` + `architecture/next-stage-upgrade-plan.md` | ✅ |
+| 32h | 提交 + push | ✅ |
 
-1. **分析各 SKILL.md 的剩餘內容**：
-   - `skills/apk-analysis/SKILL.md` — Quick Start、Default Workflow、Required Output Style、Safety、Feedback Loop
-   - `skills/app-development-guidance/SKILL.md` — When To Use、Quick Start、Default Workflow、Output Style、Feedback Loop
-   - `skills/travel-planning/SKILL.md` — When To Use、Quick Start、Default Workflow、Output Style、Feedback Loop
+**建立的新檔案**（4 個）：
 
-2. **提取到對應新層**：
-   - Quick Start → `runtime/onboarding/<skill>-quickstart.md`
-   - Default Workflow → 已存在 `workflow/<domain>/execution-flow.md`，補齊遺漏步驟
-   - Output Style → `workflow/<domain>/artifact-gates.md` 或 `analysis/<domain>/`
-   - Feedback Loop → `feedback/` 層
+| 檔案 | 說明 |
+|------|------|
+| `workflow/travel-planning/artifact-gates.md` | Travel Planning 產出規範與品質門檻（19 項必備項目、4 項品質門檻） |
+| `runtime/onboarding/apk-analysis-quickstart.md` | APK 分析 Quick Start 操作步驟（UI 架構地圖 + 持久化資產轉換） |
+| `runtime/onboarding/app-development-guidance-quickstart.md` | App Development Guidance Quick Start 15 步驟 |
+| `runtime/onboarding/travel-planning-quickstart.md` | Travel Planning Quick Start 18 步驟 |
 
-3. **SKILL.md 瘦身**：
-   - 將 `SKILL.md` 改為純 routing 文件（只包含 When To Use + 指向新層的連結）
-   - 確保 tool adapter 仍可載入（reference-first）
+**瘦身成果**：
 
-**成功驗證標準**：
-- 每個 `SKILL.md` 減少至少 70% 內容
-- 所有 extracted 內容在對應新層可找到
-- Tool adapter 仍可正常載入 skill
+| SKILL.md | 原始行數 | 瘦身後行數 | 減少比例 |
+|----------|---------|-----------|---------|
+| `skills/apk-analysis/SKILL.md` | 158 | ~55 | ~65% |
+| `skills/app-development-guidance/SKILL.md` | 132 | ~65 | ~51% |
+| `skills/travel-planning/SKILL.md` | 102 | ~55 | ~46% |
+
+**瘦身策略**：
+- Quick Start：保留 routing summary（1-2 行 per step），詳細操作步驟 → `runtime/onboarding/<skill>-quickstart.md`
+- Output Style / Safety：→ `workflow/<domain>/artifact-gates.md`
+- Feedback Loop：→ `shared-rules/feedback-lessons.md` + `feedback/` 層
+- 保留：header metadata、Shared Policy、When To Use、Out Of Scope、Default Workflow（純 routing）
+
+**關鍵發現**：
+- `travel-planning` 缺少 `workflow/travel-planning/artifact-gates.md`，需先建立才能提取 Output Style
+- `apk-analysis` 的 Quick Start 步驟 5（UI 架構地圖）和步驟 7（持久化資產）是主要操作內容，步驟 1-4 是 routing，步驟 6 是 heuristic，步驟 8 是 feedback
+- `app-development-guidance` 的 Quick Start 15 步驟全部可提取，保留 routing summary 即可
 
 ---
 
