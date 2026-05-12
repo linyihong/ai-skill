@@ -129,14 +129,14 @@ metadata/
 
 負責「如何觀察與拆解」。
 
-建議結構：
+目前結構：
 
 ```text
 analysis/
-  apk/
-  repo/
-  production/
-  issue/
+  apk/           ← APK 分析方法（pilot migrated）
+  repo/          ← Repository 分析與理解方法
+  production/    ← Production 問題分析與根因追蹤
+  issue/         ← Issue 分類與優先級判斷
 ```
 
 核心責任：
@@ -146,6 +146,9 @@ analysis/
 - 技術觀察。
 - pattern extraction。
 - 分析方法。
+- Repository 結構觀察與心智模型建立。
+- Production incident RCA 與效能診斷。
+- Issue triage、優先級計算與重複偵測。
 
 不應承載過多：
 
