@@ -389,3 +389,159 @@ records:
       profile: small
       compression_level: index-only
       reason: TTL doc 是設計文件，需要 prune context 時才讀。
+
+  - id: route.skill.app-development-guidance
+    task_intent: 產出 app/API/embedded development guidance
+    primary_source: skills/app-development-guidance/SKILL.md
+    required_dependencies:
+      - skills/app-development-guidance/README.md
+      - shared-rules/README.md
+    candidate_sources:
+      - analysis/app-development-guidance/README.md
+      - workflow/app-development-guidance/README.md
+      - intelligence/engineering/app-development-guidance/README.md
+      - knowledge/summaries/app-development-guidance.md
+      - knowledge/graphs/workflow-app-development-guidance.yaml
+    source_of_truth_gate: old-skill-entrypoint-active
+    ranking_reason: app-development-guidance 仍以 skill entrypoint 作為工具觸發與授權邊界；新分層目前只作候選目的地與 mapping。
+    validation_signal: 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 3500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: old-entrypoint-active
+    model:
+      profile: specialized
+      compression_level: source-backed
+      reason: App development guidance 需要 skill entrypoint、workflow 與 domain-specific controls/checklists routing。
+
+  - id: route.skill.travel-planning
+    task_intent: 規劃 evidence-based travel itinerary
+    primary_source: skills/travel-planning/SKILL.md
+    required_dependencies:
+      - skills/travel-planning/README.md
+      - shared-rules/README.md
+    candidate_sources:
+      - analysis/travel/README.md
+      - workflow/travel-planning/README.md
+      - intelligence/travel/README.md
+      - knowledge/summaries/travel-planning.md
+      - knowledge/graphs/workflow-travel-planning.yaml
+    source_of_truth_gate: old-skill-entrypoint-active
+    ranking_reason: travel-planning 仍以 skill entrypoint 作為工具觸發與授權邊界；新分層目前只作候選目的地與 mapping。
+    validation_signal: 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 2800
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: old-entrypoint-active
+    model:
+      profile: specialized
+      compression_level: source-backed
+      reason: Travel planning 需要 skill entrypoint、workflow 與 domain-specific sources/tools routing。
+
+  - id: route.runtime.onboarding
+    task_intent: 新 session 或新專案的快速啟動指引
+    primary_source: runtime/onboarding/README.md
+    required_dependencies:
+      - skills/apk-analysis/SKILL.md
+      - skills/app-development-guidance/SKILL.md
+      - skills/travel-planning/SKILL.md
+    candidate_sources:
+      - runtime/onboarding/apk-analysis-setup.md
+      - runtime/onboarding/apk-analysis-completion.md
+      - runtime/onboarding/apk-analysis-quickstart.md
+      - runtime/onboarding/app-development-guidance-quickstart.md
+      - runtime/onboarding/travel-planning-quickstart.md
+      - knowledge/graphs/runtime-onboarding.yaml
+    source_of_truth_gate: old-skill-entrypoint-active
+    ranking_reason: onboarding 文件從 SKILL.md 的 Quick Start 提取，提供更詳細的逐步指引，但 skill entrypoint 仍為授權邊界。
+    validation_signal: 各 quickstart 的步驟可依序執行，且與對應 SKILL.md 的 Quick Start 摘要一致。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 2500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: old-entrypoint-active
+    model:
+      profile: specialized
+      compression_level: summary-first
+      reason: Onboarding 文件在需要執行對應 skill 的完整流程時才讀取。
+
+  - id: route.analysis.apk.workflows
+    task_intent: 執行 APK 分析操作流程（Frida hook、API 文件化、local proxy、media HLS）
+    primary_source: analysis/apk/workflows/README.md
+    required_dependencies:
+      - analysis/apk/README.md
+      - skills/apk-analysis/SKILL.md
+    candidate_sources:
+      - analysis/apk/workflows/frida-hook-flow.md
+      - analysis/apk/workflows/http-api-documentation-flow.md
+      - analysis/apk/workflows/local-proxy-hook-flow.md
+      - analysis/apk/workflows/media-hls-analysis-flow.md
+      - intelligence/engineering/apk-analysis/heuristics/hook-selection.md
+      - intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md
+    source_of_truth_gate: old-skill-entrypoint-active
+    ranking_reason: 操作流程從 techniques/ 分解而來，提供 step-by-step 執行指引，但 skill entrypoint 仍為授權邊界。
+    validation_signal: 各 workflow 有明確步驟與產出格式，可依序執行。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 3000
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: old-entrypoint-active
+    model:
+      profile: specialized
+      compression_level: summary-first
+      reason: 需要執行對應操作流程時才讀取完整 workflow。
+
+  - id: route.intelligence.apk-analysis.atoms
+    task_intent: 套用 APK 分析工程智慧（heuristics、anti-patterns、failure、signals）
+    primary_source: intelligence/engineering/apk-analysis/README.md
+    required_dependencies:
+      - skills/apk-analysis/SKILL.md
+      - analysis/apk/README.md
+    candidate_sources:
+      - intelligence/engineering/apk-analysis/heuristics/README.md
+      - intelligence/engineering/apk-analysis/anti-patterns/README.md
+      - intelligence/engineering/apk-analysis/failure/README.md
+      - intelligence/engineering/apk-analysis/signals/README.md
+      - intelligence/engineering/apk-analysis/evidence-first-routing.md
+      - intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md
+      - intelligence/engineering/apk-analysis/live-readiness-gates.md
+      - knowledge/graphs/intelligence-apk-analysis-atoms.yaml
+    source_of_truth_gate: old-skill-entrypoint-active
+    ranking_reason: intelligence atoms 從 techniques/ 分解而來，提供決策智慧，但 skill entrypoint 仍為授權邊界。
+    validation_signal: 各 atom 有明確決策表或信號表，可反查驗證。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 2000
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: old-entrypoint-active
+    model:
+      profile: specialized
+      compression_level: summary-first
+      reason: 需要對應決策智慧時才讀取完整 atom。

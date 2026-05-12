@@ -484,9 +484,10 @@ Pilot 成功 = AI 開始能做 decision routing：
 ### 尚未完成的下一階段
 
 - **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。所有內容已提取到新分層，舊檔案已標註提取狀態。舊 skills 的清理時間線定義於 [`governance/lifecycle/README.md`](governance/lifecycle/README.md) 的 Skills Deprecation Timeline（Phase A→D），目前處於 Phase B（techniques 已標註 deprecated，保留檔案供 tool adapter 載入）。
-- **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建。
+- **Runtime surfaces 更新**：✅ 已完成（2026-05-12）。`knowledge/runtime/routing-registry.yaml` 新增 5 條路由（app-development-guidance、travel-planning、onboarding、apk-workflows、apk-intelligence-atoms）。`knowledge/indexes/README.md` 新增 3 條索引列（onboarding、workflows、intelligence atoms）。generated summaries、reports、SQLite index 已可一鍵重建。
 - **Intelligence Extraction Pipeline 實戰驗證（P2）**：✅ 已完成（Phase 32-33 已實際執行 pipeline 的 3 種模式，pipeline 文件已更新狀態表，遺漏的 index 更新已補齊）
 - **Skills Deprecation（Phase B）**：✅ 已完成（2026-05-12）。所有 8 個 techniques 檔案（4 skills/ + 4 analysis/）已從 `# Intelligence Extracted` 升級為 `# Deprecated — see <new path>`。詳細時間線見 [`governance/lifecycle/README.md`](governance/lifecycle/README.md)。
+- **跨層一致性檢查**：✅ 已完成（2026-05-12）。`analysis/apk/workflows/README.md`、`intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/README.md` 均已列出完整 atom 表格，無遺漏。
 
 ### 下一階段 Phase 規劃（29-33）
 
@@ -1214,6 +1215,11 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P2 | done | Phase 31：Intelligence Extraction Pipeline | `governance/lifecycle/intelligence-extraction-pipeline.md` | 已完成 7-step pipeline（內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引） | Pipeline 文件已建立，已驗證 Technique Decomposition 和 Feedback History Extraction 兩種模式 |
 | P2 | done | Phase 32：SKILL.md 分解 | `runtime/onboarding/apk-analysis-quickstart.md`, `runtime/onboarding/app-development-guidance-quickstart.md`, `runtime/onboarding/travel-planning-quickstart.md`, `workflow/travel-planning/artifact-gates.md` | 已完成 3 個 SKILL.md 瘦身（46-65% 減少），4 個新檔案建立 | SKILL.md 中所有內容已對應到目標層，舊檔案已標註 |
 | P4 | done | Phase 33：Skill-Specific Intelligence Extraction（P4） | `plans/skill-specific-extraction.md`, `workflow/app-development-guidance/review-checklist.md`, `analysis/travel/sources-and-tools.md`, `analysis/travel/README.md` | 已完成 3 個 skills 的剩餘內容提取（CHECKLIST.md、TOOLS.md、README.md），所有 skills 內容已全部提取到新分層 | 每個 skill 有專屬 extraction strategy，內容結構分析 → 拆解 → 標註 → 驗證的完整流程已執行 |
+| P2 | done | Knowledge Graph 補齊（Phase 28-33） | `knowledge/graphs/workflow-app-development-guidance.yaml`, `knowledge/graphs/intelligence-apk-analysis-atoms.yaml`, `knowledge/graphs/workflow-layers.yaml`, `knowledge/graphs/analysis-layers.yaml`, `knowledge/graphs/runtime-onboarding.yaml` | 已完成 5 個 graph records 更新，新增 1 個 graph record（runtime-onboarding） | Phase 28-33 所有新檔案在 graph records 中有對應 edge |
+| P2 | done | Intelligence Extraction Pipeline 實戰驗證（P2） | `governance/lifecycle/intelligence-extraction-pipeline.md`, `analysis/apk/workflows/README.md`, `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/README.md` | 已完成 pipeline 狀態表更新，5 個 README 的 placeholder 已替換為實際 atom 表格 | Pipeline 的 3 種模式（Technique Decomposition、Feedback History Extraction、SKILL.md Decomposition）均已實際執行 |
+| P2 | done | Skills Deprecation（Phase B） | `governance/lifecycle/README.md`, `skills/apk-analysis/techniques/`, `analysis/apk/techniques/` | 已完成 8 個 techniques 檔案從 `# Intelligence Extracted` 升級為 `# Deprecated — see <new path>` | Phase B 條件（techniques decomposition 完成 + pilot 驗證通過）已滿足 |
+| P2 | done | Runtime surfaces 更新 | `knowledge/runtime/routing-registry.yaml`, `knowledge/indexes/README.md` | 已完成 routing-registry 新增 5 條路由（app-development-guidance、travel-planning、onboarding、apk-workflows、apk-intelligence-atoms），indexes 新增 3 條索引列 | 所有新層級在 routing-registry 和 indexes 中有對應路由 |
+| P2 | done | 跨層一致性檢查 | `analysis/apk/workflows/README.md`, `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/README.md` | 已完成所有 README 的 atom/workflow 表格檢查，無遺漏 | 每個 README 的表格與實際檔案一致 |
 
 ## 最終目標
 
