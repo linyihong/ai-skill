@@ -178,11 +178,60 @@
 |--------|--------|----------|------|
 | [`workflow/app-development-guidance/development-process.md`](../workflow/app-development-guidance/development-process.md) | `workflow/` | `skills/app-development-guidance/process/README.md` | Contract-first 開發流程：Default Flow、Required Contracts、Initial Documentation Pack、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill、Contract-First Rules、Definition of Ready/Done |
 
+### ✅ 已完成：Phase 28 — Technique → Intelligence Pilot（flutter-dart-aot）
+
+Phase 28 是策略轉折點：從「搬遷內容」轉為「拆解 techniques，workflow 進 analysis/，intelligence 進 intelligence/」。
+
+#### 策略摘要
+
+- **核心目標**：提升 AI decision quality，不是把分類變漂亮
+- **Technique Decomposition**：拆解（不是搬遷），HOW TO DO 進 `analysis/`，HOW TO THINK 進 `intelligence/`
+- **舊 techniques 保留**，只標註已提取
+- **不做完整 meta architecture**，先讓 intelligence 活起來
+
+#### 建立的新目錄
+
+| 目錄 | 說明 |
+|------|------|
+| `intelligence/engineering/apk-analysis/heuristics/` | 啟發式判斷規則（何時該用哪個技術） |
+| `intelligence/engineering/apk-analysis/anti-patterns/` | 可預防的錯誤模式 |
+| `intelligence/engineering/apk-analysis/failure/` | 具體失敗模式與診斷 |
+| `intelligence/engineering/apk-analysis/signals/` | 技術特徵辨識信號 |
+| `analysis/apk/workflows/` | HOW TO DO 操作流程 |
+
+#### 建立的新檔案
+
+| 檔案 | 層 | 說明 |
+|------|-----|------|
+| [`analysis/apk/workflows/frida-hook-flow.md`](../analysis/apk/workflows/frida-hook-flow.md) | `analysis/` | Frida hook 操作流程（command、setup、步驟） |
+| [`intelligence/engineering/apk-analysis/heuristics/hook-selection.md`](../intelligence/engineering/apk-analysis/heuristics/hook-selection.md) | `intelligence/` | Hook 策略選擇啟發式（決策表） |
+| [`intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md`](../intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md) | `intelligence/` | 過早 hook 導致不穩定（症狀表） |
+| [`intelligence/engineering/apk-analysis/failure/frida-spawn-race.md`](../intelligence/engineering/apk-analysis/failure/frida-spawn-race.md) | `intelligence/` | Frida spawn race condition（診斷與緩解） |
+| [`intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md`](../intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md) | `intelligence/` | Flutter/Dart AOT 辨識信號（信號表） |
+| [`notes/intelligence-extraction-observations.md`](../notes/intelligence-extraction-observations.md) | `notes/` | Extraction 過程記錄與觀察 |
+
+#### 更新的既有檔案
+
+| 檔案 | 變更 |
+|------|------|
+| `intelligence/engineering/apk-analysis/README.md` | 加入新子目錄結構與 scope |
+| `analysis/apk/README.md` | 加入 workflows/ 目錄，更新 migration notes |
+| `skills/apk-analysis/techniques/flutter-dart-aot/README.md` | 加入 `# Intelligence Extracted` 標註 |
+| `analysis/apk/techniques/flutter-dart-aot.md` | 加入 `# Intelligence Extracted` 標註 |
+
+#### 成功驗證標準
+
+Pilot 成功 = AI 開始能做 decision routing：
+- 以前：只會照流程 dump
+- 現在：能根據 signal 改變策略
+
 ### 尚未完成的下一階段
 
 - **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `SKILL.md` 仍為 skill-local。
 - **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建，但更多 skill 內容需要提取到新分層。
-- **更多 skill 內容可提取**：`skills/apk-analysis/` 的 `techniques/` 子目錄已提取 catalog 至 `analysis/apk/techniques/`，但個別 technique 文件尚未提取。`skills/app-development-guidance/` 和 `skills/apk-analysis/` 的 `feedback_history/` 子目錄尚未提取到 `feedback/` 層。
+- **更多 skill 內容可提取**：`skills/apk-analysis/` 的 `techniques/` 子目錄已提取 catalog 至 `analysis/apk/techniques/`，flutter-dart-aot 已完成 decomposition pilot。`skills/app-development-guidance/` 和 `skills/apk-analysis/` 的 `feedback_history/` 子目錄尚未提取到 `feedback/` 層。
+- **其餘 3 個 techniques**（http-api、local-proxy、media-hls）待後續 decomposition。
+- **Intelligence Extraction Pipeline** 待 pilot 驗證成功後再抽象化。
 
 ## 核心問題
 

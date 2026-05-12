@@ -1,5 +1,15 @@
 # Flutter / Dart AOT Techniques
 
+> **Intelligence Extracted** — This technique has been decomposed into HOW TO DO (workflow) and HOW TO THINK (intelligence).
+> See:
+> - Workflow: `analysis/apk/workflows/frida-hook-flow.md`
+> - Heuristics: `intelligence/engineering/apk-analysis/heuristics/hook-selection.md`
+> - Anti-patterns: `intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md`
+> - Failure: `intelligence/engineering/apk-analysis/failure/frida-spawn-race.md`
+> - Signals: `intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md`
+>
+> This file remains the active skill entrypoint during pilot.
+
 Use this category only when evidence points to Flutter or Dart AOT. Do not read it for a Java/Kotlin-only, WebView-only, plain native, or media-only task unless routing evidence leads here.
 
 ## When To Use
