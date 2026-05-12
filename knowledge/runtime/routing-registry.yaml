@@ -365,13 +365,14 @@ records:
       reason: Router flow 是設計文件，需要 routing 決策時才讀。
 
   - id: route.intelligence.engineering.heuristics
-    task_intent: 套用通用工程經驗法則（field confidence、magic bytes、premature optimization 等）
+    task_intent: 套用通用工程經驗法則（field confidence、magic bytes、document priority、premature optimization 等）
     primary_source: intelligence/engineering/heuristics/README.md
     required_dependencies:
       - intelligence/engineering/README.md
     candidate_sources:
       - intelligence/engineering/heuristics/field-confidence-judgment.md
       - intelligence/engineering/heuristics/magic-bytes-reference.md
+      - intelligence/engineering/heuristics/document-priority-hierarchy.md
       - intelligence/engineering/heuristics/premature-optimization.md
       - intelligence/engineering/heuristics/abstraction-threshold.md
       - intelligence/engineering/heuristics/retry-smell.md

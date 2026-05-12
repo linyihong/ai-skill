@@ -488,10 +488,13 @@ Pilot 成功 = AI 開始能做 decision routing：
 - **Intelligence Extraction Pipeline 實戰驗證（P2）**：✅ 已完成（Phase 32-33 已實際執行 pipeline 的 3 種模式，pipeline 文件已更新狀態表，遺漏的 index 更新已補齊）
 - **Skills Deprecation（Phase B）**：✅ 已完成（2026-05-12）。所有 8 個 techniques 檔案（4 skills/ + 4 analysis/）已從 `# Intelligence Extracted` 升級為 `# Deprecated — see <new path>`。詳細時間線見 [`governance/lifecycle/README.md`](governance/lifecycle/README.md)。
 - **跨層一致性檢查**：✅ 已完成（2026-05-12）。`analysis/apk/workflows/README.md`、`intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/README.md` 均已列出完整 atom 表格，無遺漏。
-- **跨 skill intelligence promotion**：✅ 已完成（2026-05-12）。從 `intelligence/engineering/apk-analysis/` 提取 2 個 proven generalized atoms 到 `intelligence/engineering/heuristics/`：
+- **跨 skill intelligence promotion（apk-analysis → heuristics）**：✅ 已完成（2026-05-12）。從 `intelligence/engineering/apk-analysis/` 提取 2 個 proven generalized atoms 到 `intelligence/engineering/heuristics/`：
   - `api-documentation-completeness.md` → `field-confidence-judgment.md`（Field Confidence 判斷表：confirmed/candidate/needs capture/meaning unknown 等 8 種狀態）
   - `media-type-detection.md` → `magic-bytes-reference.md`（Magic Bytes 參考表：MP4/WebP/GIF/PNG/JPEG/MP3/FLAC/TS/WebM）
   - 原始 atoms 已加入 `# Cross-Domain Promotion` 標註
+- **跨 skill intelligence promotion（app-development-guidance → heuristics）**：✅ 已完成（2026-05-12）。從 `intelligence/engineering/app-development-guidance/` 提取 1 個 proven generalized atom 到 `intelligence/engineering/heuristics/`：
+  - `contract-governance-heuristic.md` → `document-priority-hierarchy.md`（文件優先順序階層：6 層優先級、衝突分類流程、常見誤用表）
+  - 原始 atom 已加入 `# Cross-Domain Promotion` 標註
 
 ### 下一階段 Phase 規劃（29-33）
 
@@ -1224,7 +1227,8 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P2 | done | Skills Deprecation（Phase B） | `governance/lifecycle/README.md`, `skills/apk-analysis/techniques/`, `analysis/apk/techniques/` | 已完成 8 個 techniques 檔案從 `# Intelligence Extracted` 升級為 `# Deprecated — see <new path>` | Phase B 條件（techniques decomposition 完成 + pilot 驗證通過）已滿足 |
 | P2 | done | Runtime surfaces 更新 | `knowledge/runtime/routing-registry.yaml`, `knowledge/indexes/README.md` | 已完成 routing-registry 新增 5 條路由（app-development-guidance、travel-planning、onboarding、apk-workflows、apk-intelligence-atoms），indexes 新增 3 條索引列 | 所有新層級在 routing-registry 和 indexes 中有對應路由 |
 | P2 | done | 跨層一致性檢查 | `analysis/apk/workflows/README.md`, `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/README.md` | 已完成所有 README 的 atom/workflow 表格檢查，無遺漏 | 每個 README 的表格與實際檔案一致 |
-| P2 | done | 跨 skill intelligence promotion | `intelligence/engineering/heuristics/field-confidence-judgment.md`, `intelligence/engineering/heuristics/magic-bytes-reference.md` | 已完成 2 個 proven generalized atoms 從 apk-analysis 提升到跨領域 heuristics 層 | 原始 atoms 有 `# Cross-Domain Promotion` 標註，新 atoms 有 `# Source` 指向原始 domain atom |
+| P2 | done | 跨 skill intelligence promotion（apk-analysis → heuristics） | `intelligence/engineering/heuristics/field-confidence-judgment.md`, `intelligence/engineering/heuristics/magic-bytes-reference.md` | 已完成 2 個 proven generalized atoms 從 apk-analysis 提升到跨領域 heuristics 層 | 原始 atoms 有 `# Cross-Domain Promotion` 標註，新 atoms 有 `# Source` 指向原始 domain atom |
+| P2 | done | 跨 skill intelligence promotion（app-development-guidance → heuristics） | `intelligence/engineering/heuristics/document-priority-hierarchy.md` | 已完成 1 個 proven generalized atom 從 app-development-guidance 提升到跨領域 heuristics 層 | 原始 atom 有 `# Cross-Domain Promotion` 標註，新 atom 有 `# Source` 指向原始 domain atom |
 
 ## 最終目標
 
