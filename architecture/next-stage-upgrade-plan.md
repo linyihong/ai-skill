@@ -157,29 +157,61 @@ analysis/
 
 ### `intelligence/`
 
-負責「沉澱工程智慧與領域知識」。
+負責「沉澱工程智慧與領域知識」。本層不是百科知識（什麼是 Redis、什麼是 CQRS），而是**經過經驗抽象化後的工程智慧**——AI 的「專家腦內模型」。
+
+#### 與其他層的差異
+
+| 層 | 偏 | 範例 |
+|---|----|------|
+| `knowledge/` | 事實 | Redis supports pub/sub |
+| `skills/` | 執行流程 | How to debug Redis latency |
+| `intelligence/` | 判斷力與經驗法則 | If Redis latency spikes suddenly, check connection lifecycle before scaling |
+
+#### 核心內容
+
+- **Heuristics（經驗法則）** — 資深工程師直覺
+- **Tradeoffs（取捨）** — 「沒有銀彈」的理解
+- **Pattern Recognition（模式辨識）** — 可重複的設計與反設計模式
+- **Failure Recognition（災難辨識）** — 抽象化後的失敗模式
+- **Decision Intelligence（決策智慧）** — 架構與技術選擇的判斷力
+- **Contextual Thinking（情境思考）** — 何時適用、何時不適用的邊界條件
 
 建議結構：
 
 ```text
 intelligence/
   engineering/
-    domain/
-    architecture/
-    failure/
-    realtime/
-    erp/
-  travel/
-  business/
+    architecture/          # 架構思考模式（非教學）
+    domain/                # DDD / 業務模型智慧
+    failure/               # 工程災難智慧（抽象化失敗模式）
+    heuristics/            # 經驗法則（intelligence 核心）
+    anti-patterns/         # 常見錯誤設計
+    tradeoffs/             # 技術取捨智慧
+    distributed-systems/   # 分散式系統生存經驗
+  business/                # 商業決策智慧
+  travel/                  # 特定領域智慧（Personal Domain Intelligence）
 ```
 
-核心責任：
+#### 各子目錄說明
 
-- engineering decision。
-- trade-off。
-- anti-pattern。
-- architecture lesson。
-- reusable domain knowledge。
+| 目錄 | 核心 | 範例內容 |
+|------|------|---------|
+| `engineering/architecture/` | 架構判斷力 | `modular-monolith-vs-microservices.md`、`event-driven-tradeoffs.md`、`cqrs-when-not-to-use.md` |
+| `engineering/domain/` | 業務建模經驗 | `aggregate-boundary-heuristics.md`、`inventory-domain-patterns.md` |
+| `engineering/failure/` | AI 的「危險雷達」 | `connection-leak-patterns.md`、`distributed-lock-failure.md` |
+| `engineering/heuristics/` | 資深工程師直覺 | `premature-optimization.md`、`abstraction-threshold.md`、`retry-smell.md` |
+| `engineering/anti-patterns/` | AI 自動避雷 | `generic-repository-overuse.md`、`shared-database-microservices.md`、`god-service-pattern.md` |
+| `engineering/tradeoffs/` | 「沒有銀彈」的理解 | `postgres-vs-mongodb.md`、`websocket-vs-polling.md`、`sqlite-vs-postgres.md` |
+| `engineering/distributed-systems/` | 大型系統生存經驗 | `eventual-consistency-patterns.md`、`event-ordering-risks.md`、`backpressure-signals.md` |
+| `business/` | 商業判斷力 | `saas-pricing-heuristics.md`、`enterprise-sales-warning.md`、`pmf-signals.md` |
+| `travel/` | 領域經驗法則 | `japan-roadtrip-fatigue.md`、`ski-trip-routing.md`、`golden-week-avoidance.md` |
+
+#### 與根目錄 `anti-patterns/` 的邊界
+
+| 位置 | 內容 |
+|------|------|
+| [`anti-patterns/`](../../anti-patterns/) | Agent 操作層的 anti-patterns（context explosion、recursive tool loop、hallucination loop 等） |
+| `intelligence/engineering/anti-patterns/` | 工程領域的 anti-patterns（設計錯誤、架構錯誤等） |
 
 `intelligence/` 是 Senior Engineer Brain。
 
