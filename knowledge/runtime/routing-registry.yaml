@@ -1,9 +1,10 @@
-registry_version: knowledge-routing/v1
+registry_version: knowledge-routing/v2
 status: candidate
 owner_layer: knowledge/runtime
 source_of_truth_policy: old-entrypoint-active
 description: >
-  第一版 machine-readable routing registry。此檔只描述 routing，不取代
+  第二版 machine-readable routing registry。新增 context_cost metadata、
+  load_strategy、ttl 與 skills-index 路由。此檔只描述 routing，不取代
   shared-rules、skills 或其他 canonical source。Agent 仍需依 required_dependencies
   讀取必要入口與驗證規則。
 refresh_policy: knowledge/runtime/refresh-policy.yaml
@@ -11,29 +12,112 @@ refresh_policy: knowledge/runtime/refresh-policy.yaml
 records:
   - id: route.bootstrap.ai-skill
     task_intent: 啟動或接手 Ai-skill work
-    primary_source: README.md
+    primary_source: CORE_BOOTSTRAP.md
     required_dependencies:
+      - README.md
       - shared-rules/README.md
-      - shared-rules/dependency-reading.md
-      - shared-rules/linked-updates.md
-      - shared-rules/conversation-goal-ledger.md
     candidate_sources:
+      - skills-index.yaml
       - knowledge/indexes/README.md
-      - runtime/routing/README.md
+      - runtime/router/activation-rules.yaml
       - knowledge/summaries/root-bootstrap.md
       - knowledge/graphs/metadata-navigation.yaml
-    source_of_truth_gate: root-readme-and-shared-rules-active
-    ranking_reason: Root README 與 shared-rules bootstrap 是所有 Ai-skill 工作的最低共同入口。
-    validation_signal: Bootstrap required set 已讀，且 git status 已檢查。
+    source_of_truth_gate: core-bootstrap-and-readme-active
+    ranking_reason: CORE_BOOTSTRAP.md 是每個 session 的最小啟動集合（3 rules, ~800 tokens）。
+    validation_signal: Core Bootstrap 3 rules 已讀，skills-index.yaml 已查詢，git status 已檢查。
     metadata:
       priority: P1
       confidence: high
-      context_cost: medium
+      context_cost:
+        estimated_tokens: 800
+        load_strategy: preload
+        cacheable: false
+        ttl:
+          session: 1
       compatibility_state: old-entrypoint-active
     model:
-      profile: large
-      compression_level: source-backed
-      reason: Ai-skill bootstrap 和 repository close-loop 需要完整 source 與 required dependencies。
+      profile: small
+      compression_level: summary-first
+      reason: Bootstrap 階段只需要 Core Bootstrap 3 rules 與 OS layout，不需要完整 source。
+
+  - id: route.skill.discovery
+    task_intent: 根據 task intent 找到對應 skill
+    primary_source: skills-index.yaml
+    required_dependencies:
+      - CORE_BOOTSTRAP.md
+    candidate_sources:
+      - knowledge/indexes/README.md
+      - knowledge/summaries/README.md
+    source_of_truth_gate: skills-index-active
+    ranking_reason: skills-index.yaml 提供結構化 skill routing，Agent 先比對 task intent 與 triggers，不掃描整個 skills/ 目錄。
+    validation_signal: Task intent 已對應到 skills-index.yaml 的 triggers，entrypoint 與 summary path 可解析。
+    metadata:
+      priority: P1
+      confidence: high
+      context_cost:
+        estimated_tokens: 300
+        load_strategy: preload
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: Skills index 輕量（~300 tokens），可在整個對話中 cache。
+
+  - id: route.runtime.activation-rules
+    task_intent: 決定哪些 lazy-load rules 需要 activate
+    primary_source: runtime/router/activation-rules.yaml
+    required_dependencies:
+      - CORE_BOOTSTRAP.md
+      - skills-index.yaml
+    candidate_sources:
+      - runtime/context/ttl-policy.yaml
+      - knowledge/runtime/README.md
+    source_of_truth_gate: activation-rules-active
+    ranking_reason: Activation rules 定義每個 lazy-load rule 的觸發條件，Agent 依目前 task 比對後決定載入哪些規則。
+    validation_signal: 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。
+    metadata:
+      priority: P1
+      confidence: medium
+      context_cost:
+        estimated_tokens: 500
+        load_strategy: preload
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: Activation rules 輕量（~500 tokens），可在整個對話中 cache。
+
+  - id: route.runtime.context-ttl
+    task_intent: 管理 context 生命週期，防止 token 膨脹
+    primary_source: runtime/context/ttl-policy.yaml
+    required_dependencies:
+      - runtime/router/activation-rules.yaml
+    candidate_sources:
+      - knowledge/runtime/README.md
+      - knowledge/runtime/routing-registry.yaml
+    source_of_truth_gate: design-layer-only
+    ranking_reason: TTL policy 定義每條 context 的存活時間，Agent 依此 prune 過期 context。
+    validation_signal: Context TTL 已套用，過期 context 已 prune，token 使用率在預算內。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 400
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: TTL policy 輕量，需要 prune 時才讀。
 
   - id: route.governance.durable-goal-boundary
     task_intent: 維護 active goal 與 durable roadmap goal 邊界
@@ -53,7 +137,12 @@ records:
     metadata:
       priority: P1
       confidence: high
-      context_cost: medium
+      context_cost:
+        estimated_tokens: 600
+        load_strategy: preload
+        cacheable: false
+        ttl:
+          session: 1
       compatibility_state: old-entrypoint-active
     model:
       profile: large
@@ -78,7 +167,12 @@ records:
     metadata:
       priority: P1
       confidence: medium
-      context_cost: low
+      context_cost:
+        estimated_tokens: 400
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
       compatibility_state: dual-reference
     model:
       profile: small
@@ -105,7 +199,12 @@ records:
     metadata:
       priority: P2
       confidence: high
-      context_cost: medium
+      context_cost:
+        estimated_tokens: 1200
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
       compatibility_state: new-layer-promoted
     model:
       profile: large
@@ -133,7 +232,12 @@ records:
     metadata:
       priority: P2
       confidence: medium
-      context_cost: high
+      context_cost:
+        estimated_tokens: 4500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
       compatibility_state: old-entrypoint-active
     model:
       profile: specialized
@@ -158,7 +262,12 @@ records:
     metadata:
       priority: P1
       confidence: medium
-      context_cost: medium
+      context_cost:
+        estimated_tokens: 2000
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
       compatibility_state: dual-reference
     model:
       profile: specialized
@@ -186,7 +295,12 @@ records:
     metadata:
       priority: P1
       confidence: medium
-      context_cost: medium
+      context_cost:
+        estimated_tokens: 1800
+        load_strategy: lazy
+        cacheable: false
+        ttl:
+          task: 1
       compatibility_state: dual-reference
     model:
       profile: large
@@ -210,7 +324,12 @@ records:
     metadata:
       priority: P2
       confidence: medium
-      context_cost: low
+      context_cost:
+        estimated_tokens: 1200
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
       compatibility_state: dual-reference
     model:
       profile: large
