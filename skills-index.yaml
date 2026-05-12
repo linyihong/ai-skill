@@ -93,6 +93,9 @@ skills:
     entrypoint: skills/app-development-guidance/SKILL.md
     summary: knowledge/summaries/app-development-guidance.md
     related:
+      - workflow/app-development-guidance/README.md
+      - analysis/app-development-guidance/README.md
+      - intelligence/engineering/app-development-guidance/README.md
       - skills/app-development-guidance/README.md
       - skills/app-development-guidance/checklists/README.md
       - skills/app-development-guidance/controls/README.md
@@ -124,6 +127,9 @@ skills:
     entrypoint: skills/travel-planning/SKILL.md
     summary: knowledge/summaries/travel-planning.md
     related:
+      - workflow/travel-planning/README.md
+      - analysis/travel/README.md
+      - intelligence/travel/README.md
       - skills/travel-planning/README.md
 
   - id: repo-governance
