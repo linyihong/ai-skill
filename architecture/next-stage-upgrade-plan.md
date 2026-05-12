@@ -266,9 +266,11 @@ runtime/
   routing/
   orchestration/
   context/
-  budget/          ← 新增：Token Budget System
-  health/          ← 新增：Context Health Score
-  guards/          ← 新增：Circuit Breaker + Context Pollution Detection
+  budget/                ← Token Budget System
+  health/                ← Context Health Score
+  guards/                ← Circuit Breaker + Context Pollution Detection
+  pipeline/              ← Session lifecycle, guard chain, relevance engine
+  prompt-artifacts/      ← 新增：Task-specific prompt artifact generator
 ```
 
 核心責任：
@@ -282,6 +284,8 @@ runtime/
 - **token budget management**（`runtime/budget/token-budget.yaml`）。
 - **context health scoring**（`runtime/health/context-health-score.yaml`）。
 - **circuit breaker & guards**（`runtime/guards/circuit-breaker.yaml`、`runtime/guards/context-pollution.yaml`）。
+- **session lifecycle management**（`runtime/pipeline/session-lifecycle.yaml`）。
+- **prompt artifact generation**（`runtime/prompt-artifacts/`）— 根據 task type 自動組合 prompt 結構，引用 workflow/ 的執行步驟、intelligence/ 的工程智慧、analysis/ 的分析方法，產出針對當前任務優化的 prompt artifact。
 
 ### `tools/`
 

@@ -1,0 +1,542 @@
+# Prompt Artifact Templates
+# 定義各 task type 的 prompt artifact 結構。
+# Agent 在 routing stage 完成後，根據 task type 找到對應模板，
+# 依 sections 定義依序載入各 section 內容，組裝成最終 prompt artifact。
+#
+# 每個 section 定義：
+#   - id: section 識別碼
+#   - description: section 用途說明
+#   - source: 內容來源（可為固定文字、檔案路徑、或 composition rule）
+#   - composition_rule: 引用 composition-rules.yaml 中的規則（可選）
+#   - estimated_tokens: 預估 token 成本
+#   - load_strategy: always | on_condition（預設 always）
+#   - load_condition: 僅在 load_strategy=on_condition 時評估
+#   - required: true | false（預設 true）
+
+prompt_artifact_templates_version: v1
+status: candidate
+owner_layer: runtime/prompt-artifacts
+description: >
+  Task-specific prompt artifact templates. 每個 template 定義一個完整的 prompt 結構，
+  包含 sections、composition rules、與 token budget。Agent 在 routing stage 完成後，
+  根據 task type 載入對應模板，依序組裝各 section 成為 execution stage 的 prompt。
+
+templates:
+  # ──────────────────────────────────────────────
+  # APK Analysis
+  # ──────────────────────────────────────────────
+  - task_type: apk-analysis
+    name: APK Analysis Prompt Artifact
+    description: >
+      授權 APK 流量分析的完整 prompt 結構。包含分析範圍、執行流程、
+      工程智慧（路由選擇、證據優先）、分析方法、產出閘門與輸出格式。
+    skill_id: apk-analysis
+    triggers:
+      - apk
+      - mitm
+      - flutter
+      - frida
+      - traffic-analysis
+      - reverse-engineering
+    estimated_total_tokens: 4500
+    token_budget:
+      warning_at: 3500
+      hard_stop_at: 4000
+    sections:
+      - id: task-context
+        description: >
+          任務上下文。包含授權確認、scope 定義、APK 版本、裝置/模擬器資訊、
+          允許的操作範圍。
+        source: inline
+        content: |
+          ## Task Context
+          - Authorization: [confirmed / pending]
+          - Scope: [APK traffic analysis / runtime behavior / specific feature]
+          - APK Version: [version]
+          - Device/Emulator: [device info]
+          - Allowed Actions: [capture / hook / decrypt / document]
+        estimated_tokens: 200
+        required: true
+
+      - id: workflow-steps
+        description: >
+          APK 分析執行流程。引用 workflow/apk-analysis/ 中的執行步驟。
+        source: workflow/apk-analysis/execution-flow.md
+        composition_rule: workflow-steps
+        estimated_tokens: 1200
+        required: true
+
+      - id: intelligence-atoms
+        description: >
+          APK 分析相關的工程智慧 atoms。根據 task 類型選擇性載入。
+        source: intelligence/engineering/apk-analysis/
+        composition_rule: intelligence-atoms
+        estimated_tokens: 800
+        required: false
+        load_strategy: on_condition
+        load_condition: "task_requires_judgment == true"
+
+      - id: analysis-methods
+        description: >
+          APK 分析的具體方法。引用 analysis/apk/ 中的技術內容。
+        source: analysis/apk/
+        composition_rule: analysis-methods
+        estimated_tokens: 1000
+        required: false
+        load_strategy: on_condition
+        load_condition: "technique_detail_needed == true"
+
+      - id: artifact-gates
+        description: >
+          產出閘門定義。引用 workflow/apk-analysis/artifact-gates.md。
+        source: workflow/apk-analysis/artifact-gates.md
+        estimated_tokens: 800
+        required: true
+
+      - id: output-format
+        description: >
+          輸出格式要求。定義最終產出的結構與品質標準。
+        source: inline
+        content: |
+          ## Output Format
+          - UI Architecture Map (page-level)
+          - API Catalog (endpoint-level)
+          - Domain/Runtime Baseline
+          - Feature Reconstruction Handoff (if applicable)
+          - Unknowns & Open Questions
+          - Sanitization Checklist
+        estimated_tokens: 300
+        required: true
+
+  # ──────────────────────────────────────────────
+  # App Development Guidance
+  # ──────────────────────────────────────────────
+  - task_type: app-development-guidance
+    name: App Development Guidance Prompt Artifact
+    description: >
+      App/API/Embedded 開發審查與指引的完整 prompt 結構。包含審查類型、
+      檢查清單、安全控制評估、工程智慧與輸出格式。
+    skill_id: app-development-guidance
+    triggers:
+      - api
+      - backend
+      - mobile
+      - security
+      - firmware
+      - embedded
+      - contract
+      - codegen
+    estimated_total_tokens: 5000
+    token_budget:
+      warning_at: 4000
+      hard_stop_at: 4500
+    sections:
+      - id: task-context
+        description: >
+          審查任務上下文。包含審查類型、範圍、目標與相關文件。
+        source: inline
+        content: |
+          ## Task Context
+          - Review Type: [design / code / release / security / contract-governance]
+          - Scope: [feature / architecture / API change / full audit]
+          - Target: [platform / language / framework]
+          - Related Documents: [links to design docs / contracts / code]
+        estimated_tokens: 200
+        required: true
+
+      - id: review-type-workflow
+        description: >
+          對應審查類型的執行流程。引用 workflow/app-development-guidance/。
+        source: workflow/app-development-guidance/
+        composition_rule: workflow-steps
+        estimated_tokens: 1500
+        required: true
+
+      - id: checklists
+        description: >
+          審查檢查清單。引用 skills/app-development-guidance/checklists/。
+        source: skills/app-development-guidance/CHECKLIST.md
+        estimated_tokens: 1200
+        required: true
+
+      - id: controls
+        description: >
+          安全控制評估標準。引用 skills/app-development-guidance/controls/。
+        source: skills/app-development-guidance/controls/
+        estimated_tokens: 1000
+        required: false
+        load_strategy: on_condition
+        load_condition: "security_review == true"
+
+      - id: intelligence-atoms
+        description: >
+          開發相關的工程智慧 atoms。根據審查類型選擇性載入。
+        source: intelligence/engineering/
+        composition_rule: intelligence-atoms
+        estimated_tokens: 600
+        required: false
+        load_strategy: on_condition
+        load_condition: "architecture_or_design_review == true"
+
+      - id: output-format
+        description: >
+          審查結果輸出格式。包含 verdict、findings、建議修復方式。
+        source: inline
+        content: |
+          ## Output Format
+          - Verdict: [approve / approve-with-comments / changes-requested / blocked]
+          - Findings: [list of findings with risk level]
+          - Recommended Fixes: [actionable suggestions per finding]
+          - Open Questions: [unresolved items]
+        estimated_tokens: 300
+        required: true
+
+  # ──────────────────────────────────────────────
+  # Repository Analysis
+  # ──────────────────────────────────────────────
+  - task_type: repo-analysis
+    name: Repository Analysis Prompt Artifact
+    description: >
+      Repository 分析的完整 prompt 結構。包含分析類型、方法、工程智慧與輸出格式。
+    skill_id: repo-analysis
+    triggers:
+      - repo-analysis
+      - codebase-analysis
+      - onboarding
+      - tech-debt
+      - migration-impact
+    estimated_total_tokens: 3500
+    token_budget:
+      warning_at: 2800
+      hard_stop_at: 3200
+    sections:
+      - id: task-context
+        description: >
+          分析任務上下文。包含分析類型、目標 repository、分析目標。
+        source: inline
+        content: |
+          ## Task Context
+          - Analysis Type: [onboarding / deep-analysis / migration-impact / tech-debt / security-audit]
+          - Target Repository: [name / URL]
+          - Analysis Goal: [specific questions to answer]
+          - Constraints: [time / depth / focus areas]
+        estimated_tokens: 200
+        required: true
+
+      - id: analysis-workflow
+        description: >
+          Repository 分析執行流程。引用 workflow/repo-analysis/。
+        source: workflow/repo-analysis/
+        composition_rule: workflow-steps
+        estimated_tokens: 1000
+        required: true
+
+      - id: analysis-methods
+        description: >
+          Repository 分析的具體方法。引用 analysis/repo/。
+        source: analysis/repo/
+        composition_rule: analysis-methods
+        estimated_tokens: 800
+        required: false
+        load_strategy: on_condition
+        load_condition: "deep_analysis == true"
+
+      - id: intelligence-atoms
+        description: >
+          架構與領域相關的工程智慧 atoms。
+        source: intelligence/engineering/architecture/
+        composition_rule: intelligence-atoms
+        estimated_tokens: 600
+        required: false
+        load_strategy: on_condition
+        load_condition: "architecture_assessment_needed == true"
+
+      - id: output-format
+        description: >
+          分析結果輸出格式。
+        source: inline
+        content: |
+          ## Output Format
+          - Repository Mental Model: [high-level structure summary]
+          - Key Findings: [list of findings with evidence references]
+          - Risk Assessment: [risks identified]
+          - Recommendations: [actionable next steps]
+          - Open Questions: [unresolved items]
+        estimated_tokens: 300
+        required: true
+
+  # ──────────────────────────────────────────────
+  # Travel Planning
+  # ──────────────────────────────────────────────
+  - task_type: travel-planning
+    name: Travel Planning Prompt Artifact
+    description: >
+      旅遊規劃的完整 prompt 結構。包含規劃範圍、執行流程、領域智慧與輸出格式。
+    skill_id: travel-planning
+    triggers:
+      - travel
+      - itinerary
+      - route
+      - transportation
+      - accommodation
+      - sightseeing
+      - trip
+      - vacation
+    estimated_total_tokens: 3500
+    token_budget:
+      warning_at: 2800
+      hard_stop_at: 3200
+    sections:
+      - id: task-context
+        description: >
+          規劃任務上下文。包含目的地、日期、人數、預算與旅遊風格。
+        source: inline
+        content: |
+          ## Task Context
+          - Destination: [city / region / multi-city]
+          - Dates: [start / end / duration]
+          - Travelers: [adults / children / seniors]
+          - Budget: [total / daily]
+          - Style: [relaxed / packed / adventure / culture / food]
+          - Special Requirements: [dietary / mobility / interests]
+        estimated_tokens: 200
+        required: true
+
+      - id: planning-workflow
+        description: >
+          旅遊規劃執行流程。引用 workflow/travel-planning/。
+        source: workflow/travel-planning/
+        composition_rule: workflow-steps
+        estimated_tokens: 1200
+        required: true
+
+      - id: intelligence-atoms
+        description: >
+          旅遊領域智慧 atoms。根據目的地與規劃類型選擇性載入。
+        source: intelligence/travel/
+        composition_rule: intelligence-atoms
+        estimated_tokens: 500
+        required: false
+        load_strategy: on_condition
+        load_condition: "domain_specific_heuristics_available == true"
+
+      - id: output-format
+        description: >
+          規劃結果輸出格式。
+        source: inline
+        content: |
+          ## Output Format
+          - Daily Itinerary: [day-by-day plan with time slots]
+          - Transportation: [routes / costs / alternatives]
+          - Accommodation: [options with pros/cons]
+          - Budget Breakdown: [estimated costs by category]
+          - Backup Plans: [alternatives for key items]
+          - Preparation Checklist: [packing / documents / bookings]
+        estimated_tokens: 400
+        required: true
+
+  # ──────────────────────────────────────────────
+  # Repository Governance
+  # ──────────────────────────────────────────────
+  - task_type: repo-governance
+    name: Repository Governance Prompt Artifact
+    description: >
+      AI-native Knowledge OS 本身維護與治理的完整 prompt 結構。
+      包含治理範圍、生命週期、驗證閘門與輸出格式。
+    skill_id: repo-governance
+    triggers:
+      - governance
+      - migration
+      - architecture-upgrade
+      - repo-maintenance
+      - cleanup
+      - deprecation
+      - lifecycle
+      - validation
+      - metadata
+      - schema
+    estimated_total_tokens: 3000
+    token_budget:
+      warning_at: 2400
+      hard_stop_at: 2700
+    sections:
+      - id: task-context
+        description: >
+          治理任務上下文。包含治理類型、範圍與目標。
+        source: inline
+        content: |
+          ## Task Context
+          - Governance Type: [migration / upgrade / cleanup / validation / deprecation]
+          - Scope: [layer / directory / file pattern]
+          - Goal: [specific outcome]
+          - Constraints: [backward-compatibility / timeline / dependencies]
+        estimated_tokens: 200
+        required: true
+
+      - id: governance-workflow
+        description: >
+          治理執行流程。引用 governance/ 中的生命週期與驗證規則。
+        source: governance/
+        composition_rule: workflow-steps
+        estimated_tokens: 1000
+        required: true
+
+      - id: lifecycle-rules
+        description: >
+          知識生命週期規則。引用 governance/lifecycle/。
+        source: governance/lifecycle/
+        estimated_tokens: 600
+        required: true
+
+      - id: validation-gates
+        description: >
+          驗證閘門定義。引用 governance/validation/。
+        source: governance/validation/
+        estimated_tokens: 600
+        required: true
+
+      - id: output-format
+        description: >
+          治理結果輸出格式。
+        source: inline
+        content: |
+          ## Output Format
+          - Changes Made: [list of changes with file paths]
+          - Validation Results: [pass / fail per gate]
+          - Migration Status: [completed / pending / blocked]
+          - Linked Updates Required: [files that need sync]
+          - Open Issues: [unresolved items]
+        estimated_tokens: 300
+        required: true
+
+  # ──────────────────────────────────────────────
+  # Knowledge Navigation
+  # ──────────────────────────────────────────────
+  - task_type: knowledge-navigation
+    name: Knowledge Navigation Prompt Artifact
+    description: >
+      知識導航與查詢的完整 prompt 結構。包含查詢類型、索引、摘要與輸出格式。
+    skill_id: knowledge-navigation
+    triggers:
+      - navigation
+      - routing
+      - index
+      - summary
+      - knowledge-graph
+      - context-loading
+      - runtime
+    estimated_total_tokens: 2500
+    token_budget:
+      warning_at: 2000
+      hard_stop_at: 2250
+    sections:
+      - id: task-context
+        description: >
+          導航任務上下文。包含查詢類型與目標。
+        source: inline
+        content: |
+          ## Task Context
+          - Query Type: [find-atom / find-skill / find-summary / trace-relationship]
+          - Query Target: [keyword / topic / file pattern]
+          - Depth: [summary / full / graph]
+        estimated_tokens: 150
+        required: true
+
+      - id: navigation-index
+        description: >
+          知識導航索引。引用 knowledge/indexes/。
+        source: knowledge/indexes/
+        estimated_tokens: 800
+        required: true
+
+      - id: knowledge-summary
+        description: >
+          知識摘要。引用 knowledge/summaries/。
+        source: knowledge/summaries/
+        composition_rule: knowledge-summary
+        estimated_tokens: 600
+        required: false
+        load_strategy: on_condition
+        load_condition: "summary_needed == true"
+
+      - id: output-format
+        description: >
+          導航結果輸出格式。
+        source: inline
+        content: |
+          ## Output Format
+          - Found Atoms: [list with paths and status]
+          - Relevance Score: [per atom]
+          - Relationships: [graph edges if applicable]
+          - Recommended Load Order: [priority-ordered list]
+        estimated_tokens: 300
+        required: true
+
+  # ──────────────────────────────────────────────
+  # Feedback & Promotion
+  # ──────────────────────────────────────────────
+  - task_type: feedback-promotion
+    name: Feedback & Promotion Prompt Artifact
+    description: >
+      Feedback lesson 管理與 promotion 的完整 prompt 結構。
+      包含 lesson 內容、promotion 目標、驗證規則與輸出格式。
+    skill_id: feedback-promotion
+    triggers:
+      - feedback
+      - lesson
+      - promotion
+      - failure-learning
+      - extraction
+      - refinement
+    estimated_total_tokens: 3000
+    token_budget:
+      warning_at: 2400
+      hard_stop_at: 2700
+    sections:
+      - id: task-context
+        description: >
+          Feedback 任務上下文。包含操作類型與 lesson 範圍。
+        source: inline
+        content: |
+          ## Task Context
+          - Operation: [create-lesson / promote / extract / refine / replay]
+          - Lesson Source: [feedback_history / failure-patterns / conversation]
+          - Target Layer: [intelligence / workflow / analysis / shared-rules]
+        estimated_tokens: 200
+        required: true
+
+      - id: promotion-workflow
+        description: >
+          Promotion 執行流程。引用 feedback/promotion/ 與 feedback/pipeline/。
+        source: feedback/promotion/
+        composition_rule: workflow-steps
+        estimated_tokens: 1000
+        required: true
+
+      - id: lesson-format
+        description: >
+          Lesson 格式要求。引用 shared-rules/feedback-lessons.md。
+        source: shared-rules/feedback-lessons.md
+        estimated_tokens: 800
+        required: true
+
+      - id: validation-rules
+        description: >
+          Promotion 驗證規則。引用 governance/validation/。
+        source: governance/validation/
+        estimated_tokens: 600
+        required: true
+
+      - id: output-format
+        description: >
+          Feedback 操作結果輸出格式。
+        source: inline
+        content: |
+          ## Output Format
+          - Lesson ID: [generated or existing]
+          - Promotion Target: [layer / file path]
+          - Validation Results: [pass / fail per gate]
+          - Linked Updates: [files that need sync]
+          - Status: [created / promoted / rejected / reworked]
+        estimated_tokens: 300
+        required: true
