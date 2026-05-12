@@ -1,10 +1,10 @@
-# Extracted — See [`analysis/travel/sources-and-tools.md`](../../analysis/travel/sources-and-tools.md)
+# Travel Planning Sources and Tools（旅遊規劃來源與工具）
 
-# Travel Planning Sources and Tools
+本文件定義旅遊規劃的資訊來源層級、各類查詢策略，以及常見的 red flags。承接 [`skills/travel-planning/TOOLS.md`](../../skills/travel-planning/TOOLS.md) 的內容，提取為 tool-neutral 的分析方法。
 
-Use current web sources for travel planning. Do not rely on model memory for operating hours, closures, prices, route disruptions, or overnight-stay rules.
+> **相容性規則**：`skills/travel-planning/TOOLS.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
 
-## Source Hierarchy
+## Source Hierarchy（來源層級）
 
 | Priority | Source Type | Use For |
 | --- | --- | --- |
@@ -13,7 +13,7 @@ Use current web sources for travel planning. Do not rely on model memory for ope
 | 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, country-appropriate restaurant review/rating platforms, map review platforms, calendar/reminder fields, notes app structure, travel planning app fields, and offline-map needs | Discovery, exact location identity, navigation identifiers, parking/access notes, restaurant screening, app-ready organization, recent user signals; verify key claims elsewhere. |
 | 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
 
-## Japan Travel Sources
+## Japan Travel Sources（日本旅遊來源）
 
 Use official or operator pages first:
 
@@ -34,7 +34,7 @@ Use official or operator pages first:
 
 For 車中泊 discovery, a user may provide community maps such as `https://syachuhaku.fxtec.info/`. Treat these as discovery sources, then verify overnight rules, toilets, gates, fees, and recent notices through official pages, RV Park listings, local pages, or direct contact when needed.
 
-## Travel Agency and Model-Course Sources
+## Travel Agency and Model-Course Sources（旅行社與模型行程來源）
 
 Use agency tours and official model courses either as benchmarks or direct package options:
 
@@ -44,7 +44,7 @@ Use agency tours and official model courses either as benchmarks or direct packa
 - Watch for: agency-specific shortcuts, charter bus assumptions, group-only meals, omitted free time, commercial stops, sponsored shopping, and routes that do not work for self-drive or public transit.
 - Record whether the agency item is a `direct package option` or `benchmark only`, what was borrowed, what was changed, and what the user should verify before booking.
 
-## Checks By Travel Type
+## Checks By Travel Type（依旅遊類型檢查）
 
 | Travel Type | Minimum Checks |
 | --- | --- |
@@ -56,7 +56,7 @@ Use agency tours and official model courses either as benchmarks or direct packa
 | Seasonal events | Official event dates, ticketing, crowd control, special transit, road restrictions. |
 | Calendar / app use | Stable time blocks, timezone, map pins, reminder timing, reservation notes, day grouping, offline-map and backup-save needs. |
 
-## Stop Experience and Food Sources
+## Stop Experience and Food Sources（停留體驗與美食來源）
 
 For each key stop, verify or describe:
 
@@ -68,7 +68,7 @@ For each key stop, verify or describe:
 
 Do not overfill an itinerary with food recommendations that are off-route or closed at the planned time.
 
-## Restaurant Rating and Review Sources
+## Restaurant Rating and Review Sources（餐廳評分與評論來源）
 
 Use the destination country's common restaurant discovery tools instead of applying one global rating rule.
 
@@ -90,7 +90,7 @@ Japan checks:
 
 For other countries, identify local equivalents before recommending restaurants, such as the dominant map platform, reservation platform, food guide, tourism-board food page, or local review site.
 
-## Lodging and Overnight Sources
+## Lodging and Overnight Sources（住宿與過夜來源）
 
 When an itinerary includes overnight stays, use current sources for:
 
@@ -101,7 +101,7 @@ When an itinerary includes overnight stays, use current sources for:
 
 Lodging candidates can include hotels, guesthouses, minshuku, ryokan, hostels, business hotels, campgrounds, cabins, RV Parks, and car-stay bases. If exact availability is not checked, recommend the area/base first and mark specific candidates `needs availability check`.
 
-## Route Shape Sources
+## Route Shape Sources（路線形狀來源）
 
 Use route planners and maps to inspect whether the order is efficient:
 
@@ -111,7 +111,7 @@ Use route planners and maps to inspect whether the order is efficient:
 - Compare one-way progression, loop route, and hub-based route.
 - Add time/cost impact for any intentional detour or strongly recommended stop.
 
-## Transport Booking and Cost Sources
+## Transport Booking and Cost Sources（交通預訂與費用來源）
 
 For non-driving plans, use official or operator-backed sources for:
 
@@ -130,7 +130,7 @@ For driving plans, estimate with:
 
 Cost estimates should be labeled as rough unless all operator prices and route choices are fixed.
 
-## Long-Distance Transport Comparison Sources
+## Long-Distance Transport Comparison Sources（長途交通比較來源）
 
 When transfer time is 2+ hours or crosses major regions, compare:
 
@@ -143,7 +143,7 @@ When transfer time is 2+ hours or crosses major regions, compare:
 
 Always compare door-to-door time and total cost. Ticket price alone is not enough.
 
-## Country-Specific Driving Sources
+## Country-Specific Driving Sources（國家特定駕駛來源）
 
 When the trip uses a car, check whether the destination country has local navigation or access conventions.
 
@@ -166,7 +166,7 @@ Parking source handling:
 - If no reliable visitor parking exists, choose a different stop, suggest public transport/taxi for that segment, or add a confirmed nearby paid parking lot.
 - When Google Maps shows a correct attraction pin but the user is driving, also provide or replace with the nearest confirmed visitor parking pin; state walking distance or shuttle requirement when material.
 
-## Exact Location Sources
+## Exact Location Sources（精確位置來源）
 
 Use precise location sources when marking stops:
 
@@ -197,7 +197,7 @@ Location red flags:
 - Japan restaurant recommendations omit 食べログ or another local screening source when the user asks for local rating tools and enough current information is available.
 - Rural, mountain, island, night, or winter driving legs omit last/next reliable fuel or charging points.
 
-## Weather-Aware Planning Sources
+## Weather-Aware Planning Sources（天氣感知規劃來源）
 
 Check weather at the smallest practical area and time window:
 
@@ -209,7 +209,7 @@ Check weather at the smallest practical area and time window:
 
 Use weather to decide route order. If the forecast is uncertain, provide Plan A / Plan B rather than a single fragile schedule.
 
-## Road-Trip Support Stops
+## Road-Trip Support Stops（公路旅行支援停留）
 
 For car-stay or long driving days, search and verify:
 
@@ -221,7 +221,7 @@ For car-stay or long driving days, search and verify:
 | Fuel / charging | Fuel station, EV charger, roadside station, service area | Hours, charger type, payment app/card, rural gaps, last/next reliable point. |
 | Rest / toilet | 道の駅, service area, park, public toilet, bath facility | Overnight access, cleanliness recency, gates, lighting. |
 
-## Schedule Feasibility Sources
+## Schedule Feasibility Sources（行程可行性來源）
 
 Check the timing assumptions behind the day:
 
@@ -232,7 +232,7 @@ Check the timing assumptions behind the day:
 
 Mark days as `comfortable`, `tight`, `too packed`, or `needs day-before check`.
 
-## Calendar And App-Ready Sources
+## Calendar And App-Ready Sources（日曆與應用程式就緒來源）
 
 Use these when the output should be easy to add to a calendar, map list, reminder app, notes app, or travel planning app:
 
@@ -250,7 +250,7 @@ Calendar/app red flags:
 - Map list mixes primary stops and backups without labels.
 - App-ready output implies a generated export file when only structured text was provided.
 
-## 車中泊 Quietness Sources
+## 車中泊 Quietness Sources（車中泊安靜度來源）
 
 When evaluating car-stay candidates, check:
 
@@ -261,7 +261,7 @@ When evaluating car-stay candidates, check:
 
 Use labels: `quiet`, `moderate`, `noisy`, or `unknown`. If quietness is `noisy` or `unknown`, include a quieter backup when possible.
 
-## Source Note Format
+## Source Note Format（來源記錄格式）
 
 When citing a time-sensitive source, record:
 
@@ -273,7 +273,7 @@ When citing a time-sensitive source, record:
 - Confidence: confirmed | likely | needs day-before check | unknown
 ```
 
-## Red Flags
+## Red Flags（紅旗警示）
 
 - Opening hours shown only on a map listing, with no official confirmation.
 - Travel agency itinerary used as the only source for a time-sensitive claim.
@@ -297,3 +297,12 @@ When citing a time-sensitive source, record:
 - Ferry, ropeway, mountain road, or viewpoint plans that ignore wind, visibility, snow, or wave forecasts.
 - Last-entry time too close to arrival.
 - Backup location more than 30-60 minutes away for late-night plans.
+
+---
+
+## 與其他層的關係
+
+- `workflow/travel-planning/execution-flow.md` 提供執行流程，本文件提供流程中的來源選擇策略。
+- `workflow/travel-planning/artifact-gates.md` 提供產出格式規範，本文件提供產出所需的來源驗證方法。
+- `intelligence/travel/` 提供旅遊規劃的啟發式規則，本文件提供執行這些規則所需的工具與來源知識。
+- `skills/travel-planning/TOOLS.md` 是原始來源，仍為 active entrypoint。

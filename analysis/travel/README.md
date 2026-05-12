@@ -1,10 +1,10 @@
-# Extracted — See [`analysis/travel/README.md`](../../analysis/travel/README.md)
+# Travel Analysis Methods（旅遊規劃分析方法）
 
-# Travel Planning Skill
+本文件定義旅遊規劃的核心目標、範圍與使用模式。承接 [`skills/travel-planning/README.md`](../../skills/travel-planning/README.md) 的內容，提取為 tool-neutral 的分析方法。
 
-This skill supports source-backed travel planning: itinerary design, travel agency itinerary benchmarking or direct package-tour adoption, package price comparison, long-distance transport comparison, stop-level activity and food recommendations, country-appropriate restaurant rating/review screening, exact location verification, driving Google Maps pins that target usable visitor parking, calendar-ready and app-ready itinerary output, current opening-hour checks, schedule feasibility checks, weather-aware route ordering, seasonal feasibility, public-transport optimization, fare and driving-cost estimates, lodging or guesthouse recommendations, car-stay routing, car-stay quietness checks, anti-backtracking route checks, fuel/charging gap planning, country-specific driving checks, road-trip support stops, and backup planning.
+> **相容性規則**：`skills/travel-planning/README.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
 
-## Goals
+## 核心目標
 
 - Turn a destination and date range into a practical route.
 - Use travel agency tours, package tours, and official model courses as benchmarks, or recommend them directly when they fit the user's needs.
@@ -29,32 +29,23 @@ This skill supports source-backed travel planning: itinerary design, travel agen
 - Use community sources for discovery while grounding decisions in official or current sources.
 - Make car-stay and road-trip plans realistic: legal overnight status, toilets, bathing, laundry, trash rules, noise rules, weather, road conditions, and backup lodging.
 
-## What Belongs Here
+## 範圍
+
+### 屬於本層
 
 - Reusable workflows for planning trips.
 - Source hierarchy, travel agency/model-course benchmark or direct-package checks, package price comparison, long-distance transport comparison, stop-level activity/food checks, country-specific restaurant rating/review checks, exact-location and driving-parking-pin checks, calendar/app-ready output checks, schedule-feasibility checks, lodging/base checks, car-stay quietness checks, anti-backtracking route checks, transport booking/cost checks, fuel/charging checks, country-specific checks, and verification rules.
 - Output templates for itineraries, agency/model-course comparison, package price comparison, long-distance transport comparison, stop recommendations, schedule feasibility, lodging candidates, route-shape warnings, quietness notes, transport plans, cost estimates, weather/backup logic, support-stop tables, source tables, and day-before checklists.
 - Reusable lessons about travel planning quality, not private trip details.
 
-## What Does Not Belong Here
+### 不屬於本層
 
 - Passport, payment, reservation code, home address, or traveler identity details.
 - One-off live availability results that only apply to a specific user's trip.
 - Claims that a facility is open, bookable, or legal for overnight stay without source and timestamp context.
 - Legal, medical, immigration, or insurance advice beyond linking official sources.
 
-## Files
-
-| File | Purpose |
-| --- | --- |
-| `SKILL.md` | Agent entry point and trigger rules. |
-| `WORKFLOW.md` | Planning and verification workflow. |
-| `TOOLS.md` | Source categories and preferred lookup strategy. |
-| `DOCUMENTATION.md` | Itinerary, source table, risk, and checklist templates. |
-| `FEEDBACK.md` | Short entry pointing to shared feedback rules. |
-| `feedback_history/` | Reusable travel-planning lessons. |
-
-## Use Pattern
+## 使用模式
 
 1. Start from the user's destination, dates, style, and constraints.
 2. Gather official and current sources for every time-sensitive recommendation.
@@ -71,3 +62,11 @@ This skill supports source-backed travel planning: itinerary design, travel agen
 13. Add calendar/app-ready fields when the user may import the trip into a calendar, map list, reminder app, notes app, travel planning app, or offline map.
 14. Mark confidence and unresolved checks clearly.
 15. Convert new reusable planning lessons into `feedback_history/` when they generalize.
+
+## 與其他層的關係
+
+- `workflow/travel-planning/execution-flow.md` 提供執行流程，本文件提供流程中的分析目標與範圍。
+- `analysis/travel/sources-and-tools.md` 提供來源選擇策略與工具知識。
+- `workflow/travel-planning/artifact-gates.md` 提供產出格式規範。
+- `intelligence/travel/` 提供旅遊規劃的啟發式規則。
+- `skills/travel-planning/README.md` 是原始來源，仍為 active entrypoint。

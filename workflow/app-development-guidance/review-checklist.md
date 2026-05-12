@@ -1,19 +1,29 @@
-# Extracted — See [`workflow/app-development-guidance/review-checklist.md`](../../workflow/app-development-guidance/review-checklist.md)
+# Review Checklist（審查檢查清單）
 
-# App Development Guidance Checklist
+本文件定義開發流程中的審查檢查項目。承接 [`skills/app-development-guidance/CHECKLIST.md`](../../skills/app-development-guidance/CHECKLIST.md) 的內容，提取為 tool-neutral 的 workflow gates。
 
-Use this checklist during design review, PR review, and release review. It is intentionally high level: project-specific requirements should live in the product repository.
+> **相容性規則**：`skills/app-development-guidance/CHECKLIST.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
 
-For focused checklists, use:
+## 使用原則
 
-- [`checklists/mobile-design-review.md`](checklists/mobile-design-review.md)
-- [`checklists/mobile-pr-review.md`](checklists/mobile-pr-review.md)
-- [`checklists/mobile-release-review.md`](checklists/mobile-release-review.md)
-- [`checklists/api-security-review.md`](checklists/api-security-review.md)
-- [`checklists/contract-governance-review.md`](checklists/contract-governance-review.md)
-- [`checklists/embedded-firmware-review.md`](checklists/embedded-firmware-review.md)
+1. **Keep checklists short enough to run during real development** — 檢查清單必須在實際開發中可執行。
+2. **Checklist items must stay linked to implementation docs** — 檢查項目必須連結到它們要求審查者驗證的實作文件。
+3. **When adding a check, update or verify implementation and control docs** — 新增檢查項目時，在同一變更中更新或驗證對應的 implementation 和 control 文件。
 
-When a checklist item changes because of a new control or implementation pattern, the linked `controls/` and `implementation/` docs must be updated or explicitly verified in the same change.
+## 聚焦檢查清單
+
+對於特定領域的聚焦檢查清單，使用：
+
+- [`checklists/mobile-design-review.md`](../../skills/app-development-guidance/checklists/mobile-design-review.md)
+- [`checklists/mobile-pr-review.md`](../../skills/app-development-guidance/checklists/mobile-pr-review.md)
+- [`checklists/mobile-release-review.md`](../../skills/app-development-guidance/checklists/mobile-release-review.md)
+- [`checklists/api-security-review.md`](../../skills/app-development-guidance/checklists/api-security-review.md)
+- [`checklists/contract-governance-review.md`](../../skills/app-development-guidance/checklists/contract-governance-review.md)
+- [`checklists/embedded-firmware-review.md`](../../skills/app-development-guidance/checklists/embedded-firmware-review.md)
+
+當檢查項目因新的 control 或 implementation pattern 而變更時，對應的 `controls/` 和 `implementation/` 文件必須在同一變更中更新或明確驗證。
+
+---
 
 ## Change Intake
 
@@ -168,3 +178,11 @@ When a checklist item changes because of a new control or implementation pattern
 - No unresolved blocker questions remain for behavior, contracts, errors, security, storage, ownership, or tests.
 - Known residual risks are documented in the project repository.
 - Reusable lessons are generalized into this skill only after sanitization.
+
+---
+
+## 與其他層的關係
+
+- `workflow/app-development-guidance/execution-flow.md` 提供執行流程，本文件提供流程中的審查門檻。
+- `analysis/app-development-guidance/controls-catalog.md` 提供檢查清單引用的控制原則。
+- `skills/app-development-guidance/CHECKLIST.md` 是原始來源，仍為 active entrypoint。

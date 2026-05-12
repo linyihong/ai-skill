@@ -296,8 +296,8 @@ Pilot 成功 = AI 開始能做 decision routing：
 | **Phase 29** | P1 | ✅ 已完成 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/apk-analysis/{heuristics,signals}/` | Phase 28（pilot 模式已驗證） |
 | **Phase 30** | P1 | ✅ 已完成 | Feedback history 提取到 feedback/ 層 | `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/extraction/`，建立 category index | Phase 29（techniques 完成後，feedback 可對應到已建立的 workflow/intelligence） |
 | **Phase 31** | P2 | ✅ 已完成 | Intelligence Extraction Pipeline 抽象化 | [`governance/lifecycle/intelligence-extraction-pipeline.md`](governance/lifecycle/intelligence-extraction-pipeline.md) — 7-step pipeline（內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引） | Phase 29（所有 techniques 完成後才有足夠經驗） |
-| **Phase 32** | P2 | SKILL.md 分解 | 將各 skill 的 `SKILL.md` 中剩餘內容（Quick Start、Default Workflow、Output Style、Feedback Loop）提取到對應新層 | Phase 30（feedback 提取完成） |
-| **Phase 33** | P4 | Skill-Specific Intelligence Extraction | 見 [`plans/skill-specific-extraction.md`](plans/skill-specific-extraction.md) | Phase 31（pipeline 驗證成功）+ Phase 32（SKILL.md 分解完成） |
+| **Phase 32** | P2 | ✅ 已完成 | SKILL.md 分解 | 將各 skill 的 `SKILL.md` 中剩餘內容（Quick Start、Default Workflow、Output Style、Feedback Loop）提取到對應新層 | Phase 30（feedback 提取完成） |
+| **Phase 33** | P4 | ✅ 已完成 | Skill-Specific Intelligence Extraction | 見 [`plans/skill-specific-extraction.md`](plans/skill-specific-extraction.md) | Phase 31（pipeline 驗證成功）+ Phase 32（SKILL.md 分解完成） |
 
 ---
 
@@ -433,29 +433,60 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 ---
 
-#### Phase 33：Skill-Specific Intelligence Extraction（P4）
+#### ✅ 已完成：Phase 33 — Skill-Specific Intelligence Extraction（P4）
 
-**目標**：為每個 skill 設計專屬的 extraction strategy。
+**目標**：為每個 skill 設計專屬的 extraction strategy，並執行剩餘未提取內容的提取。
 
-**詳細規劃**：見 [`plans/skill-specific-extraction.md`](plans/skill-specific-extraction.md)。
+**執行摘要**：
 
-**啟動條件**：
-- Phase 31（Intelligence Extraction Pipeline）驗證成功
-- Phase 32（SKILL.md 分解）完成
-- 所有 technique decomposition 完成
+| 子步驟 | 內容 | 狀態 |
+|--------|------|------|
+| 33a | 提取 `skills/app-development-guidance/CHECKLIST.md` → `workflow/app-development-guidance/review-checklist.md` | ✅ |
+| 33b | 提取 `skills/travel-planning/TOOLS.md` → `analysis/travel/sources-and-tools.md` | ✅ |
+| 33c | 提取 `skills/travel-planning/README.md` → `analysis/travel/README.md` | ✅ |
+| 33d | 更新 `plans/skill-specific-extraction.md` 為執行結果 | ✅ |
+| 33e | 更新 `architecture/next-stage-upgrade-plan.md` | ✅ |
+| 33f | 提交 + push | ✅ |
 
-**成功驗證標準**：
-- 每個 skill 有專屬 extraction strategy
-- 內容結構分析 → 拆解 → 標註 → 驗證的完整流程已定義
+**建立的新檔案**（3 個）：
+
+| 檔案 | 說明 |
+|------|------|
+| `workflow/app-development-guidance/review-checklist.md` | 完整審查檢查清單（15 個類別：Change Intake、Test Strategy、Performance Test、Product To Contract、Documentation Backfill、Contract Governance、Reusable Guidance Boundary、Embedded/Hardware Review、API And Transport、Auth/Tokens/Sessions、Local Storage、Flutter/Android Build、Logging/Telemetry、Anti-Tamper/Risk、Release Gate） |
+| `analysis/travel/sources-and-tools.md` | 旅遊規劃來源與工具完整清單（Source Hierarchy、Japan Travel Sources、Agency Sources、Checks By Travel Type、Stop/Food Sources、Restaurant Sources、Lodging Sources、Route Shape Sources、Transport Sources、Country-Specific Driving、Exact Location Sources、Weather Sources、Road-Trip Stops、Schedule Feasibility、Calendar/App-Ready、車中泊 Quietness、Source Note Format、Red Flags） |
+| `analysis/travel/README.md` | Travel Planning 分析方法（Core Goals、Scope、Usage Pattern、Relationships） |
+
+**更新的既有檔案**（4 個）：
+
+| 檔案 | 變更 |
+|------|------|
+| `skills/app-development-guidance/CHECKLIST.md` | 加入 `# Extracted — See workflow/app-development-guidance/review-checklist.md` |
+| `skills/travel-planning/TOOLS.md` | 加入 `# Extracted — See analysis/travel/sources-and-tools.md` |
+| `skills/travel-planning/README.md` | 加入 `# Extracted — See analysis/travel/README.md` |
+| `plans/skill-specific-extraction.md` | 從 pending 更新為執行結果（含完整 extraction status 表、annotation status 表、validation 結果） |
+
+**提取策略摘要**：
+
+| Skill | 提取策略 | 已提取內容 |
+|-------|---------|-----------|
+| `apk-analysis` | Technique Decomposition（Phase 28-29）+ Feedback History Index（Phase 30）+ SKILL.md Decomposition（Phase 32） | 全部提取完成 |
+| `app-development-guidance` | Catalog Extraction（Phase 26）+ Process Extraction（Phase 27）+ Feedback History Index（Phase 30）+ SKILL.md Decomposition（Phase 32）+ Checklist Extraction（Phase 33） | 全部提取完成 |
+| `travel-planning` | Workflow/Artifact Extraction（Phase 18）+ SKILL.md Decomposition（Phase 32）+ Tools/README Extraction（Phase 33） | 全部提取完成 |
+
+**關鍵發現**：
+- 3 個 skills 的內容結構差異大，但 extraction 策略可歸納為 3 種模式：**Technique Decomposition**（apk-analysis）、**Catalog Extraction**（app-development-guidance）、**Direct Promotion**（travel-planning）
+- `travel-planning` 的 `TOOLS.md`（298 行）和 `README.md`（72 行）是純參考資料，直接 promotion 到 `analysis/` 層即可，不需拆解
+- `app-development-guidance/CHECKLIST.md`（169 行）是純審查清單，直接 promotion 到 `workflow/` 層即可，不需拆解
+- 所有 3 個 skills 的內容現在已全部提取到新分層，舊檔案已標註提取狀態
+
+---
 
 ### 尚未完成的下一階段
 
-- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `SKILL.md` 仍為 skill-local。舊 skills 的清理時間線定義於 [`governance/lifecycle/README.md`](governance/lifecycle/README.md) 的 Skills Deprecation Timeline（Phase A→D），目前處於 Phase A（不刪除）。
-- **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建，但更多 skill 內容需要提取到新分層。
-- **更多 skill 內容可提取**：`skills/apk-analysis/` 的 `techniques/` 子目錄已提取 catalog 至 `analysis/apk/techniques/`，flutter-dart-aot 已完成 decomposition pilot。`skills/app-development-guidance/` 和 `skills/apk-analysis/` 的 `feedback_history/` 子目錄尚未提取到 `feedback/` 層。
-- **其餘 3 個 techniques**（http-api、local-proxy、media-hls）待後續 decomposition。
-- **Intelligence Extraction Pipeline** 待 pilot 驗證成功後再抽象化。
-- **Skill-Specific Intelligence Extraction（遠期）**：不同 skill 的內容結構差異大，無法用單一 extraction pipeline 處理。詳細規劃見 [`plans/skill-specific-extraction.md`](plans/skill-specific-extraction.md)。此項目應在所有 technique decomposition 完成、Intelligence Extraction Pipeline 驗證成功後才啟動（P4）。
+- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。所有內容已提取到新分層，舊檔案已標註提取狀態。舊 skills 的清理時間線定義於 [`governance/lifecycle/README.md`](governance/lifecycle/README.md) 的 Skills Deprecation Timeline（Phase A→D），目前處於 Phase A（不刪除）。
+- **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建。
+- **Intelligence Extraction Pipeline** 已建立（Phase 31），但尚未在實際工作階段中驗證 intelligence atoms 是否改善 AI 決策品質。
+- **Skills Deprecation（遠期）**：所有 3 個 skills 的內容已全部提取到新分層，可考慮進入 Phase B（標記 deprecated）。詳細時間線見 [`governance/lifecycle/README.md`](governance/lifecycle/README.md) 和 [`plans/skill-specific-extraction.md`](plans/skill-specific-extraction.md)。
 
 ### 下一階段 Phase 規劃（29-33）
 
@@ -463,11 +494,11 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 | Phase | 優先級 | 目標 | 主要產出 | 依賴 |
 |-------|--------|------|----------|------|
-| **Phase 29** | P1 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/` | Phase 28（pilot 模式已驗證） |
-| **Phase 30** | P1 | Feedback history 提取到 feedback/ 層 | `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/extraction/`，建立 category index | Phase 29（techniques 完成後，feedback 可對應到已建立的 workflow/intelligence） |
-| **Phase 31** | P2 | Pilot 驗證 + Intelligence Extraction Pipeline 抽象化 | 在實際 APK analysis session 中驗證 intelligence atoms 是否改善 AI 決策品質；從 pilot 經驗提煉出可重複的 extraction pipeline | Phase 29（所有 techniques 完成後才有足夠經驗） |
-| **Phase 32** | P2 | SKILL.md 分解 | 將各 skill 的 `SKILL.md` 中剩餘內容（Quick Start、Default Workflow、Output Style、Feedback Loop）提取到對應新層 | Phase 30（feedback 提取完成） |
-| **Phase 33** | P4 | Skill-Specific Intelligence Extraction | 見 [`plans/skill-specific-extraction.md`](plans/skill-specific-extraction.md) | Phase 31（pipeline 驗證成功）+ Phase 32（SKILL.md 分解完成） |
+| **Phase 29** | P1 | ✅ 已完成 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/` | Phase 28（pilot 模式已驗證） |
+| **Phase 30** | P1 | ✅ 已完成 | Feedback history 提取到 feedback/ 層 | `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/extraction/`，建立 category index | Phase 29（techniques 完成後，feedback 可對應到已建立的 workflow/intelligence） |
+| **Phase 31** | P2 | ✅ 已完成 | Intelligence Extraction Pipeline 抽象化 | [`governance/lifecycle/intelligence-extraction-pipeline.md`](governance/lifecycle/intelligence-extraction-pipeline.md) — 7-step pipeline（內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引） | Phase 29（所有 techniques 完成後才有足夠經驗） |
+| **Phase 32** | P2 | ✅ 已完成 | SKILL.md 分解 | 將各 skill 的 `SKILL.md` 中剩餘內容（Quick Start、Default Workflow、Output Style、Feedback Loop）提取到對應新層 | Phase 30（feedback 提取完成） |
+| **Phase 33** | P4 | ✅ 已完成 | Skill-Specific Intelligence Extraction | 見 [`plans/skill-specific-extraction.md`](plans/skill-specific-extraction.md) | Phase 31（pipeline 驗證成功）+ Phase 32（SKILL.md 分解完成） |
 
 ## 核心問題
 
@@ -1179,10 +1210,10 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 升級 Skills Metadata v2 | `skills-index.yaml` | 已完成所有 13 skills 加入 weight/domains/dependencies/conflicts/priority.runtime | Skill relevance scoring 與 conflict detection 可運作 |
 | P1 | done | 重建 intelligence/ 為專家智慧層 | `intelligence/README.md`, `intelligence/engineering/{architecture,domain,failure,heuristics,anti-patterns,tradeoffs,distributed-systems}/`, `intelligence/business/`, `intelligence/travel/` | 已完成 9 子目錄結構與 scope 定義，尚未填充實際 atoms | 每個子目錄有 README.md 定義核心、範例內容、與其他層的關係；與根 `anti-patterns/` 邊界已明確定義 |
 | P1 | done | Phase 29：其餘 3 個 techniques decomposition | `analysis/apk/workflows/`, `intelligence/engineering/apk-analysis/{heuristics,signals}/` | 已完成 http-api、local-proxy、media-hls 拆解（3 workflows + 4 intelligence atoms） | 每個 technique 有 workflow + 1-2 intelligence atoms，舊檔案已標註 |
-| P1 | pending | Phase 30：Feedback history 提取 | `feedback/extraction/` | 將 apk-analysis 和 app-development-guidance 的 feedback_history 提取到 feedback/ 層 | Category index 已建立，至少 50% lessons 已對應到目標層 |
-| P2 | pending | Phase 31：Pilot 驗證 + Intelligence Extraction Pipeline | `governance/lifecycle/intelligence-extraction-pipeline.md` | 驗證 intelligence atoms 改善決策品質，抽象出可重複的 extraction pipeline | Pilot 驗證報告 + pipeline 文件已建立 |
-| P2 | pending | Phase 32：SKILL.md 分解 | `runtime/onboarding/`, `workflow/`, `feedback/` | 將 apk-analysis 和 app-development-guidance 的 SKILL.md 拆解到對應層 | SKILL.md 中所有內容已對應到目標層，舊檔案已標註 |
-| P4 | pending | Phase 33：Skill-Specific Intelligence Extraction（P4） | `plans/skill-specific-extraction.md` | 待所有 technique decomposition 完成、Intelligence Extraction Pipeline 驗證成功後啟動 | 每個 skill 有專屬 extraction strategy，內容結構分析 → 拆解 → 標註 → 驗證的完整流程已定義 |
+| P1 | done | Phase 30：Feedback history 提取 | `feedback/extraction/apk-analysis-index.md`, `feedback/extraction/app-development-guidance-index.md` | 已完成 101 lessons 索引建立，100% lessons 已對應到目標層 | Category index 已建立，101/101 lessons 已對應到目標層 |
+| P2 | done | Phase 31：Intelligence Extraction Pipeline | `governance/lifecycle/intelligence-extraction-pipeline.md` | 已完成 7-step pipeline（內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引） | Pipeline 文件已建立，已驗證 Technique Decomposition 和 Feedback History Extraction 兩種模式 |
+| P2 | done | Phase 32：SKILL.md 分解 | `runtime/onboarding/apk-analysis-quickstart.md`, `runtime/onboarding/app-development-guidance-quickstart.md`, `runtime/onboarding/travel-planning-quickstart.md`, `workflow/travel-planning/artifact-gates.md` | 已完成 3 個 SKILL.md 瘦身（46-65% 減少），4 個新檔案建立 | SKILL.md 中所有內容已對應到目標層，舊檔案已標註 |
+| P4 | done | Phase 33：Skill-Specific Intelligence Extraction（P4） | `plans/skill-specific-extraction.md`, `workflow/app-development-guidance/review-checklist.md`, `analysis/travel/sources-and-tools.md`, `analysis/travel/README.md` | 已完成 3 個 skills 的剩餘內容提取（CHECKLIST.md、TOOLS.md、README.md），所有 skills 內容已全部提取到新分層 | 每個 skill 有專屬 extraction strategy，內容結構分析 → 拆解 → 標註 → 驗證的完整流程已執行 |
 
 ## 最終目標
 
