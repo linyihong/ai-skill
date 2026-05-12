@@ -298,16 +298,16 @@ tools/
 
 負責「長期記憶」。
 
-建議結構：
+目前結構：
 
 ```text
 memory/
   working/         ← Session-local, discardable 工作記憶
   summary/         ← 壓縮 session 歷史（≤500 tokens）
   decision/        ← 輕量 ADR（immutable, numbered）
-  episodic/        ← 情節記憶（future）
-  project/         ← 專案記憶（future）
-  failure/         ← 失效記憶（future）
+  episodic/        ← 情境記憶（跨 session 經驗 recall）
+  project/         ← 專案記憶（跨 session 專案脈絡）
+  failure/         ← 失效記憶（抽象化失效模式）
 ```
 
 核心責任：
@@ -315,9 +315,12 @@ memory/
 - experience replay。
 - long-term memory。
 - historical context。
-- **session-local working memory**（`memory/working/README.md`）。
-- **compressed session summaries**（`memory/summary/README.md`）。
-- **architecture decision records**（`memory/decision/README.md`）。
+- **session-local working memory**（[`memory/working/README.md`](memory/working/README.md)）。
+- **compressed session summaries**（[`memory/summary/README.md`](memory/summary/README.md)）。
+- **architecture decision records**（[`memory/decision/README.md`](memory/decision/README.md)）。
+- **episodic memory**（[`memory/episodic/README.md`](memory/episodic/README.md)）— 跨 session 情境經驗 recall。
+- **project memory**（[`memory/project/README.md`](memory/project/README.md)）— 跨 session 專案脈絡保持。
+- **failure memory**（[`memory/failure/README.md`](memory/failure/README.md)）— 抽象化失效模式記錄。
 
 ### `decisions/`
 
@@ -773,7 +776,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 建立 Context Pollution Detection | `runtime/guards/context-pollution.yaml` | 已完成 5 signals、composite pollution score、auto-archive on critical | Context 污染可自動偵測與歸檔 |
 | P1 | done | 建立 Tool Metadata & Lazy Activation | `tools/metadata/README.md`, `tools/routing/README.md` | 已完成 tool cost/risk/activation schema、explosion detection | 工具層級 token 消耗可預測與控制 |
 | P1 | done | 建立 Tool Output Compression | `tools/compression/README.md` | 已完成 4-level compression、per-output-type strategies | 工具輸出 token 減少 50-95% |
-| P1 | done | 建立 Memory Architecture 子層 | `memory/working/README.md`, `memory/summary/README.md`, `memory/decision/README.md` | 已完成 3 子層（working/summary/decision） | 記憶管理精準，不再單一 memory 層 |
+| P1 | done | 建立 Memory Architecture 子層 | `memory/working/README.md`, `memory/summary/README.md`, `memory/decision/README.md`, `memory/episodic/README.md`, `memory/project/README.md`, `memory/failure/README.md` | 已完成 6 子層（working/summary/decision/episodic/project/failure） | 記憶管理精準，不再單一 memory 層 |
 | P1 | done | 建立 Decision System（ADR） | `decisions/README.md` | 已完成 ADR lifecycle、naming convention | 架構決策有記錄，避免重複討論 |
 | P1 | done | 建立 Anti-patterns | `anti-patterns/README.md` + 5 patterns | 已完成 5 個 anti-pattern 文件 | 失效模式可主動辨識與避免 |
 | P1 | done | 升級 Skills Metadata v2 | `skills-index.yaml` | 已完成所有 13 skills 加入 weight/domains/dependencies/conflicts/priority.runtime | Skill relevance scoring 與 conflict detection 可運作 |

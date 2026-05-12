@@ -2,6 +2,15 @@
 
 `memory/` 負責「長期記憶」。本層保存可重用、可回放、可治理的歷史脈絡設計與記憶分類，不保存專案私有 raw evidence 或 active conversation state。
 
+## 目前入口
+
+- [`working/`](memory/working/README.md) — Session-local 工作記憶（可丟棄）
+- [`summary/`](memory/summary/README.md) — 壓縮 session 歷史（≤500 tokens）
+- [`decision/`](memory/decision/README.md) — 輕量 ADR（immutable, numbered）
+- [`episodic/`](memory/episodic/README.md) — 情境記憶（跨 session 經驗 recall）
+- [`project/`](memory/project/README.md) — 專案記憶（跨 session 專案脈絡）
+- [`failure/`](memory/failure/README.md) — 失效記憶（抽象化失效模式）
+
 ## 放什麼
 
 - Long-term memory、episodic memory 與 experience replay 的設計。
