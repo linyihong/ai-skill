@@ -24,29 +24,35 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
 
 ## Default Workflow
 
-Read [WORKFLOW.md](WORKFLOW.md) before doing hands-on analysis. Use it as the default decision tree.
+### 新分層路徑（優先讀取）
 
-Use [TOOLS.md](TOOLS.md) when preparing an environment or choosing between adb, pcap, Proxyman/mitmproxy, Frida, jadx, apktool, blutter, or offline decoding scripts.
+| 用途 | 路徑 |
+|------|------|
+| 執行流程（Quick Start → 分析 → 結束 → 回饋） | [`workflow/apk-analysis/execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) |
+| 分析方法（Traffic Triage、Tools & Failures） | [`analysis/apk/README.md`](../../analysis/apk/README.md) |
+| 操作流程（Frida Hook、HTTP API、Local Proxy、Media HLS） | [`analysis/apk/workflows/README.md`](../../analysis/apk/workflows/README.md) |
+| 工程智慧（Heuristics、Signals、Anti-patterns、Failure） | [`intelligence/engineering/apk-analysis/README.md`](../../intelligence/engineering/apk-analysis/README.md) |
+| 產出格式與品質門檻 | [`workflow/apk-analysis/artifact-gates.md`](../../workflow/apk-analysis/artifact-gates.md) |
+| 新專案 Runbook | [`runtime/onboarding/apk-analysis-setup.md`](../../runtime/onboarding/apk-analysis-setup.md) |
 
-Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing human-readable results.
+### 舊路徑（保留向後相容）
 
-Use [`techniques/`](techniques/) after common triage identifies a category. Only read the matching category folder unless the evidence crosses categories.
+| 用途 | 路徑 |
+|------|------|
+| WORKFLOW.md（舊執行流程） | [`WORKFLOW.md`](WORKFLOW.md) |
+| TOOLS.md（舊工具參考） | [`TOOLS.md`](TOOLS.md) |
+| DOCUMENTATION.md（舊產出格式） | [`DOCUMENTATION.md`](DOCUMENTATION.md) |
+| RUNBOOK.md（舊 runbook） | [`RUNBOOK.md`](RUNBOOK.md) |
 
-Use [shared-rules/feedback-lessons.md](../../shared-rules/feedback-lessons.md) for **how** to write feedback; put each lesson in the matching [`feedback_history/<category>/`](feedback_history/) folder. **Agents:** treat this as mandatory whenever such an idea appears—see **Quick Start §8** and **Feedback Loop** below.
+### Cross-skill handoff
 
-Use [`app-development-guidance`](../app-development-guidance/) when analysis findings should become app development guidance, implementation patterns, PR/release checklists, or validation tests.
-
-Automatically read and apply [`app-development-guidance/SKILL.md`](../app-development-guidance/SKILL.md) when the user wants APK analysis documents to produce an app-related tool, SDK, client, mock API, fixture-driven implementation, contract test, or rebuilt feature. Before drafting implementation plans, first apply the **Development readiness gate** above: if the work must reach a real backend or replay a live feature, the project analysis docs must already contain the minimum runnable factors, including the authorized identity material self-generation audit when identity/session/device material is involved, or the missing factors must be promoted to blocker questions. Do this so missing runtime, BDD, contract, error-handling, storage, security, ownership, or test questions are surfaced before development starts instead of being invented inside `apk-analysis`.
-
-When the user wants a feature rebuilt from APK findings or wants analysis docs turned into app tools / SDK work, use this cross-skill handoff:
+When the user wants a feature rebuilt from APK findings or wants analysis docs turned into app tools / SDK work:
 
 - Target skill: [`app-development-guidance`](../app-development-guidance/).
 - Trigger: APK findings must become rebuildable app behavior, app-related tools, SDK/client behavior, API/interface contracts, implementation slices, fixtures, mocks, or tests.
 - Handoff artifact: Feature Reconstruction Handoff with sanitized behavior, domain, API/interface, state/error, data lifecycle, fixture, and open-question detail.
 - Ownership boundary: `apk-analysis` owns evidence recovery, traffic/UI attribution, schema notes, fixtures, and confidence labels; `app-development-guidance` owns BDD, Domain Model Contract, API / Interface Contract, Error Handling Contract, implementation guidance, checklists, and tests.
 - Sanitization boundary: target-specific hosts, tokens, raw responses, accounts, and private business conclusions stay in project docs.
-
-Use [RUNBOOK.md](RUNBOOK.md) when starting a new APK project or when the user asks how to apply this skill to another product.
 
 ## Output Style & Artifact Gates
 

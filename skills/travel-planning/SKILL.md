@@ -47,13 +47,23 @@ Routing summary:
 
 ## Default Workflow
 
-Read [WORKFLOW.md](WORKFLOW.md) for the planning decision tree.
+### 新分層路徑（優先讀取）
 
-Use [TOOLS.md](TOOLS.md) when choosing current information sources for official hours, travel conditions, transport, weather, events, and 車中泊 discovery.
+| 用途 | 路徑 |
+|------|------|
+| 執行流程（Intake → Source Triage → Feasibility → Output） | [`workflow/travel-planning/execution-flow.md`](../../workflow/travel-planning/execution-flow.md) |
+| 分析方法（Sources & Tools、分析方法說明） | [`analysis/travel/README.md`](../../analysis/travel/README.md) |
+| 工程智慧（Heuristics） | [`intelligence/travel/README.md`](../../intelligence/travel/README.md) |
+| 產出格式與品質門檻 | [`workflow/travel-planning/artifact-gates.md`](../../workflow/travel-planning/artifact-gates.md) |
 
-Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing itinerary outputs, source tables, open-question lists, and day-before checklists.
+### 舊路徑（保留向後相容）
 
-Use [README.md](README.md) for human guidance and skill boundaries.
+| 用途 | 路徑 |
+|------|------|
+| WORKFLOW.md（舊執行流程） | [`WORKFLOW.md`](WORKFLOW.md) |
+| TOOLS.md（舊工具參考） | [`TOOLS.md`](TOOLS.md) |
+| DOCUMENTATION.md（舊產出格式） | [`DOCUMENTATION.md`](DOCUMENTATION.md) |
+| README.md（舊說明） | [`README.md`](README.md) |
 
 ## Output Style & Artifact Gates
 

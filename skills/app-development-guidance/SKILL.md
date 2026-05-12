@@ -46,21 +46,26 @@ Routing summary:
 
 ## Default Workflow
 
-Read [WORKFLOW.md](WORKFLOW.md) to translate analysis evidence into development requirements and implementation guidance. For repositories that use Gherkin or another public behavior spec, follow the **Docs-first BDD closure loop** in [WORKFLOW.md](WORKFLOW.md) § *Docs-first BDD closure loop* and the project's own governance docs so contracts, behavior specs, executable tests, and code move in the same batch.
+### 新分層路徑（優先讀取）
 
-**SDK defect closure (production-facing):** When someone reports a suspected bug in **SDK behavior** against a production-like host or vendor service, do **not** stop at narrative analysis. Follow [WORKFLOW.md](WORKFLOW.md) § *SDK defect closure loop*: reproduce through the SDK's supported public surfaces, record the outcome in the project's integration-test notes or equivalent traceability artifact, then—if the behavior is confirmed or must be pinned—add behavior specs, executable tests, and regression coverage in the **same work batch**. This closes the loop between field reports and durable specs without embedding project-specific incidents in this reusable skill.
+| 用途 | 路徑 |
+|------|------|
+| 開發流程（Product Brief → BDD → 實作 → 驗證） | [`workflow/app-development-guidance/development-process.md`](../../workflow/app-development-guidance/development-process.md) |
+| 執行流程（Change Intake → Docs-First BDD → SDK Defect → Performance Gate） | [`workflow/app-development-guidance/execution-flow.md`](../../workflow/app-development-guidance/execution-flow.md) |
+| 分析方法（Risk Translation、Controls Catalog、Platforms/Languages Catalog） | [`analysis/app-development-guidance/README.md`](../../analysis/app-development-guidance/README.md) |
+| 工程智慧（Heuristics、Anti-patterns） | [`intelligence/engineering/app-development-guidance/README.md`](../../intelligence/engineering/app-development-guidance/README.md) |
+| 產出格式與品質門檻 | [`workflow/app-development-guidance/artifact-gates.md`](../../workflow/app-development-guidance/artifact-gates.md) |
+| Review Checklist | [`workflow/app-development-guidance/review-checklist.md`](../../workflow/app-development-guidance/review-checklist.md) |
 
-Use [`process/`](process/) when starting from a product brief, planning a feature from BDD through Domain Model, Architecture, API / Interface, Error Handling, implementation, and tests, or backfilling missing documents for an existing implemented project.
+### 舊路徑（保留向後相容）
 
-Use [`templates/`](templates/) to choose a copyable template. Use [`templates/initial-development-docs.md`](templates/initial-development-docs.md) when the user wants the first draft of the development documents or when requirements are still being clarified through discussion.
-
-Use [CHECKLIST.md](CHECKLIST.md) for the checklist index and [`checklists/`](checklists/) for focused design, PR, release, and API reviews.
-
-Use [DOCUMENTATION.md](DOCUMENTATION.md) when writing reusable development guidance or project-specific hardening notes.
-
-Use [`controls/`](controls/) as the primary home for cross-platform guidance, then link to [`platforms/`](platforms/) or [`languages/`](languages/) for implementation details.
-
-Use [`implementation/`](implementation/) when the user asks how to build or implement a hardening control.
+| 用途 | 路徑 |
+|------|------|
+| WORKFLOW.md（舊執行流程） | [`WORKFLOW.md`](WORKFLOW.md) |
+| process/（舊開發流程） | [`process/`](process/) |
+| CHECKLIST.md + checklists/ | [`CHECKLIST.md`](CHECKLIST.md)、[`checklists/`](checklists/) |
+| DOCUMENTATION.md（舊產出格式） | [`DOCUMENTATION.md`](DOCUMENTATION.md) |
+| controls/ + platforms/ + languages/ + implementation/ | [`controls/`](controls/)、[`platforms/`](platforms/)、[`languages/`](languages/)、[`implementation/`](implementation/) |
 
 ## Output Style & Artifact Gates
 
