@@ -2,6 +2,25 @@
 
 本目錄放各種 AI coding / agent 工具如何讀取與同步本知識庫。新增其他工具時，在這裡加新的子檔，例如 CLI agent、IDE agent、雲端 agent 或其他支援 skill/rules 的工具。
 
+## 配置思想與邊界定義
+
+每個 AI 工具的配置應遵循**薄配置層**設計：
+
+| 層級 | 位置 | 內容 |
+|------|------|------|
+| **自動載入入口** | 工具專屬入口檔（如 `CLAUDE.md`、`.cursorrules`） | 一行，指向 `README.md` |
+| **工具配置** | 工具配置檔（如 `.claude/settings.json`） | 僅放 permissions、hooks 等工具特定設定 |
+| **工具使用說明** | `ai-tools/<tool>.md` | 此工具的配置實作與 Claude 特殊操作注意 |
+| **共用規則** | `shared-rules/` | 所有規則本體，集中管理 |
+| **知識庫入口** | `README.md` | OS layout 與導航，所有工具的共同起點 |
+
+**不應放在工具配置或工具說明中的內容：**
+- Bootstrap 規則清單（由 `shared-rules/README.md` 管理）
+- 情境路由表或架構層級表（由 `README.md` / `shared-rules/README.md` 管理）
+- 任何已在 shared-rules 或 README.md 中的重複內容
+
+---
+
 共用原則：**中央庫是真相來源**，工具端只做參照、symlink 或同步快照。
 
 通用 shared rules、skills、templates 與根 README 應保持工具中立；工具專屬路徑、hook、UI、reload、設定與同步命令放在本目錄對應工具文件中。
