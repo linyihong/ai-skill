@@ -1,0 +1,300 @@
+# Promotion Engine
+# 定義 feedback lesson 的 promotion scoring 與 decision rules。
+# 使用 lesson 的 metadata、內容特徵與歷史數據計算 promotion score（0.0-1.0）。
+#
+# 依賴：
+#   - skills/*/feedback_history/ (lesson source)
+#   - shared-rules/feedback-lessons.md (lesson format)
+#   - governance/lifecycle/README.md (lifecycle states)
+
+promotion_engine_version: v1
+status: candidate
+owner_layer: feedback/pipeline
+description: >
+  Promotion scoring engine. 對 feedback_history 中的每條 lesson 計算 promotion score，
+  決定是否 promotion、promotion 到哪個 target layer，以及 promotion 的優先級。
+  Score ≥ 0.7 的 lesson 應立即 promotion，0.5-0.7 的列入 backlog，< 0.5 的暫緩。
+
+scoring:
+  method: weighted_combination
+  description: >
+    Promotion score 由五個子分數加權組合而成：
+    - impact_score（0.30）：lesson 的影響範圍與重要性
+    - maturity_score（0.25）：lesson 的成熟度（validated vs experimental）
+    - frequency_score（0.20）：lesson 被引用的頻率
+    - freshness_score（0.15）：lesson 的新鮮度（越新越高）
+    - urgency_score（0.10）：lesson 的急迫性（是否 blocking 其他工作）
+    
+    最終分數 = impact × 0.30 + maturity × 0.25 + frequency × 0.20 + freshness × 0.15 + urgency × 0.10
+    
+    根據最終分數決定 promotion target：
+    - score ≥ 0.8 → promote to shared-rules/ or intelligence/
+    - score ≥ 0.6 → promote to workflow/ or skill documentation
+    - score ≥ 0.4 → keep in feedback_history, mark as candidate
+    - score < 0.4 → archive or mark as experimental
+  threshold:
+    immediate_promotion: 0.7  # ≥ 0.7 → 立即執行 promotion
+    backlog: 0.5              # 0.5-0.7 → 列入 promotion backlog
+    hold: 0.0                 # < 0.5 → 暫緩，等待更多證據
+
+  components:
+    - id: impact_score
+      weight: 0.30
+      description: >
+        評估 lesson 的影響範圍與重要性。
+        跨 skill 的 lesson 得分最高，單一 skill 內單一 technique 的 lesson 得分最低。
+      scoring_logic: >
+        if cross_skill: return 1.0
+        elif cross_category: return 0.8
+        elif single_skill_wide: return 0.6
+        elif single_category: return 0.4
+        elif single_technique: return 0.2
+        else: return 0.1
+      factors:
+        - name: cross_skill
+          description: "Lesson 適用於多個 skill（如 apk-analysis + app-development-guidance）"
+          evidence: "Promotion Target 指向 shared-rules/ 或 intelligence/"
+        - name: cross_category
+          description: "Lesson 適用於 skill 內多個 category（如 common/ + http-api/）"
+          evidence: "Lesson 內容提及多個 category 的通用原則"
+        - name: single_skill_wide
+          description: "Lesson 適用於整個 skill"
+          evidence: "Promotion Target 指向 SKILL.md 或 WORKFLOW.md"
+        - name: single_category
+          description: "Lesson 適用於 skill 內單一 category"
+          evidence: "Lesson 放在 feedback_history/<category>/"
+        - name: single_technique
+          description: "Lesson 只適用於特定 technique"
+          evidence: "Promotion Target 指向 techniques/<technique>/README.md"
+
+    - id: maturity_score
+      weight: 0.25
+      description: >
+        評估 lesson 的成熟度。Validated lesson 得分最高，
+        experimental 或未經驗證的 lesson 得分最低。
+      scoring_logic: >
+        status = lesson.status  # from lesson frontmatter
+        if status == 'promoted': return 1.0
+        elif status == 'validated': return 0.8
+        elif status == 'candidate': return 0.5
+        elif status == 'experimental': return 0.3
+        elif status == 'deprecated': return 0.0
+        else: return 0.3
+      factors:
+        - name: has_validation
+          description: "Lesson 有明確的 Validation 區塊"
+          evidence: "Lesson 包含 '#### Validation' 區塊"
+        - name: has_evidence
+          description: "Lesson 有明確的 Evidence 區塊"
+          evidence: "Lesson 包含 '#### Evidence' 區塊"
+        - name: has_applies_when
+          description: "Lesson 有明確的適用條件"
+          evidence: "Lesson 包含 '#### Applies When' 區塊"
+
+    - id: frequency_score
+      weight: 0.20
+      description: >
+        評估 lesson 被引用的頻率。
+        被多個 session 引用、或被多個 lesson 連結的 lesson 得分最高。
+      scoring_logic: >
+        reference_count = count_references(lesson_id)
+        if reference_count >= 5: return 1.0
+        elif reference_count >= 3: return 0.7
+        elif reference_count >= 1: return 0.4
+        else: return 0.1
+      factors:
+        - name: referenced_by_other_lessons
+          description: "被其他 lesson 在 Required Linked Updates 中引用"
+        - name: referenced_by_summary
+          description: "被 knowledge/summaries/ 中的 summary 引用"
+        - name: referenced_by_routing
+          description: "被 knowledge/runtime/routing-registry.yaml 引用"
+
+    - id: freshness_score
+      weight: 0.15
+      description: >
+        評估 lesson 的新鮮度。越新的 lesson 得分越高，
+        因為新 lesson 通常反映最新的經驗與環境。
+      scoring_logic: >
+        days_old = (today - lesson_date).days
+        if days_old <= 7: return 1.0
+        elif days_old <= 30: return 0.8
+        elif days_old <= 90: return 0.5
+        elif days_old <= 180: return 0.3
+        else: return 0.1
+      factors:
+        - name: lesson_date
+          description: "Lesson 檔名中的日期（YYYY-MM-DD）"
+
+    - id: urgency_score
+      weight: 0.10
+      description: >
+        評估 lesson 的急迫性。如果 lesson 解決的是 blocking issue、
+        或防止 agent 重複犯錯，則急迫性高。
+      scoring_logic: >
+        if blocks_other_work: return 1.0
+        elif prevents_repeated_error: return 0.8
+        elif improves_efficiency: return 0.5
+        elif nice_to_have: return 0.2
+        else: return 0.0
+      factors:
+        - name: blocks_other_work
+          description: "Lesson 解決的問題會 blocking 其他工作"
+        - name: prevents_repeated_error
+          description: "Lesson 防止 agent 重複犯同樣的錯誤"
+        - name: improves_efficiency
+          description: "Lesson 改善效率但不是必須"
+
+# Promotion Target Decision
+# 根據 scoring 結果決定 promotion target：
+#
+# ┌─────────────────────────────────────────────────────────────┐
+# │                    Promotion Decision                        │
+# │                                                             │
+# │  score ≥ 0.8 ──→ shared-rules/ or intelligence/            │
+# │    條件：cross_skill + validated + high_frequency           │
+# │                                                             │
+# │  score ≥ 0.6 ──→ workflow/ or skill documentation          │
+# │    條件：single_skill + validated + medium_frequency        │
+# │                                                             │
+# │  score ≥ 0.4 ──→ keep in feedback_history, mark candidate  │
+# │    條件：single_category + candidate + low_frequency        │
+# │                                                             │
+# │  score < 0.4 ──→ archive or mark experimental              │
+# │    條件：single_technique + experimental + no_references    │
+# └─────────────────────────────────────────────────────────────┘
+
+target_decisions:
+  - id: promote_to_shared_rules
+    condition: "final_score >= 0.8 AND cross_skill == true AND maturity_score >= 0.8"
+    target: "shared-rules/{rule-name}.md"
+    description: >
+      Cross-skill、高成熟度的 lesson，promote 到 shared-rules/ 作為通用規則。
+    steps:
+      - generalize_content: "移除 skill-specific 內容，改為通用表述"
+      - add_to_index: "更新 shared-rules/README.md 的規則索引"
+      - update_lifecycle: "將原 lesson 標為 promoted"
+
+  - id: promote_to_intelligence
+    condition: "final_score >= 0.8 AND cross_skill == true AND domain == 'engineering-intelligence'"
+    target: "intelligence/{domain}/{topic}.md"
+    description: >
+      Cross-skill 的工程智慧，promote 到 intelligence/ 作為可重用 domain knowledge。
+    steps:
+      - generalize_content: "移除 skill-specific 內容"
+      - create_intelligence_atom: "在 intelligence/ 建立新 atom"
+      - update_index: "更新 knowledge/indexes/README.md"
+      - update_lifecycle: "將原 lesson 標為 promoted"
+
+  - id: promote_to_workflow
+    condition: "final_score >= 0.6 AND final_score < 0.8 AND execution_flow == true"
+    target: "workflow/{domain}/{workflow-name}.md"
+    description: >
+      影響執行流程的 lesson，promote 到 workflow/ 作為 workflow step。
+    steps:
+      - extract_workflow_step: "從 lesson 中提取可執行的 workflow step"
+      - create_workflow: "在 workflow/ 建立新 workflow 或更新既有 workflow"
+      - update_lifecycle: "將原 lesson 標為 promoted"
+
+  - id: promote_to_skill_doc
+    condition: "final_score >= 0.6 AND final_score < 0.8 AND single_skill == true"
+    target: "skills/{skill-id}/{doc-type}.md"
+    description: >
+      單一 skill 內的高價值 lesson，promote 到 skill 的 WORKFLOW.md、TOOLS.md 或 DOCUMENTATION.md。
+    steps:
+      - merge_into_skill_doc: "將 lesson 內容合併到對應 skill doc"
+      - update_lifecycle: "將原 lesson 標為 promoted"
+
+  - id: keep_as_candidate
+    condition: "final_score >= 0.4 AND final_score < 0.6"
+    target: "feedback_history/{category}/{filename}"
+    description: >
+      Score 中等，留在 feedback_history 作為 candidate，等待更多證據。
+    steps:
+      - mark_as_candidate: "確保 lesson status 為 candidate"
+      - add_to_backlog: "記錄在 promotion backlog"
+
+  - id: archive_or_experimental
+    condition: "final_score < 0.4"
+    target: "feedback_history/{category}/{filename}"
+    description: >
+      Score 過低，標為 experimental 或 archive。
+    steps:
+      - mark_as_experimental: "將 lesson status 改為 experimental"
+      - OR_archive: "如果超過 180 天且無引用，建議 archive"
+
+# Scoring Examples
+examples:
+  - scenario: "Cross-skill validated lesson with high frequency"
+    lesson: "ui-hierarchy-content-desc-redaction"
+    category: "common"
+    skill: "apk-analysis"
+    scores:
+      impact: 0.8    # cross_category: UI hierarchy 原則也適用於 app-development-guidance
+      maturity: 0.8  # validated, has validation + evidence + applies_when
+      frequency: 0.7 # referenced by 3+ other lessons
+      freshness: 0.5 # ~30 days old
+      urgency: 0.5   # improves efficiency
+    final_score: 0.8 × 0.30 + 0.8 × 0.25 + 0.7 × 0.20 + 0.5 × 0.15 + 0.5 × 0.10 = 0.71
+    decision: "immediate_promotion → promote_to_skill_doc (WORKFLOW.md)"
+
+  - scenario: "Single-technique experimental lesson"
+    lesson: "dart-aot-interceptor-strings-after-java-helper-miss"
+    category: "flutter-dart-aot"
+    skill: "apk-analysis"
+    scores:
+      impact: 0.2    # single_technique: 只適用於 flutter-dart-aot 的特定情境
+      maturity: 0.3  # experimental, 尚無 validation
+      frequency: 0.1 # no references
+      freshness: 0.8 # ~10 days old
+      urgency: 0.2   # nice_to_have
+    final_score: 0.2 × 0.30 + 0.3 × 0.25 + 0.1 × 0.20 + 0.8 × 0.15 + 0.2 × 0.10 = 0.27
+    decision: "hold → archive_or_experimental"
+
+  - scenario: "Cross-skill engineering intelligence"
+    lesson: "checkpoint-replay-runner"
+    category: "common"
+    skill: "apk-analysis"
+    scores:
+      impact: 1.0    # cross_skill: checkpoint/replay 模式適用於多種分析工作
+      maturity: 0.8  # validated
+      frequency: 0.4 # referenced by 1 lesson
+      freshness: 0.5 # ~30 days old
+      urgency: 0.8   # prevents_repeated_error: 避免每次從頭開始
+    final_score: 1.0 × 0.30 + 0.8 × 0.25 + 0.4 × 0.20 + 0.5 × 0.15 + 0.8 × 0.10 = 0.74
+    decision: "immediate_promotion → promote_to_intelligence"
+
+# Engine Rules
+rules:
+  - id: no-auto-promote-without-validation
+    description: >
+      Status 為 experimental 的 lesson 不可被自動 promotion。
+      即使 score ≥ 0.7，也必須先手動驗證才能 promotion。
+    severity: error
+    rationale: >
+      Experimental lesson 尚未經過驗證，直接 promotion 可能引入錯誤的知識。
+
+  - id: promote-preserves-original
+    description: >
+      Promotion 後必須保留原始 lesson 在 feedback_history/ 中。
+      不可刪除或覆寫原始 lesson，僅在 lifecycle 中標為 promoted。
+    severity: error
+    rationale: >
+      原始 lesson 是歷史紀錄，刪除後無法追溯 promotion 的來源與決策過程。
+
+  - id: linked-updates-after-promotion
+    description: >
+      Promotion 完成後，必須更新所有相關的 linked files：
+      knowledge/indexes/README.md、knowledge/summaries/、knowledge/runtime/routing-registry.yaml、
+      knowledge/graphs/、governance/lifecycle/README.md。
+    severity: warning
+    rationale: >
+      Promotion 會改變知識的存放位置與路由方式，必須同步更新所有相關索引。
+
+  - id: score-transparency
+    description: >
+      Agent 在決定 promotion 時，必須記錄每個子分數與最終分數。
+      這使得 promotion 決策可追溯、可調試。
+    severity: warning
+    rationale: >
+      透明的 scoring 記錄有助於調整 scoring weights 與 thresholds。

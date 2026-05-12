@@ -1,0 +1,291 @@
+# Lifecycle Automation
+# 定義 feedback lesson 的自動 lifecycle 管理規則。
+# 包括 auto-archive（冷資料歸檔）、auto-downgrade（過期降級）、
+# auto-promotion-check（定期 promotion 檢查）。
+#
+# 依賴：
+#   - governance/lifecycle/README.md (lifecycle states)
+#   - knowledge/runtime/sqlite/ (cold data lookup)
+#   - shared-rules/failure-learning-system.md (failure pattern lifecycle)
+
+lifecycle_automation_version: v1
+status: candidate
+owner_layer: feedback/pipeline
+description: >
+  Automated lifecycle management for feedback lessons. 定義何時 archive、
+  何時 downgrade、何時檢查 promotion。目標是防止 feedback_history 無限增長，
+  確保只有高價值的 lesson 保留在 active 狀態。
+
+automations:
+  - id: auto-archive-cold
+    name: Auto-archive Cold Lessons
+    description: >
+      自動歸檔超過 180 天未修改、無引用、且 score < 0.4 的 lesson。
+      歸檔後的 lesson 從 active index 中移除，但仍保留在 git history 中。
+    trigger:
+      frequency: monthly  # 每月執行一次
+      condition: "lesson_age > 180 AND reference_count == 0 AND promotion_score < 0.4"
+    actions:
+      - id: mark-archived
+        action: update_status
+        target: "feedback_history/{category}/{filename}"
+        description: 將 lesson status 改為 archived
+        details:
+          new_status: archived
+          archive_reason: "cold_data: over 180 days, no references, low score"
+          archived_at: "{current_date}"
+      - id: remove-from-active-index
+        action: update
+        target: "feedback_history/{category}/README.md"
+        description: 從 active index 中移除該 lesson
+        details:
+          operation: remove_from_table
+          condition: "status == archived"
+      - id: add-to-cold-index
+        action: update
+        target: "knowledge/runtime/sqlite/"
+        description: 加入 SQLite cold lookup index（可選）
+        details:
+          operation: add_to_cold_index
+          condition: "sqlite_index_exists == true"
+    rules:
+      - id: no-delete-archived
+        description: >
+          Archived lesson 不可被刪除。它們仍保留在 git history 中，
+          可透過 git log 或 SQLite cold index 查詢。
+        severity: error
+      - id: archive-preserves-content
+        description: >
+          Archive 只改變 lesson 的 status，不修改 lesson 內容。
+          原始 lesson 全文必須完整保留。
+        severity: error
+
+  - id: auto-downgrade-stale
+    name: Auto-downgrade Stale Lessons
+    description: >
+      自動降級超過 90 天未驗證的 lesson。
+      Validated → candidate（如果超過 90 天無新驗證）
+      Candidate → experimental（如果超過 90 天無更新）
+    trigger:
+      frequency: monthly
+      condition: "last_verified_age > 90"
+    actions:
+      - id: downgrade-validated-to-candidate
+        action: update_status
+        target: "feedback_history/{category}/{filename}"
+        description: >
+          Validated lesson 超過 90 天無新驗證，降級為 candidate。
+        details:
+          old_status: validated
+          new_status: candidate
+          downgrade_reason: "stale: no re-validation in 90 days"
+          downgraded_at: "{current_date}"
+        condition: "lesson.status == 'validated' AND days_since_last_verification > 90"
+      - id: downgrade-candidate-to-experimental
+        action: update_status
+        target: "feedback_history/{category}/{filename}"
+        description: >
+          Candidate lesson 超過 90 天無更新，降級為 experimental。
+        details:
+          old_status: candidate
+          new_status: experimental
+          downgrade_reason: "stale: no update in 90 days"
+          downgraded_at: "{current_date}"
+        condition: "lesson.status == 'candidate' AND days_since_last_update > 90"
+    rules:
+      - id: no-downgrade-promoted
+        description: >
+          Promoted lesson 不可被自動降級。
+          Promoted lesson 的 lifecycle 由 target layer 管理。
+        severity: error
+      - id: downgrade-notifies
+        description: >
+          降級時必須在 lesson 中新增 downgrade note，
+          說明降級原因與日期，不可默默修改 status。
+        severity: warning
+
+  - id: periodic-promotion-check
+    name: Periodic Promotion Check
+    description: >
+      定期檢查 feedback_history 中的 candidate lesson，
+      重新計算 promotion score，判斷是否需要 promotion。
+    trigger:
+      frequency: weekly  # 每週執行一次
+      condition: "lesson.status == 'candidate' OR lesson.status == 'validated'"
+    actions:
+      - id: recalculate-score
+        action: score
+        target: "feedback_history/{category}/{filename}"
+        description: >
+          使用 promotion-engine.yaml 重新計算 promotion score。
+          因為 frequency_score 和 freshness_score 可能已變化。
+        details:
+          engine: promotion-engine.yaml
+          recalculated_at: "{current_date}"
+      - id: update-backlog
+        action: update
+        target: "feedback/pipeline/promotion-backlog.yaml"
+        description: >
+          更新 promotion backlog，將 score 變化的 lesson 重新排序。
+        details:
+          operation: update_backlog
+          new_score: "{recalculated_score}"
+    rules:
+      - id: no-auto-promote
+        description: >
+          Periodic check 只更新 score 與 backlog，
+          不自動執行 promotion。Promotion 仍需人工或 session-level 決策。
+        severity: error
+      - id: backlog-transparency
+        description: >
+          Promotion backlog 必須包含每個 lesson 的 score 歷史，
+          便於追蹤 score 變化趨勢。
+        severity: warning
+
+  - id: cold-data-threshold-monitor
+    name: Cold Data Threshold Monitor
+    description: >
+      監控 feedback_history 的數量，當超過 threshold 時觸發 cold data archive。
+      參考 governance/lifecycle/README.md 的 Trigger Thresholds。
+    trigger:
+      frequency: weekly
+      condition: "lesson_count > threshold"
+    actions:
+      - id: check-category-counts
+        action: count
+        target: "feedback_history/*/"
+        description: 檢查每個 category 的 lesson 數量
+        details:
+          thresholds:
+            single_category_50: "超過 50 條 lesson → 產生 category index"
+            single_category_20: "超過 20 條在同一類別 → 產生 summary rows"
+            sqlite_lookup: "Agent 需要讀多個 README 才能找到 lesson → 建立 SQLite index"
+      - id: generate-category-index
+        action: generate
+        target: "feedback_history/{category}/README.md"
+        description: 產生或更新 category index
+        details:
+          format: table
+          columns: [filename, status, title, date, score]
+        condition: "category_count > 50"
+      - id: update-sqlite-index
+        action: update
+        target: "knowledge/runtime/sqlite/"
+        description: 更新 SQLite cold lookup index
+        details:
+          operation: rebuild_index
+          scope: "feedback_history"
+        condition: "sqlite_index_exists == true AND (category_count > 50 OR lookup_cost_high == true)"
+    rules:
+      - id: threshold-based-archive
+        description: >
+          Cold data archive 必須基於明確的 threshold，
+          不可因「感覺太多」就隨意歸檔。
+        severity: error
+      - id: archive-before-delete
+        description: >
+          在刪除任何 active index entry 之前，
+          必須先完成 cold data archive 流程。
+        severity: error
+
+# Lifecycle State Transitions
+# 完整的 lifecycle state machine：
+#
+# ┌──────────────┐
+# │  new         │  ← 新建立的 lesson
+# └──────┬───────┘
+#        ▼
+# ┌──────────────┐
+# │  experimental│  ← 未經驗證的 lesson
+# └──────┬───────┘
+#        ▼
+# ┌──────────────┐     ┌──────────────────┐
+# │  candidate   │────→│  auto-downgrade  │
+# └──────┬───────┘     │  (90 days stale) │
+#        ▼             └──────────────────┘
+# ┌──────────────┐
+# │  validated   │  ← 已驗證的 lesson
+# └──────┬───────┘
+#        ▼
+# ┌──────────────┐     ┌──────────────────┐
+# │  promoted    │────→│  auto-archive    │
+# └──────────────┘     │  (180 days cold) │
+#                      └──────────────────┘
+#        ▼
+# ┌──────────────┐
+# │  archived    │  ← 已歸檔（保留在 git history）
+# └──────────────┘
+#
+# 注意：promoted → archived 是例外情況。
+# 通常 promoted lesson 的 lifecycle 由 target layer 管理。
+# 只有在 promoted lesson 的 target 也被 deprecate 時，才 archive。
+
+state_transitions:
+  - from: new
+    to: experimental
+    trigger: initial_save
+    description: "新 lesson 建立後預設為 experimental"
+
+  - from: experimental
+    to: candidate
+    trigger: first_validation
+    description: "Lesson 經過首次驗證後升級為 candidate"
+
+  - from: candidate
+    to: validated
+    trigger: successful_reuse
+    description: "Lesson 被成功重用後升級為 validated"
+
+  - from: validated
+    to: promoted
+    trigger: promotion_executed
+    description: "Lesson 被 promotion 到 target layer"
+
+  - from: validated
+    to: candidate
+    trigger: auto_downgrade_stale
+    description: "超過 90 天無新驗證，自動降級"
+
+  - from: candidate
+    to: experimental
+    trigger: auto_downgrade_stale
+    description: "超過 90 天無更新，自動降級"
+
+  - from: any
+    to: archived
+    trigger: auto_archive_cold
+    description: "超過 180 天無修改、無引用、低 score，自動歸檔"
+
+# Automation Rules
+rules:
+  - id: no-silent-state-change
+    description: >
+      任何 lifecycle state 變更都必須在 lesson 中留下記錄。
+      不可默默修改 status 而不說明原因。
+    severity: error
+    rationale: >
+      無記錄的 state change 會導致 lifecycle 不可追溯。
+
+  - id: archive-is-not-delete
+    description: >
+      Archived lesson 不可被刪除。Archive 只是改變 status，
+      原始內容仍保留在 git history 中。
+    severity: error
+    rationale: >
+      Archived lesson 可能仍有參考價值，只是不 active。
+
+  - id: promote-before-archive
+    description: >
+      在 archive 高 score lesson 之前，先檢查是否應該 promotion。
+      如果 score ≥ 0.5，先執行 promotion check，再決定是否 archive。
+    severity: warning
+    rationale: >
+      避免將有價值的 lesson 直接歸檔，錯失 promotion 機會。
+
+  - id: lifecycle-log
+    description: >
+      每次 lifecycle state 變更都必須記錄在 feedback/pipeline/lifecycle-log.yaml 中。
+      記錄內容：lesson_id、from_state、to_state、trigger、date、reason。
+    severity: warning
+    rationale: >
+      Lifecycle log 提供完整的 lifecycle 歷史，便於審計與調試。

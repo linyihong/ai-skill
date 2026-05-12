@@ -598,7 +598,16 @@ rules:
 4. 建立 Guard Chain → [`runtime/pipeline/guard-chain.yaml`](../runtime/pipeline/guard-chain.yaml) — 每 stage 的 guard 執行順序（ordered by severity）、檢查頻率（per_tool_call / per_task / per_edit）、中斷行為
 5. 建立 Skill Relevance Engine → [`runtime/pipeline/relevance-engine.yaml`](../runtime/pipeline/relevance-engine.yaml) — 3 維度 scoring（trigger_match 0.5 + domain_match 0.3 + weight 0.2）、threshold 0.5、conflict penalty ×0.5
 
-### Step 8：建立 Semantic Retrieval（長期）
+### Step 8：建立 Feedback Promotion Pipeline（已實作）
+
+將 feedback lesson 從 `skills/*/feedback_history/` 的原始觀察，透過機器可讀的 scoring、workflow 與 lifecycle automation，推進到 `workflow/`、`intelligence/`、`shared-rules/`、`memory/` 或 runtime surfaces：
+
+1. 建立 Promotion Pipeline 概覽 → [`feedback/pipeline/README.md`](../feedback/pipeline/README.md) — pipeline 架構圖、與既有層的關係、使用方式
+2. 建立 Promotion Engine → [`feedback/pipeline/promotion-engine.yaml`](../feedback/pipeline/promotion-engine.yaml) — 5 維度 scoring（impact 0.30 + maturity 0.25 + frequency 0.20 + freshness 0.15 + urgency 0.10）、threshold 0.7 immediate / 0.5 backlog、5 種 promotion target decisions、3 個 scoring examples
+3. 建立 Promotion Workflow → [`feedback/pipeline/promotion-workflow.yaml`](../feedback/pipeline/promotion-workflow.yaml) — 5 階段 workflow（assess → prepare → write → update → validate）、每階段有 entry/exit conditions、steps、output
+4. 建立 Lifecycle Automation → [`feedback/pipeline/lifecycle-automation.yaml`](../feedback/pipeline/lifecycle-automation.yaml) — 4 種 automation（auto-archive cold 180 days、auto-downgrade stale 90 days、periodic promotion check weekly、cold data threshold monitor）、完整 state machine（new → experimental → candidate → validated → promoted → archived）
+
+### Step 9：建立 Semantic Retrieval（長期）
 
 1. 深化 SQLite / FTS runtime index
 2. 加入 embedding-based retrieval

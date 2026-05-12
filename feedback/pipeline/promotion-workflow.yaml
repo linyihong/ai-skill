@@ -1,0 +1,241 @@
+# Promotion Workflow
+# 定義 feedback lesson promotion 的可執行 workflow steps。
+# Agent 在決定 promotion 後，遵循此 workflow 執行實際的 promotion 操作。
+#
+# 依賴：
+#   - feedback/pipeline/promotion-engine.yaml (scoring & decision)
+#   - governance/lifecycle/README.md (lifecycle states)
+#   - governance/validation/README.md (validation gates)
+#   - shared-rules/linked-updates.md (linked update rules)
+
+promotion_workflow_version: v1
+status: candidate
+owner_layer: feedback/pipeline
+description: >
+  Executable promotion workflow. 定義從決定 promotion 到完成 promotion 的每個步驟。
+  每個步驟有明確的 action、input、output 與 validation gate。
+
+workflow:
+  - id: assess-lesson
+    name: Assess Lesson
+    description: >
+      評估單條 lesson 的 promotion 需求。
+      這是 promotion 的起點，在每次 close-loop 階段執行。
+    entry_conditions:
+      - session_complete: true
+      - new_lessons_added: true
+      - OR periodic_review: true  # 定期 review 既有 lesson
+    steps:
+      - id: read-lesson
+        action: read_file
+        target: "feedback_history/{category}/{filename}"
+        description: 讀取 lesson 全文
+        estimated_tokens: 500
+      - id: run-promotion-engine
+        action: score
+        target: lesson_content
+        description: 使用 promotion-engine.yaml 計算 promotion score
+        estimated_tokens: 200
+      - id: decide-target
+        action: decide
+        input: promotion_score
+        description: 根據 score 決定 promotion target
+        estimated_tokens: 100
+    exit_conditions:
+      - promotion_score_calculated: true
+      - target_identified: true
+    output:
+      - lesson_id: "lesson-id"
+      - promotion_score: 0.0-1.0
+      - target_layer: "shared-rules | intelligence | workflow | skill-doc | none"
+      - decision: "immediate_promotion | backlog | hold"
+
+  - id: prepare-content
+    name: Prepare Content
+    description: >
+      準備 promotion 所需的內容。
+      包括 generalize、去敏、格式化等操作。
+    entry_conditions:
+      - decision == "immediate_promotion"
+      - target_identified: true
+    steps:
+      - id: generalize-content
+        action: rewrite
+        input: lesson_content
+        description: >
+          移除 skill-specific 內容，改為通用表述。
+          例如：將「apk-analysis 的 flutter-dart-aot hook 步驟」改為
+          「在分析 Dart AOT 編譯的應用時，hook 步驟應...」
+        estimated_tokens: 300
+        condition: "target_layer != 'skill-doc'"  # skill-doc 不需要 generalize
+      - id: check-boundary
+        action: validate
+        target: generalized_content
+        description: >
+          使用 reusable-guidance-boundary.md 檢查內容是否已去敏、
+          不包含 project-specific evidence。
+        estimated_tokens: 100
+      - id: format-target
+        action: format
+        input: generalized_content
+        description: 根據 target layer 的格式要求格式化內容
+        estimated_tokens: 100
+    exit_conditions:
+      - content_prepared: true
+      - boundary_check_passed: true
+    output:
+      - prepared_content: "Generalized and formatted content"
+      - target_path: "path/to/target/file"
+
+  - id: write-target
+    name: Write Target
+    description: >
+      將準備好的內容寫入 target layer。
+    entry_conditions:
+      - content_prepared: true
+      - target_path_defined: true
+    steps:
+      - id: check-existing
+        action: check
+        target: target_path
+        description: 檢查 target 檔案是否已存在
+        estimated_tokens: 50
+      - id: create-or-merge
+        action: write
+        target: target_path
+        description: >
+          如果 target 不存在，建立新檔案。
+          如果 target 已存在，將內容 merge 到適當位置。
+        estimated_tokens: 500
+        condition: "content_prepared == true"
+      - id: update-lifecycle
+        action: write
+        target: "feedback_history/{category}/{filename}"
+        description: >
+          在原始 lesson 的 lifecycle 區塊標記為 promoted，
+          並記錄 promotion target 與日期。
+        estimated_tokens: 100
+    exit_conditions:
+      - target_written: true
+      - lifecycle_updated: true
+    output:
+      - target_path: "path/to/target/file"
+      - lesson_status: "promoted"
+      - promotion_date: "YYYY-MM-DD"
+
+  - id: update-linked
+    name: Update Linked Files
+    description: >
+      Promotion 完成後，更新所有相關的 linked files。
+    entry_conditions:
+      - target_written: true
+    steps:
+      - id: update-knowledge-index
+        action: update
+        target: knowledge/indexes/README.md
+        description: 如果 promotion 到 shared-rules 或 intelligence，更新索引
+        estimated_tokens: 100
+        condition: "target_layer == 'shared-rules' OR target_layer == 'intelligence'"
+      - id: update-summary
+        action: update
+        target: "knowledge/summaries/{skill-id}.md"
+        description: 更新 skill summary，加入 promoted lesson 的參考
+        estimated_tokens: 200
+        condition: "target_layer == 'skill-doc' OR target_layer == 'workflow'"
+      - id: update-routing-registry
+        action: update
+        target: knowledge/runtime/routing-registry.yaml
+        description: 如果 promotion 到新的 routing surface，更新 registry
+        estimated_tokens: 100
+        condition: "target_layer == 'intelligence' OR target_layer == 'workflow'"
+      - id: update-graph
+        action: update
+        target: "knowledge/graphs/{graph-id}.yaml"
+        description: 更新 knowledge graph，加入新的 promotion edge
+        estimated_tokens: 100
+        condition: "new_knowledge_graph_needed == true"
+    exit_conditions:
+      - linked_files_updated: true
+    output:
+      - updated_files: ["knowledge/indexes/README.md", "knowledge/summaries/..."]
+
+  - id: validate-close-loop
+    name: Validate & Close-loop
+    description: >
+      執行 validation gates 並完成 close-loop。
+    entry_conditions:
+      - linked_files_updated: true
+    steps:
+      - id: run-validation
+        action: validate
+        target: all_changed_files
+        description: >
+          執行 governance/validation/README.md 中的必要 gates：
+          - Source boundary check
+          - Old entrypoint check
+          - Linked updates check
+          - Markdown link check
+          - Diff review
+        estimated_tokens: 300
+      - id: commit-push
+        action: git
+        description: >
+          Commit 所有變更，push 到 remote，
+          讀回確認，檢查 git status clean。
+        estimated_tokens: 100
+    exit_conditions:
+      - validation_passed: true
+      - git_clean: true
+    output:
+      - commit_hash: "commit-hash"
+      - status: "clean"
+
+# Workflow Diagram
+#
+# ┌─────────────────────────────────────────────────────────────┐
+# │                    Promotion Workflow                        │
+# │                                                             │
+# │  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐ │
+# │  │  Assess  │ → │ Prepare  │ → │  Write   │ → │  Update  │ │
+# │  │  Lesson  │   │ Content  │   │  Target  │   │  Linked  │ │
+# │  └────┬─────┘   └────┬─────┘   └────┬─────┘   └────┬─────┘ │
+# │       │              │              │              │        │
+# │       ▼              ▼              ▼              ▼        │
+# │  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐ │
+# │  │Score +   │   │Generalize│   │Create or │   │Index +   │ │
+# │  │Decide    │   │+ Check   │   │Merge     │   │Summary + │ │
+# │  │Target    │   │Boundary  │   │+ Lifecycle│  │Registry  │ │
+# │  └──────────┘   └──────────┘   └──────────┘   └──────────┘ │
+# │                                                             │
+# │  ┌──────────────────────────────────────────────────────┐   │
+# │  │              Validate & Close-loop                    │   │
+# │  │  Validation Gates → Commit → Push → Readback → Clean │   │
+# │  └──────────────────────────────────────────────────────┘   │
+# └─────────────────────────────────────────────────────────────┘
+
+# Workflow Rules
+rules:
+  - id: one-lesson-per-promotion
+    description: >
+      每次 promotion workflow 只處理一條 lesson。
+      不可在同一次 workflow 中 promotion 多條 lesson。
+    severity: warning
+    rationale: >
+      每條 lesson 的 promotion 需要獨立的 generalize、boundary check 與 linked updates。
+      一次處理多條可能導致內容混淆或 linked updates 遺漏。
+
+  - id: rollback-on-validation-failure
+    description: >
+      如果 validation 失敗（如 boundary check 未通過、linked updates 遺漏），
+      必須 rollback 所有變更，不可部分提交。
+    severity: error
+    rationale: >
+      部分提交會導致知識不一致，影響後續的 routing 與 navigation。
+
+  - id: promotion-log
+    description: >
+      每次 promotion 完成後，必須在 feedback/pipeline/promotion-log.yaml 中記錄：
+      lesson_id、promotion_score、target_layer、target_path、promotion_date、commit_hash。
+    severity: warning
+    rationale: >
+      Promotion log 提供完整的 promotion 歷史，便於追溯與審計。

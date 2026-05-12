@@ -71,6 +71,15 @@
 - **Guard Chain**：[`runtime/pipeline/guard-chain.yaml`](../runtime/pipeline/guard-chain.yaml) — 每 stage 的 guard 執行順序（ordered by severity）、檢查頻率（per_tool_call / per_task / per_edit）、layered violation 行為（critical → halt, high/medium → warn）
 - **Skill Relevance Engine**：[`runtime/pipeline/relevance-engine.yaml`](../runtime/pipeline/relevance-engine.yaml) — 3 維度 scoring（trigger_match 0.5 + domain_match 0.3 + weight 0.2）、threshold 0.5、conflict penalty ×0.5、dependency_missing penalty ×0.8、3 個 scoring examples
 
+### ✅ 已完成：Feedback Promotion Pipeline（Phase 4）
+
+將 feedback lesson 從 `skills/*/feedback_history/` 的原始觀察，透過機器可讀的 scoring、workflow 與 lifecycle automation，推進到 `workflow/`、`intelligence/`、`shared-rules/`、`memory/` 或 runtime surfaces：
+
+- **Promotion Pipeline 概覽**：[`feedback/pipeline/README.md`](../feedback/pipeline/README.md) — pipeline 架構圖（feedback_history → Promotion Engine → Promotion Workflow → Target Layer）、與既有層的關係、使用方式
+- **Promotion Engine**：[`feedback/pipeline/promotion-engine.yaml`](../feedback/pipeline/promotion-engine.yaml) — 5 維度 scoring（impact 0.30 + maturity 0.25 + frequency 0.20 + freshness 0.15 + urgency 0.10）、threshold 0.7 immediate / 0.5 backlog、5 種 promotion target decisions（shared-rules/intelligence/workflow/skill-doc/archive）、3 個 scoring examples（cross-skill validated lesson → 0.71 promote_to_skill_doc、single-technique experimental → 0.27 archive、cross-skill engineering intelligence → 0.74 promote_to_intelligence）
+- **Promotion Workflow**：[`feedback/pipeline/promotion-workflow.yaml`](../feedback/pipeline/promotion-workflow.yaml) — 5 階段 workflow（assess-lesson → prepare-content → write-target → update-linked → validate-close-loop）、每階段有 entry/exit conditions、steps、output、rollback-on-validation-failure rule
+- **Lifecycle Automation**：[`feedback/pipeline/lifecycle-automation.yaml`](../feedback/pipeline/lifecycle-automation.yaml) — 4 種 automation（auto-archive-cold 180 days no references score<0.4、auto-downgrade-stale 90 days no re-validation、periodic-promotion-check weekly recalculate score、cold-data-threshold-monitor 50 lessons per category trigger index）、完整 state machine（new → experimental → candidate → validated → promoted → archived）、6 條 automation rules
+
 尚未完成的下一階段：
 
 - 尚未建立上述分層的完整子目錄；`apk-analysis` 已有第一個 intelligence 示範遷移內容。
