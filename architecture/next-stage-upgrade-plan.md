@@ -227,11 +227,17 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 ### 尚未完成的下一階段
 
-- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `SKILL.md` 仍為 skill-local。
+- **既有 `skills/` 仍同時承載 workflow、analysis 方法、工程智慧、templates 與 feedback lessons**（by reference-first design，舊入口維持 active）。大部分內容已提取到新分層，但 `SKILL.md` 仍為 skill-local。舊 skills 的清理時間線定義於 [`governance/lifecycle/README.md`](governance/lifecycle/README.md) 的 Skills Deprecation Timeline（Phase A→D），目前處於 Phase A（不刪除）。
 - **Runtime surfaces 持續擴充**：generated summaries、reports、SQLite index 已可一鍵重建，但更多 skill 內容需要提取到新分層。
 - **更多 skill 內容可提取**：`skills/apk-analysis/` 的 `techniques/` 子目錄已提取 catalog 至 `analysis/apk/techniques/`，flutter-dart-aot 已完成 decomposition pilot。`skills/app-development-guidance/` 和 `skills/apk-analysis/` 的 `feedback_history/` 子目錄尚未提取到 `feedback/` 層。
 - **其餘 3 個 techniques**（http-api、local-proxy、media-hls）待後續 decomposition。
 - **Intelligence Extraction Pipeline** 待 pilot 驗證成功後再抽象化。
+- **Skill-Specific Intelligence Extraction（遠期）**：不同 skill 的內容結構差異大（apk-analysis 的 techniques/ 混合 workflow+intelligence、app-development-guidance 的 controls/platforms/languages/implementation/checklists/process 各自獨立、travel-planning 的 WORKFLOW+DOCUMENTATION 緊密耦合），無法用單一 extraction pipeline 處理所有 skill。未來應為每類 skill 設計專屬的 extraction strategy，包含：
+  - 內容結構分析（identify 哪些部分是 HOW TO DO、哪些是 HOW TO THINK）
+  - 拆解策略（decomposition vs. catalog vs. direct promotion）
+  - 舊檔案標註規則（# Intelligence Extracted 或 # Migrated To）
+  - 驗證方式（pilot-driven，每個 skill 獨立驗證）
+  - 此項目應在所有 technique decomposition 完成、Intelligence Extraction Pipeline 驗證成功後才啟動。
 
 ## 核心問題
 
@@ -942,6 +948,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 建立 Anti-patterns | `anti-patterns/README.md` + 5 patterns | 已完成 5 個 anti-pattern 文件 | 失效模式可主動辨識與避免 |
 | P1 | done | 升級 Skills Metadata v2 | `skills-index.yaml` | 已完成所有 13 skills 加入 weight/domains/dependencies/conflicts/priority.runtime | Skill relevance scoring 與 conflict detection 可運作 |
 | P1 | done | 重建 intelligence/ 為專家智慧層 | `intelligence/README.md`, `intelligence/engineering/{architecture,domain,failure,heuristics,anti-patterns,tradeoffs,distributed-systems}/`, `intelligence/business/`, `intelligence/travel/` | 已完成 9 子目錄結構與 scope 定義，尚未填充實際 atoms | 每個子目錄有 README.md 定義核心、範例內容、與其他層的關係；與根 `anti-patterns/` 邊界已明確定義 |
+| P4 | pending | Skill-Specific Intelligence Extraction | `architecture/next-stage-upgrade-plan.md`（本文件） | 待所有 technique decomposition 完成、Intelligence Extraction Pipeline 驗證成功後啟動 | 每個 skill 有專屬 extraction strategy，內容結構分析 → 拆解 → 標註 → 驗證的完整流程已定義 |
 
 ## 最終目標
 
