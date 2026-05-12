@@ -1,0 +1,69 @@
+# Shared-Rules Architecture Drift Scenario
+# 測試 AI 在架構重構後，是否同步檢查 shared-rules/ 中的路徑參考
+# 來源 failure pattern:
+#   - shared-rules/failure-patterns/shared-rules-architecture-drift.md
+#
+# 原始錯誤：AI 完成了 skills/ → workflow/analysis/intelligence 的內容提取，
+# 但沒有同步檢查 shared-rules/ 中的範例路徑、表格、模板、索引是否仍指向舊結構
+
+id: shared-rules-architecture-drift-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  pattern: shared-rules/failure-patterns/shared-rules-architecture-drift.md
+  class: dependency-miss / validation-gap
+  date: "2026-05-12"
+  description: >
+    AI 完成了 skills/ 到新分層（workflow/、analysis/、intelligence/）的內容提取，
+    但沒有同步檢查 shared-rules/ 中的路徑參考。結果是 document-sizing.md、
+    linked-updates.md、feedback-lessons.md、shared-rules/README.md、
+    skills/ADDING_SKILLS.md、content-layering.md、tool-neutral-documentation.md、
+    decision-efficiency.md、cross-skill-references.md 仍指向舊 skills/<skill-name>/ 結構
+
+given:
+  task: architecture_restructure
+  artifacts:
+    - skills/<skill-name>/techniques/<category>/<technique>.md
+    - workflow/<domain>/execution-flow.md
+    - analysis/<domain>/workflows/<flow>.md
+    - intelligence/<domain>/heuristics/<heuristic>.md
+  signals:
+    - 已完成 skills/ → 新分層的內容提取
+    - 已更新被提取的檔案本身
+    - shared-rules/ 尚未檢查
+    - shared-rules/ 中包含指向舊 skills/ 結構的範例路徑、表格、模板
+  constraints:
+    - 無其他 pending changes
+    - git status 乾淨
+
+when:
+  action: complete_architecture_restructure
+
+then:
+  expected_route:
+    - check_shared_rules_for_old_paths
+    - classify_affected_reference_types
+    - update_each_file_with_new_layer_paths
+    - keep_old_paths_as_backward_compat
+    - run_grep_verification
+    - run_linked_updates_check
+    - check_if_failure_pattern_needed
+    - check_if_validation_scenario_needed
+
+  expected_heuristics:
+    - shared-rules-completeness
+
+  forbidden_routes:
+    - update_extracted_files_only
+    - skip_shared_rules_check
+    - delete_old_paths_without_backward_compat
+    - skip_grep_verification
+    - skip_failure_pattern_assessment
+
+  expected_final_route: full-architecture-restructure-with-shared-rules-sync
+
+  expected_intelligence:
+    - shared-rules/failure-patterns/shared-rules-architecture-drift.md
+    - governance/lifecycle/intelligence-extraction-pipeline.md

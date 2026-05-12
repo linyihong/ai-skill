@@ -97,6 +97,7 @@ Pattern records 要短。若 pattern 變長，將 examples 拆成較小 pattern 
 | Cross-document 或 cross-agent workflow failure | `shared-rules/failure-patterns/` 加上相關 shared rule |
 | Skill-specific repeated mistake | 該 skill 的 `feedback_history/`，成熟後再推進 workflow/checklist |
 | Tool-specific execution failure | `ai-tools/<tool>.md`、tool config 或 skill tool adapter |
+| **架構重構後 shared-rules 未同步** | **`shared-rules/failure-patterns/shared-rules-architecture-drift.md`** + 執行 `governance/lifecycle/intelligence-extraction-pipeline.md` Step 7a |
 | **AI 系統面執行錯誤**（routing 錯誤、heuristic 誤用、forbidden route 被選中） | **`validation/scenarios/failure-derived/`** — 建立 stateless scenario，未來可自動驗證同類錯誤是否重演 |
 
 ### Failure → Validation Scenario 條件

@@ -384,6 +384,51 @@ Extraction 完成後需要更新以下文件：
 | `knowledge/graphs/` | 加入新 graph edge（如需要） |
 | `architecture/next-stage-upgrade-plan.md` | 更新 Phase 完成狀態 |
 
+### Step 7a：Shared-Rules 同步檢查（架構變更專用）
+
+當 extraction 涉及**架構重構**（目錄重組、分層新增、路徑變更、命名變更）時，除了更新上述索引，**必須**同步檢查 `shared-rules/` 中的路徑參考是否過期。
+
+#### 檢查範圍
+
+| 類型 | 檢查重點 | 範例檔案 |
+|------|---------|---------|
+| 範例路徑 | 目錄結構範例是否仍指向舊路徑 | `shared-rules/document-sizing.md` |
+| 表格內容 | 連動關係表是否仍使用舊路徑 | `shared-rules/linked-updates.md` |
+| 模板 | Promotion Target 是否缺少新分層選項 | `shared-rules/feedback-lessons.md` |
+| 索引 | lazy-load 表格是否指向舊檔案 | `shared-rules/README.md` |
+| 教學文件 | 目錄結構建議是否仍以舊結構為主 | `skills/ADDING_SKILLS.md` |
+| 規則正文 | 路徑描述是否過期 | `shared-rules/content-layering.md`、`shared-rules/tool-neutral-documentation.md` |
+| 流程規則 | Context Loading 步驟是否指向舊入口 | `shared-rules/decision-efficiency.md` |
+| 引用規則 | Cross-skill reference 格式是否過期 | `shared-rules/cross-skill-references.md` |
+
+#### 更新原則
+
+1. **保留舊路徑**作為向後相容參考，標註「舊結構，向後相容」
+2. **新增新分層路徑**作為主要參考，標註「新分層（優先）」
+3. 通用規則（如 `document-sizing.md`）應明確標註「可跨專案通用」
+4. 使用通用格式（`<domain>`）而非硬編碼 skill 名稱
+
+#### 驗證命令
+
+```bash
+# 確認無遺漏的舊路徑參考（預期：無，或只有 intentional 向後相容參考）
+grep -rn "skills/<old-path>/" shared-rules/ --include="*.md"
+
+# 確認新分層路徑已出現
+grep -rn "workflow/<domain>/" shared-rules/ --include="*.md"
+grep -rn "analysis/<domain>/" shared-rules/ --include="*.md"
+grep -rn "intelligence/<domain>/" shared-rules/ --include="*.md"
+```
+
+#### 觸發條件
+
+符合任一條件時，**必須**執行 Step 7a：
+
+- 新增或重組 `workflow/<domain>/`、`analysis/<domain>/`、`intelligence/<domain>/` 等新分層
+- 將舊 `skills/<skill-name>/` 內容提取到新分層
+- 修改 `skills/` 結構後，未檢查 `shared-rules/` 中的範例路徑、表格、模板
+- 只更新了「被提取的檔案本身」，但沒有更新「描述如何提取的規則」
+
 ---
 
 ## Pipeline 適用範圍
