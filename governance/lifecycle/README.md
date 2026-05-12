@@ -111,12 +111,12 @@ Do not delete or move old skill files during candidate-map or candidate-atom pha
 
 舊 `skills/` 目錄的內容不會一次性刪除，而是依以下階段逐步 deprecate：
 
-| Phase | Condition | Action |
-| --- | --- | --- |
-| **Phase A**（目前） | 新分層已建立，舊入口仍 active | 不刪除。舊 `skills/` 維持 source of truth，新分層作為 reference / routing / promotion surface。 |
-| **Phase B**（所有 technique decomposition 完成後） | 所有 `techniques/` 已完成 decomposition（workflow → `analysis/`，intelligence → `intelligence/`），且 pilot 驗證通過 | 舊 technique 檔案標註 `# Deprecated — see <new path>`，但保留檔案。`skills/` 仍可被 tool adapter 載入。 |
-| **Phase C**（Intelligence Extraction Pipeline 驗證成功後） | Pipeline 可自動從舊 skill 提取 intelligence atoms，且驗證通過 | 可開始刪除已完全覆蓋的舊 technique 檔案。刪除前需確認：<br>1. `analysis/` 有對應 workflow<br>2. `intelligence/` 有對應 atoms<br>3. `knowledge/indexes/` 可 route 到新路徑<br>4. `knowledge/runtime/routing-registry.yaml` 已更新<br>5. 無任何 tool adapter 依賴該舊路徑 |
-| **Phase D**（Skill-Specific Extraction 完成後） | 所有 skill 內容已完全遷移到新分層 | 可刪除整個 `skills/` 目錄，或保留為唯讀 archive。刪除前需通過完整的 deprecation checklist（見 `architecture/ai-native-knowledge-operating-system.md` 的 Phase 3 Deprecation Checklist）。 |
+| Phase | Condition | Action | Status |
+| --- | --- | --- | --- |
+| **Phase A** | 新分層已建立，舊入口仍 active | 不刪除。舊 `skills/` 維持 source of truth，新分層作為 reference / routing / promotion surface。 | ✅ 已完成 |
+| **Phase B** | 所有 `techniques/` 已完成 decomposition（workflow → `analysis/`，intelligence → `intelligence/`），且 pilot 驗證通過 | 舊 technique 檔案標註 `# Deprecated — see <new path>`，但保留檔案。`skills/` 仍可被 tool adapter 載入。 | ✅ 已完成（2026-05-12） |
+| **Phase C** | Pipeline 可自動從舊 skill 提取 intelligence atoms，且驗證通過 | 可開始刪除已完全覆蓋的舊 technique 檔案。刪除前需確認：<br>1. `analysis/` 有對應 workflow<br>2. `intelligence/` 有對應 atoms<br>3. `knowledge/indexes/` 可 route 到新路徑<br>4. `knowledge/runtime/routing-registry.yaml` 已更新<br>5. 無任何 tool adapter 依賴該舊路徑 | ⏳ 待執行 |
+| **Phase D** | 所有 skill 內容已完全遷移到新分層 | 可刪除整個 `skills/` 目錄，或保留為唯讀 archive。刪除前需通過完整的 deprecation checklist（見 `architecture/ai-native-knowledge-operating-system.md` 的 Phase 3 Deprecation Checklist）。 | ⏳ 待執行 |
 
 ### 判斷是否可刪除單一舊檔案的檢查清單
 

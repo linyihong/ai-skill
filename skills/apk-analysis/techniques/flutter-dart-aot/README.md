@@ -1,6 +1,6 @@
 # Flutter / Dart AOT Techniques
 
-> **Intelligence Extracted** — This technique has been decomposed into HOW TO DO (workflow) and HOW TO THINK (intelligence).
+> **Deprecated** — This technique has been fully decomposed. See the new locations below.
 > See:
 > - Workflow: `analysis/apk/workflows/frida-hook-flow.md`
 > - Heuristics: `intelligence/engineering/apk-analysis/heuristics/hook-selection.md`

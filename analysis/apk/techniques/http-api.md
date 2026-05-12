@@ -1,6 +1,6 @@
 # HTTP API Documentation Techniques
 
-> **Intelligence Extracted**
+> **Deprecated** — This technique has been fully decomposed. See the new locations below.
 > See:
 > - `analysis/apk/workflows/http-api-documentation-flow.md`（HOW TO DO 操作流程）
 > - `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`（API 文件完整性啟發式）

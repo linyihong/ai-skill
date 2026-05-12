@@ -1,6 +1,6 @@
 # Local Proxy / Loopback Techniques
 
-> **Intelligence Extracted**
+> **Deprecated** — This technique has been fully decomposed. See the new locations below.
 > See:
 > - `analysis/apk/workflows/local-proxy-hook-flow.md`（HOW TO DO 操作流程）
 > - `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`（路由診斷啟發式）

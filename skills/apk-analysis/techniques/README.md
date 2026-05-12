@@ -1,5 +1,9 @@
 # APK Analysis Technique Categories
 
+> **Deprecated** — All techniques in this directory have been fully decomposed into HOW TO DO (workflow → `analysis/apk/workflows/`) and HOW TO THINK (intelligence → `intelligence/engineering/apk-analysis/`). See individual technique READMEs for specific new paths.
+>
+> This directory is preserved for tool adapter compatibility. New content should be added to the new locations, not here.
+
 Use this directory to keep technique-specific guidance out of the default workflow. The top-level `WORKFLOW.md`, `TOOLS.md`, and `DOCUMENTATION.md` stay as common routing and documentation rules. Category folders hold deeper guidance for a specific app/runtime/API family.
 
 ## Routing Rule

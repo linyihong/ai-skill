@@ -1,6 +1,6 @@
 # Media / HLS Techniques
 
-> **Intelligence Extracted**
+> **Deprecated** — This technique has been fully decomposed. See the new locations below.
 > See:
 > - `analysis/apk/workflows/media-hls-analysis-flow.md`（HOW TO DO 操作流程）
 > - `intelligence/engineering/apk-analysis/signals/media-type-detection.md`（媒體類型偵測信號）

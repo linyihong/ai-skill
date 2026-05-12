@@ -1,5 +1,9 @@
 # APK Analysis Technique Categories
 
+> **Deprecated** — All techniques in this directory have been fully decomposed into HOW TO DO (workflow → `analysis/apk/workflows/`) and HOW TO THINK (intelligence → `intelligence/engineering/apk-analysis/`). See individual technique files for specific new paths.
+>
+> This directory is preserved as a reference archive. New content should be added to the new locations, not here.
+
 `analysis/apk/techniques/` 負責 APK 分析中各技術路線的深度分析方法。本目錄保存特定 app/runtime/API 家族的技術指引，讓分析過程可根據證據選擇對應路線。
 
 > **相容性規則**：`skills/apk-analysis/techniques/` 仍為 active skill entrypoint。本目錄為 reference target，兩者應保持同步。
