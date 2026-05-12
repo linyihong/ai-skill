@@ -1,0 +1,49 @@
+# Local Proxy vs TLS Pinning Diagnosis Scenario
+# 測試 AI 在 Wi-Fi MITM 看不到流量時，能否正確區分 local proxy 和 TLS pinning
+# 來源 atoms:
+#   - intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md
+#   - intelligence/engineering/apk-analysis/signals/local-proxy-detection.md
+
+id: local-proxy-vs-pinning-v1
+domain: apk-analysis
+type: routing-decision
+priority: P1
+
+given:
+  app_type: android-native
+  signals:
+    - Wi-Fi MITM 看不到 business CONNECT
+    - app 正常運作
+    - pcap 顯示外部 TLS 連線
+    - MITM proxy 無 SSL handshake error
+    - OkHttp/WebView hooks 不暴露 upstream
+  constraints:
+    - 尚未檢查 logcat
+    - 尚未檢查 pcap loopback
+
+when:
+  action: diagnose_missing_traffic
+
+then:
+  expected_route:
+    - check_pcap_loopback
+    - check_logcat_proxy
+    - confirm_local_proxy
+    - start_handler_hook_flow
+
+  expected_heuristics:
+    - local-proxy-routing-diagnosis
+
+  forbidden_routes:
+    - declare_tls_pinning_without_evidence
+    - start_tls_pinning_bypass
+    - broad_hook_raw_sockets
+
+  expected_final_route: handler-hook-flow
+
+  expected_intelligence:
+    - intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md
+    - intelligence/engineering/apk-analysis/signals/local-proxy-detection.md
+
+  unexpected_intelligence:
+    - intelligence/engineering/apk-analysis/heuristics/hook-selection.md

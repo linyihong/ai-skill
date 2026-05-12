@@ -1,0 +1,28 @@
+# Runtime-First Hooking Rule
+# 對應 heuristic: intelligence/engineering/apk-analysis/heuristics/hook-selection.md
+# 禁止過早靜態 patch，優先 runtime hook
+
+id: runtime-first-hooking
+domain: apk-analysis
+priority: high
+
+signals:
+  - relocation_incomplete
+  - dart_vm_initializing
+  - libapp_so_present
+
+expected_behavior:
+  - avoid_static_patch
+  - prefer_runtime_hook
+  - delay_hook_attachment
+
+forbidden_behavior:
+  - direct_elf_patch
+  - immediate_spawn_hook
+
+validation:
+  method: trace_analysis
+  required_fields:
+    - hook_timing
+    - hook_method
+    - target_function

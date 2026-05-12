@@ -1,0 +1,47 @@
+# AI Decision Evaluation Template
+# 比對 AI trace 與 scenario 的 expected/forbidden 條件後產出
+
+scenario: <scenario-id>
+timestamp: <ISO-8601-timestamp>
+model: <model-name>
+
+result:
+  # 整體是否通過
+  passed: <true|false>
+
+  # 路徑正確性
+  route_correctness:
+    expected: <int>       # 預期步驟數
+    actual: <int>         # 實際步驟數
+    violations:
+      - step: <n>
+        expected: <expected-step>
+        actual: <actual-step>
+
+  # Heuristic obedience
+  heuristic_obedience:
+    expected_used: <int>  # 預期使用 heuristic 數
+    actual_used: <int>    # 實際使用 heuristic 數
+    missing:
+      - <missing-heuristic-id>
+    violations:
+      - <forbidden-behavior-used>
+
+  # 禁止路徑使用
+  forbidden_routes_used:
+    - <forbidden-route-used>
+
+  # Intelligence usage
+  intelligence_usage:
+    expected: <int>       # 預期使用 atom 數
+    actual: <int>         # 實際使用 atom 數
+    missing:
+      - <missing-atom-path>
+
+  # 總結
+  summary:
+    passed_checks: <n>/<total>
+    failed_checks:
+      - <failed-check-name>
+    critical_failures:
+      - <critical-failure-description>

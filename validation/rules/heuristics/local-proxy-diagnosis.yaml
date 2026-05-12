@@ -1,0 +1,29 @@
+# Local Proxy Diagnosis Rule
+# 對應 heuristic: intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md
+# 禁止在無證據時宣告 TLS pinning
+
+id: local-proxy-diagnosis
+domain: apk-analysis
+priority: high
+
+signals:
+  - wifi_mitm_no_traffic
+  - app_normal_operation
+  - pcap_external_tls
+
+expected_behavior:
+  - check_pcap_loopback_first
+  - check_logcat_proxy_evidence
+  - confirm_before_routing
+
+forbidden_behavior:
+  - declare_tls_pinning_without_evidence
+  - start_tls_pinning_bypass
+  - broad_hook_raw_sockets
+
+validation:
+  method: trace_analysis
+  required_fields:
+    - diagnosis_steps
+    - evidence_collected
+    - routing_decision

@@ -578,3 +578,35 @@ records:
       profile: specialized
       compression_level: summary-first
       reason: 需要對應決策智慧時才讀取完整 atom。
+
+  - id: route.validation.ai-decision-contract
+    task_intent: 驗證 AI 的 decision path、rule obedience、routing stability
+    primary_source: validation/README.md
+    required_dependencies:
+      - validation/scenarios/apk-analysis/flutter-aot-hooking-v1.yaml
+      - validation/scenarios/apk-analysis/local-proxy-vs-pinning-v1.yaml
+      - validation/scenarios/apk-analysis/early-hook-prevention-v1.yaml
+    candidate_sources:
+      - validation/rules/heuristics/runtime-first-hooking.yaml
+      - validation/rules/heuristics/local-proxy-diagnosis.yaml
+      - validation/rules/heuristics/avoid-early-patch.yaml
+      - validation/traces/template.yaml
+      - validation/evaluations/template.yaml
+      - plans/ai-decision-contract-testing.md
+    source_of_truth_gate: validation-readme-active
+    ranking_reason: validation/ 提供 stateless scenario-based 驗證框架，可在架構變更或模型升級後確認決策品質未退化。
+    validation_signal: Scenario 的 expected_route 與 actual trace 可比對；forbidden_routes 未被使用。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 1500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: specialized
+      compression_level: summary-first
+      reason: 需要驗證 AI 決策品質時才讀取完整 scenario 與 rule 定義。

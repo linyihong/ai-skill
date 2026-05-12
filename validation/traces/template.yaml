@@ -1,0 +1,36 @@
+# AI Decision Trace Template
+# 執行 scenario 後，AI 必須輸出此結構化 trace
+
+scenario: <scenario-id>
+timestamp: <ISO-8601-timestamp>
+model: <model-name>
+
+trace:
+  # 偵測到的信號（從 given.signals 中識別）
+  signals_detected:
+    - <signal-1>
+    - <signal-2>
+
+  # 使用的 heuristic（從 intelligence/ 中載入）
+  heuristics_used:
+    - <heuristic-id-1>
+    - <heuristic-id-2>
+
+  # 拒絕的路徑（含原因）
+  rejected_routes:
+    - route: <rejected-route-1>
+      reason: <why-rejected>
+    - route: <rejected-route-2>
+      reason: <why-rejected>
+
+  # 最終選擇的路徑
+  final_route: <chosen-route>
+
+  # 載入的 intelligence atoms
+  intelligence_loaded:
+    - <path-to-atom-1>
+    - <path-to-atom-2>
+
+  # 決策理由（自由文字）
+  decision_rationale: >
+    <explanation-of-decision-process>

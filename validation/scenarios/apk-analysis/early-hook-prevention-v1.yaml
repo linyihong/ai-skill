@@ -1,0 +1,53 @@
+# Early Hook Prevention Scenario
+# 測試 AI 在 Flutter/Dart AOT 分析中，是否能避免過早附加 hook
+# 來源 atoms:
+#   - intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md
+#   - intelligence/engineering/apk-analysis/failure/frida-spawn-race.md
+
+id: early-hook-prevention-v1
+domain: apk-analysis
+type: failure-recovery
+priority: P1
+
+given:
+  app_type: flutter
+  artifacts:
+    - lib/arm64-v8a/libflutter.so
+    - lib/arm64-v8a/libapp.so
+  signals:
+    - Dart AOT snapshot 載入中
+    - relocation 未完成
+    - 前一次 spawn 模式 crash
+  constraints:
+    - Frida 版本 16.0
+    - 需使用 spawn 模式
+
+when:
+  action: setup_hook_with_spawn
+
+then:
+  expected_route:
+    - detect_previous_crash
+    - check_spawn_race_condition
+    - apply_pause_mode
+    - delay_hook_attachment
+    - verify_hook_stability
+
+  expected_heuristics:
+    - avoid-early-patch
+    - spawn-race-mitigation
+
+  forbidden_routes:
+    - immediate_spawn_without_pause
+    - broad_hook_runtime_helpers
+    - ignore_previous_crash
+
+  expected_final_route: pause-spawn-with-delay
+
+  expected_intelligence:
+    - intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md
+    - intelligence/engineering/apk-analysis/failure/frida-spawn-race.md
+    - intelligence/engineering/apk-analysis/heuristics/hook-selection.md
+
+  unexpected_intelligence:
+    - intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md

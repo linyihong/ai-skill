@@ -1232,6 +1232,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P2 | done | 跨 skill intelligence promotion（app-development-guidance → heuristics） | `intelligence/engineering/heuristics/document-priority-hierarchy.md` | 已完成 1 個 proven generalized atom 從 app-development-guidance 提升到跨領域 heuristics 層 | 原始 atom 有 `# Cross-Domain Promotion` 標註，新 atom 有 `# Source` 指向原始 domain atom |
 | P2 | done | Skills Deprecation（Phase C） | `governance/lifecycle/README.md`, `skills/apk-analysis/techniques/`, `analysis/apk/techniques/` | 已完成 10 個舊 technique 檔案刪除（4 個子目錄 + 1 個 README 在 skills/，4 個 .md + 1 個 README 在 analysis/），更新 15+ 個引用舊路徑的檔案 | Phase C 檢查清單 7 項條件全部滿足，刪除後可 git revert rollback |
 | P2 | done | Bootstrap flow 修正 — primary_entrypoint 優先 | `skills-index.yaml`, `CORE_BOOTSTRAP.md`, `shared-rules/dependency-reading.md` | 已完成 3 個 skill 新增 primary_entrypoint 指向新分層路徑，CORE_BOOTSTRAP.md 啟動流程加入 primary_entrypoint 優先規則，dependency-reading.md 加入 primary_entrypoint 優先規則 | AI 啟動時優先讀 primary_entrypoint 指向的新分層路徑，不再被舊 entrypoint 導向舊 skills/ |
+| P1 | done | AI Decision Contract Testing 框架 | `validation/README.md`, `validation/scenarios/apk-analysis/`, `validation/rules/heuristics/`, `validation/traces/template.yaml`, `validation/evaluations/template.yaml`, `plans/ai-decision-contract-testing.md` | 已完成 validation/ 目錄建立（scenarios/rules/traces/evaluations），3 個 Scenario（flutter-aot-hooking、local-proxy-vs-pinning、early-hook-prevention），3 個 Rule 定義，Trace/Evaluation template | AI 的 decision path、rule obedience、routing stability 可透過 stateless scenario 驗證 |
 
 ## 最終目標
 

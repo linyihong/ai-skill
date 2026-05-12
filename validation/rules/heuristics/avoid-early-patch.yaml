@@ -1,0 +1,29 @@
+# Avoid Early Patch Rule
+# 對應 anti-pattern: intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md
+# 禁止在 relocation 完成前附加 hook
+
+id: avoid-early-patch
+domain: apk-analysis
+priority: high
+
+signals:
+  - spawn_mode_active
+  - previous_spawn_crash
+  - dart_vm_initializing
+
+expected_behavior:
+  - use_pause_mode
+  - delay_hook_attachment
+  - verify_hook_stability
+
+forbidden_behavior:
+  - immediate_spawn_without_pause
+  - broad_hook_runtime_helpers
+  - ignore_previous_crash
+
+validation:
+  method: trace_analysis
+  required_fields:
+    - spawn_mode
+    - hook_timing
+    - crash_history
