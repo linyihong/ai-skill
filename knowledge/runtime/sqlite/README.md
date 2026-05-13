@@ -6,12 +6,12 @@
 
 | Surface | Role |
 | --- | --- |
-| Markdown / YAML source files | Canonical source-of-truth，例如 `skills/*/feedback_history/`、`shared-rules/`、`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/routing-registry.yaml`。 |
+| Markdown / YAML source files | Canonical source-of-truth，例如 `feedback/history/`、`shared-rules/`、`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/routing-registry.yaml`。 |
 | SQLite database | Generated lookup cache；可刪除、可重建、不可作為唯一資料來源。 |
 | Generator script | 從 canonical sources deterministic 產生 SQLite tables / FTS index。 |
 | Query helper | 從 SQLite 回傳少量 candidate `source_path`、summary、tags、score 與 validation signal。 |
 
-SQLite row 可以索引 feedback lessons，但 feedback lesson 全文仍留在 `skills/<skill>/feedback_history/`。Agent 查詢 SQLite 後，只能把結果當作 candidate list；需要執行、修改或高信心判斷時，仍需讀 canonical source。
+SQLite row 可以索引 feedback lessons，但 feedback lesson 全文仍留在 `feedback/history/<domain>/`。Agent 查詢 SQLite 後，只能把結果當作 candidate list；需要執行、修改或高信心判斷時，仍需讀 canonical source。
 
 ## Why It Can Save Tokens
 
@@ -34,7 +34,7 @@ SQLite index 可讓 agent 先做低成本查詢：
 | `sources` | Canonical `source_path`、layer、title、mtime / checksum。 | Markdown / YAML source files |
 | `routes` | Task intent 到 primary source / dependencies / model profile。 | `knowledge/runtime/routing-registry.yaml` |
 | `edges` | depends / related / routes_to / promotes_from 關係。 | `knowledge/graphs/*.yaml` |
-| `feedback_lessons` | skill feedback lesson 的標題、status、category、summary 與 source path。 | `skills/*/feedback_history/**` |
+| `feedback_lessons` | skill feedback lesson 的標題、status、category、summary 與 source path。 | `feedback/history/*/**` |
 | `fts` | FTS5 full-text index，索引 title、summary、tags、trigger、when_to_read。 | Generated from tables above |
 
 ## Minimum Fields

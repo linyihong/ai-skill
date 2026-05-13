@@ -18,4 +18,4 @@
 
 - `runtime/` 根目錄提供 runtime 整體架構，本目錄提供具體的 onboarding 指引。
 - `workflow/` 提供執行流程，本目錄提供如何啟動流程的設定指引。
-- `skills/` 是原始來源，已不再作為 active entrypoint。
+- `skills/` 是原始來源，已不再作為 active entrypoint（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。

@@ -1,8 +1,8 @@
 # APK Analysis Completion Definition
 
-本文件定義新 APK 分析專案的完成門檻。承接 [`skills/apk-analysis/RUNBOOK.md`](../../skills/apk-analysis/RUNBOOK.md) 的內容，提取為 tool-neutral 的 runtime completion gates。
+本文件定義新 APK 分析專案的完成門檻。承接 [`workflow/apk-analysis/execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) 與 [`workflow/apk-analysis/artifact-gates.md`](../../workflow/apk-analysis/artifact-gates.md) 的內容，提取為 tool-neutral 的 runtime completion gates。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/apk-analysis/RUNBOOK.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：此文件為新分層的 reference target，舊 `skills/apk-analysis/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 初步分析完成定義
 
@@ -27,10 +27,10 @@
 4. **找高語意 hook**：request options、response wrapper、response decoder / decryptor、token/session provider。
 5. **分類路由**：先用共通流程判斷 runtime / traffic family。證據指向特定技術才讀對應 techniques 文件。不要在分類未明時一次讀完所有 technique folders。
 6. **文件化**：失敗路徑也要寫、成功證據要可重現、API 結論和方法論要分開、去敏後才保存樣本。若下一步是 SDK/client/app tool/live integration 開發，先補 project-level domain/runtime baseline 的最小可跑因素；若需要 device/install/account/session/vendor/server-issued material，補 authorized identity material self-generation audit。
-7. **回饋 skill**：新技巧寫入 `feedback_history/<category>/` 或 `feedback_history/common/`。已驗證技巧再同步進 `WORKFLOW.md` / `TOOLS.md` / `DOCUMENTATION.md` 或對應 `techniques/<category>/`。
+7. **回饋 skill**：新技巧寫入 `feedback/history/apk-analysis/<category>/` 或 `feedback/history/apk-analysis/common/`。已驗證技巧再同步進 `workflow/apk-analysis/execution-flow.md`、`workflow/apk-analysis/artifact-gates.md`、`analysis/apk/workflows/` 或 `intelligence/engineering/apk-analysis/`。
 
 ## 與其他層的關係
 
 - `workflow/apk-analysis/execution-flow.md` 提供詳細的分析執行步驟，本文件定義何時算完成。
 - `workflow/apk-analysis/artifact-gates.md` 提供產出規範與品質門檻。
-- `skills/apk-analysis/RUNBOOK.md` 是原始來源，已不再作為 active entrypoint。
+- `skills/apk-analysis/RUNBOOK.md` 是原始來源，已不再作為 active entrypoint（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。

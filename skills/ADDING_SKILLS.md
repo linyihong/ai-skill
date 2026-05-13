@@ -6,7 +6,7 @@
 
 | 情況 | 建議 |
 | --- | --- |
-| 內容仍是 APK／流量／Frida／Flutter AOT 等同家族 | 擴充現有 **`apk-analysis/`**，用 `feedback_history/<category>/` 與 WORKFLOW／TOOLS／techniques 收斂 |
+| 內容仍是 APK／流量／Frida／Flutter AOT 等同家族 | 擴充現有 **`apk-analysis/`**，用 `feedback/history/apk-analysis/<category>/` 與 WORKFLOW／TOOLS／techniques 收斂 |
 | 新領域（例：iOS 靜態流程、另一種合規測試方法論）且會長期累積 | 新建 **`skills/<name>/`** |
 
 Skill **資料夾名稱**建議 **kebab-case**、簡短、穩定（例：`apk-analysis`，之後如 `ios-ipa-analysis`）。
@@ -44,7 +44,7 @@ feedback/
 ```text
 skills/<skill-name>/
   SKILL.md              # 必填：YAML frontmatter + 給 Agent 的入口正文
-  feedback_history/     # 強烈建議：每條 lesson 一檔；若 skill 有分類，使用 feedback_history/<category>/（見 shared-rules/feedback-lessons.md）
+  feedback_history/     # 已於 2026-05-13 刪除。新 lesson 請直接寫入 feedback/history/<domain>/<category>/（見 shared-rules/feedback-lessons.md）
 ```
 
 常見擴充（依需求增量建立；僅限尚未遷移的 skill）：
@@ -64,11 +64,10 @@ skills/<skill-name>/
 可直接複製範本（在 `<AI_SKILL_REPO>` 根目錄執行，將 `my-skill` 改成你的名稱）：
 
 ```bash
-mkdir -p "skills/my-skill/feedback_history"
+# 新 lesson 請直接寫入 feedback/history/<domain>/<category>/，不再使用 skills/<name>/feedback_history/
 cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 # 再編輯 skills/my-skill/SKILL.md 與 FEEDBACK.md，替換 <…> 占位符
 # 可選：建立 skills/my-skill/README.md、RUNBOOK.md 等
-# 可選：touch skills/my-skill/feedback_history/README.md 做索引表
 ```
 
 ## 3. `SKILL.md` 必填欄位（Agent）
@@ -151,7 +150,7 @@ skills/<skill-name>/tool-adapters/
 - [ ] 已依 `shared-rules/dependency-reading.md` 建立 dependency read ledger，讀取或明確檢查相關依賴文件，並標示缺檔不適用項
 - [ ] 若引用其他 skill，已依 `shared-rules/cross-skill-references.md` 寫明 trigger、artifact、ownership boundary 與 linked updates
 - [ ] 若文件開始變大，已依 `shared-rules/document-sizing.md` 拆成資料夾、目錄與子檔
-- [ ] 已建立 `feedback_history/`（可先要 `README.md` 索引；若 skill 有分類，同步建立 `feedback_history/<category>/README.md`）
+- [ ] 新 lesson 已寫入 `feedback/history/<domain>/<category>/`（見 shared-rules/feedback-lessons.md）
 - [ ] 根目錄 `README.md` 與 `skills/README.md` 已更新
 - [ ] 已依 `shared-rules/linked-updates.md` 完成或明確檢查必要連動更新
 - [ ] 無真實本機絕對路徑、無機密寫入將 commit 的檔案

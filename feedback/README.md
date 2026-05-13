@@ -19,7 +19,7 @@
 ## 與既有層的關係
 
 - `feedback/history/` 是 lesson 的統一目標路徑。
-- `skills/*/feedback_history/`、`workflow/*/feedback_history/`、`analysis/*/feedback_history/`、`intelligence/*/feedback_history/` 是舊路徑，僅保留向後相容（既有 lesson 尚未搬遷）。
+- `skills/*/feedback_history/` 已於 2026-05-13 刪除（apk-analysis、app-development-guidance、travel-planning），所有 lesson 已搬遷至 `feedback/history/`。
 - `shared-rules/failure-learning-system.md` 與 `shared-rules/feedback-lessons.md` 仍是可執行規則。
 - `intelligence/` 承接成熟的工程智慧。
 - `governance/` 定義 promotion、deprecation 與 validation lifecycle。
@@ -37,5 +37,5 @@
 
 - `shared-rules/failure-learning-system.md`
 - `shared-rules/feedback-lessons.md`
-- `skills/*/feedback_history/`（舊路徑 lesson 將分批搬遷至 `feedback/history/`）
+- ✅ `skills/*/feedback_history/`（已於 2026-05-13 全部搬遷至 `feedback/history/`，舊目錄已刪除）
 - `architecture/next-stage-upgrade-plan.md` 的 Intelligence Feedback Loop

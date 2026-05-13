@@ -28,7 +28,7 @@
 ## 與既有層的關係
 
 - `shared-rules/failure-learning-system.md` 仍定義 failure learning 的可執行流程。
-- `skills/*/feedback_history/` 仍保存 skill-specific lesson，成熟後可抽象成 memory 或 intelligence。
+- `feedback/history/` 保存 skill-specific lesson，成熟後可抽象成 memory 或 intelligence。
 - `knowledge/` 管導航與 atom；本層管記憶類型、回放與保存邊界。
 - `governance/` 管記憶 lifecycle、deprecation 與清理。
 - 冷資料查找由 `knowledge/runtime/sqlite/` 這類 generated lookup cache 處理；本層只定義哪些 historical context 值得長期保留與回放。
@@ -37,4 +37,4 @@
 
 - `shared-rules/failure-learning-system.md` 中的 storage 與 promotion 概念
 - `shared-rules/failure-patterns/`
-- `skills/*/feedback_history/` 中可抽象成長期記憶類型的經驗
+- `feedback/history/` 中可抽象成長期記憶類型的經驗

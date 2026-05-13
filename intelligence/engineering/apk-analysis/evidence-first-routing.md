@@ -1,7 +1,7 @@
 # Evidence-First Analysis Routing（以證據驅動分析路線選擇）
 
 **Status**: `validated-intelligence`
-**Source**: Multiple `skills/apk-analysis/feedback_history/common/` lessons
+**Source**: Multiple `feedback/history/apk-analysis/common/` lessons
 
 ## 問題
 

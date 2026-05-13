@@ -90,8 +90,8 @@ Agent 把某個 skill 的 analysis technique lesson 放到另一個不相關 ski
 **為什麼錯**：這兩個是 APK 分析技術（Frida hook 策略），不是開發指引。`app-development-guidance` 的 scope 是 SDK 設計、API contract、BDD、測試策略。
 
 **正確位置**：
-- `analysis/apk/feedback_history/local-proxy/`（非標準 TLS — 分析方法）
-- `skills/app-development-guidance/feedback_history/common/`（dart:io HttpClient — 這個 lesson 同時涉及開發指引，因為它影響 SDK 的 HTTP client 選擇）
+- `feedback/history/apk-analysis/local-proxy/`（非標準 TLS — APK 分析技術）
+- `feedback/history/app-development-guidance/common/`（dart:io HttpClient — 這個 lesson 同時涉及開發指引，因為它影響 SDK 的 HTTP client 選擇）
 
 ### ❌ 錯誤範例 2：已遷移 skill 的 lesson 放到舊路徑
 
@@ -99,9 +99,9 @@ Agent 把某個 skill 的 analysis technique lesson 放到另一個不相關 ski
 
 **錯誤行為**：使用舊 `skills/<name>/feedback_history/` 路徑
 
-**為什麼錯**：已遷移 skill 的 lesson 必須放到對應的新分層路徑（`workflow/`、`analysis/`、`intelligence/`）
+**為什麼錯**：所有 lesson 的統一目標路徑是 `feedback/history/<domain>/`，不再按 lesson 性質分散到各層。
 
-**正確位置**：`analysis/apk/feedback_history/local-proxy/`（分析技術）
+**正確位置**：`feedback/history/apk-analysis/local-proxy/`（APK 分析技術）
 
 ### ✅ 正確範例：判斷 lesson 歸屬
 

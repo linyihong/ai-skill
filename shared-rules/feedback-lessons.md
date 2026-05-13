@@ -21,7 +21,7 @@
 | **每一條獨立 lesson（所有 skill，無論遷移狀態）** | **`feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`** |
 | **條目總覽表**（可選） | **`feedback/history/<domain>/README.md`** 與必要的 **`feedback/history/<domain>/<category>/README.md`** |
 
-> **重要：** `feedback/history/` 是 lesson 的唯一目標路徑。舊的 `skills/<name>/feedback_history/`、`workflow/<name>/feedback_history/`、`analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/` 路徑僅保留向後相容（既有 lesson 尚未搬遷），**新 lesson 一律寫入 `feedback/history/<domain>/`**。
+> **重要：** `feedback/history/` 是 lesson 的唯一目標路徑。舊的 `skills/<name>/feedback_history/`、`workflow/<name>/feedback_history/`、`analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/` 路徑已於 2026-05-13 刪除（`skills/` 下的 `feedback_history/` 已全部搬遷完畢），**新 lesson 一律寫入 `feedback/history/<domain>/`**。
 
 ### 判斷流程
 
@@ -86,7 +86,7 @@
 - 跨分類、全域適用或分類尚未明確的 lesson 放到 **`feedback/history/<domain>/common/`**。
 - 若一條 lesson 會 promote 到多個分類，放在主要分類，並在 lesson 的 **Promotion Target** / **Required Linked Updates** 寫出其他同步更新位置。
 - `feedback/history/<domain>/README.md` 應是總索引，列出 category folders；每個 category folder 可有自己的 `README.md` 表格。
-- 既有歷史 lesson 若已被外部文件連結，可以先保留原路徑（`skills/<name>/feedback_history/` 等舊路徑），並用 `feedback/history/<domain>/README.md` 索引清楚；若真的搬移，必須同一個 change 更新所有相對連結與索引。
+- ✅ 既有歷史 lesson 已全部搬遷至 `feedback/history/<domain>/`，舊路徑 `skills/<name>/feedback_history/` 已於 2026-05-13 刪除。
 - 不要為了分類而重複複製 lesson 內容；一條 lesson 只保留一份全文，其他地方用連結。
 
 ## 檔名規則（時間 + `<slug>`）
@@ -175,6 +175,6 @@ Status: candidate | validated | deprecated | promoted | experimental
 
 - **索引**：維護者可定期整理 **`feedback/history/<domain>/README.md`**（表格：檔名、Status、標題、一句話摘要，或 category index）；若該 domain 已有索引，agent 新增 lesson 檔後**必須**追加表格列或明確說明為何暫不更新。已分類 domain 同時更新對應 **`feedback/history/<domain>/<category>/README.md`**。
 - **Git**：**`feedback/history/`** 版本控制；不要提交含機密的原始 log。
-- **歷史**：既有 lesson 分散在 `skills/<name>/feedback_history/`、`workflow/<name>/feedback_history/`、`analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/` 等舊路徑，將分批搬遷至 `feedback/history/<domain>/`。搬遷完成前，舊路徑 lesson 仍可被引用，但新 lesson 一律寫入 `feedback/history/`。
+- **歷史**：✅ `skills/<name>/feedback_history/` 下的既有 lesson 已於 2026-05-13 全部搬遷至 `feedback/history/<domain>/`，舊目錄已刪除。新 lesson 一律寫入 `feedback/history/`。
 
 ← [回到共用規則索引](README.md)

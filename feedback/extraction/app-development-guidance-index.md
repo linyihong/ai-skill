@@ -130,7 +130,7 @@
 
 ## 相容性說明
 
-- `skills/app-development-guidance/feedback_history/` 仍是 lesson storage 的相容層，所有原始檔案保留不刪。
+- ✅ `skills/app-development-guidance/feedback_history/` 已於 2026-05-13 刪除，所有 lesson 已搬遷至 `feedback/history/app-development-guidance/`。
 - 此索引僅供 `feedback/` 層發現 lessons，不改變 lesson 的 storage location。
 - 提取到目標層時，在原始 lesson 檔案開頭加入 `# Extracted — See <target path>` 標記。
 - 此索引應隨 lessons 的新增或提取狀態變更而更新。

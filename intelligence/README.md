@@ -71,5 +71,5 @@ intelligence/
 
 - `skills/app-development-guidance/implementation/`
 - `skills/app-development-guidance/controls/`
-- `skills/*/feedback_history/` 中已成熟且跨專案可重用的 lesson
+- `feedback/history/` 中已成熟且跨專案可重用的 lesson
 - `shared-rules/failure-patterns/` 中偏工程判斷的 pattern 摘要

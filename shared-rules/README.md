@@ -85,7 +85,7 @@
 | 文件大小與拆分 | [document-sizing.md](document-sizing.md) | 文件拆分原則、決策流程、拆分後必做事項；token 成本模型見 decision-efficiency.md，跨專案適用見 content-layering.md。 | lazy (P2) |
 | Cross-skill references | [cross-skill-references.md](cross-skill-references.md) | 一個 skill 需要引用另一個 skill 的規範、模板、交接產物或驗證流程時怎麼寫。 | lazy (P2) |
 | 連動更新 | [linked-updates.md](linked-updates.md) | 全庫必須連動更新規則：改一處影響多處時，相關文件必須同步更新或明確檢查。 | lazy (P1) |
-| Feedback 與技巧條目 | [feedback-lessons.md](feedback-lessons.md) | **檔名規則、模板、agent 行為、索引**（唯一正文）；所有 lesson 統一放在 `feedback/history/<domain>/`，舊 `skills/<name>/feedback_history/` 僅保留向後相容。 | lazy (P2) |
+| Feedback 與技巧條目 | [feedback-lessons.md](feedback-lessons.md) | **檔名規則、模板、agent 行為、索引**（唯一正文）；所有 lesson 統一放在 `feedback/history/<domain>/`，舊 `skills/<name>/feedback_history/` 已於 2026-05-13 刪除。 | lazy (P2) |
 | VS Code Extension 全域設定修改 | [vscode-extension-global-state.md](../intelligence/ide/vscode-extension-global-state.md) | VS Code Extension 的全域設定儲存在 SQLite 資料庫中，修改方法與注意事項。此為可重複使用的工程智慧，非工具設定。 | lazy (P2) |
 
 

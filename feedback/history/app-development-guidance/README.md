@@ -9,4 +9,4 @@
 
 ## 來源
 
-所有 lesson 原位於 `skills/app-development-guidance/feedback_history/`，已於 2026-05-13 搬遷至此。
+所有 lesson 原位於 `skills/app-development-guidance/feedback_history/`，已於 2026-05-13 搬遷至此，舊目錄已刪除。

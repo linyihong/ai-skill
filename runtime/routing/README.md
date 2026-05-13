@@ -64,7 +64,7 @@ task intent
 
 使用 `../../metadata/compatibility/README.md` 與 `../../governance/lifecycle/README.md`：
 
-- 若舊 `skills/` 或 `shared-rules/` source 仍 active，它優先於 candidate new-layer content。
+- 若舊 `skills/`（已於 2026-05-13 標記為 deprecated）或 `shared-rules/` source 仍 active，它優先於 candidate new-layer content。
 - 若 new layer path 只是 candidate map，它可引導 discovery，但不可覆蓋 behavior。
 - 若已有 promoted atom，依賴它作 replacement 前，先確認 old links 仍可解析。
 

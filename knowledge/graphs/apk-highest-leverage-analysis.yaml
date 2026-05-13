@@ -6,16 +6,12 @@ summary: >
   lesson、WORKFLOW 主線選擇規則、summary 與 runtime registry route。
 edges:
   - type: promotes_from
-    target: skills/apk-analysis/feedback_history/common/2026-05-07_131000-highest-leverage-analysis-path.md
+    target: feedback/history/apk-analysis/common/2026-05-07_131000-highest-leverage-analysis-path.md
     reason: 原 lesson 定義 time-to-evidence、evidence strength、safety 與 validation clarity 的 route 選擇規則。
     validation: feedback lesson 保留 candidate 狀態與 promotion target；intelligence atom 只抽取 generalized judgment。
   - type: depends_on
-    target: skills/apk-analysis/SKILL.md
-    reason: APK analysis 仍以 skill entrypoint 作為授權、scope 與工作邊界。
-    validation: old skill entrypoint remains active。
-  - type: depends_on
-    target: skills/apk-analysis/WORKFLOW.md
-    reason: WORKFLOW.md § 2 已把最高收益路線作為主線選擇檢查。
+    target: workflow/apk-analysis/execution-flow.md
+    reason: execution-flow.md § 2 已把最高收益路線作為主線選擇檢查。
     validation: workflow 包含 time-to-evidence、語意距離、安全性與 validation signal。
   - type: related_to
     target: knowledge/summaries/apk-highest-leverage-analysis.md

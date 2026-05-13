@@ -18,7 +18,7 @@
 
 - 目前必須執行的共用政策；放到 `shared-rules/`。
 - 單一工具的 hook、setting、UI 或 mirror sync 細節；放到 `ai-tools/`。
-- Skill-specific workflow 全文；放到 `workflow/` 或保留在 `skills/`。
+- Skill-specific workflow 全文；放到 `workflow/`（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。
 - 長期記憶內容本身；放到 `memory/` 或 `knowledge/`。
 
 ## 與既有層的關係

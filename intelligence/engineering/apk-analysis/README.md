@@ -1,6 +1,6 @@
 # APK Analysis Engineering Intelligence
 
-`intelligence/engineering/apk-analysis/` 是 `apk-analysis` pilot 中用來保存穩定工程判斷的候選位置。Pilot 期間，lesson history 仍保留在 `skills/apk-analysis/feedback_history/`；本目錄只保存已抽象成 engineering intelligence 的判斷與 promotion map。
+`intelligence/engineering/apk-analysis/` 是 `apk-analysis` pilot 中用來保存穩定工程判斷的候選位置。Pilot 期間，lesson history 保留在 `feedback/history/apk-analysis/`；本目錄只保存已抽象成 engineering intelligence 的判斷與 promotion map。
 
 ## 目錄結構
 
@@ -44,17 +44,17 @@ intelligence/engineering/apk-analysis/
 - Step-by-step capture workflow；使用 `workflow/apk-analysis/`。
 - Traffic/runtime observation methods；使用 `analysis/apk/`。
 - **HOW TO DO** 操作流程、command、setup；使用 `analysis/apk/workflows/`。
-- Skill-specific lesson archive；在 promotion 前保留於 `skills/apk-analysis/feedback_history/`。
+- Skill-specific lesson archive；在 promotion 前保留於 `feedback/history/apk-analysis/`。
 
 ## Candidate Intelligence Areas
 
 | Area | Current source | Future shape |
 | --- | --- | --- |
-| Evidence-first route selection | `../../../skills/apk-analysis/WORKFLOW.md`, `../../../skills/apk-analysis/feedback_history/common/` | decision guidance for high-leverage analysis routing |
-| API catalog and runtime baseline readiness | `../../../skills/apk-analysis/DOCUMENTATION.md`, `../../../skills/apk-analysis/feedback_history/http-api/`, `../../../skills/apk-analysis/feedback_history/common/` | engineering guidance for live SDK / client readiness |
-| Flutter / Dart AOT anti-patterns | `../../../skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除）, `../../../skills/apk-analysis/feedback_history/flutter-dart-aot/` | stable failure patterns and hook-selection trade-offs |
-| Local proxy and routing ambiguity | `../../../skills/apk-analysis/techniques/local-proxy/`（已刪除）, `../../../skills/apk-analysis/feedback_history/local-proxy/` | guidance for separating routing, proxy, TLS, and attribution |
-| Media chain completeness | `../../../skills/apk-analysis/techniques/media-hls/`（已刪除）, `../../../skills/apk-analysis/feedback_history/media-hls/` | control-plane / data-plane and validation heuristics |
+| Evidence-first route selection | `../../../skills/apk-analysis/WORKFLOW.md`, `../../../feedback/history/apk-analysis/common/` | decision guidance for high-leverage analysis routing |
+| API catalog and runtime baseline readiness | `../../../skills/apk-analysis/DOCUMENTATION.md`, `../../../feedback/history/apk-analysis/http-api/`, `../../../feedback/history/apk-analysis/common/` | engineering guidance for live SDK / client readiness |
+| Flutter / Dart AOT anti-patterns | `../../../skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除）, `../../../feedback/history/apk-analysis/flutter-dart-aot/` | stable failure patterns and hook-selection trade-offs |
+| Local proxy and routing ambiguity | `../../../skills/apk-analysis/techniques/local-proxy/`（已刪除）, `../../../feedback/history/apk-analysis/local-proxy/` | guidance for separating routing, proxy, TLS, and attribution |
+| Media chain completeness | `../../../skills/apk-analysis/techniques/media-hls/`（已刪除）, `../../../feedback/history/apk-analysis/media-hls/` | control-plane / data-plane and validation heuristics |
 
 ## Promotion Rule
 
@@ -69,6 +69,6 @@ A lesson can be promoted here when:
 ## Compatibility Notes
 
 - Do not delete or rewrite existing feedback lessons during the pilot.
-- Use this directory to point agents toward reusable judgment; use `skills/apk-analysis/feedback_history/` for historical lesson records.
+- Use this directory to point agents toward reusable judgment; use `feedback/history/apk-analysis/` for historical lesson records.
 - If an insight becomes a cross-skill or all-repo prevention gate, promote it to `shared-rules/` or `shared-rules/failure-patterns/` instead of keeping it only here.
 - Old `skills/apk-analysis/techniques/` and `analysis/apk/techniques/` have been deleted (Phase C). Intelligence atoms here were extracted from those sources.

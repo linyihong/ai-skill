@@ -1,8 +1,8 @@
 # App Development Guidance Quick Start（開發指引快速入門）
 
-本文件提取 [`skills/app-development-guidance/SKILL.md`](../../skills/app-development-guidance/SKILL.md) 中 Quick Start 的操作步驟，作為 `runtime/onboarding/` 層的執行指引。
+本文件提取 [`workflow/app-development-guidance/execution-flow.md`](../../workflow/app-development-guidance/execution-flow.md) 與 [`workflow/app-development-guidance/artifact-gates.md`](../../workflow/app-development-guidance/artifact-gates.md) 中 Quick Start 的操作步驟，作為 `runtime/onboarding/` 層的執行指引。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/SKILL.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：此文件為新分層的 reference target，舊 `skills/app-development-guidance/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 快速入門步驟
 
@@ -171,8 +171,8 @@ For embedded/hardware work，額外更新：
 ### 步驟 15：未成熟 Lesson 處理
 
 若 lesson 可重用但尚未成熟：
-1. 先加入對應的 `feedback_history/<category>/` 資料夾
-2. 跨領域 lesson 使用 `feedback_history/common/`
+1. 先加入對應的 `feedback/history/app-development-guidance/<category>/` 資料夾
+2. 跨領域 lesson 使用 `feedback/history/app-development-guidance/common/`
 3. 驗證後再 promotion 到結構化目錄
 
 ## 與其他層的關係
@@ -180,4 +180,4 @@ For embedded/hardware work，額外更新：
 - `workflow/app-development-guidance/execution-flow.md` 提供執行流程，本文件提供快速入門的操作步驟。
 - `workflow/app-development-guidance/artifact-gates.md` 提供產出規範與品質門檻。
 - `workflow/app-development-guidance/development-process.md` 提供完整的開發流程。
-- `skills/app-development-guidance/SKILL.md` 是原始來源，已不再作為 active entrypoint。
+- `skills/app-development-guidance/SKILL.md` 是原始來源，已不再作為 active entrypoint（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。

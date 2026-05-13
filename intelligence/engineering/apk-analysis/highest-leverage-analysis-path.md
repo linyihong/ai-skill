@@ -8,7 +8,7 @@
 | --- | --- |
 | Status | `candidate-intelligence` |
 | Source skill | `skills/apk-analysis/` |
-| Source lesson | `skills/apk-analysis/feedback_history/common/2026-05-07_131000-highest-leverage-analysis-path.md` |
+| Source lesson | `feedback/history/apk-analysis/common/2026-05-07_131000-highest-leverage-analysis-path.md` |
 | Current workflow anchor | `skills/apk-analysis/WORKFLOW.md` § `2. 選擇主線` |
 | Runtime route | `route.intelligence.apk-highest-leverage-path` |
 

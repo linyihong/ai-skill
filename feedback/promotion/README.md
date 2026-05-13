@@ -6,7 +6,7 @@
 
 | Layer | Role |
 | --- | --- |
-| `skills/<skill>/feedback_history/` | Lesson 全文與歷史紀錄的 source-of-truth。 |
+| `feedback/history/<domain>/` | Lesson 全文與歷史紀錄的 source-of-truth。 |
 | `shared-rules/feedback-lessons.md` | Lesson 命名、模板、索引與 agent 行為規則。 |
 | `shared-rules/failure-learning-system.md` | Agent failure 或 close-loop gap 的分類與 promotion target。 |
 | `governance/lifecycle/README.md` | Candidate、validated、promoted、deprecated 的 lifecycle gate。 |
@@ -25,7 +25,7 @@
 
 ## Promotion Checklist
 
-1. 保留原 `feedback_history/` lesson；不要刪除或覆寫歷史。
+1. 保留原 `feedback/history/<domain>/` lesson；不要刪除或覆寫歷史。
 2. 檢查 lesson 是否只含 generalized rule、適用條件與 validation，不含 project incident raw evidence。
 3. 決定最小 durable target：skill workflow、intelligence、workflow、shared-rule、memory 或 runtime surface。
 4. 若 promotion 變成 runtime route，更新 `knowledge/indexes/README.md`、`knowledge/runtime/routing-registry.yaml`、summary、graph 與 generated reports。

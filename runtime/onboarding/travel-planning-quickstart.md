@@ -1,8 +1,8 @@
 # Travel Planning Quick Start（旅行規劃快速入門）
 
-本文件提取 [`skills/travel-planning/SKILL.md`](../../skills/travel-planning/SKILL.md) 中 Quick Start 的操作步驟，作為 `runtime/onboarding/` 層的執行指引。
+本文件提取 [`workflow/travel-planning/execution-flow.md`](../../workflow/travel-planning/execution-flow.md) 與 [`workflow/travel-planning/artifact-gates.md`](../../workflow/travel-planning/artifact-gates.md) 中 Quick Start 的操作步驟，作為 `runtime/onboarding/` 層的執行指引。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/travel-planning/SKILL.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：此文件為新分層的 reference target，舊 `skills/travel-planning/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 快速入門步驟
 
@@ -196,4 +196,4 @@
 
 - `workflow/travel-planning/execution-flow.md` 提供執行流程，本文件提供快速入門的操作步驟。
 - `workflow/travel-planning/artifact-gates.md` 提供產出規範與品質門檻。
-- `skills/travel-planning/SKILL.md` 是原始來源，已不再作為 active entrypoint。
+- `skills/travel-planning/SKILL.md` 是原始來源，已不再作為 active entrypoint（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。

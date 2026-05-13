@@ -7,7 +7,7 @@
 1. **Technique 文件混合了兩種本質不同的知識**：HOW TO DO（操作流程）和 HOW TO THINK（決策智慧）
 2. **直接搬運 technique 到新層沒有意義** — 需要的是拆解（decompose），不是搬運（move）
 3. **每個 technique 的拆解模式不同** — 有些產生多個 intelligence atoms（flutter-dart-aot → 4 atoms），有些只產生 1-2 個（media-hls → 1 atom）
-4. **Feedback history 的 extraction 模式完全不同** — 已經是「已提取產品」，只需索引 + 標註
+4. **Feedback history 的 extraction 模式完全不同** — 已經是「已提取產品」，只需索引 + 標註；所有 lesson 已搬遷至 `feedback/history/<domain>/`，舊 `skills/*/feedback_history/` 已於 2026-05-13 刪除
 
 本 pipeline 定義從「混合內容」到「分層知識」的可重複流程。
 

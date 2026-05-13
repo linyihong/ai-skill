@@ -50,7 +50,7 @@ Execution Stage (uses composed artifact as prompt)
 | `workflow/` | 提供執行步驟（what to do） |
 | `intelligence/` | 提供判斷依據（how to think） |
 | `analysis/` | 提供分析方法（how to do） |
-| `skills/` | 提供 entrypoint 與 tool-specific 內容 |
+| `skills/` | 提供 entrypoint 與 tool-specific 內容（舊結構，已於 2026-05-13 標記為 deprecated） |
 | `metadata/schema.md` | 提供 context cost 估算 |
 | `runtime/pipeline/` | 提供 session lifecycle 整合點 |
 
@@ -76,7 +76,7 @@ Agent 在 routing stage 完成後、execution stage 開始前：
 
 | 層 | 偏 | 範例 |
 |---|----|------|
-| `skills/` | 工具綁定的完整 skill 文件 | SKILL.md 包含 trigger、workflow、tools |
+| `skills/` | 工具綁定的完整 skill 文件（舊結構，已於 2026-05-13 標記為 deprecated） | SKILL.md 包含 trigger、workflow、tools |
 | `workflow/` | 工具中立的執行流程 | apk-analysis execution flow |
 | `intelligence/` | 工程智慧 atoms | modular-monolith-vs-microservices.md |
 | `runtime/prompt-artifacts/` | **動態組合的 prompt 結構** | 根據 task type 自動組裝上述各層 |

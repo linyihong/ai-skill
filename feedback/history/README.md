@@ -27,7 +27,7 @@ feedback/history/
 - 新 lesson 一律寫入 `feedback/history/<domain>/` 對應分類，**不得**再寫入 `skills/<name>/feedback_history/` 或 `workflow/<name>/feedback_history/` 等舊路徑。
 - 檔名規則、模板、agent 行為見 [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)。
 - 若 domain 下尚無對應分類目錄，**應主動建立**，而非退回舊路徑。
-- 舊 `skills/<name>/feedback_history/` 中的 lesson 將分批搬遷至此，搬遷完成後刪除舊目錄。
+- ✅ 舊 `skills/<name>/feedback_history/` 中的 lesson 已於 2026-05-13 全部搬遷完畢，舊目錄已刪除。
 
 ## 與其他層的關係
 

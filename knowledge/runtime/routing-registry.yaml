@@ -248,16 +248,16 @@ records:
     task_intent: 選擇 APK 分析最高收益路線
     primary_source: intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md
     required_dependencies:
-      - skills/apk-analysis/SKILL.md
-      - skills/apk-analysis/WORKFLOW.md
-      - skills/apk-analysis/feedback_history/common/2026-05-07_131000-highest-leverage-analysis-path.md
+      - workflow/apk-analysis/execution-flow.md
+      - workflow/apk-analysis/artifact-gates.md
+      - feedback/history/apk-analysis/common/2026-05-07_131000-highest-leverage-analysis-path.md
     candidate_sources:
       - knowledge/summaries/apk-highest-leverage-analysis.md
       - knowledge/graphs/apk-highest-leverage-analysis.yaml
       - runtime/routing/README.md
       - shared-rules/decision-efficiency.md
-    source_of_truth_gate: old-skill-entrypoint-active
-    ranking_reason: 此 intelligence atom 抽象化已進入 WORKFLOW 的 route selection judgment，但 APK 分析授權與完整 workflow 仍由 skill entrypoint 管理。
+    source_of_truth_gate: new-layer-promoted
+    ranking_reason: 此 intelligence atom 抽象化已進入 workflow 的 route selection judgment。舊 skills/ 結構已於 2026-05-13 標記為 deprecated。
     validation_signal: 已比較可用 routes、選定 evidence-to-cost ratio 最高路線、記錄 fallback 與 attribution 回補條件。
     metadata:
       priority: P1
@@ -268,7 +268,7 @@ records:
         cacheable: true
         ttl:
           task: 1
-      compatibility_state: dual-reference
+      compatibility_state: new-layer-promoted
     model:
       profile: specialized
       compression_level: source-backed

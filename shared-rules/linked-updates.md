@@ -18,7 +18,7 @@
 
 | 改動位置 | 必須同步更新或檢查 |
 | --- | --- |
-| `shared-rules/README.md` 或新增 shared rule | 根 `README.md`、相關 skill 的入口說明（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）、`feedback_history` 模板引用。 |
+| `shared-rules/README.md` 或新增 shared rule | 根 `README.md`、相關 skill 的入口說明（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）、`feedback/history/` 模板引用。 |
 | `shared-rules/reusable-guidance-boundary.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/feedback-lessons.md`、`shared-rules/sanitization.md`、`shared-rules/goal-action-validation.md`、相關 skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`），以及已新增 lesson 的 promotion target 與 index。 |
 | `shared-rules/dependency-reading.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/linked-updates.md`、工具專用 always-apply agent rule、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）與根 `README.md`。若變更涉及重讀 / reload 防呆，這些入口必須提醒 agent 建立 dependency read ledger，並明列不存在的依賴檔為 `not applicable`。 |
 | `shared-rules/neutral-language.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/feedback-lessons.md`、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）與根 `README.md`。 |
@@ -30,7 +30,7 @@
 | `shared-rules/goal-action-validation.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/feedback-lessons.md`、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）與根 `README.md`；若某 skill 有 `execution-flow.md` 或 `artifact-gates.md` 的輸出格式，也需同步更新或明確檢查。 |
 | `shared-rules/conversation-goal-ledger.md` | `shared-rules/README.md`、`shared-rules/content-layering.md`、`shared-rules/dependency-reading.md`、`scripts/README.md`、相關 helper script、`ai-tools/` 中各工具整合文件；若 tool-specific hook / rule 實作變更，也需同步對應工具規則或 hook 文件。 |
 | `shared-rules/cross-skill-references.md` 或新增 cross-skill 關係 | referring skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）、target skill 的入口或接收格式、必要時 `skills/_template/SKILL.md` 與 `skills/ADDING_SKILLS.md`。 |
-| `shared-rules/feedback-lessons.md` | `feedback/history/README.md`、各 domain 的 `feedback/history/<domain>/README.md`、新增 lesson 模板。舊結構 `skills/<name>/FEEDBACK.md` 與 `skills/<name>/feedback_history/README.md` 僅限尚未搬遷的既有 lesson。 |
+| `shared-rules/feedback-lessons.md` | `feedback/history/README.md`、各 domain 的 `feedback/history/<domain>/README.md`、新增 lesson 模板。舊結構 `skills/<name>/FEEDBACK.md` 與 `skills/<name>/feedback_history/README.md` 已於 2026-05-13 刪除。 |
 | 工具同步文件或同步腳本 | 根 `README.md`、`scripts/README.md`、`ai-tools/` 對應工具文件、Agents 必讀規則、實際執行同步。 |
 | 新增或修改 `tools/adapters/<tool>.md`（新分層）或 `skills/<name>/tool-adapters/<tool>.md`（舊結構，僅限尚未遷移的 skill；已遷移 skill 的舊 tool-adapters 路徑已被刪除） | 該 skill 的入口（`skills/<name>/README.md` 或 `workflow/<domain>/README.md`）、核心 `execution-flow.md` 中的 adapter link、`ai-tools/<tool>.md` 的 cross-link（若該工具已有集中說明）、必要 validation/checklist。 |
 | `scripts/ai-skill-close-loop.sh` | `scripts/README.md`、根 `README.md`、`shared-rules/dependency-reading.md`、本檔；若改變 lock / commit / push 條件，也需同步相關 skill close-loop 說明。 |
@@ -72,7 +72,7 @@
 可以不改其他檔，但要能說明理由，例如：
 
 - 只修正 typo，沒有改變流程或規則。
-- 只新增單一 lesson，尚未成熟到推廣進主流程；已更新 `feedback_history/README.md`。
+- 只新增單一 lesson，尚未成熟到推廣進主流程；已更新 `feedback/history/<domain>/README.md`。
 - 某控制沒有平台或語言差異；已檢查相關資料夾，無需更新。
 
 ← [回到共用規則索引](README.md)
