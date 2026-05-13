@@ -25,13 +25,15 @@
 
 ## 新增工具的步驟
 
-1. **確認工具類型**：是 AI Agent（CLI / IDE 內建）還是 IDE 設定？Agent 放 `ai-tools/agent/`，IDE 設定放 `ai-tools/ide/`。
-2. **建立工具使用說明**：在對應目錄下建立 `<tool>.md`，只記錄該工具特有的差異。
+1. **確認工具類型**：是 AI Agent（CLI / IDE 內建）？Agent 放 `ai-tools/agent/`。
+2. **建立工具使用說明**：在 `ai-tools/agent/` 下建立 `<tool>.md`，只記錄該工具特有的差異。
 3. **設定自動載入入口**：依工具的機制設定入口，指向 `CORE_BOOTSTRAP.md`。
 4. **設定語言偏好**：依工具的設定方式，加入軟性語言偏好。
 5. **實作對話目標閉環**：依工具的能力（hooks / custom instructions / 操作注意），實作 goal ledger 整合。
-6. **更新 `ai-tools/README.md`**：在對應類別的表格中加入新工具的連結與用途說明。
+6. **更新 `ai-tools/README.md`**：在 agent 類別的表格中加入新工具的連結與用途說明。
 7. **驗證**：執行 `scripts/validate-knowledge-runtime.rb` 確認無誤。
+
+> **注意**：IDE 生態系統的通用知識（如 VS Code Extension 全域設定的 SQLite 儲存機制）屬於可重複使用的工程智慧，應放在 `intelligence/engineering/ide/`，而非 `ai-tools/` 下。`ai-tools/` 只放工具特有的設定與操作方式。
 
 ## 不建議設定的項目
 
