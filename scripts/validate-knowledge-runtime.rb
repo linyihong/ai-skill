@@ -487,11 +487,74 @@ def validate_language_consistency
   end
 end
 
+def validate_intelligence_classification_boundary
+  # Check that every top-level subdirectory under intelligence/ is listed in
+  # intelligence/README.md's structure diagram. This prevents "framework dependency
+  # bias" — putting a directory under engineering/ when it should be a sibling.
+  #
+  # The structure diagram in intelligence/README.md defines the canonical classification.
+  # Any new directory must be added there first, with a clear description of its boundary.
+  readme_path = ROOT + "intelligence/README.md"
+  unless readme_path.exist?
+    add_error("intelligence/README.md is missing (cannot validate classification boundary)")
+    return
+  end
+
+  readme_text = read_text(readme_path)
+
+  # Parse the structure diagram: find lines between ```text and ``` that contain "  dirname/"
+  in_diagram = false
+  listed_dirs = []
+  readme_text.each_line do |line|
+    if line.strip == "```text"
+      in_diagram = true
+      next
+    end
+    if line.strip == "```" && in_diagram
+      in_diagram = false
+      next
+    end
+    next unless in_diagram
+
+    # Match lines like "  engineering/" or "  ide/" (indented directory names)
+    if line.match?(/^\s{2}[a-z][a-z0-9_-]+\/\s*(#.*)?$/)
+      dir_name = line.strip.split("/").first
+      listed_dirs << dir_name
+    end
+  end
+
+  # Get actual top-level directories under intelligence/
+  actual_dirs = []
+  intel_dir = ROOT + "intelligence"
+  if intel_dir.exist?
+    intel_dir.each_child do |child|
+      next unless child.directory?
+      next if child.basename.to_s.start_with?(".")
+      actual_dirs << child.basename.to_s
+    end
+  end
+
+  # Check for directories not listed in the structure diagram
+  actual_dirs.each do |dir|
+    unless listed_dirs.include?(dir)
+      add_error("intelligence/#{dir}/ exists but is not listed in intelligence/README.md structure diagram (possible classification boundary violation)")
+    end
+  end
+
+  # Check for directories listed in diagram but not existing (optional warning)
+  listed_dirs.each do |dir|
+    unless actual_dirs.include?(dir)
+      add_error("intelligence/README.md lists '#{dir}/' in structure diagram but directory does not exist")
+    end
+  end
+end
+
 validate_registry
 validate_refresh_policy
 validate_summaries
 validate_graphs
 validate_directory_structure
+validate_intelligence_classification_boundary
 validate_no_outdated_active_entrypoint
 validate_intelligence_ide_knowledge
 validate_language_consistency
