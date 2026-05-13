@@ -164,11 +164,13 @@
 
 | 新文件 | 目標層 | 原始來源 | 說明 |
 |--------|--------|----------|------|
-| [`analysis/app-development-guidance/controls-catalog.md`](../analysis/app-development-guidance/controls-catalog.md) | `analysis/` | `skills/app-development-guidance/controls/` | 6 種跨平台安全控制（API Transport、Auth & Session、Local Storage、Logging & Telemetry、Anti-Tamper、Release Build） |
-| [`analysis/app-development-guidance/implementation-catalog.md`](../analysis/app-development-guidance/implementation-catalog.md) | `analysis/` | `skills/app-development-guidance/implementation/` | 5 類實作模式（Backend、Mobile、Embedded、Tooling、Examples）與 contract-to-implementation 映射流程 |
-| [`analysis/app-development-guidance/platforms-catalog.md`](../analysis/app-development-guidance/platforms-catalog.md) | `analysis/` | `skills/app-development-guidance/platforms/` | 4 類平台指引（Mobile、Web、Backend、Embedded） |
-| [`analysis/app-development-guidance/languages-catalog.md`](../analysis/app-development-guidance/languages-catalog.md) | `analysis/` | `skills/app-development-guidance/languages/` | 4 類語言陷阱（Dart、Kotlin/Java、Swift、TypeScript） |
+| [`metadata/app-development-guidance/controls-catalog.md`](../metadata/app-development-guidance/controls-catalog.md) | `metadata/` | `skills/app-development-guidance/controls/` | 6 種跨平台安全控制（API Transport、Auth & Session、Local Storage、Logging & Telemetry、Anti-Tamper、Release Build） |
+| [`metadata/app-development-guidance/implementation-catalog.md`](../metadata/app-development-guidance/implementation-catalog.md) | `metadata/` | `skills/app-development-guidance/implementation/` | 5 類實作模式（Backend、Mobile、Embedded、Tooling、Examples）與 contract-to-implementation 映射流程 |
+| [`metadata/app-development-guidance/platforms-catalog.md`](../metadata/app-development-guidance/platforms-catalog.md) | `metadata/` | `skills/app-development-guidance/platforms/` | 4 類平台指引（Mobile、Web、Backend、Embedded） |
+| [`metadata/app-development-guidance/languages-catalog.md`](../metadata/app-development-guidance/languages-catalog.md) | `metadata/` | `skills/app-development-guidance/languages/` | 4 類語言陷阱（Dart、Kotlin/Java、Swift、TypeScript） |
 | [`workflow/app-development-guidance/review-checklists.md`](../workflow/app-development-guidance/review-checklists.md) | `workflow/` | `skills/app-development-guidance/checklists/` | 6 種審查 checklist（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
+
+> **後續修正**：4 個 catalog 文件原放在 `analysis/`，後發現其本質為分類索引而非分析方法，已於 2026-05-13 移至 `metadata/app-development-guidance/`。
 
 ### ✅ 已完成：Phase 27 — Extract process/ to workflow/app-development-guidance/
 
@@ -553,7 +555,7 @@ metadata/
 ```text
 analysis/
   apk/                     ← APK 分析方法（pilot migrated）
-  app-development-guidance/ ← 開發指引分析方法（風險翻譯、控制層選擇）與參考 catalog
+  app-development-guidance/ ← 開發指引分析方法（風險翻譯、控制層選擇）
   repo/                    ← Repository 分析與理解方法
   production/              ← Production 問題分析與根因追蹤
   issue/                   ← Issue 分類與優先級判斷
