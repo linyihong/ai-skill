@@ -47,4 +47,4 @@
 - `workflow/repo-analysis/` 引用本方法作為分析步驟的具體實作。
 - `analysis/repo/documentation-backfill.md` 提供文件恢復的完整流程。
 - `analysis/repo/traceability-gate.md` 提供追溯連結的建立方法。
-- `skills/app-development-guidance/process/README.md` 是原始來源，仍為 active entrypoint。
+- `skills/app-development-guidance/process/README.md` 是原始來源，已不再作為 active entrypoint。

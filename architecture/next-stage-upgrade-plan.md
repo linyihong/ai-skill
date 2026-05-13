@@ -1111,7 +1111,7 @@ knowledge/runtime/
 
 ### Phase 4：Workflow / Intelligence 分離
 
-Status: `apk-analysis` pilot 已完成 content extraction（6 個新檔案）；`intelligence/` 已重建為 9 個子目錄的專家智慧層；舊 `skills/apk-analysis/` 仍為 active entrypoint，未搬移或刪除。
+Status: `apk-analysis` pilot 已完成 content extraction（6 個新檔案）；`intelligence/` 已重建為 9 個子目錄的專家智慧層；舊 `skills/apk-analysis/` 已不再作為 active entrypoint。
 
 已完成項目：
 

@@ -150,7 +150,7 @@
 |---------|------|------|
 | 內容完整性 | ✅ Pass | 所有舊 skill 的核心功能已被新分層完整覆蓋 |
 | 可發現性 | ✅ Pass | `knowledge/indexes/README.md` 和 `knowledge/runtime/routing-registry.yaml` 可 route 到新路徑 |
-| 向後相容 | ✅ Pass | 舊 skill 入口仍為 active entrypoint，tool adapter 可正常載入 |
+| 向後相容 | ✅ Pass | 舊 skill 入口已不再作為 active entrypoint，新分層已完全承接 |
 | AI 決策品質 | ✅ Pass | 新分層內容的結構化程度更高，AI 決策品質不低於使用舊 skill |
 
 ---

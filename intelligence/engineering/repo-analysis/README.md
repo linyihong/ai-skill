@@ -15,4 +15,4 @@
 
 - `analysis/repo/` 提供具體的分析方法（documentation-backfill、traceability-gate、contract-governance），本層提供背後的原則與 why。
 - `workflow/repo-analysis/` 提供執行流程，本層提供選擇方法的決策邏輯。
-- `skills/app-development-guidance/process/README.md` 是原始來源，仍為 active entrypoint。
+- `skills/app-development-guidance/process/README.md` 是原始來源，已不再作為 active entrypoint。

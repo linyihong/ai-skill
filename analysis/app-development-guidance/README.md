@@ -2,7 +2,7 @@
 
 `analysis/app-development-guidance/` 負責「開發指引的分析方法」。本目錄保存從分析觀察到開發指引的轉換方法論，包括風險翻譯、控制層選擇、指引分類等分析技術，以及跨平台安全控制、實作模式、平台指引、語言陷阱的 catalog 參考。
 
-> **相容性規則**：`skills/app-development-guidance/` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
+> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## Scope
 
@@ -45,5 +45,5 @@
 ## Migration Notes
 
 - 本目錄為 Phase 17 與 Phase 26 提取產物，內容來自 `skills/app-development-guidance/WORKFLOW.md` §2-4 及 `skills/app-development-guidance/` 的 controls/、implementation/、platforms/、languages/ 子目錄。
-- 舊入口 `skills/app-development-guidance/` 仍為 active source of truth。
+- 舊入口 `skills/app-development-guidance/` 已不再作為 active source of truth，新內容請直接寫入此目錄。
 - 未來遷移完成條件：所有 analysis methods 完全提取、索引更新、舊入口保留 redirect reference。

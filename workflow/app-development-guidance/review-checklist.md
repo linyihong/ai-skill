@@ -2,7 +2,7 @@
 
 本文件定義開發流程中的審查檢查項目。承接 [`skills/app-development-guidance/CHECKLIST.md`](../../skills/app-development-guidance/CHECKLIST.md) 的內容，提取為 tool-neutral 的 workflow gates。
 
-> **相容性規則**：`skills/app-development-guidance/CHECKLIST.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
+> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/CHECKLIST.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 使用原則
 
@@ -185,4 +185,4 @@
 
 - `workflow/app-development-guidance/execution-flow.md` 提供執行流程，本文件提供流程中的審查門檻。
 - `analysis/app-development-guidance/controls-catalog.md` 提供檢查清單引用的控制原則。
-- `skills/app-development-guidance/CHECKLIST.md` 是原始來源，仍為 active entrypoint。
+- `skills/app-development-guidance/CHECKLIST.md` 是原始來源，已不再作為 active entrypoint。

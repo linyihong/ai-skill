@@ -49,10 +49,10 @@
 - `workflow/repo-analysis/` 引用本方法作為分析步驟的具體實作。
 - `intelligence/engineering/architecture/` 承接從 repo 分析中萃取的架構判斷。
 - `intelligence/engineering/domain/` 承接從 repo 分析中萃取的領域模型理解。
-- `skills/app-development-guidance/process/README.md` 是原始來源，仍為 active entrypoint。
+- `skills/app-development-guidance/process/README.md` 是原始來源，已不再作為 active entrypoint。
 
-## 相容性規則
+## 遷移狀態
 
-- 本文件是 `skills/app-development-guidance/process/README.md` 的 reference target，非 replacement。
-- 舊入口維持 active；本文件只承接逐步抽出的通用分析方法。
+- 本文件是 `skills/app-development-guidance/process/README.md` 的 reference target，已取代舊入口。
+- 新內容請直接寫入此文件。
 - 恢復的 Product Brief 欄位若為 `unknown`，必須明確標記，不得發明商業理由。

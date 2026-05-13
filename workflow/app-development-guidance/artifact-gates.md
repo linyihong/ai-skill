@@ -2,7 +2,7 @@
 
 本文件定義開發指引文件的產出規範與品質門檻。承接 [`skills/app-development-guidance/DOCUMENTATION.md`](../../skills/app-development-guidance/DOCUMENTATION.md) 的內容，提取為 tool-neutral 的 artifact gates。
 
-> **相容性規則**：`skills/app-development-guidance/DOCUMENTATION.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
+> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/DOCUMENTATION.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 1. 可重複使用的筆記結構（Reusable Note Structure）
 

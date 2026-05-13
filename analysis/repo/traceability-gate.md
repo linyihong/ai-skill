@@ -46,4 +46,4 @@ Stable IDs 可以是：
 
 - `workflow/repo-analysis/` 引用本方法作為分析步驟的具體實作。
 - `analysis/repo/documentation-backfill.md` 提供文件恢復的完整流程。
-- `skills/app-development-guidance/process/README.md` 是原始來源，仍為 active entrypoint。
+- `skills/app-development-guidance/process/README.md` 是原始來源，已不再作為 active entrypoint。

@@ -81,7 +81,7 @@
 - `workflow/repo-analysis/` 可引用本層的分析步驟，但不複製分析方法細節。
 - `intelligence/engineering/architecture/` 承接從 repo 分析中萃取的架構判斷。
 - `intelligence/engineering/domain/` 承接從 repo 分析中萃取的領域模型理解。
-- `skills/app-development-guidance/process/README.md` 是原始來源，仍為 active entrypoint。
+- `skills/app-development-guidance/process/README.md` 是原始來源，已不再作為 active entrypoint。
 
 ## 產出格式
 

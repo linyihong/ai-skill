@@ -20,5 +20,5 @@
 
 - `analysis/` 提供具體分析方法，本層提供背後的原則與 why。
 - `workflow/` 提供執行流程，本層提供選擇流程的決策邏輯。
-- `skills/` 是原始來源，仍為 active entrypoint。
+- `skills/` 是原始來源，已不再作為 active entrypoint。
 - `agent-architecture/` 研究 AI Agent 自身的認知行為模式，與 `shared-rules/failure-patterns/` 互補（後者記錄具體失效模式，前者解釋為什麼會發生）。

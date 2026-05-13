@@ -2,7 +2,7 @@
 
 本文件定義旅遊規劃的核心目標、範圍與使用模式。承接 [`skills/travel-planning/README.md`](../../skills/travel-planning/README.md) 的內容，提取為 tool-neutral 的分析方法。
 
-> **相容性規則**：`skills/travel-planning/README.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
+> **遷移狀態**：此文件為新分層的 reference target，`skills/travel-planning/README.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 核心目標
 
@@ -69,4 +69,4 @@
 - `analysis/travel/sources-and-tools.md` 提供來源選擇策略與工具知識。
 - `workflow/travel-planning/artifact-gates.md` 提供產出格式規範。
 - `intelligence/travel/` 提供旅遊規劃的啟發式規則。
-- `skills/travel-planning/README.md` 是原始來源，仍為 active entrypoint。
+- `skills/travel-planning/README.md` 是原始來源，已不再作為 active entrypoint。

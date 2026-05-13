@@ -381,11 +381,34 @@ def validate_directory_structure
   COUNTS[:workflow_domains] = Dir.glob((ROOT + "workflow/*").to_s).count { |p| File.directory?(p) }
 end
 
+def validate_no_outdated_active_entrypoint
+  # Check that no files under workflow/, analysis/, runtime/onboarding/ still reference
+  # skills/ as "active entrypoint". These should have been migrated to "遷移狀態" headers.
+  scan_dirs = %w[workflow analysis runtime/onboarding]
+  pattern = /仍為 active( skill)? (entrypoint|source of truth)/i
+
+  scan_dirs.each do |dir|
+    base = ROOT + dir
+    next unless base.exist?
+
+    Dir.glob((base + "**/*.md").to_s).sort.each do |file|
+      next if file.include?("feedback_history/")
+      next if file.include?("/archived/")
+
+      text = read_text(file)
+      if text.match?(pattern)
+        add_error("#{rel(file)}: contains outdated '仍為 active entrypoint' reference (should be '遷移狀態')")
+      end
+    end
+  end
+end
+
 validate_registry
 validate_refresh_policy
 validate_summaries
 validate_graphs
 validate_directory_structure
+validate_no_outdated_active_entrypoint
 check_markdown_links("knowledge/runtime/README.md")
 check_markdown_links("knowledge/runtime/runtime-report.md") if (ROOT + "knowledge/runtime/runtime-report.md").exist?
 check_markdown_links("knowledge/runtime/model-context-report.md") if (ROOT + "knowledge/runtime/model-context-report.md").exist?

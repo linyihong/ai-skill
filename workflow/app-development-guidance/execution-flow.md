@@ -2,7 +2,7 @@
 
 本文件定義從分析觀察轉換為開發指引的執行流程。承接 [`skills/app-development-guidance/WORKFLOW.md`](../../skills/app-development-guidance/WORKFLOW.md) 的內容，提取為 tool-neutral 的執行步驟。
 
-> **相容性規則**：`skills/app-development-guidance/WORKFLOW.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
+> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/WORKFLOW.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 1. 從證據開始（Start From Evidence）
 

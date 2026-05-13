@@ -2,7 +2,7 @@
 
 本文件提取 [`skills/app-development-guidance/SKILL.md`](../../skills/app-development-guidance/SKILL.md) 中 Quick Start 的操作步驟，作為 `runtime/onboarding/` 層的執行指引。
 
-> **相容性規則**：`skills/app-development-guidance/SKILL.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
+> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/SKILL.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 快速入門步驟
 
@@ -180,4 +180,4 @@ For embedded/hardware work，額外更新：
 - `workflow/app-development-guidance/execution-flow.md` 提供執行流程，本文件提供快速入門的操作步驟。
 - `workflow/app-development-guidance/artifact-gates.md` 提供產出規範與品質門檻。
 - `workflow/app-development-guidance/development-process.md` 提供完整的開發流程。
-- `skills/app-development-guidance/SKILL.md` 是原始來源，仍為 active entrypoint。
+- `skills/app-development-guidance/SKILL.md` 是原始來源，已不再作為 active entrypoint。

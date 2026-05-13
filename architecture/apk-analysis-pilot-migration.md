@@ -14,19 +14,18 @@
 | 已提取檔案 | `workflow/apk-analysis/execution-flow.md`, `workflow/apk-analysis/artifact-gates.md`, `analysis/apk/traffic-triage.md`, `analysis/apk/tools-and-failures.md`, `analysis/apk/workflows/frida-hook-flow.md`, `analysis/apk/workflows/http-api-documentation-flow.md`, `analysis/apk/workflows/local-proxy-hook-flow.md`, `analysis/apk/workflows/media-hls-analysis-flow.md`, `intelligence/engineering/apk-analysis/evidence-first-routing.md`, `intelligence/engineering/apk-analysis/live-readiness-gates.md`, `intelligence/engineering/apk-analysis/heuristics/hook-selection.md`, `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`, `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`, `intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md`, `intelligence/engineering/apk-analysis/failure/frida-spawn-race.md`, `intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md`, `intelligence/engineering/apk-analysis/signals/local-proxy-detection.md`, `intelligence/engineering/apk-analysis/signals/media-type-detection.md` |
 | 索引已更新 | `knowledge/indexes/README.md` — 新增 4 條 routing entries |
 
-## 相容性規則
+## 遷移狀態
 
-- `skills/apk-analysis/SKILL.md` 仍為 tools 載入 skill 的 canonical trigger。
-- 新 top-level layer 路徑在內容被複製、驗證、索引並連結回舊入口之前，僅為 reference targets，非 replacement。
-- Pilot 期間不得搬移或刪除既有 `skills/apk-analysis/` 檔案。
-- 未來任何搬移必須保留舊連結，以 redirect notes 或 index rows 標示。
+- `skills/apk-analysis/SKILL.md` 已不再作為 active entrypoint。新內容請直接寫入新分層路徑。
+- 新 top-level layer 路徑已承接對應內容，並通過 validation。
+- 既有 `skills/apk-analysis/` 檔案保留作為歷史參考，不應作為新內容的寫入目標。
 - 特定 APK hosts、endpoints、raw responses、tokens、device identifiers 與 private run evidence 留在 project docs。
 
 ## 來源到目標對應表
 
 | 既有來源 | 目前角色 | 候選目標 | 遷移動作 | 狀態 |
 | --- | --- | --- | --- | --- |
-| `skills/apk-analysis/SKILL.md` | Tool skill trigger、authorization boundary、output style、cross-skill handoff | `workflow/apk-analysis/` | 保留為 active entrypoint；後續將 tool-neutral execution flow 提取到 workflow，同時保留 skill trigger | candidate |
+| `skills/apk-analysis/SKILL.md` | Tool skill trigger、authorization boundary、output style、cross-skill handoff | `workflow/apk-analysis/` | 已遷移至新分層，skills/ 不再作為 active entrypoint | ✅ migrated |
 | `skills/apk-analysis/WORKFLOW.md` | Evidence-first traffic/runtime decision tree | `analysis/apk/` + `workflow/apk-analysis/` | 將 observation / triage methods 拆分到 analysis；execution sequencing 保留在 workflow | candidate |
 | `skills/apk-analysis/TOOLS.md` | 工具選擇、命令模板、失敗判讀 | `analysis/apk/` + `workflow/apk-analysis/` | 將 tool-selection reasoning 移到 analysis；setup steps 保留為 workflow references 或 tool docs | candidate |
 | `skills/apk-analysis/DOCUMENTATION.md` | 專案 artifact templates 與 documentation gates | `workflow/apk-analysis/` + `intelligence/engineering/apk-analysis/` | Artifact production flow 保留在 workflow；stable engineering lessons 提取到 intelligence | candidate |

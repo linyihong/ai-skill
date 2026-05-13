@@ -2,7 +2,7 @@
 
 本文件列出跨平台安全控制的種類與核心原則。承接 [`skills/app-development-guidance/controls/`](../../skills/app-development-guidance/controls/) 的內容，提取為 tool-neutral 的分析參考。
 
-> **相容性規則**：`skills/app-development-guidance/controls/` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
+> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/controls/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 控制類型
 
@@ -32,4 +32,4 @@
 
 - `analysis/app-development-guidance/risk-translation.md` 提供如何將觀察轉譯為控制的流程。
 - `intelligence/engineering/app-development-guidance/risk-translation-heuristic.md` 提供控制選擇的背後原則。
-- `skills/app-development-guidance/controls/` 是原始來源，仍為 active entrypoint。
+- `skills/app-development-guidance/controls/` 是原始來源，已不再作為 active entrypoint。

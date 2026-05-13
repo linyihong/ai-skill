@@ -2,7 +2,7 @@
 
 本文件列出可建置的實作模式分類與索引。承接 [`skills/app-development-guidance/implementation/`](../../skills/app-development-guidance/implementation/) 的內容，提取為 tool-neutral 的分析參考。
 
-> **相容性規則**：`skills/app-development-guidance/implementation/` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
+> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/implementation/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 分類
 
@@ -27,4 +27,4 @@
 
 - `analysis/app-development-guidance/controls-catalog.md` 提供跨平台控制原則，implementation 提供具體實作。
 - `analysis/app-development-guidance/risk-translation.md` 提供從觀察到控制的流程。
-- `skills/app-development-guidance/implementation/` 是原始來源，仍為 active entrypoint。
+- `skills/app-development-guidance/implementation/` 是原始來源，已不再作為 active entrypoint。

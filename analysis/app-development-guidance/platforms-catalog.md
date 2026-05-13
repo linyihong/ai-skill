@@ -2,7 +2,7 @@
 
 本文件列出各平台/應用類型的開發指引分類與索引。承接 [`skills/app-development-guidance/platforms/`](../../skills/app-development-guidance/platforms/) 的內容，提取為 tool-neutral 的分析參考。
 
-> **相容性規則**：`skills/app-development-guidance/platforms/` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
+> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/platforms/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
 ## 平台分類
 
@@ -23,4 +23,4 @@
 
 - `analysis/app-development-guidance/controls-catalog.md` 提供跨平台控制原則。
 - `analysis/app-development-guidance/implementation-catalog.md` 提供可建置實作模式。
-- `skills/app-development-guidance/platforms/` 是原始來源，仍為 active entrypoint。
+- `skills/app-development-guidance/platforms/` 是原始來源，已不再作為 active entrypoint。
