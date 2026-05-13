@@ -14,6 +14,36 @@ Claude Code 啟動時會自動讀取根目錄的 `CLAUDE.md`。本庫的 `CLAUDE
 
 `.claude/settings.json` 記錄 Claude Code 的工具特定設定（permissions、bootstrap 路徑等）。詳細內容見該檔案本身，此處不重複。
 
+## 全域設定 vs 專案設定
+
+Claude Code 的設定方式與 Roo Code 不同，沒有「全域 Custom Instructions」的概念。但可以透過以下方式達到「設定一次，所有專案生效」的效果：
+
+### 設定層級說明
+
+| 層級 | 範圍 | 設定位置 | 說明 |
+|------|------|----------|------|
+| 層級 A：全域（所有專案） | 所有專案 | `~/.claude/` 中的 `claude.md` 或 `projects.json` | 放在使用者的 home 目錄中，所有專案都會載入 |
+| 層級 B：專案（單一專案） | 單一專案 | `<PROJECT_ROOT>/CLAUDE.md` | 只對該專案生效 |
+
+### 建議策略
+
+```
+全域 ~/.claude/claude.md（層級 A）
+  ├── 指向 Ai-skill 的 CORE_BOOTSTRAP.md（絕對路徑）
+  ├── 語言偏好設定
+  └── 語言一致性強制規則
+
+專案 CLAUDE.md（層級 B，可選）
+  ├── 只在需要專案特定規則時建立
+  └── 加上該專案特有的規則
+```
+
+### 注意事項
+
+- Claude Code 支援 `~/.claude/claude.md` 作為全域設定檔，所有專案啟動時都會載入。
+- 如果 Ai-skill 路徑變更，需要更新 `~/.claude/claude.md` 中的路徑。
+- 專案 `CLAUDE.md` 中的內容會與全域 `~/.claude/claude.md` 合併（不會覆蓋），因此不需要像 Roo Code 那樣擔心覆蓋問題。
+
 ## Claude Code 與對話目標閉環
 
 工具中立規則見 [`shared-rules/conversation-goal-ledger.md`](../../shared-rules/conversation-goal-ledger.md)。Claude Code 是 CLI 工具，沒有 hooks 機制，但可以透過 `CLAUDE.md` 中的 Custom Instructions 和操作注意來實作對話目標閉環。
@@ -74,9 +104,9 @@ skills/<skill-name>/tool-adapters/claude.md
 
 該 adapter 只寫 skill-specific 差異，並連回核心 `WORKFLOW.md` / `TOOLS.md`。
 
-## 語言偏好設定
+## 語言偏好設定（重要）
 
-Claude Code 的語言偏好設定方式與 Roo Code（VS Code Extension）不同，因為 Claude Code 是 CLI 工具，**沒有** SQLite 全域資料庫。
+Claude Code 的語言偏好設定方式與 Roo Code（VS Code Extension）不同，因為 Claude Code 是 CLI 工具，**沒有** SQLite 全域資料庫。為了完整解決語言漂移問題，需要在語言偏好設定中加入**語言一致性強制規則**。
 
 ### 設定方式
 
@@ -90,6 +120,8 @@ Language Preference: Default to English, but always match the user's language in
 If the user writes in Chinese, respond in Chinese.
 If the user writes in Japanese, respond in Japanese.
 If the user switches languages, follow their switch.
+
+語言一致性強制規則：所有輸出（包含 attempt_completion 結果、技術分析、表格欄位、章節標題、commit message）都必須與使用者當前語言一致。如果使用者使用中文，所有內容（包括技術關鍵詞、程式碼註解、分析報告）都必須使用中文。在 attempt_completion 前必須先確認語言一致性。
 ```
 
 ### 與 Roo Code 的差異
@@ -100,11 +132,13 @@ If the user switches languages, follow their switch.
 | 設定位置 | `CLAUDE.md`（檔案） | `.roomodes` + SQLite 全域資料庫 |
 | 全域語言欄位 | 無 | 有（`language` 欄位在 `state.vscdb`） |
 | 設定方式 | 直接編輯 `CLAUDE.md` | 編輯 `.roomodes` + 修改 SQLite |
+| 語言一致性強制規則 | 需手動加入 `CLAUDE.md` | 需手動加入 `.roomodes` 或全域 Custom Instructions |
 
 ### 注意事項
 
 - Claude Code 沒有「全域語言強制」的問題，只要 `CLAUDE.md` 中的語言偏好設定正確，Claude 就會跟隨使用者語言。
-- 如果 Claude 仍然強制使用英文，請檢查 `CLAUDE.md` 中是否有固定的 `You should always speak and think in the "English" (en) language` 設定，改為上述軟性偏好即可。
+- 如果 Claude 仍然強制使用英文，請檢查 `CLAUDE.md` 中是否有固定的 `You should always speak and think in the "English" (en) language` 設定，改為上述軟性偏好 + 語言一致性強制規則即可。
+- **語言一致性強制規則**是為了解決「作者習慣漂移」問題（Type B），即 agent 在描述技術細節時會不自覺使用英文。加入此規則後，所有輸出（包括 attempt_completion、表格、commit message）都會強制跟隨使用者語言。
 
 ## 驗證
 

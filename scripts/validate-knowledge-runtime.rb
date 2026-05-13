@@ -753,6 +753,73 @@ def validate_intelligence_entry_solution_crossref
   end
 end
 
+def validate_tool_config_standards
+  # Validate that all agent tool config files in ai-tools/agent/ follow the
+  # architecture defined in agent-onboarding.md:
+  #
+  # Required sections (from agent-onboarding.md 必要設定 table):
+  # 1. 自動載入入口 — references CORE_BOOTSTRAP.md for startup flow
+  # 2. 語言偏好 — soft language preference + 語言一致性強制規則
+  # 3. 對話目標閉環 — goal ledger integration
+  # 4. 全域設定 vs 專案設定 — global vs project config guide
+  #
+  # Each tool may have its own customization (hooks, modes, etc.),
+  # but all must follow this architecture.
+  agent_dir = ROOT + "ai-tools/agent"
+  return unless agent_dir.exist? && agent_dir.directory?
+
+  # Architecture requirements from agent-onboarding.md
+  required_architecture = [
+    {
+      name: "自動載入入口",
+      patterns: [/CORE_BOOTSTRAP\.md/],
+      hint: "必須引用 CORE_BOOTSTRAP.md 作為啟動流程入口"
+    },
+    {
+      name: "語言偏好設定（含語言一致性強制規則）",
+      patterns: [
+        /語言偏好設定/,
+        /語言一致性強制規則/,
+        /所有輸出.*attempt_completion.*commit message.*都必須與使用者當前語言一致/
+      ],
+      hint: "必須包含軟性語言偏好 + 語言一致性強制規則（所有輸出包含 attempt_completion、表格、commit message 都必須與使用者語言一致）"
+    },
+    {
+      name: "對話目標閉環",
+      patterns: [/conversation-goal-ledger\.md/, /goal ledger/, /\.agent-goals/],
+      hint: "必須引用 conversation-goal-ledger.md 或實作 goal ledger 整合"
+    },
+    {
+      name: "全域設定 vs 專案設定",
+      patterns: [
+        /##\s+全域設定\s*vs\s+專案設定/,
+        /設定層級說明/,
+        /層級 A[：:]/,
+        /層級 B[：:]/,
+        /建議策略/
+      ],
+      hint: "必須包含全域 vs 專案設定的層級說明（層級 A/層級 B）與建議策略"
+    },
+  ]
+
+  agent_dir.each_child do |file|
+    next unless file.extname == ".md"
+    next if file.basename.to_s == "README.md"
+
+    text = read_text(file)
+    basename = file.basename.to_s
+
+    required_architecture.each do |arch|
+      matched = arch[:patterns].any? { |pattern| text.match?(pattern) }
+      unless matched
+        add_error("#{rel(file)}: 缺少必要架構項目「#{arch[:name]}」— #{arch[:hint]}（依據 agent-onboarding.md 必要設定表）")
+      end
+    end
+
+    COUNTS[:tool_config_files] += 1
+  end
+end
+
 validate_registry
 validate_refresh_policy
 validate_summaries
@@ -764,6 +831,7 @@ validate_failure_pattern_validator_coverage
 validate_no_outdated_active_entrypoint
 validate_intelligence_ide_knowledge
 validate_language_consistency
+validate_tool_config_standards
 check_markdown_links("knowledge/runtime/README.md")
 check_markdown_links("knowledge/runtime/runtime-report.md") if (ROOT + "knowledge/runtime/runtime-report.md").exist?
 check_markdown_links("knowledge/runtime/model-context-report.md") if (ROOT + "knowledge/runtime/model-context-report.md").exist?
@@ -779,6 +847,7 @@ if ERRORS.empty?
   puts "intelligence_domains=#{COUNTS[:intelligence_domains]}"
   puts "analysis_domains=#{COUNTS[:analysis_domains]}"
   puts "workflow_domains=#{COUNTS[:workflow_domains]}"
+  puts "tool_config_files=#{COUNTS[:tool_config_files]}"
 else
   warn "Knowledge runtime validation failed:"
   ERRORS.each { |error| warn "- #{error}" }

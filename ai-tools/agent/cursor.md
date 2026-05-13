@@ -27,11 +27,43 @@
 
 若工作區已用多資料夾同時打開業務專案與中央庫，Agent 直接開檔最穩。
 
-## 語言偏好設定
+## 全域設定 vs 專案設定
 
-Cursor 的語言行為由 `.cursor/rules/*.mdc` 中的規則控制：
+Cursor 的設定方式與 Roo Code 不同，沒有「全域 Custom Instructions」的概念。但可以透過以下方式達到「設定一次，所有專案生效」的效果：
 
-1. **在 `.cursor/rules/` 中設定**：本知識庫的 `.cursor/rules/` 目錄已包含語言偏好設定。
+### 設定層級說明
+
+| 層級 | 範圍 | 設定位置 | 說明 |
+|------|------|----------|------|
+| 層級 A：全域（所有專案） | 所有專案 | `~/.cursor/rules/` 中的 `alwaysApply: true` 規則 | 放在使用者的 home 目錄 `.cursor/rules/` 中，所有專案都會載入 |
+| 層級 B：專案（單一專案） | 單一專案 | `<PROJECT_ROOT>/.cursor/rules/*.mdc` | 只對該專案生效 |
+
+### 建議策略
+
+```
+全域 .cursor/rules/（層級 A，放在 ~/.cursor/rules/）
+  ├── 指向 Ai-skill 的 CORE_BOOTSTRAP.md（絕對路徑）
+  ├── 語言偏好設定
+  └── 語言一致性強制規則
+
+專案 .cursor/rules/（層級 B，可選）
+  ├── 只在需要專案特定規則時建立
+  └── 加上該專案特有的規則
+```
+
+### 注意事項
+
+- Cursor 的 `alwaysApply` 規則會在所有專案中載入，因此放在 `~/.cursor/rules/` 中的規則可以達到「設定一次，所有專案生效」的效果。
+- 如果 Ai-skill 路徑變更，需要更新 `~/.cursor/rules/` 中的規則路徑。
+- 專案 `.cursor/rules/` 中的規則會與全域規則合併（不會覆蓋），因此不需要像 Roo Code 那樣擔心覆蓋問題。
+
+## 語言偏好設定（重要）
+
+Cursor 的語言行為由 `.cursor/rules/*.mdc` 中的規則控制。為了完整解決語言漂移問題，需要在語言偏好設定中加入**語言一致性強制規則**。
+
+### 設定方式
+
+1. **在 `~/.cursor/rules/` 中設定**（全域生效）：將語言偏好設定放在 `~/.cursor/rules/` 中的 `alwaysApply: true` 規則中，所有專案都會載入。
 2. **語言偏好內容**（在 `alwaysApply` 的規則中）：
 
 ```text
@@ -39,6 +71,8 @@ Language Preference: Default to English, but always match the user's language in
 If the user writes in Chinese, respond in Chinese.
 If the user writes in Japanese, respond in Japanese.
 If the user switches languages, follow their switch.
+
+語言一致性強制規則：所有輸出（包含 attempt_completion 結果、技術分析、表格欄位、章節標題、commit message）都必須與使用者當前語言一致。如果使用者使用中文，所有內容（包括技術關鍵詞、程式碼註解、分析報告）都必須使用中文。在 attempt_completion 前必須先確認語言一致性。
 ```
 
 ### 與 Roo Code 的差異
@@ -49,12 +83,14 @@ If the user switches languages, follow their switch.
 | 設定位置 | `.cursor/rules/*.mdc`（檔案） | `.roomodes` + SQLite 全域資料庫 |
 | 全域語言欄位 | 無公開 API 直接修改 | 有（`language` 欄位在 `state.vscdb`） |
 | 設定方式 | 編輯 `.cursor/rules/` 中的規則 | 編輯 `.roomodes` + 修改 SQLite |
+| 語言一致性強制規則 | 需手動加入 `alwaysApply` 規則 | 需手動加入 `.roomodes` 或全域 Custom Instructions |
 
 ### 注意事項
 
 - Cursor 沒有公開的 SQLite 全域資料庫修改方式，語言偏好完全由 `.cursor/rules/` 中的規則控制。
-- 如果 Cursor 仍然強制使用英文，請檢查 `.cursor/rules/` 中是否有固定的語言偏好設定，改為上述軟性偏好即可。
+- 如果 Cursor 仍然強制使用英文，請檢查 `.cursor/rules/` 中是否有固定的語言偏好設定，改為上述軟性偏好 + 語言一致性強制規則即可。
 - Cursor 的 `alwaysApply` 規則會在每個 session 啟動時自動載入，因此語言偏好設定放在 `alwaysApply: true` 的規則中最有效。
+- **語言一致性強制規則**是為了解決「作者習慣漂移」問題（Type B），即 agent 在描述技術細節時會不自覺使用英文。加入此規則後，所有輸出（包括 attempt_completion、表格、commit message）都會強制跟隨使用者語言。
 
 ## 公用更新流程
 
