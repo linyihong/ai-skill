@@ -615,7 +615,7 @@ records:
       reason: 需要驗證 AI 決策品質時才讀取完整 scenario 與 rule 定義。
 
   - id: route.intelligence.engineering.agent-architecture
-    task_intent: 了解 AI Agent 自身運作智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries）
+    task_intent: 了解 AI Agent 自身運作智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries、pilot-first validation、failure-to-scenario closure、linked-updates completeness、decomposition strategy、stateless validation）
     primary_source: intelligence/engineering/agent-architecture/README.md
     required_dependencies:
       - intelligence/engineering/README.md
@@ -626,6 +626,11 @@ records:
       - intelligence/engineering/agent-architecture/attention-budgeting.md
       - intelligence/engineering/agent-architecture/failure-recovery.md
       - intelligence/engineering/agent-architecture/cognitive-boundaries.md
+      - intelligence/engineering/agent-architecture/pilot-first-validation.md
+      - intelligence/engineering/agent-architecture/failure-to-scenario-closure.md
+      - intelligence/engineering/agent-architecture/linked-updates-completeness.md
+      - intelligence/engineering/agent-architecture/decomposition-strategy-selection.md
+      - intelligence/engineering/agent-architecture/stateless-validation-necessity.md
       - shared-rules/failure-patterns/README.md
       - shared-rules/decision-efficiency.md
     source_of_truth_gate: design-layer-only

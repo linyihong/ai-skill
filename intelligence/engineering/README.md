@@ -11,7 +11,7 @@
 | [`domain/`](domain/README.md) | 領域模型智慧 |
 | [`anti-patterns/`](anti-patterns/README.md) | 反模式 |
 | [`distributed-systems/`](distributed-systems/README.md) | 分散式系統 |
-| [`agent-architecture/`](agent-architecture/README.md) | AI Agent 自身運作的智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries） |
+| [`agent-architecture/`](agent-architecture/README.md) | AI Agent 自身運作的智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries、pilot-first validation、failure-to-scenario closure、linked-updates completeness、decomposition strategy、stateless validation） |
 | [`apk-analysis/`](apk-analysis/README.md) | APK 分析工程智慧 |
 | [`app-development-guidance/`](app-development-guidance/README.md) | 開發指引工程智慧 |
 | [`repo-analysis/`](repo-analysis/README.md) | Repository 分析工程智慧 |

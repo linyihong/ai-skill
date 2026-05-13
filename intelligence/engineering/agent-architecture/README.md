@@ -16,6 +16,11 @@ AI 不是黑盒子 — 它的行為模式可以被觀察、分類、預測、改
 | [`attention-budgeting.md`](attention-budgeting.md) | Agent has finite attention per session; every unnecessary file read or tool call consumes budget that could be spent on reasoning. | `candidate-intelligence` | 本系統實際運作觀察 |
 | [`failure-recovery.md`](failure-recovery.md) | Agent's first recovery attempt after failure is usually the most reliable; repeated retries without strategy change degrade output quality. | `candidate-intelligence` | 本系統實際運作觀察 |
 | [`cognitive-boundaries.md`](cognitive-boundaries.md) | Agent cannot reliably detect its own cognitive boundaries; external gates (validation, checklists, failure patterns) are required. | `candidate-intelligence` | 本系統實際運作觀察 |
+| [`pilot-first-validation.md`](pilot-first-validation.md) | Before abstracting a pattern into a generalized pipeline, validate it with a concrete pilot first. | `candidate-intelligence` | Phase 28-31 實際運作經驗 |
+| [`failure-to-scenario-closure.md`](failure-to-scenario-closure.md) | Every AI-system failure that can be reproduced statelessly should be converted into a validation scenario. | `candidate-intelligence` | 本系統實際運作經驗 |
+| [`linked-updates-completeness.md`](linked-updates-completeness.md) | When modifying one file, agent must identify and update all files that reference or depend on it. | `candidate-intelligence` | Phase 33-35 實際運作經驗 |
+| [`decomposition-strategy-selection.md`](decomposition-strategy-selection.md) | Not all content benefits from the same extraction strategy; choose based on content structure. | `candidate-intelligence` | Phase 26-33 實際運作經驗 |
+| [`stateless-validation-necessity.md`](stateless-validation-necessity.md) | AI decision path validation must be stateless — it cannot depend on conversation memory. | `candidate-intelligence` | 本系統實際運作經驗 |
 
 ## 與其他層的關係
 

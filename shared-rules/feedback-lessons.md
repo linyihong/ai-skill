@@ -18,11 +18,33 @@
 | --- | --- |
 | **共用政策（全庫）** | [`shared-rules/README.md`](README.md) |
 | **本檔** | 命名規則、模板、索引與 Git 約定（**唯一正文**） |
-| **每一條獨立 lesson（未分類 skill）** | **`<skill>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
-| **每一條獨立 lesson（已有分類的 skill）** | **`<skill>/feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`** |
+| **每一條獨立 lesson（未分類 skill，尚未遷移至新框架）** | **`<skill>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
+| **每一條獨立 lesson（已有分類的 skill，尚未遷移至新框架）** | **`<skill>/feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`** |
 | **條目總覽表**（可選） | **`<skill>/feedback_history/README.md`** 與必要的 **`<skill>/feedback_history/<category>/README.md`** |
 
-範例：`skills/apk-analysis/feedback_history/`；若 skill 已有 `techniques/flutter-dart-aot/` 這類分類，對應 lesson 應放在 `skills/apk-analysis/feedback_history/flutter-dart-aot/`，跨分類或全域規則放 `skills/apk-analysis/feedback_history/common/`。
+### ⚠️ 重要：已遷移至新框架的 skill
+
+若 skill 已按新分層（`workflow/<name>/`、`analysis/<name>/`、`intelligence/<name>/`）重構，**feedback lesson 不得再寫入舊 `skills/<name>/feedback_history/` 路徑**，應改寫至對應的新分層路徑：
+
+| 內容 | 位置 |
+| --- | --- |
+| **與執行流程相關的 lesson** | **`workflow/<name>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
+| **與分析方法相關的 lesson** | **`analysis/<name>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
+| **與工程智慧相關的 lesson** | **`intelligence/<name>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
+| **跨領域或無法歸類的 lesson** | **`workflow/<name>/feedback_history/common/YYYY-MM-DD_HHMMSS-<slug>.md`** |
+
+若對應新分層路徑下尚無 `feedback_history/` 目錄，**應主動建立**，而非退回舊路徑。
+
+### 判斷流程
+
+1. 檢查該 skill 的 `SKILL.md` 或 `README.md`，確認是否有「新分層路徑（優先讀取）」章節。
+2. 若有新分層路徑 → 表示已遷移 → lesson 寫到新分層對應的 `feedback_history/`。
+3. 若無新分層路徑 → 表示尚未遷移 → lesson 寫到舊 `skills/<name>/feedback_history/`。
+
+### 範例
+
+- **已遷移（app-development-guidance）**：lesson 應放 `workflow/app-development-guidance/feedback_history/` 或 `intelligence/engineering/app-development-guidance/feedback_history/`，**不是** `skills/app-development-guidance/feedback_history/`。
+- **尚未遷移（apk-analysis）**：lesson 仍放 `skills/apk-analysis/feedback_history/`。
 
 成熟後可將 lesson 整理進該 skill 的 `workflow/<domain>/execution-flow.md`、`analysis/<domain>/` 或 `intelligence/<domain>/`（見模板中 **Promotion Target**）。舊結構保留 `WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md` 作為向後相容。
 
@@ -50,8 +72,11 @@
 
 複製到新檔：
 
-- 未分類 skill：**`<skill>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**
-- 已分類 skill：**`<skill>/feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`**
+- 未遷移 skill（舊路徑）：**`<skill>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**
+- 未遷移 skill + 已有分類：**`<skill>/feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`**
+- **已遷移 skill（新分層路徑）**：**`workflow/<name>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**（或對應的 `analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/`）
+
+**重要：** 若 skill 已遷移至新框架（`SKILL.md` 中有「新分層路徑（優先讀取）」章節），**不得**使用舊 `<skill>/feedback_history/` 路徑。請先判斷 lesson 屬於哪一層（workflow / analysis / intelligence），再寫入對應的 `feedback_history/`。
 
 注意：以下引用路徑以檔案位於 `feedback_history/` 內為準；若檔案在 `feedback_history/<category>/`，共用規則連結要多上一層，改成 `../../../../shared-rules/...`。
 
@@ -111,9 +136,11 @@ Status: candidate | validated | deprecated | promoted | experimental
 - `workflow/<domain>/execution-flow.md`（新分層）
 - `analysis/<domain>/`（新分層）
 - `intelligence/<domain>/`（新分層）
-- `skills/<name>/WORKFLOW.md`（舊結構，向後相容）
-- `skills/<name>/TOOLS.md`（舊結構，向後相容）
-- `skills/<name>/DOCUMENTATION.md`（舊結構，向後相容）
+- `skills/<name>/WORKFLOW.md`（舊結構，向後相容；僅限尚未遷移的 skill）
+- `skills/<name>/TOOLS.md`（舊結構，向後相容；僅限尚未遷移的 skill）
+- `skills/<name>/DOCUMENTATION.md`（舊結構，向後相容；僅限尚未遷移的 skill）
+
+> **注意：** 若 skill 已遷移至新框架，promotion target 只能選新分層路徑，不得選 `skills/<name>/` 下的舊路徑。
 
 #### Required Linked Updates
 

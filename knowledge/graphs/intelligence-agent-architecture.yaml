@@ -2,14 +2,16 @@ id: graph.intelligence-agent-architecture
 source: intelligence/engineering/agent-architecture/README.md
 status: candidate
 summary: >
-   連接 agent-architecture 層的所有 atoms：context-collapse、rule-overload、
-   task-routing、attention-budgeting、failure-recovery、cognitive-boundaries。
-   每個 atom 研究 AI Agent 自身的認知行為模式，與 shared-rules/failure-patterns/ 互補。
+    連接 agent-architecture 層的所有 atoms：context-collapse、rule-overload、
+    task-routing、attention-budgeting、failure-recovery、cognitive-boundaries、
+    pilot-first-validation、failure-to-scenario-closure、linked-updates-completeness、
+    decomposition-strategy-selection、stateless-validation-necessity。
+    每個 atom 研究 AI Agent 自身的認知行為模式，與 shared-rules/failure-patterns/ 互補。
 edges:
   - type: depends_on
     target: intelligence/engineering/agent-architecture/README.md
     reason: Agent-architecture README 提供目錄索引、atom 清單與各 atom 的簡要說明。
-    validation: README 列出所有 6 個 atoms 及其核心原則。
+    validation: README 列出所有 11 個 atoms 及其核心原則。
 
   - type: related_to
     target: intelligence/engineering/agent-architecture/context-collapse.md
@@ -42,6 +44,31 @@ edges:
     validation: atom 定義 principle、symptom table、external gate design principles 與 known boundaries table。
 
   - type: related_to
+    target: intelligence/engineering/agent-architecture/pilot-first-validation.md
+    reason: 先驗證再抽象化 — 在抽象化為通用 pipeline 之前先用具體 pilot 驗證。
+    validation: atom 定義 principle、symptom table、prevention 與 common misuse；來源為 Phase 28-31 實際運作經驗。
+
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/failure-to-scenario-closure.md
+    reason: 錯誤經驗轉化為驗證場景 — 每個可 stateless 重現的 AI 錯誤都應轉化為 validation scenario。
+    validation: atom 定義判斷條件表、閉環流程、prevention 與 common misuse。
+
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/linked-updates-completeness.md
+    reason: 連動更新完整性 — 修改一個檔案時必須找出並更新所有引用或依賴它的檔案。
+    validation: atom 定義常見遺漏表、prevention 與 common misuse；來源為 Phase 33-35 實際運作經驗。
+
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/decomposition-strategy-selection.md
+    reason: 拆解策略選擇 — 根據內容結構選擇 extraction 策略，不是根據慣例。
+    validation: atom 定義三種策略對比表、判斷流程、symptom table 與 common misuse。
+
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/stateless-validation-necessity.md
+    reason: 無狀態驗證的必要性 — AI 決策路徑驗證不能依賴對話記憶或累積上下文。
+    validation: atom 定義 stateless vs stateful 對比表、確保 stateless 的方法與 common misuse。
+
+  - type: related_to
     target: shared-rules/failure-patterns/README.md
     reason: failure-patterns 記錄具體 agent 失效模式，本層解釋為什麼會發生的認知原理。
     validation: 兩者互補 — failure-patterns 提供 trigger/action/prevention，agent-architecture 提供 root cause 分析。
@@ -57,6 +84,26 @@ edges:
     validation: document-sizing 的拆分規則可在 agent-architecture 的 attention-budgeting 和 context-collapse 中找到理論依據。
 
   - type: related_to
+    target: shared-rules/linked-updates.md
+    reason: linked-updates 提供連動更新的執行規則，linked-updates-completeness atom 提供為什麼需要完整連動更新的認知基礎。
+    validation: linked-updates-completeness atom 的常見遺漏表可在 linked-updates.md 的常見連動關係表中找到對應。
+
+  - type: related_to
     target: validation/README.md
     reason: validation/ 提供 stateless 驗證場景，本層提供為什麼需要驗證的認知邊界理論。
-    validation: cognitive-boundaries atom 解釋 agent 無法自我檢測錯誤，因此需要外部 validation gate。
+    validation: cognitive-boundaries atom 解釋 agent 無法自我檢測錯誤，因此需要外部 validation gate；stateless-validation-necessity atom 解釋為什麼驗證必須是 stateless 的。
+
+  - type: related_to
+    target: plans/archived/technique-intelligence-pilot.md
+    reason: pilot-first-validation atom 從此計畫的實際執行經驗提煉而來。
+    validation: 計畫的「不做範圍」和 pilot-first 策略直接對應 atom 的核心原則。
+
+  - type: related_to
+    target: plans/archived/skill-specific-extraction.md
+    reason: decomposition-strategy-selection atom 從此計畫的 3 種策略對比表提煉而來。
+    validation: 計畫的 3 種策略（Decomposition、Catalog、Direct Promotion）直接對應 atom 的策略選擇流程。
+
+  - type: related_to
+    target: plans/archived/ai-decision-contract-testing.md
+    reason: stateless-validation-necessity 和 failure-to-scenario-closure atom 從此計畫的 Stateless Deterministic Validation 原則提煉而來。
+    validation: 計畫的 Stateless Deterministic Validation 章節直接對應 atom 的核心原則。
