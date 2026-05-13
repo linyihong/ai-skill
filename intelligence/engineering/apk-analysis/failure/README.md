@@ -21,3 +21,4 @@
 | Atom | 說明 | 來源 |
 |------|------|------|
 | [`frida-spawn-race.md`](frida-spawn-race.md) | Frida spawn race condition — Frida 在 spawn 模式下的 race condition 診斷與緩解策略 | `skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除） |
+| [`javascript-bitwise-64bit-truncation.md`](javascript-bitwise-64bit-truncation.md) | JavaScript 位元運算子截斷 64-bit 指標 — 所有 `tryReadDartString` 回傳 `undecoded` 或 `hexdump` 報 access violation 時的診斷入口，解法指向 heuristics | `feedback/history/apk-analysis/flutter-dart-aot/` |
