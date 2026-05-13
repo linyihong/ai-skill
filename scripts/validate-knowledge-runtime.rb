@@ -403,12 +403,49 @@ def validate_no_outdated_active_entrypoint
   end
 end
 
+def validate_intelligence_ide_knowledge
+  # Check that intelligence/engineering/ide/ exists and has proper structure.
+  # This knowledge was promoted from ai-tools/ide/ to intelligence/engineering/ide/.
+  ide_dir = ROOT + "intelligence/engineering/ide"
+  unless ide_dir.exist?
+    add_error("intelligence/engineering/ide/ does not exist (expected after promotion from ai-tools/ide/)")
+    return
+  end
+
+  # Must have README.md
+  readme = ide_dir + "README.md"
+  unless readme.exist?
+    add_error("intelligence/engineering/ide/README.md is missing")
+    return
+  end
+
+  # README.md must list all .md files in the directory (excluding itself)
+  listed = files_listed_in_readme(readme).map(&:to_s)
+  actual = ide_dir.each_child
+                  .select { |f| f.extname == ".md" && f.basename.to_s != "README.md" }
+                  .map(&:to_s)
+
+  actual.each do |f|
+    unless listed.include?(f)
+      basename = File.basename(f)
+      add_error("intelligence/engineering/ide/README.md does not list #{basename}")
+    end
+  end
+
+  # The vscode-extension-global-state.md should NOT exist in ai-tools/ide/ anymore
+  old_path = ROOT + "ai-tools/ide/vscode-extension-global-state.md"
+  if old_path.exist?
+    add_error("ai-tools/ide/vscode-extension-global-state.md still exists (should have been promoted to intelligence/engineering/ide/)")
+  end
+end
+
 validate_registry
 validate_refresh_policy
 validate_summaries
 validate_graphs
 validate_directory_structure
 validate_no_outdated_active_entrypoint
+validate_intelligence_ide_knowledge
 check_markdown_links("knowledge/runtime/README.md")
 check_markdown_links("knowledge/runtime/runtime-report.md") if (ROOT + "knowledge/runtime/runtime-report.md").exist?
 check_markdown_links("knowledge/runtime/model-context-report.md") if (ROOT + "knowledge/runtime/model-context-report.md").exist?
