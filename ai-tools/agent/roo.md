@@ -43,6 +43,66 @@ Language Preference: Default to English, but always match the user's language in
 - 新專案不需要額外設定，直接開啟 Roo Code 即可
 - 全域設定是**軟性預設值**，專案可以透過 `.roomodes` 覆蓋
 
+##### 自動寫入方式（AI agent 專用）
+
+如果 AI agent 有檔案系統寫入權限，可以直接修改 VS Code 的 `state.vscdb`（SQLite 資料庫），無需使用者手動操作。
+
+**資料庫路徑**：
+```
+~/Library/Application Support/Code/User/globalStorage/state.vscdb
+```
+
+**Table / Key 結構**：
+- Table: `ItemTable`（key-value store）
+- Key: `RooVeterinaryInc.roo-cline`
+- Value: JSON blob，包含所有 Roo Code 全域設定
+
+**寫入欄位**：在 JSON blob 中加入 `customInstructions` 欄位
+
+**Python 寫入範例**：
+
+```python
+import json, sqlite3
+
+CUSTOM_INSTRUCTIONS = """你是一個運行在 Roo Code（VS Code AI extension）的 AI agent。
+
+開始工作前，請依 /Users/larrylin/Documents/Ai-skill/CORE_BOOTSTRAP.md 的啟動流程載入核心規則與 OS layout。
+
+Language Preference: Default to English, but always match the user's language in conversation. If the user writes in Chinese, respond in Chinese. If the user writes in Japanese, respond in Japanese. If the user switches languages, follow their switch.
+
+語言一致性強制規則：所有輸出（包含 attempt_completion 結果、技術分析、表格欄位、章節標題、commit message）都必須與使用者當前語言一致。如果使用者使用中文，所有內容（包括技術關鍵詞、程式碼註解、分析報告）都必須使用中文。在 attempt_completion 前必須先確認語言一致性。"""
+
+DB_PATH = os.path.expanduser(
+    "~/Library/Application Support/Code/User/globalStorage/state.vscdb"
+)
+
+conn = sqlite3.connect(DB_PATH)
+cursor = conn.cursor()
+
+# 讀取現有 JSON
+cursor.execute("SELECT value FROM ItemTable WHERE key = 'RooVeterinaryInc.roo-cline'")
+row = cursor.fetchone()
+data = json.loads(row[0])
+
+# 寫入 customInstructions
+data["customInstructions"] = CUSTOM_INSTRUCTIONS
+
+# 寫回資料庫
+new_value = json.dumps(data, ensure_ascii=False)
+cursor.execute(
+    "UPDATE ItemTable SET value = ? WHERE key = 'RooVeterinaryInc.roo-cline'",
+    (new_value,)
+)
+conn.commit()
+conn.close()
+```
+
+**注意事項**：
+1. `state.vscdb` 是 VS Code 執行中可能會鎖定的檔案，建議在 VS Code 未使用 Roo Code 時操作
+2. 修改後需**重新開啟 Roo Code session** 才會生效
+3. 如果 Ai-skill 路徑變更，需同步更新 `CUSTOM_INSTRUCTIONS` 中的絕對路徑
+4. 此方法也適用於修改其他 Roo Code 全域設定（如 `language` 欄位）
+
 #### 層級 B：專案 `.roomodes`（單一專案專用）
 
 在專案根目錄建立 `.roomodes` 檔案，Roo Code 會自動讀取。此設定**只對該專案生效**。

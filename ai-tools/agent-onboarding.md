@@ -40,6 +40,20 @@
 2. **專案設定只在需要時才建立**：如果專案需要自訂 mode 定義或 file restrictions，才在專案根目錄建立設定檔
 3. **注意覆蓋行為**：部分工具（如 Roo Code）的專案設定檔會**完全覆蓋**全域設定（不會合併），所以專案設定檔中必須包含全域設定的所有內容
 
+### 自動寫入方式（AI agent 專用）
+
+部分工具（如 Roo Code）的全域設定儲存在 VS Code 的 SQLite 資料庫中，AI agent 可以直接寫入，無需使用者手動操作。
+
+**通用流程**：
+
+1. 找到工具的設定儲存位置（VS Code `state.vscdb` 或工具專屬的 JSON/YAML 設定檔）
+2. 讀取現有設定（JSON blob 或 YAML）
+3. 在設定中加入 `customInstructions`（或對應的欄位名稱），內容指向 `CORE_BOOTSTRAP.md` 的絕對路徑
+4. 寫回儲存位置
+5. 通知使用者重新開啟工具 session
+
+**各工具的自動寫入細節**，請參考對應的 `ai-tools/agent/<tool>.md` 文件。
+
 ### 路徑注意事項
 
 全域設定中使用的是**絕對路徑**（如 `/Users/larrylin/Documents/Ai-skill/CORE_BOOTSTRAP.md`）。如果：
