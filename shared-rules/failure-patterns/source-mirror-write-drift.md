@@ -59,4 +59,8 @@ Agent 編輯目前工具看得到的 copy，而不是 canonical `<AI_SKILL_REPO>
 - [`tool-neutral-documentation.md`](../tool-neutral-documentation.md)
 - [`linked-updates.md`](../linked-updates.md)
 
+## Linked Validation Scenarios
+
+- `validate_intelligence_ide_knowledge` — 檢查 `intelligence/ide/` 的結構與內容，確保昇華後的知識有正確的目錄結構，防止 source/mirror write drift
+
 ← [Back to failure patterns](README.md)

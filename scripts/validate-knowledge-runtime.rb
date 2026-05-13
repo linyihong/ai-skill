@@ -549,12 +549,60 @@ def validate_intelligence_classification_boundary
   end
 end
 
+# ──────────────────────────────────────────────
+# Failure-to-Validator Closure Test
+# ──────────────────────────────────────────────
+def validate_failure_pattern_validator_coverage
+  # Check that every failure pattern in shared-rules/failure-patterns/ has at least
+  # one entry in its "Linked Validation Scenarios" section. This prevents the
+  # "failure-to-validator closure" pattern where an error is fixed but no reusable
+  # test is added to prevent recurrence.
+  #
+  # Rationale: If a failure pattern's Linked Validation Scenarios is empty, it means
+  # the agent who created the pattern didn't add a corresponding validator test.
+  # This is itself a failure-to-validator closure.
+  patterns_dir = ROOT + "shared-rules/failure-patterns"
+  return unless patterns_dir.exist?
+
+  patterns_dir.each_child do |file|
+    next unless file.extname == ".md"
+    next if file.basename.to_s == "README.md"
+
+    text = read_text(file)
+    lines = text.each_line.to_a
+
+    # Find the "Linked Validation Scenarios" section
+    in_section = false
+    scenario_lines = []
+    lines.each_with_index do |line, idx|
+      if line.match?(/^## Linked Validation Scenarios/)
+        in_section = true
+        next
+      end
+      if in_section && line.start_with?("## ")
+        break
+      end
+      if in_section
+        scenario_lines << line
+      end
+    end
+
+    # Check if there's at least one non-empty scenario entry
+    has_scenario = scenario_lines.any? { |l| l.match?(/^- `[^`]+`/) }
+
+    unless has_scenario
+      add_error("failure pattern #{file.basename} has empty Linked Validation Scenarios — add at least one validator test reference (failure-to-validator closure)")
+    end
+  end
+end
+
 validate_registry
 validate_refresh_policy
 validate_summaries
 validate_graphs
 validate_directory_structure
 validate_intelligence_classification_boundary
+validate_failure_pattern_validator_coverage
 validate_no_outdated_active_entrypoint
 validate_intelligence_ide_knowledge
 validate_language_consistency

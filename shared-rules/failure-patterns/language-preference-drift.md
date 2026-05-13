@@ -140,7 +140,7 @@ Agent 在使用者用中文提問後，仍然用英文回應，因為：
 
 ## Linked Failure Patterns
 
-- (none)
+- [Failure-to-validator closure](failure-to-validator-closure.md)：修復語言漂移後，必須加入對應的 validator 測試（如 `validate_language_consistency`），否則修復不完整。
 
 ## Linked Feedback Lessons
 
@@ -149,7 +149,7 @@ Agent 在使用者用中文提問後，仍然用英文回應，因為：
 
 ## Linked Validation Scenarios
 
-- (none yet — 需要建立 cross-domain scenario 測試語言跟隨行為)
+- `validate_language_consistency` — 檢查中文文件中的英文表格欄位，防止作者習慣漂移（Type B）
 
 ---
 

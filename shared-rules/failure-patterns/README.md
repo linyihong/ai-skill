@@ -13,6 +13,7 @@
 | [Source / mirror write drift](source-mirror-write-drift.md) | `source-mirror-drift` | validated | 防止 agent 更新 project-local tool mirrors 或 runtime copies，而不是 canonical source repo。 |
 | [Tool config design without rule check](tool-config-design-without-rule-check.md) | `tool-strategy-gap` | candidate | 防止 agent 設計新工具配置時漏讀 `ai-tools/<tool>.md` 的現有規則，導致重複或邊界混淆。 |
 | [Language preference drift](language-preference-drift.md) | `configuration-gap` / `instruction-conflict` | validated | 防止 agent 的 Custom Instructions 中設定了固定語言偏好，導致無視使用者實際使用的語言，強制用英文回應。 |
+| [Failure-to-validator closure](failure-to-validator-closure.md) | `validation-gap` / `process-gap` | validated | 防止 agent 修復錯誤後，沒有把錯誤模式抽象化為可重複檢測的 validator 測試案例。 |
 
 ## 維護
 

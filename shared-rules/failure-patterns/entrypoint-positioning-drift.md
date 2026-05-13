@@ -44,3 +44,7 @@ Agent 更新了 secondary references、mid-document sections、links 或 filenam
 - [`../goal-action-validation.md`](../goal-action-validation.md)
 - [`../linked-updates.md`](../linked-updates.md)
 - [`../content-layering.md`](../content-layering.md)
+
+## Linked Validation Scenarios
+
+- `validate_intelligence_classification_boundary` — 檢查 `intelligence/README.md` 的結構圖與實際目錄一致，防止入口定位漂移導致新目錄未在結構圖中註冊

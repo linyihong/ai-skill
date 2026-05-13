@@ -75,6 +75,10 @@ Agent 把某個 skill 的 analysis technique lesson 放到另一個不相關 ski
 - [`../failure-learning-system.md`](../failure-learning-system.md)（失效學習系統）
 - [`../scope-drift` 類別](../failure-learning-system.md#failure-taxonomy)
 
+## Linked Validation Scenarios
+
+- `validate_intelligence_classification_boundary` — 檢查 `intelligence/README.md` 的結構圖與實際目錄是否一致，防止新目錄加入時沒有正確分類
+
 ## Error Examples
 
 ### ❌ 錯誤範例 1：APK 分析技術放到 app-development-guidance

@@ -83,4 +83,8 @@ Agent 基於假設或記憶提出工具配置設計，而不是從 `ai-tools/<to
 - **第 5-13 行**: 「自動配置」- 說明 `.claude/settings.json` 的角色
 - **第 87-95 行**: 「與 Tool Adapter 的關係」- 明確定義不同層級的責任
 
+## Linked Validation Scenarios
+
+- `validate_directory_structure` — 檢查 `ai-tools/` 中各工具文件的 README 是否列出所有子檔案，防止工具配置設計漏讀現有規則
+
 ← [Back to failure patterns](README.md)
