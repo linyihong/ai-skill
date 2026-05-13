@@ -613,3 +613,35 @@ records:
       profile: specialized
       compression_level: summary-first
       reason: 需要驗證 AI 決策品質時才讀取完整 scenario 與 rule 定義。
+
+  - id: route.intelligence.engineering.agent-architecture
+    task_intent: 了解 AI Agent 自身運作智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries）
+    primary_source: intelligence/engineering/agent-architecture/README.md
+    required_dependencies:
+      - intelligence/engineering/README.md
+    candidate_sources:
+      - intelligence/engineering/agent-architecture/context-collapse.md
+      - intelligence/engineering/agent-architecture/rule-overload.md
+      - intelligence/engineering/agent-architecture/task-routing.md
+      - intelligence/engineering/agent-architecture/attention-budgeting.md
+      - intelligence/engineering/agent-architecture/failure-recovery.md
+      - intelligence/engineering/agent-architecture/cognitive-boundaries.md
+      - shared-rules/failure-patterns/README.md
+      - shared-rules/decision-efficiency.md
+    source_of_truth_gate: design-layer-only
+    ranking_reason: agent-architecture 研究 AI Agent 自身的認知行為模式，與 shared-rules/failure-patterns/ 互補（後者記錄具體失效模式，前者解釋為什麼會發生）。
+    validation_signal: 各 atom 有明確原則、症狀表與預防方式，可反查驗證。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 2000
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: agent-architecture atoms 在需要理解 AI 行為模式時才讀取完整內容。

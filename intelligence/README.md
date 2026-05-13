@@ -31,6 +31,7 @@ intelligence/
     anti-patterns/         # 常見錯誤設計
     tradeoffs/             # 技術取捨智慧
     distributed-systems/   # 分散式系統生存經驗
+    agent-architecture/    # AI Agent 自身運作智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries）
   business/                # 商業決策智慧
   travel/                  # 特定領域智慧（Personal Domain Intelligence）
 ```

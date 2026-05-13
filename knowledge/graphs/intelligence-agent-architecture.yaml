@@ -1,0 +1,62 @@
+id: graph.intelligence-agent-architecture
+source: intelligence/engineering/agent-architecture/README.md
+status: candidate
+summary: >
+   連接 agent-architecture 層的所有 atoms：context-collapse、rule-overload、
+   task-routing、attention-budgeting、failure-recovery、cognitive-boundaries。
+   每個 atom 研究 AI Agent 自身的認知行為模式，與 shared-rules/failure-patterns/ 互補。
+edges:
+  - type: depends_on
+    target: intelligence/engineering/agent-architecture/README.md
+    reason: Agent-architecture README 提供目錄索引、atom 清單與各 atom 的簡要說明。
+    validation: README 列出所有 6 個 atoms 及其核心原則。
+
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/context-collapse.md
+    reason: 上下文崩塌 — 當上下文超過有效窗口時，agent 遺失早期決策並重複或矛盾。
+    validation: atom 定義 principle、symptom table、prevention 與 common misuse。
+
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/rule-overload.md
+    reason: 規則超載 — 當太多規則競爭注意力時，agent 遵循最近載入或最具體的規則。
+    validation: atom 定義 principle、symptom table、prevention 與 common misuse。
+
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/task-routing.md
+    reason: 任務路由 — Agent 路由決策由信號強度決定，不是信號正確性。
+    validation: atom 定義 principle、symptom table、prevention 與 common misuse。
+
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/attention-budgeting.md
+    reason: 注意力預算 — Agent 每個 session 有有限注意力，不必要的檔案讀取消耗推理預算。
+    validation: atom 定義 principle、symptom table、prevention 與 budget allocation table。
+
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/failure-recovery.md
+    reason: 失效恢復 — Agent 第一次恢復嘗試最可靠，無策略重試降低輸出品質。
+    validation: atom 定義 principle、symptom table、recovery strategy flow 與 prevention。
+
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/cognitive-boundaries.md
+    reason: 認知邊界 — Agent 無法可靠檢測自身認知邊界，需要外部關卡補償。
+    validation: atom 定義 principle、symptom table、external gate design principles 與 known boundaries table。
+
+  - type: related_to
+    target: shared-rules/failure-patterns/README.md
+    reason: failure-patterns 記錄具體 agent 失效模式，本層解釋為什麼會發生的認知原理。
+    validation: 兩者互補 — failure-patterns 提供 trigger/action/prevention，agent-architecture 提供 root cause 分析。
+
+  - type: related_to
+    target: shared-rules/decision-efficiency.md
+    reason: decision-efficiency 提供決策效率的執行規則，本層提供為什麼需要這些規則的認知基礎。
+    validation: decision-efficiency 的 Context Loading、Decision Routing 規則可在 agent-architecture 的 attention-budgeting 和 cognitive-boundaries 中找到理論依據。
+
+  - type: related_to
+    target: shared-rules/document-sizing.md
+    reason: document-sizing 提供文件拆分的執行規則，本層提供為什麼拆分能改善 agent 注意力的認知基礎。
+    validation: document-sizing 的拆分規則可在 agent-architecture 的 attention-budgeting 和 context-collapse 中找到理論依據。
+
+  - type: related_to
+    target: validation/README.md
+    reason: validation/ 提供 stateless 驗證場景，本層提供為什麼需要驗證的認知邊界理論。
+    validation: cognitive-boundaries atom 解釋 agent 無法自我檢測錯誤，因此需要外部 validation gate。

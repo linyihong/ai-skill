@@ -30,6 +30,7 @@
 | [`intelligence-apk-analysis-atoms.yaml`](intelligence-apk-analysis-atoms.yaml) | 連接 evidence-first-routing、live-readiness-gates atoms 與 skill、workflow、analysis。 | `candidate` |
 | [`intelligence-app-development-guidance.yaml`](intelligence-app-development-guidance.yaml) | 連接 docs-first-bdd-closure、risk-translation-heuristic、contract-governance-heuristic atoms 與 workflow、analysis 來源。 | `candidate` |
 | [`intelligence-repo-analysis.yaml`](intelligence-repo-analysis.yaml) | 連接 documentation-backfill-heuristic、traceability-heuristic atoms 與 analysis/repo/、workflow 來源。 | `candidate` |
+| [`intelligence-agent-architecture.yaml`](intelligence-agent-architecture.yaml) | 連接 agent-architecture 層的所有 atoms（context-collapse、rule-overload、task-routing、attention-budgeting、failure-recovery、cognitive-boundaries）與 shared-rules/failure-patterns/、decision-efficiency、document-sizing、validation。 | `candidate` |
 
 ### Runtime & Pipeline（Phase 14）
 
