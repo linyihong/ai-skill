@@ -79,7 +79,7 @@ Status: candidate
 
 #### Promotion Target
 
-- `skills/apk-analysis/techniques/local-proxy/non-standard-tls-hook.md`（舊結構）
+- `analysis/apk/workflows/local-proxy-hook-flow.md`（新分層）
 
 #### Required Linked Updates
 

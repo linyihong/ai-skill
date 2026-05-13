@@ -37,14 +37,60 @@
 
 ### 判斷流程
 
-1. 檢查該 skill 的 `SKILL.md` 或 `README.md`，確認是否有「新分層路徑（優先讀取）」章節。
-2. 若有新分層路徑 → 表示已遷移 → lesson 寫到新分層對應的 `feedback_history/`。
-3. 若無新分層路徑 → 表示尚未遷移 → lesson 寫到舊 `skills/<name>/feedback_history/`。
+1. **確認 lesson 的 skill 歸屬**：這個技巧屬於哪個 skill 的 scope？
+   - APK 分析技術（Frida hook、TLS capture、proxy 架構、response decoding）→ `apk-analysis`
+   - 開發指引（SDK 設計、API contract、BDD、測試策略、release gate）→ `app-development-guidance`
+   - 若不確定，先讀取該 skill 的 `SKILL.md` 確認 scope 描述。
+2. **檢查該 skill 的 `SKILL.md` 或 `README.md`**，確認是否有「新分層路徑（優先讀取）」章節。
+3. 若有新分層路徑 → 表示已遷移 → lesson 寫到新分層對應的 `feedback_history/`，並依 lesson 性質選擇層級：
+   - 執行流程相關 → `workflow/<name>/feedback_history/`
+   - 分析方法相關 → `analysis/<name>/feedback_history/`
+   - 工程智慧相關 → `intelligence/<name>/feedback_history/`
+4. 若無新分層路徑 → 表示尚未遷移 → lesson 寫到舊 `skills/<name>/feedback_history/`。
 
 ### 範例
 
 - **已遷移（app-development-guidance）**：lesson 應放 `workflow/app-development-guidance/feedback_history/` 或 `intelligence/engineering/app-development-guidance/feedback_history/`，**不是** `skills/app-development-guidance/feedback_history/`。
-- **尚未遷移（apk-analysis）**：lesson 仍放 `skills/apk-analysis/feedback_history/`。
+- **已遷移（apk-analysis）**：lesson 應放 `workflow/apk-analysis/feedback_history/`、`analysis/apk/feedback_history/` 或 `intelligence/engineering/apk-analysis/feedback_history/`，**不是** `skills/apk-analysis/feedback_history/`。
+
+### ⚠️ 常見錯誤（必讀）
+
+以下錯誤案例來自實際 feedback lesson 寫入失誤，新 agent 在建立 lesson 前應先閱讀，避免重蹈覆轍：
+
+#### ❌ 錯誤 1：混淆 lesson 的 skill 歸屬
+
+**情境**：從 TATA 專案學到「非標準 TLS bypasses SSL hooks」和「dart:io HttpClient bypasses Java hooks」
+
+**錯誤行為**：把這兩個 lesson 放到 `intelligence/engineering/app-development-guidance/feedback_history/common/`
+
+**為什麼錯**：這兩個是 APK 分析技術（Frida hook 策略），不是開發指引。`app-development-guidance` 的 scope 是 SDK 設計、API contract、BDD、測試策略。
+
+**正確做法**：
+- 先確認 lesson 屬於哪個 skill：非標準 TLS hook 是 APK 分析技術 → `apk-analysis`
+- 再確認遷移狀態：`apk-analysis` 已遷移 → 使用新分層路徑
+- 最終位置：`analysis/apk/feedback_history/local-proxy/`（分析方法）
+
+#### ❌ 錯誤 2：已遷移 skill 的 lesson 放到舊路徑
+
+**情境**：`apk-analysis` 已遷移至新分層（`SKILL.md` 有「新分層路徑（優先讀取）」），但 agent 仍把 lesson 放到 `skills/apk-analysis/feedback_history/`
+
+**錯誤行為**：使用舊 `skills/<name>/feedback_history/` 路徑
+
+**為什麼錯**：已遷移 skill 的 lesson 必須放到對應的新分層路徑。舊路徑僅保留向後相容，新 lesson 不得寫入。
+
+**正確做法**：`analysis/apk/feedback_history/local-proxy/`（分析技術）
+
+#### ✅ 正確範例：完整的判斷流程
+
+**Lesson 主題**：「External JVM SDK 無法直接呼叫受 PerimeterX 保護的 API」
+
+**判斷流程**：
+1. 這是一個開發指引（SDK 設計限制），不是 APK 分析技術 → `app-development-guidance`
+2. `app-development-guidance` 已遷移 → 使用新分層路徑
+3. 這是工程智慧（理解 anti-bot 的行為邊界）→ `intelligence/engineering/app-development-guidance/feedback_history/`
+4. ✅ 最終位置：`intelligence/engineering/app-development-guidance/feedback_history/common/2026-05-13_094500-anti-bot-gateway-blocks-external-sdk.md`
+
+> 更多 failure pattern 請見 [`shared-rules/failure-patterns/skill-classification-boundary-confusion.md`](failure-patterns/skill-classification-boundary-confusion.md)。
 
 成熟後可將 lesson 整理進該 skill 的 `workflow/<domain>/execution-flow.md`、`analysis/<domain>/` 或 `intelligence/<domain>/`（見模板中 **Promotion Target**）。已遷移 skill 的舊結構路徑（`WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md`、`techniques/`）已被刪除，不再保留向後相容。
 
