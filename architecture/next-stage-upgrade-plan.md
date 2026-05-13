@@ -552,10 +552,11 @@ metadata/
 
 ```text
 analysis/
-  apk/           ← APK 分析方法（pilot migrated）
-  repo/          ← Repository 分析與理解方法
-  production/    ← Production 問題分析與根因追蹤
-  issue/         ← Issue 分類與優先級判斷
+  apk/                     ← APK 分析方法（pilot migrated）
+  app-development-guidance/ ← 開發指引分析方法（風險翻譯、控制層選擇）與參考 catalog
+  repo/                    ← Repository 分析與理解方法
+  production/              ← Production 問題分析與根因追蹤
+  issue/                   ← Issue 分類與優先級判斷
 ```
 
 核心責任：

@@ -5,6 +5,7 @@
 ## 目前入口
 
 - [`apk/`](apk/README.md)：`apk-analysis` pilot 的分析方法候選目的地；目前仍 reference `skills/apk-analysis/`，不搬移大量內容。
+- [`app-development-guidance/`](app-development-guidance/README.md)：開發指引的分析方法（風險翻譯、控制層選擇）與參考 catalog（controls、implementation、platforms、languages）。
 - [`repo/`](repo/README.md)：Repository 分析與理解方法（結構觀察、依賴分析、心智模型建立、技術債評估）。
 - [`production/`](production/README.md)：Production 問題分析與根因追蹤方法（incident 分類、觀測性資料判讀、RCA 流程、效能診斷）。
 - [`issue/`](issue/README.md)：Issue 分類與優先級判斷方法（triage 流程、優先級計算、初步診斷、重複偵測）。
