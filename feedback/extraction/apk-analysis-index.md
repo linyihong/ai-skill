@@ -2,6 +2,10 @@
 
 本索引列出 `skills/apk-analysis/feedback_history/` 下所有 lessons，依其 `Promotion Target` 分類到對應的目標層。此索引讓 `feedback/` 層可發現 lessons，並追蹤哪些 lessons 已被提取到目標層。
 
+> ⚠️ **Lesson 已搬遷**：所有 lesson 實體已移至 [`feedback/history/apk-analysis/`](../history/apk-analysis/README.md)。本索引保留作為 extraction 追蹤用途，來源路徑 `skills/apk-analysis/feedback_history/` 保留僅供向後相容。
+>
+> 搬遷日期：2026-05-13
+
 ## 索引說明
 
 | 欄位 | 說明 |

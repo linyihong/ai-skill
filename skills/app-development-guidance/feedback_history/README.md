@@ -1,5 +1,9 @@
 # app-development-guidance feedback history
 
+> ⚠️ **已搬遷**：所有 lesson 已移至 [`feedback/history/app-development-guidance/`](../../../feedback/history/app-development-guidance/README.md)。本目錄保留僅供向後相容參考，新 lesson 請勿再寫入此處。
+>
+> 搬遷日期：2026-05-13
+
 Each file in this directory is one reusable app development guidance lesson.
 
 Follow [`shared-rules/feedback-lessons.md`](../../../shared-rules/feedback-lessons.md). Do not duplicate shared rules in every lesson.

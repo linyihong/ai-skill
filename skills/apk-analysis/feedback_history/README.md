@@ -1,5 +1,9 @@
 # feedback_history 索引
 
+> ⚠️ **已搬遷**：所有 lesson 已移至 [`feedback/history/apk-analysis/`](../../../feedback/history/apk-analysis/README.md)。本目錄保留僅供向後相容參考，新 lesson 請勿再寫入此處。
+>
+> 搬遷日期：2026-05-13
+
 下列為條目檔名與摘要；完整內容請開啟對應 `.md`。檔名格式：**`YYYY-MM-DD_HHMMSS-<slug>.md`**（`HHMMSS` 為 24 小時制本機時間）。
 
 | 檔案 | Status | 標題 | 一句話摘要 |
