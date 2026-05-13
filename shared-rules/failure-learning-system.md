@@ -127,7 +127,7 @@ Pattern records 要短。若 pattern 變長，將 examples 拆成較小 pattern 
 1. 定位 canonical `<AI_SKILL_REPO>` git root。
 2. 在該 repo 確認 `git status --short --branch`。
 3. 先編輯 canonical source files。
-4. 將 `.cursor`、`~/.cursor/skills*`、`~/.cursor/shared-rules`、`~/.cursor/bundles/*`、generated bundles 與 project-local mirrors 視為 deployment/runtime surfaces。
+4. 將工具部署 / mirror 路徑（如 `~/.cursor/`、`~/.claude/`、專案本機設定檔、generated bundles 與 project-local mirrors）視為 deployment/runtime surfaces。具體工具部署路徑見 [`ai-tools/agent/`](../ai-tools/agent/) 中各工具文件。
 5. Source repo change 完成後才同步 mirrors。
 6. Commit、push、read back，並確認 clean status 後才宣稱完成。
 

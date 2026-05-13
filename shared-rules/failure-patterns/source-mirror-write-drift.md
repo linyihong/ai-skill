@@ -5,7 +5,7 @@ Class: `source-mirror-drift`
 
 ## Trigger
 
-當使用者要求 agent 更新 rules、skills、tool setup、feedback lessons、templates 或 OS guidance，且可見檔案位於 project `.cursor`、`~/.cursor`、generated bundle、runtime copy 或其他 tool mirror 時，使用此 pattern。
+當使用者要求 agent 更新 rules、skills、tool setup、feedback lessons、templates 或 OS guidance，且可見檔案位於工具部署 / mirror 路徑（如 `~/.cursor/`、`~/.claude/`、專案本機設定檔、generated bundle、runtime copy 或其他 tool mirror）時，使用此 pattern。具體工具部署路徑見 [`ai-tools/agent/`](../../ai-tools/agent/) 中各工具文件。
 
 ## Failure Mode
 
@@ -14,7 +14,7 @@ Agent 編輯目前工具看得到的 copy，而不是 canonical `<AI_SKILL_REPO>
 ## Risk
 
 - 下一個 agent 讀到 stale canonical rules，並重複同一錯誤。
-- Project-local `.cursor` copy 與 shared knowledge base 分歧。
+- Project-local mirror copy 與 shared knowledge base 分歧。
 - Agent 誤以為 mirror 是 source，跳過 tool sync、commit、push 與 readback gates。
 - Private project paths 或 tool-local details 可能洩漏進 reusable docs。
 
@@ -24,7 +24,7 @@ Agent 編輯目前工具看得到的 copy，而不是 canonical `<AI_SKILL_REPO>
 2. 定位 `<AI_SKILL_REPO>`，並確認它是 git root。
 3. 在 `<AI_SKILL_REPO>` 檢查 `git status --short --branch`。
 4. 在 canonical source file 套用 reusable change。
-5. 將 project `.cursor`、`~/.cursor/skills*`、`~/.cursor/shared-rules`、`~/.cursor/bundles/*` 與 generated bundles 視為 deployment 或 runtime surfaces。
+5. 將工具部署 / mirror 路徑（如 `~/.cursor/`、`~/.claude/`、專案本機設定檔、generated bundles 與 project-local mirrors）視為 deployment 或 runtime surfaces。具體工具部署路徑見 [`ai-tools/agent/`](../../ai-tools/agent/) 中各工具文件。
 6. 只有 source changes 正確後，才執行 configured tool sync。
 7. 宣稱完成前，commit、push、reread updated entries，並確認 clean status。
 
