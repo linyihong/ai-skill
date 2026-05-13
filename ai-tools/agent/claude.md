@@ -14,13 +14,55 @@ Claude Code 啟動時會自動讀取根目錄的 `CLAUDE.md`。本庫的 `CLAUDE
 
 `.claude/settings.json` 記錄 Claude Code 的工具特定設定（permissions、bootstrap 路徑等）。詳細內容見該檔案本身，此處不重複。
 
-## Claude 操作注意
+## Claude Code 與對話目標閉環
 
-- Claude 若只能看到單一專案，請同時提供 `<AI_SKILL_REPO>` 的可讀路徑，或把必要 skill/shared-rules 以工具支援的方式同步成可讀上下文。
-- 如果 Claude 已經長時間對話，請先要求它讀 `<PROJECT_ROOT>/.agent-goals/`，確認未完成項、優先順序與 owner/lock 狀態。
-- 如果 goal 標示 `single-owner` 或 `non-parallelizable`，不要讓 Claude 和其他 agent 分工同一流程；先取得使用者確認。
-- 若 Claude 要改本庫，提醒它不要只更新文件；還要跑驗證、commit、push、讀回和 clean status。
-- 若 Claude 完成 goal 後仍留下長期 roadmap 或治理狀態，要求它先回寫到 durable planning 文件，再刪除 active goal。
+工具中立規則見 [`shared-rules/conversation-goal-ledger.md`](../../shared-rules/conversation-goal-ledger.md)。Claude Code 是 CLI 工具，沒有 hooks 機制，但可以透過 `CLAUDE.md` 中的 Custom Instructions 和操作注意來實作對話目標閉環。
+
+### 在 `CLAUDE.md` 中加入 goal ledger 提醒
+
+本知識庫的 [`CLAUDE.md`](../../CLAUDE.md) 已包含以下內容：
+
+```text
+開始工作前，若 `<PROJECT_ROOT>/.agent-goals/` 存在，先讀取確認是否有未完成的 active goal。
+若 goal 標示 `single-owner` 或 `non-parallelizable`，不要和其他 agent 分工同一流程；先取得使用者確認。
+完成目標後，若仍有長期 roadmap 或治理狀態，先回寫到 durable planning 文件，再刪除 active goal。
+```
+
+### 建議操作
+
+在 Claude Code 開始可中斷、可拆解或多目標工作時，或已看到 active project 有 modified / staged / untracked files、已建立 TodoWrite、使用者說「繼續」前一個多步驟任務時：
+
+1. 讀取 `<PROJECT_ROOT>/.agent-goals/`，確認是否已有 active / blocked / needs-validation goal，以及 priority、owner、lock、parallelization mode、plan/todo links、missing/decision/strengthen。若使用者說 agent 中斷、突然關閉、要從哪裡重做、剩下什麼或下一步是什麼，必須先讀 `.agent-goals/README.md` 與對應 active goal，再用 transcripts、terminal output、git status 交叉確認；不要把 transcript/git 當成第一真相來源。
+2. 若沒有 ledger 且任務不是單一回覆即可完成，使用本庫 helper 初始化；不要因為已有 TodoWrite 就跳過 goal ledger：
+
+   ```bash
+   <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> init
+   ```
+
+3. 建立或更新本輪主要目標：
+
+   ```bash
+   <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> start \
+     --id P1-short-goal \
+     --title "Short goal title" \
+     --source "User request summary" \
+     --parallelization single-owner \
+     --next "Next concrete action" \
+     --criteria "Observable completion condition"
+   ```
+
+4. 若使用者轉移目標，先 `pause` 或 `update --status superseded` 舊 goal，再建立新的 `P1`。
+5. 若有 planning 文件或 TodoWrite todo，使用 `--plan` / `--todo` 連到 goal，並讓 `.agent-goals/README.md` 的主目標表可快速跳回該 goal。
+6. 若發現需要拆小目標，使用 `split` 或在 goal 檔的 `Subgoals` 區塊記錄；若發現不能分工或需單一 owner，使用 `--parallelization single-owner|non-parallelizable` 更新。
+7. 在回覆完成前，只有完成條件與驗證都成立時才 `complete --validated`；條件已成立時必須同輪刪除 goal 並刷新 `.agent-goals/README.md`，不要把 `completed` row 留在 active 表。若該 goal 完成後仍有長期 roadmap、phase、migration、promotion、deprecation 或治理狀態，先回寫到 durable planning 文件，再刪除 active goal。否則保留 goal，讓下一個 agent 可接手。
+
+### 與 Cursor 的差異
+
+| 特性 | Cursor | Claude Code |
+|------|--------|-------------|
+| 自動提醒機制 | `.cursor/hooks.json`（sessionStart / preCompact / stop） | 無 hooks，需在 `CLAUDE.md` 中手動提醒 |
+| Goal ledger 操作 | 可透過 hooks 自動檢查 | 需在每個 session 開始時手動讀取 |
+| 設定位置 | `.cursor/rules/*.mdc` + hooks.json | `CLAUDE.md`（Custom Instructions） |
 
 ## 與 Tool Adapter 的關係
 
