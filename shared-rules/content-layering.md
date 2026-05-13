@@ -18,6 +18,7 @@
 | 全庫**依賴讀取鐵則、dependency read ledger 與 writeback transaction gate**（發現 skill/rule/template/lesson 更新時必須讀相關依賴，重讀 skill 時列出已讀/不適用/阻塞項，寫入 Ai-skill 時必須先定位 canonical repo，不把工具 mirror 當 source，並完成 sync/commit/push/readback/clean status） | **[`dependency-reading.md`](dependency-reading.md)**（全庫唯一正文） |
 | 全庫**可重用規則與專案證據邊界**（incident 只能抽象成通用原因、規則與驗證；具體證據留專案） | **[`reusable-guidance-boundary.md`](reusable-guidance-boundary.md)**（全庫唯一正文） |
 | 可重用的**單一技巧、lesson 全文** | **`feedback/history/<domain>/`**（統一目標路徑）；舊結構保留：`skills/<skill-name>/feedback_history/`、`workflow/<name>/feedback_history/`、`analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/`（向後相容，僅限既有 lesson 尚未搬遷）。成熟 lesson 可 promotion 到 `intelligence/<domain>/` 或 `workflow/<domain>/` |
+| **intelligence 內部：entry vs solution 分層** | 見下方 [Intelligence Entry/Solution 分層](#intelligence-entrysolution-分層) |
 | 某 skill 的**工具策略 adapter**（同一 skill 在某 AI 工具上的執行差異） | 新分層：`tools/adapters/<tool>.md`；舊結構保留：`skills/<skill-name>/tool-adapters/<tool>.md`（向後相容，僅限尚未遷移的 skill；已遷移 skill 的舊 tool-adapters 路徑已被刪除）。只寫該工具差異並連回核心 workflow，工具全域設定仍放 `ai-tools/<tool>.md` |
 | **如何**下筆、命名、模板 | **[`feedback-lessons.md`](feedback-lessons.md)**（全庫唯一）；各 skill 可選保留一行入口 `FEEDBACK.md` 指向該檔 |
 | **某 skill 需要引用另一個 skill 的規範或交接產物** | 在 referring skill 寫短 cross-link 與觸發條件；規則見 **[`cross-skill-references.md`](cross-skill-references.md)**；不要複製 target skill 的全文 |
@@ -37,5 +38,45 @@
 | 系統設計文件 | `design/README.md` + `design/architecture.md` + `design/data-model.md` |
 | 專案 wiki | `wiki/README.md` + `wiki/onboarding.md` + `wiki/development-setup.md` |
 | 技術文件集 | `docs/README.md` + `docs/guides/` + `docs/references/` + `docs/tutorials/` |
+
+## Intelligence Entry/Solution 分層
+
+當 `intelligence/<domain>/` 下的知識點同時涉及「診斷/偵測」與「解法/預防」時，應採用 **entry/solution 分層**，避免同一知識點在多處重複：
+
+### 原則
+
+1. **一個知識點只放一份解法**，但可以有多個入口指向它。
+2. **入口（Entry）**：症狀驅動、問題驅動的分類。當 agent 遇到具體錯誤或現象時，從這裡切入。例如：
+   - `failure/` — 「我出了什麼錯？」（錯誤症狀、診斷方式）
+   - `signals/` — 「我看到什麼現象？」（觀察到的信號）
+   - `anti-patterns/` — 「我是不是在走彎路？」（可預防的錯誤模式）
+3. **解法（Solution）**：規則驅動、預防驅動的分類。當 agent 需要知道「正確做法是什麼」時，從這裡找。例如：
+   - `heuristics/` — 「我應該怎麼做？」（啟發式規則、決策表）
+   - `patterns/` — 「正確的模式是什麼？」（設計模式、最佳實踐）
+4. **入口檔案**只放症狀描述與診斷方式，解法直接指向 solution 分類的對應檔案，不重複解法內容。
+5. **解法檔案**頂部可反向引用入口（「如果遇到症狀，先看 entry 確認」），但本體只放預防規則與驗證方式。
+
+### 範例
+
+```
+intelligence/engineering/apk-analysis/
+  failure/
+    javascript-bitwise-64bit-truncation.md    # 入口：症狀（undecoded、access violation）+ 診斷方式
+                                                # → 解法見 heuristics/javascript-bitwise-64bit-truncation.md
+  heuristics/
+    javascript-bitwise-64bit-truncation.md    # 解法：預防規則、決策表、驗證碼
+                                                # → 頂部引用 failure 入口
+```
+
+### 適用時機
+
+- 同一個知識點同時有「診斷/偵測」和「解法/預防」兩個面向
+- 多個入口（failure、signals、anti-patterns）指向同一個解法
+- 解法需要在多處被引用（避免重複）
+
+### 不適用時機
+
+- 純粹的參考資料（如 API 規格、資料格式），沒有「診斷 vs 解法」的區分
+- 只有單一面向的知識點（只有解法沒有診斷，或只有診斷沒有解法）
 
 ← [回到共用規則索引](README.md)
