@@ -69,8 +69,7 @@ Tool-specific details 屬於 `ai-tools/`。Generic rules 應使用「configured 
 
 | Surface | 目前角色 | 保留條件 | 移除或 deprecation 信號 |
 | --- | --- | --- | --- |
-| `shared-rules/cursor-sync.md` | Cursor-specific reference/symlink/bundle/copy strategy guide。 | Cursor users 仍需要 local mirrors 的具體 setup 與 troubleshooting。 | 當 Cursor workflows 不再需要 mirror setup guidance 時，將細節完全移到 `ai-tools/cursor.md` 或 archive。 |
-| `ai-tools/cursor.md` | Cursor adapter，說明 reference-first loading、optional native skill scanning 與 project/global `.cursor` paths。 | Cursor 仍是 active tool adapter。 | 保留作為 tool adapter；只有沒有 Cursor workflow 需要 copy/bundle sections 時才移除那些段落。 |
+| `ai-tools/agent/cursor.md` | Cursor adapter，說明 reference-first loading、Core Bootstrap 與語言偏好設定。 | Cursor 仍是 active tool adapter。 | 保留作為 tool adapter。 |
 | `scripts/sync-cursor-bundle.sh` | `~/.cursor/bundles` 與 `~/.cursor/skills` 的 optional symlink/bundle bridge。 | 任何 local setup 仍需要 Cursor native scan 或 bundle paths。 | 當 native scan workflows 有 documented reference-first 或 symlink-free replacement 時 deprecate。 |
 | `scripts/git-hooks/post-commit` with `AI_SKILL_SYNC_CURSOR_BUNDLE=1` | 明確 opt in 的 post-commit mirror refresh。 | Users 想在 commits 後自動 refresh local mirror。 | `sync-cursor-bundle.sh` deprecated 後，或沒有 active setup export 該 opt-in flag 時移除。 |
 | `dependency-reading.md`、`linked-updates.md`、`failure-learning-system.md` 與 `failure-patterns/source-mirror-write-drift.md` 中的 source/mirror guardrails | 防止 `.cursor`、`~/.cursor`、bundles 或 generated copies 被誤認為 source updates。 | 任何 mirror、runtime copy 或 tool deployment surface 仍存在。 | 即使 bundle scripts 移除，只要 tool adapter 仍可能建立 runtime copies，就保留。 |

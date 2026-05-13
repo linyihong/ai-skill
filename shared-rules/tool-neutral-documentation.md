@@ -48,7 +48,7 @@
 
 ## 與既有工具文件的關係
 
-本 repository 目前包含 Cursor-specific 文件與 helper scripts。它們仍然有效，但引用應集中在 `ai-tools/cursor.md`、`shared-rules/cursor-sync.md`、`.cursor/rules/` 與 script docs；如果 script 本身是工具專屬，也可在 script docs 說明。
+本 repository 目前包含 Cursor-specific 文件與 helper scripts。它們仍然有效，但引用應集中在 `ai-tools/agent/cursor.md`、`.cursor/rules/` 與 script docs；如果 script 本身是工具專屬，也可在 script docs 說明。
 
 可重用文件可以把工具當作範例提及，但不可把工具寫成預設要求；除非該文件本來就在該工具的文件區域內。
 

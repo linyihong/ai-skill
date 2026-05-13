@@ -49,7 +49,6 @@
 | [feedback-lessons.md](feedback-lessons.md) | 撰寫或 promotion lesson | ~600 | P2 |
 | [content-layering.md](content-layering.md) | 遷移或重構內容 | ~300 | P2 |
 | [reusable-guidance-boundary.md](reusable-guidance-boundary.md) | 泛化 lesson 為 reusable rule | ~400 | P2 |
-| [cursor-sync.md](cursor-sync.md) | Cursor 工具同步 | ~300 | P3 |
 
 ### Activation 判斷流程
 
@@ -85,7 +84,6 @@
 | Cross-skill references | [cross-skill-references.md](cross-skill-references.md) | 一個 skill 需要引用另一個 skill 的規範、模板、交接產物或驗證流程時怎麼寫。 | lazy (P2) |
 | 連動更新 | [linked-updates.md](linked-updates.md) | 全庫必須連動更新規則：改一處影響多處時，相關文件必須同步更新或明確檢查。 | lazy (P1) |
 | Feedback 與技巧條目 | [feedback-lessons.md](feedback-lessons.md) | **檔名規則、模板、agent 行為、索引**（唯一正文）；所有 lesson 統一放在 `feedback/history/<domain>/`，舊 `skills/<name>/feedback_history/` 僅保留向後相容。 | lazy (P2) |
-| Cursor 同步 | [cursor-sync.md](cursor-sync.md) | Cursor 專屬同步策略與注意事項。 | lazy (P3) |
 | VS Code Extension 全域設定修改 | [vscode-extension-global-state.md](../ai-tools/ide/vscode-extension-global-state.md) | VS Code Extension 的全域設定儲存在 SQLite 資料庫中，修改方法與注意事項。 | lazy (P2) |
 
 

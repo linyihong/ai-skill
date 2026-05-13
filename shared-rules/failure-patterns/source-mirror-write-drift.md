@@ -40,7 +40,7 @@ Agent 編輯目前工具看得到的 copy，而不是 canonical `<AI_SKILL_REPO>
 | Sync strategy | 目前是 reference-only、symlink/bundle，還是 copy snapshot？ |
 | Close loop | 會跑哪些 diff review、sync、commit、push、readback 與 clean-status checks？ |
 
-若任何答案未知，不要編輯 mirror。先讀 [`dependency-reading.md`](../dependency-reading.md)、[`cursor-sync.md`](../cursor-sync.md) 與相關 `ai-tools/` 文件。
+若任何答案未知，不要編輯 mirror。先讀 [`dependency-reading.md`](../dependency-reading.md) 與相關 `ai-tools/` 文件。
 
 ## 驗證
 
@@ -56,7 +56,6 @@ Agent 編輯目前工具看得到的 copy，而不是 canonical `<AI_SKILL_REPO>
 
 - [`failure-learning-system.md`](../failure-learning-system.md)
 - [`dependency-reading.md`](../dependency-reading.md)
-- [`cursor-sync.md`](../cursor-sync.md)
 - [`tool-neutral-documentation.md`](../tool-neutral-documentation.md)
 - [`linked-updates.md`](../linked-updates.md)
 
