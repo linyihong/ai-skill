@@ -33,6 +33,7 @@ APK analysis session 經常浪費 token，原因如下：
 | 偵測到 Flutter libapp.so | 使用 blutter/unflutter + Dart AOT hooks | 讀取 HTTP API technique docs |
 | Proxy CONNECT 成功但 TLS 失敗 | 檢查 CA trust、network config、pinning | 假設「proxy 不能用」 |
 | 只有 pcap SNI 可見 | 在 decompiled code 中靜態搜尋 host/path | 跳過 request shape 直接解密 |
+| Frida constructor chain 顯示 `PBC.ctor`（PaddedBlockCipher）但 mode（CBC vs SIC vs GCM）無法從 `processBlock` count 區分 | 執行 live proxy test：分別用不同 mode 加密相同明文，比對 HTTP response status code | 僅依賴 block count 猜測 mode（43 blocks 可對應多種 mode） |
 
 ## Token 影響
 

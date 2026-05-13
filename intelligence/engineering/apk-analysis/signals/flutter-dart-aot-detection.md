@@ -24,6 +24,16 @@
 | 靜態字串包含 `HttpClient`（dart:io） | `grep -r "HttpClient" libapp.so` | 中 |
 | 靜態字串包含加密相關名稱 | `grep -r "encrypt\|decrypt\|AES" libapp.so` | 中低 |
 
+### 進階信號（Frida 動態檢測，中高可信度）
+
+| 信號 | 檢查方式 | 可信度 |
+|------|---------|-------|
+| Frida constructor chain 顯示 `AES.ctor`、`Key.ctor`、`IV.ctor` | Hook Dart `encrypt` package constructors（需先識別 libapp.so offset） | 中高 |
+| Frida 顯示 `PBC.ctor`（PaddedBlockCipher） | Hook `PaddedBlockCipher` constructor | 中高 |
+| Frida 顯示 `CBCBlockCipher.ctor` | Hook `CBCBlockCipher` constructor | 中高 |
+| Frida 顯示 `GCMBlockCipher.ctor` | Hook `GCMBlockCipher` constructor（注意：可能屬於不同 encryption group） | 中高 |
+| Frida 顯示 `processBlock` 被呼叫 43 次 | Hook `CBCBlockCipher.processBlock` / `GCMBlockCipher.processBlock` | 中（需 live proxy test 確認 mode） |
+
 ### 排除信號
 
 | 信號 | 意義 |
