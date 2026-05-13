@@ -32,6 +32,7 @@ intelligence/
     tradeoffs/             # 技術取捨智慧
     distributed-systems/   # 分散式系統生存經驗
     agent-architecture/    # AI Agent 自身運作智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries）
+  ide/                     # IDE 生態系統知識（VS Code Extension 全域設定儲存機制等）
   business/                # 商業決策智慧
   travel/                  # 特定領域智慧（Personal Domain Intelligence）
 ```

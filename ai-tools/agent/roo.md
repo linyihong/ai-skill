@@ -132,21 +132,21 @@ If the user switches languages, follow their switch.
 
 Roo Code 的全域設定儲存在 VS Code 的 **globalStorage SQLite 資料庫**中。其中的 `language` 欄位（預設 `"en"`）會影響 system prompt 的建構。
 
-VS Code Extension 全域設定的通用查詢/修改方法見 [`intelligence/engineering/ide/vscode-extension-global-state.md`](../../intelligence/engineering/ide/vscode-extension-global-state.md)。Roo Code 專屬的 key 為 `RooVeterinaryInc.roo-cline`，需修改的欄位為 `language`（設為 `"zh-CN"`）。
+VS Code Extension 全域設定的通用查詢/修改方法見 [`intelligence/ide/vscode-extension-global-state.md`](../../intelligence/ide/vscode-extension-global-state.md)。Roo Code 專屬的 key 為 `RooVeterinaryInc.roo-cline`，需修改的欄位為 `language`（設為 `"zh-CN"`）。
 
 ### 如何預設語言偏好以跟隨文件規則
 
 本知識庫的文件規則要求：**預設英文，但跟隨使用者語言**。要讓 Roo Code 遵守此規則，需完成以下步驟：
 
 1. **建立 `.roomodes`**（已建立）：在專案根目錄建立 `.roomodes`，每個 mode 的 `customInstructions` 中包含上述軟性語言偏好設定。
-2. **修改全域 `language` 欄位**（已修改）：將 SQLite 中的 `language` 從 `"en"` 改為 `"zh-CN"`，避免 system prompt 強制使用英文。通用修改方法見 [`intelligence/engineering/ide/vscode-extension-global-state.md`](../../intelligence/engineering/ide/vscode-extension-global-state.md)。
+2. **修改全域 `language` 欄位**（已修改）：將 SQLite 中的 `language` 從 `"en"` 改為 `"zh-CN"`，避免 system prompt 強制使用英文。通用修改方法見 [`intelligence/ide/vscode-extension-global-state.md`](../../intelligence/ide/vscode-extension-global-state.md)。
 3. **驗證**：啟動新 session 後，用中文提問確認 agent 以中文回應。
 
 > **注意**：如果只做步驟 1 不做步驟 2，Roo Code 的 system prompt 仍可能因 `language: "en"` 而傾向英文。兩個層級都設定才能完整解決。
 
 ### 相關資源
 
-- VS Code Extension 全域設定修改通用指南: [`intelligence/engineering/ide/vscode-extension-global-state.md`](../../intelligence/engineering/ide/vscode-extension-global-state.md)
+- VS Code Extension 全域設定修改通用指南: [`intelligence/ide/vscode-extension-global-state.md`](../../intelligence/ide/vscode-extension-global-state.md)
 - Failure pattern: [`shared-rules/failure-patterns/language-preference-drift.md`](../../shared-rules/failure-patterns/language-preference-drift.md)
 - Feedback lesson: [`feedback/history/roo-code/2026-05-13_124800-language-preference-drift.md`](../../feedback/history/roo-code/2026-05-13_124800-language-preference-drift.md)
 - 設定檔: [`.roomodes`](../../.roomodes)

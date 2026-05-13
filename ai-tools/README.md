@@ -6,7 +6,7 @@
 |------|------|----------|
 | [`agent/`](agent/) | AI Agent 工具（CLI 或 IDE 內建的 AI 助手） | Roo Code、Cursor、Claude Code |
 
-> **注意**：VS Code Extension 全域設定的通用知識（SQLite 資料庫位置、結構、查詢/修改方法）已昇華到 [`intelligence/engineering/ide/vscode-extension-global-state.md`](../intelligence/engineering/ide/vscode-extension-global-state.md) 作為可重複使用的工程智慧。各 agent 工具（如 Roo Code）的專屬設定細節留在對應的工具文件中。
+> **注意**：VS Code Extension 全域設定的通用知識（SQLite 資料庫位置、結構、查詢/修改方法）已昇華到 [`intelligence/ide/vscode-extension-global-state.md`](../intelligence/ide/vscode-extension-global-state.md) 作為可重複使用的工程智慧。各 agent 工具（如 Roo Code）的專屬設定細節留在對應的工具文件中。
 
 新增其他工具時，依 [`agent-onboarding.md`](agent-onboarding.md) 的 checklist 完成設定。
 

@@ -12,7 +12,6 @@
 | [`anti-patterns/`](anti-patterns/README.md) | 反模式 |
 | [`distributed-systems/`](distributed-systems/README.md) | 分散式系統 |
 | [`agent-architecture/`](agent-architecture/README.md) | AI Agent 自身運作的智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries、pilot-first validation、failure-to-scenario closure、linked-updates completeness、decomposition strategy、stateless validation） |
-| [`ide/`](ide/README.md) | IDE 生態系統知識（VS Code Extension 全域設定儲存機制、SQLite 查詢/修改方法等可重複使用的工程智慧） |
 | [`apk-analysis/`](apk-analysis/README.md) | APK 分析工程智慧 |
 | [`app-development-guidance/`](app-development-guidance/README.md) | 開發指引工程智慧 |
 | [`repo-analysis/`](repo-analysis/README.md) | Repository 分析工程智慧 |
@@ -23,4 +22,4 @@
 - `workflow/` 提供執行流程，本層提供選擇流程的決策邏輯。
 - `skills/` 是原始來源，已不再作為 active entrypoint。
 - `agent-architecture/` 研究 AI Agent 自身的認知行為模式，與 `shared-rules/failure-patterns/` 互補（後者記錄具體失效模式，前者解釋為什麼會發生）。
-- `ide/` 記錄 IDE 生態系統的工程智慧（如 VS Code Extension 全域設定的 SQLite 儲存機制），與 `ai-tools/agent/` 中的工具設定互補（後者記錄特定工具的設定細節，前者提供通用的底層知識）。
+- IDE 生態系統知識（VS Code Extension 全域設定儲存機制等）已移至 [`intelligence/ide/`](../ide/README.md)，與本層同為 `intelligence/` 下的獨立子目錄。

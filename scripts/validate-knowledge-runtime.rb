@@ -376,7 +376,10 @@ def validate_directory_structure
     end
   end
 
-  COUNTS[:intelligence_domains] = Dir.glob((ROOT + "intelligence/engineering/*").to_s).count { |p| File.directory?(p) }
+  # Count engineering subdomains + top-level intelligence subdirectories (ide, business, travel, etc.)
+  eng_domains = Dir.glob((ROOT + "intelligence/engineering/*").to_s).count { |p| File.directory?(p) }
+  top_domains = Dir.glob((ROOT + "intelligence/*").to_s).count { |p| File.directory?(p) && File.basename(p) != "engineering" }
+  COUNTS[:intelligence_domains] = eng_domains + top_domains
   COUNTS[:analysis_domains] = Dir.glob((ROOT + "analysis/*").to_s).count { |p| File.directory?(p) }
   COUNTS[:workflow_domains] = Dir.glob((ROOT + "workflow/*").to_s).count { |p| File.directory?(p) }
 end
@@ -404,18 +407,18 @@ def validate_no_outdated_active_entrypoint
 end
 
 def validate_intelligence_ide_knowledge
-  # Check that intelligence/engineering/ide/ exists and has proper structure.
-  # This knowledge was promoted from ai-tools/ide/ to intelligence/engineering/ide/.
-  ide_dir = ROOT + "intelligence/engineering/ide"
+  # Check that intelligence/ide/ exists and has proper structure.
+  # This knowledge was promoted from ai-tools/ide/ to intelligence/ide/.
+  ide_dir = ROOT + "intelligence/ide"
   unless ide_dir.exist?
-    add_error("intelligence/engineering/ide/ does not exist (expected after promotion from ai-tools/ide/)")
+    add_error("intelligence/ide/ does not exist (expected after promotion from ai-tools/ide/)")
     return
   end
 
   # Must have README.md
   readme = ide_dir + "README.md"
   unless readme.exist?
-    add_error("intelligence/engineering/ide/README.md is missing")
+    add_error("intelligence/ide/README.md is missing")
     return
   end
 
@@ -428,14 +431,59 @@ def validate_intelligence_ide_knowledge
   actual.each do |f|
     unless listed.include?(f)
       basename = File.basename(f)
-      add_error("intelligence/engineering/ide/README.md does not list #{basename}")
+      add_error("intelligence/ide/README.md does not list #{basename}")
     end
   end
 
   # The vscode-extension-global-state.md should NOT exist in ai-tools/ide/ anymore
   old_path = ROOT + "ai-tools/ide/vscode-extension-global-state.md"
   if old_path.exist?
-    add_error("ai-tools/ide/vscode-extension-global-state.md still exists (should have been promoted to intelligence/engineering/ide/)")
+    add_error("ai-tools/ide/vscode-extension-global-state.md still exists (should have been promoted to intelligence/ide/)")
+  end
+end
+
+def validate_language_consistency
+  # Check for Author Habit Drift (Type B): Chinese documents with English table headers.
+  # This is a simple heuristic — if a .md file is mostly Chinese but has common English
+  # table header patterns like "| Change |" or "| Description |", flag it.
+  # Scans files under shared-rules/failure-patterns/ and intelligence/ide/ as these
+  # are most prone to this drift.
+  scan_dirs = %w[shared-rules/failure-patterns intelligence/ide]
+
+  # Common English table headers that should be in Chinese if the document is Chinese
+  english_headers = /\|\s*(Change|Description|Status|Notes|Example|Type|Name|Value|Key|Field|Method|Source|Target|Action|Result|Category|Priority|Risk|Impact|Scope|Trigger|Failure Mode|Root Cause|Prevention Gate|Validation Method)\s*\|/
+
+  scan_dirs.each do |dir|
+    base = ROOT + dir
+    next unless base.exist?
+
+    Dir.glob((base + "**/*.md").to_s).sort.each do |file|
+      next if file.include?("feedback_history/")
+      next if file.include?("/archived/")
+
+      text = read_text(file)
+      # Only check files that have Chinese content (to avoid false positives on English-only files)
+      has_chinese = text.match?(/[\u4e00-\u9fff]/)
+      next unless has_chinese
+
+      # Skip content inside code blocks (```...```) — these are intentional examples
+      lines = text.lines
+      in_code_block = false
+      lines.each_with_index do |line, idx|
+        line_num = idx + 1
+        if line.strip.start_with?("```")
+          in_code_block = !in_code_block
+          next
+        end
+        next if in_code_block
+
+        if line.match?(english_headers) && line.include?("|")
+          # Check if this is a table separator line (---|---|---)
+          next if line.strip.match?(/^[\|\s\-:]+$/)
+          add_error("#{rel(file)}:#{line_num}: possible Author Habit Drift — English table header '#{line.strip}' in Chinese document")
+        end
+      end
+    end
   end
 end
 
@@ -446,6 +494,7 @@ validate_graphs
 validate_directory_structure
 validate_no_outdated_active_entrypoint
 validate_intelligence_ide_knowledge
+validate_language_consistency
 check_markdown_links("knowledge/runtime/README.md")
 check_markdown_links("knowledge/runtime/runtime-report.md") if (ROOT + "knowledge/runtime/runtime-report.md").exist?
 check_markdown_links("knowledge/runtime/model-context-report.md") if (ROOT + "knowledge/runtime/model-context-report.md").exist?

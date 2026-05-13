@@ -33,7 +33,7 @@
 6. **更新 `ai-tools/README.md`**：在 agent 類別的表格中加入新工具的連結與用途說明。
 7. **驗證**：執行 `scripts/validate-knowledge-runtime.rb` 確認無誤。
 
-> **注意**：IDE 生態系統的通用知識（如 VS Code Extension 全域設定的 SQLite 儲存機制）屬於可重複使用的工程智慧，應放在 `intelligence/engineering/ide/`，而非 `ai-tools/` 下。`ai-tools/` 只放工具特有的設定與操作方式。
+> **注意**：IDE 生態系統的通用知識（如 VS Code Extension 全域設定的 SQLite 儲存機制）屬於可重複使用的工程智慧，應放在 `intelligence/ide/`，而非 `ai-tools/` 下。`ai-tools/` 只放工具特有的設定與操作方式。
 
 ## 不建議設定的項目
 

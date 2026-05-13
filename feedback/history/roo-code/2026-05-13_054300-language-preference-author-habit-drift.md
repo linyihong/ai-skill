@@ -6,7 +6,7 @@
 
 ## 情境
 
-使用者在確認 `vscode-extension-global-state.md` 昇華到 `intelligence/engineering/ide/` 的實作結果後，指出 `attempt_completion` 的內容混用了中英文（表格欄位用英文、分析段落中關鍵詞用英文）。
+使用者在確認 `vscode-extension-global-state.md` 昇華到 `intelligence/ide/` 的實作結果後，指出 `attempt_completion` 的內容混用了中英文（表格欄位用英文、分析段落中關鍵詞用英文）。
 
 ## 當下使用的工具
 
