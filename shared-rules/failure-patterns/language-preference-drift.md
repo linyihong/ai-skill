@@ -1,7 +1,7 @@
 # Language Preference Drift（語言偏好漂移）
 
 Status: validated
-Class: `configuration-gap` / `instruction-conflict`
+Class: `configuration-gap` / `instruction-conflict` / `author-habit`
 
 ## Trigger
 
@@ -27,6 +27,44 @@ Agent 在使用者用中文提問後，仍然用英文回應，因為：
 | 使用者用中文問問題，agent 用英文回答 | agent 應使用與使用者相同的語言回應 |
 | Custom Instructions 寫「always speak English」，agent 永遠不切換語言 | Custom Instructions 應加註「除非使用者使用其他語言」 |
 | 使用者多次用中文，agent 仍持續用英文 | agent 應在第一次偵測到使用者語言後就切換 |
+
+### 子類型 B：作者習慣漂移（Author Habit Drift）
+
+**與 Type A（system prompt 強制）不同**，此類型發生在 agent 已經正確使用中文回應，但在撰寫 `attempt_completion`、建立檔案內容或分析報告時，不自覺地混入英文。
+
+#### Trigger
+
+1. Agent 已正確使用中文與使用者對話
+2. 但在撰寫結構化輸出（表格、分析報告、`attempt_completion`）時，習慣性地使用英文關鍵詞或英文表格欄位
+3. 原因是 agent 的訓練資料中，技術分析類內容大量使用英文，形成寫作慣性
+
+#### Failure Mode
+
+| 錯誤 | 正確 |
+|------|------|
+| 表格欄位用英文（Change、Description） | 表格欄位應與正文語言一致 |
+| 技術分析段落中關鍵詞用英文（cognitive bias、reusable knowledge vs tool config） | 關鍵詞應翻譯或至少用中文解釋 |
+| 認為「技術內容用英文比較精準」 | 使用者已用中文提問，表示使用者偏好中文；精準度應透過定義達成，而非語言 |
+
+#### Root Cause
+
+這**不是** Roo Code 的 system prompt 問題，也不是模型問題，而是：
+- Agent 的訓練資料中，技術分析類內容大量使用英文
+- Agent 在「寫作模式」下會回歸到訓練資料的統計慣性
+- 使用者沒有在每次飄移時立即糾正，讓慣性持續
+
+#### Required Agent Action
+
+在每次產生結構化輸出前：
+1. **確認當前對話語言**：使用者最後一次使用的語言是什麼？
+2. **設定輸出語言**：在腦中（或內部 prompt）設定「此回應全程使用 XXX 語言」
+3. **檢查表格與標題**：表格欄位、章節標題是否與正文語言一致？
+4. **檢查專有名詞**：如果使用英文專有名詞，是否需要在旁加註中文？
+
+#### Prevention Gate
+
+- 在 Custom Instructions 中加入「所有輸出（包含表格、標題、分析報告）都必須與使用者當前語言一致」
+- 在 `attempt_completion` 前增加語言一致性檢查
 
 ## Risk
 
@@ -61,7 +99,8 @@ Agent 在使用者用中文提問後，仍然用英文回應，因為：
 
 ## Linked Feedback Lessons
 
-- `feedback/history/roo-code/2026-05-13_124800-language-preference-drift.md`
+- `feedback/history/roo-code/2026-05-13_124800-language-preference-drift.md`（Type A：system prompt 強制）
+- `feedback/history/roo-code/2026-05-13_054300-language-preference-author-habit-drift.md`（Type B：作者習慣漂移）
 
 ## Linked Validation Scenarios
 
