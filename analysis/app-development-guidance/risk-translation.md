@@ -1,96 +1,96 @@
-# Risk Translation & Control Selection
+# 風險翻譯與控制選擇
 
 本文件定義如何將分析觀察轉換為開發者視角的風險陳述，並選擇最適合的控制層。承接 [`skills/app-development-guidance/WORKFLOW.md`](../../skills/app-development-guidance/WORKFLOW.md) §2-4 的內容。
 
-## 1. Translate To Risk
+## 1. 翻譯為風險
 
-Write the risk in developer terms:
+以開發者用語撰寫風險：
 
-| Observation | Developer takeaway |
+| 觀察 | 開發者結論 |
 | --- | --- |
-| Request can be replayed with the same body and token | Backend contract may lack nonce, timestamp, idempotency, or risk scoring. |
-| Token is long-lived and broadly scoped | Account takeover blast radius is too large if token leaks. |
-| Sensitive values appear in logs | Debug or telemetry pipeline may leak secrets. |
-| App relies on hidden client logic for authorization | Server may be trusting client state that attackers can modify. |
-| Local storage contains recoverable secrets | Device compromise or backups can expose credentials. |
-| Release build exposes symbols, debug flags, or test endpoints | Reverse engineering cost is unnecessarily low. |
-| Generated client diverges from OpenAPI/schema | Frontend, SDK, or tool consumers may call stale routes or deserialize wrong shapes. |
-| Gherkin exists without executable linkage | The team may believe behavior is tested when it is only documented. |
-| Vendor docs are copied directly into product flow | Secrets, irrelevant fields, or unstable third-party assumptions can leak into implementation and reusable docs. |
+| Request 可以用相同 body 和 token 重放 | 後端合約可能缺少 nonce、timestamp、idempotency 或風險評分 |
+| Token 有效期長且範圍廣泛 | Token 洩漏時帳號接管爆炸半徑過大 |
+| 敏感值出現在日誌中 | Debug 或遙測管線可能洩漏機密 |
+| App 依賴隱藏的客戶端邏輯進行授權 | 伺服器可能信任攻擊者可修改的客戶端狀態 |
+| 本地儲存包含可復原的機密 | 裝置入侵或備份可暴露憑證 |
+| Release build 暴露符號、debug flag 或測試端點 | 逆向工程成本不必要地低 |
+| 生成的客戶端與 OpenAPI/schema 不一致 | 前端、SDK 或工具消費者可能呼叫過時路由或反序列化錯誤形狀 |
+| Gherkin 存在但無可執行連結 | 團隊可能認為行為已測試，但實際上只有文件 |
+| 供應商文件直接複製到產品流程中 | 機密、無關欄位或不穩定的第三方假設可能洩漏到實作和可重用文件中 |
 
-## 2. Choose The Owner Layer
+## 2. 選擇擁有者層
 
-Prefer controls owned by the strongest layer:
+優先選擇由最強層擁有的控制：
 
-| Layer | Good use |
+| 層 | 適用場景 |
 | --- | --- |
-| Backend/API | Authorization, replay defense, rate limits, fraud signals, token rotation, audit logs. |
-| Client app | Safe storage, secure defaults, pinning where justified, UX friction for risky flows, telemetry hygiene. |
-| Full-stack contract | OpenAPI/schema generation, typed clients, provider/consumer fixtures, contract tests, compatibility rules. |
-| Tooling / extension | Pure rule engine or command kernel, adapter boundary, diagnostics/commands, fixture-backed rules, editor/CLI integration tests. |
-| Third-party integration | Sanitized vendor excerpt, credentials boundary, live-test gate, replay/idempotency/webhook/settlement behavior, audit logs. |
-| Embedded/firmware | Sensor/protocol parsing, hardware context injection, driver/service/application boundary, RTOS/task ownership, host fixtures, hardware-in-loop checks. |
-| Build/release | Obfuscation, symbol stripping, debug flag enforcement, dependency review, secret scanning. |
-| Monitoring | Anomaly detection, device risk signals, abuse pattern alerts. |
+| 後端/API | 授權、重放防禦、速率限制、詐欺訊號、Token 輪換、審計日誌 |
+| 客戶端 App | 安全儲存、安全預設、必要時的憑證固定、高風險流程的 UX 摩擦、遙測衛生 |
+| 全端合約 | OpenAPI/schema 生成、型別客戶端、provider/consumer fixture、合約測試、相容性規則 |
+| 工具/擴充 | 純規則引擎或命令核心、adapter 邊界、診斷/命令、fixture 支援的規則、編輯器/CLI 整合測試 |
+| 第三方整合 | 清理後的供應商摘錄、憑證邊界、即時測試關卡、重放/冪等/webhook/結算行為、審計日誌 |
+| 嵌入式/韌體 | 感測器/協定解析、硬體上下文注入、驅動/服務/應用程式邊界、RTOS/任務擁有權、主機 fixture、硬體迴圈檢查 |
+| 建置/發布 | 混淆、符號剝離、debug flag 強制執行、相依性審查、機密掃描 |
+| 監控 | 異常偵測、裝置風險訊號、濫用模式警示 |
 
-Client-side hardening raises cost and improves signal quality, but it must not be the only control for authorization or financial/business integrity.
+客戶端強化可以提高成本並改善訊號品質，但不能作為授權或財務/業務完整性的唯一控制。
 
-## 3. Define Controls
+## 3. 定義控制
 
-For each risk or useful implementation lesson, define:
+針對每個風險或有用的實作教訓，定義：
 
-- Required control.
-- Owner.
-- Implementation note.
-- Validation method.
-- Residual risk.
+- 必要控制
+- 擁有者
+- 實作說明
+- 驗證方法
+- 殘餘風險
 
-Example:
+範例：
 
 ```text
-Risk: API request can be replayed.
-Control: Server verifies timestamp, nonce, account/session binding, and idempotency key.
-Owner: Backend/API.
-Validation: Integration test replays the same signed request and expects rejection or idempotent handling.
-Residual risk: Device compromise can still steal valid sessions; monitoring remains required.
+風險：API request 可被重放
+控制：伺服器驗證 timestamp、nonce、帳號/session 綁定與冪等金鑰
+擁有者：後端/API
+驗證：整合測試重放相同簽章 request，預期拒絕或冪等處理
+殘餘風險：裝置入侵仍可竊取有效 session；需保留監控
 ```
 
-## 4. File The Guidance
+## 4. 歸檔指引
 
-Classify the outcome before writing docs:
+在撰寫文件前先分類結果：
 
-| If the lesson is about... | Put it in |
+| 如果教訓是關於... | 放在 |
 | --- | --- |
-| Security property that applies across stacks | `controls/` |
-| Mobile, web, backend, embedded, firmware, hardware, or OS-specific implementation | `platforms/` |
-| Dart, Kotlin/Java, Swift, TypeScript, or runtime-specific pitfalls | `languages/` |
-| Concrete buildable pattern or how-to | `implementation/` |
-| A repeated design, PR, release, or API review step | `checklists/` |
-| A reusable but still emerging lesson | `feedback_history/<category>/` or `feedback_history/common/` |
-| A copyable documentation shape | `templates/` |
-| Missing development documents in an implemented project | `process/` and `templates/initial-development-docs.md` |
-| Blocker questions for missing requirements or contracts | `process/` and the current planning document |
-| Change intake before code | `process/` and the current planning document |
-| Test strategy for new or AI-generated code | `process/`, `CHECKLIST.md`, and the current planning document |
-| Embedded/hardware product flow | `platforms/embedded/`, `implementation/embedded/`, `process/`, and hardware-aware checklists |
-| OpenAPI/schema/codegen or full-stack provider/consumer contract | `implementation/backend/`, `process/`, `CHECKLIST.md`, and relevant API checklists |
-| Tool, CLI, IDE extension, linter, or static-analysis architecture | `implementation/tooling/`, `process/`, and relevant review checklists |
-| Vendor or third-party API integration | `implementation/backend/`, `controls/`, `checklists/`, and project-specific sanitized docs |
+| 跨堆疊適用的安全屬性 | `controls/` |
+| 行動端、Web、後端、嵌入式、韌體、硬體或 OS 特定實作 | `platforms/` |
+| Dart、Kotlin/Java、Swift、TypeScript 或執行時期特定陷阱 | `languages/` |
+| 具體可建置的模式或操作指南 | `implementation/` |
+| 重複出現的設計、PR、發布或 API 審查步驟 | `checklists/` |
+| 可重用但仍在浮現中的教訓 | `feedback_history/<category>/` 或 `feedback_history/common/` |
+| 可複製的文件形狀 | `templates/` |
+| 已實作專案中遺失的開發文件 | `process/` 和 `templates/initial-development-docs.md` |
+| 缺少需求或合約的阻礙問題 | `process/` 和當前規劃文件 |
+| 程式碼前的變更接收 | `process/` 和當前規劃文件 |
+| 新程式碼或 AI 生成程式碼的測試策略 | `process/`、`CHECKLIST.md` 和當前規劃文件 |
+| 嵌入式/硬體產品流程 | `platforms/embedded/`、`implementation/embedded/`、`process/` 和硬體感知檢查清單 |
+| OpenAPI/schema/codegen 或全端 provider/consumer 合約 | `implementation/backend/`、`process/`、`CHECKLIST.md` 和相關 API 檢查清單 |
+| 工具、CLI、IDE 擴充、linter 或靜態分析架構 | `implementation/tooling/`、`process/` 和相關審查檢查清單 |
+| 供應商或第三方 API 整合 | `implementation/backend/`、`controls/`、`checklists/` 和專案特定的清理後文件 |
 
-Prefer linking between folders over duplicating the same guidance.
+優先使用資料夾間的連結，而非複製相同指引。
 
-## 5. Apply Required Linked Updates
+## 5. 執行必要連結更新
 
-Before finishing a change, follow the repo-wide rule in [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md). If the update affects related folders, those linked updates are **required** in the same change:
+在完成變更前，遵循倉儲級規則 [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md)。如果更新影響相關資料夾，這些連結更新在**同一變更中為必要**：
 
-| Changed area | Must update or verify |
+| 變更區域 | 必須更新或驗證 |
 | --- | --- |
-| `controls/` | Relevant `implementation/`, `platforms/`, `languages/`, and `checklists/` docs. |
-| `implementation/` | Relevant `controls/`, `platforms/`, `languages/`, and `checklists/` docs. |
-| `platforms/` | Relevant `controls/`, `implementation/`, language notes, and checklists. |
-| `languages/` | Relevant platform and implementation docs. |
-| `checklists/` | Relevant controls and implementation docs. |
-| `templates/` | `templates/README.md`, `DOCUMENTATION.md`, and any docs that instruct users to copy the template. |
-| `process/` governance or backfill rules | `templates/`, `CHECKLIST.md`, `WORKFLOW.md`, and relevant `implementation/` docs. |
+| `controls/` | 相關的 `implementation/`、`platforms/`、`languages/` 和 `checklists/` 文件 |
+| `implementation/` | 相關的 `controls/`、`platforms/`、`languages/` 和 `checklists/` 文件 |
+| `platforms/` | 相關的 `controls/`、`implementation/`、語言說明和檢查清單 |
+| `languages/` | 相關的平台和實作文件 |
+| `checklists/` | 相關的控制和實作文件 |
+| `templates/` | `templates/README.md`、`DOCUMENTATION.md` 以及指示使用者複製範本的文件 |
+| `process/` 治理或回填規則 | `templates/`、`CHECKLIST.md`、`WORKFLOW.md` 和相關的 `implementation/` 文件 |
 
-If no linked update is needed, state why. Do not call linked updates optional when they are required for consistency.
+如果不需要連結更新，說明原因。不要將必要的連結更新稱為可選。

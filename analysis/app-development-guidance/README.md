@@ -1,17 +1,17 @@
-# App Development Guidance Analysis Methods
+# 開發指引分析方法
 
 `analysis/app-development-guidance/` 負責「開發指引的分析方法」。本目錄保存從分析觀察到開發指引的轉換方法論，包括風險翻譯、控制層選擇、指引分類等分析技術。
 
 > **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 
-## Scope
+## 範圍
 
 本目錄涵蓋以下分析方法：
 
-- **Risk Translation**：將分析觀察轉換為開發者視角的風險陳述。
-- **Owner Layer Selection**：根據風險類型選擇最適合的控制層。
-- **Control Definition**：定義控制措施的結構與驗證方法。
-- **Guidance Classification**：將指引分類到正確的目錄位置。
+- **風險翻譯（Risk Translation）**：將分析觀察轉換為開發者視角的風險陳述。
+- **擁有者層選擇（Owner Layer Selection）**：根據風險類型選擇最適合的控制層。
+- **控制定義（Control Definition）**：定義控制措施的結構與驗證方法。
+- **指引分類（Guidance Classification）**：將指引分類到正確的目錄位置。
 
 ## 參考 Catalog
 
@@ -24,7 +24,7 @@
 | [`platforms-catalog.md`](../../metadata/app-development-guidance/platforms-catalog.md) | 平台特定指引分類 |
 | [`languages-catalog.md`](../../metadata/app-development-guidance/languages-catalog.md) | 語言特定陷阱分類 |
 
-## Current Source References
+## 當前來源參考
 
 - `skills/app-development-guidance/WORKFLOW.md` §2-5（Translate To Risk → File The Guidance）
 - `skills/app-development-guidance/DOCUMENTATION.md`（Reusable Note Structure）
@@ -33,7 +33,7 @@
 - `skills/app-development-guidance/platforms/`（Platform-specific guidance）
 - `skills/app-development-guidance/languages/`（Language-specific pitfalls）
 
-## Read Order
+## 閱讀順序
 
 1. 先讀本 README 了解 scope。
 2. 需要分析方法細節時讀 [`risk-translation.md`](risk-translation.md)。
@@ -41,7 +41,7 @@
 4. 需要執行流程時參考 `workflow/app-development-guidance/execution-flow.md`。
 5. 需要產出規範時參考 `workflow/app-development-guidance/artifact-gates.md`。
 
-## Migration Notes
+## 遷移說明
 
 - 本目錄為 Phase 17 與 Phase 26 提取產物，內容來自 `skills/app-development-guidance/WORKFLOW.md` §2-4。
 - 分類索引（catalogs）已移至 `metadata/app-development-guidance/`。
