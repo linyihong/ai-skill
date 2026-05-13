@@ -94,14 +94,18 @@ cursor.execute(
     (new_value,)
 )
 conn.commit()
+
+# 重要：強制 WAL checkpoint，確保寫入持久化
+conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
 conn.close()
 ```
 
 **注意事項**：
-1. `state.vscdb` 是 VS Code 執行中可能會鎖定的檔案，建議在 VS Code 未使用 Roo Code 時操作
-2. 修改後需**重新開啟 Roo Code session** 才會生效
-3. 如果 Ai-skill 路徑變更，需同步更新 `CUSTOM_INSTRUCTIONS` 中的絕對路徑
-4. 此方法也適用於修改其他 Roo Code 全域設定（如 `language` 欄位）
+1. `state.vscdb` 使用 WAL（Write-Ahead Log）模式，寫入後必須執行 `PRAGMA wal_checkpoint(TRUNCATE);` 才能確保持久化
+2. VS Code 執行中可能會鎖定資料庫，建議在 VS Code 未使用 Roo Code 時操作
+3. 修改後需**重新開啟 Roo Code session** 才會生效
+4. 如果 Ai-skill 路徑變更，需同步更新 `CUSTOM_INSTRUCTIONS` 中的絕對路徑
+5. 此方法也適用於修改其他 Roo Code 全域設定（如 `language` 欄位）
 
 #### 層級 B：專案 `.roomodes`（單一專案專用）
 
