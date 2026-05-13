@@ -23,15 +23,43 @@
 | 工具文件 | `ai-tools/agent/claude.md` | `ai-tools/agent/cursor.md` | `ai-tools/agent/roo.md` |
 | 驗證流程 | pre-commit hook（共用） | pre-commit hook（共用） | pre-commit hook（共用） |
 
+## 全域設定 vs 專案設定
+
+每個 AI agent 工具都有兩種設定層級，需要根據使用情境決定用哪一種。
+
+### 設定層級說明
+
+| 層級 | 設定位置 | 生效範圍 | 優先順序 | 適用時機 |
+|------|---------|---------|---------|---------|
+| **全域** | 工具設定面板（如 Roo Code Custom Instructions） | 所有專案 | 低（可被專案設定覆蓋） | 希望所有專案都自動啟用 Ai-skill 系統 |
+| **專案** | 專案根目錄的設定檔（如 `.roomodes`、`.cursor/rules/`） | 單一專案 | 高（覆蓋全域設定） | 專案需要自訂 mode 定義或覆蓋全域設定 |
+
+### 建議策略
+
+1. **全域設定一次**：在工具的全域設定中，用**絕對路徑**指向 Ai-skill 的 `CORE_BOOTSTRAP.md`，加上語言偏好與語言一致性規則
+2. **專案設定只在需要時才建立**：如果專案需要自訂 mode 定義或 file restrictions，才在專案根目錄建立設定檔
+3. **注意覆蓋行為**：部分工具（如 Roo Code）的專案設定檔會**完全覆蓋**全域設定（不會合併），所以專案設定檔中必須包含全域設定的所有內容
+
+### 路徑注意事項
+
+全域設定中使用的是**絕對路徑**（如 `/Users/larrylin/Documents/Ai-skill/CORE_BOOTSTRAP.md`）。如果：
+- **Ai-skill 移動位置** → 更新全域設定中的路徑
+- **在其他電腦使用** → 修改為對應的絕對路徑
+- **使用相對路徑** → 只能在 Ai-skill repo 內生效，不適合全域設定
+
 ## 新增工具的步驟
 
 1. **確認工具類型**：是 AI Agent（CLI / IDE 內建）？Agent 放 `ai-tools/agent/`。
-2. **建立工具使用說明**：在 `ai-tools/agent/` 下建立 `<tool>.md`，只記錄該工具特有的差異。
-3. **設定自動載入入口**：依工具的機制設定入口，指向 `CORE_BOOTSTRAP.md`。
-4. **設定語言偏好**：依工具的設定方式，加入軟性語言偏好。
-5. **實作對話目標閉環**：依工具的能力（hooks / custom instructions / 操作注意），實作 goal ledger 整合。
-6. **更新 `ai-tools/README.md`**：在 agent 類別的表格中加入新工具的連結與用途說明。
-7. **驗證**：執行 `scripts/validate-knowledge-runtime.rb` 確認無誤。
+2. **決定設定層級**：全域設定一次（所有專案生效）還是只做專案設定？
+3. **建立工具使用說明**：在 `ai-tools/agent/` 下建立 `<tool>.md`，記錄：
+   - 全域設定的內容與位置
+   - 專案設定檔的格式與位置
+   - 兩個層級的覆蓋關係
+4. **設定自動載入入口**：依工具的機制設定入口，指向 `CORE_BOOTSTRAP.md`。
+5. **設定語言偏好**：依工具的設定方式，加入軟性語言偏好。
+6. **實作對話目標閉環**：依工具的能力（hooks / custom instructions / 操作注意），實作 goal ledger 整合。
+7. **更新 `ai-tools/README.md`**：在 agent 類別的表格中加入新工具的連結與用途說明。
+8. **驗證**：執行 `scripts/validate-knowledge-runtime.rb` 確認無誤。
 
 > **注意**：IDE 生態系統的通用知識（如 VS Code Extension 全域設定的 SQLite 儲存機制）屬於可重複使用的工程智慧，應放在 `intelligence/ide/`，而非 `ai-tools/` 下。`ai-tools/` 只放工具特有的設定與操作方式。
 

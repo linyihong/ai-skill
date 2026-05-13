@@ -16,19 +16,64 @@
 
 ### 自動載入入口：Custom Instructions
 
-Roo Code 沒有像 `CLAUDE.md` 那樣的自動載入機制。你需要手動設定 **Custom Instructions**：
+Roo Code 沒有像 `CLAUDE.md` 那樣的自動載入機制。你需要手動設定 **Custom Instructions**。
 
-1. 在 VS Code 中開啟本 repo
-2. 點擊 Roo Code extension 的設定圖示（⚙️）
-3. 在 **Custom Instructions** 中貼入以下內容：
+Custom Instructions 有**兩個層級**，各有不同的用途：
+
+#### 層級 A：全域 Custom Instructions（所有專案共用）
+
+在 Roo Code Extension 設定面板中設定的 Custom Instructions，**每個專案都會載入**。
+
+**設定位置**：VS Code → Roo Code Extension 圖示 → 設定（⚙️）→ **Custom Instructions** 欄位
+
+**建議內容**（貼入該欄位）：
 
 ```text
 你是一個運行在 Roo Code（VS Code AI extension）的 AI agent。
 
-開始工作前，請依 CORE_BOOTSTRAP.md 的啟動流程載入核心規則與 OS layout。
+開始工作前，請依 /Users/larrylin/Documents/Ai-skill/CORE_BOOTSTRAP.md 的啟動流程載入核心規則與 OS layout。
+
+Language Preference: Default to English, but always match the user's language in conversation. If the user writes in Chinese, respond in Chinese. If the user writes in Japanese, respond in Japanese. If the user switches languages, follow their switch.
+
+語言一致性強制規則：所有輸出（包含 attempt_completion 結果、技術分析、表格欄位、章節標題、commit message）都必須與使用者當前語言一致。如果使用者使用中文，所有內容（包括技術關鍵詞、程式碼註解、分析報告）都必須使用中文。在 attempt_completion 前必須先確認語言一致性。
 ```
 
-Roo Code 會自動讀取根目錄的 `CORE_BOOTSTRAP.md`、`README.md`、`skills-index.yaml` 等檔案，不需要在 custom instructions 中列出完整 bootstrap 流程。
+**適用時機**：
+- 你希望**所有專案**都自動啟用 Ai-skill 知識庫系統
+- 新專案不需要額外設定，直接開啟 Roo Code 即可
+- 全域設定是**軟性預設值**，專案可以透過 `.roomodes` 覆蓋
+
+#### 層級 B：專案 `.roomodes`（單一專案專用）
+
+在專案根目錄建立 `.roomodes` 檔案，Roo Code 會自動讀取。此設定**只對該專案生效**。
+
+**適用時機**：
+- 該專案需要**不同的 mode 定義**（如不同的 file restrictions、role definition）
+- 該專案需要**覆蓋**全域 Custom Instructions 中的某些設定
+- 該專案不在本機，無法使用絕對路徑指向 Ai-skill
+
+**注意**：`.roomodes` 中的 `customInstructions` 會**完全覆蓋**全域 Custom Instructions，不會合併。所以如果用了 `.roomodes`，需要把全域的設定也複製進去。
+
+#### 建議策略
+
+```
+全域 Custom Instructions（層級 A）
+  ├── 指向 Ai-skill 的 CORE_BOOTSTRAP.md（絕對路徑）
+  ├── 語言偏好設定
+  └── 語言一致性強制規則
+
+專案 .roomodes（層級 B，可選）
+  ├── 只在需要自訂 mode 定義時建立
+  ├── 必須包含層級 A 的所有內容（因為會完全覆蓋）
+  └── 加上該專案特有的 mode 設定
+```
+
+#### 如果 Ai-skill 路徑變更
+
+全域 Custom Instructions 中使用的是絕對路徑 `/Users/larrylin/Documents/Ai-skill/`。如果：
+- **Ai-skill 移動位置** → 更新全域 Custom Instructions 中的路徑
+- **在其他電腦使用** → 修改為對應的絕對路徑
+- **使用相對路徑** → 只能在 Ai-skill repo 內生效，不適合全域設定
 
 ### Modes 設定
 
