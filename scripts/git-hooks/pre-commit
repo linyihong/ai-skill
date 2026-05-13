@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Ai-skill: pre-commit hook for knowledge runtime validation.
+#
+# When staged changes touch knowledge/ or validation/ surfaces, run
+# validate-knowledge-runtime.rb to catch errors before commit.
+#
+# Enable with:
+#   git config core.hooksPath scripts/git-hooks
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+
+# Only check when knowledge/ or validation/ files are staged
+CHANGED=$(git diff --cached --name-only)
+if echo "$CHANGED" | grep -qE '^(knowledge/|validation/|scripts/validate-)'; then
+  ruby "${ROOT}/scripts/validate-knowledge-runtime.rb" || {
+    echo ""
+    echo "ERROR: Knowledge runtime validation failed."
+    echo "Run 'ruby scripts/refresh-knowledge-runtime.rb' to regenerate and diagnose."
+    echo "Fix the errors above, then stage and commit again."
+    exit 1
+  }
+fi

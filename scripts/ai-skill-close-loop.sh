@@ -216,6 +216,14 @@ main() {
     return 0
   fi
 
+  # Run knowledge runtime validation before committing
+  echo "Running knowledge runtime validation..."
+  ruby scripts/validate-knowledge-runtime.rb || {
+    echo "ERROR: Knowledge runtime validation failed."
+    echo "Run 'ruby scripts/refresh-knowledge-runtime.rb' to regenerate and fix."
+    exit 1
+  }
+
   for group in "${groups[@]}"; do
     group_file_array=()
     while IFS= read -r path; do

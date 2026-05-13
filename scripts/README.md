@@ -122,6 +122,8 @@ AI_SKILL_SYNC_CURSOR_BUNDLE=1 ./scripts/ai-skill-close-loop.sh --commit
 
 ## Knowledge runtime validation
 
+> **重要**：修改 `knowledge/` 或 `validation/` 下的檔案後，**必須**執行 `ruby scripts/refresh-knowledge-runtime.rb` 確認所有 validator 通過，再提交。Pre-commit hook（`scripts/git-hooks/pre-commit`）會在 commit 時自動檢查，但建議在修改後立即執行以加速迭代。
+
 產生並檢查 generated knowledge surfaces：
 
 ```bash
