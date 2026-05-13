@@ -47,6 +47,8 @@ Language Preference: Default to English, but always match the user's language in
 
 如果 AI agent 有檔案系統寫入權限，可以直接修改 VS Code 的 `state.vscdb`（SQLite 資料庫），無需使用者手動操作。
 
+**⚠️ 重要限制**：VS Code 的 extension host 會主動管理 `state.vscdb`。如果 VS Code 正在執行，直接寫入 SQLite 後，VS Code 在下一次狀態變更（如切換 mode、變更 API 設定）時會用自己的記憶體狀態覆寫資料庫。因此**必須先關閉 VS Code**再執行寫入。
+
 **資料庫路徑**：
 ```
 ~/Library/Application Support/Code/User/globalStorage/state.vscdb
@@ -59,10 +61,21 @@ Language Preference: Default to English, but always match the user's language in
 
 **寫入欄位**：在 JSON blob 中加入 `customInstructions` 欄位
 
-**Python 寫入範例**：
+**建議使用專用腳本**（內含 VS Code 執行中檢查）：
+
+```bash
+# 1. 先關閉 VS Code（Cmd+Q）
+# 2. 執行腳本
+python3 scripts/set-roo-global-custom-instructions.py
+# 3. 重新開啟 VS Code
+```
+
+腳本路徑：[`scripts/set-roo-global-custom-instructions.py`](scripts/set-roo-global-custom-instructions.py)
+
+**手動 Python 寫入範例**（供參考）：
 
 ```python
-import json, sqlite3
+import json, sqlite3, os, subprocess
 
 CUSTOM_INSTRUCTIONS = """你是一個運行在 Roo Code（VS Code AI extension）的 AI agent。
 
@@ -76,18 +89,22 @@ DB_PATH = os.path.expanduser(
     "~/Library/Application Support/Code/User/globalStorage/state.vscdb"
 )
 
+# 步驟 1：檢查 VS Code 是否正在執行
+result = subprocess.run(["pgrep", "-f", "Visual Studio Code"],
+                        capture_output=True, text=True, timeout=5)
+if result.returncode == 0 and len(result.stdout.strip()) > 0:
+    print("⚠️  VS Code 正在執行中！請先關閉 VS Code 再執行。")
+    exit(1)
+
+# 步驟 2：讀取現有 JSON
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
-
-# 讀取現有 JSON
 cursor.execute("SELECT value FROM ItemTable WHERE key = 'RooVeterinaryInc.roo-cline'")
 row = cursor.fetchone()
 data = json.loads(row[0])
 
-# 寫入 customInstructions
+# 步驟 3：寫入 customInstructions
 data["customInstructions"] = CUSTOM_INSTRUCTIONS
-
-# 寫回資料庫
 new_value = json.dumps(data, ensure_ascii=False)
 cursor.execute(
     "UPDATE ItemTable SET value = ? WHERE key = 'RooVeterinaryInc.roo-cline'",
@@ -95,15 +112,17 @@ cursor.execute(
 )
 conn.commit()
 
-# 重要：強制 WAL checkpoint，確保寫入持久化
+# 步驟 4：強制 WAL checkpoint
 conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
 conn.close()
+
+print("✅ 寫入成功！請重新開啟 VS Code。")
 ```
 
 **注意事項**：
-1. `state.vscdb` 使用 WAL（Write-Ahead Log）模式，寫入後必須執行 `PRAGMA wal_checkpoint(TRUNCATE);` 才能確保持久化
-2. VS Code 執行中可能會鎖定資料庫，建議在 VS Code 未使用 Roo Code 時操作
-3. 修改後需**重新開啟 Roo Code session** 才會生效
+1. **必須先關閉 VS Code**，否則寫入會被 VS Code 覆寫
+2. `state.vscdb` 使用 WAL（Write-Ahead Log）模式，寫入後必須執行 `PRAGMA wal_checkpoint(TRUNCATE);` 才能確保持久化
+3. 修改後需**重新開啟 VS Code** 才會生效
 4. 如果 Ai-skill 路徑變更，需同步更新 `CUSTOM_INSTRUCTIONS` 中的絕對路徑
 5. 此方法也適用於修改其他 Roo Code 全域設定（如 `language` 欄位）
 

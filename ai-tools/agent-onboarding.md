@@ -44,13 +44,16 @@
 
 部分工具（如 Roo Code）的全域設定儲存在 VS Code 的 SQLite 資料庫中，AI agent 可以直接寫入，無需使用者手動操作。
 
+**⚠️ 重要限制**：VS Code 的 extension host 會主動管理 `state.vscdb`。如果 VS Code 正在執行，直接寫入 SQLite 後，VS Code 在下一次狀態變更時會用自己的記憶體狀態覆寫資料庫。因此**必須先關閉 VS Code**再執行寫入。
+
 **通用流程**：
 
-1. 找到工具的設定儲存位置（VS Code `state.vscdb` 或工具專屬的 JSON/YAML 設定檔）
-2. 讀取現有設定（JSON blob 或 YAML）
-3. 在設定中加入 `customInstructions`（或對應的欄位名稱），內容指向 `CORE_BOOTSTRAP.md` 的絕對路徑
-4. 寫回儲存位置
-5. 通知使用者重新開啟工具 session
+1. **關閉 VS Code**（Cmd+Q）
+2. 找到工具的設定儲存位置（VS Code `state.vscdb` 或工具專屬的 JSON/YAML 設定檔）
+3. 讀取現有設定（JSON blob 或 YAML）
+4. 在設定中加入 `customInstructions`（或對應的欄位名稱），內容指向 `CORE_BOOTSTRAP.md` 的絕對路徑
+5. 寫回儲存位置，並強制 WAL checkpoint（SQLite 專用）
+6. **重新開啟 VS Code**
 
 **各工具的自動寫入細節**，請參考對應的 `ai-tools/agent/<tool>.md` 文件。
 
