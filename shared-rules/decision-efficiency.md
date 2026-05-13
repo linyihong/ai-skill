@@ -62,6 +62,32 @@ Current unknown: <what must be learned or decided next>
 
 不得用 token reduction 當作跳過 required dependencies 的理由。若 [`dependency-reading.md`](dependency-reading.md) 要求某依賴，必須讀取，或標為 blocked / not applicable。
 
+### Token 成本模型
+
+文件大小直接影響每次 session 的 token 消耗。以下是參考閾值：
+
+| 檔案大小 | Token 估算（約） | 建議行動 |
+|----------|-----------------|----------|
+| < 50 行 | < 1K tokens | 保持單檔，不需要拆分 |
+| 50-150 行 | 1K-3K tokens | 觀察：如果內容主題單一，可保持；如果已混合多主題，考慮拆分 |
+| 150-300 行 | 3K-6K tokens | **警戒線**：檢查是否符合「單一目的」原則。若否，應拆分 |
+| 300-500 行 | 6K-10K tokens | **拆分線**：強烈建議拆分。agent 每次讀取會浪費大量 token 在無關內容 |
+| > 500 行 | > 10K tokens | **必須拆分**：除非是自動產生的 report 或索引，否則不應存在 |
+
+> **注意**：這些是參考值，不是硬性規則。關鍵判斷標準是「agent 是否每次都需要讀完整檔才能找到當前任務需要的內容」。如果是，就該拆分。
+
+#### Token 節省計算範例
+
+假設一個 400 行的檔案，每次 session agent 只需要其中 50 行：
+
+```
+Before: 每次載入 400 行 ≈ 8K tokens
+After:  只載入 50 行 ≈ 1K tokens
+節省:   7K tokens per session
+```
+
+如果每天 10 個 session，每月節省約 **2.1M tokens**。
+
 ## Stop Conditions
 
 遇到下列情況時，停止目前路線並重新評估：

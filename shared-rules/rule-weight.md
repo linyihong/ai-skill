@@ -15,7 +15,7 @@ Rule weight 不是看哪個檔案最近被讀到，而是看該規則控制的 u
 | P0 | Safety、authorization、secrets、data loss、destructive actions、source-of-truth integrity | Authorization scope、sanitization、no secrets、未明確同意不得 destructive git、source vs mirror boundaries | 不得因方便、速度或工具限制而繞過。若 blocked，停止並詢問。 |
 | P1 | 使用者最新明確要求與 active goal closure | 最新 user instruction、accepted plan、active `.agent-goals/` goal、completion criteria | 除非與 P0 衝突，否則驅動目前任務。被 redirect 時更新或暫停舊 goal。 |
 | P1 | Canonical repository writeback 與 validation gates | Dependency reading、linked updates、diff review、commit/push/readback、clean status | 宣稱 repository changes 完成前必須滿足。Tool reload 或 local sync 不能取代。 |
-| P2 | Cross-repo operating policy | Tool-neutral documentation、failure learning、goal/action/validation、document sizing、neutral language | 一致套用，但輸出長度可依任務調整。 |
+| P2 | Cross-repo operating policy | Tool-neutral documentation、failure learning、goal/action/validation、document sizing（含 token 成本管理）、neutral language | 一致套用，但輸出長度可依任務調整。 |
 | P2 | Skill-specific workflow 與 checklists | `skills/<name>/SKILL.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、`CHECKLIST.md` | 在 shared operating rules 之後套用；除非 shared rule 明確 delegating，否則不可覆蓋 shared rules。 |
 | P3 | Tool adapter 與 compatibility guidance | `ai-tools/`、`.cursor/rules/`、sync scripts、symlink/bundle/copy snapshot details | 只在 active tool 或 compatibility path 適用。不得重新定義 canonical source，也不得把 optional sync 變成 universal。 |
 | P3 | Efficiency 與 style preferences | Decision efficiency、output shape、formatting preferences、optional cleanup | 只在高權重要求滿足後最佳化。 |
@@ -48,6 +48,8 @@ Rule weight 不是看哪個檔案最近被讀到，而是看該規則控制的 u
 | Skill workflow 建議 shortcut，但 shared rules 要求 sanitization 或 source/mirror checks。 | P0 safety/source integrity 高於 P2 skill workflow。 | 先套用 shared rule，再調整 skill workflow。 |
 | 使用者要求 destructive git action，但 repository rules 要求 explicit confirmation。 | P0 destructive-action safety 在確認前高於 P1 user goal。 | 先明確詢問確認並說明風險。 |
 | Compatibility script 可執行，但沒有 active workflow 依賴 native scan 或 local mirrors。 | P3 compatibility 保持條件式。 | 不使用 script；記錄 reference-first 已足夠。 |
+| 文件超過 300 行且混合多主題，但 agent 為了省事不想拆分。 | P2 document sizing 高於 P3 efficiency。 | 必須拆分，並更新索引和連結。拆分本身是 P2，但拆分後的連動更新是 P1。 |
+| Token 成本太高想合併小檔案，但合併後檔案超過 300 行且主題不一致。 | P2 document sizing（單一目的原則）高於 P3 token optimization。 | 不要合併。改用 summary layer 或 better routing 降低 token 成本。 |
 
 ## 驗證
 

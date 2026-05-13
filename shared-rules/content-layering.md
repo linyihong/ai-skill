@@ -27,4 +27,15 @@
 
 若任何 skill、技巧分類、shared rule、模板或寫作規範開始變大，不要把所有內容繼續堆在同一個 Markdown 檔。依 [`document-sizing.md`](document-sizing.md) 拆成「資料夾 + `README.md` 目錄 + 多個子檔」，讓 agent 只讀與任務相關的子文件。
 
+### 跨專案適用說明
+
+上述分層結構**不限於 AI agent 知識庫**。任何專案文件都可套用相同原則：
+
+| 專案類型 | 範例結構 |
+|----------|----------|
+| API 規格書 | `api/README.md` + `api/authentication.md` + `api/endpoints/` |
+| 系統設計文件 | `design/README.md` + `design/architecture.md` + `design/data-model.md` |
+| 專案 wiki | `wiki/README.md` + `wiki/onboarding.md` + `wiki/development-setup.md` |
+| 技術文件集 | `docs/README.md` + `docs/guides/` + `docs/references/` + `docs/tutorials/` |
+
 ← [回到共用規則索引](README.md)
