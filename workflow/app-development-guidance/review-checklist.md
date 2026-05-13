@@ -25,159 +25,159 @@
 
 ---
 
-## Change Intake
+## Change Intake（變更接收）
 
-- The project's 企劃書, product brief, planning doc, issue, ticket, PRD, design note, BDD, API contract, or equivalent artifact was reviewed before code.
-- Major Product Brief claims are validated or labeled: goal, users, scope, non-goals, assumptions, success criteria, constraints, dependencies, and risks.
-- Unvalidated Product Brief claims that affect behavior, contracts, risk, ownership, tests, schedule, or release gates are blocker questions.
-- The change is classified as new requirement, bug fix, refactor, hardening, or documentation-only.
-- New requirements update planning docs, BDD, affected contracts, implementation slices, and test plan before code starts.
-- Bug fixes document expected vs actual behavior, reproduction/evidence, affected BDD scenario or missing scenario, impacted contracts/errors, and regression test plan.
-- Bug fixes that change **observable** behavior update affected contracts, BDD/traceability, and integration or live-test notes **in the same work session** as the code fix (not only after merge); deferral requires an explicit tracked follow-up, not silent drift.
-- Refactors are confirmed to have no behavior or public contract change; otherwise they are reclassified.
-- Changes that can affect latency, throughput, resource usage, startup, background work, database access, batching, caching, concurrency, or external-call volume define a performance budget and test type before code.
-- Blocker questions are answered, backed by evidence, or explicitly scoped out before implementation.
+- 在程式碼之前已審查專案的企劃書、product brief、planning doc、issue、ticket、PRD、design note、BDD、API contract 或同等 artifact。
+- 主要的 Product Brief 聲明已驗證或標記：目標、使用者、範圍、non-goals、假設、成功標準、限制、依賴和風險。
+- 影響行為、合約、風險、所有權、測試、時程或發布關卡的未驗證 Product Brief 聲明是阻擋性問題。
+- 變更已分類為新需求、bug 修復、重構、強化或僅文件。
+- 新需求在程式碼開始前更新規劃文件、BDD、受影響的合約、實作切片和測試計劃。
+- Bug 修復記錄預期行為 vs 實際行為、重現/證據、受影響的 BDD scenario 或缺失 scenario、受影響的合約/錯誤和回歸測試計劃。
+- 改變**可觀察**行為的 bug 修復在**同一個工作階段**中更新受影響的合約、BDD/可追溯性和整合或即時測試筆記（不僅在合併後）；延後需要明確的追蹤後續行動，而非無聲漂移。
+- 重構已確認沒有行為或公開合約變更；否則重新分類。
+- 可能影響延遲、吞吐量、資源使用、啟動、背景工作、資料庫存取、批次處理、快取、並發性或外部呼叫量的變更在程式碼之前定義效能預算和測試類型。
+- 阻擋性問題在實作前已回答、有證據支持或明確排除範圍。
 
-## Test Strategy
+## Test Strategy（測試策略）
 
-- Existing/legacy behavior has regression coverage for the affected paths.
-- New or changed behavior has BDD scenarios before production code.
-- New code has failing unit, contract, property, integration, or executable spec coverage before implementation when feasible.
-- Changed/new-code coverage is checked separately from total project coverage.
-- Mutation testing, property-based testing, invariant tests, or negative cases cover rule-heavy or safety-sensitive logic.
-- Database, repository, migration, or persistence behavior is verified with fixtures or integration tests when state matters.
-- Performance-sensitive changes include load, stress, spike, soak, or smoke-size performance evidence appropriate to the risk.
-- Performance evidence reports P95/P99 latency, throughput, error rate, and resource usage; average latency alone is not treated as sufficient.
-- Embedded or hardware-backed behavior distinguishes host-repeatable tests from target-only or hardware-in-loop evidence.
-- AI-generated code receives human review against planning docs, BDD, contracts, edge cases, and security/ownership boundaries.
+- 既有/舊有行為對受影響路徑有回歸覆蓋。
+- 新或變更的行為在生產程式碼之前有 BDD scenarios。
+- 新程式碼在可行時在實作之前有 failing unit、contract、property、integration 或 executable spec 覆蓋。
+- 變更/新程式碼覆蓋率與總專案覆蓋率分開檢查。
+- 突變測試、基於屬性的測試、不變量測試或負面案例涵蓋規則密集或安全敏感的邏輯。
+- 當狀態重要時，資料庫、儲存庫、遷移或持久化行為使用 fixtures 或整合測試驗證。
+- 效能敏感變更包含適合風險的 load、stress、spike、soak 或 smoke-size 效能證據。
+- 效能證據報告 P95/P99 延遲、吞吐量、錯誤率和資源使用率；平均延遲不被視為足夠。
+- 嵌入式或硬體支援的行為區分主機可重複測試與僅目標或硬體在迴路中的證據。
+- AI 生成的程式碼接受針對規劃文件、BDD、合約、邊緣案例和安全/所有權邊界的人類審查。
 
-## Performance Test Strategy
+## Performance Test Strategy（效能測試策略）
 
-- Performance testing is part of the release gate when user experience, operating cost, reliability, capacity, or external dependency load can change.
-- Load tests cover expected steady demand and compare results against the agreed latency, throughput, error-rate, and resource budgets.
-- Stress tests identify saturation behavior and confirm the system degrades predictably instead of failing silently.
-- Spike tests cover sudden traffic, job, queue, retry, cache, or external-call bursts.
-- Soak tests cover long-running memory, connection, cache, file-handle, queue, database, or resource drift.
-- CI/CD includes at least a small performance smoke check for critical paths when full suites are too expensive for every commit.
-- Performance baselines are versioned or recorded so reviewers can tell whether a change is faster, slower, or still within budget.
+- 當使用者體驗、營運成本、可靠性、容量或外部依賴負載可能改變時，效能測試是發布關卡的一部分。
+- 負載測試涵蓋預期的穩定需求，並將結果與同意的延遲、吞吐量、錯誤率和資源預算進行比較。
+- 壓力測試識別飽和行為，並確認系統可預測地降級而非無聲失敗。
+- 尖峰測試涵蓋突然的流量、作業、佇列、重試、快取或外部呼叫爆量。
+- 浸泡測試涵蓋長時間運行的記憶體、連線、快取、檔案控制代碼、佇列、資料庫或資源漂移。
+- CI/CD 至少包含關鍵路徑的小型效能 smoke 檢查，當完整套件對每次提交來說太昂貴時。
+- 效能基準已版本化或記錄，以便審查者可以判斷變更是更快、更慢還是仍在預算內。
 
-## Product To Contract Flow
+## Product To Contract Flow（產品到合約流程）
 
-- Product brief names goals, users, scope, non-goals, assumptions, and constraints.
-- Product brief claims have evidence, explicit decision, validation plan, or `open question` status before they drive BDD or implementation.
-- Success criteria can be proven by BDD, test, metric, demo, release checklist, or manual evidence.
-- Performance success criteria include explicit budgets when relevant: P95/P99 latency, throughput, error rate, and resource ceiling.
-- Assumptions have owners, validation plan, and impact if false.
-- Bounded Contexts or modules are split by domain responsibility and integration boundary.
-- Critical behavior is written as BDD scenarios before implementation.
-- Domain Model Contract defines entities, value objects, commands, events, and invariants.
-- Architecture Contract defines dependency direction, data ownership, runtime boundaries, and allowed integrations.
-- API, event, command, or public interface contract is defined before parallel implementation.
-- Error Handling Contract defines error taxonomy, retry rules, user messaging, logging, and redaction.
-- Embedded products define datasheet/protocol truth, hardware context, driver/service/application ownership, target constraints, and bring-up validation.
-- If there is no frontend/backend split, producer and consumer roles are still named.
-- Mock APIs, fixtures, schemas, or stubs are generated from the latest contract.
-- Unit, BDD, contract, and integration test responsibilities are assigned before build work starts.
-- Missing behavior, domain, API/interface, error handling, security, storage, ownership, or test requirements are asked as blocker questions before development continues.
+- Product brief 命名目標、使用者、範圍、non-goals、假設和限制。
+- Product brief 聲明在驅動 BDD 或實作之前有證據、明確決策、驗證計劃或 `open question` 狀態。
+- 成功標準可由 BDD、測試、指標、demo、發布檢查清單或手動證據證明。
+- 效能成功標準在相關時包含明確預算：P95/P99 延遲、吞吐量、錯誤率和資源上限。
+- 假設有負責人、驗證計劃和如果為假的影響。
+- Bounded Contexts 或模組按領域職責和整合邊界拆分。
+- 關鍵行為在實作之前撰寫為 BDD scenarios。
+- Domain Model Contract 定義 entities、value objects、commands、events 和 invariants。
+- Architecture Contract 定義依賴方向、資料所有權、runtime boundaries 和允許的整合。
+- API、event、command 或 public interface contract 在平行實作之前定義。
+- Error Handling Contract 定義 error taxonomy、retry rules、user messaging、logging 和 redaction。
+- 嵌入式產品定義 datasheet/protocol truth、hardware context、driver/service/application 所有權、target 限制和 bring-up validation。
+- 如果沒有前端/後端拆分，仍然命名 producer 和 consumer 角色。
+- Mock APIs、fixtures、schemas 或 stubs 從最新 contract 生成。
+- Unit、BDD、contract 和 integration test 責任在建置工作開始前分配。
+- 缺失的行為、領域、API/介面、錯誤處理、安全性、儲存、所有權或測試要求在開發繼續前作為阻擋性問題提出。
 
-## Existing Project Documentation Backfill
+## Existing Project Documentation Backfill（既有專案文件回填）
 
-- Existing project docs are inventoried and marked `exists`, `partial`, `missing`, or `unknown`.
-- Missing Product Brief fields are reconstructed only from evidence; unavailable original intent is marked `unknown` or `open question`.
-- Backfilled Product Brief claims are not treated as validated unless supported by UI, API, code, tests, logs, fixtures, user decision, or other evidence.
-- BDD behavior is complete for implemented critical happy paths, failure paths, permissions, empty states, edge cases, and cross-context flows.
-- BDD scenarios cite evidence from UI behavior, API behavior, code paths, tests, logs, fixtures, or manual verification.
-- Domain Model, Architecture, API / Interface, and Error Handling Contracts are backfilled from observed behavior and implementation evidence.
-- Every critical BDD scenario maps to existing test coverage or a required test gap.
-- Any gap that cannot be backfilled from evidence and affects behavior or contracts is asked before implementation proceeds.
-- Document precedence is defined so agents know which artifact wins when docs disagree.
-- Stable IDs link product/rule/operation/command/diagnostic entries to BDD, code refs, fixtures, and tests.
-- BDD scenarios are marked `automated`, `fixture-backed`, `manual-evidence`, `pending-runner`, or `not-automatable`.
-- Canceled, deferred, process-only, noop, manual-only, and out-of-scope items are explicitly labeled.
+- 既有專案文件已盤點並標記為 `exists`、`partial`、`missing` 或 `unknown`。
+- 缺失的 Product Brief 欄位僅從證據重建；不可取得的原始意圖標記為 `unknown` 或 `open question`。
+- 回填的 Product Brief 聲明除非有 UI、API、程式碼、測試、日誌、fixtures、使用者決策或其他證據支持，否則不被視為已驗證。
+- BDD behavior 對已實作的關鍵 happy paths、failure paths、權限、空狀態、edge cases 和跨 context 流程是完整的。
+- BDD scenarios 引用來自 UI 行為、API 行為、程式碼路徑、測試、日誌、fixtures 或手動驗證的證據。
+- Domain Model、Architecture、API / Interface 和 Error Handling Contracts 從觀察到的行為和實作證據回填。
+- 每個關鍵 BDD scenario 對應到既有測試覆蓋率或必要的測試差距。
+- 任何無法從證據回填且影響行為或合約的差距在實作繼續前提出。
+- 文件優先順序已定義，以便 agent 在文件不一致時知道哪個 artifact 優先。
+- Stable IDs 將 product/rule/operation/command/diagnostic 條目連結到 BDD、code refs、fixtures 和 tests。
+- BDD scenarios 標記為 `automated`、`fixture-backed`、`manual-evidence`、`pending-runner` 或 `not-automatable`。
+- 已取消、延後、僅流程、noop、僅手動和排除範圍的項目已明確標記。
 
-## Contract Governance
+## Contract Governance（合約治理）
 
-- Governance/framework contract, product plan, BDD, domain/API/interface/error contracts, implementation, and tests have a clear precedence order.
-- Minimum doc-sync matrix exists for API, permission, database, UI flow, generated client, vendor integration, CLI command, diagnostic rule, and release setting changes when those surfaces exist.
-- OpenAPI/schema/API contract changes regenerate typed clients, SDKs, mocks, fixtures, or schema packages.
-- Vendor integration docs separate raw vendor sources from sanitized integration excerpts, fixtures, live-test gates, and secret handling.
-- Tooling/extension rule catalogs map stable IDs to diagnostics/commands, fixtures, tests, and explicit non-enforceable entries.
+- Governance/framework contract、product plan、BDD、domain/API/interface/error contracts、implementation 和 tests 有明確的優先順序。
+- 當這些表面存在時，存在最小文件同步矩陣，涵蓋 API、permission、database、UI flow、generated client、vendor integration、CLI command、diagnostic rule 和 release setting 變更。
+- OpenAPI/schema/API contract 變更重新生成 typed clients、SDKs、mocks、fixtures 或 schema packages。
+- Vendor integration docs 分開 raw vendor sources 與 sanitized integration excerpts、fixtures、live-test gates 和 secret handling。
+- Tooling/extension rule catalogs 將 stable IDs 映射到 diagnostics/commands、fixtures、tests 和明確的 non-enforceable entries。
 
-## Reusable Guidance Boundary
+## Reusable Guidance Boundary（可重複使用指引邊界）
 
-- Apply the global rule in [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md).
-- Reusable skill guidance states the generalized failure mode, decision rule, owner layer, and validation method.
-- Project names, local paths, hosts, endpoint strings, payload fragments, sample IDs, class names, live-data quirks, and execution results stay in the project repository, not the reusable skill.
-- Incident-derived lessons are split: generalized method in the skill; concrete reproduction evidence and BDD/test file names in project docs.
-- After editing this skill, search the changed skill folder for project-specific strings and remove or relocate any matches.
+- 應用 [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md) 中的全域規則。
+- 可重複使用的技能指引說明通用故障模式、決策規則、擁有者層和驗證方法。
+- 專案名稱、本機路徑、主機、端點字串、負載片段、樣本 ID、類別名稱、即時資料特異性和執行結果保留在專案儲存庫中，而非可重複使用的技能中。
+- 從事件衍生的課程被拆分：技能中的通用方法；專案文件中的具體重現證據和 BDD/test 檔案名稱。
+- 編輯此技能後，搜尋變更的技能資料夾中的專案特定字串，並移除或重新定位任何匹配項。
 
-## Embedded / Hardware Product Review
+## Embedded / Hardware Product Review（嵌入式/硬體產品審查）
 
-- Datasheet, vendor protocol, errata, and observed deviations are documented separately from product behavior.
-- Hardware context records board revision, pins, bus/UART/I2C/SPI/BLE/CAN settings, buffers, timing, and power assumptions.
-- Board-specific wiring and pin choices are injected through context/config rather than hard-coded as the only production path.
-- Driver, service, domain, and application layers have clear ownership; raw bytes/registers do not leak into product behavior code.
-- BDD uses domain behavior and device states, not raw UART/register operations.
-- Protocol fixtures include positive examples, invalid length/shape, resynchronization or checksum failures, and boundary values from the spec.
-- Host-repeatable tests cover parsing, domain invariants, command/API contracts, and error mapping before relying on bench-only checks.
-- Hardware-in-loop or manual bring-up records firmware version, board/wiring, test command, logs, measurement evidence, and known limitations.
-- Safety-related behavior defines fail-safe state, timeout, debounce/cooldown, retry, and recovery rules.
-- Release gate covers target build, flashing path, config defaults, secrets, debug logs, calibration/version notes, and rollback or recovery path.
+- Datasheet、vendor protocol、errata 和觀察到的偏差與產品行為分開記錄。
+- Hardware context 記錄板子修訂、引腳、匯流排/UART/I2C/SPI/BLE/CAN 設定、緩衝區、時間和電源假設。
+- 板子特定的接線和引腳選擇透過 context/config 注入，而非硬編碼為唯一的生產路徑。
+- Driver、service、domain 和 application layers 有明確的所有權；raw bytes/registers 不會洩漏到產品行為程式碼中。
+- BDD 使用領域行為和裝置狀態，而非 raw UART/register 操作。
+- Protocol fixtures 包含正面範例、無效長度/形狀、重新同步或 checksum 失敗，以及 spec 中的邊界值。
+- 主機可重複測試在依賴 bench-only 檢查之前涵蓋 parsing、domain invariants、command/API contracts 和 error mapping。
+- 硬體在迴路中或手動啟動記錄韌體版本、板子/接線、測試命令、日誌、測量證據和已知限制。
+- 安全相關行為定義 fail-safe state、timeout、debounce/cooldown、retry 和 recovery rules。
+- 發布關卡涵蓋目標建置、燒錄路徑、配置預設值、機密、除錯日誌、校準/版本備註和回滾或復原路徑。
 
-## API And Transport
+## API And Transport（API 與傳輸）
 
-- Sensitive flows use HTTPS only; cleartext traffic is disabled in release builds.
-- Certificate pinning is considered for high-risk apps, with a rotation and incident plan.
-- Backend authorization does not trust client-only flags, roles, prices, balances, or feature gates.
-- Replay-sensitive requests have server-side timestamp, nonce, idempotency, or risk checks.
-- Request signing, if used, signs the right fields and does not rely on a static client secret.
-- Error responses avoid leaking stack traces, internal hostnames, or sensitive business rules.
-- Generated clients and SDKs come from the current API/schema contract; consumers do not hand-copy routes, DTOs, or response envelopes.
-- Third-party webhooks/callbacks validate signature, timestamp, body binding, idempotency, and replay behavior.
+- 敏感流程僅使用 HTTPS；明文流量在發布建置中禁用。
+- 對高風險應用程式考慮憑證固定，並附有輪換和事件計劃。
+- 後端授權不信任僅客戶端的標誌、角色、價格、餘額或功能閘門。
+- 對重放敏感的請求具有伺服器端時間戳、nonce、冪等性或風險檢查。
+- 請求簽名（如果使用）簽署正確的欄位，且不依賴靜態客戶端機密。
+- 錯誤回應避免洩漏堆疊追蹤、內部主機名稱或敏感業務規則。
+- 生成的客戶端和 SDK 來自當前 API/schema contract；消費者不手抄 routes、DTOs 或 response envelopes。
+- 第三方 webhooks/callbacks 驗證簽名、時間戳、body binding、冪等性和重放行為。
 
-## Auth, Tokens, And Sessions
+## Auth, Tokens, And Sessions（驗證、令牌與工作階段）
 
-- Access tokens are scoped, time-limited, and revocable.
-- Refresh flows are rate-limited and bound to account/session context.
-- Logout, password change, and risk events invalidate relevant sessions.
-- Tokens are not written to debug logs, crash reports, analytics, or screenshots.
-- Session identifiers are not used as long-term device identifiers.
+- 存取令牌有範圍、時限且可撤銷。
+- 重新整理流程有速率限制且綁定到帳戶/工作階段上下文。
+- 登出、密碼變更和風險事件使相關工作階段失效。
+- 令牌不會寫入除錯日誌、崩潰報告、分析或螢幕截圖。
+- 工作階段識別碼不用作長期裝置識別碼。
 
-## Local Storage
+## Local Storage（本地儲存）
 
-- Secrets are stored only when needed, and use platform-backed secure storage where possible.
-- Cache files, SQLite, shared preferences, and downloaded media are reviewed for sensitive content.
-- Backups and screenshots are configured according to product risk.
-- Offline data has an expiry, encryption plan, or clear business justification.
+- 機密僅在需要時儲存，並在可能的情況下使用平台支援的安全儲存。
+- 快取檔案、SQLite、共享偏好設定和下載的媒體會審查敏感內容。
+- 備份和螢幕截圖根據產品風險進行配置。
+- 離線資料有到期日、加密計劃或明確的業務理由。
 
-## Flutter And Android Build
+## Flutter And Android Build（Flutter 與 Android 建置）
 
-- Release builds disable debug flags, test endpoints, dev menus, and verbose network logging.
-- Obfuscation/minification is enabled where compatible with crash symbolication and support needs.
-- Native symbols are stripped unless needed for diagnostics.
-- Flutter platform channels do not expose privileged operations without server-side or OS-level checks.
-- Third-party SDKs are reviewed for permissions, telemetry, and data collection.
+- 發布建置禁用除錯標誌、測試端點、開發選單和詳細的網路日誌。
+- 在與崩潰符號化和支援需求相容的地方啟用混淆/最小化。
+- 除非診斷需要，否則移除原生符號。
+- Flutter platform channels 在沒有伺服器端或 OS 級別檢查的情況下不暴露特權操作。
+- 第三方 SDK 會審查權限、遙測和資料收集。
 
-## Logging And Telemetry
+## Logging And Telemetry（日誌與遙測）
 
-- Logs redact tokens, cookies, authorization headers, device IDs, and personal data.
-- Crash reports and analytics events avoid raw request/response payloads.
-- Debug logging is gated away from release builds.
-- Security-relevant failures are observable without exposing secrets.
+- 日誌清理令牌、cookies、授權標頭、裝置 ID 和個人資料。
+- 崩潰報告和分析事件避免原始 request/response 負載。
+- 除錯日誌與發布建置隔離。
+- 安全相關的故障是可觀察的，而不暴露機密。
 
-## Anti-Tamper And Risk Signals
+## Anti-Tamper And Risk Signals（反篡改與風險訊號）
 
-- Root/jailbreak/emulator/hook detection is treated as a risk signal, not a sole access-control decision.
-- Server-side risk scoring can tolerate false positives and false negatives.
-- Critical operations still require backend authorization and abuse controls.
-- The app avoids storing static secrets that become permanent bypass targets.
+- Root/jailbreak/emulator/hook 檢測被視為風險訊號，而非唯一的存取控制決策。
+- 伺服器端風險評分可以容忍誤報和漏報。
+- 關鍵操作仍然需要後端授權和濫用控制。
+- 應用程式避免儲存成為永久繞過目標的靜態機密。
 
-## Release Gate
+## Release Gate（發布關卡）
 
-- A reviewer can point to tests, build checks, or documented evidence for every required control.
-- No unresolved blocker questions remain for behavior, contracts, errors, security, storage, ownership, or tests.
-- Known residual risks are documented in the project repository.
-- Reusable lessons are generalized into this skill only after sanitization.
+- 審查者可以指向測試、建置檢查或記錄的證據，證明每個必要控制存在。
+- 沒有影響行為、合約、錯誤、安全性、儲存、所有權或測試的未解決阻擋性問題。
+- 已知的殘留風險記錄在專案儲存庫中。
+- 可重複使用的課程僅在清理後才提升到此技能中。
 
 ---
 

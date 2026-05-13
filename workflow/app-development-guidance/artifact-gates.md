@@ -1,104 +1,104 @@
-# App Development Guidance Artifact Gates
+# App Development Guidance Artifact Gates（開發指引產出規範）
 
 本文件定義開發指引文件的產出規範與品質門檻。承接 [`skills/app-development-guidance/DOCUMENTATION.md`](../../skills/app-development-guidance/DOCUMENTATION.md) 的內容，提取為 tool-neutral 的 artifact gates。
 
 > **相容性規則**：`skills/app-development-guidance/DOCUMENTATION.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
 
-## 1. Reusable Note Structure
+## 1. 可重複使用的筆記結構（Reusable Note Structure）
 
-When turning an APK analysis lesson, implementation observation, embedded/firmware observation, hardware-product lesson, or design review into reusable development guidance, use this structure:
+當將 APK 分析課程、實作觀察、嵌入式/韌體觀察、硬體產品課程或設計審查轉換為可重複使用的開發指引時，使用此結構：
 
 ```markdown
-### Short title
+### 簡短標題
 
-Status: candidate | validated | promoted | deprecated | experimental
+狀態：candidate | validated | promoted | deprecated | experimental
 
-#### Observed Risk
+#### 觀察到的風險（Observed Risk）
 
-What pattern was observed, without target-specific secrets.
+觀察到的模式，不含目標特定機密。
 
-#### Development Consequence
+#### 開發後果（Development Consequence）
 
-Why this matters when building our own app, API, SDK, firmware, or hardware-backed product.
+為什麼這在建立我們自己的應用程式、API、SDK、韌體或硬體支援產品時很重要。
 
-#### Recommended Implementation / Control
+#### 建議實作 / 控制（Recommended Implementation / Control）
 
-What to implement, and which layer owns it.
+要實作什麼，以及哪一層擁有它。
 
-#### Validation
+#### 驗證（Validation）
 
-How to prove the control exists or fails safely.
+如何證明控制存在或安全地失敗。
 
-#### Limits
+#### 限制（Limits）
 
-What this does not solve.
+這不能解決什麼。
 ```
 
-## 2. Content Classification (Keep Separate)
+## 2. 內容分類（保持分離）
 
-| Content | Put it in |
+| 內容 | 放置位置 |
 | --- | --- |
-| Cross-platform security principle | `controls/`. |
-| Platform, app-type, embedded, firmware, or hardware-product implementation detail | `platforms/`. |
-| Language/runtime-specific pitfall | `languages/`. |
-| Concrete buildable implementation pattern | `implementation/`. |
-| Repeatable review process | `checklists/`. |
-| Reusable development principle not yet promoted | Matching `feedback_history/<category>/`, or `feedback_history/common/` for cross-cutting lessons. |
-| APK analysis method or hook technique | `skills/apk-analysis/`. |
-| Project-specific board wiring, calibration logs, firmware dumps, bench measurements, device identifiers, or target hardware conclusions | Project repository docs. |
-| Product-specific API host, endpoint, schema, or token detail | Project repository docs. |
-| Raw vendor documents, account-specific terms, credentials, sandbox/live hosts, private webhook payloads, or real customer data | Project repository docs with sanitization and access control. |
-| Generated clients, SDKs, fixtures, and provider/consumer contract checks | `implementation/` and the project repository. |
-| Product Brief validation, document precedence, traceability, and BDD closure process | `process/`, templates, and checklists. |
-| Performance budgets, load/stress/spike/soak strategy, CI smoke checks, and release evidence | `process/`, `CHECKLIST.md`, templates, and the project repository's test or release notes. |
-| Shared sanitization or feedback rules | `shared-rules/`. |
-| Local-only scratch notes, credentials, or ephemeral process artifacts | Project repository only: **gitignored** paths with **neutral** directory naming; configuration via env vars and optional untracked files; keep tracked READMEs free of filesystem tours and internal codenames. |
+| 跨平台安全原則 | `controls/` |
+| 平台、應用類型、嵌入式、韌體或硬體產品實作細節 | `platforms/` |
+| 語言/執行時期特定的陷阱 | `languages/` |
+| 具體的可建置實作模式 | `implementation/` |
+| 可重複的審查流程 | `checklists/` |
+| 尚未提升的可重複使用開發原則 | 匹配的 `feedback_history/<category>/`，或跨領域的 `feedback_history/common/` |
+| APK 分析方法或 hook 技術 | `skills/apk-analysis/` |
+| 專案特定的板子接線、校準日誌、韌體 dump、bench 測量、裝置識別碼或目標硬體結論 | 專案儲存庫文件 |
+| 產品特定的 API 主機、端點、schema 或令牌細節 | 專案儲存庫文件 |
+| 原始供應商文件、帳戶特定條款、憑證、沙箱/正式主機、私人 webhook 負載或真實客戶資料 | 專案儲存庫文件，附清理和存取控制 |
+| 生成的客戶端、SDK、fixtures 和提供者/消費者合約檢查 | `implementation/` 和專案儲存庫 |
+| Product Brief 驗證、文件優先順序、可追溯性和 BDD 閉環流程 | `process/`、templates 和 checklists |
+| 效能預算、負載/壓力/尖峰/浸泡策略、CI smoke 檢查和發布證據 | `process/`、`CHECKLIST.md`、templates 和專案儲存庫的測試或發布筆記 |
+| 共享的清理或回饋規則 | `shared-rules/` |
+| 僅限本機的暫記筆記、憑證或暫時性流程產出 | 僅限專案儲存庫：**gitignored** 路徑搭配**中性**目錄命名；透過環境變數和可選的未追蹤檔案進行配置；保持追蹤的 README 不含檔案系統導覽和內部代號 |
 
-## 3. Reusable Guidance Boundary
+## 3. 可重複使用指引邊界（Reusable Guidance Boundary）
 
-This section applies the global rule in [`shared-rules/reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md).
+本節應用 [`shared-rules/reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md) 中的全域規則。
 
-Skill documentation should describe the reusable reason, failure mode, decision rule, and validation method. Do not promote a project incident by copying its app name, module name, endpoint path, sample payload, class name, local path, host, or live-data quirk into the skill.
+技能文件應描述可重複使用的原因、故障模式、決策規則和驗證方法。不要將專案事件透過複製其應用程式名稱、模組名稱、端點路徑、範例負載、類別名稱、本機路徑、主機或即時資料特異性提升到技能中。
 
-If an incident teaches a useful lesson, split it:
+如果一個事件教導了有用的課程，將其拆分：
 
-- **Skill:** generalized rule, such as "SDK bugs reported against a live service should be reproduced through the SDK public surface and then pinned with behavior specs and regression tests."
-- **Project docs:** concrete reproduction target, affected feature, sample IDs, live environment notes, BDD file names, test class names, and execution results.
+- **技能：** 通用規則，例如「針對即時服務報告的 SDK bug 應透過 SDK 公開表面重現，然後用行為規格和回歸測試鎖定。」
+- **專案文件：** 具體的重現目標、受影響功能、樣本 ID、即時環境筆記、BDD 檔案名稱、測試類別名稱和執行結果。
 
-Start with `templates/README.md` when choosing a copyable documentation shape. Use `templates/initial-development-docs.md` when starting from or validating a product brief, `templates/hardening-note.md` for reusable guidance, and `templates/threat-model-lite.md` for quick feature reviews.
+從 `templates/README.md` 開始選擇可複製的文件形狀。從 product brief 開始或驗證時使用 `templates/initial-development-docs.md`，可重複使用指引使用 `templates/hardening-note.md`，快速功能審查使用 `templates/threat-model-lite.md`。
 
-## 4. Required Linked Update Statement
+## 4. 必要連結更新聲明（Required Linked Update Statement）
 
-Every reusable note that affects multiple folders must follow [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md) and include a short linked-update statement:
+每個影響多個資料夾的可重複使用筆記必須遵循 [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md) 並包含簡短的連結更新聲明：
 
 ```markdown
-#### Required Linked Updates
+#### 必要連結更新（Required Linked Updates）
 
-- `controls/...`: updated or checked because ...
-- `implementation/...`: updated or checked because ...
-- `checklists/...`: updated or checked because ...
+- `controls/...`：已更新或已檢查，因為 ...
+- `implementation/...`：已更新或已檢查，因為 ...
+- `checklists/...`：已更新或已檢查，因為 ...
 ```
 
-If linked updates are not needed, state why. This makes it clear that related docs are required to stay in sync, not optional follow-ups.
+如果不需要連結更新，說明原因。這使得相關文件必須保持同步而非可選的後續行動變得明確。
 
-## 5. Good Guidance Criteria
+## 5. 良好指引標準（Good Guidance Criteria）
 
-Good development guidance is:
+良好的開發指引是：
 
-- Actionable by an engineer.
-- Explicit about the owner layer.
-- Clear enough to turn into code, configuration, tests, or review checklist items.
-- Testable.
-- Honest about residual risk.
-- Sanitized and free of target-specific details.
-- Explicit when performance evidence is required, including the metric, budget, environment, runner, and release gate.
+- 工程師可執行的。
+- 明確說明擁有者層。
+- 足夠清楚以轉化為程式碼、配置、測試或審查檢查清單項目。
+- 可測試的。
+- 誠實面對殘留風險。
+- 已清理且不含目標特定細節。
+- 在需要效能證據時明確，包括指標、預算、環境、執行器和發布關卡。
 
-## 6. Avoid
+## 6. 避免（Avoid）
 
-- Tracked markdown that maps unpublished workflow to evocative directory names, lists developer-machine paths, or repeats internal investigation stories—those belong in local-only notes under gitignore, not in the default-branch narrative.
-- "Use obfuscation" without naming what it protects and what it does not.
-- "Performance is fine" based only on functional tests or average latency, without P95/P99, throughput, error-rate, resource, baseline, or environment context.
-- "Add pinning" without a rotation plan or threat model.
-- "Detect root" as a hard authorization decision.
-- "Hide the secret in the app" as a durable security control.
-- Copying raw findings from a third-party APK into reusable docs.
+- 將未發布的工作流程映射到暗示性目錄名稱、列出開發者機器路徑或重複內部調查故事的追蹤 Markdown——這些屬於 gitignore 下的僅本機筆記，而非預設分支敘述。
+- 使用「混淆」而不說明它保護什麼和不保護什麼。
+- 僅基於功能測試或平均延遲就說「效能沒問題」，而沒有 P95/P99、吞吐量、錯誤率、資源、基準或環境上下文。
+- 沒有輪換計劃或威脅模型就「添加固定」。
+- 將「檢測 root」作為硬性授權決策。
+- 將「在應用程式中隱藏機密」作為持久的安全控制。
+- 將第三方 APK 的原始發現複製到可重複使用的文件中。

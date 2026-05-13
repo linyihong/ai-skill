@@ -1,158 +1,158 @@
-# App Development Guidance Execution Flow
+# App Development Guidance Execution Flow（開發指引執行流程）
 
 本文件定義從分析觀察轉換為開發指引的執行流程。承接 [`skills/app-development-guidance/WORKFLOW.md`](../../skills/app-development-guidance/WORKFLOW.md) 的內容，提取為 tool-neutral 的執行步驟。
 
 > **相容性規則**：`skills/app-development-guidance/WORKFLOW.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
 
-## 1. Start From Evidence
+## 1. 從證據開始（Start From Evidence）
 
-Record the reusable observation:
+記錄可重複使用的觀察：
 
-- What is the goal of this work unit, what action was taken, and how was it validated? If validation is not executable, cite the reference source and reasoning boundary.
-- What behavior was observed?
-- Which layer exposed it: client code, transport, API contract, storage, logs, build config, firmware, hardware context, protocol, or runtime behavior?
-- Is the issue confirmed, suspected, or only a risk pattern?
+- 這個工作單元的目標是什麼、採取了什麼行動、以及如何驗證？如果驗證不可執行，引用參考來源和推理邊界。
+- 觀察到了什麼行為？
+- 哪一層暴露了它：客戶端程式碼、傳輸層、API 合約、儲存層、日誌、建置配置、韌體、硬體上下文、協定或執行時期行為？
+- 問題是已確認、可疑還是僅為風險模式？
 
-Do not copy target-specific endpoints, tokens, secrets, device IDs, raw user data, or project incident details into this skill. Apply [`shared-rules/reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md) before promoting observations into reusable guidance.
+不要將目標特定的端點、令牌、機密、裝置 ID、原始使用者資料或專案事件細節複製到這個技能中。在將觀察提升為可重複使用的指引之前，應用 [`shared-rules/reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md)。
 
-### Change Intake
+### 變更接收（Change Intake）
 
-Before code work, run change intake:
+在程式碼工作之前，執行變更接收：
 
-| Question | Required action |
+| 問題 | 必要行動 |
 | --- | --- |
-| What planning artifact exists? | Read the 企劃書, product brief, planning doc, issue, ticket, PRD, design note, BDD, API contract, or equivalent. |
-| Has the product brief itself been validated? | Check goal, users, scope, non-goals, assumptions, constraints, dependencies, risks, and success criteria against evidence or explicit decisions. Mark each major claim `validated`, `assumption`, `open question`, `scoped out`, or `invalidated`. |
-| Is this a new requirement or behavior change? | Update planning docs, BDD, contracts, implementation slices, and tests before code. |
-| Is this a bug fix? | Confirm expected vs actual behavior, reproduction/evidence, affected BDD or missing scenario, impacted contracts/errors, and regression test. |
-| Is this a refactor? | Confirm no behavior or public contract change; otherwise reclassify. |
-| Is this hardening? | Confirm threat/failure mode, owner layer, validation, and linked checklist/control updates. |
-| Does this change affect latency, throughput, resource usage, startup, background work, database access, batch processing, or external-call volume? | Define a performance budget and required performance test type before code. Do not rely on "functionally correct" as proof that the change is release-ready. |
-| Does this change conflict with existing docs? | Apply document precedence: governance/framework contract, product plan, BDD, contracts, implementation, tests. Update the owning document instead of silently fixing only code. |
+| 存在什麼規劃產出？ | 閱讀企劃書、product brief、規劃文件、issue、ticket、PRD、設計備註、BDD、API 合約或同等文件 |
+| Product brief 本身是否已驗證？ | 根據證據或明確決策檢查目標、使用者、範圍、non-goals、假設、限制、依賴、風險和成功標準。將每個主要聲明標記為 `validated`（已驗證）、`assumption`（假設）、`open question`（開放問題）、`scoped out`（排除範圍）或 `invalidated`（無效） |
+| 這是新需求還是行為變更？ | 在程式碼之前更新規劃文件、BDD、合約、實作切片和測試 |
+| 這是 bug 修復？ | 確認預期行為 vs 實際行為、重現/證據、受影響的 BDD 或缺失 scenario、受影響的合約/錯誤和回歸測試 |
+| 這是重構？ | 確認沒有行為或公開合約變更；否則重新分類 |
+| 這是強化？ | 確認威脅/故障模式、擁有者層、驗證和連結的檢查清單/控制更新 |
+| 這個變更是否影響延遲、吞吐量、資源使用、啟動、背景工作、資料庫存取、批次處理或外部呼叫量？ | 在程式碼之前定義效能預算和必要的效能測試類型。不要依賴「功能正確」作為變更可發布的證明 |
+| 這個變更是否與現有文件衝突？ | 應用文件優先順序：治理/框架合約、產品計劃、BDD、合約、實作、測試。更新擁有文件，而不是僅默默修正程式碼 |
 
-If no planning artifact exists and the request changes behavior, create a lightweight change brief and ask blocker questions before implementation.
+如果不存在規劃產出且請求會改變行為，在實作之前建立輕量的變更簡報並詢問阻擋性問題。
 
-If the product brief exists but has unvalidated claims that affect behavior, contracts, risks, tests, ownership, schedule, or release gates, treat those claims as blockers before implementation. For pure planning answers, cite the reference source or reasoning boundary instead of pretending the brief is validated.
+如果 product brief 存在但包含影響行為、合約、風險、測試、所有權、時程或發布關卡的未驗證聲明，在實作之前將這些聲明視為阻擋項。對於純規劃答案，引用參考來源或推理邊界，而不是假裝 brief 已驗證。
 
-## 2. Docs-First BDD Closure Loop
+## 2. 文件優先 BDD 閉環（Docs-First BDD Closure Loop）
 
-When working in a repository where behavior is governed by human-readable specs plus executable tests, keep the artifacts synchronized before changing observable behavior:
+當在行為由人類可讀規格加上可執行測試管理的儲存庫中工作時，在改變可觀察行為之前保持產出同步：
 
-| Step | Action |
+| 步驟 | 行動 |
 | --- | --- |
-| 1 | Update the **owning contract** (architecture, API/interface, domain model, error handling, product brief, or equivalent) and resolve or label open questions before code. |
-| 2 | Add or edit the **human-readable behavior spec** in the project's designated location. |
-| 3 | Mirror the same scenarios in the project's **executable behavior tests**; keep written scenarios and runnable checks in lockstep. |
-| 4 | Implement step definitions, adapters, fixtures, and production code. |
-| 5 | **Definition of done:** the aggregate executable behavior suite or equivalent verification passes in the same change, and any status tables or traceability docs are updated. |
+| 1 | 更新**擁有合約**（架構、API/介面、領域模型、錯誤處理、product brief 或同等文件），並在程式碼之前解決或標記開放問題 |
+| 2 | 在專案指定位置添加或編輯**人類可讀的行為規格** |
+| 3 | 在專案的**可執行行為測試**中鏡像相同的 scenarios；保持書面 scenarios 和可執行檢查同步 |
+| 4 | 實作步驟定義、適配器、fixtures 和生產程式碼 |
+| 5 | **完成定義：** 聚合的可執行行為套件或同等驗證在同一次變更中通過，且任何狀態表或可追溯性文件已更新 |
 
-Do not merge observable behavior or shared-contract changes with **only** unit tests and no behavior-spec alignment unless the team has explicitly scoped the missing spec work in a traceable change record.
+除非團隊已在可追溯的變更記錄中明確範圍化缺失的規格工作，否則不要僅使用**單元測試**而沒有行為規格對齊就合併可觀察行為或共享合約變更。
 
-For project-specific paths, test runners, and status tables, use the application repository's own governance docs; do not copy those details into this reusable skill.
+對於專案特定路徑、測試執行器和狀態表，使用應用程式儲存庫自己的治理文件；不要將這些細節複製到這個可重複使用的技能中。
 
-## 3. SDK Defect Closure Loop (Live Reproduction + BDD Regression)
+## 3. SDK 缺陷閉環（即時重現 + BDD 回歸）
 
-Use this when a report concerns **SDK-observable behavior** against a production-like environment or vendor service. Goal: **verify with the same code paths integrators use**, then **lock the generalized behavior** in docs and tests—not only chat conclusions or one-off debugging notes.
+當報告涉及**針對生產環境或供應商服務的 SDK 可觀察行為**時使用此流程。目標：**使用整合者使用的相同程式碼路徑進行驗證**，然後**在文件和測試中鎖定通用行為**——而不僅是聊天結論或一次性除錯筆記。
 
-| Step | Action |
+| 步驟 | 行動 |
 | --- | --- |
-| 1 | **Reproduce** using the application's live or integration-test harness, calling **supported SDK public surfaces only**; do not inject captured authorization material or hand-built HTTP outside the SDK unless the project explicitly defines that as the surface under test. |
-| 2 | **Record** pass/fail, instability, environment constraints, and sanitized failure class in the project's integration-test notes or equivalent traceability artifact. Capture the cause category, not private host names, tokens, user data, or one-off sample IDs. |
-| 3 | If behavior is wrong or must be documented as contract: update the project's human-readable behavior spec, mirror executable behavior tests, and add or extend fixture-backed and/or live regression coverage. |
-| 4 | Apply **same-session closure**: owning contracts and Linked updates move with code/docs in one batch. |
+| 1 | **重現**：使用應用程式的即時或整合測試工具，僅呼叫**支援的 SDK 公開表面**；除非專案明確將其定義為測試中的表面，否則不要注入捕獲的授權資料或手動建構的 HTTP |
+| 2 | **記錄**：在專案的整合測試筆記或同等可追溯性產出中記錄通過/失敗、不穩定性、環境限制和已清理的失敗類別。捕獲原因類別，而非私人主機名稱、令牌、使用者資料或一次性樣本 ID |
+| 3 | 如果行為錯誤或必須記錄為合約：更新專案的人類可讀行為規格、鏡像可執行行為測試，並添加或擴展 fixture 支援和/或即時回歸覆蓋 |
+| 4 | 應用**同工作階段閉環**：擁有合約和連結更新與程式碼/文件在同一批次中移動 |
 
-Stable composition, mapping, decoding, and error semantics usually belong in **fixture-backed behavior tests**; remote service availability and edge protection may remain **live-only** with documented flakiness and fallback validation.
+穩定的組合、映射、解碼和錯誤語義通常屬於**fixture 支援的行為測試**；遠端服務 availability 和邊緣保護可能保持**僅即時**，並記錄不穩定性和備用驗證。
 
-## 4. Same-Session Closure (Code + Durable Docs)
+## 4. 同工作階段閉環（程式碼 + 持久文件）
 
-Implementation work often stalls after **tests pass**. That leaves contracts, BDD, and integration notes describing obsolete behavior—especially when the task was framed as "fix the bug" or "adjust the SDK" without mentioning documentation.
+實作工作通常在**測試通過**後停滯。這使得合約、BDD 和整合筆記描述過時的行為——特別是當任務被框架化為「修復 bug」或「調整 SDK」而未提及文件時。
 
-| Root cause | Mitigation |
+| 根本原因 | 緩解措施 |
 | --- | --- |
-| Task framed as code-only | Classify the change anyway; if **observable** behavior changed, linked specs must move in the **same batch** as production code. |
-| User message omitted "update docs" | Skill still applies: bug fixes that change semantics **are** behavior changes for governance purposes. |
-| Definition of Done = green CI | Expand DoD: owning contract/BDD rows updated, or an explicit **scoped** docs debt ticket ID recorded in the change brief. |
-| Project Linked Updates live only in repo README | Follow that matrix when touching the listed surfaces; agents should read it when editing those packages. |
+| 任務被框架化為僅程式碼 | 仍然分類變更；如果**可觀察**行為改變了，連結的規格必須在**同一批次**中與生產程式碼一起移動 |
+| 使用者訊息省略了「更新文件」 | 技能仍然適用：改變語義的 bug 修復在治理目的上**是**行為變更 |
+| 完成定義 = 綠色 CI | 擴展 DoD：擁有合約/BDD 行已更新，或在變更簡報中記錄明確的**範圍化**文件債務 ticket ID |
+| 專案連結更新僅存在於儲存庫 README 中 | 在觸及所列表面時遵循該矩陣；agent 在編輯這些套件時應讀取它 |
 
-**Before marking complete:** verify durable artifacts match the new runtime truth—at minimum the project's Architecture/API/Error/Test contracts that apply, Gherkin or executable specs for affected flows, and live-test or integration notes when public semantics shift.
+**在標記完成之前：** 驗證持久文件符合新的執行時期真相——至少是適用的專案架構/API/錯誤/測試合約、受影響流程的 Gherkin 或可執行規格，以及當公開語義改變時的即時測試或整合筆記。
 
-### Test Strategy Definition
+### 測試策略定義
 
-Then define the test strategy:
+然後定義測試策略：
 
-| Question | Required action |
+| 問題 | 必要行動 |
 | --- | --- |
-| What existing behavior must not regress? | Run or add regression tests for impacted old behavior. |
-| What new behavior is being introduced? | Write BDD and failing tests or executable specs before production code when feasible. |
-| Does total coverage hide untested new code? | Track changed/new-code coverage separately from whole-project coverage. |
-| Is the logic rule-heavy or safety-sensitive? | Add mutation testing, property-based tests, invariant tests, or negative cases. |
-| Does persistence matter? | Add fixture-backed database/repository/migration tests or integration tests. |
-| Was code generated by AI? | Require tests plus human review against planning docs, BDD, contracts, and edge cases. |
-| Is this embedded or hardware-backed? | Separate host-repeatable tests from target-only or hardware-in-loop evidence; record board, wiring, pin/bus settings, firmware version, logs, and observed deviations. |
-| Does performance matter for this change? | Add a small, repeatable performance check first; choose load, stress, spike, or soak testing based on the risk. Track P95/P99 latency, throughput, error rate, and resource usage instead of only average latency. |
+| 哪些既有行為不能回歸？ | 為受影響的舊行為執行或添加回歸測試 |
+| 引入了什麼新行為？ | 在可行時在生產程式碼之前撰寫 BDD 和失敗測試或可執行規格 |
+| 總覆蓋率是否隱藏了未測試的新程式碼？ | 分別追蹤變更/新程式碼覆蓋率與整個專案覆蓋率 |
+| 邏輯是否規則密集或安全敏感？ | 添加突變測試、基於屬性的測試、不變量測試或負面案例 |
+| 持久化是否重要？ | 添加 fixture 支援的資料庫/儲存庫/遷移測試或整合測試 |
+| 程式碼是否由 AI 生成？ | 需要測試加上針對規劃文件、BDD、合約和邊緣案例的人類審查 |
+| 這是嵌入式或硬體支援的？ | 分開主機可重複測試與僅目標或硬體在迴路中的證據；記錄板子、接線、引腳/匯流排設定、韌體版本、日誌和觀察到的偏差 |
+| 這個變更是否涉及效能？ | 首先添加一個小的、可重複的效能檢查；根據風險選擇負載、壓力、尖峰或浸泡測試。追蹤 P95/P99 延遲、吞吐量、錯誤率和資源使用率，而不僅是平均延遲 |
 
-## 5. Performance Test Gate
+## 5. 效能測試關卡（Performance Test Gate）
 
-Functional correctness is not enough when a change can affect response time, throughput, resource use, startup work, background processing, database access, external API fan-out, caching, batching, or concurrency. Treat performance as part of the release contract when user experience, cost, reliability, or operational capacity depends on it.
+當變更可能影響回應時間、吞吐量、資源使用、啟動工作、背景處理、資料庫存取、外部 API 扇出、快取、批次處理或並發性時，功能正確性是不夠的。當使用者體驗、成本、可靠性或營運容量依賴於它時，將效能視為發布合約的一部分。
 
-| Test type | Use when | Proves |
+| 測試類型 | 使用時機 | 證明 |
 | --- | --- | --- |
-| Load test | Expected traffic or normal batch volume is known. | The system stays within latency, throughput, error-rate, and resource budgets under normal demand. |
-| Stress test | Capacity limit or scaling behavior is unknown. | The system degrades predictably and exposes the first bottleneck before production does. |
-| Spike test | Traffic can jump suddenly, queues can burst, or AI-generated changes alter call volume. | Autoscaling, queues, rate limits, caches, and retry behavior tolerate sudden demand shifts. |
-| Soak test | Memory, connection, cache, file-handle, queue, or database drift may appear over time. | Long-running behavior remains stable and does not leak resources or degrade gradually. |
+| 負載測試 | 預期流量或正常批次量已知 | 系統在正常需求下保持在延遲、吞吐量、錯誤率和資源預算內 |
+| 壓力測試 | 容量限制或擴展行為未知 | 系統可預測地降級，並在生產之前暴露第一個瓶頸 |
+| 尖峰測試 | 流量可能突然跳升、佇列可能爆量、或 AI 生成的變更改變了呼叫量 | 自動擴展、佇列、速率限制、快取和重試行為能承受突然的需求變化 |
+| 浸泡測試 | 記憶體、連線、快取、檔案控制代碼、佇列或資料庫漂移可能隨時間出現 | 長時間運行的行為保持穩定，不會洩漏資源或逐漸降級 |
 
-Minimum metrics:
+最低指標：
 
-- Latency: P95 and P99 for user-visible or contract-visible operations; averages are supporting context only.
-- Throughput: requests, jobs, messages, or operations per second/minute for the relevant surface.
-- Error rate: timeout, 5xx, retry exhaustion, queue failure, or domain-specific failure budget.
-- Resource usage: CPU, memory, disk, network, database connections, queue depth, thread/task count, and external-call volume where relevant.
+- 延遲：使用者可見或合約可見操作的 P95 和 P99；平均值僅為支援性上下文。
+- 吞吐量：相關表面的每秒/分鐘請求、作業、訊息或操作數。
+- 錯誤率：超時、5xx、重試耗盡、佇列失敗或領域特定的失敗預算。
+- 資源使用率：相關時的 CPU、記憶體、磁碟、網路、資料庫連線、佇列深度、執行緒/任務計數和外部呼叫量。
 
-CI/CD can start with small smoke-size performance checks. Larger load, stress, spike, or soak suites may run nightly, pre-release, or on demand, but their trigger, owner, budget, and evidence location must be documented.
+CI/CD 可以從小的 smoke 級別效能檢查開始。較大的負載、壓力、尖峰或浸泡套件可以夜間運行、預發布或按需運行，但其觸發條件、擁有者、預算和證據位置必須記錄。
 
-## 6. Backfill Rules for Implemented Projects
+## 6. 已實作專案的回填規則（Backfill Rules for Implemented Projects）
 
-If the project is already implemented and documentation is missing, start with a document gap audit before proposing new guidance:
+如果專案已實作且文件缺失，在提出新的指引之前先進行文件差距審計：
 
-| Document | Backfill requirement |
+| 文件 | 回填要求 |
 | --- | --- |
-| Product Brief | Backfill only evidence-supported goal, users, scope, constraints, and assumptions; mark unavailable intent as `unknown` or `open question`. |
-| BDD Behavior | Required. Complete from observable UI, API, code, tests, logs, fixtures, and manual verification. |
-| Contracts | Backfill Domain Model, Architecture, API / Interface, Error Handling, and Test Plan from implemented behavior and evidence. |
-| Embedded/hardware evidence | Backfill datasheet/protocol references, hardware context, driver/service/application boundary, host fixtures, and bring-up evidence from code, logs, wiring notes, and tests. |
-| Traceability | Link product/rule IDs to BDD, BDD to code refs, BDD to tests, API/command/diagnostic contracts to fixtures, and generated clients to source contracts. |
+| Product Brief | 僅回填證據支援的目標、使用者、範圍、限制和假設；將不可取得的意圖標記為 `unknown` 或 `open question` |
+| BDD 行為 | **必須完成。** 從可觀察的 UI、API、程式碼、測試、日誌、fixtures 和手動驗證中完成 |
+| 合約 | 從已實作的行為和證據回填領域模型、架構、API/介面、錯誤處理和測試計劃 |
+| 嵌入式/硬體證據 | 從程式碼、日誌、接線筆記和測試中回填 datasheet/協定參考、硬體上下文、驅動程式/服務/應用程式邊界、主機 fixtures 和啟動證據 |
+| 可追溯性 | 將產品/規則 ID 連結到 BDD，BDD 連結到程式碼引用，BDD 連結到測試，API/命令/診斷合約連結到 fixtures，以及生成的客戶端連結到來源合約 |
 
-Do not let a missing product brief block BDD backfill for an already implemented product.
+不要讓缺失的 product brief 阻擋已實作產品的 BDD 回填。
 
-For implemented-first projects, also recover the delivery pipeline: source product docs or plan radar, document precedence, minimum doc-sync matrix, OpenAPI/schema/codegen flow, vendor integration excerpts, and explicit canceled/deferred/out-of-scope decisions.
+對於先實作優先的專案，也要恢復交付管線：來源產品文件或計劃雷達、文件優先順序、最小文件同步矩陣、OpenAPI/schema/codegen 流程、供應商整合摘錄，以及明確的已取消/延後/排除範圍的決策。
 
-Missing information that affects behavior, domain invariants, API/interface shape, error handling, security, storage, ownership, or tests is a blocker. Ask the user or request evidence, update the docs with the answer, and only then continue development planning or implementation. Non-blocking unknowns must be labeled with why they do not change behavior or contracts.
+影響行為、領域不變量、API/介面形狀、錯誤處理、安全性、儲存、所有權或測試的缺失資訊是阻擋項。向使用者提問或要求證據，用答案更新文件，然後才繼續開發規劃或實作。非阻擋性的未知項必須標記為什麼它們不改變行為或合約。
 
-For embedded or hardware-backed products, missing datasheet/protocol truth, electrical interface, pin/bus mapping, hardware context ownership, timing/concurrency constraints, safety behavior, fixture source, or target validation method is also a blocker unless explicitly scoped out.
+對於嵌入式或硬體支援的產品，缺失的 datasheet/協定真相、電氣介面、引腳/匯流排映射、硬體上下文所有權、時間/並發限制、安全行為、fixture 來源或目標驗證方法也是阻擋項，除非明確排除範圍。
 
-## 7. Validate
+## 7. 驗證（Validate）
 
-Use at least one validation method:
+使用至少一種驗證方法：
 
-- Unit or integration test.
-- Release checklist item.
-- Static scan or build assertion.
-- Manual review with evidence.
-- Runtime or backend telemetry query.
-- Host-side fixture test, simulator test, bench log, or hardware-in-loop run for embedded/hardware behavior.
-- Provider/consumer contract test, generated-client compile check, fixture pair, diagnostic snapshot, or gated live integration test.
+- 單元或整合測試。
+- 發布檢查清單項目。
+- 靜態掃描或建置斷言。
+- 附證據的手動審查。
+- 執行時期或後端遙測查詢。
+- 嵌入式/硬體行為的主機端 fixture 測試、模擬器測試、bench 日誌或硬體在迴路中運行。
+- 提供者/消費者合約測試、生成的客戶端編譯檢查、fixture 對、診斷快照或閘控即時整合測試。
 
-Before validating implementation, verify there are no unresolved blocker questions that affect behavior, contracts, error handling, security, storage, ownership, or tests.
+在驗證實作之前，確認沒有影響行為、合約、錯誤處理、安全性、儲存、所有權或測試的未解決阻擋性問題。
 
-Validation should distinguish "old behavior remains guarded" from "new code is proven". Prefer BDD/TDD plus changed-code tests; add mutation, property-based, contract, database-backed, generated-client, fixture-backed, host-side fixture, or hardware-in-loop tests when examples alone do not prove the rule.
+驗證應區分「舊行為仍受保護」與「新程式碼已證明」。優先使用 BDD/TDD 加上變更程式碼測試；當範例單獨無法證明規則時，添加突變、基於屬性、合約、資料庫支援、生成的客戶端、fixture 支援、主機端 fixture 或硬體在迴路中的測試。
 
-## 8. Feed Back Reusable Lessons
+## 8. 回饋可重複使用的課程（Feed Back Reusable Lessons）
 
-If a lesson generalizes beyond one product:
+如果一個課程超越了一個產品：
 
-1. Add a file under the matching `feedback_history/<category>/`, or `feedback_history/common/` if it is cross-cutting.
-2. Link shared rules instead of duplicating them.
-3. Promote validated guidance into the structured folders, checklists, or this workflow.
+1. 在匹配的 `feedback_history/<category>/` 或跨領域的 `feedback_history/common/` 下添加一個檔案。
+2. 連結共享規則而不是複製它們。
+3. 將已驗證的指引提升到結構化資料夾、檢查清單或此工作流程中。
 
-If the lesson came from APK analysis, keep the analysis method in `skills/apk-analysis/` and the development action here.
+如果課程來自 APK 分析，將分析方法保留在 `skills/apk-analysis/` 中，將開發行動保留在此處。

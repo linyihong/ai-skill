@@ -4,7 +4,7 @@
 
 > **相容性規則**：`skills/app-development-guidance/process/README.md` 仍為 active skill entrypoint。本文件為 reference target，兩者應保持同步。
 
-## Default Flow
+## Default Flow（預設流程）
 
 | 步驟 | 產出 | 說明 |
 | --- | --- | --- |
@@ -22,7 +22,7 @@
 | 12. 效能測試計畫 | Load、stress、spike 或 soak 範圍、metric budget、runner、證據位置 | 當 latency、throughput、資源使用率、concurrency、啟動時間、背景任務、資料庫存取、外部呼叫量、caching 或 batching 可能改變時需要 |
 | 13. 整合測試 | End-to-end 或 component integration 證據 | 驗證真實 adapters、auth/session、錯誤路徑、效能敏感路徑和跨 context 流程 |
 
-## Required Contracts
+## Required Contracts（必要合約）
 
 不要假設每個專案都有前端/後端拆分。選擇符合架構的 contracts：
 
@@ -38,7 +38,7 @@
 | Embedded / firmware / 硬體產品 | Datasheet 或 protocol contract、hardware context contract、driver/service/application 邊界、BDD、host fixtures、hardware-in-loop checks |
 | 靜態分析 / IDE extension / 開發者工具 | Rule catalog、diagnostic 或 command contract、pure kernel/adapter 邊界、fixture pairs、editor/CLI integration tests |
 
-## Initial Documentation Pack
+## Initial Documentation Pack（初始文件包）
 
 當這個 workflow 被用於新功能或新專案時，agent 應協助產出第一版草稿，或針對以下文件提問缺失資訊：
 
@@ -56,7 +56,7 @@
 
 這些文件可以從輕量的 Markdown 草稿開始。如果專案很小，放在一個 planning file 中；如果長大，拆成一個資料夾加上 `README.md` 和聚焦的子文件。
 
-## Product Brief Validation Gate
+## Product Brief Validation Gate（Product Brief 驗證關卡）
 
 企劃書 / Product Brief 不會因為存在就自動可信。在使用它作為 BDD、contracts、估算、實作切片或測試的來源之前，先把它當作獨立的 artifact 來驗證。
 
@@ -86,7 +86,7 @@
 | `scoped out` | 明確不屬於當前工作範圍 | 記錄 non-goal 並防止意外實作 |
 | `invalidated` | 證據與 brief 矛盾 | 在 code 之前修訂 brief、BDD、contracts 和 tests |
 
-## Change Intake Gate
+## Change Intake Gate（變更接收關卡）
 
 在任何由這個 workflow 驅動的 code 變更之前，檢查專案的企劃書、product brief、planning docs、issue、ticket、PRD、design note、BDD、API contract 或同等專案 artifact。在實作前分類請求：
 
@@ -99,7 +99,7 @@
 
 如果沒有 planning artifact，在實作前建立輕量的 change brief。如果請求是新需求，缺失的 planning docs 是 blockers；向使用者提問並在寫 code 前填寫 BDD/contracts。
 
-## Contract Governance Gate
+## Contract Governance Gate（合約治理關卡）
 
 每個有多份文件的專案必須定義當文件不一致時哪個 artifact 優先。除非專案有更強的本地規則，否則使用這個預設優先順序：
 
@@ -122,7 +122,7 @@
 
 明確記錄已取消、延後、排除範圍和無法由工具強制執行的項目。不要讓它們成為未來 agent 可能重新引入的隱形空缺。
 
-## Traceability Gate
+## Traceability Gate（可追溯性關卡）
 
 當專案是先實作後補文件時，要求雙向追溯：
 
@@ -136,7 +136,7 @@
 
 Stable IDs 可以是 feature IDs、rule IDs、operation IDs、route names、command names、diagnostic codes、event names 或 scenario tags。如果一個行為被有意識地記錄但未實作，標記為 `TBD`、`noop`、`not enforceable by tool`、`manual-only` 或 `out of scope`，並附上原因和負責人。
 
-## BDD Execution Closure
+## BDD Execution Closure（BDD 執行閉環）
 
 Narrative BDD 在回填期間是可接受的，但不能被當作完成的測試覆蓋率。對每個關鍵 scenario，記錄以下狀態之一：
 
@@ -150,7 +150,7 @@ Narrative BDD 在回填期間是可接受的，但不能被當作完成的測試
 
 BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求每個關鍵 scenario 有明確的驗證路徑，且沒有模糊的「已記錄但未測試」狀態。
 
-## Test Strategy Gate
+## Test Strategy Gate（測試策略關卡）
 
 在實作前區分「保護舊行為」和「驗證新 code」。高總體覆蓋率可以證明舊行為受到保護，但不能證明新產生或新撰寫的 code 是正確的。
 
@@ -184,7 +184,7 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 
 不要只接受平均 latency 作為效能證據。記錄 percentile latency、throughput、error rate 和資源使用率，以及環境和資料集大小。
 
-## Embedded / Hardware Product Flow
+## Embedded / Hardware Product Flow（嵌入式/硬體產品流程）
 
 當專案涉及 firmware、sensors、boards、UART/I2C/SPI/BLE/CAN/GPIO、RTOS tasks、hardware bring-up 或 host/target validation 時使用這個流程：
 
@@ -208,7 +208,7 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 5. 只在無法在 host 上證明的證據才定義 target 或 hardware-in-loop validation
 6. 記錄 bring-up evidence：board revision、wiring、pins、bus settings、firmware version、logs 和已知偏差
 
-## Missing Information Gate
+## Missing Information Gate（缺失資訊關卡）
 
 在開發規劃或實作繼續之前，缺失資訊必須被明確處理：
 
@@ -221,7 +221,7 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 
 不要在未解決的 blockers 下繼續開發。Agent 必須將缺失項目列為問題，等待答案或證據，然後在繼續前更新文件。
 
-## Existing Project Documentation Backfill
+## Existing Project Documentation Backfill（既有專案文件回填）
 
 當這個 workflow 被用於已經完全或大部分實作的專案時，先審查既有文件並回填任何缺失的開發文件。不要因為實作已經存在就跳過流程。
 
@@ -257,7 +257,7 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 6. 如果 BDD 無法從可用證據完成，停止並要求缺失的行為、screen/API 範例、logs、test cases 或使用者決策，然後再繼續開發
 7. 對任何缺乏覆蓋率的關鍵 BDD scenario 加上 tests 或 test TODOs
 
-## Contract-First Rules
+## Contract-First Rules（合約優先規則）
 
 - BDD 描述行為；它不應鎖定 framework 或資料庫選擇
 - Domain Model Contract 擁有 invariants、業務詞彙和狀態轉換
@@ -277,7 +277,7 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 - 對於已實作的專案，BDD 成為必要的行為恢復文件。Product Brief 可能包含 unknowns，但 BDD 必須從可觀察的產品行為和實作證據填寫
 - 任何改變行為、contracts、所有權、錯誤處理、儲存、安全性或 tests 的缺失資訊都會阻塞開發，直到被回答或明確排除範圍
 
-## When Frontend And Backend Do Not Both Exist
+## When Frontend And Backend Do Not Both Exist（當前後端不都存在時）
 
 將「前端」和「後端」替換為 producer/consumer 角色：
 
@@ -294,7 +294,7 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 4. 各自對著 mock、fixture 或 schema 建構
 5. 用 contract 和 integration tests 證明相容性
 
-## Minimum Definition Of Ready
+## Minimum Definition Of Ready（最低就緒定義）
 
 在實作開始前，功能應具備：
 
@@ -312,7 +312,7 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 
 對於已實作的專案，「ready」表示缺失文件審查已完成，且 BDD 涵蓋已實作的關鍵行為，即使原始 product intent 仍部分未知。
 
-## Minimum Definition Of Done
+## Minimum Definition Of Done（最低完成定義）
 
 在出貨或合併前：
 
