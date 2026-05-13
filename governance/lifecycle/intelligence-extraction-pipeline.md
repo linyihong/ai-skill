@@ -40,7 +40,13 @@ Step 5: 標註來源（Source Annotation）
 Step 6: 驗證（Validation）
     │
     ▼
+Step 6a: 建立 Validation Scenario（架構變更／新 extraction 專用） ← 新增
+    │
+    ▼
 Step 7: 更新索引（Index Update）
+    │
+    ▼
+Step 7a: Shared-Rules 同步檢查（架構變更專用）
 ```
 
 ---
@@ -368,6 +374,43 @@ Step 7: 更新索引（Index Update）
 - **已在 tools-and-failures.md 中的工具選擇** — 不重複
 - **只適用單一專案的細節** — 不適合 intelligence
 - **無法泛化的觀察** — 留在 feedback history
+
+### Step 6a：建立 Validation Scenario（架構變更／新 extraction 專用）
+
+當 extraction 或架構重構完成後，**必須**評估是否需要建立對應的 validation scenario，用於驗證 AI 在未來是否正確使用新結構。
+
+#### 判斷是否要建立 scenario
+
+| 條件 | 應建立 scenario | 不應建立 scenario |
+|------|----------------|-------------------|
+| 變更類型 | 新目錄結構、新 routing 規則、新 intelligence atom | 純內容更新（無行為影響） |
+| 影響範圍 | 影響 AI 的決策路徑、檔案讀取順序、routing 選擇 | 只影響人類閱讀的文件 |
+| 可測試性 | 有明確的 expected route 或 forbidden route | 無法定義 stateless 測試條件 |
+| Prevention 價值 | 未來可能再次發生 routing 錯誤 | 一次性事件 |
+
+#### 建立規則
+
+1. **每個 extraction 至少評估一次**是否需要建立 scenario
+2. **每個架構重構**（目錄重組、路徑變更、分層新增）**必須**建立至少一個 scenario
+3. Scenario 放在 `validation/scenarios/<domain>/` 或 `validation/scenarios/failure-derived/`
+4. 在 extraction 的 commit message 中標註 `scenario: <id>` 以便追蹤
+
+#### Scenario 內容要求
+
+每個建立的 scenario 必須涵蓋：
+
+- **Expected route**：AI 應該讀取哪些新路徑
+- **Forbidden route**：AI 不應該再讀取哪些舊路徑
+- **Expected intelligence**：AI 應該使用哪些新 intelligence atoms
+- **Unexpected intelligence**：AI 不應該再使用哪些舊 intelligence atoms
+
+#### 與 Step 7a 的關係
+
+| 步驟 | 目標 | 執行時機 |
+|------|------|---------|
+| Step 6a | 建立 validation scenario（預防未來錯誤） | Extraction 完成後 |
+| Step 7a | 同步 shared-rules 路徑參考（修正既有規則） | 架構變更後 |
+| 兩者關係 | Step 6a 是「建立測試」，Step 7a 是「修正規則」，互補而非互斥 |
 
 ---
 

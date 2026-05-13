@@ -215,10 +215,12 @@ then:
 
 ### 首批 Failure-Derived Scenarios
 
-| # | ID | 來源 Failure Pattern | 測試目標 |
-|---|-----|---------------------|---------|
+| # | ID | 來源 Failure Pattern / 架構變更 | 測試目標 |
+|---|-----|-------------------------------|---------|
 | 1 | `entrypoint-drift-v1` | `shared-rules/failure-patterns/entrypoint-positioning-drift.md` | 更新 entrypoint 時是否同時更新 title、opening、indexes |
 | 2 | `source-mirror-write-v1` | `shared-rules/failure-patterns/source-mirror-write-drift.md` | 編輯前是否先確認 canonical source vs mirror |
+| 3 | `shared-rules-architecture-drift-v1` | `shared-rules/failure-patterns/shared-rules-architecture-drift.md` | 架構重構後是否同步檢查 shared-rules/ 路徑參考 |
+| 4 | `feedback-history-consolidation-v1` | `feedback/history/` 目錄整合（2026-05-13） | 新 feedback lesson 是否正確使用 feedback/history/<domain>/ 而非舊 skills/ 路徑 |
 
 ## 與其他層的關係
 

@@ -588,6 +588,8 @@ records:
       - validation/scenarios/apk-analysis/early-hook-prevention-v1.yaml
       - validation/scenarios/failure-derived/entrypoint-drift-v1.yaml
       - validation/scenarios/failure-derived/source-mirror-write-v1.yaml
+      - validation/scenarios/failure-derived/shared-rules-architecture-drift-v1.yaml
+      - validation/scenarios/failure-derived/feedback-history-consolidation-v1.yaml
     candidate_sources:
       - validation/rules/heuristics/runtime-first-hooking.yaml
       - validation/rules/heuristics/local-proxy-diagnosis.yaml

@@ -1,0 +1,76 @@
+# Feedback History Consolidation Scenario
+# 測試 AI 在收到新的 feedback lesson 時，是否正確使用 feedback/history/<domain>/ 路徑
+# 而不是舊的 skills/<skill-name>/feedback_history/ 路徑
+#
+# 來源架構變更：
+#   - feedback/history/ 目錄結構建立（2026-05-13）
+#   - feedback-lessons.md 條目放哪裡表格改為 feedback/history/<domain>/
+#   - content-layering.md feedback 位置改為 feedback/history/
+#   - 舊 skills/<skill-name>/feedback_history/ 保留向後相容
+#
+# 原始錯誤模式：AI 在架構重構後，仍使用舊路徑存放新 lesson
+
+id: feedback-history-consolidation-v1
+domain: cross-domain
+type: routing-decision
+priority: P1
+
+failure_source:
+  class: architecture-restructure / path-migration
+  date: "2026-05-13"
+  description: >
+    feedback/history/ 目錄建立完成後，AI 在收到新的 feedback lesson 時，
+    可能仍使用舊的 skills/<skill-name>/feedback_history/ 路徑存放，
+    因為舊路徑仍然存在（向後相容），且 AI 的 bootstrap flow 可能仍指向舊路徑。
+
+given:
+  task: store_new_feedback_lesson
+  artifacts:
+    - feedback/history/README.md          # 新結構定義
+    - feedback/history/apk-analysis/       # 新 domain 目錄
+    - feedback/history/app-development-guidance/  # 新 domain 目錄
+    - feedback/history/travel-planning/    # 新 domain 目錄
+    - shared-rules/feedback-lessons.md     # 規則已更新指向 feedback/history/
+    - skills/apk-analysis/feedback_history/  # 舊路徑（仍存在，向後相容）
+    - skills/app-development-guidance/feedback_history/  # 舊路徑（仍存在）
+  signals:
+    - 新的 feedback lesson 需要存放
+    - lesson 的 domain 歸屬明確（apk-analysis / app-development-guidance / travel-planning）
+    - 新結構 feedback/history/<domain>/ 已存在
+    - 舊結構 skills/<skill-name>/feedback_history/ 仍存在
+    - feedback-lessons.md 規則已更新
+  constraints:
+    - lesson 是全新的（非搬遷既有 lesson）
+    - domain 歸屬明確
+
+when:
+  action: determine_feedback_lesson_storage_path
+
+then:
+  expected_route:
+    - identify_lesson_domain
+    - check_feedback_lessons_md_for_current_rules
+    - check_feedback_history_readme_for_structure
+    - store_to_feedback_history_domain_subdirectory
+    - update_feedback_history_readme_if_new_category
+    - update_linked_files_if_needed
+
+  expected_heuristics:
+    - feedback-lessons-domain-classification
+    - architecture-first-path-selection
+
+  forbidden_routes:
+    - store_to_old_skills_feedback_history  # 禁止使用舊路徑存放新 lesson
+    - store_to_feedback_root_directly       # 禁止直接放 feedback/ 根目錄
+    - store_without_domain_subdirectory     # 禁止不分類直接放 history/
+    - skip_feedback_lessons_md_check        # 禁止不讀規則直接決定路徑
+
+  expected_final_route: feedback/history/<domain>/<category>/<date>-<slug>.md
+
+  expected_intelligence:
+    - feedback/history/README.md
+    - shared-rules/feedback-lessons.md
+
+  unexpected_intelligence:
+    - skills/apk-analysis/feedback_history/README.md
+    - skills/app-development-guidance/feedback_history/README.md
