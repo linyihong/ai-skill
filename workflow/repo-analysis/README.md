@@ -21,10 +21,11 @@
 
 ## 與既有層的關係
 
+- `workflow/repo-analysis/` 是 Repository 分析執行流程的主要入口。所有 agent 應優先參考本目錄的內容。
 - `analysis/repo/README.md` 提供 repository 分析的具體方法（靜態結構分析、依賴分析、entrypoint 追蹤、技術債評估）。本 workflow 引用這些方法，但不複製方法細節。
-- `skills/` 目前仍是 active skill entrypoint；本層只承接逐步抽出的通用執行流程。
 - `intelligence/engineering/architecture/` 可承接從 repo 分析中萃取的架構判斷。
 - `intelligence/engineering/domain/` 可承接從 repo 分析中萃取的領域模型理解。
+- `skills/` 是原始 skill 目錄，內容已逐步遷移至本層。新內容應直接寫入本層。
 
 ## 第一批候選遷移來源
 

@@ -1,6 +1,6 @@
 # APK Analysis Workflow（APK 分析工作流程）
 
-`workflow/apk-analysis/` 是 tool-neutral APK 分析執行流程的候選目錄。在試行期間，`skills/apk-analysis/SKILL.md` 仍然是 active tool skill entrypoint。
+`workflow/apk-analysis/` 是 APK 分析執行流程的主要目錄，包含 tool-neutral 的執行步驟與產出規範。
 
 ## Scope（範圍）
 
@@ -20,9 +20,9 @@
 
 ## Current Source References（當前來源參考）
 
-| 工作流程關注點 | 當前來源 | 試行目標狀態 |
+| 工作流程關注點 | 原始來源 | 提取狀態 |
 | --- | --- | --- |
-| Skill 觸發和授權邊界 | `../../skills/apk-analysis/SKILL.md` | 保持 active |
+| Skill 觸發和授權邊界 | `../../skills/apk-analysis/SKILL.md` | 參考用，內容已遷移至本層 |
 | 預設決策樹 | `../../skills/apk-analysis/WORKFLOW.md` | ✅ 已提取到 [`execution-flow.md`](execution-flow.md) |
 | 捕獲窗口詳細規則 | `../../skills/apk-analysis/WORKFLOW.md` | ✅ 已提取到 [`execution-flow.md`](execution-flow.md) |
 | 環境和工具準備 | `../../skills/apk-analysis/TOOLS.md` | 從 `analysis/apk/` 參考；不重複 |
@@ -44,12 +44,13 @@
 2. 透過 `analysis/apk/` 路由以識別流量/執行時期路徑。
 3. 從 `analysis/apk/workflows/` 載入匹配的工作流程，並從 `intelligence/engineering/apk-analysis/` 載入智慧原子。
 4. 產生已清理的專案產出：UI 地圖、操作到 API 矩陣、API 目錄、執行時期基線、fixtures 和適用的開放問題。
-5. 如果發現必須成為應用程式/API/SDK 實作指引，使用已清理的 Feature Reconstruction Handoff 交接給 `skills/app-development-guidance/`。
-6. 如果出現可重複使用的課程，將課程保留在 `skills/apk-analysis/feedback_history/` 中，直到提升規則將其移至智慧或回饋層。
+5. 如果發現必須成為應用程式/API/SDK 實作指引，使用已清理的 Feature Reconstruction Handoff 交接給 `workflow/app-development-guidance/`。
+6. 如果出現可重複使用的課程，將課程保留在 `feedback/history/apk-analysis/` 中，直到提升規則將其移至智慧或回饋層。
 
-## Compatibility Notes（相容性備註）
+## 與既有層的關係
 
-- 現有工具仍應載入 `skills/apk-analysis/SKILL.md`。
-- 此目錄現在是一個實質的參考優先工作流程層。來自 `WORKFLOW.md` 和 `DOCUMENTATION.md` 的大部分內容已提取到此處。
-- 原始技能檔案仍包含權威內容；此目錄提供參考優先的視圖。
-- 未來的提取應保留舊連結、更新 `knowledge/indexes/README.md`，並為每個原子附加 `metadata/schema.md` 元資料。
+- `workflow/apk-analysis/` 是 APK 分析執行流程的主要入口。所有 agent 應優先參考本目錄的內容。
+- `analysis/apk/` 提供深度技術方法（traffic triage、Frida hook、proxy 架構等），被本 workflow 引用。
+- `intelligence/engineering/apk-analysis/` 提供從 APK 分析中萃取的工程智慧（啟發式、反模式、失敗模式），被本 workflow 引用。
+- `feedback/history/apk-analysis/` 儲存 APK 分析的具體課程記錄，可被提升至 intelligence 層。
+- `skills/apk-analysis/` 是原始 skill 目錄，內容已逐步遷移至本層。新內容應直接寫入本層。

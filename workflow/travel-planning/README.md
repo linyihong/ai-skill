@@ -23,10 +23,11 @@
 
 ## 與既有層的關係
 
-- `skills/travel-planning/` 目前仍是 active skill entrypoint；本層只承接逐步抽出的通用執行流程。
-- `skills/travel-planning/WORKFLOW.md` 是目前的 workflow source of truth。
-- `skills/travel-planning/DOCUMENTATION.md` 是目前的 artifact template source of truth。
-- `intelligence/travel/` 可被本 workflow 引用來輔助規劃判斷。
+- `workflow/travel-planning/` 是旅行規劃執行流程的主要入口。所有 agent 應優先參考本目錄的內容。
+- `intelligence/travel/` 提供旅行規劃的工程智慧（source triage、feasibility build、fatigue 評估等），被本 workflow 引用。
+- `analysis/travel/` 提供旅行規劃的分析方法（來源與工具評估），被本 workflow 引用。
+- `feedback/history/travel-planning/` 儲存旅行規劃的具體課程記錄。
+- `skills/travel-planning/` 是原始 skill 目錄，內容已逐步遷移至本層。新內容應直接寫入本層。
 
 ## 第一批候選遷移來源
 

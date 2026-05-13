@@ -28,14 +28,12 @@
 
 ## 與既有層的關係
 
-- `skills/app-development-guidance/` 目前仍是 active skill entrypoint；本層只承接逐步抽出的通用執行流程。
-- `skills/app-development-guidance/WORKFLOW.md` 是目前的 workflow source of truth。
-- `skills/app-development-guidance/process/README.md` 提供 contract-first 開發流程（已提取至本層）。
-- `skills/app-development-guidance/checklists/` 提供各審查類型的 checklist 正文（已提取 catalog 至本層）。
-- `skills/app-development-guidance/controls/` 提供各安全控制的評估標準（已提取 catalog 至 `analysis/app-development-guidance/`）。
+- `workflow/app-development-guidance/` 是 App 開發指引執行流程的主要入口。所有 agent 應優先參考本目錄的內容。
+- `analysis/app-development-guidance/` 提供安全控制、實作模式、平台指引、語言陷阱的 catalog 參考，被本 workflow 引用。
 - `analysis/repo/` 可被本 workflow 引用來分析 repository 結構。
-- `analysis/app-development-guidance/` 提供安全控制、實作模式、平台指引、語言陷阱的 catalog 參考。
 - `intelligence/` 可被本 workflow 引用來輔助工程判斷。
+- `feedback/history/app-development-guidance/` 儲存開發指引的具體課程記錄。
+- `skills/app-development-guidance/` 是原始 skill 目錄，內容已逐步遷移至本層。新內容應直接寫入本層。
 
 ## 第一批候選遷移來源
 
