@@ -432,8 +432,8 @@ skills:
     entrypoint: ai-tools/README.md
     summary: null
     related:
-      - ai-tools/claude.md
-      - ai-tools/cursor.md
+      - ai-tools/agent/claude.md
+      - ai-tools/agent/cursor.md
 
   - id: scripts-automation
     name: Scripts & Automation

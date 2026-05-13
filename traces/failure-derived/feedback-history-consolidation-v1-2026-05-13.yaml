@@ -1,0 +1,47 @@
+scenario: feedback-history-consolidation-v1
+timestamp: "2026-05-13T01:54:00Z"
+model: deepseek-chat
+
+trace:
+  signals_detected:
+    - 新的 feedback lesson 需要存放
+    - lesson 的 domain 歸屬明確（apk-analysis / app-development-guidance / travel-planning）
+    - 新結構 feedback/history/<domain>/ 已存在
+    - 舊結構 skills/<skill-name>/feedback_history/ 仍存在
+    - feedback-lessons.md 規則已更新
+
+  heuristics_used:
+    - feedback-lessons-domain-classification
+    - architecture-first-path-selection
+
+  rejected_routes:
+    - store_to_old_skills_feedback_history: >
+        舊路徑 skills/<domain>/feedback_history/ 雖然仍存在（向後相容），
+        但 feedback-lessons.md 已更新指向 feedback/history/<domain>/，
+        且所有 lesson 已搬遷完畢，舊 README 已標註「已搬遷」。
+        新 lesson 不應再寫入舊路徑。
+    - store_to_feedback_root_directly: >
+        feedback/ 根目錄僅存放 README.md 結構定義，不直接存放 lesson 實體。
+    - store_without_domain_subdirectory: >
+        即使放在 feedback/history/ 下，也必須依 domain 分類到對應子目錄，
+        否則會破壞 domain 索引結構。
+
+  final_route: feedback/history/<domain>/<category>/<date>-<slug>.md
+
+  intelligence_loaded:
+    - feedback/history/README.md
+    - shared-rules/feedback-lessons.md
+    - feedback/history/apk-analysis/README.md
+    - feedback/history/app-development-guidance/README.md
+    - feedback/history/travel-planning/README.md
+
+  decision_rationale: >
+    根據 feedback-lessons.md 的「條目放哪裡」判斷流程：
+    1. 先判斷 lesson 的 domain 歸屬（apk-analysis / app-development-guidance / travel-planning）
+    2. 查詢 feedback-lessons.md 確認當前規則指向 feedback/history/<domain>/
+    3. 查詢對應 domain 的 feedback/history/<domain>/README.md 確認分類結構
+    4. 依 category 存放至 feedback/history/<domain>/<category>/<date>-<slug>.md
+    5. 若新增 category，更新對應 domain 的 README.md
+    6. 檢查是否需要 linked updates（如 extraction index）
+    舊路徑 skills/<domain>/feedback_history/ 雖然仍存在，但僅供向後相容，
+    新 lesson 不應使用。

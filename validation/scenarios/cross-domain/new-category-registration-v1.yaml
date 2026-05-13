@@ -1,0 +1,89 @@
+# New Category Registration Scenario
+# 測試 AI 在新增 intelligence/analysis/workflow 領域類別時，
+# 是否正確建立 README.md、更新 routing registry、並在 README 中列出所有檔案
+#
+# 來源架構變更：
+#   - validate-knowledge-runtime.rb 新增 validate_directory_structure 檢查（2026-05-13）
+#   - 要求每個 intelligence/engineering/<domain>/ 子類別目錄有 README.md 列出所有 .md 檔案
+#   - 要求每個 analysis/<domain>/workflows/ 有 README.md 列出所有 .md 檔案
+#   - 要求每個 workflow/<domain>/ 有 README.md 列出所有 .md 檔案
+#
+# 原始錯誤模式：新增領域類別後，未建立 README.md 或未更新 routing registry，
+# 導致 agent 無法透過 navigation 找到新內容
+
+id: new-category-registration-v1
+domain: cross-domain
+type: directory-structure / registration
+priority: P1
+
+failure_source:
+  class: missing-registration / incomplete-structure
+  date: "2026-05-13"
+  description: >
+    在新增 intelligence/engineering/<domain>/ 或 analysis/<domain>/workflows/
+    或 workflow/<domain>/ 的新類別時，AI 可能只建立內容檔案，
+    卻未建立 README.md 索引、未在 routing registry 註冊新路由、
+    或未在 README.md 中列出所有檔案，導致新內容成為「孤兒知識」，
+    agent 無法透過 navigation 找到這些內容。
+
+given:
+  task: add_new_knowledge_category
+  artifacts:
+    - intelligence/engineering/README.md          # 領域索引定義
+    - analysis/README.md                          # 分析層索引定義
+    - workflow/README.md                          # 工作流程層索引定義
+    - knowledge/runtime/routing-registry.yaml     # 路由註冊表
+    - knowledge/indexes/README.md                 # 任務路由索引
+  signals:
+    - 需要在 intelligence/engineering/ 下新增 domain（如 new-domain/）
+    - 需要在 analysis/ 下新增 domain（如 new-domain/）
+    - 需要在 workflow/ 下新增 domain（如 new-domain/）
+    - 新 domain 需要建立子類別目錄（heuristics / anti-patterns / failure / signals）
+    - 新 domain 需要建立 workflows/ 目錄（analysis 專用）
+    - 新 domain 需要註冊到 routing-registry.yaml
+    - 新 domain 需要更新 knowledge/indexes/README.md 任務路由索引
+  constraints:
+    - 新 domain 是全新的（非搬遷既有內容）
+    - 新 domain 的內容檔案已建立
+
+when:
+  action: register_new_knowledge_category
+
+then:
+  expected_route:
+    - identify_new_domain_boundary
+    - create_domain_readme_with_file_list
+    - create_subcategory_readmes_with_file_list
+    - register_in_routing_registry
+    - update_knowledge_indexes_readme
+    - run_validate_knowledge_runtime
+
+  expected_heuristics:
+    - directory-structure-completeness
+    - routing-registry-registration
+    - readme-file-listing
+
+  forbidden_routes:
+    - create_files_without_readme           # 禁止建立檔案但不建立 README.md
+    - skip_routing_registry_update          # 禁止不更新 routing-registry.yaml
+    - skip_knowledge_indexes_update         # 禁止不更新 knowledge/indexes/README.md
+    - skip_validation                       # 禁止不執行 validate-knowledge-runtime.rb
+
+  expected_final_route: |
+    intelligence/engineering/<domain>/README.md
+    intelligence/engineering/<domain>/<subcategory>/README.md  (列出所有 .md 檔案)
+    analysis/<domain>/README.md
+    analysis/<domain>/workflows/README.md  (列出所有 .md 檔案)
+    workflow/<domain>/README.md  (列出所有 .md 檔案)
+    knowledge/runtime/routing-registry.yaml  (新增 routing record)
+    knowledge/indexes/README.md  (新增任務路由列)
+
+  expected_intelligence:
+    - intelligence/engineering/README.md
+    - analysis/README.md
+    - workflow/README.md
+    - knowledge/runtime/routing-registry.yaml
+    - knowledge/indexes/README.md
+
+  unexpected_intelligence:
+    - (none — 所有相關檔案都應被讀取)

@@ -1,6 +1,6 @@
 # Claude 使用說明
 
-本檔說明 Claude Code 特有的配置與操作注意事項。通用配置原則見 [`ai-tools/README.md`](README.md)；知識庫入口見 [`README.md`](../README.md)；啟動流程見 [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md)。
+本檔說明 Claude Code 特有的配置與操作注意事項。通用配置原則見 [`ai-tools/README.md`](../README.md)；知識庫入口見 [`README.md`](../../README.md)；啟動流程見 [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md)。
 
 ## Claude Code 配置實作
 
@@ -32,6 +32,38 @@ skills/<skill-name>/tool-adapters/claude.md
 
 該 adapter 只寫 skill-specific 差異，並連回核心 `WORKFLOW.md` / `TOOLS.md`。
 
+## 語言偏好設定
+
+Claude Code 的語言偏好設定方式與 Roo Code（VS Code Extension）不同，因為 Claude Code 是 CLI 工具，**沒有** SQLite 全域資料庫。
+
+### 設定方式
+
+Claude Code 的語言行為由 `CLAUDE.md` 中的 Custom Instructions 控制：
+
+1. **在 `CLAUDE.md` 中設定**：本知識庫的 [`CLAUDE.md`](../CLAUDE.md) 已包含語言偏好設定。
+2. **語言偏好內容**：
+
+```text
+Language Preference: Default to English, but always match the user's language in conversation.
+If the user writes in Chinese, respond in Chinese.
+If the user writes in Japanese, respond in Japanese.
+If the user switches languages, follow their switch.
+```
+
+### 與 Roo Code 的差異
+
+| 特性 | Claude Code | Roo Code |
+|------|------------|----------|
+| 執行環境 | CLI terminal | VS Code extension |
+| 設定位置 | `CLAUDE.md`（檔案） | `.roomodes` + SQLite 全域資料庫 |
+| 全域語言欄位 | 無 | 有（`language` 欄位在 `state.vscdb`） |
+| 設定方式 | 直接編輯 `CLAUDE.md` | 編輯 `.roomodes` + 修改 SQLite |
+
+### 注意事項
+
+- Claude Code 沒有「全域語言強制」的問題，只要 `CLAUDE.md` 中的語言偏好設定正確，Claude 就會跟隨使用者語言。
+- 如果 Claude 仍然強制使用英文，請檢查 `CLAUDE.md` 中是否有固定的 `You should always speak and think in the "English" (en) language` 設定，改為上述軟性偏好即可。
+
 ## 驗證
 
 使用 Claude 完成任務時，最後要求它回報：
@@ -41,4 +73,4 @@ skills/<skill-name>/tool-adapters/claude.md
 - 目標是否完成，還有哪些 `.agent-goals` 未完成。
 - 驗證方法：diff review、link check、commit/push/readback/clean status。
 
-← [回到 AI 工具索引](README.md)
+← [回到 AI 工具索引](../README.md)

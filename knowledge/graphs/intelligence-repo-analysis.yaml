@@ -1,5 +1,10 @@
 id: graph.intelligence-repo-analysis
 source: intelligence/engineering/repo-analysis/README.md
+status: candidate
+summary: >
+  連接 repo-analysis intelligence 層的所有 atoms：
+  documentation-backfill-heuristic、traceability-heuristic。
+  每個 atom 從 analysis/repo/ 層萃取可重用的文件回填與追溯性原則。
 edges:
   - type: depends_on
     target: intelligence/engineering/repo-analysis/README.md
@@ -37,4 +42,8 @@ edges:
     target: knowledge/runtime/routing-registry.yaml
     reason: 透過 runtime routing 可被任務路由發現
     validation: 確認 routing-registry.yaml 存在
-status: candidate
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-13

@@ -18,11 +18,11 @@ edges:
     reason: helper usage 說明 complete --validated 前需回寫 durable planning。
     validation: scripts/README.md 的安全條件包含 durable goal completion gate。
   - type: related_to
-    target: ai-tools/cursor.md
+    target: ai-tools/agent/cursor.md
     reason: Cursor tool guidance 需要提醒 agent 不把 completed row 當長期記憶。
     validation: Cursor goal ledger section 包含 durable planning handoff rule。
   - type: related_to
-    target: ai-tools/claude.md
+    target: ai-tools/agent/claude.md
     reason: Claude tool guidance 需要相同 durable planning handoff reminder。
     validation: Claude 操作注意包含 completed goal row 不作長期記憶。
   - type: routes_to

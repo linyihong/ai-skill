@@ -107,3 +107,9 @@ edges:
     target: plans/archived/ai-decision-contract-testing.md
     reason: stateless-validation-necessity 和 failure-to-scenario-closure atom 從此計畫的 Stateless Deterministic Validation 原則提煉而來。
     validation: 計畫的 Stateless Deterministic Validation 章節直接對應 atom 的核心原則。
+
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-13

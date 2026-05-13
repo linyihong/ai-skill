@@ -8,4 +8,4 @@
 4. 依 [runtime/router/activation-rules.yaml](runtime/router/activation-rules.yaml) 決定 lazy-load rules
 5. 先讀 `knowledge/summaries/` 對應 summary（300-500 tokens），需要時才展開全文
 
-詳細使用說明見 [ai-tools/claude.md](ai-tools/claude.md)。
+詳細使用說明見 [ai-tools/agent/claude.md](ai-tools/agent/claude.md)。

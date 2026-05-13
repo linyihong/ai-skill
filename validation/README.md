@@ -137,11 +137,12 @@ result:
 
 ## 首批 Scenario
 
-| # | ID | 來源 Atom | 測試目標 |
-|---|-----|-----------|---------|
+| # | ID | 來源 Atom / 架構變更 | 測試目標 |
+|---|-----|---------------------|---------|
 | 1 | `flutter-aot-hooking-v1` | `hook-selection.md` + `flutter-dart-aot-detection.md` | Flutter AOT 分析路線選擇 |
 | 2 | `local-proxy-vs-pinning-v1` | `local-proxy-routing-diagnosis.md` + `local-proxy-detection.md` | Local proxy vs TLS pinning 判斷 |
 | 3 | `early-hook-prevention-v1` | `early-hook-instability.md` + `frida-spawn-race.md` | 過早 hook 的預防行為 |
+| 4 | `new-category-registration-v1` | `validate-knowledge-runtime.rb` 新增 `validate_directory_structure`（2026-05-13） | 新增 intelligence/analysis/workflow 類別時是否正確建立 README.md、更新 routing registry |
 
 ## 執行方式
 

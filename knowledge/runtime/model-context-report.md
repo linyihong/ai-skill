@@ -16,7 +16,6 @@
 
 | Route | Primary source | Compression | Reason |
 | --- | --- | --- | --- |
-| `route.bootstrap.ai-skill` | `README.md` | `source-backed` | Ai-skill bootstrap 和 repository close-loop 需要完整 source 與 required dependencies。 |
 | `route.governance.durable-goal-boundary` | `shared-rules/conversation-goal-ledger.md` | `source-backed` | Goal 刪除與 durable planning gate 會影響 long-term state，需讀 shared rule source。 |
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `source-backed` | 建立或修改 atom metadata 時需讀 schema 與子規則全文。 |
 | `route.feedback.promotion-pipeline` | `feedback/promotion/README.md` | `source-backed` | Promotion / downgrade 會影響 shared rules、skill history、intelligence 與 runtime surfaces，需要讀 full source 與 validation gates。 |
@@ -26,7 +25,16 @@
 
 | Route | Primary source | Compression | Reason |
 | --- | --- | --- | --- |
+| `route.bootstrap.ai-skill` | `CORE_BOOTSTRAP.md` | `summary-first` | Bootstrap 階段只需要 Core Bootstrap 3 rules 與 OS layout，不需要完整 source。 |
+| `route.skill.discovery` | `skills-index.yaml` | `index-only` | Skills index 輕量（~300 tokens），可在整個對話中 cache。 |
+| `route.runtime.activation-rules` | `runtime/router/activation-rules.yaml` | `index-only` | Activation rules 輕量（~500 tokens），可在整個對話中 cache。 |
+| `route.runtime.context-ttl` | `runtime/context/ttl-policy.yaml` | `index-only` | TTL policy 輕量，需要 prune 時才讀。 |
 | `route.runtime.context-loading` | `runtime/routing/README.md` | `summary-first` | routing decision 可先用 registry、index、summary；修改 source 時再升級。 |
+| `route.runtime.router-flow` | `runtime/router/README.md` | `index-only` | Router flow 是設計文件，需要 routing 決策時才讀。 |
+| `route.intelligence.engineering.heuristics` | `intelligence/engineering/heuristics/README.md` | `index-only` | 通用 heuristics 在需要對應判斷時才讀取完整 atom。 |
+| `route.runtime.context-ttl-doc` | `runtime/context/README.md` | `index-only` | TTL doc 是設計文件，需要 prune context 時才讀。 |
+| `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `index-only` | agent-architecture atoms 在需要理解 AI 行為模式時才讀取完整內容。 |
+| `route.feedback.history` | `feedback/history/README.md` | `index-only` | feedback/history 在需要查詢或新增 lesson 時才讀取。 |
 
 ### `specialized`
 
@@ -34,13 +42,20 @@
 | --- | --- | --- | --- |
 | `route.skill.apk-analysis` | `skills/apk-analysis/SKILL.md` | `source-backed` | APK analysis 需要 skill entrypoint、workflow 與 domain-specific technique routing。 |
 | `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md` | `source-backed` | APK route selection 需要 domain workflow、feedback source 與 intelligence judgment 一起判斷。 |
+| `route.skill.app-development-guidance` | `skills/app-development-guidance/SKILL.md` | `source-backed` | App development guidance 需要 skill entrypoint、workflow 與 domain-specific controls/checklists routing。 |
+| `route.skill.travel-planning` | `skills/travel-planning/SKILL.md` | `source-backed` | Travel planning 需要 skill entrypoint、workflow 與 domain-specific sources/tools routing。 |
+| `route.runtime.onboarding` | `runtime/onboarding/README.md` | `summary-first` | Onboarding 文件在需要執行對應 skill 的完整流程時才讀取。 |
+| `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `summary-first` | 需要執行對應操作流程時才讀取完整 workflow。 |
+| `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/apk-analysis/README.md` | `summary-first` | 需要對應決策智慧時才讀取完整 atom。 |
+| `route.validation.ai-decision-contract` | `validation/README.md` | `summary-first` | 需要驗證 AI 決策品質時才讀取完整 scenario 與 rule 定義。 |
 
 ## Compression View
 
 | Compression level | Routes | Escalation note |
 | --- | --- | --- |
-| `source-backed` | `route.bootstrap.ai-skill`, `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.skill.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
-| `summary-first` | `route.runtime.context-loading` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
+| `index-only` | `route.skill.discovery`, `route.runtime.activation-rules`, `route.runtime.context-ttl`, `route.runtime.router-flow`, `route.intelligence.engineering.heuristics`, `route.runtime.context-ttl-doc`, `route.intelligence.engineering.agent-architecture`, `route.feedback.history` | 依 `models/compression/README.md` 的 escalation rules 判斷。 |
+| `source-backed` | `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.skill.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing`, `route.skill.app-development-guidance`, `route.skill.travel-planning` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
+| `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.context-loading`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.intelligence.apk-analysis.atoms`, `route.validation.ai-decision-contract` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
 
 ## Agent Output Shape
 

@@ -1,0 +1,24 @@
+scenario: feedback-history-consolidation-v1
+timestamp: "2026-05-13T01:54:00Z"
+model: deepseek-chat
+
+result:
+  passed: true
+  route_correctness:
+    expected: 6
+    actual: 6
+    violations: []
+  heuristic_obedience:
+    expected_used: 2
+    actual_used: 2
+    missing: []
+    violations: []
+  forbidden_routes_used: []
+  intelligence_usage:
+    expected: 2
+    actual: 2
+    missing: []
+  summary:
+    passed_checks: 6/6
+    failed_checks: []
+    critical_failures: []

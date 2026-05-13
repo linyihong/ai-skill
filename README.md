@@ -60,8 +60,8 @@ Session Start
 
 | Tool | Config |
 | --- | --- |
-| **Claude Code** | [`ai-tools/claude.md`](ai-tools/claude.md) |
-| **Cursor** | [`ai-tools/cursor.md`](ai-tools/cursor.md) |
+| **Claude Code** | [`ai-tools/agent/claude.md`](ai-tools/agent/claude.md) |
+| **Cursor** | [`ai-tools/agent/cursor.md`](ai-tools/agent/cursor.md) |
 
 ## 📖 Key Documents
 

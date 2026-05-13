@@ -1,6 +1,13 @@
 # AI 工具使用說明
 
-本目錄放各種 AI coding / agent 工具如何讀取與同步本知識庫。新增其他工具時，在這裡加新的子檔，例如 CLI agent、IDE agent、雲端 agent 或其他支援 skill/rules 的工具。
+本目錄放各種 AI coding / agent 工具如何讀取與同步本知識庫。工具依類型分為以下類別：
+
+| 類別 | 說明 | 包含工具 |
+|------|------|----------|
+| [`agent/`](agent/) | AI Agent 工具（CLI 或 IDE 內建的 AI 助手） | Roo Code、Cursor、Claude Code |
+| [`ide/`](ide/) | IDE 相關設定（編輯器本身而非 AI 工具） | VS Code Extension 全域設定 |
+
+新增其他工具時，依其類型放入對應子目錄。
 
 ## 配置思想與邊界定義
 
@@ -50,10 +57,18 @@ Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating
 
 若某個 skill 對某工具有必要的特殊執行策略，skill 內可用 `skills/<skill>/tool-adapters/<tool>.md` 記錄差異；本目錄仍只放該工具的全域設定、同步與操作方式。
 
+## Agent 工具
+
 | 工具 | 文件 | 用途（僅記錄該工具特有差異） |
 | --- | --- | --- |
-| Claude | [claude.md](claude.md) | `CLAUDE.md` 自動載入入口、`.claude/settings.json` 工具配置、tool adapter 機制。 |
-| Cursor | [cursor.md](cursor.md) | `.cursor/rules/*.mdc` 自動載入、reference/symlink/copy 三種同步策略、`.cursor/hooks.json` 設定、`.agent-goals/` 閉環提醒。 |
-| Roo Code | [roo.md](roo.md) | Custom instructions 手動設定、多 modes 與 file restrictions、`.roomodes` 自訂 mode 定義、VS Code 多資料夾工作區協作。 |
+| Claude Code | [`agent/claude.md`](agent/claude.md) | `CLAUDE.md` 自動載入入口、`.claude/settings.json` 工具配置、tool adapter 機制。 |
+| Cursor | [`agent/cursor.md`](agent/cursor.md) | `.cursor/rules/*.mdc` 自動載入、reference/symlink/copy 三種同步策略、`.cursor/hooks.json` 設定、`.agent-goals/` 閉環提醒。 |
+| Roo Code | [`agent/roo.md`](agent/roo.md) | Custom instructions 手動設定、多 modes 與 file restrictions、`.roomodes` 自訂 mode 定義、VS Code 多資料夾工作區協作。 |
+
+## IDE 設定
+
+| 文件 | 用途 |
+| --- | --- |
+| [`ide/vscode-extension-global-state.md`](ide/vscode-extension-global-state.md) | VS Code Extension 全域設定（SQLite 資料庫）的查詢、修改與注意事項。 |
 
 ← [回到根目錄](../README.md)

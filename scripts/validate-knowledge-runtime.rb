@@ -57,6 +57,8 @@ SUMMARY_FIELDS = [
   "Validation signal"
 ].freeze
 
+SKIP_SUBDIRS = %w[feedback_history].freeze
+
 def add_error(message)
   ERRORS << message
 end
@@ -268,10 +270,122 @@ def validate_graphs
   COUNTS[:graphs] = graph_files.length
 end
 
+def markdown_links_from_text(text)
+  # Extract both standard markdown links [...](...) and table cell links [...](...)
+  links = markdown_links(text)
+  # Also extract links from table cells: | [text](path) |
+  text.scan(/\|?\s*\[[^\]]+\]\(([^)]+)\)\s*\|?/).flatten.each { |l| links << l }
+  links.uniq
+end
+
+def files_listed_in_readme(readme_path)
+  return [] unless readme_path.exist?
+
+  readme_text = read_text(readme_path)
+  links = markdown_links_from_text(readme_text)
+  links.map { |t| t.split("#", 2).first }
+       .reject(&:empty?)
+       .map { |t| (readme_path.dirname + t).cleanpath }
+end
+
+def validate_directory_structure
+  # Check that every subdirectory under intelligence/engineering/<domain>/ has a README.md
+  domains_dir = ROOT + "intelligence/engineering"
+  if domains_dir.exist?
+    domains_dir.each_child do |domain_dir|
+      next unless domain_dir.directory?
+      next if domain_dir.basename.to_s.start_with?(".")
+
+      domain_rel = rel(domain_dir)
+      readme = domain_dir + "README.md"
+      add_error("#{domain_rel}: missing README.md") unless readme.exist?
+
+      # Check sub-categories (heuristics, anti-patterns, failure, signals) have README.md
+      domain_dir.each_child do |sub_dir|
+        next unless sub_dir.directory?
+        next if sub_dir.basename.to_s.start_with?(".")
+        next if SKIP_SUBDIRS.include?(sub_dir.basename.to_s)
+
+        sub_rel = rel(sub_dir)
+        sub_readme = sub_dir + "README.md"
+        add_error("#{sub_rel}: missing README.md") unless sub_readme.exist?
+
+        # Check that every .md file in sub-category is listed in its README.md
+        if sub_readme.exist?
+          listed = files_listed_in_readme(sub_readme)
+
+          sub_dir.each_child do |file|
+            next unless file.extname == ".md"
+            next if file.basename.to_s == "README.md"
+
+            add_error("#{rel(file)}: not listed in #{sub_rel}/README.md") unless listed.include?(file.cleanpath)
+          end
+        end
+      end
+    end
+  end
+
+  # Check that every subdirectory under analysis/<domain>/workflows/ has its .md files listed in README.md
+  analysis_dir = ROOT + "analysis"
+  if analysis_dir.exist?
+    analysis_dir.each_child do |domain_dir|
+      next unless domain_dir.directory?
+      next if domain_dir.basename.to_s.start_with?(".")
+
+      workflows_dir = domain_dir + "workflows"
+      next unless workflows_dir.exist?
+
+      workflows_rel = rel(workflows_dir)
+      workflows_readme = workflows_dir + "README.md"
+      add_error("#{workflows_rel}: missing README.md") unless workflows_readme.exist?
+
+      if workflows_readme.exist?
+        listed = files_listed_in_readme(workflows_readme)
+
+        workflows_dir.each_child do |file|
+          next unless file.extname == ".md"
+          next if file.basename.to_s == "README.md"
+
+          add_error("#{rel(file)}: not listed in #{workflows_rel}/README.md") unless listed.include?(file.cleanpath)
+        end
+      end
+    end
+  end
+
+  # Check that every subdirectory under workflow/<domain>/ has its .md files listed in README.md
+  workflow_dir = ROOT + "workflow"
+  if workflow_dir.exist?
+    workflow_dir.each_child do |domain_dir|
+      next unless domain_dir.directory?
+      next if domain_dir.basename.to_s.start_with?(".")
+
+      domain_rel = rel(domain_dir)
+      domain_readme = domain_dir + "README.md"
+      add_error("#{domain_rel}: missing README.md") unless domain_readme.exist?
+
+      if domain_readme.exist?
+        listed = files_listed_in_readme(domain_readme)
+
+        domain_dir.each_child do |file|
+          next unless file.extname == ".md"
+          next if file.basename.to_s == "README.md"
+
+          add_error("#{rel(file)}: not listed in #{domain_rel}/README.md") unless listed.include?(file.cleanpath)
+        end
+      end
+    end
+  end
+
+  COUNTS[:intelligence_domains] = Dir.glob((ROOT + "intelligence/engineering/*").to_s).count { |p| File.directory?(p) }
+  COUNTS[:analysis_domains] = Dir.glob((ROOT + "analysis/*").to_s).count { |p| File.directory?(p) }
+  COUNTS[:workflow_domains] = Dir.glob((ROOT + "workflow/*").to_s).count { |p| File.directory?(p) }
+end
+
 validate_registry
 validate_refresh_policy
 validate_summaries
 validate_graphs
+validate_directory_structure
 check_markdown_links("knowledge/runtime/README.md")
 check_markdown_links("knowledge/runtime/runtime-report.md") if (ROOT + "knowledge/runtime/runtime-report.md").exist?
 check_markdown_links("knowledge/runtime/model-context-report.md") if (ROOT + "knowledge/runtime/model-context-report.md").exist?
@@ -284,6 +398,9 @@ if ERRORS.empty?
   puts "registry_records=#{COUNTS[:registry_records]}"
   puts "summaries=#{COUNTS[:summaries]}"
   puts "graphs=#{COUNTS[:graphs]}"
+  puts "intelligence_domains=#{COUNTS[:intelligence_domains]}"
+  puts "analysis_domains=#{COUNTS[:analysis_domains]}"
+  puts "workflow_domains=#{COUNTS[:workflow_domains]}"
 else
   warn "Knowledge runtime validation failed:"
   ERRORS.each { |error| warn "- #{error}" }

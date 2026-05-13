@@ -23,18 +23,18 @@ This layer does not own:
 | Workflow concern | Current source | Pilot target status |
 | --- | --- | --- |
 | Skill trigger and authorization boundary | `../../skills/apk-analysis/SKILL.md` | remains active |
-| Default decision tree | `../../skills/apk-analysis/WORKFLOW.md` | ✅ extracted to `execution-flow.md` |
-| Capture window detailed rules | `../../skills/apk-analysis/WORKFLOW.md` | ✅ extracted to `execution-flow.md` |
+| Default decision tree | `../../skills/apk-analysis/WORKFLOW.md` | ✅ extracted to [`execution-flow.md`](execution-flow.md) |
+| Capture window detailed rules | `../../skills/apk-analysis/WORKFLOW.md` | ✅ extracted to [`execution-flow.md`](execution-flow.md) |
 | Environment and tool preparation | `../../skills/apk-analysis/TOOLS.md` | reference from `analysis/apk/`; do not duplicate |
-| Documentation and artifact gates | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
-| SDK live self-generation audit | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
-| Identity material self-generation audit | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
-| UI architecture map template | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
-| API catalog detail requirements | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
-| Sanitization rules | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
-| Developer guidance notes | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
-| Feedback lesson writing tips | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
-| Backfill rules | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to `artifact-gates.md` |
+| Documentation and artifact gates | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to [`artifact-gates.md`](artifact-gates.md) |
+| SDK live self-generation audit | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to [`artifact-gates.md`](artifact-gates.md) |
+| Identity material self-generation audit | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to [`artifact-gates.md`](artifact-gates.md) |
+| UI architecture map template | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to [`artifact-gates.md`](artifact-gates.md) |
+| API catalog detail requirements | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to [`artifact-gates.md`](artifact-gates.md) |
+| Sanitization rules | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to [`artifact-gates.md`](artifact-gates.md) |
+| Developer guidance notes | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to [`artifact-gates.md`](artifact-gates.md) |
+| Feedback lesson writing tips | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to [`artifact-gates.md`](artifact-gates.md) |
+| Backfill rules | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ extracted to [`artifact-gates.md`](artifact-gates.md) |
 | First-day project runbook | `../../skills/apk-analysis/RUNBOOK.md` | candidate for onboarding workflow |
 | Development guidance handoff | `../../skills/app-development-guidance/` | referenced only when trigger applies |
 

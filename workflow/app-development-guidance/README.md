@@ -41,7 +41,7 @@
 
 - `skills/app-development-guidance/WORKFLOW.md` — ✅ 已提取（execution-flow.md, artifact-gates.md, analysis/app-development-guidance/risk-translation.md）
 - `skills/app-development-guidance/process/` — ✅ 已提取（development-process.md）
-- `skills/app-development-guidance/checklists/` — ✅ 已提取（review-checklists.md）
+- `skills/app-development-guidance/checklists/` — ✅ 已提取（[`review-checklist.md`](review-checklist.md)）
 
 ## 已提取內容
 
@@ -50,7 +50,7 @@
 | [`execution-flow.md`](execution-flow.md) | `WORKFLOW.md` §1, §5-8 | Start From Evidence、Change Intake、BDD Closure Loop、SDK Defect Closure、Same-Session Closure、Performance Gate、Backfill Rules、Validate |
 | [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md` | Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria |
 | [`analysis/app-development-guidance/risk-translation.md`](../analysis/app-development-guidance/risk-translation.md) | `WORKFLOW.md` §2-5 | Risk Translation Table、Owner Layer Selection、Control Definition、Guidance Classification、Linked Updates |
-| [`review-checklists.md`](review-checklists.md) | `skills/app-development-guidance/checklists/` | 6 種審查 checklist 的 catalog（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
+| [`review-checklist.md`](review-checklist.md) | `skills/app-development-guidance/checklists/` | 6 種審查 checklist 的 catalog（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
 | [`development-process.md`](development-process.md) | `skills/app-development-guidance/process/README.md` | Contract-first 開發流程：Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill、Contract-First Rules、Definition of Ready/Done |
 
 ## 建議 Workflow 流程
