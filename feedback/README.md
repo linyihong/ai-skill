@@ -11,29 +11,31 @@
 
 ## 不放什麼
 
-- 單一 skill lesson 正文；仍放在 `skills/<skill>/feedback_history/`，直到遷移策略穩定。
+- 單一 lesson 正文；統一放在 `feedback/history/<domain>/`。
 - 全庫可執行 feedback lesson 檔名與模板規則；放到 `shared-rules/feedback-lessons.md`。
 - Failure pattern 的可執行 prevention gate；放到 `shared-rules/failure-patterns/` 或相關 shared rule。
 - 專案 raw evidence 或未去敏資料；留在業務專案。
 
 ## 與既有層的關係
 
-- `skills/*/feedback_history/` 仍是目前 lesson storage 的相容層。
+- `feedback/history/` 是 lesson 的統一目標路徑。
+- `skills/*/feedback_history/`、`workflow/*/feedback_history/`、`analysis/*/feedback_history/`、`intelligence/*/feedback_history/` 是舊路徑，僅保留向後相容（既有 lesson 尚未搬遷）。
 - `shared-rules/failure-learning-system.md` 與 `shared-rules/feedback-lessons.md` 仍是可執行規則。
 - `intelligence/` 承接成熟的工程智慧。
 - `governance/` 定義 promotion、deprecation 與 validation lifecycle。
-- `knowledge/runtime/sqlite/` 可索引冷 feedback lessons，協助低 token 查找；lesson 全文仍留在 `skills/*/feedback_history/`。
+- `knowledge/runtime/sqlite/` 可索引冷 feedback lessons，協助低 token 查找；lesson 全文仍留在 `feedback/history/`。
 
 ## 目前入口
 
+- [`history/`](history/README.md)：所有 lesson 的統一存放路徑（依 domain 分類）。
 - [`replay/`](replay/README.md)：定義經驗重播的系統設計（從過往 session、failure 與成功經驗中提取可重複使用的教訓）。
 - [`extraction/`](extraction/README.md)：定義智慧抽取的系統設計（從 feedback lesson、replay 結果中提煉 intelligence atom）。
 - [`refinement/`](refinement/README.md)：定義流程精煉的系統設計（從實作經驗中持續改進 workflow）。
-- [`promotion/`](promotion/README.md)：定義 feedback lesson 如何從 skill-local history 推進到 workflow、intelligence、shared rules、memory 或 runtime surfaces。
+- [`promotion/`](promotion/README.md)：定義 feedback lesson 如何從 history 推進到 workflow、intelligence、shared rules、memory 或 runtime surfaces。
 
 ## 第一批候選遷移來源
 
 - `shared-rules/failure-learning-system.md`
 - `shared-rules/feedback-lessons.md`
-- `skills/*/feedback_history/README.md`
+- `skills/*/feedback_history/`（舊路徑 lesson 將分批搬遷至 `feedback/history/`）
 - `architecture/next-stage-upgrade-plan.md` 的 Intelligence Feedback Loop

@@ -2,12 +2,12 @@
 
 「怎麼寫回饋、檔名怎麼取、模板長怎樣」**全部**在本檔維護；各 skill **不再**另存一份 `FEEDBACK.md` 正文（`apk-analysis` 目錄下僅保留極短入口檔，指向本檔）。
 
-**每一條 lesson 全文**放在對應 skill 的 **`feedback_history/`** 之下（未分類 skill 可直接放根層；已分類 skill 放 `<category>/` 或 `common/`），**不要**把長篇堆進任何說明檔。
+**每一條 lesson 全文**統一放在 **`feedback/history/<domain>/`** 之下（對應 skill 領域名稱，如 `apk-analysis/`、`app-development-guidance/`、`travel-planning/`），**不要**再把 lesson 分散到 `workflow/<name>/feedback_history/`、`analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/` 或 `skills/<name>/feedback_history/` 等舊路徑。
 
 ## 原則
 
 - **不要**在每條 lesson 裡重複貼上 [sanitization.md](sanitization.md)、[dependency-reading.md](dependency-reading.md)、[neutral-language.md](neutral-language.md)、[goal-action-validation.md](goal-action-validation.md)、[authorization-scope.md](authorization-scope.md) 等全文；條目頂部用一行**引用** [README.md](README.md) 或**本檔**即可。
-- **Agent 行為：** 在授權分析過程中一旦得到可重用技巧／失敗模式／驗證規則，應**主動**在同一輪對話內於該 skill 的 **`feedback_history/`** 對應位置新增檔案（依下方**分類規則**、**檔名規則**與**模板**），**不要**等使用者提醒。
+- **Agent 行為：** 在授權分析過程中一旦得到可重用技巧／失敗模式／驗證規則，應**主動**在同一輪對話內於 **`feedback/history/<domain>/`** 對應分類新增檔案（依下方**分類規則**、**檔名規則**與**模板**），**不要**等使用者提醒。
 - **每輪回饋檢查：** 每個有實質進展的工作回合結束前、切回長時間專案工作前、提交 project-only evidence 前、或使用者說「繼續」展開下一輪前，agent 必須明確自問：本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？若是，先開啟 canonical `<AI_SKILL_REPO>` writeback transaction；若否，最終回覆可簡短說明本輪沒有新增泛化 lesson，或只留下 project-specific evidence。
 - 只寫**通用方法**，不寫特定 App / project incident 的私有結論或具體證據；必須依 [reusable-guidance-boundary.md](reusable-guidance-boundary.md) 先抽象化原因、規則與驗證，再依 [sanitization.md](sanitization.md) 去敏；若 lesson 來自 agent 失誤或閉環不完整，另依 [failure-learning-system.md](failure-learning-system.md) 分類失效模式並判斷是否需要 `shared-rules/failure-patterns/`；不要只新增 skill-local feedback lesson 就宣稱已吸收 agent 錯誤，需先判斷是否也需要 cross-skill failure pattern；發現 skill/rule/template/lesson 更新時依 [dependency-reading.md](dependency-reading.md) 讀取依賴；標題、slug、摘要與正文必須依 [neutral-language.md](neutral-language.md) 使用中性低爭議用語；每個重要結論必須依 [goal-action-validation.md](goal-action-validation.md) 說明目標、執行、驗證或參考來源；必須說明證據與適用／不適用條件；不確定標 `experimental`。
 - 不得寫入本機絕對路徑、使用者名稱、私有工作目錄、clone 位置；用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 等 placeholder。
@@ -18,67 +18,52 @@
 | --- | --- |
 | **共用政策（全庫）** | [`shared-rules/README.md`](README.md) |
 | **本檔** | 命名規則、模板、索引與 Git 約定（**唯一正文**） |
-| **每一條獨立 lesson（未分類 skill，尚未遷移至新框架）** | **`<skill>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
-| **每一條獨立 lesson（已有分類的 skill，尚未遷移至新框架）** | **`<skill>/feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`** |
-| **條目總覽表**（可選） | **`<skill>/feedback_history/README.md`** 與必要的 **`<skill>/feedback_history/<category>/README.md`** |
+| **每一條獨立 lesson（所有 skill，無論遷移狀態）** | **`feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`** |
+| **條目總覽表**（可選） | **`feedback/history/<domain>/README.md`** 與必要的 **`feedback/history/<domain>/<category>/README.md`** |
 
-### ⚠️ 重要：已遷移至新框架的 skill
-
-若 skill 已按新分層（`workflow/<name>/`、`analysis/<name>/`、`intelligence/<name>/`）重構，**feedback lesson 不得再寫入舊 `skills/<name>/feedback_history/` 路徑**，應改寫至對應的新分層路徑：
-
-| 內容 | 位置 |
-| --- | --- |
-| **與執行流程相關的 lesson** | **`workflow/<name>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
-| **與分析方法相關的 lesson** | **`analysis/<name>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
-| **與工程智慧相關的 lesson** | **`intelligence/<name>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`** |
-| **跨領域或無法歸類的 lesson** | **`workflow/<name>/feedback_history/common/YYYY-MM-DD_HHMMSS-<slug>.md`** |
-
-若對應新分層路徑下尚無 `feedback_history/` 目錄，**應主動建立**，而非退回舊路徑。
+> **重要：** `feedback/history/` 是 lesson 的唯一目標路徑。舊的 `skills/<name>/feedback_history/`、`workflow/<name>/feedback_history/`、`analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/` 路徑僅保留向後相容（既有 lesson 尚未搬遷），**新 lesson 一律寫入 `feedback/history/<domain>/`**。
 
 ### 判斷流程
 
-1. **確認 lesson 的 skill 歸屬**：這個技巧屬於哪個 skill 的 scope？
+1. **確認 lesson 的 domain 歸屬**：這個技巧屬於哪個 skill 的 scope？
    - APK 分析技術（Frida hook、TLS capture、proxy 架構、response decoding）→ `apk-analysis`
    - 開發指引（SDK 設計、API contract、BDD、測試策略、release gate）→ `app-development-guidance`
+   - 旅遊規劃（行程、交通、住宿、預算）→ `travel-planning`
    - 若不確定，先讀取該 skill 的 `SKILL.md` 確認 scope 描述。
-2. **檢查該 skill 的 `SKILL.md` 或 `README.md`**，確認是否有「新分層路徑（優先讀取）」章節。
-3. 若有新分層路徑 → 表示已遷移 → lesson 寫到新分層對應的 `feedback_history/`，並依 lesson 性質選擇層級：
-   - 執行流程相關 → `workflow/<name>/feedback_history/`
-   - 分析方法相關 → `analysis/<name>/feedback_history/`
-   - 工程智慧相關 → `intelligence/<name>/feedback_history/`
-4. 若無新分層路徑 → 表示尚未遷移 → lesson 寫到舊 `skills/<name>/feedback_history/`。
+2. **確認 domain 下的分類**：對應 `feedback/history/<domain>/` 下是否有對應分類目錄（如 `common/`、`flutter-dart-aot/`、`controls/`）。
+3. **寫入 `feedback/history/<domain>/<category>/`**，若尚無對應分類目錄，**應主動建立**，而非退回舊路徑。
 
 ### 範例
 
-- **已遷移（app-development-guidance）**：lesson 應放 `workflow/app-development-guidance/feedback_history/` 或 `intelligence/engineering/app-development-guidance/feedback_history/`，**不是** `skills/app-development-guidance/feedback_history/`。
-- **已遷移（apk-analysis）**：lesson 應放 `workflow/apk-analysis/feedback_history/`、`analysis/apk/feedback_history/` 或 `intelligence/engineering/apk-analysis/feedback_history/`，**不是** `skills/apk-analysis/feedback_history/`。
+- **APK 分析 lesson**：`feedback/history/apk-analysis/common/2026-05-13_094500-anti-bot-gateway-blocks-external-sdk.md`
+- **開發指引 lesson**：`feedback/history/app-development-guidance/controls/2026-05-01_142100-client-encrypted-header-not-boundary.md`
+- **旅遊規劃 lesson**：`feedback/history/travel-planning/common/2026-05-13_094500-xxx.md`
 
 ### ⚠️ 常見錯誤（必讀）
 
 以下錯誤案例來自實際 feedback lesson 寫入失誤，新 agent 在建立 lesson 前應先閱讀，避免重蹈覆轍：
 
-#### ❌ 錯誤 1：混淆 lesson 的 skill 歸屬
+#### ❌ 錯誤 1：混淆 lesson 的 domain 歸屬
 
 **情境**：從 TATA 專案學到「非標準 TLS bypasses SSL hooks」和「dart:io HttpClient bypasses Java hooks」
 
-**錯誤行為**：把這兩個 lesson 放到 `intelligence/engineering/app-development-guidance/feedback_history/common/`
+**錯誤行為**：把這兩個 lesson 放到 `feedback/history/app-development-guidance/common/`
 
 **為什麼錯**：這兩個是 APK 分析技術（Frida hook 策略），不是開發指引。`app-development-guidance` 的 scope 是 SDK 設計、API contract、BDD、測試策略。
 
 **正確做法**：
-- 先確認 lesson 屬於哪個 skill：非標準 TLS hook 是 APK 分析技術 → `apk-analysis`
-- 再確認遷移狀態：`apk-analysis` 已遷移 → 使用新分層路徑
-- 最終位置：`analysis/apk/feedback_history/local-proxy/`（分析方法）
+- 先確認 lesson 屬於哪個 domain：非標準 TLS hook 是 APK 分析技術 → `apk-analysis`
+- 最終位置：`feedback/history/apk-analysis/local-proxy/`
 
 #### ❌ 錯誤 2：已遷移 skill 的 lesson 放到舊路徑
 
-**情境**：`apk-analysis` 已遷移至新分層（`SKILL.md` 有「新分層路徑（優先讀取）」），但 agent 仍把 lesson 放到 `skills/apk-analysis/feedback_history/`
+**情境**：`apk-analysis` 已遷移至新分層，但 agent 仍把 lesson 放到 `skills/apk-analysis/feedback_history/` 或 `workflow/apk-analysis/feedback_history/`
 
-**錯誤行為**：使用舊 `skills/<name>/feedback_history/` 路徑
+**錯誤行為**：使用舊路徑（無論是 `skills/` 還是 `workflow/`、`analysis/`、`intelligence/` 底下的 `feedback_history/`）
 
-**為什麼錯**：已遷移 skill 的 lesson 必須放到對應的新分層路徑。舊路徑僅保留向後相容，新 lesson 不得寫入。
+**為什麼錯**：所有 lesson 的統一目標路徑是 `feedback/history/<domain>/`，不再按 lesson 性質分散到各層。
 
-**正確做法**：`analysis/apk/feedback_history/local-proxy/`（分析技術）
+**正確做法**：`feedback/history/apk-analysis/local-proxy/`
 
 #### ✅ 正確範例：完整的判斷流程
 
@@ -86,23 +71,22 @@
 
 **判斷流程**：
 1. 這是一個開發指引（SDK 設計限制），不是 APK 分析技術 → `app-development-guidance`
-2. `app-development-guidance` 已遷移 → 使用新分層路徑
-3. 這是工程智慧（理解 anti-bot 的行為邊界）→ `intelligence/engineering/app-development-guidance/feedback_history/`
-4. ✅ 最終位置：`intelligence/engineering/app-development-guidance/feedback_history/common/2026-05-13_094500-anti-bot-gateway-blocks-external-sdk.md`
+2. 確認 domain 分類：`feedback/history/app-development-guidance/common/`
+3. ✅ 最終位置：`feedback/history/app-development-guidance/common/2026-05-13_094500-anti-bot-gateway-blocks-external-sdk.md`
 
 > 更多 failure pattern 請見 [`shared-rules/failure-patterns/skill-classification-boundary-confusion.md`](failure-patterns/skill-classification-boundary-confusion.md)。
 
-成熟後可將 lesson 整理進該 skill 的 `workflow/<domain>/execution-flow.md`、`analysis/<domain>/` 或 `intelligence/<domain>/`（見模板中 **Promotion Target**）。已遷移 skill 的舊結構路徑（`WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md`、`techniques/`）已被刪除，不再保留向後相容。
+成熟後可將 lesson 整理進 `workflow/<domain>/execution-flow.md`、`analysis/<domain>/` 或 `intelligence/<domain>/`（見模板中 **Promotion Target**）。
 
 ## 分類規則
 
-當某個 skill 內部已經開始按 runtime、platform、control、technique、checklist 等方式分類時，`feedback_history/` 也要跟著分類，避免所有 lesson 混在同一層：
+當某個 domain 內部已經開始按 runtime、platform、control、technique、checklist 等方式分類時，`feedback/history/<domain>/` 也要跟著分類，避免所有 lesson 混在同一層：
 
-- 新 lesson 優先放到 **`feedback_history/<category>/`**，其中 `<category>` 應對應該 skill 內既有分類名稱，例如 `flutter-dart-aot`、`http-api`、`controls`、`platforms`。
-- 跨分類、全域適用或分類尚未明確的 lesson 放到 **`feedback_history/common/`**。
+- 新 lesson 優先放到 **`feedback/history/<domain>/<category>/`**，其中 `<category>` 應對應該 domain 內既有分類名稱，例如 `flutter-dart-aot`、`http-api`、`controls`、`common`。
+- 跨分類、全域適用或分類尚未明確的 lesson 放到 **`feedback/history/<domain>/common/`**。
 - 若一條 lesson 會 promote 到多個分類，放在主要分類，並在 lesson 的 **Promotion Target** / **Required Linked Updates** 寫出其他同步更新位置。
-- `feedback_history/README.md` 應是總索引，列出 category folders；每個 category folder 可有自己的 `README.md` 表格。
-- 既有歷史 lesson 若已被外部文件連結，可以先保留原路徑，並用 category README 索引清楚；若真的搬移，必須同一個 change 更新所有相對連結與索引。
+- `feedback/history/<domain>/README.md` 應是總索引，列出 category folders；每個 category folder 可有自己的 `README.md` 表格。
+- 既有歷史 lesson 若已被外部文件連結，可以先保留原路徑（`skills/<name>/feedback_history/` 等舊路徑），並用 `feedback/history/<domain>/README.md` 索引清楚；若真的搬移，必須同一個 change 更新所有相對連結與索引。
 - 不要為了分類而重複複製 lesson 內容；一條 lesson 只保留一份全文，其他地方用連結。
 
 ## 檔名規則（時間 + `<slug>`）
@@ -118,13 +102,10 @@
 
 複製到新檔：
 
-- 未遷移 skill（舊路徑）：**`<skill>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**
-- 未遷移 skill + 已有分類：**`<skill>/feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`**
-- **已遷移 skill（新分層路徑）**：**`workflow/<name>/feedback_history/YYYY-MM-DD_HHMMSS-<slug>.md`**（或對應的 `analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/`）
+- **所有 lesson（統一目標路徑）**：**`feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`**
+- 若 domain 下尚無對應分類目錄，**應主動建立**，而非退回舊路徑。
 
-**重要：** 若 skill 已遷移至新框架（`SKILL.md` 中有「新分層路徑（優先讀取）」章節），**不得**使用舊 `<skill>/feedback_history/` 路徑。請先判斷 lesson 屬於哪一層（workflow / analysis / intelligence），再寫入對應的 `feedback_history/`。
-
-注意：以下引用路徑以檔案位於 `feedback_history/` 內為準；若檔案在 `feedback_history/<category>/`，共用規則連結要多上一層，改成 `../../../../shared-rules/...`。
+注意：以下引用路徑以檔案位於 `feedback/history/<domain>/<category>/` 內為準；若檔案在 `feedback/history/<domain>/common/`，共用規則連結路徑相同。
 
 ```markdown
 > 遵守 [共用規則索引](../../../shared-rules/README.md)、[dependency-reading](../../../shared-rules/dependency-reading.md)、[neutral-language](../../../shared-rules/neutral-language.md)、[goal-action-validation](../../../shared-rules/goal-action-validation.md) 與 [feedback-lessons](../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
@@ -179,14 +160,10 @@ Status: candidate | validated | deprecated | promoted | experimental
 
 #### Promotion Target
 
-- `workflow/<domain>/execution-flow.md`（新分層）
-- `analysis/<domain>/`（新分層）
-- `intelligence/<domain>/`（新分層）
-- `skills/<name>/WORKFLOW.md`（舊結構，向後相容；僅限尚未遷移的 skill）
-- `skills/<name>/TOOLS.md`（舊結構，向後相容；僅限尚未遷移的 skill）
-- `skills/<name>/DOCUMENTATION.md`（舊結構，向後相容；僅限尚未遷移的 skill）
-
-> **注意：** 若 skill 已遷移至新框架，promotion target 只能選新分層路徑，不得選 `skills/<name>/` 下的舊路徑。
+- `workflow/<domain>/execution-flow.md`
+- `analysis/<domain>/`
+- `intelligence/<domain>/`
+- `shared-rules/`（若 lesson 適合提升為全庫規則）
 
 #### Required Linked Updates
 
@@ -196,8 +173,8 @@ Status: candidate | validated | deprecated | promoted | experimental
 
 ## 同步與索引
 
-- **索引**：維護者可定期整理 **`<skill>/feedback_history/README.md`**（表格：檔名、Status、標題、一句話摘要，或 category index）；若該 skill 已有索引，agent 新增 lesson 檔後**必須**追加表格列或明確說明為何暫不更新。已分類 skill 同時更新對應 **`feedback_history/<category>/README.md`**。
-- **Git**：**`feedback_history/`** 版本控制；不要提交含機密的原始 log。
-- **歷史**：既有長篇 lesson 應已拆至各 `feedback_history/*.md`（若見批次時間戳如 `120000`–`120010` 僅供排序，新建請用**當下** `HHMMSS`）；請自此新增檔案而非往舊版單檔底部堆疊。
+- **索引**：維護者可定期整理 **`feedback/history/<domain>/README.md`**（表格：檔名、Status、標題、一句話摘要，或 category index）；若該 domain 已有索引，agent 新增 lesson 檔後**必須**追加表格列或明確說明為何暫不更新。已分類 domain 同時更新對應 **`feedback/history/<domain>/<category>/README.md`**。
+- **Git**：**`feedback/history/`** 版本控制；不要提交含機密的原始 log。
+- **歷史**：既有 lesson 分散在 `skills/<name>/feedback_history/`、`workflow/<name>/feedback_history/`、`analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/` 等舊路徑，將分批搬遷至 `feedback/history/<domain>/`。搬遷完成前，舊路徑 lesson 仍可被引用，但新 lesson 一律寫入 `feedback/history/`。
 
 ← [回到共用規則索引](README.md)
