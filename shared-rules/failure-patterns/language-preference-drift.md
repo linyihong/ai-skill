@@ -30,6 +30,14 @@ Agent 在使用者用中文提問後，仍然用英文回應，因為：
 
 ### 子類型 B：作者習慣漂移（Author Habit Drift）
 
+#### 2026-05-13 再次發生記錄
+
+**時間**：`attempt_completion` 階段
+**情境**：修復 `validate_language_consistency` 的 false positive 後，在 `attempt_completion` 結果中寫了「新增 allowlist 機制 — 允許 intentional 的英文結構標題」
+**觸發原因**：描述 validator 技術實作時，大腦自動跳到訓練資料中最常出現的英文詞彙（allowlist、intentional）
+**與前次差異**：之前發生在寫 `.md` 文件內容時，這次發生在 `attempt_completion` 的對話回應中
+**教訓**：`attempt_completion` 也需要語言一致性檢查，不能只檢查 `.md` 文件
+
 **與 Type A（system prompt 強制）不同**，此類型發生在 agent 已經正確使用中文回應，但在撰寫 `attempt_completion`、建立檔案內容或分析報告時，不自覺地混入英文。
 
 #### Trigger
