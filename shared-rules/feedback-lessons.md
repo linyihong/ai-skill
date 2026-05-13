@@ -46,7 +46,7 @@
 - **已遷移（app-development-guidance）**：lesson 應放 `workflow/app-development-guidance/feedback_history/` 或 `intelligence/engineering/app-development-guidance/feedback_history/`，**不是** `skills/app-development-guidance/feedback_history/`。
 - **尚未遷移（apk-analysis）**：lesson 仍放 `skills/apk-analysis/feedback_history/`。
 
-成熟後可將 lesson 整理進該 skill 的 `workflow/<domain>/execution-flow.md`、`analysis/<domain>/` 或 `intelligence/<domain>/`（見模板中 **Promotion Target**）。舊結構保留 `WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md` 作為向後相容。
+成熟後可將 lesson 整理進該 skill 的 `workflow/<domain>/execution-flow.md`、`analysis/<domain>/` 或 `intelligence/<domain>/`（見模板中 **Promotion Target**）。已遷移 skill 的舊結構路徑（`WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md`、`techniques/`）已被刪除，不再保留向後相容。
 
 ## 分類規則
 

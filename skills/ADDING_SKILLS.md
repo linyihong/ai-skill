@@ -37,9 +37,9 @@ feedback/
   extraction/           # feedback 提取索引
 ```
 
-### 舊結構（向後相容）
+### 舊結構（向後相容，僅限尚未遷移的 skill）
 
-最小可運作組合：
+最小可運作組合（注意：已遷移 skill 的 `WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md`、`techniques/`、`tool-adapters/` 已被刪除，不再保留）：
 
 ```text
 skills/<skill-name>/
@@ -47,7 +47,7 @@ skills/<skill-name>/
   feedback_history/     # 強烈建議：每條 lesson 一檔；若 skill 有分類，使用 feedback_history/<category>/（見 shared-rules/feedback-lessons.md）
 ```
 
-常見擴充（依需求增量建立）：
+常見擴充（依需求增量建立；僅限尚未遷移的 skill）：
 
 ```text
   README.md             # 給人類的導讀
@@ -125,7 +125,7 @@ tools/adapters/
 ```
 
 ```text
-# 舊結構（向後相容）
+# 舊結構（向後相容，僅限尚未遷移的 skill）
 skills/<skill-name>/tool-adapters/
   README.md
   <tool>.md

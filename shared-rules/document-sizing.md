@@ -76,9 +76,9 @@ intelligence/<domain>/
     <failure>.md
 ```
 
-### 舊結構（向後相容參考）
+### 舊結構（向後相容參考，僅限尚未遷移的 skill）
 
-若專案仍使用傳統 skill 結構，常見模式：
+若專案仍使用傳統 skill 結構，常見模式（注意：已遷移 skill 的 `WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md`、`techniques/` 已被刪除，不再保留）：
 
 ```text
 skills/<skill-name>/
