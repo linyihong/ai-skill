@@ -596,12 +596,94 @@ def validate_failure_pattern_validator_coverage
   end
 end
 
+# ──────────────────────────────────────────────
+# Intelligence Entry/Solution Cross-Reference Test
+# ──────────────────────────────────────────────
+def validate_intelligence_entry_solution_crossref
+  # Check that intelligence/<domain>/ subdirectories follow the Entry/Solution layering
+  # rules defined in shared-rules/content-layering.md:
+  #
+  # 1. If a file in failure/ says "解法見 heuristics/X.md", then heuristics/X.md must exist
+  # 2. If a file in heuristics/ has a corresponding file in failure/ with the same basename,
+  #    the failure file should reference it (cross-reference completeness)
+  #
+  # Entry directories: failure, signals, anti-patterns
+  # Solution directories: heuristics, patterns
+  entry_dirs = %w[failure signals anti-patterns].freeze
+  solution_dirs = %w[heuristics patterns].freeze
+
+  intel_dir = ROOT + "intelligence"
+  return unless intel_dir.exist?
+
+  intel_dir.each_child do |domain_dir|
+    next unless domain_dir.directory?
+    next if domain_dir.basename.to_s.start_with?(".")
+
+    # Check each entry/solution subdirectory pair
+    entry_dirs.each do |entry_name|
+      entry_dir = domain_dir + entry_name
+      next unless entry_dir.exist? && entry_dir.directory?
+
+      entry_dir.each_child do |entry_file|
+        next unless entry_file.extname == ".md"
+        next if entry_file.basename.to_s == "README.md"
+
+        text = read_text(entry_file)
+        # Look for "解法見" or "→ see" patterns pointing to solution files
+        text.each_line do |line|
+          solution_dirs.each do |sol_name|
+            # Match patterns like: "解法見 heuristics/X.md" or "→ see heuristics/X.md"
+            if line.match?(/#{Regexp.escape(sol_name)}\/([a-z][a-z0-9_-]+)\.md/i)
+              target_basename = $1
+              target_path = domain_dir + sol_name + "#{target_basename}.md"
+              unless target_path.exist?
+                add_error("#{rel(entry_file)}: references #{sol_name}/#{target_basename}.md but file does not exist (broken entry/solution cross-reference)")
+              end
+            end
+          end
+        end
+      end
+    end
+
+    # Check solution files have corresponding entry files (optional warning)
+    solution_dirs.each do |sol_name|
+      sol_dir = domain_dir + sol_name
+      next unless sol_dir.exist? && sol_dir.directory?
+
+      sol_dir.each_child do |sol_file|
+        next unless sol_file.extname == ".md"
+        next if sol_file.basename.to_s == "README.md"
+
+        basename = sol_file.basename.to_s
+        # Check if any entry directory has a file with the same basename
+        has_entry = entry_dirs.any? do |entry_name|
+          entry_dir = domain_dir + entry_name
+          (entry_dir + basename).exist?
+        end
+
+        # If no entry file exists, that's fine — not all solutions need entries.
+        # But if an entry file exists, the solution file should reference it.
+        if has_entry
+          text = read_text(sol_file)
+          # Check if solution file references back to entry (top 10 lines)
+          first_lines = text.each_line.first(10).join
+          has_backref = entry_dirs.any? { |en| first_lines.match?(/#{Regexp.escape(en)}\//) }
+          unless has_backref
+            add_error("#{rel(sol_file)}: has corresponding entry file in failure/ but does not reference it in top 10 lines (missing back-reference per content-layering.md rule 5)")
+          end
+        end
+      end
+    end
+  end
+end
+
 validate_registry
 validate_refresh_policy
 validate_summaries
 validate_graphs
 validate_directory_structure
 validate_intelligence_classification_boundary
+validate_intelligence_entry_solution_crossref
 validate_failure_pattern_validator_coverage
 validate_no_outdated_active_entrypoint
 validate_intelligence_ide_knowledge
