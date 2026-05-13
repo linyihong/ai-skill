@@ -443,15 +443,64 @@ def validate_intelligence_ide_knowledge
 end
 
 def validate_language_consistency
-  # Check for Author Habit Drift (Type B): Chinese documents with English table headers.
-  # This is a simple heuristic — if a .md file is mostly Chinese but has common English
-  # table header patterns like "| Change |" or "| Description |", flag it.
-  # Scans files under shared-rules/failure-patterns/ and intelligence/ide/ as these
-  # are most prone to this drift.
-  scan_dirs = %w[shared-rules/failure-patterns intelligence/ide]
+  # Check for Author Habit Drift (Type B): Chinese documents with English headings
+  # or table headers. This detects when an agent writes Chinese content but uses
+  # English section titles (e.g., "## Token Impact") or English table headers.
+  #
+  # Scans intelligence/, workflow/, analysis/, shared-rules/ — any directory where
+  # Chinese documents may have English headings.
+  scan_dirs = %w[intelligence workflow analysis shared-rules]
 
-  # Common English table headers that should be in Chinese if the document is Chinese
-  english_headers = /\|\s*(Change|Description|Status|Notes|Example|Type|Name|Value|Key|Field|Method|Source|Target|Action|Result|Category|Priority|Risk|Impact|Scope|Trigger|Failure Mode|Root Cause|Prevention Gate|Validation Method)\s*\|/
+  # English section headings that commonly appear in Chinese documents (author habit drift)
+  # These are heading patterns like "## Token Impact" or "### Risk Assessment"
+  english_headings = /\A#{'#{1,6}'}\s+(Token Impact|Token 影響|Risk|Scope|Trigger|Failure Mode|Root Cause|Prevention Gate|Validation Method|Decision Rule|Preferred Pattern|Validation Signal|Boundaries|Intelligence Status|Examples Of|Example|Change|Description|Status|Notes|Type|Name|Value|Key|Field|Method|Source|Target|Action|Result|Category|Priority|Impact|Summary|Overview|Background|Purpose|Goal|Prerequisites|Steps|Output|Next Steps|Related|See Also|References)\s*\z/
+
+  # English table headers that should be in Chinese if the document is Chinese
+  english_table_headers = /\|\s*(Change|Description|Status|Notes|Example|Type|Name|Value|Key|Field|Method|Source|Target|Action|Result|Category|Priority|Risk|Impact|Scope|Trigger|Failure Mode|Root Cause|Prevention Gate|Validation Method)\s*\|/
+
+  # ── Allowlist ──────────────────────────────────────────────────────────────
+  # These are intentional structural conventions, NOT author habit drift.
+  # Failure patterns use standard English template headings across all patterns.
+  # Intelligence documents use "## Token Impact" as a standard section.
+  # These should NOT be flagged.
+  allowed_english_headings = [
+    # Failure pattern template headings (intentional structural convention)
+    "Trigger", "Failure Mode", "Risk", "Root Cause",
+    "Required Agent Action", "Prevention Gate", "Validation Method",
+    "Linked Rules", "Linked Failure Patterns",
+    "Linked Feedback Lessons", "Linked Validation Scenarios",
+    # README standard structural headings
+    "Scope",
+    # Intelligence standard sections
+    "Token Impact", "Token 影響",
+    # Intelligence document template (highest-leverage-analysis-path)
+    "Intelligence Status", "Decision Rule", "Preferred Pattern",
+    "Validation Signal", "Boundaries",
+  ].freeze
+
+  # ── Table header allowlist ─────────────────────────────────────────────────
+  # These are intentional conventions where English field names serve as
+  # identifiers in Chinese documents (e.g., goal ledger field names like
+  # "Priority", "Status", "Source", "Scope" used as row labels).
+  # The table header row itself should be Chinese, but content rows with
+  # English field identifiers are intentional.
+  allowed_table_field_names = %w[
+    Priority Status Source Scope Goal Trigger
+    Field Value Atom
+    Parallelization mode Owner Owner/lock decision
+    Subgoals Planning/todo links Open work/decisions
+    Dependencies Next action Completion criteria
+    Target skill Expected input/output Ownership boundary
+    Sanitization boundary Linked updates
+    Required set Read Not applicable Deferred/blocked Validation
+  ].freeze
+
+  # Check if a heading is in the allowlist (case-insensitive match on the heading text after ##)
+  def allowed_heading?(heading_text, allowed_list)
+    # Extract the heading text after the ## markers
+    clean = heading_text.sub(/\A#+\s+/, "").strip
+    allowed_list.any? { |a| clean.casecmp?(a) }
+  end
 
   scan_dirs.each do |dir|
     base = ROOT + dir
@@ -460,6 +509,7 @@ def validate_language_consistency
     Dir.glob((base + "**/*.md").to_s).sort.each do |file|
       next if file.include?("feedback_history/")
       next if file.include?("/archived/")
+      next if file.include?("node_modules/")
 
       text = read_text(file)
       # Only check files that have Chinese content (to avoid false positives on English-only files)
@@ -477,10 +527,36 @@ def validate_language_consistency
         end
         next if in_code_block
 
-        if line.match?(english_headers) && line.include?("|")
+        # Check for English section headings (## Token Impact)
+        stripped = line.strip
+        if stripped.match?(english_headings)
+          # Skip if this heading is in the allowlist (intentional structural convention)
+          next if allowed_heading?(stripped, allowed_english_headings)
+          add_error("#{rel(file)}:#{line_num}: possible Author Habit Drift — English heading '#{stripped}' in Chinese document")
+        end
+
+        # Check for English table headers — only flag the actual header row
+        # (the first row of a table, before the separator line).
+        # Content rows with English field names (e.g., "| Priority | P0 |")
+        # are intentional identifiers and should NOT be flagged.
+        if line.match?(english_table_headers) && line.include?("|")
           # Check if this is a table separator line (---|---|---)
           next if line.strip.match?(/^[\|\s\-:]+$/)
-          add_error("#{rel(file)}:#{line_num}: possible Author Habit Drift — English table header '#{line.strip}' in Chinese document")
+          # Check if the NEXT line is a table separator (---|---|---)
+          # If so, this is the header row — flag it if it has English headers
+          next_line = lines[idx + 1]
+          if next_line && next_line.strip.match?(/^[\|\s\-:]+$/)
+            # This is a table header row — check if all cells are English
+            # (mixed Chinese/English headers like "| Scope | 放置位置 |" are borderline)
+            cells = line.split("|").map(&:strip).reject(&:empty?)
+            english_cells = cells.count { |c| c.match?(/\A[a-zA-Z\s\/]+\z/) }
+            total_cells = cells.length
+            if english_cells == total_cells
+              add_error("#{rel(file)}:#{line_num}: possible Author Habit Drift — English table header '#{line.strip}' in Chinese document")
+            end
+          end
+          # Content rows (not header rows) are NOT flagged — English field names
+          # like "Priority", "Status", "Source" are intentional identifiers
         end
       end
     end

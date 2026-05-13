@@ -6,7 +6,7 @@
 
 ## Source Hierarchy（來源層級）
 
-| Priority | Source Type | Use For |
+| 優先級 | 來源類型 | 用途 |
 | --- | --- | --- |
 | 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, official address, and facility access pages | Confirming facts that affect feasibility and identity. |
 | 2 | Official reservation platforms, travel agency tour pages, package-tour price pages, airline pages, airport access pages, Shinkansen/rail operator pages, highway bus pages, ferry pages, lodging/guesthouse booking pages, ticketing pages, restaurant pages, reservation platforms, local market pages, RV Park listings, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, package price, total transport cost, route benchmark, food planning. |

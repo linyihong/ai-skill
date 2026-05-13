@@ -18,7 +18,7 @@ intelligence/engineering/apk-analysis/
 
 ## 目前 intelligence atoms
 
-| Atom | Status | Source |
+| Atom | 狀態 | 來源 |
 | --- | --- | --- |
 | [`evidence-first-routing.md`](evidence-first-routing.md) | `validated` | `skills/apk-analysis/feedback_history/common/` |
 | [`highest-leverage-analysis-path.md`](highest-leverage-analysis-path.md) | `candidate-intelligence` | `skills/apk-analysis/feedback_history/common/2026-05-07_131000-highest-leverage-analysis-path.md` |

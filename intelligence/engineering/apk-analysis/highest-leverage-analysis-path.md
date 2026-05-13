@@ -4,7 +4,7 @@
 
 ## Intelligence Status
 
-| Field | Value |
+| 欄位 | 值 |
 | --- | --- |
 | Status | `candidate-intelligence` |
 | Source skill | `skills/apk-analysis/` |
