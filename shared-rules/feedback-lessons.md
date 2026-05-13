@@ -10,7 +10,7 @@
 - **Agent 行為：** 在授權分析過程中一旦得到可重用技巧／失敗模式／驗證規則，應**主動**在同一輪對話內於 **`feedback/history/<domain>/`** 對應分類新增檔案（依下方**分類規則**、**檔名規則**與**模板**），**不要**等使用者提醒。
 - **每輪回饋檢查：** 每個有實質進展的工作回合結束前、切回長時間專案工作前、提交 project-only evidence 前、或使用者說「繼續」展開下一輪前，agent 必須明確自問：本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？若是，先開啟 canonical `<AI_SKILL_REPO>` writeback transaction；若否，最終回覆可簡短說明本輪沒有新增泛化 lesson，或只留下 project-specific evidence。
 - 只寫**通用方法**，不寫特定 App / project incident 的私有結論或具體證據；必須依 [reusable-guidance-boundary.md](reusable-guidance-boundary.md) 先抽象化原因、規則與驗證，再依 [sanitization.md](sanitization.md) 去敏；若 lesson 來自 agent 失誤或閉環不完整，另依 [failure-learning-system.md](failure-learning-system.md) 分類失效模式並判斷是否需要 `shared-rules/failure-patterns/`；不要只新增 skill-local feedback lesson 就宣稱已吸收 agent 錯誤，需先判斷是否也需要 cross-skill failure pattern；發現 skill/rule/template/lesson 更新時依 [dependency-reading.md](dependency-reading.md) 讀取依賴；標題、slug、摘要與正文必須依 [neutral-language.md](neutral-language.md) 使用中性低爭議用語；每個重要結論必須依 [goal-action-validation.md](goal-action-validation.md) 說明目標、執行、驗證或參考來源；必須說明證據與適用／不適用條件；不確定標 `experimental`。
-- 不得寫入本機絕對路徑、使用者名稱、私有工作目錄、clone 位置；用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 等 placeholder。
+- **去敏檢查：** 寫入任何 lesson 前，必須依 [`sanitization.md`](sanitization.md) 逐項檢查：不得包含本機絕對路徑（改用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 占位符）、使用者名稱、私有工作目錄、clone 位置、secrets、raw tokens、私人 host、個資或 project-specific evidence。寫入完成後在 `git diff` 中再次確認去敏項目已處理。
 
 ## 條目放哪裡
 

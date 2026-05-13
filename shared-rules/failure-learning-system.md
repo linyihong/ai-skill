@@ -11,7 +11,7 @@
 1. **Capture**：在目前工作脈絡記錄發生什麼、在哪裡被發現、造成什麼 user-facing risk。
 2. **Classify**：用下方 taxonomy 分類失效模式。
 3. **Contain**：繼續廣泛工作前先控制當前風險。
-4. **Promote**：把可重用 lesson 放到正確 durable location。
+4. **Promote**：把可重用 lesson 放到正確 durable location。**寫入前必須依 [`sanitization.md`](sanitization.md) 去敏**：不得包含本機絕對路徑（改用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 占位符）、使用者名稱、私有工作目錄、clone 位置、secrets、raw tokens、私人 host、個資或 project-specific evidence。
 5. **Strengthen**：補強原本可防止它的 rule、workflow、checklist、tool adapter 或 validation gate。
 6. **Validate**：確認未來 agent 找得到並能套用這個 prevention。
 

@@ -86,12 +86,41 @@ Claude Code 的設定方式與 Roo Code 不同，沒有「全域 Custom Instruct
 6. 若發現需要拆小目標，使用 `split` 或在 goal 檔的 `Subgoals` 區塊記錄；若發現不能分工或需單一 owner，使用 `--parallelization single-owner|non-parallelizable` 更新。
 7. 在回覆完成前，只有完成條件與驗證都成立時才 `complete --validated`；條件已成立時必須同輪刪除 goal 並刷新 `.agent-goals/README.md`，不要把 `completed` row 留在 active 表。若該 goal 完成後仍有長期 roadmap、phase、migration、promotion、deprecation 或治理狀態，先回寫到 durable planning 文件，再刪除 active goal。否則保留 goal，讓下一個 agent 可接手。
 
+## Claude Code 與知識更新流程 Checkpoint
+
+工具中立規則見 [`governance/lifecycle/knowledge-update-flow.md`](../../governance/lifecycle/knowledge-update-flow.md)。Claude Code 是 CLI 工具，沒有 hooks 機制，但可以透過 `CLAUDE.md` 中的 Custom Instructions 加入 checkpoint 提醒。
+
+### 在 `CLAUDE.md` 中加入 checkpoint 提醒
+
+本知識庫的 [`CLAUDE.md`](../../CLAUDE.md) 應加入以下內容（在 goal ledger 提醒之後）：
+
+```text
+## 知識更新流程 Checkpoint
+
+每輪工作結束前、切回長時間專案工作前、或使用者說「繼續」展開下一輪前，必須執行知識更新檢查：
+
+1. 讀取 [`<AI_SKILL_REPO>/governance/lifecycle/knowledge-update-flow.md`] 了解完整流程。
+2. 自問：本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？
+3. 若是，依 knowledge-update-flow.md 的 11 個步驟執行：
+   - Step 1-2：觸發檢查 + 分類知識類型
+   - Step 3：決定 Promotion Target（intelligence / workflow / analysis / shared-rules / runtime / memory）
+   - Step 4：寫入 feedback/history/<domain>/<category>/ lesson（寫入前依 sanitization.md 去敏）
+   - Step 5：更新目標層
+   - Step 6-7：選擇性執行 Intelligence Extraction 或 Failure Learning
+   - Step 8：執行 Linked Updates
+   - Step 9：更新 Runtime Surfaces
+   - Step 10：驗證（diff review、去敏檢查、link check）
+   - Step 11：Commit / Push / Readback（關閉 writeback transaction）
+4. 若否，簡短說明本輪只有 project-specific evidence 或尚未達可泛化標準。
+```
+
 ### 與 Cursor 的差異
 
 | 特性 | Cursor | Claude Code |
 |------|--------|-------------|
 | 自動提醒機制 | `.cursor/hooks.json`（sessionStart / preCompact / stop） | 無 hooks，需在 `CLAUDE.md` 中手動提醒 |
 | Goal ledger 操作 | 可透過 hooks 自動檢查 | 需在每個 session 開始時手動讀取 |
+| 知識更新流程 Checkpoint | 可在 `.cursor/rules/*.mdc` 中加入，可選 hooks 輔助 | 需在 `CLAUDE.md` 中加入 |
 | 設定位置 | `.cursor/rules/*.mdc` + hooks.json | `CLAUDE.md`（Custom Instructions） |
 
 ## 與 Tool Adapter 的關係

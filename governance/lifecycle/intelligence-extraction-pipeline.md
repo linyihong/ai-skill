@@ -365,6 +365,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 | Workflow 可執行 | 照著 workflow 步驟可完成操作 |
 | Signal 可驗證 | 每個 signal 有具體的檢查方式 |
 | 無專案特定內容 | Intelligence atoms 不含專案名稱、客戶名稱、raw evidence |
+| **去敏檢查** | 依 [`sanitization.md`](../../shared-rules/sanitization.md) 檢查：不得包含本機絕對路徑（改用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 占位符）、使用者名稱、私有工作目錄、clone 位置、secrets、raw tokens、私人 host、個資 |
 
 ### 不強制 atomize 的情況
 
