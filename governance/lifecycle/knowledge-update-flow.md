@@ -56,7 +56,8 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 **Agent 必須自問**：
 
-> 本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？
+> 1. 本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？
+> 2. 本輪是否涉及新增或改名目錄？→ 若是，先執行 [`directory-structure-governance.md`](directory-structure-governance.md) 的 5 步驟 Checkpoint
 
 **判斷結果**：
 

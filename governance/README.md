@@ -5,6 +5,7 @@
 ## 目前入口
 
 - [`lifecycle/`](lifecycle/README.md)：定義舊 `skills/` 與新分層之間的 lifecycle、promotion gates 與 source-of-truth 保護。
+  - [`directory-structure-governance.md`](lifecycle/directory-structure-governance.md)：目錄結構治理流程 — 新增/改名目錄前的 5 步驟 Checkpoint（名稱衝突、邊界清晰度、慣性命名、路徑深度、全域引用影響）。
 - [`validation/`](validation/README.md)：定義新分層變更的 validation gates、migration checklist 與 pass / block rules。
 - [`cleanup/`](cleanup/README.md)：定義知識重複偵測、拆分規則與所有權邊界。
 - [`dependency/`](dependency/README.md)：定義知識依賴圖的維護規則與連動更新流程。

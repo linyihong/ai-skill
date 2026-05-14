@@ -75,6 +75,18 @@
 4. Query result 只作 candidate list，不跳過 source-of-truth gate。
 5. Runtime reports、SQLite counts 與 canonical summary / graph / registry counts 可交叉檢查。
 
+## 目錄結構治理（Directory Structure Governance）
+
+新增或改名目錄前，應執行 [`directory-structure-governance.md`](directory-structure-governance.md) 定義的 5 步驟 Checkpoint：
+
+1. **Name Conflict Check** — 新目錄名稱是否與其他層同名？例如 `intelligence/engineering/analysis/` 與根目錄 `analysis/` 同名，但內容本質不同。
+2. **Boundary Clarity Check** — 目錄邊界是否清晰？Agent 能否明確判斷某份文件該放哪？
+3. **Inertial Naming Check** — 命名是否只是沿用舊技能名稱（如 `apk-analysis` → `analysis`），沒有反映內容本質？
+4. **Path Depth Check** — 目錄深度是否合理？是否過度嵌套？
+5. **Global Reference Impact Assessment** — 改名會影響多少外部檔案？是否有完整的 linked updates 計畫？
+
+此流程應在知識更新流程（[`knowledge-update-flow.md`](knowledge-update-flow.md)）Step 1 觸發。
+
 ## 提升關卡（Promotion Gates）
 
 候選項目只有在所有關卡通過時才能提升：
