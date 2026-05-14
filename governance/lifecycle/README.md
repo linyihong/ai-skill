@@ -142,3 +142,60 @@
 - [ ] 所有 `knowledge/summaries/` 和 `knowledge/graphs/` 已更新
 - [ ] 無 tool adapter 或 `.claude/settings.json` 依賴該舊路徑
 - [ ] 刪除後可 rollback（git revert）
+
+## Enforcement Rule Deprecation
+
+Enforcement rules（`enforcement/` 下的規則）有專屬的 deprecation 流程，作為通用 lifecycle 的補充。
+
+### 狀態定義
+
+| 狀態 | 意義 | 檔案位置 | Metadata status |
+|------|------|---------|----------------|
+| `active` | 當前有效規則 | `enforcement/<rule>.md` | `validated` 或 `stable` |
+| `deprecated` | 即將移除，有替代方案 | `enforcement/<rule>.md`（標記 notice） | `deprecated` |
+| `removed` | 已搬移至 deprecated/ | `enforcement/deprecated/<rule>.md` | `deprecated`（source_path 更新） |
+
+### Deprecation 流程（4 階段）
+
+```
+標記（Mark）→ 公告（Announce）→ 緩衝期（Buffer）→ 搬移（Move）
+```
+
+詳細步驟請參閱 [`enforcement/deprecated/README.md`](../../enforcement/deprecated/README.md)。
+
+### 與通用 Lifecycle 的關係
+
+| 通用 Lifecycle 狀態 | Enforcement Rule 對應 |
+|-------------------|---------------------|
+| `source-of-truth` | `active` — 規則在 `enforcement/` 中有效 |
+| `deprecated` | `deprecated` — 規則已標記 deprecation notice |
+| （無直接對應） | `removed` — 規則已搬移至 `enforcement/deprecated/` |
+
+### Rule 版本追蹤
+
+Enforcement rules 的版本變更應記錄在 metadata 中：
+
+```yaml
+# metadata/rules/<rule-name>.yaml
+status: deprecated
+replaces: enforcement.<new-rule-id>
+deprecation_date: "2026-05-14"
+removal_date: "2026-08-14"
+```
+
+- `replaces` 欄位指向取代它的新 rule（使用 `enforcement.<rule-id>` 格式）
+- `deprecation_date` 為標記 deprecation 的日期
+- `removal_date` 為預計搬移至 `enforcement/deprecated/` 的日期（預設 3 個月緩衝期）
+
+### 檢查清單
+
+Deprecate 一條 enforcement rule 前，確認：
+
+- [ ] Metadata 已更新（`status: deprecated`、`replaces`、`deprecation_date`）
+- [ ] 原始 rule 檔案已加入 deprecation notice
+- [ ] `enforcement/README.md` 規則索引已更新
+- [ ] `runtime/router/activation-rules.yaml` 已移除或註解該 rule
+- [ ] `knowledge/graphs/rules/` 中該 rule 的 graph 記錄已更新
+- [ ] Linked updates 已完成（`enforcement/linked-updates.md`）
+- [ ] 取代規則至少已通過 1 次成功使用驗證
+- [ ] 緩衝期（3 個月）已設定
