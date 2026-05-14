@@ -60,8 +60,9 @@ Session Start
 
 | Tool | Config |
 | --- | --- |
-| **Claude Code** | [`ai-tools/agent/claude.md`](ai-tools/agent/claude.md) |
+| **Roo Code** | [`ai-tools/agent/roo.md`](ai-tools/agent/roo.md) |
 | **Cursor** | [`ai-tools/agent/cursor.md`](ai-tools/agent/cursor.md) |
+| **Claude Code** | [`ai-tools/agent/claude.md`](ai-tools/agent/claude.md) |
 
 ## 📖 Key Documents
 
@@ -101,22 +102,7 @@ Session Start
 
 ### 給 AI agent（session 啟動時）
 
-```text
-Use the AI-native Knowledge Operating System.
-
-Canonical repository:
-<AI_SKILL_REPO>
-
-First read:
-<AI_SKILL_REPO>/CORE_BOOTSTRAP.md
-<AI_SKILL_REPO>/README.md
-
-Then query:
-<AI_SKILL_REPO>/skills-index.yaml
-
-For multi-step tasks, initialize:
-<PROJECT_ROOT>/.agent-goals/
-```
+啟動流程已在 [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) 定義（含新專案自動偵測），依序執行即可。
 
 ## 📋 Rules
 
