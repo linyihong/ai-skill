@@ -79,7 +79,7 @@ edges:
     validation: decision-efficiency 的 Context Loading、Decision Routing 規則可在 agent-architecture 的 attention-budgeting 和 cognitive-boundaries 中找到理論依據。
 
   - type: related_to
-    target: shared-rules/document-sizing.md
+    target: governance/document-sizing.md
     reason: document-sizing 提供文件拆分的執行規則，本層提供為什麼拆分能改善 agent 注意力的認知基礎。
     validation: document-sizing 的拆分規則可在 agent-architecture 的 attention-budgeting 和 context-collapse 中找到理論依據。
 

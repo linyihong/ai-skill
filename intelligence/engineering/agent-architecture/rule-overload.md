@@ -12,7 +12,7 @@
 ## 為什麼
 
 1. **規則不是權重驅動的** — Agent 沒有內建的規則優先級排序器。它依賴 recency 和 specificity 來決定哪條規則適用。
-2. **最近載入的規則有優勢** — 如果 `dependency-reading.md` 在第 10 步載入，`document-sizing.md` 在第 50 步載入，後者可能覆蓋前者的行為。
+2. **最近載入的規則有優勢** — 如果 `dependency-reading.md` 在第 10 步載入，[`governance/document-sizing.md`](../../governance/document-sizing.md) 在第 50 步載入，後者可能覆蓋前者的行為。
 3. **具體規則勝過抽象規則** — 「檔案超過 300 行要拆分」比「保持文件簡潔」更有行為影響力，即使後者更重要。
 4. **規則之間的真實衝突很少被檢測** — Agent 通常不會主動檢查規則是否矛盾，而是選擇最近看到的那條。
 

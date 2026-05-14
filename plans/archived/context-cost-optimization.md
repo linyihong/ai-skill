@@ -63,7 +63,7 @@ CORE_BOOTSTRAP.md
 | `failure-learning-system` | user 指出 agent 失誤、close-loop gap | 發生 failure 時 |
 | `decision-efficiency` | 任務有多條可行路線需選擇 | 決策分歧時 |
 | `tool-neutral-documentation` | 建立或修改可重用文件 | 寫文件時 |
-| `document-sizing` | 文件接近拆分門檻 | 文件變大時 |
+| `governance/document-sizing` | 文件接近拆分門檻 | 文件變大時 |
 | `document-todo-list` | 文件有未完成項目 | 修改文件時 |
 | `goal-action-validation` | 重要工作單元需要驗證 | 執行關鍵步驟時 |
 | `neutral-language` | 撰寫或審查文件用語 | 寫文件時 |

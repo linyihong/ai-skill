@@ -436,7 +436,7 @@ Extraction 完成後需要更新以下文件：
 
 | 類型 | 檢查重點 | 範例檔案 |
 |------|---------|---------|
-| 範例路徑 | 目錄結構範例是否仍指向舊路徑 | `shared-rules/document-sizing.md` |
+| 範例路徑 | 目錄結構範例是否仍指向舊路徑 | `governance/document-sizing.md` |
 | 表格內容 | 連動關係表是否仍使用舊路徑 | `shared-rules/linked-updates.md` |
 | 模板 | Promotion Target 是否缺少新分層選項 | `shared-rules/feedback-lessons.md` |
 | 索引 | lazy-load 表格是否指向舊檔案 | `shared-rules/README.md` |
@@ -449,7 +449,7 @@ Extraction 完成後需要更新以下文件：
 
 1. **保留舊路徑**作為向後相容參考，標註「舊結構，向後相容」
 2. **新增新分層路徑**作為主要參考，標註「新分層（優先）」
-3. 通用規則（如 `document-sizing.md`）應明確標註「可跨專案通用」
+3. 通用規則（如 `governance/document-sizing.md`）應明確標註「可跨專案通用」
 4. 使用通用格式（`<domain>`）而非硬編碼 skill 名稱
 
 #### 驗證命令

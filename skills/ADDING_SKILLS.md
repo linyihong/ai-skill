@@ -59,7 +59,7 @@ skills/<skill-name>/
   FEEDBACK.md           # 可選：極短入口，連到 shared-rules/feedback-lessons.md
 ```
 
-若單一文件開始過大，或一句規則展開成多個步驟、例外、模板、範例，依 [`shared-rules/document-sizing.md`](../shared-rules/document-sizing.md) 改成資料夾包裝：父層 `README.md` 做目錄與讀取路由，子檔保存具體內容。不要把不同技巧分類、寫作規範、工具教學和 feedback lesson 全堆在同一檔。
+若單一文件開始過大，或一句規則展開成多個步驟、例外、模板、範例，依 [`governance/document-sizing.md`](../governance/document-sizing.md) 改成資料夾包裝：父層 `README.md` 做目錄與讀取路由，子檔保存具體內容。不要把不同技巧分類、寫作規範、工具教學和 feedback lesson 全堆在同一檔。
 
 可直接複製範本（在 `<AI_SKILL_REPO>` 根目錄執行，將 `my-skill` 改成你的名稱）：
 
@@ -88,7 +88,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 - **授權、去敏、中性低爭議用語、目標/執行/驗證流程、依賴讀取鐵則、路徑占位、feedback 檔名與模板**：一律只維護在 **`shared-rules/`**，各 skill **不要**複製長文。
 - **Cross-skill reference**：若某 skill 需要引用另一個 skill 的規範、模板、檢查清單或交接產物，依 **[`shared-rules/cross-skill-references.md`](../shared-rules/cross-skill-references.md)** 寫短引用，包含 target skill、觸發條件、交接 artifact、ownership boundary、去敏邊界與 linked updates；不要複製 target skill 的全文。
 - **連動更新規則**：一律只維護在 **[`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md)**；新增 skill 或修改 skill 結構時，受影響的索引、入口、同步文件、分類文件**必須**同步更新或明確檢查。
-- **文件大小與拆分規則**：一律只維護在 **[`shared-rules/document-sizing.md`](../shared-rules/document-sizing.md)**；skill、技巧分類與寫作規範變大時，用資料夾與 `README.md` 目錄拆分。
+- **文件大小與拆分規則**：一律只維護在 **[`governance/document-sizing.md`](../governance/document-sizing.md)**；skill、技巧分類與寫作規範變大時，用資料夾與 `README.md` 目錄拆分。
 - **中性與低爭議用語**：一律只維護在 **[`shared-rules/neutral-language.md`](../shared-rules/neutral-language.md)**；新增 skill 的標題、description、檔名、slug、索引與摘要都要避免高風險或容易造成 AI/搜尋誤判的詞，改用授權、合規、契約、風險控制等中性語境。
 - **工具中立文件**：一律只維護在 **[`shared-rules/tool-neutral-documentation.md`](../shared-rules/tool-neutral-documentation.md)**；新增 skill 的 README / SKILL / workflow / template 預設不寫特定工具路徑、hook、UI 或同步細節。工具全域做法放到 [`ai-tools/`](../ai-tools/README.md)；若某 skill 對某工具有必要的執行差異，用 Strategy-style adapter 放 `skills/<skill>/tool-adapters/<tool>.md`（舊結構）或 `tools/adapters/<tool>.md`（新分層），只寫差異並連回核心 workflow。
 - **文件 TODO**：一律只維護在 **[`shared-rules/document-todo-list.md`](../shared-rules/document-todo-list.md)**；若新增 skill 文件仍有未完成、待決策、待補強或待驗證項目，在文件前段放 `Document TODO` 表並連到相關章節或 goal。
@@ -149,7 +149,7 @@ skills/<skill-name>/tool-adapters/
 - [ ] 輸出格式已依 `shared-rules/goal-action-validation.md` 要求重要工作單元包含目標、執行、驗證或參考來源
 - [ ] 已依 `shared-rules/dependency-reading.md` 建立 dependency read ledger，讀取或明確檢查相關依賴文件，並標示缺檔不適用項
 - [ ] 若引用其他 skill，已依 `shared-rules/cross-skill-references.md` 寫明 trigger、artifact、ownership boundary 與 linked updates
-- [ ] 若文件開始變大，已依 `shared-rules/document-sizing.md` 拆成資料夾、目錄與子檔
+- [ ] 若文件開始變大，已依 `governance/document-sizing.md` 拆成資料夾、目錄與子檔
 - [ ] 新 lesson 已寫入 `feedback/history/<domain>/<category>/`（見 shared-rules/feedback-lessons.md）
 - [ ] 根目錄 `README.md` 與 `skills/README.md` 已更新
 - [ ] 已依 `shared-rules/linked-updates.md` 完成或明確檢查必要連動更新

@@ -30,7 +30,7 @@
 | [`intelligence-apk-analysis-atoms.yaml`](intelligence-apk-analysis-atoms.yaml) | 連接 evidence-first-routing、live-readiness-gates atoms 與 skill、workflow、analysis。 | `candidate` |
 | [`intelligence-development-guidance.yaml`](intelligence-development-guidance.yaml) | 連接 docs-first-bdd-closure、risk-translation-heuristic、contract-governance-heuristic atoms 與 workflow、analysis 來源。 | `candidate` |
 | [`intelligence-repo-analysis.yaml`](intelligence-repo-analysis.yaml) | 連接 documentation-backfill-heuristic、traceability-heuristic atoms 與 analysis/repo/、workflow 來源。 | `candidate` |
-| [`intelligence-agent-architecture.yaml`](intelligence-agent-architecture.yaml) | 連接 agent-architecture 層的所有 11 個 atoms（context-collapse、rule-overload、task-routing、attention-budgeting、failure-recovery、cognitive-boundaries、pilot-first-validation、failure-to-scenario-closure、linked-updates-completeness、decomposition-strategy-selection、stateless-validation-necessity）與 shared-rules/failure-patterns/、decision-efficiency、document-sizing、validation、linked-updates、plans。 | `candidate` |
+| [`intelligence-agent-architecture.yaml`](intelligence-agent-architecture.yaml) | 連接 agent-architecture 層的所有 11 個 atoms（context-collapse、rule-overload、task-routing、attention-budgeting、failure-recovery、cognitive-boundaries、pilot-first-validation、failure-to-scenario-closure、linked-updates-completeness、decomposition-strategy-selection、stateless-validation-necessity）與 shared-rules/failure-patterns/、decision-efficiency、governance/document-sizing、validation、linked-updates、plans。 | `candidate` |
 
 ### Runtime & Pipeline（Phase 14）
 

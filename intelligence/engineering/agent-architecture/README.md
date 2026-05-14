@@ -26,7 +26,7 @@ AI 不是黑盒子 — 它的行為模式可以被觀察、分類、預測、改
 
 - `shared-rules/failure-patterns/` — 記錄具體的 agent 失效模式，本層提供背後為什麼會發生的認知原理
 - `shared-rules/decision-efficiency.md` — 提供決策效率的執行規則，本層提供為什麼需要這些規則的認知基礎
-- `shared-rules/document-sizing.md` — 提供文件拆分的執行規則，本層提供為什麼拆分能改善 agent 注意力的認知基礎
+- [`governance/document-sizing.md`](../../governance/document-sizing.md) — 提供文件拆分的治理規則，本層提供為什麼拆分能改善 agent 注意力的認知基礎
 - `validation/` — 提供 stateless 驗證場景，本層提供為什麼需要驗證的認知邊界理論
 - `governance/lifecycle/` — 提供知識生命週期管理，本層提供 agent 如何處理資訊的認知模型
 

@@ -26,7 +26,7 @@
 
 ## 文件變大時
 
-若任何 skill、技巧分類、shared rule、模板或寫作規範開始變大，不要把所有內容繼續堆在同一個 Markdown 檔。依 [`document-sizing.md`](document-sizing.md) 拆成「資料夾 + `README.md` 目錄 + 多個子檔」，讓 agent 只讀與任務相關的子文件。
+若任何 skill、技巧分類、shared rule、模板或寫作規範開始變大，不要把所有內容繼續堆在同一個 Markdown 檔。依 [`../governance/document-sizing.md`](../governance/document-sizing.md) 拆成「資料夾 + `README.md` 目錄 + 多個子檔」，讓 agent 只讀與任務相關的子文件。
 
 ### 跨專案適用說明
 

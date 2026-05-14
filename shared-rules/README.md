@@ -40,7 +40,7 @@
 | [failure-learning-system.md](failure-learning-system.md) | user 指出失誤、close-loop gap | ~1200 | P1 |
 | [decision-efficiency.md](decision-efficiency.md) | 多條可行路線需選擇 | ~600 | P2 |
 | [tool-neutral-documentation.md](tool-neutral-documentation.md) | 建立或修改可重用文件 | ~500 | P2 |
-| [document-sizing.md](document-sizing.md) | 文件接近拆分門檻 | ~400 | P2 |
+| [governance/document-sizing.md](../governance/document-sizing.md) | 文件接近拆分門檻 | ~400 | P2 |
 | [document-todo-list.md](document-todo-list.md) | 文件有未完成項目 | ~300 | P2 |
 | [goal-action-validation.md](goal-action-validation.md) | 重要工作單元需要驗證 | ~500 | P2 |
 | [neutral-language.md](neutral-language.md) | 撰寫或審查文件用語 | ~300 | P2 |
@@ -82,7 +82,7 @@
 | 依賴文件讀取 | [dependency-reading.md](dependency-reading.md) | 發現 skill/shared rule/tool-specific rule/template/lesson 更新時，必須讀相關依賴文件，包含 shared-rules，並用 dependency read ledger 防止漏讀。 | **core** |
 | 內容分層 | [content-layering.md](content-layering.md) | 共用規則／技巧／業務專案各自放哪；intelligence 內部 entry/solution 分層。 | lazy (P2) |
 | 可重用規則與專案證據邊界 | [reusable-guidance-boundary.md](reusable-guidance-boundary.md) | 技巧只沉澱通用原因、規則與驗證；專案 incident 證據留在專案文件；指出閉環不完整時必須分析原因並強化規則。 | lazy (P2) |
-| 文件大小與拆分 | [document-sizing.md](document-sizing.md) | 文件拆分原則、決策流程、拆分後必做事項；token 成本模型見 decision-efficiency.md，跨專案適用見 content-layering.md。 | lazy (P2) |
+| 文件大小與拆分 | [governance/document-sizing.md](../governance/document-sizing.md) | 文件拆分原則、決策流程、拆分後必做事項；token 成本模型見 decision-efficiency.md，跨專案適用見 content-layering.md。 | lazy (P2) |
 | Cross-skill references | [cross-skill-references.md](cross-skill-references.md) | 一個 skill 需要引用另一個 skill 的規範、模板、交接產物或驗證流程時怎麼寫。 | lazy (P2) |
 | 連動更新 | [linked-updates.md](linked-updates.md) | 全庫必須連動更新規則：改一處影響多處時，相關文件必須同步更新或明確檢查。 | lazy (P1) |
 | Feedback 與技巧條目 | [feedback-lessons.md](feedback-lessons.md) | **檔名規則、模板、agent 行為、索引**（唯一正文）；所有 lesson 統一放在 `feedback/history/<domain>/`，舊 `skills/<name>/feedback_history/` 已於 2026-05-13 刪除。 | lazy (P2) |

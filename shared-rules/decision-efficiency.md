@@ -58,7 +58,7 @@
 - 已知名稱用精確搜尋；廣泛探索才用語意搜尋。
 - 原始日誌、大型酬載、螢幕截圖、產生的傾印檔放在專案成品區，回答中引用路徑或去敏摘錄。
 - 記錄未解決的問題，而不是為了填補推測缺口讀無關檔案。
-- 可重用但冗長的材料，依 [`document-sizing.md`](document-sizing.md) 移到聚焦子檔。
+- 可重用但冗長的材料，依 [`../governance/document-sizing.md`](../governance/document-sizing.md) 移到聚焦子檔。
 
 不得用 token 節省當作跳過必要依賴的理由。若 [`dependency-reading.md`](dependency-reading.md) 要求某依賴，必須讀取，或標為受阻／不適用。
 
@@ -119,7 +119,7 @@ After:  只載入 50 行 ≈ 1K tokens
 ## 與其他規則的關係
 
 - 必要依賴範圍依 [`dependency-reading.md`](dependency-reading.md)。
-- 決策指引變長或變成路線專屬時，依 [`document-sizing.md`](document-sizing.md)。
+- 決策指引變長或變成路線專屬時，依 [`../governance/document-sizing.md`](../governance/document-sizing.md)。
 - 目標／執行／驗證閉環依 [`goal-action-validation.md`](goal-action-validation.md)。
 - 路線變更產生新目標、阻礙或交接時，依 [`conversation-goal-ledger.md`](conversation-goal-ledger.md)。
 
