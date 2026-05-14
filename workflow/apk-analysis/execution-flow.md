@@ -70,8 +70,13 @@
 3. 從 network path triage 開始（見 [`analysis/apk/traffic-triage.md`](../../analysis/apk/traffic-triage.md)）。
 4. 證據指向特定技術類別後，才讀對應的 `analysis/apk/` 方法。
 5. 建立 UI architecture map（若可操作裝置）。
-6. 優先使用高語意 hook（request object > raw socket, response decoder > TLS bytes）。
-7. 將動態結果轉換為 durable assets：
+6. **選擇 Frida 部署策略**：
+   - 初始化階段的函數（static initializer、constructor、library loading）→ 使用 **spawn 模式**（`frida -U -f <package> -l script.js`）
+   - 執行階段的函數（使用者操作、網路請求）→ 使用 **attach 模式**（`frida -U <package> -l script.js`）
+   - 不確定時，先用 spawn 模式確認完整流程，再用 attach 模式進行細部 hook
+   - 注意：Frida JS 無 `Buffer` API，操作二進位資料使用 `ptr.add(i).readU8()`
+7. 優先使用高語意 hook（request object > raw socket, response decoder > TLS bytes）。
+8. 將動態結果轉換為 durable assets：
    - UI architecture map + operation-to-API matrix。
    - Redacted HTTP/API docs。
    - Domain/runtime baseline。
@@ -80,7 +85,7 @@
    - Offline decoders or fixtures。
    - API/schema docs。
    - Contract tests（若專案有 SDK/client implementation）。
-8. **Automatic skill feedback**：每次學到新 reusable technique 時，在同一輪寫入 `feedback_history/`。
+9. **Automatic skill feedback**：每次學到新 reusable technique 時，在同一輪寫入 `feedback_history/`。
 
 ## 3. 分析結束定義
 
