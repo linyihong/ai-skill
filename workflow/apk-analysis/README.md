@@ -22,20 +22,20 @@
 
 | 工作流程關注點 | 原始來源 | 提取狀態 |
 | --- | --- | --- |
-| Skill 觸發和授權邊界 | `../../skills/apk-analysis/SKILL.md` | 參考用，內容已遷移至本層 |
-| 預設決策樹 | `../../skills/apk-analysis/WORKFLOW.md` | ✅ 已提取到 [`execution-flow.md`](execution-flow.md) |
-| 捕獲窗口詳細規則 | `../../skills/apk-analysis/WORKFLOW.md` | ✅ 已提取到 [`execution-flow.md`](execution-flow.md) |
-| 環境和工具準備 | `../../skills/apk-analysis/TOOLS.md` | 從 `analysis/apk/` 參考；不重複 |
-| 文件和產出規範 | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
-| SDK 即時自我生成審計 | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
-| 身份資料自我生成審計 | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
-| UI 架構圖模板 | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
-| API 目錄詳細要求 | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
-| 清理規則 | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
-| 開發者指引備註 | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
-| 回饋課程撰寫技巧 | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
-| 回填規則 | `../../skills/apk-analysis/DOCUMENTATION.md` | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
-| 第一天專案 runbook | `../../skills/apk-analysis/RUNBOOK.md` | 候選用於 onboarding workflow |
+| Skill 觸發和授權邊界 | `../../skills/apk-analysis/SKILL.md`（已刪除） | ✅ 內容已遷移至本層 |
+| 預設決策樹 | `../../skills/apk-analysis/WORKFLOW.md`（已刪除） | ✅ 已提取到 [`execution-flow.md`](execution-flow.md) |
+| 捕獲窗口詳細規則 | `../../skills/apk-analysis/WORKFLOW.md`（已刪除） | ✅ 已提取到 [`execution-flow.md`](execution-flow.md) |
+| 環境和工具準備 | `../../skills/apk-analysis/TOOLS.md`（已刪除） | ✅ 從 `analysis/apk/` 參考 |
+| 文件和產出規範 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
+| SDK 即時自我生成審計 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
+| 身份資料自我生成審計 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
+| UI 架構圖模板 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
+| API 目錄詳細要求 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
+| 清理規則 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
+| 開發者指引備註 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
+| 回饋課程撰寫技巧 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
+| 回填規則 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
+| 第一天專案 runbook | `../../skills/apk-analysis/RUNBOOK.md`（已刪除） | ✅ 已提取至 `runtime/onboarding/apk-analysis-setup.md` |
 | 開發指引交接 | `../../skills/app-development-guidance/` | 僅在觸發條件適用時參考 |
 
 ## Reference-First Workflow Shape（參考優先的工作流程形狀）
@@ -53,4 +53,4 @@
 - `analysis/apk/` 提供深度技術方法（traffic triage、Frida hook、proxy 架構等），被本 workflow 引用。
 - `intelligence/engineering/analytical-reasoning/` 提供從 APK 分析中萃取的工程智慧（啟發式、反模式、失敗模式），被本 workflow 引用。
 - `feedback/history/apk-analysis/` 儲存 APK 分析的具體課程記錄，可被提升至 intelligence 層。
-- `skills/apk-analysis/` 是原始 skill 目錄，內容已逐步遷移至本層。新內容應直接寫入本層。
+- `skills/apk-analysis/` 是原始 skill 目錄，內容已全部遷移至本層，舊目錄已刪除。

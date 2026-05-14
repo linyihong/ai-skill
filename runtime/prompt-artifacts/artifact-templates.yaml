@@ -154,15 +154,15 @@ templates:
 
       - id: checklists
         description: >
-          審查檢查清單。引用 skills/app-development-guidance/checklists/。
-        source: skills/app-development-guidance/CHECKLIST.md
+          審查檢查清單。原引用 skills/app-development-guidance/checklists/（已刪除）。
+        source: workflow/software-delivery/review-checklist.md
         estimated_tokens: 1200
         required: true
 
       - id: controls
         description: >
-          安全控制評估標準。引用 skills/app-development-guidance/controls/。
-        source: skills/app-development-guidance/controls/
+          安全控制評估標準。原引用 skills/app-development-guidance/controls/（已刪除）。
+        source: metadata/development-guidance/controls-catalog.md
         estimated_tokens: 1000
         required: false
         load_strategy: on_condition

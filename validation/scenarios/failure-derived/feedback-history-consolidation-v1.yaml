@@ -32,7 +32,7 @@ given:
     - feedback/history/travel-planning/    # 新 domain 目錄
     - enforcement/feedback-lessons.md     # 規則已更新指向 feedback/history/
     - skills/apk-analysis/feedback_history/  # 舊路徑（仍存在，向後相容）
-    - skills/app-development-guidance/feedback_history/  # 舊路徑（仍存在）
+    - skills/app-development-guidance/feedback_history/  # 舊路徑（已刪除）
   signals:
     - 新的 feedback lesson 需要存放
     - lesson 的 domain 歸屬明確（apk-analysis / app-development-guidance / travel-planning）
@@ -73,4 +73,4 @@ then:
 
   unexpected_intelligence:
     - skills/apk-analysis/feedback_history/README.md
-    - skills/app-development-guidance/feedback_history/README.md
+    - skills/app-development-guidance/feedback_history/README.md（已刪除）

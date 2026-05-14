@@ -33,23 +33,25 @@
 - `analysis/repo/` 可被本 workflow 引用來分析 repository 結構。
 - `intelligence/` 可被本 workflow 引用來輔助工程判斷。
 - `feedback/history/development-guidance/` 儲存開發指引的具體課程記錄。
-- `skills/app-development-guidance/` 是原始 skill 目錄，內容已逐步遷移至本層。新內容應直接寫入本層。
+- `skills/app-development-guidance/` 是原始 skill 目錄，已刪除。所有內容已遷移至本層。
 
-## 第一批候選遷移來源
+## 遷移狀態
 
-- `skills/app-development-guidance/WORKFLOW.md` — ✅ 已提取（execution-flow.md, artifact-gates.md, analysis/development-guidance/risk-translation.md）
-- `skills/app-development-guidance/process/` — ✅ 已提取（development-process.md）
-- `skills/app-development-guidance/checklists/` — ✅ 已提取（[`review-checklist.md`](review-checklist.md)）
+| 來源 | 目標 | 狀態 |
+|------|------|------|
+| `skills/app-development-guidance/WORKFLOW.md` | [`execution-flow.md`](execution-flow.md)、[`artifact-gates.md`](artifact-gates.md)、[`analysis/development-guidance/risk-translation.md`](../analysis/development-guidance/risk-translation.md) | ✅ 已遷移，舊目錄已刪除 |
+| `skills/app-development-guidance/process/` | [`development-process.md`](development-process.md) | ✅ 已遷移，舊目錄已刪除 |
+| `skills/app-development-guidance/checklists/` | [`review-checklist.md`](review-checklist.md) | ✅ 已遷移，舊目錄已刪除 |
 
 ## 已提取內容
 
 | 檔案 | 來源 | 說明 |
 |------|------|------|
-| [`execution-flow.md`](execution-flow.md) | `WORKFLOW.md` §1, §5-8 | Start From Evidence、Change Intake、BDD Closure Loop、SDK Defect Closure、Same-Session Closure、Performance Gate、Backfill Rules、Validate |
-| [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md` | Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria |
-| [`analysis/development-guidance/risk-translation.md`](../analysis/development-guidance/risk-translation.md) | `WORKFLOW.md` §2-5 | Risk Translation Table、Owner Layer Selection、Control Definition、Guidance Classification、Linked Updates |
-| [`review-checklist.md`](review-checklist.md) | `skills/app-development-guidance/checklists/` | 6 種審查 checklist 的 catalog（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
-| [`development-process.md`](development-process.md) | `skills/app-development-guidance/process/README.md` | Contract-first 開發流程：Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill、Contract-First Rules、Definition of Ready/Done |
+| [`execution-flow.md`](execution-flow.md) | `WORKFLOW.md` §1, §5-8（已刪除） | Start From Evidence、Change Intake、BDD Closure Loop、SDK Defect Closure、Same-Session Closure、Performance Gate、Backfill Rules、Validate |
+| [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md`（已刪除） | Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria |
+| [`analysis/development-guidance/risk-translation.md`](../analysis/development-guidance/risk-translation.md) | `WORKFLOW.md` §2-5（已刪除） | Risk Translation Table、Owner Layer Selection、Control Definition、Guidance Classification、Linked Updates |
+| [`review-checklist.md`](review-checklist.md) | `skills/app-development-guidance/checklists/`（已刪除） | 6 種審查 checklist 的 catalog（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
+| [`development-process.md`](development-process.md) | `skills/app-development-guidance/process/README.md`（已刪除） | Contract-first 開發流程：Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill、Contract-First Rules、Definition of Ready/Done |
 
 ## 建議 Workflow 流程
 

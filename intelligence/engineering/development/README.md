@@ -14,5 +14,5 @@
 
 - `workflow/software-delivery/` 提供執行流程，本層提供背後的原則與 why。
 - `analysis/development-guidance/` 提供具體的分析方法，本層提供選擇方法的決策邏輯。
-- `skills/app-development-guidance/` 是原始來源，已不再作為 active entrypoint。
+- `skills/app-development-guidance/` 是原始來源，已刪除。內容已由新分層承接。
 - `feedback/history/development-guidance/` 存放本領域的 feedback lessons。

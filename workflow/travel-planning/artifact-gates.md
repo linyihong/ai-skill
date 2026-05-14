@@ -1,8 +1,8 @@
 # Travel Planning Artifact Gates（旅行規劃產出規範）
 
-本文件定義旅行規劃的產出格式與品質門檻。承接 [`skills/travel-planning/SKILL.md`](../../skills/travel-planning/SKILL.md) 的 Output Style 內容，提取為 workflow 層的 artifact gates。
+本文件定義旅行規劃的產出格式與品質門檻。承接舊 `skills/travel-planning/SKILL.md` 的 Output Style 內容（已刪除），提取為 workflow 層的 artifact gates。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/travel-planning/SKILL.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：此文件為新分層的 reference target，舊 `skills/travel-planning/` 已刪除。新內容請直接寫入此文件。
 
 ## 1. 產出必備項目
 
@@ -100,5 +100,4 @@
 ## 4. 與其他層的關係
 
 - `workflow/travel-planning/execution-flow.md` 提供執行流程，本文件定義產出規範。
-- `skills/travel-planning/SKILL.md` 是原始來源，已不再作為 active entrypoint。
-- `skills/travel-planning/DOCUMENTATION.md` 提供詳細的輸出模板。
+- `skills/travel-planning/` 是原始來源，已全部遷移至本層，舊目錄已刪除。

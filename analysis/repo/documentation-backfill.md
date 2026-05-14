@@ -1,6 +1,6 @@
 # Existing Project Documentation Backfill
 
-從 [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md) 提取。當分析一個已實作完成的 repository 時，使用本方法系統化地恢復缺失的開發文件。
+從 [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md)（已刪除）提取。當分析一個已實作完成的 repository 時，使用本方法系統化地恢復缺失的開發文件。
 
 ## 適用時機
 
@@ -49,10 +49,10 @@
 - `workflow/repo-analysis/` 引用本方法作為分析步驟的具體實作。
 - `intelligence/engineering/architecture/` 承接從 repo 分析中萃取的架構判斷。
 - `intelligence/engineering/domain/` 承接從 repo 分析中萃取的領域模型理解。
-- `skills/app-development-guidance/process/README.md` 是原始來源，已不再作為 active entrypoint。
+- `skills/app-development-guidance/process/README.md` 是原始來源，已刪除。內容已由本文件承接。
 
 ## 遷移狀態
 
-- 本文件是 `skills/app-development-guidance/process/README.md` 的 reference target，已取代舊入口。
+- 本文件是 `skills/app-development-guidance/process/README.md`（已刪除）的 reference target，已取代舊入口。
 - 新內容請直接寫入此文件。
 - 恢復的 Product Brief 欄位若為 `unknown`，必須明確標記，不得發明商業理由。

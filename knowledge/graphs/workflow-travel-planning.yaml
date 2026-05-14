@@ -30,20 +30,6 @@ edges:
     reason: Japan roadtrip fatigue atom 提供長途自駕的疲勞管理原則，與車中泊 checks、transport mode decision 相關。
     validation: atom 定義 principle、when to apply、decision flow。
 
-  - type: promotes_from
-    target: skills/travel-planning/WORKFLOW.md
-    reason: execution-flow.md 的 17 個 workflow sections 從 WORKFLOW.md 提取。
-    validation: execution-flow.md 的 compatibility notes 標明舊入口維持 active。
-
-  - type: promotes_from
-    target: skills/travel-planning/DOCUMENTATION.md
-    reason: artifact-gates.md 的 14 個 output templates 從 DOCUMENTATION.md 提取。
-    validation: artifact-gates.md 的 compatibility notes 標明舊入口維持 active。
-
-  - type: preserves_entrypoint
-    target: skills/travel-planning/SKILL.md
-    reason: SKILL.md 仍為 tools 載入 skill 的 canonical trigger。
-    validation: workflow/travel-planning/README.md 說明舊入口維持 active。
 
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml

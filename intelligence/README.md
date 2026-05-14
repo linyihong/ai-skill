@@ -68,20 +68,20 @@ intelligence/
 - [`route.intelligence.engineering.agent-architecture`](../knowledge/runtime/routing-registry.yaml:621) — required_dependencies 引用 `intelligence/engineering/README.md`
 - [`route.intelligence.apk-analysis.atoms`](../knowledge/runtime/routing-registry.yaml:548) — primary_source 為 `intelligence/engineering/analytical-reasoning/README.md`
 - [`route.intelligence.apk-highest-leverage-path`](../knowledge/runtime/routing-registry.yaml:249) — primary_source 為 `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md`
-- [`route.skill.apk-analysis`](../knowledge/runtime/routing-registry.yaml:226) — candidate_sources 引用 `intelligence/engineering/analytical-reasoning/README.md`
-- [`route.skill.app-development-guidance`](../knowledge/runtime/routing-registry.yaml:435) — candidate_sources 引用 `intelligence/engineering/development/README.md`
-- [`route.skill.travel-planning`](../knowledge/runtime/routing-registry.yaml:465) — candidate_sources 引用 `intelligence/travel/README.md`
+- [`route.workflow.apk-analysis`](../knowledge/runtime/routing-registry.yaml) — candidate_sources 引用 `intelligence/engineering/analytical-reasoning/README.md`
+- [`route.workflow.software-delivery`](../knowledge/runtime/routing-registry.yaml) — candidate_sources 引用 `intelligence/engineering/development/README.md`
+- [`route.workflow.travel-planning`](../knowledge/runtime/routing-registry.yaml) — candidate_sources 引用 `intelligence/travel/README.md`
 
 ## 與既有層的關係
 
-- `skills/` 目前仍提供能力入口；成熟的工程智慧可逐步抽到本層。
+- `skills/` 已逐步遷移至新分層。舊 `skills/app-development-guidance/` 已刪除。
 - `workflow/` 應 reference 本層，而不是內嵌大量知識。
 - `feedback/` 可把新 lesson promotion 到本層。
 - `governance/` 定義本層知識的 lifecycle、清理與 validation。
 
-## 第一批候選遷移來源
+## 遷移狀態
 
-- `skills/app-development-guidance/implementation/`
-- `skills/app-development-guidance/controls/`
-- `feedback/history/` 中已成熟且跨專案可重用的 lesson
-- `enforcement/failure-patterns/` 中偏工程判斷的 pattern 摘要
+- `skills/app-development-guidance/implementation/` — ✅ 已遷移至 `metadata/development-guidance/implementation-catalog.md`，舊目錄已刪除
+- `skills/app-development-guidance/controls/` — ✅ 已遷移至 `metadata/development-guidance/controls-catalog.md`，舊目錄已刪除
+- `feedback/history/` 中已成熟且跨專案可重用的 lesson — 持續進行中
+- `enforcement/failure-patterns/` 中偏工程判斷的 pattern 摘要 — 持續進行中

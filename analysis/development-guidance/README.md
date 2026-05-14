@@ -2,7 +2,7 @@
 
 `analysis/development-guidance/` 負責「開發指引的分析方法」。本目錄保存從分析觀察到開發指引的轉換方法論，包括風險翻譯、控制層選擇、指引分類等分析技術。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：`skills/app-development-guidance/` 已刪除。此文件為 canonical source，新內容請直接寫入此文件。
 
 ## 範圍
 
@@ -26,12 +26,12 @@
 
 ## 當前來源參考
 
-- `skills/app-development-guidance/WORKFLOW.md` §2-5（Translate To Risk → File The Guidance）
-- `skills/app-development-guidance/DOCUMENTATION.md`（Reusable Note Structure）
-- `skills/app-development-guidance/controls/`（Cross-platform security controls）
-- `skills/app-development-guidance/implementation/`（Buildable implementation patterns）
-- `skills/app-development-guidance/platforms/`（Platform-specific guidance）
-- `skills/app-development-guidance/languages/`（Language-specific pitfalls）
+- `skills/app-development-guidance/WORKFLOW.md` §2-5（已刪除）
+- `skills/app-development-guidance/DOCUMENTATION.md`（已刪除）
+- `skills/app-development-guidance/controls/`（已刪除）
+- `skills/app-development-guidance/implementation/`（已刪除）
+- `skills/app-development-guidance/platforms/`（已刪除）
+- `skills/app-development-guidance/languages/`（已刪除）
 
 ## 閱讀順序
 
@@ -43,7 +43,6 @@
 
 ## 遷移說明
 
-- 本目錄為 Phase 17 與 Phase 26 提取產物，內容來自 `skills/app-development-guidance/WORKFLOW.md` §2-4。
+- 本目錄為 Phase 17 與 Phase 26 提取產物，內容來自 `skills/app-development-guidance/WORKFLOW.md` §2-4（已刪除）。
 - 分類索引（catalogs）已移至 `metadata/development-guidance/`。
-- 舊入口 `skills/app-development-guidance/` 已不再作為 active source of truth，新內容請直接寫入此目錄。
-- 未來遷移完成條件：所有 analysis methods 完全提取、索引更新、舊入口保留 redirect reference。
+- 舊入口 `skills/app-development-guidance/` 已刪除。新內容請直接寫入此目錄。

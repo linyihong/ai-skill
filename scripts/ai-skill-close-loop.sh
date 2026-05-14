@@ -171,7 +171,6 @@ group_for_path() {
     enforcement/*|README.md|CONTRIBUTING.md|.gitignore) echo "shared" ;;
     scripts/*) echo "scripts" ;;
     skills/apk-analysis/*) echo "apk-analysis" ;;
-    skills/app-development-guidance/*) echo "app-development-guidance" ;;
     skills/*)
       local rest skill
       rest="${path#skills/}"

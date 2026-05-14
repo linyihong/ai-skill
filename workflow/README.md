@@ -4,7 +4,7 @@
 
 ## 目前入口
 
-- [`apk-analysis/`](apk-analysis/README.md)：`apk-analysis` pilot 的 tool-neutral workflow 候選目的地；目前仍保留 `skills/apk-analysis/SKILL.md` 作為 active skill entrypoint。
+- [`apk-analysis/`](apk-analysis/README.md)：APK 分析的 tool-neutral workflow。已從舊 `skills/apk-analysis/` 遷移至本層。
 - [`software-delivery/`](software-delivery/README.md)：軟體交付的執行流程（design review、code review、release review、security review）。
 - [`repo-analysis/`](repo-analysis/README.md)：Repository 分析的執行流程（new onboarding、deep codebase analysis、migration impact、tech debt assessment）。
 - [`travel-planning/`](travel-planning/README.md)：旅遊規劃的執行流程（itinerary planning、transportation research、budget planning）。
@@ -39,9 +39,9 @@
 - `analysis/` 與 `intelligence/` 是 workflow 的知識來源，不應被大量複製。
 - `runtime/` 未來可依 metadata 動態載入合適 workflow。
 
-## 第一批候選遷移來源
+## 遷移狀態
 
-- `skills/apk-analysis/WORKFLOW.md`
-- `skills/app-development-guidance/WORKFLOW.md`
-- `skills/travel-planning/` 中可工具中立化的 itinerary workflow
+- `skills/apk-analysis/WORKFLOW.md` — ✅ 已遷移至 `workflow/apk-analysis/execution-flow.md`
+- `skills/app-development-guidance/WORKFLOW.md` — ✅ 已遷移至 `workflow/software-delivery/execution-flow.md`
+- `skills/travel-planning/WORKFLOW.md` — ✅ 已遷移至 `workflow/travel-planning/execution-flow.md`
 - `plans/archived/next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明

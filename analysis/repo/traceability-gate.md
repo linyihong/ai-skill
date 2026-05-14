@@ -1,6 +1,6 @@
 # Traceability Gate
 
-從 [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md) 提取。當分析一個已實作完成的 repository 並需要建立文件與程式碼之間的雙向追溯時，使用本方法。
+從 [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md)（已刪除）提取。當分析一個已實作完成的 repository 並需要建立文件與程式碼之間的雙向追溯時，使用本方法。
 
 ## 適用時機
 
@@ -46,4 +46,4 @@ Stable IDs 可以是：
 
 - `workflow/repo-analysis/` 引用本方法作為分析步驟的具體實作。
 - `analysis/repo/documentation-backfill.md` 提供文件恢復的完整流程。
-- `skills/app-development-guidance/process/README.md` 是原始來源，已不再作為 active entrypoint。
+- `skills/app-development-guidance/process/README.md` 是原始來源，已刪除。內容已由本文件承接。

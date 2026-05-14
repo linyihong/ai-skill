@@ -57,7 +57,7 @@
 
 #### ❌ 錯誤 2：已遷移 skill 的 lesson 放到舊路徑
 
-**情境**：`apk-analysis` 已遷移至新分層，但 agent 仍把 lesson 放到 `skills/apk-analysis/feedback_history/` 或 `workflow/apk-analysis/feedback_history/`
+**情境**：`apk-analysis` 已遷移至新分層（舊 `skills/apk-analysis/` 已刪除），但 agent 仍把 lesson 放到 `workflow/apk-analysis/feedback_history/`
 
 **錯誤行為**：使用舊路徑（無論是 `skills/` 還是 `workflow/`、`analysis/`、`intelligence/` 底下的 `feedback_history/`）
 

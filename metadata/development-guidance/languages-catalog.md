@@ -1,17 +1,17 @@
 # Language-Specific Pitfalls Catalog
 
-本文件列出各語言/runtime 特有的陷阱與注意事項。承接 [`skills/app-development-guidance/languages/`](../../skills/app-development-guidance/languages/) 的內容，提取為 tool-neutral 的分析參考。
+本文件列出各語言/runtime 特有的陷阱與注意事項。原承接 [`skills/app-development-guidance/languages/`](../../skills/app-development-guidance/languages/) 的內容（已刪除），提取為 tool-neutral 的分析參考。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/languages/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：`skills/app-development-guidance/languages/` 已刪除。此文件為 canonical source，新內容請直接寫入此文件。
 
 ## 語言分類
 
 | 語言 | 範圍 | 原始來源 |
 |------|------|----------|
-| **Dart** | Dart and Flutter-specific concerns | [`languages/dart.md`](../../skills/app-development-guidance/languages/dart.md) |
-| **Kotlin/Java** | Kotlin/Java Android-specific code patterns | [`languages/kotlin-java.md`](../../skills/app-development-guidance/languages/kotlin-java.md) |
-| **Swift** | Swift/iOS-specific code patterns | [`languages/swift.md`](../../skills/app-development-guidance/languages/swift.md) |
-| **TypeScript** | TypeScript frontend/backend client code concerns | [`languages/typescript.md`](../../skills/app-development-guidance/languages/typescript.md) |
+| **Dart** | Dart and Flutter-specific concerns | [`languages/dart.md`](../../skills/app-development-guidance/languages/dart.md)（已刪除） |
+| **Kotlin/Java** | Kotlin/Java Android-specific code patterns | [`languages/kotlin-java.md`](../../skills/app-development-guidance/languages/kotlin-java.md)（已刪除） |
+| **Swift** | Swift/iOS-specific code patterns | [`languages/swift.md`](../../skills/app-development-guidance/languages/swift.md)（已刪除） |
+| **TypeScript** | TypeScript frontend/backend client code concerns | [`languages/typescript.md`](../../skills/app-development-guidance/languages/typescript.md)（已刪除） |
 
 ## 使用原則
 
@@ -23,4 +23,4 @@
 
 - `analysis/development-guidance/controls-catalog.md` 提供跨平台控制原則。
 - `analysis/development-guidance/implementation-catalog.md` 提供可建置實作模式。
-- `skills/app-development-guidance/languages/` 是原始來源，已不再作為 active entrypoint。
+- `skills/app-development-guidance/languages/` 是原始來源，已刪除。內容已由本文件承接。

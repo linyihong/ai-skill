@@ -18,4 +18,4 @@
 
 - 旅遊規劃流程 → `workflow/travel-planning/`
 - 旅遊事實與參考資料 → `knowledge/`
-- `skills/travel-planning/` 是原始來源，已不再作為 active entrypoint
+- `skills/travel-planning/` 是原始來源，已全部遷移至新分層，舊目錄已刪除

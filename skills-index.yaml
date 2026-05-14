@@ -12,45 +12,6 @@ description: >
   domains/dependencies/conflicts 做 dynamic loading 與 conflict detection。
 
 skills:
-  - id: apk-analysis
-    name: APK Analysis
-    description: 授權 APK 流量分析、動態抓包、Flutter/Dart AOT、response 解碼、文件化
-    weight: 0.9
-    domains:
-      - mobile-security
-      - reverse-engineering
-      - network-analysis
-    dependencies:
-      - enforcement/rule-weight.md
-      - enforcement/dependency-reading.md
-    conflicts:
-      - app-development-guidance  # 分析 vs 開發，不同目標
-    triggers:
-      - apk
-      - mitm
-      - flutter
-      - frida
-      - traffic-analysis
-      - proxy
-      - reverse-engineering
-      - network-capture
-      - dart-aot
-      - hls
-      - media-streaming
-    cost:
-      estimated_tokens: 4500
-      context_load: high
-    priority:
-      runtime: high
-    primary_entrypoint: workflow/apk-analysis/execution-flow.md
-    entrypoint: skills/apk-analysis/SKILL.md
-    summary: knowledge/summaries/apk-analysis-pilot.md
-    related:
-      - plans/archived/apk-analysis-pilot-migration.md
-      - analysis/apk/README.md
-      - workflow/apk-analysis/README.md
-      - intelligence/engineering/analytical-reasoning/README.md
-
   - id: app-development-guidance
     name: App/API/Embedded Development Guidance
     description: 將授權 App/API/Embedded/Firmware 觀察轉成開發 guidance、實作模式、控制項、檢查清單
@@ -63,8 +24,7 @@ skills:
     dependencies:
       - enforcement/rule-weight.md
       - enforcement/dependency-reading.md
-    conflicts:
-      - apk-analysis  # 開發 vs 分析，不同目標
+    conflicts: []
     triggers:
       - api
       - backend
@@ -92,48 +52,12 @@ skills:
     priority:
       runtime: high
     primary_entrypoint: workflow/software-delivery/execution-flow.md
-    entrypoint: skills/app-development-guidance/SKILL.md
+    entrypoint: workflow/software-delivery/execution-flow.md
     summary: knowledge/summaries/development-guidance.md
     related:
       - workflow/software-delivery/README.md
       - analysis/development-guidance/README.md
       - intelligence/engineering/development/README.md
-      - skills/app-development-guidance/README.md
-      - skills/app-development-guidance/checklists/README.md
-      - skills/app-development-guidance/controls/README.md
-
-  - id: travel-planning
-    name: Travel Planning
-    description: 依目的地、日期、交通與玩法規劃行程，包含營業時間查證、交通比較、住宿與備案
-    weight: 0.5
-    domains:
-      - travel
-      - itinerary-planning
-      - logistics
-    dependencies: []
-    conflicts: []
-    triggers:
-      - travel
-      - itinerary
-      - route
-      - transportation
-      - accommodation
-      - sightseeing
-      - trip
-      - vacation
-    cost:
-      estimated_tokens: 2800
-      context_load: medium
-    priority:
-      runtime: medium
-    primary_entrypoint: workflow/travel-planning/execution-flow.md
-    entrypoint: skills/travel-planning/SKILL.md
-    summary: knowledge/summaries/travel-planning.md
-    related:
-      - workflow/travel-planning/README.md
-      - analysis/travel/README.md
-      - intelligence/travel/README.md
-      - skills/travel-planning/README.md
 
   - id: documentation-ai-native
     name: Agent-Friendly Documentation

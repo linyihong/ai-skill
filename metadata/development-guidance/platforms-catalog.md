@@ -1,17 +1,17 @@
 # Platform Guidance Catalog
 
-本文件列出各平台/應用類型的開發指引分類與索引。承接 [`skills/app-development-guidance/platforms/`](../../skills/app-development-guidance/platforms/) 的內容，提取為 tool-neutral 的分析參考。
+本文件列出各平台/應用類型的開發指引分類與索引。原承接 [`skills/app-development-guidance/platforms/`](../../skills/app-development-guidance/platforms/) 的內容（已刪除），提取為 tool-neutral 的分析參考。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/platforms/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：`skills/app-development-guidance/platforms/` 已刪除。此文件為 canonical source，新內容請直接寫入此文件。
 
 ## 平台分類
 
 | 平台 | 範圍 | 原始來源 |
 |------|------|----------|
-| **Mobile** | Android, iOS, Flutter, React Native, and mobile release concerns | [`platforms/mobile/`](../../skills/app-development-guidance/platforms/mobile/) |
-| **Web** | Browser/frontend app hardening | [`platforms/web/`](../../skills/app-development-guidance/platforms/web/) |
-| **Backend** | API/server controls that apps depend on | [`platforms/backend/`](../../skills/app-development-guidance/platforms/backend/) |
-| **Embedded** | Firmware, sensors, hardware context, protocols, board bring-up, and hardware-in-loop validation | [`platforms/embedded/`](../../skills/app-development-guidance/platforms/embedded/) |
+| **Mobile** | Android, iOS, Flutter, React Native, and mobile release concerns | [`platforms/mobile/`](../../skills/app-development-guidance/platforms/mobile/)（已刪除） |
+| **Web** | Browser/frontend app hardening | [`platforms/web/`](../../skills/app-development-guidance/platforms/web/)（已刪除） |
+| **Backend** | API/server controls that apps depend on | [`platforms/backend/`](../../skills/app-development-guidance/platforms/backend/)（已刪除） |
+| **Embedded** | Firmware, sensors, hardware context, protocols, board bring-up, and hardware-in-loop validation | [`platforms/embedded/`](../../skills/app-development-guidance/platforms/embedded/)（已刪除） |
 
 ## 使用原則
 
@@ -23,4 +23,4 @@
 
 - `analysis/development-guidance/controls-catalog.md` 提供跨平台控制原則。
 - `analysis/development-guidance/implementation-catalog.md` 提供可建置實作模式。
-- `skills/app-development-guidance/platforms/` 是原始來源，已不再作為 active entrypoint。
+- `skills/app-development-guidance/platforms/` 是原始來源，已刪除。內容已由本文件承接。

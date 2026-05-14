@@ -1,8 +1,8 @@
 # Travel Planning Sources and Tools（旅遊規劃來源與工具）
 
-本文件定義旅遊規劃的資訊來源層級、各類查詢策略，以及常見的 red flags。承接 [`skills/travel-planning/TOOLS.md`](../../skills/travel-planning/TOOLS.md) 的內容，提取為 tool-neutral 的分析方法。
+本文件定義旅遊規劃的資訊來源層級、各類查詢策略，以及常見的 red flags。承接舊 `skills/travel-planning/TOOLS.md` 的內容（已刪除），提取為 tool-neutral 的分析方法。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/travel-planning/TOOLS.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：此文件為新分層的 reference target，舊 `skills/travel-planning/` 已刪除。新內容請直接寫入此文件。
 
 ## Source Hierarchy（來源層級）
 
@@ -305,4 +305,4 @@ When citing a time-sensitive source, record:
 - `workflow/travel-planning/execution-flow.md` 提供執行流程，本文件提供流程中的來源選擇策略。
 - `workflow/travel-planning/artifact-gates.md` 提供產出格式規範，本文件提供產出所需的來源驗證方法。
 - `intelligence/travel/` 提供旅遊規劃的啟發式規則，本文件提供執行這些規則所需的工具與來源知識。
-- `skills/travel-planning/TOOLS.md` 是原始來源，已不再作為 active entrypoint。
+- `skills/travel-planning/` 是原始來源，已全部遷移至新分層，舊目錄已刪除。

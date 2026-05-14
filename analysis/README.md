@@ -4,7 +4,7 @@
 
 ## 目前入口
 
-- [`apk/`](apk/README.md)：`apk-analysis` pilot 的分析方法候選目的地；目前仍 reference `skills/apk-analysis/`，不搬移大量內容。
+- [`apk/`](apk/README.md)：APK 分析的可重用分析方法。已從舊 `skills/apk-analysis/` 遷移至本層。
 - [`development-guidance/`](development-guidance/README.md)：開發指引的分析方法（風險翻譯、控制層選擇）。
 - [`repo/`](repo/README.md)：Repository 分析與理解方法（結構觀察、依賴分析、心智模型建立、技術債評估）。
 - [`production/`](production/README.md)：Production 問題分析與根因追蹤方法（incident 分類、觀測性資料判讀、RCA 流程、效能診斷）。
@@ -26,21 +26,24 @@
 
 ## 誰會參考這裡（Inbound References）
 
-- [`route.skill.apk-analysis`](../knowledge/runtime/routing-registry.yaml:225) — candidate_sources 引用 `analysis/apk/README.md`
-- [`route.skill.app-development-guidance`](../knowledge/runtime/routing-registry.yaml:433) — candidate_sources 引用 `analysis/development-guidance/README.md`
-- [`route.skill.travel-planning`](../knowledge/runtime/routing-registry.yaml:463) — candidate_sources 引用 `analysis/travel/README.md`
-- [`route.intelligence.apk-analysis.atoms`](../knowledge/runtime/routing-registry.yaml:551) — required_dependencies 引用 `analysis/apk/README.md`
-- [`route.analysis.apk.workflows`](../knowledge/runtime/routing-registry.yaml:519) — required_dependencies 引用 `analysis/apk/README.md`
+- [`route.workflow.apk-analysis`](../knowledge/runtime/routing-registry.yaml) — candidate_sources 引用 `analysis/apk/README.md`
+- [`route.workflow.software-delivery`](../knowledge/runtime/routing-registry.yaml) — candidate_sources 引用 `analysis/development-guidance/README.md`
+- [`route.workflow.travel-planning`](../knowledge/runtime/routing-registry.yaml) — candidate_sources 引用 `analysis/travel/README.md`
+- [`route.intelligence.apk-analysis.atoms`](../knowledge/runtime/routing-registry.yaml) — required_dependencies 引用 `analysis/apk/README.md`
+- [`route.analysis.apk.workflows`](../knowledge/runtime/routing-registry.yaml) — required_dependencies 引用 `analysis/apk/README.md`
 
 ## 與既有層的關係
 
-- `skills/` 目前仍是相容入口；本層只承接逐步抽出的分析方法。
+- `skills/` 已 deprecated，`apk-analysis` 與 `travel-planning` 已遷移至本層與 `workflow/`。
 - `workflow/` 可以引用本層，但不應複製完整分析知識。
 - `intelligence/` 承接從分析結果萃取出的工程判斷。
 - `enforcement/` 仍負責授權、去敏、依賴讀取與 validation policy。
 
-## 第一批候選遷移來源
+## 遷移狀態
 
-- `skills/apk-analysis/techniques/`（已刪除，內容已遷移至 `analysis/apk/workflows/`）
-- `skills/app-development-guidance/process/` 中偏分析與 discovery 的內容
-- `plans/archived/next-stage-upgrade-plan.md` 中 `analysis/` 的分層說明
+- `skills/apk-analysis/techniques/` — ✅ 已遷移至 `analysis/apk/workflows/`
+- `skills/apk-analysis/TOOLS.md` — ✅ 已遷移至 `analysis/apk/tools-and-failures.md`
+- `skills/apk-analysis/WORKFLOW.md`（分析部分） — ✅ 已遷移至 `analysis/apk/traffic-triage.md`
+- `skills/travel-planning/TOOLS.md` — ✅ 已遷移至 `analysis/travel/sources-and-tools.md`
+- `skills/travel-planning/README.md` — ✅ 已遷移至 `analysis/travel/README.md`
+- `skills/app-development-guidance/` — ✅ 已遷移至新分層，舊目錄已刪除

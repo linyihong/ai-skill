@@ -1,7 +1,7 @@
 # Source Triage Heuristic（旅行資訊來源分級經驗法則）
 
 **Status**: `candidate-intelligence`
-**Source**: [`workflow/travel-planning/execution-flow.md`](../../workflow/travel-planning/execution-flow.md), [`skills/travel-planning/WORKFLOW.md`](../../skills/travel-planning/WORKFLOW.md)
+**Source**: [`workflow/travel-planning/execution-flow.md`](../../workflow/travel-planning/execution-flow.md)（舊 `skills/travel-planning/WORKFLOW.md` 已刪除）
 
 ## 原則
 

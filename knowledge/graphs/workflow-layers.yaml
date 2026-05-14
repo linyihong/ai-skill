@@ -28,11 +28,11 @@ edges:
   - type: related_to
     target: workflow/software-delivery/execution-flow.md
     reason: App development guidance 的具體執行步驟（8 個 workflow sections）。
-    validation: execution-flow.md 從 skills/app-development-guidance/WORKFLOW.md 提取。
+    validation: execution-flow.md 從 skills/app-development-guidance/WORKFLOW.md（已刪除）提取。
   - type: related_to
     target: workflow/software-delivery/artifact-gates.md
     reason: App development guidance 的產出閘門定義（6 個 artifact sections）。
-    validation: artifact-gates.md 從 skills/app-development-guidance/DOCUMENTATION.md 提取。
+    validation: artifact-gates.md 從 skills/app-development-guidance/DOCUMENTATION.md（已刪除）提取。
   - type: related_to
     target: workflow/repo-analysis/README.md
     reason: Repository 分析的執行流程。
@@ -60,12 +60,12 @@ edges:
   - type: related_to
     target: workflow/software-delivery/development-process.md
     reason: Contract-first 開發流程 — Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Test Strategy Gate、Definition of Ready/Done。
-    validation: development-process.md 從 skills/app-development-guidance/process/README.md 提取。
+    validation: development-process.md 從 skills/app-development-guidance/process/README.md（已刪除）提取。
 
   - type: related_to
     target: workflow/software-delivery/review-checklist.md
     reason: 審查檢查清單 — 15 個審查類別（Change Intake、Test Strategy、Performance Test、Product To Contract、Documentation Backfill、Contract Governance、Embedded/Hardware Review、API And Transport、Auth/Tokens/Sessions、Local Storage、Flutter/Android Build、Logging/Telemetry、Anti-Tamper/Risk、Release Gate）。
-    validation: review-checklist.md 從 skills/app-development-guidance/CHECKLIST.md 提取。
+    validation: review-checklist.md 從 skills/app-development-guidance/CHECKLIST.md（已刪除）提取。
   - type: related_to
     target: analysis/apk/README.md
     reason: Workflow 引用 analysis/ 的技術方法，不重複技術細節。

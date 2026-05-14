@@ -20,21 +20,6 @@ edges:
     reason: APK 分析完成定義 — 初步分析完成定義、第一輪分析順序。
     validation: apk-analysis-completion.md 從 skills/apk-analysis/RUNBOOK.md 提取。
 
-  - type: preserves_entrypoint
-    target: skills/apk-analysis/SKILL.md
-    reason: SKILL.md 仍為 tools 載入 skill 的 canonical trigger。
-    validation: runtime/onboarding/README.md 說明舊入口維持 active。
-
-  - type: preserves_entrypoint
-    target: skills/app-development-guidance/SKILL.md
-    reason: SKILL.md 仍為 tools 載入 skill 的 canonical trigger。
-    validation: runtime/onboarding/README.md 說明舊入口維持 active。
-
-  - type: preserves_entrypoint
-    target: skills/travel-planning/SKILL.md
-    reason: SKILL.md 仍為 tools 載入 skill 的 canonical trigger。
-    validation: runtime/onboarding/README.md 說明舊入口維持 active。
-
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.runtime.onboarding record。

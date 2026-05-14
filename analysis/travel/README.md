@@ -1,8 +1,8 @@
 # Travel Analysis Methods（旅遊規劃分析方法）
 
-本文件定義旅遊規劃的核心目標、範圍與使用模式。承接 [`skills/travel-planning/README.md`](../../skills/travel-planning/README.md) 的內容，提取為 tool-neutral 的分析方法。
+本文件定義旅遊規劃的核心目標、範圍與使用模式。承接舊 `skills/travel-planning/README.md` 的內容（已刪除），提取為 tool-neutral 的分析方法。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/travel-planning/README.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：此文件為新分層的 reference target，舊 `skills/travel-planning/` 已刪除。新內容請直接寫入此文件。
 
 ## 核心目標
 
@@ -69,4 +69,4 @@
 - `analysis/travel/sources-and-tools.md` 提供來源選擇策略與工具知識。
 - `workflow/travel-planning/artifact-gates.md` 提供產出格式規範。
 - `intelligence/travel/` 提供旅遊規劃的啟發式規則。
-- `skills/travel-planning/README.md` 是原始來源，已不再作為 active entrypoint。
+- `skills/travel-planning/` 是原始來源，已全部遷移至新分層，舊目錄已刪除。

@@ -1,8 +1,8 @@
 # App Development Guidance Artifact Gates（開發指引產出規範）
 
-本文件定義開發指引文件的產出規範與品質門檻。承接 [`skills/app-development-guidance/DOCUMENTATION.md`](../../skills/app-development-guidance/DOCUMENTATION.md) 的內容，提取為 tool-neutral 的 artifact gates。
+本文件定義開發指引文件的產出規範與品質門檻。承接 [`skills/app-development-guidance/DOCUMENTATION.md`](../../skills/app-development-guidance/DOCUMENTATION.md)（已刪除）的內容，提取為 tool-neutral 的 artifact gates。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/DOCUMENTATION.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：此文件為新分層的 canonical source，`skills/app-development-guidance/DOCUMENTATION.md` 已刪除。新內容請直接寫入此文件。
 
 ## 1. 可重複使用的筆記結構（Reusable Note Structure）
 
@@ -44,7 +44,7 @@
 | 具體的可建置實作模式 | `implementation/` |
 | 可重複的審查流程 | `checklists/` |
 | 尚未提升的可重複使用開發原則 | 匹配的 `feedback_history/<category>/`，或跨領域的 `feedback_history/common/` |
-| APK 分析方法或 hook 技術 | `skills/apk-analysis/` |
+| APK 分析方法或 hook 技術 | `analysis/apk/`、`workflow/apk-analysis/` |
 | 專案特定的板子接線、校準日誌、韌體 dump、bench 測量、裝置識別碼或目標硬體結論 | 專案儲存庫文件 |
 | 產品特定的 API 主機、端點、schema 或令牌細節 | 專案儲存庫文件 |
 | 原始供應商文件、帳戶特定條款、憑證、沙箱/正式主機、私人 webhook 負載或真實客戶資料 | 專案儲存庫文件，附清理和存取控制 |

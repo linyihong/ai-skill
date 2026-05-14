@@ -72,16 +72,16 @@
 
 | 來源 | 目標 | 內容 |
 | --- | --- | --- |
-| `skills/app-development-guidance/process/README.md` §Existing Project Documentation Backfill | [`documentation-backfill.md`](documentation-backfill.md) | 8 種文件恢復規則、6 種 pipeline artifact 恢復方法、7 步恢復順序 |
-| `skills/app-development-guidance/process/README.md` §Traceability Gate | [`traceability-gate.md`](traceability-gate.md) | 5 種追溯連結、stable ID 類型、未實作行為標記 |
-| `skills/app-development-guidance/process/README.md` §Contract Governance Gate | [`contract-governance.md`](contract-governance.md) | 6 級文件優先順序、5 種衝突處理規則、取消/延後記錄方法 |
+| `skills/app-development-guidance/process/README.md`（已刪除）§Existing Project Documentation Backfill | [`documentation-backfill.md`](documentation-backfill.md) | 8 種文件恢復規則、6 種 pipeline artifact 恢復方法、7 步恢復順序 |
+| `skills/app-development-guidance/process/README.md`（已刪除）§Traceability Gate | [`traceability-gate.md`](traceability-gate.md) | 5 種追溯連結、stable ID 類型、未實作行為標記 |
+| `skills/app-development-guidance/process/README.md`（已刪除）§Contract Governance Gate | [`contract-governance.md`](contract-governance.md) | 6 級文件優先順序、5 種衝突處理規則、取消/延後記錄方法 |
 
 ## 與其他層的關係
 
 - `workflow/repo-analysis/` 可引用本層的分析步驟，但不複製分析方法細節。
 - `intelligence/engineering/architecture/` 承接從 repo 分析中萃取的架構判斷。
 - `intelligence/engineering/domain/` 承接從 repo 分析中萃取的領域模型理解。
-- `skills/app-development-guidance/process/README.md` 是原始來源，已不再作為 active entrypoint。
+- `skills/app-development-guidance/process/README.md` 是原始來源，已刪除。內容已由本文件承接。
 
 ## 產出格式
 

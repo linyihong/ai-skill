@@ -2,7 +2,7 @@
 
 本文件定義新 APK 分析專案的初始設定流程與提示詞模板。承接 [`workflow/apk-analysis/execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) 與 [`workflow/apk-analysis/artifact-gates.md`](../../workflow/apk-analysis/artifact-gates.md) 的內容，提取為 tool-neutral 的 runtime onboarding 指引。
 
-> **遷移狀態**：此文件為新分層的 reference target，舊 `skills/apk-analysis/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：此文件為新分層的 reference target，舊 `skills/apk-analysis/` 已刪除。新內容請直接寫入此文件。
 
 ## 放置位置
 
@@ -92,4 +92,4 @@ intelligence/engineering/analytical-reasoning/<atom-type>/<name>.md
 - `workflow/apk-analysis/execution-flow.md` 提供分析執行流程，本文件提供如何啟動分析的設定指引。
 - `workflow/apk-analysis/artifact-gates.md` 提供產出格式與完成定義。
 - `enforcement/feedback-lessons.md` 提供 lesson 格式與回饋規則。
-- `skills/apk-analysis/RUNBOOK.md` 是原始來源，已不再作為 active entrypoint（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。
+- `skills/apk-analysis/RUNBOOK.md` 是原始來源，已刪除。內容已遷移至本文件與 `workflow/apk-analysis/`。

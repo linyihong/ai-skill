@@ -1,8 +1,8 @@
 # APK Analysis Feedback History Index
 
-本索引列出 `skills/apk-analysis/feedback_history/` 下所有 lessons，依其 `Promotion Target` 分類到對應的目標層。此索引讓 `feedback/` 層可發現 lessons，並追蹤哪些 lessons 已被提取到目標層。
+本索引列出舊 `skills/apk-analysis/feedback_history/`（已刪除）下所有 lessons，依其 `Promotion Target` 分類到對應的目標層。此索引讓 `feedback/` 層可發現 lessons，並追蹤哪些 lessons 已被提取到目標層。
 
-> ⚠️ **Lesson 已搬遷**：所有 lesson 實體已移至 [`feedback/history/apk-analysis/`](../history/apk-analysis/README.md)。本索引保留作為 extraction 追蹤用途，來源路徑 `skills/apk-analysis/feedback_history/` 保留僅供向後相容。
+> ⚠️ **Lesson 已搬遷**：所有 lesson 實體已移至 [`feedback/history/apk-analysis/`](../history/apk-analysis/README.md)。本索引保留作為 extraction 追蹤用途，來源路徑 `skills/apk-analysis/feedback_history/` 已刪除。
 >
 > 搬遷日期：2026-05-13
 
@@ -11,7 +11,7 @@
 | 欄位 | 說明 |
 | --- | --- |
 | **目標層** | lesson 的 Promotion Target 對應到的新架構層 |
-| **來源檔案** | `skills/apk-analysis/feedback_history/` 下的原始 lesson 檔案 |
+| **來源檔案** | 舊 `skills/apk-analysis/feedback_history/`（已刪除）下的原始 lesson 檔案 |
 | **Status** | lesson 的成熟度狀態（promoted / validated / candidate） |
 | **提取狀態** | 是否已提取到目標層（✅ 已提取 / ⬜ 未提取 / 🔄 部分提取） |
 | **目標檔案** | 提取後的目標檔案路徑 |

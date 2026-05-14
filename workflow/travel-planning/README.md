@@ -27,12 +27,15 @@
 - `intelligence/travel/` 提供旅行規劃的工程智慧（source triage、feasibility build、fatigue 評估等），被本 workflow 引用。
 - `analysis/travel/` 提供旅行規劃的分析方法（來源與工具評估），被本 workflow 引用。
 - `feedback/history/travel-planning/` 儲存旅行規劃的具體課程記錄。
-- `skills/travel-planning/` 是原始 skill 目錄，內容已逐步遷移至本層。新內容應直接寫入本層。
+- `skills/travel-planning/` 是原始 skill 目錄，內容已全部遷移至本層，舊目錄已刪除。
 
-## 第一批候選遷移來源
+## 遷移狀態
 
-- `skills/travel-planning/WORKFLOW.md` — ✅ 已提取（execution-flow.md）
-- `skills/travel-planning/DOCUMENTATION.md` — ✅ 已提取（artifact-gates.md）
+- `skills/travel-planning/WORKFLOW.md` — ✅ 已遷移至 `workflow/travel-planning/execution-flow.md`
+- `skills/travel-planning/DOCUMENTATION.md` — ✅ 已遷移至 `workflow/travel-planning/artifact-gates.md`
+- `skills/travel-planning/SKILL.md` — ✅ 已遷移至 `workflow/travel-planning/`
+- `skills/travel-planning/TOOLS.md` — ✅ 已遷移至 `analysis/travel/sources-and-tools.md`
+- `skills/travel-planning/README.md` — ✅ 已遷移至 `analysis/travel/README.md`
 
 ## 已提取內容
 

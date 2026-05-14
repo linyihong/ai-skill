@@ -1,8 +1,8 @@
 # 開發流程
 
-`workflow/software-delivery/development-process.md` 是從 `skills/app-development-guidance/process/README.md` 提取的開發流程。本文件定義 contract-first 開發流程：在團隊開始 coding 前先釐清行為與領域語言，然後讓每個實作面向對著同一份 contract 工作。
+`workflow/software-delivery/development-process.md` 是從 `skills/app-development-guidance/process/README.md`（已刪除）提取的開發流程。本文件定義 contract-first 開發流程：在團隊開始 coding 前先釐清行為與領域語言，然後讓每個實作面向對著同一份 contract 工作。
 
-> **遷移狀態**：此文件為新分層的 reference target，`skills/app-development-guidance/process/README.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：`skills/app-development-guidance/process/README.md` 已刪除。此文件為 canonical source，新內容請直接寫入此文件。
 
 ## Default Flow（預設流程）
 

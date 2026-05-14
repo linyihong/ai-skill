@@ -95,7 +95,7 @@ Agent 把某個 skill 的 analysis technique lesson 放到另一個不相關 ski
 
 ### ❌ 錯誤範例 2：已遷移 skill 的 lesson 放到舊路徑
 
-**情境**：`apk-analysis` 已遷移至新分層（`SKILL.md` 有「新分層路徑（優先讀取）」），但 agent 仍把 lesson 放到 `skills/apk-analysis/feedback_history/`
+**情境**：`apk-analysis` 已遷移至新分層（舊 `skills/apk-analysis/` 已刪除），但 agent 仍把 lesson 放到舊路徑
 
 **錯誤行為**：使用舊 `skills/<name>/feedback_history/` 路徑
 

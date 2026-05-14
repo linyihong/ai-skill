@@ -34,10 +34,6 @@ edges:
     target: analysis/repo/contract-governance.md
     reason: contract-governance-heuristic 從 contract-governance.md 萃取原則
     validation: 確認 contract-governance.md 包含對應內容
-  - type: preserves_entrypoint
-    target: skills/app-development-guidance/SKILL.md
-    reason: skills/app-development-guidance/ 仍為 active entrypoint
-    validation: 確認 SKILL.md 存在
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: 透過 runtime routing 可被任務路由發現

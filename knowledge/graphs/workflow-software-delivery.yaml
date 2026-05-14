@@ -13,22 +13,22 @@ edges:
   - type: related_to
     target: workflow/software-delivery/execution-flow.md
     reason: App development guidance 的具體執行步驟 — Start From Evidence、Change Intake、Docs-first BDD closure loop、SDK defect closure loop、Same-session closure、Performance test gate、Backfill rules、Validate、Feed Back。
-    validation: execution-flow.md 定義 8 個 workflow sections，從 skills/app-development-guidance/WORKFLOW.md 提取。
+    validation: execution-flow.md 定義 8 個 workflow sections，從 skills/app-development-guidance/WORKFLOW.md（已刪除）提取。
 
   - type: related_to
     target: workflow/software-delivery/artifact-gates.md
     reason: App development guidance 的產出閘門定義 — Reusable Note Structure、Keep Separate、Guidance Boundary、Linked Update Statement、Good Guidance、Avoid。
-    validation: artifact-gates.md 定義 6 個 artifact sections，從 skills/app-development-guidance/DOCUMENTATION.md 提取。
+    validation: artifact-gates.md 定義 6 個 artifact sections，從 skills/app-development-guidance/DOCUMENTATION.md（已刪除）提取。
 
   - type: related_to
     target: workflow/software-delivery/development-process.md
     reason: Contract-first 開發流程 — Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Test Strategy Gate、Definition of Ready/Done。
-    validation: development-process.md 定義 14 個流程階段，從 skills/app-development-guidance/process/README.md 提取。
+    validation: development-process.md 定義 14 個流程階段，從 skills/app-development-guidance/process/README.md（已刪除）提取。
 
   - type: related_to
     target: workflow/software-delivery/review-checklist.md
     reason: 審查檢查清單 — Change Intake、Test Strategy、Performance Test、Product To Contract、Documentation Backfill、Contract Governance、Embedded/Hardware Review、API And Transport、Auth/Tokens/Sessions、Local Storage、Flutter/Android Build、Logging/Telemetry、Anti-Tamper/Risk、Release Gate。
-    validation: review-checklist.md 定義 15 個審查類別，從 skills/app-development-guidance/CHECKLIST.md 提取。
+    validation: review-checklist.md 定義 15 個審查類別，從 skills/app-development-guidance/CHECKLIST.md（已刪除）提取。
 
   - type: related_to
     target: analysis/development-guidance/README.md
@@ -38,22 +38,7 @@ edges:
   - type: related_to
     target: analysis/development-guidance/risk-translation.md
     reason: Risk translation 方法 — Translate To Risk、Choose Owner Layer、Define Controls、File Guidance、Apply Linked Updates。
-    validation: risk-translation.md 定義 5 個 analysis methods，從 skills/app-development-guidance/WORKFLOW.md §2-5 提取。
-
-  - type: promotes_from
-    target: skills/app-development-guidance/WORKFLOW.md
-    reason: execution-flow.md 的 8 個 workflow sections 從 WORKFLOW.md 提取。
-    validation: execution-flow.md 的 compatibility notes 標明舊入口維持 active。
-
-  - type: promotes_from
-    target: skills/app-development-guidance/DOCUMENTATION.md
-    reason: artifact-gates.md 的 6 個 artifact sections 從 DOCUMENTATION.md 提取。
-    validation: artifact-gates.md 的 compatibility notes 標明舊入口維持 active。
-
-  - type: preserves_entrypoint
-    target: skills/app-development-guidance/SKILL.md
-    reason: SKILL.md 仍為 tools 載入 skill 的 canonical trigger。
-    validation: workflow/software-delivery/README.md 說明舊入口維持 active。
+    validation: risk-translation.md 定義 5 個 analysis methods，從 skills/app-development-guidance/WORKFLOW.md（已刪除）§2-5 提取。
 
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml

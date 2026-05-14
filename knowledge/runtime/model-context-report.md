@@ -47,11 +47,11 @@
 
 | Route | Primary source | Compression | Reason |
 | --- | --- | --- | --- |
-| `route.skill.apk-analysis` | `skills/apk-analysis/SKILL.md` | `source-backed` | APK analysis 需要 skill entrypoint、workflow 與 domain-specific technique routing。 |
+| `route.workflow.apk-analysis` | `workflow/apk-analysis/execution-flow.md` | `source-backed` | APK analysis 需要 workflow、analysis methods 與 domain-specific intelligence routing。 |
 | `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md` | `source-backed` | APK route selection 需要 domain workflow、feedback source 與 intelligence judgment 一起判斷。 |
-| `route.skill.app-development-guidance` | `skills/app-development-guidance/SKILL.md` | `source-backed` | App development guidance 需要 skill entrypoint、workflow 與 domain-specific controls/checklists routing。 |
-| `route.skill.travel-planning` | `skills/travel-planning/SKILL.md` | `source-backed` | Travel planning 需要 skill entrypoint、workflow 與 domain-specific sources/tools routing。 |
-| `route.runtime.onboarding` | `runtime/onboarding/README.md` | `summary-first` | Onboarding 文件在需要執行對應 skill 的完整流程時才讀取。 |
+| `route.workflow.software-delivery` | `workflow/software-delivery/execution-flow.md` | `source-backed` | App development guidance 需要 workflow、analysis methods 與 domain-specific controls/checklists routing。 |
+| `route.workflow.travel-planning` | `workflow/travel-planning/execution-flow.md` | `source-backed` | Travel planning 需要 workflow、analysis methods 與 domain-specific intelligence routing。 |
+| `route.runtime.onboarding` | `runtime/onboarding/README.md` | `summary-first` | Onboarding 文件在需要執行對應 workflow 的完整流程時才讀取。 |
 | `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `summary-first` | 需要執行對應操作流程時才讀取完整 workflow。 |
 | `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/analytical-reasoning/README.md` | `summary-first` | 需要對應決策智慧時才讀取完整 atom。 |
 | `route.validation.ai-decision-contract` | `validation/README.md` | `summary-first` | 需要驗證 AI 決策品質時才讀取完整 scenario 與 rule 定義。 |
@@ -61,7 +61,7 @@
 | Compression level | Routes | Escalation note |
 | --- | --- | --- |
 | `index-only` | `route.skill.discovery`, `route.runtime.activation-rules`, `route.runtime.context-ttl`, `route.runtime.router-flow`, `route.intelligence.engineering.heuristics`, `route.runtime.context-ttl-doc`, `route.intelligence.engineering.agent-architecture`, `route.feedback.history`, `route.evaluations.scenario-results`, `route.tools.metadata-routing`, `route.traces.decision-traces` | 依 `models/compression/README.md` 的 escalation rules 判斷。 |
-| `source-backed` | `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.skill.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing`, `route.skill.app-development-guidance`, `route.skill.travel-planning` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
+| `source-backed` | `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.workflow.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing`, `route.workflow.software-delivery`, `route.workflow.travel-planning` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
 | `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.context-loading`, `route.workflow.documentation-ai-native`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.intelligence.apk-analysis.atoms`, `route.validation.ai-decision-contract`, `route.decisions.adr`, `route.architecture.permanent-docs`, `route.anti-patterns.runtime-patterns` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
 
 ## Agent Output Shape

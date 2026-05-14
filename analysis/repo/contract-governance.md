@@ -1,6 +1,6 @@
 # Contract Governance Gate
 
-從 [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md) 提取。當分析一個 repository 並需要定義文件間的優先順序與衝突處理規則時，使用本方法。
+從 [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md)（已刪除）提取。當分析一個 repository 並需要定義文件間的優先順序與衝突處理規則時，使用本方法。
 
 ## 適用時機
 
@@ -47,4 +47,4 @@
 - `workflow/repo-analysis/` 引用本方法作為分析步驟的具體實作。
 - `analysis/repo/documentation-backfill.md` 提供文件恢復的完整流程。
 - `analysis/repo/traceability-gate.md` 提供追溯連結的建立方法。
-- `skills/app-development-guidance/process/README.md` 是原始來源，已不再作為 active entrypoint。
+- `skills/app-development-guidance/process/README.md` 是原始來源，已刪除。內容已由本文件承接。

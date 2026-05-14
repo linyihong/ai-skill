@@ -25,20 +25,23 @@
 - `analysis/repo/README.md` 提供 repository 分析的具體方法（靜態結構分析、依賴分析、entrypoint 追蹤、技術債評估）。本 workflow 引用這些方法，但不複製方法細節。
 - `intelligence/engineering/architecture/` 可承接從 repo 分析中萃取的架構判斷。
 - `intelligence/engineering/domain/` 可承接從 repo 分析中萃取的領域模型理解。
-- `skills/` 是原始 skill 目錄，內容已逐步遷移至本層。新內容應直接寫入本層。
+- `skills/` 是原始 skill 目錄，已逐步遷移至新分層。舊 `skills/app-development-guidance/` 已刪除。
 
-## 第一批候選遷移來源
+## 遷移狀態
 
-- `skills/app-development-guidance/process/README.md` — 已提取 Existing Project Documentation Backfill 到 `analysis/repo/documentation-backfill.md`。
-- `plans/archived/next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明。
+| 來源 | 目標 | 狀態 |
+| --- | --- | --- |
+| `skills/app-development-guidance/process/README.md` §Existing Project Documentation Backfill | `analysis/repo/documentation-backfill.md` | ✅ 已遷移，舊目錄已刪除 |
+| `skills/app-development-guidance/process/README.md` §Traceability Gate | `analysis/repo/traceability-gate.md` | ✅ 已遷移，舊目錄已刪除 |
+| `skills/app-development-guidance/process/README.md` §Contract Governance Gate | `analysis/repo/contract-governance.md` | ✅ 已遷移，舊目錄已刪除 |
 
 ## 已提取內容
 
 | 來源 | 目標 | 內容 |
 | --- | --- | --- |
-| `skills/app-development-guidance/process/README.md` §Existing Project Documentation Backfill | `analysis/repo/documentation-backfill.md` | 已實作專案的文件恢復方法（8 種文件、6 種 pipeline artifact、7 步順序） |
-| `skills/app-development-guidance/process/README.md` §Traceability Gate | `analysis/repo/traceability-gate.md` | 文件追溯性建立方法（5 種連結、stable ID、未實作標記） |
-| `skills/app-development-guidance/process/README.md` §Contract Governance Gate | `analysis/repo/contract-governance.md` | 文件優先順序與衝突處理規則 |
+| `skills/app-development-guidance/process/README.md`（已刪除）§Existing Project Documentation Backfill | `analysis/repo/documentation-backfill.md` | 已實作專案的文件恢復方法（8 種文件、6 種 pipeline artifact、7 步順序） |
+| `skills/app-development-guidance/process/README.md`（已刪除）§Traceability Gate | `analysis/repo/traceability-gate.md` | 文件追溯性建立方法（5 種連結、stable ID、未實作標記） |
+| `skills/app-development-guidance/process/README.md`（已刪除）§Contract Governance Gate | `analysis/repo/contract-governance.md` | 文件優先順序與衝突處理規則 |
 
 ## 建議 Workflow 流程
 

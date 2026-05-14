@@ -5,10 +5,6 @@ summary: >
   描述 apk-analysis pilot migration map 與舊 skill entrypoint、新 analysis/workflow/intelligence
   候選目的地、summary 和 routing registry 的關係。
 edges:
-  - type: preserves_entrypoint
-    target: skills/apk-analysis/SKILL.md
-    reason: Pilot 期間 `skills/apk-analysis/SKILL.md` 仍是工具觸發、授權邊界與 active skill entrypoint。
-    validation: architecture/apk-analysis-pilot-migration.md 明確保留 old entrypoint；knowledge index 與 registry 也指向 old skill source。
   - type: related_to
     target: analysis/apk/README.md
     reason: 候選 analysis layer 保存 APK observation、traffic/runtime triage 與 pattern extraction 方法。

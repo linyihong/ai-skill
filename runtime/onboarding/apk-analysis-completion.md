@@ -2,7 +2,7 @@
 
 本文件定義新 APK 分析專案的完成門檻。承接 [`workflow/apk-analysis/execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) 與 [`workflow/apk-analysis/artifact-gates.md`](../../workflow/apk-analysis/artifact-gates.md) 的內容，提取為 tool-neutral 的 runtime completion gates。
 
-> **遷移狀態**：此文件為新分層的 reference target，舊 `skills/apk-analysis/` 已不再作為 active entrypoint。新內容請直接寫入此文件。
+> **遷移狀態**：此文件為新分層的 reference target，舊 `skills/apk-analysis/` 已刪除。新內容請直接寫入此文件。
 
 ## 初步分析完成定義
 
@@ -33,4 +33,4 @@
 
 - `workflow/apk-analysis/execution-flow.md` 提供詳細的分析執行步驟，本文件定義何時算完成。
 - `workflow/apk-analysis/artifact-gates.md` 提供產出規範與品質門檻。
-- `skills/apk-analysis/RUNBOOK.md` 是原始來源，已不再作為 active entrypoint（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。
+- `skills/apk-analysis/RUNBOOK.md` 是原始來源，已刪除。內容已遷移至本文件與 `workflow/apk-analysis/`。

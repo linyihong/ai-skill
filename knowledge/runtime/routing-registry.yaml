@@ -211,38 +211,38 @@ records:
       compression_level: source-backed
       reason: 建立或修改 atom metadata 時需讀 schema 與子規則全文。
 
-  - id: route.skill.apk-analysis
+  - id: route.workflow.apk-analysis
     task_intent: 執行授權 APK analysis 能力
-    primary_source: skills/apk-analysis/SKILL.md
+    primary_source: workflow/apk-analysis/execution-flow.md
     required_dependencies:
-      - skills/apk-analysis/README.md
-      - skills/apk-analysis/WORKFLOW.md
+      - workflow/apk-analysis/artifact-gates.md
       - enforcement/README.md
       - enforcement/dependency-reading.md
     candidate_sources:
-      - plans/archived/apk-analysis-pilot-migration.md
       - analysis/apk/README.md
-      - workflow/apk-analysis/README.md
+      - analysis/apk/traffic-triage.md
+      - analysis/apk/tools-and-failures.md
+      - analysis/apk/workflows/README.md
       - intelligence/engineering/analytical-reasoning/README.md
       - knowledge/summaries/apk-analysis-pilot.md
       - knowledge/graphs/apk-analysis-pilot.yaml
-    source_of_truth_gate: old-skill-entrypoint-active
-    ranking_reason: apk-analysis 仍以 skill entrypoint 作為工具觸發與授權邊界；新分層目前只作候選目的地與 mapping。
-    validation_signal: 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。
+    source_of_truth_gate: new-layer-promoted
+    ranking_reason: apk-analysis 已從舊 skills/ 遷移至新分層，workflow/apk-analysis/ 為 active entrypoint。
+    validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離。
     metadata:
       priority: P2
-      confidence: medium
+      confidence: high
       context_cost:
-        estimated_tokens: 4500
+        estimated_tokens: 3500
         load_strategy: lazy
         cacheable: true
         ttl:
           task: 1
-      compatibility_state: old-entrypoint-active
+      compatibility_state: new-layer-promoted
     model:
       profile: specialized
       compression_level: source-backed
-      reason: APK analysis 需要 skill entrypoint、workflow 與 domain-specific technique routing。
+      reason: APK analysis 需要 workflow、analysis methods 與 domain-specific intelligence routing。
 
   - id: route.intelligence.apk-highest-leverage-path
     task_intent: 選擇 APK 分析最高收益路線
@@ -423,11 +423,11 @@ records:
       compression_level: index-only
       reason: TTL doc 是設計文件，需要 prune context 時才讀。
 
-  - id: route.skill.app-development-guidance
+  - id: route.workflow.software-delivery
     task_intent: 產出 app/API/embedded development guidance
-    primary_source: skills/app-development-guidance/SKILL.md
+    primary_source: workflow/software-delivery/execution-flow.md
     required_dependencies:
-      - skills/app-development-guidance/README.md
+      - workflow/software-delivery/artifact-gates.md
       - enforcement/README.md
     candidate_sources:
       - analysis/development-guidance/README.md
@@ -435,53 +435,53 @@ records:
       - intelligence/engineering/development/README.md
       - knowledge/summaries/development-guidance.md
       - knowledge/graphs/workflow-software-delivery.yaml
-    source_of_truth_gate: old-skill-entrypoint-active
-    ranking_reason: app-development-guidance 仍以 skill entrypoint 作為工具觸發與授權邊界；新分層目前只作候選目的地與 mapping。
-    validation_signal: 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。
+    source_of_truth_gate: new-layer-promoted
+    ranking_reason: app-development-guidance 已從舊 skills/ 遷移至新分層，workflow/software-delivery/ 為 active entrypoint。
+    validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離。
     metadata:
       priority: P2
-      confidence: medium
+      confidence: high
       context_cost:
         estimated_tokens: 3500
         load_strategy: lazy
         cacheable: true
         ttl:
           task: 1
-      compatibility_state: old-entrypoint-active
+      compatibility_state: new-layer-promoted
     model:
       profile: specialized
       compression_level: source-backed
-      reason: App development guidance 需要 skill entrypoint、workflow 與 domain-specific controls/checklists routing。
+      reason: App development guidance 需要 workflow、analysis methods 與 domain-specific controls/checklists routing。
 
-  - id: route.skill.travel-planning
+  - id: route.workflow.travel-planning
     task_intent: 規劃 evidence-based travel itinerary
-    primary_source: skills/travel-planning/SKILL.md
+    primary_source: workflow/travel-planning/execution-flow.md
     required_dependencies:
-      - skills/travel-planning/README.md
+      - workflow/travel-planning/artifact-gates.md
       - enforcement/README.md
     candidate_sources:
       - analysis/travel/README.md
-      - workflow/travel-planning/README.md
+      - analysis/travel/sources-and-tools.md
       - intelligence/travel/README.md
       - knowledge/summaries/travel-planning.md
       - knowledge/graphs/workflow-travel-planning.yaml
-    source_of_truth_gate: old-skill-entrypoint-active
-    ranking_reason: travel-planning 仍以 skill entrypoint 作為工具觸發與授權邊界；新分層目前只作候選目的地與 mapping。
-    validation_signal: 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。
+    source_of_truth_gate: new-layer-promoted
+    ranking_reason: travel-planning 已從舊 skills/ 遷移至新分層，workflow/travel-planning/ 為 active entrypoint。
+    validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離。
     metadata:
       priority: P2
-      confidence: medium
+      confidence: high
       context_cost:
         estimated_tokens: 2800
         load_strategy: lazy
         cacheable: true
         ttl:
           task: 1
-      compatibility_state: old-entrypoint-active
+      compatibility_state: new-layer-promoted
     model:
       profile: specialized
       compression_level: source-backed
-      reason: Travel planning 需要 skill entrypoint、workflow 與 domain-specific sources/tools routing。
+      reason: Travel planning 需要 workflow、analysis methods 與 domain-specific intelligence routing。
 
   - id: route.workflow.documentation-ai-native
     task_intent: 在業務專案或其他 repo 撰寫或整理 agent 友善文件、降低無效 token、建立穩定分類與索引
@@ -520,37 +520,37 @@ records:
     task_intent: 新 session 或新專案的快速啟動指引
     primary_source: runtime/onboarding/README.md
     required_dependencies:
-      - skills/apk-analysis/SKILL.md
-      - skills/app-development-guidance/SKILL.md
-      - skills/travel-planning/SKILL.md
+      - workflow/apk-analysis/execution-flow.md
+      - workflow/software-delivery/execution-flow.md
+      - workflow/travel-planning/execution-flow.md
     candidate_sources:
       - runtime/onboarding/apk-analysis-setup.md
       - runtime/onboarding/apk-analysis-completion.md
       - knowledge/graphs/runtime-onboarding.yaml
-    source_of_truth_gate: old-skill-entrypoint-active
-    ranking_reason: onboarding 文件從 SKILL.md 的 Quick Start 提取，提供更詳細的逐步指引，但 skill entrypoint 仍為授權邊界。
-    validation_signal: 各 quickstart 的步驟可依序執行，且與對應 SKILL.md 的 Quick Start 摘要一致。
+    source_of_truth_gate: new-layer-promoted
+    ranking_reason: onboarding 文件從新分層 workflow 提取，提供更詳細的逐步指引。
+    validation_signal: 各 quickstart 的步驟可依序執行，且與對應 workflow 的內容一致。
     metadata:
       priority: P2
-      confidence: medium
+      confidence: high
       context_cost:
         estimated_tokens: 2500
         load_strategy: lazy
         cacheable: true
         ttl:
           task: 1
-      compatibility_state: old-entrypoint-active
+      compatibility_state: new-layer-promoted
     model:
       profile: specialized
       compression_level: summary-first
-      reason: Onboarding 文件在需要執行對應 skill 的完整流程時才讀取。
+      reason: Onboarding 文件在需要執行對應 workflow 的完整流程時才讀取。
 
   - id: route.analysis.apk.workflows
     task_intent: 執行 APK 分析操作流程（Frida hook、API 文件化、local proxy、media HLS）
     primary_source: analysis/apk/workflows/README.md
     required_dependencies:
       - analysis/apk/README.md
-      - skills/apk-analysis/SKILL.md
+      - workflow/apk-analysis/execution-flow.md
     candidate_sources:
       - analysis/apk/workflows/frida-hook-flow.md
       - analysis/apk/workflows/http-api-documentation-flow.md
@@ -558,19 +558,19 @@ records:
       - analysis/apk/workflows/media-hls-analysis-flow.md
       - intelligence/engineering/analytical-reasoning/heuristics/hook-selection.md
       - intelligence/engineering/analytical-reasoning/signals/flutter-dart-aot-detection.md
-    source_of_truth_gate: old-skill-entrypoint-active
-    ranking_reason: 操作流程從 techniques/ 分解而來，提供 step-by-step 執行指引，但 skill entrypoint 仍為授權邊界。
+    source_of_truth_gate: new-layer-promoted
+    ranking_reason: 操作流程從 techniques/ 分解而來，提供 step-by-step 執行指引，新分層為 active entrypoint。
     validation_signal: 各 workflow 有明確步驟與產出格式，可依序執行。
     metadata:
       priority: P2
-      confidence: medium
+      confidence: high
       context_cost:
         estimated_tokens: 3000
         load_strategy: lazy
         cacheable: true
         ttl:
           task: 1
-      compatibility_state: old-entrypoint-active
+      compatibility_state: new-layer-promoted
     model:
       profile: specialized
       compression_level: summary-first
@@ -580,7 +580,7 @@ records:
     task_intent: 套用 APK 分析工程智慧（heuristics、anti-patterns、failure、signals）
     primary_source: intelligence/engineering/analytical-reasoning/README.md
     required_dependencies:
-      - skills/apk-analysis/SKILL.md
+      - workflow/apk-analysis/execution-flow.md
       - analysis/apk/README.md
     candidate_sources:
       - intelligence/engineering/analytical-reasoning/heuristics/README.md
@@ -593,19 +593,19 @@ records:
       - intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md
       - intelligence/engineering/analytical-reasoning/live-readiness-gates.md
       - knowledge/graphs/intelligence-apk-analysis-atoms.yaml
-    source_of_truth_gate: old-skill-entrypoint-active
-    ranking_reason: intelligence atoms 從 techniques/ 分解而來，提供決策智慧，但 skill entrypoint 仍為授權邊界。
+    source_of_truth_gate: new-layer-promoted
+    ranking_reason: intelligence atoms 從 techniques/ 分解而來，提供決策智慧，新分層為 active entrypoint。
     validation_signal: 各 atom 有明確決策表或信號表，可反查驗證。
     metadata:
       priority: P2
-      confidence: medium
+      confidence: high
       context_cost:
         estimated_tokens: 2000
         load_strategy: lazy
         cacheable: true
         ttl:
           task: 1
-      compatibility_state: old-entrypoint-active
+      compatibility_state: new-layer-promoted
     model:
       profile: specialized
       compression_level: summary-first
