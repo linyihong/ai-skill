@@ -4,6 +4,34 @@
 > **Role**: 定義 AI agent 必須遵守的執行政策
 > **Position**: `governance/` (Policy Architecture) → `enforcement/` (Runtime Enforcement) → `runtime/` (Runtime Engine)
 
+## 範圍邊界（Scope Boundary）
+
+### ✅ 什麼該放這裡
+
+- **AI agent 必須遵守的執行政策**：跨 skill 共用的強制規則，例如授權範圍、去敏規則、依賴讀取鐵則、連動更新義務
+- **Core Bootstrap 規則**：每個 session 啟動時必須載入的規則（rule-weight、dependency-reading、conversation-goal-ledger）
+- **Lazy-load 規則**：依條件 activate 的規則（linked-updates、failure-learning、sanitization、feedback-lessons 等）
+- **Failure Patterns**：跨 skill 可重用的 agent 失效模式（`failure-patterns/`）
+- **Runtime Activation Model**：定義 Core Bootstrap + Lazy-load 的載入策略
+
+### ❌ 什麼不該放這裡
+
+- **知識治理的架構設計** → 放 [`governance/`](../governance/README.md)（生命週期、驗證關卡、清理策略、萃取管線）
+- **AI 系統的動態載入與路由實作** → 放 [`runtime/`](../runtime/README.md)（context routing、activation rules、onboarding）
+- **可重用的工程智慧（heuristics、signals、tradeoffs）** → 放 [`intelligence/`](../intelligence/README.md)
+- **專案特定的 incident 證據** → 放 [`feedback/history/`](../feedback/history/) 或專案文件
+- **工具特定的設定與同步腳本** → 放 [`ai-tools/`](../ai-tools/README.md) 或工具設定檔
+- **業務專案的分析產出** → 放 [`analysis/`](../analysis/README.md)
+
+### 層間互動規則
+
+1. `governance/` 定義 `enforcement/` 的治理架構（如何建立/更新/廢棄規則），但不定義規則的具體內容。
+2. `enforcement/` 定義 `runtime/` 的載入政策（哪些必讀、何時 activate），但不定義如何載入。
+3. `runtime/` 實作 `enforcement/` 的載入要求，但不定義載入什麼。
+4. 上層可引用下層（governance → enforcement → runtime），下層不應反向引用上層的具體內容。
+
+---
+
 本目錄放**所有 skill 共用**的政策與約定，依主題分檔維護。**不要**在每一則 `feedback_history` lesson 裡重複貼上全文；條目頂部用相對路徑**連回此處**即可（模板與檔名規則見 [feedback-lessons.md](feedback-lessons.md)）。
 
 ## Agents（必讀）
