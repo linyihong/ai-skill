@@ -1,4 +1,4 @@
-# APK Traffic & Runtime Path Triage
+# APK 流量與執行路徑分流
 
 本文件定義如何判斷 APK 的網路流量走哪一層。這是所有 APK 分析的第一步，在選擇具體工具或 hook 策略之前。
 
