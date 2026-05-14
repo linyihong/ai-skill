@@ -103,6 +103,7 @@ AI_SKILL_SYNC_CURSOR_BUNDLE=1 ./scripts/ai-skill-close-loop.sh --commit
 - 若存在 merge / rebase / cherry-pick 狀態，腳本會停止。
 - 若 dirty path 無法歸到 `architecture`（含下一階段 top-level 分層）、`shared-rules`、`scripts`、`ai-tools`、`.cursor/rules` 或某個 `skills/<name>` owner，腳本會停止。
 - 預設只 dry-run；必須明確加 `--commit` / `--push` 才會寫入 git。
+- 根目錄 `CONTRIBUTING.md` 與 `README.md`、`enforcement/`、`.gitignore` 同屬 `shared` owner group（見 `group_for_path` in `ai-skill-close-loop.sh`）。
 
 ## Conversation goal ledger helper
 

@@ -168,7 +168,7 @@ group_for_path() {
   case "${path}" in
     .cursor/rules/*|ai-tools/*) echo "tooling" ;;
     architecture/*|analysis/*|intelligence/*|workflow/*|runtime/*|memory/*|feedback/*|models/*|governance/*|knowledge/*|metadata/*) echo "architecture" ;;
-    enforcement/*|README.md|.gitignore) echo "shared" ;;
+    enforcement/*|README.md|CONTRIBUTING.md|.gitignore) echo "shared" ;;
     scripts/*) echo "scripts" ;;
     skills/apk-analysis/*) echo "apk-analysis" ;;
     skills/app-development-guidance/*) echo "app-development-guidance" ;;
