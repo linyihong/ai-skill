@@ -281,8 +281,12 @@ ruby scripts/validate-knowledge-runtime.rb
    - 不得包含 project-specific evidence（依 [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md)）
 3. ✅ `git diff` 檢查將提交的內容，確認上述去敏項目已處理
 4. ✅ 執行適用的 lints / Markdown link check / required linked updates 檢查
-5. ✅ 若本輪使用或更新 tool mirror，執行對應 tool sync；reference-only 只需確認 `<AI_SKILL_REPO>` 可讀
-6. ✅ 若有多個 owner group，使用 `scripts/ai-skill-close-loop.sh --commit` 分組提交
+5. ✅ **目錄結構命名檢查** — 若本輪涉及新增或改名目錄，執行 `scripts/validate-knowledge-runtime.rb` 的 `validate_directory_naming`：
+   - 檢查 `intelligence/engineering/` 下是否有與根目錄同名的目錄（跨層名稱衝突）
+   - 檢查目錄名稱是否為舊技能名稱的縮寫（慣性命名）
+   - 檢查目錄深度是否超過 4 層
+6. ✅ 若本輪使用或更新 tool mirror，執行對應 tool sync；reference-only 只需確認 `<AI_SKILL_REPO>` 可讀
+7. ✅ 若有多個 owner group，使用 `scripts/ai-skill-close-loop.sh --commit` 分組提交
 
 ---
 

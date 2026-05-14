@@ -1,0 +1,97 @@
+# Directory Naming Governance Scenario
+# 測試 AI 在新增或改名目錄時，是否執行 directory-structure-governance.md 定義的
+# 5 步驟 Checkpoint：
+#   1. Name Conflict Check — 新目錄名稱是否與其他層同名？
+#   2. Boundary Clarity Check — 目錄邊界是否清晰？
+#   3. Inertial Naming Check — 命名是否只是沿用舊技能名稱？
+#   4. Path Depth Check — 目錄深度是否合理？
+#   5. Global Reference Impact Assessment — 改名會影響多少外部檔案？
+#
+# 來源架構變更：
+#   - governance/lifecycle/directory-structure-governance.md 新增（2026-05-14）
+#   - 要求新增/改名目錄前執行 5 步驟 Checkpoint
+#   - 要求 validate-knowledge-runtime.rb 新增 validate_directory_naming 檢查
+#
+# 原始錯誤模式：
+#   1. intelligence/engineering/analysis/ 與根目錄 analysis/ 同名但內容本質不同
+#   2. intelligence/engineering/anti-patterns/ 與根目錄 anti-patterns/ 同名
+#   3. 目錄命名沿用舊技能名稱（apk-analysis → analysis），未反映內容本質
+#   4. 改名後未更新全庫外部引用
+
+id: directory-naming-governance-v1
+domain: cross-domain
+type: directory-structure / naming-governance
+priority: P1
+
+failure_source:
+  class: naming-conflict / inertial-naming / incomplete-linked-updates
+  date: "2026-05-14"
+  description: >
+    在新增或改名 intelligence/engineering/ 下的目錄時，AI 可能：
+    (a) 使用與根目錄或其他層同名的名稱（如 analysis/、anti-patterns/），
+        造成 agent 無法判斷文件歸屬；
+    (b) 沿用舊技能名稱的縮寫（如 apk-analysis → analysis），
+        未反映內容本質（analytical-reasoning）；
+    (c) 改名後未更新全庫外部檔案引用，
+        導致 broken links 和 agent 導航錯誤。
+
+given:
+  task: rename_or_create_knowledge_directory
+  artifacts:
+    - governance/lifecycle/directory-structure-governance.md  # 5 步驟 Checkpoint 定義
+    - governance/lifecycle/knowledge-update-flow.md           # 知識更新流程（Step 1 觸發）
+    - governance/lifecycle/README.md                          # 生命週期入口
+    - shared-rules/linked-updates.md                          # 連動更新規則
+    - scripts/validate-knowledge-runtime.rb                   # Validator（含 validate_directory_naming）
+  signals:
+    - 需要在 intelligence/engineering/ 下新增 domain 目錄
+    - 需要改名 intelligence/engineering/ 下的既有目錄
+    - 新目錄名稱與根目錄或其他層的目錄名稱相同
+    - 新目錄名稱是舊技能名稱的縮寫或簡化版本
+    - 改名會影響多個外部檔案的路徑引用
+  constraints:
+    - 目錄改名後，所有外部引用必須同步更新
+    - 目錄名稱必須反映內容本質，而非來源技能名稱
+
+when:
+  action: apply_directory_naming_governance
+
+then:
+  expected_route:
+    - detect_directory_change_intent
+    - run_name_conflict_check
+    - run_boundary_clarity_check
+    - run_inertial_naming_check
+    - run_path_depth_check
+    - run_global_reference_impact_assessment
+    - create_linked_updates_plan
+    - execute_rename_with_full_reference_update
+    - run_validate_knowledge_runtime
+
+  expected_heuristics:
+    - directory-naming-governance
+    - cross-layer-name-conflict-detection
+    - inertial-naming-detection
+    - linked-updates-completeness
+
+  forbidden_routes:
+    - rename_without_name_conflict_check       # 禁止改名但不檢查跨層同名衝突
+    - rename_without_inertial_naming_check     # 禁止改名但不檢查慣性命名
+    - rename_without_linked_updates            # 禁止改名但不更新全庫外部引用
+    - create_dir_without_boundary_clarity      # 禁止新增目錄但不定義邊界
+    - skip_validate_knowledge_runtime          # 禁止不執行 validator
+
+  expected_final_route: |
+    intelligence/engineering/<domain>/README.md  (含邊界說明)
+    governance/lifecycle/directory-structure-governance.md  (5 步驟 Checkpoint 已執行)
+    shared-rules/linked-updates.md  (連動更新計畫已執行)
+    scripts/validate-knowledge-runtime.rb  (validate_directory_naming 已通過)
+
+  expected_intelligence:
+    - governance/lifecycle/directory-structure-governance.md
+    - governance/lifecycle/knowledge-update-flow.md
+    - shared-rules/linked-updates.md
+    - scripts/validate-knowledge-runtime.rb
+
+  unexpected_intelligence:
+    - (none — 所有相關文件都應被讀取)

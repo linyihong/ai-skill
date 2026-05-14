@@ -4,6 +4,7 @@
 
 require "date"
 require "pathname"
+require "set"
 require "yaml"
 
 ROOT = Pathname.new(__dir__).parent.realpath
@@ -382,6 +383,82 @@ def validate_directory_structure
   COUNTS[:intelligence_domains] = eng_domains + top_domains
   COUNTS[:analysis_domains] = Dir.glob((ROOT + "analysis/*").to_s).count { |p| File.directory?(p) }
   COUNTS[:workflow_domains] = Dir.glob((ROOT + "workflow/*").to_s).count { |p| File.directory?(p) }
+end
+
+def validate_directory_naming
+  # ── Allowlist ──────────────────────────────────────────────────────────────
+  # Pre-existing directories with clear boundary documentation in their README.md.
+  # These are intentionally named to match a top-level category but have distinct
+  # content scope (e.g., engineering anti-patterns vs agent operation anti-patterns).
+  # New directories should NOT be added here — they should use distinct names.
+  allowed_same_name_dirs = %w[
+    anti-patterns
+    architecture
+  ].to_set
+
+  # Check 1: Same-name cross-layer conflict detection
+  # Detect directories under intelligence/engineering/ that share a name with
+  # top-level directories (e.g., intelligence/engineering/anti-patterns/ vs anti-patterns/).
+  # This is a naming governance violation — the name should reflect content essence,
+  # not just reuse an existing category name.
+  top_level_dirs = ROOT.each_child
+                       .select { |d| d.directory? && !d.basename.to_s.start_with?(".") }
+                       .map { |d| d.basename.to_s }
+                       .to_set
+
+  eng_dir = ROOT + "intelligence/engineering"
+  if eng_dir.exist?
+    eng_dir.each_child do |domain_dir|
+      next unless domain_dir.directory?
+      dirname = domain_dir.basename.to_s
+      next if dirname.start_with?(".")
+      next if allowed_same_name_dirs.include?(dirname)
+
+      if top_level_dirs.include?(dirname)
+        add_error("#{rel(domain_dir)}: same-name cross-layer conflict — '#{dirname}' also exists as top-level directory '#{dirname}/'. " \
+                  "Rename to reflect content essence (see governance/lifecycle/directory-structure-governance.md Step 1)")
+      end
+    end
+  end
+
+  # Check 2: Inertial naming detection
+  # Detect directory names that appear to be shortened versions of old skill names
+  # rather than reflecting content essence. This is a heuristic check based on
+  # known old skill names.
+  old_skill_names = %w[apk-analysis app-development-guidance travel-planning repo-analysis]
+  if eng_dir.exist?
+    eng_dir.each_child do |domain_dir|
+      next unless domain_dir.directory?
+      dirname = domain_dir.basename.to_s
+
+      # Check if dirname is a prefix/shortened form of an old skill name
+      old_skill_names.each do |skill|
+        # e.g., "analysis" is a prefix of "apk-analysis" or "repo-analysis"
+        if skill.start_with?(dirname) && skill != dirname
+          add_error("#{rel(domain_dir)}: possible inertial naming — '#{dirname}' is a prefix of old skill '#{skill}'. " \
+                    "Rename to reflect content essence, not source skill name (see governance/lifecycle/directory-structure-governance.md Step 3)")
+        end
+      end
+    end
+  end
+
+  # Check 3: Path depth warning
+  # Detect directories deeper than 4 levels from root (excluding root itself).
+  # Deep nesting makes navigation harder and increases cognitive load.
+  max_depth = 4
+  Dir.glob((ROOT + "**/*/").to_s).sort.each do |dir_path|
+    next if dir_path.include?(".git/")
+    next if dir_path.include?("node_modules/")
+
+    dir = Pathname.new(dir_path)
+    relative = dir.relative_path_from(ROOT).to_s
+    depth = relative.split.length
+
+    if depth > max_depth
+      add_error("#{relative}: path depth #{depth} exceeds maximum #{max_depth}. " \
+                "Consider flattening the directory structure (see governance/lifecycle/directory-structure-governance.md Step 4)")
+    end
+  end
 end
 
 def validate_no_outdated_active_entrypoint
@@ -825,6 +902,7 @@ validate_refresh_policy
 validate_summaries
 validate_graphs
 validate_directory_structure
+validate_directory_naming
 validate_intelligence_classification_boundary
 validate_intelligence_entry_solution_crossref
 validate_failure_pattern_validator_coverage
