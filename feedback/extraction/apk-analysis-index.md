@@ -133,6 +133,14 @@
 | `common/2026-05-07_131000-highest-leverage-analysis-path.md` | candidate | Highest leverage analysis path | ✅ | `intelligence/engineering/apk-analysis/heuristics/` |
 | `flutter-dart-aot/2026-05-01_145948-dart-aot-callsite-hooks-are-not-function-hooks.md` | validated | Dart AOT Callsite Hooks Are Not Function Hooks | ✅ | `intelligence/engineering/apk-analysis/heuristics/` |
 | `flutter-dart-aot/2026-05-07_135100-entry-boundary-before-unstable-aot-hooks.md` | candidate | Entry boundary before unstable AOT hooks | ✅ | `intelligence/engineering/apk-analysis/heuristics/` |
+| `http-api/2026-05-01_171650-ui-architecture-map-from-screenshots.md` | validated | UI Architecture Map from screenshots | ✅ | `intelligence/engineering/apk-analysis/heuristics/ui-operation-stability.md` |
+| `http-api/2026-05-05_183400-ui-automation-operation-scripts-for-api-capture.md` | validated | UI automation operation scripts for API capture | ✅ | `intelligence/engineering/apk-analysis/heuristics/ui-operation-stability.md` |
+| `http-api/2026-05-05_183700-scrollable-clickable-screen-mapping.md` | validated | Scrollable clickable screen mapping | ✅ | `intelligence/engineering/apk-analysis/heuristics/ui-operation-stability.md` |
+| `common/2026-05-07_124100-ui-fast-path-bounded-scroll.md` | candidate | UI fast path and bounded scroll | ✅ | `intelligence/engineering/apk-analysis/heuristics/ui-operation-stability.md` |
+| `http-api/2026-05-05_184700-screen-reachability-operation-recipes.md` | validated | Screen reachability operation recipes | ✅ | `intelligence/engineering/apk-analysis/heuristics/ui-to-api-attribution.md` |
+| `common/2026-05-07_144300-ui-route-backfill-after-runtime-probe.md` | candidate | UI route backfill after runtime probe | ✅ | `intelligence/engineering/apk-analysis/heuristics/ui-to-api-attribution.md` |
+| `common/2026-05-06_111558-foreground-package-validation.md` | promoted | Foreground package validation | ✅ | `intelligence/engineering/apk-analysis/heuristics/ui-to-api-attribution.md` |
+| `common/2026-05-06_130300-feature-context-validation.md` | promoted | Feature context validation | ✅ | `intelligence/engineering/apk-analysis/heuristics/ui-to-api-attribution.md` |
 
 ### 適合 anti-patterns/
 
@@ -223,12 +231,12 @@
 | 目標層 | lessons 數量 | 已提取 | 未提取 |
 | --- | ---: | ---: | ---: |
 | `workflow/apk-analysis/` | 29 | 29 | 0 |
-| `intelligence/engineering/apk-analysis/` | 9 | 9 | 0 |
+| `intelligence/engineering/apk-analysis/` | 17 | 17 | 0 |
 | `analysis/apk/workflows/` | 12 | 12 | 0 |
 | `analysis/apk/tools-and-failures.md` | 3 | 3 | 0 |
 | `workflow/apk-analysis/artifact-gates.md` | 4 | 4 | 0 |
 | `shared-rules/` | 4 | 4 | 0 |
-| **總計** | **61** | **61** | **0** |
+| **總計** | **69** | **69** | **0** |
 
 ---
 

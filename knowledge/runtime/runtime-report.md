@@ -67,14 +67,14 @@
 | `graph.analysis-layers` | `analysis/README.md` | `candidate` | 17 | [`analysis-layers.yaml`](../graphs/analysis-layers.yaml) |
 | `graph.analysis-repo-methods` | `analysis/repo/README.md` | `candidate` | 8 | [`analysis-repo-methods.yaml`](../graphs/analysis-repo-methods.yaml) |
 | `graph.apk-analysis-pilot` | `architecture/apk-analysis-pilot-migration.md` | `candidate` | 6 | [`apk-analysis-pilot.yaml`](../graphs/apk-analysis-pilot.yaml) |
-| `graph.apk-highest-leverage-analysis` | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md` | `candidate` | 5 | [`apk-highest-leverage-analysis.yaml`](../graphs/apk-highest-leverage-analysis.yaml) |
+| `graph.apk-highest-leverage-analysis` | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md` | `candidate` | 4 | [`apk-highest-leverage-analysis.yaml`](../graphs/apk-highest-leverage-analysis.yaml) |
 | `graph.decisions-adr` | `decisions/README.md` | `candidate` | 9 | [`decisions-adr.yaml`](../graphs/decisions-adr.yaml) |
 | `graph.feedback-layers` | `feedback/README.md` | `candidate` | 9 | [`feedback-layers.yaml`](../graphs/feedback-layers.yaml) |
 | `graph.feedback-promotion-pipeline` | `feedback/promotion/README.md` | `candidate` | 6 | [`feedback-promotion-pipeline.yaml`](../graphs/feedback-promotion-pipeline.yaml) |
 | `graph.governance-layers` | `governance/README.md` | `candidate` | 8 | [`governance-layers.yaml`](../graphs/governance-layers.yaml) |
 | `graph.intelligence-agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `candidate` | 20 | [`intelligence-agent-architecture.yaml`](../graphs/intelligence-agent-architecture.yaml) |
 | `graph.intelligence-anti-patterns` | `intelligence/engineering/anti-patterns/generic-repository-overuse.md` | `candidate` | 5 | [`intelligence-anti-patterns.yaml`](../graphs/intelligence-anti-patterns.yaml) |
-| `graph.intelligence-apk-analysis-atoms` | `intelligence/engineering/apk-analysis/README.md` | `candidate` | 16 | [`intelligence-apk-analysis-atoms.yaml`](../graphs/intelligence-apk-analysis-atoms.yaml) |
+| `graph.intelligence-apk-analysis-atoms` | `intelligence/engineering/apk-analysis/README.md` | `candidate` | 18 | [`intelligence-apk-analysis-atoms.yaml`](../graphs/intelligence-apk-analysis-atoms.yaml) |
 | `graph.intelligence-app-development-guidance` | `intelligence/engineering/app-development-guidance/README.md` | `candidate` | 9 | [`intelligence-app-development-guidance.yaml`](../graphs/intelligence-app-development-guidance.yaml) |
 | `graph.intelligence-architecture` | `intelligence/engineering/architecture/modular-monolith-vs-microservices.md` | `candidate` | 5 | [`intelligence-architecture.yaml`](../graphs/intelligence-architecture.yaml) |
 | `graph.intelligence-business` | `intelligence/business/saas-pricing-heuristics.md` | `candidate` | 3 | [`intelligence-business.yaml`](../graphs/intelligence-business.yaml) |

@@ -23,7 +23,7 @@ intelligence/engineering/apk-analysis/
 | [`evidence-first-routing.md`](evidence-first-routing.md) | `validated` | `skills/apk-analysis/feedback_history/common/` |
 | [`highest-leverage-analysis-path.md`](highest-leverage-analysis-path.md) | `candidate-intelligence` | `skills/apk-analysis/feedback_history/common/2026-05-07_131000-highest-leverage-analysis-path.md` |
 | [`live-readiness-gates.md`](live-readiness-gates.md) | `validated` | `skills/apk-analysis/feedback_history/common/` |
-| [`heuristics/`](heuristics/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/`（已刪除） |
+| [`heuristics/`](heuristics/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/`（已刪除）+ UI operation intelligence extraction |
 | [`anti-patterns/`](anti-patterns/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/`（已刪除） |
 | [`failure/`](failure/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/`（已刪除） |
 | [`signals/`](signals/) | `pilot` | Technique decomposition from `skills/apk-analysis/techniques/`（已刪除） |

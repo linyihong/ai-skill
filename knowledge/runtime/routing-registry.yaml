@@ -554,6 +554,8 @@ records:
       - analysis/apk/README.md
     candidate_sources:
       - intelligence/engineering/apk-analysis/heuristics/README.md
+      - intelligence/engineering/apk-analysis/heuristics/ui-operation-stability.md
+      - intelligence/engineering/apk-analysis/heuristics/ui-to-api-attribution.md
       - intelligence/engineering/apk-analysis/anti-patterns/README.md
       - intelligence/engineering/apk-analysis/failure/README.md
       - intelligence/engineering/apk-analysis/signals/README.md

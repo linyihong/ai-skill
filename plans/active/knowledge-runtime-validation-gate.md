@@ -233,14 +233,14 @@ flowchart LR
 11. ✅ 測試：故意新增 `workflow/test-new-domain/test-file.md` → validator 正確阻擋（missing README.md）
 12. ✅ 測試：故意新增 `workflow/apk-analysis/unlisted-test-file.md` → validator 正確阻擋（not listed in README）
 
-### Phase B: UI Operation Intelligence Extraction（P3）
+### Phase B: UI Operation Intelligence Extraction（✅ 已完成）
 
-1. 建立 `intelligence/engineering/apk-analysis/heuristics/ui-operation-stability.md`
-2. 建立 `intelligence/engineering/apk-analysis/heuristics/ui-to-api-attribution.md`
-3. 更新 `intelligence/engineering/apk-analysis/heuristics/README.md`
-4. 更新 `intelligence/engineering/apk-analysis/README.md`
-5. 更新 `knowledge/graphs/intelligence-apk-analysis-atoms.yaml`
-6. 更新 `knowledge/summaries/apk-analysis-pilot.md`
-7. 更新 `knowledge/runtime/routing-registry.yaml`
-8. 更新 `feedback/extraction/apk-analysis-index.md`
-9. 執行 `ruby scripts/refresh-knowledge-runtime.rb` 確認所有 validator 通過
+1. ✅ 建立 `intelligence/engineering/apk-analysis/heuristics/ui-operation-stability.md`
+2. ✅ 建立 `intelligence/engineering/apk-analysis/heuristics/ui-to-api-attribution.md`
+3. ✅ 更新 `intelligence/engineering/apk-analysis/heuristics/README.md`
+4. ✅ 更新 `intelligence/engineering/apk-analysis/README.md`
+5. ✅ 更新 `knowledge/graphs/intelligence-apk-analysis-atoms.yaml`
+6. ✅ 更新 `knowledge/summaries/apk-analysis-pilot.md`
+7. ✅ 更新 `knowledge/runtime/routing-registry.yaml`
+8. ✅ 更新 `feedback/extraction/apk-analysis-index.md`
+9. ✅ 執行 `ruby scripts/refresh-knowledge-runtime.rb` — 所有 validator 通過（registry_records=22, summaries=14, graphs=29）

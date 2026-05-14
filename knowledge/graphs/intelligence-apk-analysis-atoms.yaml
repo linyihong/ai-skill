@@ -67,6 +67,15 @@ edges:
     validation: atom 定義 Magic Bytes 參考表、靜態 vs 動畫判斷、Container Probe 指令。
 
   - type: related_to
+    target: intelligence/engineering/apk-analysis/heuristics/ui-operation-stability.md
+    reason: UI 操作穩定性啟發式 — 決定何時該用 bounded scroll、operation script、API-first replay 的決策表。
+    validation: atom 定義決策表（5 情境）、來源 lessons（4 筆）、Token 影響。
+  - type: related_to
+    target: intelligence/engineering/apk-analysis/heuristics/ui-to-api-attribution.md
+    reason: UI-to-API 歸因啟發式 — 確保 UI 操作能正確對應到 API 請求，避免 attribution 錯誤的決策表。
+    validation: atom 定義決策表（5 情境）、來源 lessons（4 筆）、Token 影響。
+
+  - type: related_to
     target: workflow/apk-analysis/execution-flow.md
     reason: APK analysis workflow 引用 intelligence atoms 來輔助執行流程中的判斷。
     validation: workflow 提及引用 intelligence/engineering/apk-analysis/。
