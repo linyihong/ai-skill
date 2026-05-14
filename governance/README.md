@@ -35,7 +35,7 @@
 
 ## 與既有層的關係
 
-- `enforcement/` 仍是可執行 governance policy 的 source of truth。
+- `enforcement/` 仍是可執行 governance policy 的 source of truth（例如可重用文件的語言與用語見 [`enforcement/neutral-language.md`](../enforcement/neutral-language.md)；`governance/validation` 以 **Neutral language** gate 掛鉤該規則，而非在 `governance/` 重複條文）。
 - `scripts/` 提供 goal ledger 與 close-loop helper；本層描述治理架構，不取代腳本文件。
 - `metadata/` 提供治理可讀取的 ranking、confidence、compatibility 與 lifecycle 控制資料。
 - `knowledge/` 的 atom、index、summary 與 graph 需要由本層定義維護責任。
