@@ -14,6 +14,10 @@ AI 知識作業系統 — 讓 agent 用最小 token 成本找到正確知識。
 
 詳細啟動流程：[`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md)
 
+## 維護本 repository（人類貢獻者）
+
+`skills-index.yaml` 與 `knowledge/indexes/` 等索引主要給 **agent 依任務路由**；若你要**修改 Ai-skill 本庫**（PR、治理、驗證指令），請從 **[`governance/contributing.md`](governance/contributing.md)** 進入（內含與 [`scripts/README.md`](scripts/README.md)、[`governance/validation/README.md`](governance/validation/README.md) 的連結）。GitHub 慣例入口：[`CONTRIBUTING.md`](CONTRIBUTING.md)。
+
 ## 📂 OS Layout
 
 | 層級 | 路徑 | 用途 |
@@ -68,6 +72,7 @@ Session Start
 
 | Document | Purpose |
 | --- | --- |
+| [`governance/contributing.md`](governance/contributing.md) | Human maintainer entry: validation commands, PR gates, doc index |
 | [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | Minimal bootstrap (3 rules, ~800 tokens) |
 | [`skills-index.yaml`](skills-index.yaml) | Skill routing index |
 | [`plans/archived/next-stage-upgrade-plan.md`](plans/archived/next-stage-upgrade-plan.md) | Full architecture upgrade plan |
