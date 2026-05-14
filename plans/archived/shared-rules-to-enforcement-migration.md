@@ -1,6 +1,6 @@
-# enforcement/ → enforcement/ 搬遷計畫
+# shared-rules/ → enforcement/ 搬遷計畫
 
-Status: `draft`
+Status: `completed`
 Created: 2026-05-14
 Related: [`enforcement/README.md`](../../enforcement/README.md), [`runtime/README.md`](../../runtime/README.md), [`governance/README.md`](../../governance/README.md)
 
