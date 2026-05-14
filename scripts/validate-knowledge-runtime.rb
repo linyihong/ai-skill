@@ -377,6 +377,16 @@ def validate_directory_structure
     end
   end
 
+  # Check that every top-level directory (excluding hidden dirs and files) has a README.md
+  top_level_dirs = ROOT.each_child
+                       .select { |d| d.directory? && !d.basename.to_s.start_with?(".") }
+                       .sort
+  top_level_dirs.each do |dir|
+    dir_rel = rel(dir)
+    readme = dir + "README.md"
+    add_error("#{dir_rel}: missing README.md — every top-level directory must have an entry point") unless readme.exist?
+  end
+
   # Count engineering subdomains + top-level intelligence subdirectories (ide, business, travel, etc.)
   eng_domains = Dir.glob((ROOT + "intelligence/engineering/*").to_s).count { |p| File.directory?(p) }
   top_domains = Dir.glob((ROOT + "intelligence/*").to_s).count { |p| File.directory?(p) && File.basename(p) != "engineering" }
