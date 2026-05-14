@@ -40,7 +40,7 @@ Use this skill when a user wants a practical trip plan that depends on dates, pl
 
 ## Quick Start（Routing）
 
-See [`runtime/onboarding/travel-planning-quickstart.md`](../../runtime/onboarding/travel-planning-quickstart.md) for the full 18-step quick start.
+See [`workflow/travel-planning/execution-flow.md`](../../workflow/travel-planning/execution-flow.md) for the full execution flow.
 
 Routing summary:
 1. Trip frame → 2. Time-sensitive checks → 3. Current web sources → 4. Travel agency tours → 5. Exact location → 6. Stop recommendations → 7. Long-distance transport comparison → 8. Feasible route → 9. Non-driving optimization → 10. Driving cost estimate → 11. Lodging → 12. Route shape check → 13. Schedule feasibility → 14. Fallback plans → 15. Country-specific checks → 16. 車中泊 checks → 17. Calendar/app-ready output → 18. Full itinerary.

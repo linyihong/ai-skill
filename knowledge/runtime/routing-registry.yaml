@@ -493,8 +493,6 @@ records:
     candidate_sources:
       - runtime/onboarding/apk-analysis-setup.md
       - runtime/onboarding/apk-analysis-completion.md
-      - runtime/onboarding/apk-analysis-quickstart.md
-      - runtime/onboarding/travel-planning-quickstart.md
       - knowledge/graphs/runtime-onboarding.yaml
     source_of_truth_gate: old-skill-entrypoint-active
     ranking_reason: onboarding 文件從 SKILL.md 的 Quick Start 提取，提供更詳細的逐步指引，但 skill entrypoint 仍為授權邊界。

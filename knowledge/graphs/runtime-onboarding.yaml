@@ -2,13 +2,12 @@ id: graph.runtime-onboarding
 source: runtime/onboarding/README.md
 status: candidate
 summary: >
-  連接 runtime/onboarding/ 的所有 quickstart 檔案：apk-analysis-setup、
-  apk-analysis-completion、apk-analysis-quickstart、
-  travel-planning-quickstart，以及相關的 skills、workflow 層。
+  連接 runtime/onboarding/ 的 onboarding 檔案：apk-analysis-setup、
+  apk-analysis-completion，以及相關的 skills、workflow 層。
 edges:
   - type: depends_on
     target: runtime/onboarding/README.md
-    reason: Onboarding README 提供目錄索引、scope 與各 quickstart 的關係。
+    reason: Onboarding README 提供目錄索引、scope 與各 onboarding 文件的關係。
     validation: README 定義 onboarding 層的放什麼/不放什麼。
 
   - type: related_to
@@ -20,26 +19,6 @@ edges:
     target: runtime/onboarding/apk-analysis-completion.md
     reason: APK 分析完成定義 — 初步分析完成定義、第一輪分析順序。
     validation: apk-analysis-completion.md 從 skills/apk-analysis/RUNBOOK.md 提取。
-
-  - type: related_to
-    target: runtime/onboarding/apk-analysis-quickstart.md
-    reason: APK 分析 Quick Start 操作步驟 — UI 架構地圖（Page-level artifact rule、Capture Strategy、Navigation Summary、Screen Inventory、Screen Reachability、Interaction Inventory、Operation To API Matrix、Unknown Navigation）與持久化資產轉換。
-    validation: apk-analysis-quickstart.md 從 skills/apk-analysis/SKILL.md Quick Start 步驟 5+7 提取。
-
-  - type: related_to
-    target: runtime/onboarding/travel-planning-quickstart.md
-    reason: Travel Planning Quick Start 18 步驟 — 從 Intake 到 Final Verification 的完整操作流程。
-    validation: travel-planning-quickstart.md 從 skills/travel-planning/SKILL.md Quick Start 提取。
-
-  - type: promotes_from
-    target: skills/apk-analysis/SKILL.md
-    reason: apk-analysis-quickstart.md 從 SKILL.md Quick Start 步驟 5+7 提取。
-    validation: apk-analysis-quickstart.md 的 compatibility notes 標明舊入口維持 active。
-
-  - type: promotes_from
-    target: skills/travel-planning/SKILL.md
-    reason: travel-planning-quickstart.md 從 SKILL.md Quick Start 提取。
-    validation: travel-planning-quickstart.md 的 compatibility notes 標明舊入口維持 active。
 
   - type: preserves_entrypoint
     target: skills/apk-analysis/SKILL.md

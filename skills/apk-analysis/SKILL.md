@@ -17,9 +17,9 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
 2. **Separate method from target facts**: Reusable techniques → this skill folder. Target-specific endpoints, hosts, schemas, findings → project API/reference docs.
 3. **Network path triage**: localhost → whole-device pcap → system proxy/MITM → Java HTTP hooks → Flutter Dart AOT/native paths.
 4. **Route into technique category** only after evidence points there. Use [`techniques/`](techniques/) as category index. If APK type unknown, stay in common workflow.
-5. **Build UI architecture map** → see [`runtime/onboarding/apk-analysis-quickstart.md`](../../runtime/onboarding/apk-analysis-quickstart.md) § 步驟 5.
+5. **Build UI architecture map** → see [`workflow/apk-analysis/execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) § UI Architecture Map.
 6. **Prefer high-semantic hooks**: request object hooks > raw socket hooks; response interceptor/decode hooks > TLS byte reconstruction.
-7. **Convert dynamic results into durable assets** → see [`runtime/onboarding/apk-analysis-quickstart.md`](../../runtime/onboarding/apk-analysis-quickstart.md) § 步驟 7.
+7. **Convert dynamic results into durable assets** → see [`workflow/apk-analysis/artifact-gates.md`](../../workflow/apk-analysis/artifact-gates.md) § Durable Assets.
 8. **Automatic skill feedback** → see [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md) and [`feedback/`](../../feedback/) layer.
 
 ## Default Workflow

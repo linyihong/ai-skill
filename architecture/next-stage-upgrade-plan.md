@@ -398,20 +398,18 @@ Pilot 成功 = AI 開始能做 decision routing：
 |--------|------|------|
 | 32a | 分析 3 個 SKILL.md 的剩餘內容 | ✅ |
 | 32b | 建立 `workflow/travel-planning/artifact-gates.md`（travel-planning 缺少此文件） | ✅ |
-| 32c | 提取 apk-analysis SKILL.md Quick Start 步驟 5+7 → `runtime/onboarding/apk-analysis-quickstart.md` | ✅ |
+| 32c | 提取 apk-analysis SKILL.md Quick Start 步驟 5+7 → `runtime/onboarding/apk-analysis-quickstart.md` | ✅（已刪除：內容已回歸 workflow/apk-analysis/） |
 | 32d | 提取 app-development-guidance SKILL.md Quick Start → `runtime/onboarding/app-development-guidance-quickstart.md` | ✅（已刪除：內容已回歸 workflow/software-delivery/） |
-| 32e | 提取 travel-planning SKILL.md Quick Start → `runtime/onboarding/travel-planning-quickstart.md` | ✅ |
+| 32e | 提取 travel-planning SKILL.md Quick Start → `runtime/onboarding/travel-planning-quickstart.md` | ✅（已刪除：內容已回歸 workflow/travel-planning/） |
 | 32f | 瘦身 3 個 SKILL.md 為純 routing 文件 | ✅ |
 | 32g | 更新 `runtime/onboarding/README.md` + `architecture/next-stage-upgrade-plan.md` | ✅ |
 | 32h | 提交 + push | ✅ |
 
-**建立的新檔案**（4 個）：
+**建立的新檔案**（1 個）：
 
 | 檔案 | 說明 |
 |------|------|
 | `workflow/travel-planning/artifact-gates.md` | Travel Planning 產出規範與品質門檻（19 項必備項目、4 項品質門檻） |
-| `runtime/onboarding/apk-analysis-quickstart.md` | APK 分析 Quick Start 操作步驟（UI 架構地圖 + 持久化資產轉換） |
-| `runtime/onboarding/travel-planning-quickstart.md` | Travel Planning Quick Start 18 步驟 |
 
 **瘦身成果**：
 
@@ -1223,7 +1221,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | Phase 29：其餘 3 個 techniques decomposition | `analysis/apk/workflows/`, `intelligence/engineering/analytical-reasoning/{heuristics,signals}/` | 已完成 http-api、local-proxy、media-hls 拆解（3 workflows + 4 intelligence atoms） | 每個 technique 有 workflow + 1-2 intelligence atoms，舊檔案已標註 |
 | P1 | done | Phase 30：Feedback history 提取 | `feedback/extraction/apk-analysis-index.md`, `feedback/extraction/development-guidance-index.md` | 已完成 101 lessons 索引建立，100% lessons 已對應到目標層 | Category index 已建立，101/101 lessons 已對應到目標層 |
 | P2 | done | Phase 31：Intelligence Extraction Pipeline | `governance/lifecycle/intelligence-extraction-pipeline.md` | 已完成 7-step pipeline（內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引） | Pipeline 文件已建立，已驗證 Technique Decomposition 和 Feedback History Extraction 兩種模式 |
-| P2 | done | Phase 32：SKILL.md 分解 | `runtime/onboarding/apk-analysis-quickstart.md`, `runtime/onboarding/app-development-guidance-quickstart.md`, `runtime/onboarding/travel-planning-quickstart.md`, `workflow/travel-planning/artifact-gates.md` | 已完成 3 個 SKILL.md 瘦身（46-65% 減少），4 個新檔案建立 | SKILL.md 中所有內容已對應到目標層，舊檔案已標註 |
+| P2 | done | Phase 32：SKILL.md 分解 | ~~`runtime/onboarding/apk-analysis-quickstart.md`~~（已刪除）, ~~`runtime/onboarding/app-development-guidance-quickstart.md`~~（已刪除）, ~~`runtime/onboarding/travel-planning-quickstart.md`~~（已刪除）, `workflow/travel-planning/artifact-gates.md` | 已完成 3 個 SKILL.md 瘦身（46-65% 減少），quickstart 檔案已刪除（內容回歸 workflow/） | SKILL.md 中所有內容已對應到目標層，舊檔案已標註 |
 | P4 | done | Phase 33：Skill-Specific Intelligence Extraction（P4） | `plans/skill-specific-extraction.md`, `workflow/software-delivery/review-checklist.md`, `analysis/travel/sources-and-tools.md`, `analysis/travel/README.md` | 已完成 3 個 skills 的剩餘內容提取（CHECKLIST.md、TOOLS.md、README.md），所有 skills 內容已全部提取到新分層 | 每個 skill 有專屬 extraction strategy，內容結構分析 → 拆解 → 標註 → 驗證的完整流程已執行 |
 | P2 | done | Knowledge Graph 補齊（Phase 28-33） | `knowledge/graphs/workflow-software-delivery.yaml`, `knowledge/graphs/intelligence-apk-analysis-atoms.yaml`, `knowledge/graphs/workflow-layers.yaml`, `knowledge/graphs/analysis-layers.yaml`, `knowledge/graphs/runtime-onboarding.yaml` | 已完成 5 個 graph records 更新，新增 1 個 graph record（runtime-onboarding） | Phase 28-33 所有新檔案在 graph records 中有對應 edge |
 | P2 | done | Intelligence Extraction Pipeline 實戰驗證（P2） | `governance/lifecycle/intelligence-extraction-pipeline.md`, `analysis/apk/workflows/README.md`, `intelligence/engineering/analytical-reasoning/{heuristics,anti-patterns,failure,signals}/README.md` | 已完成 pipeline 狀態表更新，5 個 README 的 placeholder 已替換為實際 atom 表格 | Pipeline 的 3 種模式（Technique Decomposition、Feedback History Extraction、SKILL.md Decomposition）均已實際執行 |

@@ -169,9 +169,9 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 
 | SKILL.md | Quick Start 產出 | Output Style 產出 | 瘦身比例 |
 |----------|-----------------|-------------------|---------|
-| apk-analysis | `runtime/onboarding/apk-analysis-quickstart.md`（步驟 5+7） | `workflow/apk-analysis/artifact-gates.md`（既有） | ~65%（158→55 行） |
+| apk-analysis | ~~`runtime/onboarding/apk-analysis-quickstart.md`（步驟 5+7）~~（已刪除：內容已回歸 `workflow/apk-analysis/`） | `workflow/apk-analysis/artifact-gates.md`（既有） | ~65%（158→55 行） |
 | app-development-guidance | ~~`runtime/onboarding/app-development-guidance-quickstart.md`（15 步驟）~~（已刪除：內容已回歸 `workflow/software-delivery/`） | `workflow/software-delivery/artifact-gates.md`（既有） | ~51%（132→65 行） |
-| travel-planning | `runtime/onboarding/travel-planning-quickstart.md`（18 步驟） | `workflow/travel-planning/artifact-gates.md`（**新建**） | ~46%（102→55 行） |
+| travel-planning | ~~`runtime/onboarding/travel-planning-quickstart.md`（18 步驟）~~（已刪除：內容已回歸 `workflow/travel-planning/`） | `workflow/travel-planning/artifact-gates.md`（**新建**） | ~46%（102→55 行） |
 
 **關鍵發現**：
 - `travel-planning` 缺少 `workflow/travel-planning/artifact-gates.md`，需先建立才能提取 Output Style
