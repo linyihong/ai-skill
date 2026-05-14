@@ -45,7 +45,7 @@
 | 檔案 | 狀態 | 說明 |
 |------|------|------|
 | [`active/cognitive-boundary-system.md`](active/cognitive-boundary-system.md) | ⏳ draft | Cognitive Boundary System 整合計畫，待審閱後開始實作 |
-| [`active/enforcement-layer-enhancement.md`](active/enforcement-layer-enhancement.md) | 📄 draft | enforcement/ 後續強化計畫：Metadata Spec、Rule Graph、Activation Engine、Conflict Matrix、Deprecation Lifecycle |
+| [`archived/enforcement-layer-enhancement.md`](archived/enforcement-layer-enhancement.md) | ✅ completed | enforcement/ 後續強化計畫：Metadata Spec、Rule Graph、Activation Engine、Conflict Matrix、Deprecation Lifecycle（5 方向全完成） |
 | [`archived/shared-rules-to-enforcement-migration.md`](archived/shared-rules-to-enforcement-migration.md) | ✅ completed | shared-rules/ → enforcement/ 搬遷計畫，含 Layer Responsibility Contract |
 | [`archived/knowledge-runtime-validation-gate.md`](archived/knowledge-runtime-validation-gate.md) | ✅ completed | Part 1: Validation Gate 已完成；Part 2: UI Operation Intelligence Extraction 已完成 |
 | [`archived/technique-intelligence-pilot.md`](archived/technique-intelligence-pilot.md) | ✅ completed | Phase 28：Technique → Intelligence Pilot（flutter-dart-aot） |

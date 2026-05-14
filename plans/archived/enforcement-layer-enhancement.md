@@ -1,6 +1,6 @@
 # Enforcement Layer Enhancement（enforcement/ 後續強化計畫）
 
-Status: `draft`
+Status: `completed`
 Created: 2026-05-14
 Depends on: [`shared-rules-to-enforcement-migration.md`](shared-rules-to-enforcement-migration.md)（搬遷完成後才能開始）
 Related: [`metadata/schema.md`](../../metadata/schema.md), [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml), [`enforcement/rule-weight.md`](../../enforcement/rule-weight.md), [`governance/lifecycle/README.md`](../../governance/lifecycle/README.md)
