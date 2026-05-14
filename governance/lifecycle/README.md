@@ -88,15 +88,18 @@
 7. 任何持久的 roadmap 或 lifecycle 狀態已在 `.agent-goals/` 之外更新。
 8. 已完成 commit、push、readback 和 clean status。
 
-## 技能仍在變更時的更新策略（Update Strategy While Skills Still Change）
+## 技能仍在變更時的救援策略（Rescue Strategy While Skills Still Change）
 
-當舊 skill 在遷移前被更新時：
+當舊 skill 在遷移進行中被更新時，**不應再更新舊的 `skills/<name>/` 來源**，因為該 skill 正在被遷移到新分層，舊路徑應視為凍結（frozen）。
 
-1. 先更新舊的 `skills/<name>/` 來源。
-2. 檢查是否有 candidate map 或 promoted atom 參考了變更的章節。
-3. 如果有，在同一變更中更新 map、metadata、summary 或 index。
-4. 如果沒有，在最終驗證中記錄不需要連動更新。
-5. 除非變更是明確的 atom promotion，否則不要將新的 skill 文字複製到新分層。
+正確的救援流程：
+
+1. **直接更新新分層的目標檔案** — 找出該 skill 對應的 `workflow/`、`analysis/`、`intelligence/` 目標，將變更內容寫入新分層。
+2. **檢查 candidate map 或 promoted atom** — 確認是否有 map 或 atom 參考了變更的章節。
+3. **同步更新 map、metadata、summary 或 index** — 如果有參考，在同一變更中更新。
+4. **記錄不需要連動更新** — 如果沒有參考，在最終驗證中記錄即可。
+5. **不要複製到舊路徑** — 除非該 atom 尚未被 promote，否則不要將新內容複製回 `skills/`。
+6. **標註舊檔案為 deprecated** — 如果該 skill 的所有內容都已遷移完成，在舊檔案開頭加入 `# Deprecated — see <new path>` 標註。
 
 ## 刪除規則（Deletion Rule）
 
