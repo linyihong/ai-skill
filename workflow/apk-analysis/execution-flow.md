@@ -75,8 +75,22 @@
    - 執行階段的函數（使用者操作、網路請求）→ 使用 **attach 模式**（`frida -U <package> -l script.js`）
    - 不確定時，先用 spawn 模式確認完整流程，再用 attach 模式進行細部 hook
    - 注意：Frida JS 無 `Buffer` API，操作二進位資料使用 `ptr.add(i).readU8()`
-7. 優先使用高語意 hook（request object > raw socket, response decoder > TLS bytes）。
-8. 將動態結果轉換為 durable assets：
+7. **建立 Frida capture 自動化腳本**（若需要多次 capture）：
+   - 建立 reusable shell script 處理完整 lifecycle：`adb pm clear` → `frida spawn` → `tee` 輸出 → 儲存 log
+   - 腳本應接受 Frida script path 作為參數，自動產生 timestamped log 檔名
+   - 參考範本：`<PROJECT_ROOT>/scripts/frida/auto_capture_iv.sh`
+   - 這減少手動錯誤、確保 capture 可重現、釋放注意力給分析本身
+8. **分析 Dart AOT 函數時檢查大小和回傳值**：
+   - 函數 ≤ 12 bytes（ARM64）→ 幾乎是 trivial field accessor，不是業務 getter
+   - 回傳值 class tag `0x010d011c` + 4 null fields → 空的未初始化 container
+   - 不要浪費時間分析 trivial field accessor，直接 hook 它的呼叫者
+   - 交叉比對不同來源的函數名稱（`flutter_meta.json` vs 手動命名）
+9. **分析加密 token 前綴時跨 session 比對**：
+   - 不要假設前綴是 device-specific——跨 session 比對是唯一可靠方式
+   - 比對 call #1 與 calls #25+——第一個 call 的前綴可能與後續有微小差異
+   - 逐 byte hex 比對，不只是整體 Base64 比較
+10. 優先使用高語意 hook（request object > raw socket, response decoder > TLS bytes）。
+11. 將動態結果轉換為 durable assets：
    - UI architecture map + operation-to-API matrix。
    - Redacted HTTP/API docs。
    - Domain/runtime baseline。
