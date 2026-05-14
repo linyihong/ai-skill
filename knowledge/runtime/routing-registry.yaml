@@ -492,7 +492,6 @@ records:
       - workflow/documentation/execution-flow.md
       - governance/document-sizing.md
       - enforcement/decision-efficiency.md
-      - enforcement/tool-neutral-documentation.md
       - enforcement/neutral-language.md
       - knowledge/indexes/README.md
     source_of_truth_gate: new-layer-promoted
@@ -500,8 +499,8 @@ records:
       將「如何寫文件」收斂為可執行 workflow，並連回既有 enforcement 與 governance；
       agent 先讀 README 再視任務展開 execution-flow 與 document-sizing。
     validation_signal: >
-      新文件或目錄具 index-first 導航、分類維度（kind/audience/stability）已標註，
-      可重用段落符合 tool-neutral 與 neutral-language；長文已按 document-sizing 拆分。
+      新文件或目錄具 index-first 導航、分類維度（kind/audience/stability）已標註；
+      長文已按 document-sizing 拆分；語言與工具敘述依專案自訂 policy（本 route 不預設 tool-neutral）。
     metadata:
       priority: P2
       confidence: medium

@@ -169,7 +169,6 @@ skills:
     summary: null
     related:
       - governance/document-sizing.md
-      - enforcement/tool-neutral-documentation.md
       - enforcement/decision-efficiency.md
 
   - id: repo-governance

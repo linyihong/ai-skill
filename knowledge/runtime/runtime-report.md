@@ -34,7 +34,7 @@
 | `route.runtime.context-ttl-doc` | `runtime/context/README.md` | `small` | `index-only` | TTL policy 已套用，prune strategy 已理解。 |
 | `route.skill.app-development-guidance` | `skills/app-development-guidance/SKILL.md` | `specialized` | `source-backed` | 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。 |
 | `route.skill.travel-planning` | `skills/travel-planning/SKILL.md` | `specialized` | `source-backed` | 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。 |
-| `route.workflow.documentation-ai-native` | `workflow/documentation/README.md` | `small` | `summary-first` | 新文件或目錄具 index-first 導航、分類維度（kind/audience/stability）已標註， 可重用段落符合 tool-neutral 與 neutral-language；長文已按 document-sizing 拆分。  |
+| `route.workflow.documentation-ai-native` | `workflow/documentation/README.md` | `small` | `summary-first` | 新文件或目錄具 index-first 導航、分類維度（kind/audience/stability）已標註； 長文已按 document-sizing 拆分；語言與工具敘述依專案自訂 policy（本 route 不預設 tool-neutral）。  |
 | `route.runtime.onboarding` | `runtime/onboarding/README.md` | `specialized` | `summary-first` | 各 quickstart 的步驟可依序執行，且與對應 SKILL.md 的 Quick Start 摘要一致。 |
 | `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `specialized` | `summary-first` | 各 workflow 有明確步驟與產出格式，可依序執行。 |
 | `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/analytical-reasoning/README.md` | `specialized` | `summary-first` | 各 atom 有明確決策表或信號表，可反查驗證。 |

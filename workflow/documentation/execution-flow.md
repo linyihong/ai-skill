@@ -50,23 +50,16 @@
 4. **單一真相**：同一規則不在兩處維護兩份全文；第二處只留一行連結與差異說明。
 5. **拆分閾值**：見 [`../../governance/document-sizing.md`](../../governance/document-sizing.md)（行數與主題單一性）。
 
-## 4. 工具中立與語言
-
-- 可重用段落：依 [`../../enforcement/tool-neutral-documentation.md`](../../enforcement/tool-neutral-documentation.md)。
-- 可重用中文語氣與標題：依 [`../../enforcement/neutral-language.md`](../../enforcement/neutral-language.md)。
-- 工具操作步驟：集中在專案的 `ai-tools/` 對應說明、或 `docs/tools/<tool>.md`，不要塞進核心 policy。
-
-## 5. 驗證與連動
+## 4. 驗證與連動
 
 - **Link**：從本檔或 `README` 出去的相對連結可點、無斷鏈。
 - **路由**：父層 README 的表格含新子檔；`skills-index` 或專案內索引若有對應列，一併更新。
 - **Ai-skill 本庫**：若同步規則或模板，依 [`../../enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md) 與 [`../../enforcement/linked-updates.md`](../../enforcement/linked-updates.md) 走完整閉環。
 
-## 6. 完成訊號（給 agent 自查）
+## 5. 完成訊號（給 agent 自查）
 
 - [ ] 新文件有 `kind` / `audience` / `stability`（或父 README 等價欄位）。
 - [ ] 有 `index` 或導航區；長文已拆 `leaf`。
-- [ ] 無工具專屬綁死在可重用段落（除非該檔本就屬 tool doc）。
 - [ ] 無重複規範全文；斷鏈已修。
 - [ ] 本輪暫存與長期 durable 分界清楚。
 
