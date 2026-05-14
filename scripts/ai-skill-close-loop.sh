@@ -100,6 +100,60 @@ acquire_lock() {
   trap 'rm -rf "${LOCK_DIR}"' EXIT
 }
 
+# Check if any plan in active/ has all items completed but hasn't been closed.
+# Prints warnings for plans that need closure.
+check_plan_completion() {
+  local plans_dir="${REPO_ROOT}/plans/active"
+  local found=0
+  if [[ ! -d "${plans_dir}" ]]; then
+    return 0
+  fi
+  # Store regex patterns in variables to avoid ] inside [[ =~ ]] syntax errors
+  local re_checklist='^[[:space:]]*[-*][[:space:]]*\[.\]'
+  local re_checked='\[[xX]\]'
+  local re_numbered_done='^[[:space:]]*[0-9]+\. ✅'
+  local re_numbered_pending='^[[:space:]]*[0-9]+\. ⏳'
+  local re_numbered_unchecked='^[[:space:]]*[0-9]+\. \[ \]'
+  for plan_file in "${plans_dir}"/*.md; do
+    [[ -f "${plan_file}" ]] || continue
+    local plan_name
+    plan_name="$(basename "${plan_file}")"
+    # Skip cognitive-boundary-system (draft)
+    [[ "${plan_name}" == "cognitive-boundary-system.md" ]] && continue
+    # Check if all checklist items are marked done (✅)
+    # Count total task lines and completed task lines
+    local total=0 done=0
+    while IFS= read -r line; do
+      # Match lines like "- [ ]" or "- [x]" in markdown checklists
+      if [[ "${line}" =~ $re_checklist ]]; then
+        total=$((total + 1))
+        if [[ "${line}" =~ $re_checked || "${line}" =~ ✅ ]]; then
+          done=$((done + 1))
+        fi
+      fi
+      # Also match numbered task lines with ✅/⏳ markers
+      if [[ "${line}" =~ $re_numbered_done ]]; then
+        done=$((done + 1))
+        total=$((total + 1))
+      elif [[ "${line}" =~ $re_numbered_pending || "${line}" =~ $re_numbered_unchecked ]]; then
+        total=$((total + 1))
+      fi
+    done < "${plan_file}"
+    if [[ "${total}" -gt 0 && "${done}" -eq "${total}" ]]; then
+      # Check if plan is already in archived/
+      local archived_file="${REPO_ROOT}/plans/archived/${plan_name}"
+      if [[ ! -f "${archived_file}" ]]; then
+        echo "⚠️  Plan completion detected: ${plan_name}"
+        echo "   All ${total}/${total} tasks completed."
+        echo "   Action: Run the plan completion closure checklist in plans/README.md"
+        echo "   (move to archived/ or mark exception reason)"
+        found=1
+      fi
+    fi
+  done
+  return "${found}"
+}
+
 ensure_no_git_operation_in_progress() {
   local git_dir
   git_dir="$(git rev-parse --git-dir)"
@@ -182,6 +236,7 @@ main() {
   done < <(changed_paths)
   if [[ "${#paths[@]}" -eq 0 ]]; then
     echo "Ai-skill close-loop: working tree clean."
+    check_plan_completion
     return 0
   fi
 
