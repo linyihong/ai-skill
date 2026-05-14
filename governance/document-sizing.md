@@ -64,6 +64,8 @@ Token 成本模型與 context loading 分層策略請見 [`../enforcement/decisi
 - **若改動影響 routing registry**，執行 `ruby scripts/refresh-knowledge-runtime.rb` 更新 runtime index。
 - **若檔案在 routing registry 中被引用**，更新 registry 中的路徑（否則 validator 會報錯）。
 
+在業務專案或其他 repository **從零撰寫 agent 友善文件**時的步驟、分類維度與驗證自查，見 [`../workflow/documentation/execution-flow.md`](../workflow/documentation/execution-flow.md)（本檔定閾值與拆分形狀，該檔定操作順序與與 `enforcement/` 的對齊方式）。
+
 ## 建議結構
 
 任何主題或類別，建議拆分為：

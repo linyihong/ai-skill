@@ -33,6 +33,7 @@
 | `route.runtime.router-flow` | `runtime/router/README.md` | `index-only` | Router flow 是設計文件，需要 routing 決策時才讀。 |
 | `route.intelligence.engineering.heuristics` | `intelligence/engineering/heuristics/README.md` | `index-only` | 通用 heuristics 在需要對應判斷時才讀取完整 atom。 |
 | `route.runtime.context-ttl-doc` | `runtime/context/README.md` | `index-only` | TTL doc 是設計文件，需要 prune context 時才讀。 |
+| `route.workflow.documentation-ai-native` | `workflow/documentation/README.md` | `summary-first` | 多數任務只需 workflow README 與 execution-flow；policy 全文留在 enforcement。 |
 | `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `index-only` | agent-architecture atoms 在需要理解 AI 行為模式時才讀取完整內容。 |
 | `route.feedback.history` | `feedback/history/README.md` | `index-only` | feedback/history 在需要查詢或新增 lesson 時才讀取。 |
 | `route.decisions.adr` | `decisions/README.md` | `summary-first` | decisions/ 在需要查詢歷史決策或建立新 ADR 時才讀取。 |
@@ -61,7 +62,7 @@
 | --- | --- | --- |
 | `index-only` | `route.skill.discovery`, `route.runtime.activation-rules`, `route.runtime.context-ttl`, `route.runtime.router-flow`, `route.intelligence.engineering.heuristics`, `route.runtime.context-ttl-doc`, `route.intelligence.engineering.agent-architecture`, `route.feedback.history`, `route.evaluations.scenario-results`, `route.tools.metadata-routing`, `route.traces.decision-traces` | 依 `models/compression/README.md` 的 escalation rules 判斷。 |
 | `source-backed` | `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.skill.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing`, `route.skill.app-development-guidance`, `route.skill.travel-planning` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
-| `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.context-loading`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.intelligence.apk-analysis.atoms`, `route.validation.ai-decision-contract`, `route.decisions.adr`, `route.architecture.permanent-docs`, `route.anti-patterns.runtime-patterns` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
+| `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.context-loading`, `route.workflow.documentation-ai-native`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.intelligence.apk-analysis.atoms`, `route.validation.ai-decision-contract`, `route.decisions.adr`, `route.architecture.permanent-docs`, `route.anti-patterns.runtime-patterns` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
 
 ## Agent Output Shape
 

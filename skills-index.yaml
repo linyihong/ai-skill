@@ -135,6 +135,43 @@ skills:
       - intelligence/travel/README.md
       - skills/travel-planning/README.md
 
+  - id: documentation-ai-native
+    name: Agent-Friendly Documentation
+    description: 跨專案撰寫可路由、index-first、可重用文件以降低 agent token，並用穩定分類維度整理 docs/wiki/README
+    weight: 0.65
+    domains:
+      - documentation
+      - knowledge-management
+      - technical-writing
+    dependencies:
+      - enforcement/content-layering.md
+      - enforcement/dependency-reading.md
+    conflicts: []
+    triggers:
+      - documentation
+      - wiki
+      - markdown
+      - README
+      - technical-writing
+      - index-first
+      - agent-friendly-docs
+      - token-cost
+      - 文件
+      - 寫文件
+      - 文件分類
+    cost:
+      estimated_tokens: 1200
+      context_load: low
+    priority:
+      runtime: medium
+    primary_entrypoint: workflow/documentation/execution-flow.md
+    entrypoint: workflow/documentation/README.md
+    summary: null
+    related:
+      - governance/document-sizing.md
+      - enforcement/tool-neutral-documentation.md
+      - enforcement/decision-efficiency.md
+
   - id: repo-governance
     name: Repository Governance
     description: AI-native Knowledge Operating System 本身的維護、升級、遷移與治理
@@ -404,7 +441,8 @@ skills:
       runtime: medium
     entrypoint: workflow/README.md
     summary: null
-    related: []
+    related:
+      - workflow/documentation/README.md
 
   - id: tool-adapters
     name: Tool Adapters

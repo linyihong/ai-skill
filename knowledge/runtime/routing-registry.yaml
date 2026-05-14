@@ -483,6 +483,40 @@ records:
       compression_level: source-backed
       reason: Travel planning 需要 skill entrypoint、workflow 與 domain-specific sources/tools routing。
 
+  - id: route.workflow.documentation-ai-native
+    task_intent: 在業務專案或其他 repo 撰寫或整理 agent 友善文件、降低無效 token、建立穩定分類與索引
+    primary_source: workflow/documentation/README.md
+    required_dependencies:
+      - enforcement/content-layering.md
+    candidate_sources:
+      - workflow/documentation/execution-flow.md
+      - governance/document-sizing.md
+      - enforcement/decision-efficiency.md
+      - enforcement/tool-neutral-documentation.md
+      - enforcement/neutral-language.md
+      - knowledge/indexes/README.md
+    source_of_truth_gate: new-layer-promoted
+    ranking_reason: >
+      將「如何寫文件」收斂為可執行 workflow，並連回既有 enforcement 與 governance；
+      agent 先讀 README 再視任務展開 execution-flow 與 document-sizing。
+    validation_signal: >
+      新文件或目錄具 index-first 導航、分類維度（kind/audience/stability）已標註，
+      可重用段落符合 tool-neutral 與 neutral-language；長文已按 document-sizing 拆分。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 1200
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: 多數任務只需 workflow README 與 execution-flow；policy 全文留在 enforcement。
+
   - id: route.runtime.onboarding
     task_intent: 新 session 或新專案的快速啟動指引
     primary_source: runtime/onboarding/README.md

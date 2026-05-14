@@ -6,7 +6,7 @@
 
 | Surface | Path | Count / Status |
 | --- | --- | --- |
-| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 28 records |
+| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 29 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
@@ -34,6 +34,7 @@
 | `route.runtime.context-ttl-doc` | `runtime/context/README.md` | `small` | `index-only` | TTL policy 已套用，prune strategy 已理解。 |
 | `route.skill.app-development-guidance` | `skills/app-development-guidance/SKILL.md` | `specialized` | `source-backed` | 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。 |
 | `route.skill.travel-planning` | `skills/travel-planning/SKILL.md` | `specialized` | `source-backed` | 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。 |
+| `route.workflow.documentation-ai-native` | `workflow/documentation/README.md` | `small` | `summary-first` | 新文件或目錄具 index-first 導航、分類維度（kind/audience/stability）已標註， 可重用段落符合 tool-neutral 與 neutral-language；長文已按 document-sizing 拆分。  |
 | `route.runtime.onboarding` | `runtime/onboarding/README.md` | `specialized` | `summary-first` | 各 quickstart 的步驟可依序執行，且與對應 SKILL.md 的 Quick Start 摘要一致。 |
 | `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `specialized` | `summary-first` | 各 workflow 有明確步驟與產出格式，可依序執行。 |
 | `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/analytical-reasoning/README.md` | `specialized` | `summary-first` | 各 atom 有明確決策表或信號表，可反查驗證。 |
@@ -96,7 +97,7 @@
 | `graph.runtime-pipeline` | `runtime/pipeline/README.md` | `candidate` | 12 | [`runtime-pipeline.yaml`](../graphs/runtime-pipeline.yaml) |
 | `graph.runtime-prompt-artifacts` | `runtime/prompt-artifacts/README.md` | `candidate` | 8 | [`runtime-prompt-artifacts.yaml`](../graphs/runtime-prompt-artifacts.yaml) |
 | `graph.source-boundary` | `governance/lifecycle/README.md` | `candidate` | 6 | [`source-boundary.yaml`](../graphs/source-boundary.yaml) |
-| `graph.workflow-layers` | `workflow/README.md` | `candidate` | 16 | [`workflow-layers.yaml`](../graphs/workflow-layers.yaml) |
+| `graph.workflow-layers` | `workflow/README.md` | `candidate` | 18 | [`workflow-layers.yaml`](../graphs/workflow-layers.yaml) |
 | `graph.workflow-app-development-guidance` | `workflow/software-delivery/README.md` | `candidate` | 11 | [`workflow-software-delivery.yaml`](../graphs/workflow-software-delivery.yaml) |
 | `graph.workflow-travel-planning` | `workflow/travel-planning/README.md` | `candidate` | 9 | [`workflow-travel-planning.yaml`](../graphs/workflow-travel-planning.yaml) |
 

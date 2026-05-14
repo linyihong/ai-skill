@@ -3,7 +3,7 @@ source: workflow/README.md
 status: candidate
 summary: >
   連接 workflow 層的所有子目錄：apk-analysis、software-delivery、
-  repo-analysis、travel-planning，以及相關的 intelligence、analysis、skills 層。
+  repo-analysis、travel-planning、documentation，以及相關的 intelligence、analysis、skills 層。
 edges:
   - type: depends_on
     target: workflow/README.md
@@ -49,7 +49,14 @@ edges:
     target: workflow/travel-planning/artifact-gates.md
     reason: Travel planning 的產出閘門定義（14 個 output templates）。
     validation: artifact-gates.md 從 skills/travel-planning/DOCUMENTATION.md 提取。
-
+  - type: related_to
+    target: workflow/documentation/README.md
+    reason: Agent-friendly documentation — 跨專案文件撰寫、分類與 index-first 以降低 token。
+    validation: README 定義 scope、與 enforcement/governance 的關係與 inbound route id。
+  - type: related_to
+    target: workflow/documentation/execution-flow.md
+    reason: 文件撰寫的具體步驟、分類維度表與完成訊號。
+    validation: execution-flow.md 含步驟 0–6 與自查 checklist。
   - type: related_to
     target: workflow/software-delivery/development-process.md
     reason: Contract-first 開發流程 — Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Test Strategy Gate、Definition of Ready/Done。
@@ -75,4 +82,4 @@ metadata:
   priority: P2
   confidence: medium
   compatibility_state: new-layer-promoted
-  last_checked: 2026-05-12
+  last_checked: 2026-05-14
