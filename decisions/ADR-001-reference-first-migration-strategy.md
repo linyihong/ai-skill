@@ -52,7 +52,7 @@
 
 ## Related
 
-- [`architecture/apk-analysis-pilot-migration.md`](../architecture/apk-analysis-pilot-migration.md) — 第一個 pilot migration map
+- [`plans/archived/apk-analysis-pilot-migration.md`](../plans/archived/apk-analysis-pilot-migration.md) — 第一個 pilot migration map
 - [`governance/lifecycle/README.md`](../governance/lifecycle/README.md) — lifecycle states（candidate-map → candidate-atom → validated-atom → promoted）
 - [`knowledge/graphs/README.md`](../knowledge/graphs/README.md) — graph edge types（`preserves_entrypoint`）
 - [`architecture/next-stage-upgrade-plan.md`](../architecture/next-stage-upgrade-plan.md) — 整體升級規劃

@@ -71,7 +71,7 @@ Session Start
 | [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | Minimal bootstrap (3 rules, ~800 tokens) |
 | [`skills-index.yaml`](skills-index.yaml) | Skill routing index |
 | [`architecture/next-stage-upgrade-plan.md`](architecture/next-stage-upgrade-plan.md) | Full architecture upgrade plan |
-| [`architecture/context-cost-optimization-plan.md`](architecture/context-cost-optimization-plan.md) | Token cost optimization plan |
+| [`plans/archived/context-cost-optimization.md`](plans/archived/context-cost-optimization.md) | Token cost optimization plan |
 | [`runtime/router/activation-rules.yaml`](runtime/router/activation-rules.yaml) | Lazy-load activation rules |
 | [`runtime/context/ttl-policy.yaml`](runtime/context/ttl-policy.yaml) | Context TTL policy |
 

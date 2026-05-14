@@ -51,6 +51,8 @@
 | [`archived/technique-intelligence-pilot.md`](archived/technique-intelligence-pilot.md) | ✅ completed | Phase 28：Technique → Intelligence Pilot（flutter-dart-aot） |
 | [`archived/skill-specific-extraction.md`](archived/skill-specific-extraction.md) | ✅ completed | Phase 33：Skill-Specific Intelligence Extraction |
 | [`archived/ai-decision-contract-testing.md`](archived/ai-decision-contract-testing.md) | ✅ completed | AI Decision Contract Testing 框架設計與實作 |
+| [`archived/context-cost-optimization.md`](archived/context-cost-optimization.md) | ✅ completed | Phase 1：Context Cost Optimization 執行計畫（原 architecture/） |
+| [`archived/apk-analysis-pilot-migration.md`](archived/apk-analysis-pilot-migration.md) | ✅ completed | APK Analysis Pilot Migration 狀態圖（原 architecture/） |
 
 ## 與其他層的關係
 

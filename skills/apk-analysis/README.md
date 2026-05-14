@@ -9,7 +9,7 @@
 
 ## 下一階段 migration note
 
-`skills/apk-analysis/` 目前仍是 active skill entrypoint。下一階段分層的 pilot map 見 [`../../architecture/apk-analysis-pilot-migration.md`](../../architecture/apk-analysis-pilot-migration.md)；候選 reference-first 目的地為 [`../../analysis/apk/`](../../analysis/apk/)、[`../../workflow/apk-analysis/`](../../workflow/apk-analysis/) 與 [`../../intelligence/engineering/analytical-reasoning/`](../../intelligence/engineering/analytical-reasoning/)。Pilot 期間不搬移大量內容，既有入口與連結維持可用。
+`skills/apk-analysis/` 目前仍是 active skill entrypoint。下一階段分層的 pilot map 見 [`../../plans/archived/apk-analysis-pilot-migration.md`](../../plans/archived/apk-analysis-pilot-migration.md)；候選 reference-first 目的地為 [`../../analysis/apk/`](../../analysis/apk/)、[`../../workflow/apk-analysis/`](../../workflow/apk-analysis/) 與 [`../../intelligence/engineering/analytical-reasoning/`](../../intelligence/engineering/analytical-reasoning/)。Pilot 期間不搬移大量內容，既有入口與連結維持可用。
 
 ## 目標
 

@@ -1,5 +1,5 @@
 id: graph.apk-analysis-pilot
-source: architecture/apk-analysis-pilot-migration.md
+source: plans/archived/apk-analysis-pilot-migration.md
 status: candidate
 summary: >
   描述 apk-analysis pilot migration map 與舊 skill entrypoint、新 analysis/workflow/intelligence

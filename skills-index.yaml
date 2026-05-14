@@ -46,7 +46,7 @@ skills:
     entrypoint: skills/apk-analysis/SKILL.md
     summary: knowledge/summaries/apk-analysis-pilot.md
     related:
-      - architecture/apk-analysis-pilot-migration.md
+      - plans/archived/apk-analysis-pilot-migration.md
       - analysis/apk/README.md
       - workflow/apk-analysis/README.md
       - intelligence/engineering/analytical-reasoning/README.md
@@ -168,7 +168,7 @@ skills:
     summary: knowledge/summaries/repo-governance.md
     related:
       - architecture/next-stage-upgrade-plan.md
-      - architecture/context-cost-optimization-plan.md
+      - plans/archived/context-cost-optimization.md
       - metadata/schema.md
       - knowledge/runtime/routing-registry.yaml
 

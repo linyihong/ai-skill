@@ -3,7 +3,7 @@
 | 欄位 | 值 |
 | --- | --- |
 | Atom ID | `architecture.context-cost-optimization` |
-| Source path | `architecture/context-cost-optimization-plan.md` |
+| Source path | `plans/archived/context-cost-optimization.md` |
 | Lifecycle | `validated` |
 | Summary | Token 成本優化規劃。Phase 1（立即省錢）：Bootstrap 極小化（~800 tokens）、README 拆分、Rule lazy-load、Summary layer。Phase 2（架構升級）：Runtime Context Router、Context Cost Metadata、Skill Index、Context TTL。Phase 3（長期）：Semantic Retrieval、Episodic Memory、Multi-model Routing。 |
 | When to read | 需要了解 token 成本優化策略、Bootstrap 拆分原則、或 lazy-load activation model 時。 |
