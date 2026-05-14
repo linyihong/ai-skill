@@ -72,7 +72,7 @@ Session Start
 
 | Document | Purpose |
 | --- | --- |
-| [`governance/contributing.md`](governance/contributing.md) | Human maintainer entry: validation commands, PR gates, doc index |
+| [`governance/contributing.md`](governance/contributing.md) | 人類維護入口：驗證指令、PR gate、文件索引 |
 | [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | Minimal bootstrap (3 rules, ~800 tokens) |
 | [`skills-index.yaml`](skills-index.yaml) | Skill routing index |
 | [`plans/archived/next-stage-upgrade-plan.md`](plans/archived/next-stage-upgrade-plan.md) | Full architecture upgrade plan |
