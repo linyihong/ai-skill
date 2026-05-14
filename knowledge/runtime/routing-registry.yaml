@@ -712,3 +712,142 @@ records:
       profile: small
       compression_level: summary-first
       reason: decisions/ 在需要查詢歷史決策或建立新 ADR 時才讀取。
+
+  - id: route.architecture.permanent-docs
+    task_intent: 查詢永久性架構定義、了解 OS 層級設計原則與相容性策略
+    primary_source: architecture/README.md
+    required_dependencies:
+      - CORE_BOOTSTRAP.md
+    candidate_sources:
+      - architecture/ai-native-knowledge-operating-system.md
+      - decisions/ADR-001-reference-first-migration-strategy.md
+      - decisions/ADR-003-three-layer-architecture.md
+      - knowledge/graphs/metadata-navigation.yaml
+    source_of_truth_gate: architecture-readme-active
+    ranking_reason: architecture/README.md 提供架構層 entry point，列出永久性架構文件與設計原則。
+    validation_signal: architecture/README.md 已讀取，架構文件清單已查詢。
+    metadata:
+      priority: P2
+      confidence: high
+      context_cost:
+        estimated_tokens: 300
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: architecture/ 在需要查詢架構定義或設計原則時才讀取。
+
+  - id: route.evaluations.scenario-results
+    task_intent: 查詢或記錄 validation scenario 的實際執行結果
+    primary_source: evaluations/README.md
+    required_dependencies:
+      - validation/README.md
+    candidate_sources:
+      - evaluations/failure-derived/feedback-history-consolidation-v1-2026-05-13.yaml
+      - validation/evaluations/template.yaml
+    source_of_truth_gate: evaluations-readme-active
+    ranking_reason: evaluations/README.md 提供 evaluation 記錄的 entry point，說明格式與目錄結構。
+    validation_signal: Evaluation 記錄已依 scenario 分類存放，格式與 template 一致。
+    metadata:
+      priority: P3
+      confidence: medium
+      context_cost:
+        estimated_tokens: 200
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: evaluations/ 在需要查詢或記錄 scenario 執行結果時才讀取。
+
+  - id: route.tools.metadata-routing
+    task_intent: 查詢 tool metadata、compression 策略或 routing 規則
+    primary_source: tools/README.md
+    required_dependencies:
+      - ai-tools/README.md
+    candidate_sources:
+      - tools/compression/README.md
+      - tools/metadata/README.md
+      - tools/routing/README.md
+      - runtime/guards/circuit-breaker.yaml
+    source_of_truth_gate: tools-readme-active
+    ranking_reason: tools/README.md 提供 tool 層 entry point，統整 compression/metadata/routing 三個子目錄。
+    validation_signal: Tool metadata 已定義，compression 策略與 routing 規則已建立。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 300
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: tools/ 在需要查詢 tool 設定或 routing 規則時才讀取。
+
+  - id: route.traces.decision-traces
+    task_intent: 查詢或記錄 AI 的實際 decision trace
+    primary_source: traces/README.md
+    required_dependencies:
+      - validation/README.md
+    candidate_sources:
+      - traces/failure-derived/feedback-history-consolidation-v1-2026-05-13.yaml
+      - validation/traces/template.yaml
+    source_of_truth_gate: traces-readme-active
+    ranking_reason: traces/README.md 提供 decision trace 記錄的 entry point，說明格式與目錄結構。
+    validation_signal: Trace 記錄已依 scenario 分類存放，格式與 template 一致。
+    metadata:
+      priority: P3
+      confidence: medium
+      context_cost:
+        estimated_tokens: 200
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: traces/ 在需要查詢或記錄 decision trace 時才讀取。
+
+  - id: route.anti-patterns.runtime-patterns
+    task_intent: 查詢 AI Runtime 常見 anti-patterns 的症狀、預防與恢復方式
+    primary_source: anti-patterns/README.md
+    required_dependencies:
+      - CORE_BOOTSTRAP.md
+    candidate_sources:
+      - anti-patterns/context-explosion.md
+      - anti-patterns/recursive-tool-loop.md
+      - anti-patterns/hallucination-loop.md
+      - anti-patterns/stale-summary.md
+      - anti-patterns/skill-pollution.md
+      - shared-rules/failure-patterns/README.md
+      - runtime/guards/README.md
+    source_of_truth_gate: anti-patterns-readme-active
+    ranking_reason: anti-patterns/README.md 提供 runtime anti-patterns 的 entry point，列出所有 anti-pattern 與嚴重度。
+    validation_signal: Anti-pattern 已依格式記錄，症狀、預防與恢復方式已定義。
+    metadata:
+      priority: P2
+      confidence: high
+      context_cost:
+        estimated_tokens: 400
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: anti-patterns/ 在需要查詢 runtime 失效模式或預防方式時才讀取。

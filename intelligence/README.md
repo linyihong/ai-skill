@@ -62,6 +62,16 @@ intelligence/
 - 對話暫存 goal、目前 owner 或 next action；放到 `.agent-goals/`。
 - 可執行 policy 與 close-loop gate；放到 `shared-rules/`。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.intelligence.engineering.heuristics`](../knowledge/runtime/routing-registry.yaml:371) — required_dependencies 引用 `intelligence/engineering/README.md`
+- [`route.intelligence.engineering.agent-architecture`](../knowledge/runtime/routing-registry.yaml:621) — required_dependencies 引用 `intelligence/engineering/README.md`
+- [`route.intelligence.apk-analysis.atoms`](../knowledge/runtime/routing-registry.yaml:548) — primary_source 為 `intelligence/engineering/analytical-reasoning/README.md`
+- [`route.intelligence.apk-highest-leverage-path`](../knowledge/runtime/routing-registry.yaml:249) — primary_source 為 `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md`
+- [`route.skill.apk-analysis`](../knowledge/runtime/routing-registry.yaml:226) — candidate_sources 引用 `intelligence/engineering/analytical-reasoning/README.md`
+- [`route.skill.app-development-guidance`](../knowledge/runtime/routing-registry.yaml:435) — candidate_sources 引用 `intelligence/engineering/development/README.md`
+- [`route.skill.travel-planning`](../knowledge/runtime/routing-registry.yaml:465) — candidate_sources 引用 `intelligence/travel/README.md`
+
 ## 與既有層的關係
 
 - `skills/` 目前仍提供能力入口；成熟的工程智慧可逐步抽到本層。

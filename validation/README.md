@@ -223,6 +223,14 @@ then:
 | 3 | `shared-rules-architecture-drift-v1` | `shared-rules/failure-patterns/shared-rules-architecture-drift.md` | 架構重構後是否同步檢查 shared-rules/ 路徑參考 |
 | 4 | `feedback-history-consolidation-v1` | `feedback/history/` 目錄整合（2026-05-13） | 新 feedback lesson 是否正確使用 feedback/history/<domain>/ 而非舊 skills/ 路徑 |
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.validation.ai-decision-contract`](../knowledge/runtime/routing-registry.yaml:583) — primary_source 為 `validation/README.md`
+- [`route.evaluations.scenario-results`](../knowledge/runtime/routing-registry.yaml:748) — required_dependencies 引用 `validation/README.md`
+- [`route.traces.decision-traces`](../knowledge/runtime/routing-registry.yaml:802) — required_dependencies 引用 `validation/README.md`
+- [`shared-rules/failure-learning-system.md`](../shared-rules/failure-learning-system.md) — 定義 Failure → Scenario 閉環流程
+- [`shared-rules/failure-patterns/`](../shared-rules/failure-patterns/) — 每個 failure pattern 可對應 failure-derived scenario
+
 ## 與其他層的關係
 
 - `intelligence/engineering/` — 每個 heuristic atom 可對應 1+ 個 scenario

@@ -25,6 +25,12 @@
 - Feedback lesson 的 promotion workflow；放到 `feedback/`。
 - 可執行 shared policy；放到 `shared-rules/`。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.decisions.adr`](../knowledge/runtime/routing-registry.yaml:696) — candidate_sources 引用 `memory/decision/README.md`
+- [`shared-rules/failure-learning-system.md`](../shared-rules/failure-learning-system.md) — 定義 failure memory 的 storage 與 promotion 規則
+- [`plans/active/next-stage-upgrade-plan.md`](../plans/active/next-stage-upgrade-plan.md) — 引用 memory/ 的設計概念
+
 ## 與既有層的關係
 
 - `shared-rules/failure-learning-system.md` 仍定義 failure learning 的可執行流程。

@@ -33,6 +33,16 @@ evaluations/
 
 詳細格式請見 [`validation/evaluations/template.yaml`](../validation/evaluations/template.yaml)。
 
+## 誰會參考這裡（Inbound References）
+
+變更本層內容時，需要一併檢查以下依賴方：
+
+| 來源 | 關係 |
+|------|------|
+| [`route.evaluations.scenario-results`](../knowledge/runtime/routing-registry.yaml) | Routing registry record，agent 依此找到 evaluations/ |
+| [`validation/`](../validation/README.md) | Scenario 執行後寫入 evaluation 至此 |
+| [`shared-rules/failure-learning-system.md`](../shared-rules/failure-learning-system.md) | Failure → Scenario 閉環完成後產出 evaluation |
+
 ## 與既有層的關係
 
 - [`validation/`](../validation/README.md)：scenario 定義與驗證框架

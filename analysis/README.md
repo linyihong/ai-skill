@@ -24,6 +24,14 @@
 - 可執行 shared policy；放到 `shared-rules/`。
 - 工具專屬路徑、hook 或 UI；放到 `ai-tools/`。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.skill.apk-analysis`](../knowledge/runtime/routing-registry.yaml:225) — candidate_sources 引用 `analysis/apk/README.md`
+- [`route.skill.app-development-guidance`](../knowledge/runtime/routing-registry.yaml:433) — candidate_sources 引用 `analysis/development-guidance/README.md`
+- [`route.skill.travel-planning`](../knowledge/runtime/routing-registry.yaml:463) — candidate_sources 引用 `analysis/travel/README.md`
+- [`route.intelligence.apk-analysis.atoms`](../knowledge/runtime/routing-registry.yaml:551) — required_dependencies 引用 `analysis/apk/README.md`
+- [`route.analysis.apk.workflows`](../knowledge/runtime/routing-registry.yaml:519) — required_dependencies 引用 `analysis/apk/README.md`
+
 ## 與既有層的關係
 
 - `skills/` 目前仍是相容入口；本層只承接逐步抽出的分析方法。

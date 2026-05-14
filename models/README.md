@@ -23,6 +23,12 @@
 - Metadata schema 欄位定義；放到 `metadata/`。
 - 對模型能力的未驗證主張；需先標示 confidence 或留在 TODO。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.models.model-aware-routing`](../knowledge/runtime/routing-registry.yaml:312) — primary_source 為 `models/profiles/README.md`，required_dependencies 引用 `models/compression/README.md`
+- [`knowledge/runtime/model-context-report.md`](../knowledge/runtime/model-context-report.md) — generated view，由 routing registry 產生的 model-aware context loading view
+- [`knowledge/runtime/model-checklists.md`](../knowledge/runtime/model-checklists.md) — generated view，由 routing registry 產生的 per-model context-loading checklist
+
 ## 與既有層的關係
 
 - `metadata/` 可記錄知識適合哪些 model profile。

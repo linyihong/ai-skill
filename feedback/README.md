@@ -33,6 +33,13 @@
 - [`refinement/`](refinement/README.md)：定義流程精煉的系統設計（從實作經驗中持續改進 workflow）。
 - [`promotion/`](promotion/README.md)：定義 feedback lesson 如何從 history 推進到 workflow、intelligence、shared rules、memory 或 runtime surfaces。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.feedback.promotion-pipeline`](../knowledge/runtime/routing-registry.yaml:290) — candidate_sources 引用 `feedback/README.md`
+- [`route.feedback.history`](../knowledge/runtime/routing-registry.yaml:664) — candidate_sources 引用 `feedback/README.md`
+- [`shared-rules/feedback-lessons.md`](../shared-rules/feedback-lessons.md) — 定義 feedback lesson 的寫作規則與分類
+- [`governance/lifecycle/intelligence-extraction-pipeline.md`](../governance/lifecycle/intelligence-extraction-pipeline.md) — Step 4 使用 feedback history 做 extraction
+
 ## 第一批候選遷移來源
 
 - `shared-rules/failure-learning-system.md`

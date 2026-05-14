@@ -24,6 +24,19 @@
 - Agent 執行流程；放到 `workflow/`。
 - 可執行 shared rules；放到 `shared-rules/`。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.bootstrap.ai-skill`](../knowledge/runtime/routing-registry.yaml:21) — candidate_sources 引用 `knowledge/indexes/README.md`
+- [`route.skill.discovery`](../knowledge/runtime/routing-registry.yaml:49) — candidate_sources 引用 `knowledge/indexes/README.md`、`knowledge/summaries/README.md`
+- [`route.runtime.activation-rules`](../knowledge/runtime/routing-registry.yaml:77) — candidate_sources 引用 `knowledge/runtime/README.md`
+- [`route.runtime.context-ttl`](../knowledge/runtime/routing-registry.yaml:102) — candidate_sources 引用 `knowledge/runtime/README.md`、`knowledge/runtime/routing-registry.yaml`
+- [`route.runtime.context-loading`](../knowledge/runtime/routing-registry.yaml:161) — candidate_sources 引用 `knowledge/runtime/README.md`、`knowledge/summaries/README.md`、`knowledge/graphs/README.md`
+- [`route.metadata.knowledge-atom-schema`](../knowledge/runtime/routing-registry.yaml:191) — candidate_sources 引用 `knowledge/runtime/README.md`、`knowledge/summaries/README.md`、`knowledge/graphs/README.md`
+- [`route.models.model-aware-routing`](../knowledge/runtime/routing-registry.yaml:319) — candidate_sources 引用 `knowledge/runtime/README.md`
+- [`route.runtime.router-flow`](../knowledge/runtime/routing-registry.yaml:348) — candidate_sources 引用 `knowledge/runtime/README.md`
+- [`route.runtime.context-ttl-doc`](../knowledge/runtime/routing-registry.yaml:407) — candidate_sources 引用 `knowledge/runtime/README.md`
+- 共 9 條 routing records 直接引用 `knowledge/` 子目錄作為 candidate_sources
+
 ## 與既有層的關係
 
 - `skills/` 與 `shared-rules/` 仍是目前可直接讀取的主要內容來源。

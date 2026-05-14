@@ -25,6 +25,17 @@ tools/
 | [`metadata/`](metadata/README.md) | 定義 tool metadata schema，記錄每個 tool 的 input/output token 成本、遞迴風險、activation 策略 |
 | [`routing/`](routing/README.md) | 實作 tool lazy activation 流程與 tool explosion detection 信號 |
 
+## 誰會參考這裡（Inbound References）
+
+變更本層內容時，需要一併檢查以下依賴方：
+
+| 來源 | 關係 |
+|------|------|
+| [`route.tools.metadata-routing`](../knowledge/runtime/routing-registry.yaml) | Routing registry record，agent 依此找到 tools/ |
+| [`runtime/guards/circuit-breaker.yaml`](../runtime/guards/circuit-breaker.yaml) | 引用 tools/metadata/ 的 tool 成本資訊 |
+| [`ai-tools/`](../ai-tools/README.md) | 工具配置依賴 tools/metadata/ 的 schema |
+| [`models/compression/`](../models/compression/README.md) | Model-aware compression 策略參考 tools/compression/ |
+
 ## 與既有層的關係
 
 - [`ai-tools/`](../ai-tools/README.md)：工具配置與同步細節（Claude Code、Cursor 等）

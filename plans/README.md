@@ -54,6 +54,12 @@
 | [`archived/context-cost-optimization.md`](archived/context-cost-optimization.md) | ✅ completed | Phase 1：Context Cost Optimization 執行計畫（原 architecture/） |
 | [`archived/apk-analysis-pilot-migration.md`](archived/apk-analysis-pilot-migration.md) | ✅ completed | APK Analysis Pilot Migration 狀態圖（原 architecture/） |
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.governance.durable-goal-boundary`](../knowledge/runtime/routing-registry.yaml:129) — candidate_sources 引用 `scripts/README.md`
+- [`shared-rules/conversation-goal-ledger.md`](../shared-rules/conversation-goal-ledger.md) — 定義 active goal 與 durable planning 的邊界
+- [`shared-rules/linked-updates.md`](../shared-rules/linked-updates.md) — 計畫完成後需執行連動更新檢查
+
 ## 與其他層的關係
 
 - [`plans/active/next-stage-upgrade-plan.md`](active/next-stage-upgrade-plan.md) — 全局升級路線圖，`plans/` 中的計畫是路線圖的具體執行計畫

@@ -23,6 +23,13 @@
 - 工具專屬操作細節；放到 `ai-tools/` 或 skill-local `tool-adapters/`。
 - Conversation goal ledger state；放到 `.agent-goals/`。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.skill.apk-analysis`](../knowledge/runtime/routing-registry.yaml:225) — candidate_sources 引用 `workflow/apk-analysis/README.md`
+- [`route.skill.app-development-guidance`](../knowledge/runtime/routing-registry.yaml:434) — candidate_sources 引用 `workflow/software-delivery/README.md`
+- [`route.skill.travel-planning`](../knowledge/runtime/routing-registry.yaml:464) — candidate_sources 引用 `workflow/travel-planning/README.md`
+- [`route.intelligence.apk-highest-leverage-path`](../knowledge/runtime/routing-registry.yaml:251) — required_dependencies 引用 `workflow/apk-analysis/execution-flow.md`、`workflow/apk-analysis/artifact-gates.md`
+
 ## 與既有層的關係
 
 - `skills/` 仍是目前主要 capability entry；本層會逐步承接 skill 中的通用執行流程。

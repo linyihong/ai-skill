@@ -25,6 +25,13 @@
 - Model capability profile 本身；放到 `models/`。
 - Tool-specific metadata storage 或 UI；放到 `ai-tools/`。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.runtime.context-loading`](../knowledge/runtime/routing-registry.yaml:157) — required_dependencies 引用 `metadata/ranking/README.md`、`metadata/confidence/README.md`、`metadata/compatibility/README.md`
+- [`route.metadata.knowledge-atom-schema`](../knowledge/runtime/routing-registry.yaml:186) — required_dependencies 引用 `metadata/rules/README.md`、`metadata/ranking/README.md`、`metadata/confidence/README.md`、`metadata/compatibility/README.md`
+- [`route.models.model-aware-routing`](../knowledge/runtime/routing-registry.yaml:316) — required_dependencies 引用 `metadata/ranking/README.md`
+- [`knowledge/runtime/routing-registry.yaml`](../knowledge/runtime/routing-registry.yaml) — 多條 records 的 metadata 欄位使用 metadata schema
+
 ## 與既有層的關係
 
 - `shared-rules/rule-weight.md` 仍是目前規則衝突的可執行 policy。

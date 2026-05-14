@@ -14,6 +14,17 @@
 |------|------|
 | [`ai-native-knowledge-operating-system.md`](ai-native-knowledge-operating-system.md) | AI-native Knowledge Operating System 架構定義、層級說明、Reference-first 載入策略、相容層與 Deprecation 流程 |
 
+## 誰會參考這裡（Inbound References）
+
+變更本層內容時，需要一併檢查以下依賴方：
+
+| 來源 | 關係 |
+|------|------|
+| [`route.architecture.permanent-docs`](../knowledge/runtime/routing-registry.yaml) | Routing registry record，agent 依此找到 architecture/ |
+| [`README.md`](../README.md) | 根目錄 OS Layout 表格列出 architecture/ 層 |
+| [`decisions/`](../decisions/README.md) | ADR 可能引用 architecture 架構原則 |
+| [`plans/`](../plans/README.md) | 執行計畫可能引用 architecture 設計原則 |
+
 ## 與既有層的關係
 
 - [`plans/`](../plans/README.md)：執行計畫存放處，完成後歸檔至 `plans/archived/`

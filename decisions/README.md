@@ -92,6 +92,11 @@ proposed → accepted → deprecated → superseded
 3. **Linked**：每個 decision 連結到相關的 source files 或 decisions。
 4. **Minimal**：每個 ADR 不超過 1000 tokens。需要詳細技術分析時引用外部文件。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.decisions.adr`](../knowledge/runtime/routing-registry.yaml:687) — primary_source 為 `decisions/README.md`
+- [`route.architecture.permanent-docs`](../knowledge/runtime/routing-registry.yaml:723) — candidate_sources 引用 `decisions/ADR-001`、`decisions/ADR-003`
+
 ## 與既有層的關係
 
 - `memory/decision/`：輕量版決策記錄（session-level）

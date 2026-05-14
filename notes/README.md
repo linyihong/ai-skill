@@ -20,6 +20,10 @@
 2. 當筆記內容被正式化為規則或文件後，應在筆記中標註「已遷移」並連結目標路徑
 3. 不從 notes/ 建立 routing registry record（非 knowledge layer）
 
+## 誰會參考這裡（Inbound References）
+
+本層無 routing registry record（非 knowledge layer）。變更時無需通知其他層，但 promotion 時需更新目標層。
+
 ## 與既有層的關係
 
 - [`intelligence/`](../intelligence/README.md)：筆記中發現的可重用 pattern 可 promotion 至此

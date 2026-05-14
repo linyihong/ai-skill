@@ -21,6 +21,17 @@
 - Skill-specific workflow 全文；放到 `workflow/`（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。
 - 長期記憶內容本身；放到 `memory/` 或 `knowledge/`。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.runtime.activation-rules`](../knowledge/runtime/routing-registry.yaml:77) — candidate_sources 引用 `knowledge/runtime/README.md`
+- [`route.runtime.context-ttl`](../knowledge/runtime/routing-registry.yaml:102) — candidate_sources 引用 `knowledge/runtime/README.md`
+- [`route.runtime.context-loading`](../knowledge/runtime/routing-registry.yaml:161) — candidate_sources 引用 `knowledge/runtime/README.md`
+- [`route.metadata.knowledge-atom-schema`](../knowledge/runtime/routing-registry.yaml:191) — candidate_sources 引用 `knowledge/runtime/README.md`
+- [`route.models.model-aware-routing`](../knowledge/runtime/routing-registry.yaml:319) — candidate_sources 引用 `knowledge/runtime/README.md`
+- [`route.runtime.router-flow`](../knowledge/runtime/routing-registry.yaml:348) — candidate_sources 引用 `knowledge/runtime/README.md`
+- [`route.runtime.context-ttl-doc`](../knowledge/runtime/routing-registry.yaml:407) — candidate_sources 引用 `knowledge/runtime/README.md`
+- 共 7 條 routing records 間接引用 `runtime/` 子目錄（透過 `knowledge/runtime/README.md`）
+
 ## 與既有層的關係
 
 - `shared-rules/` 是目前可執行 policy layer；本層先描述 runtime design。

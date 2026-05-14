@@ -24,6 +24,13 @@
 - Active conversation goal state；放到 `.agent-goals/`。
 - 單一 skill 的 checklist 正文；保留在 `skills/` 或後續依遷移策略拆分。
 
+## 誰會參考這裡（Inbound References）
+
+- [`route.governance.durable-goal-boundary`](../knowledge/runtime/routing-registry.yaml:127) — required_dependencies 引用 `governance/lifecycle/README.md`
+- [`route.feedback.promotion-pipeline`](../knowledge/runtime/routing-registry.yaml:285) — required_dependencies 引用 `governance/lifecycle/README.md` 與 `governance/validation/README.md`
+- [`shared-rules/failure-learning-system.md`](../shared-rules/failure-learning-system.md) — 引用 governance 的 lifecycle 規則
+- [`plans/active/next-stage-upgrade-plan.md`](../plans/active/next-stage-upgrade-plan.md) — 引用 `governance/lifecycle/` 的 Skills Deprecation Timeline
+
 ## 與既有層的關係
 
 - `shared-rules/` 仍是可執行 governance policy 的 source of truth。

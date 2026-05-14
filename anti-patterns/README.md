@@ -54,6 +54,16 @@ AI 在長時間運作中容易陷入特定失效模式：
 - runtime/guards/{相關 guard}
 ```
 
+## 誰會參考這裡（Inbound References）
+
+變更本層內容時，需要一併檢查以下依賴方：
+
+| 來源 | 關係 |
+|------|------|
+| [`route.anti-patterns.runtime-patterns`](../knowledge/runtime/routing-registry.yaml) | Routing registry record，agent 依此找到 anti-patterns/ |
+| [`shared-rules/failure-patterns/`](../shared-rules/failure-patterns/README.md) | 操作層級 failure patterns 與本層互補 |
+| [`runtime/guards/`](../runtime/guards/README.md) | Runtime guards 實作本層 anti-pattern 的預防方式 |
+
 ## 與既有層的關係
 
 - `shared-rules/failure-patterns/`：現有的 failure patterns（偏重操作層級）
