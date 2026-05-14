@@ -17,13 +17,20 @@
 ```
 1. 讀取 CORE_BOOTSTRAP.md（本檔）
 2. 讀取 README.md（超短入口，了解 OS layout）
-3. 依任務 intent 查詢 skills-index.yaml 找到對應 skill
-4. 檢查該 skill 是否有 primary_entrypoint 欄位：
+3. [新專案檢查] 檢查目前專案是否已設定 Ai-skill：
+   - 檢查 .roomodes 是否存在且包含 CORE_BOOTSTRAP.md 參考
+   - 檢查 .cursor/rules/ 下是否有 ai-skill bootstrap 規則
+   - 檢查 CLAUDE.md 是否存在且包含 CORE_BOOTSTRAP.md 參考
+   - 若以上皆無 → 主動告知使用者：「此專案尚未設定 Ai-skill 知識庫。
+     是否要執行初始化？(./scripts/init-new-project.sh <PROJECT_ROOT>)」
+   - 若使用者同意，執行初始化腳本
+4. 依任務 intent 查詢 skills-index.yaml 找到對應 skill
+5. 檢查該 skill 是否有 primary_entrypoint 欄位：
    - 有 → 優先讀 primary_entrypoint 指向的新分層路徑
    - 無 → 讀 entrypoint 指向的舊路徑（向後相容）
-5. 依 activation rules 決定哪些 lazy-load rules 需要載入
-6. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
-7. 需要時才展開完整 source
+6. 依 activation rules 決定哪些 lazy-load rules 需要載入
+7. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
+8. 需要時才展開完整 source
 ```
 
 ## 與舊 Default Bootstrap 的關係
@@ -43,5 +50,6 @@
 ## 驗證
 
 - Core Bootstrap 三條規則已讀
+- 新專案檢查已完成（若為新專案，已詢問使用者是否初始化）
 - 任務 intent 已對應到 skills-index.yaml
 - Lazy-load rules 的 activation conditions 已檢查
