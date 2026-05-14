@@ -1,6 +1,6 @@
 # Cognitive Boundary System 整合計畫
 
-> **Status**: `draft` — 等待用戶審閱後調整
+> **Status**: `completed`
 
 ## 背景
 
