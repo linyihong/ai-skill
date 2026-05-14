@@ -35,6 +35,12 @@
 | `route.runtime.context-ttl-doc` | `runtime/context/README.md` | `index-only` | TTL doc 是設計文件，需要 prune context 時才讀。 |
 | `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `index-only` | agent-architecture atoms 在需要理解 AI 行為模式時才讀取完整內容。 |
 | `route.feedback.history` | `feedback/history/README.md` | `index-only` | feedback/history 在需要查詢或新增 lesson 時才讀取。 |
+| `route.decisions.adr` | `decisions/README.md` | `summary-first` | decisions/ 在需要查詢歷史決策或建立新 ADR 時才讀取。 |
+| `route.architecture.permanent-docs` | `architecture/README.md` | `summary-first` | architecture/ 在需要查詢架構定義或設計原則時才讀取。 |
+| `route.evaluations.scenario-results` | `evaluations/README.md` | `index-only` | evaluations/ 在需要查詢或記錄 scenario 執行結果時才讀取。 |
+| `route.tools.metadata-routing` | `tools/README.md` | `index-only` | tools/ 在需要查詢 tool 設定或 routing 規則時才讀取。 |
+| `route.traces.decision-traces` | `traces/README.md` | `index-only` | traces/ 在需要查詢或記錄 decision trace 時才讀取。 |
+| `route.anti-patterns.runtime-patterns` | `anti-patterns/README.md` | `summary-first` | anti-patterns/ 在需要查詢 runtime 失效模式或預防方式時才讀取。 |
 
 ### `specialized`
 
@@ -53,9 +59,9 @@
 
 | Compression level | Routes | Escalation note |
 | --- | --- | --- |
-| `index-only` | `route.skill.discovery`, `route.runtime.activation-rules`, `route.runtime.context-ttl`, `route.runtime.router-flow`, `route.intelligence.engineering.heuristics`, `route.runtime.context-ttl-doc`, `route.intelligence.engineering.agent-architecture`, `route.feedback.history` | 依 `models/compression/README.md` 的 escalation rules 判斷。 |
+| `index-only` | `route.skill.discovery`, `route.runtime.activation-rules`, `route.runtime.context-ttl`, `route.runtime.router-flow`, `route.intelligence.engineering.heuristics`, `route.runtime.context-ttl-doc`, `route.intelligence.engineering.agent-architecture`, `route.feedback.history`, `route.evaluations.scenario-results`, `route.tools.metadata-routing`, `route.traces.decision-traces` | 依 `models/compression/README.md` 的 escalation rules 判斷。 |
 | `source-backed` | `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.skill.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing`, `route.skill.app-development-guidance`, `route.skill.travel-planning` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
-| `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.context-loading`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.intelligence.apk-analysis.atoms`, `route.validation.ai-decision-contract` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
+| `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.context-loading`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.intelligence.apk-analysis.atoms`, `route.validation.ai-decision-contract`, `route.decisions.adr`, `route.architecture.permanent-docs`, `route.anti-patterns.runtime-patterns` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
 
 ## Agent Output Shape
 

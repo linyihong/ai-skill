@@ -47,6 +47,12 @@ Guardrails:
 | `route.runtime.context-ttl-doc` | Primary: `runtime/context/README.md`<br>Compression: `index-only`<br>Required: `runtime/context/ttl-policy.yaml`<br>Validation: TTL policy 已套用，prune strategy 已理解。 |
 | `route.intelligence.engineering.agent-architecture` | Primary: `intelligence/engineering/agent-architecture/README.md`<br>Compression: `index-only`<br>Required: `intelligence/engineering/README.md`<br>Validation: 各 atom 有明確原則、症狀表與預防方式，可反查驗證。 |
 | `route.feedback.history` | Primary: `feedback/history/README.md`<br>Compression: `index-only`<br>Required: `enforcement/feedback-lessons.md`<br>Validation: Lesson 已寫入 feedback/history/<domain>/ 對應分類，且 feedback/history/<domain>/README.md 已更新索引。 |
+| `route.decisions.adr` | Primary: `decisions/README.md`<br>Compression: `summary-first`<br>Required: `CORE_BOOTSTRAP.md`<br>Validation: decisions/README.md 已讀取，ADR 清單已查詢，graph edge 已確認。 |
+| `route.architecture.permanent-docs` | Primary: `architecture/README.md`<br>Compression: `summary-first`<br>Required: `CORE_BOOTSTRAP.md`<br>Validation: architecture/README.md 已讀取，架構文件清單已查詢。 |
+| `route.evaluations.scenario-results` | Primary: `evaluations/README.md`<br>Compression: `index-only`<br>Required: `validation/README.md`<br>Validation: Evaluation 記錄已依 scenario 分類存放，格式與 template 一致。 |
+| `route.tools.metadata-routing` | Primary: `tools/README.md`<br>Compression: `index-only`<br>Required: `ai-tools/README.md`<br>Validation: Tool metadata 已定義，compression 策略與 routing 規則已建立。 |
+| `route.traces.decision-traces` | Primary: `traces/README.md`<br>Compression: `index-only`<br>Required: `validation/README.md`<br>Validation: Trace 記錄已依 scenario 分類存放，格式與 template 一致。 |
+| `route.anti-patterns.runtime-patterns` | Primary: `anti-patterns/README.md`<br>Compression: `summary-first`<br>Required: `CORE_BOOTSTRAP.md`<br>Validation: Anti-pattern 已依格式記錄，症狀、預防與恢復方式已定義。 |
 
 ### `specialized`
 
