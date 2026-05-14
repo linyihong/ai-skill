@@ -74,7 +74,32 @@ Session Start
 | [`runtime/router/activation-rules.yaml`](runtime/router/activation-rules.yaml) | Lazy-load activation rules |
 | [`runtime/context/ttl-policy.yaml`](runtime/context/ttl-policy.yaml) | Context TTL policy |
 
-## 📌 Quickstart for New Projects
+## 📌 新專案快速啟用
+
+### 給人類（開新專案的人）
+
+如果你開了一個**全新的專案**，想讓它使用此知識庫，執行以下命令一次設定所有 AI 工具：
+
+```bash
+# 從 Ai-skill repo 目錄執行
+./scripts/init-new-project.sh /path/to/your/new-project
+
+# 範例
+./scripts/init-new-project.sh ~/projects/my-new-app
+```
+
+這會在目標專案中建立：
+
+| 工具 | 產出 | 效果 |
+|------|------|------|
+| **Roo Code** | `.roomodes` | 5 個 mode，含語言規則 + 知識更新 checkpoint |
+| **Cursor** | `.cursor/rules/ai-skill-bootstrap.mdc` | alwaysApply 規則，自動載入 |
+| **Claude Code** | `CLAUDE.md` | 自動載入 Core Bootstrap |
+| **通用** | `.agent-goals/` | 對話目標帳本 |
+
+詳細說明：[`ai-tools/new-project-onboarding.md`](ai-tools/new-project-onboarding.md)
+
+### 給 AI agent（session 啟動時）
 
 ```text
 Use the AI-native Knowledge Operating System.
