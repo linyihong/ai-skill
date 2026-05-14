@@ -22,6 +22,7 @@ Flutter/Dart AOT 分析中，何時該用 Java-level Frida hook、何時該用 D
 | Java helper/plugin hooks miss 但 proxy 顯示加密 headers | 先 inspect Dart AOT interceptors | Java hooks 無流量但 pcap 有網路活動 |
 | blutter 識別 snapshot 但 crash | 保留失敗證據，切換到 unflutter | blutter 輸出 crash log |
 | Frida constructor chain 顯示 `PBC.ctor`（PaddedBlockCipher）但 mode（CBC vs SIC vs GCM）無法從 block count 區分 | 執行 live proxy test：分別用不同 mode 加密相同明文，比對 HTTP response status code | `processBlock` count 為 43（ambiguous：CBC=42+1, GCM=1+42, CTR+PKCS7=42+1）；`GCMBlockCipher.ctor` 可能屬於不同 encryption group |
+| Frida 顯示自訂 AES 實作使用 8-byte 金鑰（非標準 16/24/32 bytes） | 不要嘗試猜測金鑰衍生方式；直接反組譯 Dart AOT 函式或新增 Frida hook 追蹤金鑰擴展階段 | 標準 Java `javax.crypto.Cipher` 或 BC `AESEngine` 拒絕 8-byte 金鑰；所有標準填充/雜湊方式（repeat、zero-pad、MD5、SHA-256、concat、XOR）都無法匹配 Dart 輸出 |
 
 ## 不建議的做法
 
