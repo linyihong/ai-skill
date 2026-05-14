@@ -98,4 +98,16 @@ Token 成本模型與 context loading 分層策略請見 [`../shared-rules/decis
 | 拆分後不更新 validator | routing registry 中的路徑失效，validation 失敗 | 執行 `ruby scripts/refresh-knowledge-runtime.rb` |
 | 忽略 token 成本 | 不考慮 agent 每次讀取的成本 | 見 `decision-efficiency.md` 的 Token 成本模型 |
 
+## 檢查點
+
+本規則應在以下時間點被檢查：
+
+| 檢查點 | 時機 | 檢查內容 |
+|--------|------|----------|
+| 新增文件後 | 建立任何 `.md` 檔案後 | 檔案是否超過 150 行？是否混合多主題？是否需要拆分？ |
+| 大幅修改文件後 | 對既有檔案新增大量內容後 | 同上，並檢查既有拆分結構是否仍合理 |
+| 文件合併或重組後 | 搬移、合併或重組目錄結構後 | 新結構是否符合拆分原則？父層 README 是否需更新？ |
+| 任何 commit 前 | `git add` 前 | 快速掃描本次新增/修改的檔案行數，確認無遺漏拆分需求 |
+| 知識提取 pipeline 完成後 | intelligence-extraction-pipeline.md 執行完 Step 5 後 | 提取產出的新檔案是否需要拆分？ |
+
 ← [回到 governance 索引](README.md)
