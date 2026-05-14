@@ -1,73 +1,73 @@
-# Knowledge Lifecycle
+# 知識生命週期（Knowledge Lifecycle）
 
-`governance/lifecycle/` defines how knowledge moves from existing source files into the new AI-native layers without breaking old skill entrypoints.
+`governance/lifecycle/` 定義知識如何從既有來源檔案遷移到新的 AI-native 分層，同時不破壞舊 skill 入口。
 
-## Source Of Truth Rule
+## 真相來源規則（Source Of Truth Rule）
 
-Until a migration is explicitly promoted and validated, existing `skills/`, `shared-rules/`, `ai-tools/`, and `scripts/` files remain the source of truth for executable behavior.
+在遷移被明確提升（promote）並驗證之前，既有的 `skills/`、`shared-rules/`、`ai-tools/` 和 `scripts/` 檔案仍然是可執行行為的真相來源。
 
-New layer files under `analysis/`, `workflow/`, `intelligence/`, `runtime/`, `memory/`, `feedback/`, `models/`, `governance/`, `knowledge/`, and `metadata/` may act as:
+`analysis/`、`workflow/`、`intelligence/`、`runtime/`、`memory/`、`feedback/`、`models/`、`governance/`、`knowledge/` 和 `metadata/` 下的新分層檔案可以作為：
 
-- Routing surfaces.
-- Candidate maps.
-- Promotion targets.
-- Metadata or summary surfaces.
-- Governance and runtime design.
+- 路由表面（Routing surfaces）
+- 候選地圖（Candidate maps）
+- 提升目標（Promotion targets）
+- 中繼資料或摘要表面（Metadata or summary surfaces）
+- 治理與執行期設計（Governance and runtime design）
 
-They must not silently replace old skill behavior before promotion.
+它們在提升之前不得靜默取代舊 skill 行為。
 
-## Durable Goal Boundary
+## 持久目標邊界（Durable Goal Boundary）
 
-Long-term lifecycle states belong in durable planning files, not in `.agent-goals/`.
+長期生命週期狀態應放在持久規劃檔案中，而不是 `.agent-goals/`。
 
-| Goal type | Durable location |
+| 目標類型 | 持久位置 |
 | --- | --- |
-| Repository roadmap, phase, migration sequence | `architecture/` |
-| Layer responsibility, candidate destinations, promotion targets | Layer README files |
-| Knowledge lifecycle, validation and deprecation rules | `governance/` |
-| Routing, metadata and atom discovery | `knowledge/`, `metadata/`, `runtime/` |
-| Active implementation work for the current conversation | `.agent-goals/` only until completion |
+| 儲存庫路線圖、階段、遷移順序 | `architecture/` |
+| 分層職責、候選目的地、提升目標 | 各分層 README 檔案 |
+| 知識生命週期、驗證與棄用規則 | `governance/` |
+| 路由、中繼資料與 atom 發現 | `knowledge/`、`metadata/`、`runtime/` |
+| 當前對話的實作工作 | `.agent-goals/`（僅到完成為止） |
 
-Before deleting an active `.agent-goals/` entry, confirm that any remaining roadmap, lifecycle, migration, promotion, deprecation or follow-up state has been written to the durable location above.
+刪除 active `.agent-goals/` 條目前，請確認任何剩餘的路線圖、生命週期、遷移、提升、棄用或後續狀態已寫入上述持久位置。
 
-## Lifecycle States
+## 生命週期狀態（Lifecycle States）
 
-| State | Meaning | Allowed content | Not allowed |
+| 狀態 | 意義 | 允許的內容 | 不允許的內容 |
 | --- | --- | --- | --- |
-| `source-of-truth` | Current canonical behavior lives here. | Existing skill/shared rule/tool/script files. | Treating a newer map as override. |
-| `candidate-map` | A map from current sources to future layer destinations. | Ownership boundaries, source-to-target tables, compatibility notes. | Bulk content migration or behavior changes. |
-| `candidate-atom` | A proposed Knowledge Atom or summary. | Metadata, summary, links to source, validation criteria. | Marking as stable without use. |
-| `validated-atom` | A candidate used or reviewed successfully. | Routing metadata, summary, checklist, validation evidence. | Removing old entrypoint. |
-| `promoted` | New layer becomes a supported reference path. | Old entrypoint links to promoted atom, index routes to both when needed. | Deleting compatibility path without deprecation. |
-| `deprecated` | Old path is being retired with a replacement. | Deprecation note, replacement link, validation record. | Breaking existing links or tool loading. |
+| `source-of-truth` | 當前標準行為在此 | 既有的 skill/shared rule/tool/script 檔案 | 將較新的地圖視為覆蓋 |
+| `candidate-map` | 從當前來源到未來分層目的地的地圖 | 擁有權邊界、來源到目標對應表、相容性說明 | 大量內容遷移或行為變更 |
+| `candidate-atom` | 提議的 Knowledge Atom 或摘要 | 中繼資料、摘要、來源連結、驗證標準 | 未經使用就標記為穩定 |
+| `validated-atom` | 已成功使用或審查的候選項目 | 路由中繼資料、摘要、檢查清單、驗證證據 | 移除舊入口 |
+| `promoted` | 新分層成為支援的參考路徑 | 舊入口連結到提升後的 atom，索引在需要時路由到兩者 | 未經棄用就刪除相容路徑 |
+| `deprecated` | 舊路徑正在退役，有替代方案 | 棄用說明、替代連結、驗證記錄 | 破壞既有連結或工具載入 |
 
-## Cold Data Archive
+## 冷資料歸檔（Cold Data Archive）
 
-Cold data archive 是 lifecycle / runtime compression 策略，不是把知識搬離 Markdown。當 lesson、summary 或 graph 數量成長到 agent 每次都需要掃大量冷資料時，應先建立 generated summary、SQLite / FTS lookup cache 或 report view，讓 agent 先查候選 source，再按需讀全文。
+冷資料歸檔是生命週期/執行期壓縮策略，不是把知識搬離 Markdown。當 lesson、summary 或 graph 數量成長到 agent 每次都需要掃大量冷資料時，應先建立 generated summary、SQLite / FTS lookup cache 或 report view，讓 agent 先查候選 source，再按需讀全文。
 
-### Trigger Thresholds
+### 觸發門檻（Trigger Thresholds）
 
-符合任一條件時，應啟動 cold-data archive / generated lookup 檢查：
+符合任一條件時，應啟動冷資料歸檔 / generated lookup 檢查：
 
-| Trigger | Action |
+| 觸發條件 | 動作 |
 | --- | --- |
-| 單一 domain 的 `feedback/history/<domain>/` 超過約 50 條 lesson，或單一 category 超過約 20 條。 | 產生或更新 category index、summary rows 與 SQLite / FTS index。 |
-| Agent 為了找 lesson 需要讀多個 `feedback_history` README 或大量 lesson 全文。 | 先用 SQLite / FTS query 找候選 `source_path`，再讀 1-3 個 canonical files。 |
-| 某批 lesson 長期未修改，但仍可能被 routing / promotion 使用。 | 標為 cold lookup candidate，保留 Markdown source，產生短 summary / tags / validation signal。 |
-| feedback lesson 被 promotion 到 `workflow/`、`intelligence/`、`shared-rules/` 或 runtime route。 | 保留原 lesson，更新 summary / graph / registry / SQLite lookup。 |
-| 查詢成本高於判斷成本，例如只需要知道「有哪些相關 lesson」。 | 使用 generated report / SQLite index，不讀全文。 |
+| 單一 domain 的 `feedback/history/<domain>/` 超過約 50 條 lesson，或單一 category 超過約 20 條 | 產生或更新 category index、summary rows 與 SQLite / FTS index |
+| Agent 為了找 lesson 需要讀多個 `feedback_history` README 或大量 lesson 全文 | 先用 SQLite / FTS query 找候選 `source_path`，再讀 1-3 個 canonical files |
+| 某批 lesson 長期未修改，但仍可能被 routing / promotion 使用 | 標為 cold lookup candidate，保留 Markdown source，產生短 summary / tags / validation signal |
+| feedback lesson 被 promotion 到 `workflow/`、`intelligence/`、`shared-rules/` 或 runtime route | 保留原 lesson，更新 summary / graph / registry / SQLite lookup |
+| 查詢成本高於判斷成本，例如只需要知道「有哪些相關 lesson」 | 使用 generated report / SQLite index，不讀全文 |
 
-### Rules
+### 規則（Rules）
 
 - Canonical source 仍是 `feedback/history/*/*.md`、`shared-rules/`、`knowledge/summaries/`、`knowledge/graphs/` 與 routing registry。
 - SQLite / FTS、generated summaries、runtime reports 都是 generated lookup views；可刪除、可重建，不作唯一來源。
-- Cold archive 不等於 deprecated。冷資料仍可能有效，只是預設不讀全文。
+- 冷資料歸檔不等於棄用。冷資料仍可能有效，只是預設不讀全文。
 - 需要修改、promotion、debug、failure learning 或高信心判斷時，必須回到 canonical Markdown / YAML。
 - 若 generated lookup 與 source 不一致，降級 lookup confidence 並重新產生，不要改 source 去迎合 cache。
 
-### Validation
+### 驗證（Validation）
 
-Cold-data archive 啟用或更新後，至少驗證：
+冷資料歸檔啟用或更新後，至少驗證：
 
 1. Generated lookup 可從 clean checkout 重建。
 2. Generated DB 或 cache 不進 git，除非另有明確 governance 決策。
@@ -75,43 +75,43 @@ Cold-data archive 啟用或更新後，至少驗證：
 4. Query result 只作 candidate list，不跳過 source-of-truth gate。
 5. Runtime reports、SQLite counts 與 canonical summary / graph / registry counts 可交叉檢查。
 
-## Promotion Gates
+## 提升關卡（Promotion Gates）
 
-A candidate can be promoted only when all gates pass:
+候選項目只有在所有關卡通過時才能提升：
 
-1. The old source path remains reachable or has a redirect note.
-2. `metadata/schema.md` metadata exists for the promoted atom or surface.
-3. `knowledge/indexes/README.md` routes relevant task intents.
-4. The owning layer README links the new path.
-5. Validation is documented in `governance/validation/`.
-6. Diff review confirms no project-specific evidence, secrets, local absolute paths, or tool mirror paths were introduced.
-7. Any durable roadmap or lifecycle state has been updated outside `.agent-goals/`.
-8. Commit, push, readback, and clean status have completed.
+1. 舊來源路徑仍然可達，或有重新導向說明。
+2. 提升後的 atom 或 surface 有 `metadata/schema.md` 中繼資料。
+3. `knowledge/indexes/README.md` 可路由相關任務意圖。
+4. 所屬分層的 README 連結了新路徑。
+5. 驗證記錄在 `governance/validation/` 中。
+6. Diff review 確認沒有引入專案特定證據、機密、本機絕對路徑或工具 mirror 路徑。
+7. 任何持久的 roadmap 或 lifecycle 狀態已在 `.agent-goals/` 之外更新。
+8. 已完成 commit、push、readback 和 clean status。
 
-## Update Strategy While Skills Still Change
+## 技能仍在變更時的更新策略（Update Strategy While Skills Still Change）
 
-When an old skill is updated before migration:
+當舊 skill 在遷移前被更新時：
 
-1. Update the old `skills/<name>/` source first.
-2. Check whether a candidate map or promoted atom references the changed section.
-3. If yes, update the map, metadata, summary, or index in the same change.
-4. If no, record that no linked update was needed in the final validation.
-5. Do not copy new skill text into a new layer unless the change is an explicit atom promotion.
+1. 先更新舊的 `skills/<name>/` 來源。
+2. 檢查是否有 candidate map 或 promoted atom 參考了變更的章節。
+3. 如果有，在同一變更中更新 map、metadata、summary 或 index。
+4. 如果沒有，在最終驗證中記錄不需要連動更新。
+5. 除非變更是明確的 atom promotion，否則不要將新的 skill 文字複製到新分層。
 
-## Deletion Rule
+## 刪除規則（Deletion Rule）
 
-Do not delete or move old skill files during candidate-map or candidate-atom phases. Deletion can be considered only after:
+在 candidate-map 或 candidate-atom 階段不要刪除或移動舊 skill 檔案。只有在以下條件滿足時才能考慮刪除：
 
-- The replacement path is promoted.
-- Existing tool adapters can still load the skill or have documented replacements.
-- Links, indexes, summaries, and metadata are updated.
-- A deprecation note and rollback path exist.
+- 替代路徑已被提升。
+- 既有的 tool adapter 仍可載入該 skill，或有文件化的替代方案。
+- 連結、indexes、summaries 和 metadata 已更新。
+- 存在棄用說明和復原路徑。
 
-## Skills Deprecation Timeline
+## 技能棄用時間表（Skills Deprecation Timeline）
 
 舊 `skills/` 目錄的內容不會一次性刪除，而是依以下階段逐步 deprecate：
 
-| Phase | Condition | Action | Status |
+| 階段 | 條件 | 動作 | 狀態 |
 | --- | --- | --- | --- |
 | **Phase A** | 新分層已建立，舊入口仍 active | 不刪除。舊 `skills/` 維持 source of truth，新分層作為 reference / routing / promotion surface。 | ✅ 已完成 |
 | **Phase B** | 所有 `techniques/` 已完成 decomposition（workflow → `analysis/`，intelligence → `intelligence/`），且 pilot 驗證通過 | 舊 technique 檔案標註 `# Deprecated — see <new path>`，但保留檔案。`skills/` 仍可被 tool adapter 載入。 | ✅ 已完成（2026-05-12） |
