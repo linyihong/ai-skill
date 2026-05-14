@@ -45,7 +45,7 @@ Wi-Fi MITM 看不到 business CONNECT？
 
 ## 相關 atoms
 
-- `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`
+- `intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md`
 - `analysis/apk/workflows/local-proxy-hook-flow.md`
 - `analysis/apk/traffic-triage.md`
 

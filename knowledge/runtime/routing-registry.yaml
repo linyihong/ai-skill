@@ -223,7 +223,7 @@ records:
       - architecture/apk-analysis-pilot-migration.md
       - analysis/apk/README.md
       - workflow/apk-analysis/README.md
-      - intelligence/engineering/apk-analysis/README.md
+      - intelligence/engineering/analysis/README.md
       - knowledge/summaries/apk-analysis-pilot.md
       - knowledge/graphs/apk-analysis-pilot.yaml
     source_of_truth_gate: old-skill-entrypoint-active
@@ -246,7 +246,7 @@ records:
 
   - id: route.intelligence.apk-highest-leverage-path
     task_intent: 選擇 APK 分析最高收益路線
-    primary_source: intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md
+    primary_source: intelligence/engineering/analysis/highest-leverage-analysis-path.md
     required_dependencies:
       - workflow/apk-analysis/execution-flow.md
       - workflow/apk-analysis/artifact-gates.md
@@ -432,7 +432,7 @@ records:
     candidate_sources:
       - analysis/app-development-guidance/README.md
       - workflow/app-development-guidance/README.md
-      - intelligence/engineering/app-development-guidance/README.md
+      - intelligence/engineering/development/README.md
       - knowledge/summaries/app-development-guidance.md
       - knowledge/graphs/workflow-app-development-guidance.yaml
     source_of_truth_gate: old-skill-entrypoint-active
@@ -526,8 +526,8 @@ records:
       - analysis/apk/workflows/http-api-documentation-flow.md
       - analysis/apk/workflows/local-proxy-hook-flow.md
       - analysis/apk/workflows/media-hls-analysis-flow.md
-      - intelligence/engineering/apk-analysis/heuristics/hook-selection.md
-      - intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md
+      - intelligence/engineering/analysis/heuristics/hook-selection.md
+      - intelligence/engineering/analysis/signals/flutter-dart-aot-detection.md
     source_of_truth_gate: old-skill-entrypoint-active
     ranking_reason: 操作流程從 techniques/ 分解而來，提供 step-by-step 執行指引，但 skill entrypoint 仍為授權邊界。
     validation_signal: 各 workflow 有明確步驟與產出格式，可依序執行。
@@ -548,20 +548,20 @@ records:
 
   - id: route.intelligence.apk-analysis.atoms
     task_intent: 套用 APK 分析工程智慧（heuristics、anti-patterns、failure、signals）
-    primary_source: intelligence/engineering/apk-analysis/README.md
+    primary_source: intelligence/engineering/analysis/README.md
     required_dependencies:
       - skills/apk-analysis/SKILL.md
       - analysis/apk/README.md
     candidate_sources:
-      - intelligence/engineering/apk-analysis/heuristics/README.md
-      - intelligence/engineering/apk-analysis/heuristics/ui-operation-stability.md
-      - intelligence/engineering/apk-analysis/heuristics/ui-to-api-attribution.md
-      - intelligence/engineering/apk-analysis/anti-patterns/README.md
-      - intelligence/engineering/apk-analysis/failure/README.md
-      - intelligence/engineering/apk-analysis/signals/README.md
-      - intelligence/engineering/apk-analysis/evidence-first-routing.md
-      - intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md
-      - intelligence/engineering/apk-analysis/live-readiness-gates.md
+      - intelligence/engineering/analysis/heuristics/README.md
+      - intelligence/engineering/analysis/heuristics/ui-operation-stability.md
+      - intelligence/engineering/analysis/heuristics/ui-to-api-attribution.md
+      - intelligence/engineering/analysis/anti-patterns/README.md
+      - intelligence/engineering/analysis/failure/README.md
+      - intelligence/engineering/analysis/signals/README.md
+      - intelligence/engineering/analysis/evidence-first-routing.md
+      - intelligence/engineering/analysis/highest-leverage-analysis-path.md
+      - intelligence/engineering/analysis/live-readiness-gates.md
       - knowledge/graphs/intelligence-apk-analysis-atoms.yaml
     source_of_truth_gate: old-skill-entrypoint-active
     ranking_reason: intelligence atoms 從 techniques/ 分解而來，提供決策智慧，但 skill entrypoint 仍為授權邊界。

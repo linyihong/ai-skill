@@ -1,7 +1,7 @@
 # Field Confidence Judgment Heuristic（欄位信心判斷啟發式）
 
 **Status**: `candidate-intelligence`
-**Source**: 從 `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md` 提取的跨領域通用部分
+**Source**: 從 `intelligence/engineering/analysis/heuristics/api-documentation-completeness.md` 提取的跨領域通用部分
 
 ## 問題
 
@@ -35,7 +35,7 @@
 
 ## 相關 atoms
 
-- `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`（領域特定版本，包含何時開始/完成 API Catalog 的決策表）
+- `intelligence/engineering/analysis/heuristics/api-documentation-completeness.md`（領域特定版本，包含何時開始/完成 API Catalog 的決策表）
 
 ## Token 影響
 

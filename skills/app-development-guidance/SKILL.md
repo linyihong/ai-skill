@@ -53,7 +53,7 @@ Routing summary:
 | 開發流程（Product Brief → BDD → 實作 → 驗證） | [`workflow/app-development-guidance/development-process.md`](../../workflow/app-development-guidance/development-process.md) |
 | 執行流程（Change Intake → Docs-First BDD → SDK Defect → Performance Gate） | [`workflow/app-development-guidance/execution-flow.md`](../../workflow/app-development-guidance/execution-flow.md) |
 | 分析方法（Risk Translation、Controls Catalog、Platforms/Languages Catalog） | [`analysis/app-development-guidance/README.md`](../../analysis/app-development-guidance/README.md) |
-| 工程智慧（Heuristics、Anti-patterns） | [`intelligence/engineering/app-development-guidance/README.md`](../../intelligence/engineering/app-development-guidance/README.md) |
+| 工程智慧（Heuristics、Anti-patterns） | [`intelligence/engineering/development/README.md`](../../intelligence/engineering/development/README.md) |
 | 產出格式與品質門檻 | [`workflow/app-development-guidance/artifact-gates.md`](../../workflow/app-development-guidance/artifact-gates.md) |
 | Review Checklist | [`workflow/app-development-guidance/review-checklist.md`](../../workflow/app-development-guidance/review-checklist.md) |
 

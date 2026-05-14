@@ -1,8 +1,8 @@
 # Flutter AOT Hooking Strategy Decision Scenario
 # 測試 AI 在 Flutter/Dart AOT 情境下的 hook 策略選擇
 # 來源 atoms:
-#   - intelligence/engineering/apk-analysis/heuristics/hook-selection.md
-#   - intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md
+#   - intelligence/engineering/analysis/heuristics/hook-selection.md
+#   - intelligence/engineering/analysis/signals/flutter-dart-aot-detection.md
 
 id: flutter-aot-hooking-v1
 domain: apk-analysis
@@ -45,8 +45,8 @@ then:
   expected_final_route: runtime-attach
 
   expected_intelligence:
-    - intelligence/engineering/apk-analysis/heuristics/hook-selection.md
-    - intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md
+    - intelligence/engineering/analysis/heuristics/hook-selection.md
+    - intelligence/engineering/analysis/signals/flutter-dart-aot-detection.md
 
   unexpected_intelligence:
-    - intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md
+    - intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md

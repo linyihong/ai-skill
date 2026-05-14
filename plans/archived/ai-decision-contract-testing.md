@@ -95,12 +95,12 @@ then:
 
   # 預期使用的 intelligence atoms
   expected_intelligence:
-    - intelligence/engineering/apk-analysis/heuristics/hook-selection.md
-    - intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md
+    - intelligence/engineering/analysis/heuristics/hook-selection.md
+    - intelligence/engineering/analysis/signals/flutter-dart-aot-detection.md
 
   # 預期不使用的 intelligence atoms
   unexpected_intelligence:
-    - intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md
+    - intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md
 ```
 
 ## Rule 格式
@@ -161,9 +161,9 @@ trace:
   final_route: runtime-attach  # 最終選擇
 
   intelligence_loaded:
-    - intelligence/engineering/apk-analysis/heuristics/hook-selection.md
-    - intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md
-    - intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md
+    - intelligence/engineering/analysis/heuristics/hook-selection.md
+    - intelligence/engineering/analysis/signals/flutter-dart-aot-detection.md
+    - intelligence/engineering/analysis/anti-patterns/early-hook-instability.md
 
   decision_rationale: >
     Flutter AOT 偵測到 libapp.so 存在且 blutter 可識別 snapshot，
@@ -211,7 +211,7 @@ result:
     expected: 3                # 預期使用 3 個 atoms
     actual: 2                  # 實際使用 2 個
     missing:
-      - intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md
+      - intelligence/engineering/analysis/anti-patterns/early-hook-instability.md
 
   # 總結
   summary:

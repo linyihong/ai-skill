@@ -49,7 +49,7 @@ skills:
       - architecture/apk-analysis-pilot-migration.md
       - analysis/apk/README.md
       - workflow/apk-analysis/README.md
-      - intelligence/engineering/apk-analysis/README.md
+      - intelligence/engineering/analysis/README.md
 
   - id: app-development-guidance
     name: App/API/Embedded Development Guidance
@@ -97,7 +97,7 @@ skills:
     related:
       - workflow/app-development-guidance/README.md
       - analysis/app-development-guidance/README.md
-      - intelligence/engineering/app-development-guidance/README.md
+      - intelligence/engineering/development/README.md
       - skills/app-development-guidance/README.md
       - skills/app-development-guidance/checklists/README.md
       - skills/app-development-guidance/controls/README.md
@@ -377,7 +377,7 @@ skills:
     entrypoint: intelligence/README.md
     summary: null
     related:
-      - intelligence/engineering/apk-analysis/README.md
+      - intelligence/engineering/analysis/README.md
 
   - id: workflow-execution
     name: Workflow Execution

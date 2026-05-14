@@ -1,5 +1,5 @@
 id: graph.intelligence-app-development-guidance
-source: intelligence/engineering/app-development-guidance/README.md
+source: intelligence/engineering/development/README.md
 status: candidate
 summary: >
   連接 app-development-guidance intelligence 層的所有 atoms：
@@ -7,19 +7,19 @@ summary: >
   每個 atom 從 execution-flow 與 analysis 層萃取可重用的工程決策原則。
 edges:
   - type: depends_on
-    target: intelligence/engineering/app-development-guidance/README.md
+    target: intelligence/engineering/development/README.md
     reason: 索引檔案，列出所有 app-development-guidance intelligence atoms
     validation: 確認 README 存在且 atoms 列表正確
   - type: related_to
-    target: intelligence/engineering/app-development-guidance/docs-first-bdd-closure.md
+    target: intelligence/engineering/development/docs-first-bdd-closure.md
     reason: BDD 優先閉環原則：observable behavior 變更前必須先更新管轄契約
     validation: 確認 atom 存在且格式正確
   - type: related_to
-    target: intelligence/engineering/app-development-guidance/risk-translation-heuristic.md
+    target: intelligence/engineering/development/risk-translation-heuristic.md
     reason: 風險轉譯原則：將攻擊者視角的觀察轉譯為開發者行動
     validation: 確認 atom 存在且格式正確
   - type: related_to
-    target: intelligence/engineering/app-development-guidance/contract-governance-heuristic.md
+    target: intelligence/engineering/development/contract-governance-heuristic.md
     reason: 契約治理原則：文件衝突時的優先順序與解決方法
     validation: 確認 atom 存在且格式正確
   - type: promotes_from

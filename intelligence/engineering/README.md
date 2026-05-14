@@ -12,13 +12,12 @@
 | [`anti-patterns/`](anti-patterns/README.md) | 反模式 |
 | [`distributed-systems/`](distributed-systems/README.md) | 分散式系統 |
 | [`agent-architecture/`](agent-architecture/README.md) | AI Agent 自身運作的智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries、pilot-first validation、failure-to-scenario closure、linked-updates completeness、decomposition strategy、stateless validation） |
-| [`apk-analysis/`](apk-analysis/README.md) | APK 分析工程智慧 |
-| [`app-development-guidance/`](app-development-guidance/README.md) | 開發指引工程智慧 |
-| [`repo-analysis/`](repo-analysis/README.md) | Repository 分析工程智慧 |
+| [`development/`](development/README.md) | 開發指引工程智慧（risk translation、docs-first BDD、contract governance） |
+| [`analysis/`](analysis/README.md) | 分析工程智慧（APK analysis、repo analysis、evidence-first routing、heuristics、signals、failure patterns） |
 
 ## 與其他層的關係
 
-- `analysis/` 提供具體分析方法，本層提供背後的原則與 why。
+- `analysis/`（根目錄）提供具體分析方法，本層提供背後的原則與 why。
 - `workflow/` 提供執行流程，本層提供選擇流程的決策邏輯。
 - `skills/` 是原始來源，已不再作為 active entrypoint。
 - `agent-architecture/` 研究 AI Agent 自身的認知行為模式，與 `shared-rules/failure-patterns/` 互補（後者記錄具體失效模式，前者解釋為什麼會發生）。

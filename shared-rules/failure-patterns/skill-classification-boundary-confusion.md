@@ -85,7 +85,7 @@ Agent 把某個 skill 的 analysis technique lesson 放到另一個不相關 ski
 
 **情境**：從 TATA 專案學到「非標準 TLS bypasses SSL hooks」和「dart:io HttpClient bypasses Java hooks」
 
-**錯誤行為**：把這兩個 lesson 放到 `intelligence/engineering/app-development-guidance/feedback_history/common/`
+**錯誤行為**：把這兩個 lesson 放到 `intelligence/engineering/development/feedback_history/common/`
 
 **為什麼錯**：這兩個是 APK 分析技術（Frida hook 策略），不是開發指引。`app-development-guidance` 的 scope 是 SDK 設計、API contract、BDD、測試策略。
 
@@ -110,7 +110,7 @@ Agent 把某個 skill 的 analysis technique lesson 放到另一個不相關 ski
 **判斷流程**：
 1. 這是一個開發指引（SDK 設計限制），不是 APK 分析技術
 2. `app-development-guidance` 已遷移 → 使用新分層路徑
-3. 這是工程智慧（理解 anti-bot 的行為邊界）→ `intelligence/engineering/app-development-guidance/feedback_history/`
-4. ✅ 最終位置：`intelligence/engineering/app-development-guidance/feedback_history/common/2026-05-13_094500-anti-bot-gateway-blocks-external-sdk.md`
+3. 這是工程智慧（理解 anti-bot 的行為邊界）→ `intelligence/engineering/development/feedback_history/`
+4. ✅ 最終位置：`intelligence/engineering/development/feedback_history/common/2026-05-13_094500-anti-bot-gateway-blocks-external-sdk.md`
 
 ← [Back to failure patterns](README.md)

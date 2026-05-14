@@ -1,6 +1,6 @@
 # Highest Leverage APK Analysis Path
 
-本文件把 `apk-analysis` 中已驗證到工作流層的「最高收益路線」整理成 engineering intelligence。它是決策判斷，不取代 `skills/apk-analysis/SKILL.md`、`WORKFLOW.md` 或原始 feedback lesson。
+本文件把 `analysis` 中已驗證到工作流層的「最高收益路線」整理成 engineering intelligence。它是決策判斷，不取代 `skills/apk-analysis/SKILL.md`、`WORKFLOW.md` 或原始 feedback lesson。
 
 ## Intelligence Status
 

@@ -1,6 +1,6 @@
-# APK Analysis Failure Intelligence
+# Analysis Failure Intelligence
 
-`intelligence/engineering/apk-analysis/failure/` 存放 APK 分析過程中具體的失敗模式與診斷知識。
+`intelligence/engineering/analysis/failure/` 存放分析過程中具體的失敗模式與診斷知識，主要源自 APK 分析領域。
 
 ## Scope
 
@@ -13,8 +13,8 @@
 
 ## 與其他層的關係
 
-- `shared-rules/failure-learning-system.md` 定義通用 failure learning 框架，本目錄存放 apk-analysis 領域的具體 failure patterns
-- `intelligence/engineering/apk-analysis/anti-patterns/` 記錄可預防的錯誤模式，本目錄記錄已發生的失敗與診斷方式
+- `shared-rules/failure-learning-system.md` 定義通用 failure learning 框架，本目錄存放分析領域的具體 failure patterns
+- `intelligence/engineering/analysis/anti-patterns/` 記錄可預防的錯誤模式，本目錄記錄已發生的失敗與診斷方式
 
 ## 目前 atoms
 

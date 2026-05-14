@@ -27,7 +27,7 @@
 4. **找高語意 hook**：request options、response wrapper、response decoder / decryptor、token/session provider。
 5. **分類路由**：先用共通流程判斷 runtime / traffic family。證據指向特定技術才讀對應 techniques 文件。不要在分類未明時一次讀完所有 technique folders。
 6. **文件化**：失敗路徑也要寫、成功證據要可重現、API 結論和方法論要分開、去敏後才保存樣本。若下一步是 SDK/client/app tool/live integration 開發，先補 project-level domain/runtime baseline 的最小可跑因素；若需要 device/install/account/session/vendor/server-issued material，補 authorized identity material self-generation audit。
-7. **回饋 skill**：新技巧寫入 `feedback/history/apk-analysis/<category>/` 或 `feedback/history/apk-analysis/common/`。已驗證技巧再同步進 `workflow/apk-analysis/execution-flow.md`、`workflow/apk-analysis/artifact-gates.md`、`analysis/apk/workflows/` 或 `intelligence/engineering/apk-analysis/`。
+7. **回饋 skill**：新技巧寫入 `feedback/history/apk-analysis/<category>/` 或 `feedback/history/apk-analysis/common/`。已驗證技巧再同步進 `workflow/apk-analysis/execution-flow.md`、`workflow/apk-analysis/artifact-gates.md`、`analysis/apk/workflows/` 或 `intelligence/engineering/analysis/`。
 
 ## 與其他層的關係
 

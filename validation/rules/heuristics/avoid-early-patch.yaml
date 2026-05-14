@@ -1,5 +1,5 @@
 # Avoid Early Patch Rule
-# 對應 anti-pattern: intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md
+# 對應 anti-pattern: intelligence/engineering/analysis/anti-patterns/early-hook-instability.md
 # 禁止在 relocation 完成前附加 hook
 
 id: avoid-early-patch

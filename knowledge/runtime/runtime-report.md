@@ -26,7 +26,7 @@
 | `route.runtime.context-loading` | `runtime/routing/README.md` | `small` | `summary-first` | Primary source、deferred sources、source-of-truth gate 與 validation signal 已可被記錄。 |
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `large` | `source-backed` | 欄位可套用到第一批 atom candidates，且 Markdown links 可解析。 |
 | `route.skill.apk-analysis` | `skills/apk-analysis/SKILL.md` | `specialized` | `source-backed` | 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。 |
-| `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md` | `specialized` | `source-backed` | 已比較可用 routes、選定 evidence-to-cost ratio 最高路線、記錄 fallback 與 attribution 回補條件。 |
+| `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/analysis/highest-leverage-analysis-path.md` | `specialized` | `source-backed` | 已比較可用 routes、選定 evidence-to-cost ratio 最高路線、記錄 fallback 與 attribution 回補條件。 |
 | `route.feedback.promotion-pipeline` | `feedback/promotion/README.md` | `large` | `source-backed` | 原 lesson source 保留、promotion target 明確、runtime surfaces 與 close-loop validation 已同步。 |
 | `route.models.model-aware-routing` | `models/profiles/README.md` | `large` | `source-backed` | Profile、compression level、primary source、deferred sources 與 validation signal 可被記錄。 |
 | `route.runtime.router-flow` | `runtime/router/README.md` | `small` | `index-only` | Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。 |
@@ -36,7 +36,7 @@
 | `route.skill.travel-planning` | `skills/travel-planning/SKILL.md` | `specialized` | `source-backed` | 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。 |
 | `route.runtime.onboarding` | `runtime/onboarding/README.md` | `specialized` | `summary-first` | 各 quickstart 的步驟可依序執行，且與對應 SKILL.md 的 Quick Start 摘要一致。 |
 | `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `specialized` | `summary-first` | 各 workflow 有明確步驟與產出格式，可依序執行。 |
-| `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/apk-analysis/README.md` | `specialized` | `summary-first` | 各 atom 有明確決策表或信號表，可反查驗證。 |
+| `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/analysis/README.md` | `specialized` | `summary-first` | 各 atom 有明確決策表或信號表，可反查驗證。 |
 | `route.validation.ai-decision-contract` | `validation/README.md` | `specialized` | `summary-first` | Scenario 的 expected_route 與 actual trace 可比對；forbidden_routes 未被使用。 |
 | `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `small` | `index-only` | 各 atom 有明確原則、症狀表與預防方式，可反查驗證。 |
 | `route.feedback.history` | `feedback/history/README.md` | `small` | `index-only` | Lesson 已寫入 feedback/history/<domain>/ 對應分類，且 feedback/history/<domain>/README.md 已更新索引。 |
@@ -67,22 +67,22 @@
 | `graph.analysis-layers` | `analysis/README.md` | `candidate` | 17 | [`analysis-layers.yaml`](../graphs/analysis-layers.yaml) |
 | `graph.analysis-repo-methods` | `analysis/repo/README.md` | `candidate` | 8 | [`analysis-repo-methods.yaml`](../graphs/analysis-repo-methods.yaml) |
 | `graph.apk-analysis-pilot` | `architecture/apk-analysis-pilot-migration.md` | `candidate` | 6 | [`apk-analysis-pilot.yaml`](../graphs/apk-analysis-pilot.yaml) |
-| `graph.apk-highest-leverage-analysis` | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md` | `candidate` | 4 | [`apk-highest-leverage-analysis.yaml`](../graphs/apk-highest-leverage-analysis.yaml) |
+| `graph.apk-highest-leverage-analysis` | `intelligence/engineering/analysis/highest-leverage-analysis-path.md` | `candidate` | 4 | [`apk-highest-leverage-analysis.yaml`](../graphs/apk-highest-leverage-analysis.yaml) |
 | `graph.decisions-adr` | `decisions/README.md` | `candidate` | 9 | [`decisions-adr.yaml`](../graphs/decisions-adr.yaml) |
 | `graph.feedback-layers` | `feedback/README.md` | `candidate` | 9 | [`feedback-layers.yaml`](../graphs/feedback-layers.yaml) |
 | `graph.feedback-promotion-pipeline` | `feedback/promotion/README.md` | `candidate` | 6 | [`feedback-promotion-pipeline.yaml`](../graphs/feedback-promotion-pipeline.yaml) |
 | `graph.governance-layers` | `governance/README.md` | `candidate` | 8 | [`governance-layers.yaml`](../graphs/governance-layers.yaml) |
 | `graph.intelligence-agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `candidate` | 20 | [`intelligence-agent-architecture.yaml`](../graphs/intelligence-agent-architecture.yaml) |
 | `graph.intelligence-anti-patterns` | `intelligence/engineering/anti-patterns/generic-repository-overuse.md` | `candidate` | 5 | [`intelligence-anti-patterns.yaml`](../graphs/intelligence-anti-patterns.yaml) |
-| `graph.intelligence-apk-analysis-atoms` | `intelligence/engineering/apk-analysis/README.md` | `candidate` | 18 | [`intelligence-apk-analysis-atoms.yaml`](../graphs/intelligence-apk-analysis-atoms.yaml) |
-| `graph.intelligence-app-development-guidance` | `intelligence/engineering/app-development-guidance/README.md` | `candidate` | 9 | [`intelligence-app-development-guidance.yaml`](../graphs/intelligence-app-development-guidance.yaml) |
+| `graph.intelligence-apk-analysis-atoms` | `intelligence/engineering/analysis/README.md` | `candidate` | 18 | [`intelligence-apk-analysis-atoms.yaml`](../graphs/intelligence-apk-analysis-atoms.yaml) |
+| `graph.intelligence-app-development-guidance` | `intelligence/engineering/development/README.md` | `candidate` | 9 | [`intelligence-app-development-guidance.yaml`](../graphs/intelligence-app-development-guidance.yaml) |
 | `graph.intelligence-architecture` | `intelligence/engineering/architecture/modular-monolith-vs-microservices.md` | `candidate` | 5 | [`intelligence-architecture.yaml`](../graphs/intelligence-architecture.yaml) |
 | `graph.intelligence-business` | `intelligence/business/saas-pricing-heuristics.md` | `candidate` | 3 | [`intelligence-business.yaml`](../graphs/intelligence-business.yaml) |
 | `graph.intelligence-distributed-systems` | `intelligence/engineering/distributed-systems/eventual-consistency-patterns.md` | `candidate` | 5 | [`intelligence-distributed-systems.yaml`](../graphs/intelligence-distributed-systems.yaml) |
 | `graph.intelligence-domain` | `intelligence/engineering/domain/aggregate-boundary-heuristics.md` | `candidate` | 5 | [`intelligence-domain.yaml`](../graphs/intelligence-domain.yaml) |
 | `graph.intelligence-failure` | `intelligence/engineering/failure/connection-leak-patterns.md` | `candidate` | 5 | [`intelligence-failure.yaml`](../graphs/intelligence-failure.yaml) |
 | `graph.intelligence-heuristics` | `intelligence/engineering/heuristics/README.md` | `candidate` | 10 | [`intelligence-heuristics.yaml`](../graphs/intelligence-heuristics.yaml) |
-| `graph.intelligence-repo-analysis` | `intelligence/engineering/repo-analysis/README.md` | `candidate` | 9 | [`intelligence-repo-analysis.yaml`](../graphs/intelligence-repo-analysis.yaml) |
+| `graph.intelligence-repo-analysis` | `intelligence/engineering/analysis/README.md` | `candidate` | 9 | [`intelligence-repo-analysis.yaml`](../graphs/intelligence-repo-analysis.yaml) |
 | `graph.intelligence-tradeoffs` | `intelligence/engineering/tradeoffs/postgres-vs-mongodb.md` | `candidate` | 5 | [`intelligence-tradeoffs.yaml`](../graphs/intelligence-tradeoffs.yaml) |
 | `graph.intelligence-travel` | `intelligence/travel/README.md` | `candidate` | 7 | [`intelligence-travel.yaml`](../graphs/intelligence-travel.yaml) |
 | `graph.metadata-navigation` | `metadata/schema.md` | `candidate` | 7 | [`metadata-navigation.yaml`](../graphs/metadata-navigation.yaml) |

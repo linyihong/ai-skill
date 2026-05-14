@@ -1,4 +1,4 @@
-> 遵守 [共用規則索引](../../../../../shared-rules/README.md)、[dependency-reading](../../../../../shared-rules/dependency-reading.md)、[neutral-language](../../../../../shared-rules/neutral-language.md)、[goal-action-validation](../../../../../shared-rules/goal-action-validation.md) 與 [feedback-lessons](../../../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+> 遵守 [共用規則索引](../../../../shared-rules/README.md)、[dependency-reading](../../../../shared-rules/dependency-reading.md)、[neutral-language](../../../../shared-rules/neutral-language.md)、[goal-action-validation](../../../../shared-rules/goal-action-validation.md) 與 [feedback-lessons](../../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 
 ### 2026-05-13 - Anti-Bot Gateway Blocks External SDK Calls via TLS Fingerprint
 
@@ -74,7 +74,7 @@ Status: candidate
 
 #### Promotion Target
 
-- `intelligence/engineering/app-development-guidance/anti-bot-gateway.md`（新分層）
+- `intelligence/engineering/development/anti-bot-gateway.md`（新分層）
 - `workflow/app-development-guidance/execution-flow.md`（SDK defect closure loop 中增加 anti-bot 檢查步驟）
 
 #### Required Linked Updates

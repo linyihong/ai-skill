@@ -1,7 +1,7 @@
 # Document Priority Hierarchy Heuristic（文件優先順序階層經驗法則）
 
 **Status**: `candidate-intelligence`
-**Source**: 從 [`intelligence/engineering/app-development-guidance/contract-governance-heuristic.md`](../app-development-guidance/contract-governance-heuristic.md) 提取的跨領域通用部分
+**Source**: 從 [`intelligence/engineering/development/contract-governance-heuristic.md`](../app-development-guidance/contract-governance-heuristic.md) 提取的跨領域通用部分
 
 ## 原則
 

@@ -1,6 +1,6 @@
-# APK Analysis Signal Detection
+# Analysis Signal Detection
 
-`intelligence/engineering/apk-analysis/signals/` 存放 APK 分析中用來辨識技術特徵的信號檢測知識。
+`intelligence/engineering/analysis/signals/` 存放分析過程中用來辨識技術特徵的信號檢測知識，主要源自 APK 分析領域。
 
 ## Scope
 
@@ -14,7 +14,7 @@
 ## 與其他層的關係
 
 - `analysis/apk/traffic-triage.md` 提供流量分流流程，本目錄提供分流所需的判斷信號
-- `intelligence/engineering/apk-analysis/heuristics/` 使用本目錄的信號來決定策略
+- `intelligence/engineering/analysis/heuristics/` 使用本目錄的信號來決定策略
 
 ## 目前 atoms
 

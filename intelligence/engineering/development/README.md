@@ -1,8 +1,6 @@
-# App Development Guidance Intelligence
+# Development Guidance Intelligence
 
-## 核心
-
-從 APK analysis、code review、design review 中萃取的可重用開發指引原則。這些 atoms 描述如何將安全觀察轉譯為開發者行動、如何維護文件契約、以及如何確保行為變更被正確記錄。
+`intelligence/engineering/development/` 存放與「開發指引」相關的工程智慧。這些 atoms 描述如何將安全觀察轉譯為開發者行動、如何維護文件契約、以及如何確保行為變更被正確記錄。
 
 ## 目前 atoms
 
@@ -17,3 +15,4 @@
 - `workflow/app-development-guidance/` 提供執行流程，本層提供背後的原則與 why。
 - `analysis/app-development-guidance/` 提供具體的分析方法，本層提供選擇方法的決策邏輯。
 - `skills/app-development-guidance/` 是原始來源，已不再作為 active entrypoint。
+- `feedback/history/app-development-guidance/` 存放本領域的 feedback lessons。

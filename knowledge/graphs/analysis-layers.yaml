@@ -72,7 +72,7 @@ edges:
     reason: Workflow 引用 analysis/ 的技術方法，analysis/ 提供 workflow 所需的技術細節。
     validation: workflow/apk-analysis/README.md 說明 reference analysis/apk/。
   - type: related_to
-    target: intelligence/engineering/apk-analysis/README.md
+    target: intelligence/engineering/analysis/README.md
     reason: Intelligence 提供判斷力，analysis 提供技術方法，兩者互補。
     validation: intelligence/apk-analysis/README.md 說明與 analysis 層的關係。
   - type: routes_to

@@ -1,5 +1,5 @@
 # Runtime-First Hooking Rule
-# 對應 heuristic: intelligence/engineering/apk-analysis/heuristics/hook-selection.md
+# 對應 heuristic: intelligence/engineering/analysis/heuristics/hook-selection.md
 # 禁止過早靜態 patch，優先 runtime hook
 
 id: runtime-first-hooking

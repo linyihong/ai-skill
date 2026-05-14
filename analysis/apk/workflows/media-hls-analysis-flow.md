@@ -1,10 +1,10 @@
 # Media / HLS Analysis Flow（媒體 / HLS 分析操作流程）
 
-`analysis/apk/workflows/media-hls-analysis-flow.md` 是從 `skills/apk-analysis/techniques/media-hls/`（已刪除）拆解出的 **HOW TO DO** 操作流程。決策智慧（媒體類型判斷信號）請見 `intelligence/engineering/apk-analysis/signals/media-type-detection.md`。
+`analysis/apk/workflows/media-hls-analysis-flow.md` 是從 `skills/apk-analysis/techniques/media-hls/`（已刪除）拆解出的 **HOW TO DO** 操作流程。決策智慧（媒體類型判斷信號）請見 `intelligence/engineering/analysis/signals/media-type-detection.md`。
 
 > **Intelligence Extracted**
 > See:
-> - `intelligence/engineering/apk-analysis/signals/media-type-detection.md`
+> - `intelligence/engineering/analysis/signals/media-type-detection.md`
 
 ## 前置準備
 

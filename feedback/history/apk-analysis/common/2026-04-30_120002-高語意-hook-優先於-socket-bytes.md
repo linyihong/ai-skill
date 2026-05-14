@@ -1,4 +1,4 @@
-# Extracted — See [`workflow/apk-analysis/execution-flow.md`](../../../../workflow/apk-analysis/execution-flow.md) (Section 2: Quick Start, step 6) and [`intelligence/engineering/apk-analysis/heuristics/hook-selection.md`](../../../../intelligence/engineering/apk-analysis/heuristics/hook-selection.md)
+# Extracted — See [`workflow/apk-analysis/execution-flow.md`](../../../../workflow/apk-analysis/execution-flow.md) (Section 2: Quick Start, step 6) and [`intelligence/engineering/analysis/heuristics/hook-selection.md`](../../../../intelligence/engineering/analysis/heuristics/hook-selection.md)
 
 ### 2026-04-30 - 高語意 hook 優先於 socket bytes
 

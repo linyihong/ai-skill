@@ -69,7 +69,7 @@ templates:
       - id: intelligence-atoms
         description: >
           APK 分析相關的工程智慧 atoms。根據 task 類型選擇性載入。
-        source: intelligence/engineering/apk-analysis/
+        source: intelligence/engineering/analysis/
         composition_rule: intelligence-atoms
         estimated_tokens: 800
         required: false

@@ -1,11 +1,11 @@
 # Local Proxy / Loopback Hook Flow（本機代理 Hook 操作流程）
 
-`analysis/apk/workflows/local-proxy-hook-flow.md` 是從 `skills/apk-analysis/techniques/local-proxy/`（已刪除）拆解出的 **HOW TO DO** 操作流程。決策智慧（何時該懷疑 local proxy、如何區分導流 vs TLS 問題）請見 `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`。
+`analysis/apk/workflows/local-proxy-hook-flow.md` 是從 `skills/apk-analysis/techniques/local-proxy/`（已刪除）拆解出的 **HOW TO DO** 操作流程。決策智慧（何時該懷疑 local proxy、如何區分導流 vs TLS 問題）請見 `intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md`。
 
 > **Intelligence Extracted**
 > See:
-> - `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`
-> - `intelligence/engineering/apk-analysis/signals/local-proxy-detection.md`
+> - `intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md`
+> - `intelligence/engineering/analysis/signals/local-proxy-detection.md`
 
 ## 前置準備
 

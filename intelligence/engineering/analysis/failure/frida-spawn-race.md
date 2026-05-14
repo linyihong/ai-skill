@@ -34,8 +34,8 @@ frida -f <app.bundle.id> --pause -l script.js
 
 ## 相關 atoms
 
-- `intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md`
-- `intelligence/engineering/apk-analysis/heuristics/hook-selection.md`
+- `intelligence/engineering/analysis/anti-patterns/early-hook-instability.md`
+- `intelligence/engineering/analysis/heuristics/hook-selection.md`
 
 ## Token 影響
 

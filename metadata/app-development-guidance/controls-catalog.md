@@ -31,5 +31,5 @@
 ## 與其他層的關係
 
 - `analysis/app-development-guidance/risk-translation.md` 提供如何將觀察轉譯為控制的流程。
-- `intelligence/engineering/app-development-guidance/risk-translation-heuristic.md` 提供控制選擇的背後原則。
+- `intelligence/engineering/development/risk-translation-heuristic.md` 提供控制選擇的背後原則。
 - `skills/app-development-guidance/controls/` 是原始來源，已不再作為 active entrypoint。

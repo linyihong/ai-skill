@@ -2,7 +2,9 @@
 
 ### 2026-05-14 - Dart 自訂 AES 實作：8-byte 金鑰無法以標準 Java/BC AES 重現
 
-Status: validated
+> **⚠️ 2026-05-14 更新：此問題已解決。** 8-byte 金鑰可以透過 **AES/CTR/NoPadding + PKCS7 padding** 搭配 **zero-padding 至 16 bytes** 的方式以標準 Java AES 重現。詳見下方「## 已解決」章節。
+
+Status: resolved ✅
 
 #### One-line Summary
 
@@ -101,10 +103,67 @@ Status: validated
 
 #### Promotion Target
 
-- `intelligence/engineering/apk-analysis/failure/` — 新增 failure atom：「custom-dart-aes-8byte-key-not-reproducible.md」
-- `intelligence/engineering/apk-analysis/heuristics/` — 更新 `hook-selection.md` 加入 8-byte key 的判斷規則
+- `intelligence/engineering/analysis/failure/` — 新增 failure atom：「custom-dart-aes-8byte-key-not-reproducible.md」
+- `intelligence/engineering/analysis/heuristics/` — 更新 `hook-selection.md` 加入 8-byte key 的判斷規則
 
 #### Required Linked Updates
 
 - `<PROJECT_ROOT>/api/API列表/public/guest_login.md` — 更新 Encryption Parameters 表格（IV 與金鑰相同）；更新 Open Questions（新增 8-byte key derivation 問題）
 - `<PROJECT_ROOT>/apk-analysis-sdk/.../SkyShieldXAspnetVersionProvider.java` — 更新 Javadoc 說明 8-byte key 無法以標準 AES 重現的事實；修正預設 IV
+
+---
+
+## ✅ 已解決（2026-05-14）
+
+### 正確解法
+
+SkyShield 的 `aesEncryptFallback` 使用 **標準 AES-128 CTR 模式**，但金鑰和 IV 在傳入前已被呼叫者 **zero-padded 至 16 bytes**。Frida hook 攔截到的是 padding 前的原始 8-byte 值，導致誤判為「自訂金鑰衍生」。
+
+**正確參數**：
+
+| 參數 | 值 | 說明 |
+|------|-----|------|
+| 加密模式 | `AES/CTR/NoPadding` | 即 SIC 模式，Java 中為 CTR |
+| 金鑰 | `"l65tvNcw"` → zero-pad 至 16 bytes | `6c 36 35 74 76 4e 63 77 00 00 00 00 00 00 00 00` |
+| IV/Nonce | `"5jZyks1r"` → zero-pad 至 16 bytes | `35 6a 5a 79 6b 73 31 72 00 00 00 00 00 00 00 00` |
+| 填充 | PKCS7 padding（先 pad 再 CTR encrypt） | 29 bytes → 32 bytes (0x03 0x03 0x03) |
+| 輸出 | Base64 encoded ciphertext | 32 bytes → 44 chars Base64 |
+
+### Java 實作
+
+```java
+byte[] key16 = padZero("l65tvNcw".getBytes("UTF-8"), 16);
+byte[] seed16 = padZero("5jZyks1r".getBytes("UTF-8"), 16);
+
+Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key16, "AES"), new IvParameterSpec(seed16));
+
+// PKCS7 pad plaintext to 16-byte boundary first
+byte[] paddedPt = pkcs7Pad(pt, 16);
+byte[] result = cipher.doFinal(paddedPt);
+String b64 = Base64.getEncoder().encodeToString(result);
+```
+
+### 驗證結果
+
+- **28/28 測試案例全部通過** 🎉
+- 所有 Frida capture 的 ciphertext 均與 Java 輸出完全一致
+- 第一個 block 永遠相同（相同 key + IV），第二個 block 隨 random suffix 變化
+
+### 為何之前失敗
+
+| 錯誤嘗試 | 失敗原因 |
+|----------|----------|
+| AES/GCM | 錯誤的模式（GCM 需要 12-byte IV，且輸出包含 auth tag） |
+| AES/CBC | 錯誤的模式（CBC 需要 16-byte IV，且輸出結構不同） |
+| BC SICBlockCipher | 正確的模式但 `processBlock` 需要完整 16-byte block |
+| 重複填充金鑰 | 正確的 key 是 zero-pad，不是 repeat-pad |
+| 未先 PKCS7 pad 就 CTR encrypt | CTR 模式本身不需要 padding，但 Dart 實作先 pad 再 CTR |
+
+### 關鍵教訓
+
+1. **Frida hook 的參數不一定是加密函式收到的實際值**——呼叫者可能在傳入前已修改參數
+2. **8-byte key 不一定是自訂金鑰衍生**——可能是呼叫者先 zero-pad 再傳入
+3. **CTR 模式 + PKCS7 padding 是罕見但有效的組合**——通常 CTR 不需要 padding，但 Dart 實作確實先 pad 再 CTR
+4. **不要只測試 CBC/GCM**——如果 CBC/GCM 都失敗，試試 CTR 模式
+5. **第一個 block 匹配是關鍵信號**——如果第一個 block 的 keystream 匹配，表示 key 和 IV 正確，問題在於模式或 padding

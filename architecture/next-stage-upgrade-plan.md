@@ -16,7 +16,7 @@
 - Cursor / Claude tool docs 已指向 central repository 與 shared-rule bootstrap。
 - `knowledge/indexes/README.md` 已建立第一版 task intent routing table 與索引格式。
 - `metadata/schema.md` 已建立 Knowledge Atom metadata schema v1，可套用到第一批 atom candidates。
-- `apk-analysis` pilot migration map 已建立，並新增 `analysis/apk/`、`workflow/apk-analysis/`、`intelligence/engineering/apk-analysis/` 候選目的地。
+- `apk-analysis` pilot migration map 已建立，並新增 `analysis/apk/`、`workflow/apk-analysis/`、`intelligence/engineering/analysis/` 候選目的地。
 - 新分層流程優先策略已建立：`governance/lifecycle/`、`governance/validation/`、metadata 子規則、`runtime/routing/`、`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/`。
 - `knowledge/runtime/routing-registry.yaml` 已建立第一版 machine-readable routing registry，包含 8 筆 sample routing records。
 - `scripts/validate-knowledge-runtime.rb` 已建立 deterministic validation helper，檢查 routing registry、refresh policy、summaries 與 graph records。
@@ -24,7 +24,7 @@
 - `scripts/generate-model-context-report.rb` 已建立第一版 model-aware context report 工具，產出 `knowledge/runtime/model-context-report.md`。
 - `feedback/promotion/README.md` 已建立 feedback promotion pipeline surface。
 - `knowledge/summaries/` 已建立第一批 6 個 Knowledge Atom summaries，覆蓋 root bootstrap、metadata schema、apk-analysis pilot、goal ledger boundary、APK highest-leverage route selection 與 feedback promotion pipeline。
-- `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md` 已建立第一個實際 APK engineering intelligence atom。
+- `intelligence/engineering/analysis/highest-leverage-analysis-path.md` 已建立第一個實際 APK engineering intelligence atom。
 - `knowledge/summaries/` 已新增 APK highest-leverage route selection summary。
 - `knowledge/graphs/` 已建立 5 個 graph records：source-boundary、metadata-navigation、apk-analysis-pilot、apk-highest-leverage-analysis、feedback-promotion-pipeline。
 - `knowledge/runtime/refresh-policy.yaml` 已建立 generated summaries / graphs / registry refresh 流程，定義 refresh、revalidate、downgrade 與 no update needed。
@@ -142,9 +142,9 @@
 
 | 領域 | 新 atoms | 位置 |
 |------|----------|------|
-| **app-development-guidance** | docs-first-bdd-closure、risk-translation-heuristic、contract-governance-heuristic | `intelligence/engineering/app-development-guidance/` |
+| **app-development-guidance** | docs-first-bdd-closure、risk-translation-heuristic、contract-governance-heuristic | `intelligence/engineering/development/` |
 | **travel-planning** | source-triage-heuristic、feasibility-build-heuristic | `intelligence/travel/` |
-| **repo-analysis** | documentation-backfill-heuristic、traceability-heuristic | `intelligence/engineering/repo-analysis/` |
+| **repo-analysis** | documentation-backfill-heuristic、traceability-heuristic | `intelligence/engineering/analysis/` |
 
 同時建立對應的 graph records（`intelligence-app-development-guidance.yaml`、`intelligence-repo-analysis.yaml`），並更新 `intelligence-travel.yaml` 加入新 atom edges。
 
@@ -204,34 +204,34 @@
 
 1. **http-api decomposition**：
    - Workflow → `analysis/apk/workflows/http-api-documentation-flow.md`（7 步驟操作流程：API Entry → Group Index → Per-API Detail → Coverage/Gap Matrix → SDK Mapping → Finish Gate → UI Automation）
-   - Intelligence → `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`（何時開始、何時完成、Field Confidence 判斷）
+   - Intelligence → `intelligence/engineering/analysis/heuristics/api-documentation-completeness.md`（何時開始、何時完成、Field Confidence 判斷）
    - 舊檔案已標註：`skills/apk-analysis/techniques/http-api/README.md`、`analysis/apk/techniques/http-api.md`
 
 2. **local-proxy decomposition**：
    - Workflow → `analysis/apk/workflows/local-proxy-hook-flow.md`（6 步驟操作流程：確認證據 → 識別 Handler → Hook → Cast Netty → 去敏 → 歸因）
-   - Intelligence → `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`（Local Proxy vs TLS Pinning 判斷表）
-   - Intelligence → `intelligence/engineering/apk-analysis/signals/local-proxy-detection.md`（主要/次要/排除信號表）
+   - Intelligence → `intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md`（Local Proxy vs TLS Pinning 判斷表）
+   - Intelligence → `intelligence/engineering/analysis/signals/local-proxy-detection.md`（主要/次要/排除信號表）
    - 舊檔案已標註：`skills/apk-analysis/techniques/local-proxy/README.md`、`analysis/apk/techniques/local-proxy.md`
 
 3. **media-hls decomposition**：
    - Workflow → `analysis/apk/workflows/media-hls-analysis-flow.md`（7 步驟操作流程：分離控制面/資料面 → Playlist → Key → Segments → 合併 → 容器驗證）
-   - Intelligence → `intelligence/engineering/apk-analysis/signals/media-type-detection.md`（Magic Bytes 參考表、靜態 vs 動畫判斷、Container Probe 指令）
+   - Intelligence → `intelligence/engineering/analysis/signals/media-type-detection.md`（Magic Bytes 參考表、靜態 vs 動畫判斷、Container Probe 指令）
    - 舊檔案已標註：`skills/apk-analysis/techniques/media-hls/README.md`、`analysis/apk/techniques/media-hls.md`
 
 **成功驗證標準**：
 - ✅ 每個 technique 至少有 1 個 workflow 檔案 + 1-2 個 intelligence atoms
 - ✅ 舊 technique 檔案已標註 `# Intelligence Extracted`
-- ✅ `analysis/apk/README.md` 和 `intelligence/engineering/apk-analysis/README.md` 待更新
+- ✅ `analysis/apk/README.md` 和 `intelligence/engineering/analysis/README.md` 待更新
 - ⏳ `knowledge/indexes/README.md` 和 `knowledge/runtime/routing-registry.yaml` 待更新
 
 **新增檔案**（7 個）：
 - `analysis/apk/workflows/http-api-documentation-flow.md`
 - `analysis/apk/workflows/local-proxy-hook-flow.md`
 - `analysis/apk/workflows/media-hls-analysis-flow.md`
-- `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`
-- `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md`
-- `intelligence/engineering/apk-analysis/signals/local-proxy-detection.md`
-- `intelligence/engineering/apk-analysis/signals/media-type-detection.md`
+- `intelligence/engineering/analysis/heuristics/api-documentation-completeness.md`
+- `intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md`
+- `intelligence/engineering/analysis/signals/local-proxy-detection.md`
+- `intelligence/engineering/analysis/signals/media-type-detection.md`
 
 **更新檔案**（6 個）：
 - `skills/apk-analysis/techniques/http-api/README.md`
@@ -257,10 +257,10 @@ Phase 28 是策略轉折點：從「搬遷內容」轉為「拆解 techniques，
 
 | 目錄 | 說明 |
 |------|------|
-| `intelligence/engineering/apk-analysis/heuristics/` | 啟發式判斷規則（何時該用哪個技術） |
-| `intelligence/engineering/apk-analysis/anti-patterns/` | 可預防的錯誤模式 |
-| `intelligence/engineering/apk-analysis/failure/` | 具體失敗模式與診斷 |
-| `intelligence/engineering/apk-analysis/signals/` | 技術特徵辨識信號 |
+| `intelligence/engineering/analysis/heuristics/` | 啟發式判斷規則（何時該用哪個技術） |
+| `intelligence/engineering/analysis/anti-patterns/` | 可預防的錯誤模式 |
+| `intelligence/engineering/analysis/failure/` | 具體失敗模式與診斷 |
+| `intelligence/engineering/analysis/signals/` | 技術特徵辨識信號 |
 | `analysis/apk/workflows/` | HOW TO DO 操作流程 |
 
 #### 建立的新檔案
@@ -268,17 +268,17 @@ Phase 28 是策略轉折點：從「搬遷內容」轉為「拆解 techniques，
 | 檔案 | 層 | 說明 |
 |------|-----|------|
 | [`analysis/apk/workflows/frida-hook-flow.md`](../analysis/apk/workflows/frida-hook-flow.md) | `analysis/` | Frida hook 操作流程（command、setup、步驟） |
-| [`intelligence/engineering/apk-analysis/heuristics/hook-selection.md`](../intelligence/engineering/apk-analysis/heuristics/hook-selection.md) | `intelligence/` | Hook 策略選擇啟發式（決策表） |
-| [`intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md`](../intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md) | `intelligence/` | 過早 hook 導致不穩定（症狀表） |
-| [`intelligence/engineering/apk-analysis/failure/frida-spawn-race.md`](../intelligence/engineering/apk-analysis/failure/frida-spawn-race.md) | `intelligence/` | Frida spawn race condition（診斷與緩解） |
-| [`intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md`](../intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md) | `intelligence/` | Flutter/Dart AOT 辨識信號（信號表） |
+| [`intelligence/engineering/analysis/heuristics/hook-selection.md`](../intelligence/engineering/analysis/heuristics/hook-selection.md) | `intelligence/` | Hook 策略選擇啟發式（決策表） |
+| [`intelligence/engineering/analysis/anti-patterns/early-hook-instability.md`](../intelligence/engineering/analysis/anti-patterns/early-hook-instability.md) | `intelligence/` | 過早 hook 導致不穩定（症狀表） |
+| [`intelligence/engineering/analysis/failure/frida-spawn-race.md`](../intelligence/engineering/analysis/failure/frida-spawn-race.md) | `intelligence/` | Frida spawn race condition（診斷與緩解） |
+| [`intelligence/engineering/analysis/signals/flutter-dart-aot-detection.md`](../intelligence/engineering/analysis/signals/flutter-dart-aot-detection.md) | `intelligence/` | Flutter/Dart AOT 辨識信號（信號表） |
 | [`notes/intelligence-extraction-observations.md`](../notes/intelligence-extraction-observations.md) | `notes/` | Extraction 過程記錄與觀察 |
 
 #### 更新的既有檔案
 
 | 檔案 | 變更 |
 |------|------|
-| `intelligence/engineering/apk-analysis/README.md` | 加入新子目錄結構與 scope |
+| `intelligence/engineering/analysis/README.md` | 加入新子目錄結構與 scope |
 | `analysis/apk/README.md` | 加入 workflows/ 目錄，更新 migration notes |
 | `skills/apk-analysis/techniques/flutter-dart-aot/README.md` | 加入 `# Intelligence Extracted` 標註 |
 | `analysis/apk/techniques/flutter-dart-aot.md` | 加入 `# Intelligence Extracted` 標註 |
@@ -295,7 +295,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 | Phase | 優先級 | 目標 | 主要產出 | 依賴 |
 |-------|--------|------|----------|------|
-| **Phase 29** | P1 | ✅ 已完成 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/apk-analysis/{heuristics,signals}/` | Phase 28（pilot 模式已驗證） |
+| **Phase 29** | P1 | ✅ 已完成 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/analysis/{heuristics,signals}/` | Phase 28（pilot 模式已驗證） |
 | **Phase 30** | P1 | ✅ 已完成 | Feedback history 提取到 feedback/ 層 | `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/extraction/`，建立 category index | Phase 29（techniques 完成後，feedback 可對應到已建立的 workflow/intelligence） |
 | **Phase 31** | P2 | ✅ 已完成 | Intelligence Extraction Pipeline 抽象化 | [`governance/lifecycle/intelligence-extraction-pipeline.md`](governance/lifecycle/intelligence-extraction-pipeline.md) — 7-step pipeline（內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引） | Phase 29（所有 techniques 完成後才有足夠經驗） |
 | **Phase 32** | P2 | ✅ 已完成 | SKILL.md 分解 | 將各 skill 的 `SKILL.md` 中剩餘內容（Quick Start、Default Workflow、Output Style、Feedback Loop）提取到對應新層 | Phase 30（feedback 提取完成） |
@@ -311,9 +311,9 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 | Technique | Workflow | Intelligence Atoms |
 |-----------|----------|-------------------|
-| http-api | `analysis/apk/workflows/http-api-documentation-flow.md` | `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md` |
-| local-proxy | `analysis/apk/workflows/local-proxy-hook-flow.md` | `intelligence/engineering/apk-analysis/heuristics/local-proxy-routing-diagnosis.md` + `intelligence/engineering/apk-analysis/signals/local-proxy-detection.md` |
-| media-hls | `analysis/apk/workflows/media-hls-analysis-flow.md` | `intelligence/engineering/apk-analysis/signals/media-type-detection.md` |
+| http-api | `analysis/apk/workflows/http-api-documentation-flow.md` | `intelligence/engineering/analysis/heuristics/api-documentation-completeness.md` |
+| local-proxy | `analysis/apk/workflows/local-proxy-hook-flow.md` | `intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md` + `intelligence/engineering/analysis/signals/local-proxy-detection.md` |
+| media-hls | `analysis/apk/workflows/media-hls-analysis-flow.md` | `intelligence/engineering/analysis/signals/media-type-detection.md` |
 
 **注意**：http-api 和 media-hls 的決策智慧較少，未產生獨立的 failure atom；local-proxy 因涉及 routing 判斷，產生了 2 個 intelligence atoms（heuristic + signals）。
 
@@ -346,7 +346,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 | 目標層 | apk-analysis | app-development-guidance |
 |--------|:-----------:|:-----------------------:|
 | `workflow/*/execution-flow.md` | 29 | 18 |
-| `intelligence/engineering/apk-analysis/` | 9 | — |
+| `intelligence/engineering/analysis/` | 9 | — |
 | `analysis/*/workflows/` | 12 | — |
 | `analysis/*/tools-and-failures.md` | 3 | — |
 | `workflow/*/artifact-gates.md` | 4 | 3 |
@@ -489,12 +489,12 @@ Pilot 成功 = AI 開始能做 decision routing：
 - **Runtime surfaces 更新**：✅ 已完成（2026-05-12）。`knowledge/runtime/routing-registry.yaml` 新增 5 條路由（app-development-guidance、travel-planning、onboarding、apk-workflows、apk-intelligence-atoms）。`knowledge/indexes/README.md` 新增 3 條索引列（onboarding、workflows、intelligence atoms）。generated summaries、reports、SQLite index 已可一鍵重建。
 - **Intelligence Extraction Pipeline 實戰驗證（P2）**：✅ 已完成（Phase 32-33 已實際執行 pipeline 的 3 種模式，pipeline 文件已更新狀態表，遺漏的 index 更新已補齊）
 - **Skills Deprecation（Phase B）**：✅ 已完成（2026-05-12）。所有 8 個 techniques 檔案（4 skills/ + 4 analysis/）已從 `# Intelligence Extracted` 升級為 `# Deprecated — see <new path>`。詳細時間線見 [`governance/lifecycle/README.md`](governance/lifecycle/README.md)。
-- **跨層一致性檢查**：✅ 已完成（2026-05-12）。`analysis/apk/workflows/README.md`、`intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/README.md` 均已列出完整 atom 表格，無遺漏。
-- **跨 skill intelligence promotion（apk-analysis → heuristics）**：✅ 已完成（2026-05-12）。從 `intelligence/engineering/apk-analysis/` 提取 2 個 proven generalized atoms 到 `intelligence/engineering/heuristics/`：
+- **跨層一致性檢查**：✅ 已完成（2026-05-12）。`analysis/apk/workflows/README.md`、`intelligence/engineering/analysis/{heuristics,anti-patterns,failure,signals}/README.md` 均已列出完整 atom 表格，無遺漏。
+- **跨 skill intelligence promotion（apk-analysis → heuristics）**：✅ 已完成（2026-05-12）。從 `intelligence/engineering/analysis/` 提取 2 個 proven generalized atoms 到 `intelligence/engineering/heuristics/`：
   - `api-documentation-completeness.md` → `field-confidence-judgment.md`（Field Confidence 判斷表：confirmed/candidate/needs capture/meaning unknown 等 8 種狀態）
   - `media-type-detection.md` → `magic-bytes-reference.md`（Magic Bytes 參考表：MP4/WebP/GIF/PNG/JPEG/MP3/FLAC/TS/WebM）
   - 原始 atoms 已加入 `# Cross-Domain Promotion` 標註
-- **跨 skill intelligence promotion（app-development-guidance → heuristics）**：✅ 已完成（2026-05-12）。從 `intelligence/engineering/app-development-guidance/` 提取 1 個 proven generalized atom 到 `intelligence/engineering/heuristics/`：
+- **跨 skill intelligence promotion（app-development-guidance → heuristics）**：✅ 已完成（2026-05-12）。從 `intelligence/engineering/development/` 提取 1 個 proven generalized atom 到 `intelligence/engineering/heuristics/`：
   - `contract-governance-heuristic.md` → `document-priority-hierarchy.md`（文件優先順序階層：6 層優先級、衝突分類流程、常見誤用表）
   - 原始 atom 已加入 `# Cross-Domain Promotion` 標註
 - **Skills Deprecation（Phase C）**：✅ 已完成（2026-05-12）。已刪除 10 個舊 technique 檔案（`skills/apk-analysis/techniques/` 的 4 個子目錄 + 1 個 README，`analysis/apk/techniques/` 的 4 個 .md + 1 個 README）。刪除前已確認 Phase C 檢查清單 7 項條件全部滿足。15+ 個引用舊路徑的檔案已更新為指向新路徑。
@@ -505,7 +505,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 | Phase | 優先級 | 目標 | 主要產出 | 依賴 |
 |-------|--------|------|----------|------|
-| **Phase 29** | P1 | ✅ 已完成 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/` | Phase 28（pilot 模式已驗證） |
+| **Phase 29** | P1 | ✅ 已完成 | 其餘 3 個 techniques decomposition（http-api、local-proxy、media-hls） | 每個 technique 拆出 workflow → `analysis/apk/workflows/` + intelligence atoms → `intelligence/engineering/analysis/{heuristics,anti-patterns,failure,signals}/` | Phase 28（pilot 模式已驗證） |
 | **Phase 30** | P1 | ✅ 已完成 | Feedback history 提取到 feedback/ 層 | `skills/apk-analysis/feedback_history/` 和 `skills/app-development-guidance/feedback_history/` 的 lessons 提取到 `feedback/extraction/`，建立 category index | Phase 29（techniques 完成後，feedback 可對應到已建立的 workflow/intelligence） |
 | **Phase 31** | P2 | ✅ 已完成 | Intelligence Extraction Pipeline 抽象化 | [`governance/lifecycle/intelligence-extraction-pipeline.md`](governance/lifecycle/intelligence-extraction-pipeline.md) — 7-step pipeline（內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引） | Phase 29（所有 techniques 完成後才有足夠經驗） |
 | **Phase 32** | P2 | ✅ 已完成 | SKILL.md 分解 | 將各 skill 的 `SKILL.md` 中剩餘內容（Quick Start、Default Workflow、Output Style、Feedback Loop）提取到對應新層 | Phase 30（feedback 提取完成） |
@@ -1120,7 +1120,7 @@ Status: `apk-analysis` pilot 已完成 content extraction（6 個新檔案）；
 
 - `analysis/apk/`：已提取 traffic triage 與 tools/failures 兩份分析文件。
 - `workflow/apk-analysis/`：已提取 execution flow 與 artifact gates 兩份工作流程文件。
-- `intelligence/engineering/apk-analysis/`：已提取 evidence-first-routing 與 live-readiness-gates 兩個 validated-intelligence atoms。
+- `intelligence/engineering/analysis/`：已提取 evidence-first-routing 與 live-readiness-gates 兩個 validated-intelligence atoms。
 - `intelligence/` 重建為 9 個子目錄（architecture、domain、failure、heuristics、anti-patterns、tradeoffs、distributed-systems、business、travel），每個有 README.md 定義 scope。
 - `knowledge/indexes/README.md`：新增 4 條 routing entries 指向新提取檔案。
 - `architecture/apk-analysis-pilot-migration.md`：狀態更新為 `content-extracted`。
@@ -1192,7 +1192,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 建立 top-level architecture directories | `analysis/`, `intelligence/`, `workflow/`, `runtime/`, `memory/`, `feedback/`, `models/`, `governance/`, `knowledge/`, `metadata/` | 已完成 | 每個目錄責任邊界清楚，不搬移大量內容 |
 | P2 | done | 設計 metadata schema | `metadata/schema.md` | 已完成 | Schema 可套用到第一批 Knowledge Atom |
 | P2 | done | 建立 knowledge navigation index | `knowledge/indexes/README.md` | 已完成 | Agent 能從 index 找到 task-relevant knowledge |
-| P2 | done | 遷移第一個 skill 作為示範 | `architecture/apk-analysis-pilot-migration.md`, `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/apk-analysis/` | 已完成 content extraction（6 files），舊入口仍 active | 舊入口仍可用，新路徑可被 reference-first 找到 |
+| P2 | done | 遷移第一個 skill 作為示範 | `architecture/apk-analysis-pilot-migration.md`, `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/analysis/` | 已完成 content extraction（6 files），舊入口仍 active | 舊入口仍可用，新路徑可被 reference-first 找到 |
 | P1 | done | 建立新分層運作流程 | `governance/`, `metadata/`, `runtime/routing/`, `knowledge/` | 已完成第一版流程與格式 | 舊 `skills/` 維持 source of truth，新分層可作 routing / promotion / validation surface |
 | P1 | done | 規範 active goal 與 durable roadmap 邊界 | `shared-rules/conversation-goal-ledger.md`, `shared-rules/content-layering.md`, `governance/lifecycle/README.md` | 已完成 | `.agent-goals/` 不作長期 archive；刪除 active goal 前需回寫 durable planning |
 | P1 | done | 建立 machine-readable routing registry | `knowledge/runtime/routing-registry.yaml`, `runtime/routing/README.md` | 已完成第一版 registry 與 8 筆 sample routing records | Runtime 可用結構化資料從 task intent 找到 primary source、dependencies、candidate summaries 與 validation signal |
@@ -1203,7 +1203,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 建立 registry / refresh validation helper | `scripts/validate-knowledge-runtime.rb`, `governance/validation/README.md`, `knowledge/runtime/README.md` | 已完成 deterministic helper | Helper 可檢查 registry、refresh policy、summaries、graphs 的必要欄位、YAML / Markdown 格式與 canonical paths |
 | P1 | done | 建立 runtime report generator | `scripts/generate-knowledge-runtime-report.rb`, `knowledge/runtime/runtime-report.md` | 已完成 deterministic report generator | Report 可由 registry、refresh policy、summaries、graphs 重新產生，並通過 runtime validator 與 Markdown link check |
 | P1 | done | 建立 model-aware context report generator | `scripts/generate-model-context-report.rb`, `knowledge/runtime/model-context-report.md`, `models/README.md` | 已完成 deterministic model context report | Report 可依 routing registry 的 model profile / compression level 重新產生，並通過 runtime validator 與 Markdown link check |
-| P1 | done | 建立第一個 APK engineering intelligence atom | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md`, `knowledge/summaries/apk-highest-leverage-analysis.md`, `knowledge/graphs/apk-highest-leverage-analysis.yaml` | 已完成最高收益路線 candidate intelligence atom | Old skill entrypoint remains active；runtime registry、summary、graph 與 knowledge index 可 route 到此 atom |
+| P1 | done | 建立第一個 APK engineering intelligence atom | `intelligence/engineering/analysis/highest-leverage-analysis-path.md`, `knowledge/summaries/apk-highest-leverage-analysis.md`, `knowledge/graphs/apk-highest-leverage-analysis.yaml` | 已完成最高收益路線 candidate intelligence atom | Old skill entrypoint remains active；runtime registry、summary、graph 與 knowledge index 可 route 到此 atom |
 | P1 | done | 建立 feedback promotion pipeline surface | `feedback/promotion/README.md`, `knowledge/summaries/feedback-promotion-pipeline.md`, `knowledge/graphs/feedback-promotion-pipeline.yaml` | 已完成 promotion / downgrade design surface | Lesson source 保留於 `feedback_history/`；runtime registry、summary、graph 與 knowledge index 可 route 到 promotion pipeline |
 | P1 | done | 建立 SQLite / FTS runtime index prototype | `knowledge/runtime/sqlite/README.md`, `scripts/generate-runtime-sqlite-index.rb`, `scripts/query-runtime-index.rb`, `scripts/validate-runtime-sqlite-index.rb` | 已完成本機 generated lookup cache、ranked query helper、filtering 與 stale checksum validator | SQLite 作為 generated lookup cache，不提交 DB binary；feedback lessons 只被索引，不搬離 `feedback_history/` |
 | P1 | done | 定義 cold feedback lesson archive lifecycle | `governance/lifecycle/README.md`, `knowledge/runtime/sqlite/README.md`, `feedback/README.md`, `memory/README.md` | 已完成冷資料觸發門檻與 source-of-truth 邊界 | Lesson 超過門檻時先使用 generated summary / SQLite FTS 查候選；Markdown 仍是 canonical source |
@@ -1221,16 +1221,16 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 建立 Anti-patterns | `anti-patterns/README.md` + 5 patterns | 已完成 5 個 anti-pattern 文件 | 失效模式可主動辨識與避免 |
 | P1 | done | 升級 Skills Metadata v2 | `skills-index.yaml` | 已完成所有 13 skills 加入 weight/domains/dependencies/conflicts/priority.runtime | Skill relevance scoring 與 conflict detection 可運作 |
 | P1 | done | 重建 intelligence/ 為專家智慧層 | `intelligence/README.md`, `intelligence/engineering/{architecture,domain,failure,heuristics,anti-patterns,tradeoffs,distributed-systems}/`, `intelligence/business/`, `intelligence/travel/` | 已完成 9 子目錄結構與 scope 定義，尚未填充實際 atoms | 每個子目錄有 README.md 定義核心、範例內容、與其他層的關係；與根 `anti-patterns/` 邊界已明確定義 |
-| P1 | done | Phase 29：其餘 3 個 techniques decomposition | `analysis/apk/workflows/`, `intelligence/engineering/apk-analysis/{heuristics,signals}/` | 已完成 http-api、local-proxy、media-hls 拆解（3 workflows + 4 intelligence atoms） | 每個 technique 有 workflow + 1-2 intelligence atoms，舊檔案已標註 |
+| P1 | done | Phase 29：其餘 3 個 techniques decomposition | `analysis/apk/workflows/`, `intelligence/engineering/analysis/{heuristics,signals}/` | 已完成 http-api、local-proxy、media-hls 拆解（3 workflows + 4 intelligence atoms） | 每個 technique 有 workflow + 1-2 intelligence atoms，舊檔案已標註 |
 | P1 | done | Phase 30：Feedback history 提取 | `feedback/extraction/apk-analysis-index.md`, `feedback/extraction/app-development-guidance-index.md` | 已完成 101 lessons 索引建立，100% lessons 已對應到目標層 | Category index 已建立，101/101 lessons 已對應到目標層 |
 | P2 | done | Phase 31：Intelligence Extraction Pipeline | `governance/lifecycle/intelligence-extraction-pipeline.md` | 已完成 7-step pipeline（內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引） | Pipeline 文件已建立，已驗證 Technique Decomposition 和 Feedback History Extraction 兩種模式 |
 | P2 | done | Phase 32：SKILL.md 分解 | `runtime/onboarding/apk-analysis-quickstart.md`, `runtime/onboarding/app-development-guidance-quickstart.md`, `runtime/onboarding/travel-planning-quickstart.md`, `workflow/travel-planning/artifact-gates.md` | 已完成 3 個 SKILL.md 瘦身（46-65% 減少），4 個新檔案建立 | SKILL.md 中所有內容已對應到目標層，舊檔案已標註 |
 | P4 | done | Phase 33：Skill-Specific Intelligence Extraction（P4） | `plans/skill-specific-extraction.md`, `workflow/app-development-guidance/review-checklist.md`, `analysis/travel/sources-and-tools.md`, `analysis/travel/README.md` | 已完成 3 個 skills 的剩餘內容提取（CHECKLIST.md、TOOLS.md、README.md），所有 skills 內容已全部提取到新分層 | 每個 skill 有專屬 extraction strategy，內容結構分析 → 拆解 → 標註 → 驗證的完整流程已執行 |
 | P2 | done | Knowledge Graph 補齊（Phase 28-33） | `knowledge/graphs/workflow-app-development-guidance.yaml`, `knowledge/graphs/intelligence-apk-analysis-atoms.yaml`, `knowledge/graphs/workflow-layers.yaml`, `knowledge/graphs/analysis-layers.yaml`, `knowledge/graphs/runtime-onboarding.yaml` | 已完成 5 個 graph records 更新，新增 1 個 graph record（runtime-onboarding） | Phase 28-33 所有新檔案在 graph records 中有對應 edge |
-| P2 | done | Intelligence Extraction Pipeline 實戰驗證（P2） | `governance/lifecycle/intelligence-extraction-pipeline.md`, `analysis/apk/workflows/README.md`, `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/README.md` | 已完成 pipeline 狀態表更新，5 個 README 的 placeholder 已替換為實際 atom 表格 | Pipeline 的 3 種模式（Technique Decomposition、Feedback History Extraction、SKILL.md Decomposition）均已實際執行 |
+| P2 | done | Intelligence Extraction Pipeline 實戰驗證（P2） | `governance/lifecycle/intelligence-extraction-pipeline.md`, `analysis/apk/workflows/README.md`, `intelligence/engineering/analysis/{heuristics,anti-patterns,failure,signals}/README.md` | 已完成 pipeline 狀態表更新，5 個 README 的 placeholder 已替換為實際 atom 表格 | Pipeline 的 3 種模式（Technique Decomposition、Feedback History Extraction、SKILL.md Decomposition）均已實際執行 |
 | P2 | done | Skills Deprecation（Phase B） | `governance/lifecycle/README.md`, `skills/apk-analysis/techniques/`, `analysis/apk/techniques/` | 已完成 8 個 techniques 檔案從 `# Intelligence Extracted` 升級為 `# Deprecated — see <new path>` | Phase B 條件（techniques decomposition 完成 + pilot 驗證通過）已滿足 |
 | P2 | done | Runtime surfaces 更新 | `knowledge/runtime/routing-registry.yaml`, `knowledge/indexes/README.md` | 已完成 routing-registry 新增 5 條路由（app-development-guidance、travel-planning、onboarding、apk-workflows、apk-intelligence-atoms），indexes 新增 3 條索引列 | 所有新層級在 routing-registry 和 indexes 中有對應路由 |
-| P2 | done | 跨層一致性檢查 | `analysis/apk/workflows/README.md`, `intelligence/engineering/apk-analysis/{heuristics,anti-patterns,failure,signals}/README.md` | 已完成所有 README 的 atom/workflow 表格檢查，無遺漏 | 每個 README 的表格與實際檔案一致 |
+| P2 | done | 跨層一致性檢查 | `analysis/apk/workflows/README.md`, `intelligence/engineering/analysis/{heuristics,anti-patterns,failure,signals}/README.md` | 已完成所有 README 的 atom/workflow 表格檢查，無遺漏 | 每個 README 的表格與實際檔案一致 |
 | P2 | done | 跨 skill intelligence promotion（apk-analysis → heuristics） | `intelligence/engineering/heuristics/field-confidence-judgment.md`, `intelligence/engineering/heuristics/magic-bytes-reference.md` | 已完成 2 個 proven generalized atoms 從 apk-analysis 提升到跨領域 heuristics 層 | 原始 atoms 有 `# Cross-Domain Promotion` 標註，新 atoms 有 `# Source` 指向原始 domain atom |
 | P2 | done | 跨 skill intelligence promotion（app-development-guidance → heuristics） | `intelligence/engineering/heuristics/document-priority-hierarchy.md` | 已完成 1 個 proven generalized atom 從 app-development-guidance 提升到跨領域 heuristics 層 | 原始 atom 有 `# Cross-Domain Promotion` 標註，新 atom 有 `# Source` 指向原始 domain atom |
 | P2 | done | Skills Deprecation（Phase C） | `governance/lifecycle/README.md`, `skills/apk-analysis/techniques/`, `analysis/apk/techniques/` | 已完成 10 個舊 technique 檔案刪除（4 個子目錄 + 1 個 README 在 skills/，4 個 .md + 1 個 README 在 analysis/），更新 15+ 個引用舊路徑的檔案 | Phase C 檢查清單 7 項條件全部滿足，刪除後可 git revert rollback |

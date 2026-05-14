@@ -1,13 +1,13 @@
 # Frida Hook Flow（Frida Hook 操作流程）
 
-`analysis/apk/workflows/frida-hook-flow.md` 是從 `skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除）拆解出的 **HOW TO DO** 操作流程。決策智慧（何時該用哪個步驟）請見 `intelligence/engineering/apk-analysis/`。
+`analysis/apk/workflows/frida-hook-flow.md` 是從 `skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除）拆解出的 **HOW TO DO** 操作流程。決策智慧（何時該用哪個步驟）請見 `intelligence/engineering/analysis/`。
 
 > **Intelligence Extracted**
 > See:
-> - `intelligence/engineering/apk-analysis/heuristics/hook-selection.md`
-> - `intelligence/engineering/apk-analysis/anti-patterns/early-hook-instability.md`
-> - `intelligence/engineering/apk-analysis/failure/frida-spawn-race.md`
-> - `intelligence/engineering/apk-analysis/signals/flutter-dart-aot-detection.md`
+> - `intelligence/engineering/analysis/heuristics/hook-selection.md`
+> - `intelligence/engineering/analysis/anti-patterns/early-hook-instability.md`
+> - `intelligence/engineering/analysis/failure/frida-spawn-race.md`
+> - `intelligence/engineering/analysis/signals/flutter-dart-aot-detection.md`
 
 ## 前置準備
 

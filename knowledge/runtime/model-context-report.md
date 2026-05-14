@@ -41,12 +41,12 @@
 | Route | Primary source | Compression | Reason |
 | --- | --- | --- | --- |
 | `route.skill.apk-analysis` | `skills/apk-analysis/SKILL.md` | `source-backed` | APK analysis 需要 skill entrypoint、workflow 與 domain-specific technique routing。 |
-| `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md` | `source-backed` | APK route selection 需要 domain workflow、feedback source 與 intelligence judgment 一起判斷。 |
+| `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/analysis/highest-leverage-analysis-path.md` | `source-backed` | APK route selection 需要 domain workflow、feedback source 與 intelligence judgment 一起判斷。 |
 | `route.skill.app-development-guidance` | `skills/app-development-guidance/SKILL.md` | `source-backed` | App development guidance 需要 skill entrypoint、workflow 與 domain-specific controls/checklists routing。 |
 | `route.skill.travel-planning` | `skills/travel-planning/SKILL.md` | `source-backed` | Travel planning 需要 skill entrypoint、workflow 與 domain-specific sources/tools routing。 |
 | `route.runtime.onboarding` | `runtime/onboarding/README.md` | `summary-first` | Onboarding 文件在需要執行對應 skill 的完整流程時才讀取。 |
 | `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `summary-first` | 需要執行對應操作流程時才讀取完整 workflow。 |
-| `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/apk-analysis/README.md` | `summary-first` | 需要對應決策智慧時才讀取完整 atom。 |
+| `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/analysis/README.md` | `summary-first` | 需要對應決策智慧時才讀取完整 atom。 |
 | `route.validation.ai-decision-contract` | `validation/README.md` | `summary-first` | 需要驗證 AI 決策品質時才讀取完整 scenario 與 rule 定義。 |
 
 ## Compression View

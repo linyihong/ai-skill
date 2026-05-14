@@ -1,7 +1,7 @@
 # Magic Bytes Reference Heuristic（Magic Bytes 快速參考）
 
 **Status**: `candidate-intelligence`
-**Source**: 從 `intelligence/engineering/apk-analysis/signals/media-type-detection.md` 提取的跨領域通用部分
+**Source**: 從 `intelligence/engineering/analysis/signals/media-type-detection.md` 提取的跨領域通用部分
 
 ## 問題
 
@@ -71,7 +71,7 @@ ffmpeg -i media_file -f null -
 
 ## 相關 atoms
 
-- `intelligence/engineering/apk-analysis/signals/media-type-detection.md`（領域特定版本，包含 HLS/TS 等 APK 分析專用信號）
+- `intelligence/engineering/analysis/signals/media-type-detection.md`（領域特定版本，包含 HLS/TS 等 APK 分析專用信號）
 
 ## Token 影響
 

@@ -87,7 +87,7 @@ Status: candidate
 
 #### Promotion Target
 
-- `intelligence/engineering/app-development-guidance/`（新分層）
+- `intelligence/engineering/development/`（新分層）
 
 #### Required Linked Updates
 

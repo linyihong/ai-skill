@@ -1,6 +1,6 @@
 # APK Analysis Execution Flow
 
-本文件定義授權 APK 分析的 agent 執行流程。分析方法見 [`analysis/apk/`](../../analysis/apk/)；工程智慧見 [`intelligence/engineering/apk-analysis/`](../../intelligence/engineering/apk-analysis/)。
+本文件定義授權 APK 分析的 agent 執行流程。分析方法見 [`analysis/apk/`](../../analysis/apk/)；工程智慧見 [`intelligence/engineering/analysis/`](../../intelligence/engineering/analysis/)。
 
 ## 1. 開始前確認
 

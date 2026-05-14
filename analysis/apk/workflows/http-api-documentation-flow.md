@@ -1,10 +1,10 @@
 # HTTP API Documentation Flow（HTTP API 文件操作流程）
 
-`analysis/apk/workflows/http-api-documentation-flow.md` 是從 `skills/apk-analysis/techniques/http-api/`（已刪除）拆解出的 **HOW TO DO** 操作流程。決策智慧（何時該開始、何時該停、欄位信心判斷）請見 `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`。
+`analysis/apk/workflows/http-api-documentation-flow.md` 是從 `skills/apk-analysis/techniques/http-api/`（已刪除）拆解出的 **HOW TO DO** 操作流程。決策智慧（何時該開始、何時該停、欄位信心判斷）請見 `intelligence/engineering/analysis/heuristics/api-documentation-completeness.md`。
 
 > **Intelligence Extracted**
 > See:
-> - `intelligence/engineering/apk-analysis/heuristics/api-documentation-completeness.md`
+> - `intelligence/engineering/analysis/heuristics/api-documentation-completeness.md`
 
 ## 前置準備
 

@@ -3,7 +3,7 @@
 | 欄位 | 值 |
 | --- | --- |
 | Atom ID | `intelligence.apk-highest-leverage-analysis` |
-| Source path | [`../../intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md`](../../intelligence/engineering/apk-analysis/highest-leverage-analysis-path.md) |
+| Source path | [`../../intelligence/engineering/analysis/highest-leverage-analysis-path.md`](../../intelligence/engineering/analysis/highest-leverage-analysis-path.md) |
 | Lifecycle | `candidate` |
 | Summary | APK 分析 checkpoint 應先界定未知，再依 time-to-evidence、語意距離、安全性與 validation clarity 選擇最高收益路線。 |
 | When to read | APK 分析卡住、可選多條 route，或需要判斷 UI、API replay、hook、pcap、MITM、static xref 哪條先做時。 |
