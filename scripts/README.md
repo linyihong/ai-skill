@@ -2,6 +2,7 @@
 
 | 檔案 | 用途 |
 | --- | --- |
+| [`init-new-project.sh`](init-new-project.sh) | **新專案初始化**：在目標專案目錄中一次建立 Roo Code（`.roomodes`）、Cursor（`.cursor/rules/`）、Claude Code（`CLAUDE.md`）的設定檔，全部指向 Ai-skill 知識庫。開新專案時跑一次就好。 |
 | [`sync-cursor-bundle.sh`](sync-cursor-bundle.sh) | 可選的 Cursor symlink / bundle bridge：把本庫同步到 **`~/.cursor/bundles/shared-rules`**（共用規則）與 **`~/.cursor/bundles/ai-skill/`**（各 skill），再讓 `~/.cursor/shared-rules`、`~/.cursor/skills/<name>` 指向 bundle（與其他 `.cursor` 內容分流）。Reference-only 不需要執行。 |
 | [`ai-skill-close-loop.sh`](ai-skill-close-loop.sh) | 保守收尾工具：偵測 active close-loop lock、列出 dirty 檔案 owner group；預設 dry-run，`--commit` 才分組提交，`--push` 才推遠端。 |
 | [`agent-goals.sh`](agent-goals.sh) | 工具中立的專案暫存 goal ledger helper：在 `<PROJECT_ROOT>/.agent-goals/` 建立、更新、拆解、暫停、完成刪除對話目標；不提交 goal 檔。 |
@@ -15,6 +16,44 @@
 | [`query-knowledge-graph.rb`](query-knowledge-graph.rb) | 查詢 graph edges，支援 source / target / type / keyword filters。 |
 | [`refresh-knowledge-runtime.rb`](refresh-knowledge-runtime.rb) | 一鍵重建 model/runtime reports、SQLite index，並執行 runtime validators。 |
 | [`git-hooks/post-commit`](git-hooks/post-commit) | **可選。**在本 repo 設定 `git config core.hooksPath scripts/git-hooks` 且 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 時，**`git commit`** 後會執行 `sync-cursor-bundle.sh`。 |
+
+## New project initialization
+
+開新專案時，用 [`init-new-project.sh`](init-new-project.sh) 一次設定所有 AI 工具：
+
+```bash
+./scripts/init-new-project.sh ~/projects/my-new-app
+```
+
+這會在目標專案中建立：
+
+| 工具 | 產出檔案 | 內容 |
+|------|---------|------|
+| Roo Code | `.roomodes` | 5 個 mode（code/architect/ask/debug/orchestrator），含語言規則 + 知識更新 checkpoint |
+| Cursor | `.cursor/rules/ai-skill-bootstrap.mdc` | alwaysApply 規則，含啟動流程 + 語言規則 + checkpoint |
+| Cursor | `.cursor/hooks.json` | sessionStart hook 提醒 |
+| Claude Code | `CLAUDE.md` | 自動載入 Core Bootstrap + 語言規則 + checkpoint |
+| 通用 | `.agent-goals/` | 對話目標帳本目錄 |
+
+只設定特定工具：
+
+```bash
+./scripts/init-new-project.sh ~/projects/my-new-app --tools roo,cursor
+```
+
+預覽模式（不實際寫入）：
+
+```bash
+./scripts/init-new-project.sh ~/projects/my-new-app --dry-run
+```
+
+覆蓋已有檔案：
+
+```bash
+./scripts/init-new-project.sh ~/projects/my-new-app --force
+```
+
+完整說明見 [`ai-tools/new-project-onboarding.md`](../ai-tools/new-project-onboarding.md)。
 
 **規則：**reference-only 是預設，不需要跑 bundle sync。只有本機明確用 Cursor symlink / bundle / copy mirror 佈署，且希望 mirror 立刻跟上時，才跑 `sync-cursor-bundle.sh`（或以 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 啟用上述 hook / close-loop helper 同步）。
 
