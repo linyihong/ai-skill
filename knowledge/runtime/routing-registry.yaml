@@ -681,3 +681,34 @@ records:
       profile: small
       compression_level: index-only
       reason: feedback/history 在需要查詢或新增 lesson 時才讀取。
+
+  - id: route.decisions.adr
+    task_intent: 查詢或記錄架構決策、了解歷史決策脈絡、或確認某個決策是否已有 ADR
+    primary_source: decisions/README.md
+    required_dependencies:
+      - CORE_BOOTSTRAP.md
+    candidate_sources:
+      - decisions/ADR-001-reference-first-migration-strategy.md
+      - decisions/ADR-002-intelligence-vs-knowledge-separation.md
+      - decisions/ADR-003-three-layer-architecture.md
+      - decisions/ADR-004-feedback-promotion-pipeline.md
+      - decisions/ADR-005-memory-architecture.md
+      - memory/decision/README.md
+      - knowledge/graphs/decisions-adr.yaml
+    source_of_truth_gate: decisions-readme-active
+    ranking_reason: decisions/README.md 提供 ADR 生命週期、格式與現有 ADR 清單，是 decisions 層的 entry point。
+    validation_signal: decisions/README.md 已讀取，ADR 清單已查詢，graph edge 已確認。
+    metadata:
+      priority: P2
+      confidence: high
+      context_cost:
+        estimated_tokens: 300
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: decisions/ 在需要查詢歷史決策或建立新 ADR 時才讀取。

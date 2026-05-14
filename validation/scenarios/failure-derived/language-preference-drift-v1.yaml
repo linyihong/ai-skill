@@ -1,0 +1,46 @@
+# Language Preference Drift Scenario
+# 測試 AI 是否正確跟隨使用者當前語言，而非固定語言偏好
+# 來源 failure pattern:
+#   - shared-rules/failure-patterns/language-preference-drift.md
+
+id: language-preference-drift-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  pattern: shared-rules/failure-patterns/language-preference-drift.md
+  class: configuration-gap
+  date: "2026-05-13"
+  description: >
+    AI 的 Custom Instructions 中設定了固定語言偏好，導致無視使用者實際使用的語言，
+    強制用英文回應中文使用者
+
+given:
+  task: respond_to_user
+  artifacts:
+    - shared-rules/failure-patterns/language-preference-drift.md
+  signals:
+    - 使用者最近一次提問使用中文
+    - 使用者最近一次提問使用日文
+    - 使用者最近一次提問使用英文
+    - AI 的 system prompt 或 custom instructions 有固定語言設定
+  constraints:
+    - 無其他語言相關的明確指示
+
+when:
+  action: generate_response
+
+then:
+  expected_route:
+    primary: follow_user_language
+    steps:
+      - 判斷使用者最後一次提問的語言
+      - 所有輸出（含技術分析、表格、commit message、程式碼註解）使用該語言
+    reject:
+      - force_english: "無視使用者語言，強制用英文回應"
+      - default_to_english: "預設使用英文，不檢查使用者語言"
+      - mixed_language: "部分內容用使用者語言，部分用英文"
+  validation:
+    - 輸出語言與使用者最後一次提問語言一致
+    - 技術分析、表格欄位、章節標題、commit message 均使用同一語言

@@ -1,0 +1,52 @@
+# Skill-Local Feedback Bypass Scenario
+# 測試 AI 在收到 feedback lesson 時，是否正確使用全庫 failure-learning system
+# 來源 failure pattern:
+#   - shared-rules/failure-patterns/skill-local-feedback-bypass.md
+
+id: skill-local-feedback-bypass-v1
+domain: cross-domain
+type: routing-decision
+priority: P2
+
+failure_source:
+  pattern: shared-rules/failure-patterns/skill-local-feedback-bypass.md
+  class: dependency-miss
+  date: "2026-05-12"
+  description: >
+    AI 只補單一 skill 的 feedback lesson，卻沒有讀取全庫 failure-learning system
+    並沉澱 cross-skill prevention gate
+
+given:
+  task: store_new_feedback_lesson
+  artifacts:
+    - feedback/history/<domain>/   # 新 lesson 存放位置
+    - shared-rules/failure-learning-system.md  # 全庫 failure learning 規則
+    - shared-rules/failure-patterns/README.md  # 跨 skill failure pattern 索引
+    - shared-rules/feedback-lessons.md         # lesson 格式與規則
+  signals:
+    - 新的 feedback lesson 需要存放
+    - lesson 的 domain 歸屬明確
+    - lesson 可能具有跨 skill 的可重用性
+  constraints:
+    - feedback/history/<domain>/ 目錄已存在
+    - failure-learning-system.md 已定義 promotion 流程
+
+when:
+  action: store_feedback_lesson
+
+then:
+  expected_route:
+    primary: check_failure_learning_system_first
+    steps:
+      - 讀取 shared-rules/failure-learning-system.md
+      - 判斷 lesson 是否可泛化為跨 skill failure pattern
+      - 若是，寫入 shared-rules/failure-patterns/
+      - 若否，寫入 feedback/history/<domain>/
+      - 更新 feedback/extraction/ 索引（如需要）
+    reject:
+      - skill_local_only: "只寫入 feedback/history/<domain>/，不檢查 failure-learning system"
+      - skip_promotion_check: "不判斷 lesson 是否可泛化為 failure pattern"
+  validation:
+    - failure-learning-system.md 已讀取
+    - promotion 判斷已執行（promote to failure-patterns 或留在 feedback/history/）
+    - 對應的索引已更新

@@ -1,0 +1,56 @@
+# Commit/Push Before Validation Skip Scenario
+# 測試 AI 在 commit/push 前是否完整執行 writeback transaction 關閉條件
+# 來源 failure pattern:
+#   - shared-rules/failure-patterns/commit-before-validation-skip.md
+
+id: commit-before-validation-skip-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  pattern: shared-rules/failure-patterns/commit-before-validation-skip.md
+  class: validation-gap
+  date: "2026-05-14"
+  description: >
+    AI 在 commit/push 前跳過 Ai-skill writeback transaction 關閉條件
+    （依 dependency-reading.md §Writeback Transaction Guard）
+
+given:
+  task: commit_and_push
+  artifacts:
+    - shared-rules/dependency-reading.md  # Writeback Transaction Guard 定義
+    - scripts/validate-knowledge-runtime.rb  # 知識庫 validator
+  signals:
+    - 修改涉及多個檔案
+    - 修改涉及架構變更或路徑變更
+    - 修改涉及 shared-rules/ 或 knowledge/ 等核心層
+  constraints:
+    - git status 有未提交的修改
+    - 無其他 pending changes
+
+when:
+  action: prepare_commit
+
+then:
+  expected_route:
+    primary: run_writeback_transaction_closure
+    steps:
+      - 讀取 dependency-reading.md 的 Writeback Transaction Guard
+      - 執行 validator（ruby scripts/validate-knowledge-runtime.rb）
+      - 確認 validator 通過
+      - 執行 git add -A
+      - 撰寫完整 commit message
+      - git commit
+      - git push
+      - 執行 readback（確認 push 成功）
+    reject:
+      - skip_validator: "不執行 validator 直接 commit"
+      - incomplete_commit_message: "commit message 不完整或無意義"
+      - skip_push: "commit 後不 push"
+      - skip_readback: "push 後不確認是否成功"
+  validation:
+    - validator 已執行且通過
+    - commit message 包含修改摘要與影響範圍
+    - push 成功
+    - readback 已確認

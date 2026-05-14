@@ -1,0 +1,54 @@
+# Failure-to-Validator Closure Scenario
+# 測試 AI 在修復錯誤後，是否將錯誤模式抽象化為可重複檢測的 validator 測試案例
+# 來源 failure pattern:
+#   - shared-rules/failure-patterns/failure-to-validator-closure.md
+
+id: failure-to-validator-closure-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  pattern: shared-rules/failure-patterns/failure-to-validator-closure.md
+  class: validation-gap
+  date: "2026-05-13"
+  description: >
+    AI 修復錯誤後，沒有把錯誤模式抽象化為可重複檢測的 validator 測試案例，
+    導致同類錯誤可能在未來重演
+
+given:
+  task: fix_detected_error
+  artifacts:
+    - scripts/validate-knowledge-runtime.rb  # 現有 validator
+    - validation/scenarios/failure-derived/  # 現有 failure-derived scenarios
+    - shared-rules/failure-patterns/README.md  # failure pattern 索引
+  signals:
+    - 錯誤已被修復
+    - 錯誤模式具有可重複性（可能跨檔案、跨 session 重演）
+    - 現有 validator 或 scenario 無法檢測此模式
+  constraints:
+    - 錯誤修復已完成
+    - git status 有未提交的修改
+
+when:
+  action: complete_error_fix
+
+then:
+  expected_route:
+    primary: create_or_update_validator
+    steps:
+      - 分析錯誤的根本原因與可重複模式
+      - 判斷是否可寫入 validator（Ruby script）或 validation scenario（YAML）
+      - 若是 validator：更新 scripts/validate-knowledge-runtime.rb
+      - 若是 scenario：建立 validation/scenarios/failure-derived/<id>.yaml
+      - 更新 failure pattern 的 Linked Validation Scenarios 區段
+      - 執行 validator 確認新規則通過
+    reject:
+      - fix_only: "只修錯誤，不建立 prevention"
+      - skip_validator_update: "錯誤模式可被 validator 檢測但不更新 validator"
+      - skip_scenario: "錯誤模式可被 scenario 檢測但不建立 scenario"
+  validation:
+    - 錯誤模式已抽象化
+    - validator 或 scenario 已建立或更新
+    - failure pattern 的 Linked Validation Scenarios 已更新
+    - 新 validator/scenario 可通過當前程式碼

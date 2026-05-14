@@ -1,0 +1,55 @@
+# Correction Loop Bypass Scenario
+# 測試 AI 在使用者指出修正不完整時，是否完整執行修正閉環
+# 來源 failure pattern:
+#   - shared-rules/failure-patterns/correction-loop-bypass.md
+
+id: correction-loop-bypass-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  pattern: shared-rules/failure-patterns/correction-loop-bypass.md
+  class: validation-gap
+  date: "2026-05-12"
+  description: >
+    AI 在使用者指出修正不完整時，只修當下文字，卻漏掉 .agent-goals、
+    failure learning、linked updates、validation、commit/push/readback
+
+given:
+  task: fix_incomplete_correction
+  artifacts:
+    - .agent-goals/          # 對話目標記錄
+    - shared-rules/failure-patterns/  # failure learning 系統
+    - shared-rules/linked-updates.md  # 連動更新規則
+  signals:
+    - 使用者指出「還有其他檔案沒更新」
+    - 使用者指出「你只修了文字，沒跑 validation」
+    - 使用者指出「你跳過了 commit/push/readback」
+    - 當前修改只涉及單一檔案的文字變更
+  constraints:
+    - 無其他 pending changes
+    - git status 有未提交的修改
+
+when:
+  action: complete_correction_loop
+
+then:
+  expected_route:
+    primary: execute_full_correction_loop
+    steps:
+      - 檢查 .agent-goals/ 是否有未完成的 goal
+      - 檢查 failure learning system 是否需要更新
+      - 執行 linked updates 檢查
+      - 執行 validator
+      - commit/push/readback
+    reject:
+      - patch_only_text: "只修使用者指出的文字，不跑完整閉環"
+      - skip_validation: "跳過 validator 直接 commit"
+      - skip_linked_updates: "不檢查連動更新"
+  validation:
+    - .agent-goals/ 已更新或確認無未完成 goal
+    - failure learning 已檢查
+    - linked updates 已執行
+    - validator 已通過
+    - commit/push/readback 已完成
