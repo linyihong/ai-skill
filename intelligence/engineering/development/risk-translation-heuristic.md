@@ -1,7 +1,7 @@
 # Risk Translation Heuristic（風險轉譯經驗法則）
 
 **Status**: `candidate-intelligence`
-**Source**: [`analysis/app-development-guidance/risk-translation.md`](../../analysis/app-development-guidance/risk-translation.md), [`workflow/app-development-guidance/execution-flow.md`](../../workflow/app-development-guidance/execution-flow.md)
+**Source**: [`analysis/development-guidance/risk-translation.md`](../../analysis/development-guidance/risk-translation.md), [`workflow/software-delivery/execution-flow.md`](../../workflow/software-delivery/execution-flow.md)
 
 ## 原則
 

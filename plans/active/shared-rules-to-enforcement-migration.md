@@ -202,7 +202,7 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 - [ ] 更新 `feedback/README.md`（若有 shared-rules 引用）
 - [ ] 更新 `feedback/pipeline/README.md`（若有 shared-rules 引用）
 - [ ] 更新 `feedback/extraction/apk-analysis-index.md`（若有 shared-rules 引用）
-- [ ] 更新 `feedback/extraction/app-development-guidance-index.md`（若有 shared-rules 引用）
+- [ ] 更新 `feedback/extraction/development-guidance-index.md`（若有 shared-rules 引用）
 - [ ] 更新 `feedback/history/README.md`（若有 shared-rules 引用）
 
 **knowledge/:**
@@ -222,7 +222,7 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 
 **analysis/:**
 - [ ] 更新 `analysis/README.md`（若有 shared-rules 引用）
-- [ ] 更新 `analysis/app-development-guidance/README.md`（若有 shared-rules 引用）
+- [ ] 更新 `analysis/development-guidance/README.md`（若有 shared-rules 引用）
 
 **metadata/:**
 - [ ] 更新 `metadata/README.md`（若有 shared-rules 引用）

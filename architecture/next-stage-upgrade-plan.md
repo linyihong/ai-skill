@@ -87,7 +87,7 @@
 - **Phase 6：Governance 子目錄** — `governance/cleanup/README.md`（5 種 duplicate 類型、splitting 規則、ownership boundary）、`governance/dependency/README.md`（graph 更新時機、edge type controlled vocabulary、validation checklist）
 - **Phase 7：Analysis 子目錄** — `analysis/repo/README.md`（4 種分析方法）、`analysis/production/README.md`（5 種生產分析）、`analysis/issue/README.md`（5 種 issue 分類與 priority 計算）
 - **Phase 8：Feedback 子目錄** — `feedback/replay/README.md`（5 種 trigger conditions、replay flow）、`feedback/extraction/README.md`（extraction threshold table、intelligence type mapping）、`feedback/refinement/README.md`（6 種 trigger、5 種 problem types、version management）
-- **Phase 9：Workflow 子目錄** — `workflow/app-development-guidance/README.md`（5 種 review types）、`workflow/repo-analysis/README.md`（5 種 analysis types）、`workflow/travel-planning/README.md`（6 種 planning types）
+- **Phase 9：Workflow 子目錄** — `workflow/software-delivery/README.md`（5 種 review types）、`workflow/repo-analysis/README.md`（5 種 analysis types）、`workflow/travel-planning/README.md`（6 種 planning types）
 - **Phase 10：Memory 子目錄** — `memory/episodic/README.md`（情境記憶）、`memory/project/README.md`（專案記憶）、`memory/failure/README.md`（失效記憶），memory/ 完整 6 子層
 - **Phase 11：Decisions ADR** — 5 筆實際 ADR（Reference-First Migration Strategy、Intelligence vs Knowledge Separation、Three-Layer Architecture、Feedback Promotion Pipeline、Memory Architecture）
 
@@ -104,11 +104,11 @@
 ### ✅ 已完成：Phase 17-19
 
 - **Phase 17：App Development Guidance 內容提取** — 從 `skills/app-development-guidance/` 提取以下內容到新分層：
-  - `WORKFLOW.md` → `workflow/app-development-guidance/execution-flow.md`：8 個 workflow sections（Start From Evidence + Change Intake、Docs-first BDD closure loop、SDK defect closure loop、Same-session closure、Performance test gate、Backfill rules、Validate、Feed Back Reusable Lessons）
-  - `DOCUMENTATION.md` → `workflow/app-development-guidance/artifact-gates.md`：6 個 artifact sections（Reusable Note Structure、Keep Separate、Reusable Guidance Boundary、Required Linked Update Statement、Good Guidance、Avoid）
-  - `WORKFLOW.md` §2-5 → `analysis/app-development-guidance/risk-translation.md`：5 個 analysis methods（Translate To Risk、Choose The Owner Layer、Define Controls、File The Guidance、Apply Required Linked Updates）
-  - 建立 `analysis/app-development-guidance/README.md` 定義 scope 與 4 個 analysis methods
-  - 更新 `workflow/app-development-guidance/README.md` 加入 extracted content table
+  - `WORKFLOW.md` → `workflow/software-delivery/execution-flow.md`：8 個 workflow sections（Start From Evidence + Change Intake、Docs-first BDD closure loop、SDK defect closure loop、Same-session closure、Performance test gate、Backfill rules、Validate、Feed Back Reusable Lessons）
+  - `DOCUMENTATION.md` → `workflow/software-delivery/artifact-gates.md`：6 個 artifact sections（Reusable Note Structure、Keep Separate、Reusable Guidance Boundary、Required Linked Update Statement、Good Guidance、Avoid）
+  - `WORKFLOW.md` §2-5 → `analysis/development-guidance/risk-translation.md`：5 個 analysis methods（Translate To Risk、Choose The Owner Layer、Define Controls、File The Guidance、Apply Required Linked Updates）
+  - 建立 `analysis/development-guidance/README.md` 定義 scope 與 4 個 analysis methods
+  - 更新 `workflow/software-delivery/README.md` 加入 extracted content table
 
 - **Phase 18：Travel Planning 內容提取** — 從 `skills/travel-planning/` 提取以下內容到新分層：
   - `WORKFLOW.md` → `workflow/travel-planning/execution-flow.md`：17 個 workflow sections（Intake、Source Triage、Agency Benchmark、Location Verification、Stop Planning、Weather、Transport、Lodging、Route Shape、Country Checks、Feasibility、Schedule、Calendar Output、車中泊、Recommendation Pass、Final Verification）
@@ -164,21 +164,21 @@
 
 | 新文件 | 目標層 | 原始來源 | 說明 |
 |--------|--------|----------|------|
-| [`metadata/app-development-guidance/controls-catalog.md`](../metadata/app-development-guidance/controls-catalog.md) | `metadata/` | `skills/app-development-guidance/controls/` | 6 種跨平台安全控制（API Transport、Auth & Session、Local Storage、Logging & Telemetry、Anti-Tamper、Release Build） |
-| [`metadata/app-development-guidance/implementation-catalog.md`](../metadata/app-development-guidance/implementation-catalog.md) | `metadata/` | `skills/app-development-guidance/implementation/` | 5 類實作模式（Backend、Mobile、Embedded、Tooling、Examples）與 contract-to-implementation 映射流程 |
-| [`metadata/app-development-guidance/platforms-catalog.md`](../metadata/app-development-guidance/platforms-catalog.md) | `metadata/` | `skills/app-development-guidance/platforms/` | 4 類平台指引（Mobile、Web、Backend、Embedded） |
-| [`metadata/app-development-guidance/languages-catalog.md`](../metadata/app-development-guidance/languages-catalog.md) | `metadata/` | `skills/app-development-guidance/languages/` | 4 類語言陷阱（Dart、Kotlin/Java、Swift、TypeScript） |
-| [`workflow/app-development-guidance/review-checklists.md`](../workflow/app-development-guidance/review-checklists.md) | `workflow/` | `skills/app-development-guidance/checklists/` | 6 種審查 checklist（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
+| [`metadata/development-guidance/controls-catalog.md`](../metadata/development-guidance/controls-catalog.md) | `metadata/` | `skills/app-development-guidance/controls/` | 6 種跨平台安全控制（API Transport、Auth & Session、Local Storage、Logging & Telemetry、Anti-Tamper、Release Build） |
+| [`metadata/development-guidance/implementation-catalog.md`](../metadata/development-guidance/implementation-catalog.md) | `metadata/` | `skills/app-development-guidance/implementation/` | 5 類實作模式（Backend、Mobile、Embedded、Tooling、Examples）與 contract-to-implementation 映射流程 |
+| [`metadata/development-guidance/platforms-catalog.md`](../metadata/development-guidance/platforms-catalog.md) | `metadata/` | `skills/app-development-guidance/platforms/` | 4 類平台指引（Mobile、Web、Backend、Embedded） |
+| [`metadata/development-guidance/languages-catalog.md`](../metadata/development-guidance/languages-catalog.md) | `metadata/` | `skills/app-development-guidance/languages/` | 4 類語言陷阱（Dart、Kotlin/Java、Swift、TypeScript） |
+| [`workflow/software-delivery/review-checklists.md`](../workflow/software-delivery/review-checklists.md) | `workflow/` | `skills/app-development-guidance/checklists/` | 6 種審查 checklist（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
 
-> **後續修正**：4 個 catalog 文件原放在 `analysis/`，後發現其本質為分類索引而非分析方法，已於 2026-05-13 移至 `metadata/app-development-guidance/`。
+> **後續修正**：4 個 catalog 文件原放在 `analysis/`，後發現其本質為分類索引而非分析方法，已於 2026-05-13 移至 `metadata/development-guidance/`。
 
-### ✅ 已完成：Phase 27 — Extract process/ to workflow/app-development-guidance/
+### ✅ 已完成：Phase 27 — Extract process/ to workflow/software-delivery/
 
-從 `skills/app-development-guidance/process/README.md` 提取 contract-first 開發流程到 `workflow/app-development-guidance/development-process.md`：
+從 `skills/app-development-guidance/process/README.md` 提取 contract-first 開發流程到 `workflow/software-delivery/development-process.md`：
 
 | 新文件 | 目標層 | 原始來源 | 說明 |
 |--------|--------|----------|------|
-| [`workflow/app-development-guidance/development-process.md`](../workflow/app-development-guidance/development-process.md) | `workflow/` | `skills/app-development-guidance/process/README.md` | Contract-first 開發流程：Default Flow、Required Contracts、Initial Documentation Pack、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill、Contract-First Rules、Definition of Ready/Done |
+| [`workflow/software-delivery/development-process.md`](../workflow/software-delivery/development-process.md) | `workflow/` | `skills/app-development-guidance/process/README.md` | Contract-first 開發流程：Default Flow、Required Contracts、Initial Documentation Pack、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill、Contract-First Rules、Definition of Ready/Done |
 
 ### ✅ 已完成：Phase 28 — Technique → Intelligence Pilot（flutter-dart-aot）
 
@@ -190,7 +190,7 @@
 
 **實際執行結果**：
 - 建立 `feedback/extraction/apk-analysis-index.md`（61 lessons，6 個目標層）
-- 建立 `feedback/extraction/app-development-guidance-index.md`（40 lessons，6 個目標層）
+- 建立 `feedback/extraction/development-guidance-index.md`（40 lessons，6 個目標層）
 - 101/101 個 lesson 檔案已加入 `# Extracted — See <target>` 標記
 - 100% lessons 已對應到目標層（workflow/、intelligence/、analysis/、shared-rules/）
 
@@ -333,7 +333,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 | 產出 | 路徑 | 說明 |
 |------|------|------|
 | APK Analysis Index | `feedback/extraction/apk-analysis-index.md` | 61 lessons 分類到 6 個目標層 |
-| App Development Guidance Index | `feedback/extraction/app-development-guidance-index.md` | 40 lessons 分類到 6 個目標層 |
+| App Development Guidance Index | `feedback/extraction/development-guidance-index.md` | 40 lessons 分類到 6 個目標層 |
 | 已標註 lessons | `skills/*/feedback_history/*/*.md` | 101/101 檔案加入 `# Extracted — See <target>` 標記 |
 
 **提取策略**：
@@ -399,7 +399,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 | 32a | 分析 3 個 SKILL.md 的剩餘內容 | ✅ |
 | 32b | 建立 `workflow/travel-planning/artifact-gates.md`（travel-planning 缺少此文件） | ✅ |
 | 32c | 提取 apk-analysis SKILL.md Quick Start 步驟 5+7 → `runtime/onboarding/apk-analysis-quickstart.md` | ✅ |
-| 32d | 提取 app-development-guidance SKILL.md Quick Start → `runtime/onboarding/app-development-guidance-quickstart.md` | ✅ |
+| 32d | 提取 app-development-guidance SKILL.md Quick Start → `runtime/onboarding/app-development-guidance-quickstart.md` | ✅（已刪除：內容已回歸 workflow/software-delivery/） |
 | 32e | 提取 travel-planning SKILL.md Quick Start → `runtime/onboarding/travel-planning-quickstart.md` | ✅ |
 | 32f | 瘦身 3 個 SKILL.md 為純 routing 文件 | ✅ |
 | 32g | 更新 `runtime/onboarding/README.md` + `architecture/next-stage-upgrade-plan.md` | ✅ |
@@ -411,7 +411,6 @@ Pilot 成功 = AI 開始能做 decision routing：
 |------|------|
 | `workflow/travel-planning/artifact-gates.md` | Travel Planning 產出規範與品質門檻（19 項必備項目、4 項品質門檻） |
 | `runtime/onboarding/apk-analysis-quickstart.md` | APK 分析 Quick Start 操作步驟（UI 架構地圖 + 持久化資產轉換） |
-| `runtime/onboarding/app-development-guidance-quickstart.md` | App Development Guidance Quick Start 15 步驟 |
 | `runtime/onboarding/travel-planning-quickstart.md` | Travel Planning Quick Start 18 步驟 |
 
 **瘦身成果**：
@@ -443,7 +442,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 | 子步驟 | 內容 | 狀態 |
 |--------|------|------|
-| 33a | 提取 `skills/app-development-guidance/CHECKLIST.md` → `workflow/app-development-guidance/review-checklist.md` | ✅ |
+| 33a | 提取 `skills/app-development-guidance/CHECKLIST.md` → `workflow/software-delivery/review-checklist.md` | ✅ |
 | 33b | 提取 `skills/travel-planning/TOOLS.md` → `analysis/travel/sources-and-tools.md` | ✅ |
 | 33c | 提取 `skills/travel-planning/README.md` → `analysis/travel/README.md` | ✅ |
 | 33d | 更新 `plans/skill-specific-extraction.md` 為執行結果 | ✅ |
@@ -454,7 +453,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 | 檔案 | 說明 |
 |------|------|
-| `workflow/app-development-guidance/review-checklist.md` | 完整審查檢查清單（15 個類別：Change Intake、Test Strategy、Performance Test、Product To Contract、Documentation Backfill、Contract Governance、Reusable Guidance Boundary、Embedded/Hardware Review、API And Transport、Auth/Tokens/Sessions、Local Storage、Flutter/Android Build、Logging/Telemetry、Anti-Tamper/Risk、Release Gate） |
+| `workflow/software-delivery/review-checklist.md` | 完整審查檢查清單（15 個類別：Change Intake、Test Strategy、Performance Test、Product To Contract、Documentation Backfill、Contract Governance、Reusable Guidance Boundary、Embedded/Hardware Review、API And Transport、Auth/Tokens/Sessions、Local Storage、Flutter/Android Build、Logging/Telemetry、Anti-Tamper/Risk、Release Gate） |
 | `analysis/travel/sources-and-tools.md` | 旅遊規劃來源與工具完整清單（Source Hierarchy、Japan Travel Sources、Agency Sources、Checks By Travel Type、Stop/Food Sources、Restaurant Sources、Lodging Sources、Route Shape Sources、Transport Sources、Country-Specific Driving、Exact Location Sources、Weather Sources、Road-Trip Stops、Schedule Feasibility、Calendar/App-Ready、車中泊 Quietness、Source Note Format、Red Flags） |
 | `analysis/travel/README.md` | Travel Planning 分析方法（Core Goals、Scope、Usage Pattern、Relationships） |
 
@@ -462,7 +461,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 
 | 檔案 | 變更 |
 |------|------|
-| `skills/app-development-guidance/CHECKLIST.md` | 加入 `# Extracted — See workflow/app-development-guidance/review-checklist.md` |
+| `skills/app-development-guidance/CHECKLIST.md` | 加入 `# Extracted — See workflow/software-delivery/review-checklist.md` |
 | `skills/travel-planning/TOOLS.md` | 加入 `# Extracted — See analysis/travel/sources-and-tools.md` |
 | `skills/travel-planning/README.md` | 加入 `# Extracted — See analysis/travel/README.md` |
 | `plans/skill-specific-extraction.md` | 從 pending 更新為執行結果（含完整 extraction status 表、annotation status 表、validation 結果） |
@@ -555,7 +554,7 @@ metadata/
 ```text
 analysis/
   apk/                     ← APK 分析方法（pilot migrated）
-  app-development-guidance/ ← 開發指引分析方法（風險翻譯、控制層選擇）
+  development-guidance/    ← 開發指引分析方法（風險翻譯、控制層選擇）
   repo/                    ← Repository 分析與理解方法
   production/              ← Production 問題分析與根因追蹤
   issue/                   ← Issue 分類與優先級判斷
@@ -649,7 +648,7 @@ intelligence/
 ```text
 workflow/
   apk-analysis/              ← APK 分析執行流程（pilot migrated）
-  app-development-guidance/  ← App 開發審查與指引執行流程
+  software-delivery/         ← 軟體交付執行流程
   repo-analysis/             ← Repository 分析執行流程
   travel-planning/           ← 旅遊規劃執行流程
 ```
@@ -1222,11 +1221,11 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 升級 Skills Metadata v2 | `skills-index.yaml` | 已完成所有 13 skills 加入 weight/domains/dependencies/conflicts/priority.runtime | Skill relevance scoring 與 conflict detection 可運作 |
 | P1 | done | 重建 intelligence/ 為專家智慧層 | `intelligence/README.md`, `intelligence/engineering/{architecture,domain,failure,heuristics,anti-patterns,tradeoffs,distributed-systems}/`, `intelligence/business/`, `intelligence/travel/` | 已完成 9 子目錄結構與 scope 定義，尚未填充實際 atoms | 每個子目錄有 README.md 定義核心、範例內容、與其他層的關係；與根 `anti-patterns/` 邊界已明確定義 |
 | P1 | done | Phase 29：其餘 3 個 techniques decomposition | `analysis/apk/workflows/`, `intelligence/engineering/analytical-reasoning/{heuristics,signals}/` | 已完成 http-api、local-proxy、media-hls 拆解（3 workflows + 4 intelligence atoms） | 每個 technique 有 workflow + 1-2 intelligence atoms，舊檔案已標註 |
-| P1 | done | Phase 30：Feedback history 提取 | `feedback/extraction/apk-analysis-index.md`, `feedback/extraction/app-development-guidance-index.md` | 已完成 101 lessons 索引建立，100% lessons 已對應到目標層 | Category index 已建立，101/101 lessons 已對應到目標層 |
+| P1 | done | Phase 30：Feedback history 提取 | `feedback/extraction/apk-analysis-index.md`, `feedback/extraction/development-guidance-index.md` | 已完成 101 lessons 索引建立，100% lessons 已對應到目標層 | Category index 已建立，101/101 lessons 已對應到目標層 |
 | P2 | done | Phase 31：Intelligence Extraction Pipeline | `governance/lifecycle/intelligence-extraction-pipeline.md` | 已完成 7-step pipeline（內容審計 → 類型判斷 → 拆解執行 → 格式轉換 → 標註來源 → 驗證 → 更新索引） | Pipeline 文件已建立，已驗證 Technique Decomposition 和 Feedback History Extraction 兩種模式 |
 | P2 | done | Phase 32：SKILL.md 分解 | `runtime/onboarding/apk-analysis-quickstart.md`, `runtime/onboarding/app-development-guidance-quickstart.md`, `runtime/onboarding/travel-planning-quickstart.md`, `workflow/travel-planning/artifact-gates.md` | 已完成 3 個 SKILL.md 瘦身（46-65% 減少），4 個新檔案建立 | SKILL.md 中所有內容已對應到目標層，舊檔案已標註 |
-| P4 | done | Phase 33：Skill-Specific Intelligence Extraction（P4） | `plans/skill-specific-extraction.md`, `workflow/app-development-guidance/review-checklist.md`, `analysis/travel/sources-and-tools.md`, `analysis/travel/README.md` | 已完成 3 個 skills 的剩餘內容提取（CHECKLIST.md、TOOLS.md、README.md），所有 skills 內容已全部提取到新分層 | 每個 skill 有專屬 extraction strategy，內容結構分析 → 拆解 → 標註 → 驗證的完整流程已執行 |
-| P2 | done | Knowledge Graph 補齊（Phase 28-33） | `knowledge/graphs/workflow-app-development-guidance.yaml`, `knowledge/graphs/intelligence-apk-analysis-atoms.yaml`, `knowledge/graphs/workflow-layers.yaml`, `knowledge/graphs/analysis-layers.yaml`, `knowledge/graphs/runtime-onboarding.yaml` | 已完成 5 個 graph records 更新，新增 1 個 graph record（runtime-onboarding） | Phase 28-33 所有新檔案在 graph records 中有對應 edge |
+| P4 | done | Phase 33：Skill-Specific Intelligence Extraction（P4） | `plans/skill-specific-extraction.md`, `workflow/software-delivery/review-checklist.md`, `analysis/travel/sources-and-tools.md`, `analysis/travel/README.md` | 已完成 3 個 skills 的剩餘內容提取（CHECKLIST.md、TOOLS.md、README.md），所有 skills 內容已全部提取到新分層 | 每個 skill 有專屬 extraction strategy，內容結構分析 → 拆解 → 標註 → 驗證的完整流程已執行 |
+| P2 | done | Knowledge Graph 補齊（Phase 28-33） | `knowledge/graphs/workflow-software-delivery.yaml`, `knowledge/graphs/intelligence-apk-analysis-atoms.yaml`, `knowledge/graphs/workflow-layers.yaml`, `knowledge/graphs/analysis-layers.yaml`, `knowledge/graphs/runtime-onboarding.yaml` | 已完成 5 個 graph records 更新，新增 1 個 graph record（runtime-onboarding） | Phase 28-33 所有新檔案在 graph records 中有對應 edge |
 | P2 | done | Intelligence Extraction Pipeline 實戰驗證（P2） | `governance/lifecycle/intelligence-extraction-pipeline.md`, `analysis/apk/workflows/README.md`, `intelligence/engineering/analytical-reasoning/{heuristics,anti-patterns,failure,signals}/README.md` | 已完成 pipeline 狀態表更新，5 個 README 的 placeholder 已替換為實際 atom 表格 | Pipeline 的 3 種模式（Technique Decomposition、Feedback History Extraction、SKILL.md Decomposition）均已實際執行 |
 | P2 | done | Skills Deprecation（Phase B） | `governance/lifecycle/README.md`, `skills/apk-analysis/techniques/`, `analysis/apk/techniques/` | 已完成 8 個 techniques 檔案從 `# Intelligence Extracted` 升級為 `# Deprecated — see <new path>` | Phase B 條件（techniques decomposition 完成 + pilot 驗證通過）已滿足 |
 | P2 | done | Runtime surfaces 更新 | `knowledge/runtime/routing-registry.yaml`, `knowledge/indexes/README.md` | 已完成 routing-registry 新增 5 條路由（app-development-guidance、travel-planning、onboarding、apk-workflows、apk-intelligence-atoms），indexes 新增 3 條索引列 | 所有新層級在 routing-registry 和 indexes 中有對應路由 |

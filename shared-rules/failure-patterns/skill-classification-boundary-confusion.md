@@ -91,7 +91,7 @@ Agent 把某個 skill 的 analysis technique lesson 放到另一個不相關 ski
 
 **正確位置**：
 - `feedback/history/apk-analysis/local-proxy/`（非標準 TLS — APK 分析技術）
-- `feedback/history/app-development-guidance/common/`（dart:io HttpClient — 這個 lesson 同時涉及開發指引，因為它影響 SDK 的 HTTP client 選擇）
+- `feedback/history/development-guidance/common/`（dart:io HttpClient — 這個 lesson 同時涉及開發指引，因為它影響 SDK 的 HTTP client 選擇）
 
 ### ❌ 錯誤範例 2：已遷移 skill 的 lesson 放到舊路徑
 

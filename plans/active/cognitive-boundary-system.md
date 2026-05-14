@@ -200,7 +200,7 @@ Goal:
     - workflow/apk-analysis/
     - intelligence/engineering/analytical-reasoning/
   forbidden_context:   # 禁止讀取的目錄/檔案
-    - workflow/app-development-guidance/
+    - workflow/software-delivery/
     - analysis/repo/
   max_files: 15        # 此 goal 的檔案讀取上限
   max_tool_calls: 40   # 此 goal 的 tool call 上限

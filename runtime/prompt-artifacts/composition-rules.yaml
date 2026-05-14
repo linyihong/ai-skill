@@ -30,7 +30,7 @@ rules:
       method: task_type_mapping
       mapping:
         apk-analysis: workflow/apk-analysis/
-        app-development-guidance: workflow/app-development-guidance/
+        app-development-guidance: workflow/software-delivery/
         repo-analysis: workflow/repo-analysis/
         travel-planning: workflow/travel-planning/
         repo-governance: governance/
@@ -164,7 +164,7 @@ rules:
       method: skill_id_mapping
       mapping:
         apk-analysis: knowledge/summaries/apk-analysis-pilot.md
-        app-development-guidance: knowledge/summaries/app-development-guidance.md
+        app-development-guidance: knowledge/summaries/development-guidance.md
         travel-planning: knowledge/summaries/travel-planning.md
         repo-governance: knowledge/summaries/repo-governance.md
         knowledge-navigation: knowledge/summaries/knowledge-navigation.md

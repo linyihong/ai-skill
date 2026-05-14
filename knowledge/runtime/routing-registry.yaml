@@ -430,11 +430,11 @@ records:
       - skills/app-development-guidance/README.md
       - shared-rules/README.md
     candidate_sources:
-      - analysis/app-development-guidance/README.md
-      - workflow/app-development-guidance/README.md
+      - analysis/development-guidance/README.md
+      - workflow/software-delivery/README.md
       - intelligence/engineering/development/README.md
-      - knowledge/summaries/app-development-guidance.md
-      - knowledge/graphs/workflow-app-development-guidance.yaml
+      - knowledge/summaries/development-guidance.md
+      - knowledge/graphs/workflow-software-delivery.yaml
     source_of_truth_gate: old-skill-entrypoint-active
     ranking_reason: app-development-guidance 仍以 skill entrypoint 作為工具觸發與授權邊界；新分層目前只作候選目的地與 mapping。
     validation_signal: 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。
@@ -494,7 +494,6 @@ records:
       - runtime/onboarding/apk-analysis-setup.md
       - runtime/onboarding/apk-analysis-completion.md
       - runtime/onboarding/apk-analysis-quickstart.md
-      - runtime/onboarding/app-development-guidance-quickstart.md
       - runtime/onboarding/travel-planning-quickstart.md
       - knowledge/graphs/runtime-onboarding.yaml
     source_of_truth_gate: old-skill-entrypoint-active
@@ -662,11 +661,11 @@ records:
       - shared-rules/feedback-lessons.md
     candidate_sources:
       - feedback/history/apk-analysis/README.md
-      - feedback/history/app-development-guidance/README.md
+      - feedback/history/development-guidance/README.md
       - feedback/history/travel-planning/README.md
       - feedback/README.md
       - feedback/extraction/apk-analysis-index.md
-      - feedback/extraction/app-development-guidance-index.md
+      - feedback/extraction/development-guidance-index.md
     source_of_truth_gate: feedback-history-active
     ranking_reason: feedback/history/ 是 lesson 的統一目標路徑，取代分散在各層的 feedback_history/ 舊路徑。
     validation_signal: Lesson 已寫入 feedback/history/<domain>/ 對應分類，且 feedback/history/<domain>/README.md 已更新索引。

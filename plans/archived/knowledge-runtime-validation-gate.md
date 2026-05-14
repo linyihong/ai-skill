@@ -226,7 +226,7 @@ flowchart LR
    - 檢查 `workflow/<domain>/` 有 README.md 列出所有 .md 檔案
 8. ✅ 修復 validator 發現的 4 個既有問題：
    - `workflow/apk-analysis/README.md` 改用正確 markdown link
-   - `workflow/app-development-guidance/README.md` 修正檔名 typo
+   - `workflow/software-delivery/README.md` 修正檔名 typo
    - `knowledge/indexes/README.md` 修正壞掉的 link（`../../validation/rules/heuristics/README.md` → `../../validation/rules/heuristics/`）
 9. ✅ 建立 `validation/scenarios/cross-domain/new-category-registration-v1.yaml`
 10. ✅ 更新 `validation/README.md` 加入新 scenario 到首批 Scenario 表格

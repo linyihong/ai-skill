@@ -94,18 +94,18 @@
 
 | 原始檔案 | 目標路徑 | 策略 | 狀態 |
 |---------|---------|------|------|
-| `controls/` | `analysis/app-development-guidance/controls-catalog.md` | Catalog | ✅ |
-| `implementation/` | `analysis/app-development-guidance/implementation-catalog.md` | Catalog | ✅ |
-| `platforms/` | `analysis/app-development-guidance/platforms-catalog.md` | Catalog | ✅ |
-| `languages/` | `analysis/app-development-guidance/languages-catalog.md` | Catalog | ✅ |
-| `checklists/` | `workflow/app-development-guidance/review-checklist.md` | Direct Promotion | ✅ |
-| `process/README.md` | `workflow/app-development-guidance/development-process.md` | Direct Promotion | ✅ |
-| `WORKFLOW.md` | `workflow/app-development-guidance/execution-flow.md` | Direct Promotion | ✅ |
-| `DOCUMENTATION.md` | `workflow/app-development-guidance/artifact-gates.md` | Direct Promotion | ✅ |
+| `controls/` | `analysis/development-guidance/controls-catalog.md` | Catalog | ✅ |
+| `implementation/` | `analysis/development-guidance/implementation-catalog.md` | Catalog | ✅ |
+| `platforms/` | `analysis/development-guidance/platforms-catalog.md` | Catalog | ✅ |
+| `languages/` | `analysis/development-guidance/languages-catalog.md` | Catalog | ✅ |
+| `checklists/` | `workflow/software-delivery/review-checklist.md` | Direct Promotion | ✅ |
+| `process/README.md` | `workflow/software-delivery/development-process.md` | Direct Promotion | ✅ |
+| `WORKFLOW.md` | `workflow/software-delivery/execution-flow.md` | Direct Promotion | ✅ |
+| `DOCUMENTATION.md` | `workflow/software-delivery/artifact-gates.md` | Direct Promotion | ✅ |
 | `SKILL.md` | Slimmed to routing（~65 lines） | SKILL.md Decomposition | ✅ |
-| `CHECKLIST.md` | `workflow/app-development-guidance/review-checklist.md` | Direct Promotion | ✅ |
+| `CHECKLIST.md` | `workflow/software-delivery/review-checklist.md` | Direct Promotion | ✅ |
 | `FEEDBACK.md` | 已整併至共用規則 | Consolidation | ✅ |
-| `feedback_history/` | `feedback/extraction/app-development-guidance-index.md` | Index + Annotate | ✅ |
+| `feedback_history/` | `feedback/extraction/development-guidance-index.md` | Index + Annotate | ✅ |
 
 **剩餘內容**：無
 
@@ -136,11 +136,11 @@
 | `analysis/apk/techniques/http-api.md` | `# Intelligence Extracted` | ✅ |
 | `analysis/apk/techniques/local-proxy.md` | `# Intelligence Extracted` | ✅ |
 | `analysis/apk/techniques/media-hls.md` | `# Intelligence Extracted` | ✅ |
-| `skills/app-development-guidance/CHECKLIST.md` | `# Extracted — See workflow/app-development-guidance/review-checklist.md` | ✅ |
+| `skills/app-development-guidance/CHECKLIST.md` | `# Extracted — See workflow/software-delivery/review-checklist.md` | ✅ |
 | `skills/travel-planning/TOOLS.md` | `# Extracted — See analysis/travel/sources-and-tools.md` | ✅ |
 | `skills/travel-planning/README.md` | `# Extracted — See analysis/travel/README.md` | ✅ |
 | `skills/apk-analysis/feedback_history/`（101 files） | `# Extracted — See feedback/extraction/apk-analysis-index.md` | ✅ |
-| `skills/app-development-guidance/feedback_history/`（40 files） | `# Extracted — See feedback/extraction/app-development-guidance-index.md` | ✅ |
+| `skills/app-development-guidance/feedback_history/`（40 files） | `# Extracted — See feedback/extraction/development-guidance-index.md` | ✅ |
 
 ---
 

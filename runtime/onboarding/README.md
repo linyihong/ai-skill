@@ -11,7 +11,6 @@
 | [`apk-analysis-setup.md`](apk-analysis-setup.md) | APK 分析專案的初始設定流程與提示詞模板 |
 | [`apk-analysis-completion.md`](apk-analysis-completion.md) | APK 分析專案的完成門檻定義 |
 | [`apk-analysis-quickstart.md`](apk-analysis-quickstart.md) | APK 分析 SKILL.md Quick Start 的操作步驟（UI 架構地圖 + 持久化資產） |
-| [`app-development-guidance-quickstart.md`](app-development-guidance-quickstart.md) | App Development Guidance SKILL.md Quick Start 的 15 個操作步驟 |
 | [`travel-planning-quickstart.md`](travel-planning-quickstart.md) | Travel Planning SKILL.md Quick Start 的 18 個操作步驟 |
 
 ## 與其他層的關係

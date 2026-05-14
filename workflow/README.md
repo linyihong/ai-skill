@@ -5,7 +5,7 @@
 ## 目前入口
 
 - [`apk-analysis/`](apk-analysis/README.md)：`apk-analysis` pilot 的 tool-neutral workflow 候選目的地；目前仍保留 `skills/apk-analysis/SKILL.md` 作為 active skill entrypoint。
-- [`app-development-guidance/`](app-development-guidance/README.md)：App 開發審查與指引的執行流程（design review、code review、release review、security review）。
+- [`software-delivery/`](software-delivery/README.md)：軟體交付的執行流程（design review、code review、release review、security review）。
 - [`repo-analysis/`](repo-analysis/README.md)：Repository 分析的執行流程（new onboarding、deep codebase analysis、migration impact、tech debt assessment）。
 - [`travel-planning/`](travel-planning/README.md)：旅遊規劃的執行流程（itinerary planning、transportation research、budget planning）。
 

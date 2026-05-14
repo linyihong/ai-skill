@@ -44,7 +44,7 @@
 2. 透過 `analysis/apk/` 路由以識別流量/執行時期路徑。
 3. 從 `analysis/apk/workflows/` 載入匹配的工作流程，並從 `intelligence/engineering/analytical-reasoning/` 載入智慧原子。
 4. 產生已清理的專案產出：UI 地圖、操作到 API 矩陣、API 目錄、執行時期基線、fixtures 和適用的開放問題。
-5. 如果發現必須成為應用程式/API/SDK 實作指引，使用已清理的 Feature Reconstruction Handoff 交接給 `workflow/app-development-guidance/`。
+5. 如果發現必須成為應用程式/API/SDK 實作指引，使用已清理的 Feature Reconstruction Handoff 交接給 `workflow/software-delivery/`。
 6. 如果出現可重複使用的課程，將課程保留在 `feedback/history/apk-analysis/` 中，直到提升規則將其移至智慧或回饋層。
 
 ## 與既有層的關係

@@ -28,7 +28,7 @@ given:
   artifacts:
     - feedback/history/README.md          # 新結構定義
     - feedback/history/apk-analysis/       # 新 domain 目錄
-    - feedback/history/app-development-guidance/  # 新 domain 目錄
+    - feedback/history/development-guidance/  # 新 domain 目錄
     - feedback/history/travel-planning/    # 新 domain 目錄
     - shared-rules/feedback-lessons.md     # 規則已更新指向 feedback/history/
     - skills/apk-analysis/feedback_history/  # 舊路徑（仍存在，向後相容）

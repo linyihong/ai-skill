@@ -146,8 +146,8 @@ templates:
 
       - id: review-type-workflow
         description: >
-          對應審查類型的執行流程。引用 workflow/app-development-guidance/。
-        source: workflow/app-development-guidance/
+          對應審查類型的執行流程。引用 workflow/software-delivery/。
+        source: workflow/software-delivery/
         composition_rule: workflow-steps
         estimated_tokens: 1500
         required: true

@@ -1,4 +1,4 @@
-# Extracted — See [`workflow/app-development-guidance/review-checklist.md`](../../workflow/app-development-guidance/review-checklist.md)
+# Extracted — See [`workflow/software-delivery/review-checklist.md`](../../workflow/software-delivery/review-checklist.md)
 
 # App Development Guidance Checklist
 

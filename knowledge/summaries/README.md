@@ -21,7 +21,7 @@ Summaries 用來協助 agent：
 | `intelligence.apk-highest-leverage-analysis` | APK 分析 highest-leverage route selection engineering intelligence。 | [`apk-highest-leverage-analysis.md`](apk-highest-leverage-analysis.md) |
 | `feedback.promotion.pipeline` | Feedback lesson promotion / downgrade pipeline。 | [`feedback-promotion-pipeline.md`](feedback-promotion-pipeline.md) |
 | `governance.goal-ledger-boundary` | Active conversation goal 與 durable roadmap goal 邊界。 | [`goal-ledger-boundary.md`](goal-ledger-boundary.md) |
-| `skill.app-development-guidance` | App/API/Embedded 開發 guidance、控制項、檢查清單。 | [`app-development-guidance.md`](app-development-guidance.md) |
+| `skill.app-development-guidance` | App/API/Embedded 開發 guidance、控制項、檢查清單。 | [`development-guidance.md`](development-guidance.md) |
 | `skill.travel-planning` | 依目的地/日期/交通規劃行程。 | [`travel-planning.md`](travel-planning.md) |
 | `governance.repo-maintenance` | Repo 維護、升級、遷移與治理。 | [`repo-governance.md`](repo-governance.md) |
 | `knowledge.navigation` | 知識導航：indexes、summaries、graphs、runtime。 | [`knowledge-navigation.md`](knowledge-navigation.md) |

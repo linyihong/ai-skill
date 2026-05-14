@@ -140,6 +140,6 @@ frida -U -l hook_okhttp.js -f com.target.app --no-pause
 ## 注意事項
 
 - Screenshots 可支援 UI trigger attribution，但不取代 HTTP header/request/response field analysis
-- 如果目標是重建 feature，API docs 應準備好讓 `workflow/app-development-guidance/` 轉換為 BDD、Domain Model Contract、API/Interface Contract
+- 如果目標是重建 feature，API docs 應準備好讓 `workflow/software-delivery/` 轉換為 BDD、Domain Model Contract、API/Interface Contract
 - 不確定的 field meaning 或 domain vocabulary 標記為 `candidate`
 - 避免執行 login loops、payment、destructive actions、posting、messaging、account changes

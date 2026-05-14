@@ -32,7 +32,7 @@ trace:
     - feedback/history/README.md
     - shared-rules/feedback-lessons.md
     - feedback/history/apk-analysis/README.md
-    - feedback/history/app-development-guidance/README.md
+    - feedback/history/development-guidance/README.md
     - feedback/history/travel-planning/README.md
 
   decision_rationale: >

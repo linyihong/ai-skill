@@ -47,7 +47,7 @@
 | --- | --- | --- | --- |
 | `architecture.apk-analysis-pilot` | `candidate` | [`apk-analysis-pilot.md`](../summaries/apk-analysis-pilot.md) | `apk-analysis` 作為第一個 Workflow / Analysis / Intelligence 分離 pilot 的 migration map。它建立新 reference-first 候選目的地，但保留 `skills/apk-analysis/SKILL.md` 作為 active skill entrypoint。 |
 | `intelligence.apk-highest-leverage-analysis` | `candidate` | [`apk-highest-leverage-analysis.md`](../summaries/apk-highest-leverage-analysis.md) | APK 分析 checkpoint 應先界定未知，再依 time-to-evidence、語意距離、安全性與 validation clarity 選擇最高收益路線。 |
-| `skill.app-development-guidance` | `validated` | [`app-development-guidance.md`](../summaries/app-development-guidance.md) | 將授權 App/API/Embedded/Firmware 觀察轉成開發 guidance、實作模式、控制項、檢查清單。涵蓋 mobile（Android/iOS/Flutter/React Native）、backend API、embedded firmware 的安全控制、實作模式與 release gate。 |
+| `skill.app-development-guidance` | `validated` | [`development-guidance.md`](../summaries/development-guidance.md) | 將授權 App/API/Embedded/Firmware 觀察轉成開發 guidance、實作模式、控制項、檢查清單。涵蓋 mobile（Android/iOS/Flutter/React Native）、backend API、embedded firmware 的安全控制、實作模式與 release gate。 |
 | `architecture.context-cost-optimization` | `validated` | [`context-cost-optimization.md`](../summaries/context-cost-optimization.md) | Token 成本優化規劃。Phase 1（立即省錢）：Bootstrap 極小化（~800 tokens）、README 拆分、Rule lazy-load、Summary layer。Phase 2（架構升級）：Runtime Context Router、Context Cost Metadata、Skill Index、Context TTL。Phase 3（長期）：Semantic Retrieval、Episodic Memory、Multi-model Routing。 |
 | `feedback.promotion.pipeline` | `candidate` | [`feedback-promotion-pipeline.md`](../summaries/feedback-promotion-pipeline.md) | 定義 feedback lesson 從 skill-local history 推進到 workflow、intelligence、shared-rules、memory 或 runtime surfaces 的 promotion / downgrade gate。 |
 | `governance.goal-ledger-boundary` | `validated` | [`goal-ledger-boundary.md`](../summaries/goal-ledger-boundary.md) | `.agent-goals/` 只保存 active conversation goals；長期 roadmap、phase、migration、promotion、deprecation 與治理狀態必須落到 durable planning 文件。 |
@@ -75,7 +75,7 @@
 | `graph.intelligence-agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `candidate` | 20 | [`intelligence-agent-architecture.yaml`](../graphs/intelligence-agent-architecture.yaml) |
 | `graph.intelligence-anti-patterns` | `intelligence/engineering/anti-patterns/generic-repository-overuse.md` | `candidate` | 5 | [`intelligence-anti-patterns.yaml`](../graphs/intelligence-anti-patterns.yaml) |
 | `graph.intelligence-apk-analysis-atoms` | `intelligence/engineering/analytical-reasoning/README.md` | `candidate` | 18 | [`intelligence-apk-analysis-atoms.yaml`](../graphs/intelligence-apk-analysis-atoms.yaml) |
-| `graph.intelligence-app-development-guidance` | `intelligence/engineering/development/README.md` | `candidate` | 9 | [`intelligence-app-development-guidance.yaml`](../graphs/intelligence-app-development-guidance.yaml) |
+| `graph.intelligence-development-guidance` | `intelligence/engineering/development/README.md` | `candidate` | 9 | [`intelligence-development-guidance.yaml`](../graphs/intelligence-development-guidance.yaml) |
 | `graph.intelligence-architecture` | `intelligence/engineering/architecture/modular-monolith-vs-microservices.md` | `candidate` | 5 | [`intelligence-architecture.yaml`](../graphs/intelligence-architecture.yaml) |
 | `graph.intelligence-business` | `intelligence/business/saas-pricing-heuristics.md` | `candidate` | 3 | [`intelligence-business.yaml`](../graphs/intelligence-business.yaml) |
 | `graph.intelligence-distributed-systems` | `intelligence/engineering/distributed-systems/eventual-consistency-patterns.md` | `candidate` | 5 | [`intelligence-distributed-systems.yaml`](../graphs/intelligence-distributed-systems.yaml) |
@@ -90,7 +90,7 @@
 | `graph.runtime-pipeline` | `runtime/pipeline/README.md` | `candidate` | 12 | [`runtime-pipeline.yaml`](../graphs/runtime-pipeline.yaml) |
 | `graph.runtime-prompt-artifacts` | `runtime/prompt-artifacts/README.md` | `candidate` | 8 | [`runtime-prompt-artifacts.yaml`](../graphs/runtime-prompt-artifacts.yaml) |
 | `graph.source-boundary` | `governance/lifecycle/README.md` | `candidate` | 6 | [`source-boundary.yaml`](../graphs/source-boundary.yaml) |
-| `graph.workflow-app-development-guidance` | `workflow/app-development-guidance/README.md` | `candidate` | 11 | [`workflow-app-development-guidance.yaml`](../graphs/workflow-app-development-guidance.yaml) |
+| `graph.workflow-app-development-guidance` | `workflow/software-delivery/README.md` | `candidate` | 11 | [`workflow-software-delivery.yaml`](../graphs/workflow-software-delivery.yaml) |
 | `graph.workflow-layers` | `workflow/README.md` | `candidate` | 16 | [`workflow-layers.yaml`](../graphs/workflow-layers.yaml) |
 | `graph.workflow-travel-planning` | `workflow/travel-planning/README.md` | `candidate` | 9 | [`workflow-travel-planning.yaml`](../graphs/workflow-travel-planning.yaml) |
 

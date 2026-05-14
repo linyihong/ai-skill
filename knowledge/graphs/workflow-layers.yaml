@@ -2,7 +2,7 @@ id: graph.workflow-layers
 source: workflow/README.md
 status: candidate
 summary: >
-  連接 workflow 層的所有子目錄：apk-analysis、app-development-guidance、
+  連接 workflow 層的所有子目錄：apk-analysis、software-delivery、
   repo-analysis、travel-planning，以及相關的 intelligence、analysis、skills 層。
 edges:
   - type: depends_on
@@ -22,15 +22,15 @@ edges:
     reason: APK analysis 的產出閘門定義。
     validation: artifact-gates.md 定義 UI map、API catalog、runtime baseline 等閘門。
   - type: related_to
-    target: workflow/app-development-guidance/README.md
+    target: workflow/software-delivery/README.md
     reason: App 開發審查與指引的執行流程。
     validation: README 定義 scope、核心原則、與既有層的關係。
   - type: related_to
-    target: workflow/app-development-guidance/execution-flow.md
+    target: workflow/software-delivery/execution-flow.md
     reason: App development guidance 的具體執行步驟（8 個 workflow sections）。
     validation: execution-flow.md 從 skills/app-development-guidance/WORKFLOW.md 提取。
   - type: related_to
-    target: workflow/app-development-guidance/artifact-gates.md
+    target: workflow/software-delivery/artifact-gates.md
     reason: App development guidance 的產出閘門定義（6 個 artifact sections）。
     validation: artifact-gates.md 從 skills/app-development-guidance/DOCUMENTATION.md 提取。
   - type: related_to
@@ -51,12 +51,12 @@ edges:
     validation: artifact-gates.md 從 skills/travel-planning/DOCUMENTATION.md 提取。
 
   - type: related_to
-    target: workflow/app-development-guidance/development-process.md
+    target: workflow/software-delivery/development-process.md
     reason: Contract-first 開發流程 — Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Test Strategy Gate、Definition of Ready/Done。
     validation: development-process.md 從 skills/app-development-guidance/process/README.md 提取。
 
   - type: related_to
-    target: workflow/app-development-guidance/review-checklist.md
+    target: workflow/software-delivery/review-checklist.md
     reason: 審查檢查清單 — 15 個審查類別（Change Intake、Test Strategy、Performance Test、Product To Contract、Documentation Backfill、Contract Governance、Embedded/Hardware Review、API And Transport、Auth/Tokens/Sessions、Local Storage、Flutter/Android Build、Logging/Telemetry、Anti-Tamper/Risk、Release Gate）。
     validation: review-checklist.md 從 skills/app-development-guidance/CHECKLIST.md 提取。
   - type: related_to

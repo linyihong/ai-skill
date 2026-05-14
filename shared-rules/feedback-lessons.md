@@ -36,7 +36,7 @@
 ### 範例
 
 - **APK 分析 lesson**：`feedback/history/apk-analysis/common/2026-05-13_094500-anti-bot-gateway-blocks-external-sdk.md`
-- **開發指引 lesson**：`feedback/history/app-development-guidance/controls/2026-05-01_142100-client-encrypted-header-not-boundary.md`
+- **開發指引 lesson**：`feedback/history/development-guidance/controls/2026-05-01_142100-client-encrypted-header-not-boundary.md`
 - **旅遊規劃 lesson**：`feedback/history/travel-planning/common/2026-05-13_094500-xxx.md`
 
 ### ⚠️ 常見錯誤（必讀）
@@ -47,7 +47,7 @@
 
 **情境**：從 TATA 專案學到「非標準 TLS bypasses SSL hooks」和「dart:io HttpClient bypasses Java hooks」
 
-**錯誤行為**：把這兩個 lesson 放到 `feedback/history/app-development-guidance/common/`
+**錯誤行為**：把這兩個 lesson 放到 `feedback/history/development-guidance/common/`
 
 **為什麼錯**：這兩個是 APK 分析技術（Frida hook 策略），不是開發指引。`app-development-guidance` 的 scope 是 SDK 設計、API contract、BDD、測試策略。
 
@@ -71,8 +71,8 @@
 
 **判斷流程**：
 1. 這是一個開發指引（SDK 設計限制），不是 APK 分析技術 → `app-development-guidance`
-2. 確認 domain 分類：`feedback/history/app-development-guidance/common/`
-3. ✅ 最終位置：`feedback/history/app-development-guidance/common/2026-05-13_094500-anti-bot-gateway-blocks-external-sdk.md`
+2. 確認 domain 分類：`feedback/history/development-guidance/common/`
+3. ✅ 最終位置：`feedback/history/development-guidance/common/2026-05-13_094500-anti-bot-gateway-blocks-external-sdk.md`
 
 > 更多 failure pattern 請見 [`shared-rules/failure-patterns/skill-classification-boundary-confusion.md`](failure-patterns/skill-classification-boundary-confusion.md)。
 

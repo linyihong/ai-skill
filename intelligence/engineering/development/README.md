@@ -12,7 +12,7 @@
 
 ## 與其他層的關係
 
-- `workflow/app-development-guidance/` 提供執行流程，本層提供背後的原則與 why。
-- `analysis/app-development-guidance/` 提供具體的分析方法，本層提供選擇方法的決策邏輯。
+- `workflow/software-delivery/` 提供執行流程，本層提供背後的原則與 why。
+- `analysis/development-guidance/` 提供具體的分析方法，本層提供選擇方法的決策邏輯。
 - `skills/app-development-guidance/` 是原始來源，已不再作為 active entrypoint。
-- `feedback/history/app-development-guidance/` 存放本領域的 feedback lessons。
+- `feedback/history/development-guidance/` 存放本領域的 feedback lessons。

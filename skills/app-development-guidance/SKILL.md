@@ -39,8 +39,6 @@ Use this skill when APK analysis, app/API review, embedded/firmware review, or p
 
 ## Quick Start（Routing）
 
-See [`runtime/onboarding/app-development-guidance-quickstart.md`](../../runtime/onboarding/app-development-guidance-quickstart.md) for the full 15-step quick start.
-
 Routing summary:
 1. Identify source → 2. Validate planning docs → 3. Classify request → 4. New req: planning docs first → 5. Bug fix: before/after code rules → 6. Test strategy before code → 7. Product brief → `process/` → 8. Existing project: backfill → 9. Blocker questions → 10. Risk statement → 11. Choose control layer → 12. Validation method → 13. Classify guidance → 14. Linked updates → 15. Immature lesson → `feedback_history/`.
 
@@ -50,12 +48,12 @@ Routing summary:
 
 | 用途 | 路徑 |
 |------|------|
-| 開發流程（Product Brief → BDD → 實作 → 驗證） | [`workflow/app-development-guidance/development-process.md`](../../workflow/app-development-guidance/development-process.md) |
-| 執行流程（Change Intake → Docs-First BDD → SDK Defect → Performance Gate） | [`workflow/app-development-guidance/execution-flow.md`](../../workflow/app-development-guidance/execution-flow.md) |
-| 分析方法（Risk Translation、Controls Catalog、Platforms/Languages Catalog） | [`analysis/app-development-guidance/README.md`](../../analysis/app-development-guidance/README.md) |
+| 開發流程（Product Brief → BDD → 實作 → 驗證） | [`workflow/software-delivery/development-process.md`](../../workflow/software-delivery/development-process.md) |
+| 執行流程（Change Intake → Docs-First BDD → SDK Defect → Performance Gate） | [`workflow/software-delivery/execution-flow.md`](../../workflow/software-delivery/execution-flow.md) |
+| 分析方法（Risk Translation、Controls Catalog、Platforms/Languages Catalog） | [`analysis/development-guidance/README.md`](../../analysis/development-guidance/README.md) |
 | 工程智慧（Heuristics、Anti-patterns） | [`intelligence/engineering/development/README.md`](../../intelligence/engineering/development/README.md) |
-| 產出格式與品質門檻 | [`workflow/app-development-guidance/artifact-gates.md`](../../workflow/app-development-guidance/artifact-gates.md) |
-| Review Checklist | [`workflow/app-development-guidance/review-checklist.md`](../../workflow/app-development-guidance/review-checklist.md) |
+| 產出格式與品質門檻 | [`workflow/software-delivery/artifact-gates.md`](../../workflow/software-delivery/artifact-gates.md) |
+| Review Checklist | [`workflow/software-delivery/review-checklist.md`](../../workflow/software-delivery/review-checklist.md) |
 
 ### 舊路徑（保留向後相容）
 
@@ -69,7 +67,7 @@ Routing summary:
 
 ## Output Style & Artifact Gates
 
-See [`workflow/app-development-guidance/artifact-gates.md`](../../workflow/app-development-guidance/artifact-gates.md) for output format and quality gates.
+See [`workflow/software-delivery/artifact-gates.md`](../../workflow/software-delivery/artifact-gates.md) for output format and quality gates.
 
 ## Feedback Loop
 

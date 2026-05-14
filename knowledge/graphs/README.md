@@ -28,7 +28,7 @@
 | [`intelligence-business.yaml`](intelligence-business.yaml) | 連接 saas-pricing-heuristics atom 與 business intelligence 層。 | `candidate` |
 | [`intelligence-travel.yaml`](intelligence-travel.yaml) | 連接 japan-roadtrip-fatigue、source-triage-heuristic、feasibility-build-heuristic atoms 與 travel workflow。 | `candidate` |
 | [`intelligence-apk-analysis-atoms.yaml`](intelligence-apk-analysis-atoms.yaml) | 連接 evidence-first-routing、live-readiness-gates atoms 與 skill、workflow、analysis。 | `candidate` |
-| [`intelligence-app-development-guidance.yaml`](intelligence-app-development-guidance.yaml) | 連接 docs-first-bdd-closure、risk-translation-heuristic、contract-governance-heuristic atoms 與 workflow、analysis 來源。 | `candidate` |
+| [`intelligence-development-guidance.yaml`](intelligence-development-guidance.yaml) | 連接 docs-first-bdd-closure、risk-translation-heuristic、contract-governance-heuristic atoms 與 workflow、analysis 來源。 | `candidate` |
 | [`intelligence-repo-analysis.yaml`](intelligence-repo-analysis.yaml) | 連接 documentation-backfill-heuristic、traceability-heuristic atoms 與 analysis/repo/、workflow 來源。 | `candidate` |
 | [`intelligence-agent-architecture.yaml`](intelligence-agent-architecture.yaml) | 連接 agent-architecture 層的所有 11 個 atoms（context-collapse、rule-overload、task-routing、attention-budgeting、failure-recovery、cognitive-boundaries、pilot-first-validation、failure-to-scenario-closure、linked-updates-completeness、decomposition-strategy-selection、stateless-validation-necessity）與 shared-rules/failure-patterns/、decision-efficiency、document-sizing、validation、linked-updates、plans。 | `candidate` |
 
@@ -43,8 +43,8 @@
 
 | Graph record | 用途 | 狀態 |
 | --- | --- | --- |
-| [`workflow-layers.yaml`](workflow-layers.yaml) | 連接 workflow 所有子目錄（apk-analysis、app-development-guidance、repo-analysis、travel-planning）及其子檔案。 | `candidate` |
-| [`workflow-app-development-guidance.yaml`](workflow-app-development-guidance.yaml) | 連接 app-development-guidance workflow 的 execution-flow、artifact-gates 與 skills、analysis 來源。 | `candidate` |
+| [`workflow-layers.yaml`](workflow-layers.yaml) | 連接 workflow 所有子目錄（apk-analysis、software-delivery、repo-analysis、travel-planning）及其子檔案。 | `candidate` |
+| [`workflow-software-delivery.yaml`](workflow-software-delivery.yaml) | 連接 software-delivery workflow 的 execution-flow、artifact-gates 與 skills、analysis 來源。 | `candidate` |
 | [`workflow-travel-planning.yaml`](workflow-travel-planning.yaml) | 連接 travel-planning workflow 的 execution-flow、artifact-gates 與 skills、intelligence 來源。 | `candidate` |
 | [`analysis-layers.yaml`](analysis-layers.yaml) | 連接 analysis 所有子目錄（apk、repo、production、issue）及其子檔案。 | `candidate` |
 | [`analysis-repo-methods.yaml`](analysis-repo-methods.yaml) | 連接 analysis/repo/ 的 7 個分析方法（靜態結構、依賴、entrypoint、技術債、文件恢復、追溯性、契約治理）與 skills 來源。 | `candidate` |
