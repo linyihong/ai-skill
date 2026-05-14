@@ -65,6 +65,7 @@ code .   # 或 cursor . 或 claude .
 1. **Core Bootstrap 啟動**：指向 `<AI_SKILL_REPO>/CORE_BOOTSTRAP.md`
 2. **語言強制規則**：無預設語言，強制跟隨使用者語言
 3. **知識更新流程 Checkpoint**：每輪結束前檢查是否有新知識要回饋
+4. **專案 durable Markdown 預設**：在本專案新增或大幅改寫 `docs/`、`wiki/`、`README.md`、ADR、runbook 等長期保存的 Markdown 時，動筆前先讀 `<AI_SKILL_REPO>/workflow/documentation/README.md` 與 `execution-flow.md`（無須使用者先說「docs/wiki/token」等關鍵字）
 
 > **注意**：`.roomodes` 是專案層級設定，會**完全覆蓋**全域 Custom Instructions（不會合併）。如果之前有設定全域 Custom Instructions，`.roomodes` 中的內容會取代它。
 
@@ -73,8 +74,9 @@ code .   # 或 cursor . 或 claude .
 建立 alwaysApply 規則，包含：
 
 1. **啟動流程**：指向 `CORE_BOOTSTRAP.md` 與 `skills-index.yaml`
-2. **語言強制規則**
-3. **知識更新流程 Checkpoint**
+2. **專案 durable Markdown 預設**：寫入 `docs/`、`wiki/`、`README.md`、ADR、runbook 等長期保存的 Markdown 前，先讀 `workflow/documentation/README.md` 與 `execution-flow.md`（無須使用者先說關鍵字）
+3. **語言強制規則**
+4. **知識更新流程 Checkpoint**
 
 同時建立 `.cursor/hooks.json`，在 session 啟動時提醒載入 Ai-skill。
 
@@ -83,8 +85,9 @@ code .   # 或 cursor . 或 claude .
 建立自動載入檔案，包含：
 
 1. **啟動流程**：指向 `CORE_BOOTSTRAP.md` 與 `skills-index.yaml`
-2. **語言強制規則**
-3. **知識更新流程 Checkpoint**
+2. **專案 durable Markdown 預設**：寫入 `docs/`、`wiki/`、`README.md`、ADR、runbook 等長期保存的 Markdown 前，先讀 `workflow/documentation/README.md` 與 `execution-flow.md`（無須使用者先說關鍵字）
+3. **語言強制規則**
+4. **知識更新流程 Checkpoint**
 
 ## 發現機制：新專案如何知道 Ai-skill？
 
