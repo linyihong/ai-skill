@@ -1,0 +1,322 @@
+id: graph.rules.full-rule-graph
+source: enforcement/linked-updates.md
+status: candidate
+summary: >
+  完整的 enforcement rule dependency graph，包含所有 16 條 enforcement rules
+  之間的依賴關係。每個 edge 對應 linked-updates.md 中「常見連動關係」表格的一行。
+edges:
+  # ============================================================
+  # Core Bootstrap Rules
+  # ============================================================
+
+  # rule-weight.md（linked-updates.md line 26）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/rule-weight.md
+    reason: rule-weight 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 26
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/rule-weight.md
+    reason: rule-weight 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 26
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    source: enforcement/rule-weight.md
+    reason: rule-weight 修改時需同步更新 dependency-reading.md 的最低讀取範圍。
+    validation: linked-updates.md line 26
+  - type: depends_on
+    target: enforcement/linked-updates.md
+    source: enforcement/rule-weight.md
+    reason: rule-weight 修改時需同步更新 linked-updates.md 的常見連動關係表。
+    validation: linked-updates.md line 26
+  - type: depends_on
+    target: enforcement/decision-efficiency.md
+    source: enforcement/rule-weight.md
+    reason: rule-weight 修改時需同步更新 decision-efficiency.md 的權重參考。
+    validation: linked-updates.md line 26
+  - type: depends_on
+    target: enforcement/goal-action-validation.md
+    source: enforcement/rule-weight.md
+    reason: rule-weight 修改時需同步更新 goal-action-validation.md 的權重參考。
+    validation: linked-updates.md line 26
+
+  # dependency-reading.md（linked-updates.md line 23）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/dependency-reading.md
+    reason: dependency-reading 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 23
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/dependency-reading.md
+    reason: dependency-reading 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 23
+  - type: depends_on
+    target: enforcement/linked-updates.md
+    source: enforcement/dependency-reading.md
+    reason: dependency-reading 修改時需同步更新 linked-updates.md 的常見連動關係表。
+    validation: linked-updates.md line 23
+
+  # conversation-goal-ledger.md（linked-updates.md line 31）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/conversation-goal-ledger.md
+    reason: conversation-goal-ledger 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 31
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/conversation-goal-ledger.md
+    reason: conversation-goal-ledger 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 31
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    source: enforcement/conversation-goal-ledger.md
+    reason: conversation-goal-ledger 修改時需同步更新 dependency-reading.md 的 writeback transaction 規則。
+    validation: linked-updates.md line 31
+
+  # ============================================================
+  # Lazy-load Rules
+  # ============================================================
+
+  # linked-updates.md（linked-updates.md line 21-52 通用）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/linked-updates.md
+    reason: linked-updates 的常見連動關係表大量引用 enforcement/README.md。
+    validation: linked-updates.md 表格通用
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/linked-updates.md
+    reason: linked-updates 的常見連動關係表頻繁引用 content-layering.md。
+    validation: linked-updates.md 表格通用
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    source: enforcement/linked-updates.md
+    reason: linked-updates 的規則依賴 dependency-reading.md 的 writeback transaction。
+    validation: linked-updates.md line 9
+
+  # failure-learning-system.md（linked-updates.md line 28）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/failure-learning-system.md
+    reason: failure-learning-system 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 28
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/failure-learning-system.md
+    reason: failure-learning-system 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 28
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    source: enforcement/failure-learning-system.md
+    reason: failure-learning-system 修改時需同步更新 dependency-reading.md 的 Failure Learning Boundary。
+    validation: linked-updates.md line 28
+  - type: depends_on
+    target: enforcement/linked-updates.md
+    source: enforcement/failure-learning-system.md
+    reason: failure-learning-system 修改時需同步更新 linked-updates.md 的常見連動關係表。
+    validation: linked-updates.md line 28
+  - type: depends_on
+    target: enforcement/reusable-guidance-boundary.md
+    source: enforcement/failure-learning-system.md
+    reason: failure-learning-system 的 lesson 抽象化依賴 reusable-guidance-boundary.md。
+    validation: linked-updates.md line 28
+  - type: depends_on
+    target: enforcement/feedback-lessons.md
+    source: enforcement/failure-learning-system.md
+    reason: failure-learning-system 的 lesson promotion 依賴 feedback-lessons.md。
+    validation: linked-updates.md line 28
+  - type: depends_on
+    target: enforcement/goal-action-validation.md
+    source: enforcement/failure-learning-system.md
+    reason: failure-learning-system 的 lesson 驗證依賴 goal-action-validation.md。
+    validation: linked-updates.md line 28
+
+  # decision-efficiency.md（linked-updates.md line 27）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/decision-efficiency.md
+    reason: decision-efficiency 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 27
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/decision-efficiency.md
+    reason: decision-efficiency 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 27
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    source: enforcement/decision-efficiency.md
+    reason: decision-efficiency 修改時需同步更新 dependency-reading.md 的 Context Loading 步驟。
+    validation: linked-updates.md line 27
+  - type: depends_on
+    target: enforcement/linked-updates.md
+    source: enforcement/decision-efficiency.md
+    reason: decision-efficiency 修改時需同步更新 linked-updates.md 的常見連動關係表。
+    validation: linked-updates.md line 27
+
+  # tool-neutral-documentation.md（linked-updates.md line 25）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/tool-neutral-documentation.md
+    reason: tool-neutral-documentation 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 25
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/tool-neutral-documentation.md
+    reason: tool-neutral-documentation 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 25
+  - type: depends_on
+    target: enforcement/linked-updates.md
+    source: enforcement/tool-neutral-documentation.md
+    reason: tool-neutral-documentation 修改時需同步更新 linked-updates.md 的常見連動關係表。
+    validation: linked-updates.md line 25
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    source: enforcement/tool-neutral-documentation.md
+    reason: tool-neutral-documentation 修改時需同步更新 dependency-reading.md 的 Tool-Neutral Documentation Boundary。
+    validation: linked-updates.md line 25
+
+  # document-todo-list.md（linked-updates.md line 29）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/document-todo-list.md
+    reason: document-todo-list 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 29
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/document-todo-list.md
+    reason: document-todo-list 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 29
+  - type: depends_on
+    target: enforcement/linked-updates.md
+    source: enforcement/document-todo-list.md
+    reason: document-todo-list 修改時需同步更新 linked-updates.md 的常見連動關係表。
+    validation: linked-updates.md line 29
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    source: enforcement/document-todo-list.md
+    reason: document-todo-list 修改時需同步更新 dependency-reading.md 的 Document TODO List Boundary。
+    validation: linked-updates.md line 29
+  - type: depends_on
+    target: enforcement/conversation-goal-ledger.md
+    source: enforcement/document-todo-list.md
+    reason: document-todo-list 修改時需同步更新 conversation-goal-ledger.md 的 Document TODO 邊界。
+    validation: linked-updates.md line 29
+
+  # goal-action-validation.md（linked-updates.md line 30）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/goal-action-validation.md
+    reason: goal-action-validation 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 30
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/goal-action-validation.md
+    reason: goal-action-validation 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 30
+  - type: depends_on
+    target: enforcement/feedback-lessons.md
+    source: enforcement/goal-action-validation.md
+    reason: goal-action-validation 修改時需同步更新 feedback-lessons.md 的驗證規則。
+    validation: linked-updates.md line 30
+
+  # neutral-language.md（linked-updates.md line 24）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/neutral-language.md
+    reason: neutral-language 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 24
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/neutral-language.md
+    reason: neutral-language 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 24
+  - type: depends_on
+    target: enforcement/feedback-lessons.md
+    source: enforcement/neutral-language.md
+    reason: neutral-language 修改時需同步更新 feedback-lessons.md 的用語規則。
+    validation: linked-updates.md line 24
+
+  # sanitization.md（linked-updates.md line 22，透過 reusable-guidance-boundary 連動）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/sanitization.md
+    reason: sanitization 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 22（reusable-guidance-boundary 的連動包含 sanitization）
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/sanitization.md
+    reason: sanitization 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 22
+  - type: depends_on
+    target: enforcement/feedback-lessons.md
+    source: enforcement/sanitization.md
+    reason: sanitization 修改時需同步更新 feedback-lessons.md 的去敏規則。
+    validation: linked-updates.md line 22
+  - type: depends_on
+    target: enforcement/goal-action-validation.md
+    source: enforcement/sanitization.md
+    reason: sanitization 修改時需同步更新 goal-action-validation.md 的驗證規則。
+    validation: linked-updates.md line 22
+
+  # authorization-scope.md（linked-updates.md 通用規則）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/authorization-scope.md
+    reason: authorization-scope 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md 通用規則
+
+  # cross-skill-references.md（linked-updates.md line 32）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/cross-skill-references.md
+    reason: cross-skill-references 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 32
+
+  # feedback-lessons.md（linked-updates.md line 33）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/feedback-lessons.md
+    reason: feedback-lessons 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 33
+
+  # content-layering.md（linked-updates.md 通用規則）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/content-layering.md
+    reason: content-layering 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md 通用規則
+
+  # reusable-guidance-boundary.md（linked-updates.md line 22）
+  - type: depends_on
+    target: enforcement/README.md
+    source: enforcement/reusable-guidance-boundary.md
+    reason: reusable-guidance-boundary 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 22
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/reusable-guidance-boundary.md
+    reason: reusable-guidance-boundary 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 22
+  - type: depends_on
+    target: enforcement/feedback-lessons.md
+    source: enforcement/reusable-guidance-boundary.md
+    reason: reusable-guidance-boundary 修改時需同步更新 feedback-lessons.md 的 lesson 抽象化規則。
+    validation: linked-updates.md line 22
+  - type: depends_on
+    target: enforcement/sanitization.md
+    source: enforcement/reusable-guidance-boundary.md
+    reason: reusable-guidance-boundary 修改時需同步更新 sanitization.md 的去敏規則。
+    validation: linked-updates.md line 22
+  - type: depends_on
+    target: enforcement/goal-action-validation.md
+    source: enforcement/reusable-guidance-boundary.md
+    reason: reusable-guidance-boundary 修改時需同步更新 goal-action-validation.md 的驗證規則。
+    validation: linked-updates.md line 22
+
+metadata:
+  priority: P2
+  confidence: high
+  compatibility_state: old-entrypoint-active
+  last_checked: 2026-05-14

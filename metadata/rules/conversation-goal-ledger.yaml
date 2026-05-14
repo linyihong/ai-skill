@@ -1,0 +1,56 @@
+# Enforcement Rule Metadata
+id: enforcement.conversation-goal-ledger
+title: 對話目標帳本
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/conversation-goal-ledger.md
+summary: 使用專案本地 .agent-goals/ 暫存帳本追蹤 active goals、優先權、parallelization mode、owner/lock 決策、plan/todo links、完成驗證與刪除條件。
+domains:
+  - repo-governance
+tags:
+  - conversation-goal-ledger
+  - goal-tracking
+  - handoff
+  - multi-agent
+status: validated
+priority: P0
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 100
+  load_strategy: preload
+  cacheable: true
+  ttl:
+    session: 1
+when_to_read: 每個 session 啟動時必讀（Core Bootstrap）
+validation: .agent-goals/ 目錄結構與 conversation-goal-ledger.md 規範一致
+complexity: medium
+depends:
+  - enforcement/dependency-reading.md
+related:
+  - enforcement/document-todo-list.md
+  - enforcement/goal-action-validation.md
+conflicts: []
+replaces: []
+models:
+  small: 使用 goal file 範本與主要 goal 表格
+  large: 完整讀取所有 owner/lock/parallelization 規則
+checklist:
+  - 多步驟工作前檢查或初始化 .agent-goals/
+  - 完成後更新 goal 狀態並驗證
+runtime_notes: Core Bootstrap 規則，每個 session 預載入
+governance_notes: 修改 goal ledger 規範時需同步更新 enforcement/README.md 的索引
+
+activation_conditions:
+  when:
+    - session 啟動時（Core Bootstrap）
+    - 多步驟工作開始前
+    - 使用者要求繼續前一個任務
+  load_strategy: preload
+  priority: P0
+  estimated_tokens: 100
+always_apply: true
+scope: agent-behavior
+deprecated_by:
+rule_id: enforcement.conversation-goal-ledger

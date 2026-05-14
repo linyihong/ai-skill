@@ -1,0 +1,59 @@
+# Enforcement Rule Metadata
+id: enforcement.feedback-lessons
+title: Feedback 與技巧條目
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/feedback-lessons.md
+summary: 定義 feedback lesson 的檔名規則、模板、agent 行為、索引；所有 lesson 統一放在 feedback/history/<domain>/。
+domains:
+  - repo-governance
+tags:
+  - feedback
+  - lessons
+  - template
+  - history
+status: validated
+priority: P2
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 600
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 撰寫或 promotion lesson 時
+validation: feedback/history/ 目錄結構與 feedback-lessons.md 規範一致
+complexity: low
+depends:
+  - enforcement/sanitization.md
+  - enforcement/reusable-guidance-boundary.md
+  - enforcement/neutral-language.md
+related:
+  - enforcement/goal-action-validation.md
+  - enforcement/dependency-reading.md
+conflicts: []
+replaces: []
+models:
+  small: 使用 lesson 模板
+  large: 完整讀取所有分類規則與判斷流程
+checklist:
+  - 確認 lesson 的 domain 歸屬
+  - 使用正確檔名格式
+  - 寫入 feedback/history/<domain>/ 下
+runtime_notes: Lazy-load，P2 優先權
+governance_notes: 新增 domain 時需同步更新 feedback/history/ 目錄結構
+
+activation_conditions:
+  when:
+    - 撰寫 feedback lesson
+    - promotion lesson 到 intelligence/
+    - 審查 lesson 品質
+  load_strategy: lazy
+  priority: P2
+  estimated_tokens: 600
+always_apply: false
+scope: content-governance
+deprecated_by:
+rule_id: enforcement.feedback-lessons

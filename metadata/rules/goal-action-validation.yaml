@@ -1,0 +1,55 @@
+# Enforcement Rule Metadata
+id: enforcement.goal-action-validation
+title: 目標、執行、驗證共同流程
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/goal-action-validation.md
+summary: 每個重要工作單元要能反查目標、執行內容與驗證方式；純判斷題用參考來源與推論邊界。
+domains:
+  - repo-governance
+tags:
+  - goal-action-validation
+  - verification
+  - traceability
+status: validated
+priority: P2
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 500
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 重要工作單元需要驗證時
+validation: 每個工作單元都有目標、執行、驗證三欄
+complexity: low
+depends: []
+related:
+  - enforcement/conversation-goal-ledger.md
+  - enforcement/document-todo-list.md
+conflicts: []
+replaces: []
+models:
+  small: 使用目標/執行/驗證三欄表格
+  large: 完整讀取所有使用時機與範例
+checklist:
+  - 每個工作單元回答目標、執行、驗證
+  - 純判斷題使用參考來源與推論邊界
+runtime_notes: Lazy-load，P2 優先權
+governance_notes: 新增使用時機時需同步更新 enforcement/README.md
+
+activation_conditions:
+  when:
+    - 修改文件或程式
+    - 產出分析結論
+    - 制定計畫
+    - 回答是否需要改
+  load_strategy: lazy
+  priority: P2
+  estimated_tokens: 500
+always_apply: false
+scope: workflow
+deprecated_by:
+rule_id: enforcement.goal-action-validation

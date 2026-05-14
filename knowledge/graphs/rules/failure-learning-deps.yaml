@@ -1,0 +1,50 @@
+id: graph.rules.failure-learning-deps
+source: enforcement/linked-updates.md
+status: candidate
+summary: >
+  描述 failure-learning-system 依賴的所有 rules。修改 failure-learning-system.md
+  或 failure-patterns/ 時，必須同步更新這些 rules。
+edges:
+  # failure-learning-system.md 的連動關係（linked-updates.md line 28）
+  - type: depends_on
+    target: enforcement/README.md
+    reason: failure-learning-system 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 28 列出 enforcement/README.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    reason: failure-learning-system 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 28 列出 enforcement/content-layering.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    reason: failure-learning-system 修改時需同步更新 dependency-reading.md 的 Failure Learning Boundary。
+    validation: linked-updates.md line 28 列出 enforcement/dependency-reading.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/linked-updates.md
+    reason: failure-learning-system 修改時需同步更新 linked-updates.md 的常見連動關係表。
+    validation: linked-updates.md line 28 列出 enforcement/linked-updates.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/reusable-guidance-boundary.md
+    reason: failure-learning-system 的 lesson 抽象化依賴 reusable-guidance-boundary.md 的邊界定義。
+    validation: linked-updates.md line 28 列出 enforcement/reusable-guidance-boundary.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/feedback-lessons.md
+    reason: failure-learning-system 的 lesson promotion 依賴 feedback-lessons.md 的模板與索引規則。
+    validation: linked-updates.md line 28 列出 enforcement/feedback-lessons.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/goal-action-validation.md
+    reason: failure-learning-system 的 lesson 驗證依賴 goal-action-validation.md 的目標/執行/驗證流程。
+    validation: linked-updates.md line 28 列出 enforcement/goal-action-validation.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/sanitization.md
+    reason: failure-learning-system 的 lesson 寫入前必須依 sanitization.md 去敏。
+    validation: failure-learning-system.md line 14 引用 sanitization.md 為寫入前必要步驟。
+  - type: depends_on
+    target: enforcement/failure-patterns/README.md
+    reason: failure-learning-system 的 pattern records 存放在 failure-patterns/ 目錄下。
+    validation: failure-learning-system.md 的 Promote 步驟指向 enforcement/failure-patterns/。
+
+metadata:
+  priority: P1
+  confidence: high
+  compatibility_state: old-entrypoint-active
+  last_checked: 2026-05-14

@@ -1,0 +1,55 @@
+# Enforcement Rule Metadata
+id: enforcement.cross-skill-references
+title: Cross-skill references（跨 skill 引用）
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/cross-skill-references.md
+summary: 一個 skill 需要引用另一個 skill 的規範、模板、交接產物或驗證流程時，使用明確 cross-skill reference 格式。
+domains:
+  - repo-governance
+tags:
+  - cross-skill
+  - references
+  - inter-skill
+status: validated
+priority: P2
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 400
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 引用其他 skill 時
+validation: cross-skill reference 包含 target skill、trigger、expected input/output、ownership boundary、sanitization boundary
+complexity: low
+depends:
+  - enforcement/tool-neutral-documentation.md
+related:
+  - enforcement/content-layering.md
+conflicts: []
+replaces: []
+models:
+  small: 使用必要引用格式表
+  large: 完整讀取所有原則與範例
+checklist:
+  - 包含 target skill 連結
+  - 明確寫出 trigger
+  - 說明 ownership boundary
+runtime_notes: Lazy-load，P2 優先權
+governance_notes: 新增 skill 時需考慮是否需要 cross-skill references
+
+activation_conditions:
+  when:
+    - 一個 skill 需要引用另一個 skill
+    - 跨 skill handoff
+    - 共用 template 或 checklist
+  load_strategy: lazy
+  priority: P2
+  estimated_tokens: 400
+always_apply: false
+scope: content-governance
+deprecated_by:
+rule_id: enforcement.cross-skill-references

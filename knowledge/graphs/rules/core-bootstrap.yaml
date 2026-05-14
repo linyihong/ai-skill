@@ -1,0 +1,66 @@
+id: graph.rules.core-bootstrap
+source: enforcement/linked-updates.md
+status: candidate
+summary: >
+  描述 3 條 Core Bootstrap 規則（rule-weight、dependency-reading、
+  conversation-goal-ledger）之間的依賴關係。
+edges:
+  # rule-weight.md 的連動關係（linked-updates.md line 26）
+  - type: depends_on
+    target: enforcement/README.md
+    reason: rule-weight 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 26 列出 enforcement/README.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    reason: rule-weight 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 26 列出 enforcement/content-layering.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    reason: rule-weight 修改時需同步更新 dependency-reading.md 的最低讀取範圍。
+    validation: linked-updates.md line 26 列出 enforcement/dependency-reading.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/linked-updates.md
+    reason: rule-weight 修改時需同步更新 linked-updates.md 的常見連動關係表。
+    validation: linked-updates.md line 26 列出 enforcement/linked-updates.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/decision-efficiency.md
+    reason: rule-weight 修改時需同步更新 decision-efficiency.md 的權重參考。
+    validation: linked-updates.md line 26 列出 enforcement/decision-efficiency.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/goal-action-validation.md
+    reason: rule-weight 修改時需同步更新 goal-action-validation.md 的權重參考。
+    validation: linked-updates.md line 26 列出 enforcement/goal-action-validation.md 為必須同步更新。
+
+  # dependency-reading.md 的連動關係（linked-updates.md line 23）
+  - type: depends_on
+    target: enforcement/README.md
+    reason: dependency-reading 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 23 列出 enforcement/README.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    reason: dependency-reading 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 23 列出 enforcement/content-layering.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/linked-updates.md
+    reason: dependency-reading 修改時需同步更新 linked-updates.md 的常見連動關係表。
+    validation: linked-updates.md line 23 列出 enforcement/linked-updates.md 為必須同步更新。
+
+  # conversation-goal-ledger.md 的連動關係（linked-updates.md line 31）
+  - type: depends_on
+    target: enforcement/README.md
+    reason: conversation-goal-ledger 修改時需同步更新 enforcement/README.md 的索引。
+    validation: linked-updates.md line 31 列出 enforcement/README.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    reason: conversation-goal-ledger 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 31 列出 enforcement/content-layering.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    reason: conversation-goal-ledger 修改時需同步更新 dependency-reading.md 的 writeback transaction 規則。
+    validation: linked-updates.md line 31 列出 enforcement/dependency-reading.md 為必須同步更新。
+
+metadata:
+  priority: P0
+  confidence: high
+  compatibility_state: old-entrypoint-active
+  last_checked: 2026-05-14

@@ -22,7 +22,7 @@
 | `id` | string | yes | 穩定識別碼，使用小寫 kebab-case；優先採 `<layer>.<domain>.<short-name>`。 |
 | `title` | string | yes | 給人讀的標題。 |
 | `type` | enum | yes | Atom 類型：`rule`、`workflow`、`analysis-method`、`intelligence`、`template`、`checklist`、`index`、`schema`、`tool-adapter`、`failure-pattern`、`reference`。 |
-| `layer` | enum | yes | 主要歸屬層：`analysis`、`intelligence`、`workflow`、`runtime`、`memory`、`feedback`、`models`、`governance`、`knowledge`、`metadata`、`shared-rules`、`skills`、`ai-tools`、`scripts`、`architecture`。 |
+| `layer` | enum | yes | 主要歸屬層：`analysis`、`intelligence`、`workflow`、`runtime`、`memory`、`feedback`、`models`、`governance`、`knowledge`、`metadata`、`enforcement`、`skills`、`ai-tools`、`scripts`、`architecture`。 |
 | `source_path` | string | yes | canonical repository-relative source 檔案或資料夾路徑。 |
 | `summary` | string | yes | 一到兩句說明此 atom 提供 agent 什麼能力或判斷。 |
 | `domains` | string array | yes | 此 atom 適用的 domain 或 capability，例如 `apk-analysis`、`app-development`、`travel-planning`、`repo-governance`。 |

@@ -1,0 +1,57 @@
+# Enforcement Rule Metadata
+id: enforcement.dependency-reading
+title: 依賴文件讀取鐵則
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/dependency-reading.md
+summary: 發現 skill/shared rule/tool-specific rule/template/lesson 更新時，必須讀相關依賴文件，包含 shared-rules，並用 dependency read ledger 防止漏讀。
+domains:
+  - repo-governance
+tags:
+  - dependency-reading
+  - dependency-read-ledger
+  - writeback-transaction
+  - bootstrap
+status: validated
+priority: P0
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 400
+  load_strategy: preload
+  cacheable: true
+  ttl:
+    session: 1
+when_to_read: 每個 session 啟動時必讀（Core Bootstrap）
+validation: dependency-reading.md 中的最低讀取範圍表與 enforcement/ 實際檔案結構一致
+complexity: high
+depends:
+  - enforcement/linked-updates.md
+  - enforcement/conversation-goal-ledger.md
+related:
+  - enforcement/rule-weight.md
+  - enforcement/tool-neutral-documentation.md
+conflicts: []
+replaces: []
+models:
+  small: 使用 Default Bootstrap Boundary 的必讀規則表
+  large: 完整讀取所有最低讀取範圍表與 writeback transaction 規則
+checklist:
+  - 先讀 enforcement/README.md 的 Default Bootstrap
+  - 依任務讀相關 shared rule 全文
+  - 建立 dependency read ledger
+runtime_notes: Core Bootstrap 規則，每個 session 預載入
+governance_notes: 修改最低讀取範圍時需同步更新 enforcement/README.md 的索引
+
+activation_conditions:
+  when:
+    - session 啟動時（Core Bootstrap）
+    - 發現 skill/rule/template/lesson 更新時
+  load_strategy: preload
+  priority: P0
+  estimated_tokens: 400
+always_apply: true
+scope: agent-behavior
+deprecated_by:
+rule_id: enforcement.dependency-reading

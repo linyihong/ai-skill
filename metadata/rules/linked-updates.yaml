@@ -1,0 +1,55 @@
+# Enforcement Rule Metadata
+id: enforcement.linked-updates
+title: 連動更新
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/linked-updates.md
+summary: 全庫必須連動更新規則：改一處影響多處時，相關文件必須同步更新或明確檢查。
+domains:
+  - repo-governance
+tags:
+  - linked-updates
+  - consistency
+  - multi-file-change
+status: validated
+priority: P1
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 800
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 當進行 multi-file change 或 architecture update 時
+validation: linked-updates.md 中的依賴表與 enforcement/ 實際檔案結構一致
+complexity: medium
+depends:
+  - enforcement/dependency-reading.md
+related:
+  - enforcement/rule-weight.md
+  - knowledge/graphs/rules/
+conflicts: []
+replaces: []
+models:
+  small: 使用常見連動關係表
+  large: 完整讀取所有連動規則
+checklist:
+  - 修改前檢查 linked-updates.md 的依賴表
+  - 修改後執行連動更新
+runtime_notes: Lazy-load，P1 優先權
+governance_notes: 新增或刪除 enforcement rule 時需同步更新 linked-updates.md
+
+activation_conditions:
+  when:
+    - 修改會影響多個檔案
+    - 架構重構或目錄搬遷
+    - 新增或刪除 enforcement rule
+  load_strategy: lazy
+  priority: P1
+  estimated_tokens: 800
+always_apply: false
+scope: workflow
+deprecated_by:
+rule_id: enforcement.linked-updates

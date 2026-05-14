@@ -1,0 +1,74 @@
+id: graph.rules.content-layering-deps
+source: enforcement/linked-updates.md
+status: candidate
+summary: >
+  描述 content-layering 被哪些 rules 依賴。content-layering.md 定義全庫的內容分層表，
+  幾乎所有 enforcement rules 修改時都需要同步更新它。
+edges:
+  # content-layering 被以下 rules 依賴（從 linked-updates.md 表格提取）
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/rule-weight.md
+    reason: rule-weight 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 26 列出 enforcement/content-layering.md 為 rule-weight 的必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/dependency-reading.md
+    reason: dependency-reading 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 23 列出 enforcement/content-layering.md 為 dependency-reading 的必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/conversation-goal-ledger.md
+    reason: conversation-goal-ledger 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 31 列出 enforcement/content-layering.md 為 conversation-goal-ledger 的必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/linked-updates.md
+    reason: linked-updates 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 23 間接引用 content-layering.md。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/failure-learning-system.md
+    reason: failure-learning-system 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 28 列出 enforcement/content-layering.md 為 failure-learning-system 的必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/decision-efficiency.md
+    reason: decision-efficiency 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 27 列出 enforcement/content-layering.md 為 decision-efficiency 的必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/tool-neutral-documentation.md
+    reason: tool-neutral-documentation 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 25 列出 enforcement/content-layering.md 為 tool-neutral-documentation 的必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/document-todo-list.md
+    reason: document-todo-list 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 29 列出 enforcement/content-layering.md 為 document-todo-list 的必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/goal-action-validation.md
+    reason: goal-action-validation 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 30 列出 enforcement/content-layering.md 為 goal-action-validation 的必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/neutral-language.md
+    reason: neutral-language 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 24 列出 enforcement/content-layering.md 為 neutral-language 的必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/reusable-guidance-boundary.md
+    reason: reusable-guidance-boundary 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 22 列出 enforcement/content-layering.md 為 reusable-guidance-boundary 的必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    source: enforcement/feedback-lessons.md
+    reason: feedback-lessons 修改時需同步更新 content-layering.md 的分層表。
+    validation: linked-updates.md line 22 列出 enforcement/content-layering.md 為 reusable-guidance-boundary 的連動（feedback-lessons 也間接依賴）。
+
+metadata:
+  priority: P2
+  confidence: high
+  compatibility_state: old-entrypoint-active
+  last_checked: 2026-05-14

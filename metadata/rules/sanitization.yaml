@@ -1,0 +1,57 @@
+# Enforcement Rule Metadata
+id: enforcement.sanitization
+title: 去敏與占位符
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/sanitization.md
+summary: 可重用文件不得包含 secrets、raw tokens、本機絕對路徑、使用者名稱、project incident 細節；一律使用占位符。
+domains:
+  - repo-governance
+tags:
+  - sanitization
+  - placeholder
+  - security
+  - privacy
+status: validated
+priority: P1
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 400
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 撰寫或修改 feedback lesson、可重用文件時
+validation: git diff 中確認無 secrets、raw tokens、本機絕對路徑
+complexity: low
+depends:
+  - enforcement/reusable-guidance-boundary.md
+related:
+  - enforcement/feedback-lessons.md
+  - enforcement/neutral-language.md
+conflicts: []
+replaces: []
+models:
+  small: 使用去敏檢查清單
+  large: 完整讀取所有禁止項目與占位符約定
+checklist:
+  - 檢查是否包含本機絕對路徑
+  - 檢查是否包含 secrets/tokens
+  - 檢查是否包含 project incident 細節
+runtime_notes: Lazy-load，P1 優先權
+governance_notes: 修改占位符約定時需同步更新根 README.md
+
+activation_conditions:
+  when:
+    - 撰寫 feedback lesson
+    - 修改可重用文件
+    - commit 前 diff review
+  load_strategy: lazy
+  priority: P1
+  estimated_tokens: 400
+always_apply: false
+scope: content-governance
+deprecated_by:
+rule_id: enforcement.sanitization

@@ -1,0 +1,62 @@
+# Enforcement Rule Metadata
+id: enforcement.failure-learning-system
+title: 失效學習系統
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/failure-learning-system.md
+summary: 使用 failure taxonomy、pattern records、promotion targets 與 validation gate，將重複 agent 失效模式沉澱成可重用防呆規則。
+domains:
+  - repo-governance
+tags:
+  - failure-learning
+  - failure-patterns
+  - prevention
+  - close-loop
+status: validated
+priority: P1
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 1200
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 使用者指出 agent 失誤、close-loop gap、或發現重複失效模式時
+validation: failure-patterns/ 目錄下的 pattern 與 failure-learning-system.md 的 taxonomy 一致
+complexity: medium
+depends:
+  - enforcement/reusable-guidance-boundary.md
+  - enforcement/feedback-lessons.md
+  - enforcement/sanitization.md
+related:
+  - enforcement/goal-action-validation.md
+  - enforcement/dependency-reading.md
+conflicts: []
+replaces: []
+models:
+  small: 使用 Failure Taxonomy 表分類
+  large: 完整讀取 capture-classify-contain-promote-strengthen-validate 流程
+checklist:
+  - Capture: 記錄發生什麼
+  - Classify: 用 taxonomy 分類
+  - Contain: 控制當前風險
+  - Promote: 放到正確 durable location
+  - Strengthen: 補強 prevention
+  - Validate: 確認未來可套用
+runtime_notes: Lazy-load，P1 優先權
+governance_notes: 新增 failure taxonomy class 時需同步更新 enforcement/README.md
+
+activation_conditions:
+  when:
+    - 使用者指出 agent mistake
+    - close-loop gap 被發現
+    - 重複失效模式出現
+  load_strategy: lazy
+  priority: P1
+  estimated_tokens: 1200
+always_apply: false
+scope: agent-behavior
+deprecated_by:
+rule_id: enforcement.failure-learning-system

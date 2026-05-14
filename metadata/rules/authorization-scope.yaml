@@ -1,0 +1,56 @@
+# Enforcement Rule Metadata
+id: enforcement.authorization-scope
+title: 授權與範圍
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/authorization-scope.md
+summary: 僅在已授權的 APK / 產品分析範圍內操作；不蒐集或發佈與目標無關的第三方流量、個資或未授權系統的資料。
+domains:
+  - repo-governance
+  - security
+tags:
+  - authorization
+  - scope
+  - security
+  - compliance
+status: validated
+priority: P0
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 300
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 涉及授權邊界或開始新分析任務時
+validation: 分析範圍與授權文件一致
+complexity: low
+depends: []
+related:
+  - enforcement/sanitization.md
+  - enforcement/reusable-guidance-boundary.md
+conflicts: []
+replaces: []
+models:
+  small: 使用核心原則
+  large: 完整讀取
+checklist:
+  - 確認操作在授權範圍內
+  - 不蒐集無關第三方資料
+runtime_notes: Lazy-load，P0 優先權（最高安全權重）
+governance_notes: 修改授權範圍定義時需同步更新 enforcement/README.md
+
+activation_conditions:
+  when:
+    - 開始新分析任務
+    - 涉及第三方資料
+    - 可能超出授權邊界
+  load_strategy: lazy
+  priority: P0
+  estimated_tokens: 300
+always_apply: false
+scope: agent-behavior
+deprecated_by:
+rule_id: enforcement.authorization-scope

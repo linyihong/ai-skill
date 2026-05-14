@@ -1,0 +1,54 @@
+# Enforcement Rule Metadata
+id: enforcement.document-todo-list
+title: 文件 TODO 清單
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/document-todo-list.md
+summary: 文件有未完成、待決策、待補強或待驗證內容時，在前段放可掃描 TODO 表並連到相關章節、goal 或 issue。
+domains:
+  - repo-governance
+tags:
+  - document-todo
+  - unfinished-work
+  - tracking
+status: validated
+priority: P2
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 300
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 文件有未完成項目時
+validation: 文件前段的 TODO 表與文件實際未完成內容一致
+complexity: low
+depends:
+  - enforcement/conversation-goal-ledger.md
+related:
+  - enforcement/goal-action-validation.md
+conflicts: []
+replaces: []
+models:
+  small: 使用 TODO 區塊範本
+  large: 完整讀取所有放置位置與更新規則
+checklist:
+  - 文件有未完成內容時加入 TODO 區塊
+  - TODO 放在詳細正文之前
+runtime_notes: Lazy-load，P2 優先權
+governance_notes: 修改 TODO 規範時需同步更新 enforcement/README.md
+
+activation_conditions:
+  when:
+    - 文件有未完成章節
+    - 缺少 examples/tables/links
+    - 需要驗證的 claims
+  load_strategy: lazy
+  priority: P2
+  estimated_tokens: 300
+always_apply: false
+scope: content-governance
+deprecated_by:
+rule_id: enforcement.document-todo-list

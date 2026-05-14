@@ -1,0 +1,55 @@
+# Enforcement Rule Metadata
+id: enforcement.tool-neutral-documentation
+title: 工具中立文件
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/tool-neutral-documentation.md
+summary: 可重用文件預設保持工具中立；工具專屬路徑、hook、同步與 UI 步驟放到 ai-tools/ 或工具設定檔。
+domains:
+  - repo-governance
+tags:
+  - tool-neutral
+  - documentation
+  - portability
+status: validated
+priority: P2
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 500
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 建立或修改可重用文件時
+validation: 可重用文件中無工具專屬路徑、hook、UI 步驟
+complexity: low
+depends:
+  - enforcement/content-layering.md
+related:
+  - enforcement/linked-updates.md
+  - enforcement/dependency-reading.md
+conflicts: []
+replaces: []
+models:
+  small: 使用核心規則與允許工具專屬內容的位置表
+  large: 完整讀取所有避免項目與 adapter 策略
+checklist:
+  - 先寫通用 agent/tool 行為
+  - 工具專屬內容放到 ai-tools/ 或 adapter
+runtime_notes: Lazy-load，P2 優先權
+governance_notes: 新增工具時需同步更新 ai-tools/ 目錄
+
+activation_conditions:
+  when:
+    - 建立或修改可重用文件
+    - 新增 skill 或 shared rule
+    - 審查文件是否工具中立
+  load_strategy: lazy
+  priority: P2
+  estimated_tokens: 500
+always_apply: false
+scope: content-governance
+deprecated_by:
+rule_id: enforcement.tool-neutral-documentation

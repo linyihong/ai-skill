@@ -39,6 +39,17 @@
 | [`runtime-pipeline.yaml`](runtime-pipeline.yaml) | 連接 pipeline 所有元件（session-lifecycle、context-flow、guard-chain、relevance-engine）與 budget、health、guards。 | `candidate` |
 | [`runtime-prompt-artifacts.yaml`](runtime-prompt-artifacts.yaml) | 連接 prompt artifact generator（artifact-templates、composition-rules）與 workflow、intelligence、pipeline。 | `candidate` |
 
+### Rule Dependency Graphs（Direction B）
+
+| Graph record | 用途 | 狀態 |
+| --- | --- | --- |
+| [`rules/README.md`](rules/README.md) | Rule dependency graphs 索引，引用 enforcement/linked-updates.md 為 source of truth | `candidate` |
+| [`rules/core-bootstrap.yaml`](rules/core-bootstrap.yaml) | rule-weight、dependency-reading、conversation-goal-ledger 之間的關係 | `candidate` |
+| [`rules/linked-updates-deps.yaml`](rules/linked-updates-deps.yaml) | linked-updates 依賴的所有 rules | `candidate` |
+| [`rules/failure-learning-deps.yaml`](rules/failure-learning-deps.yaml) | failure-learning-system 依賴的所有 rules | `candidate` |
+| [`rules/content-layering-deps.yaml`](rules/content-layering-deps.yaml) | content-layering 被哪些 rules 依賴 | `candidate` |
+| [`rules/full-rule-graph.yaml`](rules/full-rule-graph.yaml) | 完整的 rule dependency graph，含所有 16 條 enforcement rules | `candidate` |
+
 ### Workflow / Analysis / Governance / Feedback / Decisions
 
 | Graph record | 用途 | 狀態 |

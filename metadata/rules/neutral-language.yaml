@@ -1,0 +1,56 @@
+# Enforcement Rule Metadata
+id: enforcement.neutral-language
+title: 中性與低爭議文件用語
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/neutral-language.md
+summary: 文件標題、檔名、摘要與正文避免高風險或爭議詞；可重用文件正文預設繁體中文，必要英文保留給路徑、指令、API 欄位與專有名詞。
+domains:
+  - repo-governance
+tags:
+  - neutral-language
+  - terminology
+  - language-consistency
+  - low-controversy
+status: validated
+priority: P2
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 300
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 撰寫或審查文件用語時
+validation: 文件標題、檔名、slug 無高風險詞
+complexity: low
+depends: []
+related:
+  - enforcement/feedback-lessons.md
+  - enforcement/sanitization.md
+conflicts: []
+replaces: []
+models:
+  small: 使用建議替換表
+  large: 完整讀取所有寫作規則
+checklist:
+  - 標題/檔名/slug 使用中性詞
+  - 避免高風險詞在可重用文件標題
+  - 正文預設繁體中文
+runtime_notes: Lazy-load，P2 優先權
+governance_notes: 修改語言規則時需同步更新 enforcement/README.md
+
+activation_conditions:
+  when:
+    - 撰寫或審查文件用語
+    - 建立新文件或 feedback lesson
+    - 審查 slug/檔名/標題
+  load_strategy: lazy
+  priority: P2
+  estimated_tokens: 300
+always_apply: false
+scope: content-governance
+deprecated_by:
+rule_id: enforcement.neutral-language

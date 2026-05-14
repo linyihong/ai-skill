@@ -1,0 +1,55 @@
+# Enforcement Rule Metadata
+id: enforcement.decision-efficiency
+title: 決策效率
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/decision-efficiency.md
+summary: 先界定未知，再依 time-to-evidence、語意距離、風險、驗證信號與 context 成本選下一步，避免無關讀取與 token 浪費。
+domains:
+  - repo-governance
+tags:
+  - decision-efficiency
+  - context-control
+  - routing
+status: validated
+priority: P2
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 600
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 多條可行路線需選擇時
+validation: 決策效率規則與 enforcement/README.md 的 Runtime Activation Model 一致
+complexity: medium
+depends:
+  - enforcement/dependency-reading.md
+related:
+  - enforcement/rule-weight.md
+  - governance/document-sizing.md
+conflicts: []
+replaces: []
+models:
+  small: 使用核心規則與選擇標準表
+  large: 完整讀取所有 context 載入與分層策略
+checklist:
+  - 用一句話說明目前決策點
+  - 依選擇標準選下一步
+runtime_notes: Lazy-load，P2 優先權
+governance_notes: 修改決策標準時需同步更新 enforcement/README.md
+
+activation_conditions:
+  when:
+    - 多條可行路線需選擇
+    - context 成本高需優先排序
+    - 需要決定下一步行動
+  load_strategy: lazy
+  priority: P2
+  estimated_tokens: 600
+always_apply: false
+scope: agent-behavior
+deprecated_by:
+rule_id: enforcement.decision-efficiency

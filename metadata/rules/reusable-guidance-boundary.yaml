@@ -1,0 +1,58 @@
+# Enforcement Rule Metadata
+id: enforcement.reusable-guidance-boundary
+title: 可重用規則與專案證據邊界
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/reusable-guidance-boundary.md
+summary: 技巧只沉澱通用原因、規則與驗證；專案 incident 證據留在專案文件；指出閉環不完整時必須分析原因並強化規則。
+domains:
+  - repo-governance
+tags:
+  - reusable-guidance
+  - boundary
+  - abstraction
+  - project-evidence
+status: validated
+priority: P2
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 400
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 泛化 lesson 為 reusable rule 時
+validation: reusable 文件中無 project-specific evidence
+complexity: low
+depends:
+  - enforcement/failure-learning-system.md
+  - enforcement/sanitization.md
+related:
+  - enforcement/linked-updates.md
+  - enforcement/feedback-lessons.md
+conflicts: []
+replaces: []
+models:
+  small: 使用核心規則表與寫作檢查清單
+  large: 完整讀取所有原因分析與強化規則流程
+checklist:
+  - 問：這句話換到另一個專案是否仍然成立？
+  - 問：是否包含 project-specific 名稱/路徑？
+  - 問：是否只描述修正結果而非可重用原因？
+runtime_notes: Lazy-load，P2 優先權
+governance_notes: 修改邊界定義時需同步更新 enforcement/README.md
+
+activation_conditions:
+  when:
+    - 泛化 lesson 為 reusable rule
+    - 使用者指出閉環不完整
+    - 審查文件是否包含 project evidence
+  load_strategy: lazy
+  priority: P2
+  estimated_tokens: 400
+always_apply: false
+scope: content-governance
+deprecated_by:
+rule_id: enforcement.reusable-guidance-boundary

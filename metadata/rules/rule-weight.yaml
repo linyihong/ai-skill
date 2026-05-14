@@ -1,0 +1,55 @@
+# Enforcement Rule Metadata
+# 繼承 Knowledge Atom schema 必填欄位 + Enforcement Rule 專屬欄位
+id: enforcement.rule-weight
+title: 規則權重與衝突優先序
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/rule-weight.md
+summary: 當 shared rules、skill workflow、tool adapter、使用者目標或效率規則看似衝突時，依安全/source/validation/user-goal/tool adapter/效率的權重排序處理。
+domains:
+  - repo-governance
+tags:
+  - rule-weight
+  - conflict-resolution
+  - priority
+status: validated
+priority: P0
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 300
+  load_strategy: preload
+  cacheable: true
+  ttl:
+    session: 1
+when_to_read: 每個 session 啟動時必讀（Core Bootstrap）
+validation: 規則權重順序與 enforcement/README.md 的 Runtime Activation Model 一致
+complexity: low
+depends:
+  - enforcement/dependency-reading.md
+related:
+  - metadata/rules/conflict-matrix.yaml
+conflicts: []
+replaces: []
+models:
+  small: 只使用權重順序表
+  large: 完整讀取所有範例
+checklist:
+  - 依 rule-weight.md 的權重順序判斷衝突
+  - 不確定時依 rule-weight.md 的處理流程
+runtime_notes: Core Bootstrap 規則，每個 session 預載入
+governance_notes: 修改權重順序時需同步更新 enforcement/README.md 的索引
+
+# Enforcement Rule 專屬欄位
+activation_conditions:
+  when:
+    - 任何規則看似衝突時
+    - session 啟動時（Core Bootstrap）
+  load_strategy: preload
+  priority: P0
+  estimated_tokens: 300
+always_apply: true
+scope: agent-behavior
+deprecated_by:
+rule_id: enforcement.rule-weight

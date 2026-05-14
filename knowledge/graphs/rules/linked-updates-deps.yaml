@@ -1,0 +1,79 @@
+id: graph.rules.linked-updates-deps
+source: enforcement/linked-updates.md
+status: candidate
+summary: >
+  描述 linked-updates 依賴的所有 rules。linked-updates 本身是「改一處影響多處時
+  必須同步更新」的規則，因此它依賴所有可能被改動的 enforcement rules。
+edges:
+  # linked-updates.md 本身的連動關係（linked-updates.md line 21-52 的完整表格）
+  # 以下列出 linked-updates 直接依賴的 enforcement rules：
+  - type: depends_on
+    target: enforcement/README.md
+    reason: linked-updates 的常見連動關係表大量引用 enforcement/README.md 的索引。
+    validation: linked-updates.md 表格中幾乎每行都列出 enforcement/README.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/content-layering.md
+    reason: linked-updates 的常見連動關係表頻繁引用 content-layering.md 的分層定義。
+    validation: linked-updates.md 表格中多行列出 enforcement/content-layering.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/dependency-reading.md
+    reason: linked-updates 的規則依賴 dependency-reading.md 的 writeback transaction 定義。
+    validation: linked-updates.md line 9 引用 dependency-reading.md 的 writeback transaction。
+  - type: depends_on
+    target: enforcement/rule-weight.md
+    reason: linked-updates 的規則依賴 rule-weight.md 的權重順序判斷衝突。
+    validation: linked-updates.md 的連動更新需依 rule-weight.md 判斷優先序。
+  - type: depends_on
+    target: enforcement/conversation-goal-ledger.md
+    reason: linked-updates 的 document-todo-list 連動關係引用 conversation-goal-ledger.md。
+    validation: linked-updates.md line 29 列出 enforcement/conversation-goal-ledger.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/decision-efficiency.md
+    reason: linked-updates 的 rule-weight 連動關係引用 decision-efficiency.md。
+    validation: linked-updates.md line 27 列出 enforcement/decision-efficiency.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/goal-action-validation.md
+    reason: linked-updates 的 rule-weight 與 failure-learning 連動關係引用 goal-action-validation.md。
+    validation: linked-updates.md line 26, 28 列出 enforcement/goal-action-validation.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/reusable-guidance-boundary.md
+    reason: linked-updates 的 failure-learning 連動關係引用 reusable-guidance-boundary.md。
+    validation: linked-updates.md line 28 列出 enforcement/reusable-guidance-boundary.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/feedback-lessons.md
+    reason: linked-updates 的 failure-learning 與 reusable-guidance 連動關係引用 feedback-lessons.md。
+    validation: linked-updates.md line 22, 28 列出 enforcement/feedback-lessons.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/sanitization.md
+    reason: linked-updates 的 reusable-guidance-boundary 連動關係引用 sanitization.md。
+    validation: linked-updates.md line 22 列出 enforcement/sanitization.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/tool-neutral-documentation.md
+    reason: linked-updates 的 tool-neutral-documentation 連動關係引用自身。
+    validation: linked-updates.md line 25 列出 enforcement/tool-neutral-documentation.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/document-todo-list.md
+    reason: linked-updates 的 document-todo-list 連動關係引用自身。
+    validation: linked-updates.md line 29 列出 enforcement/document-todo-list.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/neutral-language.md
+    reason: linked-updates 的 neutral-language 連動關係引用自身。
+    validation: linked-updates.md line 24 列出 enforcement/neutral-language.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/cross-skill-references.md
+    reason: linked-updates 的 cross-skill-references 連動關係引用自身。
+    validation: linked-updates.md line 32 列出 enforcement/cross-skill-references.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/failure-learning-system.md
+    reason: linked-updates 的 failure-learning-system 連動關係引用自身。
+    validation: linked-updates.md line 28 列出 enforcement/failure-learning-system.md 為必須同步更新。
+  - type: depends_on
+    target: enforcement/authorization-scope.md
+    reason: authorization-scope 修改時需依 linked-updates 檢查連動。
+    validation: linked-updates.md 的通用規則適用於所有 enforcement rules。
+
+metadata:
+  priority: P1
+  confidence: high
+  compatibility_state: old-entrypoint-active
+  last_checked: 2026-05-14

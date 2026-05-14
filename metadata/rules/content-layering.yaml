@@ -1,0 +1,55 @@
+# Enforcement Rule Metadata
+id: enforcement.content-layering
+title: 內容分層
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/content-layering.md
+summary: 定義共用規則、技巧、業務專案各自放哪；intelligence 內部 entry/solution 分層；文件變大時依 document-sizing.md 拆分。
+domains:
+  - repo-governance
+tags:
+  - content-layering
+  - organization
+  - structure
+status: validated
+priority: P2
+confidence: high
+stability: stable
+context_cost:
+  estimated_tokens: 300
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+when_to_read: 遷移或重構內容時
+validation: 內容放置位置與 content-layering.md 的分層表一致
+complexity: low
+depends:
+  - governance/document-sizing.md
+related:
+  - enforcement/tool-neutral-documentation.md
+  - enforcement/linked-updates.md
+conflicts: []
+replaces: []
+models:
+  small: 使用內容分層表
+  large: 完整讀取所有分層規則與 intelligence entry/solution 分層
+checklist:
+  - 確認內容放在正確層級
+  - 文件變大時依 document-sizing.md 拆分
+runtime_notes: Lazy-load，P2 優先權
+governance_notes: 新增層級時需同步更新 enforcement/README.md
+
+activation_conditions:
+  when:
+    - 遷移或重構內容
+    - 新增文件或目錄
+    - 文件接近拆分門檻
+  load_strategy: lazy
+  priority: P2
+  estimated_tokens: 300
+always_apply: false
+scope: content-governance
+deprecated_by:
+rule_id: enforcement.content-layering
