@@ -402,7 +402,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 | 32d | 提取 app-development-guidance SKILL.md Quick Start → `runtime/onboarding/app-development-guidance-quickstart.md` | ✅（已刪除：內容已回歸 workflow/software-delivery/） |
 | 32e | 提取 travel-planning SKILL.md Quick Start → `runtime/onboarding/travel-planning-quickstart.md` | ✅（已刪除：內容已回歸 workflow/travel-planning/） |
 | 32f | 瘦身 3 個 SKILL.md 為純 routing 文件 | ✅ |
-| 32g | 更新 `runtime/onboarding/README.md` + `architecture/next-stage-upgrade-plan.md` | ✅ |
+| 32g | 更新 `runtime/onboarding/README.md` + `plans/active/next-stage-upgrade-plan.md` | ✅ |
 | 32h | 提交 + push | ✅ |
 
 **建立的新檔案**（1 個）：
@@ -444,7 +444,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 | 33b | 提取 `skills/travel-planning/TOOLS.md` → `analysis/travel/sources-and-tools.md` | ✅ |
 | 33c | 提取 `skills/travel-planning/README.md` → `analysis/travel/README.md` | ✅ |
 | 33d | 更新 `plans/skill-specific-extraction.md` 為執行結果 | ✅ |
-| 33e | 更新 `architecture/next-stage-upgrade-plan.md` | ✅ |
+| 33e | 更新 `plans/active/next-stage-upgrade-plan.md` | ✅ |
 | 33f | 提交 + push | ✅ |
 
 **建立的新檔案**（3 個）：
@@ -1185,7 +1185,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 
 | Priority | Status | Goal | Durable location | Next action | Completion criteria |
 | --- | --- | --- | --- | --- | --- |
-| P1 | done | 建立 next-stage upgrade plan | `architecture/next-stage-upgrade-plan.md` | 已完成 | 規劃書 commit/push/readback，root/architecture 入口可找到 |
+| P1 | done | 建立 next-stage upgrade plan | `plans/active/next-stage-upgrade-plan.md` | 已完成 | 規劃書 commit/push/readback，root/architecture 入口可找到 |
 | P1 | done | 建立 top-level architecture directories | `analysis/`, `intelligence/`, `workflow/`, `runtime/`, `memory/`, `feedback/`, `models/`, `governance/`, `knowledge/`, `metadata/` | 已完成 | 每個目錄責任邊界清楚，不搬移大量內容 |
 | P2 | done | 設計 metadata schema | `metadata/schema.md` | 已完成 | Schema 可套用到第一批 Knowledge Atom |
 | P2 | done | 建立 knowledge navigation index | `knowledge/indexes/README.md` | 已完成 | Agent 能從 index 找到 task-relevant knowledge |

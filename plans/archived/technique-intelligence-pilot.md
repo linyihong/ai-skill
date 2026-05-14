@@ -100,7 +100,7 @@ analysis/apk/
 
 ### Phase 28g：更新架構文件
 
-更新 `architecture/next-stage-upgrade-plan.md`，記錄 Phase 28。
+更新 `plans/active/next-stage-upgrade-plan.md`，記錄 Phase 28。
 
 ### Phase 28h：提交 + push
 

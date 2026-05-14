@@ -68,7 +68,7 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 | **metadata/** | ~5 檔 | 🟢 低 | `README.md`、`rules/README.md`、`ranking/README.md` 等 |
 | **models/** | ~2 檔 | 🟢 低 | `README.md`、`profiles/README.md` |
 | **memory/** | ~2 檔 | 🟢 低 | `README.md`、`failure/README.md` |
-| **architecture/** | ~1 檔 | 🟢 低 | `next-stage-upgrade-plan.md` |
+| **plans/active/** | ~1 檔 | 🟢 低 | `next-stage-upgrade-plan.md` |
 | **plans/archived/** | ~2 檔 | 🟢 低 | `context-cost-optimization.md`、`apk-analysis-pilot-migration.md` |
 | **plans/** | ~2 檔 | 🟢 低 | `README.md`、`active/*.md` |
 | **anti-patterns/** | ~1 檔 | 🟢 低 | `README.md` |
@@ -239,7 +239,7 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 - [ ] 更新 `memory/failure/README.md`（若有 shared-rules 引用）
 
 **architecture/:**
-- [ ] 更新 `architecture/next-stage-upgrade-plan.md`（若有 shared-rules 引用）
+- [ ] 更新 `plans/active/next-stage-upgrade-plan.md`（若有 shared-rules 引用）
 - [ ] 更新 `plans/archived/apk-analysis-pilot-migration.md`（若有 shared-rules 引用）
 
 **plans/:**

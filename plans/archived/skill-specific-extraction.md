@@ -4,7 +4,7 @@
 > **Status**: ✅ completed（Phase 33）
 > **啟動條件**: 所有 technique decomposition 完成 + Intelligence Extraction Pipeline 驗證成功後
 > **Durable location**: 本文件（`plans/skill-specific-extraction.md`）
-> **Roadmap 引用**: [`architecture/next-stage-upgrade-plan.md`](architecture/next-stage-upgrade-plan.md) 的 Durable Roadmap Goals
+> **Roadmap 引用**: [`next-stage-upgrade-plan.md`](../active/next-stage-upgrade-plan.md) 的 Durable Roadmap Goals
 
 ---
 
@@ -157,7 +157,7 @@
 
 ## 與其他文件的關係
 
-- [`architecture/next-stage-upgrade-plan.md`](architecture/next-stage-upgrade-plan.md) — Durable Roadmap Goals 引用本文件
+- [`next-stage-upgrade-plan.md`](../active/next-stage-upgrade-plan.md) — Durable Roadmap Goals 引用本文件
 - [`governance/lifecycle/README.md`](governance/lifecycle/README.md) — Skills Deprecation Timeline（Phase D 對應本文件的執行結果）
 - [`notes/intelligence-extraction-observations.md`](notes/intelligence-extraction-observations.md) — Pilot extraction 過程記錄
 - [`plans/technique-intelligence-pilot.md`](plans/technique-intelligence-pilot.md) — Flutter-dart-aot pilot 執行計畫

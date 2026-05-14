@@ -77,5 +77,5 @@ intelligence/ ← 判斷層（When / Why / Trade-off）
 - [`intelligence/README.md`](../intelligence/README.md) — intelligence 層定義
 - [`knowledge/README.md`](../knowledge/README.md) — knowledge 層定義
 - [`skills/ADDING_SKILLS.md`](../skills/ADDING_SKILLS.md) — skills 層定義
-- [`architecture/next-stage-upgrade-plan.md`](../architecture/next-stage-upgrade-plan.md) — 整體架構規劃
+- [`plans/active/next-stage-upgrade-plan.md`](../plans/active/next-stage-upgrade-plan.md) — 整體架構規劃
 - [`feedback/README.md`](../feedback/README.md) — 演化引擎

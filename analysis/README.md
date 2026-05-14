@@ -35,4 +35,4 @@
 
 - `skills/apk-analysis/techniques/`（已刪除，內容已遷移至 `analysis/apk/workflows/`）
 - `skills/app-development-guidance/process/` 中偏分析與 discovery 的內容
-- `architecture/next-stage-upgrade-plan.md` 中 `analysis/` 的分層說明
+- `plans/active/next-stage-upgrade-plan.md` 中 `analysis/` 的分層說明

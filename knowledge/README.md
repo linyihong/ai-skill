@@ -34,6 +34,6 @@
 
 ## 第一批候選遷移來源
 
-- `architecture/next-stage-upgrade-plan.md` 的 Knowledge Navigation System
+- `plans/active/next-stage-upgrade-plan.md` 的 Knowledge Navigation System
 - `skills/README.md` 與各 skill README 中可抽成全庫索引的入口資訊
 - `knowledge/indexes/README.md` 的 navigation index 初版

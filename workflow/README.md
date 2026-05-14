@@ -35,4 +35,4 @@
 - `skills/apk-analysis/WORKFLOW.md`
 - `skills/app-development-guidance/WORKFLOW.md`
 - `skills/travel-planning/` 中可工具中立化的 itinerary workflow
-- `architecture/next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明
+- `plans/active/next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明

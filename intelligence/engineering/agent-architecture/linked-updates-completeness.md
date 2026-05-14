@@ -35,7 +35,7 @@
 | 修改路徑 | `skills-index.yaml` 的 `related` 欄位、`routing-registry.yaml` 的 route |
 | 新增 intelligence atom | `intelligence/<domain>/README.md` 的 atoms 表格、Knowledge Graph |
 | 修改 shared-rules | `shared-rules/README.md` 的索引、`dependency-reading.md` 的邊界 |
-| 修改架構文件 | `architecture/next-stage-upgrade-plan.md` 的 Durable Roadmap Goals |
+| 修改架構文件 | `plans/active/next-stage-upgrade-plan.md` 的 Durable Roadmap Goals |
 
 ## 預防方式
 

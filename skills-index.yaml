@@ -167,7 +167,7 @@ skills:
     entrypoint: governance/README.md
     summary: knowledge/summaries/repo-governance.md
     related:
-      - architecture/next-stage-upgrade-plan.md
+      - plans/active/next-stage-upgrade-plan.md
       - plans/archived/context-cost-optimization.md
       - metadata/schema.md
       - knowledge/runtime/routing-registry.yaml

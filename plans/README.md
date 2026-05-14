@@ -56,6 +56,6 @@
 
 ## 與其他層的關係
 
-- [`architecture/next-stage-upgrade-plan.md`](../architecture/next-stage-upgrade-plan.md) — 全局升級路線圖，`plans/` 中的計畫是路線圖的具體執行計畫
+- [`plans/active/next-stage-upgrade-plan.md`](active/next-stage-upgrade-plan.md) — 全局升級路線圖，`plans/` 中的計畫是路線圖的具體執行計畫
 - [`governance/lifecycle/README.md`](../governance/lifecycle/README.md) — Skills Deprecation Timeline 等生命週期規則
 - [`intelligence/engineering/agent-architecture/`](../intelligence/engineering/agent-architecture/) — 從已完成計畫中提煉的系統經驗結晶

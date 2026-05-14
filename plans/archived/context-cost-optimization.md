@@ -1,6 +1,6 @@
 # Context Cost Optimization Plan
 
-本文件是 [`next-stage-upgrade-plan.md`](next-stage-upgrade-plan.md) 的**成本優化補充規劃**。它不取代原有架構分層規劃，而是針對目前最迫切的 **token 成本與 context 過重問題**，提出具體改造路徑。
+本文件是 [`next-stage-upgrade-plan.md`](../active/next-stage-upgrade-plan.md) 的**成本優化補充規劃**。它不取代原有架構分層規劃，而是針對目前最迫切的 **token 成本與 context 過重問題**，提出具體改造路徑。
 
 ## 問題摘要
 
@@ -633,7 +633,7 @@ rules:
 
 ## 與現有架構的關係
 
-本規劃完全相容於 [`next-stage-upgrade-plan.md`](next-stage-upgrade-plan.md) 的 10 層架構：
+本規劃完全相容於 [`next-stage-upgrade-plan.md`](../active/next-stage-upgrade-plan.md) 的 10 層架構：
 
 | 本規劃元件 | 對應現有層 | 關係 |
 | --- | --- | --- |

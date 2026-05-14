@@ -426,7 +426,7 @@ Extraction 完成後需要更新以下文件：
 | `knowledge/indexes/README.md` | 加入新路由列（如需要） |
 | `knowledge/runtime/routing-registry.yaml` | 加入新 routing record（如需要） |
 | `knowledge/graphs/` | 加入新 graph edge（如需要） |
-| `architecture/next-stage-upgrade-plan.md` | 更新 Phase 完成狀態 |
+| `plans/active/next-stage-upgrade-plan.md` | 更新 Phase 完成狀態 |
 
 ### Step 7a：Shared-Rules 同步檢查（架構變更專用）
 
@@ -505,4 +505,4 @@ grep -rn "intelligence/<domain>/" shared-rules/ --include="*.md"
 - [`metadata/schema.md`](../../metadata/schema.md) — 定義 Knowledge Atom metadata schema，intelligence atoms 應符合其格式
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — 任務路由索引，extraction 完成後需更新
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing registry，extraction 完成後需更新
-- [`architecture/next-stage-upgrade-plan.md`](../../architecture/next-stage-upgrade-plan.md) — 整體升級規劃，本 pipeline 是 Phase 31 的核心產出
+- [`plans/active/next-stage-upgrade-plan.md`](../../plans/active/next-stage-upgrade-plan.md) — 整體升級規劃，本 pipeline 是 Phase 31 的核心產出

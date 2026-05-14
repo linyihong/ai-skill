@@ -38,4 +38,4 @@
 - `shared-rules/failure-learning-system.md`
 - `shared-rules/feedback-lessons.md`
 - ✅ `skills/*/feedback_history/`（已於 2026-05-13 全部搬遷至 `feedback/history/`，舊目錄已刪除）
-- `architecture/next-stage-upgrade-plan.md` 的 Intelligence Feedback Loop
+- `plans/active/next-stage-upgrade-plan.md` 的 Intelligence Feedback Loop
