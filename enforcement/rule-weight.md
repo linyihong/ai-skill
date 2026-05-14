@@ -40,16 +40,31 @@ Rule weight 不是看哪個檔案最近被讀到，而是看該規則控制的 u
 
 ## 常見範例
 
-| 情境 | 較高權重規則 | 正確行動 |
-| --- | --- | --- |
-| Tool adapter 說要 sync local bundle，但目前 setup 是 reference-first。 | P1 canonical writeback 與 P3 conditional compatibility。 | 不要預設跑 bundle sync。Commit/push/readback canonical repo，並標記 tool sync not applicable。 |
-| Decision efficiency 建議少讀 context，但 `dependency-reading.md` 要求讀特定依賴。 | P1 validation gate 高於 P3 efficiency。 | 讀 required dependency，或標成 blocked/not applicable；不能為了速度跳過。 |
-| 舊 `.agent-goals/` entry 指向舊工作，但最新 user message 重新導向任務。 | P1 latest user request 高於 stale goal context。 | 更新、暫停或完成舊 goal，並跟隨最新要求。 |
-| Skill workflow 建議 shortcut，但 shared rules 要求 sanitization 或 source/mirror checks。 | P0 safety/source integrity 高於 P2 skill workflow。 | 先套用 shared rule，再調整 skill workflow。 |
-| 使用者要求 destructive git action，但 repository rules 要求 explicit confirmation。 | P0 destructive-action safety 在確認前高於 P1 user goal。 | 先明確詢問確認並說明風險。 |
-| Compatibility script 可執行，但沒有 active workflow 依賴 native scan 或 local mirrors。 | P3 compatibility 保持條件式。 | 不使用 script；記錄 reference-first 已足夠。 |
-| 文件超過 300 行且混合多主題，但 agent 為了省事不想拆分。 | P2 document sizing 高於 P3 efficiency。 | 必須拆分，並更新索引和連結。拆分本身是 P2，但拆分後的連動更新是 P1。 |
-| Token 成本太高想合併小檔案，但合併後檔案超過 300 行且主題不一致。 | P2 document sizing（單一目的原則）高於 P3 token optimization。 | 不要合併。改用 summary layer 或 better routing 降低 token 成本。 |
+| # | 情境 | 較高權重規則 | 正確行動 | Conflict Matrix |
+| --- | --- | --- | --- | --- |
+| 1 | Tool adapter 說要 sync local bundle，但目前 setup 是 reference-first。 | P1 canonical writeback 高於 P3 conditional compatibility。 | 不要預設跑 bundle sync。Commit/push/readback canonical repo，並標記 tool sync not applicable。 | [`conflict-001`](../metadata/rules/conflict-matrix.yaml#L56) |
+| 2 | Decision efficiency 建議少讀 context，但 `dependency-reading.md` 要求讀特定依賴。 | P1 validation gate 高於 P3 efficiency。 | 讀 required dependency，或標成 blocked/not applicable；不能為了速度跳過。 | [`conflict-002`](../metadata/rules/conflict-matrix.yaml#L67) |
+| 3 | 舊 `.agent-goals/` entry 指向舊工作，但最新 user message 重新導向任務。 | P1 latest user request 高於 stale goal context。 | 更新、暫停或完成舊 goal，並跟隨最新要求。 | [`conflict-003`](../metadata/rules/conflict-matrix.yaml#L78) |
+| 4 | Skill workflow 建議 shortcut，但 shared rules 要求 sanitization 或 source/mirror checks。 | P0 safety/source integrity 高於 P2 skill workflow。 | 先套用 shared rule，再調整 skill workflow。 | [`conflict-004`](../metadata/rules/conflict-matrix.yaml#L89) |
+| 5 | 使用者要求 destructive git action，但 repository rules 要求 explicit confirmation。 | P0 destructive-action safety 在確認前高於 P1 user goal。 | 先明確詢問確認並說明風險。 | [`conflict-005`](../metadata/rules/conflict-matrix.yaml#L100) |
+| 6 | Compatibility script 可執行，但沒有 active workflow 依賴 native scan 或 local mirrors。 | P3 compatibility 保持條件式。 | 不使用 script；記錄 reference-first 已足夠。 | [`conflict-006`](../metadata/rules/conflict-matrix.yaml#L111) |
+| 7 | 文件超過 300 行且混合多主題，但 agent 為了省事不想拆分。 | P2 document sizing 高於 P3 efficiency。 | 必須拆分，並更新索引和連結。拆分本身是 P2，但拆分後的連動更新是 P1。 | [`conflict-007`](../metadata/rules/conflict-matrix.yaml#L122) |
+| 8 | Token 成本太高想合併小檔案，但合併後檔案超過 300 行且主題不一致。 | P2 document sizing（單一目的原則）高於 P3 token optimization。 | 不要合併。改用 summary layer 或 better routing 降低 token 成本。 | [`conflict-008`](../metadata/rules/conflict-matrix.yaml#L133) |
+
+## Conflict Matrix
+
+本文件的衝突規則與範例已結構化為 machine-readable 格式，存放於：
+
+[`metadata/rules/conflict-matrix.yaml`](../metadata/rules/conflict-matrix.yaml)
+
+該檔案包含：
+- **6 條衝突規則**（對應本文件第 23-31 行）
+- **12 個衝突配對**（8 個來自本文件範例 + 4 個額外配對）
+- **權重對照表**（P0/P1/P2/P3 各包含哪些規則）
+- 每個配對的 `rule_id` 直接對應 `metadata/rules/*.yaml`
+
+Agent 在遇到規則衝突時，應優先查詢 conflict matrix 的 machine-readable 配對，
+再回本文件查閱完整說明。
 
 ## 驗證
 

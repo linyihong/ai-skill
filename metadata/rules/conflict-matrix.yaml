@@ -1,0 +1,222 @@
+# Conflict Matrix
+# Machine-readable 格式，定義 enforcement rules 之間的已知衝突配對與解決方式。
+# 來源：enforcement/rule-weight.md 的 6 條衝突規則 + 8 個常見範例。
+#
+# 每個 conflict pair 定義：
+#   - rule_a, rule_b: 衝突的兩條規則（使用 metadata/rules/ 中的 rule_id）
+#   - resolution: 哪條規則勝出（rule_a 或 rule_b）
+#   - rationale: 原因說明
+#   - weight_a, weight_b: 各自的權重（P0-P3）
+#   - applies_conflict_rule: 對應的衝突規則編號（1-6）
+#   - example_ref: 對應 rule-weight.md 中的範例編號（1-8）
+
+conflict_matrix_version: v1
+status: validated
+owner_layer: metadata/rules
+description: >
+  Machine-readable conflict matrix for enforcement rules.
+  Each entry defines a known conflict pair and which rule wins.
+
+# 衝突規則（從 rule-weight.md 第 23-31 行提取）
+conflict_rules:
+  - id: 1
+    rule: "高權重勝出。低權重 instruction 不得削弱高權重 safety、source、validation 或 user-goal requirement。"
+    applies_when: "rule_a.weight != rule_b.weight"
+  - id: 2
+    rule: "同權重時具體勝過泛用。Task-specific accepted plan 可以細化 general workflow，但不能跳過 required validation。"
+    applies_when: "rule_a.weight == rule_b.weight && rule_a.is_specific != rule_b.is_specific"
+  - id: 3
+    rule: "最新使用者要求勝過 stale context。若最新 user message 重新導向任務，更新 goal state 並跟隨新要求，除非違反 P0。"
+    applies_when: "rule_a.is_stale != rule_b.is_stale && no P0 involved"
+  - id: 4
+    rule: "Tool adapters 不定義 source truth。工具文件可說明工具如何讀取或同步內容，但 canonical edits 仍發生在 <AI_SKILL_REPO>。"
+    applies_when: "one rule is tool-adapter (P3) and other is canonical-writeback (P1)"
+  - id: 5
+    rule: "Efficiency 不能跳過 required dependencies。Context-saving 與 decision-efficiency rules 可選擇閱讀順序，但不可移除 required reads。"
+    applies_when: "one rule is efficiency (P3) and other is dependency-validation (P1/P2)"
+  - id: 6
+    rule: "Compatibility layers 保持條件式。symlink、bundle、copy snapshot 只在有意使用時適用；reference-first 仍是預設。"
+    applies_when: "one rule is compatibility (P3) and other is reference-first (P1)"
+
+# 衝突配對
+conflicts:
+  # ── 範例 1：Tool adapter vs Canonical writeback ──
+  - id: conflict-001
+    rule_a: enforcement.tool-neutral-documentation
+    rule_b: enforcement.dependency-reading
+    weight_a: P2
+    weight_b: P1
+    resolution: rule_b
+    rationale: "Tool adapter (P3/P2 conditional) 不得取代 canonical writeback (P1 validation gate)。Commit/push/readback canonical repo，並標記 tool sync not applicable。"
+    applies_conflict_rule: 1
+    example_ref: 1
+    source: enforcement/rule-weight.md#L45
+
+  # ── 範例 2：Decision efficiency vs Dependency reading ──
+  - id: conflict-002
+    rule_a: enforcement.decision-efficiency
+    rule_b: enforcement.dependency-reading
+    weight_a: P2
+    weight_b: P1
+    resolution: rule_b
+    rationale: "Efficiency (P3/P2) 不能跳過 required dependency reads (P1)。讀 required dependency，或標成 blocked/not applicable。"
+    applies_conflict_rule: 5
+    example_ref: 2
+    source: enforcement/rule-weight.md#L46
+
+  # ── 範例 3：Stale goal vs Latest user request ──
+  - id: conflict-003
+    rule_a: enforcement.conversation-goal-ledger
+    rule_b: enforcement.conversation-goal-ledger
+    weight_a: P1
+    weight_b: P1
+    resolution: rule_b
+    rationale: "同權重 (P1) 時，最新使用者要求勝過 stale goal context。更新、暫停或完成舊 goal，並跟隨最新要求。"
+    applies_conflict_rule: 3
+    example_ref: 3
+    source: enforcement/rule-weight.md#L47
+    note: "同一條規則的不同狀態（stale vs latest）衝突"
+
+  # ── 範例 4：Skill workflow vs Safety/sanitization ──
+  - id: conflict-004
+    rule_a: enforcement.sanitization
+    rule_b: enforcement.feedback-lessons
+    weight_a: P0
+    weight_b: P2
+    resolution: rule_a
+    rationale: "P0 safety/source-integrity 高於 P2 skill workflow。先套用 shared rule（去敏），再調整 skill workflow。"
+    applies_conflict_rule: 1
+    example_ref: 4
+    source: enforcement/rule-weight.md#L48
+
+  # ── 範例 5：Destructive action safety vs User goal ──
+  - id: conflict-005
+    rule_a: enforcement.authorization-scope
+    rule_b: enforcement.conversation-goal-ledger
+    weight_a: P0
+    weight_b: P1
+    resolution: rule_a
+    rationale: "P0 destructive-action safety 在確認前高於 P1 user goal。先明確詢問確認並說明風險。"
+    applies_conflict_rule: 1
+    example_ref: 5
+    source: enforcement/rule-weight.md#L49
+
+  # ── 範例 6：Compatibility script vs Reference-first ──
+  - id: conflict-006
+    rule_a: enforcement.dependency-reading
+    rule_b: enforcement.tool-neutral-documentation
+    weight_a: P1
+    weight_b: P2
+    resolution: rule_a
+    rationale: "P3 compatibility 保持條件式。不使用 script；記錄 reference-first 已足夠。"
+    applies_conflict_rule: 6
+    example_ref: 6
+    source: enforcement/rule-weight.md#L50
+
+  # ── 範例 7：Efficiency vs Document sizing ──
+  - id: conflict-007
+    rule_a: enforcement.document-todo-list
+    rule_b: enforcement.decision-efficiency
+    weight_a: P2
+    weight_b: P2
+    resolution: rule_a
+    rationale: "P2 document sizing（拆分義務）高於 P3 efficiency。必須拆分，並更新索引和連結。拆分本身是 P2，但拆分後的連動更新是 P1。"
+    applies_conflict_rule: 1
+    example_ref: 7
+    source: enforcement/rule-weight.md#L51
+
+  # ── 範例 8：Token optimization vs Document sizing ──
+  - id: conflict-008
+    rule_a: enforcement.content-layering
+    rule_b: enforcement.decision-efficiency
+    weight_a: P2
+    weight_b: P2
+    resolution: rule_a
+    rationale: "P2 document sizing（單一目的原則）高於 P3 token optimization。不要合併。改用 summary layer 或 better routing 降低 token 成本。"
+    applies_conflict_rule: 1
+    example_ref: 8
+    source: enforcement/rule-weight.md#L52
+
+  # ── 額外：Cross-skill references vs Tool-neutral documentation ──
+  - id: conflict-009
+    rule_a: enforcement.cross-skill-references
+    rule_b: enforcement.tool-neutral-documentation
+    weight_a: P2
+    weight_b: P2
+    resolution: rule_a
+    rationale: "Cross-skill references 定義跨 skill 引用格式，tool-neutral-documentation 定義工具中立原則。當 skill 文件需要引用另一個 skill 時，cross-skill-references 的格式要求優先。"
+    applies_conflict_rule: 2
+    example_ref: null
+    source: null
+    note: "同權重 (P2) 時，具體（cross-skill 格式）勝過泛用（工具中立）"
+
+  # ── 額外：Failure learning vs Goal-action-validation ──
+  - id: conflict-010
+    rule_a: enforcement.failure-learning-system
+    rule_b: enforcement.goal-action-validation
+    weight_a: P1
+    weight_b: P2
+    resolution: rule_a
+    rationale: "Failure learning (P1) 要求在發現重複錯誤時建立 durable prevention，高於 goal-action-validation (P2) 的單次驗證流程。"
+    applies_conflict_rule: 1
+    example_ref: null
+    source: null
+
+  # ── 額外：Linked updates vs Decision efficiency ──
+  - id: conflict-011
+    rule_a: enforcement.linked-updates
+    rule_b: enforcement.decision-efficiency
+    weight_a: P1
+    weight_b: P2
+    resolution: rule_a
+    rationale: "Linked updates (P1) 要求在修改一處時同步更新相關文件，不能被 decision-efficiency (P2) 的 token 節省邏輯跳過。"
+    applies_conflict_rule: 5
+    example_ref: null
+    source: null
+
+  # ── 額外：Neutral language vs Cross-skill references ──
+  - id: conflict-012
+    rule_a: enforcement.neutral-language
+    rule_b: enforcement.cross-skill-references
+    weight_a: P2
+    weight_b: P2
+    resolution: rule_a
+    rationale: "Neutral language (P2) 要求在文件中使用中性低爭議用語。當 cross-skill-references (P2) 引用外部 skill 時，若引用文字包含非中性用語，neutral-language 的用語規範優先。"
+    applies_conflict_rule: 2
+    example_ref: null
+    source: null
+    note: "同權重 (P2) 時，內容品質規則（neutral-language）勝過格式規則（cross-skill-references）"
+
+# 權重對照表（供快速參考）
+weight_reference:
+  P0:
+    description: "Safety、authorization、secrets、data loss、destructive actions、source-of-truth integrity"
+    rules:
+      - enforcement.authorization-scope
+      - enforcement.sanitization
+    behavior: "不得因方便、速度或工具限制而繞過。若 blocked，停止並詢問。"
+  P1:
+    description: "使用者最新明確要求、active goal closure、canonical writeback、validation gates"
+    rules:
+      - enforcement.dependency-reading
+      - enforcement.linked-updates
+      - enforcement.conversation-goal-ledger
+      - enforcement.failure-learning-system
+    behavior: "除非與 P0 衝突，否則驅動目前任務。被 redirect 時更新或暫停舊 goal。"
+  P2:
+    description: "Cross-repo operating policy、skill-specific workflow、document quality"
+    rules:
+      - enforcement.tool-neutral-documentation
+      - enforcement.document-todo-list
+      - enforcement.goal-action-validation
+      - enforcement.neutral-language
+      - enforcement.cross-skill-references
+      - enforcement.feedback-lessons
+      - enforcement.content-layering
+      - enforcement.reusable-guidance-boundary
+      - enforcement.decision-efficiency
+    behavior: "一致套用，但輸出長度可依任務調整。"
+  P3:
+    description: "Tool adapter、compatibility guidance、efficiency/style preferences"
+    rules: []
+    behavior: "只在 active tool 或 compatibility path 適用。不得重新定義 canonical source。"

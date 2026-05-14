@@ -26,6 +26,7 @@
 | [`reusable-guidance-boundary.yaml`](reusable-guidance-boundary.yaml) | 可重用規則與專案證據邊界（Lazy-load，P2） |
 | [`content-layering.yaml`](content-layering.yaml) | 內容分層（Lazy-load，P2） |
 | [`decision-efficiency.yaml`](decision-efficiency.yaml) | 決策效率（Lazy-load，P2） |
+| [`conflict-matrix.yaml`](conflict-matrix.yaml) | Rule 衝突配對矩陣，定義已知衝突與解決方式（12 個配對） |
 
 ## 邊界
 
