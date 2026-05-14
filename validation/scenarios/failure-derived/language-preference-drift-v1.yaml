@@ -1,7 +1,7 @@
 # Language Preference Drift Scenario
 # 測試 AI 是否正確跟隨使用者當前語言，而非固定語言偏好
 # 來源 failure pattern:
-#   - shared-rules/failure-patterns/language-preference-drift.md
+#   - enforcement/failure-patterns/language-preference-drift.md
 
 id: language-preference-drift-v1
 domain: cross-domain
@@ -9,7 +9,7 @@ type: heuristic-obedience
 priority: P1
 
 failure_source:
-  pattern: shared-rules/failure-patterns/language-preference-drift.md
+  pattern: enforcement/failure-patterns/language-preference-drift.md
   class: configuration-gap
   date: "2026-05-13"
   description: >
@@ -19,7 +19,7 @@ failure_source:
 given:
   task: respond_to_user
   artifacts:
-    - shared-rules/failure-patterns/language-preference-drift.md
+    - enforcement/failure-patterns/language-preference-drift.md
   signals:
     - 使用者最近一次提問使用中文
     - 使用者最近一次提問使用日文

@@ -5,7 +5,7 @@
 #
 # 依賴：
 #   - skills-index.yaml (weight, domains, triggers, conflicts)
-#   - shared-rules/rule-weight.md (conflict resolution priority)
+#   - enforcement/rule-weight.md (conflict resolution priority)
 
 relevance_engine_version: v1
 status: candidate

@@ -15,7 +15,7 @@
 1. 任務若涉及 safety、source-of-truth、commit/push/readback 或 shared rule 更新，最低需套用 `large` profile 的讀取深度。
 2. 任務若只是定位入口、查詢狀態或使用已驗證 checklist，可使用 `small` profile。
 3. 任務若需要 APK、app guidance、travel planning 或 tool adapter 的專門流程，使用 `specialized` profile，但仍要先遵守 shared-rule bootstrap。
-4. Profile 只決定 context loading 深度，不決定規則權重。規則衝突仍依 `shared-rules/rule-weight.md`。
+4. Profile 只決定 context loading 深度，不決定規則權重。規則衝突仍依 `enforcement/rule-weight.md`。
 
 ## Metadata Mapping
 

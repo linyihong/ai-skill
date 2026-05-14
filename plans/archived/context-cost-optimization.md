@@ -17,7 +17,7 @@
 ## 核心診斷
 
 ```
-README.md + shared-rules/README.md + Default Bootstrap
+README.md + enforcement/README.md + Default Bootstrap
     ↓
 已變成「AI OS Kernel」
     ↓
@@ -89,9 +89,9 @@ CORE_BOOTSTRAP.md
 
 ### 1.3 Rule Lazy-load 機制 ✅ 已實作
 
-**現狀**：`shared-rules/README.md` 的 Default Bootstrap 要求每次載入 12 條規則。
+**現狀**：`enforcement/README.md` 的 Default Bootstrap 要求每次載入 12 條規則。
 
-**改造**：在 `shared-rules/README.md` 中引入 **runtime activation model**：
+**改造**：在 `enforcement/README.md` 中引入 **runtime activation model**：
 
 ```yaml
 rule:
@@ -547,7 +547,7 @@ rules:
 ### Step 1：建立 Core Bootstrap（立即）✅ 已實作
 
 1. 建立 [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md) — 只含 rule-weight、dependency-reading、goal-ledger
-2. 更新 `shared-rules/README.md` — 加入 runtime activation model
+2. 更新 `enforcement/README.md` — 加入 runtime activation model
 3. 更新根 `README.md` — 縮短為超短入口
 
 ### Step 2：建立 Skills Index（立即）✅ 已實作
@@ -600,7 +600,7 @@ rules:
 
 ### Step 8：建立 Feedback Promotion Pipeline（已實作）
 
-將 feedback lesson 從 `skills/*/feedback_history/` 的原始觀察，透過機器可讀的 scoring、workflow 與 lifecycle automation，推進到 `workflow/`、`intelligence/`、`shared-rules/`、`memory/` 或 runtime surfaces：
+將 feedback lesson 從 `skills/*/feedback_history/` 的原始觀察，透過機器可讀的 scoring、workflow 與 lifecycle automation，推進到 `workflow/`、`intelligence/`、`enforcement/`、`memory/` 或 runtime surfaces：
 
 1. 建立 Promotion Pipeline 概覽 → [`feedback/pipeline/README.md`](../feedback/pipeline/README.md) — pipeline 架構圖、與既有層的關係、使用方式
 2. 建立 Promotion Engine → [`feedback/pipeline/promotion-engine.yaml`](../feedback/pipeline/promotion-engine.yaml) — 5 維度 scoring（impact 0.30 + maturity 0.25 + frequency 0.20 + freshness 0.15 + urgency 0.10）、threshold 0.7 immediate / 0.5 backlog、5 種 promotion target decisions、3 個 scoring examples
@@ -637,7 +637,7 @@ rules:
 
 | 本規劃元件 | 對應現有層 | 關係 |
 | --- | --- | --- |
-| Core Bootstrap | `shared-rules/` | 縮小現有 Default Bootstrap |
+| Core Bootstrap | `enforcement/` | 縮小現有 Default Bootstrap |
 | Skills Index | `knowledge/indexes/` | 擴充現有 routing table |
 | Summary Layer | `knowledge/summaries/` | 擴充現有 summaries |
 | Runtime Router | `runtime/`, `knowledge/runtime/` | 將設計文件轉為可執行 routing |

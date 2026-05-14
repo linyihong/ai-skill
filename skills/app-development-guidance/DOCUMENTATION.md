@@ -47,12 +47,12 @@ What this does not solve.
 | Generated clients, SDKs, fixtures, and provider/consumer contract checks | `implementation/` and the project repository. |
 | Product Brief validation, document precedence, traceability, and BDD closure process | `process/`, templates, and checklists. |
 | Performance budgets, load/stress/spike/soak strategy, CI smoke checks, and release evidence | `process/`, `CHECKLIST.md`, templates, and the project repository's test or release notes. |
-| Shared sanitization or feedback rules | [`shared-rules`](../../shared-rules/README.md). |
+| Shared sanitization or feedback rules | [`shared-rules`](../../enforcement/README.md). |
 | Local-only scratch notes, credentials, or ephemeral process artifacts | Project repository only: **gitignored** paths with **neutral** directory naming; configuration via env vars and optional untracked files; keep tracked READMEs free of filesystem tours and internal codenames. |
 
 ## Reusable Guidance Boundary
 
-This section applies the global rule in [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md).
+This section applies the global rule in [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md).
 
 Skill documentation should describe the reusable reason, failure mode, decision rule, and validation method. Do not promote a project incident by copying its app name, module name, endpoint path, sample payload, class name, local path, host, or live-data quirk into the skill.
 
@@ -65,7 +65,7 @@ Start with [`templates/README.md`](templates/README.md) when choosing a copyable
 
 ## Required Linked Update Statement
 
-Every reusable note that affects multiple folders must follow [`../../shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md) and include a short linked-update statement:
+Every reusable note that affects multiple folders must follow [`../../enforcement/linked-updates.md`](../../enforcement/linked-updates.md) and include a short linked-update statement:
 
 ```markdown
 #### Required Linked Updates

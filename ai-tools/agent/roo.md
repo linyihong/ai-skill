@@ -275,13 +275,13 @@ VS Code Extension 全域設定的通用查詢/修改方法見 [`intelligence/ide
 ### 相關資源
 
 - VS Code Extension 全域設定修改通用指南: [`intelligence/ide/vscode-extension-global-state.md`](../../intelligence/ide/vscode-extension-global-state.md)
-- Failure pattern: [`shared-rules/failure-patterns/language-preference-drift.md`](../../shared-rules/failure-patterns/language-preference-drift.md)
+- Failure pattern: [`enforcement/failure-patterns/language-preference-drift.md`](../../enforcement/failure-patterns/language-preference-drift.md)
 - Feedback lesson: [`feedback/history/roo-code/2026-05-13_124800-language-preference-drift.md`](../../feedback/history/roo-code/2026-05-13_124800-language-preference-drift.md)
 - 設定檔: [`.roomodes`](../../.roomodes)
 
 ## Roo Code 與對話目標閉環
 
-工具中立規則見 [`shared-rules/conversation-goal-ledger.md`](../../shared-rules/conversation-goal-ledger.md)。Roo Code 沒有像 Cursor 那樣的 hooks 機制，但可以透過以下方式實作對話目標閉環。
+工具中立規則見 [`enforcement/conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md)。Roo Code 沒有像 Cursor 那樣的 hooks 機制，但可以透過以下方式實作對話目標閉環。
 
 ### 在 Custom Instructions 中加入 goal ledger 提醒
 

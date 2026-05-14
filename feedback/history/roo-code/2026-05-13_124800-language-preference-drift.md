@@ -39,9 +39,9 @@ If the user switches languages, follow their switch.
 
 1. Custom Instructions 中的語言規則應加上「除非使用者使用其他語言」的例外
 2. 或者在 Custom Instructions 中完全移除語言偏好，讓 agent 自動跟隨使用者語言
-3. 已建立 failure pattern: `shared-rules/failure-patterns/language-preference-drift.md`
+3. 已建立 failure pattern: `enforcement/failure-patterns/language-preference-drift.md`
 
 ## 相關檔案
 
-- Failure pattern: [`shared-rules/failure-patterns/language-preference-drift.md`](../../shared-rules/failure-patterns/language-preference-drift.md)
+- Failure pattern: [`enforcement/failure-patterns/language-preference-drift.md`](../../enforcement/failure-patterns/language-preference-drift.md)
 - Roo Code 設定文件: [`ai-tools/agent/roo.md`](../../ai-tools/agent/roo.md)

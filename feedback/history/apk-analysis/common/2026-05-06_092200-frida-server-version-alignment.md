@@ -1,4 +1,4 @@
-> 遵守 [共用規則索引](../../../../shared-rules/README.md)、[neutral-language](../../../../shared-rules/neutral-language.md) 與 [feedback-lessons](../../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+> 遵守 [共用規則索引](../../../../enforcement/README.md)、[neutral-language](../../../../enforcement/neutral-language.md) 與 [feedback-lessons](../../../../enforcement/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 
 # Extracted — See [`analysis/apk/tools-and-failures.md`](../../../../analysis/apk/tools-and-failures.md) (Frida 健康檢查)
 

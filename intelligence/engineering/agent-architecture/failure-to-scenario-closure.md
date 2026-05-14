@@ -40,7 +40,7 @@
 ```
 Failure Occurs
     ↓
-記錄 failure pattern（shared-rules/failure-patterns/）
+記錄 failure pattern（enforcement/failure-patterns/）
     ↓
 判斷是否可 stateless 重現
     ↓

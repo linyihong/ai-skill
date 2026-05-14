@@ -60,4 +60,4 @@
 - `memory/summary/`：episodic memory 提供 summary 無法捕捉的「情境細節」
 - `feedback/replay/`：episodic memory 是 replay 的分析原料
 - `intelligence/engineering/failure/`：失敗類的 episodic memory 可抽象化為 failure intelligence
-- `shared-rules/failure-learning-system.md`：failure episodic 的 promotion 路徑
+- `enforcement/failure-learning-system.md`：failure episodic 的 promotion 路徑

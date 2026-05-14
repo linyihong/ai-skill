@@ -43,4 +43,4 @@ The source contract owns operation names, routes, DTOs, errors, auth/session sha
 
 ## Required Linked Updates
 
-Follow [`../../../../shared-rules/linked-updates.md`](../../../../shared-rules/linked-updates.md). Contract-codegen changes must update or verify [`../../process/`](../../process/), [`../../CHECKLIST.md`](../../CHECKLIST.md), [`../../checklists/api-security-review.md`](../../checklists/api-security-review.md), backend/API platform notes, and any template fields that describe API/interface contracts.
+Follow [`../../../../enforcement/linked-updates.md`](../../../../enforcement/linked-updates.md). Contract-codegen changes must update or verify [`../../process/`](../../process/), [`../../CHECKLIST.md`](../../CHECKLIST.md), [`../../checklists/api-security-review.md`](../../checklists/api-security-review.md), backend/API platform notes, and any template fields that describe API/interface contracts.

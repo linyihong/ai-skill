@@ -20,7 +20,7 @@ AI 知識作業系統 — 讓 agent 用最小 token 成本找到正確知識。
 | --- | --- | --- |
 | 🎯 **Core Bootstrap** | [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | 最小必讀啟動集合（3 rules, ~800 tokens） |
 | 📐 **Architecture** | [`architecture/`](architecture/) | Roadmap、升級規劃、成本優化 |
-| ⚙️ **Shared Rules** | [`shared-rules/`](shared-rules/README.md) | 共用作業規則（含 lazy-load activation model） |
+| ⚙️ **Shared Rules** | [`enforcement/`](enforcement/README.md) | 共用作業規則（含 lazy-load activation model） |
 | 🧠 **Skills** | [`skills/`](skills/README.md) | 可重用 agent 能力模組 |
 | 🗺️ **Skill Index** | [`skills-index.yaml`](skills-index.yaml) | 結構化 skill routing index |
 | 🔧 **Tool Adapters** | [`ai-tools/`](ai-tools/README.md) | Claude Code、Cursor 等工具配置 |
@@ -70,7 +70,7 @@ Session Start
 | --- | --- |
 | [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | Minimal bootstrap (3 rules, ~800 tokens) |
 | [`skills-index.yaml`](skills-index.yaml) | Skill routing index |
-| [`plans/active/next-stage-upgrade-plan.md`](plans/active/next-stage-upgrade-plan.md) | Full architecture upgrade plan |
+| [`plans/archived/next-stage-upgrade-plan.md`](plans/archived/next-stage-upgrade-plan.md) | Full architecture upgrade plan |
 | [`plans/archived/context-cost-optimization.md`](plans/archived/context-cost-optimization.md) | Token cost optimization plan |
 | [`runtime/router/activation-rules.yaml`](runtime/router/activation-rules.yaml) | Lazy-load activation rules |
 | [`runtime/context/ttl-policy.yaml`](runtime/context/ttl-policy.yaml) | Context TTL policy |

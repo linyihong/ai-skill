@@ -167,7 +167,7 @@ feedback_budget:
 
 ### Phase 1：建立 `core-principles.md`
 
-**位置**：`shared-rules/core-principles.md`
+**位置**：`enforcement/core-principles.md`
 
 **內容**：10-15 條不可被 context 淹沒的最高層原則
 
@@ -187,7 +187,7 @@ feedback_budget:
 **連動更新**：
 - `CORE_BOOTSTRAP.md` — 加入 core-principles.md 為第 0 條必讀
 - `rule-weight.md` — 確認 P0 包含 core-principles
-- `shared-rules/README.md` — 加入 core-principles 到 always-apply 集合
+- `enforcement/README.md` — 加入 core-principles 到 always-apply 集合
 
 ### Phase 2：擴充 `.agent-goals/` 加入 Context Scope
 
@@ -212,7 +212,7 @@ Goal:
 
 ### Phase 3：建立 `context-budget.md`
 
-**位置**：`shared-rules/context-budget.md`
+**位置**：`enforcement/context-budget.md`
 
 **內容**：
 
@@ -246,7 +246,7 @@ large      | 30        | 60        | 80             | context_conflict
 
 ### Phase 4：建立 `rule-capacity.md`
 
-**位置**：`shared-rules/rule-capacity.md`
+**位置**：`enforcement/rule-capacity.md`
 
 **內容**：定義規則數量上限與管理機制
 
@@ -273,7 +273,7 @@ large      | 30        | 60        | 80             | context_conflict
 
 **連動更新**：
 - `rule-weight.md` — 加入 rule capacity 的權重說明
-- `shared-rules/README.md` — 加入 rule capacity 到索引
+- `enforcement/README.md` — 加入 rule capacity 到索引
 - `governance/lifecycle/README.md` — 加入規則生命週期管理
 
 ### Phase 5：整合 `agent-architecture/` atoms 到執行規則
@@ -320,11 +320,11 @@ large      | 30        | 60        | 80             | context_conflict
 ## 執行計畫
 
 ### Phase 1：core-principles.md
-- 建立 `shared-rules/core-principles.md`
+- 建立 `enforcement/core-principles.md`
 - 加入 feedback 原則（原則 11-12）
 - 更新 `CORE_BOOTSTRAP.md` 加入第 0 條必讀
 - 更新 `rule-weight.md` 確認 P0 包含 core-principles
-- 更新 `shared-rules/README.md` 索引
+- 更新 `enforcement/README.md` 索引
 
 ### Phase 2：Context Scope for .agent-goals/
 - 修改 `.agent-goals/README.md` 加入 allowed_context / forbidden_context / max_files / max_tool_calls / feedback_targets
@@ -332,20 +332,20 @@ large      | 30        | 60        | 80             | context_conflict
 - 新增 `scripts/agent-goals.sh validate-boundary` 命令
 
 ### Phase 3：context-budget.md
-- 建立 `shared-rules/context-budget.md`
+- 建立 `enforcement/context-budget.md`
 - 加入 feedback_budget 表格（small/medium/large 的 feedback tool call 預算）
 - 更新 `decision-efficiency.md` 加入 context budget
 - 更新 `dependency-reading.md` 加入 budget 邊界
 - 更新 `CORE_BOOTSTRAP.md` lazy-load 規則
 
 ### Phase 4：rule-capacity.md
-- 建立 `shared-rules/rule-capacity.md`
+- 建立 `enforcement/rule-capacity.md`
 - 更新 `rule-weight.md`
-- 更新 `shared-rules/README.md`
+- 更新 `enforcement/README.md`
 - 更新 `governance/lifecycle/README.md`
 
 ### Phase 5：feedback-enforcement.md
-- 建立 `shared-rules/feedback-enforcement.md`
+- 建立 `enforcement/feedback-enforcement.md`
 - 內容：Task Type → Feedback Target 對應表、強制機制、completion gate 定義
 - 更新 `feedback-lessons.md` 加入 feedback-enforcement 引用
 - 更新 `failure-learning-system.md` 加入 feedback-enforcement 引用
@@ -363,10 +363,10 @@ large      | 30        | 60        | 80             | context_conflict
 ### Phase 8：Bootstrap Flow 更新
 - 修改 `CORE_BOOTSTRAP.md` 啟動流程（加入 feedback check 步驟）
 - 更新 `dependency-reading.md` Default Bootstrap Boundary
-- 建立 `shared-rules/core-principles.md`
+- 建立 `enforcement/core-principles.md`
 - 更新 `CORE_BOOTSTRAP.md` 加入第 0 條必讀
 - 更新 `rule-weight.md` 確認 P0 包含 core-principles
-- 更新 `shared-rules/README.md` 索引
+- 更新 `enforcement/README.md` 索引
 
 ---
 

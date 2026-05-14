@@ -10,5 +10,5 @@
 ## 與既有層的關係
 
 - `anti-patterns/` 記錄 runtime anti-patterns 的症狀與預防方式；本層提供具體的 guard 實作。
-- `shared-rules/failure-patterns/` 記錄 agent 常犯的錯誤模式；本層提供 prevention gate。
+- `enforcement/failure-patterns/` 記錄 agent 常犯的錯誤模式；本層提供 prevention gate。
 - `runtime/` 定義 runtime 整體設計；本層是 runtime 的安全護欄子系統。

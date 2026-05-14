@@ -2,7 +2,7 @@
 
 本文件整合 Ai-skill 系統中從「學到新知識」到「commit/push 完成」的完整端到端流程。它不取代既有文件的細節，而是作為**執行順序的總索引**，讓 agent 在每輪 checkpoint 知道下一步該做什麼。
 
-> 遵守 [`shared-rules/README.md`](../../shared-rules/README.md)、[`shared-rules/dependency-reading.md`](../../shared-rules/dependency-reading.md)、[`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md)、[`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)、[`shared-rules/failure-learning-system.md`](../../shared-rules/failure-learning-system.md)；本檔只定義流程順序，不重複貼上各規則全文。
+> 遵守 [`enforcement/README.md`](../../enforcement/README.md)、[`enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md)、[`enforcement/linked-updates.md`](../../enforcement/linked-updates.md)、[`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md)、[`enforcement/failure-learning-system.md`](../../enforcement/failure-learning-system.md)；本檔只定義流程順序，不重複貼上各規則全文。
 
 ---
 
@@ -50,7 +50,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 ## Step 1：觸發檢查（Per-Round Checkpoint）
 
-**來源**：[`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md) 第 11 行
+**來源**：[`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) 第 11 行
 
 **時機**：每個有實質進展的工作回合結束前、切回長時間專案工作前、提交 project-only evidence 前、或使用者說「繼續」展開下一輪前。
 
@@ -71,7 +71,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 ## Step 2：分類知識類型
 
-**來源**：[`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md) §判斷流程
+**來源**：[`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) §判斷流程
 
 **判斷流程**：
 
@@ -98,7 +98,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 | 單一 skill 技巧 | `skills/<skill>/WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md` 或 `techniques/` | Lesson 已 generalized、去敏，且 skill index 已更新 |
 | 工程判斷 | `intelligence/` | 影響 trade-off、anti-pattern、route selection 或 cross-project decision |
 | 執行流程 | `workflow/` | 影響 agent 如何執行 planning、review、handoff 或 validation |
-| 跨 skill 或全庫規則 | `shared-rules/` 或 `shared-rules/failure-patterns/` | Failure class 或 prevention gate 可跨 skill 重演 |
+| 跨 skill 或全庫規則 | `enforcement/` 或 `enforcement/failure-patterns/` | Failure class 或 prevention gate 可跨 skill 重演 |
 | Runtime 導航 | `knowledge/`、`metadata/`、`runtime/` | 需要被 registry、summary、graph 或 model context report route 到 |
 | 長期記憶 | `memory/` | 需要保留 replay / episodic / project abstraction boundary |
 
@@ -106,7 +106,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 ## Step 4：寫入 Feedback Lesson
 
-**來源**：[`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md) §模板、§檔名規則
+**來源**：[`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) §模板、§檔名規則
 
 **位置**：`feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`
 
@@ -139,8 +139,8 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 | `workflow/<domain>/artifact-gates.md` | 加入新的產出規範或驗證 gate |
 | `intelligence/<domain>/` | 新增 intelligence atom（heuristics / anti-patterns / failure / signals） |
 | `analysis/<domain>/` | 更新分析方法或技術流程 |
-| `shared-rules/` | 新增或更新全庫規則 |
-| `shared-rules/failure-patterns/` | 新增 failure pattern（見 Step 7） |
+| `enforcement/` | 新增或更新全庫規則 |
+| `enforcement/failure-patterns/` | 新增 failure pattern（見 Step 7） |
 | `knowledge/` / `metadata/` / `runtime/` | 更新 registry / summary / graph（見 Step 9） |
 | `memory/` | 更新長期記憶條目 |
 
@@ -191,7 +191,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 
 ## Step 7：Failure Learning（選擇性）
 
-**來源**：[`shared-rules/failure-learning-system.md`](../../shared-rules/failure-learning-system.md)
+**來源**：[`enforcement/failure-learning-system.md`](../../enforcement/failure-learning-system.md)
 
 **適用時機**：當新知識來自 agent 錯誤、close-loop gap、或重複失效模式時。
 
@@ -212,7 +212,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 |--------------|-----------------|
 | 只影響單一 conversation | `.agent-goals/` |
 | 單一文件有局部 gap | 該文件的 Document TODO |
-| Cross-document 或 cross-agent | `shared-rules/failure-patterns/` |
+| Cross-document 或 cross-agent | `enforcement/failure-patterns/` |
 | Skill-specific 重複錯誤 | `feedback/history/<domain>/` |
 | Tool-specific 執行錯誤 | `ai-tools/<tool>.md` |
 | 架構重構後 shared-rules 未同步 | `failure-patterns/shared-rules-architecture-drift.md` + Step 7a |
@@ -222,7 +222,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 
 ## Step 8：Linked Updates
 
-**來源**：[`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md)
+**來源**：[`enforcement/linked-updates.md`](../../enforcement/linked-updates.md)
 
 **核心原則**：修改一個文件時，必須同步更新所有相關文件，或明確寫出「已檢查，無需更新」的理由。
 
@@ -230,14 +230,14 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 
 | 改動位置 | 必須同步更新或檢查 |
 |----------|------------------|
-| `shared-rules/` | 根 `README.md`、相關 skill 入口、`feedback/history/` 模板引用 |
+| `enforcement/` | 根 `README.md`、相關 skill 入口、`feedback/history/` 模板引用 |
 | `feedback/history/` lesson | `feedback/history/<domain>/README.md`、promotion target |
 | `workflow/<domain>/` | 對應 `analysis/`、`intelligence/`、`runtime/onboarding/` |
 | `intelligence/<domain>/` | `knowledge/indexes/`、`knowledge/summaries/`、`knowledge/graphs/` |
 | `knowledge/` / `runtime/` | 執行 `refresh-knowledge-runtime.rb` |
 | 架構重構 | 建立 validation scenario + shared-rules 同步檢查（Step 6a + Step 7a） |
 
-> 完整表格請見 [`linked-updates.md`](../../shared-rules/linked-updates.md) §常見連動關係
+> 完整表格請見 [`linked-updates.md`](../../enforcement/linked-updates.md) §常見連動關係
 
 ---
 
@@ -269,16 +269,16 @@ ruby scripts/validate-knowledge-runtime.rb
 
 ## Step 10：驗證（Validation）
 
-**來源**：[`shared-rules/dependency-reading.md`](../../shared-rules/dependency-reading.md) §Ai-skill 回寫完成門檻、[`shared-rules/sanitization.md`](../../shared-rules/sanitization.md)
+**來源**：[`enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md) §Ai-skill 回寫完成門檻、[`enforcement/sanitization.md`](../../enforcement/sanitization.md)
 
 **驗證檢查清單**：
 
 1. ✅ `git status --short --branch` 檢查變更
-2. ✅ **去敏檢查（Sanitization）** — 依 [`shared-rules/sanitization.md`](../../shared-rules/sanitization.md) 檢查所有新增/修改的可重用文件：
+2. ✅ **去敏檢查（Sanitization）** — 依 [`enforcement/sanitization.md`](../../enforcement/sanitization.md) 檢查所有新增/修改的可重用文件：
    - 不得包含本機真實絕對路徑（改用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 占位符）
    - 不得包含使用者帳號名稱、私用工作目錄、git clone 實體路徑
    - 不得包含 secrets、raw tokens、私人 host、個資
-   - 不得包含 project-specific evidence（依 [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md)）
+   - 不得包含 project-specific evidence（依 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md)）
 3. ✅ `git diff` 檢查將提交的內容，確認上述去敏項目已處理
 4. ✅ 執行適用的 lints / Markdown link check / required linked updates 檢查
 5. ✅ **目錄結構命名檢查** — 若本輪涉及新增或改名目錄，執行 `scripts/validate-knowledge-runtime.rb` 的 `validate_directory_naming`：
@@ -292,7 +292,7 @@ ruby scripts/validate-knowledge-runtime.rb
 
 ## Step 11：Commit / Push / Readback
 
-**來源**：[`shared-rules/dependency-reading.md`](../../shared-rules/dependency-reading.md) §Writeback Transaction Guard、§Commit/Push 後讀回 Gate
+**來源**：[`enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md) §Writeback Transaction Guard、§Commit/Push 後讀回 Gate
 
 **交易關閉條件**：
 
@@ -307,7 +307,7 @@ ruby scripts/validate-knowledge-runtime.rb
 
 | 更新類型 | Commit/push 後必須重新讀取 |
 |---------|--------------------------|
-| `shared-rules/` | 更新過的 shared rule、`shared-rules/README.md`、`shared-rules/linked-updates.md` |
+| `enforcement/` | 更新過的 shared rule、`enforcement/README.md`、`enforcement/linked-updates.md` |
 | `skills/<name>/` | 該 skill 的 `SKILL.md`，以及本次更新過的 workflow / documentation / checklist |
 | 工具專用規則 | 更新過的工具規則檔，以及對應的 shared rule 正文 |
 | template 或 feedback lesson | 更新過的 template/lesson、索引 README、promotion target |
@@ -336,15 +336,15 @@ ruby scripts/validate-knowledge-runtime.rb
 
 | 文件 | 在本流程中的角色 |
 |------|----------------|
-| [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md) | Step 1-2, 4：觸發檢查、分類、寫入 lesson |
+| [`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) | Step 1-2, 4：觸發檢查、分類、寫入 lesson |
 | [`feedback/promotion/README.md`](../../feedback/promotion/README.md) | Step 3, 5：決定 promotion target、更新目標層 |
 | [`feedback/pipeline/README.md`](../../feedback/pipeline/README.md) | Pipeline 架構設計，agent 在 close-loop 階段遵循的執行模型 |
-| [`shared-rules/failure-learning-system.md`](../../shared-rules/failure-learning-system.md) | Step 7：failure capture → classify → promote |
-| [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md) | Step 8：多文件同步更新規則 |
-| [`shared-rules/dependency-reading.md`](../../shared-rules/dependency-reading.md) | Step 10-11：writeback transaction、驗證、commit/push/readback |
+| [`enforcement/failure-learning-system.md`](../../enforcement/failure-learning-system.md) | Step 7：failure capture → classify → promote |
+| [`enforcement/linked-updates.md`](../../enforcement/linked-updates.md) | Step 8：多文件同步更新規則 |
+| [`enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md) | Step 10-11：writeback transaction、驗證、commit/push/readback |
 | [`governance/lifecycle/intelligence-extraction-pipeline.md`](../../governance/lifecycle/intelligence-extraction-pipeline.md) | Step 6：從 technique/feedback/SKILL.md 提取 intelligence atoms |
 | [`knowledge/runtime/README.md`](../../knowledge/runtime/README.md) | Step 9：更新 runtime surfaces |
-| [`shared-rules/failure-patterns/`](../../shared-rules/failure-patterns/) | Step 7 的 promotion target：跨 skill failure pattern |
+| [`enforcement/failure-patterns/`](../../enforcement/failure-patterns/) | Step 7 的 promotion target：跨 skill failure pattern |
 | [`feedback/history/apk-analysis/common/2026-05-11_125615-per-round-feedback-checkpoint.md`](../../feedback/history/apk-analysis/common/2026-05-11_125615-per-round-feedback-checkpoint.md) | 既有 lesson：per-round checkpoint 的原始記錄 |
 
 ---

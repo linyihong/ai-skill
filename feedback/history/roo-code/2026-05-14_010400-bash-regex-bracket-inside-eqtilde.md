@@ -58,7 +58,7 @@ When writing bash `[[ "${var}" =~ ... ]]` conditionals:
 Run `bash -n script.sh` to verify no syntax errors. If the script passes, the fix is correct.
 
 #### Promotion Target
-`shared-rules/failure-patterns/` — This is a general bash scripting gotcha that could be a failure pattern if it recurs.
+`enforcement/failure-patterns/` — This is a general bash scripting gotcha that could be a failure pattern if it recurs.
 
 #### Required Linked Updates
 None.

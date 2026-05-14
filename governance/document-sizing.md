@@ -11,11 +11,11 @@
 
 ## 權重與關係
 
-本規則在 [`../shared-rules/rule-weight.md`](../shared-rules/rule-weight.md) 中屬於 **P2（Cross-repo operating policy）**。詳細的權重衝突處理請見 rule-weight.md 的「常見範例」表格。
+本規則在 [`../enforcement/rule-weight.md`](../enforcement/rule-weight.md) 中屬於 **P2（Cross-repo operating policy）**。詳細的權重衝突處理請見 rule-weight.md 的「常見範例」表格。
 
-Token 成本模型與 context loading 分層策略請見 [`../shared-rules/decision-efficiency.md`](../shared-rules/decision-efficiency.md) 的 Token 成本模型章節。
+Token 成本模型與 context loading 分層策略請見 [`../enforcement/decision-efficiency.md`](../enforcement/decision-efficiency.md) 的 Token 成本模型章節。
 
-內容分層與跨專案適用說明請見 [`../shared-rules/content-layering.md`](../shared-rules/content-layering.md)。
+內容分層與跨專案適用說明請見 [`../enforcement/content-layering.md`](../enforcement/content-layering.md)。
 
 ## 何時要拆
 
@@ -60,7 +60,7 @@ Token 成本模型與 context loading 分層策略請見 [`../shared-rules/decis
 - **父層 `README.md`** 要說明每個子檔何時讀，不要只列檔名。
 - **舊連結要同步更新**；必要時保留短入口連到新位置。
 - **若是全庫共用規則**，正文只放在 `governance/`，其他檔案引用它。
-- **若改動影響索引、模板、skill 入口或分類文件**，依 [`../shared-rules/linked-updates.md`](../shared-rules/linked-updates.md) 同步檢查。
+- **若改動影響索引、模板、skill 入口或分類文件**，依 [`../enforcement/linked-updates.md`](../enforcement/linked-updates.md) 同步檢查。
 - **若改動影響 routing registry**，執行 `ruby scripts/refresh-knowledge-runtime.rb` 更新 runtime index。
 - **若檔案在 routing registry 中被引用**，更新 registry 中的路徑（否則 validator 會報錯）。
 
@@ -86,7 +86,7 @@ Token 成本模型與 context loading 分層策略請見 [`../shared-rules/decis
     <specific-flow>.md
 ```
 
-本知識庫實際使用的三層分離範例（操作流程層 / 分析方法層 / 決策智慧層）請見 [`../shared-rules/content-layering.md`](../shared-rules/content-layering.md) 的「文件變大時」章節。
+本知識庫實際使用的三層分離範例（操作流程層 / 分析方法層 / 決策智慧層）請見 [`../enforcement/content-layering.md`](../enforcement/content-layering.md) 的「文件變大時」章節。
 
 ## 常見錯誤
 

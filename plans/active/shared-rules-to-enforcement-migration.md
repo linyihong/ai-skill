@@ -1,8 +1,8 @@
-# shared-rules/ → enforcement/ 搬遷計畫
+# enforcement/ → enforcement/ 搬遷計畫
 
 Status: `draft`
 Created: 2026-05-14
-Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/README.md`](../../runtime/README.md), [`governance/README.md`](../../governance/README.md)
+Related: [`enforcement/README.md`](../../enforcement/README.md), [`runtime/README.md`](../../runtime/README.md), [`governance/README.md`](../../governance/README.md)
 
 ---
 
@@ -10,13 +10,13 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 
 ### 1.1 為什麼要改名
 
-`shared-rules/` 這個名稱在架構上已不再準確：
+`enforcement/` 這個名稱在架構上已不再準確：
 
 | 面向 | 現狀問題 | 改名後 |
 |------|---------|--------|
 | **語意** | 「共用規則」暗示「可選的、建議性的」 | `enforcement/` 明確表示「這是必須執行的政策」 |
 | **架構定位** | 名稱沒有反映它在三層模型中的角色 | `enforcement/` 是 governance → enforcement → runtime 的中間層 |
-| **與 runtime/ 的邊界** | `shared-rules/` 和 `runtime/` 名稱上沒有層級關係 | `enforcement/` 和 `runtime/` 形成明確的 policy/engine 分離 |
+| **與 runtime/ 的邊界** | `enforcement/` 和 `runtime/` 名稱上沒有層級關係 | `enforcement/` 和 `runtime/` 形成明確的 policy/engine 分離 |
 | **未來擴充** | 名稱無法承載 rule metadata、activation condition、runtime cost 等進階概念 | `enforcement/` 可以自然擴充為完整的 runtime enforcement layer |
 
 ### 1.2 三層架構模型
@@ -53,8 +53,8 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 
 | 類別 | 檔案數量 | 影響程度 | 說明 |
 |------|---------|---------|------|
-| **enforcement/ 內部** | ~26 檔 | 🔴 高 | 所有內部相對路徑引用需更新（`../` → `../` 不變，但 `shared-rules/` → `enforcement/`） |
-| **根目錄入口** | 2 檔 | 🔴 高 | `README.md`、`CORE_BOOTSTRAP.md` 直接引用 `shared-rules/` |
+| **enforcement/ 內部** | ~26 檔 | 🔴 高 | 所有內部相對路徑引用需更新（`../` → `../` 不變，但 `enforcement/` → `enforcement/`） |
+| **根目錄入口** | 2 檔 | 🔴 高 | `README.md`、`CORE_BOOTSTRAP.md` 直接引用 `enforcement/` |
 | **governance/** | ~5 檔 | 🔴 高 | `governance/README.md` 引用 shared-rules 作為 migration source |
 | **runtime/** | ~3 檔 | 🟡 中 | `runtime/README.md` 提及 shared-rules 作為 policy layer |
 | **scripts/** | 4 檔 | 🔴 高 | `validate-knowledge-runtime.rb`、`ai-skill-close-loop.sh`、`sync-cursor-bundle.sh`、`init-new-project.sh` |
@@ -80,22 +80,22 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 
 | 原始路徑 | 新路徑 | 變更類型 |
 |---------|--------|---------|
-| `../shared-rules/xxx.md` | `../enforcement/xxx.md` | 路徑前綴變更 |
-| `shared-rules/xxx.md`（同層級引用） | `xxx.md`（不變，因同目錄） | 不變 |
-| `../shared-rules/failure-patterns/xxx.md` | `../enforcement/failure-patterns/xxx.md` | 路徑前綴變更 |
-| `../../shared-rules/xxx.md` | `../../enforcement/xxx.md` | 路徑前綴變更 |
+| `../enforcement/xxx.md` | `../enforcement/xxx.md` | 路徑前綴變更 |
+| `enforcement/xxx.md`（同層級引用） | `xxx.md`（不變，因同目錄） | 不變 |
+| `../enforcement/failure-patterns/xxx.md` | `../enforcement/failure-patterns/xxx.md` | 路徑前綴變更 |
+| `../../enforcement/xxx.md` | `../../enforcement/xxx.md` | 路徑前綴變更 |
 
 ### 2.3 外部檔案路徑更新
 
-全庫搜尋 `shared-rules/` 的引用模式：
+全庫搜尋 `enforcement/` 的引用模式：
 
 | 引用模式 | 出現位置範例 | 新模式 |
 |---------|------------|--------|
-| `shared-rules/README.md` | 根 README.md、CORE_BOOTSTRAP.md | `enforcement/README.md` |
-| `shared-rules/xxx.md` | 各層 README、linked-updates 表格 | `enforcement/xxx.md` |
-| `shared-rules/failure-patterns/` | validator、failure-patterns 索引 | `enforcement/failure-patterns/` |
+| `enforcement/README.md` | 根 README.md、CORE_BOOTSTRAP.md | `enforcement/README.md` |
+| `enforcement/xxx.md` | 各層 README、linked-updates 表格 | `enforcement/xxx.md` |
+| `enforcement/failure-patterns/` | validator、failure-patterns 索引 | `enforcement/failure-patterns/` |
 | `shared-rules`（字串） | close-loop.sh owner group、sync script | `enforcement` |
-| `shared-rules/`（目錄路徑） | sync-cursor-bundle.sh bundle 路徑 | `enforcement/` |
+| `enforcement/`（目錄路徑） | sync-cursor-bundle.sh bundle 路徑 | `enforcement/` |
 
 ---
 
@@ -106,18 +106,18 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 - [ ] 確認目前 `git status --short --branch` 乾淨
 - [ ] 確認無 active lock 或 pending commit
 - [ ] 讀取本計畫全文
-- [ ] 讀取 [`shared-rules/failure-patterns/shared-rules-architecture-drift.md`](../../shared-rules/failure-patterns/shared-rules-architecture-drift.md) 的 Prevention Gate
+- [ ] 讀取 [`enforcement/failure-patterns/shared-rules-architecture-drift.md`](../../enforcement/failure-patterns/shared-rules-architecture-drift.md) 的 Prevention Gate
 
 ### Phase 1：建立 enforcement/ 目錄（安全複製）
 
-**目標**：建立 `enforcement/` 作為 `shared-rules/` 的完全鏡像，不刪除任何既有檔案。
+**目標**：建立 `enforcement/` 作為 `enforcement/` 的完全鏡像，不刪除任何既有檔案。
 
 - [ ] 建立 `enforcement/` 目錄
-- [ ] 複製 `shared-rules/*.md` 到 `enforcement/`（17 個 .md 檔案）
-- [ ] 複製 `shared-rules/failure-patterns/` 到 `enforcement/failure-patterns/`（9 個 failure pattern + README.md）
-- [ ] 驗證：`diff -r shared-rules/ enforcement/` 應無差異（除 `.gitkeep` 等非 md 檔案）
+- [ ] 複製 `enforcement/*.md` 到 `enforcement/`（17 個 .md 檔案）
+- [ ] 複製 `enforcement/failure-patterns/` 到 `enforcement/failure-patterns/`（9 個 failure pattern + README.md）
+- [ ] 驗證：`diff -r enforcement/ enforcement/` 應無差異（除 `.gitkeep` 等非 md 檔案）
 
-**向後相容**：`shared-rules/` 保留不動，所有既有連結繼續有效。
+**向後相容**：`enforcement/` 保留不動，所有既有連結繼續有效。
 
 ### Phase 2：更新 enforcement/ 內部路徑
 
@@ -125,66 +125,66 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 
 - [ ] 更新 `enforcement/README.md`：
   - 標題改為「強制執行規則（分類索引）」
-  - 所有 `../shared-rules/` 改為 `../enforcement/`
-  - 所有 `shared-rules/`（同層級引用）保持不變
+  - 所有 `../enforcement/` 改為 `../enforcement/`
+  - 所有 `enforcement/`（同層級引用）保持不變
   - 新增 Layer Responsibility Contract 說明
 - [ ] 更新 `enforcement/linked-updates.md`：
-  - 第 7 條的 `shared-rules/` 改為 `enforcement/`
-  - 常見連動關係表中所有 `shared-rules/` 改為 `enforcement/`
-  - 第 51 行「架構重構」連動關係中的 `shared-rules/` 改為 `enforcement/`
+  - 第 7 條的 `enforcement/` 改為 `enforcement/`
+  - 常見連動關係表中所有 `enforcement/` 改為 `enforcement/`
+  - 第 51 行「架構重構」連動關係中的 `enforcement/` 改為 `enforcement/`
 - [ ] 更新 `enforcement/dependency-reading.md`：
-  - 所有 `shared-rules/` 路徑改為 `enforcement/`
+  - 所有 `enforcement/` 路徑改為 `enforcement/`
 - [ ] 更新 `enforcement/rule-weight.md`：
   - 結尾 `← [Back to shared rules index](README.md)` 改為 `← [Back to enforcement index](README.md)`
 - [ ] 更新 `enforcement/failure-patterns/README.md`：
   - 結尾 `← [Back to shared rules index](../README.md)` 改為 `← [Back to enforcement index](../README.md)`
 - [ ] 更新 `enforcement/failure-patterns/shared-rules-architecture-drift.md`：
-  - 所有 `shared-rules/` 路徑改為 `enforcement/`
+  - 所有 `enforcement/` 路徑改為 `enforcement/`
   - 檔名本身不改（內容描述的是架構漂移 pattern，仍適用）
 - [ ] 更新 `enforcement/` 其餘檔案中的路徑引用
-- [ ] 驗證：`grep -rn "shared-rules" enforcement/` — 應無 `shared-rules/` 路徑引用（保留 `shared-rules` 字串在說明文字中可接受，但路徑引用必須更新）
+- [ ] 驗證：`grep -rn "shared-rules" enforcement/` — 應無 `enforcement/` 路徑引用（保留 `shared-rules` 字串在說明文字中可接受，但路徑引用必須更新）
 
 ### Phase 3：更新全庫外部引用
 
-**目標**：所有非 `shared-rules/` 的檔案中的 `shared-rules/` 路徑引用改為 `enforcement/`。
+**目標**：所有非 `enforcement/` 的檔案中的 `enforcement/` 路徑引用改為 `enforcement/`。
 
 **根目錄：**
 - [ ] 更新 `README.md`：
-  - OS Layout 表格：`shared-rules/` → `enforcement/`
-  - 說明文字中的 `shared-rules/` → `enforcement/`
+  - OS Layout 表格：`enforcement/` → `enforcement/`
+  - 說明文字中的 `enforcement/` → `enforcement/`
 - [ ] 更新 `CORE_BOOTSTRAP.md`：
-  - 必讀規則表格：`shared-rules/rule-weight.md` → `enforcement/rule-weight.md`
-  - 其餘 `shared-rules/` 引用 → `enforcement/`
+  - 必讀規則表格：`enforcement/rule-weight.md` → `enforcement/rule-weight.md`
+  - 其餘 `enforcement/` 引用 → `enforcement/`
 
 **governance/:**
 - [ ] 更新 `governance/README.md`：
-  - 「第一批候選遷移來源」中的 `shared-rules/` → `enforcement/`
-  - 與既有層關係中的 `shared-rules/` → `enforcement/`
+  - 「第一批候選遷移來源」中的 `enforcement/` → `enforcement/`
+  - 與既有層關係中的 `enforcement/` → `enforcement/`
 - [ ] 更新 `governance/lifecycle/intelligence-extraction-pipeline.md`：
-  - Step 7a 中的 `shared-rules/` → `enforcement/`
+  - Step 7a 中的 `enforcement/` → `enforcement/`
 - [ ] 更新 `governance/dependency/README.md`（若有 shared-rules 引用）
 - [ ] 更新 `governance/lifecycle/knowledge-update-flow.md`（若有 shared-rules 引用）
 
 **runtime/:**
 - [ ] 更新 `runtime/README.md`：
-  - 「不放什麼」：`shared-rules/` → `enforcement/`
-  - 「與既有層的關係」：`shared-rules/` → `enforcement/`
+  - 「不放什麼」：`enforcement/` → `enforcement/`
+  - 「與既有層的關係」：`enforcement/` → `enforcement/`
 - [ ] 更新 `runtime/routing/README.md`（若有 shared-rules 引用）
 - [ ] 更新 `runtime/onboarding/README.md`（若有 shared-rules 引用）
 
 **scripts/:**
 - [ ] 更新 `scripts/validate-knowledge-runtime.rb`：
   - 第 452 行：`scan_dirs = %w[intelligence workflow analysis shared-rules]` → `scan_dirs = %w[intelligence workflow analysis enforcement]`
-  - 第 640 行：`patterns_dir = ROOT + "shared-rules/failure-patterns"` → `patterns_dir = ROOT + "enforcement/failure-patterns"`
-  - 第 680 行註解：`shared-rules/content-layering.md` → `enforcement/content-layering.md`
+  - 第 640 行：`patterns_dir = ROOT + "enforcement/failure-patterns"` → `patterns_dir = ROOT + "enforcement/failure-patterns"`
+  - 第 680 行註解：`enforcement/content-layering.md` → `enforcement/content-layering.md`
 - [ ] 更新 `scripts/ai-skill-close-loop.sh`：
-  - 第 171 行：`shared-rules/*|README.md|.gitignore) echo "shared" ;;` → `enforcement/*|README.md|.gitignore) echo "shared" ;;`
+  - 第 171 行：`enforcement/*|README.md|.gitignore) echo "shared" ;;` → `enforcement/*|README.md|.gitignore) echo "shared" ;;`
 - [ ] 更新 `scripts/sync-cursor-bundle.sh`：
   - 所有 `shared-rules` 路徑 → `enforcement`
   - BUNDLE_RULES、CURSOR_SHARED 變數
   - symlink 目標路徑
 - [ ] 更新 `scripts/init-new-project.sh`：
-  - Custom Instructions 中的 `shared-rules/` → `enforcement/`
+  - Custom Instructions 中的 `enforcement/` → `enforcement/`
   - 知識更新流程中的 `shared-rules` → `enforcement`
 
 **ai-tools/:**
@@ -239,12 +239,12 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 - [ ] 更新 `memory/failure/README.md`（若有 shared-rules 引用）
 
 **architecture/:**
-- [ ] 更新 `plans/active/next-stage-upgrade-plan.md`（若有 shared-rules 引用）
+- [ ] 更新 `plans/archived/next-stage-upgrade-plan.md`（若有 shared-rules 引用）
 - [ ] 更新 `plans/archived/apk-analysis-pilot-migration.md`（若有 shared-rules 引用）
 
 **plans/:**
 - [ ] 更新 `plans/README.md`：
-  - 第 28 行：`shared-rules/linked-updates.md` → `enforcement/linked-updates.md`
+  - 第 28 行：`enforcement/linked-updates.md` → `enforcement/linked-updates.md`
 - [ ] 更新 `plans/active/knowledge-runtime-validation-gate.md`（若有 shared-rules 引用）
 
 **anti-patterns/:**
@@ -266,28 +266,28 @@ Related: [`shared-rules/README.md`](../../shared-rules/README.md), [`runtime/REA
 
 **目標**：確認所有連結正確，無遺漏。
 
-- [ ] 執行 `grep -rn "shared-rules/" --include="*.md" --include="*.rb" --include="*.sh" --include="*.yaml" .` — 應只出現：
-  - `shared-rules/` 目錄本身的檔案（這些是舊檔案，將在 Phase 6 移除）
+- [ ] 執行 `grep -rn "enforcement/" --include="*.md" --include="*.rb" --include="*.sh" --include="*.yaml" .` — 應只出現：
+  - `enforcement/` 目錄本身的檔案（這些是舊檔案，將在 Phase 6 移除）
   - 說明文字中的「shared-rules」字串（非路徑引用）
 - [ ] 執行 `grep -rn "enforcement/" --include="*.md" --include="*.rb" --include="*.sh" --include="*.yaml" .` — 應出現所有新路徑
 - [ ] 執行 `ruby scripts/refresh-knowledge-runtime.rb` — 所有 validator 通過
 - [ ] 隨機抽查 5-10 個檔案的 enforcement/ 連結，確認可正確點擊
 
-### Phase 6：移除 shared-rules/ 並提交
+### Phase 6：移除 enforcement/ 並提交
 
 **目標**：移除舊目錄，完成搬遷。
 
 - [ ] 確認 Phase 1-5 全部完成且驗證通過
-- [ ] 執行 `git rm -r shared-rules/`
+- [ ] 執行 `git rm -r enforcement/`
 - [ ] 執行 `git add -A`
-- [ ] 執行 `git commit -m "refactor: rename shared-rules/ to enforcement/
+- [ ] 執行 `git commit -m "refactor: rename enforcement/ to enforcement/
 
-- Phase 1: Create enforcement/ as mirror of shared-rules/
+- Phase 1: Create enforcement/ as mirror of enforcement/
 - Phase 2: Update enforcement/ internal path references
-- Phase 3: Update all external shared-rules/ references to enforcement/
+- Phase 3: Update all external enforcement/ references to enforcement/
 - Phase 4: Update validator paths
 - Phase 5: Verify all links correct
-- Phase 6: Remove shared-rules/ directory
+- Phase 6: Remove enforcement/ directory
 
 Layer Responsibility Contract:
 - governance/ (Policy Architecture / WHY)
@@ -346,7 +346,7 @@ Layer Responsibility Contract:
 | 搬遷期間有其他人 commit 新 shared-rules 引用 | 搬遷後新引用指向不存在路徑 | 搬遷前確認 git 乾淨，搬遷後立即推送 |
 | sync-cursor-bundle.sh 的 symlink 路徑錯誤 | Cursor bundle 失效 | Phase 4 更新 script 後手動測試一次 |
 | validator 中的 shared-rules 路徑未更新完全 | validator 掃描錯誤目錄 | Phase 4 專門更新 validator，Phase 5 執行 validator 驗證 |
-| 向後相容不足，既有工具仍指向 shared-rules/ | 工具找不到規則 | Phase 1 保留 shared-rules/ 直到 Phase 6，提供緩衝期 |
+| 向後相容不足，既有工具仍指向 enforcement/ | 工具找不到規則 | Phase 1 保留 enforcement/ 直到 Phase 6，提供緩衝期 |
 
 ---
 
@@ -354,7 +354,7 @@ Layer Responsibility Contract:
 
 ### 6.1 通過條件
 
-1. `grep -rn "shared-rules/" --include="*.md" --include="*.rb" --include="*.sh" --include="*.yaml" .` 只出現 shared-rules/ 目錄本身的檔案
+1. `grep -rn "enforcement/" --include="*.md" --include="*.rb" --include="*.sh" --include="*.yaml" .` 只出現 enforcement/ 目錄本身的檔案
 2. `ruby scripts/refresh-knowledge-runtime.rb` 所有 validator 通過
 3. `git status --short --branch` 乾淨
 4. 隨機抽查 10 個 enforcement/ 連結，全部正確
@@ -371,7 +371,7 @@ Layer Responsibility Contract:
 
 ## 7. 與既有文件的關係
 
-- [`shared-rules/failure-patterns/shared-rules-architecture-drift.md`](../../shared-rules/failure-patterns/shared-rules-architecture-drift.md) — 本計畫直接對應此 failure pattern 的 prevention gate
+- [`enforcement/failure-patterns/shared-rules-architecture-drift.md`](../../enforcement/failure-patterns/shared-rules-architecture-drift.md) — 本計畫直接對應此 failure pattern 的 prevention gate
 - [`governance/lifecycle/intelligence-extraction-pipeline.md`](../../governance/lifecycle/intelligence-extraction-pipeline.md) Step 7a — 架構重構後的 shared-rules 同步檢查
-- [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md) — 第 51 行「架構重構」連動關係
+- [`enforcement/linked-updates.md`](../../enforcement/linked-updates.md) — 第 51 行「架構重構」連動關係
 - [`plans/README.md`](../../plans/README.md) — 本計畫完成後需更新 plans/README.md 狀態並搬移至 archived/

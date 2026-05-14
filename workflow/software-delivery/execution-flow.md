@@ -13,7 +13,7 @@
 - 哪一層暴露了它：客戶端程式碼、傳輸層、API 合約、儲存層、日誌、建置配置、韌體、硬體上下文、協定或執行時期行為？
 - 問題是已確認、可疑還是僅為風險模式？
 
-不要將目標特定的端點、令牌、機密、裝置 ID、原始使用者資料或專案事件細節複製到這個技能中。在將觀察提升為可重複使用的指引之前，應用 [`shared-rules/reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md)。
+不要將目標特定的端點、令牌、機密、裝置 ID、原始使用者資料或專案事件細節複製到這個技能中。在將觀察提升為可重複使用的指引之前，應用 [`enforcement/reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md)。
 
 ### 變更接收（Change Intake）
 

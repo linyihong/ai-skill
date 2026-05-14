@@ -21,8 +21,8 @@ skills:
       - reverse-engineering
       - network-analysis
     dependencies:
-      - shared-rules/rule-weight.md
-      - shared-rules/dependency-reading.md
+      - enforcement/rule-weight.md
+      - enforcement/dependency-reading.md
     conflicts:
       - app-development-guidance  # 分析 vs 開發，不同目標
     triggers:
@@ -61,8 +61,8 @@ skills:
       - embedded-systems
       - security-hardening
     dependencies:
-      - shared-rules/rule-weight.md
-      - shared-rules/dependency-reading.md
+      - enforcement/rule-weight.md
+      - enforcement/dependency-reading.md
     conflicts:
       - apk-analysis  # 開發 vs 分析，不同目標
     triggers:
@@ -144,9 +144,9 @@ skills:
       - architecture-governance
       - metadata-management
     dependencies:
-      - shared-rules/rule-weight.md
-      - shared-rules/dependency-reading.md
-      - shared-rules/linked-updates.md
+      - enforcement/rule-weight.md
+      - enforcement/dependency-reading.md
+      - enforcement/linked-updates.md
     conflicts: []
     triggers:
       - governance
@@ -167,7 +167,7 @@ skills:
     entrypoint: governance/README.md
     summary: knowledge/summaries/repo-governance.md
     related:
-      - plans/active/next-stage-upgrade-plan.md
+      - plans/archived/next-stage-upgrade-plan.md
       - plans/archived/context-cost-optimization.md
       - metadata/schema.md
       - knowledge/runtime/routing-registry.yaml
@@ -181,7 +181,7 @@ skills:
       - information-retrieval
       - runtime-routing
     dependencies:
-      - shared-rules/rule-weight.md
+      - enforcement/rule-weight.md
     conflicts: []
     triggers:
       - navigation
@@ -213,8 +213,8 @@ skills:
       - lesson-extraction
       - knowledge-evolution
     dependencies:
-      - shared-rules/feedback-lessons.md
-      - shared-rules/failure-learning-system.md
+      - enforcement/feedback-lessons.md
+      - enforcement/failure-learning-system.md
     conflicts: []
     triggers:
       - feedback
@@ -230,8 +230,8 @@ skills:
     entrypoint: feedback/README.md
     summary: knowledge/summaries/feedback-promotion-pipeline.md
     related:
-      - shared-rules/feedback-lessons.md
-      - shared-rules/failure-learning-system.md
+      - enforcement/feedback-lessons.md
+      - enforcement/failure-learning-system.md
       - feedback/promotion/README.md
 
   - id: model-routing
@@ -274,8 +274,8 @@ skills:
       - context-management
       - agent-coordination
     dependencies:
-      - shared-rules/rule-weight.md
-      - shared-rules/dependency-reading.md
+      - enforcement/rule-weight.md
+      - enforcement/dependency-reading.md
     conflicts: []
     triggers:
       - runtime
@@ -331,7 +331,7 @@ skills:
       - pattern-extraction
       - technical-analysis
     dependencies:
-      - shared-rules/dependency-reading.md
+      - enforcement/dependency-reading.md
     conflicts:
       - app-development-guidance  # 分析 vs 開發，不同目標
     triggers:
@@ -359,8 +359,8 @@ skills:
       - architecture-decision
       - anti-pattern
     dependencies:
-      - shared-rules/rule-weight.md
-      - shared-rules/dependency-reading.md
+      - enforcement/rule-weight.md
+      - enforcement/dependency-reading.md
     conflicts: []
     triggers:
       - intelligence
@@ -388,7 +388,7 @@ skills:
       - task-decomposition
       - execution-flow
     dependencies:
-      - shared-rules/dependency-reading.md
+      - enforcement/dependency-reading.md
     conflicts: []
     triggers:
       - workflow
@@ -444,7 +444,7 @@ skills:
       - scripting
       - ci-cd
     dependencies:
-      - shared-rules/dependency-reading.md
+      - enforcement/dependency-reading.md
     conflicts: []
     triggers:
       - script

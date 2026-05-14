@@ -90,7 +90,7 @@ expansion_levels:
         description: "Skill full source（~3500 tokens）"
         condition: "summary_insufficient == true"
       - type: rule_full
-        path_template: "shared-rules/{rule-id}.md"
+        path_template: "enforcement/{rule-id}.md"
         description: "Rule full source（~2000 tokens）"
         condition: "activation_rule_matched == true AND summary_insufficient == true"
       - type: architecture_doc

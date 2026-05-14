@@ -90,7 +90,7 @@ stages:
           estimated_tokens: 300
         - id: load-activated-rules
           action: read_file
-          target: "shared-rules/{rule-id}.md"
+          target: "enforcement/{rule-id}.md"
           description: 載入 activated lazy-load rules
           estimated_tokens: 800
           condition: "activation_rule_matched == true"

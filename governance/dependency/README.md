@@ -70,7 +70,7 @@
 | 新增 depends_on | `knowledge/indexes/README.md`（確保 routing 順序正確）、`knowledge/summaries/`（更新 summary 的 prerequisite 欄位）、`knowledge/runtime/routing-registry.yaml`（更新 dependencies 欄位）。 |
 | 移除 depends_on | 同上，移除對應 reference。 |
 | 新增 replaces | `governance/lifecycle/README.md`（檢查 promotion gates）、舊 source 加 deprecation note、`knowledge/indexes/README.md`（更新路由優先順序）。 |
-| 新增 conflicts_with | `shared-rules/rule-weight.md`（確認衝突解決規則）、`metadata/ranking/README.md`（更新 ranking 優先順序）。 |
+| 新增 conflicts_with | `enforcement/rule-weight.md`（確認衝突解決規則）、`metadata/ranking/README.md`（更新 ranking 優先順序）。 |
 | 新增 preserves_entrypoint | 舊 source README 或 entrypoint 文件加 reference note。 |
 
 ## Graph Validation
@@ -93,4 +93,4 @@
 - `knowledge/indexes/README.md`：index 與 graph 應一致，graph 的 depends_on 應反映在 index 的 routing 順序。
 - `knowledge/runtime/routing-registry.yaml`：registry 的 dependencies 欄位應與 graph 的 depends_on edges 一致。
 - `metadata/schema.md`：metadata 的 depends / conflicts 欄位應與 graph edges 一致。
-- `shared-rules/linked-updates.md`：graph 變更後的 linked updates 需符合 linked update 規則。
+- `enforcement/linked-updates.md`：graph 變更後的 linked updates 需符合 linked update 規則。

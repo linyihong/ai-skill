@@ -20,7 +20,7 @@
 
 ```text
 請先閱讀共用規則索引：
-<AI_SKILL_REPO>/shared-rules/README.md
+<AI_SKILL_REPO>/enforcement/README.md
 之後依 workflow/<domain>/execution-flow.md 進行。
 完成後在 <AI_SKILL_REPO> commit 並 push。
 ```
@@ -98,7 +98,7 @@ If the user switches languages, follow their switch.
 
 1. 在 `<AI_SKILL_REPO>` 執行 `git pull`（若與他人共用或換機）。
 2. 只在本庫編輯文件。
-3. 依 [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md) 檢查連動更新。
+3. 依 [`enforcement/linked-updates.md`](../../enforcement/linked-updates.md) 檢查連動更新。
 4. 在 `<AI_SKILL_REPO>` 執行 `git add`、`git commit`、`git push`。
 
 ## Cursor 連動更新
@@ -113,7 +113,7 @@ If the user switches languages, follow their switch.
 
 ## Cursor 與對話目標閉環
 
-工具中立規則見 [`shared-rules/conversation-goal-ledger.md`](../../shared-rules/conversation-goal-ledger.md)。Cursor 只是其中一種操作環境；goal ledger 的真相來源仍是業務專案本地的 `<PROJECT_ROOT>/.agent-goals/`，不要放在 `.cursor/`，也不要把 goal 檔 commit。
+工具中立規則見 [`enforcement/conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md)。Cursor 只是其中一種操作環境；goal ledger 的真相來源仍是業務專案本地的 `<PROJECT_ROOT>/.agent-goals/`，不要放在 `.cursor/`，也不要把 goal 檔 commit。
 
 ### 建議操作
 

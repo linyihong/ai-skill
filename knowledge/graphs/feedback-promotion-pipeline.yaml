@@ -6,11 +6,11 @@ summary: >
   governance lifecycle、summary 與 runtime registry route。
 edges:
   - type: depends_on
-    target: shared-rules/feedback-lessons.md
+    target: enforcement/feedback-lessons.md
     reason: Lesson 命名、模板、索引與 agent 行為的 source-of-truth。
-    validation: shared-rules/feedback-lessons.md 保留可執行 feedback 寫作規則。
+    validation: enforcement/feedback-lessons.md 保留可執行 feedback 寫作規則。
   - type: depends_on
-    target: shared-rules/failure-learning-system.md
+    target: enforcement/failure-learning-system.md
     reason: Agent failure 或 close-loop gap 需要 failure taxonomy 與 promotion decision。
     validation: failure-learning-system 定義 storage rules 與 promotion targets。
   - type: depends_on

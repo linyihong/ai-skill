@@ -2,7 +2,7 @@
 
 本文件定義第一版 Knowledge Atom metadata。目標是讓 `knowledge/indexes/`、未來 summaries / graphs / runtime routing，以及各層候選知識能用同一組欄位描述「這份知識是什麼、何時讀、可信度如何、依賴什麼、適合哪些模型」。
 
-本 schema 先服務 navigation 與 migration planning，不要求立即把既有 `skills/` 或 `shared-rules/` 全部轉成 atom。
+本 schema 先服務 navigation 與 migration planning，不要求立即把既有 `skills/` 或 `enforcement/` 全部轉成 atom。
 
 ## Schema 狀態
 
@@ -176,10 +176,10 @@ validation: Links 可解析、primary sources 仍為 canonical，且 roadmap sta
 complexity: low
 depends:
   - README.md
-  - shared-rules/dependency-reading.md
+  - enforcement/dependency-reading.md
 related:
   - metadata/schema.md
-  - plans/active/next-stage-upgrade-plan.md
+  - plans/archived/next-stage-upgrade-plan.md
 conflicts: []
 models:
   small: 只使用 task routing table 與 validation signal。
@@ -197,5 +197,5 @@ governance_notes: 新增 top-level layers、skills 或 canonical entrypoints 時
 - `source_path` 必須指向 canonical repository path，不可指向 local tool mirror。
 - `depends`、`related`、`conflicts`、`replaces` 有 atom ID 時優先使用 atom ID；migration 期間可使用 repository-relative path。
 - `summary`、`when_to_read`、`validation` 必須足夠具體，讓 agent 能判斷是否需要載入此 atom。
-- 不可用 metadata 覆蓋可執行 shared rules；若規則衝突，依 `shared-rules/rule-weight.md`。
+- 不可用 metadata 覆蓋可執行 shared rules；若規則衝突，依 `enforcement/rule-weight.md`。
 - Atom 至少經過一次真實使用或 review，且有 validation evidence 後，才可標記為 `stable`。

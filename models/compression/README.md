@@ -47,6 +47,6 @@ Validation signal:
 
 ## Boundary
 
-- 壓縮策略不能取代 `shared-rules/dependency-reading.md` 的 required reads。
+- 壓縮策略不能取代 `enforcement/dependency-reading.md` 的 required reads。
 - 壓縮策略不能把 candidate summary 當成 replacement path。
 - 壓縮策略不能把 tool mirror 或 generated output 當成 canonical source。

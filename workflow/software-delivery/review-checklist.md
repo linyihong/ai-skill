@@ -105,7 +105,7 @@
 
 ## Reusable Guidance Boundary（可重複使用指引邊界）
 
-- 應用 [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md) 中的全域規則。
+- 應用 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) 中的全域規則。
 - 可重複使用的技能指引說明通用故障模式、決策規則、擁有者層和驗證方法。
 - 專案名稱、本機路徑、主機、端點字串、負載片段、樣本 ID、類別名稱、即時資料特異性和執行結果保留在專案儲存庫中，而非可重複使用的技能中。
 - 從事件衍生的課程被拆分：技能中的通用方法；專案文件中的具體重現證據和 BDD/test 檔案名稱。

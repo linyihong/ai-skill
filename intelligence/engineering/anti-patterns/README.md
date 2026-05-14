@@ -22,4 +22,4 @@ AI 自動避雷。
 ## 與其他層的關係
 
 - Agent 操作層的 anti-patterns → [`anti-patterns/`](../../anti-patterns/)
-- 具體的 failure pattern policy → `shared-rules/failure-patterns/`
+- 具體的 failure pattern policy → `enforcement/failure-patterns/`

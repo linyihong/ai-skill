@@ -40,6 +40,6 @@
 
 ## 第一批候選遷移來源
 
-- `plans/active/next-stage-upgrade-plan.md` 的 Multi-model Runtime Architecture
-- `shared-rules/decision-efficiency.md` 中與 context cost、compression 相關的 routing 概念
+- `plans/archived/next-stage-upgrade-plan.md` 的 Multi-model Runtime Architecture
+- `enforcement/decision-efficiency.md` 中與 context cost、compression 相關的 routing 概念
 - 未來各 tool adapter 中可抽象成工具中立 model profile 的內容

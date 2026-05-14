@@ -42,4 +42,4 @@
 ## 相關 Guards
 
 - `runtime/guards/circuit-breaker.yaml`
-- `shared-rules/dependency-reading.md`
+- `enforcement/dependency-reading.md`

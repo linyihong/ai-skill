@@ -6,8 +6,8 @@
 
 - `intelligence/engineering/` — 靜態 heuristic 文件
 - `governance/validation/` — 文件層級 validation gates
-- `shared-rules/failure-learning-system.md` — 被動 capture failure
-- `shared-rules/goal-action-validation.md` — 目標/執行/驗證格式
+- `enforcement/failure-learning-system.md` — 被動 capture failure
+- `enforcement/goal-action-validation.md` — 目標/執行/驗證格式
 
 但缺少的是：
 
@@ -234,7 +234,7 @@ result:
 | 驗證目標 | 文件完整性、路徑正確性 | Rule obedience、routing stability |
 | 執行時機 | Commit 前 | 架構變更後、模型升級後 |
 
-### 與 `shared-rules/failure-learning-system.md` 的關係
+### 與 `enforcement/failure-learning-system.md` 的關係
 
 - Failure learning 是**被動 capture**：AI 犯錯後記錄 pattern
 - Decision contract testing 是**主動驗證**：在犯錯前就先定義 expected behavior
@@ -334,7 +334,7 @@ ruby scripts/run-decision-contract-tests.rb --scenario flutter-aot-hooking-v1
 - Workflow 流程（留在 `workflow/`）
 - Analysis 方法（留在 `analysis/`）
 - 文件層級 validation gates（留在 `governance/validation/`）
-- Failure pattern 記錄（留在 `shared-rules/failure-patterns/`）
+- Failure pattern 記錄（留在 `enforcement/failure-patterns/`）
 
 ## 風險與緩解
 

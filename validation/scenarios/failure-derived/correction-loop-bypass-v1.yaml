@@ -1,7 +1,7 @@
 # Correction Loop Bypass Scenario
 # 測試 AI 在使用者指出修正不完整時，是否完整執行修正閉環
 # 來源 failure pattern:
-#   - shared-rules/failure-patterns/correction-loop-bypass.md
+#   - enforcement/failure-patterns/correction-loop-bypass.md
 
 id: correction-loop-bypass-v1
 domain: cross-domain
@@ -9,7 +9,7 @@ type: heuristic-obedience
 priority: P1
 
 failure_source:
-  pattern: shared-rules/failure-patterns/correction-loop-bypass.md
+  pattern: enforcement/failure-patterns/correction-loop-bypass.md
   class: validation-gap
   date: "2026-05-12"
   description: >
@@ -20,8 +20,8 @@ given:
   task: fix_incomplete_correction
   artifacts:
     - .agent-goals/          # 對話目標記錄
-    - shared-rules/failure-patterns/  # failure learning 系統
-    - shared-rules/linked-updates.md  # 連動更新規則
+    - enforcement/failure-patterns/  # failure learning 系統
+    - enforcement/linked-updates.md  # 連動更新規則
   signals:
     - 使用者指出「還有其他檔案沒更新」
     - 使用者指出「你只修了文字，沒跑 validation」

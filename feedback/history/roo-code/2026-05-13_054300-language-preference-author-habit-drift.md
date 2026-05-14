@@ -38,5 +38,5 @@ Roo Code（Code mode），deepseek-chat model
 
 ## 相關文件
 
-- Failure pattern: [`shared-rules/failure-patterns/language-preference-drift.md`](../../shared-rules/failure-patterns/language-preference-drift.md)（已新增子類型 B）
+- Failure pattern: [`enforcement/failure-patterns/language-preference-drift.md`](../../enforcement/failure-patterns/language-preference-drift.md)（已新增子類型 B）
 - 前一次 lesson: [`feedback/history/roo-code/2026-05-13_124800-language-preference-drift.md`](./2026-05-13_124800-language-preference-drift.md)

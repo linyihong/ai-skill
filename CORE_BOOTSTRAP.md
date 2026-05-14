@@ -6,9 +6,9 @@
 
 | 順序 | 規則 | 用途 | 預估 tokens |
 | --- | --- | --- | --- |
-| 1 | [`shared-rules/rule-weight.md`](shared-rules/rule-weight.md) | 規則衝突時如何判斷優先序（P0/P1/P2/P3） | ~300 |
-| 2 | [`shared-rules/dependency-reading.md`](shared-rules/dependency-reading.md) | 依賴文件讀取鐵則與 Ai-skill writeback transaction | ~400 |
-| 3 | [`shared-rules/conversation-goal-ledger.md`](shared-rules/conversation-goal-ledger.md) | 對話目標閉環與 `.agent-goals/` 使用方式 | ~100 |
+| 1 | [`enforcement/rule-weight.md`](enforcement/rule-weight.md) | 規則衝突時如何判斷優先序（P0/P1/P2/P3） | ~300 |
+| 2 | [`enforcement/dependency-reading.md`](enforcement/dependency-reading.md) | 依賴文件讀取鐵則與 Ai-skill writeback transaction | ~400 |
+| 3 | [`enforcement/conversation-goal-ledger.md`](enforcement/conversation-goal-ledger.md) | 對話目標閉環與 `.agent-goals/` 使用方式 | ~100 |
 
 **總計：~800 tokens**
 
@@ -38,7 +38,7 @@
 舊 Default Bootstrap（12 條規則）已拆分為：
 
 - **Core Bootstrap**（本檔）：3 條必讀規則，每個 session 載入
-- **Lazy-load rules**：9 條規則，只在特定情境 activate（詳見 [`shared-rules/README.md`](shared-rules/README.md) 的 activation model）
+- **Lazy-load rules**：9 條規則，只在特定情境 activate（詳見 [`enforcement/README.md`](enforcement/README.md) 的 activation model）
 
 ## 不變的原則
 

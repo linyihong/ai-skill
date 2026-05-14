@@ -116,7 +116,7 @@ cp ~/Library/Application\ Support/Code/User/globalStorage/state.vscdb.backup \
 ## 與其他層的關係
 
 - `ai-tools/agent/roo.md` 記錄 Roo Code 專屬的 key 與欄位（如 `RooVeterinaryInc.roo-cline`、`language` 欄位），以及如何與 `.roomodes` 搭配使用。
-- `shared-rules/failure-patterns/language-preference-drift.md` 記錄語言偏好漂移的失效模式。
+- `enforcement/failure-patterns/language-preference-drift.md` 記錄語言偏好漂移的失效模式。
 - 本文件只記錄 VS Code Extension 全域設定的通用知識（資料庫位置、結構、查詢/修改方法），不包含特定工具的設定細節。
 
 ---

@@ -22,4 +22,4 @@
 ## 與其他層的關係
 
 - 具體執行步驟 → `workflow/`
-- 可執行的規則 → `shared-rules/`
+- 可執行的規則 → `enforcement/`

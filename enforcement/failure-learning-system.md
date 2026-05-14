@@ -37,7 +37,7 @@
 | 內容 | Durable location |
 | --- | --- |
 | 當前未完成修復、owner、lock、next action | `<PROJECT_ROOT>/.agent-goals/` |
-| 跨 skill 可重用 failure pattern | `shared-rules/failure-patterns/` |
+| 跨 skill 可重用 failure pattern | `enforcement/failure-patterns/` |
 | Skill-specific technique 或 failure lesson | `feedback/history/<domain>/` |
 | Tool-specific reminder、hook、prompt 或 UI detail | `ai-tools/<tool>.md` 或 tool config |
 | Project incident evidence、raw logs、exact private paths、hosts、tokens | Project docs、issue tracker 或 private evidence，不進 reusable docs |
@@ -51,7 +51,7 @@
 建議檔案：
 
 ```text
-shared-rules/failure-patterns/<short-slug>.md
+enforcement/failure-patterns/<short-slug>.md
 ```
 
 建議格式：
@@ -94,10 +94,10 @@ Pattern records 要短。若 pattern 變長，將 examples 拆成較小 pattern 
 | --- | --- |
 | 只影響單一 active conversation | `.agent-goals/` progress 或 handoff note |
 | 單一 reusable document 有局部 open gap | 該文件前段的 Document TODO |
-| Cross-document 或 cross-agent workflow failure | `shared-rules/failure-patterns/` 加上相關 shared rule |
+| Cross-document 或 cross-agent workflow failure | `enforcement/failure-patterns/` 加上相關 shared rule |
 | Skill-specific repeated mistake | 該 skill 的 `feedback_history/`，成熟後再推進 workflow/checklist |
 | Tool-specific execution failure | `ai-tools/<tool>.md`、tool config 或 skill tool adapter |
-| **架構重構後 shared-rules 未同步** | **`shared-rules/failure-patterns/shared-rules-architecture-drift.md`** + 執行 `governance/lifecycle/intelligence-extraction-pipeline.md` Step 7a |
+| **架構重構後 shared-rules 未同步** | **`enforcement/failure-patterns/shared-rules-architecture-drift.md`** + 執行 `governance/lifecycle/intelligence-extraction-pipeline.md` Step 7a |
 | **AI 系統面執行錯誤**（routing 錯誤、heuristic 誤用、forbidden route 被選中） | **`validation/scenarios/failure-derived/`** — 建立 stateless scenario，未來可自動驗證同類錯誤是否重演 |
 
 ### Failure → Validation Scenario 條件

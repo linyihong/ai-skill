@@ -10,6 +10,6 @@ Use these templates when turning app analysis, product intent, or review finding
 
 ## Required Linked Updates
 
-Template changes affect how agents draft project documents. Follow [`../../../shared-rules/linked-updates.md`](../../../shared-rules/linked-updates.md): when a template changes, update or verify `../DOCUMENTATION.md`, `../process/`, `../CHECKLIST.md`, and any workflow or skill entry that tells users to copy the template.
+Template changes affect how agents draft project documents. Follow [`../../../enforcement/linked-updates.md`](../../../enforcement/linked-updates.md): when a template changes, update or verify `../DOCUMENTATION.md`, `../process/`, `../CHECKLIST.md`, and any workflow or skill entry that tells users to copy the template.
 
 If no linked update is needed, state why in the change note or commit message.

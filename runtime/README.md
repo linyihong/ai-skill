@@ -16,7 +16,7 @@
 
 ## 不放什麼
 
-- 目前必須執行的共用政策；放到 `shared-rules/`。
+- 目前必須執行的共用政策；放到 `enforcement/`。
 - 單一工具的 hook、setting、UI 或 mirror sync 細節；放到 `ai-tools/`。
 - Skill-specific workflow 全文；放到 `workflow/`（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。
 - 長期記憶內容本身；放到 `memory/` 或 `knowledge/`。
@@ -34,7 +34,7 @@
 
 ## 與既有層的關係
 
-- `shared-rules/` 是目前可執行 policy layer；本層先描述 runtime design。
+- `enforcement/` 是目前可執行 policy layer；本層先描述 runtime design。
 - `metadata/` 提供 runtime selection 與 ranking 的控制資料。
 - `knowledge/` 提供可被 runtime 找到的 atom、index、summary 與 graph。
 - `ai-tools/` 記錄各工具如何實作或近似 runtime 行為。
@@ -42,5 +42,5 @@
 ## 第一批候選遷移來源
 
 - `architecture/ai-native-knowledge-operating-system.md` 的 reference-first 與 compatibility inventory
-- `plans/active/next-stage-upgrade-plan.md` 的 runtime / context routing 章節
-- `shared-rules/decision-efficiency.md` 中可抽成 runtime routing design 的概念
+- `plans/archived/next-stage-upgrade-plan.md` 的 runtime / context routing 章節
+- `enforcement/decision-efficiency.md` 中可抽成 runtime routing design 的概念

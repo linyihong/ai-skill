@@ -1,5 +1,5 @@
-> 遵守 [共用規則索引](../../../../shared-rules/README.md)、[dependency-reading](../../../../shared-rules/dependency-reading.md)、[neutral-language](../../../../shared-rules/neutral-language.md)、[goal-action-validation](../../../../shared-rules/goal-action-validation.md) 與 [feedback-lessons](../../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
-# Extracted — See [`shared-rules/dependency-reading.md`](../../../../shared-rules/dependency-reading.md)
+> 遵守 [共用規則索引](../../../../enforcement/README.md)、[dependency-reading](../../../../enforcement/dependency-reading.md)、[neutral-language](../../../../enforcement/neutral-language.md)、[goal-action-validation](../../../../enforcement/goal-action-validation.md) 與 [feedback-lessons](../../../../enforcement/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+# Extracted — See [`enforcement/dependency-reading.md`](../../../../enforcement/dependency-reading.md)
 
 ### 2026-05-08 - Agent goals before transcripts when resuming
 
@@ -41,7 +41,7 @@ When resuming interrupted work:
 
 - Goal: Make interrupted-session recovery start from the durable project goal ledger instead of chat history alone.
 - Action: Promote the ordering into Cursor tool guidance and keep this feedback lesson as the reusable reminder.
-- Validation or reference source: `shared-rules/conversation-goal-ledger.md` defines `.agent-goals` as the project-local handoff source; `ai-tools/cursor.md` now states the Cursor-specific resume ordering.
+- Validation or reference source: `enforcement/conversation-goal-ledger.md` defines `.agent-goals` as the project-local handoff source; `ai-tools/cursor.md` now states the Cursor-specific resume ordering.
 
 #### Applies When
 
@@ -61,10 +61,10 @@ Confirm by checking that Cursor tool guidance says `.agent-goals` comes before t
 #### Promotion Target
 
 - `ai-tools/cursor.md`
-- `shared-rules/conversation-goal-ledger.md`
+- `enforcement/conversation-goal-ledger.md`
 
 #### Required Linked Updates
 
 - Updated `ai-tools/cursor.md` because this is a Cursor-specific execution failure.
-- Checked `shared-rules/conversation-goal-ledger.md`; it already defines `.agent-goals` as the project-local source of truth and requires reading it before editing, so no generic rule change is needed.
+- Checked `enforcement/conversation-goal-ledger.md`; it already defines `.agent-goals` as the project-local source of truth and requires reading it before editing, so no generic rule change is needed.
 - Updated `skills/apk-analysis/feedback_history/common/README.md` index.

@@ -106,7 +106,7 @@ AI_SKILL_SYNC_CURSOR_BUNDLE=1 ./scripts/ai-skill-close-loop.sh --commit
 
 ## Conversation goal ledger helper
 
-規則正文見 [`shared-rules/conversation-goal-ledger.md`](../shared-rules/conversation-goal-ledger.md)。Goal ledger 是專案本地暫存狀態，放在 `<PROJECT_ROOT>/.agent-goals/`，用來在 agent 中斷、轉移目標、多 agent 操作、context compact、已有 TodoWrite 或看到 dirty files 後回溯目前目標，不取代 git / issue tracker / Ai-skill writeback transaction。
+規則正文見 [`enforcement/conversation-goal-ledger.md`](../enforcement/conversation-goal-ledger.md)。Goal ledger 是專案本地暫存狀態，放在 `<PROJECT_ROOT>/.agent-goals/`，用來在 agent 中斷、轉移目標、多 agent 操作、context compact、已有 TodoWrite 或看到 dirty files 後回溯目前目標，不取代 git / issue tracker / Ai-skill writeback transaction。
 
 進入多步驟工作、使用者要求「繼續」前一個任務、或已看到 active project 有 modified / staged / untracked files 時，先檢查 active goal、priority、owner、lock、parallelization mode、plan/todo links、open missing/decision/strengthen：
 

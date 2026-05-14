@@ -1,6 +1,6 @@
 # Feedback Promotion Pipeline
 
-`feedback/pipeline/` 將 feedback lesson 從 `feedback/history/` 的原始觀察，透過機器可讀的 scoring、workflow 與 lifecycle automation，推進到 `workflow/`、`intelligence/`、`shared-rules/`、`memory/` 或 runtime surfaces。
+`feedback/pipeline/` 將 feedback lesson 從 `feedback/history/` 的原始觀察，透過機器可讀的 scoring、workflow 與 lifecycle automation，推進到 `workflow/`、`intelligence/`、`enforcement/`、`memory/` 或 runtime surfaces。
 
 ## 為什麼需要 Pipeline
 
@@ -17,7 +17,7 @@ Pipeline 解決這些問題：
 feedback_history/  ──→  Promotion Engine  ──→  Promotion Workflow  ──→  Target Layer
      (86 lessons)         (score + decide)        (executable steps)       (workflow/
                                                                            intelligence/
-                                                                           shared-rules/
+                                                                           enforcement/
                                                                            memory/)
                                │
                                ▼
@@ -40,7 +40,7 @@ feedback/pipeline/
 
 | Pipeline 元件 | 依賴的既有層 | 關係 |
 |-------------|------------|------|
-| promotion-engine | `feedback/history/`, `shared-rules/feedback-lessons.md` | 讀取 lesson 內容做 scoring |
+| promotion-engine | `feedback/history/`, `enforcement/feedback-lessons.md` | 讀取 lesson 內容做 scoring |
 | promotion-workflow | `governance/lifecycle/README.md`, `governance/validation/README.md` | 遵循 lifecycle states 與 validation gates |
 | lifecycle-automation | `governance/lifecycle/README.md`, `knowledge/runtime/sqlite/` | 使用 SQLite index 做 cold data lookup |
 

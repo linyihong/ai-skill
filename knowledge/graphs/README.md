@@ -30,7 +30,7 @@
 | [`intelligence-apk-analysis-atoms.yaml`](intelligence-apk-analysis-atoms.yaml) | 連接 evidence-first-routing、live-readiness-gates atoms 與 skill、workflow、analysis。 | `candidate` |
 | [`intelligence-development-guidance.yaml`](intelligence-development-guidance.yaml) | 連接 docs-first-bdd-closure、risk-translation-heuristic、contract-governance-heuristic atoms 與 workflow、analysis 來源。 | `candidate` |
 | [`intelligence-repo-analysis.yaml`](intelligence-repo-analysis.yaml) | 連接 documentation-backfill-heuristic、traceability-heuristic atoms 與 analysis/repo/、workflow 來源。 | `candidate` |
-| [`intelligence-agent-architecture.yaml`](intelligence-agent-architecture.yaml) | 連接 agent-architecture 層的所有 11 個 atoms（context-collapse、rule-overload、task-routing、attention-budgeting、failure-recovery、cognitive-boundaries、pilot-first-validation、failure-to-scenario-closure、linked-updates-completeness、decomposition-strategy-selection、stateless-validation-necessity）與 shared-rules/failure-patterns/、decision-efficiency、governance/document-sizing、validation、linked-updates、plans。 | `candidate` |
+| [`intelligence-agent-architecture.yaml`](intelligence-agent-architecture.yaml) | 連接 agent-architecture 層的所有 11 個 atoms（context-collapse、rule-overload、task-routing、attention-budgeting、failure-recovery、cognitive-boundaries、pilot-first-validation、failure-to-scenario-closure、linked-updates-completeness、decomposition-strategy-selection、stateless-validation-necessity）與 enforcement/failure-patterns/、decision-efficiency、governance/document-sizing、validation、linked-updates、plans。 | `candidate` |
 
 ### Runtime & Pipeline（Phase 14）
 
@@ -113,5 +113,5 @@ status: candidate
 - 新 graph record 必須能解析所有 source / target path。
 - Graph record 不可包含 secrets、project incident evidence、本機絕對路徑或 tool mirror source。
 - 若 source 改動，graph record 需要 revalidate 或降級 confidence。
-- Graph 只描述關係；可執行規則仍以 `shared-rules/` 與 active source-of-truth 文件為準。
+- Graph 只描述關係；可執行規則仍以 `enforcement/` 與 active source-of-truth 文件為準。
 - Source、summary、registry 或 lifecycle state 改動時，依 [`../runtime/refresh-policy.yaml`](../runtime/refresh-policy.yaml) 判斷是否 refresh、revalidate 或 downgrade。

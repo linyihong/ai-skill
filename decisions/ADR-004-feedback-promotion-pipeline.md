@@ -32,7 +32,7 @@ feedback/refinement/ ← 流程精煉（根據 lesson 改進 workflow）
        ↓
 feedback/promotion/  ← Promotion Engine（scoring → decision → write → validate）
        ↓
-Target Layers: workflow/ | intelligence/ | shared-rules/ | memory/ | skill-doc/
+Target Layers: workflow/ | intelligence/ | enforcement/ | memory/ | skill-doc/
 ```
 
 ### 核心設計決策
@@ -47,7 +47,7 @@ Target Layers: workflow/ | intelligence/ | shared-rules/ | memory/ | skill-doc/
 
 | Score | Target | 條件 |
 | --- | --- | --- |
-| ≥ 0.7 | `shared-rules/` | 跨 skill 驗證過的執行規則 |
+| ≥ 0.7 | `enforcement/` | 跨 skill 驗證過的執行規則 |
 | ≥ 0.7 | `intelligence/` | 跨 skill 的工程智慧 |
 | ≥ 0.7 | `workflow/` | 可改進執行流程的 lesson |
 | ≥ 0.5 | `skill-doc/` | Skill-specific 的改進建議 |
@@ -58,7 +58,7 @@ Target Layers: workflow/ | intelligence/ | shared-rules/ | memory/ | skill-doc/
 ### 正面
 
 - **Feedback 有完整 lifecycle**：從 raw observation → replay → extraction → refinement → promotion → archive。
-- **跨 skill 推廣**：成熟的 lesson 可以 promotion 到 intelligence/ 或 shared-rules/，被多個 skill 使用。
+- **跨 skill 推廣**：成熟的 lesson 可以 promotion 到 intelligence/ 或 enforcement/，被多個 skill 使用。
 - **自動化門檻**：Scoring 機制讓 promotion 可部分自動化，降低人工負擔。
 - **Token 效率**：Replay 和 extraction 只在 trigger conditions 滿足時執行，不浪費 token。
 
@@ -83,4 +83,4 @@ Target Layers: workflow/ | intelligence/ | shared-rules/ | memory/ | skill-doc/
 - [`feedback/pipeline/promotion-engine.yaml`](../feedback/pipeline/promotion-engine.yaml) — Scoring 規則
 - [`feedback/pipeline/promotion-workflow.yaml`](../feedback/pipeline/promotion-workflow.yaml) — Promotion workflow
 - [`feedback/pipeline/lifecycle-automation.yaml`](../feedback/pipeline/lifecycle-automation.yaml) — Lifecycle automation
-- [`shared-rules/feedback-lessons.md`](../shared-rules/feedback-lessons.md) — Feedback lesson 格式
+- [`enforcement/feedback-lessons.md`](../enforcement/feedback-lessons.md) — Feedback lesson 格式

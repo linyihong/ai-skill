@@ -1,14 +1,14 @@
 # Feedback Promotion Pipeline
 
-`feedback/promotion/` 定義 feedback lesson 如何從 skill-local history 推進到 `workflow/`、`intelligence/`、`shared-rules/`、`memory/` 或 runtime surfaces。它是 promotion design layer，不取代 `shared-rules/feedback-lessons.md` 的可執行寫作規則。
+`feedback/promotion/` 定義 feedback lesson 如何從 skill-local history 推進到 `workflow/`、`intelligence/`、`enforcement/`、`memory/` 或 runtime surfaces。它是 promotion design layer，不取代 `enforcement/feedback-lessons.md` 的可執行寫作規則。
 
 ## Source Of Truth
 
 | Layer | Role |
 | --- | --- |
 | `feedback/history/<domain>/` | Lesson 全文與歷史紀錄的 source-of-truth。 |
-| `shared-rules/feedback-lessons.md` | Lesson 命名、模板、索引與 agent 行為規則。 |
-| `shared-rules/failure-learning-system.md` | Agent failure 或 close-loop gap 的分類與 promotion target。 |
+| `enforcement/feedback-lessons.md` | Lesson 命名、模板、索引與 agent 行為規則。 |
+| `enforcement/failure-learning-system.md` | Agent failure 或 close-loop gap 的分類與 promotion target。 |
 | `governance/lifecycle/README.md` | Candidate、validated、promoted、deprecated 的 lifecycle gate。 |
 | `governance/validation/README.md` | Promotion、generated refresh 與 close-loop validation gate。 |
 
@@ -19,7 +19,7 @@
 | Single-skill technique | `skills/<skill>/WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md` 或 `techniques/` | Lesson 已 generalized、去敏，且 skill index 已更新。 |
 | Engineering judgment | `intelligence/` | 影響 trade-off、anti-pattern、route selection 或 cross-project decision。 |
 | Execution flow | `workflow/` | 影響 agent 如何執行 planning、review、handoff 或 validation。 |
-| Cross-skill or all-repo rule | `shared-rules/` 或 `shared-rules/failure-patterns/` | Failure class 或 prevention gate 可跨 skill 重演。 |
+| Cross-skill or all-repo rule | `enforcement/` 或 `enforcement/failure-patterns/` | Failure class 或 prevention gate 可跨 skill 重演。 |
 | Runtime navigation | `knowledge/`、`metadata/`、`runtime/` | 需要被 registry、summary、graph 或 model context report route 到。 |
 | Long-term lesson memory | `memory/` | 需要保留 replay / episodic / project abstraction boundary。 |
 

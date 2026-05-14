@@ -21,7 +21,7 @@
 
 - Agent 執行步驟與 orchestration flow；放到 `workflow/`。
 - 工程 trade-off、架構 lesson、anti-pattern 結論；放到 `intelligence/`。
-- 可執行 shared policy；放到 `shared-rules/`。
+- 可執行 shared policy；放到 `enforcement/`。
 - 工具專屬路徑、hook 或 UI；放到 `ai-tools/`。
 
 ## 誰會參考這裡（Inbound References）
@@ -37,10 +37,10 @@
 - `skills/` 目前仍是相容入口；本層只承接逐步抽出的分析方法。
 - `workflow/` 可以引用本層，但不應複製完整分析知識。
 - `intelligence/` 承接從分析結果萃取出的工程判斷。
-- `shared-rules/` 仍負責授權、去敏、依賴讀取與 validation policy。
+- `enforcement/` 仍負責授權、去敏、依賴讀取與 validation policy。
 
 ## 第一批候選遷移來源
 
 - `skills/apk-analysis/techniques/`（已刪除，內容已遷移至 `analysis/apk/workflows/`）
 - `skills/app-development-guidance/process/` 中偏分析與 discovery 的內容
-- `plans/active/next-stage-upgrade-plan.md` 中 `analysis/` 的分層說明
+- `plans/archived/next-stage-upgrade-plan.md` 中 `analysis/` 的分層說明

@@ -61,11 +61,11 @@ AI 在長時間運作中容易陷入特定失效模式：
 | 來源 | 關係 |
 |------|------|
 | [`route.anti-patterns.runtime-patterns`](../knowledge/runtime/routing-registry.yaml) | Routing registry record，agent 依此找到 anti-patterns/ |
-| [`shared-rules/failure-patterns/`](../shared-rules/failure-patterns/README.md) | 操作層級 failure patterns 與本層互補 |
+| [`enforcement/failure-patterns/`](../enforcement/failure-patterns/README.md) | 操作層級 failure patterns 與本層互補 |
 | [`runtime/guards/`](../runtime/guards/README.md) | Runtime guards 實作本層 anti-pattern 的預防方式 |
 
 ## 與既有層的關係
 
-- `shared-rules/failure-patterns/`：現有的 failure patterns（偏重操作層級）
+- `enforcement/failure-patterns/`：現有的 failure patterns（偏重操作層級）
 - `anti-patterns/`：更高層級的 runtime anti-patterns（偏重系統層級）
 - `runtime/guards/`：對應的 runtime guards（自動防護）

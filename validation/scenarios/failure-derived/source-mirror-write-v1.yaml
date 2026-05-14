@@ -1,7 +1,7 @@
 # Source / Mirror Write Drift Scenario
 # 測試 AI 在編輯文件時，能否正確區分 canonical source 與 tool mirror
 # 來源 failure pattern:
-#   - shared-rules/failure-patterns/source-mirror-write-drift.md
+#   - enforcement/failure-patterns/source-mirror-write-drift.md
 #
 # 原始錯誤：AI 編輯了目前工具看得到的 copy（mirror），而不是 canonical source repository
 
@@ -11,7 +11,7 @@ type: heuristic-obedience
 priority: P1
 
 failure_source:
-  pattern: shared-rules/failure-patterns/source-mirror-write-drift.md
+  pattern: enforcement/failure-patterns/source-mirror-write-drift.md
   class: source-mirror-drift
   date: "2026-05-12"
   description: >
@@ -56,7 +56,7 @@ then:
   expected_final_route: canonical-source-edit
 
   expected_intelligence:
-    - shared-rules/failure-patterns/source-mirror-write-drift.md
-    - shared-rules/dependency-reading.md
+    - enforcement/failure-patterns/source-mirror-write-drift.md
+    - enforcement/dependency-reading.md
 
   unexpected_intelligence: []

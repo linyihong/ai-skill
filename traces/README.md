@@ -41,10 +41,10 @@ traces/
 |------|------|
 | [`route.traces.decision-traces`](../knowledge/runtime/routing-registry.yaml) | Routing registry record，agent 依此找到 traces/ |
 | [`validation/`](../validation/README.md) | Scenario 執行後寫入 trace 至此 |
-| [`shared-rules/failure-learning-system.md`](../shared-rules/failure-learning-system.md) | Failure → Scenario 閉環完成後產出 trace |
+| [`enforcement/failure-learning-system.md`](../enforcement/failure-learning-system.md) | Failure → Scenario 閉環完成後產出 trace |
 
 ## 與既有層的關係
 
 - [`validation/`](../validation/README.md)：scenario 定義與驗證框架
 - [`evaluations/`](../evaluations/README.md)：scenario 執行結果（與 trace 成對）
-- [`shared-rules/failure-learning-system.md`](../shared-rules/failure-learning-system.md)：Failure → Scenario 閉環流程
+- [`enforcement/failure-learning-system.md`](../enforcement/failure-learning-system.md)：Failure → Scenario 閉環流程

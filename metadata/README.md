@@ -21,7 +21,7 @@
 ## 不放什麼
 
 - Knowledge Atom 正文、index 或 graph 內容；放到 `knowledge/`。
-- 可執行 rule weight 與 dependency reading policy；放到 `shared-rules/`。
+- 可執行 rule weight 與 dependency reading policy；放到 `enforcement/`。
 - Model capability profile 本身；放到 `models/`。
 - Tool-specific metadata storage 或 UI；放到 `ai-tools/`。
 
@@ -34,7 +34,7 @@
 
 ## 與既有層的關係
 
-- `shared-rules/rule-weight.md` 仍是目前規則衝突的可執行 policy。
+- `enforcement/rule-weight.md` 仍是目前規則衝突的可執行 policy。
 - `runtime/` 會使用本層資料做 dynamic loading 與 routing。
 - `knowledge/` 會引用本層 schema 讓 atoms 可搜尋、可排序、可治理。
 - `knowledge/runtime/sqlite/` 應從本層 schema 取得索引欄位，不另創不相容欄位語意。
@@ -42,6 +42,6 @@
 
 ## 第一批候選遷移來源
 
-- `plans/active/next-stage-upgrade-plan.md` 的 Knowledge Atom metadata 欄位草案
+- `plans/archived/next-stage-upgrade-plan.md` 的 Knowledge Atom metadata 欄位草案
 - `metadata/schema.md`
-- `shared-rules/rule-weight.md`、`decision-efficiency.md` 中可抽象為 metadata 欄位的概念
+- `enforcement/rule-weight.md`、`decision-efficiency.md` 中可抽象為 metadata 欄位的概念

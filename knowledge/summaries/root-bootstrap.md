@@ -3,7 +3,7 @@
 | 欄位 | 值 |
 | --- | --- |
 | Atom ID | `root.bootstrap.ai-skill` |
-| Source path | [`../../README.md`](../../README.md), [`../../CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md), [`../../shared-rules/README.md`](../../shared-rules/README.md) |
+| Source path | [`../../README.md`](../../README.md), [`../../CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md), [`../../enforcement/README.md`](../../enforcement/README.md) |
 | Lifecycle | `validated` |
 | Summary | Ai-skill 工作的 bootstrap 入口。Root README 定義 OS layout 與 cost-aware 啟動流程；CORE_BOOTSTRAP.md 定義 3 條核心規則（~800 tokens）；shared-rules README 定義 Runtime Activation Model 與 lazy-load rules。 |
 | When to read | 新 session、接手長對話、使用者要求繼續 Ai-skill 升級、或需要確認 source-of-truth / close-loop 流程時。 |

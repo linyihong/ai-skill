@@ -1,7 +1,7 @@
 # Skills（技巧包）
 
 本目錄放**各技能／技巧包**（每個子資料夾一個 skill，例如 `apk-analysis/`）。  
-**全庫共用的政策與寫作底線**不在此重複維護，請見上一層的 [`shared-rules/`](../shared-rules/README.md)。
+**全庫共用的政策與寫作底線**不在此重複維護，請見上一層的 [`enforcement/`](../enforcement/README.md)。
 
 - **新建 skill 流程與檢查清單：**[`ADDING_SKILLS.md`](ADDING_SKILLS.md)  
 - **可複製的最小檔案：**[`_template/`](_template/)（勿把 `_template` 本身接到任何工具的正式 skill 目錄）

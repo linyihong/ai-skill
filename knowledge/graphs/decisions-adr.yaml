@@ -30,7 +30,7 @@ edges:
     reason: ADR-005 — Memory Architecture。決定 memory/ 的子層拆分（working/summary/decision/episodic/project/failure）。
     validation: ADR 記錄 context、decision、consequences 與 alternatives。
   - type: related_to
-    target: plans/active/next-stage-upgrade-plan.md
+    target: plans/archived/next-stage-upgrade-plan.md
     reason: ADR records 記錄了架構升級過程中的關鍵決策，與 upgrade plan 互補。
     validation: upgrade plan 的 decisions/ 區段說明 ADR 的角色。
   - type: related_to

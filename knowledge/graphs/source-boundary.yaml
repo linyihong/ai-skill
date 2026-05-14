@@ -6,11 +6,11 @@ summary: >
   validation gates 與 tool-facing reminders 之間的關係。
 edges:
   - type: depends_on
-    target: shared-rules/conversation-goal-ledger.md
+    target: enforcement/conversation-goal-ledger.md
     reason: active goal 完成、刪除與 durable follow-up gate 的 source-of-truth。
-    validation: shared-rules/conversation-goal-ledger.md 定義 Goal 層級邊界與完成刪除條件。
+    validation: enforcement/conversation-goal-ledger.md 定義 Goal 層級邊界與完成刪除條件。
   - type: depends_on
-    target: shared-rules/content-layering.md
+    target: enforcement/content-layering.md
     reason: 定義長期目標、active implementation task 與 durable planning 文件的放置位置。
     validation: content-layering 表格包含 durable planning 與 .agent-goals 邊界。
   - type: related_to
@@ -28,7 +28,7 @@ edges:
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: routing registry 提供 route.governance.durable-goal-boundary record。
-    validation: registry record 指向 shared-rules/conversation-goal-ledger.md。
+    validation: registry record 指向 enforcement/conversation-goal-ledger.md。
 metadata:
   priority: P1
   confidence: high

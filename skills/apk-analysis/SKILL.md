@@ -7,9 +7,9 @@ description: Guides authorized APK traffic analysis, dynamic capture, Flutter/Da
 
 Use this skill for authorized APK analysis only. The goal is to recover how an app communicates, captures, decodes, and validates data in a reproducible way, then turn findings into documentation and reusable tests without leaking secrets or target-specific private details.
 
-**Shared policy (do not duplicate in every lesson):** read [`shared-rules` index](../../shared-rules/README.md) once (or [`feedback-lessons.md`](../../shared-rules/feedback-lessons.md) for feedback-specific rules), apply [`dependency-reading.md`](../../shared-rules/dependency-reading.md) when this skill or a related rule/template/lesson has changed, apply [`neutral-language.md`](../../shared-rules/neutral-language.md) when naming or summarizing docs, and apply [`goal-action-validation.md`](../../shared-rules/goal-action-validation.md) so important conclusions include a goal, action, validation, or reference source. When reloading this skill after an update or when the user asks whether shared rules were read, create a dependency read ledger before continuing project analysis: required files, files read, `not applicable` missing files (for example no `CHECKLIST.md`), blocked items, and validation method. Per-technique files in `feedback_history/` should **reference** shared rules, not paste the full common rules.
+**Shared policy (do not duplicate in every lesson):** read [`shared-rules` index](../../enforcement/README.md) once (or [`feedback-lessons.md`](../../enforcement/feedback-lessons.md) for feedback-specific rules), apply [`dependency-reading.md`](../../enforcement/dependency-reading.md) when this skill or a related rule/template/lesson has changed, apply [`neutral-language.md`](../../enforcement/neutral-language.md) when naming or summarizing docs, and apply [`goal-action-validation.md`](../../enforcement/goal-action-validation.md) so important conclusions include a goal, action, validation, or reference source. When reloading this skill after an update or when the user asks whether shared rules were read, create a dependency read ledger before continuing project analysis: required files, files read, `not applicable` missing files (for example no `CHECKLIST.md`), blocked items, and validation method. Per-technique files in `feedback_history/` should **reference** shared rules, not paste the full common rules.
 
-**Cross-skill references:** follow [`cross-skill-references.md`](../../shared-rules/cross-skill-references.md). `apk-analysis` may reference another skill when analysis output must be consumed by that skill, but it must name the trigger, handoff artifact, ownership boundary, and sanitization boundary instead of copying the target skill's full workflow.
+**Cross-skill references:** follow [`cross-skill-references.md`](../../enforcement/cross-skill-references.md). `apk-analysis` may reference another skill when analysis output must be consumed by that skill, but it must name the trigger, handoff artifact, ownership boundary, and sanitization boundary instead of copying the target skill's full workflow.
 
 ## Quick Start（Routing）
 
@@ -20,7 +20,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
 5. **Build UI architecture map** → see [`workflow/apk-analysis/execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) § UI Architecture Map.
 6. **Prefer high-semantic hooks**: request object hooks > raw socket hooks; response interceptor/decode hooks > TLS byte reconstruction.
 7. **Convert dynamic results into durable assets** → see [`workflow/apk-analysis/artifact-gates.md`](../../workflow/apk-analysis/artifact-gates.md) § Durable Assets.
-8. **Automatic skill feedback** → see [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md) and [`feedback/`](../../feedback/) layer.
+8. **Automatic skill feedback** → see [`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) and [`feedback/`](../../feedback/) layer.
 
 ## Default Workflow
 
@@ -60,6 +60,6 @@ See [`workflow/apk-analysis/artifact-gates.md`](../../workflow/apk-analysis/arti
 
 ## Feedback Loop
 
-See [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md) for the feedback lesson template and workflow. See [`feedback/`](../../feedback/) for the feedback promotion pipeline.
+See [`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) for the feedback lesson template and workflow. See [`feedback/`](../../feedback/) for the feedback promotion pipeline.
 
-**Git（本 repository）：**若在**同一工作區**修改了 `<AI_SKILL_REPO>` 底下的 `skills/apk-analysis/`、`shared-rules/` 等（含新建 `feedback_history/` 檔），**除非使用者明講不要提交**，否則在結束任務前**必須**於 `<AI_SKILL_REPO>` 根目錄執行 `git status`，將相關變更 **`git add` → `git commit`**（訊息清楚）→ **`git push`**；需要權限時**必須**向使用者申請（例如 git_write／網路）。第一次寫入時先依 [`dependency-reading.md`](../../shared-rules/dependency-reading.md) 開啟 writeback transaction；僅重載或重讀任一工具/skill **不會**自動完成這一步。若本輪明確使用或更新本機 tool sync / bundle mirror，才依 [`ai-tools/`](../../ai-tools/README.md) 執行對應同步；reference-only 不需要同步。
+**Git（本 repository）：**若在**同一工作區**修改了 `<AI_SKILL_REPO>` 底下的 `skills/apk-analysis/`、`enforcement/` 等（含新建 `feedback_history/` 檔），**除非使用者明講不要提交**，否則在結束任務前**必須**於 `<AI_SKILL_REPO>` 根目錄執行 `git status`，將相關變更 **`git add` → `git commit`**（訊息清楚）→ **`git push`**；需要權限時**必須**向使用者申請（例如 git_write／網路）。第一次寫入時先依 [`dependency-reading.md`](../../enforcement/dependency-reading.md) 開啟 writeback transaction；僅重載或重讀任一工具/skill **不會**自動完成這一步。若本輪明確使用或更新本機 tool sync / bundle mirror，才依 [`ai-tools/`](../../ai-tools/README.md) 執行對應同步；reference-only 不需要同步。

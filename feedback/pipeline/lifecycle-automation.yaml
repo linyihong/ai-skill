@@ -6,7 +6,7 @@
 # 依賴：
 #   - governance/lifecycle/README.md (lifecycle states)
 #   - knowledge/runtime/sqlite/ (cold data lookup)
-#   - shared-rules/failure-learning-system.md (failure pattern lifecycle)
+#   - enforcement/failure-learning-system.md (failure pattern lifecycle)
 
 lifecycle_automation_version: v1
 status: candidate

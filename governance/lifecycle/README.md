@@ -4,7 +4,7 @@
 
 ## 真相來源規則（Source Of Truth Rule）
 
-在遷移被明確提升（promote）並驗證之前，既有的 `skills/`、`shared-rules/`、`ai-tools/` 和 `scripts/` 檔案仍然是可執行行為的真相來源。
+在遷移被明確提升（promote）並驗證之前，既有的 `skills/`、`enforcement/`、`ai-tools/` 和 `scripts/` 檔案仍然是可執行行為的真相來源。
 
 `analysis/`、`workflow/`、`intelligence/`、`runtime/`、`memory/`、`feedback/`、`models/`、`governance/`、`knowledge/` 和 `metadata/` 下的新分層檔案可以作為：
 
@@ -54,12 +54,12 @@
 | 單一 domain 的 `feedback/history/<domain>/` 超過約 50 條 lesson，或單一 category 超過約 20 條 | 產生或更新 category index、summary rows 與 SQLite / FTS index |
 | Agent 為了找 lesson 需要讀多個 `feedback_history` README 或大量 lesson 全文 | 先用 SQLite / FTS query 找候選 `source_path`，再讀 1-3 個 canonical files |
 | 某批 lesson 長期未修改，但仍可能被 routing / promotion 使用 | 標為 cold lookup candidate，保留 Markdown source，產生短 summary / tags / validation signal |
-| feedback lesson 被 promotion 到 `workflow/`、`intelligence/`、`shared-rules/` 或 runtime route | 保留原 lesson，更新 summary / graph / registry / SQLite lookup |
+| feedback lesson 被 promotion 到 `workflow/`、`intelligence/`、`enforcement/` 或 runtime route | 保留原 lesson，更新 summary / graph / registry / SQLite lookup |
 | 查詢成本高於判斷成本，例如只需要知道「有哪些相關 lesson」 | 使用 generated report / SQLite index，不讀全文 |
 
 ### 規則（Rules）
 
-- Canonical source 仍是 `feedback/history/*/*.md`、`shared-rules/`、`knowledge/summaries/`、`knowledge/graphs/` 與 routing registry。
+- Canonical source 仍是 `feedback/history/*/*.md`、`enforcement/`、`knowledge/summaries/`、`knowledge/graphs/` 與 routing registry。
 - SQLite / FTS、generated summaries、runtime reports 都是 generated lookup views；可刪除、可重建，不作唯一來源。
 - 冷資料歸檔不等於棄用。冷資料仍可能有效，只是預設不讀全文。
 - 需要修改、promotion、debug、failure learning 或高信心判斷時，必須回到 canonical Markdown / YAML。

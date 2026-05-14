@@ -1,6 +1,6 @@
 # Hardening Note Template
 
-> Follow [`shared-rules`](../../../shared-rules/README.md). Do not include target-specific secrets, raw endpoints, tokens, or private product conclusions.
+> Follow [`shared-rules`](../../../enforcement/README.md). Do not include target-specific secrets, raw endpoints, tokens, or private product conclusions.
 
 ## Title
 

@@ -1,4 +1,4 @@
-> 遵守 [共用規則索引](../../../../shared-rules/README.md) 與 [feedback-lessons](../../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+> 遵守 [共用規則索引](../../../../enforcement/README.md) 與 [feedback-lessons](../../../../enforcement/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 # Extracted — See [`workflow/software-delivery/development-process.md`](../../../../workflow/software-delivery/development-process.md)
 
 ### 2026-05-05 - Contract-first development flow
@@ -89,7 +89,7 @@ When no frontend/backend split exists, define provider/consumer roles that match
 - `SKILL.md`
 - `README.md`
 - `CHECKLIST.md`
-- `shared-rules/linked-updates.md`
+- `enforcement/linked-updates.md`
 
 #### Required Linked Updates
 
@@ -101,5 +101,5 @@ When no frontend/backend split exists, define provider/consumer roles that match
 - Updated `README.md` file index and classification rules.
 - Updated `CHECKLIST.md` with product-to-contract readiness checks.
 - Updated `DOCUMENTATION.md` with the initial development docs template link.
-- Updated `shared-rules/linked-updates.md` with `process/` and `templates/` linked updates.
+- Updated `enforcement/linked-updates.md` with `process/` and `templates/` linked updates.
 - Updated `feedback_history/README.md` and `feedback_history/common/README.md`.

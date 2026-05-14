@@ -13,7 +13,7 @@
 
 ## 與其他層的關係
 
-- `shared-rules/failure-learning-system.md` 定義通用 failure learning 框架，本目錄存放分析領域的具體 failure patterns
+- `enforcement/failure-learning-system.md` 定義通用 failure learning 框架，本目錄存放分析領域的具體 failure patterns
 - `intelligence/engineering/analytical-reasoning/anti-patterns/` 記錄可預防的錯誤模式，本目錄記錄已發生的失敗與診斷方式
 
 ## 目前 atoms

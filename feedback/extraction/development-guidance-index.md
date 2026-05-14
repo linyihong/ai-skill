@@ -84,14 +84,14 @@
 
 ---
 
-## 5. 目標層：`shared-rules/`
+## 5. 目標層：`enforcement/`
 
 這類 lessons 影響全庫共用規則。
 
 | 來源檔案 | Status | 標題 | 提取狀態 | 目標檔案 |
 | --- | --- | --- | --- | --- |
-| `common/2026-05-07_081800-keep-project-incidents-out-of-skills.md` | promoted | Keep project incidents out of skills | ✅ | `shared-rules/reusable-guidance-boundary.md` |
-| `common/2026-05-05_194400-contract-first-development-flow.md` | promoted | Contract-first development flow | ✅ | `shared-rules/linked-updates.md` |
+| `common/2026-05-07_081800-keep-project-incidents-out-of-skills.md` | promoted | Keep project incidents out of skills | ✅ | `enforcement/reusable-guidance-boundary.md` |
+| `common/2026-05-05_194400-contract-first-development-flow.md` | promoted | Contract-first development flow | ✅ | `enforcement/linked-updates.md` |
 
 ---
 
@@ -122,7 +122,7 @@
 | `analysis/development-guidance/` | 6 | 6 | 0 |
 | `workflow/software-delivery/artifact-gates.md` | 3 | 3 | 0 |
 | `analysis/development-guidance/controls-catalog.md` | 1 | 1 | 0 |
-| `shared-rules/` | 2 | 2 | 0 |
+| `enforcement/` | 2 | 2 | 0 |
 | `workflow/software-delivery/development-process.md` | 10 | 10 | 0 |
 | **總計** | **40** | **40** | **0** |
 

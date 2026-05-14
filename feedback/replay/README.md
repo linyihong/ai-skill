@@ -36,7 +36,7 @@
 
 2. 收集 replay 素材
    ├─ Session summary（memory/summary/）
-   ├─ Failure record（shared-rules/failure-patterns/ 或 feedback_history/）
+   ├─ Failure record（enforcement/failure-patterns/ 或 feedback_history/）
    ├─ Decision record（memory/decision/ 或 decisions/）
    └─ Context health / circuit breaker 記錄（runtime/health/、runtime/guards/）
 
@@ -50,7 +50,7 @@
 4. 產出 replay 結果
    ├─ Generalized lesson（寫入 feedback_history/ 或 intelligence/）
    ├─ Workflow 更新建議（寫入 workflow/）
-   ├─ Prevention gate 建議（寫入 shared-rules/failure-patterns/）
+   ├─ Prevention gate 建議（寫入 enforcement/failure-patterns/）
    └─ Runtime 配置建議（寫入 runtime/ 或 tools/）
 
 5. 決定 promotion 路徑
@@ -72,7 +72,7 @@ pattern_type: <known_variant | new_pattern | workflow_gap | knowledge_gap | tool
 generalized_lesson: |
   <去敏後的泛化教訓，不含專案特定 raw evidence>
 promotion_candidate:
-  target: <intelligence/ | workflow/ | shared-rules/ | runtime/ | tools/>
+  target: <intelligence/ | workflow/ | enforcement/ | runtime/ | tools/>
   confidence: <high | medium | low>
   validation: <需要哪些驗證才能 promotion>
 linked_updates:
@@ -86,6 +86,6 @@ linked_updates:
 - `feedback/promotion/`：Replay 結果的 promotion 路徑由 promotion pipeline 管理。
 - `memory/summary/`：Session summary 是 replay 的重要素材來源。
 - `memory/decision/`：Decision record 可輔助 replay 分析。
-- `shared-rules/failure-patterns/`：Replay 發現的新 failure pattern 可寫入此處。
+- `enforcement/failure-patterns/`：Replay 發現的新 failure pattern 可寫入此處。
 - `intelligence/`：Replay 產出的工程智慧可 promotion 到 intelligence。
 - `workflow/`：Replay 發現的流程缺口可 promotion 到 workflow。

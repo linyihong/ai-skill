@@ -41,10 +41,10 @@ evaluations/
 |------|------|
 | [`route.evaluations.scenario-results`](../knowledge/runtime/routing-registry.yaml) | Routing registry record，agent 依此找到 evaluations/ |
 | [`validation/`](../validation/README.md) | Scenario 執行後寫入 evaluation 至此 |
-| [`shared-rules/failure-learning-system.md`](../shared-rules/failure-learning-system.md) | Failure → Scenario 閉環完成後產出 evaluation |
+| [`enforcement/failure-learning-system.md`](../enforcement/failure-learning-system.md) | Failure → Scenario 閉環完成後產出 evaluation |
 
 ## 與既有層的關係
 
 - [`validation/`](../validation/README.md)：scenario 定義與驗證框架
 - [`traces/`](../traces/README.md)：AI 的實際 decision trace（與 evaluation 成對）
-- [`shared-rules/failure-learning-system.md`](../shared-rules/failure-learning-system.md)：Failure → Scenario 閉環流程
+- [`enforcement/failure-learning-system.md`](../enforcement/failure-learning-system.md)：Failure → Scenario 閉環流程

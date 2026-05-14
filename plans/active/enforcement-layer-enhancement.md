@@ -3,13 +3,13 @@
 Status: `draft`
 Created: 2026-05-14
 Depends on: [`shared-rules-to-enforcement-migration.md`](shared-rules-to-enforcement-migration.md)（搬遷完成後才能開始）
-Related: [`metadata/schema.md`](../../metadata/schema.md), [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml), [`shared-rules/rule-weight.md`](../../shared-rules/rule-weight.md), [`governance/lifecycle/README.md`](../../governance/lifecycle/README.md)
+Related: [`metadata/schema.md`](../../metadata/schema.md), [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml), [`enforcement/rule-weight.md`](../../enforcement/rule-weight.md), [`governance/lifecycle/README.md`](../../governance/lifecycle/README.md)
 
 ---
 
 ## 背景
 
-在 [`shared-rules/ → enforcement/` 搬遷](shared-rules-to-enforcement-migration.md)完成後，enforcement layer 需要進一步強化以發揮完整潛力。本計畫涵蓋 5 個強化方向，對應外部建議中「尚未做到」的部分。
+在 [`enforcement/ → enforcement/` 搬遷](shared-rules-to-enforcement-migration.md)完成後，enforcement layer 需要進一步強化以發揮完整潛力。本計畫涵蓋 5 個強化方向，對應外部建議中「尚未做到」的部分。
 
 ---
 
@@ -115,7 +115,7 @@ Related: [`metadata/schema.md`](../../metadata/schema.md), [`runtime/router/acti
   - 涵蓋所有常見情境（repo refactor、reusable extraction、failure repeated、close-loop 等）
 - [ ] 更新 `activation-rules.yaml`：
   - 狀態從 `candidate` 改為 `validated`
-  - 所有 `source` 路徑從 `shared-rules/` 改為 `enforcement/`
+  - 所有 `source` 路徑從 `enforcement/` 改為 `enforcement/`
   - 加入 `rule_id` 與 `metadata/rules/` 中 `.yaml` 檔案的對應
 - [ ] 更新 `runtime/router/README.md` 加入 activation engine 的使用說明
 - [ ] 驗證：activation engine 能正確判斷 5 個以上測試情境
@@ -184,7 +184,7 @@ Related: [`metadata/schema.md`](../../metadata/schema.md), [`runtime/router/acti
 ## 執行順序
 
 ```
-Phase 0: shared-rules/ → enforcement/ 搬遷完成（必要前置條件）
+Phase 0: enforcement/ → enforcement/ 搬遷完成（必要前置條件）
     │
     ├── 方向 A (Enforcement Metadata Spec)
     │   └── 方向 B (Rule Dependency Graph) — 依賴 A 的 rule_id
@@ -212,6 +212,6 @@ Phase 0: shared-rules/ → enforcement/ 搬遷完成（必要前置條件）
 - [`shared-rules-to-enforcement-migration.md`](shared-rules-to-enforcement-migration.md) — 本計畫的前置條件
 - [`metadata/schema.md`](../../metadata/schema.md) — 方向 A 的基礎 schema
 - [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — 方向 C 的基礎資料
-- [`shared-rules/rule-weight.md`](../../shared-rules/rule-weight.md) — 方向 D 的基礎規則
+- [`enforcement/rule-weight.md`](../../enforcement/rule-weight.md) — 方向 D 的基礎規則
 - [`governance/lifecycle/README.md`](../../governance/lifecycle/README.md) — 方向 E 的基礎 lifecycle
-- [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md) — 方向 B 的 source of truth
+- [`enforcement/linked-updates.md`](../../enforcement/linked-updates.md) — 方向 B 的 source of truth

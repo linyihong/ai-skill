@@ -1,4 +1,4 @@
-> 遵守 [共用規則索引](../../../../shared-rules/README.md)、[dependency-reading](../../../../shared-rules/dependency-reading.md)、[neutral-language](../../../../shared-rules/neutral-language.md)、[goal-action-validation](../../../../shared-rules/goal-action-validation.md) 與 [feedback-lessons](../../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+> 遵守 [共用規則索引](../../../../enforcement/README.md)、[dependency-reading](../../../../enforcement/dependency-reading.md)、[neutral-language](../../../../enforcement/neutral-language.md)、[goal-action-validation](../../../../enforcement/goal-action-validation.md) 與 [feedback-lessons](../../../../enforcement/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 # Extracted — See [`analysis/apk/tools-and-failures.md`](../../../../analysis/apk/tools-and-failures.md)
 
 ### 2026-05-07 - Provider Read Negative Matrix
@@ -77,4 +77,4 @@ Confirm all of the following before promoting a result:
 
 - Updated the common feedback indexes so this candidate lesson is discoverable.
 - Promotion into main workflow is deferred until at least one additional authorized project validates the no-writeback provider-read pattern.
-- Project-specific evidence must remain in project docs per [`reusable-guidance-boundary`](../../../../shared-rules/reusable-guidance-boundary.md).
+- Project-specific evidence must remain in project docs per [`reusable-guidance-boundary`](../../../../enforcement/reusable-guidance-boundary.md).

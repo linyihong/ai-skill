@@ -1,7 +1,7 @@
 # Entrypoint Positioning Drift Scenario
 # 測試 AI 在更新 entrypoint 時，是否同時更新 title、opening、indexes
 # 來源 failure pattern:
-#   - shared-rules/failure-patterns/entrypoint-positioning-drift.md
+#   - enforcement/failure-patterns/entrypoint-positioning-drift.md
 #
 # 原始錯誤：AI 更新了 secondary references、mid-document sections、links，
 # 卻漏掉 primary entrypoint positioning（root title、opening paragraph、index summary）
@@ -12,7 +12,7 @@ type: heuristic-obedience
 priority: P2
 
 failure_source:
-  pattern: shared-rules/failure-patterns/entrypoint-positioning-drift.md
+  pattern: enforcement/failure-patterns/entrypoint-positioning-drift.md
   class: validation-gap
   date: "2026-05-12"
   description: >
@@ -57,6 +57,6 @@ then:
   expected_final_route: full-entrypoint-update
 
   expected_intelligence:
-    - shared-rules/failure-patterns/entrypoint-positioning-drift.md
+    - enforcement/failure-patterns/entrypoint-positioning-drift.md
 
   unexpected_intelligence: []

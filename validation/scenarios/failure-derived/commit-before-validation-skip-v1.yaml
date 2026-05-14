@@ -1,7 +1,7 @@
 # Commit/Push Before Validation Skip Scenario
 # 測試 AI 在 commit/push 前是否完整執行 writeback transaction 關閉條件
 # 來源 failure pattern:
-#   - shared-rules/failure-patterns/commit-before-validation-skip.md
+#   - enforcement/failure-patterns/commit-before-validation-skip.md
 
 id: commit-before-validation-skip-v1
 domain: cross-domain
@@ -9,7 +9,7 @@ type: heuristic-obedience
 priority: P1
 
 failure_source:
-  pattern: shared-rules/failure-patterns/commit-before-validation-skip.md
+  pattern: enforcement/failure-patterns/commit-before-validation-skip.md
   class: validation-gap
   date: "2026-05-14"
   description: >
@@ -19,12 +19,12 @@ failure_source:
 given:
   task: commit_and_push
   artifacts:
-    - shared-rules/dependency-reading.md  # Writeback Transaction Guard 定義
+    - enforcement/dependency-reading.md  # Writeback Transaction Guard 定義
     - scripts/validate-knowledge-runtime.rb  # 知識庫 validator
   signals:
     - 修改涉及多個檔案
     - 修改涉及架構變更或路徑變更
-    - 修改涉及 shared-rules/ 或 knowledge/ 等核心層
+    - 修改涉及 enforcement/ 或 knowledge/ 等核心層
   constraints:
     - git status 有未提交的修改
     - 無其他 pending changes

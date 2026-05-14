@@ -365,7 +365,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 | Workflow 可執行 | 照著 workflow 步驟可完成操作 |
 | Signal 可驗證 | 每個 signal 有具體的檢查方式 |
 | 無專案特定內容 | Intelligence atoms 不含專案名稱、客戶名稱、raw evidence |
-| **去敏檢查** | 依 [`sanitization.md`](../../shared-rules/sanitization.md) 檢查：不得包含本機絕對路徑（改用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 占位符）、使用者名稱、私有工作目錄、clone 位置、secrets、raw tokens、私人 host、個資 |
+| **去敏檢查** | 依 [`sanitization.md`](../../enforcement/sanitization.md) 檢查：不得包含本機絕對路徑（改用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 占位符）、使用者名稱、私有工作目錄、clone 位置、secrets、raw tokens、私人 host、個資 |
 
 ### 不強制 atomize 的情況
 
@@ -426,24 +426,24 @@ Extraction 完成後需要更新以下文件：
 | `knowledge/indexes/README.md` | 加入新路由列（如需要） |
 | `knowledge/runtime/routing-registry.yaml` | 加入新 routing record（如需要） |
 | `knowledge/graphs/` | 加入新 graph edge（如需要） |
-| `plans/active/next-stage-upgrade-plan.md` | 更新 Phase 完成狀態 |
+| `plans/archived/next-stage-upgrade-plan.md` | 更新 Phase 完成狀態 |
 
 ### Step 7a：Shared-Rules 同步檢查（架構變更專用）
 
-當 extraction 涉及**架構重構**（目錄重組、分層新增、路徑變更、命名變更）時，除了更新上述索引，**必須**同步檢查 `shared-rules/` 中的路徑參考是否過期。
+當 extraction 涉及**架構重構**（目錄重組、分層新增、路徑變更、命名變更）時，除了更新上述索引，**必須**同步檢查 `enforcement/` 中的路徑參考是否過期。
 
 #### 檢查範圍
 
 | 類型 | 檢查重點 | 範例檔案 |
 |------|---------|---------|
 | 範例路徑 | 目錄結構範例是否仍指向舊路徑 | `governance/document-sizing.md` |
-| 表格內容 | 連動關係表是否仍使用舊路徑 | `shared-rules/linked-updates.md` |
-| 模板 | Promotion Target 是否缺少新分層選項 | `shared-rules/feedback-lessons.md` |
-| 索引 | lazy-load 表格是否指向舊檔案 | `shared-rules/README.md` |
+| 表格內容 | 連動關係表是否仍使用舊路徑 | `enforcement/linked-updates.md` |
+| 模板 | Promotion Target 是否缺少新分層選項 | `enforcement/feedback-lessons.md` |
+| 索引 | lazy-load 表格是否指向舊檔案 | `enforcement/README.md` |
 | 教學文件 | 目錄結構建議是否仍以舊結構為主 | `skills/ADDING_SKILLS.md` |
-| 規則正文 | 路徑描述是否過期 | `shared-rules/content-layering.md`、`shared-rules/tool-neutral-documentation.md` |
-| 流程規則 | Context Loading 步驟是否指向舊入口 | `shared-rules/decision-efficiency.md` |
-| 引用規則 | Cross-skill reference 格式是否過期 | `shared-rules/cross-skill-references.md` |
+| 規則正文 | 路徑描述是否過期 | `enforcement/content-layering.md`、`enforcement/tool-neutral-documentation.md` |
+| 流程規則 | Context Loading 步驟是否指向舊入口 | `enforcement/decision-efficiency.md` |
+| 引用規則 | Cross-skill reference 格式是否過期 | `enforcement/cross-skill-references.md` |
 
 #### 更新原則
 
@@ -456,12 +456,12 @@ Extraction 完成後需要更新以下文件：
 
 ```bash
 # 確認無遺漏的舊路徑參考（預期：無，或只有 intentional 向後相容參考）
-grep -rn "skills/<old-path>/" shared-rules/ --include="*.md"
+grep -rn "skills/<old-path>/" enforcement/ --include="*.md"
 
 # 確認新分層路徑已出現
-grep -rn "workflow/<domain>/" shared-rules/ --include="*.md"
-grep -rn "analysis/<domain>/" shared-rules/ --include="*.md"
-grep -rn "intelligence/<domain>/" shared-rules/ --include="*.md"
+grep -rn "workflow/<domain>/" enforcement/ --include="*.md"
+grep -rn "analysis/<domain>/" enforcement/ --include="*.md"
+grep -rn "intelligence/<domain>/" enforcement/ --include="*.md"
 ```
 
 #### 觸發條件
@@ -470,7 +470,7 @@ grep -rn "intelligence/<domain>/" shared-rules/ --include="*.md"
 
 - 新增或重組 `workflow/<domain>/`、`analysis/<domain>/`、`intelligence/<domain>/` 等新分層
 - 將舊 `skills/<skill-name>/` 內容提取到新分層
-- 修改 `skills/` 結構後，未檢查 `shared-rules/` 中的範例路徑、表格、模板
+- 修改 `skills/` 結構後，未檢查 `enforcement/` 中的範例路徑、表格、模板
 - 只更新了「被提取的檔案本身」，但沒有更新「描述如何提取的規則」
 
 ---
@@ -505,4 +505,4 @@ grep -rn "intelligence/<domain>/" shared-rules/ --include="*.md"
 - [`metadata/schema.md`](../../metadata/schema.md) — 定義 Knowledge Atom metadata schema，intelligence atoms 應符合其格式
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — 任務路由索引，extraction 完成後需更新
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing registry，extraction 完成後需更新
-- [`plans/active/next-stage-upgrade-plan.md`](../../plans/active/next-stage-upgrade-plan.md) — 整體升級規劃，本 pipeline 是 Phase 31 的核心產出
+- [`plans/archived/next-stage-upgrade-plan.md`](../../plans/archived/next-stage-upgrade-plan.md) — 整體升級規劃，本 pipeline 是 Phase 31 的核心產出

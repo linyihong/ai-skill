@@ -11,7 +11,7 @@ Record the reusable observation:
 - Which layer exposed it: client code, transport, API contract, storage, logs, build config, firmware, hardware context, protocol, or runtime behavior?
 - Is the issue confirmed, suspected, or only a risk pattern?
 
-Do not copy target-specific endpoints, tokens, secrets, device IDs, raw user data, or project incident details into this skill. Apply [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md) before promoting observations into reusable guidance.
+Do not copy target-specific endpoints, tokens, secrets, device IDs, raw user data, or project incident details into this skill. Apply [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) before promoting observations into reusable guidance.
 
 Before code work, run change intake:
 
@@ -202,7 +202,7 @@ Prefer linking between folders over duplicating the same guidance.
 
 ## 6. Apply Required Linked Updates
 
-Before finishing a change, follow the repo-wide rule in [`../../shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md). If the update affects related folders, those linked updates are **required** in the same change:
+Before finishing a change, follow the repo-wide rule in [`../../enforcement/linked-updates.md`](../../enforcement/linked-updates.md). If the update affects related folders, those linked updates are **required** in the same change:
 
 | Changed area | Must update or verify |
 | --- | --- |

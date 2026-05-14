@@ -47,4 +47,4 @@ Prefer this order:
 
 ## Required Linked Updates
 
-Follow [`../../../../shared-rules/linked-updates.md`](../../../../shared-rules/linked-updates.md). Embedded/platform changes must update or verify [`../../implementation/embedded/`](../../implementation/embedded/), [`../../process/`](../../process/), [`../../CHECKLIST.md`](../../CHECKLIST.md), and relevant templates or review checklists.
+Follow [`../../../../enforcement/linked-updates.md`](../../../../enforcement/linked-updates.md). Embedded/platform changes must update or verify [`../../implementation/embedded/`](../../implementation/embedded/), [`../../process/`](../../process/), [`../../CHECKLIST.md`](../../CHECKLIST.md), and relevant templates or review checklists.

@@ -44,7 +44,7 @@ Capture practical guidance for:
 - High-level controls that can be implemented by app, API, backend, or release engineering teams.
 - Checklists that help prevent repeat mistakes.
 - Guidance that clearly names validation steps and limitations.
-- Generalized incident lessons that explain the reusable cause, decision rule, and validation method without preserving the triggering project's concrete details; follow [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md).
+- Generalized incident lessons that explain the reusable cause, decision rule, and validation method without preserving the triggering project's concrete details; follow [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md).
 
 ## What Does Not Belong Here
 
@@ -83,7 +83,7 @@ When adding new guidance:
 5. Put development process and contract-first flow guidance in [`process/`](process/).
 6. Put repeatable review steps in [`checklists/`](checklists/).
 7. Put draft reusable lessons in the matching [`feedback_history/<category>/`](feedback_history/) folder before promoting them into the structured folders; use `feedback_history/common/` for cross-cutting lessons.
-8. When the source is a project incident, split the generalized method into this skill and keep concrete reproduction evidence in the project repository, per [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md).
+8. When the source is a project incident, split the generalized method into this skill and keep concrete reproduction evidence in the project repository, per [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md).
 
 For existing implemented projects, use [`process/`](process/) to audit and backfill missing documents. Product Brief gaps can remain `unknown`; BDD behavior must be completed from observable behavior and implementation evidence.
 
@@ -101,7 +101,7 @@ This keeps the skill readable as it grows across mobile, web, backend, and futur
 
 ## Required Linked Updates
 
-Repo-wide rule: [`../../shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md). Some changes must move together. If a change touches a control, platform, language, checklist, implementation pattern, or template, the related files **must** be updated or explicitly checked in the same change.
+Repo-wide rule: [`../../enforcement/linked-updates.md`](../../enforcement/linked-updates.md). Some changes must move together. If a change touches a control, platform, language, checklist, implementation pattern, or template, the related files **must** be updated or explicitly checked in the same change.
 
 Examples:
 

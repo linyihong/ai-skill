@@ -28,7 +28,7 @@
 問題：新目錄名稱是否與以下任一衝突？
 ├── 同層其他目錄（如 engineering/ 下的兄弟目錄）
 ├── 不同層但同名目錄（如根目錄 analysis/ vs engineering/analysis/）
-├── 語意相近但邊界不同的目錄（如 intelligence/engineering/heuristics/ vs shared-rules/failure-patterns/）
+├── 語意相近但邊界不同的目錄（如 intelligence/engineering/heuristics/ vs enforcement/failure-patterns/）
 └── 已棄用或正在遷移的舊目錄
 ```
 
@@ -46,7 +46,7 @@
 ├── 與上層目錄的邊界（這個目錄的內容為什麼不能直接放在上層？）
 ├── 與兄弟目錄的邊界（這個目錄和隔壁目錄的差別是什麼？）
 ├── 與同名跨層目錄的邊界（如果有的話）
-└── 與 shared-rules/ 的邊界（工程判斷 vs 可執行 policy）
+└── 與 enforcement/ 的邊界（工程判斷 vs 可執行 policy）
 ```
 
 **判斷原則**：
@@ -164,9 +164,9 @@ intelligence/engineering/
 | 流程 | 關係 |
 |------|------|
 | [`knowledge-update-flow.md`](knowledge-update-flow.md) | 本 checkpoint 可作為 Step 1（觸發檢查）的可選子檢查 |
-| [`dependency-reading.md`](../../shared-rules/dependency-reading.md) | Step 5 的影響評估需要遵守 dependency reading 規則 |
-| [`linked-updates.md`](../../shared-rules/linked-updates.md) | 目錄重構後的 linked updates 需要遵守此規則 |
-| [`content-layering.md`](../../shared-rules/content-layering.md) | 目錄結構需要與內容分層原則一致 |
+| [`dependency-reading.md`](../../enforcement/dependency-reading.md) | Step 5 的影響評估需要遵守 dependency reading 規則 |
+| [`linked-updates.md`](../../enforcement/linked-updates.md) | 目錄重構後的 linked updates 需要遵守此規則 |
+| [`content-layering.md`](../../enforcement/content-layering.md) | 目錄結構需要與內容分層原則一致 |
 | [`intelligence/README.md`](../../intelligence/README.md) | 定義了 intelligence 層的放什麼/不放什麼 |
 | [`analysis/README.md`](../../analysis/README.md) | 定義了 analysis 層的放什麼/不放什麼 |
 

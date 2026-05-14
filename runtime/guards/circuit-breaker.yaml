@@ -70,8 +70,8 @@ conflict_rules:
   description: 偵測目前 context 中的規則衝突
   check_on: task_start
   sources:
-    - shared-rules/rule-weight.md
-    - shared-rules/README.md
+    - enforcement/rule-weight.md
+    - enforcement/README.md
   on_conflict:
     - action: warn
       message: "⚠️ 偵測到規則衝突。依 rule-weight.md 判斷優先序。"

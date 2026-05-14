@@ -41,7 +41,7 @@ given:
     - governance/lifecycle/directory-structure-governance.md  # 5 步驟 Checkpoint 定義
     - governance/lifecycle/knowledge-update-flow.md           # 知識更新流程（Step 1 觸發）
     - governance/lifecycle/README.md                          # 生命週期入口
-    - shared-rules/linked-updates.md                          # 連動更新規則
+    - enforcement/linked-updates.md                          # 連動更新規則
     - scripts/validate-knowledge-runtime.rb                   # Validator（含 validate_directory_naming）
   signals:
     - 需要在 intelligence/engineering/ 下新增 domain 目錄
@@ -84,13 +84,13 @@ then:
   expected_final_route: |
     intelligence/engineering/<domain>/README.md  (含邊界說明)
     governance/lifecycle/directory-structure-governance.md  (5 步驟 Checkpoint 已執行)
-    shared-rules/linked-updates.md  (連動更新計畫已執行)
+    enforcement/linked-updates.md  (連動更新計畫已執行)
     scripts/validate-knowledge-runtime.rb  (validate_directory_naming 已通過)
 
   expected_intelligence:
     - governance/lifecycle/directory-structure-governance.md
     - governance/lifecycle/knowledge-update-flow.md
-    - shared-rules/linked-updates.md
+    - enforcement/linked-updates.md
     - scripts/validate-knowledge-runtime.rb
 
   unexpected_intelligence:

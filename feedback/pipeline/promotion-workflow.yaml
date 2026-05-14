@@ -6,7 +6,7 @@
 #   - feedback/pipeline/promotion-engine.yaml (scoring & decision)
 #   - governance/lifecycle/README.md (lifecycle states)
 #   - governance/validation/README.md (validation gates)
-#   - shared-rules/linked-updates.md (linked update rules)
+#   - enforcement/linked-updates.md (linked update rules)
 
 promotion_workflow_version: v1
 status: candidate

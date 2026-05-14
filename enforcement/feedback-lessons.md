@@ -9,14 +9,14 @@
 - **不要**在每條 lesson 裡重複貼上 [sanitization.md](sanitization.md)、[dependency-reading.md](dependency-reading.md)、[neutral-language.md](neutral-language.md)、[goal-action-validation.md](goal-action-validation.md)、[authorization-scope.md](authorization-scope.md) 等全文；條目頂部用一行**引用** [README.md](README.md) 或**本檔**即可。
 - **Agent 行為：** 在授權分析過程中一旦得到可重用技巧／失敗模式／驗證規則，應**主動**在同一輪對話內於 **`feedback/history/<domain>/`** 對應分類新增檔案（依下方**分類規則**、**檔名規則**與**模板**），**不要**等使用者提醒。
 - **每輪回饋檢查：** 每個有實質進展的工作回合結束前、切回長時間專案工作前、提交 project-only evidence 前、或使用者說「繼續」展開下一輪前，agent 必須明確自問：本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？若是，先開啟 canonical `<AI_SKILL_REPO>` writeback transaction；若否，最終回覆可簡短說明本輪沒有新增泛化 lesson，或只留下 project-specific evidence。
-- 只寫**通用方法**，不寫特定 App / project incident 的私有結論或具體證據；必須依 [reusable-guidance-boundary.md](reusable-guidance-boundary.md) 先抽象化原因、規則與驗證，再依 [sanitization.md](sanitization.md) 去敏；若 lesson 來自 agent 失誤或閉環不完整，另依 [failure-learning-system.md](failure-learning-system.md) 分類失效模式並判斷是否需要 `shared-rules/failure-patterns/`；不要只新增 skill-local feedback lesson 就宣稱已吸收 agent 錯誤，需先判斷是否也需要 cross-skill failure pattern；發現 skill/rule/template/lesson 更新時依 [dependency-reading.md](dependency-reading.md) 讀取依賴；標題、slug、摘要與正文必須依 [neutral-language.md](neutral-language.md) 使用中性低爭議用語；每個重要結論必須依 [goal-action-validation.md](goal-action-validation.md) 說明目標、執行、驗證或參考來源；必須說明證據與適用／不適用條件；不確定標 `experimental`。
+- 只寫**通用方法**，不寫特定 App / project incident 的私有結論或具體證據；必須依 [reusable-guidance-boundary.md](reusable-guidance-boundary.md) 先抽象化原因、規則與驗證，再依 [sanitization.md](sanitization.md) 去敏；若 lesson 來自 agent 失誤或閉環不完整，另依 [failure-learning-system.md](failure-learning-system.md) 分類失效模式並判斷是否需要 `enforcement/failure-patterns/`；不要只新增 skill-local feedback lesson 就宣稱已吸收 agent 錯誤，需先判斷是否也需要 cross-skill failure pattern；發現 skill/rule/template/lesson 更新時依 [dependency-reading.md](dependency-reading.md) 讀取依賴；標題、slug、摘要與正文必須依 [neutral-language.md](neutral-language.md) 使用中性低爭議用語；每個重要結論必須依 [goal-action-validation.md](goal-action-validation.md) 說明目標、執行、驗證或參考來源；必須說明證據與適用／不適用條件；不確定標 `experimental`。
 - **去敏檢查：** 寫入任何 lesson 前，必須依 [`sanitization.md`](sanitization.md) 逐項檢查：不得包含本機絕對路徑（改用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 占位符）、使用者名稱、私有工作目錄、clone 位置、secrets、raw tokens、私人 host、個資或 project-specific evidence。寫入完成後在 `git diff` 中再次確認去敏項目已處理。
 
 ## 條目放哪裡
 
 | 內容 | 位置 |
 | --- | --- |
-| **共用政策（全庫）** | [`shared-rules/README.md`](README.md) |
+| **共用政策（全庫）** | [`enforcement/README.md`](README.md) |
 | **本檔** | 命名規則、模板、索引與 Git 約定（**唯一正文**） |
 | **每一條獨立 lesson（所有 skill，無論遷移狀態）** | **`feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`** |
 | **條目總覽表**（可選） | **`feedback/history/<domain>/README.md`** 與必要的 **`feedback/history/<domain>/<category>/README.md`** |
@@ -74,7 +74,7 @@
 2. 確認 domain 分類：`feedback/history/development-guidance/common/`
 3. ✅ 最終位置：`feedback/history/development-guidance/common/2026-05-13_094500-anti-bot-gateway-blocks-external-sdk.md`
 
-> 更多 failure pattern 請見 [`shared-rules/failure-patterns/skill-classification-boundary-confusion.md`](failure-patterns/skill-classification-boundary-confusion.md)。
+> 更多 failure pattern 請見 [`enforcement/failure-patterns/skill-classification-boundary-confusion.md`](failure-patterns/skill-classification-boundary-confusion.md)。
 
 成熟後可將 lesson 整理進 `workflow/<domain>/execution-flow.md`、`analysis/<domain>/` 或 `intelligence/<domain>/`（見模板中 **Promotion Target**）。
 
@@ -163,7 +163,7 @@ Status: candidate | validated | deprecated | promoted | experimental
 - `workflow/<domain>/execution-flow.md`
 - `analysis/<domain>/`
 - `intelligence/<domain>/`
-- `shared-rules/`（若 lesson 適合提升為全庫規則）
+- `enforcement/`（若 lesson 適合提升為全庫規則）
 
 #### Required Linked Updates
 

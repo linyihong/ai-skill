@@ -22,7 +22,7 @@
 | `route.skill.discovery` | `skills-index.yaml` | `small` | `index-only` | Task intent 已對應到 skills-index.yaml 的 triggers，entrypoint 與 summary path 可解析。 |
 | `route.runtime.activation-rules` | `runtime/router/activation-rules.yaml` | `small` | `index-only` | 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。 |
 | `route.runtime.context-ttl` | `runtime/context/ttl-policy.yaml` | `small` | `index-only` | Context TTL 已套用，過期 context 已 prune，token 使用率在預算內。 |
-| `route.governance.durable-goal-boundary` | `shared-rules/conversation-goal-ledger.md` | `large` | `source-backed` | 長期狀態已落到 durable planning 文件，且 active goal 完成後才刪除。 |
+| `route.governance.durable-goal-boundary` | `enforcement/conversation-goal-ledger.md` | `large` | `source-backed` | 長期狀態已落到 durable planning 文件，且 active goal 完成後才刪除。 |
 | `route.runtime.context-loading` | `runtime/routing/README.md` | `small` | `summary-first` | Primary source、deferred sources、source-of-truth gate 與 validation signal 已可被記錄。 |
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `large` | `source-backed` | 欄位可套用到第一批 atom candidates，且 Markdown links 可解析。 |
 | `route.skill.apk-analysis` | `skills/apk-analysis/SKILL.md` | `specialized` | `source-backed` | 舊入口仍可讀，新 reference-first paths 可找到，且未 bulk migrate skill content。 |

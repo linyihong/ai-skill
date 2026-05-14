@@ -31,7 +31,7 @@
 除非章節明確討論工具整合，否則下列位置避免工具專屬措辭：
 
 - Root `README.md`。
-- `shared-rules/README.md` 索引摘要。
+- `enforcement/README.md` 索引摘要。
 - `workflow/<domain>/`、`analysis/<domain>/`、`intelligence/<domain>/` 下的所有文件。
 - Skill templates 與 `skills/ADDING_SKILLS.md`。
 - Feedback lessons 與可重用 checklists。
@@ -87,7 +87,7 @@ tools/
 | Tool-wide setup、sync、global hooks、UI、settings | `ai-tools/<tool>.md` |
 | 單一工具的 skill-specific 執行差異 | `tools/adapters/<tool>.md` |
 | Project-specific tool config | Project docs 或 project tool config |
-| Reusable cross-tool policy | `shared-rules/` |
+| Reusable cross-tool policy | `enforcement/` |
 
 ## Review Checklist
 

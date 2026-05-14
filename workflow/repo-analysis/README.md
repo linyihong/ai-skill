@@ -30,7 +30,7 @@
 ## 第一批候選遷移來源
 
 - `skills/app-development-guidance/process/README.md` — 已提取 Existing Project Documentation Backfill 到 `analysis/repo/documentation-backfill.md`。
-- `plans/active/next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明。
+- `plans/archived/next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明。
 
 ## 已提取內容
 

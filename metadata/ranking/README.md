@@ -20,7 +20,7 @@
 
 1. 必要的 safety、source-of-truth、dependency reading 與 validation rules。
 2. 最新 user goal 與 active `.agent-goals/` state。
-3. 目前 source-of-truth entrypoints，尤其是 `shared-rules/` 與 `skills/<name>/SKILL.md`。
+3. 目前 source-of-truth entrypoints，尤其是 `enforcement/` 與 `skills/<name>/SKILL.md`。
 4. 直接符合 task intent 的 `validated` 或 `stable` Knowledge Atoms。
 5. 能協助導航、但不取代 source 行為的 candidate maps 與 summaries。
 6. Examples、background references 與 optional optimization notes。

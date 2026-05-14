@@ -40,7 +40,7 @@ rules:
       strategy: lazy
       priority: P1
       estimated_tokens: 800
-      source: shared-rules/linked-updates.md
+      source: enforcement/linked-updates.md
 
   - rule_id: failure-learning-system
     description: 失效學習系統 — 將重複 agent 錯誤轉成 durable prevention
@@ -74,7 +74,7 @@ rules:
       strategy: lazy
       priority: P1
       estimated_tokens: 1200
-      source: shared-rules/failure-learning-system.md
+      source: enforcement/failure-learning-system.md
 
   - rule_id: decision-efficiency
     description: 決策效率 — 以最高收益路線做決策
@@ -99,7 +99,7 @@ rules:
       strategy: lazy
       priority: P2
       estimated_tokens: 600
-      source: shared-rules/decision-efficiency.md
+      source: enforcement/decision-efficiency.md
 
   - rule_id: tool-neutral-documentation
     description: 工具中立文件 — 可重用文件保持工具中立
@@ -112,14 +112,14 @@ rules:
             - update-readme
             - create-shared-rule
         - type: file_change
-          pattern: "shared-rules/**"
+          pattern: "enforcement/**"
         - type: file_change
           pattern: "skills/**/SKILL.md"
     load:
       strategy: lazy
       priority: P2
       estimated_tokens: 500
-      source: shared-rules/tool-neutral-documentation.md
+      source: enforcement/tool-neutral-documentation.md
 
   - rule_id: document-sizing
     description: 文件大小與拆分 — 文件變大時如何拆分
@@ -136,7 +136,7 @@ rules:
       strategy: lazy
       priority: P2
       estimated_tokens: 400
-      source: shared-rules/document-sizing.md
+      source: enforcement/document-sizing.md
 
   - rule_id: document-todo-list
     description: 文件 TODO 表 — 文件前段 TODO 與 goal/章節連結
@@ -153,7 +153,7 @@ rules:
       strategy: lazy
       priority: P2
       estimated_tokens: 300
-      source: shared-rules/document-todo-list.md
+      source: enforcement/document-todo-list.md
 
   - rule_id: goal-action-validation
     description: 目標、執行、驗證 — 重要工作單元的驗證流程
@@ -175,7 +175,7 @@ rules:
       strategy: lazy
       priority: P2
       estimated_tokens: 500
-      source: shared-rules/goal-action-validation.md
+      source: enforcement/goal-action-validation.md
 
   - rule_id: neutral-language
     description: 中性低爭議用語 — 文件語言一致性
@@ -187,14 +187,14 @@ rules:
             - review-documentation
             - translate
         - type: file_change
-          pattern: "shared-rules/**"
+          pattern: "enforcement/**"
         - type: file_change
           pattern: "skills/**/README.md"
     load:
       strategy: lazy
       priority: P2
       estimated_tokens: 300
-      source: shared-rules/neutral-language.md
+      source: enforcement/neutral-language.md
 
   - rule_id: sanitization
     description: 去敏與占位符 — 什麼不可寫進可重用文件
@@ -211,7 +211,7 @@ rules:
       strategy: lazy
       priority: P1
       estimated_tokens: 400
-      source: shared-rules/sanitization.md
+      source: enforcement/sanitization.md
 
   - rule_id: authorization-scope
     description: 授權與範圍 — 僅在授權範圍內分析
@@ -233,7 +233,7 @@ rules:
       strategy: lazy
       priority: P0
       estimated_tokens: 300
-      source: shared-rules/authorization-scope.md
+      source: enforcement/authorization-scope.md
 
   - rule_id: cross-skill-references
     description: Cross-skill references — 一個 skill 引用另一個 skill 的規範
@@ -251,7 +251,7 @@ rules:
       strategy: lazy
       priority: P2
       estimated_tokens: 400
-      source: shared-rules/cross-skill-references.md
+      source: enforcement/cross-skill-references.md
 
   - rule_id: feedback-lessons
     description: Feedback 與技巧條目 — 檔名規則、模板、agent 行為
@@ -269,7 +269,7 @@ rules:
       strategy: lazy
       priority: P2
       estimated_tokens: 600
-      source: shared-rules/feedback-lessons.md
+      source: enforcement/feedback-lessons.md
 
   - rule_id: content-layering
     description: 內容分層 — 共用規則／技巧／業務專案各自放哪
@@ -287,7 +287,7 @@ rules:
       strategy: lazy
       priority: P2
       estimated_tokens: 300
-      source: shared-rules/content-layering.md
+      source: enforcement/content-layering.md
 
   - rule_id: reusable-guidance-boundary
     description: 可重用規則與專案證據邊界
@@ -308,7 +308,7 @@ rules:
       strategy: lazy
       priority: P2
       estimated_tokens: 400
-      source: shared-rules/reusable-guidance-boundary.md
+      source: enforcement/reusable-guidance-boundary.md
 
   - rule_id: cursor-sync
     description: 工具同步 — Cursor 專屬同步策略
@@ -326,4 +326,4 @@ rules:
       strategy: lazy
       priority: P3
       estimated_tokens: 300
-      source: shared-rules/cursor-sync.md
+      source: enforcement/cursor-sync.md

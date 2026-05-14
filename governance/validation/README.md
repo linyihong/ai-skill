@@ -1,13 +1,13 @@
 # Knowledge Validation Gates
 
-`governance/validation/` 定義新 AI-native 分層變更的 validation gates。它補充 `shared-rules/` 的可執行規則，但不取代 shared rules。
+`governance/validation/` 定義新 AI-native 分層變更的 validation gates。它補充 `enforcement/` 的可執行規則，但不取代 shared rules。
 
 ## 必要 Gates
 
 | Gate | 必要檢查 | 適用時機 |
 | --- | --- | --- |
 | Source boundary | 確認編輯的是 canonical repository paths，不是 tool mirrors 或 runtime copies。 | 每次 Ai-skill writeback。 |
-| Old entrypoint | 確認舊 `skills/`、`shared-rules/`、`ai-tools/` 或 `scripts/` entrypoints 仍可到達。 | Candidate maps、atom promotions、migrations。 |
+| Old entrypoint | 確認舊 `skills/`、`enforcement/`、`ai-tools/` 或 `scripts/` entrypoints 仍可到達。 | Candidate maps、atom promotions、migrations。 |
 | Linked updates | 檢查受影響 README、roadmap、index、metadata 與 source entry files。 | 任何新 layer path 或 routing change。 |
 | Metadata | 引入或 promotion Knowledge Atom 時，確認 `metadata/schema.md` 欄位已存在。 | Candidate atom、validated atom、promoted atom。 |
 | Navigation | 應可發現新路徑時，確認 `knowledge/indexes/README.md` 可 route 到該路徑。 | Routing surfaces 與 promoted reference paths。 |
@@ -99,7 +99,7 @@ Validation:
 
 ## 與 Shared Rules 的關係
 
-- Dependency reading、canonical writeback、commit / push / readback 與 clean status 仍由 `shared-rules/dependency-reading.md` 管理。
-- Linked update requirements 仍由 `shared-rules/linked-updates.md` 管理。
-- Rule priority 仍由 `shared-rules/rule-weight.md` 管理。
+- Dependency reading、canonical writeback、commit / push / readback 與 clean status 仍由 `enforcement/dependency-reading.md` 管理。
+- Linked update requirements 仍由 `enforcement/linked-updates.md` 管理。
+- Rule priority 仍由 `enforcement/rule-weight.md` 管理。
 - 本檔提供新 knowledge system 的 architecture-layer validation shape。

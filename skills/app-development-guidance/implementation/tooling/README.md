@@ -44,4 +44,4 @@ Use this guidance for developer tools: IDE extensions, linters, static analyzers
 
 ## Required Linked Updates
 
-Follow [`../../../../shared-rules/linked-updates.md`](../../../../shared-rules/linked-updates.md). Tooling implementation changes must update or verify [`../../process/`](../../process/), [`../../CHECKLIST.md`](../../CHECKLIST.md), templates if they add traceability fields, and any relevant language/platform notes.
+Follow [`../../../../enforcement/linked-updates.md`](../../../../enforcement/linked-updates.md). Tooling implementation changes must update or verify [`../../process/`](../../process/), [`../../CHECKLIST.md`](../../CHECKLIST.md), templates if they add traceability fields, and any relevant language/platform notes.

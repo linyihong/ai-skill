@@ -78,7 +78,7 @@ if [ -n "$(git diff --name-only)" ] || [ -n "$(git diff --cached --name-only)" ]
 fi
 ```
 
-#### 3. 更新 `shared-rules/linked-updates.md`
+#### 3. 更新 `enforcement/linked-updates.md`
 
 在「常見連動關係」表格中新增一列：
 
@@ -216,7 +216,7 @@ flowchart LR
 
 1. ✅ 建立 `scripts/git-hooks/pre-commit`
 2. ✅ 修改 `scripts/ai-skill-close-loop.sh` 加入 validation gate
-3. ✅ 更新 `shared-rules/linked-updates.md` 加入對應連動規則
+3. ✅ 更新 `enforcement/linked-updates.md` 加入對應連動規則
 4. ✅ 更新 `scripts/README.md` 加入提醒
 5. ✅ 設定 `git config core.hooksPath scripts/git-hooks` 啟用 hook
 6. ✅ 測試：故意引入一個錯誤，確認 hook 阻擋 commit

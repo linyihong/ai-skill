@@ -1,6 +1,6 @@
 # Failure Memory
 
-`memory/failure/` 保存**抽象化的失效模式記憶**。不同於 `shared-rules/failure-patterns/`（可執行的 failure detection 規則），failure memory 記錄的是「發生過什麼失效、為什麼發生、學到了什麼」，作為 failure intelligence 的原始素材與回顧依據。
+`memory/failure/` 保存**抽象化的失效模式記憶**。不同於 `enforcement/failure-patterns/`（可執行的 failure detection 規則），failure memory 記錄的是「發生過什麼失效、為什麼發生、學到了什麼」，作為 failure intelligence 的原始素材與回顧依據。
 
 ## 用途
 
@@ -12,7 +12,7 @@
 
 ## 不放什麼
 
-- 可執行的 failure detection 規則 → `shared-rules/failure-patterns/`
+- 可執行的 failure detection 規則 → `enforcement/failure-patterns/`
 - 抽象化的 failure intelligence atom → `intelligence/engineering/failure/`
 - 專案私有的 incident raw logs → 留在業務專案
 - Session-local 的錯誤記錄 → `memory/working/`
@@ -57,7 +57,7 @@
 - {date}：{brief context}
 
 ## Linked Patterns
-- {related failure pattern 1}（→ shared-rules/failure-patterns/）
+- {related failure pattern 1}（→ enforcement/failure-patterns/）
 - {related failure pattern 2}
 ```
 
@@ -67,15 +67,15 @@
 2. **去敏**：Failure memory 不保存 token、host、private key 等敏感資訊。
 3. **連結到 source**：每個 failure record 應連結到發生時的 session summary，以便追溯。
 4. **Promotion 路徑**：成熟的 failure lesson 應考慮 promotion 到：
-   - `shared-rules/failure-patterns/`（可執行規則）
+   - `enforcement/failure-patterns/`（可執行規則）
    - `intelligence/engineering/failure/`（抽象化 intelligence）
 5. **演化追蹤**：同一 failure 模式多次發生時，應更新 occurrences 列表並評估是否需要升級 prevention 策略。
 6. **Token-aware**：每個 failure record 不超過 400 tokens。
 
 ## 與既有層的關係
 
-- `shared-rules/failure-learning-system.md`：定義 failure learning 的可執行流程
-- `shared-rules/failure-patterns/`：可執行的 failure detection 規則（promotion 目標）
+- `enforcement/failure-learning-system.md`：定義 failure learning 的可執行流程
+- `enforcement/failure-patterns/`：可執行的 failure detection 規則（promotion 目標）
 - `intelligence/engineering/failure/`：抽象化的 failure intelligence（promotion 目標）
 - `memory/episodic/`：failure 發生的情境細節
 - `memory/summary/`：failure 發生時的 session 摘要

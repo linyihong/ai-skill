@@ -44,4 +44,4 @@ Keep these documents separate:
 
 ## Required Linked Updates
 
-Follow [`../../../../shared-rules/linked-updates.md`](../../../../shared-rules/linked-updates.md). Vendor integration changes must update or verify [`../../controls/api-transport.md`](../../controls/api-transport.md), [`../../controls/logging-telemetry.md`](../../controls/logging-telemetry.md), [`../../platforms/backend/api.md`](../../platforms/backend/api.md), [`../../checklists/api-security-review.md`](../../checklists/api-security-review.md), and project-specific sanitized docs.
+Follow [`../../../../enforcement/linked-updates.md`](../../../../enforcement/linked-updates.md). Vendor integration changes must update or verify [`../../controls/api-transport.md`](../../controls/api-transport.md), [`../../controls/logging-telemetry.md`](../../controls/logging-telemetry.md), [`../../platforms/backend/api.md`](../../platforms/backend/api.md), [`../../checklists/api-security-review.md`](../../checklists/api-security-review.md), and project-specific sanitized docs.

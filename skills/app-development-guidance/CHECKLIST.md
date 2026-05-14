@@ -95,7 +95,7 @@ When a checklist item changes because of a new control or implementation pattern
 
 ## Reusable Guidance Boundary
 
-- Apply the global rule in [`reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md).
+- Apply the global rule in [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md).
 - Reusable skill guidance states the generalized failure mode, decision rule, owner layer, and validation method.
 - Project names, local paths, hosts, endpoint strings, payload fragments, sample IDs, class names, live-data quirks, and execution results stay in the project repository, not the reusable skill.
 - Incident-derived lessons are split: generalized method in the skill; concrete reproduction evidence and BDD/test file names in project docs.

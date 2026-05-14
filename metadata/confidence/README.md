@@ -43,7 +43,7 @@
 
 - 舊 `skills/` source 已變更，而 atom 尚未重新檢查。
 - Links 失效。
-- 與 `shared-rules/` 或 source-of-truth skill behavior 出現衝突。
+- 與 `enforcement/` 或 source-of-truth skill behavior 出現衝突。
 - Candidate path 被誤認為 replacement path。
 
 ## 驗證

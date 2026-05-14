@@ -11,10 +11,10 @@
 
   "reference": {
     "claude_usage": "ai-tools/claude.md",
-    "bootstrap_rules": "shared-rules/README.md",
+    "bootstrap_rules": "enforcement/README.md",
     "task_routing": "knowledge/indexes/README.md",
     "goal_tracking": ".agent-goals/",
-    "failure_learning": "shared-rules/failure-learning-system.md",
+    "failure_learning": "enforcement/failure-learning-system.md",
     "token_budget": "runtime/budget/token-budget.yaml",
     "context_health": "runtime/health/context-health-score.yaml",
     "circuit_breaker": "runtime/guards/circuit-breaker.yaml",

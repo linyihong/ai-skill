@@ -1,7 +1,7 @@
 # Linked Updates Completeness（連動更新完整性）
 
 **Status**: `candidate-intelligence`
-**Source**: 本系統 Phase 33-35 實際運作經驗（[`shared-rules/linked-updates.md`](../../../shared-rules/linked-updates.md)）
+**Source**: 本系統 Phase 33-35 實際運作經驗（[`enforcement/linked-updates.md`](../../../enforcement/linked-updates.md)）
 
 ## 原則
 
@@ -34,8 +34,8 @@
 | 刪除舊檔案 | 所有引用該檔案的 README、index、graph、summary |
 | 修改路徑 | `skills-index.yaml` 的 `related` 欄位、`routing-registry.yaml` 的 route |
 | 新增 intelligence atom | `intelligence/<domain>/README.md` 的 atoms 表格、Knowledge Graph |
-| 修改 shared-rules | `shared-rules/README.md` 的索引、`dependency-reading.md` 的邊界 |
-| 修改架構文件 | `plans/active/next-stage-upgrade-plan.md` 的 Durable Roadmap Goals |
+| 修改 shared-rules | `enforcement/README.md` 的索引、`dependency-reading.md` 的邊界 |
+| 修改架構文件 | `plans/archived/next-stage-upgrade-plan.md` 的 Durable Roadmap Goals |
 
 ## 預防方式
 

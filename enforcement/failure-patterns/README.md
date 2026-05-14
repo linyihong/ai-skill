@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | [Correction loop bypass](correction-loop-bypass.md) | `validation-gap` | validated | 防止 agent 在使用者指出修正不完整時，只修當下文字，卻漏掉 `.agent-goals`、failure learning、linked updates、validation、commit/push/readback。 |
 | [Entrypoint positioning drift](entrypoint-positioning-drift.md) | `validation-gap` | validated | 防止 agent 在命名或架構變更後，只更新次要連結或段落，卻留下 root title、opening paragraph 或主要入口 framing 過期。 |
-| [Shared-rules architecture drift](shared-rules-architecture-drift.md) | `dependency-miss` / `validation-gap` | validated | 防止 agent 在架構重構後，只更新主要檔案（workflow、intelligence、analysis）卻漏掉 shared-rules/ 中的路徑參考同步。 |
+| [Shared-rules architecture drift](shared-rules-architecture-drift.md) | `dependency-miss` / `validation-gap` | validated | 防止 agent 在架構重構後，只更新主要檔案（workflow、intelligence、analysis）卻漏掉 enforcement/ 中的路徑參考同步。 |
 | [Skill-local feedback bypass](skill-local-feedback-bypass.md) | `dependency-miss` / `validation-gap` | validated | 防止 agent 只補單一 skill 的 feedback lesson，卻沒有讀取全庫 failure-learning system 並沉澱 cross-skill prevention gate。 |
 | [Source / mirror write drift](source-mirror-write-drift.md) | `source-mirror-drift` | validated | 防止 agent 更新 project-local tool mirrors 或 runtime copies，而不是 canonical source repo。 |
 | [Tool config design without rule check](tool-config-design-without-rule-check.md) | `tool-strategy-gap` | candidate | 防止 agent 設計新工具配置時漏讀 `ai-tools/<tool>.md` 的現有規則，導致重複或邊界混淆。 |

@@ -1,6 +1,6 @@
 # Extracted — See [`workflow/apk-analysis/artifact-gates.md`](../../../../workflow/apk-analysis/artifact-gates.md) (Feature Reconstruction Handoff) and [`analysis/apk/workflows/http-api-documentation-flow.md`](../../../../analysis/apk/workflows/http-api-documentation-flow.md)
 
-> 遵守 [共用規則索引](../../../../shared-rules/README.md)、[neutral-language](../../../../shared-rules/neutral-language.md) 與 [feedback-lessons](../../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+> 遵守 [共用規則索引](../../../../enforcement/README.md)、[neutral-language](../../../../enforcement/neutral-language.md) 與 [feedback-lessons](../../../../enforcement/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 
 ### 2026-05-06 - Feature handoff finish gate
 

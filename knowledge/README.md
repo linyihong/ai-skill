@@ -22,7 +22,7 @@
 - Atom metadata 欄位規格；放到 `metadata/`。
 - 工程智慧正文；放到 `intelligence/`。
 - Agent 執行流程；放到 `workflow/`。
-- 可執行 shared rules；放到 `shared-rules/`。
+- 可執行 shared rules；放到 `enforcement/`。
 
 ## 誰會參考這裡（Inbound References）
 
@@ -39,7 +39,7 @@
 
 ## 與既有層的關係
 
-- `skills/` 與 `shared-rules/` 仍是目前可直接讀取的主要內容來源。
+- `skills/` 與 `enforcement/` 仍是目前可直接讀取的主要內容來源。
 - `metadata/` 定義 knowledge atom 的控制欄位。
 - `runtime/` 使用本層 index、summary 與 graph 做 context routing。
 - SQLite / FTS index 屬於 runtime lookup cache，應由 canonical Markdown / YAML 產生並可重建。
@@ -47,6 +47,6 @@
 
 ## 第一批候選遷移來源
 
-- `plans/active/next-stage-upgrade-plan.md` 的 Knowledge Navigation System
+- `plans/archived/next-stage-upgrade-plan.md` 的 Knowledge Navigation System
 - `skills/README.md` 與各 skill README 中可抽成全庫索引的入口資訊
 - `knowledge/indexes/README.md` 的 navigation index 初版

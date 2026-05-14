@@ -60,7 +60,7 @@ intelligence/
 - 觀察與拆解的原始方法；放到 `analysis/`。
 - 逐步執行流程、review flow 或 task orchestration；放到 `workflow/`。
 - 對話暫存 goal、目前 owner 或 next action；放到 `.agent-goals/`。
-- 可執行 policy 與 close-loop gate；放到 `shared-rules/`。
+- 可執行 policy 與 close-loop gate；放到 `enforcement/`。
 
 ## 誰會參考這裡（Inbound References）
 
@@ -84,4 +84,4 @@ intelligence/
 - `skills/app-development-guidance/implementation/`
 - `skills/app-development-guidance/controls/`
 - `feedback/history/` 中已成熟且跨專案可重用的 lesson
-- `shared-rules/failure-patterns/` 中偏工程判斷的 pattern 摘要
+- `enforcement/failure-patterns/` 中偏工程判斷的 pattern 摘要

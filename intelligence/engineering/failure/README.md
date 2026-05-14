@@ -14,4 +14,4 @@ AI 的「危險雷達」。
 ## 與其他層的關係
 
 - 具體 incident 記錄 → `feedback/` 或 project docs
-- 可執行的 failure prevention policy → `shared-rules/failure-patterns/`
+- 可執行的 failure prevention policy → `enforcement/failure-patterns/`

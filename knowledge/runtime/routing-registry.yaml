@@ -15,7 +15,7 @@ records:
     primary_source: CORE_BOOTSTRAP.md
     required_dependencies:
       - README.md
-      - shared-rules/README.md
+      - enforcement/README.md
     candidate_sources:
       - skills-index.yaml
       - knowledge/indexes/README.md
@@ -121,9 +121,9 @@ records:
 
   - id: route.governance.durable-goal-boundary
     task_intent: 維護 active goal 與 durable roadmap goal 邊界
-    primary_source: shared-rules/conversation-goal-ledger.md
+    primary_source: enforcement/conversation-goal-ledger.md
     required_dependencies:
-      - shared-rules/content-layering.md
+      - enforcement/content-layering.md
       - governance/lifecycle/README.md
     candidate_sources:
       - scripts/README.md
@@ -217,8 +217,8 @@ records:
     required_dependencies:
       - skills/apk-analysis/README.md
       - skills/apk-analysis/WORKFLOW.md
-      - shared-rules/README.md
-      - shared-rules/dependency-reading.md
+      - enforcement/README.md
+      - enforcement/dependency-reading.md
     candidate_sources:
       - plans/archived/apk-analysis-pilot-migration.md
       - analysis/apk/README.md
@@ -255,7 +255,7 @@ records:
       - knowledge/summaries/apk-highest-leverage-analysis.md
       - knowledge/graphs/apk-highest-leverage-analysis.yaml
       - runtime/routing/README.md
-      - shared-rules/decision-efficiency.md
+      - enforcement/decision-efficiency.md
     source_of_truth_gate: new-layer-promoted
     ranking_reason: 此 intelligence atom 抽象化已進入 workflow 的 route selection judgment。舊 skills/ 結構已於 2026-05-13 標記為 deprecated。
     validation_signal: 已比較可用 routes、選定 evidence-to-cost ratio 最高路線、記錄 fallback 與 attribution 回補條件。
@@ -278,10 +278,10 @@ records:
     task_intent: 規劃 feedback lesson promotion 或 downgrade
     primary_source: feedback/promotion/README.md
     required_dependencies:
-      - shared-rules/feedback-lessons.md
-      - shared-rules/reusable-guidance-boundary.md
-      - shared-rules/sanitization.md
-      - shared-rules/failure-learning-system.md
+      - enforcement/feedback-lessons.md
+      - enforcement/reusable-guidance-boundary.md
+      - enforcement/sanitization.md
+      - enforcement/failure-learning-system.md
       - governance/lifecycle/README.md
       - governance/validation/README.md
     candidate_sources:
@@ -290,7 +290,7 @@ records:
       - feedback/README.md
       - knowledge/runtime/refresh-policy.yaml
     source_of_truth_gate: shared-rule-active
-    ranking_reason: feedback/promotion 描述 lesson promotion 的 durable target selection；可執行 lesson 寫作規則仍由 shared-rules/feedback-lessons.md 管理。
+    ranking_reason: feedback/promotion 描述 lesson promotion 的 durable target selection；可執行 lesson 寫作規則仍由 enforcement/feedback-lessons.md 管理。
     validation_signal: 原 lesson source 保留、promotion target 明確、runtime surfaces 與 close-loop validation 已同步。
     metadata:
       priority: P1
@@ -428,7 +428,7 @@ records:
     primary_source: skills/app-development-guidance/SKILL.md
     required_dependencies:
       - skills/app-development-guidance/README.md
-      - shared-rules/README.md
+      - enforcement/README.md
     candidate_sources:
       - analysis/development-guidance/README.md
       - workflow/software-delivery/README.md
@@ -458,7 +458,7 @@ records:
     primary_source: skills/travel-planning/SKILL.md
     required_dependencies:
       - skills/travel-planning/README.md
-      - shared-rules/README.md
+      - enforcement/README.md
     candidate_sources:
       - analysis/travel/README.md
       - workflow/travel-planning/README.md
@@ -596,7 +596,7 @@ records:
       - validation/traces/template.yaml
       - validation/evaluations/template.yaml
       - plans/archived/ai-decision-contract-testing.md
-      - shared-rules/failure-learning-system.md
+      - enforcement/failure-learning-system.md
     source_of_truth_gate: validation-readme-active
     ranking_reason: validation/ 提供 stateless scenario-based 驗證框架，可在架構變更或模型升級後確認決策品質未退化。failure-derived scenarios 從實際 AI 錯誤提煉，形成 Failure → Scenario 閉環。
     validation_signal: Scenario 的 expected_route 與 actual trace 可比對；forbidden_routes 未被使用。
@@ -632,10 +632,10 @@ records:
       - intelligence/engineering/agent-architecture/linked-updates-completeness.md
       - intelligence/engineering/agent-architecture/decomposition-strategy-selection.md
       - intelligence/engineering/agent-architecture/stateless-validation-necessity.md
-      - shared-rules/failure-patterns/README.md
-      - shared-rules/decision-efficiency.md
+      - enforcement/failure-patterns/README.md
+      - enforcement/decision-efficiency.md
     source_of_truth_gate: design-layer-only
-    ranking_reason: agent-architecture 研究 AI Agent 自身的認知行為模式，與 shared-rules/failure-patterns/ 互補（後者記錄具體失效模式，前者解釋為什麼會發生）。
+    ranking_reason: agent-architecture 研究 AI Agent 自身的認知行為模式，與 enforcement/failure-patterns/ 互補（後者記錄具體失效模式，前者解釋為什麼會發生）。
     validation_signal: 各 atom 有明確原則、症狀表與預防方式，可反查驗證。
     metadata:
       priority: P2
@@ -656,7 +656,7 @@ records:
     task_intent: 查詢或新增 feedback lesson
     primary_source: feedback/history/README.md
     required_dependencies:
-      - shared-rules/feedback-lessons.md
+      - enforcement/feedback-lessons.md
     candidate_sources:
       - feedback/history/apk-analysis/README.md
       - feedback/history/development-guidance/README.md
@@ -832,7 +832,7 @@ records:
       - anti-patterns/hallucination-loop.md
       - anti-patterns/stale-summary.md
       - anti-patterns/skill-pollution.md
-      - shared-rules/failure-patterns/README.md
+      - enforcement/failure-patterns/README.md
       - runtime/guards/README.md
     source_of_truth_gate: anti-patterns-readme-active
     ranking_reason: anti-patterns/README.md 提供 runtime anti-patterns 的 entry point，列出所有 anti-pattern 與嚴重度。

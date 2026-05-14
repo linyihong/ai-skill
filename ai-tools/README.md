@@ -21,7 +21,7 @@
 | **自動載入入口** | 工具專屬入口檔（如 `CLAUDE.md`、`.cursorrules`） | 一行，指向 `README.md` |
 | **工具配置** | 工具配置檔（如 `.claude/settings.json`） | 僅放 permissions、hooks 等工具特定設定 |
 | **工具使用說明** | `ai-tools/<tool>.md` | 此工具的配置實作與特殊操作注意 |
-| **共用規則** | `shared-rules/` | 所有規則本體，集中管理 |
+| **共用規則** | `enforcement/` | 所有規則本體，集中管理 |
 | **知識庫入口** | `README.md` | OS layout 與導航，所有工具的共同起點 |
 
 ### 工具文件不得重複中央庫內容
@@ -37,15 +37,15 @@
 | Guard chain 執行順序 | [`runtime/pipeline/guard-chain.yaml`](../runtime/pipeline/guard-chain.yaml) |
 | Token budget 分配表 | [`runtime/budget/token-budget.yaml`](../runtime/budget/token-budget.yaml) |
 | 知識庫路徑對照表（CORE_BOOTSTRAP.md → README.md → skills-index.yaml → ...） | [`README.md`](../README.md) OS layout |
-| 共用規則清單 | [`shared-rules/README.md`](../shared-rules/README.md) |
-| Goal ledger 操作流程 | [`shared-rules/conversation-goal-ledger.md`](../shared-rules/conversation-goal-ledger.md) |
-| Close-loop 流程（commit/push/readback） | [`shared-rules/dependency-reading.md`](../shared-rules/dependency-reading.md) |
+| 共用規則清單 | [`enforcement/README.md`](../enforcement/README.md) |
+| Goal ledger 操作流程 | [`enforcement/conversation-goal-ledger.md`](../enforcement/conversation-goal-ledger.md) |
+| Close-loop 流程（commit/push/readback） | [`enforcement/dependency-reading.md`](../enforcement/dependency-reading.md) |
 
 **原則**：每個工具文件應假設 reader 已讀過 `README.md` 的 OS layout 與 `CORE_BOOTSTRAP.md` 的啟動流程。工具文件只回答：「這個工具跟其他工具有什麼不同？它的入口檔、配置檔、特殊操作要注意什麼？」
 
 **不應放在工具配置或工具說明中的內容：**
-- Bootstrap 規則清單（由 `shared-rules/README.md` 管理）
-- 情境路由表或架構層級表（由 `README.md` / `shared-rules/README.md` 管理）
+- Bootstrap 規則清單（由 `enforcement/README.md` 管理）
+- 情境路由表或架構層級表（由 `README.md` / `enforcement/README.md` 管理）
 - 任何已在 shared-rules 或 README.md 中的重複內容
 
 ---
@@ -56,7 +56,7 @@
 
 Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating-system.md`](../architecture/ai-native-knowledge-operating-system.md)：reference-first 是預設，工具 mirror / bundle / copy snapshot 是相容層。
 
-若工具文件、skill workflow、使用者目標或 shared rules 看似衝突，依 [`shared-rules/rule-weight.md`](../shared-rules/rule-weight.md) 判斷權重；工具 adapter 不得覆蓋 safety、source-of-truth、validation 或最新使用者目標。
+若工具文件、skill workflow、使用者目標或 shared rules 看似衝突，依 [`enforcement/rule-weight.md`](../enforcement/rule-weight.md) 判斷權重；工具 adapter 不得覆蓋 safety、source-of-truth、validation 或最新使用者目標。
 
 若某個 skill 對某工具有必要的特殊執行策略，skill 內可用 `skills/<skill>/tool-adapters/<tool>.md` 記錄差異；本目錄仍只放該工具的全域設定、同步與操作方式。
 

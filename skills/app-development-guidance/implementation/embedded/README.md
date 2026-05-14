@@ -54,4 +54,4 @@ Record target-only evidence in the product repository:
 
 ## Required Linked Updates
 
-Follow [`../../../../shared-rules/linked-updates.md`](../../../../shared-rules/linked-updates.md). Embedded implementation patterns must update or verify [`../../platforms/embedded/`](../../platforms/embedded/), [`../../CHECKLIST.md`](../../CHECKLIST.md), [`../../checklists/`](../../checklists/), and templates when the project-document shape changes.
+Follow [`../../../../enforcement/linked-updates.md`](../../../../enforcement/linked-updates.md). Embedded implementation patterns must update or verify [`../../platforms/embedded/`](../../platforms/embedded/), [`../../CHECKLIST.md`](../../CHECKLIST.md), [`../../checklists/`](../../checklists/), and templates when the project-document shape changes.

@@ -71,4 +71,4 @@ A lesson can be promoted here when:
 
 - Do not delete or rewrite existing feedback lessons during the pilot.
 - Use this directory to point agents toward reusable judgment; use `feedback/history/apk-analysis/` for historical lesson records.
-- If an insight becomes a cross-skill or all-repo prevention gate, promote it to `shared-rules/` or `shared-rules/failure-patterns/` instead of keeping it only here.
+- If an insight becomes a cross-skill or all-repo prevention gate, promote it to `enforcement/` or `enforcement/failure-patterns/` instead of keeping it only here.

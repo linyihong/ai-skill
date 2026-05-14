@@ -1,5 +1,5 @@
-> Follow [shared rules](../../../../shared-rules/README.md), [feedback lessons](../../../../shared-rules/feedback-lessons.md), and [goal/action/validation](../../../../shared-rules/goal-action-validation.md). This lesson is generalized and avoids project-specific details.
-# Extracted — See [`shared-rules/reusable-guidance-boundary.md`](../../../../shared-rules/reusable-guidance-boundary.md)
+> Follow [shared rules](../../../../enforcement/README.md), [feedback lessons](../../../../enforcement/feedback-lessons.md), and [goal/action/validation](../../../../enforcement/goal-action-validation.md). This lesson is generalized and avoids project-specific details.
+# Extracted — See [`enforcement/reusable-guidance-boundary.md`](../../../../enforcement/reusable-guidance-boundary.md)
 
 ### 2026-05-07 - Keep Project Incidents Out Of Skills
 
@@ -51,8 +51,8 @@ Before editing a reusable skill, scan the proposed text for project names, priva
 
 #### Promotion Target
 
-- `shared-rules/reusable-guidance-boundary.md`.
-- `shared-rules/README.md`, `content-layering.md`, `feedback-lessons.md`, `linked-updates.md`, `sanitization.md`, `goal-action-validation.md`, `dependency-reading.md`.
+- `enforcement/reusable-guidance-boundary.md`.
+- `enforcement/README.md`, `content-layering.md`, `feedback-lessons.md`, `linked-updates.md`, `sanitization.md`, `goal-action-validation.md`, `dependency-reading.md`.
 - `DOCUMENTATION.md` § Reusable Guidance Boundary.
 - `CHECKLIST.md` § Reusable Guidance Boundary.
 - `WORKFLOW.md` Docs-first BDD closure loop / SDK defect closure loop.
@@ -67,5 +67,5 @@ Before editing a reusable skill, scan the proposed text for project names, priva
 - `README.md`: updated so the skill index states what belongs and what does not belong in reusable guidance.
 - `SKILL.md`: updated so the feedback loop requires a post-edit search for project-specific strings.
 - `feedback_history/common/README.md`: indexed this lesson.
-- `shared-rules/reusable-guidance-boundary.md`: promoted the boundary to a global rule because it applies to all skills and shared docs, not only app development guidance.
-- `shared-rules/README.md`, `content-layering.md`, `feedback-lessons.md`, `linked-updates.md`, `sanitization.md`, `goal-action-validation.md`, `dependency-reading.md`: updated or linked so agents must read and apply the global boundary, analyze incomplete closure causes, and perform required linked updates.
+- `enforcement/reusable-guidance-boundary.md`: promoted the boundary to a global rule because it applies to all skills and shared docs, not only app development guidance.
+- `enforcement/README.md`, `content-layering.md`, `feedback-lessons.md`, `linked-updates.md`, `sanitization.md`, `goal-action-validation.md`, `dependency-reading.md`: updated or linked so agents must read and apply the global boundary, analyze incomplete closure causes, and perform required linked updates.

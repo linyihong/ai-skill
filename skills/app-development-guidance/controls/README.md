@@ -13,7 +13,7 @@ Use `controls/` before `platforms/`, `languages/`, or `implementation/` when the
 | `anti-tamper-risk.md` | Root/hook/emulator signals, anti-tamper limits, risk scoring. |
 | `release-build.md` | Obfuscation, debug flag removal, symbol stripping, dependency and secret checks. |
 
-If a control has concrete implementation details, keep the core principle here and link to `implementation/`, `platforms/`, or `languages/` as required by [`../../../shared-rules/linked-updates.md`](../../../shared-rules/linked-updates.md).
+If a control has concrete implementation details, keep the core principle here and link to `implementation/`, `platforms/`, or `languages/` as required by [`../../../enforcement/linked-updates.md`](../../../enforcement/linked-updates.md).
 
 Common implementation links:
 

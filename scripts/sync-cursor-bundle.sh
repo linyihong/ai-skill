@@ -4,7 +4,7 @@
 #   bundles/ai-skill/     -> 各 skill（僅含 skills/*，不含 shared-rules）
 # 再讓 ~/.cursor/shared-rules 與 ~/.cursor/skills/<name> 指向上述 bundle（與其他 `.cursor` 內容分流）。
 #
-# 禁止在 repo 內出現「指回父目錄」的同名 symlink（例 shared-rules/shared-rules），否則 IDE 會無限巢狀。
+# 禁止在 repo 內出現「指回父目錄」的同名 symlink（例 enforcement/shared-rules），否則 IDE 會無限巢狀。
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -14,7 +14,7 @@ CURSOR_SHARED="${HOME}/.cursor/shared-rules"
 
 # 移除 repo 內會造成無限展開的 symlink（開頭與結尾各跑一次，避免同步過程或外部工具中途建立）。
 _strip_repo_loop_symlinks() {
-  local sr="${REPO_ROOT}/shared-rules"
+  local sr="${REPO_ROOT}/enforcement"
   local sk="${REPO_ROOT}/skills"
 
   # shared-rules 底下任意深度的「名為 shared-rules 的 symlink」在此專案皆不合法；-P 不跟隨目錄 symlink 遞迴
@@ -67,7 +67,7 @@ if [[ -e "${CURSOR_SHARED}" && ! -L "${CURSOR_SHARED}" ]]; then
 fi
 
 # 僅寫入 ~/.cursor/bundles，永不寫 REPO_ROOT/shared-rules 內
-ln -sf "${REPO_ROOT}/shared-rules" "${BUNDLE_RULES}"
+ln -sf "${REPO_ROOT}/enforcement" "${BUNDLE_RULES}"
 
 rm -f "${CURSOR_SHARED}"
 ln -sf "${BUNDLE_RULES}" "${CURSOR_SHARED}"
@@ -88,7 +88,7 @@ done < <(find -P "${REPO_ROOT}/skills" -mindepth 1 -maxdepth 1 -type d -print0)
 _strip_repo_loop_symlinks
 
 echo "Synced bundles:"
-echo "  ${BUNDLE_RULES} -> ${REPO_ROOT}/shared-rules"
+echo "  ${BUNDLE_RULES} -> ${REPO_ROOT}/enforcement"
 echo "  ${CURSOR_SHARED} -> ${BUNDLE_RULES}"
 echo "  Skills (${#synced_skills[@]}):"
 for name in "${synced_skills[@]}"; do

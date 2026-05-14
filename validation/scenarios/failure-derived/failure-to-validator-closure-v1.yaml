@@ -1,7 +1,7 @@
 # Failure-to-Validator Closure Scenario
 # 測試 AI 在修復錯誤後，是否將錯誤模式抽象化為可重複檢測的 validator 測試案例
 # 來源 failure pattern:
-#   - shared-rules/failure-patterns/failure-to-validator-closure.md
+#   - enforcement/failure-patterns/failure-to-validator-closure.md
 
 id: failure-to-validator-closure-v1
 domain: cross-domain
@@ -9,7 +9,7 @@ type: heuristic-obedience
 priority: P2
 
 failure_source:
-  pattern: shared-rules/failure-patterns/failure-to-validator-closure.md
+  pattern: enforcement/failure-patterns/failure-to-validator-closure.md
   class: validation-gap
   date: "2026-05-13"
   description: >
@@ -21,7 +21,7 @@ given:
   artifacts:
     - scripts/validate-knowledge-runtime.rb  # 現有 validator
     - validation/scenarios/failure-derived/  # 現有 failure-derived scenarios
-    - shared-rules/failure-patterns/README.md  # failure pattern 索引
+    - enforcement/failure-patterns/README.md  # failure pattern 索引
   signals:
     - 錯誤已被修復
     - 錯誤模式具有可重複性（可能跨檔案、跨 session 重演）

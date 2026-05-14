@@ -19,8 +19,8 @@
 
 ## 第一批候選遷移來源
 
-- `shared-rules/failure-learning-system.md` 中偏 production 分析的方法。
-- `plans/active/next-stage-upgrade-plan.md` 中 `analysis/` 的分層說明。
+- `enforcement/failure-learning-system.md` 中偏 production 分析的方法。
+- `plans/archived/next-stage-upgrade-plan.md` 中 `analysis/` 的分層說明。
 
 ## 建議分析方法
 

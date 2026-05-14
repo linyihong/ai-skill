@@ -18,7 +18,7 @@ edges:
     reason: 分散式系統中的 connection pool 管理與 eventual consistency 的 idempotency 要求相關。
     validation: 兩個 atoms 都涉及分散式系統的可靠性。
   - type: related_to
-    target: shared-rules/failure-learning-system.md
+    target: enforcement/failure-learning-system.md
     reason: Failure learning system 提供 failure taxonomy 與 promotion decision。
     validation: failure-learning-system 定義 storage rules 與 promotion targets。
   - type: routes_to

@@ -1,4 +1,4 @@
-> 遵守 [共用規則索引](../../../../shared-rules/README.md) 與 [feedback-lessons](../../../../shared-rules/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+> 遵守 [共用規則索引](../../../../enforcement/README.md) 與 [feedback-lessons](../../../../enforcement/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 # Extracted — See [`workflow/software-delivery/development-process.md`](../../../../workflow/software-delivery/development-process.md)
 
 ### 2026-05-06 - Change intake before code

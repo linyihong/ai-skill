@@ -33,7 +33,7 @@
 ## 與既有層的關係
 
 - `skills/` 仍是目前主要 capability entry；本層會逐步承接 skill 中的通用執行流程。
-- `shared-rules/` 仍提供 dependency reading、linked updates、validation 與 source boundary。
+- `enforcement/` 仍提供 dependency reading、linked updates、validation 與 source boundary。
 - `analysis/` 與 `intelligence/` 是 workflow 的知識來源，不應被大量複製。
 - `runtime/` 未來可依 metadata 動態載入合適 workflow。
 
@@ -42,4 +42,4 @@
 - `skills/apk-analysis/WORKFLOW.md`
 - `skills/app-development-guidance/WORKFLOW.md`
 - `skills/travel-planning/` 中可工具中立化的 itinerary workflow
-- `plans/active/next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明
+- `plans/archived/next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明

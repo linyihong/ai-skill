@@ -30,7 +30,7 @@ trace:
 
   intelligence_loaded:
     - feedback/history/README.md
-    - shared-rules/feedback-lessons.md
+    - enforcement/feedback-lessons.md
     - feedback/history/apk-analysis/README.md
     - feedback/history/development-guidance/README.md
     - feedback/history/travel-planning/README.md

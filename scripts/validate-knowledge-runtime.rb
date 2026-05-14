@@ -534,9 +534,9 @@ def validate_language_consistency
   # or table headers. This detects when an agent writes Chinese content but uses
   # English section titles (e.g., "## Token Impact") or English table headers.
   #
-  # Scans intelligence/, workflow/, analysis/, shared-rules/ — any directory where
+  # Scans intelligence/, workflow/, analysis/, enforcement/ — any directory where
   # Chinese documents may have English headings.
-  scan_dirs = %w[intelligence workflow analysis shared-rules]
+  scan_dirs = %w[intelligence workflow analysis enforcement]
 
   # English section headings that commonly appear in Chinese documents (author habit drift)
   # These are heading patterns like "## Token Impact" or "### Risk Assessment"
@@ -716,7 +716,7 @@ end
 # Failure-to-Validator Closure Test
 # ──────────────────────────────────────────────
 def validate_failure_pattern_validator_coverage
-  # Check that every failure pattern in shared-rules/failure-patterns/ has at least
+  # Check that every failure pattern in enforcement/failure-patterns/ has at least
   # one entry in its "Linked Validation Scenarios" section. This prevents the
   # "failure-to-validator closure" pattern where an error is fixed but no reusable
   # test is added to prevent recurrence.
@@ -724,7 +724,7 @@ def validate_failure_pattern_validator_coverage
   # Rationale: If a failure pattern's Linked Validation Scenarios is empty, it means
   # the agent who created the pattern didn't add a corresponding validator test.
   # This is itself a failure-to-validator closure.
-  patterns_dir = ROOT + "shared-rules/failure-patterns"
+  patterns_dir = ROOT + "enforcement/failure-patterns"
   return unless patterns_dir.exist?
 
   patterns_dir.each_child do |file|
@@ -764,7 +764,7 @@ end
 # ──────────────────────────────────────────────
 def validate_intelligence_entry_solution_crossref
   # Check that intelligence/<domain>/ subdirectories follow the Entry/Solution layering
-  # rules defined in shared-rules/content-layering.md:
+  # rules defined in enforcement/content-layering.md:
   #
   # 1. If a file in failure/ says "解法見 heuristics/X.md", then heuristics/X.md must exist
   # 2. If a file in heuristics/ has a corresponding file in failure/ with the same basename,

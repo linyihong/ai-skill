@@ -38,5 +38,5 @@ Roo Code（Code mode），deepseek-chat model
 
 ## 相關文件
 
-- Failure pattern: [`shared-rules/failure-patterns/failure-to-validator-closure.md`](../../shared-rules/failure-patterns/failure-to-validator-closure.md)
+- Failure pattern: [`enforcement/failure-patterns/failure-to-validator-closure.md`](../../enforcement/failure-patterns/failure-to-validator-closure.md)
 - Validator test: [`scripts/validate-knowledge-runtime.rb`](../../scripts/validate-knowledge-runtime.rb) 中的 `validate_intelligence_classification_boundary`

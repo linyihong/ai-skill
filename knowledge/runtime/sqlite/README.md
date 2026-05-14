@@ -6,7 +6,7 @@
 
 | Surface | Role |
 | --- | --- |
-| Markdown / YAML source files | Canonical source-of-truth，例如 `feedback/history/`、`shared-rules/`、`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/routing-registry.yaml`。 |
+| Markdown / YAML source files | Canonical source-of-truth，例如 `feedback/history/`、`enforcement/`、`knowledge/summaries/`、`knowledge/graphs/`、`knowledge/runtime/routing-registry.yaml`。 |
 | SQLite database | Generated lookup cache；可刪除、可重建、不可作為唯一資料來源。 |
 | Generator script | 從 canonical sources deterministic 產生 SQLite tables / FTS index。 |
 | Query helper | 從 SQLite 回傳少量 candidate `source_path`、summary、tags、score 與 validation signal。 |

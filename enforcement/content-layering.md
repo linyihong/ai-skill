@@ -2,10 +2,10 @@
 
 | 內容 | 放哪裡 |
 | --- | --- |
-| Repo-level **架構方向、roadmap、遷移階段與移除條件** | **`architecture/`**；例如 [`../architecture/ai-native-knowledge-operating-system.md`](../architecture/ai-native-knowledge-operating-system.md)。這類文件不是 executable shared rule，不放 `shared-rules/` 正文。 |
+| Repo-level **架構方向、roadmap、遷移階段與移除條件** | **`architecture/`**；例如 [`../architecture/ai-native-knowledge-operating-system.md`](../architecture/ai-native-knowledge-operating-system.md)。這類文件不是 executable shared rule，不放 `enforcement/` 正文。 |
 | **長期目標、phase、未完成能力、migration 狀態、promotion / deprecation 決策** | **Durable planning 文件**：repo-level 放 `architecture/` 或相關 layer README；知識生命週期放 `governance/`；routing / atom 方向放 `knowledge/`、`metadata/`；業務專案放正式 project docs / issue tracker。**不要**用 `.agent-goals/` 保存長期目標或 completed archive。 |
 | **本輪可中斷、需接手的 active conversation goal / implementation task** | **`<PROJECT_ROOT>/.agent-goals/`**；只追蹤目前對話的可恢復工作。完成驗證後刪除；若仍有長期方向，刪除前先回寫 durable planning 文件。 |
-| 全 skill **共用政策**（授權、去敏、路徑、feedback 原則） | **`shared-rules/`** 各分類檔（本目錄） |
+| 全 skill **共用政策**（授權、去敏、路徑、feedback 原則） | **`enforcement/`** 各分類檔（本目錄） |
 | 全庫**連動更新規則**（改一處會影響多處時要同步改哪些） | **[`linked-updates.md`](linked-updates.md)**（全庫唯一正文） |
 | 全庫**文件用語與語言一致性規則**（正文預設繁體中文；中性、低爭議、避免 AI/搜尋誤判的標題、slug、摘要與正文） | **[`neutral-language.md`](neutral-language.md)**（全庫唯一正文） |
 | 全庫**工具中立文件規則**（可重用 docs 不綁單一 IDE/agent；工具路徑、hook、UI、同步步驟放工具文件） | **[`tool-neutral-documentation.md`](tool-neutral-documentation.md)**（全庫唯一正文）；具體工具操作放 `ai-tools/<tool>.md` 或工具設定檔 |

@@ -6,7 +6,7 @@ summary: >
     task-routing、attention-budgeting、failure-recovery、cognitive-boundaries、
     pilot-first-validation、failure-to-scenario-closure、linked-updates-completeness、
     decomposition-strategy-selection、stateless-validation-necessity。
-    每個 atom 研究 AI Agent 自身的認知行為模式，與 shared-rules/failure-patterns/ 互補。
+    每個 atom 研究 AI Agent 自身的認知行為模式，與 enforcement/failure-patterns/ 互補。
 edges:
   - type: depends_on
     target: intelligence/engineering/agent-architecture/README.md
@@ -69,12 +69,12 @@ edges:
     validation: atom 定義 stateless vs stateful 對比表、確保 stateless 的方法與 common misuse。
 
   - type: related_to
-    target: shared-rules/failure-patterns/README.md
+    target: enforcement/failure-patterns/README.md
     reason: failure-patterns 記錄具體 agent 失效模式，本層解釋為什麼會發生的認知原理。
     validation: 兩者互補 — failure-patterns 提供 trigger/action/prevention，agent-architecture 提供 root cause 分析。
 
   - type: related_to
-    target: shared-rules/decision-efficiency.md
+    target: enforcement/decision-efficiency.md
     reason: decision-efficiency 提供決策效率的執行規則，本層提供為什麼需要這些規則的認知基礎。
     validation: decision-efficiency 的 Context Loading、Decision Routing 規則可在 agent-architecture 的 attention-budgeting 和 cognitive-boundaries 中找到理論依據。
 
@@ -84,7 +84,7 @@ edges:
     validation: document-sizing 的拆分規則可在 agent-architecture 的 attention-budgeting 和 context-collapse 中找到理論依據。
 
   - type: related_to
-    target: shared-rules/linked-updates.md
+    target: enforcement/linked-updates.md
     reason: linked-updates 提供連動更新的執行規則，linked-updates-completeness atom 提供為什麼需要完整連動更新的認知基礎。
     validation: linked-updates-completeness atom 的常見遺漏表可在 linked-updates.md 的常見連動關係表中找到對應。
 

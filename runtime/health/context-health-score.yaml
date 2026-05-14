@@ -50,9 +50,9 @@ dimensions:
     weight: 0.20
     signals:
       - type: rule_conflict
-        source: shared-rules/rule-weight.md
+        source: enforcement/rule-weight.md
       - type: source_mirror_drift
-        source: shared-rules/failure-patterns/source-mirror-write-drift.md
+        source: enforcement/failure-patterns/source-mirror-write-drift.md
     scoring:
       0.0-0.1: healthy
       0.1-0.3: warning（有可解決的衝突）

@@ -7,7 +7,7 @@ description: Plan evidence-based travel itineraries with current operating hours
 
 Use this skill when a user wants a practical trip plan that depends on dates, place availability, transport feasibility, local conditions, or current web information. The goal is to produce an itinerary that is enjoyable, realistic, and traceable to sources.
 
-**Shared policy:** read [`shared-rules` index](../../shared-rules/README.md), apply [`dependency-reading.md`](../../shared-rules/dependency-reading.md) when this skill or related rules change, apply [`neutral-language.md`](../../shared-rules/neutral-language.md) for titles and summaries, and apply [`goal-action-validation.md`](../../shared-rules/goal-action-validation.md) so major recommendations include sources, validation, and uncertainty. If this skill is reloaded after an update, create a dependency read ledger covering required files, files read, missing files marked `not applicable`, blocked items, and validation. Lessons in `feedback_history/` should reference those files, not duplicate shared rules.
+**Shared policy:** read [`shared-rules` index](../../enforcement/README.md), apply [`dependency-reading.md`](../../enforcement/dependency-reading.md) when this skill or related rules change, apply [`neutral-language.md`](../../enforcement/neutral-language.md) for titles and summaries, and apply [`goal-action-validation.md`](../../enforcement/goal-action-validation.md) so major recommendations include sources, validation, and uncertainty. If this skill is reloaded after an update, create a dependency read ledger covering required files, files read, missing files marked `not applicable`, blocked items, and validation. Lessons in `feedback_history/` should reference those files, not duplicate shared rules.
 
 ## When To Use
 
@@ -71,4 +71,4 @@ See [`workflow/travel-planning/artifact-gates.md`](../../workflow/travel-plannin
 
 ## Feedback Loop
 
-See [`shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md) for the feedback lesson template and workflow. See [`feedback/`](../../feedback/) for the feedback promotion pipeline.
+See [`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) for the feedback lesson template and workflow. See [`feedback/`](../../feedback/) for the feedback promotion pipeline.

@@ -1,6 +1,6 @@
 # APK 分析文件寫法
 
-分析文件的目標是讓人和 AI 都能重現推理，而不是只留下最後答案。每個重要分析段落都要依 [`goal-action-validation.md`](../../shared-rules/goal-action-validation.md) 交代目標、執行、驗證；若是純判斷或暫時無法驗證，必須附參考來源、推論邊界與 open questions。
+分析文件的目標是讓人和 AI 都能重現推理，而不是只留下最後答案。每個重要分析段落都要依 [`goal-action-validation.md`](../../enforcement/goal-action-validation.md) 交代目標、執行、驗證；若是純判斷或暫時無法驗證，必須附參考來源、推論邊界與 open questions。
 
 ## 文件分層
 
@@ -655,7 +655,7 @@ Java OkHttp hook installed successfully, but no target host/path appeared while 
 
 ## 技巧回饋文件要給人讀
 
-寫入 **`feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`**（跨分類用 `feedback_history/common/`；規則與模板見 [`../../shared-rules/feedback-lessons.md`](../../shared-rules/feedback-lessons.md)）時，請避免只有工具名與短結論。每條技巧都應包含：
+寫入 **`feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`**（跨分類用 `feedback_history/common/`；規則與模板見 [`../../enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md)）時，請避免只有工具名與短結論。每條技巧都應包含：
 
 - `One-line Summary`：一句話講重點。
 - `Human Explanation`：給人看的背景與誤判風險。

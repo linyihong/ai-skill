@@ -34,9 +34,9 @@ edges:
     reason: Feedback promotion pipeline graph 已涵蓋 promotion 的核心關係。
     validation: feedback-promotion-pipeline.yaml 的 edges 包含 shared-rules 與 governance。
   - type: related_to
-    target: shared-rules/feedback-lessons.md
+    target: enforcement/feedback-lessons.md
     reason: Feedback lessons 的格式、模板與索引規則。
-    validation: shared-rules/feedback-lessons.md 定義 lesson 的完整格式。
+    validation: enforcement/feedback-lessons.md 定義 lesson 的完整格式。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.feedback.layers record。

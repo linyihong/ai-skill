@@ -81,7 +81,7 @@
 
 ## 5. 執行必要連結更新
 
-在完成變更前，遵循倉儲級規則 [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md)。如果更新影響相關資料夾，這些連結更新在**同一變更中為必要**：
+在完成變更前，遵循倉儲級規則 [`enforcement/linked-updates.md`](../../enforcement/linked-updates.md)。如果更新影響相關資料夾，這些連結更新在**同一變更中為必要**：
 
 | 變更區域 | 必須更新或驗證 |
 | --- | --- |

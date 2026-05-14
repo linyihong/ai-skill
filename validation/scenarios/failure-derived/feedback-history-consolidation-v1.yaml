@@ -30,7 +30,7 @@ given:
     - feedback/history/apk-analysis/       # 新 domain 目錄
     - feedback/history/development-guidance/  # 新 domain 目錄
     - feedback/history/travel-planning/    # 新 domain 目錄
-    - shared-rules/feedback-lessons.md     # 規則已更新指向 feedback/history/
+    - enforcement/feedback-lessons.md     # 規則已更新指向 feedback/history/
     - skills/apk-analysis/feedback_history/  # 舊路徑（仍存在，向後相容）
     - skills/app-development-guidance/feedback_history/  # 舊路徑（仍存在）
   signals:
@@ -69,7 +69,7 @@ then:
 
   expected_intelligence:
     - feedback/history/README.md
-    - shared-rules/feedback-lessons.md
+    - enforcement/feedback-lessons.md
 
   unexpected_intelligence:
     - skills/apk-analysis/feedback_history/README.md

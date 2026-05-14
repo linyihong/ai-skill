@@ -4,7 +4,7 @@
 #
 # 依賴：
 #   - skills/*/feedback_history/ (lesson source)
-#   - shared-rules/feedback-lessons.md (lesson format)
+#   - enforcement/feedback-lessons.md (lesson format)
 #   - governance/lifecycle/README.md (lifecycle states)
 
 promotion_engine_version: v1
@@ -28,7 +28,7 @@ scoring:
     最終分數 = impact × 0.30 + maturity × 0.25 + frequency × 0.20 + freshness × 0.15 + urgency × 0.10
     
     根據最終分數決定 promotion target：
-    - score ≥ 0.8 → promote to shared-rules/ or intelligence/
+    - score ≥ 0.8 → promote to enforcement/ or intelligence/
     - score ≥ 0.6 → promote to workflow/ or skill documentation
     - score ≥ 0.4 → keep in feedback_history, mark as candidate
     - score < 0.4 → archive or mark as experimental
@@ -53,7 +53,7 @@ scoring:
       factors:
         - name: cross_skill
           description: "Lesson 適用於多個 skill（如 apk-analysis + app-development-guidance）"
-          evidence: "Promotion Target 指向 shared-rules/ 或 intelligence/"
+          evidence: "Promotion Target 指向 enforcement/ 或 intelligence/"
         - name: cross_category
           description: "Lesson 適用於 skill 內多個 category（如 common/ + http-api/）"
           evidence: "Lesson 內容提及多個 category 的通用原則"
@@ -151,7 +151,7 @@ scoring:
 # ┌─────────────────────────────────────────────────────────────┐
 # │                    Promotion Decision                        │
 # │                                                             │
-# │  score ≥ 0.8 ──→ shared-rules/ or intelligence/            │
+# │  score ≥ 0.8 ──→ enforcement/ or intelligence/            │
 # │    條件：cross_skill + validated + high_frequency           │
 # │                                                             │
 # │  score ≥ 0.6 ──→ workflow/ or skill documentation          │
@@ -167,12 +167,12 @@ scoring:
 target_decisions:
   - id: promote_to_shared_rules
     condition: "final_score >= 0.8 AND cross_skill == true AND maturity_score >= 0.8"
-    target: "shared-rules/{rule-name}.md"
+    target: "enforcement/{rule-name}.md"
     description: >
-      Cross-skill、高成熟度的 lesson，promote 到 shared-rules/ 作為通用規則。
+      Cross-skill、高成熟度的 lesson，promote 到 enforcement/ 作為通用規則。
     steps:
       - generalize_content: "移除 skill-specific 內容，改為通用表述"
-      - add_to_index: "更新 shared-rules/README.md 的規則索引"
+      - add_to_index: "更新 enforcement/README.md 的規則索引"
       - update_lifecycle: "將原 lesson 標為 promoted"
 
   - id: promote_to_intelligence

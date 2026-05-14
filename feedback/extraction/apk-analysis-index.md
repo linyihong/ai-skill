@@ -213,16 +213,16 @@
 
 ---
 
-## 6. 目標層：`shared-rules/`
+## 6. 目標層：`enforcement/`
 
 這類 lessons 影響全庫共用規則。
 
 | 來源檔案 | Status | 標題 | 提取狀態 | 目標檔案 |
 | --- | --- | --- | --- | --- |
-| `common/2026-05-01_174100-technique-category-routing.md` | promoted | Technique category routing | ✅ | `shared-rules/cross-skill-references.md` |
-| `common/2026-05-01_175500-workflow-as-routing-not-technique-dump.md` | promoted | Workflow as routing, not technique dump | ✅ | `shared-rules/cross-skill-references.md` |
-| `common/2026-05-11_125615-per-round-feedback-checkpoint.md` | promoted | Per-round feedback checkpoint | ✅ | `shared-rules/feedback-lessons.md` |
-| `common/2026-05-08_135700-agent-goals-before-transcripts.md` | candidate | Agent goals before transcripts when resuming | ✅ | `shared-rules/dependency-reading.md` |
+| `common/2026-05-01_174100-technique-category-routing.md` | promoted | Technique category routing | ✅ | `enforcement/cross-skill-references.md` |
+| `common/2026-05-01_175500-workflow-as-routing-not-technique-dump.md` | promoted | Workflow as routing, not technique dump | ✅ | `enforcement/cross-skill-references.md` |
+| `common/2026-05-11_125615-per-round-feedback-checkpoint.md` | promoted | Per-round feedback checkpoint | ✅ | `enforcement/feedback-lessons.md` |
+| `common/2026-05-08_135700-agent-goals-before-transcripts.md` | candidate | Agent goals before transcripts when resuming | ✅ | `enforcement/dependency-reading.md` |
 
 ---
 
@@ -235,7 +235,7 @@
 | `analysis/apk/workflows/` | 12 | 12 | 0 |
 | `analysis/apk/tools-and-failures.md` | 3 | 3 | 0 |
 | `workflow/apk-analysis/artifact-gates.md` | 4 | 4 | 0 |
-| `shared-rules/` | 4 | 4 | 0 |
+| `enforcement/` | 4 | 4 | 0 |
 | **總計** | **69** | **69** | **0** |
 
 ---

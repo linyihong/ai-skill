@@ -51,12 +51,12 @@
 | 生成的客戶端、SDK、fixtures 和提供者/消費者合約檢查 | `implementation/` 和專案儲存庫 |
 | Product Brief 驗證、文件優先順序、可追溯性和 BDD 閉環流程 | `process/`、templates 和 checklists |
 | 效能預算、負載/壓力/尖峰/浸泡策略、CI smoke 檢查和發布證據 | `process/`、`CHECKLIST.md`、templates 和專案儲存庫的測試或發布筆記 |
-| 共享的清理或回饋規則 | `shared-rules/` |
+| 共享的清理或回饋規則 | `enforcement/` |
 | 僅限本機的暫記筆記、憑證或暫時性流程產出 | 僅限專案儲存庫：**gitignored** 路徑搭配**中性**目錄命名；透過環境變數和可選的未追蹤檔案進行配置；保持追蹤的 README 不含檔案系統導覽和內部代號 |
 
 ## 3. 可重複使用指引邊界（Reusable Guidance Boundary）
 
-本節應用 [`shared-rules/reusable-guidance-boundary.md`](../../shared-rules/reusable-guidance-boundary.md) 中的全域規則。
+本節應用 [`enforcement/reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) 中的全域規則。
 
 技能文件應描述可重複使用的原因、故障模式、決策規則和驗證方法。不要將專案事件透過複製其應用程式名稱、模組名稱、端點路徑、範例負載、類別名稱、本機路徑、主機或即時資料特異性提升到技能中。
 
@@ -69,7 +69,7 @@
 
 ## 4. 必要連結更新聲明（Required Linked Update Statement）
 
-每個影響多個資料夾的可重複使用筆記必須遵循 [`shared-rules/linked-updates.md`](../../shared-rules/linked-updates.md) 並包含簡短的連結更新聲明：
+每個影響多個資料夾的可重複使用筆記必須遵循 [`enforcement/linked-updates.md`](../../enforcement/linked-updates.md) 並包含簡短的連結更新聲明：
 
 ```markdown
 #### 必要連結更新（Required Linked Updates）

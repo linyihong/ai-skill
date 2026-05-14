@@ -46,7 +46,7 @@ Claude Code 的設定方式與 Roo Code 不同，沒有「全域 Custom Instruct
 
 ## Claude Code 與對話目標閉環
 
-工具中立規則見 [`shared-rules/conversation-goal-ledger.md`](../../shared-rules/conversation-goal-ledger.md)。Claude Code 是 CLI 工具，沒有 hooks 機制，但可以透過 `CLAUDE.md` 中的 Custom Instructions 和操作注意來實作對話目標閉環。
+工具中立規則見 [`enforcement/conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md)。Claude Code 是 CLI 工具，沒有 hooks 機制，但可以透過 `CLAUDE.md` 中的 Custom Instructions 和操作注意來實作對話目標閉環。
 
 ### 在 `CLAUDE.md` 中加入 goal ledger 提醒
 

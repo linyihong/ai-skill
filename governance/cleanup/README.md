@@ -15,9 +15,9 @@
 | --- | --- | --- |
 | **Cross-layer duplicate** | 同一知識同時存在於 `skills/` 與新分層（如 `analysis/`、`workflow/`、`intelligence/`）。 | 保留舊 entrypoint 直到 promotion 完成；promotion 後在舊 source 加 deprecation note 指向新路徑。 |
 | **Intra-layer duplicate** | 同一層內兩個文件描述相同概念（如兩個 `intelligence/` atoms 都討論 retry strategy）。 | 合併為單一 atom，更新所有指向舊路徑的 index / summary / graph / registry。 |
-| **Cross-skill duplicate** | 兩個不同 skill 包含相似的操作說明或知識（如 `apk-analysis` 與 `app-development-guidance` 都提到 proxy 設定）。 | 抽取共用部分到 `shared-rules/` 或 `intelligence/`，兩邊 skill 保留 reference。 |
+| **Cross-skill duplicate** | 兩個不同 skill 包含相似的操作說明或知識（如 `apk-analysis` 與 `app-development-guidance` 都提到 proxy 設定）。 | 抽取共用部分到 `enforcement/` 或 `intelligence/`，兩邊 skill 保留 reference。 |
 | **Source vs summary drift** | `knowledge/summaries/` 的 summary 與 `skills/` 或新分層的 canonical source 不一致。 | 執行 generated refresh checklist，決定 refresh / revalidate / downgrade。 |
-| **Tool mirror duplicate** | `ai-tools/` 文件複製了 `shared-rules/` 或 `skills/` 的可執行規則。 | 移除 tool mirror 中的重複規則，改為 reference 指向 canonical source。 |
+| **Tool mirror duplicate** | `ai-tools/` 文件複製了 `enforcement/` 或 `skills/` 的可執行規則。 | 移除 tool mirror 中的重複規則，改為 reference 指向 canonical source。 |
 
 ## 偵測流程
 
@@ -83,7 +83,7 @@
 | 判斷原則與 heuristics | `intelligence/` | `workflow/` 可引用判斷原則，不複製原理 |
 | 分析方法與工具用法 | `analysis/` | `workflow/` 可引用分析步驟，不複製方法細節 |
 | 事實性知識 | `knowledge/` | 各層可引用，不複製事實正文 |
-| 可執行規則 | `shared-rules/` | 各層可引用，不複製規則正文 |
+| 可執行規則 | `enforcement/` | 各層可引用，不複製規則正文 |
 | 工具設定 | `ai-tools/` | 不複製中央庫內容，只 reference |
 
 ## 清理執行流程
@@ -110,5 +110,5 @@
 - `metadata/`：ranking、confidence、compatibility 可輔助判斷哪個 source 是 canonical。
 - `knowledge/graphs/`：graph edges 可輔助發現跨層 duplicate（多個 source 指向同一 target）。
 - `knowledge/indexes/README.md`：cleanup 後需更新 index 移除或重新指向已變更的路徑。
-- `shared-rules/dependency-reading.md`：cleanup 過程中的文件讀取仍受 dependency reading 約束。
-- `shared-rules/linked-updates.md`：cleanup 後的 linked updates 需符合 linked update 規則。
+- `enforcement/dependency-reading.md`：cleanup 過程中的文件讀取仍受 dependency reading 約束。
+- `enforcement/linked-updates.md`：cleanup 後的 linked updates 需符合 linked update 規則。

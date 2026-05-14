@@ -218,9 +218,9 @@ then:
 
 | # | ID | 來源 Failure Pattern / 架構變更 | 測試目標 |
 |---|-----|-------------------------------|---------|
-| 1 | `entrypoint-drift-v1` | `shared-rules/failure-patterns/entrypoint-positioning-drift.md` | 更新 entrypoint 時是否同時更新 title、opening、indexes |
-| 2 | `source-mirror-write-v1` | `shared-rules/failure-patterns/source-mirror-write-drift.md` | 編輯前是否先確認 canonical source vs mirror |
-| 3 | `shared-rules-architecture-drift-v1` | `shared-rules/failure-patterns/shared-rules-architecture-drift.md` | 架構重構後是否同步檢查 shared-rules/ 路徑參考 |
+| 1 | `entrypoint-drift-v1` | `enforcement/failure-patterns/entrypoint-positioning-drift.md` | 更新 entrypoint 時是否同時更新 title、opening、indexes |
+| 2 | `source-mirror-write-v1` | `enforcement/failure-patterns/source-mirror-write-drift.md` | 編輯前是否先確認 canonical source vs mirror |
+| 3 | `shared-rules-architecture-drift-v1` | `enforcement/failure-patterns/shared-rules-architecture-drift.md` | 架構重構後是否同步檢查 enforcement/ 路徑參考 |
 | 4 | `feedback-history-consolidation-v1` | `feedback/history/` 目錄整合（2026-05-13） | 新 feedback lesson 是否正確使用 feedback/history/<domain>/ 而非舊 skills/ 路徑 |
 
 ## 誰會參考這裡（Inbound References）
@@ -228,13 +228,13 @@ then:
 - [`route.validation.ai-decision-contract`](../knowledge/runtime/routing-registry.yaml:583) — primary_source 為 `validation/README.md`
 - [`route.evaluations.scenario-results`](../knowledge/runtime/routing-registry.yaml:748) — required_dependencies 引用 `validation/README.md`
 - [`route.traces.decision-traces`](../knowledge/runtime/routing-registry.yaml:802) — required_dependencies 引用 `validation/README.md`
-- [`shared-rules/failure-learning-system.md`](../shared-rules/failure-learning-system.md) — 定義 Failure → Scenario 閉環流程
-- [`shared-rules/failure-patterns/`](../shared-rules/failure-patterns/) — 每個 failure pattern 可對應 failure-derived scenario
+- [`enforcement/failure-learning-system.md`](../enforcement/failure-learning-system.md) — 定義 Failure → Scenario 閉環流程
+- [`enforcement/failure-patterns/`](../enforcement/failure-patterns/) — 每個 failure pattern 可對應 failure-derived scenario
 
 ## 與其他層的關係
 
 - `intelligence/engineering/` — 每個 heuristic atom 可對應 1+ 個 scenario
 - `governance/validation/` — 文件層級 validation gates，與本層互補
-- `shared-rules/failure-learning-system.md` — 被動 capture failure，與本層主動驗證互補；failure 可 promotion 為 scenario
-- `shared-rules/failure-patterns/` — 每個 validated failure pattern 可對應 1+ 個 failure-derived scenario
-- `plans/active/next-stage-upgrade-plan.md` — Durable Roadmap Goals 記錄本層狀態
+- `enforcement/failure-learning-system.md` — 被動 capture failure，與本層主動驗證互補；failure 可 promotion 為 scenario
+- `enforcement/failure-patterns/` — 每個 validated failure pattern 可對應 1+ 個 failure-derived scenario
+- `plans/archived/next-stage-upgrade-plan.md` — Durable Roadmap Goals 記錄本層狀態
