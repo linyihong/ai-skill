@@ -198,7 +198,7 @@ Goal:
   title: ...
   allowed_context:     # 允許讀取的目錄/檔案
     - workflow/apk-analysis/
-    - intelligence/engineering/analysis/
+    - intelligence/engineering/analytical-reasoning/
   forbidden_context:   # 禁止讀取的目錄/檔案
     - workflow/app-development-guidance/
     - analysis/repo/

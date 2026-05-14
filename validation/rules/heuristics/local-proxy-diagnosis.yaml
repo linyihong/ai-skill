@@ -1,5 +1,5 @@
 # Local Proxy Diagnosis Rule
-# 對應 heuristic: intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md
+# 對應 heuristic: intelligence/engineering/analytical-reasoning/heuristics/local-proxy-routing-diagnosis.md
 # 禁止在無證據時宣告 TLS pinning
 
 id: local-proxy-diagnosis

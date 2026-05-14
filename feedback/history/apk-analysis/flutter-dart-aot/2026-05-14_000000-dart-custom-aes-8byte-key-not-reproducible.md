@@ -103,8 +103,8 @@ Status: resolved ✅
 
 #### Promotion Target
 
-- `intelligence/engineering/analysis/failure/` — 新增 failure atom：「custom-dart-aes-8byte-key-not-reproducible.md」
-- `intelligence/engineering/analysis/heuristics/` — 更新 `hook-selection.md` 加入 8-byte key 的判斷規則
+- `intelligence/engineering/analytical-reasoning/failure/` — 新增 failure atom：「custom-dart-aes-8byte-key-not-reproducible.md」
+- `intelligence/engineering/analytical-reasoning/heuristics/` — 更新 `hook-selection.md` 加入 8-byte key 的判斷規則
 
 #### Required Linked Updates
 

@@ -1,6 +1,6 @@
 # Analysis Anti-Patterns
 
-`intelligence/engineering/analysis/anti-patterns/` 存放分析過程中常見的反模式與錯誤做法，主要源自 APK 分析領域。
+`intelligence/engineering/analytical-reasoning/anti-patterns/` 存放分析過程中常見的反模式與錯誤做法，主要源自 APK 分析領域。
 
 ## Scope
 
@@ -14,7 +14,7 @@
 ## 與其他層的關係
 
 - `anti-patterns/`（根目錄）存放跨領域通用反模式，本目錄只放分析領域 specific
-- `intelligence/engineering/analysis/failure/` 記錄具體失敗案例，本目錄記錄可預防的錯誤模式
+- `intelligence/engineering/analytical-reasoning/failure/` 記錄具體失敗案例，本目錄記錄可預防的錯誤模式
 
 ## 目前 atoms
 

@@ -18,9 +18,9 @@ edges:
     reason: 候選 workflow layer 保存 tool-neutral APK analysis execution flow。
     validation: workflow/apk-analysis/README.md 說明 active skill entrypoint 仍在 skills/apk-analysis/SKILL.md。
   - type: related_to
-    target: intelligence/engineering/analysis/README.md
+    target: intelligence/engineering/analytical-reasoning/README.md
     reason: 候選 intelligence layer 保存 validated engineering judgment 與 promotion map。
-    validation: intelligence/engineering/analysis/README.md 說明 lesson history 仍在 skills/apk-analysis/feedback_history/。
+    validation: intelligence/engineering/analytical-reasoning/README.md 說明 lesson history 仍在 skills/apk-analysis/feedback_history/。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 提供 route.skill.apk-analysis record，並保留 old-skill-entrypoint-active gate。

@@ -31,7 +31,7 @@ Use this skill for authorized APK analysis only. The goal is to recover how an a
 | 執行流程（Quick Start → 分析 → 結束 → 回饋） | [`workflow/apk-analysis/execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) |
 | 分析方法（Traffic Triage、Tools & Failures） | [`analysis/apk/README.md`](../../analysis/apk/README.md) |
 | 操作流程（Frida Hook、HTTP API、Local Proxy、Media HLS） | [`analysis/apk/workflows/README.md`](../../analysis/apk/workflows/README.md) |
-| 工程智慧（Heuristics、Signals、Anti-patterns、Failure） | [`intelligence/engineering/analysis/README.md`](../../intelligence/engineering/analysis/README.md) |
+| 工程智慧（Heuristics、Signals、Anti-patterns、Failure） | [`intelligence/engineering/analytical-reasoning/README.md`](../../intelligence/engineering/analytical-reasoning/README.md) |
 | 產出格式與品質門檻 | [`workflow/apk-analysis/artifact-gates.md`](../../workflow/apk-analysis/artifact-gates.md) |
 | 新專案 Runbook | [`runtime/onboarding/apk-analysis-setup.md`](../../runtime/onboarding/apk-analysis-setup.md) |
 

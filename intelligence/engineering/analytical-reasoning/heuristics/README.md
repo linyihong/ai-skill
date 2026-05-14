@@ -1,6 +1,6 @@
 # Analysis Heuristics
 
-`intelligence/engineering/analysis/heuristics/` 存放分析過程中的啟發式判斷規則，主要源自 APK 分析領域。
+`intelligence/engineering/analytical-reasoning/heuristics/` 存放分析過程中的啟發式判斷規則，主要源自 APK 分析領域。
 
 ## Scope
 
@@ -16,7 +16,7 @@
 ## 與其他層的關係
 
 - `analysis/apk/workflows/` 提供操作步驟，本目錄提供「何時該用哪個步驟」的判斷
-- `intelligence/engineering/analysis/evidence-first-routing.md` 決定分析路線，本目錄決定路線內的技術選擇
+- `intelligence/engineering/analytical-reasoning/evidence-first-routing.md` 決定分析路線，本目錄決定路線內的技術選擇
 
 ## 目前 atoms
 

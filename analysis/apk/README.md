@@ -27,7 +27,7 @@ This layer does not own:
 
 - Tool skill trigger text; keep that in `skills/apk-analysis/SKILL.md`.
 - End-to-end agent execution flow; use `workflow/apk-analysis/`.
-- **HOW TO THINK** decision intelligence: heuristics, anti-patterns, failure learning, signal detection; use `intelligence/engineering/analysis/`.
+- **HOW TO THINK** decision intelligence: heuristics, anti-patterns, failure learning, signal detection; use `intelligence/engineering/analytical-reasoning/`.
 - Target-specific API hosts, endpoints, tokens, raw samples, or live run evidence; keep those in project docs.
 
 ## Current Source References
@@ -38,10 +38,10 @@ This layer does not own:
 | Tool choice and failure interpretation | `../../skills/apk-analysis/TOOLS.md` | ✅ extracted to `tools-and-failures.md` |
 | Media verification tools | `../../skills/apk-analysis/TOOLS.md` | ✅ extracted to `tools-and-failures.md` |
 | Automation script safety boundary | `../../skills/apk-analysis/TOOLS.md` | ✅ extracted to `tools-and-failures.md` |
-| Flutter / Dart AOT methods | `../../skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除） | ✅ workflow → `workflows/frida-hook-flow.md`, intelligence → `intelligence/engineering/analysis/` |
-| HTTP API documentation methods | `../../skills/apk-analysis/techniques/http-api/`（已刪除） | ✅ workflow → `workflows/http-api-documentation-flow.md`, intelligence → `intelligence/engineering/analysis/heuristics/api-documentation-completeness.md` |
-| Local proxy / loopback methods | `../../skills/apk-analysis/techniques/local-proxy/`（已刪除） | ✅ workflow → `workflows/local-proxy-hook-flow.md`, intelligence → `intelligence/engineering/analysis/` |
-| Media / HLS methods | `../../skills/apk-analysis/techniques/media-hls/`（已刪除） | ✅ workflow → `workflows/media-hls-analysis-flow.md`, intelligence → `intelligence/engineering/analysis/signals/media-type-detection.md` |
+| Flutter / Dart AOT methods | `../../skills/apk-analysis/techniques/flutter-dart-aot/`（已刪除） | ✅ workflow → `workflows/frida-hook-flow.md`, intelligence → `intelligence/engineering/analytical-reasoning/` |
+| HTTP API documentation methods | `../../skills/apk-analysis/techniques/http-api/`（已刪除） | ✅ workflow → `workflows/http-api-documentation-flow.md`, intelligence → `intelligence/engineering/analytical-reasoning/heuristics/api-documentation-completeness.md` |
+| Local proxy / loopback methods | `../../skills/apk-analysis/techniques/local-proxy/`（已刪除） | ✅ workflow → `workflows/local-proxy-hook-flow.md`, intelligence → `intelligence/engineering/analytical-reasoning/` |
+| Media / HLS methods | `../../skills/apk-analysis/techniques/media-hls/`（已刪除） | ✅ workflow → `workflows/media-hls-analysis-flow.md`, intelligence → `intelligence/engineering/analytical-reasoning/signals/media-type-detection.md` |
 
 ## Read Order
 
@@ -50,7 +50,7 @@ This layer does not own:
 3. Read `traffic-triage.md` for traffic/runtime path triage.
 4. Read `tools-and-failures.md` for tool choice, failure interpretation, and command templates.
 5. Read `workflows/` for HOW TO DO execution steps after evidence identifies a route.
-6. Read `intelligence/engineering/analysis/` for HOW TO THINK decision guidance.
+6. Read `intelligence/engineering/analytical-reasoning/` for HOW TO THINK decision guidance.
 
 ## Migration Notes
 

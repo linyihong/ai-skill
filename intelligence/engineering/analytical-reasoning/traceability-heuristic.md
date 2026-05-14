@@ -67,4 +67,4 @@
 
 ---
 
-← [回到 intelligence/engineering/analysis/](README.md)
+← [回到 intelligence/engineering/analytical-reasoning/](README.md)

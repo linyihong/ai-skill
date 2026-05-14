@@ -97,8 +97,8 @@ String b64 = Base64.getEncoder().encodeToString(result);
 
 ## 相關 atoms
 
-- `intelligence/engineering/analysis/heuristics/hook-selection.md`
-- `intelligence/engineering/analysis/failure/processBlock-count-ambiguity.md`
+- `intelligence/engineering/analytical-reasoning/heuristics/hook-selection.md`
+- `intelligence/engineering/analytical-reasoning/failure/processBlock-count-ambiguity.md`
 - `feedback/history/apk-analysis/flutter-dart-aot/2026-05-14_000000-dart-custom-aes-8byte-key-not-reproducible.md`
 
 ## Token 影響

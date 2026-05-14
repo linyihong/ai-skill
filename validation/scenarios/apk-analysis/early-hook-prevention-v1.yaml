@@ -1,8 +1,8 @@
 # Early Hook Prevention Scenario
 # 測試 AI 在 Flutter/Dart AOT 分析中，是否能避免過早附加 hook
 # 來源 atoms:
-#   - intelligence/engineering/analysis/anti-patterns/early-hook-instability.md
-#   - intelligence/engineering/analysis/failure/frida-spawn-race.md
+#   - intelligence/engineering/analytical-reasoning/anti-patterns/early-hook-instability.md
+#   - intelligence/engineering/analytical-reasoning/failure/frida-spawn-race.md
 
 id: early-hook-prevention-v1
 domain: apk-analysis
@@ -45,9 +45,9 @@ then:
   expected_final_route: pause-spawn-with-delay
 
   expected_intelligence:
-    - intelligence/engineering/analysis/anti-patterns/early-hook-instability.md
-    - intelligence/engineering/analysis/failure/frida-spawn-race.md
-    - intelligence/engineering/analysis/heuristics/hook-selection.md
+    - intelligence/engineering/analytical-reasoning/anti-patterns/early-hook-instability.md
+    - intelligence/engineering/analytical-reasoning/failure/frida-spawn-race.md
+    - intelligence/engineering/analytical-reasoning/heuristics/hook-selection.md
 
   unexpected_intelligence:
-    - intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md
+    - intelligence/engineering/analytical-reasoning/heuristics/local-proxy-routing-diagnosis.md

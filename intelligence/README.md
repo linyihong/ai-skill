@@ -24,25 +24,27 @@
 ```text
 intelligence/
   engineering/
-    architecture/          # 架構思考模式（非教學）
-    domain/                # DDD / 業務模型智慧
-    failure/               # 工程災難智慧（抽象化失敗模式）
-    heuristics/            # 經驗法則（intelligence 核心）
-    anti-patterns/         # 常見錯誤設計
-    tradeoffs/             # 技術取捨智慧
-    distributed-systems/   # 分散式系統生存經驗
-    agent-architecture/    # AI Agent 自身運作智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries）
-  ide/                     # IDE 生態系統知識（VS Code Extension 全域設定儲存機制等）
-  business/                # 商業決策智慧
-  travel/                  # 特定領域智慧（Personal Domain Intelligence）
+    architecture/              # 架構思考模式（非教學）
+    domain/                    # DDD / 業務模型智慧
+    failure/                   # 工程災難智慧（抽象化失敗模式）
+    heuristics/                # 經驗法則（intelligence 核心）
+    anti-patterns/             # 常見錯誤設計
+    tradeoffs/                 # 技術取捨智慧
+    distributed-systems/       # 分散式系統生存經驗
+    agent-architecture/        # AI Agent 自身運作智慧
+    analytical-reasoning/      # 分析推理智慧（APK analysis、repo analysis、heuristics、signals、failure patterns）
+    development/               # 開發指引智慧（app development guidance、controls、review checklists）
+  ide/                         # IDE 生態系統知識
+  business/                    # 商業決策智慧
+  travel/                      # 特定領域智慧（Personal Domain Intelligence）
 ```
 
 ## 目前入口
 
-- [`engineering/apk-analysis/`](engineering/apk-analysis/README.md)：`apk-analysis` pilot 的 engineering intelligence 候選目的地。
-  - [`highest-leverage-analysis-path.md`](engineering/apk-analysis/highest-leverage-analysis-path.md)：第一個實際 promoted candidate intelligence atom。
-  - [`evidence-first-routing.md`](engineering/apk-analysis/evidence-first-routing.md)：證據驅動路線選擇（`validated-intelligence`）。
-  - [`live-readiness-gates.md`](engineering/apk-analysis/live-readiness-gates.md)：SDK/client readiness gates（`validated-intelligence`）。
+- [`engineering/analytical-reasoning/`](engineering/analytical-reasoning/README.md)：分析推理智慧（APK analysis、repo analysis、evidence-first routing、heuristics、signals、failure patterns）。
+  - [`highest-leverage-analysis-path.md`](engineering/analytical-reasoning/highest-leverage-analysis-path.md)：第一個實際 promoted candidate intelligence atom。
+  - [`evidence-first-routing.md`](engineering/analytical-reasoning/evidence-first-routing.md)：證據驅動路線選擇（`validated-intelligence`）。
+  - [`live-readiness-gates.md`](engineering/analytical-reasoning/live-readiness-gates.md)：SDK/client readiness gates（`validated-intelligence`）。
 
 ## 放什麼
 

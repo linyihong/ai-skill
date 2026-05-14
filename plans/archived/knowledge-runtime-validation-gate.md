@@ -149,7 +149,7 @@ flowchart LR
 
 ### 新增檔案
 
-#### 1. `intelligence/engineering/analysis/heuristics/ui-operation-stability.md`
+#### 1. `intelligence/engineering/analytical-reasoning/heuristics/ui-operation-stability.md`
 
 **目的**：決定何時該用哪種 UI 操作策略來穩定 capture API。
 
@@ -169,7 +169,7 @@ flowchart LR
 - `scrollable-clickable-screen-mapping.md`
 - `ui-fast-path-bounded-scroll.md`
 
-#### 2. `intelligence/engineering/analysis/heuristics/ui-to-api-attribution.md`
+#### 2. `intelligence/engineering/analytical-reasoning/heuristics/ui-to-api-attribution.md`
 
 **目的**：確保 UI 操作能正確對應到 API 請求，避免 attribution 錯誤。
 
@@ -201,8 +201,8 @@ flowchart LR
 
 | 檔案 | 更新內容 |
 |------|---------|
-| `intelligence/engineering/analysis/heuristics/README.md` | 加入新 heuristic 的索引 |
-| `intelligence/engineering/analysis/README.md` | 更新 atom 列表 |
+| `intelligence/engineering/analytical-reasoning/heuristics/README.md` | 加入新 heuristic 的索引 |
+| `intelligence/engineering/analytical-reasoning/README.md` | 更新 atom 列表 |
 | `knowledge/graphs/intelligence-apk-analysis-atoms.yaml` | 加入新 edge |
 | `knowledge/summaries/apk-analysis-pilot.md` | 更新 summary table |
 | `knowledge/runtime/routing-registry.yaml` | 確認 routing 涵蓋新 atom |
@@ -235,10 +235,10 @@ flowchart LR
 
 ### Phase B: UI Operation Intelligence Extraction（✅ 已完成）
 
-1. ✅ 建立 `intelligence/engineering/analysis/heuristics/ui-operation-stability.md`
-2. ✅ 建立 `intelligence/engineering/analysis/heuristics/ui-to-api-attribution.md`
-3. ✅ 更新 `intelligence/engineering/analysis/heuristics/README.md`
-4. ✅ 更新 `intelligence/engineering/analysis/README.md`
+1. ✅ 建立 `intelligence/engineering/analytical-reasoning/heuristics/ui-operation-stability.md`
+2. ✅ 建立 `intelligence/engineering/analytical-reasoning/heuristics/ui-to-api-attribution.md`
+3. ✅ 更新 `intelligence/engineering/analytical-reasoning/heuristics/README.md`
+4. ✅ 更新 `intelligence/engineering/analytical-reasoning/README.md`
 5. ✅ 更新 `knowledge/graphs/intelligence-apk-analysis-atoms.yaml`
 6. ✅ 更新 `knowledge/summaries/apk-analysis-pilot.md`
 7. ✅ 更新 `knowledge/runtime/routing-registry.yaml`

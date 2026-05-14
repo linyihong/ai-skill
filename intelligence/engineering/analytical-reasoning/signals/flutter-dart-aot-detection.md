@@ -56,7 +56,7 @@ libflutter.so + libapp.so 存在？
 
 ## 相關 atoms
 
-- `intelligence/engineering/analysis/heuristics/hook-selection.md`
+- `intelligence/engineering/analytical-reasoning/heuristics/hook-selection.md`
 - `analysis/apk/traffic-triage.md`
 
 ## Token 影響

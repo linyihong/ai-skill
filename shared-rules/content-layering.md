@@ -59,7 +59,7 @@
 ### 範例
 
 ```
-intelligence/engineering/analysis/
+intelligence/engineering/analytical-reasoning/
   failure/
     javascript-bitwise-64bit-truncation.md    # 入口：症狀（undecoded、access violation）+ 診斷方式
                                                 # → 解法見 heuristics/javascript-bitwise-64bit-truncation.md

@@ -14,7 +14,7 @@
 
 本目錄不負責：
 
-- **HOW TO THINK** 決策智慧（何時該用哪個技術）；使用 `intelligence/engineering/analysis/`
+- **HOW TO THINK** 決策智慧（何時該用哪個技術）；使用 `intelligence/engineering/analytical-reasoning/`
 - 端到端 agent 執行流程；使用 `workflow/apk-analysis/`
 - 工具選擇與失敗判讀；使用 `analysis/apk/tools-and-failures.md`
 
@@ -22,7 +22,7 @@
 
 - `analysis/apk/traffic-triage.md` 決定流量分流路線，本目錄提供路線內的具體操作
 - `analysis/apk/tools-and-failures.md` 提供工具選擇與命令模板，本目錄提供完整操作流程
-- `intelligence/engineering/analysis/heuristics/` 提供「何時該用哪個流程」的判斷
+- `intelligence/engineering/analytical-reasoning/heuristics/` 提供「何時該用哪個流程」的判斷
 - `workflow/apk-analysis/` 提供端到端 agent 執行流程，本目錄提供單一技術的深度操作
 
 ## 目前 workflows

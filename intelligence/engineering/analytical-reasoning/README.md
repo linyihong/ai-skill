@@ -1,11 +1,11 @@
 # Analysis Engineering Intelligence
 
-`intelligence/engineering/analysis/` 存放與「分析」相關的工程智慧，涵蓋 APK 分析、repository 分析等領域。這些 atoms 描述如何選擇分析路線、辨識技術特徵、避免常見錯誤，以及從分析結果中提煉可重用原則。
+`intelligence/engineering/analytical-reasoning/` 存放與「分析」相關的工程智慧，涵蓋 APK 分析、repository 分析等領域。這些 atoms 描述如何選擇分析路線、辨識技術特徵、避免常見錯誤，以及從分析結果中提煉可重用原則。
 
 ## 目錄結構
 
 ```
-intelligence/engineering/analysis/
+intelligence/engineering/analytical-reasoning/
 ├── README.md                           # 本文件
 ├── evidence-first-routing.md           # 以證據驅動分析路線選擇
 ├── highest-leverage-analysis-path.md   # 最高槓桿分析路徑

@@ -28,8 +28,8 @@
 
 ## 相關 atoms
 
-- `intelligence/engineering/analysis/failure/frida-spawn-race.md`
-- `intelligence/engineering/analysis/heuristics/hook-selection.md`
+- `intelligence/engineering/analytical-reasoning/failure/frida-spawn-race.md`
+- `intelligence/engineering/analytical-reasoning/heuristics/hook-selection.md`
 
 ## Token 影響
 

@@ -1,5 +1,5 @@
 id: graph.intelligence-repo-analysis
-source: intelligence/engineering/analysis/README.md
+source: intelligence/engineering/analytical-reasoning/README.md
 status: candidate
 summary: >
   連接 repo-analysis intelligence 層的所有 atoms：
@@ -7,15 +7,15 @@ summary: >
   每個 atom 從 analysis/repo/ 層萃取可重用的文件回填與追溯性原則。
 edges:
   - type: depends_on
-    target: intelligence/engineering/analysis/README.md
+    target: intelligence/engineering/analytical-reasoning/README.md
     reason: 索引檔案，列出所有 repo-analysis intelligence atoms
     validation: 確認 README 存在且 atoms 列表正確
   - type: related_to
-    target: intelligence/engineering/analysis/documentation-backfill-heuristic.md
+    target: intelligence/engineering/analytical-reasoning/documentation-backfill-heuristic.md
     reason: 文件回填原則：從已實作程式碼系統化恢復缺失的開發文件
     validation: 確認 atom 存在且格式正確
   - type: related_to
-    target: intelligence/engineering/analysis/traceability-heuristic.md
+    target: intelligence/engineering/analytical-reasoning/traceability-heuristic.md
     reason: 文件追溯性原則：建立需求、實作、測試之間的雙向追溯
     validation: 確認 atom 存在且格式正確
   - type: promotes_from

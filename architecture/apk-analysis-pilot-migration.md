@@ -9,9 +9,9 @@
 | Pilot skill | `skills/apk-analysis/` |
 | 狀態 | `techniques-deleted` |
 | 舊入口 | `skills/apk-analysis/SKILL.md` 仍為 active skill entrypoint |
-| 新參考路徑 | `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/analysis/` |
+| 新參考路徑 | `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/analytical-reasoning/` |
 | 大量搬移 | Phase C 已完成 — `skills/apk-analysis/techniques/` 和 `analysis/apk/techniques/` 已刪除。新檔案為 canonical source。 |
-| 已提取檔案 | `workflow/apk-analysis/execution-flow.md`, `workflow/apk-analysis/artifact-gates.md`, `analysis/apk/traffic-triage.md`, `analysis/apk/tools-and-failures.md`, `analysis/apk/workflows/frida-hook-flow.md`, `analysis/apk/workflows/http-api-documentation-flow.md`, `analysis/apk/workflows/local-proxy-hook-flow.md`, `analysis/apk/workflows/media-hls-analysis-flow.md`, `intelligence/engineering/analysis/evidence-first-routing.md`, `intelligence/engineering/analysis/live-readiness-gates.md`, `intelligence/engineering/analysis/heuristics/hook-selection.md`, `intelligence/engineering/analysis/heuristics/api-documentation-completeness.md`, `intelligence/engineering/analysis/heuristics/local-proxy-routing-diagnosis.md`, `intelligence/engineering/analysis/anti-patterns/early-hook-instability.md`, `intelligence/engineering/analysis/failure/frida-spawn-race.md`, `intelligence/engineering/analysis/signals/flutter-dart-aot-detection.md`, `intelligence/engineering/analysis/signals/local-proxy-detection.md`, `intelligence/engineering/analysis/signals/media-type-detection.md` |
+| 已提取檔案 | `workflow/apk-analysis/execution-flow.md`, `workflow/apk-analysis/artifact-gates.md`, `analysis/apk/traffic-triage.md`, `analysis/apk/tools-and-failures.md`, `analysis/apk/workflows/frida-hook-flow.md`, `analysis/apk/workflows/http-api-documentation-flow.md`, `analysis/apk/workflows/local-proxy-hook-flow.md`, `analysis/apk/workflows/media-hls-analysis-flow.md`, `intelligence/engineering/analytical-reasoning/evidence-first-routing.md`, `intelligence/engineering/analytical-reasoning/live-readiness-gates.md`, `intelligence/engineering/analytical-reasoning/heuristics/hook-selection.md`, `intelligence/engineering/analytical-reasoning/heuristics/api-documentation-completeness.md`, `intelligence/engineering/analytical-reasoning/heuristics/local-proxy-routing-diagnosis.md`, `intelligence/engineering/analytical-reasoning/anti-patterns/early-hook-instability.md`, `intelligence/engineering/analytical-reasoning/failure/frida-spawn-race.md`, `intelligence/engineering/analytical-reasoning/signals/flutter-dart-aot-detection.md`, `intelligence/engineering/analytical-reasoning/signals/local-proxy-detection.md`, `intelligence/engineering/analytical-reasoning/signals/media-type-detection.md` |
 | 索引已更新 | `knowledge/indexes/README.md` — 新增 4 條 routing entries |
 
 ## 遷移狀態
@@ -28,9 +28,9 @@
 | `skills/apk-analysis/SKILL.md` | Tool skill trigger、authorization boundary、output style、cross-skill handoff | `workflow/apk-analysis/` | 已遷移至新分層，skills/ 不再作為 active entrypoint | ✅ migrated |
 | `skills/apk-analysis/WORKFLOW.md` | Evidence-first traffic/runtime decision tree | `analysis/apk/` + `workflow/apk-analysis/` | 將 observation / triage methods 拆分到 analysis；execution sequencing 保留在 workflow | candidate |
 | `skills/apk-analysis/TOOLS.md` | 工具選擇、命令模板、失敗判讀 | `analysis/apk/` + `workflow/apk-analysis/` | 將 tool-selection reasoning 移到 analysis；setup steps 保留為 workflow references 或 tool docs | candidate |
-| `skills/apk-analysis/DOCUMENTATION.md` | 專案 artifact templates 與 documentation gates | `workflow/apk-analysis/` + `intelligence/engineering/analysis/` | Artifact production flow 保留在 workflow；stable engineering lessons 提取到 intelligence | candidate |
+| `skills/apk-analysis/DOCUMENTATION.md` | 專案 artifact templates 與 documentation gates | `workflow/apk-analysis/` + `intelligence/engineering/analytical-reasoning/` | Artifact production flow 保留在 workflow；stable engineering lessons 提取到 intelligence | candidate |
 | `skills/apk-analysis/techniques/` | Route-specific analysis methods | `analysis/apk/techniques/` | 已提取 4 個 categories（flutter-dart-aot、http-api、local-proxy、media-hls）到 `analysis/apk/techniques/`，含 routing rules 與 migration notes | ✅ extracted |
-| `skills/apk-analysis/feedback_history/` | Lesson history 與 validated/candidate learning | `intelligence/engineering/analysis/` + `feedback/` + `memory/` | Lesson files 保留在 skill history；stable conclusions 以 reference 方式 promotion，非 bulk copy | candidate |
+| `skills/apk-analysis/feedback_history/` | Lesson history 與 validated/candidate learning | `intelligence/engineering/analytical-reasoning/` + `feedback/` + `memory/` | Lesson files 保留在 skill history；stable conclusions 以 reference 方式 promotion，非 bulk copy | candidate |
 | Cross-skill handoff 到 `app-development-guidance` | Evidence recovery 與 development guidance 之間的邊界 | `workflow/apk-analysis/` | 保留 handoff artifact 與 ownership boundary | candidate |
 
 ## 首批 Reference-First 路徑
@@ -39,7 +39,7 @@
 | --- | --- | --- |
 | 決定如何觀察 APK traffic/runtime 路徑 | `analysis/apk/README.md` | `skills/apk-analysis/WORKFLOW.md`、相關 `skills/apk-analysis/techniques/` category |
 | 執行 APK analysis session 或 handoff | `workflow/apk-analysis/README.md` | `skills/apk-analysis/SKILL.md`、`WORKFLOW.md`、`DOCUMENTATION.md` |
-| 重複使用 APK analysis 的工程經驗 | `intelligence/engineering/analysis/README.md` | `skills/apk-analysis/feedback_history/README.md`、validated lesson files |
+| 重複使用 APK analysis 的工程經驗 | `intelligence/engineering/analytical-reasoning/README.md` | `skills/apk-analysis/feedback_history/README.md`、validated lesson files |
 
 ## 未來遷移的完成條件
 
@@ -52,5 +52,5 @@
 ## 待辦事項
 
 - 為最高價值的 `apk-analysis` workflow 與 technique entries 建立 Knowledge Atom candidates。
-- 定義 feedback lesson 何時從 `skills/apk-analysis/feedback_history/` 畢業到 `intelligence/engineering/analysis/`。
+- 定義 feedback lesson 何時從 `skills/apk-analysis/feedback_history/` 畢業到 `intelligence/engineering/analytical-reasoning/`。
 - 評估 `skills/repo-analysis/` 是否為下一批遷移目標。

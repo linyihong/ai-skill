@@ -25,7 +25,7 @@ console.log("Broken:", broken.toString());
 
 ## 解法
 
-見 [`intelligence/engineering/analysis/heuristics/javascript-bitwise-64bit-truncation.md`](../heuristics/javascript-bitwise-64bit-truncation.md) — 包含正確的 `untagHeapPtr` 實作、`NativePointer` API 用法、以及決策表。
+見 [`intelligence/engineering/analytical-reasoning/heuristics/javascript-bitwise-64bit-truncation.md`](../heuristics/javascript-bitwise-64bit-truncation.md) — 包含正確的 `untagHeapPtr` 實作、`NativePointer` API 用法、以及決策表。
 
 ## 受影響的檔案
 
@@ -39,7 +39,7 @@ console.log("Broken:", broken.toString());
 
 ## 相關 atoms
 
-- [`intelligence/engineering/analysis/heuristics/javascript-bitwise-64bit-truncation.md`](../heuristics/javascript-bitwise-64bit-truncation.md)（解法與預防規則）
+- [`intelligence/engineering/analytical-reasoning/heuristics/javascript-bitwise-64bit-truncation.md`](../heuristics/javascript-bitwise-64bit-truncation.md)（解法與預防規則）
 - `feedback/history/apk-analysis/flutter-dart-aot/2026-05-13_060300-javascript-bitwise-32bit-truncation-dart-64bit-ptr.md`（原始 lesson）
 
 ## Token 影響

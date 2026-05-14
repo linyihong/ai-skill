@@ -121,49 +121,49 @@
 
 ---
 
-## 2. 目標層：`intelligence/engineering/analysis/`
+## 2. 目標層：`intelligence/engineering/analytical-reasoning/`
 
-這類 lessons 包含可泛化的工程判斷、啟發式或信號檢測，適合提取到 `intelligence/engineering/analysis/`。
+這類 lessons 包含可泛化的工程判斷、啟發式或信號檢測，適合提取到 `intelligence/engineering/analytical-reasoning/`。
 
 ### 適合 heuristics/
 
 | 來源檔案 | Status | 標題 | 提取狀態 | 目標檔案 |
 | --- | --- | --- | --- | --- |
-| `common/2026-04-30_120002-高語意-hook-優先於-socket-bytes.md` | promoted | 高語意 hook 優先於 socket bytes | ✅ | `intelligence/engineering/analysis/heuristics/hook-selection.md` |
-| `common/2026-05-07_131000-highest-leverage-analysis-path.md` | candidate | Highest leverage analysis path | ✅ | `intelligence/engineering/analysis/heuristics/` |
-| `flutter-dart-aot/2026-05-01_145948-dart-aot-callsite-hooks-are-not-function-hooks.md` | validated | Dart AOT Callsite Hooks Are Not Function Hooks | ✅ | `intelligence/engineering/analysis/heuristics/` |
-| `flutter-dart-aot/2026-05-07_135100-entry-boundary-before-unstable-aot-hooks.md` | candidate | Entry boundary before unstable AOT hooks | ✅ | `intelligence/engineering/analysis/heuristics/` |
-| `http-api/2026-05-01_171650-ui-architecture-map-from-screenshots.md` | validated | UI Architecture Map from screenshots | ✅ | `intelligence/engineering/analysis/heuristics/ui-operation-stability.md` |
-| `http-api/2026-05-05_183400-ui-automation-operation-scripts-for-api-capture.md` | validated | UI automation operation scripts for API capture | ✅ | `intelligence/engineering/analysis/heuristics/ui-operation-stability.md` |
-| `http-api/2026-05-05_183700-scrollable-clickable-screen-mapping.md` | validated | Scrollable clickable screen mapping | ✅ | `intelligence/engineering/analysis/heuristics/ui-operation-stability.md` |
-| `common/2026-05-07_124100-ui-fast-path-bounded-scroll.md` | candidate | UI fast path and bounded scroll | ✅ | `intelligence/engineering/analysis/heuristics/ui-operation-stability.md` |
-| `http-api/2026-05-05_184700-screen-reachability-operation-recipes.md` | validated | Screen reachability operation recipes | ✅ | `intelligence/engineering/analysis/heuristics/ui-to-api-attribution.md` |
-| `common/2026-05-07_144300-ui-route-backfill-after-runtime-probe.md` | candidate | UI route backfill after runtime probe | ✅ | `intelligence/engineering/analysis/heuristics/ui-to-api-attribution.md` |
-| `common/2026-05-06_111558-foreground-package-validation.md` | promoted | Foreground package validation | ✅ | `intelligence/engineering/analysis/heuristics/ui-to-api-attribution.md` |
-| `common/2026-05-06_130300-feature-context-validation.md` | promoted | Feature context validation | ✅ | `intelligence/engineering/analysis/heuristics/ui-to-api-attribution.md` |
+| `common/2026-04-30_120002-高語意-hook-優先於-socket-bytes.md` | promoted | 高語意 hook 優先於 socket bytes | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/hook-selection.md` |
+| `common/2026-05-07_131000-highest-leverage-analysis-path.md` | candidate | Highest leverage analysis path | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/` |
+| `flutter-dart-aot/2026-05-01_145948-dart-aot-callsite-hooks-are-not-function-hooks.md` | validated | Dart AOT Callsite Hooks Are Not Function Hooks | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/` |
+| `flutter-dart-aot/2026-05-07_135100-entry-boundary-before-unstable-aot-hooks.md` | candidate | Entry boundary before unstable AOT hooks | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/` |
+| `http-api/2026-05-01_171650-ui-architecture-map-from-screenshots.md` | validated | UI Architecture Map from screenshots | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/ui-operation-stability.md` |
+| `http-api/2026-05-05_183400-ui-automation-operation-scripts-for-api-capture.md` | validated | UI automation operation scripts for API capture | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/ui-operation-stability.md` |
+| `http-api/2026-05-05_183700-scrollable-clickable-screen-mapping.md` | validated | Scrollable clickable screen mapping | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/ui-operation-stability.md` |
+| `common/2026-05-07_124100-ui-fast-path-bounded-scroll.md` | candidate | UI fast path and bounded scroll | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/ui-operation-stability.md` |
+| `http-api/2026-05-05_184700-screen-reachability-operation-recipes.md` | validated | Screen reachability operation recipes | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/ui-to-api-attribution.md` |
+| `common/2026-05-07_144300-ui-route-backfill-after-runtime-probe.md` | candidate | UI route backfill after runtime probe | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/ui-to-api-attribution.md` |
+| `common/2026-05-06_111558-foreground-package-validation.md` | promoted | Foreground package validation | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/ui-to-api-attribution.md` |
+| `common/2026-05-06_130300-feature-context-validation.md` | promoted | Feature context validation | ✅ | `intelligence/engineering/analytical-reasoning/heuristics/ui-to-api-attribution.md` |
 
 ### 適合 anti-patterns/
 
 | 來源檔案 | Status | 標題 | 提取狀態 | 目標檔案 |
 | --- | --- | --- | --- | --- |
-| `common/2026-04-30_120000-proxy-failure-要先拆成導流與-tls-兩層.md` | promoted | Proxy failure 要先拆成導流與 TLS 兩層 | ✅ | `intelligence/engineering/analysis/anti-patterns/` |
-| `common/2026-05-01_112900-proxy-config-vs-business-route.md` | validated | Proxy config is not business route proof | ✅ | `intelligence/engineering/analysis/anti-patterns/` |
+| `common/2026-04-30_120000-proxy-failure-要先拆成導流與-tls-兩層.md` | promoted | Proxy failure 要先拆成導流與 TLS 兩層 | ✅ | `intelligence/engineering/analytical-reasoning/anti-patterns/` |
+| `common/2026-05-01_112900-proxy-config-vs-business-route.md` | validated | Proxy config is not business route proof | ✅ | `intelligence/engineering/analytical-reasoning/anti-patterns/` |
 
 ### 適合 failure/
 
 | 來源檔案 | Status | 標題 | 提取狀態 | 目標檔案 |
 | --- | --- | --- | --- | --- |
-| `common/2026-04-30_120004-frida-只有-banner-時先做最小-hook-健康檢查.md` | validated | Frida 只有 banner 時先做最小 hook 健康檢查 | ✅ | `intelligence/engineering/analysis/failure/` |
-| `common/2026-05-06_090100-frida-17-jailed-android-gadget-gate.md` | validated | Frida 17 / jailed Android Gadget gate | ✅ | `intelligence/engineering/analysis/failure/` |
-| `common/2026-05-06_092200-frida-server-version-alignment.md` | validated | Frida server version alignment before attach debugging | ✅ | `intelligence/engineering/analysis/failure/` |
+| `common/2026-04-30_120004-frida-只有-banner-時先做最小-hook-健康檢查.md` | validated | Frida 只有 banner 時先做最小 hook 健康檢查 | ✅ | `intelligence/engineering/analytical-reasoning/failure/` |
+| `common/2026-05-06_090100-frida-17-jailed-android-gadget-gate.md` | validated | Frida 17 / jailed Android Gadget gate | ✅ | `intelligence/engineering/analytical-reasoning/failure/` |
+| `common/2026-05-06_092200-frida-server-version-alignment.md` | validated | Frida server version alignment before attach debugging | ✅ | `intelligence/engineering/analytical-reasoning/failure/` |
 
 ### 適合 signals/
 
 | 來源檔案 | Status | 標題 | 提取狀態 | 目標檔案 |
 | --- | --- | --- | --- | --- |
-| `common/2026-05-01_101500-doh-dns-query-param-side-channel-from-okhttp-log.md` | validated | DoH 的 `dns=` 參數可作為 MITM 業務 host 空白時的側信道 | ✅ | `intelligence/engineering/analysis/signals/` |
-| `local-proxy/2026-04-30_120009-內建-sing-box-tun-類通道可能繞過-wi-fi-系統代理.md` | candidate | 內建 sing-box／TUN 類通道可能繞過 Wi‑Fi 系統代理 | ✅ | `intelligence/engineering/analysis/signals/local-proxy-detection.md` |
-| `local-proxy/2026-04-30_120010-本機-loopback-proxyserver-轉發會讓-wi-fi-http-mitm-看不到業務-connect.md` | candidate | 本機 loopback「ProxyServer」轉發會讓 Wi‑Fi HTTP MITM 看不到業務 CONNECT | ✅ | `intelligence/engineering/analysis/signals/local-proxy-detection.md` |
+| `common/2026-05-01_101500-doh-dns-query-param-side-channel-from-okhttp-log.md` | validated | DoH 的 `dns=` 參數可作為 MITM 業務 host 空白時的側信道 | ✅ | `intelligence/engineering/analytical-reasoning/signals/` |
+| `local-proxy/2026-04-30_120009-內建-sing-box-tun-類通道可能繞過-wi-fi-系統代理.md` | candidate | 內建 sing-box／TUN 類通道可能繞過 Wi‑Fi 系統代理 | ✅ | `intelligence/engineering/analytical-reasoning/signals/local-proxy-detection.md` |
+| `local-proxy/2026-04-30_120010-本機-loopback-proxyserver-轉發會讓-wi-fi-http-mitm-看不到業務-connect.md` | candidate | 本機 loopback「ProxyServer」轉發會讓 Wi‑Fi HTTP MITM 看不到業務 CONNECT | ✅ | `intelligence/engineering/analytical-reasoning/signals/local-proxy-detection.md` |
 
 ---
 
@@ -231,7 +231,7 @@
 | 目標層 | lessons 數量 | 已提取 | 未提取 |
 | --- | ---: | ---: | ---: |
 | `workflow/apk-analysis/` | 29 | 29 | 0 |
-| `intelligence/engineering/analysis/` | 17 | 17 | 0 |
+| `intelligence/engineering/analytical-reasoning/` | 17 | 17 | 0 |
 | `analysis/apk/workflows/` | 12 | 12 | 0 |
 | `analysis/apk/tools-and-failures.md` | 3 | 3 | 0 |
 | `workflow/apk-analysis/artifact-gates.md` | 4 | 4 | 0 |
