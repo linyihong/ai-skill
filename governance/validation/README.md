@@ -19,6 +19,7 @@
 | Runtime refresh orchestration | 執行 `ruby scripts/refresh-knowledge-runtime.rb` 一鍵重建 reports / SQLite index 並跑 validators。 | 多個 generated runtime surfaces 可能同時 stale 時。 |
 | Knowledge runtime helper | 執行 `ruby scripts/validate-knowledge-runtime.rb` 檢查 generated surfaces。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
 | Link check | 解析 touched docs 的 Markdown links。 | Documentation changes。 |
+| Neutral language | 依 [`enforcement/neutral-language.md`](../../enforcement/neutral-language.md) 檢查可重用文件：繁體中文正文、英文限路徑／指令／符號與必要專有名詞、標題與摘要中性化。 | 變更 `enforcement/`、`skills/**/README.md`、根 `README.md`、根 `CONTRIBUTING.md`、`governance/` 下可重用說明、模板或 onboarding 類 Markdown。 |
 | Lints | 執行 touched files 可用的 lints。 | Documentation 或 code changes。 |
 | Diff review | 檢查 secrets、private hostnames、raw evidence、local absolute paths 與 unrelated changes。 | Commit 前。 |
 | Close-loop dry run | 執行 `./scripts/ai-skill-close-loop.sh` 確認 dirty path grouping。 | Commit 前。 |
