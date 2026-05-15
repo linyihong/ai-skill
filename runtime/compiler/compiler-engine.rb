@@ -56,6 +56,10 @@ def extract_domain(source_path)
   match = source_path.match(%r{enforcement/(.+)\.md$})
   return match[1].tr('-', '_') if match
 
+  # plans/active/*.md → plans-index (single target for all plans)
+  match = source_path.match(%r{plans/})
+  return 'plans-index' if match
+
   'unknown'
 end
 
@@ -514,6 +518,88 @@ def compile_failure_recovery(source_path, mapping_entry)
   puts "  ✓ #{target}"
 end
 
+def compile_plans_index(source_path, _mapping_entry)
+  content = File.read(source_path)
+
+  # Extract plan_id from filename (YYYY-MM-DD-HHMM-<slug>.md)
+  filename = File.basename(source_path, '.md')
+  plan_id = filename.sub(/^\d{4}-\d{2}-\d{2}-\d{4}-/, '')
+
+  # Extract status from front matter (> **狀態**: draft/in-progress/completed)
+  status = 'unknown'
+  status_match = content.match(/>\s*\*\*狀態\*\*[：:]\s*(.+)$/)
+  status = status_match[1].strip if status_match
+
+  # Extract title from first # heading
+  title = ''
+  title_match = content.match(/^#\s+(.+)$/)
+  title = title_match[1].strip if title_match
+
+  # Extract purpose from front matter (> **目的**: ...)
+  purpose = ''
+  purpose_match = content.match(/>\s*\*\*目的\*\*[：:]\s*(.+)$/)
+  purpose = purpose_match[1].strip if purpose_match
+
+  # Fallback: if no front matter status, check if file is in archived/
+  if status == 'unknown'
+    status = source_path.include?('/archived/') ? 'completed' : 'draft'
+  end
+
+  # Extract phases from ### Phase N: Title (P0/P1/P2) headings
+  # Supports both half-width (P0) and full-width （P0）parentheses
+  phases = []
+  content.scan(/^###\s+Phase\s+(\d+)[：:]\s*(.+?)$/) do |match|
+    phase_num = match[0].strip.to_i
+    phase_title_line = match[1].strip
+
+    # Extract priority from parenthetical (P0/P1/P2/P3) — both half and full width
+    # Matches formats: (P0), （P0）, (P0 — 立即), （P0 — 立即）
+    priority = 'P?'
+    priority_match = phase_title_line.match(/[（(]P(\d)/)
+    priority = "P#{priority_match[1]}" if priority_match
+
+    # Clean title (remove priority annotation like (P0) or （P0 — 立即）)
+    phase_title = phase_title_line.gsub(/[（(]P\d[^)）]*[)）]/, '').strip
+
+    phases << {
+      'phase' => phase_num,
+      'title' => phase_title,
+      'priority' => priority
+    }
+  end
+
+  # Extract affected files from tables with "檔案 | 變更類型 | Phase" header
+  affected_files = []
+  in_affected_table = false
+  content.each_line do |line|
+    if line.match?(/^\|\s*檔案\s*\|\s*變更類型\s*\|\s*Phase\s*\|$/)
+      in_affected_table = true
+      next
+    end
+    if in_affected_table
+      break unless line.match?(/^\|.+\|.+\|.+\|$/)
+      next if line.match?(/^\|[\s-]+\|[\s-]+\|[\s-]+\|$/)
+      cols = line.split('|').map(&:strip).reject(&:empty?)
+      next if cols.length < 3
+      affected_files << {
+        'path' => cols[0],
+        'change_type' => cols[1],
+        'phase' => cols[2]
+      }
+    end
+  end
+
+  {
+    'plan_id' => plan_id,
+    'filename' => filename,
+    'title' => title,
+    'status' => status,
+    'purpose' => purpose,
+    'phases' => phases,
+    'affected_files' => affected_files
+  }
+end
+
 def compile_source(source_path, mapping_entry)
   compile_rule = mapping_entry['compile_rule']
 
@@ -532,6 +618,8 @@ def compile_source(source_path, mapping_entry)
     compile_goal_action_gates(source_path, mapping_entry)
   when /從 failure taxonomy 與 recovery 描述提取 pattern 與 strategy/
     compile_failure_recovery(source_path, mapping_entry)
+  when /從 plans\/active\/\*\.md 的 front matter、phase 標題、受影響檔案表格提取 plan index/
+    compile_plans_index(source_path, mapping_entry)
   else
     puts "  ⚠  Unknown compile rule: #{compile_rule}"
   end
@@ -539,15 +627,30 @@ end
 
 def check_modified_sources
   modified = []
+  plans_modified = false
+  plans_target = File.join(GENERATED_DIR, 'plans-index.yaml')
+
   @mapping.each do |entry|
     source_glob = entry['source']
     Dir.glob(source_glob).each do |source_path|
-      target = target_path_for(source_path, entry)
-      if !File.exist?(target) || File.mtime(source_path) > File.mtime(target)
-        modified << { source: source_path, mapping: entry }
+      # Plans index: check if any plan file is newer than the aggregated target
+      if entry['compile_rule']&.include?('plans/active/*.md')
+        if !File.exist?(plans_target) || File.mtime(source_path) > File.mtime(plans_target)
+          plans_modified = true
+        end
+      else
+        target = target_path_for(source_path, entry)
+        if !File.exist?(target) || File.mtime(source_path) > File.mtime(target)
+          modified << { source: source_path, mapping: entry }
+        end
       end
     end
   end
+
+  if plans_modified
+    modified << { source: 'plans/active/*.md', mapping: @mapping.find { |e| e['compile_rule']&.include?('plans/active/*.md') } }
+  end
+
   modified
 end
 
@@ -582,11 +685,33 @@ def run(options)
   puts "Compiling prose sources to generated YAML..."
   puts
 
+  # Track plans index entries for aggregation
+  plans_entries = []
+
   @mapping.each do |entry|
     source_glob = entry['source']
     Dir.glob(source_glob).each do |source_path|
-      compile_source(source_path, entry)
+      # Special handling for plans index: aggregate all plans into one file
+      if entry['compile_rule']&.include?('plans/active/*.md')
+        plans_entries << compile_plans_index(source_path, entry)
+      else
+        compile_source(source_path, entry)
+      end
     end
+  end
+
+  # Write aggregated plans index
+  unless plans_entries.empty?
+    target = File.join(GENERATED_DIR, 'plans-index.yaml')
+    header = generated_header('plans/active/*.md')
+    yaml_content = {
+      'header' => header,
+      'compiled_from' => 'plans/active/*.md',
+      'total_plans' => plans_entries.length,
+      'plans' => plans_entries
+    }
+    File.write(target, YAML.dump(yaml_content))
+    puts "  ✓ #{target}"
   end
 
   puts

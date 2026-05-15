@@ -103,7 +103,19 @@ source_target_mapping:
       - content_boundary_rules
     compile_rule: "從 tool-neutral-documentation.md 的核心規則與允許位置提取 tool neutrality 定義"
 
-  # ── P3.5: Knowledge Update Flow Mapping ──
+  # ── P3.5: Plans Index Mapping ──
+
+  - source: "plans/active/*.md"
+    target: "runtime/generated/plans-index.yaml"
+    extract:
+      - plan_id
+      - plan_status
+      - plan_priority
+      - phases
+      - affected_files
+    compile_rule: "從 plans/active/*.md 的 front matter、phase 標題、受影響檔案表格提取 plan index"
+
+  # ── P3.6: Knowledge Update Flow Mapping ──
 
   - source: "governance/lifecycle/knowledge-update-flow.md"
     target: "runtime/generated/knowledge-update-phases.yaml"
