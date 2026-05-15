@@ -1,7 +1,7 @@
 ---
 header:
   generated_from: governance/lifecycle/knowledge-update-flow.md
-  generated_at: '2026-05-15T02:15:52Z'
+  generated_at: '2026-05-15T02:22:13Z'
   compiler_version: 1.0.0
   status: synced
 compiled_from: governance/lifecycle/knowledge-update-flow.md
@@ -33,6 +33,8 @@ steps:
   references:
   - name: feedback/promotion/README.md
     path: "../../feedback/promotion/README.md"
+  - name: runtime/output-governance/language-policy.yaml
+    path: "../../runtime/output-governance/language-policy.yaml"
 - step: 4
   name: 寫入 Feedback Lesson
   entry_conditions: []
