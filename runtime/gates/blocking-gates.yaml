@@ -1,0 +1,276 @@
+# Blocking Gates
+# 定義每個 phase 中必須通過的 blocking gates。Gate 是「不能做的事」，
+# 與 obligation（「該做的事」）互補。
+#
+# Gate 有三種 severity：
+#   - critical: 未通過時 block phase transition，agent 不能繼續
+#   - high: 未通過時 block phase transition，但可進入 recovery
+#   - medium: 未通過時記錄警告，不 block phase transition
+#
+# 依賴：
+#   - runtime/phases/phase-machine.yaml（phase 定義）
+#   - runtime/obligations/obligation-ledger.yaml（obligation 定義）
+
+blocking_gates_version: v1
+status: active
+owner_layer: runtime/gates
+description: >
+  Per-phase blocking gates. 定義每個 phase 中必須通過的檢查點。
+  Gate 是 phase transition 的必要條件。未通過 critical/high gate 時，
+  agent 不能進入下一個 phase。
+
+gates:
+  # ── Bootstrap Gates ──
+  - id: gate.bootstrap.core_rules_loaded
+    phase: phase.bootstrap
+    name: Core Rules Loaded
+    description: "CORE_BOOTSTRAP.md 的 3 條核心規則已載入"
+    severity: critical
+    check:
+      type: file_read
+      target: CORE_BOOTSTRAP.md
+      verification: "core_bootstrap_loaded == true"
+    failure_action: halt_bootstrap
+    failure_message: "無法繼續：CORE_BOOTSTRAP.md 未載入"
+
+  - id: gate.bootstrap.layout_loaded
+    phase: phase.bootstrap
+    name: Layout Loaded
+    description: "README.md（OS layout）已載入"
+    severity: high
+    check:
+      type: file_read
+      target: README.md
+      verification: "layout_loaded == true"
+    failure_action: warn + continue
+    failure_message: "警告：README.md 未載入，可能缺少 OS layout 資訊"
+
+  # ── Checkpoint Gates ──
+  - id: gate.checkpoint.obligation_ledger_loaded
+    phase: phase.checkpoint
+    name: Obligation Ledger Loaded
+    description: "Obligation ledger 已讀取，pending obligations 已確認"
+    severity: critical
+    check:
+      type: file_read
+      target: runtime/obligations/obligation-ledger.yaml
+      verification: "obligation_ledger_loaded == true AND pending_obligations_reviewed == true"
+    failure_action: block_transition
+    failure_message: "無法進入 execution：obligation ledger 未讀取或有未完成的 obligation"
+
+  - id: gate.checkpoint.blocking_gates_checked
+    phase: phase.checkpoint
+    name: Blocking Gates Checked
+    description: "本輪的 blocking gates 已檢查，無 blocking condition"
+    severity: critical
+    check:
+      type: file_read
+      target: runtime/gates/blocking-gates.yaml
+      verification: "blocking_gates_checked == true AND no_blocking_condition == true"
+    failure_action: block_transition
+    failure_message: "無法進入 execution：有 blocking gate 未通過"
+
+  # ── Execution Gates ──
+  - id: gate.execution.goal_defined
+    phase: phase.execution
+    name: Goal Defined
+    description: "本輪的執行目標已明確定義"
+    severity: critical
+    check:
+      type: verification
+      target: ".agent-goals/ 或 conversation context"
+      verification: "execution_goal_defined == true"
+    failure_action: block_execution
+    failure_message: "無法執行：本輪目標未定義"
+
+  - id: gate.execution.scope_clear
+    phase: phase.execution
+    name: Scope Clear
+    description: "執行範圍已明確，無 scope creep 風險"
+    severity: high
+    check:
+      type: verification
+      target: "goal definition"
+      verification: "execution_scope_clear == true"
+    failure_action: warn + confirm
+    failure_message: "警告：執行範圍不明確，建議先釐清 scope"
+
+  # ── Validation Gates ──
+  - id: gate.validation.all_obligations_met
+    phase: phase.validation
+    name: All Obligations Met
+    description: "本輪所有 obligation 已完成"
+    severity: critical
+    check:
+      type: verification
+      target: runtime/obligations/obligation-ledger.yaml
+      verification: "all_phase_obligations_fulfilled == true"
+    failure_action: block_transition
+    failure_message: "無法進入 commit：有未完成的 obligation"
+
+  - id: gate.validation.linked_updates_complete
+    phase: phase.validation
+    name: Linked Updates Complete
+    description: "所有連動更新已執行（依 enforcement/linked-updates.md）"
+    severity: critical
+    check:
+      type: verification
+      target: enforcement/linked-updates.md
+      verification: "all_linked_updates_applied == true OR no_linked_updates_needed == true"
+    failure_action: block_transition
+    failure_message: "無法進入 commit：有連動更新未完成"
+
+  - id: gate.validation.artifacts_complete
+    phase: phase.validation
+    name: Artifacts Complete
+    description: "本輪產出的 artifacts 完整且符合規範"
+    severity: high
+    check:
+      type: verification
+      target: "artifact list"
+      verification: "all_required_artifacts_produced == true"
+    failure_action: warn + suggest_fix
+    failure_message: "警告：部分 artifacts 可能不完整"
+
+  - id: gate.validation.no_forbidden_actions_used
+    phase: phase.validation
+    name: No Forbidden Actions Used
+    description: "本輪未使用任何 forbidden actions"
+    severity: critical
+    check:
+      type: audit
+      target: "action log"
+      verification: "no_forbidden_actions_in_log == true"
+    failure_action: block_transition + escalate
+    failure_message: "嚴重：偵測到 forbidden action 使用，需進入 recovery"
+
+  # ── Commit Gates ──
+  - id: gate.commit.staging_complete
+    phase: phase.commit
+    name: Staging Complete
+    description: "所有變更已 git add"
+    severity: critical
+    check:
+      type: command
+      target: "git diff --cached"
+      verification: "staging_complete == true"
+    failure_action: block_commit
+    failure_message: "無法 commit：有變更未 staging"
+
+  - id: gate.commit.commit_message_valid
+    phase: phase.commit
+    name: Commit Message Valid
+    description: "Commit message 符合 conventional commit 格式"
+    severity: high
+    check:
+      type: verification
+      target: "commit message"
+      verification: "commit_message_format_valid == true"
+    failure_action: warn + suggest_format
+    failure_message: "警告：commit message 格式不標準"
+
+  - id: gate.commit.pre_commit_hooks_passed
+    phase: phase.commit
+    name: Pre-commit Hooks Passed
+    description: "Pre-commit hook 執行成功"
+    severity: critical
+    check:
+      type: command
+      target: "git commit 輸出"
+      verification: "pre_commit_hooks_exit_code == 0"
+    failure_action: block_commit
+    failure_message: "無法 commit：pre-commit hook 失敗"
+
+  # ── Push Gates ──
+  - id: gate.push.remote_reachable
+    phase: phase.push
+    name: Remote Reachable
+    description: "遠端 repository 可連線"
+    severity: critical
+    check:
+      type: command
+      target: "git remote -v"
+      verification: "remote_reachable == true"
+    failure_action: block_push
+    failure_message: "無法 push：遠端無法連線"
+
+  - id: gate.push.push_successful
+    phase: phase.push
+    name: Push Successful
+    description: "git push 成功"
+    severity: critical
+    check:
+      type: command
+      target: "git push 輸出"
+      verification: "push_exit_code == 0"
+    failure_action: block_transition
+    failure_message: "無法進入 readback：push 失敗"
+
+  # ── Readback Gates ──
+  - id: gate.readback.working_tree_clean
+    phase: phase.readback
+    name: Working Tree Clean
+    description: "git status 顯示工作樹乾淨"
+    severity: critical
+    check:
+      type: command
+      target: "git status --short"
+      verification: "working_tree_clean == true"
+    failure_action: block_transition
+    failure_message: "無法進入 finalize：工作樹不乾淨"
+
+  - id: gate.readback.remote_synced
+    phase: phase.readback
+    name: Remote Synced
+    description: "本地與遠端同步"
+    severity: high
+    check:
+      type: command
+      target: "git log --oneline origin/main..main"
+      verification: "local_remote_synced == true"
+    failure_action: warn + suggest_push
+    failure_message: "警告：本地與遠端不同步，建議重新 push"
+
+  # ── Finalize Gates ──
+  - id: gate.finalize.all_obligations_closed
+    phase: phase.finalize
+    name: All Obligations Closed
+    description: "本輪所有 obligation 已關閉"
+    severity: critical
+    check:
+      type: verification
+      target: runtime/obligations/obligation-ledger.yaml
+      verification: "all_obligations_closed == true"
+    failure_action: block_finalize
+    failure_message: "無法 finalize：有 obligation 未關閉"
+
+  - id: gate.finalize.knowledge_updated
+    phase: phase.finalize
+    name: Knowledge Updated
+    description: "知識更新 checkpoint 已執行"
+    severity: high
+    check:
+      type: verification
+      target: governance/lifecycle/knowledge-update-flow.md
+      verification: "knowledge_checkpoint_completed == true"
+    failure_action: warn + suggest_update
+    failure_message: "警告：知識更新 checkpoint 未執行"
+
+  # ── Recovery Gates ──
+  - id: gate.recovery.repair_strategy_defined
+    phase: phase.recovery
+    name: Repair Strategy Defined
+    description: "修復策略已定義，有明確的修復步驟"
+    severity: critical
+    check:
+      type: verification
+      target: "recovery plan"
+      verification: "repair_strategy_defined == true"
+    failure_action: halt_recovery
+    failure_message: "無法修復：修復策略未定義"
+
+metadata:
+  priority: P0
+  confidence: high
+  compatibility_state: new
+  last_checked: 2026-05-15

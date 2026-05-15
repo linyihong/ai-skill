@@ -1,0 +1,235 @@
+# Obligation Ledger
+# 定義每個 phase 中 agent 必須完成的 obligation。Obligation 是「該做的事」，
+# 與 blocking gates（「不能做的事」）互補。
+#
+# Agent 在每個 phase 進入時讀取此檔案，確認該 phase 有哪些 obligation 需要完成。
+# Obligation 完成後標記為 fulfilled，未完成時會 block phase transition。
+#
+# 依賴：
+#   - runtime/phases/phase-machine.yaml（phase 定義）
+#   - runtime/gates/blocking-gates.yaml（gate 定義）
+#   - enforcement/conversation-goal-ledger.md（goal 追蹤）
+
+obligation_ledger_version: v1
+status: active
+owner_layer: runtime/obligations
+description: >
+  Per-phase obligation ledger. 定義每個 phase 中 agent 必須完成的 obligation。
+  Obligation 是 atomic duty，完成後標記 fulfilled。所有 obligation 都 fulfilled
+  後才能進行 phase transition（除非進入 recovery）。
+
+obligations:
+  # ── Bootstrap Phase ──
+  - id: obligation.bootstrap.init_ledger
+    phase: phase.bootstrap
+    name: Initialize Obligation Ledger
+    description: "初始化 obligation ledger，建立空的 obligation 追蹤表"
+    verification:
+      - "obligation_ledger_initialized == true"
+    severity: critical
+    depends_on: []
+    linked_gates:
+      - gate.bootstrap.core_rules_loaded
+
+  # ── Checkpoint Phase ──
+  - id: obligation.checkpoint.review_pending_obligations
+    phase: phase.checkpoint
+    name: Review Pending Obligations
+    description: "讀取 obligation ledger，檢查上一輪是否有未完成的 obligation"
+    verification:
+      - "pending_obligations_reviewed == true"
+      - "no_stale_obligations == true OR stale_obligations_documented == true"
+    severity: critical
+    depends_on:
+      - obligation.bootstrap.init_ledger
+    linked_gates:
+      - gate.checkpoint.obligation_ledger_loaded
+
+  - id: obligation.checkpoint.check_knowledge_update_needed
+    phase: phase.checkpoint
+    name: Check Knowledge Update Needed
+    description: "檢查 governance/lifecycle/knowledge-update-flow.md 判斷本輪是否需要知識更新"
+    verification:
+      - "knowledge_update_check_completed == true"
+    severity: high
+    depends_on: []
+    linked_gates:
+      - gate.checkpoint.blocking_gates_checked
+
+  # ── Execution Phase ──
+  - id: obligation.execution.log_actions
+    phase: phase.execution
+    name: Log Actions
+    description: "記錄本輪執行的所有 action，供 validation 階段檢查"
+    verification:
+      - "action_log_maintained == true"
+    severity: medium
+    depends_on: []
+    linked_gates: []
+
+  - id: obligation.execution.track_artifacts
+    phase: phase.execution
+    name: Track Artifacts
+    description: "追蹤本輪產出的 artifacts（檔案修改、命令輸出等）"
+    verification:
+      - "artifact_list_maintained == true"
+    severity: medium
+    depends_on: []
+    linked_gates: []
+
+  # ── Validation Phase ──
+  - id: obligation.validation.run_knowledge_runtime_validator
+    phase: phase.validation
+    name: Run Knowledge Runtime Validator
+    description: "執行 ruby scripts/validate-knowledge-runtime.rb 檢查 knowledge runtime 一致性"
+    verification:
+      - "validator_exit_code == 0"
+      - "validator_output_no_errors == true"
+    severity: critical
+    depends_on:
+      - obligation.execution.log_actions
+    linked_gates:
+      - gate.validation.all_obligations_met
+
+  - id: obligation.validation.check_linked_updates
+    phase: phase.validation
+    name: Check Linked Updates
+    description: "依 enforcement/linked-updates.md 檢查所有連動更新是否完整"
+    verification:
+      - "linked_updates_checked == true"
+      - "all_linked_updates_applied == true OR no_linked_updates_needed == true"
+    severity: critical
+    depends_on:
+      - obligation.execution.track_artifacts
+    linked_gates:
+      - gate.validation.linked_updates_complete
+
+  # ── Commit Phase ──
+  - id: obligation.commit.write_commit_message
+    phase: phase.commit
+    name: Write Commit Message
+    description: "撰寫符合 conventional commit 格式的 commit message"
+    verification:
+      - "commit_message_written == true"
+      - "commit_message_format_valid == true"
+    severity: critical
+    depends_on: []
+    linked_gates:
+      - gate.commit.commit_message_valid
+
+  - id: obligation.commit.verify_pre_commit_hooks
+    phase: phase.commit
+    name: Verify Pre-commit Hooks
+    description: "確認 pre-commit hook 執行成功，無 blocking errors"
+    verification:
+      - "pre_commit_hooks_passed == true"
+    severity: critical
+    depends_on:
+      - obligation.commit.write_commit_message
+    linked_gates:
+      - gate.commit.pre_commit_hooks_passed
+
+  # ── Push Phase ──
+  - id: obligation.push.verify_push_success
+    phase: phase.push
+    name: Verify Push Success
+    description: "確認 git push 成功，遠端已接收所有 commit"
+    verification:
+      - "push_exit_code == 0"
+      - "remote_ref_updated == true"
+    severity: critical
+    depends_on: []
+    linked_gates:
+      - gate.push.push_successful
+
+  # ── Readback Phase ──
+  - id: obligation.readback.verify_clean_tree
+    phase: phase.readback
+    name: Verify Clean Working Tree
+    description: "執行 git status 確認工作樹乾淨，無未追蹤或未提交的變更"
+    verification:
+      - "working_tree_clean == true"
+    severity: critical
+    depends_on:
+      - obligation.push.verify_push_success
+    linked_gates:
+      - gate.readback.working_tree_clean
+
+  - id: obligation.readback.confirm_sync
+    phase: phase.readback
+    name: Confirm Remote Sync
+    description: "確認本地與遠端同步（git log 比對）"
+    verification:
+      - "local_remote_synced == true"
+    severity: high
+    depends_on:
+      - obligation.readback.verify_clean_tree
+    linked_gates:
+      - gate.readback.remote_synced
+
+  # ── Finalize Phase ──
+  - id: obligation.finalize.close_ledger
+    phase: phase.finalize
+    name: Close Obligation Ledger
+    description: "關閉本輪的 obligation ledger，清理已完成的 obligation 記錄"
+    verification:
+      - "all_obligations_fulfilled == true"
+      - "ledger_closed == true"
+    severity: critical
+    depends_on:
+      - obligation.readback.confirm_sync
+    linked_gates:
+      - gate.finalize.all_obligations_closed
+
+  - id: obligation.finalize.run_knowledge_checkpoint
+    phase: phase.finalize
+    name: Run Knowledge Update Checkpoint
+    description: "執行 governance/lifecycle/knowledge-update-flow.md 的知識更新檢查"
+    verification:
+      - "knowledge_checkpoint_completed == true"
+    severity: high
+    depends_on:
+      - obligation.finalize.close_ledger
+    linked_gates:
+      - gate.finalize.knowledge_updated
+
+  # ── Recovery Phase ──
+  - id: obligation.recovery.diagnose_root_cause
+    phase: phase.recovery
+    name: Diagnose Root Cause
+    description: "診斷 state inconsistency 的根本原因"
+    verification:
+      - "root_cause_identified == true"
+    severity: critical
+    depends_on: []
+    linked_gates:
+      - gate.recovery.repair_strategy_defined
+
+  - id: obligation.recovery.apply_repair
+    phase: phase.recovery
+    name: Apply Repair
+    description: "執行修復策略，修復 state/obligation/phase 不一致"
+    verification:
+      - "repair_applied == true"
+    severity: critical
+    depends_on:
+      - obligation.recovery.diagnose_root_cause
+    linked_gates: []
+
+  - id: obligation.recovery.verify_repair
+    phase: phase.recovery
+    name: Verify Repair
+    description: "驗證修復是否成功，state 是否已一致"
+    verification:
+      - "repair_verified == true"
+      - "state_consistent == true"
+    severity: critical
+    depends_on:
+      - obligation.recovery.apply_repair
+    linked_gates: []
+
+metadata:
+  priority: P0
+  confidence: high
+  compatibility_state: new
+  last_checked: 2026-05-15

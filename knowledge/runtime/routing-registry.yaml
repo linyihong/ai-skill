@@ -40,6 +40,86 @@ records:
       compression_level: summary-first
       reason: Bootstrap 階段只需要 Core Bootstrap 3 rules 與 OS layout，不需要完整 source。
 
+  - id: route.runtime.phase-machine
+    task_intent: 載入目前 phase 狀態、allowed/forbidden actions、phase transition rules
+    primary_source: runtime/phases/phase-machine.yaml
+    required_dependencies:
+      - CORE_BOOTSTRAP.md
+      - README.md
+    candidate_sources:
+      - runtime/obligations/obligation-ledger.yaml
+      - runtime/gates/blocking-gates.yaml
+    source_of_truth_gate: runtime-phase-machine-active
+    ranking_reason: Phase Machine 定義 9 個 phase（bootstrap→checkpoint→execution→validation→commit→push→readback→finalize→recovery），每個 session 啟動後必須載入目前 phase 才能決定 allowed_actions 與 blocking gates。
+    validation_signal: 目前 phase 已確認，allowed_actions 與 forbidden_actions 已載入，phase transition rules 已檢查。
+    metadata:
+      priority: P0
+      confidence: high
+      context_cost:
+        estimated_tokens: 800
+        load_strategy: preload
+        cacheable: false
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Phase Machine 是執行階段的核心狀態機，每個 session 啟動後必須載入。
+
+  - id: route.runtime.obligation-ledger
+    task_intent: 載入本 phase 的未完成義務清單，確認執行前義務已滿足
+    primary_source: runtime/obligations/obligation-ledger.yaml
+    required_dependencies:
+      - runtime/phases/phase-machine.yaml
+    candidate_sources:
+      - runtime/gates/blocking-gates.yaml
+      - enforcement/conversation-goal-ledger.md
+    source_of_truth_gate: runtime-obligation-ledger-active
+    ranking_reason: Obligation Ledger 定義 15 個 atomic duties 分散在 9 個 phase，每個 phase 有對應的 obligations 需在 phase entry 時檢查。
+    validation_signal: 本 phase 的 obligations 已確認，pending obligations 已記錄，blocking gates 已檢查。
+    metadata:
+      priority: P0
+      confidence: high
+      context_cost:
+        estimated_tokens: 600
+        load_strategy: preload
+        cacheable: false
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Obligation Ledger 是執行階段的義務檢查清單，每個 phase entry 時必須載入。
+
+  - id: route.runtime.blocking-gates
+    task_intent: 載入本 phase 的阻斷閘門，確認 phase transition 是否被允許
+    primary_source: runtime/gates/blocking-gates.yaml
+    required_dependencies:
+      - runtime/phases/phase-machine.yaml
+      - runtime/obligations/obligation-ledger.yaml
+    candidate_sources:
+      - enforcement/goal-action-validation.md
+      - enforcement/failure-learning-system.md
+    source_of_truth_gate: runtime-blocking-gates-active
+    ranking_reason: Blocking Gates 定義 18 個 gates 分散在 9 個 phase，severity 分 critical/high/medium，critical 與 high 會 blocking phase transition。
+    validation_signal: 本 phase 的 blocking gates 已檢查，無未通過的 critical/high gates，phase transition 可進行。
+    metadata:
+      priority: P0
+      confidence: high
+      context_cost:
+        estimated_tokens: 500
+        load_strategy: preload
+        cacheable: false
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Blocking Gates 是執行階段的阻斷檢查，每個 phase transition 前必須載入。
+
   - id: route.skill.discovery
     task_intent: 根據 task intent 找到對應 skill
     primary_source: skills-index.yaml

@@ -17,20 +17,25 @@
 ```
 1. 讀取 CORE_BOOTSTRAP.md（本檔）
 2. 讀取 README.md（超短入口，了解 OS layout）
-3. [新專案檢查] 檢查目前專案是否已設定 Ai-skill：
+3. [Runtime Phase 初始化] 讀取 runtime/generated/phase-machine.yaml：
+   - 載入目前 phase、allowed_actions、forbidden_actions、blocking_gates
+   - 載入 obligation-ledger.yaml 確認本 phase 的未完成義務
+   - 載入 blocking-gates.yaml 確認本 phase 的阻斷閘門
+   - 若 phase 為 bootstrap → 繼續往下；若為其他 phase → 先檢查 blocking gates
+4. [新專案檢查] 檢查目前專案是否已設定 Ai-skill：
    - 檢查 .roomodes 是否存在且包含 CORE_BOOTSTRAP.md 參考
    - 檢查 .cursor/rules/ 下是否有 ai-skill bootstrap 規則
    - 檢查 CLAUDE.md 是否存在且包含 CORE_BOOTSTRAP.md 參考
    - 若以上皆無 → 主動告知使用者：「此專案尚未設定 Ai-skill 知識庫。
      是否要執行初始化？(./scripts/init-new-project.sh <PROJECT_ROOT>)」
    - 若使用者同意，執行初始化腳本
-4. 依任務 intent 查詢 skills-index.yaml 找到對應 skill
-5. 檢查該 skill 是否有 primary_entrypoint 欄位：
+5. 依任務 intent 查詢 skills-index.yaml 找到對應 skill
+6. 檢查該 skill 是否有 primary_entrypoint 欄位：
    - 有 → 優先讀 primary_entrypoint 指向的新分層路徑
    - 無 → 讀 entrypoint 指向的舊路徑（向後相容）
-6. 依 activation rules 決定哪些 lazy-load rules 需要載入
-7. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
-8. 需要時才展開完整 source
+7. 依 activation rules 決定哪些 lazy-load rules 需要載入
+8. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
+9. 需要時才展開完整 source
 ```
 
 ## 與舊 Default Bootstrap 的關係
