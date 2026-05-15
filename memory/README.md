@@ -29,7 +29,7 @@
 
 - [`route.decisions.adr`](../knowledge/runtime/routing-registry.yaml:696) — candidate_sources 引用 `memory/decision/README.md`
 - [`enforcement/failure-learning-system.md`](../enforcement/failure-learning-system.md) — 定義 failure memory 的 storage 與 promotion 規則
-- [`plans/archived/2026-05-11-next-stage-upgrade-plan.md`](../plans/archived/2026-05-11-next-stage-upgrade-plan.md) — 引用 memory/ 的設計概念
+- [`plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md`](../plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md) — 引用 memory/ 的設計概念
 
 ## 與既有層的關係
 

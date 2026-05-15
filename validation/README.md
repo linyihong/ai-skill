@@ -237,4 +237,4 @@ then:
 - `governance/validation/` — 文件層級 validation gates，與本層互補
 - `enforcement/failure-learning-system.md` — 被動 capture failure，與本層主動驗證互補；failure 可 promotion 為 scenario
 - `enforcement/failure-patterns/` — 每個 validated failure pattern 可對應 1+ 個 failure-derived scenario
-- `plans/archived/2026-05-11-next-stage-upgrade-plan.md` — Durable Roadmap Goals 記錄本層狀態
+- `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` — Durable Roadmap Goals 記錄本層狀態

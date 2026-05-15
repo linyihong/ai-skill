@@ -2,7 +2,7 @@
 
 本文件是下一階段架構升級規劃書。它承接 [`ai-native-knowledge-operating-system.md`](ai-native-knowledge-operating-system.md) 的 reference-first、goal ledger、failure learning、rule weight 與 close-loop 基礎，規劃如何從現有 skill-centered repository 演進成 AI Knowledge Runtime System。
 
-> **⚠️ 成本優化補充規劃**：本文件專注於架構分層與遷移路徑。關於 **token 成本優化、Bootstrap 極小化、Rule lazy-load、Summary layer、Context TTL** 等立即省錢措施，請見獨立的 [`context-cost-optimization.md`](../plans/archived/2026-05-12-context-cost-optimization.md)。兩份文件互補，建議先讀成本優化規劃再讀本文件。
+> **⚠️ 成本優化補充規劃**：本文件專注於架構分層與遷移路徑。關於 **token 成本優化、Bootstrap 極小化、Rule lazy-load、Summary layer、Context TTL** 等立即省錢措施，請見獨立的 [`context-cost-optimization.md`](../plans/archived/2026-05-12-1101-context-cost-optimization.md)。兩份文件互補，建議先讀成本優化規劃再讀本文件。
 
 ## 目前走到哪裡
 
@@ -32,7 +32,7 @@
 
 ### ✅ 已完成：Context Cost Optimization（Phase 1）
 
-以下為 [`context-cost-optimization.md`](../plans/archived/2026-05-12-context-cost-optimization.md) 中已完成的項目：
+以下為 [`context-cost-optimization.md`](../plans/archived/2026-05-12-1101-context-cost-optimization.md) 中已完成的項目：
 
 - **Bootstrap 極小化**：`CORE_BOOTSTRAP.md` 建立（3 rules, ~800 tokens），取代舊 Default Bootstrap（12 rules, ~5000 tokens）。
 - **README 拆分**：根 `README.md` 縮短為 ~80 行超短入口。
@@ -402,7 +402,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 | 32d | 提取 app-development-guidance SKILL.md Quick Start → `runtime/onboarding/app-development-guidance-quickstart.md` | ✅（已刪除：內容已回歸 workflow/software-delivery/） |
 | 32e | 提取 travel-planning SKILL.md Quick Start → `runtime/onboarding/travel-planning-quickstart.md` | ✅（已刪除：內容已回歸 workflow/travel-planning/） |
 | 32f | 瘦身 3 個 SKILL.md 為純 routing 文件 | ✅ |
-| 32g | 更新 `runtime/onboarding/README.md` + `plans/archived/2026-05-11-next-stage-upgrade-plan.md` | ✅ |
+| 32g | 更新 `runtime/onboarding/README.md` + `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` | ✅ |
 | 32h | 提交 + push | ✅ |
 
 **建立的新檔案**（1 個）：
@@ -444,7 +444,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 | 33b | 提取 `skills/travel-planning/TOOLS.md` → `analysis/travel/sources-and-tools.md` | ✅ |
 | 33c | 提取 `skills/travel-planning/README.md` → `analysis/travel/README.md` | ✅ |
 | 33d | 更新 `plans/skill-specific-extraction.md` 為執行結果 | ✅ |
-| 33e | 更新 `plans/archived/2026-05-11-next-stage-upgrade-plan.md` | ✅ |
+| 33e | 更新 `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` | ✅ |
 | 33f | 提交 + push | ✅ |
 
 **建立的新檔案**（3 個）：
@@ -1120,7 +1120,7 @@ Status: `apk-analysis` pilot 已完成 content extraction（6 個新檔案）；
 - `intelligence/engineering/analytical-reasoning/`：已提取 evidence-first-routing 與 live-readiness-gates 兩個 validated-intelligence atoms。
 - `intelligence/` 重建為 9 個子目錄（architecture、domain、failure、heuristics、anti-patterns、tradeoffs、distributed-systems、business、travel），每個有 README.md 定義 scope。
 - `knowledge/indexes/README.md`：新增 4 條 routing entries 指向新提取檔案。
-- `plans/archived/2026-05-11-apk-analysis-pilot-migration.md`：狀態更新為 `content-extracted`。
+- `plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md`：狀態更新為 `content-extracted`。
 
 尚未完成：
 
@@ -1185,11 +1185,11 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 
 | Priority | Status | Goal | Durable location | Next action | Completion criteria |
 | --- | --- | --- | --- | --- | --- |
-| P1 | done | 建立 next-stage upgrade plan | `plans/archived/2026-05-11-next-stage-upgrade-plan.md` | 已完成 | 規劃書 commit/push/readback，root/architecture 入口可找到 |
+| P1 | done | 建立 next-stage upgrade plan | `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` | 已完成 | 規劃書 commit/push/readback，root/architecture 入口可找到 |
 | P1 | done | 建立 top-level architecture directories | `analysis/`, `intelligence/`, `workflow/`, `runtime/`, `memory/`, `feedback/`, `models/`, `governance/`, `knowledge/`, `metadata/` | 已完成 | 每個目錄責任邊界清楚，不搬移大量內容 |
 | P2 | done | 設計 metadata schema | `metadata/schema.md` | 已完成 | Schema 可套用到第一批 Knowledge Atom |
 | P2 | done | 建立 knowledge navigation index | `knowledge/indexes/README.md` | 已完成 | Agent 能從 index 找到 task-relevant knowledge |
-| P2 | done | 遷移第一個 skill 作為示範 | `plans/archived/2026-05-11-apk-analysis-pilot-migration.md`, `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/analytical-reasoning/` | 已完成 content extraction（6 files），舊入口仍 active | 舊入口仍可用，新路徑可被 reference-first 找到 |
+| P2 | done | 遷移第一個 skill 作為示範 | `plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md`, `analysis/apk/`, `workflow/apk-analysis/`, `intelligence/engineering/analytical-reasoning/` | 已完成 content extraction（6 files），舊入口仍 active | 舊入口仍可用，新路徑可被 reference-first 找到 |
 | P1 | done | 建立新分層運作流程 | `governance/`, `metadata/`, `runtime/routing/`, `knowledge/` | 已完成第一版流程與格式 | 舊 `skills/` 維持 source of truth，新分層可作 routing / promotion / validation surface |
 | P1 | done | 規範 active goal 與 durable roadmap 邊界 | `enforcement/conversation-goal-ledger.md`, `enforcement/content-layering.md`, `governance/lifecycle/README.md` | 已完成 | `.agent-goals/` 不作長期 archive；刪除 active goal 前需回寫 durable planning |
 | P1 | done | 建立 machine-readable routing registry | `knowledge/runtime/routing-registry.yaml`, `runtime/routing/README.md` | 已完成第一版 registry 與 8 筆 sample routing records | Runtime 可用結構化資料從 task intent 找到 primary source、dependencies、candidate summaries 與 validation signal |

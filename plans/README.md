@@ -11,7 +11,7 @@
 
 1. **`active/` 只放尚未開始或正在執行的計畫** — 一旦計畫執行完畢，立即搬移至 `archived/`
 2. **`archived/` 的計畫不刪除** — 作為歷史決策記錄，可供日後查閱
-3. **計畫檔案命名規則**：`YYYY-MM-DD-<slug>.md`，日期前綴讓檔案按時間排序，slug 需能反映計畫核心目標
+3. **計畫檔案命名規則**：`YYYY-MM-DD-HHMM-<slug>.md`，日期時間前綴讓檔案按時間排序（精確到分鐘），slug 需能反映計畫核心目標
 4. **每個計畫必須在檔頭標註狀態**：`draft` / `in-progress` / `completed`
 5. **計畫完成後，若從中提煉出可重用的系統經驗，應建立對應的 intelligence atom**
 
@@ -44,17 +44,17 @@
 
 | 檔案 | 狀態 | 說明 |
 |------|------|------|
-| [`archived/2026-05-11-next-stage-upgrade-plan.md`](archived/2026-05-11-next-stage-upgrade-plan.md) | ✅ completed | 全局升級路線圖（所有 Phase 1-33 已執行完畢） |
-| [`archived/2026-05-11-apk-analysis-pilot-migration.md`](archived/2026-05-11-apk-analysis-pilot-migration.md) | ✅ completed | APK Analysis Pilot Migration 狀態圖（原 architecture/） |
-| [`archived/2026-05-12-context-cost-optimization.md`](archived/2026-05-12-context-cost-optimization.md) | ✅ completed | Phase 1：Context Cost Optimization 執行計畫（原 architecture/） |
-| [`archived/2026-05-12-technique-intelligence-pilot.md`](archived/2026-05-12-technique-intelligence-pilot.md) | ✅ completed | Phase 28：Technique → Intelligence Pilot（flutter-dart-aot） |
-| [`archived/2026-05-12-skill-specific-extraction.md`](archived/2026-05-12-skill-specific-extraction.md) | ✅ completed | Phase 33：Skill-Specific Intelligence Extraction |
-| [`archived/2026-05-13-cognitive-boundary-system.md`](archived/2026-05-13-cognitive-boundary-system.md) | ✅ completed | Cognitive Boundary System 整合計畫，所有 Phase 1-8 已執行完畢 |
-| [`archived/2026-05-13-knowledge-runtime-validation-gate.md`](archived/2026-05-13-knowledge-runtime-validation-gate.md) | ✅ completed | Part 1: Validation Gate 已完成；Part 2: UI Operation Intelligence Extraction 已完成 |
-| [`archived/2026-05-13-ai-decision-contract-testing.md`](archived/2026-05-13-ai-decision-contract-testing.md) | ✅ completed | AI Decision Contract Testing 框架設計與實作 |
-| [`archived/2026-05-14-enforcement-layer-enhancement.md`](archived/2026-05-14-enforcement-layer-enhancement.md) | ✅ completed | enforcement/ 後續強化計畫：Metadata Spec、Rule Graph、Activation Engine、Conflict Matrix、Deprecation Lifecycle（5 方向全完成） |
-| [`archived/2026-05-14-shared-rules-to-enforcement-migration.md`](archived/2026-05-14-shared-rules-to-enforcement-migration.md) | ✅ completed | shared-rules/ → enforcement/ 搬遷計畫，含 Layer Responsibility Contract |
-| [`active/2026-05-15-runtime-execution-layer-upgrade-analysis.md`](active/2026-05-15-runtime-execution-layer-upgrade-analysis.md) | 📝 draft | AI-native Cognitive Execution System 升級計畫比對分析 — Phase Runtime、Obligation Ledger、Blocking Gates、ai-tools 控制流程遷移、Knowledge/Runtime 邊界決策 |
+| [`archived/2026-05-11-1112-next-stage-upgrade-plan.md`](archived/2026-05-11-1112-next-stage-upgrade-plan.md) | ✅ completed | 全局升級路線圖（所有 Phase 1-33 已執行完畢） |
+| [`archived/2026-05-11-1129-apk-analysis-pilot-migration.md`](archived/2026-05-11-1129-apk-analysis-pilot-migration.md) | ✅ completed | APK Analysis Pilot Migration 狀態圖（原 architecture/） |
+| [`archived/2026-05-12-1101-context-cost-optimization.md`](archived/2026-05-12-1101-context-cost-optimization.md) | ✅ completed | Phase 1：Context Cost Optimization 執行計畫（原 architecture/） |
+| [`archived/2026-05-12-1458-technique-intelligence-pilot.md`](archived/2026-05-12-1458-technique-intelligence-pilot.md) | ✅ completed | Phase 28：Technique → Intelligence Pilot（flutter-dart-aot） |
+| [`archived/2026-05-12-1506-skill-specific-extraction.md`](archived/2026-05-12-1506-skill-specific-extraction.md) | ✅ completed | Phase 33：Skill-Specific Intelligence Extraction |
+| [`archived/2026-05-13-0954-cognitive-boundary-system.md`](archived/2026-05-13-0954-cognitive-boundary-system.md) | ✅ completed | Cognitive Boundary System 整合計畫，所有 Phase 1-8 已執行完畢 |
+| [`archived/2026-05-13-1331-knowledge-runtime-validation-gate.md`](archived/2026-05-13-1331-knowledge-runtime-validation-gate.md) | ✅ completed | Part 1: Validation Gate 已完成；Part 2: UI Operation Intelligence Extraction 已完成 |
+| [`archived/2026-05-13-0837-ai-decision-contract-testing.md`](archived/2026-05-13-0837-ai-decision-contract-testing.md) | ✅ completed | AI Decision Contract Testing 框架設計與實作 |
+| [`archived/2026-05-14-1035-enforcement-layer-enhancement.md`](archived/2026-05-14-1035-enforcement-layer-enhancement.md) | ✅ completed | enforcement/ 後續強化計畫：Metadata Spec、Rule Graph、Activation Engine、Conflict Matrix、Deprecation Lifecycle（5 方向全完成） |
+| [`archived/2026-05-14-1028-shared-rules-to-enforcement-migration.md`](archived/2026-05-14-1028-shared-rules-to-enforcement-migration.md) | ✅ completed | shared-rules/ → enforcement/ 搬遷計畫，含 Layer Responsibility Contract |
+| [`active/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md`](active/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md) | 📝 draft | AI-native Cognitive Execution System 升級計畫比對分析 — Phase Runtime、Obligation Ledger、Blocking Gates、ai-tools 控制流程遷移、Knowledge/Runtime 邊界決策 |
 
 ## 誰會參考這裡（Inbound References）
 
@@ -64,6 +64,6 @@
 
 ## 與其他層的關係
 
-- [`plans/archived/2026-05-11-next-stage-upgrade-plan.md`](archived/2026-05-11-next-stage-upgrade-plan.md) — 已完成的全局升級路線圖（所有 Phase 1-33 已執行完畢）
+- [`plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md`](archived/2026-05-11-1112-next-stage-upgrade-plan.md) — 已完成的全局升級路線圖（所有 Phase 1-33 已執行完畢）
 - [`governance/lifecycle/README.md`](../governance/lifecycle/README.md) — Skills Deprecation Timeline 等生命週期規則
 - [`intelligence/engineering/agent-architecture/`](../intelligence/engineering/agent-architecture/) — 從已完成計畫中提煉的系統經驗結晶

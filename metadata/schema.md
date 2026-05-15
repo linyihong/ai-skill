@@ -179,7 +179,7 @@ depends:
   - enforcement/dependency-reading.md
 related:
   - metadata/schema.md
-  - plans/archived/2026-05-11-next-stage-upgrade-plan.md
+  - plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md
 conflicts: []
 models:
   small: 只使用 task routing table 與 validation signal。

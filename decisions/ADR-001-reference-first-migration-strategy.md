@@ -52,7 +52,7 @@
 
 ## Related
 
-- [`plans/archived/2026-05-11-apk-analysis-pilot-migration.md`](../plans/archived/2026-05-11-apk-analysis-pilot-migration.md) — 第一個 pilot migration map
+- [`plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md`](../plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md) — 第一個 pilot migration map
 - [`governance/lifecycle/README.md`](../governance/lifecycle/README.md) — lifecycle states（candidate-map → candidate-atom → validated-atom → promoted）
 - [`knowledge/graphs/README.md`](../knowledge/graphs/README.md) — graph edge types（`preserves_entrypoint`）
-- [`plans/archived/2026-05-11-next-stage-upgrade-plan.md`](../plans/archived/2026-05-11-next-stage-upgrade-plan.md) — 整體升級規劃
+- [`plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md`](../plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md) — 整體升級規劃

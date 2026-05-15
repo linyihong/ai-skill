@@ -45,4 +45,4 @@
 - `enforcement/failure-learning-system.md`
 - `enforcement/feedback-lessons.md`
 - ✅ `skills/*/feedback_history/`（已於 2026-05-13 全部搬遷至 `feedback/history/`，舊目錄已刪除）
-- `plans/archived/2026-05-11-next-stage-upgrade-plan.md` 的 Intelligence Feedback Loop
+- `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` 的 Intelligence Feedback Loop

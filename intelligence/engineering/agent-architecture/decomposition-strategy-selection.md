@@ -1,7 +1,7 @@
 # Decomposition Strategy Selection（拆解策略選擇）
 
 **Status**: `candidate-intelligence`
-**Source**: 本系統 Phase 26-33 實際運作經驗（[`plans/archived/2026-05-12-skill-specific-extraction.md`](../../../plans/archived/2026-05-12-skill-specific-extraction.md)）
+**Source**: 本系統 Phase 26-33 實際運作經驗（[`plans/archived/2026-05-12-1506-skill-specific-extraction.md`](../../../plans/archived/2026-05-12-1506-skill-specific-extraction.md)）
 
 ## 原則
 
