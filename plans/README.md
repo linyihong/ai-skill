@@ -11,7 +11,7 @@
 
 1. **`active/` 只放尚未開始或正在執行的計畫** — 一旦計畫執行完畢，立即搬移至 `archived/`
 2. **`archived/` 的計畫不刪除** — 作為歷史決策記錄，可供日後查閱
-3. **計畫檔案命名規則**：`<slug>.md`，slug 需能反映計畫核心目標
+3. **計畫檔案命名規則**：`YYYY-MM-DD-<slug>.md`，日期前綴讓檔案按時間排序，slug 需能反映計畫核心目標
 4. **每個計畫必須在檔頭標註狀態**：`draft` / `in-progress` / `completed`
 5. **計畫完成後，若從中提煉出可重用的系統經驗，應建立對應的 intelligence atom**
 
@@ -53,6 +53,7 @@
 | [`archived/ai-decision-contract-testing.md`](archived/ai-decision-contract-testing.md) | ✅ completed | AI Decision Contract Testing 框架設計與實作 |
 | [`archived/context-cost-optimization.md`](archived/context-cost-optimization.md) | ✅ completed | Phase 1：Context Cost Optimization 執行計畫（原 architecture/） |
 | [`archived/apk-analysis-pilot-migration.md`](archived/apk-analysis-pilot-migration.md) | ✅ completed | APK Analysis Pilot Migration 狀態圖（原 architecture/） |
+| [`active/2026-05-15-runtime-execution-layer-upgrade-analysis.md`](active/2026-05-15-runtime-execution-layer-upgrade-analysis.md) | 📝 draft | AI-native Cognitive Execution System 升級計畫比對分析 — Phase Runtime、Obligation Ledger、Blocking Gates、ai-tools 控制流程遷移、Knowledge/Runtime 邊界決策 |
 
 ## 誰會參考這裡（Inbound References）
 
