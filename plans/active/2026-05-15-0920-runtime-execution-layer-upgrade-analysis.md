@@ -1098,38 +1098,341 @@ loop:
 
 ## 十二、總結：完整升級路徑
 
-### 優先順序總表
+### 優先順序總表（經外部審查調整）
 
 ```
-P0 — 立即（Phase 1-3 + ai-tools Phase 1）
+P0 — 立即（Phase 1-3）
   ├── Phase Runtime（phase-machine.yaml）
   ├── Obligation Ledger（obligation-ledger.yaml）
-  ├── Blocking Gates（blocking-gates.yaml）
-  └── Runtime 統一元件（config/、hooks/、adapters/、bootstrap/）
+  └── Blocking Gates（blocking-gates.yaml）
 
-P1 — 短期（Phase 4-6 + ai-tools Phase 2-4）
-  ├── Transaction Runtime（transaction-machine.yaml）
+P1 — 短期（Phase 4-6）
+  ├── State Repair System（runtime/recovery/）
+  │   ├── recovery-strategies.yaml
+  │   ├── state-repair.yaml
+  │   ├── obligation-rebuild.yaml
+  │   └── phase-reconciliation.yaml
+  ├── Execution Scheduler（runtime/scheduler/）
+  │   ├── priority-scheduler.yaml
+  │   └── execution-queue.yaml
+  └── Transaction Runtime（transaction-machine.yaml）
+
+P2 — 中期（Phase 7-9）
   ├── Runtime Compiler（compiler-rules.yaml）
   ├── State-based Enforcement
+  ├── Intelligence Routing（intelligence-routing.yaml）
   ├── 精簡 ai-tools 文件
   ├── 更新入口檔（CLAUDE.md、.cursor/rules/、.roomodes）
   └── 更新 ai-tools/README.md
 
-P2 — 長期（Phase 7）
-  └── Intelligence Routing（intelligence-routing.yaml）
+P3 — 長期（Phase 10）
+  ├── Distributed Runtime
+  └── Multi-agent Consistency
 
-P3 — 遠期（Phase 8）
+P4 — 遠期（Phase 11）
   └── Agent VM（vm-spec.yaml）
 ```
 
 ### 核心原則
 
 1. **ai-tools 只保留 Entry Point**：所有控制流程由 runtime 管理
-2. **Prose → YAML**：流程文件轉換為 machine-readable YAML
+2. **Prose → YAML（限 deterministic）**：只 compile execution-critical state（current_phase、allowed_actions、forbidden_actions、blocking_gates、required_artifacts、open_obligations、transaction_state）；heuristics、debugging judgment、troubleshooting strategy、architectural tradeoffs、domain intelligence、anti-pattern reasoning 永遠留 prose
 3. **Runtime Compiler**：建立從 canonical source 到 generated surface 的編譯層
 4. **Knowledge/Runtime 分離**：workflow/analysis/intelligence 的 prose 留在原處，runtime 只放 `runtime/generated/*.yaml`（compiled phase machine）
 5. **進入點直連 runtime**：`CORE_BOOTSTRAP.md` 直接指向 `runtime/generated/phase-machine.yaml`，不繞路
 6. **三層同步架構**：Canonical Source → Runtime Compiler → Generated Surface，pre-commit hook 強制 prose 與 YAML 一致
 7. **Generated YAML 唯讀**：`runtime/generated/*.yaml` 由 compiler 產生，不應手動編輯；檔頭標註 `generated_from`、`generated_at`、`status`
-8. **不破壞現有框架**：reference-first、activation model、close-loop script、goal ledger、enforcement rules 保持不變
-9. **逐步遷移**：P0 → P1 → P2 → P3，不一次全部實作
+8. **Runtime Repair 優先於 Runtime Abstraction**：先做 state repair system，再做 Agent VM
+9. **Execution Scheduler**：priority、deadline、blocking_dependencies、resource_cost、token_cost、context_weight、retry_policy 來解決注意力漂移
+10. **不破壞現有框架**：reference-first、activation model、close-loop script、goal ledger、enforcement rules 保持不變
+11. **逐步遷移**：P0 → P1 → P2 → P3 → P4，不一次全部實作
+
+---
+
+## 十三、外部審查風險分析
+
+> 以下內容來自外部資深架構師對本計畫的審查 feedback，記錄為正式風險評估，供後續 Phase 實作時參考。
+
+### 13.1 風險 1：過度 VM 化
+
+#### 問題
+
+計畫中出現了大量 runtime 元件：
+
+```
+runtime
+compiler
+state machine
+generated surfaces
+routing
+guards
+activation
+transaction runtime
+agent vm
+interrupt handling
+execution stack
+```
+
+這已經開始接近「自己做一個 AI orchestration OS」。但目前的 bottleneck 還不是 VM，而是 **state consistency**：
+
+- runtime state 是否可信？
+- obligation 是否完整？
+- phase transition 是否正確？
+- generated yaml 是否同步？
+- compiler 是否漏轉換？
+- prose 與 runtime 是否 drift？
+
+#### 建議
+
+先做 **Runtime Correctness**，再做 Runtime Abstraction。具體來說：
+
+| 優先 | 項目 | 原因 |
+|------|------|------|
+| ✅ 先做 | State Repair System | 確保 state 可信後，才有基礎做 abstraction |
+| ✅ 先做 | Execution Scheduler | 解決注意力漂移比抽象化更重要 |
+| ⏸️ 延後 | Agent VM | 等 state model、compiler、obligations、phase transitions 都穩了再做 |
+
+#### 對計畫的影響
+
+- Agent VM（原 Phase 8）從 P3 移至 **P4**
+- 新增 State Repair System 和 Execution Scheduler 到 **P1**
+
+---
+
+### 13.2 風險 2：Runtime Compiler 變成維護地獄
+
+#### 問題
+
+計畫中的三層同步架構（Canonical Source → Runtime Compiler → Generated Surface）理論漂亮，但實務上 prose 是高度模糊的：
+
+```
+如果 proxy 沒抓到流量，
+先檢查 certificate pinning，
+再檢查 websocket
+```
+
+這種東西不是 state machine。它是：
+
+- heuristic reasoning
+- diagnosis tree
+- probabilistic troubleshooting
+
+如果硬 compile，最後一定會：
+
+- rule explosion
+- YAML 巨大化
+- compiler ambiguity
+- maintenance nightmare
+
+#### 建議
+
+**只 compile execution-critical state**，其餘永遠留 prose。
+
+| 適合 compile（deterministic） | 不適合 compile（留 prose） |
+|------------------------------|---------------------------|
+| `current_phase` | heuristics |
+| `allowed_actions` | debugging judgment |
+| `forbidden_actions` | troubleshooting strategy |
+| `blocking_gates` | architectural tradeoffs |
+| `required_artifacts` | domain intelligence |
+| `open_obligations` | anti-pattern reasoning |
+| `transaction_state` | |
+
+#### 對計畫的影響
+
+- 核心原則 2 從「Prose → YAML」改為「**Prose → YAML（限 deterministic）**」
+- Section 11 的三層同步架構中，compiler 的 scope 限縮為只處理 execution-critical state
+- Section 9 的 Prose → YAML 轉換盤點需要加上「是否 deterministic」的過濾條件
+
+---
+
+### 13.3 風險 3：缺少 Runtime Repair System
+
+#### 問題
+
+目前有：
+
+- gates
+- guards
+- blocking
+- validation
+
+但缺少 **self-repair loop**。LLM 永遠會：
+
+- phase drift
+- hallucinate state
+- partial completion
+- stale obligations
+- inconsistent transaction
+
+所以 runtime 不只要 **detect invalid state**，還要 **repair invalid state**。
+
+#### 建議
+
+新增 `runtime/recovery/` 目錄：
+
+| 檔案 | 用途 |
+|------|------|
+| `runtime/recovery/recovery-strategies.yaml` | 定義各種 state inconsistency 的修復策略 |
+| `runtime/recovery/state-repair.yaml` | state 不一致時的修復流程 |
+| `runtime/recovery/obligation-rebuild.yaml` | obligation 遺失或過期時的重建流程 |
+| `runtime/recovery/phase-reconciliation.yaml` | phase 不一致時的調解流程 |
+
+#### 對計畫的影響
+
+- 新增 **P1 項目：State Repair System**
+- 對應的 pre-commit hook 和 validation gate 也需要擴充 repair 檢查
+
+---
+
+### 13.4 風險 4：同步式 Runtime 遇到 Async 問題
+
+#### 問題
+
+目前大多是：
+
+- 單 agent
+- 單 session
+- 同步流程
+
+但未來如果進入：
+
+- multi-agent
+- background jobs
+- async tasks
+- delegated execution
+- tool pipelines
+
+會碰到 **distributed state consistency**：
+
+| 情境 | 問題 |
+|------|------|
+| Agent A 更新 phase，Agent B 還在舊 phase | phase inconsistency |
+| obligation 已完成但 ledger 沒同步 | obligation drift |
+| runtime/generated 還沒 rebuild，agent 已開始執行 | generated surface stale |
+
+#### 建議
+
+在進入 multi-agent 階段前，先確保：
+
+1. **Transaction Runtime** 支援 distributed transaction（P1）
+2. **Phase Reconciliation** 機制（P1，屬於 State Repair System）
+3. **Generated Surface 的版本控制**（P2，compiler 產出要有 version）
+
+#### 對計畫的影響
+
+- Distributed Runtime 和 Multi-agent Consistency 移至 **P3**
+- 但在 P1 的 Transaction Runtime 中預留 distributed transaction 的擴充點
+
+---
+
+### 13.5 風險 5：缺少 Priority Scheduler
+
+#### 問題
+
+目前有：
+
+- goals
+- obligations
+- gates
+
+但沒有 **execution prioritization engine**。LLM 最大問題之一是注意力漂移，scheduler 可以解決：
+
+- 一次處理太多問題
+- context overload
+- long chain collapse
+- recursive drift
+
+#### 建議
+
+新增 `runtime/scheduler/` 目錄：
+
+```yaml
+# runtime/scheduler/priority-scheduler.yaml（待建立）
+execution_queue:
+  - id: task-001
+    priority: P0
+    deadline: 2026-05-15T12:00:00
+    blocking_dependencies: [obligation-003]
+    resource_cost:
+      estimated_tokens: 2000
+      context_weight: 0.3
+    retry_policy:
+      max_retries: 3
+      backoff: exponential
+```
+
+| 元件 | 用途 |
+|------|------|
+| `runtime/scheduler/priority-scheduler.yaml` | 定義 priority、deadline、blocking_dependencies |
+| `runtime/scheduler/execution-queue.yaml` | 管理待執行的 task queue |
+
+#### 對計畫的影響
+
+- 新增 **P1 項目：Execution Scheduler**
+- 與 Obligation Ledger 搭配：obligation 決定「該做什麼」，scheduler 決定「先做哪個」
+
+---
+
+### 13.6 風險 6：Agent VM 太早
+
+#### 問題
+
+目前：
+
+- state model 還沒穩
+- compiler 還沒穩
+- obligations 還沒穩
+- phase transitions 還沒穩
+
+這時做 VM，很容易變 **architecture-first overengineering**。
+
+#### 建議
+
+現在真正該做的是 **execution reliability**，不是 execution abstraction。
+
+| 階段 | 目標 |
+|------|------|
+| 現在 ~ P2 | Execution Reliability（state consistency、repair、scheduler） |
+| P3 | Distributed Reliability（multi-agent、async） |
+| P4 | Execution Abstraction（Agent VM） |
+
+#### 對計畫的影響
+
+- Agent VM 從 P3 移至 **P4**
+- 核心原則 8 新增：「Runtime Repair 優先於 Runtime Abstraction」
+
+---
+
+### 13.7 整體優先順序調整對照
+
+| 原優先順序 | 調整後優先順序 |
+|-----------|--------------|
+| P0: Phase Runtime / Obligation Ledger / Blocking Gates | **P0: 不變** |
+| P1: Transaction Runtime / Runtime Compiler / State-based Enforcement | **P1: State Repair System / Execution Scheduler / Transaction Runtime**（compiler 往後移） |
+| P2: Intelligence Routing | **P2: Runtime Compiler / State-based Enforcement / Intelligence Routing** |
+| P3: Agent VM | **P3: Distributed Runtime / Multi-agent Consistency** |
+| — | **P4: Agent VM**（最晚） |
+
+### 13.8 最有價值的概念：Runtime Projection Layer
+
+審查者特別指出，整個計畫中最有價值的概念不是 VM，而是 **Runtime Projection Layer**：
+
+```
+Human Knowledge
+    ↓
+Compiled Operational Surface
+    ↓
+LLM Runtime
+```
+
+這本質上是 **cognitive compression**——不是單純的 YAML 化，而是將人類知識壓縮為 LLM 可執行的 operational surface。這個方向應該作為整個計畫的指導原則。
+
+### 13.9 與其他章節的關係
+
+| 章節 | 關係 |
+|------|------|
+| [十一、Knowledge / Runtime 邊界決策](#十一knowledge--runtime-邊界決策) | 風險 2 直接影響 compiler scope，需限縮為只 compile deterministic state |
+| [九、Prose → YAML 轉換盤點](#九prose--yaml-轉換盤點) | 需加上「是否 deterministic」過濾條件 |
+| [五、建議升級路徑](#五建議升級路徑) | 優先順序已重新調整 |
+| [十、ai-tools 控制流程遷移](#十ai-tools-控制流程遷移) | 不受影響，維持原計畫 |
