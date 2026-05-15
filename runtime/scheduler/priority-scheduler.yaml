@@ -1,0 +1,165 @@
+# Priority Scheduler
+# 定義 execution queue 的優先順序規則，解決注意力漂移問題。
+# 當多個 obligations、gates、或 phase transitions 需要執行時，
+# 依 priority、deadline、blocking_dependencies、resource_cost 決定執行順序。
+#
+# 使用方式：
+# 1. 進入新 phase 時 → 載入本 phase 的 obligations 與 gates
+# 2. 依 priority 排序決定執行順序
+# 3. 高 priority 項目先執行，blocking dependencies 先滿足
+
+version: 1.0
+status: candidate
+owner_layer: runtime/scheduler
+last_updated: 2026-05-15
+
+scheduling_policy:
+  name: Default Priority Policy
+  description: >
+    預設排程策略：先依 priority 降序，再依 deadline 升序，
+    最後依 blocking_dependencies 決定拓撲順序。
+  sort_order:
+    - field: priority
+      direction: desc
+    - field: deadline
+      direction: asc
+    - field: blocking_dependencies
+      direction: topological
+
+priority_levels:
+  - level: P0
+    name: Critical
+    description: "必須立即執行，阻斷所有其他工作"
+    color: red
+    examples:
+      - "blocking gate severity=critical 的檢查"
+      - "recovery phase 的修復程序"
+      - "security 相關的 obligation"
+    preempts: true  # 可搶佔 P1/P2/P3 的工作
+
+  - level: P1
+    name: High
+    description: "應在目前 phase 內完成"
+    color: orange
+    examples:
+      - "blocking gate severity=high 的檢查"
+      - "phase transition 前的 obligations"
+      - "commit/push 相關的 obligations"
+    preempts: false
+
+  - level: P2
+    name: Medium
+    description: "應在目前 session 內完成"
+    color: yellow
+    examples:
+      - "knowledge update checkpoint"
+      - "非 blocking 的 obligations"
+      - "artifacts 整理"
+    preempts: false
+
+  - level: P3
+    name: Low
+    description: "可在有空時執行"
+    color: green
+    examples:
+      - "非緊急的 linked updates"
+      - "選擇性的 validation"
+      - "文件整理"
+    preempts: false
+
+scheduling_rules:
+
+  - id: sched.rule.blocking_first
+    name: Blocking Gates First
+    description: "所有 blocking gates 必須在 obligations 之前檢查"
+    rule: "先執行 blocking-gates.yaml 中 severity=critical 或 severity=high 的 gates，再執行 obligations"
+    priority: P0
+    applies_to:
+      - "phase entry"
+      - "phase transition"
+
+  - id: sched.rule.dependency_before_dependent
+    name: Dependency Before Dependent
+    description: "有 depends_on 的 obligation 必須在上游完成後才能執行"
+    rule: "依 obligation-ledger.yaml 的 depends_on 建立拓撲排序"
+    priority: P0
+    applies_to:
+      - "obligation execution"
+
+  - id: sched.rule.deadline_aware
+    name: Deadline-Aware Scheduling
+    description: "接近 deadline 的項目優先執行"
+    rule: "deadline 在 5 步驟內的項目提升一級 priority"
+    priority: P1
+    applies_to:
+      - "all scheduled items"
+
+  - id: sched.rule.phase_transition_gate
+    name: Phase Transition Gate
+    description: "phase transition 前必須先通過所有 blocking gates"
+    rule: "transition 前執行 blocking-gates.yaml 中目標 phase 的所有 gates"
+    priority: P0
+    applies_to:
+      - "phase transition"
+
+  - id: sched.rule.recovery_preempts_all
+    name: Recovery Preempts All
+    description: "recovery phase 的工作優先於所有其他 phase 的工作"
+    rule: "當 current_phase=recovery 時，所有 recovery 相關工作提升至 P0"
+    priority: P0
+    applies_to:
+      - "recovery phase"
+
+  - id: sched.rule.token_budget_aware
+    name: Token Budget Awareness
+    description: "在 token 預算內優先執行高價值項目"
+    rule: "當 token 使用率 > 70% 時，只執行 P0 和 P1 項目"
+    priority: P2
+    applies_to:
+      - "token management"
+
+scheduling_examples:
+
+  - scenario: "Phase: execution → validation transition"
+    items:
+      - name: "Check all_obligations_met gate"
+        priority: P0
+        reason: "blocking gate severity=critical"
+      - name: "Check artifacts_complete gate"
+        priority: P0
+        reason: "blocking gate severity=high"
+      - name: "Run knowledge runtime validator"
+        priority: P1
+        reason: "phase obligation"
+      - name: "Check linked updates"
+        priority: P1
+        reason: "phase obligation"
+      - name: "Log actions"
+        priority: P2
+        reason: "non-blocking obligation"
+    execution_order:
+      - "Check all_obligations_met gate"
+      - "Check artifacts_complete gate"
+      - "Run knowledge runtime validator"
+      - "Check linked updates"
+      - "Log actions"
+
+  - scenario: "Recovery phase entry"
+    items:
+      - name: "Diagnose root cause"
+        priority: P0
+        reason: "recovery preempts all"
+      - name: "Apply repair"
+        priority: P0
+        reason: "recovery preempts all"
+      - name: "Verify repair"
+        priority: P0
+        reason: "recovery preempts all"
+      - name: "Run full state reconciliation"
+        priority: P1
+        reason: "post-recovery verification"
+    execution_order:
+      - "Diagnose root cause"
+      - "Apply repair"
+      - "Verify repair"
+      - "Run full state reconciliation"

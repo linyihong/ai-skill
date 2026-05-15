@@ -120,6 +120,92 @@ records:
       compression_level: source-backed
       reason: Blocking Gates 是執行階段的阻斷檢查，每個 phase transition 前必須載入。
 
+  - id: route.runtime.recovery
+    task_intent: 載入 phase 修復策略，處理 blocking gate 阻斷或 phase state 損毀
+    primary_source: runtime/recovery/recovery-strategies.yaml
+    required_dependencies:
+      - runtime/phases/phase-machine.yaml
+      - runtime/gates/blocking-gates.yaml
+    candidate_sources:
+      - runtime/recovery/state-repair.yaml
+      - runtime/recovery/obligation-rebuild.yaml
+      - runtime/recovery/phase-reconciliation.yaml
+      - enforcement/failure-learning-system.md
+      - enforcement/failure-patterns/README.md
+    source_of_truth_gate: runtime-recovery-active
+    ranking_reason: State Repair System 定義 6 種 recovery strategies、5 種 state repair procedures、3 種 obligation rebuild 程序、4 種 phase reconciliation 程序，是 blocking gate 阻斷後的第一道防線。
+    validation_signal: 阻斷 gate 已對應到 strategy，repair steps 已執行，verify steps 已通過。
+    metadata:
+      priority: P1
+      confidence: high
+      context_cost:
+        estimated_tokens: 1200
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: State Repair System 在 blocking gate 阻斷時才需要載入，不佔用 bootstrap 預算。
+
+  - id: route.runtime.scheduler
+    task_intent: 載入 execution queue 排程規則，決定 obligations/gates 的執行順序
+    primary_source: runtime/scheduler/priority-scheduler.yaml
+    required_dependencies:
+      - runtime/phases/phase-machine.yaml
+      - runtime/obligations/obligation-ledger.yaml
+      - runtime/gates/blocking-gates.yaml
+    candidate_sources:
+      - runtime/scheduler/execution-queue.yaml
+      - runtime/budget/token-budget.yaml
+    source_of_truth_gate: runtime-scheduler-active
+    ranking_reason: Priority Scheduler 定義 4 級 priority（P0-P3）、6 條 scheduling rules、2 個 scheduling examples，解決注意力漂移問題。Execution Queue 定義 queue 結構、7 條管理規則、3 個 phase queue examples。
+    validation_signal: Queue 已依 priority 排序，blocking gates 優先於 obligations，dependencies 已解析。
+    metadata:
+      priority: P1
+      confidence: high
+      context_cost:
+        estimated_tokens: 1000
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Scheduler 在 phase entry 時載入，決定 execution queue 的優先順序。
+
+  - id: route.runtime.transactions
+    task_intent: 管理 Ai-skill writeback transaction 的生命週期
+    primary_source: runtime/transactions/transaction-machine.yaml
+    required_dependencies:
+      - runtime/phases/phase-machine.yaml
+      - enforcement/dependency-reading.md
+    candidate_sources:
+      - runtime/transactions/transaction-templates.yaml
+      - enforcement/sanitization.md
+      - enforcement/linked-updates.md
+    source_of_truth_gate: runtime-transactions-active
+    ranking_reason: Transaction Machine 定義 7 個 transaction states（closed→open→staging→commit_ready→committed→pushed→verified）、6 條 transaction rules、3 個 templates，將 procedural writeback 升級為 declarative state machine。
+    validation_signal: Transaction state 正確，所有 rules 已檢查，templates 已套用。
+    metadata:
+      priority: P1
+      confidence: high
+      context_cost:
+        estimated_tokens: 800
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Transaction Runtime 在需要寫入 Ai-skill 檔案時才載入，不佔用 bootstrap 預算。
+
   - id: route.skill.discovery
     task_intent: 根據 task intent 找到對應 skill
     primary_source: skills-index.yaml

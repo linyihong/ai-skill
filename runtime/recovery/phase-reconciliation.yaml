@@ -1,0 +1,150 @@
+# Phase Reconciliation
+# 定義 phase 之間狀態不一致時的 reconciliation 程序。
+# 當 phase_history、current_phase、blocking_gates、obligations 四者狀態不一致時，
+# 需要 reconciliation 來恢復一致性。
+#
+# 使用方式：
+# 1. 偵測到跨 phase 狀態不一致 → 執行 reconciliation
+# 2. 依不一致類型選擇對應的 reconciliation procedure
+# 3. 執行後驗證所有 phase 狀態一致
+
+version: 1.0
+status: candidate
+owner_layer: runtime/recovery
+last_updated: 2026-05-15
+
+reconciliation_procedures:
+
+  - id: reconcile.phase.forward_sync
+    name: Forward Phase Sync
+    description: >
+      當 phase_history 顯示已完成的 phase 但 current_phase 落後時的 reconciliation。
+      例如：validation 已完成但 current_phase 仍停留在 execution。
+    detection:
+      signal: "phase_history 的最後 phase 與 current_phase 不一致"
+      check: "比對 phase_history 的最後記錄與 current_phase"
+    procedure:
+      - step: 1
+        action: "COMPARE_HISTORY_VS_CURRENT"
+        description: "比對 phase_history 與 current_phase"
+        command: "phase_history.last vs current_phase"
+      - step: 2
+        action: "IDENTIFY_MISSING_TRANSITIONS"
+        description: "找出缺少的 phase transitions"
+        command: "依 phase 順序找出從 current_phase 到 phase_history.last 之間缺少的 transitions"
+      - step: 3
+        action: "FAST_FORWARD_PHASE"
+        description: "快速前進到正確的 phase"
+        command: "依序執行每個缺少 phase 的 entry_conditions（不重複執行 obligations）"
+      - step: 4
+        action: "UPDATE_CURRENT_PHASE"
+        description: "更新 current_phase"
+        command: "設定 current_phase = phase_history.last"
+      - step: 5
+        action: "RELOAD_PHASE_STATE"
+        description: "重新載入正確 phase 的 state"
+        command: "載入 phase-machine.yaml 中該 phase 的 allowed_actions、blocking_gates、obligations"
+    verify:
+      - "current_phase == phase_history.last"
+      - "current_phase 的 allowed_actions 與 blocking gates 已載入"
+      - "無遺漏的 phase transition"
+
+  - id: reconcile.phase.backward_sync
+    name: Backward Phase Sync
+    description: >
+      當 current_phase 超前於實際完成狀態時的 reconciliation。
+      例如：current_phase 為 commit 但 validation 的 obligations 尚未完成。
+    detection:
+      signal: "current_phase 超前於 obligations 完成狀態"
+      check: "檢查 current_phase 之前的 phase 是否有未完成的 obligations"
+    procedure:
+      - step: 1
+        action: "IDENTIFY_PRECEDING_PHASE"
+        description: "找出 current_phase 的前一個 phase"
+        command: "依 phase 順序找出 current_phase 的前一個 phase"
+      - step: 2
+        action: "CHECK_PRECEDING_OBLIGATIONS"
+        description: "檢查前一個 phase 的 obligations 完成狀態"
+        command: "讀取 obligation-ledger.yaml 中前一個 phase 的 obligations 狀態"
+      - step: 3
+        action: "ROLLBACK_IF_INCOMPLETE"
+        description: "如果前一個 phase 未完成，回滾到該 phase"
+        command: "設定 current_phase = 前一個 phase，重新載入 state"
+      - step: 4
+        action: "COMPLETE_MISSED_OBLIGATIONS"
+        description: "補完成遺漏的 obligations"
+        command: "執行前一個 phase 的 pending obligations"
+      - step: 5
+        action: "RE_ATTEMPT_TRANSITION"
+        description: "重新嘗試 phase transition"
+        command: "依 phase_transition_rules 重新 transition 到 current_phase"
+    verify:
+      - "所有前置 phase 的 obligations 已完成"
+      - "phase_transition_rules 中 from→to 合法"
+      - "current_phase 的 blocking gates 已通過"
+
+  - id: reconcile.phase.gate_obligation_mismatch
+    name: Gate-Obligation State Mismatch
+    description: >
+      當 blocking gate 狀態與 obligation 狀態不一致時的 reconciliation。
+      例如：gate 顯示 passed 但對應的 obligation 顯示 pending。
+    detection:
+      signal: "gate 狀態與 linked obligation 狀態不一致"
+      check: "比對 blocking-gates.yaml 的 gate 結果與 obligation-ledger.yaml 中 linked_gates 的 obligation 狀態"
+    procedure:
+      - step: 1
+        action: "LIST_GATE_OBLIGATION_PAIRS"
+        description: "列出所有 gate-obligation 配對"
+        command: "從 blocking-gates.yaml 中提取 linked_obligations，對照 obligation-ledger.yaml"
+      - step: 2
+        action: "IDENTIFY_MISMATCHES"
+        description: "找出狀態不一致的配對"
+        command: "比對 gate 的 passed/failed 與 obligation 的 completed/pending"
+      - step: 3
+        action: "RESOLVE_EACH_MISMATCH"
+        description: "逐項解決不一致"
+        command: "如果 gate passed 但 obligation pending → 重新驗證 obligation；如果 gate failed 但 obligation completed → 重新檢查 gate"
+      - step: 4
+        action: "SYNC_STATES"
+        description: "同步兩邊的狀態"
+        command: "更新不一致的 gate 或 obligation 狀態"
+    verify:
+      - "所有 linked gate-obligation 配對狀態一致"
+      - "無 gate passed 但 obligation pending 的情況"
+      - "無 gate failed 但 obligation completed 的情況"
+
+  - id: reconcile.phase.full_state_reconciliation
+    name: Full State Reconciliation
+    description: >
+      當多個 phase 狀態元件不一致時的完整 reconciliation。
+      同時檢查：current_phase、phase_history、blocking_gates、obligations 四者的一致性。
+    trigger_conditions:
+      - "recovery phase 進入時"
+      - "偵測到 2 個以上不一致"
+      - "手動觸發完整 reconciliation"
+    procedure:
+      - step: 1
+        action: "SNAPSHOT_ALL_STATE"
+        description: "快照所有 phase state"
+        command: "記錄 current_phase、phase_history、所有 gate 狀態、所有 obligation 狀態"
+      - step: 2
+        action: "RUN_ALL_DETECTIONS"
+        description: "執行所有不一致檢測"
+        command: "依序執行 forward_sync、backward_sync、gate_obligation_mismatch 的 detection"
+      - step: 3
+        action: "PRIORITIZE_ISSUES"
+        description: "依嚴重度排序不一致問題"
+        command: "critical（phase 順序錯誤）> high（gate-obligation 不一致）> medium（state 過期）"
+      - step: 4
+        action: "RESOLVE_IN_ORDER"
+        description: "依序解決所有不一致"
+        command: "從最高嚴重度開始，依 reconciliation procedure 解決"
+      - step: 5
+        action: "VERIFY_CONSISTENCY"
+        description: "驗證所有 state 一致"
+        command: "重新執行所有 detection 確認無不一致"
+    verify:
+      - "current_phase 與 phase_history 一致"
+      - "所有 blocking gates 狀態與 obligations 狀態一致"
+      - "無遺漏的 phase transition"
+      - "所有 phase 的 obligations 狀態正確"
