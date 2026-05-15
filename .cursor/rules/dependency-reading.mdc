@@ -17,7 +17,11 @@ At session start or when taking over a task, load the **Core Bootstrap** (3 rule
    - [runtime/phases/phase-machine.yaml](../../runtime/phases/phase-machine.yaml) — current phase state
    - [runtime/obligations/obligation-ledger.yaml](../../runtime/obligations/obligation-ledger.yaml) — phase obligations
    - [runtime/gates/blocking-gates.yaml](../../runtime/gates/blocking-gates.yaml) — phase blocking gates
-6. Read the skill's summary from `knowledge/summaries/` (300-500 tokens) before expanding to full source
+6. Load Output Governance initialization:
+   - [runtime/output-governance/language-policy.yaml](../../runtime/output-governance/language-policy.yaml) — language enforcement rules
+   - [runtime/output-governance/output-rules.yaml](../../runtime/output-governance/output-rules.yaml) — document output rules
+   - [runtime/output-governance/governance-gates.yaml](../../runtime/output-governance/governance-gates.yaml) — output quality blocking gates
+7. Read the skill's summary from `knowledge/summaries/` (300-500 tokens) before expanding to full source
 
 ## Dependency Reading
 

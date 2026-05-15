@@ -10,6 +10,10 @@
    - [runtime/phases/phase-machine.yaml](runtime/phases/phase-machine.yaml) — 目前 phase 狀態
    - [runtime/obligations/obligation-ledger.yaml](runtime/obligations/obligation-ledger.yaml) — 本 phase 義務
    - [runtime/gates/blocking-gates.yaml](runtime/gates/blocking-gates.yaml) — 本 phase blocking gates
-6. 先讀 `knowledge/summaries/` 對應 summary（300-500 tokens），需要時才展開全文
+6. 載入 Output Governance 初始化：
+   - [runtime/output-governance/language-policy.yaml](runtime/output-governance/language-policy.yaml) — 語言強制規則
+   - [runtime/output-governance/output-rules.yaml](runtime/output-governance/output-rules.yaml) — 文件輸出規則
+   - [runtime/output-governance/governance-gates.yaml](runtime/output-governance/governance-gates.yaml) — 輸出品質 blocking gates
+7. 先讀 `knowledge/summaries/` 對應 summary（300-500 tokens），需要時才展開全文
 
 詳細使用說明見 [ai-tools/agent/claude.md](ai-tools/agent/claude.md)。

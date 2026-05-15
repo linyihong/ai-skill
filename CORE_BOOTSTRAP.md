@@ -22,20 +22,25 @@
    - 載入 obligation-ledger.yaml 確認本 phase 的未完成義務
    - 載入 blocking-gates.yaml 確認本 phase 的阻斷閘門
    - 若 phase 為 bootstrap → 繼續往下；若為其他 phase → 先檢查 blocking gates
-4. [新專案檢查] 檢查目前專案是否已設定 Ai-skill：
+4. [Output Governance 初始化] 載入輸出規則：
+   - 讀取 runtime/output-governance/language-policy.yaml — 語言強制規則
+   - 讀取 runtime/output-governance/output-rules.yaml — 文件輸出規則
+   - 讀取 runtime/output-governance/governance-gates.yaml — 輸出品質 blocking gates
+   - 確認目前 phase 的 governance gates 狀態
+5. [新專案檢查] 檢查目前專案是否已設定 Ai-skill：
    - 檢查 .roomodes 是否存在且包含 CORE_BOOTSTRAP.md 參考
    - 檢查 .cursor/rules/ 下是否有 ai-skill bootstrap 規則
    - 檢查 CLAUDE.md 是否存在且包含 CORE_BOOTSTRAP.md 參考
    - 若以上皆無 → 主動告知使用者：「此專案尚未設定 Ai-skill 知識庫。
      是否要執行初始化？(./scripts/init-new-project.sh <PROJECT_ROOT>)」
    - 若使用者同意，執行初始化腳本
-5. 依任務 intent 查詢 skills-index.yaml 找到對應 skill
-6. 檢查該 skill 是否有 primary_entrypoint 欄位：
+6. 依任務 intent 查詢 skills-index.yaml 找到對應 skill
+7. 檢查該 skill 是否有 primary_entrypoint 欄位：
    - 有 → 優先讀 primary_entrypoint 指向的新分層路徑
    - 無 → 讀 entrypoint 指向的舊路徑（向後相容）
-7. 依 activation rules 決定哪些 lazy-load rules 需要載入
-8. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
-9. 需要時才展開完整 source
+8. 依 activation rules 決定哪些 lazy-load rules 需要載入
+9. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
+10. 需要時才展開完整 source
 ```
 
 ## 與舊 Default Bootstrap 的關係
