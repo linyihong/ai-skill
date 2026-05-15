@@ -64,5 +64,5 @@
 
 - [`intelligence/README.md`](../intelligence/README.md) — intelligence 層定義
 - [`knowledge/README.md`](../knowledge/README.md) — knowledge 層定義
-- [`plans/archived/next-stage-upgrade-plan.md`](../plans/archived/next-stage-upgrade-plan.md) — 分層架構規劃
+- [`plans/archived/2026-05-11-next-stage-upgrade-plan.md`](../plans/archived/2026-05-11-next-stage-upgrade-plan.md) — 分層架構規劃
 - [`governance/lifecycle/README.md`](../governance/lifecycle/README.md) — lifecycle 差異化管理

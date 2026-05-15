@@ -628,7 +628,7 @@ records:
       - validation/rules/heuristics/avoid-early-patch.yaml
       - validation/traces/template.yaml
       - validation/evaluations/template.yaml
-      - plans/archived/ai-decision-contract-testing.md
+      - plans/archived/2026-05-13-ai-decision-contract-testing.md
       - enforcement/failure-learning-system.md
     source_of_truth_gate: validation-readme-active
     ranking_reason: validation/ 提供 stateless scenario-based 驗證框架，可在架構變更或模型升級後確認決策品質未退化。failure-derived scenarios 從實際 AI 錯誤提煉，形成 Failure → Scenario 閉環。

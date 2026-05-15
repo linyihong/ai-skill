@@ -44,4 +44,4 @@
 - `skills/apk-analysis/WORKFLOW.md` — ✅ 已遷移至 `workflow/apk-analysis/execution-flow.md`
 - `skills/app-development-guidance/WORKFLOW.md` — ✅ 已遷移至 `workflow/software-delivery/execution-flow.md`
 - `skills/travel-planning/WORKFLOW.md` — ✅ 已遷移至 `workflow/travel-planning/execution-flow.md`
-- `plans/archived/next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明
+- `plans/archived/2026-05-11-next-stage-upgrade-plan.md` 中 `workflow/` 的分層說明

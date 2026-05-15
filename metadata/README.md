@@ -45,6 +45,6 @@
 
 ## 第一批候選遷移來源
 
-- `plans/archived/next-stage-upgrade-plan.md` 的 Knowledge Atom metadata 欄位草案
+- `plans/archived/2026-05-11-next-stage-upgrade-plan.md` 的 Knowledge Atom metadata 欄位草案
 - `metadata/schema.md`
 - `enforcement/rule-weight.md`、`decision-efficiency.md` 中可抽象為 metadata 欄位的概念

@@ -239,8 +239,8 @@ Related: [`enforcement/README.md`](../../enforcement/README.md), [`runtime/READM
 - [ ] 更新 `memory/failure/README.md`（若有 shared-rules 引用）
 
 **architecture/:**
-- [ ] 更新 `plans/archived/next-stage-upgrade-plan.md`（若有 shared-rules 引用）
-- [ ] 更新 `plans/archived/apk-analysis-pilot-migration.md`（若有 shared-rules 引用）
+- [ ] 更新 `plans/archived/2026-05-11-next-stage-upgrade-plan.md`（若有 shared-rules 引用）
+- [ ] 更新 `plans/archived/2026-05-11-apk-analysis-pilot-migration.md`（若有 shared-rules 引用）
 
 **plans/:**
 - [ ] 更新 `plans/README.md`：

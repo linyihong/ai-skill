@@ -42,5 +42,5 @@
 ## 第一批候選遷移來源
 
 - `architecture/ai-native-knowledge-operating-system.md` 的 reference-first 與 compatibility inventory
-- `plans/archived/next-stage-upgrade-plan.md` 的 runtime / context routing 章節
+- `plans/archived/2026-05-11-next-stage-upgrade-plan.md` 的 runtime / context routing 章節
 - `enforcement/decision-efficiency.md` 中可抽成 runtime routing design 的概念

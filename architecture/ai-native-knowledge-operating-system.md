@@ -2,7 +2,7 @@
 
 本文件定義 AI-native Knowledge Operating System 的 repository-level architecture direction。它是 roadmap 與 boundary document，不是 executable shared rule。可執行政策仍放在 `enforcement/`；工具專屬設定仍放在 `ai-tools/`。
 
-下一階段完整升級規劃見 [`next-stage-upgrade-plan.md`](../plans/archived/next-stage-upgrade-plan.md)。
+下一階段完整升級規劃見 [`next-stage-upgrade-plan.md`](../plans/archived/2026-05-11-next-stage-upgrade-plan.md)。
 
 ## 目的
 

@@ -31,7 +31,7 @@
 - [`route.governance.durable-goal-boundary`](../knowledge/runtime/routing-registry.yaml:127) — required_dependencies 引用 `governance/lifecycle/README.md`
 - [`route.feedback.promotion-pipeline`](../knowledge/runtime/routing-registry.yaml:285) — required_dependencies 引用 `governance/lifecycle/README.md` 與 `governance/validation/README.md`
 - [`enforcement/failure-learning-system.md`](../enforcement/failure-learning-system.md) — 引用 governance 的 lifecycle 規則
-- [`plans/archived/next-stage-upgrade-plan.md`](../plans/archived/next-stage-upgrade-plan.md) — 引用 `governance/lifecycle/` 的 Skills Deprecation Timeline
+- [`plans/archived/2026-05-11-next-stage-upgrade-plan.md`](../plans/archived/2026-05-11-next-stage-upgrade-plan.md) — 引用 `governance/lifecycle/` 的 Skills Deprecation Timeline
 
 ## 與既有層的關係
 

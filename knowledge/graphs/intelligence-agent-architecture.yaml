@@ -94,17 +94,17 @@ edges:
     validation: cognitive-boundaries atom 解釋 agent 無法自我檢測錯誤，因此需要外部 validation gate；stateless-validation-necessity atom 解釋為什麼驗證必須是 stateless 的。
 
   - type: related_to
-    target: plans/archived/technique-intelligence-pilot.md
+    target: plans/archived/2026-05-12-technique-intelligence-pilot.md
     reason: pilot-first-validation atom 從此計畫的實際執行經驗提煉而來。
     validation: 計畫的「不做範圍」和 pilot-first 策略直接對應 atom 的核心原則。
 
   - type: related_to
-    target: plans/archived/skill-specific-extraction.md
+    target: plans/archived/2026-05-12-skill-specific-extraction.md
     reason: decomposition-strategy-selection atom 從此計畫的 3 種策略對比表提煉而來。
     validation: 計畫的 3 種策略（Decomposition、Catalog、Direct Promotion）直接對應 atom 的策略選擇流程。
 
   - type: related_to
-    target: plans/archived/ai-decision-contract-testing.md
+    target: plans/archived/2026-05-13-ai-decision-contract-testing.md
     reason: stateless-validation-necessity 和 failure-to-scenario-closure atom 從此計畫的 Stateless Deterministic Validation 原則提煉而來。
     validation: 計畫的 Stateless Deterministic Validation 章節直接對應 atom 的核心原則。
 

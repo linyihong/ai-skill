@@ -1,7 +1,7 @@
 # Pilot-First Validation（先驗證再抽象化）
 
 **Status**: `candidate-intelligence`
-**Source**: 本系統 Phase 28-31 實際運作經驗（[`plans/archived/technique-intelligence-pilot.md`](../../../plans/archived/technique-intelligence-pilot.md)）
+**Source**: 本系統 Phase 28-31 實際運作經驗（[`plans/archived/2026-05-12-technique-intelligence-pilot.md`](../../../plans/archived/2026-05-12-technique-intelligence-pilot.md)）
 
 ## 原則
 

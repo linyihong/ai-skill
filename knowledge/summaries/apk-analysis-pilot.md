@@ -3,7 +3,7 @@
 | 欄位 | 值 |
 | --- | --- |
 | Atom ID | `architecture.apk-analysis-pilot` |
-| Source path | [`../../plans/archived/apk-analysis-pilot-migration.md`](../../plans/archived/apk-analysis-pilot-migration.md) |
+| Source path | [`../../plans/archived/2026-05-11-apk-analysis-pilot-migration.md`](../../plans/archived/2026-05-11-apk-analysis-pilot-migration.md) |
 | Lifecycle | `candidate` |
 | Summary | `apk-analysis` 作為第一個 Workflow / Analysis / Intelligence 分離 pilot 的 migration map。它建立新 reference-first 候選目的地，舊 `skills/apk-analysis/` 已不再作為 active entrypoint。 |
 | When to read | 規劃 `apk-analysis` 內容抽取、維護舊 skill 與新分層的相容關係，或判斷哪些內容應進 `analysis/apk/`、`workflow/apk-analysis/`、`intelligence/engineering/analytical-reasoning/` 時。 |
