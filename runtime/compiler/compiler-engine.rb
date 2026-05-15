@@ -60,6 +60,10 @@ def extract_domain(source_path)
   match = source_path.match(%r{plans/})
   return 'plans-index' if match
 
+  # analysis/apk/workflows/*.md → apk-workflow (single target for all APK workflows)
+  match = source_path.match(%r{analysis/apk/workflows/})
+  return 'apk-workflow' if match
+
   'unknown'
 end
 
@@ -239,6 +243,119 @@ def compile_workflow_phases(source_path, mapping_entry)
   FileUtils.mkdir_p(File.dirname(target))
   File.write(target, YAML.dump(yaml_content))
   puts "  ✓ #{target}"
+end
+
+def extract_apk_step_sections(content)
+  # Split content into step sections by ## 步驟 N： heading
+  # Returns array of { heading:, line_number:, body: }
+  sections = []
+  content.scan(/^(##\s+步驟\s+\d+[：:]\s*.+)$/) do
+    heading_text = $1.strip
+    heading_line = $`.lines.count + 1
+
+    # Find the start of this section
+    section_start = $`.size
+    # Find the next ## 步驟 heading or end of content
+    remaining = content[section_start + $&.size..]
+    next_section_match = remaining.match(/^##\s+步驟\s+\d+[：:]/)
+    section_body = if next_section_match
+                     remaining[0...next_section_match.begin(0)]
+                   else
+                     remaining
+                   end
+
+    sections << {
+      'heading' => heading_text.sub(/^##\s+/, '').strip,
+      'line_number' => heading_line,
+      'body' => section_body.strip
+    }
+  end
+  sections
+end
+
+def extract_prerequisites(content)
+  # Extract prerequisites from ## 前置準備 section
+  prereq_match = content.match(/^##\s+前置準備\n(.+?)(?=\n##\s+|\z)/m)
+  return [] unless prereq_match
+
+  prereq_body = prereq_match[1].strip
+  items = []
+
+  # Extract bullet list items
+  prereq_body.scan(/^-\s+(.+)$/) do |match|
+    items << match[0].strip
+  end
+
+  # Extract ### sub-headings as prerequisite categories
+  prereq_body.scan(/^###\s+(.+)$/) do |match|
+    items << match[0].strip
+  end
+
+  items
+end
+
+def extract_output_format(content)
+  # Extract output format from ## 成功產出格式 section
+  output_match = content.match(/^##\s+成功產出格式\n(.+?)(?=\n##\s+|\z)/m)
+  return nil unless output_match
+
+  output_match[1].strip
+end
+
+def extract_prerequisites_clean(content)
+  # Extract prerequisites from ## 前置準備 section, excluding ### sub-headings
+  prereq_match = content.match(/^##\s+前置準備\n(.+?)(?=\n##\s+|\z)/m)
+  return [] unless prereq_match
+
+  prereq_body = prereq_match[1].strip
+  items = []
+
+  # Extract bullet list items only (skip ### sub-headings like "必要條件", "工具")
+  prereq_body.scan(/^-\s+(.+)$/) do |match|
+    items << match[0].strip
+  end
+
+  items
+end
+
+def compile_apk_workflow_phases(source_path, _mapping_entry)
+  # Skip README — not a workflow
+  filename = File.basename(source_path, '.md')
+  if filename == 'README'
+    puts "  - #{source_path} (skipped — README)"
+    return nil
+  end
+
+  content = File.read(source_path)
+
+  # Extract step sections using ## 步驟 N： heading format
+  sections = extract_apk_step_sections(content)
+
+  steps = sections.map do |sec|
+    {
+      'title' => sec['heading'],
+      'source_line' => sec['line_number']
+    }
+  end
+
+  # Extract prerequisites (bullet items only, skip ### sub-headings)
+  prerequisites = extract_prerequisites_clean(content)
+
+  # Extract output format
+  output_format = extract_output_format(content)
+
+  # Return entry for aggregation (run method handles writing)
+  entry = {
+    'workflow_name' => filename,
+    'source_path' => source_path,
+    'total_steps' => steps.length,
+    'steps' => steps
+  }
+  entry['prerequisites'] = prerequisites unless prerequisites.empty?
+  entry['output_format'] = output_format unless output_format.nil?
+
+  puts "  ✓ #{source_path} (#{steps.length} steps)"
+  entry
 end
 
 def compile_enforcement_transactions(source_path, mapping_entry)
@@ -747,6 +864,8 @@ def compile_source(source_path, mapping_entry)
     compile_plans_index(source_path, mapping_entry)
   when /從 knowledge-update-flow\.md Step 2\.4 的決策樹與 intelligence\/engineering\/ 的 README 提取分類維度定義/
     compile_classification_rules(source_path, mapping_entry)
+  when /從 analysis\/apk\/workflows\/\*\.md 的「步驟 N：」標題提取 step 定義/
+    compile_apk_workflow_phases(source_path, mapping_entry)
   else
     puts "  ⚠  Unknown compile rule: #{compile_rule}"
   end
@@ -755,8 +874,10 @@ end
 def check_modified_sources
   modified = []
   plans_modified = false
+  apk_workflow_modified = false
   plans_target = File.join(GENERATED_DIR, 'plans-index.yaml')
   classification_target = File.join(GENERATED_DIR, 'classification-rules.yaml')
+  apk_workflow_target = File.join(GENERATED_DIR, 'apk-workflow-phases.yaml')
 
   @mapping.each do |entry|
     source_glob = entry['source']
@@ -765,6 +886,13 @@ def check_modified_sources
       if entry['compile_rule']&.include?('plans/active/*.md')
         if !File.exist?(plans_target) || File.mtime(source_path) > File.mtime(plans_target)
           plans_modified = true
+        end
+      # APK workflow: check if any APK workflow file is newer than the aggregated target
+      elsif entry['compile_rule']&.include?('analysis/apk/workflows/*.md')
+        # Skip README — not a workflow
+        next if File.basename(source_path) == 'README.md'
+        if !File.exist?(apk_workflow_target) || File.mtime(source_path) > File.mtime(apk_workflow_target)
+          apk_workflow_modified = true
         end
       # Classification rules: also depends on intelligence/engineering/ README files
       elsif entry['compile_rule']&.include?('分類維度定義')
@@ -792,6 +920,10 @@ def check_modified_sources
 
   if plans_modified
     modified << { source: 'plans/active/*.md', mapping: @mapping.find { |e| e['compile_rule']&.include?('plans/active/*.md') } }
+  end
+
+  if apk_workflow_modified
+    modified << { source: 'analysis/apk/workflows/*.md', mapping: @mapping.find { |e| e['compile_rule']&.include?('analysis/apk/workflows/*.md') } }
   end
 
   modified
@@ -828,8 +960,9 @@ def run(options)
   puts "Compiling prose sources to generated YAML..."
   puts
 
-  # Track plans index entries for aggregation
+  # Track plans index entries and APK workflow entries for aggregation
   plans_entries = []
+  apk_workflow_entries = []
 
   @mapping.each do |entry|
     source_glob = entry['source']
@@ -837,6 +970,9 @@ def run(options)
       # Special handling for plans index: aggregate all plans into one file
       if entry['compile_rule']&.include?('plans/active/*.md')
         plans_entries << compile_plans_index(source_path, entry)
+      # Special handling for APK workflows: aggregate all workflows into one file
+      elsif entry['compile_rule']&.include?('analysis/apk/workflows/*.md')
+        apk_workflow_entries << compile_apk_workflow_phases(source_path, entry)
       else
         compile_source(source_path, entry)
       end
@@ -852,6 +988,21 @@ def run(options)
       'compiled_from' => 'plans/active/*.md',
       'total_plans' => plans_entries.length,
       'plans' => plans_entries
+    }
+    File.write(target, YAML.dump(yaml_content))
+    puts "  ✓ #{target}"
+  end
+
+  # Write aggregated APK workflow phases
+  apk_workflow_entries = apk_workflow_entries.compact
+  unless apk_workflow_entries.empty?
+    target = File.join(GENERATED_DIR, 'apk-workflow-phases.yaml')
+    header = generated_header('analysis/apk/workflows/*.md')
+    yaml_content = {
+      'header' => header,
+      'compiled_from' => 'analysis/apk/workflows/*.md',
+      'total_workflows' => apk_workflow_entries.length,
+      'workflows' => apk_workflow_entries
     }
     File.write(target, YAML.dump(yaml_content))
     puts "  ✓ #{target}"

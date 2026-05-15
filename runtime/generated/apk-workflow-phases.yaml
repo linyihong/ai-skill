@@ -1,0 +1,112 @@
+---
+header:
+  generated_from: analysis/apk/workflows/*.md
+  generated_at: '2026-05-15T04:05:25Z'
+  compiler_version: 1.0.0
+  status: synced
+compiled_from: analysis/apk/workflows/*.md
+total_workflows: 4
+workflows:
+- workflow_name: local-proxy-hook-flow
+  source_path: analysis/apk/workflows/local-proxy-hook-flow.md
+  total_steps: 6
+  steps:
+  - title: 步驟 1：確認 Loopback 證據
+    source_line: 29
+  - title: 步驟 2：識別 Handler 方法與 Request Object Type
+    source_line: 44
+  - title: 步驟 3：Hook Handler Argument
+    source_line: 54
+  - title: 步驟 4：Cast Netty Request（如適用）
+    source_line: 72
+  - title: 步驟 5：去敏與摘要
+    source_line: 85
+  - title: 步驟 6：歸因到 Upstream API
+    source_line: 92
+  prerequisites:
+  - 目標 app 已安裝並可執行
+  - 具備 pcap/logcat/MITM 觀測能力
+  - Frida 可用於 hook Java 層
+  output_format: |-
+    ```text
+    local proxy evidence:
+      pcap: 127.0.0.1:8080 loopback detected
+      logcat: ProxyServer started on port 8080
+
+    handler hook:
+      class: com.example.ProxyHandler
+      method: handleRequest(FullHttpRequest)
+      local request: GET /local/feed
+      upstream: GET https://api.example.com/v1/feed
+    ```
+- workflow_name: media-hls-analysis-flow
+  source_path: analysis/apk/workflows/media-hls-analysis-flow.md
+  total_steps: 7
+  steps:
+  - title: 步驟 1：分離控制面與資料面
+    source_line: 32
+  - title: 步驟 2：分析 Detail/Control API
+    source_line: 41
+  - title: 步驟 3：分析 Playlist（HLS `.m3u8`）
+    source_line: 47
+  - title: 步驟 4：分析 Key（如適用）
+    source_line: 63
+  - title: 步驟 5：下載與分析 Segments
+    source_line: 78
+  - title: 步驟 6：合併與解碼 Final Media
+    source_line: 94
+  - title: 步驟 7：容器驗證
+    source_line: 108
+  prerequisites:
+  - API responses 中包含 media source paths、HLS playlist URLs、key URLs、segment lists、signed
+    media URLs 或 image/audio/video payloads
+  - 目標是 reconstruct playable media 或 verify media container type
+  output_format: "```markdown"
+- workflow_name: http-api-documentation-flow
+  source_path: analysis/apk/workflows/http-api-documentation-flow.md
+  total_steps: 7
+  steps:
+  - title: 步驟 1：建立 API Entry
+    source_line: 27
+  - title: 步驟 2：建立 Group Index
+    source_line: 39
+  - title: 步驟 3：建立 Per-API Detail
+    source_line: 53
+  - title: 步驟 4：建立 Coverage / Gap Matrix
+    source_line: 72
+  - title: 步驟 5：建立 SDK/Client Mapping（如適用）
+    source_line: 83
+  - title: 步驟 6：執行 Catalog Finish Gate
+    source_line: 87
+  - title: 步驟 7：UI Automation For API Capture（選擇性）
+    source_line: 99
+  prerequisites:
+  - HTTP/HTTPS 流量已可觀測（MITM、Frida hook、local proxy handler、Flutter/Dart interceptor、pcap）
+  - 目標 API 的 method/path/header/request/response metadata 已可見或已解碼
+  output_format: |-
+    ```markdown
+    # API Catalog
+- workflow_name: frida-hook-flow
+  source_path: analysis/apk/workflows/frida-hook-flow.md
+  total_steps: 6
+  steps:
+  - title: 步驟 1：生成偽源碼與函數偏移
+    source_line: 38
+  - title: 步驟 2：搜尋關鍵字
+    source_line: 56
+  - title: 步驟 3：Hook Request Options
+    source_line: 74
+  - title: 步驟 4：Hook Response Decode/Decrypt
+    source_line: 99
+  - title: 步驟 5：Dart String Decoding（如有需要）
+    source_line: 115
+  - title: 步驟 6：對齊與去敏
+    source_line: 128
+  output_format: |-
+    ```text
+    request hook:
+      method / baseUrl / path / headers / query
+
+    response decode hook:
+      decrypted JSON/string
+    ```

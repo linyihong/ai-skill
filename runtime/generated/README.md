@@ -40,3 +40,4 @@ ruby runtime/compiler/compiler-engine.rb
 | `knowledge-update-phases.yaml` | `governance/lifecycle/knowledge-update-flow.md` | ✅ 已產生 |
 | `classification-rules.yaml` | `governance/lifecycle/knowledge-update-flow.md` + `intelligence/engineering/README.md` | ✅ 已產生 |
 | `plans-index.yaml` | `plans/active/*.md`（聚合） | ✅ 已產生 |
+| `apk-workflow-phases.yaml` | `analysis/apk/workflows/*.md`（聚合 4 個 APK 操作流程） | ✅ 已產生 |

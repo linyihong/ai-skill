@@ -138,6 +138,16 @@ source_target_mapping:
       - known_platforms
     compile_rule: "從 knowledge-update-flow.md Step 2.4 的決策樹與 intelligence/engineering/ 的 README 提取分類維度定義與已知語言/框架/平台列表"
 
+  # ── P3.8: APK Workflow Phases Mapping ──
+
+  - source: "analysis/apk/workflows/*.md"
+    target: "runtime/generated/apk-workflow-phases.yaml"
+    extract:
+      - step_definitions
+      - prerequisites
+      - output_formats
+    compile_rule: "從 analysis/apk/workflows/*.md 的「步驟 N：」標題提取 step 定義，從「前置準備」提取 prerequisites，從「成功產出格式」提取 output format"
+
 compilation_rules:
 
   - id: compile.rule.deterministic_only

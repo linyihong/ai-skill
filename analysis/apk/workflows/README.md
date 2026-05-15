@@ -33,3 +33,16 @@
 | [`http-api-documentation-flow.md`](http-api-documentation-flow.md) | HTTP API 文件化操作流程 — 7 步驟（API Entry → Group Index → Per-API Detail → Coverage/Gap Matrix → SDK Mapping → Finish Gate → UI Automation） | `skills/apk-analysis/techniques/http-api/`（已刪除，見 `http-api-documentation-flow.md`） |
 | [`local-proxy-hook-flow.md`](local-proxy-hook-flow.md) | Local Proxy Hook 操作流程 — 6 步驟（確認證據 → 識別 Handler → Hook → Cast Netty → 去敏 → 歸因） | `skills/apk-analysis/techniques/local-proxy/`（已刪除，見 `local-proxy-hook-flow.md`） |
 | [`media-hls-analysis-flow.md`](media-hls-analysis-flow.md) | Media/HLS 分析操作流程 — 7 步驟（分離控制面/資料面 → Playlist → Key → Segments → 合併 → 容器驗證） | `skills/apk-analysis/techniques/media-hls/`（已刪除，見 `media-hls-analysis-flow.md`） |
+
+## Generated Surface
+
+本目錄的 4 個操作流程已由 [`runtime/compiler/compiler-engine.rb`](../../runtime/compiler/compiler-engine.rb) 編譯為 [`runtime/generated/apk-workflow-phases.yaml`](../../runtime/generated/apk-workflow-phases.yaml)，包含：
+
+- 各 workflow 的步驟定義（step title + source line）
+- 前置準備項目（prerequisites）
+- 成功產出格式（output format）
+
+相關連結：
+- [`workflow/apk-analysis/execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) — 端到端 agent 執行流程
+- [`runtime/generated/README.md`](../../runtime/generated/README.md) — 所有 generated surface 索引
+- [`runtime/routing/README.md`](../../runtime/routing/README.md) — Runtime routing 流程
