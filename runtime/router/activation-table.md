@@ -40,6 +40,8 @@
 | 24 | **泛化為共用規則** | task_intent: promote-to-shared-rule | reusable-guidance-boundary | 將專案證據泛化為共用規則時需要邊界檢查 |
 | 25 | **抽象化討論** | user_signal: 泛化, 可重用, reusable, 抽象化 | reusable-guidance-boundary | 使用者提及抽象化/可重用時啟動 |
 | 26 | **翻譯文件** | task_intent: translate | neutral-language | 翻譯時需要中性用語規範 |
+| 27 | **App/API/Embedded 開發** | task_intent: 開發, 實作, implement, coding, build, bug-fix, feature, code-review, design-review | workflow.software-delivery | 需要開發指引時載入 software-delivery workflow |
+| 28 | **使用者要求開發** | user_signal: 幫我寫, 幫我做, 幫我開發, 幫我實作, 要怎麼做 | workflow.software-delivery | 使用者明確要求開發協助時載入 workflow |
 
 ## 複合情境範例
 

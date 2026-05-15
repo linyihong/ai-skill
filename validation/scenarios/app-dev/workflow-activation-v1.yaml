@@ -1,0 +1,62 @@
+# Workflow Activation Scenario
+# 測試 AI 在處理到一半發現需要開發時，是否能正確載入 software-delivery workflow
+# 來源 activation rule:
+#   - runtime/router/activation-rules.yaml (workflow.software-delivery)
+
+id: workflow-activation-v1
+domain: app-dev
+type: routing-decision
+priority: P1
+
+given:
+  task: mid_session_development
+  artifacts:
+    - runtime/router/activation-rules.yaml
+    - knowledge/runtime/routing-registry.yaml
+    - workflow/software-delivery/execution-flow.md
+  signals:
+    - 使用者原本在分析 APK
+    - 分析過程中發現需要實作一個 hook script
+    - 使用者說「幫我寫這個 hook」
+  constraints:
+    - 目前 session 已載入 Core Bootstrap
+    - 尚未載入 software-delivery workflow
+    - activation-engine.rb 可用於判斷
+
+when:
+  action: detect_workflow_switch
+
+then:
+  expected_route:
+    primary: activate_software_delivery_workflow
+    steps:
+      - 偵測到 task_intent 包含「實作」「寫程式」等開發相關詞彙
+      - 查詢 activation-rules.yaml 的 workflow.software-delivery rule
+      - 比對 task_intent 或 user_signal 符合 activation 條件
+      - 載入 workflow/software-delivery/execution-flow.md
+      - 先讀 knowledge/summaries/development-guidance.md（摘要）
+      - 依 execution-flow.md 的 Step 1（Start From Evidence）開始
+    reject:
+      - ignore_workflow: "繼續用 APK analysis workflow 處理開發任務"
+      - manual_guess: "不參考 workflow，憑經驗直接寫 code"
+      - wrong_workflow: "載入其他不相關的 workflow（如 travel-planning）"
+
+  expected_heuristics:
+    - workflow-activation-check
+    - mid-session-intent-redetection
+
+  forbidden_routes:
+    - continue_apk_analysis_for_development
+    - skip_workflow_loading
+    - load_wrong_workflow
+
+  expected_final_route: software-delivery-execution-flow
+
+  expected_intelligence:
+    - workflow/software-delivery/execution-flow.md
+    - knowledge/summaries/development-guidance.md
+    - runtime/router/activation-rules.yaml
+
+  unexpected_intelligence:
+    - workflow/apk-analysis/execution-flow.md
+    - workflow/travel-planning/execution-flow.md

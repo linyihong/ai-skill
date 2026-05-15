@@ -591,6 +591,40 @@ records:
 
   - id: route.workflow.software-delivery
     task_intent: 產出 app/API/embedded development guidance
+    triggers:
+      - 開發
+      - 實作
+      - implement
+      - 寫程式
+      - coding
+      - 建置
+      - build
+      - 修 bug
+      - bug-fix
+      - 新功能
+      - feature
+      - code-review
+      - design-review
+      - release-review
+      - contract-first
+      - bdd
+      - api
+      - backend
+      - mobile
+      - security
+      - firmware
+      - embedded
+      - flutter
+      - react-native
+      - ios
+      - android
+      - kotlin
+      - swift
+      - typescript
+      - dart
+      - signing
+      - session
+      - anti-tamper
     primary_source: workflow/software-delivery/execution-flow.md
     required_dependencies:
       - workflow/software-delivery/artifact-gates.md
@@ -602,10 +636,10 @@ records:
       - knowledge/summaries/development-guidance.md
       - knowledge/graphs/workflow-software-delivery.yaml
     source_of_truth_gate: new-layer-promoted
-    ranking_reason: app-development-guidance 已從舊 skills/ 遷移至新分層，workflow/software-delivery/ 為 active entrypoint。
-    validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離。
+    ranking_reason: app-development-guidance 已從舊 skills/ 遷移至新分層，workflow/software-delivery/ 為 active entrypoint。triggers 已擴充涵蓋開發相關詞彙。
+    validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離，activation rule 已建立。
     metadata:
-      priority: P2
+      priority: P1
       confidence: high
       context_cost:
         estimated_tokens: 3500
@@ -617,7 +651,7 @@ records:
     model:
       profile: specialized
       compression_level: source-backed
-      reason: App development guidance 需要 workflow、analysis methods 與 domain-specific controls/checklists routing。
+      reason: App development guidance 需要 workflow、analysis methods 與 domain-specific controls/checklists routing。triggers 已擴充以支援中途切換。
 
   - id: route.workflow.travel-planning
     task_intent: 規劃 evidence-based travel itinerary

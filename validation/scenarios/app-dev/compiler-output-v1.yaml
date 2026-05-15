@@ -1,0 +1,123 @@
+# Compiler Output Scenario
+# 測試 compiler-engine.rb 是否能從 workflow/software-delivery/execution-flow.md
+# 正確提取 phase definitions、blocking gates、allowed_actions、forbidden_actions
+# 並產出結構化的 runtime/generated/workflow-software-delivery-phases.yaml
+#
+# 來源 compiler rule:
+#   - runtime/compiler/compiler-rules.yaml (source_target_mapping[0])
+#   - runtime/compiler/compiler-engine.rb (compile_workflow_phases)
+
+id: compiler-output-v1
+domain: app-dev
+type: compiler-verification
+priority: P1
+
+given:
+  task: compile_workflow_phases
+  artifacts:
+    - runtime/compiler/compiler-rules.yaml
+    - runtime/compiler/compiler-engine.rb
+    - workflow/software-delivery/execution-flow.md
+    - runtime/generated/workflow-software-delivery-phases.yaml
+  signals:
+    - workflow/software-delivery/execution-flow.md 有 8 個 ## 章節標題
+    - 每個章節包含表格（| 問題 | 必要行動 |）
+    - 部分章節包含 gate 描述（**bold**：description 格式）
+    - compiler-rules.yaml 宣告 extract: [phase_definitions, allowed_actions, forbidden_actions, blocking_gates]
+  constraints:
+    - compiler-engine.rb 的 extract_phases_from_flow 只提取 ## 數字. 標題
+    - compiler-engine.rb 的 extract_gates_from_content 只提取 **bold**：description
+    - "目前 generated YAML 的 gates 為空陣列"
+    - compiler-rules.yaml 宣告 blocking_gates 應包含 id, severity, check.type, check.verification
+
+when:
+  action: run_compiler
+
+then:
+  expected_route:
+    primary: produce_structured_yaml
+    steps:
+      - 讀取 workflow/software-delivery/execution-flow.md
+      - 提取 8 個 phase definitions（## 數字. 標題）
+      - 從 Change Intake 表格提取 allowed_actions（如：閱讀企劃書、更新規劃文件、確認預期行為）
+      - 從 Change Intake 表格提取 forbidden_actions（如：跳過變更接收直接寫 code）
+      - 從 Product Brief Validation 描述提取 blocking_gates（如：未驗證聲明視為阻擋項）
+      - 寫入 runtime/generated/workflow-software-delivery-phases.yaml
+      - 檔頭包含 generated_from、generated_at、compiler_version、status=synced
+    reject:
+      - empty_gates: "gates 欄位保持 [] 空陣列，忽略 execution-flow.md 中的 gate 描述"
+      - missing_allowed_actions: "不從 Change Intake 表格提取 allowed_actions"
+      - missing_forbidden_actions: "不從 Change Intake 表格提取 forbidden_actions"
+      - flat_phases_only: "只輸出 phase name 和 source_line，忽略所有結構化欄位"
+
+  expected_heuristics:
+    - compiler-deterministic-output
+    - prose-to-yaml-extraction
+    - gate-structure-preservation
+
+  expected_output_shape:
+    header:
+      generated_from: "workflow/software-delivery/execution-flow.md"
+      status: "synced"
+    phases:
+      - name: string
+        source_line: integer
+        allowed_actions:
+          - string
+        forbidden_actions:
+          - string
+    gates:
+      - id: string
+        name: string
+        severity: string (critical|high|medium|low)
+        check:
+          type: string
+          verification: string
+
+  expected_phase_count: 8
+
+  expected_phase_names:
+    - "從證據開始（Start From Evidence）"
+    - "文件優先 BDD 閉環（Docs-First BDD Closure Loop）"
+    - "SDK 缺陷閉環（即時重現 + BDD 回歸）"
+    - "同工作階段閉環（程式碼 + 持久文件）"
+    - "效能測試關卡（Performance Test Gate）"
+    - "已實作專案的回填規則（Backfill Rules for Implemented Projects）"
+    - "驗證（Validate）"
+    - "回饋可重複使用的課程（Feed Back Reusable Lessons）"
+
+  expected_gates:
+    - id: gate.change-intake.product-brief-validation
+      name: Product Brief Validation
+      severity: critical
+      check:
+        type: manual
+        verification: "檢查 product brief 的每個主要聲明是否標記為 validated / assumption / open question / scoped out / invalidated"
+    - id: gate.change-intake.performance-budget
+      name: Performance Budget Definition
+      severity: high
+      check:
+        type: manual
+        verification: "在程式碼之前定義效能預算和必要的效能測試類型"
+
+  expected_allowed_actions:
+    - "閱讀企劃書、product brief、規劃文件、issue、ticket、PRD、設計備註、BDD、API 合約或同等文件"
+    - "根據證據或明確決策檢查目標、使用者、範圍、non-goals、假設、限制、依賴、風險和成功標準"
+    - "在程式碼之前更新規劃文件、BDD、合約、實作切片和測試"
+    - "確認預期行為 vs 實際行為、重現/證據、受影響的 BDD 或缺失 scenario"
+    - "在程式碼之前定義效能預算和必要的效能測試類型"
+    - "應用文件優先順序：治理/框架合約、產品計劃、BDD、合約、實作、測試"
+
+  expected_forbidden_actions:
+    - "跳過變更接收直接寫程式碼"
+    - "在 product brief 包含未驗證聲明時仍開始實作"
+    - "僅使用單元測試而沒有行為規格對齊就合併可觀察行為或共享合約變更"
+    - "將專案特定端點、令牌、機密、裝置 ID、原始使用者資料複製到技能中"
+
+  validation:
+    - "執行 ruby runtime/compiler/compiler-engine.rb 後，generated YAML 的 phases 長度為 8"
+    - "generated YAML 的 gates 不為空陣列"
+    - "每個 phase 包含 allowed_actions 和 forbidden_actions 欄位"
+    - "每個 gate 包含 id, severity, check.type, check.verification"
+    - "檔頭 status 為 synced"
+    - "重新執行 compiler 產生相同輸出（idempotent）"
