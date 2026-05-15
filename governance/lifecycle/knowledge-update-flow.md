@@ -146,23 +146,52 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 ### 2.4 是否需要新分類（New Category Decision）
 
 > 當現有子層中沒有對應的分類時，需要判斷是否建立新分類。
+> 注意：新分類可能出現在不同層級 — 可以是現有目錄下的子層，也可以是與現有目錄平行的新維度。
 
 **判斷流程**：
 
-1. **檢查現有子層**：`intelligence/engineering/analytical-reasoning/` 下已有：
-   - `heuristics/` — 跨語言啟發式規則
-   - `failure/` — 語言/框架特定的失敗模式
-   - `anti-patterns/` — 可預防的錯誤設計
-   - `signals/` — 偵測信號
+1. **檢查現有分類維度**：`intelligence/engineering/` 下目前有這些分類維度：
+   - `analytical-reasoning/` — 分析相關的工程智慧（heuristics / failure / anti-patterns / signals）
+   - `agent-architecture/` — Agent 架構設計智慧
+   - `architecture/` — 系統架構 trade-off
+   - `development/` — 開發流程智慧
+   - `distributed-systems/` — 分散式系統模式
+   - `domain/` — 領域驅動設計
+   - `failure/` — 跨語言通用失敗模式
+   - `heuristics/` — 跨領域通用啟發式規則
+   - `tradeoffs/` — 技術選擇 trade-off
 
-2. **若知識不屬於任何現有子層**，考慮：
+2. **判斷是否需要新的分類維度**（橫向思考）：
+
+   ```
+   這份知識是否屬於全新的分類維度？
+      │
+      ├─ 語言特定知識（Java、JavaScript、Dart 等）
+      │   → 考慮建立 intelligence/engineering/language-specific/<lang>/
+      │
+      ├─ 框架特定知識（Frida、Spring、Flutter 等）
+      │   → 考慮建立 intelligence/engineering/framework-specific/<framework>/
+      │
+      ├─ 平台特定知識（Android、iOS、Web 等）
+      │   → 考慮建立 intelligence/engineering/platform-specific/<platform>/
+      │
+      └─ 以上皆非 → 回到現有維度下的子層決策
+   ```
+
+3. **若不需要新維度**，檢查現有子層是否能容納：
+   - 以 `analytical-reasoning/` 為例，現有子層：
+     - `heuristics/` — 跨語言啟發式規則
+     - `failure/` — 語言/框架特定的失敗模式
+     - `anti-patterns/` — 可預防的錯誤設計
+     - `signals/` — 偵測信號
    - 是否可擴展現有子層的 scope 描述來容納？
-   - 若否，建立新子層（如 `techniques/`、`patterns/`）
+   - 若否，在現有維度下建立新子層（如 `techniques/`、`patterns/`）
 
-3. **建立新分類的門檻**：
+4. **建立新分類的門檻**：
    - 至少有 1 份已驗證的知識文件
    - 有明確的 scope 邊界（什麼該放、什麼不該放）
    - 已建立 `README.md` 描述該分類的 scope
+   - 若建立新維度（如 `language-specific/`），需在 `intelligence/engineering/README.md` 中加入該維度的索引
 
 ### 2.5 更新 Workflow 分類規則（Workflow Classification Update）
 
@@ -185,9 +214,15 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 2.1 領域歸屬：apk-analysis（Java 後端 TSV 解析）
 2.2 語言相依性：語言特定（Java String.trim() 行為）
 2.3 層級判斷：失敗模式（已發生的 bug，有 root cause 分析）
-     → intelligence/engineering/analytical-reasoning/failure/
-2.4 新分類：不需要（failure/ 已存在，scope 可涵蓋）
-2.5 Workflow 更新：無需更新（分類已存在）
+2.4 新分類判斷：
+     ├─ 橫向思考：這是語言特定知識 → 考慮建立 language-specific/<lang>/
+     ├─ 現有子層：analytical-reasoning/failure/ 可容納，但會與分析技術失敗混雜
+     └─ 決策：建立 intelligence/engineering/language-specific/java/failure/
+         理由：Java 特定失敗模式不屬於分析技術，且未來可能累積更多 Java 知識
+2.5 Workflow 更新：
+     ├─ knowledge-update-flow.md Step 2.4 → 加入 language-specific/ 維度
+     ├─ intelligence/engineering/README.md → 加入 language-specific/ 索引
+     └─ intelligence/engineering/language-specific/java/failure/README.md → 建立 scope
 ```
 
 ---

@@ -1,8 +1,8 @@
 # Java TSV `trim()` Before `split("\t", -1)` Destroys Trailing Empty Fields
 
 > **Language**: Java (language-specific)
-> **Layer**: `intelligence/engineering/analytical-reasoning/failure/`
-> **Classification reason**: Root cause involves Java `String.trim()` standard library behavior (removes ≤ U+0020 chars including tab 0x09). This is a language-specific failure pattern, not a cross-language heuristic — therefore placed in `failure/` instead of `heuristics/`.
+> **Layer**: `intelligence/engineering/language-specific/java/failure/`
+> **Classification reason**: Root cause involves Java `String.trim()` standard library behavior (removes ≤ U+0020 chars including tab 0x09). This is a language-specific failure pattern — placed in `language-specific/java/failure/` to keep Java knowledge separate from cross-language analytical-reasoning failures.
 
 ## Problem
 

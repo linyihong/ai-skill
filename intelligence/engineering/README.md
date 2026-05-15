@@ -14,6 +14,7 @@
 | [`agent-architecture/`](agent-architecture/README.md) | AI Agent 自身運作的智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries、pilot-first validation、failure-to-scenario closure、linked-updates completeness、decomposition strategy、stateless validation） |
 | [`development/`](development/README.md) | 開發指引工程智慧（risk translation、docs-first BDD、contract governance） |
 | [`analytical-reasoning/`](analytical-reasoning/README.md) | 分析推理智慧（APK analysis、repo analysis、evidence-first routing、heuristics、signals、failure patterns） |
+| [`language-specific/`](language-specific/README.md) | 語言特定知識（Java、JavaScript、Dart 等語言的 failure patterns、techniques） |
 
 ## 與其他層的關係
 
