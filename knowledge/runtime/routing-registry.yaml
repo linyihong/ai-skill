@@ -1144,3 +1144,43 @@ records:
       profile: small
       compression_level: source-backed
       reason: Output Governance 在 validation 與 finalize phase 時才需要載入，不佔用 bootstrap 預算。
+
+  # ── P3 Routes ──
+
+  - id: route.runtime.distributed
+    task_intent: 載入 distributed runtime 鎖定機制、multi-agent 協調規則、async job 生命週期管理
+    primary_source: runtime/distributed/README.md
+    required_dependencies:
+      - runtime/phases/phase-machine.yaml
+      - runtime/obligations/obligation-ledger.yaml
+      - runtime/gates/blocking-gates.yaml
+    candidate_sources:
+      - runtime/distributed/distributed-locks.yaml
+      - runtime/distributed/multi-agent-coordination.yaml
+      - runtime/distributed/async-job-lifecycle.yaml
+      - runtime/transactions/transaction-machine.yaml
+    source_of_truth_gate: runtime-distributed-active
+    ranking_reason: >
+      Distributed Runtime 定義 4 種分散式鎖（phase_transition、obligation_ledger、
+      generated_surface、transaction）含 lease time、retry policy、release condition；
+      6 條 multi-agent 協調規則（phase_check_before_action、generated_surface_version_check、
+      obligation_ledger_sync、transaction_isolation、phase_transition_exclusive、
+      stale_state_recovery）；5 個 async job 狀態（pending→running→completed/failed/cancelled）
+      含 allowed_transitions、timeout、retry_policy、dependency_check。
+    validation_signal: >
+      Distributed locks 已正確 acquire/release，multi-agent coordination rules 已遵守，
+      async job lifecycle 狀態轉換正確，無 deadlock 或 stale state。
+    metadata:
+      priority: P3
+      confidence: medium
+      context_cost:
+        estimated_tokens: 800
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Distributed Runtime 在 multi-agent 協作或 async job 執行時才需要載入，不佔用 bootstrap 預算。

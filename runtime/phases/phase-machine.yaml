@@ -116,7 +116,8 @@ phases:
     name: Validation
     description: >
       驗證階段。檢查 execution 的產出是否符合 gates、obligations 是否完成、
-      linked updates 是否完整。此階段不允許修改檔案。
+      linked updates 是否完整、output governance 是否通過。
+      此階段不允許修改檔案。
     entry_conditions:
       - execution_complete: true
     allowed_actions:
@@ -125,6 +126,7 @@ phases:
       - run_validator
       - check_linked_updates
       - verify_obligations
+      - check_output_governance  # P3: 檢查語言/格式/去敏/工具中立性
     forbidden_actions:
       - write_file
       - apply_diff
@@ -137,9 +139,15 @@ phases:
       - gate.validation.linked_updates_complete
       - gate.validation.artifacts_complete
       - gate.validation.no_forbidden_actions_used
+      # P3: Output governance gates
+      - gate.output.language_consistency
+      - gate.output.sanitization_check
+      - gate.output.tool_neutrality
+      - gate.output.neutral_language
     obligations:
       - obligation.validation.run_knowledge_runtime_validator
       - obligation.validation.check_linked_updates
+      - obligation.validation.check_output_governance  # P3: 檢查 output governance
     next_phase: phase.commit
     phase_transition_triggers:
       - condition: "all_gates_passed == true"
@@ -239,12 +247,14 @@ phases:
     description: >
       最終階段。關閉 writeback transaction，清理 obligation ledger，
       標記本輪完成。此階段後 session 可結束或回到 checkpoint 開始下一輪。
+      執行最終 output governance 檢查（語言一致性、去敏狀態）。
     entry_conditions:
       - readback_complete: true
     allowed_actions:
       - close_obligation_ledger
       - update_knowledge
       - summarize_completion
+      - check_output_governance  # P3: 最終 output governance 檢查
     forbidden_actions:
       - write_file
       - apply_diff
@@ -254,9 +264,13 @@ phases:
     blocking_gates:
       - gate.finalize.all_obligations_closed
       - gate.finalize.knowledge_updated
+      # P3: Final output governance gates
+      - gate.output.final_language_check
+      - gate.output.final_sanitization_check
     obligations:
       - obligation.finalize.close_ledger
       - obligation.finalize.run_knowledge_checkpoint
+      - obligation.finalize.verify_output_governance  # P3: 最終 output governance 驗證
     next_phase: phase.checkpoint  # 回到 checkpoint 開始下一輪
     phase_transition_triggers:
       - condition: "finalize_complete == true"

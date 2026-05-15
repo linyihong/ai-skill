@@ -26,6 +26,9 @@ compilation_scope:
     - open_obligations (id, phase, verification_criteria)
     - transaction_state (state, allowed_actions, transitions)
     - phase_transition_rules (from, to, blocked, reason)
+    - language_policy (core_rules, anti_drift, tool_overrides, validation)
+    - output_rules (format_rules, content_boundary, sanitization, validation)
+    - governance_gates (id, phase, severity, check.type, check.verification)
   never_compile:
     - heuristics
     - debugging judgment
@@ -75,6 +78,30 @@ source_target_mapping:
       - failure_patterns
       - recovery_strategies
     compile_rule: "從 failure taxonomy 與 recovery 描述提取 pattern 與 strategy"
+
+  # ── P3: Output Governance Mappings ──
+
+  - source: "enforcement/neutral-language.md"
+    target: "runtime/generated/language-policy.yaml"
+    extract:
+      - language_core_rules
+      - language_anti_drift
+      - language_validation
+    compile_rule: "從 neutral-language.md 的核心原則與寫作規則提取 language policy 定義"
+
+  - source: "enforcement/sanitization.md"
+    target: "runtime/generated/sanitization-rules.yaml"
+    extract:
+      - sanitization_rules
+      - placeholder_rules
+    compile_rule: "從 sanitization.md 的去敏規則提取 sanitization 定義"
+
+  - source: "enforcement/tool-neutral-documentation.md"
+    target: "runtime/generated/tool-neutrality-rules.yaml"
+    extract:
+      - tool_neutrality_rules
+      - content_boundary_rules
+    compile_rule: "從 tool-neutral-documentation.md 的核心規則與允許位置提取 tool neutrality 定義"
 
 compilation_rules:
 

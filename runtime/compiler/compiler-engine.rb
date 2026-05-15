@@ -119,6 +119,36 @@ def compile_enforcement_transactions(source_path, mapping_entry)
   puts "  ✓ #{target}"
 end
 
+def compile_output_governance(source_path, mapping_entry)
+  content = File.read(source_path)
+
+  # Extract governance rules from markdown content
+  rules = []
+  content.scan(/^###?\s+(.+?)$/) do |match|
+    rules << { 'section' => match[0].strip }
+  end
+
+  # Extract validation gates
+  gates = []
+  content.scan(/^\*\*([^*]+)\*\*：(.+)$/) do |match|
+    gates << { 'name' => match[0].strip, 'description' => match[1].strip }
+  end
+
+  target = target_path_for(source_path, mapping_entry)
+  header = generated_header(source_path)
+
+  yaml_content = {
+    'header' => header,
+    'compiled_from' => source_path,
+    'rules' => rules,
+    'gates' => gates
+  }
+
+  FileUtils.mkdir_p(File.dirname(target))
+  File.write(target, YAML.dump(yaml_content))
+  puts "  ✓ #{target}"
+end
+
 def compile_source(source_path, mapping_entry)
   compile_rule = mapping_entry['compile_rule']
 
@@ -127,6 +157,8 @@ def compile_source(source_path, mapping_entry)
     compile_workflow_phases(source_path, mapping_entry)
   when /從 writeback transaction 章節提取 state machine 定義/
     compile_enforcement_transactions(source_path, mapping_entry)
+  when /提取 language policy 定義|提取 sanitization 定義|提取 tool neutrality 定義/
+    compile_output_governance(source_path, mapping_entry)
   else
     puts "  ⚠  Unknown compile rule: #{compile_rule}"
   end

@@ -34,3 +34,6 @@ ruby runtime/compiler/compiler-engine.rb
 | `transaction-machine.yaml` | `enforcement/dependency-reading.md` | 待產生 |
 | `goal-action-gates.yaml` | `enforcement/goal-action-validation.md` | 待產生 |
 | `failure-recovery.yaml` | `enforcement/failure-learning-system.md` | 待產生 |
+| `language-policy.yaml` | `enforcement/neutral-language.md` | 待產生 |
+| `sanitization-rules.yaml` | `enforcement/sanitization.md` | 待產生 |
+| `tool-neutrality-rules.yaml` | `enforcement/tool-neutral-documentation.md` | 待產生 |

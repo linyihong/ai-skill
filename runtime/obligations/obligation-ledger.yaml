@@ -104,6 +104,26 @@ obligations:
     linked_gates:
       - gate.validation.linked_updates_complete
 
+  # P3: Output Governance Check (Validation Phase)
+  - id: obligation.validation.check_output_governance
+    phase: phase.validation
+    name: Check Output Governance
+    description: "檢查 output governance gates：語言一致性、去敏狀態、工具中立性、中性語言"
+    verification:
+      - "output_governance_checked == true"
+      - "gate.output.language_consistency == passed"
+      - "gate.output.sanitization_check == passed"
+      - "gate.output.tool_neutrality == passed OR warn_only == true"
+      - "gate.output.neutral_language == passed OR warn_only == true"
+    severity: critical
+    depends_on:
+      - obligation.validation.run_knowledge_runtime_validator
+    linked_gates:
+      - gate.output.language_consistency
+      - gate.output.sanitization_check
+      - gate.output.tool_neutrality
+      - gate.output.neutral_language
+
   # ── Commit Phase ──
   - id: obligation.commit.write_commit_message
     phase: phase.commit
@@ -192,6 +212,22 @@ obligations:
       - obligation.finalize.close_ledger
     linked_gates:
       - gate.finalize.knowledge_updated
+
+  # P3: Final Output Governance Verification (Finalize Phase)
+  - id: obligation.finalize.verify_output_governance
+    phase: phase.finalize
+    name: Verify Output Governance
+    description: "最終 output governance 驗證：語言一致性、去敏狀態"
+    verification:
+      - "final_output_governance_verified == true"
+      - "gate.output.final_language_check == passed"
+      - "gate.output.final_sanitization_check == passed"
+    severity: critical
+    depends_on:
+      - obligation.finalize.run_knowledge_checkpoint
+    linked_gates:
+      - gate.output.final_language_check
+      - gate.output.final_sanitization_check
 
   # ── Recovery Phase ──
   - id: obligation.recovery.diagnose_root_cause
