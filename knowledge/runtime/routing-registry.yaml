@@ -1184,3 +1184,43 @@ records:
       profile: small
       compression_level: source-backed
       reason: Distributed Runtime 在 multi-agent 協作或 async job 執行時才需要載入，不佔用 bootstrap 預算。
+
+  - id: route.governance.knowledge-update-flow
+    task_intent: 載入知識更新流程的 11 個步驟定義，決定目前 knowledge update 走到哪一步
+    primary_source: governance/lifecycle/knowledge-update-flow.md
+    required_dependencies:
+      - runtime/phases/phase-machine.yaml
+      - runtime/obligations/obligation-ledger.yaml
+      - runtime/gates/blocking-gates.yaml
+    candidate_sources:
+      - runtime/generated/knowledge-update-phases.yaml
+      - enforcement/feedback-lessons.md
+      - enforcement/failure-learning-system.md
+      - enforcement/linked-updates.md
+      - enforcement/dependency-reading.md
+      - knowledge/runtime/README.md
+    source_of_truth_gate: governance-knowledge-update-flow-active
+    ranking_reason: >
+      Knowledge Update Flow 定義 11 個步驟（觸發檢查→分類→Promotion Target→寫入→
+      更新目標層→Intelligence Extraction→Failure Learning→Linked Updates→
+      Runtime Surfaces→驗證→Commit/Push/Readback），每個步驟有 entry conditions、
+      exit conditions、reference sources。Compiler 產生的 knowledge-update-phases.yaml
+      提供 machine-readable 的步驟定義，讓 agent 可以直接讀 YAML 知道目前走到哪一步，
+      不用每次重讀 prose。
+    validation_signal: >
+      目前 knowledge update 的步驟已確認，entry conditions 已滿足，exit conditions
+      已檢查，reference sources 已載入，下一步驟已決定。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 600
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Knowledge Update Flow 在 checkpoint 或 finalize phase 需要執行知識更新時才載入，不佔用 bootstrap 預算。

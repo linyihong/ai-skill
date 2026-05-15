@@ -1,0 +1,42 @@
+---
+header:
+  generated_from: enforcement/dependency-reading.md
+  generated_at: '2026-05-15T01:14:40Z'
+  compiler_version: 1.0.0
+  status: synced
+compiled_from: enforcement/dependency-reading.md
+states:
+- name: 核心規則
+  context: 
+- name: Agent 行為
+  context: 
+- name: Dependency Read Ledger
+  context: 
+- name: Default Bootstrap Boundary
+  context: 
+- name: primary_entrypoint 優先規則
+  context: 
+- name: 必讀規則
+  context: 
+- name: Ai-skill Writeback Transaction Guard → Runtime Transaction Machine
+  context: 
+- name: 本節保留的邊界規則
+  context: 
+- name: 交易關閉條件（由 transaction-machine.yaml 定義）
+  context: 
+- name: Conversation Goal Ledger Boundary
+  context: 
+- name: Failure Learning Boundary
+  context: 
+- name: Tool-Neutral Documentation Boundary
+  context: 
+- name: Document TODO List Boundary
+  context: 
+- name: Ai-skill 回寫完成門檻
+  context: 
+- name: Commit / Push 後讀回 Gate
+  context: 
+- name: 與連動更新的關係
+  context: 
+- name: 驗證
+  context: 

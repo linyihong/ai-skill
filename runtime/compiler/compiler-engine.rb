@@ -27,7 +27,7 @@ COMPILER_RULES = File.join(File.dirname(__FILE__), 'compiler-rules.yaml')
 @mapping = nil
 
 def load_mapping
-  rules = YAML.safe_load(File.read(COMPILER_RULES))
+  rules = YAML.safe_load(File.read(COMPILER_RULES), permitted_classes: [Date])
   @mapping = rules['source_target_mapping']
 end
 
@@ -149,6 +149,62 @@ def compile_output_governance(source_path, mapping_entry)
   puts "  ✓ #{target}"
 end
 
+def compile_knowledge_update_flow(source_path, _mapping_entry)
+  content = File.read(source_path)
+
+  # Extract 11 steps from ## level headings with step numbers
+  steps = []
+  content.scan(/^##\s+Step\s+(\d+)[：:]\s*(.+?)$/) do |match|
+    step_num = match[0].strip.to_i
+    step_name = match[1].strip
+
+    # Find the step's content block (from this ## to next ## or end)
+    step_start = content.index("## Step #{step_num}：")
+    next unless step_start
+
+    remaining = content[step_start..]
+    next_step_match = remaining.index(/^## Step #{step_num + 1}[：:]/)
+    step_content = if next_step_match
+                     remaining[0...next_step_match]
+                   else
+                     remaining
+                   end
+
+    # Extract entry conditions (判斷結果 table)
+    entry_conditions = []
+    step_content.scan(/^\|\s*(\w[\w\s]+?)\s*\|\s*(.+?)\s*\|$/) do |row|
+      entry_conditions << { 'condition' => row[0].strip, 'next_step' => row[1].strip }
+    end
+
+    # Extract reference sources
+    references = []
+    step_content.scan(/\[`([^`]+)`\]\(([^)]+)\)/) do |ref|
+      references << { 'name' => ref[0], 'path' => ref[1] }
+    end
+
+    steps << {
+      'step' => step_num,
+      'name' => step_name,
+      'entry_conditions' => entry_conditions,
+      'references' => references
+    }
+  end
+
+  target = File.join(GENERATED_DIR, 'knowledge-update-phases.yaml')
+  header = generated_header(source_path)
+
+  yaml_content = {
+    'header' => header,
+    'compiled_from' => source_path,
+    'total_steps' => 11,
+    'steps' => steps
+  }
+
+  FileUtils.mkdir_p(GENERATED_DIR)
+  File.write(target, YAML.dump(yaml_content))
+  puts "  ✓ #{target}"
+end
+
 def compile_source(source_path, mapping_entry)
   compile_rule = mapping_entry['compile_rule']
 
@@ -159,6 +215,8 @@ def compile_source(source_path, mapping_entry)
     compile_enforcement_transactions(source_path, mapping_entry)
   when /提取 language policy 定義|提取 sanitization 定義|提取 tool neutrality 定義/
     compile_output_governance(source_path, mapping_entry)
+  when /從 knowledge-update-flow\.md 的 11 個步驟標題與判斷表格提取 phase 定義/
+    compile_knowledge_update_flow(source_path, mapping_entry)
   else
     puts "  ⚠  Unknown compile rule: #{compile_rule}"
   end

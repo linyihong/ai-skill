@@ -1,0 +1,42 @@
+---
+header:
+  generated_from: workflow/travel-planning/execution-flow.md
+  generated_at: '2026-05-15T01:14:40Z'
+  compiler_version: 1.0.0
+  status: synced
+phases:
+- name: 需求接收（Intake）
+  source_line: 7
+- name: 來源分類（Source Triage）
+  source_line: 24
+- name: 旅行社與模型路線基準 / 直接選項
+  source_line: 54
+- name: 確切地點驗證
+  source_line: 68
+- name: 停留體驗與餐飲規劃
+  source_line: 82
+- name: 天氣與備案檢查
+  source_line: 95
+- name: 長途交通比較關卡
+  source_line: 108
+- name: 交通方式決策
+  source_line: 119
+- name: 過夜基地與住宿規劃
+  source_line: 143
+- name: 路線形狀與折返檢查
+  source_line: 154
+- name: 國家與地區特定檢查
+  source_line: 165
+- name: 可行性建構
+  source_line: 182
+- name: 行程可行性檢查
+  source_line: 201
+- name: 日曆 / 應用程式就緒輸出
+  source_line: 212
+- name: 車中泊 / Road Trip 檢查
+  source_line: 224
+- name: 推薦檢查
+  source_line: 255
+- name: 最終驗證
+  source_line: 283
+gates: []

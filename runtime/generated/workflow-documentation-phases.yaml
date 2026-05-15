@@ -1,0 +1,22 @@
+---
+header:
+  generated_from: workflow/documentation/execution-flow.md
+  generated_at: '2026-05-15T01:14:40Z'
+  compiler_version: 1.0.0
+  status: synced
+phases:
+- name: 釐清讀者與生命週期
+  source_line: 5
+- name: 分類維度（寫入前先選標籤）
+  source_line: 18
+- name: 選目錄與檔名（對照 content layering）
+  source_line: 31
+- name: 檔案形狀（降低 token）
+  source_line: 45
+- name: 驗證與連動
+  source_line: 53
+- name: 完成訊號（給 agent 自查）
+  source_line: 59
+gates:
+- name: 檔名
+  description: 優先 `kebab-case`、主題明確；避免 `notes2.md`、`misc.md`。

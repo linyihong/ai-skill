@@ -1,0 +1,15 @@
+---
+header:
+  generated_from: enforcement/tool-neutral-documentation.md
+  generated_at: '2026-05-15T01:14:40Z'
+  compiler_version: 1.0.0
+  status: synced
+compiled_from: enforcement/tool-neutral-documentation.md
+rules:
+- section: 核心規則
+- section: 允許工具專屬內容的位置
+- section: 可重用文件中應避免
+- section: 與既有工具文件的關係
+- section: Strategy-style Tool Adapters
+- section: Review Checklist
+gates: []

@@ -103,6 +103,17 @@ source_target_mapping:
       - content_boundary_rules
     compile_rule: "從 tool-neutral-documentation.md 的核心規則與允許位置提取 tool neutrality 定義"
 
+  # ── P3.5: Knowledge Update Flow Mapping ──
+
+  - source: "governance/lifecycle/knowledge-update-flow.md"
+    target: "runtime/generated/knowledge-update-phases.yaml"
+    extract:
+      - knowledge_update_steps
+      - step_entry_conditions
+      - step_exit_conditions
+      - step_reference_sources
+    compile_rule: "從 knowledge-update-flow.md 的 11 個步驟標題與判斷表格提取 phase 定義"
+
 compilation_rules:
 
   - id: compile.rule.deterministic_only

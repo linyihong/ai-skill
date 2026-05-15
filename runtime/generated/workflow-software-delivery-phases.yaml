@@ -1,0 +1,24 @@
+---
+header:
+  generated_from: workflow/software-delivery/execution-flow.md
+  generated_at: '2026-05-15T01:14:40Z'
+  compiler_version: 1.0.0
+  status: synced
+phases:
+- name: 從證據開始（Start From Evidence）
+  source_line: 7
+- name: 文件優先 BDD 閉環（Docs-First BDD Closure Loop）
+  source_line: 37
+- name: SDK 缺陷閉環（即時重現 + BDD 回歸）
+  source_line: 53
+- name: 同工作階段閉環（程式碼 + 持久文件）
+  source_line: 66
+- name: 效能測試關卡（Performance Test Gate）
+  source_line: 94
+- name: 已實作專案的回填規則（Backfill Rules for Implemented Projects）
+  source_line: 114
+- name: 驗證（Validate）
+  source_line: 134
+- name: 回饋可重複使用的課程（Feed Back Reusable Lessons）
+  source_line: 150
+gates: []

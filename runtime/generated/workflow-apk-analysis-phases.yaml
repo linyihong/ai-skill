@@ -1,0 +1,24 @@
+---
+header:
+  generated_from: workflow/apk-analysis/execution-flow.md
+  generated_at: '2026-05-15T01:14:40Z'
+  compiler_version: 1.0.0
+  status: synced
+phases:
+- name: 開始前確認
+  source_line: 5
+- name: Quick Start（預設執行順序）
+  source_line: 64
+- name: 分析結束定義
+  source_line: 104
+- name: Required Output Style
+  source_line: 121
+- name: Safety and Sanitization
+  source_line: 143
+- name: Feedback Loop
+  source_line: 165
+- name: 文件分層
+  source_line: 178
+- name: 回填規則
+  source_line: 186
+gates: []

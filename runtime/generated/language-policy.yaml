@@ -1,0 +1,14 @@
+---
+header:
+  generated_from: enforcement/neutral-language.md
+  generated_at: '2026-05-15T01:14:40Z'
+  compiler_version: 1.0.0
+  status: synced
+compiled_from: enforcement/neutral-language.md
+rules:
+- section: 核心原則
+- section: 寫作規則
+- section: 建議替換
+- section: 何時可以保留原詞
+- section: Agent 輸出要求
+gates: []
