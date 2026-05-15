@@ -1,5 +1,9 @@
 # Java TSV `trim()` Before `split("\t", -1)` Destroys Trailing Empty Fields
 
+> **語言**：Java（語言特定）
+> **分類**：`intelligence/engineering/analytical-reasoning/failure/`
+> **分類原因**：Root cause 涉及 Java `String.trim()` 的標準庫行為（移除 ≤ U+0020 字元，包含 tab 0x09），屬於語言特定的失敗模式。不適用於 `heuristics/`（跨語言啟發式規則）。
+
 ## Problem
 
 When parsing tab-separated value (TSV) files in Java, calling `String.trim()` on a line before `split("\t", -1)` silently drops records with trailing empty fields.
