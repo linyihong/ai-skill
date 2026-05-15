@@ -36,13 +36,19 @@
 
 ## Generated Surface
 
-本目錄的 4 個操作流程已由 [`runtime/compiler/compiler-engine.rb`](../../runtime/compiler/compiler-engine.rb) 編譯為 [`runtime/generated/apk-workflow-phases.yaml`](../../runtime/generated/apk-workflow-phases.yaml)，包含：
+本目錄的 4 個操作流程已由 [`runtime/compiler/compiler-engine.rb`](../../runtime/compiler/compiler-engine.rb) 編譯為 [`generated-phases.yaml`](generated-phases.yaml)，包含：
 
 - 各 workflow 的步驟定義（step title + source line）
 - 前置準備項目（prerequisites）
 - 成功產出格式（output format）
 
+### 位置說明
+
+`generated-phases.yaml` 放在本目錄而非 `runtime/generated/`，因為 APK workflow 屬於
+領域操作技巧（analysis 層），不是系統 runtime 的一部分。遵循三層分離原則：
+領域層的 generated surface 跟隨 source 目錄。
+
 相關連結：
 - [`workflow/apk-analysis/execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) — 端到端 agent 執行流程
-- [`runtime/generated/README.md`](../../runtime/generated/README.md) — 所有 generated surface 索引
+- [`runtime/generated/README.md`](../../runtime/generated/README.md) — 系統層 generated surface 索引
 - [`runtime/routing/README.md`](../../runtime/routing/README.md) — Runtime routing 流程

@@ -141,7 +141,7 @@ source_target_mapping:
   # ── P3.8: APK Workflow Phases Mapping ──
 
   - source: "analysis/apk/workflows/*.md"
-    target: "runtime/generated/apk-workflow-phases.yaml"
+    target: "analysis/apk/workflows/generated-phases.yaml"
     extract:
       - step_definitions
       - prerequisites

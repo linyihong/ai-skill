@@ -13,6 +13,9 @@
 - Runtime orchestration、scheduler、coordination 與 context pruning pattern。
 - 如何利用 metadata 選擇 rules、workflow、knowledge atoms 與 model profile。
 - AI-native Knowledge Operating System 的 runtime architecture 草案。
+- **僅限系統層**：`runtime/` 只存放「AI 系統如何運作」的設計與產出。
+  領域操作技巧（如 `analysis/`、`intelligence/`）的 generated surface 應跟隨 source 目錄，
+  不應混入 `runtime/generated/`。
 
 ## 不放什麼
 
@@ -20,6 +23,10 @@
 - 單一工具的 hook、setting、UI 或 mirror sync 細節；放到 `ai-tools/`。
 - Skill-specific workflow 全文；放到 `workflow/`（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。
 - 長期記憶內容本身；放到 `memory/` 或 `knowledge/`。
+- **領域層的 generated surface**：`analysis/`、`intelligence/`、`feedback/` 等領域層的
+  generated YAML 應放在各自的 source 目錄下，不應集中到 `runtime/generated/`。
+  `runtime/generated/` 只存放系統層（`workflow/`、`enforcement/`、`governance/`、`plans/`）的
+  generated surfaces。
 
 ## 誰會參考這裡（Inbound References）
 

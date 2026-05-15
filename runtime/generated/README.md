@@ -11,6 +11,9 @@
    - `stale`：prose source 已修改但未重新編譯
    - `orphan`：prose source 已不存在
 4. **Pre-commit Hook 保護**：commit 前檢查所有 generated YAML 的 status 是否為 synced。
+5. **範圍限定**：本目錄只存放**系統層**（`workflow/`、`enforcement/`、`governance/`、`plans/`）的 generated surfaces。
+   **領域層**（`analysis/`、`intelligence/`、`feedback/`）的 generated YAML 應放在各自的 source 目錄下，
+   不應集中到本目錄。
 
 ## 目前狀態
 
@@ -40,4 +43,3 @@ ruby runtime/compiler/compiler-engine.rb
 | `knowledge-update-phases.yaml` | `governance/lifecycle/knowledge-update-flow.md` | ✅ 已產生 |
 | `classification-rules.yaml` | `governance/lifecycle/knowledge-update-flow.md` + `intelligence/engineering/README.md` | ✅ 已產生 |
 | `plans-index.yaml` | `plans/active/*.md`（聚合） | ✅ 已產生 |
-| `apk-workflow-phases.yaml` | `analysis/apk/workflows/*.md`（聚合 4 個 APK 操作流程） | ✅ 已產生 |

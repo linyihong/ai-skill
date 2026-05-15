@@ -44,7 +44,13 @@ def target_path_for(source_path, mapping_entry)
   domain = extract_domain(source_path)
   target = mapping_entry['target']
     .gsub('{domain}', domain)
-  File.join(GENERATED_DIR, File.basename(target))
+  # If target contains a directory path (e.g., analysis/apk/workflows/generated-phases.yaml),
+  # use it directly. Otherwise, join with GENERATED_DIR.
+  if target.include?('/')
+    target
+  else
+    File.join(GENERATED_DIR, File.basename(target))
+  end
 end
 
 def extract_domain(source_path)
@@ -877,7 +883,8 @@ def check_modified_sources
   apk_workflow_modified = false
   plans_target = File.join(GENERATED_DIR, 'plans-index.yaml')
   classification_target = File.join(GENERATED_DIR, 'classification-rules.yaml')
-  apk_workflow_target = File.join(GENERATED_DIR, 'apk-workflow-phases.yaml')
+  apk_mapping = @mapping.find { |e| e['compile_rule']&.include?('analysis/apk/workflows/*.md') }
+  apk_workflow_target = apk_mapping ? apk_mapping['target'] : File.join(GENERATED_DIR, 'apk-workflow-phases.yaml')
 
   @mapping.each do |entry|
     source_glob = entry['source']
@@ -996,7 +1003,8 @@ def run(options)
   # Write aggregated APK workflow phases
   apk_workflow_entries = apk_workflow_entries.compact
   unless apk_workflow_entries.empty?
-    target = File.join(GENERATED_DIR, 'apk-workflow-phases.yaml')
+    apk_mapping = @mapping.find { |e| e['compile_rule']&.include?('analysis/apk/workflows/*.md') }
+    target = apk_mapping ? apk_mapping['target'] : File.join(GENERATED_DIR, 'apk-workflow-phases.yaml')
     header = generated_header('analysis/apk/workflows/*.md')
     yaml_content = {
       'header' => header,
