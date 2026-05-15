@@ -77,19 +77,16 @@
 
 每輪工作結束前、切回長時間專案工作前、或使用者說「繼續」展開下一輪前，必須執行知識更新檢查：
 
-1. 讀取 [`<AI_SKILL_REPO>/governance/lifecycle/knowledge-update-flow.md`] 了解完整流程。
+### 快速路徑（預設）
+
+1. 讀取 generated YAML：[`<AI_SKILL_REPO>/runtime/generated/knowledge-update-phases.yaml`] 了解 11 個步驟的結構與參考文件。
 2. 自問：本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？
-3. 若是，依 knowledge-update-flow.md 的 11 個步驟執行：
-   - Step 1-2：觸發檢查 + 分類知識類型
-   - Step 3：決定 Promotion Target（intelligence / workflow / analysis / shared-rules / runtime / memory）
-   - Step 4：寫入 feedback/history/<domain>/<category>/ lesson（寫入前依 sanitization.md 去敏）
-   - Step 5：更新目標層
-   - Step 6-7：選擇性執行 Intelligence Extraction 或 Failure Learning
-   - Step 8：執行 Linked Updates
-   - Step 9：更新 Runtime Surfaces
-   - Step 10：驗證（diff review、去敏檢查、link check）
-   - Step 11：Commit / Push / Readback（關閉 writeback transaction）
+3. 若是，依 generated YAML 的 11 個步驟執行（各步驟的詳細 prose 說明請參考 YAML 中 `references` 指向的文件）。
 4. 若否，簡短說明本輪只有 project-specific evidence 或尚未達可泛化標準。
+
+### 完整路徑（僅首次或需要細節時）
+
+- 如果這是當前 session **第一次**執行知識更新，或 generated YAML 的資訊不足以完成某個步驟，才讀取完整 prose：[`<AI_SKILL_REPO>/governance/lifecycle/knowledge-update-flow.md`]
 ```
 
 ### 各工具的實作方式
