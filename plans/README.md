@@ -31,7 +31,7 @@
 | 6 | **Commit & push** | 提交搬移與狀態更新，並推送 |
 | 7 | **最終確認** | 執行 `git status --short --branch` 確認工作樹乾淨 |
 
-### 不搬移的例外情況
+### 不搬移的例外情況i
 
 若 plan 符合以下任一條件，可留在 `active/` 但標註 `✅ completed`：
 
