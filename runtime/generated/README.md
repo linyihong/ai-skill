@@ -14,27 +14,27 @@
 
 ## 目前狀態
 
-本目錄尚無 generated YAML。Compiler 建置完成後，執行以下命令產生：
+所有 generated YAML 已由 compiler 產生。執行以下命令重新編譯：
 
 ```bash
 ruby runtime/compiler/compiler-engine.rb
 ```
 
-## 預計產生的檔案
+## 已產生的檔案
 
 | 檔案 | 來源 | 狀態 |
 |------|------|------|
-| `workflow-apk-analysis-phases.yaml` | `workflow/apk-analysis/execution-flow.md` | 待產生 |
-| `workflow-apk-analysis-artifacts.yaml` | `workflow/apk-analysis/artifact-gates.md` | 待產生 |
-| `workflow-software-delivery-phases.yaml` | `workflow/software-delivery/execution-flow.md` | 待產生 |
-| `workflow-software-delivery-artifacts.yaml` | `workflow/software-delivery/artifact-gates.md` | 待產生 |
-| `workflow-travel-planning-phases.yaml` | `workflow/travel-planning/execution-flow.md` | 待產生 |
-| `workflow-travel-planning-artifacts.yaml` | `workflow/travel-planning/artifact-gates.md` | 待產生 |
-| `workflow-documentation-phases.yaml` | `workflow/documentation/execution-flow.md` | 待產生 |
-| `transaction-machine.yaml` | `enforcement/dependency-reading.md` | 待產生 |
-| `goal-action-gates.yaml` | `enforcement/goal-action-validation.md` | 待產生 |
-| `failure-recovery.yaml` | `enforcement/failure-learning-system.md` | 待產生 |
-| `language-policy.yaml` | `enforcement/neutral-language.md` | 待產生 |
-| `sanitization-rules.yaml` | `enforcement/sanitization.md` | 待產生 |
-| `tool-neutrality-rules.yaml` | `enforcement/tool-neutral-documentation.md` | 待產生 |
-| `knowledge-update-phases.yaml` | `governance/lifecycle/knowledge-update-flow.md` | 待產生 |
+| `workflow-apk-analysis-phases.yaml` | `workflow/apk-analysis/execution-flow.md` | ✅ 已產生 |
+| `workflow-apk-analysis-artifacts.yaml` | `workflow/apk-analysis/artifact-gates.md` | ✅ 已產生 |
+| `workflow-software-delivery-phases.yaml` | `workflow/software-delivery/execution-flow.md` | ✅ 已產生 |
+| `workflow-software-delivery-artifacts.yaml` | `workflow/software-delivery/artifact-gates.md` | ✅ 已產生 |
+| `workflow-travel-planning-phases.yaml` | `workflow/travel-planning/execution-flow.md` | ✅ 已產生 |
+| `workflow-travel-planning-artifacts.yaml` | `workflow/travel-planning/artifact-gates.md` | ✅ 已產生 |
+| `workflow-documentation-phases.yaml` | `workflow/documentation/execution-flow.md` | ✅ 已產生 |
+| `transaction-machine.yaml` | `enforcement/dependency-reading.md` | ✅ 已產生 |
+| `goal-action-gates.yaml` | `enforcement/goal-action-validation.md` | ✅ 已產生 |
+| `failure-recovery.yaml` | `enforcement/failure-learning-system.md` | ✅ 已產生 |
+| `language-policy.yaml` | `enforcement/neutral-language.md` | ✅ 已產生 |
+| `sanitization-rules.yaml` | `enforcement/sanitization.md` | ✅ 已產生 |
+| `tool-neutrality-rules.yaml` | `enforcement/tool-neutral-documentation.md` | ✅ 已產生 |
+| `knowledge-update-phases.yaml` | `governance/lifecycle/knowledge-update-flow.md` | ✅ 已產生 |

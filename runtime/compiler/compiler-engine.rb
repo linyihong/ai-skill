@@ -205,6 +205,174 @@ def compile_knowledge_update_flow(source_path, _mapping_entry)
   puts "  ✓ #{target}"
 end
 
+def compile_workflow_artifacts(source_path, mapping_entry)
+  content = File.read(source_path)
+
+  # Extract artifact sections from ## level headings
+  artifacts = []
+  content.scan(/^##\s+\d+\.\s+(.+)$/) do |match|
+    artifacts << { 'name' => match[0].strip }
+  end
+
+  # Extract verification gates (completion gates, quality gates)
+  gates = []
+  content.scan(/^###\s+(.+?)(?:\s*Gate|gate)?$/) do |match|
+    gates << { 'name' => match[0].strip, 'type' => 'verification_gate' }
+  end
+
+  # Extract table-based artifact definitions (markdown tables with | Artifact | ... |)
+  tables = []
+  content.scan(/^\|.+\|.+\|$/) do |line|
+    next if line.match?(/^\|[\s-]+\|[\s-]+\|$/) # skip separator rows
+    next if line.match?(/^\|.*#.*\|$/) # skip non-artifact tables
+    tables << line.strip
+  end
+
+  # Extract required items from numbered lists under artifact sections
+  required_items = []
+  content.scan(/^\d+\.\s+\*\*([^*]+)\*\*(.*)$/) do |match|
+    required_items << { 'name' => match[0].strip, 'description' => match[1]&.strip }
+  end
+
+  target = target_path_for(source_path, mapping_entry)
+  header = generated_header(source_path)
+
+  yaml_content = {
+    'header' => header,
+    'compiled_from' => source_path,
+    'artifacts' => artifacts,
+    'verification_gates' => gates,
+    'required_items' => required_items
+  }
+
+  FileUtils.mkdir_p(File.dirname(target))
+  File.write(target, YAML.dump(yaml_content))
+  puts "  ✓ #{target}"
+end
+
+def compile_goal_action_gates(source_path, mapping_entry)
+  content = File.read(source_path)
+
+  # Extract the core goal/execution/validation table (Chinese headers: 欄位 | 必填內容)
+  core_fields = []
+  # Match table rows with Chinese or English content in first column
+  content.scan(/^\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) do |match|
+    col1 = match[0].strip
+    col2 = match[1].strip
+    next if col1 == '---' || col1 == '欄位' || col1 == '必填內容'
+    next if col1 == '情境' || col1 == '要求'
+    next if col1 == '工作類型' || col1 == '驗證方式'
+    next if col1 == '工作單元' || col1 == '目標' || col1 == '執行' || col1 == '驗證 / 參考來源'
+    next if col1.start_with?('`<') # skip template placeholders
+    # Only capture the 3 core fields: 目標, 執行, 驗證
+    if %w[目標 執行 驗證].include?(col1)
+      core_fields << { 'field' => col1, 'description' => col2 }
+    end
+  end
+
+  # Extract usage scenarios table (情境 | 要求)
+  scenarios = []
+  content.scan(/^\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) do |match|
+    col1 = match[0].strip
+    col2 = match[1].strip
+    next if col1 == '---' || col1 == '情境' || col1 == '要求'
+    next if col1 == '欄位' || col1 == '必填內容'
+    next if col1 == '工作類型' || col1 == '驗證方式'
+    next if col1 == '工作單元' || col1 == '目標' || col1 == '執行' || col1 == '驗證 / 參考來源'
+    next if col1.start_with?('`<')
+    # These are the scenario rows (modify files, produce analysis, etc.)
+    scenarios << { 'scenario' => col1, 'requirement' => col2 }
+  end
+
+  # Extract validation gates from "驗證 Gate 參考" section
+  gate_section = content[/### 驗證 Gate 參考\n(.+?)(?=\n## |\n### |\z)/m]
+  gates = []
+  if gate_section
+    gate_section.scan(/^\d+\.\s+(.+)$/) do |match|
+      gates << { 'rule' => match[0].strip }
+    end
+  end
+
+  # Extract verification examples table (工作類型 | 驗證方式)
+  verification_examples = []
+  content.scan(/^\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) do |match|
+    col1 = match[0].strip
+    col2 = match[1].strip
+    next if col1 == '---' || col1 == '工作類型' || col1 == '驗證方式'
+    next if col1 == '欄位' || col1 == '必填內容'
+    next if col1 == '情境' || col1 == '要求'
+    next if col1 == '工作單元' || col1 == '目標' || col1 == '執行' || col1 == '驗證 / 參考來源'
+    next if col1.start_with?('`<')
+    verification_examples << { 'work_type' => col1, 'verification_method' => col2 }
+  end
+
+  target = target_path_for(source_path, mapping_entry)
+  header = generated_header(source_path)
+
+  yaml_content = {
+    'header' => header,
+    'compiled_from' => source_path,
+    'core_fields' => core_fields,
+    'scenarios' => scenarios,
+    'gates' => gates,
+    'verification_examples' => verification_examples
+  }
+
+  FileUtils.mkdir_p(File.dirname(target))
+  File.write(target, YAML.dump(yaml_content))
+  puts "  ✓ #{target}"
+end
+
+def compile_failure_recovery(source_path, mapping_entry)
+  content = File.read(source_path)
+
+  # Extract failure taxonomy classes
+  taxonomy = []
+  content.scan(/^\|\s*`([^`]+)`\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) do |match|
+    taxonomy << {
+      'class' => match[0].strip,
+      'meaning' => match[1].strip,
+      'common_prevention' => match[2].strip
+    }
+  end
+
+  # Extract storage rules
+  storage_rules = []
+  content.scan(/^\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) do |match|
+    next if match[0] == '---' || match[0] == '內容' || match[0] == 'Durable location'
+    storage_rules << { 'content_type' => match[0].strip, 'location' => match[1].strip }
+  end
+
+  # Extract promotion decisions
+  promotion_decisions = []
+  content.scan(/^\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) do |match|
+    next if match[0] == '---' || match[0] == 'Failure scope' || match[0] == 'Promotion target'
+    promotion_decisions << { 'failure_scope' => match[0].strip, 'promotion_target' => match[1].strip }
+  end
+
+  # Extract core loop steps (capture → classify → contain → promote → strengthen → validate)
+  loop_steps = []
+  content.scan(/^\d+\.\s+\*\*([^*]+)\*\*[：:]\s*(.+)$/) do |match|
+    loop_steps << { 'step' => match[0].strip, 'description' => match[1].strip }
+  end
+
+  target = target_path_for(source_path, mapping_entry)
+  header = generated_header(source_path)
+
+  yaml_content = {
+    'header' => header,
+    'compiled_from' => source_path,
+    'failure_taxonomy' => taxonomy,
+    'storage_rules' => storage_rules,
+    'promotion_decisions' => promotion_decisions,
+    'loop_steps' => loop_steps
+  }
+
+  FileUtils.mkdir_p(File.dirname(target))
+  File.write(target, YAML.dump(yaml_content))
+  puts "  ✓ #{target}"
+end
+
 def compile_source(source_path, mapping_entry)
   compile_rule = mapping_entry['compile_rule']
 
@@ -217,6 +385,12 @@ def compile_source(source_path, mapping_entry)
     compile_output_governance(source_path, mapping_entry)
   when /從 knowledge-update-flow\.md 的 11 個步驟標題與判斷表格提取 phase 定義/
     compile_knowledge_update_flow(source_path, mapping_entry)
+  when /從 artifact gates 的檢查清單提取 required artifacts 與 verification criteria/
+    compile_workflow_artifacts(source_path, mapping_entry)
+  when /從 validation gate 描述提取 gate 定義/
+    compile_goal_action_gates(source_path, mapping_entry)
+  when /從 failure taxonomy 與 recovery 描述提取 pattern 與 strategy/
+    compile_failure_recovery(source_path, mapping_entry)
   else
     puts "  ⚠  Unknown compile rule: #{compile_rule}"
   end

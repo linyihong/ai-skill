@@ -1,0 +1,83 @@
+---
+header:
+  generated_from: workflow/apk-analysis/artifact-gates.md
+  generated_at: '2026-05-15T01:22:05Z'
+  compiler_version: 1.0.0
+  status: synced
+compiled_from: workflow/apk-analysis/artifact-gates.md
+artifacts:
+- name: UI Architecture Map
+- name: API Catalog
+- name: Domain/Runtime Baseline
+- name: Feature Reconstruction Handoff
+- name: 單次分析筆記模板
+- name: 證據鏈要求
+- name: 失敗也要記錄
+- name: SDK Live Self-Generation Audit
+- name: Authorized Identity Material Self-Generation Audit
+- name: UI Architecture Map Template
+- name: API Catalog Detail Requirements
+- name: Sanitization Rules
+- name: Developer Guidance Notes（可選）
+- name: Feedback Lesson Writing Tips
+- name: Backfill Rules
+verification_gates:
+- name: 最小章節
+  type: verification_gate
+- name: 規則
+  type: verification_gate
+- name: 建議結構
+  type: verification_gate
+- name: Catalog minimum
+  type: verification_gate
+- name: Catalog completion
+  type: verification_gate
+- name: 建議章節
+  type: verification_gate
+- name: Development readiness
+  type: verification_gate
+- name: 最低表格
+  type: verification_gate
+- name: Feature handoff finish
+  type: verification_gate
+- name: Page-level artifact rule
+  type: verification_gate
+- name: Capture Strategy
+  type: verification_gate
+- name: Navigation Summary
+  type: verification_gate
+- name: Screen Inventory
+  type: verification_gate
+- name: Screen Reachability / Operation Recipe
+  type: verification_gate
+- name: Interaction Inventory
+  type: verification_gate
+- name: Operation To API Matrix
+  type: verification_gate
+- name: Unknown / Untested Navigation
+  type: verification_gate
+- name: Field meaning rule
+  type: verification_gate
+- name: API / Schema Document Template
+  type: verification_gate
+- name: HTTP Request Headers
+  type: verification_gate
+- name: Request Query / Path Parameters
+  type: verification_gate
+- name: Request Body
+  type: verification_gate
+- name: Response Wrapper
+  type: verification_gate
+- name: Decrypted / Inner Payload
+  type: verification_gate
+- name: Response Headers
+  type: verification_gate
+- name: Evidence
+  type: verification_gate
+- name: Validation
+  type: verification_gate
+- name: Reconstruction Notes
+  type: verification_gate
+- name: Proxy failure 要先拆成導流與 TLS 兩層
+  type: verification_gate
+required_items: []
