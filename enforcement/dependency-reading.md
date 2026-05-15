@@ -109,6 +109,69 @@ Transaction 的完整關閉條件已由 [`runtime/transactions/transaction-machi
 
 若 transaction 未關閉，agent 不得把注意力長時間切回業務專案，也不得把「已更新 skill」當作完成。可以繼續工作的唯一例外是：使用者明確要求暫停 Ai-skill close-loop；此時必須說明目前 dirty/ahead/behind/unmerged 狀態與下一步。
 
+### State-based Enforcement（狀態化強制規則）
+
+下列邊界規則已對應到 runtime state machine 的 phase/gate 定義，agent 應優先查閱對應的 YAML：
+
+```yaml
+# State-based enforcement mapping for dependency-reading.md
+# 這些規則已由 runtime state machine 管理，agent 不應再以 prose 方式逐條檢查。
+state_based_enforcement:
+  version: v1
+  status: active
+  owner_layer: enforcement/dependency-reading
+  description: >
+    將 Ai-skill writeback transaction 的邊界規則對應到 runtime state machine。
+    Agent 應優先讀取對應的 YAML，而非依賴本節的 prose 摘要。
+
+  # Canonical source first → 由 phase-machine.yaml 的 phase.execution 管理
+  # allowed_actions 包含 write_file/apply_diff/execute_command
+  # forbidden_actions 包含 commit/push/finalize
+  - rule: canonical_source_first
+    phase: phase.execution
+    enforcement: |
+      Agent 必須在 canonical <AI_SKILL_REPO> 中修改檔案。
+      若誤改 runtime/mirror copy，必須停止並定位 canonical repo。
+    runtime_ref: runtime/phases/phase-machine.yaml
+    runtime_section: "phase.execution.allowed_actions"
+
+  # Lock 檢查 → 由 transaction-machine.yaml 的 tx.rule.lock_check 管理
+  - rule: lock_check
+    phase: phase.execution
+    enforcement: |
+      開始 transaction 前必須檢查是否有 active lock。
+      若有其他 agent/user 正在操作，不得自動 commit/push。
+    runtime_ref: runtime/transactions/transaction-machine.yaml
+    runtime_section: "tx.rule.lock_check"
+
+  # 去敏檢查 → 由 blocking-gates.yaml 的 gate.validation.artifacts_complete 管理
+  - rule: sanitization_check
+    phase: phase.validation
+    enforcement: |
+      Commit 前必須執行去敏檢查。
+      依 sanitization.md 檢查所有新增/修改的可重用文件。
+    runtime_ref: runtime/gates/blocking-gates.yaml
+    runtime_section: "gate.validation.artifacts_complete"
+
+  # Tool sync 邊界 → 由 transaction-machine.yaml 的 tx.rule.linked_updates_check 管理
+  - rule: tool_sync_boundary
+    phase: phase.validation
+    enforcement: |
+      若本輪使用或更新 tool mirror/symlink/copy snapshot，
+      必要的 tool sync 已執行；reference-only 記為不適用。
+    runtime_ref: runtime/transactions/transaction-machine.yaml
+    runtime_section: "tx.rule.linked_updates_check"
+
+  # 最終狀態確認 → 由 transaction-machine.yaml 的 verified → closed 管理
+  - rule: final_status_check
+    phase: phase.readback
+    enforcement: |
+      最後一次 git status --short --branch 顯示 clean，
+      branch 沒有 ahead/behind。
+    runtime_ref: runtime/transactions/transaction-machine.yaml
+    runtime_section: "state.verified → state.closed"
+```
+
 ## Conversation Goal Ledger Boundary
 
 [`conversation-goal-ledger.md`](conversation-goal-ledger.md) 管的是使用者對話目標是否完成；本檔的 Ai-skill writeback transaction 管的是本知識庫改動是否完成 sync / commit / push / reread / clean status。兩者不可互相取代：

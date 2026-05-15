@@ -1,7 +1,7 @@
 ---
 header:
   generated_from: enforcement/dependency-reading.md
-  generated_at: '2026-05-15T01:22:05Z'
+  generated_at: '2026-05-15T02:01:01Z'
   compiler_version: 1.0.0
   status: synced
 compiled_from: enforcement/dependency-reading.md
@@ -23,6 +23,8 @@ states:
 - name: 本節保留的邊界規則
   context: 
 - name: 交易關閉條件（由 transaction-machine.yaml 定義）
+  context: 
+- name: State-based Enforcement（狀態化強制規則）
   context: 
 - name: Conversation Goal Ledger Boundary
   context: 

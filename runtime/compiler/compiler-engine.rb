@@ -59,37 +59,178 @@ def extract_domain(source_path)
   'unknown'
 end
 
-def extract_phases_from_flow(content)
-  # Extract phase definitions from markdown headings (## level)
-  phases = []
-  content.scan(/^##\s+\d+\.\s+(.+)$/) do |match|
-    phases << { 'name' => match[0].strip, 'source_line' => $`.lines.count + 1 }
+def extract_phase_sections(content)
+  # Split content into phase sections by ## N. heading
+  # Returns array of { heading:, line_number:, body: }
+  sections = []
+  content.scan(/^(##\s+\d+\.\s+.+)$/) do
+    heading_text = $1.strip
+    heading_line = $`.lines.count + 1
+
+    # Find the start of this section
+    section_start = $`.size
+    # Find the next ## heading or end of content
+    remaining = content[section_start + $&.size..]
+    next_section_match = remaining.match(/^##\s+\d+\.\s+/)
+    section_body = if next_section_match
+                     remaining[0...next_section_match.begin(0)]
+                   else
+                     remaining
+                   end
+
+    sections << {
+      'heading' => heading_text.sub(/^##\s+/, '').strip,
+      'line_number' => heading_line,
+      'body' => section_body.strip
+    }
   end
-  phases
+  sections
 end
 
-def extract_gates_from_content(content)
-  # Extract blocking gates from markdown lists or gate descriptions
-  gates = []
-  content.scan(/^\*\*([^*]+)\*\*：(.+)$/) do |match|
-    gates << { 'name' => match[0].strip, 'description' => match[1].strip }
+def extract_allowed_actions_from_section(body)
+  # Extract allowed actions from:
+  # 1. Markdown tables with "行動" or "Action" column
+  # 2. Bullet lists under "記錄" or "必要行動" or similar
+  # 3. Numbered step lists
+  actions = []
+
+  # Pattern 1: Table rows with action descriptions (| N | action |)
+  body.scan(/^\|\s*\d+\s*\|\s*(.+?)\s*\|$/) do |match|
+    actions << { 'action' => match[0].strip, 'source' => 'table' }
   end
-  gates
+
+  # Pattern 2: Table rows with "問題 | 必要行動" format (second column is action)
+  # Only capture rows where the second column is a meaningful action description
+  body.scan(/^\|\s*(?:[^|]+)\s*\|\s*(.+?)\s*\|$/) do |match|
+    col2 = match[0].strip
+    next if col2 == '---' || col2 == '必要行動' || col2 == 'Action' || col2 == '行動'
+    next if col2 == '緩解措施' || col2 == '回填要求' || col2 == '證明'
+    next if col2.start_with?('`<')
+    next if col2 =~ /^(步驟|Step|Reset|測試類型|文件|問題|根本原因|用途)/
+    next if col2.length < 10  # skip short/non-action content
+    next if col2 =~ /^\|/  # skip nested table artifacts
+    actions << { 'action' => col2, 'source' => 'table' }
+  end
+
+  # Pattern 3: Bullet list items under "記錄" or action-oriented paragraphs
+  body.scan(/^-\s+(.+)$/) do |match|
+    item = match[0].strip
+    next if item.start_with?('`<')
+    next if item =~ /^(不要|禁止|Don't|Do not|Never|避免)/
+    actions << { 'action' => item, 'source' => 'bullet' }
+  end
+
+  # Pattern 4: Numbered step items (1. **Action**)
+  body.scan(/^\d+\.\s+\*\*([^*]+)\*\*[：:]\s*(.+)$/) do |match|
+    actions << { 'action' => "#{match[0].strip}：#{match[1].strip}", 'source' => 'step' }
+  end
+
+  actions.uniq { |a| a['action'] }
+end
+
+def extract_blocking_gates_from_section(body)
+  # Extract blocking gates from:
+  # 1. "禁止" or "Don't" bullet lists
+  # 2. "阻擋項" or "blocking" mentions
+  # 3. Validation/check conditions
+  gates = []
+
+  # Pattern 1: "禁止" / "Don't" / "不要" bullet lists
+  body.scan(/^-\s+(不要|禁止|Don't|Do not|Never|避免)\s*(.+)$/i) do |prefix, rest|
+    gates << {
+      'id' => "gate.#{rest.strip.downcase.gsub(/[^a-z0-9]+/, '_').gsub(/^_|_$/, '')}",
+      'description' => "#{prefix}#{rest}",
+      'severity' => 'critical',
+      'source' => 'prohibition'
+    }
+  end
+
+  # Pattern 2: "阻擋項" or "blocking" mentions
+  body.scan(/(.+?)(?:是|為|屬於)\s*阻擋項/) do |match|
+    gates << {
+      'id' => "gate.blocking.#{match[0].strip.downcase.gsub(/[^a-z0-9]+/, '_').gsub(/^_|_$/, '')}",
+      'description' => "#{match[0].strip}是阻擋項",
+      'severity' => 'critical',
+      'source' => 'blocking_condition'
+    }
+  end
+
+  # Pattern 3: "必須" / "must" conditions that act as gates
+  body.scan(/(?:在|於|在).+?(?:之前|前).+?(?:必須|需要|應).+?。/) do |match|
+    gates << {
+      'id' => "gate.prerequisite.#{match[0..30].strip.downcase.gsub(/[^a-z0-9]+/, '_').gsub(/^_|_$/, '')}",
+      'description' => match[0].strip,
+      'severity' => 'high',
+      'source' => 'prerequisite'
+    }
+  end
+
+  gates.uniq { |g| g['id'] }
+end
+
+def extract_tables_from_section(body)
+  # Extract markdown tables as structured data
+  tables = []
+  lines = body.split("\n")
+  current_table = []
+  in_table = false
+
+  lines.each do |line|
+    if line.match?(/^\|.+\|$/)
+      current_table << line.strip
+      in_table = true
+    else
+      if in_table && current_table.length >= 3 # header + separator + at least 1 row
+        # Parse the table
+        header = current_table[0].split('|').map(&:strip).reject(&:empty?)
+        rows = current_table[2..].map { |r| r.split('|').map(&:strip).reject(&:empty?) }
+        tables << { 'header' => header, 'rows' => rows }
+      end
+      current_table = []
+      in_table = false
+    end
+  end
+
+  # Don't forget last table
+  if in_table && current_table.length >= 3
+    header = current_table[0].split('|').map(&:strip).reject(&:empty?)
+    rows = current_table[2..].map { |r| r.split('|').map(&:strip).reject(&:empty?) }
+    tables << { 'header' => header, 'rows' => rows }
+  end
+
+  tables
 end
 
 def compile_workflow_phases(source_path, mapping_entry)
   content = File.read(source_path)
-  phases = extract_phases_from_flow(content)
-  gates = extract_gates_from_content(content)
+  sections = extract_phase_sections(content)
+
+  phases = sections.map do |sec|
+    allowed = extract_allowed_actions_from_section(sec['body'])
+    gates = extract_blocking_gates_from_section(sec['body'])
+    tables = extract_tables_from_section(sec['body'])
+
+    phase_entry = {
+      'name' => sec['heading'],
+      'source_line' => sec['line_number']
+    }
+    phase_entry['allowed_actions'] = allowed unless allowed.empty?
+    phase_entry['blocking_gates'] = gates unless gates.empty?
+    phase_entry['tables'] = tables unless tables.empty?
+    phase_entry
+  end
+
+  # Also extract global gates (not tied to a specific phase)
+  all_gates = phases.flat_map { |p| p['blocking_gates'] || [] }.uniq { |g| g['id'] }
 
   target = target_path_for(source_path, mapping_entry)
   header = generated_header(source_path)
 
   yaml_content = {
     'header' => header,
-    'phases' => phases,
-    'gates' => gates
+    'phases' => phases
   }
+  yaml_content['gates'] = all_gates unless all_gates.empty?
 
   FileUtils.mkdir_p(File.dirname(target))
   File.write(target, YAML.dump(yaml_content))

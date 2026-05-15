@@ -1,6 +1,6 @@
 # Compiler Output Scenario
 # 測試 compiler-engine.rb 是否能從 workflow/software-delivery/execution-flow.md
-# 正確提取 phase definitions、blocking gates、allowed_actions、forbidden_actions
+# 正確提取 phase definitions、allowed_actions、blocking_gates、tables
 # 並產出結構化的 runtime/generated/workflow-software-delivery-phases.yaml
 #
 # 來源 compiler rule:
@@ -21,14 +21,15 @@ given:
     - runtime/generated/workflow-software-delivery-phases.yaml
   signals:
     - workflow/software-delivery/execution-flow.md 有 8 個 ## 章節標題
-    - 每個章節包含表格（| 問題 | 必要行動 |）
-    - 部分章節包含 gate 描述（**bold**：description 格式）
+    - 每個章節包含表格（| 問題 | 必要行動 |）或 bullet lists
+    - 部分章節包含 blocking conditions（如「是阻擋項」）
     - compiler-rules.yaml 宣告 extract: [phase_definitions, allowed_actions, forbidden_actions, blocking_gates]
   constraints:
-    - compiler-engine.rb 的 extract_phases_from_flow 只提取 ## 數字. 標題
-    - compiler-engine.rb 的 extract_gates_from_content 只提取 **bold**：description
-    - "目前 generated YAML 的 gates 為空陣列"
-    - compiler-rules.yaml 宣告 blocking_gates 應包含 id, severity, check.type, check.verification
+    - compiler-engine.rb 的 extract_phase_sections 按 ## N. 標題分割區塊
+    - compiler-engine.rb 的 extract_allowed_actions_from_section 從表格和 bullet list 提取
+    - compiler-engine.rb 的 extract_blocking_gates_from_section 從「阻擋項」和「禁止」條件提取
+    - compiler-engine.rb 的 extract_tables_from_section 提取結構化 markdown 表格
+    - "強化後的 generated YAML 的 gates 不為空陣列"
 
 when:
   action: run_compiler
@@ -38,22 +39,24 @@ then:
     primary: produce_structured_yaml
     steps:
       - 讀取 workflow/software-delivery/execution-flow.md
-      - 提取 8 個 phase definitions（## 數字. 標題）
-      - 從 Change Intake 表格提取 allowed_actions（如：閱讀企劃書、更新規劃文件、確認預期行為）
-      - 從 Change Intake 表格提取 forbidden_actions（如：跳過變更接收直接寫 code）
-      - 從 Product Brief Validation 描述提取 blocking_gates（如：未驗證聲明視為阻擋項）
+      - 用 extract_phase_sections 分割 8 個 phase 區塊
+      - 從每個區塊的表格提取 allowed_actions（如：閱讀企劃書、更新規劃文件）
+      - 從每個區塊的 bullet lists 提取 allowed_actions（如：觀察到了什麼行為？）
+      - 從每個區塊的「阻擋項」描述提取 blocking_gates（如：未驗證聲明視為阻擋項）
+      - 從每個區塊提取結構化 tables（header + rows）
       - 寫入 runtime/generated/workflow-software-delivery-phases.yaml
       - 檔頭包含 generated_from、generated_at、compiler_version、status=synced
     reject:
-      - empty_gates: "gates 欄位保持 [] 空陣列，忽略 execution-flow.md 中的 gate 描述"
-      - missing_allowed_actions: "不從 Change Intake 表格提取 allowed_actions"
-      - missing_forbidden_actions: "不從 Change Intake 表格提取 forbidden_actions"
+      - empty_gates: "gates 欄位保持 [] 空陣列，忽略 execution-flow.md 中的 blocking conditions"
+      - missing_allowed_actions: "不從表格或 bullet list 提取 allowed_actions"
       - flat_phases_only: "只輸出 phase name 和 source_line，忽略所有結構化欄位"
+      - missing_tables: "不提取 markdown 表格的結構化資料"
 
   expected_heuristics:
     - compiler-deterministic-output
     - prose-to-yaml-extraction
     - gate-structure-preservation
+    - section-based-phase-extraction
 
   expected_output_shape:
     header:
@@ -63,42 +66,42 @@ then:
       - name: string
         source_line: integer
         allowed_actions:
-          - string
-        forbidden_actions:
-          - string
+          - action: string
+            source: string (table|bullet|step)
+        blocking_gates:
+          - id: string
+            description: string
+            severity: string (critical|high)
+            source: string (blocking_condition|prerequisite|prohibition)
+        tables:
+          - header:
+              - string
+            rows:
+              - - string
     gates:
       - id: string
-        name: string
-        severity: string (critical|high|medium|low)
-        check:
-          type: string
-          verification: string
+        description: string
+        severity: string
 
   expected_phase_count: 8
 
   expected_phase_names:
-    - "從證據開始（Start From Evidence）"
-    - "文件優先 BDD 閉環（Docs-First BDD Closure Loop）"
-    - "SDK 缺陷閉環（即時重現 + BDD 回歸）"
-    - "同工作階段閉環（程式碼 + 持久文件）"
-    - "效能測試關卡（Performance Test Gate）"
-    - "已實作專案的回填規則（Backfill Rules for Implemented Projects）"
-    - "驗證（Validate）"
-    - "回饋可重複使用的課程（Feed Back Reusable Lessons）"
+    - "1. 從證據開始（Start From Evidence）"
+    - "2. 文件優先 BDD 閉環（Docs-First BDD Closure Loop）"
+    - "3. SDK 缺陷閉環（即時重現 + BDD 回歸）"
+    - "4. 同工作階段閉環（程式碼 + 持久文件）"
+    - "5. 效能測試關卡（Performance Test Gate）"
+    - "6. 已實作專案的回填規則（Backfill Rules for Implemented Projects）"
+    - "7. 驗證（Validate）"
+    - "8. 回饋可重複使用的課程（Feed Back Reusable Lessons）"
 
-  expected_gates:
-    - id: gate.change-intake.product-brief-validation
-      name: Product Brief Validation
+  expected_blocking_gates:
+    - id: "gate.blocking.product_brief"
+      description: "包含「product brief 存在但包含未驗證聲明」是阻擋項"
       severity: critical
-      check:
-        type: manual
-        verification: "檢查 product brief 的每個主要聲明是否標記為 validated / assumption / open question / scoped out / invalidated"
-    - id: gate.change-intake.performance-budget
-      name: Performance Budget Definition
-      severity: high
-      check:
-        type: manual
-        verification: "在程式碼之前定義效能預算和必要的效能測試類型"
+    - id: "gate.blocking.api"
+      description: "包含「影響行為、API/介面形狀的缺失資訊」是阻擋項"
+      severity: critical
 
   expected_allowed_actions:
     - "閱讀企劃書、product brief、規劃文件、issue、ticket、PRD、設計備註、BDD、API 合約或同等文件"
@@ -108,16 +111,24 @@ then:
     - "在程式碼之前定義效能預算和必要的效能測試類型"
     - "應用文件優先順序：治理/框架合約、產品計劃、BDD、合約、實作、測試"
 
-  expected_forbidden_actions:
-    - "跳過變更接收直接寫程式碼"
-    - "在 product brief 包含未驗證聲明時仍開始實作"
-    - "僅使用單元測試而沒有行為規格對齊就合併可觀察行為或共享合約變更"
-    - "將專案特定端點、令牌、機密、裝置 ID、原始使用者資料複製到技能中"
+  expected_tables:
+    - header: ["問題", "必要行動"]
+      row_count: 8
+    - header: ["步驟", "行動"]
+      row_count: 5
+    - header: ["根本原因", "緩解措施"]
+      row_count: 4
+    - header: ["測試類型", "使用時機", "證明"]
+      row_count: 4
+    - header: ["文件", "回填要求"]
+      row_count: 5
 
   validation:
     - "執行 ruby runtime/compiler/compiler-engine.rb 後，generated YAML 的 phases 長度為 8"
     - "generated YAML 的 gates 不為空陣列"
-    - "每個 phase 包含 allowed_actions 和 forbidden_actions 欄位"
-    - "每個 gate 包含 id, severity, check.type, check.verification"
+    - "每個 phase 包含 allowed_actions 欄位（從表格或 bullet list 提取）"
+    - "至少一個 phase 包含 blocking_gates 欄位"
+    - "至少一個 phase 包含 tables 欄位（結構化 markdown 表格）"
+    - "每個 blocking_gate 包含 id, description, severity"
     - "檔頭 status 為 synced"
     - "重新執行 compiler 產生相同輸出（idempotent）"
