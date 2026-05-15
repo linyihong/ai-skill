@@ -1106,3 +1106,41 @@ records:
       profile: small
       compression_level: index-only
       reason: Intelligence routing 在需要領域知識時才載入，不佔用 bootstrap 預算。
+
+  # ── P2.5 Routes ──
+
+  - id: route.runtime.output-governance
+    task_intent: 載入語言強制規則與文件輸出規則，確保輸出品質
+    primary_source: runtime/output-governance/README.md
+    required_dependencies:
+      - runtime/phases/phase-machine.yaml
+      - runtime/gates/blocking-gates.yaml
+    candidate_sources:
+      - runtime/output-governance/language-policy.yaml
+      - runtime/output-governance/output-rules.yaml
+      - runtime/output-governance/governance-gates.yaml
+      - enforcement/neutral-language.md
+      - enforcement/sanitization.md
+      - enforcement/tool-neutral-documentation.md
+    source_of_truth_gate: runtime-output-governance-active
+    ranking_reason: >
+      Output Governance 定義語言強制規則（跟隨使用者語言、防漂移機制）、
+      文件輸出規則（格式、內容邊界、去敏、工具中立性）、以及 governance
+      blocking gates。在 validation 與 finalize phase 必須檢查這些規則。
+    validation_signal: >
+      Language consistency 已確認，sanitization 已通過，tool neutrality 已檢查，
+      format compliance 已驗證，governance gates 全部通過。
+    metadata:
+      priority: P2.5
+      confidence: high
+      context_cost:
+        estimated_tokens: 800
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Output Governance 在 validation 與 finalize phase 時才需要載入，不佔用 bootstrap 預算。

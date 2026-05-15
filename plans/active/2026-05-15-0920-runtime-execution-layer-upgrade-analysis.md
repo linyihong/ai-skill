@@ -1436,3 +1436,77 @@ LLM Runtime
 | [九、Prose → YAML 轉換盤點](#九prose--yaml-轉換盤點) | 需加上「是否 deterministic」過濾條件 |
 | [五、建議升級路徑](#五建議升級路徑) | 優先順序已重新調整 |
 | [十、ai-tools 控制流程遷移](#十ai-tools-控制流程遷移) | 不受影響，維持原計畫 |
+
+## 十四、Output Governance（新增 — 使用者要求）
+
+### 14.1 問題
+
+目前語言偏好與文件輸出規則分散在多處 prose 檔案中，沒有 machine-readable 的統一控制：
+
+| 位置 | 內容 | 格式 |
+|------|------|------|
+| `.roomodes` | 每個 mode 的語言強制規則 | JSON 字串（prose） |
+| `ai-tools/agent/roo.md` | Roo Code 語言設定說明 | Markdown |
+| `ai-tools/agent/claude.md` | Claude Code 語言設定說明 | Markdown |
+| `ai-tools/agent/cursor.md` | Cursor 語言設定說明 | Markdown |
+| `enforcement/neutral-language.md` | 文件用語規則 | Markdown |
+| `enforcement/sanitization.md` | 去敏規則 | Markdown |
+| `enforcement/tool-neutral-documentation.md` | 工具中立性規則 | Markdown |
+
+這些規則目前只能靠 agent 讀取 prose 後自行判斷，無法被 runtime 直接檢查或強制執行。
+
+### 14.2 目標
+
+建立 `runtime/output-governance/` 元件，將語言與文件輸出規則升級為 declarative YAML，讓 runtime 可以：
+
+1. **統一控制語言行為**：定義語言強制規則（跟隨使用者語言、防漂移機制、各工具的語言設定方式）
+2. **統一控制文件輸出**：定義文件輸出規則（格式要求、內容邊界、去敏規則、工具中立性）
+3. **Phase-aware 輸出檢查**：在 `validation` phase 自動檢查輸出是否符合語言/格式/去敏規則
+4. **Compiler 整合**：compiler 在編譯 generated YAML 時同時檢查輸出規則
+
+### 14.3 建議檔案結構
+
+```
+runtime/output-governance/
+├── README.md                          # 設計原則與使用說明
+├── language-policy.yaml               # 語言強制規則
+│   ├── core_rules:                     # 核心原則（跟隨使用者語言、無預設語言）
+│   ├── anti_drift:                     # 防漂移機制
+│   ├── tool_overrides:                 # 各工具語言設定方式（roo/claude/cursor）
+│   └── validation:                     # 語言一致性驗證 gate
+│
+├── output-rules.yaml                  # 文件輸出規則
+│   ├── format_rules:                   # 格式要求（markdown link、table、code block）
+│   ├── content_boundary:              # 內容邊界（工具中立性、可重用邊界）
+│   ├── sanitization:                  # 去敏規則（路徑占位符、secret 過濾）
+│   └── validation:                    # 輸出品質驗證 gate
+│
+└── governance-gates.yaml              # Output governance blocking gates
+    ├── gate.output.language_consistency
+    ├── gate.output.sanitization_check
+    ├── gate.output.tool_neutrality
+    └── gate.output.format_compliance
+```
+
+### 14.4 與既有層的關係
+
+| 元件 | 關係 |
+|------|------|
+| `runtime/phases/phase-machine.yaml` | Output governance gates 應掛在 `validation` 與 `finalize` phase |
+| `runtime/gates/blocking-gates.yaml` | Governance gates 為 blocking gates 的子集 |
+| `runtime/compiler/compiler-rules.yaml` | Compiler 在編譯時應檢查 output rules |
+| `runtime/intelligence/intelligence-routing.yaml` | Intelligence 知識的輸出也受 governance 規範 |
+| `enforcement/neutral-language.md` | 語言規則的 prose source，governance YAML 為 compiled version |
+| `enforcement/sanitization.md` | 去敏規則的 prose source |
+| `enforcement/tool-neutral-documentation.md` | 工具中立性規則的 prose source |
+| `ai-tools/agent/*.md` | 各工具的語言設定方式應 reference governance YAML |
+
+### 14.5 優先順序
+
+| Phase | 內容 | 依賴 |
+|-------|------|------|
+| P2.5 | `runtime/output-governance/README.md` + `language-policy.yaml` | 無 |
+| P2.5 | `runtime/output-governance/output-rules.yaml` | 無 |
+| P2.5 | `runtime/output-governance/governance-gates.yaml` | `runtime/gates/blocking-gates.yaml` |
+| P3 | Compiler 整合 output governance check | `runtime/compiler/compiler-rules.yaml` |
+| P3 | Validation phase 自動檢查 output governance | `runtime/phases/phase-machine.yaml` |

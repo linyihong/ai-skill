@@ -1,0 +1,184 @@
+# Language Policy
+# 語言強制規則 — declarative YAML version
+# Canonical source: enforcement/neutral-language.md, .roomodes, ai-tools/agent/*.md
+#
+# 本檔案由 runtime compiler 維護。修改 prose source 後執行 compiler 同步更新。
+# 手動修改本檔案會被 compiler 覆蓋。
+
+language_policy_version: v1
+status: active
+owner_layer: runtime/output-governance
+canonical_sources:
+  - enforcement/neutral-language.md
+  - .roomodes
+  - ai-tools/agent/roo.md
+  - ai-tools/agent/claude.md
+  - ai-tools/agent/cursor.md
+description: >
+  定義所有 agent 輸出必須遵守的語言規則。核心原則是「強制跟隨使用者語言」，
+  不存在預設語言。所有輸出（技術分析、表格、commit message、程式碼註解）
+  都必須與使用者當前語言一致。
+
+# ──────────────────────────────────────────────
+# Core Rules
+# ──────────────────────────────────────────────
+core_rules:
+
+  - id: lang.follow_user_language
+    priority: highest
+    rule: >
+      使用者用什麼語言提問，所有輸出就必須用什麼語言。
+      使用者第一次提問的語言即為本次對話語言。
+    applies_to:
+      - all_output
+      - attempt_completion
+      - technical_analysis
+      - table_fields
+      - section_titles
+      - commit_messages
+      - code_comments
+    exceptions:
+      - 路徑、指令、環境變數、API 欄位、程式符號、固定 protocol 名稱、工具名稱
+      - 翻譯後會降低精準度的專有名詞（如 "AI-native Knowledge Operating System"、"reference-first"）
+      - prompt template 內容（但 template 外的用途說明仍須跟隨使用者語言）
+
+  - id: lang.no_default_language
+    priority: highest
+    rule: >
+      不存在「Default to English」。不存在預設語言，只有「使用者當前語言」。
+      禁止出現「Default to English」思維。
+    applies_to:
+      - system_prompt
+      - custom_instructions
+      - all_output
+
+  - id: lang.no_self_switch
+    priority: highest
+    rule: >
+      禁止自行切換語言。即使分析技術內容、寫 commit message、產生表格，
+      也必須與使用者當前語言一致。
+    applies_to:
+      - all_output
+
+  - id: lang.follow_user_switch
+    priority: high
+    rule: >
+      如果使用者切換語言，跟隨其切換。
+    applies_to:
+      - all_output
+
+  - id: lang.pre_attempt_completion_check
+    priority: high
+    rule: >
+      attempt_completion 前必須檢查：確認結果的語言與使用者最後一次提問的語言一致。
+    applies_to:
+      - attempt_completion
+
+# ──────────────────────────────────────────────
+# Anti-Drift Mechanisms
+# ──────────────────────────────────────────────
+anti_drift:
+
+  - id: drift.zh_consistency
+    condition: "使用者用中文"
+    rule: >
+      所有輸出（包含技術分析、表格欄位、章節標題、commit message、程式碼註解）
+      都必須使用中文。禁止中英混雜成段落。
+    applies_to:
+      - all_output
+
+  - id: drift.ja_consistency
+    condition: "使用者用日文"
+    rule: >
+      所有輸出都必須使用日文。
+    applies_to:
+      - all_output
+
+  - id: drift.en_consistency
+    condition: "使用者用英文"
+    rule: >
+      所有輸出都必須使用英文。
+    applies_to:
+      - all_output
+
+  - id: drift.neutral_language
+    rule: >
+      可重用文件正文預設使用繁體中文。英文保留給路徑、指令、環境變數、
+      API 欄位、程式符號與必要專有名詞。
+    applies_to:
+      - enforcement/
+      - workflow/
+      - analysis/
+      - intelligence/
+      - reusable_skills
+      - feedback_lessons
+    canonical_source: enforcement/neutral-language.md
+
+  - id: drift.no_high_risk_words_in_title
+    rule: >
+      標題、檔名、slug、索引列與 one-line summary 使用中性詞。
+      避免把特定品牌、產品、成人、仇恨、暴力、賭博、金融濫用、憑證、
+      繞過、破解、攻擊、盜用等高風險詞放在可重用文件標題或檔名。
+    applies_to:
+      - enforcement/
+      - workflow/
+      - analysis/
+      - intelligence/
+      - reusable_skills
+    canonical_source: enforcement/neutral-language.md
+
+# ──────────────────────────────────────────────
+# Tool-Specific Overrides
+# ──────────────────────────────────────────────
+# 各工具的語言設定方式。核心規則相同，但設定機制不同。
+tool_overrides:
+
+  - tool: roo_code
+    config_location: ".roomodes (customInstructions) + SQLite globalStorage"
+    setup_steps:
+      - "在 .roomodes 每個 mode 的 customInstructions 中加入語言強制規則（見 core_rules）"
+      - "修改 VS Code globalStorage SQLite 中 RooVeterinaryInc.roo-cline 的 language 欄位為 'zh-CN'"
+    note: >
+      .roomodes 中的 customInstructions 會覆蓋 Roo Code Extension 設定面板中的全域 Custom Instructions。
+      SQLite 的 language 欄位（預設 "en"）會影響 system prompt 建構，需一併修改。
+    reference:
+      - ai-tools/agent/roo.md
+      - intelligence/ide/vscode-extension-global-state.md
+
+  - tool: claude_code
+    config_location: "CLAUDE.md"
+    setup_steps:
+      - "在 CLAUDE.md 中加入語言強制規則（見 core_rules）"
+      - "加入語言一致性強制規則段落"
+    note: >
+      Claude Code 沒有 SQLite 全域資料庫，語言行為完全由 CLAUDE.md 中的 Custom Instructions 控制。
+    reference:
+      - ai-tools/agent/claude.md
+      - CLAUDE.md
+
+  - tool: cursor
+    config_location: ".cursor/rules/*.mdc (alwaysApply: true)"
+    setup_steps:
+      - "在 ~/.cursor/rules/ 的 alwaysApply: true 規則中加入語言強制規則（見 core_rules）"
+      - "加入語言一致性強制規則段落"
+    note: >
+      Cursor 沒有公開的 SQLite 全域資料庫修改方式，語言偏好完全由 .cursor/rules/ 中的規則控制。
+      alwaysApply 規則會在每個 session 啟動時自動載入。
+    reference:
+      - ai-tools/agent/cursor.md
+
+# ──────────────────────────────────────────────
+# Validation
+# ──────────────────────────────────────────────
+validation:
+  - id: lang.validate_language_consistency
+    phase: phase.validation
+    check: "確認所有輸出語言與使用者最後一次提問的語言一致"
+    failure_action: block_transition
+    failure_message: "語言一致性檢查失敗：輸出語言與使用者語言不一致"
+
+  - id: lang.validate_no_default_english
+    phase: phase.validation
+    check: "確認 system prompt / custom instructions 中沒有 'Default to English' 固定設定"
+    failure_action: warn + suggest_fix
+    failure_message: "警告：偵測到 'Default to English' 固定設定，建議改為軟性偏好"

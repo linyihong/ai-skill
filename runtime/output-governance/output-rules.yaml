@@ -1,0 +1,264 @@
+# Output Rules
+# 文件輸出規則 — declarative YAML version
+# Canonical source: enforcement/sanitization.md, enforcement/tool-neutral-documentation.md,
+#                   enforcement/neutral-language.md
+#
+# 本檔案由 runtime compiler 維護。修改 prose source 後執行 compiler 同步更新。
+# 手動修改本檔案會被 compiler 覆蓋。
+
+output_rules_version: v1
+status: active
+owner_layer: runtime/output-governance
+canonical_sources:
+  - enforcement/sanitization.md
+  - enforcement/tool-neutral-documentation.md
+  - enforcement/neutral-language.md
+description: >
+  定義所有可重用文件的輸出格式、內容邊界、去敏規則與工具中立性要求。
+  適用範圍：enforcement/、workflow/、analysis/、intelligence/、reusable skills、feedback lessons。
+
+# ──────────────────────────────────────────────
+# Format Rules
+# ──────────────────────────────────────────────
+format_rules:
+
+  - id: fmt.markdown_links
+    rule: >
+      所有回應中對 `language construct` 或 filename 的引用必須使用 clickable link 格式：
+      [`filename`](relative/file/path.ext:line) 或 [`language.declaration()`](relative/file/path.ext:line)。
+      line 對 `syntax` 為必填，對 filename 為選填。
+    applies_to:
+      - all_responses
+      - attempt_completion
+
+  - id: fmt.table_format
+    rule: >
+      表格欄位優先使用繁體中文（除非欄位內容為固定英文術語）。
+      表格前後需有空行。
+    applies_to:
+      - all_documents
+    canonical_source: enforcement/neutral-language.md
+
+  - id: fmt.code_blocks
+    rule: >
+      Code block 可保留原始語言（英文程式碼、指令、環境變數）。
+      Code block 外的說明文字須跟隨使用者語言。
+    applies_to:
+      - all_documents
+
+  - id: fmt.no_mixed_language_paragraphs
+    rule: >
+      文件正文不要中英混雜成段落。除非文件本身是工具輸入範本、prompt、
+      程式註解或外部規格引用，否則標題、摘要、說明段落與表格欄位
+      優先使用繁體中文。
+    applies_to:
+      - enforcement/
+      - workflow/
+      - analysis/
+      - intelligence/
+      - reusable_skills
+      - feedback_lessons
+    canonical_source: enforcement/neutral-language.md
+
+  - id: fmt.english_retention
+    rule: >
+      下列內容可保留英文：檔名、路徑、命令、環境變數、程式符號、
+      API 欄位、固定 protocol 名稱、工具名稱，以及翻譯後會降低精準度的
+      專有名詞（如 "AI-native Knowledge Operating System"、"reference-first"、
+      "Default Bootstrap"、"rule-weight"、"source-of-truth"）。
+    applies_to:
+      - all_documents
+    canonical_source: enforcement/neutral-language.md
+
+  - id: fmt.prompt_template_language
+    rule: >
+      Prompt template 可保留英文，方便直接貼給 agent。
+      Template 外的用途說明、前後文與驗證要求仍以繁體中文描述。
+    applies_to:
+      - reusable_skills
+      - templates
+    canonical_source: enforcement/neutral-language.md
+
+# ──────────────────────────────────────────────
+# Content Boundary Rules
+# ──────────────────────────────────────────────
+content_boundary:
+
+  - id: boundary.tool_neutral
+    rule: >
+      可重用規則、skills、templates、索引與 feedback lessons 預設應保持工具中立。
+      使用通用詞彙（agent、AI tool、tool-specific adapter、local tool mirror、project tool config）。
+      除非規則確實只適用於單一工具，否則不要讓特定工具聽起來像必要條件。
+    applies_to:
+      - enforcement/
+      - workflow/
+      - analysis/
+      - intelligence/
+      - reusable_skills
+      - feedback_lessons
+    canonical_source: enforcement/tool-neutral-documentation.md
+
+  - id: boundary.tool_specific_allowed_locations
+    rule: >
+      工具名稱、路徑與 UI 操作只可出現在：
+      - ai-tools/<tool>.md
+      - tools/adapters/<tool>.md
+      - 工具設定檔（.cursor/rules/*.mdc、.roomodes、CLAUDE.md）
+      - 工具專屬 scripts 或 script docs
+      - Project-local tool files
+    applies_to:
+      - enforcement/
+      - workflow/
+      - analysis/
+      - intelligence/
+      - reusable_skills
+    canonical_source: enforcement/tool-neutral-documentation.md
+
+  - id: boundary.no_tool_specific_in_generic
+    rule: >
+      除非章節明確討論工具整合，否則下列位置避免工具專屬措辭：
+      - Root README.md
+      - enforcement/README.md 索引摘要
+      - workflow/<domain>/、analysis/<domain>/、intelligence/<domain>/ 下的所有文件
+      - Skill templates 與 skills/ADDING_SKILLS.md
+      - Feedback lessons 與可重用 checklists
+    applies_to:
+      - root_readme
+      - enforcement_readme
+      - workflow
+      - analysis
+      - intelligence
+      - skill_templates
+      - feedback_lessons
+    canonical_source: enforcement/tool-neutral-documentation.md
+
+  - id: boundary.reusable_guidance
+    rule: >
+      可重用文件不得包含 project-specific 的具體 app/project 名稱、endpoint、
+      host、payload fragment、sample ID、class/test 名稱、live run 結果或環境 quirks。
+      這些依 reusable-guidance-boundary.md 留在專案文件。
+    applies_to:
+      - reusable_skills
+      - feedback_lessons
+      - enforcement/
+    canonical_source: enforcement/reusable-guidance-boundary.md
+
+  - id: boundary.neutral_description
+    rule: >
+      使用功能、角色、資料流、狀態、風險類別描述，不使用嘲諷、煽動、獵奇、
+      誇大或道德判斷語。授權語境：分析、測試、逆向、抓包、工具、SDK 等內容
+      都要明確放在授權、合規、測試、文件化或相容性語境中。
+    applies_to:
+      - enforcement/
+      - workflow/
+      - analysis/
+      - intelligence/
+      - reusable_skills
+      - feedback_lessons
+    canonical_source: enforcement/neutral-language.md
+
+  - id: boundary.no_conclusion_change
+    rule: >
+      中性化不能把未授權行為寫成授權行為，也不能把安全風險寫成已解決。
+      若有風險，仍要明確描述控制、限制與驗證方法。
+    applies_to:
+      - all_documents
+    canonical_source: enforcement/neutral-language.md
+
+# ──────────────────────────────────────────────
+# Sanitization Rules
+# ──────────────────────────────────────────────
+sanitization:
+
+  - id: sanit.no_auth_tokens
+    rule: "可重用文件不得包含完整 Authorization / token、session cookie、可識別特定使用者的實體裝置識別"
+    severity: critical
+    applies_to:
+      - reusable_skills
+      - feedback_lessons
+      - enforcement/
+    canonical_source: enforcement/sanitization.md
+
+  - id: sanit.no_crypto_keys
+    rule: "可重用文件不得包含 AES/HMAC/簽名密鑰（除非教學用、合成、可公開測試向量）"
+    severity: critical
+    applies_to:
+      - reusable_skills
+      - feedback_lessons
+      - enforcement/
+    canonical_source: enforcement/sanitization.md
+
+  - id: sanit.no_raw_requests
+    rule: "可重用文件不得包含未去敏的 raw request/response"
+    severity: high
+    applies_to:
+      - reusable_skills
+      - feedback_lessons
+      - enforcement/
+    canonical_source: enforcement/sanitization.md
+
+  - id: sanit.no_local_paths
+    rule: "可重用文件不得包含本機真實絕對路徑、使用者帳號名稱、私用工作目錄、git clone 實體路徑"
+    severity: high
+    applies_to:
+      - reusable_skills
+      - feedback_lessons
+      - enforcement/
+    canonical_source: enforcement/sanitization.md
+
+  - id: sanit.no_project_incident_details
+    rule: "可重用文件不得包含 project incident 的具體 app/project 名稱、endpoint、host、payload fragment"
+    severity: high
+    applies_to:
+      - reusable_skills
+      - feedback_lessons
+      - enforcement/
+    canonical_source: enforcement/sanitization.md
+
+  - id: sanit.use_placeholders
+    rule: "一律改用 <AI_SKILL_REPO>、<PROJECT_ROOT>、<WORKSPACE> 等占位符"
+    applies_to:
+      - reusable_skills
+      - feedback_lessons
+      - enforcement/
+    canonical_source: enforcement/sanitization.md
+
+  - id: sanit.original_terms_allowed
+    rule: >
+      可以在專案私有文件或證據附件中保留最小必要原詞，但必須同時滿足：
+      1. 原詞是重現、合約、UI 對照、法規或錯誤碼判讀所必需
+      2. 文件明確標示授權範圍與去敏狀態
+      3. 不會被複製到 reusable skill、shared rule、lesson、模板或公開範例
+      4. 可用中性別名在索引、摘要與 cross-link 中引用
+    applies_to:
+      - project_private_documents
+      - evidence_attachments
+    canonical_source: enforcement/neutral-language.md
+
+# ──────────────────────────────────────────────
+# Validation
+# ──────────────────────────────────────────────
+validation:
+  - id: output.validate_sanitization
+    phase: phase.validation
+    check: "確認所有輸出已去敏：無 token、密鑰、raw request、真實路徑、project incident 細節"
+    failure_action: block_transition
+    failure_message: "去敏檢查失敗：輸出包含未去敏的敏感資訊"
+
+  - id: output.validate_tool_neutrality
+    phase: phase.validation
+    check: "確認可重用文件未包含工具專屬措辭（除非在允許位置）"
+    failure_action: warn + suggest_fix
+    failure_message: "警告：可重用文件包含工具專屬措辭，建議移至 ai-tools/ 或使用通用詞彙"
+
+  - id: output.validate_format
+    phase: phase.validation
+    check: "確認輸出格式符合 markdown link、table、code block 規則"
+    failure_action: warn + suggest_fix
+    failure_message: "警告：輸出格式不符合規範"
+
+  - id: output.validate_neutral_language
+    phase: phase.validation
+    check: "確認可重用文件使用中性描述，無高風險詞在標題/檔名/slug"
+    failure_action: warn + suggest_fix
+    failure_message: "警告：可重用文件包含高風險詞或非中性描述"
