@@ -789,13 +789,21 @@ runtime/gates/blocking-gates.yaml
 
 ---
 
-## 十一、Knowledge / Runtime 邊界決策
+## 十一、Knowledge / Runtime 邊界決策（擴充版）
 
-> **決策**：workflow/analysis/intelligence 的流程知識**留在原處**（prose），runtime 只放 `runtime/generated/*.yaml`（compiled phase machine）。
+> **核心決策**：workflow/analysis/intelligence 的流程知識**留在原處**（prose），runtime 只放 `runtime/generated/*.yaml`（compiled phase machine）。
+>
+> **進入點決策**：agent 啟動後**直接讀取 runtime/generated/phase-machine.yaml**，不繞路。
+>
+> **同步決策**：prose 與 YAML 之間建立三層同步架構，用 pre-commit hook 強制保證一致性。
 
 ### 11.1 問題
 
-workflow/analysis/intelligence 中有大量流程知識（execution steps、judgment conditions、heuristics），這些內容**可能包含流程控制邏輯**。問題是：這些流程知識應該搬到 runtime，還是留在原處？
+workflow/analysis/intelligence 中有大量流程知識（execution steps、judgment conditions、heuristics），這些內容**可能包含流程控制邏輯**。問題是：
+
+1. **邊界問題**：流程知識應該搬到 runtime，還是留在原處？
+2. **進入點問題**：agent 啟動後，第一站應該讀哪裡？
+3. **同步問題**：如果 prose 改了，YAML 怎麼保證也更新？
 
 ### 11.2 三種方案比較
 
@@ -831,36 +839,240 @@ runtime/ 的內容（what）：                    workflow/analysis/intelligenc
 
 這種 conditional judgment 適合 prose，不適合 YAML state machine。
 
-### 11.4 實際運作流程
+---
+
+### 11.4 三層同步架構（新增）
+
+這是方案 B 的核心實作細節：**Canonical Source → Runtime Compiler → Generated Surface**。
 
 ```
-Agent 啟動
+┌─────────────────────────────────────────────────┐
+│              Canonical Source (prose)            │
+│  workflow/*/execution-flow.md                   │
+│  enforcement/*.md                                │
+│  governance/lifecycle/*.md                       │
+│  ↑ 這是真相來源，開發者直接修改這裡               │
+└──────────────┬──────────────────────────────────┘
+               │ ① 開發者修改 prose
+               ▼
+┌─────────────────────────────────────────────────┐
+│             Runtime Compiler                     │
+│  scripts/compile-runtime-phases.rb               │
+│  功能：從 prose 提取 phase/action/gate/obligation │
+│  輸出：runtime/generated/*.yaml                  │
+│  觸發：手動執行 或 pre-commit 自動偵測變更        │
+└──────────────┬──────────────────────────────────┘
+               │ ② 編譯產生
+               ▼
+┌─────────────────────────────────────────────────┐
+│            Generated Surface (唯讀 YAML)          │
+│  runtime/generated/phase-machine.yaml            │
+│  runtime/generated/workflow-*-phases.yaml        │
+│  runtime/generated/enforcement-*-gates.yaml      │
+│  runtime/generated/governance-*-phases.yaml      │
+│  ↑ agent 直接讀取這裡，不讀 prose 做流程判斷      │
+└──────────────┬──────────────────────────────────┘
+               │ ③ agent 讀取
+               ▼
+┌─────────────────────────────────────────────────┐
+│                   Agent                          │
+│  強制讀取：runtime/generated/*.yaml              │
+│    → 知道 current_phase、allowed、forbidden      │
+│  選擇性讀取：workflow/*/execution-flow.md        │
+│    → 知道具體做法、judgment 條件                 │
+└─────────────────────────────────────────────────┘
+```
+
+#### 11.4.1 各層職責
+
+| 層 | 內容 | 誰修改 | agent 讀取方式 |
+|----|------|--------|--------------|
+| **Canonical Source** | workflow/enforcement/governance 的 prose 文件 | 開發者手動編輯 | 選擇性（參考 judgment） |
+| **Runtime Compiler** | 從 prose 提取結構化資料的 script | 開發者執行或 pre-commit 自動觸發 | 不直接讀取 |
+| **Generated Surface** | `runtime/generated/*.yaml` | 唯讀（由 compiler 產生） | **強制讀取**（執行合約） |
+
+#### 11.4.2 Generated YAML 檔頭格式
+
+每個 `runtime/generated/*.yaml` 必須在檔頭標註來源，確保可追溯：
+
+```yaml
+# runtime/generated/workflow-apk-analysis-phases.yaml
+generated_from: workflow/apk-analysis/execution-flow.md
+generated_at: 2026-05-15
+compiler_version: compile-runtime-phases-v1
+status: synced  # synced | stale | orphan
+---
+phases:
+  - id: phase.checkpoint
+    description: "開始前確認 capture window 是否開啟"
+    allowed_actions: [validate, diff_review, update_knowledge]
+    forbidden_actions: [finalize, commit, push]
+    blocking_gates: [capture_window_open, baseline_established]
+    next_phase: phase.validation
+```
+
+#### 11.4.3 同步狀態標籤
+
+| 狀態 | 意義 | agent 行為 |
+|------|------|-----------|
+| `synced` | YAML 與 prose 一致 | 正常執行 |
+| `stale` | prose 已修改但 YAML 未更新 | **block execution**，提示執行 compiler |
+| `orphan` | YAML 存在但對應 prose 已刪除 | 警告，建議清理 |
+
+---
+
+### 11.5 進入點設計（新增）
+
+#### 11.5.1 目前路徑（要改）
+
+```
+CORE_BOOTSTRAP.md
     ↓
+routing-registry.yaml（繞路）
+    ↓
+workflow/*/execution-flow.md（直接讀 prose 做流程判斷）
+```
+
+問題：agent 啟動後先讀 routing registry，再讀 prose，從 prose 中自己推導出「現在該做什麼」。這等於**讓每個 agent 自己實作一次流程解析**，沒有統一執行層。
+
+#### 11.5.2 目標路徑
+
+```
+CORE_BOOTSTRAP.md
+    ↓
+runtime/generated/phase-machine.yaml ← 直接讀取，不繞路
+    ↓
+（可選）workflow/*/execution-flow.md ← 需要 judgment 時才讀
+```
+
+**具體修改**：
+- `CORE_BOOTSTRAP.md` 的啟動流程中，加入「讀取 `runtime/generated/phase-machine.yaml`」作為啟動後第一站
+- `runtime/generated/phase-machine.yaml` 作為全域 phase machine，包含所有 workflow 的 phase 定義
+- agent 從 phase machine 知道「現在在哪個 phase、能做什麼、不能做什麼」
+- 需要 judgment 時才去讀對應的 prose
+
+#### 11.5.3 進入點流程圖
+
+```
+CORE_BOOTSTRAP.md 啟動
+    │
+    ▼
 ① 讀取 runtime/generated/phase-machine.yaml
-   → 知道目前 phase: CHECKPOINT
-   → 知道 allowed: [validate, diff_review, update_knowledge]
-   → 知道 forbidden: [finalize, commit, push]
-    ↓
-② 讀取 workflow/apk-analysis/execution-flow.md
-   → 知道 CHECKPOINT phase 的具體做法
-   → 「開始前確認 capture window 是否開啟」
-   → 「確認 baseline 是否已建立」
-    ↓
-③ 執行 validate action
-    ↓
-④ phase transition → VALIDATION
-    ↓
-⑤ 讀取 workflow/apk-analysis/artifact-gates.md
-   → 知道 validation 的具體 gate 條件
-   → 「UI Architecture Map 是否完整？」
-   → 「API Catalog 是否包含 endpoint/method/headers？」
+   ├── current_phase: BOOTSTRAP
+   ├── allowed: [read_runtime, read_bootstrap, check_git_status]
+   └── forbidden: [execute_workflow, commit, push]
+    │
+    ▼
+② 根據 current_phase 決定下一步
+   ├── 如果是 BOOTSTRAP → 完成啟動，transition 到 CHECKPOINT
+   ├── 如果是 CHECKPOINT → 讀取對應 workflow prose 做 judgment
+   └── 如果是 VALIDATION → 執行 validation gates
+    │
+    ▼
+③ 執行 allowed action
+    │
+    ▼
+④ phase transition（由 phase machine 定義 next_phase）
+    │
+    ▼
+⑤ 回到步驟 ①（重新讀取 phase-machine.yaml，確認新 phase）
 ```
 
-**關鍵原則**：
-- **步驟 ① 是強制的**：agent 必須遵守 phase machine 的 allowed/forbidden actions
-- **步驟 ②⑤ 是參考的**：agent 參考 prose 來決定「怎麼做」，但 prose 不能 override phase machine
+---
 
-### 11.5 受影響的檔案
+### 11.6 同步保證機制（新增）
+
+這是整個架構能否運作的關鍵：**prose 改了，YAML 必須跟著改**。
+
+#### 11.6.1 Pre-commit Hook 強制同步
+
+```mermaid
+flowchart TD
+    A[開發者修改 workflow/*.md] --> B{pre-commit hook}
+    B --> C[偵測 workflow/ 有變更]
+    C --> D{對應的 runtime/generated/*.yaml 也變更了？}
+    D -->|是| E[檢查 YAML 檔頭 status: synced]
+    D -->|否| F[BLOCK COMMIT]
+    F --> G[提示：請執行 scripts/compile-runtime-phases.rb]
+    G --> H[開發者執行 compiler]
+    H --> I[YAML 更新, status: synced]
+    I --> J[commit 通過]
+    E -->|status: synced| J
+    E -->|status: stale| F
+```
+
+#### 11.6.2 三層同步規則
+
+| 情境 | 規則 | 後果 |
+|------|------|------|
+| 修改 prose，沒改 YAML | **pre-commit hook block** | 無法 commit，需執行 compiler |
+| 修改 prose，也執行 compiler 更新 YAML | 正常通過 | 兩者一致 |
+| 直接修改 YAML（不建議） | pre-commit hook 警告「generated file 不應手動編輯」 | 允許但記錄警告 |
+| 刪除 prose | 對應 YAML 標註 `status: orphan`，下次 compiler 執行時清理 | 自動清理 |
+
+#### 11.6.3 Compiler Script 規格
+
+```yaml
+# scripts/compile-runtime-phases.rb（待建立）
+功能:
+  - 掃描 workflow/*/execution-flow.md 提取 phase 定義
+  - 掃描 enforcement/*.md 提取 gate 定義
+  - 掃描 governance/lifecycle/*.md 提取 lifecycle phase 定義
+  - 產生 runtime/generated/*.yaml
+  - 每個 YAML 檔頭寫入 generated_from、generated_at、status: synced
+
+觸發時機:
+  - 手動：ruby scripts/compile-runtime-phases.rb
+  - 自動：pre-commit hook 偵測到 workflow/enforcement/governance 變更時提示執行
+
+驗證:
+  - ruby scripts/validate-knowledge-runtime.rb 檢查所有 generated YAML 的 status
+  - 若發現 stale 或 orphan，輸出警告並提示執行 compiler
+```
+
+#### 11.6.4 Validation Gate 擴充
+
+現有的 `validate-knowledge-runtime.rb` 需要擴充以下檢查：
+
+| 檢查項目 | 說明 |
+|---------|------|
+| **generated YAML 存在性** | 每個 workflow/enforcement/governance 的 prose 是否有對應的 generated YAML？ |
+| **generated_from 正確性** | YAML 檔頭的 `generated_from` 指向的檔案是否存在？ |
+| **status 檢查** | 是否有 `status: stale` 或 `status: orphan` 的 YAML？ |
+| **prose 修改時間比對** | prose 的 mtime 是否晚於 YAML 的 `generated_at`？若是，標註 stale |
+
+---
+
+### 11.7 Agent 讀取策略（新增）
+
+#### 11.7.1 強制讀取 vs 選擇性讀取
+
+| 檔案 | 讀取方式 | 原因 |
+|------|---------|------|
+| `runtime/generated/phase-machine.yaml` | **強制**（每次 action 前都讀） | 決定當前 phase 和 allowed/forbidden actions |
+| `runtime/generated/workflow-*-phases.yaml` | **依 phase 強制** | 當前 phase 對應的 workflow phase 定義 |
+| `runtime/generated/enforcement-*-gates.yaml` | **依 phase 強制** | 當前 phase 需要通過的 validation gates |
+| `workflow/*/execution-flow.md` | **選擇性** | 需要 judgment 時才讀 |
+| `workflow/*/artifact-gates.md` | **選擇性** | 需要檢查產出規範時才讀 |
+| `analysis/*/README.md` | **選擇性** | 需要領域知識時才讀 |
+| `intelligence/*/README.md` | **選擇性** | 需要 heuristics 時才讀 |
+
+#### 11.7.2 Agent 執行循環
+
+```
+loop:
+  ① 讀取 runtime/generated/phase-machine.yaml
+     → current_phase, allowed_actions, forbidden_actions
+  ② 若需要 judgment → 讀取對應 workflow prose
+  ③ 執行 allowed action
+  ④ 檢查 blocking gates（讀 enforcement gates YAML）
+  ⑤ phase transition（寫入新 phase）
+  ⑥ goto ①
+```
+
+---
+
+### 11.8 受影響的檔案
 
 | 層 | 保留 prose（不搬） | 產生 YAML 到 runtime/generated/ |
 |---|-------------------|-------------------------------|
@@ -869,14 +1081,18 @@ Agent 啟動
 | **intelligence/** | 所有 heuristics、anti-patterns、tradeoffs | 不產生（無 phase machine 需求） |
 | **enforcement/** | 所有規則描述、failure patterns | `runtime/generated/enforcement-*-gates.yaml` |
 | **governance/** | 所有 lifecycle 說明 | `runtime/generated/governance-*-phases.yaml` |
+| **CORE_BOOTSTRAP.md** | 啟動流程（需修改加入 runtime 入口） | 不產生 |
+| **scripts/** | 新增 `compile-runtime-phases.rb` | 不產生 |
+| **pre-commit hook** | 擴充 `validate-knowledge-runtime.rb` | 不產生 |
 
-### 11.6 與其他章節的關係
+### 11.9 與其他章節的關係
 
 | 章節 | 關係 |
 |------|------|
 | [九、Prose → YAML 轉換盤點](#九prose--yaml-轉換盤點) | 方案 B 的具體轉換清單已在 9.2-9.4 中定義 |
 | [五、Phase 5：Runtime Compiler](#phase-5runtime-compilerp1--中期) | Runtime Compiler 負責將 canonical source 編譯為 `runtime/generated/*.yaml` |
 | [六、6.1 不破壞 reference-first](#61-不破壞-reference-first) | `runtime/generated/` 是 generated cache，不取代 canonical source |
+| [十、ai-tools 控制流程遷移](#十ai-tools-控制流程遷移) | ai-tools 的入口點也應指向 `runtime/generated/`，而非直接指向 prose |
 
 ---
 
@@ -912,5 +1128,8 @@ P3 — 遠期（Phase 8）
 2. **Prose → YAML**：流程文件轉換為 machine-readable YAML
 3. **Runtime Compiler**：建立從 canonical source 到 generated surface 的編譯層
 4. **Knowledge/Runtime 分離**：workflow/analysis/intelligence 的 prose 留在原處，runtime 只放 `runtime/generated/*.yaml`（compiled phase machine）
-5. **不破壞現有框架**：reference-first、activation model、close-loop script、goal ledger、enforcement rules 保持不變
-6. **逐步遷移**：P0 → P1 → P2 → P3，不一次全部實作
+5. **進入點直連 runtime**：`CORE_BOOTSTRAP.md` 直接指向 `runtime/generated/phase-machine.yaml`，不繞路
+6. **三層同步架構**：Canonical Source → Runtime Compiler → Generated Surface，pre-commit hook 強制 prose 與 YAML 一致
+7. **Generated YAML 唯讀**：`runtime/generated/*.yaml` 由 compiler 產生，不應手動編輯；檔頭標註 `generated_from`、`generated_at`、`status`
+8. **不破壞現有框架**：reference-first、activation model、close-loop script、goal ledger、enforcement rules 保持不變
+9. **逐步遷移**：P0 → P1 → P2 → P3，不一次全部實作
