@@ -2,6 +2,17 @@
 
 `workflow/software-delivery/` 負責「App 開發審查與指引的執行流程」。本目錄保存 agent 在進行 app 開發審查時可照著執行的 planning flow、review flow、handoff flow、review checklists 與 contract-first 開發流程，讓開發與審查過程可重複、可驗證。
 
+## 何時進入此 Workflow
+
+當工作任務需要**開發、實作、修改程式碼、進行 code review / design review / release review** 時，agent 應自行判斷並載入本 workflow。不需要 runtime 觸發——agent 知道什麼時候需要開發。
+
+進入方式：
+1. 讀取 [`execution-flow.md`](execution-flow.md) 了解執行流程
+2. 依流程的 Step 1（Start From Evidence）開始
+3. 需要 artifact 規範時參考 [`artifact-gates.md`](artifact-gates.md)
+4. 需要審查檢查清單時參考 [`review-checklist.md`](review-checklist.md)
+5. 需要完整開發流程時參考 [`development-process.md`](development-process.md)
+
 ## Scope
 
 本 workflow 涵蓋以下流程與審查類型：

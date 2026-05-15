@@ -297,44 +297,6 @@ rules:
       source: enforcement/reusable-guidance-boundary.md
 
   # ── Workflow Activation Rules ──
-
-  - rule_id: workflow.software-delivery
-    description: 開發指引 workflow — 當任務需要 app/API/embedded 開發時 activate
-    activation:
-      when:
-        - type: task_intent
-          matches:
-            - 開發
-            - 實作
-            - implement
-            - 寫程式
-            - coding
-            - 建置
-            - build
-            - 修 bug
-            - bug-fix
-            - 新功能
-            - feature
-            - 開發指引
-            - development-guidance
-            - contract-first
-            - bdd
-            - code-review
-            - design-review
-            - release-review
-        - type: user_signal
-          matches:
-            - 開發
-            - 寫 code
-            - 實作
-            - 要怎麼做
-            - 幫我寫
-            - 幫我做
-            - 幫我開發
-            - 幫我實作
-    load:
-      strategy: lazy
-      priority: P1
-      estimated_tokens: 3500
-      source: workflow/software-delivery/execution-flow.md
-      summary: knowledge/summaries/development-guidance.md
+  # （此區塊預留給未來跨 workflow 的基礎設施規則）
+  # Workflow-specific 觸發條件由各 workflow 的 README.md 定義，
+  # agent 在需要時自行判斷並載入對應的 execution-flow.md。
