@@ -1,0 +1,74 @@
+---
+header:
+  generated_from: governance/lifecycle/knowledge-update-flow.md
+  generated_at: '2026-05-15T03:58:04Z'
+  compiler_version: 1.0.0
+  status: synced
+compiled_from: governance/lifecycle/knowledge-update-flow.md + intelligence/engineering/README.md
+classification_dimensions:
+- name: heuristics/
+  description: 通用軟體工程經驗法則
+  path: heuristics/README.md
+  subdirectories: []
+- name: architecture/
+  description: 架構決策智慧
+  path: architecture/README.md
+  subdirectories: []
+- name: tradeoffs/
+  description: 技術權衡
+  path: tradeoffs/README.md
+  subdirectories: []
+- name: failure/
+  description: 失效模式
+  path: failure/README.md
+  subdirectories: []
+- name: domain/
+  description: 領域模型智慧
+  path: domain/README.md
+  subdirectories: []
+- name: anti-patterns/
+  description: 反模式
+  path: anti-patterns/README.md
+  subdirectories: []
+- name: distributed-systems/
+  description: 分散式系統
+  path: distributed-systems/README.md
+  subdirectories: []
+- name: agent-architecture/
+  description: AI Agent 自身運作的智慧（context collapse、rule overload、task routing、attention
+    budgeting、failure recovery、cognitive boundaries、pilot-first validation、failure-to-scenario
+    closure、linked-updates completeness、decomposition strategy、stateless validation）
+  path: agent-architecture/README.md
+  subdirectories: []
+- name: development/
+  description: 開發指引工程智慧（risk translation、docs-first BDD、contract governance）
+  path: development/README.md
+  subdirectories: []
+- name: analytical-reasoning/
+  description: 分析推理智慧（APK analysis、repo analysis、evidence-first routing、heuristics、signals、failure
+    patterns）
+  path: analytical-reasoning/README.md
+  subdirectories:
+  - anti-patterns
+  - failure
+  - heuristics
+  - signals
+- name: language-specific/
+  description: 語言特定知識（Java、JavaScript、Dart 等語言的 failure patterns、techniques）
+  path: language-specific/README.md
+  subdirectories:
+  - java
+known_languages:
+- name: Java
+  path: intelligence/engineering/language-specific/java/
+  atoms: 1 failure pattern
+known_frameworks: []
+known_platforms: []
+decision_tree:
+- branch: 語言特定知識（Java、JavaScript、Dart 等）
+- branch: 框架特定知識（Frida、Spring、Flutter 等）
+- branch: 平台特定知識（Android、iOS、Web 等）
+- action: 考慮建立 intelligence/engineering/language-specific/<lang>/
+- action: 考慮建立 intelligence/engineering/framework-specific/<framework>/
+- action: 考慮建立 intelligence/engineering/platform-specific/<platform>/
+- action: 回到現有維度下的子層決策

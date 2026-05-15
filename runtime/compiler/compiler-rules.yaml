@@ -126,6 +126,18 @@ source_target_mapping:
       - step_reference_sources
     compile_rule: "從 knowledge-update-flow.md 的 11 個步驟標題與判斷表格提取 phase 定義"
 
+  # ── P3.7: Classification Rules Mapping ──
+
+  - source: "governance/lifecycle/knowledge-update-flow.md"
+    target: "runtime/generated/classification-rules.yaml"
+    extract:
+      - classification_dimensions
+      - dimension_decision_conditions
+      - known_languages
+      - known_frameworks
+      - known_platforms
+    compile_rule: "從 knowledge-update-flow.md Step 2.4 的決策樹與 intelligence/engineering/ 的 README 提取分類維度定義與已知語言/框架/平台列表"
+
 compilation_rules:
 
   - id: compile.rule.deterministic_only

@@ -600,6 +600,131 @@ def compile_plans_index(source_path, _mapping_entry)
   }
 end
 
+def compile_classification_rules(_source_path, _mapping_entry)
+  # ── Step 1: Read intelligence/engineering/README.md for known dimensions ──
+  eng_readme_path = 'intelligence/engineering/README.md'
+  dimensions = []
+  if File.exist?(eng_readme_path)
+    content = File.read(eng_readme_path)
+    # Extract dimension rows from the subdirectory table
+    content.scan(/^\|\s*\[`([^`]+)`\]\(([^)]+)\)\s*\|\s*(.+?)\s*\|$/) do |match|
+      dir_name = match[0].strip
+      rel_path = match[1].strip
+      description = match[2].strip
+      # Skip non-dimension entries (like the table header)
+      next if dir_name == '子目錄' || dir_name == '---'
+      # Determine subdirectories by scanning the actual directory
+      subdirs = []
+      full_path = File.join(File.dirname(eng_readme_path), dir_name)
+      if Dir.exist?(full_path)
+        Dir.entries(full_path).each do |entry|
+          next if entry.start_with?('.')
+          next unless File.directory?(File.join(full_path, entry))
+          subdirs << entry
+        end
+      end
+      dimensions << {
+        'name' => dir_name,
+        'description' => description,
+        'path' => rel_path,
+        'subdirectories' => subdirs.sort
+      }
+    end
+  end
+
+  # ── Step 2: Read language-specific/README.md for known languages ──
+  lang_readme_path = 'intelligence/engineering/language-specific/README.md'
+  known_languages = []
+  if File.exist?(lang_readme_path)
+    content = File.read(lang_readme_path)
+    # Extract language rows from the "Current Languages" table
+    in_lang_table = false
+    content.each_line do |line|
+      if line.match?(/^\|\s*Language\s*\|\s*Directory\s*\|\s*Atoms\s*\|$/)
+        in_lang_table = true
+        next
+      end
+      if in_lang_table
+        break unless line.match?(/^\|.+\|.+\|.+\|$/)
+        next if line.match?(/^\|[\s-]+\|[\s-]+\|[\s-]+\|$/)
+        cols = line.split('|').map(&:strip).reject(&:empty?)
+        next if cols.length < 3
+        known_languages << {
+          'name' => cols[0],
+          'path' => "intelligence/engineering/language-specific/#{cols[0].downcase}/",
+          'atoms' => cols[2].to_s
+        }
+      end
+    end
+  end
+
+  # ── Step 3: Scan for framework-specific/ and platform-specific/ directories ──
+  known_frameworks = []
+  known_platforms = []
+  eng_dir = 'intelligence/engineering'
+  if Dir.exist?(eng_dir)
+    Dir.entries(eng_dir).each do |entry|
+      next if entry.start_with?('.')
+      full_path = File.join(eng_dir, entry)
+      next unless File.directory?(full_path)
+
+      if entry == 'framework-specific'
+        Dir.entries(full_path).each do |fw|
+          next if fw.start_with?('.')
+          next unless File.directory?(File.join(full_path, fw))
+          known_frameworks << { 'name' => fw, 'path' => "#{eng_dir}/#{entry}/#{fw}/" }
+        end
+      elsif entry == 'platform-specific'
+        Dir.entries(full_path).each do |pl|
+          next if pl.start_with?('.')
+          next unless File.directory?(File.join(full_path, pl))
+          known_platforms << { 'name' => pl, 'path' => "#{eng_dir}/#{entry}/#{pl}/" }
+        end
+      end
+    end
+  end
+
+  # ── Step 4: Extract decision tree from knowledge-update-flow.md Step 2.4 ──
+  decision_tree = []
+  kuf_path = 'governance/lifecycle/knowledge-update-flow.md'
+  if File.exist?(kuf_path)
+    content = File.read(kuf_path)
+    # Find Step 2.4 section
+    step_section = content[/^###\s+2\.4\s.*?\n(.*?)(?=^###\s+2\.5|\z)/m]
+    if step_section
+      # Extract decision branches from code blocks
+      step_section.scan(/├─\s*(.+?)$/) do |match|
+        branch = match[0].strip
+        next if branch.start_with?('─') || branch.empty?
+        decision_tree << { 'branch' => branch }
+      end
+      # Also extract the "→ 考慮建立" patterns
+      step_section.scan(/→\s*(.+?)$/) do |match|
+        action = match[0].strip
+        decision_tree << { 'action' => action } unless action.empty?
+      end
+    end
+  end
+
+  # ── Step 5: Write classification-rules.yaml ──
+  target = File.join(GENERATED_DIR, 'classification-rules.yaml')
+  header = generated_header('governance/lifecycle/knowledge-update-flow.md')
+
+  yaml_content = {
+    'header' => header,
+    'compiled_from' => 'governance/lifecycle/knowledge-update-flow.md + intelligence/engineering/README.md',
+    'classification_dimensions' => dimensions,
+    'known_languages' => known_languages,
+    'known_frameworks' => known_frameworks,
+    'known_platforms' => known_platforms,
+    'decision_tree' => decision_tree
+  }
+
+  FileUtils.mkdir_p(GENERATED_DIR)
+  File.write(target, YAML.dump(yaml_content))
+  puts "  ✓ #{target}"
+end
+
 def compile_source(source_path, mapping_entry)
   compile_rule = mapping_entry['compile_rule']
 
@@ -620,6 +745,8 @@ def compile_source(source_path, mapping_entry)
     compile_failure_recovery(source_path, mapping_entry)
   when /從 plans\/active\/\*\.md 的 front matter、phase 標題、受影響檔案表格提取 plan index/
     compile_plans_index(source_path, mapping_entry)
+  when /從 knowledge-update-flow\.md Step 2\.4 的決策樹與 intelligence\/engineering\/ 的 README 提取分類維度定義/
+    compile_classification_rules(source_path, mapping_entry)
   else
     puts "  ⚠  Unknown compile rule: #{compile_rule}"
   end
@@ -629,6 +756,7 @@ def check_modified_sources
   modified = []
   plans_modified = false
   plans_target = File.join(GENERATED_DIR, 'plans-index.yaml')
+  classification_target = File.join(GENERATED_DIR, 'classification-rules.yaml')
 
   @mapping.each do |entry|
     source_glob = entry['source']
@@ -637,6 +765,21 @@ def check_modified_sources
       if entry['compile_rule']&.include?('plans/active/*.md')
         if !File.exist?(plans_target) || File.mtime(source_path) > File.mtime(plans_target)
           plans_modified = true
+        end
+      # Classification rules: also depends on intelligence/engineering/ README files
+      elsif entry['compile_rule']&.include?('分類維度定義')
+        target = classification_target
+        # Check all dependency files
+        deps = [
+          source_path,
+          'intelligence/engineering/README.md',
+          'intelligence/engineering/language-specific/README.md'
+        ]
+        deps.each do |dep|
+          if File.exist?(dep) && (!File.exist?(target) || File.mtime(dep) > File.mtime(target))
+            modified << { source: source_path, mapping: entry }
+            break
+          end
         end
       else
         target = target_path_for(source_path, entry)

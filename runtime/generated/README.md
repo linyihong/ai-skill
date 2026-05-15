@@ -38,4 +38,5 @@ ruby runtime/compiler/compiler-engine.rb
 | `sanitization-rules.yaml` | `enforcement/sanitization.md` | ✅ 已產生 |
 | `tool-neutrality-rules.yaml` | `enforcement/tool-neutral-documentation.md` | ✅ 已產生 |
 | `knowledge-update-phases.yaml` | `governance/lifecycle/knowledge-update-flow.md` | ✅ 已產生 |
+| `classification-rules.yaml` | `governance/lifecycle/knowledge-update-flow.md` + `intelligence/engineering/README.md` | ✅ 已產生 |
 | `plans-index.yaml` | `plans/active/*.md`（聚合） | ✅ 已產生 |
