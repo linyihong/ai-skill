@@ -50,7 +50,8 @@ phases:
     name: Checkpoint
     description: >
       每輪工作開始前的檢查點。確認目前 state、讀取 obligation ledger、
-      檢查 blocking gates、決定本輪要做什麼。
+      檢查 blocking gates、執行知識更新檢查（快速路徑：
+      runtime/generated/knowledge-update-phases.yaml）、決定本輪要做什麼。
     entry_conditions:
       - bootstrap_complete: true
       - OR:
@@ -60,6 +61,7 @@ phases:
       - read_obligation_ledger
       - read_phase_machine
       - read_blocking_gates
+      - read_knowledge_update_phases
       - diff_review
       - update_knowledge
       - plan_next_actions
@@ -70,12 +72,13 @@ phases:
     blocking_gates:
       - gate.checkpoint.obligation_ledger_loaded
       - gate.checkpoint.blocking_gates_checked
+      - gate.checkpoint.knowledge_update_checked
     obligations:
       - obligation.checkpoint.review_pending_obligations
       - obligation.checkpoint.check_knowledge_update_needed
     next_phase: phase.execution
     phase_transition_triggers:
-      - condition: "obligation_ledger_loaded == true AND blocking_gates_checked == true"
+      - condition: "obligation_ledger_loaded == true AND blocking_gates_checked == true AND knowledge_update_checked == true"
         auto_transition: false
         requires_confirmation: true
 

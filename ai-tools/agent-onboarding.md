@@ -68,34 +68,26 @@
 
 ## 知識更新流程 Checkpoint 規範
 
-每個 AI agent 工具在整合時，**必須**在 Custom Instructions 或自動載入規則中加入以下 checkpoint 提醒，確保每輪工作結束前都會執行知識更新流程：
+知識更新檢查已由 **runtime phase machine** 統一管理（`phase.checkpoint` → `obligation.checkpoint.check_knowledge_update_needed`），
+不再需要每個工具各自在 Custom Instructions 中維護完整的 checkpoint 邏輯。
 
-### Checkpoint 提醒內容（工具中立版本）
+### 工具只需加入簡短參考
 
 ```text
 ## 知識更新流程 Checkpoint
 
-每輪工作結束前、切回長時間專案工作前、或使用者說「繼續」展開下一輪前，必須執行知識更新檢查：
-
-### 快速路徑（預設）
-
-1. 讀取 generated YAML：[`<AI_SKILL_REPO>/runtime/generated/knowledge-update-phases.yaml`] 了解 11 個步驟的結構與參考文件。
-2. 自問：本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？
-3. 若是，依 generated YAML 的 11 個步驟執行（各步驟的詳細 prose 說明請參考 YAML 中 `references` 指向的文件）。
-4. 若否，簡短說明本輪只有 project-specific evidence 或尚未達可泛化標準。
-
-### 完整路徑（僅首次或需要細節時）
-
-- 如果這是當前 session **第一次**執行知識更新，或 generated YAML 的資訊不足以完成某個步驟，才讀取完整 prose：[`<AI_SKILL_REPO>/governance/lifecycle/knowledge-update-flow.md`]
+知識更新檢查已由 runtime phase machine 管理（phase.checkpoint → obligation.checkpoint.check_knowledge_update_needed）。
+快速路徑：<AI_SKILL_REPO>/runtime/generated/knowledge-update-phases.yaml
+完整路徑：<AI_SKILL_REPO>/governance/lifecycle/knowledge-update-flow.md
 ```
 
 ### 各工具的實作方式
 
 | 工具 | 放置位置 | 實作方式 |
 |------|---------|---------|
-| **Roo Code** | `.roomodes` 每個 mode 的 `customInstructions` | 直接加入 checkpoint 提醒文字 |
-| **Cursor** | `.cursor/rules/*.mdc`（alwaysApply） | 在規則檔中加入 checkpoint 提醒；可選用 `hooks.json` 的 `sessionStart` / `preCompact` / `stop` 事件輔助提醒 |
-| **Claude Code** | `CLAUDE.md` | 在檔案中加入 checkpoint 提醒文字 |
+| **Roo Code** | `.roomodes` 每個 mode 的 `customInstructions` | 加入簡短參考（3 行） |
+| **Cursor** | `.cursor/rules/*.mdc`（alwaysApply） | 在規則檔中加入簡短參考 |
+| **Claude Code** | `CLAUDE.md` | 在檔案中加入簡短參考 |
 
 > 各工具的具體 checkpoint 內容範本，請參考對應的 `ai-tools/agent/<tool>.md` 文件。
 

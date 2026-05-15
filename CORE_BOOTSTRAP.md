@@ -17,10 +17,11 @@
 ```
 1. 讀取 CORE_BOOTSTRAP.md（本檔）
 2. 讀取 README.md（超短入口，了解 OS layout）
-3. [Runtime Phase 初始化] 讀取 runtime/generated/phase-machine.yaml：
+3. [Runtime Phase 初始化] 讀取 runtime/phases/phase-machine.yaml：
    - 載入目前 phase、allowed_actions、forbidden_actions、blocking_gates
    - 載入 obligation-ledger.yaml 確認本 phase 的未完成義務
    - 載入 blocking-gates.yaml 確認本 phase 的阻斷閘門
+   - 載入 runtime/generated/knowledge-update-phases.yaml 作為知識更新快速路徑
    - 若 phase 為 bootstrap → 繼續往下；若為其他 phase → 先檢查 blocking gates
 4. [Output Governance 初始化] 載入輸出規則：
    - 讀取 runtime/output-governance/language-policy.yaml — 語言強制規則

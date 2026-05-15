@@ -70,6 +70,18 @@ gates:
     failure_action: block_transition
     failure_message: "無法進入 execution：有 blocking gate 未通過"
 
+  - id: gate.checkpoint.knowledge_update_checked
+    phase: phase.checkpoint
+    name: Knowledge Update Checked
+    description: "知識更新檢查已完成（快速路徑：runtime/generated/knowledge-update-phases.yaml）"
+    severity: high
+    check:
+      type: file_read
+      target: runtime/generated/knowledge-update-phases.yaml
+      verification: "knowledge_update_checked == true"
+    failure_action: warn + continue
+    failure_message: "警告：知識更新檢查未完成，建議在 checkpoint 階段執行"
+
   # ── Execution Gates ──
   - id: gate.execution.goal_defined
     phase: phase.execution

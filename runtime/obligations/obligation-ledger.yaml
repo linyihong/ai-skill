@@ -48,7 +48,10 @@ obligations:
   - id: obligation.checkpoint.check_knowledge_update_needed
     phase: phase.checkpoint
     name: Check Knowledge Update Needed
-    description: "檢查 governance/lifecycle/knowledge-update-flow.md 判斷本輪是否需要知識更新"
+    description: >
+      快速路徑（預設）：讀取 runtime/generated/knowledge-update-phases.yaml（~118 lines）
+      了解 11 個步驟的結構與參考文件，自問本輪是否新增可重用知識。
+      完整路徑（首次或需要細節時）：讀 governance/lifecycle/knowledge-update-flow.md（~522 lines）
     verification:
       - "knowledge_update_check_completed == true"
     severity: high
