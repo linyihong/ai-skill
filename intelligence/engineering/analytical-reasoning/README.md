@@ -12,10 +12,10 @@ intelligence/engineering/analytical-reasoning/
 ├── live-readiness-gates.md             # 實作就緒門檻
 ├── documentation-backfill-heuristic.md # 文件回填經驗法則（from repo-analysis）
 ├── traceability-heuristic.md           # 文件追溯性經驗法則（from repo-analysis）
-├── heuristics/                         # 分析過程中的啟發式判斷規則
+├── heuristics/                         # 跨語言啟發式判斷規則（不包含語言特定知識）
 ├── signals/                            # 技術特徵辨識信號
-├── failure/                            # 具體失敗模式與診斷
-└── anti-patterns/                      # 可預防的錯誤模式
+├── failure/                            # 語言/框架特定的失敗模式與診斷
+└── anti-patterns/                      # 可預防的錯誤模式（跨語言通用）
 ```
 
 ## 目前 atoms

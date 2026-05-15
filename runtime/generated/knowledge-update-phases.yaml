@@ -1,7 +1,7 @@
 ---
 header:
   generated_from: governance/lifecycle/knowledge-update-flow.md
-  generated_at: '2026-05-15T02:08:46Z'
+  generated_at: '2026-05-15T02:15:52Z'
   compiler_version: 1.0.0
   status: synced
 compiled_from: governance/lifecycle/knowledge-update-flow.md
@@ -19,6 +19,12 @@ steps:
   name: 分類知識類型
   entry_conditions: []
   references:
+  - name: enforcement/feedback-lessons.md
+    path: "../../enforcement/feedback-lessons.md"
+  - name: knowledge-update-flow.md
+    path: knowledge-update-flow.md
+  - name: intelligence/engineering/analytical-reasoning/README.md
+    path: "../../intelligence/engineering/analytical-reasoning/README.md"
   - name: enforcement/feedback-lessons.md
     path: "../../enforcement/feedback-lessons.md"
 - step: 3
