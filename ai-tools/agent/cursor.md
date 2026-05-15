@@ -115,92 +115,26 @@ If the user switches languages, follow their switch.
 
 工具中立規則見 [`enforcement/conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md)。Cursor 只是其中一種操作環境；goal ledger 的真相來源仍是業務專案本地的 `<PROJECT_ROOT>/.agent-goals/`，不要放在 `.cursor/`，也不要把 goal 檔 commit。
 
-### 建議操作
+**Goal ledger 操作流程已由 runtime 管理**，請參考：
+- [`runtime/phases/phase-machine.yaml`](../../runtime/phases/phase-machine.yaml) — checkpoint phase 的 obligation 定義
+- [`runtime/obligations/obligation-ledger.yaml`](../../runtime/obligations/obligation-ledger.yaml) — goal ledger 相關義務
+- [`scripts/agent-goals.sh`](../../scripts/agent-goals.sh) — goal ledger CLI helper
 
-在 Cursor 開始可中斷、可拆解或多目標工作時，或已看到 active project 有 modified / staged / untracked files、已建立 TodoWrite、使用者說「繼續」前一個多步驟任務時：
-
-1. 讀取 `<PROJECT_ROOT>/.agent-goals/`，確認是否已有 active / blocked / needs-validation goal，以及 priority、owner、lock、parallelization mode、plan/todo links、missing/decision/strengthen。若使用者說 agent 中斷、突然關閉、要從哪裡重做、剩下什麼或下一步是什麼，必須先讀 `.agent-goals/README.md` 與對應 active goal，再用 transcripts、terminal output、git status 交叉確認；不要把 transcript/git 當成第一真相來源。
-2. 若沒有 ledger 且任務不是單一回覆即可完成，使用本庫 helper 初始化；不要因為已有 TodoWrite 就跳過 goal ledger：
-
-   ```bash
-   <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> init
-   ```
-
-3. 建立或更新本輪主要目標：
-
-   ```bash
-   <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> start \
-     --id P1-short-goal \
-     --title "Short goal title" \
-     --source "User request summary" \
-     --parallelization single-owner \
-     --next "Next concrete action" \
-     --criteria "Observable completion condition"
-   ```
-
-4. 若使用者轉移目標，先 `pause` 或 `update --status superseded` 舊 goal，再建立新的 `P1`。
-5. 若有 planning 文件或 TodoWrite todo，使用 `--plan` / `--todo` 連到 goal，並讓 `.agent-goals/README.md` 的主目標表可快速跳回該 goal。
-6. 若發現需要拆小目標，使用 `split` 或在 goal 檔的 `Subgoals` 區塊記錄；若發現不能分工或需單一 owner，使用 `--parallelization single-owner|non-parallelizable` 更新。
-7. 在回覆完成前，只有完成條件與驗證都成立時才 `complete --validated`；條件已成立時必須同輪刪除 goal 並刷新 `.agent-goals/README.md`，不要把 `completed` row 留在 active 表。若該 goal 完成後仍有長期 roadmap、phase、migration、promotion、deprecation 或治理狀態，先回寫到 durable planning 文件，再刪除 active goal。否則保留 goal，讓下一個 agent 可接手。
+Cursor 專屬注意事項：
+- 可透過 hooks 自動檢查 goal ledger（sessionStart / preCompact / stop）
+- `.agent-goals/` 不應放在 `.cursor/` 目錄下
 
 ## Cursor 與知識更新流程 Checkpoint
 
 工具中立規則見 [`governance/lifecycle/knowledge-update-flow.md`](../../governance/lifecycle/knowledge-update-flow.md)。Cursor 可以透過 `.cursor/rules/*.mdc`（alwaysApply）加入 checkpoint 提醒，並可選用 hooks 輔助。
 
-### 在 `.cursor/rules/*.mdc` 中加入 checkpoint 提醒
+**Knowledge update flow 已由 runtime 管理**，請參考：
+- [`runtime/recovery/recovery-strategies.yaml`](../../runtime/recovery/recovery-strategies.yaml) — knowledge_stale 修復策略
+- [`runtime/transactions/transaction-machine.yaml`](../../runtime/transactions/transaction-machine.yaml) — writeback transaction 狀態機
 
-在 `dependency-reading.mdc` 或其他 alwaysApply 規則檔中，加入以下內容：
-
-```markdown
-## 知識更新流程 Checkpoint
-
-每輪工作結束前、切回長時間專案工作前、或使用者說「繼續」展開下一輪前，必須執行知識更新檢查：
-
-1. 讀取 [`<AI_SKILL_REPO>/governance/lifecycle/knowledge-update-flow.md`] 了解完整流程。
-2. 自問：本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？
-3. 若是，依 knowledge-update-flow.md 的 11 個步驟執行：
-   - Step 1-2：觸發檢查 + 分類知識類型
-   - Step 3：決定 Promotion Target（intelligence / workflow / analysis / shared-rules / runtime / memory）
-   - Step 4：寫入 feedback/history/<domain>/<category>/ lesson（寫入前依 sanitization.md 去敏）
-   - Step 5：更新目標層
-   - Step 6-7：選擇性執行 Intelligence Extraction 或 Failure Learning
-   - Step 8：執行 Linked Updates
-   - Step 9：更新 Runtime Surfaces
-   - Step 10：驗證（diff review、去敏檢查、link check）
-   - Step 11：Commit / Push / Readback（關閉 writeback transaction）
-4. 若否，簡短說明本輪只有 project-specific evidence 或尚未達可泛化標準。
-```
-
-### Cursor hooks 輔助提醒（可選）
-
-Cursor 的 hooks 機制可以用來輔助提醒 checkpoint，但不應取代規則檔中的強制提醒：
-
-| Event | 用途 | 行為 |
-| --- | --- | --- |
-| `sessionStart` | 開局提醒 | 檢查是否有未完成的知識更新流程，提醒 agent 先完成 writeback transaction 再開始新工作。 |
-| `preCompact` | 壓縮前檢查 | 若有未關閉的 writeback transaction，提醒 agent 先 commit/push 再壓縮。 |
-| `stop` | 停止前檢查 | 若有 dirty Ai-skill repo 或未關閉的 transaction，提醒 agent 處理或記錄狀態。 |
-
-Hook 建議使用 command hook，fail-open，避免 hook 故障阻塞正常工作。若要建立專案 hook，放在：
-
-```text
-<PROJECT_ROOT>/.cursor/hooks.json
-<PROJECT_ROOT>/.cursor/hooks/knowledge-update-reminder.sh
-```
-
-範例 `hooks.json` 方向：
-
-```json
-{
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "command": ".cursor/hooks/knowledge-update-reminder.sh", "timeout": 5, "failClosed": false }],
-    "preCompact": [{ "command": ".cursor/hooks/knowledge-update-reminder.sh", "timeout": 5, "failClosed": false }],
-    "stop": [{ "command": ".cursor/hooks/knowledge-update-reminder.sh", "timeout": 5, "failClosed": false }]
-  }
-}
-```
-
-Hook script 只應檢查 `<AI_SKILL_REPO>` 的 git status 和 `.agent-goals/` 狀態並提醒，除非團隊明確要求自動執行。
+Cursor 專屬注意事項：
+- 可在 `.cursor/rules/*.mdc` 中加入 checkpoint 提醒（alwaysApply）
+- 可選用 hooks 輔助（sessionStart / preCompact / stop），fail-open 避免阻塞正常工作
+- Hook script 只應檢查 `<AI_SKILL_REPO>` 的 git status 和 `.agent-goals/` 狀態並提醒，除非團隊明確要求自動執行
 
 ← [回到 AI 工具索引](../README.md)

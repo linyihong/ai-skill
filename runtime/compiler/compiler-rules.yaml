@@ -1,0 +1,143 @@
+# Compiler Rules
+# 定義從 canonical source（prose）到 generated surface（YAML）的編譯規則。
+# 只有 deterministic、execution-critical 的狀態會被編譯。
+# Heuristics、judgment、troubleshooting strategy 永遠留在 prose。
+#
+# 使用方式：
+# 1. 修改 prose source → 執行 compiler → 更新 generated YAML
+# 2. Pre-commit hook 檢查 prose 與 YAML 是否一致
+# 3. 若不一致 → block commit
+
+version: 1.0
+status: candidate
+owner_layer: runtime/compiler
+last_updated: 2026-05-15
+
+compilation_scope:
+  description: >
+    只有以下類別的內容會被編譯為 YAML。
+    所有需要 human judgment、heuristics、troubleshooting 的內容永遠留在 prose。
+  deterministic_only:
+    - current_phase
+    - allowed_actions
+    - forbidden_actions
+    - blocking_gates (id, severity, check.type, check.verification)
+    - required_artifacts (name, path, format)
+    - open_obligations (id, phase, verification_criteria)
+    - transaction_state (state, allowed_actions, transitions)
+    - phase_transition_rules (from, to, blocked, reason)
+  never_compile:
+    - heuristics
+    - debugging judgment
+    - troubleshooting strategy
+    - architectural tradeoffs
+    - domain intelligence
+    - anti-pattern reasoning
+    - failure analysis
+    - decision rationale
+    - contextual examples
+
+source_target_mapping:
+
+  - source: "workflow/*/execution-flow.md"
+    target: "runtime/generated/workflow-{domain}-phases.yaml"
+    extract:
+      - phase_definitions
+      - allowed_actions
+      - forbidden_actions
+      - blocking_gates
+    compile_rule: "從 execution-flow 的章節標題提取 phase 定義，從 gate 描述提取 blocking gates"
+
+  - source: "workflow/*/artifact-gates.md"
+    target: "runtime/generated/workflow-{domain}-artifacts.yaml"
+    extract:
+      - required_artifacts
+      - artifact_verification_criteria
+    compile_rule: "從 artifact gates 的檢查清單提取 required artifacts 與 verification criteria"
+
+  - source: "enforcement/dependency-reading.md"
+    target: "runtime/generated/transaction-machine.yaml"
+    extract:
+      - transaction_states
+      - transaction_rules
+    compile_rule: "從 writeback transaction 章節提取 state machine 定義"
+
+  - source: "enforcement/goal-action-validation.md"
+    target: "runtime/generated/goal-action-gates.yaml"
+    extract:
+      - validation_gates
+      - validation_criteria
+    compile_rule: "從 validation gate 描述提取 gate 定義"
+
+  - source: "enforcement/failure-learning-system.md"
+    target: "runtime/generated/failure-recovery.yaml"
+    extract:
+      - failure_patterns
+      - recovery_strategies
+    compile_rule: "從 failure taxonomy 與 recovery 描述提取 pattern 與 strategy"
+
+compilation_rules:
+
+  - id: compile.rule.deterministic_only
+    name: Deterministic Only
+    description: "只編譯 deterministic 內容，不編譯需要 judgment 的內容"
+    rule: "如果內容需要 human judgment 才能理解 → 不編譯。如果內容是機械式的 state/action/gate → 編譯。"
+    severity: critical
+
+  - id: compile.rule.header_required
+    name: Generated Header Required
+    description: "每個 generated YAML 必須包含檔頭標註來源"
+    rule: "檔頭包含 generated_from、generated_at、compiler_version、status（synced/stale/orphan）"
+    severity: high
+
+  - id: compile.rule.no_manual_edit
+    name: No Manual Edit
+    description: "generated YAML 不應手動編輯"
+    rule: "所有修改應在 prose source 進行，再透過 compiler 更新 generated YAML"
+    severity: high
+
+  - id: compile.rule.sync_on_commit
+    name: Sync on Commit
+    description: "commit 前必須確保 prose 與 generated YAML 一致"
+    rule: "pre-commit hook 檢查：如果 prose source 修改了，對應的 generated YAML 必須同步更新"
+    severity: critical
+
+  - id: compile.rule.idempotent
+    name: Idempotent Compilation
+    description: "相同 prose source 應產生相同 generated YAML"
+    rule: "compiler 應為 deterministic function：相同輸入 → 相同輸出"
+    severity: high
+
+  - id: compile.rule.backward_compatible
+    name: Backward Compatible
+    description: "compiler 升級不應破壞現有 generated YAML 格式"
+    rule: "新增欄位應為 optional，不應移除現有欄位"
+    severity: medium
+
+compiler_workflow:
+  description: "Compiler 的標準執行流程"
+  steps:
+    - step: 1
+      action: "SCAN_SOURCES"
+      description: "掃描所有 prose source 檔案"
+      command: "依 source_target_mapping 找出所有需要編譯的 source"
+    - step: 2
+      action: "CHECK_MODIFIED"
+      description: "檢查哪些 source 有修改"
+      command: "比對 git diff 或檔案修改時間"
+    - step: 3
+      action: "EXTRACT_STATE"
+      description: "從修改的 source 中提取 deterministic state"
+      command: "依 extract 欄位定義提取內容"
+    - step: 4
+      action: "GENERATE_YAML"
+      description: "產生對應的 YAML"
+      command: "依 compile_rule 轉換為 YAML 格式"
+    - step: 5
+      action: "UPDATE_HEADER"
+      description: "更新 generated YAML 檔頭"
+      command: "設定 generated_at、status=synced"
+    - step: 6
+      action: "VERIFY"
+      description: "驗證 generated YAML 格式"
+      command: "檢查 YAML 語法、必填欄位、reference 可解析"

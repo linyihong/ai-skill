@@ -17,6 +17,24 @@
 
 目標不是歸檔責任，而是把已觀察到的 failure 轉成有明確 trigger 與 validation method 的 reusable guardrail。
 
+### Recovery 參考
+
+當 failure 導致 phase transition 被 blocking gate 阻斷時，修復流程已由 runtime recovery 系統管理：
+
+- **Recovery Strategies**：[`runtime/recovery/recovery-strategies.yaml`](../runtime/recovery/recovery-strategies.yaml) — 6 種修復策略（phase_drift、obligation_missed、gate_blocked、transaction_incomplete、knowledge_stale、unknown_failure），每種策略包含 detection signal、repair steps、verify steps、escalation。
+- **State Repair**：[`runtime/recovery/state-repair.yaml`](../runtime/recovery/state-repair.yaml) — 5 種狀態修復程序（current_phase_corrupted、blocking_gates_stale、obligation_ledger_desync、phase_history_gap、allowed_actions_mismatch）。
+- **Obligation Rebuild**：[`runtime/recovery/obligation-rebuild.yaml`](../runtime/recovery/obligation-rebuild.yaml) — 3 種重建程序（full_rebuild、phase_partial、dependency_chain）。
+- **Phase Reconciliation**：[`runtime/recovery/phase-reconciliation.yaml`](../runtime/recovery/phase-reconciliation.yaml) — 4 種同步程序（forward_sync、backward_sync、gate_obligation_mismatch、full_state_reconciliation）。
+
+本節的 failure learning loop 專注於「將 failure 轉為 reusable prevention」（capture → classify → promote → strengthen → validate），而 runtime recovery 系統專注於「failure 發生後的即時修復與狀態恢復」。兩者互補：
+
+| 面向 | Failure Learning System | Runtime Recovery |
+|------|------------------------|------------------|
+| 目標 | 防止同類 failure 重演 | 修復目前 failure 造成的損害 |
+| 產出 | failure pattern、feedback lesson、validation scenario | recovery strategy、state repair procedure |
+| 時機 | failure 發生後（post-mortem） | failure 發生時（real-time） |
+| 範圍 | cross-session、cross-agent | 目前 session、目前 phase |
+
 ## Failure Taxonomy
 
 | Class | 意義 | 常見 prevention |

@@ -281,82 +281,28 @@ VS Code Extension 全域設定的通用查詢/修改方法見 [`intelligence/ide
 
 ## Roo Code 與對話目標閉環
 
-工具中立規則見 [`enforcement/conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md)。Roo Code 沒有像 Cursor 那樣的 hooks 機制，但可以透過以下方式實作對話目標閉環。
+工具中立規則見 [`enforcement/conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md)。Roo Code 沒有像 Cursor 那樣的 hooks 機制，但可以透過 `.roomodes` 的 `customInstructions` 加入 goal ledger 提醒。
 
-### 在 Custom Instructions 中加入 goal ledger 提醒
+**Goal ledger 操作流程已由 runtime 管理**，請參考：
+- [`runtime/phases/phase-machine.yaml`](../../runtime/phases/phase-machine.yaml) — checkpoint phase 的 obligation 定義
+- [`runtime/obligations/obligation-ledger.yaml`](../../runtime/obligations/obligation-ledger.yaml) — goal ledger 相關義務
+- [`scripts/agent-goals.sh`](../../scripts/agent-goals.sh) — goal ledger CLI helper
 
-在 `.roomodes` 的每個 mode 的 `customInstructions` 中，加入以下內容：
-
-```text
-開始工作前，若 `<PROJECT_ROOT>/.agent-goals/` 存在，先讀取確認是否有未完成的 active goal。
-若 goal 標示 `single-owner` 或 `non-parallelizable`，不要和其他 agent 分工同一流程；先取得使用者確認。
-完成目標後，若仍有長期 roadmap 或治理狀態，先回寫到 durable planning 文件，再刪除 active goal。
-```
-
-### 建議操作
-
-在 Roo Code 開始可中斷、可拆解或多目標工作時，或已看到 active project 有 modified / staged / untracked files、已建立 TodoWrite、使用者說「繼續」前一個多步驟任務時：
-
-1. 讀取 `<PROJECT_ROOT>/.agent-goals/`，確認是否已有 active / blocked / needs-validation goal，以及 priority、owner、lock、parallelization mode、plan/todo links、missing/decision/strengthen。若使用者說 agent 中斷、突然關閉、要從哪裡重做、剩下什麼或下一步是什麼，必須先讀 `.agent-goals/README.md` 與對應 active goal，再用 transcripts、terminal output、git status 交叉確認；不要把 transcript/git 當成第一真相來源。
-2. 若沒有 ledger 且任務不是單一回覆即可完成，使用本庫 helper 初始化；不要因為已有 TodoWrite 就跳過 goal ledger：
-
-   ```bash
-   <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> init
-   ```
-
-3. 建立或更新本輪主要目標：
-
-   ```bash
-   <AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> start \
-     --id P1-short-goal \
-     --title "Short goal title" \
-     --source "User request summary" \
-     --parallelization single-owner \
-     --next "Next concrete action" \
-     --criteria "Observable completion condition"
-   ```
-
-4. 若使用者轉移目標，先 `pause` 或 `update --status superseded` 舊 goal，再建立新的 `P1`。
-5. 若有 planning 文件或 TodoWrite todo，使用 `--plan` / `--todo` 連到 goal，並讓 `.agent-goals/README.md` 的主目標表可快速跳回該 goal。
-6. 若發現需要拆小目標，使用 `split` 或在 goal 檔的 `Subgoals` 區塊記錄；若發現不能分工或需單一 owner，使用 `--parallelization single-owner|non-parallelizable` 更新。
-7. 在回覆完成前，只有完成條件與驗證都成立時才 `complete --validated`；條件已成立時必須同輪刪除 goal 並刷新 `.agent-goals/README.md`，不要把 `completed` row 留在 active 表。若該 goal 完成後仍有長期 roadmap、phase、migration、promotion、deprecation 或治理狀態，先回寫到 durable planning 文件，再刪除 active goal。否則保留 goal，讓下一個 agent 可接手。
+Roo Code 專屬注意事項：
+- Roo Code 沒有 hooks 機制，需在 `.roomodes` 的 `customInstructions` 中手動加入 goal ledger 提醒
+- 多 mode 支援：每個 mode 可獨立設定 goal ledger 提醒
 
 ## Roo Code 與知識更新流程 Checkpoint
 
 工具中立規則見 [`governance/lifecycle/knowledge-update-flow.md`](../../governance/lifecycle/knowledge-update-flow.md)。Roo Code 沒有 hooks 機制，但可以透過 `.roomodes` 的 `customInstructions` 加入 checkpoint 提醒。
 
-### 在 Custom Instructions 中加入 checkpoint 提醒
+**Knowledge update flow 已由 runtime 管理**，請參考：
+- [`runtime/recovery/recovery-strategies.yaml`](../../runtime/recovery/recovery-strategies.yaml) — knowledge_stale 修復策略
+- [`runtime/transactions/transaction-machine.yaml`](../../runtime/transactions/transaction-machine.yaml) — writeback transaction 狀態機
 
-在 `.roomodes` 的每個 mode 的 `customInstructions` 中，在 goal ledger 提醒之後加入以下內容：
-
-```text
-## 知識更新流程 Checkpoint
-
-每輪工作結束前、切回長時間專案工作前、或使用者說「繼續」展開下一輪前，必須執行知識更新檢查：
-
-1. 讀取 [`<AI_SKILL_REPO>/governance/lifecycle/knowledge-update-flow.md`] 了解完整流程。
-2. 自問：本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？
-3. 若是，依 knowledge-update-flow.md 的 11 個步驟執行：
-   - Step 1-2：觸發檢查 + 分類知識類型
-   - Step 3：決定 Promotion Target（intelligence / workflow / analysis / shared-rules / runtime / memory）
-   - Step 4：寫入 feedback/history/<domain>/<category>/ lesson（寫入前依 sanitization.md 去敏）
-   - Step 5：更新目標層
-   - Step 6-7：選擇性執行 Intelligence Extraction 或 Failure Learning
-   - Step 8：執行 Linked Updates
-   - Step 9：更新 Runtime Surfaces
-   - Step 10：驗證（diff review、去敏檢查、link check）
-   - Step 11：Commit / Push / Readback（關閉 writeback transaction）
-4. 若否，簡短說明本輪只有 project-specific evidence 或尚未達可泛化標準。
-```
-
-### 與 Cursor 的差異
-
-| 特性 | Cursor | Roo Code |
-|------|--------|----------|
-| 自動提醒機制 | `.cursor/hooks.json`（sessionStart / preCompact / stop） | 無 hooks，需在 Custom Instructions 中手動提醒 |
-| Goal ledger 操作 | 可透過 hooks 自動檢查 | 需在每個 session 開始時手動讀取 |
-| 知識更新流程 Checkpoint | 可在 `.cursor/rules/*.mdc` 中加入，可選 hooks 輔助 | 需在 `.roomodes` Custom Instructions 中加入 |
-| 多 mode 支援 | 單一模式 | 多 modes，每個 mode 可獨立設定 checkpoint 提醒 |
+Roo Code 專屬注意事項：
+- 無 hooks 機制，需在 Custom Instructions 中手動提醒
+- 多 mode 支援：每個 mode 可獨立設定 checkpoint 提醒
 
 ## Roo Code 操作注意
 

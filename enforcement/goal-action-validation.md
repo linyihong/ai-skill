@@ -71,6 +71,19 @@
 - 若驗證失敗，應回到目標與執行重新修正，直到驗證通過、被明確標為 blocker，或被使用者決定 scope out。
 - 若 reusable guidance 更新被指出混入 project incident 或漏做 linked updates，不可只修文字；必須依 [`reusable-guidance-boundary.md`](reusable-guidance-boundary.md) 分析原因並補強規則層。
 
+### 驗證 Gate 參考
+
+本規則的「驗證」概念已升級為 declarative blocking gates，定義於 [`runtime/gates/blocking-gates.yaml`](../runtime/gates/blocking-gates.yaml)。每個 phase 都有對應的 blocking gates（critical/high/medium severity），定義了 phase transition 的必要條件。
+
+Agent 在執行驗證時應：
+
+1. 查詢目前 phase 的 blocking gates（`runtime/gates/blocking-gates.yaml`）
+2. 依 severity 順序通過各 gate（critical → high → medium）
+3. 若 gate 未通過 → 進入 recovery（`runtime/recovery/recovery-strategies.yaml`）
+4. 若所有 gate 通過 → 允許 phase transition
+
+本節的 prose 規則（目標/執行/驗證三欄）仍適用於工作單元的內部品質檢查，但 phase transition 的 blocking gate 檢查應以 blocking-gates.yaml 為 authoritative reference。
+
 ## 與其他規則的關係
 
 - 去敏與敏感資料處理依 [`sanitization.md`](sanitization.md)。

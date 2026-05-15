@@ -1050,3 +1050,59 @@ records:
       profile: small
       compression_level: summary-first
       reason: anti-patterns/ 在需要查詢 runtime 失效模式或預防方式時才讀取。
+
+  # ── P2 Routes ──
+
+  - id: route.runtime.compiler
+    task_intent: 編譯 prose workflow/enforcement 文件為 machine-readable YAML
+    primary_source: runtime/compiler/compiler-rules.yaml
+    required_dependencies:
+      - runtime/phases/phase-machine.yaml
+      - runtime/transactions/transaction-machine.yaml
+    candidate_sources:
+      - runtime/compiler/compiler-engine.rb
+      - runtime/compiler/README.md
+      - runtime/generated/README.md
+    source_of_truth_gate: runtime-compiler-active
+    ranking_reason: Runtime Compiler 定義 deterministic-only 編譯範圍（current_phase、allowed_actions、blocking_gates 等 8 種）、5 條 source-target mappings、6 條編譯規則。Compiler engine（Ruby CLI）支援 --check、--diff 模式。Generated YAML 含 header（generated_from、generated_at、compiler_version、status）。
+    validation_signal: 所有 modified sources 已編譯，generated YAML header status 為 synced，compiler --check 回傳 exit 0。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 600
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Compiler 在 workflow/enforcement 文件變更後才需要執行，不佔用 bootstrap 預算。
+
+  - id: route.runtime.intelligence-routing
+    task_intent: 根據 phase + task intent 路由到 intelligence/ 層的領域知識
+    primary_source: runtime/intelligence/intelligence-routing.yaml
+    required_dependencies:
+      - runtime/phases/phase-machine.yaml
+    candidate_sources:
+      - runtime/intelligence/README.md
+      - intelligence/README.md
+    source_of_truth_gate: runtime-intelligence-routing-active
+    ranking_reason: Intelligence Routing 定義 11 個 domain 的 routing rules（analytical_reasoning、agent_architecture、development、heuristics、anti-patterns、tradeoffs、distributed_systems、domain、failure、travel、business、IDE），每個 domain 有 applicable_phases、task_intent_patterns、load_strategy。Fallback 到 intelligence/README.md 全文搜尋。
+    validation_signal: Task intent 已對應到 intelligence-routing.yaml 的 domain，applicable_phases 已檢查，domain README 已載入。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: index-only
+      reason: Intelligence routing 在需要領域知識時才載入，不佔用 bootstrap 預算。
