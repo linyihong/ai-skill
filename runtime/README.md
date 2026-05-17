@@ -6,6 +6,7 @@
 
 - [`routing/`](routing/README.md)：定義 task intent → knowledge index → metadata → source-of-truth gate 的 context loading 流程。
 - [`onboarding/`](onboarding/README.md)：新專案或新任務的初始設定指引、開場提示詞模板、完成門檻定義。
+- [`discovery/`](discovery/README.md)：能力探索機制，解決 Capability Discovery Problem，在每個 phase 的關鍵時機主動搜尋 agent 可能不知道的能力。
 
 ## 放什麼
 
@@ -37,7 +38,9 @@
 - [`route.models.model-aware-routing`](../knowledge/runtime/routing-registry.yaml:319) — candidate_sources 引用 `knowledge/runtime/README.md`
 - [`route.runtime.router-flow`](../knowledge/runtime/routing-registry.yaml:348) — candidate_sources 引用 `knowledge/runtime/README.md`
 - [`route.runtime.context-ttl-doc`](../knowledge/runtime/routing-registry.yaml:407) — candidate_sources 引用 `knowledge/runtime/README.md`
-- 共 7 條 routing records 間接引用 `runtime/` 子目錄（透過 `knowledge/runtime/README.md`）
+- [`gate.checkpoint.capability_discovery_completed`](gates/blocking-gates.yaml) — checkpoint phase 的 blocking gate，引用 `runtime/discovery/`
+- [`obligation.checkpoint.run_capability_discovery`](obligations/obligation-ledger.yaml) — checkpoint phase 的 obligation，引用 `runtime/discovery/`
+- 共 9 條 inbound references（7 條 routing records + 2 條 runtime 內部引用）
 
 ## 與既有層的關係
 

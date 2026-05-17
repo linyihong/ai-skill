@@ -76,6 +76,26 @@ obligations:
     linked_gates:
       - gate.checkpoint.system_upgrade_governance_checked
 
+  - id: obligation.checkpoint.run_capability_discovery
+    phase: phase.checkpoint
+    name: Run Capability Discovery
+    description: >
+      執行能力探索檢查點。讀取 runtime/discovery/capability-checkpoints.yaml，
+      根據本輪任務意圖搜尋可能不知道的工作流程、intelligence atoms、
+      驗證規則與治理規則。使用 knowledge indexes、graphs 與 routing registry
+      作為搜尋來源。此 obligation 解決 Capability Discovery Problem：
+      lazy loading 本身不會產生探索意識，agent 需要主動搜尋未知能力。
+    verification:
+      - "capability_discovery_completed == true"
+      - "discovery_targets_searched == true"
+      - "if_relevant_workflow_found: workflow_loaded == true"
+      - "if_relevant_intelligence_found: intelligence_loaded == true"
+    severity: medium
+    depends_on:
+      - obligation.checkpoint.check_system_upgrade_governance
+    linked_gates:
+      - gate.checkpoint.capability_discovery_completed
+
   # ── Execution Phase ──
   - id: obligation.execution.log_actions
     phase: phase.execution

@@ -37,8 +37,26 @@ edges:
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.governance.layers record。
     validation: registry record 的 primary_source 指向 governance/README.md。
+  - type: depends_on
+    target: governance/lifecycle/system-upgrade-governance.md
+    reason: >
+      系統升級治理要則定義大型系統升級的條件、檢查清單與強制規則。
+      所有 governance 層的升級都必須遵循此要則。
+    validation: system-upgrade-governance.md 的 §1 定義 5 種升級條件、§2 定義 8 類檢查清單。
+  - type: related_to
+    target: runtime/generated/system-upgrade-governance.yaml
+    reason: >
+      System upgrade governance 的 generated YAML surface，由 compiler 從 prose 編譯。
+      提供快速路徑給 agent 讀取升級治理定義。
+    validation: generated YAML 包含 upgrade_conditions、checklist_categories、forced_rules。
+  - type: related_to
+    target: runtime/discovery/capability-checkpoints.yaml
+    reason: >
+      Capability discovery checkpoints 使用 governance graphs 作為搜尋索引，
+      在 checkpoint phase 搜尋與任務相關的治理規則。
+    validation: capability-checkpoints.yaml 的 checkpoint phase discovery_targets 包含 governance 類型。
 metadata:
   priority: P1
   confidence: medium
   compatibility_state: new-layer-promoted
-  last_checked: 2026-05-12
+  last_checked: 2026-05-17

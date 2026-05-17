@@ -96,6 +96,21 @@ gates:
     failure_action: warn + continue
     failure_message: "警告：系統升級治理檢查未完成，如有進行中的大型升級請確認檢查清單"
 
+  - id: gate.checkpoint.capability_discovery_completed
+    phase: phase.checkpoint
+    name: Capability Discovery Completed
+    description: >
+      能力探索檢查已完成。Agent 已根據 runtime/discovery/capability-checkpoints.yaml
+      搜尋與本輪任務相關的工作流程、intelligence atoms、驗證規則與治理規則。
+      此 gate 為 medium severity，未通過時記錄警告但不 block transition。
+    severity: medium
+    check:
+      type: file_read
+      target: runtime/discovery/capability-checkpoints.yaml
+      verification: "capability_discovery_completed == true AND discovery_targets_searched == true"
+    failure_action: warn + continue
+    failure_message: "警告：能力探索檢查未完成，建議在 checkpoint 階段執行 discovery 以發現可能不知道的能力"
+
   # ── Execution Gates ──
   - id: gate.execution.goal_defined
     phase: phase.execution
