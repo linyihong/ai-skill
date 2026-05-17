@@ -12,53 +12,6 @@ description: >
   domains/dependencies/conflicts 做 dynamic loading 與 conflict detection。
 
 skills:
-  - id: app-development-guidance
-    name: App/API/Embedded Development Guidance
-    description: 將授權 App/API/Embedded/Firmware 觀察轉成開發 guidance、實作模式、控制項、檢查清單
-    weight: 0.8
-    domains:
-      - mobile-development
-      - api-design
-      - embedded-systems
-      - security-hardening
-    dependencies:
-      - enforcement/rule-weight.md
-      - enforcement/dependency-reading.md
-    conflicts: []
-    triggers:
-      - api
-      - backend
-      - architecture
-      - mobile
-      - security
-      - firmware
-      - embedded
-      - flutter
-      - react-native
-      - ios
-      - android
-      - kotlin
-      - swift
-      - typescript
-      - dart
-      - contract
-      - codegen
-      - signing
-      - session
-      - anti-tamper
-    cost:
-      estimated_tokens: 3500
-      context_load: medium
-    priority:
-      runtime: high
-    primary_entrypoint: workflow/software-delivery/execution-flow.md
-    entrypoint: workflow/software-delivery/execution-flow.md
-    summary: knowledge/summaries/development-guidance.md
-    related:
-      - workflow/software-delivery/README.md
-      - analysis/development-guidance/README.md
-      - intelligence/engineering/development/README.md
-
   - id: documentation-ai-native
     name: Agent-Friendly Documentation
     description: 跨專案撰寫可路由、index-first、可重用文件以降低 agent token，並用穩定分類維度整理 docs/wiki/README
@@ -292,8 +245,7 @@ skills:
       - technical-analysis
     dependencies:
       - enforcement/dependency-reading.md
-    conflicts:
-      - app-development-guidance  # 分析 vs 開發，不同目標
+    conflicts: []
     triggers:
       - analysis
       - reverse-engineering

@@ -435,7 +435,7 @@ def validate_directory_naming
   # Detect directory names that appear to be shortened versions of old skill names
   # rather than reflecting content essence. This is a heuristic check based on
   # known old skill names.
-  old_skill_names = %w[apk-analysis app-development-guidance travel-planning repo-analysis]
+  old_skill_names = %w[apk-analysis travel-planning repo-analysis]
   if eng_dir.exist?
     eng_dir.each_child do |domain_dir|
       next unless domain_dir.directory?

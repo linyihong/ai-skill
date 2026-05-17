@@ -4097,17 +4097,6 @@ module EmbeddedRuntimeData
             ],
             "final_score": 0.88
           },
-          {
-            "skill": "app-development-guidance",
-            "trigger_match": 0.1,
-            "domain_match": 0.0,
-            "weight": 0.8,
-            "raw_score": "0.1 × 0.5 + 0.0 × 0.3 + 0.8 × 0.2 = 0.21",
-            "penalties": [
-  
-            ],
-            "final_score": 0.21
-          }
         ]
       },
       {
@@ -4124,24 +4113,13 @@ module EmbeddedRuntimeData
         },
         "results": [
           {
-            "skill": "app-development-guidance",
-            "trigger_match": 0.6,
-            "domain_match": 1.0,
-            "weight": 0.8,
-            "raw_score": "0.6 × 0.5 + 1.0 × 0.3 + 0.8 × 0.2 = 0.76",
-            "penalties": [
-  
-            ],
-            "final_score": 0.76
-          },
-          {
             "skill": "apk-analysis",
             "trigger_match": 0.0,
             "domain_match": 0.0,
             "weight": 0.9,
             "raw_score": "0.0 × 0.5 + 0.0 × 0.3 + 0.9 × 0.2 = 0.18",
             "penalties": [
-  
+
             ],
             "final_score": 0.18
           }
@@ -4171,20 +4149,6 @@ module EmbeddedRuntimeData
             ],
             "final_score": 0.78
           },
-          {
-            "skill": "app-development-guidance",
-            "trigger_match": 0.4,
-            "domain_match": 0.0,
-            "weight": 0.8,
-            "raw_score": "0.4 × 0.5 + 0.0 × 0.3 + 0.8 × 0.2 = 0.36",
-            "penalties": [
-              {
-                "conflict": "apk-analysis",
-                "multiplier": 0.5
-              }
-            ],
-            "final_score": "0.36 × 0.5 = 0.18"
-          }
         ]
       }
     ],
@@ -4659,79 +4623,6 @@ module EmbeddedRuntimeData
         ]
       },
       {
-        "task_type": "app-development-guidance",
-        "name": "App Development Guidance Prompt Artifact",
-        "description": "App/API/Embedded 開發審查與指引的完整 prompt 結構。包含審查類型、 檢查清單、安全控制評估、工程智慧與輸出格式。\n",
-        "skill_id": "app-development-guidance",
-        "triggers": [
-          "api",
-          "backend",
-          "mobile",
-          "security",
-          "firmware",
-          "embedded",
-          "contract",
-          "codegen"
-        ],
-        "estimated_total_tokens": 5000,
-        "token_budget": {
-          "warning_at": 4000,
-          "hard_stop_at": 4500
-        },
-        "sections": [
-          {
-            "id": "task-context",
-            "description": "審查任務上下文。包含審查類型、範圍、目標與相關文件。\n",
-            "source": "inline",
-            "content": "## Task Context\n- Review Type: [design / code / release / security / contract-governance]\n- Scope: [feature / architecture / API change / full audit]\n- Target: [platform / language / framework]\n- Related Documents: [links to design docs / contracts / code]\n",
-            "estimated_tokens": 200,
-            "required": true
-          },
-          {
-            "id": "review-type-workflow",
-            "description": "對應審查類型的執行流程。引用 workflow/software-delivery/。\n",
-            "source": "workflow/software-delivery/",
-            "composition_rule": "workflow-steps",
-            "estimated_tokens": 1500,
-            "required": true
-          },
-          {
-            "id": "checklists",
-            "description": "審查檢查清單。原引用 skills/app-development-guidance/checklists/（已刪除）。\n",
-            "source": "workflow/software-delivery/review-checklist.md",
-            "estimated_tokens": 1200,
-            "required": true
-          },
-          {
-            "id": "controls",
-            "description": "安全控制評估標準。原引用 skills/app-development-guidance/controls/（已刪除）。\n",
-            "source": "metadata/development-guidance/controls-catalog.md",
-            "estimated_tokens": 1000,
-            "required": false,
-            "load_strategy": "on_condition",
-            "load_condition": "security_review == true"
-          },
-          {
-            "id": "intelligence-atoms",
-            "description": "開發相關的工程智慧 atoms。根據審查類型選擇性載入。\n",
-            "source": "intelligence/engineering/",
-            "composition_rule": "intelligence-atoms",
-            "estimated_tokens": 600,
-            "required": false,
-            "load_strategy": "on_condition",
-            "load_condition": "architecture_or_design_review == true"
-          },
-          {
-            "id": "output-format",
-            "description": "審查結果輸出格式。包含 verdict、findings、建議修復方式。\n",
-            "source": "inline",
-            "content": "## Output Format\n- Verdict: [approve / approve-with-comments / changes-requested / blocked]\n- Findings: [list of findings with risk level]\n- Recommended Fixes: [actionable suggestions per finding]\n- Open Questions: [unresolved items]\n",
-            "estimated_tokens": 300,
-            "required": true
-          }
-        ]
-      },
-      {
         "task_type": "repo-analysis",
         "name": "Repository Analysis Prompt Artifact",
         "description": "Repository 分析的完整 prompt 結構。包含分析類型、方法、工程智慧與輸出格式。\n",
@@ -5047,7 +4938,6 @@ module EmbeddedRuntimeData
           "method": "task_type_mapping",
           "mapping": {
             "apk-analysis": "workflow/apk-analysis/",
-            "app-development-guidance": "workflow/software-delivery/",
             "repo-analysis": "workflow/repo-analysis/",
             "travel-planning": "workflow/travel-planning/",
             "repo-governance": "governance/",
@@ -5085,21 +4975,6 @@ module EmbeddedRuntimeData
                 "reverse-engineering",
                 "flutter",
                 "mitm"
-              ]
-            },
-            "app-development-guidance": {
-              "primary_domain": "engineering",
-              "secondary_domains": [
-                "engineering/architecture",
-                "engineering/tradeoffs",
-                "engineering/anti-patterns",
-                "engineering/domain"
-              ],
-              "keywords": [
-                "architecture",
-                "api-design",
-                "security",
-                "mobile"
               ]
             },
             "repo-analysis": {
@@ -5171,8 +5046,7 @@ module EmbeddedRuntimeData
           "method": "task_type_mapping",
           "mapping": {
             "apk-analysis": "analysis/apk/",
-            "repo-analysis": "analysis/repo/",
-            "app-development-guidance": "analysis/repo/"
+            "repo-analysis": "analysis/repo/"
           },
           "fallback": "analysis/README.md"
         },
@@ -5197,7 +5071,6 @@ module EmbeddedRuntimeData
           "method": "skill_id_mapping",
           "mapping": {
             "apk-analysis": "knowledge/summaries/apk-analysis-pilot.md",
-            "app-development-guidance": "knowledge/summaries/development-guidance.md",
             "travel-planning": "knowledge/summaries/travel-planning.md",
             "repo-governance": "knowledge/summaries/repo-governance.md",
             "knowledge-navigation": "knowledge/summaries/knowledge-navigation.md",
