@@ -7,3 +7,9 @@ knowledge/runtime/sqlite/*.sqlite
 knowledge/runtime/sqlite/*.sqlite-*
 knowledge/runtime/sqlite/*.db
 knowledge/runtime/sqlite/*.db-*
+
+# Generated runtime databases; rebuilt by compiler-engine.rb from canonical sources.
+runtime/runtime.db
+runtime/runtime.db-*
+runtime/runtime-state.db
+runtime/runtime-state.db-*
