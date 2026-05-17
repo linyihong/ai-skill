@@ -44,7 +44,7 @@ governance_notes: 新增工具時需同步更新 ai-tools/ 目錄
 activation_conditions:
   when:
     - 建立或修改可重用文件
-    - 新增 skill 或 shared rule
+    - 新增 skill 或 enforcement rule
     - 審查文件是否工具中立
   load_strategy: lazy
   priority: P2

@@ -1,7 +1,7 @@
 ---
 header:
   generated_from: enforcement/goal-action-validation.md
-  generated_at: '2026-05-17T01:59:03Z'
+  generated_at: '2026-05-17T02:10:01Z'
   compiler_version: 1.0.0
   status: synced
 compiled_from: enforcement/goal-action-validation.md
@@ -19,7 +19,7 @@ scenarios:
   requirement: 說明計畫目標、依據、風險、完成後如何驗證。
 - scenario: 回答「是否需要改」
   requirement: 說明判斷目標、檢查了哪些文件/證據、為什麼足夠或不足。
-- scenario: 新增 feedback lesson 或 shared rule
+- scenario: 新增 feedback lesson 或 enforcement rule
   requirement: 說明要沉澱的目標、推廣到哪些文件、連動更新與驗證。
 - scenario: 使用者指出閉環不完整
   requirement: 說明漏掉的原因、已補強的 shared/skill 規則、連動更新清單，以及如何驗證不會再只修局部。
@@ -52,7 +52,7 @@ verification_examples:
   verification_method: 說明計畫目標、依據、風險、完成後如何驗證。
 - work_type: 回答「是否需要改」
   verification_method: 說明判斷目標、檢查了哪些文件/證據、為什麼足夠或不足。
-- work_type: 新增 feedback lesson 或 shared rule
+- work_type: 新增 feedback lesson 或 enforcement rule
   verification_method: 說明要沉澱的目標、推廣到哪些文件、連動更新與驗證。
 - work_type: 使用者指出閉環不完整
   verification_method: 說明漏掉的原因、已補強的 shared/skill 規則、連動更新清單，以及如何驗證不會再只修局部。

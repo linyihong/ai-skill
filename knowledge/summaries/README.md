@@ -1,6 +1,6 @@
 # Knowledge Summaries
 
-`knowledge/summaries/` 保存 Knowledge Atoms 與 source-of-truth 文件的 compact summaries。本層協助 agent 降低 context loading cost，但不取代舊 skills、shared rules 或 canonical source。
+`knowledge/summaries/` 保存 Knowledge Atoms 與 source-of-truth 文件的 compact summaries。本層協助 agent 降低 context loading cost，但不取代舊 skills、enforcement rules 或 canonical source。
 
 ## Summary 目的
 
@@ -15,7 +15,7 @@ Summaries 用來協助 agent：
 
 | Atom ID | Summary | Source path |
 | --- | --- | --- |
-| `root.bootstrap.ai-skill` | Root bootstrap 與 shared-rules 啟動入口。 | [`root-bootstrap.md`](root-bootstrap.md) |
+| `root.bootstrap.ai-skill` | Root bootstrap 與 enforcement 啟動入口。 | [`root-bootstrap.md`](root-bootstrap.md) |
 | `metadata.schema.knowledge-atom` | Knowledge Atom metadata schema v1。 | [`metadata-schema.md`](metadata-schema.md) |
 | `architecture.apk-analysis-pilot` | `apk-analysis` 分層 pilot migration map。 | [`apk-analysis-pilot.md`](apk-analysis-pilot.md) |
 | `intelligence.apk-highest-leverage-analysis` | APK 分析 highest-leverage route selection engineering intelligence。 | [`apk-highest-leverage-analysis.md`](apk-highest-leverage-analysis.md) |

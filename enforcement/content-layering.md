@@ -2,7 +2,7 @@
 
 | 內容 | 放哪裡 |
 | --- | --- |
-| Repo-level **架構方向、roadmap、遷移階段與移除條件** | **`architecture/`**；例如 [`../architecture/ai-native-knowledge-operating-system.md`](../architecture/ai-native-knowledge-operating-system.md)。這類文件不是 executable shared rule，不放 `enforcement/` 正文。 |
+| Repo-level **架構方向、roadmap、遷移階段與移除條件** | **`architecture/`**；例如 [`../architecture/ai-native-knowledge-operating-system.md`](../architecture/ai-native-knowledge-operating-system.md)。這類文件不是 executable enforcement rule，不放 `enforcement/` 正文。 |
 | **長期目標、phase、未完成能力、migration 狀態、promotion / deprecation 決策** | **Durable planning 文件**：repo-level 放 `architecture/` 或相關 layer README；知識生命週期放 `governance/`；routing / atom 方向放 `knowledge/`、`metadata/`；業務專案放正式 project docs / issue tracker。**不要**用 `.agent-goals/` 保存長期目標或 completed archive。 |
 | **本輪可中斷、需接手的 active conversation goal / implementation task** | **`<PROJECT_ROOT>/.agent-goals/`**；只追蹤目前對話的可恢復工作。完成驗證後刪除；若仍有長期方向，刪除前先回寫 durable planning 文件。 |
 | 全 skill **共用政策**（授權、去敏、路徑、feedback 原則） | **`enforcement/`** 各分類檔（本目錄） |
@@ -26,7 +26,7 @@
 
 ## 文件變大時
 
-若任何 skill、技巧分類、shared rule、模板或寫作規範開始變大，不要把所有內容繼續堆在同一個 Markdown 檔。依 [`../governance/document-sizing.md`](../governance/document-sizing.md) 拆成「資料夾 + `README.md` 目錄 + 多個子檔」，讓 agent 只讀與任務相關的子文件。
+若任何 skill、技巧分類、enforcement rule、模板或寫作規範開始變大，不要把所有內容繼續堆在同一個 Markdown 檔。依 [`../governance/document-sizing.md`](../governance/document-sizing.md) 拆成「資料夾 + `README.md` 目錄 + 多個子檔」，讓 agent 只讀與任務相關的子文件。
 
 ### 跨專案適用說明
 

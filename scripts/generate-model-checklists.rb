@@ -37,12 +37,12 @@ def profile_guardrails(profile)
     [
       "讀 primary source、required dependencies 與 task-relevant related sources。",
       "回報 deferred sources 與 validation signal。",
-      "涉及 writeback、promotion、shared rules 或 migration 時保持 source-backed。"
+      "涉及 writeback、promotion、enforcement rules 或 migration 時保持 source-backed。"
     ]
   when "specialized"
     [
       "先讀 routing registry 與 primary source，再讀 domain workflow / technique / adapter。",
-      "不得讓工具能力覆蓋 shared rules、authorization 或 source-of-truth。",
+      "不得讓工具能力覆蓋 enforcement rules、authorization 或 source-of-truth。",
       "保留 domain-specific validation 與 project evidence boundary。"
     ]
   else
@@ -99,7 +99,7 @@ def build_report
   lines << ""
   lines << "- Summary / registry 與 source-of-truth 可能不一致時，讀全文。"
   lines << "- 任務需要修改、commit、push、readback 或 promotion 時，升級到 `source-backed`。"
-  lines << "- 涉及 safety、secrets、authorization、source/mirror 或 destructive actions 時，升級到 full source 和 shared rules。"
+  lines << "- 涉及 safety、secrets、authorization、source/mirror 或 destructive actions 時，升級到 full source 和 enforcement rules。"
   lines << "- Routing registry 指向 candidate path，但 old entrypoint 仍 active 時，保留 old entrypoint gate。"
   lines << "- Validation signal 不足以支持結論時，停止並讀 required dependencies。"
   lines << ""

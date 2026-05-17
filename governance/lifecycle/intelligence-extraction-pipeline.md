@@ -410,7 +410,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 | 步驟 | 目標 | 執行時機 |
 |------|------|---------|
 | Step 6a | 建立 validation scenario（預防未來錯誤） | Extraction 完成後 |
-| Step 7a | 同步 shared-rules 路徑參考（修正既有規則） | 架構變更後 |
+| Step 7a | 同步 enforcement 路徑參考（修正既有規則） | 架構變更後 |
 | 兩者關係 | Step 6a 是「建立測試」，Step 7a 是「修正規則」，互補而非互斥 |
 
 ---
@@ -428,7 +428,7 @@ Extraction 完成後需要更新以下文件：
 | `knowledge/graphs/` | 加入新 graph edge（如需要） |
 | `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` | 更新 Phase 完成狀態 |
 
-### Step 7a：Shared-Rules 同步檢查（架構變更專用）
+### Step 7a：Enforcement 同步檢查（架構變更專用）
 
 當 extraction 涉及**架構重構**（目錄重組、分層新增、路徑變更、命名變更）時，除了更新上述索引，**必須**同步檢查 `enforcement/` 中的路徑參考是否過期。
 

@@ -37,7 +37,7 @@
 | 21 | **Promote lesson** | task_intent: promote-lesson, review-feedback | feedback-lessons | 升級或審閱 feedback 條目時啟動 |
 | 22 | **內容重組** | task_intent: content-organization | content-layering | 內容組織重構時需要分層規則 |
 | 23 | **多 README 修改** | file_change: `**/README.md` count>=3 | content-layering | 同時改 3+ 個 README 時檢查內容分層 |
-| 24 | **泛化為共用規則** | task_intent: promote-to-shared-rule | reusable-guidance-boundary | 將專案證據泛化為共用規則時需要邊界檢查 |
+| 24 | **泛化為共用規則** | task_intent: promote-to-enforcement-rule | reusable-guidance-boundary | 將專案證據泛化為共用規則時需要邊界檢查 |
 | 25 | **抽象化討論** | user_signal: 泛化, 可重用, reusable, 抽象化 | reusable-guidance-boundary | 使用者提及抽象化/可重用時啟動 |
 | 26 | **翻譯文件** | task_intent: translate | neutral-language | 翻譯時需要中性用語規範 |
 
@@ -51,7 +51,7 @@
 | Debug + 重複錯誤 | debug + user_signal: 錯誤 | failure-learning-system |
 | 寫文件 + 修改 enforcement | write-documentation + file_change enforcement/** | tool-neutral-documentation, neutral-language |
 | 安全分析 + 跨 skill | security-analysis + cross-skill | authorization-scope, cross-skill-references |
-| 寫 feedback + 泛化 | write-feedback + promote-to-shared-rule | sanitization, feedback-lessons, reusable-guidance-boundary |
+| 寫 feedback + 泛化 | write-feedback + promote-to-enforcement-rule | sanitization, feedback-lessons, reusable-guidance-boundary |
 
 ## 優先權參考
 

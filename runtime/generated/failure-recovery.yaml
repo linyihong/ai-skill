@@ -1,7 +1,7 @@
 ---
 header:
   generated_from: enforcement/failure-learning-system.md
-  generated_at: '2026-05-17T01:59:03Z'
+  generated_at: '2026-05-17T02:10:01Z'
   compiler_version: 1.0.0
   status: synced
 compiled_from: enforcement/failure-learning-system.md
@@ -91,12 +91,12 @@ storage_rules:
 - content_type: 單一 reusable document 有局部 open gap
   location: 該文件前段的 Document TODO
 - content_type: Cross-document 或 cross-agent workflow failure
-  location: "`enforcement/failure-patterns/` 加上相關 shared rule"
+  location: "`enforcement/failure-patterns/` 加上相關 enforcement rule"
 - content_type: Skill-specific repeated mistake
   location: 該 skill 的 `feedback_history/`，成熟後再推進 workflow/checklist
 - content_type: Tool-specific execution failure
   location: "`ai-tools/<tool>.md`、tool config 或 skill tool adapter"
-- content_type: "**架構重構後 shared-rules 未同步**"
+- content_type: "**架構重構後 enforcement 未同步**"
   location: "**`enforcement/failure-patterns/shared-rules-architecture-drift.md`**
     + 執行 `governance/lifecycle/intelligence-extraction-pipeline.md` Step 7a"
 - content_type: "**AI 系統面執行錯誤**（routing 錯誤、heuristic 誤用、forbidden route 被選中）"
@@ -159,12 +159,12 @@ promotion_decisions:
 - failure_scope: 單一 reusable document 有局部 open gap
   promotion_target: 該文件前段的 Document TODO
 - failure_scope: Cross-document 或 cross-agent workflow failure
-  promotion_target: "`enforcement/failure-patterns/` 加上相關 shared rule"
+  promotion_target: "`enforcement/failure-patterns/` 加上相關 enforcement rule"
 - failure_scope: Skill-specific repeated mistake
   promotion_target: 該 skill 的 `feedback_history/`，成熟後再推進 workflow/checklist
 - failure_scope: Tool-specific execution failure
   promotion_target: "`ai-tools/<tool>.md`、tool config 或 skill tool adapter"
-- failure_scope: "**架構重構後 shared-rules 未同步**"
+- failure_scope: "**架構重構後 enforcement 未同步**"
   promotion_target: "**`enforcement/failure-patterns/shared-rules-architecture-drift.md`**
     + 執行 `governance/lifecycle/intelligence-extraction-pipeline.md` Step 7a"
 - failure_scope: "**AI 系統面執行錯誤**（routing 錯誤、heuristic 誤用、forbidden route 被選中）"

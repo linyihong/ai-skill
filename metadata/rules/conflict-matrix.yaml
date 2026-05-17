@@ -84,7 +84,7 @@ conflicts:
     weight_a: P0
     weight_b: P2
     resolution: rule_a
-    rationale: "P0 safety/source-integrity 高於 P2 skill workflow。先套用 shared rule（去敏），再調整 skill workflow。"
+    rationale: "P0 safety/source-integrity 高於 P2 skill workflow。先套用 enforcement rule（去敏），再調整 skill workflow。"
     applies_conflict_rule: 1
     example_ref: 4
     source: enforcement/rule-weight.md#L48

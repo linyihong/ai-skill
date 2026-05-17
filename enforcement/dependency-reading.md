@@ -4,7 +4,7 @@
 
 ## 核心規則
 
-只要發現某個 skill、shared rule、tool-specific rule、模板或 feedback lesson 已更新、將被更新、或可能影響目前任務，agent 必須讀取它的相關依賴文件後才能下結論或繼續修改。
+只要發現某個 skill、enforcement rule、tool-specific rule、模板或 feedback lesson 已更新、將被更新、或可能影響目前任務，agent 必須讀取它的相關依賴文件後才能下結論或繼續修改。
 
 最低讀取範圍：
 
@@ -16,32 +16,32 @@
 | `enforcement/tool-neutral-documentation.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、根 `README.md`、`skills/README.md`、`skills/ADDING_SKILLS.md`、各 skill 入口/README、`skills/*/tool-adapters/` 索引、`ai-tools/README.md` 與受影響工具文件。 |
 | `enforcement/rule-weight.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`enforcement/decision-efficiency.md`、`enforcement/goal-action-validation.md`、工具專用 always-apply agent rule、`ai-tools/` bootstrap 清單。 |
 | `enforcement/decision-efficiency.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`governance/document-sizing.md`、相關 skill 的 workflow / tools / README（若該 skill 有決策路由或 context-loading 指引）。 |
-| `enforcement/failure-learning-system.md` 或 `enforcement/failure-patterns/` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/reusable-guidance-boundary.md`、`enforcement/feedback-lessons.md`、`enforcement/goal-action-validation.md`、`enforcement/dependency-reading.md`、相關 tool 文件與被補強的 shared rule / skill workflow。 |
+| `enforcement/failure-learning-system.md` 或 `enforcement/failure-patterns/` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/reusable-guidance-boundary.md`、`enforcement/feedback-lessons.md`、`enforcement/goal-action-validation.md`、`enforcement/dependency-reading.md`、相關 tool 文件與被補強的 enforcement rule / skill workflow。 |
 | 任一 `skills/<name>/tool-adapters/<tool>.md` | 該 skill 的 `SKILL.md`、`README.md`、核心 `WORKFLOW.md`/`TOOLS.md`、adapter index、`enforcement/tool-neutral-documentation.md`、`ai-tools/<tool>.md`（若存在）、`enforcement/linked-updates.md`。 |
 | `enforcement/document-todo-list.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/conversation-goal-ledger.md`、`skills/ADDING_SKILLS.md`、相關模板與 documentation/checklist 文件。 |
 | `enforcement/conversation-goal-ledger.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`scripts/README.md`、相關 goal helper script、`ai-tools/` 中受影響工具文件；若同時改 tool-specific hook/rule，讀對應 hook/rule 文件。 |
-| 任一工具專用規則檔 | 對應的 shared rule 正文、`enforcement/README.md`、受影響工具文件，以及受影響的 skill 入口。 |
+| 任一工具專用規則檔 | 對應的 enforcement rule 正文、`enforcement/README.md`、受影響工具文件，以及受影響的 skill 入口。 |
 | 任一 template | 模板目錄 `README.md`、引用該模板的 workflow/documentation/checklist、`enforcement/linked-updates.md`。 |
 | 任一 feedback lesson | 該分類 `README.md`、skill 的 `feedback_history/README.md`、`enforcement/feedback-lessons.md`，以及 promotion target。 |
 
 ## Agent 行為
 
-1. 先讀 `enforcement/README.md` 的 **Default Bootstrap**，並載入 bootstrap 表列出的最小必讀集合；再依任務讀相關 shared rule 全文。
+1. 先讀 `enforcement/README.md` 的 **Default Bootstrap**，並載入 bootstrap 表列出的最小必讀集合；再依任務讀相關 enforcement rule 全文。
 2. 若任務碰到 skill，讀該 skill 入口與依賴文件；不要只依賴 `description`、`SKILL.md` 單檔或單一段落。
 3. 若看到文件有 cross-link、promotion target、required linked updates、template reference、feedback index，或 reusable guidance / project incident 邊界，就循連結讀到任務所需的規則載入完成。
 4. 若依賴文件不存在，記錄為 `not applicable`；若存在但未讀，不可宣稱已完成檢查。
 5. 回覆或提交前，說明依賴讀取與連動更新的驗證方式。
-6. 完成 `git commit`、`git push` 與必要的 tool sync 後，必須重新讀取本次更新過的 skill/shared-rule 入口文件與主要依賴文件，確認目前 agent context 已載入最新版；不可只依賴提交前讀過的內容。Reference-only 策略不需要 tool sync。
+6. 完成 `git commit`、`git push` 與必要的 tool sync 後，必須重新讀取本次更新過的 skill/enforcement-rule 入口文件與主要依賴文件，確認目前 agent context 已載入最新版；不可只依賴提交前讀過的內容。Reference-only 策略不需要 tool sync。
 7. 最終回覆前必須執行 `git status --short --branch`。若 `Ai-skill` repo 仍有 modified/untracked/staged changes，或 branch 仍 ahead/behind remote，不得回覆「已完成」；必須先完成驗證、sync、commit、push、讀回，或明確說明被什麼阻塞。
 8. 若使用者未明確要求 push / merge，而更新後發現 `Ai-skill` 有尚未推送、尚未合併、ahead/behind、或其他 pending commit 狀態，最終回覆必須主動提醒使用者目前狀態與下一步（例如需要 push、pull/rebase、或處理既有 dirty changes），不可讓使用者以為規則已完全進入遠端主線。
 
 ### Dependency Read Ledger
 
-當使用者要求「重新讀 skill」、指出「shared rules / shared skill 是否漏讀」、或 agent 自己發現某個 skill/rule 已更新時，必須在繼續業務專案前建立一個簡短的 dependency read ledger（可在回覆、todo 或工作筆記中呈現），至少列：
+當使用者要求「重新讀 skill」、指出「enforcement rules / shared skill 是否漏讀」、或 agent 自己發現某個 skill/rule 已更新時，必須在繼續業務專案前建立一個簡短的 dependency read ledger（可在回覆、todo 或工作筆記中呈現），至少列：
 
 | 欄位 | 必填內容 |
 | --- | --- |
-| Trigger | 例如 `skills/<name>/SKILL.md changed`、user asked to reload skill、shared rule changed。 |
+| Trigger | 例如 `skills/<name>/SKILL.md changed`、user asked to reload skill、enforcement rule changed。 |
 | Required set | 依本檔「最低讀取範圍」列出應讀文件。 |
 | Read | 實際已讀文件。 |
 | Not applicable | 不存在的檔案，例如該 skill 沒有 `CHECKLIST.md`；必須明寫，不可假裝已讀。 |
@@ -186,20 +186,20 @@ state_based_enforcement:
 
 [`failure-learning-system.md`](failure-learning-system.md) 管的是「已發現失效模式如何變成可重用防呆規則」。當使用者指出 agent 反覆失誤、寫錯 source/mirror、漏讀依賴、漏做驗證、忘記 goal、混入專案細節或閉環不完整時：
 
-- 先依本檔與相關 shared rule 補救當前 close-loop。
+- 先依本檔與相關 enforcement rule 補救當前 close-loop。
 - 再用 `failure-learning-system.md` 分類失效模式、選擇 promotion target，必要時新增或更新 `enforcement/failure-patterns/`。
-- 若失效模式是 skill-specific，將 lesson 放到該 skill 的 `feedback_history/`；若是 cross-skill 或全庫行為，放到 `enforcement/failure-patterns/` 或對應 shared rule。
+- 若失效模式是 skill-specific，將 lesson 放到該 skill 的 `feedback_history/`；若是 cross-skill 或全庫行為，放到 `enforcement/failure-patterns/` 或對應 enforcement rule。
 - 不可把 project incident 的 raw evidence、私人路徑、host、token 或一次性細節寫進 failure pattern；先依 `reusable-guidance-boundary.md` 抽象化。
 
 ## Tool-Neutral Documentation Boundary
 
-[`tool-neutral-documentation.md`](tool-neutral-documentation.md) 要求可重用文件預設保持工具中立。新增或修改 shared rule、skill、template、README、lesson 時：
+[`tool-neutral-documentation.md`](tool-neutral-documentation.md) 要求可重用文件預設保持工具中立。新增或修改 enforcement rule、skill、template、README、lesson 時：
 
 - 先寫通用 agent/tool 行為，不把單一 IDE、CLI 或 agent 產品寫成預設需求。
 - 工具專屬路徑、hook、同步命令、UI 操作、reload 步驟，放在 `ai-tools/<tool>.md`、工具設定檔或工具專用腳本文件。
 - 若 generic rule 需要提同步，用「configured tool sync」等中立詞，再連到 `ai-tools/` 取得具體工具做法。
 - 若某 skill 需要工具差異，使用 Strategy-style adapter：核心 skill 保存通用契約與 workflow，`skills/<skill>/tool-adapters/<tool>.md` 只寫該工具執行差異並連回核心步驟。
-- Commit/push 後讀回時，也要確認沒有把工具專屬段落誤放進 root README、skill README、shared rule index 或 reusable lesson。
+- Commit/push 後讀回時，也要確認沒有把工具專屬段落誤放進 root README、skill README、enforcement rule index 或 reusable lesson。
 
 ## Document TODO List Boundary
 
@@ -218,7 +218,7 @@ state_based_enforcement:
 2. `git diff` 檢查將提交的內容，不得包含 secrets、raw tokens、私人 host、個資或本機絕對路徑。
 3. 執行適用的 lints / Markdown link check / required linked updates 檢查。
 4. 若本輪明確使用或更新本機工具 mirror / symlink / copy snapshot，執行對應 tool sync；reference-only 只需確認 `<AI_SKILL_REPO>` 可讀，不跑同步。
-5. 若有多個 owner group，優先使用 `./scripts/ai-skill-close-loop.sh --commit` 分組提交；若手動提交，仍需按 shared-rules、scripts、各 skill owner 分開提交，避免把不相干內容混成一包。
+5. 若有多個 owner group，優先使用 `./scripts/ai-skill-close-loop.sh --commit` 分組提交；若手動提交，仍需按 enforcement、scripts、各 skill owner 分開提交，避免把不相干內容混成一包。
 6. `git add` 相關檔案。
 7. `git commit`。
 8. `git push`。
@@ -233,9 +233,9 @@ state_based_enforcement:
 
 | 更新類型 | Commit / push 後必須重新讀取 |
 | --- | --- |
-| `enforcement/` | 更新過的 shared rule、`enforcement/README.md`、`enforcement/linked-updates.md`；若有工具專用規則，也讀對應工具規則檔。 |
+| `enforcement/` | 更新過的 enforcement rule、`enforcement/README.md`、`enforcement/linked-updates.md`；若有工具專用規則，也讀對應工具規則檔。 |
 | `skills/<name>/` | 該 skill 的 `SKILL.md`，以及本次更新過的 workflow / documentation / checklist / template / feedback index。 |
-| 工具專用規則 | 更新過的工具規則檔，以及對應的 shared rule 正文。 |
+| 工具專用規則 | 更新過的工具規則檔，以及對應的 enforcement rule 正文。 |
 | template 或 feedback lesson | 更新過的 template/lesson、索引 README、promotion target 或引用它的 workflow/documentation。 |
 
 讀回目的：

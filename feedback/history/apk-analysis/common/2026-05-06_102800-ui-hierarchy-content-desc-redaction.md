@@ -50,7 +50,7 @@ Before writing UI hierarchy findings:
 
 - The analysis uses screenshots, XML hierarchy, UIAutomator, OCR, or accessibility-node dumps.
 - Visible text can come from user-generated content, search results, comments, chat, or media cards.
-- Findings will be copied into project docs, reusable lessons, or shared rules.
+- Findings will be copied into project docs, reusable lessons, or enforcement rules.
 
 #### Does Not Apply When
 

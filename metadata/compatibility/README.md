@@ -1,6 +1,6 @@
 # Metadata Compatibility
 
-`metadata/compatibility/` 定義 migration 進行中時，新知識分層如何保留既有 skill、shared-rule、tool 與 script 行為。
+`metadata/compatibility/` 定義 migration 進行中時，新知識分層如何保留既有 skill、enforcement rule、tool 與 script 行為。
 
 ## 相容性欄位
 
@@ -9,7 +9,7 @@
 | 欄位 | 用途 |
 | --- | --- |
 | `source_path` | 仍具權威性的 canonical old source path。 |
-| `depends` | 必須先讀的 old entrypoints 或 shared rules。 |
+| `depends` | 必須先讀的 old entrypoints 或 enforcement rules。 |
 | `related` | Candidate new layer paths 或 supporting references。 |
 | `replaces` | 只有 promotion 或 deprecation approval 後才可填寫。 |
 | `conflicts` | 需要解決的潛在 rule 或 entrypoint conflicts。 |
@@ -42,7 +42,7 @@
 - 某工具仍只能載入 old skill path，且沒有 adapter。
 - 變更後尚未讀回 old entrypoint。
 - `knowledge/indexes/README.md` 只指向 candidate path，卻漏掉 active source。
-- Shared rule 指明 old source 是 canonical，且未同步更新規則。
+- Enforcement rule 指明 old source 是 canonical，且未同步更新規則。
 - Link check 或 close-loop validation 失敗。
 
 ## Reference-First 預設

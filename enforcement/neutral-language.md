@@ -1,6 +1,6 @@
 # 中性與低爭議文件用語
 
-本規則適用於本庫所有 shared rules、skills、templates、feedback lessons，以及由 skill 產出的可重用文件。目的不是隱瞞事實，而是避免文件因用詞過度刺激、帶有判斷、像是在規避平台審查、或含有可被誤判的高風險詞而降低 AI 檢索、摘要、審查與協作穩定性。
+本規則適用於本庫所有 enforcement rules、skills、templates、feedback lessons，以及由 skill 產出的可重用文件。目的不是隱瞞事實，而是避免文件因用詞過度刺激、帶有判斷、像是在規避平台審查、或含有可被誤判的高風險詞而降低 AI 檢索、摘要、審查與協作穩定性。
 
 ## 核心原則
 
@@ -43,7 +43,7 @@
 
 1. 原詞是重現、合約、UI 對照、法規或錯誤碼判讀所必需。
 2. 文件明確標示授權範圍與去敏狀態。
-3. 不會被複製到 reusable skill、shared rule、lesson、模板或公開範例。
+3. 不會被複製到 reusable skill、enforcement rule、lesson、模板或公開範例。
 4. 可用中性別名在索引、摘要與 cross-link 中引用。
 
 ## Agent 輸出要求

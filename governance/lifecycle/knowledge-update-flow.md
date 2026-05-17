@@ -38,7 +38,7 @@ Step 3a: 確認目標文件語言 ── 寫入前先檢查目標文件的語言
 Step 4: 寫入 Feedback Lesson ── 寫入 feedback/history/<domain>/
     │                           (feedback-lessons.md §模板)
     ▼
-Step 5: 更新目標層 ────────── 同步更新 intelligence / workflow / analysis / shared-rules / runtime
+Step 5: 更新目標層 ────────── 同步更新 intelligence / workflow / analysis / enforcement / runtime
     │                           (promotion/README.md §Promotion Checklist)
     ▼
 Step 6: 執行 Intelligence Extraction ─ 若需要提取 intelligence atoms
@@ -389,7 +389,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 | Cross-document 或 cross-agent | `enforcement/failure-patterns/` |
 | Skill-specific 重複錯誤 | `feedback/history/<domain>/` |
 | Tool-specific 執行錯誤 | `ai-tools/<tool>.md` |
-| 架構重構後 shared-rules 未同步 | `failure-patterns/shared-rules-architecture-drift.md` + Step 7a |
+| 架構重構後 enforcement 未同步 | `failure-patterns/enforcement-architecture-drift.md` + Step 7a |
 | AI 系統面執行錯誤 | `validation/scenarios/failure-derived/` |
 
 ---
@@ -409,7 +409,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 | `workflow/<domain>/` | 對應 `analysis/`、`intelligence/`、`runtime/onboarding/` |
 | `intelligence/<domain>/` | `knowledge/indexes/`、`knowledge/summaries/`、`knowledge/graphs/` |
 | `knowledge/` / `runtime/` | 執行 `refresh-knowledge-runtime.rb` |
-| 架構重構 | 建立 validation scenario + shared-rules 同步檢查（Step 6a + Step 7a） |
+| 架構重構 | 建立 validation scenario + enforcement 同步檢查（Step 6a + Step 7a） |
 
 > 完整表格請見 [`linked-updates.md`](../../enforcement/linked-updates.md) §常見連動關係
 
@@ -496,7 +496,7 @@ ruby scripts/validate-knowledge-runtime.rb
 □ Step 3:  決定 Promotion Target（feedback/promotion/README.md）
 □ Step 3a: 確認目標文件語言（language-policy.yaml）
 □ Step 4:  寫入 feedback/history/<domain>/<category>/  lesson
-□ Step 5:  更新目標層（workflow / intelligence / analysis / shared-rules / runtime）
+□ Step 5:  更新目標層（workflow / intelligence / analysis / enforcement / runtime）
 □ Step 6:  若需要，執行 Intelligence Extraction Pipeline
 □ Step 7:  若需要，執行 Failure Learning Loop
 □ Step 8:  執行 Linked Updates（linked-updates.md）

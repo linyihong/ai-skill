@@ -121,7 +121,7 @@ schema_version: enforcement-rule/v1
 type: rule
 layer: enforcement
 source_path: enforcement/rule-weight.md
-summary: 當 shared rules、skill workflow、tool adapter、使用者目標或效率規則看似衝突時，依安全/source/validation/user-goal/tool adapter/效率的權重排序處理。
+summary: 當 enforcement rules、skill workflow、tool adapter、使用者目標或效率規則看似衝突時，依安全/source/validation/user-goal/tool adapter/效率的權重排序處理。
 domains:
   - repo-governance
 tags:

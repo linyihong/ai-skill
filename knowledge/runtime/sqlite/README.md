@@ -45,7 +45,7 @@ SQLite records 至少保留：
 | --- | --- |
 | `id` | Stable lookup key。 |
 | `source_path` | 回到 canonical source。 |
-| `layer` | 對應 `knowledge`、`feedback`、`intelligence`、`skills`、`shared-rules` 等分層。 |
+| `layer` | 對應 `knowledge`、`feedback`、`intelligence`、`skills`、`enforcement` 等分層。 |
 | `type` | `rule`、`workflow`、`intelligence`、`index`、`schema`、`reference` 等。 |
 | `status` | `candidate`、`validated`、`stable`、`deprecated`。 |
 | `priority` / `confidence` / `context_cost` | 支援 runtime ranking。 |

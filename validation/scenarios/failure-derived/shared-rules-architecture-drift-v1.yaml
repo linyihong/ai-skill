@@ -1,4 +1,4 @@
-# Shared-Rules Architecture Drift Scenario
+# Enforcement Architecture Drift Scenario
 # 測試 AI 在架構重構後，是否同步檢查 enforcement/ 中的路徑參考
 # 來源 failure pattern:
 #   - enforcement/failure-patterns/shared-rules-architecture-drift.md
@@ -43,7 +43,7 @@ when:
 
 then:
   expected_route:
-    - check_shared_rules_for_old_paths
+    - check_enforcement_for_old_paths
     - classify_affected_reference_types
     - update_each_file_with_new_layer_paths
     - keep_old_paths_as_backward_compat
@@ -53,16 +53,16 @@ then:
     - check_if_validation_scenario_needed
 
   expected_heuristics:
-    - shared-rules-completeness
+    - enforcement-completeness
 
   forbidden_routes:
     - update_extracted_files_only
-    - skip_shared_rules_check
+    - skip_enforcement_check
     - delete_old_paths_without_backward_compat
     - skip_grep_verification
     - skip_failure_pattern_assessment
 
-  expected_final_route: full-architecture-restructure-with-shared-rules-sync
+  expected_final_route: full-architecture-restructure-with-enforcement-sync
 
   expected_intelligence:
     - enforcement/failure-patterns/shared-rules-architecture-drift.md

@@ -17,7 +17,7 @@ templates:
 
   - id: template.enforcement_rule_update
     name: Enforcement Rule Update
-    description: "修改 enforcement/ 下的 shared rule"
+    description: "修改 enforcement/ 下的 enforcement rule"
     applicable_scenarios:
       - "修改 dependency-reading.md"
       - "修改 goal-action-validation.md"

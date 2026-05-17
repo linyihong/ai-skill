@@ -171,7 +171,7 @@ priority: P2
 confidence: medium
 stability: evolving
 context_cost: low
-when_to_read: 當 agent 需要找到 task-relevant Ai-skill knowledge，但不應載入所有 skill 或 shared rule 時使用。
+when_to_read: 當 agent 需要找到 task-relevant Ai-skill knowledge，但不應載入所有 skill 或 enforcement rule 時使用。
 validation: Links 可解析、primary sources 仍為 canonical，且 roadmap status 符合目前 repository structure。
 complexity: low
 depends:
@@ -197,5 +197,5 @@ governance_notes: 新增 top-level layers、skills 或 canonical entrypoints 時
 - `source_path` 必須指向 canonical repository path，不可指向 local tool mirror。
 - `depends`、`related`、`conflicts`、`replaces` 有 atom ID 時優先使用 atom ID；migration 期間可使用 repository-relative path。
 - `summary`、`when_to_read`、`validation` 必須足夠具體，讓 agent 能判斷是否需要載入此 atom。
-- 不可用 metadata 覆蓋可執行 shared rules；若規則衝突，依 `enforcement/rule-weight.md`。
+- 不可用 metadata 覆蓋可執行 enforcement rules；若規則衝突，依 `enforcement/rule-weight.md`。
 - Atom 至少經過一次真實使用或 review，且有 validation evidence 後，才可標記為 `stable`。

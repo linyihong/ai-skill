@@ -23,4 +23,4 @@
 - 若 pattern 變成 skill-specific，把 lesson 移到該 skill 的 `feedback_history/`；只有 cross-skill trigger 仍有價值時，才從這裡連回。
 - 若 pattern 變長，拆出獨立 examples，不要膨脹索引。
 
-← [Back to shared rules index](../README.md)
+← [Back to enforcement index](../README.md)

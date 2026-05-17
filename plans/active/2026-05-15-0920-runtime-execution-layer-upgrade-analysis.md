@@ -459,7 +459,7 @@ Phase 8: Agent VM           ← 遠期目標
 | [`entrypoint-positioning-drift.md`](../enforcement/failure-patterns/entrypoint-positioning-drift.md) | Entrypoint 定位漂移 | **D (Gate Definitions)** | 可轉為 blocking gate |
 | [`failure-to-validator-closure.md`](../enforcement/failure-patterns/failure-to-validator-closure.md) | Failure 未轉為 validator | **D (Gate Definitions)** | 可轉為 blocking gate |
 | [`language-preference-drift.md`](../enforcement/failure-patterns/language-preference-drift.md) | 語言偏好漂移 | **G (Keep as prose)** | 純 failure 描述 |
-| [`shared-rules-architecture-drift.md`](../enforcement/failure-patterns/shared-rules-architecture-drift.md) | Shared rules 架構漂移 | **G (Keep as prose)** | 純 failure 描述 |
+| [`shared-rules-architecture-drift.md`](../enforcement/failure-patterns/shared-rules-architecture-drift.md) | Enforcement 架構漂移 | **G (Keep as prose)** | 純 failure 描述 |
 | [`skill-classification-boundary-confusion.md`](../enforcement/failure-patterns/skill-classification-boundary-confusion.md) | Skill 分類邊界混淆 | **G (Keep as prose)** | 純 failure 描述 |
 | [`skill-local-feedback-bypass.md`](../enforcement/failure-patterns/skill-local-feedback-bypass.md) | Skill local feedback 繞過 | **D (Gate Definitions)** | 可轉為 blocking gate |
 | [`source-mirror-write-drift.md`](../enforcement/failure-patterns/source-mirror-write-drift.md) | Source-mirror write 漂移 | **D (Gate Definitions)** | 可轉為 blocking gate |

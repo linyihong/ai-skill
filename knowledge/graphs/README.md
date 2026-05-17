@@ -1,6 +1,6 @@
 # Knowledge Graphs
 
-`knowledge/graphs/` 描述 Knowledge Atoms、source files、skills、shared rules 與 runtime routing surfaces 之間的關係。本目錄保存 graph record 格式與所有 atoms 的 graph records。
+`knowledge/graphs/` 描述 Knowledge Atoms、source files、skills、enforcement rules 與 runtime routing surfaces 之間的關係。本目錄保存 graph record 格式與所有 atoms 的 graph records。
 
 ## 目前 graph records
 

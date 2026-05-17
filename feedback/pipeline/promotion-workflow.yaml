@@ -47,7 +47,7 @@ workflow:
     output:
       - lesson_id: "lesson-id"
       - promotion_score: 0.0-1.0
-      - target_layer: "shared-rules | intelligence | workflow | skill-doc | none"
+      - target_layer: "enforcement | intelligence | workflow | skill-doc | none"
       - decision: "immediate_promotion | backlog | hold"
 
   - id: prepare-content
@@ -133,9 +133,9 @@ workflow:
       - id: update-knowledge-index
         action: update
         target: knowledge/indexes/README.md
-        description: 如果 promotion 到 shared-rules 或 intelligence，更新索引
+        description: 如果 promotion 到 enforcement 或 intelligence，更新索引
         estimated_tokens: 100
-        condition: "target_layer == 'shared-rules' OR target_layer == 'intelligence'"
+        condition: "target_layer == 'enforcement' OR target_layer == 'intelligence'"
       - id: update-summary
         action: update
         target: "knowledge/summaries/{skill-id}.md"

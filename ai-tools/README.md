@@ -46,17 +46,17 @@
 **不應放在工具配置或工具說明中的內容：**
 - Bootstrap 規則清單（由 `enforcement/README.md` 管理）
 - 情境路由表或架構層級表（由 `README.md` / `enforcement/README.md` 管理）
-- 任何已在 shared-rules 或 README.md 中的重複內容
+- 任何已在 enforcement 或 README.md 中的重複內容
 
 ---
 
 共用原則：**中央庫是真相來源**，工具端只做參照、symlink 或同步快照。
 
-通用 shared rules、skills、templates 與根 README 應保持工具中立；工具專屬路徑、hook、UI、reload、設定與同步命令放在本目錄對應工具文件中。
+通用 enforcement rules、skills、templates 與根 README 應保持工具中立；工具專屬路徑、hook、UI、reload、設定與同步命令放在本目錄對應工具文件中。
 
 Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating-system.md`](../architecture/ai-native-knowledge-operating-system.md)：reference-first 是預設，工具 mirror / bundle / copy snapshot 是相容層。
 
-若工具文件、skill workflow、使用者目標或 shared rules 看似衝突，依 [`enforcement/rule-weight.md`](../enforcement/rule-weight.md) 判斷權重；工具 adapter 不得覆蓋 safety、source-of-truth、validation 或最新使用者目標。
+若工具文件、skill workflow、使用者目標或 enforcement rules 看似衝突，依 [`enforcement/rule-weight.md`](../enforcement/rule-weight.md) 判斷權重；工具 adapter 不得覆蓋 safety、source-of-truth、validation 或最新使用者目標。
 
 若某個 skill 對某工具有必要的特殊執行策略，skill 內可用 `skills/<skill>/tool-adapters/<tool>.md` 記錄差異；本目錄仍只放該工具的全域設定、同步與操作方式。
 

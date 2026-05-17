@@ -27,7 +27,7 @@
 
 1. 保留原 `feedback/history/<domain>/` lesson；不要刪除或覆寫歷史。
 2. 檢查 lesson 是否只含 generalized rule、適用條件與 validation，不含 project incident raw evidence。
-3. 決定最小 durable target：skill workflow、intelligence、workflow、shared-rule、memory 或 runtime surface。
+3. 決定最小 durable target：skill workflow、intelligence、workflow、enforcement rule、memory 或 runtime surface。
 4. 若 promotion 變成 runtime route，更新 `knowledge/indexes/README.md`、`knowledge/runtime/routing-registry.yaml`、summary、graph 與 generated reports。
 5. 若 source lesson 或 old skill entrypoint 仍 active，在新 layer 明確標 `candidate` / `dual-reference` / `old-entrypoint-active`。
 6. 執行 lints、Markdown link check、generated runtime validation、close-loop dry run、commit、push、readback 與 clean status。

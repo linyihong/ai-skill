@@ -5,7 +5,7 @@ source_of_truth_policy: old-entrypoint-active
 description: >
   第二版 machine-readable routing registry。新增 context_cost metadata、
   load_strategy、ttl 與 skills-index 路由。此檔只描述 routing，不取代
-  shared-rules、skills 或其他 canonical source。Agent 仍需依 required_dependencies
+  enforcement、skills 或其他 canonical source。Agent 仍需依 required_dependencies
   讀取必要入口與驗證規則。
 refresh_policy: knowledge/runtime/refresh-policy.yaml
 
@@ -471,7 +471,7 @@ records:
     model:
       profile: large
       compression_level: source-backed
-      reason: Promotion / downgrade 會影響 shared rules、skill history、intelligence 與 runtime surfaces，需要讀 full source 與 validation gates。
+      reason: Promotion / downgrade 會影響 enforcement rules、skill history、intelligence 與 runtime surfaces，需要讀 full source 與 validation gates。
 
   - id: route.models.model-aware-routing
     task_intent: 建立或使用 model-aware routing / compression strategy

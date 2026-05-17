@@ -22,7 +22,7 @@
 - Atom metadata 欄位規格；放到 `metadata/`。
 - 工程智慧正文；放到 `intelligence/`。
 - Agent 執行流程；放到 `workflow/`。
-- 可執行 shared rules；放到 `enforcement/`。
+- 可執行 enforcement rules；放到 `enforcement/`。
 
 ## 誰會參考這裡（Inbound References）
 

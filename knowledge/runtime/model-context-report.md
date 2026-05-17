@@ -18,7 +18,7 @@
 | --- | --- | --- | --- |
 | `route.governance.durable-goal-boundary` | `enforcement/conversation-goal-ledger.md` | `source-backed` | Goal 刪除與 durable planning gate 會影響 long-term state，需讀 shared rule source。 |
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `source-backed` | 建立或修改 atom metadata 時需讀 schema 與子規則全文。 |
-| `route.feedback.promotion-pipeline` | `feedback/promotion/README.md` | `source-backed` | Promotion / downgrade 會影響 shared rules、skill history、intelligence 與 runtime surfaces，需要讀 full source 與 validation gates。 |
+| `route.feedback.promotion-pipeline` | `feedback/promotion/README.md` | `source-backed` | Promotion / downgrade 會影響 enforcement rules、skill history、intelligence 與 runtime surfaces，需要讀 full source 與 validation gates。 |
 | `route.models.model-aware-routing` | `models/profiles/README.md` | `source-backed` | 修改 model strategy 會影響 runtime routing，需讀 profiles、compression 與 routing source。 |
 
 ### `small`

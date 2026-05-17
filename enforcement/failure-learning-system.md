@@ -99,7 +99,7 @@ What check would have stopped the mistake?
 How to confirm the prevention worked?
 
 ## Linked Rules
-- <shared rule / skill / tool doc links>
+- <enforcement rule / skill / tool doc links>
 ```
 
 Pattern records 要短。若 pattern 變長，將 examples 拆成較小 pattern files，並讓 `failure-patterns/README.md` 保持索引功能。
@@ -112,10 +112,10 @@ Pattern records 要短。若 pattern 變長，將 examples 拆成較小 pattern 
 | --- | --- |
 | 只影響單一 active conversation | `.agent-goals/` progress 或 handoff note |
 | 單一 reusable document 有局部 open gap | 該文件前段的 Document TODO |
-| Cross-document 或 cross-agent workflow failure | `enforcement/failure-patterns/` 加上相關 shared rule |
+| Cross-document 或 cross-agent workflow failure | `enforcement/failure-patterns/` 加上相關 enforcement rule |
 | Skill-specific repeated mistake | 該 skill 的 `feedback_history/`，成熟後再推進 workflow/checklist |
 | Tool-specific execution failure | `ai-tools/<tool>.md`、tool config 或 skill tool adapter |
-| **架構重構後 shared-rules 未同步** | **`enforcement/failure-patterns/shared-rules-architecture-drift.md`** + 執行 `governance/lifecycle/intelligence-extraction-pipeline.md` Step 7a |
+| **架構重構後 enforcement 未同步** | **`enforcement/failure-patterns/shared-rules-architecture-drift.md`** + 執行 `governance/lifecycle/intelligence-extraction-pipeline.md` Step 7a |
 | **AI 系統面執行錯誤**（routing 錯誤、heuristic 誤用、forbidden route 被選中） | **`validation/scenarios/failure-derived/`** — 建立 stateless scenario，未來可自動驗證同類錯誤是否重演 |
 
 ### Failure → Validation Scenario 條件
@@ -227,4 +227,4 @@ state_based_enforcement:
     runtime_section: "state.verified → state.closed"
 ```
 
-← [Back to shared rules index](README.md)
+← [Back to enforcement index](README.md)

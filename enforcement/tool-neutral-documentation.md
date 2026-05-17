@@ -9,7 +9,7 @@
 1. 先描述可攜的行為、決策規則、workflow 或 artifact。
 2. 使用通用詞彙，例如 `agent`、`AI tool`、`tool-specific adapter`、`local tool mirror`、`project tool config` 與 `<PROJECT_ROOT>`。
 3. 除非規則確實只適用於單一工具，否則不要讓特定工具聽起來像必要條件。
-4. 工具行為不同時，使用 Strategy-style adapter：核心 skill/shared rule 保留共同契約，工具專屬執行差異獨立放置。
+4. 工具行為不同時，使用 Strategy-style adapter：核心 skill/enforcement rule 保留共同契約，工具專屬執行差異獨立放置。
 5. 工具層級設定放在對應的 `ai-tools/<tool>.md`。
 6. skill-specific 工具執行差異只在確實屬於該 skill 時，放入小型 skill-local adapter 文件。
 7. 使用者需要具體設定步驟時，從可重用文件連到 `ai-tools/` 或 skill-local adapter。
@@ -78,7 +78,7 @@ tools/
 - 工具專屬 failure modes 與 validation。
 - 連回它實作的核心 workflow 步驟。
 
-不要把完整核心 workflow 複製到每個 adapter。若 tool-specific adapter 需要重述共同行為，應把共同內容移回核心 skill/shared rule，再由 adapter 連回去。
+不要把完整核心 workflow 複製到每個 adapter。若 tool-specific adapter 需要重述共同行為，應把共同內容移回核心 skill/enforcement rule，再由 adapter 連回去。
 
 依 scope 選擇放置位置：
 
@@ -97,6 +97,6 @@ tools/
 - `.cursor/` 或 `~/.cursor/` 等工具專屬路徑是否只出現在 tool docs、tool config 或明確工具專屬 scripts？
 - Generic rule 是否先使用「configured tool sync」，並連到 `ai-tools/` 取得具體命令？
 - 如果 skill 需要 tool-specific 行為，是否隔離在 `tool-adapters/<tool>.md`，並連回核心 workflow？
-- 新增的 skill 或 shared rule 是否誤複製工具專屬設定章節，而不是連到工具文件？
+- 新增的 skill 或 enforcement rule 是否誤複製工具專屬設定章節，而不是連到工具文件？
 
-← [Back to shared rules index](README.md)
+← [Back to enforcement index](README.md)

@@ -1,6 +1,6 @@
 # Feedback
 
-`feedback/` 負責「系統如何持續演化」。本層保存 feedback replay、lesson extraction、refinement 與 promotion 的系統設計，讓一次性觀察能被驗證後推進到 workflow、intelligence、memory 或 shared rules。
+`feedback/` 負責「系統如何持續演化」。本層保存 feedback replay、lesson extraction、refinement 與 promotion 的系統設計，讓一次性觀察能被驗證後推進到 workflow、intelligence、memory 或 enforcement rules。
 
 ## 放什麼
 
@@ -13,7 +13,7 @@
 
 - 單一 lesson 正文；統一放在 `feedback/history/<domain>/`。
 - 全庫可執行 feedback lesson 檔名與模板規則；放到 `enforcement/feedback-lessons.md`。
-- Failure pattern 的可執行 prevention gate；放到 `enforcement/failure-patterns/` 或相關 shared rule。
+- Failure pattern 的可執行 prevention gate；放到 `enforcement/failure-patterns/` 或相關 enforcement rule。
 - 專案 raw evidence 或未去敏資料；留在業務專案。
 
 ## 與既有層的關係
@@ -31,7 +31,7 @@
 - [`replay/`](replay/README.md)：定義經驗重播的系統設計（從過往 session、failure 與成功經驗中提取可重複使用的教訓）。
 - [`extraction/`](extraction/README.md)：定義智慧抽取的系統設計（從 feedback lesson、replay 結果中提煉 intelligence atom）。
 - [`refinement/`](refinement/README.md)：定義流程精煉的系統設計（從實作經驗中持續改進 workflow）。
-- [`promotion/`](promotion/README.md)：定義 feedback lesson 如何從 history 推進到 workflow、intelligence、shared rules、memory 或 runtime surfaces。
+- [`promotion/`](promotion/README.md)：定義 feedback lesson 如何從 history 推進到 workflow、intelligence、enforcement rules、memory 或 runtime surfaces。
 
 ## 誰會參考這裡（Inbound References）
 

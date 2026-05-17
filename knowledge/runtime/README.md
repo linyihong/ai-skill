@@ -44,7 +44,7 @@ Runtime view 應回答：
 | --- | --- |
 | `task_intent` | Agent 正在嘗試完成的任務意圖。 |
 | `primary_source` | 第一個應讀的 canonical source。 |
-| `required_dependencies` | 必讀的 shared rules、skill entrypoints 或 metadata。 |
+| `required_dependencies` | 必讀的 enforcement rules、skill entrypoints 或 metadata。 |
 | `candidate_sources` | 可選的 maps、summaries 或 atoms。 |
 | `source_of_truth_gate` | 舊 entrypoint 是否仍勝過 candidate new-layer path。 |
 | `ranking_reason` | 為什麼此 source 排第一。 |

@@ -189,7 +189,7 @@ transaction_templates:
 
   - id: tx.template.skill_update
     name: Skill Update Transaction
-    description: "修改 skill 或 shared rule 時的標準 transaction"
+    description: "修改 skill 或 enforcement rule 時的標準 transaction"
     typical_steps:
       - "在 canonical repo 修改 source"
       - "記錄 touched paths"

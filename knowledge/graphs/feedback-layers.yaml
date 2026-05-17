@@ -3,7 +3,7 @@ source: feedback/README.md
 status: candidate
 summary: >
   連接 feedback 層的所有子目錄：extraction、refinement、replay、promotion、pipeline，
-  以及相關的 governance、shared-rules 層。feedback-promotion-pipeline 已有獨立 graph record。
+  以及相關的 governance、enforcement 層。feedback-promotion-pipeline 已有獨立 graph record。
 edges:
   - type: depends_on
     target: feedback/README.md
@@ -32,7 +32,7 @@ edges:
   - type: related_to
     target: knowledge/graphs/feedback-promotion-pipeline.yaml
     reason: Feedback promotion pipeline graph 已涵蓋 promotion 的核心關係。
-    validation: feedback-promotion-pipeline.yaml 的 edges 包含 shared-rules 與 governance。
+    validation: feedback-promotion-pipeline.yaml 的 edges 包含 enforcement 與 governance。
   - type: related_to
     target: enforcement/feedback-lessons.md
     reason: Feedback lessons 的格式、模板與索引規則。

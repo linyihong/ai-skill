@@ -310,4 +310,4 @@ Agents 必須透過 lock directories 協調：
 
 工具專屬處理見 `ai-tools/` 中對應文件。
 
-← [Back to shared rules index](README.md)
+← [Back to enforcement index](README.md)

@@ -119,7 +119,7 @@ If the user switches languages, follow their switch.
 
 使用 Claude 完成任務時，最後要求它回報：
 
-- 讀了哪些 shared rules 與 skill 依賴。
+- 讀了哪些 enforcement rules 與 skill 依賴。
 - 哪些依賴不存在（標示 `not applicable`）。
 - 目標是否完成，還有哪些 `.agent-goals` 未完成。
 - 驗證方法：diff review、link check、commit/push/readback/clean status。

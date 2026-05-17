@@ -42,7 +42,7 @@ task intent
 
 使用 `../../metadata/ranking/README.md` 決定讀取順序：
 
-1. Required shared rules 與 safety / source / validation gates。
+1. Required enforcement rules 與 safety / source / validation gates。
 2. 目前 source-of-truth entrypoint。
 3. Validated 或 stable atoms。
 4. Candidate maps 與 summaries。
@@ -56,7 +56,7 @@ task intent
 
 - `small` profile 優先使用 index、registry、summary、checklist，但不能跳過 required dependencies。
 - `large` profile 預設使用 source-backed loading，適合跨層規劃、規則更新、migration 與 close-loop 任務。
-- `specialized` profile 在 domain / tool / data format 任務中使用，但仍需遵守 shared-rule bootstrap 與 source-of-truth gate。
+- `specialized` profile 在 domain / tool / data format 任務中使用，但仍需遵守 enforcement bootstrap 與 source-of-truth gate。
 
 若任務要修改 canonical source、commit / push / readback、處理 conflict、promotion 或 deprecation，必須升級到 `source-backed` 或 `graph-assisted`。
 

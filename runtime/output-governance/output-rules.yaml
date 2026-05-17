@@ -228,7 +228,7 @@ sanitization:
       可以在專案私有文件或證據附件中保留最小必要原詞，但必須同時滿足：
       1. 原詞是重現、合約、UI 對照、法規或錯誤碼判讀所必需
       2. 文件明確標示授權範圍與去敏狀態
-      3. 不會被複製到 reusable skill、shared rule、lesson、模板或公開範例
+      3. 不會被複製到 reusable skill、enforcement rule、lesson、模板或公開範例
       4. 可用中性別名在索引、摘要與 cross-link 中引用
     applies_to:
       - project_private_documents

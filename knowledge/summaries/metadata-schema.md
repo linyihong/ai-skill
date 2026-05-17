@@ -7,7 +7,7 @@
 | Lifecycle | `validated` |
 | Summary | Knowledge Atom metadata schema v1，定義 atom 的必填欄位、選填欄位、受控值、YAML 範本與驗證規則。 |
 | When to read | 建立或評估 Knowledge Atom、summary、graph record、runtime registry record，或需要判斷 ranking / confidence / compatibility 欄位時。 |
-| Do not use for | 不可用 metadata 覆蓋可執行 shared rules；規則衝突仍依 `enforcement/rule-weight.md`。 |
+| Do not use for | 不可用 metadata 覆蓋可執行 enforcement rules；規則衝突仍依 `enforcement/rule-weight.md`。 |
 | Validation signal | Schema 欄位可套用到 routing registry 與第一批 summary atoms；Markdown links 可解析。 |
 | Last checked | 2026-05-11 |
 

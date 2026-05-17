@@ -1,6 +1,6 @@
 # 可重用規則與專案證據邊界
 
-本檔是 **Ai-skill repository 全庫鐵則**：任何 reusable skill、shared rule、template、feedback lesson、checklist 或 workflow，都只能沉澱**可重用原因、決策規則、驗證方法與適用邊界**。專案 incident 的具體證據留在專案文件、issue、runbook 或 integration notes，不進 reusable skill 正文。
+本檔是 **Ai-skill repository 全庫鐵則**：任何 reusable skill、enforcement rule、template、feedback lesson、checklist 或 workflow，都只能沉澱**可重用原因、決策規則、驗證方法與適用邊界**。專案 incident 的具體證據留在專案文件、issue、runbook 或 integration notes，不進 reusable skill 正文。
 
 ## 核心規則
 
@@ -18,7 +18,7 @@
 2. **規則強化**：把防止重犯的規則補到正確層級。若是全庫行為，放 `enforcement/`；若是單一 skill 行為，才放 skill 文件。
 3. **失效學習**：若該問題可能重複發生，依 [`failure-learning-system.md`](failure-learning-system.md) 分類失效模式，必要時新增或更新 `enforcement/failure-patterns/` 或對應 skill 的 `feedback_history/`。
 4. **連動更新**：依 [`linked-updates.md`](linked-updates.md) 同步 README、入口、checklist、templates、feedback index 或受影響 skill。
-5. **驗證**：搜尋 reusable docs 是否仍含專案特例；反查新規則是否可從 shared rule index 與相關 skill 入口找到。
+5. **驗證**：搜尋 reusable docs 是否仍含專案特例；反查新規則是否可從 enforcement index 與相關 skill 入口找到。
 
 ## 寫作檢查
 
@@ -28,7 +28,7 @@
 - 是否包含某個專案的 name/path/endpoint/class/sample/live result？
 - 是否把「這次看到的現象」誤寫成全域規則？
 - 是否只描述修正結果，卻沒有描述可重用原因與驗證方法？
-- 是否已把具體證據留在專案文件，而非 skill/shared rule？
+- 是否已把具體證據留在專案文件，而非 skill/enforcement rule？
 
 任一答案顯示內容仍綁定專案，就不要寫進 reusable skill；改寫成 generalized rule，並把具體證據移到專案文件。
 

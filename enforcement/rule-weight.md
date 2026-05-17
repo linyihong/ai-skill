@@ -16,7 +16,7 @@ Rule weight 不是看哪個檔案最近被讀到，而是看該規則控制的 u
 | P1 | 使用者最新明確要求與 active goal closure | 最新 user instruction、accepted plan、active `.agent-goals/` goal、completion criteria | 除非與 P0 衝突，否則驅動目前任務。被 redirect 時更新或暫停舊 goal。 |
 | P1 | Canonical repository writeback 與 validation gates | Dependency reading、linked updates、diff review、commit/push/readback、clean status | 宣稱 repository changes 完成前必須滿足。Tool reload 或 local sync 不能取代。 |
 | P2 | Cross-repo operating policy | Tool-neutral documentation、failure learning、goal/action/validation、document sizing（含 token 成本管理）、neutral language | 一致套用，但輸出長度可依任務調整。 |
-| P2 | Skill-specific workflow 與 checklists | `skills/<name>/SKILL.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、`CHECKLIST.md` | 在 shared operating rules 之後套用；除非 shared rule 明確 delegating，否則不可覆蓋 shared rules。 |
+| P2 | Skill-specific workflow 與 checklists | `skills/<name>/SKILL.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、`CHECKLIST.md` | 在 enforcement operating rules 之後套用；除非 enforcement rule 明確 delegating，否則不可覆蓋 enforcement rules。 |
 | P3 | Tool adapter 與 compatibility guidance | `ai-tools/`、`.cursor/rules/`、sync scripts、symlink/bundle/copy snapshot details | 只在 active tool 或 compatibility path 適用。不得重新定義 canonical source，也不得把 optional sync 變成 universal。 |
 | P3 | Efficiency 與 style preferences | Decision efficiency、output shape、formatting preferences、optional cleanup | 只在高權重要求滿足後最佳化。 |
 
@@ -45,7 +45,7 @@ Rule weight 不是看哪個檔案最近被讀到，而是看該規則控制的 u
 | 1 | Tool adapter 說要 sync local bundle，但目前 setup 是 reference-first。 | P1 canonical writeback 高於 P3 conditional compatibility。 | 不要預設跑 bundle sync。Commit/push/readback canonical repo，並標記 tool sync not applicable。 | [`conflict-001`](../metadata/rules/conflict-matrix.yaml#L56) |
 | 2 | Decision efficiency 建議少讀 context，但 `dependency-reading.md` 要求讀特定依賴。 | P1 validation gate 高於 P3 efficiency。 | 讀 required dependency，或標成 blocked/not applicable；不能為了速度跳過。 | [`conflict-002`](../metadata/rules/conflict-matrix.yaml#L67) |
 | 3 | 舊 `.agent-goals/` entry 指向舊工作，但最新 user message 重新導向任務。 | P1 latest user request 高於 stale goal context。 | 更新、暫停或完成舊 goal，並跟隨最新要求。 | [`conflict-003`](../metadata/rules/conflict-matrix.yaml#L78) |
-| 4 | Skill workflow 建議 shortcut，但 shared rules 要求 sanitization 或 source/mirror checks。 | P0 safety/source integrity 高於 P2 skill workflow。 | 先套用 shared rule，再調整 skill workflow。 | [`conflict-004`](../metadata/rules/conflict-matrix.yaml#L89) |
+| 4 | Skill workflow 建議 shortcut，但 enforcement rules 要求 sanitization 或 source/mirror checks。 | P0 safety/source integrity 高於 P2 skill workflow。 | 先套用 enforcement rule，再調整 skill workflow。 | [`conflict-004`](../metadata/rules/conflict-matrix.yaml#L89) |
 | 5 | 使用者要求 destructive git action，但 repository rules 要求 explicit confirmation。 | P0 destructive-action safety 在確認前高於 P1 user goal。 | 先明確詢問確認並說明風險。 | [`conflict-005`](../metadata/rules/conflict-matrix.yaml#L100) |
 | 6 | Compatibility script 可執行，但沒有 active workflow 依賴 native scan 或 local mirrors。 | P3 compatibility 保持條件式。 | 不使用 script；記錄 reference-first 已足夠。 | [`conflict-006`](../metadata/rules/conflict-matrix.yaml#L111) |
 | 7 | 文件超過 300 行且混合多主題，但 agent 為了省事不想拆分。 | P2 document sizing 高於 P3 efficiency。 | 必須拆分，並更新索引和連結。拆分本身是 P2，但拆分後的連動更新是 P1。 | [`conflict-007`](../metadata/rules/conflict-matrix.yaml#L122) |

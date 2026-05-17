@@ -32,7 +32,7 @@ edges:
   - type: related_to
     target: knowledge/summaries/metadata-schema.md
     reason: Summary 提供 metadata schema 的低成本 routing preview。
-    validation: summary 指向 canonical metadata/schema.md，且標明不可覆蓋 shared rules。
+    validation: summary 指向 canonical metadata/schema.md，且標明不可覆蓋 enforcement rules。
 metadata:
   priority: P2
   confidence: high

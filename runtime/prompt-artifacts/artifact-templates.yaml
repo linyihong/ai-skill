@@ -501,7 +501,7 @@ templates:
           ## Task Context
           - Operation: [create-lesson / promote / extract / refine / replay]
           - Lesson Source: [feedback_history / failure-patterns / conversation]
-          - Target Layer: [intelligence / workflow / analysis / shared-rules]
+          - Target Layer: [intelligence / workflow / analysis / enforcement]
         estimated_tokens: 200
         required: true
 

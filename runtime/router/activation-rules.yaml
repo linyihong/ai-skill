@@ -113,7 +113,7 @@ rules:
             - write-documentation
             - create-template
             - update-readme
-            - create-shared-rule
+            - create-enforcement-rule
         - type: file_change
           pattern: "enforcement/**"
         - type: file_change
@@ -283,7 +283,7 @@ rules:
           matches:
             - write-feedback
             - create-lesson
-            - promote-to-shared-rule
+            - promote-to-enforcement-rule
         - type: user_signal
           matches:
             - 泛化

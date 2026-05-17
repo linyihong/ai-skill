@@ -6,7 +6,7 @@
 
 目前 feedback_history 已有大量 lesson（僅 `apk-analysis` 就有 **86 條**，跨 6 個分類），但：
 
-1. **無自動 promotion** — lesson 寫完就留在 feedback_history，不會自動推進到 workflow/intelligence/shared-rules。
+1. **無自動 promotion** — lesson 寫完就留在 feedback_history，不會自動推進到 workflow/intelligence/enforcement。
 2. **無優先級** — 86 條 lesson 中，哪些該先 promote、哪些該 archive，沒有機器可讀的判斷。
 3. **無生命週期** — lesson 不會自動過期、降級或歸檔，冷資料持續累積。
 4. **無 scoring** — 無法量化 lesson 的品質、適用性與 promotion 急迫性。

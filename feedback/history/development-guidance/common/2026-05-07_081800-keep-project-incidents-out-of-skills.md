@@ -1,4 +1,4 @@
-> Follow [shared rules](../../../../enforcement/README.md), [feedback lessons](../../../../enforcement/feedback-lessons.md), and [goal/action/validation](../../../../enforcement/goal-action-validation.md). This lesson is generalized and avoids project-specific details.
+> Follow [enforcement rules](../../../../enforcement/README.md), [feedback lessons](../../../../enforcement/feedback-lessons.md), and [goal/action/validation](../../../../enforcement/goal-action-validation.md). This lesson is generalized and avoids project-specific details.
 # Extracted — See [`enforcement/reusable-guidance-boundary.md`](../../../../enforcement/reusable-guidance-boundary.md)
 
 ### 2026-05-07 - Keep Project Incidents Out Of Skills

@@ -1,6 +1,6 @@
 # Runtime
 
-`runtime/` 負責「AI 系統如何運作」。本層保存 dynamic loading、context routing、context pruning、agent coordination 與 orchestration 的設計，不取代可執行 shared rules。
+`runtime/` 負責「AI 系統如何運作」。本層保存 dynamic loading、context routing、context pruning、agent coordination 與 orchestration 的設計，不取代可執行 enforcement rules。
 
 ## 目前入口
 

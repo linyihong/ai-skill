@@ -1,6 +1,6 @@
 # Knowledge Validation Gates
 
-`governance/validation/` 定義新 AI-native 分層變更的 validation gates。它補充 `enforcement/` 的可執行規則，但不取代 shared rules。
+`governance/validation/` 定義新 AI-native 分層變更的 validation gates。它補充 `enforcement/` 的可執行規則，但不取代 enforcement rules。
 
 **治理與 enforcement 的分工（語言為例）：**可重用文件的語言一致性、低爭議用語等，在概念上屬於知識治理；**可執行條文**寫在 [`enforcement/neutral-language.md`](../../enforcement/neutral-language.md)，本目錄則以 **Neutral language** gate 規定「何時必須依該檔自檢」，把治理目標落實到 PR 閉環。
 
@@ -100,7 +100,7 @@ Validation:
 - 若 generated summary / graph / registry 可能 stale，必須 refresh、revalidate 或 downgrade confidence；不可假裝仍 current。
 - 若變更是 reference-only 且未使用 tool mirror，tool sync 不適用。
 
-## 與 Shared Rules 的關係
+## 與 Enforcement Rules 的關係
 
 - Dependency reading、canonical writeback、commit / push / readback 與 clean status 仍由 `enforcement/dependency-reading.md` 管理。
 - Linked update requirements 仍由 `enforcement/linked-updates.md` 管理。

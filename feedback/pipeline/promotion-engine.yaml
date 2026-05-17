@@ -165,7 +165,7 @@ scoring:
 # └─────────────────────────────────────────────────────────────┘
 
 target_decisions:
-  - id: promote_to_shared_rules
+  - id: promote_to_enforcement_rules
     condition: "final_score >= 0.8 AND cross_skill == true AND maturity_score >= 0.8"
     target: "enforcement/{rule-name}.md"
     description: >
