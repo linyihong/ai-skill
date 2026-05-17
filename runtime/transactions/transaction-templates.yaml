@@ -151,8 +151,8 @@ templates:
         command: "編輯 workflow/ 下對應檔案"
       - step: 3
         action: "CHECK_GENERATED_SURFACES"
-        description: "檢查是否有對應的 generated YAML 需要更新"
-        command: "檢查 runtime/generated/ 下是否有對應的 compiled YAML"
+        description: "檢查是否有對應的 generated surface（runtime.db）需要更新"
+        command: "查詢 runtime.db 確認對應的 generated_surfaces 記錄是否存在"
       - step: 4
         action: "UPDATE_GENERATED_YAML"
         description: "更新 generated YAML（如存在）"

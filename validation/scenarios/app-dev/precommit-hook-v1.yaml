@@ -21,7 +21,7 @@ given:
     - scripts/install-hooks.sh
   signals:
     - workflow/software-delivery/execution-flow.md 被修改（新增或修改 gate 描述）
-    - runtime/generated/workflow-software-delivery-phases.yaml 未同步更新
+    - runtime.db 的 generated_surfaces 表未同步更新（對應 workflow_phases 記錄）
     - git add 已將 execution-flow.md 加入 staging
     - git commit 被執行
     - SKIP_COMPILER_CHECK 環境變數未設定

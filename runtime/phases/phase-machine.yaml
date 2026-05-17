@@ -51,7 +51,7 @@ phases:
     description: >
       每輪工作開始前的檢查點。確認目前 state、讀取 obligation ledger、
       檢查 blocking gates、執行知識更新檢查（快速路徑：
-      runtime/generated/knowledge-update-phases.yaml）、決定本輪要做什麼。
+      查詢 runtime.db generated_surfaces 表）、決定本輪要做什麼。
     entry_conditions:
       - bootstrap_complete: true
       - OR:

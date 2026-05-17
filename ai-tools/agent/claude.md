@@ -59,10 +59,10 @@ Claude Code 專屬注意事項：
 
 ## Claude Code 與知識更新流程 Checkpoint
 
-工具中立規則見 [`governance/lifecycle/knowledge-update-flow.md`](../../governance/lifecycle/knowledge-update-flow.md)。**快速路徑**請優先使用 generated YAML：[`runtime/generated/knowledge-update-phases.yaml`](../../runtime/generated/knowledge-update-phases.yaml)。Claude Code 是 CLI 工具，沒有 hooks 機制，但可以透過 `CLAUDE.md` 中的 Custom Instructions 加入 checkpoint 提醒。
+工具中立規則見 [`governance/lifecycle/knowledge-update-flow.md`](../../governance/lifecycle/knowledge-update-flow.md)。**快速路徑**請優先查詢 runtime.db：[`runtime/runtime.db`](../../runtime/runtime.db)（`generated_surfaces` 表）。Claude Code 是 CLI 工具，沒有 hooks 機制，但可以透過 `CLAUDE.md` 中的 Custom Instructions 加入 checkpoint 提醒。
 
 **Knowledge update flow 已由 runtime 管理**，請參考：
-- [`runtime/generated/knowledge-update-phases.yaml`](../../runtime/generated/knowledge-update-phases.yaml) — 11 個步驟的結構化 YAML（快速路徑）
+- `runtime/runtime.db → generated_surfaces (type='knowledge_update_phases')` — 11 個步驟的結構化記錄（快速路徑）
 - [`runtime/recovery/recovery-strategies.yaml`](../../runtime/recovery/recovery-strategies.yaml) — knowledge_stale 修復策略
 - [`runtime/transactions/transaction-machine.yaml`](../../runtime/transactions/transaction-machine.yaml) — writeback transaction 狀態機
 

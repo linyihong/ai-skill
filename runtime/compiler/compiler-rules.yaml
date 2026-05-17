@@ -1,21 +1,21 @@
 # Compiler Rules
-# 定義從 canonical source（prose）到 generated surface（YAML）的編譯規則。
+# 定義從 canonical source（prose）到 generated surface（SQLite）的編譯規則。
 # 只有 deterministic、execution-critical 的狀態會被編譯。
 # Heuristics、judgment、troubleshooting strategy 永遠留在 prose。
 #
 # 使用方式：
-# 1. 修改 prose source → 執行 compiler → 更新 generated YAML
-# 2. Pre-commit hook 檢查 prose 與 YAML 是否一致
+# 1. 修改 prose source → 執行 compiler → 更新 runtime.db
+# 2. Pre-commit hook 檢查 prose 與 runtime.db 是否一致
 # 3. 若不一致 → block commit
 
-version: 1.0
-status: candidate
+version: 1.1
+status: active
 owner_layer: runtime/compiler
-last_updated: 2026-05-15
+last_updated: 2026-05-17
 
 compilation_scope:
   description: >
-    只有以下類別的內容會被編譯為 YAML。
+    只有以下類別的內容會被編譯為 SQLite（runtime.db）。
     所有需要 human judgment、heuristics、troubleshooting 的內容永遠留在 prose。
   deterministic_only:
     - current_phase
@@ -43,111 +43,111 @@ compilation_scope:
 source_target_mapping:
 
   - source: "workflow/*/execution-flow.md"
-    target: "runtime/generated/workflow-{domain}-phases.yaml"
+    target: "sqlite:runtime.db → generated_surfaces (type='workflow_phases')"
     extract:
       - phase_definitions
       - allowed_actions
       - forbidden_actions
       - blocking_gates
-    compile_rule: "從 execution-flow 的章節標題提取 phase 定義，從 gate 描述提取 blocking gates"
+    compile_rule: "從 execution-flow 的章節標題提取 phase 定義，從 gate 描述提取 blocking gates，寫入 runtime.db generated_surfaces 表"
 
   - source: "workflow/*/artifact-gates.md"
-    target: "runtime/generated/workflow-{domain}-artifacts.yaml"
+    target: "sqlite:runtime.db → generated_surfaces (type='workflow_artifacts')"
     extract:
       - required_artifacts
       - artifact_verification_criteria
-    compile_rule: "從 artifact gates 的檢查清單提取 required artifacts 與 verification criteria"
+    compile_rule: "從 artifact gates 的檢查清單提取 required artifacts 與 verification criteria，寫入 runtime.db generated_surfaces 表"
 
   - source: "enforcement/dependency-reading.md"
-    target: "runtime/generated/transaction-machine.yaml"
+    target: "sqlite:runtime.db → transaction_states"
     extract:
       - transaction_states
       - transaction_rules
-    compile_rule: "從 writeback transaction 章節提取 state machine 定義"
+    compile_rule: "從 writeback transaction 章節提取 state machine 定義，寫入 runtime.db transaction_states 表"
 
   - source: "enforcement/goal-action-validation.md"
-    target: "runtime/generated/goal-action-gates.yaml"
+    target: "sqlite:runtime.db → gates (type='validation_gate')"
     extract:
       - validation_gates
       - validation_criteria
-    compile_rule: "從 validation gate 描述提取 gate 定義"
+    compile_rule: "從 validation gate 描述提取 gate 定義，寫入 runtime.db gates 表"
 
   - source: "enforcement/failure-learning-system.md"
-    target: "runtime/generated/failure-recovery.yaml"
+    target: "sqlite:runtime.db → generated_surfaces (type='failure_recovery')"
     extract:
       - failure_patterns
       - recovery_strategies
-    compile_rule: "從 failure taxonomy 與 recovery 描述提取 pattern 與 strategy"
+    compile_rule: "從 failure taxonomy 與 recovery 描述提取 pattern 與 strategy，寫入 runtime.db generated_surfaces 表"
 
   # ── P3: Output Governance Mappings ──
 
   - source: "enforcement/neutral-language.md"
-    target: "runtime/generated/language-policy.yaml"
+    target: "sqlite:runtime.db → language_policy"
     extract:
       - language_core_rules
       - language_anti_drift
       - language_validation
-    compile_rule: "從 neutral-language.md 的核心原則與寫作規則提取 language policy 定義"
+    compile_rule: "從 neutral-language.md 的核心原則與寫作規則提取 language policy 定義，寫入 runtime.db language_policy 表"
 
   - source: "enforcement/sanitization.md"
-    target: "runtime/generated/sanitization-rules.yaml"
+    target: "sqlite:runtime.db → generated_surfaces (type='sanitization_rules')"
     extract:
       - sanitization_rules
       - placeholder_rules
-    compile_rule: "從 sanitization.md 的去敏規則提取 sanitization 定義"
+    compile_rule: "從 sanitization.md 的去敏規則提取 sanitization 定義，寫入 runtime.db generated_surfaces 表"
 
   - source: "enforcement/tool-neutral-documentation.md"
-    target: "runtime/generated/tool-neutrality-rules.yaml"
+    target: "sqlite:runtime.db → generated_surfaces (type='tool_neutrality_rules')"
     extract:
       - tool_neutrality_rules
       - content_boundary_rules
-    compile_rule: "從 tool-neutral-documentation.md 的核心規則與允許位置提取 tool neutrality 定義"
+    compile_rule: "從 tool-neutral-documentation.md 的核心規則與允許位置提取 tool neutrality 定義，寫入 runtime.db generated_surfaces 表"
 
   # ── P3.5: Plans Index Mapping ──
 
   - source: "plans/active/*.md"
-    target: "runtime/generated/plans-index.yaml"
+    target: "sqlite:runtime.db → plans_index"
     extract:
       - plan_id
       - plan_status
       - plan_priority
       - phases
       - affected_files
-    compile_rule: "從 plans/active/*.md 的 front matter、phase 標題、受影響檔案表格提取 plan index"
+    compile_rule: "從 plans/active/*.md 的 front matter、phase 標題、受影響檔案表格提取 plan index，寫入 runtime.db plans_index 表"
 
   # ── P3.6: Knowledge Update Flow Mapping ──
 
   - source: "governance/lifecycle/knowledge-update-flow.md"
-    target: "runtime/generated/knowledge-update-phases.yaml"
+    target: "sqlite:runtime.db → generated_surfaces (type='knowledge_update_phases')"
     extract:
       - knowledge_update_steps
       - step_entry_conditions
       - step_exit_conditions
       - step_reference_sources
-    compile_rule: "從 knowledge-update-flow.md 的 11 個步驟標題與判斷表格提取 phase 定義"
+    compile_rule: "從 knowledge-update-flow.md 的 11 個步驟標題與判斷表格提取 phase 定義，寫入 runtime.db generated_surfaces 表"
 
   # ── P3.7: Classification Rules Mapping ──
 
   - source: "governance/lifecycle/knowledge-update-flow.md"
-    target: "runtime/generated/classification-rules.yaml"
+    target: "sqlite:runtime.db → generated_surfaces (type='classification_rules')"
     extract:
       - classification_dimensions
       - dimension_decision_conditions
       - known_languages
       - known_frameworks
       - known_platforms
-    compile_rule: "從 knowledge-update-flow.md Step 2.4 的決策樹與 intelligence/engineering/ 的 README 提取分類維度定義與已知語言/框架/平台列表"
+    compile_rule: "從 knowledge-update-flow.md Step 2.4 的決策樹與 intelligence/engineering/ 的 README 提取分類維度定義與已知語言/框架/平台列表，寫入 runtime.db generated_surfaces 表"
 
   # ── P3.8: System Upgrade Governance Mapping ──
 
   - source: "governance/lifecycle/system-upgrade-governance.md"
-    target: "runtime/generated/system-upgrade-governance.yaml"
+    target: "sqlite:runtime.db → generated_surfaces (type='system_upgrade_governance')"
     extract:
       - upgrade_conditions
       - checklist_categories
       - checklist_items
       - forced_rules
-    compile_rule: "從系統升級治理要則的 §1 條件表格、§2 檢查清單分類與項目、§3 強制規則提取升級治理定義"
+    compile_rule: "從系統升級治理要則的 §1 條件表格、§2 檢查清單分類與項目、§3 強制規則提取升級治理定義，寫入 runtime.db generated_surfaces 表"
 
   # ── P3.9: APK Workflow Phases Mapping ──
 

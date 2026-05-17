@@ -1,10 +1,12 @@
 # 知識更新流程（Knowledge Update Flow）
 
-> **快速路徑**：如果已經讀過本文件，請直接使用 generated YAML 作為執行參考：
-> [`runtime/generated/knowledge-update-phases.yaml`](../../runtime/generated/knowledge-update-phases.yaml)
+> **快速路徑**：如果已經讀過本文件，請直接查詢 runtime.db 作為執行參考：
+> ```bash
+> sqlite3 runtime/runtime.db "SELECT content FROM generated_surfaces WHERE type = 'knowledge_update_phases';"
+> ```
 >
-> 該 YAML 包含 11 個步驟的結構、entry conditions、以及各步驟的參考文件路徑。
-> 僅在 **當前 session 第一次執行知識更新** 或 **YAML 資訊不足以完成某個步驟** 時，才需要重新讀取本 prose 文件。
+> 該記錄包含 11 個步驟的結構、entry conditions、以及各步驟的參考文件路徑。
+> 僅在 **當前 session 第一次執行知識更新** 或 **SQLite 記錄不足以完成某個步驟** 時，才需要重新讀取本 prose 文件。
 
 本文件整合 Ai-skill 系統中從「學到新知識」到「commit/push 完成」的完整端到端流程。它不取代既有文件的細節，而是作為**執行順序的總索引**，讓 agent 在每輪 checkpoint 知道下一步該做什麼。
 

@@ -44,11 +44,11 @@ edges:
       所有 governance 層的升級都必須遵循此要則。
     validation: system-upgrade-governance.md 的 §1 定義 5 種升級條件、§2 定義 8 類檢查清單。
   - type: related_to
-    target: runtime/generated/system-upgrade-governance.yaml
+    target: runtime/runtime.db
     reason: >
-      System upgrade governance 的 generated YAML surface，由 compiler 從 prose 編譯。
-      提供快速路徑給 agent 讀取升級治理定義。
-    validation: generated YAML 包含 upgrade_conditions、checklist_categories、forced_rules。
+      System upgrade governance 的 generated SQLite surface（generated_surfaces 表），由 compiler 從 prose 編譯。
+      提供快速路徑給 agent 查詢升級治理定義。
+    validation: runtime.db 的 generated_surfaces 表包含 upgrade_conditions、checklist_categories、forced_rules。
   - type: related_to
     target: governance/lifecycle/capability-discovery-philosophy.md
     reason: >

@@ -1,7 +1,7 @@
 # Compiler Output Scenario
 # 測試 compiler-engine.rb 是否能從 workflow/software-delivery/execution-flow.md
 # 正確提取 phase definitions、allowed_actions、blocking_gates、tables
-# 並產出結構化的 runtime/generated/workflow-software-delivery-phases.yaml
+# 並產出結構化的 runtime.db（generated_surfaces 表）
 #
 # 來源 compiler rule:
 #   - runtime/compiler/compiler-rules.yaml (source_target_mapping[0])
@@ -18,7 +18,7 @@ given:
     - runtime/compiler/compiler-rules.yaml
     - runtime/compiler/compiler-engine.rb
     - workflow/software-delivery/execution-flow.md
-    - runtime/generated/workflow-software-delivery-phases.yaml
+    - runtime/runtime.db
   signals:
     - workflow/software-delivery/execution-flow.md 有 8 個 ## 章節標題
     - 每個章節包含表格（| 問題 | 必要行動 |）或 bullet lists
@@ -44,8 +44,8 @@ then:
       - 從每個區塊的 bullet lists 提取 allowed_actions（如：觀察到了什麼行為？）
       - 從每個區塊的「阻擋項」描述提取 blocking_gates（如：未驗證聲明視為阻擋項）
       - 從每個區塊提取結構化 tables（header + rows）
-      - 寫入 runtime/generated/workflow-software-delivery-phases.yaml
-      - 檔頭包含 generated_from、generated_at、compiler_version、status=synced
+      - 寫入 runtime.db 的 generated_surfaces 表（type='workflow_phases'）
+      - 記錄包含 source、content、type、updated_at 等欄位
     reject:
       - empty_gates: "gates 欄位保持 [] 空陣列，忽略 execution-flow.md 中的 blocking conditions"
       - missing_allowed_actions: "不從表格或 bullet list 提取 allowed_actions"

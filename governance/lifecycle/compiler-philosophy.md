@@ -15,17 +15,17 @@
 
 ## Runtime Surface
 
-| Source | Target | 提取內容 |
-|--------|--------|----------|
-| `workflow/*/execution-flow.md` | `runtime/generated/workflow-{domain}-phases.yaml` | phase definitions、allowed/forbidden actions、blocking gates |
-| `workflow/*/artifact-gates.md` | `runtime/generated/workflow-{domain}-artifacts.yaml` | required artifacts、verification criteria |
-| `enforcement/dependency-reading.md` | `runtime/generated/transaction-machine.yaml` | transaction states、rules |
-| `enforcement/goal-action-validation.md` | `runtime/generated/goal-action-gates.yaml` | validation gates、criteria |
-| `enforcement/failure-learning-system.md` | `runtime/generated/failure-recovery.yaml` | failure patterns、recovery strategies |
+| Source | Target (SQLite) | 提取內容 |
+|--------|----------------|----------|
+| `workflow/*/execution-flow.md` | `runtime.db → generated_surfaces (type='workflow_phases')` | phase definitions、allowed/forbidden actions、blocking gates |
+| `workflow/*/artifact-gates.md` | `runtime.db → generated_surfaces (type='workflow_artifacts')` | required artifacts、verification criteria |
+| `enforcement/dependency-reading.md` | `runtime.db → transaction_states` | transaction states、rules |
+| `enforcement/goal-action-validation.md` | `runtime.db → gates (type='validation_gate')` | validation gates、criteria |
+| `enforcement/failure-learning-system.md` | `runtime.db → generated_surfaces (type='failure_recovery')` | failure patterns、recovery strategies |
 
 ## 與既有文件的關係
 
 - [`runtime/compiler/README.md`](../../runtime/compiler/README.md) — Runtime navigation entry point
 - [`runtime/compiler/compiler-engine.rb`](../../runtime/compiler/compiler-engine.rb) — Compiler implementation
 - [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — Source-target mapping rules
-- [`runtime/generated/`](../../runtime/generated/) — Compiled YAML surfaces
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Compiled SQLite surfaces (replaces `runtime/generated/`)

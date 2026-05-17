@@ -1,9 +1,0 @@
----
-header:
-  generated_from: enforcement/sanitization.md
-  generated_at: '2026-05-17T02:13:28Z'
-  compiler_version: 1.0.0
-  status: synced
-compiled_from: enforcement/sanitization.md
-rules: []
-gates: []

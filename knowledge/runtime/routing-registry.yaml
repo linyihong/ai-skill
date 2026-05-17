@@ -1064,8 +1064,8 @@ records:
       - runtime/compiler/README.md
       - runtime/generated/README.md
     source_of_truth_gate: runtime-compiler-active
-    ranking_reason: Runtime Compiler 定義 deterministic-only 編譯範圍（current_phase、allowed_actions、blocking_gates 等 8 種）、5 條 source-target mappings、6 條編譯規則。Compiler engine（Ruby CLI）支援 --check、--diff 模式。Generated YAML 含 header（generated_from、generated_at、compiler_version、status）。
-    validation_signal: 所有 modified sources 已編譯，generated YAML header status 為 synced，compiler --check 回傳 exit 0。
+    ranking_reason: Runtime Compiler 定義 deterministic-only 編譯範圍（current_phase、allowed_actions、blocking_gates 等 8 種）、12 條 source-target mappings（輸出至 SQLite）、6 條編譯規則。Compiler engine（Ruby CLI）支援 --check、--diff 模式。Generated surfaces 寫入 runtime.db（generated_surfaces 表）。
+    validation_signal: 所有 modified sources 已編譯，runtime.db 的 generated_surfaces 表包含最新記錄，validate-runtime-db.rb 回傳 exit 0。
     metadata:
       priority: P2
       confidence: medium
@@ -1193,7 +1193,7 @@ records:
       - runtime/obligations/obligation-ledger.yaml
       - runtime/gates/blocking-gates.yaml
     candidate_sources:
-      - runtime/generated/knowledge-update-phases.yaml
+      - runtime/runtime.db
       - enforcement/feedback-lessons.md
       - enforcement/failure-learning-system.md
       - enforcement/linked-updates.md

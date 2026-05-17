@@ -85,11 +85,11 @@ job_templates:
 
   - id: job.template.compilation
     name: Compilation Job
-    description: "非同步執行 compiler 編譯 generated YAML"
+    description: "非同步執行 compiler 編譯至 runtime.db"
     default_max_execution_seconds: 120
     default_max_retries: 3
     lock_required: lock.generated_surface
-    output: "runtime/generated/*.yaml"
+    output: "runtime/runtime.db"
 
   - id: job.template.validation
     name: Validation Job

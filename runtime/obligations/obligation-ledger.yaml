@@ -49,7 +49,7 @@ obligations:
     phase: phase.checkpoint
     name: Check Knowledge Update Needed
     description: >
-      快速路徑（預設）：讀取 runtime/generated/knowledge-update-phases.yaml（~118 lines）
+      快速路徑（預設）：查詢 runtime.db（generated_surfaces 表 WHERE type='knowledge_update_phases'）
       了解 11 個步驟的結構與參考文件，自問本輪是否新增可重用知識。
       完整路徑（首次或需要細節時）：讀 governance/lifecycle/knowledge-update-flow.md（~522 lines）
     verification:
@@ -63,7 +63,7 @@ obligations:
     phase: phase.checkpoint
     name: Check System Upgrade Governance
     description: >
-      快速路徑（預設）：讀取 runtime/generated/system-upgrade-governance.yaml
+      快速路徑（預設）：查詢 runtime.db（generated_surfaces 表 WHERE type='system_upgrade_governance'）
       了解大型系統升級的條件、檢查清單分類與強制規則。
       如果 plans/active/ 中有大型升級計畫，必須逐項確認檢查清單。
       完整路徑：讀 governance/lifecycle/system-upgrade-governance.md（~244 lines）

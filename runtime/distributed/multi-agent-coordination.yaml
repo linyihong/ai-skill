@@ -31,16 +31,17 @@ coordination_rules:
 
   - id: coord.rule.generated_surface_version_check
     name: Generated Surface Version Check
-    description: "使用 generated YAML 前檢查版本是否最新"
+    description: "使用 runtime.db 前檢查版本是否最新"
     rule: >
-      Agent 在讀取 runtime/generated/*.yaml 前，必須檢查 header 中的 generated_at
-      是否為最新版本。如果 generated_at 早於 prose source 的修改時間，表示
-      generated surface 已 stale，需先執行 compiler 重新編譯。
+      Agent 在查詢 runtime.db 前，必須確認 generated_surfaces 表的記錄
+      是否為最新版本。如果 prose source 的修改時間晚於最後一次 compiler 執行時間，
+      表示 runtime.db 已 stale，需先執行 compiler 重新編譯。
     severity: high
     check:
-      type: version_check
-      target: runtime/generated/*.yaml
-      verification: "generated_at >= prose_source_mtime"
+      type: sqlite_query
+      target: runtime/runtime.db
+      query: "SELECT MAX(updated_at) FROM generated_surfaces"
+      verification: "db_updated_at >= prose_source_mtime"
 
   - id: coord.rule.obligation_ledger_sync
     name: Obligation Ledger Sync

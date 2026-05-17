@@ -77,7 +77,7 @@
 ## 知識更新流程 Checkpoint
 
 知識更新檢查已由 runtime phase machine 管理（phase.checkpoint → obligation.checkpoint.check_knowledge_update_needed）。
-快速路徑：<AI_SKILL_REPO>/runtime/generated/knowledge-update-phases.yaml
+快速路徑：<AI_SKILL_REPO>/runtime/runtime.db（查詢 generated_surfaces 表）
 完整路徑：<AI_SKILL_REPO>/governance/lifecycle/knowledge-update-flow.md
 ```
 
