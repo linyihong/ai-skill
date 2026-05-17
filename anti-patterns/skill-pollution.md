@@ -20,8 +20,8 @@
 
 ## 預防
 
-1. 使用 `skills-index.yaml` 的 triggers 做精準 routing。
-2. 只載入 task intent 匹配的 skill。
+1. 使用 `knowledge/runtime/routing-registry.yaml` 的 task_intent 做精準 routing。
+2. 只載入 task intent 匹配的 route。
 3. 使用 summary-first routing：先讀 summary（300-500 tokens），需要才展開。
 4. 定期 prune 不相關的 context。
 
@@ -34,11 +34,11 @@
 ## 恢復
 
 1. Prune 不相關的 skill context。
-2. 重新確認 task intent 與 skills-index.yaml 的匹配。
+2. 重新確認 task intent 與 routing-registry.yaml 的匹配。
 3. 必要時建立新 session。
 
 ## 相關 Guards
 
-- `skills-index.yaml`
+- `knowledge/runtime/routing-registry.yaml`
 - `runtime/context/ttl-policy.yaml`
 - `runtime/health/context-health-score.yaml`

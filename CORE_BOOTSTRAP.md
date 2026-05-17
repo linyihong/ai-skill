@@ -35,13 +35,9 @@
    - 若以上皆無 → 主動告知使用者：「此專案尚未設定 Ai-skill 知識庫。
      是否要執行初始化？(./scripts/init-new-project.sh <PROJECT_ROOT>)」
    - 若使用者同意，執行初始化腳本
-6. 依任務 intent 查詢 skills-index.yaml 找到對應 skill
-7. 檢查該 skill 是否有 primary_entrypoint 欄位：
-   - 有 → 優先讀 primary_entrypoint 指向的新分層路徑
-   - 無 → 讀 entrypoint 指向的舊路徑（向後相容）
-8. 依 activation rules 決定哪些 lazy-load rules 需要載入
-9. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
-10. 需要時才展開完整 source
+6. 依 activation rules 決定哪些 lazy-load rules 需要載入
+7. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
+8. 需要時才展開完整 source
 ```
 
 > **Runtime Config 已編譯至 SQLite**：所有 `runtime/**/*.yaml` 設定檔已由 compiler 編譯至 `runtime/runtime.db` 的專屬表格（如 `phase_machine`、`obligation_ledger`、`blocking_gates`、`language_policy`、`output_rules`、`governance_gates` 等）。Agent 可直接查 SQLite 取得結構化資料，YAML 檔案仍為 source-of-truth 供人類編輯。
@@ -64,5 +60,4 @@
 
 - Core Bootstrap 三條規則已讀
 - 新專案檢查已完成（若為新專案，已詢問使用者是否初始化）
-- 任務 intent 已對應到 skills-index.yaml
 - Lazy-load rules 的 activation conditions 已檢查

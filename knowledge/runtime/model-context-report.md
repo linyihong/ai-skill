@@ -26,7 +26,6 @@
 | Route | Primary source | Compression | Reason |
 | --- | --- | --- | --- |
 | `route.bootstrap.ai-skill` | `CORE_BOOTSTRAP.md` | `summary-first` | Bootstrap 階段只需要 Core Bootstrap 3 rules 與 OS layout，不需要完整 source。 |
-| `route.skill.discovery` | `skills-index.yaml` | `index-only` | Skills index 輕量（~300 tokens），可在整個對話中 cache。 |
 | `route.runtime.activation-rules` | `runtime/compiler/embedded_data.rb` | `index-only` | Activation rules 輕量（~500 tokens），可在整個對話中 cache。 |
 | `route.runtime.context-ttl` | `runtime/compiler/embedded_data.rb` | `index-only` | TTL policy 輕量，需要 prune 時才讀。 |
 | `route.runtime.context-loading` | `runtime/routing/` | `summary-first` | routing decision 可先用 registry、index、summary；修改 source 時再升級。 |

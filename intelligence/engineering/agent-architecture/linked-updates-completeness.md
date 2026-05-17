@@ -32,7 +32,7 @@
 |---------|-------------------|
 | 建立新檔案 | `knowledge/indexes/README.md`、`knowledge/runtime/routing-registry.yaml`、所屬目錄的 `README.md` |
 | 刪除舊檔案 | 所有引用該檔案的 README、index、graph、summary |
-| 修改路徑 | `skills-index.yaml` 的 `related` 欄位、`routing-registry.yaml` 的 route |
+| 修改路徑 | `knowledge/runtime/routing-registry.yaml` 的 route |
 | 新增 intelligence atom | `intelligence/<domain>/README.md` 的 atoms 表格、Knowledge Graph |
 | 修改 enforcement rules | `enforcement/README.md` 的索引、`dependency-reading.md` 的邊界 |
 | 修改架構文件 | `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` 的 Durable Roadmap Goals |

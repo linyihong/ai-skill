@@ -220,7 +220,7 @@ alwaysApply: true
 
 1. 讀取 Core Bootstrap：[\`${AI_SKILL_REPO}/CORE_BOOTSTRAP.md\`](${AI_SKILL_REPO}/CORE_BOOTSTRAP.md)
 2. 了解 OS layout：[\`${AI_SKILL_REPO}/README.md\`](${AI_SKILL_REPO}/README.md)
-3. 依任務 intent 查詢 skills-index：[\`${AI_SKILL_REPO}/skills-index.yaml\`](${AI_SKILL_REPO}/skills-index.yaml)
+3. 依任務 intent 查詢 routing-registry：[\`${AI_SKILL_REPO}/knowledge/runtime/routing-registry.yaml\`](${AI_SKILL_REPO}/knowledge/runtime/routing-registry.yaml)
 4. 載入 lazy-load rules（依 activation conditions）
 
 ## 專案 durable Markdown（預設 workflow）
@@ -301,7 +301,7 @@ if [[ -n "${TOOL_MAP[claude]:-}" ]]; then
 
 1. 讀取 Core Bootstrap：[\`${AI_SKILL_REPO}/CORE_BOOTSTRAP.md\`](${AI_SKILL_REPO}/CORE_BOOTSTRAP.md)
 2. 了解 OS layout：[\`${AI_SKILL_REPO}/README.md\`](${AI_SKILL_REPO}/README.md)
-3. 依任務 intent 查詢 skills-index：[\`${AI_SKILL_REPO}/skills-index.yaml\`](${AI_SKILL_REPO}/skills-index.yaml)
+3. 依任務 intent 查詢 routing-registry：[\`${AI_SKILL_REPO}/knowledge/runtime/routing-registry.yaml\`](${AI_SKILL_REPO}/knowledge/runtime/routing-registry.yaml)
 4. 載入 lazy-load rules（依 activation conditions）
 
 ## 專案 durable Markdown（預設 workflow）

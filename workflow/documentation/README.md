@@ -40,6 +40,5 @@
 ## 誰會參考這裡（Inbound References）
 
 - [`route.workflow.documentation-ai-native`](../../knowledge/runtime/routing-registry.yaml) — `primary_source` 指向本 `README.md`。
-- [`skills-index.yaml`](../../skills-index.yaml) 的 `documentation-ai-native` skill 條目。
 
 ← [回到 workflow 索引](../README.md)

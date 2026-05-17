@@ -4,12 +4,11 @@
 
 ## 使用方式
 
-1. **先查 `skills-index.yaml`**（根目錄）：用 task intent 比對 triggers，找到對應 skill 與 entrypoint。
-2. 再用任務意圖對照下方的 [任務路由索引](#任務路由索引) 取得 deeper context。
-3. 讀取 `Primary source`，再依需要讀 `Related sources`。
-4. 若需要 machine-readable route，讀取 [`../../knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml)。
-5. 若任務需要建立或評估 Knowledge Atom，使用 [`../../metadata/schema.md`](../../metadata/schema.md) 的欄位與 controlled values。
-6. 若路由產生新候選知識，先記錄在對應 source 層或 `.agent-goals/`，不要直接搬移大量內容。
+1. 用任務意圖對照下方的 [任務路由索引](#任務路由索引) 取得 deeper context。
+2. 讀取 `Primary source`，再依需要讀 `Related sources`。
+3. 若需要 machine-readable route，讀取 [`../../knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml)。
+4. 若任務需要建立或評估 Knowledge Atom，使用 [`../../metadata/schema.md`](../../metadata/schema.md) 的欄位與 controlled values。
+5. 若路由產生新候選知識，先記錄在對應 source 層或 `.agent-goals/`，不要直接搬移大量內容。
 
 ## 索引欄位
 

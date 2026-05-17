@@ -1,5 +1,5 @@
 ---
-description: Auto-bootstrap Core Bootstrap + skills-index.yaml at session start; require dependency reads on skill/rule changes
+description: Auto-bootstrap Core Bootstrap at session start; require dependency reads on skill/rule changes
 alwaysApply: true
 ---
 
@@ -11,7 +11,7 @@ At session start or when taking over a task, load the **Core Bootstrap** (3 rule
 
 1. Read [CORE_BOOTSTRAP.md](../../CORE_BOOTSTRAP.md) — 3 core rules: `rule-weight.md`, `dependency-reading.md`, `conversation-goal-ledger.md`
 2. Read [README.md](../../README.md) — OS layout & quickstart
-3. Match task intent against [skills-index.yaml](../../skills-index.yaml) to find the relevant skill
+3. Match task intent against [routing-registry.yaml](../../knowledge/runtime/routing-registry.yaml) to find the relevant route
 4. Check [runtime/router/activation-rules.yaml](../../runtime/router/activation-rules.yaml) for which lazy-load rules to activate
 5. Load Runtime Phase initialization:
    - [runtime/phases/phase-machine.yaml](../../runtime/phases/phase-machine.yaml) — current phase state

@@ -88,13 +88,12 @@
 
 ```
 1. 讀取 CORE_BOOTSTRAP.md（3 條核心規則）
-2. 依 task intent 查詢 skills-index.yaml
-3. 檢查 runtime/router/activation-rules.yaml：
+2. 檢查 runtime/router/activation-rules.yaml：
    - 目前 task 是否符合任何 rule 的 activation.when 條件？
    - 符合 → 載入該 rule 全文
    - 不符合 → deferred，不載入
-4. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
-5. 需要時才展開完整 source
+3. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
+4. 需要時才展開完整 source
 ```
 
 ### 完整規則索引

@@ -34,8 +34,8 @@
 | 工具同步文件或同步腳本 | 根 `README.md`、`scripts/README.md`、`ai-tools/` 對應工具文件、Agents 必讀規則、實際執行同步。 |
 | 新增或修改 `tools/adapters/<tool>.md`（新分層）或 `skills/<name>/tool-adapters/<tool>.md`（舊結構，僅限尚未遷移的 skill；已遷移 skill 的舊 tool-adapters 路徑已被刪除） | 該 skill 的入口（`skills/<name>/README.md` 或 `workflow/<domain>/README.md`）、核心 `execution-flow.md` 中的 adapter link、`ai-tools/<tool>.md` 的 cross-link（若該工具已有集中說明）、必要 validation/checklist。 |
 | `scripts/ai-skill-close-loop.sh` | `scripts/README.md`、根 `README.md`、`enforcement/dependency-reading.md`、本檔；若改變 lock / commit / push 條件，也需同步相關 skill close-loop 說明。 |
-| 新增 skill | 根 `README.md`、`skills/README.md`、`skills-index.yaml`、必要 tool sync 實際同步結果。 |
-| 修改 `skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md` 觸發條件或流程 | 該 skill 的 `README.md`、`runtime/onboarding/` 對應 quickstart、`skills-index.yaml`、相關 cross-link。 |
+| 新增 skill | 根 `README.md`、`skills/README.md`、必要 tool sync 實際同步結果。 |
+| 修改 `skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md` 觸發條件或流程 | 該 skill 的 `README.md`、`runtime/onboarding/` 對應 quickstart、相關 cross-link。 |
 | 新增 `feedback/history/` lesson | `feedback/history/<domain>/README.md`，必要時 `feedback/history/<domain>/<category>/README.md`。 |
 | 修改 `analysis/development-guidance/controls-catalog.md`（原 `skills/app-development-guidance/controls/`，已刪除） | 相關 `analysis/development-guidance/implementation-catalog.md`、`analysis/development-guidance/platforms-catalog.md`、`analysis/development-guidance/languages-catalog.md`、`workflow/software-delivery/development-process.md`。 |
 | 修改 `workflow/software-delivery/development-process.md`（原 `skills/app-development-guidance/process/`，已刪除） | 相關 `workflow/software-delivery/artifact-gates.md`、`analysis/development-guidance/risk-translation.md`、`analysis/development-guidance/implementation-catalog.md`、`workflow/software-delivery/execution-flow.md`。 |

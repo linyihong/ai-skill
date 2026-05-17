@@ -5,7 +5,7 @@
   "bootstrap": {
     "core": "CORE_BOOTSTRAP.md",
     "layout": "README.md",
-    "skill_index": "skills-index.yaml",
+    "skill_index": "knowledge/runtime/routing-registry.yaml",
     "activation_rules": "runtime/router/activation-rules.yaml"
   },
 

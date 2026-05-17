@@ -1650,7 +1650,7 @@ module EmbeddedRuntimeData
         "signals": [
           {
             "type": "task_intent_match",
-            "source": "skills-index.yaml"
+            "source": "routing-registry.yaml"
           },
           {
             "type": "activation_rule_match",
@@ -3959,10 +3959,10 @@ module EmbeddedRuntimeData
     "relevance_engine_version": "v1",
     "status": "candidate",
     "owner_layer": "runtime/pipeline",
-    "description": "Skill Relevance Engine. 在 routing stage 執行，對 skills-index.yaml 中的每個 skill 計算 relevance score（0.0-1.0）。Score ≥ 0.5 的 skill 才會被載入 summary。 Score < 0.5 的 skill 被跳過，避免浪費 token 在不相關的 skill 上。\n",
+    "description": "Skill Relevance Engine. 在 routing stage 執行，對 routing-registry.yaml 中的每個 route 計算 relevance score（0.0-1.0）。Score ≥ 0.5 的 skill 才會被載入 summary。 Score < 0.5 的 skill 被跳過，避免浪費 token 在不相關的 skill 上。\n",
     "scoring": {
       "method": "weighted_combination",
-      "description": "Relevance score 由三個子分數加權組合而成： - trigger_match_score（0.5）：基於 user intent 與 skill triggers 的匹配度 - domain_match_score（0.3）：基於 task domain 與 skill domains 的匹配度 - weight_score（0.2）：基於 skill 的基礎 weight（來自 skills-index.yaml）\n最終分數 = trigger_match × 0.5 + domain_match × 0.3 + weight × 0.2\n如果 skill 與已選 skill 有 conflicts，最終分數 × 0.5（penalty）。\n",
+      "description": "Relevance score 由三個子分數加權組合而成： - trigger_match_score（0.5）：基於 user intent 與 skill triggers 的匹配度 - domain_match_score（0.3）：基於 task domain 與 skill domains 的匹配度 - weight_score（0.2）：基於 route 的基礎 weight（來自 routing-registry.yaml）\n最終分數 = trigger_match × 0.5 + domain_match × 0.3 + weight × 0.2\n如果 skill 與已選 skill 有 conflicts，最終分數 × 0.5（penalty）。\n",
       "threshold": 0.5,
       "components": [
         {
@@ -3980,7 +3980,7 @@ module EmbeddedRuntimeData
         {
           "id": "weight_score",
           "weight": 0.2,
-          "description": "直接使用 skills-index.yaml 中的 weight 值（0.0-1.0）。 這是 skill 的基礎重要性，不受 task 影響。\n",
+          "description": "直接使用 routing-registry.yaml 中的 weight 值（0.0-1.0）。 這是 skill 的基礎重要性，不受 task 影響。\n",
           "scoring_logic": "return skill.weight\n"
         }
       ],
@@ -4017,7 +4017,7 @@ module EmbeddedRuntimeData
           "id": "score-all-skills",
           "action": "compute",
           "input": [
-            "skills-index.yaml",
+            "routing-registry.yaml",
             "parsed_intent"
           ],
           "output": {
@@ -4163,7 +4163,7 @@ module EmbeddedRuntimeData
         "id": "conflict-penalty-mandatory",
         "description": "如果 skill 與已選 skill 有 conflicts，conflict_penalty（×0.5） 必須被應用。不可因 Agent 判斷而跳過 penalty。\n",
         "severity": "error",
-        "rationale": "Conflicts 定義在 skills-index.yaml 中，代表已知的目標衝突。 忽略 conflict penalty 可能導致 context pollution。\n"
+        "rationale": "Conflicts 定義在 routing-registry.yaml 中，代表已知的目標衝突。 忽略 conflict penalty 可能導致 context pollution。\n"
       },
       {
         "id": "score-transparency",
@@ -4279,15 +4279,15 @@ module EmbeddedRuntimeData
             {
               "id": "query-skill-index",
               "action": "read_file",
-              "target": "skills-index.yaml",
-              "description": "查詢 skills-index.yaml 找到對應 skill",
+              "target": "routing-registry.yaml",
+              "description": "查詢 routing-registry.yaml 找到對應 route",
               "estimated_tokens": 500
             },
             {
               "id": "run-relevance-engine",
               "action": "score",
-              "target": "skills-index.yaml",
-              "description": "使用 relevance engine 計算每個 skill 的相關性分數",
+              "target": "routing-registry.yaml",
+              "description": "使用 relevance engine 計算每個 route 的相關性分數",
               "estimated_tokens": 200
             },
             {
@@ -7175,7 +7175,7 @@ module EmbeddedRuntimeData
         "id": "tx.rule.reread_after_push",
         "name": "Reread After Push",
         "description": "push 後必須重新讀取更新過的入口、主要依賴、索引與 promotion target",
-        "rule": "push 完成後重新讀取 CORE_BOOTSTRAP.md、skills-index.yaml、routing-registry.yaml",
+        "rule": "push 完成後重新讀取 CORE_BOOTSTRAP.md、routing-registry.yaml",
         "severity": "high"
       },
       {
@@ -7210,7 +7210,6 @@ module EmbeddedRuntimeData
         "description": "建立新 skill 時的標準 transaction",
         "typical_steps": [
           "在 canonical repo 建立新檔案",
-          "更新 skills-index.yaml",
           "更新 routing-registry.yaml（如需要）",
           "記錄 touched paths",
           "執行去敏檢查",
@@ -7318,7 +7317,7 @@ module EmbeddedRuntimeData
             "step": 9,
             "action": "REREAD",
             "description": "重新讀取更新檔案",
-            "command": "讀取 CORE_BOOTSTRAP.md、skills-index.yaml、routing-registry.yaml"
+            "command": "讀取 CORE_BOOTSTRAP.md、routing-registry.yaml"
           },
           {
             "step": 10,
@@ -7569,7 +7568,7 @@ module EmbeddedRuntimeData
         "description": "同時修改多個層級的檔案（例如：修改 workflow 同時更新 enforcement）",
         "applicable_scenarios": [
           "修改 workflow 同時更新對應的 enforcement rules",
-          "新增 skill 同時更新 skills-index.yaml 和 routing-registry.yaml",
+          "新增 skill 同時更新 routing-registry.yaml",
           "重構目錄結構同時更新所有 cross-references"
         ],
         "pre_checks": [

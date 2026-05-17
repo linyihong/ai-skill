@@ -7,16 +7,15 @@ AI 認知執行系統 — 讓 agent 以 runtime state machine 驅動知識路由
 ```text
 1. Read CORE_BOOTSTRAP.md  (3 rules, ~800 tokens)
 2. Read this README         (OS layout)
-3. Query skills-index.yaml  (find relevant skill)
-4. Check activation-rules   (load lazy rules if needed)
-5. Read knowledge summary   (300-500 tokens, then expand if needed)
+3. Check activation-rules   (load lazy rules if needed)
+4. Read knowledge summary   (300-500 tokens, then expand if needed)
 ```
 
 詳細啟動流程：[`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md)
 
 ## 維護本 repository（人類貢獻者）
 
-`skills-index.yaml` 與 `knowledge/indexes/` 等索引主要給 **agent 依任務路由**；若你要**修改 Ai-skill 本庫**（PR、治理、驗證指令），請從 **[`governance/contributing.md`](governance/contributing.md)** 進入（內含與 [`scripts/README.md`](scripts/README.md)、[`governance/validation/README.md`](governance/validation/README.md) 的連結）。GitHub 慣例入口：[`CONTRIBUTING.md`](CONTRIBUTING.md)。
+`knowledge/indexes/` 等索引主要給 **agent 依任務路由**；若你要**修改 Ai-skill 本庫**（PR、治理、驗證指令），請從 **[`governance/contributing.md`](governance/contributing.md)** 進入（內含與 [`scripts/README.md`](scripts/README.md)、[`governance/validation/README.md`](governance/validation/README.md) 的連結）。GitHub 慣例入口：[`CONTRIBUTING.md`](CONTRIBUTING.md)。
 
 ## 📂 OS Layout
 
@@ -26,7 +25,6 @@ AI 認知執行系統 — 讓 agent 以 runtime state machine 驅動知識路由
 | 📐 **Architecture** | [`architecture/`](architecture/) | Roadmap、升級規劃、成本優化 |
 | ⚙️ **Shared Rules** | [`enforcement/`](enforcement/README.md) | 共用作業規則（含 lazy-load activation model） |
 | 🧠 **Skills** | [`skills/`](skills/README.md) | 可重用 agent 能力模組 |
-| 🗺️ **Skill Index** | [`skills-index.yaml`](skills-index.yaml) | 結構化 skill routing index |
 | 🔧 **Tool Adapters** | [`ai-tools/`](ai-tools/README.md) | Claude Code、Cursor 等工具配置 |
 | 🔄 **Runtime** | [`runtime/`](runtime/README.md) | Context routing、activation、TTL |
 | 🧭 **Knowledge** | [`knowledge/`](knowledge/README.md) | Indexes、summaries、graphs、runtime surfaces |
@@ -49,15 +47,13 @@ Session Start
   │
   ├─ 2. Read README.md (OS layout)
   │
-  ├─ 3. Query skills-index.yaml → find skill by task intent
+  ├─ 3. Check activation-rules.yaml → load lazy rules if triggered
   │
-  ├─ 4. Check activation-rules.yaml → load lazy rules if triggered
+  ├─ 4. Read knowledge summary (300-500 tokens)
   │
-  ├─ 5. Read skill summary (300-500 tokens)
+  ├─ 5. Expand to full source only if needed
   │
-  ├─ 6. Expand to full source only if needed
-  │
-  └─ 7. Use .agent-goals/ for multi-step tasks
+  └─ 6. Use .agent-goals/ for multi-step tasks
 ```
 
 ## 🛠️ AI Tools
@@ -74,7 +70,6 @@ Session Start
 | --- | --- |
 | [`governance/contributing.md`](governance/contributing.md) | 人類維護入口：驗證指令、PR gate、文件索引 |
 | [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | Minimal bootstrap (3 rules, ~800 tokens) |
-| [`skills-index.yaml`](skills-index.yaml) | Skill routing index |
 | [`plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md`](plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md) | ✅ 已完成：AI-native Cognitive Execution System 升級 |
 | [`plans/archived/2026-05-12-1101-context-cost-optimization.md`](plans/archived/2026-05-12-1101-context-cost-optimization.md) | Token cost optimization plan |
 | [`runtime/router/activation-rules.yaml`](runtime/router/activation-rules.yaml) | Lazy-load activation rules |

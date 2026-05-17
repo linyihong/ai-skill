@@ -22,12 +22,12 @@ Agent 的路由決策是由信號強度決定的，而不是信號正確性。
 |------|------|--------|
 | **路徑漂移** | Agent 被相似名稱的目錄吸引，去了錯誤的位置 | 高 |
 | **持續修改同一檔案** | Agent 不斷回到同一個檔案，即使任務已經轉移到其他領域 | 高 |
-| **忽略 primary_entrypoint** | Agent 讀了 `skills-index.yaml` 的 `entrypoint` 後，沒有檢查 `primary_entrypoint` | 高 |
+| **忽略 primary_source** | Agent 讀了 `knowledge/runtime/routing-registry.yaml` 的 `candidate_sources` 後，沒有檢查 `primary_source` | 高 |
 | **工具偏好** | Agent 持續使用同一種工具（如 `apply_diff`），即使其他工具更適合當前任務 | 中 |
 
 ## 預防方式
 
-1. **明確的 routing 信號** — 在 `skills-index.yaml` 中使用 `primary_entrypoint` 明確引導 agent 到正確路徑
+1. **明確的 routing 信號** — 在 `knowledge/runtime/routing-registry.yaml` 中使用 `primary_source` 明確引導 agent 到正確路徑
 2. **負面信號** — 在檔案中明確標記「不屬於這裡」的內容，幫助 agent 排除錯誤路由
 3. **路由驗證** — 在關鍵 routing 點設置 validation gate，確認 agent 選擇了正確路徑
 4. **限制搜尋範圍** — 在 task plan 中明確指定要操作的目錄，減少 agent 自由探索的空間

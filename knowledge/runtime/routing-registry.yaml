@@ -17,14 +17,13 @@ records:
       - README.md
       - enforcement/README.md
     candidate_sources:
-      - skills-index.yaml
       - knowledge/indexes/README.md
       - runtime/compiler/embedded_data.rb
       - knowledge/summaries/root-bootstrap.md
       - knowledge/graphs/metadata-navigation.yaml
     source_of_truth_gate: core-bootstrap-and-readme-active
     ranking_reason: CORE_BOOTSTRAP.md 是每個 session 的最小啟動集合（3 rules, ~800 tokens）。
-    validation_signal: Core Bootstrap 3 rules 已讀，skills-index.yaml 已查詢，git status 已檢查。
+    validation_signal: Core Bootstrap 3 rules 已讀，git status 已檢查。
     metadata:
       priority: P1
       confidence: high
@@ -207,16 +206,16 @@ records:
       reason: Transaction Runtime 在需要寫入 Ai-skill 檔案時才載入，不佔用 bootstrap 預算。
 
   - id: route.skill.discovery
-    task_intent: 根據 task intent 找到對應 skill
-    primary_source: skills-index.yaml
+    task_intent: 根據 task intent 找到對應 route
+    primary_source: knowledge/runtime/routing-registry.yaml
     required_dependencies:
       - CORE_BOOTSTRAP.md
     candidate_sources:
       - knowledge/indexes/README.md
       - knowledge/summaries/README.md
-    source_of_truth_gate: skills-index-active
-    ranking_reason: skills-index.yaml 提供結構化 skill routing，Agent 先比對 task intent 與 triggers，不掃描整個 skills/ 目錄。
-    validation_signal: Task intent 已對應到 skills-index.yaml 的 triggers，entrypoint 與 summary path 可解析。
+    source_of_truth_gate: routing-registry-active
+    ranking_reason: routing-registry.yaml 提供結構化 route routing，Agent 先比對 task intent 與 triggers，不掃描整個 knowledge/ 目錄。
+    validation_signal: Task intent 已對應到 routing-registry.yaml 的 triggers，entrypoint 與 summary path 可解析。
     metadata:
       priority: P1
       confidence: high
@@ -230,14 +229,14 @@ records:
     model:
       profile: small
       compression_level: index-only
-      reason: Skills index 輕量（~300 tokens），可在整個對話中 cache。
+      reason: Routing registry 輕量（~300 tokens），可在整個對話中 cache。
 
   - id: route.runtime.activation-rules
     task_intent: 決定哪些 lazy-load rules 需要 activate
     primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
       - CORE_BOOTSTRAP.md
-      - skills-index.yaml
+      - knowledge/runtime/routing-registry.yaml
     candidate_sources:
       - runtime/compiler/embedded_data.rb
       - knowledge/runtime/README.md
@@ -509,7 +508,7 @@ records:
       - runtime/compiler/embedded_data.rb
       - runtime/compiler/embedded_data.rb
     candidate_sources:
-      - skills-index.yaml
+      - knowledge/runtime/routing-registry.yaml
       - knowledge/summaries/runtime-operations.md
       - knowledge/runtime/README.md
     source_of_truth_gate: design-layer-only

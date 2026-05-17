@@ -1,7 +1,7 @@
 # 貢獻與驗證入口（人類維護者）
 
-本頁給**修改 Ai-skill 本 repository** 的維護者與 reviewer：把「要跑什麼、去哪讀權威文件」收成單一路徑。  
-`skills-index.yaml`、`knowledge/indexes/` 等索引主要服務 **agent 依 task intent 路由**；本頁服務 **人類改 repo 時的 PR / 閉環流程**。
+本頁給**修改 Ai-skill 本 repository** 的維護者與 reviewer：把「要跑什麼、去哪讀權威文件」收成單一路徑。
+`knowledge/indexes/` 等索引主要服務 **agent 依 task intent 路由**；本頁服務 **人類改 repo 時的 PR / 閉環流程**。
 
 ## 開始前
 

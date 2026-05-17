@@ -73,7 +73,7 @@ code .   # 或 cursor . 或 claude .
 
 建立 alwaysApply 規則，包含：
 
-1. **啟動流程**：指向 `CORE_BOOTSTRAP.md` 與 `skills-index.yaml`
+1. **啟動流程**：指向 `CORE_BOOTSTRAP.md`
 2. **專案 durable Markdown 預設**：寫入 `docs/`、`wiki/`、`README.md`、ADR、runbook 等長期保存的 Markdown 前，先讀 `workflow/documentation/README.md` 與 `execution-flow.md`（無須使用者先說關鍵字）
 3. **語言強制規則**
 4. **知識更新流程 Checkpoint**
@@ -84,7 +84,7 @@ code .   # 或 cursor . 或 claude .
 
 建立自動載入檔案，包含：
 
-1. **啟動流程**：指向 `CORE_BOOTSTRAP.md` 與 `skills-index.yaml`
+1. **啟動流程**：指向 `CORE_BOOTSTRAP.md`
 2. **專案 durable Markdown 預設**：寫入 `docs/`、`wiki/`、`README.md`、ADR、runbook 等長期保存的 Markdown 前，先讀 `workflow/documentation/README.md` 與 `execution-flow.md`（無須使用者先說關鍵字）
 3. **語言強制規則**
 4. **知識更新流程 Checkpoint**

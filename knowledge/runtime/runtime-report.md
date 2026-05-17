@@ -18,8 +18,7 @@
 
 | ID | Primary source | Model | Compression | Validation signal |
 | --- | --- | --- | --- | --- |
-| `route.bootstrap.ai-skill` | `CORE_BOOTSTRAP.md` | `small` | `summary-first` | Core Bootstrap 3 rules 已讀，skills-index.yaml 已查詢，git status 已檢查。 |
-| `route.skill.discovery` | `skills-index.yaml` | `small` | `index-only` | Task intent 已對應到 skills-index.yaml 的 triggers，entrypoint 與 summary path 可解析。 |
+| `route.bootstrap.ai-skill` | `CORE_BOOTSTRAP.md` | `small` | `summary-first` | Core Bootstrap 3 rules 已讀，git status 已檢查。 |
 | `route.runtime.activation-rules` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。 |
 | `route.runtime.context-ttl` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | Context TTL 已套用，過期 context 已 prune，token 使用率在預算內。 |
 | `route.governance.durable-goal-boundary` | `enforcement/conversation-goal-ledger.md` | `large` | `source-backed` | 長期狀態已落到 durable planning 文件，且 active goal 完成後才刪除。 |

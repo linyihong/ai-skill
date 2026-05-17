@@ -37,9 +37,8 @@ Guardrails:
 
 | Route | Checklist |
 | --- | --- |
-| `route.bootstrap.ai-skill` | Primary: `CORE_BOOTSTRAP.md`<br>Compression: `summary-first`<br>Required: `README.md`<br>`enforcement/README.md`<br>Validation: Core Bootstrap 3 rules 已讀，skills-index.yaml 已查詢，git status 已檢查。 |
-| `route.skill.discovery` | Primary: `skills-index.yaml`<br>Compression: `index-only`<br>Required: `CORE_BOOTSTRAP.md`<br>Validation: Task intent 已對應到 skills-index.yaml 的 triggers，entrypoint 與 summary path 可解析。 |
-| `route.runtime.activation-rules` | Primary: `runtime/compiler/embedded_data.rb`<br>Compression: `index-only`<br>Required: `CORE_BOOTSTRAP.md`<br>`skills-index.yaml`<br>Validation: 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。 |
+| `route.bootstrap.ai-skill` | Primary: `CORE_BOOTSTRAP.md`<br>Compression: `summary-first`<br>Required: `README.md`<br>`enforcement/README.md`<br>Validation: Core Bootstrap 3 rules 已讀，git status 已檢查。 |
+| `route.runtime.activation-rules` | Primary: `runtime/compiler/embedded_data.rb`<br>Compression: `index-only`<br>Required: `CORE_BOOTSTRAP.md`<br>Validation: 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。 |
 | `route.runtime.context-ttl` | Primary: `runtime/compiler/embedded_data.rb`<br>Compression: `index-only`<br>Required: `runtime/compiler/embedded_data.rb`<br>Validation: Context TTL 已套用，過期 context 已 prune，token 使用率在預算內。 |
 | `route.runtime.context-loading` | Primary: `runtime/routing/`<br>Compression: `summary-first`<br>Required: `knowledge/indexes/README.md`<br>`metadata/ranking/README.md`<br>`metadata/confidence/README.md`<br>`metadata/compatibility/README.md`<br>Validation: Primary source、deferred sources、source-of-truth gate 與 validation signal 已可被記錄。 |
 | `route.runtime.router-flow` | Primary: `runtime/router/`<br>Compression: `index-only`<br>Required: `runtime/compiler/embedded_data.rb`<br>`runtime/compiler/embedded_data.rb`<br>Validation: Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。 |

@@ -13,7 +13,7 @@ Session Start
   │
   ├─ 2. Read README.md（OS layout, ~80 lines）
   │
-  ├─ 3. Query skills-index.yaml → match task intent → find skill
+  ├─ 3. Check activation-rules.yaml → load lazy rules if triggered
   │
   ├─ 4. Run activation-engine.rb → load lazy rules if triggered
   │
@@ -58,5 +58,5 @@ ruby runtime/router/activation-engine.rb --intent migration --file-changed "**/*
 - [`runtime/router/activation-table.md`](../../runtime/router/activation-table.md) — Situation → Activated Rules table
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing records
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — Human-readable task intent routing table
-- [`skills-index.yaml`](../../skills-index.yaml) — Skill-level routing index
+- [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing registry
 - [`runtime/context/ttl-policy.yaml`](../../runtime/context/ttl-policy.yaml) — Context 生命週期管理

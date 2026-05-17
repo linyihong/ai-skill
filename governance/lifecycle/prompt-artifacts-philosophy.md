@@ -6,7 +6,7 @@
 
 | 層 | 提供 | 但缺少 |
 |---|------|--------|
-| `skills-index.yaml` | Skill routing（用哪個 skill） | 每個 skill 的 prompt 結構 |
+| `knowledge/runtime/routing-registry.yaml` | Route routing（用哪個 route） | 每個 route 的 prompt 結構 |
 | `workflow/` | 執行流程步驟 | 如何將步驟組合成 prompt |
 | `intelligence/` | 工程智慧 atoms | 何時在 prompt 中引用哪些 atoms |
 | `analysis/` | 分析方法 | 如何在 prompt 中引用方法 |

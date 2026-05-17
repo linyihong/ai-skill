@@ -55,7 +55,7 @@
 
 ### 2.4 索引與路由更新
 
-- [ ] **skills-index.yaml**：如有 skill 層級變更，是否更新？
+- [ ] **knowledge/runtime/routing-registry.yaml**：如有 route 層級變更，是否更新？
 - [ ] **knowledge/indexes/README.md**：路由索引是否反映新結構？
 - [ ] **knowledge/runtime/routing-registry.yaml**：routing registry 是否新增/更新路由？
 - [ ] **knowledge/graphs/**：graph records 是否反映新檔案之間的關係？
@@ -202,7 +202,7 @@
 - [ ] ADR 已記錄關鍵決策
 
 ### 索引與路由
-- [ ] skills-index.yaml 已更新
+- [ ] knowledge/runtime/routing-registry.yaml 已更新
 - [ ] knowledge/indexes/README.md 已更新
 - [ ] routing-registry.yaml 已更新
 - [ ] graph records 已更新
