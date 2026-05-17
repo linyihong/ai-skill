@@ -39,6 +39,7 @@ REQUIRED_TABLES = %w[
   execution_queue priority_scheduler activation_rules_mirror
   transaction_templates_ext distributed_locks multi_agent_coordination
   async_job_lifecycle capability_checkpoints
+  compiler_rules
 ].freeze
 
 MINIMUM_ROWS = {
@@ -79,7 +80,8 @@ MINIMUM_ROWS = {
   'distributed_locks' => 1,
   'multi_agent_coordination' => 1,
   'async_job_lifecycle' => 1,
-  'capability_checkpoints' => 1
+  'capability_checkpoints' => 1,
+  'compiler_rules' => 1
 }.freeze
 
 JSON_COLUMNS = {

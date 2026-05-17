@@ -171,7 +171,15 @@ def create_runtime_db_schema(db_path)
       id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT, rule TEXT, severity TEXT DEFAULT 'high'
     );
     CREATE TABLE IF NOT EXISTS transaction_templates (
-      id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT, typical_steps TEXT
+      id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT, typical_steps TEXT,
+      content TEXT DEFAULT '{}'
+    );
+    CREATE TABLE IF NOT EXISTS compiler_rules (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      rule_id TEXT,
+      content TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
     );
     CREATE TABLE IF NOT EXISTS activation_rules (
       rule_id TEXT PRIMARY KEY, description TEXT, activation_when TEXT,
@@ -799,6 +807,43 @@ def build_runtime_db(db_path)
     end
     sqlite_exec(db_path, "INSERT OR REPLACE INTO async_job_lifecycle (id, state, content) VALUES ((SELECT id FROM async_job_lifecycle WHERE state = '__config__'), '__config__', #{jsn(aj)});")
     puts "    ✓ async job lifecycle"
+  end
+
+  # 8aa. Transaction Templates → transaction_templates
+  tt_path = File.join(rd, 'transactions', 'transaction-templates.yaml')
+  if File.exist?(tt_path)
+    tt = YAML.safe_load(File.read(tt_path), permitted_classes: [Date])
+    (tt['templates'] || []).each do |t|
+      tid = t['id'] || t['name'] || 'default'
+      tname = t['name'] || tid
+      tdesc = t['description'] || ''
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO transaction_templates (id, name, description, typical_steps, content) VALUES (#{sqe(tid)}, #{sqe(tname)}, #{sqe(tdesc)}, #{jsn(t['steps'] || [])}, #{jsn(t)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO transaction_templates (id, name, description, typical_steps, content) VALUES ('__config__', '__config__', 'Full YAML config', '[]', #{jsn(tt)});")
+    puts "    ✓ #{tt['templates']&.length || 0} transaction templates"
+  end
+
+  # 8ab. Compiler Rules → compiler_rules
+  cr_path = File.join(rd, 'compiler', 'compiler-rules.yaml')
+  if File.exist?(cr_path)
+    cr = YAML.safe_load(File.read(cr_path), permitted_classes: [Date])
+    # Compile compilation_rules
+    (cr['compilation_rules'] || []).each do |r|
+      rid = r['id'] || r['name'] || "rule_#{r.object_id}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO compiler_rules (id, rule_id, content) VALUES ((SELECT id FROM compiler_rules WHERE rule_id = #{sqe(rid)}), #{sqe(rid)}, #{jsn(r)});")
+    end
+    # Compile source_target_mapping entries
+    (cr['source_target_mapping'] || []).each_with_index do |m, i|
+      mid = m['source'] || "mapping_#{i}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO compiler_rules (id, rule_id, content) VALUES ((SELECT id FROM compiler_rules WHERE rule_id = #{sqe(mid)}), #{sqe(mid)}, #{jsn(m)});")
+    end
+    # Compile compiler_workflow steps
+    (cr['compiler_workflow'] && cr['compiler_workflow']['steps'] || []).each do |s|
+      sid = s['action'] || "step_#{s['step']}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO compiler_rules (id, rule_id, content) VALUES ((SELECT id FROM compiler_rules WHERE rule_id = #{sqe(sid)}), #{sqe(sid)}, #{jsn(s)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO compiler_rules (id, rule_id, content) VALUES ((SELECT id FROM compiler_rules WHERE rule_id = '__config__'), '__config__', #{jsn(cr)});")
+    puts "    ✓ #{cr['compilation_rules']&.length || 0} compiler rules + #{cr['source_target_mapping']&.length || 0} mappings + #{cr.dig('compiler_workflow', 'steps')&.length || 0} workflow steps"
   end
 
   puts "  ✓ runtime config YAML compiled to dedicated tables"
