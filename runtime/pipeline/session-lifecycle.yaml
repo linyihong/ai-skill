@@ -1,6 +1,7 @@
 # Session Lifecycle
 # 定義 AI session 的四個階段：Bootstrap → Routing → Execution → Close-loop
 # 每個階段有明確的進入條件、執行內容、離開條件與 token budget。
+# COMPILER SOURCE → session_lifecycle
 
 session_lifecycle_version: v1
 status: candidate

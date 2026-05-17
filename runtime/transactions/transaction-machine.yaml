@@ -1,4 +1,5 @@
 # Transaction Machine
+# COMPILER SOURCE → transaction_templates_ext
 # 定義 Ai-skill writeback transaction 的狀態機。
 # 將現有 procedural writeback transaction（enforcement/dependency-reading.md §90-122）
 # 升級為 declarative transaction state machine。

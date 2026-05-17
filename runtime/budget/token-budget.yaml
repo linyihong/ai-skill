@@ -1,6 +1,7 @@
 # Token Budget System
 # 定義 session token 預算、警告門檻與 hard stop。
 # Agent 在 session 啟動時載入此 policy，並在 context 成長時持續檢查。
+# COMPILER SOURCE → runtime_budget
 
 token_budget_version: v1
 status: candidate

@@ -29,4 +29,14 @@ sqlite3 runtime/runtime.db "SELECT id, name, severity FROM gates WHERE phase = '
 
 # 查詢 generated surfaces（取代 legacy YAML）
 sqlite3 runtime/runtime.db "SELECT type, source, updated_at FROM generated_surfaces;"
+
+# 查詢 runtime config（已編譯至專屬表格）
+sqlite3 runtime/runtime.db "SELECT model_name FROM runtime_budget;"
+sqlite3 runtime/runtime.db "SELECT ttl_type FROM context_ttl_policy;"
+sqlite3 runtime/runtime.db "SELECT guard_name FROM circuit_breaker;"
+sqlite3 runtime/runtime.db "SELECT phase_id, content FROM phase_machine;"
+sqlite3 runtime/runtime.db "SELECT obligation_id FROM obligation_ledger;"
+sqlite3 runtime/runtime.db "SELECT gate_id FROM blocking_gates;"
 ```
+
+完整表格清單請見 [`../README.md`](../README.md) 的 Databases 章節。

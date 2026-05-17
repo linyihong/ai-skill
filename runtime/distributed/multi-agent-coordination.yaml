@@ -1,4 +1,5 @@
 # Multi-agent Coordination
+# COMPILER SOURCE → multi_agent_coordination
 # 定義多 agent 間的協調規則，防止 phase inconsistency、obligation drift、
 # generated surface stale 等 distributed state 問題。
 #

@@ -1,6 +1,7 @@
 # Context Health Score
 # 評估目前 context 的健康狀態，低於門檻時觸發清理或 halt。
 # Agent 在 task boundary 或 token threshold 接近時執行此檢查。
+# COMPILER SOURCE → context_health_score
 
 context_health_version: v1
 status: candidate

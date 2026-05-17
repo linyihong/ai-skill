@@ -1,4 +1,5 @@
 # Priority Scheduler
+# COMPILER SOURCE → priority_scheduler
 # 定義 execution queue 的優先順序規則，解決注意力漂移問題。
 # 當多個 obligations、gates、或 phase transitions 需要執行時，
 # 依 priority、deadline、blocking_dependencies、resource_cost 決定執行順序。

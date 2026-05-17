@@ -17,16 +17,16 @@
 ```
 1. 讀取 CORE_BOOTSTRAP.md（本檔）
 2. 讀取 README.md（超短入口，了解 OS layout）
-3. [Runtime Phase 初始化] 讀取 runtime/phases/phase-machine.yaml：
+3. [Runtime Phase 初始化] 讀取 runtime/phases/phase-machine.yaml（或查 SQLite phase_machine 表）：
    - 載入目前 phase、allowed_actions、forbidden_actions、blocking_gates
-   - 載入 obligation-ledger.yaml 確認本 phase 的未完成義務
-   - 載入 blocking-gates.yaml 確認本 phase 的阻斷閘門
+   - 載入 obligation-ledger.yaml（或查 SQLite obligation_ledger 表）確認本 phase 的未完成義務
+   - 載入 blocking-gates.yaml（或查 SQLite blocking_gates 表）確認本 phase 的阻斷閘門
    - 查詢 runtime.db（generated_surfaces 表）作為知識更新快速路徑
    - 若 phase 為 bootstrap → 繼續往下；若為其他 phase → 先檢查 blocking gates
-4. [Output Governance 初始化] 載入輸出規則：
-   - 讀取 runtime/output-governance/language-policy.yaml — 語言強制規則
-   - 讀取 runtime/output-governance/output-rules.yaml — 文件輸出規則
-   - 讀取 runtime/output-governance/governance-gates.yaml — 輸出品質 blocking gates
+4. [Output Governance 初始化] 載入輸出規則（YAML 或 SQLite 皆可）：
+   - 讀取 runtime/output-governance/language-policy.yaml（或查 SQLite language_policy 表）— 語言強制規則
+   - 讀取 runtime/output-governance/output-rules.yaml（或查 SQLite output_rules 表）— 文件輸出規則
+   - 讀取 runtime/output-governance/governance-gates.yaml（或查 SQLite governance_gates 表）— 輸出品質 blocking gates
    - 確認目前 phase 的 governance gates 狀態
 5. [新專案檢查] 檢查目前專案是否已設定 Ai-skill：
    - 檢查 .roomodes 是否存在且包含 CORE_BOOTSTRAP.md 參考
@@ -43,6 +43,8 @@
 9. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
 10. 需要時才展開完整 source
 ```
+
+> **Runtime Config 已編譯至 SQLite**：所有 `runtime/**/*.yaml` 設定檔已由 compiler 編譯至 `runtime/runtime.db` 的專屬表格（如 `phase_machine`、`obligation_ledger`、`blocking_gates`、`language_policy`、`output_rules`、`governance_gates` 等）。Agent 可直接查 SQLite 取得結構化資料，YAML 檔案仍為 source-of-truth 供人類編輯。
 
 ## 與舊 Default Bootstrap 的關係
 

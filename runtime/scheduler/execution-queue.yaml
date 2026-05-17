@@ -1,4 +1,5 @@
 # Execution Queue
+# COMPILER SOURCE → execution_queue
 # 定義 execution queue 的結構與管理規則。
 # Queue 包含目前 phase 中所有待執行的項目（obligations、gates、actions），
 # 依 priority-scheduler.yaml 的規則排序。

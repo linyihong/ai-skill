@@ -1,6 +1,7 @@
 # Progressive Context Expansion Flow
 # 定義 context 如何從 summary → module summary → detailed source → raw source 漸進擴展。
 # 目標：不一次載入全部，只在需要時擴展到下一層。
+# COMPILER SOURCE → pipeline_context_flow
 #
 # 依賴：
 #   - knowledge/summaries/ (summary layer)

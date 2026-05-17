@@ -2,6 +2,7 @@
 # 文件輸出規則 — declarative YAML version
 # Canonical source: enforcement/sanitization.md, enforcement/tool-neutral-documentation.md,
 #                   enforcement/neutral-language.md
+# COMPILER SOURCE → output_rules
 #
 # 本檔案由 runtime compiler 維護。修改 prose source 後執行 compiler 同步更新。
 # 手動修改本檔案會被 compiler 覆蓋。

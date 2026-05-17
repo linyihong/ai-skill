@@ -1,6 +1,7 @@
 # Guard Chain
 # 定義 circuit breaker guards 在每個 pipeline stage 的執行順序。
 # 每個 stage 有獨立的 guard chain，確保 guards 按正確順序執行。
+# COMPILER SOURCE → guard_chain
 #
 # 依賴：
 #   - runtime/guards/circuit-breaker.yaml (guard definitions)

@@ -1,6 +1,7 @@
 # Blocking Gates
 # 定義每個 phase 中必須通過的 blocking gates。Gate 是「不能做的事」，
 # 與 obligation（「該做的事」）互補。
+# COMPILER SOURCE → blocking_gates
 #
 # Gate 有三種 severity：
 #   - critical: 未通過時 block phase transition，agent 不能繼續

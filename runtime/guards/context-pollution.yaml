@@ -1,6 +1,7 @@
 # Context Pollution Detection
 # 偵測 context 是否已被「污染」— 過長、過多修改、過多 modules。
 # 污染發生時建議建立新 session。
+# COMPILER SOURCE → context_pollution
 
 context_pollution_version: v1
 status: candidate

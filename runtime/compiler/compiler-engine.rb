@@ -201,6 +201,128 @@ def create_runtime_db_schema(db_path)
     CREATE INDEX IF NOT EXISTS idx_discovery_checkpoints_phase ON discovery_checkpoints(phase);
     CREATE INDEX IF NOT EXISTS idx_phase_transitions_from ON phase_transitions(from_phase);
     CREATE INDEX IF NOT EXISTS idx_transaction_transitions_from ON transaction_transitions(from_state);
+
+    -- Runtime Config Tables (v2 migration)
+    CREATE TABLE IF NOT EXISTS runtime_budget (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, model_name TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS context_ttl_policy (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, ttl_type TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS circuit_breaker (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, guard_name TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS context_pollution (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, signal_name TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS context_health_score (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, dimension TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS intelligence_routing (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, rule_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS obligation_ledger (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, obligation_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS language_policy (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, section TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS output_rules (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, section TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS governance_gates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, gate_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS blocking_gates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, gate_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS phase_machine (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, phase_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS pipeline_context_flow (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, level TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS guard_chain (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, stage TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS relevance_engine (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, component TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS session_lifecycle (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, stage TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS prompt_artifact_templates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, template_name TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS prompt_composition_rules (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, rule_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS recovery_strategies (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, strategy_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS state_repair (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, procedure_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS obligation_rebuild (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, procedure_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS phase_reconciliation (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, procedure_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS execution_queue (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, queue_name TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS priority_scheduler (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, priority_level TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS activation_rules_mirror (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, rule_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS transaction_templates_ext (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, template_name TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS distributed_locks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, lock_name TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS multi_agent_coordination (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, rule_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS async_job_lifecycle (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, state TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS capability_checkpoints (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, checkpoint_id TEXT,
+      content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+    );
   SQL
 end
 
@@ -294,6 +416,392 @@ def build_runtime_db(db_path)
   sqlite_exec(db_path, "INSERT INTO compiler_metadata (key, value) VALUES ('compiled_at', #{sqe(Time.now.utc.strftime('%Y-%m-%dT%H:%M:%SZ'))});")
   sqlite_exec(db_path, "INSERT INTO compiler_metadata (key, value) VALUES ('schema_version', '1.0');")
   puts "  ✓ compiler metadata written"
+
+  # ═══════════════════════════════════════════════════════════════
+  # 8. Runtime Config YAML → Dedicated Tables
+  # ═══════════════════════════════════════════════════════════════
+
+  # 8a. Token Budget
+  tb_path = File.join(rd, 'budget', 'token-budget.yaml')
+  if File.exist?(tb_path)
+    tb = YAML.safe_load(File.read(tb_path), permitted_classes: [Date])
+    (tb['per_model'] || []).each do |m|
+      name = m['name'] || m['model'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO runtime_budget (id, model_name, content) VALUES ((SELECT id FROM runtime_budget WHERE model_name = #{sqe(name)}), #{sqe(name)}, #{jsn(m)});")
+    end
+    if tb['default_budget']
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO runtime_budget (id, model_name, content) VALUES ((SELECT id FROM runtime_budget WHERE model_name = '__default_budget__'), '__default_budget__', #{jsn(tb['default_budget'])});")
+    end
+    if tb['per_layer']
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO runtime_budget (id, model_name, content) VALUES ((SELECT id FROM runtime_budget WHERE model_name = '__per_layer__'), '__per_layer__', #{jsn(tb['per_layer'])});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO runtime_budget (id, model_name, content) VALUES ((SELECT id FROM runtime_budget WHERE model_name = '__config__'), '__config__', #{jsn(tb)});")
+    puts "    ✓ #{tb['per_model']&.length || 0} budget models"
+  end
+
+  # 8b. Context TTL → context_ttl_policy
+  ct_path = File.join(rd, 'context', 'ttl-policy.yaml')
+  if File.exist?(ct_path)
+    ct = YAML.safe_load(File.read(ct_path), permitted_classes: [Date])
+    (ct['rules'] || []).each do |r|
+      name = r['name'] || r['id'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO context_ttl_policy (id, ttl_type, content) VALUES ((SELECT id FROM context_ttl_policy WHERE ttl_type = #{sqe(name)}), #{sqe(name)}, #{jsn(r)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO context_ttl_policy (id, ttl_type, content) VALUES ((SELECT id FROM context_ttl_policy WHERE ttl_type = '__config__'), '__config__', #{jsn(ct)});")
+    puts "    ✓ #{ct['rules']&.length || 0} context TTL rules"
+  end
+
+  # 8c. Discovery Checkpoints → capability_checkpoints
+  dc_path = File.join(rd, 'discovery', 'capability-checkpoints.yaml')
+  if File.exist?(dc_path)
+    dc = YAML.safe_load(File.read(dc_path), permitted_classes: [Date])
+    (dc['checkpoints'] || []).each do |cp|
+      name = cp['phase'] || cp['name'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO capability_checkpoints (id, checkpoint_id, content) VALUES ((SELECT id FROM capability_checkpoints WHERE checkpoint_id = #{sqe(name)}), #{sqe(name)}, #{jsn(cp)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO capability_checkpoints (id, checkpoint_id, content) VALUES ((SELECT id FROM capability_checkpoints WHERE checkpoint_id = '__config__'), '__config__', #{jsn(dc)});")
+    puts "    ✓ #{dc['checkpoints']&.length || 0} discovery checkpoints"
+  end
+
+  # 8d. Distributed Config → distributed_locks
+  dd_path = File.join(rd, 'distributed', 'distributed-locks.yaml')
+  if File.exist?(dd_path)
+    dd = YAML.safe_load(File.read(dd_path), permitted_classes: [Date])
+    (dd['locks'] || []).each do |l|
+      name = l['name'] || l['id'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO distributed_locks (id, lock_name, content) VALUES ((SELECT id FROM distributed_locks WHERE lock_name = #{sqe(name)}), #{sqe(name)}, #{jsn(l)});")
+    end
+    (dd['conflict_rules'] || []).each do |r|
+      name = r['name'] || r['id'] || "rule_#{r.object_id}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO distributed_locks (id, lock_name, content) VALUES ((SELECT id FROM distributed_locks WHERE lock_name = #{sqe(name)}), #{sqe(name)}, #{jsn(r)});")
+    end
+    (dd['distributed_states'] || []).each do |s|
+      name = s['state'] || s['name'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO distributed_locks (id, lock_name, content) VALUES ((SELECT id FROM distributed_locks WHERE lock_name = #{sqe(name)}), #{sqe(name)}, #{jsn(s)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO distributed_locks (id, lock_name, content) VALUES ((SELECT id FROM distributed_locks WHERE lock_name = '__config__'), '__config__', #{jsn(dd)});")
+    puts "    ✓ distributed config"
+  end
+
+  # 8e. Blocking Gates → blocking_gates
+  bg_path = File.join(rd, 'gates', 'blocking-gates.yaml')
+  if File.exist?(bg_path)
+    bg = YAML.safe_load(File.read(bg_path), permitted_classes: [Date])
+    (bg['gates'] || []).each do |g|
+      name = g['id'] || g['name'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO blocking_gates (id, gate_id, content) VALUES ((SELECT id FROM blocking_gates WHERE gate_id = #{sqe(name)}), #{sqe(name)}, #{jsn(g)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO blocking_gates (id, gate_id, content) VALUES ((SELECT id FROM blocking_gates WHERE gate_id = '__config__'), '__config__', #{jsn(bg)});")
+    puts "    ✓ #{bg['gates']&.length || 0} blocking gates"
+  end
+
+  # 8f. Circuit Breaker
+  cb_path = File.join(rd, 'guards', 'circuit-breaker.yaml')
+  if File.exist?(cb_path)
+    cb = YAML.safe_load(File.read(cb_path), permitted_classes: [Date])
+    guard_keys = %w[recursive_depth tool_calls context_growth hallucination_risk conflict_rules]
+    guard_keys.each do |key|
+      next unless cb[key]
+      entry = { 'name' => key }.merge(cb[key])
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO circuit_breaker (id, guard_name, content) VALUES ((SELECT id FROM circuit_breaker WHERE guard_name = #{sqe(key)}), #{sqe(key)}, #{jsn(entry)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO circuit_breaker (id, guard_name, content) VALUES ((SELECT id FROM circuit_breaker WHERE guard_name = '__config__'), '__config__', #{jsn(cb)});")
+    puts "    ✓ circuit breaker guards"
+  end
+
+  # 8g. Context Pollution
+  cp_path = File.join(rd, 'guards', 'context-pollution.yaml')
+  if File.exist?(cp_path)
+    cp = YAML.safe_load(File.read(cp_path), permitted_classes: [Date])
+    (cp['signals'] || []).each do |s|
+      name = s['name'] || s['id'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO context_pollution (id, signal_name, content) VALUES ((SELECT id FROM context_pollution WHERE signal_name = #{sqe(name)}), #{sqe(name)}, #{jsn(s)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO context_pollution (id, signal_name, content) VALUES ((SELECT id FROM context_pollution WHERE signal_name = '__config__'), '__config__', #{jsn(cp)});")
+    puts "    ✓ #{cp['signals']&.length || 0} pollution signals"
+  end
+
+  # 8h. Health Checks → context_health_score
+  hc_path = File.join(rd, 'health', 'context-health-score.yaml')
+  if File.exist?(hc_path)
+    hc = YAML.safe_load(File.read(hc_path), permitted_classes: [Date])
+    (hc['dimensions'] || []).each do |d|
+      name = d['name'] || d['dimension'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO context_health_score (id, dimension, content) VALUES ((SELECT id FROM context_health_score WHERE dimension = #{sqe(name)}), #{sqe(name)}, #{jsn(d)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO context_health_score (id, dimension, content) VALUES ((SELECT id FROM context_health_score WHERE dimension = '__config__'), '__config__', #{jsn(hc)});")
+    puts "    ✓ #{hc['dimensions']&.length || 0} health dimensions"
+  end
+
+  # 8i. Intelligence Routing → intelligence_routing
+  ir_path = File.join(rd, 'intelligence', 'intelligence-routing.yaml')
+  if File.exist?(ir_path)
+    ir = YAML.safe_load(File.read(ir_path), permitted_classes: [Date])
+    (ir['routing_rules'] || []).each do |r|
+      name = r['name'] || r['id'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO intelligence_routing (id, rule_id, content) VALUES ((SELECT id FROM intelligence_routing WHERE rule_id = #{sqe(name)}), #{sqe(name)}, #{jsn(r)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO intelligence_routing (id, rule_id, content) VALUES ((SELECT id FROM intelligence_routing WHERE rule_id = '__config__'), '__config__', #{jsn(ir)});")
+    puts "    ✓ #{ir['routing_rules']&.length || 0} routing rules"
+  end
+
+  # 8j. Obligation Ledger → obligation_ledger
+  ol_path = File.join(rd, 'obligations', 'obligation-ledger.yaml')
+  if File.exist?(ol_path)
+    ol = YAML.safe_load(File.read(ol_path), permitted_classes: [Date])
+    (ol['obligations'] || []).each do |ob|
+      name = ob['id'] || ob['name'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO obligation_ledger (id, obligation_id, content) VALUES ((SELECT id FROM obligation_ledger WHERE obligation_id = #{sqe(name)}), #{sqe(name)}, #{jsn(ob)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO obligation_ledger (id, obligation_id, content) VALUES ((SELECT id FROM obligation_ledger WHERE obligation_id = '__config__'), '__config__', #{jsn(ol)});")
+    puts "    ✓ #{ol['obligations']&.length || 0} obligations"
+  end
+
+  # 8k. Output Governance → output_rules
+  og_path = File.join(rd, 'output-governance', 'output-rules.yaml')
+  if File.exist?(og_path)
+    og = YAML.safe_load(File.read(og_path), permitted_classes: [Date])
+    (og['rules'] || []).each do |r|
+      name = r['name'] || r['id'] || "rule_#{r.object_id}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO output_rules (id, section, content) VALUES ((SELECT id FROM output_rules WHERE section = #{sqe(name)}), #{sqe(name)}, #{jsn(r)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO output_rules (id, section, content) VALUES ((SELECT id FROM output_rules WHERE section = '__config__'), '__config__', #{jsn(og)});")
+    puts "    ✓ #{og['rules']&.length || 0} output rules"
+  end
+
+  # 8l. Governance Gates
+  gg_path = File.join(rd, 'output-governance', 'governance-gates.yaml')
+  if File.exist?(gg_path)
+    gg = YAML.safe_load(File.read(gg_path), permitted_classes: [Date])
+    (gg['gates'] || []).each do |g|
+      name = g['id'] || g['name'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO governance_gates (id, gate_id, content) VALUES ((SELECT id FROM governance_gates WHERE gate_id = #{sqe(name)}), #{sqe(name)}, #{jsn(g)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO governance_gates (id, gate_id, content) VALUES ((SELECT id FROM governance_gates WHERE gate_id = '__config__'), '__config__', #{jsn(gg)});")
+    puts "    ✓ #{gg['gates']&.length || 0} governance gates"
+  end
+
+  # 8m. Phase Machine → phase_machine
+  pm_path = File.join(rd, 'phases', 'phase-machine.yaml')
+  if File.exist?(pm_path)
+    pm = YAML.safe_load(File.read(pm_path), permitted_classes: [Date])
+    (pm['phases'] || []).each do |ph|
+      name = ph['id'] || ph['name'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO phase_machine (id, phase_id, content) VALUES ((SELECT id FROM phase_machine WHERE phase_id = #{sqe(name)}), #{sqe(name)}, #{jsn(ph)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO phase_machine (id, phase_id, content) VALUES ((SELECT id FROM phase_machine WHERE phase_id = '__config__'), '__config__', #{jsn(pm)});")
+    puts "    ✓ #{pm['phases']&.length || 0} phases"
+  end
+
+  # 8n. Pipeline Config → pipeline_context_flow + guard_chain + session_lifecycle
+  # context-flow.yaml → pipeline_context_flow
+  cf_path = File.join(rd, 'pipeline', 'context-flow.yaml')
+  if File.exist?(cf_path)
+    cf = YAML.safe_load(File.read(cf_path), permitted_classes: [Date])
+    (cf['levels'] || []).each do |l|
+      name = l['name'] || l['level'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO pipeline_context_flow (id, level, content) VALUES ((SELECT id FROM pipeline_context_flow WHERE level = #{sqe(name)}), #{sqe(name)}, #{jsn(l)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO pipeline_context_flow (id, level, content) VALUES ((SELECT id FROM pipeline_context_flow WHERE level = '__config__'), '__config__', #{jsn(cf)});")
+    puts "    ✓ pipeline context flow"
+  end
+  # guard-chain.yaml → guard_chain
+  gc_path = File.join(rd, 'pipeline', 'guard-chain.yaml')
+  if File.exist?(gc_path)
+    gc = YAML.safe_load(File.read(gc_path), permitted_classes: [Date])
+    (gc['stages'] || []).each do |s|
+      name = s['name'] || s['stage'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO guard_chain (id, stage, content) VALUES ((SELECT id FROM guard_chain WHERE stage = #{sqe(name)}), #{sqe(name)}, #{jsn(s)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO guard_chain (id, stage, content) VALUES ((SELECT id FROM guard_chain WHERE stage = '__config__'), '__config__', #{jsn(gc)});")
+    puts "    ✓ guard chain"
+  end
+  # session-lifecycle.yaml → session_lifecycle
+  sl_path = File.join(rd, 'pipeline', 'session-lifecycle.yaml')
+  if File.exist?(sl_path)
+    sl = YAML.safe_load(File.read(sl_path), permitted_classes: [Date])
+    (sl['stages'] || []).each do |s|
+      name = s['name'] || s['stage'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO session_lifecycle (id, stage, content) VALUES ((SELECT id FROM session_lifecycle WHERE stage = #{sqe(name)}), #{sqe(name)}, #{jsn(s)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO session_lifecycle (id, stage, content) VALUES ((SELECT id FROM session_lifecycle WHERE stage = '__config__'), '__config__', #{jsn(sl)});")
+    puts "    ✓ session lifecycle"
+  end
+
+  # 8o. Relevance Engine
+  re_path = File.join(rd, 'pipeline', 'relevance-engine.yaml')
+  if File.exist?(re_path)
+    re = YAML.safe_load(File.read(re_path), permitted_classes: [Date])
+    scoring = re['scoring']
+    if scoring && scoring['components'].is_a?(Array)
+      scoring['components'].each do |c|
+        name = c['id'] || c['name'] || 'default'
+        sqlite_exec(db_path, "INSERT OR REPLACE INTO relevance_engine (id, component, content) VALUES ((SELECT id FROM relevance_engine WHERE component = #{sqe(name)}), #{sqe(name)}, #{jsn(c)});")
+      end
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO relevance_engine (id, component, content) VALUES ((SELECT id FROM relevance_engine WHERE component = '__config__'), '__config__', #{jsn(re)});")
+    puts "    ✓ relevance engine components"
+  end
+
+  # 8p. Prompt Artifacts → prompt_artifact_templates
+  pa_path = File.join(rd, 'prompt-artifacts', 'artifact-templates.yaml')
+  if File.exist?(pa_path)
+    pa = YAML.safe_load(File.read(pa_path), permitted_classes: [Date])
+    (pa['templates'] || []).each do |t|
+      name = t['name'] || t['id'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO prompt_artifact_templates (id, template_name, content) VALUES ((SELECT id FROM prompt_artifact_templates WHERE template_name = #{sqe(name)}), #{sqe(name)}, #{jsn(t)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO prompt_artifact_templates (id, template_name, content) VALUES ((SELECT id FROM prompt_artifact_templates WHERE template_name = '__config__'), '__config__', #{jsn(pa)});")
+    puts "    ✓ #{pa['templates']&.length || 0} prompt templates"
+  end
+  # composition-rules.yaml → prompt_composition_rules
+  cr_path = File.join(rd, 'prompt-artifacts', 'composition-rules.yaml')
+  if File.exist?(cr_path)
+    cr = YAML.safe_load(File.read(cr_path), permitted_classes: [Date])
+    (cr['rules'] || []).each do |r|
+      name = r['rule_id'] || r['name'] || "rule_#{r.object_id}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO prompt_composition_rules (id, rule_id, content) VALUES ((SELECT id FROM prompt_composition_rules WHERE rule_id = #{sqe(name)}), #{sqe(name)}, #{jsn(r)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO prompt_composition_rules (id, rule_id, content) VALUES ((SELECT id FROM prompt_composition_rules WHERE rule_id = '__config__'), '__config__', #{jsn(cr)});")
+    puts "    ✓ #{cr['rules']&.length || 0} composition rules"
+  end
+
+  # 8q. Recovery Config → recovery_strategies + state_repair + obligation_rebuild + phase_reconciliation
+  # recovery-strategies.yaml → recovery_strategies
+  rs_path = File.join(rd, 'recovery', 'recovery-strategies.yaml')
+  if File.exist?(rs_path)
+    rs = YAML.safe_load(File.read(rs_path), permitted_classes: [Date])
+    (rs['recovery_strategies'] || []).each do |s|
+      name = s['name'] || s['id'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO recovery_strategies (id, strategy_id, content) VALUES ((SELECT id FROM recovery_strategies WHERE strategy_id = #{sqe(name)}), #{sqe(name)}, #{jsn(s)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO recovery_strategies (id, strategy_id, content) VALUES ((SELECT id FROM recovery_strategies WHERE strategy_id = '__config__'), '__config__', #{jsn(rs)});")
+    puts "    ✓ recovery strategies"
+  end
+  # state-repair.yaml → state_repair
+  sr_path = File.join(rd, 'recovery', 'state-repair.yaml')
+  if File.exist?(sr_path)
+    sr = YAML.safe_load(File.read(sr_path), permitted_classes: [Date])
+    (sr['repair_procedures'] || []).each do |p|
+      name = p['name'] || p['id'] || "proc_#{p.object_id}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO state_repair (id, procedure_id, content) VALUES ((SELECT id FROM state_repair WHERE procedure_id = #{sqe(name)}), #{sqe(name)}, #{jsn(p)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO state_repair (id, procedure_id, content) VALUES ((SELECT id FROM state_repair WHERE procedure_id = '__config__'), '__config__', #{jsn(sr)});")
+    puts "    ✓ state repair"
+  end
+  # obligation-rebuild.yaml → obligation_rebuild
+  ob_path = File.join(rd, 'recovery', 'obligation-rebuild.yaml')
+  if File.exist?(ob_path)
+    ob = YAML.safe_load(File.read(ob_path), permitted_classes: [Date])
+    (ob['rebuild_procedures'] || []).each do |p|
+      name = p['name'] || p['id'] || "proc_#{p.object_id}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO obligation_rebuild (id, procedure_id, content) VALUES ((SELECT id FROM obligation_rebuild WHERE procedure_id = #{sqe(name)}), #{sqe(name)}, #{jsn(p)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO obligation_rebuild (id, procedure_id, content) VALUES ((SELECT id FROM obligation_rebuild WHERE procedure_id = '__config__'), '__config__', #{jsn(ob)});")
+    puts "    ✓ obligation rebuild"
+  end
+  # phase-reconciliation.yaml → phase_reconciliation
+  pr_path = File.join(rd, 'recovery', 'phase-reconciliation.yaml')
+  if File.exist?(pr_path)
+    pr = YAML.safe_load(File.read(pr_path), permitted_classes: [Date])
+    (pr['reconciliation_procedures'] || []).each do |p|
+      name = p['name'] || p['id'] || "proc_#{p.object_id}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO phase_reconciliation (id, procedure_id, content) VALUES ((SELECT id FROM phase_reconciliation WHERE procedure_id = #{sqe(name)}), #{sqe(name)}, #{jsn(p)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO phase_reconciliation (id, procedure_id, content) VALUES ((SELECT id FROM phase_reconciliation WHERE procedure_id = '__config__'), '__config__', #{jsn(pr)});")
+    puts "    ✓ phase reconciliation"
+  end
+
+  # 8r. Router Config — no dedicated table in schema (uses activation_rules table)
+  # 8s. Routing Registry — no dedicated table in schema
+
+  # 8t. Execution Queue
+  eq_path = File.join(rd, 'scheduler', 'execution-queue.yaml')
+  if File.exist?(eq_path)
+    eq = YAML.safe_load(File.read(eq_path), permitted_classes: [Date])
+    queue_struct = eq['queue_structure']
+    if queue_struct
+      name = queue_struct['name'] || 'default'
+      entry = { 'name' => name }.merge(queue_struct)
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO execution_queue (id, queue_name, content) VALUES ((SELECT id FROM execution_queue WHERE queue_name = #{sqe(name)}), #{sqe(name)}, #{jsn(entry)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO execution_queue (id, queue_name, content) VALUES ((SELECT id FROM execution_queue WHERE queue_name = '__config__'), '__config__', #{jsn(eq)});")
+    puts "    ✓ execution queue"
+  end
+
+  # 8u. Priority Scheduler
+  ps_path = File.join(rd, 'scheduler', 'priority-scheduler.yaml')
+  if File.exist?(ps_path)
+    ps = YAML.safe_load(File.read(ps_path), permitted_classes: [Date])
+    (ps['levels'] || []).each do |l|
+      name = l['name'] || l['level'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO priority_scheduler (id, priority_level, content) VALUES ((SELECT id FROM priority_scheduler WHERE priority_level = #{sqe(name)}), #{sqe(name)}, #{jsn(l)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO priority_scheduler (id, priority_level, content) VALUES ((SELECT id FROM priority_scheduler WHERE priority_level = '__config__'), '__config__', #{jsn(ps)});")
+    puts "    ✓ #{ps['levels']&.length || 0} priority levels"
+  end
+
+  # 8v. Activation Rules Mirror → activation_rules_mirror
+  ar_path = File.join(rd, 'router', 'activation-rules.yaml')
+  if File.exist?(ar_path)
+    ar = YAML.safe_load(File.read(ar_path), permitted_classes: [Date])
+    (ar['rules'] || []).each do |r|
+      name = r['rule_id'] || r['name'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO activation_rules_mirror (id, rule_id, content) VALUES ((SELECT id FROM activation_rules_mirror WHERE rule_id = #{sqe(name)}), #{sqe(name)}, #{jsn(r)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO activation_rules_mirror (id, rule_id, content) VALUES ((SELECT id FROM activation_rules_mirror WHERE rule_id = '__config__'), '__config__', #{jsn(ar)});")
+    puts "    ✓ #{ar['rules']&.length || 0} activation rules mirror"
+  end
+
+  # 8w. Transaction Templates Ext → transaction_templates_ext
+  tt_path = File.join(rd, 'transactions', 'transaction-machine.yaml')
+  if File.exist?(tt_path)
+    tt = YAML.safe_load(File.read(tt_path), permitted_classes: [Date])
+    (tt['transaction_templates'] || []).each do |t|
+      name = t['id'] || t['name'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO transaction_templates_ext (id, template_name, content) VALUES ((SELECT id FROM transaction_templates_ext WHERE template_name = #{sqe(name)}), #{sqe(name)}, #{jsn(t)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO transaction_templates_ext (id, template_name, content) VALUES ((SELECT id FROM transaction_templates_ext WHERE template_name = '__config__'), '__config__', #{jsn(tt)});")
+    puts "    ✓ #{tt['transaction_templates']&.length || 0} transaction templates ext"
+  end
+
+  # 8x. Language Policy
+  lp_path = File.join(rd, 'output-governance', 'language-policy.yaml')
+  if File.exist?(lp_path)
+    lp = YAML.safe_load(File.read(lp_path), permitted_classes: [Date])
+    (lp['rules'] || []).each do |r|
+      name = r['name'] || r['id'] || "rule_#{r.object_id}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO language_policy (id, section, content) VALUES ((SELECT id FROM language_policy WHERE section = #{sqe(name)}), #{sqe(name)}, #{jsn(r)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO language_policy (id, section, content) VALUES ((SELECT id FROM language_policy WHERE section = '__config__'), '__config__', #{jsn(lp)});")
+    puts "    ✓ #{lp['rules']&.length || 0} language policy rules"
+  end
+
+  # 8y. Multi-agent Coordination → multi_agent_coordination
+  ma_path = File.join(rd, 'distributed', 'multi-agent-coordination.yaml')
+  if File.exist?(ma_path)
+    ma = YAML.safe_load(File.read(ma_path), permitted_classes: [Date])
+    (ma['coordination_rules'] || []).each do |r|
+      name = r['name'] || r['id'] || "rule_#{r.object_id}"
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO multi_agent_coordination (id, rule_id, content) VALUES ((SELECT id FROM multi_agent_coordination WHERE rule_id = #{sqe(name)}), #{sqe(name)}, #{jsn(r)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO multi_agent_coordination (id, rule_id, content) VALUES ((SELECT id FROM multi_agent_coordination WHERE rule_id = '__config__'), '__config__', #{jsn(ma)});")
+    puts "    ✓ multi-agent coordination"
+  end
+
+  # 8z. Async Job Lifecycle → async_job_lifecycle
+  aj_path = File.join(rd, 'distributed', 'async-job-lifecycle.yaml')
+  if File.exist?(aj_path)
+    aj = YAML.safe_load(File.read(aj_path), permitted_classes: [Date])
+    (aj['states'] || []).each do |s|
+      name = s['name'] || s['state'] || 'default'
+      sqlite_exec(db_path, "INSERT OR REPLACE INTO async_job_lifecycle (id, state, content) VALUES ((SELECT id FROM async_job_lifecycle WHERE state = #{sqe(name)}), #{sqe(name)}, #{jsn(s)});")
+    end
+    sqlite_exec(db_path, "INSERT OR REPLACE INTO async_job_lifecycle (id, state, content) VALUES ((SELECT id FROM async_job_lifecycle WHERE state = '__config__'), '__config__', #{jsn(aj)});")
+    puts "    ✓ async job lifecycle"
+  end
+
+  puts "  ✓ runtime config YAML compiled to dedicated tables"
 end
 
 # ═══════════════════════════════════════════════════════════════

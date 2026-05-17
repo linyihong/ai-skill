@@ -1,6 +1,7 @@
 # AI Runtime Circuit Breaker
 # 防止 agent 陷入遞迴循環、tool explosion、context 失控。
 # Agent 在每個 action 前檢查 breaker 狀態。
+# COMPILER SOURCE → circuit_breaker
 
 circuit_breaker_version: v1
 status: candidate

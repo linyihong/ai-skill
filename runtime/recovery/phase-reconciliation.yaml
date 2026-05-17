@@ -1,4 +1,5 @@
 # Phase Reconciliation
+# COMPILER SOURCE → phase_reconciliation
 # 定義 phase 之間狀態不一致時的 reconciliation 程序。
 # 當 phase_history、current_phase、blocking_gates、obligations 四者狀態不一致時，
 # 需要 reconciliation 來恢復一致性。

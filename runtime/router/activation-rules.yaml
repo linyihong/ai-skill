@@ -1,4 +1,5 @@
 # Runtime Activation Rules
+# COMPILER SOURCE → activation_rules_mirror
 # 定義哪些 enforcement rules 在什麼條件下 activate（lazy-load）。
 # Agent 不預設讀 lazy-load rules，只在符合 when 條件時才 activate。
 #

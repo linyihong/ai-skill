@@ -1,5 +1,6 @@
 # Distributed Locks
 # 定義 distributed lock / lease 機制，防止多 agent 同時修改同一 state。
+# COMPILER SOURCE → distributed_locks
 #
 # 依賴：
 #   - runtime/transactions/transaction-machine.yaml（transaction state machine）

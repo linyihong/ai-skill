@@ -1,5 +1,6 @@
 # Context TTL Policy
 # 定義每條 context 的生命週期，防止 Agent 永久保留 context 導致 token 膨脹。
+# COMPILER SOURCE → context_ttl_policy
 
 ttl_policy_version: v1
 status: candidate

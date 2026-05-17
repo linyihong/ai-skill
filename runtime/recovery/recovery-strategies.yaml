@@ -1,4 +1,5 @@
 # Recovery Strategies
+# COMPILER SOURCE → recovery_strategies
 # 定義當 phase transition 被 blocking gate 阻斷時，各類失效的修復策略。
 # 每個 strategy 對應一種 failure pattern，提供可操作的修復步驟。
 #

@@ -1,4 +1,5 @@
 # Async Job Lifecycle
+# COMPILER SOURCE → async_job_lifecycle
 # 定義 background job / async task 的生命週期管理。
 #
 # 依賴：

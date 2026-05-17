@@ -2,6 +2,7 @@
 # 定義各 task type 的 prompt artifact 結構。
 # Agent 在 routing stage 完成後，根據 task type 找到對應模板，
 # 依 sections 定義依序載入各 section 內容，組裝成最終 prompt artifact。
+# COMPILER SOURCE → prompt_artifact_templates
 #
 # 每個 section 定義：
 #   - id: section 識別碼

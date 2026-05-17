@@ -30,6 +30,15 @@ REQUIRED_TABLES = %w[
   activation_rules core_bootstrap_rules
   discovery_checkpoints discovery_search_strategy
   generated_surfaces compiler_metadata
+  runtime_budget context_ttl_policy circuit_breaker context_pollution
+  context_health_score intelligence_routing obligation_ledger
+  language_policy output_rules governance_gates blocking_gates
+  phase_machine pipeline_context_flow guard_chain relevance_engine
+  session_lifecycle prompt_artifact_templates prompt_composition_rules
+  recovery_strategies state_repair obligation_rebuild phase_reconciliation
+  execution_queue priority_scheduler activation_rules_mirror
+  transaction_templates_ext distributed_locks multi_agent_coordination
+  async_job_lifecycle capability_checkpoints
 ].freeze
 
 MINIMUM_ROWS = {
@@ -39,7 +48,38 @@ MINIMUM_ROWS = {
   'activation_rules' => 10,
   'core_bootstrap_rules' => 2,
   'discovery_checkpoints' => 3,
-  'compiler_metadata' => 2
+  'compiler_metadata' => 2,
+  # Runtime Config Tables (v2 migration) — each should have at least 1 row (__config__)
+  'runtime_budget' => 1,
+  'context_ttl_policy' => 1,
+  'circuit_breaker' => 1,
+  'context_pollution' => 1,
+  'context_health_score' => 1,
+  'intelligence_routing' => 1,
+  'obligation_ledger' => 1,
+  'language_policy' => 1,
+  'output_rules' => 1,
+  'governance_gates' => 1,
+  'blocking_gates' => 1,
+  'phase_machine' => 1,
+  'pipeline_context_flow' => 1,
+  'guard_chain' => 1,
+  'relevance_engine' => 1,
+  'session_lifecycle' => 1,
+  'prompt_artifact_templates' => 1,
+  'prompt_composition_rules' => 1,
+  'recovery_strategies' => 1,
+  'state_repair' => 1,
+  'obligation_rebuild' => 1,
+  'phase_reconciliation' => 1,
+  'execution_queue' => 1,
+  'priority_scheduler' => 1,
+  'activation_rules_mirror' => 1,
+  'transaction_templates_ext' => 1,
+  'distributed_locks' => 1,
+  'multi_agent_coordination' => 1,
+  'async_job_lifecycle' => 1,
+  'capability_checkpoints' => 1
 }.freeze
 
 JSON_COLUMNS = {

@@ -2,6 +2,7 @@
 # 定義每個 phase 中 agent 應執行的能力探索檢查點。
 # Discovery 的目的是讓 agent 在執行前主動搜尋「可能不知道的能力」，
 # 解決 Capability Discovery Problem：lazy loading 本身不會產生探索意識。
+# COMPILER SOURCE → capability_checkpoints
 #
 # 每個 checkpoint 定義：
 #   - phase: 所屬 phase

@@ -3,6 +3,7 @@
 # Canonical source: enforcement/neutral-language.md, .roomodes, ai-tools/agent/*.md
 #
 # 本檔案由 runtime compiler 維護。修改 prose source 後執行 compiler 同步更新。
+# COMPILER SOURCE → language_policy
 # 手動修改本檔案會被 compiler 覆蓋。
 
 language_policy_version: v1

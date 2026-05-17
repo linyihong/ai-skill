@@ -1,4 +1,5 @@
 # State Repair
+# COMPILER SOURCE → state_repair
 # 定義 phase state 損毀時的修復程序。
 # Phase state 包含：current_phase、phase_history、allowed_actions、forbidden_actions、blocking_gates 狀態。
 #

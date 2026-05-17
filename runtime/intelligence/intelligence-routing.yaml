@@ -1,6 +1,7 @@
 # Intelligence Routing
 # 定義 agent 如何根據 phase + task intent 路由到 intelligence/ 層的領域知識。
 # Intelligence 知識留在原處（intelligence/），runtime 只存放 routing 規則。
+# COMPILER SOURCE → intelligence_routing
 #
 # 使用方式：
 # 1. 當 task intent 確定後 → 查詢本檔找到對應 domain

@@ -1,6 +1,7 @@
 # Governance Gates
 # Output governance blocking gates — declarative YAML version
 # 本檔案為 runtime/gates/blocking-gates.yaml 的子集，專注於語言與文件輸出檢查。
+# COMPILER SOURCE → governance_gates
 #
 # Gate 有三種 severity：
 #   - critical: 未通過時 block phase transition，agent 不能繼續

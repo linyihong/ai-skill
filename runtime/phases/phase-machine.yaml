@@ -3,6 +3,7 @@
 # allowed_actions、forbidden_actions、blocking_gates 與 next_phase 轉換規則。
 #
 # Agent 啟動後第一站就是讀取此檔案，決定「現在該做什麼、不能做什麼」。
+# COMPILER SOURCE → phase_machine
 #
 # 依賴：
 #   - runtime/gates/blocking-gates.yaml（gate 定義）

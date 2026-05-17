@@ -29,6 +29,32 @@ compilation_scope:
     - language_policy (core_rules, anti_drift, tool_overrides, validation)
     - output_rules (format_rules, content_boundary, sanitization, validation)
     - governance_gates (id, phase, severity, check.type, check.verification)
+    - runtime_budget (model_name, per_model config, default_budget, per_layer)
+    - context_ttl_policy (ttl_type, ttl_rules)
+    - circuit_breaker (guard_name, guard config)
+    - context_pollution (signal_name, pollution signals)
+    - context_health_score (dimension, health dimensions)
+    - intelligence_routing (rule_id, routing rules)
+    - obligation_ledger (obligation_id, obligations)
+    - phase_machine (phase_id, phases)
+    - pipeline_context_flow (level, context flow levels)
+    - guard_chain (stage, guard stages)
+    - relevance_engine (component, scoring components)
+    - session_lifecycle (stage, session stages)
+    - prompt_artifact_templates (template_name, templates)
+    - prompt_composition_rules (rule_id, composition rules)
+    - recovery_strategies (strategy_id, recovery strategies)
+    - state_repair (procedure_id, repair procedures)
+    - obligation_rebuild (procedure_id, rebuild procedures)
+    - phase_reconciliation (procedure_id, reconciliation procedures)
+    - execution_queue (queue_name, queue config)
+    - priority_scheduler (priority_level, scheduler config)
+    - activation_rules_mirror (rule_id, activation rules mirror)
+    - transaction_templates_ext (template_name, extended templates)
+    - distributed_locks (lock_name, distributed locks)
+    - multi_agent_coordination (rule_id, coordination rules)
+    - async_job_lifecycle (state, job lifecycle states)
+    - capability_checkpoints (checkpoint_id, capability checkpoints)
   never_compile:
     - heuristics
     - debugging judgment
@@ -158,6 +184,12 @@ source_target_mapping:
       - prerequisites
       - output_formats
     compile_rule: "從 analysis/apk/workflows/*.md 的「步驟 N：」標題提取 step 定義，從「前置準備」提取 prerequisites，從「成功產出格式」提取 output format"
+
+  # ── P4: Runtime Config YAML → SQLite (via build_runtime_db) ──
+  # These are structured YAML files under runtime/**/*.yaml that are compiled
+  # directly to dedicated SQLite tables by build_runtime_db in compiler-engine.rb.
+  # Unlike prose sources, these are already structured data and are compiled
+  # deterministically without extraction rules.
 
 compilation_rules:
 

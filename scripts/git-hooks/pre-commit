@@ -16,7 +16,7 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 CHANGED=$(git diff --cached --name-only)
 
 # --- Compiler: regenerate runtime.db when runtime YAML/compiler sources change ---
-if echo "$CHANGED" | grep -qE '^(runtime/(phases|obligations|gates|transactions|router|discovery|compiler)/|scripts/git-hooks/pre-commit)'; then
+if echo "$CHANGED" | grep -qE '^(runtime/(phases|obligations|gates|transactions|router|discovery|compiler|budget|context|guards|health|intelligence|output-governance|pipeline|prompt-artifacts|recovery|scheduler|distributed)/|scripts/git-hooks/pre-commit)'; then
   echo "--- Runtime sources changed, compiling runtime.db ---"
   ruby "${ROOT}/runtime/compiler/compiler-engine.rb" || {
     echo ""

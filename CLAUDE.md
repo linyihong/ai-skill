@@ -6,14 +6,16 @@
 2. 讀 [README.md](README.md) — 超短入口，了解 OS layout
 3. 依 task intent 查 [skills-index.yaml](skills-index.yaml) 找到對應 skill
 4. 依 [runtime/router/activation-rules.yaml](runtime/router/activation-rules.yaml) 決定 lazy-load rules
-5. 載入 Runtime Phase 初始化：
-   - [runtime/phases/phase-machine.yaml](runtime/phases/phase-machine.yaml) — 目前 phase 狀態
-   - [runtime/obligations/obligation-ledger.yaml](runtime/obligations/obligation-ledger.yaml) — 本 phase 義務
-   - [runtime/gates/blocking-gates.yaml](runtime/gates/blocking-gates.yaml) — 本 phase blocking gates
-6. 載入 Output Governance 初始化：
-   - [runtime/output-governance/language-policy.yaml](runtime/output-governance/language-policy.yaml) — 語言強制規則
-   - [runtime/output-governance/output-rules.yaml](runtime/output-governance/output-rules.yaml) — 文件輸出規則
-   - [runtime/output-governance/governance-gates.yaml](runtime/output-governance/governance-gates.yaml) — 輸出品質 blocking gates
+5. 載入 Runtime Phase 初始化（YAML 為 source-of-truth，同時已編譯至 SQLite）：
+   - [runtime/phases/phase-machine.yaml](runtime/phases/phase-machine.yaml) → `phase_machine` 表 — 目前 phase 狀態
+   - [runtime/obligations/obligation-ledger.yaml](runtime/obligations/obligation-ledger.yaml) → `obligation_ledger` 表 — 本 phase 義務
+   - [runtime/gates/blocking-gates.yaml](runtime/gates/blocking-gates.yaml) → `blocking_gates` 表 — 本 phase blocking gates
+6. 載入 Output Governance 初始化（YAML 為 source-of-truth，同時已編譯至 SQLite）：
+   - [runtime/output-governance/language-policy.yaml](runtime/output-governance/language-policy.yaml) → `language_policy` 表 — 語言強制規則
+   - [runtime/output-governance/output-rules.yaml](runtime/output-governance/output-rules.yaml) → `output_rules` 表 — 文件輸出規則
+   - [runtime/output-governance/governance-gates.yaml](runtime/output-governance/governance-gates.yaml) → `governance_gates` 表 — 輸出品質 blocking gates
 7. 先讀 `knowledge/summaries/` 對應 summary（300-500 tokens），需要時才展開全文
+
+> **Runtime Config 已編譯至 SQLite**：所有 `runtime/**/*.yaml` 設定檔已由 compiler 編譯至 `runtime/runtime.db` 的專屬表格。Agent 可直接查 SQLite 取得結構化資料，YAML 檔案仍為 source-of-truth 供人類編輯。
 
 詳細使用說明見 [ai-tools/agent/claude.md](ai-tools/agent/claude.md)。

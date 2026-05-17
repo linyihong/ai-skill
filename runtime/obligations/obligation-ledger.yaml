@@ -1,6 +1,7 @@
 # Obligation Ledger
 # 定義每個 phase 中 agent 必須完成的 obligation。Obligation 是「該做的事」，
 # 與 blocking gates（「不能做的事」）互補。
+# COMPILER SOURCE → obligation_ledger
 #
 # Agent 在每個 phase 進入時讀取此檔案，確認該 phase 有哪些 obligation 需要完成。
 # Obligation 完成後標記為 fulfilled，未完成時會 block phase transition。

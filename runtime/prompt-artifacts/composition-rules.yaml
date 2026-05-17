@@ -1,4 +1,5 @@
 # Prompt Artifact Composition Rules
+# COMPILER SOURCE → prompt_composition_rules
 # 定義如何從各層動態組合 prompt artifact 的規則。
 # Agent 在組裝 artifact 時，依 composition_rule 找到對應規則，
 # 根據 task context 決定哪些內容需要嵌入。

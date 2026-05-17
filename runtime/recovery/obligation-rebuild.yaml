@@ -1,4 +1,5 @@
 # Obligation Rebuild
+# COMPILER SOURCE → obligation_rebuild
 # 定義當 obligation ledger 需要重建時的完整程序。
 # 適用場景：recovery phase 進入後、phase state 損毀修復後、或手動觸發重建。
 #

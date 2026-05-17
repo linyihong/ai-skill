@@ -2,6 +2,7 @@
 # 計算每個 skill 對當前 task 的相關性分數。
 # 使用 skills-index.yaml v2 的 metadata（weight、domains、triggers、conflicts）
 # 做 runtime relevance scoring。
+# COMPILER SOURCE → relevance_engine
 #
 # 依賴：
 #   - skills-index.yaml (weight, domains, triggers, conflicts)
