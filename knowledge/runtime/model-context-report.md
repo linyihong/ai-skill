@@ -27,12 +27,12 @@
 | --- | --- | --- | --- |
 | `route.bootstrap.ai-skill` | `CORE_BOOTSTRAP.md` | `summary-first` | Bootstrap 階段只需要 Core Bootstrap 3 rules 與 OS layout，不需要完整 source。 |
 | `route.skill.discovery` | `skills-index.yaml` | `index-only` | Skills index 輕量（~300 tokens），可在整個對話中 cache。 |
-| `route.runtime.activation-rules` | `runtime/router/activation-rules.yaml` | `index-only` | Activation rules 輕量（~500 tokens），可在整個對話中 cache。 |
-| `route.runtime.context-ttl` | `runtime/context/ttl-policy.yaml` | `index-only` | TTL policy 輕量，需要 prune 時才讀。 |
-| `route.runtime.context-loading` | `runtime/routing/README.md` | `summary-first` | routing decision 可先用 registry、index、summary；修改 source 時再升級。 |
-| `route.runtime.router-flow` | `runtime/router/README.md` | `index-only` | Router flow 是設計文件，需要 routing 決策時才讀。 |
+| `route.runtime.activation-rules` | `runtime/compiler/embedded_data.rb` | `index-only` | Activation rules 輕量（~500 tokens），可在整個對話中 cache。 |
+| `route.runtime.context-ttl` | `runtime/compiler/embedded_data.rb` | `index-only` | TTL policy 輕量，需要 prune 時才讀。 |
+| `route.runtime.context-loading` | `runtime/routing/` | `summary-first` | routing decision 可先用 registry、index、summary；修改 source 時再升級。 |
+| `route.runtime.router-flow` | `runtime/router/` | `index-only` | Router flow 是設計文件，需要 routing 決策時才讀。 |
 | `route.intelligence.engineering.heuristics` | `intelligence/engineering/heuristics/README.md` | `index-only` | 通用 heuristics 在需要對應判斷時才讀取完整 atom。 |
-| `route.runtime.context-ttl-doc` | `runtime/context/README.md` | `index-only` | TTL doc 是設計文件，需要 prune context 時才讀。 |
+| `route.runtime.context-ttl-doc` | `runtime/context/` | `index-only` | TTL doc 是設計文件，需要 prune context 時才讀。 |
 | `route.workflow.documentation-ai-native` | `workflow/documentation/README.md` | `summary-first` | 多數任務只需 workflow README 與 execution-flow；policy 全文留在 enforcement。 |
 | `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `index-only` | agent-architecture atoms 在需要理解 AI 行為模式時才讀取完整內容。 |
 | `route.feedback.history` | `feedback/history/README.md` | `index-only` | feedback/history 在需要查詢或新增 lesson 時才讀取。 |

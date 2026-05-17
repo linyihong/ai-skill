@@ -46,7 +46,7 @@ Task Intent Identified
 
 ## 與既有文件的關係
 
-- [`runtime/intelligence/README.md`](../../runtime/intelligence/README.md) — Runtime navigation entry point
+- [`runtime/intelligence/`](../../runtime/intelligence/) — Runtime navigation entry point (data file: `intelligence-routing.yaml`)
 - [`runtime/intelligence/intelligence-routing.yaml`](../../runtime/intelligence/intelligence-routing.yaml) — Machine-readable routing rules
 - [`intelligence/README.md`](../../intelligence/README.md) — Intelligence layer overview
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Global routing registry

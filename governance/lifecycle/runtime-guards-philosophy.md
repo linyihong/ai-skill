@@ -11,7 +11,7 @@
 
 ## 與既有文件的關係
 
-- [`runtime/guards/README.md`](../../runtime/guards/README.md) — Runtime navigation entry point
+- [`runtime/guards/`](../../runtime/guards/) — Runtime navigation entry point (data files: `circuit-breaker.yaml`, `context-pollution.yaml`)
 - [`runtime/guards/circuit-breaker.yaml`](../../runtime/guards/circuit-breaker.yaml) — Circuit breaker definitions
 - [`runtime/guards/context-pollution.yaml`](../../runtime/guards/context-pollution.yaml) — Context pollution detection
 - [`anti-patterns/`](../../anti-patterns/) — Runtime anti-patterns 的症狀與預防方式

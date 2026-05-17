@@ -1,24 +1,24 @@
 id: graph.runtime-prompt-artifacts
-source: runtime/prompt-artifacts/README.md
+source: runtime/prompt-artifacts/
 status: candidate
 summary: >
   連接 prompt artifact generator 的所有元件：artifact-templates、composition-rules，
   以及相關的 workflow、intelligence、analysis、pipeline 層。
 edges:
   - type: depends_on
-    target: runtime/prompt-artifacts/README.md
-    reason: Prompt artifacts README 提供概覽、設計與使用方式。
-    validation: README 定義 artifact composition flow 與各層的關係。
+    target: runtime/prompt-artifacts/
+    reason: Prompt artifacts 目錄提供概覽、設計與使用方式。
+    validation: 目錄定義 artifact composition flow 與各層的關係。
   - type: depends_on
-    target: runtime/prompt-artifacts/artifact-templates.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Artifact templates 定義各 task type 的 prompt 結構與 sections。
     validation: artifact-templates.yaml 包含 7 個 task type 的模板定義。
   - type: depends_on
-    target: runtime/prompt-artifacts/composition-rules.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Composition rules 定義如何從各層動態選擇內容。
     validation: composition-rules.yaml 包含 4 個 composition rules 與 section ordering。
   - type: depends_on
-    target: runtime/pipeline/session-lifecycle.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Prompt artifact generator 在 routing stage 完成後、execution stage 前執行。
     validation: session-lifecycle.yaml 定義 routing stage 的輸出為 prompt artifact 的輸入。
   - type: related_to
@@ -36,7 +36,7 @@ edges:
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.runtime.prompt-artifacts record。
-    validation: registry record 的 primary_source 指向 runtime/prompt-artifacts/README.md。
+    validation: registry record 的 primary_source 指向 runtime/prompt-artifacts/。
 metadata:
   priority: P2
   confidence: medium

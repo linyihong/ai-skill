@@ -20,18 +20,18 @@
 | --- | --- | --- | --- | --- |
 | `route.bootstrap.ai-skill` | `CORE_BOOTSTRAP.md` | `small` | `summary-first` | Core Bootstrap 3 rules 已讀，skills-index.yaml 已查詢，git status 已檢查。 |
 | `route.skill.discovery` | `skills-index.yaml` | `small` | `index-only` | Task intent 已對應到 skills-index.yaml 的 triggers，entrypoint 與 summary path 可解析。 |
-| `route.runtime.activation-rules` | `runtime/router/activation-rules.yaml` | `small` | `index-only` | 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。 |
-| `route.runtime.context-ttl` | `runtime/context/ttl-policy.yaml` | `small` | `index-only` | Context TTL 已套用，過期 context 已 prune，token 使用率在預算內。 |
+| `route.runtime.activation-rules` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。 |
+| `route.runtime.context-ttl` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | Context TTL 已套用，過期 context 已 prune，token 使用率在預算內。 |
 | `route.governance.durable-goal-boundary` | `enforcement/conversation-goal-ledger.md` | `large` | `source-backed` | 長期狀態已落到 durable planning 文件，且 active goal 完成後才刪除。 |
-| `route.runtime.context-loading` | `runtime/routing/README.md` | `small` | `summary-first` | Primary source、deferred sources、source-of-truth gate 與 validation signal 已可被記錄。 |
+| `route.runtime.context-loading` | `runtime/routing/` | `small` | `summary-first` | Primary source、deferred sources、source-of-truth gate 與 validation signal 已可被記錄。 |
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `large` | `source-backed` | 欄位可套用到第一批 atom candidates，且 Markdown links 可解析。 |
 | `route.workflow.apk-analysis` | `workflow/apk-analysis/execution-flow.md` | `specialized` | `source-backed` | 已從舊 `skills/apk-analysis/` 遷移至新分層，新 reference-first paths 為 canonical source。 |
 | `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md` | `specialized` | `source-backed` | 已比較可用 routes、選定 evidence-to-cost ratio 最高路線、記錄 fallback 與 attribution 回補條件。 |
 | `route.feedback.promotion-pipeline` | `feedback/promotion/README.md` | `large` | `source-backed` | 原 lesson source 保留、promotion target 明確、runtime surfaces 與 close-loop validation 已同步。 |
 | `route.models.model-aware-routing` | `models/profiles/README.md` | `large` | `source-backed` | Profile、compression level、primary source、deferred sources 與 validation signal 可被記錄。 |
-| `route.runtime.router-flow` | `runtime/router/README.md` | `small` | `index-only` | Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。 |
+| `route.runtime.router-flow` | `runtime/router/` | `small` | `index-only` | Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。 |
 | `route.intelligence.engineering.heuristics` | `intelligence/engineering/heuristics/README.md` | `small` | `index-only` | 各 atom 有明確原則與決策表，可反查驗證。 |
-| `route.runtime.context-ttl-doc` | `runtime/context/README.md` | `small` | `index-only` | TTL policy 已套用，prune strategy 已理解。 |
+| `route.runtime.context-ttl-doc` | `runtime/context/` | `small` | `index-only` | TTL policy 已套用，prune strategy 已理解。 |
 | `route.workflow.software-delivery` | `workflow/software-delivery/execution-flow.md` | `specialized` | `source-backed` | 已從舊 `skills/app-development-guidance/` 遷移至新分層，舊目錄已刪除。新 reference-first paths 為 canonical source。 |
 | `route.workflow.travel-planning` | `workflow/travel-planning/execution-flow.md` | `specialized` | `source-backed` | 已從舊 `skills/travel-planning/` 遷移至新分層，新 reference-first paths 為 canonical source。 |
 | `route.workflow.documentation-ai-native` | `workflow/documentation/README.md` | `small` | `summary-first` | 新文件或目錄具 index-first 導航、分類維度（kind/audience/stability）已標註； 長文已按 document-sizing 拆分；語言與工具敘述依專案自訂 policy（本 route 不預設 tool-neutral）。  |
@@ -94,8 +94,8 @@
 | `graph.intelligence-travel` | `intelligence/travel/README.md` | `candidate` | 7 | [`intelligence-travel.yaml`](../graphs/intelligence-travel.yaml) |
 | `graph.metadata-navigation` | `metadata/schema.md` | `candidate` | 7 | [`metadata-navigation.yaml`](../graphs/metadata-navigation.yaml) |
 | `graph.runtime-onboarding` | `runtime/onboarding/README.md` | `candidate` | 7 | [`runtime-onboarding.yaml`](../graphs/runtime-onboarding.yaml) |
-| `graph.runtime-pipeline` | `runtime/pipeline/README.md` | `candidate` | 12 | [`runtime-pipeline.yaml`](../graphs/runtime-pipeline.yaml) |
-| `graph.runtime-prompt-artifacts` | `runtime/prompt-artifacts/README.md` | `candidate` | 8 | [`runtime-prompt-artifacts.yaml`](../graphs/runtime-prompt-artifacts.yaml) |
+| `graph.runtime-pipeline` | `runtime/pipeline/` | `candidate` | 12 | [`runtime-pipeline.yaml`](../graphs/runtime-pipeline.yaml) |
+| `graph.runtime-prompt-artifacts` | `runtime/prompt-artifacts/` | `candidate` | 8 | [`runtime-prompt-artifacts.yaml`](../graphs/runtime-prompt-artifacts.yaml) |
 | `graph.source-boundary` | `governance/lifecycle/README.md` | `candidate` | 6 | [`source-boundary.yaml`](../graphs/source-boundary.yaml) |
 | `graph.workflow-layers` | `workflow/README.md` | `candidate` | 18 | [`workflow-layers.yaml`](../graphs/workflow-layers.yaml) |
 | `graph.workflow-app-development-guidance` | `workflow/software-delivery/README.md` | `candidate` | 11 | [`workflow-software-delivery.yaml`](../graphs/workflow-software-delivery.yaml) |

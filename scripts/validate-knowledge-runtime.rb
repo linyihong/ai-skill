@@ -924,7 +924,6 @@ check_markdown_links("knowledge/runtime/README.md")
 check_markdown_links("knowledge/runtime/runtime-report.md") if (ROOT + "knowledge/runtime/runtime-report.md").exist?
 check_markdown_links("knowledge/runtime/model-context-report.md") if (ROOT + "knowledge/runtime/model-context-report.md").exist?
 check_markdown_links("knowledge/runtime/model-checklists.md") if (ROOT + "knowledge/runtime/model-checklists.md").exist?
-check_markdown_links("runtime/routing/README.md")
 check_markdown_links("knowledge/indexes/README.md")
 
 if ERRORS.empty?

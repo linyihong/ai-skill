@@ -19,7 +19,7 @@ records:
     candidate_sources:
       - skills-index.yaml
       - knowledge/indexes/README.md
-      - runtime/router/activation-rules.yaml
+      - runtime/compiler/embedded_data.rb
       - knowledge/summaries/root-bootstrap.md
       - knowledge/graphs/metadata-navigation.yaml
     source_of_truth_gate: core-bootstrap-and-readme-active
@@ -42,13 +42,13 @@ records:
 
   - id: route.runtime.phase-machine
     task_intent: 載入目前 phase 狀態、allowed/forbidden actions、phase transition rules
-    primary_source: runtime/phases/phase-machine.yaml
+    primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
       - CORE_BOOTSTRAP.md
       - README.md
     candidate_sources:
-      - runtime/obligations/obligation-ledger.yaml
-      - runtime/gates/blocking-gates.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     source_of_truth_gate: runtime-phase-machine-active
     ranking_reason: Phase Machine 定義 9 個 phase（bootstrap→checkpoint→execution→validation→commit→push→readback→finalize→recovery），每個 session 啟動後必須載入目前 phase 才能決定 allowed_actions 與 blocking gates。
     validation_signal: 目前 phase 已確認，allowed_actions 與 forbidden_actions 已載入，phase transition rules 已檢查。
@@ -69,11 +69,11 @@ records:
 
   - id: route.runtime.obligation-ledger
     task_intent: 載入本 phase 的未完成義務清單，確認執行前義務已滿足
-    primary_source: runtime/obligations/obligation-ledger.yaml
+    primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
-      - runtime/phases/phase-machine.yaml
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
-      - runtime/gates/blocking-gates.yaml
+      - runtime/compiler/embedded_data.rb
       - enforcement/conversation-goal-ledger.md
     source_of_truth_gate: runtime-obligation-ledger-active
     ranking_reason: Obligation Ledger 定義 15 個 atomic duties 分散在 9 個 phase，每個 phase 有對應的 obligations 需在 phase entry 時檢查。
@@ -95,10 +95,10 @@ records:
 
   - id: route.runtime.blocking-gates
     task_intent: 載入本 phase 的阻斷閘門，確認 phase transition 是否被允許
-    primary_source: runtime/gates/blocking-gates.yaml
+    primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
-      - runtime/phases/phase-machine.yaml
-      - runtime/obligations/obligation-ledger.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
       - enforcement/goal-action-validation.md
       - enforcement/failure-learning-system.md
@@ -122,14 +122,14 @@ records:
 
   - id: route.runtime.recovery
     task_intent: 載入 phase 修復策略，處理 blocking gate 阻斷或 phase state 損毀
-    primary_source: runtime/recovery/recovery-strategies.yaml
+    primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
-      - runtime/phases/phase-machine.yaml
-      - runtime/gates/blocking-gates.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
-      - runtime/recovery/state-repair.yaml
-      - runtime/recovery/obligation-rebuild.yaml
-      - runtime/recovery/phase-reconciliation.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
       - enforcement/failure-learning-system.md
       - enforcement/failure-patterns/README.md
     source_of_truth_gate: runtime-recovery-active
@@ -152,14 +152,14 @@ records:
 
   - id: route.runtime.scheduler
     task_intent: 載入 execution queue 排程規則，決定 obligations/gates 的執行順序
-    primary_source: runtime/scheduler/priority-scheduler.yaml
+    primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
-      - runtime/phases/phase-machine.yaml
-      - runtime/obligations/obligation-ledger.yaml
-      - runtime/gates/blocking-gates.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
-      - runtime/scheduler/execution-queue.yaml
-      - runtime/budget/token-budget.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     source_of_truth_gate: runtime-scheduler-active
     ranking_reason: Priority Scheduler 定義 4 級 priority（P0-P3）、6 條 scheduling rules、2 個 scheduling examples，解決注意力漂移問題。Execution Queue 定義 queue 結構、7 條管理規則、3 個 phase queue examples。
     validation_signal: Queue 已依 priority 排序，blocking gates 優先於 obligations，dependencies 已解析。
@@ -180,12 +180,12 @@ records:
 
   - id: route.runtime.transactions
     task_intent: 管理 Ai-skill writeback transaction 的生命週期
-    primary_source: runtime/transactions/transaction-machine.yaml
+    primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
-      - runtime/phases/phase-machine.yaml
+      - runtime/compiler/embedded_data.rb
       - enforcement/dependency-reading.md
     candidate_sources:
-      - runtime/transactions/transaction-templates.yaml
+      - runtime/compiler/embedded_data.rb
       - enforcement/sanitization.md
       - enforcement/linked-updates.md
     source_of_truth_gate: runtime-transactions-active
@@ -234,12 +234,12 @@ records:
 
   - id: route.runtime.activation-rules
     task_intent: 決定哪些 lazy-load rules 需要 activate
-    primary_source: runtime/router/activation-rules.yaml
+    primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
       - CORE_BOOTSTRAP.md
       - skills-index.yaml
     candidate_sources:
-      - runtime/context/ttl-policy.yaml
+      - runtime/compiler/embedded_data.rb
       - knowledge/runtime/README.md
     source_of_truth_gate: activation-rules-active
     ranking_reason: Activation rules 定義每個 lazy-load rule 的觸發條件，Agent 依目前 task 比對後決定載入哪些規則。
@@ -261,9 +261,9 @@ records:
 
   - id: route.runtime.context-ttl
     task_intent: 管理 context 生命週期，防止 token 膨脹
-    primary_source: runtime/context/ttl-policy.yaml
+    primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
-      - runtime/router/activation-rules.yaml
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
       - knowledge/runtime/README.md
       - knowledge/runtime/routing-registry.yaml
@@ -317,7 +317,7 @@ records:
 
   - id: route.runtime.context-loading
     task_intent: 決定 runtime context loading 路線
-    primary_source: runtime/routing/README.md
+    primary_source: runtime/routing/
     required_dependencies:
       - knowledge/indexes/README.md
       - metadata/ranking/README.md
@@ -420,7 +420,7 @@ records:
     candidate_sources:
       - knowledge/summaries/apk-highest-leverage-analysis.md
       - knowledge/graphs/apk-highest-leverage-analysis.yaml
-      - runtime/routing/README.md
+      - runtime/routing/
       - enforcement/decision-efficiency.md
     source_of_truth_gate: new-layer-promoted
     ranking_reason: 此 intelligence atom 抽象化已進入 workflow 的 route selection judgment。舊 skills/ 結構已於 2026-05-13 標記為 deprecated。
@@ -478,7 +478,7 @@ records:
     primary_source: models/profiles/README.md
     required_dependencies:
       - models/compression/README.md
-      - runtime/routing/README.md
+      - runtime/routing/
       - metadata/ranking/README.md
       - knowledge/summaries/README.md
     candidate_sources:
@@ -504,16 +504,16 @@ records:
 
   - id: route.runtime.router-flow
     task_intent: 了解 context routing 決策流程
-    primary_source: runtime/router/README.md
+    primary_source: runtime/router/
     required_dependencies:
-      - runtime/router/activation-rules.yaml
-      - runtime/context/ttl-policy.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
       - skills-index.yaml
       - knowledge/summaries/runtime-operations.md
       - knowledge/runtime/README.md
     source_of_truth_gate: design-layer-only
-    ranking_reason: runtime/router/README.md 定義完整的 routing decision flow（Bootstrap → Layout → Skill routing → Rule activation → Summary → Full source）。
+    ranking_reason: runtime/router/ 定義完整的 routing decision flow（Bootstrap → Layout → Skill routing → Rule activation → Summary → Full source）。
     validation_signal: Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。
     metadata:
       priority: P2
@@ -565,14 +565,14 @@ records:
 
   - id: route.runtime.context-ttl-doc
     task_intent: 了解 context TTL 與 prune 策略
-    primary_source: runtime/context/README.md
+    primary_source: runtime/context/
     required_dependencies:
-      - runtime/context/ttl-policy.yaml
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
       - knowledge/summaries/runtime-operations.md
       - knowledge/runtime/README.md
     source_of_truth_gate: design-layer-only
-    ranking_reason: runtime/context/README.md 定義 TTL 類型、prune 策略與觸發條件。
+    ranking_reason: runtime/context/ 定義 TTL 類型、prune 策略與觸發條件。
     validation_signal: TTL policy 已套用，prune strategy 已理解。
     metadata:
       priority: P2
@@ -975,7 +975,7 @@ records:
       - tools/compression/README.md
       - tools/metadata/README.md
       - tools/routing/README.md
-      - runtime/guards/circuit-breaker.yaml
+      - runtime/compiler/embedded_data.rb
     source_of_truth_gate: tools-readme-active
     ranking_reason: tools/README.md 提供 tool 層 entry point，統整 compression/metadata/routing 三個子目錄。
     validation_signal: Tool metadata 已定義，compression 策略與 routing 規則已建立。
@@ -1032,7 +1032,7 @@ records:
       - anti-patterns/stale-summary.md
       - anti-patterns/skill-pollution.md
       - enforcement/failure-patterns/README.md
-      - runtime/guards/README.md
+      - runtime/guards/
     source_of_truth_gate: anti-patterns-readme-active
     ranking_reason: anti-patterns/README.md 提供 runtime anti-patterns 的 entry point，列出所有 anti-pattern 與嚴重度。
     validation_signal: Anti-pattern 已依格式記錄，症狀、預防與恢復方式已定義。
@@ -1055,10 +1055,10 @@ records:
 
   - id: route.runtime.compiler
     task_intent: 編譯 prose workflow/enforcement 文件為 machine-readable YAML
-    primary_source: runtime/compiler/compiler-rules.yaml
+    primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
-      - runtime/phases/phase-machine.yaml
-      - runtime/transactions/transaction-machine.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
       - runtime/compiler/compiler-engine.rb
       - runtime/compiler/README.md
@@ -1083,11 +1083,11 @@ records:
 
   - id: route.runtime.intelligence-routing
     task_intent: 根據 phase + task intent 路由到 intelligence/ 層的領域知識
-    primary_source: runtime/intelligence/intelligence-routing.yaml
+    primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
-      - runtime/phases/phase-machine.yaml
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
-      - runtime/intelligence/README.md
+      - runtime/intelligence/
       - intelligence/README.md
     source_of_truth_gate: runtime-intelligence-routing-active
     ranking_reason: Intelligence Routing 定義 11 個 domain 的 routing rules（analytical_reasoning、agent_architecture、development、heuristics、anti-patterns、tradeoffs、distributed_systems、domain、failure、travel、business、IDE），每個 domain 有 applicable_phases、task_intent_patterns、load_strategy。Fallback 到 intelligence/README.md 全文搜尋。
@@ -1111,14 +1111,14 @@ records:
 
   - id: route.runtime.output-governance
     task_intent: 載入語言強制規則與文件輸出規則，確保輸出品質
-    primary_source: runtime/output-governance/README.md
+    primary_source: runtime/output-governance/
     required_dependencies:
-      - runtime/phases/phase-machine.yaml
-      - runtime/gates/blocking-gates.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
-      - runtime/output-governance/language-policy.yaml
-      - runtime/output-governance/output-rules.yaml
-      - runtime/output-governance/governance-gates.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
       - enforcement/neutral-language.md
       - enforcement/sanitization.md
       - enforcement/tool-neutral-documentation.md
@@ -1149,16 +1149,16 @@ records:
 
   - id: route.runtime.distributed
     task_intent: 載入 distributed runtime 鎖定機制、multi-agent 協調規則、async job 生命週期管理
-    primary_source: runtime/distributed/README.md
+    primary_source: runtime/distributed/
     required_dependencies:
-      - runtime/phases/phase-machine.yaml
-      - runtime/obligations/obligation-ledger.yaml
-      - runtime/gates/blocking-gates.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
-      - runtime/distributed/distributed-locks.yaml
-      - runtime/distributed/multi-agent-coordination.yaml
-      - runtime/distributed/async-job-lifecycle.yaml
-      - runtime/transactions/transaction-machine.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     source_of_truth_gate: runtime-distributed-active
     ranking_reason: >
       Distributed Runtime 定義 4 種分散式鎖（phase_transition、obligation_ledger、
@@ -1189,9 +1189,9 @@ records:
     task_intent: 載入知識更新流程的 11 個步驟定義，決定目前 knowledge update 走到哪一步
     primary_source: governance/lifecycle/knowledge-update-flow.md
     required_dependencies:
-      - runtime/phases/phase-machine.yaml
-      - runtime/obligations/obligation-ledger.yaml
-      - runtime/gates/blocking-gates.yaml
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
+      - runtime/compiler/embedded_data.rb
     candidate_sources:
       - runtime/runtime.db
       - enforcement/feedback-lessons.md

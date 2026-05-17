@@ -47,7 +47,7 @@ runtime/pipeline/
 
 ## 與既有文件的關係
 
-- [`runtime/pipeline/README.md`](../../runtime/pipeline/README.md) — Runtime navigation entry point
+- [`runtime/pipeline/`](../../runtime/pipeline/) — Runtime navigation entry point (data files: `context-flow.yaml`, `guard-chain.yaml`, `relevance-engine.yaml`, `session-lifecycle.yaml`)
 - [`runtime/pipeline/session-lifecycle.yaml`](../../runtime/pipeline/session-lifecycle.yaml) — Session lifecycle stages
 - [`runtime/pipeline/context-flow.yaml`](../../runtime/pipeline/context-flow.yaml) — Progressive context expansion
 - [`runtime/pipeline/guard-chain.yaml`](../../runtime/pipeline/guard-chain.yaml) — Guard execution order

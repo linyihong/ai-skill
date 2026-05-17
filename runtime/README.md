@@ -29,15 +29,15 @@ Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 | Domain | Path | Description |
 |--------|------|-------------|
 | Activation | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Lazy-load rules with activation conditions |
-| Routing | [`routing/README.md`](routing/README.md) | Task intent → knowledge index → metadata → source-of-truth gate |
-| Discovery | [`discovery/README.md`](discovery/README.md) | Phase-aware capability discovery checkpoints |
+| Routing | [`routing/`](routing/) | Task intent → knowledge index → metadata → source-of-truth gate |
+| Discovery | [`discovery/`](discovery/) | Phase-aware capability discovery checkpoints |
 | Phases | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Execution phase state machine |
 | Obligations | [`obligations/obligation-ledger.yaml`](obligations/obligation-ledger.yaml) | Per-phase atomic duties |
 | Gates | [`gates/blocking-gates.yaml`](gates/blocking-gates.yaml) | Phase transition prerequisites |
 | Compiler | [`compiler/compiler-engine.rb`](compiler/compiler-engine.rb) | Prose → SQLite compilation |
 | Runtime DB | [`runtime.db`](runtime.db) | Compiled immutable runtime registry (`.gitignore`) |
 | State DB | [`runtime-state.db`](runtime-state.db) | Mutable execution state (`.gitignore`) |
-| Generated | [`generated/`](generated/) | Compiled runtime surfaces (legacy, being migrated to SQLite) |
+| Generated | [`generated/`](generated/) | Compiled runtime surfaces (legacy, migrated to SQLite) |
 | Transactions | [`transactions/transaction-machine.yaml`](transactions/transaction-machine.yaml) | Writeback transaction state machine |
 | Pipeline | [`pipeline/`](pipeline/) | Context flow, guard chain, relevance engine |
 | Recovery | [`recovery/`](recovery/) | Phase reconciliation, state repair, obligation rebuild |

@@ -1,58 +1,58 @@
 id: graph.runtime-pipeline
-source: runtime/pipeline/README.md
+source: runtime/pipeline/
 status: candidate
 summary: >
   連接 runtime pipeline 的所有元件：session-lifecycle、context-flow、guard-chain、
   relevance-engine，以及相關的 runtime router、budget、health、guards 層。
 edges:
   - type: depends_on
-    target: runtime/pipeline/README.md
-    reason: Pipeline README 提供架構概覽、流程圖與元件間通訊表。
-    validation: README 定義 pipeline 架構與所有元件的關係。
+    target: runtime/pipeline/
+    reason: Pipeline 目錄提供架構概覽、流程圖與元件間通訊表。
+    validation: pipeline 目錄定義 pipeline 架構與所有元件的關係。
   - type: depends_on
-    target: runtime/pipeline/session-lifecycle.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Session lifecycle 定義 bootstrap → routing → execution → close-loop 四個階段。
     validation: session-lifecycle.yaml 定義每個階段的進入/離開條件與 token budget。
   - type: depends_on
-    target: runtime/pipeline/context-flow.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Context flow 定義 progressive context expansion 策略。
     validation: context-flow.yaml 定義從 summary → module → detailed → raw 的擴展順序。
   - type: depends_on
-    target: runtime/pipeline/guard-chain.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Guard chain 定義 circuit breaker guards 的執行順序。
     validation: guard-chain.yaml 定義 guard 執行順序與相依關係。
   - type: depends_on
-    target: runtime/pipeline/relevance-engine.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Relevance engine 計算每個 skill 對當前 task 的相關性分數。
     validation: relevance-engine.yaml 定義 scoring 方法與 threshold。
   - type: related_to
-    target: runtime/budget/token-budget.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Token budget 是 pipeline 中跨階段的 continuous component。
     validation: token-budget.yaml 定義 session token budget 分配。
   - type: related_to
-    target: runtime/health/context-health-score.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Context health score 是 pipeline 中每個階段的檢查點。
     validation: context-health-score.yaml 定義 health score 計算方式。
   - type: related_to
-    target: runtime/guards/circuit-breaker.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Circuit breaker 是 pipeline guard chain 的一部分。
     validation: circuit-breaker.yaml 定義 circuit breaker 的觸發條件。
   - type: related_to
-    target: runtime/guards/context-pollution.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Context pollution detection 是 pipeline guard chain 的一部分。
     validation: context-pollution.yaml 定義 pollution detection 規則。
   - type: related_to
-    target: runtime/context/ttl-policy.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: TTL policy 定義 context 生命週期，與 pipeline 的 context flow 相關。
     validation: ttl-policy.yaml 定義 TTL 類型與 prune 策略。
   - type: related_to
-    target: runtime/router/activation-rules.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: Activation rules 在 pipeline 的 routing stage 中被檢查。
     validation: activation-rules.yaml 定義 lazy-load rules 的觸發條件。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.runtime.pipeline record。
-    validation: registry record 的 primary_source 指向 runtime/pipeline/README.md。
+    validation: registry record 的 primary_source 指向 runtime/pipeline/。
 metadata:
   priority: P1
   confidence: medium

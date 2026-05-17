@@ -34,7 +34,7 @@
 | Model profiles | `models/profiles/README.md` |
 | Compression strategy | `models/compression/README.md` |
 | Lifecycle and validation gates | `governance/lifecycle/README.md`, `governance/validation/README.md` |
-| Runtime routing design | `runtime/routing/README.md` |
+| Runtime routing design | `runtime/routing/` |
 
 ## Runtime View Format
 

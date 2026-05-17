@@ -43,7 +43,7 @@ Execution Stage (uses composed artifact as prompt)
 
 ## 與既有文件的關係
 
-- [`runtime/prompt-artifacts/README.md`](../../runtime/prompt-artifacts/README.md) — Runtime navigation entry point
+- [`runtime/prompt-artifacts/`](../../runtime/prompt-artifacts/) — Runtime navigation entry point (data files: `artifact-templates.yaml`, `composition-rules.yaml`)
 - [`runtime/prompt-artifacts/artifact-templates.yaml`](../../runtime/prompt-artifacts/artifact-templates.yaml) — Task type artifact template definitions
 - [`runtime/prompt-artifacts/composition-rules.yaml`](../../runtime/prompt-artifacts/composition-rules.yaml) — Composition rules
 - [`workflow/`](../../workflow/) — 提供執行步驟（what to do）

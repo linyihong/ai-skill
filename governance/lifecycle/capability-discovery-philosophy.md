@@ -43,7 +43,7 @@ Discovery 使用 [`knowledge/graphs/`](../../knowledge/graphs/README.md) 的 edg
 
 ## 與既有文件的關係
 
-- [`runtime/discovery/README.md`](../../runtime/discovery/README.md) — Runtime navigation entry point
+- [`runtime/discovery/`](../../runtime/discovery/) — Runtime navigation entry point (data file: `capability-checkpoints.yaml`)
 - [`runtime/discovery/capability-checkpoints.yaml`](../../runtime/discovery/capability-checkpoints.yaml) — Structured checkpoint definitions
 - [`runtime/router/activation-engine.rb`](../../runtime/router/activation-engine.rb) — 被動 lazy-loading，與 discovery 互補
 - [`knowledge/graphs/README.md`](../../knowledge/graphs/README.md) — Graph edges 作為 discovery 的搜尋索引

@@ -57,7 +57,7 @@ edges:
       概念說明歸 governance 層。
     validation: capability-discovery-philosophy.md 說明問題、解決方案、與 Activation Engine 的互補關係。
   - type: related_to
-    target: runtime/discovery/capability-checkpoints.yaml
+    target: runtime/compiler/embedded_data.rb
     reason: >
       Capability discovery checkpoints 使用 governance graphs 作為搜尋索引，
       在 checkpoint phase 搜尋與任務相關的治理規則。

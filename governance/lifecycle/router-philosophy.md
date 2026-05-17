@@ -52,7 +52,7 @@ ruby runtime/router/activation-engine.rb --intent migration --file-changed "**/*
 
 ## 與既有文件的關係
 
-- [`runtime/router/README.md`](../../runtime/router/README.md) — Runtime navigation entry point
+- [`runtime/router/`](../../runtime/router/) — Runtime navigation entry point (data files: `activation-rules.yaml`, `activation-engine.rb`, `activation-table.md`)
 - [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — Lazy-load rules with activation conditions
 - [`runtime/router/activation-engine.rb`](../../runtime/router/activation-engine.rb) — Activation engine implementation
 - [`runtime/router/activation-table.md`](../../runtime/router/activation-table.md) — Situation → Activated Rules table

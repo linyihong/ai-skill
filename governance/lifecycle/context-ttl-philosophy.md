@@ -37,7 +37,7 @@ Preserve:
 
 ## 與既有文件的關係
 
-- [`runtime/context/README.md`](../../runtime/context/README.md) — Runtime navigation entry point
+- [`runtime/context/`](../../runtime/context/) — Runtime navigation entry point (data file: `ttl-policy.yaml`)
 - [`runtime/context/ttl-policy.yaml`](../../runtime/context/ttl-policy.yaml) — TTL policy definitions
 - [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — 決定哪些 rules 需要載入（影響 context 總量）
 - [`knowledge/summaries/`](../../knowledge/summaries/) — 輕量 summary 可頻繁載入而不需 prune

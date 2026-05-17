@@ -13,7 +13,7 @@
 
 ## 與既有文件的關係
 
-- [`runtime/output-governance/README.md`](../../runtime/output-governance/README.md) — Runtime navigation entry point
+- [`runtime/output-governance/`](../../runtime/output-governance/) — Runtime navigation entry point (data files: `language-policy.yaml`, `output-rules.yaml`, `governance-gates.yaml`)
 - [`runtime/output-governance/language-policy.yaml`](../../runtime/output-governance/language-policy.yaml) — 語言強制規則
 - [`runtime/output-governance/output-rules.yaml`](../../runtime/output-governance/output-rules.yaml) — 文件輸出規則
 - [`runtime/output-governance/governance-gates.yaml`](../../runtime/output-governance/governance-gates.yaml) — Output governance blocking gates

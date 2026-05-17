@@ -252,7 +252,7 @@ skills:
     entrypoint: runtime/README.md
     summary: knowledge/summaries/runtime-operations.md
     related:
-      - runtime/routing/README.md
+      - runtime/routing/
       - knowledge/runtime/routing-registry.yaml
       - knowledge/runtime/README.md
 

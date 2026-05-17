@@ -67,7 +67,7 @@ task intent
 
 ## 與既有文件的關係
 
-- [`runtime/routing/README.md`](../../runtime/routing/README.md) — Runtime navigation entry point
+- [`runtime/routing/`](../../runtime/routing/) — Runtime navigation entry point
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — Task intent routing table
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing records
 - [`metadata/ranking/README.md`](../../metadata/ranking/README.md) — Metadata ranking rules

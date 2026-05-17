@@ -51,4 +51,4 @@
 相關連結：
 - [`workflow/apk-analysis/execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) — 端到端 agent 執行流程
 - [`runtime/runtime.db`](../../runtime/runtime.db) — 系統層 generated surface（SQLite，取代 `runtime/generated/`）
-- [`runtime/routing/README.md`](../../runtime/routing/README.md) — Runtime routing 流程
+- [`runtime/routing/`](../../runtime/routing/) — Runtime routing 流程
