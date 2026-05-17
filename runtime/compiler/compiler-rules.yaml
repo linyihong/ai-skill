@@ -1,4 +1,5 @@
 # Compiler Rules
+# COMPILER SOURCE → compiler_rules
 # 定義從 canonical source（prose）到 generated surface（SQLite）的編譯規則。
 # 只有 deterministic、execution-critical 的狀態會被編譯。
 # Heuristics、judgment、troubleshooting strategy 永遠留在 prose。
