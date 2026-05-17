@@ -1,0 +1,271 @@
+---
+header:
+  generated_from: governance/lifecycle/system-upgrade-governance.md
+  generated_at: '2026-05-17T02:13:28Z'
+  compiler_version: 1.0.0
+  status: synced
+compiled_from: governance/lifecycle/system-upgrade-governance.md
+upgrade_conditions:
+- emoji: "\U0001F3F7️"
+  condition: 系統名稱變更
+  description: 改變 repository 的定位名稱
+  example: "`Skill Repository` → `Knowledge Operating System` → `Cognitive Execution
+    System`"
+- emoji: "\U0001F3DB️"
+  condition: 架構分層變更
+  description: 新增/刪除/合併頂層目錄
+  example: 新增 `runtime/`、`governance/`、`intelligence/` 層
+- emoji: "\U0001F504"
+  condition: 核心流程變更
+  description: 改變 agent 的啟動、執行、閉環流程
+  example: Bootstrap 流程改寫、新增 phase machine
+- emoji: "\U0001F4C4"
+  condition: 對外文件變更
+  description: 改變 README、CORE_BOOTSTRAP、入口文件
+  example: README 標題/描述更新、新增 Key Documents
+- emoji: "\U0001F5D1️"
+  condition: 舊結構淘汰
+  description: 標註 deprecated、搬遷內容、刪除舊檔案
+  example: Skills deprecation、techniques 搬遷
+checklist_categories:
+- id: '2.1'
+  name: 計畫書本身
+  items:
+  - id: 2-1-1
+    title: 計畫書狀態標記
+    description: draft → active → completed / abandoned
+    required: true
+  - id: 2-1-2
+    title: 完成日期記錄
+    description: 記錄實際完成日期
+    required: true
+  - id: 2-1-3
+    title: 偏離記錄
+    description: 如果實作偏離原始計畫，記錄偏離內容與原因
+    required: true
+  - id: 2-1-4
+    title: 歸檔
+    description: 完成後移至 `plans/archived/`
+    required: true
+- id: '2.2'
+  name: README 更新
+  items:
+  - id: 2-2-1
+    title: 系統名稱
+    description: "`README.md` 標題是否反映新名稱？"
+    required: true
+  - id: 2-2-2
+    title: 系統描述
+    description: "`README.md` 副標題/描述是否反映新定位？"
+    required: true
+  - id: 2-2-3
+    title: OS Layout 表格
+    description: 是否有新增/修改的層級需要更新？
+    required: true
+  - id: 2-2-4
+    title: Key Documents
+    description: 是否有新增/歸檔的計畫文件需要更新？
+    required: true
+  - id: 2-2-5
+    title: Agent 作業流程
+    description: 流程圖是否仍正確？
+    required: true
+  - id: 2-2-6
+    title: Quickstart
+    description: 啟動步驟是否仍正確？
+    required: true
+- id: '2.3'
+  name: 架構文件更新
+  items:
+  - id: 2-3-1
+    title: architecture/ 文件
+    description: 如有架構變更，是否更新了對應的架構文件？
+    required: true
+  - id: 2-3-2
+    title: CORE_BOOTSTRAP.md
+    description: 啟動流程是否因升級而需要修改？
+    required: true
+  - id: 2-3-3
+    title: ADR 記錄
+    description: 是否建立了 Architecture Decision Record 記錄本次升級的關鍵決策？
+    required: true
+- id: '2.4'
+  name: 索引與路由更新
+  items:
+  - id: 2-4-1
+    title: skills-index.yaml
+    description: 如有 skill 層級變更，是否更新？
+    required: true
+  - id: 2-4-2
+    title: knowledge/indexes/README.md
+    description: 路由索引是否反映新結構？
+    required: true
+  - id: 2-4-3
+    title: knowledge/runtime/routing-registry.yaml
+    description: routing registry 是否新增/更新路由？
+    required: true
+  - id: 2-4-4
+    title: knowledge/graphs/
+    description: graph records 是否反映新檔案之間的關係？
+    required: true
+- id: '2.5'
+  name: 舊檔案處理
+  items:
+  - id: 2-5-1
+    title: 舊檔案標註
+    description: 被取代的舊檔案是否標註 `# Deprecated — see <new path>`？
+    required: true
+  - id: 2-5-2
+    title: 已提取標註
+    description: 內容被提取的檔案是否標註 `# Intelligence Extracted` 或 `# Extracted — See <target>`？
+    required: true
+  - id: 2-5-3
+    title: 舊檔案刪除
+    description: 如果刪除舊檔案，是否確認無殘留引用？（建議先標註 deprecated，下一個版本再刪除）
+    required: true
+  - id: 2-5-4
+    title: 引用更新
+    description: 所有指向舊路徑的引用是否已更新為新路徑？
+    required: true
+- id: '2.6'
+  name: Runtime Surface 更新
+  items:
+  - id: 2-6-1
+    title: Generated YAML 重新編譯
+    description: 執行 `ruby runtime/compiler/compiler-engine.rb` 重新編譯
+    required: true
+  - id: 2-6-2
+    title: phase-machine.yaml
+    description: 如有 phase 變更，是否同步更新？
+    required: true
+  - id: 2-6-3
+    title: obligation-ledger.yaml
+    description: 如有 obligation 變更，是否同步更新？
+    required: true
+  - id: 2-6-4
+    title: blocking-gates.yaml
+    description: 如有 gate 變更，是否同步更新？
+    required: true
+- id: '2.7'
+  name: 跨層一致性檢查
+  items:
+  - id: 2-7-1
+    title: README 一致性
+    description: 各層 README 的表格（atoms、workflows、files）與實際檔案一致
+    required: true
+  - id: 2-7-2
+    title: 引用一致性
+    description: 所有跨文件引用（相對路徑連結）有效
+    required: true
+  - id: 2-7-3
+    title: 命名一致性
+    description: 新檔案命名遵循 path convention（小寫、連字號）
+    required: true
+- id: '2.8'
+  name: 閉環驗證
+  items:
+  - id: 2-8-1
+    title: Diff Review
+    description: 執行 `git diff` 審查所有變更
+    required: true
+  - id: 2-8-2
+    title: Linked Updates
+    description: 檢查是否有遺漏的連動更新（參見 [`enforcement/linked-updates.md`](../../enforcement/linked-updates.md)）
+    required: true
+  - id: 2-8-3
+    title: Commit
+    description: "`git add -A && git commit`"
+    required: true
+  - id: 2-8-4
+    title: Push
+    description: "`git push`"
+    required: true
+  - id: 2-8-5
+    title: Readback
+    description: 確認 push 成功，遠端狀態正確
+    required: true
+forced_rules:
+- id: rule.1
+  title: 計畫書必須包含完成檢查清單
+  lesson: "`2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md` 的 Phase 規劃中沒有明確列出「完成後需要更新
+    README」，導致執行 agent 忘記更新系統名稱。"
+  enforcement: 每一份升級計畫書必須在結尾包含 §2 的檢查清單（或子集），執行 agent 在完成所有實作後逐項確認。
+- id: rule.2
+  title: 系統名稱變更必須寫在計畫書中
+  lesson: 從 Knowledge OS → Cognitive Execution System 的名稱變更，在計畫書中只有 §一 的「現有框架摘要」提到舊名稱，沒有明確寫出「升級完成後
+    README 標題要改為 XXX」。
+  enforcement: |-
+    如果升級涉及系統名稱變更，計畫書必須明確寫出：
+    ```
+    ## 完成條件
+    - [ ] README.md 標題改為「# AI-native Cognitive Execution System」
+    - [ ] README.md 描述改為「AI 認知執行系統 — ...」
+    ```
+- id: rule.3
+  title: 舊檔案必須在升級過程中標註
+  lesson: 第一次升級（skill → Knowledge OS）時，舊 `skills/` 檔案沒有即時標註 `# Deprecated`，導致 agent
+    仍然優先讀取舊路徑。後來才透過 `primary_entrypoint` 機制修正。
+  enforcement: |-
+    - 內容被搬遷的舊檔案：標註 `# Deprecated — see <new path>`
+    - 內容被提取的舊檔案：標註 `# Intelligence Extracted` 或 `# Extracted — See <target>`
+    - 刪除舊檔案前：至少保留一個版本的 deprecated 過渡期
+- id: rule.4
+  title: 索引必須在升級完成前更新
+  lesson: "`knowledge/runtime/routing-registry.yaml` 和 `knowledge/indexes/README.md`
+    在多次升級中都曾被遺漏，直到跨層一致性檢查才補上。"
+  enforcement: 索引更新是升級的**完成條件**，不是「有時間再補」。在檢查清單中必須有對應項目。
+- id: rule.5
+  title: Compiler 必須在升級完成前執行
+  lesson: 修改 prose 檔案後忘記執行 `ruby runtime/compiler/compiler-engine.rb`，導致 generated
+    YAML 與 canonical source 不一致。
+  enforcement: 任何修改 prose 檔案的升級，在 commit 前必須執行 compiler 重新編譯 generated YAML。
+checklist_template:
+- name: "## 完成檢查清單"
+  items: []
+- name: 計畫書本身
+  items:
+  - 計畫書狀態標記為 completed
+  - 記錄完成日期
+  - 記錄偏離（如有）
+  - 歸檔至 plans/archived/
+- name: README 更新
+  items:
+  - 系統名稱已更新
+  - 系統描述已更新
+  - OS Layout 表格已更新
+  - Key Documents 已更新
+  - Agent 作業流程已確認
+  - Quickstart 已確認
+- name: 架構文件
+  items:
+  - architecture/ 文件已更新
+  - CORE_BOOTSTRAP.md 已確認
+  - ADR 已記錄關鍵決策
+- name: 索引與路由
+  items:
+  - skills-index.yaml 已更新
+  - knowledge/indexes/README.md 已更新
+  - routing-registry.yaml 已更新
+  - graph records 已更新
+- name: 舊檔案處理
+  items:
+  - 舊檔案已標註 deprecated/extracted
+  - 所有引用已更新為新路徑
+- name: Runtime Surface
+  items:
+  - compiler 已執行
+  - phase-machine.yaml 已同步
+  - obligation-ledger.yaml 已同步
+  - blocking-gates.yaml 已同步
+- name: 跨層一致性
+  items:
+  - README 表格與實際檔案一致
+  - 跨文件引用有效
+  - 命名遵循 convention
+- name: 閉環驗證
+  items:
+  - Diff review 完成
+  - Linked updates 完成
+  - Commit 完成
+  - Push 完成
+  - Readback 確認

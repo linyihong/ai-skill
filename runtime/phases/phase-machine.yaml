@@ -62,6 +62,7 @@ phases:
       - read_phase_machine
       - read_blocking_gates
       - read_knowledge_update_phases
+      - read_system_upgrade_governance
       - diff_review
       - update_knowledge
       - plan_next_actions
@@ -73,12 +74,14 @@ phases:
       - gate.checkpoint.obligation_ledger_loaded
       - gate.checkpoint.blocking_gates_checked
       - gate.checkpoint.knowledge_update_checked
+      - gate.checkpoint.system_upgrade_governance_checked
     obligations:
       - obligation.checkpoint.review_pending_obligations
       - obligation.checkpoint.check_knowledge_update_needed
+      - obligation.checkpoint.check_system_upgrade_governance
     next_phase: phase.execution
     phase_transition_triggers:
-      - condition: "obligation_ledger_loaded == true AND blocking_gates_checked == true AND knowledge_update_checked == true"
+      - condition: "obligation_ledger_loaded == true AND blocking_gates_checked == true AND knowledge_update_checked == true AND system_upgrade_governance_checked == true"
         auto_transition: false
         requires_confirmation: true
 

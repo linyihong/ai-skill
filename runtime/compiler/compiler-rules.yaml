@@ -138,7 +138,18 @@ source_target_mapping:
       - known_platforms
     compile_rule: "從 knowledge-update-flow.md Step 2.4 的決策樹與 intelligence/engineering/ 的 README 提取分類維度定義與已知語言/框架/平台列表"
 
-  # ── P3.8: APK Workflow Phases Mapping ──
+  # ── P3.8: System Upgrade Governance Mapping ──
+
+  - source: "governance/lifecycle/system-upgrade-governance.md"
+    target: "runtime/generated/system-upgrade-governance.yaml"
+    extract:
+      - upgrade_conditions
+      - checklist_categories
+      - checklist_items
+      - forced_rules
+    compile_rule: "從系統升級治理要則的 §1 條件表格、§2 檢查清單分類與項目、§3 強制規則提取升級治理定義"
+
+  # ── P3.9: APK Workflow Phases Mapping ──
 
   - source: "analysis/apk/workflows/*.md"
     target: "analysis/apk/workflows/generated-phases.yaml"

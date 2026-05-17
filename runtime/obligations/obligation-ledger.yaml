@@ -59,6 +59,23 @@ obligations:
     linked_gates:
       - gate.checkpoint.blocking_gates_checked
 
+  - id: obligation.checkpoint.check_system_upgrade_governance
+    phase: phase.checkpoint
+    name: Check System Upgrade Governance
+    description: >
+      快速路徑（預設）：讀取 runtime/generated/system-upgrade-governance.yaml
+      了解大型系統升級的條件、檢查清單分類與強制規則。
+      如果 plans/active/ 中有大型升級計畫，必須逐項確認檢查清單。
+      完整路徑：讀 governance/lifecycle/system-upgrade-governance.md（~244 lines）
+    verification:
+      - "system_upgrade_governance_checked == true"
+      - "if_active_upgrade_plan: checklist_items_reviewed == true"
+    severity: high
+    depends_on:
+      - obligation.checkpoint.check_knowledge_update_needed
+    linked_gates:
+      - gate.checkpoint.system_upgrade_governance_checked
+
   # ── Execution Phase ──
   - id: obligation.execution.log_actions
     phase: phase.execution

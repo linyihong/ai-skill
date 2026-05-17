@@ -82,6 +82,20 @@ gates:
     failure_action: warn + continue
     failure_message: "警告：知識更新檢查未完成，建議在 checkpoint 階段執行"
 
+  - id: gate.checkpoint.system_upgrade_governance_checked
+    phase: phase.checkpoint
+    name: System Upgrade Governance Checked
+    description: >
+      系統升級治理檢查已完成（快速路徑：runtime/generated/system-upgrade-governance.yaml）。
+      如有進行中的大型升級計畫（plans/active/），必須確認治理檢查清單已執行。
+    severity: high
+    check:
+      type: file_read
+      target: runtime/generated/system-upgrade-governance.yaml
+      verification: "system_upgrade_governance_checked == true AND (no_active_upgrade_plan == true OR checklist_items_reviewed == true)"
+    failure_action: warn + continue
+    failure_message: "警告：系統升級治理檢查未完成，如有進行中的大型升級請確認檢查清單"
+
   # ── Execution Gates ──
   - id: gate.execution.goal_defined
     phase: phase.execution

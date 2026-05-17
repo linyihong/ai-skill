@@ -848,6 +848,106 @@ def compile_classification_rules(_source_path, _mapping_entry)
   puts "  ✓ #{target}"
 end
 
+def compile_system_upgrade_governance(source_path, _mapping_entry)
+  content = File.read(source_path)
+  sections = content.split(/^##\s+/)
+
+  # Parse §1: upgrade conditions from table
+  upgrade_conditions = []
+  if content =~ /## 1\. 什麼是「大型系統升級」\n\n(.*?)(?:\n\n##|\z)/m
+    section1 = $1
+    section1.scan(/^\|\s*(🏷️|🏛️|🔄|📄|🗑️)\s*\*\*(.+?)\*\*\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) do |emoji, condition, desc, example|
+      upgrade_conditions << {
+        'emoji' => emoji,
+        'condition' => condition.strip,
+        'description' => desc.strip,
+        'example' => example.strip
+      }
+    end
+  end
+
+  # Parse §2: checklist categories and items
+  checklist_categories = []
+  if content =~ /## 2\. 升級計畫書必須包含的檢查清單\n(.*?)(?:\n\n##\s+\d+\.|\z)/m
+    section2 = $1
+    # Split by ### subsections
+    subsections = section2.split(/^###\s+/)
+    subsections.each do |sub|
+      next if sub.strip.empty?
+      if sub =~ /^(\d+\.\d+)\s+(.+?)\n(.*)/m
+        cat_id = $1.strip
+        cat_name = $2.strip
+        body = $3
+        items = []
+        body.scan(/^-\s+\[( |x)\]\s+\*\*(.+?)\*\*(?::|：)\s*(.+?)?$/) do |checked, title, desc|
+          items << {
+            'id' => "#{cat_id.tr('.', '-')}-#{items.length + 1}",
+            'title' => title.strip,
+            'description' => (desc || '').strip,
+            'required' => true
+          }
+        end
+        checklist_categories << {
+          'id' => cat_id,
+          'name' => cat_name,
+          'items' => items
+        }
+      end
+    end
+  end
+
+  # Parse §3: forced rules
+  forced_rules = []
+  if content =~ /## 3\. 從三次升級提煉的強制規則\n(.*?)(?:\n\n##\s+\d+\.|\z)/m
+    section3 = $1
+    section3.scan(/^###\s+規則\s+(\d+)[：:]\s*(.+?)\n\n\*\*教訓\*\*：(.+?)\n\n\*\*強制\*\*：(.+?)(?=\n\n###|\n\n---|\z)/m) do |num, title, lesson, enforce|
+      forced_rules << {
+        'id' => "rule.#{num}",
+        'title' => title.strip,
+        'lesson' => lesson.strip,
+        'enforcement' => enforce.strip
+      }
+    end
+  end
+
+  # Parse §5: checklist template categories and items
+  template_categories = []
+  if content =~ /## 5\. 檢查清單範本（可直接複製到計畫書）\n\n```markdown\n(.*?)```/m
+    template_md = $1
+    template_sections = template_md.split(/^###\s+/)
+    template_sections.each do |sub|
+      next if sub.strip.empty?
+      if sub =~ /^(.+?)\n(.*)/m
+        cat_name = $1.strip
+        body = $2
+        items = []
+        body.scan(/^-\s+\[( |x)\]\s+(.+?)$/) do |_checked, title|
+          items << title.strip
+        end
+        template_categories << {
+          'name' => cat_name,
+          'items' => items
+        }
+      end
+    end
+  end
+
+  target = target_path_for(source_path, @mapping.find { |e| e['source'] == 'governance/lifecycle/system-upgrade-governance.md' })
+  header = generated_header(source_path)
+
+  yaml_content = {
+    'header' => header,
+    'compiled_from' => source_path,
+    'upgrade_conditions' => upgrade_conditions,
+    'checklist_categories' => checklist_categories,
+    'forced_rules' => forced_rules,
+    'checklist_template' => template_categories
+  }
+
+  File.write(target, YAML.dump(yaml_content))
+  puts "  ✓ #{target}"
+end
+
 def compile_source(source_path, mapping_entry)
   compile_rule = mapping_entry['compile_rule']
 
@@ -870,6 +970,8 @@ def compile_source(source_path, mapping_entry)
     compile_plans_index(source_path, mapping_entry)
   when /從 knowledge-update-flow\.md Step 2\.4 的決策樹與 intelligence\/engineering\/ 的 README 提取分類維度定義/
     compile_classification_rules(source_path, mapping_entry)
+  when /從系統升級治理要則的 §1 條件表格、§2 檢查清單分類與項目、§3 強制規則提取升級治理定義/
+    compile_system_upgrade_governance(source_path, mapping_entry)
   when /從 analysis\/apk\/workflows\/\*\.md 的「步驟 N：」標題提取 step 定義/
     compile_apk_workflow_phases(source_path, mapping_entry)
   else

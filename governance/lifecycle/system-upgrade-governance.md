@@ -232,10 +232,45 @@
 
 ---
 
-## 6. 與既有文件的關係
+## 6. Runtime Surface
+
+本文件已註冊為 runtime compiler 的 source，產生對應的 YAML surface 供 agent 在 checkpoint 階段快速讀取。
+
+| Runtime Surface | 位置 | 用途 |
+|----------------|------|------|
+| Generated YAML | [`runtime/generated/system-upgrade-governance.yaml`](../../runtime/generated/system-upgrade-governance.yaml) | Agent 在 checkpoint 階段讀取此 YAML，了解升級條件、檢查清單分類與強制規則 |
+
+### 觸發時機
+
+系統升級治理檢查在每個 checkpoint 階段自動觸發（由 [`phase-machine.yaml`](../../runtime/phases/phase-machine.yaml) 的 `gate.checkpoint.system_upgrade_governance_checked` 管理）：
+
+1. Agent 進入 checkpoint phase
+2. 讀取 [`runtime/generated/system-upgrade-governance.yaml`](../../runtime/generated/system-upgrade-governance.yaml)（快速路徑）
+3. 檢查 `plans/active/` 中是否有大型升級計畫
+4. 如有 → 逐項確認 §2 檢查清單
+5. 如無 → 跳過
+
+### 更新流程
+
+修改本文件後，必須執行 compiler 重新編譯：
+
+```bash
+ruby runtime/compiler/compiler-engine.rb
+```
+
+Pre-commit hook 會檢查 prose 與 generated YAML 是否一致，不一致時 block commit。
+
+---
+
+## 7. 與既有文件的關係
 
 | 文件 | 關係 |
 |------|------|
+| [`runtime/generated/system-upgrade-governance.yaml`](../../runtime/generated/system-upgrade-governance.yaml) | 本文件的 runtime surface，由 compiler 自動產生 |
+| [`runtime/phases/phase-machine.yaml`](../../runtime/phases/phase-machine.yaml) | Checkpoint phase 的 `gate.checkpoint.system_upgrade_governance_checked` 觸發治理檢查 |
+| [`runtime/obligations/obligation-ledger.yaml`](../../runtime/obligations/obligation-ledger.yaml) | `obligation.checkpoint.check_system_upgrade_governance` 定義治理檢查義務 |
+| [`runtime/gates/blocking-gates.yaml`](../../runtime/gates/blocking-gates.yaml) | `gate.checkpoint.system_upgrade_governance_checked` 定義檢查通過條件 |
+| [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) | 定義本文件到 YAML 的編譯規則 |
 | [`enforcement/linked-updates.md`](../../enforcement/linked-updates.md) | 本要則的 §2.8 閉環驗證引用 linked-updates 規則 |
 | [`governance/lifecycle/README.md`](../../governance/lifecycle/README.md) | 本要則是 lifecycle 治理的一部分，專注於「升級」這個特定 lifecycle 事件 |
 | [`plans/README.md`](../../plans/README.md) | 本要則定義了計畫書必須包含的內容，與 plans/ 的目錄規則互補 |
