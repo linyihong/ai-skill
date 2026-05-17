@@ -476,8 +476,9 @@ ruby scripts/validate-knowledge-runtime.rb
 2. ✅ 必要的 linked updates 已同步或明確寫出不適用理由
 3. ✅ 若本輪使用或更新 tool mirror，必要的 tool sync 已執行
 4. ✅ 相關檔案已 `git add`、`git commit`、`git push`
-5. ✅ Push 後已重新讀取更新過的入口、主要依賴、索引與 promotion target
-6. ✅ 最後一次 `git status --short --branch` 顯示 clean，且 branch 沒有 ahead/behind
+5. ✅ **若 runtime YAML 來源或 compiler 規則有變更，`runtime.db` 已 `git add` 並包含在 commit 中**（pre-commit hook 會自動處理，手動 commit 時需自行確認）
+6. ✅ Push 後已重新讀取更新過的入口、主要依賴、索引與 promotion target
+7. ✅ 最後一次 `git status --short --branch` 顯示 clean，且 branch 沒有 ahead/behind
 
 **Commit/Push 後讀回 Gate**：
 

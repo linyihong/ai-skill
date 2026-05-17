@@ -220,10 +220,11 @@ state_based_enforcement:
 4. 若本輪明確使用或更新本機工具 mirror / symlink / copy snapshot，執行對應 tool sync；reference-only 只需確認 `<AI_SKILL_REPO>` 可讀，不跑同步。
 5. 若有多個 owner group，優先使用 `./scripts/ai-skill-close-loop.sh --commit` 分組提交；若手動提交，仍需按 enforcement、scripts、各 skill owner 分開提交，避免把不相干內容混成一包。
 6. `git add` 相關檔案。
-7. `git commit`。
-8. `git push`。
-9. Push 後重新讀取更新過的入口與主要依賴文件。
-10. 再跑 `git status --short --branch`，必須看到沒有未提交變更，且 branch 不再 ahead/behind remote。
+7. **若 runtime YAML 來源或 compiler 規則有變更，確認 `runtime.db` 已 `git add`**（pre-commit hook 會自動處理，但手動 commit 時需自行確認）。
+8. `git commit`。
+9. `git push`。
+10. Push 後重新讀取更新過的入口與主要依賴文件。
+11. 再跑 `git status --short --branch`，必須看到沒有未提交變更，且 branch 不再 ahead/behind remote。
 
 若第 10 步不乾淨，agent 必須回到第 1 步處理剩餘變更。不可在 dirty tree 或未 push 狀態下回覆「完成」。若使用者沒有授權 push 或 merge，必須明確提醒「本地已提交但尚未推送 / 合併」以及需要使用者決定下一步。
 
