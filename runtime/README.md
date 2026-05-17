@@ -1,56 +1,49 @@
 # Runtime
 
-`runtime/` 負責「AI 系統如何運作」。本層保存 dynamic loading、context routing、context pruning、agent coordination 與 orchestration 的設計，不取代可執行 enforcement rules。
+Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 
-## 目前入口
+## Domains
 
-- [`routing/`](routing/README.md)：定義 task intent → knowledge index → metadata → source-of-truth gate 的 context loading 流程。
-- [`onboarding/`](onboarding/README.md)：新專案或新任務的初始設定指引、開場提示詞模板、完成門檻定義。
-- [`discovery/`](discovery/README.md)：能力探索機制，解決 Capability Discovery Problem，在每個 phase 的關鍵時機主動搜尋 agent 可能不知道的能力。
+| Domain | Path | Description |
+|--------|------|-------------|
+| Activation | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Lazy-load rules with activation conditions |
+| Routing | [`routing/README.md`](routing/README.md) | Task intent → knowledge index → metadata → source-of-truth gate |
+| Discovery | [`discovery/README.md`](discovery/README.md) | Phase-aware capability discovery checkpoints |
+| Phases | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Execution phase state machine |
+| Obligations | [`obligations/obligation-ledger.yaml`](obligations/obligation-ledger.yaml) | Per-phase atomic duties |
+| Gates | [`gates/blocking-gates.yaml`](gates/blocking-gates.yaml) | Phase transition prerequisites |
+| Compiler | [`compiler/compiler-engine.rb`](compiler/compiler-engine.rb) | Prose → YAML compilation |
+| Generated | [`generated/`](generated/) | Compiled runtime surfaces |
+| Transactions | [`transactions/transaction-machine.yaml`](transactions/transaction-machine.yaml) | Writeback transaction state machine |
+| Pipeline | [`pipeline/`](pipeline/) | Context flow, guard chain, relevance engine |
+| Recovery | [`recovery/`](recovery/) | Phase reconciliation, state repair, obligation rebuild |
+| Scheduler | [`scheduler/`](scheduler/) | Execution queue, priority scheduler |
+| Guards | [`guards/`](guards/) | Circuit breaker, context pollution |
+| Onboarding | [`onboarding/`](onboarding/) | New project/task setup guidance |
+| Output Governance | [`output-governance/`](output-governance/) | Language policy, output rules, governance gates |
+| Prompt Artifacts | [`prompt-artifacts/`](prompt-artifacts/) | Artifact templates, composition rules |
+| Context | [`context/`](context/) | TTL policy |
+| Budget | [`budget/`](budget/) | Token budget |
+| Distributed | [`distributed/`](distributed/) | Multi-agent coordination, distributed locks |
+| Intelligence | [`intelligence/`](intelligence/) | Intelligence routing |
 
-## 放什麼
+## Inbound References
 
-- Context routing 與 dynamic loading 規則的設計。
-- Runtime orchestration、scheduler、coordination 與 context pruning pattern。
-- 如何利用 metadata 選擇 rules、workflow、knowledge atoms 與 model profile。
-- AI-native Knowledge Operating System 的 runtime architecture 草案。
-- **僅限系統層**：`runtime/` 只存放「AI 系統如何運作」的設計與產出。
-  領域操作技巧（如 `analysis/`、`intelligence/`）的 generated surface 應跟隨 source 目錄，
-  不應混入 `runtime/generated/`。
+- [`route.runtime.activation-rules`](../knowledge/runtime/routing-registry.yaml:77)
+- [`route.runtime.context-ttl`](../knowledge/runtime/routing-registry.yaml:102)
+- [`route.runtime.context-loading`](../knowledge/runtime/routing-registry.yaml:161)
+- [`route.metadata.knowledge-atom-schema`](../knowledge/runtime/routing-registry.yaml:191)
+- [`route.models.model-aware-routing`](../knowledge/runtime/routing-registry.yaml:319)
+- [`route.runtime.router-flow`](../knowledge/runtime/routing-registry.yaml:348)
+- [`route.runtime.context-ttl-doc`](../knowledge/runtime/routing-registry.yaml:407)
+- [`gate.checkpoint.capability_discovery_completed`](gates/blocking-gates.yaml)
+- [`obligation.checkpoint.run_capability_discovery`](obligations/obligation-ledger.yaml)
 
-## 不放什麼
+## Source-of-Truth
 
-- 目前必須執行的共用政策；放到 `enforcement/`。
-- 單一工具的 hook、setting、UI 或 mirror sync 細節；放到 `ai-tools/`。
-- Skill-specific workflow 全文；放到 `workflow/`（舊 `skills/` 結構已於 2026-05-13 標記為 deprecated）。
-- 長期記憶內容本身；放到 `memory/` 或 `knowledge/`。
-- **領域層的 generated surface**：`analysis/`、`intelligence/`、`feedback/` 等領域層的
-  generated YAML 應放在各自的 source 目錄下，不應集中到 `runtime/generated/`。
-  `runtime/generated/` 只存放系統層（`workflow/`、`enforcement/`、`governance/`、`plans/`）的
-  generated surfaces。
+Runtime does not hold conceptual explanations. Source-of-truth for runtime design:
 
-## 誰會參考這裡（Inbound References）
-
-- [`route.runtime.activation-rules`](../knowledge/runtime/routing-registry.yaml:77) — candidate_sources 引用 `knowledge/runtime/README.md`
-- [`route.runtime.context-ttl`](../knowledge/runtime/routing-registry.yaml:102) — candidate_sources 引用 `knowledge/runtime/README.md`
-- [`route.runtime.context-loading`](../knowledge/runtime/routing-registry.yaml:161) — candidate_sources 引用 `knowledge/runtime/README.md`
-- [`route.metadata.knowledge-atom-schema`](../knowledge/runtime/routing-registry.yaml:191) — candidate_sources 引用 `knowledge/runtime/README.md`
-- [`route.models.model-aware-routing`](../knowledge/runtime/routing-registry.yaml:319) — candidate_sources 引用 `knowledge/runtime/README.md`
-- [`route.runtime.router-flow`](../knowledge/runtime/routing-registry.yaml:348) — candidate_sources 引用 `knowledge/runtime/README.md`
-- [`route.runtime.context-ttl-doc`](../knowledge/runtime/routing-registry.yaml:407) — candidate_sources 引用 `knowledge/runtime/README.md`
-- [`gate.checkpoint.capability_discovery_completed`](gates/blocking-gates.yaml) — checkpoint phase 的 blocking gate，引用 `runtime/discovery/`
-- [`obligation.checkpoint.run_capability_discovery`](obligations/obligation-ledger.yaml) — checkpoint phase 的 obligation，引用 `runtime/discovery/`
-- 共 9 條 inbound references（7 條 routing records + 2 條 runtime 內部引用）
-
-## 與既有層的關係
-
-- `enforcement/` 是目前可執行 policy layer；本層先描述 runtime design。
-- `metadata/` 提供 runtime selection 與 ranking 的控制資料。
-- `knowledge/` 提供可被 runtime 找到的 atom、index、summary 與 graph。
-- `ai-tools/` 記錄各工具如何實作或近似 runtime 行為。
-
-## 第一批候選遷移來源
-
-- `architecture/ai-native-knowledge-operating-system.md` 的 reference-first 與 compatibility inventory
-- `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` 的 runtime / context routing 章節
-- `enforcement/decision-efficiency.md` 中可抽成 runtime routing design 的概念
+- `governance/` — Design philosophy, lifecycle, validation
+- `workflow/` — Human-readable execution flows
+- `intelligence/` — Heuristics, analytical reasoning
+- `enforcement/` — Executable policy rules
