@@ -2,6 +2,28 @@
 
 Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 
+## 放什麼
+
+- Schema、registry、state definitions、transitions
+- Activation graph、routing rules、guard definitions
+- Generated artifacts（compiled YAML）
+- Runtime metadata（budget、health、scheduler）
+- Navigation-only README（files、refs、source-of-truth）
+
+## 不放什麼
+
+- 長篇解釋、philosophy、reasoning
+- 教學、architecture discussion、design rationale
+- Knowledge base 內容、領域知識
+- 人類流程說明、操作步驟
+
+這些內容屬於：
+- `governance/` — Design philosophy、lifecycle、validation
+- `workflow/` — Human-readable execution flows
+- `intelligence/` — Heuristics、analytical reasoning
+- `enforcement/` — Executable policy rules
+- `analysis/` — Analysis 思路
+
 ## Domains
 
 | Domain | Path | Description |
