@@ -27,7 +27,7 @@ edges:
     validation: README 定義 scope、核心原則、與既有層的關係。
   - type: related_to
     target: workflow/software-delivery/execution-flow.md
-    reason: App development guidance 的具體執行步驟（8 個 workflow sections）。
+    reason: App development guidance 的具體執行步驟（9 個 workflow sections，§9 Surgical Changes Rules 為新增）。
     validation: execution-flow.md 從 skills/app-development-guidance/WORKFLOW.md（已刪除）提取。
   - type: related_to
     target: workflow/software-delivery/artifact-gates.md
@@ -66,6 +66,10 @@ edges:
     target: workflow/software-delivery/review-checklist.md
     reason: 審查檢查清單 — 15 個審查類別（Change Intake、Test Strategy、Performance Test、Product To Contract、Documentation Backfill、Contract Governance、Embedded/Hardware Review、API And Transport、Auth/Tokens/Sessions、Local Storage、Flutter/Android Build、Logging/Telemetry、Anti-Tamper/Risk、Release Gate）。
     validation: review-checklist.md 從 skills/app-development-guidance/CHECKLIST.md（已刪除）提取。
+  - type: related_to
+    target: workflow/software-delivery/examples/EXAMPLES.md
+    reason: Simplicity First、Surgical Changes、Think Before Coding、Goal-Driven Execution 的行為範例與 anti-patterns 對照。
+    validation: EXAMPLES.md 提供 4 個原則的具體 code diff 範例，展示「常見錯誤」vs「正確做法」。
   - type: related_to
     target: analysis/apk/README.md
     reason: Workflow 引用 analysis/ 的技術方法，不重複技術細節。

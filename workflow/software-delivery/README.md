@@ -12,6 +12,7 @@
 3. 需要 artifact 規範時參考 [`artifact-gates.md`](artifact-gates.md)
 4. 需要審查檢查清單時參考 [`review-checklist.md`](review-checklist.md)
 5. 需要完整開發流程時參考 [`development-process.md`](development-process.md)
+6. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)
 
 ## Scope
 
@@ -36,6 +37,8 @@
 2. **Checklist 是輔助不是取代**。Checklist 確保基本項目不被遺漏，但 reviewer 仍需使用工程判斷。
 3. **Review 結果必須 actionable**。每個 finding 應包含：問題描述、風險等級、建議修復方式。
 4. **Review 記錄應可追溯**。每個 review 的 finding、decision 與 resolution 應可追溯到對應的 commit 或 ticket。
+5. **Simplicity First（簡潔優先）**：從最簡單的實作開始。不要預先加入抽象層、Strategy pattern、或 speculative features。當需求證明需要複雜度時再重構。參見 [`examples/EXAMPLES.md`](examples/EXAMPLES.md) §2。
+6. **Surgical Changes（外科手術式修改）**：只改解決問題所需的行。匹配既有 code style，不要順便 refactor 不相關的 code。參見 [`execution-flow.md`](execution-flow.md) §9 和 [`examples/EXAMPLES.md`](examples/EXAMPLES.md) §3。
 
 ## 與既有層的關係
 
