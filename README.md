@@ -1,6 +1,6 @@
-# AI-native Knowledge Operating System
+# AI-native Cognitive Execution System
 
-AI 知識作業系統 — 讓 agent 用最小 token 成本找到正確知識。
+AI 認知執行系統 — 讓 agent 以 runtime state machine 驅動知識路由、phase 執行與閉環驗證。
 
 ## 🚀 Quickstart
 
@@ -75,7 +75,7 @@ Session Start
 | [`governance/contributing.md`](governance/contributing.md) | 人類維護入口：驗證指令、PR gate、文件索引 |
 | [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | Minimal bootstrap (3 rules, ~800 tokens) |
 | [`skills-index.yaml`](skills-index.yaml) | Skill routing index |
-| [`plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md`](plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md) | Full architecture upgrade plan |
+| [`plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md`](plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md) | ✅ 已完成：AI-native Cognitive Execution System 升級 |
 | [`plans/archived/2026-05-12-1101-context-cost-optimization.md`](plans/archived/2026-05-12-1101-context-cost-optimization.md) | Token cost optimization plan |
 | [`runtime/router/activation-rules.yaml`](runtime/router/activation-rules.yaml) | Lazy-load activation rules |
 | [`runtime/context/ttl-policy.yaml`](runtime/context/ttl-policy.yaml) | Context TTL policy |
