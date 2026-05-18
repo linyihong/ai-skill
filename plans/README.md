@@ -54,6 +54,7 @@
 | [`archived/2026-05-13-0837-ai-decision-contract-testing.md`](archived/2026-05-13-0837-ai-decision-contract-testing.md) | ✅ completed | AI Decision Contract Testing 框架設計與實作 |
 | [`archived/2026-05-14-1035-enforcement-layer-enhancement.md`](archived/2026-05-14-1035-enforcement-layer-enhancement.md) | ✅ completed | enforcement/ 後續強化計畫：Metadata Spec、Rule Graph、Activation Engine、Conflict Matrix、Deprecation Lifecycle（5 方向全完成） |
 | [`archived/2026-05-14-1028-shared-rules-to-enforcement-migration.md`](archived/2026-05-14-1028-shared-rules-to-enforcement-migration.md) | ✅ completed | shared-rules/ → enforcement/ 搬遷計畫，含 Layer Responsibility Contract |
+| [`archived/2026-05-18-scrapling-knowledge-integration-plan.md`](archived/2026-05-18-scrapling-knowledge-integration-plan.md) | ✅ completed | Scrapling 知識整合計畫：analysis/web/ + 6 份 intelligence 文件 + sanitization 強化 + routing 註冊，3 個 Phase 全完成 |
 | [`active/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md`](active/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md) | 📝 draft | AI-native Cognitive Execution System 升級計畫比對分析 — Phase Runtime、Obligation Ledger、Blocking Gates、ai-tools 控制流程遷移、Knowledge/Runtime 邊界決策 |
 
 ## 誰會參考這裡（Inbound References）

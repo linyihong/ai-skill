@@ -74,11 +74,11 @@ edges:
     reason: Adaptive Parsing（Find Similar Elements）— 3 層過濾演算法（DOM depth → tag hierarchy → fuzzy attribute matching），解決結構變動問題。
     validation: adaptive-parsing.md 定義演算法步驟、API 使用、適用場景與限制。
   - type: related_to
-    target: analysis/web/mcp-server-patterns.md
+    target: intelligence/engineering/mcp-server-patterns.md
     reason: MCP Server Design Pattern — 3-Layer 架構（Basic/Dynamic/Stealth）、10 tools、CSS selector precision extraction、prompt injection protection。
     validation: mcp-server-patterns.md 定義架構圖、工具選擇策略、關鍵設計決策。
   - type: related_to
-    target: analysis/web/multi-strategy-routing.md
+    target: intelligence/engineering/multi-strategy-routing.md
     reason: Multi-strategy Routing — 4 種策略分類（Fetch/Parse/Session/Concurrency）、路由決策流程、策略組合範例與切換條件。
     validation: multi-strategy-routing.md 定義策略分類表、決策流程圖、策略組合範例。
   - type: related_to

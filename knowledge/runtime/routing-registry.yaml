@@ -748,8 +748,8 @@ records:
       - analysis/README.md
     candidate_sources:
       - analysis/web/sources-and-tools.md
-      - analysis/web/multi-strategy-routing.md
-      - analysis/web/mcp-server-patterns.md
+      - intelligence/engineering/multi-strategy-routing.md
+      - intelligence/engineering/mcp-server-patterns.md
       - intelligence/web-scraping/adaptive-parsing.md
       - intelligence/web-scraping/README.md
     source_of_truth_gate: new-layer-promoted
