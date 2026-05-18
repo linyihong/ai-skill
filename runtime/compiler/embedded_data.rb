@@ -680,6 +680,15 @@ module EmbeddedRuntimeData
             ],
             "min_confidence": "low",
             "failure_action": "ignore"
+          },
+          {
+            "type": "analysis",
+            "description": "搜尋與任務領域相關的分析方法與觀察框架（analysis/）。當任務涉及分析外部系統、工具、程式庫或新領域時，應檢查 analysis/ 下是否有對應的分析方法。",
+            "search_sources": [
+              "analysis/README.md"
+            ],
+            "min_confidence": "medium",
+            "failure_action": "warn + continue"
           }
         ]
       },

@@ -34,6 +34,8 @@ intelligence/
     agent-architecture/        # AI Agent 自身運作智慧
     analytical-reasoning/      # 分析推理智慧（APK analysis、repo analysis、heuristics、signals、failure patterns）
     development/               # 開發指引智慧（app development guidance、controls、review checklists）
+    mcp-server-patterns.md     # MCP Server 設計模式
+  web-scraping/                # Web Scraping 工程智慧（adaptive parsing、anti-bot bypass）
   ide/                         # IDE 生態系統知識
   business/                    # 商業決策智慧
   travel/                      # 特定領域智慧（Personal Domain Intelligence）
