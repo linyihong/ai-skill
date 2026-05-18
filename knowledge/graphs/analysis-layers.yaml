@@ -41,52 +41,46 @@ edges:
     target: analysis/apk/workflows/frida-hook-flow.md
     reason: Frida Hook 操作流程 — 6 步驟操作流程（確認 Flutter/Dart AOT、搜尋關鍵字、Hook Request Options、Hook Response Decode/Decrypt、Dart String Decoding、對齊與去敏）。
     validation: frida-hook-flow.md 定義 command、setup、6 步驟流程，從 skills/apk-analysis/techniques/flutter-dart-aot/README.md 提取。
-
   - type: related_to
     target: analysis/apk/workflows/http-api-documentation-flow.md
     reason: HTTP API 文件化操作流程 — 7 步驟操作流程（API Entry → Group Index → Per-API Detail → Coverage/Gap Matrix → SDK Mapping → Finish Gate → UI Automation）。
     validation: http-api-documentation-flow.md 定義 7 步驟流程，從 skills/apk-analysis/techniques/http-api/README.md 提取。
-
   - type: related_to
     target: analysis/apk/workflows/local-proxy-hook-flow.md
     reason: Local Proxy Hook 操作流程 — 6 步驟操作流程（確認證據 → 識別 Handler → Hook → Cast Netty → 去敏 → 歸因）。
     validation: local-proxy-hook-flow.md 定義 6 步驟流程，從 skills/apk-analysis/techniques/local-proxy/README.md 提取。
-
   - type: related_to
     target: analysis/apk/workflows/media-hls-analysis-flow.md
     reason: Media/HLS 分析操作流程 — 7 步驟操作流程（分離控制面/資料面 → Playlist → Key → Segments → 合併 → 容器驗證）。
     validation: media-hls-analysis-flow.md 定義 7 步驟流程，從 skills/apk-analysis/techniques/media-hls/README.md 提取。
-
   - type: related_to
     target: analysis/travel/README.md
     reason: Travel Planning 分析方法 — Core Goals、Scope、Usage Pattern、Relationships。
     validation: analysis/travel/README.md 從 skills/travel-planning/README.md 提取。
-
   - type: related_to
     target: analysis/travel/sources-and-tools.md
     reason: 旅遊規劃來源與工具完整清單 — Source Hierarchy、Japan Travel Sources、Agency Sources、Checks By Travel Type、Stop/Food Sources、Restaurant Sources、Lodging Sources、Route Shape Sources、Transport Sources、Country-Specific Driving、Exact Location Sources、Weather Sources、Road-Trip Stops、Schedule Feasibility、Calendar/App-Ready、車中泊 Quietness、Source Note Format、Red Flags。
     validation: sources-and-tools.md 從 skills/travel-planning/TOOLS.md 提取。
-
   - type: related_to
     target: analysis/web/README.md
     reason: Web Scraping 分析方法 — 範圍與邊界、何時進入此領域、分析流程、工具選擇、風險評估。
     validation: README 定義 Web Scraping analysis 的 scope、analysis flow 與 inbound/outbound 關係。
-
   - type: related_to
     target: analysis/web/sources-and-tools.md
     reason: Web Scraping 工具比較與選擇原則 — 提取工具、HTML 解析工具、瀏覽器自動化工具、4 種選擇原則。
     validation: sources-and-tools.md 提供工具比較表與選擇決策樹。
-
   - type: related_to
     target: intelligence/web-scraping/adaptive-parsing.md
     reason: Adaptive Parsing（Find Similar Elements）— 3 層過濾演算法（DOM depth → tag hierarchy → fuzzy attribute matching），解決結構變動問題。
     validation: adaptive-parsing.md 定義演算法步驟、API 使用、適用場景與限制。
-
   - type: related_to
-    target: intelligence/engineering/mcp-server-patterns.md
+    target: analysis/web/mcp-server-patterns.md
     reason: MCP Server Design Pattern — 3-Layer 架構（Basic/Dynamic/Stealth）、10 tools、CSS selector precision extraction、prompt injection protection。
     validation: mcp-server-patterns.md 定義架構圖、工具選擇策略、關鍵設計決策。
-
+  - type: related_to
+    target: analysis/web/multi-strategy-routing.md
+    reason: Multi-strategy Routing — 4 種策略分類（Fetch/Parse/Session/Concurrency）、路由決策流程、策略組合範例與切換條件。
+    validation: multi-strategy-routing.md 定義策略分類表、決策流程圖、策略組合範例。
   - type: related_to
     target: workflow/apk-analysis/README.md
     reason: Workflow 引用 analysis/ 的技術方法，analysis/ 提供 workflow 所需的技術細節。

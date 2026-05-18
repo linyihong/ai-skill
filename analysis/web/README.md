@@ -60,12 +60,15 @@ Web Scraping Analysis 負責**分析網頁內容提取的需求與可行性**，
 - **Headless browser**（Playwright/Puppeteer）：需要 JS 渲染
 - **Stealth browser**（Scrapling StealthyFetcher）：有 anti-bot 保護
 - **MCP Server**（Scrapling MCP）：AI agent 整合場景
+- 詳細策略對照：[`multi-strategy-routing.md`](multi-strategy-routing.md) — 提取/解析/Session/並發策略選擇
+- MCP 架構參考：[`mcp-server-patterns.md`](mcp-server-patterns.md) — 3-Layer 工具選擇策略
 
 ### 4. 策略設計
 - CSS selector / XPath 定位
 - 自適應解析（Find Similar Elements）
 - 分頁處理（pagination / infinite scroll）
 - 並發控制（rate limiting、retry、backoff）
+- 策略組合範例：[`multi-strategy-routing.md`](multi-strategy-routing.md) — HTTP Direct / Dynamic Browser / Stealth Browser 組合
 
 ### 5. 風險評估
 - 法律風險（robots.txt、ToS）

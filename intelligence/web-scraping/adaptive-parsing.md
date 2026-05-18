@@ -102,4 +102,4 @@ page.find('.quote').find_similar()
 
 - [`analysis/web/README.md`](../../analysis/web/README.md) — Web Scraping 分析方法的範圍
 - [`analysis/web/sources-and-tools.md`](../../analysis/web/sources-and-tools.md) — 工具選擇參考
-- [`intelligence/engineering/mcp-server-patterns.md`](../engineering/mcp-server-patterns.md) — MCP Server 整合 Adaptive Parsing
+- [`analysis/web/mcp-server-patterns.md`](../../analysis/web/mcp-server-patterns.md) — MCP Server 整合 Adaptive Parsing

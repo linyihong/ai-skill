@@ -152,6 +152,6 @@ async def handle_captcha(fetcher, url, max_retries=3):
 
 - [`analysis/web/README.md`](../../analysis/web/README.md) — Web Scraping 分析方法的範圍
 - [`analysis/web/sources-and-tools.md`](../../analysis/web/sources-and-tools.md) — 工具選擇參考（StealthyFetcher）
-- [`intelligence/engineering/multi-strategy-routing.md`](../engineering/multi-strategy-routing.md) — 提取策略中的 Stealth Browser
+- [`analysis/web/multi-strategy-routing.md`](../../analysis/web/multi-strategy-routing.md) — 提取策略中的 Stealth Browser
 - [`intelligence/engineering/cache-replay-pattern.md`](../engineering/cache-replay-pattern.md) — 開發階段使用 Cache 避免被 ban
-- [`intelligence/engineering/mcp-server-patterns.md`](../engineering/mcp-server-patterns.md) — MCP Server 的 Stealth Layer
+- [`analysis/web/mcp-server-patterns.md`](../../analysis/web/mcp-server-patterns.md) — MCP Server 的 Stealth Layer

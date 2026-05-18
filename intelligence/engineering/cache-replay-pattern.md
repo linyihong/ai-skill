@@ -144,5 +144,5 @@ class SessionCache:
 ## 與既有知識的關係
 
 - [`analysis/web/README.md`](../../analysis/web/README.md) — Web Scraping 分析方法的範圍
-- [`intelligence/engineering/multi-strategy-routing.md`](multi-strategy-routing.md) — Cache 作為並發策略的一部分
-- [`intelligence/engineering/mcp-server-patterns.md`](mcp-server-patterns.md) — MCP Server 可搭配 Cache 使用
+- [`analysis/web/multi-strategy-routing.md`](../../analysis/web/multi-strategy-routing.md) — Cache 作為並發策略的一部分
+- [`analysis/web/mcp-server-patterns.md`](../../analysis/web/mcp-server-patterns.md) — MCP Server 可搭配 Cache 使用
