@@ -10,7 +10,7 @@
 
 本文件整合 Ai-skill 系統中從「學到新知識」到「commit/push 完成」的完整端到端流程。它不取代既有文件的細節，而是作為**執行順序的總索引**，讓 agent 在每輪 checkpoint 知道下一步該做什麼。
 
-> 遵守 [`enforcement/README.md`](../../enforcement/README.md)、[`enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md)、[`enforcement/linked-updates.md`](../../enforcement/linked-updates.md)、[`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md)、[`enforcement/failure-learning-system.md`](../../enforcement/failure-learning-system.md)；本檔只定義流程順序，不重複貼上各規則全文。
+> 遵守 [`enforcement/README.md`](../../enforcement/README.md)、[`enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md)、[`enforcement/linked-updates.md`](../../enforcement/linked-updates.md)、[`../../../feedback/feedback-lessons.md`](../../../../../feedback/feedback-lessons.md)、[`enforcement/failure-learning-system.md`](../../enforcement/failure-learning-system.md)；本檔只定義流程順序，不重複貼上各規則全文。
 
 ---
 
@@ -66,7 +66,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 ## Step 1：觸發檢查（Per-Round Checkpoint）
 
-**來源**：[`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) 第 11 行
+**來源**：[`../../../feedback/feedback-lessons.md`](../../../../../feedback/feedback-lessons.md) 第 11 行
 
 **時機**：每個有實質進展的工作回合結束前、切回長時間專案工作前、提交 project-only evidence 前、或使用者說「繼續」展開下一輪前。
 
@@ -74,6 +74,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 > 1. 本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？
 > 2. 本輪是否涉及新增或改名目錄？→ 若是，先執行 [`directory-structure-governance.md`](directory-structure-governance.md) 的 5 步驟 Checkpoint
+> 3. 本輪是否與使用者**鎖定決策**（「就這樣做」「不要 X」）？→ 若是，依 [`runtime/decisions/decision-recording.yaml`](../../runtime/decisions/decision-recording.yaml) 寫入 **ADR**（`decisions/`）、**session**（`memory/decision/`）或 **project**（`<PROJECT_ROOT>/docs/decisions/`），並更新對應 README 索引
 
 **判斷結果**：
 
@@ -87,7 +88,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 ## Step 2：分類知識類型
 
-**來源**：[`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) §判斷流程
+**來源**：[`../../../feedback/feedback-lessons.md`](../../../../../feedback/feedback-lessons.md) §判斷流程
 
 **核心問題**：這份新知識應該放在哪個目錄？是否需要建立新的分類？
 
@@ -212,7 +213,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 | [`knowledge-update-flow.md`](knowledge-update-flow.md)（本文件） | 在 Step 2 的層級判斷樹中加入新分類 |
 | [`intelligence/engineering/analytical-reasoning/README.md`](../../intelligence/engineering/analytical-reasoning/README.md) | 更新子層列表與 scope 描述 |
 | 新分類的 `README.md` | 建立 scope 描述、與其他層的關係 |
-| [`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) §判斷流程 | 若新分類影響 domain 判斷邏輯 |
+| [`../../../feedback/feedback-lessons.md`](../../../../../feedback/feedback-lessons.md) §判斷流程 | 若新分類影響 domain 判斷邏輯 |
 
 **範例**（以本次 Java TSV 遷移為例）：
 
@@ -282,7 +283,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 ## Step 4：寫入 Feedback Lesson
 
-**來源**：[`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) §模板、§檔名規則
+**來源**：[`../../../feedback/feedback-lessons.md`](../../../../../feedback/feedback-lessons.md) §模板、§檔名規則
 
 **位置**：`feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`
 
@@ -514,7 +515,7 @@ ruby scripts/validate-knowledge-runtime.rb
 
 | 文件 | 在本流程中的角色 |
 |------|----------------|
-| [`enforcement/feedback-lessons.md`](../../enforcement/feedback-lessons.md) | Step 1-2, 4：觸發檢查、分類、寫入 lesson |
+| [`../../../feedback/feedback-lessons.md`](../../../../../feedback/feedback-lessons.md) | Step 1-2, 4：觸發檢查、分類、寫入 lesson |
 | [`feedback/promotion/README.md`](../../feedback/promotion/README.md) | Step 3, 5：決定 promotion target、更新目標層 |
 | [`feedback/pipeline/README.md`](../../feedback/pipeline/README.md) | Pipeline 架構設計，agent 在 close-loop 階段遵循的執行模型 |
 | [`enforcement/failure-learning-system.md`](../../enforcement/failure-learning-system.md) | Step 7：failure capture → classify → promote |

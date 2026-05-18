@@ -1,0 +1,73 @@
+decision_recording_version: v1
+status: active
+owner_layer: runtime/decisions
+description: >
+  閉環與知識更新時，將「本輪鎖定的決策」寫入可搜尋的 durable 位置。
+  避免決策只留在對話或 plan 內文而無法事後追查。
+
+close_loop:
+  stage: close-loop
+  mandatory_self_check:
+    - 本輪是否與使用者鎖定了設計／架構／流程決策（含「不要 X、改用 Y」）？
+    - 若有多條，是否已分 tier（architecture / session / project）？
+    - 若為 architecture 或影響多 repo／多 workflow，是否已寫 ADR 或排入下一 ADR？
+  blocking_if_skipped:
+    - 使用者明確要求「記住決策」或「之後要查」
+    - 變更 routing-registry、activation-table、workflow 進入點、enforcement 行為
+    - 跨 SDK public API 契約鎖定（應有 project docs/decisions 或 ADR 引用）
+
+tiers:
+  - id: architecture
+    description: 跨 session、跨專案、影響 Ai-skill OS 或 workflow 編排
+  - id: session
+    description: 本輪重要取捨，但尚不足以單獨 ADR；需可追溯
+  - id: project
+    description: 單一 repo／產品線實作選擇；給未來 agent 與 code review 查閱
+
+routes:
+  - tier: architecture
+    primary_source: decisions/README.md
+    write_pattern: decisions/ADR-{next_number}-{slug}.md
+    format_doc: decisions/README.md
+    examples:
+      - decisions/ADR-006-registry-first-workflow-activation.md
+    when:
+      - 變更 workflow 進入點、routing-registry 結構、activation 模型
+      - 新增或廢止整層 governance 行為
+  - tier: session
+    primary_source: memory/decision/README.md
+    write_pattern: memory/decision/{date}_{slug}.md
+    format_doc: memory/decision/README.md
+    when:
+      - 本輪鎖定但範圍小於 ADR
+      - 作為 ADR 的前置草稿（accepted 後可升級為 ADR）
+  - tier: project
+    primary_source: <PROJECT_ROOT>/docs/decisions/README.md
+    write_pattern: <PROJECT_ROOT>/docs/decisions/{date}-{slug}.md
+    fallback_if_no_readme: <PROJECT_ROOT>/docs/plans/
+    when:
+      - SDK／模組 public API、快取語意、領域 model 命名
+      - 僅影響單一 product repo（如 apk-analysis-sdk）
+
+lookup:
+  by_symptom:
+    - symptom: agent 只載入 docs-first 就寫碼、未走 execution-flow
+      read:
+        - decisions/ADR-006-registry-first-workflow-activation.md
+        - workflow/workflow-routing.md
+    - symptom: 每加 workflow 就加 activation #
+      read:
+        - decisions/ADR-006-registry-first-workflow-activation.md
+        - runtime/decisions/decision-recording.yaml
+    - symptom: 找不到 Page／cache／catalog 為何這樣設計
+      read:
+        - <PROJECT_ROOT>/docs/decisions/
+        - docs/plans/sdk-catalog-item-and-cache-plan.md
+
+registry_refs:
+  - route.decisions.adr
+  - route.runtime.decision-recording
+
+linked_flows:
+  - governance/lifecycle/knowledge-update-flow.md
+  - runtime/pipeline/session-lifecycle.yaml

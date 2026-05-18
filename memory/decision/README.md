@@ -42,8 +42,16 @@
 3. **Linked**：每個 decision 連結到相關的 source files 或 decisions。
 4. **Searchable**：使用標準 front matter 格式。
 
+## 索引（session 級）
+
+| 日期 | 檔案 | 摘要 |
+| --- | --- | --- |
+| 2026-05-14 | [2026-05-14_architecture-plans-boundary.md](./2026-05-14_architecture-plans-boundary.md) | architecture/ vs plans/ 邊界 |
+| 2026-05-18 | [2026-05-18_registry-first-and-decision-runtime.md](./2026-05-18_registry-first-and-decision-runtime.md) | ADR-006 + runtime decision-recording |
+
 ## 與既有層的關係
 
 - `decisions/`：正式的 ADR 目錄（長期、跨專案的決策）
+- `runtime/decisions/`：machine-readable 決策寫入路由（close-loop）
 - `memory/summary/`：session summary 可連結到 decisions
 - `intelligence/`：engineering intelligence 可引用 decisions

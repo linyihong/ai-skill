@@ -1044,17 +1044,59 @@ records:
       compression_level: index-only
       reason: feedback/history 在需要查詢或新增 lesson 時才讀取。
 
+  - id: route.runtime.decision-recording
+    task_intent: 記錄或查詢本輪鎖定的設計決策（寫入哪一層、用何格式）
+    activation_triggers:
+      task_intents:
+        - record-decision
+        - architecture-decision
+        - decision-recording
+      user_signals:
+        - 決策
+        - 我們決定
+        - 記住決策
+        - ADR
+    primary_source: runtime/decisions/decision-recording.yaml
+    required_dependencies:
+      - runtime/decisions/README.md
+      - decisions/README.md
+    candidate_sources:
+      - memory/decision/README.md
+      - governance/lifecycle/knowledge-update-flow.md
+      - runtime/pipeline/session-lifecycle.yaml
+    source_of_truth_gate: runtime-decision-recording-active
+    ranking_reason: >
+      將「決策寫到哪」從對話抽成 declarative 路由：architecture→ADR、session→memory/decision、project→docs/decisions。
+      close-loop 與 knowledge-update Step 1 共用同一自問清單。
+    validation_signal: 本輪若有鎖定決策，對應 tier 的檔案與 README 索引已更新。
+    metadata:
+      priority: P1
+      confidence: high
+      context_cost:
+        estimated_tokens: 400
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: 避免決策只留在 plan 或對話；查問題時依 lookup.by_symptom 回溯。
+
   - id: route.decisions.adr
     task_intent: 查詢或記錄架構決策、了解歷史決策脈絡、或確認某個決策是否已有 ADR
     primary_source: decisions/README.md
     required_dependencies:
       - CORE_BOOTSTRAP.md
+      - runtime/decisions/decision-recording.yaml
     candidate_sources:
       - decisions/ADR-001-reference-first-migration-strategy.md
       - decisions/ADR-002-intelligence-vs-knowledge-separation.md
       - decisions/ADR-003-three-layer-architecture.md
       - decisions/ADR-004-feedback-promotion-pipeline.md
       - decisions/ADR-005-memory-architecture.md
+      - decisions/ADR-006-registry-first-workflow-activation.md
       - memory/decision/README.md
       - knowledge/graphs/decisions-adr.yaml
     source_of_truth_gate: decisions-readme-active

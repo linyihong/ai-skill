@@ -32,6 +32,7 @@ proposed → accepted → deprecated → superseded
 | [ADR-003](ADR-003-three-layer-architecture.md) | Three-Layer Architecture（Knowledge / Skills / Intelligence） | accepted | 2026-05-12 |
 | [ADR-004](ADR-004-feedback-promotion-pipeline.md) | Feedback Promotion Pipeline | accepted | 2026-05-12 |
 | [ADR-005](ADR-005-memory-architecture.md) | Memory Architecture（6 子層記憶模型） | accepted | 2026-05-12 |
+| [ADR-006](ADR-006-registry-first-workflow-activation.md) | Registry-First Workflow Activation | accepted | 2026-05-18 |
 
 ## 格式
 
@@ -75,6 +76,9 @@ proposed → accepted → deprecated → superseded
 | Agent 犯了重複錯誤 | [`enforcement/failure-patterns/README.md`](../enforcement/failure-patterns/README.md) | 對應的 failure pattern 與 prevention gate |
 | 某個架構決策需要修改 | 建立新 ADR（`ADR-006-{title}.md`）並標記舊 ADR 為 superseded | 新 ADR 記錄變更理由 |
 | Session-level 的輕量決策 | [`memory/decision/`](../memory/decision/) | 跨 session 但非架構級的決策記錄 |
+| Agent 跳過 workflow discovery 就寫碼 | [ADR-006](ADR-006-registry-first-workflow-activation.md)、[`workflow/workflow-routing.md`](../workflow/workflow-routing.md) | registry-first + #27 閘門 |
+| 每加 workflow 就加 activation # | [ADR-006](ADR-006-registry-first-workflow-activation.md)、[`runtime/decisions/decision-recording.yaml`](../runtime/decisions/decision-recording.yaml) | 觸發條件在 registry |
+| SDK Page／cache／catalog 為何這樣設計 | `<PROJECT_ROOT>/docs/decisions/`（如 apk-analysis-sdk） | 專案 tier；見 runtime decision-recording |
 
 ## 與 Failure Patterns 的關係
 
@@ -92,9 +96,18 @@ proposed → accepted → deprecated → superseded
 3. **Linked**：每個 decision 連結到相關的 source files 或 decisions。
 4. **Minimal**：每個 ADR 不超過 1000 tokens。需要詳細技術分析時引用外部文件。
 
+## Runtime 決策紀錄（close-loop）
+
+閉環時 agent 應讀 [`runtime/decisions/decision-recording.yaml`](../runtime/decisions/decision-recording.yaml)：
+
+- **architecture** → 本目錄 `ADR-{n}-*.md`
+- **session** → `memory/decision/{date}_*.md`
+- **project** → `<PROJECT_ROOT>/docs/decisions/`
+
 ## 誰會參考這裡（Inbound References）
 
-- [`route.decisions.adr`](../knowledge/runtime/routing-registry.yaml:687) — primary_source 為 `decisions/README.md`
+- [`route.runtime.decision-recording`](../knowledge/runtime/routing-registry.yaml) — 何時寫入哪一 tier
+- [`route.decisions.adr`](../knowledge/runtime/routing-registry.yaml) — primary_source 為 `decisions/README.md`
 - [`route.architecture.permanent-docs`](../knowledge/runtime/routing-registry.yaml:723) — candidate_sources 引用 `decisions/ADR-001`、`decisions/ADR-003`
 
 ## 與既有層的關係

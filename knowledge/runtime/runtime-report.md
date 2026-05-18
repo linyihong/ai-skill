@@ -6,7 +6,7 @@
 
 | Surface | Path | Count / Status |
 | --- | --- | --- |
-| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 42 records |
+| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 43 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
@@ -49,6 +49,7 @@
 | `route.validation.ai-decision-contract` | `validation/README.md` | `specialized` | `summary-first` | Scenario 的 expected_route 與 actual trace 可比對；forbidden_routes 未被使用。 |
 | `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `small` | `index-only` | 各 atom 有明確原則、症狀表與預防方式，可反查驗證。 |
 | `route.feedback.history` | `feedback/history/README.md` | `small` | `index-only` | Lesson 已寫入 feedback/history/<domain>/ 對應分類，且 feedback/history/<domain>/README.md 已更新索引。 |
+| `route.runtime.decision-recording` | `runtime/decisions/decision-recording.yaml` | `small` | `source-backed` | 本輪若有鎖定決策，對應 tier 的檔案與 README 索引已更新。 |
 | `route.decisions.adr` | `decisions/README.md` | `small` | `summary-first` | decisions/README.md 已讀取，ADR 清單已查詢，graph edge 已確認。 |
 | `route.architecture.permanent-docs` | `architecture/README.md` | `small` | `summary-first` | architecture/README.md 已讀取，架構文件清單已查詢。 |
 | `route.evaluations.scenario-results` | `evaluations/README.md` | `small` | `index-only` | Evaluation 記錄已依 scenario 分類存放，格式與 template 一致。 |
@@ -88,7 +89,7 @@
 | `graph.analysis-repo-methods` | `analysis/repo/README.md` | `candidate` | 6 | [`analysis-repo-methods.yaml`](../graphs/analysis-repo-methods.yaml) |
 | `graph.apk-analysis-pilot` | `plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md` | `candidate` | 5 | [`apk-analysis-pilot.yaml`](../graphs/apk-analysis-pilot.yaml) |
 | `graph.apk-highest-leverage-analysis` | `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md` | `candidate` | 4 | [`apk-highest-leverage-analysis.yaml`](../graphs/apk-highest-leverage-analysis.yaml) |
-| `graph.decisions-adr` | `decisions/README.md` | `candidate` | 9 | [`decisions-adr.yaml`](../graphs/decisions-adr.yaml) |
+| `graph.decisions-adr` | `decisions/README.md` | `candidate` | 11 | [`decisions-adr.yaml`](../graphs/decisions-adr.yaml) |
 | `graph.feedback-layers` | `feedback/README.md` | `candidate` | 9 | [`feedback-layers.yaml`](../graphs/feedback-layers.yaml) |
 | `graph.feedback-promotion-pipeline` | `feedback/promotion/README.md` | `candidate` | 6 | [`feedback-promotion-pipeline.yaml`](../graphs/feedback-promotion-pipeline.yaml) |
 | `graph.governance-layers` | `governance/README.md` | `candidate` | 22 | [`governance-layers.yaml`](../graphs/governance-layers.yaml) |

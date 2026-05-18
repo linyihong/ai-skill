@@ -190,10 +190,15 @@
       :description: 寫入壓縮的 session summary（≤500 tokens）
       :estimated_tokens: 500
       :condition: task_complete == true
-    - :id: record-decision
+    - :id: decision-recording-checkpoint
+      :action: classify_and_write
+      :target: runtime/decisions/decision-recording.yaml
+      :description: '自問本輪鎖定決策；依 tier 寫 ADR（decisions/）、session（memory/decision/）或專案（<PROJECT_ROOT>/docs/decisions/）'
+      :estimated_tokens: 250
+    - :id: record-adr
       :action: write
       :target: decisions/
-      :description: 記錄架構決策（如有）
+      :description: 寫入 ADR（architecture tier；見 decision-recording.yaml）
       :estimated_tokens: 200
       :condition: architecture_decision_made == true
     - :id: auto-archive

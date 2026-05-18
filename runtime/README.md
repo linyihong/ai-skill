@@ -50,6 +50,7 @@ Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 | Budget | [`budget/`](budget/) | Token budget |
 | Distributed | [`distributed/`](distributed/) | Multi-agent coordination, distributed locks |
 | Intelligence | [`intelligence/`](intelligence/) | Intelligence routing |
+| Decision recording | [`decisions/`](decisions/) | Close-loop tier routing（ADR / session / project） |
 
 ## Inbound References
 
