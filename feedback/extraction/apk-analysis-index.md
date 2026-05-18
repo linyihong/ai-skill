@@ -221,7 +221,7 @@
 | --- | --- | --- | --- | --- |
 | `common/2026-05-01_174100-technique-category-routing.md` | promoted | Technique category routing | ✅ | `enforcement/cross-skill-references.md` |
 | `common/2026-05-01_175500-workflow-as-routing-not-technique-dump.md` | promoted | Workflow as routing, not technique dump | ✅ | `enforcement/cross-skill-references.md` |
-| `common/2026-05-11_125615-per-round-feedback-checkpoint.md` | promoted | Per-round feedback checkpoint | ✅ | `enforcement/feedback-lessons.md` |
+| `common/2026-05-11_125615-per-round-feedback-checkpoint.md` | promoted | Per-round feedback checkpoint | ✅ | `../feedback-lessons.md` |
 | `common/2026-05-08_135700-agent-goals-before-transcripts.md` | candidate | Agent goals before transcripts when resuming | ✅ | `enforcement/dependency-reading.md` |
 
 ---

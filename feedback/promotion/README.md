@@ -1,13 +1,13 @@
 # Feedback Promotion Pipeline
 
-`feedback/promotion/` 定義 feedback lesson 如何從 skill-local history 推進到 `workflow/`、`intelligence/`、`enforcement/`、`memory/` 或 runtime surfaces。它是 promotion design layer，不取代 `enforcement/feedback-lessons.md` 的可執行寫作規則。
+`feedback/promotion/` 定義 feedback lesson 如何從 skill-local history 推進到 `workflow/`、`intelligence/`、`enforcement/`、`memory/` 或 runtime surfaces。它是 promotion design layer，不取代 `../feedback-lessons.md` 的可執行寫作規則。
 
 ## Source Of Truth
 
 | Layer | Role |
 | --- | --- |
 | `feedback/history/<domain>/` | Lesson 全文與歷史紀錄的 source-of-truth。 |
-| `enforcement/feedback-lessons.md` | Lesson 命名、模板、索引與 agent 行為規則。 |
+| `../feedback-lessons.md` | Lesson 命名、模板、索引與 agent 行為規則。 |
 | `enforcement/failure-learning-system.md` | Agent failure 或 close-loop gap 的分類與 promotion target。 |
 | `governance/lifecycle/README.md` | Candidate、validated、promoted、deprecated 的 lifecycle gate。 |
 | `governance/validation/README.md` | Promotion、generated refresh 與 close-loop validation gate。 |

@@ -40,7 +40,7 @@ feedback/pipeline/
 
 | Pipeline 元件 | 依賴的既有層 | 關係 |
 |-------------|------------|------|
-| promotion-engine | `feedback/history/`, `enforcement/feedback-lessons.md` | 讀取 lesson 內容做 scoring |
+| promotion-engine | `feedback/history/`, `../feedback-lessons.md` | 讀取 lesson 內容做 scoring |
 | promotion-workflow | `governance/lifecycle/README.md`, `governance/validation/README.md` | 遵循 lifecycle states 與 validation gates |
 | lifecycle-automation | `governance/lifecycle/README.md`, `knowledge/runtime/sqlite/` | 使用 SQLite index 做 cold data lookup |
 

@@ -83,4 +83,4 @@ Target Layers: workflow/ | intelligence/ | enforcement/ | memory/ | skill-doc/
 - [`feedback/pipeline/promotion-engine.yaml`](../feedback/pipeline/promotion-engine.yaml) — Scoring 規則
 - [`feedback/pipeline/promotion-workflow.yaml`](../feedback/pipeline/promotion-workflow.yaml) — Promotion workflow
 - [`feedback/pipeline/lifecycle-automation.yaml`](../feedback/pipeline/lifecycle-automation.yaml) — Lifecycle automation
-- [`enforcement/feedback-lessons.md`](../enforcement/feedback-lessons.md) — Feedback lesson 格式
+- [`../feedback/feedback-lessons.md`](../feedback/feedback-lessons.md) — Feedback lesson 格式

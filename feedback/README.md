@@ -12,7 +12,7 @@
 ## 不放什麼
 
 - 單一 lesson 正文；統一放在 `feedback/history/<domain>/`。
-- 全庫可執行 feedback lesson 檔名與模板規則；放到 `enforcement/feedback-lessons.md`。
+- 全庫可執行 feedback lesson 檔名與模板規則；放到 `./feedback-lessons.md`。
 - Failure pattern 的可執行 prevention gate；放到 `enforcement/failure-patterns/` 或相關 enforcement rule。
 - 專案 raw evidence 或未去敏資料；留在業務專案。
 
@@ -20,7 +20,7 @@
 
 - `feedback/history/` 是 lesson 的統一目標路徑。
 - `skills/*/feedback_history/` 已於 2026-05-13 刪除（apk-analysis、app-development-guidance、travel-planning），所有 lesson 已搬遷至 `feedback/history/`。
-- `enforcement/failure-learning-system.md` 與 `enforcement/feedback-lessons.md` 仍是可執行規則。
+- `enforcement/failure-learning-system.md` 與 `./feedback-lessons.md` 仍是可執行規則。
 - `intelligence/` 承接成熟的工程智慧。
 - `governance/` 定義 promotion、deprecation 與 validation lifecycle。
 - `knowledge/runtime/sqlite/` 可索引冷 feedback lessons，協助低 token 查找；lesson 全文仍留在 `feedback/history/`。
@@ -37,12 +37,12 @@
 
 - [`route.feedback.promotion-pipeline`](../knowledge/runtime/routing-registry.yaml:290) — candidate_sources 引用 `feedback/README.md`
 - [`route.feedback.history`](../knowledge/runtime/routing-registry.yaml:664) — candidate_sources 引用 `feedback/README.md`
-- [`enforcement/feedback-lessons.md`](../enforcement/feedback-lessons.md) — 定義 feedback lesson 的寫作規則與分類
+- [`./feedback-lessons.md`](./feedback-lessons.md) — 定義 feedback lesson 的寫作規則與分類
 - [`governance/lifecycle/intelligence-extraction-pipeline.md`](../governance/lifecycle/intelligence-extraction-pipeline.md) — Step 4 使用 feedback history 做 extraction
 
 ## 第一批候選遷移來源
 
 - `enforcement/failure-learning-system.md`
-- `enforcement/feedback-lessons.md`
+- `./feedback-lessons.md`
 - ✅ `skills/*/feedback_history/`（已於 2026-05-13 全部搬遷至 `feedback/history/`，舊目錄已刪除）
 - `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` 的 Intelligence Feedback Loop
