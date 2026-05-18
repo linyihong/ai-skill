@@ -65,6 +65,7 @@
 | 使用者指出 agent 反覆出現同類失效模式，但只修當下文件 | 依 [`failure-learning-system.md`](failure-learning-system.md) 分類失效模式、建立或更新 `enforcement/failure-patterns/`，並補 prevention gate 與 validation。 |
 | 更新完 skill / enforcement rules 後沒有提醒 repo 仍有 pending commit / ahead / behind 狀態 | 最終回覆必須列出 `git status --short --branch` 的關鍵狀態、哪些是本輪提交、哪些是既有 dirty changes，以及需要 push / merge / 清理的下一步。 |
 | 有多個 dirty owner group 卻混成單一 commit | 沒有 active lock 時使用 `scripts/ai-skill-close-loop.sh --commit` 或手動依 enforcement、scripts、各 skill owner 分開 commit；有 active lock 時停止並提醒，不得更新。 |
+| Plan 所有 Phase 完成後未執行 Plan Completion Closure（未更新狀態表、未搬移至 archived/、未更新 plans/README.md） | 立即執行 [`plans/README.md`](../plans/README.md) 的閉環檢查清單 7 步驟；若已 commit，需另開 commit 補閉環操作，不得 amend 既有 commit。 |
 
 ## 語氣規則
 

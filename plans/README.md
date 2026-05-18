@@ -31,7 +31,13 @@
 | 6 | **Commit & push** | 提交搬移與狀態更新，並推送 |
 | 7 | **最終確認** | 執行 `git status --short --branch` 確認工作樹乾淨 |
 
-### 不搬移的例外情況i
+### 強制執行規則
+
+1. **最後一個 Phase 完成後，agent 必須立即執行閉環檢查清單**，不得直接結束或進行 commit & push。
+2. 若 plan 有多個 Phase，最後一個 Phase 的完成條件中必須包含「執行 Plan Completion Closure」。
+3. 違反此規則的 commit 應被視為閉環不完整，需依 [`enforcement/linked-updates.md`](../enforcement/linked-updates.md) 的「閉環不完整時的強制補救」處理。
+
+### 不搬移的例外情況
 
 若 plan 符合以下任一條件，可留在 `active/` 但標註 `✅ completed`：
 
