@@ -40,3 +40,23 @@ sqlite3 runtime/runtime.db "SELECT gate_id FROM blocking_gates;"
 ```
 
 完整表格清單請見 [`../README.md`](../README.md) 的 Databases 章節。
+
+## 寫入 Feedback Lesson 前的提醒
+
+在寫入新 feedback lesson 到 `feedback/history/<domain>/` 前，必須先確認目標 domain 目錄確實存在：
+
+```bash
+# 1. 查看所有 domain 目錄
+ls feedback/history/
+
+# 2. 確認目標 domain 存在後，查看分類
+ls feedback/history/<domain>/
+
+# 3. 確認分類目錄存在後再寫入
+```
+
+> ⚠️ **不要依賴內部記憶**：domain 名稱可能已改名（例如 `app-development-guidance` → `development-guidance`）。永遠以檔案系統的實際狀態為準。
+>
+> 相關 lesson：[`feedback/history/development-guidance/common/2026-05-18_142700-list-files-verify-domain-path-before-write.md`](../../feedback/history/development-guidance/common/2026-05-18_142700-list-files-verify-domain-path-before-write.md)
+>
+> 寫 feedback lesson 的規則見 [`feedback/feedback-lessons.md`](../../feedback/feedback-lessons.md)。
