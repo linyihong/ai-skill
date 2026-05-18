@@ -437,7 +437,7 @@ Phase 8: Agent VM           ← 遠期目標
 | [`goal-action-validation.md`](../enforcement/goal-action-validation.md) | 83 | 核心規則、使用時機、建議輸出形狀、驗證方式範例、防呆規則 | **D (Gate Definitions)** | Validation gate 定義可轉為 blocking gates。 |
 | [`linked-updates.md`](../enforcement/linked-updates.md) | 81 | Agent 必須做的事、常見連動關係、閉環不完整時的強制補救 | **B (Transition Rules)** + **G (Keep as prose)** | 連動關係可轉為 transition rules（修改 X 必須同步更新 Y）。 |
 | [`failure-learning-system.md`](../enforcement/failure-learning-system.md) | 148 | 核心規則、Failure Taxonomy、Storage Rules、Failure Pattern Record、Promotion Decision、Validation Scenario | **D (Gate Definitions)** + **G (Keep as prose)** | Failure taxonomy 和 promotion decision 可轉為 gate definitions。 |
-| [`feedback-lessons.md`](../enforcement/feedback-lessons.md) | — | Feedback lesson 撰寫規則 | **G (Keep as prose)** | 主要是撰寫指引。 |
+| [`feedback-lessons.md`](../../../../feedback/feedback-lessons.md) | — | Feedback lesson 撰寫規則 | **G (Keep as prose)** | 主要是撰寫指引。 |
 | [`sanitization.md`](../enforcement/sanitization.md) | — | 去敏規則 | **G (Keep as prose)** | 純規則描述。 |
 | [`content-layering.md`](../enforcement/content-layering.md) | — | 內容分層原則 | **G (Keep as prose)** | 純規則描述。 |
 | [`tool-neutral-documentation.md`](../enforcement/tool-neutral-documentation.md) | — | 工具中立文件原則 | **G (Keep as prose)** | 純規則描述。 |

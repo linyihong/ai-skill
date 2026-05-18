@@ -422,7 +422,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 **瘦身策略**：
 - Quick Start：保留 routing summary（1-2 行 per step），詳細操作步驟 → `runtime/onboarding/<skill>-quickstart.md`
 - Output Style / Safety：→ `workflow/<domain>/artifact-gates.md`
-- Feedback Loop：→ `enforcement/feedback-lessons.md` + `feedback/` 層
+- Feedback Loop：→ `../../../feedback/feedback-lessons.md` + `feedback/` 層
 - 保留：header metadata、Shared Policy、When To Use、Out Of Scope、Default Workflow（純 routing）
 
 **關鍵發現**：
