@@ -44,7 +44,7 @@ feedback/
 ```text
 skills/<skill-name>/
   SKILL.md              # 必填：YAML frontmatter + 給 Agent 的入口正文
-  feedback_history/     # 已於 2026-05-13 刪除。新 lesson 請直接寫入 feedback/history/<domain>/<category>/（見 enforcement/feedback-lessons.md）
+  feedback_history/     # 已於 2026-05-13 刪除。新 lesson 請直接寫入 feedback/history/<domain>/<category>/（見 ../../feedback/feedback-lessons.md）
 ```
 
 常見擴充（依需求增量建立；僅限尚未遷移的 skill）：
@@ -56,7 +56,7 @@ skills/<skill-name>/
   TOOLS.md              # 工具與環境
   DOCUMENTATION.md      # 產出格式
   tool-adapters/        # 可選：只有在某 AI 工具有 skill-specific 執行差異時建立
-  FEEDBACK.md           # 可選：極短入口，連到 enforcement/feedback-lessons.md
+  FEEDBACK.md           # 可選：極短入口，連到 ../../feedback/feedback-lessons.md
 ```
 
 若單一文件開始過大，或一句規則展開成多個步驟、例外、模板、範例，依 [`governance/document-sizing.md`](../governance/document-sizing.md) 改成資料夾包裝：父層 `README.md` 做目錄與讀取路由，子檔保存具體內容。不要把不同技巧分類、寫作規範、工具教學和 feedback lesson 全堆在同一檔。
@@ -79,7 +79,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 | `name` | 與資料夾名一致或至少可對應；建議 kebab-case |
 | `description` | **英文**一段話，描述何時應套用此 skill（觸發詞、場景、邊界）。寫給路由／檢索用，避免特定客戶名與機密 |
 
-正文建議包含：**何時用／不用**、**Quick Start**、**如何回饋**（指向 `enforcement/feedback-lessons.md`）、**預設讀哪些檔**。
+正文建議包含：**何時用／不用**、**Quick Start**、**如何回饋**（指向 `../../feedback/feedback-lessons.md`）、**預設讀哪些檔**。
 
 完整占位稿見 **[`_template/SKILL.md`](_template/SKILL.md)**。
 
@@ -94,7 +94,7 @@ cp "skills/_template/SKILL.md" "skills/_template/FEEDBACK.md" "skills/my-skill/"
 - **文件 TODO**：一律只維護在 **[`enforcement/document-todo-list.md`](../enforcement/document-todo-list.md)**；若新增 skill 文件仍有未完成、待決策、待補強或待驗證項目，在文件前段放 `Document TODO` 表並連到相關章節或 goal。
 - **目標、執行、驗證流程**：一律只維護在 **[`enforcement/goal-action-validation.md`](../enforcement/goal-action-validation.md)**；新增 skill 的輸出格式、workflow、documentation 規則要能讓重要結論反查目標、執行、驗證，純判斷題則附參考來源與推論邊界。
 - **依賴文件讀取鐵則**：一律只維護在 **[`enforcement/dependency-reading.md`](../enforcement/dependency-reading.md)**；新增、修改或重新讀取 skill 時，必須建立 dependency read ledger，讀 skill 入口、相關 README/workflow/checklist/template、enforcement rules 與 linked updates，並把不存在的檔案標成 `not applicable`，不能只讀單一檔案。
-- 各 skill 的 **`FEEDBACK.md`**（若需要）：維持與 [`apk-analysis/FEEDBACK.md`](apk-analysis/FEEDBACK.md) 相同模式——**幾行連結**到 [`enforcement/feedback-lessons.md`](../enforcement/feedback-lessons.md)。
+- 各 skill 的 **`FEEDBACK.md`**（若需要）：維持與 [`apk-analysis/FEEDBACK.md`](apk-analysis/FEEDBACK.md) 相同模式——**幾行連結**到 [`../feedback/feedback-lessons.md`](../feedback/feedback-lessons.md)。
 - 每一則 lesson 頂部引用 `enforcement rules`（路徑依檔案深度調整 `../../../enforcement/...`）。
 
 ## 5. 在本庫登記與提交
@@ -150,7 +150,7 @@ skills/<skill-name>/tool-adapters/
 - [ ] 已依 `enforcement/dependency-reading.md` 建立 dependency read ledger，讀取或明確檢查相關依賴文件，並標示缺檔不適用項
 - [ ] 若引用其他 skill，已依 `enforcement/cross-skill-references.md` 寫明 trigger、artifact、ownership boundary 與 linked updates
 - [ ] 若文件開始變大，已依 `governance/document-sizing.md` 拆成資料夾、目錄與子檔
-- [ ] 新 lesson 已寫入 `feedback/history/<domain>/<category>/`（見 enforcement/feedback-lessons.md）
+- [ ] 新 lesson 已寫入 `feedback/history/<domain>/<category>/`（見 ../../feedback/feedback-lessons.md）
 - [ ] 根目錄 `README.md` 與 `skills/README.md` 已更新
 - [ ] 已依 `enforcement/linked-updates.md` 完成或明確檢查必要連動更新
 - [ ] 無真實本機絕對路徑、無機密寫入將 commit 的檔案
