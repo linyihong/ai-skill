@@ -1,0 +1,168 @@
+---
+:ttl_policy_version: v1
+:status: candidate
+:owner_layer: runtime/context
+:description: 'Context TTL（Time-To-Live）系統。每條 context 載入後依本政策決定存活時間。 過期 context 應被 prune，不永久留在 context graph。
+
+'
+:default_ttl:
+  :type: session
+  :value: 1
+  :reason: 預設只活一個 task/session，防止 context 無限制累積
+:rules:
+- :id: core-bootstrap
+  :type: rule-weight
+  :ttl:
+    :type: session
+    :value: 1
+  :reason: 規則權重每個 session 重新載入即可
+  :cacheable: false
+- :id: core-bootstrap-dependency
+  :type: dependency-reading
+  :ttl:
+    :type: session
+    :value: 1
+  :reason: 依賴讀取規則每個 session 重新載入
+  :cacheable: false
+- :id: core-bootstrap-goal
+  :type: conversation-goal-ledger
+  :ttl:
+    :type: conversation
+    :value: true
+  :reason: 對話目標 ledger 需要在整個對話中保留
+  :cacheable: true
+- :id: lazy-linked-updates
+  :type: linked-updates
+  :ttl:
+    :type: task
+    :value: 1
+  :reason: 連動更新規則只在相關 task 中需要
+  :cacheable: false
+- :id: lazy-failure-learning
+  :type: failure-learning-system
+  :ttl:
+    :type: task
+    :value: 1
+  :reason: 失效學習規則只在發生 failure 時需要
+  :cacheable: false
+- :id: lazy-decision-efficiency
+  :type: decision-efficiency
+  :ttl:
+    :type: task
+    :value: 1
+  :reason: 決策效率規則只在路線選擇時需要
+  :cacheable: false
+- :id: lazy-tool-neutral
+  :type: tool-neutral-documentation
+  :ttl:
+    :type: task
+    :value: 1
+  :reason: 工具中立規則只在寫文件時需要
+  :cacheable: false
+- :id: lazy-sanitization
+  :type: sanitization
+  :ttl:
+    :type: task
+    :value: 1
+  :reason: 去敏規則只在寫 lesson 時需要
+  :cacheable: false
+- :id: lazy-authorization
+  :type: authorization-scope
+  :ttl:
+    :type: task
+    :value: 1
+  :reason: 授權範圍規則只在涉及外部系統時需要
+  :cacheable: false
+- :id: skill-workflow
+  :type: skill-workflow
+  :ttl:
+    :type: task
+    :value: 1
+  :reason: Skill workflow 只在相關 task 中需要
+  :cacheable: true
+- :id: skill-checklist
+  :type: skill-checklist
+  :ttl:
+    :type: task
+    :value: 1
+  :reason: Checklist 只在相關 task 中需要
+  :cacheable: true
+- :id: feedback-lesson
+  :type: feedback-lesson
+  :ttl:
+    :type: task
+    :value: 1
+  :reason: Feedback lesson 只在相關操作時需要
+  :cacheable: false
+- :id: architecture-roadmap
+  :type: architecture-roadmap
+  :ttl:
+    :type: session
+    :value: 1
+  :reason: Roadmap 每個 session 確認一次即可
+  :cacheable: false
+- :id: runtime-registry
+  :type: runtime-routing-registry
+  :ttl:
+    :type: conversation
+    :value: true
+  :reason: Routing registry 可在整個對話中 cache，因為它輕量且不常變
+  :cacheable: true
+- :id: knowledge-summary
+  :type: knowledge-summary
+  :ttl:
+    :type: conversation
+    :value: true
+  :reason: Summary 輕量（300-500 tokens）且可跨 task 使用
+  :cacheable: true
+- :id: knowledge-graph
+  :type: knowledge-graph
+  :ttl:
+    :type: conversation
+    :value: true
+  :reason: Knowledge graph edges 輕量且可跨 task 使用
+  :cacheable: true
+- :id: skills-index
+  :type: skills-index
+  :ttl:
+    :type: conversation
+    :value: true
+  :reason: Skills index 輕量且可跨 task 使用
+  :cacheable: true
+- :id: model-profile
+  :type: model-profile
+  :ttl:
+    :type: conversation
+    :value: true
+  :reason: Model profile 不常變，可在整個對話中 cache
+  :cacheable: true
+- :id: tool-adapter
+  :type: tool-adapter
+  :ttl:
+    :type: session
+    :value: 1
+  :reason: Tool adapter 每個 session 確認一次即可
+  :cacheable: false
+- :id: agent-goals
+  :type: agent-goals
+  :ttl:
+    :type: conversation
+    :value: true
+  :reason: Active goals 需要在整個對話中保留
+  :cacheable: true
+:prune:
+  :trigger:
+  - :type: token_threshold
+    :threshold: 80%
+  - :type: task_boundary
+    :when: task_completed
+  - :type: session_boundary
+    :when: new_session
+  :strategy:
+    :expired_first: true
+    :lowest_priority_first: true
+    :largest_first: true
+  :preserve:
+  - core-bootstrap
+  - agent-goals
+  - conversation-goal-ledger

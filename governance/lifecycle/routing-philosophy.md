@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`runtime/routing/` 定義 agent 如何為任務選擇要載入的 Ai-skill knowledge。這是 routing design layer，不是 executable policy。
+`governance/lifecycle/routing-philosophy.md`（本檔）與 `runtime/router/` 定義 agent 如何為任務選擇要載入的 Ai-skill knowledge。這是 routing design layer，不是 executable policy。
 
 ## Routing Pipeline
 
@@ -37,6 +37,16 @@ task intent
 - 只有任務需要時才載入 `Related sources`。
 - 若沒有符合的 row，fallback 到 root `README.md`、`enforcement/README.md` 與相關 layer README。
 
+### Workflow 編排（activation #27 + registry-first）
+
+當任務命中 activation **#27** 或任一 `route.workflow.*` 的 **`activation_triggers`** 時，在 Step 2 之後 **必須**：
+
+1. 比對 [`routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) 內所有 `route.workflow.*` 的 `activation_triggers`。
+2. 若多條命中，讀 [`workflow/workflow-routing.md`](../../workflow/workflow-routing.md) §常見歧義（例如 **software-delivery** vs **apk-analysis**）。
+3. 載入選定 route 的 `primary_source` 與 `required_dependencies`。
+
+未完成本 Pipeline **不得**開始寫可觀察產品行為變更。新增 workflow 時只擴充 registry，不擴充 activation-table 專向列。
+
 ## Step 3: Apply Metadata Ranking
 
 使用 `metadata/ranking/README.md` 決定讀取順序：
@@ -67,7 +77,7 @@ task intent
 
 ## 與既有文件的關係
 
-- [`runtime/routing/`](../../runtime/routing/) — Runtime navigation entry point
+- [`runtime/router/`](../../runtime/router/) — Activation 與 router 資料（`activation-table.md`、`activation-rules.yaml`）
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — Task intent routing table
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing records
 - [`metadata/ranking/README.md`](../../metadata/ranking/README.md) — Metadata ranking rules

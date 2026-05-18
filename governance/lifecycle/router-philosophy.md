@@ -17,6 +17,9 @@ Session Start
   │
   ├─ 4. Run activation-engine.rb → load lazy rules if triggered
   │
+  ├─ 4b. 若命中 activation #27 或 registry route.workflow.* activation_triggers：
+  │       強制 routing-philosophy → 比對 activation_triggers → workflow-routing 歧義裁決 → execution-flow.md
+  │
   ├─ 5. Read knowledge summary（300-500 tokens）
   │
   ├─ 6. Expand to full source only if needed

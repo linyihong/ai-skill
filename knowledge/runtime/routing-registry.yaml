@@ -316,7 +316,7 @@ records:
 
   - id: route.runtime.context-loading
     task_intent: 決定 runtime context loading 路線
-    primary_source: runtime/routing/
+    primary_source: governance/lifecycle/routing-philosophy.md
     required_dependencies:
       - knowledge/indexes/README.md
       - metadata/ranking/README.md
@@ -327,7 +327,7 @@ records:
       - knowledge/summaries/README.md
       - knowledge/graphs/metadata-navigation.yaml
     source_of_truth_gate: design-layer-only
-    ranking_reason: runtime/routing 描述 task intent 到 primary source 的載入流程，metadata 子規則決定排序、信心與相容性。
+    ranking_reason: routing-philosophy 與 runtime/router 描述 task intent 到 primary source 的載入流程，metadata 子規則決定排序、信心與相容性。
     validation_signal: Primary source、deferred sources、source-of-truth gate 與 validation signal 已可被記錄。
     metadata:
       priority: P1
@@ -378,11 +378,29 @@ records:
 
   - id: route.workflow.apk-analysis
     task_intent: 執行授權 APK analysis 能力
+    activation_triggers:
+      task_intents:
+        - apk-analysis
+        - reverse-engineer
+        - frida
+        - hook
+        - capture
+        - protocol-analysis
+      user_signals:
+        - 抓包
+        - Frida
+        - 逆向
+        - APK
+      file_change_globs:
+        - "**/TATA/**"
+        - "**/mr.HS/**"
+        - "**/scripts/frida/**"
     primary_source: workflow/apk-analysis/execution-flow.md
     required_dependencies:
       - workflow/apk-analysis/artifact-gates.md
       - enforcement/README.md
       - enforcement/dependency-reading.md
+      - enforcement/authorization-scope.md
     candidate_sources:
       - analysis/apk/README.md
       - analysis/apk/traffic-triage.md
@@ -419,7 +437,7 @@ records:
     candidate_sources:
       - knowledge/summaries/apk-highest-leverage-analysis.md
       - knowledge/graphs/apk-highest-leverage-analysis.yaml
-      - runtime/routing/
+      - runtime/router/
       - enforcement/decision-efficiency.md
     source_of_truth_gate: new-layer-promoted
     ranking_reason: 此 intelligence atom 抽象化已進入 workflow 的 route selection judgment。舊 skills/ 結構已於 2026-05-13 標記為 deprecated。
@@ -477,7 +495,7 @@ records:
     primary_source: models/profiles/README.md
     required_dependencies:
       - models/compression/README.md
-      - runtime/routing/
+      - runtime/router/
       - metadata/ranking/README.md
       - knowledge/summaries/README.md
     candidate_sources:
@@ -564,7 +582,7 @@ records:
 
   - id: route.runtime.context-ttl-doc
     task_intent: 了解 context TTL 與 prune 策略
-    primary_source: runtime/context/
+    primary_source: governance/lifecycle/context-ttl-philosophy.md
     required_dependencies:
       - runtime/compiler/embedded_data.rb
     candidate_sources:
@@ -590,16 +608,45 @@ records:
 
   - id: route.workflow.software-delivery
     task_intent: 產出 app/API/embedded development guidance
+    activation_triggers:
+      task_intents:
+        - implement
+        - development
+        - develop
+        - sdk
+        - write-plan
+        - code-review
+        - design-review
+      user_signals:
+        - 開發
+        - 實作
+        - SDK
+        - plan
+        - 契約
+      file_change_globs:
+        - "**/*-sdk/**"
+        - "**/sdk-platform/**"
+        - "**/docs/plans/**"
+        - "**/docs/development/**"
     primary_source: workflow/software-delivery/execution-flow.md
     required_dependencies:
       - workflow/software-delivery/artifact-gates.md
       - enforcement/README.md
+      - enforcement/linked-updates.md
+      - intelligence/engineering/development/docs-first-bdd-closure.md
     candidate_sources:
       - analysis/development-guidance/README.md
       - workflow/software-delivery/README.md
       - intelligence/engineering/development/README.md
       - knowledge/summaries/development-guidance.md
       - knowledge/graphs/workflow-software-delivery.yaml
+    project_overlays:
+      - when_repo_contains: apk-analysis-sdk/runtime/workflow-activation.yaml
+        load_after_workflow_entry: true
+        sources:
+          - <PROJECT_ROOT>/apk-analysis-sdk/runtime/workflow-activation.yaml
+          - <PROJECT_ROOT>/apk-analysis-sdk/runtime/README.md
+          - <PROJECT_ROOT>/apk-analysis-sdk/docs/development/README.md
     templates:
       change-brief: workflow/software-delivery/templates/change-brief-template.md
       contract: workflow/software-delivery/templates/contract-template.md
@@ -611,7 +658,10 @@ records:
       - /skill.contract
       - /skill.bdd
     source_of_truth_gate: new-layer-promoted
-    ranking_reason: app-development-guidance 已從舊 skills/ 遷移至新分層，workflow/software-delivery/ 為 active entrypoint。觸發條件由 workflow/software-delivery/README.md 定義，agent 在需要開發時自行判斷載入。
+    ranking_reason: >
+      app-development-guidance 已遷移至 workflow/software-delivery/ 為 **唯一 Workflow 進入點**（含 SDK/plan/契約實作）。
+      觸發由 workflow/software-delivery/README.md 定義；**不**另立 route.project.*。
+      若 repo 含 apk-analysis-sdk/runtime/workflow-activation.yaml，在進入本 workflow 後載入 project_overlays（專案 gate，非平行 routing）。
     validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離。
     metadata:
       priority: P1
@@ -630,6 +680,19 @@ records:
 
   - id: route.workflow.greenfield
     task_intent: 從零開始的新專案標準化流程（specify → plan → tasks → implement）
+    activation_triggers:
+      task_intents:
+        - greenfield
+        - new-project
+        - specify
+        - spec-kit
+      user_signals:
+        - 從零
+        - 新專案
+        - greenfield
+      file_change_globs:
+        - "**/.specify/**"
+        - "**/specs/**"
     primary_source: workflow/greenfield/execution-flow.md
     required_dependencies:
       - workflow/greenfield/README.md
@@ -669,6 +732,14 @@ records:
 
   - id: route.workflow.travel-planning
     task_intent: 規劃 evidence-based travel itinerary
+    activation_triggers:
+      task_intents:
+        - travel-planning
+        - itinerary
+      user_signals:
+        - 旅遊
+        - 行程
+        - itinerary
     primary_source: workflow/travel-planning/execution-flow.md
     required_dependencies:
       - workflow/travel-planning/artifact-gates.md
@@ -699,6 +770,17 @@ records:
 
   - id: route.workflow.documentation-ai-native
     task_intent: 在業務專案或其他 repo 撰寫或整理 agent 友善文件、降低無效 token、建立穩定分類與索引
+    activation_triggers:
+      task_intents:
+        - documentation-ai-native
+        - agent-friendly-docs
+        - index-first-docs
+      user_signals:
+        - agent 友善
+        - index-first
+        - 零行為變更
+      file_change_globs:
+        - "**/docs/**/index.md"
     primary_source: workflow/documentation/README.md
     required_dependencies:
       - enforcement/content-layering.md

@@ -10,6 +10,26 @@
 | **Core Bootstrap**（永遠 preload） | rule-weight, dependency-reading, conversation-goal-ledger | Session 啟動時自動載入，~800 tokens |
 | **Lazy-load**（依條件 activate） | 其餘 12 條規則 | 依下方情境表判斷 |
 
+## 任務察覺 → Workflow Discovery（必讀）
+
+當 agent 察覺任務屬於 **需要 workflow 指揮** 的工作（命中下方 **#27** 或 registry 內任一 `route.workflow.*.activation_triggers`），**不要**直接寫碼／抓包／改 plan 就結束。依序：
+
+1. **強制**執行 **[`governance/lifecycle/routing-philosophy.md`](../../governance/lifecycle/routing-philosophy.md)** Routing Pipeline（Step 1–5）：`task intent` → [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) → [`routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) → `primary_source`。
+2. **比對** registry 中所有 `route.workflow.*` 的 **`activation_triggers`**（task_intents、user_signals、file_change_globs）；列出命中者。
+3. 若多條命中 → 讀 **[`workflow/workflow-routing.md`](../../workflow/workflow-routing.md)** §常見歧義 裁決；否則直接採唯一命中 route。
+4. **進入**該 route 的 `README.md` → `execution-flow.md`，並載入該 route 的 **`required_dependencies`**（`dependency-reading`：必須讀 `primary_source`）。
+5. 若該 route 含 **project_overlays**，在 **已進入 workflow 之後** 再載入 `<PROJECT_ROOT>` 專案 yaml。
+
+| 常見任務 | registry `id`（觸發條件見各 route 的 `activation_triggers`） |
+| --- | --- |
+| SDK／plan／契約／實作／BDD | `route.workflow.software-delivery` |
+| APK 逆向／Frida／協議分析 | `route.workflow.apk-analysis` |
+| 純 agent 友善文件、零行為變更 | `route.workflow.documentation-ai-native` |
+| 從零新專案 | `route.workflow.greenfield` |
+| 旅遊行程 | `route.workflow.travel-planning` |
+
+**新增 workflow 時**：只擴充 `routing-registry.yaml` 一筆 `route.workflow.*`（含 `activation_triggers`），**不必**在本表新增專向列。
+
 ## 情境對照表
 
 | # | 情境 | 觸發條件 | Activated Rules | 說明 |
@@ -40,8 +60,9 @@
 | 24 | **泛化為共用規則** | task_intent: promote-to-enforcement-rule | reusable-guidance-boundary | 將專案證據泛化為共用規則時需要邊界檢查 |
 | 25 | **抽象化討論** | user_signal: 泛化, 可重用, reusable, 抽象化 | reusable-guidance-boundary | 使用者提及抽象化/可重用時啟動 |
 | 26 | **翻譯文件** | task_intent: translate | neutral-language | 翻譯時需要中性用語規範 |
+| 27 | **Workflow 編排任務** | 任一 [`routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) 內 `route.workflow.*` 的 `activation_triggers` 命中；或 user_signal: workflow, 走 workflow；task_intent: workflow-orchestration | 見上方 §Workflow Discovery；各 route 的 `required_dependencies` 由 registry 定義 | **Blocking**：未完成 discovery 不得執行可觀察產品行為變更；具體 route 與 lazy rules **不在此表重複** |
 
-> **關於 Workflow 進入點**：各 workflow 的觸發條件由各自的 README.md 定義。Runtime 不維護 workflow-specific 的觸發規則——agent 在需要時（如發現需要開發、分析 APK、規劃旅遊）自行判斷並載入對應的 `execution-flow.md`。詳見 [`workflow/README.md`](../workflow/README.md)。
+> **Registry-first**：#27 是進入 workflow 世界的**通用閘門**。開發、APK、greenfield、documentation 等觸發條件與依賴文件寫在對應 `route.workflow.*`，不為每個 workflow 新增 activation 列。專案 overlay（如 `apk-analysis-sdk/runtime/workflow-activation.yaml`）僅在選定 **software-delivery** 後附加。
 
 ## 複合情境範例
 
@@ -52,6 +73,9 @@
 | 寫文件 + 修改 enforcement | write-documentation + file_change enforcement/** | tool-neutral-documentation, neutral-language |
 | 安全分析 + 跨 skill | security-analysis + cross-skill | authorization-scope, cross-skill-references |
 | 寫 feedback + 泛化 | write-feedback + promote-to-enforcement-rule | sanitization, feedback-lessons, reusable-guidance-boundary |
+| 改 SDK plan + 實作 | file_change docs/plans/** + task_intent implement | registry → `route.workflow.software-delivery`（含 docs-first、linked-updates） |
+| Frida 抓短劇 API | task_intent frida + file_change TATA/scripts/frida/** | registry → `route.workflow.apk-analysis`（含 authorization-scope） |
+| 多 route 同時命中 | 改 `*-sdk/**` 且開 Frida | §Workflow Discovery 步驟 3 + workflow-routing §歧義 → 通常 software-delivery vs apk-analysis |
 
 ## 優先權參考
 

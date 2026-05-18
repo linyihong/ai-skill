@@ -34,7 +34,7 @@
 | Model profiles | `models/profiles/README.md` |
 | Compression strategy | `models/compression/README.md` |
 | Lifecycle and validation gates | `governance/lifecycle/README.md`, `governance/validation/README.md` |
-| Runtime routing design | `runtime/routing/` |
+| Runtime routing design | `runtime/router/`、`governance/lifecycle/routing-philosophy.md` |
 
 ## Runtime View Format
 
@@ -43,6 +43,7 @@ Runtime view 應回答：
 | Field | Purpose |
 | --- | --- |
 | `task_intent` | Agent 正在嘗試完成的任務意圖。 |
+| `activation_triggers` | （`route.workflow.*`）task_intents、user_signals、file_change_globs；與 activation-table **#27** 搭配，**registry-first**，避免每個 workflow 一列 activation。 |
 | `primary_source` | 第一個應讀的 canonical source。 |
 | `required_dependencies` | 必讀的 enforcement rules、skill entrypoints 或 metadata。 |
 | `candidate_sources` | 可選的 maps、summaries 或 atoms。 |

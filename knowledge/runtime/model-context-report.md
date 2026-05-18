@@ -35,10 +35,10 @@
 | `route.skill.discovery` | `knowledge/runtime/routing-registry.yaml` | `index-only` | Routing registry 輕量（~300 tokens），可在整個對話中 cache。 |
 | `route.runtime.activation-rules` | `runtime/compiler/embedded_data.rb` | `index-only` | Activation rules 輕量（~500 tokens），可在整個對話中 cache。 |
 | `route.runtime.context-ttl` | `runtime/compiler/embedded_data.rb` | `index-only` | TTL policy 輕量，需要 prune 時才讀。 |
-| `route.runtime.context-loading` | `runtime/routing/` | `summary-first` | routing decision 可先用 registry、index、summary；修改 source 時再升級。 |
+| `route.runtime.context-loading` | `governance/lifecycle/routing-philosophy.md` | `summary-first` | routing decision 可先用 registry、index、summary；修改 source 時再升級。 |
 | `route.runtime.router-flow` | `runtime/router/` | `index-only` | Router flow 是設計文件，需要 routing 決策時才讀。 |
 | `route.intelligence.engineering.heuristics` | `intelligence/engineering/heuristics/README.md` | `index-only` | 通用 heuristics 在需要對應判斷時才讀取完整 atom。 |
-| `route.runtime.context-ttl-doc` | `runtime/context/` | `index-only` | TTL doc 是設計文件，需要 prune context 時才讀。 |
+| `route.runtime.context-ttl-doc` | `governance/lifecycle/context-ttl-philosophy.md` | `index-only` | TTL doc 是設計文件，需要 prune context 時才讀。 |
 | `route.workflow.documentation-ai-native` | `workflow/documentation/README.md` | `summary-first` | 多數任務只需 workflow README 與 execution-flow；policy 全文留在 enforcement。 |
 | `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `index-only` | agent-architecture atoms 在需要理解 AI 行為模式時才讀取完整內容。 |
 | `route.feedback.history` | `feedback/history/README.md` | `index-only` | feedback/history 在需要查詢或新增 lesson 時才讀取。 |
@@ -61,6 +61,7 @@
 | `route.workflow.apk-analysis` | `workflow/apk-analysis/execution-flow.md` | `source-backed` | APK analysis 需要 workflow、analysis methods 與 domain-specific intelligence routing。 |
 | `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md` | `source-backed` | APK route selection 需要 domain workflow、feedback source 與 intelligence judgment 一起判斷。 |
 | `route.workflow.software-delivery` | `workflow/software-delivery/execution-flow.md` | `source-backed` | App development guidance 需要 workflow、analysis methods 與 domain-specific controls/checklists routing。triggers 已擴充以支援中途切換。 |
+| `route.workflow.greenfield` | `workflow/greenfield/execution-flow.md` | `source-backed` | Greenfield 需要 workflow、templates 與 software-delivery 的 BDD Closure 整合。 |
 | `route.workflow.travel-planning` | `workflow/travel-planning/execution-flow.md` | `source-backed` | Travel planning 需要 workflow、analysis methods 與 domain-specific intelligence routing。 |
 | `route.runtime.onboarding` | `runtime/onboarding/README.md` | `summary-first` | Onboarding 文件在需要執行對應 workflow 的完整流程時才讀取。 |
 | `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `summary-first` | 需要執行對應操作流程時才讀取完整 workflow。 |
@@ -73,7 +74,7 @@
 | Compression level | Routes | Escalation note |
 | --- | --- | --- |
 | `index-only` | `route.skill.discovery`, `route.runtime.activation-rules`, `route.runtime.context-ttl`, `route.runtime.router-flow`, `route.intelligence.engineering.heuristics`, `route.runtime.context-ttl-doc`, `route.intelligence.engineering.agent-architecture`, `route.feedback.history`, `route.evaluations.scenario-results`, `route.tools.metadata-routing`, `route.traces.decision-traces`, `route.runtime.intelligence-routing` | 依 `models/compression/README.md` 的 escalation rules 判斷。 |
-| `source-backed` | `route.runtime.phase-machine`, `route.runtime.obligation-ledger`, `route.runtime.blocking-gates`, `route.runtime.recovery`, `route.runtime.scheduler`, `route.runtime.transactions`, `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.workflow.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing`, `route.workflow.software-delivery`, `route.workflow.travel-planning`, `route.runtime.compiler`, `route.runtime.output-governance`, `route.runtime.distributed`, `route.governance.knowledge-update-flow` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
+| `source-backed` | `route.runtime.phase-machine`, `route.runtime.obligation-ledger`, `route.runtime.blocking-gates`, `route.runtime.recovery`, `route.runtime.scheduler`, `route.runtime.transactions`, `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.workflow.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing`, `route.workflow.software-delivery`, `route.workflow.greenfield`, `route.workflow.travel-planning`, `route.runtime.compiler`, `route.runtime.output-governance`, `route.runtime.distributed`, `route.governance.knowledge-update-flow` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
 | `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.context-loading`, `route.workflow.documentation-ai-native`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.analysis.web`, `route.intelligence.apk-analysis.atoms`, `route.validation.ai-decision-contract`, `route.decisions.adr`, `route.architecture.permanent-docs`, `route.anti-patterns.runtime-patterns` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
 
 ## Agent Output Shape

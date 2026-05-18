@@ -5,6 +5,10 @@
 # 讀取 runtime/router/activation-rules.yaml，根據輸入的 task intent、
 # file change、user signal 等條件，輸出應該 activate 的 rule 列表。
 #
+# Workflow 編排：觸發條件以 knowledge/runtime/routing-registry.yaml 內
+# route.workflow.*.activation_triggers 為準（registry-first）；activation-table #27
+# 為通用閘門。未來可擴充本 engine 比對 registry triggers。
+#
 # Usage:
 #   # 顯示所有規則的 activation 狀態（無輸入）
 #   ./runtime/router/activation-engine.rb

@@ -1,0 +1,82 @@
+---
+:multi_agent_coordination_version: v1
+:status: candidate
+:owner_layer: runtime/distributed
+:description: 'Multi-agent coordination rules. 當多個 agent 同時操作同一 repository 時， 需遵守以下協調規則確保 state consistency。
+
+'
+:coordination_rules:
+- :id: coord.rule.phase_check_before_action
+  :name: Phase Check Before Action
+  :description: 執行任何 action 前先讀取 phase-machine.yaml 確認目前 phase
+  :rule: 'Agent 在執行任何 action 前，必須先讀取 runtime/phases/phase-machine.yaml， 確認目前 phase 與 allowed_actions。如果 phase 與預期不符，表示有其他 agent 已變更 state，需執行 reconciliation。
+
+'
+  :severity: critical
+  :check:
+    :type: file_read
+    :target: runtime/phases/phase-machine.yaml
+    :verification: current_phase_matches_expectation == true
+- :id: coord.rule.generated_surface_version_check
+  :name: Generated Surface Version Check
+  :description: 使用 runtime.db 前檢查版本是否最新
+  :rule: 'Agent 在查詢 runtime.db 前，必須確認 generated_surfaces 表的記錄 是否為最新版本。如果 prose source 的修改時間晚於最後一次 compiler 執行時間， 表示 runtime.db 已 stale，需先執行 compiler 重新編譯。
+
+'
+  :severity: high
+  :check:
+    :type: sqlite_query
+    :target: runtime/runtime.db
+    :query: SELECT MAX(updated_at) FROM generated_surfaces
+    :verification: db_updated_at >= prose_source_mtime
+- :id: coord.rule.obligation_ledger_sync
+  :name: Obligation Ledger Sync
+  :description: 修改 obligation ledger 前先取得 lock
+  :rule: 'Agent 在修改 runtime/obligations/obligation-ledger.yaml 前，必須先取得 lock.obligation_ledger。修改完成後釋放 lock。如果無法取得 lock， 表示有其他 agent 正在操作，需等待或進入 recovery。
+
+'
+  :severity: critical
+  :lock_required: lock.obligation_ledger
+- :id: coord.rule.transaction_isolation
+  :name: Transaction Isolation
+  :description: 同一時間只有一個 agent 可以操作同一 transaction
+  :rule: 'Agent 在操作 transaction 前，必須先取得 lock.transaction。 Transaction 的 scope 為 per_transaction，不同 transaction 可並行操作。
+
+'
+  :severity: critical
+  :lock_required: lock.transaction
+- :id: coord.rule.phase_transition_exclusive
+  :name: Phase Transition Exclusive
+  :description: Phase transition 為獨占操作，同一時間只有一個 agent 可以執行
+  :rule: 'Agent 在執行 phase transition 前，必須先取得 lock.phase_transition。 Phase transition 完成後釋放 lock。如果無法取得 lock，表示有其他 agent 正在進行 phase transition，需等待。
+
+'
+  :severity: critical
+  :lock_required: lock.phase_transition
+- :id: coord.rule.stale_state_recovery
+  :name: Stale State Recovery
+  :description: 偵測到 stale state 時執行 recovery
+  :rule: '如果 agent 偵測到 phase inconsistency、obligation drift、或 generated surface stale，必須先執行 runtime/recovery/phase-reconciliation.yaml 的 reconciliation 程序，才能繼續執行。
+
+'
+  :severity: critical
+  :recovery_procedure: runtime/recovery/phase-reconciliation.yaml
+:consistency_checks:
+- :id: check.phase_consistency
+  :name: Phase Consistency Check
+  :description: 檢查目前 phase 是否與預期一致
+  :check_interval: 每次 action 前
+  :failure_action: run_reconciliation
+  :failure_message: 'Phase inconsistency detected: expected {expected_phase}, actual {actual_phase}'
+- :id: check.obligation_drift
+  :name: Obligation Drift Check
+  :description: 檢查 obligation ledger 是否有未預期的變更
+  :check_interval: 每次 phase entry
+  :failure_action: run_reconciliation
+  :failure_message: 'Obligation drift detected: obligation ledger has unexpected changes'
+- :id: check.generated_surface_stale
+  :name: Generated Surface Stale Check
+  :description: 檢查 generated YAML 是否為最新版本
+  :check_interval: 每次讀取 generated YAML 前
+  :failure_action: run_compiler
+  :failure_message: 'Generated surface is stale: {target} generated_at {generated_at}, prose modified at {prose_mtime}'

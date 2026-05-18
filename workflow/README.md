@@ -2,11 +2,17 @@
 
 `workflow/` 負責「AI 如何執行工作」。本層保存 agent 可照著執行的 planning flow、task decomposition、review flow、orchestration flow 與 handoff flow。
 
+## Workflow 選路（先做這步）
+
+察覺任務後、動手前，先讀 **[`workflow-routing.md`](./workflow-routing.md)**：依任務性質對照選路表 → 查 [`routing-registry.yaml`](../knowledge/runtime/routing-registry.yaml) 的 `route.workflow.*` → 進入對應子目錄 README + `execution-flow.md`。
+
+[`activation-table.md`](../runtime/router/activation-table.md) 的 **#27（Workflow 編排閘門）** 與 registry 內各 `route.workflow.*.activation_triggers` 會觸發上述 discovery；**registry-first**，不為每個 workflow 新增 activation 列。
+
 ## 目前入口
 
 - [`apk-analysis/`](apk-analysis/README.md)：APK 分析的 tool-neutral workflow。已從舊 `skills/apk-analysis/` 遷移至本層。
 - [`software-delivery/`](software-delivery/README.md)：軟體交付的執行流程（design review、code review、release review、security review）。
-- [`repo-analysis/`](repo-analysis/README.md)：Repository 分析的執行流程（new onboarding、deep codebase analysis、migration impact、tech debt assessment）。
+- [`repo-analysis/`](repo-analysis/README.md)：Repository 分析的執行流程（new onboarding、deep codebase analysis、migration impact、tech debt assessment）。選路見 [`workflow-routing.md`](./workflow-routing.md)；routing 條目以 registry 為準。
 - [`travel-planning/`](travel-planning/README.md)：旅遊規劃的執行流程（itinerary planning、transportation research、budget planning）。
 - [`documentation/`](documentation/README.md)：跨專案 **agent 友善文件** 的撰寫與分類流程（index-first、降低無效 token、與 `enforcement/` / `governance/` 對齊）。
 

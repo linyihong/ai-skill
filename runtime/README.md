@@ -29,7 +29,7 @@ Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 | Domain | Path | Description |
 |--------|------|-------------|
 | Activation | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Lazy-load rules with activation conditions |
-| Routing | [`routing/`](routing/) | Task intent → knowledge index → metadata → source-of-truth gate |
+| Routing | [`router/`](router/) | Task intent → knowledge index → metadata → source-of-truth gate |
 | Discovery | [`discovery/`](discovery/) | Phase-aware capability discovery checkpoints |
 | Phases | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Execution phase state machine |
 | Obligations | [`obligations/obligation-ledger.yaml`](obligations/obligation-ledger.yaml) | Per-phase atomic duties |
