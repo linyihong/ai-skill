@@ -159,11 +159,11 @@ Phase 3 (P2): Cache & Replay + Anti-bot Bypass
 
 ## 完成條件
 
-- [ ] Phase 1 完成（analysis/web/ 建立 + 2 份知識文件 + graphs/routing 更新 + compiler/validator 通過）
-- [ ] Phase 2 完成（1 份修改 + 1 份建立 + graphs 更新 + compiler/validator 通過）
-- [ ] Phase 3 完成（2 份知識文件建立 + graphs 更新 + compiler/validator 通過）
-- [ ] 所有新文件都經過 linked-updates 檢查
-- [ ] Commit + Push
+- [x] Phase 1 完成（analysis/web/ 建立 + 2 份知識文件 + graphs/routing 更新 + compiler/validator 通過）
+- [x] Phase 2 完成（1 份修改 + 1 份建立 + graphs 更新 + compiler/validator 通過）
+- [x] Phase 3 完成（2 份知識文件建立 + graphs 更新 + compiler/validator 通過）
+- [x] 所有新文件都經過 linked-updates 檢查
+- [x] Commit + Push
 
 ## 與既有文件的關係
 

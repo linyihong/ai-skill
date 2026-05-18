@@ -741,6 +741,38 @@ records:
       compression_level: summary-first
       reason: 需要執行對應操作流程時才讀取完整 workflow。
 
+  - id: route.analysis.web
+    task_intent: 執行 Web Scraping 分析（網站評估、工具選擇、提取策略設計、風險評估）
+    primary_source: analysis/web/README.md
+    required_dependencies:
+      - analysis/README.md
+    candidate_sources:
+      - analysis/web/sources-and-tools.md
+      - intelligence/web-scraping/adaptive-parsing.md
+      - intelligence/engineering/mcp-server-patterns.md
+      - intelligence/web-scraping/README.md
+    source_of_truth_gate: new-layer-promoted
+    ranking_reason: >
+      Web Scraping analysis 提供網站評估、工具選擇、提取策略設計與風險評估的系統化方法。
+      與 analysis/repo/（靜態結構分析）互補，web/ 專注於網頁內容提取的分析。
+    validation_signal: >
+      目標網站已評估（技術棧、JS 需求、anti-bot 保護），工具已選擇（HTTP/Dynamic/Stealth），
+      提取策略已設計（selector/adaptive parsing），風險已評估（legal/technical/data quality）。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 2000
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: specialized
+      compression_level: summary-first
+      reason: Web Scraping analysis 在需要從網頁提取資料時才讀取，不佔用 bootstrap 預算。
+
   - id: route.intelligence.apk-analysis.atoms
     task_intent: 套用 APK 分析工程智慧（heuristics、anti-patterns、failure、signals）
     primary_source: intelligence/engineering/analytical-reasoning/README.md
