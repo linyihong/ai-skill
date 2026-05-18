@@ -114,6 +114,16 @@
 
 ## 產出格式
 
+本 workflow 各階段使用標準化輸出模板，確保產出格式一致、可追溯、可被後續階段自動消費：
+
+| 模板 | 對應階段 | 用途 |
+|------|---------|------|
+| [`templates/change-brief-template.md`](templates/change-brief-template.md) | Change Intake | 記錄變更類型、證據、範圍、blocker 評估 |
+| [`templates/contract-template.md`](templates/contract-template.md) | Contract Governance | 記錄 domain model、架構決策、API 合約、錯誤處理 |
+| [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) | BDD Closure Loop | 記錄 Given/When/Then 場景、edge cases、regression scope |
+| [`templates/implementation-plan-template.md`](templates/implementation-plan-template.md) | Implementation | 記錄任務拆解、檔案路徑、驗收條件、風險評估 |
+| [`templates/review-report-template.md`](templates/review-report-template.md) | Review（6 種類型） | 記錄 finding、decision、reviewed artifacts |
+
 每次 review 應產出：
 
 - **Review 摘要**（≤200 tokens）：審查類型、範圍、verdict。

@@ -22,6 +22,8 @@
 | 12. 效能測試計畫 | Load、stress、spike 或 soak 範圍、metric budget、runner、證據位置 | 當 latency、throughput、資源使用率、concurrency、啟動時間、背景任務、資料庫存取、外部呼叫量、caching 或 batching 可能改變時需要 |
 | 13. 整合測試 | End-to-end 或 component integration 證據 | 驗證真實 adapters、auth/session、錯誤路徑、效能敏感路徑和跨 context 流程 |
 
+> **輸出模板**：Default Flow 完成後，使用 [`templates/implementation-plan-template.md`](templates/implementation-plan-template.md) 記錄實作計畫。
+
 ## Required Contracts（必要合約）
 
 不要假設每個專案都有前端/後端拆分。選擇符合架構的 contracts：
@@ -99,6 +101,8 @@
 
 如果沒有 planning artifact，在實作前建立輕量的 change brief。如果請求是新需求，缺失的 planning docs 是 blockers；向使用者提問並在寫 code 前填寫 BDD/contracts。
 
+> **輸出模板**：Change Intake 完成後，使用 [`templates/change-brief-template.md`](templates/change-brief-template.md) 記錄變更簡報。
+
 ## Contract Governance Gate（合約治理關卡）
 
 每個有多份文件的專案必須定義當文件不一致時哪個 artifact 優先。除非專案有更強的本地規則，否則使用這個預設優先順序：
@@ -121,6 +125,8 @@
 | Test 或 fixture 過時 | 將 tests/fixtures 更新到當前 contract 並引用來源 |
 
 明確記錄已取消、延後、排除範圍和無法由工具強制執行的項目。不要讓它們成為未來 agent 可能重新引入的隱形空缺。
+
+> **輸出模板**：Contract Governance 完成後，使用 [`templates/contract-template.md`](templates/contract-template.md) 記錄合約。
 
 ## Traceability Gate（可追溯性關卡）
 
@@ -149,6 +155,8 @@ Narrative BDD 在回填期間是可接受的，但不能被當作完成的測試
 | `not-automatable` | Tooling 無法直接強制執行 | 說明手動審查或 release checklist 項目 |
 
 BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求每個關鍵 scenario 有明確的驗證路徑，且沒有模糊的「已記錄但未測試」狀態。
+
+> **輸出模板**：BDD Execution Closure 完成後，使用 [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) 記錄行為場景。
 
 ## Test Strategy Gate（測試策略關卡）
 

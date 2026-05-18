@@ -600,6 +600,12 @@ records:
       - intelligence/engineering/development/README.md
       - knowledge/summaries/development-guidance.md
       - knowledge/graphs/workflow-software-delivery.yaml
+    templates:
+      change-brief: workflow/software-delivery/templates/change-brief-template.md
+      contract: workflow/software-delivery/templates/contract-template.md
+      bdd-scenario: workflow/software-delivery/templates/bdd-scenario-template.md
+      implementation-plan: workflow/software-delivery/templates/implementation-plan-template.md
+      review-report: workflow/software-delivery/templates/review-report-template.md
     source_of_truth_gate: new-layer-promoted
     ranking_reason: app-development-guidance 已從舊 skills/ 遷移至新分層，workflow/software-delivery/ 為 active entrypoint。觸發條件由 workflow/software-delivery/README.md 定義，agent 在需要開發時自行判斷載入。
     validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離。
