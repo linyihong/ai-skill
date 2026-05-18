@@ -18,3 +18,7 @@
 - [ ] Existing tests affected: <list>
 - [ ] New tests required: <count>
 - [ ] Test data/fixtures needed: <description>
+
+## Traceability
+- **Upstream**: <link to contract-template.md>
+- **Downstream**: → Implementation Plan → Review Report

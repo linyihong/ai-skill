@@ -24,6 +24,9 @@
 - **Backward Compatibility**: <yes/no + reason>
 
 ## Traceability
-- **Change Brief**: <link>
-- **BDD Scenarios**: <link>
-- **Implementation Plan**: <link after creation>
+- **Upstream**: <link to change-brief-template.md>
+- **Downstream**: → BDD Scenarios → Implementation Plan → Review Report
+- **Linked Artifacts**:
+  - **Change Brief**: <link>
+  - **BDD Scenarios**: <link>
+  - **Implementation Plan**: <link after creation>

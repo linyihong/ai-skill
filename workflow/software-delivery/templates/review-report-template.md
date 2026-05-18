@@ -20,3 +20,10 @@
 
 ## Artifacts Reviewed
 - <link to contracts, code, docs>
+
+## Traceability
+- **Upstream Artifacts**:
+  - Change Brief: <link if applicable>
+  - Contract: <link if applicable>
+  - BDD Scenarios: <link if applicable>
+  - Implementation Plan: <link if applicable>

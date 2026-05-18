@@ -18,3 +18,7 @@
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
 | <risk> | <H/M/L> | <H/M/L> | <plan> |
+
+## Traceability
+- **Upstream**: <link to change-brief | contract | bdd-scenario>
+- **Downstream**: → Review Report

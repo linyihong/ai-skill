@@ -20,6 +20,10 @@
 - [ ] No blocker — proceed to Contract phase
 - [ ] Blocker identified: <description>
 
-## Linked Artifacts
-- **Contract**: <link after creation>
-- **BDD Scenarios**: <link after creation>
+## Traceability
+- **Spec Source**: <link to spec-template.md if from Greenfield workflow>
+- **Downstream**: → Contract → BDD Scenarios → Implementation Plan → Review Report
+- **Linked Artifacts**:
+  - **Contract**: <link after creation>
+  - **BDD Scenarios**: <link after creation>
+  - **Implementation Plan**: <link after creation>

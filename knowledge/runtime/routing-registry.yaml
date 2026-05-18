@@ -606,6 +606,10 @@ records:
       bdd-scenario: workflow/software-delivery/templates/bdd-scenario-template.md
       implementation-plan: workflow/software-delivery/templates/implementation-plan-template.md
       review-report: workflow/software-delivery/templates/review-report-template.md
+    slash_commands:
+      - /skill.brief
+      - /skill.contract
+      - /skill.bdd
     source_of_truth_gate: new-layer-promoted
     ranking_reason: app-development-guidance 已從舊 skills/ 遷移至新分層，workflow/software-delivery/ 為 active entrypoint。觸發條件由 workflow/software-delivery/README.md 定義，agent 在需要開發時自行判斷載入。
     validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離。
@@ -623,6 +627,45 @@ records:
       profile: specialized
       compression_level: source-backed
       reason: App development guidance 需要 workflow、analysis methods 與 domain-specific controls/checklists routing。triggers 已擴充以支援中途切換。
+
+  - id: route.workflow.greenfield
+    task_intent: 從零開始的新專案標準化流程（specify → plan → tasks → implement）
+    primary_source: workflow/greenfield/execution-flow.md
+    required_dependencies:
+      - workflow/greenfield/README.md
+      - enforcement/README.md
+    candidate_sources:
+      - workflow/greenfield/templates/spec-template.md
+      - workflow/greenfield/templates/plan-template.md
+      - workflow/greenfield/templates/tasks-template.md
+      - workflow/software-delivery/execution-flow.md
+    templates:
+      spec: workflow/greenfield/templates/spec-template.md
+      plan: workflow/greenfield/templates/plan-template.md
+      tasks: workflow/greenfield/templates/tasks-template.md
+    slash_commands:
+      - /skill.spec
+      - /skill.plan
+      - /skill.tasks
+    source_of_truth_gate: new-layer-promoted
+    ranking_reason: >
+      Greenfield workflow 提供從零開始的標準化 4 階段流程（Specify → Plan → Tasks → Implement），
+      改編自 github/spec-kit 的 SDD pipeline。產出可作為 software-delivery workflow 的 Change Intake 輸入。
+    validation_signal: 新分層路徑可讀取，workflow 與 templates 內容完整。
+    metadata:
+      priority: P1
+      confidence: medium
+      context_cost:
+        estimated_tokens: 2500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: specialized
+      compression_level: source-backed
+      reason: Greenfield 需要 workflow、templates 與 software-delivery 的 BDD Closure 整合。
 
   - id: route.workflow.travel-planning
     task_intent: 規劃 evidence-based travel itinerary
