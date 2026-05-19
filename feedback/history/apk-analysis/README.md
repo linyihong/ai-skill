@@ -9,7 +9,7 @@
 | [`http-api/`](http-api/) | 23 | HTTP API 分析、文件化、UI 操作流程 |
 | [`local-proxy/`](local-proxy/) | 7 | Local proxy 設定、診斷、hook |
 | [`media-hls/`](media-hls/) | 3 | Media/HLS 串流分析 |
-| [`dynamic-capture/`](dynamic-capture/) | 1 | 動態捕獲相關 |
+| [`dynamic-capture/`](dynamic-capture/) | 2 | 動態捕獲相關 |
 
 ## 來源
 

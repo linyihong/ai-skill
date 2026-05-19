@@ -101,6 +101,7 @@
 | `http-api/2026-05-11_113200-read-only-argument-override-preserve-app-path.md` | candidate | Read-only argument override preserve app path | ✅ | `analysis/apk/workflows/http-api-documentation-flow.md` |
 | `http-api/2026-05-11_135000-redacted-sample-targeting-classifier.md` | candidate | Redacted sample targeting classifier | ✅ | `analysis/apk/workflows/http-api-documentation-flow.md` |
 | `http-api/2026-05-11_135700-articles-first-live-adapter-smoke.md` | candidate | Articles-first live adapter smoke | ✅ | `analysis/apk/workflows/http-api-documentation-flow.md` |
+| `dynamic-capture/2026-05-19_143500-avoid-single-cached-target-for-decrypt-capture.md` | candidate | Avoid single cached target for decrypt capture | ⬜ | `workflow/apk-analysis/execution-flow.md`, `analysis/apk/workflows/frida-hook-flow.md` |
 
 ### local-proxy/
 
