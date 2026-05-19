@@ -45,6 +45,7 @@
 | `load_strategy` | enum | yes | 載入策略：`preload`（每個 session 必讀）、`lazy`（依條件 activate）、`on_demand`（使用者要求才讀）。 |
 | `cacheable` | boolean | yes | 是否可在 session/conversation 內 cache。 |
 | `ttl` | object | no | Context TTL 設定（見下方）。 |
+| `provider_cache` | object | no | Provider prompt cache 對齊提示（見下方）。 |
 | `breakdown` | object | no | 成本細項，例如 `header_and_navigation`、`core_content`、`examples`、`validation`。 |
 
 ### `context_cost.ttl` 子欄位
@@ -55,6 +56,17 @@
 | `task` | integer | 活幾個 task。 |
 | `conversation` | boolean | 是否活整個對話。 |
 
+### `context_cost.provider_cache` 子欄位
+
+Provider prompt cache 欄位描述此 atom 是否適合放進穩定 prompt layout。它不取代 `cacheable`：`cacheable` 表示 runtime / conversation 內可重用，`provider_cache_candidate` 才表示適合作為 provider prompt cache 的候選內容。
+
+| 欄位 | 型別 | 用途 |
+| --- | --- | --- |
+| `provider_cache_candidate` | boolean | 是否適合納入 provider prompt cache 的穩定布局。 |
+| `prefix_stability` | enum | 前綴穩定性：`stable`、`semi_stable`、`volatile`。 |
+| `cache_position` | enum | 建議 prompt 位置：`prefix`、`middle`、`suffix`。 |
+| `churn_risk` | enum | 前綴變動風險：`low`、`medium`、`high`。 |
+
 ### `context_cost` 範例
 
 ```yaml
@@ -64,6 +76,11 @@ context_cost:
   cacheable: true
   ttl:
     task: 1
+  provider_cache:
+    provider_cache_candidate: true
+    prefix_stability: semi_stable
+    cache_position: middle
+    churn_risk: medium
   breakdown:
     header_and_navigation: 200
     core_content: 700
@@ -133,6 +150,11 @@ priority:
 confidence:
 stability:
 context_cost:
+  estimated_tokens:
+  load_strategy:
+  cacheable:
+  ttl:
+  provider_cache:
 when_to_read:
 validation:
 complexity:

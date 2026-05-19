@@ -338,6 +338,82 @@ rules:
 
 ---
 
+## Phase 2.5：Provider Prompt Cache Alignment（規範層）✅ 已實作
+
+### 2.5.1 為什麼要放在 Phase 2 與 Phase 3 之間
+
+Phase 2 已建立 `context_cost`、`load_strategy`、`cacheable` 與 TTL 等 context metadata；Phase 3 則會處理 Semantic Retrieval、Episodic Memory 與 Runtime Orchestration。Provider prompt cache 命中率介於兩者之間：它需要 Phase 2 的 metadata 才能判斷哪些 context 穩定可重用，但不需要等 Phase 3 的 retrieval / memory 自動化完成。
+
+因此本階段先定義 **prompt layout 與 cache eligibility 規範**，讓 agent 立刻能用人工規則提高 provider prompt cache 命中率；Phase 3 再把這些規範接進 runtime orchestration 自動執行。
+
+**實作狀態**：規範層已建立：
+
+- [`runtime/context/prompt-cache-playbook.md`](../../runtime/context/prompt-cache-playbook.md)
+- [`enforcement/prompt-cache-efficiency.md`](../../enforcement/prompt-cache-efficiency.md)
+- `metadata/schema.md` 的 `context_cost.provider_cache` 欄位
+- `runtime/router/activation-rules.yaml` 與 `knowledge/runtime/routing-registry.yaml` 的 lazy-load route
+
+Runtime 自動排序與 provider cache hit observability 仍保留給 Phase 3 Runtime Orchestration。
+
+### 2.5.2 問題
+
+目前 `cacheable: true` 只表示 context 可在 session / conversation 內重用，尚未區分「是否適合放進 provider prompt cache 的穩定前綴」。若每次 prompt 都把時間戳、git status、open files、tool output 或 task-specific evidence 插在固定規則前面，provider 端即使支援 prefix caching，也會因前綴 churn 而降低 cache hit。
+
+### 2.5.3 改造目標
+
+建立 Provider Prompt Cache Alignment playbook，明確區分：
+
+| 類型 | 放置位置 | 範例 | 目標 |
+| --- | --- | --- | --- |
+| Stable prefix | Prompt 前段，順序固定 | Core Bootstrap、固定 runtime initialization、穩定 routing policy | 提高 prefix cache hit |
+| Semi-stable middle | Stable prefix 之後 | task intent 對應的 summary、route-specific rules | 控制重用與任務相關性 |
+| Volatile suffix | Prompt 後段 | 使用者當前要求、git status、open files、tool output、時間戳 | 避免污染穩定前綴 |
+
+### 2.5.4 建議新增的規範
+
+1. **Prompt cache playbook**
+   - 建議位置：`runtime/context/prompt-cache-playbook.md`
+   - 定義 stable prefix、semi-stable middle、volatile suffix 的排序規則。
+   - 說明 Cursor / Claude 使用時，哪些內容應避免插入固定前綴。
+
+2. **Context metadata extension**
+   - 建議擴充 `metadata/schema.md`：
+     - `provider_cache_candidate: true | false`
+     - `prefix_stability: stable | semi_stable | volatile`
+     - `cache_position: prefix | middle | suffix`
+     - `churn_risk: low | medium | high`
+
+3. **Runtime ordering rule**
+   - stable context 的順序必須固定，不因 task 改變而重排。
+   - volatile context 一律放在 suffix，不可插入 bootstrap / rule prefix 中間。
+   - 若需要插入新的常駐規則，應追加到 stable prefix 的固定區塊末端，並記錄 prefix churn reason。
+
+4. **Observability**
+   - 在 token budget / context health 之後加入 prompt-cache 指標：
+     - `stable_prefix_size`
+     - `prefix_churn_count`
+     - `provider_cache_candidate_tokens`
+     - `volatile_prefix_violation_count`
+
+### 2.5.5 不做事項
+
+- 不把 provider prompt cache 視為正確性保證；它只是一個成本與延遲優化。
+- 不為了 cache hit 犧牲 required dependencies、safety rules 或 source-of-truth validation。
+- 不把高變動 evidence、使用者私有輸入、工具輸出或 runtime status 放入 stable prefix。
+- 不要求 Phase 3 前完成自動化；本階段只先定義人工可遵守的 layout 與 metadata 規範。
+
+### 2.5.6 與 Phase 3 的銜接
+
+Phase 3 的 Runtime Orchestration 應讀取本階段定義的 metadata，將 context 自動排成：
+
+```text
+stable prefix → semi-stable task context → volatile suffix
+```
+
+Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 負責決定 context 在 prompt 裡的位置與穩定性約束。兩者互補，不互相取代。
+
+---
+
 ## Phase 3：真正 AI OS（第三優先）⏳ 待實作
 
 ### 3.1 Semantic Retrieval ⏳ 待實作

@@ -71,6 +71,7 @@
 | [linked-updates.md](linked-updates.md) | multi-file change、architecture update | ~800 | P1 |
 | [failure-learning-system.md](failure-learning-system.md) | user 指出失誤、close-loop gap | ~1200 | P1 |
 | [decision-efficiency.md](decision-efficiency.md) | 多條可行路線需選擇 | ~600 | P2 |
+| [prompt-cache-efficiency.md](prompt-cache-efficiency.md) | prompt cache、context loading 或 token cost layout | ~700 | P2 |
 | [tool-neutral-documentation.md](tool-neutral-documentation.md) | 建立或修改可重用文件 | ~500 | P2 |
 | [governance/document-sizing.md](../governance/document-sizing.md) | 文件接近拆分門檻 | ~400 | P2 |
 | [document-todo-list.md](document-todo-list.md) | 文件有未完成項目 | ~300 | P2 |
@@ -106,6 +107,7 @@
 | 工具中立文件 | [tool-neutral-documentation.md](tool-neutral-documentation.md) | 可重用文件預設保持工具中立；工具專屬路徑、hook、同步與 UI 步驟放到 `ai-tools/` 或工具設定檔。 | lazy (P2) |
 | 規則權重與衝突優先序 | [rule-weight.md](rule-weight.md) | 當 enforcement rules、skill workflow、tool adapter、使用者目標或效率規則看似衝突時，依安全/source/validation/user-goal/tool adapter/效率的權重排序處理。 | **core** |
 | 決策效率 | [decision-efficiency.md](decision-efficiency.md) | 先界定未知，再依 time-to-evidence、語意距離、風險、驗證信號與 context 成本選下一步。 | lazy (P2) |
+| Prompt cache efficiency | [prompt-cache-efficiency.md](prompt-cache-efficiency.md) | 組裝 context 時維持 stable prefix / semi-stable middle / volatile suffix，避免高變動內容破壞 provider prompt cache 命中率。 | lazy (P2) |
 | 失效學習系統 | [failure-learning-system.md](failure-learning-system.md) / [failure-patterns](failure-patterns/README.md) | 使用 failure taxonomy、pattern records、promotion targets 與 validation gate，將重複 agent 失效模式沉澱成可重用防呆規則；例如 source/mirror 寫入漂移。 | lazy (P1) |
 | 文件 TODO | [document-todo-list.md](document-todo-list.md) | 文件有未完成、待決策、待補強或待驗證內容時，在前段放可掃描 TODO 表並連到相關章節、goal 或 issue。 | lazy (P2) |
 | 目標、執行、驗證 | [goal-action-validation.md](goal-action-validation.md) | 每個重要工作單元要能反查目標、執行內容與驗證方式；純判斷題用參考來源與推論邊界。 | lazy (P2) |

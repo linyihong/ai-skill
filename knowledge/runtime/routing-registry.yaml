@@ -284,6 +284,42 @@ records:
       compression_level: index-only
       reason: TTL policy 輕量，需要 prune 時才讀。
 
+  - id: route.runtime.prompt-cache-alignment
+    task_intent: 管理 provider prompt cache layout，穩定 prefix 並隔離高變動 context
+    primary_source: runtime/context/prompt-cache-playbook.md
+    required_dependencies:
+      - enforcement/prompt-cache-efficiency.md
+      - metadata/schema.md
+      - runtime/context/ttl-policy.yaml
+    candidate_sources:
+      - knowledge/summaries/prompt-cache-alignment.md
+      - knowledge/summaries/context-cost-optimization.md
+      - runtime/context/README.md
+      - runtime/budget/token-budget.yaml
+      - runtime/health/context-health-score.yaml
+    source_of_truth_gate: prompt-cache-playbook-active
+    ranking_reason: Prompt cache alignment 需要先固定 context layout：stable prefix、semi-stable middle、volatile suffix，避免高變動輸入破壞 provider prefix cache。
+    validation_signal: Prompt cache playbook、enforcement rule、metadata provider_cache 欄位與 activation rule 已同步。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 1200
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+        provider_cache:
+          provider_cache_candidate: true
+          prefix_stability: semi_stable
+          cache_position: middle
+          churn_risk: medium
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: 先讀 prompt-cache summary 與 playbook；修改 metadata 或 enforcement 時再讀 full source。
+
   - id: route.governance.durable-goal-boundary
     task_intent: 維護 active goal 與 durable roadmap goal 邊界
     primary_source: enforcement/conversation-goal-ledger.md

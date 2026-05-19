@@ -1,0 +1,66 @@
+# Enforcement Rule Metadata
+id: enforcement.prompt-cache-efficiency
+title: Prompt Cache Efficiency
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/prompt-cache-efficiency.md
+summary: 維持 stable prefix、semi-stable middle、volatile suffix 的 context layout，避免高變動內容破壞 provider prompt cache 命中率。
+domains:
+  - repo-governance
+  - runtime-context
+tags:
+  - prompt-cache
+  - context-loading
+  - token-cost
+  - provider-cache
+status: candidate
+priority: P2
+confidence: medium
+stability: evolving
+context_cost:
+  estimated_tokens: 700
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+  provider_cache:
+    provider_cache_candidate: true
+    prefix_stability: semi_stable
+    cache_position: middle
+    churn_risk: medium
+when_to_read: 討論或修改 prompt cache、context loading、bootstrap layout、token cost optimization 或 provider cached-token 策略時
+validation: enforcement/README.md、runtime/router/activation-rules.yaml、metadata/schema.md 與 runtime/context/prompt-cache-playbook.md 都能導向同一規則
+complexity: medium
+depends:
+  - enforcement/dependency-reading.md
+  - enforcement/decision-efficiency.md
+  - runtime/context/prompt-cache-playbook.md
+related:
+  - metadata/schema.md
+  - runtime/context/ttl-policy.yaml
+  - runtime/budget/token-budget.yaml
+conflicts: []
+replaces: []
+models:
+  small: 使用核心 layout 表與檢查清單
+  large: 完整讀取 playbook 與 metadata schema extension
+checklist:
+  - Stable prefix 是否固定且低變動
+  - Volatile context 是否放在 suffix
+  - 是否區分 cacheable 與 provider_cache_candidate
+runtime_notes: Lazy-load，P2 優先權；供 context loading 與 prompt composition 任務使用
+governance_notes: 修改 provider cache metadata 時需同步更新 metadata/schema.md 與 runtime/context/prompt-cache-playbook.md
+
+activation_conditions:
+  when:
+    - 討論或修改 prompt cache / prefix cache / cached tokens
+    - 設計 context loading、bootstrap layout 或 prompt composition
+    - token cost optimization 需要 provider cache alignment
+  load_strategy: lazy
+  priority: P2
+  estimated_tokens: 700
+always_apply: false
+scope: agent-behavior
+deprecated_by:
+rule_id: enforcement.prompt-cache-efficiency

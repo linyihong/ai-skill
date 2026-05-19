@@ -46,7 +46,7 @@ Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 | Onboarding | [`onboarding/`](onboarding/) | New project/task setup guidance |
 | Output Governance | [`output-governance/`](output-governance/) | Language policy, output rules, governance gates |
 | Prompt Artifacts | [`prompt-artifacts/`](prompt-artifacts/) | Artifact templates, composition rules |
-| Context | [`context/`](context/) | TTL policy |
+| Context | [`context/`](context/) | TTL policy and provider prompt cache layout |
 | Budget | [`budget/`](budget/) | Token budget |
 | Distributed | [`distributed/`](distributed/) | Multi-agent coordination, distributed locks |
 | Intelligence | [`intelligence/`](intelligence/) | Intelligence routing |

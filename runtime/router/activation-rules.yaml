@@ -2,9 +2,7 @@
 :activation_rules_version: v2
 :status: validated
 :owner_layer: runtime/router
-:description: 'Runtime activation rules for lazy-load enforcement rules. Core Bootstrap rules (rule-weight, dependency-reading, conversation-goal-ledger) 永遠 preload。 其餘 rules 依本檔定義的條件 activate。
-
-'
+:description: Runtime activation rules for lazy-load enforcement rules. Core Bootstrap rules (rule-weight, dependency-reading, conversation-goal-ledger) 永遠 preload。其餘 rules 依本檔定義的條件 activate。
 :core_bootstrap:
 - rule-weight
 - dependency-reading
@@ -92,6 +90,35 @@
     :priority: P2
     :estimated_tokens: 600
     :source: enforcement/decision-efficiency.md
+- :rule_id: enforcement.prompt-cache-efficiency
+  :description: Prompt cache efficiency — 維持穩定 prompt layout 以提高 provider cache 命中率
+  :activation:
+    :when:
+    - :type: task_intent
+      :matches:
+      - prompt-cache
+      - prefix-cache
+      - cached-tokens
+      - context-loading
+      - prompt-composition
+      - token-cost-optimization
+    - :type: user_signal
+      :matches:
+      - prompt cache
+      - prefix cache
+      - cached token
+      - 緩存命中
+      - 快取命中
+      - token 消耗
+    - :type: file_change
+      :pattern: "runtime/context/**"
+    - :type: file_change
+      :pattern: "metadata/schema.md"
+  :load:
+    :strategy: lazy
+    :priority: P2
+    :estimated_tokens: 700
+    :source: enforcement/prompt-cache-efficiency.md
 - :rule_id: enforcement.tool-neutral-documentation
   :description: 工具中立文件 — 可重用文件保持工具中立
   :activation:

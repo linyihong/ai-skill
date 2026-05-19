@@ -26,9 +26,10 @@ Summaries 用來協助 agent：
 | `governance.repo-maintenance` | Repo 維護、升級、遷移與治理。 | [`repo-governance.md`](repo-governance.md) |
 | `knowledge.navigation` | 知識導航：indexes、summaries、graphs、runtime。 | [`knowledge-navigation.md`](knowledge-navigation.md) |
 | `runtime.operations` | Context routing、activation、TTL、pruning。 | [`runtime-operations.md`](runtime-operations.md) |
+| `runtime.prompt-cache-alignment` | Provider prompt cache layout：stable prefix、semi-stable middle、volatile suffix。 | [`prompt-cache-alignment.md`](prompt-cache-alignment.md) |
 | `models.routing` | 多模型協作、capability profile、compression。 | [`model-routing.md`](model-routing.md) |
 | `memory.operations` | 長期記憶、episodic、project、failure memory。 | [`memory-operations.md`](memory-operations.md) |
-| `architecture.context-cost-optimization` | Token 成本優化規劃（3 Phases）。 | [`context-cost-optimization.md`](context-cost-optimization.md) |
+| `architecture.context-cost-optimization` | Token 成本優化規劃（含 Phase 2.5 prompt cache alignment）。 | [`context-cost-optimization.md`](context-cost-optimization.md) |
 
 ## Summary 格式
 

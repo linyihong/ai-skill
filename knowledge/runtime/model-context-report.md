@@ -35,6 +35,7 @@
 | `route.skill.discovery` | `knowledge/runtime/routing-registry.yaml` | `index-only` | Routing registry 輕量（~300 tokens），可在整個對話中 cache。 |
 | `route.runtime.activation-rules` | `runtime/compiler/embedded_data.rb` | `index-only` | Activation rules 輕量（~500 tokens），可在整個對話中 cache。 |
 | `route.runtime.context-ttl` | `runtime/compiler/embedded_data.rb` | `index-only` | TTL policy 輕量，需要 prune 時才讀。 |
+| `route.runtime.prompt-cache-alignment` | `runtime/context/prompt-cache-playbook.md` | `summary-first` | 先讀 prompt-cache summary 與 playbook；修改 metadata 或 enforcement 時再讀 full source。 |
 | `route.runtime.context-loading` | `governance/lifecycle/routing-philosophy.md` | `summary-first` | routing decision 可先用 registry、index、summary；修改 source 時再升級。 |
 | `route.runtime.router-flow` | `runtime/router/` | `index-only` | Router flow 是設計文件，需要 routing 決策時才讀。 |
 | `route.intelligence.engineering.heuristics` | `intelligence/engineering/heuristics/README.md` | `index-only` | 通用 heuristics 在需要對應判斷時才讀取完整 atom。 |
@@ -76,7 +77,7 @@
 | --- | --- | --- |
 | `index-only` | `route.skill.discovery`, `route.runtime.activation-rules`, `route.runtime.context-ttl`, `route.runtime.router-flow`, `route.intelligence.engineering.heuristics`, `route.runtime.context-ttl-doc`, `route.intelligence.engineering.agent-architecture`, `route.feedback.history`, `route.evaluations.scenario-results`, `route.tools.metadata-routing`, `route.traces.decision-traces`, `route.runtime.intelligence-routing` | 依 `models/compression/README.md` 的 escalation rules 判斷。 |
 | `source-backed` | `route.runtime.phase-machine`, `route.runtime.obligation-ledger`, `route.runtime.blocking-gates`, `route.runtime.recovery`, `route.runtime.scheduler`, `route.runtime.transactions`, `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.workflow.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing`, `route.workflow.software-delivery`, `route.workflow.greenfield`, `route.workflow.travel-planning`, `route.runtime.decision-recording`, `route.runtime.compiler`, `route.runtime.output-governance`, `route.runtime.distributed`, `route.governance.knowledge-update-flow` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
-| `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.context-loading`, `route.workflow.documentation-ai-native`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.analysis.web`, `route.intelligence.apk-analysis.atoms`, `route.validation.ai-decision-contract`, `route.decisions.adr`, `route.architecture.permanent-docs`, `route.anti-patterns.runtime-patterns` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
+| `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.prompt-cache-alignment`, `route.runtime.context-loading`, `route.workflow.documentation-ai-native`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.analysis.web`, `route.intelligence.apk-analysis.atoms`, `route.validation.ai-decision-contract`, `route.decisions.adr`, `route.architecture.permanent-docs`, `route.anti-patterns.runtime-patterns` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
 
 ## Agent Output Shape
 

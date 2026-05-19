@@ -6,12 +6,12 @@
 
 | Surface | Path | Count / Status |
 | --- | --- | --- |
-| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 43 records |
+| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 44 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
 | SQLite runtime index | [`sqlite/`](sqlite/) | generated lookup cache prototype |
-| Summaries | [`../summaries/`](../summaries/) | 14 files |
+| Summaries | [`../summaries/`](../summaries/) | 15 files |
 | Graph records | [`../graphs/`](../graphs/) | 29 files |
 
 ## Routing Records
@@ -28,6 +28,7 @@
 | `route.skill.discovery` | `knowledge/runtime/routing-registry.yaml` | `small` | `index-only` | Task intent 已對應到 routing-registry.yaml 的 triggers，entrypoint 與 summary path 可解析。 |
 | `route.runtime.activation-rules` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。 |
 | `route.runtime.context-ttl` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | Context TTL 已套用，過期 context 已 prune，token 使用率在預算內。 |
+| `route.runtime.prompt-cache-alignment` | `runtime/context/prompt-cache-playbook.md` | `small` | `summary-first` | Prompt cache playbook、enforcement rule、metadata provider_cache 欄位與 activation rule 已同步。 |
 | `route.governance.durable-goal-boundary` | `enforcement/conversation-goal-ledger.md` | `large` | `source-backed` | 長期狀態已落到 durable planning 文件，且 active goal 完成後才刪除。 |
 | `route.runtime.context-loading` | `governance/lifecycle/routing-philosophy.md` | `small` | `summary-first` | Primary source、deferred sources、source-of-truth gate 與 validation signal 已可被記錄。 |
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `large` | `source-backed` | 欄位可套用到第一批 atom candidates，且 Markdown links 可解析。 |
@@ -68,17 +69,18 @@
 | --- | --- | --- | --- |
 | `architecture.apk-analysis-pilot` | `new-layer-promoted` | [`apk-analysis-pilot.md`](../summaries/apk-analysis-pilot.md) | `apk-analysis` 作為第一個 Workflow / Analysis / Intelligence 分離 pilot 的 migration map。新分層已 promoted：`workflow/apk-analysis/` 是端到端執行入口，`analysis/apk/` 保存可重用觀察、拆解與證據取得方法，`intelligence/engineering/analytical-reasoning/` 保存 reusable decision intelligence。 |
 | `intelligence.apk-highest-leverage-analysis` | `candidate` | [`apk-highest-leverage-analysis.md`](../summaries/apk-highest-leverage-analysis.md) | APK 分析 checkpoint 應先界定未知，再依 time-to-evidence、語意距離、安全性與 validation clarity 選擇最高收益路線。 |
-| `architecture.context-cost-optimization` | `validated` | [`context-cost-optimization.md`](../summaries/context-cost-optimization.md) | Token 成本優化規劃。Phase 1（立即省錢）：Bootstrap 極小化（~800 tokens）、README 拆分、Rule lazy-load、Summary layer。Phase 2（架構升級）：Runtime Context Router、Context Cost Metadata、Skill Index、Context TTL。Phase 3（長期）：Semantic Retrieval、Episodic Memory、Multi-model Routing。 |
+| `architecture.context-cost-optimization` | `validated` | [`context-cost-optimization.md`](../summaries/context-cost-optimization.md) | Token 成本優化規劃。Phase 1（立即省錢）：Bootstrap 極小化（~800 tokens）、README 拆分、Rule lazy-load、Summary layer。Phase 2（架構升級）：Runtime Context Router、Context Cost Metadata、Skill Index、Context TTL。Phase 2.5（規範層已實作）：Provider Prompt Cache Alignment，定義 stable prefix / volatile suffix 與 provider cache metadata。Phase 3（長期）：Semantic Retrieval、Episodic Memory、Multi-model Routing。 |
 | `workflow.software-delivery` | `validated` | [`development-guidance.md`](../summaries/development-guidance.md) | 將授權 App/API/Embedded/Firmware 觀察轉成開發 guidance、實作模式、控制項、檢查清單。涵蓋 mobile（Android/iOS/Flutter/React Native）、backend API、embedded firmware 的安全控制、實作模式與 release gate。原 `skills/app-development-guidance/` 已刪除，所有內容已遷移至新分層。提供 5 個標準化輸出模板（change-brief / contract / bdd-scenario / implementation-plan / review-report），位於 `workflow/software-delivery/templates/`。另提供 Greenfield 標準化流程（`workflow/greenfield/`）與 Slash Command 模式（`ai-tools/slash-commands.md`）。 |
 | `feedback.promotion.pipeline` | `candidate` | [`feedback-promotion-pipeline.md`](../summaries/feedback-promotion-pipeline.md) | 定義 feedback lesson 從 skill-local history 推進到 workflow、intelligence、enforcement、memory 或 runtime surfaces 的 promotion / downgrade gate。 |
 | `governance.goal-ledger-boundary` | `validated` | [`goal-ledger-boundary.md`](../summaries/goal-ledger-boundary.md) | `.agent-goals/` 只保存 active conversation goals；長期 roadmap、phase、migration、promotion、deprecation 與治理狀態必須落到 durable planning 文件。 |
 | `knowledge.navigation` | `validated` | [`knowledge-navigation.md`](../summaries/knowledge-navigation.md) | 知識導航系統：indexes（任務路由）、summaries（300-500 token 摘要）、graphs（知識圖譜邊）、runtime（routing registry、refresh policy、SQLite lookup cache）。讓 agent 用最小 token 成本找到正確知識。 |
 | `memory.operations` | `candidate` | [`memory-operations.md`](../summaries/memory-operations.md) | 長期記憶層：short-term（目前 task context）、episodic（過去 task 關鍵決策與結果）、project（專案歷史脈絡）、failure（反覆失效模式）。支援 similarity-based retrieval。 |
-| `metadata.schema.knowledge-atom` | `validated` | [`metadata-schema.md`](../summaries/metadata-schema.md) | Knowledge Atom metadata schema v1，定義 atom 的必填欄位、選填欄位、受控值、YAML 範本與驗證規則。 |
+| `metadata.schema.knowledge-atom` | `validated` | [`metadata-schema.md`](../summaries/metadata-schema.md) | Knowledge Atom metadata schema v1，定義 atom 的必填欄位、選填欄位、受控值、YAML 範本、驗證規則與 provider prompt cache hints。 |
 | `models.routing` | `candidate` | [`model-routing.md`](../summaries/model-routing.md) | 多模型協作架構：capability profile（small/large/specialized）、compression strategy（checklist/compressed/full）、model-aware context report。根據 task 複雜度選擇模型與 context 策略。 |
+| `runtime.prompt-cache-alignment` | `candidate` | [`prompt-cache-alignment.md`](../summaries/prompt-cache-alignment.md) | Provider prompt cache 對齊規範。定義 stable prefix、semi-stable middle、volatile suffix 的 context layout，並說明 `cacheable` 與 `provider_cache_candidate` 的邊界。 |
 | `governance.repo-maintenance` | `validated` | [`repo-governance.md`](../summaries/repo-governance.md) | AI-native Knowledge Operating System 本身的維護、升級、遷移與治理。涵蓋 lifecycle management、validation、cleanup、splitting rules、dependency maintenance。 |
 | `root.bootstrap.ai-skill` | `validated` | [`root-bootstrap.md`](../summaries/root-bootstrap.md) | Ai-skill 工作的 bootstrap 入口。Root README 定義 OS layout 與 cost-aware 啟動流程；CORE_BOOTSTRAP.md 定義 3 條核心規則（~800 tokens）；enforcement README 定義 Runtime Activation Model 與 lazy-load rules。 |
-| `runtime.operations` | `validated` | [`runtime-operations.md`](../summaries/runtime-operations.md) | Runtime 層負責 context routing、dynamic loading、context pruning、agent coordination 與 orchestration。包含 router（activation rules、cost budget）、context（TTL policy、prune strategy）。 |
+| `runtime.operations` | `validated` | [`runtime-operations.md`](../summaries/runtime-operations.md) | Runtime 層負責 context routing、dynamic loading、context pruning、agent coordination 與 orchestration。包含 router（activation rules、cost budget）、context（TTL policy、prune strategy、prompt cache layout）。 |
 | `workflow.travel-planning` | `candidate` | [`travel-planning.md`](../summaries/travel-planning.md) | 依目的地、日期、交通與玩法規劃行程，包含營業時間查證、交通比較、住宿與備案。支援 itinerary 結構化輸出與可行性檢查。 |
 
 ## Graph Records
