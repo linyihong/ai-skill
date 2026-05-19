@@ -63,8 +63,8 @@ mcp__Claude_in_Chrome__tabs_context_mcp → createIfEmpty: true
 3. 明確告知使用者：「訂房系統為 JS 動態載入，WebFetch 無法取得即時空位，請直接前往以下連結或致電確認」
 
 **關鍵限制說明（必須對使用者說清楚）**
-- 絕大多數日本旅館訂房系統（489ban、yadosys、jalan、rakuten travel 等）均為 SPA / JS-heavy
-- WebFetch 只讀靜態 HTML，對這類系統結果為空白或 403
+- 旅館官方訂房系統與主流預訂平台幾乎全為 SPA / JS-heavy，WebFetch 抓不到即時空位
+- WebFetch 只讀靜態 HTML，對動態系統結果為空白或 403
 - 即使 Chrome extension 可用，部分系統有 CAPTCHA 或登入牆，可能仍需使用者自行操作
 
 #### Anti-patterns
