@@ -55,6 +55,7 @@
 | `common/2026-05-11_125615-per-round-feedback-checkpoint.md` | promoted | Per-round feedback checkpoint | ✅ | `workflow/apk-analysis/execution-flow.md` |
 | `common/2026-05-08_135700-agent-goals-before-transcripts.md` | candidate | Agent goals before transcripts when resuming | ✅ | `workflow/apk-analysis/execution-flow.md` |
 | `common/2026-05-08_141430-identity-material-self-generation-audit.md` | candidate | Identity material self-generation audit | ✅ | `workflow/apk-analysis/execution-flow.md` |
+| `common/2026-05-19_135900-android-cache-reset-before-image-hook-capture.md` | candidate | Android cache reset before image hook capture | ⬜ | `workflow/apk-analysis/execution-flow.md`, `analysis/apk/workflows/frida-hook-flow.md` |
 
 ### flutter-dart-aot/
 
