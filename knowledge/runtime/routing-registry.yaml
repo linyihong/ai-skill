@@ -1448,9 +1448,9 @@ records:
       Knowledge Update Flow 定義 11 個步驟（觸發檢查→分類→Promotion Target→寫入→
       更新目標層→Intelligence Extraction→Failure Learning→Linked Updates→
       Runtime Surfaces→驗證→Commit/Push/Readback），每個步驟有 entry conditions、
-      exit conditions、reference sources。Compiler 產生的 knowledge-update-phases.yaml
-      提供 machine-readable 的步驟定義，讓 agent 可以直接讀 YAML 知道目前走到哪一步，
-      不用每次重讀 prose。
+      exit conditions、reference sources。Compiler 將 knowledge update phases 寫入
+      runtime.db 的 generated_surfaces 表（type='knowledge_update_phases'），
+      讓 agent 可以查詢 machine-readable 的步驟定義，不用每次重讀 prose。
     validation_signal: >
       目前 knowledge update 的步驟已確認，entry conditions 已滿足，exit conditions
       已檢查，reference sources 已載入，下一步驟已決定。
