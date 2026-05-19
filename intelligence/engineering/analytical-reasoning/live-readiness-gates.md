@@ -1,7 +1,7 @@
 # Live SDK/Client Readiness Gates（實作就緒門檻）
 
 **Status**: `validated-intelligence`
-**Source**: `skills/apk-analysis/DOCUMENTATION.md`（development readiness gate、SDK live self-generation audit）
+**Source**: `workflow/apk-analysis/artifact-gates.md`（development readiness gate、SDK live self-generation audit）
 
 ## 問題
 

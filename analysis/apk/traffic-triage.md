@@ -146,6 +146,33 @@ native backtrace 落在哪裡？
 
 不要只看副檔名判斷格式。應用 magic bytes、container probe 或 frame count 驗證。
 
+## 混合功能：原生 API 殼層 + 嵌入式 H5 主體
+
+部分 Flutter 功能只有少量原生 REST（餘額、配置、兌換），**列表／聊天在 H5**（`flutter_inappwebview` → `WebView`）。必須分線，不可在 Dio 主線上猜 `/feature/list`。
+
+```text
+反編譯只有少數 /feature/* path，list sweep 全 404
+  -> 搜 *h5_page*、jumpToNext、domain 鍵 *H5
+  -> 路線 A：原生殼 live probe / Dio（僅已確認 path）
+  -> 路線 B：H5 開頁 URL
+        優先 Java WebView.loadUrl（低風險）
+        可選 blutter 單點「URL 寫入 H5 page」hook
+        禁止啟動期全域 Uri::parse + 全量 Response/decrypt（易崩潰）
+  -> 路線 C：H5 內 XHR
+        對 H5 第三方 host：MITM / shouldInterceptRequest（第二階段）
+```
+
+| 層 | 抓包手段 | SDK 可否（Java） |
+| --- | --- | --- |
+| 原生殼 | Dio hook、live test | 可：已確認 path 的 facade |
+| H5 入口 URL | Frida WebView + 單點 Dart hook | 可：`h5EntryUrl()` 組 query（需 domain 配置 + session） |
+| H5 內 API | 對 H5 host 的 MITM／intercept | 待證據；通常**非**主站 CloudFront client |
+
+可重用 lesson：
+
+- [`feedback/history/apk-analysis/common/2026-05-19_101500-hybrid-native-shell-plus-embedded-h5-frida-routing.md`](../../feedback/history/apk-analysis/common/2026-05-19_101500-hybrid-native-shell-plus-embedded-h5-frida-routing.md)
+- [`feedback/history/apk-analysis/flutter-dart-aot/2026-05-19_101500-embedded-h5-entry-url-minimal-frida-hooks.md`](../../feedback/history/apk-analysis/flutter-dart-aot/2026-05-19_101500-embedded-h5-entry-url-minimal-frida-hooks.md)
+
 ---
 
 ← [回到 analysis/apk/](README.md)

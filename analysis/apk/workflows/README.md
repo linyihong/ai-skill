@@ -1,10 +1,12 @@
 # APK 分析工作流程
 
-`analysis/apk/workflows/` 存放 APK 分析的操作流程與執行步驟。
+`analysis/apk/workflows/` 存放 APK 分析中單一技術路線的操作流程與證據取得步驟。
+
+命名上的 `workflows/` 是歷史相容路徑：本目錄屬於 `analysis/apk/`，負責技術方法內部的 procedure；端到端 agent orchestration、任務分解、交接與完成門檻仍由 `workflow/apk-analysis/` 負責。
 
 ## Scope
 
-本目錄負責 **HOW TO DO** — execution knowledge：
+本目錄負責 **HOW TO COLLECT EVIDENCE** — analysis-local procedure：
 
 - Frida hook 操作流程（command、setup、adb、proxy）
 - 代理導流設定步驟
@@ -17,6 +19,7 @@
 - **HOW TO THINK** 決策智慧（何時該用哪個技術）；使用 `intelligence/engineering/analytical-reasoning/`
 - 端到端 agent 執行流程；使用 `workflow/apk-analysis/`
 - 工具選擇與失敗判讀；使用 `analysis/apk/tools-and-failures.md`
+- Raw case logs、App 專屬 class dump、host、endpoint、token 或一次性 reverse 過程；保留在業務專案 evidence。
 
 ## 與其他層的關係
 

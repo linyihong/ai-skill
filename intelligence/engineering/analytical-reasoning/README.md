@@ -50,6 +50,19 @@ intelligence/engineering/analytical-reasoning/
 - **HOW TO DO** 操作流程、command、setup；使用 `analysis/apk/workflows/`。
 - Skill-specific lesson archive；在 promotion 前保留於 `feedback/history/`。
 
+## Atom 分類規則
+
+新增或整理 atom 時，用以下問題判斷：
+
+| 主要回答 | 分類 |
+| --- | --- |
+| 看到什麼 signal 代表哪種技術路線？ | `signals/` |
+| 這個症狀發生時如何診斷 root cause？ | `failure/` |
+| 未來應採用哪個判斷規則或取捨？ | `heuristics/` |
+| 哪種做法應避免，因為它常導致錯誤或不穩？ | `anti-patterns/` |
+| 只是操作順序、命令模板或 capture procedure | `analysis/apk/workflows/` 或 `workflow/<domain>/` |
+| 只是某次 App 的 raw evidence / case transcript | 業務專案 evidence；去敏後才可成為 `feedback/history/` lesson |
+
 ## 與其他層的關係
 
 - `analysis/apk/` 提供 APK 分析的具體操作方法，本層提供背後的原則與 why。
@@ -64,7 +77,7 @@ A lesson can be promoted here when:
 1. It is generalized and sanitized.
 2. It has validation evidence or repeated use.
 3. It affects engineering judgment, not only one tool command.
-4. The original `feedback_history/` entry remains discoverable.
+4. The original `feedback/history/` entry remains discoverable.
 5. `knowledge/indexes/README.md` and metadata are updated if the promoted atom becomes a routing target.
 
 ## Compatibility Notes

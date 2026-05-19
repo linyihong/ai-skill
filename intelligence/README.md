@@ -1,6 +1,8 @@
 # Intelligence
 
-`intelligence/` 負責「沉澱工程智慧與領域知識」。本層不是百科知識（什麼是 Redis、什麼是 CQRS），而是**經過經驗抽象化後的工程智慧**——AI 的「專家腦內模型」。
+`intelligence/` 負責「沉澱可重用決策智慧與領域判斷」。本層不是百科知識（什麼是 Redis、什麼是 CQRS），也不是 raw case archive，而是**經過經驗抽象化後的工程智慧**——AI 的「專家腦內模型」。
+
+判斷原則：如果內容核心是在回答「未來遇到類似情況時如何判斷、取捨、避錯或選路」，通常屬於 `intelligence/`。
 
 ## 與其他層的差異
 
@@ -59,8 +61,9 @@ intelligence/
 ## 不放什麼
 
 - 百科式知識或技術介紹；放到 `knowledge/`。
-- 觀察與拆解的原始方法；放到 `analysis/`。
+- 觀察、拆解與證據取得方法；放到 `analysis/`。
 - 逐步執行流程、review flow 或 task orchestration；放到 `workflow/`。
+- Raw logs、未去敏 traces、專案 findings、host、endpoint、class dump 或一次性 reverse 過程；留在業務專案 evidence，必要時去敏後進 `feedback/history/`。
 - 對話暫存 goal、目前 owner 或 next action；放到 `.agent-goals/`。
 - 可執行 policy 與 close-loop gate；放到 `enforcement/`。
 

@@ -66,7 +66,7 @@
 
 | Atom ID | Lifecycle | File | Summary |
 | --- | --- | --- | --- |
-| `architecture.apk-analysis-pilot` | `candidate` | [`apk-analysis-pilot.md`](../summaries/apk-analysis-pilot.md) | `apk-analysis` 作為第一個 Workflow / Analysis / Intelligence 分離 pilot 的 migration map。它建立新 reference-first 候選目的地，舊 `skills/apk-analysis/` 已不再作為 active entrypoint。 |
+| `architecture.apk-analysis-pilot` | `new-layer-promoted` | [`apk-analysis-pilot.md`](../summaries/apk-analysis-pilot.md) | `apk-analysis` 作為第一個 Workflow / Analysis / Intelligence 分離 pilot 的 migration map。新分層已 promoted：`workflow/apk-analysis/` 是端到端執行入口，`analysis/apk/` 保存可重用觀察、拆解與證據取得方法，`intelligence/engineering/analytical-reasoning/` 保存 reusable decision intelligence。 |
 | `intelligence.apk-highest-leverage-analysis` | `candidate` | [`apk-highest-leverage-analysis.md`](../summaries/apk-highest-leverage-analysis.md) | APK 分析 checkpoint 應先界定未知，再依 time-to-evidence、語意距離、安全性與 validation clarity 選擇最高收益路線。 |
 | `architecture.context-cost-optimization` | `validated` | [`context-cost-optimization.md`](../summaries/context-cost-optimization.md) | Token 成本優化規劃。Phase 1（立即省錢）：Bootstrap 極小化（~800 tokens）、README 拆分、Rule lazy-load、Summary layer。Phase 2（架構升級）：Runtime Context Router、Context Cost Metadata、Skill Index、Context TTL。Phase 3（長期）：Semantic Retrieval、Episodic Memory、Multi-model Routing。 |
 | `workflow.software-delivery` | `validated` | [`development-guidance.md`](../summaries/development-guidance.md) | 將授權 App/API/Embedded/Firmware 觀察轉成開發 guidance、實作模式、控制項、檢查清單。涵蓋 mobile（Android/iOS/Flutter/React Native）、backend API、embedded firmware 的安全控制、實作模式與 release gate。原 `skills/app-development-guidance/` 已刪除，所有內容已遷移至新分層。提供 5 個標準化輸出模板（change-brief / contract / bdd-scenario / implementation-plan / review-report），位於 `workflow/software-delivery/templates/`。另提供 Greenfield 標準化流程（`workflow/greenfield/`）與 Slash Command 模式（`ai-tools/slash-commands.md`）。 |
@@ -87,7 +87,7 @@
 | --- | --- | --- | --- | --- |
 | `graph.analysis-layers` | `analysis/README.md` | `candidate` | 22 | [`analysis-layers.yaml`](../graphs/analysis-layers.yaml) |
 | `graph.analysis-repo-methods` | `analysis/repo/README.md` | `candidate` | 6 | [`analysis-repo-methods.yaml`](../graphs/analysis-repo-methods.yaml) |
-| `graph.apk-analysis-pilot` | `plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md` | `candidate` | 5 | [`apk-analysis-pilot.yaml`](../graphs/apk-analysis-pilot.yaml) |
+| `graph.apk-analysis-pilot` | `plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md` | `new-layer-promoted` | 5 | [`apk-analysis-pilot.yaml`](../graphs/apk-analysis-pilot.yaml) |
 | `graph.apk-highest-leverage-analysis` | `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md` | `candidate` | 4 | [`apk-highest-leverage-analysis.yaml`](../graphs/apk-highest-leverage-analysis.yaml) |
 | `graph.decisions-adr` | `decisions/README.md` | `candidate` | 11 | [`decisions-adr.yaml`](../graphs/decisions-adr.yaml) |
 | `graph.feedback-layers` | `feedback/README.md` | `candidate` | 9 | [`feedback-layers.yaml`](../graphs/feedback-layers.yaml) |
@@ -95,7 +95,7 @@
 | `graph.governance-layers` | `governance/README.md` | `candidate` | 22 | [`governance-layers.yaml`](../graphs/governance-layers.yaml) |
 | `graph.intelligence-agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `candidate` | 20 | [`intelligence-agent-architecture.yaml`](../graphs/intelligence-agent-architecture.yaml) |
 | `graph.intelligence-anti-patterns` | `intelligence/engineering/anti-patterns/generic-repository-overuse.md` | `candidate` | 5 | [`intelligence-anti-patterns.yaml`](../graphs/intelligence-anti-patterns.yaml) |
-| `graph.intelligence-apk-analysis-atoms` | `intelligence/engineering/analytical-reasoning/README.md` | `candidate` | 17 | [`intelligence-apk-analysis-atoms.yaml`](../graphs/intelligence-apk-analysis-atoms.yaml) |
+| `graph.intelligence-apk-analysis-atoms` | `intelligence/engineering/analytical-reasoning/README.md` | `candidate` | 19 | [`intelligence-apk-analysis-atoms.yaml`](../graphs/intelligence-apk-analysis-atoms.yaml) |
 | `graph.intelligence-architecture` | `intelligence/engineering/architecture/modular-monolith-vs-microservices.md` | `candidate` | 5 | [`intelligence-architecture.yaml`](../graphs/intelligence-architecture.yaml) |
 | `graph.intelligence-business` | `intelligence/business/saas-pricing-heuristics.md` | `candidate` | 3 | [`intelligence-business.yaml`](../graphs/intelligence-business.yaml) |
 | `graph.intelligence-app-development-guidance` | `intelligence/engineering/development/README.md` | `candidate` | 8 | [`intelligence-development-guidance.yaml`](../graphs/intelligence-development-guidance.yaml) |

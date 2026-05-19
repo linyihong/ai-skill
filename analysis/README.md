@@ -1,6 +1,8 @@
 # Analysis
 
-`analysis/` 負責「如何觀察與拆解」。本層保存可重用的分析方法、觀察框架、問題拆解方式與 pattern extraction 路線，讓 agent 先知道如何取得證據，再決定是否沉澱成 workflow 或 intelligence。
+`analysis/` 負責「如何觀察、拆解與取得證據」。本層保存可重用的分析方法、觀察框架、問題拆解方式與 pattern extraction 路線，讓 agent 先知道如何取得證據，再決定是否沉澱成 workflow 或 intelligence。
+
+本層不是 raw case archive。單一 App、專案或一次 live run 的 raw logs、pcap、Frida output、class dump、host、endpoint、token、payload fragment 與執行證據，應留在業務專案的受控文件或 evidence 位置；若要進入本庫，必須先去敏並抽象成可重用的方法、lesson 或 decision atom。
 
 ## 目前入口
 
@@ -17,13 +19,27 @@
 - Repo、APK、production issue 或其他系統的分析路線。
 - 將 raw evidence 轉成可重用 pattern 的 extraction 方法。
 - 可被 workflow 引用的分析檢查點與判讀順序。
+- 可重複使用的證據取得與 triage 方法，例如「如何判斷流量走哪一層」。
 
 ## 不放什麼
 
+- Raw logs、未去敏 traces、pcap、Frida output、class dump 或 command history。
+- 某個 App / 專案專屬的 findings、host、endpoint、sample、payload 或 live run 結果。
 - Agent 執行步驟與 orchestration flow；放到 `workflow/`。
 - 工程 trade-off、架構 lesson、anti-pattern 結論；放到 `intelligence/`。
 - 可執行 shared policy；放到 `enforcement/`。
 - 工具專屬路徑、hook 或 UI；放到 `ai-tools/`。
+
+## 快速判斷
+
+新增內容前先問：
+
+| 問題 | 放置位置 |
+| --- | --- |
+| 主要是在回答「如何取得與拆解證據？」 | `analysis/` |
+| 主要是在回答「先做 A 再做 B？」 | `workflow/` |
+| 主要是在回答「未來遇到類似情況如何判斷？」 | `intelligence/` |
+| 主要是在保存「這次實際發生了什麼？」且脫離案例就失效 | 業務專案 evidence / 去敏後的 `feedback/history/` |
 
 ## 誰會參考這裡（Inbound References）
 

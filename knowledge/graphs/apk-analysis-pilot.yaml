@@ -1,26 +1,26 @@
 id: graph.apk-analysis-pilot
 source: plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md
-status: candidate
+status: new-layer-promoted
 summary: >
   描述 apk-analysis pilot migration map 與舊 skill entrypoint、新 analysis/workflow/intelligence
   候選目的地、summary 和 routing registry 的關係。
 edges:
   - type: related_to
     target: analysis/apk/README.md
-    reason: 候選 analysis layer 保存 APK observation、traffic/runtime triage 與 pattern extraction 方法。
-    validation: analysis/apk/README.md 說明仍 reference skills/apk-analysis，不搬移大量內容。
+    reason: Analysis layer 保存 APK observation、traffic/runtime triage、證據取得與 pattern extraction 方法；不保存 raw case archive。
+    validation: analysis/apk/README.md 說明 raw logs、pcap、Frida output、host、endpoint 與一次性證據留在業務專案。
   - type: related_to
     target: workflow/apk-analysis/README.md
-    reason: 候選 workflow layer 保存 tool-neutral APK analysis execution flow。
-    validation: workflow/apk-analysis/README.md 說明 active skill entrypoint 仍在 skills/apk-analysis/SKILL.md。
+    reason: Workflow layer 保存 tool-neutral APK analysis execution flow、任務分解、capture window、文件閉環與交接流程。
+    validation: workflow/apk-analysis/README.md 說明本層是 APK analysis 執行流程主要入口。
   - type: related_to
     target: intelligence/engineering/analytical-reasoning/README.md
-    reason: 候選 intelligence layer 保存 validated engineering judgment 與 promotion map。
-    validation: intelligence/engineering/analytical-reasoning/README.md 說明 lesson history 仍在 skills/apk-analysis/feedback_history/。
+    reason: Intelligence layer 保存 validated engineering judgment、heuristics、signals、failure 與 anti-patterns。
+    validation: intelligence/engineering/analytical-reasoning/README.md 說明 atom 分類規則與 feedback/history promotion 邊界。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
-    reason: Registry 提供 route.skill.apk-analysis record，並保留 old-skill-entrypoint-active gate。
-    validation: registry record 的 primary_source 是 skills/apk-analysis/SKILL.md。
+    reason: Registry 提供 route.workflow.apk-analysis、route.analysis.apk.workflows 與 route.intelligence.apk-analysis.atoms records。
+    validation: registry records 的 primary_source 指向新分層 canonical paths。
   - type: related_to
     target: knowledge/summaries/apk-analysis-pilot.md
     reason: Summary 提供 pilot map 的低成本 preview。
@@ -28,5 +28,5 @@ edges:
 metadata:
   priority: P2
   confidence: medium
-  compatibility_state: old-entrypoint-active
-  last_checked: 2026-05-11
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-19

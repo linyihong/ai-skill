@@ -4,12 +4,12 @@
 | --- | --- |
 | Atom ID | `architecture.apk-analysis-pilot` |
 | Source path | [`../../plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md`](../../plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md) |
-| Lifecycle | `candidate` |
-| Summary | `apk-analysis` 作為第一個 Workflow / Analysis / Intelligence 分離 pilot 的 migration map。它建立新 reference-first 候選目的地，舊 `skills/apk-analysis/` 已不再作為 active entrypoint。 |
+| Lifecycle | `new-layer-promoted` |
+| Summary | `apk-analysis` 作為第一個 Workflow / Analysis / Intelligence 分離 pilot 的 migration map。新分層已 promoted：`workflow/apk-analysis/` 是端到端執行入口，`analysis/apk/` 保存可重用觀察、拆解與證據取得方法，`intelligence/engineering/analytical-reasoning/` 保存 reusable decision intelligence。 |
 | When to read | 規劃 `apk-analysis` 內容抽取、維護舊 skill 與新分層的相容關係，或判斷哪些內容應進 `analysis/apk/`、`workflow/apk-analysis/`、`intelligence/engineering/analytical-reasoning/` 時。 |
-| Do not use for | 不可把新候選路徑當成正式 replacement；pilot 期間不搬移大量內容。 |
-| Validation signal | New reference-first paths 可找到；`knowledge/indexes/README.md` 與 routing registry 均已更新為新分層路徑。 |
-| Last checked | 2026-05-14 |
+| Do not use for | 不可把 `analysis/` 當成 raw case archive；raw logs、pcap、Frida output、class dump、host、endpoint 與一次性 reverse 過程留在業務專案 evidence，去敏抽象後才進 `feedback/history/` 或 promoted atoms。 |
+| Validation signal | New reference-first paths 可找到；`knowledge/indexes/README.md`、routing registry 與 graph 均已更新為新分層路徑。 |
+| Last checked | 2026-05-19 |
 
 ## Heuristics
 
@@ -22,5 +22,5 @@
 
 - 先讀 `workflow/apk-analysis/execution-flow.md`。
 - 需要 migration context 時讀 pilot map。
-- 候選新路徑只作 mapping / promotion target，不覆蓋 skill 行為。
+- `analysis/apk/` 回答如何取得與拆解證據；`workflow/apk-analysis/` 回答如何執行任務順序；`intelligence/engineering/analytical-reasoning/` 回答如何判斷與避錯。
 - 任何 promotion 都要補 metadata、knowledge index、validation 與 old entrypoint compatibility。

@@ -139,8 +139,21 @@ response decode hook:
   decrypted JSON/string
 ```
 
+## 嵌入式 H5（`flutter_inappwebview`）
+
+當業務主體在 WebView、原生只有殼層 API 時，**不要**用本流程步驟 3–4 的全量 Dio/解密 hook 來找「列表 API」。改走：
+
+1. blutter 搜 `*h5_page*`、`jumpToNext`、domain 鍵 `*H5`；靜態還原 query（常見：`tt` token、`uu`/`un` 使用者、`au` API base、`aId` 渠道）。
+2. Frida **minimal**：`Java.perform` hook `android.webkit.WebView.loadUrl`（filter `http` / `tt=`）。
+3. 可選：單點 hook blutter 定位的「H5 page URL assign」offset（`onEnter` 讀 `x0` 字串一次），**勿** hook 全域 `Uri::parse`。
+4. attach **已啟動** PID；錄製 60–120s 內由使用者手動進入 H5。
+5. H5 內 XHR：第二階段對 H5 host 做 MITM 或 `WebViewClient.shouldInterceptRequest`。
+
+詳見 [`traffic-triage.md`](../traffic-triage.md) §混合功能、[`feedback/.../hybrid-native-shell-plus-embedded-h5-frida-routing.md`](../../feedback/history/apk-analysis/common/2026-05-19_101500-hybrid-native-shell-plus-embedded-h5-frida-routing.md)。
+
 ## 注意事項
 
 - 避免 broad hooks on global Dart runtime helpers（如 `LinkedHashMap._set`）
 - 除非使用 short filtered observation window，否則不要 broad hook
 - Dart AOT callsite `BL` addresses 是 navigation hints，不是 function hook entry points
+- 嵌入式 H5：**禁止**啟動期 `Uri::parse` object walk；優先 Java WebView（見上節）

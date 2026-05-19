@@ -4,7 +4,7 @@
 
 ## Scope
 
-本目錄負責：
+本目錄負責「未來遇到類似情況時應如何判斷」：
 
 - Hook 策略選擇啟發式（何時用 Frida、何時靜態分析、何時用 Dart-level hook）
 - API 文件完整性判斷啟發式
@@ -12,11 +12,14 @@
 - 媒體串流鏈完整性判斷啟發式
 - UI 操作穩定性啟發式（何時用 bounded scroll、operation script、API-first replay）
 - UI-to-API 歸因啟發式（前景 package 驗證、feature context 驗證、操作時間窗對齊）
+- 加密模式、padding、參數來源與 hook timing 的決策表
+- Flutter + Java/Kotlin 混合架構的安全層映射啟發式
 
 ## 與其他層的關係
 
 - `analysis/apk/workflows/` 提供操作步驟，本目錄提供「何時該用哪個步驟」的判斷
 - `intelligence/engineering/analytical-reasoning/evidence-first-routing.md` 決定分析路線，本目錄決定路線內的技術選擇
+- 如果內容只是某次失敗症狀與診斷入口，放 `failure/`；如果是可重用的預防規則與決策表，放本目錄。
 
 ## 目前 atoms
 
@@ -33,3 +36,4 @@
 | [`dart-encrypt-package-mode-detection.md`](dart-encrypt-package-mode-detection.md) | Dart `encrypt` 套件 AES 模式檢測 — 如何區分 CBC vs CTR/SIC vs GCM，包含 live proxy test 確認方法 | `feedback/history/apk-analysis/flutter-dart-aot/2026-05-13_232600-dart-encrypt-package-aes-mode-cbc-not-ctr.md` | — |
 | [`frida-spawn-vs-attach-init-timing.md`](frida-spawn-vs-attach-init-timing.md) | Frida spawn vs attach 初始化時機 — 初始化函數必須用 spawn 模式；Frida JS 無 Buffer API | `feedback/history/apk-analysis/common/2026-05-14_073700-frida-spawn-vs-attach-init-timing-no-buffer.md` + `feedback/history/apk-analysis/flutter-dart-aot/2026-05-14_081500-initialize-hook-does-fire-in-spawn.md` | — |
 | [`dart-aot-pool-constant-pp-peep.md`](dart-aot-pool-constant-pp-peep.md) | Dart AOT pool constant (PP_peep) 啟發式 — `string_refs.jsonl` 中 `kind:"PP_peep"` 的條目可直接揭露硬編碼字串常數（如 AES key、secret），無需反組譯 | `feedback/history/apk-analysis/flutter-dart-aot/2026-05-15_094700-dart-aot-pool-constant-pp-peep-hardcoded-key.md` | — |
+| [`flutter-java-hybrid-security-layer-mapping.md`](flutter-java-hybrid-security-layer-mapping.md) | Flutter + Java/Kotlin 混合架構安全層映射 — 分層識別 Dart AOT、Java bridge、local proxy、gateway、request signing 與 response decrypt boundary | `feedback/history/apk-analysis/common/2026-05-18_172200-flutter-java-hybrid-security-architecture-overview.md` | — |

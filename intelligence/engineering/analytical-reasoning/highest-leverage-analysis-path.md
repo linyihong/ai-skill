@@ -1,15 +1,15 @@
 # Highest Leverage APK Analysis Path
 
-本文件把 `analysis` 中已驗證到工作流層的「最高收益路線」整理成 engineering intelligence。它是決策判斷，不取代 `skills/apk-analysis/SKILL.md`、`WORKFLOW.md` 或原始 feedback lesson。
+本文件把 APK analysis 中已驗證到 workflow 層的「最高收益路線」整理成 engineering intelligence。它是決策判斷，不取代 `workflow/apk-analysis/`、`analysis/apk/` 或原始 feedback lesson。
 
 ## Intelligence Status
 
 | 欄位 | 值 |
 | --- | --- |
 | Status | `candidate-intelligence` |
-| Source skill | `skills/apk-analysis/` |
+| Source layer | `workflow/apk-analysis/` + `feedback/history/apk-analysis/` |
 | Source lesson | `feedback/history/apk-analysis/common/2026-05-07_131000-highest-leverage-analysis-path.md` |
-| Current workflow anchor | `skills/apk-analysis/WORKFLOW.md` § `2. 選擇主線` |
+| Current workflow anchor | `workflow/apk-analysis/execution-flow.md` + `analysis/apk/traffic-triage.md` |
 | Runtime route | `route.intelligence.apk-highest-leverage-path` |
 
 ## Decision Rule
@@ -57,4 +57,4 @@
 
 - 不可用本文件跳過授權、去敏、source-of-truth 或 skill dependency reads。
 - 不可把 faster route 當成允許猜測 secrets、繞過 scope 或執行未授權寫入。
-- 不可把本文件當作完整 APK workflow；實作分析仍從 `skills/apk-analysis/SKILL.md` 與 `WORKFLOW.md` 進入。
+- 不可把本文件當作完整 APK workflow；實作分析仍從 `workflow/apk-analysis/execution-flow.md` 進入，並依證據載入 `analysis/apk/` 與相關 intelligence atoms。

@@ -26,6 +26,14 @@ edges:
     target: intelligence/engineering/analytical-reasoning/heuristics/hook-selection.md
     reason: Hook 策略選擇啟發式 — 根據 signal（Flutter/Dart AOT、Java OkHttp、Socket）選擇 hook 策略的決策表。
     validation: atom 定義問題、原則、決策表、不建議的做法、Token 影響。
+  - type: related_to
+    target: intelligence/engineering/analytical-reasoning/heuristics/dart-encrypt-package-mode-detection.md
+    reason: Dart 加密模式判斷啟發式 — 區分 CBC、CTR/SIC、GCM、padding 與短參數 normalization。
+    validation: atom 定義信號、決策表、驗證順序與去敏邊界。
+  - type: related_to
+    target: intelligence/engineering/analytical-reasoning/heuristics/flutter-java-hybrid-security-layer-mapping.md
+    reason: Flutter + Java/Kotlin 混合架構安全層映射 — 分層識別 Dart AOT、Java bridge、local proxy、gateway、request signing 與 response decrypt boundary。
+    validation: atom 定義分層信號、API family mapping、不建議做法與 live readiness 交接。
 
   - type: related_to
     target: intelligence/engineering/analytical-reasoning/anti-patterns/early-hook-instability.md
@@ -87,4 +95,4 @@ metadata:
   priority: P1
   confidence: medium
   compatibility_state: dual-reference
-  last_checked: 2026-05-12
+  last_checked: 2026-05-19

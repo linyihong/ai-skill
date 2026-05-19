@@ -1,6 +1,8 @@
 # APK 分析方法
 
-`analysis/apk/` 是可重用的 APK 觀測與拆解方法的目錄。舊 `skills/apk-analysis/` 已全部遷移至新分層，本目錄為 canonical source。
+`analysis/apk/` 是可重用的 APK 觀測、拆解與證據取得方法的目錄。舊 `skills/apk-analysis/` 已全部遷移至新分層，本目錄為 canonical source。
+
+本目錄不保存 raw case archive。某個 App 的 raw log、pcap、Frida output、class dump、host、endpoint、token、payload fragment 或一次性 reverse 過程，應留在業務專案 evidence；只有去敏並抽象後的觀察方法、triage 方法或可重用 lesson 才能進入本庫。
 
 ## 目錄結構
 
@@ -21,7 +23,7 @@ analysis/apk/
 - 以證據優先選擇路線：pcap、MITM、Java hooks、native hooks、Flutter / Dart AOT、local proxy、media、offline decoding。
 - 從動態捕獲中萃取模式，轉化為可重用的分析方法。
 - 在撰寫 workflow 或工程結論之前，進行分析類別路由。
-- **HOW TO DO** 執行知識：workflow、命令、設定、追蹤、hook 步驟、dump 方法（`workflows/`）。
+- 領域內單一技術的證據取得 procedure：命令、設定、追蹤、hook 步驟、dump 方法（`workflows/`）。這是 analysis-local procedure library，不是端到端 agent orchestration。
 
 本層不負責：
 
