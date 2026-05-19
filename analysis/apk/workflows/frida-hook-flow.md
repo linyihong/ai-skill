@@ -129,6 +129,18 @@ dd if=libapp.so bs=1 skip=<OFFSET> count=<LENGTH> | xxd
 
 將 raw wrapper 與 decrypted payload 對齊成 sanitized fixture。
 
+### Image / Resource Decrypt Fixture Sampling
+
+當目標是圖片、封面、avatar 或其他 resource decrypt，而單一指定樣本已被 memory/disk/image cache 吃掉時，不要把指定樣本當作唯一證據來源。先把它當定位點：確認 UI route、loader branch、path family、hook offset 或 cache key 形狀；真正建立 decrypt fixture 時，放寬 hook 條件到同一資源族群，例如同一 path family 或同一 loader branch。
+
+建議 capture 形狀：
+
+1. 在 loader / cache boundary 記錄 path hash、event type、byte length 與去敏 path family。
+2. 針對 decrypt function 同時抓 encrypted input、key / params、decrypt output；若函式參數是 wrapper object，先用 AOT 確認 field layout，不要直接把參數當 bytes。
+3. 停用 noisy memory-cache dump，除非需要 final payload parity；優先短窗口 attach，讓人工或已驗證 checkpoint 操作列表。
+4. 離線 probe 先用任一乾淨同族樣本驗證算法，再回到原指定樣本做 parity。
+5. 成功條件是 offline output 可由 magic bytes / container length 驗證，而不是只看到 UI 顯示圖片。
+
 ## 成功產出格式
 
 ```text
@@ -137,6 +149,9 @@ request hook:
 
 response decode hook:
   decrypted JSON/string
+
+resource decrypt hook:
+  path hash / event / encrypted input / key or params / decrypted bytes / final magic
 ```
 
 ## 嵌入式 H5（`flutter_inappwebview`）

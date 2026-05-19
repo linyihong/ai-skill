@@ -2,7 +2,7 @@
 
 ### 2026-05-19 - Avoid Single Cached Target For Decrypt Capture
 
-Status: candidate
+Status: validated
 
 #### One-line Summary
 
@@ -78,4 +78,6 @@ Status: candidate
 
 - `feedback/history/apk-analysis/README.md` 更新 `dynamic-capture` 數量。
 - `feedback/extraction/apk-analysis-index.md` 加入本 lesson 的 candidate row。
+- `analysis/apk/workflows/frida-hook-flow.md` 已補入 image/resource decrypt fixture sampling 規則。
+- `workflow/apk-analysis/execution-flow.md` 暫不更新：此條目前屬於 Frida image/decrypt hook 操作細節，workflow 層已有 capture window 與 feedback loop 原則。
 - 已檢查 `enforcement/failure-patterns/skill-local-feedback-bypass.md` 與 `correction-loop-bypass.md`；本輪的 agent failure 已有可用 pattern，不新增重複 failure pattern。
