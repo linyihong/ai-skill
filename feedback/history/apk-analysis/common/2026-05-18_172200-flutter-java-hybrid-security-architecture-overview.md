@@ -141,9 +141,9 @@
 
 #### Promotion Target
 
-`intelligence/engineering/analytical-reasoning/heuristics/flutter-java-hybrid-security-layer-mapping.md`（✅ 已 promote）
+`intelligence/engineering/apk-analysis/heuristics/flutter-java-hybrid-security-layer-mapping.md`（✅ 已 promote）
 
 #### Required Linked Updates
 
 - `workflow/apk-analysis/execution-flow.md`：加入 App 架構分析步驟
-- `intelligence/engineering/analytical-reasoning/heuristics/`：加入 Flutter+Java 混合架構分析啟發式
+- `intelligence/engineering/apk-analysis/heuristics/`：加入 Flutter+Java 混合架構分析啟發式

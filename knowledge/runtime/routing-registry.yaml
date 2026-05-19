@@ -907,11 +907,14 @@ records:
 
   - id: route.intelligence.apk-analysis.atoms
     task_intent: 套用 APK 分析工程智慧（heuristics、anti-patterns、failure、signals）
-    primary_source: intelligence/engineering/analytical-reasoning/README.md
+    primary_source: intelligence/engineering/apk-analysis/README.md
     required_dependencies:
+      - intelligence/engineering/analytical-reasoning/README.md
       - workflow/apk-analysis/execution-flow.md
       - analysis/apk/README.md
     candidate_sources:
+      - intelligence/engineering/apk-analysis/heuristics/README.md
+      - intelligence/engineering/apk-analysis/heuristics/flutter-java-hybrid-security-layer-mapping.md
       - intelligence/engineering/analytical-reasoning/heuristics/README.md
       - intelligence/engineering/analytical-reasoning/heuristics/ui-operation-stability.md
       - intelligence/engineering/analytical-reasoning/heuristics/ui-to-api-attribution.md

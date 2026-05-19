@@ -52,14 +52,14 @@
 - 已建立分層 map：Dart AOT、Java/Kotlin bridge、local proxy / gateway、response decoder。
 - 每個 API family 都有自己的 signing / identity / decrypt boundary 判斷，不共用未驗證假設。
 - 對外部 client 或 SDK 實作只回填 mode、boundary、normalization 與 pass/fail，不回填 raw secret 或 project-only values。
-- 若需要實作 live client，先套用 [`../live-readiness-gates.md`](../live-readiness-gates.md)。
+- 若需要實作 live client，先套用 [`../../analytical-reasoning/live-readiness-gates.md`](../../analytical-reasoning/live-readiness-gates.md)。
 
 ## 相關 atoms
 
-- [`hook-selection.md`](hook-selection.md)
-- [`local-proxy-routing-diagnosis.md`](local-proxy-routing-diagnosis.md)
-- [`dart-encrypt-package-mode-detection.md`](dart-encrypt-package-mode-detection.md)
-- [`../signals/flutter-dart-aot-detection.md`](../signals/flutter-dart-aot-detection.md)
+- [`hook-selection.md`](../../analytical-reasoning/heuristics/hook-selection.md)
+- [`local-proxy-routing-diagnosis.md`](../../analytical-reasoning/heuristics/local-proxy-routing-diagnosis.md)
+- [`dart-encrypt-package-mode-detection.md`](../../analytical-reasoning/heuristics/dart-encrypt-package-mode-detection.md)
+- [`../../analytical-reasoning/signals/flutter-dart-aot-detection.md`](../../analytical-reasoning/signals/flutter-dart-aot-detection.md)
 
 ## Token 影響
 

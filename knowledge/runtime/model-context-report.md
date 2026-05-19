@@ -67,7 +67,7 @@
 | `route.runtime.onboarding` | `runtime/onboarding/README.md` | `summary-first` | Onboarding 文件在需要執行對應 workflow 的完整流程時才讀取。 |
 | `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `summary-first` | 需要執行對應操作流程時才讀取完整 workflow。 |
 | `route.analysis.web` | `analysis/web/README.md` | `summary-first` | Web Scraping analysis 在需要從網頁提取資料時才讀取，不佔用 bootstrap 預算。 |
-| `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/analytical-reasoning/README.md` | `summary-first` | 需要對應決策智慧時才讀取完整 atom。 |
+| `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/apk-analysis/README.md` | `summary-first` | 需要對應決策智慧時才讀取完整 atom。 |
 | `route.validation.ai-decision-contract` | `validation/README.md` | `summary-first` | 需要驗證 AI 決策品質時才讀取完整 scenario 與 rule 定義。 |
 
 ## Compression View

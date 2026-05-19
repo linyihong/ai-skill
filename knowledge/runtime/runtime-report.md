@@ -45,7 +45,7 @@
 | `route.runtime.onboarding` | `runtime/onboarding/README.md` | `specialized` | `summary-first` | 各 quickstart 的步驟可依序執行，且與對應 workflow 的內容一致。 |
 | `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `specialized` | `summary-first` | 各 workflow 有明確步驟與產出格式，可依序執行。 |
 | `route.analysis.web` | `analysis/web/README.md` | `specialized` | `summary-first` | 目標網站已評估（技術棧、JS 需求、anti-bot 保護），工具已選擇（HTTP/Dynamic/Stealth）， 提取策略已設計（selector/adaptive parsing），風險已評估（legal/technical/data quality）。  |
-| `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/analytical-reasoning/README.md` | `specialized` | `summary-first` | 各 atom 有明確決策表或信號表，可反查驗證。 |
+| `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/apk-analysis/README.md` | `specialized` | `summary-first` | 各 atom 有明確決策表或信號表，可反查驗證。 |
 | `route.validation.ai-decision-contract` | `validation/README.md` | `specialized` | `summary-first` | Scenario 的 expected_route 與 actual trace 可比對；forbidden_routes 未被使用。 |
 | `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `small` | `index-only` | 各 atom 有明確原則、症狀表與預防方式，可反查驗證。 |
 | `route.feedback.history` | `feedback/history/README.md` | `small` | `index-only` | Lesson 已寫入 feedback/history/<domain>/ 對應分類，且 feedback/history/<domain>/README.md 已更新索引。 |
@@ -95,7 +95,7 @@
 | `graph.governance-layers` | `governance/README.md` | `candidate` | 22 | [`governance-layers.yaml`](../graphs/governance-layers.yaml) |
 | `graph.intelligence-agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `candidate` | 20 | [`intelligence-agent-architecture.yaml`](../graphs/intelligence-agent-architecture.yaml) |
 | `graph.intelligence-anti-patterns` | `intelligence/engineering/anti-patterns/generic-repository-overuse.md` | `candidate` | 5 | [`intelligence-anti-patterns.yaml`](../graphs/intelligence-anti-patterns.yaml) |
-| `graph.intelligence-apk-analysis-atoms` | `intelligence/engineering/analytical-reasoning/README.md` | `candidate` | 19 | [`intelligence-apk-analysis-atoms.yaml`](../graphs/intelligence-apk-analysis-atoms.yaml) |
+| `graph.intelligence-apk-analysis-atoms` | `intelligence/engineering/apk-analysis/README.md` | `candidate` | 20 | [`intelligence-apk-analysis-atoms.yaml`](../graphs/intelligence-apk-analysis-atoms.yaml) |
 | `graph.intelligence-architecture` | `intelligence/engineering/architecture/modular-monolith-vs-microservices.md` | `candidate` | 5 | [`intelligence-architecture.yaml`](../graphs/intelligence-architecture.yaml) |
 | `graph.intelligence-business` | `intelligence/business/saas-pricing-heuristics.md` | `candidate` | 3 | [`intelligence-business.yaml`](../graphs/intelligence-business.yaml) |
 | `graph.intelligence-app-development-guidance` | `intelligence/engineering/development/README.md` | `candidate` | 8 | [`intelligence-development-guidance.yaml`](../graphs/intelligence-development-guidance.yaml) |

@@ -1,14 +1,18 @@
 id: graph.intelligence-apk-analysis-atoms
-source: intelligence/engineering/analytical-reasoning/README.md
+source: intelligence/engineering/apk-analysis/README.md
 status: candidate
 summary: >
-  連接 APK analysis intelligence atoms（evidence-first-routing、live-readiness-gates、
-  highest-leverage-analysis-path）與相關的 workflow、analysis、skill 層，
+  連接 APK analysis intelligence atoms（domain-specific heuristics、evidence-first-routing、
+  live-readiness-gates、highest-leverage-analysis-path）與相關的 workflow、analysis、skill 層，
   以及 runtime routing。highest-leverage-analysis-path 已有獨立 graph record。
 edges:
   - type: depends_on
+    target: intelligence/engineering/apk-analysis/README.md
+    reason: APK analysis domain intelligence README 提供領域專屬 heuristics 入口與 scope。
+    validation: README 指向 APK-only heuristics 子目錄。
+  - type: depends_on
     target: intelligence/engineering/analytical-reasoning/README.md
-    reason: APK analysis intelligence README 提供目錄索引、scope 與 candidate intelligence areas。
+    reason: 跨領域 analytical-reasoning README 提供共用 atoms、signals、failure 與 anti-patterns 索引。
     validation: README 列出所有 atoms 及其狀態。
   - type: related_to
     target: intelligence/engineering/analytical-reasoning/evidence-first-routing.md
@@ -31,7 +35,7 @@ edges:
     reason: Dart 加密模式判斷啟發式 — 區分 CBC、CTR/SIC、GCM、padding 與短參數 normalization。
     validation: atom 定義信號、決策表、驗證順序與去敏邊界。
   - type: related_to
-    target: intelligence/engineering/analytical-reasoning/heuristics/flutter-java-hybrid-security-layer-mapping.md
+    target: intelligence/engineering/apk-analysis/heuristics/flutter-java-hybrid-security-layer-mapping.md
     reason: Flutter + Java/Kotlin 混合架構安全層映射 — 分層識別 Dart AOT、Java bridge、local proxy、gateway、request signing 與 response decrypt boundary。
     validation: atom 定義分層信號、API family mapping、不建議做法與 live readiness 交接。
 
