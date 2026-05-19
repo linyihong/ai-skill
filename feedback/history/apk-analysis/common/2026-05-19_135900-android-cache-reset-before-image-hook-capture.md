@@ -76,3 +76,4 @@ Android App 的圖片載入常同時有記憶體快取、磁碟 cache、Flutter 
 #### Required Linked Updates
 
 - `feedback/extraction/apk-analysis-index.md` 加入本 lesson 的 candidate row。
+- `analysis/apk/workflows/frida-hook-flow.md` 已補入 image/resource capture 前置 cache reset 流程。

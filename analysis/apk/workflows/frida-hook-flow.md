@@ -129,17 +129,33 @@ dd if=libapp.so bs=1 skip=<OFFSET> count=<LENGTH> | xxd
 
 將 raw wrapper 與 decrypted payload 對齊成 sanitized fixture。
 
+### Image / Resource Cache Reset Before Capture
+
+當 UI 已能顯示圖片、封面、avatar 或富文本圖，但 image loader、cache boundary、decryptor 或 HTTP hook 沒有新事件時，先處理 App 端 cache 遮蔽，不要直接加重 hook。
+
+前置 reset 流程：
+
+1. 先確認目前要進入的 tab / detail / list route，並保留足夠人工操作窗口。
+2. 執行 `adb shell am force-stop <package>` 清掉進程與記憶體 cache。
+3. 用 Frida spawn 或早期 attach，在使用者進入目標畫面前安裝最小 image / decrypt hook。
+4. 若需要清磁碟 cache，在 App 進程內取得 `Application` context，清除 `getCacheDir()`、`getExternalCacheDir()`、`getCodeCacheDir()` 等 cache 目錄內容。
+5. 不要預設使用 `pm clear <package>`；它會清 App data、登入與裝置狀態，除非任務明確需要完整重置且使用者同意。
+6. Capture 後用 manifest、path hash、magic bytes、尺寸或 fixture index 驗證新 artifact，不能只看 UI 已顯示。
+
+若 reset 後仍沒有目標 hash，把問題標成 UI route、hook boundary 或樣本選擇問題；不要宣稱資源不存在，也不要直接擴大到全量 Dart AOT / memory dump。
+
 ### Image / Resource Decrypt Fixture Sampling
 
 當目標是圖片、封面、avatar 或其他 resource decrypt，而單一指定樣本已被 memory/disk/image cache 吃掉時，不要把指定樣本當作唯一證據來源。先把它當定位點：確認 UI route、loader branch、path family、hook offset 或 cache key 形狀；真正建立 decrypt fixture 時，放寬 hook 條件到同一資源族群，例如同一 path family 或同一 loader branch。
 
 建議 capture 形狀：
 
-1. 在 loader / cache boundary 記錄 path hash、event type、byte length 與去敏 path family。
-2. 針對 decrypt function 同時抓 encrypted input、key / params、decrypt output；若函式參數是 wrapper object，先用 AOT 確認 field layout，不要直接把參數當 bytes。
-3. 停用 noisy memory-cache dump，除非需要 final payload parity；優先短窗口 attach，讓人工或已驗證 checkpoint 操作列表。
-4. 離線 probe 先用任一乾淨同族樣本驗證算法，再回到原指定樣本做 parity。
-5. 成功條件是 offline output 可由 magic bytes / container length 驗證，而不是只看到 UI 顯示圖片。
+1. 必要時先執行 cache reset，確認新 capture window 真的會重新走 loader / decrypt path。
+2. 在 loader / cache boundary 記錄 path hash、event type、byte length 與去敏 path family。
+3. 針對 decrypt function 同時抓 encrypted input、key / params、decrypt output；若函式參數是 wrapper object，先用 AOT 確認 field layout，不要直接把參數當 bytes。
+4. 停用 noisy memory-cache dump，除非需要 final payload parity；優先短窗口 attach，讓人工或已驗證 checkpoint 操作列表。
+5. 離線 probe 先用任一乾淨同族樣本驗證算法，再回到原指定樣本做 parity。
+6. 成功條件是 offline output 可由 magic bytes / container length 驗證，而不是只看到 UI 顯示圖片。
 
 ## 成功產出格式
 
@@ -151,7 +167,7 @@ response decode hook:
   decrypted JSON/string
 
 resource decrypt hook:
-  path hash / event / encrypted input / key or params / decrypted bytes / final magic
+  reset signal / path hash / event / encrypted input / key or params / decrypted bytes / final magic
 ```
 
 ## 嵌入式 H5（`flutter_inappwebview`）
