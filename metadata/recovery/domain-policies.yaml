@@ -1,0 +1,117 @@
+schema_version: recovery-domain-policies/v1
+status: candidate
+owner_layer: metadata/recovery
+source_path: metadata/recovery/domain-policies.yaml
+summary: Domain-specific recovery reload policies used when mismatch escalation requires rediscovery and replanning.
+
+policies:
+  - domain: apk-analysis
+    title: APK Analysis Recovery Policy
+    applies_when:
+      - authorized APK analysis workflow is active
+      - UI, API, Frida, MITM, pcap, decompile, or fixture evidence conflicts
+      - capture automation reaches an external package, wrong in-app screen, or stale feature checkpoint
+      - user reports that the agent missed an APK workflow or analysis source
+    trigger_classes:
+      - repeated_failure
+      - user_contradiction
+      - evidence_conflict
+      - source_of_truth_miss
+      - automation_drift
+      - assumption_drift
+    required_reload_set:
+      - id: workflow
+        source: workflow/apk-analysis/execution-flow.md
+        reason: Defines authorized APK analysis execution order, package/feature checkpoint rules, and capture windows.
+      - id: artifact-gates
+        source: workflow/apk-analysis/artifact-gates.md
+        reason: Defines closure gates for APK evidence and deliverables.
+      - id: traffic-triage
+        source: analysis/apk/traffic-triage.md
+        reason: Rebuilds network attribution before treating requests as feature-triggered.
+      - id: frida-flow
+        source: analysis/apk/workflows/frida-hook-flow.md
+        reason: Reloads hook deployment, cache reset, and fixture sampling rules.
+      - id: feedback-index
+        source: feedback/history/apk-analysis/README.md
+        reason: Checks whether a recent APK failure lesson already changes the expected route.
+      - id: analytical-reasoning
+        source: intelligence/engineering/analytical-reasoning/README.md
+        reason: Reloads reusable APK reasoning heuristics and failure signals.
+    rebuild_graph:
+      required_fields:
+        - analysis_goal
+        - target_package_or_scope
+        - evidence_window
+        - selected_workflow
+        - hook_or_capture_strategy
+        - validation_checkpoint
+        - sanitized_output_boundary
+    forbidden_behaviors:
+      - continue capturing after foreground package is external without marking the window invalid
+      - treat Frida hits as proof of UI attribution without package and feature-context validation
+      - merge reset/session recovery and feature attribution into one long window when timing drift is the failure
+      - store raw tokens, cookies, private hosts, device identifiers, signatures, or user data in reusable guidance
+    validation:
+      - Required reload set is read or marked not_applicable/source_missing.
+      - Rebuilt graph names the next checkpoint and expected evidence type.
+      - Capture evidence is classified as startup/preload, session-recovery, navigation, feature-triggered, cache-hydration, or background/ambiguous.
+      - Sanitization boundary is stated before documenting reusable lessons.
+
+  - domain: software-delivery
+    title: Software Delivery Recovery Policy
+    applies_when:
+      - implementation, contract, BDD, tests, or product brief conflict
+      - user says the agent skipped planning, owner docs, architecture, or executable specs
+      - behavior change is being patched without updating linked durable docs
+      - validation passes locally but conflicts with workflow or contract gates
+    trigger_classes:
+      - repeated_failure
+      - user_contradiction
+      - evidence_conflict
+      - source_of_truth_miss
+      - automation_drift
+      - assumption_drift
+    required_reload_set:
+      - id: workflow
+        source: workflow/software-delivery/execution-flow.md
+        reason: Defines change intake, docs-first BDD closure, and same-session closure.
+      - id: artifact-gates
+        source: workflow/software-delivery/artifact-gates.md
+        reason: Defines deliverable gates before completion.
+      - id: development-process
+        source: workflow/software-delivery/development-process.md
+        reason: Defines architecture/API/error/test contracts and planning expectations.
+      - id: implementation-plan-template
+        source: workflow/software-delivery/templates/implementation-plan-template.md
+        reason: Provides architecture compatibility and execution planning structure.
+      - id: linked-updates
+        source: enforcement/linked-updates.md
+        reason: Reloads required durable document updates for changed surfaces.
+      - id: dependency-reading
+        source: enforcement/dependency-reading.md
+        reason: Reloads source-of-truth and plan preflight obligations.
+    rebuild_graph:
+      required_fields:
+        - change_type
+        - owner_contract
+        - behavior_spec_or_bdd
+        - implementation_surface
+        - validation_command_or_manual_gate
+        - linked_updates
+        - rollback_or_migration_boundary
+    forbidden_behaviors:
+      - patch code after contract or BDD conflict without reloading owner docs
+      - claim completion from green tests while durable docs are stale
+      - treat implementation as source-of-truth when product brief, contract, or workflow says otherwise
+      - preserve compatibility with unshipped in-branch changes by adding shims instead of replacing the branch-local design
+    validation:
+      - Required reload set is read or marked not_applicable/source_missing.
+      - New graph identifies the owner contract and the executable or manual validation gate.
+      - Linked durable docs are updated in the same batch or an explicit scoped deferral is recorded.
+      - Tests, lints, or manual validation are run or the blocker is reported.
+
+selection_rules:
+  - If multiple policies match, load all matching required_reload_set entries before replanning.
+  - If no domain policy matches, use runtime recovery strategy.mismatch_escalation_recovery and open a metadata policy gap for the domain.
+  - Domain policies supplement enforcement/escalation-policy.md; they do not replace trigger classification or recovery output schema.

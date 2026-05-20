@@ -1,0 +1,73 @@
+schema_version: recovery-escalation-levels/v1
+status: candidate
+owner_layer: metadata/recovery
+source_path: metadata/recovery/escalation-levels.yaml
+summary: Domain recovery escalation levels and minimum reload requirements used after mismatch escalation triggers.
+
+levels:
+  - level: L1
+    name: simple-retry
+    trigger_summary: Single transient tool, command, or network failure without evidence conflict.
+    default_action: retry_once
+    minimum_reload_set: []
+    execution_allowed_after:
+      - retry result is captured
+      - no repeated-failure or source-of-truth-miss signal appears
+
+  - level: L2
+    name: local-workflow-reload
+    trigger_summary: Local workflow, checklist, or command assumption may be stale.
+    default_action: reload_current_workflow
+    minimum_reload_set:
+      - current workflow primary source
+      - artifact gates for the current workflow when present
+    execution_allowed_after:
+      - workflow source is reread or marked source_missing
+      - revised next action matches workflow gates
+
+  - level: L3
+    name: source-of-truth-reload
+    trigger_summary: Repeated failure or assumption drift indicates insufficient source context.
+    default_action: reload_owner_docs_and_primary_sources
+    minimum_reload_set:
+      - current workflow primary source
+      - owner docs or contracts for the affected surface
+      - validation source or executable evidence for the affected behavior
+    execution_allowed_after:
+      - old assumption is suspended
+      - required reload set is read or explicitly marked not_applicable/source_missing
+      - validation checkpoint is named
+
+  - level: L4
+    name: execution-graph-rebuild
+    trigger_summary: User contradiction, evidence conflict, source-of-truth miss, or automation drift.
+    default_action: enter_recovery_and_rebuild_execution_graph
+    minimum_reload_set:
+      - selected domain policy from metadata/recovery/domain-policies.yaml
+      - workflow primary source
+      - owner docs or contracts
+      - artifact gates or validation scenario
+      - runtime recovery procedure when execution graph is being rebuilt
+    execution_allowed_after:
+      - recovery output schema is complete
+      - new execution graph contains goal, route, dependencies, checkpoint, and validation
+      - forbidden behaviors from the selected domain policy are avoided
+
+  - level: L5
+    name: assumption-collapse-rediscovery
+    trigger_summary: Task framing, route selection, or source-of-truth ownership may be wrong.
+    default_action: return_to_discovery
+    minimum_reload_set:
+      - routing registry entry or workflow routing source
+      - all plausible workflow primary sources
+      - domain policy candidates
+      - user goal or plan source
+    execution_allowed_after:
+      - task framing is restated
+      - rejected routes and reasons are recorded
+      - user confirmation is requested when route ambiguity remains
+
+validation:
+  - Levels L3-L5 require old_assumption and contradicting_evidence.
+  - Levels L4-L5 require a rebuilt execution graph before implementation resumes.
+  - Required reload items may be marked source_missing only after the expected path or owner source was checked.

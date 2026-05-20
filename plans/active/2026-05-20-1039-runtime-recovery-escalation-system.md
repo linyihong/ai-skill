@@ -356,6 +356,8 @@ Phase 3 result:
 
 ### Phase 4 — Metadata Recovery Policy
 
+Status: completed 2026-05-20.
+
 Goal: 讓不同 domain 可指定 required reload set。
 
 Candidate files:
@@ -366,14 +368,34 @@ Candidate files:
 
 Tasks:
 
-- [ ] 建立 recovery metadata 目錄與 schema。
-- [ ] 加入 `apk-analysis` policy。
-- [ ] 加入 `software-delivery` policy：contract / implementation / test conflict 時 reload owner contract + BDD + executable feature。
-- [ ] 決定 metadata 是否需編入 `runtime.db` 或只由 routing / validation 使用。
+- [x] 建立 recovery metadata 目錄與 schema。
+- [x] 加入 `apk-analysis` policy。
+- [x] 加入 `software-delivery` policy：contract / implementation / test conflict 時 reload owner contract + BDD + executable feature。
+- [x] 決定 metadata 是否需編入 `runtime.db` 或只由 routing / validation 使用。
 
 Exit criteria:
 
-- [ ] Domain-specific recovery 不再硬寫在單一 enforcement rule。
+- [x] Domain-specific recovery 不再硬寫在單一 enforcement rule。
+
+#### Phase 4 Architecture Compatibility Preflight
+
+| 欄位 | 結果 |
+| --- | --- |
+| Trigger | 開始執行 Phase 4 — Metadata Recovery Policy |
+| Checked sources | `plans/README.md`、`metadata/README.md`、`metadata/schema.md`、`runtime/README.md`、`knowledge/runtime/routing-registry.yaml`、`workflow/apk-analysis/execution-flow.md`、`workflow/software-delivery/execution-flow.md` |
+| Conflicts | `metadata/recovery/` 尚不存在；Phase 3 已把通用 recovery procedure 編入 `runtime.db`，Phase 4 不應再新增 runtime table。 |
+| Decision | proceed with metadata-only recovery policy and expose it through routing / validation |
+| Validation | YAML parse、routing registry validation via knowledge runtime refresh、lints、diff review |
+
+Phase 4 result:
+
+| Area | Result |
+| --- | --- |
+| Metadata schema | `metadata/recovery/README.md` defines policy schema, runtime boundary, and file roles. |
+| Escalation levels | `metadata/recovery/escalation-levels.yaml` defines L1-L5 metadata and minimum reload sets. |
+| Domain policies | `metadata/recovery/domain-policies.yaml` defines `apk-analysis` and `software-delivery` recovery reload policies. |
+| Routing | `knowledge/runtime/routing-registry.yaml` links `route.runtime.recovery` to metadata recovery policies. |
+| Runtime decision | Metadata stays out of `runtime.db` for Phase 4; runtime enforcement remains in `runtime/compiler/embedded_data.rb`. |
 
 ### Phase 5 — Workflow Integration
 

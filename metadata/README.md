@@ -9,6 +9,7 @@
 - [`ranking/`](ranking/README.md)：用 priority、status、confidence、context cost 與 depends/conflicts 排定讀取順序。
 - [`confidence/`](confidence/README.md)：定義 low / medium / high 信心與 lifecycle state 的關係。
 - [`compatibility/`](compatibility/README.md)：記錄 old entrypoint 與 new layer path 的相容狀態。
+- [`recovery/`](recovery/README.md)：定義 mismatch escalation 後的 domain-specific reload set、L1-L5 metadata 與 recovery policy。
 
 ## 放什麼
 
@@ -17,6 +18,7 @@
 - Compatibility、model suitability、depends、related 與 conflicts metadata。
 - **Enforcement Rule metadata**：`metadata/rules/enforcement-rule-spec.md` 定義 spec，`metadata/rules/*.yaml` 為各 rule 的 metadata 實例。
 - Runtime loading、promotion、cleanup 與 graph construction 所需的控制資料。
+- Recovery escalation 後的 domain-specific source-of-truth reload policy。
 - SQLite / FTS runtime index 的欄位來源，例如 `source_path`、`tags`、`priority`、`confidence`、`context_cost`、`when_to_read` 與 `validation`。
 
 ## 不放什麼
