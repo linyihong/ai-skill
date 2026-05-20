@@ -415,6 +415,35 @@ records:
       compression_level: summary-first
       reason: routing decision 可先用 registry、index、summary；修改 source 時再升級。
 
+  - id: route.governance.routing-signal
+    task_intent: 防止 routing signal 漂移，確認 task intent、primary source、negative signal 與 multi-route disambiguation
+    primary_source: governance/ai-runtime-governance/routing-signal-governance.md
+    required_dependencies:
+      - intelligence/engineering/agent-architecture/task-routing.md
+      - governance/lifecycle/routing-philosophy.md
+    candidate_sources:
+      - workflow/workflow-routing.md
+      - knowledge/indexes/README.md
+      - runtime/router/activation-table.md
+      - validation/
+    source_of_truth_gate: governance-design-active
+    ranking_reason: routing-signal-governance 將 task-routing intelligence 轉譯為 routing decision gate，避免最近檔案、相似路徑或第一匹配覆蓋 registry primary_source。
+    validation_signal: Task intent 已先於 path signal 確認；primary_source、negative signals、multi-route disambiguation 與 route validation signal 已檢查。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 900
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: candidate
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: 多數路由疑義先讀治理 gate 與 source intelligence；只有修改 workflow/routing surface 時再展開 registry 和 activation table。
+
   - id: route.metadata.knowledge-atom-schema
     task_intent: 設計或評估 Knowledge Atom metadata
     primary_source: metadata/schema.md

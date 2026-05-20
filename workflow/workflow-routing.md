@@ -7,11 +7,12 @@
 | 文件 | 角色 |
 | --- | --- |
 | [`governance/lifecycle/routing-philosophy.md`](../governance/lifecycle/routing-philosophy.md) | **Normative**：task intent → `knowledge/indexes` → `routing-registry` → primary source |
+| [`governance/ai-runtime-governance/routing-signal-governance.md`](../governance/ai-runtime-governance/routing-signal-governance.md) | **Gate**：避免最近檔案、相似路徑或第一匹配覆蓋 primary source |
 | [`enforcement/dependency-reading.md`](../enforcement/dependency-reading.md) | 查到 route 後 **必須** 讀 `primary_source` |
 | [`knowledge/indexes/README.md`](../knowledge/indexes/README.md) | 人類可讀 task intent 表（含 development guidance 列） |
 | [`runtime/router/activation-table.md`](../runtime/router/activation-table.md) **#27** | Workflow 編排通用閘門；具體觸發見 registry `activation_triggers` |
 
-**強制規則**：命中任一 `route.workflow.*` 或 activation **#27** 時，**不得**只載入單一 intelligence 規則就寫碼；**必須**先完成 [`routing-philosophy.md`](../governance/lifecycle/routing-philosophy.md) Step 1–5，比對 registry `activation_triggers`，再依本檔 §選路表／§歧義鎖定單一 `route.workflow.*`。
+**強制規則**：命中任一 `route.workflow.*` 或 activation **#27** 時，**不得**只載入單一 intelligence 規則就寫碼；**必須**先完成 [`routing-philosophy.md`](../governance/lifecycle/routing-philosophy.md) Step 1–5，套用 [`routing-signal-governance.md`](../governance/ai-runtime-governance/routing-signal-governance.md) 的 primary source / negative signal / multi-route gate，比對 registry `activation_triggers`，再依本檔 §選路表／§歧義鎖定單一 `route.workflow.*`。
 
 ## Discovery 流程（與 governance 對齊）
 
@@ -19,9 +20,10 @@
 0. Activation #27 或 registry `route.workflow.*.activation_triggers` 命中
 1. routing-philosophy Step 1：分類 task intent
 2. routing-philosophy Step 2：knowledge/indexes → routing-registry.yaml
-3. 本檔 §選路表：在 route.workflow.* 中選 workflow（非單一 repo）
-4. 載入選中 workflow 的 README.md → execution-flow.md
-5. 若該 route 含 project_overlays：進入 workflow 後載入 <PROJECT_ROOT> 專案 overlay
+3. routing-signal governance：檢查 primary_source、negative signal、multi-route disambiguation
+4. 本檔 §選路表：在 route.workflow.* 中選 workflow（非單一 repo）
+5. 載入選中 workflow 的 README.md → execution-flow.md
+6. 若該 route 含 project_overlays：進入 workflow 後載入 <PROJECT_ROOT> 專案 overlay
 ```
 
 **Catalog 索引（machine-readable）**：[`knowledge/runtime/routing-registry.yaml`](../knowledge/runtime/routing-registry.yaml) 內所有 `id: route.workflow.*`。
