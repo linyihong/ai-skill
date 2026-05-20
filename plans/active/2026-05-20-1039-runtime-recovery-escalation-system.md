@@ -227,6 +227,8 @@ Exit criteria:
 
 **Linked update completed**: `runtime/README.md` now marks embedded-only runtime domains as sourced from `runtime/compiler/embedded_data.rb` rather than broken standalone YAML links.
 
+**Compiler alignment update**: before Phase 2, `runtime/compiler/compiler-engine.rb` was aligned to read existing runtime YAML sources first and fall back to `runtime/compiler/embedded_data.rb` only when a YAML source is absent. This is required because `runtime/router/activation-rules.yaml` had gained `enforcement.escalation-policy`, but the compiled `runtime.db` was still reading the stale embedded activation rule set.
+
 ### Phase 1 — Enforcement Policy
 
 Status: completed 2026-05-20.
@@ -281,6 +283,7 @@ Tasks:
 - [ ] 在 execution stage 的 guard chain 中插入 `mismatch_escalation`。
 - [ ] 定義 action：`warn`、`suspend_execution`、`enter_recovery`、`rediscovery_required`。
 - [ ] 若 runtime source YAML 已由 compiler 管理，將 source 與 generated `runtime.db` 更新納入同一工作單。
+- [ ] 若新增獨立 guard YAML（例如 `runtime/guards/mismatch-escalation.yaml`），同步更新 compiler loader / runtime table mapping；否則把 guard 定義放入已編譯的 guard source。
 
 Exit criteria:
 

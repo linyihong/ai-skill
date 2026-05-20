@@ -19,6 +19,7 @@
 require 'yaml'
 require 'fileutils'
 require 'time'
+require 'date'
 require 'optparse'
 require 'open3'
 require 'json'
@@ -27,8 +28,28 @@ require_relative 'embedded_data'
 COMPILER_VERSION = '1.1.0'
 GENERATED_DIR = File.join(File.dirname(__FILE__), '..', 'generated')
 DEFAULT_DB_PATH = File.join(File.dirname(__FILE__), '..', 'runtime.db')
+ROOT_DIR = File.expand_path('../..', __dir__)
 
 @mapping = nil
+
+def deep_symbolize(value)
+  case value
+  when Hash
+    value.each_with_object({}) { |(k, v), h| h[k.to_s.to_sym] = deep_symbolize(v) }
+  when Array
+    value.map { |item| deep_symbolize(item) }
+  else
+    value
+  end
+end
+
+def runtime_config(relative_path, embedded_data)
+  path = File.join(ROOT_DIR, relative_path)
+  return embedded_data unless File.exist?(path)
+
+  data = YAML.safe_load(File.read(path), permitted_classes: [Date, Time, Symbol], aliases: true)
+  data ? deep_symbolize(data) : embedded_data
+end
 
 def load_mapping
   rules = EmbeddedRuntimeData::COMPILER_COMPILER_RULES
@@ -382,7 +403,7 @@ def build_runtime_db(db_path)
   puts "    ✓ #{tx[:transaction_rules]&.length || 0} rules, #{tx[:transaction_templates]&.length || 0} templates"
 
   # 5. Activation Rules
-  ar = EmbeddedRuntimeData::ROUTER_ACTIVATION_RULES
+  ar = runtime_config('runtime/router/activation-rules.yaml', EmbeddedRuntimeData::ROUTER_ACTIVATION_RULES)
   (ar[:core_bootstrap] || []).each_with_index { |rid, i| sqlite_exec(db_path, "INSERT INTO core_bootstrap_rules (rule_id, ordinal) VALUES (#{sqe(rid)}, #{i});") }
   (ar[:rules] || []).each do |r|
     ac = r[:activation] || {}; ld = r[:load] || {}
@@ -469,7 +490,7 @@ def build_runtime_db(db_path)
   puts "    ✓ #{bg[:gates]&.length || 0} blocking gates"
 
   # 8f. Circuit Breaker
-  cb = EmbeddedRuntimeData::GUARDS_CIRCUIT_BREAKER
+  cb = runtime_config('runtime/guards/circuit-breaker.yaml', EmbeddedRuntimeData::GUARDS_CIRCUIT_BREAKER)
   guard_keys = %i[recursive_depth tool_calls context_growth hallucination_risk conflict_rules]
   guard_keys.each do |key|
     next unless cb[key]
@@ -480,7 +501,7 @@ def build_runtime_db(db_path)
   puts "    ✓ circuit breaker guards"
 
   # 8g. Context Pollution
-  cp = EmbeddedRuntimeData::GUARDS_CONTEXT_POLLUTION
+  cp = runtime_config('runtime/guards/context-pollution.yaml', EmbeddedRuntimeData::GUARDS_CONTEXT_POLLUTION)
   (cp[:signals] || []).each do |s|
     name = s[:name] || s[:id] || 'default'
     sqlite_exec(db_path, "INSERT OR REPLACE INTO context_pollution (id, signal_name, content) VALUES ((SELECT id FROM context_pollution WHERE signal_name = #{sqe(name)}), #{sqe(name)}, #{jsn(s)});")
@@ -552,7 +573,7 @@ def build_runtime_db(db_path)
   sqlite_exec(db_path, "INSERT OR REPLACE INTO pipeline_context_flow (id, level, content) VALUES ((SELECT id FROM pipeline_context_flow WHERE level = '__config__'), '__config__', #{jsn(cf)});")
   puts "    ✓ pipeline context flow"
   # guard-chain.yaml → guard_chain
-  gc = EmbeddedRuntimeData::PIPELINE_GUARD_CHAIN
+  gc = runtime_config('runtime/pipeline/guard-chain.yaml', EmbeddedRuntimeData::PIPELINE_GUARD_CHAIN)
   (gc[:stages] || []).each do |s|
     name = s[:name] || s[:stage] || 'default'
     sqlite_exec(db_path, "INSERT OR REPLACE INTO guard_chain (id, stage, content) VALUES ((SELECT id FROM guard_chain WHERE stage = #{sqe(name)}), #{sqe(name)}, #{jsn(s)});")
@@ -655,7 +676,7 @@ def build_runtime_db(db_path)
   puts "    ✓ #{ps[:levels]&.length || 0} priority levels"
 
   # 8v. Activation Rules Mirror → activation_rules_mirror
-  ar = EmbeddedRuntimeData::ROUTER_ACTIVATION_RULES
+  ar = runtime_config('runtime/router/activation-rules.yaml', EmbeddedRuntimeData::ROUTER_ACTIVATION_RULES)
   (ar[:rules] || []).each do |r|
     name = r[:rule_id] || r[:name] || 'default'
     sqlite_exec(db_path, "INSERT OR REPLACE INTO activation_rules_mirror (id, rule_id, content) VALUES ((SELECT id FROM activation_rules_mirror WHERE rule_id = #{sqe(name)}), #{sqe(name)}, #{jsn(r)});")
