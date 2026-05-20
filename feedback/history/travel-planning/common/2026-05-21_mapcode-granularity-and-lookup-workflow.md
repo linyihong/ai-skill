@@ -1,10 +1,10 @@
-> 遵守 [共用規則索引](../../../../enforcement/README.md) 與 [feedback-lessons](../../../../enforcement/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+> 遵守 [共用規則索引](../../../../enforcement/README.md)、[dependency-reading](../../../../enforcement/dependency-reading.md)、[neutral-language](../../../../enforcement/neutral-language.md)、[goal-action-validation](../../../../enforcement/goal-action-validation.md) 與 [feedback-lessons](../../../feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 
 # Mapcode Granularity and Lookup Workflow
 
 ### 2026-05-21 - 日本自駕行程 mapcode 粒度規則與查詢工具鏈
 
-Status: active
+Status: validated
 
 #### One-line Summary
 
@@ -95,6 +95,47 @@ URL: https://www.mapion.co.jp/phonebook/[カテゴリ]/[地域コード]/[施設
 - ❌ 同日に A→B（25km 離れ）で B の mapcode を記載しない
 - ❌ mapcode が見つからないとき、表に行を追加せず無言でスキップする
 - ❌ 路肩停車ポイントに mapcode がないからといって記載を省略する（バス停代替で対処）
+
+#### Agent Action
+
+- 自駕行程の mapcode 表を作成・レビューするとき、**必ず**各日の停車ポイントを個別確認し、同一景點内で 2km+ 離れた sub-spot がないか検査する
+- mapcode が見つからない場合も**必ず**表に行を追加し、代替コードまたは「要確認（Tel XXXX）」を記載する
+- 「大景點 1 行でまとめた」状態を最終成果物と見なさない
+
+#### Goal / Action / Validation
+
+- Goal: 全ての自駕停車ポイントがカーナビで個別に入力可能な状態にする
+- Action: 粒度ルール（2km+ → 分割）を適用し、工具鏈で各 mapcode を取得する
+- Validation or reference source: 行程表の mapcode 表で「要確認」がゼロになること、または代替コード＋注釈が記載されていること
+
+#### Applies When
+
+- 日本の自駕行程で mapcode 表を作成・更新するとき
+- 渓流・海岸線・高原など沿線タイプの観光地（複数の停車点がある景點）を行程に含むとき
+- 同日に 2か所以上の異なる目的地を設定するとき
+
+#### Does Not Apply When
+
+- 徒歩・公共交通のみの行程（カーナビ不要）
+- mapcode ではなく Google Maps や住所での案内が求められているとき
+
+#### Validation
+
+- 行程表の全停車ポイントに mapcode 行があること
+- 沿線スポット（奧入瀨溪流等）が複数行に分割されていること
+- 代替コード使用時は注釈（「〇〇バス停付近」等）が記載されていること
+
+#### Promotion Target
+
+- `workflow/travel-planning/execution-flow.md`（Step 4 Exact Location Verification に mapcode 粒度ルールを追記）
+- `analysis/travel/sources-and-tools.md`（mapcode 查詢工具鏈を追記）
+
+#### Required Linked Updates
+
+- `workflow/travel-planning/execution-flow.md`：Step 4 に「沿線スポットは停車点ごとに独立 mapcode 行を設ける」ルールを追加
+- `analysis/travel/sources-and-tools.md`：mapcode 查詢の工具鏈（MapFan spots → Mapion 電話帳 → 旅行ブログ → バス停代替）を追記
+- `knowledge/summaries/travel-planning.md`：mapcode 粒度ルールの一行摘要を追記
+- 已依 [reusable-guidance-boundary.md](../../../../enforcement/reusable-guidance-boundary.md) 確認：具體旅館名稱、地名已抽象化，僅保留通用規則與工具鏈
 
 #### Related
 

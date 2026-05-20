@@ -1,10 +1,10 @@
-> 遵守 [共用規則索引](../../../../enforcement/README.md) 與 [feedback-lessons](../../../../enforcement/feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
+> 遵守 [共用規則索引](../../../../enforcement/README.md)、[dependency-reading](../../../../enforcement/dependency-reading.md)、[neutral-language](../../../../enforcement/neutral-language.md)、[goal-action-validation](../../../../enforcement/goal-action-validation.md) 與 [feedback-lessons](../../../feedback-lessons.md)；本檔只寫本條 lesson，不重複貼上共用政策全文。
 
 # Hotel Availability Check Workflow
 
 ### 2026-05-19 - 查詢飯店空房的工具優先順序與限制
 
-Status: active
+Status: validated
 
 #### One-line Summary
 
@@ -72,6 +72,45 @@ mcp__Claude_in_Chrome__tabs_context_mcp → createIfEmpty: true
 - ❌ 用 WebFetch 直接抓訂房系統 URL，誤以為能查到空位
 - ❌ 未告知使用者查詢限制，讓使用者誤以為已確認空房
 - ❌ Chrome extension 連線失敗後未切換至降級路線，直接放棄
+
+#### Agent Action
+
+- 先執行 `mcp__Claude_in_Chrome__tabs_context_mcp` 確認 Chrome 連線狀態，**再**選擇工具路徑
+- 降級路線結束後，**必須**明確告知使用者「無法取得即時空位」及替代聯絡方式
+- 不得沉默跳過空位查詢，也不得只提供訂房平台連結而不說明限制
+
+#### Goal / Action / Validation
+
+- Goal: 在 Chrome 可用時取得即時空位；不可用時提供靜態資訊 + 明確告知限制
+- Action: 依三步驟工作流程執行（確認連線 → Chrome 操作 或 降級路線）
+- Validation or reference source: 使用者能根據回報的資訊（即時空位 或 電話/連結）自行完成預訂決策
+
+#### Applies When
+
+- 使用者要求查詢特定住宿的空位或可訂性
+- 任務涉及日本訂房平台（Booking.com、じゃらん、楽天、Agoda、一休、Trip.com）或旅館官方預約系統
+
+#### Does Not Apply When
+
+- 使用者只要求旅館資訊（地址、設施、價格範圍），不要求確認空位
+- 任務是規劃行程候選清單，尚未到確認空位階段
+
+#### Validation
+
+- 執行 Step 1（確認 Chrome 連線）後，工具路徑是否與連線狀態一致
+- 降級路線結束後，是否已回報限制說明與替代聯絡方式
+
+#### Promotion Target
+
+- `workflow/travel-planning/execution-flow.md`（Step 8 Lodging Planning 工具選擇段）
+- `analysis/travel/sources-and-tools.md`（訂房平台工具欄位）
+
+#### Required Linked Updates
+
+- `workflow/travel-planning/execution-flow.md`：在 Lodging Planning 步驟加入 Chrome-first / WebFetch-降級的工具選擇規則
+- `analysis/travel/sources-and-tools.md`：在訂房平台來源行補充「JS 動態系統限制，WebFetch 僅取靜態資訊」
+- `knowledge/summaries/travel-planning.md`：確認是否需補充工具限制摘要（若未提及則新增）
+- 已依 [reusable-guidance-boundary.md](../../../../enforcement/reusable-guidance-boundary.md) 確認：具體旅館名稱與旅行日期已從 Evidence 移除，僅保留通用規則
 
 #### Related
 

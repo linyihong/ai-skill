@@ -40,19 +40,29 @@ Step 3a: 確認目標文件語言 ── 寫入前先檢查目標文件的語言
 Step 4: 寫入 Feedback Lesson ── 寫入 feedback/history/<domain>/
     │                           (feedback-lessons.md §模板)
     ▼
-Step 5: 更新目標層 ────────── 同步更新 intelligence / workflow / analysis / enforcement / runtime
+Step 5: 更新目標層 ────────── 【強制】同步更新 intelligence / workflow / analysis / enforcement / runtime
+    │   ⛔ 跳過此步驟即構成閉環缺口，不得宣稱知識更新完成
     │                           (promotion/README.md §Promotion Checklist)
     ▼
-Step 6: 執行 Intelligence Extraction ─ 若需要提取 intelligence atoms
+Step 6: Intelligence Extraction 判斷 ─ 【強制判斷，條件執行】
+    │   必須明確回答「是/否」；不得沉默跳過
+    │   是 → 執行 extraction pipeline
+    │   否 → 在 commit message 或 lesson 的 Required Linked Updates 寫明「Step 6 不適用，原因：___」
     │                           (governance/lifecycle/intelligence-extraction-pipeline.md)
     ▼
-Step 7: 檢查 Failure Learning ── 是否需要建立 failure pattern？
+Step 7: Failure Learning 判斷 ── 【強制判斷，條件執行】
+    │   必須明確回答「是/否」；不得沉默跳過
+    │   是 → 執行 Failure Learning Loop
+    │   否 → 在 commit message 或 lesson 的 Required Linked Updates 寫明「Step 7 不適用，原因：___」
     │                           (failure-learning-system.md)
     ▼
-Step 8: 執行 Linked Updates ── 同步更新所有相關文件
+Step 8: 執行 Linked Updates ── 【強制】同步更新所有相關文件
+    │   ⛔ lesson 的 Required Linked Updates 欄位必須已填寫，才能進入本步驟
+    │   ⛔ 跳過此步驟即構成閉環缺口，不得進行 commit
     │                           (linked-updates.md)
     ▼
-Step 9: 更新 Runtime Surfaces ── 更新 registry / summaries / graphs / reports
+Step 9: 更新 Runtime Surfaces ── 【強制】更新 registry / summaries / graphs / reports
+    │   ⛔ 只要 Step 5 或 Step 8 有實際修改文件，本步驟必須執行
     │                           (knowledge/runtime/README.md)
     ▼
 Step 10: 驗證 ──────────────── 執行 validators、link check、diff review
@@ -331,9 +341,13 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 ---
 
-## Step 6：Intelligence Extraction（選擇性）
+## Step 6：Intelligence Extraction 判斷（強制判斷，條件執行）
 
 **來源**：[`governance/lifecycle/intelligence-extraction-pipeline.md`](../../governance/lifecycle/intelligence-extraction-pipeline.md)
+
+> ⚠️ **強制判斷**：Agent 必須明確回答「是/否」，並記錄理由。不得沉默略過。
+> - **是** → 執行下方 Pipeline 步驟。
+> - **否** → 在 lesson 的 `Required Linked Updates` 或 commit message 中寫明：「Step 6 不適用，原因：[具體原因]」。
 
 **適用時機**：當新知識來自 technique 文件、SKILL.md 或 feedback history，且需要提取 intelligence atoms 時。
 
@@ -366,9 +380,13 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 
 ---
 
-## Step 7：Failure Learning（選擇性）
+## Step 7：Failure Learning 判斷（強制判斷，條件執行）
 
 **來源**：[`enforcement/failure-learning-system.md`](../../enforcement/failure-learning-system.md)
+
+> ⚠️ **強制判斷**：Agent 必須明確回答「是/否」，並記錄理由。不得沉默略過。
+> - **是** → 執行下方 Failure Learning Loop。
+> - **否** → 在 lesson 的 `Required Linked Updates` 或 commit message 中寫明：「Step 7 不適用，原因：[具體原因]」。
 
 **適用時機**：當新知識來自 agent 錯誤、close-loop gap、或重複失效模式時。
 
@@ -494,19 +512,31 @@ ruby scripts/validate-knowledge-runtime.rb
 
 ## 快速參考：每輪 Checkpoint 執行摘要
 
+> **強制等級說明**
+> - `[強制]` — 必須執行，跳過即構成閉環缺口，不得進行 commit
+> - `[強制判斷]` — 必須明確回答是/否並記錄理由，執行本身依條件決定
+> - `[條件]` — 僅在特定前提下才需執行
+
 ```
-□ Step 1:  本輪是否有新知識？（feedback-lessons.md §原則）
-□ Step 2:  分類知識類型（feedback-lessons.md §判斷流程）
-□ Step 3:  決定 Promotion Target（feedback/promotion/README.md）
-□ Step 3a: 確認目標文件語言（language-policy.yaml）
-□ Step 4:  寫入 feedback/history/<domain>/<category>/  lesson
-□ Step 5:  更新目標層（workflow / intelligence / analysis / enforcement / runtime）
-□ Step 6:  若需要，執行 Intelligence Extraction Pipeline
-□ Step 7:  若需要，執行 Failure Learning Loop
-□ Step 8:  執行 Linked Updates（linked-updates.md）
-□ Step 9:  更新 Runtime Surfaces + 執行 scripts
-□ Step 10: 驗證（diff review、link check、lint）
-□ Step 11: Commit / Push / Readback（dependency-reading.md）
+□ Step 1:  [強制] 本輪是否有新知識？（feedback-lessons.md §原則）
+□ Step 2:  [強制] 分類知識類型（feedback-lessons.md §判斷流程）
+□ Step 3:  [強制] 決定 Promotion Target（feedback/promotion/README.md）
+□ Step 3a: [強制] 確認目標文件語言（language-policy.yaml）
+□ Step 4:  [強制] 寫入 feedback/history/<domain>/<category>/ lesson
+           ↳ 必須含：Promotion Target、Required Linked Updates、Agent Action、
+             Applies When、Does Not Apply When、Validation
+□ Step 5:  [強制] 更新目標層（workflow / intelligence / analysis / enforcement / runtime）
+           ⛔ 不得跳過，跳過即構成閉環缺口
+□ Step 6:  [強制判斷] Intelligence Extraction：明確回答是/否並記錄理由
+           ↳ 是 → 執行 Pipeline；否 → Required Linked Updates 中寫明原因
+□ Step 7:  [強制判斷] Failure Learning：明確回答是/否並記錄理由
+           ↳ 是 → 執行 Loop；否 → Required Linked Updates 中寫明原因
+□ Step 8:  [強制] 執行 Linked Updates（linked-updates.md）
+           ⛔ lesson 的 Required Linked Updates 欄位未填不得進行 commit
+□ Step 9:  [強制] 更新 Runtime Surfaces（Step 5 或 Step 8 有修改時）
+           ↳ routing-registry.yaml、summaries/、graphs/、runtime scripts
+□ Step 10: [強制] 驗證（diff review、去敏、link check、lint）
+□ Step 11: [強制] Commit / Push / Readback（dependency-reading.md）
 ```
 
 ---
