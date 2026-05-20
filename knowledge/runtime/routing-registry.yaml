@@ -355,6 +355,36 @@ records:
       compression_level: source-backed
       reason: Goal 刪除與 durable planning gate 會影響 long-term state，需讀 shared rule source。
 
+  - id: route.governance.ai-runtime-five-step
+    task_intent: 新增或擴張 skill、workflow、rule、memory、context、automation 或 runtime surface 前，套用 five-step AI runtime governance
+    primary_source: governance/ai-runtime-governance/five-step-ai-governance.md
+    required_dependencies:
+      - governance/ai-runtime-governance/README.md
+      - intelligence/engineering/philosophy/musk-five-step-algorithm.md
+    candidate_sources:
+      - intelligence/engineering/philosophy/README.md
+      - plans/archived/2026-05-20-1307-ai-runtime-governance-five-step-integration.md
+      - governance/lifecycle/README.md
+      - governance/document-sizing.md
+      - runtime/context/prompt-cache-playbook.md
+    source_of_truth_gate: governance-design-active
+    ranking_reason: Five-Step AI Governance 將 source philosophy 轉譯為新增 durable knowledge、context、memory、automation 和 runtime surface 前的 necessity/delete/simplify/accelerate/automation-last gate。
+    validation_signal: 新增項目已通過 necessity、deletion、simplification、cycle-time 與 automation-last 檢查，且沒有加入 always-load context。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 1200
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: candidate
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: 只有 governance / architecture / automation 擴張決策需要讀取完整 five-step governance；一般任務不常駐載入。
+
   - id: route.runtime.context-loading
     task_intent: 決定 runtime context loading 路線
     primary_source: governance/lifecycle/routing-philosophy.md

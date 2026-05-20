@@ -11,6 +11,7 @@
 | [`domain/`](domain/README.md) | 領域模型智慧 |
 | [`anti-patterns/`](anti-patterns/README.md) | 反模式 |
 | [`distributed-systems/`](distributed-systems/README.md) | 分散式系統 |
+| [`philosophy/`](philosophy/README.md) | 原始工程哲學與認知框架（Musk Five-Step、first principles、automation last） |
 | [`agent-architecture/`](agent-architecture/README.md) | AI Agent 自身運作的智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries、pilot-first validation、failure-to-scenario closure、linked-updates completeness、decomposition strategy、stateless validation） |
 | [`development/`](development/README.md) | 開發指引工程智慧（risk translation、docs-first BDD、contract governance） |
 | [`analytical-reasoning/`](analytical-reasoning/README.md) | 分析推理智慧（APK analysis、repo analysis、evidence-first routing、heuristics、signals、failure patterns） |

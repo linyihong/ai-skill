@@ -97,6 +97,7 @@
 | [`archived/2026-05-18-scrapling-knowledge-integration-plan.md`](archived/2026-05-18-scrapling-knowledge-integration-plan.md) | ✅ completed | Scrapling 知識整合計畫：analysis/web/ + 6 份 intelligence 文件 + sanitization 強化 + routing 註冊，3 個 Phase 全完成 |
 | [`archived/2026-05-18-0155-software-delivery-output-templates.md`](archived/2026-05-18-0155-software-delivery-output-templates.md) | ✅ completed | Software Delivery Output Templates — 建立 5 個輸出模板 + Greenfield 標準化流程 + Slash Command 模式 + 模板 Traceability 整合 |
 | [`archived/2026-05-20-1039-runtime-recovery-escalation-system.md`](archived/2026-05-20-1039-runtime-recovery-escalation-system.md) | ✅ completed | Runtime Recovery & Escalation System — escalation policy、runtime guard、recovery procedure、metadata policy、workflow hooks 與 validation scenarios 全完成 |
+| [`archived/2026-05-20-1307-ai-runtime-governance-five-step-integration.md`](archived/2026-05-20-1307-ai-runtime-governance-five-step-integration.md) | ✅ completed | AI Runtime Governance Five-Step Integration — Musk Five-Step source philosophy 與 AI runtime governance 轉譯層已完成 |
 | [`active/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md`](active/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md) | 📝 draft | AI-native Cognitive Execution System 升級計畫比對分析 — Phase Runtime、Obligation Ledger、Blocking Gates、ai-tools 控制流程遷移、Knowledge/Runtime 邊界決策 |
 
 ## 誰會參考這裡（Inbound References）

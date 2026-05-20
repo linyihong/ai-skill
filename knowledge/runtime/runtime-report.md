@@ -6,7 +6,7 @@
 
 | Surface | Path | Count / Status |
 | --- | --- | --- |
-| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 44 records |
+| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 45 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
@@ -30,6 +30,7 @@
 | `route.runtime.context-ttl` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | Context TTL 已套用，過期 context 已 prune，token 使用率在預算內。 |
 | `route.runtime.prompt-cache-alignment` | `runtime/context/prompt-cache-playbook.md` | `small` | `summary-first` | Prompt cache playbook、enforcement rule、metadata provider_cache 欄位與 activation rule 已同步。 |
 | `route.governance.durable-goal-boundary` | `enforcement/conversation-goal-ledger.md` | `large` | `source-backed` | 長期狀態已落到 durable planning 文件，且 active goal 完成後才刪除。 |
+| `route.governance.ai-runtime-five-step` | `governance/ai-runtime-governance/five-step-ai-governance.md` | `small` | `summary-first` | 新增項目已通過 necessity、deletion、simplification、cycle-time 與 automation-last 檢查，且沒有加入 always-load context。 |
 | `route.runtime.context-loading` | `governance/lifecycle/routing-philosophy.md` | `small` | `summary-first` | Primary source、deferred sources、source-of-truth gate 與 validation signal 已可被記錄。 |
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `large` | `source-backed` | 欄位可套用到第一批 atom candidates，且 Markdown links 可解析。 |
 | `route.workflow.apk-analysis` | `workflow/apk-analysis/execution-flow.md` | `specialized` | `source-backed` | 新分層路徑可讀取，workflow 與 analysis 內容已分離。 |
