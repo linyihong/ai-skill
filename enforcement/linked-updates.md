@@ -2,6 +2,8 @@
 
 本檔是 **Ai-skill repository 全部文件與 skill 的連動更新規則**。若某項改動會影響其他文件、索引、同步流程、skill 入口、分類文件或範本，相關檔案 **必須**在同一次變更中更新或明確檢查，不可寫成「可選」或「之後再說」。
 
+Linked-update completeness 的治理 gate 見 [`governance/ai-runtime-governance/linked-update-governance.md`](../governance/ai-runtime-governance/linked-update-governance.md)；本檔保留全庫必須同步更新的具體表格與 close-loop 條文。
+
 ## Agent 必須做的事
 
 1. 改任何 `enforcement/`、`skills/`、根 `README.md`、同步腳本或模板前，先判斷是否有連動文件。

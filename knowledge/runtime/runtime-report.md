@@ -64,7 +64,7 @@
 | `route.runtime.intelligence-routing` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | Task intent 已對應到 intelligence-routing.yaml 的 domain，applicable_phases 已檢查，domain README 已載入。 |
 | `route.runtime.output-governance` | `runtime/output-governance/` | `small` | `source-backed` | Language consistency 已確認，sanitization 已通過，tool neutrality 已檢查， format compliance 已驗證，governance gates 全部通過。  |
 | `route.runtime.distributed` | `runtime/distributed/` | `small` | `source-backed` | Distributed locks 已正確 acquire/release，multi-agent coordination rules 已遵守， async job lifecycle 狀態轉換正確，無 deadlock 或 stale state。  |
-| `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.md` | `small` | `source-backed` | 目前 knowledge update 的步驟已確認，entry conditions 已滿足，exit conditions 已檢查，reference sources 已載入，下一步驟已決定。  |
+| `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.md` | `small` | `source-backed` | 目前 knowledge update 的步驟已確認，entry conditions 已滿足，exit conditions 已檢查，reference sources 已載入；linked update completeness gates 已通過， 下一步驟已決定。  |
 
 ## Summary Records
 

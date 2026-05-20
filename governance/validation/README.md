@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | Source boundary | 確認編輯的是 canonical repository paths，不是 tool mirrors 或 runtime copies。 | 每次 Ai-skill writeback。 |
 | Old entrypoint | 確認舊 `skills/`、`enforcement/`、`ai-tools/` 或 `scripts/` entrypoints 仍可到達。 | Candidate maps、atom promotions、migrations。 |
-| Linked updates | 檢查受影響 README、roadmap、index、metadata 與 source entry files。 | 任何新 layer path 或 routing change。 |
+| Linked updates | 依 [`linked-update-governance.md`](../ai-runtime-governance/linked-update-governance.md) 檢查受影響 README、roadmap、index、metadata、generated surface 與 source entry files。 | 任何新 layer path 或 routing change。 |
 | Metadata | 引入或 promotion Knowledge Atom 時，確認 `metadata/schema.md` 欄位已存在。 | Candidate atom、validated atom、promoted atom。 |
 | Navigation | 應可發現新路徑時，確認 `knowledge/indexes/README.md` 可 route 到該路徑。 | Routing surfaces 與 promoted reference paths。 |
 | Generated refresh | Source 變更時，確認 summaries、graphs、registry records 是否需要 refresh、revalidate 或 downgrade。 | Source-of-truth 文件、metadata、routing registry、summaries、graphs 變更。 |
