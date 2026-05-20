@@ -1,302 +1,302 @@
-# Travel Planning Sources and Tools（旅遊規劃來源與工具）
+# 旅遊規劃來源與工具（Travel Planning Sources and Tools）
 
-本文件定義旅遊規劃的資訊來源層級、各類查詢策略，以及常見的 red flags。承接舊 `skills/travel-planning/TOOLS.md` 的內容（已刪除），提取為 tool-neutral 的分析方法。
+本文件定義旅遊規劃的資訊來源層級、各類查詢策略，以及常見的風險警示。承接舊 `skills/travel-planning/TOOLS.md` 的內容（已刪除），提取為 tool-neutral 的分析方法。
 
 > **遷移狀態**：此文件為新分層的 reference target，舊 `skills/travel-planning/` 已刪除。新內容請直接寫入此文件。
 
-## Source Hierarchy（來源層級）
+## 來源層級（Source Hierarchy）
 
 | 優先級 | 來源類型 | 用途 |
 | --- | --- | --- |
-| 1 | Official facility, transport operator, event, park, campground, tourism board, local government, weather, marine, mountain, road authority, official address, and facility access pages | Confirming facts that affect feasibility and identity. |
-| 2 | Official reservation platforms, travel agency tour pages, package-tour price pages, airline pages, airport access pages, Shinkansen/rail operator pages, highway bus pages, ferry pages, lodging/guesthouse booking pages, ticketing pages, restaurant pages, reservation platforms, local market pages, RV Park listings, fare calculators, pass pages, toll calculators, bath/shower facilities, laundromats, parking operators, charging networks, and fuel station operators | Availability, booking rules, fees, cancellation rules, schedules, access, package price, total transport cost, route benchmark, food planning. |
-| 3 | Google Maps exact place links, coordinate pins, current map services, Mapcode lookup services, country-appropriate restaurant review/rating platforms, map review platforms, calendar/reminder fields, notes app structure, travel planning app fields, and offline-map needs | Discovery, exact location identity, navigation identifiers, parking/access notes, restaurant screening, app-ready organization, recent user signals; verify key claims elsewhere. |
-| 4 | Blogs, community maps, videos, forum posts, social posts | Discovery and qualitative context; label as unconfirmed unless cross-checked. |
+| 1 | 官方設施、交通營運者、活動、園區、露營場、觀光局、地方政府、天氣、海象、山岳、道路主管機關、官方地址與設施交通頁面 | 確認會影響可行性與地點識別的事實。 |
+| 2 | 官方預訂平台、旅行社行程頁、套裝行程價格頁、航空公司頁、機場交通頁、新幹線/鐵路營運者頁、高速巴士頁、渡輪頁、住宿/民宿預訂頁、票券頁、餐廳頁、預約平台、在地市場頁、RV Park 清單、票價計算器、pass 頁、通行費計算器、浴場/淋浴設施、自助洗衣店、停車場營運者、充電網路與加油站營運者 | Availability、預訂規則、費用、取消規則、時刻表、交通方式、套裝價格、總交通成本、路線 benchmark、飲食規劃。 |
+| 3 | Google Maps 精確地點連結、座標 pin、當前地圖服務、Mapcode 查詢服務、目的地國家適用的餐廳評論/評分平台、地圖評論平台、calendar/reminder 欄位、筆記 app 結構、旅遊規劃 app 欄位與離線地圖需求 | Discovery、精確地點識別、導航識別碼、停車/交通備註、餐廳篩選、app-ready 組織、近期使用者訊號；關鍵 claim 仍需用其他來源驗證。 |
+| 4 | 部落格、社群地圖、影片、論壇文章、社群貼文 | Discovery 與定性脈絡；除非交叉驗證，否則標記為未確認。 |
 
-## Japan Travel Sources（日本旅遊來源）
+## 日本旅遊來源（Japan Travel Sources）
 
-Use official or operator pages first:
+優先使用官方或營運者頁面：
 
-- Facility official websites and official social accounts.
-- Travel agency tour pages, package-tour itineraries, bus-tour routes, and official tourism model courses for route benchmarking.
-- Google Maps exact place links or coordinate pins; avoid generic search-result links when they can open many similarly named places. For self-drive stops, prefer the nearest confirmed visitor parking or official designated parking pin as the driving navigation target.
-- Local tourism association pages.
-- Train, bus, ferry, ropeway, highway bus, airport operators, official route planners, fare tables, reservation pages, seat rules, and pass pages.
-- Airline, Shinkansen, limited express, highway bus, ferry, rental-car, toll, fuel/charging, parking, airport access, and station access pages for long-distance transport comparison.
-- Japan Meteorological Agency or reputable weather services; for islands, coasts, ferries, mountains, or snow routes, also check marine, wind, wave, snowfall, or road-condition sources.
-- Highway and road authority pages for closures, snow, tolls, ETC/pass options, and rest areas.
-- National park, prefecture, city, and 道の駅 official pages.
-- Local food guides, restaurant official pages, market pages, roadside station food pages, tourism-board specialty pages, Google Maps restaurant listings, 食べログ, and reservation platforms such as TableCheck or restaurant booking pages when relevant.
-- RV Park, campground, and booking sites for overnight rules and reservations.
-- Mapcode lookup services and facility access pages for self-drive navigation. If Mapcode is unavailable, capture fallback navigation input: official name, address, phone number, Google Maps exact place link, or coordinate pin.
-- Onsen, sento, super sento, public bath, coin shower, campground shower, laundromat, fuel, EV charging, and grocery pages or map listings for support-stop planning.
-- Parking operator pages, official facility access pages, and map listings for visitor parking. Prefer ordinary visitor parking, public parking, facility parking, coin parking, 道の駅 parking, or service-area parking closest to the actual stop. Exclude 月極 parking, resident-only parking, staff-only parking, apartment parking, permit-only parking, and unclear private lots.
+- 設施官方網站與官方社群帳號。
+- 旅行社行程頁、套裝行程、巴士行程與官方觀光示範路線，用於路線 benchmark。
+- Google Maps 精確地點連結或座標 pin；避免使用可能打開多個同名地點的通用搜尋結果連結。自駕停靠點優先使用已確認的訪客停車場或官方指定停車 pin 作為導航目標。
+- 在地觀光協會頁面。
+- 火車、公車、渡輪、纜車、高速巴士、機場營運者、官方路線規劃器、票價表、預訂頁、座位規則與 pass 頁面。
+- 航空、新幹線、特急、高速巴士、渡輪、租車、通行費、燃油/充電、停車、機場交通與車站交通頁面，用於長距離交通比較。
+- 日本氣象廳或可信天氣服務；離島、海岸、渡輪、山區或雪季路線，還要檢查海象、風、浪、降雪或道路狀況來源。
+- 高速公路與道路主管機關頁面，用於封路、積雪、通行費、ETC/pass 選項與休息站資訊。
+- 國家公園、都道府縣、市町村與道の駅官方頁面。
+- 在地美食指南、餐廳官方頁、市場頁、道の駅餐飲頁、觀光局特產頁、Google Maps 餐廳清單、食べログ，以及相關時的 TableCheck 或餐廳預訂頁。
+- RV Park、露營場與預訂網站，用於過夜規則與預訂。
+- Mapcode 查詢服務與設施交通頁，用於自駕導航。若無 Mapcode，記錄備用導航輸入：官方名稱、地址、電話、Google Maps 精確地點連結或座標 pin。
+- 溫泉、錢湯、スーパー銭湯、公眾浴場、投幣淋浴、露營場淋浴、自助洗衣、加油、EV 充電與超市頁面或地圖清單，用於支援停靠點規劃。
+- 停車場營運者頁、官方設施交通頁與地圖清單，用於訪客停車。優先使用最接近實際停靠點的一般訪客停車場、公共停車場、設施停車場、coin parking、道の駅停車場或 service-area 停車場。排除月極停車場、住戶專用、員工專用、公寓停車場、需許可停車場與不明確的私人停車場。
 
-For 車中泊 discovery, a user may provide community maps such as `https://syachuhaku.fxtec.info/`. Treat these as discovery sources, then verify overnight rules, toilets, gates, fees, and recent notices through official pages, RV Park listings, local pages, or direct contact when needed.
+車中泊 discovery 可使用使用者提供的社群地圖，例如 `https://syachuhaku.fxtec.info/`。這類來源只作為 discovery，再依需要透過官方頁、RV Park 清單、地方頁面或直接聯絡確認過夜規則、廁所、閘門、費用與近期公告。
 
-## Travel Agency and Model-Course Sources（旅行社與模型行程來源）
+## 旅行社與模型行程來源（Travel Agency and Model-Course Sources）
 
-Use agency tours and official model courses either as benchmarks or direct package options:
+旅行社行程與官方示範路線可作為 benchmark，也可作為直接套裝選項：
 
-- Good for: route order, typical travel time, popular stop combinations, seasonal highlights, lunch timing, base areas, tour duration, and booking/ticket patterns.
-- Direct package option checks: package price, per-person/group basis, included transport/meals/tickets/lodging, excluded costs, cancellation/change terms, booking deadline, meeting point, departure/return time, and minimum participants.
-- Must re-check: exact Google Maps pin, opening hours, closure days, current price, parking, public transport, weather suitability, lodging availability, car-stay rules, and whether the route fits the user's pace.
-- Watch for: agency-specific shortcuts, charter bus assumptions, group-only meals, omitted free time, commercial stops, sponsored shopping, and routes that do not work for self-drive or public transit.
-- Record whether the agency item is a `direct package option` or `benchmark only`, what was borrowed, what was changed, and what the user should verify before booking.
+- 適合參考：路線順序、典型移動時間、熱門停靠組合、季節亮點、午餐時間、住宿 base 區域、行程長度與預訂/票券模式。
+- 直接套裝選項檢查：套裝價格、每人/每團計價基準、包含的交通/餐食/票券/住宿、不包含成本、取消/變更條款、預訂期限、集合點、出發/返回時間與最低成團人數。
+- 必須重新檢查：精確 Google Maps pin、營業時間、休息日、當前價格、停車、公共交通、天氣適合度、住宿 availability、車宿規則，以及路線是否符合使用者步調。
+- 注意：旅行社專用捷徑、包車假設、團體限定餐食、省略自由時間、商業停靠點、贊助購物點，以及不適用於自駕或公共交通的路線。
+- 記錄該旅行社項目是 `direct package option` 還是 `benchmark only`，借用了什麼、調整了什麼，以及使用者預訂前需自行確認什麼。
 
-## Checks By Travel Type（依旅遊類型檢查）
+## 依旅遊類型檢查（Checks By Travel Type）
 
-| Travel Type | Minimum Checks |
+| 旅遊類型 | 最低檢查 |
 | --- | --- |
-| City trip | Opening days, last entry, restaurant reservations, transit pass value, crowd/event calendar. |
-| Rural road trip | Drive time, fuel, parking, road closure, weather, limited food hours, backup lodging. |
-| 車中泊 | Overnight permission, quietness, toilets, bath/shower, laundry, trash/cooking/idling rules, safety, backup lodging. |
-| Hiking/nature | Trail status, weather, daylight, transport return, facility closure, gear and emergency limits. |
-| Ferry/island | Sailing schedule, weather cancellation, vehicle reservation, last return, port access. |
-| Seasonal events | Official event dates, ticketing, crowd control, special transit, road restrictions. |
-| Calendar / app use | Stable time blocks, timezone, map pins, reminder timing, reservation notes, day grouping, offline-map and backup-save needs. |
+| 城市旅行 | 營業日、最後入場、餐廳預約、交通 pass 是否划算、人潮/活動 calendar。 |
+| 鄉村 road trip | 駕駛時間、燃油、停車、封路、天氣、有限餐飲時段、備用住宿。 |
+| 車中泊 | 過夜許可、安靜程度、廁所、浴場/淋浴、洗衣、垃圾/烹飪/怠速規則、安全、備用住宿。 |
+| 健行/自然 | 步道狀態、天氣、日照時間、回程交通、設施休業、裝備與緊急限制。 |
+| 渡輪/離島 | 航班時刻、天氣取消風險、車輛預約、末班回程、港口交通。 |
+| 季節活動 | 官方活動日期、票券、人流管制、特殊交通、道路限制。 |
+| 日曆 / app 使用 | 穩定時間區塊、時區、地圖 pin、提醒時間、預訂備註、日分組、離線地圖與備份保存需求。 |
 
-## Stop Experience and Food Sources（停留體驗與美食來源）
+## 停留體驗與美食來源（Stop Experience and Food Sources）
 
-For each key stop, verify or describe:
+每個關鍵停靠點需驗證或描述：
 
-- Main activity: viewpoint, short walk, museum, hot spring, shrine/temple, market, seasonal event, shopping street, local experience, or rest/support stop.
-- Visit duration and best timing.
-- Local food: regional specialty, restaurant/cafe candidate, market, roadside station item, food street, or convenience fallback.
-- Food constraints: opening day, last order, reservation, cash-only, queue risk, parking, dietary fit, and nearby backup.
-- Whether the stop is a destination or just a support stop.
+- 主要活動：展望點、短步行、博物館、溫泉、神社/寺廟、市場、季節活動、商店街、在地體驗或休息/支援停靠點。
+- 停留時間與最佳時段。
+- 在地食物：地方特產、餐廳/咖啡候選、市場、道の駅品項、美食街或便利商店備案。
+- 飲食限制：營業日、最後點餐、預約、僅收現金、排隊風險、停車、飲食偏好與附近備案。
+- 該停靠點是目的地，還是只是支援停靠點。
 
-Do not overfill an itinerary with food recommendations that are off-route or closed at the planned time.
+不要在行程中塞入偏離路線或預計時間已休息的餐飲推薦。
 
-## Restaurant Rating and Review Sources（餐廳評分與評論來源）
+## 餐廳評分與評論來源（Restaurant Rating and Review Sources）
 
-Use the destination country's common restaurant discovery tools instead of applying one global rating rule.
+使用目的地國家常用的餐廳探索工具，不套用單一全球評分規則。
 
-General checks:
+一般檢查：
 
-- Cross-check at least one map/review source with the restaurant's official page, reservation page, or current listing when timing matters.
-- Consider rating, review count, review recency, price range, queue risk, reservation availability, cuisine fit, local specialty fit, last order, closure days, payment, parking/transit access, and route timing.
-- Prefer restaurants that are reachable inside the day's route and meal window. A higher-rated restaurant that causes a long detour, missed last order, or uncertain parking should be downgraded or listed as optional.
-- Include a nearby backup for rural areas, popular restaurants, closed-day risk, sold-out menus, bad weather, or car-stay late arrivals.
-- Do not claim a restaurant is open, reservable, or has parking from old reviews alone.
+- 時間安排重要時，至少用一個地圖/評論來源交叉檢查餐廳官方頁、預訂頁或當前清單。
+- 考量評分、評論數、評論新鮮度、價格區間、排隊風險、預約 availability、料理適配度、在地特色適配度、最後點餐、休息日、付款方式、停車/交通與路線時間。
+- 優先選擇在當日路線與用餐時間窗內可到達的餐廳。評分較高但造成長距離繞路、錯過最後點餐或停車不確定的餐廳，應降級或列為 optional。
+- 鄉村地區、熱門餐廳、休息日風險、售完風險、壞天氣或車宿晚到情境，需加入附近備案。
+- 不要只根據舊評論宣稱餐廳營業中、可預約或有停車。
 
-Japan checks:
+日本檢查：
 
-- Use Google Maps for exact place identity, recent reviews, photos, access, and practical route fit.
-- Use 食べログ when practical for local restaurant screening, genre, rating, budget, review volume, reservation links, lunch/dinner distinction, and closure/seat notes.
-- Treat Google Maps and 食べログ as complementary signals. If ratings diverge, explain the practical choice instead of hiding the mismatch.
-- Cross-check official restaurant pages, mall/market pages, or reservation pages for hours, last order, closed days, temporary closures, price, and booking rules.
-- For self-drive trips, check facility parking or nearby visitor-usable paid parking; do not use 月極 or unclear private parking as the restaurant parking solution.
+- 使用 Google Maps 確認精確地點、近期評論、照片、交通與實際路線適配度。
+- 可行時使用食べログ篩選在地餐廳、類型、評分、預算、評論量、預訂連結、午餐/晚餐差異與休息/座位備註。
+- 將 Google Maps 與食べログ視為互補訊號。若評分分歧，說明實際選擇理由，不要隱藏 mismatch。
+- 用餐廳官方頁、商場/市場頁或預訂頁交叉檢查營業時間、最後點餐、休息日、臨時休業、價格與預訂規則。
+- 自駕行程需檢查設施停車或附近可供訪客使用的付費停車；不要把月極或不明確私人停車場當作餐廳停車方案。
 
-For other countries, identify local equivalents before recommending restaurants, such as the dominant map platform, reservation platform, food guide, tourism-board food page, or local review site.
+其他國家需先識別在地等價工具，例如主要地圖平台、預訂平台、美食指南、觀光局美食頁或在地評論網站，再推薦餐廳。
 
-## Lodging and Overnight Sources（住宿與過夜來源）
+## 住宿與過夜來源（Lodging and Overnight Sources）
 
-When an itinerary includes overnight stays, use current sources for:
+行程包含過夜時，使用當前來源檢查：
 
-- Availability and price: official lodging page or booking platform.
-- Access: nearest station/bus stop, shuttle, parking, check-in route, late-arrival rule, and winter/night access.
-- Fit: room type, family capacity, luggage, meals, bath/shower, laundry, breakfast time, cancellation rules, and payment method.
-- Route value: whether the lodging area reduces next-day travel or prevents backtracking.
+- Availability 與價格：官方住宿頁或 booking platform。
+- 交通：最近車站/公車站、接駁、停車、check-in 路線、晚到規則與冬季/夜間交通。
+- 適配度：房型、家庭容量、行李、餐食、浴場/淋浴、洗衣、早餐時間、取消規則與付款方式。
+- 路線價值：住宿區域是否減少隔日移動或避免折返。
 
-Lodging candidates can include hotels, guesthouses, minshuku, ryokan, hostels, business hotels, campgrounds, cabins, RV Parks, and car-stay bases. If exact availability is not checked, recommend the area/base first and mark specific candidates `needs availability check`.
+住宿候選可包含飯店、guesthouse、民宿、旅館、hostel、商務旅館、露營場、小木屋、RV Park 與車宿 base。若未檢查精確 availability，先推薦區域/base，並將具體候選標為 `needs availability check`。
 
-## Route Shape Sources（路線形狀來源）
+## 路線形狀來源（Route Shape Sources）
 
-Use route planners and maps to inspect whether the order is efficient:
+使用路線規劃器與地圖檢查順序是否有效率：
 
-- Map the stop order visually or by route planner legs.
-- Check if a later stop lies between two earlier stops.
-- Check if overnight base selection forces returning to already-passed areas.
-- Compare one-way progression, loop route, and hub-based route.
-- Add time/cost impact for any intentional detour or strongly recommended stop.
+- 以地圖或路線規劃器視覺化停靠順序。
+- 檢查較晚停靠點是否位於較早兩點之間。
+- 檢查住宿 base 是否迫使隔日回到已經經過的區域。
+- 比較單向推進、環線與 hub-based route。
+- 對任何刻意繞路或強烈推薦停靠點，加上時間/成本影響。
 
-## Transport Booking and Cost Sources（交通預訂與費用來源）
+## 交通預訂與費用來源（Transport Booking and Cost Sources）
 
-For non-driving plans, use official or operator-backed sources for:
+非自駕規劃使用官方或營運者支援的來源檢查：
 
-- Timetable: train, bus, ferry, flight, shuttle, ropeway/cable car, airport transfer, or taxi reservation window.
-- Required booking: reserved seat, highway bus, ferry vehicle/passenger booking, flight, airport transfer, event shuttle, timed attraction entry, luggage delivery, or taxi.
-- Fare: base fare, seat fee, limited express fee, bus/ferry fare, pass price, local day pass, child fare, luggage/bicycle fee, and cancellation/change rules when important.
-- Final-leg risk: last bus/train, sparse rural service, weather-cancelable ferry, cash-only bus, sold-out seat, and transfer buffer.
+- 時刻表：火車、公車、渡輪、航班、接駁、纜車/登山鐵道、機場交通或計程車預約時間窗。
+- 必要預訂：指定席、高速巴士、渡輪車輛/乘客預訂、航班、機場接送、活動接駁、定時入場景點、行李配送或計程車。
+- 票價：基本票價、座位費、特急費、公車/渡輪票價、pass 價格、當地 day pass、兒童票、行李/自行車費，以及重要時的取消/變更規則。
+- 末段風險：末班公車/火車、鄉村班次稀疏、可能因天氣取消的渡輪、只收現金的公車、座位售完與轉乘 buffer。
 
-For driving plans, estimate with:
+自駕規劃估算：
 
-- Distance and time from a route planner.
-- Fuel economy or EV efficiency assumptions.
-- Fuel price, charging rate, toll calculator, ferry/bridge fee, parking fee, rental-car fee, insurance/add-ons, winter tire or chain fee when relevant.
-- Last reliable fuel/charging point before rural, mountain, island, night, or winter routes; next reliable point after the sparse segment.
-- Range or caveat when ETC discounts, vehicle class, seasonal rates, parking duration, or detours can change the number.
+- 來自路線規劃器的距離與時間。
+- 油耗或 EV efficiency 假設。
+- 油價、充電費率、通行費計算器、渡輪/橋樑費、停車費、租車費、保險/附加項目，以及相關時的冬胎或雪鏈費。
+- 進入鄉村、山區、離島、夜間或冬季稀疏路段前的最後可靠加油/充電點，以及通過後的下一個可靠點。
+- 當 ETC 折扣、車種、季節費率、停車時長或繞路可能改變數字時，加上範圍或 caveat。
 
-Cost estimates should be labeled as rough unless all operator prices and route choices are fixed.
+除非所有營運者價格與路線選擇都已固定，成本估算都應標為粗估。
 
-## Long-Distance Transport Comparison Sources（長途交通比較來源）
+## 長途交通比較來源（Long-Distance Transport Comparison Sources）
 
-When transfer time is 2+ hours or crosses major regions, compare:
+移動時間超過 2 小時或跨主要區域時，比較：
 
-- Flight: airfare, airport access time/cost, check-in/security, baggage, airport-to-destination transfer, delay/weather risk.
-- Shinkansen / rail / limited express: base fare, seat fee, transfers, luggage rules, station access, last train, pass value.
-- Highway bus: fare, reservation deadline, boarding point, arrival point, rest stops, cancellation, luggage, delay risk.
-- Ferry: passenger/vehicle fare, sailing schedule, weather cancellation, port access, vehicle reservation, boarding buffer.
-- Rental car / self-drive: rental fee, tolls, fuel/charging, parking, fatigue, weather/road risk, destination parking.
-- Mixed mode: rail/flight plus local rental car, taxi, bus, or ferry.
+- 航班：票價、機場交通時間/成本、check-in/security、行李、機場到目的地交通、延誤/天氣風險。
+- 新幹線 / 鐵路 / 特急：基本票價、座位費、轉乘、行李規則、車站交通、末班車、pass 價值。
+- 高速巴士：票價、預訂期限、上車點、到達點、休息站、取消、行李、延誤風險。
+- 渡輪：乘客/車輛票價、航班時刻、天氣取消風險、港口交通、車輛預約、登船 buffer。
+- 租車 / 自駕：租車費、通行費、燃油/充電、停車、疲勞、天氣/道路風險、目的地停車。
+- 混合模式：鐵路/航班加上當地租車、計程車、公車或渡輪。
 
-Always compare door-to-door time and total cost. Ticket price alone is not enough.
+必須比較 door-to-door 時間與總成本。只比較票面價格不足夠。
 
-## Country-Specific Driving Sources（國家特定駕駛來源）
+## 國家特定駕駛來源（Country-Specific Driving Sources）
 
-When the trip uses a car, check whether the destination country has local navigation or access conventions.
+使用汽車時，檢查目的地國家是否有本地導航或通行慣例。
 
-### Japan self-drive
+### 日本自駕（Japan self-drive）
 
-For every drive-to stop, try to record:
+每個自駕停靠點盡量記錄：
 
-- Mapcode for car navigation when available.
-- Google Maps exact place link or coordinate pin for the practical driving target, usually the nearest confirmed visitor parking or official designated parking rather than the attraction entrance.
-- Fallback navigation input: official facility name, address, phone number, or map link.
-- Parking type: visitor/facility/public/coin/RV Park/道の駅/service area, or `unclear`.
-- Parking caveats: fee, hours, height limit, distance to destination, event restrictions, shuttle-only access, winter closure, or fills-early risk.
-- Cross-check status: Mapcode, Google Maps, official address, and access/parking page match or have noted differences.
+- 可用時記錄車用導航 Mapcode。
+- 實際駕車目標的 Google Maps 精確地點連結或座標 pin；通常是最近已確認訪客停車場或官方指定停車場，而不是景點入口。
+- 備用導航輸入：官方設施名稱、地址、電話或地圖連結。
+- 停車類型：訪客/設施/公共/coin/RV Park/道の駅/service area，或 `unclear`。
+- 停車 caveats：費用、時間、高度限制、到目的地距離、活動限制、只能接駁、冬季關閉或早滿風險。
+- 交叉檢查狀態：Mapcode、Google Maps、官方地址與交通/停車頁一致，或已註明差異。
 
-Parking source handling:
+停車來源處理：
 
-- Prefer official facility access pages and parking operator pages.
-- Map listings and reviews can help discover parking, but verify whether the lot is visitor-usable.
-- Treat 月極, resident-only, staff-only, apartment, permit-only, and unclear private lots as unavailable unless an official source says visitors can use them.
-- If no reliable visitor parking exists, choose a different stop, suggest public transport/taxi for that segment, or add a confirmed nearby paid parking lot.
-- When Google Maps shows a correct attraction pin but the user is driving, also provide or replace with the nearest confirmed visitor parking pin; state walking distance or shuttle requirement when material.
+- 優先使用官方設施交通頁與停車場營運者頁。
+- 地圖清單與評論可協助發現停車場，但仍需確認該停車場是否可供訪客使用。
+- 月極、住戶專用、員工專用、公寓、需許可與不明確私人停車場，一律視為不可用，除非官方來源說明訪客可用。
+- 若沒有可靠訪客停車，選擇其他停靠點、建議該段使用公共交通/計程車，或加入已確認的附近付費停車場。
+- Google Maps 的景點 pin 正確但使用者自駕時，另提供或改用最近已確認訪客停車 pin；若步行距離或接駁需求重要，需明說。
 
-## Exact Location Sources（精確位置來源）
+## 精確位置來源（Exact Location Sources）
 
-Use precise location sources when marking stops:
+標記停靠點時使用精確位置來源：
 
-- Google Maps place URLs that open one exact facility, not a search results page.
-- Coordinate pins when the practical destination is an entrance, trailhead, parking lot, pier, station exit, or viewpoint instead of the facility's general address.
-- For driving, exact location means the best usable arrival point for the vehicle. Prefer nearest confirmed visitor parking, official parking, public parking, coin parking, or facility parking; exclude 月極 and unclear private lots.
-- Official address and access pages to confirm the map pin.
-- Mapcode for Japan self-drive, cross-checked against the Google Maps pin and official address/access page.
+- 能打開單一精確設施的 Google Maps place URL，而不是搜尋結果頁。
+- 當實際目的地是入口、登山口、停車場、碼頭、車站出口或展望點，而不是設施一般地址時，使用座標 pin。
+- 自駕時，精確位置指車輛最佳可到達點。優先使用最近已確認的訪客停車場、官方停車場、公共停車場、coin parking 或設施停車場；排除月極與不明確私人停車場。
+- 用官方地址與交通頁確認地圖 pin。
+- 日本自駕使用 Mapcode，並與 Google Maps pin 和官方地址/交通頁交叉檢查。
 
-Location red flags:
+位置風險警示：
 
-- Search URL or broad area link instead of a specific place.
-- Multiple facilities with the same or similar name.
-- Google Maps pin, Mapcode, and official address point to different roads, entrances, lots, or nearby towns.
-- Attraction pin is correct but the practical navigation target should be the visitor parking lot, shuttle stop, pier, trailhead, or reception.
-- Driving itinerary uses an attraction/restaurant Google Maps pin while nearby visitor parking is the actual arrival point.
-- Nearest parking found on a map is 月極, resident-only, staff-only, apartment, permit-only, or unclear private parking.
-- Map listing is user-generated and the official page gives a different address or access route.
-- Agency/package-tour route copied without verifying official hours, exact locations, parking, transport, or weather.
-- Direct package option shown without price, included/excluded items, cancellation terms, or user-facing caveats.
-- Agency tour timing reused without adjusting for self-drive, public transit, individual meals, parking, or user pace.
-- Overnight lodging is chosen by price/name only, without route-base logic or check-in/access checks.
-- Route goes A to B and then returns to an intermediate point without a warning or strong reason.
-- A strongly recommended detour lacks time/cost tradeoff and a shorter alternative.
-- Recommended sightseeing stops have no explanation of what to do there or how long to stay.
-- Food recommendations are off-route, closed at the planned time, or listed without backup in rural areas.
-- Restaurant choices rely only on a single numeric rating without review count, recency, opening/last-order check, reservation/queue risk, route fit, or local platform context.
-- Japan restaurant recommendations omit 食べログ or another local screening source when the user asks for local rating tools and enough current information is available.
-- Rural, mountain, island, night, or winter driving legs omit last/next reliable fuel or charging points.
+- 使用搜尋 URL 或大範圍連結，而不是特定地點。
+- 多個設施名稱相同或相似。
+- Google Maps pin、Mapcode 與官方地址指向不同道路、入口、停車場或鄰近城鎮。
+- 景點 pin 正確，但實際導航目標應該是訪客停車場、接駁站、碼頭、登山口或受付。
+- 自駕行程使用景點/餐廳 Google Maps pin，但附近訪客停車場才是實際抵達點。
+- 地圖上最近停車場是月極、住戶專用、員工專用、公寓、需許可或不明確私人停車場。
+- 地圖清單由使用者產生，而官方頁提供不同地址或交通路線。
+- 直接複製旅行社/套裝行程路線，未驗證官方時間、精確地點、停車、交通或天氣。
+- 直接套裝選項沒有顯示價格、包含/不包含項目、取消條款或使用者可見 caveats。
+- 使用旅行社行程時間，但未依自駕、公共交通、個人用餐、停車或使用者步調調整。
+- 住宿只依價格/名稱選擇，沒有路線 base 邏輯或 check-in/交通檢查。
+- 路線從 A 到 B 後又返回中間點，且沒有警告或強理由。
+- 強烈推薦的繞路缺少時間/成本取捨與較短替代方案。
+- 推薦景點沒有說明要做什麼或停留多久。
+- 餐飲推薦偏離路線、預計時間已休息，或鄉村地區沒有備案。
+- 餐廳選擇只依單一數字評分，沒有評論數、新鮮度、營業/最後點餐檢查、預約/排隊風險、路線適配或在地平台脈絡。
+- 使用者要求在地評分工具且有足夠當前資訊時，日本餐廳推薦未檢查食べログ或其他在地篩選來源。
+- 鄉村、山區、離島、夜間或冬季自駕路段沒有最後/下一個可靠加油或充電點。
 
-## Weather-Aware Planning Sources（天氣感知規劃來源）
+## 天氣感知規劃來源（Weather-Aware Planning Sources）
 
-Check weather at the smallest practical area and time window:
+在可行的最小區域與時間窗檢查天氣：
 
-- General forecast: temperature, precipitation probability, wind, humidity, heat index, and hourly trend.
-- Mountain or highland: visibility, wind, snow, trail alerts, ropeway operation, and road closures.
-- Coast or island: wind, wave, ferry cancellation risk, tide, storm, and marine warnings.
-- Winter road trip: snow, ice, chain/tire requirements, pass closures, and daylight.
-- Urban trip: heavy rain, heat, crowd/event congestion, indoor alternatives, and transit disruption.
+- 一般預報：氣溫、降雨機率、風、濕度、heat index 與逐時趨勢。
+- 山區或高地：能見度、風、雪、步道警示、纜車運行與封路。
+- 海岸或離島：風、浪、渡輪取消風險、潮汐、風暴與海象警報。
+- 冬季 road trip：雪、冰、鏈條/輪胎要求、山口封閉與日照時間。
+- 城市旅行：大雨、高溫、人潮/活動壅塞、室內替代方案與交通中斷。
 
-Use weather to decide route order. If the forecast is uncertain, provide Plan A / Plan B rather than a single fragile schedule.
+用天氣決定路線順序。若預報不確定，提供 Plan A / Plan B，而不是單一脆弱行程。
 
-## Road-Trip Support Stops（公路旅行支援停留）
+## 公路旅行支援停留（Road-Trip Support Stops）
 
-For car-stay or long driving days, search and verify:
+車宿或長駕駛日需搜尋並驗證：
 
-| Support Need | Examples | Checks |
+| 支援需求 | 範例 | 檢查 |
 | --- | --- | --- |
-| Bathing / shower | Onsen, sento, super sento, day-use bath, coin shower, campground shower | Hours, last entry, closed days, towel rental, parking, tattoo policy when relevant, crowd risk. |
-| Laundry | Coin laundry, campground laundry, hotel day-use laundry when available | Hours, parking, machine count if known, detergent, drying time, nearby food/bath stop. |
-| Food / groceries | Supermarket, convenience store, local market, late restaurant | Closing time, parking, rest-day risk, cash/card. |
-| Fuel / charging | Fuel station, EV charger, roadside station, service area | Hours, charger type, payment app/card, rural gaps, last/next reliable point. |
-| Rest / toilet | 道の駅, service area, park, public toilet, bath facility | Overnight access, cleanliness recency, gates, lighting. |
+| 盥洗 / 淋浴 | 溫泉、錢湯、スーパー銭湯、日歸浴場、投幣淋浴、露營場淋浴 | 營業時間、最後入場、休息日、毛巾租借、停車、相關時的刺青政策、人潮風險。 |
+| 洗衣 | 投幣洗衣、露營場洗衣、可用時的飯店 day-use 洗衣 | 營業時間、停車、已知機台數、洗劑、烘乾時間、附近餐飲/浴場。 |
+| 食物 / 補給 | 超市、便利商店、在地市場、晚間餐廳 | 關門時間、停車、休息日風險、現金/刷卡。 |
+| 加油 / 充電 | 加油站、EV 充電器、道の駅、service area | 營業時間、充電規格、付款 app/card、鄉村缺口、最後/下一個可靠點。 |
+| 休息 / 廁所 | 道の駅、service area、公園、公廁、浴場設施 | 夜間可用性、近期整潔狀態、閘門、照明。 |
 
-## Schedule Feasibility Sources（行程可行性來源）
+## 行程可行性來源（Schedule Feasibility Sources）
 
-Check the timing assumptions behind the day:
+檢查當日時間假設：
 
-- Opening hours, last entry, last order, check-in deadline, transport last departure, sunset/sunrise, and seasonal road access.
-- Travel time plus buffer for parking, walking from station/parking, ticketing, toilets, fuel/charging, luggage, and queues.
-- Walking distance, driving hours, and consecutive long-day fatigue.
-- Whether a stop is a quick support stop, ordinary visit, meal stop, or half-day destination.
+- 營業時間、最後入場、最後點餐、check-in 截止、交通末班、日落/日出與季節道路通行。
+- 交通時間加上停車、從車站/停車場步行、購票、廁所、加油/充電、行李與排隊 buffer。
+- 步行距離、駕駛時數與連續長天數疲勞。
+- 停靠點是快速支援停靠、一般參觀、用餐停靠或半日目的地。
 
-Mark days as `comfortable`, `tight`, `too packed`, or `needs day-before check`.
+將日程標記為 `comfortable`、`tight`、`too packed` 或 `needs day-before check`。
 
-## Calendar And App-Ready Sources（日曆與應用程式就緒來源）
+## 日曆與應用程式就緒來源（Calendar And App-Ready Sources）
 
-Use these when the output should be easy to add to a calendar, map list, reminder app, notes app, or travel planning app:
+當輸出需要容易加入 calendar、地圖清單、提醒 app、筆記 app 或旅遊規劃 app 時，使用以下欄位：
 
-- Calendar fields: event title, start/end time, time zone, location, URL, notes, and reminder offset.
-- Map-list fields: day, route segment, category, exact place/pin, parking pin, backup flag, and offline-save priority.
-- Reminder fields: booking deadline, day-before weather check, departure time, last entry, last order, check-in, fuel/charging before sparse areas, and ferry/train/flight boarding buffer.
-- Notes fields: reservation number placeholder, source link, confidence, cash/card caveat, language note, and emergency/backup contact when relevant.
-- Offline support: offline map area, screenshots, reservation PDFs, route notes, emergency contacts, and backup lodging/support stops.
+- Calendar 欄位：事件標題、開始/結束時間、時區、地點、URL、備註與提醒 offset。
+- 地圖清單欄位：日期、路線段、類別、精確地點/pin、停車 pin、備案標記與離線保存優先級。
+- 提醒欄位：預訂期限、前一日天氣檢查、出發時間、最後入場、最後點餐、check-in、進入稀疏區前加油/充電，以及渡輪/火車/航班登船/搭乘 buffer。
+- 筆記欄位：預訂號 placeholder、來源連結、信心程度、現金/刷卡 caveat、語言備註，以及相關時的緊急/備案聯絡資訊。
+- 離線支援：離線地圖區域、截圖、預訂 PDF、路線備註、緊急聯絡與備用住宿/支援停靠點。
 
-Calendar/app red flags:
+Calendar/app 風險警示：
 
-- Import-ready events include unverified times, unknown timezone, uncertain location, or weather-dependent choices without a `needs recheck` label.
-- Calendar location uses the attraction pin for self-drive when the practical arrival point is a separate parking lot.
-- Reminder times ignore travel buffers, last entry, last order, check-in, or boarding deadlines.
-- Map list mixes primary stops and backups without labels.
-- App-ready output implies a generated export file when only structured text was provided.
+- 可匯入事件包含未驗證時間、未知時區、不確定位置或受天氣影響的選擇，但未標 `needs recheck`。
+- 自駕行程的 calendar location 使用景點 pin，而實際抵達點是另一個停車場。
+- 提醒時間忽略交通 buffer、最後入場、最後點餐、check-in 或登船/搭乘期限。
+- 地圖清單混合主要停靠點與備案但沒有標籤。
+- App-ready 輸出暗示已生成 export file，但實際只提供結構化文字。
 
-## 車中泊 Quietness Sources（車中泊安靜度來源）
+## 車中泊安靜度來源（Quietness Sources）
 
-When evaluating car-stay candidates, check:
+評估車宿候選時檢查：
 
-- Map context: major road, highway service area, truck route, port, station, train line, nightlife, convenience store, event site, or industrial area.
-- Recent reviews mentioning quiet, noisy, idling, trucks, motorcycles, crowds, lighting, toilets, safety, or early-morning traffic.
-- Official quiet-hour, idling, camping, parking, and overnight-use rules.
-- Distance from toilets/facilities versus quietness. Closer is convenient but may be noisier.
+- 地圖脈絡：主要道路、高速公路休息站、卡車路線、港口、車站、鐵路線、夜生活區、便利商店、活動場地或工業區。
+- 提及安靜、吵雜、怠速、卡車、摩托車、人潮、照明、廁所、安全或清晨車流的近期評論。
+- 官方 quiet-hour、怠速、露營、停車與過夜使用規則。
+- 與廁所/設施距離相對於安靜程度的取捨。越近越方便，但可能更吵。
 
-Use labels: `quiet`, `moderate`, `noisy`, or `unknown`. If quietness is `noisy` or `unknown`, include a quieter backup when possible.
+使用標籤：`quiet`、`moderate`、`noisy` 或 `unknown`。若安靜程度為 `noisy` 或 `unknown`，可行時加入較安靜的備案。
 
-## Source Note Format（來源記錄格式）
+## 來源記錄格式（Source Note Format）
 
-When citing a time-sensitive source, record:
+引用會隨時間變動的來源時，記錄：
 
 ```markdown
-- Source: <site/page name>
-- URL: <url>
-- Checked: <date and timezone>
-- Claim verified: <hours / closure / rule / schedule / price>
-- Confidence: confirmed | likely | needs day-before check | unknown
+- 來源：<site/page name>
+- URL：<url>
+- 檢查時間：<date and timezone>
+- 已驗證 claim：<hours / closure / rule / schedule / price>
+- 信心程度：confirmed | likely | needs day-before check | unknown
 ```
 
-## Red Flags（紅旗警示）
+## 風險警示（Red Flags）
 
-- Opening hours shown only on a map listing, with no official confirmation.
-- Travel agency itinerary used as the only source for a time-sensitive claim.
-- Itinerary stop has only a generic Google Maps search link or broad area link.
-- Mapcode and Google Maps pin disagree without a note explaining which navigation target to use.
-- Community reports older than the current season.
-- A place described as 車中泊-friendly without explicit overnight, parking, or toilet details.
-- Japan self-drive stops without Mapcode or fallback navigation input.
-- Parking candidates labeled 月極, resident-only, staff-only, permit-only, apartment parking, or unclear private lot.
-- Non-driving itineraries that omit required reservation timing, last-return risk, or fare estimate.
-- Long-distance transfer chosen without comparing flight/Shinkansen/rail/bus/ferry/car or without door-to-door time and total cost.
-- Driving itineraries that compare routes without fuel/charging, toll, parking, ferry/bridge, or rental-cost assumptions.
-- Driving itineraries through sparse areas without a refuel/charge recommendation before the low-supply segment.
-- Overnight plans that omit lodging-area rationale, access/check-in constraints, or next-day flow.
-- Itineraries with hidden backtracking or no route-shape warning for A to B then back toward the middle.
-- 車中泊 candidate lacks quietness/sleep-quality assessment or backup when noisy/unknown.
-- Overloaded days with no schedule pressure label or simplification.
-- A bath, shower, or laundromat stop placed after its last entry or likely closing time.
-- A meal stop placed after last order, before opening, on a regular closed day, or where self-drive parking is only 月極/unclear private parking.
-- Winter, typhoon, heavy rain, wildfire, landslide, or road restriction risk.
-- Ferry, ropeway, mountain road, or viewpoint plans that ignore wind, visibility, snow, or wave forecasts.
-- Last-entry time too close to arrival.
-- Backup location more than 30-60 minutes away for late-night plans.
+- 營業時間只出現在地圖清單，沒有官方確認。
+- 旅行社行程被用作時間敏感 claim 的唯一來源。
+- 行程停靠點只有通用 Google Maps 搜尋連結或大範圍連結。
+- Mapcode 與 Google Maps pin 不一致，且沒有說明該使用哪個導航目標。
+- 社群回報早於當前季節。
+- 地點被描述為適合車中泊，但缺少明確過夜、停車或廁所細節。
+- 日本自駕停靠點沒有 Mapcode 或備用導航輸入。
+- 停車候選被標為月極、住戶專用、員工專用、需許可、公寓停車場或不明確私人停車場。
+- 非自駕行程缺少必要預訂時間、末班回程風險或票價估算。
+- 長距離移動未比較航班/新幹線/鐵路/巴士/渡輪/汽車，或未比較 door-to-door 時間與總成本。
+- 自駕行程比較路線時未納入燃油/充電、通行費、停車、渡輪/橋樑或租車成本假設。
+- 自駕路線穿越補給稀疏區，卻未建議進入前加油/充電。
+- 過夜計畫缺少住宿區域理由、交通/check-in 限制或隔日動線。
+- 行程有隱性折返，或 A 到 B 後再回中間點卻沒有路線形狀警告。
+- 車宿候選缺少安靜/睡眠品質評估，或在 noisy/unknown 時沒有備案。
+- 日程過載但沒有 schedule pressure 標籤或簡化方案。
+- 浴場、淋浴或自助洗衣停靠點排在最後入場或可能關門之後。
+- 用餐停靠點排在最後點餐後、開店前、固定休息日，或自駕停車只有月極/不明確私人停車。
+- 冬季、颱風、大雨、野火、土石流或道路限制風險未被處理。
+- 渡輪、纜車、山路或展望點計畫忽略風、能見度、雪或浪況預報。
+- 抵達時間太接近最後入場時間。
+- 深夜計畫的備案地點距離超過 30-60 分鐘。
 
 ---
 
