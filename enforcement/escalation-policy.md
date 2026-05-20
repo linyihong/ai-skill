@@ -12,6 +12,8 @@ suspend assumption -> reload source-of-truth -> rebuild execution graph -> resum
 
 Escalation 是 real-time control；它處理「現在不能繼續錯路線」。Failure learning 是 post-mortem prevention；它處理「之後如何避免重犯」。
 
+Recovery retry 的治理 gate 見 [`governance/ai-runtime-governance/recovery-retry-governance.md`](../governance/ai-runtime-governance/recovery-retry-governance.md)；本檔保留即時 escalation policy 與 required recovery output。
+
 ## Trigger Classes
 
 | 類別 | 觸發條件 | 預設層級 | 必要動作 |

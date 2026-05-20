@@ -22,7 +22,7 @@
 | `route.runtime.phase-machine` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 目前 phase 已確認，allowed_actions 與 forbidden_actions 已載入，phase transition rules 已檢查。 |
 | `route.runtime.obligation-ledger` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 本 phase 的 obligations 已確認，pending obligations 已記錄，blocking gates 已檢查。 |
 | `route.runtime.blocking-gates` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 本 phase 的 blocking gates 已檢查，無未通過的 critical/high gates，phase transition 可進行。 |
-| `route.runtime.recovery` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 阻斷 gate 已對應到 strategy，domain policy 已選定，required reload set 已讀或標記 not_applicable/source_missing，repair steps 已執行，verify steps 已通過。 |
+| `route.runtime.recovery` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 阻斷 gate 已對應到 strategy；retry limit、strategy change、domain policy、required reload set、execution graph rebuild 與 recovery validation 已檢查。 |
 | `route.runtime.scheduler` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | Queue 已依 priority 排序，blocking gates 優先於 obligations，dependencies 已解析。 |
 | `route.runtime.transactions` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | Transaction state 正確，所有 rules 已檢查，templates 已套用。 |
 | `route.skill.discovery` | `knowledge/runtime/routing-registry.yaml` | `small` | `index-only` | Task intent 已對應到 routing-registry.yaml 的 triggers，entrypoint 與 summary path 可解析。 |

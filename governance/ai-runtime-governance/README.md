@@ -36,6 +36,7 @@ intelligence source
 | [`routing-signal-governance.md`](routing-signal-governance.md) | [`task-routing.md`](../../intelligence/engineering/agent-architecture/task-routing.md) | 將 signal strength、primary source、negative signal 與 multi-route disambiguation 轉成 routing decision gate。 |
 | [`context-attention-governance.md`](context-attention-governance.md) | [`context-collapse.md`](../../intelligence/engineering/agent-architecture/context-collapse.md), [`attention-budgeting.md`](../../intelligence/engineering/agent-architecture/attention-budgeting.md) | 將 summary-first、attention budget、recap checkpoint 與 task-boundary prune 轉成 context loading gate。 |
 | [`validation-scenario-governance.md`](validation-scenario-governance.md) | [`stateless-validation-necessity.md`](../../intelligence/engineering/agent-architecture/stateless-validation-necessity.md), [`failure-to-scenario-closure.md`](../../intelligence/engineering/agent-architecture/failure-to-scenario-closure.md) | 將 stateless reproduction、answer leakage、failure class 與 traceability 轉成 scenario promotion gate。 |
+| [`recovery-retry-governance.md`](recovery-retry-governance.md) | [`failure-recovery.md`](../../intelligence/engineering/agent-architecture/failure-recovery.md), [`cognitive-boundaries.md`](../../intelligence/engineering/agent-architecture/cognitive-boundaries.md) | 將 retry limit、strategy change、source reload 與 recovery validation 轉成 recovery gate。 |
 
 ## 放什麼
 

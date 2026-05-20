@@ -123,6 +123,9 @@ records:
     task_intent: 載入 phase 修復策略，處理 blocking gate 阻斷或 phase state 損毀
     primary_source: runtime/compiler/embedded_data.rb
     required_dependencies:
+      - governance/ai-runtime-governance/recovery-retry-governance.md
+      - intelligence/engineering/agent-architecture/failure-recovery.md
+      - intelligence/engineering/agent-architecture/cognitive-boundaries.md
       - runtime/compiler/embedded_data.rb
       - runtime/compiler/embedded_data.rb
       - metadata/recovery/escalation-levels.yaml
@@ -131,14 +134,15 @@ records:
       - runtime/compiler/embedded_data.rb
       - runtime/compiler/embedded_data.rb
       - runtime/compiler/embedded_data.rb
+      - enforcement/escalation-policy.md
       - metadata/recovery/README.md
       - metadata/recovery/escalation-levels.yaml
       - metadata/recovery/domain-policies.yaml
       - enforcement/failure-learning-system.md
       - enforcement/failure-patterns/README.md
     source_of_truth_gate: runtime-recovery-active
-    ranking_reason: State Repair System 定義 recovery strategies、state repair、obligation rebuild、phase reconciliation 與 mismatch escalation recovery procedure；metadata/recovery 補充 domain-specific reload set，避免 recovery 只靠單一通用 rule。
-    validation_signal: 阻斷 gate 已對應到 strategy，domain policy 已選定，required reload set 已讀或標記 not_applicable/source_missing，repair steps 已執行，verify steps 已通過。
+    ranking_reason: State Repair System 定義 recovery strategies、state repair、obligation rebuild、phase reconciliation；recovery-retry-governance 將 failure-recovery/cognitive-boundaries intelligence 轉成 retry limit、strategy change、source reload 與 validation gate；metadata/recovery 補充 domain-specific reload set。
+    validation_signal: 阻斷 gate 已對應到 strategy；retry limit、strategy change、domain policy、required reload set、execution graph rebuild 與 recovery validation 已檢查。
     metadata:
       priority: P1
       confidence: high
