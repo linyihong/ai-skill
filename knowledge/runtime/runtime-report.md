@@ -27,7 +27,7 @@
 | `route.runtime.transactions` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | Transaction state 正確，所有 rules 已檢查，templates 已套用。 |
 | `route.skill.discovery` | `knowledge/runtime/routing-registry.yaml` | `small` | `index-only` | Task intent 已對應到 routing-registry.yaml 的 triggers，entrypoint 與 summary path 可解析。 |
 | `route.runtime.activation-rules` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。 |
-| `route.runtime.context-ttl` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | Context TTL 已套用，過期 context 已 prune，token 使用率在預算內。 |
+| `route.runtime.context-ttl` | `governance/ai-runtime-governance/context-attention-governance.md` | `small` | `summary-first` | Summary-first、attention budget、decision externalization、recap checkpoint 與 task-boundary prune 已檢查；必要時再讀 TTL policy。 |
 | `route.runtime.prompt-cache-alignment` | `runtime/context/prompt-cache-playbook.md` | `small` | `summary-first` | Prompt cache playbook、enforcement rule、metadata provider_cache 欄位與 activation rule 已同步。 |
 | `route.governance.durable-goal-boundary` | `enforcement/conversation-goal-ledger.md` | `large` | `source-backed` | 長期狀態已落到 durable planning 文件，且 active goal 完成後才刪除。 |
 | `route.governance.ai-runtime-five-step` | `governance/ai-runtime-governance/five-step-ai-governance.md` | `small` | `summary-first` | 新增項目已通過 necessity、deletion、simplification、cycle-time 與 automation-last 檢查，且沒有加入 always-load context。 |

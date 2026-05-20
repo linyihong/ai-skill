@@ -37,6 +37,7 @@ Preserve:
 
 ## 與既有文件的關係
 
+- [`governance/ai-runtime-governance/context-attention-governance.md`](../ai-runtime-governance/context-attention-governance.md) — 將 context collapse / attention budgeting intelligence 轉譯成 context loading、recap 與 prune gate
 - [`runtime/context/`](../../runtime/context/) — Runtime navigation entry point (data file: `ttl-policy.yaml`)
 - [`runtime/context/ttl-policy.yaml`](../../runtime/context/ttl-policy.yaml) — TTL policy definitions
 - [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — 決定哪些 rules 需要載入（影響 context 總量）

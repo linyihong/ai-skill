@@ -9,6 +9,7 @@
 
 ## Related Sources
 
+- Governance translation: [`governance/ai-runtime-governance/context-attention-governance.md`](../../governance/ai-runtime-governance/context-attention-governance.md)
 - Prose philosophy: [`governance/lifecycle/context-ttl-philosophy.md`](../../governance/lifecycle/context-ttl-philosophy.md)
 - Enforcement rule: [`enforcement/prompt-cache-efficiency.md`](../../enforcement/prompt-cache-efficiency.md)
 - Metadata fields: [`metadata/schema.md`](../../metadata/schema.md)

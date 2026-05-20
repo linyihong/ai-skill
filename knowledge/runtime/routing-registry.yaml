@@ -265,20 +265,24 @@ records:
 
   - id: route.runtime.context-ttl
     task_intent: 管理 context 生命週期，防止 token 膨脹
-    primary_source: runtime/compiler/embedded_data.rb
+    primary_source: governance/ai-runtime-governance/context-attention-governance.md
     required_dependencies:
-      - runtime/compiler/embedded_data.rb
+      - intelligence/engineering/agent-architecture/context-collapse.md
+      - intelligence/engineering/agent-architecture/attention-budgeting.md
+      - governance/lifecycle/context-ttl-philosophy.md
     candidate_sources:
+      - runtime/context/README.md
+      - runtime/context/ttl-policy.yaml
       - knowledge/runtime/README.md
       - knowledge/runtime/routing-registry.yaml
     source_of_truth_gate: design-layer-only
-    ranking_reason: TTL policy 定義每條 context 的存活時間，Agent 依此 prune 過期 context。
-    validation_signal: Context TTL 已套用，過期 context 已 prune，token 使用率在預算內。
+    ranking_reason: context-attention-governance 將 context collapse 與 attention budgeting intelligence 轉譯為 summary-first、recap、prune 與 task-boundary gate；TTL policy 是 machine-readable 承接面。
+    validation_signal: Summary-first、attention budget、decision externalization、recap checkpoint 與 task-boundary prune 已檢查；必要時再讀 TTL policy。
     metadata:
       priority: P2
       confidence: medium
       context_cost:
-        estimated_tokens: 400
+        estimated_tokens: 900
         load_strategy: lazy
         cacheable: true
         ttl:
@@ -286,8 +290,8 @@ records:
       compatibility_state: new-layer-promoted
     model:
       profile: small
-      compression_level: index-only
-      reason: TTL policy 輕量，需要 prune 時才讀。
+      compression_level: summary-first
+      reason: 多數 context drift 先讀治理 gate 與 source intelligence；修改 runtime policy 時再展開 ttl-policy.yaml。
 
   - id: route.runtime.prompt-cache-alignment
     task_intent: 管理 provider prompt cache layout，穩定 prefix 並隔離高變動 context
