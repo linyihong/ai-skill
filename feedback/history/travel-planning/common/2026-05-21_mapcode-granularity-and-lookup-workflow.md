@@ -8,7 +8,7 @@ Status: validated
 
 #### One-line Summary
 
-自駕行程規劃時，同一大景點下若有距離相遠的小景點，每個停車點都必須有獨立 mapcode；查詢工具依 MapFan spots → Mapion phonebook → 旅遊部落格 → 最近バス停代替 的優先順序執行。
+自駕行程規劃時，同一大景點下若有距離相遠的小景點，每個停車點都必須有獨立 mapcode；查詢工具依 MapFan spots → Mapion phonebook → 旅遊部落格 → 最近巴士站代替 的優先順序執行。
 
 #### Human Explanation
 
@@ -18,127 +18,127 @@ Status: validated
 
 同日不同目的地（如角館 → 田澤湖）距離達 25km+ 時，也需各自一行 mapcode。
 
-另一個常見問題是「自然景觀類」景點（滝、渓流の流れ等）在主流地図サービスにマップコードが登録されていない場合がある。このときは以下の代替策を使う：
-- 最寄りのバス停・駐車場のマップコードを代替として使い、注釈を付ける
-- 路肩駐車ポイントの場合は「路肩」と明記
+另一個常見問題是「自然景觀類」景點（例如瀑布、溪流路段）不一定在主流地圖服務中登錄 Mapcode。此時使用以下替代方式：
+- 使用最近的巴士站或停車場 Mapcode 作為替代，並加註說明
+- 若是路肩停車點，明確標示「路肩」
 
 #### Trigger
 
 - 自駕行程中某一天有複數景點且彼此相隔 2km 以上
-- 渓流・海岸線・高原など「沿線」タイプの観光地（複数の停車点がある）
-- 同一日程に「A 景點 → 同日 B 景點（距離遠）」のパターンがある
-- ユーザーが「mapcode を追加して」と言ったとき、既存エントリの粒度が粗すぎないか確認する
+- 溪流、海岸線、高原等沿線型觀光地，且有多個停車點
+- 同一日程出現「A 景點 → 同日 B 景點（距離遠）」的模式
+- 使用者要求加入 mapcode 時，需檢查既有條目的粒度是否過粗
 
 #### Evidence
 
-- タスク：東北旅行（奧入瀨溪流 10/31、角館→田澤湖 11/2）のmapcodeを追加
-- 初版：奧入瀨溪流を石ヶ戸の1行のみで記載
-- ユーザーフィードバック：「奧入瀨溪流には小景點がたくさんある。距離が遠い場合はすべてmapcode補記が必要」
-- 修正後：石ヶ戸・阿修羅の流れ（路肩）・銚子大滝 の3行に分割
-- 同日：田澤湖（御座石神社）のmapcodeが角館とは別に必要と判明し追加
+- 任務：為東北旅行（奧入瀨溪流 10/31、角館→田澤湖 11/2）追加 mapcode
+- 初版：奧入瀨溪流只以石ヶ戸 1 行表示
+- 使用者回饋：「奧入瀨溪流有很多小景點。距離遠時都需要補記 mapcode」
+- 修正後：拆成石ヶ戸、阿修羅の流れ（路肩）、銚子大滝 3 行
+- 同日：確認田澤湖（御座石神社）的 mapcode 需與角館分開列出並追加
 
 #### Generalized Lesson
 
-**mapcode 粒度ルール（自駕行程）**
+**mapcode 粒度規則（自駕行程）**
 
 ```
-同一景點下に停車ポイントが複数かつ相互に 2km 以上離れている
-  → 各停車点に独立行を設ける
+同一景點下有多個停車點，且彼此相距 2km 以上
+  → 各停車點建立獨立行
 
-同日に異なる目的地が 2か所以上ある
-  → 各目的地に独立行を設ける（距離問わず）
+同日有 2 個以上不同目的地
+  → 各目的地建立獨立行（不論距離）
 ```
 
 **mapcode 查詢工具鏈（優先順序）**
 
-**Step 1：MapFan spots ページ（最優先）**
+**Step 1：MapFan spots 頁（最優先）**
 ```
 URL: https://mapfan.com/spots/[spot_code]
 ```
-- Google で `site:mapfan.com [景點名]` で spot URL を取得
-- WebFetch でページ取得 → `マップコード` 文字列に続く数字を抽出
-- 注意：mapfan.com と mapion.co.jp は Chrome extension でブロックされる（`navigate` 不可）
+- 用 Google 搜尋 `site:mapfan.com [景點名]` 取得 spot URL
+- 用 WebFetch 取得頁面 → 抽出 `マップコード` 後面的數字
+- 注意：mapfan.com 與 mapion.co.jp 會被 Chrome extension 封鎖（`navigate` 不可）
 
-**Step 2：Mapion 電話帳ページ**
+**Step 2：Mapion 電話帳頁**
 ```
 URL: https://www.mapion.co.jp/phonebook/[カテゴリ]/[地域コード]/[施設ID]/
 ```
-- Google で `site:mapion.co.jp [景點名] [市区町村]` で URL を取得
-- カテゴリ分類例：M06007（観光名所）、M06005（神社寺院）、M12001（バス停）
-- WebFetch でページ取得 → `マップコード` を抽出
+- 用 Google 搜尋 `site:mapion.co.jp [景點名] [市区町村]` 取得 URL
+- 類別分類例：M06007（觀光名所）、M06005（神社寺院）、M12001（巴士站）
+- 用 WebFetch 取得頁面 → 抽出 `マップコード`
 
 **Step 3：旅遊部落格（WebSearch → WebFetch）**
-- `[景點名] マップコード [予想コード前3桁]` で検索
-- 自然景観スポット（滝・渓流）は専門旅行サイトではなく個人ブログに掲載されていることが多い
+- 搜尋 `[景點名] マップコード [預估前三碼]`
+- 自然景觀點（瀑布、溪流）常出現在個人部落格，而不是專門旅行網站
 
-**Step 4：最近バス停・駐車場を代替として使用**
-- `site:mapion.co.jp [最寄りバス停名] バス停` で mapcode 取得
-- 表に `[景點名]（[代替ポイント名]付近）` と注釈を明記
+**Step 4：使用最近巴士站或停車場作為替代**
+- 用 `site:mapion.co.jp [最寄りバス停名] バス停` 搜尋並取得 mapcode
+- 在表格中寫成 `[景點名]（[代替點名]附近）`，並明確加註
 
-**Step 5：未取得の場合**
-- 表に `要確認（Tel XXXX-XX-XXXX 索取）` と記載
-- カーナビ不可の旨をユーザーに伝える
+**Step 5：無法取得時**
+- 在表格中記載 `要確認（Tel XXXX-XX-XXXX 索取）`
+- 告知使用者該點無法直接用車用導航輸入
 
-**自然景観スポット（滝・渓流）の注意点**
+**自然景觀點（瀑布、溪流）的注意事項**
 
-| 種類 | mapcode 登録状況 | 対処 |
+| 種類 | mapcode 登錄狀況 | 對應方式 |
 |------|----------------|------|
-| 道の駅・駐車場 | ほぼ必ず登録あり | Step 1-2で取得可 |
-| 旅館・ホテル | ほぼ必ず登録あり | Step 1-2で取得可 |
-| 神社・仏閣 | ほぼ登録あり | Step 1-2で取得可 |
-| 滝・渓流の流れ | **登録なしが多い** | Step 3-4で代替 |
-| 路肩駐車ポイント | **未登録** | 最寄りバス停を代替使用 |
+| 道の駅、停車場 | 幾乎都有登錄 | Step 1-2 可取得 |
+| 旅館、飯店 | 幾乎都有登錄 | Step 1-2 可取得 |
+| 神社、寺院 | 多數有登錄 | Step 1-2 可取得 |
+| 瀑布、溪流路段 | **常未登錄** | Step 3-4 替代 |
+| 路肩停車點 | **通常未登錄** | 使用最近巴士站替代 |
 
 #### Anti-patterns
 
-- ❌ 渓流・海岸線などの沿線スポットを「大景點 1行 = 1 mapcode」でまとめる
-- ❌ 同日に A→B（25km 離れ）で B の mapcode を記載しない
-- ❌ mapcode が見つからないとき、表に行を追加せず無言でスキップする
-- ❌ 路肩停車ポイントに mapcode がないからといって記載を省略する（バス停代替で対処）
+- ❌ 將溪流、海岸線等沿線景點用「大景點 1 行 = 1 mapcode」概括
+- ❌ 同日 A→B（相距 25km）時未記載 B 的 mapcode
+- ❌ 找不到 mapcode 時，不在表格中加入行並沉默跳過
+- ❌ 因路肩停車點沒有 mapcode 就省略記載；應使用巴士站替代處理
 
 #### Agent Action
 
-- 自駕行程の mapcode 表を作成・レビューするとき、**必ず**各日の停車ポイントを個別確認し、同一景點内で 2km+ 離れた sub-spot がないか検査する
-- mapcode が見つからない場合も**必ず**表に行を追加し、代替コードまたは「要確認（Tel XXXX）」を記載する
-- 「大景點 1 行でまとめた」状態を最終成果物と見なさない
+- 建立或審查自駕行程的 mapcode 表時，**必須**逐日確認各停車點，檢查同一景點內是否有相距 2km+ 的 sub-spot
+- 找不到 mapcode 時也**必須**在表格中加入行，記載替代碼或「要確認（Tel XXXX）」
+- 不得把「大景點 1 行概括」視為最終成果物
 
 #### Goal / Action / Validation
 
-- Goal: 全ての自駕停車ポイントがカーナビで個別に入力可能な状態にする
-- Action: 粒度ルール（2km+ → 分割）を適用し、工具鏈で各 mapcode を取得する
-- Validation or reference source: 行程表の mapcode 表で「要確認」がゼロになること、または代替コード＋注釈が記載されていること
+- Goal: 讓所有自駕停車點都能在車用導航中個別輸入
+- Action: 套用粒度規則（2km+ → 分割），並用工具鏈取得各 mapcode
+- Validation or reference source: 行程表的 mapcode 表中「要確認」為零，或已記載替代碼與註解
 
 #### Applies When
 
-- 日本の自駕行程で mapcode 表を作成・更新するとき
-- 渓流・海岸線・高原など沿線タイプの観光地（複数の停車点がある景點）を行程に含むとき
-- 同日に 2か所以上の異なる目的地を設定するとき
+- 建立或更新日本自駕行程的 mapcode 表時
+- 行程包含溪流、海岸線、高原等沿線型觀光地，且有多個停車點時
+- 同日設定 2 個以上不同目的地時
 
 #### Does Not Apply When
 
-- 徒歩・公共交通のみの行程（カーナビ不要）
-- mapcode ではなく Google Maps や住所での案内が求められているとき
+- 只有步行或公共交通的行程（不需要車用導航）
+- 使用者要求的是 Google Maps 或地址導航，而不是 mapcode
 
 #### Validation
 
-- 行程表の全停車ポイントに mapcode 行があること
-- 沿線スポット（奧入瀨溪流等）が複数行に分割されていること
-- 代替コード使用時は注釈（「〇〇バス停付近」等）が記載されていること
+- 行程表的所有停車點都有 mapcode 行
+- 沿線景點（例如奧入瀨溪流）已拆成多行
+- 使用替代碼時，已記載註解（例如「〇〇巴士站附近」）
 
 #### Promotion Target
 
-- `workflow/travel-planning/execution-flow.md`（Step 4 Exact Location Verification に mapcode 粒度ルールを追記）
-- `analysis/travel/sources-and-tools.md`（mapcode 查詢工具鏈を追記）
+- `workflow/travel-planning/execution-flow.md`（Step 11 國家與地區特定檢查中的日本自駕段落，已加入 mapcode 粒度規則）
+- `analysis/travel/sources-and-tools.md`（mapcode 查詢工具鏈）
 
 #### Required Linked Updates
 
-- `workflow/travel-planning/execution-flow.md`：Step 4 に「沿線スポットは停車点ごとに独立 mapcode 行を設ける」ルールを追加
-- `analysis/travel/sources-and-tools.md`：mapcode 查詢の工具鏈（MapFan spots → Mapion 電話帳 → 旅行ブログ → バス停代替）を追記
-- `knowledge/summaries/travel-planning.md`：mapcode 粒度ルールの一行摘要を追記
+- `workflow/travel-planning/execution-flow.md`：Step 11 的日本自駕段落加入「沿線景點需依停車點建立獨立 mapcode 行」規則
+- `analysis/travel/sources-and-tools.md`：補充 mapcode 查詢工具鏈（MapFan spots → Mapion 電話帳 → 旅行部落格 → 巴士站替代）
+- `knowledge/summaries/travel-planning.md`：補充 mapcode 粒度規則的一行摘要
 - 已依 [reusable-guidance-boundary.md](../../../../enforcement/reusable-guidance-boundary.md) 確認：具體旅館名稱、地名已抽象化，僅保留通用規則與工具鏈
 
 #### Related
 
-- ツール：`WebFetch`、`WebSearch`、`mcp__Claude_in_Chrome__navigate`（mapfan/mapion はブロックされるため注意）
-- 參考：[hotel-availability-check-workflow.md](./2026-05-19_hotel-availability-check-workflow.md)（Chrome extension ブロックドメインの対処パターン共通）
-- mapcode 信頼済みソース：`mapfan.com/spots/`、`mapion.co.jp/phonebook/`、個人旅行ブログ（ks2345.sakura.ne.jp 等）
+- 工具：`WebFetch`、`WebSearch`、`mcp__Claude_in_Chrome__navigate`（注意 mapfan/mapion 會被 Chrome extension 封鎖）
+- 參考：[hotel-availability-check-workflow.md](./2026-05-19_hotel-availability-check-workflow.md)（Chrome extension 封鎖域名的處理模式共通）
+- mapcode 可信來源：`mapfan.com/spots/`、`mapion.co.jp/phonebook/`、個人旅行部落格（例如 ks2345.sakura.ne.jp）
