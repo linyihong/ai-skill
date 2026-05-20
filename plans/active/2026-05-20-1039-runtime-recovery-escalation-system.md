@@ -229,6 +229,8 @@ Exit criteria:
 
 ### Phase 1 — Enforcement Policy
 
+Status: completed 2026-05-20.
+
 Goal: 建立全庫 escalation trigger 與 forbidden behavior。
 
 Candidate files:
@@ -241,15 +243,25 @@ Candidate files:
 
 Tasks:
 
-- [ ] 新增 `escalation-policy.md`，定義 trigger classes、levels、recovery required actions。
-- [ ] 在 `failure-learning-system.md` 區分 real-time escalation 與 post-mortem failure learning。
-- [ ] 在 `dependency-reading.md` 加入 source-of-truth miss / reload ledger 的關聯。
-- [ ] 更新 `enforcement/README.md` lazy-load 表格與完整索引。
-- [ ] 更新 `linked-updates.md`，加入新增 escalation policy 的連動規則。
+- [x] 新增 `escalation-policy.md`，定義 trigger classes、levels、recovery required actions。
+- [x] 在 `failure-learning-system.md` 區分 real-time escalation 與 post-mortem failure learning。
+- [x] 在 `dependency-reading.md` 加入 source-of-truth miss / reload ledger 的關聯。
+- [x] 更新 `enforcement/README.md` lazy-load 表格與完整索引。
+- [x] 更新 `linked-updates.md`，加入新增 escalation policy 的連動規則。
+- [x] 新增 metadata rule 並接入 `runtime/router/activation-rules.yaml`，讓 escalation policy 可 lazy-load。
 
 Exit criteria:
 
-- [ ] 使用者否定、重複失敗、evidence conflict 能從 enforcement index 找到 recovery 要求。
+- [x] 使用者否定、重複失敗、evidence conflict 能從 enforcement index 找到 recovery 要求。
+
+Phase 1 result:
+
+| Area | Result |
+| --- | --- |
+| Rule source | `enforcement/escalation-policy.md` |
+| Activation | `runtime/router/activation-rules.yaml` contains `enforcement.escalation-policy` for user contradiction, repeated failure, evidence conflict, source-of-truth miss, automation drift, and runtime recovery intents. |
+| Metadata | `metadata/rules/escalation-policy.yaml` + `metadata/rules/README.md` |
+| Linked updates | `enforcement/README.md`, `enforcement/failure-learning-system.md`, `enforcement/dependency-reading.md`, `enforcement/linked-updates.md` |
 
 ### Phase 2 — Runtime Guard Integration
 

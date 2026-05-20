@@ -14,6 +14,7 @@
 | [`dependency-reading.yaml`](dependency-reading.yaml) | 依賴文件讀取鐵則（Core Bootstrap，P0） |
 | [`conversation-goal-ledger.yaml`](conversation-goal-ledger.yaml) | 對話目標帳本（Core Bootstrap，P0） |
 | [`linked-updates.yaml`](linked-updates.yaml) | 連動更新（Lazy-load，P1） |
+| [`escalation-policy.yaml`](escalation-policy.yaml) | Escalation policy（Lazy-load，P1） |
 | [`failure-learning-system.yaml`](failure-learning-system.yaml) | 失效學習系統（Lazy-load，P1） |
 | [`sanitization.yaml`](sanitization.yaml) | 去敏與占位符（Lazy-load，P1） |
 | [`authorization-scope.yaml`](authorization-scope.yaml) | 授權與範圍（Lazy-load，P0） |

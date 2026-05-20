@@ -66,6 +66,38 @@
     :priority: P1
     :estimated_tokens: 1200
     :source: enforcement/failure-learning-system.md
+- :rule_id: enforcement.escalation-policy
+  :description: Escalation policy — mismatch 發生時停止局部 patch 並重建 execution graph
+  :activation:
+    :when:
+    - :type: user_signal
+      :matches:
+      - 不是這樣
+      - 你沒看
+      - 你又在猜
+      - 反覆失敗
+      - 一直失敗
+      - evidence conflict
+      - source-of-truth
+    - :type: validation_gap
+      :matches:
+      - repeated-failure
+      - user-contradiction
+      - evidence-conflict
+      - source-of-truth-miss
+      - automation-drift
+    - :type: task_intent
+      :matches:
+      - runtime-recovery
+      - escalation
+      - rediscovery
+      - execution-graph-rebuild
+      - mismatch-recovery
+  :load:
+    :strategy: lazy
+    :priority: P1
+    :estimated_tokens: 900
+    :source: enforcement/escalation-policy.md
 - :rule_id: enforcement.decision-efficiency
   :description: 決策效率 — 以最高收益路線做決策
   :activation:

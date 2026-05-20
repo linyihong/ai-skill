@@ -16,6 +16,7 @@
 | `enforcement/tool-neutral-documentation.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、根 `README.md`、`skills/README.md`、`skills/ADDING_SKILLS.md`、各 skill 入口/README、`skills/*/tool-adapters/` 索引、`ai-tools/README.md` 與受影響工具文件。 |
 | `enforcement/rule-weight.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`enforcement/decision-efficiency.md`、`enforcement/goal-action-validation.md`、工具專用 always-apply agent rule、`ai-tools/` bootstrap 清單。 |
 | `enforcement/decision-efficiency.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`governance/document-sizing.md`、相關 skill 的 workflow / tools / README（若該 skill 有決策路由或 context-loading 指引）。 |
+| `enforcement/escalation-policy.md` | `enforcement/README.md`、`enforcement/linked-updates.md`、`enforcement/failure-learning-system.md`、`enforcement/dependency-reading.md`、`runtime/README.md`、`runtime/pipeline/guard-chain.yaml`（若要接 runtime guard）、相關 workflow primary source（若 domain-specific mismatch hook 受影響）。 |
 | `enforcement/failure-learning-system.md` 或 `enforcement/failure-patterns/` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/reusable-guidance-boundary.md`、`../../feedback/feedback-lessons.md`、`enforcement/goal-action-validation.md`、`enforcement/dependency-reading.md`、相關 tool 文件與被補強的 enforcement rule / skill workflow。 |
 | 任一 `skills/<name>/tool-adapters/<tool>.md` | 該 skill 的 `SKILL.md`、`README.md`、核心 `WORKFLOW.md`/`TOOLS.md`、adapter index、`enforcement/tool-neutral-documentation.md`、`ai-tools/<tool>.md`（若存在）、`enforcement/linked-updates.md`。 |
 | `enforcement/document-todo-list.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/conversation-goal-ledger.md`、`skills/ADDING_SKILLS.md`、相關模板與 documentation/checklist 文件。 |
@@ -49,6 +50,17 @@
 | Validation | 連動更新檢查、diff review、sync、commit/push/readback 或純判斷的參考來源。 |
 
 若 ledger 顯示最低讀取範圍仍有缺口，agent 不得宣稱「已按更新後 skill 執行」或長時間切回專案分析；必須先補讀、標 `not applicable`，或明確向使用者說明阻塞。
+
+### Source-of-truth Miss Escalation
+
+若 agent 已開始執行，但發現重要操作前未讀 canonical workflow、owner docs、UI map、API contract、runtime source 或 routing registry，這不只是一般 dependency miss。依 [`escalation-policy.md`](escalation-policy.md) 將它視為 `source-of-truth-miss`：
+
+1. 停止目前 patch / automation / guess。
+2. 在 dependency read ledger 中標明缺少的 source。
+3. 讀取或標記 `not applicable` / `source missing`。
+4. 重建 execution graph 後才恢復執行。
+
+若使用者指出「你沒看文件」「不是這個流程」「你又在猜」，同樣依 escalation policy 進入 recovery frame，不只補一個檔案讀取。
 
 ## Default Bootstrap Boundary
 

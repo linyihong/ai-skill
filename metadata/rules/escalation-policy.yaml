@@ -1,0 +1,72 @@
+# Enforcement Rule Metadata
+id: enforcement.escalation-policy
+title: Escalation Policy
+schema_version: enforcement-rule/v1
+type: rule
+layer: enforcement
+source_path: enforcement/escalation-policy.md
+summary: Defines real-time mismatch escalation triggers, forbidden behaviors, and required recovery outputs before an agent resumes execution.
+domains:
+  - runtime-recovery
+  - repo-governance
+  - workflow-execution
+tags:
+  - escalation
+  - recovery
+  - source-of-truth
+  - execution-graph
+  - mismatch
+status: validated
+priority: P1
+confidence: high
+stability: evolving
+context_cost:
+  estimated_tokens: 900
+  load_strategy: lazy
+  cacheable: true
+  ttl:
+    task: 1
+  provider_cache:
+    provider_cache_candidate: true
+    prefix_stability: semi_stable
+    cache_position: middle
+    churn_risk: medium
+when_to_read: Read when repeated failure, user contradiction, evidence conflict, source-of-truth miss, automation drift, or runtime recovery escalation appears.
+validation: Confirm enforcement/README.md, runtime/router/activation-rules.yaml, metadata/rules/README.md, dependency-reading.md, failure-learning-system.md, and linked-updates.md all reference the rule consistently.
+complexity: medium
+depends:
+  - enforcement.dependency-reading
+  - enforcement.failure-learning-system
+  - enforcement.linked-updates
+related:
+  - plans/active/2026-05-20-1039-runtime-recovery-escalation-system.md
+  - runtime/README.md
+conflicts: []
+replaces: []
+models:
+  small: Load when explicit escalation signals appear; otherwise rely on summary through activation metadata.
+  large: Load before continuing work after user contradiction or repeated execution mismatch.
+  specialized: Use with runtime recovery guard integration and validation scenarios.
+checklist:
+  - Trigger class and level are named.
+  - Old assumption is suspended.
+  - Required source-of-truth is read or marked not applicable.
+  - Execution graph is rebuilt before execution resumes.
+  - Failure learning loop is opened if durable prevention is needed.
+runtime_notes: Activation is lazy via runtime/router/activation-rules.yaml; Phase 2 will connect runtime guards.
+governance_notes: This rule is real-time control and does not replace failure-learning durable prevention.
+
+activation_conditions:
+  when:
+    - repeated failure or automation drift occurs
+    - user contradicts the agent's route or assumptions
+    - evidence conflicts with the selected workflow or source-of-truth
+    - important canonical source was missed before execution
+    - runtime recovery or rediscovery is requested
+  load_strategy: lazy
+  priority: P1
+  estimated_tokens: 900
+always_apply: false
+scope: agent-behavior
+deprecated_by:
+rule_id: enforcement.escalation-policy
