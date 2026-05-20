@@ -1,0 +1,312 @@
+# Cross-Platform Go Script Runtime
+
+> **狀態**：draft
+> **建立時間**：2026-05-21 08:34
+> **目的**：將 `scripts/` 從依賴特定 shell、Ruby runtime 與本機環境假設，升級為可在 Windows、macOS、Linux 穩定執行的跨平台工具層；iOS / Android 先評估可行性與限制，不預設納入同等支援範圍。
+
+## 背景
+
+目前 `scripts/` 同時包含 shell、Ruby、Python 與 git hook script。這些工具已能支援本庫的 close-loop、runtime refresh、SQLite index、hook 安裝與新專案初始化，但執行成功常隱含以下前提：
+
+- 使用者環境有 POSIX shell、Ruby、Python、SQLite CLI、git 與相容的檔案權限模型。
+- 腳本以 macOS / Linux 路徑與 shell 行為為主，Windows 需要 Git Bash、WSL 或額外 runtime。
+- hook 與 close-loop 行為依賴本機 git 設定、執行權限與環境變數。
+- runtime compiler 與 generated surface 驗證依賴 Ruby 與 SQLite CLI，agent 在不同環境容易漏跑或跑不完整。
+
+本計畫不把「改用 Go」視為單純語言替換，而是把 scripts 層重構為可測試、可發佈、可跨平台執行的工具產品。
+
+## 目標
+
+1. 建立一個跨平台 CLI 入口，例如 `ai-skill`，以 Go 實作主要 script 能力。
+2. 在 Windows、macOS、Linux 上提供一致的命令、輸出、exit code、dry-run 與錯誤訊息。
+3. 將現有 shell / Ruby script 的行為先規格化，再分批遷移，避免一次重寫造成 close-loop 失效。
+4. 建立完整測試矩陣：unit test、golden output、fixture repo、跨 OS CI、端到端 dry-run、runtime.db / SQLite assertion。
+5. 保留必要的 Ruby compiler 或逐步移植策略，確保 runtime source-of-truth 與 generated artifact 不漂移。
+6. 評估 iOS / Android 是否適合作為「執行平台」、「遠端控制平台」或「不可支援平台」，並寫出明確結論。
+
+## 非目標
+
+- 不在第一階段移除所有現有 script；新 CLI 應先與既有 script 並行，通過驗證後再 deprecate。
+- 不把手機平台承諾成完整本機執行環境；iOS / Android 的 sandbox、檔案系統、git、SQLite 與 process model 需先評估。
+- 不改變 Ai-skill 的 source-of-truth 分層；CLI 只是執行介面，不能取代 `governance/`、`runtime/`、`knowledge/` 與 `plans/` 的 canonical 文件。
+- 不把工具 mirror 當 source repo；reference-first 與 writeback transaction 規則維持不變。
+
+## Architecture Compatibility Preflight
+
+| 欄位 | 內容 |
+| --- | --- |
+| Trigger | 建立跨平台 script runtime plan，尚未進入 implementation phase |
+| Checked sources | `plans/README.md`、`scripts/README.md`、`enforcement/dependency-reading.md`、`enforcement/linked-updates.md`、`enforcement/neutral-language.md`、`governance/lifecycle/knowledge-update-flow.md`、`runtime/compiler/compiler-engine.rb` |
+| Current architecture | `scripts/` 是 automation / validation / close-loop 執行層；`runtime/compiler/` 是 runtime.db compiler source；`knowledge/runtime/` 是 generated runtime surfaces；`plans/active/*.md` 會被 compiler 納入 plans index |
+| Conflicts | 無直接衝突；但若 implementation 改 `scripts/` 或 `runtime/compiler/`，必須同步 `scripts/README.md`、必要 validator、runtime.db 與 generated reports |
+| Decision | proceed with planning only；implementation phase 前必須重新做 preflight，確認 candidate files、source-of-truth 與 test strategy 仍有效 |
+| Validation | 本計畫建立後需更新 `plans/README.md`，執行 knowledge runtime refresh、runtime compiler、`validate-runtime-db`、link check、lint、commit / push / readback |
+
+## Current Script Inventory
+
+| 類型 | 目前檔案 | 主要風險 |
+| --- | --- | --- |
+| Shell CLI | `init-new-project.sh`、`sync-cursor-bundle.sh`、`ai-skill-close-loop.sh`、`agent-goals.sh`、`install-hooks.sh` | Windows shell 相容性、執行權限、path separator、symlink、環境變數、git hook 行為 |
+| Ruby generator / validator | `validate-knowledge-runtime.rb`、`refresh-knowledge-runtime.rb`、`generate-*.rb`、`query-*.rb`、`validate-runtime-db.rb`、`runtime/compiler/compiler-engine.rb` | Ruby runtime、gem/native extension、encoding、SQLite CLI / library 差異 |
+| Python helper | `set-roo-global-custom-instructions.py` | Python availability、path 與使用者設定檔位置 |
+| Git hooks | `scripts/git-hooks/pre-commit`、`scripts/git-hooks/post-commit` | hook shell、PATH、環境變數、跨平台 git hook 限制 |
+
+## Proposed Target Architecture
+
+### 1. Go CLI 作為穩定入口
+
+建立 `cmd/ai-skill` 或 `tools/ai-skill-cli`：
+
+```text
+ai-skill
+  init-project
+  sync-cursor-bundle
+  close-loop
+  goals
+  runtime refresh
+  runtime validate
+  runtime compile
+  runtime query
+  hooks install
+  doctor
+```
+
+CLI 必須提供：
+
+- `--dry-run`：所有會寫檔、commit、push、安裝 hook、建立 symlink 的命令都必須支援。
+- `--json`：提供 agent / CI 可解析輸出。
+- `--plain`：提供人類可讀輸出，避免只依賴彩色終端。
+- 穩定 exit code：validation failure、dirty working tree、missing dependency、permission denied、unsupported platform 要有不同 code。
+- path abstraction：統一處理 Windows drive、UNC path、POSIX path、symlink 與 path normalization。
+
+### 2. 以 adapter 包住既有 script，再逐步移植
+
+第一版 Go CLI 不必立刻重寫所有 Ruby compiler / generator。建議分三層：
+
+| 層級 | 策略 | 目的 |
+| --- | --- | --- |
+| Wrapper mode | Go CLI 呼叫既有 script，統一參數、輸出、exit code | 快速建立跨平台入口與測試 harness |
+| Native mode | 將 shell script 與 path/git/file 操作移植到 Go | 優先解決 Windows/macOS/Linux 差異 |
+| Compiler migration | 評估 Ruby generator / compiler 是否移植到 Go 或保留 Ruby | 避免 premature rewrite 破壞 runtime semantics |
+
+### 3. Runtime compiler 的保守策略
+
+`runtime/compiler/compiler-engine.rb` 是 `runtime/runtime.db` 的 source-to-generated compiler。遷移策略必須保守：
+
+- Phase 1-2 只用 Go CLI 包裝 compiler，不改變 compiler semantics。
+- Phase 3 建立 golden DB / JSON snapshot，比對 Ruby compiler 與 Go prototype 的輸出。
+- 只有在 snapshot parity、SQLite schema validation、generated_surfaces content assertion 全部通過後，才可切換 compiler source。
+- 若保留 Ruby compiler，Go CLI 的 `doctor` 必須能清楚提示 Ruby / encoding / SQLite 缺失。
+
+## Phase Plan
+
+### Phase 0：Discovery & Contract（P0）
+
+**目標**：先定義 script runtime 的行為契約，不急著改寫。
+
+Tasks：
+
+- [ ] 盤點所有 `scripts/`、`runtime/compiler/` 與 git hook 的輸入、輸出、寫檔位置、exit code、環境變數、外部命令依賴。
+- [ ] 建立 command contract 文件，列出每個命令的 arguments、dry-run 行為、side effects、validation signal。
+- [ ] 建立 platform support matrix：Windows、macOS、Linux、iOS、Android。
+- [ ] 建立風險清單：symlink、chmod、git hook、SQLite、Ruby gems、encoding、shell quoting、路徑大小寫。
+- [ ] 決定 repository layout：`cmd/ai-skill`、`internal/`、`pkg/`、`testdata/`、`docs/` 或其他命名。
+
+Completion criteria：
+
+- 所有現有 scripts 都有 command contract。
+- 每個命令都標示是否可 native Go migration、需要 wrapper、或暫不支援。
+- iOS / Android 有初步結論：native local run、remote control、或 unsupported。
+
+### Phase 1：Go CLI Skeleton & Doctor（P0）
+
+**目標**：建立可跨平台編譯與自我診斷的 Go CLI。
+
+Tasks：
+
+- [ ] 新增 `go.mod` 與 CLI skeleton。
+- [ ] 實作 `ai-skill doctor`：檢查 git、SQLite、Ruby、Python、repo root、write permission、hooksPath、PATH。
+- [ ] 實作 path / OS abstraction，禁止散落 OS-specific string manipulation。
+- [ ] 建立 `--json` / `--plain` output contract。
+- [ ] 建立基本 unit tests 與 GitHub Actions matrix：Windows、macOS、Linux。
+
+Completion criteria：
+
+- `go test ./...` 在三大桌面 OS 通過。
+- `ai-skill doctor --json` 輸出可被 CI / agent 解析。
+- 沒有任何命令在未傳 `--confirm` 或非 dry-run 模式下執行破壞性操作。
+
+### Phase 2：Shell Script Migration（P1）
+
+**目標**：優先移除最容易受平台影響的 shell 腳本依賴。
+
+Candidate commands：
+
+- `init-new-project.sh` → `ai-skill init-project`
+- `agent-goals.sh` → `ai-skill goals`
+- `install-hooks.sh` → `ai-skill hooks install`
+- `sync-cursor-bundle.sh` → `ai-skill sync-cursor-bundle`
+- `ai-skill-close-loop.sh` → `ai-skill close-loop`
+
+Tasks：
+
+- [ ] 用 fixtures 模擬新專案初始化，不寫入真實使用者目錄。
+- [ ] 用 temporary git repo 測試 close-loop、dirty owner group、lock、merge/rebase state、dry-run。
+- [ ] 對 symlink / copy fallback 建立 Windows 行為策略。
+- [ ] 更新 `scripts/README.md`，標示舊 script 與新 CLI 的對應關係與 deprecation policy。
+
+Completion criteria：
+
+- 新 CLI 與舊 script 在 fixtures 上輸出一致或差異有文件化理由。
+- Windows 不需要 Git Bash / WSL 即可跑 native CLI。
+- close-loop 不會混入 unrelated dirty changes。
+
+### Phase 3：Runtime & Knowledge Tooling Strategy（P1）
+
+**目標**：處理 Ruby generator / validator 的跨平台問題。
+
+Tasks：
+
+- [ ] 先建立 Go wrapper：`ai-skill runtime refresh`、`runtime validate`、`runtime compile`。
+- [ ] Wrapper 必須固定 UTF-8 環境，並在缺 Ruby / SQLite 時給明確修復建議。
+- [ ] 建立 golden fixture：同一組 source 產出固定 `runtime-report.md`、model reports、SQLite index、`runtime.db` assertion。
+- [ ] 評估哪些 Ruby validator 適合原生 Go 重寫，哪些應保留 Ruby。
+- [ ] 若開始移植 compiler，先建立 Ruby vs Go parity test，不得直接替換 production compiler。
+
+Completion criteria：
+
+- Go CLI 可一鍵跑完整更新流程並輸出 machine-readable summary。
+- `runtime.db` 的 `generated_surfaces` 必須可查到 modified source 的內容 assertion。
+- Ruby / Go parity test 未通過前，不切換 runtime compiler source。
+
+### Phase 4：Cross-Platform Release & Distribution（P1）
+
+**目標**：讓使用者不需要先安裝完整開發環境也能跑主要工具。
+
+Tasks：
+
+- [ ] 建立 release artifact：Windows `.exe`、macOS universal / arch-specific、Linux amd64 / arm64。
+- [ ] 建立 checksum 與版本輸出：`ai-skill version`。
+- [ ] 建立 upgrade / rollback 文件。
+- [ ] 評估 Homebrew、Scoop、winget、GitHub Releases、直接下載 binary 的維護成本。
+
+Completion criteria：
+
+- 三大桌面 OS 都能下載 binary 後執行 `doctor` 與 dry-run commands。
+- 文件說明 source build 與 binary install 的差異。
+- release 流程有 dry-run 與 artifact verification。
+
+### Phase 5：Mobile Feasibility Evaluation（P2）
+
+**目標**：明確回答 iOS / Android 是否可行，而不是模糊承諾。
+
+Evaluation dimensions：
+
+| 平台 | 可行方向 | 主要限制 |
+| --- | --- | --- |
+| Android | Termux / app sandbox / remote runner client | git、SQLite、檔案權限、背景任務、使用者資料路徑、shell compatibility |
+| iOS | Shortcuts / app wrapper / remote runner client | sandbox、JIT / process 限制、git 可用性、檔案存取、背景執行限制 |
+
+Decision options：
+
+- **Native local runner**：手機本機直接跑 CLI，只有在 git + filesystem + SQLite + process model 足夠時才可選。
+- **Remote control client**：手機只觸發桌面 / server runner，較可能可行。
+- **Unsupported**：若成本高於收益，明確標示不支援，不讓 agent 誤判。
+
+Completion criteria：
+
+- 寫出 iOS / Android support decision record。
+- 若不支援，CLI `doctor` 與文件要明確顯示 unsupported reason。
+- 若支援 remote control client，必須另開安全與授權計畫，不混在本計畫直接實作。
+
+### Phase 6：Deprecation & Closure（P2）
+
+**目標**：完成舊 script 到新 CLI 的治理閉環。
+
+Tasks：
+
+- [ ] 更新 `scripts/README.md`：新 CLI 為 primary，舊 script 標記 deprecated / compatibility wrapper。
+- [ ] 更新 `enforcement/linked-updates.md` 中與 close-loop / scripts 有關的說明。
+- [ ] 更新必要的 git hook 文件與 ai-tools 文件。
+- [ ] 執行 Plan Completion Closure：validator、linked updates、`plans/README.md` 狀態、搬移 archived、commit / push、readback。
+
+Completion criteria：
+
+- 舊 script 不再是主要入口，或只作為 thin wrapper 呼叫 Go CLI。
+- 所有文件、runtime generated surfaces、測試與 release artifact 一致。
+- plan 完成後移到 `plans/archived/` 或明確標註持續生效例外。
+
+## Testing Strategy
+
+| 測試類型 | 必須覆蓋 |
+| --- | --- |
+| Unit tests | path normalization、OS detection、exit code、JSON output、dry-run planner |
+| Golden tests | command output、generated reports、runtime.db assertion、hook templates |
+| Fixture tests | temporary repo、dirty files、merge/rebase state、missing dependency、permission denied |
+| Cross-OS CI | Windows、macOS、Linux；至少覆蓋 amd64，arm64 視 CI 能力納入 |
+| Compatibility tests | 新 CLI wrapper vs 舊 script 的行為比對 |
+| Runtime validation | `ruby scripts/refresh-knowledge-runtime.rb`、`ruby scripts/validate-runtime-db.rb`、SQLite content assertion |
+| Release tests | binary checksum、`ai-skill version`、`doctor`、dry-run commands |
+
+測試原則：
+
+- 所有 destructive / write operations 先以 dry-run fixture 測試。
+- 涉及 git 的測試一律使用 temporary repo，不碰使用者真實 working tree。
+- 涉及 home directory、Cursor bundle、hook install 的測試必須支援 fake home / fake config path。
+- Windows 測試不得假設 POSIX shell 存在。
+- Runtime compiler migration 必須使用 parity test，不得只比較 exit code。
+
+## Documentation Requirements
+
+Implementation phase 必須同步建立或更新：
+
+- `scripts/README.md`：CLI 使用方式、舊 script 對應表、環境需求、dry-run、錯誤處理。
+- `docs` 或 `scripts/` 下的 command contract 文件：每個命令的輸入、輸出、side effects、exit code。
+- `go` package / module README：build、test、release、cross-compile。
+- `governance/lifecycle/knowledge-update-flow.md` 或相關 validator 文件：若完整更新流程改由 CLI 統一執行，需同步更新 Step 9-11。
+- `ai-tools/`：只有當工具 mirror / Cursor bundle / hook 行為有變更時才更新。
+
+## Affected Files
+
+| 檔案 | 變更類型 | Phase |
+| --- | --- | --- |
+| `plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md` | 新增計畫 | Phase 0 |
+| `plans/README.md` | 新增 active plan 索引 | Phase 0 |
+| `scripts/README.md` | 未來更新 CLI mapping / deprecation policy | Phase 2 / Phase 6 |
+| `scripts/*.sh` | 未來 wrapper / deprecation / replacement | Phase 2 / Phase 6 |
+| `scripts/*.rb` | 未來 wrapper / parity migration | Phase 3 |
+| `runtime/compiler/compiler-engine.rb` | 若移植 compiler，需建立 parity gate | Phase 3 |
+| `cmd/ai-skill/` 或等效 Go CLI 目錄 | 未來新增 | Phase 1 |
+| `go.mod` / `go.sum` | 未來新增 | Phase 1 |
+| `.github/workflows/` 或既有 CI 設定 | 未來新增跨 OS 測試 | Phase 1 / Phase 4 |
+
+## Recommended Execution Order
+
+1. 先執行 Phase 0，完成 command contract 與 support matrix。
+2. 再執行 Phase 1，建立 Go CLI skeleton、doctor 與跨 OS CI。
+3. 優先執行 Phase 2，因為 shell scripts 是 Windows 相容性風險最高的部分。
+4. Phase 3 必須保守推進，runtime compiler 不可在沒有 parity test 前替換。
+5. Phase 4 在 CLI 行為穩定後再做 release；避免先發佈不穩定 binary。
+6. Phase 5 可以與 Phase 1-2 並行做 feasibility research，但不得阻塞桌面平台支援。
+7. Phase 6 只有在新 CLI 覆蓋主要能力且文件、測試、runtime surfaces 都通過後才能執行。
+
+## Open Questions
+
+- Go CLI 是否放在 repository root 的 `cmd/ai-skill`，或放在 `tools/ai-skill-cli` 以避免與知識文件混淆？
+- Ruby runtime compiler 是長期保留，還是以 parity test 分階段移植到 Go？
+- Release artifact 是否由 GitHub Actions 產生，或先只支援 source build？
+- iOS / Android 的主要使用場景是本機執行、遠端觸發，還是只需要讀取文件與狀態？
+- 是否需要把 `ai-skill close-loop --commit --push` 變成所有 agent 的預設 commit path，取代手動 git 流程？
+
+## Validation Plan
+
+本計畫本身完成時必須驗證：
+
+- `plans/README.md` 已加入 active plan 索引。
+- Markdown link check 通過。
+- `ruby scripts/refresh-knowledge-runtime.rb` 通過。
+- `ruby runtime/compiler/compiler-engine.rb` 通過，且 `runtime/runtime.db` 已包含 plans index 更新。
+- `ruby scripts/validate-runtime-db.rb` 通過。
+- SQLite assertion 可查到本計畫的 `plan_id` 或標題。
+- `git diff --check` 通過。
+- commit / push / readback 後 `git status --short --branch` clean。
