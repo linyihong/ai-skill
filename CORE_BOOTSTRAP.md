@@ -17,11 +17,12 @@
 ```
 1. 讀取 CORE_BOOTSTRAP.md（本檔）
 2. 讀取 README.md（超短入口，了解 OS layout）
-3. [Runtime Phase 初始化] 讀取 runtime/phases/phase-machine.yaml（或查 SQLite phase_machine 表）：
-   - 載入目前 phase、allowed_actions、forbidden_actions、blocking_gates
-   - 載入 obligation-ledger.yaml（或查 SQLite obligation_ledger 表）確認本 phase 的未完成義務
-   - 載入 blocking-gates.yaml（或查 SQLite blocking_gates 表）確認本 phase 的阻斷閘門
-   - 查詢 runtime.db（generated_surfaces 表）作為知識更新快速路徑
+3. [Runtime Phase 初始化] 查詢 [`runtime/runtime.db`](runtime/runtime.db)（SQLite）：
+   - `phase_machine` / `phases`：目前 phase、allowed_actions、forbidden_actions
+   - `obligation_ledger` / `obligations`：本 phase 的未完成義務
+   - `blocking_gates` / `gates`：本 phase 的阻斷閘門
+   - `generated_surfaces`：知識更新與 governance surface 快速路徑
+   - 若需修改 phase / obligation / gate / recovery 定義，source 是 [`runtime/compiler/embedded_data.rb`](runtime/compiler/embedded_data.rb)，不是已移除的 `runtime/phases/`、`runtime/obligations/`、`runtime/gates/` 或 `runtime/recovery/` YAML。
    - 若 phase 為 bootstrap → 繼續往下；若為其他 phase → 先檢查 blocking gates
 4. [Output Governance 初始化] 載入輸出規則（YAML 或 SQLite 皆可）：
    - 讀取 runtime/output-governance/language-policy.yaml（或查 SQLite language_policy 表）— 語言強制規則

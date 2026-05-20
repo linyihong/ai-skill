@@ -8,14 +8,15 @@
 :coordination_rules:
 - :id: coord.rule.phase_check_before_action
   :name: Phase Check Before Action
-  :description: 執行任何 action 前先讀取 phase-machine.yaml 確認目前 phase
-  :rule: 'Agent 在執行任何 action 前，必須先讀取 runtime/phases/phase-machine.yaml， 確認目前 phase 與 allowed_actions。如果 phase 與預期不符，表示有其他 agent 已變更 state，需執行 reconciliation。
+  :description: 執行任何 action 前先查詢 runtime.db 確認目前 phase
+  :rule: 'Agent 在執行任何 action 前，必須先查詢 runtime/runtime.db 的 phase_machine / phases tables，確認目前 phase 與 allowed_actions。如果 phase 與預期不符，表示有其他 agent 已變更 state，需執行 reconciliation。
 
 '
   :severity: critical
   :check:
-    :type: file_read
-    :target: runtime/phases/phase-machine.yaml
+    :type: sqlite_query
+    :target: runtime/runtime.db
+    :query: SELECT * FROM phase_machine
     :verification: current_phase_matches_expectation == true
 - :id: coord.rule.generated_surface_version_check
   :name: Generated Surface Version Check
@@ -31,8 +32,8 @@
     :verification: db_updated_at >= prose_source_mtime
 - :id: coord.rule.obligation_ledger_sync
   :name: Obligation Ledger Sync
-  :description: 修改 obligation ledger 前先取得 lock
-  :rule: 'Agent 在修改 runtime/obligations/obligation-ledger.yaml 前，必須先取得 lock.obligation_ledger。修改完成後釋放 lock。如果無法取得 lock， 表示有其他 agent 正在操作，需等待或進入 recovery。
+  :description: 修改 obligation runtime source 前先取得 lock
+  :rule: 'Agent 在修改 obligation runtime source（目前為 runtime/compiler/embedded_data.rb，並編譯至 runtime/runtime.db）前，必須先取得 lock.obligation_ledger。修改完成後釋放 lock。如果無法取得 lock， 表示有其他 agent 正在操作，需等待或進入 recovery。
 
 '
   :severity: critical
@@ -56,11 +57,11 @@
 - :id: coord.rule.stale_state_recovery
   :name: Stale State Recovery
   :description: 偵測到 stale state 時執行 recovery
-  :rule: '如果 agent 偵測到 phase inconsistency、obligation drift、或 generated surface stale，必須先執行 runtime/recovery/phase-reconciliation.yaml 的 reconciliation 程序，才能繼續執行。
+  :rule: '如果 agent 偵測到 phase inconsistency、obligation drift、或 generated surface stale，必須先查詢 runtime/runtime.db 的 phase_reconciliation / recovery_strategies，必要時讀 runtime/compiler/embedded_data.rb 的 source，完成 reconciliation 後才能繼續執行。
 
 '
   :severity: critical
-  :recovery_procedure: runtime/recovery/phase-reconciliation.yaml
+  :recovery_procedure: runtime/runtime.db:phase_reconciliation
 :consistency_checks:
 - :id: check.phase_consistency
   :name: Phase Consistency Check
@@ -76,7 +77,7 @@
   :failure_message: 'Obligation drift detected: obligation ledger has unexpected changes'
 - :id: check.generated_surface_stale
   :name: Generated Surface Stale Check
-  :description: 檢查 generated YAML 是否為最新版本
-  :check_interval: 每次讀取 generated YAML 前
+  :description: 檢查 generated runtime surface 是否為最新版本
+  :check_interval: 每次讀取 generated runtime surface 前
   :failure_action: run_compiler
   :failure_message: 'Generated surface is stale: {target} generated_at {generated_at}, prose modified at {prose_mtime}'

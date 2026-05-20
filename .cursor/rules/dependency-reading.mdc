@@ -13,10 +13,11 @@ At session start or when taking over a task, load the **Core Bootstrap** (3 rule
 2. Read [README.md](../../README.md) — OS layout & quickstart
 3. Match task intent against [routing-registry.yaml](../../knowledge/runtime/routing-registry.yaml) to find the relevant route
 4. Check [runtime/router/activation-rules.yaml](../../runtime/router/activation-rules.yaml) for which lazy-load rules to activate
-5. Load Runtime Phase initialization:
-   - [runtime/phases/phase-machine.yaml](../../runtime/phases/phase-machine.yaml) — current phase state
-   - [runtime/obligations/obligation-ledger.yaml](../../runtime/obligations/obligation-ledger.yaml) — phase obligations
-   - [runtime/gates/blocking-gates.yaml](../../runtime/gates/blocking-gates.yaml) — phase blocking gates
+5. Load Runtime Phase initialization from [runtime/runtime.db](../../runtime/runtime.db):
+   - `phase_machine` / `phases` — current phase state
+   - `obligation_ledger` / `obligations` — phase obligations
+   - `blocking_gates` / `gates` — phase blocking gates
+   - Runtime phase / obligation / gate / recovery source is [runtime/compiler/embedded_data.rb](../../runtime/compiler/embedded_data.rb); do not reference removed `runtime/phases/`, `runtime/obligations/`, `runtime/gates/`, or `runtime/recovery/` YAML.
 6. Load Output Governance initialization:
    - [runtime/output-governance/language-policy.yaml](../../runtime/output-governance/language-policy.yaml) — language enforcement rules
    - [runtime/output-governance/output-rules.yaml](../../runtime/output-governance/output-rules.yaml) — document output rules

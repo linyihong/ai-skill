@@ -174,55 +174,55 @@ state_based_enforcement:
   owner_layer: enforcement/failure-learning-system
   description: >
     將 failure-learning close-loop 檢查對應到 runtime state machine 的 phase/gate。
-    Agent 應優先讀取 phase-machine.yaml 和 blocking-gates.yaml，
-    而非依賴本節的 prose 摘要。
+    Agent 應優先查詢 runtime/runtime.db，必要時讀 runtime/compiler/embedded_data.rb，
+    而非依賴本節的 prose 摘要或已移除的 standalone YAML。
 
-  # Immediate issue control → 由 phase-machine.yaml 的 phase.recovery 管理
+  # Immediate issue control → 由 runtime/runtime.db 的 phase.recovery 管理
   - rule: immediate_issue_control
     phase: phase.recovery
     description: "Immediate issue 已被控制，或明確記錄仍 open"
-    runtime_ref: runtime/phases/phase-machine.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "phase.recovery.entry_conditions"
 
-  # Failure classification → 由 obligation-ledger.yaml 的 obligation.recovery.diagnose_root_cause 管理
+  # Failure classification → 由 runtime/runtime.db 的 obligation.recovery.diagnose_root_cause 管理
   - rule: failure_classification
     phase: phase.recovery
     obligation: obligation.recovery.diagnose_root_cause
     description: "Failure class 已命名，root cause 已診斷"
-    runtime_ref: runtime/obligations/obligation-ledger.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "obligation.recovery.diagnose_root_cause"
 
-  # Durable location → 由 phase-machine.yaml 的 phase.execution.allowed_actions 管理
+  # Durable location → 由 runtime/runtime.db 的 phase.execution.allowed_actions 管理
   - rule: durable_location
     phase: phase.execution
     description: "Durable location 正確（feedback_history/、enforcement/failure-patterns/ 等）"
-    runtime_ref: runtime/phases/phase-machine.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "phase.execution.allowed_actions"
 
-  # Prevention gate → 由 blocking-gates.yaml 的 gate.recovery.repair_strategy_defined 管理
+  # Prevention gate → 由 runtime/runtime.db 的 gate.recovery.repair_strategy_defined 管理
   - rule: prevention_gate
     phase: phase.validation
     gate: gate.validation.artifacts_complete
     description: "Prevention gate 已寫在未來 agent 會讀到的位置"
-    runtime_ref: runtime/gates/blocking-gates.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "gate.validation.artifacts_complete"
 
-  # Linked updates → 由 blocking-gates.yaml 的 gate.validation.linked_updates_complete 管理
+  # Linked updates → 由 runtime/runtime.db 的 gate.validation.linked_updates_complete 管理
   - rule: linked_updates
     phase: phase.validation
     gate: gate.validation.linked_updates_complete
     description: "Linked updates 已檢查"
-    runtime_ref: runtime/gates/blocking-gates.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "gate.validation.linked_updates_complete"
 
-  # Writeback close-loop → 由 transaction-machine.yaml 的 verified → closed 管理
+  # Writeback close-loop → 由 runtime/runtime.db 的 verified → closed 管理
   - rule: writeback_close_loop
     phase: phase.readback
     description: |
       若 canonical repository 有變更：
       tool sync → commit → push → readback → clean status 已完成。
       Reference-first 時 tool sync 可標 not applicable。
-    runtime_ref: runtime/transactions/transaction-machine.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "state.verified → state.closed"
 ```
 

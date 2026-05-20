@@ -52,6 +52,20 @@ Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 | Intelligence | [`intelligence/`](intelligence/) | Intelligence routing |
 | Decision recording | [`decisions/`](decisions/) | Close-loop tier routing（ADR / session / project） |
 
+## Recovery Source Map
+
+Runtime recovery 現在不是 standalone `runtime/recovery/*.yaml`。Agent 要處理 blocking gate、phase drift、stale generated surface 或 recovery retry 時，依下列分層讀取：
+
+| Need | Read |
+| --- | --- |
+| 即時 escalation / recovery output | [`../enforcement/escalation-policy.md`](../enforcement/escalation-policy.md) |
+| Retry limit、strategy change、source reload、validation gate | [`../governance/ai-runtime-governance/recovery-retry-governance.md`](../governance/ai-runtime-governance/recovery-retry-governance.md) |
+| Domain-specific reload set / forbidden behaviors | [`../metadata/recovery/`](../metadata/recovery/) |
+| Machine-readable recovery strategy / phase reconciliation / state repair | [`runtime.db`](runtime.db) tables: `recovery_strategies`, `phase_reconciliation`, `state_repair`, `obligation_rebuild` |
+| 修改 runtime recovery 定義 | [`compiler/embedded_data.rb`](compiler/embedded_data.rb)，修改後重新編譯 `runtime.db` |
+
+不要引用已移除的 `runtime/recovery/recovery-strategies.yaml`、`runtime/recovery/phase-reconciliation.yaml`、`runtime/phases/phase-machine.yaml`、`runtime/obligations/obligation-ledger.yaml` 或 `runtime/gates/blocking-gates.yaml` 作為 standalone source。
+
 ## Inbound References
 
 - [`route.runtime.activation-rules`](../knowledge/runtime/routing-registry.yaml:77)

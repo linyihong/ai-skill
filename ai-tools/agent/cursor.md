@@ -116,8 +116,8 @@ If the user switches languages, follow their switch.
 工具中立規則見 [`enforcement/conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md)。Cursor 只是其中一種操作環境；goal ledger 的真相來源仍是業務專案本地的 `<PROJECT_ROOT>/.agent-goals/`，不要放在 `.cursor/`，也不要把 goal 檔 commit。
 
 **Goal ledger 操作流程已由 runtime 管理**，請參考：
-- [`runtime/phases/phase-machine.yaml`](../../runtime/phases/phase-machine.yaml) — checkpoint phase 的 obligation 定義
-- [`runtime/obligations/obligation-ledger.yaml`](../../runtime/obligations/obligation-ledger.yaml) — goal ledger 相關義務
+- [`runtime/runtime.db`](../../runtime/runtime.db) — `phase_machine` / `obligation_ledger` / `blocking_gates` 快速查詢
+- [`runtime/compiler/embedded_data.rb`](../../runtime/compiler/embedded_data.rb) — phase / obligation / gate / transaction / recovery 的 embedded source
 - [`scripts/agent-goals.sh`](../../scripts/agent-goals.sh) — goal ledger CLI helper
 
 Cursor 專屬注意事項：
@@ -130,8 +130,8 @@ Cursor 專屬注意事項：
 
 **Knowledge update flow 已由 runtime 管理**，請參考：
 - `runtime/runtime.db → generated_surfaces (type='knowledge_update_phases')` — 11 個步驟的結構化記錄（快速路徑）
-- [`runtime/recovery/recovery-strategies.yaml`](../../runtime/recovery/recovery-strategies.yaml) — knowledge_stale 修復策略
-- [`runtime/transactions/transaction-machine.yaml`](../../runtime/transactions/transaction-machine.yaml) — writeback transaction 狀態機
+- `runtime/runtime.db → recovery_strategies / phase_reconciliation / state_repair` — runtime recovery strategy（快速路徑）
+- [`runtime/compiler/embedded_data.rb`](../../runtime/compiler/embedded_data.rb) — recovery / transaction state machine 的 source
 
 Cursor 專屬注意事項：
 - 可在 `.cursor/rules/*.mdc` 中加入 checkpoint 提醒（alwaysApply）

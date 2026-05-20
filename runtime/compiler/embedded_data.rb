@@ -769,7 +769,7 @@ module EmbeddedRuntimeData
             "type": "writeback_requirements",
             "description": "搜尋回寫需求與 transaction gates",
             "search_sources": [
-              "runtime/transactions/transaction-machine.yaml",
+              "runtime/runtime.db:transaction_states",
               "enforcement/dependency-reading.md"
             ],
             "min_confidence": "high",
@@ -1016,7 +1016,7 @@ module EmbeddedRuntimeData
         "id": "lock.rule.lease_timeout_recovery",
         "rule": "Lease 逾時後，agent 必須執行 recovery 程序才能重新取得 lock",
         "severity": "high",
-        "recovery_procedure": "runtime/recovery/phase-reconciliation.yaml"
+        "recovery_procedure": "runtime/runtime.db:phase_reconciliation"
       },
       {
         "id": "lock.rule.no_nested_locks",
@@ -1036,12 +1036,12 @@ module EmbeddedRuntimeData
       {
         "id": "coord.rule.phase_check_before_action",
         "name": "Phase Check Before Action",
-        "description": "執行任何 action 前先讀取 phase-machine.yaml 確認目前 phase",
-        "rule": "Agent 在執行任何 action 前，必須先讀取 runtime/phases/phase-machine.yaml， 確認目前 phase 與 allowed_actions。如果 phase 與預期不符，表示有其他 agent 已變更 state，需執行 reconciliation。\n",
+        "description": "執行任何 action 前先讀取 runtime.db phase_machine 確認目前 phase",
+        "rule": "Agent 在執行任何 action 前，必須先讀取 runtime/runtime.db:phase_machine， 確認目前 phase 與 allowed_actions。如果 phase 與預期不符，表示有其他 agent 已變更 state，需執行 reconciliation。\n",
         "severity": "critical",
         "check": {
           "type": "file_read",
-          "target": "runtime/phases/phase-machine.yaml",
+          "target": "runtime/runtime.db:phase_machine",
           "verification": "current_phase_matches_expectation == true"
         }
       },
@@ -1062,7 +1062,7 @@ module EmbeddedRuntimeData
         "id": "coord.rule.obligation_ledger_sync",
         "name": "Obligation Ledger Sync",
         "description": "修改 obligation ledger 前先取得 lock",
-        "rule": "Agent 在修改 runtime/obligations/obligation-ledger.yaml 前，必須先取得 lock.obligation_ledger。修改完成後釋放 lock。如果無法取得 lock， 表示有其他 agent 正在操作，需等待或進入 recovery。\n",
+        "rule": "Agent 在修改 runtime/runtime.db:obligation_ledger 前，必須先取得 lock.obligation_ledger。修改完成後釋放 lock。如果無法取得 lock， 表示有其他 agent 正在操作，需等待或進入 recovery。\n",
         "severity": "critical",
         "lock_required": "lock.obligation_ledger"
       },
@@ -1086,9 +1086,9 @@ module EmbeddedRuntimeData
         "id": "coord.rule.stale_state_recovery",
         "name": "Stale State Recovery",
         "description": "偵測到 stale state 時執行 recovery",
-        "rule": "如果 agent 偵測到 phase inconsistency、obligation drift、或 generated surface stale，必須先執行 runtime/recovery/phase-reconciliation.yaml 的 reconciliation 程序，才能繼續執行。\n",
+        "rule": "如果 agent 偵測到 phase inconsistency、obligation drift、或 generated surface stale，必須先執行 runtime/runtime.db:phase_reconciliation 的 reconciliation 程序，才能繼續執行。\n",
         "severity": "critical",
-        "recovery_procedure": "runtime/recovery/phase-reconciliation.yaml"
+        "recovery_procedure": "runtime/runtime.db:phase_reconciliation"
       }
     ],
     "consistency_checks": [
@@ -1119,7 +1119,7 @@ module EmbeddedRuntimeData
     ]
   }
 
-  # Source: runtime/gates/blocking-gates.yaml
+  # Source: runtime/runtime.db:blocking_gates
   GATES_BLOCKING_GATES =   {
     "blocking_gates_version": "v1",
     "status": "active",
@@ -1162,7 +1162,7 @@ module EmbeddedRuntimeData
         "severity": "critical",
         "check": {
           "type": "file_read",
-          "target": "runtime/obligations/obligation-ledger.yaml",
+          "target": "runtime/runtime.db:obligation_ledger",
           "verification": "obligation_ledger_loaded == true AND pending_obligations_reviewed == true"
         },
         "failure_action": "block_transition",
@@ -1176,7 +1176,7 @@ module EmbeddedRuntimeData
         "severity": "critical",
         "check": {
           "type": "file_read",
-          "target": "runtime/gates/blocking-gates.yaml",
+          "target": "runtime/runtime.db:blocking_gates",
           "verification": "blocking_gates_checked == true AND no_blocking_condition == true"
         },
         "failure_action": "block_transition",
@@ -1262,7 +1262,7 @@ module EmbeddedRuntimeData
         "severity": "critical",
         "check": {
           "type": "verification",
-          "target": "runtime/obligations/obligation-ledger.yaml",
+          "target": "runtime/runtime.db:obligation_ledger",
           "verification": "all_phase_obligations_fulfilled == true"
         },
         "failure_action": "block_transition",
@@ -1416,7 +1416,7 @@ module EmbeddedRuntimeData
         "severity": "critical",
         "check": {
           "type": "verification",
-          "target": "runtime/obligations/obligation-ledger.yaml",
+          "target": "runtime/runtime.db:obligation_ledger",
           "verification": "all_obligations_closed == true"
         },
         "failure_action": "block_finalize",
@@ -2004,7 +2004,7 @@ module EmbeddedRuntimeData
     }
   }
 
-  # Source: runtime/obligations/obligation-ledger.yaml
+  # Source: runtime/runtime.db:obligation_ledger
   OBLIGATIONS_OBLIGATION_LEDGER =   {
     "obligation_ledger_version": "v1",
     "status": "active",
@@ -2382,8 +2382,8 @@ module EmbeddedRuntimeData
     "governance_gates_version": "v1",
     "status": "active",
     "owner_layer": "runtime/output-governance",
-    "parent": "runtime/gates/blocking-gates.yaml",
-    "description": "Output governance blocking gates. 定義 validation 與 finalize phase 中 必須通過的語言與文件輸出檢查點。這些 gate 是 blocking-gates.yaml 的子集， 專注於輸出品質控制。\n",
+    "parent": "runtime/runtime.db:blocking_gates",
+    "description": "Output governance blocking gates. 定義 validation 與 finalize phase 中 必須通過的語言與文件輸出檢查點。這些 gate 是 runtime.db blocking_gates 的子集， 專注於輸出品質控制。\n",
     "gates": [
       {
         "id": "gate.output.language_consistency",
@@ -2968,7 +2968,7 @@ module EmbeddedRuntimeData
     ]
   }
 
-  # Source: runtime/phases/phase-machine.yaml
+  # Source: runtime/runtime.db:phase_machine
   PHASES_PHASE_MACHINE =   {
     "phase_machine_version": "v1",
     "status": "active",
@@ -5154,7 +5154,7 @@ module EmbeddedRuntimeData
     }
   }
 
-  # Source: runtime/recovery/obligation-rebuild.yaml
+  # Source: runtime/runtime.db:obligation_rebuild
   RECOVERY_OBLIGATION_REBUILD =   {
     "version": 1.0,
     "status": "candidate",
@@ -5166,7 +5166,7 @@ module EmbeddedRuntimeData
         "name": "Full Obligation Ledger Rebuild",
         "description": "從頭重建完整的 obligation ledger。 適用於 ledger 完全遺失或嚴重損毀的情況。\n",
         "trigger_conditions": [
-          "obligation-ledger.yaml 無法讀取",
+          "runtime.db obligation_ledger 無法讀取",
           "所有 obligations 狀態皆為 unknown",
           "recovery phase 首次進入"
         ],
@@ -5174,8 +5174,8 @@ module EmbeddedRuntimeData
           {
             "step": 1,
             "action": "LOAD_PHASE_MACHINE",
-            "description": "載入 phase-machine.yaml 取得所有 phase 定義",
-            "command": "讀取 runtime/phases/phase-machine.yaml"
+            "description": "載入 runtime.db phase_machine 取得所有 phase 定義",
+            "command": "讀取 runtime/runtime.db:phase_machine"
           },
           {
             "step": 2,
@@ -5187,7 +5187,7 @@ module EmbeddedRuntimeData
             "step": 3,
             "action": "EXTRACT_OBLIGATIONS_PER_PHASE",
             "description": "從每個 phase 的 obligations 欄位提取義務",
-            "command": "讀取 phase-machine.yaml 中各 phase 的 obligations 列表"
+            "command": "讀取 runtime.db phase_machine 中各 phase 的 obligations 列表"
           },
           {
             "step": 4,
@@ -5234,13 +5234,13 @@ module EmbeddedRuntimeData
             "step": 2,
             "action": "LOAD_PHASE_OBLIGATIONS",
             "description": "載入該 phase 的 obligations",
-            "command": "從 phase-machine.yaml 中該 phase 的 obligations 欄位提取"
+            "command": "從 runtime.db phase_machine 中該 phase 的 obligations 欄位提取"
           },
           {
             "step": 3,
             "action": "CROSS_REFERENCE_LEDGER",
-            "description": "對照 obligation-ledger.yaml 確認完整定義",
-            "command": "從 obligation-ledger.yaml 中過濾 phase 對應的 obligations"
+            "description": "對照 runtime.db obligation_ledger 確認完整定義",
+            "command": "從 runtime.db obligation_ledger 中過濾 phase 對應的 obligations"
           },
           {
             "step": 4,
@@ -5275,7 +5275,7 @@ module EmbeddedRuntimeData
             "step": 1,
             "action": "BUILD_DEPENDENCY_GRAPH",
             "description": "建立完整的 dependency 圖",
-            "command": "從 obligation-ledger.yaml 中提取所有 depends_on 關係"
+            "command": "從 runtime.db obligation_ledger 中提取所有 depends_on 關係"
           },
           {
             "step": 2,
@@ -5311,7 +5311,7 @@ module EmbeddedRuntimeData
     ]
   }
 
-  # Source: runtime/recovery/phase-reconciliation.yaml
+  # Source: runtime/runtime.db:phase_reconciliation
   RECOVERY_PHASE_RECONCILIATION =   {
     "version": 1.0,
     "status": "candidate",
@@ -5355,7 +5355,7 @@ module EmbeddedRuntimeData
             "step": 5,
             "action": "RELOAD_PHASE_STATE",
             "description": "重新載入正確 phase 的 state",
-            "command": "載入 phase-machine.yaml 中該 phase 的 allowed_actions、blocking_gates、obligations"
+            "command": "載入 runtime.db phase_machine 中該 phase 的 allowed_actions、blocking_gates、obligations"
           }
         ],
         "verify": [
@@ -5383,7 +5383,7 @@ module EmbeddedRuntimeData
             "step": 2,
             "action": "CHECK_PRECEDING_OBLIGATIONS",
             "description": "檢查前一個 phase 的 obligations 完成狀態",
-            "command": "讀取 obligation-ledger.yaml 中前一個 phase 的 obligations 狀態"
+            "command": "讀取 runtime.db obligation_ledger 中前一個 phase 的 obligations 狀態"
           },
           {
             "step": 3,
@@ -5416,14 +5416,14 @@ module EmbeddedRuntimeData
         "description": "當 blocking gate 狀態與 obligation 狀態不一致時的 reconciliation。 例如：gate 顯示 passed 但對應的 obligation 顯示 pending。\n",
         "detection": {
           "signal": "gate 狀態與 linked obligation 狀態不一致",
-          "check": "比對 blocking-gates.yaml 的 gate 結果與 obligation-ledger.yaml 中 linked_gates 的 obligation 狀態"
+          "check": "比對 runtime.db blocking_gates 的 gate 結果與 runtime.db obligation_ledger 中 linked_gates 的 obligation 狀態"
         },
         "procedure": [
           {
             "step": 1,
             "action": "LIST_GATE_OBLIGATION_PAIRS",
             "description": "列出所有 gate-obligation 配對",
-            "command": "從 blocking-gates.yaml 中提取 linked_obligations，對照 obligation-ledger.yaml"
+            "command": "從 runtime.db blocking_gates 中提取 linked_obligations，對照 runtime.db obligation_ledger"
           },
           {
             "step": 2,
@@ -5501,7 +5501,7 @@ module EmbeddedRuntimeData
     ]
   }
 
-  # Source: runtime/recovery/recovery-strategies.yaml
+  # Source: runtime/runtime.db:recovery_strategies
   RECOVERY_RECOVERY_STRATEGIES =   {
     "version": 1.0,
     "status": "candidate",
@@ -5697,7 +5697,7 @@ module EmbeddedRuntimeData
           {
             "action": "IDENTIFY_CURRENT_PHASE",
             "description": "確認目前 phase 與 blocking gate",
-            "command": "讀取 runtime/phases/phase-machine.yaml 中目前 phase 的 allowed_actions"
+            "command": "讀取 runtime/runtime.db:phase_machine 中目前 phase 的 allowed_actions"
           },
           {
             "action": "ROLLBACK_TO_CORRECT_PHASE",
@@ -5707,7 +5707,7 @@ module EmbeddedRuntimeData
           {
             "action": "REPLAY_MISSED_STEPS",
             "description": "補執行被跳過的 phase 步驟",
-            "command": "依 phase-machine.yaml 的 phase_transition_rules 重新依序執行"
+            "command": "依 runtime.db phase_machine 的 phase_transition_rules 重新依序執行"
           },
           {
             "action": "VERIFY_PHASE_SEQUENCE",
@@ -5740,13 +5740,13 @@ module EmbeddedRuntimeData
         ],
         "detection": {
           "signal": "blocking gate 因 obligation 未滿足而阻斷",
-          "check": "查詢 runtime/obligations/obligation-ledger.yaml 中本 phase 的 pending obligations"
+          "check": "查詢 runtime/runtime.db:obligation_ledger 中本 phase 的 pending obligations"
         },
         "repair_steps": [
           {
             "action": "LIST_PENDING_OBLIGATIONS",
             "description": "列出本 phase 所有未滿足的 obligations",
-            "command": "讀取 obligation-ledger.yaml 中 phase 對應的 obligations，過濾未完成者"
+            "command": "讀取 runtime.db obligation_ledger 中 phase 對應的 obligations，過濾未完成者"
           },
           {
             "action": "EXECUTE_EACH_OBLIGATION",
@@ -5756,7 +5756,7 @@ module EmbeddedRuntimeData
           {
             "action": "RE_VERIFY_GATES",
             "description": "重新檢查 blocking gates",
-            "command": "執行 blocking-gates.yaml 中本 phase 的 gates，確認 severity 狀態"
+            "command": "執行 runtime.db blocking_gates 中本 phase 的 gates，確認 severity 狀態"
           },
           {
             "action": "UPDATE_OBLIGATION_STATE",
@@ -5782,13 +5782,13 @@ module EmbeddedRuntimeData
         ],
         "detection": {
           "signal": "blocking gate 檢查回傳 failed",
-          "check": "讀取 blocking-gates.yaml 中該 gate 的 failure_message 與 failure_action"
+          "check": "讀取 runtime.db blocking_gates 中該 gate 的 failure_message 與 failure_action"
         },
         "repair_steps": [
           {
             "action": "READ_GATE_DETAILS",
             "description": "讀取阻斷 gate 的完整定義",
-            "command": "查詢 blocking-gates.yaml 中 gate 的 check.type、check.verification、failure_action"
+            "command": "查詢 runtime.db blocking_gates 中 gate 的 check.type、check.verification、failure_action"
           },
           {
             "action": "EXECUTE_FAILURE_ACTION",
@@ -5954,7 +5954,7 @@ module EmbeddedRuntimeData
     ]
   }
 
-  # Source: runtime/recovery/state-repair.yaml
+  # Source: runtime/runtime.db:state_repair
   RECOVERY_STATE_REPAIR =   {
     "version": 1.0,
     "status": "candidate",
@@ -5992,7 +5992,7 @@ module EmbeddedRuntimeData
             "step": 4,
             "action": "RELOAD_PHASE_STATE",
             "description": "重新載入該 phase 的 allowed_actions、forbidden_actions、blocking_gates",
-            "command": "讀取 phase-machine.yaml 中該 phase 的定義"
+            "command": "讀取 runtime.db phase_machine 中該 phase 的定義"
           }
         ],
         "verify": [
@@ -6007,14 +6007,14 @@ module EmbeddedRuntimeData
         "description": "當 blocking gates 狀態過期或未正確初始化時的修復程序。 例如：phase 已變更但 blocking gates 仍停留在上一個 phase 的狀態。\n",
         "detection": {
           "signal": "blocking gates 狀態與目前 phase 不匹配",
-          "check": "比對 blocking-gates.yaml 中目前 phase 的 gates 與實際檢查結果"
+          "check": "比對 runtime.db blocking_gates 中目前 phase 的 gates 與實際檢查結果"
         },
         "procedure": [
           {
             "step": 1,
             "action": "IDENTIFY_CURRENT_PHASE_GATES",
             "description": "找出目前 phase 應檢查的所有 gates",
-            "command": "讀取 blocking-gates.yaml 中 phase 對應的 gates"
+            "command": "讀取 runtime.db blocking_gates 中 phase 對應的 gates"
           },
           {
             "step": 2,
@@ -6026,7 +6026,7 @@ module EmbeddedRuntimeData
             "step": 3,
             "action": "RE_RUN_GATES",
             "description": "重新執行所有 gates 的檢查",
-            "command": "依 blocking-gates.yaml 的 check.verification 逐項執行"
+            "command": "依 runtime.db blocking_gates 的 check.verification 逐項執行"
           },
           {
             "step": 4,
@@ -6047,14 +6047,14 @@ module EmbeddedRuntimeData
         "description": "當 obligation ledger 狀態與實際完成情況不一致時的修復程序。 例如：obligation 已執行但 ledger 未更新為 completed。\n",
         "detection": {
           "signal": "obligation 狀態與實際執行情況不符",
-          "check": "比對 obligation-ledger.yaml 的 verification_criteria 與實際檢查結果"
+          "check": "比對 runtime.db obligation_ledger 的 verification_criteria 與實際檢查結果"
         },
         "procedure": [
           {
             "step": 1,
             "action": "LIST_ALL_OBLIGATIONS",
             "description": "列出目前 phase 的所有 obligations",
-            "command": "讀取 obligation-ledger.yaml 中 phase 對應的 obligations"
+            "command": "讀取 runtime.db obligation_ledger 中 phase 對應的 obligations"
           },
           {
             "step": 2,
@@ -6087,14 +6087,14 @@ module EmbeddedRuntimeData
         "description": "當 phase_history 有遺漏（gap）時的修復程序。 例如：直接從 execution 跳到 finalize，缺少 validation→commit→push→readback。\n",
         "detection": {
           "signal": "phase_history 中缺少中間 phase",
-          "check": "比對 phase_history 的 phase 順序與 phase-machine.yaml 的 phase_transition_rules"
+          "check": "比對 phase_history 的 phase 順序與 runtime.db phase_machine 的 phase_transition_rules"
         },
         "procedure": [
           {
             "step": 1,
             "action": "IDENTIFY_GAP",
             "description": "找出 phase_history 中缺少的 phase",
-            "command": "依 phase-machine.yaml 的 phase 順序比對 phase_history"
+            "command": "依 runtime.db phase_machine 的 phase 順序比對 phase_history"
           },
           {
             "step": 2,
@@ -6106,7 +6106,7 @@ module EmbeddedRuntimeData
             "step": 3,
             "action": "BACKFILL_GAP",
             "description": "補執行缺少的 phase",
-            "command": "依 phase-machine.yaml 執行缺少 phase 的 entry_conditions 與 obligations"
+            "command": "依 runtime.db phase_machine 執行缺少 phase 的 entry_conditions 與 obligations"
           },
           {
             "step": 4,
@@ -6127,14 +6127,14 @@ module EmbeddedRuntimeData
         "description": "當 agent 嘗試的 action 不屬於目前 phase 的 allowed_actions 時的修復程序。 例如：在 execution phase 嘗試執行 commit。\n",
         "detection": {
           "signal": "agent action 不在目前 phase 的 allowed_actions 中",
-          "check": "比對 agent 的下一步意圖與 phase-machine.yaml 中目前 phase 的 allowed_actions"
+          "check": "比對 agent 的下一步意圖與 runtime.db phase_machine 中目前 phase 的 allowed_actions"
         },
         "procedure": [
           {
             "step": 1,
             "action": "IDENTIFY_FORBIDDEN_ACTION",
             "description": "確認哪個 action 被禁止",
-            "command": "查詢 phase-machine.yaml 中目前 phase 的 forbidden_actions"
+            "command": "查詢 runtime.db phase_machine 中目前 phase 的 forbidden_actions"
           },
           {
             "step": 2,
@@ -6637,7 +6637,7 @@ module EmbeddedRuntimeData
         {
           "name": "ref",
           "type": "string",
-          "description": "引用 blocking-gates.yaml、obligation-ledger.yaml 或 recovery 中的 id"
+          "description": "引用 runtime.db blocking_gates、runtime.db obligation_ledger 或 recovery 中的 id"
         },
         {
           "name": "priority",
@@ -6698,7 +6698,7 @@ module EmbeddedRuntimeData
         "id": "queue.rule.init_on_phase_entry",
         "name": "Initialize Queue on Phase Entry",
         "description": "進入新 phase 時初始化 execution queue",
-        "rule": "載入 phase-machine.yaml 中該 phase 的 blocking_gates 與 obligations， 加上 blocking-gates.yaml 與 obligation-ledger.yaml 的完整定義， 建立初始 queue。\n",
+        "rule": "載入 runtime.db phase_machine 中該 phase 的 blocking_gates 與 obligations， 加上 runtime.db blocking_gates 與 runtime.db obligation_ledger 的完整定義， 建立初始 queue。\n",
         "trigger": "phase transition"
       },
       {
@@ -6991,7 +6991,7 @@ module EmbeddedRuntimeData
         "id": "sched.rule.blocking_first",
         "name": "Blocking Gates First",
         "description": "所有 blocking gates 必須在 obligations 之前檢查",
-        "rule": "先執行 blocking-gates.yaml 中 severity=critical 或 severity=high 的 gates，再執行 obligations",
+        "rule": "先執行 runtime.db blocking_gates 中 severity=critical 或 severity=high 的 gates，再執行 obligations",
         "priority": "P0",
         "applies_to": [
           "phase entry",
@@ -7002,7 +7002,7 @@ module EmbeddedRuntimeData
         "id": "sched.rule.dependency_before_dependent",
         "name": "Dependency Before Dependent",
         "description": "有 depends_on 的 obligation 必須在上游完成後才能執行",
-        "rule": "依 obligation-ledger.yaml 的 depends_on 建立拓撲排序",
+        "rule": "依 runtime.db obligation_ledger 的 depends_on 建立拓撲排序",
         "priority": "P0",
         "applies_to": [
           "obligation execution"
@@ -7022,7 +7022,7 @@ module EmbeddedRuntimeData
         "id": "sched.rule.phase_transition_gate",
         "name": "Phase Transition Gate",
         "description": "phase transition 前必須先通過所有 blocking gates",
-        "rule": "transition 前執行 blocking-gates.yaml 中目標 phase 的所有 gates",
+        "rule": "transition 前執行 runtime.db blocking_gates 中目標 phase 的所有 gates",
         "priority": "P0",
         "applies_to": [
           "phase transition"
@@ -7121,7 +7121,7 @@ module EmbeddedRuntimeData
     ]
   }
 
-  # Source: runtime/transactions/transaction-machine.yaml
+  # Source: runtime/runtime.db:transaction_states
   TRANSACTIONS_TRANSACTION_MACHINE =   {
     "version": 1.0,
     "status": "candidate",
@@ -7517,15 +7517,15 @@ module EmbeddedRuntimeData
         "name": "Runtime Component Update",
         "description": "新增或修改 runtime/ 下的元件",
         "applicable_scenarios": [
-          "新增 phase-machine.yaml",
-          "新增 obligation-ledger.yaml",
-          "新增 blocking-gates.yaml",
+          "新增 runtime.db phase_machine",
+          "新增 runtime.db obligation_ledger",
+          "新增 runtime.db blocking_gates",
           "新增 recovery/ 下的檔案",
           "新增 scheduler/ 下的檔案",
           "新增 transactions/ 下的檔案"
         ],
         "pre_checks": [
-          "確認新元件與現有 phase-machine.yaml 的 phase 定義一致",
+          "確認新元件與現有 runtime.db phase_machine 的 phase 定義一致",
           "確認新元件的 id 不與現有 routing-registry.yaml 衝突",
           "確認新元件遵循 generated YAML 格式（如適用）"
         ],

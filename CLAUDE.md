@@ -5,10 +5,11 @@
 1. 讀 [CORE_BOOTSTRAP.md](CORE_BOOTSTRAP.md) — 3 條必讀核心規則（~800 tokens）
 2. 讀 [README.md](README.md) — 超短入口，了解 OS layout
 3. 依 [runtime/router/activation-rules.yaml](runtime/router/activation-rules.yaml) 決定 lazy-load rules
-4. 載入 Runtime Phase 初始化（YAML 為 source-of-truth，同時已編譯至 SQLite）：
-   - [runtime/phases/phase-machine.yaml](runtime/phases/phase-machine.yaml) → `phase_machine` 表 — 目前 phase 狀態
-   - [runtime/obligations/obligation-ledger.yaml](runtime/obligations/obligation-ledger.yaml) → `obligation_ledger` 表 — 本 phase 義務
-   - [runtime/gates/blocking-gates.yaml](runtime/gates/blocking-gates.yaml) → `blocking_gates` 表 — 本 phase blocking gates
+4. 載入 Runtime Phase 初始化（SQLite 為 agent 快速路徑）：
+   - [runtime/runtime.db](runtime/runtime.db) → `phase_machine` / `phases` — 目前 phase 狀態
+   - [runtime/runtime.db](runtime/runtime.db) → `obligation_ledger` / `obligations` — 本 phase 義務
+   - [runtime/runtime.db](runtime/runtime.db) → `blocking_gates` / `gates` — 本 phase blocking gates
+   - Runtime phase / obligation / gate / recovery 的 source 在 [runtime/compiler/embedded_data.rb](runtime/compiler/embedded_data.rb)；不要引用已移除的 `runtime/phases/`、`runtime/obligations/`、`runtime/gates/` 或 `runtime/recovery/` YAML。
 6. 載入 Output Governance 初始化（YAML 為 source-of-truth，同時已編譯至 SQLite）：
    - [runtime/output-governance/language-policy.yaml](runtime/output-governance/language-policy.yaml) → `language_policy` 表 — 語言強制規則
    - [runtime/output-governance/output-rules.yaml](runtime/output-governance/output-rules.yaml) → `output_rules` 表 — 文件輸出規則

@@ -2,8 +2,8 @@
 :governance_gates_version: v1
 :status: active
 :owner_layer: runtime/output-governance
-:parent: runtime/gates/blocking-gates.yaml
-:description: 'Output governance blocking gates. 定義 validation 與 finalize phase 中 必須通過的語言與文件輸出檢查點。這些 gate 是 blocking-gates.yaml 的子集， 專注於輸出品質控制。
+:parent: runtime/runtime.db:blocking_gates
+:description: 'Output governance blocking gates. 定義 validation 與 finalize phase 中 必須通過的語言與文件輸出檢查點。這些 gate 是 runtime/runtime.db 中 blocking_gates 的子集， 專注於輸出品質控制。
 
 '
 :gates:

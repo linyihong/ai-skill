@@ -30,7 +30,7 @@
   - lease_expired
 - :id: lock.generated_surface
   :name: Generated Surface Lock
-  :description: 防止多 agent 同時編譯 generated YAML
+  :description: 防止多 agent 同時編譯 generated runtime surfaces
   :scope: global
   :lease_time_seconds: 120
   :acquire_retry:
@@ -60,7 +60,7 @@
 - :id: lock.rule.lease_timeout_recovery
   :rule: Lease 逾時後，agent 必須執行 recovery 程序才能重新取得 lock
   :severity: high
-  :recovery_procedure: runtime/recovery/phase-reconciliation.yaml
+  :recovery_procedure: runtime/runtime.db:phase_reconciliation
 - :id: lock.rule.no_nested_locks
   :rule: 避免 nested lock acquisition，防止 deadlock
   :severity: medium
