@@ -448,6 +448,36 @@ records:
       compression_level: summary-first
       reason: 多數路由疑義先讀治理 gate 與 source intelligence；只有修改 workflow/routing surface 時再展開 registry 和 activation table。
 
+  - id: route.governance.validation-scenario
+    task_intent: 決定 AI failure 是否 promotion 為 stateless validation scenario，或設計 scenario gate
+    primary_source: governance/ai-runtime-governance/validation-scenario-governance.md
+    required_dependencies:
+      - intelligence/engineering/agent-architecture/stateless-validation-necessity.md
+      - intelligence/engineering/agent-architecture/failure-to-scenario-closure.md
+      - validation/README.md
+    candidate_sources:
+      - enforcement/failure-learning-system.md
+      - validation/scenarios/failure-derived/
+      - validation/traces/template.yaml
+      - validation/evaluations/template.yaml
+    source_of_truth_gate: governance-design-active
+    ranking_reason: validation-scenario-governance 將 stateless validation 與 failure-to-scenario intelligence 轉譯成 scenario promotion gate，避免 scenario 依賴 conversation memory 或洩漏 expected answer。
+    validation_signal: Stateless reproduction、no answer leakage、failure class、expected/forbidden behavior 與 traceability gates 已檢查。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 1000
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: candidate
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: 先讀 scenario governance 與 source intelligence；建立或修改 scenario 時再展開 validation format 與 failure-learning source。
+
   - id: route.metadata.knowledge-atom-schema
     task_intent: 設計或評估 Knowledge Atom metadata
     primary_source: metadata/schema.md

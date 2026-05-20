@@ -8,6 +8,8 @@
 - **Deterministic**：相同 scenario 應產出相同決策路徑
 - **Traceable**：AI 必須輸出結構化 trace，記錄 signals、heuristics、rejected routes、final route
 
+治理 gate 見 [`governance/ai-runtime-governance/validation-scenario-governance.md`](../governance/ai-runtime-governance/validation-scenario-governance.md)；本檔只保存 scenario、trace 與 evaluation 的執行格式。
+
 ## 目錄結構
 
 ```

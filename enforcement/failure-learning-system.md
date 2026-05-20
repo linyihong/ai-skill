@@ -117,6 +117,8 @@ Pattern records 要短。若 pattern 變長，將 examples 拆成較小 pattern 
 
 ### Failure → Validation Scenario 條件
 
+Scenario promotion 的治理 gate 見 [`governance/ai-runtime-governance/validation-scenario-governance.md`](../governance/ai-runtime-governance/validation-scenario-governance.md)；本節保留 failure learning loop 需要的最小條件。
+
 當 failure 符合以下所有條件時，應 promotion 為 validation scenario：
 
 1. **可 stateless 重現**：不需要前文提示或 conversation memory，給定相同 signals 應產出相同決策
