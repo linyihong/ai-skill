@@ -25,12 +25,16 @@ require 'open3'
 require 'json'
 require_relative 'embedded_data'
 
-COMPILER_VERSION = '1.1.0'
+COMPILER_VERSION = '1.1.1'
 GENERATED_DIR = File.join(File.dirname(__FILE__), '..', 'generated')
 DEFAULT_DB_PATH = File.join(File.dirname(__FILE__), '..', 'runtime.db')
 ROOT_DIR = File.expand_path('../..', __dir__)
 
 @mapping = nil
+
+def read_utf8(path)
+  File.read(path, mode: 'r:UTF-8')
+end
 
 def deep_symbolize(value)
   case value
@@ -47,7 +51,7 @@ def runtime_config(relative_path, embedded_data)
   path = File.join(ROOT_DIR, relative_path)
   return embedded_data unless File.exist?(path)
 
-  data = YAML.safe_load(File.read(path), permitted_classes: [Date, Time, Symbol], aliases: true)
+  data = YAML.safe_load(read_utf8(path), permitted_classes: [Date, Time, Symbol], aliases: true)
   data ? deep_symbolize(data) : embedded_data
 end
 
@@ -760,7 +764,7 @@ end
 # ═══════════════════════════════════════════════════════════════
 
 def compile_workflow_phases_to_sqlite(db_path, source_path, mapping_entry)
-  content = File.read(source_path)
+  content = read_utf8(source_path)
   sections = extract_phase_sections(content)
   phases = sections.map do |sec|
     allowed = extract_allowed_actions_from_section(sec['body'])
@@ -779,7 +783,7 @@ def compile_workflow_phases_to_sqlite(db_path, source_path, mapping_entry)
 end
 
 def compile_enforcement_transactions_to_sqlite(db_path, source_path, mapping_entry)
-  content = File.read(source_path)
+  content = read_utf8(source_path)
   states = []
   content.scan(/^###?\s+(.+?)(?:\s*\((.+?)\))?$/) { |m| states << { 'name' => m[0].strip, 'context' => m[1]&.strip } }
   insert_gs(db_path, source_path, "enforcement.#{extract_domain(source_path)}.transactions", mapping_entry[:compile_rule], { 'compiled_from' => source_path, 'states' => states })
@@ -787,7 +791,7 @@ def compile_enforcement_transactions_to_sqlite(db_path, source_path, mapping_ent
 end
 
 def compile_output_governance_to_sqlite(db_path, source_path, mapping_entry)
-  content = File.read(source_path)
+  content = read_utf8(source_path)
   rules = []; content.scan(/^###?\s+(.+?)$/) { |m| rules << { 'section' => m[0].strip } }
   gates = []; content.scan(/^\*\*([^*]+)\*\*：(.+)$/) { |m| gates << { 'name' => m[0].strip, 'description' => m[1].strip } }
   insert_gs(db_path, source_path, "governance.#{extract_domain(source_path)}", mapping_entry[:compile_rule], { 'compiled_from' => source_path, 'rules' => rules, 'gates' => gates })
@@ -795,7 +799,7 @@ def compile_output_governance_to_sqlite(db_path, source_path, mapping_entry)
 end
 
 def compile_knowledge_update_flow_to_sqlite(db_path, source_path, _mapping_entry)
-  content = File.read(source_path)
+  content = read_utf8(source_path)
   steps = []
   content.scan(/^##\s+Step\s+(\d+)[：:]\s*(.+?)$/) do |m|
     sn = m[0].strip.to_i; sname = m[1].strip
@@ -804,14 +808,19 @@ def compile_knowledge_update_flow_to_sqlite(db_path, source_path, _mapping_entry
     sc = nsm ? rem[0...nsm] : rem
     ec = []; sc.scan(/^\|\s*(\w[\w\s]+?)\s*\|\s*(.+?)\s*\|$/) { |r| ec << { 'condition' => r[0].strip, 'next_step' => r[1].strip } }
     refs = []; sc.scan(/\[`([^`]+)`\]\(([^)]+)\)/) { |r| refs << { 'name' => r[0], 'path' => r[1] } }
-    steps << { 'step' => sn, 'name' => sname, 'entry_conditions' => ec, 'references' => refs }
+    rules = []; sc.scan(/^-\s+(.+)$/) { |r| rules << r[0].strip }
+    code_blocks = []; sc.scan(/```[^\n]*\n(.*?)```/m) { |r| code_blocks << r[0].strip }
+    step = { 'step' => sn, 'name' => sname, 'entry_conditions' => ec, 'references' => refs }
+    step['rules'] = rules unless rules.empty?
+    step['code_blocks'] = code_blocks unless code_blocks.empty?
+    steps << step
   end
   insert_gs(db_path, source_path, 'governance.knowledge_update_flow', '從 knowledge-update-flow.md 的 11 個步驟標題與判斷表格提取 phase 定義', { 'compiled_from' => source_path, 'total_steps' => 11, 'steps' => steps })
   puts "  ✓ #{source_path}"
 end
 
 def compile_workflow_artifacts_to_sqlite(db_path, source_path, mapping_entry)
-  content = File.read(source_path)
+  content = read_utf8(source_path)
   artifacts = []; content.scan(/^##\s+\d+\.\s+(.+)$/) { |m| artifacts << { 'name' => m[0].strip } }
   gates = []; content.scan(/^###\s+(.+?)(?:\s*Gate|gate)?$/) { |m| gates << { 'name' => m[0].strip, 'type' => 'verification_gate' } }
   tables = []; content.scan(/^\|.+\|.+\|$/) { |l| next if l.match?(/^\|[\s-]+\|[\s-]+\|$/) || l.match?(/^\|.*#.*\|$/); tables << l.strip }
@@ -821,7 +830,7 @@ def compile_workflow_artifacts_to_sqlite(db_path, source_path, mapping_entry)
 end
 
 def compile_goal_action_gates_to_sqlite(db_path, source_path, mapping_entry)
-  content = File.read(source_path)
+  content = read_utf8(source_path)
   cf = []; sc = []; ve = []
   content.scan(/^\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) do |m|
     c1 = m[0].strip; c2 = m[1].strip
@@ -836,7 +845,7 @@ def compile_goal_action_gates_to_sqlite(db_path, source_path, mapping_entry)
 end
 
 def compile_failure_recovery_to_sqlite(db_path, source_path, mapping_entry)
-  content = File.read(source_path)
+  content = read_utf8(source_path)
   tx = []; content.scan(/^\|\s*`([^`]+)`\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) { |m| tx << { 'class' => m[0].strip, 'meaning' => m[1].strip, 'common_prevention' => m[2].strip } }
   sr = []; content.scan(/^\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) { |m| sr << { 'content_type' => m[0].strip, 'location' => m[1].strip } unless m[0] == '---' || m[0] == '內容' || m[0] == 'Durable location' }
   pd = []; content.scan(/^\|\s*(.+?)\s*\|\s*(.+?)\s*\|$/) { |m| pd << { 'failure_scope' => m[0].strip, 'promotion_target' => m[1].strip } unless m[0] == '---' || m[0] == 'Failure scope' || m[0] == 'Promotion target' }
@@ -846,7 +855,7 @@ def compile_failure_recovery_to_sqlite(db_path, source_path, mapping_entry)
 end
 
 def compile_plans_index_to_sqlite(db_path, source_path, _mapping_entry)
-  content = File.read(source_path)
+  content = read_utf8(source_path)
   filename = File.basename(source_path, '.md')
   plan_id = filename.sub(/^\d{4}-\d{2}-\d{2}-\d{4}-/, '')
   status = 'unknown'
@@ -877,7 +886,7 @@ def compile_classification_rules_to_sqlite(db_path, _source_path, _mapping_entry
   eng_readme_path = 'intelligence/engineering/README.md'
   dimensions = []
   if File.exist?(eng_readme_path)
-    content = File.read(eng_readme_path)
+    content = read_utf8(eng_readme_path)
     content.scan(/^\|\s*\[`([^`]+)`\]\(([^)]+)\)\s*\|\s*(.+?)\s*\|$/) do |m|
       dn = m[0].strip; rp = m[1].strip; desc = m[2].strip
       next if %w[子目錄 ---].include?(dn)
@@ -896,7 +905,7 @@ def compile_classification_rules_to_sqlite(db_path, _source_path, _mapping_entry
   lang_readme_path = 'intelligence/engineering/language-specific/README.md'
   known_languages = []
   if File.exist?(lang_readme_path)
-    content = File.read(lang_readme_path)
+    content = read_utf8(lang_readme_path)
     in_lt = false
     content.each_line do |line|
       if line.match?(/^\|\s*Language\s*\|\s*Directory\s*\|\s*Atoms\s*\|$/); in_lt = true; next; end
@@ -925,7 +934,7 @@ def compile_classification_rules_to_sqlite(db_path, _source_path, _mapping_entry
   decision_tree = []
   kuf_path = 'governance/lifecycle/knowledge-update-flow.md'
   if File.exist?(kuf_path)
-    content = File.read(kuf_path)
+    content = read_utf8(kuf_path)
     ss = content[/^###\s+2\.4\s.*?\n(.*?)(?=^###\s+2\.5|\z)/m]
     if ss
       ss.scan(/├─\s*(.+?)$/) { |m| decision_tree << { 'branch' => m[0].strip } unless m[0].strip.start_with?('─') || m[0].strip.empty? }
@@ -943,7 +952,7 @@ def compile_classification_rules_to_sqlite(db_path, _source_path, _mapping_entry
 end
 
 def compile_system_upgrade_governance_to_sqlite(db_path, source_path, _mapping_entry)
-  content = File.read(source_path)
+  content = read_utf8(source_path)
 
   upgrade_conditions = []
   if content =~ /## 1\. 什麼是「大型系統升級」\n\n(.*?)(?:\n\n##|\z)/m
@@ -994,7 +1003,7 @@ def compile_apk_workflow_phases_to_sqlite(db_path, source_path, _mapping_entry)
     puts "  - #{source_path} (skipped — README)"
     return nil
   end
-  content = File.read(source_path)
+  content = read_utf8(source_path)
   sections = []
   content.scan(/^(##\s+步驟\s+\d+[：:]\s*.+)$/) do
     ht = $1.strip; hl = $`.lines.count + 1

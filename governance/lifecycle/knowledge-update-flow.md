@@ -459,10 +459,45 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 
 **適用時機**：當新知識影響到 routing、summary、graph 或 model context 時。
 
+**runtime.db 強制同步條件**：
+
+如果本輪 modified / staged files 命中 `runtime/runtime.db` 的 `generated_surfaces.source_path`，或命中 runtime compiler mapping，則必須重編 `runtime.db`。這是 blocking gate，不是建議事項。
+
+常見命中來源包括：
+
+- `governance/lifecycle/knowledge-update-flow.md`
+- `enforcement/neutral-language.md`
+- `enforcement/dependency-reading.md`
+- `enforcement/goal-action-validation.md`
+- `enforcement/failure-learning-system.md`
+- `enforcement/sanitization.md`
+- `enforcement/tool-neutral-documentation.md`
+- `workflow/*/execution-flow.md`
+- `workflow/*/artifact-gates.md`
+- `analysis/apk/workflows/*.md`
+- `plans/active/*.md`
+
+**必須執行**：
+
+```bash
+LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ruby runtime/compiler/compiler-engine.rb
+ruby scripts/validate-runtime-db.rb
+```
+
+**必須確認**：
+
+```bash
+sqlite3 runtime/runtime.db \
+  "SELECT source_path, target_key, status FROM generated_surfaces WHERE source_path = '<modified-source-path>';"
+```
+
+若修改內容應反映在 compiled surface，必須再用 `sqlite3` 查詢 `data` 欄位確認新關鍵字存在、舊錯誤內容不存在。只看到 compiler 成功不夠；必須確認內容真的進入 `runtime.db`。若 `runtime.db` 產生 diff，必須與 source 變更同一輪 commit。
+
 **必須更新的 surfaces**：
 
 | Surface | 更新方式 |
 |---------|---------|
+| `runtime/runtime.db` | `LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ruby runtime/compiler/compiler-engine.rb`，當 modified source 命中 `generated_surfaces.source_path` 或 compiler mapping 時強制執行 |
 | `knowledge/runtime/routing-registry.yaml` | 新增或更新 routing record |
 | `knowledge/runtime/refresh-policy.yaml` | 更新 refresh / revalidate / downgrade 規則 |
 | `knowledge/summaries/` | 更新對應 domain 的 summary |
@@ -475,6 +510,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 ```bash
 ruby scripts/refresh-knowledge-runtime.rb
 ruby scripts/validate-knowledge-runtime.rb
+ruby scripts/validate-runtime-db.rb
 ```
 
 ---
@@ -553,6 +589,9 @@ ruby scripts/validate-knowledge-runtime.rb
            ⛔ lesson 的 Required Linked Updates 欄位未填不得進行 commit
 □ Step 9:  [強制] 更新 Runtime Surfaces（Step 5 或 Step 8 有修改時）
            ↳ routing-registry.yaml、summaries/、graphs/、runtime scripts
+           ⛔ 若 modified files 命中 runtime.db generated_surfaces.source_path，
+             必須跑 compiler-engine、validate-runtime-db、SQLite content assertion，
+             並將 runtime/runtime.db 納入同輪 commit
 □ Step 10: [強制] 驗證（diff review、去敏、link check、lint）
 □ Step 11: [強制] Commit / Push / Readback（dependency-reading.md）
 ```
