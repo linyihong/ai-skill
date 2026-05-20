@@ -1,5 +1,23 @@
 # Workflow Activation Contract — Migration Plan
 
+> **狀態**: completed / superseded / archived
+> **建立日期**: 2026-05-15
+> **歸檔日期**: 2026-05-20
+> **Closure**: 本計畫提出的 per-workflow `activation-contract.yaml` 方案已被 ADR-006「Registry-First Workflow Activation」取代。現行方案使用 activation-table #27 作為通用 workflow gate、`knowledge/runtime/routing-registry.yaml` 的 `route.workflow.*.activation_triggers` 作為 machine-readable triggers、`workflow/workflow-routing.md` 作為多 route 歧義裁決。
+
+
+## Closure Reconciliation
+
+| Original proposal | Final decision / current state |
+| --- | --- |
+| 每個 workflow 新增 `activation-contract.yaml` | Superseded. ADR-006 選擇 registry-first，不新增 per-workflow activation contract。 |
+| Runtime 掃描 `workflow/*/activation-contract.yaml` | Superseded. Current routing relies on activation #27 + `route.workflow.*.activation_triggers` + `workflow/workflow-routing.md`. |
+| 精簡 `activation-rules.yaml` 中 workflow-specific rules | Completed by moving workflow selection into registry-first routing model; current activation #27 is the generic workflow orchestration gate. |
+| 更新 routing registry | Completed through `route.workflow.*` records and activation triggers. |
+| Validation scenario | Covered by routing/recovery validation surfaces; no separate activation-contract scan scenario is needed because the contract file approach was not adopted. |
+
+References: [`decisions/ADR-006-registry-first-workflow-activation.md`](../../decisions/ADR-006-registry-first-workflow-activation.md), [`workflow/workflow-routing.md`](../../workflow/workflow-routing.md), [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml).
+
 ## 問題
 
 目前的 [`activation-rules.yaml`](../../runtime/router/activation-rules.yaml) 同時包含兩種不同性質的規則：
@@ -308,7 +326,7 @@ Registry 只保留 route metadata（priority, confidence, context_cost, model pr
 
 ### Compiler 整合
 
-- 可考慮將 `activation-contract.yaml` 加入 [`compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) 的 `source_target_mapping`
+- 可考慮將 `activation-contract.yaml` 加入 [`embedded_data.rb`](../../runtime/compiler/embedded_data.rb) 的 compiler mapping（若恢復此方案）
 - 但 activation contract 本身已經是 YAML，不需要編譯——它直接是 runtime 可讀格式
 - 如果需要 generated 版本，可以加一個 pass-through mapping
 

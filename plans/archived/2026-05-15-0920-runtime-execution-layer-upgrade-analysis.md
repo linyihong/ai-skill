@@ -1,8 +1,28 @@
 # AI-native Cognitive Execution System — 升級計畫比對分析
 
-> **狀態**: draft
+> **狀態**: completed / archived
 > **建立日期**: 2026-05-15
+> **歸檔日期**: 2026-05-20
 > **目的**: 比對使用者提出的「Execution-centric Cognitive Runtime」升級計畫與現有框架，找出衝突、缺口與可行路徑
+> **Closure**: 本計畫作為架構分析已完成。P0/P1/P2 的核心 execution runtime 缺口已由後續 `runtime/runtime.db`、`runtime/compiler/embedded_data.rb`、runtime recovery、output governance、distributed runtime、routing registry 與 cognitive governance plan 吸收；下文提到的 `runtime/phases/`、`runtime/obligations/`、`runtime/gates/`、`runtime/recovery/` standalone YAML 路徑已被 embedded source + SQLite compiled runtime 取代。Agent VM 仍為遠期方向，未納入本次 closure。
+
+---
+
+## Closure Reconciliation
+
+| Area | Closure status | Current source / decision |
+| --- | --- | --- |
+| Phase State Machine | Completed via compiled runtime | `runtime/runtime.db` tables `phase_machine` / `phases`; source in `runtime/compiler/embedded_data.rb`. |
+| Obligation Ledger | Completed via compiled runtime | `runtime/runtime.db` tables `obligation_ledger` / `obligations`; source in `runtime/compiler/embedded_data.rb`. |
+| Blocking Gates | Completed via compiled runtime | `runtime/runtime.db` tables `blocking_gates` / `gates`; source in `runtime/compiler/embedded_data.rb`. |
+| Transaction Runtime | Completed via compiled runtime | `transaction_states`, `transaction_transitions`, `transaction_rules` in `runtime/runtime.db`. |
+| Runtime Compiler / Projection | Completed with SQLite target | `runtime/compiler/compiler-engine.rb`, `runtime/compiler/embedded_data.rb`, `runtime/runtime.db`, and `generated_surfaces`. |
+| State Repair / Recovery | Completed in later recovery plan | `plans/archived/2026-05-20-1039-runtime-recovery-escalation-system.md`, `governance/ai-runtime-governance/recovery-retry-governance.md`, `metadata/recovery/`. |
+| Output Governance | Completed | `runtime/output-governance/` and `runtime/runtime.db` governance tables. |
+| Workflow / runtime boundary | Superseded by later decisions | `workflow/workflow-routing.md`, ADR-006 registry-first workflow activation, and current routing registry. |
+| Agent VM | Deferred | Still a long-term direction; current closure focuses on execution reliability, not VM abstraction. |
+
+本檔保留為 historical analysis。若未來要恢復 standalone YAML source 或 Agent VM，應建立新的 active plan，並以 current `runtime/README.md` 的 embedded-source boundary 為 preflight 起點。
 
 ---
 
@@ -30,17 +50,17 @@ Close-loop (ai-skill-close-loop.sh → commit/push/readback)
 
 | 元件 | 位置 | 成熟度 |
 |------|------|--------|
-| Session Lifecycle | [`runtime/pipeline/session-lifecycle.yaml`](../runtime/pipeline/session-lifecycle.yaml) | candidate — 4 stages defined |
-| Guard Chain | [`runtime/pipeline/guard-chain.yaml`](../runtime/pipeline/guard-chain.yaml) | candidate — 11 guards, 3 severity levels |
-| Token Budget | [`runtime/budget/token-budget.yaml`](../runtime/budget/token-budget.yaml) | candidate — per-model, per-layer |
-| Context Health | [`runtime/health/context-health-score.yaml`](../runtime/health/context-health-score.yaml) | candidate — 4 dimensions |
-| Circuit Breaker | [`runtime/guards/circuit-breaker.yaml`](../runtime/guards/circuit-breaker.yaml) | candidate — 5 guards |
-| Context Pollution | [`runtime/guards/context-pollution.yaml`](../runtime/guards/context-pollution.yaml) | candidate — 5 signals |
-| Activation Engine | [`runtime/router/activation-engine.rb`](../runtime/router/activation-engine.rb) | validated — programmatic rule activation |
-| Routing Registry | [`knowledge/runtime/routing-registry.yaml`](../knowledge/runtime/routing-registry.yaml) | validated — machine-readable routing |
-| Close-loop Script | [`scripts/ai-skill-close-loop.sh`](../scripts/ai-skill-close-loop.sh) | validated — lock, group, commit, push |
-| Conversation Goal Ledger | [`enforcement/conversation-goal-ledger.md`](../enforcement/conversation-goal-ledger.md) | core — project-local goal tracking |
-| Writeback Transaction | [`enforcement/dependency-reading.md`](../enforcement/dependency-reading.md) | core — commit/push/readback gate |
+| Session Lifecycle | [`runtime/pipeline/session-lifecycle.yaml`](../../runtime/pipeline/session-lifecycle.yaml) | candidate — 4 stages defined |
+| Guard Chain | [`runtime/pipeline/guard-chain.yaml`](../../runtime/pipeline/guard-chain.yaml) | candidate — 11 guards, 3 severity levels |
+| Token Budget | [`runtime/budget/token-budget.yaml`](../../runtime/budget/token-budget.yaml) | candidate — per-model, per-layer |
+| Context Health | [`runtime/health/context-health-score.yaml`](../../runtime/health/context-health-score.yaml) | candidate — 4 dimensions |
+| Circuit Breaker | [`runtime/guards/circuit-breaker.yaml`](../../runtime/guards/circuit-breaker.yaml) | candidate — 5 guards |
+| Context Pollution | [`runtime/guards/context-pollution.yaml`](../../runtime/guards/context-pollution.yaml) | candidate — 5 signals |
+| Activation Engine | [`runtime/router/activation-engine.rb`](../../runtime/router/activation-engine.rb) | validated — programmatic rule activation |
+| Routing Registry | [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) | validated — machine-readable routing |
+| Close-loop Script | [`scripts/ai-skill-close-loop.sh`](../../scripts/ai-skill-close-loop.sh) | validated — lock, group, commit, push |
+| Conversation Goal Ledger | [`enforcement/conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md) | core — project-local goal tracking |
+| Writeback Transaction | [`enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md) | core — commit/push/readback gate |
 
 ---
 
@@ -393,132 +413,132 @@ Phase 8: Agent VM           ← 遠期目標
 
 | 檔案 | 行數 | 內容摘要 | 轉換類型 | 說明 |
 |------|------|----------|----------|------|
-| [`execution-flow.md`](../workflow/apk-analysis/execution-flow.md) | 201 | 8 個執行階段：開始前確認、Quick Start、分析結束定義、Output Style、Safety、Feedback Loop、文件分層、回填規則 | **A (Phase Machine)** + **B (Transition Rules)** | 每個階段可對應 phase state machine 的 state。Quick Start 的 11 步驟可轉為 transition rules。分析結束定義的 10 項條件可轉為 blocking gates。 |
-| [`artifact-gates.md`](../workflow/apk-analysis/artifact-gates.md) | 565 | 15 個產出規範：UI Architecture Map、API Catalog、Domain/Runtime Baseline、Feature Handoff、SDK Audit、Sanitization 等 | **D (Gate Definitions)** + **G (Keep as prose)** | Gate 定義（completion gate、finish gate、development readiness gate）可轉為 blocking gates。Template 和範例保留為 prose。 |
-| [`README.md`](../workflow/apk-analysis/README.md) | 57 | Scope、Source References、Reference-First Workflow Shape | **G (Keep as prose)** | 純參考/說明用途，不轉換。 |
+| [`execution-flow.md`](../../workflow/apk-analysis/execution-flow.md) | 201 | 8 個執行階段：開始前確認、Quick Start、分析結束定義、Output Style、Safety、Feedback Loop、文件分層、回填規則 | **A (Phase Machine)** + **B (Transition Rules)** | 每個階段可對應 phase state machine 的 state。Quick Start 的 11 步驟可轉為 transition rules。分析結束定義的 10 項條件可轉為 blocking gates。 |
+| [`artifact-gates.md`](../../workflow/apk-analysis/artifact-gates.md) | 565 | 15 個產出規範：UI Architecture Map、API Catalog、Domain/Runtime Baseline、Feature Handoff、SDK Audit、Sanitization 等 | **D (Gate Definitions)** + **G (Keep as prose)** | Gate 定義（completion gate、finish gate、development readiness gate）可轉為 blocking gates。Template 和範例保留為 prose。 |
+| [`README.md`](../../workflow/apk-analysis/README.md) | 57 | Scope、Source References、Reference-First Workflow Shape | **G (Keep as prose)** | 純參考/說明用途，不轉換。 |
 
 #### 9.2.2 `workflow/software-delivery/`
 
 | 檔案 | 行數 | 內容摘要 | 轉換類型 | 說明 |
 |------|------|----------|----------|------|
-| [`execution-flow.md`](../workflow/software-delivery/execution-flow.md) | 159 | 8 個執行階段：Start From Evidence、Change Intake、BDD Closure、SDK Defect Closure、Same-Session Closure、Performance Gate、Backfill、Validate、Feedback | **A (Phase Machine)** + **B (Transition Rules)** | 每個階段可對應 phase state machine。Change Intake → BDD → Code → Test → Validate → Close 的流程可轉為 phase transitions。 |
-| [`development-process.md`](../workflow/software-delivery/development-process.md) | 325 | 完整開發流程：Default Flow、Required Contracts、Product Brief Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Closure、Test Strategy Gate、Embedded Flow、Missing Info Gate、Backfill、Contract-First Rules、Definition of Ready/Done | **D (Gate Definitions)** + **E (Transaction State Machine)** | 6 個 gate（Product Brief、Change Intake、Contract Governance、Traceability、BDD Closure、Test Strategy）可轉為 blocking gates。Definition of Ready/Done 可轉為 transaction state machine 的完成條件。 |
-| [`artifact-gates.md`](../workflow/software-delivery/artifact-gates.md) | 105 | 6 個產出規範：Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria、Avoid | **G (Keep as prose)** | 主要是撰寫指引和分類表，不涉及執行流程。 |
-| [`review-checklist.md`](../workflow/software-delivery/review-checklist.md) | 189 | 6 種審查 checklist：Change Intake、Test Strategy、Performance Test、Product to Contract、Backfill、Contract Governance | **D (Gate Definitions)** | Checklist 項目可轉為 gate resolvers 的驗證條件。 |
-| [`README.md`](../workflow/software-delivery/README.md) | 108 | Scope、核心原則、Review Flows、遷移狀態 | **G (Keep as prose)** | 純參考/說明用途。 |
+| [`execution-flow.md`](../../workflow/software-delivery/execution-flow.md) | 159 | 8 個執行階段：Start From Evidence、Change Intake、BDD Closure、SDK Defect Closure、Same-Session Closure、Performance Gate、Backfill、Validate、Feedback | **A (Phase Machine)** + **B (Transition Rules)** | 每個階段可對應 phase state machine。Change Intake → BDD → Code → Test → Validate → Close 的流程可轉為 phase transitions。 |
+| [`development-process.md`](../../workflow/software-delivery/development-process.md) | 325 | 完整開發流程：Default Flow、Required Contracts、Product Brief Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Closure、Test Strategy Gate、Embedded Flow、Missing Info Gate、Backfill、Contract-First Rules、Definition of Ready/Done | **D (Gate Definitions)** + **E (Transaction State Machine)** | 6 個 gate（Product Brief、Change Intake、Contract Governance、Traceability、BDD Closure、Test Strategy）可轉為 blocking gates。Definition of Ready/Done 可轉為 transaction state machine 的完成條件。 |
+| [`artifact-gates.md`](../../workflow/software-delivery/artifact-gates.md) | 105 | 6 個產出規範：Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria、Avoid | **G (Keep as prose)** | 主要是撰寫指引和分類表，不涉及執行流程。 |
+| [`review-checklist.md`](../../workflow/software-delivery/review-checklist.md) | 189 | 6 種審查 checklist：Change Intake、Test Strategy、Performance Test、Product to Contract、Backfill、Contract Governance | **D (Gate Definitions)** | Checklist 項目可轉為 gate resolvers 的驗證條件。 |
+| [`README.md`](../../workflow/software-delivery/README.md) | 108 | Scope、核心原則、Review Flows、遷移狀態 | **G (Keep as prose)** | 純參考/說明用途。 |
 
 #### 9.2.3 `workflow/travel-planning/`
 
 | 檔案 | 行數 | 內容摘要 | 轉換類型 | 說明 |
 |------|------|----------|----------|------|
-| [`execution-flow.md`](../workflow/travel-planning/execution-flow.md) | 292 | 17 個執行步驟：Intake、Source Triage、Agency Benchmark、Location Verification、Stop Planning、Weather、Transport、Lodging、Route Shape、Country Checks、Feasibility、Schedule、Calendar Output、車中泊、Recommendation Pass、Final Verification | **A (Phase Machine)** + **B (Transition Rules)** | 17 步驟可對應 phase state machine 的 states。每個步驟有明確的完成條件和 transition 規則。 |
-| [`artifact-gates.md`](../workflow/travel-planning/artifact-gates.md) | 104 | 19 個產出必備項目、4 個品質門檻（地點精確度、來源驗證、可行性檢查、備案要求）、產出格式範例 | **D (Gate Definitions)** + **G (Keep as prose)** | 品質門檻可轉為 blocking gates。產出格式範例保留為 prose。 |
-| [`README.md`](../workflow/travel-planning/README.md) | 103 | Scope、核心原則、Workflow Flows、產出格式 | **G (Keep as prose)** | 純參考/說明用途。 |
+| [`execution-flow.md`](../../workflow/travel-planning/execution-flow.md) | 292 | 17 個執行步驟：Intake、Source Triage、Agency Benchmark、Location Verification、Stop Planning、Weather、Transport、Lodging、Route Shape、Country Checks、Feasibility、Schedule、Calendar Output、車中泊、Recommendation Pass、Final Verification | **A (Phase Machine)** + **B (Transition Rules)** | 17 步驟可對應 phase state machine 的 states。每個步驟有明確的完成條件和 transition 規則。 |
+| [`artifact-gates.md`](../../workflow/travel-planning/artifact-gates.md) | 104 | 19 個產出必備項目、4 個品質門檻（地點精確度、來源驗證、可行性檢查、備案要求）、產出格式範例 | **D (Gate Definitions)** + **G (Keep as prose)** | 品質門檻可轉為 blocking gates。產出格式範例保留為 prose。 |
+| [`README.md`](../../workflow/travel-planning/README.md) | 103 | Scope、核心原則、Workflow Flows、產出格式 | **G (Keep as prose)** | 純參考/說明用途。 |
 
 #### 9.2.4 `workflow/documentation/`
 
 | 檔案 | 行數 | 內容摘要 | 轉換類型 | 說明 |
 |------|------|----------|----------|------|
-| [`execution-flow.md`](../workflow/documentation/execution-flow.md) | 67 | 5 個步驟：釐清讀者與生命週期、分類維度、選目錄與檔名、檔案形狀、驗證與連動 | **A (Phase Machine)** | 步驟較少，可濃縮為一個 phase 或數個 states。 |
-| [`README.md`](../workflow/documentation/README.md) | 46 | Scope、核心原則、與其他層的關係 | **G (Keep as prose)** | 純參考/說明用途。 |
+| [`execution-flow.md`](../../workflow/documentation/execution-flow.md) | 67 | 5 個步驟：釐清讀者與生命週期、分類維度、選目錄與檔名、檔案形狀、驗證與連動 | **A (Phase Machine)** | 步驟較少，可濃縮為一個 phase 或數個 states。 |
+| [`README.md`](../../workflow/documentation/README.md) | 46 | Scope、核心原則、與其他層的關係 | **G (Keep as prose)** | 純參考/說明用途。 |
 
 #### 9.2.5 `workflow/repo-analysis/`
 
 | 檔案 | 行數 | 內容摘要 | 轉換類型 | 說明 |
 |------|------|----------|----------|------|
-| [`README.md`](../workflow/repo-analysis/README.md) | 110 | Scope、核心原則、5 種 Workflow Flows（New Repo Onboarding、Deep Codebase Analysis、Migration Impact、Documentation Backfill） | **A (Phase Machine)** + **G (Keep as prose)** | 5 種 flow 可各自對應 phase machine，但內容較輕量，可先保留 prose。 |
+| [`README.md`](../../workflow/repo-analysis/README.md) | 110 | Scope、核心原則、5 種 Workflow Flows（New Repo Onboarding、Deep Codebase Analysis、Migration Impact、Documentation Backfill） | **A (Phase Machine)** + **G (Keep as prose)** | 5 種 flow 可各自對應 phase machine，但內容較輕量，可先保留 prose。 |
 
 ### 9.3 Enforcement 層轉換盤點
 
 | 檔案 | 行數 | 內容摘要 | 轉換類型 | 說明 |
 |------|------|----------|----------|------|
-| [`dependency-reading.md`](../enforcement/dependency-reading.md) | 215 | 核心規則、Dependency Read Ledger、Writeback Transaction Guard（7 步驟）、Commit/Push Readback Gate | **E (Transaction State Machine)** + **D (Gate Definitions)** | Writeback Transaction Guard 的 7 步驟可直接轉為 transaction state machine。Commit/Push Readback Gate 可轉為 blocking gate。 |
-| [`conversation-goal-ledger.md`](../enforcement/conversation-goal-ledger.md) | 314 | Goal 層級邊界、Goal file 範本、Priority 規則、Decomposition、Owner/Lock、Multi-agent Safety、完成與刪除 | **C (Obligation Templates)** + **G (Keep as prose)** | Goal 範本和 priority 規則可轉為 obligation templates。其餘規則保留 prose。 |
-| [`goal-action-validation.md`](../enforcement/goal-action-validation.md) | 83 | 核心規則、使用時機、建議輸出形狀、驗證方式範例、防呆規則 | **D (Gate Definitions)** | Validation gate 定義可轉為 blocking gates。 |
-| [`linked-updates.md`](../enforcement/linked-updates.md) | 81 | Agent 必須做的事、常見連動關係、閉環不完整時的強制補救 | **B (Transition Rules)** + **G (Keep as prose)** | 連動關係可轉為 transition rules（修改 X 必須同步更新 Y）。 |
-| [`failure-learning-system.md`](../enforcement/failure-learning-system.md) | 148 | 核心規則、Failure Taxonomy、Storage Rules、Failure Pattern Record、Promotion Decision、Validation Scenario | **D (Gate Definitions)** + **G (Keep as prose)** | Failure taxonomy 和 promotion decision 可轉為 gate definitions。 |
-| [`feedback-lessons.md`](../../../../feedback/feedback-lessons.md) | — | Feedback lesson 撰寫規則 | **G (Keep as prose)** | 主要是撰寫指引。 |
-| [`sanitization.md`](../enforcement/sanitization.md) | — | 去敏規則 | **G (Keep as prose)** | 純規則描述。 |
-| [`content-layering.md`](../enforcement/content-layering.md) | — | 內容分層原則 | **G (Keep as prose)** | 純規則描述。 |
-| [`tool-neutral-documentation.md`](../enforcement/tool-neutral-documentation.md) | — | 工具中立文件原則 | **G (Keep as prose)** | 純規則描述。 |
-| [`reusable-guidance-boundary.md`](../enforcement/reusable-guidance-boundary.md) | — | 可重用指引邊界 | **G (Keep as prose)** | 純規則描述。 |
-| [`rule-weight.md`](../enforcement/rule-weight.md) | — | 規則權重 | **G (Keep as prose)** | 純規則描述。 |
-| [`decision-efficiency.md`](../enforcement/decision-efficiency.md) | — | 決策效率規則 | **G (Keep as prose)** | 純規則描述。 |
-| [`neutral-language.md`](../enforcement/neutral-language.md) | — | 中性語言規則 | **G (Keep as prose)** | 純規則描述。 |
-| [`cross-skill-references.md`](../enforcement/cross-skill-references.md) | — | 跨 skill 引用規則 | **G (Keep as prose)** | 純規則描述。 |
-| [`authorization-scope.md`](../enforcement/authorization-scope.md) | — | 授權範圍規則 | **G (Keep as prose)** | 純規則描述。 |
-| [`document-todo-list.md`](../enforcement/document-todo-list.md) | — | Document TODO list 規則 | **G (Keep as prose)** | 純規則描述。 |
-| [`README.md`](../enforcement/README.md) | 125 | Runtime Activation Model、Core Bootstrap、Lazy-load Rules 索引 | **F (Intelligence Routing)** + **G (Keep as prose)** | Activation model 的規則索引可轉為 intelligence routing。 |
+| [`dependency-reading.md`](../../enforcement/dependency-reading.md) | 215 | 核心規則、Dependency Read Ledger、Writeback Transaction Guard（7 步驟）、Commit/Push Readback Gate | **E (Transaction State Machine)** + **D (Gate Definitions)** | Writeback Transaction Guard 的 7 步驟可直接轉為 transaction state machine。Commit/Push Readback Gate 可轉為 blocking gate。 |
+| [`conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md) | 314 | Goal 層級邊界、Goal file 範本、Priority 規則、Decomposition、Owner/Lock、Multi-agent Safety、完成與刪除 | **C (Obligation Templates)** + **G (Keep as prose)** | Goal 範本和 priority 規則可轉為 obligation templates。其餘規則保留 prose。 |
+| [`goal-action-validation.md`](../../enforcement/goal-action-validation.md) | 83 | 核心規則、使用時機、建議輸出形狀、驗證方式範例、防呆規則 | **D (Gate Definitions)** | Validation gate 定義可轉為 blocking gates。 |
+| [`linked-updates.md`](../../enforcement/linked-updates.md) | 81 | Agent 必須做的事、常見連動關係、閉環不完整時的強制補救 | **B (Transition Rules)** + **G (Keep as prose)** | 連動關係可轉為 transition rules（修改 X 必須同步更新 Y）。 |
+| [`failure-learning-system.md`](../../enforcement/failure-learning-system.md) | 148 | 核心規則、Failure Taxonomy、Storage Rules、Failure Pattern Record、Promotion Decision、Validation Scenario | **D (Gate Definitions)** + **G (Keep as prose)** | Failure taxonomy 和 promotion decision 可轉為 gate definitions。 |
+| [`feedback-lessons.md`](../../../../../feedback/feedback-lessons.md) | — | Feedback lesson 撰寫規則 | **G (Keep as prose)** | 主要是撰寫指引。 |
+| [`sanitization.md`](../../enforcement/sanitization.md) | — | 去敏規則 | **G (Keep as prose)** | 純規則描述。 |
+| [`content-layering.md`](../../enforcement/content-layering.md) | — | 內容分層原則 | **G (Keep as prose)** | 純規則描述。 |
+| [`tool-neutral-documentation.md`](../../enforcement/tool-neutral-documentation.md) | — | 工具中立文件原則 | **G (Keep as prose)** | 純規則描述。 |
+| [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) | — | 可重用指引邊界 | **G (Keep as prose)** | 純規則描述。 |
+| [`rule-weight.md`](../../enforcement/rule-weight.md) | — | 規則權重 | **G (Keep as prose)** | 純規則描述。 |
+| [`decision-efficiency.md`](../../enforcement/decision-efficiency.md) | — | 決策效率規則 | **G (Keep as prose)** | 純規則描述。 |
+| [`neutral-language.md`](../../enforcement/neutral-language.md) | — | 中性語言規則 | **G (Keep as prose)** | 純規則描述。 |
+| [`cross-skill-references.md`](../../enforcement/cross-skill-references.md) | — | 跨 skill 引用規則 | **G (Keep as prose)** | 純規則描述。 |
+| [`authorization-scope.md`](../../enforcement/authorization-scope.md) | — | 授權範圍規則 | **G (Keep as prose)** | 純規則描述。 |
+| [`document-todo-list.md`](../../enforcement/document-todo-list.md) | — | Document TODO list 規則 | **G (Keep as prose)** | 純規則描述。 |
+| [`README.md`](../../enforcement/README.md) | 125 | Runtime Activation Model、Core Bootstrap、Lazy-load Rules 索引 | **F (Intelligence Routing)** + **G (Keep as prose)** | Activation model 的規則索引可轉為 intelligence routing。 |
 
 #### Enforcement Failure Patterns
 
 | 檔案 | 內容摘要 | 轉換類型 | 說明 |
 |------|----------|----------|------|
-| [`commit-before-validation-skip.md`](../enforcement/failure-patterns/commit-before-validation-skip.md) | Commit 前跳過 validation 的 failure pattern | **D (Gate Definitions)** | 可轉為 blocking gate（validation_missing 阻止 commit） |
-| [`correction-loop-bypass.md`](../enforcement/failure-patterns/correction-loop-bypass.md) | 修正迴圈繞過 | **D (Gate Definitions)** | 可轉為 blocking gate |
-| [`entrypoint-positioning-drift.md`](../enforcement/failure-patterns/entrypoint-positioning-drift.md) | Entrypoint 定位漂移 | **D (Gate Definitions)** | 可轉為 blocking gate |
-| [`failure-to-validator-closure.md`](../enforcement/failure-patterns/failure-to-validator-closure.md) | Failure 未轉為 validator | **D (Gate Definitions)** | 可轉為 blocking gate |
-| [`language-preference-drift.md`](../enforcement/failure-patterns/language-preference-drift.md) | 語言偏好漂移 | **G (Keep as prose)** | 純 failure 描述 |
-| [`shared-rules-architecture-drift.md`](../enforcement/failure-patterns/shared-rules-architecture-drift.md) | Enforcement 架構漂移 | **G (Keep as prose)** | 純 failure 描述 |
-| [`skill-classification-boundary-confusion.md`](../enforcement/failure-patterns/skill-classification-boundary-confusion.md) | Skill 分類邊界混淆 | **G (Keep as prose)** | 純 failure 描述 |
-| [`skill-local-feedback-bypass.md`](../enforcement/failure-patterns/skill-local-feedback-bypass.md) | Skill local feedback 繞過 | **D (Gate Definitions)** | 可轉為 blocking gate |
-| [`source-mirror-write-drift.md`](../enforcement/failure-patterns/source-mirror-write-drift.md) | Source-mirror write 漂移 | **D (Gate Definitions)** | 可轉為 blocking gate |
-| [`tool-config-design-without-rule-check.md`](../enforcement/failure-patterns/tool-config-design-without-rule-check.md) | Tool config 設計未檢查規則 | **D (Gate Definitions)** | 可轉為 blocking gate |
+| [`commit-before-validation-skip.md`](../../enforcement/failure-patterns/commit-before-validation-skip.md) | Commit 前跳過 validation 的 failure pattern | **D (Gate Definitions)** | 可轉為 blocking gate（validation_missing 阻止 commit） |
+| [`correction-loop-bypass.md`](../../enforcement/failure-patterns/correction-loop-bypass.md) | 修正迴圈繞過 | **D (Gate Definitions)** | 可轉為 blocking gate |
+| [`entrypoint-positioning-drift.md`](../../enforcement/failure-patterns/entrypoint-positioning-drift.md) | Entrypoint 定位漂移 | **D (Gate Definitions)** | 可轉為 blocking gate |
+| [`failure-to-validator-closure.md`](../../enforcement/failure-patterns/failure-to-validator-closure.md) | Failure 未轉為 validator | **D (Gate Definitions)** | 可轉為 blocking gate |
+| [`language-preference-drift.md`](../../enforcement/failure-patterns/language-preference-drift.md) | 語言偏好漂移 | **G (Keep as prose)** | 純 failure 描述 |
+| [`shared-rules-architecture-drift.md`](../../enforcement/failure-patterns/shared-rules-architecture-drift.md) | Enforcement 架構漂移 | **G (Keep as prose)** | 純 failure 描述 |
+| [`skill-classification-boundary-confusion.md`](../../enforcement/failure-patterns/skill-classification-boundary-confusion.md) | Skill 分類邊界混淆 | **G (Keep as prose)** | 純 failure 描述 |
+| [`skill-local-feedback-bypass.md`](../../enforcement/failure-patterns/skill-local-feedback-bypass.md) | Skill local feedback 繞過 | **D (Gate Definitions)** | 可轉為 blocking gate |
+| [`source-mirror-write-drift.md`](../../enforcement/failure-patterns/source-mirror-write-drift.md) | Source-mirror write 漂移 | **D (Gate Definitions)** | 可轉為 blocking gate |
+| [`tool-config-design-without-rule-check.md`](../../enforcement/failure-patterns/tool-config-design-without-rule-check.md) | Tool config 設計未檢查規則 | **D (Gate Definitions)** | 可轉為 blocking gate |
 
 ### 9.4 Governance 層轉換盤點
 
 | 檔案 | 行數 | 內容摘要 | 轉換類型 | 說明 |
 |------|------|----------|----------|------|
-| [`lifecycle/knowledge-update-flow.md`](../governance/lifecycle/knowledge-update-flow.md) | 353 | 11 步驟知識更新流程（觸發檢查 → 分類 → Promotion Target → 寫入 → 更新 → Extraction → Failure Learning → Linked Updates → Runtime Surfaces → 驗證 → Commit/Push/Readback） | **A (Phase Machine)** + **E (Transaction State Machine)** | 11 步驟本身就是完整的 phase state machine。每個步驟的條件和產出可轉為 phase transitions 和 transaction states。 |
-| [`lifecycle/intelligence-extraction-pipeline.md`](../governance/lifecycle/intelligence-extraction-pipeline.md) | 509 | 7 步驟 Intelligence Extraction Pipeline（Content Audit → Type Classification → Decomposition → Format Transformation → Source Annotation → Validation → Index Update） | **A (Phase Machine)** | Pipeline 步驟可轉為 phase machine。 |
-| [`lifecycle/directory-structure-governance.md`](../governance/lifecycle/directory-structure-governance.md) | 180 | 5 步驟目錄結構治理 Checkpoint（名稱衝突 → 邊界清晰度 → 慣性命名 → 路徑深度 → 全域引用影響） | **A (Phase Machine)** + **G (Keep as prose)** | Checkpoint 步驟可轉為 phase machine，但內容較輕量。 |
-| [`validation/README.md`](../governance/validation/README.md) | 109 | Knowledge Validation Gates、Migration Validation Checklist、Generated Refresh Checklist | **D (Gate Definitions)** | Validation gates 可轉為 blocking gates。 |
-| [`contributing.md`](../governance/contributing.md) | — | 貢獻規則 | **G (Keep as prose)** | 純規則描述。 |
-| [`document-sizing.md`](../governance/document-sizing.md) | — | 文件大小規則 | **G (Keep as prose)** | 純規則描述。 |
-| [`cleanup/README.md`](../governance/cleanup/README.md) | — | 清理規則 | **G (Keep as prose)** | 純規則描述。 |
-| [`dependency/README.md`](../governance/dependency/README.md) | — | 依賴規則 | **G (Keep as prose)** | 純規則描述。 |
-| [`lifecycle/README.md`](../governance/lifecycle/README.md) | — | Lifecycle 概覽 | **G (Keep as prose)** | 純參考/說明用途。 |
+| [`lifecycle/knowledge-update-flow.md`](../../governance/lifecycle/knowledge-update-flow.md) | 353 | 11 步驟知識更新流程（觸發檢查 → 分類 → Promotion Target → 寫入 → 更新 → Extraction → Failure Learning → Linked Updates → Runtime Surfaces → 驗證 → Commit/Push/Readback） | **A (Phase Machine)** + **E (Transaction State Machine)** | 11 步驟本身就是完整的 phase state machine。每個步驟的條件和產出可轉為 phase transitions 和 transaction states。 |
+| [`lifecycle/intelligence-extraction-pipeline.md`](../../governance/lifecycle/intelligence-extraction-pipeline.md) | 509 | 7 步驟 Intelligence Extraction Pipeline（Content Audit → Type Classification → Decomposition → Format Transformation → Source Annotation → Validation → Index Update） | **A (Phase Machine)** | Pipeline 步驟可轉為 phase machine。 |
+| [`lifecycle/directory-structure-governance.md`](../../governance/lifecycle/directory-structure-governance.md) | 180 | 5 步驟目錄結構治理 Checkpoint（名稱衝突 → 邊界清晰度 → 慣性命名 → 路徑深度 → 全域引用影響） | **A (Phase Machine)** + **G (Keep as prose)** | Checkpoint 步驟可轉為 phase machine，但內容較輕量。 |
+| [`validation/README.md`](../../governance/validation/README.md) | 109 | Knowledge Validation Gates、Migration Validation Checklist、Generated Refresh Checklist | **D (Gate Definitions)** | Validation gates 可轉為 blocking gates。 |
+| [`contributing.md`](../../governance/contributing.md) | — | 貢獻規則 | **G (Keep as prose)** | 純規則描述。 |
+| [`document-sizing.md`](../../governance/document-sizing.md) | — | 文件大小規則 | **G (Keep as prose)** | 純規則描述。 |
+| [`cleanup/README.md`](../../governance/cleanup/README.md) | — | 清理規則 | **G (Keep as prose)** | 純規則描述。 |
+| [`dependency/README.md`](../../governance/dependency/README.md) | — | 依賴規則 | **G (Keep as prose)** | 純規則描述。 |
+| [`lifecycle/README.md`](../../governance/lifecycle/README.md) | — | Lifecycle 概覽 | **G (Keep as prose)** | 純參考/說明用途。 |
 
 ### 9.5 Analysis 層轉換盤點
 
 | 檔案 | 內容摘要 | 轉換類型 | 說明 |
 |------|----------|----------|------|
-| [`apk/workflows/frida-hook-flow.md`](../analysis/apk/workflows/frida-hook-flow.md) | Frida hook 操作流程 | **G (Keep as prose)** | 技術操作流程，不涉及執行階段管理。 |
-| [`apk/workflows/http-api-documentation-flow.md`](../analysis/apk/workflows/http-api-documentation-flow.md) | HTTP API 文件化流程 | **G (Keep as prose)** | 技術操作流程。 |
-| [`apk/workflows/local-proxy-hook-flow.md`](../analysis/apk/workflows/local-proxy-hook-flow.md) | Local proxy hook 流程 | **G (Keep as prose)** | 技術操作流程。 |
-| [`apk/workflows/media-hls-analysis-flow.md`](../analysis/apk/workflows/media-hls-analysis-flow.md) | Media HLS 分析流程 | **G (Keep as prose)** | 技術操作流程。 |
-| [`apk/traffic-triage.md`](../analysis/apk/traffic-triage.md) | 流量分類方法 | **G (Keep as prose)** | 技術方法。 |
-| [`apk/tools-and-failures.md`](../analysis/apk/tools-and-failures.md) | 工具與失敗判讀 | **G (Keep as prose)** | 技術參考。 |
-| [`development-guidance/risk-translation.md`](../analysis/development-guidance/risk-translation.md) | 風險轉譯表 | **G (Keep as prose)** | 技術參考。 |
-| [`repo/documentation-backfill.md`](../analysis/repo/documentation-backfill.md) | 文件回填方法 | **G (Keep as prose)** | 技術方法。 |
-| [`repo/traceability-gate.md`](../analysis/repo/traceability-gate.md) | 可追溯性方法 | **G (Keep as prose)** | 技術方法。 |
-| [`repo/contract-governance.md`](../analysis/repo/contract-governance.md) | 合約治理方法 | **G (Keep as prose)** | 技術方法。 |
-| [`travel/sources-and-tools.md`](../analysis/travel/sources-and-tools.md) | 旅遊來源與工具 | **G (Keep as prose)** | 技術參考。 |
+| [`apk/workflows/frida-hook-flow.md`](../../analysis/apk/workflows/frida-hook-flow.md) | Frida hook 操作流程 | **G (Keep as prose)** | 技術操作流程，不涉及執行階段管理。 |
+| [`apk/workflows/http-api-documentation-flow.md`](../../analysis/apk/workflows/http-api-documentation-flow.md) | HTTP API 文件化流程 | **G (Keep as prose)** | 技術操作流程。 |
+| [`apk/workflows/local-proxy-hook-flow.md`](../../analysis/apk/workflows/local-proxy-hook-flow.md) | Local proxy hook 流程 | **G (Keep as prose)** | 技術操作流程。 |
+| [`apk/workflows/media-hls-analysis-flow.md`](../../analysis/apk/workflows/media-hls-analysis-flow.md) | Media HLS 分析流程 | **G (Keep as prose)** | 技術操作流程。 |
+| [`apk/traffic-triage.md`](../../analysis/apk/traffic-triage.md) | 流量分類方法 | **G (Keep as prose)** | 技術方法。 |
+| [`apk/tools-and-failures.md`](../../analysis/apk/tools-and-failures.md) | 工具與失敗判讀 | **G (Keep as prose)** | 技術參考。 |
+| [`development-guidance/risk-translation.md`](../../analysis/development-guidance/risk-translation.md) | 風險轉譯表 | **G (Keep as prose)** | 技術參考。 |
+| [`repo/documentation-backfill.md`](../../analysis/repo/documentation-backfill.md) | 文件回填方法 | **G (Keep as prose)** | 技術方法。 |
+| [`repo/traceability-gate.md`](../../analysis/repo/traceability-gate.md) | 可追溯性方法 | **G (Keep as prose)** | 技術方法。 |
+| [`repo/contract-governance.md`](../../analysis/repo/contract-governance.md) | 合約治理方法 | **G (Keep as prose)** | 技術方法。 |
+| [`travel/sources-and-tools.md`](../../analysis/travel/sources-and-tools.md) | 旅遊來源與工具 | **G (Keep as prose)** | 技術參考。 |
 
 ### 9.6 Validation 層轉換盤點
 
 | 檔案 | 內容摘要 | 轉換類型 | 說明 |
 |------|----------|----------|------|
-| [`scenarios/apk-analysis/early-hook-prevention-v1.yaml`](../validation/scenarios/apk-analysis/early-hook-prevention-v1.yaml) | 早期 hook 預防 scenario | **G (Keep as YAML)** | 已是 YAML，不需轉換。 |
-| [`scenarios/apk-analysis/flutter-aot-hooking-v1.yaml`](../validation/scenarios/apk-analysis/flutter-aot-hooking-v1.yaml) | Flutter AOT hooking scenario | **G (Keep as YAML)** | 已是 YAML。 |
-| [`scenarios/apk-analysis/local-proxy-vs-pinning-v1.yaml`](../validation/scenarios/apk-analysis/local-proxy-vs-pinning-v1.yaml) | Local proxy vs pinning scenario | **G (Keep as YAML)** | 已是 YAML。 |
-| [`scenarios/cross-domain/directory-naming-governance-v1.yaml`](../validation/scenarios/cross-domain/directory-naming-governance-v1.yaml) | 目錄命名治理 scenario | **G (Keep as YAML)** | 已是 YAML。 |
-| [`scenarios/cross-domain/new-category-registration-v1.yaml`](../validation/scenarios/cross-domain/new-category-registration-v1.yaml) | 新分類註冊 scenario | **G (Keep as YAML)** | 已是 YAML。 |
-| [`scenarios/failure-derived/*.yaml`](../validation/scenarios/failure-derived/) | 從 failure pattern 衍生的 validation scenarios | **G (Keep as YAML)** | 已是 YAML。 |
-| [`rules/heuristics/*.yaml`](../validation/rules/heuristics/) | Heuristic validation rules | **G (Keep as YAML)** | 已是 YAML。 |
+| [`scenarios/apk-analysis/early-hook-prevention-v1.yaml`](../../validation/scenarios/apk-analysis/early-hook-prevention-v1.yaml) | 早期 hook 預防 scenario | **G (Keep as YAML)** | 已是 YAML，不需轉換。 |
+| [`scenarios/apk-analysis/flutter-aot-hooking-v1.yaml`](../../validation/scenarios/apk-analysis/flutter-aot-hooking-v1.yaml) | Flutter AOT hooking scenario | **G (Keep as YAML)** | 已是 YAML。 |
+| [`scenarios/apk-analysis/local-proxy-vs-pinning-v1.yaml`](../../validation/scenarios/apk-analysis/local-proxy-vs-pinning-v1.yaml) | Local proxy vs pinning scenario | **G (Keep as YAML)** | 已是 YAML。 |
+| [`scenarios/cross-domain/directory-naming-governance-v1.yaml`](../../validation/scenarios/cross-domain/directory-naming-governance-v1.yaml) | 目錄命名治理 scenario | **G (Keep as YAML)** | 已是 YAML。 |
+| [`scenarios/cross-domain/new-category-registration-v1.yaml`](../../validation/scenarios/cross-domain/new-category-registration-v1.yaml) | 新分類註冊 scenario | **G (Keep as YAML)** | 已是 YAML。 |
+| [`scenarios/failure-derived/*.yaml`](../../validation/scenarios/failure-derived/) | 從 failure pattern 衍生的 validation scenarios | **G (Keep as YAML)** | 已是 YAML。 |
+| [`rules/heuristics/*.yaml`](../../validation/rules/heuristics/) | Heuristic validation rules | **G (Keep as YAML)** | 已是 YAML。 |
 
 ### 9.7 Feedback 層轉換盤點
 
 | 目錄 | 內容摘要 | 轉換類型 | 說明 |
 |------|----------|----------|------|
-| [`feedback/history/apk-analysis/`](../feedback/history/apk-analysis/) | APK 分析的 feedback lessons（~80 個檔案） | **G (Keep as prose)** | Feedback lessons 是歷史記錄，不轉換。 |
-| [`feedback/history/development-guidance/`](../feedback/history/development-guidance/) | 開發指引的 feedback lessons（~20 個檔案） | **G (Keep as prose)** | 歷史記錄。 |
-| [`feedback/history/travel-planning/`](../feedback/history/travel-planning/) | 旅遊規劃的 feedback lessons | **G (Keep as prose)** | 歷史記錄。 |
-| [`feedback/extraction/apk-analysis-index.md`](../feedback/extraction/apk-analysis-index.md) | APK 分析 extraction 索引 | **G (Keep as prose)** | 索引文件。 |
-| [`feedback/extraction/development-guidance-index.md`](../feedback/extraction/development-guidance-index.md) | 開發指引 extraction 索引 | **G (Keep as prose)** | 索引文件。 |
-| [`feedback/pipeline/promotion-engine.yaml`](../feedback/pipeline/promotion-engine.yaml) | Promotion engine 定義 | **G (Keep as YAML)** | 已是 YAML。 |
-| [`feedback/pipeline/promotion-workflow.yaml`](../feedback/pipeline/promotion-workflow.yaml) | Promotion workflow 定義 | **G (Keep as YAML)** | 已是 YAML。 |
-| [`feedback/pipeline/lifecycle-automation.yaml`](../feedback/pipeline/lifecycle-automation.yaml) | Lifecycle automation 定義 | **G (Keep as YAML)** | 已是 YAML。 |
+| [`feedback/history/apk-analysis/`](../../feedback/history/apk-analysis/) | APK 分析的 feedback lessons（~80 個檔案） | **G (Keep as prose)** | Feedback lessons 是歷史記錄，不轉換。 |
+| [`feedback/history/development-guidance/`](../../feedback/history/development-guidance/) | 開發指引的 feedback lessons（~20 個檔案） | **G (Keep as prose)** | 歷史記錄。 |
+| [`feedback/history/travel-planning/`](../../feedback/history/travel-planning/) | 旅遊規劃的 feedback lessons | **G (Keep as prose)** | 歷史記錄。 |
+| [`feedback/extraction/apk-analysis-index.md`](../../feedback/extraction/apk-analysis-index.md) | APK 分析 extraction 索引 | **G (Keep as prose)** | 索引文件。 |
+| [`feedback/extraction/development-guidance-index.md`](../../feedback/extraction/development-guidance-index.md) | 開發指引 extraction 索引 | **G (Keep as prose)** | 索引文件。 |
+| [`feedback/pipeline/promotion-engine.yaml`](../../feedback/pipeline/promotion-engine.yaml) | Promotion engine 定義 | **G (Keep as YAML)** | 已是 YAML。 |
+| [`feedback/pipeline/promotion-workflow.yaml`](../../feedback/pipeline/promotion-workflow.yaml) | Promotion workflow 定義 | **G (Keep as YAML)** | 已是 YAML。 |
+| [`feedback/pipeline/lifecycle-automation.yaml`](../../feedback/pipeline/lifecycle-automation.yaml) | Lifecycle automation 定義 | **G (Keep as YAML)** | 已是 YAML。 |
 
 ### 9.8 轉換總計
 
@@ -544,7 +564,7 @@ Phase 8: Agent VM           ← 遠期目標
 
 ### 10.1 現狀：ai-tools 中嵌入的控制流程
 
-目前三個 agent 工具文件（[`ai-tools/agent/roo.md`](../ai-tools/agent/roo.md)、[`ai-tools/agent/cursor.md`](../ai-tools/agent/cursor.md)、[`ai-tools/agent/claude.md`](../ai-tools/agent/claude.md)）各自包含大量**控制流程邏輯**，違反「薄配置層」設計原則。
+目前三個 agent 工具文件（[`ai-tools/agent/roo.md`](../../ai-tools/agent/roo.md)、[`ai-tools/agent/cursor.md`](../../ai-tools/agent/cursor.md)、[`ai-tools/agent/claude.md`](../../ai-tools/agent/claude.md)）各自包含大量**控制流程邏輯**，違反「薄配置層」設計原則。
 
 #### 10.1.1 控制流程分類
 
