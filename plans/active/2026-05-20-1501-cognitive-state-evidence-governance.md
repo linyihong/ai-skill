@@ -534,6 +534,18 @@ Compression pass requirement：
 - Prefer one `execution_reliability_degradation` signal family over many near-duplicate triggers.
 - Separate runtime primitives from governance concepts before promotion.
 - Do not allow Tier 3+ optimization to delay Tier 0-2 safe execution.
+- Next implementation step should be runtime reduction, not new abstraction: compress the current signal set into 3-5 runtime primitives before adding lifecycle, state, governance layer, or metadata category.
+
+Signal family normalization candidate：
+
+```text
+execution_reliability_degradation
+  ├── confidence decay
+  ├── stale belief
+  ├── cognitive contamination
+  ├── contradiction accumulation
+  └── intent instability
+```
 
 Runtime primitive boundary：
 
@@ -541,9 +553,12 @@ Runtime primitive boundary：
 | --- | --- |
 | Evidence qualification | yes |
 | Confidence integrity | yes |
+| Claim scope | runtime-lite; enforce only when claim affects validation or success declaration |
 | Contradiction propagation | partial; only for dependent execution claims/checkpoints |
 | Cognitive contamination | mostly governance conceptual until validated by scenarios |
 | Cognitive cost governance | governance layer by default; runtime only as minimality guard |
+| Meta-stop rule | governance only unless recurring runtime recursion failure is validated |
+| Tier boundary | governance/compiler gate; not a per-action runtime guard |
 | Cognitive runtime state machine | conceptual consolidation target, not persistent state |
 
 ### 5.18 Source Freshness and Validity Governance
@@ -680,6 +695,7 @@ U. **是否需要 tier boundary 來封頂抽象化？**
 V. **是否需要 compression pass 先 normalize signals？**
    - Current recommendation: yes.
    - Confidence decay、intent instability、contradiction propagation、contamination should be evaluated as variants of execution reliability degradation before adding separate guards.
+   - Next step is runtime reduction: compress 12+ conceptual signals into 3-5 runtime primitives before adding new lifecycle/state/layer.
 
 W. **哪些 concept 是 runtime primitive，哪些只是 governance concept？**
    - Current recommendation: separate before implementation.
@@ -718,6 +734,7 @@ Tasks:
 - [ ] 確認 governance minimality / cognitive cost governance，避免小任務觸發過重治理或 governance recursion。
 - [ ] 確認 tier boundary，限制 Tier 3+ cognitive optimization / meta-governance 不阻塞 Tier 0-2 execution。
 - [ ] 確認 compression pass，把重疊 signals normalise 為較少的 runtime primitives。
+- [ ] 確認 runtime reduction：先把 12+ conceptual signals 壓成 3-5 個 runtime primitives，不再新增 lifecycle / state / governance layer。
 - [ ] 確認 minimal runtime principle 與 meta-stop rule。
 - [ ] 確認 recovery budget 是否需要 runtime-state counter。
 - [ ] 與使用者討論 §7 open questions。
