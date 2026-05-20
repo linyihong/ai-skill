@@ -1,6 +1,6 @@
 # Runtime Recovery & Escalation System — System Plan
 
-> **狀態**: draft
+> **狀態**: completed
 > **建立日期**: 2026-05-20
 > **目的**: 在 agent 執行中偵測「現實已推翻原假設」的時機，強制停止局部 patch，進入 source-of-truth 重建與 execution graph replanning。
 
@@ -483,16 +483,37 @@ Phase 6 result:
 
 ### Phase 7 — Plan Completion Closure
 
+Status: completed 2026-05-20.
+
 Goal: 完成 plan 後執行閉環。
 
 Tasks:
 
-- [ ] 確認所有 phase 完成或明確標 blocked。
-- [ ] 執行適用 validator。
-- [ ] 檢查 linked updates。
-- [ ] 更新 `plans/README.md` 狀態。
-- [ ] 若 plan 完成，依 `plans/README.md` 搬移至 `archived/` 或標註 active 例外。
-- [ ] 完成 Ai-skill writeback close-loop。
+- [x] 確認所有 phase 完成或明確標 blocked。
+- [x] 執行適用 validator。
+- [x] 檢查 linked updates。
+- [x] 更新 `plans/README.md` 狀態。
+- [x] 若 plan 完成，依 `plans/README.md` 搬移至 `archived/` 或標註 active 例外。
+- [x] 完成 Ai-skill writeback close-loop。
+
+#### Phase 7 Architecture Compatibility Preflight
+
+| 欄位 | 結果 |
+| --- | --- |
+| Trigger | 開始執行 Phase 7 — Plan Completion Closure |
+| Checked sources | `plans/README.md`、本 plan Phase 0-6、`metadata/rules/escalation-policy.yaml`、`scripts/validate-knowledge-runtime.rb` |
+| Conflicts | 本 plan 已有明確完成邊界，不符合 `plans/README.md` 的 active 例外；應搬移至 `archived/`。 |
+| Decision | proceed with archive move and linked path updates |
+| Validation | validators、knowledge runtime refresh、diff review、commit/push/readback、clean git status |
+
+Phase 7 result:
+
+| Area | Result |
+| --- | --- |
+| Phase closure | Phase 0-6 are completed and have validation records. |
+| Validators | Runtime compiler, runtime DB validation, knowledge runtime validation, and recovery scenario validation were executed during the final closure. |
+| Linked updates | `plans/README.md` and `metadata/rules/escalation-policy.yaml` were updated for the archived plan path. |
+| Archive | Plan moved from `plans/active/` to `plans/archived/`. |
 
 ---
 

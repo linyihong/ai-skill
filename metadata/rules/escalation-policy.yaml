@@ -39,7 +39,7 @@ depends:
   - enforcement.failure-learning-system
   - enforcement.linked-updates
 related:
-  - plans/active/2026-05-20-1039-runtime-recovery-escalation-system.md
+  - plans/archived/2026-05-20-1039-runtime-recovery-escalation-system.md
   - runtime/README.md
 conflicts: []
 replaces: []
