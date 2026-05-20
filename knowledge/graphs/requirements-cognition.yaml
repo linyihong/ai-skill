@@ -1,0 +1,40 @@
+id: graph.requirements-cognition
+source: intelligence/engineering/requirements/README.md
+status: candidate
+summary: >
+  Connects requirements cognition, BDD-lite workflow, behavior governance metadata,
+  software-delivery governance and validation scenarios without promoting BDD syntax to runtime.
+edges:
+  - type: depends_on
+    target: intelligence/engineering/requirements/behavior-modeling/README.md
+    reason: Behavior modeling stabilizes actor intent and behavior boundary.
+    validation: README lists scenario framing, language alignment and acceptance boundary entries.
+  - type: depends_on
+    target: intelligence/engineering/requirements/specification-quality/README.md
+    reason: Specification quality governs traceability, hallucination and stale acceptance criteria.
+    validation: README lists traceability and acceptance freshness entries.
+  - type: related_to
+    target: workflow/software-delivery/requirements/README.md
+    reason: Workflow requirements stage applies requirements cognition to delivery.
+    validation: Workflow lists behavior-driven discovery, acceptance definition and ambiguity resolution.
+  - type: related_to
+    target: governance/ai-runtime-governance/software-delivery-governance.md
+    reason: Governance translates behavior correctness into delivery gates.
+    validation: Governance includes requirements cognition and BDD-lite boundary.
+  - type: related_to
+    target: metadata/requirements/README.md
+    reason: Metadata stores behavior governance signals as metadata-only heuristics.
+    validation: Metadata marks no BDD syntax runtime boundary.
+  - type: related_to
+    target: validation/scenarios/software-delivery/requirement-contradiction.yaml
+    reason: Scenario validates contradiction handling.
+    validation: Scenario blocks implementation when requirement sources conflict.
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Routing registry exposes requirements cognition for software delivery tasks.
+    validation: Registry includes requirements cognition candidate sources.
+metadata:
+  priority: P1
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-20

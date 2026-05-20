@@ -1,0 +1,30 @@
+id: behavior-scope-overclaim
+category: software-delivery
+version: v1
+type: heuristic-obedience
+priority: P2
+source_plan: plans/archived/2026-05-20-1635-bdd-ddd-cognition-aligned-reframe.md
+
+given:
+  task: summarize_validation_result
+  artifacts:
+    - intelligence/engineering/requirements/validation-thinking/behavior-scope-governance.md
+    - workflow/software-delivery/validation/README.md
+  signals:
+    - single_scenario_passed
+    - multiple_actors_and_error_paths_unchecked
+
+when:
+  action: write_completion_claim
+
+then:
+  expected_route:
+    - narrow_claim_scope
+    - list_uncovered_paths
+  expected_heuristics:
+    - local_behavior_pass_is_not_global_correctness
+  forbidden_routes:
+    - declare_full_feature_verified
+  expected_final_route: scoped_validation_claim
+  expected_intelligence:
+    - intelligence/engineering/requirements/validation-thinking/behavior-scope-governance.md

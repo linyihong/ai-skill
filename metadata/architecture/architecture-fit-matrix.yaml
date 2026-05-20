@@ -2,8 +2,8 @@ schema_version: architecture-fit-matrix/v1
 status: candidate
 owner_layer: metadata/architecture
 source_intelligence:
-  - intelligence/engineering/architecture/architecture-selection/architecture-fit-analysis.md
-  - intelligence/engineering/architecture/architecture-selection/architecture-tradeoff-matrix.md
+  - intelligence/engineering/architecture/architectural-fit/architecture-fit-analysis.md
+  - intelligence/engineering/architecture/architectural-fit/architecture-tradeoff-matrix.md
 boundary: metadata-only
 axes:
   domain_complexity: [low, medium, high]

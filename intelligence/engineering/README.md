@@ -4,11 +4,12 @@
 
 | 子目錄 | 描述 |
 |--------|------|
-| [`heuristics/`](heuristics/README.md) | 通用軟體工程經驗法則 |
-| [`architecture/`](architecture/README.md) | 架構決策智慧 |
-| [`tradeoffs/`](tradeoffs/README.md) | 技術權衡 |
+| [`requirements/`](requirements/README.md) | 需求與行為建模智慧（BDD-lite、ambiguity、acceptance、traceability、validation target） |
+| [`architecture/`](architecture/README.md) | 架構決策智慧（domain modeling、architectural fit、delivery alignment、boundary/consistency/coupling） |
+| [`execution/`](execution/README.md) | 軟體交付執行認知（delivery cognition、task decomposition、validation reasoning、recovery thinking） |
+| [`tradeoffs/`](tradeoffs/README.md) | 技術與 delivery 取捨 |
 | [`failure/`](failure/README.md) | 失效模式 |
-| [`domain/`](domain/README.md) | 領域模型智慧 |
+| [`domain/`](domain/README.md) | 業務領域智慧的 legacy / cross-domain entry；DDD tactical modeling 已移至 architecture cognition |
 | [`anti-patterns/`](anti-patterns/README.md) | 反模式 |
 | [`distributed-systems/`](distributed-systems/README.md) | 分散式系統 |
 | [`philosophy/`](philosophy/README.md) | 原始工程哲學與認知框架（Musk Five-Step、first principles、automation last） |
@@ -22,6 +23,7 @@
 
 - `analysis/`（根目錄）提供具體分析方法，`analytical-reasoning/` 提供背後的原則與 why。
 - `workflow/` 提供執行流程，本層提供選擇流程的決策邏輯。
+- Requirements cognition 先穩定 behavior / acceptance，再讓 architecture cognition 建立 domain boundary / invariant。
 - 舊 `skills/` scaffold 已退役；執行入口在 `workflow/`，分析方法在 `analysis/`，判斷智慧在本層。
 - `agent-architecture/` 研究 AI Agent 自身的認知行為模式，與 `enforcement/failure-patterns/` 互補（後者記錄具體失效模式，前者解釋為什麼會發生）。
 - IDE 生態系統知識（VS Code Extension 全域設定儲存機制等）已移至 [`intelligence/ide/`](../ide/README.md)，與本層同為 `intelligence/` 下的獨立子目錄。

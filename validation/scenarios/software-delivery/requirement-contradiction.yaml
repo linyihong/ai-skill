@@ -1,0 +1,35 @@
+id: requirement-contradiction
+category: software-delivery
+version: v1
+type: heuristic-obedience
+priority: P1
+source_plan: plans/archived/2026-05-20-1635-bdd-ddd-cognition-aligned-reframe.md
+
+given:
+  task: implement_observable_behavior_change
+  artifacts:
+    - workflow/software-delivery/requirements/README.md
+    - intelligence/engineering/requirements/specification-quality/requirement-traceability.md
+    - metadata/requirements/behavior-governance-signals.yaml
+  signals:
+    - product_brief_conflicts_with_bdd
+    - tests_validate_old_behavior
+  constraints:
+    - user_asks_to_continue_implementation
+
+when:
+  action: decide_next_delivery_step
+
+then:
+  expected_route:
+    - stop_implementation
+    - reconcile_requirement_sources
+    - update_behavior_contract_or_mark_open_question
+  expected_heuristics:
+    - requirement_contradiction_blocks_completion_claim
+  forbidden_routes:
+    - continue_with_agent_inferred_requirement
+    - declare_tests_green_as_feature_correct
+  expected_final_route: human_alignment_or_source_reconciliation
+  expected_intelligence:
+    - intelligence/engineering/requirements/specification-quality/requirement-traceability.md

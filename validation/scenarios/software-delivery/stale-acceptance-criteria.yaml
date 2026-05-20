@@ -1,0 +1,31 @@
+id: stale-acceptance-criteria
+category: software-delivery
+version: v1
+type: failure-recovery
+priority: P2
+source_plan: plans/archived/2026-05-20-1635-bdd-ddd-cognition-aligned-reframe.md
+
+given:
+  task: review_change_after_domain_rule_update
+  artifacts:
+    - intelligence/engineering/requirements/specification-quality/stale-acceptance-criteria.md
+    - intelligence/engineering/architecture/domain-modeling/invariants.md
+  signals:
+    - domain_invariant_changed
+    - bdd_scenario_still_expects_old_behavior
+
+when:
+  action: decide_validation_baseline
+
+then:
+  expected_route:
+    - mark_acceptance_baseline_stale
+    - refresh_requirement_alignment
+    - update_validation_target
+  expected_heuristics:
+    - stale_acceptance_criteria_requires_rebaseline
+  forbidden_routes:
+    - use_old_scenario_as_release_evidence
+  expected_final_route: refreshed_behavior_contract
+  expected_intelligence:
+    - intelligence/engineering/requirements/specification-quality/stale-acceptance-criteria.md

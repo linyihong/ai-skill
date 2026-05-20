@@ -1,0 +1,30 @@
+id: metadata.requirements.behavior-governance-signals
+status: candidate
+source_intelligence:
+  - intelligence/engineering/requirements/README.md
+  - intelligence/engineering/requirements/specification-quality/requirement-traceability.md
+signals:
+  requirement_contradiction:
+    severity: high
+    description: Requirement、behavior contract、domain invariant、implementation 或 tests 之間出現互斥 claim。
+    action: stop_and_reconcile_source_of_truth
+  missing_validation_target:
+    severity: medium
+    description: Acceptance criteria 沒有可執行或可審查的 validation target。
+    action: create_or_scope_out_validation_target
+  stale_acceptance_criteria:
+    severity: medium
+    description: Product intent、domain invariant 或 implementation truth 已變更，但 acceptance baseline 未同步。
+    action: refresh_acceptance_baseline
+  behavior_scope_overclaim:
+    severity: medium
+    description: Local scenario pass 被宣稱為完整 workflow correctness。
+    action: narrow_claim_scope
+  requirement_hallucination:
+    severity: high
+    description: Agent 將未確認推論寫成 requirement 或 feature。
+    action: downgrade_to_assumption_or_open_question
+runtime_boundary:
+  metadata_only: true
+  no_bdd_syntax_runtime: true
+  promotion_requires_plan: true

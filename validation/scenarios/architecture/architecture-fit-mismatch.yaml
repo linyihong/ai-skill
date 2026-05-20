@@ -8,8 +8,8 @@ source_plan: plans/active/2026-05-20-1601-ddd-intelligence-software-delivery-gov
 given:
   task: evaluate_high_complexity_domain_architecture
   artifacts:
-    - workflow/software-delivery/architecture/architecture-selection-governance.md
-    - intelligence/engineering/architecture/architecture-selection/complexity-evaluation.md
+    - workflow/software-delivery/architecture/architecture-fit-governance.md
+    - intelligence/engineering/architecture/architectural-fit/complexity-evaluation.md
     - metadata/architecture/ddd-adoption-signals.yaml
   signals:
     - high_domain_complexity
@@ -36,5 +36,5 @@ then:
     - skip_bounded_context_evaluation
   expected_final_route: architecture_fit_revision_required
   expected_intelligence:
-    - intelligence/engineering/architecture/architecture-selection/complexity-evaluation.md
-    - intelligence/engineering/domain/domain-driven-design/bounded-context.md
+    - intelligence/engineering/architecture/architectural-fit/complexity-evaluation.md
+    - intelligence/engineering/architecture/domain-modeling/bounded-context.md

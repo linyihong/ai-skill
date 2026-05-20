@@ -1,39 +1,39 @@
 id: graph.ddd-architecture-governance
-source: intelligence/engineering/domain/domain-driven-design/README.md
+source: intelligence/engineering/architecture/domain-modeling/README.md
 status: candidate
 summary: >
-  連接 DDD domain intelligence、architecture selection、software-delivery architecture workflow、
-  governance translation、metadata heuristics 與 validation scenarios，確保 DDD 是 selectable
-  architecture strategy，不是 runtime invariant。
+  Connects domain architecture cognition, architectural fit, software-delivery architecture workflow,
+  governance translation, metadata heuristics and validation scenarios. DDD remains a selectable
+  architecture strategy, not a runtime invariant.
 edges:
   - type: depends_on
-    target: intelligence/engineering/domain/README.md
-    reason: Domain README 定義 DDD / 業務模型智慧的 owner layer。
-    validation: README 已列出 domain-driven-design/ 入口。
-  - type: related_to
-    target: intelligence/engineering/architecture/architecture-selection/README.md
-    reason: Architecture selection 決定何時使用 CRUD、DDD Lite 或 Full DDD。
-    validation: architecture-selection README 定義 fit analysis 與 tradeoff matrix。
+    target: intelligence/engineering/requirements/README.md
+    reason: Domain architecture modeling depends on stabilized behavior language and acceptance boundary.
+    validation: Requirements README defines behavior modeling and acceptance boundary before architecture.
+  - type: depends_on
+    target: intelligence/engineering/architecture/architectural-fit/README.md
+    reason: Architectural fit decides when CRUD, DDD Lite or Full DDD is appropriate.
+    validation: Architectural-fit README defines fit analysis and tradeoff matrix.
   - type: related_to
     target: workflow/software-delivery/architecture/README.md
-    reason: Software-delivery architecture workflow 將 DDD fit analysis 應用到實際交付流程。
-    validation: workflow README 定義執行步驟與輸出格式。
+    reason: Software-delivery architecture workflow applies fit analysis to delivery.
+    validation: Workflow README defines DDD fit, bounded context discovery and consistency boundary design.
   - type: related_to
     target: governance/ai-runtime-governance/software-delivery-architecture-governance.md
-    reason: Governance layer 定義 architecture fit、minimality 與 runtime boundary gate。
-    validation: governance 文件明確禁止 DDD promotion 成 runtime invariant。
+    reason: Governance layer defines architecture fit, minimality and runtime boundary gate.
+    validation: Governance document forbids tactical DDD promotion into runtime primitive.
   - type: related_to
     target: metadata/architecture/README.md
-    reason: Metadata layer 保存 fit signal、DDD adoption signal、overengineering signal 與 bounded context heuristics。
-    validation: metadata README 標記 metadata-only boundary。
+    reason: Metadata layer stores fit signal, DDD adoption signal, overengineering signal and bounded context heuristics.
+    validation: Metadata README marks metadata-only boundary.
   - type: related_to
     target: validation/scenarios/architecture/cargo-cult-ddd.yaml
-    reason: Scenario 檢查低 complexity 專案不得預設 full DDD。
-    validation: scenario 定義 forbidden route project_implies_full_ddd。
+    reason: Scenario checks low-complexity project must not default to full DDD.
+    validation: Scenario defines forbidden route project_implies_full_ddd.
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
-    reason: Routing registry 應讓 software-delivery 與 architecture / DDD intent 找到新入口。
-    validation: registry candidate_sources 引用 architecture workflow 與 DDD intelligence。
+    reason: Routing registry lets software-delivery and architecture intent find cognition-first entrypoints.
+    validation: Registry candidate_sources reference requirements, architecture workflow and domain-modeling intelligence.
 metadata:
   priority: P2
   confidence: medium

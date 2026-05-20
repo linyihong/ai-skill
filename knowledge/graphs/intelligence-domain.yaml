@@ -22,9 +22,9 @@ edges:
     reason: 泛型 Repository 常導致 aggregate 邊界模糊，違反 DDD 原則。
     validation: generic-repository-overuse atom 討論 Repository 模式的正確使用。
   - type: related_to
-    target: intelligence/engineering/domain/domain-driven-design/README.md
+    target: intelligence/engineering/architecture/domain-modeling/README.md
     reason: DDD integration 將 bounded context、aggregate、ubiquitous language、DDD Lite / Full DDD 等 tactical heuristics 收斂到 domain intelligence。
-    validation: domain-driven-design README 定義 DDD 作為 selectable architecture strategy，而非 runtime invariant。
+    validation: domain-modeling README 定義 DDD tactical modeling belongs to domain architecture cognition, not runtime invariant。
   - type: related_to
     target: metadata/architecture/ddd-adoption-signals.yaml
     reason: DDD adoption signal 是 domain intelligence 的 metadata-only 機讀表達。

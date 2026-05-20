@@ -35,5 +35,5 @@ then:
     - treat_event_sourcing_as_default
   expected_final_route: simplify_or_defer_complexity
   expected_intelligence:
-    - intelligence/engineering/domain/domain-driven-design/overengineering-risks.md
+    - intelligence/engineering/tradeoffs/architecture-overengineering.md
     - intelligence/engineering/anti-patterns/architecture-absolutism.md

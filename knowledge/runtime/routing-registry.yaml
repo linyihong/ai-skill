@@ -757,6 +757,10 @@ records:
         - design-review
         - architecture-review
         - architecture-plan
+        - bdd
+        - requirements
+        - acceptance-criteria
+        - behavior-contract
         - ddd
         - domain-modeling
         - bounded-context
@@ -769,6 +773,10 @@ records:
         - SDK
         - plan
         - 契約
+        - BDD
+        - acceptance criteria
+        - 驗收條件
+        - 需求矛盾
         - DDD
         - 領域模型
         - bounded context
@@ -784,21 +792,33 @@ records:
       - workflow/software-delivery/artifact-gates.md
       - enforcement/README.md
       - enforcement/linked-updates.md
+      - intelligence/engineering/requirements/README.md
       - intelligence/engineering/development/docs-first-bdd-closure.md
     candidate_sources:
       - workflow/software-delivery/development-process.md
+      - workflow/software-delivery/requirements/README.md
+      - workflow/software-delivery/requirements/behavior-driven-discovery/README.md
+      - workflow/software-delivery/requirements/acceptance-definition/README.md
+      - workflow/software-delivery/requirements/ambiguity-resolution/README.md
       - workflow/software-delivery/architecture/README.md
       - workflow/software-delivery/architecture/architecture-fit-analysis.md
       - analysis/development-guidance/README.md
       - analysis/development-guidance/risk-translation.md
       - workflow/software-delivery/README.md
       - intelligence/engineering/development/README.md
-      - intelligence/engineering/architecture/architecture-selection/README.md
-      - intelligence/engineering/domain/domain-driven-design/README.md
+      - intelligence/engineering/requirements/README.md
+      - intelligence/engineering/requirements/behavior-modeling/README.md
+      - intelligence/engineering/requirements/specification-quality/README.md
+      - intelligence/engineering/requirements/validation-thinking/README.md
+      - intelligence/engineering/architecture/architectural-fit/README.md
+      - intelligence/engineering/architecture/domain-modeling/README.md
       - governance/ai-runtime-governance/software-delivery-architecture-governance.md
       - metadata/architecture/README.md
+      - metadata/requirements/README.md
       - knowledge/summaries/development-guidance.md
-      - knowledge/summaries/architecture-selection.md
+      - knowledge/summaries/architectural-fit.md
+      - knowledge/summaries/requirements-cognition.md
+      - knowledge/graphs/requirements-cognition.yaml
       - knowledge/graphs/workflow-software-delivery.yaml
       - knowledge/graphs/workflow-software-delivery-architecture.yaml
       - knowledge/graphs/ddd-architecture-governance.yaml
@@ -826,7 +846,7 @@ records:
       contract precedence、BDD closure、artifact completeness、test strategy 與 performance evidence gate。
       觸發由 workflow/software-delivery/README.md 定義；**不**另立 route.project.*。
       若 repo 含 apk-analysis-sdk/runtime/workflow-activation.yaml，在進入本 workflow 後載入 project_overlays（專案 gate，非平行 routing）。
-    validation_signal: Change intake、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence、same-session closure 與 architecture fit analysis 已檢查；workflow、analysis、intelligence 與 governance 內容已分離。
+    validation_signal: Change intake、requirements cognition、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence、same-session closure 與 architecture fit analysis 已檢查；workflow、analysis、intelligence、metadata 與 governance 內容已分離。
     metadata:
       priority: P1
       confidence: high
@@ -1112,25 +1132,65 @@ records:
       compression_level: summary-first
       reason: 需要對應決策智慧時才讀取完整 atom。
 
-  - id: route.intelligence.architecture-selection
+  - id: route.intelligence.requirements-cognition
+    task_intent: 判斷需求理解、BDD-lite、behavior contract、acceptance criteria、ambiguity、requirement traceability 或 validation target
+    primary_source: intelligence/engineering/requirements/README.md
+    required_dependencies:
+      - intelligence/engineering/requirements/behavior-modeling/README.md
+      - intelligence/engineering/requirements/specification-quality/README.md
+      - intelligence/engineering/requirements/validation-thinking/README.md
+      - workflow/software-delivery/requirements/README.md
+      - governance/ai-runtime-governance/software-delivery-governance.md
+    candidate_sources:
+      - intelligence/engineering/requirements/behavior-modeling/scenario-framing.md
+      - intelligence/engineering/requirements/behavior-modeling/acceptance-boundaries.md
+      - intelligence/engineering/requirements/specification-quality/requirement-traceability.md
+      - intelligence/engineering/requirements/specification-quality/requirement-hallucination.md
+      - intelligence/engineering/requirements/specification-quality/stale-acceptance-criteria.md
+      - intelligence/engineering/requirements/validation-thinking/validation-target-selection.md
+      - metadata/requirements/behavior-governance-signals.yaml
+      - validation/scenarios/software-delivery/requirement-contradiction.yaml
+      - knowledge/graphs/requirements-cognition.yaml
+      - knowledge/summaries/requirements-cognition.md
+    source_of_truth_gate: requirements-cognition-not-bdd-syntax-runtime
+    ranking_reason: >
+      Requirements cognition uses BDD-lite to stabilize actor intent, behavior boundary, acceptance criteria,
+      ambiguity disposition and validation target before architecture or implementation. BDD syntax remains optional.
+    validation_signal: Requirement → behavior contract → acceptance criteria → validation target → execution artifact is traceable; no unconfirmed feature is written as requirement.
+    metadata:
+      priority: P1
+      confidence: medium
+      context_cost:
+        estimated_tokens: 1600
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: 多數需求任務先讀 requirements README 與 summary；高 ambiguity 時再展開 behavior / specification / validation docs。
+
+  - id: route.intelligence.architectural-fit
     task_intent: 判斷軟體架構選型、DDD adoption、bounded context、CQRS、event sourcing、microservices 或 architecture overengineering
-    primary_source: intelligence/engineering/architecture/architecture-selection/README.md
+    primary_source: intelligence/engineering/architecture/architectural-fit/README.md
     required_dependencies:
       - intelligence/engineering/architecture/README.md
       - intelligence/engineering/domain/README.md
-      - intelligence/engineering/domain/domain-driven-design/README.md
+      - intelligence/engineering/architecture/domain-modeling/README.md
       - workflow/software-delivery/architecture/README.md
       - governance/ai-runtime-governance/software-delivery-architecture-governance.md
     candidate_sources:
-      - intelligence/engineering/architecture/architecture-selection/architecture-fit-analysis.md
-      - intelligence/engineering/architecture/architecture-selection/architecture-tradeoff-matrix.md
-      - intelligence/engineering/domain/domain-driven-design/ddd-lite-vs-full-ddd.md
-      - intelligence/engineering/domain/domain-driven-design/bounded-context.md
+      - intelligence/engineering/architecture/architectural-fit/architecture-fit-analysis.md
+      - intelligence/engineering/architecture/architectural-fit/architecture-tradeoff-matrix.md
+      - intelligence/engineering/architecture/architectural-fit/ddd-lite-vs-full-ddd.md
+      - intelligence/engineering/architecture/domain-modeling/bounded-context.md
       - intelligence/engineering/anti-patterns/cargo-cult-ddd.md
       - metadata/architecture/architecture-fit-matrix.yaml
       - metadata/architecture/ddd-adoption-signals.yaml
       - knowledge/graphs/ddd-architecture-governance.yaml
-      - knowledge/summaries/architecture-selection.md
+      - knowledge/summaries/architectural-fit.md
     source_of_truth_gate: architecture-strategy-not-runtime-invariant
     ranking_reason: >
       Architecture selection 需要先由 fit analysis 判斷 business complexity、invariant density、
@@ -1150,7 +1210,7 @@ records:
     model:
       profile: small
       compression_level: summary-first
-      reason: 先讀 architecture-selection README 與 metadata，只有在 high-complexity 或 DDD 訊號強時展開完整 DDD tactical docs。
+      reason: 先讀 architectural-fit README 與 metadata，只有在 high-complexity 或 DDD 訊號強時展開完整 DDD tactical docs。
 
   - id: route.validation.ai-decision-contract
     task_intent: 驗證 AI 的 decision path、rule obedience、routing stability
@@ -1171,6 +1231,10 @@ records:
       - validation/scenarios/architecture/overengineering-detection.yaml
       - validation/scenarios/architecture/bounded-context-collapse.yaml
       - validation/scenarios/architecture/aggregate-explosion.yaml
+      - validation/scenarios/software-delivery/requirement-contradiction.yaml
+      - validation/scenarios/software-delivery/missing-validation-target.yaml
+      - validation/scenarios/software-delivery/stale-acceptance-criteria.yaml
+      - validation/scenarios/software-delivery/behavior-scope-overclaim.yaml
     candidate_sources:
       - validation/scenarios/failure-derived/runtime-recovery-navigation-mismatch.yaml
       - validation/scenarios/failure-derived/runtime-recovery-user-contradiction.yaml
@@ -1180,6 +1244,10 @@ records:
       - validation/scenarios/architecture/overengineering-detection.yaml
       - validation/scenarios/architecture/bounded-context-collapse.yaml
       - validation/scenarios/architecture/aggregate-explosion.yaml
+      - validation/scenarios/software-delivery/requirement-contradiction.yaml
+      - validation/scenarios/software-delivery/missing-validation-target.yaml
+      - validation/scenarios/software-delivery/stale-acceptance-criteria.yaml
+      - validation/scenarios/software-delivery/behavior-scope-overclaim.yaml
       - validation/rules/heuristics/runtime-first-hooking.yaml
       - validation/rules/heuristics/local-proxy-diagnosis.yaml
       - validation/rules/heuristics/avoid-early-patch.yaml

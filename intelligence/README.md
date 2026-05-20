@@ -26,8 +26,10 @@
 ```text
 intelligence/
   engineering/
-    architecture/              # 架構思考模式（非教學）
-    domain/                    # DDD / 業務模型智慧
+    requirements/              # 需求與行為認知（BDD-lite、ambiguity、acceptance、traceability）
+    architecture/              # 架構認知（domain modeling、fit、boundary、consistency）
+    execution/                 # 執行認知（delivery cognition、decomposition、validation、recovery）
+    domain/                    # 業務領域智慧 legacy / cross-domain entry
     failure/                   # 工程災難智慧（抽象化失敗模式）
     heuristics/                # 經驗法則（intelligence 核心）
     anti-patterns/             # 常見錯誤設計
@@ -46,8 +48,10 @@ intelligence/
 
 ## 目前入口
 
-- [`engineering/architecture/`](engineering/architecture/README.md)：架構決策智慧，包含 architecture selection、complexity evaluation、team topology、integration pressure 與 tradeoff matrix。
-- [`engineering/domain/`](engineering/domain/README.md)：DDD / 業務模型智慧，包含 aggregate boundary 與 domain-driven-design 判斷。
+- [`engineering/requirements/`](engineering/requirements/README.md)：需求與行為認知，包含 BDD-lite、ambiguity、acceptance boundary、traceability 與 validation target。
+- [`engineering/architecture/`](engineering/architecture/README.md)：架構認知，包含 domain modeling、architectural fit、delivery alignment、boundary 與 consistency model。
+- [`engineering/execution/`](engineering/execution/README.md)：執行認知，包含 delivery cognition、task decomposition、validation reasoning 與 recovery thinking。
+- [`engineering/domain/`](engineering/domain/README.md)：業務領域智慧 legacy entry；DDD tactical modeling 已歸入 architecture/domain-modeling。
 - [`engineering/analytical-reasoning/`](engineering/analytical-reasoning/README.md)：分析推理智慧（APK analysis、repo analysis、evidence-first routing、heuristics、signals、failure patterns）。
   - [`highest-leverage-analysis-path.md`](engineering/analytical-reasoning/highest-leverage-analysis-path.md)：第一個實際 promoted candidate intelligence atom。
   - [`evidence-first-routing.md`](engineering/analytical-reasoning/evidence-first-routing.md)：證據驅動路線選擇（`validated-intelligence`）。

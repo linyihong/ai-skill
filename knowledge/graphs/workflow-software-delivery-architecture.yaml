@@ -18,11 +18,11 @@ edges:
     reason: Governance gate 防止 default DDD 與 architecture inflation。
     validation: governance 文件定義 fit analysis、minimality、rejected alternatives 與 runtime boundary gate。
   - type: related_to
-    target: intelligence/engineering/architecture/architecture-selection/architecture-fit-analysis.md
+    target: intelligence/engineering/architecture/architectural-fit/architecture-fit-analysis.md
     reason: Workflow 執行時引用 architecture selection intelligence。
     validation: intelligence atom 提供 evaluation axes 與 output format。
   - type: related_to
-    target: intelligence/engineering/domain/domain-driven-design/ddd-lite-vs-full-ddd.md
+    target: intelligence/engineering/architecture/architectural-fit/ddd-lite-vs-full-ddd.md
     reason: DDD adoption 決策需要區分 DDD Lite 與 Full DDD。
     validation: 文件定義 low/medium/high complexity 的適用策略。
   - type: related_to

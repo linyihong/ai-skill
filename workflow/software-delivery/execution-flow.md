@@ -25,11 +25,11 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 | --- | --- |
 | 存在什麼規劃產出？ | 閱讀企劃書、product brief、規劃文件、issue、ticket、PRD、設計備註、BDD、API 合約或同等文件 |
 | Product brief 本身是否已驗證？ | 根據證據或明確決策檢查目標、使用者、範圍、non-goals、假設、限制、依賴、風險和成功標準。將每個主要聲明標記為 `validated`（已驗證）、`assumption`（假設）、`open question`（開放問題）、`scoped out`（排除範圍）或 `invalidated`（無效） |
-| 這是新需求還是行為變更？ | 在程式碼之前更新規劃文件、BDD、合約、實作切片和測試 |
+| 這是新需求還是行為變更？ | 先執行 [`requirements/`](requirements/README.md) stage：behavior-driven discovery、acceptance definition、ambiguity resolution；再更新規劃文件、BDD、合約、實作切片和測試 |
 | 這是 bug 修復？ | 確認預期行為 vs 實際行為、重現/證據、受影響的 BDD 或缺失 scenario、受影響的合約/錯誤和回歸測試 |
 | 這是重構？ | 確認沒有行為或公開合約變更；否則重新分類 |
 | 這是強化？ | 確認威脅/故障模式、擁有者層、驗證和連結的檢查清單/控制更新 |
-| 這是架構決策或 domain model 變更？ | 先執行 [`architecture/architecture-fit-analysis.md`](architecture/architecture-fit-analysis.md)，確認 CRUD / DDD Lite / Full DDD / event-driven / microservices 的 fit evidence；不得預設套用 DDD、CQRS 或 event sourcing |
+| 這是架構決策或 domain model 變更？ | 先確認 requirements stage 已有 behavior boundary / acceptance criteria / ambiguity disposition，再執行 [`architecture/architecture-fit-analysis.md`](architecture/architecture-fit-analysis.md)，確認 CRUD / DDD Lite / Full DDD / event-driven / microservices 的 fit evidence；不得預設套用 DDD、CQRS 或 event sourcing |
 | 這個變更是否影響延遲、吞吐量、資源使用、啟動、背景工作、資料庫存取、批次處理或外部呼叫量？ | 在程式碼之前定義效能預算和必要的效能測試類型。不要依賴「功能正確」作為變更可發布的證明 |
 | 這個變更是否與現有文件衝突？ | 應用文件優先順序：治理/框架合約、產品計劃、BDD、合約、實作、測試。更新擁有文件，而不是僅默默修正程式碼 |
 
@@ -40,6 +40,16 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 如果 product brief 存在但包含影響行為、合約、風險、測試、所有權、時程或發布關卡的未驗證聲明，在實作之前將這些聲明視為阻擋項。對於純規劃答案，引用參考來源或推理邊界，而不是假裝 brief 已驗證。
 
 > **輸出模板**：Change Intake 完成後，使用 [`templates/change-brief-template.md`](templates/change-brief-template.md) 記錄變更簡報。
+
+### Requirements Cognition Checkpoint
+
+在進入 architecture 或 implementation 前，若任務涉及 observable behavior，讀取 [`requirements/`](requirements/README.md)：
+
+- Behavior-driven discovery：actor intent、behavior boundary、shared language。
+- Acceptance definition：acceptance criteria、validation target、regression scope。
+- Ambiguity resolution：將不確定項標成 `assumption`、`open question`、`scoped out` 或 `invalidated`。
+
+沒有 validation target 的 acceptance criteria 不能作為完成宣告基線；requirement contradiction 或 stale acceptance criteria 需要先重建 source-of-truth。
 
 ## 2. 文件優先 BDD 閉環（Docs-First BDD Closure Loop）
 

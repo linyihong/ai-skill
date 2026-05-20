@@ -4,12 +4,13 @@
 
 source_intelligence:
 
-- [`intelligence/engineering/architecture/architecture-selection/README.md`](../../intelligence/engineering/architecture/architecture-selection/README.md)
-- [`intelligence/engineering/domain/domain-driven-design/README.md`](../../intelligence/engineering/domain/domain-driven-design/README.md)
+- [`intelligence/engineering/requirements/README.md`](../../intelligence/engineering/requirements/README.md)
+- [`intelligence/engineering/architecture/architectural-fit/README.md`](../../intelligence/engineering/architecture/architectural-fit/README.md)
+- [`intelligence/engineering/architecture/domain-modeling/README.md`](../../intelligence/engineering/architecture/domain-modeling/README.md)
 - [`intelligence/engineering/anti-patterns/architecture-absolutism.md`](../../intelligence/engineering/anti-patterns/architecture-absolutism.md)
 - [`workflow/software-delivery/architecture/README.md`](../../workflow/software-delivery/architecture/README.md)
 
-本文件把 architecture fit analysis、DDD Lite / Full DDD selection、architecture minimality 與 overengineering detection 轉譯成 software-delivery governance。它不把 DDD 變成 runtime invariant，也不讓 architecture optimization 阻塞低風險 delivery。
+本文件把 requirements cognition 之後的 architecture fit analysis、DDD Lite / Full DDD selection、architecture minimality 與 overengineering detection 轉譯成 software-delivery governance。它不把 DDD 變成 runtime invariant，也不讓 architecture optimization 阻塞低風險 delivery。
 
 ## 觸發時機
 
@@ -24,6 +25,7 @@ source_intelligence:
 
 | Gate | 通過條件 |
 | --- | --- |
+| Requirements prerequisite | Architecture decision 已接收 behavior boundary、acceptance criteria 與 ambiguity disposition；未解 ambiguity 不直接建模。 |
 | Fit analysis | 已評估 domain complexity、invariant density、integration pressure、lifecycle、team scale 與 delivery priority。 |
 | Minimality | 已說明更簡單方案為何不足，或選擇降級為簡單方案。 |
 | Strategy selection | 已區分 CRUD / DDD Lite / Full DDD / event-driven / microservices。 |
@@ -35,8 +37,9 @@ source_intelligence:
 
 | 內容類型 | 目標層 |
 | --- | --- |
-| 為什麼這種架構適合 | `intelligence/engineering/architecture/architecture-selection/` |
-| DDD tactical modeling 判斷 | `intelligence/engineering/domain/domain-driven-design/` |
+| 為什麼這種架構適合 | `intelligence/engineering/architecture/architectural-fit/` |
+| Requirements / behavior boundary 判斷 | `intelligence/engineering/requirements/` |
+| DDD tactical modeling 判斷 | `intelligence/engineering/architecture/domain-modeling/` |
 | AI software-delivery governance gate | `governance/ai-runtime-governance/` |
 | 實際執行步驟與 decision record | `workflow/software-delivery/architecture/` |
 | 可機讀 fit signal | `metadata/architecture/` |

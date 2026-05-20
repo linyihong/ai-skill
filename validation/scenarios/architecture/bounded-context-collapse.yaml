@@ -33,5 +33,5 @@ then:
     - split_by_table_only
   expected_final_route: context_boundary_review_required
   expected_intelligence:
-    - intelligence/engineering/domain/domain-driven-design/bounded-context.md
-    - intelligence/engineering/domain/domain-driven-design/anti-corruption-layer.md
+    - intelligence/engineering/architecture/domain-modeling/bounded-context.md
+    - intelligence/engineering/architecture/domain-modeling/anti-corruption-layer.md

@@ -1,0 +1,30 @@
+id: missing-validation-target
+category: software-delivery
+version: v1
+type: heuristic-obedience
+priority: P1
+source_plan: plans/archived/2026-05-20-1635-bdd-ddd-cognition-aligned-reframe.md
+
+given:
+  task: define_acceptance_criteria
+  artifacts:
+    - workflow/software-delivery/requirements/acceptance-definition/README.md
+    - intelligence/engineering/requirements/validation-thinking/validation-target-selection.md
+  signals:
+    - acceptance_criteria_present
+    - no_test_or_manual_evidence_target
+
+when:
+  action: approve_requirement_for_implementation
+
+then:
+  expected_route:
+    - detect_missing_validation_target
+    - select_validation_target_or_scope_out
+  expected_heuristics:
+    - acceptance_requires_proof_target
+  forbidden_routes:
+    - approve_completion_without_validation_target
+  expected_final_route: requirement_ready_after_validation_target
+  expected_intelligence:
+    - intelligence/engineering/requirements/validation-thinking/validation-target-selection.md

@@ -22,9 +22,9 @@ edges:
     reason: 資料庫選擇是架構決策的一部分，與 monolith/microservices 選擇相關。
     validation: 兩個 atoms 都屬於 engineering 層的架構判斷。
   - type: related_to
-    target: intelligence/engineering/architecture/architecture-selection/README.md
+    target: intelligence/engineering/architecture/architectural-fit/README.md
     reason: Architecture selection 補足 architecture fit analysis、complexity evaluation、lifecycle、team topology、integration pressure 與 tradeoff matrix。
-    validation: architecture-selection README 定義 architecture complexity must match business complexity。
+    validation: architectural-fit README 定義 architecture complexity must match business complexity。
   - type: related_to
     target: workflow/software-delivery/architecture/README.md
     reason: Software-delivery architecture workflow 將 architecture intelligence 應用到 design review 與 planning。

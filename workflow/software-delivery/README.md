@@ -12,8 +12,9 @@
 3. 需要 artifact 規範時參考 [`artifact-gates.md`](artifact-gates.md)
 4. 需要審查檢查清單時參考 [`review-checklist.md`](review-checklist.md)
 5. 需要完整開發流程時參考 [`development-process.md`](development-process.md)
-6. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
-7. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)
+6. 需要 requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
+7. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
+8. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)
 
 ## Scope
 
@@ -21,6 +22,8 @@
 
 ### 開發流程
 
+- **Requirements Stage**：BDD-lite / requirements cognition，包含 behavior-driven discovery、acceptance definition、ambiguity resolution、traceability 與 validation target。
+- **Architecture Stage**：domain architecture cognition，包含 DDD fit、bounded context discovery、consistency boundary design、architecture escalation。
 - **Contract-First Development Process**：從企劃書到實作的完整開發流程，包含 Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill 等。
 
 ### 審查類型
@@ -48,7 +51,9 @@
 - `analysis/development-guidance/` 提供安全控制、實作模式、平台指引、語言陷阱的 catalog 參考，被本 workflow 引用。
 - `analysis/repo/` 可被本 workflow 引用來分析 repository 結構。
 - `intelligence/` 可被本 workflow 引用來輔助工程判斷。
-- `workflow/software-delivery/architecture/` 提供 architecture selection 的執行流程；其 source intelligence 來自 `intelligence/engineering/architecture/architecture-selection/` 與 `intelligence/engineering/domain/domain-driven-design/`。
+- `workflow/software-delivery/requirements/` 提供 requirements cognition 的執行流程；其 source intelligence 來自 `intelligence/engineering/requirements/`。
+- `workflow/software-delivery/architecture/` 提供 architecture fit 的執行流程；其 source intelligence 來自 `intelligence/engineering/architecture/architectural-fit/` 與 `intelligence/engineering/architecture/domain-modeling/`。
+- `governance/ai-runtime-governance/software-delivery-governance.md` 定義 requirements / behavior / contract delivery gates。
 - `governance/ai-runtime-governance/software-delivery-architecture-governance.md` 定義 software-delivery architecture governance gate，但不把 DDD promotion 成 runtime invariant。
 - `feedback/history/development-guidance/` 儲存開發指引的具體課程記錄。
 - `skills/app-development-guidance/` 是原始 skill 目錄，已刪除。所有內容已遷移至本層。

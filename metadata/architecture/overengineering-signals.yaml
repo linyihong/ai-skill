@@ -2,7 +2,7 @@ schema_version: overengineering-signals/v1
 status: candidate
 owner_layer: metadata/architecture
 source_intelligence:
-  - intelligence/engineering/domain/domain-driven-design/overengineering-risks.md
+  - intelligence/engineering/tradeoffs/architecture-overengineering.md
   - intelligence/engineering/anti-patterns/architecture-absolutism.md
 boundary: metadata-only
 signals:

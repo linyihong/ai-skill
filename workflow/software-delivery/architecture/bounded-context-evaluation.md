@@ -20,4 +20,4 @@
 
 ## 連結
 
-詳細判斷見 `intelligence/engineering/domain/domain-driven-design/bounded-context.md`。
+詳細判斷見 `intelligence/engineering/architecture/domain-modeling/bounded-context.md`。

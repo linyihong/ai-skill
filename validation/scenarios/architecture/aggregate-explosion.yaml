@@ -8,7 +8,7 @@ source_plan: plans/active/2026-05-20-1601-ddd-intelligence-software-delivery-gov
 given:
   task: review_ddd_tactical_model
   artifacts:
-    - intelligence/engineering/domain/domain-driven-design/aggregate-design.md
+    - intelligence/engineering/architecture/domain-modeling/aggregate-boundary.md
     - intelligence/engineering/domain/aggregate-boundary-heuristics.md
     - intelligence/engineering/anti-patterns/aggregate-explosion.md
   signals:
@@ -34,5 +34,5 @@ then:
     - keep_all_aggregates_without_invariant
   expected_final_route: aggregate_boundary_revision_required
   expected_intelligence:
-    - intelligence/engineering/domain/domain-driven-design/aggregate-design.md
+    - intelligence/engineering/architecture/domain-modeling/aggregate-boundary.md
     - intelligence/engineering/anti-patterns/aggregate-explosion.md

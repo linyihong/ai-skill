@@ -2,7 +2,7 @@ schema_version: bounded-context-heuristics/v1
 status: candidate
 owner_layer: metadata/architecture
 source_intelligence:
-  - intelligence/engineering/domain/domain-driven-design/bounded-context.md
+  - intelligence/engineering/architecture/domain-modeling/bounded-context.md
 boundary: metadata-only
 positive_signals:
   - same_term_has_different_meaning_by_workflow

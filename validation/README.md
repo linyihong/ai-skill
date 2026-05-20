@@ -17,6 +17,7 @@ validation/
 ├── scenarios/           # 測試情境（YAML）
 │   ├── apk-analysis/    # APK 分析領域
 │   ├── app-dev/         # App 開發領域
+│   ├── software-delivery/ # Requirements cognition / behavior validation / delivery correctness
 │   ├── architecture/    # 架構選型與 DDD adoption 決策
 │   └── travel/          # 旅遊規劃領域
 ├── rules/               # 規則定義（YAML）
@@ -37,6 +38,13 @@ validation/
 | 測試方式 | Link check、lint、diff review | Scenario-based stateless test |
 | 驗證目標 | 文件完整性、路徑正確性 | Rule obedience、routing stability |
 | 執行時機 | Commit 前 | 架構變更後、模型升級後 |
+
+## Software Delivery Scenarios
+
+- `software-delivery/requirement-contradiction.yaml` — requirement / BDD / tests 衝突時不得直接 implementation。
+- `software-delivery/missing-validation-target.yaml` — acceptance criteria 缺 validation target 時不得宣稱 ready。
+- `software-delivery/stale-acceptance-criteria.yaml` — domain invariant 改變後舊 acceptance baseline 必須刷新。
+- `software-delivery/behavior-scope-overclaim.yaml` — single scenario pass 不得宣稱 global feature correctness。
 
 ## Scenario 格式
 

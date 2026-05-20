@@ -2,8 +2,8 @@ schema_version: ddd-adoption-signals/v1
 status: candidate
 owner_layer: metadata/architecture
 source_intelligence:
-  - intelligence/engineering/domain/domain-driven-design/README.md
-  - intelligence/engineering/domain/domain-driven-design/ddd-lite-vs-full-ddd.md
+  - intelligence/engineering/architecture/domain-modeling/README.md
+  - intelligence/engineering/architecture/architectural-fit/ddd-lite-vs-full-ddd.md
 boundary: metadata-only
 adoption_levels:
   none_or_crud:

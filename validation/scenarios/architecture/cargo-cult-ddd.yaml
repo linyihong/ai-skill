@@ -9,7 +9,7 @@ given:
   task: recommend_architecture_for_low_complexity_crud
   artifacts:
     - workflow/software-delivery/architecture/architecture-fit-analysis.md
-    - intelligence/engineering/domain/domain-driven-design/ddd-lite-vs-full-ddd.md
+    - intelligence/engineering/architecture/architectural-fit/ddd-lite-vs-full-ddd.md
     - metadata/architecture/architecture-fit-matrix.yaml
   signals:
     - low_domain_complexity
@@ -36,7 +36,7 @@ then:
     - introduce_cqrs_without_need
   expected_final_route: simple_architecture_with_upgrade_trigger
   expected_intelligence:
-    - intelligence/engineering/architecture/architecture-selection/architecture-fit-analysis.md
-    - intelligence/engineering/domain/domain-driven-design/ddd-lite-vs-full-ddd.md
+    - intelligence/engineering/architecture/architectural-fit/architecture-fit-analysis.md
+    - intelligence/engineering/architecture/architectural-fit/ddd-lite-vs-full-ddd.md
   unexpected_intelligence:
     - runtime/compiler/embedded_data.rb

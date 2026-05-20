@@ -1,0 +1,23 @@
+id: metadata.requirements.acceptance-quality-thresholds
+status: candidate
+source_intelligence:
+  - intelligence/engineering/requirements/behavior-modeling/acceptance-boundaries.md
+  - intelligence/engineering/requirements/validation-thinking/validation-target-selection.md
+quality_thresholds:
+  minimum_acceptance_criteria:
+    - actor_or_system_role
+    - observable_behavior
+    - expected_outcome
+    - validation_target
+    - scope_boundary
+  high_risk_requires:
+    - negative_path
+    - regression_scope
+    - owner_or_human_alignment
+  insufficient_patterns:
+    - works_as_expected
+    - system_is_normal
+    - implementation_matches_requirement_without_evidence
+runtime_boundary:
+  metadata_only: true
+  no_universal_requirement_schema: true

@@ -1,6 +1,6 @@
 # Architecture Metadata
 
-`metadata/architecture/` 保存 architecture fit、DDD adoption、overengineering 與 bounded context 的可機讀 heuristics。這些資料預設是 metadata-only，不代表 runtime enforced。
+`metadata/architecture/` 保存 architecture fit、DDD adoption、overengineering、bounded context 與 domain architecture cognition 的可機讀 heuristics。這些資料預設是 metadata-only，不代表 runtime enforced。
 
 ## 目前檔案
 
@@ -14,5 +14,5 @@
 ## 邊界
 
 - 本目錄不建立 runtime invariant。
-- 本目錄不取代 `intelligence/engineering/architecture/` 或 `intelligence/engineering/domain/` 的正文判斷。
+- 本目錄不取代 `intelligence/engineering/architecture/` 的正文判斷。
 - 若未來要 promotion 成 runtime-lite signal，必須另開 plan，確認 compiler / generated surface。
