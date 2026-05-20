@@ -222,6 +222,9 @@ then:
 | 2 | `source-mirror-write-v1` | `enforcement/failure-patterns/source-mirror-write-drift.md` | 編輯前是否先確認 canonical source vs mirror |
 | 3 | `shared-rules-architecture-drift-v1` | `enforcement/failure-patterns/shared-rules-architecture-drift.md` | 架構重構後是否同步檢查 enforcement/ 路徑參考 |
 | 4 | `feedback-history-consolidation-v1` | `feedback/history/` 目錄整合（2026-05-13） | 新 feedback lesson 是否正確使用 feedback/history/<domain>/ 而非舊 skills/ 路徑 |
+| 5 | `runtime-recovery-navigation-mismatch` | Runtime recovery escalation system（2026-05-20） | APK navigation / UI evidence mismatch 時是否停止 capture patch 並進 recovery |
+| 6 | `runtime-recovery-user-contradiction` | Runtime recovery escalation system（2026-05-20） | 使用者指出 route/source miss 時是否停止舊 execution graph |
+| 7 | `runtime-recovery-source-miss` | Runtime recovery escalation system（2026-05-20） | source-of-truth miss 時是否補 required reload set 而非只靠局部測試 |
 
 ## 誰會參考這裡（Inbound References）
 

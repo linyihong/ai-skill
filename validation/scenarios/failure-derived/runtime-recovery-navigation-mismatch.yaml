@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Runtime Recovery Navigation Mismatch Scenario
+# 測試 APK analysis capture 跑到外部 package / wrong screen 時，agent 是否停止 patch 並進入 recovery。
+
+id: runtime-recovery-navigation-mismatch
+domain: apk-analysis
+type: failure-recovery
+priority: P1
+
+failure_source:
+  pattern: runtime-recovery-navigation-mismatch
+  class: evidence-conflict / automation-drift
+  date: "2026-05-20"
+  description: >
+    APK analysis automation 連續到達外部 package 或錯誤 in-app screen，
+    但 agent 仍試圖修 selector / hook script 並把後續 capture 當作 feature evidence。
+
+given:
+  task: capture_feature_api_from_apk
+  artifacts:
+    - workflow/apk-analysis/execution-flow.md
+    - metadata/recovery/domain-policies.yaml
+    - analysis/apk/traffic-triage.md
+    - analysis/apk/workflows/frida-hook-flow.md
+  signals:
+    - screenshot package is launcher or browser
+    - hierarchy package is not target package
+    - feature checkpoint route anchor is absent
+    - automation reached the wrong screen twice
+    - Frida still has target PID hits
+  constraints:
+    - authorized APK analysis only
+    - no raw token, cookie, signature, private host, or user data may be persisted
+
+when:
+  action: decide_next_capture_step
+
+then:
+  expected_route:
+    primary: enter_runtime_recovery
+    steps:
+      - stop_capture_and_hook_patching
+      - mark_window_invalid_for_target_feature
+      - load metadata/recovery/domain-policies.yaml
+      - select apk-analysis recovery policy
+      - reload workflow/apk-analysis/execution-flow.md
+      - reload workflow/apk-analysis/artifact-gates.md
+      - reload analysis/apk/traffic-triage.md
+      - reload analysis/apk/workflows/frida-hook-flow.md
+      - rebuild checkpoint-specific capture graph
+      - resume only after package and feature-context validation are defined
+  required_reload_set:
+    - metadata/recovery/domain-policies.yaml
+    - workflow/apk-analysis/execution-flow.md
+    - workflow/apk-analysis/artifact-gates.md
+    - analysis/apk/traffic-triage.md
+    - analysis/apk/workflows/frida-hook-flow.md
+    - feedback/history/apk-analysis/README.md
+  forbidden_routes:
+    - continue_capture_after_external_package
+    - treat_frida_hit_as_ui_attribution
+    - patch_selector_without_reloading_workflow
+    - document_wrong_window_as_feature_evidence
+  expected_final_route: apk-analysis-recovery-reentry
+  expected_intelligence:
+    - metadata/recovery/domain-policies.yaml
+    - workflow/apk-analysis/execution-flow.md
+  validation:
+    - required_reload_set 已讀或標記 not_applicable/source_missing
+    - old_assumption 與 contradicting_evidence 已填寫
+    - new execution graph 包含 checkpoint、capture window 與 validation

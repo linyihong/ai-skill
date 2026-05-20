@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ai-skill Validation Scenario",
+  "type": "object",
+  "required": ["id", "domain", "type", "priority", "given", "when", "then"],
+  "properties": {
+    "id": { "type": "string" },
+    "domain": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": ["routing-decision", "heuristic-obedience", "failure-recovery"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["P1", "P2", "P3"]
+    },
+    "failure_source": { "type": "object" },
+    "given": { "type": "object" },
+    "when": { "type": "object" },
+    "then": {
+      "type": "object",
+      "properties": {
+        "expected_route": {
+          "oneOf": [
+            { "type": "array" },
+            { "type": "object" }
+          ]
+        },
+        "required_reload_set": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "forbidden_routes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "expected_final_route": { "type": "string" },
+        "expected_intelligence": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "unexpected_intelligence": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "expected_heuristics": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "validation": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

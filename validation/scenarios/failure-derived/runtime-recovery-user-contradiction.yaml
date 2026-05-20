@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Runtime Recovery User Contradiction Scenario
+# 測試使用者指出 agent 沒讀 source-of-truth 或 route 錯誤時，agent 是否停止原 execution graph。
+
+id: runtime-recovery-user-contradiction
+domain: cross-domain
+type: failure-recovery
+priority: P1
+
+failure_source:
+  pattern: runtime-recovery-user-contradiction
+  class: user-contradiction / source-of-truth-miss
+  date: "2026-05-20"
+  description: >
+    使用者指出 agent 沒有依 workflow、owner docs、plan preflight 或 recovery policy 執行，
+    但 agent 仍沿用舊 route 繼續局部修補。
+
+given:
+  task: continue_after_user_correction
+  artifacts:
+    - enforcement/escalation-policy.md
+    - metadata/recovery/escalation-levels.yaml
+    - metadata/recovery/domain-policies.yaml
+    - workflow/workflow-routing.md
+  signals:
+    - user says "不是這樣"
+    - user says "你沒有先看 workflow"
+    - user says "這個計畫和架構有衝突"
+    - current route was selected before required source-of-truth was read
+  constraints:
+    - current implementation has not been committed
+    - user correction is newer than the old execution assumption
+
+when:
+  action: decide_after_user_contradiction
+
+then:
+  expected_route:
+    primary: enter_runtime_recovery
+    steps:
+      - stop_current_execution
+      - name trigger_class user_contradiction
+      - assign escalation level L4
+      - suspend old route assumption
+      - reload enforcement/escalation-policy.md
+      - reload workflow/workflow-routing.md
+      - reload metadata/recovery/domain-policies.yaml
+      - rebuild goal route dependencies checkpoint validation
+      - ask only if route ambiguity remains
+  required_reload_set:
+    - enforcement/escalation-policy.md
+    - workflow/workflow-routing.md
+    - metadata/recovery/escalation-levels.yaml
+    - metadata/recovery/domain-policies.yaml
+    - knowledge/runtime/routing-registry.yaml
+  forbidden_routes:
+    - continue_old_route_after_user_contradiction
+    - silently_patch_without_reloading_source
+    - apologize_without_rebuilding_execution_graph
+    - claim_completion_before_recovery_output
+  expected_final_route: user-contradiction-recovery-reentry
+  expected_intelligence:
+    - enforcement/escalation-policy.md
+    - metadata/recovery/domain-policies.yaml
+    - workflow/workflow-routing.md
+  validation:
+    - recovery output includes trigger_class, level, old_assumption, contradicting_evidence
+    - source_of_truth_reloaded lists read/not_applicable/source_missing items
+    - new execution graph replaces the invalidated route

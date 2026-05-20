@@ -439,6 +439,8 @@ Phase 5 result:
 
 ### Phase 6 — Validation Scenarios
 
+Status: completed 2026-05-20.
+
 Goal: 將本失效模式變成可測 scenario。
 
 Candidate files:
@@ -450,14 +452,34 @@ Candidate files:
 
 Tasks:
 
-- [ ] 建立 navigation mismatch scenario。
-- [ ] 建立 user contradiction scenario。
-- [ ] 建立 source miss scenario。
-- [ ] 驗證 expected route / forbidden behavior / required reload set 可被 validator 檢查。
+- [x] 建立 navigation mismatch scenario。
+- [x] 建立 user contradiction scenario。
+- [x] 建立 source miss scenario。
+- [x] 驗證 expected route / forbidden behavior / required reload set 可被 validator 檢查。
 
 Exit criteria:
 
-- [ ] 未來 agent 若遇到類似訊號，validation 可以檢測是否應進 recovery。
+- [x] 未來 agent 若遇到類似訊號，validation 可以檢測是否應進 recovery。
+
+#### Phase 6 Architecture Compatibility Preflight
+
+| 欄位 | 結果 |
+| --- | --- |
+| Trigger | 開始執行 Phase 6 — Validation Scenarios |
+| Checked sources | `plans/README.md`、`validation/README.md`、`validation/scenarios/failure-derived/`、`scripts/validate-knowledge-runtime.rb`、`knowledge/runtime/routing-registry.yaml` |
+| Conflicts | `validation/scenarios/failure-derived/` 已存在且是 failure-derived scenarios 的正確位置；現有 validator 尚未檢查 runtime recovery scenario 語意。 |
+| Decision | proceed by adding three failure-derived scenarios and a minimal semantic validator for `runtime-recovery-*.yaml` |
+| Validation | YAML parse、runtime recovery scenario validator、knowledge runtime refresh、lints、diff review |
+
+Phase 6 result:
+
+| Area | Result |
+| --- | --- |
+| Navigation mismatch | `validation/scenarios/failure-derived/runtime-recovery-navigation-mismatch.yaml` checks APK UI/navigation drift recovery. |
+| User contradiction | `validation/scenarios/failure-derived/runtime-recovery-user-contradiction.yaml` checks user contradiction recovery re-entry. |
+| Source miss | `validation/scenarios/failure-derived/runtime-recovery-source-miss.yaml` checks software-delivery source-of-truth reload recovery. |
+| Validator | `scripts/validate-knowledge-runtime.rb` checks runtime recovery scenarios include `expected_route`, `required_reload_set`, `forbidden_routes`, recovery final route, and reload/rebuild behavior. |
+| Routing | `knowledge/runtime/routing-registry.yaml` includes the new scenarios under `route.validation.ai-decision-contract`. |
 
 ### Phase 7 — Plan Completion Closure
 

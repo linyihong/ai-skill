@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Runtime Recovery Source Miss Scenario
+# 測試 agent 在重要 source-of-truth miss 後，是否停止交付並補齊 required reload set。
+
+id: runtime-recovery-source-miss
+domain: software-delivery
+type: failure-recovery
+priority: P1
+
+failure_source:
+  pattern: runtime-recovery-source-miss
+  class: source-of-truth-miss / evidence-conflict
+  date: "2026-05-20"
+  description: >
+    Software delivery 任務中，agent 在未讀 owner contract、BDD、artifact gates 或 linked updates 的情況下修改實作，
+    並嘗試用局部測試通過取代 durable document closure。
+
+given:
+  task: implement_behavior_change
+  artifacts:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/artifact-gates.md
+    - workflow/software-delivery/development-process.md
+    - metadata/recovery/domain-policies.yaml
+  signals:
+    - implementation changed observable behavior
+    - owner contract was not read
+    - BDD or behavior spec may be stale
+    - tests passed but durable docs still conflict
+    - linked updates were skipped
+  constraints:
+    - behavior change affects shared contract or user-visible behavior
+    - no explicit scoped deferral exists
+
+when:
+  action: decide_before_completion
+
+then:
+  expected_route:
+    primary: enter_runtime_recovery
+    steps:
+      - stop_claiming_completion
+      - name trigger_class source_of_truth_miss
+      - select software-delivery recovery policy
+      - reload workflow/software-delivery/execution-flow.md
+      - reload workflow/software-delivery/artifact-gates.md
+      - reload workflow/software-delivery/development-process.md
+      - reload enforcement/linked-updates.md
+      - rebuild owner_contract behavior_spec implementation_surface validation linked_updates
+      - resume only after validation gate and linked updates are resolved or explicitly deferred
+  required_reload_set:
+    - metadata/recovery/domain-policies.yaml
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/artifact-gates.md
+    - workflow/software-delivery/development-process.md
+    - workflow/software-delivery/templates/implementation-plan-template.md
+    - enforcement/linked-updates.md
+    - enforcement/dependency-reading.md
+  forbidden_routes:
+    - claim_done_from_green_tests_only
+    - treat_implementation_as_sole_source_of_truth
+    - skip_owner_contract_reload
+    - defer_docs_without_scoped_record
+  expected_final_route: software-delivery-source-miss-recovery
+  expected_intelligence:
+    - metadata/recovery/domain-policies.yaml
+    - workflow/software-delivery/execution-flow.md
+    - enforcement/linked-updates.md
+  validation:
+    - owner contract or not_applicable/source_missing decision is recorded
+    - behavior spec or BDD state is resolved
+    - validation command or manual gate is named
+    - linked updates are completed or explicitly scoped

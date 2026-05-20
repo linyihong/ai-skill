@@ -995,7 +995,13 @@ records:
       - validation/scenarios/failure-derived/source-mirror-write-v1.yaml
       - validation/scenarios/failure-derived/shared-rules-architecture-drift-v1.yaml
       - validation/scenarios/failure-derived/feedback-history-consolidation-v1.yaml
+      - validation/scenarios/failure-derived/runtime-recovery-navigation-mismatch.yaml
+      - validation/scenarios/failure-derived/runtime-recovery-user-contradiction.yaml
+      - validation/scenarios/failure-derived/runtime-recovery-source-miss.yaml
     candidate_sources:
+      - validation/scenarios/failure-derived/runtime-recovery-navigation-mismatch.yaml
+      - validation/scenarios/failure-derived/runtime-recovery-user-contradiction.yaml
+      - validation/scenarios/failure-derived/runtime-recovery-source-miss.yaml
       - validation/rules/heuristics/runtime-first-hooking.yaml
       - validation/rules/heuristics/local-proxy-diagnosis.yaml
       - validation/rules/heuristics/avoid-early-patch.yaml

@@ -760,6 +760,47 @@ def validate_failure_pattern_validator_coverage
 end
 
 # ──────────────────────────────────────────────
+# Runtime Recovery Scenario Test
+# ──────────────────────────────────────────────
+def validate_runtime_recovery_scenarios
+  scenario_files = Dir.glob((ROOT + "validation/scenarios/failure-derived/runtime-recovery-*.yaml").to_s).sort
+  required_then_fields = %w[expected_route required_reload_set forbidden_routes expected_final_route validation].freeze
+
+  scenario_files.each do |path|
+    relative = rel(path)
+    data = require_mapping(yaml_file(relative), relative)
+    next if data.empty?
+
+    if data["type"] != "failure-recovery"
+      add_error("#{relative}: runtime recovery scenario must use type=failure-recovery")
+    end
+
+    then_block = require_mapping(data["then"], "#{relative}.then")
+    check_fields(then_block, required_then_fields, "#{relative}.then")
+
+    reload_set = require_array(then_block["required_reload_set"], "#{relative}.then.required_reload_set")
+    add_error("#{relative}: required_reload_set must not be empty") if reload_set.empty?
+    reload_set.each { |item| check_repo_path(item, "#{relative}.then.required_reload_set") if item.is_a?(String) }
+
+    forbidden_routes = require_array(then_block["forbidden_routes"], "#{relative}.then.forbidden_routes")
+    add_error("#{relative}: forbidden_routes must not be empty") if forbidden_routes.empty?
+
+    final_route = then_block["expected_final_route"].to_s
+    unless final_route.include?("recovery")
+      add_error("#{relative}: expected_final_route must point to a recovery route")
+    end
+
+    expected_route = require_mapping(then_block["expected_route"], "#{relative}.then.expected_route")
+    steps = require_array(expected_route["steps"], "#{relative}.then.expected_route.steps")
+    unless steps.any? { |step| step.to_s.include?("reload") || step.to_s.include?("rebuild") }
+      add_error("#{relative}: expected_route.steps must include reload/rebuild behavior")
+    end
+
+    COUNTS[:runtime_recovery_scenarios] += 1
+  end
+end
+
+# ──────────────────────────────────────────────
 # Intelligence Entry/Solution Cross-Reference Test
 # ──────────────────────────────────────────────
 def validate_intelligence_entry_solution_crossref
@@ -916,6 +957,7 @@ validate_directory_naming
 validate_intelligence_classification_boundary
 validate_intelligence_entry_solution_crossref
 validate_failure_pattern_validator_coverage
+validate_runtime_recovery_scenarios
 validate_no_outdated_active_entrypoint
 validate_intelligence_ide_knowledge
 validate_language_consistency
@@ -935,6 +977,7 @@ if ERRORS.empty?
   puts "analysis_domains=#{COUNTS[:analysis_domains]}"
   puts "workflow_domains=#{COUNTS[:workflow_domains]}"
   puts "tool_config_files=#{COUNTS[:tool_config_files]}"
+  puts "runtime_recovery_scenarios=#{COUNTS[:runtime_recovery_scenarios]}"
 else
   warn "Knowledge runtime validation failed:"
   ERRORS.each { |error| warn "- #{error}" }
