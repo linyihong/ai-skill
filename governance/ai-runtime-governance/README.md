@@ -4,6 +4,29 @@
 
 本層是治理設計，不直接取代 `enforcement/`。當某條治理要求需要成為可執行 blocking rule，再 promotion 到 `enforcement/`、`runtime/` 或 `validation/`。
 
+## 治理編譯模式
+
+當某個想法一開始只是「人類工程直覺」或「使用者想要的系統思考方式」時，不要直接把它塞進 workflow 或 runtime。先判斷它屬於哪一層：
+
+```text
+intelligence source
+  -> governance translation
+  -> workflow application
+  -> runtime / validation enforcement
+```
+
+分層規則：
+
+| 層 | 放什麼 | 例子 |
+| --- | --- | --- |
+| `intelligence/` | 原始思想、判斷智慧、why | Musk Five-Step、index-first documentation thinking、systems thinking |
+| `governance/` | AI 化後的可執行治理語意 | context governance、documentation context governance、automation readiness gate |
+| `workflow/` | 具體任務中如何套用 | 寫文件時先選 `kind/audience/stability/routing`，再寫 README / leaf docs |
+| `runtime/` | 已穩定且可 machine-enforce 的狀態或 guard | TTL、activation rules、recovery state machine |
+| `validation/` | 可測的 failure mode | generic skill bloat、automation-before-verification、documentation route drift |
+
+這個模式用來避免 agent 把「哲學」、「治理」和「操作步驟」混成一份文件。若某個 workflow 內開始出現可跨 workflow 重用的治理原則，應優先抽到 `intelligence/` 或 `governance/`，再讓 workflow 引用它。
+
 ## 目前條目
 
 | 文件 | Source philosophy | 用途 |

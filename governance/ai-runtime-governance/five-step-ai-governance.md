@@ -135,3 +135,14 @@ Automation 前必須具備：
 - `workflow/` 在任務流程中引用治理 gate。
 - `runtime/` 只承接已穩定、可 machine-enforce 的治理結果。
 - `validation/` 可把違反本治理的模式變成 stateless scenarios。
+
+## 可重用的轉譯模式
+
+Five-Step 不是唯一可以這樣處理的思想來源。當 workflow 文件裡出現可重用治理觀念，例如 index-first documentation、README-as-router、automation-before-verification 或 context pruning，應先問：
+
+1. 它是否是可跨任務重用的判斷智慧？若是，抽到 `intelligence/`。
+2. 它是否已經是 AI runtime 的治理語意？若是，放到 `governance/`。
+3. 它是否只是某個任務的操作順序？若是，留在 `workflow/`。
+4. 它是否已穩定、可觀察、可驗證？若是，才考慮 `runtime/` 或 `validation/`。
+
+這讓系統能把工程思想編譯成 AI runtime discipline，而不是把所有知識堆進 workflow 或 prompt。
