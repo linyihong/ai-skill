@@ -33,8 +33,8 @@
 
 | Current source | New location / decision |
 | --- | --- |
-| `intelligence/engineering/architecture/domain-modeling/` | Move into `intelligence/engineering/architecture/domain-modeling/` and `architectural-fit/` where appropriate. |
-| `intelligence/engineering/architecture/architectural-fit/` | Rename / consolidate into `intelligence/engineering/architecture/architectural-fit/`. |
+| `intelligence/engineering/domain/domain-driven-design/` | Move into `intelligence/engineering/architecture/domain-modeling/` and `architectural-fit/` where appropriate. |
+| `intelligence/engineering/architecture/architecture-selection/` | Rename / consolidate into `intelligence/engineering/architecture/architectural-fit/`. |
 | `workflow/software-delivery/architecture/` | Keep as workflow stage, but reorganize around fit/discovery/design/escalation instead of DDD methodology bucket. |
 | `metadata/architecture/` | Keep, extend with behavior governance metadata. |
 | `validation/scenarios/architecture/` | Keep architecture scenarios, add software-delivery requirement/behavior scenarios. |

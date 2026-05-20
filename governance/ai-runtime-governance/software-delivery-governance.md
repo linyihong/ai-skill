@@ -54,6 +54,17 @@ source_intelligence:
 - [`workflow/software-delivery/artifact-gates.md`](../../workflow/software-delivery/artifact-gates.md) — reusable note structure and artifact quality gates。
 - [`analysis/development-guidance/README.md`](../../analysis/development-guidance/README.md) — development guidance analysis methods。
 
+## Runtime-Lite Boundary
+
+本治理不讓 runtime 理解 BDD syntax、Gherkin、scenario grammar 或 universal requirement schema。只有下列壓縮訊號可作為未來 runtime-lite 候選：
+
+- `requirement_contradiction`：requirements、BDD、contract、implementation 或 tests 出現互斥 claim。
+- `missing_validation_target`：acceptance criteria 沒有可執行或可審查的 proof target。
+- `stale_acceptance_criteria`：product intent、domain invariant 或 implementation truth 改變後，acceptance baseline 未同步。
+- `behavior_scope_overclaim`：local scenario pass 被宣稱為 global feature correctness。
+
+任何 promotion 都必須另開 plan，確認 compiler / generated surface；預設維持 metadata-only。
+
 ## Validation Candidate
 
 後續若要 promotion 到 `validation/`，可建立 scenario 檢查：

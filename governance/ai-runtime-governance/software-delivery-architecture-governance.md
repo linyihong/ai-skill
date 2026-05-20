@@ -49,11 +49,14 @@ source_intelligence:
 
 本治理不得直接寫入 `runtime.db` 或新增 phase blocking gate。只有下列壓縮訊號可作為未來 runtime-lite 候選：
 
-- cross-context invariant violation。
+- `requirement_contradiction` before architecture modeling。
+- `missing_validation_target` for architecture-significant behavior。
+- `invariant_violation` across context / aggregate / consistency boundary。
+- `stale_acceptance_criteria` after domain invariant or architecture contract change。
 - architecture drift causing delivery instability。
 - boundary mismatch causing recovery loops。
 
-即使 promotion，也只能是 reliability signal，不是 Full DDD enforcement。
+即使 promotion，也只能是 reliability signal，不是 BDD syntax、Full DDD enforcement 或 tactical pattern enforcement。
 
 ## Validation Candidate
 
