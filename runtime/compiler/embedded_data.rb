@@ -5506,8 +5506,179 @@ module EmbeddedRuntimeData
     "version": 1.0,
     "status": "candidate",
     "owner_layer": "runtime/recovery",
-    "last_updated": "2026-05-15",
+    "last_updated": "2026-05-20",
+    "recovery_state_machine": {
+      "states": [
+        "escalation",
+        "recovery",
+        "rediscovery",
+        "replan",
+        "execution"
+      ],
+      "transitions": [
+        {
+          "from": "escalation",
+          "to": "recovery",
+          "condition": "mismatch_escalation guard emits suspend_execution or enter_recovery",
+          "required_actions": [
+            "suspend_assumption",
+            "capture_contradicting_evidence"
+          ]
+        },
+        {
+          "from": "recovery",
+          "to": "rediscovery",
+          "condition": "old assumption is marked invalid and trigger class is named",
+          "required_actions": [
+            "reload_workflow_primary_source",
+            "reload_owner_docs"
+          ]
+        },
+        {
+          "from": "rediscovery",
+          "to": "replan",
+          "condition": "required source-of-truth is read or marked not applicable/source missing",
+          "required_actions": [
+            "rebuild_execution_graph",
+            "define_validation_checkpoint"
+          ]
+        },
+        {
+          "from": "replan",
+          "to": "execution",
+          "condition": "new execution graph has goal, route, dependencies, checkpoint, and validation",
+          "required_actions": [
+            "explain_failure",
+            "resume_with_new_plan"
+          ]
+        }
+      ]
+    },
+    "recovery_levels": [
+      {
+        "level": "L1",
+        "name": "simple_retry",
+        "meaning": "single transient tool or command failure",
+        "default_action": "retry_once"
+      },
+      {
+        "level": "L2",
+        "name": "reload_local_workflow",
+        "meaning": "local rule or workflow may be stale",
+        "default_action": "reload_current_workflow"
+      },
+      {
+        "level": "L3",
+        "name": "reload_source_of_truth",
+        "meaning": "repeated failure or assumption drift indicates source context is insufficient",
+        "default_action": "reload_owner_docs_and_primary_sources"
+      },
+      {
+        "level": "L4",
+        "name": "rebuild_execution_graph",
+        "meaning": "user contradiction, evidence conflict, source-of-truth miss, or automation drift",
+        "default_action": "enter_recovery_and_rebuild_execution_graph"
+      },
+      {
+        "level": "L5",
+        "name": "assumption_collapse_rediscovery",
+        "meaning": "task framing or route selection may be wrong",
+        "default_action": "return_to_discovery"
+      }
+    ],
+    "required_actions": [
+      {
+        "id": "suspend_assumption",
+        "description": "write the old assumption and mark it invalid before continuing"
+      },
+      {
+        "id": "reload_workflow_primary_source",
+        "description": "reload the selected workflow primary source plus artifact gates"
+      },
+      {
+        "id": "reload_owner_docs",
+        "description": "reload owner docs, UI map, API catalog, runtime source, or project contract as applicable"
+      },
+      {
+        "id": "rebuild_execution_graph",
+        "description": "rebuild goal -> route -> dependencies -> source-of-truth -> checkpoint -> validation"
+      },
+      {
+        "id": "explain_failure",
+        "description": "explain assumption, contradiction, new source-of-truth, revised plan, and validation"
+      }
+    ],
+    "output_schema": {
+      "required_fields": [
+        "trigger_class",
+        "level",
+        "old_assumption",
+        "contradicting_evidence",
+        "source_of_truth_reloaded",
+        "new_execution_graph",
+        "next_action",
+        "validation"
+      ],
+      "validation": [
+        "trigger_class is one of repeated_failure, user_contradiction, evidence_conflict, source_of_truth_miss, automation_drift, assumption_drift",
+        "level is L1-L5",
+        "source_of_truth_reloaded lists read, not_applicable, or source_missing items",
+        "new_execution_graph contains goal, route, dependencies, checkpoint, and validation"
+      ]
+    },
     "strategies": [
+      {
+        "id": "strategy.mismatch_escalation_recovery",
+        "name": "Mismatch Escalation Recovery",
+        "description": "當 execution 中段出現 repeated failure、user contradiction、evidence conflict、source-of-truth miss 或 automation drift 時，停止局部 patch 並重建 execution graph。",
+        "applicable_gates": [
+          "runtime.guard.mismatch_escalation",
+          "enforcement.escalation-policy"
+        ],
+        "detection": {
+          "signal": "mismatch_escalation guard emits suspend_execution, enter_recovery, or rediscovery_required",
+          "check": "檢查 runtime/pipeline/guard-chain.yaml execution stage 與 runtime/guards/circuit-breaker.yaml mismatch_escalation trigger"
+        },
+        "state_transitions": [
+          "escalation",
+          "recovery",
+          "rediscovery",
+          "replan",
+          "execution"
+        ],
+        "repair_steps": [
+          {
+            "action": "SUSPEND_ASSUMPTION",
+            "description": "停止沿用舊 mental model，寫出舊假設與反證",
+            "command": "依 enforcement/escalation-policy.md 的 Required Recovery Output 填寫 old_assumption 與 contradicting_evidence"
+          },
+          {
+            "action": "RELOAD_SOURCE_OF_TRUTH",
+            "description": "重讀 workflow primary source、artifact gates、owner docs 或 runtime source",
+            "command": "列出 read / not_applicable / source_missing 的 source-of-truth reload set"
+          },
+          {
+            "action": "REBUILD_EXECUTION_GRAPH",
+            "description": "重建 goal、route、dependencies、checkpoint 與 validation",
+            "command": "產出 new_execution_graph 並標記下一個可安全執行的 action"
+          },
+          {
+            "action": "EXPLAIN_AND_RESUME",
+            "description": "說明 failure 與新路線後恢復 execution",
+            "command": "輸出 recovery schema，然後依新 execution graph 繼續"
+          }
+        ],
+        "verify_steps": [
+          "舊假設已明確 suspend",
+          "required source-of-truth 已讀或標記 not_applicable/source_missing",
+          "new_execution_graph 包含 goal、route、dependencies、checkpoint、validation",
+          "下一步不再沿用被反證的 route 或 automation"
+        ],
+        "escalation": {
+          "condition": "rediscovery 後仍無法建立可信 execution graph",
+          "action": "升級 L5 assumption collapse，回到 discovery 並請使用者確認 task framing"
+        }
+      },
       {
         "id": "strategy.phase_drift",
         "name": "Phase Drift Recovery",

@@ -312,6 +312,8 @@ Phase 2 result:
 
 ### Phase 3 — Recovery Runtime
 
+Status: completed 2026-05-20.
+
 Goal: 建立 recovery mode 的 machine-readable procedure。
 
 Candidate files:
@@ -323,14 +325,34 @@ Candidate files:
 
 Tasks:
 
-- [ ] 定義 recovery state transitions：`escalation → recovery → rediscovery → replan → execution`。
-- [ ] 定義 required actions：suspend assumption、reload workflow、reload owner docs、rebuild execution graph、explain failure。
-- [ ] 定義 recovery output schema。
-- [ ] 定義 L1-L5 escalation levels。
+- [x] 定義 recovery state transitions：`escalation → recovery → rediscovery → replan → execution`。
+- [x] 定義 required actions：suspend assumption、reload workflow、reload owner docs、rebuild execution graph、explain failure。
+- [x] 定義 recovery output schema。
+- [x] 定義 L1-L5 escalation levels。
 
 Exit criteria:
 
-- [ ] Recovery mode 有 machine-readable steps，不只存在 prose plan。
+- [x] Recovery mode 有 machine-readable steps，不只存在 prose plan。
+
+#### Phase 3 Architecture Compatibility Preflight
+
+| 欄位 | 結果 |
+| --- | --- |
+| Trigger | 開始執行 Phase 3 — Recovery Runtime |
+| Checked sources | `plans/README.md`、`runtime/README.md`、`runtime/compiler/embedded_data.rb`、`runtime/compiler/compiler-engine.rb`、`runtime/runtime.db` recovery tables |
+| Conflicts | `runtime/recovery/` standalone YAML 不存在；recovery source-of-truth 仍是 `runtime/compiler/embedded_data.rb`。現有 `recovery_strategies`、`state_repair`、`obligation_rebuild`、`phase_reconciliation` tables 使用 JSON content，可承載 state machine / schema，不需新增 DB schema。 |
+| Decision | proceed with embedded recovery source; compile into existing recovery tables |
+| Validation | runtime compiler、`runtime.db` query、`validate-runtime-db.rb`、knowledge runtime refresh |
+
+Phase 3 result:
+
+| Area | Result |
+| --- | --- |
+| State transitions | `runtime/compiler/embedded_data.rb` defines `escalation → recovery → rediscovery → replan → execution`. |
+| Recovery levels | L1-L5 escalation levels are machine-readable in recovery config. |
+| Required actions | `suspend_assumption`, `reload_workflow_primary_source`, `reload_owner_docs`, `rebuild_execution_graph`, `explain_failure`. |
+| Output schema | Required recovery output fields and validation rules are in `recovery_strategies.__config__`. |
+| Strategy row | `strategy.mismatch_escalation_recovery` is compiled into `runtime.db.recovery_strategies`. |
 
 ### Phase 4 — Metadata Recovery Policy
 

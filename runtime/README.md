@@ -40,7 +40,7 @@ Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 | Generated | [`generated/`](generated/) | Compiled runtime surfaces (legacy, migrated to SQLite) |
 | Transactions | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Writeback transaction state machine (embedded source; compiled to `runtime.db`) |
 | Pipeline | [`pipeline/`](pipeline/) | Context flow, guard chain, relevance engine |
-| Recovery | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Phase reconciliation, state repair, obligation rebuild (embedded source; compiled to `runtime.db`) |
+| Recovery | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Recovery state machine, escalation levels, output schema, phase reconciliation, state repair, obligation rebuild (embedded source; compiled to `runtime.db`) |
 | Scheduler | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Execution queue, priority scheduler (embedded source; compiled to `runtime.db`) |
 | Guards | [`guards/`](guards/) | Circuit breaker, context pollution, mismatch escalation |
 | Onboarding | [`onboarding/`](onboarding/) | New project/task setup guidance |
@@ -113,7 +113,7 @@ Some legacy runtime YAML sources have been embedded into `compiler/embedded_data
 | `session_lifecycle` | [`pipeline/session-lifecycle.yaml`](pipeline/session-lifecycle.yaml) | Session lifecycle stage definitions |
 | `prompt_artifact_templates` | [`prompt-artifacts/artifact-templates.yaml`](prompt-artifacts/artifact-templates.yaml) | Task type prompt artifact templates |
 | `prompt_composition_rules` | [`prompt-artifacts/composition-rules.yaml`](prompt-artifacts/composition-rules.yaml) | Prompt composition rules |
-| `recovery_strategies` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | State recovery strategy definitions |
+| `recovery_strategies` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Recovery state machine, escalation levels, output schema, and strategy definitions |
 | `state_repair` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | State repair procedures |
 | `obligation_rebuild` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Obligation rebuild procedures |
 | `phase_reconciliation` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Phase reconciliation procedures |

@@ -619,16 +619,17 @@ def build_runtime_db(db_path)
   puts "    ✓ #{cr[:rules]&.length || 0} composition rules"
 
   # 8q. Recovery Config → recovery_strategies + state_repair + obligation_rebuild + phase_reconciliation
+  %w[recovery_strategies state_repair obligation_rebuild phase_reconciliation].each { |t| sqlite_exec(db_path, "DELETE FROM #{t};") }
   # recovery-strategies.yaml → recovery_strategies
-  rs = EmbeddedRuntimeData::RECOVERY_RECOVERY_STRATEGIES
-  (rs[:recovery_strategies] || []).each do |s|
-    name = s[:name] || s[:id] || 'default'
+  rs = deep_symbolize(EmbeddedRuntimeData::RECOVERY_RECOVERY_STRATEGIES)
+  (rs[:recovery_strategies] || rs[:strategies] || []).each do |s|
+    name = s[:id] || s[:name] || 'default'
     sqlite_exec(db_path, "INSERT OR REPLACE INTO recovery_strategies (id, strategy_id, content) VALUES ((SELECT id FROM recovery_strategies WHERE strategy_id = #{sqe(name)}), #{sqe(name)}, #{jsn(s)});")
   end
   sqlite_exec(db_path, "INSERT OR REPLACE INTO recovery_strategies (id, strategy_id, content) VALUES ((SELECT id FROM recovery_strategies WHERE strategy_id = '__config__'), '__config__', #{jsn(rs)});")
   puts "    ✓ recovery strategies"
   # state-repair.yaml → state_repair
-  sr = EmbeddedRuntimeData::RECOVERY_STATE_REPAIR
+  sr = deep_symbolize(EmbeddedRuntimeData::RECOVERY_STATE_REPAIR)
   (sr[:repair_procedures] || []).each do |p|
     name = p[:name] || p[:id] || "proc_#{p.object_id}"
     sqlite_exec(db_path, "INSERT OR REPLACE INTO state_repair (id, procedure_id, content) VALUES ((SELECT id FROM state_repair WHERE procedure_id = #{sqe(name)}), #{sqe(name)}, #{jsn(p)});")
@@ -636,7 +637,7 @@ def build_runtime_db(db_path)
   sqlite_exec(db_path, "INSERT OR REPLACE INTO state_repair (id, procedure_id, content) VALUES ((SELECT id FROM state_repair WHERE procedure_id = '__config__'), '__config__', #{jsn(sr)});")
   puts "    ✓ state repair"
   # obligation-rebuild.yaml → obligation_rebuild
-  ob = EmbeddedRuntimeData::RECOVERY_OBLIGATION_REBUILD
+  ob = deep_symbolize(EmbeddedRuntimeData::RECOVERY_OBLIGATION_REBUILD)
   (ob[:rebuild_procedures] || []).each do |p|
     name = p[:name] || p[:id] || "proc_#{p.object_id}"
     sqlite_exec(db_path, "INSERT OR REPLACE INTO obligation_rebuild (id, procedure_id, content) VALUES ((SELECT id FROM obligation_rebuild WHERE procedure_id = #{sqe(name)}), #{sqe(name)}, #{jsn(p)});")
@@ -644,7 +645,7 @@ def build_runtime_db(db_path)
   sqlite_exec(db_path, "INSERT OR REPLACE INTO obligation_rebuild (id, procedure_id, content) VALUES ((SELECT id FROM obligation_rebuild WHERE procedure_id = '__config__'), '__config__', #{jsn(ob)});")
   puts "    ✓ obligation rebuild"
   # phase-reconciliation.yaml → phase_reconciliation
-  pr = EmbeddedRuntimeData::RECOVERY_PHASE_RECONCILIATION
+  pr = deep_symbolize(EmbeddedRuntimeData::RECOVERY_PHASE_RECONCILIATION)
   (pr[:reconciliation_procedures] || []).each do |p|
     name = p[:name] || p[:id] || "proc_#{p.object_id}"
     sqlite_exec(db_path, "INSERT OR REPLACE INTO phase_reconciliation (id, procedure_id, content) VALUES ((SELECT id FROM phase_reconciliation WHERE procedure_id = #{sqe(name)}), #{sqe(name)}, #{jsn(p)});")
