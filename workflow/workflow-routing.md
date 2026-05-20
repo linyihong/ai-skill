@@ -28,6 +28,22 @@
 
 **人類索引**：[`workflow/README.md`](./README.md) §目前入口。
 
+### Recovery Re-entry（多 route / stale route）
+
+若執行中出現下列任一訊號，視為 workflow route 可能 stale，不要繼續在原 route 內 patch：
+
+- 使用者指出「不是這個流程」、「你沒看 workflow / owner docs」或任務其實屬於另一個 workflow。
+- 目前 workflow 的 artifact gates、owner docs、BDD、分析證據或 runtime policy 與實際操作衝突。
+- 同一 selector、automation、test route 或 capture route 連續兩次失敗，且失敗原因指向 wrong workflow / wrong source-of-truth。
+- 多個 `route.workflow.*` 同時命中，且現有 route 無法解釋必要 deliverable 或 validation gate。
+
+Recovery re-entry：
+
+1. 停止目前 execution，標記舊 route 假設與反證。
+2. 重新讀本檔、`knowledge/runtime/routing-registry.yaml`、相關 workflow README / `execution-flow.md`，以及 `metadata/recovery/domain-policies.yaml`。
+3. 若多個 workflow 仍合理，列出候選 route、拒絕理由與阻擋問題；不可默默沿用舊 route。
+4. 選定新 route 後，重建 `goal → route → dependencies → checkpoint → validation`，再回到對應 workflow。
+
 ## 選路表（Task → Workflow）
 
 | 任務性質 | 典型信號 | 接上的 Workflow | routing `id` |

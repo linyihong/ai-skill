@@ -30,6 +30,8 @@
 | 這個變更是否影響延遲、吞吐量、資源使用、啟動、背景工作、資料庫存取、批次處理或外部呼叫量？ | 在程式碼之前定義效能預算和必要的效能測試類型。不要依賴「功能正確」作為變更可發布的證明 |
 | 這個變更是否與現有文件衝突？ | 應用文件優先順序：治理/框架合約、產品計劃、BDD、合約、實作、測試。更新擁有文件，而不是僅默默修正程式碼 |
 
+**Contract / test / implementation mismatch escalation：** 若 product brief、owner contract、BDD、測試、implementation 或使用者指正彼此衝突，不要繼續局部 patch。依 `metadata/recovery/domain-policies.yaml` 的 `software-delivery` policy 進入 recovery：重讀本 workflow、artifact gates、development process、implementation plan template、linked-updates 與 dependency-reading；寫出舊假設、反證、owner contract、行為規格或 BDD、implementation surface、validation gate 與 linked updates。未完成新 execution graph 前，不可用「測試綠了」宣稱完成，也不可把 implementation 當作唯一 source-of-truth。
+
 如果不存在規劃產出且請求會改變行為，在實作之前建立輕量的變更簡報並詢問阻擋性問題。
 
 如果 product brief 存在但包含影響行為、合約、風險、測試、所有權、時程或發布關卡的未驗證聲明，在實作之前將這些聲明視為阻擋項。對於純規劃答案，引用參考來源或推理邊界，而不是假裝 brief 已驗證。

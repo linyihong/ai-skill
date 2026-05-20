@@ -399,6 +399,8 @@ Phase 4 result:
 
 ### Phase 5 — Workflow Integration
 
+Status: completed 2026-05-20.
+
 Goal: 讓高風險 workflow 具備 mismatch escalation hook。
 
 Candidate files:
@@ -409,13 +411,31 @@ Candidate files:
 
 Tasks:
 
-- [ ] 在 APK analysis 補 `UI/navigation mismatch escalation`。
-- [ ] 在 software-delivery 補 `contract / test / implementation mismatch escalation`。
-- [ ] 在 workflow routing 補多 route 或 stale route 的 recovery re-entry。
+- [x] 在 APK analysis 補 `UI/navigation mismatch escalation`。
+- [x] 在 software-delivery 補 `contract / test / implementation mismatch escalation`。
+- [x] 在 workflow routing 補多 route 或 stale route 的 recovery re-entry。
 
 Exit criteria:
 
-- [ ] Workflow primary source 能直接告訴 agent：事情跑偏時不能繼續 patch。
+- [x] Workflow primary source 能直接告訴 agent：事情跑偏時不能繼續 patch。
+
+#### Phase 5 Architecture Compatibility Preflight
+
+| 欄位 | 結果 |
+| --- | --- |
+| Trigger | 開始執行 Phase 5 — Workflow Integration |
+| Checked sources | `plans/README.md`、`workflow/apk-analysis/execution-flow.md`、`workflow/software-delivery/execution-flow.md`、`workflow/workflow-routing.md`、`metadata/recovery/domain-policies.yaml` |
+| Conflicts | 三個 candidate workflow sources 均存在；不需新增 workflow 或改 routing registry。 |
+| Decision | proceed by adding recovery hooks to existing workflow primary sources |
+| Validation | Markdown lint/readback、runtime compiler generated workflow surfaces、knowledge runtime refresh、diff review |
+
+Phase 5 result:
+
+| Area | Result |
+| --- | --- |
+| APK workflow | `workflow/apk-analysis/execution-flow.md` now stops capture/hook patching on UI/navigation mismatch and requires the `apk-analysis` recovery policy before reusing evidence. |
+| Software delivery workflow | `workflow/software-delivery/execution-flow.md` now stops local patching on contract/test/implementation mismatch and requires the `software-delivery` recovery policy before claiming completion. |
+| Workflow routing | `workflow/workflow-routing.md` now defines recovery re-entry for multiple workflow routes or stale route assumptions. |
 
 ### Phase 6 — Validation Scenarios
 

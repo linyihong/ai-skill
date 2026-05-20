@@ -55,6 +55,8 @@
 
 文件中要把 API 標為 `startup/preload`、`session-recovery`、`navigation`、`feature-triggered`、`cache-hydration` 或 `background/ambiguous`，避免把啟動期或預載 request 誤判成當前點擊觸發。
 
+**UI / navigation mismatch escalation rule：** 若 screenshot / hierarchy 顯示外部 package、錯誤 in-app screen、錯誤 tab / route anchor，或 automation 連續兩次到不了同一 feature checkpoint，立即停止 capture / hook patch。依 `metadata/recovery/domain-policies.yaml` 的 `apk-analysis` policy 進入 recovery：重新讀本 workflow、artifact gates、traffic triage、Frida flow、APK feedback index 與 analytical reasoning；寫出舊假設、反證、重新選定的 checkpoint、下一個 capture window 與 validation。未完成 recovery output 前，不可把該 window 的 API、Frida hit 或 fixture 當成 feature evidence。
+
 **Read-only argument override rule：** 若要驗證分頁、排序、語言、filter 這類 read-only 行為，但完整 UI 很難自然觸發下一頁或邊界值，優先選擇高語意函式參數覆寫的短窗口，並保留 App 自己的 session、signing、gateway 與 decrypt path。覆寫腳本必須預設短窗、輸出 schema/hash/key set，不輸出 raw token、raw signature、raw service 或 raw response value；文件要標 `app-owned signing/decrypt preserved`，不能把結果當成 standalone replay parity。
 
 **Redacted sample-targeting classifier rule：** 若 UI 盲抽樣本低收益，但 decrypted response 裡有可判斷樣本可用性的欄位（例如 count、availability、status、type），可新增 disabled-by-default classifier，只輸出 value class 與 item index（例如 `zero/nonzero/missing/other`），再用 UI replay 點擊候選項。不要輸出 raw id、title、body、comment、user、URL、token、完整 count 或其他內容值；文件要標明此 classifier 只是 sample targeting aid，不是資料擷取或 standalone replay parity。
