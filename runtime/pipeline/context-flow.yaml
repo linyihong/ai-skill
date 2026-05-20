@@ -17,11 +17,11 @@
     :revalidate_on: task_change
   :entry_conditions:
   - :routing_complete: true
-  - :skill_identified: true
+  - :route_identified: true
   :sources:
-  - :type: skill_summary
-    :path_template: knowledge/summaries/{skill-id}.md
-    :description: Skill summary（≤500 tokens）
+  - :type: route_summary
+    :path_template: knowledge/summaries/{route-id}.md
+    :description: Route summary（≤500 tokens）
     :condition: relevance_score >= 0.5
   - :type: rule_summary
     :path_template: knowledge/summaries/{rule-id}.md
@@ -31,11 +31,11 @@
   - :summary_sufficient: true
   - :OR summary_insufficient: true
   :output:
-  - :summary_context: Summary-level understanding of skill/rules
+  - :summary_context: Summary-level understanding of route/rules
   - :next_level: module_summary (if insufficient)
 - :id: module_summary
   :name: Module Summary Level
-  :description: '中量 context 層。載入 skill 的 module-level summary（如 README.md）， 提供模組結構與關鍵入口點。
+  :description: '中量 context 層。載入 workflow / analysis / intelligence 的 module-level summary（如 README.md）， 提供模組結構與關鍵入口點。
 
 '
   :estimated_tokens: 1500
@@ -46,10 +46,10 @@
   - :summary_insufficient: true
   - :module_summary_available: true
   :sources:
-  - :type: skill_readme
-    :path_template: skills/{skill-id}/README.md
-    :description: Skill README（~800 tokens）
-    :condition: exists
+  - :type: workflow_readme
+    :path_template: workflow/{workflow-id}/README.md
+    :description: Workflow README（~800 tokens）
+    :condition: workflow_route_matched == true
   - :type: module_readme
     :path_template: "{module}/README.md"
     :description: Module README（~500 tokens）
@@ -62,7 +62,7 @@
   - :next_level: detailed_source (if insufficient)
 - :id: detailed_source
   :name: Detailed Source Level
-  :description: '重 context 層。載入完整 source file（如 SKILL.md、full rule file）， 提供執行所需的完整細節。
+  :description: '重 context 層。載入完整 source file（如 execution-flow.md、analysis source、full rule file）， 提供執行所需的完整細節。
 
 '
   :estimated_tokens: 4500
@@ -73,9 +73,9 @@
   - :module_summary_insufficient: true
   - :detailed_source_available: true
   :sources:
-  - :type: skill_entrypoint
-    :path_template: skills/{skill-id}/SKILL.md
-    :description: Skill full source（~3500 tokens）
+  - :type: workflow_entrypoint
+    :path_template: workflow/{workflow-id}/execution-flow.md
+    :description: Workflow execution source（~3500 tokens）
     :condition: summary_insufficient == true
   - :type: rule_full
     :path_template: enforcement/{rule-id}.md
@@ -107,17 +107,17 @@
   - :raw_source_justified: true
   :sources:
   - :type: feedback_history
-    :path_template: skills/{skill-id}/feedback_history/{category}/{filename}
+    :path_template: feedback/history/{domain}/{category}/{filename}
     :description: Full feedback history（~5000 tokens）
     :condition: debug_needed == true
   - :type: raw_log
     :path_template: "{log-path}"
     :description: Raw log or output（~8000 tokens）
     :condition: deep_analysis_needed == true
-  - :type: full_technique
-    :path_template: skills/{skill-id}/techniques/{technique}/README.md
-    :description: Full technique documentation（~4000 tokens）
-    :condition: technique_detail_needed == true
+  - :type: full_analysis_method
+    :path_template: analysis/{domain}/{method}.md
+    :description: Full analysis method documentation（~4000 tokens）
+    :condition: analysis_method_detail_needed == true
   :exit_conditions:
   - :raw_source_sufficient: true
   - :OR resource_exhausted: true

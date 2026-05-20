@@ -1,6 +1,6 @@
 # 風險翻譯與控制選擇
 
-本文件定義如何將分析觀察轉換為開發者視角的風險陳述，並選擇最適合的控制層。原承接 [`skills/app-development-guidance/WORKFLOW.md`](../../skills/app-development-guidance/WORKFLOW.md) §2-4 的內容（已刪除）。
+本文件定義如何將分析觀察轉換為開發者視角的風險陳述，並選擇最適合的控制層。原承接 ``skills/app-development-guidance/WORKFLOW.md`` §2-4 的內容（已刪除）。
 
 ## 1. 翻譯為風險
 

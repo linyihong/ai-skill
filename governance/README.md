@@ -5,7 +5,7 @@
 ## 目前入口
 
 - [`contributing.md`](contributing.md)：人類維護者與 PR 的驗證流程入口（指令索引與權威文件連結）。
-- [`lifecycle/`](lifecycle/README.md)：定義舊 `skills/` 與新分層之間的 lifecycle、promotion gates 與 source-of-truth 保護。
+- [`lifecycle/`](lifecycle/README.md)：定義舊入口退役、新分層 lifecycle、promotion gates 與 source-of-truth 保護。
   - [`directory-structure-governance.md`](lifecycle/directory-structure-governance.md)：目錄結構治理流程 — 新增/改名目錄前的 5 步驟 Checkpoint（名稱衝突、邊界清晰度、慣性命名、路徑深度、全域引用影響）。
 - [`validation/`](validation/README.md)：定義新分層變更的 validation gates、migration checklist 與 pass / block rules。
 - [`cleanup/`](cleanup/README.md)：定義知識重複偵測、拆分規則與所有權邊界。
@@ -18,7 +18,7 @@
 - Knowledge lifecycle、deprecation、archive 與 cleanup strategy。
 - Duplicate detection、splitting rules 與 ownership boundary。
 - Validation gate、dependency maintenance 與 linked update strategy 的架構化設計。
-- 知識治理流程如何協調 `enforcement/`、`skills/`、`knowledge/` 與 `metadata/`。
+- 知識治理流程如何協調 `enforcement/`、`workflow/`、`analysis/`、`intelligence/`、`knowledge/` 與 `metadata/`。
 - 工程哲學轉譯成 AI runtime discipline 的治理設計。
 
 ## 不放什麼
@@ -26,7 +26,7 @@
 - 目前可執行的 dependency reading、linked updates 與 close-loop 規則正文；放到 `enforcement/`。
 - Tool-specific sync 或 hook 操作；放到 `ai-tools/` 或 scripts 文件。
 - Active conversation goal state；放到 `.agent-goals/`。
-- 單一 skill 的 checklist 正文；保留在 `skills/` 或後續依遷移策略拆分。
+- 單一 workflow 的 checklist 正文；保留在 `workflow/`、`analysis/` 或 `intelligence/` 的對應 source。
 
 ## 誰會參考這裡（Inbound References）
 

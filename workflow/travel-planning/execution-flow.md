@@ -1,6 +1,6 @@
 # Travel Planning Execution Flow（旅行規劃執行流程）
 
-本文件定義從使用者旅行需求到產出可行行程的執行流程。承接 [`skills/travel-planning/WORKFLOW.md`](../../skills/travel-planning/WORKFLOW.md) 的內容，提取為 tool-neutral 的執行步驟。
+本文件定義從使用者旅行需求到產出可行行程的執行流程。承接 ``skills/travel-planning/WORKFLOW.md`` 的內容，提取為 tool-neutral 的執行步驟。
 
 > **遷移狀態**：此文件為新分層的 reference target，`skills/travel-planning/WORKFLOW.md` 已不再作為 active entrypoint。新內容請直接寫入此文件。
 

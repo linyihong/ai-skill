@@ -39,7 +39,7 @@
 
 ## 與既有層的關係
 
-- `skills/` 與 `enforcement/` 仍是目前可直接讀取的主要內容來源。
+- `workflow/`、`analysis/`、`intelligence/` 與 `enforcement/` 是目前可直接讀取的主要內容來源。
 - `metadata/` 定義 knowledge atom 的控制欄位。
 - `runtime/` 使用本層 index、summary 與 graph 做 context routing。
 - SQLite / FTS index 屬於 runtime lookup cache，應由 canonical Markdown / YAML 產生並可重建。
@@ -48,5 +48,5 @@
 ## 第一批候選遷移來源
 
 - `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` 的 Knowledge Navigation System
-- `skills/README.md` 與各 skill README 中可抽成全庫索引的入口資訊
+- 舊 skill README 已遷移出的 workflow / analysis / intelligence 入口資訊
 - `knowledge/indexes/README.md` 的 navigation index 初版

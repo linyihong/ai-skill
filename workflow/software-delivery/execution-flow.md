@@ -1,6 +1,6 @@
 # App Development Guidance Execution Flow（開發指引執行流程）
 
-本文件定義從分析觀察轉換為開發指引的執行流程。承接 [`skills/app-development-guidance/WORKFLOW.md`](../../skills/app-development-guidance/WORKFLOW.md)（已刪除）的內容，提取為 tool-neutral 的執行步驟。
+本文件定義從分析觀察轉換為開發指引的執行流程。承接 ``skills/app-development-guidance/WORKFLOW.md``（已刪除）的內容，提取為 tool-neutral 的執行步驟。
 
 > **遷移狀態**：此文件為新分層的 canonical source，`skills/app-development-guidance/WORKFLOW.md` 已刪除。新內容請直接寫入此文件。
 

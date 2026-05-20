@@ -60,7 +60,7 @@
 ## 4. 驗證與連動
 
 - **Link**：從本檔或 `README` 出去的相對連結可點、無斷鏈。
-- **路由**：父層 README 的表格含新子檔；`skills-index` 或專案內索引若有對應列，一併更新。
+- **路由**：父層 README 的表格含新子檔；routing registry、workflow index 或專案內索引若有對應列，一併更新。
 - **分層**：若新增的是 why / 治理 gate，而不是操作步驟，回到 [`index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md) 或 [`documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md)，不要在 workflow 重複全文。
 - **Ai-skill 本庫**：若同步規則或模板，依 [`../../enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md) 與 [`../../enforcement/linked-updates.md`](../../enforcement/linked-updates.md) 走完整閉環。
 

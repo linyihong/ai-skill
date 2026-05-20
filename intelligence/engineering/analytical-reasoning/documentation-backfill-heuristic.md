@@ -1,7 +1,7 @@
 # Documentation Backfill Heuristic（文件回填經驗法則）
 
 **Status**: `candidate-intelligence`
-**Source**: [`analysis/repo/documentation-backfill.md`](../../analysis/repo/documentation-backfill.md), [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md)（已刪除）
+**Source**: [`analysis/repo/documentation-backfill.md`](../../../analysis/repo/documentation-backfill.md), `skills/app-development-guidance/process/README.md`（已刪除）
 
 ## 原則
 

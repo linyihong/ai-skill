@@ -72,10 +72,10 @@
       :target: routing-registry.yaml
       :description: 使用 relevance engine 計算每個 route 的相關性分數
       :estimated_tokens: 200
-    - :id: load-skill-summary
+    - :id: load-route-summary
       :action: read_file
-      :target: knowledge/summaries/{skill-id}.md
-      :description: 載入對應 skill 的 summary（300-500 tokens）
+      :target: knowledge/summaries/{route-id}.md
+      :description: 載入對應 route 的 summary（300-500 tokens）
       :estimated_tokens: 500
       :condition: relevance_score >= 0.5
     - :id: check-activation-rules
@@ -98,16 +98,16 @@
   - context_growth
   - conflict_rules
   :exit_conditions:
-  - :skill_identified: true
+  - :route_identified: true
   - :summary_loaded: true
   - :activation_rules_checked: true
   :output:
-  - :selected_skill: skill-id
+  - :selected_route: route-id
   - :relevance_score: 0.0-1.0
   - :activated_rules:
     - rule-id-1
     - rule-id-2
-  - :summary_context: Skill summary loaded
+  - :summary_context: Route summary loaded
 - :id: execution
   :name: Execution Stage
   :description: '任務執行階段。執行實際工作，使用工具、載入完整 source、產生輸出。 目標：在 token budget 內完成任務，動態調整 compression level。

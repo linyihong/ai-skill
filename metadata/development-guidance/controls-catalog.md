@@ -1,6 +1,6 @@
 # Security Controls Catalog
 
-本文件列出跨平台安全控制的種類與核心原則。原承接 [`skills/app-development-guidance/controls/`](../../skills/app-development-guidance/controls/) 的內容（已刪除），提取為 tool-neutral 的分析參考。
+本文件列出跨平台安全控制的種類與核心原則。原承接 ``skills/app-development-guidance/controls/`` 的內容（已刪除），提取為 tool-neutral 的分析參考。
 
 > **遷移狀態**：`skills/app-development-guidance/controls/` 已刪除。此文件為 canonical source，新內容請直接寫入此文件。
 
@@ -8,12 +8,12 @@
 
 | 控制 | 核心原則 | 原始來源 |
 |------|----------|----------|
-| **API Transport** | Enforce HTTPS, pinning as risk-based control, server-side freshness controls (timestamp/nonce/idempotency), backend auth must not trust client flags | [`controls/api-transport.md`](../../skills/app-development-guidance/controls/api-transport.md)（已刪除） |
-| **Auth & Session** | Token scope, refresh, revocation, logout, session invalidation, account binding | [`controls/auth-session.md`](../../skills/app-development-guidance/controls/auth-session.md)（已刪除） |
-| **Local Storage** | Secure storage, cache, backups, screenshots, offline data | [`controls/local-storage.md`](../../skills/app-development-guidance/controls/local-storage.md)（已刪除） |
-| **Logging & Telemetry** | Log redaction, crash reports, analytics, security observability | [`controls/logging-telemetry.md`](../../skills/app-development-guidance/controls/logging-telemetry.md)（已刪除） |
-| **Anti-Tamper** | Root/hook/emulator signals, anti-tamper limits, risk scoring | [`controls/anti-tamper-risk.md`](../../skills/app-development-guidance/controls/anti-tamper-risk.md)（已刪除） |
-| **Release Build** | Obfuscation, debug flag removal, symbol stripping, dependency and secret checks | [`controls/release-build.md`](../../skills/app-development-guidance/controls/release-build.md)（已刪除） |
+| **API Transport** | Enforce HTTPS, pinning as risk-based control, server-side freshness controls (timestamp/nonce/idempotency), backend auth must not trust client flags | ``controls/api-transport.md``（已刪除） |
+| **Auth & Session** | Token scope, refresh, revocation, logout, session invalidation, account binding | ``controls/auth-session.md``（已刪除） |
+| **Local Storage** | Secure storage, cache, backups, screenshots, offline data | ``controls/local-storage.md``（已刪除） |
+| **Logging & Telemetry** | Log redaction, crash reports, analytics, security observability | ``controls/logging-telemetry.md``（已刪除） |
+| **Anti-Tamper** | Root/hook/emulator signals, anti-tamper limits, risk scoring | ``controls/anti-tamper-risk.md``（已刪除） |
+| **Release Build** | Obfuscation, debug flag removal, symbol stripping, dependency and secret checks | ``controls/release-build.md``（已刪除） |
 
 ## 使用原則
 

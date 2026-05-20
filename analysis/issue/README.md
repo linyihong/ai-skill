@@ -7,7 +7,7 @@
 - Issue 分類（bug / feature / improvement / question / incident）。
 - 優先級評估（severity × urgency × impact）。
 - 初步診斷流程（從 issue 描述到可重現步驟）。
-- 標籤與路由規則（哪個 team、哪個 skill、哪個 workflow）。
+- 標籤與路由規則（哪個 team、哪個 workflow）。
 - 重複 issue 偵測（避免重複工作）。
 
 ## 與其他層的關係
@@ -15,7 +15,7 @@
 - `workflow/` 可引用本層的分類與路由規則，但不複製分析方法細節。
 - `intelligence/engineering/failure/` 承接從 issue 中萃取的抽象化失敗模式。
 - `intelligence/engineering/domain/` 承接從 issue 中萃取的領域知識。
-- `skills/` 目前仍是相容入口；本層只承接逐步抽出的分析方法。
+- 舊 `skills/` scaffold 已退役；本層是 issue triage 分析方法的 active source。
 
 ## 第一批候選遷移來源
 

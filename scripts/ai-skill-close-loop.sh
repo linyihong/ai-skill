@@ -170,27 +170,21 @@ group_for_path() {
     architecture/*|analysis/*|intelligence/*|workflow/*|runtime/*|memory/*|feedback/*|models/*|governance/*|knowledge/*|metadata/*) echo "architecture" ;;
     enforcement/*|README.md|CONTRIBUTING.md|.gitignore) echo "shared" ;;
     scripts/*) echo "scripts" ;;
-    skills/apk-analysis/*) echo "apk-analysis" ;;
-    skills/*)
-      local rest skill
-      rest="${path#skills/}"
-      skill="${rest%%/*}"
-      echo "skill-${skill}"
-      ;;
+    skills/*) echo "architecture" ;;
     *) echo "unknown" ;;
   esac
 }
 
 commit_message_for_group() {
   case "$1" in
-    shared) echo "docs(shared): close skill update loop" ;;
-    scripts) echo "chore(scripts): update skill close-loop automation" ;;
-    tooling) echo "docs(tools): update skill tool integration guidance" ;;
+    shared) echo "docs(shared): close knowledge update loop" ;;
+    scripts) echo "chore(scripts): update close-loop automation" ;;
+    tooling) echo "docs(tools): update tool integration guidance" ;;
     architecture) echo "docs(architecture): define AI-native knowledge operating system" ;;
-    apk-analysis) echo "docs(apk): close skill guidance updates" ;;
+    apk-analysis) echo "docs(apk): close guidance updates" ;;
     app-development-guidance) echo "docs(app): close guidance updates" ;;
-    skill-*) echo "docs(${1#skill-}): close skill updates" ;;
-    *) echo "docs(ai): close skill updates" ;;
+    skill-*) echo "docs(${1#skill-}): close retired skill updates" ;;
+    *) echo "docs(ai): close knowledge updates" ;;
   esac
 }
 

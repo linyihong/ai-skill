@@ -1,6 +1,6 @@
 # Implementation Pattern Catalog
 
-本文件列出可建置的實作模式分類與索引。原承接 [`skills/app-development-guidance/implementation/`](../../skills/app-development-guidance/implementation/) 的內容（已刪除），提取為 tool-neutral 的分析參考。
+本文件列出可建置的實作模式分類與索引。原承接 ``skills/app-development-guidance/implementation/`` 的內容（已刪除），提取為 tool-neutral 的分析參考。
 
 > **遷移狀態**：`skills/app-development-guidance/implementation/` 已刪除。此文件為 canonical source，新內容請直接寫入此文件。
 
@@ -8,11 +8,11 @@
 
 | 類別 | 範圍 | 原始來源 |
 |------|------|----------|
-| **Backend** | Server/API implementation patterns that mobile and web clients depend on | [`implementation/backend/`](../../skills/app-development-guidance/implementation/backend/)（已刪除） |
-| **Mobile** | Android, iOS, Flutter, React Native implementation patterns | [`implementation/mobile/`](../../skills/app-development-guidance/implementation/mobile/)（已刪除） |
-| **Embedded** | Firmware, sensor/protocol, hardware context, driver/service/application, and bring-up implementation patterns | [`implementation/embedded/`](../../skills/app-development-guidance/implementation/embedded/)（已刪除） |
-| **Tooling** | IDE extensions, CLIs, linters, static analyzers, code generators, and internal automation | [`implementation/tooling/`](../../skills/app-development-guidance/implementation/tooling/)（已刪除） |
-| **Examples** | Cross-cutting implementation patterns and snippets in pseudocode | [`implementation/examples/`](../../skills/app-development-guidance/implementation/examples/)（已刪除） |
+| **Backend** | Server/API implementation patterns that mobile and web clients depend on | ``implementation/backend/``（已刪除） |
+| **Mobile** | Android, iOS, Flutter, React Native implementation patterns | ``implementation/mobile/``（已刪除） |
+| **Embedded** | Firmware, sensor/protocol, hardware context, driver/service/application, and bring-up implementation patterns | ``implementation/embedded/``（已刪除） |
+| **Tooling** | IDE extensions, CLIs, linters, static analyzers, code generators, and internal automation | ``implementation/tooling/``（已刪除） |
+| **Examples** | Cross-cutting implementation patterns and snippets in pseudocode | ``implementation/examples/``（已刪除） |
 
 ## 使用流程
 

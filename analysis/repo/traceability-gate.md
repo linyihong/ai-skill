@@ -1,6 +1,6 @@
 # Traceability Gate
 
-從 [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md)（已刪除）提取。當分析一個已實作完成的 repository 並需要建立文件與程式碼之間的雙向追溯時，使用本方法。
+從 ``skills/app-development-guidance/process/README.md``（已刪除）提取。當分析一個已實作完成的 repository 並需要建立文件與程式碼之間的雙向追溯時，使用本方法。
 
 ## 適用時機
 

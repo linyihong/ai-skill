@@ -1,27 +1,27 @@
 # 依賴文件讀取鐵則
 
-本規則適用於所有 agent 使用、修改或檢查 `enforcement/`、`skills/`、工具專用規則、模板、feedback lessons、同步腳本與根索引時。目的不是增加形式流程，而是避免 agent 只讀單一文件，卻忽略已更新的依賴規則。
+本規則適用於所有 agent 使用、修改或檢查 `enforcement/`、`workflow/`、`analysis/`、`intelligence/`、工具專用規則、模板、feedback lessons、同步腳本與根索引時。目的不是增加形式流程，而是避免 agent 只讀單一文件，卻忽略已更新的依賴規則。
 
 ## 核心規則
 
-只要發現某個 skill、enforcement rule、tool-specific rule、模板或 feedback lesson 已更新、將被更新、或可能影響目前任務，agent 必須讀取它的相關依賴文件後才能下結論或繼續修改。
+只要發現某個 workflow、enforcement rule、tool-specific rule、模板或 feedback lesson 已更新、將被更新、或可能影響目前任務，agent 必須讀取它的相關依賴文件後才能下結論或繼續修改。
 
 最低讀取範圍：
 
 | 發現或修改的項目 | 必須讀取或明確檢查 |
 | --- | --- |
-| 任一 `skills/<name>/SKILL.md` | **新分層路徑優先**：先讀對應的 `workflow/<name>/README.md`、`analysis/<name>/README.md`、`intelligence/<domain>/<name>/README.md`（若存在）。再讀舊路徑 `README.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、`CHECKLIST.md`、`FEEDBACK.md`、相關 `feedback_history/README.md`，以及 `enforcement/README.md`。不存在的檔案可標記為不適用。 |
-| 任一 skill 子文件 | 該 skill 的 `SKILL.md`、最近的目錄 `README.md`、相關 workflow/checklist/template、`enforcement/linked-updates.md`。 |
-| 任一 `enforcement/*.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/rule-weight.md`（若涉及規則衝突、優先序或 default bootstrap）、`enforcement/reusable-guidance-boundary.md`（若涉及 reusable guidance / incident / feedback）、受影響 skill 的 `SKILL.md` 或模板。 |
-| `enforcement/tool-neutral-documentation.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、根 `README.md`、`skills/README.md`、`skills/ADDING_SKILLS.md`、各 skill 入口/README、`skills/*/tool-adapters/` 索引、`ai-tools/README.md` 與受影響工具文件。 |
+| 任一 `workflow/<domain>/execution-flow.md` | 先讀對應 `workflow/<domain>/README.md`、必要的 `analysis/<domain>/README.md`、`intelligence/<domain>/README.md` 或 `intelligence/engineering/<domain>/README.md`（若存在），以及 `enforcement/README.md`。不存在的檔案可標記為不適用。 |
+| 任一 workflow / analysis / intelligence 子文件 | 最近的目錄 `README.md`、相關 workflow/checklist/template、`enforcement/linked-updates.md`。 |
+| 任一 `enforcement/*.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/rule-weight.md`（若涉及規則衝突、優先序或 default bootstrap）、`enforcement/reusable-guidance-boundary.md`（若涉及 reusable guidance / incident / feedback）、受影響 workflow 的 `execution-flow.md` 或模板。 |
+| `enforcement/tool-neutral-documentation.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、根 `README.md`、相關 `workflow/`、`analysis/`、`intelligence/` 入口、`ai-tools/README.md` 與受影響工具文件。 |
 | `enforcement/rule-weight.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`enforcement/decision-efficiency.md`、`enforcement/goal-action-validation.md`、工具專用 always-apply agent rule、`ai-tools/` bootstrap 清單。 |
-| `enforcement/decision-efficiency.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`governance/document-sizing.md`、相關 skill 的 workflow / tools / README（若該 skill 有決策路由或 context-loading 指引）。 |
+| `enforcement/decision-efficiency.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`governance/document-sizing.md`、相關 workflow / analysis / intelligence README（若該 route 有決策路由或 context-loading 指引）。 |
 | `enforcement/escalation-policy.md` | `enforcement/README.md`、`enforcement/linked-updates.md`、`enforcement/failure-learning-system.md`、`enforcement/dependency-reading.md`、`runtime/README.md`、`runtime/pipeline/guard-chain.yaml`（若要接 runtime guard）、相關 workflow primary source（若 domain-specific mismatch hook 受影響）。 |
 | `enforcement/failure-learning-system.md` 或 `enforcement/failure-patterns/` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/reusable-guidance-boundary.md`、`../../feedback/feedback-lessons.md`、`enforcement/goal-action-validation.md`、`enforcement/dependency-reading.md`、相關 tool 文件與被補強的 enforcement rule / skill workflow。 |
-| 任一 `skills/<name>/tool-adapters/<tool>.md` | 該 skill 的 `SKILL.md`、`README.md`、核心 `WORKFLOW.md`/`TOOLS.md`、adapter index、`enforcement/tool-neutral-documentation.md`、`ai-tools/<tool>.md`（若存在）、`enforcement/linked-updates.md`。 |
-| `enforcement/document-todo-list.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/conversation-goal-ledger.md`、`skills/ADDING_SKILLS.md`、相關模板與 documentation/checklist 文件。 |
+| 任一 tool adapter | 對應 workflow / tool 文件、`enforcement/tool-neutral-documentation.md`、`ai-tools/<tool>.md`（若存在）、`enforcement/linked-updates.md`。 |
+| `enforcement/document-todo-list.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/conversation-goal-ledger.md`、相關模板與 documentation/checklist 文件。 |
 | `enforcement/conversation-goal-ledger.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`scripts/README.md`、相關 goal helper script、`ai-tools/` 中受影響工具文件；若同時改 tool-specific hook/rule，讀對應 hook/rule 文件。 |
-| 任一工具專用規則檔 | 對應的 enforcement rule 正文、`enforcement/README.md`、受影響工具文件，以及受影響的 skill 入口。 |
+| 任一工具專用規則檔 | 對應的 enforcement rule 正文、`enforcement/README.md`、受影響工具文件，以及受影響的 workflow 入口。 |
 | 任一 template | 模板目錄 `README.md`、引用該模板的 workflow/documentation/checklist、`enforcement/linked-updates.md`。 |
 | 任一 feedback lesson | 該分類 `README.md`、skill 的 `feedback_history/README.md`、`../../feedback/feedback-lessons.md`，以及 promotion target。 |
 | 開始執行任一 `plans/active/*.md` plan | `plans/README.md` 的 Architecture Compatibility Preflight、該 plan 的 Phase 0 / candidate files、相關 layer README、相關 runtime/compiler/metadata/workflow source、`enforcement/linked-updates.md`。 |
@@ -29,7 +29,7 @@
 ## Agent 行為
 
 1. 先讀 `enforcement/README.md` 的 **Default Bootstrap**，並載入 bootstrap 表列出的最小必讀集合；再依任務讀相關 enforcement rule 全文。
-2. 若任務碰到 skill，讀該 skill 入口與依賴文件；不要只依賴 `description`、`SKILL.md` 單檔或單一段落。
+2. 若任務碰到 workflow，讀該 workflow 入口與依賴文件；不要只依賴 `description`、單檔或單一段落。
 3. 若看到文件有 cross-link、promotion target、required linked updates、template reference、feedback index，或 reusable guidance / project incident 邊界，就循連結讀到任務所需的規則載入完成。
 4. 若依賴文件不存在，記錄為 `not applicable`；若存在但未讀，不可宣稱已完成檢查。
 5. 回覆或提交前，說明依賴讀取與連動更新的驗證方式。
@@ -45,14 +45,14 @@
 
 ### Dependency Read Ledger
 
-當使用者要求「重新讀 skill」、指出「enforcement rules / shared skill 是否漏讀」、或 agent 自己發現某個 skill/rule 已更新時，必須在繼續業務專案前建立一個簡短的 dependency read ledger（可在回覆、todo 或工作筆記中呈現），至少列：
+當使用者要求「重新讀 workflow」、指出「enforcement rules / shared workflow 是否漏讀」、或 agent 自己發現某個 workflow/rule 已更新時，必須在繼續業務專案前建立一個簡短的 dependency read ledger（可在回覆、todo 或工作筆記中呈現），至少列：
 
 | 欄位 | 必填內容 |
 | --- | --- |
-| Trigger | 例如 `skills/<name>/SKILL.md changed`、user asked to reload skill、enforcement rule changed。 |
+| Trigger | 例如 `workflow/<domain>/execution-flow.md changed`、user asked to reload workflow、enforcement rule changed。 |
 | Required set | 依本檔「最低讀取範圍」列出應讀文件。 |
 | Read | 實際已讀文件。 |
-| Not applicable | 不存在的檔案，例如該 skill 沒有 `CHECKLIST.md`；必須明寫，不可假裝已讀。 |
+| Not applicable | 不存在的檔案，例如該 workflow 沒有 `CHECKLIST.md`；必須明寫，不可假裝已讀。 |
 | Deferred / blocked | 因權限、缺檔、衝突或使用者決策而未讀的項目。 |
 | Validation | 連動更新檢查、diff review、sync、commit/push/readback 或純判斷的參考來源。 |
 
@@ -213,13 +213,13 @@ state_based_enforcement:
 
 ## Tool-Neutral Documentation Boundary
 
-[`tool-neutral-documentation.md`](tool-neutral-documentation.md) 要求可重用文件預設保持工具中立。新增或修改 enforcement rule、skill、template、README、lesson 時：
+[`tool-neutral-documentation.md`](tool-neutral-documentation.md) 要求可重用文件預設保持工具中立。新增或修改 enforcement rule、workflow、template、README、lesson 時：
 
 - 先寫通用 agent/tool 行為，不把單一 IDE、CLI 或 agent 產品寫成預設需求。
 - 工具專屬路徑、hook、同步命令、UI 操作、reload 步驟，放在 `ai-tools/<tool>.md`、工具設定檔或工具專用腳本文件。
 - 若 generic rule 需要提同步，用「configured tool sync」等中立詞，再連到 `ai-tools/` 取得具體工具做法。
-- 若某 skill 需要工具差異，使用 Strategy-style adapter：核心 skill 保存通用契約與 workflow，`skills/<skill>/tool-adapters/<tool>.md` 只寫該工具執行差異並連回核心步驟。
-- Commit/push 後讀回時，也要確認沒有把工具專屬段落誤放進 root README、skill README、enforcement rule index 或 reusable lesson。
+- 若某 workflow 需要工具差異，使用 Strategy-style adapter：核心 workflow 保存通用契約，工具差異放在 `ai-tools/` 或 workflow 明確連結的 adapter 說明。
+- Commit/push 後讀回時，也要確認沒有把工具專屬段落誤放進 root README、workflow README、enforcement rule index 或 reusable lesson。
 
 ## Document TODO List Boundary
 
@@ -232,13 +232,13 @@ state_based_enforcement:
 
 ## Ai-skill 回寫完成門檻
 
-只要 agent 在本庫回寫任何 `enforcement/`、`skills/`、工具專用規則、模板、feedback lessons、README 或同步腳本，最終回覆前必須完成整個更新閉環：
+只要 agent 在本庫回寫任何 `enforcement/`、`workflow/`、`analysis/`、`intelligence/`、工具專用規則、模板、feedback lessons、README 或同步腳本，最終回覆前必須完成整個更新閉環：
 
 1. `git status --short --branch` 檢查變更。
 2. `git diff` 檢查將提交的內容，不得包含 secrets、raw tokens、私人 host、個資或本機絕對路徑。
 3. 執行適用的 lints / Markdown link check / required linked updates 檢查。
 4. 若本輪明確使用或更新本機工具 mirror / symlink / copy snapshot，執行對應 tool sync；reference-only 只需確認 `<AI_SKILL_REPO>` 可讀，不跑同步。
-5. 若有多個 owner group，優先使用 `./scripts/ai-skill-close-loop.sh --commit` 分組提交；若手動提交，仍需按 enforcement、scripts、各 skill owner 分開提交，避免把不相干內容混成一包。
+5. 若有多個 owner group，優先使用 `./scripts/ai-skill-close-loop.sh --commit` 分組提交；若手動提交，仍需按 enforcement、scripts、workflow / analysis / intelligence owner 分開提交，避免把不相干內容混成一包。
 6. `git add` 相關檔案。
 7. **若 runtime YAML 來源或 compiler 規則有變更，確認 `runtime.db` 已 `git add`**（pre-commit hook 會自動處理，但手動 commit 時需自行確認）。
 8. `git commit`。
@@ -250,12 +250,12 @@ state_based_enforcement:
 
 ## Commit / Push 後讀回 Gate
 
-當本庫變更已完成 `git commit`、`git push`，且改動涉及 `enforcement/`、`skills/`、工具專用規則、模板或 feedback lessons 時，agent 必須在最終回覆前做一次讀回：
+當本庫變更已完成 `git commit`、`git push`，且改動涉及 `enforcement/`、`workflow/`、`analysis/`、`intelligence/`、工具專用規則、模板或 feedback lessons 時，agent 必須在最終回覆前做一次讀回：
 
 | 更新類型 | Commit / push 後必須重新讀取 |
 | --- | --- |
 | `enforcement/` | 更新過的 enforcement rule、`enforcement/README.md`、`enforcement/linked-updates.md`；若有工具專用規則，也讀對應工具規則檔。 |
-| `skills/<name>/` | 該 skill 的 `SKILL.md`，以及本次更新過的 workflow / documentation / checklist / template / feedback index。 |
+| `workflow/` / `analysis/` / `intelligence/` | 更新過的入口 README、execution-flow / analysis source / intelligence source，以及本次更新過的 documentation / checklist / template / feedback index。 |
 | 工具專用規則 | 更新過的工具規則檔，以及對應的 enforcement rule 正文。 |
 | template 或 feedback lesson | 更新過的 template/lesson、索引 README、promotion target 或引用它的 workflow/documentation。 |
 

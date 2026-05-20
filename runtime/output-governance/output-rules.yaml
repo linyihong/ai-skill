@@ -82,7 +82,7 @@
   - reusable_skills
   :canonical_source: enforcement/tool-neutral-documentation.md
 - :id: boundary.no_tool_specific_in_generic
-  :rule: '除非章節明確討論工具整合，否則下列位置避免工具專屬措辭： - Root README.md - enforcement/README.md 索引摘要 - workflow/<domain>/、analysis/<domain>/、intelligence/<domain>/ 下的所有文件 - Skill templates 與 skills/ADDING_SKILLS.md - Feedback lessons 與可重用 checklists
+  :rule: '除非章節明確討論工具整合，否則下列位置避免工具專屬措辭： - Root README.md - enforcement/README.md 索引摘要 - workflow/<domain>/、analysis/<domain>/、intelligence/<domain>/ 下的所有文件 - Feedback lessons 與可重用 checklists
 
 '
   :applies_to:

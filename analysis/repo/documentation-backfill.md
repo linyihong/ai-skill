@@ -1,6 +1,6 @@
 # Existing Project Documentation Backfill
 
-從 [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md)（已刪除）提取。當分析一個已實作完成的 repository 時，使用本方法系統化地恢復缺失的開發文件。
+從 ``skills/app-development-guidance/process/README.md``（已刪除）提取。當分析一個已實作完成的 repository 時，使用本方法系統化地恢復缺失的開發文件。
 
 ## 適用時機
 

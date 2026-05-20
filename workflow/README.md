@@ -20,7 +20,7 @@
 
 ## 放什麼
 
-- Skill 或任務類型的執行流程。
+- Workflow 或任務類型的執行流程。
 - 規劃、拆解、review、驗證與交接步驟。
 - 如何引用 `analysis/`、`intelligence/`、`metadata/` 來完成工作。
 - 可被不同 AI tools 套用的工具中立 workflow。
@@ -31,20 +31,20 @@
 - 單一技術路線的命令模板、hook 細節、dump procedure；放到對應 `analysis/<domain>/`。
 - 工程智慧、trade-off 與 domain lesson；放到 `intelligence/`。
 - Raw logs、case dump、專案 findings 或一次性 execution transcript；留在業務專案 evidence，去敏後再進 `feedback/history/`。
-- 工具專屬操作細節；放到 `ai-tools/` 或 skill-local `tool-adapters/`。
+- 工具專屬操作細節；放到 `ai-tools/` 或 workflow 的 tool adapter 說明。
 - Conversation goal ledger state；放到 `.agent-goals/`。
 
 ## 誰會參考這裡（Inbound References）
 
-- [`route.skill.apk-analysis`](../knowledge/runtime/routing-registry.yaml:225) — candidate_sources 引用 `workflow/apk-analysis/README.md`
-- [`route.skill.app-development-guidance`](../knowledge/runtime/routing-registry.yaml:434) — candidate_sources 引用 `workflow/software-delivery/README.md`
-- [`route.skill.travel-planning`](../knowledge/runtime/routing-registry.yaml:464) — candidate_sources 引用 `workflow/travel-planning/README.md`
+- [`route.workflow.apk-analysis`](../knowledge/runtime/routing-registry.yaml) — candidate_sources 引用 `workflow/apk-analysis/README.md`
+- [`route.workflow.software-delivery`](../knowledge/runtime/routing-registry.yaml) — candidate_sources 引用 `workflow/software-delivery/README.md`
+- [`route.workflow.travel-planning`](../knowledge/runtime/routing-registry.yaml) — candidate_sources 引用 `workflow/travel-planning/README.md`
 - [`route.workflow.documentation-ai-native`](../knowledge/runtime/routing-registry.yaml) — `primary_source` 引用 `workflow/documentation/README.md`
 - [`route.intelligence.apk-highest-leverage-path`](../knowledge/runtime/routing-registry.yaml:251) — required_dependencies 引用 `workflow/apk-analysis/execution-flow.md`、`workflow/apk-analysis/artifact-gates.md`
 
 ## 與既有層的關係
 
-- `skills/` 仍是目前主要 capability entry；本層會逐步承接 skill 中的通用執行流程。
+- 舊 `skills/` scaffold 已退役；本層是 capability execution 的 active entrypoint。
 - `enforcement/` 仍提供 dependency reading、linked updates、validation 與 source boundary。
 - `analysis/` 與 `intelligence/` 是 workflow 的知識來源，不應被大量複製。
 - `runtime/` 未來可依 metadata 動態載入合適 workflow。

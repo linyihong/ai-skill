@@ -1,6 +1,6 @@
 # App Development Guidance Artifact Gates（開發指引產出規範）
 
-本文件定義開發指引文件的產出規範與品質門檻。承接 [`skills/app-development-guidance/DOCUMENTATION.md`](../../skills/app-development-guidance/DOCUMENTATION.md)（已刪除）的內容，提取為 tool-neutral 的 artifact gates。
+本文件定義開發指引文件的產出規範與品質門檻。承接 ``skills/app-development-guidance/DOCUMENTATION.md``（已刪除）的內容，提取為 tool-neutral 的 artifact gates。
 
 > **遷移狀態**：此文件為新分層的 canonical source，`skills/app-development-guidance/DOCUMENTATION.md` 已刪除。新內容請直接寫入此文件。
 

@@ -1,6 +1,6 @@
 # Knowledge Navigation Indexes
 
-`knowledge/indexes/` 負責讓 agent 從任務意圖快速找到 task-relevant knowledge。這裡保存索引格式與 routing table；不搬移既有 `skills/` 或 `enforcement/` 內容。
+`knowledge/indexes/` 負責讓 agent 從任務意圖快速找到 task-relevant knowledge。這裡保存索引格式與 routing table；不搬移既有 `enforcement/`、`workflow/`、`analysis/` 或 `intelligence/` 內容。
 
 ## 使用方式
 

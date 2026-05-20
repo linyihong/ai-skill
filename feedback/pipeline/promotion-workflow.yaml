@@ -138,10 +138,10 @@ workflow:
         condition: "target_layer == 'enforcement' OR target_layer == 'intelligence'"
       - id: update-summary
         action: update
-        target: "knowledge/summaries/{skill-id}.md"
-        description: 更新 skill summary，加入 promoted lesson 的參考
+        target: "knowledge/summaries/{route-id}.md"
+        description: 更新 route summary，加入 promoted lesson 的參考
         estimated_tokens: 200
-        condition: "target_layer == 'skill-doc' OR target_layer == 'workflow'"
+        condition: "target_layer == 'domain-source' OR target_layer == 'workflow'"
       - id: update-routing-registry
         action: update
         target: knowledge/runtime/routing-registry.yaml

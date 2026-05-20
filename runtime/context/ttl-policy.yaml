@@ -73,15 +73,15 @@
     :value: 1
   :reason: 授權範圍規則只在涉及外部系統時需要
   :cacheable: false
-- :id: skill-workflow
-  :type: skill-workflow
+- :id: workflow-execution
+  :type: workflow-execution
   :ttl:
     :type: task
     :value: 1
-  :reason: Skill workflow 只在相關 task 中需要
+  :reason: Workflow execution source 只在相關 task 中需要
   :cacheable: true
-- :id: skill-checklist
-  :type: skill-checklist
+- :id: workflow-checklist
+  :type: workflow-checklist
   :ttl:
     :type: task
     :value: 1
@@ -122,12 +122,12 @@
     :value: true
   :reason: Knowledge graph edges 輕量且可跨 task 使用
   :cacheable: true
-- :id: skills-index
-  :type: skills-index
+- :id: workflow-index
+  :type: workflow-index
   :ttl:
     :type: conversation
     :value: true
-  :reason: Skills index 輕量且可跨 task 使用
+  :reason: Workflow / routing index 輕量且可跨 task 使用
   :cacheable: true
 - :id: model-profile
   :type: model-profile

@@ -440,7 +440,7 @@ Extraction 完成後需要更新以下文件：
 | 表格內容 | 連動關係表是否仍使用舊路徑 | `enforcement/linked-updates.md` |
 | 模板 | Promotion Target 是否缺少新分層選項 | `../../../feedback/feedback-lessons.md` |
 | 索引 | lazy-load 表格是否指向舊檔案 | `enforcement/README.md` |
-| 教學文件 | 目錄結構建議是否仍以舊結構為主 | `skills/ADDING_SKILLS.md` |
+| 教學文件 | 目錄結構建議是否仍以舊結構為主 | `workflow/README.md`、`analysis/README.md`、`intelligence/README.md` |
 | 規則正文 | 路徑描述是否過期 | `enforcement/content-layering.md`、`enforcement/tool-neutral-documentation.md` |
 | 流程規則 | Context Loading 步驟是否指向舊入口 | `enforcement/decision-efficiency.md` |
 | 引用規則 | Cross-skill reference 格式是否過期 | `enforcement/cross-skill-references.md` |

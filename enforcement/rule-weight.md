@@ -16,7 +16,7 @@ Rule weight 不是看哪個檔案最近被讀到，而是看該規則控制的 u
 | P1 | 使用者最新明確要求與 active goal closure | 最新 user instruction、accepted plan、active `.agent-goals/` goal、completion criteria | 除非與 P0 衝突，否則驅動目前任務。被 redirect 時更新或暫停舊 goal。 |
 | P1 | Canonical repository writeback 與 validation gates | Dependency reading、linked updates、diff review、commit/push/readback、clean status | 宣稱 repository changes 完成前必須滿足。Tool reload 或 local sync 不能取代。 |
 | P2 | Cross-repo operating policy | Tool-neutral documentation、failure learning、goal/action/validation、document sizing（含 token 成本管理）、neutral language | 一致套用，但輸出長度可依任務調整。 |
-| P2 | Skill-specific workflow 與 checklists | `skills/<name>/SKILL.md`、`WORKFLOW.md`、`DOCUMENTATION.md`、`CHECKLIST.md` | 在 enforcement operating rules 之後套用；除非 enforcement rule 明確 delegating，否則不可覆蓋 enforcement rules。 |
+| P2 | Workflow-specific execution flows 與 checklists | `workflow/<domain>/execution-flow.md`、`artifact-gates.md`、相關 README / checklist | 在 enforcement operating rules 之後套用；除非 enforcement rule 明確 delegating，否則不可覆蓋 enforcement rules。 |
 | P3 | Tool adapter 與 compatibility guidance | `ai-tools/`、`.cursor/rules/`、sync scripts、symlink/bundle/copy snapshot details | 只在 active tool 或 compatibility path 適用。不得重新定義 canonical source，也不得把 optional sync 變成 universal。 |
 | P3 | Efficiency 與 style preferences | Decision efficiency、output shape、formatting preferences、optional cleanup | 只在高權重要求滿足後最佳化。 |
 

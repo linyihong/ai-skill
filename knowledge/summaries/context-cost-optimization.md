@@ -10,5 +10,5 @@
 | Do not use for | 不可取代 plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md 的完整架構分層規劃。不可用於日常 skill 操作。 |
 | Context cost | ~350 tokens |
 | Estimated full cost | ~4500 tokens |
-| Validation signal | Plan 中的 migration steps 已部分完成（CORE_BOOTSTRAP、skills-index、activation-rules、ttl-policy、prompt-cache playbook）。 |
+| Validation signal | Plan 中的 migration steps 已部分完成（CORE_BOOTSTRAP、routing registry / workflow index、activation-rules、ttl-policy、prompt-cache playbook）。 |
 | Last checked | 2026-05-19 |

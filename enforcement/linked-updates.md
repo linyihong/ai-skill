@@ -1,12 +1,12 @@
 # 連動更新（全庫必須規則）
 
-本檔是 **Ai-skill repository 全部文件與 skill 的連動更新規則**。若某項改動會影響其他文件、索引、同步流程、skill 入口、分類文件或範本，相關檔案 **必須**在同一次變更中更新或明確檢查，不可寫成「可選」或「之後再說」。
+本檔是 **Ai-skill repository 全部文件與 workflow 的連動更新規則**。若某項改動會影響其他文件、索引、同步流程、workflow 入口、分類文件或範本，相關檔案 **必須**在同一次變更中更新或明確檢查，不可寫成「可選」或「之後再說」。
 
 Linked-update completeness 的治理 gate 見 [`governance/ai-runtime-governance/linked-update-governance.md`](../governance/ai-runtime-governance/linked-update-governance.md)；本檔保留全庫必須同步更新的具體表格與 close-loop 條文。
 
 ## Agent 必須做的事
 
-1. 改任何 `enforcement/`、`skills/`、根 `README.md`、同步腳本或模板前，先判斷是否有連動文件。
+1. 改任何 `enforcement/`、`workflow/`、`analysis/`、`intelligence/`、根 `README.md`、同步腳本或模板前，先判斷是否有連動文件。
 2. 若有連動文件，**必須**同步修改或明確寫下「已檢查，無需更新」的理由。
 3. 第一次寫入 Ai-skill 或其工具同步路徑時，依 [`dependency-reading.md`](dependency-reading.md) 開啟 writeback transaction；連動更新、sync、commit、push、讀回與 clean status 都完成後才可關閉。
 4. 若本輪明確使用或更新本機工具 mirror / symlink / copy snapshot，**必須**執行對應 tool sync；reference-only 策略不需要同步，具體工具命令放在 [`ai-tools/`](../ai-tools/README.md)。
@@ -20,25 +20,25 @@ Linked-update completeness 的治理 gate 見 [`governance/ai-runtime-governance
 
 | 改動位置 | 必須同步更新或檢查 |
 | --- | --- |
-| `enforcement/README.md` 或新增 enforcement rule | 根 `README.md`、相關 skill 的入口說明（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）、`feedback/history/` 模板引用。 |
-| `enforcement/reusable-guidance-boundary.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`../../feedback/feedback-lessons.md`、`enforcement/sanitization.md`、`enforcement/goal-action-validation.md`、相關 skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`），以及已新增 lesson 的 promotion target 與 index。 |
-| `enforcement/dependency-reading.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、工具專用 always-apply agent rule、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）與根 `README.md`。若變更涉及重讀 / reload 防呆，這些入口必須提醒 agent 建立 dependency read ledger，並明列不存在的依賴檔為 `not applicable`。 |
-| `enforcement/neutral-language.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`../../feedback/feedback-lessons.md`、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）與根 `README.md`。 |
-| `enforcement/tool-neutral-documentation.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、根 `README.md`、`skills/README.md`、`skills/ADDING_SKILLS.md`、各 skill 的入口/README、`skills/*/tool-adapters/` 索引（或 `tools/adapters/`）、`ai-tools/README.md` 與受影響工具文件。 |
+| `enforcement/README.md` 或新增 enforcement rule | 根 `README.md`、相關 workflow 的入口說明（`workflow/<domain>/execution-flow.md`）、`feedback/history/` 模板引用。 |
+| `enforcement/reusable-guidance-boundary.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`../../feedback/feedback-lessons.md`、`enforcement/sanitization.md`、`enforcement/goal-action-validation.md`、相關 workflow 的入口（`workflow/<domain>/execution-flow.md`），以及已新增 lesson 的 promotion target 與 index。 |
+| `enforcement/dependency-reading.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、工具專用 always-apply agent rule、所有現有 workflow 的入口（`workflow/<domain>/execution-flow.md`）與根 `README.md`。若變更涉及重讀 / reload 防呆，這些入口必須提醒 agent 建立 dependency read ledger，並明列不存在的依賴檔為 `not applicable`。 |
+| `enforcement/neutral-language.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`../../feedback/feedback-lessons.md`、所有現有 workflow / analysis / intelligence 入口與根 `README.md`。 |
+| `enforcement/tool-neutral-documentation.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、根 `README.md`、相關 workflow / analysis / intelligence 入口、`ai-tools/README.md` 與受影響工具文件。 |
 | `enforcement/rule-weight.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/dependency-reading.md`、`enforcement/linked-updates.md`、`enforcement/decision-efficiency.md`、`enforcement/goal-action-validation.md`、工具專用 always-apply agent rule、`ai-tools/README.md`、`ai-tools/cursor.md`、`ai-tools/claude.md`。 |
-| `enforcement/decision-efficiency.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/dependency-reading.md`、`enforcement/linked-updates.md`、`governance/document-sizing.md`、有決策路由/context-loading 指引的 skill workflow 或 README（`workflow/<domain>/` 或 `skills/<name>/`）。 |
+| `enforcement/decision-efficiency.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/dependency-reading.md`、`enforcement/linked-updates.md`、`governance/document-sizing.md`、有決策路由/context-loading 指引的 workflow / analysis / intelligence README。 |
 | `enforcement/escalation-policy.md` | `enforcement/README.md`、`enforcement/dependency-reading.md`、`enforcement/failure-learning-system.md`、`runtime/router/activation-rules.yaml`、`metadata/rules/escalation-policy.yaml`、`metadata/rules/README.md`；若接入 runtime guard，另同步 `runtime/README.md`、guard-chain source 與 `runtime.db`。 |
 | `enforcement/failure-learning-system.md` 或 `enforcement/failure-patterns/` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/dependency-reading.md`、`enforcement/linked-updates.md`、`enforcement/reusable-guidance-boundary.md`、`../../feedback/feedback-lessons.md`、`enforcement/goal-action-validation.md`、受影響工具文件與被補強的 enforcement rule / skill workflow。 |
-| `enforcement/document-todo-list.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`enforcement/conversation-goal-ledger.md`、`skills/ADDING_SKILLS.md`、相關模板與文件。 |
-| `enforcement/goal-action-validation.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`../../feedback/feedback-lessons.md`、`skills/_template/SKILL.md`、`skills/ADDING_SKILLS.md`、所有現有 skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）與根 `README.md`；若某 skill 有 `execution-flow.md` 或 `artifact-gates.md` 的輸出格式，也需同步更新或明確檢查。 |
+| `enforcement/document-todo-list.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`enforcement/conversation-goal-ledger.md`、相關模板與文件。 |
+| `enforcement/goal-action-validation.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`../../feedback/feedback-lessons.md`、所有現有 workflow 的入口（`workflow/<domain>/execution-flow.md`）與根 `README.md`；若某 workflow 有 `artifact-gates.md` 的輸出格式，也需同步更新或明確檢查。 |
 | `enforcement/conversation-goal-ledger.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/dependency-reading.md`、`scripts/README.md`、相關 helper script、`ai-tools/` 中各工具整合文件；若 tool-specific hook / rule 實作變更，也需同步對應工具規則或 hook 文件。 |
-| `enforcement/cross-skill-references.md` 或新增 cross-skill 關係 | referring skill 的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）、target skill 的入口或接收格式、必要時 `skills/_template/SKILL.md` 與 `skills/ADDING_SKILLS.md`。 |
+| `enforcement/cross-skill-references.md` 或新增 cross-workflow 關係 | referring workflow 的入口（`workflow/<domain>/execution-flow.md`）、target workflow 的入口或接收格式。 |
 | `../../feedback/feedback-lessons.md` | `feedback/history/README.md`、各 domain 的 `feedback/history/<domain>/README.md`、新增 lesson 模板。舊結構 `skills/<name>/FEEDBACK.md` 與 `skills/<name>/feedback_history/README.md` 已於 2026-05-13 刪除。 |
 | 工具同步文件或同步腳本 | 根 `README.md`、`scripts/README.md`、`ai-tools/` 對應工具文件、Agents 必讀規則、實際執行同步。 |
-| 新增或修改 `tools/adapters/<tool>.md`（新分層）或 `skills/<name>/tool-adapters/<tool>.md`（舊結構，僅限尚未遷移的 skill；已遷移 skill 的舊 tool-adapters 路徑已被刪除） | 該 skill 的入口（`skills/<name>/README.md` 或 `workflow/<domain>/README.md`）、核心 `execution-flow.md` 中的 adapter link、`ai-tools/<tool>.md` 的 cross-link（若該工具已有集中說明）、必要 validation/checklist。 |
+| 新增或修改 `tools/adapters/<tool>.md` 或 workflow tool adapter 說明 | 該 workflow 的入口（`workflow/<domain>/README.md`）、核心 `execution-flow.md` 中的 adapter link、`ai-tools/<tool>.md` 的 cross-link（若該工具已有集中說明）、必要 validation/checklist。 |
 | `scripts/ai-skill-close-loop.sh` | `scripts/README.md`、根 `README.md`、`enforcement/dependency-reading.md`、本檔；若改變 lock / commit / push 條件，也需同步相關 skill close-loop 說明。 |
-| 新增 skill | 根 `README.md`、`skills/README.md`、必要 tool sync 實際同步結果。 |
-| 修改 `skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md` 觸發條件或流程 | 該 skill 的 `README.md`、`runtime/onboarding/` 對應 quickstart、相關 cross-link。 |
+| 新增 workflow | 根 `README.md`、`workflow/README.md`、routing registry、必要 tool sync 實際同步結果。 |
+| 修改 `workflow/<domain>/execution-flow.md` 觸發條件或流程 | 該 workflow 的 `README.md`、`runtime/onboarding/` 對應 quickstart、相關 cross-link。 |
 | 新增 `feedback/history/` lesson | `feedback/history/<domain>/README.md`，必要時 `feedback/history/<domain>/<category>/README.md`。 |
 | 修改 `analysis/development-guidance/controls-catalog.md`（原 `skills/app-development-guidance/controls/`，已刪除） | 相關 `analysis/development-guidance/implementation-catalog.md`、`analysis/development-guidance/platforms-catalog.md`、`analysis/development-guidance/languages-catalog.md`、`workflow/software-delivery/development-process.md`。 |
 | 修改 `workflow/software-delivery/development-process.md`（原 `skills/app-development-guidance/process/`，已刪除） | 相關 `workflow/software-delivery/artifact-gates.md`、`analysis/development-guidance/risk-translation.md`、`analysis/development-guidance/implementation-catalog.md`、`workflow/software-delivery/execution-flow.md`。 |
@@ -54,7 +54,7 @@ Linked-update completeness 的治理 gate 見 [`governance/ai-runtime-governance
 | 修改 `runtime/` 下的 YAML 來源或 compiler 規則 | Compiler 會自動重新編譯 `runtime.db`。**`runtime.db` 必須包含在 commit 中**（pre-commit hook 會自動 `git add`，手動 commit 時需自行確認）。驗證：`git diff --cached --name-only | grep runtime.db`。 |
 | **Plan 執行前架構相容性檢查**（開始執行 `plans/active/*.md` 的 implementation phase） | 依 [`plans/README.md`](../plans/README.md#plan-執行前架構相容性檢查architecture-compatibility-preflight) 確認 candidate files、source-of-truth、layer responsibility、compiler / generated surface 與 current architecture 一致；若衝突，先更新 plan 或請使用者確認，不得直接實作。 |
 | **Plan 完成閉環**（plan 所有項目標記為完成） | 依 [`plans/README.md`](../plans/README.md#plan-完成閉環plan-completion-closure) 執行 7 項檢查清單：確認所有項目完成、執行 validator、檢查連動更新、更新 `plans/README.md` 狀態、搬移至 `archived/`（或標註例外原因）、commit & push、最終確認。 |
-| **架構重構**（目錄重組、分層新增、路徑變更、命名變更） | 依 [`governance/lifecycle/intelligence-extraction-pipeline.md`](../governance/lifecycle/intelligence-extraction-pipeline.md) **Step 6a** 建立 validation scenario（至少一個，測試 AI 是否正確使用新路徑）。依 **Step 7a** 檢查以下 enforcement 檔案：`governance/document-sizing.md`（範例路徑）、`linked-updates.md`（本檔表格）、`feedback-lessons.md`（Promotion Target 模板）、`enforcement/README.md`（lazy-load 表格）、`skills/ADDING_SKILLS.md`（目錄結構建議）、`content-layering.md`（路徑描述）、`tool-neutral-documentation.md`（路徑描述）、`decision-efficiency.md`（Context Loading 步驟）、`cross-skill-references.md`（引用格式）。同時檢查 `failure-patterns/README.md` 索引與 `failure-learning-system.md` 的 Promotion Decision 表格。 |
+| **架構重構**（目錄重組、分層新增、路徑變更、命名變更） | 依 [`governance/lifecycle/intelligence-extraction-pipeline.md`](../governance/lifecycle/intelligence-extraction-pipeline.md) **Step 6a** 建立 validation scenario（至少一個，測試 AI 是否正確使用新路徑）。依 **Step 7a** 檢查以下 enforcement 檔案：`governance/document-sizing.md`（範例路徑）、`linked-updates.md`（本檔表格）、`feedback-lessons.md`（Promotion Target 模板）、`enforcement/README.md`（lazy-load 表格）、`content-layering.md`（路徑描述）、`tool-neutral-documentation.md`（路徑描述）、`decision-efficiency.md`（Context Loading 步驟）、`cross-skill-references.md`（引用格式）。同時檢查 `failure-patterns/README.md` 索引與 `failure-learning-system.md` 的 Promotion Decision 表格。 |
 
 ## 閉環不完整時的強制補救
 

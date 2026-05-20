@@ -15,7 +15,7 @@
 - `workflow/` 可引用本層的分析步驟，但不複製分析方法細節。
 - `intelligence/engineering/failure/` 承接從 production 問題中萃取的抽象化失敗模式。
 - `intelligence/engineering/tradeoffs/` 承接從 production 問題中萃取的技術取捨教訓。
-- `skills/` 目前仍是相容入口；本層只承接逐步抽出的分析方法。
+- 舊 `skills/` scaffold 已退役；本層是 production 分析方法的 active source。
 
 ## 第一批候選遷移來源
 

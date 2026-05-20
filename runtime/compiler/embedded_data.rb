@@ -561,13 +561,13 @@ module EmbeddedRuntimeData
         "cacheable": true
       },
       {
-        "id": "skills-index",
-        "type": "skills-index",
+        "id": "workflow-index",
+        "type": "workflow-index",
         "ttl": {
           "type": "conversation",
           "value": true
         },
-        "reason": "Skills index 輕量且可跨 task 使用",
+        "reason": "Workflow / routing index 輕量且可跨 task 使用",
         "cacheable": true
       },
       {
@@ -2816,14 +2816,13 @@ module EmbeddedRuntimeData
       },
       {
         "id": "boundary.no_tool_specific_in_generic",
-        "rule": "除非章節明確討論工具整合，否則下列位置避免工具專屬措辭： - Root README.md - enforcement/README.md 索引摘要 - workflow/<domain>/、analysis/<domain>/、intelligence/<domain>/ 下的所有文件 - Skill templates 與 skills/ADDING_SKILLS.md - Feedback lessons 與可重用 checklists\n",
+        "rule": "除非章節明確討論工具整合，否則下列位置避免工具專屬措辭： - Root README.md - enforcement/README.md 索引摘要 - workflow/<domain>/、analysis/<domain>/、intelligence/<domain>/ 下的所有文件 - Feedback lessons 與可重用 checklists\n",
         "applies_to": [
           "root_readme",
           "enforcement_readme",
           "workflow",
           "analysis",
           "intelligence",
-          "skill_templates",
           "feedback_lessons"
         ],
         "canonical_source": "enforcement/tool-neutral-documentation.md"
@@ -3447,14 +3446,14 @@ module EmbeddedRuntimeData
             "routing_complete": true
           },
           {
-            "skill_identified": true
+            "route_identified": true
           }
         ],
         "sources": [
           {
-            "type": "skill_summary",
-            "path_template": "knowledge/summaries/{skill-id}.md",
-            "description": "Skill summary（≤500 tokens）",
+            "type": "route_summary",
+            "path_template": "knowledge/summaries/{route-id}.md",
+            "description": "Route summary（≤500 tokens）",
             "condition": "relevance_score >= 0.5"
           },
           {
@@ -3474,7 +3473,7 @@ module EmbeddedRuntimeData
         ],
         "output": [
           {
-            "summary_context": "Summary-level understanding of skill/rules"
+            "summary_context": "Summary-level understanding of route/rules"
           },
           {
             "next_level": "module_summary (if insufficient)"
@@ -3484,7 +3483,7 @@ module EmbeddedRuntimeData
       {
         "id": "module_summary",
         "name": "Module Summary Level",
-        "description": "中量 context 層。載入 skill 的 module-level summary（如 README.md）， 提供模組結構與關鍵入口點。\n",
+        "description": "中量 context 層。載入 workflow / analysis / intelligence 的 module-level summary（如 README.md）， 提供模組結構與關鍵入口點。\n",
         "estimated_tokens": 1500,
         "cache_policy": {
           "ttl": "session",
@@ -3500,10 +3499,10 @@ module EmbeddedRuntimeData
         ],
         "sources": [
           {
-            "type": "skill_readme",
-            "path_template": "skills/{skill-id}/README.md",
-            "description": "Skill README（~800 tokens）",
-            "condition": "exists"
+            "type": "workflow_readme",
+            "path_template": "workflow/{workflow-id}/README.md",
+            "description": "Workflow README（~800 tokens）",
+            "condition": "workflow_route_matched == true"
           },
           {
             "type": "module_readme",
@@ -3532,7 +3531,7 @@ module EmbeddedRuntimeData
       {
         "id": "detailed_source",
         "name": "Detailed Source Level",
-        "description": "重 context 層。載入完整 source file（如 SKILL.md、full rule file）， 提供執行所需的完整細節。\n",
+        "description": "重 context 層。載入完整 source file（如 execution-flow.md、analysis source、full rule file）， 提供執行所需的完整細節。\n",
         "estimated_tokens": 4500,
         "cache_policy": {
           "ttl": "task",
@@ -3548,9 +3547,9 @@ module EmbeddedRuntimeData
         ],
         "sources": [
           {
-            "type": "skill_entrypoint",
-            "path_template": "skills/{skill-id}/SKILL.md",
-            "description": "Skill full source（~3500 tokens）",
+            "type": "workflow_entrypoint",
+            "path_template": "workflow/{workflow-id}/execution-flow.md",
+            "description": "Workflow execution source（~3500 tokens）",
             "condition": "summary_insufficient == true"
           },
           {
@@ -3607,7 +3606,7 @@ module EmbeddedRuntimeData
         "sources": [
           {
             "type": "feedback_history",
-            "path_template": "skills/{skill-id}/feedback_history/{category}/{filename}",
+            "path_template": "feedback/history/{domain}/{category}/{filename}",
             "description": "Full feedback history（~5000 tokens）",
             "condition": "debug_needed == true"
           },
@@ -3618,10 +3617,10 @@ module EmbeddedRuntimeData
             "condition": "deep_analysis_needed == true"
           },
           {
-            "type": "full_technique",
-            "path_template": "skills/{skill-id}/techniques/{technique}/README.md",
-            "description": "Full technique documentation（~4000 tokens）",
-            "condition": "technique_detail_needed == true"
+            "type": "full_analysis_method",
+            "path_template": "analysis/{domain}/{method}.md",
+            "description": "Full analysis method documentation（~4000 tokens）",
+            "condition": "analysis_method_detail_needed == true"
           }
         ],
         "exit_conditions": [
@@ -3989,21 +3988,21 @@ module EmbeddedRuntimeData
         {
           "id": "weight_score",
           "weight": 0.2,
-          "description": "直接使用 routing-registry.yaml 中的 weight 值（0.0-1.0）。 這是 skill 的基礎重要性，不受 task 影響。\n",
-          "scoring_logic": "return skill.weight\n"
+          "description": "直接使用 routing-registry.yaml 中的 weight 值（0.0-1.0）。 這是 route 的基礎重要性，不受 task 影響。\n",
+          "scoring_logic": "return route.weight\n"
         }
       ],
       "penalties": [
         {
           "id": "conflict_penalty",
-          "description": "如果 skill 與已選 skill 有 conflicts，最終分數 × 0.5。 這確保衝突的 skill 不會同時被載入。\n",
-          "condition": "has_conflict_with_selected_skill(skill)",
+          "description": "如果 route 與已選 route 有 conflicts，最終分數 × 0.5。 這確保衝突的 route 不會同時被載入。\n",
+          "condition": "has_conflict_with_selected_route(route)",
           "multiplier": 0.5
         },
         {
           "id": "dependency_missing_penalty",
-          "description": "如果 skill 的 dependencies 不存在或無法載入，最終分數 × 0.8。 這確保依賴不完整的 skill 不會被優先載入。\n",
-          "condition": "dependency_check_failed(skill)",
+          "description": "如果 route 的 dependencies 不存在或無法載入，最終分數 × 0.8。 這確保依賴不完整的 route 不會被優先載入。\n",
+          "condition": "dependency_check_failed(route)",
           "multiplier": 0.8
         }
       ]
@@ -4023,16 +4022,16 @@ module EmbeddedRuntimeData
           "estimated_tokens": 200
         },
         {
-          "id": "score-all-skills",
+          "id": "score-all-routes",
           "action": "compute",
           "input": [
             "routing-registry.yaml",
             "parsed_intent"
           ],
           "output": {
-            "scored_skills": [
+            "scored_routes": [
               {
-                "skill_id": "skill-id",
+                "route_id": "route-id",
                 "trigger_match_score": "0.0-1.0",
                 "domain_match_score": "0.0-1.0",
                 "weight_score": "0.0-1.0",
@@ -4048,16 +4047,16 @@ module EmbeddedRuntimeData
           "estimated_tokens": 200
         },
         {
-          "id": "select-skills",
+          "id": "select-routes",
           "action": "filter",
-          "input": "scored_skills",
+          "input": "scored_routes",
           "condition": "final_score >= 0.5",
           "output": {
-            "selected_skills": [
+            "selected_routes": [
               {
-                "skill_id": "skill-id",
+                "route_id": "route-id",
                 "final_score": "0.0-1.0",
-                "summary_path": "knowledge/summaries/{skill-id}.md"
+                "summary_path": "knowledge/summaries/{route-id}.md"
               }
             ]
           },
@@ -4066,12 +4065,12 @@ module EmbeddedRuntimeData
         {
           "id": "skip-irrelevant",
           "action": "skip",
-          "input": "scored_skills",
+          "input": "scored_routes",
           "condition": "final_score < 0.5",
           "output": {
-            "skipped_skills": [
+            "skipped_routes": [
               {
-                "skill_id": "skill-id",
+                "route_id": "route-id",
                 "final_score": "0.0-1.0",
                 "reason": "below_threshold"
               }
@@ -4300,10 +4299,10 @@ module EmbeddedRuntimeData
               "estimated_tokens": 200
             },
             {
-              "id": "load-skill-summary",
+              "id": "load-route-summary",
               "action": "read_file",
-              "target": "knowledge/summaries/{skill-id}.md",
-              "description": "載入對應 skill 的 summary（300-500 tokens）",
+              "target": "knowledge/summaries/{route-id}.md",
+              "description": "載入對應 route 的 summary（300-500 tokens）",
               "estimated_tokens": 500,
               "condition": "relevance_score >= 0.5"
             },
@@ -4336,7 +4335,7 @@ module EmbeddedRuntimeData
         ],
         "exit_conditions": [
           {
-            "skill_identified": true
+            "route_identified": true
           },
           {
             "summary_loaded": true
@@ -4347,7 +4346,7 @@ module EmbeddedRuntimeData
         ],
         "output": [
           {
-            "selected_skill": "skill-id"
+            "selected_route": "route-id"
           },
           {
             "relevance_score": "0.0-1.0"
@@ -4359,7 +4358,7 @@ module EmbeddedRuntimeData
             ]
           },
           {
-            "summary_context": "Skill summary loaded"
+            "summary_context": "Route summary loaded"
           }
         ]
       },
@@ -6318,7 +6317,7 @@ module EmbeddedRuntimeData
             },
             {
               "type": "file_change",
-              "pattern": "skills/**/SKILL.md"
+              "pattern": "workflow/**/execution-flow.md"
             }
           ]
         },
@@ -6406,7 +6405,7 @@ module EmbeddedRuntimeData
             },
             {
               "type": "file_change",
-              "pattern": "skills/**/README.md"
+              "pattern": "workflow/**/README.md"
             }
           ]
         },
@@ -6477,20 +6476,20 @@ module EmbeddedRuntimeData
       },
       {
         "rule_id": "enforcement.cross-skill-references",
-        "description": "Cross-skill references — 一個 skill 引用另一個 skill 的規範",
+        "description": "Cross-workflow references — 一個 workflow 引用另一個 workflow 的規範",
         "activation": {
           "when": [
             {
               "type": "task_intent",
               "matches": [
-                "cross-skill",
-                "multi-skill",
-                "skill-integration"
+                "cross-workflow",
+                "multi-workflow",
+                "workflow-integration"
               ]
             },
             {
               "type": "file_change",
-              "pattern": "skills/**",
+              "pattern": "workflow/**",
               "count": ">=2"
             }
           ]

@@ -71,13 +71,13 @@ Claude Code 專屬注意事項：
 
 ## 與 Tool Adapter 的關係
 
-若某個 skill 針對 Claude 有特殊執行策略（上下文載入順序、prompt chunking、工具輸出限制等），放在：
+若某個 workflow 針對 Claude 有特殊執行策略（上下文載入順序、prompt chunking、工具輸出限制等），放在對應 workflow 文件或 `ai-tools/` 的 tool-specific 說明中，例如：
 
 ```
-skills/<skill-name>/tool-adapters/claude.md
+workflow/<domain>/tool-adapters/claude.md
 ```
 
-該 adapter 只寫 skill-specific 差異，並連回核心 `WORKFLOW.md` / `TOOLS.md`。
+該 adapter 只寫 workflow-specific 差異，並連回核心 `README.md` / `execution-flow.md`。
 
 ## 語言偏好設定（重要）
 
@@ -87,7 +87,7 @@ Claude Code 的語言偏好設定方式與 Roo Code（VS Code Extension）不同
 
 Claude Code 的語言行為由 `CLAUDE.md` 中的 Custom Instructions 控制：
 
-1. **在 `CLAUDE.md` 中設定**：本知識庫的 [`CLAUDE.md`](../CLAUDE.md) 已包含語言偏好設定。
+1. **在 `CLAUDE.md` 中設定**：本知識庫的 [`CLAUDE.md`](../../CLAUDE.md) 已包含語言偏好設定。
 2. **語言偏好內容**：
 
 ```text

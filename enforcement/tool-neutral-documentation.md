@@ -33,7 +33,6 @@
 - Root `README.md`。
 - `enforcement/README.md` 索引摘要。
 - `workflow/<domain>/`、`analysis/<domain>/`、`intelligence/<domain>/` 下的所有文件。
-- Skill templates 與 `skills/ADDING_SKILLS.md`。
 - Feedback lessons 與可重用 checklists。
 
 範例：

@@ -164,7 +164,7 @@
     - :type: file_change
       :pattern: enforcement/**
     - :type: file_change
-      :pattern: skills/**/SKILL.md
+      :pattern: workflow/**/execution-flow.md
   :load:
     :strategy: lazy
     :priority: P2
@@ -219,7 +219,7 @@
     - :type: file_change
       :pattern: enforcement/**
     - :type: file_change
-      :pattern: skills/**/README.md
+      :pattern: workflow/**/README.md
   :load:
     :strategy: lazy
     :priority: P2
@@ -263,16 +263,16 @@
     :estimated_tokens: 300
     :source: enforcement/authorization-scope.md
 - :rule_id: enforcement.cross-skill-references
-  :description: Cross-skill references — 一個 skill 引用另一個 skill 的規範
+  :description: Cross-workflow references — 一個 workflow 引用另一個 workflow 的規範
   :activation:
     :when:
     - :type: task_intent
       :matches:
-      - cross-skill
-      - multi-skill
-      - skill-integration
+      - cross-workflow
+      - multi-workflow
+      - workflow-integration
     - :type: file_change
-      :pattern: skills/**
+      :pattern: workflow/**
       :count: ">=2"
   :load:
     :strategy: lazy

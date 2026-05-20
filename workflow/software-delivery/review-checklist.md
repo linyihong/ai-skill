@@ -1,6 +1,6 @@
 # Review Checklist（審查檢查清單）
 
-本文件定義開發流程中的審查檢查項目。原承接 [`skills/app-development-guidance/CHECKLIST.md`](../../skills/app-development-guidance/CHECKLIST.md) 的內容（已刪除），提取為 tool-neutral 的 workflow gates。
+本文件定義開發流程中的審查檢查項目。原承接 ``skills/app-development-guidance/CHECKLIST.md`` 的內容（已刪除），提取為 tool-neutral 的 workflow gates。
 
 > **遷移狀態**：`skills/app-development-guidance/CHECKLIST.md` 已刪除。此文件為 canonical source，新內容請直接寫入此文件。
 
@@ -14,12 +14,12 @@
 
 對於特定領域的聚焦檢查清單，使用：
 
-- [`checklists/mobile-design-review.md`](../../skills/app-development-guidance/checklists/mobile-design-review.md)（已刪除）
-- [`checklists/mobile-pr-review.md`](../../skills/app-development-guidance/checklists/mobile-pr-review.md)（已刪除）
-- [`checklists/mobile-release-review.md`](../../skills/app-development-guidance/checklists/mobile-release-review.md)（已刪除）
-- [`checklists/api-security-review.md`](../../skills/app-development-guidance/checklists/api-security-review.md)（已刪除）
-- [`checklists/contract-governance-review.md`](../../skills/app-development-guidance/checklists/contract-governance-review.md)（已刪除）
-- [`checklists/embedded-firmware-review.md`](../../skills/app-development-guidance/checklists/embedded-firmware-review.md)（已刪除）
+- ``checklists/mobile-design-review.md``（已刪除）
+- ``checklists/mobile-pr-review.md``（已刪除）
+- ``checklists/mobile-release-review.md``（已刪除）
+- ``checklists/api-security-review.md``（已刪除）
+- ``checklists/contract-governance-review.md``（已刪除）
+- ``checklists/embedded-firmware-review.md``（已刪除）
 
 當檢查項目因新的 control 或 implementation pattern 而變更時，對應的 `controls/` 和 `implementation/` 文件必須在同一變更中更新或明確驗證。
 

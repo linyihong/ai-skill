@@ -1,9 +1,9 @@
 # Contract Governance Heuristic（契約治理經驗法則）
 
-> **Cross-Domain Promotion**: 文件優先順序階層模式已提取到 [`intelligence/engineering/heuristics/document-priority-hierarchy.md`](../../heuristics/document-priority-hierarchy.md)
+> **Cross-Domain Promotion**: 文件優先順序階層模式已提取到 [`intelligence/engineering/heuristics/document-priority-hierarchy.md`](../heuristics/document-priority-hierarchy.md)
 
 **Status**: `candidate-intelligence`
-**Source**: [`analysis/repo/contract-governance.md`](../../analysis/repo/contract-governance.md), [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md)（已刪除）
+**Source**: [`analysis/repo/contract-governance.md`](../../../analysis/repo/contract-governance.md), `skills/app-development-guidance/process/README.md`（已刪除）
 
 ## 原則
 

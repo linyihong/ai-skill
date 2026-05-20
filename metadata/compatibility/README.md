@@ -19,7 +19,7 @@
 
 | 狀態 | 意義 |
 | --- | --- |
-| `old-entrypoint-active` | 既有 `skills/` 或 `enforcement/` source 仍是 active。 |
+| `old-entrypoint-active` | Legacy source 仍是 active。舊 `skills/` scaffold 已退役，不應再用此狀態表示 skills source。 |
 | `dual-reference` | Old entrypoint 與 new layer path 都已連結，供 discovery 使用。 |
 | `new-layer-promoted` | New layer path 已受支援，但 old path 仍可解析。 |
 | `deprecation-planned` | Old path 已有 replacement 與 deprecation note，但仍存在。 |

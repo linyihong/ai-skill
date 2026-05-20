@@ -196,13 +196,14 @@ target_decisions:
       - create_workflow: "在 workflow/ 建立新 workflow 或更新既有 workflow"
       - update_lifecycle: "將原 lesson 標為 promoted"
 
-  - id: promote_to_skill_doc
-    condition: "final_score >= 0.6 AND final_score < 0.8 AND single_skill == true"
-    target: "skills/{skill-id}/{doc-type}.md"
+  - id: promote_to_domain_source
+    condition: "final_score >= 0.6 AND final_score < 0.8 AND single_domain == true"
+    target: "workflow/{domain}/{doc-type}.md OR analysis/{domain}/{doc-type}.md OR intelligence/{domain}/{doc-type}.md"
     description: >
-      單一 skill 內的高價值 lesson，promote 到 skill 的 WORKFLOW.md、TOOLS.md 或 DOCUMENTATION.md。
+      單一 domain 內的高價值 lesson，依內容性質 promote 到 workflow、analysis 或 intelligence 的對應 source。
     steps:
-      - merge_into_skill_doc: "將 lesson 內容合併到對應 skill doc"
+      - select_domain_source: "依 workflow / analysis / intelligence 邊界選擇目標 source"
+      - merge_into_domain_source: "將 lesson 內容合併到對應 source"
       - update_lifecycle: "將原 lesson 標為 promoted"
 
   - id: keep_as_candidate

@@ -35,5 +35,5 @@
 - Metadata rules 不覆蓋可執行 enforcement rules。
 - Metadata 與 enforcement rules 衝突時，依 `enforcement/rule-weight.md`。
 - Metadata 可以降低 context loading cost，但不能跳過 required dependency reading。
-- 舊 `skills/` source files 在 lifecycle promotion gates 通過前，仍是 source of truth。
+- 舊 `skills/` scaffold 已退役；active source-of-truth 由 promoted workflow / analysis / intelligence / enforcement source 承接。
 - Metadata 文件正文預設使用繁體中文；英文保留給欄位名、enum、路徑、YAML key 與必要專有名詞。

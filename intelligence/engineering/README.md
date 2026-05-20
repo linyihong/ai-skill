@@ -22,6 +22,6 @@
 
 - `analysis/`（根目錄）提供具體分析方法，`analytical-reasoning/` 提供背後的原則與 why。
 - `workflow/` 提供執行流程，本層提供選擇流程的決策邏輯。
-- `skills/` 是原始來源，已不再作為 active entrypoint。
+- 舊 `skills/` scaffold 已退役；執行入口在 `workflow/`，分析方法在 `analysis/`，判斷智慧在本層。
 - `agent-architecture/` 研究 AI Agent 自身的認知行為模式，與 `enforcement/failure-patterns/` 互補（後者記錄具體失效模式，前者解釋為什麼會發生）。
 - IDE 生態系統知識（VS Code Extension 全域設定儲存機制等）已移至 [`intelligence/ide/`](../ide/README.md)，與本層同為 `intelligence/` 下的獨立子目錄。

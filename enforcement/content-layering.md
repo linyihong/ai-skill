@@ -15,14 +15,14 @@
 | 全庫**文件 TODO 規則**（文件前段列出未完成、待決策、待補強、待驗證項並連回章節/goal） | **[`document-todo-list.md`](document-todo-list.md)**（全庫唯一正文）；跨文件或跨對話目標再連到 `.agent-goals/` |
 | 全庫**工作驗證流程**（目標、執行、驗證；純判斷題用參考來源） | **[`goal-action-validation.md`](goal-action-validation.md)**（全庫唯一正文） |
 | 全工具**對話目標閉環規則**（active goals、優先權、parallelization mode、owner/lock 決策、plan/todo links、missing/decision/strengthen、拆解、轉移、multi-agent lock、完成後刪除；多步驟 / todo / dirty files / 繼續前任務時先 status/init；長期目標需落到 durable planning 文件） | **[`conversation-goal-ledger.md`](conversation-goal-ledger.md)**（全庫唯一正文）；每個專案的暫存狀態放 `<PROJECT_ROOT>/.agent-goals/`，不進 git |
-| 全庫**依賴讀取鐵則、dependency read ledger 與 writeback transaction gate**（發現 skill/rule/template/lesson 更新時必須讀相關依賴，重讀 skill 時列出已讀/不適用/阻塞項，寫入 Ai-skill 時必須先定位 canonical repo，不把工具 mirror 當 source，並完成 sync/commit/push/readback/clean status） | **[`dependency-reading.md`](dependency-reading.md)**（全庫唯一正文） |
+| 全庫**依賴讀取鐵則、dependency read ledger 與 writeback transaction gate**（發現 workflow/rule/template/lesson 更新時必須讀相關依賴，重讀 workflow 時列出已讀/不適用/阻塞項，寫入 Ai-skill 時必須先定位 canonical repo，不把工具 mirror 當 source，並完成 sync/commit/push/readback/clean status） | **[`dependency-reading.md`](dependency-reading.md)**（全庫唯一正文） |
 | 全庫**可重用規則與專案證據邊界**（incident 只能抽象成通用原因、規則與驗證；具體證據留專案） | **[`reusable-guidance-boundary.md`](reusable-guidance-boundary.md)**（全庫唯一正文） |
 | 可重用的**單一技巧、lesson 全文** | **`feedback/history/<domain>/`**（統一目標路徑）；舊結構 `skills/<skill-name>/feedback_history/` 已於 2026-05-13 刪除，所有 lesson 已搬遷至 `feedback/history/<domain>/`。成熟 lesson 可 promotion 到 `intelligence/<domain>/` 或 `workflow/<domain>/` |
 | **intelligence 內部：entry vs solution 分層** | 見下方 [Intelligence Entry/Solution 分層](#intelligence-entrysolution-分層) |
-| 某 skill 的**工具策略 adapter**（同一 skill 在某 AI 工具上的執行差異） | 新分層：`tools/adapters/<tool>.md`；舊結構保留：`skills/<skill-name>/tool-adapters/<tool>.md`（向後相容，僅限尚未遷移的 skill；已遷移 skill 的舊 tool-adapters 路徑已被刪除）。只寫該工具差異並連回核心 workflow，工具全域設定仍放 `ai-tools/<tool>.md` |
-| **如何**下筆、命名、模板 | **[`feedback-lessons.md`](feedback-lessons.md)**（全庫唯一）；各 skill 可選保留一行入口 `FEEDBACK.md` 指向該檔 |
-| **某 skill 需要引用另一個 skill 的規範或交接產物** | 在 referring skill 寫短 cross-link 與觸發條件；規則見 **[`cross-skill-references.md`](cross-skill-references.md)**；不要複製 target skill 的全文 |
-| 特定 App 的 host、一次性結論、專屬實作、live run 結果、class/test 名稱、sample ID | **業務專案**文件，不進可重用 skill；若要沉澱，依 [`reusable-guidance-boundary.md`](reusable-guidance-boundary.md) 先抽象化 |
+| 某 workflow 的**工具策略 adapter**（同一 workflow 在某 AI 工具上的執行差異） | `ai-tools/<tool>.md` 或 workflow 明確連結的 adapter 說明。只寫該工具差異並連回核心 workflow，工具全域設定仍放 `ai-tools/<tool>.md` |
+| **如何**下筆、命名、模板 | **[`feedback-lessons.md`](feedback-lessons.md)**（全庫唯一） |
+| **某 workflow 需要引用另一個 workflow 的規範或交接產物** | 在 referring workflow 寫短 cross-link 與觸發條件；規則見 **[`cross-skill-references.md`](cross-skill-references.md)**；不要複製 target workflow 的全文 |
+| 特定 App 的 host、一次性結論、專屬實作、live run 結果、class/test 名稱、sample ID | **業務專案**文件，不進可重用 source；若要沉澱，依 [`reusable-guidance-boundary.md`](reusable-guidance-boundary.md) 先抽象化 |
 
 ## 文件變大時
 

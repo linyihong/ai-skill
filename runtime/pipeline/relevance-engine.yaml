@@ -2,57 +2,57 @@
 :relevance_engine_version: v1
 :status: candidate
 :owner_layer: runtime/pipeline
-:description: 'Skill Relevance Engine. 在 routing stage 執行，對 routing-registry.yaml 中的每個 route 計算 relevance score（0.0-1.0）。Score ≥ 0.5 的 skill 才會被載入 summary。 Score < 0.5 的 skill 被跳過，避免浪費 token 在不相關的 skill 上。
+:description: 'Route Relevance Engine. 在 routing stage 執行，對 routing-registry.yaml 中的每個 route 計算 relevance score（0.0-1.0）。Score ≥ 0.5 的 route 才會被載入 summary。 Score < 0.5 的 route 被跳過，避免浪費 token 在不相關的 route 上。
 
 '
 :scoring:
   :method: weighted_combination
   :description: |
-    Relevance score 由三個子分數加權組合而成： - trigger_match_score（0.5）：基於 user intent 與 skill triggers 的匹配度 - domain_match_score（0.3）：基於 task domain 與 skill domains 的匹配度 - weight_score（0.2）：基於 route 的基礎 weight（來自 routing-registry.yaml）
+    Relevance score 由三個子分數加權組合而成： - trigger_match_score（0.5）：基於 user intent 與 route triggers 的匹配度 - domain_match_score（0.3）：基於 task domain 與 route domains 的匹配度 - weight_score（0.2）：基於 route 的基礎 weight（來自 routing-registry.yaml）
     最終分數 = trigger_match × 0.5 + domain_match × 0.3 + weight × 0.2
-    如果 skill 與已選 skill 有 conflicts，最終分數 × 0.5（penalty）。
+    如果 route 與已選 route 有 conflicts，最終分數 × 0.5（penalty）。
   :threshold: 0.5
   :components:
   - :id: trigger_match_score
     :weight: 0.5
-    :description: '計算 user intent 中的關鍵詞與 skill triggers 的匹配度。 匹配度 = matched_triggers / total_triggers（但上限 1.0）。 如果 user intent 包含 trigger 的精確匹配，該 trigger 計為 2 分。
+    :description: '計算 user intent 中的關鍵詞與 route triggers 的匹配度。 匹配度 = matched_triggers / total_triggers（但上限 1.0）。 如果 user intent 包含 trigger 的精確匹配，該 trigger 計為 2 分。
 
 '
-    :scoring_logic: 'matched_count = count(intent_keywords ∩ skill.triggers) exact_match_count = count(exact_match(intent_keywords, skill.triggers)) raw_score = (matched_count + exact_match_count) / len(skill.triggers) return min(raw_score, 1.0)
+    :scoring_logic: 'matched_count = count(intent_keywords ∩ route.triggers) exact_match_count = count(exact_match(intent_keywords, route.triggers)) raw_score = (matched_count + exact_match_count) / len(route.triggers) return min(raw_score, 1.0)
 
 '
   - :id: domain_match_score
     :weight: 0.3
-    :description: '計算 task domain 與 skill domains 的匹配度。 如果 task domain 與 skill domain 完全匹配，得分 1.0。 如果 task domain 是 skill domain 的子領域，得分 0.7。 如果 task domain 與 skill domain 無關，得分 0.0。
+    :description: '計算 task domain 與 route domains 的匹配度。 如果 task domain 與 route domain 完全匹配，得分 1.0。 如果 task domain 是 route domain 的子領域，得分 0.7。 如果 task domain 與 route domain 無關，得分 0.0。
 
 '
     :scoring_logic: |
-      if task_domain in skill.domains:
+      if task_domain in route.domains:
         return 1.0
-      elif is_subdomain(task_domain, skill.domains):
+      elif is_subdomain(task_domain, route.domains):
         return 0.7
       else:
         return 0.0
   - :id: weight_score
     :weight: 0.2
-    :description: '直接使用 routing-registry.yaml 中的 weight 值（0.0-1.0）。 這是 skill 的基礎重要性，不受 task 影響。
+    :description: '直接使用 routing-registry.yaml 中的 weight 值（0.0-1.0）。 這是 route 的基礎重要性，不受 task 影響。
 
 '
-    :scoring_logic: 'return skill.weight
+    :scoring_logic: 'return route.weight
 
 '
   :penalties:
   - :id: conflict_penalty
-    :description: '如果 skill 與已選 skill 有 conflicts，最終分數 × 0.5。 這確保衝突的 skill 不會同時被載入。
+    :description: '如果 route 與已選 route 有 conflicts，最終分數 × 0.5。 這確保衝突的 route 不會同時被載入。
 
 '
-    :condition: has_conflict_with_selected_skill(skill)
+    :condition: has_conflict_with_selected_route(route)
     :multiplier: 0.5
   - :id: dependency_missing_penalty
-    :description: '如果 skill 的 dependencies 不存在或無法載入，最終分數 × 0.8。 這確保依賴不完整的 skill 不會被優先載入。
+    :description: '如果 route 的 dependencies 不存在或無法載入，最終分數 × 0.8。 這確保依賴不完整的 route 不會被優先載入。
 
 '
-    :condition: dependency_check_failed(skill)
+    :condition: dependency_check_failed(route)
     :multiplier: 0.8
 :execution:
   :steps:
@@ -64,14 +64,14 @@
       - extracted keywords
       :domain: identified domain
     :estimated_tokens: 200
-  - :id: score-all-skills
+  - :id: score-all-routes
     :action: compute
     :input:
     - routing-registry.yaml
     - parsed_intent
     :output:
-      :scored_skills:
-      - :skill_id: skill-id
+      :scored_routes:
+      - :route_id: route-id
         :trigger_match_score: 0.0-1.0
         :domain_match_score: 0.0-1.0
         :weight_score: 0.0-1.0
@@ -81,23 +81,23 @@
         - dependency_missing
         :final_score: 0.0-1.0
     :estimated_tokens: 200
-  - :id: select-skills
+  - :id: select-routes
     :action: filter
-    :input: scored_skills
+    :input: scored_routes
     :condition: final_score >= 0.5
     :output:
-      :selected_skills:
-      - :skill_id: skill-id
+      :selected_routes:
+      - :route_id: route-id
         :final_score: 0.0-1.0
-        :summary_path: knowledge/summaries/{skill-id}.md
+        :summary_path: knowledge/summaries/{route-id}.md
     :estimated_tokens: 100
   - :id: skip-irrelevant
     :action: skip
-    :input: scored_skills
+    :input: scored_routes
     :condition: final_score < 0.5
     :output:
-      :skipped_skills:
-      - :skill_id: skill-id
+      :skipped_routes:
+      - :route_id: route-id
         :final_score: 0.0-1.0
         :reason: below_threshold
     :estimated_tokens: 50
@@ -112,7 +112,7 @@
     - analysis
     :domain: mobile-security
   :results:
-  - :skill: apk-analysis
+  - :route: route.workflow.apk-analysis
     :trigger_match: 0.8
     :domain_match: 1.0
     :weight: 0.9
@@ -129,14 +129,14 @@
     - review
     :domain: mobile-development
   :results:
-  - :skill: apk-analysis
+  - :route: route.workflow.apk-analysis
     :trigger_match: 0.0
     :domain_match: 0.0
     :weight: 0.9
     :raw_score: 0.0 × 0.5 + 0.0 × 0.3 + 0.9 × 0.2 = 0.18
     :penalties: []
     :final_score: 0.18
-- :scenario: Conflicting skills scenario
+- :scenario: Conflicting routes scenario
   :user_intent: 分析這個 APK 的架構，同時給開發建議
   :parsed:
     :keywords:
@@ -146,7 +146,7 @@
     - analysis
     :domain: mobile-security
   :results:
-  - :skill: apk-analysis
+  - :route: route.workflow.apk-analysis
     :trigger_match: 0.6
     :domain_match: 1.0
     :weight: 0.9
@@ -155,15 +155,15 @@
     :final_score: 0.78
 :rules:
 - :id: threshold-gate
-  :description: 'Final score < 0.5 的 skill 必須被跳過，不可載入其 summary 或 source。 即使 Agent 認為該 skill 可能相關，也必須遵守 threshold。
+  :description: 'Final score < 0.5 的 route 必須被跳過，不可載入其 summary 或 source。 即使 Agent 認為該 route 可能相關，也必須遵守 threshold。
 
 '
   :severity: error
-  :rationale: 'Threshold 0.5 確保只有「明顯相關」的 skill 被載入， 避免「可能相關」的 skill 浪費 token。
+  :rationale: 'Threshold 0.5 確保只有「明顯相關」的 route 被載入， 避免「可能相關」的 route 浪費 token。
 
 '
 - :id: conflict-penalty-mandatory
-  :description: '如果 skill 與已選 skill 有 conflicts，conflict_penalty（×0.5） 必須被應用。不可因 Agent 判斷而跳過 penalty。
+  :description: '如果 route 與已選 route 有 conflicts，conflict_penalty（×0.5） 必須被應用。不可因 Agent 判斷而跳過 penalty。
 
 '
   :severity: error
@@ -171,7 +171,7 @@
 
 '
 - :id: score-transparency
-  :description: 'Agent 在決定載入或跳過 skill 時，必須記錄每個子分數與最終分數。 這使得 scoring 決策可追溯、可調試。
+  :description: 'Agent 在決定載入或跳過 route 時，必須記錄每個子分數與最終分數。 這使得 scoring 決策可追溯、可調試。
 
 '
   :severity: warning
@@ -179,10 +179,10 @@
 
 '
 - :id: no-manual-override
-  :description: 'Agent 不可手動覆蓋 relevance score 或強制載入 score < 0.5 的 skill。 如果 Agent 認為某個 skill 應該被載入但 score < 0.5， 應記錄 feedback 供後續調整 weight 或 triggers。
+  :description: 'Agent 不可手動覆蓋 relevance score 或強制載入 score < 0.5 的 route。 如果 Agent 認為某個 route 應該被載入但 score < 0.5， 應記錄 feedback 供後續調整 weight 或 triggers。
 
 '
   :severity: error
-  :rationale: '手動覆蓋會破壞 relevance engine 的可靠性， 導致 token 浪費在不相關的 skill 上。
+  :rationale: '手動覆蓋會破壞 relevance engine 的可靠性， 導致 token 浪費在不相關的 route 上。
 
 '

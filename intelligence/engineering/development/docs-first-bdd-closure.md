@@ -1,7 +1,7 @@
 # Docs-First BDD Closure Heuristic（文件優先 BDD 閉環經驗法則）
 
 **Status**: `candidate-intelligence`
-**Source**: [`workflow/software-delivery/execution-flow.md`](../../workflow/software-delivery/execution-flow.md), [`skills/app-development-guidance/WORKFLOW.md`](../../skills/app-development-guidance/WORKFLOW.md)（已刪除）
+**Source**: [`workflow/software-delivery/execution-flow.md`](../../../workflow/software-delivery/execution-flow.md), `skills/app-development-guidance/WORKFLOW.md`（已刪除）
 
 ## 原則
 

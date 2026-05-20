@@ -9,7 +9,7 @@
 | Gate | 必要檢查 | 適用時機 |
 | --- | --- | --- |
 | Source boundary | 確認編輯的是 canonical repository paths，不是 tool mirrors 或 runtime copies。 | 每次 Ai-skill writeback。 |
-| Old entrypoint | 確認舊 `skills/`、`enforcement/`、`ai-tools/` 或 `scripts/` entrypoints 仍可到達。 | Candidate maps、atom promotions、migrations。 |
+| Retired entrypoint | 確認退役入口已標明替代 source，且 active routing 指向 `workflow/`、`analysis/`、`intelligence/`、`enforcement/`、`ai-tools/` 或 `scripts/` 的現行入口。 | Candidate maps、atom promotions、migrations。 |
 | Linked updates | 依 [`linked-update-governance.md`](../ai-runtime-governance/linked-update-governance.md) 檢查受影響 README、roadmap、index、metadata、generated surface 與 source entry files。 | 任何新 layer path 或 routing change。 |
 | Metadata | 引入或 promotion Knowledge Atom 時，確認 `metadata/schema.md` 欄位已存在。 | Candidate atom、validated atom、promoted atom。 |
 | Navigation | 應可發現新路徑時，確認 `knowledge/indexes/README.md` 可 route 到該路徑。 | Routing surfaces 與 promoted reference paths。 |
@@ -21,7 +21,7 @@
 | Runtime refresh orchestration | 執行 `ruby scripts/refresh-knowledge-runtime.rb` 一鍵重建 reports / SQLite index 並跑 validators。 | 多個 generated runtime surfaces 可能同時 stale 時。 |
 | Knowledge runtime helper | 執行 `ruby scripts/validate-knowledge-runtime.rb` 檢查 generated surfaces。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
 | Link check | 解析 touched docs 的 Markdown links。 | Documentation changes。 |
-| Neutral language | 依 [`enforcement/neutral-language.md`](../../enforcement/neutral-language.md) 檢查可重用文件：繁體中文正文、英文限路徑／指令／符號與必要專有名詞、標題與摘要中性化。 | 變更 `enforcement/`、`skills/**/README.md`、根 `README.md`、根 `CONTRIBUTING.md`、`governance/` 下可重用說明、模板或 onboarding 類 Markdown。 |
+| Neutral language | 依 [`enforcement/neutral-language.md`](../../enforcement/neutral-language.md) 檢查可重用文件：繁體中文正文、英文限路徑／指令／符號與必要專有名詞、標題與摘要中性化。 | 變更 `enforcement/`、`workflow/**/README.md`、`analysis/**/README.md`、`intelligence/**/README.md`、根 `README.md`、根 `CONTRIBUTING.md`、`governance/` 下可重用說明、模板或 onboarding 類 Markdown。 |
 | Lints | 執行 touched files 可用的 lints。 | Documentation 或 code changes。 |
 | Diff review | 檢查 secrets、private hostnames、raw evidence、local absolute paths 與 unrelated changes。 | Commit 前。 |
 | Close-loop dry run | 執行 `./scripts/ai-skill-close-loop.sh` 確認 dirty path grouping。 | Commit 前。 |

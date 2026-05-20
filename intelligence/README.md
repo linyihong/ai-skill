@@ -9,7 +9,7 @@
 | 層 | 偏 | 範例 |
 |---|----|------|
 | `knowledge/` | **事實** | Redis supports pub/sub |
-| `skills/` | **執行流程** | How to debug Redis latency |
+| `workflow/` | **執行流程** | How to debug Redis latency |
 | `intelligence/` | **判斷力與經驗法則** | If Redis latency spikes suddenly, check connection lifecycle before scaling |
 
 ## 核心內容
@@ -81,7 +81,7 @@ intelligence/
 
 ## 與既有層的關係
 
-- `skills/` 已逐步遷移至新分層。舊 `skills/app-development-guidance/` 已刪除。
+- 舊 `skills/` scaffold 已退役；執行流程、分析方法與判斷智慧分別由 `workflow/`、`analysis/`、`intelligence/` 承接。
 - `workflow/` 應 reference 本層，而不是內嵌大量知識。
 - `feedback/` 可把新 lesson promotion 到本層。
 - `governance/` 定義本層知識的 lifecycle、清理與 validation。

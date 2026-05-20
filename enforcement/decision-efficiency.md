@@ -31,7 +31,7 @@
 
 1. **啟動核心：**讀取共用規則的啟動核心集合。
 2. **任務框架：**讀取使用者要求、進行中的 `.agent-goals/` 條目，以及直接相關的開啟檔案。
-3. **Skill 入口：**讀取符合任務的入口（`skills/<name>/SKILL.md` 或 `workflow/<domain>/execution-flow.md`）與其路由指引。
+3. **Route 入口：**讀取符合任務的入口（通常是 `workflow/<domain>/README.md` → `workflow/<domain>/execution-flow.md`，必要時搭配 `analysis/` 或 `intelligence/` source）與其路由指引。
 4. **路線專屬文件：**只讀目前路線需要的 workflow／analysis／intelligence 分類。
 5. **深層參考：**只有證據顯示必要時，才讀範例、技巧、feedback lessons 或原始檔案。
 

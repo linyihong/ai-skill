@@ -19,13 +19,14 @@ failure_source:
     AI 完成了 skills/ 到新分層（workflow/、analysis/、intelligence/）的內容提取，
     但沒有同步檢查 enforcement/ 中的路徑參考。結果是 document-sizing.md、
     linked-updates.md、feedback-lessons.md、enforcement/README.md、
-    skills/ADDING_SKILLS.md、content-layering.md、tool-neutral-documentation.md、
+    workflow/README.md、analysis/README.md、intelligence/README.md、
+    content-layering.md、tool-neutral-documentation.md、
     decision-efficiency.md、cross-skill-references.md 仍指向舊 skills/<skill-name>/ 結構
 
 given:
   task: architecture_restructure
   artifacts:
-    - skills/<skill-name>/techniques/<category>/<technique>.md
+    - retired skills/<skill-name>/techniques/<category>/<technique>.md
     - workflow/<domain>/execution-flow.md
     - analysis/<domain>/workflows/<flow>.md
     - intelligence/<domain>/heuristics/<heuristic>.md

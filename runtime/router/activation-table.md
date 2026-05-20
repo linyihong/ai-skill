@@ -43,7 +43,7 @@
 | 7 | **路線選擇討論** | user_signal: 選擇, 路線, priority, 比較 | decision-efficiency | 使用者詢問「先做哪個」時啟動 |
 | 8 | **撰寫文件** | task_intent: write-documentation, create-template, update-readme | tool-neutral-documentation, neutral-language | 寫文件時同時需要工具中立 + 用語規範 |
 | 9 | **修改 enforcement 規則** | file_change: `enforcement/**` | tool-neutral-documentation, neutral-language | 改 enforcement 規則時檢查工具中立與用語 |
-| 10 | **修改 skill 文件** | file_change: `skills/**/SKILL.md` | tool-neutral-documentation | skill 定義文件需要工具中立 |
+| 10 | **修改 workflow 文件** | file_change: `workflow/**/execution-flow.md` | tool-neutral-documentation | workflow 定義文件需要工具中立 |
 | 11 | **更新/審閱文件** | task_intent: update-document, complete-document, review-document | document-todo-list | 文件操作時檢查 TODO 完整性 |
 | 12 | **文件含 TODO** | file_has_todo: `**/*.md` | document-todo-list | 偵測到文件內有 TODO 標記時啟動 |
 | 13 | **重要變更** | task_intent: critical-change, destructive-action, production-deploy, security-review | goal-action-validation | 高風險操作需要目標-執行-驗證流程 |
@@ -52,8 +52,8 @@
 | 16 | **修改 feedback_history** | file_change: `**/feedback_history/**` | sanitization, feedback-lessons | 修改 feedback 目錄時啟動去敏與條目規則 |
 | 17 | **安全分析** | task_intent: security-analysis, penetration-test, vulnerability-scan | authorization-scope | 安全相關任務需要授權範圍檢查 |
 | 18 | **授權邊界討論** | user_signal: 授權, authorization, scope, 邊界 | authorization-scope | 使用者提及授權/範圍時啟動 |
-| 19 | **跨 skill 整合** | task_intent: cross-skill, multi-skill, skill-integration | cross-skill-references | 跨 skill 工作時需要引用規範 |
-| 20 | **多 skill 文件修改** | file_change: `skills/**` count>=2 | cross-skill-references | 同時改多個 skill 時檢查跨引用 |
+| 19 | **跨 workflow 整合** | task_intent: cross-workflow, multi-workflow, workflow-integration | cross-skill-references | 跨 workflow 工作時需要引用規範 |
+| 20 | **多 workflow 文件修改** | file_change: `workflow/**` count>=2 | cross-skill-references | 同時改多個 workflow 時檢查跨引用 |
 | 21 | **Promote lesson** | task_intent: promote-lesson, review-feedback | feedback-lessons | 升級或審閱 feedback 條目時啟動 |
 | 22 | **內容重組** | task_intent: content-organization | content-layering | 內容組織重構時需要分層規則 |
 | 23 | **多 README 修改** | file_change: `**/README.md` count>=3 | content-layering | 同時改 3+ 個 README 時檢查內容分層 |

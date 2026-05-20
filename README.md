@@ -24,7 +24,6 @@ AI 認知執行系統 — 讓 agent 以 runtime state machine 驅動知識路由
 | 🎯 **Core Bootstrap** | [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | 最小必讀啟動集合（3 rules, ~800 tokens） |
 | 📐 **Architecture** | [`architecture/`](architecture/) | Roadmap、升級規劃、成本優化 |
 | ⚙️ **Shared Rules** | [`enforcement/`](enforcement/README.md) | 共用作業規則（含 lazy-load activation model） |
-| 🧠 **Skills** | [`skills/`](skills/README.md) | 可重用 agent 能力模組 |
 | 🔧 **Tool Adapters** | [`ai-tools/`](ai-tools/README.md) | Claude Code、Cursor 等工具配置 |
 | 🔄 **Runtime** | [`runtime/`](runtime/README.md) | Context routing、activation、TTL |
 | 🧭 **Knowledge** | [`knowledge/`](knowledge/README.md) | Indexes、summaries、graphs、runtime surfaces |

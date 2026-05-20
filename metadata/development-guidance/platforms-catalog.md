@@ -1,6 +1,6 @@
 # Platform Guidance Catalog
 
-本文件列出各平台/應用類型的開發指引分類與索引。原承接 [`skills/app-development-guidance/platforms/`](../../skills/app-development-guidance/platforms/) 的內容（已刪除），提取為 tool-neutral 的分析參考。
+本文件列出各平台/應用類型的開發指引分類與索引。原承接 ``skills/app-development-guidance/platforms/`` 的內容（已刪除），提取為 tool-neutral 的分析參考。
 
 > **遷移狀態**：`skills/app-development-guidance/platforms/` 已刪除。此文件為 canonical source，新內容請直接寫入此文件。
 
@@ -8,10 +8,10 @@
 
 | 平台 | 範圍 | 原始來源 |
 |------|------|----------|
-| **Mobile** | Android, iOS, Flutter, React Native, and mobile release concerns | [`platforms/mobile/`](../../skills/app-development-guidance/platforms/mobile/)（已刪除） |
-| **Web** | Browser/frontend app hardening | [`platforms/web/`](../../skills/app-development-guidance/platforms/web/)（已刪除） |
-| **Backend** | API/server controls that apps depend on | [`platforms/backend/`](../../skills/app-development-guidance/platforms/backend/)（已刪除） |
-| **Embedded** | Firmware, sensors, hardware context, protocols, board bring-up, and hardware-in-loop validation | [`platforms/embedded/`](../../skills/app-development-guidance/platforms/embedded/)（已刪除） |
+| **Mobile** | Android, iOS, Flutter, React Native, and mobile release concerns | ``platforms/mobile/``（已刪除） |
+| **Web** | Browser/frontend app hardening | ``platforms/web/``（已刪除） |
+| **Backend** | API/server controls that apps depend on | ``platforms/backend/``（已刪除） |
+| **Embedded** | Firmware, sensors, hardware context, protocols, board bring-up, and hardware-in-loop validation | ``platforms/embedded/``（已刪除） |
 
 ## 使用原則
 

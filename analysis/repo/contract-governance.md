@@ -1,6 +1,6 @@
 # Contract Governance Gate
 
-從 [`skills/app-development-guidance/process/README.md`](../../skills/app-development-guidance/process/README.md)（已刪除）提取。當分析一個 repository 並需要定義文件間的優先順序與衝突處理規則時，使用本方法。
+從 ``skills/app-development-guidance/process/README.md``（已刪除）提取。當分析一個 repository 並需要定義文件間的優先順序與衝突處理規則時，使用本方法。
 
 ## 適用時機
 

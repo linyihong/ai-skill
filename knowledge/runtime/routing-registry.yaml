@@ -1,12 +1,12 @@
 registry_version: knowledge-routing/v2
 status: candidate
 owner_layer: knowledge/runtime
-source_of_truth_policy: old-entrypoint-active
+source_of_truth_policy: promoted-layer-entrypoints
 description: >
   第二版 machine-readable routing registry。新增 context_cost metadata、
-  load_strategy、ttl 與 skills-index 路由。此檔只描述 routing，不取代
-  enforcement、skills 或其他 canonical source。Agent 仍需依 required_dependencies
-  讀取必要入口與驗證規則。
+  load_strategy、ttl 與 workflow/index 路由。此檔只描述 routing，不取代
+  enforcement、workflow、analysis、intelligence 或其他 canonical source。
+  舊 skills scaffold 已退役；Agent 仍需依 required_dependencies 讀取必要入口與驗證規則。
 refresh_policy: knowledge/runtime/refresh-policy.yaml
 
 records:
