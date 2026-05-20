@@ -14,12 +14,15 @@ Hybrid App 的 H5 WebView 可能在 runtime 內持有額外 gateway token、orig
 
 較安全的做法是建立一個 disabled-by-default 的外部 replay gate：只有在本機或 CI secret 明確提供授權材料、H5 request codec material、identity material 與 endpoint override 時才送出 request。測試只輸出去敏 summary，例如 host/path、HTTP status、business code、是否有 encrypted data；不保存 token、uid、完整 URL、ciphertext、raw response、key / IV 或特定使用者資料。
 
+若列表 / 業務 endpoint 只用 App token 仍回 business boundary failure，下一步不要直接放棄；先檢查 H5 是否有 bootstrap / check endpoint 可用 App token 通過，且 response 內含 H5-scoped token、source list 或 gateway material。常見模式是：App session token 只負責 bootstrap，真正業務列表要改用 bootstrap response 解出的 H5 token。
+
 #### Trigger
 
 - H5 response schema 已在 WebView runtime、MITM、DevTools 或 hook 中確認。
 - 外部 replay 與 runtime replay 結果不一致，或 business code 顯示 gateway / session 邊界仍未通過。
 - 團隊想把 H5 endpoint 包成 SDK public API，但尚未證明 SDK 外部 client 能穩定通過。
 - H5 request 需要 bundle-derived codec、runtime token、origin / referer 或 special user-agent。
+- H5 有 health-check / bootstrap endpoint，其 response 可能包含後續 business endpoint 需要的 H5-scoped token。
 
 #### Evidence
 
@@ -32,8 +35,9 @@ Hybrid App 的 H5 WebView 可能在 runtime 內持有額外 gateway token、orig
 Runtime H5 API 的 SDK readiness 應分成三層：
 
 1. **Runtime schema evidence**：WebView runtime 內成功並解出 payload shape。
-2. **External replay gate**：SDK 外部 client 使用可重建的 request flow 得到 success business code。
-3. **Public client contract**：只有 gate 通過後，才補 BDD / executable feature / production client。
+2. **Bootstrap token check**：若直接 business endpoint 失敗，先用 App token 打 H5 bootstrap / check endpoint，解出 H5-scoped token 或 gateway material。
+3. **External replay gate**：SDK 外部 client 使用可重建的 request flow 得到 success business code。
+4. **Public client contract**：只有 gate 通過後，才補 BDD / executable feature / production client。
 
 如果第 2 層仍停在 business boundary failure，完成狀態應是「H5 URL / schema documented」，不是「SDK list client implemented」。
 
@@ -45,6 +49,7 @@ Runtime H5 API 的 SDK readiness 應分成三層：
 - 先加 disabled-by-default external replay gate。
 - Gate input 全部走 env / secret store，不落 tracked fixture。
 - Gate output 只寫 sanitized summary，不寫 raw URL、token、uid、ciphertext、key / IV。
+- 若 App token 直打 business endpoint 失敗，嘗試 `bootstrap/check -> H5 token -> business endpoint` 的兩段式 gate，並只記 token source / status，不保存 token。
 - Public client 前必須有 gate pass + docs-first BDD / executable feature。
 
 #### Goal / Action / Validation
