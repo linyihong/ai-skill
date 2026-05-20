@@ -1,6 +1,6 @@
 # Agent-Friendly Documentation Workflow
 
-`workflow/documentation/` 負責「在 **業務專案或其他 repository** 撰寫、整理、分類文件時，讓內容對 **人類與 AI agent** 都好讀、好路由、且 **降低無效 token**」。本層是**可執行的步驟與分類表**；**拆檔與篇幅閾值**見 [`governance/document-sizing.md`](../../governance/document-sizing.md)。**語言與是否工具中立**不由本 workflow 預設，由業務專案自訂（見 [不取代什麼](#不取代什麼)）。
+`workflow/documentation/` 負責「在 **業務專案或其他 repository** 撰寫、整理、分類文件時，讓內容對 **人類與 AI agent** 都好讀、好路由、且 **降低無效 token**」。本層只保存**可執行的步驟與分類表**；背後的 index-first 判斷智慧見 [`index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md)，AI runtime 治理 gate 見 [`documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md)，拆檔與篇幅閾值見 [`governance/document-sizing.md`](../../governance/document-sizing.md)。**語言與是否工具中立**不由本 workflow 預設，由業務專案自訂（見 [不取代什麼](#不取代什麼)）。
 
 ## 何時讀這裡
 
@@ -17,19 +17,23 @@
 - **內容應落在哪一層（durable vs `.agent-goals/`）**：見 [`../../enforcement/content-layering.md`](../../enforcement/content-layering.md)。
 - **先界定未知、再載入 context**：見 [`../../enforcement/decision-efficiency.md`](../../enforcement/decision-efficiency.md)。
 
-## 核心原則（精簡版）
+## 執行記憶
 
-1. **README 當路由器**：目錄下的 `README.md` 只放「何時讀哪個子檔」與短摘要，不放長篇教學。
-2. **一檔一事**：同一檔不要混「規範 + 長範例 + checklist + 工具操作」；混了就拆（見 document-sizing）。
-3. **先索引再全文**：Agent 先讀索引表或 summary 區塊，證據需要時才打開子檔或專案內 deep link。
-4. **可去敏與證據邊界**：敏感或客戶專屬證據留在專案約定的證據區；是否抽象成可攜敘述由專案 policy 決定（本 workflow 不強制工具中立）。
-5. **分類可機讀**：檔名路徑或 front-matter（若專案慣例有）能表達「類型 + 生命週期」，方便之後自動化或手動路由。
+詳細治理 gate 以 [`documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md) 為準；判斷智慧以 [`index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md) 為準。本 workflow 只保留執行時需要快速檢查的版本：
+
+1. 先標讀者與生命週期。
+2. 選 `kind` / `audience` / `stability` / `routing`。
+3. 父層 `README.md` 保持 router；細節放 leaf。
+4. 重複規則只留一份 source-of-truth，其它位置連結。
+5. 變更後更新父層 README、routing 或索引。
 
 ## 已提取內容
 
 | 檔案 | 用途 |
 | --- | --- |
 | [`execution-flow.md`](execution-flow.md) | 從分類、選位、檔案形狀到驗證與連動更新的執行步驟與分類維度表。 |
+| [`../../intelligence/engineering/agent-architecture/index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md) | 為什麼 agent-facing 文件要 index-first 的判斷智慧。 |
+| [`../../governance/ai-runtime-governance/documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md) | 文件 context、分類、停止條件與單一真相的 AI runtime governance。 |
 
 ## 與既有層的關係
 

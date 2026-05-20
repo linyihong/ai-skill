@@ -854,19 +854,24 @@ records:
         - "**/docs/**/index.md"
     primary_source: workflow/documentation/README.md
     required_dependencies:
+      - governance/ai-runtime-governance/documentation-context-governance.md
+      - intelligence/engineering/agent-architecture/index-first-documentation.md
       - enforcement/content-layering.md
     candidate_sources:
       - workflow/documentation/execution-flow.md
       - governance/document-sizing.md
+      - governance/ai-runtime-governance/README.md
       - enforcement/decision-efficiency.md
       - enforcement/neutral-language.md
       - knowledge/indexes/README.md
     source_of_truth_gate: new-layer-promoted
     ranking_reason: >
-      將「如何寫文件」收斂為可執行 workflow，並連回既有 enforcement 與 governance；
-      agent 先讀 README 再視任務展開 execution-flow 與 document-sizing。
+      將「如何寫文件」收斂為可執行 workflow，並連回 index-first intelligence、
+      documentation context governance、既有 enforcement 與 document-sizing；
+      agent 先讀 README，再依任務展開 governance gate、execution-flow 與拆分規則。
     validation_signal: >
       新文件或目錄具 index-first 導航、分類維度（kind/audience/stability）已標註；
+      README-as-router、停止條件與單一真相已符合 documentation context governance；
       長文已按 document-sizing 拆分；語言與工具敘述依專案自訂 policy（本 route 不預設 tool-neutral）。
     metadata:
       priority: P2

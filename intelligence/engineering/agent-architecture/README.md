@@ -21,6 +21,7 @@ AI 不是黑盒子 — 它的行為模式可以被觀察、分類、預測、改
 | [`linked-updates-completeness.md`](linked-updates-completeness.md) | When modifying one file, agent must identify and update all files that reference or depend on it. | `candidate-intelligence` | Phase 33-35 實際運作經驗 |
 | [`decomposition-strategy-selection.md`](decomposition-strategy-selection.md) | Not all content benefits from the same extraction strategy; choose based on content structure. | `candidate-intelligence` | Phase 26-33 實際運作經驗 |
 | [`stateless-validation-necessity.md`](stateless-validation-necessity.md) | AI decision path validation must be stateless — it cannot depend on conversation memory. | `candidate-intelligence` | 本系統實際運作經驗 |
+| [`index-first-documentation.md`](index-first-documentation.md) | Documentation that agents repeatedly read should expose routeable indexes before detailed prose. | `candidate-intelligence` | documentation workflow extraction |
 
 ## 與其他層的關係
 

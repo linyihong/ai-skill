@@ -2,6 +2,11 @@
 
 在 **業務專案** 或其他 repo 寫文件時，依序執行下列步驟。目標：**人類可維護**、**agent 可路由且少讀無關字**、**分類穩定**。
 
+上層依據：
+
+- 判斷智慧：[`index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md)
+- 治理 gate：[`documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md)
+
 ## 0. 釐清讀者與生命週期
 
 用一句話寫在 PR 或 doc 頂部註記（可刪）：
@@ -50,10 +55,13 @@
 4. **單一真相**：同一規則不在兩處維護兩份全文；第二處只留一行連結與差異說明。
 5. **拆分閾值**：見 [`../../governance/document-sizing.md`](../../governance/document-sizing.md)（行數與主題單一性）。
 
+若上述規則開始被其它 workflow 重複引用，不在本檔擴寫治理原理；回到 [`documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md) 補充 gate，workflow 只保留操作順序。
+
 ## 4. 驗證與連動
 
 - **Link**：從本檔或 `README` 出去的相對連結可點、無斷鏈。
 - **路由**：父層 README 的表格含新子檔；`skills-index` 或專案內索引若有對應列，一併更新。
+- **分層**：若新增的是 why / 治理 gate，而不是操作步驟，回到 [`index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md) 或 [`documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md)，不要在 workflow 重複全文。
 - **Ai-skill 本庫**：若同步規則或模板，依 [`../../enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md) 與 [`../../enforcement/linked-updates.md`](../../enforcement/linked-updates.md) 走完整閉環。
 
 ## 5. 完成訊號（給 agent 自查）
@@ -62,5 +70,6 @@
 - [ ] 有 `index` 或導航區；長文已拆 `leaf`。
 - [ ] 無重複規範全文；斷鏈已修。
 - [ ] 本輪暫存與長期 durable 分界清楚。
+- [ ] Workflow 只保留操作步驟；可重用 why / gate 已連回 intelligence 或 governance。
 
 ← [回到本 workflow 索引](README.md) · [workflow 總索引](../README.md)

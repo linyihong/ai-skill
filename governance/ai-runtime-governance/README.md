@@ -32,6 +32,7 @@ intelligence source
 | 文件 | Source philosophy | 用途 |
 | --- | --- | --- |
 | [`five-step-ai-governance.md`](five-step-ai-governance.md) | [`musk-five-step-algorithm.md`](../../intelligence/engineering/philosophy/musk-five-step-algorithm.md) | 新增 skill / memory / workflow / rule / automation 前的 necessity、deletion、simplification、acceleration、automation-last gate。 |
+| [`documentation-context-governance.md`](documentation-context-governance.md) | [`index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md) | 將 README-as-router、分類欄位、停止條件、單一真相與 leaf expansion 轉成文件 context governance gate。 |
 
 ## 放什麼
 
