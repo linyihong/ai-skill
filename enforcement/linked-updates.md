@@ -50,6 +50,7 @@
 | 新增或大幅修改任何 `.md` 文件 | 依 [`governance/document-sizing.md`](../governance/document-sizing.md) 的檢查點檢查是否需要拆分：檔案是否超過 150 行？是否混合多主題？是否需要建立父層 README？ |
 | 修改 `knowledge/` 或 `validation/` 下的檔案 | 執行 `ruby scripts/refresh-knowledge-runtime.rb` 確認所有 validator 通過。 |
 | 修改 `runtime/` 下的 YAML 來源或 compiler 規則 | Compiler 會自動重新編譯 `runtime.db`。**`runtime.db` 必須包含在 commit 中**（pre-commit hook 會自動 `git add`，手動 commit 時需自行確認）。驗證：`git diff --cached --name-only | grep runtime.db`。 |
+| **Plan 執行前架構相容性檢查**（開始執行 `plans/active/*.md` 的 implementation phase） | 依 [`plans/README.md`](../plans/README.md#plan-執行前架構相容性檢查architecture-compatibility-preflight) 確認 candidate files、source-of-truth、layer responsibility、compiler / generated surface 與 current architecture 一致；若衝突，先更新 plan 或請使用者確認，不得直接實作。 |
 | **Plan 完成閉環**（plan 所有項目標記為完成） | 依 [`plans/README.md`](../plans/README.md#plan-完成閉環plan-completion-closure) 執行 7 項檢查清單：確認所有項目完成、執行 validator、檢查連動更新、更新 `plans/README.md` 狀態、搬移至 `archived/`（或標註例外原因）、commit & push、最終確認。 |
 | **架構重構**（目錄重組、分層新增、路徑變更、命名變更） | 依 [`governance/lifecycle/intelligence-extraction-pipeline.md`](../governance/lifecycle/intelligence-extraction-pipeline.md) **Step 6a** 建立 validation scenario（至少一個，測試 AI 是否正確使用新路徑）。依 **Step 7a** 檢查以下 enforcement 檔案：`governance/document-sizing.md`（範例路徑）、`linked-updates.md`（本檔表格）、`feedback-lessons.md`（Promotion Target 模板）、`enforcement/README.md`（lazy-load 表格）、`skills/ADDING_SKILLS.md`（目錄結構建議）、`content-layering.md`（路徑描述）、`tool-neutral-documentation.md`（路徑描述）、`decision-efficiency.md`（Context Loading 步驟）、`cross-skill-references.md`（引用格式）。同時檢查 `failure-patterns/README.md` 索引與 `failure-learning-system.md` 的 Promotion Decision 表格。 |
 
@@ -66,6 +67,7 @@
 | 使用者指出 agent 反覆出現同類失效模式，但只修當下文件 | 依 [`failure-learning-system.md`](failure-learning-system.md) 分類失效模式、建立或更新 `enforcement/failure-patterns/`，並補 prevention gate 與 validation。 |
 | 更新完 skill / enforcement rules 後沒有提醒 repo 仍有 pending commit / ahead / behind 狀態 | 最終回覆必須列出 `git status --short --branch` 的關鍵狀態、哪些是本輪提交、哪些是既有 dirty changes，以及需要 push / merge / 清理的下一步。 |
 | 有多個 dirty owner group 卻混成單一 commit | 沒有 active lock 時使用 `scripts/ai-skill-close-loop.sh --commit` 或手動依 enforcement、scripts、各 skill owner 分開 commit；有 active lock 時停止並提醒，不得更新。 |
+| 開始執行 plan 前未檢查 current architecture，導致 candidate file、source-of-truth 或 generated surface 不生效 | 立即停止 implementation，依 [`plans/README.md`](../plans/README.md#plan-執行前架構相容性檢查architecture-compatibility-preflight) 補做 preflight；若已發現衝突，先修正 plan / compiler / source-of-truth 決策，再恢復執行。 |
 | Plan 所有 Phase 完成後未執行 Plan Completion Closure（未更新狀態表、未搬移至 archived/、未更新 plans/README.md） | 立即執行 [`plans/README.md`](../plans/README.md) 的閉環檢查清單 7 步驟；若已 commit，需另開 commit 補閉環操作，不得 amend 既有 commit。 |
 
 ## 語氣規則

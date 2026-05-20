@@ -20,6 +20,7 @@
 *GATE: Must pass before proceeding to Tasks phase.*
 
 - [ ] Architecture consistency with existing system
+- [ ] Architecture Compatibility Preflight completed per `plans/README.md`
 - [ ] Dependency license compatibility
 - [ ] Security & compliance requirements
 - [ ] Performance targets achievable with chosen stack

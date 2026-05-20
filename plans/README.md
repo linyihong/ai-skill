@@ -15,6 +15,40 @@
 4. **每個計畫必須在檔頭標註狀態**：`draft` / `in-progress` / `completed`
 5. **計畫完成後，若從中提煉出可重用的系統經驗，應建立對應的 intelligence atom**
 
+## Plan 執行前架構相容性檢查（Architecture Compatibility Preflight）
+
+開始執行任何 `active/` plan 前，agent **必須**先確認 plan 與現行架構相容。此檢查是 blocking gate；未完成前不得進入 implementation phase。
+
+### 檢查清單
+
+| # | 檢查項目 | 說明 |
+|---|---------|------|
+| 1 | **Candidate files 存在性** | plan 列出的 source、generated surface、runtime table、workflow / metadata path 是否仍存在；缺檔需標 `not applicable` 或 `source missing` |
+| 2 | **Source-of-truth 一致性** | 確認應修改的是 canonical source、YAML source、embedded source、compiler source 或 generated DB；不得只改不生效的 mirror / generated output |
+| 3 | **Layer responsibility** | plan 是否把 policy、runtime state、workflow、metadata、analysis、intelligence 放在正確 layer |
+| 4 | **Compiler / generated surface** | 涉及 `runtime/`、`knowledge/`、`metadata/`、`validation/` 時，確認 compiler / validator 會讀到該 source，並列出需要重新生成的 artifact |
+| 5 | **Linked updates** | 依 [`enforcement/linked-updates.md`](../enforcement/linked-updates.md) 確認相關 README、metadata、activation rules、templates、runtime DB 或 validators 是否要同步 |
+| 6 | **Execution decision** | 若發現架構衝突，先暫停執行並更新 plan / 詢問使用者；不得邊實作邊假設 plan 仍正確 |
+
+### 最低記錄格式
+
+每次 preflight 至少要在工作筆記、plan Phase 0、或回覆中留下：
+
+| 欄位 | 必填內容 |
+| --- | --- |
+| Trigger | 要開始執行哪個 plan / phase |
+| Checked sources | 讀過哪些 current architecture sources |
+| Conflicts | 無衝突，或列出 candidate path / source-of-truth / compiler / layer 衝突 |
+| Decision | proceed / revise plan first / ask user / blocked |
+| Validation | 用什麼方式確認（diff、runtime query、validator、link check、readback） |
+
+### 強制執行規則
+
+1. **任何 active plan 的 Phase 1 或 implementation phase 開始前，都必須先完成 Architecture Compatibility Preflight。**
+2. 若 plan 已有 Phase 0，Phase 0 必須包含此檢查；若沒有，agent 必須先補做 preflight，再決定是否需要更新 plan。
+3. 若 preflight 發現 plan 與 current architecture 衝突，必須先修正 plan 或取得使用者確認，不得直接繼續執行。
+4. 涉及 `runtime.db`、generated reports、SQLite index 或 compiler outputs 時，preflight 必須確認「source 變更是否真的進入 generated surface」。
+
 ## Plan 完成閉環（Plan Completion Closure）
 
 當一個 plan 的所有項目都標記為完成（`✅`）時，agent **必須**執行以下閉環檢查：

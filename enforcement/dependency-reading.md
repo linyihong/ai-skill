@@ -24,6 +24,7 @@
 | 任一工具專用規則檔 | 對應的 enforcement rule 正文、`enforcement/README.md`、受影響工具文件，以及受影響的 skill 入口。 |
 | 任一 template | 模板目錄 `README.md`、引用該模板的 workflow/documentation/checklist、`enforcement/linked-updates.md`。 |
 | 任一 feedback lesson | 該分類 `README.md`、skill 的 `feedback_history/README.md`、`../../feedback/feedback-lessons.md`，以及 promotion target。 |
+| 開始執行任一 `plans/active/*.md` plan | `plans/README.md` 的 Architecture Compatibility Preflight、該 plan 的 Phase 0 / candidate files、相關 layer README、相關 runtime/compiler/metadata/workflow source、`enforcement/linked-updates.md`。 |
 
 ## Agent 行為
 
@@ -35,6 +36,12 @@
 6. 完成 `git commit`、`git push` 與必要的 tool sync 後，必須重新讀取本次更新過的 skill/enforcement-rule 入口文件與主要依賴文件，確認目前 agent context 已載入最新版；不可只依賴提交前讀過的內容。Reference-only 策略不需要 tool sync。
 7. 最終回覆前必須執行 `git status --short --branch`。若 `Ai-skill` repo 仍有 modified/untracked/staged changes，或 branch 仍 ahead/behind remote，不得回覆「已完成」；必須先完成驗證、sync、commit、push、讀回，或明確說明被什麼阻塞。
 8. 若使用者未明確要求 push / merge，而更新後發現 `Ai-skill` 有尚未推送、尚未合併、ahead/behind、或其他 pending commit 狀態，最終回覆必須主動提醒使用者目前狀態與下一步（例如需要 push、pull/rebase、或處理既有 dirty changes），不可讓使用者以為規則已完全進入遠端主線。
+
+### Plan Execution Preflight
+
+開始執行 `plans/active/*.md` 的任何 implementation phase 前，必須先依 [`plans/README.md`](../plans/README.md#plan-執行前架構相容性檢查architecture-compatibility-preflight) 完成 Architecture Compatibility Preflight。此檢查用來確認 candidate files、source-of-truth、compiler / generated surfaces、layer responsibility 與現行架構一致。
+
+若 preflight 發現衝突，agent 必須先暫停執行，更新 plan 或向使用者確認；不得直接套用 stale plan。若涉及 `runtime.db`、generated reports、SQLite index 或 compiler outputs，必須查詢或驗證 source 變更已進入 generated surface。
 
 ### Dependency Read Ledger
 
