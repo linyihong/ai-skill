@@ -43,7 +43,7 @@
   - feedback_lessons
   :canonical_source: enforcement/neutral-language.md
 - :id: fmt.english_retention
-  :rule: '下列內容可保留英文：檔名、路徑、命令、環境變數、程式符號、 API 欄位、固定 protocol 名稱、工具名稱，以及翻譯後會降低精準度的 專有名詞（如 "AI-native Cognitive Execution System"、"reference-first"、 "Default Bootstrap"、"rule-weight"、"source-of-truth"）。
+  :rule: '下列內容可保留英文：檔名、路徑、命令、環境變數、程式符號、 API 欄位、固定 protocol 名稱、工具名稱、固定系統名稱，以及翻譯後會降低精準度的 專有名詞（如 "reference-first"、 "Default Bootstrap"、"rule-weight"、"source-of-truth"）。
 
 '
   :applies_to:

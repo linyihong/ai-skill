@@ -70,7 +70,7 @@ Session Start
 | --- | --- |
 | [`governance/contributing.md`](governance/contributing.md) | 人類維護入口：驗證指令、PR gate、文件索引 |
 | [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | Minimal bootstrap (3 rules, ~800 tokens) |
-| [`plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md`](plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md) | ✅ 已完成：AI-native Cognitive Execution System 升級 |
+| [`plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md`](plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md) | ✅ 已完成：本系統升級 |
 | [`plans/archived/2026-05-12-1101-context-cost-optimization.md`](plans/archived/2026-05-12-1101-context-cost-optimization.md) | Token cost optimization plan |
 | [`runtime/router/activation-rules.yaml`](runtime/router/activation-rules.yaml) | Lazy-load activation rules |
 | [`runtime/context/ttl-policy.yaml`](runtime/context/ttl-policy.yaml) | Context TTL policy |

@@ -22,7 +22,7 @@
 - 避免使用「繞過、破解、盜刷、盜用、攻擊、入侵、洗錢、色情、暴力」這類詞作為文件標題、slug 或索引摘要；若必須討論，改寫成「未授權存取風險」「完整性風險」「交易濫用風險」「高風險內容類別」「授權安全測試」。
 - 不要為了降低爭議而使用模糊到不可驗證的詞。每個中性詞仍要能對應到明確 evidence、contract、BDD、test 或 blocker question。
 - 文件正文不要中英混雜成段落。除非文件本身是工具輸入範本、prompt、程式註解或外部規格引用，否則標題、摘要、說明段落與表格欄位優先使用繁體中文。
-- 下列內容可保留英文：檔名、路徑、命令、環境變數、程式符號、API 欄位、固定 protocol 名稱、工具名稱，以及翻譯後會降低精準度的專有名詞，例如 `AI-native Cognitive Execution System`、`reference-first`、`Default Bootstrap`、`rule-weight`、`source-of-truth`。
+- 下列內容可保留英文：檔名、路徑、命令、環境變數、程式符號、API 欄位、固定 protocol 名稱、工具名稱、固定系統名稱，以及翻譯後會降低精準度的專有名詞，例如 `reference-first`、`Default Bootstrap`、`rule-weight`、`source-of-truth`。
 - prompt template 可保留英文，方便直接貼給 agent；但 template 外的用途說明、前後文與驗證要求仍以繁體中文描述。
 
 ## 建議替換

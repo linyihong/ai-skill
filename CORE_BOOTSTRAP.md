@@ -1,6 +1,6 @@
 # Core Bootstrap
 
-本文件是 AI-native Cognitive Execution System 的**最小必讀啟動集合**。本系統已從 knowledge operating system 升級為以 runtime state machine、routing registry、governance translation 與 validation gates 驅動的認知執行系統。每個 session 啟動時，Agent 只需載入這 3 條核心規則，其餘規則依任務 lazy-load。
+本文件是本系統的**最小必讀啟動集合**。本系統已升級為以 runtime state machine、routing registry、governance translation 與 validation gates 驅動的認知執行系統。每個 session 啟動時，Agent 只需載入這 3 條核心規則，其餘規則依任務 lazy-load。
 
 ## 必讀規則
 

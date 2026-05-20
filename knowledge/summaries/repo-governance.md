@@ -5,7 +5,7 @@
 | Atom ID | `governance.repo-maintenance` |
 | Source path | `governance/README.md` |
 | Lifecycle | `validated` |
-| Summary | AI-native Cognitive Execution System 本身的維護、升級、遷移與治理。涵蓋 lifecycle management、validation、cleanup、splitting rules、dependency maintenance。 |
+| Summary | 本系統的維護、升級、遷移與治理。涵蓋 lifecycle management、validation、cleanup、splitting rules、dependency maintenance。 |
 | When to read | 需要維護 repo 架構、執行 migration、清理重複文件、或升級 metadata schema 時。 |
 | Do not use for | 不可取代 enforcement/ 的可執行政策。不可用於單一 skill 的日常操作。 |
 | Context cost | ~300 tokens |

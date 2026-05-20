@@ -2574,7 +2574,7 @@ module EmbeddedRuntimeData
         ],
         "exceptions": [
           "路徑、指令、環境變數、API 欄位、程式符號、固定 protocol 名稱、工具名稱",
-          "翻譯後會降低精準度的專有名詞（如 \"AI-native Cognitive Execution System\"、\"reference-first\"）",
+          "固定系統名稱，以及翻譯後會降低精準度的專有名詞（如 \"reference-first\"）",
           "prompt template 內容（但 template 外的用途說明仍須跟隨使用者語言）"
         ]
       },
@@ -2772,7 +2772,7 @@ module EmbeddedRuntimeData
       },
       {
         "id": "fmt.english_retention",
-        "rule": "下列內容可保留英文：檔名、路徑、命令、環境變數、程式符號、 API 欄位、固定 protocol 名稱、工具名稱，以及翻譯後會降低精準度的 專有名詞（如 \"AI-native Cognitive Execution System\"、\"reference-first\"、 \"Default Bootstrap\"、\"rule-weight\"、\"source-of-truth\"）。\n",
+        "rule": "下列內容可保留英文：檔名、路徑、命令、環境變數、程式符號、 API 欄位、固定 protocol 名稱、工具名稱、固定系統名稱，以及翻譯後會降低精準度的 專有名詞（如 \"reference-first\"、 \"Default Bootstrap\"、\"rule-weight\"、\"source-of-truth\"）。\n",
         "applies_to": [
           "all_documents"
         ],
