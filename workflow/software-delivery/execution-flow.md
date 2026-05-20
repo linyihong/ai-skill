@@ -67,7 +67,7 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 
 對於專案特定路徑、測試執行器和狀態表，使用應用程式儲存庫自己的治理文件；不要將這些細節複製到這個可重複使用的技能中。
 
-> **輸出模板**：BDD Closure Loop 完成後，使用 [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) 記錄行為場景。
+> **輸出模板**：BDD Closure Loop 完成後，使用 [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) 記錄行為場景、acceptance criteria、validation target 與 traceability。
 
 ## 3. SDK 缺陷閉環（即時重現 + BDD 回歸）
 

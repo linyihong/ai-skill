@@ -84,11 +84,12 @@
 1. 確認審查範圍（新功能 / 架構變更 / API 變更）。
 2. 讀取設計文件或 RFC。
 3. 檢查設計是否涵蓋：
-   ├─ 功能需求與非功能需求。
+   ├─ Requirements cognition：actor intent、behavior boundary、acceptance criteria、ambiguity disposition。
    ├─ API contract（request/response 格式、錯誤處理）。
+   ├─ Domain / architecture fit：bounded context、invariant、consistency boundary、CRUD / DDD Lite / Full DDD decision。
    ├─ 資料模型與儲存方案。
    ├─ 安全考量（授權、認證、資料保護）。
-   └─ 測試策略（單元測試、整合測試、E2E 測試）。
+   └─ Validation target 與測試策略（BDD-lite、單元測試、合約測試、整合測試、E2E 測試）。
 4. 對每個項目給出 verdict：approve / approve-with-comments / changes-requested。
 5. 記錄所有 finding 與 decision。
 ```
@@ -129,7 +130,7 @@
 |------|---------|------|
 | [`templates/change-brief-template.md`](templates/change-brief-template.md) | Change Intake | 記錄變更類型、證據、範圍、blocker 評估 |
 | [`templates/contract-template.md`](templates/contract-template.md) | Contract Governance | 記錄 domain model、架構決策、API 合約、錯誤處理 |
-| [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) | BDD Closure Loop | 記錄 Given/When/Then 場景、edge cases、regression scope |
+| [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) | BDD Closure Loop | 記錄 requirement link、behavior boundary、Given/When/Then、acceptance criteria、validation target、regression scope |
 | [`templates/implementation-plan-template.md`](templates/implementation-plan-template.md) | Implementation | 記錄任務拆解、檔案路徑、驗收條件、風險評估 |
 | [`templates/review-report-template.md`](templates/review-report-template.md) | Review（6 種類型） | 記錄 finding、decision、reviewed artifacts |
 

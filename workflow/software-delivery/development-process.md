@@ -11,18 +11,19 @@ Contract / BDD / artifact / performance 的治理 gate 見 [`software-delivery-g
 | 步驟 | 產出 | 說明 |
 | --- | --- | --- |
 | 1. 企劃書 / product brief | 目標、使用者、範圍、non-goals、限制、驗證證據 | 明確記錄假設；在將企劃視為實作輸入前先驗證 product intent；標記未知項目而非憑空創造確定性 |
-| 2. AI 分析 + 模組拆分 | Bounded Context map、模組所有權、整合點 | 依領域職責拆分，而非僅依 UI 頁面或資料庫表格 |
-| 3. BDD 行為 | Feature files 或 scenario tables | 用領域語言描述使用者/系統行為 |
-| 4. Domain Model Contract | Entities、value objects、commands、events、invariants | 這是核心 contract；定義必須永遠為真的事項 |
-| 5. Architecture Contract | 邊界、依賴關係、資料所有權、runtime/deployment 形狀 | 定義哪些層可以依賴哪些層、決策落在哪裡 |
-| 6. API Contract | OpenAPI/GraphQL/schema/events/RPC/message contracts | 當多個 surface 或服務整合時至關重要；在實作前先寫好 request/response/error 形狀 |
-| 7. Error Handling Contract | Error taxonomy、retry 規則、驗證錯誤、使用者可見訊息、logging | 在實作前設計 failure 行為；錯誤也是 contract 的一部分 |
-| 8. 平行實作規劃 | 每個 context 和 contract 的工作切片 | 只有當共享 contracts 足夠穩定時，前端/後端才能同時開始 |
-| 9. 後端 / 服務實作 | Behavior + domain + API contract 實作 | 如果沒有後端，用 local service、library、worker 或 platform 實作取代 |
-| 10. 前端 / 客戶端實作 | Mock API、schema-first client、UI 行為 | 如果沒有前端，用 CLI、SDK、mobile screen、job runner 或 consumer integration 取代 |
-| 11. 自動化測試 | Unit、BDD、API contract、schema tests | 測試應證明 domain invariants 和 contract 相容性 |
-| 12. 效能測試計畫 | Load、stress、spike 或 soak 範圍、metric budget、runner、證據位置 | 當 latency、throughput、資源使用率、concurrency、啟動時間、背景任務、資料庫存取、外部呼叫量、caching 或 batching 可能改變時需要 |
-| 13. 整合測試 | End-to-end 或 component integration 證據 | 驗證真實 adapters、auth/session、錯誤路徑、效能敏感路徑和跨 context 流程 |
+| 2. Requirements cognition | Actor intent、behavior boundary、acceptance criteria、ambiguity disposition | 先用 [`requirements/`](requirements/README.md) 穩定需求與行為，不把 BDD 縮成 Gherkin，也不讓 agent 自行補需求 |
+| 3. BDD-lite 行為合約 | Scenario tables、behavior contract、validation target、traceability | 用領域語言描述使用者/系統行為，並明確連到 proof target |
+| 4. Domain architecture cognition | Bounded Context map、invariant、consistency boundary、architecture fit | 從行為邊界推導 domain boundary；依複雜度選 CRUD / DDD Lite / Full DDD，不預設 DDD |
+| 5. Domain Model Contract | Entities、value objects、commands、events、invariants | 這是核心 contract；定義必須永遠為真的事項 |
+| 6. Architecture Contract | 邊界、依賴關係、資料所有權、runtime/deployment 形狀 | 定義哪些層可以依賴哪些層、決策落在哪裡 |
+| 7. API Contract | OpenAPI/GraphQL/schema/events/RPC/message contracts | 當多個 surface 或服務整合時至關重要；在實作前先寫好 request/response/error 形狀 |
+| 8. Error Handling Contract | Error taxonomy、retry 規則、驗證錯誤、使用者可見訊息、logging | 在實作前設計 failure 行為；錯誤也是 contract 的一部分 |
+| 9. 平行實作規劃 | 每個 context 和 contract 的工作切片 | 只有當共享 contracts 足夠穩定時，前端/後端才能同時開始 |
+| 10. 後端 / 服務實作 | Behavior + domain + API contract 實作 | 如果沒有後端，用 local service、library、worker 或 platform 實作取代 |
+| 11. 前端 / 客戶端實作 | Mock API、schema-first client、UI 行為 | 如果沒有前端，用 CLI、SDK、mobile screen、job runner 或 consumer integration 取代 |
+| 12. 自動化測試 | Unit、BDD、API contract、schema tests | 測試應證明 behavior correctness、domain invariants 和 contract 相容性 |
+| 13. 效能測試計畫 | Load、stress、spike 或 soak 範圍、metric budget、runner、證據位置 | 當 latency、throughput、資源使用率、concurrency、啟動時間、背景任務、資料庫存取、外部呼叫量、caching 或 batching 可能改變時需要 |
+| 14. 整合測試 | End-to-end 或 component integration 證據 | 驗證真實 adapters、auth/session、錯誤路徑、效能敏感路徑和跨 context 流程 |
 
 > **輸出模板**：Default Flow 完成後，使用 [`templates/implementation-plan-template.md`](templates/implementation-plan-template.md) 記錄實作計畫。
 
@@ -49,8 +50,9 @@ Contract / BDD / artifact / performance 的治理 gate 見 [`software-delivery-g
 | 文件 | 目的 | 如果缺失，詢問 |
 | --- | --- | --- |
 | Product Brief | 目標、使用者、範圍、non-goals、假設 | 這是為誰做的？解決什麼問題？明確排除什麼？ |
+| Requirements Cognition Notes | actor intent、behavior boundary、ambiguity disposition | 哪些行為是明確需求？哪些只是推論、假設或 open question？ |
+| BDD Behavior | 使用者/系統行為場景、acceptance criteria、validation target | 關鍵 happy path 和 failure path 是什麼？什麼證據能證明它完成？ |
 | Bounded Context Map | 模組/領域拆分與所有權 | 哪些概念會一起變動？哪些邊界不應洩漏？ |
-| BDD Behavior | 使用者/系統行為場景 | 關鍵 happy path 和 failure path 是什麼？ |
 | Domain Model Contract | 核心業務物件與 invariants | 什麼必須永遠為真？允許哪些狀態轉換？ |
 | Architecture Contract | 層級、依賴關係、所有權、runtime 限制 | 哪一層擁有資料、side effects、安全性、持久化、外部呼叫？ |
 | API / Interface Contract | Requests、responses、events、commands、public methods | 誰消費這個 contract？相容性如何測試？版本如何管理？ |
@@ -96,7 +98,7 @@ Contract / BDD / artifact / performance 的治理 gate 見 [`software-delivery-g
 
 | 變更類型 | code 之前需要 |
 | --- | --- |
-| 新需求 / 功能 / 行為變更 | 先更新或建立 planning docs：Product Brief 或 change brief、BDD scenarios、受影響的 Domain Model Contract、Architecture Contract、API / Interface Contract、Error Handling Contract、實作切片和 tests。在 blocker questions 解決前不要開始 code |
+| 新需求 / 功能 / 行為變更 | 先執行 requirements stage：behavior-driven discovery、acceptance definition、ambiguity resolution；再更新或建立 planning docs：Product Brief 或 change brief、BDD scenarios、受影響的 Domain Model Contract、Architecture Contract、API / Interface Contract、Error Handling Contract、實作切片和 tests。在 blocker questions 解決前不要開始 code |
 | Bug 修復 | 確認預期行為 vs 實際行為、重現步驟或證據、受影響的 BDD scenario 或缺失 scenario、受影響的 contract/error handling、以及 regression test plan。如果修復改變了預期行為或 public contract，也視為新需求 |
 | Refactor / 內部清理 | 確認沒有行為或 public contract 變更。如果行為、資料所有權、API、錯誤處理、安全性、儲存或 tests 改變，重新分類為新需求或 bug |
 | 安全 / 強化變更 | 確認威脅或 failure mode、owner layer、必要 control、驗證方法、以及行為/API/contracts/checklists 是否需要改變 |
@@ -158,7 +160,7 @@ Narrative BDD 在回填期間是可接受的，但不能被當作完成的測試
 
 BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求每個關鍵 scenario 有明確的驗證路徑，且沒有模糊的「已記錄但未測試」狀態。
 
-> **輸出模板**：BDD Execution Closure 完成後，使用 [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) 記錄行為場景。
+> **輸出模板**：BDD Execution Closure 完成後，使用 [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) 記錄行為場景、acceptance criteria、validation target 與 traceability。
 
 ## Test Strategy Gate（測試策略關卡）
 
@@ -309,8 +311,9 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 在實作開始前，功能應具備：
 
 - 包含範圍和 non-goals 的 Product brief
-- Bounded Context 或模組拆分
-- 關鍵行為的 BDD scenarios
+- Requirements cognition notes：actor intent、behavior boundary、acceptance criteria、ambiguity disposition
+- 關鍵行為的 BDD-lite scenarios，且每個 critical scenario 有 validation target
+- Bounded Context 或模組拆分，且已由 behavior boundary / invariant evidence 支撐
 - 核心 invariants 的 Domain Model Contract
 - 依賴關係、所有權和 runtime boundaries 的 Architecture Contract
 - 整合用的 API、event、command 或 public interface contract
