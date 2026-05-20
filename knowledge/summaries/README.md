@@ -30,6 +30,7 @@ Summaries 用來協助 agent：
 | `models.routing` | 多模型協作、capability profile、compression。 | [`model-routing.md`](model-routing.md) |
 | `memory.operations` | 長期記憶、episodic、project、failure memory。 | [`memory-operations.md`](memory-operations.md) |
 | `architecture.context-cost-optimization` | Token 成本優化規劃（含 Phase 2.5 prompt cache alignment）。 | [`context-cost-optimization.md`](context-cost-optimization.md) |
+| `intelligence.architecture-selection` | Architecture fit analysis 與 DDD adoption boundary。 | [`architecture-selection.md`](architecture-selection.md) |
 
 ## Summary 格式
 

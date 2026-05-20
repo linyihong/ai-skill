@@ -31,6 +31,7 @@
 | [`intelligence-development-guidance.yaml`](intelligence-development-guidance.yaml) | 連接 docs-first-bdd-closure、risk-translation-heuristic、contract-governance-heuristic atoms 與 workflow、analysis 來源。 | `candidate` |
 | [`intelligence-repo-analysis.yaml`](intelligence-repo-analysis.yaml) | 連接 documentation-backfill-heuristic、traceability-heuristic atoms 與 analysis/repo/、workflow 來源。 | `candidate` |
 | [`intelligence-agent-architecture.yaml`](intelligence-agent-architecture.yaml) | 連接 agent-architecture 層的所有 11 個 atoms（context-collapse、rule-overload、task-routing、attention-budgeting、failure-recovery、cognitive-boundaries、pilot-first-validation、failure-to-scenario-closure、linked-updates-completeness、decomposition-strategy-selection、stateless-validation-necessity）與 enforcement/failure-patterns/、decision-efficiency、governance/document-sizing、validation、linked-updates、plans。 | `candidate` |
+| [`ddd-architecture-governance.yaml`](ddd-architecture-governance.yaml) | 連接 DDD domain intelligence、architecture selection、software-delivery architecture workflow、governance、metadata 與 validation scenarios。 | `candidate` |
 
 ### Runtime & Pipeline（Phase 14）
 
@@ -56,6 +57,7 @@
 | --- | --- | --- |
 | [`workflow-layers.yaml`](workflow-layers.yaml) | 連接 workflow 所有子目錄（apk-analysis、software-delivery、repo-analysis、travel-planning）及其子檔案。 | `candidate` |
 | [`workflow-software-delivery.yaml`](workflow-software-delivery.yaml) | 連接 software-delivery workflow 的 execution-flow、artifact-gates 與 skills、analysis 來源。 | `candidate` |
+| [`workflow-software-delivery-architecture.yaml`](workflow-software-delivery-architecture.yaml) | 連接 software-delivery architecture workflow、architecture governance、DDD / architecture intelligence、metadata 與 validation scenarios。 | `candidate` |
 | [`workflow-travel-planning.yaml`](workflow-travel-planning.yaml) | 連接 travel-planning workflow 的 execution-flow、artifact-gates 與 skills、intelligence 來源。 | `candidate` |
 | [`analysis-layers.yaml`](analysis-layers.yaml) | 連接 analysis 所有子目錄（apk、repo、production、issue）及其子檔案。 | `candidate` |
 | [`analysis-repo-methods.yaml`](analysis-repo-methods.yaml) | 連接 analysis/repo/ 的 7 個分析方法（靜態結構、依賴、entrypoint、技術債、文件恢復、追溯性、契約治理）與 skills 來源。 | `candidate` |

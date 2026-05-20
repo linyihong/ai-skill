@@ -101,7 +101,7 @@
 | [`archived/2026-05-20-1039-runtime-recovery-escalation-system.md`](archived/2026-05-20-1039-runtime-recovery-escalation-system.md) | ✅ completed | Runtime Recovery & Escalation System — escalation policy、runtime guard、recovery procedure、metadata policy、workflow hooks 與 validation scenarios 全完成 |
 | [`archived/2026-05-20-1307-ai-runtime-governance-five-step-integration.md`](archived/2026-05-20-1307-ai-runtime-governance-five-step-integration.md) | ✅ completed | AI Runtime Governance Five-Step Integration — Musk Five-Step source philosophy 與 AI runtime governance 轉譯層已完成 |
 | [`active/2026-05-20-1501-cognitive-state-evidence-governance.md`](active/2026-05-20-1501-cognitive-state-evidence-governance.md) | 📝 draft | Cognitive State & Evidence Governance — tier boundary、runtime reduction、signal normalization、minimal runtime principle、belief ownership 與 recovery re-entry safety 補強計畫 |
-| [`active/2026-05-20-1601-ddd-intelligence-software-delivery-governance.md`](active/2026-05-20-1601-ddd-intelligence-software-delivery-governance.md) | 📝 draft | DDD Integration Plan — 將 DDD 納入 domain / architecture intelligence 與 software-delivery governance，並明確限制為 selectable architecture strategy，不 promotion 成 runtime invariant |
+| [`archived/2026-05-20-1601-ddd-intelligence-software-delivery-governance.md`](archived/2026-05-20-1601-ddd-intelligence-software-delivery-governance.md) | ✅ completed / archived | DDD Integration Plan — DDD domain intelligence、architecture selection、software-delivery architecture governance、metadata heuristics、validation scenarios、routing registry 與 generated runtime surfaces 已完成；DDD 維持 selectable architecture strategy，不 promotion 成 runtime invariant |
 
 ## 誰會參考這裡（Inbound References）
 

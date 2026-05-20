@@ -34,6 +34,10 @@ edges:
     reason: App development guidance 的產出閘門定義（6 個 artifact sections）。
     validation: artifact-gates.md 從 skills/app-development-guidance/DOCUMENTATION.md（已刪除）提取。
   - type: related_to
+    target: workflow/software-delivery/architecture/README.md
+    reason: Software-delivery architecture workflow 負責 architecture fit analysis、DDD adoption 與 overengineering detection。
+    validation: README 定義何時使用、流程與輸出。
+  - type: related_to
     target: workflow/repo-analysis/README.md
     reason: Repository 分析的執行流程。
     validation: README 定義 onboarding/deep-analysis/migration-impact/tech-debt/security-audit flows。

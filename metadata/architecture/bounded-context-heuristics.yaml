@@ -1,0 +1,32 @@
+schema_version: bounded-context-heuristics/v1
+status: candidate
+owner_layer: metadata/architecture
+source_intelligence:
+  - intelligence/engineering/domain/domain-driven-design/bounded-context.md
+boundary: metadata-only
+positive_signals:
+  - same_term_has_different_meaning_by_workflow
+  - different_invariants_or_lifecycle
+  - external_model_contaminates_internal_language
+  - independent_team_or_release_cadence
+  - context_mismatch_causes_contract_or_recovery_loop
+negative_signals:
+  - tables_are_many_but_language_is_same
+  - folder_is_large_only
+  - deployment_split_desired_without_domain_boundary
+  - crud_entity_count_is_high_only
+decision:
+  create_bounded_context_when:
+    - language_conflict
+    - invariant_difference
+    - lifecycle_or_ownership_boundary
+  prefer_module_when:
+    - same_language
+    - same_invariants
+    - no_external_model_pollution
+validation:
+  expected_output:
+    - boundary_reason
+    - shared_language_or_conflict
+    - invariant_scope
+    - rejected_split_reason_if_not_split

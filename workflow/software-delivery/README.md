@@ -12,7 +12,8 @@
 3. 需要 artifact 規範時參考 [`artifact-gates.md`](artifact-gates.md)
 4. 需要審查檢查清單時參考 [`review-checklist.md`](review-checklist.md)
 5. 需要完整開發流程時參考 [`development-process.md`](development-process.md)
-6. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)
+6. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
+7. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)
 
 ## Scope
 
@@ -25,6 +26,7 @@
 ### 審查類型
 
 - **Design Review**：在實作前審查設計文件、API contract 與架構決策。
+- **Architecture Review**：審查 architecture fit、DDD adoption、bounded context、overengineering 與 minimality。
 - **Code Review**：審查實作程式碼的正確性、安全性與效能。
 - **Release Review**：審查 release 前的準備狀態（build、signing、provisioning）。
 - **Security Review**：審查授權、認證、資料儲存與傳輸安全。
@@ -46,6 +48,8 @@
 - `analysis/development-guidance/` 提供安全控制、實作模式、平台指引、語言陷阱的 catalog 參考，被本 workflow 引用。
 - `analysis/repo/` 可被本 workflow 引用來分析 repository 結構。
 - `intelligence/` 可被本 workflow 引用來輔助工程判斷。
+- `workflow/software-delivery/architecture/` 提供 architecture selection 的執行流程；其 source intelligence 來自 `intelligence/engineering/architecture/architecture-selection/` 與 `intelligence/engineering/domain/domain-driven-design/`。
+- `governance/ai-runtime-governance/software-delivery-architecture-governance.md` 定義 software-delivery architecture governance gate，但不把 DDD promotion 成 runtime invariant。
 - `feedback/history/development-guidance/` 儲存開發指引的具體課程記錄。
 - `skills/app-development-guidance/` 是原始 skill 目錄，已刪除。所有內容已遷移至本層。
 
@@ -53,7 +57,7 @@
 
 | 來源 | 目標 | 狀態 |
 |------|------|------|
-| `skills/app-development-guidance/WORKFLOW.md` | [`execution-flow.md`](execution-flow.md)、[`artifact-gates.md`](artifact-gates.md)、[`analysis/development-guidance/risk-translation.md`](../analysis/development-guidance/risk-translation.md) | ✅ 已遷移，舊目錄已刪除 |
+| `skills/app-development-guidance/WORKFLOW.md` | [`execution-flow.md`](execution-flow.md)、[`artifact-gates.md`](artifact-gates.md)、[`analysis/development-guidance/risk-translation.md`](../../analysis/development-guidance/risk-translation.md) | ✅ 已遷移，舊目錄已刪除 |
 | `skills/app-development-guidance/process/` | [`development-process.md`](development-process.md) | ✅ 已遷移，舊目錄已刪除 |
 | `skills/app-development-guidance/checklists/` | [`review-checklist.md`](review-checklist.md) | ✅ 已遷移，舊目錄已刪除 |
 
@@ -63,7 +67,7 @@
 |------|------|------|
 | [`execution-flow.md`](execution-flow.md) | `WORKFLOW.md` §1, §5-8（已刪除） | Start From Evidence、Change Intake、BDD Closure Loop、SDK Defect Closure、Same-Session Closure、Performance Gate、Backfill Rules、Validate |
 | [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md`（已刪除） | Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria |
-| [`analysis/development-guidance/risk-translation.md`](../analysis/development-guidance/risk-translation.md) | `WORKFLOW.md` §2-5（已刪除） | Risk Translation Table、Owner Layer Selection、Control Definition、Guidance Classification、Linked Updates |
+| [`analysis/development-guidance/risk-translation.md`](../../analysis/development-guidance/risk-translation.md) | `WORKFLOW.md` §2-5（已刪除） | Risk Translation Table、Owner Layer Selection、Control Definition、Guidance Classification、Linked Updates |
 | [`review-checklist.md`](review-checklist.md) | `skills/app-development-guidance/checklists/`（已刪除） | 6 種審查 checklist 的 catalog（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
 | [`development-process.md`](development-process.md) | `skills/app-development-guidance/process/README.md`（已刪除） | Contract-first 開發流程：Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill、Contract-First Rules、Definition of Ready/Done |
 

@@ -1,0 +1,39 @@
+id: overengineering-detection
+category: architecture
+version: v1
+type: heuristic-obedience
+priority: P1
+source_plan: plans/active/2026-05-20-1601-ddd-intelligence-software-delivery-governance.md
+
+given:
+  task: review_architecture_plan
+  artifacts:
+    - workflow/software-delivery/architecture/architecture-overengineering-detection.md
+    - metadata/architecture/overengineering-signals.yaml
+  signals:
+    - cqrs_without_read_write_divergence
+    - event_sourcing_without_audit_need
+    - repository_single_implementation
+    - abstraction_count_exceeds_domain_concept_count
+  constraints:
+    - delivery_is_mvp
+
+when:
+  action: detect_architecture_overengineering
+
+then:
+  expected_route:
+    - run_overengineering_review
+    - propose_simplification
+    - record_rejected_heavier_option
+  expected_heuristics:
+    - architecture_minimality
+    - remove_speculative_abstraction
+  forbidden_routes:
+    - approve_architecture_purity_without_evidence
+    - treat_cqrs_as_default
+    - treat_event_sourcing_as_default
+  expected_final_route: simplify_or_defer_complexity
+  expected_intelligence:
+    - intelligence/engineering/domain/domain-driven-design/overengineering-risks.md
+    - intelligence/engineering/anti-patterns/architecture-absolutism.md

@@ -1,0 +1,52 @@
+schema_version: ddd-adoption-signals/v1
+status: candidate
+owner_layer: metadata/architecture
+source_intelligence:
+  - intelligence/engineering/domain/domain-driven-design/README.md
+  - intelligence/engineering/domain/domain-driven-design/ddd-lite-vs-full-ddd.md
+boundary: metadata-only
+adoption_levels:
+  none_or_crud:
+    positive_signals:
+      - low_domain_complexity
+      - low_invariant_density
+      - short_lifecycle
+      - high_delivery_speed_priority
+    recommended_strategy:
+      - crud
+      - vertical_slice
+      - simple_service_layer
+  ddd_lite:
+    positive_signals:
+      - medium_domain_complexity
+      - shared_business_language_needed
+      - selected_critical_invariants
+      - modular_monolith_fits
+    keeps:
+      - ubiquitous_language
+      - domain_boundary_awareness
+      - critical_invariant_protection
+      - explicit_domain_modeling
+    avoids:
+      - cqrs_by_default
+      - event_sourcing_by_default
+      - repository_for_every_entity
+  full_ddd:
+    positive_signals:
+      - high_domain_complexity
+      - high_invariant_density
+      - multiple_bounded_contexts
+      - high_integration_pressure
+      - long_lifecycle
+      - multi_team_ownership
+    may_use:
+      - bounded_contexts
+      - aggregate_consistency_boundaries
+      - anti_corruption_layers
+      - domain_events
+      - context_map
+forbidden_defaults:
+  - project_implies_full_ddd
+  - entity_implies_aggregate
+  - ddd_implies_cqrs
+  - ddd_implies_event_sourcing

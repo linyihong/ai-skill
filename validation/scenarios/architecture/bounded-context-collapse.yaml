@@ -1,0 +1,37 @@
+id: bounded-context-collapse
+category: architecture
+version: v1
+type: routing-decision
+priority: P2
+source_plan: plans/active/2026-05-20-1601-ddd-intelligence-software-delivery-governance.md
+
+given:
+  task: review_domain_model
+  artifacts:
+    - workflow/software-delivery/architecture/bounded-context-evaluation.md
+    - metadata/architecture/bounded-context-heuristics.yaml
+  signals:
+    - same_term_has_different_meaning_by_workflow
+    - different_invariants_or_lifecycle
+    - external_model_contaminates_internal_language
+  constraints:
+    - current_model_uses_single_global_model
+
+when:
+  action: evaluate_bounded_context_boundary
+
+then:
+  expected_route:
+    - detect_language_conflict
+    - evaluate_invariant_scope
+    - recommend_bounded_context_or_acl
+  expected_heuristics:
+    - bounded_context_is_language_boundary
+    - acl_prevents_model_contamination
+  forbidden_routes:
+    - keep_single_global_model_without_scope_reason
+    - split_by_table_only
+  expected_final_route: context_boundary_review_required
+  expected_intelligence:
+    - intelligence/engineering/domain/domain-driven-design/bounded-context.md
+    - intelligence/engineering/domain/domain-driven-design/anti-corruption-layer.md

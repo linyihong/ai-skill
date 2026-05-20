@@ -21,6 +21,14 @@ edges:
     target: intelligence/engineering/anti-patterns/generic-repository-overuse.md
     reason: 泛型 Repository 常導致 aggregate 邊界模糊，違反 DDD 原則。
     validation: generic-repository-overuse atom 討論 Repository 模式的正確使用。
+  - type: related_to
+    target: intelligence/engineering/domain/domain-driven-design/README.md
+    reason: DDD integration 將 bounded context、aggregate、ubiquitous language、DDD Lite / Full DDD 等 tactical heuristics 收斂到 domain intelligence。
+    validation: domain-driven-design README 定義 DDD 作為 selectable architecture strategy，而非 runtime invariant。
+  - type: related_to
+    target: metadata/architecture/ddd-adoption-signals.yaml
+    reason: DDD adoption signal 是 domain intelligence 的 metadata-only 機讀表達。
+    validation: "metadata 檔明確標記 boundary: metadata-only。"
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.intelligence.domain record。

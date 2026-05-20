@@ -46,6 +46,8 @@ intelligence/
 
 ## 目前入口
 
+- [`engineering/architecture/`](engineering/architecture/README.md)：架構決策智慧，包含 architecture selection、complexity evaluation、team topology、integration pressure 與 tradeoff matrix。
+- [`engineering/domain/`](engineering/domain/README.md)：DDD / 業務模型智慧，包含 aggregate boundary 與 domain-driven-design 判斷。
 - [`engineering/analytical-reasoning/`](engineering/analytical-reasoning/README.md)：分析推理智慧（APK analysis、repo analysis、evidence-first routing、heuristics、signals、failure patterns）。
   - [`highest-leverage-analysis-path.md`](engineering/analytical-reasoning/highest-leverage-analysis-path.md)：第一個實際 promoted candidate intelligence atom。
   - [`evidence-first-routing.md`](engineering/analytical-reasoning/evidence-first-routing.md)：證據驅動路線選擇（`validated-intelligence`）。

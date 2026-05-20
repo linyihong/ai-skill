@@ -1,6 +1,6 @@
 # DDD Integration Plan for Intelligence & Software Delivery Governance
 
-> **狀態**: draft
+> **狀態**: completed / archived
 > **建立日期**: 2026-05-20
 > **目的**: 將 Domain-Driven Design（DDD）納入 intelligence / software-delivery 知識體系，但保持其作為「architecture strategy」而非 runtime invariant，並與現有 Cognitive State & Evidence Governance、Runtime Recovery、Workflow Governance 系統建立清楚邊界與協作關係。
 
@@ -467,3 +467,23 @@ Non-blocking issues to respect during implementation:
 - `workflow/software-delivery/README.md` already has Simplicity First; DDD governance must reinforce, not weaken, this principle.
 - `governance/ai-runtime-governance/software-delivery-governance.md` already defines delivery runtime gates; architecture governance must not add mandatory DDD gates for low-risk delivery.
 - `plans/active/2026-05-20-1501-cognitive-state-evidence-governance.md` already owns cognitive evidence / confidence / claim scope; DDD should only share analogies, not take over cognitive governance.
+
+---
+
+## 16. Closure Reconciliation
+
+執行日期：2026-05-20
+
+完成狀態：
+
+- Phase 0 Boundary Definition：完成。DDD 被明確定位為 selectable architecture strategy，不是 runtime primitive；原 proposal 的 `software-delivery/architecture/` root path 已修正為 `workflow/software-delivery/architecture/` 與 `governance/ai-runtime-governance/software-delivery-architecture-governance.md`。
+- Phase 1 Intelligence Layer：完成。新增 `intelligence/engineering/domain/domain-driven-design/`、`intelligence/engineering/architecture/architecture-selection/` 與 DDD / architecture anti-patterns。
+- Phase 2 Software Delivery Governance：完成。新增 software-delivery architecture workflow 與 governance gate，並接入 `workflow/software-delivery/README.md` / `execution-flow.md`。
+- Phase 3 Metadata & Heuristics：完成。新增 `metadata/architecture/`，並標記為 metadata-only。
+- Phase 4 Validation Scenarios：完成。新增 5 個 architecture scenarios，並更新 routing registry / graphs / summaries / generated runtime surfaces。
+
+Validation：
+
+- `ruby scripts/refresh-knowledge-runtime.rb` 通過。
+- Knowledge runtime report、model context report、model checklists 與 SQLite runtime index 已重新生成。
+- DDD 未 promotion 成 `runtime.db` runtime invariant；只有 metadata / validation / routing surface 被更新。

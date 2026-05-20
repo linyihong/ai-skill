@@ -1,0 +1,40 @@
+id: architecture-fit-mismatch
+category: architecture
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-05-20-1601-ddd-intelligence-software-delivery-governance.md
+
+given:
+  task: evaluate_high_complexity_domain_architecture
+  artifacts:
+    - workflow/software-delivery/architecture/architecture-selection-governance.md
+    - intelligence/engineering/architecture/architecture-selection/complexity-evaluation.md
+    - metadata/architecture/ddd-adoption-signals.yaml
+  signals:
+    - high_domain_complexity
+    - high_invariant_density
+    - multiple_bounded_contexts
+    - long_lifecycle
+    - high_integration_pressure
+  constraints:
+    - current_proposal_is_crud_only
+
+when:
+  action: review_architecture_fit
+
+then:
+  expected_route:
+    - detect_crud_underfit
+    - load_architecture_selection_governance
+    - recommend_ddd_lite_or_full_ddd_based_on_evidence
+  expected_heuristics:
+    - architecture_fit_analysis
+    - invariant_protection
+  forbidden_routes:
+    - accept_crud_only_without_invariant_review
+    - skip_bounded_context_evaluation
+  expected_final_route: architecture_fit_revision_required
+  expected_intelligence:
+    - intelligence/engineering/architecture/architecture-selection/complexity-evaluation.md
+    - intelligence/engineering/domain/domain-driven-design/bounded-context.md

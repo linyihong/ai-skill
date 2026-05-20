@@ -1,0 +1,30 @@
+schema_version: overengineering-signals/v1
+status: candidate
+owner_layer: metadata/architecture
+source_intelligence:
+  - intelligence/engineering/domain/domain-driven-design/overengineering-risks.md
+  - intelligence/engineering/anti-patterns/architecture-absolutism.md
+boundary: metadata-only
+signals:
+  aggregate_count_growth:
+    condition: aggregate_count_grows_faster_than_domain_concepts
+    required_action: invariant_review
+  cqrs_without_need:
+    condition: no_read_write_divergence_or_scale_requirement
+    required_action: merge_command_query_model
+  event_sourcing_without_need:
+    condition: no_audit_replay_temporal_query_or_business_event_need
+    required_action: use_simpler_persistence_or_state_transition_log
+  repository_single_implementation:
+    condition: repository_does_not_protect_aggregate_boundary
+    required_action: remove_speculative_abstraction
+  microservice_without_boundary:
+    condition: no_deployment_scaling_ownership_or_compliance_boundary
+    required_action: return_to_modular_monolith
+  abstraction_exceeds_domain:
+    condition: abstraction_count_exceeds_domain_concept_count
+    required_action: simplification_review
+verdicts:
+  - keep
+  - simplify
+  - defer

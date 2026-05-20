@@ -755,12 +755,24 @@ records:
         - write-plan
         - code-review
         - design-review
+        - architecture-review
+        - architecture-plan
+        - ddd
+        - domain-modeling
+        - bounded-context
+        - cqrs
+        - event-sourcing
+        - microservices
       user_signals:
         - 開發
         - 實作
         - SDK
         - plan
         - 契約
+        - DDD
+        - 領域模型
+        - bounded context
+        - 架構選型
       file_change_globs:
         - "**/*-sdk/**"
         - "**/sdk-platform/**"
@@ -775,12 +787,21 @@ records:
       - intelligence/engineering/development/docs-first-bdd-closure.md
     candidate_sources:
       - workflow/software-delivery/development-process.md
+      - workflow/software-delivery/architecture/README.md
+      - workflow/software-delivery/architecture/architecture-fit-analysis.md
       - analysis/development-guidance/README.md
       - analysis/development-guidance/risk-translation.md
       - workflow/software-delivery/README.md
       - intelligence/engineering/development/README.md
+      - intelligence/engineering/architecture/architecture-selection/README.md
+      - intelligence/engineering/domain/domain-driven-design/README.md
+      - governance/ai-runtime-governance/software-delivery-architecture-governance.md
+      - metadata/architecture/README.md
       - knowledge/summaries/development-guidance.md
+      - knowledge/summaries/architecture-selection.md
       - knowledge/graphs/workflow-software-delivery.yaml
+      - knowledge/graphs/workflow-software-delivery-architecture.yaml
+      - knowledge/graphs/ddd-architecture-governance.yaml
     project_overlays:
       - when_repo_contains: apk-analysis-sdk/runtime/workflow-activation.yaml
         load_after_workflow_entry: true
@@ -805,7 +826,7 @@ records:
       contract precedence、BDD closure、artifact completeness、test strategy 與 performance evidence gate。
       觸發由 workflow/software-delivery/README.md 定義；**不**另立 route.project.*。
       若 repo 含 apk-analysis-sdk/runtime/workflow-activation.yaml，在進入本 workflow 後載入 project_overlays（專案 gate，非平行 routing）。
-    validation_signal: Change intake、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence 與 same-session closure 已檢查；workflow 與 analysis 內容已分離。
+    validation_signal: Change intake、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence、same-session closure 與 architecture fit analysis 已檢查；workflow、analysis、intelligence 與 governance 內容已分離。
     metadata:
       priority: P1
       confidence: high
@@ -1091,6 +1112,46 @@ records:
       compression_level: summary-first
       reason: 需要對應決策智慧時才讀取完整 atom。
 
+  - id: route.intelligence.architecture-selection
+    task_intent: 判斷軟體架構選型、DDD adoption、bounded context、CQRS、event sourcing、microservices 或 architecture overengineering
+    primary_source: intelligence/engineering/architecture/architecture-selection/README.md
+    required_dependencies:
+      - intelligence/engineering/architecture/README.md
+      - intelligence/engineering/domain/README.md
+      - intelligence/engineering/domain/domain-driven-design/README.md
+      - workflow/software-delivery/architecture/README.md
+      - governance/ai-runtime-governance/software-delivery-architecture-governance.md
+    candidate_sources:
+      - intelligence/engineering/architecture/architecture-selection/architecture-fit-analysis.md
+      - intelligence/engineering/architecture/architecture-selection/architecture-tradeoff-matrix.md
+      - intelligence/engineering/domain/domain-driven-design/ddd-lite-vs-full-ddd.md
+      - intelligence/engineering/domain/domain-driven-design/bounded-context.md
+      - intelligence/engineering/anti-patterns/cargo-cult-ddd.md
+      - metadata/architecture/architecture-fit-matrix.yaml
+      - metadata/architecture/ddd-adoption-signals.yaml
+      - knowledge/graphs/ddd-architecture-governance.yaml
+      - knowledge/summaries/architecture-selection.md
+    source_of_truth_gate: architecture-strategy-not-runtime-invariant
+    ranking_reason: >
+      Architecture selection 需要先由 fit analysis 判斷 business complexity、invariant density、
+      integration pressure、lifecycle 與 team boundary，再選 CRUD / DDD Lite / Full DDD 等策略；
+      DDD 是 selectable architecture strategy，不是 runtime invariant。
+    validation_signal: Chosen strategy、rejected lighter option、rejected heavier option、fit evidence 與 upgrade/downgrade trigger 已輸出；沒有預設套用 DDD/CQRS/event sourcing。
+    metadata:
+      priority: P2
+      confidence: medium
+      context_cost:
+        estimated_tokens: 1800
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: 先讀 architecture-selection README 與 metadata，只有在 high-complexity 或 DDD 訊號強時展開完整 DDD tactical docs。
+
   - id: route.validation.ai-decision-contract
     task_intent: 驗證 AI 的 decision path、rule obedience、routing stability
     primary_source: validation/README.md
@@ -1105,10 +1166,20 @@ records:
       - validation/scenarios/failure-derived/runtime-recovery-navigation-mismatch.yaml
       - validation/scenarios/failure-derived/runtime-recovery-user-contradiction.yaml
       - validation/scenarios/failure-derived/runtime-recovery-source-miss.yaml
+      - validation/scenarios/architecture/cargo-cult-ddd.yaml
+      - validation/scenarios/architecture/architecture-fit-mismatch.yaml
+      - validation/scenarios/architecture/overengineering-detection.yaml
+      - validation/scenarios/architecture/bounded-context-collapse.yaml
+      - validation/scenarios/architecture/aggregate-explosion.yaml
     candidate_sources:
       - validation/scenarios/failure-derived/runtime-recovery-navigation-mismatch.yaml
       - validation/scenarios/failure-derived/runtime-recovery-user-contradiction.yaml
       - validation/scenarios/failure-derived/runtime-recovery-source-miss.yaml
+      - validation/scenarios/architecture/cargo-cult-ddd.yaml
+      - validation/scenarios/architecture/architecture-fit-mismatch.yaml
+      - validation/scenarios/architecture/overengineering-detection.yaml
+      - validation/scenarios/architecture/bounded-context-collapse.yaml
+      - validation/scenarios/architecture/aggregate-explosion.yaml
       - validation/rules/heuristics/runtime-first-hooking.yaml
       - validation/rules/heuristics/local-proxy-diagnosis.yaml
       - validation/rules/heuristics/avoid-early-patch.yaml

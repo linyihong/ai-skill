@@ -21,6 +21,14 @@ edges:
     target: intelligence/engineering/tradeoffs/postgres-vs-mongodb.md
     reason: 資料庫選擇是架構決策的一部分，與 monolith/microservices 選擇相關。
     validation: 兩個 atoms 都屬於 engineering 層的架構判斷。
+  - type: related_to
+    target: intelligence/engineering/architecture/architecture-selection/README.md
+    reason: Architecture selection 補足 architecture fit analysis、complexity evaluation、lifecycle、team topology、integration pressure 與 tradeoff matrix。
+    validation: architecture-selection README 定義 architecture complexity must match business complexity。
+  - type: related_to
+    target: workflow/software-delivery/architecture/README.md
+    reason: Software-delivery architecture workflow 將 architecture intelligence 應用到 design review 與 planning。
+    validation: workflow 入口要求 chosen strategy、rejected options、fit evidence 與 validation plan。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.intelligence.architecture record。

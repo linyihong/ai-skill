@@ -1,0 +1,38 @@
+id: aggregate-explosion
+category: architecture
+version: v1
+type: heuristic-obedience
+priority: P2
+source_plan: plans/active/2026-05-20-1601-ddd-intelligence-software-delivery-governance.md
+
+given:
+  task: review_ddd_tactical_model
+  artifacts:
+    - intelligence/engineering/domain/domain-driven-design/aggregate-design.md
+    - intelligence/engineering/domain/aggregate-boundary-heuristics.md
+    - intelligence/engineering/anti-patterns/aggregate-explosion.md
+  signals:
+    - aggregate_count_grows_faster_than_domain_concepts
+    - aggregates_cannot_name_invariant
+    - one_use_case_modifies_many_aggregates
+  constraints:
+    - agent_has_already_recommended_full_ddd
+
+when:
+  action: review_aggregate_boundaries
+
+then:
+  expected_route:
+    - load_aggregate_boundary_heuristics
+    - require_invariant_for_each_aggregate
+    - recommend_merge_or_simplify_where_needed
+  expected_heuristics:
+    - aggregate_is_consistency_boundary
+    - architecture_minimality
+  forbidden_routes:
+    - entity_implies_aggregate
+    - keep_all_aggregates_without_invariant
+  expected_final_route: aggregate_boundary_revision_required
+  expected_intelligence:
+    - intelligence/engineering/domain/domain-driven-design/aggregate-design.md
+    - intelligence/engineering/anti-patterns/aggregate-explosion.md

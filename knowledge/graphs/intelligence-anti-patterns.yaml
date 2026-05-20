@@ -21,6 +21,14 @@ edges:
     target: intelligence/engineering/architecture/modular-monolith-vs-microservices.md
     reason: 泛型 Repository 在 modular monolith 中可能導致不必要的抽象層。
     validation: architecture atom 討論 modular monolith 的正確抽象層級。
+  - type: related_to
+    target: intelligence/engineering/anti-patterns/architecture-absolutism.md
+    reason: DDD integration 新增 architecture absolutism，防止 agent 把單一架構當 universal default。
+    validation: anti-pattern 定義 rejected alternatives 與 fit evidence 要求。
+  - type: related_to
+    target: intelligence/engineering/anti-patterns/cargo-cult-ddd.md
+    reason: Cargo-cult DDD 是 software-delivery architecture governance 要阻止的核心反模式。
+    validation: anti-pattern 要求回到 architecture fit analysis。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.intelligence.anti-patterns record。

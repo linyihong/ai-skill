@@ -1,0 +1,40 @@
+id: graph.workflow-software-delivery-architecture
+source: workflow/software-delivery/architecture/README.md
+status: candidate
+summary: >
+  連接 software-delivery architecture workflow、architecture governance、DDD / architecture intelligence、
+  metadata heuristics 與 architecture validation scenarios。
+edges:
+  - type: depends_on
+    target: workflow/software-delivery/README.md
+    reason: Software-delivery README 定義 workflow scope 與 architecture review entrypoint。
+    validation: README 已連到 architecture/。
+  - type: related_to
+    target: workflow/software-delivery/architecture/architecture-fit-analysis.md
+    reason: Architecture workflow 的第一步是 fit analysis。
+    validation: 文件定義 complexity axes 與輸出要求。
+  - type: related_to
+    target: governance/ai-runtime-governance/software-delivery-architecture-governance.md
+    reason: Governance gate 防止 default DDD 與 architecture inflation。
+    validation: governance 文件定義 fit analysis、minimality、rejected alternatives 與 runtime boundary gate。
+  - type: related_to
+    target: intelligence/engineering/architecture/architecture-selection/architecture-fit-analysis.md
+    reason: Workflow 執行時引用 architecture selection intelligence。
+    validation: intelligence atom 提供 evaluation axes 與 output format。
+  - type: related_to
+    target: intelligence/engineering/domain/domain-driven-design/ddd-lite-vs-full-ddd.md
+    reason: DDD adoption 決策需要區分 DDD Lite 與 Full DDD。
+    validation: 文件定義 low/medium/high complexity 的適用策略。
+  - type: related_to
+    target: metadata/architecture/architecture-fit-matrix.yaml
+    reason: Fit matrix 提供可機讀 strategy routing signal。
+    validation: metadata 檔包含 routing、avoid_by_default 與 required_output_fields。
+  - type: related_to
+    target: validation/scenarios/architecture/overengineering-detection.yaml
+    reason: Scenario 檢查 architecture overengineering 是否觸發 simplification review。
+    validation: scenario 定義 forbidden routes 與 expected final route。
+metadata:
+  priority: P2
+  confidence: medium
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-20

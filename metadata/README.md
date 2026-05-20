@@ -10,6 +10,7 @@
 - [`confidence/`](confidence/README.md)：定義 low / medium / high 信心與 lifecycle state 的關係。
 - [`compatibility/`](compatibility/README.md)：記錄 old entrypoint 與 new layer path 的相容狀態。
 - [`recovery/`](recovery/README.md)：定義 mismatch escalation 後的 domain-specific reload set、L1-L5 metadata 與 recovery policy。
+- [`architecture/`](architecture/README.md)：定義 architecture fit、DDD adoption、overengineering 與 bounded context 的 metadata-only heuristics。
 
 ## 放什麼
 
@@ -19,6 +20,7 @@
 - **Enforcement Rule metadata**：`metadata/rules/enforcement-rule-spec.md` 定義 spec，`metadata/rules/*.yaml` 為各 rule 的 metadata 實例。
 - Runtime loading、promotion、cleanup 與 graph construction 所需的控制資料。
 - Recovery escalation 後的 domain-specific source-of-truth reload policy。
+- Architecture selection 的 fit signal、DDD adoption signal、overengineering signal 與 bounded context heuristics（metadata-only）。
 - SQLite / FTS runtime index 的欄位來源，例如 `source_path`、`tags`、`priority`、`confidence`、`context_cost`、`when_to_read` 與 `validation`。
 
 ## 不放什麼

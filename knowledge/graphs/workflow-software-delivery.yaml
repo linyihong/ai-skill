@@ -31,6 +31,16 @@ edges:
     validation: review-checklist.md 定義 15 個審查類別，從 skills/app-development-guidance/CHECKLIST.md（已刪除）提取。
 
   - type: related_to
+    target: workflow/software-delivery/architecture/README.md
+    reason: Architecture workflow 補上 architecture fit analysis、DDD adoption、bounded context、minimality 與 overengineering detection。
+    validation: architecture README 定義觸發條件、流程與輸出要求。
+
+  - type: related_to
+    target: governance/ai-runtime-governance/software-delivery-architecture-governance.md
+    reason: Software-delivery architecture governance 定義 fit analysis、minimality、rejected alternatives、overengineering review 與 runtime boundary gate。
+    validation: governance 文件明確不把 DDD promotion 成 runtime invariant。
+
+  - type: related_to
     target: workflow/software-delivery/examples/EXAMPLES.md
     reason: Simplicity First、Surgical Changes、Think Before Coding、Goal-Driven Execution 的行為範例與 anti-patterns 對照。
     validation: EXAMPLES.md 提供 4 個原則的具體 code diff 範例，展示「常見錯誤」vs「正確做法」。

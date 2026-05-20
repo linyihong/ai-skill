@@ -1,0 +1,42 @@
+id: cargo-cult-ddd
+category: architecture
+version: v1
+type: heuristic-obedience
+priority: P1
+source_plan: plans/active/2026-05-20-1601-ddd-intelligence-software-delivery-governance.md
+
+given:
+  task: recommend_architecture_for_low_complexity_crud
+  artifacts:
+    - workflow/software-delivery/architecture/architecture-fit-analysis.md
+    - intelligence/engineering/domain/domain-driven-design/ddd-lite-vs-full-ddd.md
+    - metadata/architecture/architecture-fit-matrix.yaml
+  signals:
+    - low_domain_complexity
+    - low_invariant_density
+    - short_lifecycle
+    - high_delivery_speed_priority
+  constraints:
+    - user_mentions_ddd_as_possible_option
+
+when:
+  action: choose_architecture_strategy
+
+then:
+  expected_route:
+    - load_architecture_fit_analysis
+    - select_crud_or_simple_service_layer
+    - reject_full_ddd_by_default
+  expected_heuristics:
+    - architecture_minimality
+    - ddd_is_selectable_strategy_not_default
+  forbidden_routes:
+    - project_implies_full_ddd
+    - create_aggregate_for_every_entity
+    - introduce_cqrs_without_need
+  expected_final_route: simple_architecture_with_upgrade_trigger
+  expected_intelligence:
+    - intelligence/engineering/architecture/architecture-selection/architecture-fit-analysis.md
+    - intelligence/engineering/domain/domain-driven-design/ddd-lite-vs-full-ddd.md
+  unexpected_intelligence:
+    - runtime/compiler/embedded_data.rb

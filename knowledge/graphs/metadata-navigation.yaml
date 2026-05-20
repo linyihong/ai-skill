@@ -33,6 +33,10 @@ edges:
     target: knowledge/summaries/metadata-schema.md
     reason: Summary 提供 metadata schema 的低成本 routing preview。
     validation: summary 指向 canonical metadata/schema.md，且標明不可覆蓋 enforcement rules。
+  - type: related_to
+    target: metadata/architecture/README.md
+    reason: Architecture metadata 新增 fit matrix、DDD adoption signal、overengineering signal 與 bounded context heuristics，供 routing / governance 使用。
+    validation: metadata/architecture/README.md 明確標記 metadata-only，不假裝 runtime enforced。
 metadata:
   priority: P2
   confidence: high

@@ -1,0 +1,59 @@
+schema_version: architecture-fit-matrix/v1
+status: candidate
+owner_layer: metadata/architecture
+source_intelligence:
+  - intelligence/engineering/architecture/architecture-selection/architecture-fit-analysis.md
+  - intelligence/engineering/architecture/architecture-selection/architecture-tradeoff-matrix.md
+boundary: metadata-only
+axes:
+  domain_complexity: [low, medium, high]
+  invariant_density: [low, medium, high]
+  integration_pressure: [low, medium, high]
+  lifecycle_length: [short, medium, long]
+  team_scale: [solo, small, multi-team]
+  delivery_speed_priority: [high, balanced, low]
+routing:
+  low_complexity:
+    signals:
+      domain_complexity: low
+      invariant_density: low
+      integration_pressure: low
+    prefer:
+      - crud
+      - vertical_slice
+      - simple_service_layer
+    avoid_by_default:
+      - full_ddd
+      - cqrs
+      - event_sourcing
+  medium_complexity:
+    signals:
+      domain_complexity: medium
+      invariant_density: medium
+    prefer:
+      - ddd_lite
+      - selective_aggregate
+      - modular_monolith
+    avoid_by_default:
+      - microservices_without_ownership_boundary
+      - event_sourcing_without_audit_need
+  high_complexity:
+    signals:
+      domain_complexity: high
+      invariant_density: high
+      integration_pressure: medium_or_high
+    prefer:
+      - full_ddd
+      - bounded_contexts
+      - anti_corruption_layer
+      - domain_events_when_business_fact_exists
+    avoid_by_default:
+      - single_global_model
+      - crud_only_model
+validation:
+  required_output_fields:
+    - chosen_strategy
+    - fit_evidence
+    - rejected_lighter_option
+    - rejected_heavier_option
+    - upgrade_or_downgrade_trigger

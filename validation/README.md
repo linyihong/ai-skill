@@ -17,6 +17,7 @@ validation/
 ├── scenarios/           # 測試情境（YAML）
 │   ├── apk-analysis/    # APK 分析領域
 │   ├── app-dev/         # App 開發領域
+│   ├── architecture/    # 架構選型與 DDD adoption 決策
 │   └── travel/          # 旅遊規劃領域
 ├── rules/               # 規則定義（YAML）
 │   ├── heuristics/      # Heuristic obedience rules
@@ -145,6 +146,11 @@ result:
 | 2 | `local-proxy-vs-pinning-v1` | `local-proxy-routing-diagnosis.md` + `local-proxy-detection.md` | Local proxy vs TLS pinning 判斷 |
 | 3 | `early-hook-prevention-v1` | `early-hook-instability.md` + `frida-spawn-race.md` | 過早 hook 的預防行為 |
 | 4 | `new-category-registration-v1` | `validate-knowledge-runtime.rb` 新增 `validate_directory_structure`（2026-05-13） | 新增 intelligence/analysis/workflow 類別時是否正確建立 README.md、更新 routing registry |
+| 5 | `cargo-cult-ddd` | DDD integration plan + architecture metadata | 低 complexity 專案不得預設 full DDD |
+| 6 | `architecture-fit-mismatch` | architecture selection governance | 高 complexity 專案不得被壓成 CRUD-only |
+| 7 | `overengineering-detection` | overengineering metadata / workflow | 架構複雜度超過 business complexity 時需 simplification review |
+| 8 | `bounded-context-collapse` | bounded context heuristics | 多 domain 不得被錯誤混成單一 global model |
+| 9 | `aggregate-explosion` | aggregate boundary heuristics | aggregate boundaries 過度切分時需 invariant review |
 
 ## 執行方式
 
