@@ -2,7 +2,7 @@
 
 > **狀態**：draft
 > **建立時間**：2026-05-21 08:34
-> **目的**：將 `scripts/` 從依賴特定 shell、Ruby runtime 與本機環境假設，升級為可在 Windows、macOS、Linux 穩定執行的單一 Go binary 工具層；優先內建 pure Go SQLite（`modernc.org/sqlite` candidate）、YAML、JSON 與 runtime logic，iOS / Android 先評估可行性與限制，不預設納入同等支援範圍。
+> **目的**：將 `scripts/` 從依賴特定 shell、Ruby runtime 與本機環境假設，升級為可在 Windows、macOS、Linux 穩定執行的單一 Go binary 工具層；優先內建 pure Go SQLite（`modernc.org/sqlite` candidate）、YAML、JSON 與 runtime logic；iOS 以 App sandbox、Browser/WASM 或 SSH remote runner 作為可行方向，明確不支援 native arbitrary binary，Android 另評估 Termux / app sandbox / remote runner，不預設納入桌面同等支援範圍。
 
 ## 背景
 
@@ -23,7 +23,7 @@
 4. 將現有 shell / Ruby script 的行為先規格化，再分批遷移，避免一次重寫造成 close-loop 失效。
 5. 建立完整測試矩陣：unit test、golden output、fixture repo、跨 OS CI、端到端 dry-run、runtime.db / SQLite assertion。
 6. 保留必要的 Ruby compiler 或逐步移植策略，確保 runtime source-of-truth 與 generated artifact 不漂移。
-7. 評估 iOS / Android 是否適合作為「執行平台」、「遠端控制平台」或「不可支援平台」，並寫出明確結論。
+7. 評估 iOS / Android 是否適合作為「App 內建 runtime」、「Browser/WASM control plane」、「SSH / remote runner 控制端」或「不可支援平台」，並寫出明確結論。
 
 ## 非目標
 
@@ -238,23 +238,57 @@ Completion criteria：
 
 **目標**：明確回答 iOS / Android 是否可行，而不是模糊承諾。
 
+#### iOS execution model
+
+iOS 不是 general-purpose executable OS，不能假設使用者可像桌面系統一樣下載 binary 後執行：
+
+```bash
+git clone <repo>
+./bin/ai-skill runtime migrate
+```
+
+iOS 的核心限制：
+
+- 任意 executable 不能持久化後直接執行。
+- 可執行邏輯必須存在於 App sandbox、browser sandbox、或遠端機器上。
+- Git、terminal、interpreter、SQLite engine 若要在 iOS 本機執行，通常必須由 App 內建，例如 Git client app、terminal app 或專用 wrapper app。
+- Safari 下載 binary 不代表可直接執行。
+
+因此 iOS 不應列入「native single binary desktop target」。可行路線應分成：
+
+| 路線 | 定位 | 可行性 | 主要風險 |
+| --- | --- | --- | --- |
+| App 內建 runtime | iOS app 內建 Git / runtime / terminal / SQLite / config editor | 可行但需要 App 開發與發佈 | App sandbox、檔案存取、App Store policy、版本更新、credential storage |
+| Browser/WASM | `runtime.wasm` 在 browser sandbox 執行 governance runtime、YAML / state inspect、部分 replay | 可行，最接近免安裝 native runtime | local repo 存取、持久化、SQLite WASM、效能、離線能力、browser storage 限制 |
+| SSH / remote runner | iPhone 作為 control plane，實際 runtime 在 VPS、NAS、Mac mini、Linux mini PC 或桌面機 | 高可行，最符合治理 runtime 的 control-plane 性質 | 遠端授權、金鑰管理、網路可用性、審計、安全邊界 |
+| Native arbitrary binary | iOS 直接下載並執行 `ai-skill` binary | 不可作為目標 | iOS security model 不允許一般用途 executable persistence |
+
+建議預設方向：
+
+- 桌面與 CI：以 Go single binary 作為 primary runtime。
+- iOS：以 control plane / inspect UI / remote trigger 為主，不承諾本機 native binary。
+- Browser/WASM：可作為 governance runtime inspect、replay UI、state validation 的候選方向。
+- SSH / remote runner：可作為近期最實用方案，讓 iPhone 管理遠端 Linux / macOS runner。
+
 Evaluation dimensions：
 
 | 平台 | 可行方向 | 主要限制 |
 | --- | --- | --- |
 | Android | Termux / app sandbox / remote runner client | git、SQLite、檔案權限、背景任務、使用者資料路徑、shell compatibility |
-| iOS | Shortcuts / app wrapper / remote runner client | sandbox、JIT / process 限制、git 可用性、檔案存取、背景執行限制 |
+| iOS | App 內建 runtime / Browser-WASM / SSH remote runner / control plane UI | sandbox、任意 binary 不可執行、Git 與 repo 存取、credential storage、browser storage、遠端授權 |
 
 Decision options：
 
-- **Native local runner**：手機本機直接跑 CLI，只有在 git + filesystem + SQLite + process model 足夠時才可選。
-- **Remote control client**：手機只觸發桌面 / server runner，較可能可行。
+- **App-contained local runner**：由 iOS / Android App 內建 runtime、Git、SQLite 與檔案管理；不等同任意下載 binary 執行。
+- **Browser/WASM runner**：把部分 runtime 編成 WASM，在 browser sandbox 執行 state inspect、replay、validation 或 UI。
+- **Remote control client**：手機只觸發桌面 / server runner，iOS 上最可能可行。
 - **Unsupported**：若成本高於收益，明確標示不支援，不讓 agent 誤判。
 
 Completion criteria：
 
 - 寫出 iOS / Android support decision record。
-- 若不支援，CLI `doctor` 與文件要明確顯示 unsupported reason。
+- iOS decision record 必須明確排除 native arbitrary binary，並在 App-contained、Browser/WASM、SSH remote runner 之間做取捨。
+- 若不支援，CLI `doctor`、Browser/WASM UI 或文件要明確顯示 unsupported reason。
 - 若支援 remote control client，必須另開安全與授權計畫，不混在本計畫直接實作。
 
 ### Phase 6：Deprecation & Closure（P2）
