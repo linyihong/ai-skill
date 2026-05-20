@@ -1,6 +1,6 @@
 # Cross-Platform Go Script Runtime
 
-> **狀態**：draft
+> **狀態**：in-progress
 > **建立時間**：2026-05-21 08:34
 > **目的**：將 `scripts/` 從依賴特定 shell、Ruby runtime 與本機環境假設，升級為可在 Windows、macOS、Linux 穩定執行的單一 Go binary 工具層；優先內建 pure Go SQLite（`modernc.org/sqlite` candidate）、YAML、JSON 與 runtime logic；desktop Git 是 external dependency，不包進 binary，缺 Git 時由 `doctor` / linked-update flow 阻斷並提示安裝；iOS 以 App sandbox、Browser/WASM 或 SSH remote runner 作為可行方向，明確不支援 native arbitrary binary，Android 另評估 Termux / app sandbox / remote runner，不預設納入桌面同等支援範圍。
 
@@ -42,6 +42,30 @@
 | Conflicts | 無直接衝突；但若 implementation 改 `scripts/` 或 `runtime/compiler/`，必須同步 `scripts/README.md`、必要 validator、runtime.db 與 generated reports |
 | Decision | proceed with planning only；implementation phase 前必須重新做 preflight，確認 candidate files、source-of-truth 與 test strategy 仍有效 |
 | Validation | 本計畫建立後需更新 `plans/README.md`，執行 knowledge runtime refresh、runtime compiler、`validate-runtime-db`、link check、lint、commit / push / readback |
+
+## Development Workflow Alignment
+
+本計畫必須依 [`workflow/software-delivery/`](../../workflow/software-delivery/README.md) 的開發流程執行，不得直接從 Go implementation 開始。
+
+| Software-delivery stage | 本計畫對應產物 | Blocking gate |
+| --- | --- | --- |
+| Product / impact alignment | Change brief：為什麼要降低 script runtime 的環境依賴、Windows friction、close-loop 漏跑風險 | 未說明使用者 / contributor / agent runtime 的影響前，不得開始 CLI 設計 |
+| Requirements cognition / BDD-lite | Command behavior scenarios：`doctor`、`close-loop`、`runtime compile`、missing Git、missing permission、dirty tree | 未建立 Given / When / Then 與 acceptance criteria 前，不得開始 Go implementation |
+| Domain architecture cognition | Command contract、dependency detector、Git adapter、runtime compiler adapter、filesystem adapter、reporting / exit-code boundary | 未定義 domain boundary 與 side effects 前，不得建立 production package layout |
+| Test effectiveness | Fixture plan、golden output、negative cases、missing dependency、Windows path、runtime.db assertion | 未定義 fixture 與 failure tests 前，不得宣稱 Phase 1 skeleton 可完成 |
+| Artifact gates | Command contract、support matrix、exit-code table、side-effect registry、test fixture plan | 未完成文件 artifact gate 前，不得進入 Phase 1 Go CLI skeleton |
+
+**文件先行 blocking gate**：
+
+在新增 `go.mod`、`cmd/ai-skill/` 或任何 production Go implementation 前，必須先完成並 review：
+
+- `plans/artifacts/cross-platform-go-script-runtime/README.md`
+- command contract：每個命令的 arguments、輸出、exit code、side effects、dry-run 行為。
+- support matrix：Windows、macOS、Linux、iOS、Android 的支援等級與限制。
+- BDD-lite scenarios：尤其是 missing Git、missing permission、dirty tree、merge / rebase state、runtime.db assertion。
+- test fixture plan：temporary repo、fake home、PATH isolation、missing Git、Windows path、runtime DB golden fixture。
+
+若上述任一項未完成，本計畫不得進入 Go implementation。若必須例外，需先在本 plan 的 Open Questions 或 decision record 寫明原因與風險。
 
 ## Current Script Inventory
 
@@ -146,11 +170,20 @@ Desktop 平台不應把 Git 包進 `ai-skill` binary。Git 是成熟且使用者
 
 **目標**：先定義 script runtime 的行為契約，不急著改寫。
 
+Current artifacts：
+
+- [`README.md`](../artifacts/cross-platform-go-script-runtime/README.md)：Phase 0 artifact index。
+- [`change-brief.md`](../artifacts/cross-platform-go-script-runtime/change-brief.md)：change brief 與 scope / blocker。
+- [`command-contract.md`](../artifacts/cross-platform-go-script-runtime/command-contract.md)：command surface、exit codes、side effects。
+- [`support-matrix.md`](../artifacts/cross-platform-go-script-runtime/support-matrix.md)：desktop / mobile 支援矩陣。
+- [`bdd-scenarios.md`](../artifacts/cross-platform-go-script-runtime/bdd-scenarios.md)：BDD-lite scenarios。
+- [`test-fixture-plan.md`](../artifacts/cross-platform-go-script-runtime/test-fixture-plan.md)：fixture plan。
+
 Tasks：
 
 - [ ] 盤點所有 `scripts/`、`runtime/compiler/` 與 git hook 的輸入、輸出、寫檔位置、exit code、環境變數、外部命令依賴。
-- [ ] 建立 command contract 文件，列出每個命令的 arguments、dry-run 行為、side effects、validation signal。
-- [ ] 建立 platform support matrix：Windows、macOS、Linux、iOS、Android。
+- [x] 建立 command contract 文件，列出每個命令的 arguments、dry-run 行為、side effects、validation signal。
+- [x] 建立 platform support matrix：Windows、macOS、Linux、iOS、Android。
 - [ ] 建立風險清單：symlink、chmod、git hook、SQLite、Ruby gems、encoding、shell quoting、路徑大小寫。
 - [ ] 決定 repository layout：`cmd/ai-skill`、`internal/`、`pkg/`、`testdata/`、`docs/` 或其他命名。
 
@@ -358,6 +391,7 @@ Implementation phase 必須同步建立或更新：
 | 檔案 | 變更類型 | Phase |
 | --- | --- | --- |
 | `plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md` | 新增計畫 | Phase 0 |
+| `plans/artifacts/cross-platform-go-script-runtime/` | 新增文件先行 artifacts：change brief、command contract、support matrix、BDD-lite scenarios、test fixture plan | Phase 0 |
 | `plans/README.md` | 新增 active plan 索引 | Phase 0 |
 | `scripts/README.md` | 未來更新 CLI mapping / deprecation policy | Phase 2 / Phase 6 |
 | `scripts/*.sh` | 未來 wrapper / deprecation / replacement | Phase 2 / Phase 6 |
