@@ -6,62 +6,62 @@
 
 ## 核心目標
 
-- Turn a destination and date range into a practical route.
-- Use travel agency tours, package tours, and official model courses as benchmarks, or recommend them directly when they fit the user's needs.
-- Show package price, included/excluded items, booking/cancellation conditions, and self-planned cost comparison when presenting agency options.
-- Compare long-distance transport options by door-to-door time and total cost, including flights, Shinkansen, limited express, highway bus, ferry, rental car, self-drive, and mixed modes.
-- Explain what to do at each recommended stop, how long to stay, and what local food or restaurants to consider.
-- Filter restaurant candidates with the destination country's commonly used review/rating tools, such as Google Maps plus 食べログ for Japan when practical.
-- Keep daily schedules realistic with stop-duration, travel-buffer, meal, check-in, last-entry, sunset, and fatigue checks.
-- Mark places with exact Google Maps place links, coordinate pins, or precise map URLs instead of ambiguous search-result links.
-- For self-drive routes, use the nearest confirmed visitor-usable parking lot or official designated parking as the Google Maps navigation point when it differs from the attraction, restaurant, trailhead, or facility entrance.
-- Provide calendar-ready and app-ready fields when useful: event titles, start/end times, time zones, map links, reminders, reservation notes, map-list grouping, and offline-map needs.
-- Verify time-sensitive details before recommending a stop.
-- Separate confirmed facts from assumptions and open questions.
-- Use weather forecasts to choose better route order and realistic backup plans.
-- Optimize non-driving routes with transport schedules, transfer buffers, booking needs, and fare estimates.
-- Recommend overnight bases and lodging candidates that fit the route, next-day plan, budget, and travel style.
-- Avoid inefficient route shapes, especially going from A to B and then returning to an intermediate point unless clearly justified.
-- Evaluate car-stay quietness and sleep quality, including traffic, truck idling, late-night crowds, lighting, and nearby facilities.
-- Apply country- and region-specific requirements, such as Mapcode and visitor parking checks for Japan self-drive routes.
-- Estimate rough self-drive costs from distance, fuel/charging, tolls, parking, ferries, bridges, and rental-car add-ons.
-- Plan fuel or EV charging stops when the route crosses rural, mountain, island, night, winter, or long-distance areas with sparse supply.
-- Use community sources for discovery while grounding decisions in official or current sources.
-- Make car-stay and road-trip plans realistic: legal overnight status, toilets, bathing, laundry, trash rules, noise rules, weather, road conditions, and backup lodging.
+- 將目的地與日期範圍轉換成可執行的實際路線。
+- 以旅行社行程、套裝行程與官方示範路線作為 benchmark；若符合使用者需求，也可以直接推薦。
+- 推薦旅行社或套裝選項時，說明價格、包含/不包含項目、預訂與取消條件，以及與自助規劃的成本比較。
+- 以 door-to-door 時間與總成本比較長距離交通選項，包括航班、新幹線、特急、高速巴士、渡輪、租車、自駕與混合交通模式。
+- 說明每個推薦停留點要做什麼、停留多久，以及可考慮的在地食物或餐廳。
+- 依目的地國家常用的評論/評分工具篩選餐廳；例如日本可在可行時結合 Google Maps 與食べログ。
+- 用停留時間、交通 buffer、用餐、check-in、最後入場、日落與疲勞檢查，讓每日行程保持 realistic。
+- 使用精確的 Google Maps 地點連結、座標 pin 或明確地圖 URL 標記地點，避免模糊的搜尋結果連結。
+- 自駕路線中，若景點、餐廳、登山口或設施入口與實際可用停車點不同，導航目標應使用已確認可供訪客使用的最近停車場或官方指定停車點。
+- 需要時提供可匯入 calendar / app 的欄位：事件標題、開始/結束時間、時區、地圖連結、提醒、預訂備註、地圖清單分組與離線地圖需求。
+- 推薦停留點前，先驗證會隨時間變動的資訊。
+- 區分已確認事實、假設與 open questions。
+- 使用天氣預報調整路線順序與備案。
+- 非自駕路線需依交通時刻、轉乘 buffer、預訂需求與票價估算進行最佳化。
+- 推薦符合路線、隔日安排、預算與旅行風格的住宿 base 或候選住宿。
+- 避免低效率路線形狀，尤其是從 A 到 B 後又返回中間點，除非有明確理由。
+- 評估車宿安靜程度與睡眠品質風險，包括車流、卡車怠速、深夜人潮、照明與附近設施。
+- 套用國家與地區特定要求，例如日本自駕路線的 Mapcode 與訪客停車檢查。
+- 依距離、燃油/充電、通行費、停車費、渡輪、橋樑與租車附加項目估算粗略自駕成本。
+- 當路線跨越鄉村、山區、離島、夜間、冬季或長距離且補給稀疏的區域時，規劃加油或 EV 充電停靠點。
+- 可使用社群來源進行 discovery，但決策需回到官方或當前來源。
+- 讓車宿與 road trip 計畫符合現實條件：合法過夜狀態、廁所、盥洗、洗衣、垃圾規則、噪音規則、天氣、路況與備用住宿。
 
 ## 範圍
 
 ### 屬於本層
 
-- Reusable workflows for planning trips.
-- Source hierarchy, travel agency/model-course benchmark or direct-package checks, package price comparison, long-distance transport comparison, stop-level activity/food checks, country-specific restaurant rating/review checks, exact-location and driving-parking-pin checks, calendar/app-ready output checks, schedule-feasibility checks, lodging/base checks, car-stay quietness checks, anti-backtracking route checks, transport booking/cost checks, fuel/charging checks, country-specific checks, and verification rules.
-- Output templates for itineraries, agency/model-course comparison, package price comparison, long-distance transport comparison, stop recommendations, schedule feasibility, lodging candidates, route-shape warnings, quietness notes, transport plans, cost estimates, weather/backup logic, support-stop tables, source tables, and day-before checklists.
-- Reusable lessons about travel planning quality, not private trip details.
+- 可重用的旅遊規劃分析流程。
+- 來源層級、旅行社/示範路線 benchmark 或套裝直推檢查、套裝價格比較、長距離交通比較、停留點活動與飲食檢查、國家特定餐廳評論/評分檢查、精確地點與自駕停車 pin 檢查、calendar/app-ready 產出檢查、行程可行性檢查、住宿 base 檢查、車宿安靜程度檢查、反折返路線檢查、交通預訂/成本檢查、加油/充電檢查、國家特定檢查與驗證規則。
+- 行程、旅行社/示範路線比較、套裝價格比較、長距離交通比較、停留點推薦、行程可行性、住宿候選、路線形狀警告、安靜程度備註、交通規劃、成本估算、天氣/備案邏輯、支援停靠點表、來源表與前一日檢查清單的輸出模板。
+- 關於旅遊規劃品質的可重用 lessons，而不是私人旅程細節。
 
 ### 不屬於本層
 
-- Passport, payment, reservation code, home address, or traveler identity details.
-- One-off live availability results that only apply to a specific user's trip.
-- Claims that a facility is open, bookable, or legal for overnight stay without source and timestamp context.
-- Legal, medical, immigration, or insurance advice beyond linking official sources.
+- 護照、付款、預訂代碼、住址或旅客身分細節。
+- 只適用於特定使用者旅程的一次性即時 availability 結果。
+- 沒有來源與時間戳脈絡，就宣稱某設施營業、可預訂或可合法過夜。
+- 超出官方來源連結之外的法律、醫療、移民或保險建議。
 
 ## 使用模式
 
-1. Start from the user's destination, dates, style, and constraints.
-2. Gather official and current sources for every time-sensitive recommendation.
-3. Check travel agency tours, package tours, and official model courses when useful. Either benchmark them or list them as direct options with price, inclusions/exclusions, booking conditions, and user-facing caveats.
-4. Verify exact place identity with Google Maps and official name/address; for driving, choose the nearest confirmed visitor parking/official parking pin as the practical navigation target and cross-check Mapcode when relevant.
-5. Add what to do, expected stay time, and food/local-specialty ideas for key stops. Screen restaurant candidates with local review/rating platforms and route/timing constraints.
-6. For cross-city, inter-prefecture, island, airport, or 2+ hour transfers, compare long-distance transport options by time, money, baggage burden, and booking risk.
-7. Check weather and local disruption risks before locking route order.
-8. If not driving, optimize transport routes and list booking/ticket requirements with fare estimates.
-9. If driving, estimate rough transport costs, apply country-specific navigation/access/parking checks, and plan fuel/charging stops.
-10. If overnighting, recommend lodging bases or candidates that reduce next-day friction and fit the route.
-11. For car-stay or overnight parking, evaluate quietness and sleep-quality risk.
-12. Plan route order with buffers, backups, support stops, anti-backtracking checks, and time feasibility checks.
-13. Add calendar/app-ready fields when the user may import the trip into a calendar, map list, reminder app, notes app, travel planning app, or offline map.
-14. Mark confidence and unresolved checks clearly.
-15. Convert new reusable planning lessons into `feedback_history/` when they generalize.
+1. 從使用者的目的地、日期、旅行風格與限制開始。
+2. 對每個會隨時間變動的推薦項目，蒐集官方且當前的來源。
+3. 需要時檢查旅行社行程、套裝行程與官方示範路線；可作為 benchmark，也可列為直接選項並標示價格、包含/不包含項目、預訂條件與使用者可見 caveats。
+4. 用 Google Maps 與官方名稱/地址確認精確地點；自駕時選擇已確認的訪客停車場或官方停車 pin 作為實際導航目標，必要時交叉檢查 Mapcode。
+5. 為關鍵停留點加入要做什麼、預期停留時間與在地食物/特色餐飲想法；用當地評論/評分平台與路線/時間限制篩選餐廳候選。
+6. 對跨城市、跨縣市/都道府縣、離島、機場或 2 小時以上移動，比較長距離交通的時間、成本、行李負擔與預訂風險。
+7. 在固定路線順序前，檢查天氣與在地中斷風險。
+8. 若非自駕，最佳化公共交通路線，列出票券/預訂需求與票價估算。
+9. 若自駕，估算粗略交通成本，套用國家特定導航/通行/停車檢查，並規劃加油/充電停靠點。
+10. 若需要過夜，推薦能降低隔日摩擦且符合路線的住宿 base 或候選住宿。
+11. 若車宿或過夜停車，評估安靜程度與睡眠品質風險。
+12. 以 buffer、備案、支援停靠點、反折返檢查與時間可行性檢查規劃路線順序。
+13. 若使用者可能匯入 calendar、地圖清單、提醒 app、筆記 app、旅遊規劃 app 或離線地圖，加入 calendar/app-ready 欄位。
+14. 清楚標記信心程度與尚未解決的檢查。
+15. 當新的規劃經驗可泛化時，轉成 `feedback_history/` 的可重用 lesson。
 
 ## 與其他層的關係
 
