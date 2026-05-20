@@ -2,7 +2,7 @@
 
 > **狀態**：draft
 > **建立時間**：2026-05-21 08:34
-> **目的**：將 `scripts/` 從依賴特定 shell、Ruby runtime 與本機環境假設，升級為可在 Windows、macOS、Linux 穩定執行的單一 Go binary 工具層；優先內建 pure Go SQLite（`modernc.org/sqlite` candidate）、YAML、JSON 與 runtime logic；iOS 以 App sandbox、Browser/WASM 或 SSH remote runner 作為可行方向，明確不支援 native arbitrary binary，Android 另評估 Termux / app sandbox / remote runner，不預設納入桌面同等支援範圍。
+> **目的**：將 `scripts/` 從依賴特定 shell、Ruby runtime 與本機環境假設，升級為可在 Windows、macOS、Linux 穩定執行的單一 Go binary 工具層；優先內建 pure Go SQLite（`modernc.org/sqlite` candidate）、YAML、JSON 與 runtime logic；desktop Git 是 external dependency，不包進 binary，缺 Git 時由 `doctor` / linked-update flow 阻斷並提示安裝；iOS 以 App sandbox、Browser/WASM 或 SSH remote runner 作為可行方向，明確不支援 native arbitrary binary，Android 另評估 Termux / app sandbox / remote runner，不預設納入桌面同等支援範圍。
 
 ## 背景
 
@@ -90,7 +90,7 @@ CLI 必須提供：
 | JSON parser | 使用 Go standard library | 無外部 runtime 依賴 |
 | SQLite engine | 優先評估 pure Go SQLite，例如 `modernc.org/sqlite` | 避免 CGO、C compiler、SQLite dev headers 與 Windows build friction |
 | Runtime / scheduler / migration logic | Go native implementation | 讓 `ai-skill runtime migrate`、`replay`、`repair` 類命令不依賴 shell / Ruby |
-| Git 操作 | 優先用 Go process wrapper 呼叫 git binary；需要時再評估 Go git library | 保留 git 語意一致性，同時讓錯誤與 dry-run 可控 |
+| Git 操作 | 不包進 binary；desktop 預設呼叫使用者本機 `git` binary，缺 Git 時由 `doctor` 與 close-loop / linked-update flow 阻斷並提示安裝 | 保留 credential helper、SSH key、hooks、GPG signing、LFS、submodule 與使用者既有 Git 語意 |
 
 SQLite 決策尤其重要：
 
@@ -108,6 +108,18 @@ git clone <repo>
 ```
 
 上述命令不應要求使用者先安裝 Ruby、Python、sqlite3 CLI、pip、gem 或 C compiler。若某階段仍是 wrapper mode，`doctor` 必須清楚標示哪些能力仍依賴外部 runtime，以及對應遷移計畫。
+
+#### Git external dependency policy
+
+Desktop 平台不應把 Git 包進 `ai-skill` binary。Git 是成熟且使用者環境高度客製化的外部工具，內建 Git 反而容易造成 credential、SSH、hooks、GPG signing、LFS、submodule 與 global config 行為不一致。
+
+策略：
+
+- `ai-skill doctor` 必須檢查 `git` 是否存在、版本是否符合最低需求、是否可執行 `git rev-parse` / `git status`。
+- 任何需要 linked updates、writeback transaction、commit、push、runtime sync 或 close-loop 的命令，如果偵測不到 Git，必須阻斷並提醒使用者安裝 Git，不得進入半套更新流程。
+- 錯誤訊息必須明確說明：目前 binary 內建 runtime dependencies，但 Git 是 desktop 必要外部依賴。
+- 若只需要讀取 repo metadata，可評估 Go git library 作為輔助；但 commit、push、status、hooks、credential 相關行為預設仍呼叫本機 `git`。
+- CI / contributor 文件需把 Git 列為必備工具，而 Ruby、Python、sqlite3 CLI 則逐步降為 wrapper / compatibility mode 依賴。
 
 ### 3. 以 adapter 包住既有 script，再逐步移植
 
@@ -157,7 +169,7 @@ Tasks：
 - [ ] 新增 `go.mod` 與 CLI skeleton。
 - [ ] 建立 dependency policy：pure Go dependency 優先；需要 CGO、外部 binary 或平台 SDK 時必須列為 exception。
 - [ ] 選型 SQLite library，預設評估 `modernc.org/sqlite`，並記錄是否排除 `mattn/go-sqlite3` 作為預設方案。
-- [ ] 實作 `ai-skill doctor`：檢查 git、SQLite、Ruby、Python、repo root、write permission、hooksPath、PATH。
+- [ ] 實作 `ai-skill doctor`：檢查 Git external dependency、SQLite、Ruby、Python、repo root、write permission、hooksPath、PATH；其中缺 Git 必須明確提示安裝。
 - [ ] 實作 path / OS abstraction，禁止散落 OS-specific string manipulation。
 - [ ] 建立 `--json` / `--plain` output contract。
 - [ ] 建立基本 unit tests 與 GitHub Actions matrix：Windows、macOS、Linux。
@@ -166,6 +178,7 @@ Completion criteria：
 
 - `go test ./...` 在三大桌面 OS 通過。
 - `ai-skill doctor --json` 輸出可被 CI / agent 解析。
+- 缺 Git 時，`doctor` 與需要 linked-update / close-loop 的命令會以穩定 exit code 阻斷並顯示安裝提示。
 - SQLite、YAML、JSON 的基本讀寫測試不依賴外部 CLI 或本機 C compiler。
 - 沒有任何命令在未傳 `--confirm` 或非 dry-run 模式下執行破壞性操作。
 
@@ -185,6 +198,7 @@ Tasks：
 
 - [ ] 用 fixtures 模擬新專案初始化，不寫入真實使用者目錄。
 - [ ] 用 temporary git repo 測試 close-loop、dirty owner group、lock、merge/rebase state、dry-run。
+- [ ] 用 missing-git fixture 測試 linked-update / close-loop 命令會阻斷並提醒使用者安裝 Git。
 - [ ] 對 symlink / copy fallback 建立 Windows 行為策略。
 - [ ] 更新 `scripts/README.md`，標示舊 script 與新 CLI 的對應關係與 deprecation policy。
 
@@ -314,7 +328,7 @@ Completion criteria：
 | --- | --- |
 | Unit tests | path normalization、OS detection、exit code、JSON output、dry-run planner |
 | Golden tests | command output、generated reports、runtime.db assertion、hook templates |
-| Fixture tests | temporary repo、dirty files、merge/rebase state、missing dependency、permission denied |
+| Fixture tests | temporary repo、dirty files、merge/rebase state、missing Git、missing dependency、permission denied |
 | Cross-OS CI | Windows、macOS、Linux；至少覆蓋 amd64，arm64 視 CI 能力納入 |
 | Compatibility tests | 新 CLI wrapper vs 舊 script 的行為比對 |
 | Runtime validation | `ruby scripts/refresh-knowledge-runtime.rb`、`ruby scripts/validate-runtime-db.rb`、SQLite content assertion |
@@ -324,6 +338,7 @@ Completion criteria：
 
 - 所有 destructive / write operations 先以 dry-run fixture 測試。
 - 涉及 git 的測試一律使用 temporary repo，不碰使用者真實 working tree。
+- 缺 Git 情境必須用 PATH isolation 或 fake executable fixture 測試，確認 linked-update / close-loop 會阻斷並提示安裝。
 - 涉及 home directory、Cursor bundle、hook install 的測試必須支援 fake home / fake config path。
 - Windows 測試不得假設 POSIX shell 存在。
 - Runtime compiler migration 必須使用 parity test，不得只比較 exit code。
@@ -369,6 +384,7 @@ Implementation phase 必須同步建立或更新：
 - Binary artifact 是否應命名為 `ai-skill`、`runtime`，或拆成 `ai-skill` CLI 與 `runtime` subcommand？目前傾向單一 `ai-skill` binary，避免多工具分裂。
 - SQLite library 是否採用 `modernc.org/sqlite` 作為預設？若採用 CGO SQLite，哪些 compatibility / performance 證據足以抵消部署成本？
 - 是否允許把 release binary commit 到 `bin/`，或只透過 GitHub Releases / CI artifacts 發佈？若 commit binary，需評估 repo size、review 與安全掃描成本。
+- Desktop Git 是否只設定最低版本，或還需要檢查 credential helper、SSH key、LFS 與 submodule 支援？最低要求應從 close-loop 與 linked-update 命令實際需求推導。
 - Ruby runtime compiler 是長期保留，還是以 parity test 分階段移植到 Go？
 - Release artifact 是否由 GitHub Actions 產生，或先只支援 source build？
 - iOS / Android 的主要使用場景是本機執行、遠端觸發，還是只需要讀取文件與狀態？
