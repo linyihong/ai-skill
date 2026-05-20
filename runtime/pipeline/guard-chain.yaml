@@ -2,9 +2,7 @@
 :guard_chain_version: v1
 :status: candidate
 :owner_layer: runtime/pipeline
-:description: 'Guard execution order per pipeline stage. 定義每個 stage 中 guards 的執行順序、 檢查頻率與中斷行為。Guards 按 severity 與依賴關係排序， 確保高優先級 guards 先執行，低優先級 guards 在資源允許時才執行。
-
-'
+:description: Guard execution order per pipeline stage. 定義每個 stage 中 guards 的執行順序、檢查頻率與中斷行為。
 :stages:
 - :id: bootstrap
   :name: Bootstrap Stage
@@ -127,8 +125,24 @@
       :threshold: 0.7
     :action_on_violation: halt + suggest_source_read
     :source: runtime/guards/circuit-breaker.yaml
-  - :id: conversation_length
+  - :id: mismatch_escalation
     :order: 6
+    :severity: critical
+    :description: 檢查 repeated failure、user contradiction、evidence conflict、source-of-truth miss 或 automation drift 是否需要進入 recovery
+    :check:
+      :frequency: per_failed_attempt
+      :triggers:
+      - repeated_failure
+      - user_contradiction
+      - evidence_conflict
+      - source_of_truth_miss
+      - automation_drift
+    :action_on_violation:
+      :warning: warn
+      :critical: suspend_execution + enter_recovery + rediscovery_required
+    :source: runtime/guards/circuit-breaker.yaml
+  - :id: conversation_length
+    :order: 7
     :severity: high
     :description: 檢查對話長度是否超過限制
     :check:
@@ -137,7 +151,7 @@
     :action_on_violation: warn + suggest_new_session
     :source: runtime/guards/context-pollution.yaml
   - :id: conflict_rules
-    :order: 7
+    :order: 8
     :severity: medium
     :description: 檢查執行期間是否有規則衝突
     :check:
@@ -145,7 +159,7 @@
     :action_on_violation: warn + suggest_resolution
     :source: runtime/guards/circuit-breaker.yaml
   - :id: repetitive_edits
-    :order: 8
+    :order: 9
     :severity: medium
     :description: 檢查是否對同一檔案反覆修改
     :check:
@@ -154,7 +168,7 @@
     :action_on_violation: warn + suggest_review
     :source: runtime/guards/context-pollution.yaml
   - :id: module_count
-    :order: 9
+    :order: 10
     :severity: medium
     :description: 檢查載入的模組數量
     :check:
@@ -163,7 +177,7 @@
     :action_on_violation: warn + suggest_prune
     :source: runtime/guards/context-pollution.yaml
   - :id: cross_reference_depth
-    :order: 10
+    :order: 11
     :severity: medium
     :description: 檢查依賴鏈深度
     :check:
@@ -172,7 +186,7 @@
     :action_on_violation: warn + suggest_simplify
     :source: runtime/guards/context-pollution.yaml
   - :id: token_utilization
-    :order: 11
+    :order: 12
     :severity: medium
     :description: 檢查 token 使用率
     :check:
@@ -195,34 +209,18 @@
     :source: runtime/budget/token-budget.yaml
 :rules:
 - :id: ordered-execution
-  :description: 'Guards 必須按 order 順序執行。高 order 的 guard 必須在低 order 的 guard 執行完成後才能執行。
-
-'
+  :description: Guards 必須按 order 順序執行。高 order 的 guard 必須在低 order 的 guard 執行完成後才能執行。
   :severity: error
-  :rationale: 'Token budget 必須在 recursive depth 之前檢查， 因為 recursive depth 檢查需要 token 來執行。
-
-'
+  :rationale: Token budget 必須在 recursive depth 之前檢查，因為 recursive depth 檢查需要 token 來執行。
 - :id: layered-violation
-  :description: '如果 critical guard 違規，直接中斷 stage，不繼續執行 lower-order guards。 如果 high/medium guard 違規，記錄警告但繼續執行。
-
-'
+  :description: 如果 critical guard 違規，直接中斷 stage，不繼續執行 lower-order guards。 如果 high/medium guard 違規，記錄警告但繼續執行。
   :severity: warning
-  :rationale: 'Critical guards（token_budget、recursive_depth、tool_calls） 直接影響系統穩定性，違規時必須立即中斷。
-
-'
+  :rationale: Critical guards（token_budget、recursive_depth、tool_calls） 直接影響系統穩定性，違規時必須立即中斷。
 - :id: frequency-respect
-  :description: 'Guards 必須按定義的 frequency 執行。 per_tool_call 的 guard 不可只在 per_task 時檢查。
-
-'
+  :description: Guards 必須按定義的 frequency 執行。per_tool_call 的 guard 不可只在 per_task 時檢查。
   :severity: error
-  :rationale: '降低檢查頻率可能導致 guard 在違規發生後才被觸發。
-
-'
+  :rationale: 降低檢查頻率可能導致 guard 在違規發生後才被觸發。
 - :id: cross-stage-escalation
-  :description: '如果某個 guard 在 routing stage 已違規（如 conflict_rules）， 在 execution stage 也必須重新檢查，不可假設 routing stage 已處理。
-
-'
+  :description: 如果某個 guard 在 routing stage 已違規（如 conflict_rules），在 execution stage 也必須重新檢查，不可假設 routing stage 已處理。
   :severity: warning
-  :rationale: 'Execution stage 可能載入新的 rules，導致新的衝突。
-
-'
+  :rationale: Execution stage 可能載入新的 rules，導致新的衝突。

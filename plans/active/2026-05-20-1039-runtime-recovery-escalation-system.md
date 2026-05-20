@@ -267,6 +267,8 @@ Phase 1 result:
 
 ### Phase 2 — Runtime Guard Integration
 
+Status: completed 2026-05-20.
+
 Goal: 把 mismatch escalation 接進 execution guard chain。
 
 Candidate files:
@@ -279,15 +281,34 @@ Candidate files:
 
 Tasks:
 
-- [ ] 新增或擴充 runtime guard，表示 repeated failure / user contradiction / evidence conflict / automation drift。
-- [ ] 在 execution stage 的 guard chain 中插入 `mismatch_escalation`。
-- [ ] 定義 action：`warn`、`suspend_execution`、`enter_recovery`、`rediscovery_required`。
-- [ ] 若 runtime source YAML 已由 compiler 管理，將 source 與 generated `runtime.db` 更新納入同一工作單。
-- [ ] 若新增獨立 guard YAML（例如 `runtime/guards/mismatch-escalation.yaml`），同步更新 compiler loader / runtime table mapping；否則把 guard 定義放入已編譯的 guard source。
+- [x] 新增或擴充 runtime guard，表示 repeated failure / user contradiction / evidence conflict / automation drift。
+- [x] 在 execution stage 的 guard chain 中插入 `mismatch_escalation`。
+- [x] 定義 action：`warn`、`suspend_execution`、`enter_recovery`、`rediscovery_required`。
+- [x] 若 runtime source YAML 已由 compiler 管理，將 source 與 generated `runtime.db` 更新納入同一工作單。
+- [x] 若新增獨立 guard YAML（例如 `runtime/guards/mismatch-escalation.yaml`），同步更新 compiler loader / runtime table mapping；否則把 guard 定義放入已編譯的 guard source。
 
 Exit criteria:
 
-- [ ] runtime guard chain 明確知道 mismatch 不是一般 retry，而是 recovery trigger。
+- [x] runtime guard chain 明確知道 mismatch 不是一般 retry，而是 recovery trigger。
+
+#### Phase 2 Architecture Compatibility Preflight
+
+| 欄位 | 結果 |
+| --- | --- |
+| Trigger | 開始執行 Phase 2 — Runtime Guard Integration |
+| Checked sources | `plans/README.md`、`runtime/README.md`、`runtime/guards/README.md`、`runtime/guards/circuit-breaker.yaml`、`runtime/pipeline/guard-chain.yaml`、`runtime/compiler/compiler-engine.rb` |
+| Conflicts | `runtime/guards/mismatch-escalation.yaml` 尚不存在，且 compiler 目前只編譯已知 guard source；不新增獨立 YAML，改將 `mismatch_escalation` 放入已編譯的 `runtime/guards/circuit-breaker.yaml`，並擴充 compiler guard key。 |
+| Decision | proceed with revised source placement |
+| Validation | YAML parse、runtime compiler、`runtime.db` query、`validate-runtime-db.rb`、knowledge runtime refresh |
+
+Phase 2 result:
+
+| Area | Result |
+| --- | --- |
+| Guard source | `runtime/guards/circuit-breaker.yaml` includes `mismatch_escalation` trigger classes and actions. |
+| Guard chain | `runtime/pipeline/guard-chain.yaml` execution stage includes `mismatch_escalation` before lower-priority warning guards. |
+| Compiler | `runtime/compiler/compiler-engine.rb` compiles `mismatch_escalation` into the `circuit_breaker` table. |
+| Runtime DB | `runtime/runtime.db` includes the compiled guard after validation. |
 
 ### Phase 3 — Recovery Runtime
 

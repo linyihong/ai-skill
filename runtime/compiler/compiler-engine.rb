@@ -491,7 +491,7 @@ def build_runtime_db(db_path)
 
   # 8f. Circuit Breaker
   cb = runtime_config('runtime/guards/circuit-breaker.yaml', EmbeddedRuntimeData::GUARDS_CIRCUIT_BREAKER)
-  guard_keys = %i[recursive_depth tool_calls context_growth hallucination_risk conflict_rules]
+  guard_keys = %i[recursive_depth tool_calls context_growth hallucination_risk mismatch_escalation conflict_rules]
   guard_keys.each do |key|
     next unless cb[key]
     entry = { name: key }.merge(cb[key])

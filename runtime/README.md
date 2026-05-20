@@ -42,7 +42,7 @@ Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 | Pipeline | [`pipeline/`](pipeline/) | Context flow, guard chain, relevance engine |
 | Recovery | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Phase reconciliation, state repair, obligation rebuild (embedded source; compiled to `runtime.db`) |
 | Scheduler | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Execution queue, priority scheduler (embedded source; compiled to `runtime.db`) |
-| Guards | [`guards/`](guards/) | Circuit breaker, context pollution |
+| Guards | [`guards/`](guards/) | Circuit breaker, context pollution, mismatch escalation |
 | Onboarding | [`onboarding/`](onboarding/) | New project/task setup guidance |
 | Output Governance | [`output-governance/`](output-governance/) | Language policy, output rules, governance gates |
 | Prompt Artifacts | [`prompt-artifacts/`](prompt-artifacts/) | Artifact templates, composition rules |
@@ -97,7 +97,7 @@ Some legacy runtime YAML sources have been embedded into `compiler/embedded_data
 | `compiler_metadata` | Auto-generated | Compiler version, compilation timestamp, schema version |
 | `runtime_budget` | [`budget/token-budget.yaml`](budget/token-budget.yaml) | Per-model token budget configuration |
 | `context_ttl_policy` | [`context/ttl-policy.yaml`](context/ttl-policy.yaml) | Context TTL policy per context type |
-| `circuit_breaker` | [`guards/circuit-breaker.yaml`](guards/circuit-breaker.yaml) | Circuit breaker guard definitions |
+| `circuit_breaker` | [`guards/circuit-breaker.yaml`](guards/circuit-breaker.yaml) | Circuit breaker and mismatch escalation guard definitions |
 | `context_pollution` | [`guards/context-pollution.yaml`](guards/context-pollution.yaml) | Context pollution detection signals |
 | `context_health_score` | [`health/context-health-score.yaml`](health/context-health-score.yaml) | Context health scoring dimensions |
 | `intelligence_routing` | [`intelligence/intelligence-routing.yaml`](intelligence/intelligence-routing.yaml) | Intelligence routing rules |

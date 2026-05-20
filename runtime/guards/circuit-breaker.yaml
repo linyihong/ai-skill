@@ -53,6 +53,43 @@
     :message: "⛔ Hallucination risk score: {score}. Agent halted. 請先讀取 canonical source 再繼續。"
   - :action: suggest_source_reading
     :message: 建議先讀取以下 canonical source：{sources}
+:mismatch_escalation:
+  :description: 偵測 execution 中段的假設崩塌、反覆失敗或 source-of-truth miss，將一般 retry 升級為 recovery trigger
+  :trigger_classes:
+  - :class: repeated_failure
+    :signal: 同一路徑、同一 automation、同一 checkpoint 連續失敗 2 次
+    :level: L3
+    :action: suspend_execution
+  - :class: user_contradiction
+    :signal: 使用者指出 agent 沒看文件、不是這個流程、或仍在猜測
+    :level: L4
+    :action: enter_recovery
+  - :class: evidence_conflict
+    :signal: UI、API、repo structure 與 workflow / contract / README 衝突
+    :level: L4
+    :action: enter_recovery
+  - :class: source_of_truth_miss
+    :signal: 重要操作前未讀 canonical workflow、owner docs、UI map、API contract 或 runtime source
+    :level: L4
+    :action: rediscovery_required
+  - :class: automation_drift
+    :signal: 腳本反覆 patch，但 checkpoint 截圖、foreground 或 feature context 不對
+    :level: L4
+    :action: suspend_execution
+  :check_on:
+  - per_failed_attempt
+  - user_contradiction
+  - evidence_conflict
+  - before_retry_after_failure
+  :actions:
+  - :action: warn
+    :message: "⚠️ Mismatch escalation trigger detected: {trigger_class}. Stop local patching and reload source-of-truth."
+  - :action: suspend_execution
+    :message: 暫停目前 implementation / automation，先寫出舊假設與反證。
+  - :action: enter_recovery
+    :message: 依 enforcement/escalation-policy.md 重建 execution graph。
+  - :action: rediscovery_required
+    :message: 重新讀 workflow primary source、owner docs、artifact gates 與必要 source-of-truth。
 :conflict_rules:
   :description: 偵測目前 context 中的規則衝突
   :check_on: task_start
