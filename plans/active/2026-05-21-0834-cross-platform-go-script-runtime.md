@@ -2,7 +2,7 @@
 
 > **狀態**：draft
 > **建立時間**：2026-05-21 08:34
-> **目的**：將 `scripts/` 從依賴特定 shell、Ruby runtime 與本機環境假設，升級為可在 Windows、macOS、Linux 穩定執行的跨平台工具層；iOS / Android 先評估可行性與限制，不預設納入同等支援範圍。
+> **目的**：將 `scripts/` 從依賴特定 shell、Ruby runtime 與本機環境假設，升級為可在 Windows、macOS、Linux 穩定執行的單一 Go binary 工具層；優先內建 pure Go SQLite（`modernc.org/sqlite` candidate）、YAML、JSON 與 runtime logic，iOS / Android 先評估可行性與限制，不預設納入同等支援範圍。
 
 ## 背景
 
@@ -19,10 +19,11 @@
 
 1. 建立一個跨平台 CLI 入口，例如 `ai-skill`，以 Go 實作主要 script 能力。
 2. 在 Windows、macOS、Linux 上提供一致的命令、輸出、exit code、dry-run 與錯誤訊息。
-3. 將現有 shell / Ruby script 的行為先規格化，再分批遷移，避免一次重寫造成 close-loop 失效。
-4. 建立完整測試矩陣：unit test、golden output、fixture repo、跨 OS CI、端到端 dry-run、runtime.db / SQLite assertion。
-5. 保留必要的 Ruby compiler 或逐步移植策略，確保 runtime source-of-truth 與 generated artifact 不漂移。
-6. 評估 iOS / Android 是否適合作為「執行平台」、「遠端控制平台」或「不可支援平台」，並寫出明確結論。
+3. 產出可發佈的單一 binary，將 YAML parser、JSON parser、SQLite engine、runtime logic、scheduler、migration / repair logic 盡量編入 executable，降低使用者端安裝成本。
+4. 將現有 shell / Ruby script 的行為先規格化，再分批遷移，避免一次重寫造成 close-loop 失效。
+5. 建立完整測試矩陣：unit test、golden output、fixture repo、跨 OS CI、端到端 dry-run、runtime.db / SQLite assertion。
+6. 保留必要的 Ruby compiler 或逐步移植策略，確保 runtime source-of-truth 與 generated artifact 不漂移。
+7. 評估 iOS / Android 是否適合作為「執行平台」、「遠端控制平台」或「不可支援平台」，並寫出明確結論。
 
 ## 非目標
 
@@ -79,7 +80,36 @@ CLI 必須提供：
 - 穩定 exit code：validation failure、dirty working tree、missing dependency、permission denied、unsupported platform 要有不同 code。
 - path abstraction：統一處理 Windows drive、UNC path、POSIX path、symlink 與 path normalization。
 
-### 2. 以 adapter 包住既有 script，再逐步移植
+### 2. 單一 binary 與內建 dependency 原則
+
+跨平台目標應以「使用者不需要另外安裝 Ruby、Python、sqlite3 CLI、gem、pip 或 C compiler」為方向。Go CLI 應把主要 runtime dependencies 編進 binary：
+
+| Dependency | 優先策略 | 原因 |
+| --- | --- | --- |
+| YAML parser | 使用 Go library，例如 `gopkg.in/yaml.v3` | 編譯後隨 binary 發佈，不要求使用者安裝外部 YAML 工具 |
+| JSON parser | 使用 Go standard library | 無外部 runtime 依賴 |
+| SQLite engine | 優先評估 pure Go SQLite，例如 `modernc.org/sqlite` | 避免 CGO、C compiler、SQLite dev headers 與 Windows build friction |
+| Runtime / scheduler / migration logic | Go native implementation | 讓 `ai-skill runtime migrate`、`replay`、`repair` 類命令不依賴 shell / Ruby |
+| Git 操作 | 優先用 Go process wrapper 呼叫 git binary；需要時再評估 Go git library | 保留 git 語意一致性，同時讓錯誤與 dry-run 可控 |
+
+SQLite 決策尤其重要：
+
+- **預設不採用 CGO SQLite**：例如 `mattn/go-sqlite3` 需要 CGO、C compiler 與平台相依 build chain，Windows 維護成本較高。
+- **優先採用 pure Go SQLite**：例如 `modernc.org/sqlite` 可把 SQLite engine 編入 binary，較符合單一 binary 與低部署摩擦目標。
+- **若 performance / compatibility 必須使用 CGO**：必須在 plan 或 ADR 中明確記錄原因、fallback、CI matrix 與 Windows 安裝成本，不可默默引入。
+
+使用者端理想體驗：
+
+```bash
+git clone <repo>
+./bin/ai-skill runtime migrate
+./bin/ai-skill runtime replay
+./bin/ai-skill runtime repair
+```
+
+上述命令不應要求使用者先安裝 Ruby、Python、sqlite3 CLI、pip、gem 或 C compiler。若某階段仍是 wrapper mode，`doctor` 必須清楚標示哪些能力仍依賴外部 runtime，以及對應遷移計畫。
+
+### 3. 以 adapter 包住既有 script，再逐步移植
 
 第一版 Go CLI 不必立刻重寫所有 Ruby compiler / generator。建議分三層：
 
@@ -89,7 +119,7 @@ CLI 必須提供：
 | Native mode | 將 shell script 與 path/git/file 操作移植到 Go | 優先解決 Windows/macOS/Linux 差異 |
 | Compiler migration | 評估 Ruby generator / compiler 是否移植到 Go 或保留 Ruby | 避免 premature rewrite 破壞 runtime semantics |
 
-### 3. Runtime compiler 的保守策略
+### 4. Runtime compiler 的保守策略
 
 `runtime/compiler/compiler-engine.rb` 是 `runtime/runtime.db` 的 source-to-generated compiler。遷移策略必須保守：
 
@@ -125,6 +155,8 @@ Completion criteria：
 Tasks：
 
 - [ ] 新增 `go.mod` 與 CLI skeleton。
+- [ ] 建立 dependency policy：pure Go dependency 優先；需要 CGO、外部 binary 或平台 SDK 時必須列為 exception。
+- [ ] 選型 SQLite library，預設評估 `modernc.org/sqlite`，並記錄是否排除 `mattn/go-sqlite3` 作為預設方案。
 - [ ] 實作 `ai-skill doctor`：檢查 git、SQLite、Ruby、Python、repo root、write permission、hooksPath、PATH。
 - [ ] 實作 path / OS abstraction，禁止散落 OS-specific string manipulation。
 - [ ] 建立 `--json` / `--plain` output contract。
@@ -134,6 +166,7 @@ Completion criteria：
 
 - `go test ./...` 在三大桌面 OS 通過。
 - `ai-skill doctor --json` 輸出可被 CI / agent 解析。
+- SQLite、YAML、JSON 的基本讀寫測試不依賴外部 CLI 或本機 C compiler。
 - 沒有任何命令在未傳 `--confirm` 或非 dry-run 模式下執行破壞性操作。
 
 ### Phase 2：Shell Script Migration（P1）
@@ -170,6 +203,7 @@ Tasks：
 - [ ] 先建立 Go wrapper：`ai-skill runtime refresh`、`runtime validate`、`runtime compile`。
 - [ ] Wrapper 必須固定 UTF-8 環境，並在缺 Ruby / SQLite 時給明確修復建議。
 - [ ] 建立 golden fixture：同一組 source 產出固定 `runtime-report.md`、model reports、SQLite index、`runtime.db` assertion。
+- [ ] 建立 native SQLite proof-of-concept：用 pure Go SQLite 開啟、查詢、寫入測試 DB，確認 Windows / macOS / Linux 無外部 sqlite3 CLI 依賴。
 - [ ] 評估哪些 Ruby validator 適合原生 Go 重寫，哪些應保留 Ruby。
 - [ ] 若開始移植 compiler，先建立 Ruby vs Go parity test，不得直接替換 production compiler。
 
@@ -177,6 +211,7 @@ Completion criteria：
 
 - Go CLI 可一鍵跑完整更新流程並輸出 machine-readable summary。
 - `runtime.db` 的 `generated_surfaces` 必須可查到 modified source 的內容 assertion。
+- native SQLite path 可在三大桌面 OS 執行基本 migration / query / assertion。
 - Ruby / Go parity test 未通過前，不切換 runtime compiler source。
 
 ### Phase 4：Cross-Platform Release & Distribution（P1）
@@ -186,13 +221,16 @@ Completion criteria：
 Tasks：
 
 - [ ] 建立 release artifact：Windows `.exe`、macOS universal / arch-specific、Linux amd64 / arm64。
+- [ ] 建立 `bin/` 或 release artifact layout 決策：repository 是否提交 binary、只在 GitHub Releases 發佈，或提供 local build output。
 - [ ] 建立 checksum 與版本輸出：`ai-skill version`。
+- [ ] 建立 GitHub Actions cross-compile workflow，輸出 Windows、Linux、macOS artifacts。
 - [ ] 建立 upgrade / rollback 文件。
 - [ ] 評估 Homebrew、Scoop、winget、GitHub Releases、直接下載 binary 的維護成本。
 
 Completion criteria：
 
 - 三大桌面 OS 都能下載 binary 後執行 `doctor` 與 dry-run commands。
+- 發佈 artifact 不要求使用者安裝 Ruby、Python、sqlite3 CLI、pip、gem 或 C compiler 才能跑核心命令。
 - 文件說明 source build 與 binary install 的差異。
 - release 流程有 dry-run 與 artifact verification。
 
@@ -278,21 +316,25 @@ Implementation phase 必須同步建立或更新：
 | `runtime/compiler/compiler-engine.rb` | 若移植 compiler，需建立 parity gate | Phase 3 |
 | `cmd/ai-skill/` 或等效 Go CLI 目錄 | 未來新增 | Phase 1 |
 | `go.mod` / `go.sum` | 未來新增 | Phase 1 |
+| `bin/` 或 GitHub Releases artifact layout | 未來決策 | Phase 4 |
 | `.github/workflows/` 或既有 CI 設定 | 未來新增跨 OS 測試 | Phase 1 / Phase 4 |
 
 ## Recommended Execution Order
 
 1. 先執行 Phase 0，完成 command contract 與 support matrix。
-2. 再執行 Phase 1，建立 Go CLI skeleton、doctor 與跨 OS CI。
+2. 再執行 Phase 1，建立 Go CLI skeleton、dependency policy、doctor 與跨 OS CI。
 3. 優先執行 Phase 2，因為 shell scripts 是 Windows 相容性風險最高的部分。
-4. Phase 3 必須保守推進，runtime compiler 不可在沒有 parity test 前替換。
-5. Phase 4 在 CLI 行為穩定後再做 release；避免先發佈不穩定 binary。
+4. Phase 3 必須保守推進，先證明 pure Go SQLite 與 runtime assertion 可行；runtime compiler 不可在沒有 parity test 前替換。
+5. Phase 4 在 CLI 行為穩定後再做 release；release 目標是單一 binary，避免先發佈仍依賴 Ruby / Python / sqlite3 CLI 的不穩定工具。
 6. Phase 5 可以與 Phase 1-2 並行做 feasibility research，但不得阻塞桌面平台支援。
 7. Phase 6 只有在新 CLI 覆蓋主要能力且文件、測試、runtime surfaces 都通過後才能執行。
 
 ## Open Questions
 
 - Go CLI 是否放在 repository root 的 `cmd/ai-skill`，或放在 `tools/ai-skill-cli` 以避免與知識文件混淆？
+- Binary artifact 是否應命名為 `ai-skill`、`runtime`，或拆成 `ai-skill` CLI 與 `runtime` subcommand？目前傾向單一 `ai-skill` binary，避免多工具分裂。
+- SQLite library 是否採用 `modernc.org/sqlite` 作為預設？若採用 CGO SQLite，哪些 compatibility / performance 證據足以抵消部署成本？
+- 是否允許把 release binary commit 到 `bin/`，或只透過 GitHub Releases / CI artifacts 發佈？若 commit binary，需評估 repo size、review 與安全掃描成本。
 - Ruby runtime compiler 是長期保留，還是以 parity test 分階段移植到 Go？
 - Release artifact 是否由 GitHub Actions 產生，或先只支援 source build？
 - iOS / Android 的主要使用場景是本機執行、遠端觸發，還是只需要讀取文件與狀態？
