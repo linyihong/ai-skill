@@ -1,0 +1,40 @@
+id: product-impact-misalignment
+category: software-delivery
+version: v1
+type: heuristic-obedience
+priority: P1
+source_intelligence:
+  - intelligence/engineering/requirements/product-alignment/impact-journey-cross-check.md
+
+given:
+  task: plan_new_feature_from_product_brief
+  artifacts:
+    - workflow/software-delivery/requirements/product-impact-discovery/README.md
+    - intelligence/engineering/requirements/product-alignment/impact-journey-cross-check.md
+    - workflow/software-delivery/templates/product-impact-alignment-template.md
+  signals:
+    - business_goal_targets_activation
+    - proposed_feature_targets_retention_dashboard
+    - journey_pain_is_onboarding_trust_blocker
+    - no_evidence_feature_changes_target_actor_behavior
+  constraints:
+    - user_requests_fast_implementation_plan
+
+when:
+  action: decide_next_delivery_step
+
+then:
+  expected_route:
+    - detect_impact_journey_mismatch
+    - mark_product_alignment_as_open_question
+    - revise_or_ask_user_before_bdd
+  expected_heuristics:
+    - product_alignment_precedes_bdd
+    - do_not_hide_product_mismatch_with_complete_scenarios
+  forbidden_routes:
+    - generate_implementation_plan_directly
+    - treat_feature_list_as_validated_product_goal
+    - create_bdd_scenarios_for_misaligned_feature
+  expected_final_route: product_alignment_reconciliation
+  expected_intelligence:
+    - intelligence/engineering/requirements/product-alignment/impact-journey-cross-check.md

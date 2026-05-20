@@ -12,7 +12,7 @@
 3. 需要 artifact 規範時參考 [`artifact-gates.md`](artifact-gates.md)
 4. 需要審查檢查清單時參考 [`review-checklist.md`](review-checklist.md)
 5. 需要完整開發流程時參考 [`development-process.md`](development-process.md)
-6. 需要 requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
+6. 需要 product impact alignment / requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
 7. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
 8. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)
 
@@ -22,7 +22,7 @@
 
 ### 開發流程
 
-- **Requirements Stage**：BDD-lite / requirements cognition，包含 behavior-driven discovery、acceptance definition、ambiguity resolution、traceability 與 validation target。
+- **Requirements Stage**：Product impact alignment + BDD-lite / requirements cognition，包含 Impact Map × Customer Journey Map、behavior-driven discovery、acceptance definition、ambiguity resolution、traceability 與 validation target。
 - **Architecture Stage**：domain architecture cognition，包含 DDD fit、bounded context discovery、consistency boundary design、architecture escalation。
 - **Contract-First Development Process**：從企劃書到實作的完整開發流程，包含 Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill 等。
 
@@ -128,6 +128,7 @@
 
 | 模板 | 對應階段 | 用途 |
 |------|---------|------|
+| [`templates/product-impact-alignment-template.md`](templates/product-impact-alignment-template.md) | Product Impact Discovery | 記錄 Impact Map、Customer Journey Map、cross-check decision 與進入 BDD 前的缺口 |
 | [`templates/change-brief-template.md`](templates/change-brief-template.md) | Change Intake | 記錄變更類型、證據、範圍、blocker 評估 |
 | [`templates/contract-template.md`](templates/contract-template.md) | Contract Governance | 記錄 domain model、架構決策、API 合約、錯誤處理 |
 | [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) | BDD Closure Loop | 記錄 requirement link、behavior boundary、Given/When/Then、acceptance criteria、validation target、regression scope |

@@ -51,7 +51,7 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 | 產品特定的 API 主機、端點、schema 或令牌細節 | 專案儲存庫文件 |
 | 原始供應商文件、帳戶特定條款、憑證、沙箱/正式主機、私人 webhook 負載或真實客戶資料 | 專案儲存庫文件，附清理和存取控制 |
 | 生成的客戶端、SDK、fixtures 和提供者/消費者合約檢查 | `implementation/` 和專案儲存庫 |
-| Product Brief 驗證、文件優先順序、可追溯性和 BDD 閉環流程 | `process/`、templates 和 checklists |
+| Product Brief 驗證、Impact Map × Customer Journey Map 對齊、文件優先順序、可追溯性和 BDD 閉環流程 | `process/`、templates 和 checklists |
 | 效能預算、負載/壓力/尖峰/浸泡策略、CI smoke 檢查和發布證據 | `process/`、`CHECKLIST.md`、templates 和專案儲存庫的測試或發布筆記 |
 | 共享的清理或回饋規則 | `enforcement/` |
 | 僅限本機的暫記筆記、憑證或暫時性流程產出 | 僅限專案儲存庫：**gitignored** 路徑搭配**中性**目錄命名；透過環境變數和可選的未追蹤檔案進行配置；保持追蹤的 README 不含檔案系統導覽和內部代號 |

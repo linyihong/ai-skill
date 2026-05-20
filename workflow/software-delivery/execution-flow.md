@@ -25,7 +25,7 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 | --- | --- |
 | 存在什麼規劃產出？ | 閱讀企劃書、product brief、規劃文件、issue、ticket、PRD、設計備註、BDD、API 合約或同等文件 |
 | Product brief 本身是否已驗證？ | 根據證據或明確決策檢查目標、使用者、範圍、non-goals、假設、限制、依賴、風險和成功標準。將每個主要聲明標記為 `validated`（已驗證）、`assumption`（假設）、`open question`（開放問題）、`scoped out`（排除範圍）或 `invalidated`（無效） |
-| 這是新需求還是行為變更？ | 先執行 [`requirements/`](requirements/README.md) stage：behavior-driven discovery、acceptance definition、ambiguity resolution；再更新規劃文件、BDD、合約、實作切片和測試 |
+| 這是新需求還是行為變更？ | 先執行 [`requirements/`](requirements/README.md) stage：product-impact discovery、behavior-driven discovery、acceptance definition、ambiguity resolution；再更新規劃文件、BDD、合約、實作切片和測試 |
 | 這是 bug 修復？ | 確認預期行為 vs 實際行為、重現/證據、受影響的 BDD 或缺失 scenario、受影響的合約/錯誤和回歸測試 |
 | 這是重構？ | 確認沒有行為或公開合約變更；否則重新分類 |
 | 這是強化？ | 確認威脅/故障模式、擁有者層、驗證和連結的檢查清單/控制更新 |
@@ -45,6 +45,7 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 
 在進入 architecture 或 implementation 前，若任務涉及 observable behavior，讀取 [`requirements/`](requirements/README.md)：
 
+- Product-impact discovery：Impact Map、Customer Journey Map、cross-check decision。
 - Behavior-driven discovery：actor intent、behavior boundary、shared language。
 - Acceptance definition：acceptance criteria、validation target、regression scope。
 - Ambiguity resolution：將不確定項標成 `assumption`、`open question`、`scoped out` 或 `invalidated`。

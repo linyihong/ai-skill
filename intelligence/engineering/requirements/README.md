@@ -9,6 +9,7 @@ BDD = behavior alignment and requirement cognition system。
 本層處理：
 
 - ambiguity detection
+- product impact alignment
 - actor intent modeling
 - scenario framing
 - acceptance boundaries
@@ -20,6 +21,7 @@ BDD = behavior alignment and requirement cognition system。
 
 | 子目錄 | 用途 |
 | --- | --- |
+| [`product-alignment/`](product-alignment/README.md) | 用 Impact Map × Customer Journey Map 檢查 business goal、target actor、journey pain 與 feature investment 是否對齊。 |
 | [`behavior-modeling/`](behavior-modeling/README.md) | 建立 shared language、behavior boundary、scenario framing 與 acceptance boundary。 |
 | [`specification-quality/`](specification-quality/README.md) | 檢查 requirement 是否可驗證、可追溯、沒有自行擴張。 |
 | [`validation-thinking/`](validation-thinking/README.md) | 將 acceptance criteria 接到 validation target 與 proof acquisition。 |

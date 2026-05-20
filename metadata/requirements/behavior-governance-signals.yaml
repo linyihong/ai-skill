@@ -2,8 +2,21 @@ id: metadata.requirements.behavior-governance-signals
 status: candidate
 source_intelligence:
   - intelligence/engineering/requirements/README.md
+  - intelligence/engineering/requirements/product-alignment/impact-journey-cross-check.md
   - intelligence/engineering/requirements/specification-quality/requirement-traceability.md
 signals:
+  product_goal_mismatch:
+    severity: high
+    description: Business goal、target actor、journey pain 或 feature investment 無法互相對齊。
+    action: revise_product_alignment_before_bdd
+  journey_pain_mismatch:
+    severity: medium
+    description: Feature investment 沒有對準 Customer Journey 中的 pain point、emotional low 或 blocker。
+    action: revalidate_journey_evidence
+  feature_without_impact:
+    severity: medium
+    description: What 很清楚，但缺少 Why / Who / How 的 impact chain。
+    action: downgrade_feature_to_assumption_or_reject
   requirement_contradiction:
     severity: high
     description: Requirement、behavior contract、domain invariant、implementation 或 tests 之間出現互斥 claim。

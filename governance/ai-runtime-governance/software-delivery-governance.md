@@ -7,10 +7,11 @@ source_intelligence:
 - [`intelligence/engineering/requirements/README.md`](../../intelligence/engineering/requirements/README.md)
 - [`intelligence/engineering/development/docs-first-bdd-closure.md`](../../intelligence/engineering/development/docs-first-bdd-closure.md)
 - [`analysis/development-guidance/risk-translation.md`](../../analysis/development-guidance/risk-translation.md)
+- [`intelligence/engineering/requirements/product-alignment/README.md`](../../intelligence/engineering/requirements/product-alignment/README.md)
 - [`workflow/software-delivery/requirements/README.md`](../../workflow/software-delivery/requirements/README.md)
 - [`workflow/software-delivery/development-process.md`](../../workflow/software-delivery/development-process.md)
 
-本文件把 requirements cognition、docs-first BDD closure、contract-first development 與 development guidance 的風險翻譯方法轉譯成 AI runtime software-delivery governance。原始 intelligence 回答「如何穩定 observable behavior、acceptance、traceability 與 validation target」；本文件定義 change intake、requirements cognition、contract precedence、BDD closure、artifact completeness、performance evidence 與 same-session documentation closure 的治理 gate。
+本文件把 product alignment、requirements cognition、docs-first BDD closure、contract-first development 與 development guidance 的風險翻譯方法轉譯成 AI runtime software-delivery governance。原始 intelligence 回答「如何確認產品方向、穩定 observable behavior、acceptance、traceability 與 validation target」；本文件定義 change intake、product alignment、requirements cognition、contract precedence、BDD closure、artifact completeness、performance evidence 與 same-session documentation closure 的治理 gate。
 
 ## 觸發時機
 
@@ -27,6 +28,7 @@ source_intelligence:
 | --- | --- |
 | Change intake | 已分類為新需求、bug、refactor、安全/強化、performance 或 planning-only，並確認 code 前需要的 artifacts。 |
 | Brief validation | Product brief 的主要 claim 已標記 `validated`、`assumption`、`open question`、`scoped out` 或 `invalidated`。 |
+| Product alignment | Impact Map 的 Why / Who / How / What 已與 Customer Journey 的 actor、timing、pain point、blocker 交叉驗證。 |
 | Requirements cognition | Observable behavior 已有 actor intent、behavior boundary、acceptance criteria、validation target 與 ambiguity disposition。 |
 | Contract precedence | 衝突時先判斷 governing contract、product plan、BDD、domain/API/error/hardware contract、implementation、tests 的優先序。 |
 | Docs-first BDD closure | Observable behavior 變更前，owning contract、BDD scenario、executable validation 與 implementation slice 已同步或明確 scope out。 |
@@ -39,6 +41,7 @@ source_intelligence:
 
 | 內容類型 | 目標層 |
 | --- | --- |
+| 為什麼 feature investment 對準 business impact 與 user journey | `intelligence/engineering/requirements/product-alignment/` |
 | 為什麼 BDD 是 requirements cognition、如何處理 ambiguity / acceptance / traceability | `intelligence/engineering/requirements/` |
 | 為什麼 contract 要先於 code、為什麼 BDD 是 behavior bridge | `intelligence/engineering/development/` |
 | Software delivery 的 AI runtime gate 與 completion criteria | `governance/ai-runtime-governance/` |
@@ -48,7 +51,7 @@ source_intelligence:
 
 ## Workflow Mapping
 
-- [`workflow/software-delivery/requirements/README.md`](../../workflow/software-delivery/requirements/README.md) — requirements cognition stage。
+- [`workflow/software-delivery/requirements/README.md`](../../workflow/software-delivery/requirements/README.md) — product alignment and requirements cognition stage。
 - [`workflow/software-delivery/execution-flow.md`](../../workflow/software-delivery/execution-flow.md) — software-delivery workflow entry and execution order。
 - [`workflow/software-delivery/development-process.md`](../../workflow/software-delivery/development-process.md) — contract-first development process and detailed gates。
 - [`workflow/software-delivery/artifact-gates.md`](../../workflow/software-delivery/artifact-gates.md) — reusable note structure and artifact quality gates。
@@ -58,6 +61,8 @@ source_intelligence:
 
 本治理不讓 runtime 理解 BDD syntax、Gherkin、scenario grammar 或 universal requirement schema。只有下列壓縮訊號可作為未來 runtime-lite 候選：
 
+- `product_goal_mismatch`：business goal、target actor、journey pain 或 feature investment 不一致。
+- `feature_without_impact`：feature list 缺少 Why / Who / How impact chain。
 - `requirement_contradiction`：requirements、BDD、contract、implementation 或 tests 出現互斥 claim。
 - `missing_validation_target`：acceptance criteria 沒有可執行或可審查的 proof target。
 - `stale_acceptance_criteria`：product intent、domain invariant 或 implementation truth 改變後，acceptance baseline 未同步。
@@ -70,6 +75,7 @@ source_intelligence:
 後續若要 promotion 到 `validation/`，可建立 scenario 檢查：
 
 - Requirement / BDD / tests 互相矛盾卻繼續 implementation。
+- Product goal、target actor、journey pain 或 feature investment 不一致卻直接產生 implementation plan。
 - Acceptance criteria 缺 validation target 卻宣稱 ready。
 - Observable behavior change 只改 code，未更新 owning contract / BDD / tests。
 - Product brief claim 未驗證卻被當成 implementation input。

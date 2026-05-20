@@ -2,9 +2,13 @@ id: graph.requirements-cognition
 source: intelligence/engineering/requirements/README.md
 status: candidate
 summary: >
-  Connects requirements cognition, BDD-lite workflow, behavior governance metadata,
+  Connects product alignment, requirements cognition, BDD-lite workflow, behavior governance metadata,
   software-delivery governance and validation scenarios without promoting BDD syntax to runtime.
 edges:
+  - type: depends_on
+    target: intelligence/engineering/requirements/product-alignment/README.md
+    reason: Product alignment checks Impact Map and Customer Journey Map before BDD-lite behavior modeling.
+    validation: README lists impact map, customer journey and cross-check entries.
   - type: depends_on
     target: intelligence/engineering/requirements/behavior-modeling/README.md
     reason: Behavior modeling stabilizes actor intent and behavior boundary.
@@ -16,7 +20,7 @@ edges:
   - type: related_to
     target: workflow/software-delivery/requirements/README.md
     reason: Workflow requirements stage applies requirements cognition to delivery.
-    validation: Workflow lists behavior-driven discovery, acceptance definition and ambiguity resolution.
+    validation: Workflow lists product-impact discovery, behavior-driven discovery, acceptance definition and ambiguity resolution.
   - type: related_to
     target: governance/ai-runtime-governance/software-delivery-governance.md
     reason: Governance translates behavior correctness into delivery gates.
@@ -29,6 +33,10 @@ edges:
     target: validation/scenarios/software-delivery/requirement-contradiction.yaml
     reason: Scenario validates contradiction handling.
     validation: Scenario blocks implementation when requirement sources conflict.
+  - type: related_to
+    target: validation/scenarios/software-delivery/product-impact-misalignment.yaml
+    reason: Scenario validates product impact and journey mismatch handling.
+    validation: Scenario blocks direct BDD / implementation planning when product alignment is unresolved.
   - type: related_to
     target: intelligence/engineering/requirements/validation-thinking/mutation-testing-effectiveness.md
     reason: Mutation testing effectiveness validates whether tests catch meaningful behavior or invariant breaks.

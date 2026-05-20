@@ -9,6 +9,7 @@
 本目錄涵蓋以下分析方法：
 
 - **風險翻譯（Risk Translation）**：將分析觀察轉換為開發者視角的風險陳述。
+- **Product alignment（產品方向對齊）**：將 product brief 的 business goal、target actor、feature investment 對照 customer journey pain。
 - **擁有者層選擇（Owner Layer Selection）**：根據風險類型選擇最適合的控制層。
 - **控制定義（Control Definition）**：定義控制措施的結構與驗證方法。
 - **指引分類（Guidance Classification）**：將指引分類到正確的目錄位置。

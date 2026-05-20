@@ -42,6 +42,7 @@ validation/
 ## Software Delivery Scenarios
 
 - `software-delivery/requirement-contradiction.yaml` — requirement / BDD / tests 衝突時不得直接 implementation。
+- `software-delivery/product-impact-misalignment.yaml` — Impact Map 與 Customer Journey 不一致時不得直接產生 BDD 或 implementation plan。
 - `software-delivery/missing-validation-target.yaml` — acceptance criteria 缺 validation target 時不得宣稱 ready。
 - `software-delivery/stale-acceptance-criteria.yaml` — domain invariant 改變後舊 acceptance baseline 必須刷新。
 - `software-delivery/behavior-scope-overclaim.yaml` — single scenario pass 不得宣稱 global feature correctness。

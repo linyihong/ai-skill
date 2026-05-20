@@ -16,6 +16,7 @@
 | Release build 暴露符號、debug flag 或測試端點 | 逆向工程成本不必要地低 |
 | 生成的客戶端與 OpenAPI/schema 不一致 | 前端、SDK 或工具消費者可能呼叫過時路由或反序列化錯誤形狀 |
 | Gherkin 存在但無可執行連結 | 團隊可能認為行為已測試，但實際上只有文件 |
+| Impact Map 的目標族群與 Customer Journey 的痛點不一致 | 團隊可能快速實作功能，但沒有改善真正影響目標的使用者旅程 |
 | 供應商文件直接複製到產品流程中 | 機密、無關欄位或不穩定的第三方假設可能洩漏到實作和可重用文件中 |
 
 ## 2. 選擇擁有者層
@@ -70,6 +71,7 @@
 | 可複製的文件形狀 | `templates/` |
 | 已實作專案中遺失的開發文件 | `process/` 和 `templates/initial-development-docs.md` |
 | 缺少需求或合約的阻礙問題 | `process/` 和當前規劃文件 |
+| Product goal、target actor、journey pain 或 feature investment 的不一致 | `process/`、`templates/product-impact-alignment-template.md` 和當前規劃文件 |
 | 程式碼前的變更接收 | `process/` 和當前規劃文件 |
 | 新程式碼或 AI 生成程式碼的測試策略 | `process/`、`CHECKLIST.md` 和當前規劃文件 |
 | 嵌入式/硬體產品流程 | `platforms/embedded/`、`implementation/embedded/`、`process/` 和硬體感知檢查清單 |
