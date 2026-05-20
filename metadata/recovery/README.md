@@ -1,28 +1,28 @@
-# Recovery Metadata
+# Recovery Metadata（恢復政策 metadata）
 
-`metadata/recovery/` defines domain-specific recovery policy for mismatch escalation. Runtime owns the generic recovery state machine in `runtime/compiler/embedded_data.rb`; this metadata layer tells agents which source-of-truth set to reload for a given domain before rebuilding the execution graph.
+`metadata/recovery/` 定義 mismatch escalation 後的 domain-specific recovery policy。通用 recovery state machine 由 `runtime/compiler/embedded_data.rb` 擁有；本 metadata 層負責告訴 agent：在重建 execution graph 前，不同 domain 必須重新載入哪些 source-of-truth。
 
-## Files
+## 檔案
 
-| File | Purpose |
+| 檔案 | 用途 |
 | --- | --- |
-| [`escalation-levels.yaml`](escalation-levels.yaml) | L1-L5 escalation level metadata, default actions, and minimum reload requirements. |
-| [`domain-policies.yaml`](domain-policies.yaml) | Domain-specific trigger classes, required reload sets, forbidden behaviors, and validation gates. |
+| [`escalation-levels.yaml`](escalation-levels.yaml) | L1-L5 escalation level metadata、預設 action 與最低 reload 要求。 |
+| [`domain-policies.yaml`](domain-policies.yaml) | 各 domain 的 trigger classes、required reload set、forbidden behaviors 與 validation gates。 |
 
 ## Policy Schema
 
-Each domain policy should include:
+每個 domain policy 應包含：
 
-- `domain`: stable domain id such as `apk-analysis` or `software-delivery`.
-- `applies_when`: trigger conditions that select the policy.
-- `trigger_classes`: escalation trigger classes covered by the policy.
-- `required_reload_set`: source-of-truth files or source categories that must be read or explicitly marked `not_applicable` / `source_missing`.
-- `rebuild_graph`: fields that must be present before execution resumes.
-- `forbidden_behaviors`: domain-specific actions that must stop during recovery.
-- `validation`: checks proving recovery has closed before execution continues.
+- `domain`：穩定 domain id，例如 `apk-analysis` 或 `software-delivery`。
+- `applies_when`：選中此 policy 的 trigger 條件。
+- `trigger_classes`：此 policy 覆蓋的 escalation trigger classes。
+- `required_reload_set`：必須讀取的 source-of-truth 檔案或來源類別；若不適用，必須明確標記 `not_applicable` / `source_missing`。
+- `rebuild_graph`：恢復 execution 前必須具備的 execution graph 欄位。
+- `forbidden_behaviors`：進入 recovery 後必須停止的 domain-specific 行為。
+- `validation`：證明 recovery 已閉環、可以繼續 execution 的檢查。
 
 ## Runtime Boundary
 
-These files are metadata-only in Phase 4. They are not compiled into `runtime.db` yet. Use them through routing / validation and keep the executable recovery procedure in `runtime/compiler/embedded_data.rb`.
+這些檔案在 Phase 4 是 metadata-only，尚未編入 `runtime.db`。使用方式是透過 routing / validation 讀取；可執行的 recovery procedure 仍保留在 `runtime/compiler/embedded_data.rb`。
 
-If a future phase needs runtime enforcement, add a compiler target deliberately instead of assuming all metadata YAML is compiled.
+若未來 phase 需要 runtime enforcement，應明確新增 compiler target，不要假設所有 metadata YAML 都會自動編譯。
