@@ -1,6 +1,6 @@
 # Core Bootstrap
 
-本文件是 AI-native Knowledge Operating System 的**最小必讀啟動集合**。每個 session 啟動時，Agent 只需載入這 3 條核心規則，其餘規則依任務 lazy-load。
+本文件是 AI-native Cognitive Execution System 的**最小必讀啟動集合**。本系統已從 knowledge operating system 升級為以 runtime state machine、routing registry、governance translation 與 validation gates 驅動的認知執行系統。每個 session 啟動時，Agent 只需載入這 3 條核心規則，其餘規則依任務 lazy-load。
 
 ## 必讀規則
 
@@ -41,6 +41,8 @@
 ```
 
 > **Runtime Config 已編譯至 SQLite**：所有 `runtime/**/*.yaml` 設定檔已由 compiler 編譯至 `runtime/runtime.db` 的專屬表格（如 `phase_machine`、`obligation_ledger`、`blocking_gates`、`language_policy`、`output_rules`、`governance_gates` 等）。Agent 可直接查 SQLite 取得結構化資料，YAML 檔案仍為 source-of-truth 供人類編輯。
+
+> **Governance Translation 已升級**：可重用判斷智慧優先放在 `intelligence/`，AI runtime gate 放在 `governance/ai-runtime-governance/`，具體操作順序放在 `workflow/`，可機讀或可驗證狀態再進 `runtime/` / `validation/`。遇到任務分層或治理疑義時，先讀 [`governance/ai-runtime-governance/README.md`](governance/ai-runtime-governance/README.md)。
 
 ## 與舊 Default Bootstrap 的關係
 

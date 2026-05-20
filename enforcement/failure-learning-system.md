@@ -2,7 +2,7 @@
 
 本規則把重複 agent 錯誤轉成 durable prevention。它連接 failure capture、classification、reusable pattern records、linked updates 與 validation，讓同類失效模式較不容易重演。
 
-當使用者指出 agent mistake、close-loop gap、wrong source/mirror update、missed dependency、incomplete validation、forgotten goal、unsafe parallel work，或任何應成為 AI-native Knowledge Operating System 一部分的重複行為時，使用本規則。
+當使用者指出 agent mistake、close-loop gap、wrong source/mirror update、missed dependency、incomplete validation、forgotten goal、unsafe parallel work，或任何應成為 AI-native Cognitive Execution System 一部分的重複行為時，使用本規則。
 
 ## 核心規則
 
