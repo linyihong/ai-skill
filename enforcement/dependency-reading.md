@@ -17,13 +17,13 @@
 | `enforcement/rule-weight.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`enforcement/decision-efficiency.md`、`enforcement/goal-action-validation.md`、工具專用 always-apply agent rule、`ai-tools/` bootstrap 清單。 |
 | `enforcement/decision-efficiency.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/dependency-reading.md`、`governance/document-sizing.md`、相關 workflow / analysis / intelligence README（若該 route 有決策路由或 context-loading 指引）。 |
 | `enforcement/escalation-policy.md` | `enforcement/README.md`、`enforcement/linked-updates.md`、`enforcement/failure-learning-system.md`、`enforcement/dependency-reading.md`、`runtime/README.md`、`runtime/pipeline/guard-chain.yaml`（若要接 runtime guard）、相關 workflow primary source（若 domain-specific mismatch hook 受影響）。 |
-| `enforcement/failure-learning-system.md` 或 `enforcement/failure-patterns/` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/reusable-guidance-boundary.md`、`../../feedback/feedback-lessons.md`、`enforcement/goal-action-validation.md`、`enforcement/dependency-reading.md`、相關 tool 文件與被補強的 enforcement rule / skill workflow。 |
+| `enforcement/failure-learning-system.md` 或 `enforcement/failure-patterns/` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/reusable-guidance-boundary.md`、`../../feedback/feedback-lessons.md`、`enforcement/goal-action-validation.md`、`enforcement/dependency-reading.md`、相關 tool 文件與被補強的 enforcement rule / workflow。 |
 | 任一 tool adapter | 對應 workflow / tool 文件、`enforcement/tool-neutral-documentation.md`、`ai-tools/<tool>.md`（若存在）、`enforcement/linked-updates.md`。 |
 | `enforcement/document-todo-list.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`enforcement/conversation-goal-ledger.md`、相關模板與 documentation/checklist 文件。 |
 | `enforcement/conversation-goal-ledger.md` | `enforcement/README.md`、`enforcement/content-layering.md`、`enforcement/linked-updates.md`、`scripts/README.md`、相關 goal helper script、`ai-tools/` 中受影響工具文件；若同時改 tool-specific hook/rule，讀對應 hook/rule 文件。 |
 | 任一工具專用規則檔 | 對應的 enforcement rule 正文、`enforcement/README.md`、受影響工具文件，以及受影響的 workflow 入口。 |
 | 任一 template | 模板目錄 `README.md`、引用該模板的 workflow/documentation/checklist、`enforcement/linked-updates.md`。 |
-| 任一 feedback lesson | 該分類 `README.md`、skill 的 `feedback_history/README.md`、`../../feedback/feedback-lessons.md`，以及 promotion target。 |
+| 任一 feedback lesson | 該分類 `README.md`、`feedback/history/<domain>/README.md`、`../../feedback/feedback-lessons.md`，以及 promotion target。 |
 | 開始執行任一 `plans/active/*.md` plan | `plans/README.md` 的 Architecture Compatibility Preflight、該 plan 的 Phase 0 / candidate files、相關 layer README、相關 runtime/compiler/metadata/workflow source、`enforcement/linked-updates.md`。 |
 
 ## Agent 行為
