@@ -1133,7 +1133,7 @@ records:
       reason: 需要對應決策智慧時才讀取完整 atom。
 
   - id: route.intelligence.requirements-cognition
-    task_intent: 判斷需求理解、BDD-lite、behavior contract、acceptance criteria、ambiguity、requirement traceability 或 validation target
+    task_intent: 判斷需求理解、BDD-lite、behavior contract、acceptance criteria、ambiguity、requirement traceability、validation target 或 mutation testing test effectiveness
     primary_source: intelligence/engineering/requirements/README.md
     required_dependencies:
       - intelligence/engineering/requirements/behavior-modeling/README.md
@@ -1148,15 +1148,17 @@ records:
       - intelligence/engineering/requirements/specification-quality/requirement-hallucination.md
       - intelligence/engineering/requirements/specification-quality/stale-acceptance-criteria.md
       - intelligence/engineering/requirements/validation-thinking/validation-target-selection.md
+      - intelligence/engineering/requirements/validation-thinking/mutation-testing-effectiveness.md
       - metadata/requirements/behavior-governance-signals.yaml
       - validation/scenarios/software-delivery/requirement-contradiction.yaml
+      - validation/scenarios/software-delivery/mutation-testing-effectiveness.yaml
       - knowledge/graphs/requirements-cognition.yaml
       - knowledge/summaries/requirements-cognition.md
     source_of_truth_gate: requirements-cognition-not-bdd-syntax-runtime
     ranking_reason: >
       Requirements cognition uses BDD-lite to stabilize actor intent, behavior boundary, acceptance criteria,
       ambiguity disposition and validation target before architecture or implementation. BDD syntax remains optional.
-    validation_signal: Requirement → behavior contract → acceptance criteria → validation target → execution artifact is traceable; no unconfirmed feature is written as requirement.
+    validation_signal: Requirement → behavior contract → acceptance criteria → validation target → execution artifact is traceable; no unconfirmed feature is written as requirement; high coverage is not treated as test effectiveness without targeted proof when risk is high.
     metadata:
       priority: P1
       confidence: medium
@@ -1235,6 +1237,7 @@ records:
       - validation/scenarios/software-delivery/missing-validation-target.yaml
       - validation/scenarios/software-delivery/stale-acceptance-criteria.yaml
       - validation/scenarios/software-delivery/behavior-scope-overclaim.yaml
+      - validation/scenarios/software-delivery/mutation-testing-effectiveness.yaml
     candidate_sources:
       - validation/scenarios/failure-derived/runtime-recovery-navigation-mismatch.yaml
       - validation/scenarios/failure-derived/runtime-recovery-user-contradiction.yaml
@@ -1248,6 +1251,7 @@ records:
       - validation/scenarios/software-delivery/missing-validation-target.yaml
       - validation/scenarios/software-delivery/stale-acceptance-criteria.yaml
       - validation/scenarios/software-delivery/behavior-scope-overclaim.yaml
+      - validation/scenarios/software-delivery/mutation-testing-effectiveness.yaml
       - validation/rules/heuristics/runtime-first-hooking.yaml
       - validation/rules/heuristics/local-proxy-diagnosis.yaml
       - validation/rules/heuristics/avoid-early-patch.yaml

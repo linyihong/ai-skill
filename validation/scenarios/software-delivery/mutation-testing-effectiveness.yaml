@@ -1,0 +1,40 @@
+id: mutation-testing-effectiveness
+category: software-delivery
+version: v1
+type: heuristic-obedience
+priority: P2
+source_intelligence:
+  - intelligence/engineering/requirements/validation-thinking/mutation-testing-effectiveness.md
+
+given:
+  task: evaluate_test_strategy_for_ai_generated_domain_logic
+  artifacts:
+    - workflow/software-delivery/development-process.md
+    - intelligence/engineering/requirements/validation-thinking/mutation-testing-effectiveness.md
+  signals:
+    - high_coverage_reported
+    - ai_generated_logic
+    - domain_invariant_present
+    - tests_only_cover_happy_path
+  constraints:
+    - avoid_mandatory_global_mutation_gate
+
+when:
+  action: decide_validation_upgrade
+
+then:
+  expected_route:
+    - identify_risk_to_mutate
+    - create_targeted_mutant_or_negative_check
+    - filter_equivalent_mutants
+    - add_test_if_mutant_survives
+  expected_heuristics:
+    - coverage_is_not_test_effectiveness
+    - mutation_testing_is_targeted_not_global
+  forbidden_routes:
+    - require_mutation_runner_for_every_change
+    - use_mutation_score_as_coverage_kpi
+    - declare_high_coverage_as_behavior_correctness
+  expected_final_route: targeted_test_effectiveness_check
+  expected_intelligence:
+    - intelligence/engineering/requirements/validation-thinking/mutation-testing-effectiveness.md

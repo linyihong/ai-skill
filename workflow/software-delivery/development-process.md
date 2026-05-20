@@ -171,7 +171,7 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 | 既有 / 舊有行為 | 防止 regression 並保護已知 contracts | 執行覆蓋受影響行為的既有 unit、BDD、contract、integration 和 regression tests |
 | 新需求或新 code | 證明新行為正確、安全且與 docs 一致 | 先寫或更新 BDD，然後在可行時在 production code 前加上 failing tests 或 executable specs。將 changed/new-code 覆蓋率與整體專案覆蓋率分開追蹤 |
 | AI 生成的 code | 補償合理但錯誤的 code | 要求 BDD scenario、unit/contract tests，以及專注於 intent、edge cases 和安全/所有權邊界的人類審查 |
-| 業務規則 / 演算法 | 捕捉通過範例但規則錯誤的情況 | 加上 property-based tests、invariant tests 或 table-driven edge cases |
+| 業務規則 / 演算法 | 捕捉通過範例但規則錯誤的情況 | 加上 property-based tests、invariant tests、targeted mutation checks 或 table-driven edge cases |
 | 關鍵條件判斷 / 驗證邏輯 | 證明當邏輯錯誤時 tests 會失敗 | 在可行時加上 mutation testing，或手動測試如果 guards 被移除會失敗的 negative cases |
 | 資料庫 / 持久化行為 | 保護真實的狀態轉換和遷移 | 加上 fixture-backed repository tests、migration tests 或針對代表性資料的 integration tests |
 | 效能敏感行為 | 防止功能正確的 code 超出 latency、throughput、error-rate 或資源預算 | 根據風險加上 load、stress、spike 或 soak tests；追蹤 P95/P99 latency、throughput、error rate、CPU、memory、disk、network、database connections、queue depth 和 external-call volume |
@@ -184,6 +184,17 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 4. 關鍵規則的 mutation/negative checks
 5. 當變更可能影響 latency、throughput 或資源時的效能 smoke 或 targeted scenario
 6. 將 planning docs、BDD、tests 和效能證據並排進行人類審查
+
+### Mutation Testing / Test Effectiveness Check
+
+Mutation testing 是測試有效性檢查，不是 coverage KPI。當變更涉及 AI 生成邏輯、權限/安全/金流、domain invariant、複雜條件判斷、或 refactor 宣稱無行為變更時，使用 targeted mutant flow：
+
+1. 描述要防止的錯誤或 invariant break。
+2. 產生小型 mutants，例如 boundary、comparison、boolean、nullability、error handling 或 guard 移除。
+3. 過濾 equivalent mutants，避免把語意相同的版本當成測試缺口。
+4. 若 mutant survived，補 BDD / unit / property / contract / fixture test，或縮小 correctness claim。
+
+通過標準不是「mutant 越多越好」，而是至少能殺掉代表真實風險的 mutant；若沒有合適工具，可用手動 negative check 或 code review 方式模擬。
 
 對於效能測試，選擇能證明 release 風險的最小測試：
 

@@ -29,6 +29,14 @@ edges:
     target: validation/scenarios/software-delivery/requirement-contradiction.yaml
     reason: Scenario validates contradiction handling.
     validation: Scenario blocks implementation when requirement sources conflict.
+  - type: related_to
+    target: intelligence/engineering/requirements/validation-thinking/mutation-testing-effectiveness.md
+    reason: Mutation testing effectiveness validates whether tests catch meaningful behavior or invariant breaks.
+    validation: Intelligence atom keeps mutation testing targeted and prevents coverage-as-effectiveness overclaim.
+  - type: related_to
+    target: validation/scenarios/software-delivery/mutation-testing-effectiveness.yaml
+    reason: Scenario validates when AI should use targeted mutants or negative checks.
+    validation: Scenario forbids mandatory global mutation runner and mutation score KPI behavior.
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Routing registry exposes requirements cognition for software delivery tasks.

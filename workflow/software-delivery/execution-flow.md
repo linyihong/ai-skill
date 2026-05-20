@@ -106,7 +106,8 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 | 哪些既有行為不能回歸？ | 為受影響的舊行為執行或添加回歸測試 |
 | 引入了什麼新行為？ | 在可行時在生產程式碼之前撰寫 BDD 和失敗測試或可執行規格 |
 | 總覆蓋率是否隱藏了未測試的新程式碼？ | 分別追蹤變更/新程式碼覆蓋率與整個專案覆蓋率 |
-| 邏輯是否規則密集或安全敏感？ | 添加突變測試、基於屬性的測試、不變量測試或負面案例 |
+| 邏輯是否規則密集或安全敏感？ | 添加 targeted mutation checks、基於屬性的測試、不變量測試或負面案例 |
+| 測試是否真的能抓到錯誤？ | 對 AI-generated logic、critical branch、domain invariant 或 refactor-no-behavior-change claim，產生小型 mutant 或手動 negative check；若 mutant survived，補 validation target 或縮小完成宣告 |
 | 持久化是否重要？ | 添加 fixture 支援的資料庫/儲存庫/遷移測試或整合測試 |
 | 程式碼是否由 AI 生成？ | 需要測試加上針對規劃文件、BDD、合約和邊緣案例的人類審查 |
 | 這是嵌入式或硬體支援的？ | 分開主機可重複測試與僅目標或硬體在迴路中的證據；記錄板子、接線、引腳/匯流排設定、韌體版本、日誌和觀察到的偏差 |

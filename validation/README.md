@@ -45,6 +45,7 @@ validation/
 - `software-delivery/missing-validation-target.yaml` — acceptance criteria 缺 validation target 時不得宣稱 ready。
 - `software-delivery/stale-acceptance-criteria.yaml` — domain invariant 改變後舊 acceptance baseline 必須刷新。
 - `software-delivery/behavior-scope-overclaim.yaml` — single scenario pass 不得宣稱 global feature correctness。
+- `software-delivery/mutation-testing-effectiveness.yaml` — high coverage 不得直接等同測試有效；高風險邏輯用 targeted mutants / negative checks 驗證測試能抓錯。
 
 ## Scenario 格式
 

@@ -31,7 +31,7 @@ source_intelligence:
 | Contract precedence | 衝突時先判斷 governing contract、product plan、BDD、domain/API/error/hardware contract、implementation、tests 的優先序。 |
 | Docs-first BDD closure | Observable behavior 變更前，owning contract、BDD scenario、executable validation 與 implementation slice 已同步或明確 scope out。 |
 | Artifact completeness | Change brief、contract、BDD scenario、implementation plan、review report 或 project-local equivalent 已產出或標記 not applicable。 |
-| Test strategy | 新行為與舊行為 regression 分開驗證；contract、fixture、integration、property、mutation 或 hardware-in-loop evidence 依風險選擇。 |
+| Test strategy | 新行為與舊行為 regression 分開驗證；contract、fixture、integration、property、targeted mutation check 或 hardware-in-loop evidence 依風險選擇。 |
 | Performance evidence | 影響 latency、throughput、資源、concurrency、external-call fan-out 時，不以功能測試取代 performance budget / smoke / load / stress / spike / soak evidence。 |
 | Same-session closure | Code、docs、contracts、BDD、tests、generated clients、fixtures 與 linked updates 在同一批次閉環，或留下明確 owner 與 scoped debt。 |
 

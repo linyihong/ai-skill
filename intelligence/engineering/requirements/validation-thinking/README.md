@@ -9,3 +9,4 @@
 | [`acceptance-validation.md`](acceptance-validation.md) | 將 acceptance criteria 連到 proof acquisition。 |
 | [`behavior-scope-governance.md`](behavior-scope-governance.md) | 防止 local behavior pass 被誤宣稱為 global correctness。 |
 | [`validation-target-selection.md`](validation-target-selection.md) | 根據風險選擇 unit、contract、BDD、fixture、manual evidence。 |
+| [`mutation-testing-effectiveness.md`](mutation-testing-effectiveness.md) | 用 targeted mutants 檢查 tests 是否真的抓得到 behavior / invariant / contract bugs。 |
