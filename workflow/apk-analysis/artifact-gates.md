@@ -23,6 +23,7 @@
 - 先記主要 tabs/screens 即可；高價值流程才補完整操作截圖。
 - 每個重要 screen 要有可引用的 route id 與 screen id。
 - Reachability recipe 要能被人工照做，也能被 automation script 改寫。
+- 可重用 App 操控要拆成具名 navigation segments，而不是只保存一條長腳本；每段要能從已知 checkpoint 進入、停在已知 checkpoint，供後續自由組合。
 - UI 架構地圖只把 app 內頁面列入 screen inventory；外部跳轉要寫在 route recipe 的 `Destination scope` / `External transition`。
 - 每個 screen 要標記是否可滑動；滑動頁面只保存代表性 top/mid/bottom。
 - 每個 clickable entry 要記 target、selector/resource-id/content-desc 或座標來源。
@@ -345,6 +346,15 @@ Live SDK self-generation verdict:
 | `home-scroll-mid` | `home.feed` | swipe | vertical swipe up once | screenshot coordinates / hierarchy bounds | feed mid-page visible | yes/no |
 | `open-detail` | `home.feed` | tap | first item card | visible label / bounds / coordinates | `item.detail` | yes |
 
+### Navigation Segment Library（UI map 的可組合操控腳本登記處）
+
+| Segment ID | Entry checkpoint | Action | Exit checkpoint | Script / function | Preconditions | Evidence | Reusable by |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `launch-to-home` | app not running / force-stopped | launch and wait for authenticated home | `home.feed` | `scripts/ui/segments/launch-to-home.sh` | valid test session | screenshot + hierarchy + package check | any home-based flow |
+| `home-to-detail` | `home.feed` | tap first visible item card | `item.detail` | `scripts/ui/segments/home-to-detail.sh` | item list visible | screenshot + hierarchy + timestamp | detail API capture, media capture |
+
+文件要求：UI map 是 navigation segment 的 source-of-truth；script 檔案只是執行物。每個 segment 都要在 UI map 記 entry / exit checkpoint、前置狀態、selector 或 coordinate 來源、script path、輸出 evidence 與可重用範圍。組合流程時引用 segment IDs，例如 `launch-to-home -> home-to-detail`；若某段失效，只重測該 segment，不重跑整條 route。後續 agent 想去任何頁面時，應先查 `docs/UI架構地圖/<route-or-area>.md` 的 segment library，再組合既有 segments。
+
 ### Operation To API Matrix
 
 | Operation ID | Route ID | UI path / action | Automation script | Binding phase | Capture window | Method / Path | Source | Response shape | Confidence | Notes |
@@ -366,6 +376,7 @@ Live SDK self-generation verdict:
 - 先記主要 tabs/screens 即可；只有高價值流程或需要 attribution 的 API 才補完整操作截圖。
 - 每個重要 screen 都要有可引用的 route id；route id 記「怎麼到頁面」，screen id 記「頁面是什麼」。
 - Reachability recipe 要能被人工照做，也能被 automation script 改寫成 tap/swipe/launch 步驟。
+- App 操控腳本要優先拆成可重用 navigation segments，並以 UI map 作為登記處：記錄 segment id、entry checkpoint、exit checkpoint、script path、preconditions、evidence 與可組合範例；後續 capture 應先查 UI map 組合既有 segments，避免重複從頭測試。
 - UI 架構地圖只把 app 內頁面列入 screen inventory；外部跳轉要寫在 route recipe 的 `Destination scope` / `External transition`。
 - 若跳到系統設定、瀏覽器、支付、分享、第三方 App、外部 intent 或不可控 Web 流程，記錄觸發點、外部目的地類型、是否需要人工接手，以及同窗 API capture window。
 - 若分析主線不是 UI 地圖（例如 provider、session、signing、pagination、storage），但動態操作新發現了 app 內 route、settings screen、global menu、dialog、tab 或可重放操作，完成前仍要回填或建立對應 `docs/UI架構地圖/<route-or-area>.md`。

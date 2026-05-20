@@ -105,13 +105,15 @@ frida -U -l hook_okhttp.js -f com.target.app --no-pause
 3. Route map 限於 in-app pages；遇到 system screen、browser、payment/share sheet、third-party app、external intent 時標記為 external transition
 4. 分類每個 in-app screen 為 scrollable 或非 scrollable，記錄 clickable entry points
 5. 每個 script 限於一個 UI path 或 action group（如 `open-home`、`scroll-feed`）
-6. 將 route recipe 轉換為 launch/tap/swipe 步驟
-7. Scrollable screens 使用 bounded sampling（top/mid/bottom）
-8. Clickable screens 使用 labels、resource IDs、content descriptions、hierarchy bounds 或 verified coordinates
-9. 在 operation 前後印出 UTC start/end timestamps
-10. 在同一 window 中執行 pcap/MITM/Frida capture
-11. 在 operation 結束時儲存一張 sanitized screenshot 或 UI hierarchy
-12. 填寫 operation-to-API matrix（route id、method/path、source、response shape、trigger confidence）
+6. 將 route recipe 拆成可重用 navigation segments，並登記到對應 UI map 文件；每段記 `segment_id`、entry checkpoint、exit checkpoint、preconditions、script/function path、selector/coordinate source、evidence
+7. 長流程只保存為 segment composition（如 `launch-to-home -> home-to-detail -> detail-scroll-media`），不要只保存不可拆的單一腳本
+8. 後續 capture 先組合既有 segments 到目標 checkpoint，只重測缺失或失效 segment，避免每次從頭重跑完整 navigation
+9. Scrollable screens 使用 bounded sampling（top/mid/bottom）
+10. Clickable screens 使用 labels、resource IDs、content descriptions、hierarchy bounds 或 verified coordinates
+11. 在 operation 前後印出 UTC start/end timestamps
+12. 在同一 window 中執行 pcap/MITM/Frida capture
+13. 在 operation 結束時儲存一張 sanitized screenshot 或 UI hierarchy
+14. 填寫 operation-to-API matrix（route id、method/path、source、response shape、trigger confidence）
 
 ## 成功產出格式
 

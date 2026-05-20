@@ -51,6 +51,8 @@
 
 **Checkpoint replay runner rule：** 同一 feature/page 需要反覆測 Frida、media、tab sweep 或 reset baseline 時，將已確認路徑固化成 replay script，並為 `launch`、目標 tab、列表、詳情、媒體區等節點提供 `--target` / checkpoint 停點。每個 checkpoint 都應截圖、dump XML、驗證 target package；如果跑歪，先修 selector、fallback coordinate、wait 或 scroll，再把後續 capture 當證據。
 
+**Composable navigation segment rule：** App 操控腳本不要只寫成一條長流程。UI map 是可組合 navigation segments 的登記處：把可重用路徑拆成具名 segment，例如 `launch -> home`、`home -> target tab`、`target tab -> detail`，每段都記錄 entry checkpoint、exit checkpoint、selector / coordinate source、前置狀態、script path、輸出 screenshot / hierarchy 與 failure signal。後續要到某個頁面時，先查 `docs/UI架構地圖/<route-or-area>.md` 組合既有 segments，只在缺段或失效時補測；不要每次從頭重跑整條 navigation。
+
 **Post-reset window split rule：** `clear app data` / reinstall 後同時需要 session recovery 與 feature API attribution 時，優先拆成「reset + startup/session recovery」與「已驗證導航後 attach feature hooks」兩個 capture window。若 Frida-from-launch 的長窗口導致外部 App、錯頁、公告、更新、WebView 或 timing drift，不要把 feature 操作硬接在同一窗口；先用 package / feature-context guard 證明 session recovery 成功，再從目標 feature checkpoint attach 低負載 hook 取得 feature API 證據。
 
 文件中要把 API 標為 `startup/preload`、`session-recovery`、`navigation`、`feature-triggered`、`cache-hydration` 或 `background/ambiguous`，避免把啟動期或預載 request 誤判成當前點擊觸發。
