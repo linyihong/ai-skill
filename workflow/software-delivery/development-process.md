@@ -4,6 +4,8 @@
 
 > **遷移狀態**：`skills/app-development-guidance/process/README.md` 已刪除。此文件為 canonical source，新內容請直接寫入此文件。
 
+Contract / BDD / artifact / performance 的治理 gate 見 [`software-delivery-governance.md`](../../governance/ai-runtime-governance/software-delivery-governance.md)；本檔保留 development process 的詳細流程與專案 artifact 形狀。
+
 ## Default Flow（預設流程）
 
 | 步驟 | 產出 | 說明 |

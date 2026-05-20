@@ -42,7 +42,7 @@
 | `route.runtime.router-flow` | `runtime/router/` | `small` | `index-only` | Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。 |
 | `route.intelligence.engineering.heuristics` | `intelligence/engineering/heuristics/README.md` | `small` | `index-only` | 各 atom 有明確原則與決策表，可反查驗證。 |
 | `route.runtime.context-ttl-doc` | `governance/lifecycle/context-ttl-philosophy.md` | `small` | `index-only` | TTL policy 已套用，prune strategy 已理解。 |
-| `route.workflow.software-delivery` | `workflow/software-delivery/execution-flow.md` | `specialized` | `source-backed` | 新分層路徑可讀取，workflow 與 analysis 內容已分離。 |
+| `route.workflow.software-delivery` | `workflow/software-delivery/execution-flow.md` | `specialized` | `source-backed` | Change intake、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence 與 same-session closure 已檢查；workflow 與 analysis 內容已分離。 |
 | `route.workflow.greenfield` | `workflow/greenfield/execution-flow.md` | `specialized` | `source-backed` | 新分層路徑可讀取，workflow 與 templates 內容完整。 |
 | `route.workflow.travel-planning` | `workflow/travel-planning/execution-flow.md` | `specialized` | `source-backed` | 新分層路徑可讀取，workflow 與 analysis 內容已分離。 |
 | `route.workflow.documentation-ai-native` | `workflow/documentation/README.md` | `small` | `summary-first` | 新文件或目錄具 index-first 導航、分類維度（kind/audience/stability）已標註； README-as-router、停止條件與單一真相已符合 documentation context governance； 長文已按 document-sizing 拆分；語言與工具敘述依專案自訂 policy（本 route 不預設 tool-neutral）。  |

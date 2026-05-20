@@ -38,6 +38,7 @@ intelligence source
 | [`validation-scenario-governance.md`](validation-scenario-governance.md) | [`stateless-validation-necessity.md`](../../intelligence/engineering/agent-architecture/stateless-validation-necessity.md), [`failure-to-scenario-closure.md`](../../intelligence/engineering/agent-architecture/failure-to-scenario-closure.md) | 將 stateless reproduction、answer leakage、failure class 與 traceability 轉成 scenario promotion gate。 |
 | [`recovery-retry-governance.md`](recovery-retry-governance.md) | [`failure-recovery.md`](../../intelligence/engineering/agent-architecture/failure-recovery.md), [`cognitive-boundaries.md`](../../intelligence/engineering/agent-architecture/cognitive-boundaries.md) | 將 retry limit、strategy change、source reload 與 recovery validation 轉成 recovery gate。 |
 | [`linked-update-governance.md`](linked-update-governance.md) | [`linked-updates-completeness.md`](../../intelligence/engineering/agent-architecture/linked-updates-completeness.md) | 將 reference discovery、owner surface update、generated surface decision 與 explicit non-update 轉成 linked-update completeness gate。 |
+| [`software-delivery-governance.md`](software-delivery-governance.md) | [`docs-first-bdd-closure.md`](../../intelligence/engineering/development/docs-first-bdd-closure.md) | 將 change intake、contract precedence、BDD closure、artifact completeness、test strategy 與 performance evidence 轉成 software delivery gate。 |
 
 ## 放什麼
 

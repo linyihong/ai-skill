@@ -4,6 +4,8 @@
 
 > **遷移狀態**：此文件為新分層的 canonical source，`skills/app-development-guidance/WORKFLOW.md` 已刪除。新內容請直接寫入此文件。
 
+Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](../../governance/ai-runtime-governance/software-delivery-governance.md)；本 workflow 保留執行順序、模板選擇與交付流程。
+
 ## 1. 從證據開始（Start From Evidence）
 
 記錄可重複使用的觀察：

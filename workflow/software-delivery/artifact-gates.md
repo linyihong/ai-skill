@@ -4,6 +4,8 @@
 
 > **遷移狀態**：此文件為新分層的 canonical source，`skills/app-development-guidance/DOCUMENTATION.md` 已刪除。新內容請直接寫入此文件。
 
+Artifact completeness 與 same-session closure 的治理 gate 見 [`software-delivery-governance.md`](../../governance/ai-runtime-governance/software-delivery-governance.md)；本檔保留 reusable note 與 artifact 品質門檻。
+
 ## 1. 可重複使用的筆記結構（Reusable Note Structure）
 
 當將 APK 分析課程、實作觀察、嵌入式/韌體觀察、硬體產品課程或設計審查轉換為可重複使用的開發指引時，使用此結構：

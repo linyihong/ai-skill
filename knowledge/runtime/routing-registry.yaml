@@ -768,12 +768,15 @@ records:
         - "**/docs/development/**"
     primary_source: workflow/software-delivery/execution-flow.md
     required_dependencies:
+      - governance/ai-runtime-governance/software-delivery-governance.md
       - workflow/software-delivery/artifact-gates.md
       - enforcement/README.md
       - enforcement/linked-updates.md
       - intelligence/engineering/development/docs-first-bdd-closure.md
     candidate_sources:
+      - workflow/software-delivery/development-process.md
       - analysis/development-guidance/README.md
+      - analysis/development-guidance/risk-translation.md
       - workflow/software-delivery/README.md
       - intelligence/engineering/development/README.md
       - knowledge/summaries/development-guidance.md
@@ -798,9 +801,11 @@ records:
     source_of_truth_gate: new-layer-promoted
     ranking_reason: >
       app-development-guidance 已遷移至 workflow/software-delivery/ 為 **唯一 Workflow 進入點**（含 SDK/plan/契約實作）。
+      software-delivery-governance 承接 docs-first BDD closure intelligence，作為 change intake、
+      contract precedence、BDD closure、artifact completeness、test strategy 與 performance evidence gate。
       觸發由 workflow/software-delivery/README.md 定義；**不**另立 route.project.*。
       若 repo 含 apk-analysis-sdk/runtime/workflow-activation.yaml，在進入本 workflow 後載入 project_overlays（專案 gate，非平行 routing）。
-    validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離。
+    validation_signal: Change intake、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence 與 same-session closure 已檢查；workflow 與 analysis 內容已分離。
     metadata:
       priority: P1
       confidence: high
