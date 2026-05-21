@@ -8,9 +8,9 @@
 
 ## Inbound References
 
-- [`obligation.checkpoint.run_compiler`](../obligations/obligation-ledger.yaml)
-- [`gate.checkpoint.compiler_executed`](../gates/blocking-gates.yaml)
-- [`phase.checkpoint`](../phases/phase-machine.yaml) — allowed_actions includes `run_compiler`
+- `obligation.checkpoint.run_compiler` in [`runtime.db`](../runtime.db) / [`embedded_data.rb`](embedded_data.rb)
+- `gate.checkpoint.compiler_executed` in [`runtime.db`](../runtime.db) / [`embedded_data.rb`](embedded_data.rb)
+- `phase.checkpoint` in [`runtime.db`](../runtime.db) / [`embedded_data.rb`](embedded_data.rb) — allowed_actions includes `run_compiler`
 
 ## Source-of-Truth
 

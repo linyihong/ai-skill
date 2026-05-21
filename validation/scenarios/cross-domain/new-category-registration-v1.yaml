@@ -3,7 +3,7 @@
 # 是否正確建立 README.md、更新 routing registry、並在 README 中列出所有檔案
 #
 # 來源架構變更：
-#   - validate-knowledge-runtime.rb 新增 validate_directory_structure 檢查（2026-05-13）
+#   - Go-native `ai-skill runtime validate` 覆蓋 directory structure 檢查
 #   - 要求每個 intelligence/engineering/<domain>/ 子類別目錄有 README.md 列出所有 .md 檔案
 #   - 要求每個 analysis/<domain>/workflows/ 有 README.md 列出所有 .md 檔案
 #   - 要求每個 workflow/<domain>/ 有 README.md 列出所有 .md 檔案
@@ -56,7 +56,7 @@ then:
     - create_subcategory_readmes_with_file_list
     - register_in_routing_registry
     - update_knowledge_indexes_readme
-    - run_validate_knowledge_runtime
+    - run_ai_skill_runtime_validate
 
   expected_heuristics:
     - directory-structure-completeness
@@ -67,7 +67,7 @@ then:
     - create_files_without_readme           # 禁止建立檔案但不建立 README.md
     - skip_routing_registry_update          # 禁止不更新 routing-registry.yaml
     - skip_knowledge_indexes_update         # 禁止不更新 knowledge/indexes/README.md
-    - skip_validation                       # 禁止不執行 validate-knowledge-runtime.rb
+    - skip_validation                       # 禁止不執行 ai-skill runtime validate
 
   expected_final_route: |
     intelligence/engineering/<domain>/README.md

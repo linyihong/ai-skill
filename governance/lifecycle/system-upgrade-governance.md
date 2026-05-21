@@ -69,7 +69,7 @@
 
 ### 2.6 Runtime Surface 更新
 
-- [ ] **SQLite runtime 重新編譯**：執行 `ruby runtime/compiler/compiler-engine.rb` 重新編譯 `runtime/runtime.db`
+- [ ] **SQLite runtime 重新編譯**：執行 repo-local `ai-skill runtime compile --native-compiler` 或由 pre-commit hook 重新編譯 `runtime/runtime.db`
 - [ ] **phase runtime surface**：如有 phase 變更，已更新 `runtime/compiler/embedded_data.rb` 或現存 YAML source，並確認 `runtime/runtime.db` 的 `phase_machine` / `phases` 已同步。
 - [ ] **obligation runtime surface**：如有 obligation 變更，已更新 source，並確認 `runtime/runtime.db` 的 `obligation_ledger` / `obligations` 已同步。
 - [ ] **blocking gate runtime surface**：如有 gate 變更，已更新 source，並確認 `runtime/runtime.db` 的 `blocking_gates` / `gates` 已同步。
@@ -128,7 +128,7 @@
 
 ### 規則 5：Compiler 必須在升級完成前執行
 
-**教訓**：修改 prose 檔案後忘記執行 `ruby runtime/compiler/compiler-engine.rb`，導致 generated YAML 與 canonical source 不一致。
+**教訓**：修改 prose 檔案後忘記執行 repo-local `ai-skill runtime compile --native-compiler` / runtime validation，導致 generated runtime surface 與 canonical source 不一致。
 
 **強制**：任何修改 prose 檔案的升級，在 commit 前必須執行 compiler 重新編譯 generated YAML。
 
@@ -254,7 +254,7 @@
 修改本文件後，必須執行 compiler 重新編譯：
 
 ```bash
-ruby runtime/compiler/compiler-engine.rb
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime compile --native-compiler
 ```
 
 Pre-commit hook 會檢查 prose 與 runtime.db 是否一致，不一致時 block commit。

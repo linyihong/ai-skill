@@ -15,8 +15,6 @@ Session Start
   │
   ├─ 3. Check activation-rules.yaml → load lazy rules if triggered
   │
-  ├─ 4. Run activation-engine.rb → load lazy rules if triggered
-  │
   ├─ 4b. 若命中 activation #27 或 registry route.workflow.* activation_triggers：
   │       強制 routing-philosophy → 比對 activation_triggers → workflow-routing 歧義裁決 → execution-flow.md
   │
@@ -38,26 +36,16 @@ Session Start
 | 5. Summary | Skill ID | 300-500 token summary | ~400 |
 | 6. Full source | Summary match | Full document | variable |
 
-## Activation Engine Usage
+## Activation Rule Usage
 
-[`activation-engine.rb`](../../runtime/router/activation-engine.rb) 是程式化的 activation 判斷工具，接受 task intent、file change、user signal 等輸入，輸出應該 activate 的 rule 列表。
+[`activation-rules.yaml`](../../runtime/router/activation-rules.yaml) 是 lazy rule activation 的 source-of-truth。Agent 應直接比對 task intent、file change、user signal 與 validation gap；不要引用已移除的 Ruby activation engine。
 
-```bash
-# 指定 task intent
-ruby runtime/router/activation-engine.rb --intent migration
-
-# 指定 file changes
-ruby runtime/router/activation-engine.rb --file-changed enforcement/rule-weight.md
-
-# 複合條件
-ruby runtime/router/activation-engine.rb --intent migration --file-changed "**/*.md"
-```
+Go CLI 若未來新增 activation query 命令，應以 `activation-rules.yaml` 與 `knowledge/runtime/routing-registry.yaml` 為 source，並先補 validation fixture。
 
 ## 與既有文件的關係
 
-- [`runtime/router/`](../../runtime/router/) — Runtime navigation entry point (data files: `activation-rules.yaml`, `activation-engine.rb`, `activation-table.md`)
+- [`runtime/router/`](../../runtime/router/) — Runtime navigation entry point (data files: `activation-rules.yaml`, `activation-table.md`)
 - [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — Lazy-load rules with activation conditions
-- [`runtime/router/activation-engine.rb`](../../runtime/router/activation-engine.rb) — Activation engine implementation
 - [`runtime/router/activation-table.md`](../../runtime/router/activation-table.md) — Situation → Activated Rules table
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing records
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — Human-readable task intent routing table

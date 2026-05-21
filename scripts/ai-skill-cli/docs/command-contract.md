@@ -150,7 +150,7 @@
 
 ### `ai-skill hooks install`
 
-目的：替代 `scripts/install-hooks.sh` 或手動 hook 設定，安裝本 repo git hooks。
+目的：替代已刪除的 `scripts/install-hooks.sh` / `.githooks/` 舊面或手動 hook 設定，安裝本 repo git hooks。
 
 輸入：
 
@@ -170,7 +170,7 @@
 
 - `git` binary 存在。
 - 目標 repo 可由 `git rev-parse --show-toplevel` 確認。
-- hook source 目前沿用舊腳本的 `.githooks/` 目錄；target 是 repo-local `.git/hooks/`。
+- hook source 是 `scripts/git-hooks/`；target 是 repo-local `.git/hooks/`。
 - 若 repo 正在 merge / rebase / cherry-pick，安裝 hook 仍可被允許，但必須明確報告目前不安全狀態，且不得觸發 commit / push。
 
 ### `ai-skill sync-cursor-bundle`
@@ -348,14 +348,14 @@
 | --- | --- | --- |
 | `scripts/init-new-project.sh` | `ai-skill init-project` | Phase 2 native 候選 |
 | `scripts/agent-goals.sh` | `ai-skill goals` | Phase 2 native 候選 |
-| `scripts/install-hooks.sh` | `ai-skill hooks install` | Phase 2 native 候選 |
+| deleted `scripts/install-hooks.sh` / `.githooks/` | `ai-skill hooks install` | dry-run planner uses `scripts/git-hooks/`; write mode still blocked until fixture-backed |
 | `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | Phase 2 native 候選，需 mirror safety gate |
 | `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` | Phase 2 先 wrapper，owner-group parity 後 native |
 | Runtime report / SQLite generators | `ai-skill runtime refresh` | Native default completed; old Ruby entrypoints deleted |
 | Runtime validators | `ai-skill runtime validate` | Native default completed; old Ruby entrypoints deleted |
 | Runtime query helpers | `ai-skill runtime query` | Native completed; old Ruby entrypoints deleted |
 | `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | Phase 3 先 wrapper；parity tests 通過後才 native |
-| Runtime migration / state helpers | `ai-skill runtime migrate` / `ai-skill runtime state init` | deferred，需另定命令 |
+| Runtime migration / state helpers | future Go-native runtime commands | old Ruby helpers deleted; reintroduce only with command contract and fixtures |
 | Tool-specific global setting helper | 無通用 CLI 預設 | tool-specific adapter |
 
 ## Exit Code 表

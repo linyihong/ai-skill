@@ -21,7 +21,7 @@ given:
   constraints:
     - 目前 session 已載入 Core Bootstrap
     - 尚未載入 software-delivery workflow
-    - activation-engine.rb 可用於判斷
+    - activation-rules.yaml 可用於判斷
 
 when:
   action: detect_workflow_switch

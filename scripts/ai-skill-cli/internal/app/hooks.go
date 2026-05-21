@@ -113,13 +113,13 @@ func buildHooksInstallResult(opts hooksOptions) Result {
 		result.Checks = append(result.Checks, Check{Name: "git_operation", Status: "ok", Message: "no merge, rebase, or cherry-pick state detected"})
 	}
 
-	sourceDir := filepath.Join(root, ".githooks")
+	sourceDir := filepath.Join(root, "scripts", "git-hooks")
 	sourceCheck := hookSourceCheck(sourceDir)
 	result.Checks = append(result.Checks, sourceCheck)
 	if sourceCheck.Status != "ok" {
 		result.Status = "blocked"
 		result.ExitCode = ExitValidationFailed
-		result.Error = &CommandError{Code: "missing_hook_source", Message: sourceCheck.Message, Remediation: "Create .githooks/ with hook files before planning installation."}
+		result.Error = &CommandError{Code: "missing_hook_source", Message: sourceCheck.Message, Remediation: "Create scripts/git-hooks/ with hook files before planning installation."}
 		return result
 	}
 

@@ -51,4 +51,4 @@ Task Intent Identified
 - [`intelligence/README.md`](../../intelligence/README.md) — Intelligence layer overview
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Global routing registry
 - [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — Lazy-load rule activation
-- [`runtime/phases/phase-machine.yaml`](../../runtime/phases/phase-machine.yaml) — Phase definition
+- [`runtime/runtime.db`](../../runtime/runtime.db) / [`runtime/compiler/embedded_data.rb`](../../runtime/compiler/embedded_data.rb) — Phase definition

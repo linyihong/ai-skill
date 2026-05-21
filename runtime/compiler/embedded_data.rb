@@ -629,12 +629,12 @@ module EmbeddedRuntimeData
     }
   }
 
-  # Source: runtime/discovery/capability-checkpoints.yaml
+  # Source: embedded discovery checkpoints (standalone runtime/discovery source removed)
   DISCOVERY_CAPABILITY_CHECKPOINTS =   {
     "discovery_checkpoints_version": "v1",
     "status": "active",
-    "owner_layer": "runtime/discovery",
-    "description": "Phase-aware capability discovery checkpoints. 定義 agent 在每個 phase 中 應主動探索的能力類型與搜尋來源。Discovery 是 meta-cognitive 層的操作， 與 lazy-loading（activation engine）互補：activation 被動回應已知條件， discovery 主動搜尋未知能力。\n",
+    "owner_layer": "runtime/compiler",
+    "description": "Phase-aware capability discovery checkpoints. 定義 agent 在每個 phase 中 應主動探索的能力類型與搜尋來源。Discovery 是 meta-cognitive 層的操作， 與 lazy-loading（activation rules）互補：activation 被動回應已知條件， discovery 主動搜尋未知能力。\n",
     "checkpoints": [
       {
         "phase": "phase.checkpoint",
@@ -1216,11 +1216,11 @@ module EmbeddedRuntimeData
         "id": "gate.checkpoint.capability_discovery_completed",
         "phase": "phase.checkpoint",
         "name": "Capability Discovery Completed",
-        "description": "能力探索檢查已完成。Agent 已根據 runtime/discovery/capability-checkpoints.yaml 搜尋與本輪任務相關的工作流程、intelligence atoms、驗證規則與治理規則。 此 gate 為 medium severity，未通過時記錄警告但不 block transition。\n",
+        "description": "能力探索檢查已完成。Agent 已根據 runtime.db / embedded capability checkpoints 搜尋與本輪任務相關的工作流程、intelligence atoms、驗證規則與治理規則。 此 gate 為 medium severity，未通過時記錄警告但不 block transition。\n",
         "severity": "medium",
         "check": {
           "type": "file_read",
-          "target": "runtime/discovery/capability-checkpoints.yaml",
+          "target": "runtime/runtime.db:capability_checkpoints",
           "verification": "capability_discovery_completed == true AND discovery_targets_searched == true"
         },
         "failure_action": "warn + continue",
@@ -2081,7 +2081,7 @@ module EmbeddedRuntimeData
         "id": "obligation.checkpoint.run_capability_discovery",
         "phase": "phase.checkpoint",
         "name": "Run Capability Discovery",
-        "description": "執行能力探索檢查點。讀取 runtime/discovery/capability-checkpoints.yaml， 根據本輪任務意圖搜尋可能不知道的工作流程、intelligence atoms、 驗證規則與治理規則。使用 knowledge indexes、graphs 與 routing registry 作為搜尋來源。此 obligation 解決 Capability Discovery Problem： lazy loading 本身不會產生探索意識，agent 需要主動搜尋未知能力。\n",
+        "description": "執行能力探索檢查點。讀取 runtime.db / embedded capability checkpoints， 根據本輪任務意圖搜尋可能不知道的工作流程、intelligence atoms、 驗證規則與治理規則。使用 knowledge indexes、graphs 與 routing registry 作為搜尋來源。此 obligation 解決 Capability Discovery Problem： lazy loading 本身不會產生探索意識，agent 需要主動搜尋未知能力。\n",
         "verification": [
           "capability_discovery_completed == true",
           "discovery_targets_searched == true",
@@ -5886,7 +5886,7 @@ module EmbeddedRuntimeData
           {
             "action": "RE_RUN_COMPILER",
             "description": "重新執行 compiler 更新 runtime.db",
-            "command": "執行 ruby runtime/compiler/compiler-engine.rb"
+            "command": "執行 repo-local ai-skill runtime compile --native-compiler"
           },
           {
             "action": "VERIFY_SYNC",
@@ -5901,7 +5901,7 @@ module EmbeddedRuntimeData
         ],
         "verify_steps": [
           "runtime.db 的 generated_surfaces 表包含最新記錄",
-          "validate-runtime-db.rb 回傳 exit 0"
+          "ai-skill runtime validate 回傳 exit 0"
         ],
         "escalation": {
           "condition": "compiler 不存在或無法執行",

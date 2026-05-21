@@ -25,9 +25,9 @@
 | `scripts/generate-model-checklists.rb` | `ai-skill runtime refresh` | 中 | 已刪除。Runtime refresh 預設寫入 Go-native model checklists。 | per-model checklist anchors 與 native report write 已覆蓋。 |
 | `scripts/refresh-knowledge-runtime.rb` | `ai-skill runtime refresh` | 低 | 已刪除。`--legacy-wrapper` 對 refresh 回 `legacy_runtime_refresh_removed`；預設 refresh 由 Go 寫 reports / index 並跑 native checks。 | native no-Ruby fixture、generated surface fixture、no partial success fixture 已覆蓋。 |
 | `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | 低 | 預設 Go native snapshot mode；`--legacy-wrapper` 回 Ruby compiler。 | runtime source keyword、`--check` no-op、`runtime.db` generated surface assertion、Ruby vs native generated-surfaces / metadata snapshot parity；完整 runtime config row-count parity 待真正 port compiler。 |
-| `scripts/migrate-runtime-config-to-sqlite.rb` | `ai-skill runtime migrate` / `compile` | Deferred | 暫不改寫，現有 compiler path 已吸收大部分需求。 | idempotent migration fixture。 |
-| `scripts/init-runtime-state-db.rb` | `ai-skill runtime state init` | Deferred | 等 mutable runtime-state scope 明確後再處理。 | custom DB path、idempotent schema fixture。 |
-| `scripts/sync-runtime-yaml-from-embedded.rb` | `ai-skill runtime sync-yaml` | Deferred | 屬於 source sync / recovery 工具，需先確認 lifecycle owner。 | embedded-to-yaml golden fixture。 |
+| `scripts/migrate-runtime-config-to-sqlite.rb` | `ai-skill runtime compile` future source-to-DB compiler | 低 | 已刪除。舊 migration helper 會誤導 agent 走 Ruby / sqlite3 CLI path；目前 supported path 是 `ai-skill runtime compile` 與 pre-commit compiler integration。 | runtime DB validation、compiler snapshot fixture。 |
+| `scripts/init-runtime-state-db.rb` | future `ai-skill runtime state init` | 低 | 已刪除。Mutable runtime-state scope 尚未啟用，保留 Ruby initializer 會造成誤用。 | 等 scope 明確後新增 Go-native fixture。 |
+| `scripts/sync-runtime-yaml-from-embedded.rb` | future source restoration migration | 低 | 已刪除。避免從 embedded data 回寫 stale YAML；若要恢復 standalone YAML，需獨立 source restoration plan。 | source restoration plan 再補 fixture。 |
 
 ## 下一步
 

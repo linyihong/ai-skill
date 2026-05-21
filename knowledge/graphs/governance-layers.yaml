@@ -53,15 +53,15 @@ edges:
     target: governance/lifecycle/capability-discovery-philosophy.md
     reason: >
       Capability discovery philosophy 解釋 Capability Discovery Problem 與
-      discovery checkpoints 的設計原理。runtime/discovery/ 只存放 structured YAML，
-      概念說明歸 governance 層。
-    validation: capability-discovery-philosophy.md 說明問題、解決方案、與 Activation Engine 的互補關係。
+      discovery checkpoints 的設計原理。現行 structured source 已 embedded 到
+      runtime/compiler/embedded_data.rb 並編譯進 runtime.db；概念說明歸 governance 層。
+    validation: capability-discovery-philosophy.md 說明問題、解決方案、與 activation rules 的互補關係。
   - type: related_to
     target: runtime/compiler/embedded_data.rb
     reason: >
       Capability discovery checkpoints 使用 governance graphs 作為搜尋索引，
       在 checkpoint phase 搜尋與任務相關的治理規則。
-    validation: capability-checkpoints.yaml 的 checkpoint phase discovery_targets 包含 governance 類型。
+    validation: runtime.db / embedded_data.rb 的 checkpoint phase discovery_targets 包含 governance 類型。
   - type: related_to
     target: governance/lifecycle/compiler-philosophy.md
     reason: >
@@ -113,9 +113,9 @@ edges:
   - type: related_to
     target: governance/lifecycle/router-philosophy.md
     reason: >
-      Router philosophy 解釋 activation engine 與路由決策的設計原理。
-      runtime/router/ 只存放 engine、rules、table，概念說明歸 governance 層。
-    validation: router-philosophy.md 說明路由流程、決策表、activation engine 使用方式。
+      Router philosophy 解釋 activation rules 與路由決策的設計原理。
+      runtime/router/ 只存放 rules 與 table，概念說明歸 governance 層。
+    validation: router-philosophy.md 說明路由流程、決策表、activation rules 使用方式。
   - type: related_to
     target: governance/lifecycle/routing-philosophy.md
     reason: >

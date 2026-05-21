@@ -170,7 +170,7 @@ result:
 | 1 | `flutter-aot-hooking-v1` | `hook-selection.md` + `flutter-dart-aot-detection.md` | Flutter AOT 分析路線選擇 |
 | 2 | `local-proxy-vs-pinning-v1` | `local-proxy-routing-diagnosis.md` + `local-proxy-detection.md` | Local proxy vs TLS pinning 判斷 |
 | 3 | `early-hook-prevention-v1` | `early-hook-instability.md` + `frida-spawn-race.md` | 過早 hook 的預防行為 |
-| 4 | `new-category-registration-v1` | `validate-knowledge-runtime.rb` 新增 `validate_directory_structure`（2026-05-13） | 新增 intelligence/analysis/workflow 類別時是否正確建立 README.md、更新 routing registry |
+| 4 | `new-category-registration-v1` | Go-native `ai-skill runtime validate` covers directory structure checks | 新增 intelligence/analysis/workflow 類別時是否正確建立 README.md、更新 routing registry |
 | 5 | `cargo-cult-ddd` | DDD integration plan + architecture metadata | 低 complexity 專案不得預設 full DDD |
 | 6 | `architecture-fit-mismatch` | architecture selection governance | 高 complexity 專案不得被壓成 CRUD-only |
 | 7 | `overengineering-detection` | overengineering metadata / workflow | 架構複雜度超過 business complexity 時需 simplification review |
@@ -180,15 +180,15 @@ result:
 ## 執行方式
 
 ```bash
-# 執行完整 validation suite（未來實作）
-ruby scripts/run-decision-contract-tests.rb
+# 目前可執行的 Go-native runtime validation
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime validate
 
-# 執行特定 domain
-ruby scripts/run-decision-contract-tests.rb --domain apk-analysis
-
-# 執行特定 scenario
-ruby scripts/run-decision-contract-tests.rb --scenario flutter-aot-hooking-v1
+# 修改 validation/ 或 knowledge/ 後，先 refresh generated surfaces 再 validate
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime refresh
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime validate
 ```
+
+Decision-contract scenario runner 尚未實作；不要引用已移除或不存在的 Ruby runner。新增 scenario 時，先用 Go-native `runtime validate` 檢查 registry / knowledge runtime invariants，scenario-specific runner 需等 `ai-skill` CLI 增加對應命令後再寫入文件。
 
 ## Failure → Scenario 閉環
 

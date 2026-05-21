@@ -10,7 +10,7 @@ import (
 
 func TestHooksInstallDryRunPlansWithoutWriting(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, ".githooks", "pre-commit"), "#!/bin/sh\n")
+	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -55,7 +55,7 @@ func TestHooksInstallBlocksMissingSource(t *testing.T) {
 
 func TestHooksInstallBlocksExistingTargetWithoutForce(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, ".githooks", "pre-commit"), "#!/bin/sh\n")
+	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 	writeFile(t, filepath.Join(repo, ".git", "hooks", "pre-commit"), "# existing\n")
 
 	var stdout bytes.Buffer
@@ -68,7 +68,7 @@ func TestHooksInstallBlocksExistingTargetWithoutForce(t *testing.T) {
 
 func TestHooksInstallForceAllowsExistingTargetInDryRun(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, ".githooks", "pre-commit"), "#!/bin/sh\n")
+	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 	writeFile(t, filepath.Join(repo, ".git", "hooks", "pre-commit"), "# existing\n")
 
 	var stdout bytes.Buffer
@@ -81,7 +81,7 @@ func TestHooksInstallForceAllowsExistingTargetInDryRun(t *testing.T) {
 
 func TestHooksInstallReportsUnsafeGitStateButDoesNotBlockDryRun(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, ".githooks", "pre-commit"), "#!/bin/sh\n")
+	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 	writeFile(t, filepath.Join(repo, ".git", "MERGE_HEAD"), "deadbeef\n")
 
 	var stdout bytes.Buffer
@@ -113,7 +113,7 @@ func TestHooksInstallMissingGitBlocks(t *testing.T) {
 
 func TestHooksInstallWriteModeBlockedUntilParity(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, ".githooks", "pre-commit"), "#!/bin/sh\n")
+	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -137,7 +137,7 @@ func TestHooksUnsupportedSubcommandReturnsInvalidUsage(t *testing.T) {
 
 func TestHooksInstallDoesNotWriteMutations(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, ".githooks", "pre-commit"), "#!/bin/sh\n")
+	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer

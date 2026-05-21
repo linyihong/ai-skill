@@ -142,7 +142,7 @@ Some legacy runtime YAML sources have been embedded into `compiler/embedded_data
 
 ### `runtime-state.db` (Mutable — Execution State)
 
-Created by [`scripts/init-runtime-state-db.rb`](../scripts/init-runtime-state-db.rb). Written by agents during execution. Persists across sessions.
+Future mutable execution-state surface. The old Ruby initializer has been removed to avoid accidental use; do not create or mutate this database until a Go-native `ai-skill runtime state ...` command and validation contract exist.
 
 | Table | Purpose |
 |-------|---------|

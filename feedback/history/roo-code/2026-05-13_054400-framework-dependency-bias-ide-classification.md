@@ -28,7 +28,7 @@ Roo Code（Code mode），deepseek-chat model
 
 1. **修復心態**：專注於「把錯的改對」（搬移目錄），沒有切換到「防止再發」的預防模式
 2. **沒有泛化錯誤模式**：沒有把這個具體錯誤抽象化為「新目錄必須在 intelligence/README.md 結構圖中註冊」的通用檢測規則
-3. **validator 存在但沒想起來**：`scripts/validate-knowledge-runtime.rb` 已經存在，但修復時不會自動想到去擴充它
+3. **validator 存在但沒想起來**：現行 validator 是 Go-native `ai-skill runtime validate`，但修復時不會自動想到去擴充它
 
 ## 教訓
 

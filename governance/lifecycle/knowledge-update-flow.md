@@ -480,8 +480,8 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 **必須執行**：
 
 ```bash
-LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ruby runtime/compiler/compiler-engine.rb
-ai-skill runtime validate
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime compile --native-compiler
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime validate
 ```
 
 **必須確認**：
@@ -497,7 +497,7 @@ sqlite3 runtime/runtime.db \
 
 | Surface | 更新方式 |
 |---------|---------|
-| `runtime/runtime.db` | `LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ruby runtime/compiler/compiler-engine.rb`，當 modified source 命中 `generated_surfaces.source_path` 或 compiler mapping 時強制執行 |
+| `runtime/runtime.db` | repo-local `ai-skill runtime compile --native-compiler`，當 modified source 命中 `generated_surfaces.source_path` 或 compiler mapping 時強制執行 |
 | `knowledge/runtime/routing-registry.yaml` | 新增或更新 routing record |
 | `knowledge/runtime/refresh-policy.yaml` | 更新 refresh / revalidate / downgrade 規則 |
 | `knowledge/summaries/` | 更新對應 domain 的 summary |

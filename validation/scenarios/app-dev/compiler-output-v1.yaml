@@ -124,7 +124,7 @@ then:
       row_count: 5
 
   validation:
-    - "執行 ruby runtime/compiler/compiler-engine.rb 後，generated YAML 的 phases 長度為 8"
+    - "執行 repo-local ai-skill runtime compile --native-compiler 後，generated runtime surface 的 phases 長度符合預期"
     - "generated YAML 的 gates 不為空陣列"
     - "每個 phase 包含 allowed_actions 欄位（從表格或 bullet list 提取）"
     - "至少一個 phase 包含 blocking_gates 欄位"

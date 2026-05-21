@@ -1,10 +1,10 @@
 # Pre-commit Hook Scenario
-# 測試 .githooks/pre-commit 是否能正確檢查：
+# 測試 scripts/git-hooks/pre-commit 是否能正確檢查：
 # 1. Compiler sync：prose source 修改時，對應的 generated YAML 必須同步更新
 # 2. Output governance：commit 的檔案是否符合 language policy、sanitization rules
 #
 # 來源 hook:
-#   - .githooks/pre-commit
+#   - scripts/git-hooks/pre-commit
 #   - runtime/compiler/compiler-rules.yaml (compile.rule.sync_on_commit)
 
 id: precommit-hook-v1
@@ -15,10 +15,10 @@ priority: P1
 given:
   task: commit_with_unsynced_changes
   artifacts:
-    - .githooks/pre-commit
+    - scripts/git-hooks/pre-commit
     - runtime/compiler/compiler-rules.yaml
     - runtime/compiler/compiler-engine.rb
-    - scripts/install-hooks.sh
+    - scripts/git-hooks/pre-commit
   signals:
     - workflow/software-delivery/execution-flow.md 被修改（新增或修改 gate 描述）
     - runtime.db 的 generated_surfaces 表未同步更新（對應 workflow_phases 記錄）
@@ -26,8 +26,8 @@ given:
     - git commit 被執行
     - SKIP_COMPILER_CHECK 環境變數未設定
   constraints:
-    - pre-commit hook 已安裝（透過 scripts/install-hooks.sh）
-    - compiler-engine.rb --check 命令可用於驗證同步狀態
+    - pre-commit hook 已安裝（透過 ai-skill hooks install 或 git config core.hooksPath scripts/git-hooks）
+    - repo-local ai-skill runtime validate 可用於驗證同步狀態
     - hook 使用 set -euo pipefail 嚴格模式
     - REPO_ROOT 透過 git rev-parse --show-toplevel 取得
 
@@ -41,10 +41,10 @@ then:
       - hook 偵測到 git diff --cached 包含 workflow/*/execution-flow.md
       - hook 從 compiler-rules.yaml 讀取 source_target_mapping
       - hook 比對修改的檔案是否符合 source pattern（workflow/*/execution-flow.md）
-      - hook 執行 ruby runtime/compiler/compiler-engine.rb --check
-      - compiler --check 回傳非零 exit code（因為 generated YAML 未同步）
-      - hook 輸出錯誤訊息「Compiler sync check FAILED」
-      - hook 提示使用者執行 ruby runtime/compiler/compiler-engine.rb
+      - hook 執行 runtime compiler 並重新 stage runtime/runtime.db
+      - runtime validation 回傳非零 exit code（因為 generated surface 未同步）
+      - hook 輸出 runtime validation failed 訊息
+      - hook 提示使用者執行 repo-local ai-skill runtime refresh / validate
       - hook 以 exit 1 阻擋 commit
     reject:
       - allow_unsynced_commit: "即使 generated YAML 未同步，仍允許 commit 通過"
@@ -58,7 +58,7 @@ then:
 
   expected_governance_checks:
     - check_2a_language_policy:
-        description: "檢查 commit 的 .md/.yaml/.yml/.mdc/.rb 檔案是否包含 'Default to English'"
+        description: "檢查 commit 的 .md/.yaml/.yml/.mdc 檔案是否包含 'Default to English'"
         trigger: "任何 staged 檔案包含 'default to english'（case-insensitive）"
         expected_result: "block commit with violation message"
     - check_2b_sanitization:
@@ -83,7 +83,7 @@ then:
 
   validation:
     - "修改 workflow/software-delivery/execution-flow.md 後不執行 compiler → commit 應被阻擋"
-    - "修改後執行 ruby runtime/compiler/compiler-engine.rb → commit 應通過"
+    - "修改後執行 repo-local ai-skill runtime refresh / validate → commit 應通過"
     - "staged 檔案包含 'Default to English' → commit 應被阻擋"
     - "staged 檔案包含 /Users/otheruser/ 路徑 → commit 應被阻擋"
     - "設定 SKIP_COMPILER_CHECK=1 → compiler check 被跳過"

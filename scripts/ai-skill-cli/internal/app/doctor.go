@@ -326,7 +326,7 @@ func runtimeDBIntegrityCheck(path string) Check {
 }
 
 func rubyCheck() Check {
-	return executableVersionCheck("ruby", []string{"--version"}, "Ruby is only required for wrapper-mode runtime compiler / validators.")
+	return executableVersionCheck("ruby", []string{"--version"}, "Ruby is only required for wrapper-mode runtime compiler.")
 }
 
 func pythonCheck() Check {

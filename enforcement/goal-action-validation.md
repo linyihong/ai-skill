@@ -73,16 +73,16 @@
 
 ### 驗證 Gate 參考
 
-本規則的「驗證」概念已升級為 declarative blocking gates，定義於 [`runtime/gates/blocking-gates.yaml`](../runtime/gates/blocking-gates.yaml)。每個 phase 都有對應的 blocking gates（critical/high/medium severity），定義了 phase transition 的必要條件。
+本規則的「驗證」概念已升級為 declarative blocking gates，現行 source 是 [`runtime/runtime.db`](../runtime/runtime.db) / [`runtime/compiler/embedded_data.rb`](../runtime/compiler/embedded_data.rb)。每個 phase 都有對應的 blocking gates（critical/high/medium severity），定義了 phase transition 的必要條件。
 
 Agent 在執行驗證時應：
 
-1. 查詢目前 phase 的 blocking gates（`runtime/gates/blocking-gates.yaml`）
+1. 查詢目前 phase 的 blocking gates（`runtime/runtime.db`，必要時讀 `runtime/compiler/embedded_data.rb`）
 2. 依 severity 順序通過各 gate（critical → high → medium）
-3. 若 gate 未通過 → 進入 recovery（`runtime/recovery/recovery-strategies.yaml`）
+3. 若 gate 未通過 → 進入 recovery（`runtime/runtime.db` 的 recovery tables / `runtime/compiler/embedded_data.rb`）
 4. 若所有 gate 通過 → 允許 phase transition
 
-本節的 prose 規則（目標/執行/驗證三欄）仍適用於工作單元的內部品質檢查，但 phase transition 的 blocking gate 檢查應以 blocking-gates.yaml 為 authoritative reference。
+本節的 prose 規則（目標/執行/驗證三欄）仍適用於工作單元的內部品質檢查，但 phase transition 的 blocking gate 檢查應以 `runtime/runtime.db` / `runtime/compiler/embedded_data.rb` 為 authoritative reference。
 
 ### State-based Enforcement（狀態化強制規則）
 
@@ -97,60 +97,61 @@ state_based_enforcement:
   owner_layer: enforcement/goal-action-validation
   description: >
     將目標/執行/驗證三欄規則對應到 runtime state machine 的 blocking gates。
-    Agent 應優先讀取 blocking-gates.yaml，而非依賴本節的 prose 摘要。
+    Agent 應優先查詢 runtime/runtime.db，必要時讀 runtime/compiler/embedded_data.rb，
+    而非依賴本節的 prose 摘要或已移除的 standalone YAML。
 
-  # 目標定義 → 由 phase-machine.yaml 的 gate.execution.goal_defined 管理
+  # 目標定義 → 由 runtime.db / embedded_data.rb 的 gate.execution.goal_defined 管理
   - rule: goal_defined
     phase: phase.execution
     gate: gate.execution.goal_defined
     severity: critical
     description: "本輪的執行目標已明確定義"
-    runtime_ref: runtime/gates/blocking-gates.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "gate.execution.goal_defined"
 
-  # 執行範圍 → 由 phase-machine.yaml 的 gate.execution.scope_clear 管理
+  # 執行範圍 → 由 runtime.db / embedded_data.rb 的 gate.execution.scope_clear 管理
   - rule: scope_clear
     phase: phase.execution
     gate: gate.execution.scope_clear
     severity: high
     description: "執行範圍已明確，無 scope creep 風險"
-    runtime_ref: runtime/gates/blocking-gates.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "gate.execution.scope_clear"
 
-  # 驗證完整性 → 由 phase-machine.yaml 的 gate.validation.all_obligations_met 管理
+  # 驗證完整性 → 由 runtime.db / embedded_data.rb 的 gate.validation.all_obligations_met 管理
   - rule: validation_complete
     phase: phase.validation
     gate: gate.validation.all_obligations_met
     severity: critical
     description: "本輪所有 obligation 已完成，包含目標/執行/驗證三欄"
-    runtime_ref: runtime/gates/blocking-gates.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "gate.validation.all_obligations_met"
 
-  # 連動更新 → 由 phase-machine.yaml 的 gate.validation.linked_updates_complete 管理
+  # 連動更新 → 由 runtime.db / embedded_data.rb 的 gate.validation.linked_updates_complete 管理
   - rule: linked_updates_complete
     phase: phase.validation
     gate: gate.validation.linked_updates_complete
     severity: critical
     description: "所有連動更新已執行"
-    runtime_ref: runtime/gates/blocking-gates.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "gate.validation.linked_updates_complete"
 
-  # 產出完整性 → 由 phase-machine.yaml 的 gate.validation.artifacts_complete 管理
+  # 產出完整性 → 由 runtime.db / embedded_data.rb 的 gate.validation.artifacts_complete 管理
   - rule: artifacts_complete
     phase: phase.validation
     gate: gate.validation.artifacts_complete
     severity: high
     description: "本輪產出的 artifacts 完整且符合規範"
-    runtime_ref: runtime/gates/blocking-gates.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "gate.validation.artifacts_complete"
 
-  # 禁止動作 → 由 phase-machine.yaml 的 gate.validation.no_forbidden_actions_used 管理
+  # 禁止動作 → 由 runtime.db / embedded_data.rb 的 gate.validation.no_forbidden_actions_used 管理
   - rule: no_forbidden_actions
     phase: phase.validation
     gate: gate.validation.no_forbidden_actions_used
     severity: critical
     description: "本輪未使用任何 forbidden actions"
-    runtime_ref: runtime/gates/blocking-gates.yaml
+    runtime_ref: runtime/runtime.db
     runtime_section: "gate.validation.no_forbidden_actions_used"
 ```
 
