@@ -66,6 +66,8 @@
 - SQLite native path 是否可用；Phase 1 後應使用 pure Go SQLite，不依賴 `sqlite3` CLI。
 - Ruby / Python 僅在 wrapper mode 需要時提示，不應是長期核心依賴。
 - PATH、write permission、hooksPath、平台支援狀態。
+- `--check-runtime` 必須使用 native SQLite driver 做 smoke query；若找到 `runtime.db`，執行 integrity check。
+- Ruby / Python 只作為 wrapper-mode optional diagnostics；缺失時不可阻擋 native-only command。
 
 缺 Git 行為：
 

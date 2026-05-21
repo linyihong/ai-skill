@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 
 	_ "modernc.org/sqlite"
@@ -77,6 +78,8 @@ func buildDoctorResult(opts doctorOptions) Result {
 		}
 	}
 
+	result.Checks = append(result.Checks, pathCheck())
+
 	gitCheck := checkGit()
 	result.Checks = append(result.Checks, gitCheck)
 	if opts.requireGit && gitCheck.Status != "ok" && result.ExitCode == ExitSuccess {
@@ -91,6 +94,7 @@ func buildDoctorResult(opts doctorOptions) Result {
 
 	if gitCheck.Status == "ok" {
 		result.Checks = append(result.Checks, repoRootCheck())
+		result.Checks = append(result.Checks, hooksPathCheck())
 	}
 
 	if opts.requireWrite {
@@ -110,6 +114,8 @@ func buildDoctorResult(opts doctorOptions) Result {
 	if opts.checkRuntime {
 		result.Checks = append(result.Checks, nativeSQLiteCheck())
 		result.Checks = append(result.Checks, runtimeDBCheck())
+		result.Checks = append(result.Checks, rubyCheck())
+		result.Checks = append(result.Checks, pythonCheck())
 	}
 
 	return result
@@ -129,6 +135,36 @@ func platformCheck() Check {
 	default:
 		return Check{Name: "platform", Status: "unsupported", Message: runtime.GOOS}
 	}
+}
+
+func pathCheck() Check {
+	pathValue := os.Getenv("PATH")
+	if pathValue == "" {
+		return Check{
+			Name:        "path",
+			Status:      "missing",
+			Message:     "PATH is empty",
+			Remediation: "Set PATH so external dependencies such as Git can be discovered.",
+		}
+	}
+
+	entries := filepath.SplitList(pathValue)
+	emptyEntries := 0
+	for _, entry := range entries {
+		if strings.TrimSpace(entry) == "" {
+			emptyEntries++
+		}
+	}
+	if emptyEntries > 0 {
+		return Check{
+			Name:        "path",
+			Status:      "warning",
+			Message:     fmt.Sprintf("%d PATH entries, %d empty", len(entries), emptyEntries),
+			Remediation: "Remove empty PATH entries to avoid platform-specific command lookup surprises.",
+		}
+	}
+
+	return Check{Name: "path", Status: "ok", Message: fmt.Sprintf("%d entries", len(entries))}
 }
 
 func checkGit() Check {
@@ -156,6 +192,18 @@ func repoRootCheck() Check {
 		return Check{Name: "repo_root", Status: "failed", Message: "not inside a Git work tree"}
 	}
 	return Check{Name: "repo_root", Status: "ok", Message: strings.TrimSpace(string(output))}
+}
+
+func hooksPathCheck() Check {
+	output, err := exec.Command("git", "config", "--get", "core.hooksPath").Output()
+	if err != nil {
+		return Check{Name: "hooks_path", Status: "unset", Message: "core.hooksPath is not configured"}
+	}
+	value := strings.TrimSpace(string(output))
+	if value == "" {
+		return Check{Name: "hooks_path", Status: "unset", Message: "core.hooksPath is empty"}
+	}
+	return Check{Name: "hooks_path", Status: "ok", Message: value}
 }
 
 func checkWritePermission(dir string) Check {
@@ -220,4 +268,30 @@ func runtimeDBIntegrityCheck(path string) Check {
 		return Check{Name: "runtime_db", Status: "failed", Message: result}
 	}
 	return Check{Name: "runtime_db", Status: "ok", Message: path}
+}
+
+func rubyCheck() Check {
+	return executableVersionCheck("ruby", []string{"--version"}, "Ruby is only required for wrapper-mode runtime compiler / validators.")
+}
+
+func pythonCheck() Check {
+	if check := executableVersionCheck("python3", []string{"--version"}, "Python is only required for wrapper-mode helpers."); check.Status == "ok" {
+		check.Name = "python"
+		return check
+	}
+	check := executableVersionCheck("python", []string{"--version"}, "Python is only required for wrapper-mode helpers.")
+	check.Name = "python"
+	return check
+}
+
+func executableVersionCheck(name string, args []string, remediation string) Check {
+	path, err := exec.LookPath(name)
+	if err != nil {
+		return Check{Name: name, Status: "missing_optional", Message: name + " not found in PATH", Remediation: remediation}
+	}
+	output, err := exec.Command(path, args...).CombinedOutput()
+	if err != nil {
+		return Check{Name: name, Status: "failed", Message: strconv.Quote(strings.TrimSpace(string(output)))}
+	}
+	return Check{Name: name, Status: "ok", Message: strings.TrimSpace(string(output))}
 }

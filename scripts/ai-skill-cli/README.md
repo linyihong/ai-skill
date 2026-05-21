@@ -21,6 +21,7 @@
 go test ./...
 go run ./cmd/ai-skill doctor --json
 go run ./cmd/ai-skill doctor --require-git --plain
+go run ./cmd/ai-skill doctor --check-runtime --json
 ```
 
 Phase 1 採用 [`modernc.org/sqlite`](docs/dependency-policy.md) 作為 pure Go SQLite engine。Git 維持 desktop external dependency；Shell / Ruby / Python 只允許作為 wrapper-mode 過渡依賴。

@@ -109,6 +109,35 @@ func TestDoctorCheckRuntimeUsesNativeSQLite(t *testing.T) {
 	if !hasCheckStatus(result.Checks, "runtime_db", "missing") {
 		t.Fatalf("expected runtime_db missing check from isolated cwd, got %#v", result.Checks)
 	}
+	if !hasCheckStatus(result.Checks, "ruby", "missing_optional") {
+		t.Fatalf("expected ruby missing_optional check, got %#v", result.Checks)
+	}
+	if !hasCheckStatus(result.Checks, "python", "missing_optional") {
+		t.Fatalf("expected python missing_optional check, got %#v", result.Checks)
+	}
+}
+
+func TestDoctorReportsEmptyPath(t *testing.T) {
+	t.Setenv("PATH", "")
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"doctor", "--json"}, &stdout, &stderr)
+
+	if code != ExitSuccess {
+		t.Fatalf("expected success exit, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if !hasCheckStatus(result.Checks, "path", "missing") {
+		t.Fatalf("expected path missing check, got %#v", result.Checks)
+	}
+	if !hasCheckStatus(result.Checks, "git", "missing") {
+		t.Fatalf("expected git missing check, got %#v", result.Checks)
+	}
 }
 
 func emptyPathDir(t *testing.T) string {
