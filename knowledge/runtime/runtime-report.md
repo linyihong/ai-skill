@@ -109,7 +109,7 @@
 | `graph.feedback-promotion-pipeline` | `feedback/promotion/README.md` | `candidate` | 6 | [`feedback-promotion-pipeline.yaml`](../graphs/feedback-promotion-pipeline.yaml) |
 | `graph.governance-layers` | `governance/README.md` | `candidate` | 22 | [`governance-layers.yaml`](../graphs/governance-layers.yaml) |
 | `graph.intelligence-agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `candidate` | 20 | [`intelligence-agent-architecture.yaml`](../graphs/intelligence-agent-architecture.yaml) |
-| `graph.intelligence-anti-patterns` | `intelligence/engineering/anti-patterns/generic-repository-overuse.md` | `candidate` | 7 | [`intelligence-anti-patterns.yaml`](../graphs/intelligence-anti-patterns.yaml) |
+| `graph.intelligence-anti-patterns` | `intelligence/engineering/anti-patterns/generic-repository-overuse.md` | `candidate` | 9 | [`intelligence-anti-patterns.yaml`](../graphs/intelligence-anti-patterns.yaml) |
 | `graph.intelligence-apk-analysis-atoms` | `intelligence/engineering/apk-analysis/README.md` | `candidate` | 20 | [`intelligence-apk-analysis-atoms.yaml`](../graphs/intelligence-apk-analysis-atoms.yaml) |
 | `graph.intelligence-architecture` | `intelligence/engineering/architecture/modular-monolith-vs-microservices.md` | `candidate` | 7 | [`intelligence-architecture.yaml`](../graphs/intelligence-architecture.yaml) |
 | `graph.intelligence-business` | `intelligence/business/saas-pricing-heuristics.md` | `candidate` | 3 | [`intelligence-business.yaml`](../graphs/intelligence-business.yaml) |
@@ -117,9 +117,9 @@
 | `graph.intelligence-distributed-systems` | `intelligence/engineering/distributed-systems/eventual-consistency-patterns.md` | `candidate` | 5 | [`intelligence-distributed-systems.yaml`](../graphs/intelligence-distributed-systems.yaml) |
 | `graph.intelligence-domain` | `intelligence/engineering/domain/aggregate-boundary-heuristics.md` | `candidate` | 7 | [`intelligence-domain.yaml`](../graphs/intelligence-domain.yaml) |
 | `graph.intelligence-failure` | `intelligence/engineering/failure/connection-leak-patterns.md` | `candidate` | 5 | [`intelligence-failure.yaml`](../graphs/intelligence-failure.yaml) |
-| `graph.intelligence-heuristics` | `intelligence/engineering/heuristics/README.md` | `candidate` | 10 | [`intelligence-heuristics.yaml`](../graphs/intelligence-heuristics.yaml) |
+| `graph.intelligence-heuristics` | `intelligence/engineering/heuristics/README.md` | `candidate` | 11 | [`intelligence-heuristics.yaml`](../graphs/intelligence-heuristics.yaml) |
 | `graph.intelligence-repo-analysis` | `intelligence/engineering/analytical-reasoning/README.md` | `candidate` | 8 | [`intelligence-repo-analysis.yaml`](../graphs/intelligence-repo-analysis.yaml) |
-| `graph.intelligence-tradeoffs` | `intelligence/engineering/tradeoffs/postgres-vs-mongodb.md` | `candidate` | 5 | [`intelligence-tradeoffs.yaml`](../graphs/intelligence-tradeoffs.yaml) |
+| `graph.intelligence-tradeoffs` | `intelligence/engineering/tradeoffs/postgres-vs-mongodb.md` | `candidate` | 7 | [`intelligence-tradeoffs.yaml`](../graphs/intelligence-tradeoffs.yaml) |
 | `graph.intelligence-travel` | `intelligence/travel/README.md` | `candidate` | 7 | [`intelligence-travel.yaml`](../graphs/intelligence-travel.yaml) |
 | `memory-operations` | `memory/README.md` | `candidate` | 6 | [`memory-operations.yaml`](../graphs/memory-operations.yaml) |
 | `graph.metadata-navigation` | `metadata/schema.md` | `candidate` | 8 | [`metadata-navigation.yaml`](../graphs/metadata-navigation.yaml) |
