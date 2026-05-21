@@ -3,11 +3,17 @@
 | 檔案 | 用途 |
 | --- | --- |
 | [`init-new-project.sh`](init-new-project.sh) | **新專案初始化**：在目標專案目錄中一次建立 Roo Code（`.roomodes`）、Cursor（`.cursor/rules/`）、Claude Code（`CLAUDE.md`）的設定檔，全部指向 Ai-skill 知識庫；bootstrap 內含 **專案 durable Markdown 預設**（寫入 `docs/`、`README.md` 等前先讀 `workflow/documentation/`）。開新專案時跑一次就好。 |
-| [`sync-cursor-bundle.sh`](sync-cursor-bundle.sh) | 可選的 Cursor symlink / bundle bridge：把本庫同步到 **`~/.cursor/bundles/enforcement`**（共用規則）與 **`~/.cursor/bundles/ai-skill/`**（workflow / analysis / intelligence source）。Reference-only 不需要執行。 |
-| [`ai-skill-close-loop.sh`](ai-skill-close-loop.sh) | 保守收尾工具：偵測 active close-loop lock、列出 dirty 檔案 owner group；預設 dry-run，`--commit` 才分組提交，`--push` 才推遠端。 |
+| [`sync-cursor-bundle.sh`](sync-cursor-bundle.sh) | **Retained legacy** Cursor symlink / bundle bridge；只保留到 `ai-skill sync-cursor-bundle` write mode 完成，不得新增新功能。Reference-only 不需要執行。 |
+| [`ai-skill-close-loop.sh`](ai-skill-close-loop.sh) | **Retained legacy** close-loop 寫入 helper；只保留到 `ai-skill close-loop --commit/--push` parity 完成，不得新增新功能。 |
 | [`ai-skill-cli/`](ai-skill-cli/README.md) | 跨平台 Go CLI / runtime toolchain 的開發根目錄；`docs/` 放文件先行產物與舊腳本 parity 盤點，未來 `cmd/`、`internal/`、`testdata/` 放程式碼與 fixtures。 |
 | [`agent-goals.sh`](agent-goals.sh) | 工具中立的專案暫存 goal ledger helper：在 `<PROJECT_ROOT>/.agent-goals/` 建立、更新、拆解、暫停、完成刪除對話目標；不提交 goal 檔。 |
 | [`git-hooks/post-commit`](git-hooks/post-commit) | **可選。**在本 repo 設定 `git config core.hooksPath scripts/git-hooks` 且 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 時，**`git commit`** 後會執行 `sync-cursor-bundle.sh`。 |
+
+## Go-first script policy
+
+新增 automation 預設必須進 [`ai-skill-cli/`](ai-skill-cli/README.md) 的 Go CLI；不要再新增長期 `.sh`、`.rb` 或 `.py` 入口。Shell 只允許作為 Git hook adapter、轉呼叫 repo-local `ai-skill` binary 的 thin bootstrap wrapper，或尚未完成 Go write-mode parity 的 retained legacy surface。
+
+保留中的 shell 入口不得新增新功能；新功能先做成 Go command，完成 parity、fixture、文件與 release gate 後刪除舊 shell。
 
 ## Go CLI migration map
 
@@ -18,8 +24,8 @@
 | `init-new-project.sh` | `ai-skill init-project` | `--dry-run` planner 已實作；write mode 等 template parity | CLI parity、fixtures、文件通過後刪除舊 shell 入口。 |
 | `agent-goals.sh` | `ai-skill goals` | `status` read-only 與 `init --dry-run` planner 已實作；寫入命令待 parity | 完整 goal lifecycle parity 通過後刪除舊 shell 入口。 |
 | deleted legacy hook installer | `ai-skill hooks install` | dry-run planner 已實作；source 已改為 `scripts/git-hooks/`；copy / chmod write mode 待 parity | 舊 `scripts/install-hooks.sh` 與 `.githooks/` 已刪除，避免誤用 stale hook surface；Git hook files 保留在 `scripts/git-hooks/` 作為 adapter。 |
-| `sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | explicit-target dry-run planner 已實作；managed mirror write mode 待 parity | 保留條件需寫明 owner、期限與移除條件；不得成為通用 CLI 預設行為。 |
-| `ai-skill-close-loop.sh` | `ai-skill close-loop` | dry-run inspection 已實作；commit / push 待 parity | close-loop lock、dirty group、merge/rebase、dry-run、commit/push parity 通過後刪除或降為短期 thin wrapper。 |
+| `sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | legacy retained；Go command 已有 explicit-target dry-run planner，但 write mode 仍回 `write_mode_not_implemented` | 完成 managed mirror write parity、fake home fixture 與 copy / symlink 策略驗證後刪除。不得在 shell 內新增新功能。 |
+| `ai-skill-close-loop.sh` | `ai-skill close-loop` | legacy retained；Go command 已有 dry-run inspection，但 `--commit` / `--push` 仍回 `write_mode_not_implemented` | 完成 commit/push/private-path/plan-closure parity 後刪除或降為短期 binary bootstrap wrapper。不得在 shell 內新增新功能。 |
 | runtime Ruby helpers | `ai-skill runtime ...` | 已刪除 runtime report/index/query/validation/migration/state/sync Ruby entrypoints；`runtime validate`、`runtime refresh`、`runtime query`、`runtime compile` 的 desktop path 預設都走 Go-native，不依賴 Ruby、Python 或 `sqlite3` CLI。 | 已完成 native 覆蓋或易誤用的 scripts 直接刪除；runtime compiler source 已恢復為 YAML，Go compiler 是唯一 active compile path。 |
 | deleted Roo Python helper | `ai-skill roo set-global-custom-instructions` | 已刪除 `scripts/set-roo-global-custom-instructions.py`；guarded tool adapter 由 Go CLI 實作。 | fake VS Code SQLite DB tests 通過後刪除，避免未來錯誤引用 Python helper。 |
 
@@ -63,7 +69,7 @@ Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`
 
 完整說明見 [`ai-tools/new-project-onboarding.md`](../ai-tools/new-project-onboarding.md)。
 
-**規則：**reference-only 是預設，不需要跑 bundle sync。只有本機明確用 Cursor symlink / bundle / copy mirror 佈署，且希望 mirror 立刻跟上時，才跑 `sync-cursor-bundle.sh`（或以 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 啟用上述 hook / close-loop helper 同步）。
+**規則：**reference-only 是預設，不需要跑 bundle sync。Go CLI write mode 完成前，只有本機明確用 Cursor symlink / bundle / copy mirror 佈署，且希望 mirror 立刻跟上時，才暫時跑 retained legacy `sync-cursor-bundle.sh`（或以 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 啟用上述 hook / close-loop helper 同步）。新的同步功能必須加到 `ai-skill sync-cursor-bundle`，不要加回 shell。
 
 在本庫根目錄執行：
 
@@ -80,6 +86,8 @@ export AI_SKILL_SYNC_CURSOR_BUNDLE=1
 ```
 
 ## Close-loop automation
+
+`ai-skill-close-loop.sh` 目前是 retained legacy close-loop 寫入入口；Go CLI 的 `ai-skill close-loop --dry-run` 已可檢查狀態，但 `--commit` / `--push` 尚未開放。新的 close-loop 功能必須加到 Go CLI，shell 只保留到 write-mode parity 完成。
 
 先檢查，不提交：
 

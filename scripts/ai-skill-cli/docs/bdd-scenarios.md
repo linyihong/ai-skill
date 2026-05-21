@@ -54,6 +54,14 @@
 **And** 必須先補上 old surface、new owner、source-of-truth、validation evidence
 **And** 再同步 `script-parity-inventory.md` 與 `legacy-script-disposition.md`。
 
+## 場景：新增 Automation 必須先進 Go CLI
+
+**Given** maintainer 或 agent 需要新增 repository automation
+**When** automation 不是 Git hook adapter 或短期 binary bootstrap wrapper
+**Then** 不得新增長期 `.sh`、`.rb` 或 `.py` entrypoint
+**And** 必須先更新 `command-contract.md` 並實作對應 Go CLI command
+**And** 若保留 legacy shell，shell 不得新增新功能，只能等待 Go write-mode parity 後刪除。
+
 ## 場景：不安全 repo 狀態阻斷 commit
 
 **Given** repository 處於 merge、rebase 或 cherry-pick 狀態
@@ -75,6 +83,7 @@
 - Runtime compile 能以 content assertions 證明 source-to-DB propagation。
 - 每個被取代的舊腳本能力都有 parity disposition 與最低測試證據。
 - 每個被刪除的 legacy surface 都能從 migration map 反查新的 Go owner 與 source-of-truth。
+- 新增 repository automation 預設走 Go CLI，不新增長期 shell / Ruby / Python entrypoint。
 - Mobile support 決策不承諾 iOS 任意 native binary。
 
 ## 驗證目標

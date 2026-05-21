@@ -2,7 +2,7 @@
 
 ## Closure Decision
 
-The Go CLI is now the primary desktop runtime entrypoint. Runtime Ruby report/index/query/validation entrypoints, the Ruby runtime compiler, and the Roo Python adapter have been deleted after native CLI coverage became the default. Some non-runtime shell surfaces remain because they still require write-mode parity.
+The Go CLI is now the primary desktop runtime entrypoint. Runtime Ruby report/index/query/validation entrypoints, the Ruby runtime compiler, and the Roo Python adapter have been deleted after native CLI coverage became the default. Remaining shell surfaces are legacy-retained only because they still require write-mode parity; they must not receive new functionality.
 
 Developer migration details live in [`legacy-to-go-migration-map.md`](legacy-to-go-migration-map.md). Before deleting another legacy surface, update that map first so future maintainers can see the new Go owner, editable source, and validation evidence.
 
@@ -13,8 +13,8 @@ Developer migration details live in [`legacy-to-go-migration-map.md`](legacy-to-
 | `scripts/init-new-project.sh` | Retained, pending parity | Delete after `ai-skill init-project` write mode and template parity are complete |
 | `scripts/agent-goals.sh` | Retained, pending parity | Delete after full goal lifecycle write parity is complete |
 | `scripts/install-hooks.sh` / `.githooks/` | Deleted | Replaced by `ai-skill hooks install` dry-run planner using `scripts/git-hooks/`; write mode remains blocked until parity fixtures |
-| `scripts/sync-cursor-bundle.sh` | Tool-specific adapter retained | Cursor mirror sync remains opt-in and tool-specific |
-| `scripts/ai-skill-close-loop.sh` | Retained, pending parity | Delete or thin-wrap after commit/push/private-path parity |
+| `scripts/sync-cursor-bundle.sh` | Legacy retained, pending Go write-mode parity | Delete after `ai-skill sync-cursor-bundle` supports managed mirror writes with fake-home, unmanaged target safety, copy fallback, and symlink policy fixtures |
+| `scripts/ai-skill-close-loop.sh` | Legacy retained, pending Go write-mode parity | Delete or thin-wrap after `ai-skill close-loop` supports commit/push/private-path scan/plan closure/readback parity |
 | Runtime report/index/query Ruby scripts | Deleted | Replaced by `ai-skill runtime refresh` and `ai-skill runtime query`; `--legacy-wrapper` is removed for refresh |
 | Runtime validators | Deleted | Replaced by `ai-skill runtime validate`; `--legacy-wrapper` is removed for validate |
 | `runtime/compiler/compiler-engine.rb` | Deleted | Replaced by Go-native `ai-skill runtime compile` source-to-DB compiler using runtime YAML and `runtime/compiler/compiler-rules.yaml` |
@@ -32,6 +32,8 @@ Future deletion is allowed only when all are true:
 2. Tests cover dry-run, success, failure, and missing dependency behavior.
 3. Docs point users to the new CLI command.
 4. `script-parity-inventory.md` row is updated to `deleted`, `hook adapter retained`, `tool-specific adapter retained`, or `explicitly out of scope`.
+
+Future additions are stricter: new repository automation must be implemented in Go CLI first. A new shell entrypoint is allowed only as a Git hook adapter or temporary binary bootstrap wrapper with a documented deletion condition.
 
 ## Current Closure Scope
 

@@ -15,6 +15,7 @@
 | `hook adapter` | Git hook 仍是 Git adapter surface；CLI 可安裝或觸發，但不取代 hook 本身。 |
 | `deleted` | 新 CLI parity、fixtures、文件與 release gate 通過後，舊入口已刪除。 |
 | `legacy rollback` | 新 CLI 已是預設 path，但舊入口短期保留作 rollback / parity reference。 |
+| `legacy retained` | Go CLI 已有部分 coverage，但 write-mode parity 尚未完成；舊入口暫留且不得新增新功能。 |
 
 ## 高風險覆蓋規則
 
@@ -22,6 +23,7 @@
 - 會寫檔、commit、push、同步 tool mirror、更新 runtime.db、更新 generated reports 或寫入使用者設定的腳本，必須有 fixture 或 BDD scenario。
 - `close-loop`、`runtime refresh`、`runtime compile`、`init-project`、`sync-cursor-bundle` 是高風險路徑；缺少 parity 測試時不得宣稱 replacement 完成。
 - 刪除任何 legacy surface 前，必須先更新 [`legacy-to-go-migration-map.md`](legacy-to-go-migration-map.md)，明列 new owner、source-of-truth 與 validation。
+- 新增 repository automation 必須優先進 Go CLI；不得新增長期 `.sh`、`.rb` 或 `.py` 入口。保留中的 shell 只能修安全/相容性問題，不得新增新功能。
 - 手機與桌面支援決策不能只看新 CLI；必須確認舊腳本在該平台的不可攜假設已被新命令處理或明確排除。
 - Phase 6 closure 預設刪除 replacement 範圍內的舊 shell / Ruby / Python script。只有 `hook adapter`、`tool-specific` adapter 或明確短期 thin wrapper 可保留；保留時必須寫明 owner、移除條件與期限。
 
@@ -32,8 +34,8 @@
 | `scripts/init-new-project.sh` | 建立新專案 tool bootstrap：`.roomodes`、`.cursor/rules/`、`.cursor/hooks.json`、`CLAUDE.md`、`.agent-goals/` | 目標專案路徑、`--dry-run`、`--force`、`--tools` | 寫入目標專案設定；dry-run 只列出計畫 | POSIX shell、檔案系統權限 | `ai-skill init-project` | `native target` | fake home / target project fixture；既有檔案衝突 fixture；dry-run 無寫入 assertion（Phase 2 dry-run planner 已覆蓋；write mode 待 template parity） |
 | `scripts/agent-goals.sh` | 管理 project-local `.agent-goals/`、locks、goal index、split / pause / complete | `--project`、`init/status/start/update/split/pause/complete/cleanup` | 寫入 `.agent-goals/`，更新 `.git/info/exclude`，建立 / 清理 lock | POSIX shell、Python 3、可選 Git | `ai-skill goals` | `native target` | fake project fixture；lock fixture；`complete` 缺 `--validated` 不刪除 assertion（Phase 2 已覆蓋 `status` read-only 與 `init --dry-run` planner；write/start/update/split/pause/complete/cleanup 待 parity） |
 | `scripts/install-hooks.sh` | 從 `.githooks/` 複製 hooks 到 `.git/hooks/` 並加執行權限 | 無正式 flags | 寫入 `.git/hooks/`，設定可執行權限 | POSIX shell、Git repo、檔案權限 | `ai-skill hooks install` using `scripts/git-hooks/` source | `deleted` | Deleted with `.githooks/`; Go CLI dry-run planner now points at `scripts/git-hooks/`. Write copy / chmod still blocked until parity fixtures are complete. |
-| `scripts/sync-cursor-bundle.sh` | 同步 Cursor bundle / mirror symlink，清理會造成循環的 symlink | 環境中的 `$HOME` 與 repo root | 寫入 `~/.cursor/bundles/`、`~/.cursor/shared-rules`、`~/.cursor/skills/`；可能移動既有非 symlink 目標 | POSIX shell、find、ln、檔案權限、Cursor 目錄慣例 | `ai-skill sync-cursor-bundle` | `tool-specific` | fake home fixture；managed / unmanaged mirror safety fixture；reference-only 不自動同步 assertion（Phase 2 已覆蓋 explicit target dry-run、target outside repo、copy-fallback strategy、無寫入；managed mirror write mode 待 parity） |
-| `scripts/ai-skill-close-loop.sh` | 檢查 lock、dirty owner group、plan closure、knowledge runtime validation，依 group commit，可選 push | `--commit`、`--push`、`AI_SKILL_SYNC_CURSOR_BUNDLE`、`AI_SKILL_LOCK_TTL_SECONDS` | dry-run 列群組；`--commit` 執行 `git add/commit`；`--push` 執行 `git push`；可選同步 Cursor bundle | POSIX shell、Git、repo-local `ai-skill` binary、可選 Cursor sync | `ai-skill close-loop` | `wrapper first` | clean / dirty owner group fixture；merge / rebase / lock fixture；missing Git fixture；private path scan fixture（Phase 2 已覆蓋 native dry-run inspection；commit/push、plan closure、private path scan 待 parity；runtime validation 已改呼叫 repo-local CLI） |
+| `scripts/sync-cursor-bundle.sh` | 同步 Cursor bundle / mirror symlink，清理會造成循環的 symlink | 環境中的 `$HOME` 與 repo root | 寫入 `~/.cursor/bundles/`、`~/.cursor/shared-rules`、`~/.cursor/skills/`；可能移動既有非 symlink 目標 | POSIX shell、find、ln、檔案權限、Cursor 目錄慣例 | `ai-skill sync-cursor-bundle` | `legacy retained` | Go command 目前只支援 dry-run planning，write mode 明確 blocked；刪除前必須完成 managed mirror write parity、fake home fixture、copy fallback / symlink policy 與 unmanaged target safety。Shell 內不得新增新功能。 |
+| `scripts/ai-skill-close-loop.sh` | 檢查 lock、dirty owner group、plan closure、knowledge runtime validation，依 group commit，可選 push | `--commit`、`--push`、`AI_SKILL_SYNC_CURSOR_BUNDLE`、`AI_SKILL_LOCK_TTL_SECONDS` | dry-run 列群組；`--commit` 執行 `git add/commit`；`--push` 執行 `git push`；可選同步 Cursor bundle | POSIX shell、Git、repo-local `ai-skill` binary、可選 Cursor sync | `ai-skill close-loop` | `legacy retained` | Go command 目前只支援 dry-run inspection，`--commit` / `--push` 明確 blocked；刪除前必須完成 commit/push/private-path scan、plan closure、optional Cursor sync、readback 與 grouped commit parity。Shell 內不得新增新功能。 |
 | `scripts/refresh-knowledge-runtime.rb` | 串接 model report、checklist、runtime report、SQLite index 生成與 validation | 無 flags | 更新 generated Markdown reports 與本機 SQLite index；執行 validators | Ruby、sqlite3 CLI、canonical knowledge files | `ai-skill runtime refresh` | `deleted` | Native refresh default 寫 reports / index 並跑 native checks；legacy wrapper 已刪除。 |
 | `scripts/generate-knowledge-runtime-report.rb` | 從 routing registry、summaries、graphs、refresh policy 產生 deterministic runtime report | `--write` | 可輸出或寫入 `knowledge/runtime/runtime-report.md` | Ruby、YAML parser | `ai-skill runtime refresh` | `deleted` | Native builder 與 golden anchors 覆蓋；runtime refresh 寫入 generated report。 |
 | `scripts/generate-model-context-report.rb` | 從 routing registry model 欄位產生 model-aware loading report | `--write` | 可輸出或寫入 `knowledge/runtime/model-context-report.md` | Ruby、YAML parser | `ai-skill runtime refresh` | `deleted` | Native builder 與 golden anchors 覆蓋；runtime refresh 寫入 generated report。 |
@@ -80,7 +82,7 @@
 
 功能完成後，每個舊入口必須更新最終 disposition。當前 closure source-of-truth 是 [`legacy-script-disposition.md`](legacy-script-disposition.md)：
 
-- `native target` / `wrapper first` 完成 parity 並由新 CLI 覆蓋後，舊 script 必須刪除並改標 `deleted`。
+- `native target` / `wrapper first` / `legacy retained` 完成 parity 並由新 CLI 覆蓋後，舊 script 必須刪除並改標 `deleted`。
 - `hook adapter` 可保留 hook surface，但安裝、檢查與文件應由 `ai-skill hooks install` 管理；保留原因必須寫清楚。
 - `tool-specific` adapter 若仍需要，必須留在工具 adapter 層，不得成為通用 CLI 預設；保留時寫明移除條件。
 - 若短期保留 thin wrapper，wrapper 只能轉呼叫 `ai-skill`，且必須在同一 closure 記錄刪除條件與期限。

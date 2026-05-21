@@ -11,6 +11,7 @@
 - **明確 side effect**：每個命令必須列出讀取路徑、寫入路徑、外部依賴與 git 操作。
 - **禁止 partial close-loop**：linked-update、writeback、commit、push、runtime sync 若缺 Git 或 repo 狀態不安全，必須阻斷。
 - **Native default**：Runtime core commands 預設走 Go-native path；Ruby、Python 與外部 `sqlite3` CLI 不屬於 active runtime dependency。
+- **Go-first automation**：新增 repository automation 必須先設計成 `ai-skill` Go CLI command。`.sh` 只可作為 Git hook adapter、thin bootstrap wrapper，或保留到 Go write-mode parity 完成的 legacy surface。
 
 ## 初始命令範圍
 
@@ -344,8 +345,8 @@
 | `scripts/init-new-project.sh` | `ai-skill init-project` | Phase 2 native 候選 |
 | `scripts/agent-goals.sh` | `ai-skill goals` | Phase 2 native 候選 |
 | deleted `scripts/install-hooks.sh` / `.githooks/` | `ai-skill hooks install` | dry-run planner uses `scripts/git-hooks/`; write mode still blocked until fixture-backed |
-| `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | Phase 2 native 候選，需 mirror safety gate |
-| `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` | Phase 2 先 wrapper，owner-group parity 後 native |
+| `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | legacy retained；Go dry-run 已有，write mode parity 完成後刪除 |
+| `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` | legacy retained；Go dry-run 已有，commit / push parity 完成後刪除或降為短期 bootstrap wrapper |
 | Runtime report / SQLite generators | `ai-skill runtime refresh` | Native completed; old Ruby entrypoints deleted |
 | Runtime validators | `ai-skill runtime validate` | Native completed; old Ruby entrypoints deleted |
 | Runtime query helpers | `ai-skill runtime query` | Native completed; old Ruby entrypoints deleted |
@@ -377,6 +378,7 @@
 - Git hook adapter 可保留 hook surface，但安裝、檢查與文件應由 `ai-skill hooks install` 管理。
 - Tool-specific adapter 可保留在工具層，但不得成為通用 CLI 預設。
 - 短期 thin wrapper 只能轉呼叫 `ai-skill`，並必須記錄 owner、刪除條件與期限。
+- 不得新增長期 shell script 作為新功能入口；若需要 automation，先擴充本 command contract 與 Go CLI。
 
 ## 副作用登錄表
 

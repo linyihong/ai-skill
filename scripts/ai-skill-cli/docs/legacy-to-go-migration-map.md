@@ -59,6 +59,15 @@ The Roo command is a guarded tool adapter, not a general onboarding default. It 
 | `scripts/git-hooks/pre-commit` | Calls repo-local `ai-skill runtime compile` and `ai-skill runtime validate`; no Ruby compiler call remains. |
 | `scripts/ai-skill-cli/bin/*` | Rebuilt only after CLI source changes; `go test ./...` verifies `BUILDINFO`, `SHA256SUMS`, and host binary smoke. |
 
+## Retained Shell Surfaces
+
+These shell files are legacy-retained surfaces, not places for new functionality. New behavior must be added to the Go CLI first.
+
+| Legacy surface | Go owner | Current Go coverage | Deletion condition |
+| --- | --- | --- | --- |
+| `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` / `internal/app/sync_cursor_bundle.go` | Dry-run planning, explicit target requirement, target-outside-repo check, copy-fallback strategy, skill mirror planning | Delete after Go write mode supports managed mirror writes, fake home fixture, unmanaged target safety, copy fallback, and symlink policy |
+| `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` / `internal/app/close_loop.go` | Dry-run inspection, missing Git block, unsafe Git state block, active lock block, dirty owner grouping | Delete or reduce to a short binary bootstrap wrapper after Go supports commit, push, private-path scan, plan closure, optional Cursor sync, and readback parity |
+
 ## Required Close Loop
 
 Before deleting or replacing another legacy surface:
@@ -69,3 +78,5 @@ Before deleting or replacing another legacy surface:
 4. Add fixture-backed tests when the surface writes files, touches Git, mutates tool settings, or updates `runtime.db`.
 5. Run the relevant Go tests and runtime compile / refresh / validate commands.
 6. Rebuild repo-local binaries if Go CLI source changed.
+
+For new automation, create or extend a Go CLI command instead of adding a shell script. If a shell wrapper is unavoidable, it must only locate and invoke the repo-local binary and must include a deletion condition in this map.
