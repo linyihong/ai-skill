@@ -9,6 +9,7 @@
 | [`change-brief.md`](change-brief.md) | 開始或調整本計畫 scope、確認為什麼要做跨平台 runtime 時 |
 | [`command-contract.md`](command-contract.md) | 設計或實作任何 `ai-skill` CLI 命令前 |
 | [`dependency-policy.md`](dependency-policy.md) | 新增 Go dependency、外部 binary、wrapper mode 或 SQLite 行為前 |
+| [`runtime-native-rewrite-assessment.md`](runtime-native-rewrite-assessment.md) | 決定 Ruby runtime tooling 哪些先 native Go、哪些維持 wrapper-first 時 |
 | [`script-parity-inventory.md`](script-parity-inventory.md) | 檢查新 CLI 是否完整涵蓋舊腳本功能、side effects 與測試證據時 |
 | [`support-matrix.md`](support-matrix.md) | 判斷 Windows、macOS、Linux、iOS、Android 支援等級與限制時 |
 | [`bdd-scenarios.md`](bdd-scenarios.md) | 寫測試、驗收條件或 fixture 前 |
