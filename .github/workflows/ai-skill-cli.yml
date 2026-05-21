@@ -39,8 +39,47 @@ jobs:
       - name: Run tests
         run: go test ./...
 
+      - name: Smoke version JSON
+        run: go run ./cmd/ai-skill version --json
+
       - name: Smoke doctor JSON
         run: go run ./cmd/ai-skill doctor --json
 
       - name: Smoke runtime diagnostics
         run: go run ./cmd/ai-skill doctor --check-runtime --json
+
+      - name: Smoke native runtime validate
+        run: go run ./cmd/ai-skill runtime validate --repo ../.. --json
+
+      - name: Smoke native runtime compile
+        run: go run ./cmd/ai-skill runtime compile --repo ../.. --db scripts/ai-skill-cli/runtime-native-smoke.db --json
+
+  artifacts:
+    name: Build artifacts
+    runs-on: ubuntu-latest
+    needs: test
+    defaults:
+      run:
+        working-directory: scripts/ai-skill-cli
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: scripts/ai-skill-cli/go.mod
+          cache-dependency-path: scripts/ai-skill-cli/go.sum
+
+      - name: Build release artifacts
+        run: go run ./cmd/releasebuild --version ci-${{ github.run_number }} --commit ${{ github.sha }} --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --dist dist
+
+      - name: Verify checksums file
+        run: test -s dist/SHA256SUMS && test "$(wc -l < dist/SHA256SUMS)" -eq 5
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-skill-cli-artifacts
+          path: scripts/ai-skill-cli/dist/
