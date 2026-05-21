@@ -480,8 +480,13 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 **必須執行**：
 
 ```bash
-scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime compile --native-compiler
-scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime validate
+# Darwin (arm64): scripts/ai-skill-cli/bin/ai-skill-darwin-arm64
+# Darwin (amd64): scripts/ai-skill-cli/bin/ai-skill-darwin-amd64
+# Linux  (amd64): scripts/ai-skill-cli/bin/ai-skill-linux-amd64
+# Linux  (arm64): scripts/ai-skill-cli/bin/ai-skill-linux-arm64
+# Windows:        scripts/ai-skill-cli/bin/ai-skill-windows-amd64.exe
+<platform-binary> runtime compile --native-compiler
+<platform-binary> runtime validate
 ```
 
 **必須確認**：
