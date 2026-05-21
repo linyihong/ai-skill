@@ -98,6 +98,51 @@ func TestRuntimeRefreshBlocksMissingRubyBeforeWrapper(t *testing.T) {
 	}
 }
 
+func TestRuntimeCompileDryRunPlansCompiler(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "compile", "--repo", repo, "--dry-run", "--assert-source", "runtime/compiler/embedded_data.rb", "--assert-keyword", "phase", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Command != "runtime compile" || result.Mode != "dry_run" {
+		t.Fatalf("unexpected result identity: %#v", result)
+	}
+	if len(result.Mutations) != 0 {
+		t.Fatalf("runtime compile dry-run must not mutate, got %#v", result.Mutations)
+	}
+	if !hasCheckStatus(result.Checks, "wrapper_mode", "ok") {
+		t.Fatalf("expected wrapper_mode ok, got %#v", result.Checks)
+	}
+}
+
+func TestRuntimeCompileBlocksMissingRubyBeforeWrapper(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	t.Setenv("PATH", emptyPathDir(t))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "compile", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitMissingDependency {
+		t.Fatalf("expected missing dependency, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Error == nil || result.Error.Code != "missing_ruby" {
+		t.Fatalf("expected missing_ruby, got %#v", result.Error)
+	}
+}
+
 func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
 	repo := t.TempDir()
 	writeFile(t, filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb"), "# ok\n")
@@ -113,7 +158,7 @@ func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
 func TestRuntimeUnsupportedSubcommandReturnsInvalidUsage(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "compile"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "migrate"}, &stdout, &stderr)
 	if code != ExitInvalidUsage {
 		t.Fatalf("expected invalid usage, got %d", code)
 	}
@@ -147,6 +192,7 @@ func fakeRuntimeRepo(t *testing.T) string {
 	} {
 		writeFile(t, filepath.Join(repo, "scripts", name), "#!/usr/bin/env ruby\nputs 'ok'\n")
 	}
+	writeFile(t, filepath.Join(repo, "runtime", "compiler", "compiler-engine.rb"), "#!/usr/bin/env ruby\nputs 'compiled'\n")
 	return repo
 }
 

@@ -24,6 +24,7 @@ go run ./cmd/ai-skill doctor --require-git --plain
 go run ./cmd/ai-skill doctor --check-runtime --json
 go run ./cmd/ai-skill init-project --project /tmp --tools roo,cursor --dry-run --json
 go run ./cmd/ai-skill runtime refresh --repo ../.. --dry-run --json
+go run ./cmd/ai-skill runtime compile --repo ../.. --dry-run --json
 go run ./cmd/ai-skill runtime validate --repo ../.. --dry-run --json
 ```
 

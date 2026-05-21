@@ -283,8 +283,8 @@ Completion criteria：
 
 Tasks：
 
-- [ ] 先建立 Go wrapper：`ai-skill runtime refresh`、`runtime validate`、`runtime compile`。（`runtime refresh` / `runtime validate` 已開始）
-- [ ] Wrapper 必須固定 UTF-8 環境，並在缺 Ruby / SQLite 時給明確修復建議。（`runtime refresh` / `runtime validate` 已覆蓋）
+- [x] 先建立 Go wrapper：`ai-skill runtime refresh`、`runtime validate`、`runtime compile`。
+- [x] Wrapper 必須固定 UTF-8 環境，並在缺 Ruby / SQLite 時給明確修復建議。
 - [ ] 建立 golden fixture：同一組 source 產出固定 `runtime-report.md`、model reports、SQLite index、`runtime.db` assertion。
 - [ ] 建立 native SQLite proof-of-concept：用 pure Go SQLite 開啟、查詢、寫入測試 DB，確認 Windows / macOS / Linux 無外部 sqlite3 CLI 依賴。
 - [ ] 評估哪些 Ruby validator 適合原生 Go 重寫，哪些應保留 Ruby。
@@ -294,6 +294,7 @@ Progress notes：
 
 - `ai-skill runtime validate` 已建立 wrapper-first slice，支援 `--repo`、`--dry-run`、JSON / plain output，dry-run 只列出 `validate-knowledge-runtime.rb`、`validate-runtime-db.rb`、`validate-runtime-sqlite-index.rb`；執行模式固定 `LANG=C.UTF-8` / `LC_ALL=C.UTF-8`，並在缺 Ruby 或 `sqlite3` CLI 時回 `missing_dependency`。
 - `ai-skill runtime refresh` 已建立 wrapper-first slice，支援 `--repo`、`--dry-run`、JSON / plain output，dry-run 列出 `refresh-knowledge-runtime.rb` 會串接的 generator / validator scripts；執行模式固定 UTF-8 env，並在缺 Ruby、`sqlite3` CLI 或 Git 時回 `missing_dependency`。
+- `ai-skill runtime compile` 已建立 wrapper-first slice，支援 `--repo`、`--dry-run`、`--assert-source`、`--assert-keyword`、JSON / plain output，dry-run 只列出 Ruby compiler / `--diff` 計畫且不寫入 `runtime.db`；執行模式固定 UTF-8 env，並在缺 Ruby 或 `sqlite3` CLI 時回 `missing_dependency`。
 
 Completion criteria：
 

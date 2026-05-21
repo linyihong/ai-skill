@@ -10,11 +10,13 @@ import (
 )
 
 type runtimeOptions struct {
-	command     string
-	repoPath    string
-	dryRun      bool
-	jsonOutput  bool
-	plainOutput bool
+	command       string
+	repoPath      string
+	dryRun        bool
+	assertSource  string
+	assertKeyword string
+	jsonOutput    bool
+	plainOutput   bool
 }
 
 type runtimeValidator struct {
@@ -24,11 +26,11 @@ type runtimeValidator struct {
 
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh> [flags]")
+		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile> [flags]")
 		return ExitInvalidUsage
 	}
 	opts := runtimeOptions{command: args[0]}
-	if opts.command != "validate" && opts.command != "refresh" {
+	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" {
 		_, _ = fmt.Fprintf(stderr, "unsupported runtime command: %s\n", opts.command)
 		return ExitInvalidUsage
 	}
@@ -36,6 +38,8 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs := newFlagSet("runtime "+opts.command, stderr)
 	fs.StringVar(&opts.repoPath, "repo", ".", "Ai-skill repository path")
 	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview runtime wrapper scripts without executing")
+	fs.StringVar(&opts.assertSource, "assert-source", "", "source path expected in generated surfaces")
+	fs.StringVar(&opts.assertKeyword, "assert-keyword", "", "keyword expected in generated surfaces")
 	fs.BoolVar(&opts.jsonOutput, "json", false, "write machine-readable JSON output")
 	fs.BoolVar(&opts.plainOutput, "plain", false, "write human-readable output")
 	if err := fs.Parse(args[1:]); err != nil {
@@ -63,6 +67,8 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 
 func buildRuntimeResult(opts runtimeOptions) Result {
 	switch opts.command {
+	case "compile":
+		return buildRuntimeCompileResult(opts)
 	case "refresh":
 		return buildRuntimeRefreshResult(opts)
 	default:
@@ -218,6 +224,81 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 		result.Status = "blocked"
 		result.ExitCode = ExitValidationFailed
 		result.Error = &CommandError{Code: "runtime_refresh_failed", Message: check.Message, Remediation: "Inspect refresh output and fix the failing generator or validator."}
+		return result
+	}
+
+	return result
+}
+
+func buildRuntimeCompileResult(opts runtimeOptions) Result {
+	result := Result{
+		Command:        "runtime compile",
+		Mode:           "wrapper",
+		Status:         "success",
+		ExitCode:       ExitSuccess,
+		Checks:         []Check{},
+		PlannedActions: []string{},
+		Mutations:      []string{},
+	}
+	if opts.dryRun {
+		result.Mode = "dry_run"
+	}
+
+	repo, repoCheck := resolveExistingDir("repo", opts.repoPath)
+	result.Checks = append(result.Checks, repoCheck)
+	if repoCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitInvalidUsage
+		result.Error = &CommandError{Code: "invalid_repo", Message: repoCheck.Message, Remediation: "Pass --repo with the Ai-skill repository root."}
+		return result
+	}
+
+	compiler := filepath.Join(repo, "runtime", "compiler", "compiler-engine.rb")
+	result.PlannedActions = append(result.PlannedActions, "run ruby compiler: "+compiler)
+	if opts.dryRun {
+		result.PlannedActions = append(result.PlannedActions, "run ruby compiler check: "+compiler+" --diff")
+	}
+	if opts.assertSource != "" || opts.assertKeyword != "" {
+		result.PlannedActions = append(result.PlannedActions, "assert generated surface: source="+opts.assertSource+" keyword="+opts.assertKeyword)
+	}
+	if _, err := os.Stat(compiler); err != nil {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "missing_runtime_compiler", Message: compiler, Remediation: "Run from a complete Ai-skill checkout."}
+		result.Checks = append(result.Checks, Check{Name: "runtime_compiler", Status: "missing", Message: compiler})
+		return result
+	}
+
+	if opts.dryRun {
+		result.Checks = append(result.Checks, Check{Name: "wrapper_mode", Status: "ok", Message: "dry-run only; compiler not executed"})
+		return result
+	}
+
+	ruby, rubyCheck := requiredExecutable("ruby", []string{"--version"}, "Install Ruby to use wrapper-mode runtime compiler until native Go compiler replaces it.")
+	result.Checks = append(result.Checks, rubyCheck)
+	if rubyCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitMissingDependency
+		result.Error = &CommandError{Code: "missing_ruby", Message: "Ruby is required for runtime compile wrapper mode.", Remediation: rubyCheck.Remediation}
+		return result
+	}
+
+	sqlite, sqliteCheck := requiredExecutable("sqlite3", []string{"--version"}, "Install sqlite3 CLI for wrapper-mode runtime compiler until native Go SQLite compile replaces it.")
+	result.Checks = append(result.Checks, sqliteCheck)
+	if sqliteCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitMissingDependency
+		result.Error = &CommandError{Code: "missing_sqlite3", Message: "sqlite3 CLI is required for runtime compile wrapper mode.", Remediation: sqliteCheck.Remediation}
+		return result
+	}
+	_ = sqlite
+
+	check := runRuntimeScript(repo, ruby, "runtime_compile", compiler)
+	result.Checks = append(result.Checks, check)
+	if check.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "runtime_compile_failed", Message: check.Message, Remediation: "Inspect compiler output and fix the runtime source or compiler input."}
 		return result
 	}
 
