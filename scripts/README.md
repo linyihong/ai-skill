@@ -28,7 +28,7 @@
 | `agent-goals.sh` | `ai-skill goals` | `status` read-only 與 `init --dry-run` planner 已實作；寫入命令待 parity | 完整 goal lifecycle parity 通過後刪除舊 shell 入口。 |
 | `install-hooks.sh` | `ai-skill hooks install` | native target，尚未實作 | hook install parity 通過後刪除舊 shell 入口；Git hook files 本身可作為 hook adapter 保留。 |
 | `sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | tool-specific adapter，尚未實作 | 保留條件需寫明 owner、期限與移除條件；不得成為通用 CLI 預設行為。 |
-| `ai-skill-close-loop.sh` | `ai-skill close-loop` | wrapper-first target，尚未實作 | close-loop lock、dirty group、merge/rebase、dry-run、commit/push parity 通過後刪除或降為短期 thin wrapper。 |
+| `ai-skill-close-loop.sh` | `ai-skill close-loop` | dry-run inspection 已實作；commit / push 待 parity | close-loop lock、dirty group、merge/rebase、dry-run、commit/push parity 通過後刪除或降為短期 thin wrapper。 |
 | runtime Ruby helpers | `ai-skill runtime ...` | Phase 3 wrapper-first / native split | runtime refresh / compile / validate / query parity 通過後刪除被取代的 Ruby entrypoints；hook adapter 例外需文件化。 |
 
 ## New project initialization

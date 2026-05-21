@@ -181,6 +181,7 @@
 輸入：
 
 - `--dry-run`
+- `--repo <path>`
 - `--commit`
 - `--push`
 - `--json`
@@ -191,12 +192,14 @@
 - dry-run：無寫入。
 - `--commit`：可能執行 `git add`、`git commit`。
 - `--push`：可能執行 `git push`。
+- Phase 2 初始切片只開放 dry-run inspection；`--commit` / `--push` 在 commit parity 完成前必須回傳 `partial_close_loop_blocked`。
 
 必要 Git 檢查：
 
 - `git` binary 存在。
 - repo root 可由 `git rev-parse --show-toplevel` 確認。
 - 不在 merge / rebase / cherry-pick 狀態。
+- 不存在 active `.git/ai-skill-agent.lock`。
 - dirty files 可歸屬 owner group。
 
 缺 Git 行為：

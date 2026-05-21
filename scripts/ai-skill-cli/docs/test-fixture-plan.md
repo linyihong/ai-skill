@@ -100,6 +100,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - JSON 輸出列出規劃寫入項目。
 - 權限不足時回傳 `permission_denied`。
 - Phase 2 已用 `init-project --dry-run` fake project tests 覆蓋 planned actions、既有檔案 conflict、`--force`、plain output 與無寫入 assertion。
+- Phase 2 已用 temporary git repo tests 覆蓋 `close-loop --dry-run` clean repo、dirty owner group、active lock、merge/rebase state、unknown path block 與 missing Git block；commit / push write mode 仍阻斷，待 parity fixture 完成後再開啟。
 
 ## 產物關卡
 
