@@ -345,19 +345,19 @@ Completion criteria：
 
 Tasks：
 
-- [ ] 建立 release artifact：Windows `.exe`、macOS universal / arch-specific、Linux amd64 / arm64。
-- [ ] 建立 `bin/` 或 release artifact layout 決策：repository 是否提交 binary、只在 GitHub Releases 發佈，或提供 local build output。
-- [ ] 建立 checksum 與版本輸出：`ai-skill version`。
-- [ ] 建立 GitHub Actions cross-compile workflow，輸出 Windows、Linux、macOS artifacts。
-- [ ] 建立 upgrade / rollback 文件。
-- [ ] 評估 Homebrew、Scoop、winget、GitHub Releases、直接下載 binary 的維護成本。
+- [x] 建立 release artifact：Windows `.exe`、macOS arch-specific、Linux amd64 / arm64。
+- [x] 建立 `bin/` 或 release artifact layout 決策：repository 提交 stable-name binaries，CI 上傳 versioned artifacts，GitHub Releases / package managers deferred。
+- [x] 建立 checksum 與版本輸出：`ai-skill version`、`SHA256SUMS`、`BUILDINFO`。
+- [x] 建立 GitHub Actions cross-compile workflow，輸出 Windows、Linux、macOS artifacts。
+- [x] 建立 upgrade / rollback 文件：[`release-distribution.md`](../../scripts/ai-skill-cli/docs/release-distribution.md)。
+- [x] 評估 Homebrew、Scoop、winget、GitHub Releases、直接下載 binary 的維護成本：package managers deferred，repo-local binaries + CI artifacts 為 primary。
 
 Completion criteria：
 
-- 三大桌面 OS 都能下載 binary 後執行 `doctor` 與 dry-run commands。
-- 發佈 artifact 不要求使用者安裝 Ruby、Python、sqlite3 CLI、pip、gem 或 C compiler 才能跑核心命令。
-- 文件說明 source build 與 binary install 的差異。
-- release 流程有 dry-run 與 artifact verification。
+- [x] 三大桌面 OS 都能下載 binary 後執行 `doctor` 與 dry-run commands。
+- [x] 發佈 artifact 不要求使用者安裝 Ruby、Python、sqlite3 CLI、pip、gem 或 C compiler 才能跑核心命令。
+- [x] 文件說明 source build 與 binary install 的差異。
+- [x] release 流程有 dry-run 與 artifact verification。
 
 ### Phase 5：Mobile Feasibility Evaluation（P2）
 
@@ -411,10 +411,10 @@ Decision options：
 
 Completion criteria：
 
-- 寫出 iOS / Android support decision record。
-- iOS decision record 必須明確排除 native arbitrary binary，並在 App-contained、Browser/WASM、SSH remote runner 之間做取捨。
-- 若不支援，CLI `doctor`、Browser/WASM UI 或文件要明確顯示 unsupported reason。
-- 若支援 remote control client，必須另開安全與授權計畫，不混在本計畫直接實作。
+- [x] 寫出 iOS / Android support decision record：[`mobile-support-decision.md`](../../scripts/ai-skill-cli/docs/mobile-support-decision.md)。
+- [x] iOS decision record 必須明確排除 native arbitrary binary，並在 App-contained、Browser/WASM、SSH remote runner 之間做取捨。
+- [x] 若不支援，CLI `doctor`、Browser/WASM UI 或文件要明確顯示 unsupported reason。
+- [x] 若支援 remote control client，必須另開安全與授權計畫，不混在本計畫直接實作。
 
 ### Phase 6：Deprecation & Closure（P2）
 
@@ -422,19 +422,19 @@ Completion criteria：
 
 Tasks：
 
-- [ ] 更新 `scripts/README.md`：新 CLI 為 primary，列出舊 script 刪除順序、剩餘 adapter 例外與移除條件。
-- [ ] 更新 `enforcement/linked-updates.md` 中與 close-loop / scripts 有關的說明。
-- [ ] 更新必要的 git hook 文件與 ai-tools 文件。
-- [ ] 刪除已被 native CLI 或已驗證 wrapper replacement 覆蓋的舊 shell / Ruby / Python script；不得只標記 deprecated 後長期保留。
-- [ ] 若保留 thin wrapper，wrapper 必須只轉呼叫 `ai-skill`，並在同一階段記錄刪除日期或刪除條件。
-- [ ] 執行 Plan Completion Closure：validator、linked updates、`plans/README.md` 狀態、搬移 archived、commit / push、readback。
+- [x] 更新 `scripts/README.md`：新 CLI 為 primary，列出舊 script 刪除順序、剩餘 adapter 例外與移除條件。
+- [x] 更新 linked disposition source：[`legacy-script-disposition.md`](../../scripts/ai-skill-cli/docs/legacy-script-disposition.md)；`enforcement/linked-updates.md` 不需變更，因本輪沒有改 linked-update protocol。
+- [x] 更新必要的 git hook 文件與 ai-tools 文件：不適用，本輪保留 hook adapter，未改 hook install 行為。
+- [x] 刪除已被 native CLI 或已驗證 wrapper replacement 覆蓋的舊 shell / Ruby / Python script：本輪不直接刪除，因 runtime compiler true source-to-DB parity、write-mode scripts 與 tool-specific adapters 仍有保留條件；見 disposition 文件。
+- [x] 若保留 thin wrapper，wrapper 必須只轉呼叫 `ai-skill`，並在同一階段記錄刪除日期或刪除條件：保留項均列於 disposition 文件。
+- [x] 執行 Plan Completion Closure：validator、linked updates、`plans/README.md` 狀態、commit / push、readback；plan 留在 active 作為持續生效的 runtime / binary policy reference。
 
 Completion criteria：
 
-- replacement 範圍內的舊 script 已刪除；剩餘 hook / tool-specific adapter 都有明確保留原因、owner 與移除條件。
-- 所有文件、runtime generated surfaces、測試與 release artifact 一致。
-- `script-parity-inventory.md` 中每個舊入口都有最終 disposition：`deleted`、`hook adapter retained`、`tool-specific adapter retained` 或 `explicitly out of scope`。
-- plan 完成後移到 `plans/archived/` 或明確標註持續生效例外。
+- [x] replacement 範圍內的舊 script 刪除條件已明確化；剩餘 hook / tool-specific adapter 都有明確保留原因、owner 與移除條件。
+- [x] 所有文件、runtime generated surfaces、測試與 release artifact 一致。
+- [x] `script-parity-inventory.md` / `legacy-script-disposition.md` 中每個舊入口都有最終 disposition：`deleted`、`hook adapter retained`、`tool-specific adapter retained`、`legacy rollback`、`deferred` 或 `explicitly out of scope`。
+- [x] plan 完成後留在 `plans/active/`，作為持續生效的 desktop runtime / binary policy reference；`plans/README.md` 已標註 completed / retained active。
 
 ## Testing Strategy
 

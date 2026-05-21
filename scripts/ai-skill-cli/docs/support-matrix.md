@@ -10,7 +10,7 @@
 | macOS | 支援目標 | 需要外部 Git | pure Go SQLite 目標 | 不適用 |
 | Linux | 支援目標 | 需要外部 Git | pure Go SQLite 目標 | 不適用 |
 | iOS | 不支援任意 native binary | 只能透過 app 或遠端執行 | 只評估 Browser/WASM 或 app-contained | control plane / inspect UI / remote trigger |
-| Android | 可行性評估目標 | Termux / app / remote | Termux 或 app-contained | app sandbox / remote runner |
+| Android | 不列入桌面 single-binary target | Termux / app / remote | Termux 或 app-contained 需另開驗證 | app sandbox / remote runner |
 
 ## 桌面基準
 
@@ -33,6 +33,8 @@
 
 iOS 不是任意 native binary 目標。
 
+詳細 decision record：[`mobile-support-decision.md`](mobile-support-decision.md)。
+
 可評估路線：
 
 | 路線 | 定位 | 備註 |
@@ -49,6 +51,7 @@ Android 可行性必須分開評估：
 - Termux 可能比 iOS 支援更多本機執行能力。
 - App sandbox 的限制類型與 iOS 類似，但細節不同。
 - Remote runner 仍是保守選項。
+- 不承諾 repo-local desktop binary 可直接在 Android app sandbox 執行。
 
 ## 不支援 / 阻擋條件
 

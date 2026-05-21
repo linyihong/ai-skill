@@ -14,6 +14,7 @@
 | `tool-specific` | 僅服務特定工具或本機設定，不應變成通用 CLI 預設行為。 |
 | `hook adapter` | Git hook 仍是 Git adapter surface；CLI 可安裝或觸發，但不取代 hook 本身。 |
 | `deleted` | 新 CLI parity、fixtures、文件與 release gate 通過後，舊入口已刪除。 |
+| `legacy rollback` | 新 CLI 已是預設 path，但舊入口短期保留作 rollback / parity reference。 |
 
 ## 高風險覆蓋規則
 
@@ -76,7 +77,7 @@
 
 ## Phase 6 刪除 Gate
 
-功能完成後，每個舊入口必須更新最終 disposition：
+功能完成後，每個舊入口必須更新最終 disposition。當前 closure source-of-truth 是 [`legacy-script-disposition.md`](legacy-script-disposition.md)：
 
 - `native target` / `wrapper first` 完成 parity 並由新 CLI 覆蓋後，舊 script 必須刪除並改標 `deleted`。
 - `hook adapter` 可保留 hook surface，但安裝、檢查與文件應由 `ai-skill hooks install` 管理；保留原因必須寫清楚。
