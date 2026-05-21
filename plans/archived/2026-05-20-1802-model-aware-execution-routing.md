@@ -2,7 +2,6 @@
 
 > **狀態**: completed
 
-> **狀態**: draft
 > **建立日期**: 2026-05-20
 > **目的**: 將 `models/` 從 model profile / compression documentation 升級為 model-aware execution strategy layer，讓 agent 能依 task complexity、cognitive state、autonomy mode、context budget 與 tool capability 選擇合適的 execution strategy；若工具支援 explicit model selection，再進一步選用具體模型或 subagent。
 
