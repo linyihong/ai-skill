@@ -1,72 +1,83 @@
 # Runtime
 
-Executable runtime layer. Machine-oriented, query-oriented, deterministic.
+本層是 Ai-skill 的可執行 runtime 層：只放機器可查、可驗證、可重建的結構化狀態。
+
+## 核心規則：不再提交 Runtime YAML
+
+`runtime/` 目錄內的 runtime config 不再以 `*.yaml` 作為 committed source。只要內容已經是 deterministic、machine-readable，並且可以投影到 runtime tables，就必須放進 [`runtime.db`](runtime.db)：
+
+- 完整 canonical document 放在 `runtime_config_documents`
+- table 投影關係放在 `runtime_config_projections`
+- 舊 source path 相容 manifest 放在 `runtime_source_files`，並標記 `source_kind='db'`
+- 查詢用資料放在各專屬 projection table，例如 `phase_machine`、`obligation_ledger`、`blocking_gates`、`runtime_budget`
+
+不要再新增或提交 `runtime/**/*.yaml` mirror。若需要人類可讀 diff，可用臨時匯出檔檢視，但不要把匯出 mirror commit 回 repo。
 
 ## 放什麼
 
-- Schema、registry、state definitions、transitions
-- Activation graph、routing rules、guard definitions
-- Compiled SQLite databases（`runtime.db`, `runtime-state.db`）
-- Runtime metadata（budget、health、scheduler）
-- Navigation-only README（files、refs、source-of-truth）
+- SQLite runtime database：`runtime.db`
+- schema、registry、state definitions、transitions
+- activation graph、routing rules、guard definitions
+- runtime metadata：budget、health、scheduler
+- navigation-only README：說明 table、來源邊界與維護方式
 
 ## 不放什麼
 
-- 長篇解釋、philosophy、reasoning
-- 教學、architecture discussion、design rationale
-- Knowledge base 內容、領域知識
+- 長篇解釋、哲學、推理過程
+- 教學、架構討論、設計理由
+- knowledge base 內容、領域知識
 - 人類流程說明、操作步驟
 
 這些內容屬於：
-- `governance/` — Design philosophy、lifecycle、validation
-- `workflow/` — Human-readable execution flows
-- `intelligence/` — Heuristics、analytical reasoning
-- `enforcement/` — Executable policy rules
-- `analysis/` — Analysis 思路
+- `governance/`：設計哲學、生命週期、validation governance
+- `workflow/`：人類可讀的 execution flow
+- `intelligence/`：heuristics、分析推理、工程判斷
+- `enforcement/`：可執行政策規則
+- `analysis/`：分析思路與方法
 
-## Domains
+## Runtime 領域表
 
-| Domain | Path | Description |
+| 領域 | 位置 | 用途 |
 |--------|------|-------------|
-| Activation | `runtime.db` tables `activation_rules`, `activation_rules_mirror`, `core_bootstrap_rules` | Lazy-load rules with activation conditions |
-| Routing | `runtime.db` activation/runtime config tables | Runtime routing support; knowledge routing remains in `knowledge/runtime/` |
-| Discovery | `runtime.db` tables `discovery_checkpoints`, `capability_checkpoints` | Phase-aware capability discovery checkpoints |
-| Phases | `runtime.db` tables `phases`, `phase_machine`, `phase_transitions` | Execution phase state machine |
-| Obligations | `runtime.db` tables `obligations`, `obligation_ledger` | Per-phase atomic duties |
-| Gates | `runtime.db` tables `gates`, `blocking_gates` | Phase transition prerequisites |
-| Compiler | `runtime.db` tables `compiler_rules`, `runtime_config_documents`, `runtime_config_projections` + `ai-skill runtime compile` | SQLite canonical config + deterministic prose → SQLite projections |
-| Runtime DB | [`runtime.db`](runtime.db) | Compiled immutable runtime registry — **must be committed** when changed |
-| State DB | [`runtime-state.db`](runtime-state.db) | Mutable execution state (`.gitignore`) |
-| Generated | [`generated/`](generated/) | Compiled runtime surfaces (legacy, migrated to SQLite) |
-| Transactions | `runtime.db` tables `transaction_*` | Writeback transaction state machine and templates |
-| Pipeline | `runtime.db` tables `pipeline_context_flow`, `guard_chain`, `relevance_engine`, `session_lifecycle` | Context flow, guard chain, relevance engine |
-| Recovery | `runtime.db` tables `recovery_strategies`, `state_repair`, `obligation_rebuild`, `phase_reconciliation` | Recovery strategy, phase reconciliation, state repair, obligation rebuild |
-| Scheduler | `runtime.db` tables `execution_queue`, `priority_scheduler` | Execution queue, priority scheduler |
-| Guards | `runtime.db` tables `circuit_breaker`, `context_pollution` | Circuit breaker, context pollution, mismatch escalation |
-| Onboarding | [`onboarding/`](onboarding/) | New project/task setup guidance |
-| Output Governance | `runtime.db` tables `language_policy`, `output_rules`, `governance_gates` | Language policy, output rules, governance gates |
-| Prompt Artifacts | `runtime.db` tables `prompt_artifact_templates`, `prompt_composition_rules` | Artifact templates, composition rules |
-| Context | `runtime.db` table `context_ttl_policy` | TTL policy and provider prompt cache layout |
-| Budget | `runtime.db` table `runtime_budget` | Token budget |
-| Distributed | `runtime.db` tables `distributed_locks`, `multi_agent_coordination`, `async_job_lifecycle` | Multi-agent coordination, distributed locks |
-| Intelligence | `runtime.db` table `intelligence_routing` | Intelligence routing |
-| Decision recording | `runtime.db` table `decision_recording` | Close-loop tier routing（ADR / session / project） |
+| Activation | `activation_rules`, `activation_rules_mirror`, `core_bootstrap_rules` | lazy-load rule 與 activation condition |
+| Routing | `runtime.db` activation/runtime config tables | runtime routing support；knowledge routing 仍在 `knowledge/runtime/` |
+| Discovery | `discovery_checkpoints`, `capability_checkpoints` | phase-aware capability discovery checkpoint |
+| Phases | `phases`, `phase_machine`, `phase_transitions` | execution phase state machine |
+| Obligations | `obligations`, `obligation_ledger` | 每個 phase 的 atomic duties |
+| Gates | `gates`, `blocking_gates` | phase transition 的 prerequisites |
+| Compiler | `compiler_rules`, `runtime_config_documents`, `runtime_config_projections` | SQLite canonical config + deterministic prose → SQLite projections |
+| Runtime DB | [`runtime.db`](runtime.db) | committed canonical runtime registry；變更時必須 commit |
+| State DB | `runtime-state.db` | future mutable execution state；目前不提交 |
+| Generated | [`generated/`](generated/) | legacy compiled surfaces；已遷移到 SQLite |
+| Transactions | `transaction_*` | writeback transaction state machine 與 templates |
+| Pipeline | `pipeline_context_flow`, `guard_chain`, `relevance_engine`, `session_lifecycle` | context flow、guard chain、relevance engine |
+| Recovery | `recovery_strategies`, `state_repair`, `obligation_rebuild`, `phase_reconciliation` | recovery strategy 與 phase repair |
+| Scheduler | `execution_queue`, `priority_scheduler` | execution queue 與 priority scheduler |
+| Guards | `circuit_breaker`, `context_pollution` | circuit breaker、context pollution、mismatch escalation |
+| Onboarding | [`onboarding/`](onboarding/) | 新專案 / 新任務 setup guidance |
+| Output Governance | `language_policy`, `output_rules`, `governance_gates` | language policy、output rules、output gates |
+| Prompt Artifacts | `prompt_artifact_templates`, `prompt_composition_rules` | prompt artifact templates 與 composition rules |
+| Context | `context_ttl_policy` | context TTL 與 prompt cache layout |
+| Budget | `runtime_budget` | token budget |
+| Distributed | `distributed_locks`, `multi_agent_coordination`, `async_job_lifecycle` | multi-agent coordination、distributed locks |
+| Intelligence | `intelligence_routing` | intelligence routing |
+| Decision Recording | `decision_recording` | close-loop tier routing（ADR / session / project） |
 
-## Recovery Source Map
+## Recovery 來源分層
 
-Runtime recovery 的 machine-readable source 已收斂到 `runtime/runtime.db` canonical documents。Agent 要處理 blocking gate、phase drift、stale generated surface 或 recovery retry 時，依下列分層讀取：
+Runtime recovery 的 machine-readable source 已收斂到 `runtime/runtime.db` canonical documents。Agent 處理 blocking gate、phase drift、stale generated surface 或 recovery retry 時，依下列分層讀取：
 
-| Need | Read |
+| 需求 | 讀取位置 |
 | --- | --- |
 | 即時 escalation / recovery output | [`../enforcement/escalation-policy.md`](../enforcement/escalation-policy.md) |
-| Retry limit、strategy change、source reload、validation gate | [`../governance/ai-runtime-governance/recovery-retry-governance.md`](../governance/ai-runtime-governance/recovery-retry-governance.md) |
-| Domain-specific reload set / forbidden behaviors | [`../metadata/recovery/`](../metadata/recovery/) |
-| Machine-readable recovery strategy / phase reconciliation / state repair | `runtime.db` recovery tables |
-| 修改 runtime recovery 定義 | 更新 `runtime.db` canonical config document，然後執行 `ai-skill runtime compile` refresh projections |
+| retry limit、strategy change、source reload、validation gate | [`../governance/ai-runtime-governance/recovery-retry-governance.md`](../governance/ai-runtime-governance/recovery-retry-governance.md) |
+| domain-specific reload set / forbidden behaviors | [`../metadata/recovery/`](../metadata/recovery/) |
+| machine-readable recovery strategy / phase reconciliation / state repair | `runtime.db` recovery tables |
+| 修改 runtime recovery 定義 | 更新 `runtime_config_documents`，再執行 `ai-skill runtime compile` refresh projections |
 
-`runtime/runtime.db` 是 committed runtime config 的 canonical copy。不要再保留 committed runtime YAML mirror；若需要人類可讀 diff，先匯出臨時 JSON/YAML 檢視，不把 mirror commit 回 repo。
+`runtime/runtime.db` 是 committed runtime config 的 canonical copy。不要再保留 committed runtime YAML mirror。
 
-## Inbound References
+## 主要入口引用
 
 - [`route.runtime.activation-rules`](../knowledge/runtime/routing-registry.yaml:77)
 - [`route.runtime.context-ttl`](../knowledge/runtime/routing-registry.yaml:102)
@@ -78,70 +89,70 @@ Runtime recovery 的 machine-readable source 已收斂到 `runtime/runtime.db` c
 - `gate.checkpoint.capability_discovery_completed` in [`runtime.db`](runtime.db)
 - `obligation.checkpoint.run_capability_discovery` in [`runtime.db`](runtime.db)
 
-## Databases
+## 資料庫
 
-Runtime uses two SQLite databases with different lifecycles:
+Runtime 使用兩種 SQLite database，生命週期不同：
 
-### `runtime.db` (Immutable — Compiled Registry)
+### `runtime.db`（不可變：已提交的 Runtime Registry）
 
-Generated by Go-native `ai-skill runtime compile` from canonical config documents stored inside `runtime.db` plus deterministic prose mappings also stored inside `runtime.db`. Rebuilt when canonical runtime documents or mapped prose sources change.
+`runtime.db` 是 committed canonical source。Go-native `ai-skill runtime compile` 會從 DB 內的 `runtime_config_documents` 與 deterministic prose mappings refresh projection tables。
 
-All committed runtime config is stored in SQLite. Do not keep a committed YAML mirror for data whose canonical copy is `runtime.db`.
+所有 committed runtime config 都在 SQLite。若 canonical copy 已在 `runtime.db`，就不能再保留 committed YAML mirror。
 
 > **⚠️ Commit 規則：`runtime.db` 必須包含在 commit 中。**
 > 當 canonical runtime config 變更時，`runtime.db` 本身就是 source-of-truth 與 projection output 的 commit artifact。
 > 若手動 commit（跳過 hook），**必須**確認 `runtime validate` 通過且 `runtime.db` 已 `git add`。
 
-| Table | Canonical Source | Purpose |
+| Table | Canonical Source | 用途 |
 |-------|--------|---------|
-| `runtime_config_documents` | `runtime.db` | Full canonical JSON documents replacing former runtime YAML documents |
-| `runtime_config_projections` | `runtime.db` | Projection metadata from canonical documents to runtime tables |
-| `runtime_source_files` | `runtime.db` | Compatibility manifest for former source paths, marked `source_kind='db'` |
-| `phases`, `phase_transitions` | `runtime_config_documents` | Execution phase definitions and transition rules |
-| `obligations`, `obligation_ledger` | `runtime_config_documents` | Per-phase atomic duties with verification criteria |
-| `gates`, `blocking_gates` | `runtime_config_documents` | Phase transition prerequisites with severity and failure actions |
-| `transaction_states`, `transaction_transitions`, `transaction_rules`, `transaction_templates`, `transaction_templates_ext` | `runtime_config_documents` | Transaction state definitions, rules, and templates |
-| `activation_rules`, `activation_rules_mirror`, `core_bootstrap_rules` | `runtime_config_documents` | Lazy-load rule definitions with activation conditions |
-| `discovery_checkpoints`, `discovery_search_strategy`, `capability_checkpoints` | `runtime_config_documents` | Phase-aware capability discovery checkpoints |
-| `generated_surfaces` | Compiled from prose sources | Extracted structured data from workflow, enforcement, governance documents |
-| `compiler_metadata` | Auto-generated | Compiler version, compilation timestamp, schema version |
-| Remaining runtime config tables | `runtime_config_documents` | Normalized projections for budget, TTL, guards, health, intelligence routing, output governance, pipeline, prompt artifacts, recovery, scheduler, distributed runtime, and capability checkpoints |
+| `runtime_config_documents` | `runtime.db` | 保存完整 canonical JSON documents，取代舊 runtime YAML documents |
+| `runtime_config_projections` | `runtime.db` | 記錄 canonical documents 投影到哪些 runtime tables |
+| `runtime_source_files` | `runtime.db` | 舊 source path 相容 manifest，`source_kind='db'` |
+| `phases`, `phase_transitions` | `runtime_config_documents` | phase definitions 與 transition rules |
+| `obligations`, `obligation_ledger` | `runtime_config_documents` | 每個 phase 的 duties 與 verification criteria |
+| `gates`, `blocking_gates` | `runtime_config_documents` | phase transition prerequisites 與 failure actions |
+| `transaction_states`, `transaction_transitions`, `transaction_rules`, `transaction_templates`, `transaction_templates_ext` | `runtime_config_documents` | transaction state、rules、templates |
+| `activation_rules`, `activation_rules_mirror`, `core_bootstrap_rules` | `runtime_config_documents` | lazy-load rule definitions 與 activation conditions |
+| `discovery_checkpoints`, `discovery_search_strategy`, `capability_checkpoints` | `runtime_config_documents` | phase-aware capability discovery checkpoints |
+| `generated_surfaces` | prose sources | 從 workflow、enforcement、governance 文件抽取的 deterministic data |
+| `compiler_metadata` | auto-generated | compiler version、compiled timestamp、schema version |
+| 其他 runtime config tables | `runtime_config_documents` | budget、TTL、guards、health、routing、pipeline、prompt artifacts、recovery、scheduler、distributed runtime 的 normalized projections |
 
-### `runtime-state.db` (Mutable — Execution State)
+### `runtime-state.db`（可變：Execution State）
 
-Future mutable execution-state surface. The old Ruby initializer has been removed to avoid accidental use; do not create or mutate this database until a Go-native `ai-skill runtime state ...` command and validation contract exist.
+這是 future mutable execution-state surface。舊 Ruby initializer 已刪除，避免誤用。在 Go-native `ai-skill runtime state ...` command 與 validation contract 完成前，不建立也不修改這個 DB。
 
-| Table | Purpose |
+| Table | 用途 |
 |-------|---------|
-| `execution_state` | Current phase, status, sub-phase, metadata |
-| `obligation_status` | Per-obligation completion tracking (pending/in_progress/completed/blocked/skipped) |
-| `transaction_state` | Active transaction lifecycle tracking |
-| `execution_log` | Append-only event log |
+| `execution_state` | 目前 phase、status、sub-phase、metadata |
+| `obligation_status` | 每個 obligation 的 completion tracking |
+| `transaction_state` | active transaction lifecycle tracking |
+| `execution_log` | append-only event log |
 
-### Query Examples
+### 查詢範例
 
 ```sql
--- What phase am I in?
+-- 目前在哪個 phase？
 SELECT phase, status FROM execution_state ORDER BY id DESC LIMIT 1;
 
--- Which obligations are still pending?
+-- 哪些 obligations 還未完成？
 SELECT obligation_id, phase FROM obligation_status WHERE status = 'pending';
 
--- What gates block the current phase?
+-- 目前 phase 被哪些 gates 擋住？
 SELECT g.name, g.severity FROM gates g
 JOIN phases p ON g.phase = p.id
 WHERE p.id = (SELECT phase FROM execution_state ORDER BY id DESC LIMIT 1);
 
--- What transitions are allowed from the current state?
+-- 目前 state 可以轉移到哪裡？
 SELECT to_state, condition FROM transaction_transitions
 WHERE from_state = (SELECT state FROM transaction_state ORDER BY id DESC LIMIT 1);
 ```
 
-## Source-of-Truth
+## Source-of-Truth 邊界
 
-Runtime does not hold conceptual explanations. Source-of-truth for runtime design:
+Runtime 不放概念解釋。runtime design 的 source-of-truth 在：
 
-- `governance/` — Design philosophy, lifecycle, validation
-- `workflow/` — Human-readable execution flows
-- `intelligence/` — Heuristics, analytical reasoning
-- `enforcement/` — Executable policy rules
+- `governance/`：design philosophy、lifecycle、validation
+- `workflow/`：human-readable execution flows
+- `intelligence/`：heuristics、analytical reasoning
+- `enforcement/`：executable policy rules
