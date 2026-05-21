@@ -283,12 +283,16 @@ Completion criteria：
 
 Tasks：
 
-- [ ] 先建立 Go wrapper：`ai-skill runtime refresh`、`runtime validate`、`runtime compile`。
-- [ ] Wrapper 必須固定 UTF-8 環境，並在缺 Ruby / SQLite 時給明確修復建議。
+- [ ] 先建立 Go wrapper：`ai-skill runtime refresh`、`runtime validate`、`runtime compile`。（`runtime validate` 已開始）
+- [ ] Wrapper 必須固定 UTF-8 環境，並在缺 Ruby / SQLite 時給明確修復建議。（`runtime validate` 已覆蓋）
 - [ ] 建立 golden fixture：同一組 source 產出固定 `runtime-report.md`、model reports、SQLite index、`runtime.db` assertion。
 - [ ] 建立 native SQLite proof-of-concept：用 pure Go SQLite 開啟、查詢、寫入測試 DB，確認 Windows / macOS / Linux 無外部 sqlite3 CLI 依賴。
 - [ ] 評估哪些 Ruby validator 適合原生 Go 重寫，哪些應保留 Ruby。
 - [ ] 若開始移植 compiler，先建立 Ruby vs Go parity test，不得直接替換 production compiler。
+
+Progress notes：
+
+- `ai-skill runtime validate` 已建立 wrapper-first slice，支援 `--repo`、`--dry-run`、JSON / plain output，dry-run 只列出 `validate-knowledge-runtime.rb`、`validate-runtime-db.rb`、`validate-runtime-sqlite-index.rb`；執行模式固定 `LANG=C.UTF-8` / `LC_ALL=C.UTF-8`，並在缺 Ruby 或 `sqlite3` CLI 時回 `missing_dependency`。
 
 Completion criteria：
 

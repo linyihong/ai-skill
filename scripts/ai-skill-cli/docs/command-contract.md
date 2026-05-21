@@ -264,6 +264,8 @@
 
 輸入：
 
+- `--dry-run`
+- `--repo <path>`
 - `--json`
 - `--plain`
 - `--source <path>`
@@ -275,6 +277,8 @@
 
 - 驗證失敗時不得修改檔案。
 - 必須區分 missing dependency、schema invalid、assertion failed、dirty generated surface。
+- Phase 3 初始切片使用 wrapper mode 呼叫既有 Ruby validators，必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`。
+- wrapper mode 缺 Ruby 或 `sqlite3` CLI 時必須回傳 `missing_dependency`，並說明該能力尚未 native。
 
 ### `ai-skill runtime query`
 
