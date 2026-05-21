@@ -1,4 +1,4 @@
-version=repo-250bd40
-source_commit=250bd40
-built_at=2026-05-21T05:22:00Z
+version=repo-local
+source_commit=37498f9
+built_at=2026-05-21T06:23:23Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
