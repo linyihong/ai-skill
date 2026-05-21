@@ -1,72 +1,81 @@
-# BDD-Lite Scenarios：Ai-skill CLI Runtime
+# BDD-lite 場景：Ai-skill CLI Runtime
 
 > **上游計畫**：[`2026-05-21-0834-cross-platform-go-script-runtime.md`](../../../plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md)
 
-## Requirement Link
+## 需求連結
 
-- **Source**：Cross-platform Go script runtime plan
+- **來源**：Cross-platform Go script runtime plan
 - **Actor / system role**：Ai-skill maintainer、agent、CI runner、desktop contributor、mobile control-plane user
-- **Behavior boundary**：CLI command behavior、dependency detection、runtime validation、safe close-loop
-- **Ambiguity disposition**：draft; implementation cannot start until scenarios are reviewed
+- **行為邊界**：CLI 命令行為、依賴偵測、runtime 驗證、安全 close-loop
+- **模糊項處置**：draft；場景完成審查前不得開始實作
 
-## Scenario: Missing Git Blocks Close-Loop
+## 場景：缺 Git 時阻斷 close-loop
 
-**Given** `ai-skill close-loop --commit` is executed on a desktop platform  
-**When** `git` is not available in PATH  
-**Then** the command exits with `missing_dependency`  
-**And** no files are staged, committed, pushed, or modified  
-**And** the output tells the user to install Git.
+**Given** 在桌面平台執行 `ai-skill close-loop --commit`
+**When** PATH 中沒有可用的 `git`
+**Then** 命令以 `missing_dependency` 結束
+**And** 沒有檔案被 staged、committed、pushed 或 modified
+**And** 輸出提示使用者安裝 Git。
 
-## Scenario: Doctor Reports Git Requirement
+## 場景：Doctor 回報 Git 需求
 
-**Given** `ai-skill doctor --require-git --json` is executed  
-**When** Git is missing  
-**Then** JSON output contains `error.code = "missing_git"`  
-**And** the exit code is stable across Windows, macOS, and Linux.
+**Given** 執行 `ai-skill doctor --require-git --json`
+**When** Git 缺失
+**Then** JSON 輸出包含 `error.code = "missing_git"`
+**And** exit code 在 Windows、macOS 與 Linux 上保持穩定。
 
-## Scenario: Runtime Compile Asserts Generated Surface
+## 場景：Runtime Compile 驗證 generated surface
 
-**Given** a runtime source file was modified  
-**When** `ai-skill runtime compile --assert-source <path> --assert-keyword <keyword>` completes  
-**Then** `runtime/runtime.db` contains the source path and keyword in the expected generated surface  
-**And** validation fails if the keyword is absent.
+**Given** runtime source file 已被修改
+**When** `ai-skill runtime compile --assert-source <path> --assert-keyword <keyword>` 完成
+**Then** `runtime/runtime.db` 的預期 generated surface 包含 source path 與 keyword
+**And** keyword 缺失時 validation 失敗。
 
-## Scenario: Dry-Run Prevents Side Effects
+## 場景：Dry-run 防止副作用
 
-**Given** a command can write files or run git operations  
-**When** it is invoked with `--dry-run`  
-**Then** it reports planned actions  
-**And** no tracked file, untracked file, git index, commit, hook, mirror, or runtime DB is modified.
+**Given** 某個命令可寫入檔案或執行 git 操作
+**When** 以 `--dry-run` 呼叫
+**Then** 輸出規劃動作
+**And** 不修改 tracked file、untracked file、git index、commit、hook、mirror 或 runtime DB。
 
-## Scenario: Unsafe Repo State Blocks Commit
+## 場景：舊腳本 Parity 需有測試證據
 
-**Given** the repository is in merge, rebase, or cherry-pick state  
-**When** `ai-skill close-loop --commit` is executed  
-**Then** the command exits with `unsafe_repo_state`  
-**And** no commit is created.
+**Given** `script-parity-inventory.md` 中某個舊入口標記為 `native target` 或 `wrapper first`
+**When** 對應 `ai-skill` 命令進入實作
+**Then** 該列必須有最低測試證據或 fixture 名稱
+**And** 高風險路徑必須連到 `test-fixture-plan.md` 中的 fixture
+**And** 若 parity 被標為 `deferred` 或 `tool-specific`，必須說明為何不阻擋目前 Phase。
 
-## Scenario: iOS Native Binary Is Unsupported
+## 場景：不安全 repo 狀態阻斷 commit
 
-**Given** the user asks to run `ai-skill` as a downloaded native binary on iOS  
-**When** platform support is evaluated  
-**Then** the result is unsupported  
-**And** the recommended options are App-contained runtime, Browser/WASM, or SSH remote runner.
+**Given** repository 處於 merge、rebase 或 cherry-pick 狀態
+**When** 執行 `ai-skill close-loop --commit`
+**Then** 命令以 `unsafe_repo_state` 結束
+**And** 不建立 commit。
 
-## Acceptance Criteria
+## 場景：iOS native binary 不支援
 
-- Missing Git cannot produce a partial close-loop.
-- Dry-run commands do not mutate file system, git index, commits, hooks, mirrors, or runtime DB.
-- Runtime compile can prove source-to-DB propagation with content assertions.
-- Mobile support decisions do not promise iOS native arbitrary binary.
+**Given** 使用者要求在 iOS 上以下載的 native binary 執行 `ai-skill`
+**When** 評估平台支援
+**Then** 結果為不支援
+**And** 建議選項為 App-contained runtime、Browser/WASM 或 SSH remote runner。
 
-## Validation Target
+## 驗收條件
 
-- **Proof type**：fixture-backed automated tests
-- **Test / fixture / checklist**：[`test-fixture-plan.md`](test-fixture-plan.md)
-- **Limitations**：這些 scenarios 尚未證明 performance、release signing、mobile app feasibility 或 full compiler parity。
+- 缺 Git 時不能產生半套 close-loop。
+- Dry-run 命令不得修改 file system、git index、commits、hooks、mirrors 或 runtime DB。
+- Runtime compile 能以 content assertions 證明 source-to-DB propagation。
+- 每個被取代的舊腳本能力都有 parity disposition 與最低測試證據。
+- Mobile support 決策不承諾 iOS 任意 native binary。
 
-## Regression Scope
+## 驗證目標
 
-- [ ] Existing shell script behavior must remain available until replacement is validated.
-- [ ] New tests required for missing Git, unsafe repo, dry-run, runtime assertion, and iOS unsupported decision.
-- [ ] Test data / fixtures needed：temporary repo、PATH isolation、fake home、runtime source fixture。
+- **證明類型**：fixture-backed automated tests
+- **測試 / fixture / checklist**：[`test-fixture-plan.md`](test-fixture-plan.md)
+- **限制**：這些場景尚未證明 performance、release signing、mobile app feasibility 或完整 compiler parity。
+
+## 回歸範圍
+
+- [ ] 既有 shell script 行為必須保留到 replacement 完成驗證。
+- [ ] 需要新增缺 Git、不安全 repo、dry-run、舊腳本 parity、runtime assertion 與 iOS 不支援決策測試。
+- [ ] 需要測試資料 / fixtures：temporary repo、PATH isolation、fake home、runtime source fixture、legacy script parity fixture。

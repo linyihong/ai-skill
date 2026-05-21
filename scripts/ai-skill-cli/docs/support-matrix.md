@@ -1,58 +1,58 @@
-# Support Matrix：Ai-skill CLI Runtime
+# 支援矩陣：Ai-skill CLI Runtime
 
 > **上游計畫**：[`2026-05-21-0834-cross-platform-go-script-runtime.md`](../../../plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md)
 
-## Platform Support
+## 平台支援
 
-| Platform | Desktop single binary | Git dependency | Runtime DB | Mobile posture |
+| 平台 | 桌面單一 binary | Git 依賴 | Runtime DB | 行動平台定位 |
 | --- | --- | --- | --- | --- |
-| Windows | supported target | external Git required | pure Go SQLite target | not applicable |
-| macOS | supported target | external Git required | pure Go SQLite target | not applicable |
-| Linux | supported target | external Git required | pure Go SQLite target | not applicable |
-| iOS | not native arbitrary binary | only through app / remote | Browser/WASM or app-contained only | control plane / inspect UI / remote trigger |
-| Android | feasibility target | Termux / app / remote | Termux or app-contained | app sandbox / remote runner |
+| Windows | 支援目標 | 需要外部 Git | pure Go SQLite 目標 | 不適用 |
+| macOS | 支援目標 | 需要外部 Git | pure Go SQLite 目標 | 不適用 |
+| Linux | 支援目標 | 需要外部 Git | pure Go SQLite 目標 | 不適用 |
+| iOS | 不支援任意 native binary | 只能透過 app 或遠端執行 | 只評估 Browser/WASM 或 app-contained | control plane / inspect UI / remote trigger |
+| Android | 可行性評估目標 | Termux / app / remote | Termux 或 app-contained | app sandbox / remote runner |
 
-## Desktop Baseline
+## 桌面基準
 
-Desktop support targets:
+桌面支援目標：
 
 - Windows
 - macOS
 - Linux
 
-Baseline assumptions:
+基準假設：
 
-- `ai-skill` is a single Go binary for the runtime toolchain.
-- YAML, JSON, SQLite engine, runtime logic, scheduler, migration / repair logic should be bundled where feasible.
-- Git is not bundled. Git remains a required external dependency for writeback, commit, push, hooks, and close-loop commands.
+- `ai-skill` 是 runtime toolchain 的單一 Go binary。
+- YAML、JSON、SQLite engine、runtime logic、scheduler、migration / repair logic 在可行時應編入 binary。
+- Git 不包進 binary。writeback、commit、push、hooks、close-loop 命令仍需要外部 Git。
 
-## iOS Boundary
+## iOS 邊界
 
-iOS is not a native arbitrary binary target.
+iOS 不是任意 native binary 目標。
 
-Supported evaluation routes:
+可評估路線：
 
-| Route | Position | Notes |
+| 路線 | 定位 | 備註 |
 | --- | --- | --- |
-| App-contained runtime | possible | iOS app must bundle runtime, Git / file access, SQLite, and UI |
-| Browser/WASM | possible | best candidate for inspect UI, replay UI, state validation, governance control plane |
-| SSH remote runner | high feasibility | iPhone acts as control plane; runtime executes on desktop, VPS, NAS, Mac mini, or Linux host |
-| Native arbitrary binary | unsupported | iOS security model does not allow general executable persistence |
+| App-contained runtime | 可行 | iOS app 必須內建 runtime、Git / file access、SQLite 與 UI |
+| Browser/WASM | 可行 | 較適合 inspect UI、replay UI、state validation 與 governance control plane |
+| SSH remote runner | 高可行性 | iPhone 作為 control plane；runtime 在桌面、VPS、NAS、Mac mini 或 Linux host 執行 |
+| 任意 native binary | 不支援 | iOS security model 不允許一般用途 executable persistence |
 
-## Android Boundary
+## Android 邊界
 
-Android feasibility must be evaluated separately:
+Android 可行性必須分開評估：
 
-- Termux may support more local execution than iOS.
-- App sandbox has constraints similar in category but not identical to iOS.
-- Remote runner remains the conservative option.
+- Termux 可能比 iOS 支援更多本機執行能力。
+- App sandbox 的限制類型與 iOS 類似，但細節不同。
+- Remote runner 仍是保守選項。
 
-## Unsupported / Blocked Conditions
+## 不支援 / 阻擋條件
 
-| Condition | Required Behavior |
+| 條件 | 必要行為 |
 | --- | --- |
-| Missing Git on desktop close-loop | block and prompt install |
-| iOS native binary request | reject and suggest App / Browser-WASM / SSH remote runner |
-| Missing write permission | block write commands |
-| Merge / rebase / cherry-pick state | block commit / push |
-| Unsupported platform | return stable `unsupported_platform` exit code |
+| 桌面 close-loop 缺 Git | 阻斷並提示安裝 |
+| 要求 iOS native binary | 拒絕並提示 App、Browser/WASM 或 SSH remote runner |
+| 缺寫入權限 | 阻斷寫入命令 |
+| merge / rebase / cherry-pick 狀態 | 阻斷 commit / push |
+| 不支援的平台 | 回傳穩定的 `unsupported_platform` exit code |

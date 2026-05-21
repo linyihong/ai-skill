@@ -1,23 +1,26 @@
-# Ai-skill CLI Runtime Docs
+# Ai-skill CLI Runtime 文件
 
-本目錄保存 [`Ai-skill CLI Runtime`](../README.md) 的文件先行 artifacts。這些文件是 Phase 0 的 source-of-truth；未完成前不得開始 Go implementation。
+本目錄保存 [`Ai-skill CLI Runtime`](../README.md) 的文件先行產物。這些文件是 Phase 0 的 source-of-truth；未完成前不得開始 Go 實作。
 
 ## 何時讀哪個文件
 
 | 文件 | 何時讀 |
 | --- | --- |
 | [`change-brief.md`](change-brief.md) | 開始或調整本計畫 scope、確認為什麼要做跨平台 runtime 時 |
-| [`command-contract.md`](command-contract.md) | 設計或實作任何 `ai-skill` CLI command 前 |
+| [`command-contract.md`](command-contract.md) | 設計或實作任何 `ai-skill` CLI 命令前 |
+| [`script-parity-inventory.md`](script-parity-inventory.md) | 檢查新 CLI 是否完整涵蓋舊腳本功能、side effects 與測試證據時 |
 | [`support-matrix.md`](support-matrix.md) | 判斷 Windows、macOS、Linux、iOS、Android 支援等級與限制時 |
 | [`bdd-scenarios.md`](bdd-scenarios.md) | 寫測試、驗收條件或 fixture 前 |
-| [`test-fixture-plan.md`](test-fixture-plan.md) | 建立測試資料、temporary repo、missing Git 或 runtime.db assertion fixture 前 |
+| [`test-fixture-plan.md`](test-fixture-plan.md) | 建立測試資料、temporary repo、缺 Git 或 runtime.db assertion fixture 前 |
 
-## Phase 0 Artifact Gate
+## Phase 0 產物關卡
 
-- [ ] `change-brief.md` 已確認 scope / non-goals / blocker。
-- [ ] `command-contract.md` 已覆蓋所有第一批 CLI commands。
-- [ ] `support-matrix.md` 已明確列出 desktop / mobile 支援邊界。
-- [ ] `bdd-scenarios.md` 已覆蓋 high-risk success / failure paths。
-- [ ] `test-fixture-plan.md` 已覆蓋 missing Git、unsafe repo、Windows path、fake home、runtime.db assertion。
+- [x] `change-brief.md` 已確認範圍、非目標與阻擋項。
+- [x] `command-contract.md` 已覆蓋所有第一批 CLI 命令。
+- [x] `script-parity-inventory.md` 已盤點舊腳本、未來命令、parity 狀態與最低測試證據。
+- [x] `support-matrix.md` 已明確列出桌面與行動平台支援邊界。
+- [x] `bdd-scenarios.md` 已覆蓋高風險成功與失敗路徑。
+- [x] `test-fixture-plan.md` 已覆蓋缺 Git、不安全 repo、Windows path、fake home、runtime.db assertion。
+- [x] 文件標題、表格欄位、說明段落與 checklist 已使用繁體中文；只保留命令、flag、JSON 欄位、路徑與固定術語英文。
 
-完成上述項目前，不得新增 `scripts/ai-skill-cli/go.mod`、`scripts/ai-skill-cli/cmd/ai-skill/` 或 production Go implementation。
+完成上述項目前，不得新增 `scripts/ai-skill-cli/go.mod`、`scripts/ai-skill-cli/cmd/ai-skill/` 或 production Go 實作。

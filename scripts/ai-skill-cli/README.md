@@ -6,13 +6,13 @@
 
 | 路徑 | 用途 |
 | --- | --- |
-| [`docs/`](docs/README.md) | 文件先行 artifacts：command contract、support matrix、BDD-lite scenarios、fixture plan |
-| `cmd/ai-skill/` | 未來 Go CLI entrypoint（尚未建立） |
+| [`docs/`](docs/README.md) | 文件先行產物：命令契約、舊腳本 parity 盤點、支援矩陣、BDD-lite 場景、fixture 計畫 |
+| `cmd/ai-skill/` | 未來 Go CLI 入口（尚未建立） |
 | `internal/` | 未來 Go internal packages（尚未建立） |
-| `testdata/` | 未來 fixtures / golden outputs（尚未建立） |
+| `testdata/` | 未來測試 fixtures / golden 輸出（尚未建立） |
 
 ## 開發 gate
 
-在 `docs/` 的 Phase 0 artifact gate 完成並 review 前，不得新增 `scripts/ai-skill-cli/go.mod`、`scripts/ai-skill-cli/cmd/ai-skill/` 或 production Go implementation。
+在 `docs/` 的 Phase 0 產物關卡完成並審查前，不得新增 `scripts/ai-skill-cli/go.mod`、`scripts/ai-skill-cli/cmd/ai-skill/` 或 production Go 實作。
 
 上游計畫：[`plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md`](../../plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md)
