@@ -40,5 +40,5 @@
 ## 相關 Guards
 
 - `knowledge/runtime/routing-registry.yaml`
-- `runtime/context/ttl-policy.yaml`
-- `runtime/health/context-health-score.yaml`
+- `runtime/runtime.db`
+- `runtime/runtime.db`

@@ -12,16 +12,16 @@ At session start or when taking over a task, load the **Core Bootstrap** (3 rule
 1. Read [CORE_BOOTSTRAP.md](../../CORE_BOOTSTRAP.md) — 3 core rules: `rule-weight.md`, `dependency-reading.md`, `conversation-goal-ledger.md`
 2. Read [README.md](../../README.md) — OS layout & quickstart
 3. Match task intent against [routing-registry.yaml](../../knowledge/runtime/routing-registry.yaml) to find the relevant route
-4. Check [runtime/router/activation-rules.yaml](../../runtime/router/activation-rules.yaml) for which lazy-load rules to activate
+4. Check [runtime/runtime.db](../../runtime/runtime.db) (`activation_rules` / `activation_rules_mirror`) for which lazy-load rules to activate
 5. Load Runtime Phase initialization from [runtime/runtime.db](../../runtime/runtime.db):
    - `phase_machine` / `phases` — current phase state
    - `obligation_ledger` / `obligations` — phase obligations
    - `blocking_gates` / `gates` — phase blocking gates
-   - Runtime phase / obligation / gate / recovery source is `runtime/phases/`, `runtime/obligations/`, `runtime/gates/`, and `runtime/recovery/` YAML; rebuild [runtime/runtime.db](../../runtime/runtime.db) with `ai-skill runtime compile` after source edits.
+   - Runtime phase / obligation / gate / recovery committed canonical config lives in `runtime_config_documents`; do not keep committed `runtime/runtime.db canonical documents` mirrors.
 6. Load Output Governance initialization:
-   - [runtime/output-governance/language-policy.yaml](../../runtime/output-governance/language-policy.yaml) — language enforcement rules
-   - [runtime/output-governance/output-rules.yaml](../../runtime/output-governance/output-rules.yaml) — document output rules
-   - [runtime/output-governance/governance-gates.yaml](../../runtime/output-governance/governance-gates.yaml) — output quality blocking gates
+   - [runtime/runtime.db](../../runtime/runtime.db) `language_policy` — language enforcement rules
+   - [runtime/runtime.db](../../runtime/runtime.db) `output_rules` — document output rules
+   - [runtime/runtime.db](../../runtime/runtime.db) `governance_gates` — output quality blocking gates
 7. Read the skill's summary from `knowledge/summaries/` (300-500 tokens) before expanding to full source
 
 ## Dependency Reading

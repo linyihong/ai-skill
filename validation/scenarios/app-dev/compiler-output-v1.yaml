@@ -4,7 +4,7 @@
 # 並產出結構化的 runtime.db（generated_surfaces 表）
 #
 # 來源 compiler rule:
-#   - runtime/compiler/compiler-rules.yaml (source_target_mapping[0])
+#   - runtime/runtime.db (source_target_mapping[0])
 #   - scripts/ai-skill-cli/internal/app/runtime_compiler.go (compile_workflow_phases)
 
 id: compiler-output-v1
@@ -15,7 +15,7 @@ priority: P1
 given:
   task: compile_workflow_phases
   artifacts:
-    - runtime/compiler/compiler-rules.yaml
+    - runtime/runtime.db
     - scripts/ai-skill-cli/internal/app/runtime_compiler.go
     - workflow/software-delivery/execution-flow.md
     - runtime/runtime.db

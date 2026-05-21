@@ -202,7 +202,7 @@ Tasks:
 
 - [x] 檢查 `runtime/README.md` 宣稱的 `runtime/discovery/`、`runtime/recovery/`、`runtime/phases/`、`runtime/gates/` 是否仍是 source-of-truth。
 - [x] 檢查這些 source 是否已遷移到 `runtime/compiler/embedded_data.rb` 或只存在於 `runtime.db`。
-- [x] 決定本 plan 應恢復 YAML source，或改走 compiler embedded source。
+- [x] 決定本 plan 應恢復 SQLite canonical document，或改走 compiler embedded source。
 - [x] 若 README stale，列為 blocker，不直接新增依賴不存在路徑的 rule。
 
 Exit criteria:
@@ -223,11 +223,11 @@ Exit criteria:
 | Recovery strategies / state repair / reconciliation | no | `runtime/compiler/embedded_data.rb` | `recovery_strategies = 1`, `state_repair = 6`, `phase_reconciliation = 5` |
 | Guards / pipeline / context / budget | yes | `runtime/guards/*.yaml`, `runtime/pipeline/*.yaml`, `runtime/context/*.yaml`, `runtime/budget/*.yaml` | compiled into matching runtime tables |
 
-**Decision**: Phase 1 may proceed in `enforcement/` because it is prose policy. Phase 2 may add a new `runtime/guards/*.yaml` because `runtime/guards/` still exists as YAML source. Phase 3 must not directly add files under missing `runtime/recovery/` unless a separate source restoration migration is approved; for now, recovery runtime extensions should target `runtime/compiler/embedded_data.rb` plus compiler/runtime.db updates.
+**Decision**: Phase 1 may proceed in `enforcement/` because it is prose policy. Phase 2 may add a new `runtime/guards/*.yaml` because `runtime/guards/` still exists as SQLite canonical document. Phase 3 must not directly add files under missing `runtime/recovery/` unless a separate source restoration migration is approved; for now, recovery runtime extensions should target `runtime/compiler/embedded_data.rb` plus compiler/runtime.db updates.
 
 **Linked update completed**: `runtime/README.md` now marks embedded-only runtime domains as sourced from `runtime/compiler/embedded_data.rb` rather than broken standalone YAML links.
 
-**Compiler alignment update**: before Phase 2, `runtime/compiler/compiler-engine.rb` was aligned to read existing runtime YAML sources first and fall back to `runtime/compiler/embedded_data.rb` only when a YAML source is absent. This is required because `runtime/router/activation-rules.yaml` had gained `enforcement.escalation-policy`, but the compiled `runtime.db` was still reading the stale embedded activation rule set.
+**Compiler alignment update**: before Phase 2, `runtime/compiler/compiler-engine.rb` was aligned to read existing SQLite canonical runtime documents first and fall back to `runtime/compiler/embedded_data.rb` only when a SQLite canonical document is absent. This is required because `runtime/runtime.db` had gained `enforcement.escalation-policy`, but the compiled `runtime.db` was still reading the stale embedded activation rule set.
 
 ### Phase 1 — Enforcement Policy
 
@@ -250,7 +250,7 @@ Tasks:
 - [x] 在 `dependency-reading.md` 加入 source-of-truth miss / reload ledger 的關聯。
 - [x] 更新 `enforcement/README.md` lazy-load 表格與完整索引。
 - [x] 更新 `linked-updates.md`，加入新增 escalation policy 的連動規則。
-- [x] 新增 metadata rule 並接入 `runtime/router/activation-rules.yaml`，讓 escalation policy 可 lazy-load。
+- [x] 新增 metadata rule 並接入 `runtime/runtime.db`，讓 escalation policy 可 lazy-load。
 
 Exit criteria:
 
@@ -261,7 +261,7 @@ Phase 1 result:
 | Area | Result |
 | --- | --- |
 | Rule source | `enforcement/escalation-policy.md` |
-| Activation | `runtime/router/activation-rules.yaml` contains `enforcement.escalation-policy` for user contradiction, repeated failure, evidence conflict, source-of-truth miss, automation drift, and runtime recovery intents. |
+| Activation | `runtime/runtime.db` contains `enforcement.escalation-policy` for user contradiction, repeated failure, evidence conflict, source-of-truth miss, automation drift, and runtime recovery intents. |
 | Metadata | `metadata/rules/escalation-policy.yaml` + `metadata/rules/README.md` |
 | Linked updates | `enforcement/README.md`, `enforcement/failure-learning-system.md`, `enforcement/dependency-reading.md`, `enforcement/linked-updates.md` |
 
@@ -274,9 +274,9 @@ Goal: 把 mismatch escalation 接進 execution guard chain。
 Candidate files:
 
 - `runtime/guards/mismatch-escalation.yaml`
-- `runtime/guards/circuit-breaker.yaml`
-- `runtime/pipeline/guard-chain.yaml`
-- `runtime/pipeline/context-flow.yaml`
+- `runtime/runtime.db`
+- `runtime/runtime.db`
+- `runtime/runtime.db`
 - `runtime/README.md`
 
 Tasks:
@@ -296,8 +296,8 @@ Exit criteria:
 | 欄位 | 結果 |
 | --- | --- |
 | Trigger | 開始執行 Phase 2 — Runtime Guard Integration |
-| Checked sources | `plans/README.md`、`runtime/README.md`、`runtime/guards/README.md`、`runtime/guards/circuit-breaker.yaml`、`runtime/pipeline/guard-chain.yaml`、`runtime/compiler/compiler-engine.rb` |
-| Conflicts | `runtime/guards/mismatch-escalation.yaml` 尚不存在，且 compiler 目前只編譯已知 guard source；不新增獨立 YAML，改將 `mismatch_escalation` 放入已編譯的 `runtime/guards/circuit-breaker.yaml`，並擴充 compiler guard key。 |
+| Checked sources | `plans/README.md`、`runtime/README.md`、`runtime/guards/README.md`、`runtime/runtime.db`、`runtime/runtime.db`、`runtime/compiler/compiler-engine.rb` |
+| Conflicts | `runtime/guards/mismatch-escalation.yaml` 尚不存在，且 compiler 目前只編譯已知 guard source；不新增獨立 YAML，改將 `mismatch_escalation` 放入已編譯的 `runtime/runtime.db`，並擴充 compiler guard key。 |
 | Decision | proceed with revised source placement |
 | Validation | YAML parse、runtime compiler、`runtime.db` query、`validate-runtime-db.rb`、knowledge runtime refresh |
 
@@ -305,8 +305,8 @@ Phase 2 result:
 
 | Area | Result |
 | --- | --- |
-| Guard source | `runtime/guards/circuit-breaker.yaml` includes `mismatch_escalation` trigger classes and actions. |
-| Guard chain | `runtime/pipeline/guard-chain.yaml` execution stage includes `mismatch_escalation` before lower-priority warning guards. |
+| Guard source | `runtime/runtime.db` includes `mismatch_escalation` trigger classes and actions. |
+| Guard chain | `runtime/runtime.db` execution stage includes `mismatch_escalation` before lower-priority warning guards. |
 | Compiler | `runtime/compiler/compiler-engine.rb` compiles `mismatch_escalation` into the `circuit_breaker` table. |
 | Runtime DB | `runtime/runtime.db` includes the compiled guard after validation. |
 
@@ -531,7 +531,7 @@ Phase 7 result:
 
 ## 11. Open Questions
 
-- `runtime/recovery/` 等目錄是否應恢復為 YAML source，或保留在 compiler embedded data？
+- `runtime/recovery/` 等目錄是否應恢復為 SQLite canonical document，或保留在 compiler embedded data？
 - Recovery levels 是否應屬於 `runtime/guards/`、`metadata/recovery/`，還是兩者分工？
 - 是否需要 runtime-state.db 記錄 mismatch counter？
 - Validation scenario 要測 prose output shape，還是只測 route / required source selection？
@@ -545,7 +545,7 @@ Phase 7 result:
 | --- | --- |
 | Trigger | 使用者要求將 Runtime Recovery & Escalation System 寫入 Ai-skill plan，且指定要按 plan 流程。 |
 | Required set | `plans/README.md`、`enforcement/README.md`、`dependency-reading.md`、`linked-updates.md`、`content-layering.md`、`reusable-guidance-boundary.md`、`failure-learning-system.md`、`feedback-lessons.md`、相關 runtime guard / pipeline 文件。 |
-| Read | `plans/README.md`、`enforcement/README.md`、`dependency-reading.md`、`linked-updates.md`、`content-layering.md`、`reusable-guidance-boundary.md`、`failure-learning-system.md`、`feedback-lessons.md`、`runtime/README.md`、`runtime/guards/circuit-breaker.yaml`、`runtime/guards/context-pollution.yaml`、`runtime/pipeline/guard-chain.yaml`、`runtime/pipeline/context-flow.yaml`。 |
+| Read | `plans/README.md`、`enforcement/README.md`、`dependency-reading.md`、`linked-updates.md`、`content-layering.md`、`reusable-guidance-boundary.md`、`failure-learning-system.md`、`feedback-lessons.md`、`runtime/README.md`、`runtime/runtime.db`、`runtime/runtime.db`、`runtime/runtime.db`、`runtime/runtime.db`。 |
 | Not applicable | 本 plan 是 draft，尚未新增 runtime source、enforcement rule 或 validation scenario；本輪不需要更新 runtime compiler source。 |
 | Deferred / blocked | 後續實作 phase 需依各 phase 再做 linked updates、runtime compiler、validator 與 readback；本 plan 只建立 active planning entry。 |
 | Validation | 檔案放入 `plans/active/`；同步更新 `plans/README.md` 目前狀態；已執行 diff check、lint 與 knowledge runtime validation。 |

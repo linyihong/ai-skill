@@ -47,8 +47,8 @@ Task Intent Identified
 ## 與既有文件的關係
 
 - [`runtime/intelligence/`](../../runtime/intelligence/) — Runtime navigation entry point (data file: `intelligence-routing.yaml`)
-- [`runtime/intelligence/intelligence-routing.yaml`](../../runtime/intelligence/intelligence-routing.yaml) — Machine-readable routing rules
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Machine-readable routing rules
 - [`intelligence/README.md`](../../intelligence/README.md) — Intelligence layer overview
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Global routing registry
-- [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — Lazy-load rule activation
-- [`runtime/runtime.db`](../../runtime/runtime.db) / [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — Phase definition
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Lazy-load rule activation
+- [`runtime/runtime.db`](../../runtime/runtime.db) / [`runtime/runtime.db`](../../runtime/runtime.db) — Phase definition

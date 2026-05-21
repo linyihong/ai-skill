@@ -585,7 +585,7 @@ Gate：
 | Field | Content |
 | --- | --- |
 | Trigger | 使用者要求把 Cognitive State / Evidence Governance 補入 plan，並檢查是否與現有框架衝突。 |
-| Checked sources | `plans/README.md`、`plans/archived/2026-05-20-1039-runtime-recovery-escalation-system.md`、`governance/ai-runtime-governance/README.md`、`governance/ai-runtime-governance/recovery-retry-governance.md`、`runtime/README.md`、`metadata/recovery/README.md`、`runtime/guards/circuit-breaker.yaml`。 |
+| Checked sources | `plans/README.md`、`plans/archived/2026-05-20-1039-runtime-recovery-escalation-system.md`、`governance/ai-runtime-governance/README.md`、`governance/ai-runtime-governance/recovery-retry-governance.md`、`runtime/README.md`、`metadata/recovery/README.md`、`runtime/runtime.db`。 |
 | Conflicts | 不應新增 standalone `runtime/recovery/*.yaml`；runtime recovery source 目前在 `runtime/compiler/embedded_data.rb` 並編入 `runtime/runtime.db`。`metadata/recovery/` 目前是 metadata-only，若新增 domain evidence policy，不可宣稱 runtime enforced。`circuit-breaker.yaml` 已有 `hallucination_risk` 與 `mismatch_escalation`，confidence decay 應作為新 guard 或擴充 guard，避免重複語意。 |
 | Decision | proceed as new active plan；先建立治理與 enforcement 邊界，再決定哪些 component promotion 到 runtime guard / metadata / validation。 |
 | Validation | Plan readback、diff review、linked update check；若後續新增 runtime guard 或 embedded source，必須執行 runtime compiler、runtime DB validation 與 knowledge runtime refresh。 |
@@ -595,7 +595,7 @@ Gate：
 1. **與 Recovery Retry Governance 的邊界**：`recovery-retry-governance.md` 處理 retry / escalation / source reload / recovery validation；本 plan 處理 failure 發生前的 assumption / evidence / confidence。兩者相鄰但不重疊。
 2. **與 Escalation Policy 的邊界**：`enforcement/escalation-policy.md` 是 real-time control；本 plan 的 evidence qualification、belief ownership、confidence integrity 與 cognitive contamination 可成為 escalation 的上游 signal。
 3. **與 Metadata Recovery 的邊界**：`metadata/recovery/` 已保存 domain reload set；若要放 domain evidence qualification，應先決定是擴充 recovery metadata，還是新增 `metadata/evidence/`，避免 metadata 目錄混雜。
-4. **與 Runtime Guard 的邊界**：`runtime/guards/circuit-breaker.yaml` 已有 `hallucination_risk` 與 `mismatch_escalation`。`confidence_decay` 若新增，應避免只是把 `mismatch_escalation` 換名字；它的獨立價值是「尚未 failure 但 autonomy 應下降」。`autonomy_modes` 可作為 guard action target，而不是新的哲學層。Cognitive runtime state model 先保持 conceptual，不直接新增 persistent runtime state。
+4. **與 Runtime Guard 的邊界**：`runtime/runtime.db` 已有 `hallucination_risk` 與 `mismatch_escalation`。`confidence_decay` 若新增，應避免只是把 `mismatch_escalation` 換名字；它的獨立價值是「尚未 failure 但 autonomy 應下降」。`autonomy_modes` 可作為 guard action target，而不是新的哲學層。Cognitive runtime state model 先保持 conceptual，不直接新增 persistent runtime state。
 5. **與 Workflow / Goal Ledger 的邊界**：intent stability 不取代 goal ledger；它只檢查 current action 是否仍服務原 goal / validation target。
 6. **與 Runtime DB 的邊界**：若只新增 governance/enforcement docs，不需改 `runtime.db`。若新增 guard、autonomy modes、recovery exit criteria 或 embedded recovery budget，必須確認 compiler source 與 `runtime/runtime.db` 同步。
 
@@ -751,7 +751,7 @@ Exit criteria:
 | Field | Decision |
 | --- | --- |
 | Trigger | Start implementation for this active plan before Phase 1 governance translation. |
-| Checked sources | `plans/README.md`, `governance/ai-runtime-governance/README.md`, `governance/ai-runtime-governance/recovery-retry-governance.md`, `runtime/README.md`, `metadata/recovery/README.md`, `runtime/guards/circuit-breaker.yaml`, `runtime/pipeline/guard-chain.yaml`, `enforcement/README.md`, `enforcement/dependency-reading.md`, `enforcement/linked-updates.md`, `enforcement/content-layering.md`, `enforcement/rule-weight.md`, `enforcement/conversation-goal-ledger.md`. |
+| Checked sources | `plans/README.md`, `governance/ai-runtime-governance/README.md`, `governance/ai-runtime-governance/recovery-retry-governance.md`, `runtime/README.md`, `metadata/recovery/README.md`, `runtime/runtime.db`, `runtime/runtime.db`, `enforcement/README.md`, `enforcement/dependency-reading.md`, `enforcement/linked-updates.md`, `enforcement/content-layering.md`, `enforcement/rule-weight.md`, `enforcement/conversation-goal-ledger.md`. |
 | Conflicts | No blocking conflict. Current architecture supports a governance-first implementation. `runtime/recovery/*.yaml` remains removed; recovery runtime source is `runtime/compiler/embedded_data.rb` and compiled `runtime/runtime.db`. `metadata/recovery/` is metadata-only. Existing `mismatch_escalation` and `hallucination_risk` guards overlap with confidence decay, so Phase 3 must normalize signals before adding runtime guard keys. |
 | Decision | Proceed. Phase 1 should create the governance translation first. Phase 2 may promote only crisp MUST / forbidden behavior into enforcement. Phase 3 may touch runtime guard sources only after compression to 3-5 runtime primitives. |
 | Validation | Use diff review, linked-update check, `ai-skill runtime refresh`, `go test ./...` for CLI guard safety when runtime scripts are involved, commit / push / readback, and clean `git status --short --branch`. |
@@ -812,8 +812,8 @@ Tasks:
 
 Candidate files:
 
-- `runtime/guards/circuit-breaker.yaml`
-- `runtime/pipeline/guard-chain.yaml`
+- `runtime/runtime.db`
+- `runtime/runtime.db`
 - `runtime/compiler/embedded_data.rb`（若 compiler 仍使用 embedded source）
 - `runtime/runtime.db`
 

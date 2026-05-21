@@ -32,4 +32,4 @@
 ## 下一步
 
 1. CI / release gate 跑 native default smoke；runtime refresh / validate / compile legacy wrapper 已移除。
-2. 若 runtime schema 未來新增 table，先更新 YAML source、Go compiler fixture、runtime DB validation，再刪除或重建 generated output。
+2. 若 runtime schema 未來新增 table，先更新 SQLite canonical document、Go compiler fixture、runtime DB validation，再刪除或重建 generated output。

@@ -44,8 +44,8 @@ Execution Stage (uses composed artifact as prompt)
 ## 與既有文件的關係
 
 - [`runtime/prompt-artifacts/`](../../runtime/prompt-artifacts/) — Runtime navigation entry point (data files: `artifact-templates.yaml`, `composition-rules.yaml`)
-- [`runtime/prompt-artifacts/artifact-templates.yaml`](../../runtime/prompt-artifacts/artifact-templates.yaml) — Task type artifact template definitions
-- [`runtime/prompt-artifacts/composition-rules.yaml`](../../runtime/prompt-artifacts/composition-rules.yaml) — Composition rules
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Task type artifact template definitions
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Composition rules
 - [`workflow/`](../../workflow/) — 提供執行步驟（what to do）
 - [`intelligence/`](../../intelligence/) — 提供判斷依據（how to think）
 - [`analysis/`](../../analysis/) — 提供分析方法（how to do）

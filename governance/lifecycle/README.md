@@ -218,7 +218,7 @@ Deprecate 一條 enforcement rule 前，確認：
 - [ ] Metadata 已更新（`status: deprecated`、`replaces`、`deprecation_date`）
 - [ ] 原始 rule 檔案已加入 deprecation notice
 - [ ] `enforcement/README.md` 規則索引已更新
-- [ ] `runtime/router/activation-rules.yaml` 已移除或註解該 rule
+- [ ] `runtime/runtime.db` 已移除或註解該 rule
 - [ ] `knowledge/graphs/rules/` 中該 rule 的 graph 記錄已更新
 - [ ] Linked updates 已完成（`enforcement/linked-updates.md`）
 - [ ] 取代規則至少已通過 1 次成功使用驗證

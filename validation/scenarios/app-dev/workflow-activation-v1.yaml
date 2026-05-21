@@ -1,7 +1,7 @@
 # Workflow Activation Scenario
 # 測試 AI 在處理到一半發現需要開發時，是否能正確載入 software-delivery workflow
 # 來源 activation rule:
-#   - runtime/router/activation-rules.yaml (workflow.software-delivery)
+#   - runtime/runtime.db (workflow.software-delivery)
 
 id: workflow-activation-v1
 domain: app-dev
@@ -11,7 +11,7 @@ priority: P1
 given:
   task: mid_session_development
   artifacts:
-    - runtime/router/activation-rules.yaml
+    - runtime/runtime.db
     - knowledge/runtime/routing-registry.yaml
     - workflow/software-delivery/execution-flow.md
   signals:
@@ -55,7 +55,7 @@ then:
   expected_intelligence:
     - workflow/software-delivery/execution-flow.md
     - knowledge/summaries/development-guidance.md
-    - runtime/router/activation-rules.yaml
+    - runtime/runtime.db
 
   unexpected_intelligence:
     - workflow/apk-analysis/execution-flow.md

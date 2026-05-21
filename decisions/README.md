@@ -77,7 +77,7 @@ proposed → accepted → deprecated → superseded
 | 某個架構決策需要修改 | 建立新 ADR（`ADR-006-{title}.md`）並標記舊 ADR 為 superseded | 新 ADR 記錄變更理由 |
 | Session-level 的輕量決策 | [`memory/decision/`](../memory/decision/) | 跨 session 但非架構級的決策記錄 |
 | Agent 跳過 workflow discovery 就寫碼 | [ADR-006](ADR-006-registry-first-workflow-activation.md)、[`workflow/workflow-routing.md`](../workflow/workflow-routing.md) | registry-first + #27 閘門 |
-| 每加 workflow 就加 activation # | [ADR-006](ADR-006-registry-first-workflow-activation.md)、[`runtime/decisions/decision-recording.yaml`](../runtime/decisions/decision-recording.yaml) | 觸發條件在 registry |
+| 每加 workflow 就加 activation # | [ADR-006](ADR-006-registry-first-workflow-activation.md)、[`runtime/runtime.db`](../runtime/runtime.db) | 觸發條件在 registry |
 | SDK Page／cache／catalog 為何這樣設計 | `<PROJECT_ROOT>/docs/decisions/`（如 apk-analysis-sdk） | 專案 tier；見 runtime decision-recording |
 
 ## 與 Failure Patterns 的關係
@@ -98,7 +98,7 @@ proposed → accepted → deprecated → superseded
 
 ## Runtime 決策紀錄（close-loop）
 
-閉環時 agent 應讀 [`runtime/decisions/decision-recording.yaml`](../runtime/decisions/decision-recording.yaml)：
+閉環時 agent 應讀 [`runtime/runtime.db`](../runtime/runtime.db)：
 
 - **architecture** → 本目錄 `ADR-{n}-*.md`
 - **session** → `memory/decision/{date}_*.md`

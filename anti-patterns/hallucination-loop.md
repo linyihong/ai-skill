@@ -25,11 +25,11 @@
 1. 重要判斷前先讀 canonical source（`dependency-reading.md`）。
 2. Summary 只做 routing，不做精確判斷。
 3. Tool output 截斷時標記不完整，不做確定性結論。
-4. 使用 `runtime/guards/circuit-breaker.yaml` 的 hallucination risk detection。
+4. 使用 `runtime/runtime.db` 的 hallucination risk detection。
 
 ## 檢測
 
-- `runtime/guards/circuit-breaker.yaml` 的 `hallucination_risk` 維度
+- `runtime/runtime.db` 的 `hallucination_risk` 維度
 - Agent 使用「可能」、「應該」等不確定詞彙的頻率
 - Source 引用但未實際讀取
 
@@ -41,5 +41,5 @@
 
 ## 相關 Guards
 
-- `runtime/guards/circuit-breaker.yaml`
+- `runtime/runtime.db`
 - `enforcement/dependency-reading.md`

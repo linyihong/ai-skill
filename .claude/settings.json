@@ -6,7 +6,7 @@
     "core": "CORE_BOOTSTRAP.md",
     "layout": "README.md",
     "skill_index": "knowledge/runtime/routing-registry.yaml",
-    "activation_rules": "runtime/router/activation-rules.yaml"
+    "activation_rules": "runtime/runtime.db"
   },
 
   "reference": {
@@ -15,9 +15,9 @@
     "task_routing": "knowledge/indexes/README.md",
     "goal_tracking": ".agent-goals/",
     "failure_learning": "enforcement/failure-learning-system.md",
-    "token_budget": "runtime/budget/token-budget.yaml",
-    "context_health": "runtime/health/context-health-score.yaml",
-    "circuit_breaker": "runtime/guards/circuit-breaker.yaml",
+    "token_budget": "runtime/runtime.db",
+    "context_health": "runtime/runtime.db",
+    "circuit_breaker": "runtime/runtime.db",
     "tool_metadata": "tools/metadata/README.md",
     "tool_compression": "tools/compression/README.md",
     "memory_working": "memory/working/README.md",

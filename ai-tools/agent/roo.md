@@ -240,7 +240,7 @@ VS Code Extension 全域設定的通用查詢/修改方法見 [`intelligence/ide
 
 **Goal ledger 操作流程已由 runtime 管理**，請參考：
 - [`runtime/runtime.db`](../../runtime/runtime.db) — `phase_machine` / `obligation_ledger` / `blocking_gates` 快速查詢
-- [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — phase / obligation / gate / transaction / recovery 的 embedded source
+- [`runtime/runtime.db`](../../runtime/runtime.db) — phase / obligation / gate / transaction / recovery 的 embedded source
 - `ai-skill goals`（source: [`scripts/ai-skill-cli/internal/app/goals.go`](../../scripts/ai-skill-cli/internal/app/goals.go)）— goal ledger CLI helper
 
 Roo Code 專屬注意事項：
@@ -254,7 +254,7 @@ Roo Code 專屬注意事項：
 **Knowledge update flow 已由 runtime 管理**，請參考：
 - `runtime/runtime.db → generated_surfaces (type='knowledge_update_phases')` — 11 個步驟的結構化記錄（快速路徑）
 - `runtime/runtime.db → recovery_strategies / phase_reconciliation / state_repair` — runtime recovery strategy（快速路徑）
-- [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — recovery / transaction state machine 的 source
+- [`runtime/runtime.db`](../../runtime/runtime.db) — recovery / transaction state machine 的 source
 
 Roo Code 專屬注意事項：
 - 無 hooks 機制，需在 Custom Instructions 中手動提醒

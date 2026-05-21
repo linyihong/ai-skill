@@ -46,6 +46,6 @@ tool:
 ## 與既有層的關係
 
 - `ai-tools/`：工具配置與同步細節（Claude Code、Cursor 等）
-- `runtime/guards/circuit-breaker.yaml`：tool call 次數限制與 explosion detection
+- `runtime/runtime.db`：tool call 次數限制與 explosion detection
 - `tools/routing/`：tool lazy activation 決策邏輯
 - `tools/compression/`：tool output compression 策略

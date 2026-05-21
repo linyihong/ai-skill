@@ -18,7 +18,7 @@ records:
       - enforcement/README.md
     candidate_sources:
       - knowledge/indexes/README.md
-      - runtime/phases/phase-machine.yaml
+      - runtime/runtime.db
       - knowledge/summaries/root-bootstrap.md
       - knowledge/graphs/metadata-navigation.yaml
     source_of_truth_gate: core-bootstrap-and-readme-active
@@ -41,13 +41,13 @@ records:
 
   - id: route.runtime.phase-machine
     task_intent: 載入目前 phase 狀態、allowed/forbidden actions、phase transition rules
-    primary_source: runtime/phases/phase-machine.yaml
+    primary_source: runtime/runtime.db
     required_dependencies:
       - CORE_BOOTSTRAP.md
       - README.md
     candidate_sources:
-      - runtime/phases/phase-machine.yaml
-      - runtime/gates/blocking-gates.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
     source_of_truth_gate: runtime-phase-machine-active
     ranking_reason: Phase Machine 定義 9 個 phase（bootstrap→checkpoint→execution→validation→commit→push→readback→finalize→recovery），每個 session 啟動後必須載入目前 phase 才能決定 allowed_actions 與 blocking gates。
     validation_signal: 目前 phase 已確認，allowed_actions 與 forbidden_actions 已載入，phase transition rules 已檢查。
@@ -68,11 +68,11 @@ records:
 
   - id: route.runtime.obligation-ledger
     task_intent: 載入本 phase 的未完成義務清單，確認執行前義務已滿足
-    primary_source: runtime/obligations/obligation-ledger.yaml
+    primary_source: runtime/runtime.db
     required_dependencies:
-      - runtime/obligations/obligation-ledger.yaml
+      - runtime/runtime.db
     candidate_sources:
-      - runtime/gates/blocking-gates.yaml
+      - runtime/runtime.db
       - enforcement/conversation-goal-ledger.md
     source_of_truth_gate: runtime-obligation-ledger-active
     ranking_reason: Obligation Ledger 定義 15 個 atomic duties 分散在 9 個 phase，每個 phase 有對應的 obligations 需在 phase entry 時檢查。
@@ -94,10 +94,10 @@ records:
 
   - id: route.runtime.blocking-gates
     task_intent: 載入本 phase 的阻斷閘門，確認 phase transition 是否被允許
-    primary_source: runtime/gates/blocking-gates.yaml
+    primary_source: runtime/runtime.db
     required_dependencies:
-      - runtime/gates/blocking-gates.yaml
-      - runtime/phases/phase-machine.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
     candidate_sources:
       - enforcement/goal-action-validation.md
       - enforcement/failure-learning-system.md
@@ -121,19 +121,19 @@ records:
 
   - id: route.runtime.recovery
     task_intent: 載入 phase 修復策略，處理 blocking gate 阻斷或 phase state 損毀
-    primary_source: runtime/recovery/recovery-strategies.yaml
+    primary_source: runtime/runtime.db
     required_dependencies:
       - governance/ai-runtime-governance/recovery-retry-governance.md
       - intelligence/engineering/agent-architecture/failure-recovery.md
       - intelligence/engineering/agent-architecture/cognitive-boundaries.md
-      - runtime/recovery/recovery-strategies.yaml
-      - runtime/recovery/phase-reconciliation.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
       - metadata/recovery/escalation-levels.yaml
       - metadata/recovery/domain-policies.yaml
     candidate_sources:
-      - runtime/recovery/state-repair.yaml
-      - runtime/recovery/obligation-rebuild.yaml
-      - runtime/recovery/phase-reconciliation.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
+      - runtime/runtime.db
       - enforcement/escalation-policy.md
       - metadata/recovery/README.md
       - metadata/recovery/escalation-levels.yaml
@@ -160,14 +160,14 @@ records:
 
   - id: route.runtime.scheduler
     task_intent: 載入 execution queue 排程規則，決定 obligations/gates 的執行順序
-    primary_source: runtime/scheduler/priority-scheduler.yaml
+    primary_source: runtime/runtime.db
     required_dependencies:
-      - runtime/scheduler/priority-scheduler.yaml
-      - runtime/scheduler/execution-queue.yaml
-      - runtime/gates/blocking-gates.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
+      - runtime/runtime.db
     candidate_sources:
-      - runtime/scheduler/priority-scheduler.yaml
-      - runtime/scheduler/execution-queue.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
     source_of_truth_gate: runtime-scheduler-active
     ranking_reason: Priority Scheduler 定義 4 級 priority（P0-P3）、6 條 scheduling rules、2 個 scheduling examples，解決注意力漂移問題。Execution Queue 定義 queue 結構、7 條管理規則、3 個 phase queue examples。
     validation_signal: Queue 已依 priority 排序，blocking gates 優先於 obligations，dependencies 已解析。
@@ -188,12 +188,12 @@ records:
 
   - id: route.runtime.transactions
     task_intent: 管理 Ai-skill writeback transaction 的生命週期
-    primary_source: runtime/transactions/transaction-machine.yaml
+    primary_source: runtime/runtime.db
     required_dependencies:
-      - runtime/transactions/transaction-machine.yaml
+      - runtime/runtime.db
       - enforcement/dependency-reading.md
     candidate_sources:
-      - runtime/transactions/transaction-templates.yaml
+      - runtime/runtime.db
       - enforcement/sanitization.md
       - enforcement/linked-updates.md
     source_of_truth_gate: runtime-transactions-active
@@ -242,12 +242,12 @@ records:
 
   - id: route.runtime.activation-rules
     task_intent: 決定哪些 lazy-load rules 需要 activate
-    primary_source: runtime/router/activation-rules.yaml
+    primary_source: runtime/runtime.db
     required_dependencies:
       - CORE_BOOTSTRAP.md
       - knowledge/runtime/routing-registry.yaml
     candidate_sources:
-      - runtime/router/activation-rules.yaml
+      - runtime/runtime.db
       - knowledge/runtime/README.md
     source_of_truth_gate: activation-rules-active
     ranking_reason: Activation rules 定義每個 lazy-load rule 的觸發條件，Agent 依目前 task 比對後決定載入哪些規則。
@@ -276,7 +276,7 @@ records:
       - governance/lifecycle/context-ttl-philosophy.md
     candidate_sources:
       - runtime/context/README.md
-      - runtime/context/ttl-policy.yaml
+      - runtime/runtime.db
       - knowledge/runtime/README.md
       - knowledge/runtime/routing-registry.yaml
     source_of_truth_gate: design-layer-only
@@ -303,13 +303,13 @@ records:
     required_dependencies:
       - enforcement/prompt-cache-efficiency.md
       - metadata/schema.md
-      - runtime/context/ttl-policy.yaml
+      - runtime/runtime.db
     candidate_sources:
       - knowledge/summaries/prompt-cache-alignment.md
       - knowledge/summaries/context-cost-optimization.md
       - runtime/context/README.md
-      - runtime/budget/token-budget.yaml
-      - runtime/health/context-health-score.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
     source_of_truth_gate: prompt-cache-playbook-active
     ranking_reason: Prompt cache alignment 需要先固定 context layout：stable prefix、semi-stable middle、volatile suffix，避免高變動輸入破壞 provider prefix cache。
     validation_signal: Prompt cache playbook、enforcement rule、metadata provider_cache 欄位與 activation rule 已同步。
@@ -490,7 +490,7 @@ records:
       - enforcement/escalation-policy.md
       - metadata/evidence/README.md
       - metadata/evidence/domain-policies.yaml
-      - runtime/guards/circuit-breaker.yaml
+      - runtime/runtime.db
     candidate_sources:
       - intelligence/engineering/agent-architecture/cognitive-boundaries.md
       - intelligence/engineering/agent-architecture/failure-recovery.md
@@ -735,8 +735,8 @@ records:
     task_intent: 了解 context routing 決策流程
     primary_source: runtime/router/
     required_dependencies:
-      - runtime/router/activation-rules.yaml
-      - runtime/context/ttl-policy.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
     candidate_sources:
       - knowledge/runtime/routing-registry.yaml
       - knowledge/summaries/runtime-operations.md
@@ -796,7 +796,7 @@ records:
     task_intent: 了解 context TTL 與 prune 策略
     primary_source: governance/lifecycle/context-ttl-philosophy.md
     required_dependencies:
-      - runtime/context/ttl-policy.yaml
+      - runtime/runtime.db
     candidate_sources:
       - knowledge/summaries/runtime-operations.md
       - knowledge/runtime/README.md
@@ -1441,14 +1441,14 @@ records:
         - 我們決定
         - 記住決策
         - ADR
-    primary_source: runtime/decisions/decision-recording.yaml
+    primary_source: runtime/runtime.db
     required_dependencies:
       - runtime/decisions/README.md
       - decisions/README.md
     candidate_sources:
       - memory/decision/README.md
       - governance/lifecycle/knowledge-update-flow.md
-      - runtime/pipeline/session-lifecycle.yaml
+      - runtime/runtime.db
     source_of_truth_gate: runtime-decision-recording-active
     ranking_reason: >
       將「決策寫到哪」從對話抽成 declarative 路由：architecture→ADR、session→memory/decision、project→docs/decisions。
@@ -1474,7 +1474,7 @@ records:
     primary_source: decisions/README.md
     required_dependencies:
       - CORE_BOOTSTRAP.md
-      - runtime/decisions/decision-recording.yaml
+      - runtime/runtime.db
     candidate_sources:
       - decisions/ADR-001-reference-first-migration-strategy.md
       - decisions/ADR-002-intelligence-vs-knowledge-separation.md
@@ -1565,7 +1565,7 @@ records:
       - tools/compression/README.md
       - tools/metadata/README.md
       - tools/routing/README.md
-      - runtime/router/activation-rules.yaml
+      - runtime/runtime.db
     source_of_truth_gate: tools-readme-active
     ranking_reason: tools/README.md 提供 tool 層 entry point，統整 compression/metadata/routing 三個子目錄。
     validation_signal: Tool metadata 已定義，compression 策略與 routing 規則已建立。
@@ -1645,10 +1645,10 @@ records:
 
   - id: route.runtime.compiler
     task_intent: 編譯 prose workflow/enforcement 文件為 machine-readable YAML
-    primary_source: runtime/compiler/compiler-rules.yaml
+    primary_source: runtime/runtime.db
     required_dependencies:
-      - runtime/compiler/compiler-rules.yaml
-      - runtime/phases/phase-machine.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
     candidate_sources:
       - scripts/ai-skill-cli/internal/app/runtime_compiler.go
       - runtime/compiler/README.md
@@ -1673,9 +1673,9 @@ records:
 
   - id: route.runtime.intelligence-routing
     task_intent: 根據 phase + task intent 路由到 intelligence/ 層的領域知識
-    primary_source: runtime/intelligence/intelligence-routing.yaml
+    primary_source: runtime/runtime.db
     required_dependencies:
-      - runtime/intelligence/intelligence-routing.yaml
+      - runtime/runtime.db
     candidate_sources:
       - runtime/intelligence/
       - intelligence/README.md
@@ -1703,12 +1703,12 @@ records:
     task_intent: 載入語言強制規則與文件輸出規則，確保輸出品質
     primary_source: runtime/output-governance/
     required_dependencies:
-      - runtime/output-governance/language-policy.yaml
-      - runtime/output-governance/output-rules.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
     candidate_sources:
-      - runtime/output-governance/language-policy.yaml
-      - runtime/output-governance/output-rules.yaml
-      - runtime/output-governance/governance-gates.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
+      - runtime/runtime.db
       - enforcement/neutral-language.md
       - enforcement/sanitization.md
       - enforcement/tool-neutral-documentation.md
@@ -1741,14 +1741,14 @@ records:
     task_intent: 載入 distributed runtime 鎖定機制、multi-agent 協調規則、async job 生命週期管理
     primary_source: runtime/distributed/
     required_dependencies:
-      - runtime/distributed/distributed-locks.yaml
-      - runtime/distributed/multi-agent-coordination.yaml
-      - runtime/distributed/async-job-lifecycle.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
+      - runtime/runtime.db
     candidate_sources:
-      - runtime/distributed/distributed-locks.yaml
-      - runtime/distributed/multi-agent-coordination.yaml
-      - runtime/distributed/async-job-lifecycle.yaml
-      - runtime/recovery/phase-reconciliation.yaml
+      - runtime/runtime.db
+      - runtime/runtime.db
+      - runtime/runtime.db
+      - runtime/runtime.db
     source_of_truth_gate: runtime-distributed-active
     ranking_reason: >
       Distributed Runtime 定義 4 種分散式鎖（phase_transition、obligation_ledger、
@@ -1782,7 +1782,7 @@ records:
       - governance/ai-runtime-governance/linked-update-governance.md
       - intelligence/engineering/agent-architecture/linked-updates-completeness.md
       - enforcement/linked-updates.md
-      - runtime/compiler/compiler-rules.yaml
+      - runtime/runtime.db
       - runtime/runtime.db
       - runtime/generated/README.md
     candidate_sources:

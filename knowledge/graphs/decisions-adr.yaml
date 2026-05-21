@@ -34,7 +34,7 @@ edges:
     reason: ADR-006 — Registry-First Workflow Activation。activation #27 + registry triggers，不為每 workflow 加列。
     validation: ADR 記錄 context、decision、consequences 與 alternatives。
   - type: related_to
-    target: runtime/decisions/decision-recording.yaml
+    target: runtime/runtime.db
     reason: Runtime 決策紀錄路由（tier 分類與 close-loop 自問）。
     validation: yaml 定義 tiers、routes、lookup.by_symptom。
   - type: related_to

@@ -11,7 +11,7 @@ given:
   task: handle_repeated_recovery_trigger
   artifacts:
     - governance/ai-runtime-governance/cognitive-state-governance.md
-    - runtime/guards/circuit-breaker.yaml
+    - runtime/runtime.db
   signals:
     - same contradiction class appears again
     - same source reload set was already used
@@ -28,4 +28,4 @@ then:
     - continue_autonomous_retry_without_new_evidence
   expected_final_route: human_alignment_required
   expected_intelligence:
-    - runtime/guards/circuit-breaker.yaml
+    - runtime/runtime.db

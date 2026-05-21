@@ -56,4 +56,4 @@ explosion_signals:
 - `ai-tools/`：工具配置與同步細節
 - `tools/metadata/`：tool metadata schema 與成本資訊
 - `tools/compression/`：tool output compression 策略
-- `runtime/guards/circuit-breaker.yaml`：tool call 次數限制
+- `runtime/runtime.db`：tool call 次數限制

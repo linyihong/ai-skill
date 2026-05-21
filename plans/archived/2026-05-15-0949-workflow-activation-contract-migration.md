@@ -20,7 +20,7 @@ References: [`decisions/ADR-006-registry-first-workflow-activation.md`](../../de
 
 ## 問題
 
-目前的 [`activation-rules.yaml`](../../runtime/router/activation-rules.yaml) 同時包含兩種不同性質的規則：
+目前的 [`activation-rules.yaml`](../../runtime/runtime.db) 同時包含兩種不同性質的規則：
 
 | 類型 | 範例 | 該誰管 |
 |------|------|--------|
@@ -304,7 +304,7 @@ Registry 只保留 route metadata（priority, confidence, context_cost, model pr
 |------|---------|-------|
 | `workflow/software-delivery/activation-contract.yaml` | **新增** | P0 |
 | `runtime/router/activation-engine.rb` | **修改** — 新增 scan + broadcast | P0 |
-| `runtime/router/activation-rules.yaml` | **修改** — 移除 workflow.software-delivery | P1 |
+| `runtime/runtime.db` | **修改** — 移除 workflow.software-delivery | P1 |
 | `knowledge/runtime/routing-registry.yaml` | **修改** — triggers → activation_contract | P1 |
 | `runtime/router/activation-table.md` | **修改** — Row 27-28 說明 | P1 |
 | `validation/scenarios/app-dev/activation-contract-scan-v1.yaml` | **新增** | P1 |

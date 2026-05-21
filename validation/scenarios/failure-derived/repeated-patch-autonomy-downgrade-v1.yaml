@@ -10,7 +10,7 @@ failure_source:
 given:
   task: fix_after_repeated_failure
   artifacts:
-    - runtime/guards/circuit-breaker.yaml
+    - runtime/runtime.db
     - enforcement/escalation-policy.md
     - enforcement/evidence-hierarchy.md
   signals:
@@ -30,5 +30,5 @@ then:
     - claim_progress_from_repeated_edit
   expected_final_route: autonomy_downgraded_recovery
   expected_intelligence:
-    - runtime/guards/circuit-breaker.yaml
+    - runtime/runtime.db
     - enforcement/escalation-policy.md

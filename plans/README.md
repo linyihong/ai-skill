@@ -24,7 +24,7 @@
 | # | 檢查項目 | 說明 |
 |---|---------|------|
 | 1 | **Candidate files 存在性** | plan 列出的 source、generated surface、runtime table、workflow / metadata path 是否仍存在；缺檔需標 `not applicable` 或 `source missing` |
-| 2 | **Source-of-truth 一致性** | 確認應修改的是 canonical source、YAML source、embedded source、compiler source 或 generated DB；不得只改不生效的 mirror / generated output |
+| 2 | **Source-of-truth 一致性** | 確認應修改的是 canonical source、SQLite canonical document、embedded source、compiler source 或 generated DB；不得只改不生效的 mirror / generated output |
 | 3 | **Layer responsibility** | plan 是否把 policy、runtime state、workflow、metadata、analysis、intelligence 放在正確 layer |
 | 4 | **Compiler / generated surface** | 涉及 `runtime/`、`knowledge/`、`metadata/`、`validation/` 時，確認 compiler / validator 會讀到該 source，並列出需要重新生成的 artifact |
 | 5 | **Linked updates** | 依 [`enforcement/linked-updates.md`](../enforcement/linked-updates.md) 確認相關 README、metadata、activation rules、templates、runtime DB 或 validators 是否要同步 |
@@ -96,7 +96,7 @@
 | [`archived/2026-05-14-1028-shared-rules-to-enforcement-migration.md`](archived/2026-05-14-1028-shared-rules-to-enforcement-migration.md) | ✅ completed | shared-rules/ → enforcement/ 搬遷計畫，含 Layer Responsibility Contract |
 | [`archived/2026-05-18-scrapling-knowledge-integration-plan.md`](archived/2026-05-18-scrapling-knowledge-integration-plan.md) | ✅ completed | Scrapling 知識整合計畫：analysis/web/ + 6 份 intelligence 文件 + sanitization 強化 + routing 註冊，3 個 Phase 全完成 |
 | [`archived/2026-05-18-0155-software-delivery-output-templates.md`](archived/2026-05-18-0155-software-delivery-output-templates.md) | ✅ completed | Software Delivery Output Templates — 建立 5 個輸出模板 + Greenfield 標準化流程 + Slash Command 模式 + 模板 Traceability 整合 |
-| [`archived/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md`](archived/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md) | ✅ completed / archived | AI-native Cognitive Execution System 升級比對分析已完成；P0/P1/P2 execution runtime 缺口已由 `runtime/runtime.db`、runtime YAML sources、recovery、output governance、distributed runtime 與 cognitive governance plan 吸收，Agent VM 留作遠期方向 |
+| [`archived/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md`](archived/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md) | ✅ completed / archived | AI-native Cognitive Execution System 升級比對分析已完成；P0/P1/P2 execution runtime 缺口已由 `runtime/runtime.db`、SQLite canonical runtime documents、recovery、output governance、distributed runtime 與 cognitive governance plan 吸收，Agent VM 留作遠期方向 |
 | [`archived/2026-05-15-0949-workflow-activation-contract-migration.md`](archived/2026-05-15-0949-workflow-activation-contract-migration.md) | ✅ superseded / archived | Per-workflow `activation-contract.yaml` 方案已被 ADR-006 registry-first workflow activation 取代；現行 source 是 activation #27、`route.workflow.*.activation_triggers` 與 `workflow/workflow-routing.md` |
 | [`archived/2026-05-20-1039-runtime-recovery-escalation-system.md`](archived/2026-05-20-1039-runtime-recovery-escalation-system.md) | ✅ completed | Runtime Recovery & Escalation System — escalation policy、runtime guard、recovery procedure、metadata policy、workflow hooks 與 validation scenarios 全完成 |
 | [`archived/2026-05-20-1307-ai-runtime-governance-five-step-integration.md`](archived/2026-05-20-1307-ai-runtime-governance-five-step-integration.md) | ✅ completed | AI Runtime Governance Five-Step Integration — Musk Five-Step source philosophy 與 AI runtime governance 轉譯層已完成 |

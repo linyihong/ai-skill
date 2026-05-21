@@ -66,4 +66,4 @@ discard_after:
 - `memory/decision/`：重要決策 promotion 到 decision memory
 - `memory/retrieval-governance/`：決定哪些 memory refs 可以 activation 到 working buffer
 - `.agent-goals/`：active execution contract，不由 working memory 取代
-- `runtime/guards/context-pollution.yaml`：自動存檔觸發條件
+- `runtime/runtime.db`：自動存檔觸發條件

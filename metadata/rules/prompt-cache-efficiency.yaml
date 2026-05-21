@@ -30,7 +30,7 @@ context_cost:
     cache_position: middle
     churn_risk: medium
 when_to_read: 討論或修改 prompt cache、context loading、bootstrap layout、token cost optimization 或 provider cached-token 策略時
-validation: enforcement/README.md、runtime/router/activation-rules.yaml、metadata/schema.md 與 runtime/context/prompt-cache-playbook.md 都能導向同一規則
+validation: enforcement/README.md、runtime/runtime.db、metadata/schema.md 與 runtime/context/prompt-cache-playbook.md 都能導向同一規則
 complexity: medium
 depends:
   - enforcement/dependency-reading.md
@@ -38,8 +38,8 @@ depends:
   - runtime/context/prompt-cache-playbook.md
 related:
   - metadata/schema.md
-  - runtime/context/ttl-policy.yaml
-  - runtime/budget/token-budget.yaml
+  - runtime/runtime.db
+  - runtime/runtime.db
 conflicts: []
 replaces: []
 models:

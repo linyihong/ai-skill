@@ -28,43 +28,43 @@ Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 
 | Domain | Path | Description |
 |--------|------|-------------|
-| Activation | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Lazy-load rules with activation conditions |
-| Routing | [`router/`](router/) | Task intent → knowledge index → metadata → source-of-truth gate |
-| Discovery | [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml) | Phase-aware capability discovery checkpoints |
-| Phases | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Execution phase state machine |
-| Obligations | [`obligations/obligation-ledger.yaml`](obligations/obligation-ledger.yaml) | Per-phase atomic duties |
-| Gates | [`gates/blocking-gates.yaml`](gates/blocking-gates.yaml) | Phase transition prerequisites |
-| Compiler | [`compiler/compiler-rules.yaml`](compiler/compiler-rules.yaml) + `ai-skill runtime compile` | Prose/YAML → SQLite compilation |
+| Activation | `runtime.db` tables `activation_rules`, `activation_rules_mirror`, `core_bootstrap_rules` | Lazy-load rules with activation conditions |
+| Routing | `runtime.db` activation/runtime config tables | Runtime routing support; knowledge routing remains in `knowledge/runtime/` |
+| Discovery | `runtime.db` tables `discovery_checkpoints`, `capability_checkpoints` | Phase-aware capability discovery checkpoints |
+| Phases | `runtime.db` tables `phases`, `phase_machine`, `phase_transitions` | Execution phase state machine |
+| Obligations | `runtime.db` tables `obligations`, `obligation_ledger` | Per-phase atomic duties |
+| Gates | `runtime.db` tables `gates`, `blocking_gates` | Phase transition prerequisites |
+| Compiler | `runtime.db` tables `compiler_rules`, `runtime_config_documents`, `runtime_config_projections` + `ai-skill runtime compile` | SQLite canonical config + deterministic prose → SQLite projections |
 | Runtime DB | [`runtime.db`](runtime.db) | Compiled immutable runtime registry — **must be committed** when changed |
 | State DB | [`runtime-state.db`](runtime-state.db) | Mutable execution state (`.gitignore`) |
 | Generated | [`generated/`](generated/) | Compiled runtime surfaces (legacy, migrated to SQLite) |
-| Transactions | [`transactions/`](transactions/) | Writeback transaction state machine and templates |
-| Pipeline | [`pipeline/`](pipeline/) | Context flow, guard chain, relevance engine |
-| Recovery | [`recovery/`](recovery/) | Recovery strategy, phase reconciliation, state repair, obligation rebuild |
-| Scheduler | [`scheduler/`](scheduler/) | Execution queue, priority scheduler |
-| Guards | [`guards/`](guards/) | Circuit breaker, context pollution, mismatch escalation |
+| Transactions | `runtime.db` tables `transaction_*` | Writeback transaction state machine and templates |
+| Pipeline | `runtime.db` tables `pipeline_context_flow`, `guard_chain`, `relevance_engine`, `session_lifecycle` | Context flow, guard chain, relevance engine |
+| Recovery | `runtime.db` tables `recovery_strategies`, `state_repair`, `obligation_rebuild`, `phase_reconciliation` | Recovery strategy, phase reconciliation, state repair, obligation rebuild |
+| Scheduler | `runtime.db` tables `execution_queue`, `priority_scheduler` | Execution queue, priority scheduler |
+| Guards | `runtime.db` tables `circuit_breaker`, `context_pollution` | Circuit breaker, context pollution, mismatch escalation |
 | Onboarding | [`onboarding/`](onboarding/) | New project/task setup guidance |
-| Output Governance | [`output-governance/`](output-governance/) | Language policy, output rules, governance gates |
-| Prompt Artifacts | [`prompt-artifacts/`](prompt-artifacts/) | Artifact templates, composition rules |
-| Context | [`context/`](context/) | TTL policy and provider prompt cache layout |
-| Budget | [`budget/`](budget/) | Token budget |
-| Distributed | [`distributed/`](distributed/) | Multi-agent coordination, distributed locks |
-| Intelligence | [`intelligence/`](intelligence/) | Intelligence routing |
-| Decision recording | [`decisions/`](decisions/) | Close-loop tier routing（ADR / session / project） |
+| Output Governance | `runtime.db` tables `language_policy`, `output_rules`, `governance_gates` | Language policy, output rules, governance gates |
+| Prompt Artifacts | `runtime.db` tables `prompt_artifact_templates`, `prompt_composition_rules` | Artifact templates, composition rules |
+| Context | `runtime.db` table `context_ttl_policy` | TTL policy and provider prompt cache layout |
+| Budget | `runtime.db` table `runtime_budget` | Token budget |
+| Distributed | `runtime.db` tables `distributed_locks`, `multi_agent_coordination`, `async_job_lifecycle` | Multi-agent coordination, distributed locks |
+| Intelligence | `runtime.db` table `intelligence_routing` | Intelligence routing |
+| Decision recording | `runtime.db` table `decision_recording` | Close-loop tier routing（ADR / session / project） |
 
 ## Recovery Source Map
 
-Runtime recovery 的 machine-readable source 已恢復為 standalone `runtime/recovery/*.yaml`。Agent 要處理 blocking gate、phase drift、stale generated surface 或 recovery retry 時，依下列分層讀取：
+Runtime recovery 的 machine-readable source 已收斂到 `runtime/runtime.db` canonical documents。Agent 要處理 blocking gate、phase drift、stale generated surface 或 recovery retry 時，依下列分層讀取：
 
 | Need | Read |
 | --- | --- |
 | 即時 escalation / recovery output | [`../enforcement/escalation-policy.md`](../enforcement/escalation-policy.md) |
 | Retry limit、strategy change、source reload、validation gate | [`../governance/ai-runtime-governance/recovery-retry-governance.md`](../governance/ai-runtime-governance/recovery-retry-governance.md) |
 | Domain-specific reload set / forbidden behaviors | [`../metadata/recovery/`](../metadata/recovery/) |
-| Machine-readable recovery strategy / phase reconciliation / state repair | [`recovery/`](recovery/) YAML（SQLite quick path: `runtime.db` tables） |
-| 修改 runtime recovery 定義 | 修改 [`recovery/`](recovery/) YAML，然後執行 `ai-skill runtime compile` |
+| Machine-readable recovery strategy / phase reconciliation / state repair | `runtime.db` recovery tables |
+| 修改 runtime recovery 定義 | 更新 `runtime.db` canonical config document，然後執行 `ai-skill runtime compile` refresh projections |
 
-不要修改 `runtime/runtime.db` 取代 source YAML；`runtime.db` 是編譯輸出。
+`runtime/runtime.db` 是 committed runtime config 的 canonical copy。不要再保留 committed runtime YAML mirror；若需要人類可讀 diff，先匯出臨時 JSON/YAML 檢視，不把 mirror commit 回 repo。
 
 ## Inbound References
 
@@ -75,8 +75,8 @@ Runtime recovery 的 machine-readable source 已恢復為 standalone `runtime/re
 - [`route.models.model-aware-routing`](../knowledge/runtime/routing-registry.yaml:319)
 - [`route.runtime.router-flow`](../knowledge/runtime/routing-registry.yaml:348)
 - [`route.runtime.context-ttl-doc`](../knowledge/runtime/routing-registry.yaml:407)
-- `gate.checkpoint.capability_discovery_completed` in [`runtime.db`](runtime.db) / [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml)
-- `obligation.checkpoint.run_capability_discovery` in [`runtime.db`](runtime.db) / [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml)
+- `gate.checkpoint.capability_discovery_completed` in [`runtime.db`](runtime.db)
+- `obligation.checkpoint.run_capability_discovery` in [`runtime.db`](runtime.db)
 
 ## Databases
 
@@ -84,61 +84,28 @@ Runtime uses two SQLite databases with different lifecycles:
 
 ### `runtime.db` (Immutable — Compiled Registry)
 
-Generated by Go-native `ai-skill runtime compile` from runtime YAML sources and deterministic prose mappings in [`compiler/compiler-rules.yaml`](compiler/compiler-rules.yaml). Rebuilt on every commit that touches runtime sources. **Do not edit manually.**
+Generated by Go-native `ai-skill runtime compile` from canonical config documents stored inside `runtime.db` plus deterministic prose mappings also stored inside `runtime.db`. Rebuilt when canonical runtime documents or mapped prose sources change.
 
-All runtime config sources are standalone YAML files. When the `Source` column points to YAML, edit that YAML and recompile; do not update `runtime.db` directly.
+All committed runtime config is stored in SQLite. Do not keep a committed YAML mirror for data whose canonical copy is `runtime.db`.
 
 > **⚠️ Commit 規則：`runtime.db` 必須包含在 commit 中。**
-> 當 runtime YAML 來源或 compiler 規則變更時，pre-commit hook 會自動重新編譯並 `git add runtime.db`。
-> 若手動 commit（跳過 hook），**必須**確認 `runtime.db` 已 `git add`，否則 runtime 與來源不一致。
-> 驗證方式：`git diff --cached --name-only | grep runtime.db` 應回傳非空。
+> 當 canonical runtime config 變更時，`runtime.db` 本身就是 source-of-truth 與 projection output 的 commit artifact。
+> 若手動 commit（跳過 hook），**必須**確認 `runtime validate` 通過且 `runtime.db` 已 `git add`。
 
-| Table | Source | Purpose |
+| Table | Canonical Source | Purpose |
 |-------|--------|---------|
-| `phases` | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Execution phase definitions with entry conditions, allowed/forbidden actions |
-| `phase_transitions` | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Phase transition rules (blocked transitions, recovery rules) |
-| `obligations` | [`obligations/obligation-ledger.yaml`](obligations/obligation-ledger.yaml) | Per-phase atomic duties with verification criteria |
-| `gates` | [`gates/blocking-gates.yaml`](gates/blocking-gates.yaml) | Phase transition prerequisites with severity and failure actions |
-| `transaction_states` | [`transactions/transaction-machine.yaml`](transactions/transaction-machine.yaml) | Transaction state definitions |
-| `transaction_transitions` | [`transactions/transaction-machine.yaml`](transactions/transaction-machine.yaml) | Allowed state transitions |
-| `transaction_rules` | [`transactions/transaction-machine.yaml`](transactions/transaction-machine.yaml) | Transaction rules (lock check, canonical first, etc.) |
-| `transaction_templates` | [`transactions/transaction-templates.yaml`](transactions/transaction-templates.yaml) | Transaction templates (skill_update, new_skill, feedback_lesson) |
-| `activation_rules` | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Lazy-load rule definitions with activation conditions |
-| `core_bootstrap_rules` | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Core bootstrap rules (always loaded) |
-| `discovery_checkpoints` | [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml) | Phase-aware capability discovery checkpoints |
-| `discovery_search_strategy` | [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml) | Search strategy configuration |
+| `runtime_config_documents` | `runtime.db` | Full canonical JSON documents replacing former SQLite canonical runtime documents |
+| `runtime_config_projections` | `runtime.db` | Projection metadata from canonical documents to runtime tables |
+| `runtime_source_files` | `runtime.db` | Compatibility manifest for former source paths, marked `source_kind='db'` |
+| `phases`, `phase_transitions` | `runtime_config_documents` | Execution phase definitions and transition rules |
+| `obligations`, `obligation_ledger` | `runtime_config_documents` | Per-phase atomic duties with verification criteria |
+| `gates`, `blocking_gates` | `runtime_config_documents` | Phase transition prerequisites with severity and failure actions |
+| `transaction_states`, `transaction_transitions`, `transaction_rules`, `transaction_templates`, `transaction_templates_ext` | `runtime_config_documents` | Transaction state definitions, rules, and templates |
+| `activation_rules`, `activation_rules_mirror`, `core_bootstrap_rules` | `runtime_config_documents` | Lazy-load rule definitions with activation conditions |
+| `discovery_checkpoints`, `discovery_search_strategy`, `capability_checkpoints` | `runtime_config_documents` | Phase-aware capability discovery checkpoints |
 | `generated_surfaces` | Compiled from prose sources | Extracted structured data from workflow, enforcement, governance documents |
 | `compiler_metadata` | Auto-generated | Compiler version, compilation timestamp, schema version |
-| `runtime_budget` | [`budget/token-budget.yaml`](budget/token-budget.yaml) | Per-model token budget configuration |
-| `context_ttl_policy` | [`context/ttl-policy.yaml`](context/ttl-policy.yaml) | Context TTL policy per context type |
-| `circuit_breaker` | [`guards/circuit-breaker.yaml`](guards/circuit-breaker.yaml) | Circuit breaker and mismatch escalation guard definitions |
-| `context_pollution` | [`guards/context-pollution.yaml`](guards/context-pollution.yaml) | Context pollution detection signals |
-| `context_health_score` | [`health/context-health-score.yaml`](health/context-health-score.yaml) | Context health scoring dimensions |
-| `intelligence_routing` | [`intelligence/intelligence-routing.yaml`](intelligence/intelligence-routing.yaml) | Intelligence routing rules |
-| `obligation_ledger` | [`obligations/obligation-ledger.yaml`](obligations/obligation-ledger.yaml) | Obligation ledger entries |
-| `language_policy` | [`output-governance/language-policy.yaml`](output-governance/language-policy.yaml) | Language enforcement rules |
-| `output_rules` | [`output-governance/output-rules.yaml`](output-governance/output-rules.yaml) | Document output formatting rules |
-| `governance_gates` | [`output-governance/governance-gates.yaml`](output-governance/governance-gates.yaml) | Output governance blocking gates |
-| `blocking_gates` | [`gates/blocking-gates.yaml`](gates/blocking-gates.yaml) | Blocking gates (runtime config mirror) |
-| `phase_machine` | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Phase machine (runtime config mirror) |
-| `pipeline_context_flow` | [`pipeline/context-flow.yaml`](pipeline/context-flow.yaml) | Progressive context expansion levels |
-| `guard_chain` | [`pipeline/guard-chain.yaml`](pipeline/guard-chain.yaml) | Guard execution order per stage |
-| `relevance_engine` | [`pipeline/relevance-engine.yaml`](pipeline/relevance-engine.yaml) | Skill relevance scoring configuration |
-| `session_lifecycle` | [`pipeline/session-lifecycle.yaml`](pipeline/session-lifecycle.yaml) | Session lifecycle stage definitions |
-| `prompt_artifact_templates` | [`prompt-artifacts/artifact-templates.yaml`](prompt-artifacts/artifact-templates.yaml) | Task type prompt artifact templates |
-| `prompt_composition_rules` | [`prompt-artifacts/composition-rules.yaml`](prompt-artifacts/composition-rules.yaml) | Prompt composition rules |
-| `recovery_strategies` | [`recovery/recovery-strategies.yaml`](recovery/recovery-strategies.yaml) | Recovery state machine, escalation levels, output schema, and strategy definitions |
-| `state_repair` | [`recovery/state-repair.yaml`](recovery/state-repair.yaml) | State repair procedures |
-| `obligation_rebuild` | [`recovery/obligation-rebuild.yaml`](recovery/obligation-rebuild.yaml) | Obligation rebuild procedures |
-| `phase_reconciliation` | [`recovery/phase-reconciliation.yaml`](recovery/phase-reconciliation.yaml) | Phase reconciliation procedures |
-| `execution_queue` | [`scheduler/execution-queue.yaml`](scheduler/execution-queue.yaml) | Task execution queue configuration |
-| `priority_scheduler` | [`scheduler/priority-scheduler.yaml`](scheduler/priority-scheduler.yaml) | Priority scheduling levels |
-| `activation_rules_mirror` | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Activation rules (runtime config mirror) |
-| `transaction_templates_ext` | [`transactions/transaction-machine.yaml`](transactions/transaction-machine.yaml) | Transaction templates (runtime config mirror) |
-| `distributed_locks` | [`distributed/distributed-locks.yaml`](distributed/distributed-locks.yaml) | Distributed lock/lease definitions |
-| `multi_agent_coordination` | [`distributed/multi-agent-coordination.yaml`](distributed/multi-agent-coordination.yaml) | Multi-agent coordination rules |
-| `async_job_lifecycle` | [`distributed/async-job-lifecycle.yaml`](distributed/async-job-lifecycle.yaml) | Async job lifecycle state definitions |
-| `capability_checkpoints` | [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml) | Capability discovery checkpoints (runtime config mirror) |
+| Remaining runtime config tables | `runtime_config_documents` | Normalized projections for budget, TTL, guards, health, intelligence routing, output governance, pipeline, prompt artifacts, recovery, scheduler, distributed runtime, and capability checkpoints |
 
 ### `runtime-state.db` (Mutable — Execution State)
 

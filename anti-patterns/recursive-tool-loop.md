@@ -21,7 +21,7 @@
 
 ## 預防
 
-1. 設定 tool call 次數限制（`runtime/guards/circuit-breaker.yaml`）。
+1. 設定 tool call 次數限制（`runtime/runtime.db`）。
 2. 搜尋前先確認關鍵詞與範圍。
 3. 沒找到時先問使用者，而不是盲目擴大搜尋。
 4. 使用 `tools/routing/` 的 explosion detection。
@@ -40,5 +40,5 @@
 
 ## 相關 Guards
 
-- `runtime/guards/circuit-breaker.yaml`
+- `runtime/runtime.db`
 - `tools/routing/README.md`

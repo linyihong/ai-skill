@@ -12,7 +12,7 @@ given:
   artifacts:
     - governance/ai-runtime-governance/cognitive-state-governance.md
     - metadata/evidence/domain-policies.yaml
-    - runtime/guards/circuit-breaker.yaml
+    - runtime/runtime.db
   signals:
     - mechanism mainly governs governance behavior
     - no recurring validated failure exists

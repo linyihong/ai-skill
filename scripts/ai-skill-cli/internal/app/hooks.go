@@ -228,7 +228,7 @@ func runPreCommitHook(result Result, root string) Result {
 		}
 		result.Mutations = append(result.Mutations, "compiled and staged runtime/runtime.db")
 	}
-	if hasKnowledgeValidationChange(staged) {
+	if hasRuntimeDBChange(staged) || hasKnowledgeValidationChange(staged) {
 		var stdout strings.Builder
 		var stderr strings.Builder
 		code := Run([]string{"runtime", "validate", "--repo", root, "--json"}, &stdout, &stderr)
@@ -238,7 +238,7 @@ func runPreCommitHook(result Result, root string) Result {
 			result.Error = &CommandError{Code: "runtime_validate_failed", Message: compactSummary(stdout.String() + stderr.String())}
 			return result
 		}
-		result.Checks = append(result.Checks, Check{Name: "runtime_validation", Status: "ok", Message: "staged knowledge/validation changes passed"})
+		result.Checks = append(result.Checks, Check{Name: "runtime_validation", Status: "ok", Message: "staged runtime/knowledge/validation changes passed"})
 	}
 	if len(result.Mutations) == 0 {
 		result.Checks = append(result.Checks, Check{Name: "pre_commit", Status: "ok", Message: "no runtime or knowledge hook action required"})
@@ -261,8 +261,12 @@ func gitLines(root string, args ...string) ([]string, error) {
 }
 
 func hasRuntimeSourceChange(paths []string) bool {
+	return false
+}
+
+func hasRuntimeDBChange(paths []string) bool {
 	for _, path := range paths {
-		if strings.HasPrefix(path, "runtime/") || path == "scripts/git-hooks/pre-commit" {
+		if path == "runtime/runtime.db" {
 			return true
 		}
 	}

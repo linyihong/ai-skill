@@ -14,11 +14,11 @@
 ## 與既有文件的關係
 
 - [`runtime/output-governance/`](../../runtime/output-governance/) — Runtime navigation entry point (data files: `language-policy.yaml`, `output-rules.yaml`, `governance-gates.yaml`)
-- [`runtime/output-governance/language-policy.yaml`](../../runtime/output-governance/language-policy.yaml) — 語言強制規則
-- [`runtime/output-governance/output-rules.yaml`](../../runtime/output-governance/output-rules.yaml) — 文件輸出規則
-- [`runtime/output-governance/governance-gates.yaml`](../../runtime/output-governance/governance-gates.yaml) — Output governance blocking gates
+- [`runtime/runtime.db`](../../runtime/runtime.db) — 語言強制規則
+- [`runtime/runtime.db`](../../runtime/runtime.db) — 文件輸出規則
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Output governance blocking gates
 - [`runtime/runtime.db`](../../runtime/runtime.db) — `phase_machine` / `blocking_gates` / `governance_gates` compiled runtime surface
-- [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — validation / finalize phase 與 blocking gates 的 embedded source
+- [`runtime/runtime.db`](../../runtime/runtime.db) — validation / finalize phase 與 blocking gates 的 embedded source
 - [`enforcement/neutral-language.md`](../../enforcement/neutral-language.md) — 語言規則的 prose source
 - [`enforcement/sanitization.md`](../../enforcement/sanitization.md) — 去敏規則的 prose source
 - [`enforcement/tool-neutral-documentation.md`](../../enforcement/tool-neutral-documentation.md) — 工具中立性規則的 prose source

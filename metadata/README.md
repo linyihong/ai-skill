@@ -38,7 +38,7 @@
 - [`route.metadata.knowledge-atom-schema`](../knowledge/runtime/routing-registry.yaml:186) — required_dependencies 引用 `metadata/rules/README.md`、`metadata/ranking/README.md`、`metadata/confidence/README.md`、`metadata/compatibility/README.md`
 - [`route.models.model-aware-routing`](../knowledge/runtime/routing-registry.yaml:316) — required_dependencies 引用 `metadata/ranking/README.md`
 - [`knowledge/runtime/routing-registry.yaml`](../knowledge/runtime/routing-registry.yaml) — 多條 records 的 metadata 欄位使用 metadata schema
-- **Enforcement Rule metadata** 將被 `runtime/router/activation-rules.yaml` 與 `knowledge/graphs/rules/` 使用。
+- **Enforcement Rule metadata** 將被 `runtime/runtime.db` 與 `knowledge/graphs/rules/` 使用。
 
 ## 與既有層的關係
 

@@ -32,7 +32,7 @@ context_cost:
     cache_position: middle
     churn_risk: medium
 when_to_read: Read when repeated failure, user contradiction, evidence conflict, source-of-truth miss, automation drift, or runtime recovery escalation appears.
-validation: Confirm enforcement/README.md, runtime/router/activation-rules.yaml, metadata/rules/README.md, dependency-reading.md, failure-learning-system.md, and linked-updates.md all reference the rule consistently.
+validation: Confirm enforcement/README.md, runtime/runtime.db, metadata/rules/README.md, dependency-reading.md, failure-learning-system.md, and linked-updates.md all reference the rule consistently.
 complexity: medium
 depends:
   - enforcement.dependency-reading
@@ -53,7 +53,7 @@ checklist:
   - Required source-of-truth is read or marked not applicable.
   - Execution graph is rebuilt before execution resumes.
   - Failure learning loop is opened if durable prevention is needed.
-runtime_notes: Activation is lazy via runtime/router/activation-rules.yaml; Phase 2 will connect runtime guards.
+runtime_notes: Activation is lazy via runtime/runtime.db; Phase 2 will connect runtime guards.
 governance_notes: This rule is real-time control and does not replace failure-learning durable prevention.
 
 activation_conditions:

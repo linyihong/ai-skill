@@ -70,7 +70,7 @@
 ### 2.6 Runtime Surface 更新
 
 - [ ] **SQLite runtime 重新編譯**：執行 repo-local `ai-skill runtime compile --native-compiler` 或由 pre-commit hook 重新編譯 `runtime/runtime.db`
-- [ ] **phase runtime surface**：如有 phase 變更，已更新 `runtime/compiler/compiler-rules.yaml` 或現存 YAML source，並確認 `runtime/runtime.db` 的 `phase_machine` / `phases` 已同步。
+- [ ] **phase runtime surface**：如有 phase 變更，已更新 `runtime/runtime.db` 或現存 SQLite canonical document，並確認 `runtime/runtime.db` 的 `phase_machine` / `phases` 已同步。
 - [ ] **obligation runtime surface**：如有 obligation 變更，已更新 source，並確認 `runtime/runtime.db` 的 `obligation_ledger` / `obligations` 已同步。
 - [ ] **blocking gate runtime surface**：如有 gate 變更，已更新 source，並確認 `runtime/runtime.db` 的 `blocking_gates` / `gates` 已同步。
 
@@ -214,7 +214,7 @@
 ### Runtime Surface
 - [ ] compiler 已執行
 - [ ] `runtime/runtime.db` 已同步
-- [ ] phase / obligation / blocking gate source 已同步（embedded source 或現存 YAML source）
+- [ ] phase / obligation / blocking gate source 已同步（embedded source 或現存 SQLite canonical document）
 
 ### 跨層一致性
 - [ ] README 表格與實際檔案一致
@@ -241,7 +241,7 @@
 
 ### 觸發時機
 
-系統升級治理檢查在每個 checkpoint 階段自動觸發（由 `runtime/runtime.db` 的 `phase_machine` / `blocking_gates` compiled surface 管理；source 在 [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml)）：
+系統升級治理檢查在每個 checkpoint 階段自動觸發（由 `runtime/runtime.db` 的 `phase_machine` / `blocking_gates` compiled surface 管理；source 在 [`runtime/runtime.db`](../../runtime/runtime.db)）：
 
 1. Agent 進入 checkpoint phase
 2. 查詢 `runtime.db` 的 `generated_surfaces` 表（快速路徑）
@@ -267,8 +267,8 @@ Pre-commit hook 會檢查 prose 與 runtime.db 是否一致，不一致時 block
 |------|------|
 | `runtime/runtime.db → generated_surfaces (type='system_upgrade_governance')` | 本文件的 runtime surface，由 compiler 自動產生 |
 | [`runtime/runtime.db`](../../runtime/runtime.db) | Checkpoint phase、`obligation.checkpoint.check_system_upgrade_governance`、`gate.checkpoint.system_upgrade_governance_checked` 的 compiled runtime surface |
-| [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) | Phase / obligation / blocking gate 的 source；除非有 source restoration migration，不要引用已移除的 standalone YAML |
-| [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) | 定義本文件到 YAML 的編譯規則 |
+| [`runtime/runtime.db`](../../runtime/runtime.db) | Phase / obligation / blocking gate 的 source；除非有 source restoration migration，不要引用已移除的 standalone YAML |
+| [`runtime/runtime.db`](../../runtime/runtime.db) | 定義本文件到 YAML 的編譯規則 |
 | [`enforcement/linked-updates.md`](../../enforcement/linked-updates.md) | 本要則的 §2.8 閉環驗證引用 linked-updates 規則 |
 | [`governance/lifecycle/README.md`](../../governance/lifecycle/README.md) | 本要則是 lifecycle 治理的一部分，專注於「升級」這個特定 lifecycle 事件 |
 | [`plans/README.md`](../../plans/README.md) | 本要則定義了計畫書必須包含的內容，與 plans/ 的目錄規則互補 |

@@ -79,7 +79,7 @@ Step 3: 從這個 library/tool 可以萃取出哪些「工程知識」？
 
 | # | 變更 | 檔案 | 狀態 |
 |---|------|------|------|
-| 1 | Discovery checkpoint 加入 `analysis` 類型 | [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml:674) | ✅ 已新增 `analysis` discovery_target，搜尋 `analysis/README.md` |
+| 1 | Discovery checkpoint 加入 `analysis` 類型 | [`runtime/runtime.db`](../../runtime/runtime.db:674) | ✅ 已新增 `analysis` discovery_target，搜尋 `analysis/README.md` |
 | 2 | 路由索引加入 Web Scraping analysis | [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md:54) | ✅ 已新增「執行 Web Scraping 分析」路由 |
 | 3 | Analysis 入口加入 web/ | [`analysis/README.md`](../../analysis/README.md:12) | ✅ 已新增 `web/` 到「目前入口」列表 |
 | 4 | Failure pattern 記錄 | 本檔案 | ✅ 已記錄修復狀態 |

@@ -10,5 +10,5 @@
 | Do not use for | 不可取代 required dependency reading、source-of-truth validation、safety rules 或工具/供應商專屬設定文件。 |
 | Context cost | ~500 tokens |
 | Estimated full cost | ~1200 tokens |
-| Validation signal | `enforcement/prompt-cache-efficiency.md`、`metadata/schema.md`、`runtime/router/activation-rules.yaml` 與 routing registry 均指向同一 layout 規範。 |
+| Validation signal | `enforcement/prompt-cache-efficiency.md`、`metadata/schema.md`、`runtime/runtime.db` 與 routing registry 均指向同一 layout 規範。 |
 | Last checked | 2026-05-19 |

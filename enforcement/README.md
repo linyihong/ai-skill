@@ -64,7 +64,7 @@
 
 ### Lazy-load Rules（依條件 activate）
 
-以下規則**不預設載入**，只在符合 [`runtime/router/activation-rules.yaml`](../runtime/router/activation-rules.yaml) 定義的條件時才 activate：
+以下規則**不預設載入**，只在符合 [`runtime/runtime.db`](../runtime/runtime.db) 定義的條件時才 activate：
 
 | 規則 | 觸發條件範例 | 預估 tokens | 優先權 |
 | --- | --- | --- | --- |
@@ -91,7 +91,7 @@
 
 ```
 1. 讀取 CORE_BOOTSTRAP.md（3 條核心規則）
-2. 檢查 runtime/router/activation-rules.yaml：
+2. 檢查 runtime/runtime.db：
    - 目前 task 是否符合任何 rule 的 activation.when 條件？
    - 符合 → 載入該 rule 全文
    - 不符合 → deferred，不載入

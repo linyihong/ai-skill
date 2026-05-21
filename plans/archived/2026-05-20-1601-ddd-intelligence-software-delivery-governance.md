@@ -11,7 +11,7 @@
 | 欄位 | 內容 |
 | --- | --- |
 | Trigger | 使用者要求建立 DDD integration plan，並檢查是否與現有框架衝突。 |
-| Checked sources | `plans/README.md`、`plans/active/2026-05-20-1501-cognitive-state-evidence-governance.md`、`workflow/software-delivery/README.md`、`governance/ai-runtime-governance/software-delivery-governance.md`、`intelligence/engineering/architecture/README.md`、`intelligence/engineering/domain/README.md`、`runtime/intelligence/intelligence-routing.yaml`、`metadata/README.md`、`knowledge/graphs/intelligence-domain.yaml`。 |
+| Checked sources | `plans/README.md`、`plans/active/2026-05-20-1501-cognitive-state-evidence-governance.md`、`workflow/software-delivery/README.md`、`governance/ai-runtime-governance/software-delivery-governance.md`、`intelligence/engineering/architecture/README.md`、`intelligence/engineering/domain/README.md`、`runtime/runtime.db`、`metadata/README.md`、`knowledge/graphs/intelligence-domain.yaml`。 |
 | Conflicts | 原 proposal 的 `software-delivery/architecture/` root path 與現行架構不一致；應改為 `workflow/software-delivery/architecture/` 或 `governance/ai-runtime-governance/software-delivery-architecture-governance.md`。DDD tactical modeling 已有現行入口 `intelligence/engineering/domain/`，不宜全部放到 `intelligence/engineering/architecture/`。DDD 不應直接寫入 `runtime/compiler/embedded_data.rb` 或 `runtime.db`，除非後續明確 promotion 成 runtime-lite signal。 |
 | Decision | Proceed with revised plan. DDD 作為 selectable architecture strategy 納入 intelligence / workflow / governance / metadata / validation；不進 runtime primitive。 |
 | Validation | 本 plan 完成後需做 diff review、Markdown link check、ReadLints；若後續實作 metadata / routing / validation source，再跑 `ruby scripts/refresh-knowledge-runtime.rb`。 |
@@ -462,7 +462,7 @@ No blocking conflict found after boundary correction.
 
 Non-blocking issues to respect during implementation:
 
-- `runtime/intelligence/intelligence-routing.yaml` already has `route.intelligence.domain`; DDD expansion should extend or route through this rather than create a competing route without registry review.
+- `runtime/runtime.db` already has `route.intelligence.domain`; DDD expansion should extend or route through this rather than create a competing route without registry review.
 - `intelligence/engineering/domain/aggregate-boundary-heuristics.md` already exists; new DDD docs should reference it instead of duplicating aggregate boundary guidance.
 - `workflow/software-delivery/README.md` already has Simplicity First; DDD governance must reinforce, not weaken, this principle.
 - `governance/ai-runtime-governance/software-delivery-governance.md` already defines delivery runtime gates; architecture governance must not add mandatory DDD gates for low-risk delivery.

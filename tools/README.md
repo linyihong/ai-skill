@@ -32,7 +32,7 @@ tools/
 | 來源 | 關係 |
 |------|------|
 | [`route.tools.metadata-routing`](../knowledge/runtime/routing-registry.yaml) | Routing registry record，agent 依此找到 tools/ |
-| [`runtime/guards/circuit-breaker.yaml`](../runtime/guards/circuit-breaker.yaml) | 引用 tools/metadata/ 的 tool 成本資訊 |
+| [`runtime/runtime.db`](../runtime/runtime.db) | 引用 tools/metadata/ 的 tool 成本資訊 |
 | [`ai-tools/`](../ai-tools/README.md) | 工具配置依賴 tools/metadata/ 的 schema |
 | [`models/compression/`](../models/compression/README.md) | Model-aware compression 策略參考 tools/compression/ |
 

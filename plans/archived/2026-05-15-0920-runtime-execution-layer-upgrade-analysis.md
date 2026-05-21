@@ -22,7 +22,7 @@
 | Workflow / runtime boundary | Superseded by later decisions | `workflow/workflow-routing.md`, ADR-006 registry-first workflow activation, and current routing registry. |
 | Agent VM | Deferred | Still a long-term direction; current closure focuses on execution reliability, not VM abstraction. |
 
-本檔保留為 historical analysis。若未來要恢復 standalone YAML source 或 Agent VM，應建立新的 active plan，並以 current `runtime/README.md` 的 embedded-source boundary 為 preflight 起點。
+本檔保留為 historical analysis。若未來要恢復 standalone SQLite canonical document 或 Agent VM，應建立新的 active plan，並以 current `runtime/README.md` 的 embedded-source boundary 為 preflight 起點。
 
 ---
 
@@ -50,12 +50,12 @@ Close-loop (ai-skill-close-loop.sh → commit/push/readback)
 
 | 元件 | 位置 | 成熟度 |
 |------|------|--------|
-| Session Lifecycle | [`runtime/pipeline/session-lifecycle.yaml`](../../runtime/pipeline/session-lifecycle.yaml) | candidate — 4 stages defined |
-| Guard Chain | [`runtime/pipeline/guard-chain.yaml`](../../runtime/pipeline/guard-chain.yaml) | candidate — 11 guards, 3 severity levels |
-| Token Budget | [`runtime/budget/token-budget.yaml`](../../runtime/budget/token-budget.yaml) | candidate — per-model, per-layer |
-| Context Health | [`runtime/health/context-health-score.yaml`](../../runtime/health/context-health-score.yaml) | candidate — 4 dimensions |
-| Circuit Breaker | [`runtime/guards/circuit-breaker.yaml`](../../runtime/guards/circuit-breaker.yaml) | candidate — 5 guards |
-| Context Pollution | [`runtime/guards/context-pollution.yaml`](../../runtime/guards/context-pollution.yaml) | candidate — 5 signals |
+| Session Lifecycle | [`runtime/runtime.db`](../../runtime/runtime.db) | candidate — 4 stages defined |
+| Guard Chain | [`runtime/runtime.db`](../../runtime/runtime.db) | candidate — 11 guards, 3 severity levels |
+| Token Budget | [`runtime/runtime.db`](../../runtime/runtime.db) | candidate — per-model, per-layer |
+| Context Health | [`runtime/runtime.db`](../../runtime/runtime.db) | candidate — 4 dimensions |
+| Circuit Breaker | [`runtime/runtime.db`](../../runtime/runtime.db) | candidate — 5 guards |
+| Context Pollution | [`runtime/runtime.db`](../../runtime/runtime.db) | candidate — 5 signals |
 | Activation Engine | [`runtime/router/activation-engine.rb`](../../runtime/router/activation-engine.rb) | validated — programmatic rule activation |
 | Routing Registry | [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) | validated — machine-readable routing |
 | Close-loop Script | [`scripts/ai-skill-close-loop.sh`](../../scripts/ai-skill-close-loop.sh) | validated — lock, group, commit, push |
@@ -161,8 +161,8 @@ Close-loop (ai-skill-close-loop.sh → commit/push/readback)
 | Feedback loop | `feedback/pipeline/` + `enforcement/failure-learning-system.md` |
 | Promotion | `feedback/pipeline/promotion-engine.yaml` |
 | Reusable knowledge | `intelligence/` + `enforcement/reusable-guidance-boundary.md` |
-| Token minimization | `runtime/budget/token-budget.yaml` + `tools/compression/` |
-| Dynamic loading | `runtime/router/activation-rules.yaml` + `knowledge/summaries/` |
+| Token minimization | `runtime/runtime.db` + `tools/compression/` |
+| Dynamic loading | `runtime/runtime.db` + `knowledge/summaries/` |
 | Tool adapters | `ai-tools/` + `enforcement/tool-neutral-documentation.md` |
 | Close-loop | `scripts/ai-skill-close-loop.sh` + `enforcement/dependency-reading.md` |
 
@@ -399,12 +399,12 @@ Phase 8: Agent VM           ← 遠期目標
 
 | 類型 | 說明 | YAML 目標 |
 |------|------|-----------|
-| **A — Phase Machine** | 執行階段定義（current_phase、allowed_actions、forbidden_actions） | `runtime/phases/phase-machine.yaml` |
+| **A — Phase Machine** | 執行階段定義（current_phase、allowed_actions、forbidden_actions） | `runtime/runtime.db` |
 | **B — Transition Rules** | 階段轉換條件與觸發規則 | `runtime/phases/phase-transitions.yaml` |
 | **C — Obligation Templates** | 各 phase 的 obligation 模板（commit/push/readback 狀態） | `runtime/obligations/obligation-templates.yaml` |
-| **D — Gate Definitions** | Blocking gates 定義與解析策略 | `runtime/gates/blocking-gates.yaml` |
-| **E — Transaction State Machine** | 交易狀態機（commit_done/push_done/readback_done） | `runtime/transactions/transaction-machine.yaml` |
-| **F — Intelligence Routing** | required_intelligence 清單與 routing 規則 | `runtime/intelligence/intelligence-routing.yaml` |
+| **D — Gate Definitions** | Blocking gates 定義與解析策略 | `runtime/runtime.db` |
+| **E — Transaction State Machine** | 交易狀態機（commit_done/push_done/readback_done） | `runtime/runtime.db` |
+| **F — Intelligence Routing** | required_intelligence 清單與 routing 規則 | `runtime/runtime.db` |
 | **G — Keep as prose** | 保留為 prose（參考/摘要/說明用途），不轉換 | 維持 markdown |
 
 ### 9.2 Workflow 層轉換盤點
@@ -571,14 +571,14 @@ Phase 8: Agent VM           ← 遠期目標
 | 控制流程類型 | roo.md (394行) | cursor.md (207行) | claude.md (182行) | 應遷移至 |
 |-------------|---------------|------------------|------------------|---------|
 | **Core Bootstrap 啟動流程** | ✅ 嵌入 customInstructions | ✅ 嵌入 .cursor/rules/*.mdc | ✅ 嵌入 CLAUDE.md | `runtime/bootstrap/` |
-| **Goal Ledger 操作** | ✅ 7 步驟操作流程（行 296-323） | ✅ 7 步驟操作流程（行 118-144） | ✅ 7 步驟操作流程（行 61-87） | `runtime/obligations/obligation-ledger.yaml` |
-| **知識更新流程 Checkpoint** | ✅ 完整 11 步驟（行 333-351） | ✅ 完整 11 步驟（行 155-172） | ✅ 完整 11 步驟（行 97-115） | `runtime/phases/phase-machine.yaml` |
+| **Goal Ledger 操作** | ✅ 7 步驟操作流程（行 296-323） | ✅ 7 步驟操作流程（行 118-144） | ✅ 7 步驟操作流程（行 61-87） | `runtime/runtime.db` |
+| **知識更新流程 Checkpoint** | ✅ 完整 11 步驟（行 333-351） | ✅ 完整 11 步驟（行 155-172） | ✅ 完整 11 步驟（行 97-115） | `runtime/runtime.db` |
 | **語言偏好設定** | ✅ 雙層設定策略（行 234-281） | ✅ 全域/專案策略（行 60-93） | ✅ CLAUDE.md 策略（行 136-170） | `runtime/config/language-preference.yaml` |
 | **Modes 設定** | ✅ 完整 modes 定義（行 161-233） | N/A | N/A | `runtime/config/modes-config.yaml` |
 | **SQLite 全域狀態修改** | ✅ 完整操作流程（行 46-128） | N/A | N/A | `runtime/config/vscode-global-state.yaml` |
 | **Hooks 機制** | N/A | ✅ hooks.json 範本（行 174-207） | N/A | `runtime/hooks/` |
 | **Tool Adapter 機制** | N/A | N/A | ✅ skill-specific adapter（行 126-135） | `runtime/adapters/` |
-| **驗證流程** | N/A | N/A | ✅ 驗證要求（行 172-181） | `runtime/gates/blocking-gates.yaml` |
+| **驗證流程** | N/A | N/A | ✅ 驗證要求（行 172-181） | `runtime/runtime.db` |
 
 #### 10.1.2 重複的控制流程（3 份拷貝）
 
@@ -696,17 +696,17 @@ runtime/bootstrap/
 
 | 步驟 | 內容 | 受影響檔案 |
 |------|------|-----------|
-| 2.1 | 從 `roo.md` 移除 goal ledger 7 步驟操作流程，改為指向 `runtime/obligations/obligation-ledger.yaml` | `ai-tools/agent/roo.md` |
-| 2.2 | 從 `roo.md` 移除知識更新流程 11 步驟，改為指向 `runtime/phases/phase-machine.yaml` | `ai-tools/agent/roo.md` |
+| 2.1 | 從 `roo.md` 移除 goal ledger 7 步驟操作流程，改為指向 `runtime/runtime.db` | `ai-tools/agent/roo.md` |
+| 2.2 | 從 `roo.md` 移除知識更新流程 11 步驟，改為指向 `runtime/runtime.db` | `ai-tools/agent/roo.md` |
 | 2.3 | 從 `roo.md` 移除語言偏好設定策略全文，改為指向 `runtime/config/language-preference.yaml` | `ai-tools/agent/roo.md` |
-| 2.4 | 從 `cursor.md` 移除 goal ledger 7 步驟操作流程，改為指向 `runtime/obligations/obligation-ledger.yaml` | `ai-tools/agent/cursor.md` |
-| 2.5 | 從 `cursor.md` 移除知識更新流程 11 步驟，改為指向 `runtime/phases/phase-machine.yaml` | `ai-tools/agent/cursor.md` |
+| 2.4 | 從 `cursor.md` 移除 goal ledger 7 步驟操作流程，改為指向 `runtime/runtime.db` | `ai-tools/agent/cursor.md` |
+| 2.5 | 從 `cursor.md` 移除知識更新流程 11 步驟，改為指向 `runtime/runtime.db` | `ai-tools/agent/cursor.md` |
 | 2.6 | 從 `cursor.md` 移除語言偏好設定策略全文，改為指向 `runtime/config/language-preference.yaml` | `ai-tools/agent/cursor.md` |
 | 2.7 | 從 `cursor.md` 移除 hooks 範本，改為指向 `runtime/hooks/hook-specs.yaml` | `ai-tools/agent/cursor.md` |
-| 2.8 | 從 `claude.md` 移除 goal ledger 7 步驟操作流程，改為指向 `runtime/obligations/obligation-ledger.yaml` | `ai-tools/agent/claude.md` |
-| 2.9 | 從 `claude.md` 移除知識更新流程 11 步驟，改為指向 `runtime/phases/phase-machine.yaml` | `ai-tools/agent/claude.md` |
+| 2.8 | 從 `claude.md` 移除 goal ledger 7 步驟操作流程，改為指向 `runtime/runtime.db` | `ai-tools/agent/claude.md` |
+| 2.9 | 從 `claude.md` 移除知識更新流程 11 步驟，改為指向 `runtime/runtime.db` | `ai-tools/agent/claude.md` |
 | 2.10 | 從 `claude.md` 移除語言偏好設定策略全文，改為指向 `runtime/config/language-preference.yaml` | `ai-tools/agent/claude.md` |
-| 2.11 | 從 `claude.md` 移除驗證流程，改為指向 `runtime/gates/blocking-gates.yaml` | `ai-tools/agent/claude.md` |
+| 2.11 | 從 `claude.md` 移除驗證流程，改為指向 `runtime/runtime.db` | `ai-tools/agent/claude.md` |
 
 #### Phase 3：更新入口檔（P1）
 
@@ -781,13 +781,13 @@ runtime/adapters/tool-adapter-spec.yaml
 runtime/bootstrap/bootstrap-flow.yaml
   └── 啟動流程定義
 
-runtime/obligations/obligation-ledger.yaml
+runtime/runtime.db
   └── Goal ledger 操作流程（所有工具共用）
 
-runtime/phases/phase-machine.yaml
+runtime/runtime.db
   └── 知識更新流程（所有工具共用）
 
-runtime/gates/blocking-gates.yaml
+runtime/runtime.db
   └── 驗證流程（所有工具共用）
 ```
 
@@ -1293,10 +1293,10 @@ execution stack
 
 | 檔案 | 用途 |
 |------|------|
-| `runtime/recovery/recovery-strategies.yaml` | 定義各種 state inconsistency 的修復策略 |
-| `runtime/recovery/state-repair.yaml` | state 不一致時的修復流程 |
-| `runtime/recovery/obligation-rebuild.yaml` | obligation 遺失或過期時的重建流程 |
-| `runtime/recovery/phase-reconciliation.yaml` | phase 不一致時的調解流程 |
+| `runtime/runtime.db` | 定義各種 state inconsistency 的修復策略 |
+| `runtime/runtime.db` | state 不一致時的修復流程 |
+| `runtime/runtime.db` | obligation 遺失或過期時的重建流程 |
+| `runtime/runtime.db` | phase 不一致時的調解流程 |
 
 #### 對計畫的影響
 
@@ -1368,7 +1368,7 @@ execution stack
 新增 `runtime/scheduler/` 目錄：
 
 ```yaml
-# runtime/scheduler/priority-scheduler.yaml（待建立）
+# runtime/runtime.db（待建立）
 execution_queue:
   - id: task-001
     priority: P0
@@ -1384,8 +1384,8 @@ execution_queue:
 
 | 元件 | 用途 |
 |------|------|
-| `runtime/scheduler/priority-scheduler.yaml` | 定義 priority、deadline、blocking_dependencies |
-| `runtime/scheduler/execution-queue.yaml` | 管理待執行的 task queue |
+| `runtime/runtime.db` | 定義 priority、deadline、blocking_dependencies |
+| `runtime/runtime.db` | 管理待執行的 task queue |
 
 #### 對計畫的影響
 
@@ -1512,10 +1512,10 @@ runtime/output-governance/
 
 | 元件 | 關係 |
 |------|------|
-| `runtime/phases/phase-machine.yaml` | Output governance gates 應掛在 `validation` 與 `finalize` phase |
-| `runtime/gates/blocking-gates.yaml` | Governance gates 為 blocking gates 的子集 |
-| `runtime/compiler/compiler-rules.yaml` | Compiler 在編譯時應檢查 output rules |
-| `runtime/intelligence/intelligence-routing.yaml` | Intelligence 知識的輸出也受 governance 規範 |
+| `runtime/runtime.db` | Output governance gates 應掛在 `validation` 與 `finalize` phase |
+| `runtime/runtime.db` | Governance gates 為 blocking gates 的子集 |
+| `runtime/runtime.db` | Compiler 在編譯時應檢查 output rules |
+| `runtime/runtime.db` | Intelligence 知識的輸出也受 governance 規範 |
 | `enforcement/neutral-language.md` | 語言規則的 prose source，governance YAML 為 compiled version |
 | `enforcement/sanitization.md` | 去敏規則的 prose source |
 | `enforcement/tool-neutral-documentation.md` | 工具中立性規則的 prose source |
@@ -1526,7 +1526,7 @@ runtime/output-governance/
 | Phase | 內容 | 依賴 |
 |-------|------|------|
 | P2.5 | `runtime/output-governance/README.md` + `language-policy.yaml` | 無 |
-| P2.5 | `runtime/output-governance/output-rules.yaml` | 無 |
-| P2.5 | `runtime/output-governance/governance-gates.yaml` | `runtime/gates/blocking-gates.yaml` |
-| P3 | Compiler 整合 output governance check | `runtime/compiler/compiler-rules.yaml` |
-| P3 | Validation phase 自動檢查 output governance | `runtime/phases/phase-machine.yaml` |
+| P2.5 | `runtime/runtime.db` | 無 |
+| P2.5 | `runtime/runtime.db` | `runtime/runtime.db` |
+| P3 | Compiler 整合 output governance check | `runtime/runtime.db` |
+| P3 | Validation phase 自動檢查 output governance | `runtime/runtime.db` |

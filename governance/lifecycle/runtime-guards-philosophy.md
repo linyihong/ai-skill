@@ -12,7 +12,7 @@
 ## 與既有文件的關係
 
 - [`runtime/guards/`](../../runtime/guards/) — Runtime navigation entry point (data files: `circuit-breaker.yaml`, `context-pollution.yaml`)
-- [`runtime/guards/circuit-breaker.yaml`](../../runtime/guards/circuit-breaker.yaml) — Circuit breaker definitions
-- [`runtime/guards/context-pollution.yaml`](../../runtime/guards/context-pollution.yaml) — Context pollution detection
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Circuit breaker definitions
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Context pollution detection
 - [`anti-patterns/`](../../anti-patterns/) — Runtime anti-patterns 的症狀與預防方式
 - [`enforcement/failure-patterns/`](../../enforcement/failure-patterns/) — Agent 常犯的錯誤模式

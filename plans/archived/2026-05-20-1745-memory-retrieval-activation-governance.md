@@ -335,7 +335,7 @@ Candidate linked updates：
 - `knowledge/runtime/routing-registry.yaml`：新增 memory retrieval governance route 或擴充 `memory.operations` candidate。
 - `knowledge/summaries/memory-operations.md`：更新 summary，加入 retrieval / activation / replay economics。
 - `knowledge/graphs/`：建立 memory operations graph 或補強既有 graph。
-- `runtime/router/activation-rules.yaml`：只有在 memory governance 成為 lazy-load rule 時才更新。
+- `runtime/runtime.db`：只有在 memory governance 成為 lazy-load rule 時才更新。
 - `runtime/README.md`：必要時補一句 runtime 不保存 historical replay。
 
 Runtime boundary：

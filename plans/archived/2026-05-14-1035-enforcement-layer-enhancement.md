@@ -3,7 +3,7 @@
 Status: `completed`
 Created: 2026-05-14
 Depends on: [`shared-rules-to-enforcement-migration.md`](shared-rules-to-enforcement-migration.md)（搬遷完成後才能開始）
-Related: [`metadata/schema.md`](../../metadata/schema.md), [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml), [`enforcement/rule-weight.md`](../../enforcement/rule-weight.md), [`governance/lifecycle/README.md`](../../governance/lifecycle/README.md)
+Related: [`metadata/schema.md`](../../metadata/schema.md), [`runtime/runtime.db`](../../runtime/runtime.db), [`enforcement/rule-weight.md`](../../enforcement/rule-weight.md), [`governance/lifecycle/README.md`](../../governance/lifecycle/README.md)
 
 ---
 
@@ -93,13 +93,13 @@ Related: [`metadata/schema.md`](../../metadata/schema.md), [`runtime/router/acti
 
 ### 目標
 
-讓 `runtime/router/activation-rules.yaml` 從「人工參考文件」變成「可被 runtime 實際使用的 activation engine」。
+讓 `runtime/runtime.db` 從「人工參考文件」變成「可被 runtime 實際使用的 activation engine」。
 
 ### 現狀對照
 
 | 現有資產 | 缺口 |
 |---------|------|
-| `runtime/router/activation-rules.yaml` 已完成 14 條規則的結構化定義 | 未被任何 engine 讀取 |
+| `runtime/runtime.db` 已完成 14 條規則的結構化定義 | 未被任何 engine 讀取 |
 | 每條 rule 有 `activation.when` 條件 | activation 條件是人工比對 |
 | 有 `load.strategy`、`load.priority`、`load.estimated_tokens` | 無程式化的 activation 判斷邏輯 |
 
@@ -211,7 +211,7 @@ Phase 0: enforcement/ → enforcement/ 搬遷完成（必要前置條件）
 
 - [`shared-rules-to-enforcement-migration.md`](shared-rules-to-enforcement-migration.md) — 本計畫的前置條件
 - [`metadata/schema.md`](../../metadata/schema.md) — 方向 A 的基礎 schema
-- [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — 方向 C 的基礎資料
+- [`runtime/runtime.db`](../../runtime/runtime.db) — 方向 C 的基礎資料
 - [`enforcement/rule-weight.md`](../../enforcement/rule-weight.md) — 方向 D 的基礎規則
 - [`governance/lifecycle/README.md`](../../governance/lifecycle/README.md) — 方向 E 的基礎 lifecycle
 - [`enforcement/linked-updates.md`](../../enforcement/linked-updates.md) — 方向 B 的 source of truth

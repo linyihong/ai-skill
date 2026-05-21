@@ -132,7 +132,7 @@ func TestRuntimeCompileDryRunPlansCompiler(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "compile", "--repo", repo, "--dry-run", "--assert-source", "runtime/phases/phase-machine.yaml", "--assert-keyword", "phase", "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "compile", "--repo", repo, "--dry-run", "--assert-source", "runtime/runtime.db", "--assert-keyword", "phase", "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
 	}
@@ -200,7 +200,7 @@ func TestRuntimeQueryReturnsRankedResults(t *testing.T) {
 	if len(result.Results) != 1 {
 		t.Fatalf("expected one result, got %#v", result.Results)
 	}
-	if result.Results[0].ID != "phase-machine" || result.Results[0].SourcePath != "runtime/phases/phase-machine.yaml" {
+	if result.Results[0].ID != "phase-machine" || result.Results[0].SourcePath != "runtime/runtime.db" {
 		t.Fatalf("unexpected top result: %#v", result.Results[0])
 	}
 	if len(result.Mutations) != 0 {
@@ -420,34 +420,40 @@ func TestNativeRuntimeCompilerBuildsFromSources(t *testing.T) {
 	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM runtime_budget WHERE model_name = 'layer:bootstrap'", "nonzero")
 	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM runtime_budget WHERE model_name LIKE 'on_warning:%'", "nonzero")
 	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM runtime_budget WHERE model_name LIKE 'on_hard_stop:%'", "nonzero")
-	assertAllRuntimeYAMLInSourceManifest(t, repo, nativeDB)
+	assertRuntimeCanonicalDocumentsProjected(t, nativeDB)
 	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM compiler_metadata WHERE value = '2.0.0'", "nonzero")
 }
 
-func TestRuntimeValidateParsesAllRuntimeYAML(t *testing.T) {
+func TestRuntimeValidateChecksCanonicalRuntimeDocuments(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
-	writeFile(t, filepath.Join(repo, "runtime", "decisions", "broken.yaml"), "broken: [\n")
+	db, err := sql.Open("sqlite", filepath.Join(repo, "runtime", "runtime.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := db.Exec("UPDATE runtime_config_documents SET content_json = 'not-json' WHERE logical_id = 'runtime-doc-0'"); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Close(); err != nil {
+		t.Fatal(err)
+	}
 
 	result := buildRuntimeValidateResult(runtimeOptions{repoPath: repo})
 	if result.ExitCode != ExitValidationFailed {
-		t.Fatalf("expected runtime YAML syntax failure, got %#v", result)
+		t.Fatalf("expected canonical runtime document failure, got %#v", result)
 	}
-	if result.Error == nil || result.Error.Code != "runtime_yaml_syntax_failed" {
-		t.Fatalf("expected runtime_yaml_syntax_failed, got %#v", result.Error)
-	}
-	if !strings.Contains(result.Error.Message, "runtime/decisions/broken.yaml") {
-		t.Fatalf("expected failing YAML path in error, got %#v", result.Error)
+	if result.Error == nil || result.Error.Code != "runtime_db_native_failed" {
+		t.Fatalf("expected runtime_db_native_failed, got %#v", result.Error)
 	}
 }
 
-func TestRuntimeCompilerSourceManifestCoversAllRuntimeYAML(t *testing.T) {
+func TestRuntimeCompilerCanonicalDocumentsAreProjected(t *testing.T) {
 	repo := repoRootForTest(t)
 	nativeDB := filepath.Join(t.TempDir(), "runtime-native.db")
 	check := buildNativeRuntimeDBFromSources(repo, nativeDB)
 	if check.Status != "ok" {
 		t.Fatalf("native compiler failed: %#v", check)
 	}
-	assertAllRuntimeYAMLInSourceManifest(t, repo, nativeDB)
+	assertRuntimeCanonicalDocumentsProjected(t, nativeDB)
 }
 
 func TestNativeRuntimeSQLiteIndexHasStableInvariants(t *testing.T) {
@@ -613,7 +619,7 @@ func TestNativeRuntimeIndexValidationBlocksStaleChecksum(t *testing.T) {
 	repo := t.TempDir()
 	path := filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
 	createRuntimeIndexFixture(t, path)
-	writeFile(t, filepath.Join(repo, "runtime", "phases", "phase-machine.yaml"), "changed\n")
+	writeFile(t, filepath.Join(repo, "runtime", "runtime.db"), "changed\n")
 
 	check := nativeRuntimeIndexValidation(repo, path)
 	if check.Status != "failed" || !strings.Contains(check.Message, "stale checksum") {
@@ -750,6 +756,12 @@ func nativeRuntimeCreateTableSQL(table string) string {
 	if table == "compiler_metadata" {
 		return "CREATE TABLE compiler_metadata (key TEXT PRIMARY KEY, value TEXT)"
 	}
+	if table == "runtime_config_documents" {
+		return "CREATE TABLE runtime_config_documents (logical_id TEXT PRIMARY KEY, content_json TEXT NOT NULL, checksum TEXT NOT NULL)"
+	}
+	if table == "runtime_config_projections" {
+		return "CREATE TABLE runtime_config_projections (id TEXT PRIMARY KEY, logical_id TEXT, target_table TEXT, row_key TEXT, checksum TEXT)"
+	}
 	columns := []string{"id TEXT PRIMARY KEY"}
 	for _, column := range nativeRuntimeJSONColumns[table] {
 		columns = append(columns, column+" TEXT")
@@ -760,6 +772,12 @@ func nativeRuntimeCreateTableSQL(table string) string {
 func nativeRuntimeInsertSQL(table string, index int) string {
 	if table == "compiler_metadata" {
 		return fmt.Sprintf("INSERT OR REPLACE INTO compiler_metadata (key, value) VALUES ('key-%d', 'value-%d')", index, index)
+	}
+	if table == "runtime_config_documents" {
+		return fmt.Sprintf("INSERT INTO runtime_config_documents (logical_id, content_json, checksum) VALUES ('runtime-doc-%d', '{}', 'checksum-%d')", index, index)
+	}
+	if table == "runtime_config_projections" {
+		return fmt.Sprintf("INSERT INTO runtime_config_projections (id, logical_id, target_table, row_key, checksum) VALUES ('projection-%d', 'runtime-doc-%d', 'runtime_table', '__config__', 'checksum-%d')", index, index, index)
 	}
 	columns := []string{"id"}
 	values := []string{fmt.Sprintf("'%s-%d'", table, index)}
@@ -787,9 +805,12 @@ func copyFile(t *testing.T, source string, target string) {
 func createRuntimeIndexFixture(t *testing.T, path string) {
 	t.Helper()
 	repo := filepath.Dir(filepath.Dir(filepath.Dir(filepath.Dir(path))))
-	phaseSource := "phase machine runtime source feedback route\n"
 	workflowSource := "phase workflow guide route feedback\n"
-	writeFile(t, filepath.Join(repo, "runtime", "phases", "phase-machine.yaml"), phaseSource)
+	if _, err := os.Stat(filepath.Join(repo, "runtime", "runtime.db")); os.IsNotExist(err) {
+		writeFile(t, filepath.Join(repo, "runtime", "runtime.db"), "runtime db fixture\n")
+	} else if err != nil {
+		t.Fatal(err)
+	}
 	writeFile(t, filepath.Join(repo, "workflow", "software-delivery", "execution-flow.md"), workflowSource)
 
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
@@ -823,23 +844,32 @@ CREATE TABLE edges (
 );
 CREATE VIRTUAL TABLE fts USING fts5(id UNINDEXED, content);
 INSERT INTO atoms VALUES
-  ('phase-machine', 'runtime/phases/phase-machine.yaml', 'runtime', 'reference', 'validated', 'P0', 'high', 'low', 'Phase machine runtime source.'),
+  ('phase-machine', 'runtime/runtime.db', 'runtime', 'reference', 'validated', 'P0', 'high', 'low', 'Phase machine runtime source.'),
   ('workflow-phase-guide', 'workflow/software-delivery/execution-flow.md', 'workflow', 'guide', 'candidate', 'P2', 'medium', 'medium', 'Workflow phase guide.');
 INSERT INTO sources VALUES
-  ('runtime/phases/phase-machine.yaml', ?),
+  ('runtime/runtime.db', ?),
   ('workflow/software-delivery/execution-flow.md', ?);
 INSERT INTO edges VALUES
   ('phase-machine', 'workflow-phase-guide', 'relates_to');
 INSERT INTO fts VALUES
   ('phase-machine', 'phase phase phase machine runtime source feedback route'),
   ('workflow-phase-guide', 'phase workflow guide feedback route');
-`, testChecksum(phaseSource), testChecksum(workflowSource)); err != nil {
+`, testChecksumFile(t, filepath.Join(repo, "runtime", "runtime.db")), testChecksum(workflowSource)); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func testChecksum(content string) string {
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(content)))
+}
+
+func testChecksumFile(t *testing.T, path string) string {
+	t.Helper()
+	content, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return fmt.Sprintf("%x", sha256.Sum256(content))
 }
 
 func createKnowledgeGraphFixture(t *testing.T, repo string) {
@@ -893,45 +923,33 @@ func ensureRuntimeIndexForRepoTest(t *testing.T, repo string) {
 	})
 }
 
-func assertAllRuntimeYAMLInSourceManifest(t *testing.T, repo string, dbPath string) {
+func assertRuntimeCanonicalDocumentsProjected(t *testing.T, dbPath string) {
 	t.Helper()
-	paths := []string{}
-	err := filepath.WalkDir(filepath.Join(repo, "runtime"), func(path string, entry os.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		if entry.IsDir() || filepath.Ext(path) != ".yaml" {
-			return nil
-		}
-		rel, err := filepath.Rel(repo, path)
-		if err != nil {
-			return err
-		}
-		paths = append(paths, filepath.ToSlash(rel))
-		return nil
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	sort.Strings(paths)
-
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer db.Close()
 	missing := []string{}
-	for _, rel := range paths {
-		var count int
-		if err := db.QueryRow("SELECT COUNT(*) FROM runtime_source_files WHERE source_path = ?", rel).Scan(&count); err != nil {
+	for _, rel := range runtimeCanonicalDocumentPaths() {
+		var docCount int
+		if err := db.QueryRow("SELECT COUNT(*) FROM runtime_config_documents WHERE logical_id = ?", rel).Scan(&docCount); err != nil {
 			t.Fatal(err)
 		}
-		if count == 0 {
+		var projectionCount int
+		if err := db.QueryRow("SELECT COUNT(*) FROM runtime_config_projections WHERE logical_id = ?", rel).Scan(&projectionCount); err != nil {
+			t.Fatal(err)
+		}
+		var sourceCount int
+		if err := db.QueryRow("SELECT COUNT(*) FROM runtime_source_files WHERE source_path = ? AND source_kind = 'db'", rel).Scan(&sourceCount); err != nil {
+			t.Fatal(err)
+		}
+		if docCount == 0 || projectionCount == 0 || sourceCount == 0 {
 			missing = append(missing, rel)
 		}
 	}
 	if len(missing) > 0 {
-		t.Fatalf("runtime_source_files missing YAML sources: %s", strings.Join(missing, ", "))
+		t.Fatalf("runtime canonical documents missing projections: %s", strings.Join(missing, ", "))
 	}
 }
 

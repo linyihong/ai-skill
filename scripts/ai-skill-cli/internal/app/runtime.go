@@ -211,7 +211,7 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 	}
 
 	result.PlannedActions = append(result.PlannedActions, "run native runtime DB validation")
-	result.PlannedActions = append(result.PlannedActions, "parse all runtime YAML sources")
+	result.PlannedActions = append(result.PlannedActions, "validate SQLite canonical runtime documents")
 	result.PlannedActions = append(result.PlannedActions, "run native runtime SQLite index validation")
 	result.PlannedActions = append(result.PlannedActions, "run native knowledge runtime validation")
 
@@ -220,21 +220,12 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 		return result
 	}
 
-	yamlSyntaxCheck := runtimeYAMLSyntaxValidation(repo)
-	result.Checks = append(result.Checks, yamlSyntaxCheck)
-	if yamlSyntaxCheck.Status != "ok" {
-		result.Status = "blocked"
-		result.ExitCode = ExitValidationFailed
-		result.Error = &CommandError{Code: "runtime_yaml_syntax_failed", Message: yamlSyntaxCheck.Message, Remediation: "Fix runtime/**/*.yaml syntax before compiling runtime.db."}
-		return result
-	}
-
 	nativeDBCheck := nativeRuntimeDBValidation(filepath.Join(repo, "runtime", "runtime.db"))
 	result.Checks = append(result.Checks, nativeDBCheck)
 	if nativeDBCheck.Status != "ok" {
 		result.Status = "blocked"
 		result.ExitCode = ExitValidationFailed
-		result.Error = &CommandError{Code: "runtime_db_native_failed", Message: nativeDBCheck.Message, Remediation: "Fix runtime source files or run runtime compile."}
+		result.Error = &CommandError{Code: "runtime_db_native_failed", Message: nativeDBCheck.Message, Remediation: "Fix runtime/runtime.db canonical documents or run runtime compile."}
 		return result
 	}
 
@@ -363,7 +354,7 @@ func buildRuntimeCompileResult(opts runtimeOptions) Result {
 	}
 
 	outputDB := runtimeCompileDBPath(repo, opts.dbPath)
-	result.PlannedActions = append(result.PlannedActions, "compile runtime YAML and prose sources to runtime.db: "+outputDB)
+	result.PlannedActions = append(result.PlannedActions, "refresh SQLite canonical runtime documents and deterministic prose surfaces to runtime.db: "+outputDB)
 	if opts.dryRun {
 		result.PlannedActions = append(result.PlannedActions, "validate Go-native compiler output: "+outputDB)
 	}
@@ -380,7 +371,7 @@ func buildRuntimeCompileResult(opts runtimeOptions) Result {
 	if check.Status != "ok" {
 		result.Status = "blocked"
 		result.ExitCode = ExitValidationFailed
-		result.Error = &CommandError{Code: "runtime_compile_failed", Message: check.Message, Remediation: "Inspect runtime source YAML/prose and fix the compiler input."}
+		result.Error = &CommandError{Code: "runtime_compile_failed", Message: check.Message, Remediation: "Inspect runtime/runtime.db canonical documents and deterministic prose compiler input."}
 		return result
 	}
 	result.Mutations = append(result.Mutations, outputDB)
@@ -1201,7 +1192,8 @@ var nativeRuntimeRequiredTables = []string{
 	"transaction_states", "transaction_transitions", "transaction_rules", "transaction_templates",
 	"activation_rules", "core_bootstrap_rules",
 	"discovery_checkpoints", "discovery_search_strategy",
-	"decision_recording", "runtime_source_files", "generated_surfaces", "compiler_metadata",
+	"decision_recording", "runtime_config_documents", "runtime_config_projections",
+	"runtime_source_files", "generated_surfaces", "compiler_metadata",
 	"runtime_budget", "context_ttl_policy", "circuit_breaker", "context_pollution",
 	"context_health_score", "intelligence_routing", "obligation_ledger",
 	"language_policy", "output_rules", "governance_gates", "blocking_gates",
@@ -1217,7 +1209,8 @@ var nativeRuntimeRequiredTables = []string{
 var nativeRuntimeMinimumRows = map[string]int{
 	"phases": 8, "obligations": 15, "gates": 15, "activation_rules": 10,
 	"core_bootstrap_rules": 2, "discovery_checkpoints": 3, "compiler_metadata": 2,
-	"decision_recording": 1, "runtime_source_files": 30, "runtime_budget": 1, "context_ttl_policy": 1, "circuit_breaker": 1,
+	"decision_recording": 1, "runtime_config_documents": 30, "runtime_config_projections": 30,
+	"runtime_source_files": 30, "runtime_budget": 1, "context_ttl_policy": 1, "circuit_breaker": 1,
 	"context_pollution": 1, "context_health_score": 1, "intelligence_routing": 1,
 	"obligation_ledger": 1, "language_policy": 1, "output_rules": 1,
 	"governance_gates": 1, "blocking_gates": 1, "phase_machine": 1,
@@ -1265,6 +1258,9 @@ func nativeRuntimeDBValidation(path string) Check {
 	if err := nativeJSONColumnsCheck(db); err != nil {
 		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
 	}
+	if err := nativeRuntimeConfigDocumentsCheck(db); err != nil {
+		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
+	}
 	warning, err := nativeCompilerMetadataCheck(db)
 	if err != nil {
 		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
@@ -1274,6 +1270,34 @@ func nativeRuntimeDBValidation(path string) Check {
 		message += "; warning: " + warning
 	}
 	return Check{Name: "runtime_db_native", Status: "ok", Message: message}
+}
+
+func nativeRuntimeConfigDocumentsCheck(db *sql.DB) error {
+	rows, err := db.Query(`SELECT logical_id, content_json FROM runtime_config_documents ORDER BY logical_id`)
+	if err != nil {
+		return fmt.Errorf("runtime_config_documents lookup failed: %w", err)
+	}
+	defer rows.Close()
+	count := 0
+	for rows.Next() {
+		var logicalID string
+		var content string
+		if err := rows.Scan(&logicalID, &content); err != nil {
+			return err
+		}
+		var parsed any
+		if err := json.Unmarshal([]byte(content), &parsed); err != nil {
+			return fmt.Errorf("runtime_config_documents invalid JSON for %s: %w", logicalID, err)
+		}
+		count++
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if count < 30 {
+		return fmt.Errorf("runtime_config_documents row count %d below minimum 30", count)
+	}
+	return nil
 }
 
 func runtimeYAMLSyntaxValidation(repo string) Check {

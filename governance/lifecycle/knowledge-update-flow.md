@@ -85,7 +85,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 > 1. 本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？
 > 2. 本輪是否涉及新增或改名目錄？→ 若是，先執行 [`directory-structure-governance.md`](directory-structure-governance.md) 的 5 步驟 Checkpoint
-> 3. 本輪是否與使用者**鎖定決策**（「就這樣做」「不要 X」）？→ 若是，依 [`runtime/decisions/decision-recording.yaml`](../../runtime/decisions/decision-recording.yaml) 寫入 **ADR**（`decisions/`）、**session**（`memory/decision/`）或 **project**（`<PROJECT_ROOT>/docs/decisions/`），並更新對應 README 索引
+> 3. 本輪是否與使用者**鎖定決策**（「就這樣做」「不要 X」）？→ 若是，依 [`runtime/runtime.db`](../../runtime/runtime.db) 寫入 **ADR**（`decisions/`）、**session**（`memory/decision/`）或 **project**（`<PROJECT_ROOT>/docs/decisions/`），並更新對應 README 索引
 
 **判斷結果**：
 
@@ -267,7 +267,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 ## Step 3a：確認目標文件語言（Target Language Check）
 
-**來源**：[`enforcement/neutral-language.md`](../../enforcement/neutral-language.md)、[`runtime/output-governance/language-policy.yaml`](../../runtime/output-governance/language-policy.yaml)
+**來源**：[`enforcement/neutral-language.md`](../../enforcement/neutral-language.md)、[`runtime/runtime.db`](../../runtime/runtime.db)
 
 **為什麼需要這個步驟**：不同文件可能使用不同語言（中文規範文件 vs 英文技術文件）。寫入新內容前必須確認目標文件的語言，避免中英混雜。此步驟是 blocking gate，不是建議事項。
 
@@ -283,7 +283,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 1. **讀取目標文件的標題、首段與相鄰章節**，判斷其語言：
    - 標題和首段為中文 → 新內容使用中文
    - 標題和首段為英文 → 新內容使用英文
-   - 不確定 → 查詢 `enforcement/neutral-language.md` 與 `runtime/output-governance/language-policy.yaml` 的語言規則
+   - 不確定 → 查詢 `enforcement/neutral-language.md` 與 `runtime/runtime.db` 的語言規則
 
 2. **檢查語言政策**：讀取 `language-policy.yaml` 中 `applies_to` 是否涵蓋目標目錄
 
@@ -548,7 +548,7 @@ ai-skill runtime validate
 2. ✅ 必要的 linked updates 已同步或明確寫出不適用理由
 3. ✅ 若本輪使用或更新 tool mirror，必要的 tool sync 已執行
 4. ✅ 相關檔案已 `git add`、`git commit`、`git push`
-5. ✅ **若 runtime YAML 來源或 compiler 規則有變更，`runtime.db` 已 `git add` 並包含在 commit 中**（pre-commit hook 會自動處理，手動 commit 時需自行確認）
+5. ✅ **若 runtime SQLite canonical config或 compiler 規則有變更，`runtime.db` 已 `git add` 並包含在 commit 中**（pre-commit hook 會自動處理，手動 commit 時需自行確認）
 6. ✅ Push 後已重新讀取更新過的入口、主要依賴、索引與 promotion target
 7. ✅ 最後一次 `git status --short --branch` 顯示 clean，且 branch 沒有 ahead/behind
 
@@ -588,7 +588,7 @@ ai-skill runtime validate
 □ Step 8:  [強制] 執行 Linked Updates（linked-updates.md）
            ⛔ lesson 的 Required Linked Updates 欄位未填不得進行 commit
 □ Step 9:  [強制] 更新 Runtime Surfaces（Step 5 或 Step 8 有修改時）
-           ↳ routing-registry.yaml、summaries/、graphs/、runtime YAML sources
+           ↳ routing-registry.yaml、summaries/、graphs/、SQLite canonical runtime documents
            ⛔ 若 modified files 命中 runtime.db generated_surfaces.source_path，
              必須跑 `ai-skill runtime compile`、`ai-skill runtime validate`、SQLite content assertion，
              並將 runtime/runtime.db 納入同輪 commit

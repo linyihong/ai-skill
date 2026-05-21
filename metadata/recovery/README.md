@@ -1,6 +1,6 @@
 # Recovery Metadata（恢復政策 metadata）
 
-`metadata/recovery/` 定義 mismatch escalation 後的 domain-specific recovery policy。通用 recovery state machine 由 `runtime/compiler/compiler-rules.yaml` 擁有；本 metadata 層負責告訴 agent：在重建 execution graph 前，不同 domain 必須重新載入哪些 source-of-truth。
+`metadata/recovery/` 定義 mismatch escalation 後的 domain-specific recovery policy。通用 recovery state machine 由 `runtime/runtime.db` 擁有；本 metadata 層負責告訴 agent：在重建 execution graph 前，不同 domain 必須重新載入哪些 source-of-truth。
 
 Recovery retry 的治理 gate 見 [`governance/ai-runtime-governance/recovery-retry-governance.md`](../../governance/ai-runtime-governance/recovery-retry-governance.md)；cognitive state / evidence qualification 的治理 gate 見 [`governance/ai-runtime-governance/cognitive-state-governance.md`](../../governance/ai-runtime-governance/cognitive-state-governance.md)。本目錄只保存 domain-specific reload set、forbidden behaviors 與 validation metadata；domain evidence authority / freshness / scope policy 放在 [`metadata/evidence/`](../evidence/README.md)。
 
@@ -25,6 +25,6 @@ Recovery retry 的治理 gate 見 [`governance/ai-runtime-governance/recovery-re
 
 ## Runtime Boundary
 
-這些檔案在 Phase 4 是 metadata-only，尚未編入 `runtime.db`。使用方式是透過 routing / validation 讀取；可執行的 recovery procedure 仍保留在 `runtime/compiler/compiler-rules.yaml`。
+這些檔案在 Phase 4 是 metadata-only，尚未編入 `runtime.db`。使用方式是透過 routing / validation 讀取；可執行的 recovery procedure 仍保留在 `runtime/runtime.db`。
 
 若未來 phase 需要 runtime enforcement，應明確新增 compiler target，不要假設所有 metadata YAML 都會自動編譯。

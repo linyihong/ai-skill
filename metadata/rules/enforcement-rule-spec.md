@@ -49,7 +49,7 @@ Enforcement Rule metadata **必須**包含 Knowledge Atom schema 的所有必填
 
 | 欄位 | 型別 | 必填 | 用途 |
 | --- | --- | --- | --- |
-| `when` | string array | yes | 觸發此 rule 的具體情境描述（對應 `runtime/router/activation-rules.yaml` 的 `activation.when`） |
+| `when` | string array | yes | 觸發此 rule 的具體情境描述（對應 `runtime/runtime.db` 的 `activation.when`） |
 | `load_strategy` | enum | yes | `preload`（Core Bootstrap）、`lazy`（依條件 activate）、`on_demand`（使用者要求才讀） |
 | `priority` | enum | yes | 載入優先序（P0/P1/P2/P3），與頂層 `priority` 一致 |
 | `estimated_tokens` | integer | yes | 精確 token 估算 |
@@ -236,4 +236,4 @@ rule_id: enforcement.linked-updates
 4. `type` 必須為 `rule`。
 5. `always_apply: true` 的 rule 必須有 `load_strategy: preload`。
 6. `deprecated_by` 僅在 `status: deprecated` 時可填寫。
-7. `activation_conditions.when` 中的描述應與 `runtime/router/activation-rules.yaml` 的 `activation.when` 一致。
+7. `activation_conditions.when` 中的描述應與 `runtime/runtime.db` 的 `activation.when` 一致。

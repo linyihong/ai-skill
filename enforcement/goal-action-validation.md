@@ -73,16 +73,16 @@
 
 ### 驗證 Gate 參考
 
-本規則的「驗證」概念已升級為 declarative blocking gates，現行 source 是 [`runtime/runtime.db`](../runtime/runtime.db) / [`對應 runtime YAML source`](../對應 runtime YAML source)。每個 phase 都有對應的 blocking gates（critical/high/medium severity），定義了 phase transition 的必要條件。
+本規則的「驗證」概念已升級為 declarative blocking gates，現行 source 是 [`runtime/runtime.db`](../runtime/runtime.db) / [`對應 SQLite canonical runtime document`](../對應 SQLite canonical runtime document)。每個 phase 都有對應的 blocking gates（critical/high/medium severity），定義了 phase transition 的必要條件。
 
 Agent 在執行驗證時應：
 
-1. 查詢目前 phase 的 blocking gates（`runtime/runtime.db`，必要時讀 runtime YAML source）
+1. 查詢目前 phase 的 blocking gates（`runtime/runtime.db`，必要時讀 SQLite canonical runtime document）
 2. 依 severity 順序通過各 gate（critical → high → medium）
-3. 若 gate 未通過 → 進入 recovery（`runtime/runtime.db` 的 recovery tables / `對應 runtime YAML source`）
+3. 若 gate 未通過 → 進入 recovery（`runtime/runtime.db` 的 recovery tables / `對應 SQLite canonical runtime document`）
 4. 若所有 gate 通過 → 允許 phase transition
 
-本節的 prose 規則（目標/執行/驗證三欄）仍適用於工作單元的內部品質檢查，但 phase transition 的 blocking gate 檢查應以 `runtime/runtime.db` / `對應 runtime YAML source` 為 authoritative reference。
+本節的 prose 規則（目標/執行/驗證三欄）仍適用於工作單元的內部品質檢查，但 phase transition 的 blocking gate 檢查應以 `runtime/runtime.db` / `對應 SQLite canonical runtime document` 為 authoritative reference。
 
 ### State-based Enforcement（狀態化強制規則）
 
@@ -97,8 +97,8 @@ state_based_enforcement:
   owner_layer: enforcement/goal-action-validation
   description: >
     將目標/執行/驗證三欄規則對應到 runtime state machine 的 blocking gates。
-    Agent 應優先查詢 runtime/runtime.db，必要時讀 對應 runtime YAML source，
-    而非依賴本節的 prose 摘要或standalone YAML source。
+    Agent 應優先查詢 runtime/runtime.db，必要時讀 對應 SQLite canonical runtime document，
+    而非依賴本節的 prose 摘要或standalone SQLite canonical document。
 
   # 目標定義 → 由 runtime.db / runtime YAML 的 gate.execution.goal_defined 管理
   - rule: goal_defined

@@ -38,7 +38,7 @@ Enforcement rule 的 deprecation 分為 4 個階段：
 
 1. **更新 `enforcement/README.md`**：在規則索引中標記該規則為 deprecated。
 2. **更新 `knowledge/graphs/rules/`**：在 graph 記錄中標記該 rule 的 `status` 為 `deprecated`。
-3. **更新 `runtime/router/activation-rules.yaml`**：移除或註解掉 deprecated rule。
+3. **更新 `runtime/runtime.db`**：移除或註解掉 deprecated rule。
 4. **檢查 linked updates**：執行 `enforcement/linked-updates.md` 的連動更新檢查。
 
 ### 階段 3：緩衝期（Buffer）

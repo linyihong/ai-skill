@@ -43,7 +43,7 @@ source_intelligence:
 ## Runtime Mapping
 
 - [`governance/lifecycle/context-ttl-philosophy.md`](../lifecycle/context-ttl-philosophy.md) — context TTL 與 prune 的 design layer。
-- [`runtime/context/ttl-policy.yaml`](../../runtime/context/ttl-policy.yaml) — machine-readable TTL policy。
+- [`runtime/runtime.db`](../../runtime/runtime.db) — machine-readable TTL policy。
 - [`runtime/context/prompt-cache-playbook.md`](../../runtime/context/prompt-cache-playbook.md) — provider prompt cache layout。
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — route context cost、TTL 與 compression metadata。
 

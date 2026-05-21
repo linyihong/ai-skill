@@ -39,4 +39,4 @@ then:
     - intelligence/engineering/architecture/architectural-fit/architecture-fit-analysis.md
     - intelligence/engineering/architecture/architectural-fit/ddd-lite-vs-full-ddd.md
   unexpected_intelligence:
-    - runtime/compiler/compiler-rules.yaml
+    - runtime/runtime.db

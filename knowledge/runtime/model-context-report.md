@@ -33,14 +33,14 @@
 | Route | Primary source | Compression | Reason |
 | --- | --- | --- | --- |
 | `route.bootstrap.ai-skill` | `CORE_BOOTSTRAP.md` | `summary-first` | Bootstrap 階段只需要 Core Bootstrap 3 rules 與 OS layout，不需要完整 source。 |
-| `route.runtime.phase-machine` | `runtime/phases/phase-machine.yaml` | `source-backed` | Phase Machine 是執行階段的核心狀態機，每個 session 啟動後必須載入。 |
-| `route.runtime.obligation-ledger` | `runtime/obligations/obligation-ledger.yaml` | `source-backed` | Obligation Ledger 是執行階段的義務檢查清單，每個 phase entry 時必須載入。 |
-| `route.runtime.blocking-gates` | `runtime/gates/blocking-gates.yaml` | `source-backed` | Blocking Gates 是執行階段的阻斷檢查，每個 phase transition 前必須載入。 |
-| `route.runtime.recovery` | `runtime/recovery/recovery-strategies.yaml` | `source-backed` | State Repair System 在 blocking gate 阻斷時才需要載入，不佔用 bootstrap 預算。 |
-| `route.runtime.scheduler` | `runtime/scheduler/priority-scheduler.yaml` | `source-backed` | Scheduler 在 phase entry 時載入，決定 execution queue 的優先順序。 |
-| `route.runtime.transactions` | `runtime/transactions/transaction-machine.yaml` | `source-backed` | Transaction Runtime 在需要寫入 Ai-skill 檔案時才載入，不佔用 bootstrap 預算。 |
+| `route.runtime.phase-machine` | `runtime/runtime.db` | `source-backed` | Phase Machine 是執行階段的核心狀態機，每個 session 啟動後必須載入。 |
+| `route.runtime.obligation-ledger` | `runtime/runtime.db` | `source-backed` | Obligation Ledger 是執行階段的義務檢查清單，每個 phase entry 時必須載入。 |
+| `route.runtime.blocking-gates` | `runtime/runtime.db` | `source-backed` | Blocking Gates 是執行階段的阻斷檢查，每個 phase transition 前必須載入。 |
+| `route.runtime.recovery` | `runtime/runtime.db` | `source-backed` | State Repair System 在 blocking gate 阻斷時才需要載入，不佔用 bootstrap 預算。 |
+| `route.runtime.scheduler` | `runtime/runtime.db` | `source-backed` | Scheduler 在 phase entry 時載入，決定 execution queue 的優先順序。 |
+| `route.runtime.transactions` | `runtime/runtime.db` | `source-backed` | Transaction Runtime 在需要寫入 Ai-skill 檔案時才載入，不佔用 bootstrap 預算。 |
 | `route.skill.discovery` | `knowledge/runtime/routing-registry.yaml` | `index-only` | Routing registry 輕量（~300 tokens），可在整個對話中 cache。 |
-| `route.runtime.activation-rules` | `runtime/router/activation-rules.yaml` | `index-only` | Activation rules 輕量（~500 tokens），可在整個對話中 cache。 |
+| `route.runtime.activation-rules` | `runtime/runtime.db` | `index-only` | Activation rules 輕量（~500 tokens），可在整個對話中 cache。 |
 | `route.runtime.context-ttl` | `governance/ai-runtime-governance/context-attention-governance.md` | `summary-first` | 多數 context drift 先讀治理 gate 與 source intelligence；修改 runtime policy 時再展開 ttl-policy.yaml。 |
 | `route.runtime.prompt-cache-alignment` | `runtime/context/prompt-cache-playbook.md` | `summary-first` | 先讀 prompt-cache summary 與 playbook；修改 metadata 或 enforcement 時再讀 full source。 |
 | `route.governance.ai-runtime-five-step` | `governance/ai-runtime-governance/five-step-ai-governance.md` | `summary-first` | 只有 governance / architecture / automation 擴張決策需要讀取完整 five-step governance；一般任務不常駐載入。 |
@@ -55,15 +55,15 @@
 | `route.intelligence.architectural-fit` | `intelligence/engineering/architecture/architectural-fit/README.md` | `summary-first` | 先讀 architectural-fit README 與 metadata，只有在 high-complexity 或 DDD 訊號強時展開完整 DDD tactical docs。 |
 | `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `index-only` | agent-architecture atoms 在需要理解 AI 行為模式時才讀取完整內容。 |
 | `route.feedback.history` | `feedback/history/README.md` | `index-only` | feedback/history 在需要查詢或新增 lesson 時才讀取。 |
-| `route.runtime.decision-recording` | `runtime/decisions/decision-recording.yaml` | `source-backed` | 避免決策只留在 plan 或對話；查問題時依 lookup.by_symptom 回溯。 |
+| `route.runtime.decision-recording` | `runtime/runtime.db` | `source-backed` | 避免決策只留在 plan 或對話；查問題時依 lookup.by_symptom 回溯。 |
 | `route.decisions.adr` | `decisions/README.md` | `summary-first` | decisions/ 在需要查詢歷史決策或建立新 ADR 時才讀取。 |
 | `route.architecture.permanent-docs` | `architecture/README.md` | `summary-first` | architecture/ 在需要查詢架構定義或設計原則時才讀取。 |
 | `route.evaluations.scenario-results` | `evaluations/README.md` | `index-only` | evaluations/ 在需要查詢或記錄 scenario 執行結果時才讀取。 |
 | `route.tools.metadata-routing` | `tools/README.md` | `index-only` | tools/ 在需要查詢 tool 設定或 routing 規則時才讀取。 |
 | `route.traces.decision-traces` | `traces/README.md` | `index-only` | traces/ 在需要查詢或記錄 decision trace 時才讀取。 |
 | `route.anti-patterns.runtime-patterns` | `anti-patterns/README.md` | `summary-first` | anti-patterns/ 在需要查詢 runtime 失效模式或預防方式時才讀取。 |
-| `route.runtime.compiler` | `runtime/compiler/compiler-rules.yaml` | `source-backed` | Compiler 在 workflow/enforcement 文件變更後才需要執行，不佔用 bootstrap 預算。 |
-| `route.runtime.intelligence-routing` | `runtime/intelligence/intelligence-routing.yaml` | `index-only` | Intelligence routing 在需要領域知識時才載入，不佔用 bootstrap 預算。 |
+| `route.runtime.compiler` | `runtime/runtime.db` | `source-backed` | Compiler 在 workflow/enforcement 文件變更後才需要執行，不佔用 bootstrap 預算。 |
+| `route.runtime.intelligence-routing` | `runtime/runtime.db` | `index-only` | Intelligence routing 在需要領域知識時才載入，不佔用 bootstrap 預算。 |
 | `route.runtime.output-governance` | `runtime/output-governance/` | `source-backed` | Output Governance 在 validation 與 finalize phase 時才需要載入，不佔用 bootstrap 預算。 |
 | `route.runtime.distributed` | `runtime/distributed/` | `source-backed` | Distributed Runtime 在 multi-agent 協作或 async job 執行時才需要載入，不佔用 bootstrap 預算。 |
 | `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.md` | `source-backed` | Knowledge Update Flow 在 checkpoint 或 finalize phase 需要執行知識更新時才載入，不佔用 bootstrap 預算。 |

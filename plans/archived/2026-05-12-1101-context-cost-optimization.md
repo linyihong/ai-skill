@@ -159,7 +159,7 @@ runtime/
 #### Activation Rules 範例
 
 ```yaml
-# runtime/router/activation-rules.yaml
+# runtime/runtime.db
 activation_rules:
   - rule_id: linked-updates
     when:
@@ -298,7 +298,7 @@ skills:
 **改造**：建立 Context TTL 系統，定義每條 context 的生命週期：
 
 ```yaml
-# runtime/context/ttl-policy.yaml
+# runtime/runtime.db
 ttl_policy_version: v1
 
 default_ttl:
@@ -351,7 +351,7 @@ Phase 2 已建立 `context_cost`、`load_strategy`、`cacheable` 與 TTL 等 con
 - [`runtime/context/prompt-cache-playbook.md`](../../runtime/context/prompt-cache-playbook.md)
 - [`enforcement/prompt-cache-efficiency.md`](../../enforcement/prompt-cache-efficiency.md)
 - `metadata/schema.md` 的 `context_cost.provider_cache` 欄位
-- `runtime/router/activation-rules.yaml` 與 `knowledge/runtime/routing-registry.yaml` 的 lazy-load route
+- `runtime/runtime.db` 與 `knowledge/runtime/routing-registry.yaml` 的 lazy-load route
 
 Runtime 自動排序與 provider cache hit observability 仍保留給 Phase 3 Runtime Orchestration。
 
@@ -460,7 +460,7 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 
 ### 4.1 Token Budget System
 
-**檔案**：[`runtime/budget/token-budget.yaml`](../runtime/budget/token-budget.yaml)
+**檔案**：[`runtime/runtime.db`](../runtime/runtime.db)
 
 **目的**：為每個 session 設定 token 預算上限，防止 token 爆炸。
 
@@ -477,7 +477,7 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 
 ### 4.2 Context Health Score
 
-**檔案**：[`runtime/health/context-health-score.yaml`](../runtime/health/context-health-score.yaml)
+**檔案**：[`runtime/runtime.db`](../runtime/runtime.db)
 
 **目的**：量化 context 健康度，在 context 品質惡化前主動介入。
 
@@ -496,7 +496,7 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 
 ### 4.3 Circuit Breaker
 
-**檔案**：[`runtime/guards/circuit-breaker.yaml`](../runtime/guards/circuit-breaker.yaml)
+**檔案**：[`runtime/runtime.db`](../runtime/runtime.db)
 
 **目的**：防止 agent 陷入無限迴圈、工具爆炸、context 失控。
 
@@ -512,7 +512,7 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 
 ### 4.4 Context Pollution Detection
 
-**檔案**：[`runtime/guards/context-pollution.yaml`](../runtime/guards/context-pollution.yaml)
+**檔案**：[`runtime/runtime.db`](../runtime/runtime.db)
 
 **目的**：偵測 context 污染訊號，在 context 品質嚴重惡化前自動歸檔。
 
@@ -640,9 +640,9 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 
 ### Step 4：建立 Runtime Router（2-3 週）✅ 已實作
 
-1. 建立 `runtime/router/activation-rules.yaml`
+1. 建立 `runtime/runtime.db`
 2. 建立 `runtime/router/cost-budget.yaml`
-3. 建立 `runtime/context/ttl-policy.yaml`
+3. 建立 `runtime/runtime.db`
 4. 更新 `knowledge/runtime/routing-registry.yaml` 加入 cost metadata
 
 ### Step 5：全面導入 Context Cost Metadata（3-4 週）✅ 已實作
@@ -653,10 +653,10 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 
 ### Step 6：建立 Runtime Quality & Safety（已實作）
 
-1. 建立 Token Budget System → [`runtime/budget/token-budget.yaml`](../runtime/budget/token-budget.yaml)
-2. 建立 Context Health Score → [`runtime/health/context-health-score.yaml`](../runtime/health/context-health-score.yaml)
-3. 建立 Circuit Breaker → [`runtime/guards/circuit-breaker.yaml`](../runtime/guards/circuit-breaker.yaml)
-4. 建立 Context Pollution Detection → [`runtime/guards/context-pollution.yaml`](../runtime/guards/context-pollution.yaml)
+1. 建立 Token Budget System → [`runtime/runtime.db`](../runtime/runtime.db)
+2. 建立 Context Health Score → [`runtime/runtime.db`](../runtime/runtime.db)
+3. 建立 Circuit Breaker → [`runtime/runtime.db`](../runtime/runtime.db)
+4. 建立 Context Pollution Detection → [`runtime/runtime.db`](../runtime/runtime.db)
 5. 建立 Tool Metadata & Lazy Activation → [`tools/metadata/README.md`](../tools/metadata/README.md)、[`tools/routing/README.md`](../tools/routing/README.md)
 6. 建立 Tool Output Compression → [`tools/compression/README.md`](../tools/compression/README.md)
 7. 建立 Memory Architecture 子層 → [`memory/working/README.md`](../memory/working/README.md)、[`memory/summary/README.md`](../memory/summary/README.md)、[`memory/decision/README.md`](../memory/decision/README.md)
@@ -669,10 +669,10 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 將所有 Runtime Quality & Safety 元件串接成可執行的 orchestration flow：
 
 1. 建立 Pipeline 概覽 → [`runtime/pipeline/README.md`](../runtime/pipeline/README.md) — 元件接線圖、跨階段通訊表（10 個觸發事件）
-2. 建立 Session Lifecycle → [`runtime/pipeline/session-lifecycle.yaml`](../runtime/pipeline/session-lifecycle.yaml) — 4 階段（bootstrap → routing → execution → close-loop），每階段有 token budget、guard chain、進入/離開條件
-3. 建立 Progressive Context Expansion → [`runtime/pipeline/context-flow.yaml`](../runtime/pipeline/context-flow.yaml) — 4 層級（summary → module summary → detailed source → raw source），每層有 cache policy、entry/exit conditions
-4. 建立 Guard Chain → [`runtime/pipeline/guard-chain.yaml`](../runtime/pipeline/guard-chain.yaml) — 每 stage 的 guard 執行順序（ordered by severity）、檢查頻率（per_tool_call / per_task / per_edit）、中斷行為
-5. 建立 Skill Relevance Engine → [`runtime/pipeline/relevance-engine.yaml`](../runtime/pipeline/relevance-engine.yaml) — 3 維度 scoring（trigger_match 0.5 + domain_match 0.3 + weight 0.2）、threshold 0.5、conflict penalty ×0.5
+2. 建立 Session Lifecycle → [`runtime/runtime.db`](../runtime/runtime.db) — 4 階段（bootstrap → routing → execution → close-loop），每階段有 token budget、guard chain、進入/離開條件
+3. 建立 Progressive Context Expansion → [`runtime/runtime.db`](../runtime/runtime.db) — 4 層級（summary → module summary → detailed source → raw source），每層有 cache policy、entry/exit conditions
+4. 建立 Guard Chain → [`runtime/runtime.db`](../runtime/runtime.db) — 每 stage 的 guard 執行順序（ordered by severity）、檢查頻率（per_tool_call / per_task / per_edit）、中斷行為
+5. 建立 Skill Relevance Engine → [`runtime/runtime.db`](../runtime/runtime.db) — 3 維度 scoring（trigger_match 0.5 + domain_match 0.3 + weight 0.2）、threshold 0.5、conflict penalty ×0.5
 
 ### Step 8：建立 Feedback Promotion Pipeline（已實作）
 

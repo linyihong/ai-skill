@@ -5,7 +5,7 @@
 #
 # 來源 hook:
 #   - scripts/git-hooks/pre-commit
-#   - runtime/compiler/compiler-rules.yaml (compile.rule.sync_on_commit)
+#   - runtime/runtime.db (compile.rule.sync_on_commit)
 
 id: precommit-hook-v1
 domain: app-dev
@@ -16,7 +16,7 @@ given:
   task: commit_with_unsynced_changes
   artifacts:
     - scripts/git-hooks/pre-commit
-    - runtime/compiler/compiler-rules.yaml
+    - runtime/runtime.db
     - scripts/ai-skill-cli/internal/app/runtime_compiler.go
     - scripts/git-hooks/pre-commit
   signals:

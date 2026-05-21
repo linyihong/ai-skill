@@ -17,8 +17,8 @@
 
 - 先讀 `CORE_BOOTSTRAP.md`（3 條核心規則，~800 tokens）。
 - 再讀 root `README.md`（OS layout）。
-- 檢查 `runtime/router/activation-rules.yaml` 決定哪些 lazy-load rules 需要 activate。
-- Runtime config 可查 `runtime/runtime.db` 的專屬表格（如 `phase_machine`、`obligation_ledger`、`blocking_gates` 等），YAML 檔案仍為 source-of-truth。
+- 檢查 `runtime/runtime.db` 決定哪些 lazy-load rules 需要 activate。
+- Runtime config 的 committed canonical copy 是 `runtime/runtime.db`（含 `runtime_config_documents`、`phase_machine`、`obligation_ledger`、`blocking_gates` 等）；不要保留 `runtime/**/*.yaml` mirror。
 - 先讀 `knowledge/summaries/` 對應 summary（300-500 tokens）。
 - 需要時才展開完整 source。
 - Repository 變更必須 diff review、linked updates、commit、push、readback、clean status。

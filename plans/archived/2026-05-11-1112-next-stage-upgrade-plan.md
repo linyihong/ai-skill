@@ -38,8 +38,8 @@
 - **README 拆分**：根 `README.md` 縮短為 ~80 行超短入口。
 - **Rule Lazy-load 機制**：`enforcement/README.md` 引入 Runtime Activation Model，15 條 lazy-load rules 定義觸發條件。
 - **Skill Index**：`skills-index.yaml` 建立（13 skills，含 triggers、cost metadata、entrypoint、summary path）。
-- **Runtime Router**：`runtime/router/activation-rules.yaml`（15 activation rules）、`runtime/router/README.md`（routing decision flow）。
-- **Context TTL**：`runtime/context/ttl-policy.yaml`（20 context types）、`runtime/context/README.md`（prune strategy）。
+- **Runtime Router**：`runtime/runtime.db`（15 activation rules）、`runtime/router/README.md`（routing decision flow）。
+- **Context TTL**：`runtime/runtime.db`（20 context types）、`runtime/context/README.md`（prune strategy）。
 - **Context Cost Metadata**：`metadata/schema.md` 的 `context_cost` 升級為 object（estimated_tokens、load_strategy、cacheable、ttl）。
 - **Routing Registry 升級**：`knowledge/runtime/routing-registry.yaml` 升級 v2，所有 records 含 cost metadata。
 - **Summary Layer 擴充**：新增 8 個 summaries（app-development-guidance、travel-planning、repo-governance、knowledge-navigation、runtime-operations、model-routing、memory-operations、context-cost-optimization），總數從 6 → 14。
@@ -49,10 +49,10 @@
 
 以下為根據外部 review 建議，優先實作的 **Runtime Quality & Safety** 層：
 
-- **Token Budget System**：[`runtime/budget/token-budget.yaml`](../runtime/budget/token-budget.yaml) — 120K default max_tokens、per-model budgets、per-layer budget allocation、70% warning / 90% hard stop thresholds。
-- **Context Health Score**：[`runtime/health/context-health-score.yaml`](../runtime/health/context-health-score.yaml) — 4 維度（relevance 0.35、duplication 0.20、staleness 0.25、conflict 0.20）、composite score、healthy/warning/critical thresholds。
-- **Circuit Breaker**：[`runtime/guards/circuit-breaker.yaml`](../runtime/guards/circuit-breaker.yaml) — 5 guards（recursive depth max 4、tool calls 20/task、context growth 30%/task、hallucination risk 4 factors、conflict rules）。
-- **Context Pollution Detection**：[`runtime/guards/context-pollution.yaml`](../runtime/guards/context-pollution.yaml) — 5 signals（conversation length 50 turns、repetitive edits 5 edits、module count 20 modules、cross-reference depth 5 layers、token utilization 85%）。
+- **Token Budget System**：[`runtime/runtime.db`](../runtime/runtime.db) — 120K default max_tokens、per-model budgets、per-layer budget allocation、70% warning / 90% hard stop thresholds。
+- **Context Health Score**：[`runtime/runtime.db`](../runtime/runtime.db) — 4 維度（relevance 0.35、duplication 0.20、staleness 0.25、conflict 0.20）、composite score、healthy/warning/critical thresholds。
+- **Circuit Breaker**：[`runtime/runtime.db`](../runtime/runtime.db) — 5 guards（recursive depth max 4、tool calls 20/task、context growth 30%/task、hallucination risk 4 factors、conflict rules）。
+- **Context Pollution Detection**：[`runtime/runtime.db`](../runtime/runtime.db) — 5 signals（conversation length 50 turns、repetitive edits 5 edits、module count 20 modules、cross-reference depth 5 layers、token utilization 85%）。
 - **Tool Metadata**：[`tools/metadata/README.md`](../tools/metadata/README.md) — 每個工具標註 cost（avg_input_tokens、avg_output_tokens）、risk、contexts、activation strategy、compression support。
 - **Tool Lazy Activation**：[`tools/routing/README.md`](../tools/routing/README.md) — 5-step activation flow、tool explosion detection（recursive_search、repetitive_read、tool_chain_too_long、output_too_large）。
 - **Tool Output Compression**：[`tools/compression/README.md`](../tools/compression/README.md) — 4 levels（raw 1.0x、summary 0.2-0.3x、structured 0.1-0.2x、minimal 0.05-0.1x）、per-output-type strategies。
@@ -66,10 +66,10 @@
 將所有 Runtime Quality & Safety 元件串接成可執行的 orchestration flow：
 
 - **Pipeline 概覽**：[`runtime/pipeline/README.md`](../runtime/pipeline/README.md) — 元件接線圖（bootstrap → routing → execution → close-loop）、跨階段通訊表（10 個觸發事件，如 Token usage > 90% → Context Pollution auto-archive、Recursive depth > 4 → Force close-loop）
-- **Session Lifecycle**：[`runtime/pipeline/session-lifecycle.yaml`](../runtime/pipeline/session-lifecycle.yaml) — 4 階段定義：Bootstrap（2000 tokens, 2 guards）、Routing（2500 tokens, 3 guards）、Execution（100000 tokens, 11 guards）、Close-loop（1000 tokens, 1 guard）
-- **Progressive Context Expansion**：[`runtime/pipeline/context-flow.yaml`](../runtime/pipeline/context-flow.yaml) — 4 層級（summary ~500 → module summary ~1500 → detailed source ~4500 → raw source ~10000 tokens），每層有 cache policy（session/task TTL）、entry/exit conditions、no-skip-levels rule
-- **Guard Chain**：[`runtime/pipeline/guard-chain.yaml`](../runtime/pipeline/guard-chain.yaml) — 每 stage 的 guard 執行順序（ordered by severity）、檢查頻率（per_tool_call / per_task / per_edit）、layered violation 行為（critical → halt, high/medium → warn）
-- **Skill Relevance Engine**：[`runtime/pipeline/relevance-engine.yaml`](../runtime/pipeline/relevance-engine.yaml) — 3 維度 scoring（trigger_match 0.5 + domain_match 0.3 + weight 0.2）、threshold 0.5、conflict penalty ×0.5、dependency_missing penalty ×0.8、3 個 scoring examples
+- **Session Lifecycle**：[`runtime/runtime.db`](../runtime/runtime.db) — 4 階段定義：Bootstrap（2000 tokens, 2 guards）、Routing（2500 tokens, 3 guards）、Execution（100000 tokens, 11 guards）、Close-loop（1000 tokens, 1 guard）
+- **Progressive Context Expansion**：[`runtime/runtime.db`](../runtime/runtime.db) — 4 層級（summary ~500 → module summary ~1500 → detailed source ~4500 → raw source ~10000 tokens），每層有 cache policy（session/task TTL）、entry/exit conditions、no-skip-levels rule
+- **Guard Chain**：[`runtime/runtime.db`](../runtime/runtime.db) — 每 stage 的 guard 執行順序（ordered by severity）、檢查頻率（per_tool_call / per_task / per_edit）、layered violation 行為（critical → halt, high/medium → warn）
+- **Skill Relevance Engine**：[`runtime/runtime.db`](../runtime/runtime.db) — 3 維度 scoring（trigger_match 0.5 + domain_match 0.3 + weight 0.2）、threshold 0.5、conflict penalty ×0.5、dependency_missing penalty ×0.8、3 個 scoring examples
 
 ### ✅ 已完成：Feedback Promotion Pipeline（Phase 4）
 
@@ -691,10 +691,10 @@ runtime/
 - task routing。
 - context pruning。
 - agent coordination。
-- **token budget management**（`runtime/budget/token-budget.yaml`）。
-- **context health scoring**（`runtime/health/context-health-score.yaml`）。
-- **circuit breaker & guards**（`runtime/guards/circuit-breaker.yaml`、`runtime/guards/context-pollution.yaml`）。
-- **session lifecycle management**（`runtime/pipeline/session-lifecycle.yaml`）。
+- **token budget management**（`runtime/runtime.db`）。
+- **context health scoring**（`runtime/runtime.db`）。
+- **circuit breaker & guards**（`runtime/runtime.db`、`runtime/runtime.db`）。
+- **session lifecycle management**（`runtime/runtime.db`）。
 - **prompt artifact generation**（`runtime/prompt-artifacts/`）— 根據 task type 自動組合 prompt 結構，引用 workflow/ 的執行步驟、intelligence/ 的工程智慧、analysis/ 的分析方法，產出針對當前任務優化的 prompt artifact。
 
 ### `tools/`
@@ -1138,10 +1138,10 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 - `knowledge/runtime/routing-registry.yaml` — machine-readable routing registry。
 - `models/profiles/README.md` — small / large / specialized 三種 profile，含 routing rules 與 metadata mapping。
 - `models/compression/README.md` — 5 層 compression（index-only / summary-first / checklist-first / source-backed / graph-assisted），含 profile defaults 與 escalation rules。
-- `runtime/budget/token-budget.yaml` — Token Budget System（120K default、per-model budgets、per-layer allocation、70%/90% thresholds）。
-- `runtime/health/context-health-score.yaml` — Context Health Score（4 維度 composite score、healthy/warning/critical thresholds）。
-- `runtime/guards/circuit-breaker.yaml` — Circuit Breaker（5 guards：recursive depth、tool calls、context growth、hallucination risk、conflict rules）。
-- `runtime/guards/context-pollution.yaml` — Context Pollution Detection（5 signals、composite pollution score、auto-archive on critical）。
+- `runtime/runtime.db` — Token Budget System（120K default、per-model budgets、per-layer allocation、70%/90% thresholds）。
+- `runtime/runtime.db` — Context Health Score（4 維度 composite score、healthy/warning/critical thresholds）。
+- `runtime/runtime.db` — Circuit Breaker（5 guards：recursive depth、tool calls、context growth、hallucination risk、conflict rules）。
+- `runtime/runtime.db` — Context Pollution Detection（5 signals、composite pollution score、auto-archive on critical）。
 - `tools/metadata/README.md` + `tools/routing/README.md` — Tool Metadata & Lazy Activation（tool cost/risk/activation schema、explosion detection）。
 - `tools/compression/README.md` — Tool Output Compression（4-level compression、per-output-type strategies）。
 - `memory/working/README.md` + `memory/summary/README.md` + `memory/decision/README.md` — Memory Architecture 3 子層。
@@ -1207,10 +1207,10 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 建立 knowledge runtime refresh orchestrator | `scripts/refresh-knowledge-runtime.rb`, `knowledge/runtime/README.md`, `governance/validation/README.md` | 已完成一鍵重建 reports / SQLite index 並執行 validators | Generated runtime surfaces 可用單一命令重建與驗證，降低 stale cache 風險 |
 | P1 | done | 建立 knowledge graph query helper | `scripts/query-knowledge-graph.rb`, `knowledge/graphs/README.md`, `knowledge/runtime/README.md` | 已完成 source / target / type / keyword graph edge 查詢 | Graph query 只回傳候選 edge list；修改或高信心判斷仍讀 graph YAML 與 canonical source |
 | P1 | done | 建立 model checklist generator | `scripts/generate-model-checklists.rb`, `knowledge/runtime/model-checklists.md`, `models/README.md` | 已完成 per-model context-loading checklist artifact | Checklist 由 routing registry 生成；需要修改或高信心判斷仍讀 model docs 與 canonical source |
-| P1 | done | 建立 Token Budget System | `runtime/budget/token-budget.yaml` | 已完成 120K default max_tokens、per-model budgets、per-layer allocation、70%/90% thresholds | Token 用量可預測，不再因深度 reasoning 爆 token |
-| P1 | done | 建立 Context Health Score | `runtime/health/context-health-score.yaml` | 已完成 4 維度 composite score、healthy/warning/critical thresholds | Context 健康度可量化，在惡化前主動介入 |
-| P1 | done | 建立 Circuit Breaker | `runtime/guards/circuit-breaker.yaml` | 已完成 5 guards（recursive depth、tool calls、context growth、hallucination risk、conflict rules） | Agent 不再陷入無限迴圈或工具爆炸 |
-| P1 | done | 建立 Context Pollution Detection | `runtime/guards/context-pollution.yaml` | 已完成 5 signals、composite pollution score、auto-archive on critical | Context 污染可自動偵測與歸檔 |
+| P1 | done | 建立 Token Budget System | `runtime/runtime.db` | 已完成 120K default max_tokens、per-model budgets、per-layer allocation、70%/90% thresholds | Token 用量可預測，不再因深度 reasoning 爆 token |
+| P1 | done | 建立 Context Health Score | `runtime/runtime.db` | 已完成 4 維度 composite score、healthy/warning/critical thresholds | Context 健康度可量化，在惡化前主動介入 |
+| P1 | done | 建立 Circuit Breaker | `runtime/runtime.db` | 已完成 5 guards（recursive depth、tool calls、context growth、hallucination risk、conflict rules） | Agent 不再陷入無限迴圈或工具爆炸 |
+| P1 | done | 建立 Context Pollution Detection | `runtime/runtime.db` | 已完成 5 signals、composite pollution score、auto-archive on critical | Context 污染可自動偵測與歸檔 |
 | P1 | done | 建立 Tool Metadata & Lazy Activation | `tools/metadata/README.md`, `tools/routing/README.md` | 已完成 tool cost/risk/activation schema、explosion detection | 工具層級 token 消耗可預測與控制 |
 | P1 | done | 建立 Tool Output Compression | `tools/compression/README.md` | 已完成 4-level compression、per-output-type strategies | 工具輸出 token 減少 50-95% |
 | P1 | done | 建立 Memory Architecture 子層 | `memory/working/README.md`, `memory/summary/README.md`, `memory/decision/README.md`, `memory/episodic/README.md`, `memory/project/README.md`, `memory/failure/README.md` | 已完成 6 子層（working/summary/decision/episodic/project/failure） | 記憶管理精準，不再單一 memory 層 |

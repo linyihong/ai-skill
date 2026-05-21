@@ -48,10 +48,10 @@ runtime/pipeline/
 ## 與既有文件的關係
 
 - [`runtime/pipeline/`](../../runtime/pipeline/) — Runtime navigation entry point (data files: `context-flow.yaml`, `guard-chain.yaml`, `relevance-engine.yaml`, `session-lifecycle.yaml`)
-- [`runtime/pipeline/session-lifecycle.yaml`](../../runtime/pipeline/session-lifecycle.yaml) — Session lifecycle stages
-- [`runtime/pipeline/context-flow.yaml`](../../runtime/pipeline/context-flow.yaml) — Progressive context expansion
-- [`runtime/pipeline/guard-chain.yaml`](../../runtime/pipeline/guard-chain.yaml) — Guard execution order
-- [`runtime/pipeline/relevance-engine.yaml`](../../runtime/pipeline/relevance-engine.yaml) — Skill Relevance Engine
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Session lifecycle stages
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Progressive context expansion
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Guard execution order
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Skill Relevance Engine
 - [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md) — Bootstrap entry point
-- [`runtime/guards/circuit-breaker.yaml`](../../runtime/guards/circuit-breaker.yaml) — Circuit breaker
-- [`runtime/guards/context-pollution.yaml`](../../runtime/guards/context-pollution.yaml) — Context pollution detection
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Circuit breaker
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Context pollution detection

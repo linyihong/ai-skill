@@ -23,26 +23,26 @@
 
 ## 預防
 
-1. 實施 Context TTL（`runtime/context/ttl-policy.yaml`）。
-2. 設定 Token Budget（`runtime/budget/token-budget.yaml`）。
+1. 實施 Context TTL（`runtime/runtime.db`）。
+2. 設定 Token Budget（`runtime/runtime.db`）。
 3. 在 task boundary 自動 prune。
 4. 使用 summary-first routing 減少 context 載入量。
 
 ## 檢測
 
-- `runtime/health/context-health-score.yaml` 的 `relevance` 與 `staleness` 維度
-- `runtime/guards/context-pollution.yaml` 的 `token_utilization` 信號
+- `runtime/runtime.db` 的 `relevance` 與 `staleness` 維度
+- `runtime/runtime.db` 的 `token_utilization` 信號
 - Token 使用率 > 70% 時觸發警告
 
 ## 恢復
 
-1. 執行 `runtime/guards/context-pollution.yaml` 的 auto_archive。
+1. 執行 `runtime/runtime.db` 的 auto_archive。
 2. 建立新 session。
 3. 從 `memory/summary/` 載入必要的 session context。
 
 ## 相關 Guards
 
-- `runtime/context/ttl-policy.yaml`
-- `runtime/budget/token-budget.yaml`
-- `runtime/health/context-health-score.yaml`
-- `runtime/guards/context-pollution.yaml`
+- `runtime/runtime.db`
+- `runtime/runtime.db`
+- `runtime/runtime.db`
+- `runtime/runtime.db`

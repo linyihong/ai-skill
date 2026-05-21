@@ -21,7 +21,7 @@
 
 當 failure 或 mismatch 正在發生時，先依 [`escalation-policy.md`](escalation-policy.md) 判斷是否需要停止局部 patch、重讀 source-of-truth、重建 execution graph。Escalation 是 real-time control；本檔是 post-mortem learning。
 
-若 failure 導致 phase transition 被 blocking gate 阻斷，修復流程由 runtime recovery 系統管理。部分 legacy YAML 已 embedded 到 [`runtime/compiler/compiler-rules.yaml`](../runtime/compiler/compiler-rules.yaml)，並編譯進 [`runtime/runtime.db`](../runtime/runtime.db)；不要引用不存在的 `runtime/recovery/*.yaml` 作為 standalone source，除非另有 source restoration migration。
+若 failure 導致 phase transition 被 blocking gate 阻斷，修復流程由 runtime recovery 系統管理。Runtime recovery canonical config 已收斂到 [`runtime/runtime.db`](../runtime/runtime.db) 的 `runtime_config_documents` 與 recovery projection tables；不要引用 `runtime/recovery/*.yaml` 作為 standalone source，除非另有 source restoration migration。
 
 本節的 failure learning loop 專注於「將 failure 轉為 reusable prevention」（capture → classify → promote → strengthen → validate），而 escalation / runtime recovery 專注於「failure 發生時的即時停止、重讀與狀態恢復」。兩者互補：
 
@@ -174,7 +174,7 @@ state_based_enforcement:
   owner_layer: enforcement/failure-learning-system
   description: >
     將 failure-learning close-loop 檢查對應到 runtime state machine 的 phase/gate。
-    Agent 應優先查詢 runtime/runtime.db，必要時讀 runtime/compiler/compiler-rules.yaml，
+    Agent 應優先查詢 runtime/runtime.db，必要時讀 runtime/runtime.db，
     而非依賴本節的 prose 摘要或已移除的 standalone YAML。
 
   # Immediate issue control → 由 runtime/runtime.db 的 phase.recovery 管理

@@ -39,7 +39,7 @@ Preserve:
 
 - [`governance/ai-runtime-governance/context-attention-governance.md`](../ai-runtime-governance/context-attention-governance.md) — 將 context collapse / attention budgeting intelligence 轉譯成 context loading、recap 與 prune gate
 - [`runtime/context/`](../../runtime/context/) — Runtime navigation entry point (data file: `ttl-policy.yaml`)
-- [`runtime/context/ttl-policy.yaml`](../../runtime/context/ttl-policy.yaml) — TTL policy definitions
-- [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — 決定哪些 rules 需要載入（影響 context 總量）
+- [`runtime/runtime.db`](../../runtime/runtime.db) — TTL policy definitions
+- [`runtime/runtime.db`](../../runtime/runtime.db) — 決定哪些 rules 需要載入（影響 context 總量）
 - [`knowledge/summaries/`](../../knowledge/summaries/) — 輕量 summary 可頻繁載入而不需 prune
 - [`metadata/schema.md`](../../metadata/schema.md) — `context_cost.ttl` 欄位定義每個 atom 的 TTL

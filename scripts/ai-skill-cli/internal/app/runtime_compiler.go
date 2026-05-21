@@ -1,7 +1,9 @@
 package app
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -17,15 +19,15 @@ import (
 const goRuntimeCompilerVersion = "2.0.0"
 
 type compilerMappingFile struct {
-	SourceTargetMapping []compilerMapping `yaml:"source_target_mapping"`
-	CompilationRules    []map[string]any  `yaml:"compilation_rules"`
-	CompilerWorkflow    map[string]any    `yaml:"compiler_workflow"`
+	SourceTargetMapping []compilerMapping `yaml:"source_target_mapping" json:"source_target_mapping"`
+	CompilationRules    []map[string]any  `yaml:"compilation_rules" json:"compilation_rules"`
+	CompilerWorkflow    map[string]any    `yaml:"compiler_workflow" json:"compiler_workflow"`
 }
 
 type compilerMapping struct {
-	Source      string `yaml:"source"`
-	Target      string `yaml:"target"`
-	CompileRule string `yaml:"compile_rule"`
+	Source      string `yaml:"source" json:"source"`
+	Target      string `yaml:"target" json:"target"`
+	CompileRule string `yaml:"compile_rule" json:"compile_rule"`
 }
 
 type runtimeConfigMapping struct {
@@ -37,8 +39,9 @@ type runtimeConfigMapping struct {
 }
 
 func buildNativeRuntimeDBFromSources(repo string, outputDB string) Check {
-	if check := runtimeYAMLSyntaxValidation(repo); check.Status != "ok" {
-		return Check{Name: "runtime_compile_native", Status: "failed", Message: check.Message}
+	docs, err := loadRuntimeCanonicalDocuments(repo)
+	if err != nil {
+		return Check{Name: "runtime_compile_native", Status: "failed", Message: err.Error()}
 	}
 	tempDB := outputDB
 	if filepath.Clean(outputDB) == filepath.Clean(filepath.Join(repo, "runtime", "runtime.db")) {
@@ -53,10 +56,13 @@ func buildNativeRuntimeDBFromSources(repo string, outputDB string) Check {
 	if err := createGoRuntimeSchema(db); err != nil {
 		return Check{Name: "runtime_compile_native", Status: "failed", Message: err.Error()}
 	}
-	if err := compileStructuredRuntimeSources(repo, db); err != nil {
+	if err := insertRuntimeConfigDocuments(db, docs); err != nil {
 		return Check{Name: "runtime_compile_native", Status: "failed", Message: err.Error()}
 	}
-	if err := compileProseRuntimeSources(repo, db); err != nil {
+	if err := compileStructuredRuntimeSources(repo, db, docs); err != nil {
+		return Check{Name: "runtime_compile_native", Status: "failed", Message: err.Error()}
+	}
+	if err := compileProseRuntimeSources(repo, db, docs); err != nil {
 		return Check{Name: "runtime_compile_native", Status: "failed", Message: err.Error()}
 	}
 	if _, err := db.Exec("VACUUM"); err != nil {
@@ -94,7 +100,9 @@ func createGoRuntimeSchema(db *sql.DB) error {
 		`CREATE TABLE discovery_checkpoints (id INTEGER PRIMARY KEY AUTOINCREMENT, phase TEXT NOT NULL, trigger TEXT NOT NULL, description TEXT, discovery_targets TEXT, metadata TEXT);`,
 		`CREATE TABLE discovery_search_strategy (id INTEGER PRIMARY KEY AUTOINCREMENT, priority_order TEXT, fallback TEXT, min_confidence_threshold TEXT);`,
 		`CREATE TABLE decision_recording (id INTEGER PRIMARY KEY AUTOINCREMENT, section TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
-		`CREATE TABLE runtime_source_files (source_path TEXT PRIMARY KEY, target_table TEXT NOT NULL, compile_rule TEXT NOT NULL, compiled_at TEXT NOT NULL, compiler_version TEXT NOT NULL, status TEXT NOT NULL);`,
+		`CREATE TABLE runtime_config_documents (logical_id TEXT PRIMARY KEY, owner_layer TEXT, status TEXT, schema_version TEXT, content_json TEXT NOT NULL, checksum TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT (datetime('now')));`,
+		`CREATE TABLE runtime_config_projections (id INTEGER PRIMARY KEY AUTOINCREMENT, logical_id TEXT NOT NULL, target_table TEXT NOT NULL, row_key TEXT NOT NULL, checksum TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT (datetime('now')), UNIQUE(logical_id, target_table, row_key));`,
+		`CREATE TABLE runtime_source_files (source_path TEXT PRIMARY KEY, source_kind TEXT NOT NULL DEFAULT 'db', target_table TEXT NOT NULL, compile_rule TEXT NOT NULL, compiled_at TEXT NOT NULL, compiler_version TEXT NOT NULL, status TEXT NOT NULL);`,
 		`CREATE TABLE compiler_metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);`,
 		`CREATE TABLE generated_surfaces (id INTEGER PRIMARY KEY AUTOINCREMENT, source_path TEXT NOT NULL, target_key TEXT NOT NULL, compile_rule TEXT NOT NULL, compiled_at TEXT NOT NULL, compiler_version TEXT NOT NULL, status TEXT NOT NULL, data TEXT NOT NULL, UNIQUE(source_path, target_key));`,
 		`CREATE TABLE runtime_budget (id INTEGER PRIMARY KEY AUTOINCREMENT, model_name TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
@@ -136,8 +144,8 @@ func createGoRuntimeSchema(db *sql.DB) error {
 	return nil
 }
 
-func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
-	phaseMachine, err := readRuntimeYAMLMap(repo, "runtime/phases/phase-machine.yaml")
+func compileStructuredRuntimeSources(repo string, db *sql.DB, docs map[string]map[string]any) error {
+	phaseMachine, err := runtimeCanonicalDocument(docs, "runtime/phases/phase-machine.yaml")
 	if err != nil {
 		return err
 	}
@@ -156,7 +164,7 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 		}
 	}
 
-	obligationLedger, err := readRuntimeYAMLMap(repo, "runtime/obligations/obligation-ledger.yaml")
+	obligationLedger, err := runtimeCanonicalDocument(docs, "runtime/obligations/obligation-ledger.yaml")
 	if err != nil {
 		return err
 	}
@@ -168,7 +176,7 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 		}
 	}
 
-	blockingGates, err := readRuntimeYAMLMap(repo, "runtime/gates/blocking-gates.yaml")
+	blockingGates, err := runtimeCanonicalDocument(docs, "runtime/gates/blocking-gates.yaml")
 	if err != nil {
 		return err
 	}
@@ -181,7 +189,7 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 		}
 	}
 
-	transactionMachine, err := readRuntimeYAMLMap(repo, "runtime/transactions/transaction-machine.yaml")
+	transactionMachine, err := runtimeCanonicalDocument(docs, "runtime/transactions/transaction-machine.yaml")
 	if err != nil {
 		return err
 	}
@@ -215,7 +223,7 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 		}
 	}
 
-	activationRules, err := readRuntimeYAMLMap(repo, "runtime/router/activation-rules.yaml")
+	activationRules, err := runtimeCanonicalDocument(docs, "runtime/router/activation-rules.yaml")
 	if err != nil {
 		return err
 	}
@@ -234,7 +242,7 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 		}
 	}
 
-	discoveryCheckpoints, err := readRuntimeYAMLMap(repo, "runtime/discovery/capability-checkpoints.yaml")
+	discoveryCheckpoints, err := runtimeCanonicalDocument(docs, "runtime/discovery/capability-checkpoints.yaml")
 	if err != nil {
 		return err
 	}
@@ -263,11 +271,11 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 	}
 
 	for _, config := range runtimeConfigMappings() {
-		if err := insertRuntimeConfigRows(repo, db, config.rel, config.table, config.idCol, config.listKey, config.idKeys); err != nil {
+		if err := insertRuntimeConfigRows(db, docs, config.rel, config.table, config.idCol, config.listKey, config.idKeys); err != nil {
 			return err
 		}
 		if config.rel == "runtime/budget/token-budget.yaml" {
-			if err := insertTokenBudgetFrameworkRows(repo, db); err != nil {
+			if err := insertTokenBudgetFrameworkRows(db, docs); err != nil {
 				return err
 			}
 		}
@@ -275,13 +283,13 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 			return err
 		}
 	}
-	if err := insertTransactionTemplateRows(repo, db); err != nil {
+	if err := insertTransactionTemplateRows(db, docs); err != nil {
 		return err
 	}
 	if err := insertRuntimeSourceFile(db, "runtime/transactions/transaction-templates.yaml", "transaction_templates", "transaction_templates_config"); err != nil {
 		return err
 	}
-	if err := insertCompilerRuleRows(repo, db); err != nil {
+	if err := insertCompilerRuleRows(db, docs); err != nil {
 		return err
 	}
 	if err := insertRuntimeSourceFile(db, "runtime/compiler/compiler-rules.yaml", "compiler_rules", "compiler_rules_config"); err != nil {
@@ -326,13 +334,41 @@ func runtimeConfigMappings() []runtimeConfigMapping {
 	}
 }
 
-func insertRuntimeSourceFile(db *sql.DB, rel string, table string, compileRule string) error {
-	_, err := db.Exec(`INSERT OR REPLACE INTO runtime_source_files (source_path, target_table, compile_rule, compiled_at, compiler_version, status) VALUES (?, ?, ?, datetime('now'), ?, 'synced')`, rel, table, compileRule, goRuntimeCompilerVersion)
-	return err
+func runtimeCanonicalDocumentPaths() []string {
+	seen := map[string]bool{}
+	paths := []string{}
+	for _, rel := range []string{
+		"runtime/phases/phase-machine.yaml",
+		"runtime/obligations/obligation-ledger.yaml",
+		"runtime/gates/blocking-gates.yaml",
+		"runtime/transactions/transaction-machine.yaml",
+		"runtime/router/activation-rules.yaml",
+		"runtime/discovery/capability-checkpoints.yaml",
+		"runtime/transactions/transaction-templates.yaml",
+		"runtime/compiler/compiler-rules.yaml",
+	} {
+		paths = append(paths, rel)
+		seen[rel] = true
+	}
+	for _, mapping := range runtimeConfigMappings() {
+		if !seen[mapping.rel] {
+			paths = append(paths, mapping.rel)
+			seen[mapping.rel] = true
+		}
+	}
+	sort.Strings(paths)
+	return paths
 }
 
-func insertTokenBudgetFrameworkRows(repo string, db *sql.DB) error {
-	config, err := readRuntimeYAMLMap(repo, "runtime/budget/token-budget.yaml")
+func insertRuntimeSourceFile(db *sql.DB, rel string, table string, compileRule string) error {
+	if _, err := db.Exec(`INSERT OR REPLACE INTO runtime_source_files (source_path, source_kind, target_table, compile_rule, compiled_at, compiler_version, status) VALUES (?, 'db', ?, ?, datetime('now'), ?, 'synced')`, rel, table, compileRule, goRuntimeCompilerVersion); err != nil {
+		return err
+	}
+	return insertRuntimeConfigProjection(db, rel, table, "__config__")
+}
+
+func insertTokenBudgetFrameworkRows(db *sql.DB, docs map[string]map[string]any) error {
+	config, err := runtimeCanonicalDocument(docs, "runtime/budget/token-budget.yaml")
 	if err != nil {
 		return err
 	}
@@ -374,8 +410,8 @@ func insertTokenBudgetFrameworkRows(repo string, db *sql.DB) error {
 	return nil
 }
 
-func insertRuntimeConfigRows(repo string, db *sql.DB, rel string, table string, idCol string, listKey string, idKeys []string) error {
-	config, err := readRuntimeYAMLMap(repo, rel)
+func insertRuntimeConfigRows(db *sql.DB, docs map[string]map[string]any, rel string, table string, idCol string, listKey string, idKeys []string) error {
+	config, err := runtimeCanonicalDocument(docs, rel)
 	if err != nil {
 		return err
 	}
@@ -408,8 +444,8 @@ func insertRuntimeConfigRows(repo string, db *sql.DB, rel string, table string, 
 	return nil
 }
 
-func insertTransactionTemplateRows(repo string, db *sql.DB) error {
-	config, err := readRuntimeYAMLMap(repo, "runtime/transactions/transaction-templates.yaml")
+func insertTransactionTemplateRows(db *sql.DB, docs map[string]map[string]any) error {
+	config, err := runtimeCanonicalDocument(docs, "runtime/transactions/transaction-templates.yaml")
 	if err != nil {
 		return err
 	}
@@ -425,9 +461,9 @@ func insertTransactionTemplateRows(repo string, db *sql.DB) error {
 	return nil
 }
 
-func insertCompilerRuleRows(repo string, db *sql.DB) error {
+func insertCompilerRuleRows(db *sql.DB, docs map[string]map[string]any) error {
 	var config compilerMappingFile
-	if err := readRuntimeYAML(repo, "runtime/compiler/compiler-rules.yaml", &config); err != nil {
+	if err := runtimeCanonicalDocumentStruct(docs, "runtime/compiler/compiler-rules.yaml", &config); err != nil {
 		return err
 	}
 	for _, rule := range config.CompilationRules {
@@ -459,9 +495,9 @@ func insertCompilerRuleRows(repo string, db *sql.DB) error {
 	return nil
 }
 
-func compileProseRuntimeSources(repo string, db *sql.DB) error {
+func compileProseRuntimeSources(repo string, db *sql.DB, docs map[string]map[string]any) error {
 	var config compilerMappingFile
-	if err := readRuntimeYAML(repo, "runtime/compiler/compiler-rules.yaml", &config); err != nil {
+	if err := runtimeCanonicalDocumentStruct(docs, "runtime/compiler/compiler-rules.yaml", &config); err != nil {
 		return err
 	}
 	for _, mapping := range config.SourceTargetMapping {
@@ -663,6 +699,117 @@ func runtimeCompilerDomain(sourcePath string) string {
 		return strings.ReplaceAll(match[1], "-", "_")
 	}
 	return "unknown"
+}
+
+func loadRuntimeCanonicalDocuments(repo string) (map[string]map[string]any, error) {
+	dbPath := filepath.Join(repo, "runtime", "runtime.db")
+	if docs, err := readRuntimeCanonicalDocumentsFromDB(dbPath); err == nil && len(docs) >= len(runtimeCanonicalDocumentPaths()) {
+		return docs, nil
+	}
+	return importRuntimeCanonicalDocumentsFromYAML(repo)
+}
+
+func readRuntimeCanonicalDocumentsFromDB(dbPath string) (map[string]map[string]any, error) {
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+	var tableCount int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'runtime_config_documents'`).Scan(&tableCount); err != nil {
+		return nil, err
+	}
+	if tableCount == 0 {
+		return nil, fmt.Errorf("runtime_config_documents table missing")
+	}
+	rows, err := db.Query(`SELECT logical_id, content_json FROM runtime_config_documents ORDER BY logical_id`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	docs := map[string]map[string]any{}
+	for rows.Next() {
+		var logicalID string
+		var content string
+		if err := rows.Scan(&logicalID, &content); err != nil {
+			return nil, err
+		}
+		var doc map[string]any
+		if err := json.Unmarshal([]byte(content), &doc); err != nil {
+			return nil, fmt.Errorf("%s canonical JSON: %w", logicalID, err)
+		}
+		docs[logicalID] = doc
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	if len(docs) == 0 {
+		return nil, fmt.Errorf("runtime_config_documents is empty")
+	}
+	return docs, nil
+}
+
+func importRuntimeCanonicalDocumentsFromYAML(repo string) (map[string]map[string]any, error) {
+	docs := map[string]map[string]any{}
+	for _, rel := range runtimeCanonicalDocumentPaths() {
+		doc, err := readRuntimeYAMLMap(repo, rel)
+		if err != nil {
+			return nil, fmt.Errorf("load canonical runtime document %s: %w", rel, err)
+		}
+		docs[rel] = doc
+	}
+	return docs, nil
+}
+
+func insertRuntimeConfigDocuments(db *sql.DB, docs map[string]map[string]any) error {
+	for _, logicalID := range runtimeCanonicalDocumentPaths() {
+		doc, err := runtimeCanonicalDocument(docs, logicalID)
+		if err != nil {
+			return err
+		}
+		content := runtimeJSON(doc)
+		checksum := runtimeDocumentChecksum(content)
+		if _, err := db.Exec(`INSERT OR REPLACE INTO runtime_config_documents (logical_id, owner_layer, status, schema_version, content_json, checksum, updated_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))`,
+			logicalID, runtimeString(doc["owner_layer"]), runtimeDefaultString(doc["status"], "active"), runtimeString(doc["schema_version"]), content, checksum,
+		); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func insertRuntimeConfigProjection(db *sql.DB, logicalID string, targetTable string, rowKey string) error {
+	var checksum string
+	if err := db.QueryRow(`SELECT checksum FROM runtime_config_documents WHERE logical_id = ?`, logicalID).Scan(&checksum); err != nil {
+		return err
+	}
+	_, err := db.Exec(`INSERT OR REPLACE INTO runtime_config_projections (logical_id, target_table, row_key, checksum, updated_at) VALUES (?, ?, ?, ?, datetime('now'))`, logicalID, targetTable, rowKey, checksum)
+	return err
+}
+
+func runtimeCanonicalDocument(docs map[string]map[string]any, logicalID string) (map[string]any, error) {
+	doc, ok := docs[logicalID]
+	if !ok {
+		return nil, fmt.Errorf("canonical runtime document missing: %s", logicalID)
+	}
+	return doc, nil
+}
+
+func runtimeCanonicalDocumentStruct(docs map[string]map[string]any, logicalID string, target any) error {
+	doc, err := runtimeCanonicalDocument(docs, logicalID)
+	if err != nil {
+		return err
+	}
+	content, err := json.Marshal(doc)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(content, target)
+}
+
+func runtimeDocumentChecksum(content string) string {
+	sum := sha256.Sum256([]byte(content))
+	return hex.EncodeToString(sum[:])
 }
 
 func readRuntimeYAML(repo string, rel string, target any) error {

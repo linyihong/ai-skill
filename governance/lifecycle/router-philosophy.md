@@ -38,16 +38,16 @@ Session Start
 
 ## Activation Rule Usage
 
-[`activation-rules.yaml`](../../runtime/router/activation-rules.yaml) 是 lazy rule activation 的 source-of-truth。Agent 應直接比對 task intent、file change、user signal 與 validation gap；不要引用已移除的 Ruby activation engine。
+[`activation-rules.yaml`](../../runtime/runtime.db) 是 lazy rule activation 的 source-of-truth。Agent 應直接比對 task intent、file change、user signal 與 validation gap；不要引用已移除的 Ruby activation engine。
 
 Go CLI 若未來新增 activation query 命令，應以 `activation-rules.yaml` 與 `knowledge/runtime/routing-registry.yaml` 為 source，並先補 validation fixture。
 
 ## 與既有文件的關係
 
 - [`runtime/router/`](../../runtime/router/) — Runtime navigation entry point (data files: `activation-rules.yaml`, `activation-table.md`)
-- [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — Lazy-load rules with activation conditions
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Lazy-load rules with activation conditions
 - [`runtime/router/activation-table.md`](../../runtime/router/activation-table.md) — Situation → Activated Rules table
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing records
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — Human-readable task intent routing table
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing registry
-- [`runtime/context/ttl-policy.yaml`](../../runtime/context/ttl-policy.yaml) — Context 生命週期管理
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Context 生命週期管理

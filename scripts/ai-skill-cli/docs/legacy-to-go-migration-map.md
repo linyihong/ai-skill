@@ -13,27 +13,27 @@ Use this map together with [`script-parity-inventory.md`](script-parity-inventor
 
 | Old surface | New owner | Source to edit | Validation |
 | --- | --- | --- | --- |
-| `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | `runtime/compiler/compiler-rules.yaml` and runtime YAML sources | `go test ./...`, `ai-skill runtime compile`, `ai-skill runtime validate` |
-| `runtime/compiler/embedded_data.rb` | `scripts/ai-skill-cli/internal/app/runtime_compiler.go` | `runtime/phases/`, `runtime/obligations/`, `runtime/gates/`, `runtime/recovery/`, `runtime/scheduler/`, `runtime/transactions/`, `runtime/discovery/` | source-to-DB compiler tests, runtime DB row-count and JSON validation |
+| `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | `runtime/runtime.db` and SQLite canonical runtime documents | `go test ./...`, `ai-skill runtime compile`, `ai-skill runtime validate` |
+| `runtime/compiler/embedded_data.rb` | `scripts/ai-skill-cli/internal/app/runtime_compiler.go` | `runtime/runtime.db` canonical documents | source-to-DB compiler tests, runtime DB row-count and JSON validation |
 | Ruby compiler schema creation | `createGoRuntimeSchema` in `runtime_compiler.go` | Go compiler schema code | native runtime DB validation and stable compiler snapshot tests |
-| Ruby generated surface extraction | Go prose extraction in `runtime_compiler.go` | `runtime/compiler/compiler-rules.yaml` mappings and prose sources | generated surface assertions and golden runtime fixture |
+| Ruby generated surface extraction | Go prose extraction in `runtime_compiler.go` | `runtime/runtime.db` mappings and prose sources | generated surface assertions and golden runtime fixture |
 | Ruby compiler metadata writes | Go compiler metadata writes | `goRuntimeCompilerVersion` and runtime compiler code | `compiler_metadata` validation |
 
 ### Developer Rule
 
-Do not recreate Ruby fallback files or copy an existing `runtime.db` as a compiler shortcut. A valid compiler change must compile from source files into a fresh DB and pass native runtime DB validation.
+Do not recreate Ruby fallback files or committed runtime YAML mirrors. A valid compiler change must refresh projections from SQLite canonical runtime documents into a fresh DB and pass native runtime DB validation.
 
-## Restored Runtime YAML Sources
+## SQLite Canonical Runtime Sources
 
-| Runtime concern | Source path | Runtime DB tables |
+| Runtime concern | Canonical source | Runtime DB tables |
 | --- | --- | --- |
-| Phase machine | `runtime/phases/phase-machine.yaml` | `phases`, `phase_transitions`, `phase_machine` |
-| Obligations | `runtime/obligations/obligation-ledger.yaml` | `obligations`, `obligation_ledger` |
-| Blocking gates | `runtime/gates/blocking-gates.yaml` | `gates`, `blocking_gates` |
-| Transactions | `runtime/transactions/transaction-machine.yaml`, `runtime/transactions/transaction-templates.yaml` | `transaction_states`, `transaction_transitions`, `transaction_rules`, `transaction_templates`, `transaction_templates_ext` |
-| Recovery | `runtime/recovery/*.yaml` | `recovery_strategies`, `state_repair`, `obligation_rebuild`, `phase_reconciliation` |
-| Scheduler | `runtime/scheduler/*.yaml` | `execution_queue`, `priority_scheduler` |
-| Discovery checkpoints | `runtime/discovery/capability-checkpoints.yaml` | `discovery_checkpoints`, `discovery_search_strategy`, `capability_checkpoints` |
+| Phase machine | `runtime/runtime.db` | `phases`, `phase_transitions`, `phase_machine` |
+| Obligations | `runtime/runtime.db` | `obligations`, `obligation_ledger` |
+| Blocking gates | `runtime/runtime.db` | `gates`, `blocking_gates` |
+| Transactions | `runtime/runtime.db` | `transaction_states`, `transaction_transitions`, `transaction_rules`, `transaction_templates`, `transaction_templates_ext` |
+| Recovery | `runtime/runtime.db` | `recovery_strategies`, `state_repair`, `obligation_rebuild`, `phase_reconciliation` |
+| Scheduler | `runtime/runtime.db` | `execution_queue`, `priority_scheduler` |
+| Discovery checkpoints | `runtime/runtime.db` | `discovery_checkpoints`, `discovery_search_strategy`, `capability_checkpoints` |
 
 When any source above changes, run:
 

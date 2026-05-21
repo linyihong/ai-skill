@@ -2,7 +2,7 @@
 
 ## Problem
 
-現有系統的 lazy-loading 機制（[`activation-rules.yaml`](../../runtime/router/activation-rules.yaml) + [`routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml)）非常有效——它確保 agent 只載入需要的知識。但這也帶來一個根本問題：
+現有系統的 lazy-loading 機制（[`activation-rules.yaml`](../../runtime/runtime.db) + [`routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml)）非常有效——它確保 agent 只載入需要的知識。但這也帶來一個根本問題：
 
 > **Agent 不知道自己不知道什麼。**
 
@@ -36,13 +36,13 @@ Discovery 使用 [`knowledge/graphs/`](../../knowledge/graphs/README.md) 的 edg
 
 | 元件 | 整合方式 |
 |------|---------|
-| [`runtime/runtime.db`](../../runtime/runtime.db) / [`runtime/discovery/capability-checkpoints.yaml`](../../runtime/discovery/capability-checkpoints.yaml) | checkpoint phase、`run_capability_discovery` allowed_action、obligation 與 gate 的 compiled source |
+| [`runtime/runtime.db`](../../runtime/runtime.db) / [`runtime/runtime.db`](../../runtime/runtime.db) | checkpoint phase、`run_capability_discovery` allowed_action、obligation 與 gate 的 compiled source |
 | `capability_checkpoints` table | Phase-aware discovery checkpoint definitions |
 
 ## 與既有文件的關係
 
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Compiled discovery checkpoint runtime surface
-- [`runtime/discovery/capability-checkpoints.yaml`](../../runtime/discovery/capability-checkpoints.yaml) — Source for discovery checkpoints
-- [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — 被動 lazy-loading，與 discovery 互補
+- [`runtime/runtime.db`](../../runtime/runtime.db) — Source for discovery checkpoints
+- [`runtime/runtime.db`](../../runtime/runtime.db) — 被動 lazy-loading，與 discovery 互補
 - [`knowledge/graphs/README.md`](../../knowledge/graphs/README.md) — Graph edges 作為 discovery 的搜尋索引
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — Task intent routing table 作為 discovery 的快速路徑

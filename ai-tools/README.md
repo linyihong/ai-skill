@@ -32,10 +32,10 @@
 |---|---|
 | Core Bootstrap 流程（讀 CORE_BOOTSTRAP.md → README.md → ...） | [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md) |
 | Pipeline 階段（Bootstrap → Routing → Execution → Close-loop） | [`runtime/pipeline/`](../runtime/pipeline/) |
-| Context expansion 層級（Summary → Module → Detailed → Raw） | [`runtime/pipeline/context-flow.yaml`](../runtime/pipeline/context-flow.yaml) |
-| Relevance scoring 邏輯 | [`runtime/pipeline/relevance-engine.yaml`](../runtime/pipeline/relevance-engine.yaml) |
-| Guard chain 執行順序 | [`runtime/pipeline/guard-chain.yaml`](../runtime/pipeline/guard-chain.yaml) |
-| Token budget 分配表 | [`runtime/budget/token-budget.yaml`](../runtime/budget/token-budget.yaml) |
+| Context expansion 層級（Summary → Module → Detailed → Raw） | [`runtime/runtime.db`](../runtime/runtime.db) |
+| Relevance scoring 邏輯 | [`runtime/runtime.db`](../runtime/runtime.db) |
+| Guard chain 執行順序 | [`runtime/runtime.db`](../runtime/runtime.db) |
+| Token budget 分配表 | [`runtime/runtime.db`](../runtime/runtime.db) |
 | 知識庫路徑對照表（CORE_BOOTSTRAP.md → README.md → ...） | [`README.md`](../README.md) OS layout |
 | 共用規則清單 | [`enforcement/README.md`](../enforcement/README.md) |
 | Goal ledger 操作流程 | [`enforcement/conversation-goal-ledger.md`](../enforcement/conversation-goal-ledger.md) |

@@ -11,7 +11,7 @@ given:
   task: start_new_domain_task
   artifacts:
     - governance/ai-runtime-governance/cognitive-state-governance.md
-    - runtime/guards/circuit-breaker.yaml
+    - runtime/runtime.db
   signals:
     - prior task was in apk-analysis
     - new task is software-delivery

@@ -253,13 +253,13 @@
 
 副作用：
 
-- `pre-commit`：可能在 staged runtime source 改動時執行 `runtime compile` 並 stage `runtime/runtime.db`；可能執行 `runtime validate`。
+- `pre-commit`：當 staged `runtime/runtime.db` 或 knowledge / validation surface 改動時執行 `runtime validate`；不再因 committed runtime YAML mirror 觸發 compile。
 - `post-commit`：reference-only 預設 no-op；若 `AI_SKILL_SYNC_CURSOR_BUNDLE=1`，只回報 Go mirror write mode 狀態，不呼叫 deleted shell。
 
 必要行為：
 
 - 不使用 shell grep / uname 判斷業務邏輯。
-- Staged-file decision、runtime compile、knowledge validation 都在 Go 中完成。
+- Staged-file decision、runtime DB validation、knowledge validation 都在 Go 中完成。
 - Hook adapter 若保留，內容只能解析 repo root / binary path 並呼叫此 command。
 
 ### `ai-skill runtime refresh`
@@ -290,7 +290,7 @@
 
 ### `ai-skill runtime compile`
 
-目的：用 Go-native compiler 從 runtime YAML 與 deterministic prose mappings 編譯 `runtime/runtime.db`。
+目的：用 Go-native compiler 從 SQLite canonical runtime documents 與 deterministic prose mappings refresh `runtime/runtime.db` projections。
 
 輸入：
 
@@ -305,14 +305,14 @@
 副作用：
 
 - 可能更新 `runtime/runtime.db`。
-- 預設 native source-to-DB mode 不依賴 Ruby、Python 或外部 `sqlite3` CLI。
+- 預設 native SQLite-canonical projection mode 不依賴 Ruby、Python 或外部 `sqlite3` CLI。
 
 驗證：
 
 - `runtime/runtime.db` integrity check。
 - `generated_surfaces` content assertion。
 - compiler version / schema version 存在。
-- Go compiler 讀取 `runtime/compiler/compiler-rules.yaml`、runtime YAML source、以及 deterministic prose sources，產生指定 `--db` output，並通過 native runtime DB validation。
+- Go compiler 讀取 `runtime/runtime.db` 的 `runtime_config_documents`、compiler mapping document、以及 deterministic prose sources，產生指定 `--db` output，並通過 native runtime DB validation。
 
 ### `ai-skill runtime validate`
 
