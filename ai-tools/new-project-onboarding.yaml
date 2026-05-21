@@ -1,0 +1,106 @@
+id: ai_tools.new_project_onboarding
+title: New project onboarding flow
+owner_layer: ai-tools
+source_markdown: ai-tools/new-project-onboarding.md
+status: active
+contract_type: project_onboarding_flow
+
+runtime_projection:
+  enabled: true
+  target_key: ai_tools.new_project_onboarding.contract
+  surface_type: executable_yaml_contract
+  execution_scope: project_initialization
+
+activation:
+  events:
+    - new_project_created
+    - init_project_command_changed
+    - agent_tool_added_to_project_setup
+    - project_bootstrap_template_changed
+  required_when:
+    - 修改 `ai-skill init-project`
+    - 新增或移除 project-level AI tool bootstrap
+    - 修改 `ai-tools/agent/<tool>.md` 且影響新專案初始化
+    - 修改 project-local tool files 或 durable Markdown setup
+
+inputs:
+  required:
+    - project_root
+    - selected_tools
+    - ai_skill_repo_path
+  optional:
+    - force_overwrite
+    - dry_run
+    - global_tool_setup
+
+steps:
+  - id: select_tools
+    order: 1
+    action: 決定新專案需要初始化哪些 AI tool
+    required_sources:
+      - ai-tools/README.md
+      - ai-tools/agent-onboarding.yaml
+    output: selected_tool_set
+
+  - id: render_project_bootstrap_files
+    order: 2
+    action: 產生或更新 project-level bootstrap files
+    required_sources:
+      - scripts/ai-skill-cli/internal/app/init_project.go
+      - CORE_BOOTSTRAP.md
+      - README.md
+    output: project_bootstrap_files
+
+  - id: apply_tool_specific_adapters
+    order: 3
+    action: 依工具套用 adapter-specific project setup
+    required_sources:
+      - ai-tools/agent/claude.md
+      - ai-tools/agent/cursor.md
+      - ai-tools/agent/roo.md
+      - ai-tools/agent/codex.md
+    output: tool_adapter_setup
+
+  - id: wire_durable_documentation_flow
+    order: 4
+    action: 接入 durable Markdown 與 documentation workflow
+    required_sources:
+      - workflow/documentation/README.md
+      - workflow/documentation/execution-flow.md
+    output: documentation_bootstrap
+
+  - id: validate_language_and_runtime_policy
+    order: 5
+    action: 套用語言一致性、tool neutrality 與 runtime source-of-truth 規則
+    required_sources:
+      - runtime/runtime.db
+      - enforcement/neutral-language.md
+      - enforcement/tool-neutral-documentation.md
+    gates:
+      - gate.output.language_consistency
+      - gate.output.tool_neutrality
+    output: policy_validation
+
+  - id: run_runtime_validation
+    order: 6
+    action: 執行 runtime compile、refresh、validate
+    required_commands:
+      - "scripts\\ai-skill-cli\\bin\\ai-skill-windows-amd64.exe runtime compile --repo . --native-compiler --json"
+      - "scripts\\ai-skill-cli\\bin\\ai-skill-windows-amd64.exe runtime refresh --repo . --json"
+      - "scripts\\ai-skill-cli\\bin\\ai-skill-windows-amd64.exe runtime validate --repo . --json"
+    output: validation_result
+
+success_criteria:
+  - 新專案 bootstrap files 只指向 canonical source，不複製規則全文
+  - selected tools 與 `ai-tools/agent/` adapter 清單一致
+  - 新增工具時同步更新 agent onboarding 與 project onboarding
+  - runtime projection 為 synced
+
+failure_modes:
+  - id: missing_tool_in_project_onboarding
+    detection: "`ai-tools/agent/<tool>.md` 存在，但 new project onboarding 沒有列入工具清單或 init-project 支援說明"
+    recovery: "更新 `ai-tools/new-project-onboarding.md`、`ai-tools/new-project-onboarding.yaml` 與必要的 init-project code"
+
+  - id: duplicated_project_rules
+    detection: "project bootstrap file 複製大量規則正文"
+    recovery: "改成 pointer，指向 `CORE_BOOTSTRAP.md`、`README.md`、`runtime/runtime.db` 與對應 adapter"

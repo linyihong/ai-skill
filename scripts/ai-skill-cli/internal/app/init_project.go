@@ -30,7 +30,7 @@ func runInitProject(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs := newFlagSet("init-project", stderr)
 	opts := initProjectOptions{}
 	fs.StringVar(&opts.projectPath, "project", "", "target project directory")
-	fs.StringVar(&opts.tools, "tools", "roo,cursor,claude", "comma-separated tools: roo,cursor,claude")
+	fs.StringVar(&opts.tools, "tools", "roo,cursor,claude,codex", "comma-separated tools: roo,cursor,claude,codex")
 	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview planned files without writing")
 	fs.BoolVar(&opts.force, "force", false, "allow overwriting existing files")
 	fs.BoolVar(&opts.jsonOutput, "json", false, "write machine-readable JSON output")
@@ -94,7 +94,7 @@ func buildInitProjectResult(opts initProjectOptions) Result {
 		result.Error = &CommandError{
 			Code:        "invalid_tools",
 			Message:     toolsCheck.Message,
-			Remediation: "Use one or more supported tools: roo,cursor,claude.",
+			Remediation: "Use one or more supported tools: roo,cursor,claude,codex.",
 		}
 	}
 
@@ -206,7 +206,7 @@ func resolveTargetProject(projectPath string) (string, Check) {
 }
 
 func parseInitTools(value string) ([]string, Check) {
-	supported := map[string]bool{"roo": true, "cursor": true, "claude": true}
+	supported := map[string]bool{"roo": true, "cursor": true, "claude": true, "codex": true}
 	seen := map[string]bool{}
 	ignored := []string{}
 	for _, part := range strings.Split(value, ",") {
@@ -248,6 +248,8 @@ func initProjectPlannedFiles(target string, tools []string) []plannedFile {
 			)
 		case "claude":
 			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "CLAUDE.md"), description: "Claude Code settings"})
+		case "codex":
+			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "AGENTS.md"), description: "Codex settings"})
 		}
 	}
 	files = append(files, plannedFile{tool: "common", path: filepath.Join(target, ".agent-goals", "README.md"), description: "agent goals ledger"})
@@ -277,6 +279,8 @@ func initProjectFileContent(file plannedFile, repo string) (string, error) {
 		return initProjectCursorRuleContent(repo), nil
 	case "claude":
 		return initProjectClaudeContent(repo), nil
+	case "codex":
+		return initProjectCodexContent(repo), nil
 	case "common":
 		return initProjectGoalsReadmeContent(repo), nil
 	default:
@@ -365,6 +369,25 @@ func initProjectCursorHooksContent() string {
 
 func initProjectClaudeContent(repo string) string {
 	return fmt.Sprintf("# Claude Code Auto-Bootstrap\n\n%s", initProjectBootstrapText(repo))
+}
+
+func initProjectCodexContent(repo string) string {
+	return fmt.Sprintf(`# Codex Adapter Bootstrap
+
+本文件是 project-level Codex 自動載入入口，只負責指向 Ai-skill canonical source，不保存獨立規則副本。
+
+啟動時，Codex 必須依序讀取：
+
+1. %s
+2. %s
+3. %s
+4. %s
+
+若需要更新 Codex adapter 規則，請修改 Ai-skill repo 的 `+"`ai-tools/agent/codex.md`"+`，不要在本專案複製一套平行規則。
+`, filepath.Join(repo, "CORE_BOOTSTRAP.md"),
+		filepath.Join(repo, "README.md"),
+		filepath.Join(repo, "ai-tools", "agent", "codex.md"),
+		filepath.Join(repo, "runtime", "runtime.db"))
 }
 
 func initProjectGoalsReadmeContent(repo string) string {

@@ -567,6 +567,7 @@ func compileExecutableYAMLContracts(repo string, db *sql.DB) error {
 		"governance",
 		"enforcement",
 		"workflow",
+		"ai-tools",
 		filepath.ToSlash(filepath.Join("metadata", "rules")),
 	}
 	return filepath.Walk(repo, func(path string, info os.FileInfo, walkErr error) error {

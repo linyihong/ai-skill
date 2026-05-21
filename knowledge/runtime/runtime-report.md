@@ -6,7 +6,7 @@
 
 | Surface | Path | Count / Status |
 | --- | --- | --- |
-| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 53 records |
+| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 55 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
@@ -62,6 +62,8 @@
 | `route.governance.decision-promotion-pipeline` | `governance/lifecycle/decision-promotion-pipeline.yaml` | `small` | `source-backed` | Promotion target is selected by content type; ADR is created only when constitution criteria match; execution-affecting targets handle runtime projection.  |
 | `route.architecture.permanent-docs` | `architecture/README.md` | `small` | `summary-first` | architecture/README.md 已讀取，架構文件清單已查詢。 |
 | `route.evaluations.scenario-results` | `evaluations/README.md` | `small` | `index-only` | Evaluation 記錄已依 scenario 分類存放，格式與 template 一致。 |
+| `route.ai-tools.agent-onboarding` | `ai-tools/agent-onboarding.yaml` | `small` | `source-backed` | Tool bootstrap entrypoints remain thin pointers; reusable rules stay in ai-tools, enforcement, governance, workflow, or runtime.db; enabled YAML contract is synced into runtime.db.generated_surfaces.  |
+| `route.ai-tools.new-project-onboarding` | `ai-tools/new-project-onboarding.yaml` | `small` | `source-backed` | Agent adapter additions are reflected in project onboarding when they affect init-project or project-level bootstrap files; enabled YAML contract is synced into runtime.db.generated_surfaces.  |
 | `route.tools.metadata-routing` | `tools/README.md` | `small` | `index-only` | Tool metadata 已定義，compression 策略與 routing 規則已建立。 |
 | `route.traces.decision-traces` | `traces/README.md` | `small` | `index-only` | Trace 記錄已依 scenario 分類存放，格式與 template 一致。 |
 | `route.anti-patterns.runtime-patterns` | `anti-patterns/README.md` | `small` | `summary-first` | Anti-pattern 已依格式記錄，症狀、預防與恢復方式已定義。 |

@@ -188,3 +188,17 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project /path/to/p
 - [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md) — 最小啟動集合
 
 ← [回到 AI 工具索引](README.md)
+# Runtime Projection
+
+本 new project onboarding 是可執行流程，companion YAML 為 [`new-project-onboarding.yaml`](new-project-onboarding.yaml)。
+
+更新 `ai-skill init-project`、project-level bootstrap files、工具清單或 `ai-tools/agent/<tool>.md` 並影響新專案初始化時，必須同步檢查本文件與 YAML activation contract。
+
+目前 `ai-skill init-project` 支援的工具：
+
+| 工具 | Project bootstrap file | Canonical adapter |
+| --- | --- | --- |
+| Roo Code | `.roomodes` | [`agent/roo.md`](agent/roo.md) |
+| Cursor | `.cursor/rules/ai-skill-bootstrap.mdc`、`.cursor/hooks.json` | [`agent/cursor.md`](agent/cursor.md) |
+| Claude Code | `CLAUDE.md` | [`agent/claude.md`](agent/claude.md) |
+| Codex | `AGENTS.md` | [`agent/codex.md`](agent/codex.md) |

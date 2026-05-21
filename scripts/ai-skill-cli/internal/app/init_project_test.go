@@ -111,6 +111,25 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	}
 }
 
+func TestInitProjectWritesCodexBootstrap(t *testing.T) {
+	project := t.TempDir()
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"init-project", "--project", project, "--tools", "codex", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected write success, got %d; stderr=%s", code, stderr.String())
+	}
+
+	content, err := os.ReadFile(filepath.Join(project, "AGENTS.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(content), "ai-tools/agent/codex.md") {
+		t.Fatalf("expected Codex adapter pointer, got %s", string(content))
+	}
+}
+
 func TestInitProjectPlainOutputIncludesPlannedActions(t *testing.T) {
 	project := t.TempDir()
 

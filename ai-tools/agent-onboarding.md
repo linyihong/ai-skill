@@ -124,3 +124,28 @@
 | 驗證邏輯 | [`ai-skill runtime validate`](../ai-skill runtime validate) |
 
 ← [回到 AI 工具索引](README.md)
+# Runtime Projection
+
+本 onboarding checklist 是可執行流程，companion YAML 為 [`agent-onboarding.yaml`](agent-onboarding.yaml)。
+
+更新 `ai-tools/agent/` adapter、root 自動載入入口或工具設定時，必須同步檢查 YAML activation contract。
+
+如果新工具會影響 project initialization、`ai-skill init-project`、project-level bootstrap files 或工具清單，也必須同步更新 [`new-project-onboarding.md`](new-project-onboarding.md) 與 [`new-project-onboarding.yaml`](new-project-onboarding.yaml)。
+
+影響 agent execution 時，必須執行 runtime compile、refresh、validate。
+
+## Agent Adapter 更新強制檢查
+
+新增或修改 `ai-tools/agent/<tool>.md` 時，必須同步檢查：
+
+| 檢查面 | 必查文件 / 實作 | 何時需要更新 |
+| --- | --- | --- |
+| Tool adapter | `ai-tools/agent/<tool>.md` | 新增工具、修改工具 bootstrap、修改 tool-specific 限制 |
+| Tool index | [`ai-tools/README.md`](README.md) | 工具清單、用途或 adapter 位置改變 |
+| Agent onboarding contract | [`agent-onboarding.yaml`](agent-onboarding.yaml) | onboarding steps、required sources、validation gates 改變 |
+| Project onboarding | [`new-project-onboarding.md`](new-project-onboarding.md)、[`new-project-onboarding.yaml`](new-project-onboarding.yaml) | 新工具會進入 project initialization、工具清單或 bootstrap files |
+| Init-project code | `scripts/ai-skill-cli/internal/app/init_project.go` | `ai-skill init-project --tools` 需要支援新工具或新 bootstrap file |
+| Init-project tests | `scripts/ai-skill-cli/internal/app/init_project_test.go` | init-project behavior 改變 |
+| Runtime projection | [`runtime/runtime.db`](../runtime/runtime.db) | YAML contract 設定 `runtime_projection.enabled: true` |
+
+若上述任一 execution-affecting surface 改變，必須跑 runtime compile、refresh、validate；若 Go CLI code 改變，也必須跑 `go test ./...` 並重建 repo-local binaries。

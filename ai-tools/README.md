@@ -4,7 +4,7 @@
 
 | 類別 | 說明 | 包含工具 |
 |------|------|----------|
-| [`agent/`](agent/) | AI Agent 工具（CLI 或 IDE 內建的 AI 助手） | Roo Code、Cursor、Claude Code |
+| [`agent/`](agent/) | AI Agent 工具（CLI 或 IDE 內建的 AI 助手） | Roo Code、Cursor、Claude Code、Codex |
 
 > **注意**：VS Code Extension 全域設定的通用知識（SQLite 資料庫位置、結構、查詢/修改方法）已昇華到 [`intelligence/ide/vscode-extension-global-state.md`](../intelligence/ide/vscode-extension-global-state.md) 作為可重複使用的工程智慧。各 agent 工具（如 Roo Code）的專屬設定細節留在對應的工具文件中。
 
@@ -67,6 +67,7 @@ Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating
 | Claude Code | [`agent/claude.md`](agent/claude.md) | `CLAUDE.md` 自動載入入口、`.claude/settings.json` 工具配置、tool adapter 機制、對話目標閉環。 |
 | Cursor | [`agent/cursor.md`](agent/cursor.md) | `.cursor/rules/*.mdc` 自動載入、`.cursor/hooks.json` 設定、對話目標閉環（含 hooks 範本）。 |
 | Roo Code | [`agent/roo.md`](agent/roo.md) | Custom instructions 手動設定、多 modes 與 file restrictions、`.roomodes` 自訂 mode 定義、對話目標閉環、語言偏好雙層設定。 |
+| Codex | [`agent/codex.md`](agent/codex.md) | `AGENTS.md` 自動載入入口、runtime SQLite source-of-truth、YAML contract projection、commit / push 更新流程。 |
 | **新增工具指引** | [`agent-onboarding.md`](agent-onboarding.md) | 新 AI agent 工具加入時的設定 checklist，含必要項目與參考來源對照。 |
 
 ← [回到根目錄](../README.md)

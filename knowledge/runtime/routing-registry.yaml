@@ -1597,6 +1597,83 @@ records:
       compression_level: index-only
       reason: evaluations/ 在需要查詢或記錄 scenario 執行結果時才讀取。
 
+  - id: route.ai-tools.agent-onboarding
+    task_intent: 新增或修改 AI agent 工具 adapter、root bootstrap 入口、工具設定與 onboarding checklist
+    primary_source: ai-tools/agent-onboarding.yaml
+    required_dependencies:
+      - ai-tools/agent-onboarding.md
+      - ai-tools/README.md
+      - runtime/runtime.db
+    candidate_sources:
+      - ai-tools/agent/codex.md
+      - ai-tools/agent/claude.md
+      - ai-tools/agent/cursor.md
+      - ai-tools/agent/roo.md
+      - enforcement/tool-neutral-documentation.md
+      - enforcement/neutral-language.md
+    source_of_truth_gate: ai-tools-agent-onboarding-active
+    ranking_reason: >
+      Agent onboarding is a repeatable setup flow. The Markdown explains the
+      human procedure and the YAML contract defines activation, required inputs,
+      validation gates, and runtime projection.
+    validation_signal: >
+      Tool bootstrap entrypoints remain thin pointers; reusable rules stay in
+      ai-tools, enforcement, governance, workflow, or runtime.db; enabled YAML
+      contract is synced into runtime.db.generated_surfaces.
+    metadata:
+      priority: P1
+      confidence: high
+      context_cost:
+        estimated_tokens: 500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: 只有在新增或修改 agent 工具設定、adapter 或 bootstrap 入口時才載入。
+  - id: route.ai-tools.new-project-onboarding
+    task_intent: 新專案初始化、ai-skill init-project、project-level bootstrap files 與工具清單同步
+    primary_source: ai-tools/new-project-onboarding.yaml
+    required_dependencies:
+      - ai-tools/new-project-onboarding.md
+      - ai-tools/agent-onboarding.yaml
+      - ai-tools/README.md
+      - scripts/ai-skill-cli/internal/app/init_project.go
+      - runtime/runtime.db
+    candidate_sources:
+      - ai-tools/agent/codex.md
+      - ai-tools/agent/claude.md
+      - ai-tools/agent/cursor.md
+      - ai-tools/agent/roo.md
+      - workflow/documentation/README.md
+      - workflow/documentation/execution-flow.md
+    source_of_truth_gate: ai-tools-new-project-onboarding-active
+    ranking_reason: >
+      New project onboarding is a repeatable project initialization flow.
+      The Markdown explains usage and the YAML contract defines selected tools,
+      project bootstrap files, adapter setup, and validation gates.
+    validation_signal: >
+      Agent adapter additions are reflected in project onboarding when they
+      affect init-project or project-level bootstrap files; enabled YAML contract
+      is synced into runtime.db.generated_surfaces.
+    metadata:
+      priority: P1
+      confidence: high
+      context_cost:
+        estimated_tokens: 500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: 只有在修改新專案初始化、工具清單或 project bootstrap files 時才載入。
+
   - id: route.tools.metadata-routing
     task_intent: 查詢 tool metadata、compression 策略或 routing 規則
     primary_source: tools/README.md

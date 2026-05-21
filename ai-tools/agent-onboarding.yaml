@@ -1,0 +1,136 @@
+id: ai_tools.agent_onboarding
+title: AI agent onboarding flow
+owner_layer: ai-tools
+source_markdown: ai-tools/agent-onboarding.md
+status: active
+contract_type: onboarding_flow
+
+runtime_projection:
+  enabled: true
+  target_key: ai_tools.agent_onboarding.contract
+  surface_type: executable_yaml_contract
+  execution_scope: agent_tool_setup
+
+activation:
+  events:
+    - new_agent_tool_added
+    - agent_adapter_created
+    - tool_bootstrap_changed
+    - project_tool_config_updated
+  required_when:
+    - 新增或修改 AI agent 工具設定
+    - 新增 `ai-tools/agent/<tool>.md`
+    - 修改 root 自動載入入口，例如 `AGENTS.md`、`CLAUDE.md`、`.cursor/rules/*.mdc` 或 `.roomodes`
+    - 將流程、checkpoint 或 runtime obligation 接入工具設定
+
+inputs:
+  required:
+    - tool_name
+    - tool_entrypoint
+    - bootstrap_source
+  optional:
+    - tool_config_files
+    - hook_files
+    - runtime_tables
+
+steps:
+  - id: identify_agent_tool
+    order: 1
+    action: 判斷工具類型與設定位置
+    required_sources:
+      - ai-tools/README.md
+    output: tool_profile
+
+  - id: select_configuration_layer
+    order: 2
+    action: 區分全域設定與專案設定
+    required_sources:
+      - ai-tools/agent-onboarding.md
+    output: configuration_boundary
+
+  - id: create_tool_adapter
+    order: 3
+    action: 在 `ai-tools/agent/` 建立或更新工具專屬 adapter 文件
+    required_sources:
+      - ai-tools/agent/
+    output: adapter_document
+
+  - id: sync_new_project_onboarding
+    order: 4
+    action: 檢查並更新新專案 onboarding 文件與 init-project 支援面
+    required_sources:
+      - ai-tools/new-project-onboarding.md
+      - ai-tools/new-project-onboarding.yaml
+      - scripts/ai-skill-cli/internal/app/init_project.go
+    output: project_onboarding_delta
+
+  - id: wire_bootstrap_entrypoint
+    order: 5
+    action: 讓工具自動載入入口只指向 canonical source，不複製一套平行規則
+    required_sources:
+      - CORE_BOOTSTRAP.md
+      - README.md
+      - runtime/runtime.db
+    output: bootstrap_entrypoint
+
+  - id: enforce_language_policy
+    order: 6
+    action: 套用使用者語言一致性與繁體中文可重用文件規則
+    required_sources:
+      - runtime/runtime.db
+      - enforcement/neutral-language.md
+    gates:
+      - gate.output.language_consistency
+      - gate.output.final_language_check
+    output: language_policy_applied
+
+  - id: add_runtime_checkpoint
+    order: 7
+    action: 將 knowledge update checkpoint 與 runtime phase/gate 說明接入 adapter
+    required_sources:
+      - governance/lifecycle/knowledge-update-flow.yaml
+      - runtime/runtime.db
+    output: checkpoint_contract
+
+  - id: validate_tool_neutrality
+    order: 8
+    action: 確認共用規則仍留在 enforcement、governance、workflow 或 runtime，不塞進工具文件
+    required_sources:
+      - enforcement/tool-neutral-documentation.md
+      - runtime/runtime.db
+    gates:
+      - gate.output.tool_neutrality
+    output: neutrality_check
+
+  - id: run_runtime_validation
+    order: 9
+    action: 執行 runtime compile、refresh、validate
+    required_commands:
+      - "scripts\\ai-skill-cli\\bin\\ai-skill-windows-amd64.exe runtime compile --repo . --native-compiler --json"
+      - "scripts\\ai-skill-cli\\bin\\ai-skill-windows-amd64.exe runtime refresh --repo . --json"
+      - "scripts\\ai-skill-cli\\bin\\ai-skill-windows-amd64.exe runtime validate --repo . --json"
+    output: validation_result
+
+success_criteria:
+  - 工具入口只 bootstrap，不保存獨立規則副本
+  - canonical 規則仍在 `ai-tools/`、`enforcement/`、`governance/`、`workflow/` 或 `runtime/runtime.db`
+  - 新工具若影響 project initialization，`ai-tools/new-project-onboarding.md` 與 `ai-tools/new-project-onboarding.yaml` 已同步
+  - 語言政策符合使用者語言與可重用文件繁體中文規則
+  - runtime projection 為 synced
+
+failure_modes:
+  - id: duplicated_tool_rules
+    detection: "root entrypoint 包含大量平行規則正文"
+    recovery: "移回 `ai-tools/agent/<tool>.md`，root 僅保留 bootstrap pointer"
+
+  - id: missing_yaml_contract
+    detection: "onboarding checklist 只有 Markdown，沒有 companion YAML"
+    recovery: "新增或更新 `ai-tools/agent-onboarding.yaml`"
+
+  - id: stale_project_onboarding
+    detection: "新 agent adapter 已加入，但 `new-project-onboarding` 未同步工具清單、init-project 行為或驗證說明"
+    recovery: "更新 `ai-tools/new-project-onboarding.md` 與 `ai-tools/new-project-onboarding.yaml`"
+
+  - id: stale_runtime_projection
+    detection: "`runtime validate` 回報 stale checksum 或 generated surface 缺失"
+    recovery: "執行 runtime compile、refresh、validate"
