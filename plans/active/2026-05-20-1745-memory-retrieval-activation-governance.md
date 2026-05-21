@@ -35,7 +35,7 @@
 | Field | Content |
 | --- | --- |
 | Trigger | 使用者提供 Memory Layer Upgrade Plan，要求先建立計畫、檢查是否與 active plan 重複，並具體拆分。 |
-| Checked sources | `plans/active/2026-05-20-1501-cognitive-state-evidence-governance.md`、`plans/README.md`、`memory/README.md`、`memory/working/README.md`、`memory/summary/README.md`、`memory/episodic/README.md`、`memory/project/README.md`、`memory/failure/README.md`、`memory/decision/README.md`、`knowledge/README.md`、`runtime/README.md`、`governance/lifecycle/README.md`、`enforcement/conversation-goal-ledger.md`。 |
+| Checked sources | `plans/archived/2026-05-20-1501-cognitive-state-evidence-governance.md`、`plans/active/2026-05-20-1802-model-aware-execution-routing.md`、`plans/README.md`、`memory/README.md`、`memory/working/README.md`、`memory/summary/README.md`、`memory/episodic/README.md`、`memory/project/README.md`、`memory/failure/README.md`、`memory/decision/README.md`、`knowledge/README.md`、`runtime/README.md`、`governance/lifecycle/README.md`、`enforcement/conversation-goal-ledger.md`。 |
 | Conflicts | 既有 active plan 已涵蓋 memory 作為 evidence source、stale execution memory、cognitive contamination、temporal confidence decay、belief GC、governance minimality 與 runtime reduction。本 plan 不重寫那些 cognitive-state governance；只定義 `memory/` 內部 retrieval / activation / replay / promotion lifecycle，以及其與 `knowledge/`、`working memory`、`.agent-goals/`、`runtime/` 的分層邊界。 |
 | Decision | Proceed as separate active plan。Scope 應保持 memory-layer governance，不直接新增 runtime state machine，也不取代 cognitive-state plan 的 evidence/confidence governance。 |
 | Validation | Plan readback、diff review、link check、ReadLints。若後續 phase 修改 `knowledge/runtime/routing-registry.yaml`、runtime compiler source 或 generated surfaces，必須執行 `ai-skill runtime refresh` 與相關 validator。 |
@@ -57,19 +57,23 @@
 
 建議順序：
 
-1. 先執行 `plans/active/2026-05-20-1501-cognitive-state-evidence-governance.md`。
+1. 先執行 `plans/archived/2026-05-20-1501-cognitive-state-evidence-governance.md`（已完成 / archived）。
    - 原因：先定義 evidence qualification、confidence integrity、claim scope、intent stability、cognitive contamination、runtime reduction 與 minimal runtime principle。
    - Memory replay 的 freshness、confidence、contamination boundary 應引用這些通用治理語意，而不是在 `memory/` 重新發明一套。
-2. 再執行本 plan 的 Batch A / Phase 0-2。
+2. 再執行 `plans/active/2026-05-20-1802-model-aware-execution-routing.md` 的 Phase 0-2。
+   - 先建立 model-aware execution contract、capability dimensions、tool capability boundary。
+   - 此階段可與本 plan Batch A 平行，但不得把 model routing runtime 化。
+3. 接著執行本 plan 的 Batch A / Phase 0-2。
+   - 原因：memory working buffer 與 model context budget 會互相影響，但兩者都依賴 cognitive-state 的上游治理。
    - 只處理 `memory/`、`memory/working/`、`.agent-goals/`、`knowledge/`、`runtime/` 的分層邊界。
    - 暫不新增 runtime guard，不把 memory activation 變成 persistent execution state。
-3. 最後執行本 plan 的 Batch B / C / Phase 3-5。
-   - 在上游 cognitive-state governance 定穩後，再補 replay cost、activation threshold、freshness decay、routing、graphs、validation scenarios 與 lifecycle/enforcement linked updates。
+4. 最後執行 model-aware execution routing plan 的 Phase 3-6 與本 plan 的 Batch B / C。
+   - 先完成 model routing primitives 與 workflow adaptation，再接 knowledge/runtime routing、generated reports、validation scenarios。
 
 Blocking note：
 
-- 若 cognitive-state plan 尚未完成，memory plan 仍可執行 Batch A 的文件邊界整理。
-- 但 memory replay 的 runtime guard、confidence enforcement、contamination enforcement 或 activation rule promotion 必須等 cognitive-state plan 的 runtime reduction / signal normalization 完成後再決定。
+- Cognitive-state plan 已完成；本 plan 後續應引用 archived plan 與 `governance/ai-runtime-governance/cognitive-state-governance.md`，不得重寫其 evidence / confidence / contamination governance。
+- Memory replay 的 runtime guard、confidence enforcement、contamination enforcement 或 activation rule promotion 必須遵守 cognitive-state 的 runtime reduction / signal normalization，並與 model-aware execution routing 的 context budget strategy 對齊。
 
 ---
 

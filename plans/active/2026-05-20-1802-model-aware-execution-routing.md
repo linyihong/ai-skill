@@ -32,7 +32,7 @@
 | Field | Content |
 | --- | --- |
 | Trigger | 使用者指出 `models/` 目前像 documentation layer，缺少 execution routing、workflow adaptation 與 runtime routing contract，要求建立 plan、檢查是否與現行框架衝突、寫入建議 active plan 執行順序，並 commit / push。 |
-| Checked sources | `models/README.md`、`models/profiles/README.md`、`models/compression/README.md`、`knowledge/runtime/routing-registry.yaml` 的 `route.models.model-aware-routing`、`runtime/README.md`、`plans/README.md`、`plans/active/2026-05-20-1501-cognitive-state-evidence-governance.md`、`plans/active/2026-05-20-1745-memory-retrieval-activation-governance.md`。 |
+| Checked sources | `models/README.md`、`models/profiles/README.md`、`models/compression/README.md`、`knowledge/runtime/routing-registry.yaml` 的 `route.models.model-aware-routing`、`runtime/README.md`、`plans/README.md`、`plans/archived/2026-05-20-1501-cognitive-state-evidence-governance.md`、`plans/active/2026-05-20-1745-memory-retrieval-activation-governance.md`。 |
 | Conflicts | 不應宣稱 `models/` 能強制 Cursor Auto 或任何工具的主對話模型切換。Actual model selection 屬於 tool capability / `ai-tools/` 邊界；`models/` 應定義 tool-neutral execution strategy。若工具支援 explicit model selection 或 subagent model selection，才可由 routing contract 建議具體模型。 |
 | Decision | Proceed as separate active plan。Scope 應聚焦 model-aware execution strategy、routing contract、workflow adaptation、context budget orchestration 與 governance。不要直接新增 provider-specific model names 到 reusable core；必要時只在 tool adapter 或 runtime capability matrix 記錄可用性。 |
 | Validation | Plan readback、diff review、ReadLints、Markdown link check。後續若修改 `knowledge/runtime/routing-registry.yaml`、generated model reports 或 runtime source，必須執行 `ai-skill runtime refresh` 與相關 validator。 |
@@ -51,7 +51,7 @@
 
 建議順序：
 
-1. 先執行 `plans/active/2026-05-20-1501-cognitive-state-evidence-governance.md`。
+1. 先執行 `plans/archived/2026-05-20-1501-cognitive-state-evidence-governance.md`（已完成 / archived）。
    - 原因：model-aware execution routing 需要引用 cognitive state、autonomy modes、confidence integrity、contamination、runtime reduction 與 minimal runtime principle。
    - 若上游 state model 尚未定穩，model strategy 容易變成另一套平行 governance。
 2. 再執行本 plan 的 Phase 0-2。
@@ -64,8 +64,8 @@
 
 Blocking note：
 
-- 在 cognitive-state plan 未完成前，本 plan 可以做 design-layer contract 與 README / plan-level boundary。
-- 但 autonomy-mode-to-model-strategy、runtime model routing primitives、fallback routing、multi-model handoff 的 runtime promotion，必須等 cognitive-state 的 runtime reduction / signal normalization 完成後再決定。
+- Cognitive-state plan 已完成；後續執行本 plan 時應讀 archived plan 與 `governance/ai-runtime-governance/cognitive-state-governance.md` 作為上游語意。
+- Autonomy-mode-to-model-strategy、runtime model routing primitives、fallback routing、multi-model handoff 的 runtime promotion，仍必須遵守 cognitive-state 的 runtime reduction / signal normalization，不得建立平行治理。
 
 ---
 
