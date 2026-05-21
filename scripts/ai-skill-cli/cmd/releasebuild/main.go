@@ -32,6 +32,7 @@ func main() {
 	commit := flag.String("commit", "unknown", "git commit embedded into ai-skill")
 	date := flag.String("date", time.Now().UTC().Format(time.RFC3339), "build date embedded into ai-skill")
 	dist := flag.String("dist", "dist", "artifact output directory")
+	stableNames := flag.Bool("stable-names", false, "write stable artifact names without embedding the version in filenames")
 	flag.Parse()
 
 	if err := os.MkdirAll(*dist, 0o755); err != nil {
@@ -39,7 +40,7 @@ func main() {
 	}
 	checksums := []string{}
 	for _, item := range releaseTargets {
-		name := artifactName(*version, item)
+		name := artifactName(*version, item, *stableNames)
 		path := filepath.Join(*dist, name)
 		if err := buildArtifact(path, item, *version, *commit, *date); err != nil {
 			fatal(err)
@@ -57,8 +58,14 @@ func main() {
 	}
 }
 
-func artifactName(version string, item target) string {
-	name := fmt.Sprintf("ai-skill_%s_%s_%s", version, item.goos, item.goarch)
+func artifactName(version string, item target, stable bool) string {
+	separator := "_"
+	prefix := "ai-skill_" + version
+	if stable {
+		separator = "-"
+		prefix = "ai-skill"
+	}
+	name := fmt.Sprintf("%s%s%s%s%s", prefix, separator, item.goos, separator, item.goarch)
 	if item.goos == "windows" {
 		name += ".exe"
 	}

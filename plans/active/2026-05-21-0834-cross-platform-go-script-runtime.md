@@ -304,6 +304,7 @@ Tasks：
 - [x] 將 runtime core desktop path 改為 native default：`runtime validate`、`runtime refresh`、`runtime compile` 預設不依賴 Ruby / Python / `sqlite3` CLI；Ruby path 改由 `--legacy-wrapper` rollback。
 - [x] 建立 `ai-skill version` 與 Go release builder：可 cross-compile Windows、macOS、Linux artifacts 並輸出 `SHA256SUMS`。
 - [x] 強化 GitHub Actions：Windows / macOS / Linux matrix 跑 tests、version、doctor、native runtime validate / compile smoke；Ubuntu artifact job 產生並上傳 release artifacts。
+- [x] 建立 repo-local prebuilt binaries：`scripts/ai-skill-cli/bin/` 內保留 Windows / macOS / Linux stable-name binaries 與 `SHA256SUMS`，未安裝 Go 也能直接執行；CLI code 變更時才重建。
 
 Progress notes：
 
@@ -329,6 +330,7 @@ Progress notes：
 - Runtime core desktop path 已改為 native default：`runtime validate` 預設跑 Go runtime DB / SQLite index / knowledge runtime checks，`runtime refresh` 預設以 Go 寫 reports / SQLite index 並跑 native checks，`runtime compile` 預設 snapshot mode；Ruby / `sqlite3` CLI 僅在 `--legacy-wrapper` 下使用。
 - Phase 4 release artifact slice 已新增 `ai-skill version` 與 `cmd/releasebuild`：支援 ldflags 注入 version / commit / date，並產生 Windows amd64、macOS amd64/arm64、Linux amd64/arm64 artifacts 與 `SHA256SUMS`。
 - GitHub Actions 已強化 desktop completion gate：三大 OS matrix 跑 `go test ./...`、`version`、`doctor`、native runtime validate / compile smoke，並在 Ubuntu artifact job 產生 `dist/` binaries 與 `SHA256SUMS` 後 upload。
+- Repo-local binary slice 已補齊：`cmd/releasebuild --stable-names --dist bin` 會產生固定檔名 artifacts；本 repo 已提交 `bin/ai-skill-darwin-arm64`、`bin/ai-skill-darwin-amd64`、`bin/ai-skill-linux-amd64`、`bin/ai-skill-linux-arm64`、`bin/ai-skill-windows-amd64.exe` 與 `bin/SHA256SUMS`。
 
 Completion criteria：
 

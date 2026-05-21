@@ -18,19 +18,30 @@
 ## 開發指令
 
 ```bash
-go test ./...
-go run ./cmd/ai-skill version --json
-go run ./cmd/ai-skill doctor --json
-go run ./cmd/ai-skill doctor --require-git --plain
-go run ./cmd/ai-skill doctor --check-runtime --json
-go run ./cmd/ai-skill init-project --project /tmp --tools roo,cursor --dry-run --json
-go run ./cmd/ai-skill runtime refresh --repo ../.. --dry-run --json
-go run ./cmd/ai-skill runtime compile --repo ../.. --dry-run --json
-go run ./cmd/ai-skill runtime validate --repo ../.. --dry-run --json
-go run ./cmd/releasebuild --version dev --commit "$(git rev-parse --short HEAD)" --dist dist
+./bin/ai-skill-darwin-arm64 version --json
+./bin/ai-skill-darwin-arm64 doctor --json
+./bin/ai-skill-darwin-arm64 doctor --check-runtime --json
+./bin/ai-skill-darwin-arm64 runtime validate --repo ../.. --json
 ```
 
 Phase 1 / Phase 3 採用 [`modernc.org/sqlite`](docs/dependency-policy.md) 作為 pure Go SQLite engine；`doctor --check-runtime` 已覆蓋 in-memory 與 temporary file-backed write / query / integrity proof。Git 維持 desktop external dependency；Shell / Ruby / Python 只允許作為 wrapper-mode 過渡依賴。
+
+## Repo-local binaries
+
+Committed binaries live in [`bin/`](bin/) so the repo can run the CLI without a local Go install:
+
+- `bin/ai-skill-darwin-arm64`
+- `bin/ai-skill-darwin-amd64`
+- `bin/ai-skill-linux-amd64`
+- `bin/ai-skill-linux-arm64`
+- `bin/ai-skill-windows-amd64.exe`
+- `bin/SHA256SUMS`
+
+Use the binary matching the host OS/architecture. Rebuild these files only after CLI source changes:
+
+```bash
+go run ./cmd/releasebuild --stable-names --version "repo-$(git rev-parse --short HEAD)" --commit "$(git rev-parse --short HEAD)" --dist bin
+```
 
 Release artifacts：`go run ./cmd/releasebuild` 會輸出 Windows amd64、macOS amd64/arm64、Linux amd64/arm64 binaries 與 `SHA256SUMS`。`ai-skill version` 支援 `-ldflags` 注入 version / commit / date。
 

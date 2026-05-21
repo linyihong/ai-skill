@@ -62,6 +62,7 @@
 
 - 支援透過 Go `-ldflags` 注入 `Version`、`Commit`、`Date`。
 - JSON output 必須包含同一組 build metadata checks，供 CI / release verification 解析。
+- Repo-local binaries under `scripts/ai-skill-cli/bin/` must report the commit they were built from; rebuild them only when CLI source changes.
 
 ### `ai-skill doctor`
 
