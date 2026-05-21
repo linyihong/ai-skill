@@ -416,6 +416,7 @@ func TestNativeRuntimeCompilerBuildsFromSources(t *testing.T) {
 	assertSQLiteCountAtLeast(t, nativeDB, "generated_surfaces", 1)
 	assertSQLiteCountAtLeast(t, nativeDB, "compiler_rules", 1)
 	assertSQLiteCountAtLeast(t, nativeDB, "decision_recording", 1)
+	assertAllRuntimeYAMLInSourceManifest(t, repo, nativeDB)
 	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM compiler_metadata WHERE value = '2.0.0'", "nonzero")
 }
 
@@ -433,6 +434,16 @@ func TestRuntimeValidateParsesAllRuntimeYAML(t *testing.T) {
 	if !strings.Contains(result.Error.Message, "runtime/decisions/broken.yaml") {
 		t.Fatalf("expected failing YAML path in error, got %#v", result.Error)
 	}
+}
+
+func TestRuntimeCompilerSourceManifestCoversAllRuntimeYAML(t *testing.T) {
+	repo := repoRootForTest(t)
+	nativeDB := filepath.Join(t.TempDir(), "runtime-native.db")
+	check := buildNativeRuntimeDBFromSources(repo, nativeDB)
+	if check.Status != "ok" {
+		t.Fatalf("native compiler failed: %#v", check)
+	}
+	assertAllRuntimeYAMLInSourceManifest(t, repo, nativeDB)
 }
 
 func TestNativeRuntimeSQLiteIndexHasStableInvariants(t *testing.T) {
@@ -876,6 +887,48 @@ func ensureRuntimeIndexForRepoTest(t *testing.T, repo string) {
 	t.Cleanup(func() {
 		_ = os.Remove(indexPath)
 	})
+}
+
+func assertAllRuntimeYAMLInSourceManifest(t *testing.T, repo string, dbPath string) {
+	t.Helper()
+	paths := []string{}
+	err := filepath.WalkDir(filepath.Join(repo, "runtime"), func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if entry.IsDir() || filepath.Ext(path) != ".yaml" {
+			return nil
+		}
+		rel, err := filepath.Rel(repo, path)
+		if err != nil {
+			return err
+		}
+		paths = append(paths, filepath.ToSlash(rel))
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	sort.Strings(paths)
+
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	missing := []string{}
+	for _, rel := range paths {
+		var count int
+		if err := db.QueryRow("SELECT COUNT(*) FROM runtime_source_files WHERE source_path = ?", rel).Scan(&count); err != nil {
+			t.Fatal(err)
+		}
+		if count == 0 {
+			missing = append(missing, rel)
+		}
+	}
+	if len(missing) > 0 {
+		t.Fatalf("runtime_source_files missing YAML sources: %s", strings.Join(missing, ", "))
+	}
 }
 
 func requireExecutableForTest(t *testing.T, name string) string {

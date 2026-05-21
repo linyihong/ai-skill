@@ -1201,7 +1201,7 @@ var nativeRuntimeRequiredTables = []string{
 	"transaction_states", "transaction_transitions", "transaction_rules", "transaction_templates",
 	"activation_rules", "core_bootstrap_rules",
 	"discovery_checkpoints", "discovery_search_strategy",
-	"decision_recording", "generated_surfaces", "compiler_metadata",
+	"decision_recording", "runtime_source_files", "generated_surfaces", "compiler_metadata",
 	"runtime_budget", "context_ttl_policy", "circuit_breaker", "context_pollution",
 	"context_health_score", "intelligence_routing", "obligation_ledger",
 	"language_policy", "output_rules", "governance_gates", "blocking_gates",
@@ -1217,7 +1217,7 @@ var nativeRuntimeRequiredTables = []string{
 var nativeRuntimeMinimumRows = map[string]int{
 	"phases": 8, "obligations": 15, "gates": 15, "activation_rules": 10,
 	"core_bootstrap_rules": 2, "discovery_checkpoints": 3, "compiler_metadata": 2,
-	"decision_recording": 1, "runtime_budget": 1, "context_ttl_policy": 1, "circuit_breaker": 1,
+	"decision_recording": 1, "runtime_source_files": 30, "runtime_budget": 1, "context_ttl_policy": 1, "circuit_breaker": 1,
 	"context_pollution": 1, "context_health_score": 1, "intelligence_routing": 1,
 	"obligation_ledger": 1, "language_policy": 1, "output_rules": 1,
 	"governance_gates": 1, "blocking_gates": 1, "phase_machine": 1,

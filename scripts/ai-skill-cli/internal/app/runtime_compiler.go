@@ -28,6 +28,14 @@ type compilerMapping struct {
 	CompileRule string `yaml:"compile_rule"`
 }
 
+type runtimeConfigMapping struct {
+	rel     string
+	table   string
+	idCol   string
+	listKey string
+	idKeys  []string
+}
+
 func buildNativeRuntimeDBFromSources(repo string, outputDB string) Check {
 	if check := runtimeYAMLSyntaxValidation(repo); check.Status != "ok" {
 		return Check{Name: "runtime_compile_native", Status: "failed", Message: check.Message}
@@ -86,6 +94,7 @@ func createGoRuntimeSchema(db *sql.DB) error {
 		`CREATE TABLE discovery_checkpoints (id INTEGER PRIMARY KEY AUTOINCREMENT, phase TEXT NOT NULL, trigger TEXT NOT NULL, description TEXT, discovery_targets TEXT, metadata TEXT);`,
 		`CREATE TABLE discovery_search_strategy (id INTEGER PRIMARY KEY AUTOINCREMENT, priority_order TEXT, fallback TEXT, min_confidence_threshold TEXT);`,
 		`CREATE TABLE decision_recording (id INTEGER PRIMARY KEY AUTOINCREMENT, section TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
+		`CREATE TABLE runtime_source_files (source_path TEXT PRIMARY KEY, target_table TEXT NOT NULL, compile_rule TEXT NOT NULL, compiled_at TEXT NOT NULL, compiler_version TEXT NOT NULL, status TEXT NOT NULL);`,
 		`CREATE TABLE compiler_metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);`,
 		`CREATE TABLE generated_surfaces (id INTEGER PRIMARY KEY AUTOINCREMENT, source_path TEXT NOT NULL, target_key TEXT NOT NULL, compile_rule TEXT NOT NULL, compiled_at TEXT NOT NULL, compiler_version TEXT NOT NULL, status TEXT NOT NULL, data TEXT NOT NULL, UNIQUE(source_path, target_key));`,
 		`CREATE TABLE runtime_budget (id INTEGER PRIMARY KEY AUTOINCREMENT, model_name TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
@@ -253,13 +262,31 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 		return err
 	}
 
-	configs := []struct {
-		rel     string
-		table   string
-		idCol   string
-		listKey string
-		idKeys  []string
-	}{
+	for _, config := range runtimeConfigMappings() {
+		if err := insertRuntimeConfigRows(repo, db, config.rel, config.table, config.idCol, config.listKey, config.idKeys); err != nil {
+			return err
+		}
+		if err := insertRuntimeSourceFile(db, config.rel, config.table, "structured_runtime_config"); err != nil {
+			return err
+		}
+	}
+	if err := insertTransactionTemplateRows(repo, db); err != nil {
+		return err
+	}
+	if err := insertRuntimeSourceFile(db, "runtime/transactions/transaction-templates.yaml", "transaction_templates", "transaction_templates_config"); err != nil {
+		return err
+	}
+	if err := insertCompilerRuleRows(repo, db); err != nil {
+		return err
+	}
+	if err := insertRuntimeSourceFile(db, "runtime/compiler/compiler-rules.yaml", "compiler_rules", "compiler_rules_config"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func runtimeConfigMappings() []runtimeConfigMapping {
+	return []runtimeConfigMapping{
 		{"runtime/budget/token-budget.yaml", "runtime_budget", "model_name", "per_model", []string{"name", "model"}},
 		{"runtime/context/ttl-policy.yaml", "context_ttl_policy", "ttl_type", "rules", []string{"name", "id"}},
 		{"runtime/decisions/decision-recording.yaml", "decision_recording", "section", "", nil},
@@ -292,18 +319,11 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 		{"runtime/router/activation-rules.yaml", "activation_rules_mirror", "rule_id", "rules", []string{"rule_id", "name"}},
 		{"runtime/transactions/transaction-machine.yaml", "transaction_templates_ext", "template_name", "transaction_templates", []string{"id", "name"}},
 	}
-	for _, config := range configs {
-		if err := insertRuntimeConfigRows(repo, db, config.rel, config.table, config.idCol, config.listKey, config.idKeys); err != nil {
-			return err
-		}
-	}
-	if err := insertTransactionTemplateRows(repo, db); err != nil {
-		return err
-	}
-	if err := insertCompilerRuleRows(repo, db); err != nil {
-		return err
-	}
-	return nil
+}
+
+func insertRuntimeSourceFile(db *sql.DB, rel string, table string, compileRule string) error {
+	_, err := db.Exec(`INSERT OR REPLACE INTO runtime_source_files (source_path, target_table, compile_rule, compiled_at, compiler_version, status) VALUES (?, ?, ?, datetime('now'), ?, 'synced')`, rel, table, compileRule, goRuntimeCompilerVersion)
+	return err
 }
 
 func insertRuntimeConfigRows(repo string, db *sql.DB, rel string, table string, idCol string, listKey string, idKeys []string) error {

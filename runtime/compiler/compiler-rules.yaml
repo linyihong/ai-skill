@@ -49,6 +49,7 @@ compilation_scope:
         - runtime_budget (model_name, per_model config, default_budget, per_layer)
         - context_ttl_policy (ttl_type, ttl_rules)
         - decision_recording (section, durable decision recording routes)
+        - runtime_source_files (source_path, target_table, compile_rule)
         - circuit_breaker (guard_name, guard config)
         - context_pollution (signal_name, pollution signals)
         - context_health_score (dimension, health dimensions)
