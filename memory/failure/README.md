@@ -2,6 +2,8 @@
 
 `memory/failure/` 保存**抽象化的失效模式記憶**。不同於 `enforcement/failure-patterns/`（可執行的 failure detection 規則），failure memory 記錄的是「發生過什麼失效、為什麼發生、學到了什麼」，作為 failure intelligence 的原始素材與回顧依據。
 
+Failure memory 可提示風險與 prevention direction，但不能取代 enforcement rule、current source、validator 或 user-facing completion evidence。
+
 ## 用途
 
 - 記錄跨 session 的失效事件與其根本原因
@@ -71,6 +73,9 @@
    - `intelligence/engineering/failure/`（抽象化 intelligence）
 5. **演化追蹤**：同一 failure 模式多次發生時，應更新 occurrences 列表並評估是否需要升級 prevention 策略。
 6. **Token-aware**：每個 failure record 不超過 400 tokens。
+7. **Risk hint only**：Replay failure memory 時，預設只作 weak / scoped risk hint。
+8. **Current validation required**：若 failure memory 影響本次 patch、commit、runtime 或規則更新，必須重新驗證 current source。
+9. **No workaround promotion**：不得把舊 workaround 直接 promotion 成 permanent policy；需先抽象化並驗證 recurring failure。
 
 ## 與既有層的關係
 
@@ -81,3 +86,4 @@
 - `memory/summary/`：failure 發生時的 session 摘要
 - `feedback/replay/`：failure 可觸發 replay 流程
 - `governance/lifecycle/`：failure memory 的 lifecycle 管理
+- `memory/retrieval-governance/`：定義 repeated failure trigger、replay budget 與 contamination response

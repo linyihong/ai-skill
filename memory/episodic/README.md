@@ -2,6 +2,8 @@
 
 `memory/episodic/` 保存**跨 session 的情境記憶**。不同於 `memory/working/`（session-local）與 `memory/summary/`（壓縮摘要），episodic memory 記錄的是「在特定情境下發生過什麼、如何應對、結果如何」，讓 agent 在類似情境再次出現時能快速 recall 過往經驗。
 
+Episodic replay 預設只能作 weak guidance。它可以提示要檢查的風險或路線，但不得直接支撐 current truth、completion claim 或 source-of-truth override。
+
 ## 用途
 
 - 記錄跨 session 的 recurring scenarios（例如：某類分析任務反覆出現的瓶頸）
@@ -53,6 +55,9 @@
 3. **不重複 summary**：Episodic memory 不是 session summary 的副本。它聚焦於「特定情境的經驗」，而非「整個 session 做了什麼」。
 4. **Replay pipeline**：成熟的 episodic memory 應考慮 promotion 到 `feedback/replay/` 進行 generalized lesson 提取。
 5. **Token-aware**：每個 episodic record 不超過 300 tokens，保留關鍵信號即可。
+6. **Weak guidance default**：Replay 前必須確認情境、workflow family、domain boundary 與 current task 是否匹配。
+7. **Revalidation required**：任何從 episodic memory 得到的 conclusion 都必須重新驗證 current source。
+8. **No active blocker replay**：不得把過去 episode 的 blocker 當成現在仍 active。
 
 ## 與既有層的關係
 
@@ -61,3 +66,4 @@
 - `feedback/replay/`：episodic memory 是 replay 的分析原料
 - `intelligence/engineering/failure/`：失敗類的 episodic memory 可抽象化為 failure intelligence
 - `enforcement/failure-learning-system.md`：failure episodic 的 promotion 路徑
+- `memory/retrieval-governance/`：定義 episodic replay 的 trigger、budget 與 contamination boundary

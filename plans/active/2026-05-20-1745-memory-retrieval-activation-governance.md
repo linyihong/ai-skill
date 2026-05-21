@@ -1,6 +1,6 @@
 # Memory Retrieval & Activation Governance
 
-> **狀態**: draft
+> **狀態**: in-progress
 > **建立日期**: 2026-05-20
 > **目的**: 將 `memory/` 從「歷史資料分類」升級為 selective cognitive replay system，補足 retrieval、activation、replay cost、freshness、contamination boundary、working-memory buffer 與 promotion pipeline，同時避免與既有 cognitive state / evidence governance 重複。
 
@@ -351,21 +351,21 @@ Runtime boundary：
 
 ### Phase 0 — Boundary Confirmation
 
-Status: draft.
+Status: completed.
 
 Tasks:
 
-- [ ] 確認本 plan 不重寫 `2026-05-20-1501-cognitive-state-evidence-governance.md` 的 evidence / confidence / contamination governance。
-- [ ] 確認 `memory/working/` 先作為 session cognition buffer，不立即升級成 top-level `working-memory/`。
-- [ ] 確認 `memory/` 與 `knowledge/` 的 durable boundary。
-- [ ] 確認 `.agent-goals/` 不得 archive 成 memory，除非 compression / abstraction / promotion。
-- [ ] 確認 memory retrieval 只產生 candidate context，不產生 runtime execution state。
+- [x] 確認本 plan 不重寫 `2026-05-20-1501-cognitive-state-evidence-governance.md` 的 evidence / confidence / contamination governance。
+- [x] 確認 `memory/working/` 先作為 session cognition buffer，不立即升級成 top-level `working-memory/`。
+- [x] 確認 `memory/` 與 `knowledge/` 的 durable boundary。
+- [x] 確認 `.agent-goals/` 不得 archive 成 memory，除非 compression / abstraction / promotion。
+- [x] 確認 memory retrieval 只產生 candidate context，不產生 runtime execution state。
 
 Exit criteria:
 
-- [ ] 分層邊界已寫入 plan。
-- [ ] 與 active cognitive-state plan 的重疊已標出。
-- [ ] 後續 phase 的 linked updates 已列出。
+- [x] 分層邊界已寫入 plan。
+- [x] 與 active cognitive-state plan 的重疊已標出。
+- [x] 後續 phase 的 linked updates 已列出。
 
 ### Phase 1 — Memory Retrieval Governance Documents
 
@@ -382,12 +382,12 @@ Candidate files:
 
 Tasks:
 
-- [ ] 建立 retrieval governance index。
-- [ ] 定義 activation threshold 與 trigger examples。
-- [ ] 定義 replay cost classes 與 replay depth policy。
-- [ ] 定義 memory freshness、scope、confidence defaults。
-- [ ] 定義 contamination boundary 與 forbidden replay。
-- [ ] 定義 promotion / compression / pruning policy。
+- [x] 建立 retrieval governance index。
+- [x] 定義 activation threshold 與 trigger examples。
+- [x] 定義 replay cost classes 與 replay depth policy。
+- [x] 定義 memory freshness、scope、confidence defaults。
+- [x] 定義 contamination boundary 與 forbidden replay。
+- [x] 定義 promotion / compression / pruning policy。
 
 ### Phase 2 — Existing Memory README Updates
 
@@ -403,13 +403,13 @@ Candidate files:
 
 Tasks:
 
-- [ ] 更新 `memory/README.md`：memory 是 selective replay，不是 always-loaded context。
-- [ ] 更新 `memory/working/README.md`：改為 session cognition buffer，明確不保存 owner / next action / active blockers。
-- [ ] 更新 `memory/summary/README.md`：summary 只作 compressed context recovery，不作 current truth。
-- [ ] 更新 `memory/episodic/README.md`：episodic replay 預設 weak guidance。
-- [ ] 更新 `memory/project/README.md`：加入 compatibility scope / freshness decay。
-- [ ] 更新 `memory/failure/README.md`：failure memory 可提示 risk，但不能取代 enforcement rule。
-- [ ] 更新 `memory/decision/README.md`：decision replay 必須檢查 status / supersession。
+- [x] 更新 `memory/README.md`：memory 是 selective replay，不是 always-loaded context。
+- [x] 更新 `memory/working/README.md`：改為 session cognition buffer，明確不保存 owner / next action / active blockers。
+- [x] 更新 `memory/summary/README.md`：summary 只作 compressed context recovery，不作 current truth。
+- [x] 更新 `memory/episodic/README.md`：episodic replay 預設 weak guidance。
+- [x] 更新 `memory/project/README.md`：加入 compatibility scope / freshness decay。
+- [x] 更新 `memory/failure/README.md`：failure memory 可提示 risk，但不能取代 enforcement rule。
+- [x] 更新 `memory/decision/README.md`：decision replay 必須檢查 status / supersession。
 
 ### Phase 3 — Knowledge / Routing Integration
 

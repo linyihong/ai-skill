@@ -2,6 +2,8 @@
 
 `memory/project/` 保存**跨 session 的專案脈絡**。不同於 `memory/episodic/`（情境經驗），project memory 記錄的是「這個專案是什麼、目標是什麼、有哪些已知約束與決策」，讓 agent 在處理同一專案的不同 session 之間保持上下文連續性。
 
+Project memory 只在 same repo / same project / compatible architecture boundary 下 replay。Repo refactor、migration、dependency change 或 branch context 改變時，必須重新驗證 freshness 與 compatibility scope。
+
 ## 用途
 
 - 記錄專案的目標、範圍與已知約束
@@ -59,6 +61,9 @@
 4. **不重複 ADR**：重要的架構決策應放在 `memory/decision/` 或 `decisions/`，project memory 只保留摘要與連結。
 5. **Lifecycle**：專案完成或歸檔後，project memory 應標記為 `archived` 並移至冷儲存。
 6. **Token-aware**：每個 project record 不超過 500 tokens。
+7. **Compatibility scope**：每個 project memory 應能說明適用 repo、architecture boundary、workflow family 與 expires condition。
+8. **Not active state**：不得保存 active goal、owner、lock、next action 或 current blocker。
+9. **Source revalidation**：Project memory 可提供 context，但不能取代 current files、tests、runtime reports 或 user goal。
 
 ## 與既有層的關係
 
@@ -68,3 +73,4 @@
 - `workflow/`：workflow 執行時需要 project memory 作為 context
 - `governance/lifecycle/`：project memory 的 lifecycle 管理（active → archived）
 - `knowledge/`：project memory 可被 knowledge navigation 索引
+- `memory/retrieval-governance/`：定義 project memory 的 freshness decay、compatibility scope 與 activation threshold
