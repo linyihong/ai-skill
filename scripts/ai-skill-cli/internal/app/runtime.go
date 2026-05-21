@@ -65,6 +65,26 @@ type runtimeRouteModel struct {
 	Reason           string `yaml:"reason"`
 }
 
+type runtimeRefreshPolicy struct {
+	Status         string   `yaml:"status"`
+	DecisionValues []string `yaml:"decision_values"`
+}
+
+type runtimeSummaryRecord struct {
+	File      string
+	AtomID    string
+	Lifecycle string
+	Summary   string
+}
+
+type runtimeGraphRecord struct {
+	File      string
+	ID        string
+	Source    string
+	Status    string
+	EdgeCount int
+}
+
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
 		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query> [flags]")
@@ -1288,6 +1308,97 @@ func buildNativeModelChecklists(repo string) (string, error) {
 	return strings.Join(lines, "\n"), nil
 }
 
+func buildNativeKnowledgeRuntimeReport(repo string) (string, error) {
+	registry, err := readRuntimeRoutingRegistry(filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"))
+	if err != nil {
+		return "", err
+	}
+	summaries, err := runtimeSummaryRecords(repo)
+	if err != nil {
+		return "", err
+	}
+	graphs, err := runtimeGraphRecords(repo)
+	if err != nil {
+		return "", err
+	}
+	policy, err := readRuntimeRefreshPolicy(filepath.Join(repo, "knowledge", "runtime", "refresh-policy.yaml"))
+	if err != nil {
+		return "", err
+	}
+	status := policy.Status
+	if status == "" {
+		status = "unknown"
+	}
+
+	lines := []string{
+		"# Knowledge Runtime Report",
+		"",
+		"本檔由 `ruby scripts/generate-knowledge-runtime-report.rb --write` 產生，彙整 runtime registry、summaries、graphs 與 refresh policy 的目前狀態。",
+		"",
+		"## Source Surfaces",
+		"",
+		"| Surface | Path | Count / Status |",
+		"| --- | --- | --- |",
+		fmt.Sprintf("| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | %d records |", len(registry.Records)),
+		"| Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | " + status + " |",
+		"| Model context report | [`model-context-report.md`](model-context-report.md) | generated view |",
+		"| Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |",
+		"| SQLite runtime index | [`sqlite/`](sqlite/) | generated lookup cache prototype |",
+		fmt.Sprintf("| Summaries | [`../summaries/`](../summaries/) | %d files |", len(summaries)),
+		fmt.Sprintf("| Graph records | [`../graphs/`](../graphs/) | %d files |", len(graphs)),
+		"",
+		"## Routing Records",
+		"",
+		"| ID | Primary source | Model | Compression | Validation signal |",
+		"| --- | --- | --- | --- | --- |",
+	}
+	for _, record := range registry.Records {
+		lines = append(lines, "| `"+runtimeMDEscape(record.ID)+"` | `"+runtimeMDEscape(record.PrimarySource)+"` | `"+runtimeMDEscape(record.Model.Profile)+"` | `"+runtimeMDEscape(record.Model.CompressionLevel)+"` | "+runtimeMDEscape(record.ValidationSignal)+" |")
+	}
+	lines = append(lines,
+		"",
+		"## Summary Records",
+		"",
+		"| Atom ID | Lifecycle | File | Summary |",
+		"| --- | --- | --- | --- |",
+	)
+	for _, summary := range summaries {
+		base := filepath.Base(summary.File)
+		lines = append(lines, "| `"+runtimeMDEscape(summary.AtomID)+"` | `"+runtimeMDEscape(summary.Lifecycle)+"` | [`"+runtimeMDEscape(base)+"`](../summaries/"+base+") | "+runtimeMDEscape(summary.Summary)+" |")
+	}
+	lines = append(lines,
+		"",
+		"## Graph Records",
+		"",
+		"| ID | Source | Status | Edges | File |",
+		"| --- | --- | --- | --- | --- |",
+	)
+	for _, graph := range graphs {
+		base := filepath.Base(graph.File)
+		lines = append(lines, "| `"+runtimeMDEscape(graph.ID)+"` | `"+runtimeMDEscape(graph.Source)+"` | `"+runtimeMDEscape(graph.Status)+"` | "+fmt.Sprintf("%d", graph.EdgeCount)+" | [`"+runtimeMDEscape(base)+"`](../graphs/"+base+") |")
+	}
+	lines = append(lines,
+		"",
+		"## Refresh Decisions",
+		"",
+		"| Decision value | Meaning |",
+		"| --- | --- |",
+	)
+	for _, decision := range policy.DecisionValues {
+		lines = append(lines, "| `"+runtimeMDEscape(decision)+"` | 由 `refresh-policy.yaml` 定義的 generated surface decision。 |")
+	}
+	lines = append(lines,
+		"",
+		"## Validation",
+		"",
+		"- 產生前應先執行 `ruby scripts/validate-knowledge-runtime.rb`。",
+		"- 產生後應執行 Markdown link check、lints、close-loop dry run、commit / push / readback。",
+		"- 本報告是 generated view，不取代 `routing-registry.yaml`、`refresh-policy.yaml`、summary 或 graph source files。",
+		"",
+	)
+	return strings.Join(lines, "\n"), nil
+}
+
 func readRuntimeRoutingRegistry(path string) (runtimeRoutingRegistry, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
@@ -1298,6 +1409,110 @@ func readRuntimeRoutingRegistry(path string) (runtimeRoutingRegistry, error) {
 		return runtimeRoutingRegistry{}, err
 	}
 	return registry, nil
+}
+
+func readRuntimeRefreshPolicy(path string) (runtimeRefreshPolicy, error) {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return runtimeRefreshPolicy{}, err
+	}
+	var policy runtimeRefreshPolicy
+	if err := yaml.Unmarshal(content, &policy); err != nil {
+		return runtimeRefreshPolicy{}, err
+	}
+	return policy, nil
+}
+
+func runtimeSummaryRecords(repo string) ([]runtimeSummaryRecord, error) {
+	paths, err := filepath.Glob(filepath.Join(repo, "knowledge", "summaries", "*.md"))
+	if err != nil {
+		return nil, err
+	}
+	sort.Strings(paths)
+	records := []runtimeSummaryRecord{}
+	for _, path := range paths {
+		if filepath.Base(path) == "README.md" {
+			continue
+		}
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+		fields := parseRuntimeSummaryTable(string(content))
+		relative, err := filepath.Rel(repo, path)
+		if err != nil {
+			return nil, err
+		}
+		records = append(records, runtimeSummaryRecord{
+			File:      filepath.ToSlash(relative),
+			AtomID:    strings.ReplaceAll(fields["Atom ID"], "`", ""),
+			Lifecycle: strings.ReplaceAll(fields["Lifecycle"], "`", ""),
+			Summary:   fields["Summary"],
+		})
+	}
+	return records, nil
+}
+
+func parseRuntimeSummaryTable(content string) map[string]string {
+	fields := map[string]string{}
+	for _, line := range strings.Split(content, "\n") {
+		if !strings.HasPrefix(line, "|") {
+			continue
+		}
+		cells := strings.Split(strings.TrimSpace(line), "|")
+		trimmed := []string{}
+		for _, cell := range cells {
+			trimmed = append(trimmed, strings.TrimSpace(cell))
+		}
+		if len(trimmed) < 3 {
+			continue
+		}
+		key := trimmed[1]
+		if key == "欄位" || runtimeMarkdownSeparator(key) {
+			continue
+		}
+		fields[key] = trimmed[2]
+	}
+	return fields
+}
+
+func runtimeMarkdownSeparator(value string) bool {
+	if value == "" {
+		return false
+	}
+	for _, char := range value {
+		if char != '-' {
+			return false
+		}
+	}
+	return true
+}
+
+func runtimeGraphRecords(repo string) ([]runtimeGraphRecord, error) {
+	paths, err := filepath.Glob(filepath.Join(repo, "knowledge", "graphs", "*.yaml"))
+	if err != nil {
+		return nil, err
+	}
+	sort.Strings(paths)
+	records := []runtimeGraphRecord{}
+	for _, path := range paths {
+		graph, err := readKnowledgeGraphFile(path)
+		if err != nil {
+			return nil, err
+		}
+		relative, err := filepath.Rel(repo, path)
+		if err != nil {
+			return nil, err
+		}
+		records = append(records, runtimeGraphRecord{
+			File:      filepath.ToSlash(relative),
+			ID:        graph.ID,
+			Source:    graph.Source,
+			Status:    graph.Status,
+			EdgeCount: len(graph.Edges),
+		})
+	}
+	return records, nil
 }
 
 func sortedRouteGroupKeys(records []runtimeRouteRecord, group func(runtimeRouteRecord) string) []string {

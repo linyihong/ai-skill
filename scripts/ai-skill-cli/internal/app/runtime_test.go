@@ -453,6 +453,20 @@ func TestNativeModelChecklistsMatchesRubyGenerator(t *testing.T) {
 	}
 }
 
+func TestNativeKnowledgeRuntimeReportMatchesRubyGenerator(t *testing.T) {
+	repo := repoRootForTest(t)
+	ruby := requireExecutableForTest(t, "ruby")
+
+	rubyOutput := runRubyScriptStdout(t, repo, ruby, "scripts/generate-knowledge-runtime-report.rb")
+	goOutput, err := buildNativeKnowledgeRuntimeReport(repo)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if goOutput != rubyOutput {
+		t.Fatalf("Go knowledge runtime report does not match Ruby output: %s", firstStringDiff(goOutput, rubyOutput))
+	}
+}
+
 func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
 	repo := t.TempDir()
 	writeFile(t, filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb"), "# ok\n")

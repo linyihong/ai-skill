@@ -295,6 +295,7 @@ Tasks：
 - [x] 補 `runtime refresh` ordered step / partial failure fixture：Go wrapper mode 依固定順序執行 Ruby generator / validator steps，失敗時停在第一個 failing step 並回 `runtime_refresh_failed`。
 - [x] 建立第一個 generator-level Ruby vs Go parity test：`generate-model-context-report.rb` stdout 與 Go-native builder byte-for-byte 一致；尚未切換 production refresh。
 - [x] 建立第二個 generator-level Ruby vs Go parity test：`generate-model-checklists.rb` stdout 與 Go-native builder byte-for-byte 一致；尚未切換 production refresh。
+- [x] 建立第三個 generator-level Ruby vs Go parity test：`generate-knowledge-runtime-report.rb` stdout 與 Go-native builder byte-for-byte 一致；尚未切換 production refresh。
 - [ ] 若開始移植 compiler，先建立 Ruby vs Go parity test，不得直接替換 production compiler。
 
 Progress notes：
@@ -312,6 +313,7 @@ Progress notes：
 - `ai-skill runtime refresh` wrapper mode 已改為逐步執行 Ruby refresh steps，而非只呼叫整包 orchestrator；JSON checks 會記錄 model context report、model checklists、runtime report、SQLite index、SQLite index validation、knowledge runtime validation 的 ordered evidence，並在第一個失敗 step 阻斷，避免 partial refresh 被誤報 success。
 - `generate-model-context-report.rb` 已有第一個 Go-native builder parity guard：Go 端讀 `knowledge/runtime/routing-registry.yaml`，產生與 Ruby stdout byte-for-byte 相同的 model context report；目前僅作 test guard，不接 production `runtime refresh`。
 - `generate-model-checklists.rb` 已有第二個 Go-native builder parity guard：Go 端讀 `knowledge/runtime/routing-registry.yaml`，產生與 Ruby stdout byte-for-byte 相同的 per-model checklist report；目前僅作 test guard，不接 production `runtime refresh`。
+- `generate-knowledge-runtime-report.rb` 已有第三個 Go-native builder parity guard：Go 端讀 routing registry、summaries、graphs 與 refresh policy，產生與 Ruby stdout byte-for-byte 相同的 runtime report；目前僅作 test guard，不接 production `runtime refresh`。
 
 Completion criteria：
 
