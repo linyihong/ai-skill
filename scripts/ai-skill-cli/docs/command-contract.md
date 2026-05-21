@@ -22,6 +22,8 @@
 | `ai-skill init-project` | 建立新專案 AI tool bootstrap 設定 | 是 | 否 | Phase 2 |
 | `ai-skill goals` | 管理 `.agent-goals/` 暫存目標 | 是 | 否 | Phase 2 |
 | `ai-skill hooks install` | 安裝本 repo git hooks | 是 | 是 | Phase 2 |
+| `ai-skill hooks run pre-commit` | 執行 Git pre-commit hook logic，不依賴 shell script business logic | 是 | 是 | Shell To Go |
+| `ai-skill hooks run post-commit` | 執行 Git post-commit hook logic，不依賴 shell script business logic | 否 | 是 | Shell To Go |
 | `ai-skill sync-cursor-bundle` | 同步 Cursor bundle / mirror | 是 | 否 | Phase 2 |
 | `ai-skill close-loop` | 檢查 dirty owner group、commit、push、readback | 是 | 是 | Phase 2 |
 | `ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index | 是 | 否 | Phase 3 |
@@ -111,6 +113,7 @@
 - dry-run：只列出將寫入的檔案。
 - 寫入模式：可能建立 `.roomodes`、`.cursor/rules/`、`.cursor/hooks.json`、`CLAUDE.md`、`.agent-goals/` 或等效 project-local 設定。
 - Phase 2 初始切片只開放 dry-run planner；write mode 在 template parity、fixture 與覆蓋策略完成前必須回傳 `partial_close_loop_blocked`。
+- Shell To Go migration 後，write mode 必須實作並成為預設；舊 `scripts/init-new-project.sh` 必須刪除。
 
 必要行為：
 
@@ -141,6 +144,7 @@
 - 讀寫 `<PROJECT_ROOT>/.agent-goals/`。
 - 建立或清理 lock directory。
 - Phase 2 初始切片只開放 `status` read-only 與 `init --dry-run` planner；write mode 在 fixture parity 完成前必須回傳 `partial_close_loop_blocked`。
+- Shell To Go migration 後，`init/status/start/update/split/pause/complete/cleanup` 都必須由 Go 原生實作；舊 `scripts/agent-goals.sh` 必須刪除。
 
 必要行為：
 
@@ -165,6 +169,7 @@
 - dry-run：列出會設定的 hooks path。
 - 寫入模式：可能修改 repo-local git config 或 hooks path。
 - Phase 2 初始切片只開放 dry-run planner；write mode 在 hook copy / chmod parity 完成前必須回傳 `partial_close_loop_blocked`。
+- Shell To Go migration 後，hook installation 必須安裝 Go-owned hook runner；hook file 若保留，只能作最小 binary adapter。
 
 必要 Git 檢查：
 
@@ -218,6 +223,7 @@
 - `--commit`：可能執行 `git add`、`git commit`。
 - `--push`：可能執行 `git push`。
 - Phase 2 初始切片只開放 dry-run inspection；`--commit` / `--push` 在 commit parity 完成前必須回傳 `partial_close_loop_blocked`。
+- Shell To Go migration 後，`--commit` / `--push` 必須由 Go 原生執行；舊 `scripts/ai-skill-close-loop.sh` 必須刪除。
 
 必要 Git 檢查：
 
@@ -232,6 +238,29 @@
 - 不得 fallback 成手動檔案掃描後繼續。
 - 必須阻斷並提示安裝 Git。
 - JSON 輸出必須包含 `error.code = "missing_git"`。
+
+### `ai-skill hooks run`
+
+目的：讓 Git hook adapter 將業務邏輯交給 Go，避免 pre-commit / post-commit 依賴 shell 實作。
+
+輸入：
+
+- `pre-commit`
+- `post-commit`
+- `--repo <path>`
+- `--json`
+- `--plain`
+
+副作用：
+
+- `pre-commit`：可能在 staged runtime source 改動時執行 `runtime compile` 並 stage `runtime/runtime.db`；可能執行 `runtime validate`。
+- `post-commit`：reference-only 預設 no-op；若 `AI_SKILL_SYNC_CURSOR_BUNDLE=1`，只回報 Go mirror write mode 狀態，不呼叫 deleted shell。
+
+必要行為：
+
+- 不使用 shell grep / uname 判斷業務邏輯。
+- Staged-file decision、runtime compile、knowledge validation 都在 Go 中完成。
+- Hook adapter 若保留，內容只能解析 repo root / binary path 並呼叫此 command。
 
 ### `ai-skill runtime refresh`
 
@@ -342,11 +371,11 @@
 
 | 現有 script / 入口 | CLI 命令 | 遷移定位 |
 | --- | --- | --- |
-| `scripts/init-new-project.sh` | `ai-skill init-project` | Phase 2 native 候選 |
-| `scripts/agent-goals.sh` | `ai-skill goals` | Phase 2 native 候選 |
+| deleted `scripts/init-new-project.sh` | `ai-skill init-project` | Go write mode complete |
+| deleted `scripts/agent-goals.sh` | `ai-skill goals` | Go lifecycle write mode complete |
 | deleted `scripts/install-hooks.sh` / `.githooks/` | `ai-skill hooks install` | dry-run planner uses `scripts/git-hooks/`; write mode still blocked until fixture-backed |
 | deleted `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | shell 已刪；Go dry-run 已有，write mode 待 Go parity |
-| `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` | legacy retained；Go dry-run 已有，commit / push parity 完成後刪除或降為短期 bootstrap wrapper |
+| deleted `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` | Go commit / push parity complete |
 | Runtime report / SQLite generators | `ai-skill runtime refresh` | Native completed; old Ruby entrypoints deleted |
 | Runtime validators | `ai-skill runtime validate` | Native completed; old Ruby entrypoints deleted |
 | Runtime query helpers | `ai-skill runtime query` | Native completed; old Ruby entrypoints deleted |

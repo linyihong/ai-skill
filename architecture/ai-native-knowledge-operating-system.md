@@ -71,7 +71,7 @@ Tool-specific details 屬於 `ai-tools/`。Generic rules 應使用「configured 
 | --- | --- | --- | --- |
 | `ai-tools/agent/cursor.md` | Cursor adapter，說明 reference-first loading、Core Bootstrap 與語言偏好設定。 | Cursor 仍是 active tool adapter。 | 保留作為 tool adapter。 |
 | deleted `scripts/sync-cursor-bundle.sh` | 舊 Cursor bundle shell bridge 已刪。 | Reference-first 是預設；未來 mirror 寫入只允許在 `ai-skill sync-cursor-bundle` Go write mode 補回。 | 已刪除。 |
-| `scripts/git-hooks/post-commit` with `AI_SKILL_SYNC_CURSOR_BUNDLE=1` | 目前只提示 legacy shell sync 已刪，不執行 mirror refresh。 | 保留 hook adapter surface，避免 opt-in env 靜默失敗。 | `ai-skill sync-cursor-bundle` Go write mode 完成後再決定是否恢復 post-commit mirror refresh。 |
+| `scripts/git-hooks/post-commit` with `AI_SKILL_SYNC_CURSOR_BUNDLE=1` | 透過最小 adapter 呼叫 `ai-skill hooks run post-commit`；reference-only 預設不執行 mirror refresh。 | 保留 hook adapter surface，業務邏輯在 Go。 | `ai-skill sync-cursor-bundle` Go write mode 完成後再決定是否恢復 post-commit mirror refresh。 |
 | `dependency-reading.md`、`linked-updates.md`、`failure-learning-system.md` 與 `failure-patterns/source-mirror-write-drift.md` 中的 source/mirror guardrails | 防止 `.cursor`、`~/.cursor`、bundles 或 generated copies 被誤認為 source updates。 | 任何 mirror、runtime copy 或 tool deployment surface 仍存在。 | 即使 bundle scripts 移除，只要 tool adapter 仍可能建立 runtime copies，就保留。 |
 
 Inventory rule：compatibility surfaces 可以保留，但每一項都必須說明存在原因、使用時機，並維持 `reference-first` 是預設。

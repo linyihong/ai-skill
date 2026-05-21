@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -173,14 +174,40 @@ func TestCloseLoopCommitMissingGitBlocksBeforeWriteMode(t *testing.T) {
 	}
 }
 
-func TestCloseLoopCommitModeBlockedUntilParity(t *testing.T) {
+func TestCloseLoopCommitModeCreatesGroupedCommit(t *testing.T) {
 	repo := initTempGitRepo(t)
+	writeFile(t, filepath.Join(repo, "scripts", "tool.go"), "package main\n")
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	code := Run([]string{"close-loop", "--repo", repo, "--commit", "--json"}, &stdout, &stderr)
-	if code != ExitPartialCloseBlocked {
-		t.Fatalf("expected write mode blocked, got %d; stderr=%s", code, stderr.String())
+	if code != ExitSuccess {
+		t.Fatalf("expected commit success, got %d; stderr=%s stdout=%s", code, stderr.String(), stdout.String())
+	}
+	statusCmd := exec.Command("git", "-C", repo, "status", "--porcelain")
+	statusBytes, err := statusCmd.Output()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.TrimSpace(string(statusBytes)) != "" {
+		t.Fatalf("expected clean repo after commit, got %q", string(statusBytes))
+	}
+	log := gitOutput(t, repo, "log", "-1", "--format=%s")
+	if log != "chore(scripts): update Go automation" {
+		t.Fatalf("unexpected commit message: %q", log)
+	}
+}
+
+func TestCloseLoopCommitBlocksCompletedActivePlan(t *testing.T) {
+	repo := initTempGitRepo(t)
+	writeFile(t, filepath.Join(repo, "scripts", "tool.go"), "package main\n")
+	writeFile(t, filepath.Join(repo, "plans", "active", "done.md"), "# Done\n- [x] item\n")
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"close-loop", "--repo", repo, "--commit", "--json"}, &stdout, &stderr)
+	if code != ExitValidationFailed {
+		t.Fatalf("expected plan closure block, got %d; stderr=%s stdout=%s", code, stderr.String(), stdout.String())
 	}
 }
 

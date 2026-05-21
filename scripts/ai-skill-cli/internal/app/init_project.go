@@ -71,13 +71,7 @@ func buildInitProjectResult(opts initProjectOptions) Result {
 	}
 
 	if !opts.dryRun {
-		result.Status = "blocked"
-		result.ExitCode = ExitPartialCloseBlocked
-		result.Error = &CommandError{
-			Code:        "write_mode_not_implemented",
-			Message:     "init-project currently supports dry-run planning only.",
-			Remediation: "Run with --dry-run until write mode has fixture-backed parity with init-new-project.sh.",
-		}
+		result.Mode = "write"
 	}
 
 	target, targetCheck := resolveTargetProject(opts.projectPath)
@@ -128,8 +122,63 @@ func buildInitProjectResult(opts initProjectOptions) Result {
 	} else {
 		result.Checks = append(result.Checks, Check{Name: "conflicts", Status: "ok", Message: "no blocking file conflicts"})
 	}
+	if result.ExitCode != ExitSuccess || opts.dryRun {
+		return result
+	}
+
+	repo, repoCheck := resolveInitProjectAiSkillRepo()
+	result.Checks = append(result.Checks, repoCheck)
+	if repoCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{
+			Code:        "ai_skill_repo_unresolved",
+			Message:     repoCheck.Message,
+			Remediation: "Run ai-skill init-project from the Ai-skill repository or set the working directory to a checked-out repo.",
+		}
+		return result
+	}
+	for _, file := range files {
+		content, err := initProjectFileContent(file, repo)
+		if err != nil {
+			result.Status = "blocked"
+			result.ExitCode = ExitValidationFailed
+			result.Error = &CommandError{Code: "template_error", Message: err.Error()}
+			return result
+		}
+		if err := writeInitProjectFile(file.path, []byte(content), opts.force); err != nil {
+			result.Status = "blocked"
+			result.ExitCode = ExitGeneralFailure
+			result.Error = &CommandError{Code: "write_failed", Message: err.Error()}
+			return result
+		}
+		result.Mutations = append(result.Mutations, fmt.Sprintf("wrote %s: %s", file.description, file.path))
+	}
 
 	return result
+}
+
+func resolveInitProjectAiSkillRepo() (string, Check) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", Check{Name: "ai_skill_repo", Status: "failed", Message: err.Error()}
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(wd, "CORE_BOOTSTRAP.md")); err == nil {
+			if _, err := os.Stat(filepath.Join(wd, "scripts", "ai-skill-cli")); err == nil {
+				normalized, normErr := pathutil.NormalizeForReport(wd)
+				if normErr != nil {
+					normalized = wd
+				}
+				return wd, Check{Name: "ai_skill_repo", Status: "ok", Message: normalized}
+			}
+		}
+		parent := filepath.Dir(wd)
+		if parent == wd {
+			return "", Check{Name: "ai_skill_repo", Status: "failed", Message: "could not locate Ai-skill repository root"}
+		}
+		wd = parent
+	}
 }
 
 func resolveTargetProject(projectPath string) (string, Check) {
@@ -203,4 +252,129 @@ func initProjectPlannedFiles(target string, tools []string) []plannedFile {
 	}
 	files = append(files, plannedFile{tool: "common", path: filepath.Join(target, ".agent-goals", "README.md"), description: "agent goals ledger"})
 	return files
+}
+
+func writeInitProjectFile(path string, content []byte, force bool) error {
+	if !force {
+		if _, err := os.Stat(path); err == nil {
+			return fmt.Errorf("target exists: %s", path)
+		}
+	}
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(path, content, 0o644)
+}
+
+func initProjectFileContent(file plannedFile, repo string) (string, error) {
+	switch file.tool {
+	case "roo":
+		return initProjectRooContent(repo), nil
+	case "cursor":
+		if strings.HasSuffix(file.path, "hooks.json") {
+			return initProjectCursorHooksContent(), nil
+		}
+		return initProjectCursorRuleContent(repo), nil
+	case "claude":
+		return initProjectClaudeContent(repo), nil
+	case "common":
+		return initProjectGoalsReadmeContent(repo), nil
+	default:
+		return "", fmt.Errorf("unsupported init-project template: %s", file.tool)
+	}
+}
+
+func initProjectBootstrapText(repo string) string {
+	return fmt.Sprintf(`本專案使用 Ai-skill 知識庫：%s
+
+## 啟動流程
+
+1. 讀取 Core Bootstrap：%s
+2. 了解 OS layout：%s
+3. 依任務 intent 查詢 routing-registry：%s
+4. 依 activation rules 載入必要 lazy-load 文件。
+
+## 語言強制規則
+
+- 強制跟隨使用者語言。
+- 無預設語言，不可自行切換。
+- 完成前確認輸出語言與使用者最後一次提問一致。
+
+## 知識更新流程 Checkpoint
+
+每輪工作結束前，檢查是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式或閉環缺口；若有，依 governance/lifecycle/knowledge-update-flow.md 完成連動更新、驗證、commit/push/readback。
+
+## 專案 durable Markdown 預設
+
+新增或大幅改寫長期保存的 Markdown 前，先讀 %s 與 %s，並依 %s 控制拆分與篇幅。
+`, repo,
+		filepath.Join(repo, "CORE_BOOTSTRAP.md"),
+		filepath.Join(repo, "README.md"),
+		filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"),
+		filepath.Join(repo, "workflow", "documentation", "README.md"),
+		filepath.Join(repo, "workflow", "documentation", "execution-flow.md"),
+		filepath.Join(repo, "governance", "document-sizing.md"))
+}
+
+func initProjectRooContent(repo string) string {
+	text := strings.ReplaceAll(initProjectBootstrapText(repo), "\n", "\\n")
+	return fmt.Sprintf(`{
+  "customModes": [
+    {
+      "slug": "code",
+      "name": "Code",
+      "roleDefinition": "You are a highly skilled software engineer.",
+      "customInstructions": "%s",
+      "groups": ["read", "edit", "command", "mcp"]
+    },
+    {
+      "slug": "architect",
+      "name": "Architect",
+      "roleDefinition": "You are an expert software architect.",
+      "customInstructions": "%s",
+      "groups": ["read"]
+    }
+  ]
+}
+`, text, text)
+}
+
+func initProjectCursorRuleContent(repo string) string {
+	return fmt.Sprintf(`---
+description: Ai-skill 知識庫啟動流程
+globs:
+alwaysApply: true
+---
+
+# Ai-skill Bootstrap
+
+%s`, initProjectBootstrapText(repo))
+}
+
+func initProjectCursorHooksContent() string {
+	return `{
+  "sessionStart": [
+    {
+      "description": "提醒載入 Ai-skill 知識庫",
+      "command": "echo '提示：本專案使用 Ai-skill 知識庫，請確認已載入 CORE_BOOTSTRAP.md'"
+    }
+  ]
+}
+`
+}
+
+func initProjectClaudeContent(repo string) string {
+	return fmt.Sprintf("# Claude Code Auto-Bootstrap\n\n%s", initProjectBootstrapText(repo))
+}
+
+func initProjectGoalsReadmeContent(repo string) string {
+	return fmt.Sprintf(`# Agent Goals
+
+本目錄由 Ai-skill 對話目標帳本管理：%s
+用 `+"`ai-skill goals`"+` 操作。
+
+## 目前目標
+
+（尚無 active goal）
+`, filepath.Join(repo, "enforcement", "conversation-goal-ledger.md"))
 }

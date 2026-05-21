@@ -26,7 +26,7 @@
 | Pure Go dependency | 可使用；需記錄用途與替代方案 | SQLite 採用 `modernc.org/sqlite` |
 | CGO dependency | 預設不使用；若要使用，必須有 ADR、CI matrix、Windows 安裝成本與 fallback | `mattn/go-sqlite3` 不作為預設 |
 | 外部 desktop binary | 只在使用者環境語意不可替代時允許 | Git 保持 external dependency |
-| Shell adapters | 不可新增為長期入口；只能是 hook adapter、thin bootstrap wrapper，或尚未完成 write-mode parity 的 retained legacy surface | Runtime validate / refresh / compile / query 與 Roo setting adapter 已是 native default；`sync-cursor-bundle.sh` 已刪，`ai-skill-close-loop.sh` 仍待 Go write-mode parity |
+| Shell adapters | 不可新增為長期入口；只能是 hook adapter 或 thin bootstrap wrapper | Runtime validate / refresh / compile / query、Roo setting adapter、init-project、goals、close-loop 都已是 native default；`sync-cursor-bundle.sh` 與舊 `.sh` entrypoints 已刪 |
 | Tool-specific API / path | 放在 tool adapter，不進通用 CLI 預設 | Cursor / Roo Code 設定 helper 維持 tool-specific |
 
 ## SQLite 決策

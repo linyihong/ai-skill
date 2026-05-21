@@ -238,7 +238,7 @@ state_based_enforcement:
 2. `git diff` 檢查將提交的內容，不得包含 secrets、raw tokens、私人 host、個資或本機絕對路徑。
 3. 執行適用的 lints / Markdown link check / required linked updates 檢查。
 4. 若本輪明確使用或更新本機工具 mirror / symlink / copy snapshot，執行對應 tool sync；reference-only 只需確認 `<AI_SKILL_REPO>` 可讀，不跑同步。
-5. 若有多個 owner group，優先使用 `./scripts/ai-skill-close-loop.sh --commit` 分組提交；若手動提交，仍需按 enforcement、scripts、workflow / analysis / intelligence owner 分開提交，避免把不相干內容混成一包。
+5. 若有多個 owner group，優先使用 `ai-skill close-loop --commit` 分組提交；若手動提交，仍需按 enforcement、scripts、workflow / analysis / intelligence owner 分開提交，避免把不相干內容混成一包。
 6. `git add` 相關檔案。
 7. **若 runtime YAML 來源或 compiler 規則有變更，確認 `runtime.db` 已 `git add`**（pre-commit hook 會自動處理，但手動 commit 時需自行確認）。
 8. `git commit`。

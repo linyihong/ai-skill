@@ -27,7 +27,7 @@
 ai-skill runtime refresh
 
 # 提交前檢查 dirty 分組（預設 dry-run）
-./scripts/ai-skill-close-loop.sh
+ai-skill close-loop --dry-run
 ```
 
 選用：若已設定 `git config core.hooksPath scripts/git-hooks`，在 staged 檔案觸及 `knowledge/`、`validation/` 等時，`pre-commit` 會跑 `ai-skill runtime validate`（見 [`scripts/git-hooks/pre-commit`](../scripts/git-hooks/pre-commit)）。

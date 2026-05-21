@@ -71,7 +71,7 @@ Ledger 必須回答：
 實質工作前，先執行或等效完成：
 
 ```text
-<AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> status
+<AI_SKILL_REPO>/scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals status --project <PROJECT_ROOT>
 ```
 
 接著讀 `<PROJECT_ROOT>/.agent-goals/README.md` 與相關 active goal file，確認：
@@ -88,7 +88,7 @@ Ledger 是 recovery aid，不是自動切換任務的來源。最新使用者要
 若 ledger 不存在，且符合下列任一 trigger，先初始化：
 
 ```text
-<AI_SKILL_REPO>/scripts/agent-goals.sh --project <PROJECT_ROOT> init
+<AI_SKILL_REPO>/scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals init --project <PROJECT_ROOT>
 ```
 
 建立或更新 goal file 的情境：

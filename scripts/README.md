@@ -2,17 +2,14 @@
 
 | 檔案 | 用途 |
 | --- | --- |
-| [`init-new-project.sh`](init-new-project.sh) | **新專案初始化**：在目標專案目錄中一次建立 Roo Code（`.roomodes`）、Cursor（`.cursor/rules/`）、Claude Code（`CLAUDE.md`）的設定檔，全部指向 Ai-skill 知識庫；bootstrap 內含 **專案 durable Markdown 預設**（寫入 `docs/`、`README.md` 等前先讀 `workflow/documentation/`）。開新專案時跑一次就好。 |
-| [`ai-skill-close-loop.sh`](ai-skill-close-loop.sh) | **Retained legacy** close-loop 寫入 helper；只保留到 `ai-skill close-loop --commit/--push` parity 完成，不得新增新功能。 |
 | [`ai-skill-cli/`](ai-skill-cli/README.md) | 跨平台 Go CLI / runtime toolchain 的開發根目錄；`docs/` 放文件先行產物與舊腳本 parity 盤點，未來 `cmd/`、`internal/`、`testdata/` 放程式碼與 fixtures。 |
-| [`agent-goals.sh`](agent-goals.sh) | 工具中立的專案暫存 goal ledger helper：在 `<PROJECT_ROOT>/.agent-goals/` 建立、更新、拆解、暫停、完成刪除對話目標；不提交 goal 檔。 |
-| [`git-hooks/post-commit`](git-hooks/post-commit) | Reference-only 預設不做同步；`AI_SKILL_SYNC_CURSOR_BUNDLE=1` 目前只提示舊 shell 已刪，待 Go write mode 完成後再恢復 mirror refresh。 |
+| [`git-hooks/pre-commit`](git-hooks/pre-commit) / [`git-hooks/post-commit`](git-hooks/post-commit) | 最小 Git hook adapter；實際邏輯在 `ai-skill hooks run pre-commit/post-commit`。 |
 
 ## Go-first script policy
 
-新增 automation 預設必須進 [`ai-skill-cli/`](ai-skill-cli/README.md) 的 Go CLI；不要再新增長期 `.sh`、`.rb` 或 `.py` 入口。Shell 只允許作為 Git hook adapter、轉呼叫 repo-local `ai-skill` binary 的 thin bootstrap wrapper，或尚未完成 Go write-mode parity 的 retained legacy surface。
+新增 automation 預設必須進 [`ai-skill-cli/`](ai-skill-cli/README.md) 的 Go CLI；不要再新增長期 `.sh`、`.rb` 或 `.py` 入口。Shell 只允許作為 Git hook adapter 或轉呼叫 repo-local `ai-skill` binary 的 thin bootstrap wrapper。
 
-保留中的 shell 入口不得新增新功能；新功能先做成 Go command，完成 parity、fixture、文件與 release gate 後刪除舊 shell。
+已完成 parity 的 shell 入口必須刪除；新功能先做成 Go command，再補 fixture、文件與 release gate。
 
 ## Go CLI migration map
 
@@ -20,22 +17,22 @@
 
 | 現有入口 | 目標 CLI | 目前狀態 | 收尾政策 |
 | --- | --- | --- | --- |
-| `init-new-project.sh` | `ai-skill init-project` | `--dry-run` planner 已實作；write mode 等 template parity | CLI parity、fixtures、文件通過後刪除舊 shell 入口。 |
-| `agent-goals.sh` | `ai-skill goals` | `status` read-only 與 `init --dry-run` planner 已實作；寫入命令待 parity | 完整 goal lifecycle parity 通過後刪除舊 shell 入口。 |
-| deleted legacy hook installer | `ai-skill hooks install` | dry-run planner 已實作；source 已改為 `scripts/git-hooks/`；copy / chmod write mode 待 parity | 舊 `scripts/install-hooks.sh` 與 `.githooks/` 已刪除，避免誤用 stale hook surface；Git hook files 保留在 `scripts/git-hooks/` 作為 adapter。 |
+| deleted `init-new-project.sh` | `ai-skill init-project` | write mode 已實作；支援 `--dry-run`、`--force`、`--tools` | 舊 shell 已刪；新專案初始化只能走 Go CLI。 |
+| deleted `agent-goals.sh` | `ai-skill goals` | `init/status/start/update/split/pause/complete/cleanup` 已由 Go 實作 | 舊 shell 已刪；goal ledger lifecycle 只能走 Go CLI。 |
+| deleted legacy hook installer | `ai-skill hooks install` / `ai-skill hooks run ...` | install 會安裝最小 adapter；pre/post-commit 業務邏輯在 Go runner | Git hook files 只保留 adapter，不承載 reusable automation logic。 |
 | deleted `sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | 舊 shell 已刪；Go command 已有 explicit-target dry-run planner，但 write mode 仍回 `write_mode_not_implemented` | 未來若要恢復 Cursor mirror 寫入，只能補 `ai-skill sync-cursor-bundle` Go write mode。 |
-| `ai-skill-close-loop.sh` | `ai-skill close-loop` | legacy retained；Go command 已有 dry-run inspection，但 `--commit` / `--push` 仍回 `write_mode_not_implemented` | 完成 commit/push/private-path/plan-closure parity 後刪除或降為短期 binary bootstrap wrapper。不得在 shell 內新增新功能。 |
+| deleted `ai-skill-close-loop.sh` | `ai-skill close-loop` | `--dry-run`、`--commit`、`--push` 已由 Go 實作 | 舊 shell 已刪；close-loop 寫入流程只走 Go CLI。 |
 | runtime Ruby helpers | `ai-skill runtime ...` | 已刪除 runtime report/index/query/validation/migration/state/sync Ruby entrypoints；`runtime validate`、`runtime refresh`、`runtime query`、`runtime compile` 的 desktop path 預設都走 Go-native，不依賴 Ruby、Python 或 `sqlite3` CLI。 | 已完成 native 覆蓋或易誤用的 scripts 直接刪除；runtime compiler source 已恢復為 YAML，Go compiler 是唯一 active compile path。 |
 | deleted Roo Python helper | `ai-skill roo set-global-custom-instructions` | 已刪除 `scripts/set-roo-global-custom-instructions.py`；guarded tool adapter 由 Go CLI 實作。 | fake VS Code SQLite DB tests 通過後刪除，避免未來錯誤引用 Python helper。 |
 
-Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`](ai-skill-cli/docs/legacy-script-disposition.md) 是舊 shell / Ruby / Python entrypoints 的最終 disposition source；runtime desktop CLI 已是 primary，已覆蓋的 runtime Ruby/Python scripts 已刪除，尚未完整 parity 的 write-mode shell adapters 不在本輪直接刪除。
+Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`](ai-skill-cli/docs/legacy-script-disposition.md) 是舊 shell / Ruby / Python entrypoints 的最終 disposition source；runtime desktop CLI 已是 primary，已覆蓋的 scripts 已刪除，Git hook shell 只保留最小 adapter。
 
 ## New project initialization
 
-開新專案時，用 [`init-new-project.sh`](init-new-project.sh) 一次設定所有 AI 工具：
+開新專案時，用 repo-local Go CLI 一次設定所有 AI 工具：
 
 ```bash
-./scripts/init-new-project.sh ~/projects/my-new-app
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app
 ```
 
 這會在目標專案中建立：
@@ -51,19 +48,19 @@ Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`
 只設定特定工具：
 
 ```bash
-./scripts/init-new-project.sh ~/projects/my-new-app --tools roo,cursor
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app --tools roo,cursor
 ```
 
 預覽模式（不實際寫入）：
 
 ```bash
-./scripts/init-new-project.sh ~/projects/my-new-app --dry-run
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app --dry-run
 ```
 
 覆蓋已有檔案：
 
 ```bash
-./scripts/init-new-project.sh ~/projects/my-new-app --force
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app --force
 ```
 
 完整說明見 [`ai-tools/new-project-onboarding.md`](../ai-tools/new-project-onboarding.md)。
@@ -72,24 +69,24 @@ Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`
 
 ## Close-loop automation
 
-`ai-skill-close-loop.sh` 目前是 retained legacy close-loop 寫入入口；Go CLI 的 `ai-skill close-loop --dry-run` 已可檢查狀態，但 `--commit` / `--push` 尚未開放。新的 close-loop 功能必須加到 Go CLI，shell 只保留到 write-mode parity 完成。
+Close-loop 寫入入口已移到 Go CLI；舊 `ai-skill-close-loop.sh` 已刪除。
 
 先檢查，不提交：
 
 ```bash
-./scripts/ai-skill-close-loop.sh
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 close-loop --dry-run
 ```
 
 沒有人正在操作、所有 dirty path 都可歸屬時，依 owner 分組提交。預設不跑 Cursor bundle sync：
 
 ```bash
-./scripts/ai-skill-close-loop.sh --commit
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 close-loop --commit
 ```
 
 提交後也推送目前 branch：
 
 ```bash
-./scripts/ai-skill-close-loop.sh --commit --push
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 close-loop --commit --push
 ```
 
 安全條件：
@@ -98,7 +95,7 @@ Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`
 - 若存在 merge / rebase / cherry-pick 狀態，腳本會停止。
 - 若 dirty path 無法歸到 `architecture`（含下一階段 top-level 分層）、`enforcement`、`workflow`、`analysis`、`intelligence`、`scripts`、`ai-tools` 或 `.cursor/rules` owner，腳本會停止。
 - 預設只 dry-run；必須明確加 `--commit` / `--push` 才會寫入 git。
-- 根目錄 `CONTRIBUTING.md` 與 `README.md`、`enforcement/`、`.gitignore` 同屬 `shared` owner group（見 `group_for_path` in `ai-skill-close-loop.sh`）。
+- 根目錄 `CONTRIBUTING.md` 與 `README.md`、`enforcement/`、`.gitignore` 同屬 `shared` owner group（見 `closeLoopGroupForPath` in `scripts/ai-skill-cli/internal/app/close_loop.go`）。
 
 ## Conversation goal ledger helper
 
@@ -107,19 +104,19 @@ Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`
 進入多步驟工作、使用者要求「繼續」前一個任務、或已看到 active project 有 modified / staged / untracked files 時，先檢查 active goal、priority、owner、lock、parallelization mode、plan/todo links、open missing/decision/strengthen：
 
 ```bash
-./scripts/agent-goals.sh --project <PROJECT_ROOT> status
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals status --project <PROJECT_ROOT>
 ```
 
 若尚未建立 ledger 且任務不是單一回覆即可完成，先初始化：
 
 ```bash
-./scripts/agent-goals.sh --project <PROJECT_ROOT> init
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals init --project <PROJECT_ROOT>
 ```
 
 建立目前主要目標：
 
 ```bash
-./scripts/agent-goals.sh --project <PROJECT_ROOT> start \
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals start --project <PROJECT_ROOT> \
   --id P1-example-goal \
   --title "Example goal" \
   --source "User request summary" \
@@ -133,12 +130,12 @@ Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`
 更新、拆解、暫停與完成：
 
 ```bash
-./scripts/agent-goals.sh --project <PROJECT_ROOT> update --id P1-example-goal --note "Read dependencies" --next "Implement the change"
-./scripts/agent-goals.sh --project <PROJECT_ROOT> update --id P1-example-goal --missing "Validation examples are not written" --decision "Choose whether this remains P1" --strengthen "Add stronger completion criteria"
-./scripts/agent-goals.sh --project <PROJECT_ROOT> update --id P1-example-goal --parallelization non-parallelizable --note "Live capture must stay single-owner"
-./scripts/agent-goals.sh --project <PROJECT_ROOT> split --parent P1-example-goal --id P2-child-goal --title "Child goal"
-./scripts/agent-goals.sh --project <PROJECT_ROOT> pause --id P1-example-goal --reason "User changed priority"
-./scripts/agent-goals.sh --project <PROJECT_ROOT> complete --id P1-example-goal --validated --note "Validation passed"
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals update --project <PROJECT_ROOT> --id P1-example-goal --note "Read dependencies" --next "Implement the change"
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals update --project <PROJECT_ROOT> --id P1-example-goal --missing "Validation examples are not written" --decision "Choose whether this remains P1" --strengthen "Add stronger completion criteria"
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals update --project <PROJECT_ROOT> --id P1-example-goal --parallelization non-parallelizable --note "Live capture must stay single-owner"
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals split --project <PROJECT_ROOT> --parent P1-example-goal --id P2-child-goal --title "Child goal"
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals pause --project <PROJECT_ROOT> --id P1-example-goal --reason "User changed priority"
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 goals complete --project <PROJECT_ROOT> --id P1-example-goal --validated --note "Validation passed"
 ```
 
 安全條件：

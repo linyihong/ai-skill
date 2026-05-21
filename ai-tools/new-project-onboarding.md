@@ -5,10 +5,10 @@
 ## 流程總覽
 
 ```
-開新專案 → 執行初始化腳本 → 在專案中開啟 AI 工具 → 開始開發
+開新專案 → 執行 `ai-skill init-project` → 在專案中開啟 AI 工具 → 開始開發
 ```
 
-初始化腳本 [`scripts/init-new-project.sh`](../scripts/init-new-project.sh) 會一次設定所有支援的 AI 工具：
+Go CLI command `ai-skill init-project` 會一次設定所有支援的 AI 工具：
 
 | 工具 | 產出檔案 | 效果 |
 |------|---------|------|
@@ -24,7 +24,7 @@ mkdir -p ~/projects/my-new-app
 
 # 2. 執行初始化腳本（從 Ai-skill repo 目錄）
 cd /path/to/ai-skill
-./scripts/init-new-project.sh ~/projects/my-new-app
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app
 
 # 3. 在目標專案中開啟 AI 工具，開始開發
 cd ~/projects/my-new-app
@@ -37,23 +37,23 @@ code .   # 或 cursor . 或 claude .
 
 ```bash
 # 只設定 Roo Code
-./scripts/init-new-project.sh ~/projects/my-new-app --tools roo
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app --tools roo
 
 # 只設定 Cursor + Claude Code
-./scripts/init-new-project.sh ~/projects/my-new-app --tools cursor,claude
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app --tools cursor,claude
 ```
 
 ### 預覽模式（不實際寫入）
 
 ```bash
-./scripts/init-new-project.sh ~/projects/my-new-app --dry-run
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app --dry-run
 ```
 
 ### 覆蓋已有設定檔
 
 ```bash
 # 如果目標專案已有 .roomodes 或 CLAUDE.md，用 --force 覆蓋
-./scripts/init-new-project.sh ~/projects/my-new-app --force
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app --force
 ```
 
 ## 各工具設定說明
@@ -129,9 +129,9 @@ alwaysApply: true
 [`<AI_SKILL_REPO>/CORE_BOOTSTRAP.md`](<AI_SKILL_REPO>/CORE_BOOTSTRAP.md)
 ```
 
-### 層級 B：專案初始化腳本（中等，開新專案時跑一次）
+### 層級 B：專案初始化 CLI（中等，開新專案時跑一次）
 
-就是 [`scripts/init-new-project.sh`](../scripts/init-new-project.sh)。
+就是 `ai-skill init-project`。
 
 每次開新專案時執行一次，所有工具設定一次到位。
 
@@ -171,14 +171,14 @@ ls -la /path/to/project/.agent-goals/README.md
 如果 Ai-skill repo 移動位置，重新執行初始化腳本即可更新所有路徑：
 
 ```bash
-./scripts/init-new-project.sh /path/to/project --force
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project /path/to/project --force
 ```
 
 這會用新的絕對路徑覆蓋所有設定檔。
 
 ## 與既有文件的關係
 
-- [`scripts/init-new-project.sh`](../scripts/init-new-project.sh) — 初始化腳本本體
+- [`scripts/ai-skill-cli/`](../scripts/ai-skill-cli/README.md) — `ai-skill init-project` 的 Go CLI source
 - [`ai-skill roo set-global-custom-instructions`](../ai-skill roo set-global-custom-instructions) — Roo Code 全域設定寫入腳本
 - `ai-skill sync-cursor-bundle` — Cursor bundle 同步的 Go CLI 入口；目前只有 dry-run planner，write mode 待實作
 - [`ai-tools/agent-onboarding.md`](agent-onboarding.md) — 新 AI 工具 onboarding（不是新專案）

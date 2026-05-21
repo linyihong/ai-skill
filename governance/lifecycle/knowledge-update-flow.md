@@ -534,7 +534,7 @@ ai-skill runtime validate
    - 檢查目錄名稱是否為舊技能名稱的縮寫（慣性命名）
    - 檢查目錄深度是否超過 4 層
 6. ✅ 若本輪使用或更新 tool mirror，執行對應 tool sync；reference-only 只需確認 `<AI_SKILL_REPO>` 可讀
-7. ✅ 若有多個 owner group，使用 `scripts/ai-skill-close-loop.sh --commit` 分組提交
+7. ✅ 若有多個 owner group，使用 `ai-skill close-loop --commit` 分組提交
 
 ---
 

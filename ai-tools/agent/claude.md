@@ -51,7 +51,7 @@ Claude Code 的設定方式與 Roo Code 不同，沒有「全域 Custom Instruct
 **Goal ledger 操作流程已由 runtime 管理**，請參考：
 - [`runtime/runtime.db`](../../runtime/runtime.db) — `phase_machine` / `obligation_ledger` / `blocking_gates` 快速查詢
 - [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — phase / obligation / gate / transaction / recovery 的 embedded source
-- [`scripts/agent-goals.sh`](../../scripts/agent-goals.sh) — goal ledger CLI helper
+- `ai-skill goals`（source: [`scripts/ai-skill-cli/internal/app/goals.go`](../../scripts/ai-skill-cli/internal/app/goals.go)）— goal ledger CLI helper
 
 Claude Code 專屬注意事項：
 - 無 hooks 機制，需在 `CLAUDE.md` 中手動加入 goal ledger 提醒

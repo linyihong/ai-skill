@@ -78,14 +78,14 @@ Session Start
 
 ### 給人類（開新專案的人）
 
-如果你開了一個**全新的專案**，想讓它使用此知識庫，執行以下命令一次設定所有 AI 工具：
+如果你開了一個**全新的專案**，想讓它使用此知識庫，執行 repo-local Go CLI 一次設定所有 AI 工具：
 
 ```bash
 # 從 Ai-skill repo 目錄執行
-./scripts/init-new-project.sh /path/to/your/new-project
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project /path/to/your/new-project
 
 # 範例
-./scripts/init-new-project.sh ~/projects/my-new-app
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app
 ```
 
 這會在目標專案中建立：

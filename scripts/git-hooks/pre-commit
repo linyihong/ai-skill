@@ -1,66 +1,16 @@
-#!/usr/bin/env bash
-# Ai-skill: pre-commit hook for knowledge runtime validation + compiler.
-#
-# When staged changes touch knowledge/ or validation/ surfaces, run
-# the repo-local ai-skill runtime validator to catch errors before commit.
-#
-# When staged changes touch runtime/ YAML sources or compiler rules, run
-# repo-local ai-skill runtime compile to regenerate runtime.db.
-#
-# Enable with:
-#   git config core.hooksPath scripts/git-hooks
-set -euo pipefail
+#!/usr/bin/env sh
+# Minimal Git hook adapter. Business logic lives in `ai-skill hooks run pre-commit`.
+set -eu
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
-
-CHANGED=$(git diff --cached --name-only)
-
-ai_skill_cli() {
-  if [[ -n "${AI_SKILL_CLI:-}" ]]; then
-    printf '%s\n' "${AI_SKILL_CLI}"
-    return 0
-  fi
-  local os arch suffix binary
-  os="$(uname -s | tr '[:upper:]' '[:lower:]')"
-  arch="$(uname -m)"
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+BIN="${AI_SKILL_CLI:-$ROOT/scripts/ai-skill-cli/bin/ai-skill}"
+if [ ! -x "$BIN" ]; then
+  os="$(uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]')"
+  arch="$(uname -m 2>/dev/null || echo unknown)"
+  case "$os" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac
+  case "$arch" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac
   suffix=""
-  case "${os}" in
-    darwin) os="darwin" ;;
-    linux) os="linux" ;;
-    mingw*|msys*|cygwin*) os="windows"; suffix=".exe" ;;
-    *) echo "Unsupported OS for repo-local ai-skill binary: ${os}" >&2; return 1 ;;
-  esac
-  case "${arch}" in
-    arm64|aarch64) arch="arm64" ;;
-    x86_64|amd64) arch="amd64" ;;
-    *) echo "Unsupported architecture for repo-local ai-skill binary: ${arch}" >&2; return 1 ;;
-  esac
-  binary="${ROOT}/scripts/ai-skill-cli/bin/ai-skill-${os}-${arch}${suffix}"
-  [[ -x "${binary}" ]] || { echo "Missing executable ai-skill binary: ${binary}" >&2; return 1; }
-  printf '%s\n' "${binary}"
-}
-
-# --- Compiler: regenerate runtime.db when runtime YAML/compiler sources change ---
-if echo "$CHANGED" | grep -qE '^(runtime/(phases|obligations|gates|transactions|router|discovery|compiler|budget|context|guards|health|intelligence|output-governance|pipeline|prompt-artifacts|recovery|scheduler|distributed)/|scripts/git-hooks/pre-commit)'; then
-  echo "--- Runtime sources changed, compiling runtime.db ---"
-  "$(ai_skill_cli)" runtime compile --repo "${ROOT}" || {
-    echo ""
-    echo "ERROR: Runtime compiler failed."
-    echo "Fix the errors above, then stage and commit again."
-    exit 1
-  }
-  # Stage the regenerated runtime.db so it is included in the commit
-  git add "${ROOT}/runtime/runtime.db"
-  echo "--- runtime.db staged ---"
+  [ "$os" = "windows" ] && suffix=".exe"
+  BIN="$ROOT/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix"
 fi
-
-# --- Knowledge runtime validation ---
-if echo "$CHANGED" | grep -qE '^(knowledge/|validation/|scripts/validate-)'; then
-  "$(ai_skill_cli)" runtime validate --repo "${ROOT}" || {
-    echo ""
-    echo "ERROR: Knowledge runtime validation failed."
-    echo "Run '$(ai_skill_cli) runtime refresh --repo ${ROOT}' to regenerate and diagnose."
-    echo "Fix the errors above, then stage and commit again."
-    exit 1
-  }
-fi
+exec "$BIN" hooks run pre-commit --repo "$ROOT"

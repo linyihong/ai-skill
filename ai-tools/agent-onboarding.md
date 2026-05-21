@@ -106,7 +106,7 @@
 6. **實作對話目標閉環**：依工具的能力（hooks / custom instructions / 操作注意），實作 goal ledger 整合。
 7. **實作知識更新流程 Checkpoint**：依上方 §知識更新流程 Checkpoint 規範，在 Custom Instructions 或自動載入規則中加入 checkpoint 提醒。
 8. **更新 `ai-tools/README.md`**：在 agent 類別的表格中加入新工具的連結與用途說明。
-9. **建立新專案初始化支援**：在 [`scripts/init-new-project.sh`](../scripts/init-new-project.sh) 中加入該工具的設定產生邏輯，並在 [`ai-tools/new-project-onboarding.md`](new-project-onboarding.md) 中記錄設定方式。
+9. **建立新專案初始化支援**：在 `ai-skill init-project`（source: [`scripts/ai-skill-cli/internal/app/init_project.go`](../scripts/ai-skill-cli/internal/app/init_project.go)）中加入該工具的設定產生邏輯，並在 [`ai-tools/new-project-onboarding.md`](new-project-onboarding.md) 中記錄設定方式。
 10. **驗證**：執行 `ai-skill runtime validate` 確認無誤。
 
 > **注意**：IDE 生態系統的通用知識（如 VS Code Extension 全域設定的 SQLite 儲存機制）屬於可重複使用的工程智慧，應放在 `intelligence/ide/`，而非 `ai-tools/` 下。`ai-tools/` 只放工具特有的設定與操作方式。

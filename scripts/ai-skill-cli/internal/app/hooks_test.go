@@ -10,7 +10,6 @@ import (
 
 func TestHooksInstallDryRunPlansWithoutWriting(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -26,36 +25,34 @@ func TestHooksInstallDryRunPlansWithoutWriting(t *testing.T) {
 	if result.Command != "hooks install" {
 		t.Fatalf("unexpected command: %q", result.Command)
 	}
-	if len(result.PlannedActions) != 1 {
-		t.Fatalf("expected one planned hook install, got %#v", result.PlannedActions)
+	if len(result.PlannedActions) != 2 {
+		t.Fatalf("expected two planned hook installs, got %#v", result.PlannedActions)
 	}
 	if pathExists(filepath.Join(repo, ".git", "hooks", "pre-commit")) {
 		t.Fatal("dry-run wrote hook target")
 	}
 }
 
-func TestHooksInstallBlocksMissingSource(t *testing.T) {
+func TestHooksInstallWriteModeInstallsAdapters(t *testing.T) {
 	repo := initTempGitRepo(t)
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"hooks", "install", "--repo", repo, "--dry-run", "--json"}, &stdout, &stderr)
-	if code != ExitValidationFailed {
-		t.Fatalf("expected validation failure, got %d; stderr=%s", code, stderr.String())
+	code := Run([]string{"hooks", "install", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected install success, got %d; stderr=%s stdout=%s", code, stderr.String(), stdout.String())
 	}
-
-	var result Result
-	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		t.Fatalf("decode JSON: %v", err)
+	content, err := os.ReadFile(filepath.Join(repo, ".git", "hooks", "pre-commit"))
+	if err != nil {
+		t.Fatal(err)
 	}
-	if result.Error == nil || result.Error.Code != "missing_hook_source" {
-		t.Fatalf("expected missing_hook_source, got %#v", result.Error)
+	if !bytes.Contains(content, []byte("hooks run pre-commit")) {
+		t.Fatalf("expected Go hook runner adapter, got %s", string(content))
 	}
 }
 
 func TestHooksInstallBlocksExistingTargetWithoutForce(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 	writeFile(t, filepath.Join(repo, ".git", "hooks", "pre-commit"), "# existing\n")
 
 	var stdout bytes.Buffer
@@ -68,7 +65,6 @@ func TestHooksInstallBlocksExistingTargetWithoutForce(t *testing.T) {
 
 func TestHooksInstallForceAllowsExistingTargetInDryRun(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 	writeFile(t, filepath.Join(repo, ".git", "hooks", "pre-commit"), "# existing\n")
 
 	var stdout bytes.Buffer
@@ -81,7 +77,6 @@ func TestHooksInstallForceAllowsExistingTargetInDryRun(t *testing.T) {
 
 func TestHooksInstallReportsUnsafeGitStateButDoesNotBlockDryRun(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 	writeFile(t, filepath.Join(repo, ".git", "MERGE_HEAD"), "deadbeef\n")
 
 	var stdout bytes.Buffer
@@ -111,21 +106,6 @@ func TestHooksInstallMissingGitBlocks(t *testing.T) {
 	}
 }
 
-func TestHooksInstallWriteModeBlockedUntilParity(t *testing.T) {
-	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := Run([]string{"hooks", "install", "--repo", repo, "--json"}, &stdout, &stderr)
-	if code != ExitPartialCloseBlocked {
-		t.Fatalf("expected write mode blocked, got %d; stderr=%s", code, stderr.String())
-	}
-	if pathExists(filepath.Join(repo, ".git", "hooks", "pre-commit")) {
-		t.Fatal("write-blocked mode wrote hook target")
-	}
-}
-
 func TestHooksUnsupportedSubcommandReturnsInvalidUsage(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -137,7 +117,6 @@ func TestHooksUnsupportedSubcommandReturnsInvalidUsage(t *testing.T) {
 
 func TestHooksInstallDoesNotWriteMutations(t *testing.T) {
 	repo := initTempGitRepo(t)
-	writeFile(t, filepath.Join(repo, "scripts", "git-hooks", "pre-commit"), "#!/bin/sh\n")
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -152,6 +131,17 @@ func TestHooksInstallDoesNotWriteMutations(t *testing.T) {
 	}
 	if len(result.Mutations) != 0 {
 		t.Fatalf("dry-run must not mutate, got %#v", result.Mutations)
+	}
+}
+
+func TestHooksRunPostCommitReferenceOnly(t *testing.T) {
+	repo := initTempGitRepo(t)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"hooks", "run", "post-commit", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected post-commit success, got %d; stderr=%s stdout=%s", code, stderr.String(), stdout.String())
 	}
 }
 

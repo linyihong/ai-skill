@@ -36,7 +36,7 @@ Linked-update completeness 的治理 gate 見 [`governance/ai-runtime-governance
 | `../../feedback/feedback-lessons.md` | `feedback/history/README.md`、各 domain 的 `feedback/history/<domain>/README.md`、新增 lesson 模板。舊結構 `skills/<name>/FEEDBACK.md` 與 `skills/<name>/feedback_history/README.md` 已於 2026-05-13 刪除。 |
 | 工具同步文件或同步腳本 | 根 `README.md`、`scripts/README.md`、`ai-tools/` 對應工具文件、Agents 必讀規則、實際執行同步。 |
 | 新增或修改 `tools/adapters/<tool>.md` 或 workflow tool adapter 說明 | 該 workflow 的入口（`workflow/<domain>/README.md`）、核心 `execution-flow.md` 中的 adapter link、`ai-tools/<tool>.md` 的 cross-link（若該工具已有集中說明）、必要 validation/checklist。 |
-| `scripts/ai-skill-close-loop.sh` | `scripts/README.md`、根 `README.md`、`enforcement/dependency-reading.md`、本檔；若改變 lock / commit / push 條件，也需同步相關 skill close-loop 說明。 |
+| `ai-skill close-loop` / `scripts/ai-skill-cli/internal/app/close_loop.go` | `scripts/README.md`、根 `README.md`、`enforcement/dependency-reading.md`、本檔；若改變 lock / commit / push 條件，也需同步相關 close-loop 說明。 |
 | 新增 workflow | 根 `README.md`、`workflow/README.md`、routing registry、必要 tool sync 實際同步結果。 |
 | 修改 `workflow/<domain>/execution-flow.md` 觸發條件或流程 | 該 workflow 的 `README.md`、`runtime/onboarding/` 對應 quickstart、相關 cross-link。 |
 | 新增 `feedback/history/` lesson | `feedback/history/<domain>/README.md`，必要時 `feedback/history/<domain>/<category>/README.md`。 |
@@ -68,7 +68,7 @@ Linked-update completeness 的治理 gate 見 [`governance/ai-runtime-governance
 | 只描述「改了什麼」，沒有描述「為什麼會漏」與「如何防止重犯」 | 補原因分析、決策規則、驗證步驟，並依 [`goal-action-validation.md`](goal-action-validation.md) 寫明目標、執行、驗證。 |
 | 使用者指出 agent 反覆出現同類失效模式，但只修當下文件 | 依 [`failure-learning-system.md`](failure-learning-system.md) 分類失效模式、建立或更新 `enforcement/failure-patterns/`，並補 prevention gate 與 validation。 |
 | 更新完 skill / enforcement rules 後沒有提醒 repo 仍有 pending commit / ahead / behind 狀態 | 最終回覆必須列出 `git status --short --branch` 的關鍵狀態、哪些是本輪提交、哪些是既有 dirty changes，以及需要 push / merge / 清理的下一步。 |
-| 有多個 dirty owner group 卻混成單一 commit | 沒有 active lock 時使用 `scripts/ai-skill-close-loop.sh --commit` 或手動依 enforcement、scripts、各 skill owner 分開 commit；有 active lock 時停止並提醒，不得更新。 |
+| 有多個 dirty owner group 卻混成單一 commit | 沒有 active lock 時使用 `ai-skill close-loop --commit` 或手動依 enforcement、scripts、各 skill owner 分開 commit；有 active lock 時停止並提醒，不得更新。 |
 | 開始執行 plan 前未檢查 current architecture，導致 candidate file、source-of-truth 或 generated surface 不生效 | 立即停止 implementation，依 [`plans/README.md`](../plans/README.md#plan-執行前架構相容性檢查architecture-compatibility-preflight) 補做 preflight；若已發現衝突，先修正 plan / compiler / source-of-truth 決策，再恢復執行。 |
 | Plan 所有 Phase 完成後未執行 Plan Completion Closure（未更新狀態表、未搬移至 archived/、未更新 plans/README.md） | 立即執行 [`plans/README.md`](../plans/README.md) 的閉環檢查清單 7 步驟；若已 commit，需另開 commit 補閉環操作，不得 amend 既有 commit。 |
 

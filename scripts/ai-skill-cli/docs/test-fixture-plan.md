@@ -35,6 +35,8 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/legacy-script-parity` | 舊腳本覆蓋率驗證 | 每個 native target / wrapper first 舊入口都有命令映射與測試證據 |
 | `fixture/legacy-to-go-migration-map` | legacy surface 刪除前的文件 gate | 每個刪除列都有 new owner、source-of-truth、validation evidence，並連到 parity/disposition docs |
 | `fixture/go-first-automation-policy` | 新 automation 入口治理 | 新功能不得新增長期 `.sh` / `.rb` / `.py`；若為 hook / bootstrap 例外，必須有 Go owner 與刪除條件 |
+| `fixture/shell-deletion-gate` | 完成 parity 後刪除 `.sh` | `init-new-project.sh`、`agent-goals.sh`、`ai-skill-close-loop.sh` 不再存在；active docs 不再導向 shell commands |
+| `fixture/go-hook-runner` | Git hook logic Go-native | pre-commit staged runtime compile / validate 與 post-commit reference-only 行為由 `ai-skill hooks run` 覆蓋；shell hook 只作 adapter |
 
 ## 缺 Git fixture
 
@@ -99,6 +101,8 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - `deferred` 與 `tool-specific` 條目不得被當成已替代；輸出必須明確標示不在目前 Phase 範圍。
 - `legacy-to-go-migration-map.md` 必須能反查每個刪除 surface 的 Go command/package、source-of-truth 與 validation evidence。
 - Go-first automation policy 必須阻擋新的長期 shell / Ruby / Python entrypoint；legacy shell 只能等待 Go write-mode parity，不能承載新功能。
+- Shell deletion gate 必須在 parity 後確認三個 `.sh` 已刪除，並更新 active docs / migration map / disposition。
+- Git hook runner fixture 必須證明 hook business logic 可由 Go command 執行，hook file 不再包含 staged-file decision 或 runtime validation orchestration。
 
 ## Windows path fixture
 

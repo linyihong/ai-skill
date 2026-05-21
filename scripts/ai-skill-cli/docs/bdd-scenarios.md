@@ -62,6 +62,22 @@
 **And** 必須先更新 `command-contract.md` 並實作對應 Go CLI command
 **And** 若保留 legacy shell，shell 不得新增新功能，只能等待 Go write-mode parity 後刪除。
 
+## 場景：Shell 入口完成 parity 後必須刪除
+
+**Given** `scripts/init-new-project.sh`、`scripts/agent-goals.sh` 或 `scripts/ai-skill-close-loop.sh` 已有 Go write-mode parity
+**When** 對應 fixture、文件與 release gate 通過
+**Then** 舊 `.sh` 檔案必須刪除
+**And** active docs 必須改指向 `ai-skill` Go CLI
+**And** final grep 不得在 active docs 中保留舊 shell 執行指令。
+
+## 場景：Git hook logic 必須進 Go
+
+**Given** Git hook 需要 pre-commit 或 post-commit 行為
+**When** hook 需要判斷 staged files、runtime compile、runtime validate 或 Cursor sync 狀態
+**Then** 判斷邏輯必須在 `ai-skill hooks run ...` Go command
+**And** hook file 若保留，只能作 repo-local binary adapter
+**And** 不得在 hook shell 中新增 reusable automation logic。
+
 ## 場景：不安全 repo 狀態阻斷 commit
 
 **Given** repository 處於 merge、rebase 或 cherry-pick 狀態

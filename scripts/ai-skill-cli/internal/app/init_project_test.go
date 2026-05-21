@@ -76,22 +76,38 @@ func TestInitProjectForceAllowsExistingFileInDryRun(t *testing.T) {
 	}
 }
 
-func TestInitProjectWriteModeBlockedUntilParity(t *testing.T) {
+func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	project := t.TempDir()
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"init-project", "--project", project, "--json"}, &stdout, &stderr)
-	if code != ExitPartialCloseBlocked {
-		t.Fatalf("expected write mode blocked, got %d; stderr=%s", code, stderr.String())
+	code := Run([]string{"init-project", "--project", project, "--tools", "claude,cursor", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected write success, got %d; stderr=%s", code, stderr.String())
 	}
 
 	var result Result
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
 		t.Fatalf("decode JSON: %v", err)
 	}
-	if result.Error == nil || result.Error.Code != "write_mode_not_implemented" {
-		t.Fatalf("expected write_mode_not_implemented error, got %#v", result.Error)
+	if result.Mode != "write" || len(result.Mutations) != 4 {
+		t.Fatalf("expected write mutations, got %#v", result)
+	}
+	if !pathExists(filepath.Join(project, "CLAUDE.md")) {
+		t.Fatal("write mode did not create CLAUDE.md")
+	}
+	if !pathExists(filepath.Join(project, ".cursor", "rules", "ai-skill-bootstrap.mdc")) {
+		t.Fatal("write mode did not create Cursor rule")
+	}
+	if pathExists(filepath.Join(project, ".roomodes")) {
+		t.Fatal("selected tools unexpectedly wrote .roomodes")
+	}
+	goals, err := os.ReadFile(filepath.Join(project, ".agent-goals", "README.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(goals), "ai-skill goals") {
+		t.Fatalf("expected Go CLI goals guidance, got %s", string(goals))
 	}
 }
 

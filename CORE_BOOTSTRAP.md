@@ -34,7 +34,7 @@
    - 檢查 .cursor/rules/ 下是否有 ai-skill bootstrap 規則
    - 檢查 CLAUDE.md 是否存在且包含 CORE_BOOTSTRAP.md 參考
    - 若以上皆無 → 主動告知使用者：「此專案尚未設定 Ai-skill 知識庫。
-     是否要執行初始化？(./scripts/init-new-project.sh <PROJECT_ROOT>)」
+     是否要執行初始化？(`ai-skill init-project --project <PROJECT_ROOT>`)」
    - 若使用者同意，執行初始化腳本
 6. 依 activation rules 決定哪些 lazy-load rules 需要載入
 7. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）

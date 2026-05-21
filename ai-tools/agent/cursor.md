@@ -118,7 +118,7 @@ If the user switches languages, follow their switch.
 **Goal ledger 操作流程已由 runtime 管理**，請參考：
 - [`runtime/runtime.db`](../../runtime/runtime.db) — `phase_machine` / `obligation_ledger` / `blocking_gates` 快速查詢
 - [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — phase / obligation / gate / transaction / recovery 的 embedded source
-- [`scripts/agent-goals.sh`](../../scripts/agent-goals.sh) — goal ledger CLI helper
+- `ai-skill goals`（source: [`scripts/ai-skill-cli/internal/app/goals.go`](../../scripts/ai-skill-cli/internal/app/goals.go)）— goal ledger CLI helper
 
 Cursor 專屬注意事項：
 - 可透過 hooks 自動檢查 goal ledger（sessionStart / preCompact / stop）

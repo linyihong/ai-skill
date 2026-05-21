@@ -1,6 +1,16 @@
-#!/usr/bin/env bash
-# Ai-skill：reference-only 不需要同步。Legacy Cursor bundle shell sync was deleted;
-# re-enable post-commit mirror refresh only after ai-skill sync-cursor-bundle has Go write-mode parity.
-if [[ "${AI_SKILL_SYNC_CURSOR_BUNDLE:-0}" == "1" ]]; then
-  echo "AI_SKILL_SYNC_CURSOR_BUNDLE is ignored until ai-skill sync-cursor-bundle write mode is implemented." >&2
+#!/usr/bin/env sh
+# Minimal Git hook adapter. Business logic lives in `ai-skill hooks run post-commit`.
+set -eu
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+BIN="${AI_SKILL_CLI:-$ROOT/scripts/ai-skill-cli/bin/ai-skill}"
+if [ ! -x "$BIN" ]; then
+  os="$(uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]')"
+  arch="$(uname -m 2>/dev/null || echo unknown)"
+  case "$os" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac
+  case "$arch" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac
+  suffix=""
+  [ "$os" = "windows" ] && suffix=".exe"
+  BIN="$ROOT/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix"
 fi
+exec "$BIN" hooks run post-commit --repo "$ROOT"

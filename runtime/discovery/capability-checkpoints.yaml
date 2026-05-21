@@ -101,7 +101,7 @@ checkpoints:
           min_confidence: high
           search_sources:
             - enforcement/conversation-goal-ledger.md
-            - scripts/ai-skill-close-loop.sh
+            - scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 close-loop --dry-run
           type: completion_criteria
       phase: phase.finalize
       trigger: before_finalize

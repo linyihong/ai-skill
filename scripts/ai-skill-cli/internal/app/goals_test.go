@@ -80,13 +80,95 @@ func TestGoalsInitDryRunPlansWithoutWriting(t *testing.T) {
 	}
 }
 
-func TestGoalsInitWriteModeBlockedUntilParity(t *testing.T) {
+func TestGoalsInitWriteModeCreatesLedgerAndGitExclude(t *testing.T) {
 	project := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(project, ".git", "info"), 0o755); err != nil {
+		t.Fatal(err)
+	}
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	code := Run([]string{"goals", "init", "--project", project, "--json"}, &stdout, &stderr)
-	if code != ExitPartialCloseBlocked {
-		t.Fatalf("expected blocked write mode, got %d; stderr=%s", code, stderr.String())
+	if code != ExitSuccess {
+		t.Fatalf("expected write success, got %d; stderr=%s", code, stderr.String())
+	}
+	if !pathExists(filepath.Join(project, ".agent-goals", "goals")) {
+		t.Fatal("goals dir was not created")
+	}
+	exclude, err := os.ReadFile(filepath.Join(project, ".git", "info", "exclude"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Contains(exclude, []byte(".agent-goals/")) {
+		t.Fatalf("git exclude missing .agent-goals/: %s", string(exclude))
+	}
+}
+
+func TestGoalsLifecycleWriteMode(t *testing.T) {
+	project := t.TempDir()
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"goals", "start", "--project", project, "--id", "demo", "--title", "Demo", "--source", "user request", "--plan", "plan.md", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("start failed: %d stderr=%s stdout=%s", code, stderr.String(), stdout.String())
+	}
+	goal := filepath.Join(project, ".agent-goals", "goals", "demo.md")
+	if !pathExists(goal) {
+		t.Fatal("goal file was not created")
+	}
+
+	stdout.Reset()
+	stderr.Reset()
+	code = Run([]string{"goals", "update", "--project", project, "--id", "demo", "--next", "Ship it", "--missing", "none", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("update failed: %d stderr=%s stdout=%s", code, stderr.String(), stdout.String())
+	}
+	content, err := os.ReadFile(goal)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Contains(content, []byte("Ship it")) {
+		t.Fatalf("goal update missing next action: %s", string(content))
+	}
+
+	stdout.Reset()
+	stderr.Reset()
+	code = Run([]string{"goals", "complete", "--project", project, "--id", "demo", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("complete without validation failed: %d stderr=%s stdout=%s", code, stderr.String(), stdout.String())
+	}
+	if !pathExists(goal) {
+		t.Fatal("goal should remain without --validated")
+	}
+
+	stdout.Reset()
+	stderr.Reset()
+	code = Run([]string{"goals", "complete", "--project", project, "--id", "demo", "--validated", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("complete validated failed: %d stderr=%s stdout=%s", code, stderr.String(), stdout.String())
+	}
+	if pathExists(goal) {
+		t.Fatal("validated complete should delete goal")
+	}
+}
+
+func TestGoalsActiveLockBlocksWrite(t *testing.T) {
+	project := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(project, ".agent-goals", "goals"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(project, ".agent-goals", "locks", "demo.lock"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(project, ".agent-goals", "goals", "demo.md"), []byte("---\nid: demo\n---\n# Demo\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"goals", "update", "--project", project, "--id", "demo", "--note", "blocked", "--json"}, &stdout, &stderr)
+	if code != ExitUnsafeRepoState {
+		t.Fatalf("expected active lock block, got %d; stderr=%s stdout=%s", code, stderr.String(), stdout.String())
 	}
 }

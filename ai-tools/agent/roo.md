@@ -241,7 +241,7 @@ VS Code Extension 全域設定的通用查詢/修改方法見 [`intelligence/ide
 **Goal ledger 操作流程已由 runtime 管理**，請參考：
 - [`runtime/runtime.db`](../../runtime/runtime.db) — `phase_machine` / `obligation_ledger` / `blocking_gates` 快速查詢
 - [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — phase / obligation / gate / transaction / recovery 的 embedded source
-- [`scripts/agent-goals.sh`](../../scripts/agent-goals.sh) — goal ledger CLI helper
+- `ai-skill goals`（source: [`scripts/ai-skill-cli/internal/app/goals.go`](../../scripts/ai-skill-cli/internal/app/goals.go)）— goal ledger CLI helper
 
 Roo Code 專屬注意事項：
 - Roo Code 沒有 hooks 機制，需在 `.roomodes` 的 `customInstructions` 中手動加入 goal ledger 提醒

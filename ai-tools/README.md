@@ -10,7 +10,7 @@
 
 新增其他工具時，依 [`agent-onboarding.md`](agent-onboarding.md) 的 checklist 完成設定。
 
-開新專案時，用 [`new-project-onboarding.md`](new-project-onboarding.md) 了解如何一次設定所有工具，或直接執行 [`scripts/init-new-project.sh`](../scripts/init-new-project.sh)。
+開新專案時，用 [`new-project-onboarding.md`](new-project-onboarding.md) 了解如何一次設定所有工具，或直接執行 `ai-skill init-project`。
 
 ## 配置思想與邊界定義
 

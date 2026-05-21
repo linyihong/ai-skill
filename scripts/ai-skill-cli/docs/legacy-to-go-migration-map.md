@@ -65,13 +65,26 @@ The Roo command is a guarded tool adapter, not a general onboarding default. It 
 | --- | --- | --- | --- |
 | `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` / `internal/app/sync_cursor_bundle.go` | Dry-run planning, explicit target requirement, target-outside-repo check, copy-fallback strategy, skill mirror planning | Future Cursor mirror writes must be implemented as Go write mode with managed mirror writes, fake home fixture, unmanaged target safety, copy fallback, and symlink policy |
 
-## Retained Shell Surfaces
+## Shell To Go Migration Targets
 
-These shell files are legacy-retained surfaces, not places for new functionality. New behavior must be added to the Go CLI first.
+These shell files are current migration targets. They must be deleted after Go write-mode parity, fixtures, documentation updates, binary rebuild, and readback are complete.
 
 | Legacy surface | Go owner | Current Go coverage | Deletion condition |
 | --- | --- | --- | --- |
-| `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` / `internal/app/close_loop.go` | Dry-run inspection, missing Git block, unsafe Git state block, active lock block, dirty owner grouping | Delete or reduce to a short binary bootstrap wrapper after Go supports commit, push, private-path scan, plan closure, optional Cursor sync, and readback parity |
+| deleted `scripts/init-new-project.sh` | `ai-skill init-project` / `internal/app/init_project.go` | Dry-run and write mode, tool selection, conflict / force handling, bootstrap templates | Deleted after Go write mode and selected-tools fixtures passed |
+| deleted `scripts/agent-goals.sh` | `ai-skill goals` / `internal/app/goals.go` | `init`, `status`, `start`, `update`, `split`, `pause`, `complete --validated`, `cleanup`, locks, index, git exclude | Deleted after lifecycle and lock fixtures passed |
+| deleted `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` / `internal/app/close_loop.go` | Dry-run, commit, push, Git safety, owner grouping, private-path scan, plan closure, runtime validation, readback | Deleted after grouped commit and plan closure fixtures passed |
+
+## Git Hook Adapter Boundary
+
+Git hook files may remain only as integration adapters when Git requires a hook file path. Business logic must live in Go commands:
+
+| Hook surface | Go owner | Required behavior |
+| --- | --- | --- |
+| `scripts/git-hooks/pre-commit` | `ai-skill hooks run pre-commit` | Hook adapter locates repo-local binary and delegates staged runtime compile / knowledge validation to Go. |
+| `scripts/git-hooks/post-commit` | `ai-skill hooks run post-commit` | Hook adapter delegates post-commit behavior to Go; reference-only remains no-op unless a Go write mode is explicitly enabled. |
+
+If a native binary hook can be installed safely on Windows, macOS, and Linux, `ai-skill hooks install` should install the binary entrypoint. Otherwise the retained hook file must stay a minimal adapter with no reusable automation logic.
 
 ## Required Close Loop
 
@@ -84,4 +97,4 @@ Before deleting or replacing another legacy surface:
 5. Run the relevant Go tests and runtime compile / refresh / validate commands.
 6. Rebuild repo-local binaries if Go CLI source changed.
 
-For new automation, create or extend a Go CLI command instead of adding a shell script. If a shell wrapper is unavoidable, it must only locate and invoke the repo-local binary and must include a deletion condition in this map.
+For new automation, create or extend a Go CLI command instead of adding a shell script. If a hook adapter or bootstrap wrapper is unavoidable, it must only locate and invoke the repo-local binary and must include a deletion condition in this map.
