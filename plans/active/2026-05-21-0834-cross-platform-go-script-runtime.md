@@ -267,6 +267,7 @@ Progress notes：
 - `ai-skill goals status` 已建立 read-only ledger inspection；`goals init --dry-run` 已建立 planner，列出 `.agent-goals/goals`、`.agent-goals/locks`、`.agent-goals/README.md` 與 `.git/info/exclude` 更新，且 tests 證明不寫入 fake project；write mode 仍阻斷，待 parity fixture 完成後再開啟。
 - `scripts/README.md` 已新增 Go CLI migration map，將現有 scripts 入口對應到目標 CLI、目前狀態與收尾政策；replacement 範圍的舊入口完成 parity 後預設刪除，adapter 例外需文件化。
 - `ai-skill close-loop --dry-run` 已建立 native inspection slice，支援 `--repo`、JSON / plain output、Git missing block、temporary git repo clean / dirty owner group / active lock / merge / rebase fixture；`--commit` / `--push` 仍阻斷，待 commit/push parity 完成後再開啟。
+- `ai-skill hooks install --dry-run` 已建立 native planner，支援 `--repo`、`--force`、JSON / plain output、`.githooks/` source 檢查、`.git/hooks/` target 檢查、既有 target conflict、merge/rebase warning、missing Git fixture，且 tests 證明不寫入 temporary repo；copy / chmod write mode 仍阻斷，待 hook parity 完成後再開啟。
 
 Completion criteria：
 

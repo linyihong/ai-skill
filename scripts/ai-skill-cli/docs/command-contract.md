@@ -145,11 +145,13 @@
 
 - dry-run：列出會設定的 hooks path。
 - 寫入模式：可能修改 repo-local git config 或 hooks path。
+- Phase 2 初始切片只開放 dry-run planner；write mode 在 hook copy / chmod parity 完成前必須回傳 `partial_close_loop_blocked`。
 
 必要 Git 檢查：
 
 - `git` binary 存在。
 - 目標 repo 可由 `git rev-parse --show-toplevel` 確認。
+- hook source 目前沿用舊腳本的 `.githooks/` 目錄；target 是 repo-local `.git/hooks/`。
 - 若 repo 正在 merge / rebase / cherry-pick，安裝 hook 仍可被允許，但必須明確報告目前不安全狀態，且不得觸發 commit / push。
 
 ### `ai-skill sync-cursor-bundle`

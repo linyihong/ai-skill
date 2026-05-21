@@ -13,6 +13,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/temp-repo-clean` | clean repo 的 close-loop 行為 | dry-run 無實際動作，status 為 clean |
 | `fixture/temp-repo-dirty-owned` | owner group 分類 | 只把預期檔案分到對應群組 |
 | `fixture/temp-repo-merge-state` | 不安全 repo 狀態 | 阻斷 commit / push |
+| `fixture/temp-repo-hooks-install` | hook install dry-run | source / target / conflict / force 行為可驗證，且不寫入 `.git/hooks/` |
 | `fixture/missing-git-path` | PATH 中沒有 Git | `doctor` / `close-loop` 阻斷並提供安裝指引 |
 | `fixture/fake-home` | home / Cursor bundle 隔離 | 不寫入真實使用者 home |
 | `fixture/windows-paths` | path separator 與 drive 處理 | 正規化後路徑符合 contract |
@@ -101,6 +102,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - 權限不足時回傳 `permission_denied`。
 - Phase 2 已用 `init-project --dry-run` fake project tests 覆蓋 planned actions、既有檔案 conflict、`--force`、plain output 與無寫入 assertion。
 - Phase 2 已用 temporary git repo tests 覆蓋 `close-loop --dry-run` clean repo、dirty owner group、active lock、merge/rebase state、unknown path block 與 missing Git block；commit / push write mode 仍阻斷，待 parity fixture 完成後再開啟。
+- Phase 2 已用 temporary git repo tests 覆蓋 `hooks install --dry-run` source / target / conflict / force、merge state warning、missing Git 與無寫入 assertion；copy / chmod write mode 仍阻斷，待 parity fixture 完成後再開啟。
 
 ## 產物關卡
 

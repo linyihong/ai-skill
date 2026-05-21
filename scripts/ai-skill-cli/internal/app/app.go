@@ -21,6 +21,8 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runGoals(args[1:], stdout, stderr)
 	case "close-loop":
 		return runCloseLoop(args[1:], stdout, stderr)
+	case "hooks":
+		return runHooks(args[1:], stdout, stderr)
 	case "help", "-h", "--help":
 		printUsage(stdout)
 		return ExitSuccess
@@ -38,6 +40,7 @@ func printUsage(w io.Writer) {
 	_, _ = fmt.Fprintln(w, "  init-project    plan project-local AI tool bootstrap files")
 	_, _ = fmt.Fprintln(w, "  goals    inspect or plan project-local goal ledger changes")
 	_, _ = fmt.Fprintln(w, "  close-loop    inspect repository close-loop readiness")
+	_, _ = fmt.Fprintln(w, "  hooks    inspect or plan Git hook installation")
 }
 
 func newFlagSet(name string, stderr io.Writer) *flag.FlagSet {
