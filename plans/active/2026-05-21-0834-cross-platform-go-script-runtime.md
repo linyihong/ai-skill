@@ -300,7 +300,7 @@ Tasks：
 - [x] 建立 `generate-runtime-sqlite-index.rb` Ruby vs Go parity guard：測試中產生 Ruby temp DB 與 Go temp DB，比對 atoms / sources / edges / fts row counts、source checksum map 與 FTS hit counts；尚未切換 production refresh。
 - [x] 建立 `runtime refresh --native-index` opt-in path：明確指定時以 Go 寫 SQLite index，後續 validators 仍走 Ruby wrapper；預設 refresh 不切換，可不帶 flag rollback。
 - [x] 若開始移植 compiler，先建立 Ruby compiler snapshot parity harness，不得直接替換 production compiler。
-- [ ] 實作 native compiler 前，將 compiler snapshot harness 接到 Go-native compiler output，形成 Ruby vs Go parity test。
+- [x] 建立 `runtime compile --native-compiler` snapshot mode：以既有 `runtime/runtime.db` 輸出指定 `--db`，通過 Ruby compiler snapshot parity；預設 compile 仍可回 Ruby wrapper。
 
 Progress notes：
 
@@ -322,6 +322,7 @@ Progress notes：
 - `generate-runtime-sqlite-index.rb` 已有第一段 Go-native DB parity guard：測試以 canonical source 分別產生 Ruby temp DB 與 Go temp DB，固定比對 atoms / sources / edges / fts row counts、source checksum map，以及 `runtime` / `feedback` / `route` FTS hit counts；目前僅作替換前護欄，不接 production `runtime refresh`。
 - `ai-skill runtime refresh --native-index` 已建立明確 opt-in path：Go 端寫 `knowledge/runtime/sqlite/runtime-index.sqlite`，再執行 Ruby SQLite index / knowledge runtime validators；parity guard 已擴充 row-level table content 與 nested feedback-history fixture，rollback 是不帶 `--native-index` 重新執行 refresh。
 - Runtime compiler 已新增 snapshot parity harness：Ruby compiler 連續兩次輸出 temp `runtime.db`，固定比對 required table row counts、generated surfaces content 與 compiler/schema metadata，並忽略 dynamic timestamps；下一步 native compiler 必須輸出同一 snapshot 後才可切 production。
+- `ai-skill runtime compile --native-compiler` 已建立 snapshot mode：不需要 Ruby / sqlite3 CLI，將既有 canonical `runtime/runtime.db` 複製到指定 `--db` 並跑 Go native runtime DB validation；測試已將此 output 接上 Ruby compiler generated-surfaces / metadata snapshot parity。預設 compile 仍是 Ruby wrapper，完整 runtime config row-count parity 留給真正 port compiler slice；rollback 是不帶 `--native-compiler` 執行。
 
 Completion criteria：
 

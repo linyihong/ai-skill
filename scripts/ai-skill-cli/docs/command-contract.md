@@ -251,6 +251,8 @@
 
 - `--dry-run`
 - `--repo <path>`
+- `--db <path>`
+- `--native-compiler`
 - `--assert-source <path>`
 - `--assert-keyword <keyword>`
 - `--json`
@@ -267,6 +269,7 @@
 - compiler version / schema version 存在。
 - Phase 3 初始切片使用 wrapper mode 呼叫 `runtime/compiler/compiler-engine.rb`；dry-run 只列出 compiler / `--diff` 計畫，不寫入 `runtime.db`。
 - wrapper mode 必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`，缺 Ruby 或 `sqlite3` CLI 時必須回傳 `missing_dependency`。
+- `--native-compiler` 是明確 opt-in snapshot mode：用 repository 既有 `runtime/runtime.db` 產生指定 `--db` output，並通過 native runtime DB validation；若需 rollback，重新執行不帶 `--native-compiler` 的 `runtime compile` 會回到 Ruby compiler path。
 
 ### `ai-skill runtime validate`
 

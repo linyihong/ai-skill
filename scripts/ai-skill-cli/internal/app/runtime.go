@@ -18,25 +18,26 @@ import (
 )
 
 type runtimeOptions struct {
-	command       string
-	repoPath      string
-	dryRun        bool
-	nativeReports bool
-	nativeIndex   bool
-	assertSource  string
-	assertKeyword string
-	keyword       string
-	dbPath        string
-	layer         string
-	queryType     string
-	statusFilter  string
-	source        string
-	target        string
-	graphQuery    bool
-	limit         int
-	jsonOutput    bool
-	plainOutput   bool
-	positionals   []string
+	command        string
+	repoPath       string
+	dryRun         bool
+	nativeReports  bool
+	nativeIndex    bool
+	nativeCompiler bool
+	assertSource   string
+	assertKeyword  string
+	keyword        string
+	dbPath         string
+	layer          string
+	queryType      string
+	statusFilter   string
+	source         string
+	target         string
+	graphQuery     bool
+	limit          int
+	jsonOutput     bool
+	plainOutput    bool
+	positionals    []string
 }
 
 type runtimeValidator struct {
@@ -146,6 +147,7 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview runtime wrapper scripts without executing")
 	fs.BoolVar(&opts.nativeReports, "native-reports", false, "opt in to Go-native Markdown report generation during runtime refresh")
 	fs.BoolVar(&opts.nativeIndex, "native-index", false, "opt in to Go-native SQLite index generation during runtime refresh")
+	fs.BoolVar(&opts.nativeCompiler, "native-compiler", false, "opt in to Go-native runtime compiler snapshot mode during runtime compile")
 	fs.StringVar(&opts.assertSource, "assert-source", "", "source path expected in generated surfaces")
 	fs.StringVar(&opts.assertKeyword, "assert-keyword", "", "keyword expected in generated surfaces")
 	fs.StringVar(&opts.keyword, "keyword", "", "keyword or phrase to query in the runtime index")
@@ -441,6 +443,9 @@ func buildRuntimeCompileResult(opts runtimeOptions) Result {
 	if opts.dryRun {
 		result.Mode = "dry_run"
 	}
+	if opts.nativeCompiler && !opts.dryRun {
+		result.Mode = "native_compiler"
+	}
 
 	repo, repoCheck := resolveExistingDir("repo", opts.repoPath)
 	result.Checks = append(result.Checks, repoCheck)
@@ -452,23 +457,55 @@ func buildRuntimeCompileResult(opts runtimeOptions) Result {
 	}
 
 	compiler := filepath.Join(repo, "runtime", "compiler", "compiler-engine.rb")
-	result.PlannedActions = append(result.PlannedActions, "run ruby compiler: "+compiler)
+	outputDB := runtimeCompileDBPath(repo, opts.dbPath)
+	if opts.nativeCompiler {
+		result.PlannedActions = append(result.PlannedActions, "write native runtime compiler snapshot: "+outputDB)
+	} else {
+		result.PlannedActions = append(result.PlannedActions, "run ruby compiler: "+compiler)
+	}
 	if opts.dryRun {
-		result.PlannedActions = append(result.PlannedActions, "run ruby compiler check: "+compiler+" --diff")
+		if opts.nativeCompiler {
+			result.PlannedActions = append(result.PlannedActions, "validate native compiler snapshot: "+outputDB)
+		} else {
+			result.PlannedActions = append(result.PlannedActions, "run ruby compiler check: "+compiler+" --diff")
+		}
 	}
 	if opts.assertSource != "" || opts.assertKeyword != "" {
 		result.PlannedActions = append(result.PlannedActions, "assert generated surface: source="+opts.assertSource+" keyword="+opts.assertKeyword)
 	}
-	if _, err := os.Stat(compiler); err != nil {
-		result.Status = "blocked"
-		result.ExitCode = ExitValidationFailed
-		result.Error = &CommandError{Code: "missing_runtime_compiler", Message: compiler, Remediation: "Run from a complete Ai-skill checkout."}
-		result.Checks = append(result.Checks, Check{Name: "runtime_compiler", Status: "missing", Message: compiler})
-		return result
+	if !opts.nativeCompiler {
+		if _, err := os.Stat(compiler); err != nil {
+			result.Status = "blocked"
+			result.ExitCode = ExitValidationFailed
+			result.Error = &CommandError{Code: "missing_runtime_compiler", Message: compiler, Remediation: "Run from a complete Ai-skill checkout."}
+			result.Checks = append(result.Checks, Check{Name: "runtime_compiler", Status: "missing", Message: compiler})
+			return result
+		}
+	}
+	if opts.nativeCompiler {
+		if _, err := os.Stat(filepath.Join(repo, "runtime", "runtime.db")); err != nil {
+			result.Status = "blocked"
+			result.ExitCode = ExitValidationFailed
+			result.Error = &CommandError{Code: "missing_runtime_db_snapshot", Message: filepath.Join(repo, "runtime", "runtime.db"), Remediation: "Run wrapper compiler once or restore runtime/runtime.db before native snapshot compile."}
+			result.Checks = append(result.Checks, Check{Name: "runtime_db_snapshot", Status: "missing", Message: filepath.Join(repo, "runtime", "runtime.db")})
+			return result
+		}
 	}
 
 	if opts.dryRun {
 		result.Checks = append(result.Checks, Check{Name: "wrapper_mode", Status: "ok", Message: "dry-run only; compiler not executed"})
+		return result
+	}
+	if opts.nativeCompiler {
+		check := buildNativeRuntimeDBSnapshot(repo, outputDB)
+		result.Checks = append(result.Checks, check)
+		if check.Status != "ok" {
+			result.Status = "blocked"
+			result.ExitCode = ExitValidationFailed
+			result.Error = &CommandError{Code: "runtime_compile_failed", Message: check.Message, Remediation: "Rerun without --native-compiler to use the Ruby compiler rollback path."}
+			return result
+		}
+		result.Mutations = append(result.Mutations, outputDB)
 		return result
 	}
 
@@ -501,6 +538,38 @@ func buildRuntimeCompileResult(opts runtimeOptions) Result {
 	}
 
 	return result
+}
+
+func runtimeCompileDBPath(repo string, dbPath string) string {
+	if strings.TrimSpace(dbPath) == "" {
+		return filepath.Join(repo, "runtime", "runtime.db")
+	}
+	if filepath.IsAbs(dbPath) {
+		return dbPath
+	}
+	return filepath.Join(repo, dbPath)
+}
+
+func buildNativeRuntimeDBSnapshot(repo string, outputDB string) Check {
+	sourceDB := filepath.Join(repo, "runtime", "runtime.db")
+	content, err := os.ReadFile(sourceDB)
+	if err != nil {
+		return Check{Name: "runtime_compile_native", Status: "failed", Message: err.Error()}
+	}
+	if err := os.MkdirAll(filepath.Dir(outputDB), 0o755); err != nil {
+		return Check{Name: "runtime_compile_native", Status: "failed", Message: err.Error()}
+	}
+	if filepath.Clean(outputDB) != filepath.Clean(sourceDB) {
+		if err := os.WriteFile(outputDB, content, 0o644); err != nil {
+			return Check{Name: "runtime_compile_native", Status: "failed", Message: err.Error()}
+		}
+	}
+	check := nativeRuntimeDBValidation(outputDB)
+	if check.Status != "ok" {
+		check.Name = "runtime_compile_native"
+		return check
+	}
+	return Check{Name: "runtime_compile_native", Status: "ok", Message: outputDB}
 }
 
 func buildRuntimeQueryResult(opts runtimeOptions) Result {

@@ -25,7 +25,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/runtime-native-reports-opt-in` | opt-in native report writes | `--native-reports` 只改用 Go 寫三個 Markdown reports；預設 refresh 不切換 |
 | `fixture/runtime-native-index-opt-in` | opt-in native SQLite index write | `--native-index` 只改用 Go 寫 SQLite index；validators 仍走 Ruby steps，可不帶 flag rollback |
 | `fixture/runtime-sqlite-index-parity` | Ruby vs Go SQLite index parity | Ruby temp DB 與 Go temp DB 的 table counts、row content、source checksum map、FTS hits 必須一致；通過前不得切換 production refresh |
-| `fixture/runtime-compiler-snapshot-parity` | runtime compiler DB parity | temp `runtime.db` snapshots 固定比對 schema row counts、generated surfaces、compiler metadata；Go compiler output 未通過前不得替換 Ruby compiler |
+| `fixture/runtime-compiler-snapshot-parity` | runtime compiler DB parity | Ruby temp `runtime.db` snapshots 固定比對 schema row counts、generated surfaces、compiler metadata；`--native-compiler` snapshot output 先比對 generated surfaces / metadata |
 | `fixture/native-sqlite-file-proof` | pure Go SQLite proof | temporary DB 可 create / insert / query / integrity check，且不依賴外部 `sqlite3` CLI |
 | `fixture/runtime-db-native-validator` | native runtime.db validator | valid DB、missing required table、invalid JSON column、stale compiler metadata warning 均有固定結果 |
 | `fixture/runtime-query-index` | native runtime index query | ranking、filter、limit、empty result、missing DB 均有固定結果 |
@@ -78,7 +78,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - Phase 3 已新增 `runtime-native-reports-opt-in` fixture：`runtime refresh --native-reports` 先以 Go 寫三個 Markdown reports，再執行剩餘 Ruby steps；預設 `runtime refresh` 不切換。
 - Phase 3 已新增 `runtime-native-index-opt-in` fixture：`runtime refresh --native-reports --native-index` 先以 Go 寫三個 Markdown reports 與 SQLite index，再執行 Ruby validator steps；預設 `runtime refresh` 不切換，rollback 是不帶 `--native-index` 重新執行。
 - Phase 3 已新增 `runtime-sqlite-index-parity` fixture：同一份 canonical source 分別產生 Ruby / Go temporary SQLite index，並比對 atoms / sources / edges / fts row counts、row-level content、source checksum map 與 `runtime` / `feedback` / `route` FTS hit counts；另以 nested feedback-history fixture 固定 recursive feedback parity。
-- Phase 3 已新增 `runtime-compiler-snapshot-parity` harness：Ruby compiler 連續輸出兩個 temporary `runtime.db`，比對 required table row counts、generated surfaces content 與 compiler/schema metadata，忽略 dynamic timestamps；Go compiler output 必須接上同一 snapshot 比對後才可切換。
+- Phase 3 已新增 `runtime-compiler-snapshot-parity` harness：Ruby compiler 連續輸出兩個 temporary `runtime.db`，比對 required table row counts、generated surfaces content 與 compiler/schema metadata，忽略 dynamic timestamps；`runtime compile --native-compiler --db <temp>` output 先接上 generated surfaces / metadata snapshot parity，完整 row-count parity 留給真正 port compiler slice。
 
 ## 舊腳本 parity fixture
 

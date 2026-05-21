@@ -303,6 +303,34 @@ func TestRuntimeCompileDryRunPlansCompiler(t *testing.T) {
 	}
 }
 
+func TestRuntimeCompileNativeCompilerWritesSnapshotWithoutRuby(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	t.Setenv("PATH", emptyPathDir(t))
+	outputDB := filepath.Join(t.TempDir(), "runtime-native.db")
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "compile", "--repo", repo, "--native-compiler", "--db", outputDB, "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Mode != "native_compiler" {
+		t.Fatalf("expected native_compiler mode, got %#v", result.Mode)
+	}
+	if !hasCheckStatus(result.Checks, "runtime_compile_native", "ok") {
+		t.Fatalf("expected native compile check ok, got %#v", result.Checks)
+	}
+	if len(result.Mutations) != 1 || result.Mutations[0] != outputDB {
+		t.Fatalf("expected output DB mutation, got %#v", result.Mutations)
+	}
+	assertSQLiteCountAtLeast(t, outputDB, "phases", 1)
+}
+
 func TestRuntimeCompileBlocksMissingRubyBeforeWrapper(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
 	t.Setenv("PATH", emptyPathDir(t))
@@ -532,6 +560,25 @@ func TestRuntimeCompilerRubySnapshotHarnessIsStable(t *testing.T) {
 
 	if got, want := runtimeCompilerSnapshot(t, firstDB), runtimeCompilerSnapshot(t, secondDB); !reflect.DeepEqual(got, want) {
 		t.Fatalf("Ruby compiler snapshots differ: %s", firstRowDiff(got, want))
+	}
+}
+
+func TestNativeRuntimeCompilerSnapshotMatchesRubyCompiler(t *testing.T) {
+	repo := repoRootForTest(t)
+	ruby := requireExecutableForTest(t, "ruby")
+	requireExecutableForTest(t, "sqlite3")
+	temp := t.TempDir()
+	rubyDB := filepath.Join(temp, "runtime-ruby.db")
+	nativeDB := filepath.Join(temp, "runtime-native.db")
+
+	runRubyScript(t, repo, ruby, "runtime/compiler/compiler-engine.rb", "--db", rubyDB)
+	check := buildNativeRuntimeDBSnapshot(repo, nativeDB)
+	if check.Status != "ok" {
+		t.Fatalf("native compiler snapshot failed: %#v", check)
+	}
+
+	if got, want := runtimeCompilerGeneratedSurfaceSnapshot(t, nativeDB), runtimeCompilerGeneratedSurfaceSnapshot(t, rubyDB); !reflect.DeepEqual(got, want) {
+		t.Fatalf("native compiler snapshot differs from Ruby: %s", firstRowDiff(got, want))
 	}
 }
 
@@ -1277,6 +1324,51 @@ func runtimeCompilerSnapshot(t *testing.T, path string) []string {
 	defer db.Close()
 	snapshot := []string{}
 	for _, table := range nativeRuntimeRequiredTables {
+		var count int
+		if err := db.QueryRow("SELECT COUNT(*) FROM " + table).Scan(&count); err != nil {
+			t.Fatalf("count %s: %v", table, err)
+		}
+		snapshot = append(snapshot, fmt.Sprintf("count:%s=%d", table, count))
+	}
+	rows, err := db.Query(`SELECT source_path, target_key, compile_rule, status, data FROM generated_surfaces ORDER BY source_path, target_key`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var sourcePath string
+		var targetKey string
+		var compileRule string
+		var status string
+		var data string
+		if err := rows.Scan(&sourcePath, &targetKey, &compileRule, &status, &data); err != nil {
+			t.Fatal(err)
+		}
+		snapshot = append(snapshot, strings.Join([]string{"surface", sourcePath, targetKey, compileRule, status, data}, "\x1f"))
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatal(err)
+	}
+	for _, key := range []string{"compiler_version", "schema_version"} {
+		var value string
+		if err := db.QueryRow("SELECT value FROM compiler_metadata WHERE key = ?", key).Scan(&value); err != nil {
+			t.Fatalf("metadata %s: %v", key, err)
+		}
+		snapshot = append(snapshot, "metadata:"+key+"="+value)
+	}
+	sort.Strings(snapshot)
+	return snapshot
+}
+
+func runtimeCompilerGeneratedSurfaceSnapshot(t *testing.T, path string) []string {
+	t.Helper()
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	snapshot := []string{}
+	for _, table := range []string{"generated_surfaces", "compiler_metadata"} {
 		var count int
 		if err := db.QueryRow("SELECT COUNT(*) FROM " + table).Scan(&count); err != nil {
 			t.Fatalf("count %s: %v", table, err)
