@@ -26,12 +26,13 @@ source_intelligence:
 
 | Gate | 通過條件 |
 | --- | --- |
-| Change intake | 已分類為新需求、bug、refactor、安全/強化、performance 或 planning-only，並確認 code 前需要的 artifacts。 |
+| Change intake | 已分類為新需求、bug、refactor / replacement、安全/強化、performance 或 planning-only，並確認 code 前需要的 artifacts。 |
 | Brief validation | Product brief 的主要 claim 已標記 `validated`、`assumption`、`open question`、`scoped out` 或 `invalidated`。 |
 | Product alignment | Impact Map 的 Why / Who / How / What 已與 Customer Journey 的 actor、timing、pain point、blocker 交叉驗證。 |
 | Requirements cognition | Observable behavior 已有 actor intent、behavior boundary、acceptance criteria、validation target 與 ambiguity disposition。 |
 | Contract precedence | 衝突時先判斷 governing contract、product plan、BDD、domain/API/error/hardware contract、implementation、tests 的優先序。 |
 | Docs-first BDD closure | Observable behavior 變更前，owning contract、BDD scenario、executable validation 與 implementation slice 已同步或明確 scope out。 |
+| Refactor parity | 重構、遷移、改寫或 replacement 會替代既有功能、入口、腳本、API、資料流程、runtime surface 或操作流程時，已建立新舊能力 parity inventory，並為每個舊入口標明新入口、parity 狀態、副作用、外部依賴與測試 / fixture 證據。 |
 | Artifact completeness | Change brief、contract、BDD scenario、implementation plan、review report 或 project-local equivalent 已產出或標記 not applicable。 |
 | Test strategy | 新行為與舊行為 regression 分開驗證；contract、fixture、integration、property、targeted mutation check 或 hardware-in-loop evidence 依風險選擇。 |
 | Performance evidence | 影響 latency、throughput、資源、concurrency、external-call fan-out 時，不以功能測試取代 performance budget / smoke / load / stress / spike / soak evidence。 |
@@ -80,5 +81,6 @@ source_intelligence:
 - Observable behavior change 只改 code，未更新 owning contract / BDD / tests。
 - Product brief claim 未驗證卻被當成 implementation input。
 - API/schema contract 改變但 generated client、fixtures 或 consumer tests 未同步。
+- Refactor / replacement 只描述新設計，沒有盤點舊入口、舊能力、副作用、外部依賴、new surface mapping 與 parity 測試證據。
 - Performance-sensitive change 只用 unit/functional tests 宣稱可 release。
 - Existing project backfill 憑空創造 product intent，而不是標記 `unknown` 或 `open question`。

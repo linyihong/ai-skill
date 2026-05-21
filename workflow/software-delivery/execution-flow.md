@@ -27,7 +27,7 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 | Product brief 本身是否已驗證？ | 根據證據或明確決策檢查目標、使用者、範圍、non-goals、假設、限制、依賴、風險和成功標準。將每個主要聲明標記為 `validated`（已驗證）、`assumption`（假設）、`open question`（開放問題）、`scoped out`（排除範圍）或 `invalidated`（無效） |
 | 這是新需求還是行為變更？ | 先執行 [`requirements/`](requirements/README.md) stage：product-impact discovery、behavior-driven discovery、acceptance definition、ambiguity resolution；再更新規劃文件、BDD、合約、實作切片和測試 |
 | 這是 bug 修復？ | 確認預期行為 vs 實際行為、重現/證據、受影響的 BDD 或缺失 scenario、受影響的合約/錯誤和回歸測試 |
-| 這是重構？ | 確認沒有行為或公開合約變更；否則重新分類 |
+| 這是重構？ | 先分類是純內部重構、架構重組、平台遷移、工具替換或舊系統 replacement。若會替代既有功能、腳本、API、資料流程、UI flow、runtime surface 或操作流程，必須在實作前建立新舊能力 parity inventory：舊入口、現有功能、輸入、輸出 / 副作用、外部依賴、目標新入口、parity 狀態、測試 / fixture 證據與 deferred / not planned 理由。只有純內部重構且不改變 observable behavior、public contract 或操作能力時，才可只確認沒有行為變更。 |
 | 這是強化？ | 確認威脅/故障模式、擁有者層、驗證和連結的檢查清單/控制更新 |
 | 這是架構決策或 domain model 變更？ | 先確認 requirements stage 已有 behavior boundary / acceptance criteria / ambiguity disposition，再執行 [`architecture/architecture-fit-analysis.md`](architecture/architecture-fit-analysis.md)，確認 CRUD / DDD Lite / Full DDD / event-driven / microservices 的 fit evidence；不得預設套用 DDD、CQRS 或 event sourcing |
 | 這個變更是否影響延遲、吞吐量、資源使用、啟動、背景工作、資料庫存取、批次處理或外部呼叫量？ | 在程式碼之前定義效能預算和必要的效能測試類型。不要依賴「功能正確」作為變更可發布的證明 |
@@ -51,6 +51,24 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 - Ambiguity resolution：將不確定項標成 `assumption`、`open question`、`scoped out` 或 `invalidated`。
 
 沒有 validation target 的 acceptance criteria 不能作為完成宣告基線；requirement contradiction 或 stale acceptance criteria 需要先重建 source-of-truth。
+
+### 重構 / Replacement Parity Gate
+
+當變更目標是重構、遷移、改寫、替換舊工具、拆分架構、搬移 runtime surface 或建立新入口取代舊入口時，不能只寫新設計。實作前必須先產出 parity inventory，讓 reviewer 能逐項確認舊能力沒有遺漏。
+
+最低欄位：
+
+| 欄位 | 必填內容 |
+| --- | --- |
+| 舊入口 | 舊 API、command、script、UI flow、資料表、job、hook、runtime surface 或文件入口。 |
+| 現有能力 | 舊入口目前支援的行為、flags、輸入、輸出、錯誤模式與邊界條件。 |
+| 副作用 | 寫檔、寫 DB、發送請求、commit / push、生成 artifact、同步 mirror、修改使用者設定或其他狀態變更。 |
+| 外部依賴 | runtime、shell、binary、服務、權限、平台假設、環境變數與 credentials boundary。 |
+| 新入口 | 對應的新 API、command、module、adapter 或 replacement surface。 |
+| Parity 狀態 | `covered`、`wrapper first`、`native target`、`deferred`、`not planned` 或 `tool-specific`，並說明原因。 |
+| 驗證證據 | BDD scenario、contract test、fixture、golden output、migration assertion、manual review checklist 或明確的 blocker。 |
+
+Blocking rule：任何舊入口若狀態為 `deferred`、`not planned` 或 `tool-specific`，必須寫明為何不阻擋目前 release / phase；任何會產生副作用的舊入口，必須有 dry-run、fake-root、fixture 或等效隔離測試。缺少 parity inventory 時，不得開始 replacement implementation，也不得宣稱新功能已覆蓋舊功能。
 
 ## 2. 文件優先 BDD 閉環（Docs-First BDD Closure Loop）
 

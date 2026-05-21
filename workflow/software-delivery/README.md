@@ -25,6 +25,7 @@
 - **Requirements Stage**：Product impact alignment + BDD-lite / requirements cognition，包含 Impact Map × Customer Journey Map、behavior-driven discovery、acceptance definition、ambiguity resolution、traceability 與 validation target。
 - **Architecture Stage**：domain architecture cognition，包含 DDD fit、bounded context discovery、consistency boundary design、architecture escalation。
 - **Contract-First Development Process**：從企劃書到實作的完整開發流程，包含 Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill 等。
+- **Refactor / Replacement Parity**：當新入口、平台遷移、工具改寫或架構重組要取代舊能力時，先建立新舊能力 parity inventory，逐項列出舊入口、現有能力、副作用、外部依賴、新入口、parity 狀態與測試證據。
 
 ### 審查類型
 
@@ -44,6 +45,7 @@
 4. **Review 記錄應可追溯**。每個 review 的 finding、decision 與 resolution 應可追溯到對應的 commit 或 ticket。
 5. **Simplicity First（簡潔優先）**：從最簡單的實作開始。不要預先加入抽象層、Strategy pattern、或 speculative features。當需求證明需要複雜度時再重構。參見 [`examples/EXAMPLES.md`](examples/EXAMPLES.md) §2。
 6. **Surgical Changes（外科手術式修改）**：只改解決問題所需的行。匹配既有 code style，不要順便 refactor 不相關的 code。參見 [`execution-flow.md`](execution-flow.md) §9 和 [`examples/EXAMPLES.md`](examples/EXAMPLES.md) §3。
+7. **Parity Before Replacement（替換前先對照）**：重構、遷移或 replacement 若會替代既有行為、入口、腳本、API、資料流程或操作能力，先盤點舊能力到新能力的對照與驗證證據，再開始實作。
 
 ## 與既有層的關係
 

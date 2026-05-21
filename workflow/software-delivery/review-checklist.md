@@ -30,11 +30,12 @@
 - 在程式碼之前已審查專案的企劃書、product brief、planning doc、issue、ticket、PRD、design note、BDD、API contract 或同等 artifact。
 - 主要的 Product Brief 聲明已驗證或標記：目標、使用者、範圍、non-goals、假設、成功標準、限制、依賴和風險。
 - 影響行為、合約、風險、所有權、測試、時程或發布關卡的未驗證 Product Brief 聲明是阻擋性問題。
-- 變更已分類為新需求、bug 修復、重構、強化或僅文件。
+- 變更已分類為新需求、bug 修復、重構 / replacement、強化或僅文件。
 - 新需求在程式碼開始前更新規劃文件、BDD、受影響的合約、實作切片和測試計劃。
 - Bug 修復記錄預期行為 vs 實際行為、重現/證據、受影響的 BDD scenario 或缺失 scenario、受影響的合約/錯誤和回歸測試計劃。
 - 改變**可觀察**行為的 bug 修復在**同一個工作階段**中更新受影響的合約、BDD/可追溯性和整合或即時測試筆記（不僅在合併後）；延後需要明確的追蹤後續行動，而非無聲漂移。
-- 重構已確認沒有行為或公開合約變更；否則重新分類。
+- 重構已確認沒有行為或公開合約變更；若新入口會替代舊入口、舊腳本、API、資料流程、UI flow、runtime surface 或操作流程，已建立新舊能力 parity inventory。
+- Parity inventory 逐列包含舊入口、現有能力、輸入、輸出 / 副作用、外部依賴、目標新入口、parity 狀態與測試 / fixture 證據；`deferred`、`not planned` 或 `tool-specific` 項目已說明為何不阻擋目前 phase。
 - 可能影響延遲、吞吐量、資源使用、啟動、背景工作、資料庫存取、批次處理、快取、並發性或外部呼叫量的變更在程式碼之前定義效能預算和測試類型。
 - 阻擋性問題在實作前已回答、有證據支持或明確排除範圍。
 

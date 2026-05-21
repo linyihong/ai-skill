@@ -52,6 +52,7 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 | 原始供應商文件、帳戶特定條款、憑證、沙箱/正式主機、私人 webhook 負載或真實客戶資料 | 專案儲存庫文件，附清理和存取控制 |
 | 生成的客戶端、SDK、fixtures 和提供者/消費者合約檢查 | `implementation/` 和專案儲存庫 |
 | Product Brief 驗證、Impact Map × Customer Journey Map 對齊、文件優先順序、可追溯性和 BDD 閉環流程 | `process/`、templates 和 checklists |
+| 重構、遷移、replacement 或新入口替代舊入口的新舊能力 parity inventory | 專案規劃文件、implementation plan 或專屬 parity inventory；若是可重用流程缺口，回饋到 `workflow/software-delivery/` |
 | 效能預算、負載/壓力/尖峰/浸泡策略、CI smoke 檢查和發布證據 | `process/`、`CHECKLIST.md`、templates 和專案儲存庫的測試或發布筆記 |
 | 共享的清理或回饋規則 | `enforcement/` |
 | 僅限本機的暫記筆記、憑證或暫時性流程產出 | 僅限專案儲存庫：**gitignored** 路徑搭配**中性**目錄命名；透過環境變數和可選的未追蹤檔案進行配置；保持追蹤的 README 不含檔案系統導覽和內部代號 |
@@ -93,6 +94,7 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 - 可測試的。
 - 誠實面對殘留風險。
 - 已清理且不含目標特定細節。
+- 對 replacement / migration / refactor 類變更，能反查舊入口到新入口的能力覆蓋率、明確 deferred 項目與測試證據。
 - 在需要效能證據時明確，包括指標、預算、環境、執行器和發布關卡。
 
 ## 6. 避免（Avoid）
@@ -104,3 +106,4 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 - 將「檢測 root」作為硬性授權決策。
 - 將「在應用程式中隱藏機密」作為持久的安全控制。
 - 將第三方 APK 的原始發現複製到可重複使用的文件中。
+- 只描述新架構或新命令，卻沒有列出舊能力、新舊對照、副作用與 parity 驗證。

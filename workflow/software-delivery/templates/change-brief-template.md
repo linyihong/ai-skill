@@ -1,7 +1,7 @@
 # Change Brief: <title>
 
 ## Metadata
-- **Change Type**: <feature|bugfix|refactor|perf|docs|chore>
+- **Change Type**: <feature|bugfix|refactor|replacement|perf|docs|chore>
 - **Priority**: <p0|p1|p2|p3>
 - **Evidence Source**: <issue|incident|product-brief|customer-feedback>
 - **Date**: <YYYY-MM-DD>
@@ -20,6 +20,13 @@
 
 ### Out of Scope
 - <item>
+
+## Refactor / Replacement Parity
+- **Applies**: <yes|no>
+- **Inventory Artifact**: <link to parity inventory or not_applicable>
+- **Legacy Surfaces Covered**: <old APIs / commands / scripts / UI flows / jobs / hooks / runtime surfaces>
+- **Deferred / Not Planned**: <items and why they do not block this phase>
+- **Validation Evidence**: <BDD / contract test / fixture / golden output / dry-run / manual review>
 
 ## Blocker Assessment
 - [ ] No blocker — proceed to Requirements / Contract phase

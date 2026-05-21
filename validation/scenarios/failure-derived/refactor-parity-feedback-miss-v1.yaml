@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Refactor Parity Feedback Miss Scenario
+# 測試 AI 在 replacement / refactor 計畫補出 parity inventory 後，是否回饋到 software-delivery workflow
+# 來源 failure pattern:
+#   - enforcement/failure-patterns/refactor-parity-feedback-miss.md
+
+id: refactor-parity-feedback-miss-v1
+domain: software-delivery
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  pattern: enforcement/failure-patterns/refactor-parity-feedback-miss.md
+  class: validation-gap
+  date: "2026-05-21"
+  description: >
+    AI 只在單一 refactor / replacement 計畫補新舊能力 parity inventory，
+    卻沒有將通用 requirement 回饋到 software-delivery workflow 與治理 gate。
+
+given:
+  task: update_refactor_replacement_plan
+  artifacts:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/development-process.md
+    - workflow/software-delivery/artifact-gates.md
+    - governance/ai-runtime-governance/software-delivery-governance.md
+    - enforcement/failure-learning-system.md
+  signals:
+    - 計畫屬於重構、遷移、改寫或 replacement
+    - 新入口會取代舊入口、腳本、API、資料流程或 runtime surface
+    - 使用者指出缺少新舊功能對照表或要求把 lesson 回饋到 workflow
+  constraints:
+    - Project-specific parity inventory 仍保留在專案 planning docs
+    - Reusable workflow 不可包含專案特定 evidence、絕對路徑或私人細節
+
+when:
+  action: close_refactor_planning_gap
+
+then:
+  expected_route:
+    primary: promote_parity_gate_to_software_delivery
+    steps:
+      - 讀取 software-delivery workflow 與 failure-learning dependencies
+      - 確認 replacement / migration 不是純內部 refactor
+      - 在 workflow/software-delivery/ 加入 code 前 parity inventory gate
+      - 在 governance/ai-runtime-governance/software-delivery-governance.md 加入對應 runtime gate 或 validation candidate
+      - 新增或更新 failure pattern，記錄 agent 未主動回饋 reusable lesson 的失效模式
+      - 執行 linked updates、runtime validation、commit、push、readback 與 clean status
+    reject:
+      - project_only_fix: "只補 project planning docs，不更新 software-delivery workflow"
+      - no_failure_learning: "只承認漏掉，沒有新增或更新 failure pattern"
+      - parity_after_code: "把 parity inventory 當成 implementation 後補文件"
+  validation:
+    - software-delivery workflow 包含 replacement / refactor parity gate
+    - governance gate 能反查 parity inventory requirement
+    - failure pattern 已連到 Linked Validation Scenarios

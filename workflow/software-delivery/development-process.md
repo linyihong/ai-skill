@@ -115,12 +115,26 @@ Contract / BDD / artifact / performance 的治理 gate 見 [`software-delivery-g
 | --- | --- |
 | 新需求 / 功能 / 行為變更 | 先執行 requirements stage：product-impact discovery、behavior-driven discovery、acceptance definition、ambiguity resolution；再更新或建立 planning docs：Product Brief 或 change brief、BDD scenarios、受影響的 Domain Model Contract、Architecture Contract、API / Interface Contract、Error Handling Contract、實作切片和 tests。在 blocker questions 解決前不要開始 code |
 | Bug 修復 | 確認預期行為 vs 實際行為、重現步驟或證據、受影響的 BDD scenario 或缺失 scenario、受影響的 contract/error handling、以及 regression test plan。如果修復改變了預期行為或 public contract，也視為新需求 |
-| Refactor / 內部清理 | 確認沒有行為或 public contract 變更。如果行為、資料所有權、API、錯誤處理、安全性、儲存或 tests 改變，重新分類為新需求或 bug |
+| Refactor / replacement / 內部清理 | 先判斷是否取代既有功能、入口、腳本、API、資料流程、runtime surface 或操作流程。若是 replacement / migration，code 前必須建立新舊能力 parity inventory，列出舊入口、現有能力、輸入、輸出 / 副作用、外部依賴、目標新入口、parity 狀態與測試 / fixture 證據。只有純內部清理且沒有行為或 public contract 變更時，才可只記錄無行為變更；若行為、資料所有權、API、錯誤處理、安全性、儲存或 tests 改變，重新分類為新需求或 bug |
 | 安全 / 強化變更 | 確認威脅或 failure mode、owner layer、必要 control、驗證方法、以及行為/API/contracts/checklists 是否需要改變 |
 
 如果沒有 planning artifact，在實作前建立輕量的 change brief。如果請求是新需求，缺失的 planning docs 是 blockers；向使用者提問並在寫 code 前填寫 BDD/contracts。
 
 > **輸出模板**：Change Intake 完成後，使用 [`templates/change-brief-template.md`](templates/change-brief-template.md) 記錄變更簡報。
+
+### Refactor / Replacement Parity Inventory
+
+當 refactor 實際上會替代舊能力時，parity inventory 是 code 前 artifact，不是 implementation 後補充。它可以放在 change brief、implementation plan 或專案專屬 inventory，但必須能被 reviewer 逐列檢查：
+
+| 欄位 | 用途 |
+| --- | --- |
+| 舊入口 / 舊能力 | 定義不能遺漏的既有 API、command、script、UI flow、job、hook、資料流程或 runtime surface。 |
+| 輸入 / 輸出 / 副作用 | 捕捉 flags、payload、生成物、寫入、同步、網路呼叫、commit / push 或使用者可見狀態變更。 |
+| 外部依賴 | 捕捉 binary、shell、服務、平台、權限、環境變數、credential boundary 或 generated surface。 |
+| 新入口 / 對照狀態 | 標記 `covered`、`wrapper first`、`native target`、`deferred`、`not planned` 或 `tool-specific`。 |
+| 驗證證據 | 連到 BDD、contract test、fixture、golden output、dry-run、fake-root、manual review checklist 或 blocker。 |
+
+任何 `deferred`、`not planned` 或 `tool-specific` 項目都要寫明不阻擋目前 phase 的理由；任何有副作用的舊能力都需要隔離測試或 dry-run 證據。
 
 ## Contract Governance Gate（合約治理關卡）
 
