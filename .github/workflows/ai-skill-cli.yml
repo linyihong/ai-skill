@@ -48,6 +48,9 @@ jobs:
       - name: Smoke runtime diagnostics
         run: go run ./cmd/ai-skill doctor --check-runtime --json
 
+      - name: Generate native runtime artifacts
+        run: go run ./cmd/ai-skill runtime refresh --repo ../.. --json
+
       - name: Smoke native runtime validate
         run: go run ./cmd/ai-skill runtime validate --repo ../.. --json
 
