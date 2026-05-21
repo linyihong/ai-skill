@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -59,11 +60,21 @@ type runtimeRoutingRegistry struct {
 }
 
 type runtimeRouteRecord struct {
-	ID                   string            `yaml:"id"`
-	PrimarySource        string            `yaml:"primary_source"`
-	RequiredDependencies []string          `yaml:"required_dependencies"`
-	ValidationSignal     string            `yaml:"validation_signal"`
-	Model                runtimeRouteModel `yaml:"model"`
+	ID                   string               `yaml:"id"`
+	TaskIntent           string               `yaml:"task_intent"`
+	PrimarySource        string               `yaml:"primary_source"`
+	RequiredDependencies []string             `yaml:"required_dependencies"`
+	RankingReason        string               `yaml:"ranking_reason"`
+	ValidationSignal     string               `yaml:"validation_signal"`
+	Metadata             runtimeRouteMetadata `yaml:"metadata"`
+	Model                runtimeRouteModel    `yaml:"model"`
+}
+
+type runtimeRouteMetadata struct {
+	Priority           string `yaml:"priority"`
+	Confidence         string `yaml:"confidence"`
+	ContextCost        any    `yaml:"context_cost"`
+	CompatibilityState string `yaml:"compatibility_state"`
 }
 
 type runtimeRouteModel struct {
@@ -90,6 +101,32 @@ type runtimeGraphRecord struct {
 	Source    string
 	Status    string
 	EdgeCount int
+}
+
+type runtimeIndexAtom struct {
+	ID               string
+	SourcePath       string
+	Layer            string
+	Type             string
+	Status           string
+	Priority         string
+	Confidence       string
+	ContextCost      string
+	Tags             string
+	Domains          string
+	Title            string
+	Summary          string
+	WhenToRead       string
+	ValidationSignal string
+}
+
+type runtimeIndexEdge struct {
+	GraphID    string
+	SourcePath string
+	EdgeType   string
+	TargetPath string
+	Reason     string
+	Validation string
 }
 
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
@@ -568,6 +605,276 @@ func writeNativeRuntimeReport(repo string, target runtimeNativeReportTarget) Che
 		return Check{Name: target.name, Status: "failed", Message: err.Error()}
 	}
 	return Check{Name: target.name, Status: "ok", Message: target.path}
+}
+
+func buildNativeRuntimeSQLiteIndex(repo string, path string) error {
+	records, err := runtimeIndexRecords(repo)
+	if err != nil {
+		return err
+	}
+	edges, err := runtimeIndexEdges(repo)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return err
+	}
+	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	if _, err := db.Exec(`
+PRAGMA journal_mode=OFF;
+PRAGMA synchronous=OFF;
+CREATE TABLE atoms (id TEXT PRIMARY KEY, source_path TEXT, layer TEXT, type TEXT, status TEXT, priority TEXT, confidence TEXT, context_cost TEXT, tags TEXT, domains TEXT, title TEXT, summary TEXT, when_to_read TEXT, validation_signal TEXT);
+CREATE TABLE sources (source_path TEXT PRIMARY KEY, layer TEXT, title TEXT, checksum TEXT, bytes INTEGER);
+CREATE TABLE edges (graph_id TEXT, source_path TEXT, edge_type TEXT, target_path TEXT, reason TEXT, validation TEXT);
+CREATE VIRTUAL TABLE fts USING fts5(id, source_path, title, summary, tags, when_to_read, validation_signal);
+`); err != nil {
+		return err
+	}
+	for _, record := range records {
+		if _, err := db.Exec(`INSERT INTO atoms VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			record.ID, record.SourcePath, record.Layer, record.Type, record.Status, record.Priority, record.Confidence, record.ContextCost, record.Tags, record.Domains, record.Title, record.Summary, record.WhenToRead, record.ValidationSignal); err != nil {
+			return err
+		}
+		if _, err := db.Exec(`INSERT INTO fts VALUES (?, ?, ?, ?, ?, ?, ?)`,
+			record.ID, record.SourcePath, record.Title, record.Summary, record.Tags, record.WhenToRead, record.ValidationSignal); err != nil {
+			return err
+		}
+	}
+	sources, err := runtimeIndexSources(repo, records)
+	if err != nil {
+		return err
+	}
+	for _, source := range sources {
+		if _, err := db.Exec(`INSERT INTO sources VALUES (?, ?, ?, ?, ?)`, source.sourcePath, source.layer, source.title, source.checksum, source.bytes); err != nil {
+			return err
+		}
+	}
+	for _, edge := range edges {
+		if _, err := db.Exec(`INSERT INTO edges VALUES (?, ?, ?, ?, ?, ?)`, edge.GraphID, edge.SourcePath, edge.EdgeType, edge.TargetPath, edge.Reason, edge.Validation); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func runtimeIndexRecords(repo string) ([]runtimeIndexAtom, error) {
+	summaries, err := runtimeIndexSummaryRecords(repo)
+	if err != nil {
+		return nil, err
+	}
+	routes, err := runtimeIndexRouteRecords(repo)
+	if err != nil {
+		return nil, err
+	}
+	feedback, err := runtimeIndexFeedbackRecords(repo)
+	if err != nil {
+		return nil, err
+	}
+	records := append([]runtimeIndexAtom{}, summaries...)
+	records = append(records, routes...)
+	records = append(records, feedback...)
+	return records, nil
+}
+
+func runtimeIndexSummaryRecords(repo string) ([]runtimeIndexAtom, error) {
+	paths, err := filepath.Glob(filepath.Join(repo, "knowledge", "summaries", "*.md"))
+	if err != nil {
+		return nil, err
+	}
+	sort.Strings(paths)
+	records := []runtimeIndexAtom{}
+	for _, path := range paths {
+		if filepath.Base(path) == "README.md" {
+			continue
+		}
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+		fields := parseRuntimeSummaryTable(string(content))
+		sourcePath := runtimeRepoRelativeLink(repo, path, runtimeLinksFromCell(fields["Source path"]))
+		if sourcePath == "" {
+			relative, err := filepath.Rel(repo, path)
+			if err != nil {
+				return nil, err
+			}
+			sourcePath = filepath.ToSlash(relative)
+		}
+		lifecycle := runtimeStripMarkup(fields["Lifecycle"])
+		confidence := "medium"
+		if lifecycle == "validated" {
+			confidence = "high"
+		}
+		records = append(records, runtimeIndexAtom{
+			ID: runtimeStripMarkup(fields["Atom ID"]), SourcePath: sourcePath, Layer: runtimeLayerFor(sourcePath),
+			Type: "summary", Status: lifecycle, Priority: "P2", Confidence: confidence, ContextCost: "low",
+			Tags: "summary,atom", Title: runtimeStripMarkup(fields["Atom ID"]), Summary: fields["Summary"],
+			WhenToRead: fields["When to read"], ValidationSignal: fields["Validation signal"],
+		})
+	}
+	return records, nil
+}
+
+func runtimeIndexRouteRecords(repo string) ([]runtimeIndexAtom, error) {
+	registry, err := readRuntimeRoutingRegistry(filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"))
+	if err != nil {
+		return nil, err
+	}
+	records := []runtimeIndexAtom{}
+	for _, record := range registry.Records {
+		records = append(records, runtimeIndexAtom{
+			ID: record.ID, SourcePath: record.PrimarySource, Layer: runtimeLayerFor(record.PrimarySource), Type: "route",
+			Status: record.Metadata.CompatibilityState, Priority: record.Metadata.Priority, Confidence: record.Metadata.Confidence,
+			ContextCost: rubyLikeString(record.Metadata.ContextCost), Tags: strings.Join(nonEmptyStrings("route", record.Model.Profile, record.Model.CompressionLevel), ","),
+			Title: record.TaskIntent, Summary: record.RankingReason, WhenToRead: record.TaskIntent, ValidationSignal: record.ValidationSignal,
+		})
+	}
+	return records, nil
+}
+
+func runtimeIndexFeedbackRecords(repo string) ([]runtimeIndexAtom, error) {
+	roots, err := filepath.Glob(filepath.Join(repo, "skills", "*", "feedback_history"))
+	if err != nil {
+		return nil, err
+	}
+	paths := []string{}
+	for _, root := range roots {
+		if err := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if entry.IsDir() || filepath.Ext(path) != ".md" {
+				return nil
+			}
+			paths = append(paths, path)
+			return nil
+		}); err != nil {
+			return nil, err
+		}
+	}
+	sort.Strings(paths)
+	records := []runtimeIndexAtom{}
+	for _, path := range paths {
+		if filepath.Base(path) == "README.md" {
+			continue
+		}
+		contentBytes, err := os.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+		content := string(contentBytes)
+		relative, err := filepath.Rel(repo, path)
+		if err != nil {
+			return nil, err
+		}
+		relative = filepath.ToSlash(relative)
+		parts := strings.Split(relative, "/")
+		skill := ""
+		if len(parts) > 1 {
+			skill = parts[1]
+		}
+		category := ""
+		if len(parts) > 4 {
+			category = strings.Join(parts[3:len(parts)-1], "/")
+		}
+		status := regexp.MustCompile(`(?m)^Status:\s*([^\n]+)`).FindStringSubmatch(content)
+		statusValue := ""
+		if len(status) > 1 {
+			statusValue = strings.TrimSpace(status[1])
+		}
+		if statusValue == "" {
+			statusValue = "candidate"
+		}
+		confidence := "medium"
+		if statusValue == "promoted" || statusValue == "validated" {
+			confidence = "high"
+		}
+		title := firstRuntimeLineWithPrefix(content, "### ")
+		title = strings.TrimSpace(strings.TrimPrefix(title, "### "))
+		if title == "" {
+			title = strings.TrimSuffix(filepath.Base(relative), ".md")
+		}
+		records = append(records, runtimeIndexAtom{
+			ID: "feedback." + skill + "." + strings.TrimSuffix(filepath.Base(relative), ".md"), SourcePath: relative, Layer: "skills", Type: "feedback-pattern",
+			Status: statusValue, Priority: "P2", Confidence: confidence, ContextCost: "medium", Tags: strings.Join(nonEmptyStrings(skill, "feedback", category), ","),
+			Domains: skill, Title: title, Summary: firstRuntimeHeadingAfter(content, "#### One-line Summary"),
+			WhenToRead: "Feedback lesson lookup for " + skill + ".", ValidationSignal: "Open canonical feedback lesson at " + relative + ".",
+		})
+	}
+	return records, nil
+}
+
+func runtimeIndexEdges(repo string) ([]runtimeIndexEdge, error) {
+	paths, err := filepath.Glob(filepath.Join(repo, "knowledge", "graphs", "*.yaml"))
+	if err != nil {
+		return nil, err
+	}
+	sort.Strings(paths)
+	edges := []runtimeIndexEdge{}
+	for _, path := range paths {
+		graph, err := readKnowledgeGraphFile(path)
+		if err != nil {
+			return nil, err
+		}
+		for _, edge := range graph.Edges {
+			edges = append(edges, runtimeIndexEdge{GraphID: graph.ID, SourcePath: graph.Source, EdgeType: edge.Type, TargetPath: edge.Target, Reason: edge.Reason, Validation: edge.Validation})
+		}
+	}
+	return edges, nil
+}
+
+type runtimeIndexSource struct {
+	sourcePath string
+	layer      string
+	title      string
+	checksum   string
+	bytes      int
+}
+
+func runtimeIndexSources(repo string, records []runtimeIndexAtom) ([]runtimeIndexSource, error) {
+	seen := map[string]bool{}
+	sourcePaths := []string{}
+	for _, record := range records {
+		if record.SourcePath == "" || seen[record.SourcePath] {
+			continue
+		}
+		seen[record.SourcePath] = true
+		sourcePaths = append(sourcePaths, record.SourcePath)
+	}
+	sort.Strings(sourcePaths)
+	sources := []runtimeIndexSource{}
+	for _, sourcePath := range sourcePaths {
+		path := filepath.Join(repo, filepath.FromSlash(sourcePath))
+		info, err := os.Stat(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				continue
+			}
+			return nil, err
+		}
+		title := filepath.Base(sourcePath)
+		checksum := ""
+		size := 0
+		if !info.IsDir() {
+			content, err := os.ReadFile(path)
+			if err != nil {
+				return nil, err
+			}
+			title = runtimeTitleFromMarkdown(string(content))
+			sum := sha256.Sum256(content)
+			checksum = fmt.Sprintf("%x", sum)
+			size = len(content)
+		}
+		sources = append(sources, runtimeIndexSource{sourcePath: sourcePath, layer: runtimeLayerFor(sourcePath), title: title, checksum: checksum, bytes: size})
+	}
+	return sources, nil
 }
 
 func runtimeQueryDBPath(repo string, dbPath string) string {
@@ -1635,6 +1942,106 @@ func runtimeProfileGuardrails(profile string) []string {
 			"依 `models/profiles/README.md` 與 `models/compression/README.md` 選讀取深度。",
 		}
 	}
+}
+
+func runtimeLinksFromCell(cell string) []string {
+	matches := regexp.MustCompile(`\[[^\]]+\]\(([^)]+)\)`).FindAllStringSubmatch(cell, -1)
+	links := []string{}
+	for _, match := range matches {
+		if len(match) < 2 {
+			continue
+		}
+		target := strings.SplitN(match[1], "#", 2)[0]
+		if target != "" {
+			links = append(links, target)
+		}
+	}
+	return links
+}
+
+func runtimeRepoRelativeLink(repo string, basePath string, links []string) string {
+	if len(links) == 0 || links[0] == "" {
+		return ""
+	}
+	target := links[0]
+	if strings.HasPrefix(target, "http://") || strings.HasPrefix(target, "https://") {
+		return target
+	}
+	resolved := filepath.Clean(filepath.Join(filepath.Dir(basePath), filepath.FromSlash(target)))
+	relative, err := filepath.Rel(repo, resolved)
+	if err != nil {
+		return ""
+	}
+	return filepath.ToSlash(relative)
+}
+
+func runtimeStripMarkup(value string) string {
+	value = regexp.MustCompile(`\[([^\]]+)\]\([^)]+\)`).ReplaceAllString(value, "$1")
+	return strings.ReplaceAll(value, "`", "")
+}
+
+func runtimeLayerFor(path string) string {
+	parts := strings.SplitN(path, "/", 2)
+	if len(parts) == 0 {
+		return ""
+	}
+	return parts[0]
+}
+
+func rubyLikeString(value any) string {
+	switch typed := value.(type) {
+	case nil:
+		return ""
+	case string:
+		return typed
+	default:
+		return fmt.Sprint(typed)
+	}
+}
+
+func nonEmptyStrings(values ...string) []string {
+	result := []string{}
+	for _, value := range values {
+		if value != "" {
+			result = append(result, value)
+		}
+	}
+	return result
+}
+
+func firstRuntimeLineWithPrefix(content string, prefix string) string {
+	for _, line := range strings.Split(content, "\n") {
+		if strings.HasPrefix(line, prefix) {
+			return line
+		}
+	}
+	return ""
+}
+
+func firstRuntimeHeadingAfter(content string, marker string) string {
+	lines := strings.Split(content, "\n")
+	for index, line := range lines {
+		if strings.TrimSpace(line) != marker {
+			continue
+		}
+		for _, candidate := range lines[index+1:] {
+			value := strings.TrimSpace(candidate)
+			if value == "" || strings.HasPrefix(value, "#") {
+				continue
+			}
+			return value
+		}
+	}
+	return ""
+}
+
+func runtimeTitleFromMarkdown(content string) string {
+	for _, line := range strings.Split(content, "\n") {
+		if strings.HasPrefix(line, "#") {
+			return strings.TrimSpace(regexp.MustCompile(`^#+\s*`).ReplaceAllString(line, ""))
+		}
+	}
+	return ""
 }
 
 func runtimeWrapperEnv(base []string) []string {

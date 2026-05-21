@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -514,6 +515,41 @@ func TestNativeKnowledgeRuntimeReportMatchesRubyGenerator(t *testing.T) {
 	}
 	if goOutput != rubyOutput {
 		t.Fatalf("Go knowledge runtime report does not match Ruby output: %s", firstStringDiff(goOutput, rubyOutput))
+	}
+}
+
+func TestNativeRuntimeSQLiteIndexMatchesRubyInvariants(t *testing.T) {
+	repo := repoRootForTest(t)
+	ruby := requireExecutableForTest(t, "ruby")
+	requireExecutableForTest(t, "sqlite3")
+	temp := t.TempDir()
+	rubyPath := filepath.Join(temp, "ruby-runtime-index.sqlite")
+	goPath := filepath.Join(temp, "go-runtime-index.sqlite")
+	rubyRel, err := filepath.Rel(repo, rubyPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	runRubyScript(t, repo, ruby, "scripts/generate-runtime-sqlite-index.rb", "--output", filepath.ToSlash(rubyRel))
+	if err := buildNativeRuntimeSQLiteIndex(repo, goPath); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, table := range []string{"atoms", "sources", "edges", "fts"} {
+		rubyCount := sqliteCount(t, rubyPath, table)
+		goCount := sqliteCount(t, goPath, table)
+		if goCount != rubyCount {
+			t.Fatalf("%s count mismatch: go=%d ruby=%d", table, goCount, rubyCount)
+		}
+	}
+	if got, want := sqliteSourceChecksums(t, goPath), sqliteSourceChecksums(t, rubyPath); !reflect.DeepEqual(got, want) {
+		t.Fatalf("source checksums mismatch")
+	}
+	for _, keyword := range []string{"runtime", "feedback", "route"} {
+		query := "SELECT COUNT(*) FROM fts WHERE fts MATCH " + sqliteQuote(runtimeFTSMatchLiteral(keyword))
+		if got, want := sqliteScalarInt(t, goPath, query), sqliteScalarInt(t, rubyPath, query); got != want {
+			t.Fatalf("FTS hit mismatch for %q: go=%d ruby=%d", keyword, got, want)
+		}
 	}
 }
 
@@ -1042,6 +1078,56 @@ func assertSQLiteScalar(t *testing.T, path string, query string, expectation str
 	if expectation == "nonzero" && count == 0 {
 		t.Fatalf("query returned zero: %s", query)
 	}
+}
+
+func sqliteCount(t *testing.T, path string, table string) int {
+	t.Helper()
+	return sqliteScalarInt(t, path, "SELECT COUNT(*) FROM "+table)
+}
+
+func sqliteScalarInt(t *testing.T, path string, query string) int {
+	t.Helper()
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	var count int
+	if err := db.QueryRow(query).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	return count
+}
+
+func sqliteSourceChecksums(t *testing.T, path string) map[string]string {
+	t.Helper()
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	rows, err := db.Query("SELECT source_path, checksum FROM sources ORDER BY source_path")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	checksums := map[string]string{}
+	for rows.Next() {
+		var sourcePath string
+		var checksum string
+		if err := rows.Scan(&sourcePath, &checksum); err != nil {
+			t.Fatal(err)
+		}
+		checksums[sourcePath] = checksum
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatal(err)
+	}
+	return checksums
+}
+
+func sqliteQuote(value string) string {
+	return "'" + strings.ReplaceAll(value, "'", "''") + "'"
 }
 
 func containsEnv(env []string, item string) bool {
