@@ -1,0 +1,4 @@
+version=repo-3f09371
+source_commit=3f09371
+built_at=2026-05-21T04:03:10Z
+targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
