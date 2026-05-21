@@ -15,6 +15,8 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) int {
 	switch args[0] {
 	case "doctor":
 		return runDoctor(args[1:], stdout, stderr)
+	case "init-project":
+		return runInitProject(args[1:], stdout, stderr)
 	case "help", "-h", "--help":
 		printUsage(stdout)
 		return ExitSuccess
@@ -29,6 +31,7 @@ func printUsage(w io.Writer) {
 	_, _ = fmt.Fprintln(w, "")
 	_, _ = fmt.Fprintln(w, "commands:")
 	_, _ = fmt.Fprintln(w, "  doctor    check local runtime and repository readiness")
+	_, _ = fmt.Fprintln(w, "  init-project    plan project-local AI tool bootstrap files")
 }
 
 func newFlagSet(name string, stderr io.Writer) *flag.FlagSet {

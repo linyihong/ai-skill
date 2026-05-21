@@ -255,11 +255,15 @@ Candidate commands：
 
 Tasks：
 
-- [ ] 用 fixtures 模擬新專案初始化，不寫入真實使用者目錄。
+- [x] 用 fixtures 模擬新專案初始化，不寫入真實使用者目錄。
 - [ ] 用 temporary git repo 測試 close-loop、dirty owner group、lock、merge/rebase state、dry-run。
 - [ ] 用 missing-git fixture 測試 linked-update / close-loop 命令會阻斷並提醒使用者安裝 Git。
 - [ ] 對 symlink / copy fallback 建立 Windows 行為策略。
 - [ ] 更新 `scripts/README.md`，標示舊 script 與新 CLI 的對應關係與 deprecation policy。
+
+Progress notes：
+
+- `ai-skill init-project --dry-run` 已建立 planner，支援 `--project`、`--tools`、`--force`、JSON / plain output、既有檔案 conflict detection，且 tests 證明不寫入 fake project；write mode 仍阻斷，待完整 template parity 後再開啟。
 
 Completion criteria：
 

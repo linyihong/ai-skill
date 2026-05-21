@@ -99,6 +99,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - fixture root 外沒有寫入。
 - JSON 輸出列出規劃寫入項目。
 - 權限不足時回傳 `permission_denied`。
+- Phase 2 已用 `init-project --dry-run` fake project tests 覆蓋 planned actions、既有檔案 conflict、`--force`、plain output 與無寫入 assertion。
 
 ## 產物關卡
 

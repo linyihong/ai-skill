@@ -53,6 +53,28 @@ func writePlain(w io.Writer, result Result) error {
 		}
 	}
 
+	if len(result.PlannedActions) > 0 {
+		if _, err := fmt.Fprintln(w, "Planned actions:"); err != nil {
+			return err
+		}
+		for _, action := range result.PlannedActions {
+			if _, err := fmt.Fprintf(w, "- %s\n", action); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(result.Mutations) > 0 {
+		if _, err := fmt.Fprintln(w, "Mutations:"); err != nil {
+			return err
+		}
+		for _, mutation := range result.Mutations {
+			if _, err := fmt.Fprintf(w, "- %s\n", mutation); err != nil {
+				return err
+			}
+		}
+	}
+
 	if result.Error != nil {
 		if _, err := fmt.Fprintf(w, "Error: %s\n", result.Error.Message); err != nil {
 			return err
