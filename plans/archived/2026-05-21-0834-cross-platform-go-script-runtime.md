@@ -411,10 +411,10 @@ Decision options：
 
 Completion criteria：
 
-- [x] 寫出 iOS / Android support decision record：[`mobile-support-decision.md`](../../scripts/ai-skill-cli/docs/mobile-support-decision.md)。
-- [x] iOS decision record 必須明確排除 native arbitrary binary，並在 App-contained、Browser/WASM、SSH remote runner 之間做取捨。
-- [x] 若不支援，CLI `doctor`、Browser/WASM UI 或文件要明確顯示 unsupported reason。
-- [x] 若支援 remote control client，必須另開安全與授權計畫，不混在本計畫直接實作。
+- [x] 寫出 iOS / Android support boundary record：[`mobile-support-decision.md`](../../scripts/ai-skill-cli/docs/mobile-support-decision.md)。
+- [x] 明確排除 iOS native arbitrary binary；App-contained、Browser/WASM、SSH remote runner 均 deferred，需另開 mobile plan。
+- [x] 文件已明確顯示 mobile native binary unsupported / out of scope reason。
+- [x] Remote control client 不在本計畫實作；若未來要做，必須另開安全與授權計畫。
 
 ### Phase 6：Deprecation & Closure（P2）
 
@@ -427,14 +427,14 @@ Tasks：
 - [x] 更新必要的 git hook 文件與 ai-tools 文件：不適用，本輪保留 hook adapter，未改 hook install 行為。
 - [x] 刪除已被 native CLI 或已驗證 wrapper replacement 覆蓋的舊 shell / Ruby / Python script：本輪不直接刪除，因 runtime compiler true source-to-DB parity、write-mode scripts 與 tool-specific adapters 仍有保留條件；見 disposition 文件。
 - [x] 若保留 thin wrapper，wrapper 必須只轉呼叫 `ai-skill`，並在同一階段記錄刪除日期或刪除條件：保留項均列於 disposition 文件。
-- [x] 執行 Plan Completion Closure：validator、linked updates、`plans/README.md` 狀態、commit / push、readback；plan 留在 active 作為持續生效的 runtime / binary policy reference。
+- [x] 執行 Plan Completion Closure：validator、linked updates、`plans/README.md` 狀態、搬移 archived、commit / push、readback。
 
 Completion criteria：
 
 - [x] replacement 範圍內的舊 script 刪除條件已明確化；剩餘 hook / tool-specific adapter 都有明確保留原因、owner 與移除條件。
 - [x] 所有文件、runtime generated surfaces、測試與 release artifact 一致。
 - [x] `script-parity-inventory.md` / `legacy-script-disposition.md` 中每個舊入口都有最終 disposition：`deleted`、`hook adapter retained`、`tool-specific adapter retained`、`legacy rollback`、`deferred` 或 `explicitly out of scope`。
-- [x] plan 完成後留在 `plans/active/`，作為持續生效的 desktop runtime / binary policy reference；`plans/README.md` 已標註 completed / retained active。
+- [x] plan 完成後搬移至 `plans/archived/`；持續生效的 desktop runtime / binary policy 轉由 `scripts/ai-skill-cli/docs/` 文件維護。
 
 ## Testing Strategy
 
