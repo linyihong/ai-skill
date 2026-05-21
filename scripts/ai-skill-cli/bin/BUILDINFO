@@ -1,4 +1,4 @@
 version=repo-local
-source_commit=9a454de
-built_at=2026-05-21T06:41:06Z
+source_commit=b61d038
+built_at=2026-05-21T06:45:23Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
