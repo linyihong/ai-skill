@@ -25,6 +25,7 @@
 - `ai-skill` 是 runtime toolchain 的單一 Go binary。
 - YAML、JSON、SQLite engine、runtime logic、scheduler、migration / repair logic 在可行時應編入 binary。
 - Git 不包進 binary。writeback、commit、push、hooks、close-loop 命令仍需要外部 Git。
+- Release builder 產生 Windows amd64、macOS amd64/arm64、Linux amd64/arm64 artifacts 與 `SHA256SUMS`；核心 runtime commands 預設不要求 Ruby、Python 或外部 `sqlite3` CLI。
 
 ## iOS 邊界
 

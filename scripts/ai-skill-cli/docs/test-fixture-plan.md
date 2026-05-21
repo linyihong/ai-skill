@@ -31,6 +31,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/runtime-query-index` | native runtime index query | ranking、filter、limit、empty result、missing DB 均有固定結果 |
 | `fixture/runtime-query-graph` | native knowledge graph query | source / target / type / keyword filters、limit、empty result、missing filter 均有固定結果 |
 | `fixture/runtime-index-native-validator` | native runtime index validator | valid index、missing table、stale checksum、FTS count mismatch、git-ignore boundary 均有固定結果 |
+| `fixture/release-artifacts` | cross-platform release build | Windows/macOS/Linux artifacts 與 `SHA256SUMS` 可由 Go release builder 產生 |
 | `fixture/legacy-script-parity` | 舊腳本覆蓋率驗證 | 每個 native target / wrapper first 舊入口都有命令映射與測試證據 |
 
 ## 缺 Git fixture

@@ -13,6 +13,8 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) int {
 	}
 
 	switch args[0] {
+	case "version":
+		return runVersion(args[1:], stdout, stderr)
 	case "doctor":
 		return runDoctor(args[1:], stdout, stderr)
 	case "init-project":
@@ -40,6 +42,7 @@ func printUsage(w io.Writer) {
 	_, _ = fmt.Fprintln(w, "usage: ai-skill <command> [flags]")
 	_, _ = fmt.Fprintln(w, "")
 	_, _ = fmt.Fprintln(w, "commands:")
+	_, _ = fmt.Fprintln(w, "  version    print build version metadata")
 	_, _ = fmt.Fprintln(w, "  doctor    check local runtime and repository readiness")
 	_, _ = fmt.Fprintln(w, "  init-project    plan project-local AI tool bootstrap files")
 	_, _ = fmt.Fprintln(w, "  goals    inspect or plan project-local goal ledger changes")

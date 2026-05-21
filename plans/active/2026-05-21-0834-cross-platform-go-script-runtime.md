@@ -302,6 +302,7 @@ Tasks：
 - [x] 若開始移植 compiler，先建立 Ruby compiler snapshot parity harness，不得直接替換 production compiler。
 - [x] 建立 `runtime compile --native-compiler` snapshot mode：以既有 `runtime/runtime.db` 輸出指定 `--db`，通過 Ruby compiler snapshot parity；預設 compile 仍可回 Ruby wrapper。
 - [x] 將 runtime core desktop path 改為 native default：`runtime validate`、`runtime refresh`、`runtime compile` 預設不依賴 Ruby / Python / `sqlite3` CLI；Ruby path 改由 `--legacy-wrapper` rollback。
+- [x] 建立 `ai-skill version` 與 Go release builder：可 cross-compile Windows、macOS、Linux artifacts 並輸出 `SHA256SUMS`。
 
 Progress notes：
 
@@ -325,6 +326,7 @@ Progress notes：
 - Runtime compiler 已新增 snapshot parity harness：Ruby compiler 連續兩次輸出 temp `runtime.db`，固定比對 required table row counts、generated surfaces content 與 compiler/schema metadata，並忽略 dynamic timestamps；下一步 native compiler 必須輸出同一 snapshot 後才可切 production。
 - `ai-skill runtime compile --native-compiler` 已建立 snapshot mode：不需要 Ruby / sqlite3 CLI，將既有 canonical `runtime/runtime.db` 複製到指定 `--db` 並跑 Go native runtime DB validation；測試已將此 output 接上 Ruby compiler generated-surfaces / metadata snapshot parity。預設 compile 仍是 Ruby wrapper，完整 runtime config row-count parity 留給真正 port compiler slice；rollback 是不帶 `--native-compiler` 執行。
 - Runtime core desktop path 已改為 native default：`runtime validate` 預設跑 Go runtime DB / SQLite index / knowledge runtime checks，`runtime refresh` 預設以 Go 寫 reports / SQLite index 並跑 native checks，`runtime compile` 預設 snapshot mode；Ruby / `sqlite3` CLI 僅在 `--legacy-wrapper` 下使用。
+- Phase 4 release artifact slice 已新增 `ai-skill version` 與 `cmd/releasebuild`：支援 ldflags 注入 version / commit / date，並產生 Windows amd64、macOS amd64/arm64、Linux amd64/arm64 artifacts 與 `SHA256SUMS`。
 
 Completion criteria：
 

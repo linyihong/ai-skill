@@ -19,6 +19,7 @@
 
 ```bash
 go test ./...
+go run ./cmd/ai-skill version --json
 go run ./cmd/ai-skill doctor --json
 go run ./cmd/ai-skill doctor --require-git --plain
 go run ./cmd/ai-skill doctor --check-runtime --json
@@ -26,9 +27,12 @@ go run ./cmd/ai-skill init-project --project /tmp --tools roo,cursor --dry-run -
 go run ./cmd/ai-skill runtime refresh --repo ../.. --dry-run --json
 go run ./cmd/ai-skill runtime compile --repo ../.. --dry-run --json
 go run ./cmd/ai-skill runtime validate --repo ../.. --dry-run --json
+go run ./cmd/releasebuild --version dev --commit "$(git rev-parse --short HEAD)" --dist dist
 ```
 
 Phase 1 / Phase 3 採用 [`modernc.org/sqlite`](docs/dependency-policy.md) 作為 pure Go SQLite engine；`doctor --check-runtime` 已覆蓋 in-memory 與 temporary file-backed write / query / integrity proof。Git 維持 desktop external dependency；Shell / Ruby / Python 只允許作為 wrapper-mode 過渡依賴。
+
+Release artifacts：`go run ./cmd/releasebuild` 會輸出 Windows amd64、macOS amd64/arm64、Linux amd64/arm64 binaries 與 `SHA256SUMS`。`ai-skill version` 支援 `-ldflags` 注入 version / commit / date。
 
 GitHub Actions：`.github/workflows/ai-skill-cli.yml` 會在 Windows、macOS、Linux 執行 `go test ./...` 與 `doctor` smoke checks。
 

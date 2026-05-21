@@ -16,6 +16,7 @@
 
 | 命令 | 目的 | 會修改檔案 | 需要 Git | 主要 Phase |
 | --- | --- | --- | --- | --- |
+| `ai-skill version` | 輸出 binary build metadata | 否 | 否 | Phase 4 |
 | `ai-skill doctor` | 檢查 runtime、Git、repo root、PATH、write permission、hooksPath 與平台支援 | 否 | 可選檢查 | Phase 1 |
 | `ai-skill init-project` | 建立新專案 AI tool bootstrap 設定 | 是 | 否 | Phase 2 |
 | `ai-skill goals` | 管理 `.agent-goals/` 暫存目標 | 是 | 否 | Phase 2 |
@@ -45,6 +46,22 @@
 `--plain` 或預設輸出必須使用相同語意，只是以人類可讀段落呈現；不得只靠顏色或 terminal control sequence 表示 pass / fail。
 
 ## 命令細節
+
+### `ai-skill version`
+
+目的：輸出 release artifact 的 version、commit 與 build date。
+
+輸入：
+
+- `--json`
+- `--plain`
+
+副作用：無。
+
+必要行為：
+
+- 支援透過 Go `-ldflags` 注入 `Version`、`Commit`、`Date`。
+- JSON output 必須包含同一組 build metadata checks，供 CI / release verification 解析。
 
 ### `ai-skill doctor`
 
