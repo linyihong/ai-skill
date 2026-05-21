@@ -14,12 +14,12 @@
 | Metadata | 引入或 promotion Knowledge Atom 時，確認 `metadata/schema.md` 欄位已存在。 | Candidate atom、validated atom、promoted atom。 |
 | Navigation | 應可發現新路徑時，確認 `knowledge/indexes/README.md` 可 route 到該路徑。 | Routing surfaces 與 promoted reference paths。 |
 | Generated refresh | Source 變更時，確認 summaries、graphs、registry records 是否需要 refresh、revalidate 或 downgrade。 | Source-of-truth 文件、metadata、routing registry、summaries、graphs 變更。 |
-| Runtime report generation | 執行 `ruby scripts/generate-knowledge-runtime-report.rb --write` 產生 deterministic runtime report。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
-| Model context report generation | 執行 `ruby scripts/generate-model-context-report.rb --write` 產生 model-aware context loading report。 | Routing registry model 欄位、model profiles 或 compression strategy 變更。 |
-| Model checklist generation | 執行 `ruby scripts/generate-model-checklists.rb --write` 產生 per-model context-loading checklist。 | Routing registry model 欄位、required dependencies 或 model docs 變更。 |
-| SQLite runtime index boundary | 執行 `ruby scripts/validate-runtime-sqlite-index.rb`，確認 SQLite / FTS 只作 generated lookup cache，DB 可重建、被 git ignore、source checksum 未 stale，且不取代 canonical source。 | SQLite generator、query helper、feedback lesson index 或 runtime lookup cache 變更。 |
-| Runtime refresh orchestration | 執行 `ruby scripts/refresh-knowledge-runtime.rb` 一鍵重建 reports / SQLite index 並跑 validators。 | 多個 generated runtime surfaces 可能同時 stale 時。 |
-| Knowledge runtime helper | 執行 `ruby scripts/validate-knowledge-runtime.rb` 檢查 generated surfaces。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
+| Runtime report generation | 執行 `ai-skill runtime refresh` 產生 deterministic runtime report。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
+| Model context report generation | 執行 `ai-skill runtime refresh` 產生 model-aware context loading report。 | Routing registry model 欄位、model profiles 或 compression strategy 變更。 |
+| Model checklist generation | 執行 `ai-skill runtime refresh` 產生 per-model context-loading checklist。 | Routing registry model 欄位、required dependencies 或 model docs 變更。 |
+| SQLite runtime index boundary | 執行 `ai-skill runtime validate`，確認 SQLite / FTS 只作 generated lookup cache，DB 可重建、被 git ignore、source checksum 未 stale，且不取代 canonical source。 | SQLite generator、query helper、feedback lesson index 或 runtime lookup cache 變更。 |
+| Runtime refresh orchestration | 執行 `ai-skill runtime refresh` 一鍵重建 reports / SQLite index 並跑 validators。 | 多個 generated runtime surfaces 可能同時 stale 時。 |
+| Knowledge runtime helper | 執行 `ai-skill runtime validate` 檢查 generated surfaces。 | Routing registry、refresh policy、summaries 或 graphs 變更。 |
 | Link check | 解析 touched docs 的 Markdown links。 | Documentation changes。 |
 | Neutral language | 依 [`enforcement/neutral-language.md`](../../enforcement/neutral-language.md) 檢查可重用文件：繁體中文正文、英文限路徑／指令／符號與必要專有名詞、標題與摘要中性化。 | 變更 `enforcement/`、`workflow/**/README.md`、`analysis/**/README.md`、`intelligence/**/README.md`、根 `README.md`、根 `CONTRIBUTING.md`、`governance/` 下可重用說明、模板或 onboarding 類 Markdown。 |
 | Lints | 執行 touched files 可用的 lints。 | Documentation 或 code changes。 |

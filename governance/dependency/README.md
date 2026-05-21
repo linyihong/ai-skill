@@ -6,7 +6,7 @@
 
 1. **Graph 是輔助發現工具，不是 source of truth**。`knowledge/graphs/` 的 YAML records 是人工維護的 edge list，不是自動生成的完整 graph。Agent 應將 graph 視為候選清單，需要高信心判斷時仍讀 canonical source。
 2. **依賴變更必須更新 graph**。當 source file 被拆分、合併、promotion 或 deprecation 時，對應的 graph edges 必須同步更新或標記 stale。
-3. **Graph 一致性由 validation 確保**。`scripts/validate-knowledge-runtime.rb` 與 `scripts/query-knowledge-graph.rb` 可輔助檢查 graph edges 是否指向存在的路徑。
+3. **Graph 一致性由 validation 確保**。`ai-skill runtime validate` 與 `ai-skill runtime query --graph` 可輔助檢查 graph edges 是否指向存在的路徑。
 4. **不要為了 graph 而建立 graph**。只有當依賴關係對 agent 的 routing 或閱讀順序有實際影響時，才需要記錄 edge。
 
 ## 何時需要更新 Graph
@@ -82,7 +82,7 @@
 3. **No duplicate edges**：同一對 `(source, type, target)` 不重複出現。
 4. **No dangling references**：沒有指向已刪除或已 deprecation 完成的路徑（除非 edge type 是 `stale`）。
 5. **Reciprocal consistency**：如果 A `depends_on` B，B 的 graph record 不需要反向 edge，但 agent 應能從 B 找到 A（透過 index 或 summary）。
-6. **Validation script**：執行 `ruby scripts/validate-knowledge-runtime.rb` 檢查 generated surfaces 一致性。
+6. **Validation script**：執行 `ai-skill runtime validate` 檢查 generated surfaces 一致性。
 
 ## 與其他層的關係
 

@@ -81,9 +81,9 @@ Graphs 協助 agent 理解：
 低成本查詢 graph edges：
 
 ```bash
-ruby scripts/query-knowledge-graph.rb --type depends_on --limit 5
-ruby scripts/query-knowledge-graph.rb --query promotion --limit 5
-ruby scripts/query-knowledge-graph.rb --source intelligence/engineering/analysis --limit 5
+ai-skill runtime query --graph --type depends_on --limit 5
+ai-skill runtime query --graph --query promotion --limit 5
+ai-skill runtime query --graph --source intelligence/engineering/analysis --limit 5
 ```
 
 查詢結果只作候選 edge list。需要修改 graph、promotion、deprecation 或高信心判斷時，仍需讀回對應 graph YAML 與 canonical source。

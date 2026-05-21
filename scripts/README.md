@@ -7,15 +7,6 @@
 | [`ai-skill-close-loop.sh`](ai-skill-close-loop.sh) | 保守收尾工具：偵測 active close-loop lock、列出 dirty 檔案 owner group；預設 dry-run，`--commit` 才分組提交，`--push` 才推遠端。 |
 | [`ai-skill-cli/`](ai-skill-cli/README.md) | 跨平台 Go CLI / runtime toolchain 的開發根目錄；`docs/` 放文件先行產物與舊腳本 parity 盤點，未來 `cmd/`、`internal/`、`testdata/` 放程式碼與 fixtures。 |
 | [`agent-goals.sh`](agent-goals.sh) | 工具中立的專案暫存 goal ledger helper：在 `<PROJECT_ROOT>/.agent-goals/` 建立、更新、拆解、暫停、完成刪除對話目標；不提交 goal 檔。 |
-| [`validate-knowledge-runtime.rb`](validate-knowledge-runtime.rb) | 驗證 knowledge runtime generated surfaces：routing registry、refresh policy、summaries 與 graph records 的 YAML / Markdown 格式、必要欄位與 canonical path。 |
-| [`generate-knowledge-runtime-report.rb`](generate-knowledge-runtime-report.rb) | 從 routing registry、summaries、graphs 與 refresh policy 產生 deterministic runtime report。 |
-| [`generate-model-context-report.rb`](generate-model-context-report.rb) | 從 routing registry 的 model 欄位產生 model-aware context loading report。 |
-| [`generate-model-checklists.rb`](generate-model-checklists.rb) | 從 routing registry 產生 per-model context-loading checklist artifact。 |
-| [`generate-runtime-sqlite-index.rb`](generate-runtime-sqlite-index.rb) | 從 summaries、routing registry、graphs 與 feedback lessons 產生本機 SQLite / FTS lookup cache。 |
-| [`query-runtime-index.rb`](query-runtime-index.rb) | 用 keyword 查詢本機 SQLite runtime index，依 rank / priority / confidence / context cost 回傳少量 candidate source paths。 |
-| [`validate-runtime-sqlite-index.rb`](validate-runtime-sqlite-index.rb) | 驗證 SQLite runtime index 的 integrity、row counts、source paths、FTS、source checksum 與 git ignore 邊界。 |
-| [`query-knowledge-graph.rb`](query-knowledge-graph.rb) | 查詢 graph edges，支援 source / target / type / keyword filters。 |
-| [`refresh-knowledge-runtime.rb`](refresh-knowledge-runtime.rb) | 一鍵重建 model/runtime reports、SQLite index，並執行 runtime validators。 |
 | [`git-hooks/post-commit`](git-hooks/post-commit) | **可選。**在本 repo 設定 `git config core.hooksPath scripts/git-hooks` 且 `AI_SKILL_SYNC_CURSOR_BUNDLE=1` 時，**`git commit`** 後會執行 `sync-cursor-bundle.sh`。 |
 
 ## Go CLI migration map
@@ -29,9 +20,9 @@
 | `install-hooks.sh` | `ai-skill hooks install` | dry-run planner 已實作；copy / chmod write mode 待 parity | hook install parity 通過後刪除舊 shell 入口；Git hook files 本身可作為 hook adapter 保留。 |
 | `sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | explicit-target dry-run planner 已實作；managed mirror write mode 待 parity | 保留條件需寫明 owner、期限與移除條件；不得成為通用 CLI 預設行為。 |
 | `ai-skill-close-loop.sh` | `ai-skill close-loop` | dry-run inspection 已實作；commit / push 待 parity | close-loop lock、dirty group、merge/rebase、dry-run、commit/push parity 通過後刪除或降為短期 thin wrapper。 |
-| runtime Ruby helpers | `ai-skill runtime ...` | Phase 3 native default / legacy rollback split；`runtime validate`、`runtime refresh`、`runtime compile`、`runtime query` 的核心 desktop path 預設不依賴 Ruby / Python / `sqlite3` CLI；Ruby scripts 僅透過 `--legacy-wrapper` 作 rollback / parity | 保留為短期 rollback / parity reference；刪除條件見 [`ai-skill-cli/docs/legacy-script-disposition.md`](ai-skill-cli/docs/legacy-script-disposition.md)。 |
+| runtime Ruby helpers | `ai-skill runtime ...` | 已刪除 runtime report/index/query/validation Ruby entrypoints；`runtime validate`、`runtime refresh`、`runtime query` 的 desktop path 預設不依賴 Ruby / Python / `sqlite3` CLI。`runtime compile --legacy-wrapper` 仍保留 Ruby compiler engine，直到 true source-to-DB Go compiler 完成。 | 已完成 native 覆蓋的 scripts 直接刪除；剩餘非 runtime / compiler source scripts 見 [`ai-skill-cli/docs/legacy-script-disposition.md`](ai-skill-cli/docs/legacy-script-disposition.md)。 |
 
-Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`](ai-skill-cli/docs/legacy-script-disposition.md) 是舊 shell / Ruby / Python entrypoints 的最終 disposition source；runtime desktop CLI 已是 primary，尚未完整 parity 的 write-mode / tool-specific scripts 不在本輪直接刪除。
+Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`](ai-skill-cli/docs/legacy-script-disposition.md) 是舊 shell / Ruby / Python entrypoints 的最終 disposition source；runtime desktop CLI 已是 primary，已覆蓋的 runtime Ruby scripts 已刪除，尚未完整 parity 的 write-mode / tool-specific scripts 不在本輪直接刪除。
 
 ## New project initialization
 
@@ -178,32 +169,26 @@ AI_SKILL_SYNC_CURSOR_BUNDLE=1 ./scripts/ai-skill-close-loop.sh --commit
 
 ## Knowledge runtime validation
 
-> **重要**：修改 `knowledge/` 或 `validation/` 下的檔案後，**必須**執行 `ruby scripts/refresh-knowledge-runtime.rb` 確認所有 validator 通過，再提交。Pre-commit hook（`scripts/git-hooks/pre-commit`）會在 commit 時自動檢查，但建議在修改後立即執行以加速迭代。
+> **重要**：修改 `knowledge/` 或 `validation/` 下的檔案後，**必須**執行對應平台的 repo-local binary（例如 macOS Apple Silicon：`scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime refresh`）確認 native validators 通過，再提交。Pre-commit hook（`scripts/git-hooks/pre-commit`）會在 commit 時自動檢查，但建議在修改後立即執行以加速迭代。
 
 產生並檢查 generated knowledge surfaces：
 
 ```bash
-ruby scripts/refresh-knowledge-runtime.rb
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime refresh
 ```
 
 或逐步執行：
 
 ```bash
-ruby scripts/generate-knowledge-runtime-report.rb --write
-ruby scripts/generate-model-context-report.rb --write
-ruby scripts/generate-model-checklists.rb --write
-ruby scripts/validate-knowledge-runtime.rb
-ruby scripts/generate-runtime-sqlite-index.rb
-ruby scripts/validate-runtime-sqlite-index.rb
-ruby scripts/query-runtime-index.rb feedback --limit 5
-ruby scripts/query-runtime-index.rb feedback --layer feedback --limit 5
-ruby scripts/query-knowledge-graph.rb --type depends_on --limit 5
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime refresh
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime validate
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime query feedback --limit 5
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime query feedback --layer feedback --limit 5
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime query --graph --type depends_on --limit 5
 ```
 
-`generate-knowledge-runtime-report.rb --write` 會更新 `knowledge/runtime/runtime-report.md`，讓 agent 可快速檢視目前 routes、summaries、graphs 與 refresh decisions。
-`generate-model-context-report.rb --write` 會更新 `knowledge/runtime/model-context-report.md`，依 profile 與 compression level 整理 model-aware loading view。
-`generate-model-checklists.rb --write` 會更新 `knowledge/runtime/model-checklists.md`，依 profile 產生可執行的 context-loading checklist。
-`generate-runtime-sqlite-index.rb` 會產生被 git ignore 的本機 `knowledge/runtime/sqlite/runtime-index.sqlite`；query helper 只輸出候選來源，不取代 canonical Markdown / YAML。
+`runtime refresh` 會更新 `knowledge/runtime/runtime-report.md`、`knowledge/runtime/model-context-report.md`、`knowledge/runtime/model-checklists.md`，並產生被 git ignore 的本機 `knowledge/runtime/sqlite/runtime-index.sqlite`。
+`runtime query` 只輸出候選來源，不取代 canonical Markdown / YAML。
 
 此 helper 目前驗證：
 

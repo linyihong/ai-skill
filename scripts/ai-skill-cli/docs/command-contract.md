@@ -235,7 +235,7 @@
 
 ### `ai-skill runtime refresh`
 
-目的：替代 `scripts/refresh-knowledge-runtime.rb` 的入口，重建 knowledge runtime reports、model reports 與 SQLite index。
+目的：重建 knowledge runtime reports、model reports 與 SQLite index；已取代並刪除舊 `scripts/refresh-knowledge-runtime.rb`。
 
 輸入：
 
@@ -257,9 +257,9 @@
 - 若明確使用 `--legacy-wrapper` 且 Ruby 缺失，回傳 `missing_dependency`。
 - 不得只更新部分 generated surface 後回傳 success。
 - 預設 native mode 寫入 Go-generated Markdown reports 與 SQLite index，並執行 native runtime DB / index / knowledge runtime checks；dry-run 只列出將執行的 native actions，不寫入 generated surfaces。
-- `--legacy-wrapper` 依 `refresh-knowledge-runtime.rb` 的順序逐步呼叫 Ruby generator / validator scripts；wrapper mode 必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`，缺 Ruby、`sqlite3` CLI 或 Git 時必須回傳 `missing_dependency`。
-- 任一 refresh step 失敗時，CLI 必須停止後續 steps、回傳 `runtime_refresh_failed`，且 JSON checks 必須保留已執行 steps 與 failing step。
-- `--native-reports` / `--native-index` 已是預設 native refresh 行為；保留 flags 供舊 automation 顯式表示意圖。若需 rollback，使用 `--legacy-wrapper`。
+- `--legacy-wrapper` 對 `runtime refresh` 已移除；必須回傳 `legacy_runtime_refresh_removed`，提示使用者改用 native refresh。
+- 任一 native refresh step 失敗時，CLI 必須停止後續 steps、回傳 `runtime_refresh_failed`，且 JSON checks 必須保留已執行 steps 與 failing step。
+- `--native-reports` / `--native-index` 已是預設 native refresh 行為；保留 flags 供舊 automation 顯式表示意圖。
 
 ### `ai-skill runtime compile`
 
@@ -308,13 +308,13 @@
 - 驗證失敗時不得修改檔案。
 - 必須區分 missing dependency、schema invalid、assertion failed、dirty generated surface。
 - 預設 native mode 執行 Go runtime DB、SQLite index 與 knowledge runtime checks，不依賴 Ruby 或 `sqlite3` CLI。
-- `--legacy-wrapper` 呼叫既有 Ruby validators，必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`；缺 Ruby 或 `sqlite3` CLI 時必須回傳 `missing_dependency`。
+- `--legacy-wrapper` 對 `runtime validate` 已移除；必須回傳 `legacy_runtime_validate_removed`，提示使用者改用 native validation。
 - `runtime.db` native slice 已用 Go / `modernc.org/sqlite` 檢查 integrity、required tables、minimum row counts、JSON columns、compiler metadata 與 stale metadata warning；stale warning 不阻斷成功狀態。
 - SQLite runtime index native slice 已用 Go / `modernc.org/sqlite` 檢查 missing DB、integrity、required tables、row counts、atom source references、source checksums、FTS count 與 basic ranked FTS query；git-ignore boundary 以 Go 呼叫 Git 檢查，缺 Git 時回 `missing_dependency`。
 
 ### `ai-skill runtime query`
 
-目的：替代 `scripts/query-runtime-index.rb`、`scripts/query-knowledge-graph.rb` 與 runtime DB 查詢的穩定入口。
+目的：查詢 runtime SQLite index、knowledge graph 與 runtime DB；已取代並刪除舊 runtime query Ruby helpers。
 
 輸入：
 
@@ -337,8 +337,8 @@
 - Query 命令不得修改 SQLite DB 或 generated reports。
 - 查不到資料時回傳 success 並提供空 results，除非 requested table / DB schema 不存在。
 - `--json` results 必須包含 source path、rank / priority（若有）、match reason 與 validation signal（若有）。
-- Phase 3 初始 native slice 已覆蓋 `query-runtime-index.rb`：keyword / positional query、`--db`、`--layer`、`--type`、`--status`、`--limit`、empty result 與 missing DB。
-- `--graph` native slice 已覆蓋 `query-knowledge-graph.rb`：`--source`、`--target`、`--type`、`--keyword` / positional query、`--limit`、empty result 與 missing filter。
+- Native query 覆蓋舊 runtime index query：keyword / positional query、`--db`、`--layer`、`--type`、`--status`、`--limit`、empty result 與 missing DB。
+- `--graph` native query 覆蓋舊 knowledge graph query：`--source`、`--target`、`--type`、`--keyword` / positional query、`--limit`、empty result 與 missing filter。
 
 ## 舊 Script 對應
 
@@ -351,9 +351,9 @@
 | `scripts/install-hooks.sh` | `ai-skill hooks install` | Phase 2 native 候選 |
 | `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | Phase 2 native 候選，需 mirror safety gate |
 | `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` | Phase 2 先 wrapper，owner-group parity 後 native |
-| Runtime report / SQLite generators | `ai-skill runtime refresh` | Phase 3 先 wrapper，逐步 native |
-| Runtime validators | `ai-skill runtime validate` | Phase 3 先 wrapper |
-| Runtime query helpers | `ai-skill runtime query` | Phase 3 已開始 native runtime index / knowledge graph query slices |
+| Runtime report / SQLite generators | `ai-skill runtime refresh` | Native default completed; old Ruby entrypoints deleted |
+| Runtime validators | `ai-skill runtime validate` | Native default completed; old Ruby entrypoints deleted |
+| Runtime query helpers | `ai-skill runtime query` | Native completed; old Ruby entrypoints deleted |
 | `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | Phase 3 先 wrapper；parity tests 通過後才 native |
 | Runtime migration / state helpers | `ai-skill runtime migrate` / `ai-skill runtime state init` | deferred，需另定命令 |
 | Tool-specific global setting helper | 無通用 CLI 預設 | tool-specific adapter |
@@ -393,8 +393,8 @@
 | `hooks install` | `scripts/git-hooks/`、git config | `.git/config` 或 hooks path | Git |
 | `sync-cursor-bundle` | Ai-skill source | Cursor bundle / mirror path | filesystem permissions |
 | `close-loop` | git status、repo files、rules | git index、commits、remote branch | Git |
-| `runtime refresh` | `knowledge/`、`feedback/`、runtime sources | generated reports、SQLite index | wrapper mode 可能需要 Ruby |
+| `runtime refresh` | `knowledge/`、`feedback/`、runtime sources | generated reports、SQLite index | 無 |
 | `runtime compile` | runtime compiler sources、prose sources | `runtime/runtime.db` | wrapper mode 可能需要 Ruby |
-| `runtime validate` | generated reports、runtime.db | 無 | wrapper parity guard 仍需 Ruby / `sqlite3`；SQLite index git-ignore boundary 需 Git |
+| `runtime validate` | generated reports、runtime.db | 無 | SQLite index git-ignore boundary 需 Git |
 | `runtime query` | `knowledge/runtime/sqlite/runtime-index.sqlite` 或 `--db` 指定 SQLite index | 無 | 無 |
 | `runtime query --graph` | `knowledge/graphs/*.yaml` | 無 | 無 |

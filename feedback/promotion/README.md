@@ -46,7 +46,6 @@
 目前 runtime surfaces 會把 promotion pipeline 當成 design route，而不是自動 promotion engine。修改 promotion docs 或已進 runtime 的 feedback-derived atom 時，需重新執行：
 
 ```bash
-ruby scripts/generate-model-context-report.rb --write
-ruby scripts/generate-knowledge-runtime-report.rb --write
-ruby scripts/validate-knowledge-runtime.rb
+ai-skill runtime refresh
+ai-skill runtime validate
 ```

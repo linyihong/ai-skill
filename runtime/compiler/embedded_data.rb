@@ -2132,7 +2132,7 @@ module EmbeddedRuntimeData
         "id": "obligation.validation.run_knowledge_runtime_validator",
         "phase": "phase.validation",
         "name": "Run Knowledge Runtime Validator",
-        "description": "執行 ruby scripts/validate-knowledge-runtime.rb 檢查 knowledge runtime 一致性",
+        "description": "執行 ai-skill runtime validate 檢查 knowledge runtime 一致性",
         "verification": [
           "validator_exit_code == 0",
           "validator_output_no_errors == true"
@@ -5891,7 +5891,7 @@ module EmbeddedRuntimeData
           {
             "action": "VERIFY_SYNC",
             "description": "驗證 runtime.db 已更新",
-            "command": "執行 ruby scripts/validate-runtime-db.rb"
+            "command": "執行 ai-skill runtime validate"
           },
           {
             "action": "COMMIT_SYNCED_SURFACES",

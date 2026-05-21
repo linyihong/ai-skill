@@ -20,7 +20,7 @@
 
 ## 預防
 
-1. Source 更新後執行 `scripts/refresh-knowledge-runtime.rb`。
+1. Source 更新後執行 `ai-skill runtime refresh`。
 2. Summary 加入 `last_checked` 與 `validation_signal` 欄位。
 3. Summary 只做 routing，不做精確判斷。
 4. 使用 `knowledge/runtime/refresh-policy.yaml` 的 revalidation 流程。
@@ -40,5 +40,5 @@
 ## 相關 Guards
 
 - `knowledge/runtime/refresh-policy.yaml`
-- `scripts/refresh-knowledge-runtime.rb`
-- `scripts/validate-knowledge-runtime.rb`
+- `ai-skill runtime refresh`
+- `ai-skill runtime validate`

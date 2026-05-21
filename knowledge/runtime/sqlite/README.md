@@ -67,7 +67,7 @@ SQLite records 至少保留：
 SQLite / FTS 是 cold feedback lesson 與 runtime navigation 的查找層。當 lesson 數量增加、或 agent 只需要候選列表而不需要讀全文時，先查 SQLite：
 
 ```bash
-ruby scripts/query-runtime-index.rb "<keyword>" --limit 5
+ai-skill runtime query "<keyword>" --limit 5
 ```
 
 查詢結果仍只是 candidate list。需要 promotion、debug、failure learning、修改 lesson 或高信心判斷時，必須讀回 `source_path` 指向的 Markdown / YAML。
@@ -76,17 +76,17 @@ ruby scripts/query-runtime-index.rb "<keyword>" --limit 5
 
 | Tool | Role |
 | --- | --- |
-| `scripts/generate-runtime-sqlite-index.rb` | 從 summaries、graphs、registry、feedback lessons 產生本機 SQLite DB。 |
-| `scripts/query-runtime-index.rb` | 用 keyword 查候選 source，依 FTS rank、priority、confidence、context cost 排序，並可用 layer / type / status 過濾。 |
-| `scripts/validate-runtime-sqlite-index.rb` | 檢查 DB integrity、row counts、source path existence、FTS availability、source checksum stale 狀態與 git ignore 邊界。 |
+| `ai-skill runtime refresh` | 從 summaries、graphs、registry、feedback lessons 產生本機 SQLite DB。 |
+| `ai-skill runtime query` | 用 keyword 查候選 source，依 FTS rank、priority、confidence、context cost 排序，並可用 layer / type / status 過濾。 |
+| `ai-skill runtime validate` | 檢查 DB integrity、row counts、source path existence、FTS availability、source checksum stale 狀態與 git ignore 邊界。 |
 
 ## Usage
 
 ```bash
-ruby scripts/generate-runtime-sqlite-index.rb
-ruby scripts/validate-runtime-sqlite-index.rb
-ruby scripts/query-runtime-index.rb feedback --limit 5
-ruby scripts/query-runtime-index.rb feedback --layer feedback --limit 5
+ai-skill runtime refresh
+ai-skill runtime validate
+ai-skill runtime query feedback --limit 5
+ai-skill runtime query feedback --layer feedback --limit 5
 ```
 
 預設 DB 路徑：

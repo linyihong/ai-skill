@@ -13,7 +13,7 @@
 
 | 你改的是 | 必讀 / 必跑（摘要） |
 | --- | --- |
-| `knowledge/`、`validation/` 或會影響 runtime surface | 在提交前執行 `ruby scripts/refresh-knowledge-runtime.rb`；細節見 [`scripts/README.md`](../scripts/README.md#knowledge-runtime-validation)。 |
+| `knowledge/`、`validation/` 或會影響 runtime surface | 在提交前執行 `ai-skill runtime refresh`；細節見 [`scripts/README.md`](../scripts/README.md#knowledge-runtime-validation)。 |
 | `enforcement/`、`workflow/`、`analysis/`、`intelligence/`、根 `README`、模板、同步腳本 | 依 [`enforcement/linked-updates.md`](../enforcement/linked-updates.md) 做連動更新或明列「已檢查，無需更新」。 |
 | 僅文件、連結、排版 | 對 touched docs 做 Markdown link check；並依 [`enforcement/neutral-language.md`](../enforcement/neutral-language.md) 做語言與低爭議用語檢查。大改見 [`governance/validation/README.md`](validation/README.md) 的 Link check / Lints / Diff review。 |
 | 新分層 / migration / 架構重構 | 依 [`governance/validation/README.md`](validation/README.md) 的 **Migration Validation Checklist** 與 [`enforcement/linked-updates.md`](../enforcement/linked-updates.md) 架構重構列。 |
@@ -24,13 +24,13 @@
 
 ```bash
 # 改 knowledge / validation 後：重建 reports、SQLite index 並跑 validators
-ruby scripts/refresh-knowledge-runtime.rb
+ai-skill runtime refresh
 
 # 提交前檢查 dirty 分組（預設 dry-run）
 ./scripts/ai-skill-close-loop.sh
 ```
 
-選用：若已設定 `git config core.hooksPath scripts/git-hooks`，在 staged 檔案觸及 `knowledge/`、`validation/` 等時，`pre-commit` 會跑 `validate-knowledge-runtime.rb`（見 [`scripts/git-hooks/pre-commit`](../scripts/git-hooks/pre-commit)）。
+選用：若已設定 `git config core.hooksPath scripts/git-hooks`，在 staged 檔案觸及 `knowledge/`、`validation/` 等時，`pre-commit` 會跑 `ai-skill runtime validate`（見 [`scripts/git-hooks/pre-commit`](../scripts/git-hooks/pre-commit)）。
 
 ## 與「新專案接線」的差別
 

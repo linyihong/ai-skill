@@ -38,7 +38,7 @@
 | Checked sources | `plans/active/2026-05-20-1501-cognitive-state-evidence-governance.md`、`plans/README.md`、`memory/README.md`、`memory/working/README.md`、`memory/summary/README.md`、`memory/episodic/README.md`、`memory/project/README.md`、`memory/failure/README.md`、`memory/decision/README.md`、`knowledge/README.md`、`runtime/README.md`、`governance/lifecycle/README.md`、`enforcement/conversation-goal-ledger.md`。 |
 | Conflicts | 既有 active plan 已涵蓋 memory 作為 evidence source、stale execution memory、cognitive contamination、temporal confidence decay、belief GC、governance minimality 與 runtime reduction。本 plan 不重寫那些 cognitive-state governance；只定義 `memory/` 內部 retrieval / activation / replay / promotion lifecycle，以及其與 `knowledge/`、`working memory`、`.agent-goals/`、`runtime/` 的分層邊界。 |
 | Decision | Proceed as separate active plan。Scope 應保持 memory-layer governance，不直接新增 runtime state machine，也不取代 cognitive-state plan 的 evidence/confidence governance。 |
-| Validation | Plan readback、diff review、link check、ReadLints。若後續 phase 修改 `knowledge/runtime/routing-registry.yaml`、runtime compiler source 或 generated surfaces，必須執行 `ruby scripts/refresh-knowledge-runtime.rb` 與相關 validator。 |
+| Validation | Plan readback、diff review、link check、ReadLints。若後續 phase 修改 `knowledge/runtime/routing-registry.yaml`、runtime compiler source 或 generated surfaces，必須執行 `ai-skill runtime refresh` 與相關 validator。 |
 
 ### 2.1 與現有 Active Plan 的切分
 
@@ -445,7 +445,7 @@ Tasks:
 Candidate files:
 
 - `validation/scenarios/memory/`
-- `scripts/validate-knowledge-runtime.rb`（如需新增 semantic validation）
+- `ai-skill runtime validate`（如需新增 semantic validation）
 
 Tasks:
 
@@ -463,7 +463,7 @@ Tasks:
 Tasks:
 
 - [ ] 確認所有 phase 完成或標 blocked。
-- [ ] 執行適用 validator：ReadLints、Markdown link check、`ruby scripts/refresh-knowledge-runtime.rb`（若修改 routing / knowledge runtime）。
+- [ ] 執行適用 validator：ReadLints、Markdown link check、`ai-skill runtime refresh`（若修改 routing / knowledge runtime）。
 - [ ] 檢查 linked updates。
 - [ ] 更新 `plans/README.md` 狀態。
 - [ ] 若完成，搬移至 `plans/archived/`。

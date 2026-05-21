@@ -19,7 +19,7 @@ failure_source:
 given:
   task: fix_detected_error
   artifacts:
-    - scripts/validate-knowledge-runtime.rb  # 現有 validator
+    - ai-skill runtime validate  # 現有 validator
     - validation/scenarios/failure-derived/  # 現有 failure-derived scenarios
     - enforcement/failure-patterns/README.md  # failure pattern 索引
   signals:
@@ -38,8 +38,8 @@ then:
     primary: create_or_update_validator
     steps:
       - 分析錯誤的根本原因與可重複模式
-      - 判斷是否可寫入 validator（Ruby script）或 validation scenario（YAML）
-      - 若是 validator：更新 scripts/validate-knowledge-runtime.rb
+      - 判斷是否可寫入 Go validator 或 validation scenario（YAML）
+      - 若是 validator：更新 ai-skill runtime validate 對應實作
       - 若是 scenario：建立 validation/scenarios/failure-derived/<id>.yaml
       - 更新 failure pattern 的 Linked Validation Scenarios 區段
       - 執行 validator 確認新規則通過

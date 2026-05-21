@@ -20,7 +20,7 @@ given:
   task: commit_and_push
   artifacts:
     - enforcement/dependency-reading.md  # Writeback Transaction Guard 定義
-    - scripts/validate-knowledge-runtime.rb  # 知識庫 validator
+    - ai-skill runtime validate  # 知識庫 validator
   signals:
     - 修改涉及多個檔案
     - 修改涉及架構變更或路徑變更
@@ -37,7 +37,7 @@ then:
     primary: run_writeback_transaction_closure
     steps:
       - 讀取 dependency-reading.md 的 Writeback Transaction Guard
-      - 執行 validator（ruby scripts/validate-knowledge-runtime.rb）
+      - 執行 validator（ai-skill runtime validate）
       - 確認 validator 通過
       - 執行 git add -A
       - 撰寫完整 commit message

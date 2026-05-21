@@ -1,6 +1,6 @@
 # Model Checklists
 
-本檔由 `ruby scripts/generate-model-checklists.rb --write` 產生，將 routing registry 中的 model profile / compression level 轉成 agent 可直接使用的 context-loading checklist。
+本檔由 `ai-skill runtime refresh` 產生，將 routing registry 中的 model profile / compression level 轉成 agent 可直接使用的 context-loading checklist。
 
 ## Source Surfaces
 
@@ -67,7 +67,7 @@ Guardrails:
 | `route.tools.metadata-routing` | Primary: `tools/README.md`<br>Compression: `index-only`<br>Required: `ai-tools/README.md`<br>Validation: Tool metadata 已定義，compression 策略與 routing 規則已建立。 |
 | `route.traces.decision-traces` | Primary: `traces/README.md`<br>Compression: `index-only`<br>Required: `validation/README.md`<br>Validation: Trace 記錄已依 scenario 分類存放，格式與 template 一致。 |
 | `route.anti-patterns.runtime-patterns` | Primary: `anti-patterns/README.md`<br>Compression: `summary-first`<br>Required: `CORE_BOOTSTRAP.md`<br>Validation: Anti-pattern 已依格式記錄，症狀、預防與恢復方式已定義。 |
-| `route.runtime.compiler` | Primary: `runtime/compiler/embedded_data.rb`<br>Compression: `source-backed`<br>Required: `runtime/compiler/embedded_data.rb`<br>`runtime/compiler/embedded_data.rb`<br>Validation: 所有 modified sources 已編譯，runtime.db 的 generated_surfaces 表包含最新記錄，validate-runtime-db.rb 回傳 exit 0。 |
+| `route.runtime.compiler` | Primary: `runtime/compiler/embedded_data.rb`<br>Compression: `source-backed`<br>Required: `runtime/compiler/embedded_data.rb`<br>`runtime/compiler/embedded_data.rb`<br>Validation: 所有 modified sources 已編譯，runtime.db 的 generated_surfaces 表包含最新記錄，`ai-skill runtime validate` 回傳 exit 0。 |
 | `route.runtime.intelligence-routing` | Primary: `runtime/compiler/embedded_data.rb`<br>Compression: `index-only`<br>Required: `runtime/compiler/embedded_data.rb`<br>Validation: Task intent 已對應到 intelligence-routing.yaml 的 domain，applicable_phases 已檢查，domain README 已載入。 |
 | `route.runtime.output-governance` | Primary: `runtime/output-governance/`<br>Compression: `source-backed`<br>Required: `runtime/compiler/embedded_data.rb`<br>`runtime/compiler/embedded_data.rb`<br>Validation: Language consistency 已確認，sanitization 已通過，tool neutrality 已檢查， format compliance 已驗證，governance gates 全部通過。  |
 | `route.runtime.distributed` | Primary: `runtime/distributed/`<br>Compression: `source-backed`<br>Required: `runtime/compiler/embedded_data.rb`<br>`runtime/compiler/embedded_data.rb`<br>`runtime/compiler/embedded_data.rb`<br>Validation: Distributed locks 已正確 acquire/release，multi-agent coordination rules 已遵守， async job lifecycle 狀態轉換正確，無 deadlock 或 stale state。  |
@@ -104,6 +104,6 @@ Guardrails:
 
 ## Validation
 
-- 產生前應先確認 `routing-registry.yaml` 可通過 `ruby scripts/validate-knowledge-runtime.rb`。
-- 產生後應重新執行 `ruby scripts/validate-knowledge-runtime.rb`，檢查本 report links。
+- 產生前應先確認 `routing-registry.yaml` 可通過 `ai-skill runtime validate`。
+- 產生後應重新執行 `ai-skill runtime validate`，檢查本 report links。
 - 本檔是 generated view，不取代 model source docs 或 routing registry。

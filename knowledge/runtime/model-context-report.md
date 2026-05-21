@@ -1,6 +1,6 @@
 # Model Context Report
 
-本檔由 `ruby scripts/generate-model-context-report.rb --write` 產生，依 `knowledge/runtime/routing-registry.yaml` 的 model 欄位整理 model-aware context loading view。
+本檔由 `ai-skill runtime refresh` 產生，依 `knowledge/runtime/routing-registry.yaml` 的 model 欄位整理 model-aware context loading view。
 
 ## Source Surfaces
 
@@ -101,6 +101,6 @@ Validation signal:
 
 ## Validation
 
-- 產生前應先確認 `routing-registry.yaml` 可通過 `ruby scripts/validate-knowledge-runtime.rb`。
-- 產生後應重新執行 `ruby scripts/validate-knowledge-runtime.rb`，檢查本 report links。
+- 產生前應先確認 `routing-registry.yaml` 可通過 `ai-skill runtime validate`。
+- 產生後應重新執行 `ai-skill runtime validate`，檢查本 report links。
 - 本報告是 generated view，不取代 `models/profiles/README.md`、`models/compression/README.md` 或 routing registry。

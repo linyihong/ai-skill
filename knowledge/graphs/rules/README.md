@@ -27,7 +27,7 @@
 ## 查詢方式
 
 ```bash
-ruby scripts/query-knowledge-graph.rb --source knowledge/graphs/rules/ --limit 10
+ai-skill runtime query --graph --source knowledge/graphs/rules/ --limit 10
 ```
 
 ## 驗證

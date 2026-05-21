@@ -10,11 +10,10 @@
 - [`model-context-report.md`](model-context-report.md)：由 generator 產生的 model profile / compression loading view。
 - [`model-checklists.md`](model-checklists.md)：由 generator 產生的 per-model context-loading checklist。
 - [`sqlite/`](sqlite/README.md)：SQLite / FTS generated lookup cache prototype，用於低 token 搜尋 candidate sources。
-- [`../../scripts/validate-knowledge-runtime.rb`](../../scripts/validate-knowledge-runtime.rb)：檢查 generated surfaces 的 YAML / Markdown 格式、必要欄位與 canonical path。
-- [`../../scripts/generate-knowledge-runtime-report.rb`](../../scripts/generate-knowledge-runtime-report.rb)：從 runtime surfaces 產生 deterministic report。
-- [`../../scripts/generate-model-context-report.rb`](../../scripts/generate-model-context-report.rb)：從 routing registry 的 model 欄位產生 context loading report。
-- [`../../scripts/refresh-knowledge-runtime.rb`](../../scripts/refresh-knowledge-runtime.rb)：一鍵重建 reports、SQLite index 並執行 validators。
-- [`../../scripts/query-knowledge-graph.rb`](../../scripts/query-knowledge-graph.rb)：低成本查詢 graph edges，輔助 dependency / promotion / routing lookup。
+- `ai-skill runtime validate`：檢查 generated surfaces 的 YAML / Markdown 格式、必要欄位與 canonical path。
+- `ai-skill runtime refresh`：一鍵重建 reports、model context、model checklists、SQLite index 並執行 validators。
+- `ai-skill runtime query`：低成本查詢 runtime SQLite index。
+- `ai-skill runtime query --graph`：低成本查詢 graph edges，輔助 dependency / promotion / routing lookup。
 
 ## Runtime Inputs
 
@@ -64,11 +63,8 @@ Runtime view 應回答：
 - Source 變更後，必須依 `refresh-policy.yaml` 判斷 summaries、graphs、routing registry 是 refresh、revalidate、downgrade 或 no update needed。
 - SQLite / FTS 只能是 generated lookup cache；查詢結果只作 candidate list，不取代 canonical Markdown / YAML。
 - Graph query 結果只作 candidate edge list；需要修改或高信心判斷時仍讀 graph YAML 與 canonical source。
-- 修改 registry、summaries、graphs 或 refresh policy 後，重新執行 `ruby scripts/generate-knowledge-runtime-report.rb --write`。
-- 修改 registry model 欄位、model profiles 或 compression strategy 後，重新執行 `ruby scripts/generate-model-context-report.rb --write`。
-- 修改 registry model 欄位或 model docs 後，重新執行 `ruby scripts/generate-model-checklists.rb --write`。
-- 修改任何 generated runtime surface 或 SQLite source inputs 後，可先執行 `ruby scripts/refresh-knowledge-runtime.rb`。
-- 修改 registry、refresh policy、summaries 或 graphs 後，執行 `ruby scripts/validate-knowledge-runtime.rb`，再做 lints、Markdown link check、close-loop dry run 與 commit / push / readback。
+- 修改 registry、summaries、graphs、refresh policy、model profiles、model docs 或 SQLite source inputs 後，重新執行 `ai-skill runtime refresh`。
+- 修改 registry、refresh policy、summaries 或 graphs 後，執行 `ai-skill runtime validate`，再做 lints、Markdown link check、close-loop dry run 與 commit / push / readback。
 
 ## 尚未實作
 

@@ -446,7 +446,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 | `feedback/history/` lesson | `feedback/history/<domain>/README.md`、promotion target |
 | `workflow/<domain>/` | 對應 `analysis/`、`intelligence/`、`runtime/onboarding/` |
 | `intelligence/<domain>/` | `knowledge/indexes/`、`knowledge/summaries/`、`knowledge/graphs/` |
-| `knowledge/` / `runtime/` | 執行 `refresh-knowledge-runtime.rb` |
+| `knowledge/` / `runtime/` | 執行 `ai-skill runtime refresh` |
 | 架構重構 | 建立 validation scenario + enforcement 同步檢查（Step 6a + Step 7a） |
 
 > 完整表格請見 [`linked-updates.md`](../../enforcement/linked-updates.md) §常見連動關係
@@ -481,7 +481,7 @@ Step 7a: Shared-Rules 同步檢查（架構變更專用）
 
 ```bash
 LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ruby runtime/compiler/compiler-engine.rb
-ruby scripts/validate-runtime-db.rb
+ai-skill runtime validate
 ```
 
 **必須確認**：
@@ -502,15 +502,15 @@ sqlite3 runtime/runtime.db \
 | `knowledge/runtime/refresh-policy.yaml` | 更新 refresh / revalidate / downgrade 規則 |
 | `knowledge/summaries/` | 更新對應 domain 的 summary |
 | `knowledge/graphs/` | 更新對應 domain 的 graph edges |
-| `knowledge/runtime/runtime-report.md` | `ruby scripts/generate-knowledge-runtime-report.rb --write` |
-| `knowledge/runtime/model-context-report.md` | `ruby scripts/generate-model-context-report.rb --write` |
-| `knowledge/runtime/model-checklists.md` | `ruby scripts/generate-model-checklists.rb --write` |
+| `knowledge/runtime/runtime-report.md` | `ai-skill runtime refresh` |
+| `knowledge/runtime/model-context-report.md` | `ai-skill runtime refresh` |
+| `knowledge/runtime/model-checklists.md` | `ai-skill runtime refresh` |
 
 **驗證**：
 ```bash
-ruby scripts/refresh-knowledge-runtime.rb
-ruby scripts/validate-knowledge-runtime.rb
-ruby scripts/validate-runtime-db.rb
+ai-skill runtime refresh
+ai-skill runtime validate
+ai-skill runtime validate
 ```
 
 ---
@@ -529,7 +529,7 @@ ruby scripts/validate-runtime-db.rb
    - 不得包含 project-specific evidence（依 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md)）
 3. ✅ `git diff` 檢查將提交的內容，確認上述去敏項目已處理
 4. ✅ 執行適用的 lints / Markdown link check / required linked updates 檢查
-5. ✅ **目錄結構命名檢查** — 若本輪涉及新增或改名目錄，執行 `scripts/validate-knowledge-runtime.rb` 的 `validate_directory_naming`：
+5. ✅ **目錄結構命名檢查** — 若本輪涉及新增或改名目錄，執行 `ai-skill runtime validate` 的 `validate_directory_naming`：
    - 檢查 `intelligence/engineering/` 下是否有與根目錄同名的目錄（跨層名稱衝突）
    - 檢查目錄名稱是否為舊技能名稱的縮寫（慣性命名）
    - 檢查目錄深度是否超過 4 層
@@ -590,7 +590,7 @@ ruby scripts/validate-runtime-db.rb
 □ Step 9:  [強制] 更新 Runtime Surfaces（Step 5 或 Step 8 有修改時）
            ↳ routing-registry.yaml、summaries/、graphs/、runtime scripts
            ⛔ 若 modified files 命中 runtime.db generated_surfaces.source_path，
-             必須跑 compiler-engine、validate-runtime-db、SQLite content assertion，
+             必須跑 compiler-engine、`ai-skill runtime validate`、SQLite content assertion，
              並將 runtime/runtime.db 納入同輪 commit
 □ Step 10: [強制] 驗證（diff review、去敏、link check、lint）
 □ Step 11: [強制] Commit / Push / Readback（dependency-reading.md）

@@ -2,7 +2,7 @@
 # Ai-skill: pre-commit hook for knowledge runtime validation + compiler.
 #
 # When staged changes touch knowledge/ or validation/ surfaces, run
-# validate-knowledge-runtime.rb to catch errors before commit.
+# the repo-local ai-skill runtime validator to catch errors before commit.
 #
 # When staged changes touch runtime/ YAML sources or compiler rules, run
 # compiler-engine.rb to regenerate runtime.db.
@@ -14,6 +14,31 @@ set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 
 CHANGED=$(git diff --cached --name-only)
+
+ai_skill_cli() {
+  if [[ -n "${AI_SKILL_CLI:-}" ]]; then
+    printf '%s\n' "${AI_SKILL_CLI}"
+    return 0
+  fi
+  local os arch suffix binary
+  os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+  arch="$(uname -m)"
+  suffix=""
+  case "${os}" in
+    darwin) os="darwin" ;;
+    linux) os="linux" ;;
+    mingw*|msys*|cygwin*) os="windows"; suffix=".exe" ;;
+    *) echo "Unsupported OS for repo-local ai-skill binary: ${os}" >&2; return 1 ;;
+  esac
+  case "${arch}" in
+    arm64|aarch64) arch="arm64" ;;
+    x86_64|amd64) arch="amd64" ;;
+    *) echo "Unsupported architecture for repo-local ai-skill binary: ${arch}" >&2; return 1 ;;
+  esac
+  binary="${ROOT}/scripts/ai-skill-cli/bin/ai-skill-${os}-${arch}${suffix}"
+  [[ -x "${binary}" ]] || { echo "Missing executable ai-skill binary: ${binary}" >&2; return 1; }
+  printf '%s\n' "${binary}"
+}
 
 # --- Compiler: regenerate runtime.db when runtime YAML/compiler sources change ---
 if echo "$CHANGED" | grep -qE '^(runtime/(phases|obligations|gates|transactions|router|discovery|compiler|budget|context|guards|health|intelligence|output-governance|pipeline|prompt-artifacts|recovery|scheduler|distributed)/|scripts/git-hooks/pre-commit)'; then
@@ -31,10 +56,10 @@ fi
 
 # --- Knowledge runtime validation ---
 if echo "$CHANGED" | grep -qE '^(knowledge/|validation/|scripts/validate-)'; then
-  ruby "${ROOT}/scripts/validate-knowledge-runtime.rb" || {
+  "$(ai_skill_cli)" runtime validate --repo "${ROOT}" || {
     echo ""
     echo "ERROR: Knowledge runtime validation failed."
-    echo "Run 'ruby scripts/refresh-knowledge-runtime.rb' to regenerate and diagnose."
+    echo "Run '$(ai_skill_cli) runtime refresh --repo ${ROOT}' to regenerate and diagnose."
     echo "Fix the errors above, then stage and commit again."
     exit 1
   }

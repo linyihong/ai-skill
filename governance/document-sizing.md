@@ -61,7 +61,7 @@ Token 成本模型與 context loading 分層策略請見 [`../enforcement/decisi
 - **舊連結要同步更新**；必要時保留短入口連到新位置。
 - **若是全庫共用規則**，正文只放在 `governance/`，其他檔案引用它。
 - **若改動影響索引、模板、skill 入口或分類文件**，依 [`../enforcement/linked-updates.md`](../enforcement/linked-updates.md) 同步檢查。
-- **若改動影響 routing registry**，執行 `ruby scripts/refresh-knowledge-runtime.rb` 更新 runtime index。
+- **若改動影響 routing registry**，執行 `ai-skill runtime refresh` 更新 runtime index。
 - **若檔案在 routing registry 中被引用**，更新 registry 中的路徑（否則 validator 會報錯）。
 
 在業務專案或其他 repository **從零撰寫 agent 友善文件**時的步驟、分類維度與驗證自查，見 [`../workflow/documentation/execution-flow.md`](../workflow/documentation/execution-flow.md)（本檔定閾值與拆分形狀，該檔定操作順序與與 `enforcement/` 的對齊方式）。
@@ -97,7 +97,7 @@ Token 成本模型與 context loading 分層策略請見 [`../enforcement/decisi
 | 拆分後不更新索引 | 檔案移走了，但 `README.md` 和 routing registry 還指向舊路徑 | 拆分後立即執行 linked-updates 檢查 |
 | 拆分後父 README 只列檔名 | agent 不知道何時該讀哪個子檔 | 每個子檔要說明用途和觸發條件 |
 | 為了拆分而拆分 | 50 行的檔案也拆成 3 個檔案，增加維護成本 | 只有超過 150 行或混合多主題時才考慮拆分 |
-| 拆分後不更新 validator | routing registry 中的路徑失效，validation 失敗 | 執行 `ruby scripts/refresh-knowledge-runtime.rb` |
+| 拆分後不更新 validator | routing registry 中的路徑失效，validation 失敗 | 執行 `ai-skill runtime refresh` |
 | 忽略 token 成本 | 不考慮 agent 每次讀取的成本 | 見 `decision-efficiency.md` 的 Token 成本模型 |
 
 ## 檢查點

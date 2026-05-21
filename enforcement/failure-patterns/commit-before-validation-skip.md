@@ -71,4 +71,4 @@ Agent 把 Ai-skill writeback transaction 的關閉條件視為「只有影響 ru
 
 ## Linked Validation Scenarios
 
-- `validate_knowledge_runtime` — 執行 `ruby scripts/validate-knowledge-runtime.rb` 確認 knowledge runtime 完整性
+- `validate_knowledge_runtime` — 執行 `ai-skill runtime validate` 確認 knowledge runtime 完整性

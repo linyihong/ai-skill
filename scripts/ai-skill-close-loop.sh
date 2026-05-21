@@ -50,6 +50,31 @@ die() {
   exit 1
 }
 
+ai_skill_cli() {
+  if [[ -n "${AI_SKILL_CLI:-}" ]]; then
+    printf '%s\n' "${AI_SKILL_CLI}"
+    return 0
+  fi
+  local os arch suffix binary
+  os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+  arch="$(uname -m)"
+  suffix=""
+  case "${os}" in
+    darwin) os="darwin" ;;
+    linux) os="linux" ;;
+    mingw*|msys*|cygwin*) os="windows"; suffix=".exe" ;;
+    *) die "Unsupported OS for repo-local ai-skill binary: ${os}" ;;
+  esac
+  case "${arch}" in
+    arm64|aarch64) arch="arm64" ;;
+    x86_64|amd64) arch="amd64" ;;
+    *) die "Unsupported architecture for repo-local ai-skill binary: ${arch}" ;;
+  esac
+  binary="${REPO_ROOT}/scripts/ai-skill-cli/bin/ai-skill-${os}-${arch}${suffix}"
+  [[ -x "${binary}" ]] || die "Missing executable ai-skill binary: ${binary}"
+  printf '%s\n' "${binary}"
+}
+
 is_pid_alive() {
   local pid="$1"
   [[ -n "${pid}" ]] && kill -0 "${pid}" 2>/dev/null
@@ -266,9 +291,9 @@ main() {
 
   # Run knowledge runtime validation before committing
   echo "Running knowledge runtime validation..."
-  ruby scripts/validate-knowledge-runtime.rb || {
+  "$(ai_skill_cli)" runtime validate --repo "${REPO_ROOT}" || {
     echo "ERROR: Knowledge runtime validation failed."
-    echo "Run 'ruby scripts/refresh-knowledge-runtime.rb' to regenerate and fix."
+    echo "Run '$(ai_skill_cli) runtime refresh --repo ${REPO_ROOT}' to regenerate and fix."
     exit 1
   }
 

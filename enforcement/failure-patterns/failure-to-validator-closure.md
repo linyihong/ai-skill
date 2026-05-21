@@ -9,7 +9,7 @@ Class: `validation-gap` / `process-gap`
 
 1. Agent 發現並修復了一個錯誤（如分類錯誤、路徑錯誤、格式錯誤）
 2. 修復完成後，agent 直接進入下一步，沒有思考「這個錯誤如何防止再次發生」
-3. 專案中存在 validator（如 `scripts/validate-knowledge-runtime.rb`）可以擴充
+3. 專案中存在 validator（如 `ai-skill runtime validate`）可以擴充
 4. Agent 沒有把「錯誤模式 → validator 測試」當作修復流程的必要步驟
 
 ## Failure Mode
@@ -35,7 +35,7 @@ Agent 在修復錯誤後，沒有建立對應的 validator 測試，因為：
 1. **修復心態**：agent 在修復模式下專注於「把錯的改對」，沒有切換到「防止再發」的預防模式
 2. **缺乏流程強制**：沒有規則要求「每個修復必須伴隨測試案例」
 3. **泛化能力不足**：從具體錯誤抽象出通用檢測模式需要額外的認知努力
-4. **validator 存在但未被納入修復流程**：`scripts/validate-knowledge-runtime.rb` 存在，但修復時不會自動想到去擴充它
+4. **validator 存在但未被納入修復流程**：`ai-skill runtime validate` 存在，但修復時不會自動想到去擴充它
 5. **自我參照缺失**：這個 failure pattern 本身沒有被 validator 檢查——沒有測試來驗證「修復後是否加入了對應的測試」
 
 ## Required Agent Action
@@ -43,7 +43,7 @@ Agent 在修復錯誤後，沒有建立對應的 validator 測試，因為：
 在每次修復錯誤後，必須執行以下步驟：
 
 1. **泛化錯誤模式**：這個錯誤的本質是什麼？是分類錯誤、路徑錯誤、格式錯誤、還是邏輯錯誤？
-2. **檢查 validator 覆蓋率**：`scripts/validate-knowledge-runtime.rb` 中是否有測試可以檢測這類錯誤？
+2. **檢查 validator 覆蓋率**：`ai-skill runtime validate` 中是否有測試可以檢測這類錯誤？
    - 有 → 手動觸發確認測試能抓到這個錯誤
    - 無 → 加入新的測試方法
 3. **加入測試案例**：在 validator 中加入對應的檢測邏輯
@@ -56,7 +56,7 @@ Agent 在修復錯誤後，沒有建立對應的 validator 測試，因為：
 ### 層級 1：文件層（被動）
 
 - 在修復流程中加入「加入測試案例」作為必要步驟
-- 在 `scripts/validate-knowledge-runtime.rb` 的 README 中列出所有測試方法及其對應的錯誤模式
+- 在 `ai-skill runtime validate` 的 README 中列出所有測試方法及其對應的錯誤模式
 - 建立「錯誤修復檢查清單」：□ 修復完成 □ 已泛化錯誤模式 □ 已加入 validator 測試 □ 已驗證測試有效性
 
 ### 層級 2：Validator 層（主動）

@@ -35,7 +35,7 @@
 | Checked sources | `models/README.md`、`models/profiles/README.md`、`models/compression/README.md`、`knowledge/runtime/routing-registry.yaml` 的 `route.models.model-aware-routing`、`runtime/README.md`、`plans/README.md`、`plans/active/2026-05-20-1501-cognitive-state-evidence-governance.md`、`plans/active/2026-05-20-1745-memory-retrieval-activation-governance.md`。 |
 | Conflicts | 不應宣稱 `models/` 能強制 Cursor Auto 或任何工具的主對話模型切換。Actual model selection 屬於 tool capability / `ai-tools/` 邊界；`models/` 應定義 tool-neutral execution strategy。若工具支援 explicit model selection 或 subagent model selection，才可由 routing contract 建議具體模型。 |
 | Decision | Proceed as separate active plan。Scope 應聚焦 model-aware execution strategy、routing contract、workflow adaptation、context budget orchestration 與 governance。不要直接新增 provider-specific model names 到 reusable core；必要時只在 tool adapter 或 runtime capability matrix 記錄可用性。 |
-| Validation | Plan readback、diff review、ReadLints、Markdown link check。後續若修改 `knowledge/runtime/routing-registry.yaml`、generated model reports 或 runtime source，必須執行 `ruby scripts/refresh-knowledge-runtime.rb` 與相關 validator。 |
+| Validation | Plan readback、diff review、ReadLints、Markdown link check。後續若修改 `knowledge/runtime/routing-registry.yaml`、generated model reports 或 runtime source，必須執行 `ai-skill runtime refresh` 與相關 validator。 |
 
 ### 2.1 與現有 Active Plan 的切分
 
@@ -378,7 +378,7 @@ Tasks:
 Tasks:
 
 - [ ] Confirm all phases complete or marked blocked.
-- [ ] Run ReadLints, Markdown link check, and `ruby scripts/refresh-knowledge-runtime.rb` if routing / generated surfaces changed.
+- [ ] Run ReadLints, Markdown link check, and `ai-skill runtime refresh` if routing / generated surfaces changed.
 - [ ] Check linked updates.
 - [ ] Update `plans/README.md` status.
 - [ ] Move plan to `plans/archived/` if completed.

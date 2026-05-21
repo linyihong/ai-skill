@@ -39,4 +39,4 @@ Roo Code（Code mode），deepseek-chat model
 ## 相關文件
 
 - Failure pattern: [`enforcement/failure-patterns/failure-to-validator-closure.md`](../../enforcement/failure-patterns/failure-to-validator-closure.md)
-- Validator test: [`scripts/validate-knowledge-runtime.rb`](../../scripts/validate-knowledge-runtime.rb) 中的 `validate_intelligence_classification_boundary`
+- Validator test: `ai-skill runtime validate` 中的 intelligence classification boundary check

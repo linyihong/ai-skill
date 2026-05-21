@@ -815,7 +815,7 @@ Candidate files:
 - `validation/scenarios/failure-derived/cognitive-state-assumption-drift.yaml`
 - `validation/scenarios/failure-derived/evidence-hierarchy-override.yaml`
 - `validation/scenarios/failure-derived/confidence-decay-repeated-patch.yaml`
-- `scripts/validate-knowledge-runtime.rb`（若需 semantic validator）
+- `ai-skill runtime validate`（若需 semantic validator）
 
 Tasks:
 

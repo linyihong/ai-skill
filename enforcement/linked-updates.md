@@ -50,7 +50,7 @@ Linked-update completeness 的治理 gate 見 [`governance/ai-runtime-governance
 | 修改 `analysis/development-guidance/` 的 tooling 相關內容 | `workflow/software-delivery/development-process.md`、`workflow/software-delivery/execution-flow.md`、`workflow/software-delivery/artifact-gates.md`。 |
 | 修改 `workflow/software-delivery/development-process.md` 的 implemented-first governance / traceability / BDD closure 規則 | `workflow/software-delivery/development-process.md`、`workflow/software-delivery/execution-flow.md`、`workflow/software-delivery/artifact-gates.md`、`analysis/development-guidance/README.md`。 |
 | 新增或大幅修改任何 `.md` 文件 | 依 [`governance/document-sizing.md`](../governance/document-sizing.md) 的檢查點檢查是否需要拆分：檔案是否超過 150 行？是否混合多主題？是否需要建立父層 README？ |
-| 修改 `knowledge/` 或 `validation/` 下的檔案 | 執行 `ruby scripts/refresh-knowledge-runtime.rb` 確認所有 validator 通過。 |
+| 修改 `knowledge/` 或 `validation/` 下的檔案 | 執行 `ai-skill runtime refresh` 確認所有 validator 通過。 |
 | 修改 `runtime/` 下的 YAML 來源或 compiler 規則 | Compiler 會自動重新編譯 `runtime.db`。**`runtime.db` 必須包含在 commit 中**（pre-commit hook 會自動 `git add`，手動 commit 時需自行確認）。驗證：`git diff --cached --name-only | grep runtime.db`。 |
 | **Plan 執行前架構相容性檢查**（開始執行 `plans/active/*.md` 的 implementation phase） | 依 [`plans/README.md`](../plans/README.md#plan-執行前架構相容性檢查architecture-compatibility-preflight) 確認 candidate files、source-of-truth、layer responsibility、compiler / generated surface 與 current architecture 一致；若衝突，先更新 plan 或請使用者確認，不得直接實作。 |
 | **Plan 完成閉環**（plan 所有項目標記為完成） | 依 [`plans/README.md`](../plans/README.md#plan-完成閉環plan-completion-closure) 執行 7 項檢查清單：確認所有項目完成、執行 validator、檢查連動更新、更新 `plans/README.md` 狀態、搬移至 `archived/`（或標註例外原因）、commit & push、最終確認。 |

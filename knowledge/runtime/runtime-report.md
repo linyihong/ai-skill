@@ -1,6 +1,6 @@
 # Knowledge Runtime Report
 
-本檔由 `ruby scripts/generate-knowledge-runtime-report.rb --write` 產生，彙整 runtime registry、summaries、graphs 與 refresh policy 的目前狀態。
+本檔由 `ai-skill runtime refresh` 產生，彙整 runtime registry、summaries、graphs 與 refresh policy 的目前狀態。
 
 ## Source Surfaces
 
@@ -62,7 +62,7 @@
 | `route.tools.metadata-routing` | `tools/README.md` | `small` | `index-only` | Tool metadata 已定義，compression 策略與 routing 規則已建立。 |
 | `route.traces.decision-traces` | `traces/README.md` | `small` | `index-only` | Trace 記錄已依 scenario 分類存放，格式與 template 一致。 |
 | `route.anti-patterns.runtime-patterns` | `anti-patterns/README.md` | `small` | `summary-first` | Anti-pattern 已依格式記錄，症狀、預防與恢復方式已定義。 |
-| `route.runtime.compiler` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 所有 modified sources 已編譯，runtime.db 的 generated_surfaces 表包含最新記錄，validate-runtime-db.rb 回傳 exit 0。 |
+| `route.runtime.compiler` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 所有 modified sources 已編譯，runtime.db 的 generated_surfaces 表包含最新記錄，`ai-skill runtime validate` 回傳 exit 0。 |
 | `route.runtime.intelligence-routing` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | Task intent 已對應到 intelligence-routing.yaml 的 domain，applicable_phases 已檢查，domain README 已載入。 |
 | `route.runtime.output-governance` | `runtime/output-governance/` | `small` | `source-backed` | Language consistency 已確認，sanitization 已通過，tool neutrality 已檢查， format compliance 已驗證，governance gates 全部通過。  |
 | `route.runtime.distributed` | `runtime/distributed/` | `small` | `source-backed` | Distributed locks 已正確 acquire/release，multi-agent coordination rules 已遵守， async job lifecycle 狀態轉換正確，無 deadlock 或 stale state。  |
@@ -138,6 +138,6 @@
 
 ## Validation
 
-- 產生前應先執行 `ruby scripts/validate-knowledge-runtime.rb`。
+- 產生前應先執行 `ai-skill runtime validate`。
 - 產生後應執行 Markdown link check、lints、close-loop dry run、commit / push / readback。
 - 本報告是 generated view，不取代 `routing-registry.yaml`、`refresh-policy.yaml`、summary 或 graph source files。

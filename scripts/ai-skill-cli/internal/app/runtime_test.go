@@ -21,7 +21,7 @@ func TestRuntimeValidateDryRunPlansValidators(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "validate", "--repo", repo, "--legacy-wrapper", "--dry-run", "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "validate", "--repo", repo, "--dry-run", "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
 	}
@@ -41,23 +41,22 @@ func TestRuntimeValidateDryRunPlansValidators(t *testing.T) {
 	}
 }
 
-func TestRuntimeValidateBlocksMissingRubyBeforeWrapper(t *testing.T) {
+func TestRuntimeValidateBlocksRemovedLegacyWrapper(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
-	t.Setenv("PATH", emptyPathDir(t))
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	code := Run([]string{"runtime", "validate", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
-	if code != ExitMissingDependency {
-		t.Fatalf("expected missing dependency, got %d; stderr=%s", code, stderr.String())
+	if code != ExitInvalidUsage {
+		t.Fatalf("expected invalid usage, got %d; stderr=%s", code, stderr.String())
 	}
 
 	var result Result
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
 		t.Fatalf("decode JSON: %v", err)
 	}
-	if result.Error == nil || result.Error.Code != "missing_ruby" {
-		t.Fatalf("expected missing_ruby, got %#v", result.Error)
+	if result.Error == nil || result.Error.Code != "legacy_runtime_validate_removed" {
+		t.Fatalf("expected legacy_runtime_validate_removed, got %#v", result.Error)
 	}
 }
 
@@ -84,12 +83,12 @@ func TestRuntimeValidateDefaultNativeDoesNotNeedRuby(t *testing.T) {
 	}
 }
 
-func TestRuntimeRefreshDryRunPlansWrapperCommands(t *testing.T) {
+func TestRuntimeRefreshDryRunPlansNativeActions(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--dry-run", "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--dry-run", "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
 	}
@@ -102,10 +101,10 @@ func TestRuntimeRefreshDryRunPlansWrapperCommands(t *testing.T) {
 		t.Fatalf("unexpected result identity: %#v", result)
 	}
 	if len(result.PlannedActions) != 6 {
-		t.Fatalf("expected six planned refresh steps, got %#v", result.PlannedActions)
+		t.Fatalf("expected six planned native refresh actions, got %#v", result.PlannedActions)
 	}
-	if !strings.Contains(result.PlannedActions[0], "generate-model-context-report.rb --write") {
-		t.Fatalf("expected first planned step to write model context report, got %#v", result.PlannedActions)
+	if !strings.Contains(result.PlannedActions[0], "write native refresh report") {
+		t.Fatalf("expected first planned action to write native report, got %#v", result.PlannedActions)
 	}
 	if len(result.Mutations) != 0 {
 		t.Fatalf("runtime refresh dry-run must not mutate, got %#v", result.Mutations)
@@ -146,192 +145,22 @@ func TestRuntimeRefreshDefaultNativeDoesNotNeedRuby(t *testing.T) {
 	}
 }
 
-func TestRuntimeRefreshExecutesOrderedSteps(t *testing.T) {
+func TestRuntimeRefreshBlocksRemovedLegacyWrapper(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
-	requireExecutableForTest(t, "ruby")
-	requireExecutableForTest(t, "sqlite3")
-	requireExecutableForTest(t, "git")
-	writeRuntimeRefreshRecorderScripts(t, repo, "")
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
-	if code != ExitSuccess {
-		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
+	if code != ExitInvalidUsage {
+		t.Fatalf("expected invalid usage, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
 	}
 
 	var result Result
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
 		t.Fatalf("decode JSON: %v", err)
 	}
-	for _, step := range runtimeRefreshSteps(repo) {
-		if !hasCheckStatus(result.Checks, step.name, "ok") {
-			t.Fatalf("expected ok check for %s, got %#v", step.name, result.Checks)
-		}
-	}
-
-	log := readTestFile(t, filepath.Join(repo, "refresh.log"))
-	expected := strings.Join([]string{
-		"model_context_report --write",
-		"model_checklists --write",
-		"knowledge_runtime_report --write",
-		"runtime_sqlite_index",
-		"runtime_sqlite_index_validation",
-		"knowledge_runtime_validation",
-	}, "\n") + "\n"
-	if log != expected {
-		t.Fatalf("unexpected refresh order:\n%s", log)
-	}
-}
-
-func TestRuntimeRefreshStopsOnFirstFailedStep(t *testing.T) {
-	repo := fakeRuntimeRepo(t)
-	requireExecutableForTest(t, "ruby")
-	requireExecutableForTest(t, "sqlite3")
-	requireExecutableForTest(t, "git")
-	writeRuntimeRefreshRecorderScripts(t, repo, "knowledge_runtime_report")
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
-	if code != ExitValidationFailed {
-		t.Fatalf("expected validation failure, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
-	}
-
-	var result Result
-	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		t.Fatalf("decode JSON: %v", err)
-	}
-	if result.Status != "blocked" || result.Error == nil || result.Error.Code != "runtime_refresh_failed" {
-		t.Fatalf("expected runtime_refresh_failed block, got %#v", result)
-	}
-	if !hasCheckStatus(result.Checks, "knowledge_runtime_report", "failed") {
-		t.Fatalf("expected failed check for knowledge_runtime_report, got %#v", result.Checks)
-	}
-	if hasCheckStatus(result.Checks, "runtime_sqlite_index", "ok") {
-		t.Fatalf("runtime_sqlite_index should not run after failed report step: %#v", result.Checks)
-	}
-
-	log := readTestFile(t, filepath.Join(repo, "refresh.log"))
-	expected := strings.Join([]string{
-		"model_context_report --write",
-		"model_checklists --write",
-		"knowledge_runtime_report --write",
-	}, "\n") + "\n"
-	if log != expected {
-		t.Fatalf("unexpected refresh order before failure:\n%s", log)
-	}
-}
-
-func TestRuntimeRefreshNativeReportsWritesGoReportsThenRunsRemainingRubySteps(t *testing.T) {
-	repo := fakeRuntimeRepo(t)
-	requireExecutableForTest(t, "ruby")
-	requireExecutableForTest(t, "sqlite3")
-	requireExecutableForTest(t, "git")
-	writeRuntimeRefreshRecorderScripts(t, repo, "")
-	writeRuntimeNativeReportSourceFixture(t, repo)
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--native-reports", "--json"}, &stdout, &stderr)
-	if code != ExitSuccess {
-		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
-	}
-
-	var result Result
-	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		t.Fatalf("decode JSON: %v", err)
-	}
-	if result.Mode != "wrapper_native_reports" {
-		t.Fatalf("expected wrapper_native_reports mode, got %#v", result.Mode)
-	}
-	for _, name := range []string{"knowledge_runtime_report", "model_context_report", "model_checklists", "runtime_sqlite_index", "runtime_sqlite_index_validation", "knowledge_runtime_validation"} {
-		if !hasCheckStatus(result.Checks, name, "ok") {
-			t.Fatalf("expected ok check for %s, got %#v", name, result.Checks)
-		}
-	}
-	if len(result.Mutations) != 3 {
-		t.Fatalf("expected three native report mutations, got %#v", result.Mutations)
-	}
-
-	log := readTestFile(t, filepath.Join(repo, "refresh.log"))
-	expected := strings.Join([]string{
-		"runtime_sqlite_index",
-		"runtime_sqlite_index_validation",
-		"knowledge_runtime_validation",
-	}, "\n") + "\n"
-	if log != expected {
-		t.Fatalf("unexpected remaining Ruby step order:\n%s", log)
-	}
-
-	expectedRuntimeReport, err := buildNativeKnowledgeRuntimeReport(repo)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got := readTestFile(t, filepath.Join(repo, "knowledge", "runtime", "runtime-report.md")); got != expectedRuntimeReport {
-		t.Fatalf("native runtime report content mismatch")
-	}
-}
-
-func TestRuntimeRefreshNativeReportsAndIndexSkipsRubyGenerators(t *testing.T) {
-	repo := fakeRuntimeRepo(t)
-	requireExecutableForTest(t, "ruby")
-	requireExecutableForTest(t, "sqlite3")
-	requireExecutableForTest(t, "git")
-	writeRuntimeRefreshRecorderScripts(t, repo, "")
-	writeRuntimeNativeReportSourceFixture(t, repo)
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--native-reports", "--native-index", "--json"}, &stdout, &stderr)
-	if code != ExitSuccess {
-		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
-	}
-
-	var result Result
-	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		t.Fatalf("decode JSON: %v", err)
-	}
-	if result.Mode != "wrapper_native_reports_index" {
-		t.Fatalf("expected wrapper_native_reports_index mode, got %#v", result.Mode)
-	}
-	for _, name := range []string{"knowledge_runtime_report", "model_context_report", "model_checklists", "runtime_sqlite_index", "runtime_sqlite_index_validation", "knowledge_runtime_validation"} {
-		if !hasCheckStatus(result.Checks, name, "ok") {
-			t.Fatalf("expected ok check for %s, got %#v", name, result.Checks)
-		}
-	}
-	if len(result.Mutations) != 4 {
-		t.Fatalf("expected four native mutations, got %#v", result.Mutations)
-	}
-
-	log := readTestFile(t, filepath.Join(repo, "refresh.log"))
-	expected := strings.Join([]string{
-		"runtime_sqlite_index_validation",
-		"knowledge_runtime_validation",
-	}, "\n") + "\n"
-	if log != expected {
-		t.Fatalf("unexpected remaining Ruby step order:\n%s", log)
-	}
-	assertSQLiteCountAtLeast(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"), "atoms", 1)
-}
-
-func TestRuntimeRefreshBlocksMissingRubyBeforeWrapper(t *testing.T) {
-	repo := fakeRuntimeRepo(t)
-	t.Setenv("PATH", emptyPathDir(t))
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
-	if code != ExitMissingDependency {
-		t.Fatalf("expected missing dependency, got %d; stderr=%s", code, stderr.String())
-	}
-
-	var result Result
-	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		t.Fatalf("decode JSON: %v", err)
-	}
-	if result.Error == nil || result.Error.Code != "missing_ruby" {
-		t.Fatalf("expected missing_ruby, got %#v", result.Error)
+	if result.Error == nil || result.Error.Code != "legacy_runtime_refresh_removed" {
+		t.Fatalf("expected legacy_runtime_refresh_removed, got %#v", result.Error)
 	}
 }
 
@@ -571,28 +400,35 @@ func TestRuntimeGoldenFixtureCoversGeneratedSurfaces(t *testing.T) {
 	ruby := requireExecutableForTest(t, "ruby")
 	requireExecutableForTest(t, "sqlite3")
 
-	runtimeReport := runRubyScript(t, repo, ruby, "scripts/generate-knowledge-runtime-report.rb")
+	runtimeReport, err := buildNativeKnowledgeRuntimeReport(repo)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if !strings.Contains(runtimeReport, "# Knowledge Runtime Report") || !strings.Contains(runtimeReport, "`route.bootstrap.ai-skill`") {
 		t.Fatalf("runtime report missing golden anchors")
 	}
 
-	modelReport := runRubyScript(t, repo, ruby, "scripts/generate-model-context-report.rb")
+	modelReport, err := buildNativeModelContextReport(repo)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if !strings.Contains(modelReport, "# Model Context Report") || !strings.Contains(modelReport, "## Profile View") {
 		t.Fatalf("model context report missing golden anchors")
 	}
 
-	modelChecklists := runRubyScript(t, repo, ruby, "scripts/generate-model-checklists.rb")
+	modelChecklists, err := buildNativeModelChecklists(repo)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if !strings.Contains(modelChecklists, "# Model Checklists") || !strings.Contains(modelChecklists, "## Profile Checklists") {
 		t.Fatalf("model checklists missing golden anchors")
 	}
 
 	temp := t.TempDir()
 	indexPath := filepath.Join(temp, "runtime-index.sqlite")
-	indexRel, err := filepath.Rel(repo, indexPath)
-	if err != nil {
+	if err := buildNativeRuntimeSQLiteIndex(repo, indexPath); err != nil {
 		t.Fatal(err)
 	}
-	runRubyScript(t, repo, ruby, "scripts/generate-runtime-sqlite-index.rb", "--output", filepath.ToSlash(indexRel))
 	assertSQLiteCountAtLeast(t, indexPath, "atoms", 60)
 	assertSQLiteCountAtLeast(t, indexPath, "sources", 50)
 	assertSQLiteScalar(t, indexPath, "SELECT COUNT(*) FROM fts WHERE fts MATCH '\"runtime\"'", "nonzero")
@@ -639,94 +475,28 @@ func TestNativeRuntimeCompilerSnapshotMatchesRubyCompiler(t *testing.T) {
 	}
 }
 
-func TestNativeModelContextReportMatchesRubyGenerator(t *testing.T) {
+func TestNativeRuntimeSQLiteIndexHasStableInvariants(t *testing.T) {
 	repo := repoRootForTest(t)
-	ruby := requireExecutableForTest(t, "ruby")
-
-	rubyOutput := runRubyScriptStdout(t, repo, ruby, "scripts/generate-model-context-report.rb")
-	goOutput, err := buildNativeModelContextReport(repo)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if goOutput != rubyOutput {
-		t.Fatalf("Go model context report does not match Ruby output: %s", firstStringDiff(goOutput, rubyOutput))
-	}
-}
-
-func TestNativeModelChecklistsMatchesRubyGenerator(t *testing.T) {
-	repo := repoRootForTest(t)
-	ruby := requireExecutableForTest(t, "ruby")
-
-	rubyOutput := runRubyScriptStdout(t, repo, ruby, "scripts/generate-model-checklists.rb")
-	goOutput, err := buildNativeModelChecklists(repo)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if goOutput != rubyOutput {
-		t.Fatalf("Go model checklists report does not match Ruby output: %s", firstStringDiff(goOutput, rubyOutput))
-	}
-}
-
-func TestNativeKnowledgeRuntimeReportMatchesRubyGenerator(t *testing.T) {
-	repo := repoRootForTest(t)
-	ruby := requireExecutableForTest(t, "ruby")
-
-	rubyOutput := runRubyScriptStdout(t, repo, ruby, "scripts/generate-knowledge-runtime-report.rb")
-	goOutput, err := buildNativeKnowledgeRuntimeReport(repo)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if goOutput != rubyOutput {
-		t.Fatalf("Go knowledge runtime report does not match Ruby output: %s", firstStringDiff(goOutput, rubyOutput))
-	}
-}
-
-func TestNativeRuntimeSQLiteIndexMatchesRubyInvariants(t *testing.T) {
-	repo := repoRootForTest(t)
-	ruby := requireExecutableForTest(t, "ruby")
-	requireExecutableForTest(t, "sqlite3")
 	temp := t.TempDir()
-	rubyPath := filepath.Join(temp, "ruby-runtime-index.sqlite")
 	goPath := filepath.Join(temp, "go-runtime-index.sqlite")
-	rubyRel, err := filepath.Rel(repo, rubyPath)
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	runRubyScript(t, repo, ruby, "scripts/generate-runtime-sqlite-index.rb", "--output", filepath.ToSlash(rubyRel))
 	if err := buildNativeRuntimeSQLiteIndex(repo, goPath); err != nil {
 		t.Fatal(err)
 	}
 
-	for _, table := range []string{"atoms", "sources", "edges", "fts"} {
-		rubyCount := sqliteCount(t, rubyPath, table)
-		goCount := sqliteCount(t, goPath, table)
-		if goCount != rubyCount {
-			t.Fatalf("%s count mismatch: go=%d ruby=%d", table, goCount, rubyCount)
-		}
-	}
-	if got, want := sqliteSourceChecksums(t, goPath), sqliteSourceChecksums(t, rubyPath); !reflect.DeepEqual(got, want) {
-		t.Fatalf("source checksums mismatch")
-	}
-	for _, table := range []string{"atoms", "sources", "edges", "fts"} {
-		if got, want := sqliteRows(t, goPath, table), sqliteRows(t, rubyPath, table); !reflect.DeepEqual(got, want) {
-			t.Fatalf("%s row-level mismatch: %s", table, firstRowDiff(got, want))
-		}
-	}
+	assertSQLiteCountAtLeast(t, goPath, "atoms", 60)
+	assertSQLiteCountAtLeast(t, goPath, "sources", 50)
+	assertSQLiteCountAtLeast(t, goPath, "edges", 1)
 	for _, keyword := range []string{"runtime", "feedback", "route"} {
 		query := "SELECT COUNT(*) FROM fts WHERE fts MATCH " + sqliteQuote(runtimeFTSMatchLiteral(keyword))
-		if got, want := sqliteScalarInt(t, goPath, query), sqliteScalarInt(t, rubyPath, query); got != want {
-			t.Fatalf("FTS hit mismatch for %q: go=%d ruby=%d", keyword, got, want)
+		if got := sqliteScalarInt(t, goPath, query); got == 0 {
+			t.Fatalf("expected FTS hits for %q", keyword)
 		}
 	}
 }
 
-func TestNativeRuntimeSQLiteIndexMatchesRubyRecursiveFeedback(t *testing.T) {
-	ruby := requireExecutableForTest(t, "ruby")
-	requireExecutableForTest(t, "sqlite3")
-	sourceRepo := repoRootForTest(t)
+func TestNativeRuntimeSQLiteIndexIncludesRecursiveFeedback(t *testing.T) {
 	repo := t.TempDir()
-	copyFile(t, filepath.Join(sourceRepo, "scripts", "generate-runtime-sqlite-index.rb"), filepath.Join(repo, "scripts", "generate-runtime-sqlite-index.rb"))
 	writeFile(t, filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"), "records: []\n")
 	writeFile(t, filepath.Join(repo, "skills", "demo", "feedback_history", "nested", "lesson.md"), `# Feedback Lesson
 
@@ -738,34 +508,12 @@ Status: promoted
 Recursive feedback summary.
 `)
 	temp := t.TempDir()
-	rubyPath := filepath.Join(temp, "ruby-feedback.sqlite")
 	goPath := filepath.Join(temp, "go-feedback.sqlite")
-	rubyRel, err := filepath.Rel(repo, rubyPath)
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	runRubyScript(t, repo, ruby, "scripts/generate-runtime-sqlite-index.rb", "--output", filepath.ToSlash(rubyRel))
 	if err := buildNativeRuntimeSQLiteIndex(repo, goPath); err != nil {
 		t.Fatal(err)
 	}
-	for _, table := range []string{"atoms", "sources", "edges", "fts"} {
-		if got, want := sqliteRows(t, goPath, table), sqliteRows(t, rubyPath, table); !reflect.DeepEqual(got, want) {
-			t.Fatalf("%s recursive feedback rows mismatch: %s", table, firstRowDiff(got, want))
-		}
-	}
-}
-
-func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
-	repo := t.TempDir()
-	writeFile(t, filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb"), "# ok\n")
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "validate", "--repo", repo, "--legacy-wrapper", "--dry-run", "--json"}, &stdout, &stderr)
-	if code != ExitValidationFailed {
-		t.Fatalf("expected validation failure, got %d; stderr=%s", code, stderr.String())
-	}
+	assertSQLiteScalar(t, goPath, "SELECT COUNT(*) FROM atoms WHERE id = 'feedback.demo.lesson' AND source_path = 'skills/demo/feedback_history/nested/lesson.md'", "nonzero")
 }
 
 func TestRuntimeUnsupportedSubcommandReturnsInvalidUsage(t *testing.T) {
@@ -953,37 +701,10 @@ func TestNativeRuntimeIndexGitIgnoreCheckBlocksTrackedBoundary(t *testing.T) {
 func fakeRuntimeRepo(t *testing.T) string {
 	t.Helper()
 	repo := t.TempDir()
-	for _, name := range []string{
-		"generate-model-context-report.rb",
-		"generate-model-checklists.rb",
-		"generate-knowledge-runtime-report.rb",
-		"generate-runtime-sqlite-index.rb",
-		"refresh-knowledge-runtime.rb",
-		"validate-knowledge-runtime.rb",
-		"validate-runtime-db.rb",
-		"validate-runtime-sqlite-index.rb",
-	} {
-		writeFile(t, filepath.Join(repo, "scripts", name), "#!/usr/bin/env ruby\nputs 'ok'\n")
-	}
 	writeFile(t, filepath.Join(repo, "runtime", "compiler", "compiler-engine.rb"), "#!/usr/bin/env ruby\nputs 'compiled'\n")
 	copyFile(t, createNativeRuntimeDBFixture(t), filepath.Join(repo, "runtime", "runtime.db"))
 	createRuntimeIndexFixture(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
 	return repo
-}
-
-func writeRuntimeRefreshRecorderScripts(t *testing.T, repo string, failStep string) {
-	t.Helper()
-	for _, step := range runtimeRefreshSteps(repo) {
-		failLine := ""
-		if step.name == failStep {
-			failLine = "exit 7\n"
-		}
-		writeFile(t, step.path, fmt.Sprintf(`#!/usr/bin/env ruby
-line = ([%q] + ARGV).join(" ").strip
-File.open(File.join(Dir.pwd, "refresh.log"), "a") { |file| file.puts(line) }
-puts "#{line} ok"
-%s`, step.name, failLine))
-	}
 }
 
 func writeRuntimeNativeReportSourceFixture(t *testing.T, repo string) {
@@ -1022,40 +743,6 @@ edges:
   - type: depends_on
     target: CORE_BOOTSTRAP.md
 `)
-}
-
-func readTestFile(t *testing.T, path string) string {
-	t.Helper()
-	content, err := os.ReadFile(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return string(content)
-}
-
-func firstStringDiff(got string, want string) string {
-	limit := len(got)
-	if len(want) < limit {
-		limit = len(want)
-	}
-	for i := 0; i < limit; i++ {
-		if got[i] != want[i] {
-			return fmt.Sprintf("first diff at byte %d: got %q want %q", i, diffWindow(got, i), diffWindow(want, i))
-		}
-	}
-	return fmt.Sprintf("length mismatch: got %d bytes, want %d bytes", len(got), len(want))
-}
-
-func diffWindow(value string, index int) string {
-	start := index - 80
-	if start < 0 {
-		start = 0
-	}
-	end := index + 80
-	if end > len(value) {
-		end = len(value)
-	}
-	return value[start:end]
 }
 
 func createNativeRuntimeDBFixture(t *testing.T) string {
@@ -1205,7 +892,7 @@ func repoRootForTest(t *testing.T) string {
 		t.Fatal(err)
 	}
 	for {
-		if _, err := os.Stat(filepath.Join(dir, "scripts", "generate-knowledge-runtime-report.rb")); err == nil {
+		if _, err := os.Stat(filepath.Join(dir, "CORE_BOOTSTRAP.md")); err == nil {
 			return dir
 		}
 		parent := filepath.Dir(dir)
@@ -1233,20 +920,6 @@ func runRubyScript(t *testing.T, repo string, ruby string, script string, args .
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("ruby %s failed: %v\n%s", script, err, string(output))
-	}
-	return string(output)
-}
-
-func runRubyScriptStdout(t *testing.T, repo string, ruby string, script string, args ...string) string {
-	t.Helper()
-	cmd := exec.Command(ruby, append([]string{script}, args...)...)
-	cmd.Dir = repo
-	cmd.Env = runtimeWrapperEnv(os.Environ())
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	output, err := cmd.Output()
-	if err != nil {
-		t.Fatalf("ruby %s failed: %v\n%s", script, err, stderr.String())
 	}
 	return string(output)
 }

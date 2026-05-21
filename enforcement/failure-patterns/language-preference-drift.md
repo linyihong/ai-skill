@@ -76,7 +76,7 @@ Agent 在使用者用中文提問後，仍然用英文回應，因為：
 | **即時** | 輸出前語言檢查 | 在每次 `attempt_completion` 或產生結構化輸出前，先確認「使用者最後使用的語言是什麼」，然後設定「此回應全程使用該語言」。表格欄位、章節標題、分析段落都必須與正文語言一致。 |
 | **短期** | 加入 Custom Instructions 規則 | 在 `.roomodes` 或對應工具的 Custom Instructions 中加入：「所有輸出（包含表格、標題、分析報告、attempt_completion）都必須與使用者當前語言一致。如果使用者使用中文，所有內容（包括表格欄位、技術關鍵詞）都必須使用中文。」 |
 | **中期** | 建立語言一致性檢查清單 | 在產生結構化輸出前，逐項檢查：□ 表格欄位是否與正文語言一致？□ 章節標題是否與正文語言一致？□ 技術關鍵詞是否有中文翻譯或註解？□ attempt_completion 的結果描述是否與對話語言一致？ |
-| **長期** | 加入 validator 測試 | 在 `scripts/validate-knowledge-runtime.rb` 中加入語言一致性測試，掃描新建立的 `.md` 檔案，檢查表格欄位是否與檔案語言一致（需搭配語言偵測邏輯）。 |
+| **長期** | 加入 validator 測試 | 在 `ai-skill runtime validate` 中加入語言一致性測試，掃描新建立的 `.md` 檔案，檢查表格欄位是否與檔案語言一致（需搭配語言偵測邏輯）。 |
 
 #### 具體改善範例
 
@@ -144,7 +144,7 @@ Agent 在使用者用中文提問後，仍然用英文回應，因為：
 - 要求 agent 產生包含表格的結構化輸出，確認表格欄位與正文語言一致
 - 要求 agent 分析技術問題，確認關鍵詞有中文翻譯或註解
 - 檢查 `attempt_completion` 的結果描述是否與對話語言一致
-- 執行 `scripts/validate-knowledge-runtime.rb`，確認無語言一致性錯誤（若有實作）
+- 執行 `ai-skill runtime validate`，確認無語言一致性錯誤（若有實作）
 
 ## Linked Failure Patterns
 

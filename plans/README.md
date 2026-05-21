@@ -58,7 +58,7 @@
 | # | 檢查項目 | 說明 |
 |---|---------|------|
 | 1 | **確認所有項目已完成** | 檢查 plan 中所有 task 是否都標記為 `✅`，無遺漏項目 |
-| 2 | **執行 validator** | 若 plan 涉及 `knowledge/`、`validation/`、`intelligence/` 等層，執行 `ruby scripts/refresh-knowledge-runtime.rb` |
+| 2 | **執行 validator** | 若 plan 涉及 `knowledge/`、`validation/`、`intelligence/` 等層，執行 `ai-skill runtime refresh` |
 | 3 | **檢查連動更新** | 依 [`enforcement/linked-updates.md`](../enforcement/linked-updates.md) 檢查 plan 改動是否需要同步其他檔案 |
 | 4 | **更新 plans/README.md 狀態** | 將本 plan 在[目前狀態](#目前狀態)表格中的狀態改為 `✅ completed` |
 | 5 | **搬移至 archived/** | 將 plan 檔案從 `active/` 搬移至 `archived/`，檔名與內容不變 |
