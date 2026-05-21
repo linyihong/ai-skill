@@ -211,11 +211,21 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 	}
 
 	result.PlannedActions = append(result.PlannedActions, "run native runtime DB validation")
+	result.PlannedActions = append(result.PlannedActions, "parse all runtime YAML sources")
 	result.PlannedActions = append(result.PlannedActions, "run native runtime SQLite index validation")
 	result.PlannedActions = append(result.PlannedActions, "run native knowledge runtime validation")
 
 	if opts.dryRun {
 		result.Checks = append(result.Checks, Check{Name: "native_mode", Status: "ok", Message: "dry-run only; validators not executed"})
+		return result
+	}
+
+	yamlSyntaxCheck := runtimeYAMLSyntaxValidation(repo)
+	result.Checks = append(result.Checks, yamlSyntaxCheck)
+	if yamlSyntaxCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "runtime_yaml_syntax_failed", Message: yamlSyntaxCheck.Message, Remediation: "Fix runtime/**/*.yaml syntax before compiling runtime.db."}
 		return result
 	}
 
@@ -1191,7 +1201,7 @@ var nativeRuntimeRequiredTables = []string{
 	"transaction_states", "transaction_transitions", "transaction_rules", "transaction_templates",
 	"activation_rules", "core_bootstrap_rules",
 	"discovery_checkpoints", "discovery_search_strategy",
-	"generated_surfaces", "compiler_metadata",
+	"decision_recording", "generated_surfaces", "compiler_metadata",
 	"runtime_budget", "context_ttl_policy", "circuit_breaker", "context_pollution",
 	"context_health_score", "intelligence_routing", "obligation_ledger",
 	"language_policy", "output_rules", "governance_gates", "blocking_gates",
@@ -1207,7 +1217,7 @@ var nativeRuntimeRequiredTables = []string{
 var nativeRuntimeMinimumRows = map[string]int{
 	"phases": 8, "obligations": 15, "gates": 15, "activation_rules": 10,
 	"core_bootstrap_rules": 2, "discovery_checkpoints": 3, "compiler_metadata": 2,
-	"runtime_budget": 1, "context_ttl_policy": 1, "circuit_breaker": 1,
+	"decision_recording": 1, "runtime_budget": 1, "context_ttl_policy": 1, "circuit_breaker": 1,
 	"context_pollution": 1, "context_health_score": 1, "intelligence_routing": 1,
 	"obligation_ledger": 1, "language_policy": 1, "output_rules": 1,
 	"governance_gates": 1, "blocking_gates": 1, "phase_machine": 1,
@@ -1264,6 +1274,40 @@ func nativeRuntimeDBValidation(path string) Check {
 		message += "; warning: " + warning
 	}
 	return Check{Name: "runtime_db_native", Status: "ok", Message: message}
+}
+
+func runtimeYAMLSyntaxValidation(repo string) Check {
+	runtimeDir := filepath.Join(repo, "runtime")
+	info, err := os.Stat(runtimeDir)
+	if err != nil || !info.IsDir() {
+		return Check{Name: "runtime_yaml_syntax", Status: "failed", Message: "runtime directory not found: " + runtimeDir}
+	}
+	count := 0
+	if err := filepath.WalkDir(runtimeDir, func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if entry.IsDir() || filepath.Ext(path) != ".yaml" {
+			return nil
+		}
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		var parsed any
+		if err := yaml.Unmarshal(content, &parsed); err != nil {
+			rel, relErr := filepath.Rel(repo, path)
+			if relErr != nil {
+				rel = path
+			}
+			return fmt.Errorf("%s: %w", filepath.ToSlash(rel), err)
+		}
+		count++
+		return nil
+	}); err != nil {
+		return Check{Name: "runtime_yaml_syntax", Status: "failed", Message: err.Error()}
+	}
+	return Check{Name: "runtime_yaml_syntax", Status: "ok", Message: fmt.Sprintf("%d runtime YAML files parsed", count)}
 }
 
 func nativeIntegrityCheck(db *sql.DB) error {

@@ -29,6 +29,9 @@ type compilerMapping struct {
 }
 
 func buildNativeRuntimeDBFromSources(repo string, outputDB string) Check {
+	if check := runtimeYAMLSyntaxValidation(repo); check.Status != "ok" {
+		return Check{Name: "runtime_compile_native", Status: "failed", Message: check.Message}
+	}
 	tempDB := outputDB
 	if filepath.Clean(outputDB) == filepath.Clean(filepath.Join(repo, "runtime", "runtime.db")) {
 		tempDB = outputDB + ".tmp"
@@ -82,6 +85,7 @@ func createGoRuntimeSchema(db *sql.DB) error {
 		`CREATE TABLE core_bootstrap_rules (rule_id TEXT PRIMARY KEY, ordinal INTEGER DEFAULT 0);`,
 		`CREATE TABLE discovery_checkpoints (id INTEGER PRIMARY KEY AUTOINCREMENT, phase TEXT NOT NULL, trigger TEXT NOT NULL, description TEXT, discovery_targets TEXT, metadata TEXT);`,
 		`CREATE TABLE discovery_search_strategy (id INTEGER PRIMARY KEY AUTOINCREMENT, priority_order TEXT, fallback TEXT, min_confidence_threshold TEXT);`,
+		`CREATE TABLE decision_recording (id INTEGER PRIMARY KEY AUTOINCREMENT, section TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE compiler_metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);`,
 		`CREATE TABLE generated_surfaces (id INTEGER PRIMARY KEY AUTOINCREMENT, source_path TEXT NOT NULL, target_key TEXT NOT NULL, compile_rule TEXT NOT NULL, compiled_at TEXT NOT NULL, compiler_version TEXT NOT NULL, status TEXT NOT NULL, data TEXT NOT NULL, UNIQUE(source_path, target_key));`,
 		`CREATE TABLE runtime_budget (id INTEGER PRIMARY KEY AUTOINCREMENT, model_name TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
@@ -258,6 +262,7 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 	}{
 		{"runtime/budget/token-budget.yaml", "runtime_budget", "model_name", "per_model", []string{"name", "model"}},
 		{"runtime/context/ttl-policy.yaml", "context_ttl_policy", "ttl_type", "rules", []string{"name", "id"}},
+		{"runtime/decisions/decision-recording.yaml", "decision_recording", "section", "", nil},
 		{"runtime/discovery/capability-checkpoints.yaml", "capability_checkpoints", "checkpoint_id", "checkpoints", []string{"phase", "name"}},
 		{"runtime/distributed/distributed-locks.yaml", "distributed_locks", "lock_name", "locks", []string{"name", "id", "state"}},
 		{"runtime/distributed/multi-agent-coordination.yaml", "multi_agent_coordination", "rule_id", "coordination_rules", []string{"name", "id", "rule_id"}},

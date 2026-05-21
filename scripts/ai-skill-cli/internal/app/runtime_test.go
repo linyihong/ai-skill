@@ -33,8 +33,8 @@ func TestRuntimeValidateDryRunPlansValidators(t *testing.T) {
 	if result.Command != "runtime validate" || result.Mode != "dry_run" {
 		t.Fatalf("unexpected result identity: %#v", result)
 	}
-	if len(result.PlannedActions) != 3 {
-		t.Fatalf("expected three planned validators, got %#v", result.PlannedActions)
+	if len(result.PlannedActions) != 4 {
+		t.Fatalf("expected four planned validators, got %#v", result.PlannedActions)
 	}
 	if len(result.Mutations) != 0 {
 		t.Fatalf("runtime validate dry-run must not mutate, got %#v", result.Mutations)
@@ -380,6 +380,7 @@ func TestRuntimeGoldenFixtureCoversGeneratedSurfaces(t *testing.T) {
 		t.Fatalf("native compiler failed: %#v", check)
 	}
 	assertSQLiteCountAtLeast(t, runtimeDBPath, "generated_surfaces", 1)
+	assertSQLiteScalar(t, runtimeDBPath, "SELECT COUNT(*) FROM decision_recording WHERE section = '__config__'", "nonzero")
 	assertSQLiteScalar(t, runtimeDBPath, "SELECT COUNT(*) FROM generated_surfaces WHERE source_path = 'plans/active/*.md'", "nonzero")
 	assertSQLiteScalar(t, runtimeDBPath, "SELECT COUNT(*) FROM compiler_metadata WHERE key = 'compiler_version'", "nonzero")
 }
@@ -414,7 +415,24 @@ func TestNativeRuntimeCompilerBuildsFromSources(t *testing.T) {
 
 	assertSQLiteCountAtLeast(t, nativeDB, "generated_surfaces", 1)
 	assertSQLiteCountAtLeast(t, nativeDB, "compiler_rules", 1)
+	assertSQLiteCountAtLeast(t, nativeDB, "decision_recording", 1)
 	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM compiler_metadata WHERE value = '2.0.0'", "nonzero")
+}
+
+func TestRuntimeValidateParsesAllRuntimeYAML(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	writeFile(t, filepath.Join(repo, "runtime", "decisions", "broken.yaml"), "broken: [\n")
+
+	result := buildRuntimeValidateResult(runtimeOptions{repoPath: repo})
+	if result.ExitCode != ExitValidationFailed {
+		t.Fatalf("expected runtime YAML syntax failure, got %#v", result)
+	}
+	if result.Error == nil || result.Error.Code != "runtime_yaml_syntax_failed" {
+		t.Fatalf("expected runtime_yaml_syntax_failed, got %#v", result.Error)
+	}
+	if !strings.Contains(result.Error.Message, "runtime/decisions/broken.yaml") {
+		t.Fatalf("expected failing YAML path in error, got %#v", result.Error)
+	}
 }
 
 func TestNativeRuntimeSQLiteIndexHasStableInvariants(t *testing.T) {
