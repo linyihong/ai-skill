@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestRuntimeValidateDryRunPlansValidators(t *testing.T) {
@@ -219,6 +220,30 @@ func TestNativeRuntimeDBValidationBlocksInvalidJSON(t *testing.T) {
 	check := nativeRuntimeDBValidation(path)
 	if check.Status != "failed" || !strings.Contains(check.Message, "phases.entry_conditions") {
 		t.Fatalf("expected invalid JSON failure, got %#v", check)
+	}
+}
+
+func TestNativeRuntimeDBValidationReportsStaleCompilerMetadata(t *testing.T) {
+	path := createNativeRuntimeDBFixture(t)
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, err := db.Exec("UPDATE compiler_metadata SET value = ? WHERE key = 'compiled_at'", "2026-05-19T00:00:00Z"); err != nil {
+		t.Fatal(err)
+	}
+
+	originalNow := nativeRuntimeNow
+	nativeRuntimeNow = func() time.Time { return time.Date(2026, 5, 21, 12, 0, 0, 0, time.UTC) }
+	t.Cleanup(func() { nativeRuntimeNow = originalNow })
+
+	check := nativeRuntimeDBValidation(path)
+	if check.Status != "ok" {
+		t.Fatalf("stale metadata should warn without failing, got %#v", check)
+	}
+	if !strings.Contains(check.Message, "warning: runtime.db is 60.0 hours old") {
+		t.Fatalf("expected stale warning, got %#v", check)
 	}
 }
 

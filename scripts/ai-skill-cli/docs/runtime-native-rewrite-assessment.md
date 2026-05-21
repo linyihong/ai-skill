@@ -15,7 +15,7 @@
 
 | 舊入口 | 目前 CLI | Native 優先度 | 建議處置 | 必要 parity |
 | --- | --- | --- | --- | --- |
-| `scripts/validate-runtime-db.rb` | `ai-skill runtime validate` | 高 | 已開始 Go native slice。`modernc.org/sqlite` 已覆蓋 integrity、required tables、row count、JSON 與 compiler metadata；Ruby validator 暫保留作 parity guard。 | invalid DB、missing table、invalid JSON 已覆蓋；stale metadata fixture 待補。 |
+| `scripts/validate-runtime-db.rb` | `ai-skill runtime validate` | 高 | 已開始 Go native slice。`modernc.org/sqlite` 已覆蓋 integrity、required tables、row count、JSON、compiler metadata 與 stale metadata warning；Ruby validator 暫保留作 parity guard。 | invalid DB、missing table、invalid JSON、stale metadata fixture 已覆蓋。 |
 | `scripts/validate-runtime-sqlite-index.rb` | `ai-skill runtime validate` | 高 | 先改 Go native，但 FTS / checksum / git-ignore 檢查需拆分；SQLite 與 checksum 可 native，Git ignore 邊界仍需 external Git。 | missing DB、stale checksum、FTS count mismatch、git-ignore boundary fixture。 |
 | `scripts/query-runtime-index.rb` | `ai-skill runtime query` | 高 | 適合 Go native。查詢 SQLite / FTS、filter、limit 與 empty result 行為可直接測。 | ranking / filter / empty result / missing DB fixture。 |
 | `scripts/query-knowledge-graph.rb` | `ai-skill runtime query` | 中 | 可 Go native，但 YAML parsing 與 graph schema 需先固定 golden cases。 | source / target / type / keyword filter fixture。 |
@@ -31,6 +31,6 @@
 
 ## 下一步
 
-1. 補強 `runtime validate` native DB validator 的 stale compiler metadata fixture。
-2. 接著做 `runtime query` native read-only command，因為它無寫入且可用 fixture 固定輸出。
+1. 做 `runtime query` native read-only command，因為它無寫入且可用 fixture 固定輸出。
+2. 繼續拆 `runtime validate` 的 SQLite index validator native slice：checksum / FTS 可 native，git-ignore boundary 仍需 external Git。
 3. Generator / compiler 只能在 golden fixture 與 Ruby vs Go parity test 完成後替換。

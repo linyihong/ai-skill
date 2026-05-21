@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type runtimeOptions struct {
@@ -410,10 +411,15 @@ func nativeRuntimeDBValidation(path string) Check {
 	if err := nativeJSONColumnsCheck(db); err != nil {
 		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
 	}
-	if err := nativeCompilerMetadataCheck(db); err != nil {
+	warning, err := nativeCompilerMetadataCheck(db)
+	if err != nil {
 		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
 	}
-	return Check{Name: "runtime_db_native", Status: "ok", Message: "Go native runtime.db integrity, schema, row count, JSON, and compiler metadata checks passed"}
+	message := "Go native runtime.db integrity, schema, row count, JSON, and compiler metadata checks passed"
+	if warning != "" {
+		message += "; warning: " + warning
+	}
+	return Check{Name: "runtime_db_native", Status: "ok", Message: message}
 }
 
 func nativeIntegrityCheck(db *sql.DB) error {
@@ -505,10 +511,12 @@ func nativeJSONColumnsCheck(db *sql.DB) error {
 	return nil
 }
 
-func nativeCompilerMetadataCheck(db *sql.DB) error {
+var nativeRuntimeNow = time.Now
+
+func nativeCompilerMetadataCheck(db *sql.DB) (string, error) {
 	rows, err := db.Query("SELECT key, value FROM compiler_metadata")
 	if err != nil {
-		return fmt.Errorf("compiler_metadata query failed: %w", err)
+		return "", fmt.Errorf("compiler_metadata query failed: %w", err)
 	}
 	defer rows.Close()
 
@@ -516,20 +524,28 @@ func nativeCompilerMetadataCheck(db *sql.DB) error {
 	for rows.Next() {
 		var key, value string
 		if err := rows.Scan(&key, &value); err != nil {
-			return err
+			return "", err
 		}
 		metadata[key] = value
 	}
 	if err := rows.Err(); err != nil {
-		return err
+		return "", err
 	}
 	if metadata["compiler_version"] == "" {
-		return fmt.Errorf("compiler_metadata missing compiler_version")
+		return "", fmt.Errorf("compiler_metadata missing compiler_version")
 	}
 	if metadata["compiled_at"] == "" {
-		return fmt.Errorf("compiler_metadata missing compiled_at")
+		return "", fmt.Errorf("compiler_metadata missing compiled_at")
 	}
-	return nil
+	compiledAt, err := time.Parse(time.RFC3339, metadata["compiled_at"])
+	if err != nil {
+		return "", fmt.Errorf("compiler_metadata compiled_at invalid: %w", err)
+	}
+	age := nativeRuntimeNow().Sub(compiledAt)
+	if age > 24*time.Hour {
+		return fmt.Sprintf("runtime.db is %.1f hours old (compiled at %s)", age.Hours(), metadata["compiled_at"]), nil
+	}
+	return "", nil
 }
 
 func requiredExecutable(name string, args []string, remediation string) (string, Check) {
