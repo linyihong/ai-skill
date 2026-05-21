@@ -293,9 +293,11 @@
 
 輸入：
 
-- `--keyword <term>`
-- `--source <path>`
-- `--table <name>`
+- `<query>` positional term 或 `--keyword <term>`
+- `--db <path>`
+- `--layer <name>`
+- `--type <name>`
+- `--status <name>`
 - `--limit <n>`
 - `--json`
 - `--plain`
@@ -307,6 +309,7 @@
 - Query 命令不得修改 SQLite DB 或 generated reports。
 - 查不到資料時回傳 success 並提供空 results，除非 requested table / DB schema 不存在。
 - `--json` results 必須包含 source path、rank / priority（若有）、match reason 與 validation signal（若有）。
+- Phase 3 初始 native slice 已覆蓋 `query-runtime-index.rb`：keyword / positional query、`--db`、`--layer`、`--type`、`--status`、`--limit`、empty result 與 missing DB；`query-knowledge-graph.rb` 尚未移植。
 
 ## 舊 Script 對應
 
@@ -321,7 +324,7 @@
 | `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` | Phase 2 先 wrapper，owner-group parity 後 native |
 | Runtime report / SQLite generators | `ai-skill runtime refresh` | Phase 3 先 wrapper，逐步 native |
 | Runtime validators | `ai-skill runtime validate` | Phase 3 先 wrapper |
-| Runtime query helpers | `ai-skill runtime query` | Phase 3 native 候選 |
+| Runtime query helpers | `ai-skill runtime query` | Phase 3 已開始 native query-runtime-index slice |
 | `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | Phase 3 先 wrapper；parity tests 通過後才 native |
 | Runtime migration / state helpers | `ai-skill runtime migrate` / `ai-skill runtime state init` | deferred，需另定命令 |
 | Tool-specific global setting helper | 無通用 CLI 預設 | tool-specific adapter |
@@ -364,3 +367,4 @@
 | `runtime refresh` | `knowledge/`、`feedback/`、runtime sources | generated reports、SQLite index | wrapper mode 可能需要 Ruby |
 | `runtime compile` | runtime compiler sources、prose sources | `runtime/runtime.db` | wrapper mode 可能需要 Ruby |
 | `runtime validate` | generated reports、runtime.db | 無 | native migration 後無外部依賴 |
+| `runtime query` | `knowledge/runtime/sqlite/runtime-index.sqlite` 或 `--db` 指定 SQLite index | 無 | 無 |

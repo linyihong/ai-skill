@@ -17,7 +17,7 @@
 | --- | --- | --- | --- | --- |
 | `scripts/validate-runtime-db.rb` | `ai-skill runtime validate` | 高 | 已開始 Go native slice。`modernc.org/sqlite` 已覆蓋 integrity、required tables、row count、JSON、compiler metadata 與 stale metadata warning；Ruby validator 暫保留作 parity guard。 | invalid DB、missing table、invalid JSON、stale metadata fixture 已覆蓋。 |
 | `scripts/validate-runtime-sqlite-index.rb` | `ai-skill runtime validate` | 高 | 先改 Go native，但 FTS / checksum / git-ignore 檢查需拆分；SQLite 與 checksum 可 native，Git ignore 邊界仍需 external Git。 | missing DB、stale checksum、FTS count mismatch、git-ignore boundary fixture。 |
-| `scripts/query-runtime-index.rb` | `ai-skill runtime query` | 高 | 適合 Go native。查詢 SQLite / FTS、filter、limit 與 empty result 行為可直接測。 | ranking / filter / empty result / missing DB fixture。 |
+| `scripts/query-runtime-index.rb` | `ai-skill runtime query` | 高 | 已開始 Go native slice。查詢 SQLite / FTS、filter、limit 與 empty result 行為已可直接測；不依賴外部 `sqlite3` CLI。 | ranking / filter / empty result / missing DB fixture 已覆蓋。 |
 | `scripts/query-knowledge-graph.rb` | `ai-skill runtime query` | 中 | 可 Go native，但 YAML parsing 與 graph schema 需先固定 golden cases。 | source / target / type / keyword filter fixture。 |
 | `scripts/generate-runtime-sqlite-index.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper，建立 golden SQLite index 後再 native。寫入 git-ignored DB，需驗證 deterministic rows / checksums / FTS。 | golden DB row counts、checksum、FTS fixture。 |
 | `scripts/generate-knowledge-runtime-report.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper，建立 golden Markdown output 後再 native。 | routing registry / summaries / graphs golden report。 |
@@ -31,6 +31,6 @@
 
 ## 下一步
 
-1. 做 `runtime query` native read-only command，因為它無寫入且可用 fixture 固定輸出。
-2. 繼續拆 `runtime validate` 的 SQLite index validator native slice：checksum / FTS 可 native，git-ignore boundary 仍需 external Git。
+1. 繼續拆 `runtime validate` 的 SQLite index validator native slice：checksum / FTS 可 native，git-ignore boundary 仍需 external Git。
+2. 補 `runtime query` 的 `query-knowledge-graph.rb` native slice，先固定 graph filter / empty result fixture。
 3. Generator / compiler 只能在 golden fixture 與 Ruby vs Go parity test 完成後替換。

@@ -28,6 +28,21 @@ type Result struct {
 	PlannedActions []string      `json:"planned_actions"`
 	Mutations      []string      `json:"mutations"`
 	Error          *CommandError `json:"error,omitempty"`
+	Results        []QueryResult `json:"results,omitempty"`
+}
+
+type QueryResult struct {
+	Rank        float64 `json:"rank"`
+	ID          string  `json:"id"`
+	SourcePath  string  `json:"source_path"`
+	Layer       string  `json:"layer"`
+	Type        string  `json:"type"`
+	Status      string  `json:"status"`
+	Priority    string  `json:"priority"`
+	Confidence  string  `json:"confidence"`
+	ContextCost string  `json:"context_cost"`
+	Summary     string  `json:"summary"`
+	MatchReason string  `json:"match_reason"`
 }
 
 func writeJSON(w io.Writer, result Result) error {
@@ -70,6 +85,17 @@ func writePlain(w io.Writer, result Result) error {
 		}
 		for _, mutation := range result.Mutations {
 			if _, err := fmt.Fprintf(w, "- %s\n", mutation); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(result.Results) > 0 {
+		if _, err := fmt.Fprintln(w, "Results:"); err != nil {
+			return err
+		}
+		for _, item := range result.Results {
+			if _, err := fmt.Fprintf(w, "- %s (%s): %s\n", item.ID, item.SourcePath, item.Summary); err != nil {
 				return err
 			}
 		}

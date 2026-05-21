@@ -147,6 +147,94 @@ func TestRuntimeCompileBlocksMissingRubyBeforeWrapper(t *testing.T) {
 	}
 }
 
+func TestRuntimeQueryReturnsRankedResults(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	createRuntimeIndexFixture(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "query", "--repo", repo, "--keyword", "phase", "--limit", "1", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Command != "runtime query" || result.Mode != "native" {
+		t.Fatalf("unexpected result identity: %#v", result)
+	}
+	if len(result.Results) != 1 {
+		t.Fatalf("expected one result, got %#v", result.Results)
+	}
+	if result.Results[0].ID != "phase-machine" || result.Results[0].SourcePath != "runtime/compiler/embedded_data.rb" {
+		t.Fatalf("unexpected top result: %#v", result.Results[0])
+	}
+	if len(result.Mutations) != 0 {
+		t.Fatalf("runtime query must not mutate, got %#v", result.Mutations)
+	}
+}
+
+func TestRuntimeQueryFiltersByLayerTypeStatus(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	createRuntimeIndexFixture(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "query", "--keyword", "phase", "--repo", repo, "--layer", "workflow", "--type", "guide", "--status", "candidate", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if len(result.Results) != 1 || result.Results[0].ID != "workflow-phase-guide" {
+		t.Fatalf("expected filtered workflow result, got %#v", result.Results)
+	}
+}
+
+func TestRuntimeQueryEmptyResultSucceeds(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	createRuntimeIndexFixture(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "query", "--repo", repo, "--keyword", "not-present", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if len(result.Results) != 0 {
+		t.Fatalf("expected empty results, got %#v", result.Results)
+	}
+}
+
+func TestRuntimeQueryBlocksMissingIndex(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "query", "--repo", repo, "--keyword", "phase", "--json"}, &stdout, &stderr)
+	if code != ExitValidationFailed {
+		t.Fatalf("expected validation failure, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Error == nil || result.Error.Code != "missing_runtime_index" {
+		t.Fatalf("expected missing runtime index, got %#v", result.Error)
+	}
+}
+
 func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
 	repo := t.TempDir()
 	writeFile(t, filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb"), "# ok\n")
@@ -328,6 +416,40 @@ func copyFile(t *testing.T, source string, target string) {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(target, content, 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func createRuntimeIndexFixture(t *testing.T, path string) {
+	t.Helper()
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, err := db.Exec(`
+CREATE TABLE atoms (
+  id TEXT PRIMARY KEY,
+  source_path TEXT,
+  layer TEXT,
+  type TEXT,
+  status TEXT,
+  priority TEXT,
+  confidence TEXT,
+  context_cost TEXT,
+  summary TEXT
+);
+CREATE VIRTUAL TABLE fts USING fts5(id UNINDEXED, content);
+INSERT INTO atoms VALUES
+  ('phase-machine', 'runtime/compiler/embedded_data.rb', 'runtime', 'reference', 'validated', 'P0', 'high', 'low', 'Phase machine runtime source.'),
+  ('workflow-phase-guide', 'workflow/software-delivery/execution-flow.md', 'workflow', 'guide', 'candidate', 'P2', 'medium', 'medium', 'Workflow phase guide.');
+INSERT INTO fts VALUES
+  ('phase-machine', 'phase phase phase machine runtime source'),
+  ('workflow-phase-guide', 'phase workflow guide');
+`); err != nil {
 		t.Fatal(err)
 	}
 }

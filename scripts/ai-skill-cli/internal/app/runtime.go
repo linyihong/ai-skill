@@ -18,8 +18,15 @@ type runtimeOptions struct {
 	dryRun        bool
 	assertSource  string
 	assertKeyword string
+	keyword       string
+	dbPath        string
+	layer         string
+	queryType     string
+	statusFilter  string
+	limit         int
 	jsonOutput    bool
 	plainOutput   bool
+	positionals   []string
 }
 
 type runtimeValidator struct {
@@ -29,11 +36,11 @@ type runtimeValidator struct {
 
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile> [flags]")
+		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query> [flags]")
 		return ExitInvalidUsage
 	}
-	opts := runtimeOptions{command: args[0]}
-	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" {
+	opts := runtimeOptions{command: args[0], limit: 8}
+	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" && opts.command != "query" {
 		_, _ = fmt.Fprintf(stderr, "unsupported runtime command: %s\n", opts.command)
 		return ExitInvalidUsage
 	}
@@ -43,11 +50,18 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview runtime wrapper scripts without executing")
 	fs.StringVar(&opts.assertSource, "assert-source", "", "source path expected in generated surfaces")
 	fs.StringVar(&opts.assertKeyword, "assert-keyword", "", "keyword expected in generated surfaces")
+	fs.StringVar(&opts.keyword, "keyword", "", "keyword or phrase to query in the runtime index")
+	fs.StringVar(&opts.dbPath, "db", "", "SQLite runtime index path")
+	fs.StringVar(&opts.layer, "layer", "", "filter runtime query results by layer")
+	fs.StringVar(&opts.queryType, "type", "", "filter runtime query results by type")
+	fs.StringVar(&opts.statusFilter, "status", "", "filter runtime query results by status")
+	fs.IntVar(&opts.limit, "limit", 8, "maximum runtime query results")
 	fs.BoolVar(&opts.jsonOutput, "json", false, "write machine-readable JSON output")
 	fs.BoolVar(&opts.plainOutput, "plain", false, "write human-readable output")
 	if err := fs.Parse(args[1:]); err != nil {
 		return ExitInvalidUsage
 	}
+	opts.positionals = fs.Args()
 	if opts.jsonOutput && opts.plainOutput {
 		_, _ = fmt.Fprintln(stderr, "--json and --plain are mutually exclusive")
 		return ExitInvalidUsage
@@ -72,6 +86,8 @@ func buildRuntimeResult(opts runtimeOptions) Result {
 	switch opts.command {
 	case "compile":
 		return buildRuntimeCompileResult(opts)
+	case "query":
+		return buildRuntimeQueryResult(opts)
 	case "refresh":
 		return buildRuntimeRefreshResult(opts)
 	default:
@@ -317,6 +333,75 @@ func buildRuntimeCompileResult(opts runtimeOptions) Result {
 	return result
 }
 
+func buildRuntimeQueryResult(opts runtimeOptions) Result {
+	result := Result{
+		Command:        "runtime query",
+		Mode:           "native",
+		Status:         "success",
+		ExitCode:       ExitSuccess,
+		Checks:         []Check{},
+		PlannedActions: []string{},
+		Mutations:      []string{},
+		Results:        []QueryResult{},
+	}
+	if opts.dryRun {
+		result.Mode = "dry_run"
+	}
+
+	repo, repoCheck := resolveExistingDir("repo", opts.repoPath)
+	result.Checks = append(result.Checks, repoCheck)
+	if repoCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitInvalidUsage
+		result.Error = &CommandError{Code: "invalid_repo", Message: repoCheck.Message, Remediation: "Pass --repo with the Ai-skill repository root."}
+		return result
+	}
+
+	keyword := strings.TrimSpace(opts.keyword)
+	if keyword == "" && len(opts.positionals) > 0 {
+		keyword = strings.TrimSpace(opts.positionals[0])
+	}
+	if keyword == "" {
+		result.Status = "blocked"
+		result.ExitCode = ExitInvalidUsage
+		result.Error = &CommandError{Code: "missing_keyword", Message: "runtime query requires --keyword or a positional query.", Remediation: "Pass a search term, for example: ai-skill runtime query --keyword phase."}
+		return result
+	}
+	if opts.limit < 1 {
+		result.Status = "blocked"
+		result.ExitCode = ExitInvalidUsage
+		result.Error = &CommandError{Code: "invalid_limit", Message: "--limit must be greater than zero.", Remediation: "Pass --limit with a positive integer."}
+		return result
+	}
+
+	dbPath := runtimeQueryDBPath(repo, opts.dbPath)
+	result.Checks = append(result.Checks, Check{Name: "runtime_index", Status: "ok", Message: dbPath})
+	result.PlannedActions = append(result.PlannedActions, "query native runtime index: "+dbPath)
+	if opts.dryRun {
+		result.Checks = append(result.Checks, Check{Name: "query_mode", Status: "ok", Message: "dry-run only; runtime index not queried"})
+		return result
+	}
+	if _, err := os.Stat(dbPath); err != nil {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "missing_runtime_index", Message: dbPath, Remediation: "Run ai-skill runtime refresh after runtime index generation is available."}
+		result.Checks[len(result.Checks)-1].Status = "missing"
+		return result
+	}
+
+	queryResults, err := runRuntimeIndexQuery(dbPath, keyword, opts)
+	if err != nil {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "runtime_query_failed", Message: err.Error(), Remediation: "Regenerate and validate the runtime SQLite index."}
+		result.Checks = append(result.Checks, Check{Name: "runtime_query", Status: "failed", Message: err.Error()})
+		return result
+	}
+	result.Results = queryResults
+	result.Checks = append(result.Checks, Check{Name: "runtime_query", Status: "ok", Message: fmt.Sprintf("%d result(s)", len(queryResults))})
+	return result
+}
+
 func runtimeValidators(repo string) []runtimeValidator {
 	return []runtimeValidator{
 		{name: "knowledge_runtime", path: filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb")},
@@ -340,6 +425,83 @@ func runtimeRefreshScripts(repo string) []string {
 		scripts = append(scripts, filepath.Join(repo, "scripts", name))
 	}
 	return scripts
+}
+
+func runtimeQueryDBPath(repo string, dbPath string) string {
+	if strings.TrimSpace(dbPath) == "" {
+		return filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
+	}
+	if filepath.IsAbs(dbPath) {
+		return filepath.Clean(dbPath)
+	}
+	return filepath.Join(repo, dbPath)
+}
+
+func runRuntimeIndexQuery(dbPath string, keyword string, opts runtimeOptions) ([]QueryResult, error) {
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	sqlText := `SELECT bm25(fts) AS rank,
+       atoms.id,
+       atoms.source_path,
+       atoms.layer,
+       atoms.type,
+       atoms.status,
+       atoms.priority,
+       atoms.confidence,
+       atoms.context_cost,
+       atoms.summary
+FROM fts
+JOIN atoms ON atoms.id = fts.id
+WHERE fts MATCH ?`
+	args := []any{runtimeFTSMatchLiteral(keyword)}
+	if opts.layer != "" {
+		sqlText += " AND atoms.layer = ?"
+		args = append(args, opts.layer)
+	}
+	if opts.queryType != "" {
+		sqlText += " AND atoms.type = ?"
+		args = append(args, opts.queryType)
+	}
+	if opts.statusFilter != "" {
+		sqlText += " AND atoms.status = ?"
+		args = append(args, opts.statusFilter)
+	}
+	sqlText += ` ORDER BY rank,
+       CASE atoms.priority WHEN 'P0' THEN 0 WHEN 'P1' THEN 1 WHEN 'P2' THEN 2 ELSE 3 END,
+       CASE atoms.confidence WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END,
+       CASE atoms.context_cost WHEN 'low' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END,
+       atoms.id
+LIMIT ?`
+	args = append(args, opts.limit)
+
+	rows, err := db.Query(sqlText, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results := []QueryResult{}
+	for rows.Next() {
+		var item QueryResult
+		if err := rows.Scan(&item.Rank, &item.ID, &item.SourcePath, &item.Layer, &item.Type, &item.Status, &item.Priority, &item.Confidence, &item.ContextCost, &item.Summary); err != nil {
+			return nil, err
+		}
+		item.MatchReason = "fts keyword match: " + keyword
+		results = append(results, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func runtimeFTSMatchLiteral(keyword string) string {
+	escaped := strings.ReplaceAll(keyword, `"`, `""`)
+	return `"` + escaped + `"`
 }
 
 var nativeRuntimeRequiredTables = []string{
