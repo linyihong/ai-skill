@@ -216,8 +216,8 @@ Completion criteria：
 Tasks：
 
 - [x] 在 `scripts/ai-skill-cli/` 新增 `go.mod` 與 CLI skeleton。
-- [ ] 建立 dependency policy：pure Go dependency 優先；需要 CGO、外部 binary 或平台 SDK 時必須列為 exception。
-- [ ] 選型 SQLite library，預設評估 `modernc.org/sqlite`，並記錄是否排除 `mattn/go-sqlite3` 作為預設方案。
+- [x] 建立 dependency policy：pure Go dependency 優先；需要 CGO、外部 binary 或平台 SDK 時必須列為 exception。
+- [x] 選型 SQLite library，預設評估 `modernc.org/sqlite`，並記錄是否排除 `mattn/go-sqlite3` 作為預設方案。
 - [ ] 實作 `ai-skill doctor`：檢查 Git external dependency、SQLite、Ruby、Python、repo root、write permission、hooksPath、PATH；其中缺 Git 必須明確提示安裝。
 - [ ] 實作 path / OS abstraction，禁止散落 OS-specific string manipulation。
 - [x] 建立 `--json` / `--plain` output contract。
@@ -227,7 +227,8 @@ Progress notes：
 
 - 已建立最小 `doctor` slice：platform、Git discovery、repo root、write permission 與 runtime DB presence checks；缺 Git 且傳入 `--require-git` 時回傳 `missing_dependency` / `missing_git`，且不產生 mutations。
 - 已建立 `doctor` unit tests，覆蓋缺 Git、`--require-git --json`、plain output 與 unknown command；尚未建立 GitHub Actions matrix。
-- `doctor` 尚未完成 SQLite pure-Go proof、Ruby / Python wrapper-mode diagnostics、hooksPath 與完整 PATH policy，因此主 task 保持未完成。
+- 已新增 [`dependency-policy.md`](../../scripts/ai-skill-cli/docs/dependency-policy.md)，確認 pure Go dependency 優先、Git 作為 external dependency、`modernc.org/sqlite` 作為預設 SQLite engine，且 `mattn/go-sqlite3` 不作為預設。
+- `doctor --check-runtime` 已用 `modernc.org/sqlite` 建立 in-memory query proof，並在找到 `runtime.db` 時執行 integrity check；尚未完成 Ruby / Python wrapper-mode diagnostics、hooksPath 與完整 PATH policy，因此主 task 保持未完成。
 
 Completion criteria：
 
@@ -362,19 +363,22 @@ Completion criteria：
 
 ### Phase 6：Deprecation & Closure（P2）
 
-**目標**：完成舊 script 到新 CLI 的治理閉環。
+**目標**：完成舊 script 到新 CLI 的治理閉環。所有 replacement 範圍內的舊 script 在新 CLI parity、fixtures、文件與 release gate 全部通過後，必須直接刪除；不得長期保留兩套入口造成 drift。只有 Git hook adapter、明確 `tool-specific` adapter，或使用者另行批准的短期 compatibility wrapper 可以保留，且必須有 owner、移除條件與期限。
 
 Tasks：
 
-- [ ] 更新 `scripts/README.md`：新 CLI 為 primary，舊 script 標記 deprecated / compatibility wrapper。
+- [ ] 更新 `scripts/README.md`：新 CLI 為 primary，列出舊 script 刪除順序、剩餘 adapter 例外與移除條件。
 - [ ] 更新 `enforcement/linked-updates.md` 中與 close-loop / scripts 有關的說明。
 - [ ] 更新必要的 git hook 文件與 ai-tools 文件。
+- [ ] 刪除已被 native CLI 或已驗證 wrapper replacement 覆蓋的舊 shell / Ruby / Python script；不得只標記 deprecated 後長期保留。
+- [ ] 若保留 thin wrapper，wrapper 必須只轉呼叫 `ai-skill`，並在同一階段記錄刪除日期或刪除條件。
 - [ ] 執行 Plan Completion Closure：validator、linked updates、`plans/README.md` 狀態、搬移 archived、commit / push、readback。
 
 Completion criteria：
 
-- 舊 script 不再是主要入口，或只作為 thin wrapper 呼叫 Go CLI。
+- replacement 範圍內的舊 script 已刪除；剩餘 hook / tool-specific adapter 都有明確保留原因、owner 與移除條件。
 - 所有文件、runtime generated surfaces、測試與 release artifact 一致。
+- `script-parity-inventory.md` 中每個舊入口都有最終 disposition：`deleted`、`hook adapter retained`、`tool-specific adapter retained` 或 `explicitly out of scope`。
 - plan 完成後移到 `plans/archived/` 或明確標註持續生效例外。
 
 ## Testing Strategy
@@ -432,7 +436,7 @@ Implementation phase 必須同步建立或更新：
 4. Phase 3 必須保守推進，先證明 pure Go SQLite 與 runtime assertion 可行；runtime compiler 不可在沒有 parity test 前替換。
 5. Phase 4 在 CLI 行為穩定後再做 release；release 目標是單一 binary，避免先發佈仍依賴 Ruby / Python / sqlite3 CLI 的不穩定工具。
 6. Phase 5 可以與 Phase 1-2 並行做 feasibility research，但不得阻塞桌面平台支援。
-7. Phase 6 只有在新 CLI 覆蓋主要能力且文件、測試、runtime surfaces 都通過後才能執行。
+7. Phase 6 只有在新 CLI 覆蓋主要能力且文件、測試、runtime surfaces 都通過後才能執行；執行時以刪除舊 script 為預設，保留 adapter 必須逐項例外化。
 
 ## Open Questions
 

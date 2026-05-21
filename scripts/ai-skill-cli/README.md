@@ -23,6 +23,6 @@ go run ./cmd/ai-skill doctor --json
 go run ./cmd/ai-skill doctor --require-git --plain
 ```
 
-Phase 1 目前不引入外部 Go dependency。Git 維持 desktop external dependency；SQLite library 選型仍以 pure Go SQLite 為目標，待後續 Phase 1 子項完成。
+Phase 1 採用 [`modernc.org/sqlite`](docs/dependency-policy.md) 作為 pure Go SQLite engine。Git 維持 desktop external dependency；Shell / Ruby / Python 只允許作為 wrapper-mode 過渡依賴。
 
 上游計畫：[`plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md`](../../plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md)

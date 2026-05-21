@@ -13,6 +13,7 @@
 | `deferred` | 不在第一批 CLI 取代範圍內，但必須保留可執行或明確列為後續工作。 |
 | `tool-specific` | 僅服務特定工具或本機設定，不應變成通用 CLI 預設行為。 |
 | `hook adapter` | Git hook 仍是 Git adapter surface；CLI 可安裝或觸發，但不取代 hook 本身。 |
+| `deleted` | 新 CLI parity、fixtures、文件與 release gate 通過後，舊入口已刪除。 |
 
 ## 高風險覆蓋規則
 
@@ -20,6 +21,7 @@
 - 會寫檔、commit、push、同步 tool mirror、更新 runtime.db、更新 generated reports 或寫入使用者設定的腳本，必須有 fixture 或 BDD scenario。
 - `close-loop`、`runtime refresh`、`runtime compile`、`init-project`、`sync-cursor-bundle` 是高風險路徑；缺少 parity 測試時不得宣稱 replacement 完成。
 - 手機與桌面支援決策不能只看新 CLI；必須確認舊腳本在該平台的不可攜假設已被新命令處理或明確排除。
+- Phase 6 closure 預設刪除 replacement 範圍內的舊 shell / Ruby / Python script。只有 `hook adapter`、`tool-specific` adapter 或明確短期 thin wrapper 可保留；保留時必須寫明 owner、移除條件與期限。
 
 ## 舊腳本功能盤點
 
@@ -71,3 +73,12 @@
 - [x] 高風險路徑已在 [`bdd-scenarios.md`](bdd-scenarios.md) 或 [`test-fixture-plan.md`](test-fixture-plan.md) 中出現。
 - [x] 若某舊能力被 `deferred` 或 `tool-specific`，已說明為何不阻擋 Phase 1。
 - [x] `command-contract.md` 只保留摘要表；完整 parity 以本文件為 source-of-truth。
+
+## Phase 6 刪除 Gate
+
+功能完成後，每個舊入口必須更新最終 disposition：
+
+- `native target` / `wrapper first` 完成 parity 並由新 CLI 覆蓋後，舊 script 必須刪除並改標 `deleted`。
+- `hook adapter` 可保留 hook surface，但安裝、檢查與文件應由 `ai-skill hooks install` 管理；保留原因必須寫清楚。
+- `tool-specific` adapter 若仍需要，必須留在工具 adapter 層，不得成為通用 CLI 預設；保留時寫明移除條件。
+- 若短期保留 thin wrapper，wrapper 只能轉呼叫 `ai-skill`，且必須在同一 closure 記錄刪除條件與期限。

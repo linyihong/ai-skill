@@ -317,6 +317,16 @@
 | `31` | generated_surface_stale | generated artifact 未同步 |
 | `40` | partial_close_loop_blocked | 會造成 partial close-loop，因此被阻斷 |
 
+## 舊 Script 刪除政策
+
+本 CLI 是 replacement 入口，不是永久新增第二套工具。當某個舊 script 的功能已由 `ai-skill` 命令覆蓋，且 parity fixture、BDD scenario、文件與 release gate 通過後，舊 script 必須刪除；不得只標記 deprecated 後長期保留。
+
+例外：
+
+- Git hook adapter 可保留 hook surface，但安裝、檢查與文件應由 `ai-skill hooks install` 管理。
+- Tool-specific adapter 可保留在工具層，但不得成為通用 CLI 預設。
+- 短期 thin wrapper 只能轉呼叫 `ai-skill`，並必須記錄 owner、刪除條件與期限。
+
 ## 副作用登錄表
 
 | 命令 | 讀取路徑 | 寫入路徑 | 外部依賴 |

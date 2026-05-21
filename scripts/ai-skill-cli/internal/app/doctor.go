@@ -1,6 +1,7 @@
 package app
 
 import (
+	"database/sql"
 	"fmt"
 	"io"
 	"os"
@@ -8,6 +9,8 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	_ "modernc.org/sqlite"
 )
 
 type doctorOptions struct {
@@ -105,6 +108,7 @@ func buildDoctorResult(opts doctorOptions) Result {
 	}
 
 	if opts.checkRuntime {
+		result.Checks = append(result.Checks, nativeSQLiteCheck())
 		result.Checks = append(result.Checks, runtimeDBCheck())
 	}
 
@@ -178,8 +182,42 @@ func runtimeDBCheck() Check {
 	}
 	for _, candidate := range candidates {
 		if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
-			return Check{Name: "runtime_db", Status: "ok", Message: candidate}
+			return runtimeDBIntegrityCheck(candidate)
 		}
 	}
 	return Check{Name: "runtime_db", Status: "missing", Message: "runtime/runtime.db not found from current working directory"}
+}
+
+func nativeSQLiteCheck() Check {
+	db, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		return Check{Name: "native_sqlite", Status: "failed", Message: err.Error()}
+	}
+	defer db.Close()
+
+	var value int
+	if err := db.QueryRow("SELECT 1").Scan(&value); err != nil {
+		return Check{Name: "native_sqlite", Status: "failed", Message: err.Error()}
+	}
+	if value != 1 {
+		return Check{Name: "native_sqlite", Status: "failed", Message: "unexpected SQLite result"}
+	}
+	return Check{Name: "native_sqlite", Status: "ok", Message: "modernc.org/sqlite in-memory query succeeded"}
+}
+
+func runtimeDBIntegrityCheck(path string) Check {
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		return Check{Name: "runtime_db", Status: "failed", Message: err.Error()}
+	}
+	defer db.Close()
+
+	var result string
+	if err := db.QueryRow("PRAGMA integrity_check").Scan(&result); err != nil {
+		return Check{Name: "runtime_db", Status: "failed", Message: err.Error()}
+	}
+	if result != "ok" {
+		return Check{Name: "runtime_db", Status: "failed", Message: result}
+	}
+	return Check{Name: "runtime_db", Status: "ok", Message: path}
 }

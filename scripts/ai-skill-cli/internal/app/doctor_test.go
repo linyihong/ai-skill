@@ -88,6 +88,29 @@ func TestDoctorPlainOutput(t *testing.T) {
 	}
 }
 
+func TestDoctorCheckRuntimeUsesNativeSQLite(t *testing.T) {
+	t.Setenv("PATH", emptyPathDir(t))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"doctor", "--check-runtime", "--json"}, &stdout, &stderr)
+
+	if code != ExitSuccess {
+		t.Fatalf("expected success exit, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if !hasCheckStatus(result.Checks, "native_sqlite", "ok") {
+		t.Fatalf("expected native_sqlite ok check, got %#v", result.Checks)
+	}
+	if !hasCheckStatus(result.Checks, "runtime_db", "missing") {
+		t.Fatalf("expected runtime_db missing check from isolated cwd, got %#v", result.Checks)
+	}
+}
+
 func emptyPathDir(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
