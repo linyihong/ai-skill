@@ -41,7 +41,7 @@ Decision memory replay 前必須檢查 status、supersession 與 compatibility s
 
 1. **Immutable**：Decision 一旦 accepted 就不修改；需要變更時建立新的 ADR 並標記舊的為 superseded。
 2. **Numbered**：ADR 使用流水號（ADR-001, ADR-002, ...）。
-3. **Linked**：每個 decision 連結到相關的 source files 或 decisions。
+3. **Linked**：每個 decision 連結到相關的 source files、constitution records 或 session decision records。
 4. **Searchable**：使用標準 front matter 格式。
 5. **Status check required**：Replay 前必須確認 decision 仍是 `accepted`，或明確處理 `proposed` / `deprecated` / `superseded`。
 6. **Supersession first**：若 decision 有 successor，優先讀 successor。
@@ -56,8 +56,20 @@ Decision memory replay 前必須檢查 status、supersession 與 compatibility s
 
 ## 與既有層的關係
 
-- `decisions/`：正式的 ADR 目錄（長期、跨專案的決策）
-- `runtime/decisions/`：machine-readable 決策寫入路由（close-loop）
-- `memory/summary/`：session summary 可連結到 decisions
-- `intelligence/`：engineering intelligence 可引用 decisions
+- `constitution/`：正式的 ADR / constitution 目錄（長期、跨專案、架構級不可逆決策）
+- `runtime/constitution/`：machine-readable 決策寫入路由（close-loop）
+- `memory/summary/`：session summary 可連結到 `memory/decision/` 或 `constitution/`
+- `intelligence/`：engineering intelligence 可引用 `constitution/`
 - `memory/retrieval-governance/`：定義 decision replay 的 activation threshold、status check 與 budget
+## Promotion Boundary
+
+`memory/decision/` is not an ADR waiting room. Promotion target depends on content:
+
+- 可執行規則 → `enforcement/`
+- reasoning heuristic → `intelligence/`
+- 操作流程 → `workflow/`
+- runtime gate → `runtime/runtime.db`
+- 架構級不可逆決策 → `constitution/ADR-*`
+- 專案限定決策 → `<PROJECT_ROOT>/docs/decisions/`
+
+詳細規則見 [`../../governance/lifecycle/decision-promotion-pipeline.md`](../../governance/lifecycle/decision-promotion-pipeline.md)。

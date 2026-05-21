@@ -1,0 +1,317 @@
+schema_version: "1.0"
+id: governance.lifecycle.knowledge-update-flow
+status: active
+owner_layer: governance
+source_markdown: governance/lifecycle/knowledge-update-flow.md
+
+runtime_projection:
+  enabled: true
+  target_key: governance.knowledge_update_flow.contract
+  surface: generated_surfaces
+
+purpose: >
+  Machine-checkable master contract for Ai-skill knowledge updates.
+  This file prevents agents from treating sub-pipelines as the full flow.
+
+activation:
+  applies_when:
+    - A change writes reusable knowledge into Ai-skill.
+    - A change adds or updates an intelligence atom, workflow step, analysis method, enforcement rule, validation scenario, memory entry, runtime surface, or feedback lesson.
+    - A session discovers a repeatable agent failure, reusable heuristic, routing rule, validation rule, replay knob, hook guard, or close-loop gap.
+  first_read_required: governance/lifecycle/knowledge-update-flow.yaml
+  companion_read_required: governance/lifecycle/knowledge-update-flow.md
+
+execution_rules:
+  strict_order: true
+  all_steps_require_status: true
+  allowed_statuses:
+    - done
+    - not_applicable
+    - blocked
+  subpipelines_cannot_replace_master_flow: true
+  block_commit_if_any_required_step_missing: true
+  block_commit_if_runtime_surface_required_but_not_validated: true
+  block_commit_if_readback_missing_after_push: true
+  final_report_must_include_step_status: true
+
+required_status_evidence:
+  done:
+    - evidence_path_or_command
+    - result_summary
+  not_applicable:
+    - reason
+  blocked:
+    - blocker
+    - attempted_recovery
+    - next_required_action
+
+steps:
+  - id: step_01_trigger_checkpoint
+    order: 1
+    name: Per-round knowledge update checkpoint
+    required: true
+    depends_on: []
+    read:
+      - feedback/feedback-lessons.md
+    must_decide:
+      - whether_this_round_created_reusable_knowledge
+      - whether_directory_structure_governance_is_required
+      - whether_a_decision_record_is_required
+    exit_gate:
+      - reusable knowledge decision is recorded
+      - project-only evidence is routed out of Ai-skill when applicable
+    blocks_if_missing:
+      - no explicit yes/no answer for reusable knowledge
+
+  - id: step_02_classification
+    order: 2
+    name: Classify the knowledge update
+    required_if: step_01_trigger_checkpoint is done and reusable_knowledge is true
+    depends_on:
+      - step_01_trigger_checkpoint
+    read:
+      - feedback/feedback-lessons.md
+      - governance/lifecycle/directory-structure-governance.md
+    must_decide:
+      - domain
+      - language_specificity
+      - target_layer
+      - whether_new_category_is_required
+      - whether_workflow_classification_must_change
+    exit_gate:
+      - domain and target layer are named
+      - new category decision is recorded
+    blocks_if_missing:
+      - target layer is inferred but not stated
+
+  - id: step_03_promotion_target
+    order: 3
+    name: Select promotion target
+    required_if: step_02_classification is done
+    depends_on:
+      - step_02_classification
+    read:
+      - feedback/promotion/README.md
+    must_decide:
+      - promotion_target
+      - whether_target_is_durable
+      - whether_memory_or_decision_tier_is_needed
+    exit_gate:
+      - promotion target is listed in the feedback lesson and final report
+    blocks_if_missing:
+      - durable target not named
+
+  - id: step_03a_target_language_check
+    order: 3.5
+    name: Target language check
+    required_if: step_03_promotion_target is done
+    depends_on:
+      - step_03_promotion_target
+    read:
+      - enforcement/neutral-language.md
+      - runtime/runtime.db
+    must_decide:
+      - target_document_language
+      - whether_neutral_language_gate_applies
+    exit_gate:
+      - reusable docs use the required language policy
+    blocks_if_missing:
+      - mixed language in reusable documentation without explicit reason
+
+  - id: step_04_feedback_lesson
+    order: 4
+    name: Write feedback lesson
+    required_if: reusable_knowledge is true
+    depends_on:
+      - step_03a_target_language_check
+    read:
+      - feedback/feedback-lessons.md
+    writes:
+      - feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md
+    required_fields:
+      - One-line Summary
+      - Human Explanation
+      - Trigger
+      - Evidence
+      - Generalized Lesson
+      - Agent Action
+      - Goal / Action / Validation
+      - Applies When / Does Not Apply When
+      - Validation
+      - Promotion Target
+      - Required Linked Updates
+    exit_gate:
+      - lesson file exists or explicit not_applicable reason is recorded
+      - lesson contains Promotion Target and Required Linked Updates
+    blocks_if_missing:
+      - promotion without feedback lesson
+
+  - id: step_05_update_target_layer
+    order: 5
+    name: Update promoted target layer
+    required_if: step_03_promotion_target selected durable target
+    depends_on:
+      - step_04_feedback_lesson
+    read:
+      - feedback/promotion/README.md
+    allowed_targets:
+      - workflow/
+      - intelligence/
+      - analysis/
+      - enforcement/
+      - enforcement/failure-patterns/
+      - knowledge/
+      - metadata/
+      - runtime/
+      - memory/
+    exit_gate:
+      - target layer file is updated or explicit non-update reason is recorded
+    blocks_if_missing:
+      - feedback lesson exists but no promoted target update decision
+
+  - id: step_06_intelligence_extraction_decision
+    order: 6
+    name: Intelligence extraction decision
+    required: true
+    depends_on:
+      - step_05_update_target_layer
+    read:
+      - governance/lifecycle/intelligence-extraction-pipeline.md
+    execute_pipeline_if:
+      - change adds or modifies intelligence/
+      - change extracts a reusable heuristic, failure, signal, anti-pattern, tradeoff, or technique
+    exit_gate:
+      - decision is recorded as executed or not_applicable
+      - if executed, sub-pipeline status is summarized
+    blocks_if_missing:
+      - intelligence change without Step 6 decision
+
+  - id: step_07_failure_learning_decision
+    order: 7
+    name: Failure learning decision
+    required: true
+    depends_on:
+      - step_06_intelligence_extraction_decision
+    read:
+      - enforcement/failure-learning-system.md
+    execute_pipeline_if:
+      - change responds to agent failure
+      - change adds enforcement/failure-patterns/
+      - change fixes a skipped validation, source drift, close-loop gap, or repeated process miss
+    exit_gate:
+      - decision is recorded as executed or not_applicable
+      - if executed, failure learning loop status is summarized
+    blocks_if_missing:
+      - process failure without Step 7 decision
+
+  - id: step_08_linked_updates
+    order: 8
+    name: Linked updates
+    required: true
+    depends_on:
+      - step_07_failure_learning_decision
+    read:
+      - enforcement/linked-updates.md
+      - governance/ai-runtime-governance/linked-update-governance.md
+    must_check:
+      - lesson Required Linked Updates
+      - target layer README or index
+      - routing registry
+      - summaries and graphs
+      - validation scenarios when failure-derived
+    exit_gate:
+      - required linked updates are applied or explicitly marked not_applicable
+    blocks_if_missing:
+      - required linked update omitted without reason
+
+  - id: step_09_runtime_surfaces
+    order: 9
+    name: Runtime surfaces
+    required: true
+    depends_on:
+      - step_08_linked_updates
+    read:
+      - knowledge/runtime/README.md
+      - runtime/README.md
+      - runtime/runtime.db
+    must_check:
+      - whether modified files match generated_surfaces.source_path
+      - whether modified files match compiler source mapping
+      - whether runtime/runtime.db must be recompiled and committed
+    commands_when_required:
+      - scripts/ai-skill-cli/bin/ai-skill-windows-amd64.exe runtime compile --native-compiler
+      - scripts/ai-skill-cli/bin/ai-skill-windows-amd64.exe runtime validate
+    exit_gate:
+      - runtime compile and validate ran when required
+      - runtime.db update is included when compile changes it
+      - blocked status is recorded if tool/runtime is unavailable
+    blocks_if_missing:
+      - runtime mapped source changed but runtime.db not validated
+
+  - id: step_10_validation
+    order: 10
+    name: Validation
+    required: true
+    depends_on:
+      - step_09_runtime_surfaces
+    read:
+      - enforcement/dependency-reading.md
+      - enforcement/sanitization.md
+      - governance/validation/README.md
+    must_check:
+      - git status
+      - diff review
+      - sanitization
+      - markdown links or relevant validators
+      - required linked updates
+    exit_gate:
+      - validation results are recorded
+    blocks_if_missing:
+      - commit attempted before validation status
+
+  - id: step_11_commit_push_readback
+    order: 11
+    name: Commit, push, and readback
+    required_if: user requested commit or close-loop requires writeback
+    depends_on:
+      - step_10_validation
+    read:
+      - enforcement/dependency-reading.md
+    must_check:
+      - git status before staging
+      - git diff before commit
+      - staged files include required runtime.db changes
+      - push result when push is required
+      - readback after push
+      - final clean status
+    exit_gate:
+      - commit/push/readback completed or explicit not_applicable reason is recorded
+    blocks_if_missing:
+      - push without readback
+      - runtime.db changed but not staged
+
+subpipeline_boundaries:
+  governance/lifecycle/intelligence-extraction-pipeline.md:
+    may_satisfy_only:
+      - step_06_intelligence_extraction_decision
+    cannot_satisfy:
+      - step_04_feedback_lesson
+      - step_07_failure_learning_decision
+      - step_09_runtime_surfaces
+      - step_11_commit_push_readback
+  enforcement/failure-learning-system.md:
+    may_satisfy_only:
+      - step_07_failure_learning_decision
+    cannot_satisfy:
+      - step_04_feedback_lesson
+      - step_08_linked_updates
+      - step_09_runtime_surfaces
+      - step_11_commit_push_readback
+
+final_report_template:
+  required: true
+  fields:
+    - step_id
+    - status
+    - evidence_or_reason
+    - blocking_follow_up

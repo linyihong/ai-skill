@@ -1,4 +1,4 @@
-version=repo-local
-source_commit=0ac218a
-built_at=2026-05-21T07:05:29Z
+version=repo-a93077c
+source_commit=a93077c
+built_at=2026-05-21T14:37:26Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64

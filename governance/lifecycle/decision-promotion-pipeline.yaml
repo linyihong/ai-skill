@@ -1,0 +1,105 @@
+schema_version: "1.0"
+id: governance.lifecycle.decision-promotion-pipeline
+status: active
+owner_layer: governance
+source_markdown: governance/lifecycle/decision-promotion-pipeline.md
+
+runtime_projection:
+  enabled: true
+  target_key: governance.decision_promotion_pipeline.contract
+  surface: generated_surfaces
+
+purpose: >
+  Routes runtime, session, project, and architecture decisions to the correct
+  durable layer. ADR is only one possible target, not the default endpoint.
+
+activation:
+  applies_when:
+    - a session decision may need durable storage
+    - a memory/decision entry may be promoted
+    - a feedback lesson changes durable decision policy
+    - a user asks whether something should become an ADR
+  first_read_required: governance/lifecycle/decision-promotion-pipeline.yaml
+  companion_read_required: governance/lifecycle/decision-promotion-pipeline.md
+
+classification:
+  required_questions:
+    - is_the_decision_session_scoped
+    - is_the_decision_project_specific
+    - does_it_affect_agent_execution
+    - is_it_a_reasoning_heuristic
+    - is_it_an_operational_workflow
+    - is_it_an_architecture_level_irreversible_decision
+    - does_it_need_runtime_projection
+
+promotion_targets:
+  executable_policy:
+    when:
+      - cross_agent_rule
+      - blocking_policy
+      - recurring_validated_failure_prevention
+    target: enforcement/
+    runtime_projection: required_if_execution_affecting
+  reasoning_heuristic:
+    when:
+      - heuristic
+      - tradeoff
+      - signal
+      - anti_pattern
+      - failure_judgment
+    target: intelligence/
+    runtime_projection: optional
+  operational_workflow:
+    when:
+      - repeatable_work_sequence
+      - artifact_gate
+      - execution_flow
+    target: workflow/
+    runtime_projection: required_if_execution_affecting
+  runtime_gate:
+    when:
+      - activation_rule
+      - phase_transition
+      - obligation
+      - blocking_gate
+      - executable_contract_projection
+    target: runtime/runtime.db
+    runtime_projection: required
+  architecture_constitution:
+    when:
+      - foundational_architecture_decision
+      - cross_session_and_cross_project
+      - expensive_to_reverse
+      - explains_why_system_is_shaped_this_way
+    target: constitution/ADR-*
+    runtime_projection: not_required
+  session_decision:
+    when:
+      - replay_value
+      - session_context
+      - not_yet_constitutional
+    target: memory/decision/
+    runtime_projection: not_required
+  project_decision:
+    when:
+      - project_specific
+      - local_product_or_sdk_context
+    target: <PROJECT_ROOT>/docs/decisions/
+    runtime_projection: not_required
+
+blocking_rules:
+  - id: no_default_adr_promotion
+    rule: Do not promote every repeated decision to constitution/ADR-*.
+    failure_action: classify_content_type_first
+  - id: runtime_effect_requires_projection
+    rule: Execution-affecting promotion must update runtime.db or an opt-in executable YAML contract.
+    failure_action: block_close_loop_until_runtime_surface_handled
+  - id: project_decision_stays_project_local
+    rule: Project-specific decisions stay in <PROJECT_ROOT>/docs/decisions/ unless generalized.
+    failure_action: sanitize_and_generalize_before_ai_skill_promotion
+
+exit_gate:
+  - promotion target selected by content type
+  - linked updates applied
+  - runtime projection handled when required
+  - constitution ADR created only when architecture_constitution criteria match

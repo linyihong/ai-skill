@@ -64,7 +64,7 @@
 | [`analysis-repo-methods.yaml`](analysis-repo-methods.yaml) | 連接 analysis/repo/ 的 7 個分析方法（靜態結構、依賴、entrypoint、技術債、文件恢復、追溯性、契約治理）與 skills 來源。 | `candidate` |
 | [`governance-layers.yaml`](governance-layers.yaml) | 連接 governance 所有子目錄（lifecycle、validation、cleanup、dependency）。 | `candidate` |
 | [`feedback-layers.yaml`](feedback-layers.yaml) | 連接 feedback 所有子目錄（extraction、refinement、replay、promotion、pipeline）。 | `candidate` |
-| [`decisions-adr.yaml`](decisions-adr.yaml) | 連接所有 ADR records（ADR-001 到 ADR-005）與 architecture、memory。 | `candidate` |
+| [`constitution-adr.yaml`](constitution-adr.yaml) | 連接所有 ADR records（ADR-001 到 ADR-005）與 architecture、memory。 | `candidate` |
 | [`memory-operations.yaml`](memory-operations.yaml) | 連接 memory selective replay、retrieval governance、goal ledger boundary、summary 與 validation scenarios。 | `candidate` |
 
 ## Graph 目的

@@ -1,0 +1,60 @@
+id: graph.constitution-adr
+source: constitution/README.md
+status: candidate
+summary: >
+  連接 constitution 層的所有 ADR records：ADR-001 到 ADR-007，
+  以及相關的 architecture、memory 層。
+edges:
+  - type: depends_on
+    target: constitution/README.md
+    reason: Decisions README 提供 ADR 生命週期、格式與現有 ADR 清單。
+    validation: README 定義 ADR 的必要格式與生命週期狀態。
+  - type: related_to
+    target: constitution/ADR-001-reference-first-migration-strategy.md
+    reason: ADR-001 — Reference-First Migration Strategy。決定以 reference-first 方式遷移舊 skill 內容到新分層。
+    validation: ADR 記錄 context、decision、consequences 與 alternatives。
+  - type: related_to
+    target: constitution/ADR-002-intelligence-vs-knowledge-separation.md
+    reason: ADR-002 — Intelligence vs Knowledge Separation。決定 intelligence/ 與 knowledge/ 的分離原則。
+    validation: ADR 記錄 context、decision、consequences 與 alternatives。
+  - type: related_to
+    target: constitution/ADR-003-three-layer-architecture.md
+    reason: ADR-003 — Three-Layer Architecture。決定 analysis/workflow/intelligence 三層架構。
+    validation: ADR 記錄 context、decision、consequences 與 alternatives。
+  - type: related_to
+    target: constitution/ADR-004-feedback-promotion-pipeline.md
+    reason: ADR-004 — Feedback Promotion Pipeline。決定 feedback lesson 的 promotion pipeline。
+    validation: ADR 記錄 context、decision、consequences 與 alternatives。
+  - type: related_to
+    target: constitution/ADR-005-memory-architecture.md
+    reason: ADR-005 — Memory Architecture。決定 memory/ 的子層拆分（working/summary/decision/episodic/project/failure）。
+    validation: ADR 記錄 context、decision、consequences 與 alternatives。
+  - type: related_to
+    target: constitution/ADR-006-registry-first-workflow-activation.md
+    reason: ADR-006 — Registry-First Workflow Activation。activation #27 + registry triggers，不為每 workflow 加列。
+    validation: ADR 記錄 context、decision、consequences 與 alternatives。
+  - type: related_to
+    target: constitution/ADR-007-constitution-and-decision-promotion-boundary.md
+    reason: ADR-007 — Constitution and Decision Promotion Boundary。formal ADR layer 改名為 constitution，並定義 content-based decision promotion target。
+    validation: ADR 記錄 context、decision、consequences 與 alternatives。
+  - type: related_to
+    target: runtime/runtime.db
+    reason: Runtime 決策紀錄路由（tier 分類與 close-loop 自問）。
+    validation: yaml 定義 tiers、routes、lookup.by_symptom。
+  - type: related_to
+    target: plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md
+    reason: ADR records 記錄了架構升級過程中的關鍵決策，與 upgrade plan 互補。
+    validation: upgrade plan 的 constitution/ 區段說明 ADR 的角色。
+  - type: related_to
+    target: memory/decision/README.md
+    reason: Decision memory 保存 session-level 的決策記錄，與 ADR 的架構級決策不同層級。
+    validation: memory/decision/README.md 說明與 constitution/ 的差異。
+  - type: routes_to
+    target: knowledge/runtime/routing-registry.yaml
+    reason: Registry 應提供 route.constitution.adr record。
+    validation: registry record 的 primary_source 指向 constitution/README.md。
+metadata:
+  priority: P2
+  confidence: high
+  compatibility_state: new-layer-promoted
+  last_checked: 2026-05-12

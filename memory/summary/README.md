@@ -23,7 +23,7 @@
 - {achievement 2}
 
 ## Key Decisions
-- {decision 1}（→ decisions/{decision-file}）
+- {decision 1}（→ constitution/{decision-file}）
 - {decision 2}
 
 ## Files Modified
@@ -43,7 +43,7 @@
 
 1. **Session boundary**：每個 session 結束時建立一個 summary。
 2. **Compressed**：每個 summary 不超過 500 tokens。
-3. **Link to decisions**：重要決策連結到 `memory/decision/` 或 `decisions/`。
+3. **Link to decisions**：重要決策連結到 `memory/decision/` 或 `constitution/`。
 4. **Searchable**：Summary 使用標準格式，支援全文搜尋。
 5. **Not current truth**：Summary 不得取代 current source reading。
 6. **Replay budget**：Summary replay 預設只讀 latest relevant summary；不足時回到 current source 或詢問使用者，不追溯 full transcript chain。

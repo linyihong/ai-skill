@@ -1,3 +1,16 @@
+## Owner-Layer Executable Contracts
+
+`runtime/` 不接收 governance、enforcement 或 workflow source ownership。流程型 source 若需要 YAML 化，YAML contract 留在原 owner layer，例如 `governance/`、`enforcement/`、`workflow/` 或 `metadata/rules/`。
+
+會影響 agent 執行的 YAML contract 必須設定：
+
+```yaml
+runtime_projection:
+  enabled: true
+```
+
+Runtime compiler 會把這類 contract 投影到 `runtime.db` 的 `generated_surfaces`。這與 runtime internal config 不同：runtime internal config 的 canonical copy 仍直接保存在 `runtime_config_documents` 與 projection tables，不再保留 committed `runtime/**/*.yaml` mirror。
+
 # Runtime
 
 本層是 Ai-skill 的可執行 runtime 層：只放機器可查、可驗證、可重建的結構化狀態。

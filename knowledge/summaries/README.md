@@ -24,6 +24,7 @@ Summaries 用來協助 agent：
 | `skill.app-development-guidance` | App/API/Embedded 開發 guidance、控制項、檢查清單。 | [`development-guidance.md`](development-guidance.md) |
 | `skill.travel-planning` | 依目的地/日期/交通規劃行程。 | [`travel-planning.md`](travel-planning.md) |
 | `governance.repo-maintenance` | Repo 維護、升級、遷移與治理。 | [`repo-governance.md`](repo-governance.md) |
+| `governance.executable-contract-boundary` | 流程 / gate / activation 文件何時需要 YAML contract，且如何投影到 runtime.db。 | [`executable-contract-boundary.md`](executable-contract-boundary.md) |
 | `knowledge.navigation` | 知識導航：indexes、summaries、graphs、runtime。 | [`knowledge-navigation.md`](knowledge-navigation.md) |
 | `runtime.operations` | Context routing、activation、TTL、pruning。 | [`runtime-operations.md`](runtime-operations.md) |
 | `runtime.prompt-cache-alignment` | Provider prompt cache layout：stable prefix、semi-stable middle、volatile suffix。 | [`prompt-cache-alignment.md`](prompt-cache-alignment.md) |

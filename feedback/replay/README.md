@@ -37,7 +37,7 @@
 2. 收集 replay 素材
    ├─ Session summary（memory/summary/）
    ├─ Failure record（enforcement/failure-patterns/ 或 feedback_history/）
-   ├─ Decision record（memory/decision/ 或 decisions/）
+   ├─ Decision record（memory/decision/ 或 constitution/）
    └─ Context health / circuit breaker 記錄（runtime/health/、runtime/README.md）
 
 3. 分析模式

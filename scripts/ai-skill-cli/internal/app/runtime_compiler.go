@@ -302,7 +302,7 @@ func runtimeConfigMappings() []runtimeConfigMapping {
 	return []runtimeConfigMapping{
 		{"runtime/budget/token-budget.yaml", "runtime_budget", "model_name", "per_model", []string{"name", "model"}},
 		{"runtime/context/ttl-policy.yaml", "context_ttl_policy", "ttl_type", "rules", []string{"name", "id"}},
-		{"runtime/decisions/decision-recording.yaml", "decision_recording", "section", "", nil},
+		{"runtime/constitution/decision-recording.yaml", "decision_recording", "section", "", nil},
 		{"runtime/discovery/capability-checkpoints.yaml", "capability_checkpoints", "checkpoint_id", "checkpoints", []string{"phase", "name"}},
 		{"runtime/distributed/distributed-locks.yaml", "distributed_locks", "lock_name", "locks", []string{"name", "id", "state"}},
 		{"runtime/distributed/multi-agent-coordination.yaml", "multi_agent_coordination", "rule_id", "coordination_rules", []string{"name", "id", "rule_id"}},
@@ -556,7 +556,57 @@ func compileProseRuntimeSources(repo string, db *sql.DB, docs map[string]map[str
 			}
 		}
 	}
+	if err := compileExecutableYAMLContracts(repo, db); err != nil {
+		return err
+	}
 	return nil
+}
+
+func compileExecutableYAMLContracts(repo string, db *sql.DB) error {
+	sourceRoots := []string{
+		"governance",
+		"enforcement",
+		"workflow",
+		filepath.ToSlash(filepath.Join("metadata", "rules")),
+	}
+	return filepath.Walk(repo, func(path string, info os.FileInfo, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if info == nil || info.IsDir() || !strings.HasSuffix(info.Name(), ".yaml") {
+			return nil
+		}
+		rel, err := filepath.Rel(repo, path)
+		if err != nil {
+			return err
+		}
+		rel = filepath.ToSlash(rel)
+		inContractRoot := false
+		for _, root := range sourceRoots {
+			if rel == root || strings.HasPrefix(rel, root+"/") {
+				inContractRoot = true
+				break
+			}
+		}
+		if !inContractRoot {
+			return nil
+		}
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		var data map[string]any
+		if err := yaml.Unmarshal(content, &data); err != nil {
+			return fmt.Errorf("compile %s: %w", rel, err)
+		}
+		normalized := runtimeMap(runtimeNormalizeYAML(data))
+		projection := runtimeMap(normalized["runtime_projection"])
+		if !runtimeBool(projection["enabled"]) {
+			return nil
+		}
+		targetKey := runtimeDefaultString(projection["target_key"], runtimeDefaultString(normalized["id"], rel))
+		return insertGeneratedSurface(db, rel, targetKey, "executable YAML contract", normalized)
+	})
 }
 
 func compileProseFile(repo string, path string, mapping compilerMapping) (map[string]any, string, error) {
@@ -928,6 +978,17 @@ func runtimeInt(value any) int {
 		return int(typed)
 	default:
 		return 0
+	}
+}
+
+func runtimeBool(value any) bool {
+	switch typed := value.(type) {
+	case bool:
+		return typed
+	case string:
+		return strings.EqualFold(typed, "true") || typed == "1" || strings.EqualFold(typed, "yes")
+	default:
+		return false
 	}
 }
 

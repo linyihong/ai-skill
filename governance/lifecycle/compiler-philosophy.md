@@ -29,3 +29,15 @@
 - [`scripts/ai-skill-cli/internal/app/runtime_compiler.go`](../../scripts/ai-skill-cli/internal/app/runtime_compiler.go) — Compiler implementation
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Source-target mapping rules
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Compiled SQLite surfaces (replaces `runtime/generated/`)
+## Executable YAML Contract Projection
+
+流程、gate、activation、blocking condition、required evidence 或 failure action 若需要 agent 直接執行，source 層必須提供 companion YAML contract。Contract 不搬進 `runtime/`；它留在 owner layer，並用以下欄位 opt in：
+
+```yaml
+runtime_projection:
+  enabled: true
+  target_key: governance.example.contract
+  surface: generated_surfaces
+```
+
+Compiler 只會投影 `runtime_projection.enabled: true` 的 contract，避免一般 metadata、graph、validation YAML 變成 runtime 噪音。投影目標是 `runtime.db` 的 `generated_surfaces`；runtime internal config 則仍由 `runtime_config_documents` / projection tables 管理。

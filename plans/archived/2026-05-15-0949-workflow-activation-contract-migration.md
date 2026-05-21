@@ -16,7 +16,7 @@
 | 更新 routing registry | Completed through `route.workflow.*` records and activation triggers. |
 | Validation scenario | Covered by routing/recovery validation surfaces; no separate activation-contract scan scenario is needed because the contract file approach was not adopted. |
 
-References: [`decisions/ADR-006-registry-first-workflow-activation.md`](../../decisions/ADR-006-registry-first-workflow-activation.md), [`workflow/workflow-routing.md`](../../workflow/workflow-routing.md), [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml).
+References: [`constitution/ADR-006-registry-first-workflow-activation.md`](../../constitution/ADR-006-registry-first-workflow-activation.md), [`workflow/workflow-routing.md`](../../workflow/workflow-routing.md), [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml).
 
 ## 問題
 

@@ -47,3 +47,8 @@
 - `enforcement/linked-updates.md`
 - `enforcement/dependency-reading.md`
 - `architecture/ai-native-knowledge-operating-system.md` 的 deprecation checklist
+## Executable Contract Boundary
+
+流程型治理或規則文件若含 step、trigger、`depends_on`、exit gate、blocking gate、required evidence 或 failure action，必須提供 companion YAML contract。YAML source 留在原 owner layer，例如 `governance/`、`enforcement/`、`workflow/` 或 `metadata/rules/`；會影響 agent 執行的 YAML contract 必須設定 `runtime_projection.enabled: true`，再由 runtime compiler 投影到 `runtime/runtime.db`。
+
+Agent 執行流程時優先讀 YAML contract；Markdown 保留說明、背景與維護脈絡。詳細規則與第一批候選清單見 [`lifecycle/executable-contract-boundary.md`](lifecycle/executable-contract-boundary.md) 與 [`lifecycle/executable-contract-boundary.yaml`](lifecycle/executable-contract-boundary.yaml)。

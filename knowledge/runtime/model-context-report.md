@@ -56,7 +56,8 @@
 | `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `index-only` | agent-architecture atoms 在需要理解 AI 行為模式時才讀取完整內容。 |
 | `route.feedback.history` | `feedback/history/README.md` | `index-only` | feedback/history 在需要查詢或新增 lesson 時才讀取。 |
 | `route.runtime.decision-recording` | `runtime/runtime.db` | `source-backed` | 避免決策只留在 plan 或對話；查問題時依 lookup.by_symptom 回溯。 |
-| `route.decisions.adr` | `decisions/README.md` | `summary-first` | decisions/ 在需要查詢歷史決策或建立新 ADR 時才讀取。 |
+| `route.constitution.adr` | `constitution/README.md` | `summary-first` | constitution/ 在需要查詢歷史決策或建立新 ADR 時才讀取。 |
+| `route.governance.decision-promotion-pipeline` | `governance/lifecycle/decision-promotion-pipeline.yaml` | `source-backed` | Load only when recording, promoting, or reclassifying a decision. |
 | `route.architecture.permanent-docs` | `architecture/README.md` | `summary-first` | architecture/ 在需要查詢架構定義或設計原則時才讀取。 |
 | `route.evaluations.scenario-results` | `evaluations/README.md` | `index-only` | evaluations/ 在需要查詢或記錄 scenario 執行結果時才讀取。 |
 | `route.tools.metadata-routing` | `tools/README.md` | `index-only` | tools/ 在需要查詢 tool 設定或 routing 規則時才讀取。 |
@@ -66,7 +67,8 @@
 | `route.runtime.intelligence-routing` | `runtime/runtime.db` | `index-only` | Intelligence routing 在需要領域知識時才載入，不佔用 bootstrap 預算。 |
 | `route.runtime.output-governance` | `runtime/README.md` | `source-backed` | Output Governance 在 validation 與 finalize phase 時才需要載入，不佔用 bootstrap 預算。 |
 | `route.runtime.distributed` | `runtime/README.md` | `source-backed` | Distributed Runtime 在 multi-agent 協作或 async job 執行時才需要載入，不佔用 bootstrap 預算。 |
-| `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.md` | `source-backed` | Knowledge Update Flow 在 checkpoint 或 finalize phase 需要執行知識更新時才載入，不佔用 bootstrap 預算。 |
+| `route.governance.executable-contract-boundary` | `governance/lifecycle/executable-contract-boundary.yaml` | `source-backed` | Executable Contract Boundary 在新增流程、gate、policy contract 或調整 runtime projection 時才需要載入。 |
+| `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.yaml` | `source-backed` | Knowledge Update Flow 在 checkpoint 或 finalize phase 需要執行知識更新時才載入，不佔用 bootstrap 預算。 |
 
 ### `specialized`
 
@@ -88,8 +90,8 @@
 | Compression level | Routes | Escalation note |
 | --- | --- | --- |
 | `index-only` | `route.skill.discovery`, `route.runtime.activation-rules`, `route.runtime.router-flow`, `route.intelligence.engineering.heuristics`, `route.runtime.context-ttl-doc`, `route.intelligence.engineering.agent-architecture`, `route.feedback.history`, `route.evaluations.scenario-results`, `route.tools.metadata-routing`, `route.traces.decision-traces`, `route.runtime.intelligence-routing` | 依 `models/compression/README.md` 的 escalation rules 判斷。 |
-| `source-backed` | `route.runtime.phase-machine`, `route.runtime.obligation-ledger`, `route.runtime.blocking-gates`, `route.runtime.recovery`, `route.runtime.scheduler`, `route.runtime.transactions`, `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.workflow.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing`, `route.memory.retrieval-activation`, `route.workflow.software-delivery`, `route.workflow.greenfield`, `route.workflow.travel-planning`, `route.runtime.decision-recording`, `route.runtime.compiler`, `route.runtime.output-governance`, `route.runtime.distributed`, `route.governance.knowledge-update-flow` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
-| `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.context-ttl`, `route.runtime.prompt-cache-alignment`, `route.governance.ai-runtime-five-step`, `route.runtime.context-loading`, `route.governance.routing-signal`, `route.governance.validation-scenario`, `route.governance.cognitive-state-evidence`, `route.workflow.documentation-ai-native`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.analysis.web`, `route.intelligence.apk-analysis.atoms`, `route.intelligence.requirements-cognition`, `route.intelligence.architectural-fit`, `route.validation.ai-decision-contract`, `route.decisions.adr`, `route.architecture.permanent-docs`, `route.anti-patterns.runtime-patterns` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
+| `source-backed` | `route.runtime.phase-machine`, `route.runtime.obligation-ledger`, `route.runtime.blocking-gates`, `route.runtime.recovery`, `route.runtime.scheduler`, `route.runtime.transactions`, `route.governance.durable-goal-boundary`, `route.metadata.knowledge-atom-schema`, `route.workflow.apk-analysis`, `route.intelligence.apk-highest-leverage-path`, `route.feedback.promotion-pipeline`, `route.models.model-aware-routing`, `route.memory.retrieval-activation`, `route.workflow.software-delivery`, `route.workflow.greenfield`, `route.workflow.travel-planning`, `route.runtime.decision-recording`, `route.governance.decision-promotion-pipeline`, `route.runtime.compiler`, `route.runtime.output-governance`, `route.runtime.distributed`, `route.governance.executable-contract-boundary`, `route.governance.knowledge-update-flow` | 需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。 |
+| `summary-first` | `route.bootstrap.ai-skill`, `route.runtime.context-ttl`, `route.runtime.prompt-cache-alignment`, `route.governance.ai-runtime-five-step`, `route.runtime.context-loading`, `route.governance.routing-signal`, `route.governance.validation-scenario`, `route.governance.cognitive-state-evidence`, `route.workflow.documentation-ai-native`, `route.runtime.onboarding`, `route.analysis.apk.workflows`, `route.analysis.web`, `route.intelligence.apk-analysis.atoms`, `route.intelligence.requirements-cognition`, `route.intelligence.architectural-fit`, `route.validation.ai-decision-contract`, `route.constitution.adr`, `route.architecture.permanent-docs`, `route.anti-patterns.runtime-patterns` | 適合先用 registry / summary 判斷 relevance；修改 source 時升級。 |
 
 ## Agent Output Shape
 

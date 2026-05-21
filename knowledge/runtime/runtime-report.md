@@ -6,12 +6,12 @@
 
 | Surface | Path | Count / Status |
 | --- | --- | --- |
-| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 51 records |
+| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 53 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
 | SQLite runtime index | [`sqlite/`](sqlite/) | generated lookup cache prototype |
-| Summaries | [`../summaries/`](../summaries/) | 20 files |
+| Summaries | [`../summaries/`](../summaries/) | 21 files |
 | Graph records | [`../graphs/`](../graphs/) | 33 files |
 
 ## Routing Records
@@ -58,7 +58,8 @@
 | `route.intelligence.engineering.agent-architecture` | `intelligence/engineering/agent-architecture/README.md` | `small` | `index-only` | 各 atom 有明確原則、症狀表與預防方式，可反查驗證。 |
 | `route.feedback.history` | `feedback/history/README.md` | `small` | `index-only` | Lesson 已寫入 feedback/history/<domain>/ 對應分類，且 feedback/history/<domain>/README.md 已更新索引。 |
 | `route.runtime.decision-recording` | `runtime/runtime.db` | `small` | `source-backed` | 本輪若有鎖定決策，對應 tier 的檔案與 README 索引已更新。 |
-| `route.decisions.adr` | `decisions/README.md` | `small` | `summary-first` | decisions/README.md 已讀取，ADR 清單已查詢，graph edge 已確認。 |
+| `route.constitution.adr` | `constitution/README.md` | `small` | `summary-first` | constitution/README.md 已讀取，ADR 清單已查詢，graph edge 已確認。 |
+| `route.governance.decision-promotion-pipeline` | `governance/lifecycle/decision-promotion-pipeline.yaml` | `small` | `source-backed` | Promotion target is selected by content type; ADR is created only when constitution criteria match; execution-affecting targets handle runtime projection.  |
 | `route.architecture.permanent-docs` | `architecture/README.md` | `small` | `summary-first` | architecture/README.md 已讀取，架構文件清單已查詢。 |
 | `route.evaluations.scenario-results` | `evaluations/README.md` | `small` | `index-only` | Evaluation 記錄已依 scenario 分類存放，格式與 template 一致。 |
 | `route.tools.metadata-routing` | `tools/README.md` | `small` | `index-only` | Tool metadata 已定義，compression 策略與 routing 規則已建立。 |
@@ -68,7 +69,8 @@
 | `route.runtime.intelligence-routing` | `runtime/runtime.db` | `small` | `index-only` | Task intent 已對應到 intelligence-routing.yaml 的 domain，applicable_phases 已檢查，domain README 已載入。 |
 | `route.runtime.output-governance` | `runtime/README.md` | `small` | `source-backed` | Language consistency 已確認，sanitization 已通過，tool neutrality 已檢查， format compliance 已驗證，governance gates 全部通過。  |
 | `route.runtime.distributed` | `runtime/README.md` | `small` | `source-backed` | Distributed locks 已正確 acquire/release，multi-agent coordination rules 已遵守， async job lifecycle 狀態轉換正確，無 deadlock 或 stale state。  |
-| `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.md` | `small` | `source-backed` | 目前 knowledge update 的步驟已確認，entry conditions 已滿足，exit conditions 已檢查，reference sources 已載入；linked update completeness gates 已通過， 下一步驟已決定。  |
+| `route.governance.executable-contract-boundary` | `governance/lifecycle/executable-contract-boundary.yaml` | `small` | `source-backed` | YAML contract inventory 已載入；runtime_projection.enabled contract 已由 compiler 投影到 runtime.db； 普通 metadata / graph / validation YAML 不會自動進 runtime。  |
+| `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.yaml` | `small` | `source-backed` | 目前 knowledge update 的步驟已確認，entry conditions 已滿足，exit conditions 已檢查，reference sources 已載入；linked update completeness gates 已通過， 下一步驟已決定。  |
 
 ## Summary Records
 
@@ -80,6 +82,7 @@
 | `architecture.context-cost-optimization` | `validated` | [`context-cost-optimization.md`](../summaries/context-cost-optimization.md) | Token 成本優化規劃。Phase 1（立即省錢）：Bootstrap 極小化（~800 tokens）、README 拆分、Rule lazy-load、Summary layer。Phase 2（架構升級）：Runtime Context Router、Context Cost Metadata、Skill Index、Context TTL。Phase 2.5（規範層已實作）：Provider Prompt Cache Alignment，定義 stable prefix / volatile suffix 與 provider cache metadata。Phase 3（長期）：Semantic Retrieval、Episodic Memory、Multi-model Routing。 |
 | `workflow.software-delivery` | `validated` | [`development-guidance.md`](../summaries/development-guidance.md) | 將授權 App/API/Embedded/Firmware 觀察轉成開發 guidance、實作模式、控制項、檢查清單。涵蓋 mobile（Android/iOS/Flutter/React Native）、backend API、embedded firmware 的安全控制、實作模式與 release gate。原 `skills/app-development-guidance/` 已刪除，所有內容已遷移至新分層。提供 5 個標準化輸出模板（change-brief / contract / bdd-scenario / implementation-plan / review-report），位於 `workflow/software-delivery/templates/`。另提供 Greenfield 標準化流程（`workflow/greenfield/`）與 Slash Command 模式（`ai-tools/slash-commands.md`）。 |
 | `analysis.dual-token-audit` | `candidate` | [`dual-token-audit.md`](../summaries/dual-token-audit.md) | 系統內同時存在兩套以上 token 機制（JWT + JWE、HMAC + 對稱加密、平台 token + 廠商回調 token）時的審計方法。觀察點：代碼結構、key 管理、algorithm 宣告、token 流向、validation 一致性、replay 防護、log 外洩、error 訊息。Audit 五步：列 token universe → 畫 flow → key/alg matrix → 接縫盤點 → failure mode 對照。 |
+| `governance.executable-contract-boundary` | `candidate` | [`executable-contract-boundary.md`](../summaries/executable-contract-boundary.md) | Defines the boundary for executable YAML contracts: source stays in the owner layer, Markdown explains, YAML carries executable triggers/steps/gates/evidence, and execution-affecting contracts opt into `runtime.db` projection with `runtime_projection.enabled: true`. |
 | `feedback.promotion.pipeline` | `candidate` | [`feedback-promotion-pipeline.md`](../summaries/feedback-promotion-pipeline.md) | 定義 feedback lesson 從 skill-local history 推進到 workflow、intelligence、enforcement、memory 或 runtime surfaces 的 promotion / downgrade gate。 |
 | `governance.goal-ledger-boundary` | `validated` | [`goal-ledger-boundary.md`](../summaries/goal-ledger-boundary.md) | `.agent-goals/` 只保存 active conversation goals；長期 roadmap、phase、migration、promotion、deprecation 與治理狀態必須落到 durable planning 文件。 |
 | `knowledge.navigation` | `validated` | [`knowledge-navigation.md`](../summaries/knowledge-navigation.md) | 知識導航系統：indexes（任務路由）、summaries（300-500 token 摘要）、graphs（知識圖譜邊）、runtime（routing registry、refresh policy、SQLite lookup cache）。讓 agent 用最小 token 成本找到正確知識。 |
@@ -103,8 +106,8 @@
 | `graph.analysis-repo-methods` | `analysis/repo/README.md` | `candidate` | 6 | [`analysis-repo-methods.yaml`](../graphs/analysis-repo-methods.yaml) |
 | `graph.apk-analysis-pilot` | `plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md` | `new-layer-promoted` | 5 | [`apk-analysis-pilot.yaml`](../graphs/apk-analysis-pilot.yaml) |
 | `graph.apk-highest-leverage-analysis` | `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md` | `candidate` | 4 | [`apk-highest-leverage-analysis.yaml`](../graphs/apk-highest-leverage-analysis.yaml) |
+| `graph.constitution-adr` | `constitution/README.md` | `candidate` | 12 | [`constitution-adr.yaml`](../graphs/constitution-adr.yaml) |
 | `graph.ddd-architecture-governance` | `intelligence/engineering/architecture/domain-modeling/README.md` | `candidate` | 7 | [`ddd-architecture-governance.yaml`](../graphs/ddd-architecture-governance.yaml) |
-| `graph.decisions-adr` | `decisions/README.md` | `candidate` | 11 | [`decisions-adr.yaml`](../graphs/decisions-adr.yaml) |
 | `graph.feedback-layers` | `feedback/README.md` | `candidate` | 9 | [`feedback-layers.yaml`](../graphs/feedback-layers.yaml) |
 | `graph.feedback-promotion-pipeline` | `feedback/promotion/README.md` | `candidate` | 6 | [`feedback-promotion-pipeline.yaml`](../graphs/feedback-promotion-pipeline.yaml) |
 | `graph.governance-layers` | `governance/README.md` | `candidate` | 22 | [`governance-layers.yaml`](../graphs/governance-layers.yaml) |

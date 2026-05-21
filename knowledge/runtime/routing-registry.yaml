@@ -1448,14 +1448,14 @@ records:
     primary_source: runtime/runtime.db
     required_dependencies:
       - runtime/README.md
-      - decisions/README.md
+      - constitution/README.md
     candidate_sources:
       - memory/decision/README.md
       - governance/lifecycle/knowledge-update-flow.md
       - runtime/runtime.db
     source_of_truth_gate: runtime-decision-recording-active
     ranking_reason: >
-      將「決策寫到哪」從對話抽成 declarative 路由：architecture→ADR、session→memory/decision、project→docs/decisions。
+      將「決策寫到哪」從對話抽成 declarative 路由：architecture→constitution/ADR、session→memory/decision、project→docs/decisions。
       close-loop 與 knowledge-update Step 1 共用同一自問清單。
     validation_signal: 本輪若有鎖定決策，對應 tier 的檔案與 README 索引已更新。
     metadata:
@@ -1473,24 +1473,25 @@ records:
       compression_level: source-backed
       reason: 避免決策只留在 plan 或對話；查問題時依 lookup.by_symptom 回溯。
 
-  - id: route.decisions.adr
+  - id: route.constitution.adr
     task_intent: 查詢或記錄架構決策、了解歷史決策脈絡、或確認某個決策是否已有 ADR
-    primary_source: decisions/README.md
+    primary_source: constitution/README.md
     required_dependencies:
       - CORE_BOOTSTRAP.md
       - runtime/runtime.db
     candidate_sources:
-      - decisions/ADR-001-reference-first-migration-strategy.md
-      - decisions/ADR-002-intelligence-vs-knowledge-separation.md
-      - decisions/ADR-003-three-layer-architecture.md
-      - decisions/ADR-004-feedback-promotion-pipeline.md
-      - decisions/ADR-005-memory-architecture.md
-      - decisions/ADR-006-registry-first-workflow-activation.md
+      - constitution/ADR-001-reference-first-migration-strategy.md
+      - constitution/ADR-002-intelligence-vs-knowledge-separation.md
+      - constitution/ADR-003-three-layer-architecture.md
+      - constitution/ADR-004-feedback-promotion-pipeline.md
+      - constitution/ADR-005-memory-architecture.md
+      - constitution/ADR-006-registry-first-workflow-activation.md
+      - constitution/ADR-007-constitution-and-decision-promotion-boundary.md
       - memory/decision/README.md
-      - knowledge/graphs/decisions-adr.yaml
-    source_of_truth_gate: decisions-readme-active
-    ranking_reason: decisions/README.md 提供 ADR 生命週期、格式與現有 ADR 清單，是 decisions 層的 entry point。
-    validation_signal: decisions/README.md 已讀取，ADR 清單已查詢，graph edge 已確認。
+      - knowledge/graphs/constitution-adr.yaml
+    source_of_truth_gate: constitution-readme-active
+    ranking_reason: constitution/README.md 提供 ADR 生命週期、格式與現有 ADR 清單，是 constitution 層的 entry point。
+    validation_signal: constitution/README.md 已讀取，ADR 清單已查詢，graph edge 已確認。
     metadata:
       priority: P2
       confidence: high
@@ -1498,14 +1499,50 @@ records:
         estimated_tokens: 300
         load_strategy: lazy
         cacheable: true
-        ttl:
+      ttl:
           session: 1
       compatibility_state: new-layer-promoted
     model:
       profile: small
       compression_level: summary-first
-      reason: decisions/ 在需要查詢歷史決策或建立新 ADR 時才讀取。
+      reason: constitution/ 在需要查詢歷史決策或建立新 ADR 時才讀取。
 
+  - id: route.governance.decision-promotion-pipeline
+    task_intent: Classify runtime, session, project, and architecture decisions into their correct promotion target instead of defaulting to ADR
+    primary_source: governance/lifecycle/decision-promotion-pipeline.yaml
+    required_dependencies:
+      - governance/lifecycle/decision-promotion-pipeline.md
+      - constitution/README.md
+      - memory/decision/README.md
+      - runtime/runtime.db
+    candidate_sources:
+      - constitution/ADR-007-constitution-and-decision-promotion-boundary.md
+      - governance/lifecycle/executable-contract-boundary.yaml
+      - feedback/promotion/README.md
+    source_of_truth_gate: governance-decision-promotion-pipeline-active
+    ranking_reason: >
+      Decision Promotion Pipeline defines content-based targets:
+      executable rules go to enforcement, reasoning heuristics go to intelligence,
+      operational flows go to workflow, runtime gates go to runtime.db,
+      architecture-level irreversible decisions go to constitution/ADR-*,
+      session decisions go to memory/decision, and project decisions go to docs/decisions.
+    validation_signal: >
+      Promotion target is selected by content type; ADR is created only when
+      constitution criteria match; execution-affecting targets handle runtime projection.
+    metadata:
+      priority: P1
+      confidence: high
+      context_cost:
+        estimated_tokens: 500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Load only when recording, promoting, or reclassifying a decision.
   - id: route.architecture.permanent-docs
     task_intent: 查詢永久性架構定義、了解 OS 層級設計原則與相容性策略
     primary_source: architecture/README.md
@@ -1513,8 +1550,8 @@ records:
       - CORE_BOOTSTRAP.md
     candidate_sources:
       - architecture/ai-native-knowledge-operating-system.md
-      - decisions/ADR-001-reference-first-migration-strategy.md
-      - decisions/ADR-003-three-layer-architecture.md
+      - constitution/ADR-001-reference-first-migration-strategy.md
+      - constitution/ADR-003-three-layer-architecture.md
       - knowledge/graphs/metadata-navigation.yaml
     source_of_truth_gate: architecture-readme-active
     ranking_reason: architecture/README.md 提供架構層 entry point，列出永久性架構文件與設計原則。
@@ -1779,10 +1816,47 @@ records:
       compression_level: source-backed
       reason: Distributed Runtime 在 multi-agent 協作或 async job 執行時才需要載入，不佔用 bootstrap 預算。
 
+  - id: route.governance.executable-contract-boundary
+    task_intent: 判斷治理、規則或 workflow 文件何時必須提供 YAML contract，以及哪些 contract 必須投影到 runtime.db
+    primary_source: governance/lifecycle/executable-contract-boundary.yaml
+    required_dependencies:
+      - governance/lifecycle/executable-contract-boundary.md
+      - governance/lifecycle/compiler-philosophy.md
+      - runtime/README.md
+      - runtime/runtime.db
+    candidate_sources:
+      - governance/lifecycle/knowledge-update-flow.yaml
+      - scripts/ai-skill-cli/internal/app/runtime_compiler.go
+      - enforcement/README.md
+      - workflow/workflow-routing.md
+    source_of_truth_gate: governance-executable-contract-boundary-active
+    ranking_reason: >
+      Executable Contract Boundary 定義 source ownership 留在 owner layer、
+      executable YAML contract 以 runtime_projection.enabled opt in、
+      runtime compiler 投影到 runtime.db generated_surfaces，並列出第一批需要 YAML 化的候選文件。
+    validation_signal: >
+      YAML contract inventory 已載入；runtime_projection.enabled contract 已由 compiler 投影到 runtime.db；
+      普通 metadata / graph / validation YAML 不會自動進 runtime。
+    metadata:
+      priority: P1
+      confidence: medium
+      context_cost:
+        estimated_tokens: 500
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Executable Contract Boundary 在新增流程、gate、policy contract 或調整 runtime projection 時才需要載入。
+
   - id: route.governance.knowledge-update-flow
     task_intent: 載入知識更新流程的 11 個步驟定義，決定目前 knowledge update 走到哪一步
-    primary_source: governance/lifecycle/knowledge-update-flow.md
+    primary_source: governance/lifecycle/knowledge-update-flow.yaml
     required_dependencies:
+      - governance/lifecycle/knowledge-update-flow.md
       - governance/ai-runtime-governance/linked-update-governance.md
       - intelligence/engineering/agent-architecture/linked-updates-completeness.md
       - enforcement/linked-updates.md

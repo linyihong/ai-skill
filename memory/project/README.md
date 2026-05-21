@@ -16,7 +16,7 @@ Project memory 只在 same repo / same project / compatible architecture boundar
 
 - 專案私有 raw evidence（token、host、incident logs）→ 留在業務專案
 - Active goal、owner、lock、next action → `.agent-goals/`
-- 專案獨立的 architecture decision → `memory/decision/` 或 `decisions/`
+- 專案獨立的 architecture decision → `memory/decision/` 或 `constitution/`
 - 可跨專案重用的 intelligence → `intelligence/`
 - Session 進行中狀態 → `memory/working/`
 
@@ -37,7 +37,7 @@ Project memory 只在 same repo / same project / compatible architecture boundar
 - {constraint 2}（來源：{source}）
 
 ## Architecture Decisions
-- {decision 1}（→ memory/decision/ 或 decisions/）
+- {decision 1}（→ memory/decision/ 或 constitution/）
 - {decision 2}
 
 ## Tech Debt / Risks
@@ -58,7 +58,7 @@ Project memory 只在 same repo / same project / compatible architecture boundar
 1. **專案為單位**：每個專案一個檔案（或一個目錄），不混合多個專案。
 2. **抽象化邊界**：只記錄「可跨 session 重用的專案脈絡」，不記錄 session-local 細節。
 3. **連結到 summary**：每個 session 結束時，如果影響專案狀態，應更新 project memory 並連結到對應的 session summary。
-4. **不重複 ADR**：重要的架構決策應放在 `memory/decision/` 或 `decisions/`，project memory 只保留摘要與連結。
+4. **不重複 ADR**：重要的架構決策應放在 `memory/decision/` 或 `constitution/`，project memory 只保留摘要與連結。
 5. **Lifecycle**：專案完成或歸檔後，project memory 應標記為 `archived` 並移至冷儲存。
 6. **Token-aware**：每個 project record 不超過 500 tokens。
 7. **Compatibility scope**：每個 project memory 應能說明適用 repo、architecture boundary、workflow family 與 expires condition。

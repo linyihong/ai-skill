@@ -20,5 +20,5 @@ accepted
 - **風險**：既有外部引用可能仍指向舊路徑（已全部更新並驗證）
 
 ## Related
-- [`decisions/ADR-003-three-layer-architecture.md`](../../decisions/ADR-003-three-layer-architecture.md) — Three-Layer Architecture
+- [`constitution/ADR-003-three-layer-architecture.md`](../../constitution/ADR-003-three-layer-architecture.md) — Three-Layer Architecture
 - [`plans/README.md`](../../plans/README.md) — Plans 目錄規則與狀態

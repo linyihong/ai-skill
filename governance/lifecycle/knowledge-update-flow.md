@@ -85,7 +85,7 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 > 1. 本輪是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式、或閉環缺口？
 > 2. 本輪是否涉及新增或改名目錄？→ 若是，先執行 [`directory-structure-governance.md`](directory-structure-governance.md) 的 5 步驟 Checkpoint
-> 3. 本輪是否與使用者**鎖定決策**（「就這樣做」「不要 X」）？→ 若是，依 [`runtime/runtime.db`](../../runtime/runtime.db) 寫入 **ADR**（`decisions/`）、**session**（`memory/decision/`）或 **project**（`<PROJECT_ROOT>/docs/decisions/`），並更新對應 README 索引
+> 3. 本輪是否與使用者**鎖定決策**（「就這樣做」「不要 X」）？→ 若是，依 [`runtime/runtime.db`](../../runtime/runtime.db) 寫入 **ADR**（`constitution/`）、**session**（`memory/decision/`）或 **project**（`<PROJECT_ROOT>/docs/decisions/`），並更新對應 README 索引
 
 **判斷結果**：
 

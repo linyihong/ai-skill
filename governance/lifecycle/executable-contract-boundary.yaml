@@ -1,0 +1,114 @@
+schema_version: "1.0"
+id: governance.lifecycle.executable-contract-boundary
+status: active
+owner_layer: governance
+source_markdown: governance/lifecycle/executable-contract-boundary.md
+
+runtime_projection:
+  enabled: true
+  target_key: governance.executable_contract_boundary.contract
+  surface: generated_surfaces
+
+purpose: >
+  Defines which Markdown/YAML sources require machine-readable executable
+  contracts and which contracts must be projected into runtime.db.
+
+boundary_rules:
+  source_ownership:
+    rule: keep_contract_source_in_owner_layer
+    description: Governance, enforcement, and workflow contracts stay beside their owning sources.
+    forbidden:
+      - moving governance source into runtime/
+      - moving enforcement source into runtime/
+      - creating runtime/**/*.yaml committed mirrors
+  runtime_projection:
+    rule: project_execution_affecting_contracts_to_runtime_db
+    required_marker:
+      runtime_projection.enabled: true
+    target: runtime/runtime.db generated_surfaces
+  markdown_companion:
+    rule: markdown_explains_yaml_executes
+    description: Markdown carries rationale and maintenance context; YAML carries executable triggers, steps, gates, and evidence.
+
+yaml_required_when:
+  - ordered_steps
+  - activation_conditions
+  - required_reads
+  - depends_on_relationships
+  - exit_conditions
+  - blocking_gates
+  - required_evidence
+  - failure_actions
+  - final_status_report
+
+yaml_not_required_when:
+  - philosophy_only
+  - architecture_rationale_only
+  - historical_decision_record
+  - non_executable_navigation_index
+
+placement:
+  governance:
+    contract_location: governance/**/*.yaml
+    runtime_projection: required_when_execution_affecting
+  enforcement:
+    contract_location:
+      - enforcement/**/*.yaml
+      - metadata/rules/*.yaml
+    runtime_projection: required_when_execution_affecting
+  workflow:
+    contract_location: workflow/**/*.yaml
+    runtime_projection: required_when_execution_affecting
+  runtime_internal_config:
+    contract_location: runtime/runtime.db
+    runtime_projection: already_runtime_owned
+
+initial_inventory:
+  contract_exists:
+    - source: governance/lifecycle/knowledge-update-flow.md
+      contract: governance/lifecycle/knowledge-update-flow.yaml
+      reason: 11-step master flow with blocking gates and sub-pipeline boundaries.
+  candidates:
+    - source: enforcement/dependency-reading.md
+      suggested_contract: enforcement/dependency-reading.yaml
+      priority: P0
+      reason: Defines writeback transaction guard, required reads, commit/push/readback gates.
+    - source: enforcement/goal-action-validation.md
+      suggested_contract: enforcement/goal-action-validation.yaml
+      priority: P1
+      reason: Defines goal/action/validation blocking checks.
+    - source: enforcement/authorization-scope.md
+      suggested_contract: enforcement/authorization-scope.yaml
+      priority: P0
+      reason: Defines permission and authorization boundaries that block execution.
+    - source: enforcement/evidence-hierarchy.md
+      suggested_contract: enforcement/evidence-hierarchy.yaml
+      priority: P1
+      reason: Defines evidence precedence, confidence, and escalation conditions.
+    - source: enforcement/decision-efficiency.md
+      suggested_contract: enforcement/decision-efficiency.yaml
+      priority: P2
+      reason: Defines decision cost and escalation gates.
+    - source: enforcement/linked-updates.md
+      suggested_contract: enforcement/linked-updates.yaml
+      priority: P1
+      reason: Defines required linked-update checks and commit blockers.
+    - source: governance/lifecycle/directory-structure-governance.md
+      suggested_contract: governance/lifecycle/directory-structure-governance.yaml
+      priority: P2
+      reason: Defines a five-checkpoint directory creation/rename gate.
+  markdown_only:
+    - source: governance/lifecycle/runtime-guards-philosophy.md
+      reason: Philosophy and design rationale; executable gates belong in a derived contract.
+    - source: governance/lifecycle/routing-philosophy.md
+      reason: Conceptual routing pipeline unless promoted into route-specific contract.
+    - source: constitution/README.md
+      reason: ADR navigation and lifecycle, not runtime execution.
+
+agent_update_rule:
+  if_markdown_has_executable_signals_without_yaml:
+    action: create_or_record_yaml_contract_gap
+    blocking_level: linked_update_gap
+  if_yaml_contract_affects_execution:
+    action: ensure_runtime_projection_enabled_and_compile_runtime_db
+    blocking_level: runtime_surface_gate

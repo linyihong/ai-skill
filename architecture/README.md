@@ -22,11 +22,11 @@
 |------|------|
 | [`route.architecture.permanent-docs`](../knowledge/runtime/routing-registry.yaml) | Routing registry record，agent 依此找到 architecture/ |
 | [`README.md`](../README.md) | 根目錄 OS Layout 表格列出 architecture/ 層 |
-| [`decisions/`](../decisions/README.md) | ADR 可能引用 architecture 架構原則 |
+| [`constitution/`](../constitution/README.md) | ADR 可能引用 architecture 架構原則 |
 | [`plans/`](../plans/README.md) | 執行計畫可能引用 architecture 設計原則 |
 
 ## 與既有層的關係
 
 - [`plans/`](../plans/README.md)：執行計畫存放處，完成後歸檔至 `plans/archived/`
-- [`decisions/`](../decisions/README.md)：架構決策記錄（ADR），記錄為什麼做出某個架構選擇
+- [`constitution/`](../constitution/README.md)：架構決策記錄（ADR），記錄為什麼做出某個架構選擇
 - [`README.md`](../README.md)：根目錄 README 已列出 architecture 作為 OS Layout 的一層

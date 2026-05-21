@@ -578,7 +578,7 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 
 ### 4.8 Decision System（ADR）
 
-**檔案**：[`decisions/README.md`](../decisions/README.md)
+**檔案**：[`constitution/README.md`](../../constitution/README.md)
 
 **目的**：建立 Architecture Decision Records（ADR）系統，記錄關鍵架構決策，避免重複討論。
 
@@ -660,7 +660,7 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 5. 建立 Tool Metadata & Lazy Activation → [`tools/metadata/README.md`](../tools/metadata/README.md)、[`tools/routing/README.md`](../tools/routing/README.md)
 6. 建立 Tool Output Compression → [`tools/compression/README.md`](../tools/compression/README.md)
 7. 建立 Memory Architecture 子層 → [`memory/working/README.md`](../memory/working/README.md)、[`memory/summary/README.md`](../memory/summary/README.md)、[`memory/decision/README.md`](../memory/decision/README.md)
-8. 建立 Decision System（ADR）→ [`decisions/README.md`](../decisions/README.md)
+8. 建立 Decision System（ADR）→ [`constitution/README.md`](../../constitution/README.md)
 9. 建立 Anti-patterns → [`anti-patterns/README.md`](../anti-patterns/README.md)
 10. 升級 Skills Metadata v2 → [`skills-index.yaml`](../skills-index.yaml)（weight、domains、dependencies、conflicts、priority.runtime）
 
@@ -724,7 +724,7 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 | Circuit Breaker / Guards | `runtime/README.md` | 新增子層 |
 | Tool Metadata / Routing / Compression | `tools/` | 新增層 |
 | Memory 子層 | `memory/working/`, `memory/summary/`, `memory/decision/` | 拆分現有 memory 層 |
-| Decision System | `decisions/` | 新增層 |
+| Decision System | `constitution/` | 新增層 |
 | Anti-patterns | `anti-patterns/` | 新增層 |
 | Skills Metadata v2 | `skills-index.yaml` | 升級現有 index |
 | Semantic Retrieval | `knowledge/runtime/sqlite/` | 深化現有 prototype |

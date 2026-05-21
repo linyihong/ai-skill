@@ -57,7 +57,7 @@
 - **Tool Lazy Activation**：[`tools/routing/README.md`](../tools/routing/README.md) — 5-step activation flow、tool explosion detection（recursive_search、repetitive_read、tool_chain_too_long、output_too_large）。
 - **Tool Output Compression**：[`tools/compression/README.md`](../tools/compression/README.md) — 4 levels（raw 1.0x、summary 0.2-0.3x、structured 0.1-0.2x、minimal 0.05-0.1x）、per-output-type strategies。
 - **Memory Architecture 子層**：[`memory/working/README.md`](../memory/working/README.md)、[`memory/summary/README.md`](../memory/summary/README.md)、[`memory/decision/README.md`](../memory/decision/README.md) — 3 子層（working session-local、summary ≤500 tokens、decision immutable numbered）。
-- **Decision System（ADR）**：[`decisions/README.md`](../decisions/README.md) — ADR lifecycle（proposed → accepted → deprecated → superseded）、naming convention `ADR-{number}-{short-title}.md`。
+- **Decision System（ADR）**：[`constitution/README.md`](../../constitution/README.md) — ADR lifecycle（proposed → accepted → deprecated → superseded）、naming convention `ADR-{number}-{short-title}.md`。
 - **Anti-patterns**：[`anti-patterns/README.md`](../anti-patterns/README.md) + 5 patterns（context-explosion、recursive-tool-loop、hallucination-loop、stale-summary、skill-pollution）。
 - **Skills Metadata v2**：[`skills-index.yaml`](../skills-index.yaml) 升級至 v2，所有 13 skills 加入 weight、domains、dependencies、conflicts、priority.runtime。
 
@@ -745,14 +745,14 @@ memory/
 - **project memory**（[`memory/project/README.md`](memory/project/README.md)）— 跨 session 專案脈絡保持。
 - **failure memory**（[`memory/failure/README.md`](memory/failure/README.md)）— 抽象化失效模式記錄。
 
-### `decisions/`
+### `constitution/`
 
 負責「架構決策記錄（ADR）」。
 
 目前結構：
 
 ```text
-decisions/
+constitution/
   README.md                                    ← ADR 系統說明
   ADR-001-reference-first-migration-strategy.md ← Reference-First 遷移策略
   ADR-002-intelligence-vs-knowledge-separation.md ← Intelligence vs Knowledge 分離
@@ -1145,7 +1145,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 - `tools/metadata/README.md` + `tools/routing/README.md` — Tool Metadata & Lazy Activation（tool cost/risk/activation schema、explosion detection）。
 - `tools/compression/README.md` — Tool Output Compression（4-level compression、per-output-type strategies）。
 - `memory/working/README.md` + `memory/summary/README.md` + `memory/decision/README.md` — Memory Architecture 3 子層。
-- `decisions/README.md` — Decision System（ADR lifecycle、naming convention）。
+- `constitution/README.md` — Decision System（ADR lifecycle、naming convention）。
 - `anti-patterns/README.md` + 5 patterns — Anti-patterns。
 - `skills-index.yaml` — Skills Metadata v2（weight/domains/dependencies/conflicts/priority.runtime）。
 - `runtime/README.md` — Runtime Pipeline（7 階段 pipeline 架構與元件間通訊）。
@@ -1214,7 +1214,7 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 | P1 | done | 建立 Tool Metadata & Lazy Activation | `tools/metadata/README.md`, `tools/routing/README.md` | 已完成 tool cost/risk/activation schema、explosion detection | 工具層級 token 消耗可預測與控制 |
 | P1 | done | 建立 Tool Output Compression | `tools/compression/README.md` | 已完成 4-level compression、per-output-type strategies | 工具輸出 token 減少 50-95% |
 | P1 | done | 建立 Memory Architecture 子層 | `memory/working/README.md`, `memory/summary/README.md`, `memory/decision/README.md`, `memory/episodic/README.md`, `memory/project/README.md`, `memory/failure/README.md` | 已完成 6 子層（working/summary/decision/episodic/project/failure） | 記憶管理精準，不再單一 memory 層 |
-| P1 | done | 建立 Decision System（ADR） | `decisions/README.md`, `decisions/ADR-001-reference-first-migration-strategy.md`, `decisions/ADR-002-intelligence-vs-knowledge-separation.md`, `decisions/ADR-003-three-layer-architecture.md`, `decisions/ADR-004-feedback-promotion-pipeline.md`, `decisions/ADR-005-memory-architecture.md` | 已完成 ADR lifecycle、naming convention、5 筆實際 ADR | 架構決策有記錄，避免重複討論 |
+| P1 | done | 建立 Decision System（ADR） | `constitution/README.md`, `constitution/ADR-001-reference-first-migration-strategy.md`, `constitution/ADR-002-intelligence-vs-knowledge-separation.md`, `constitution/ADR-003-three-layer-architecture.md`, `constitution/ADR-004-feedback-promotion-pipeline.md`, `constitution/ADR-005-memory-architecture.md` | 已完成 ADR lifecycle、naming convention、5 筆實際 ADR | 架構決策有記錄，避免重複討論 |
 | P1 | done | 建立 Anti-patterns | `anti-patterns/README.md` + 5 patterns | 已完成 5 個 anti-pattern 文件 | 失效模式可主動辨識與避免 |
 | P1 | done | 升級 Skills Metadata v2 | `skills-index.yaml` | 已完成所有 13 skills 加入 weight/domains/dependencies/conflicts/priority.runtime | Skill relevance scoring 與 conflict detection 可運作 |
 | P1 | done | 重建 intelligence/ 為專家智慧層 | `intelligence/README.md`, `intelligence/engineering/{architecture,domain,failure,heuristics,anti-patterns,tradeoffs,distributed-systems}/`, `intelligence/business/`, `intelligence/travel/` | 已完成 9 子目錄結構與 scope 定義，尚未填充實際 atoms | 每個子目錄有 README.md 定義核心、範例內容、與其他層的關係；與根 `anti-patterns/` 邊界已明確定義 |

@@ -42,7 +42,7 @@
 | 入口與路由 | `docs/README.md` 或主題資料夾的 `README.md` |
 | 操作步驟 | `docs/how-to/<topic>.md` |
 | 規格與欄位字典 | `docs/reference/<topic>.md` |
-| 決策紀錄 | `docs/adr/` 或 `decisions/` |
+| 決策紀錄 | `docs/adr/` 或 `constitution/` |
 | 本輪實驗／待驗證 | `.agent-goals/` 或 `notes/scratch/`（不當作單一真相） |
 
 **檔名**：優先 `kebab-case`、主題明確；避免 `notes2.md`、`misc.md`。
