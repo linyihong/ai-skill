@@ -288,6 +288,7 @@ Tasks：
 - [ ] 建立 golden fixture：同一組 source 產出固定 `runtime-report.md`、model reports、SQLite index、`runtime.db` assertion。
 - [x] 建立 native SQLite proof-of-concept：用 pure Go SQLite 開啟、查詢、寫入測試 DB，確認 Windows / macOS / Linux 無外部 sqlite3 CLI 依賴。
 - [x] 評估哪些 Ruby validator 適合原生 Go 重寫，哪些應保留 Ruby。
+- [x] 建立 `runtime validate` native DB validator slice：Go native 檢查 `runtime.db` integrity、required tables、row counts、JSON columns、compiler metadata；Ruby validators 暫保留作 parity guard。
 - [ ] 若開始移植 compiler，先建立 Ruby vs Go parity test，不得直接替換 production compiler。
 
 Progress notes：
@@ -297,6 +298,7 @@ Progress notes：
 - `ai-skill runtime compile` 已建立 wrapper-first slice，支援 `--repo`、`--dry-run`、`--assert-source`、`--assert-keyword`、JSON / plain output，dry-run 只列出 Ruby compiler / `--diff` 計畫且不寫入 `runtime.db`；執行模式固定 UTF-8 env，並在缺 Ruby 或 `sqlite3` CLI 時回 `missing_dependency`。
 - `doctor --check-runtime` 的 native SQLite proof 已從 in-memory query 擴展到 temporary file-backed DB create / insert / query / `PRAGMA integrity_check`，證明 pure Go SQLite 可在不依賴外部 `sqlite3` CLI 時完成基本寫讀與 integrity assertion。
 - [`runtime-native-rewrite-assessment.md`](../../scripts/ai-skill-cli/docs/runtime-native-rewrite-assessment.md) 已完成 Ruby runtime tooling 原生化評估：`validate-runtime-db.rb`、`validate-runtime-sqlite-index.rb` 與 runtime query 優先 native；generator / compiler 維持 wrapper-first，待 golden fixture 與 Ruby vs Go parity test 完成後再替換。
+- `ai-skill runtime validate` 已新增第一段 Go native `runtime.db` validator：用 `modernc.org/sqlite` 檢查 integrity、required tables、minimum row counts、JSON columns 與 compiler metadata；unit tests 覆蓋 valid DB、missing table、invalid JSON，stale metadata fixture 待補。
 
 Completion criteria：
 

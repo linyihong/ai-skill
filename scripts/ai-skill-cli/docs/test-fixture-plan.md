@@ -20,6 +20,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/cursor-mirror-copy-fallback` | Cursor mirror 策略 | Windows / 權限受限環境預設 copy fallback；symlink 只允許明確 opt-in |
 | `fixture/runtime-source-change` | runtime.db assertion | source keyword 出現在 generated surface |
 | `fixture/native-sqlite-file-proof` | pure Go SQLite proof | temporary DB 可 create / insert / query / integrity check，且不依賴外部 `sqlite3` CLI |
+| `fixture/runtime-db-native-validator` | native runtime.db validator | valid DB、missing required table、invalid JSON column 均有固定結果；stale metadata 待補 |
 | `fixture/legacy-script-parity` | 舊腳本覆蓋率驗證 | 每個 native target / wrapper first 舊入口都有命令映射與測試證據 |
 
 ## 缺 Git fixture
@@ -57,6 +58,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - `data` 包含預期 keyword。
 - keyword 缺失時回傳 `validation_failed`。
 - Phase 3 已用 `doctor --check-runtime` / Go unit tests 覆蓋 `native-sqlite-file-proof`：pure Go SQLite 可對 temporary DB 執行 create / insert / query / `PRAGMA integrity_check`，不需外部 `sqlite3` CLI。
+- Phase 3 已新增 `runtime-db-native-validator` Go fixture，覆蓋 valid `runtime.db`、missing required table、invalid JSON column；stale compiler metadata fixture 尚未補齊。
 
 ## 舊腳本 parity fixture
 

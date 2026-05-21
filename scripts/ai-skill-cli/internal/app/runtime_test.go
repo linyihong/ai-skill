@@ -2,7 +2,10 @@ package app
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
+	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -177,6 +180,48 @@ func TestRuntimeWrapperEnvForcesUTF8(t *testing.T) {
 	}
 }
 
+func TestNativeRuntimeDBValidationAcceptsValidFixture(t *testing.T) {
+	path := createNativeRuntimeDBFixture(t)
+	check := nativeRuntimeDBValidation(path)
+	if check.Status != "ok" {
+		t.Fatalf("expected native validation ok, got %#v", check)
+	}
+}
+
+func TestNativeRuntimeDBValidationBlocksMissingTable(t *testing.T) {
+	path := createNativeRuntimeDBFixture(t)
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, err := db.Exec("DROP TABLE gates"); err != nil {
+		t.Fatal(err)
+	}
+
+	check := nativeRuntimeDBValidation(path)
+	if check.Status != "failed" || !strings.Contains(check.Message, "missing required table: gates") {
+		t.Fatalf("expected missing table failure, got %#v", check)
+	}
+}
+
+func TestNativeRuntimeDBValidationBlocksInvalidJSON(t *testing.T) {
+	path := createNativeRuntimeDBFixture(t)
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, err := db.Exec("UPDATE phases SET entry_conditions = ? WHERE id = ?", "{bad", "phases-0"); err != nil {
+		t.Fatal(err)
+	}
+
+	check := nativeRuntimeDBValidation(path)
+	if check.Status != "failed" || !strings.Contains(check.Message, "phases.entry_conditions") {
+		t.Fatalf("expected invalid JSON failure, got %#v", check)
+	}
+}
+
 func fakeRuntimeRepo(t *testing.T) string {
 	t.Helper()
 	repo := t.TempDir()
@@ -193,7 +238,73 @@ func fakeRuntimeRepo(t *testing.T) string {
 		writeFile(t, filepath.Join(repo, "scripts", name), "#!/usr/bin/env ruby\nputs 'ok'\n")
 	}
 	writeFile(t, filepath.Join(repo, "runtime", "compiler", "compiler-engine.rb"), "#!/usr/bin/env ruby\nputs 'compiled'\n")
+	copyFile(t, createNativeRuntimeDBFixture(t), filepath.Join(repo, "runtime", "runtime.db"))
 	return repo
+}
+
+func createNativeRuntimeDBFixture(t *testing.T) string {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "runtime.db")
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	for _, table := range nativeRuntimeRequiredTables {
+		if _, err := db.Exec(nativeRuntimeCreateTableSQL(table)); err != nil {
+			t.Fatalf("create %s: %v", table, err)
+		}
+	}
+	for table, minimum := range nativeRuntimeMinimumRows {
+		for i := 0; i < minimum; i++ {
+			if _, err := db.Exec(nativeRuntimeInsertSQL(table, i)); err != nil {
+				t.Fatalf("insert %s: %v", table, err)
+			}
+		}
+	}
+	if _, err := db.Exec("INSERT OR REPLACE INTO compiler_metadata (key, value) VALUES ('compiler_version', 'test'), ('compiled_at', '2026-05-21T00:00:00Z')"); err != nil {
+		t.Fatal(err)
+	}
+	return path
+}
+
+func nativeRuntimeCreateTableSQL(table string) string {
+	if table == "compiler_metadata" {
+		return "CREATE TABLE compiler_metadata (key TEXT PRIMARY KEY, value TEXT)"
+	}
+	columns := []string{"id TEXT PRIMARY KEY"}
+	for _, column := range nativeRuntimeJSONColumns[table] {
+		columns = append(columns, column+" TEXT")
+	}
+	return fmt.Sprintf("CREATE TABLE %s (%s)", table, strings.Join(columns, ", "))
+}
+
+func nativeRuntimeInsertSQL(table string, index int) string {
+	if table == "compiler_metadata" {
+		return fmt.Sprintf("INSERT OR REPLACE INTO compiler_metadata (key, value) VALUES ('key-%d', 'value-%d')", index, index)
+	}
+	columns := []string{"id"}
+	values := []string{fmt.Sprintf("'%s-%d'", table, index)}
+	for _, column := range nativeRuntimeJSONColumns[table] {
+		columns = append(columns, column)
+		values = append(values, "'[]'")
+	}
+	return fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", table, strings.Join(columns, ", "), strings.Join(values, ", "))
+}
+
+func copyFile(t *testing.T, source string, target string) {
+	t.Helper()
+	content, err := os.ReadFile(source)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(target, content, 0o644); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func containsEnv(env []string, item string) bool {

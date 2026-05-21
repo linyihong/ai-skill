@@ -1,6 +1,8 @@
 package app
 
 import (
+	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -113,6 +115,15 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 
 	if opts.dryRun {
 		result.Checks = append(result.Checks, Check{Name: "wrapper_mode", Status: "ok", Message: "dry-run only; validators not executed"})
+		return result
+	}
+
+	nativeDBCheck := nativeRuntimeDBValidation(filepath.Join(repo, "runtime", "runtime.db"))
+	result.Checks = append(result.Checks, nativeDBCheck)
+	if nativeDBCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "runtime_db_native_failed", Message: nativeDBCheck.Message, Remediation: "Fix runtime/runtime.db or run runtime compile before wrapper validators."}
 		return result
 	}
 
@@ -328,6 +339,197 @@ func runtimeRefreshScripts(repo string) []string {
 		scripts = append(scripts, filepath.Join(repo, "scripts", name))
 	}
 	return scripts
+}
+
+var nativeRuntimeRequiredTables = []string{
+	"phases", "phase_transitions", "obligations", "gates",
+	"transaction_states", "transaction_transitions", "transaction_rules", "transaction_templates",
+	"activation_rules", "core_bootstrap_rules",
+	"discovery_checkpoints", "discovery_search_strategy",
+	"generated_surfaces", "compiler_metadata",
+	"runtime_budget", "context_ttl_policy", "circuit_breaker", "context_pollution",
+	"context_health_score", "intelligence_routing", "obligation_ledger",
+	"language_policy", "output_rules", "governance_gates", "blocking_gates",
+	"phase_machine", "pipeline_context_flow", "guard_chain", "relevance_engine",
+	"session_lifecycle", "prompt_artifact_templates", "prompt_composition_rules",
+	"recovery_strategies", "state_repair", "obligation_rebuild", "phase_reconciliation",
+	"execution_queue", "priority_scheduler", "activation_rules_mirror",
+	"transaction_templates_ext", "distributed_locks", "multi_agent_coordination",
+	"async_job_lifecycle", "capability_checkpoints",
+	"compiler_rules",
+}
+
+var nativeRuntimeMinimumRows = map[string]int{
+	"phases": 8, "obligations": 15, "gates": 15, "activation_rules": 10,
+	"core_bootstrap_rules": 2, "discovery_checkpoints": 3, "compiler_metadata": 2,
+	"runtime_budget": 1, "context_ttl_policy": 1, "circuit_breaker": 1,
+	"context_pollution": 1, "context_health_score": 1, "intelligence_routing": 1,
+	"obligation_ledger": 1, "language_policy": 1, "output_rules": 1,
+	"governance_gates": 1, "blocking_gates": 1, "phase_machine": 1,
+	"pipeline_context_flow": 1, "guard_chain": 1, "relevance_engine": 1,
+	"session_lifecycle": 1, "prompt_artifact_templates": 1, "prompt_composition_rules": 1,
+	"recovery_strategies": 1, "state_repair": 1, "obligation_rebuild": 1,
+	"phase_reconciliation": 1, "execution_queue": 1, "priority_scheduler": 1,
+	"activation_rules_mirror": 1, "transaction_templates_ext": 1,
+	"distributed_locks": 1, "multi_agent_coordination": 1, "async_job_lifecycle": 1,
+	"capability_checkpoints": 1, "compiler_rules": 1,
+}
+
+var nativeRuntimeJSONColumns = map[string][]string{
+	"phases":                []string{"entry_conditions", "allowed_actions", "forbidden_actions", "blocking_gates", "obligations", "phase_transition_triggers"},
+	"obligations":           []string{"verification", "depends_on", "linked_gates"},
+	"transaction_states":    []string{"entry_conditions", "allowed_actions", "forbidden_actions", "blocking_gates"},
+	"activation_rules":      []string{"activation_when"},
+	"discovery_checkpoints": []string{"discovery_targets"},
+}
+
+func nativeRuntimeDBValidation(path string) Check {
+	info, err := os.Stat(path)
+	if err != nil {
+		return Check{Name: "runtime_db_native", Status: "failed", Message: "runtime.db not found: " + path}
+	}
+	if info.IsDir() {
+		return Check{Name: "runtime_db_native", Status: "failed", Message: "runtime.db path is a directory: " + path}
+	}
+
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
+	}
+	defer db.Close()
+
+	if err := nativeIntegrityCheck(db); err != nil {
+		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
+	}
+	if err := nativeRequiredTablesCheck(db); err != nil {
+		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
+	}
+	if err := nativeMinimumRowsCheck(db); err != nil {
+		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
+	}
+	if err := nativeJSONColumnsCheck(db); err != nil {
+		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
+	}
+	if err := nativeCompilerMetadataCheck(db); err != nil {
+		return Check{Name: "runtime_db_native", Status: "failed", Message: err.Error()}
+	}
+	return Check{Name: "runtime_db_native", Status: "ok", Message: "Go native runtime.db integrity, schema, row count, JSON, and compiler metadata checks passed"}
+}
+
+func nativeIntegrityCheck(db *sql.DB) error {
+	var result string
+	if err := db.QueryRow("PRAGMA integrity_check").Scan(&result); err != nil {
+		return fmt.Errorf("integrity_check query failed: %w", err)
+	}
+	if result != "ok" {
+		return fmt.Errorf("integrity_check failed: %s", result)
+	}
+	return nil
+}
+
+func nativeRequiredTablesCheck(db *sql.DB) error {
+	rows, err := db.Query("SELECT name FROM sqlite_master WHERE type IN ('table', 'virtual')")
+	if err != nil {
+		return fmt.Errorf("table lookup failed: %w", err)
+	}
+	defer rows.Close()
+
+	tables := map[string]bool{}
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return err
+		}
+		tables[name] = true
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	for _, table := range nativeRuntimeRequiredTables {
+		if !tables[table] {
+			return fmt.Errorf("missing required table: %s", table)
+		}
+	}
+	return nil
+}
+
+func nativeMinimumRowsCheck(db *sql.DB) error {
+	for table, minimum := range nativeRuntimeMinimumRows {
+		var count int
+		if err := db.QueryRow("SELECT COUNT(*) FROM " + table).Scan(&count); err != nil {
+			return fmt.Errorf("%s count failed: %w", table, err)
+		}
+		if count < minimum {
+			return fmt.Errorf("%s: %d rows, expected at least %d", table, count, minimum)
+		}
+	}
+	return nil
+}
+
+func nativeJSONColumnsCheck(db *sql.DB) error {
+	for table, columns := range nativeRuntimeJSONColumns {
+		rows, err := db.Query("SELECT " + strings.Join(columns, ", ") + " FROM " + table + " LIMIT 5")
+		if err != nil {
+			return fmt.Errorf("%s JSON query failed: %w", table, err)
+		}
+		values := make([]sql.NullString, len(columns))
+		scanTargets := make([]any, len(columns))
+		for i := range values {
+			scanTargets[i] = &values[i]
+		}
+		rowIndex := 0
+		for rows.Next() {
+			if err := rows.Scan(scanTargets...); err != nil {
+				rows.Close()
+				return err
+			}
+			for i, value := range values {
+				text := strings.TrimSpace(value.String)
+				if !value.Valid || text == "" || text == "[]" || text == "{}" {
+					continue
+				}
+				var decoded any
+				if err := json.Unmarshal([]byte(text), &decoded); err != nil {
+					rows.Close()
+					return fmt.Errorf("%s.%s row %d invalid JSON", table, columns[i], rowIndex)
+				}
+			}
+			rowIndex++
+		}
+		if err := rows.Err(); err != nil {
+			rows.Close()
+			return err
+		}
+		rows.Close()
+	}
+	return nil
+}
+
+func nativeCompilerMetadataCheck(db *sql.DB) error {
+	rows, err := db.Query("SELECT key, value FROM compiler_metadata")
+	if err != nil {
+		return fmt.Errorf("compiler_metadata query failed: %w", err)
+	}
+	defer rows.Close()
+
+	metadata := map[string]string{}
+	for rows.Next() {
+		var key, value string
+		if err := rows.Scan(&key, &value); err != nil {
+			return err
+		}
+		metadata[key] = value
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if metadata["compiler_version"] == "" {
+		return fmt.Errorf("compiler_metadata missing compiler_version")
+	}
+	if metadata["compiled_at"] == "" {
+		return fmt.Errorf("compiler_metadata missing compiled_at")
+	}
+	return nil
 }
 
 func requiredExecutable(name string, args []string, remediation string) (string, Check) {
