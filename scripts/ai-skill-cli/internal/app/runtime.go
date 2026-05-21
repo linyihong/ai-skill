@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -44,6 +45,22 @@ type runtimeRefreshStep struct {
 	name string
 	path string
 	args []string
+}
+
+type runtimeRoutingRegistry struct {
+	Records []runtimeRouteRecord `yaml:"records"`
+}
+
+type runtimeRouteRecord struct {
+	ID            string            `yaml:"id"`
+	PrimarySource string            `yaml:"primary_source"`
+	Model         runtimeRouteModel `yaml:"model"`
+}
+
+type runtimeRouteModel struct {
+	Profile          string `yaml:"profile"`
+	CompressionLevel string `yaml:"compression_level"`
+	Reason           string `yaml:"reason"`
 }
 
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
@@ -1095,6 +1112,141 @@ func runtimeScriptInvocation(path string, args []string) string {
 		return path
 	}
 	return path + " " + strings.Join(args, " ")
+}
+
+func buildNativeModelContextReport(repo string) (string, error) {
+	registry, err := readRuntimeRoutingRegistry(filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"))
+	if err != nil {
+		return "", err
+	}
+	records := registry.Records
+	lines := []string{
+		"# Model Context Report",
+		"",
+		"本檔由 `ruby scripts/generate-model-context-report.rb --write` 產生，依 `knowledge/runtime/routing-registry.yaml` 的 model 欄位整理 model-aware context loading view。",
+		"",
+		"## Source Surfaces",
+		"",
+		"| Surface | Path | Purpose |",
+		"| --- | --- | --- |",
+		"| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 提供每條 route 的 model profile 與 compression level。 |",
+		"| Model profiles | [`../../models/profiles/README.md`](../../models/profiles/README.md) | 定義 `small`、`large`、`specialized` 的讀取深度與 guardrails。 |",
+		"| Compression strategy | [`../../models/compression/README.md`](../../models/compression/README.md) | 定義 `summary-first`、`source-backed`、`graph-assisted` 等壓縮層級。 |",
+		"",
+		"## Profile View",
+		"",
+	}
+
+	for _, profile := range sortedRouteGroupKeys(records, func(record runtimeRouteRecord) string {
+		return record.Model.Profile
+	}) {
+		displayProfile := profile
+		if displayProfile == "" {
+			displayProfile = "unspecified"
+		}
+		lines = append(lines,
+			"### `"+runtimeMDEscape(displayProfile)+"`",
+			"",
+			"| Route | Primary source | Compression | Reason |",
+			"| --- | --- | --- | --- |",
+		)
+		for _, record := range records {
+			if record.Model.Profile != profile {
+				continue
+			}
+			lines = append(lines, "| `"+runtimeMDEscape(record.ID)+"` | `"+runtimeMDEscape(record.PrimarySource)+"` | `"+runtimeMDEscape(record.Model.CompressionLevel)+"` | "+runtimeMDEscape(record.Model.Reason)+" |")
+		}
+		lines = append(lines, "")
+	}
+
+	lines = append(lines,
+		"## Compression View",
+		"",
+		"| Compression level | Routes | Escalation note |",
+		"| --- | --- | --- |",
+	)
+	for _, level := range sortedRouteGroupKeys(records, func(record runtimeRouteRecord) string {
+		return record.Model.CompressionLevel
+	}) {
+		routeIDs := []string{}
+		for _, record := range records {
+			if record.Model.CompressionLevel == level {
+				routeIDs = append(routeIDs, "`"+runtimeMDEscape(record.ID)+"`")
+			}
+		}
+		lines = append(lines, "| `"+runtimeMDEscape(level)+"` | "+strings.Join(routeIDs, ", ")+" | "+runtimeCompressionEscalationNote(level)+" |")
+	}
+
+	lines = append(lines,
+		"",
+		"## Agent Output Shape",
+		"",
+		"使用本 report 決定 model-aware loading 時，回報：",
+		"",
+		"```text",
+		"Profile:",
+		"Compression level:",
+		"Primary source:",
+		"Summaries used:",
+		"Required full sources:",
+		"Deferred sources:",
+		"Escalation trigger:",
+		"Validation signal:",
+		"```",
+		"",
+		"## Validation",
+		"",
+		"- 產生前應先確認 `routing-registry.yaml` 可通過 `ruby scripts/validate-knowledge-runtime.rb`。",
+		"- 產生後應重新執行 `ruby scripts/validate-knowledge-runtime.rb`，檢查本 report links。",
+		"- 本報告是 generated view，不取代 `models/profiles/README.md`、`models/compression/README.md` 或 routing registry。",
+		"",
+	)
+	return strings.Join(lines, "\n"), nil
+}
+
+func readRuntimeRoutingRegistry(path string) (runtimeRoutingRegistry, error) {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return runtimeRoutingRegistry{}, err
+	}
+	var registry runtimeRoutingRegistry
+	if err := yaml.Unmarshal(content, &registry); err != nil {
+		return runtimeRoutingRegistry{}, err
+	}
+	return registry, nil
+}
+
+func sortedRouteGroupKeys(records []runtimeRouteRecord, group func(runtimeRouteRecord) string) []string {
+	seen := map[string]bool{}
+	keys := []string{}
+	for _, record := range records {
+		key := group(record)
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+func runtimeMDEscape(value string) string {
+	value = strings.ReplaceAll(value, "|", `\|`)
+	return strings.ReplaceAll(value, "\n", " ")
+}
+
+func runtimeCompressionEscalationNote(level string) string {
+	switch level {
+	case "summary-first":
+		return "適合先用 registry / summary 判斷 relevance；修改 source 時升級。"
+	case "source-backed":
+		return "需要 primary source 與 required dependencies；適合 writeback、migration 或 domain work。"
+	case "graph-assisted":
+		return "需要 graph records 輔助 dependency / conflict / promotion reasoning。"
+	default:
+		return "依 `models/compression/README.md` 的 escalation rules 判斷。"
+	}
 }
 
 func runtimeWrapperEnv(base []string) []string {

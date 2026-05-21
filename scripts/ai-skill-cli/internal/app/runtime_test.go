@@ -425,6 +425,20 @@ func TestRuntimeGoldenFixtureCoversGeneratedSurfaces(t *testing.T) {
 	assertSQLiteScalar(t, runtimeDBPath, "SELECT COUNT(*) FROM compiler_metadata WHERE key = 'compiler_version'", "nonzero")
 }
 
+func TestNativeModelContextReportMatchesRubyGenerator(t *testing.T) {
+	repo := repoRootForTest(t)
+	ruby := requireExecutableForTest(t, "ruby")
+
+	rubyOutput := runRubyScriptStdout(t, repo, ruby, "scripts/generate-model-context-report.rb")
+	goOutput, err := buildNativeModelContextReport(repo)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if goOutput != rubyOutput {
+		t.Fatalf("Go model context report does not match Ruby output: %s", firstStringDiff(goOutput, rubyOutput))
+	}
+}
+
 func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
 	repo := t.TempDir()
 	writeFile(t, filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb"), "# ok\n")
@@ -664,6 +678,31 @@ func readTestFile(t *testing.T, path string) string {
 	return string(content)
 }
 
+func firstStringDiff(got string, want string) string {
+	limit := len(got)
+	if len(want) < limit {
+		limit = len(want)
+	}
+	for i := 0; i < limit; i++ {
+		if got[i] != want[i] {
+			return fmt.Sprintf("first diff at byte %d: got %q want %q", i, diffWindow(got, i), diffWindow(want, i))
+		}
+	}
+	return fmt.Sprintf("length mismatch: got %d bytes, want %d bytes", len(got), len(want))
+}
+
+func diffWindow(value string, index int) string {
+	start := index - 80
+	if start < 0 {
+		start = 0
+	}
+	end := index + 80
+	if end > len(value) {
+		end = len(value)
+	}
+	return value[start:end]
+}
+
 func createNativeRuntimeDBFixture(t *testing.T) string {
 	t.Helper()
 	path := filepath.Join(t.TempDir(), "runtime.db")
@@ -839,6 +878,20 @@ func runRubyScript(t *testing.T, repo string, ruby string, script string, args .
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("ruby %s failed: %v\n%s", script, err, string(output))
+	}
+	return string(output)
+}
+
+func runRubyScriptStdout(t *testing.T, repo string, ruby string, script string, args ...string) string {
+	t.Helper()
+	cmd := exec.Command(ruby, append([]string{script}, args...)...)
+	cmd.Dir = repo
+	cmd.Env = runtimeWrapperEnv(os.Environ())
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	output, err := cmd.Output()
+	if err != nil {
+		t.Fatalf("ruby %s failed: %v\n%s", script, err, stderr.String())
 	}
 	return string(output)
 }

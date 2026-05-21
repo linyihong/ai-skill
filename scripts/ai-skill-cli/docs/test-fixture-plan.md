@@ -21,6 +21,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/runtime-source-change` | runtime.db assertion | source keyword 出現在 generated surface |
 | `fixture/runtime-golden-generated-surfaces` | runtime refresh / compile generated surfaces | 同一份 source 可產出 runtime report、model reports、SQLite index、`runtime.db` assertions，且不寫 production artifacts |
 | `fixture/runtime-refresh-ordered-steps` | runtime refresh wrapper orchestration | generator / validator steps 順序固定；任一步失敗時停止後續 steps 並回 failure |
+| `fixture/runtime-generator-parity` | Ruby vs Go generator parity | Go-native generator output 必須與 Ruby stdout byte-for-byte 相同，通過前不得接 production refresh |
 | `fixture/native-sqlite-file-proof` | pure Go SQLite proof | temporary DB 可 create / insert / query / integrity check，且不依賴外部 `sqlite3` CLI |
 | `fixture/runtime-db-native-validator` | native runtime.db validator | valid DB、missing required table、invalid JSON column、stale compiler metadata warning 均有固定結果 |
 | `fixture/runtime-query-index` | native runtime index query | ranking、filter、limit、empty result、missing DB 均有固定結果 |
@@ -69,6 +70,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - Phase 3 已新增 `runtime-index-native-validator` Go fixture，覆蓋 SQLite runtime index valid case、missing table、stale checksum、FTS count mismatch、git-ignore boundary；git-ignore boundary 以 Go 呼叫 external Git 檢查。
 - Phase 3 已新增 `runtime-golden-generated-surfaces` integration fixture：以同一份 canonical source 產生 runtime report、model context report、model checklists、臨時 SQLite index、臨時 `runtime.db`，並固定檢查 report anchors、index row counts、FTS hit、`generated_surfaces` 與 compiler metadata；fixture 只寫入測試 temp dir。
 - Phase 3 已新增 `runtime-refresh-ordered-steps` fixture：`runtime refresh` Go wrapper mode 依序執行 model context report、model checklists、runtime report、SQLite index、SQLite index validation、knowledge runtime validation；第一個 failing step 會阻斷並不執行後續 steps。
+- Phase 3 已新增第一個 `runtime-generator-parity` fixture：`generate-model-context-report.rb` stdout 與 Go-native builder byte-for-byte 一致；此 fixture 只建立替換前護欄，尚不改 production refresh path。
 
 ## 舊腳本 parity fixture
 
