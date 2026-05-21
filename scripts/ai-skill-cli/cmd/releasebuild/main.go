@@ -56,6 +56,11 @@ func main() {
 	if err := os.WriteFile(filepath.Join(*dist, "SHA256SUMS"), []byte(strings.Join(checksums, "\n")+"\n"), 0o644); err != nil {
 		fatal(err)
 	}
+	if *stableNames {
+		if err := writeBuildInfo(*dist, *version, *commit, *date); err != nil {
+			fatal(err)
+		}
+	}
 }
 
 func artifactName(version string, item target, stable bool) string {
@@ -95,6 +100,16 @@ func sha256File(path string) (string, error) {
 	}
 	sum := sha256.Sum256(content)
 	return hex.EncodeToString(sum[:]), nil
+}
+
+func writeBuildInfo(dist string, version string, commit string, date string) error {
+	lines := []string{
+		"version=" + version,
+		"source_commit=" + commit,
+		"built_at=" + date,
+		"targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64",
+	}
+	return os.WriteFile(filepath.Join(dist, "BUILDINFO"), []byte(strings.Join(lines, "\n")+"\n"), 0o644)
 }
 
 func fatal(err error) {

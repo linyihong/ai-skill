@@ -35,6 +35,7 @@ Committed binaries live in [`bin/`](bin/) so the repo can run the CLI without a 
 - `bin/ai-skill-linux-amd64`
 - `bin/ai-skill-linux-arm64`
 - `bin/ai-skill-windows-amd64.exe`
+- `bin/BUILDINFO`
 - `bin/SHA256SUMS`
 
 Use the binary matching the host OS/architecture. Rebuild these files only after CLI source changes:
@@ -42,6 +43,8 @@ Use the binary matching the host OS/architecture. Rebuild these files only after
 ```bash
 go run ./cmd/releasebuild --stable-names --version "repo-$(git rev-parse --short HEAD)" --commit "$(git rev-parse --short HEAD)" --dist bin
 ```
+
+`go test ./...` verifies `bin/SHA256SUMS`, checks `bin/BUILDINFO` against the latest CLI source commit, and smoke-tests the current host binary. If CLI source changes, rebuild `bin/` before committing.
 
 Release artifacts：`go run ./cmd/releasebuild` 會輸出 Windows amd64、macOS amd64/arm64、Linux amd64/arm64 binaries 與 `SHA256SUMS`。`ai-skill version` 支援 `-ldflags` 注入 version / commit / date。
 
