@@ -416,6 +416,10 @@ func TestNativeRuntimeCompilerBuildsFromSources(t *testing.T) {
 	assertSQLiteCountAtLeast(t, nativeDB, "generated_surfaces", 1)
 	assertSQLiteCountAtLeast(t, nativeDB, "compiler_rules", 1)
 	assertSQLiteCountAtLeast(t, nativeDB, "decision_recording", 1)
+	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM runtime_budget WHERE model_name = 'default_budget'", "nonzero")
+	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM runtime_budget WHERE model_name = 'layer:bootstrap'", "nonzero")
+	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM runtime_budget WHERE model_name LIKE 'on_warning:%'", "nonzero")
+	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM runtime_budget WHERE model_name LIKE 'on_hard_stop:%'", "nonzero")
 	assertAllRuntimeYAMLInSourceManifest(t, repo, nativeDB)
 	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM compiler_metadata WHERE value = '2.0.0'", "nonzero")
 }

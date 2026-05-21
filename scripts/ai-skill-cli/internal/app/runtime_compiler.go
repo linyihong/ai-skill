@@ -266,6 +266,11 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB) error {
 		if err := insertRuntimeConfigRows(repo, db, config.rel, config.table, config.idCol, config.listKey, config.idKeys); err != nil {
 			return err
 		}
+		if config.rel == "runtime/budget/token-budget.yaml" {
+			if err := insertTokenBudgetFrameworkRows(repo, db); err != nil {
+				return err
+			}
+		}
 		if err := insertRuntimeSourceFile(db, config.rel, config.table, "structured_runtime_config"); err != nil {
 			return err
 		}
@@ -324,6 +329,49 @@ func runtimeConfigMappings() []runtimeConfigMapping {
 func insertRuntimeSourceFile(db *sql.DB, rel string, table string, compileRule string) error {
 	_, err := db.Exec(`INSERT OR REPLACE INTO runtime_source_files (source_path, target_table, compile_rule, compiled_at, compiler_version, status) VALUES (?, ?, ?, datetime('now'), ?, 'synced')`, rel, table, compileRule, goRuntimeCompilerVersion)
 	return err
+}
+
+func insertTokenBudgetFrameworkRows(repo string, db *sql.DB) error {
+	config, err := readRuntimeYAMLMap(repo, "runtime/budget/token-budget.yaml")
+	if err != nil {
+		return err
+	}
+	if defaultBudget := runtimeMap(config["default_budget"]); len(defaultBudget) > 0 {
+		if _, err := db.Exec(`INSERT INTO runtime_budget (model_name, content) VALUES (?, ?)`, "default_budget", runtimeJSON(defaultBudget)); err != nil {
+			return err
+		}
+	}
+	layerBudget := runtimeMap(config["layer_budget"])
+	layerNames := make([]string, 0, len(layerBudget))
+	for name := range layerBudget {
+		layerNames = append(layerNames, name)
+	}
+	sort.Strings(layerNames)
+	for _, name := range layerNames {
+		value := runtimeMap(layerBudget[name])
+		entry := map[string]any{"layer": name}
+		for key, nested := range value {
+			entry[key] = nested
+		}
+		if _, err := db.Exec(`INSERT INTO runtime_budget (model_name, content) VALUES (?, ?)`, "layer:"+name, runtimeJSON(entry)); err != nil {
+			return err
+		}
+	}
+	for _, group := range []struct {
+		key    string
+		prefix string
+	}{
+		{key: "on_warning", prefix: "on_warning"},
+		{key: "on_hard_stop", prefix: "on_hard_stop"},
+	} {
+		for index, action := range runtimeSliceOfMaps(config[group.key]) {
+			actionName := runtimeDefaultString(action["action"], fmt.Sprintf("action_%d", index+1))
+			if _, err := db.Exec(`INSERT INTO runtime_budget (model_name, content) VALUES (?, ?)`, fmt.Sprintf("%s:%02d:%s", group.prefix, index+1, actionName), runtimeJSON(action)); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func insertRuntimeConfigRows(repo string, db *sql.DB, rel string, table string, idCol string, listKey string, idKeys []string) error {
