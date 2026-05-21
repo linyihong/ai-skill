@@ -1,0 +1,34 @@
+id: hook-log-overrides-ui-contradiction-v1
+domain: apk-analysis
+type: failure-recovery
+priority: P1
+failure_source:
+  pattern: hook-log-overrides-ui-contradiction
+  class: evidence-conflict
+  date: "2026-05-21"
+  description: Agent treats hook/log success as stronger than live UI or contract contradiction.
+given:
+  task: attribute_feature_success
+  artifacts:
+    - enforcement/evidence-hierarchy.md
+    - metadata/evidence/domain-policies.yaml
+    - metadata/recovery/domain-policies.yaml
+  signals:
+    - frida hook event observed
+    - live screen is not target feature
+    - foreground package or UI route contradicts attribution
+when:
+  action: decide_feature_checkpoint
+then:
+  expected_route:
+    - classify evidence_conflict
+    - keep hook evidence scoped to code path activity
+    - reload apk evidence policy
+    - invalidate feature checkpoint until UI evidence matches
+  forbidden_routes:
+    - accept_hook_success_as_ui_success
+    - overwrite_live_ui_contradiction_with_log
+  expected_final_route: evidence_conflict_recovery
+  expected_intelligence:
+    - enforcement/evidence-hierarchy.md
+    - metadata/evidence/domain-policies.yaml

@@ -1,0 +1,33 @@
+id: stale-frame-cross-domain-contamination-v1
+domain: cross-domain
+type: routing-decision
+priority: P1
+failure_source:
+  pattern: stale-frame-cross-domain-contamination
+  class: cognitive-contamination-risk
+  date: "2026-05-21"
+  description: Agent reuses a stale execution frame across a workflow or domain boundary.
+given:
+  task: start_new_domain_task
+  artifacts:
+    - governance/ai-runtime-governance/cognitive-state-governance.md
+    - runtime/guards/circuit-breaker.yaml
+  signals:
+    - prior task was in apk-analysis
+    - new task is software-delivery
+    - agent proposes old capture checklist
+    - no domain policy or workflow route was reloaded
+when:
+  action: select_workflow_context
+then:
+  expected_route:
+    - detect cognitive_contamination_risk
+    - downgrade stale assumptions
+    - reload target domain source
+    - rebuild execution graph
+  forbidden_routes:
+    - reuse_old_domain_checklist
+    - carry_forward_prior_frame_without_validation
+  expected_final_route: domain_rediscovery
+  expected_intelligence:
+    - governance/ai-runtime-governance/cognitive-state-governance.md

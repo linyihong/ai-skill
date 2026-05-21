@@ -10,7 +10,7 @@
 - [`validation/`](validation/README.md)：定義新分層變更的 validation gates、migration checklist 與 pass / block rules。
 - [`cleanup/`](cleanup/README.md)：定義知識重複偵測、拆分規則與所有權邊界。
 - [`dependency/`](dependency/README.md)：定義知識依賴圖的維護規則與連動更新流程。
-- [`ai-runtime-governance/`](ai-runtime-governance/README.md)：將工程哲學轉譯為 AI runtime governance，例如新增 skill / memory / workflow / automation 前的 five-step gate。
+- [`ai-runtime-governance/`](ai-runtime-governance/README.md)：將工程哲學轉譯為 AI runtime governance，例如新增 skill / memory / workflow / automation 前的 five-step gate，以及 cognitive state / evidence governance。
 - [`document-sizing.md`](document-sizing.md)：文件大小與拆分原則 — 定義文件拆分門檻、決策流程、拆分後必做事項與建議結構。
 
 ## 放什麼

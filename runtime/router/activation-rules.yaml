@@ -98,6 +98,36 @@
     :priority: P1
     :estimated_tokens: 900
     :source: enforcement/escalation-policy.md
+- :rule_id: enforcement.evidence-hierarchy
+  :description: Evidence hierarchy — 防止弱 evidence、stale assumption 或 local scope claim 驅動高風險 execution
+  :activation:
+    :when:
+    - :type: user_signal
+      :matches:
+      - 證據不足
+      - assumption
+      - 假設
+      - confidence
+      - claim scope
+      - evidence quality
+    - :type: validation_gap
+      :matches:
+      - evidence-quality-mismatch
+      - claim-scope-overreach
+      - unsupported-confidence
+      - stale-assumption
+      - ownership-conflict
+    - :type: task_intent
+      :matches:
+      - completion-claim
+      - evidence-review
+      - cognitive-governance
+      - runtime-governance
+  :load:
+    :strategy: lazy
+    :priority: P1
+    :estimated_tokens: 900
+    :source: enforcement/evidence-hierarchy.md
 - :rule_id: enforcement.decision-efficiency
   :description: 決策效率 — 以最高收益路線做決策
   :activation:

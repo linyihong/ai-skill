@@ -1,6 +1,6 @@
 # Cognitive State & Evidence Governance
 
-> **狀態**: in-progress
+> **狀態**: completed
 > **建立日期**: 2026-05-20
 > **目的**: 補足 Runtime Recovery & Escalation System 尚未覆蓋的「假設、證據、信心、來源新鮮度」治理層，讓 agent 在外部 failure 發生前就能偵測 belief drift、降速或停止自動執行。
 
@@ -787,9 +787,9 @@ Candidate files:
 
 Tasks:
 
-- [ ] 定義 assumption lifecycle、assumption ledger、belief ownership、evidence lineage、contradiction propagation、evidence qualification、confidence integrity、temporal decay、claim scope、intent stability、cognitive state model、cognitive contamination、belief GC、governance minimality / cognitive cost、tier boundary、meta-stop rule 的治理 gate。
-- [ ] 明確寫出與 `recovery-retry-governance.md` 的邊界。
-- [ ] 更新 governance index。
+- [x] 定義 assumption lifecycle、assumption ledger、belief ownership、evidence lineage、contradiction propagation、evidence qualification、confidence integrity、temporal decay、claim scope、intent stability、cognitive state model、cognitive contamination、belief GC、governance minimality / cognitive cost、tier boundary、meta-stop rule 的治理 gate。
+- [x] 明確寫出與 `recovery-retry-governance.md` 的邊界。
+- [x] 更新 governance index。
 
 ### Phase 2 — Enforcement Rules
 
@@ -802,11 +802,11 @@ Candidate files:
 
 Tasks:
 
-- [ ] 新增 low-quality / low-scope evidence 不得覆蓋 high-quality contradiction 的 MUST rule。
-- [ ] 定義 assumption 被 contradiction 推翻後的 forbidden behavior。
-- [ ] 定義 local evidence 不得支持 global claim 的 forbidden behavior。
-- [ ] 定義 current action 不得長期脫離 original goal / validation target 的 forbidden behavior。
-- [ ] 將 evidence qualification、belief ownership conflict、confidence integrity、intent drift、cognitive contamination 接到 escalation trigger。
+- [x] 新增 low-quality / low-scope evidence 不得覆蓋 high-quality contradiction 的 MUST rule。
+- [x] 定義 assumption 被 contradiction 推翻後的 forbidden behavior。
+- [x] 定義 local evidence 不得支持 global claim 的 forbidden behavior。
+- [x] 定義 current action 不得長期脫離 original goal / validation target 的 forbidden behavior。
+- [x] 將 evidence qualification、belief ownership conflict、confidence integrity、intent drift、cognitive contamination 接到 escalation trigger。
 
 ### Phase 3 — Runtime Guard / Budget
 
@@ -819,12 +819,12 @@ Candidate files:
 
 Tasks:
 
-- [ ] 新增或擴充 confidence decay guard。
-- [ ] 定義 autonomy modes、recovery budget、recovery exit criteria、re-entry safety、alignment threshold 與 contamination boundary trigger。
-- [ ] 在新增 guard 前執行 signal normalization / compression pass。
-- [ ] 僅 promotion 最小 runtime primitives；Tier 3+ governance concept 預設不 runtime 化。
-- [ ] 若需要 stateful counter，評估是否接 `runtime-state.db`。
-- [ ] 執行 compiler 與 runtime DB validation。
+- [x] 新增或擴充 confidence decay guard。
+- [x] 定義 autonomy modes、recovery budget、recovery exit criteria、re-entry safety、alignment threshold 與 contamination boundary trigger。
+- [x] 在新增 guard 前執行 signal normalization / compression pass。
+- [x] 僅 promotion 最小 runtime primitives；Tier 3+ governance concept 預設不 runtime 化。
+- [x] 若需要 stateful counter，評估是否接 `runtime-state.db`。
+- [x] 執行 compiler 與 runtime DB validation。
 
 ### Phase 4 — Metadata / Domain Evidence Policy
 
@@ -836,9 +836,9 @@ Candidate files:
 
 Tasks:
 
-- [ ] 決定 domain-specific evidence policy 的位置。
-- [ ] 加入 APK analysis / software delivery 的 evidence qualification。
-- [ ] 標明 metadata-only 或 runtime-enforced boundary。
+- [x] 決定 domain-specific evidence policy 的位置。
+- [x] 加入 APK analysis / software delivery 的 evidence qualification。
+- [x] 標明 metadata-only 或 runtime-enforced boundary。
 
 ### Phase 5 — Validation Scenarios
 
@@ -851,29 +851,29 @@ Candidate files:
 
 Tasks:
 
-- [ ] 測試 assumption 被當成 fact 的失效模式。
-- [ ] 測試 hook/log success 不能覆蓋 UI / contract contradiction。
-- [ ] 測試 repeated patch 後必須降 autonomy 或進 recovery。
-- [ ] 測試 local evidence 被壓縮成 global claim 時會被阻擋。
-- [ ] 測試 stale execution frame 跨 domain reuse 會觸發 cognitive contamination。
-- [ ] 測試 current action 脫離 original goal 時會觸發 intent stability gate。
-- [ ] 測試底層 assumption 被推翻時相依 checkpoint 會被 invalidated。
-- [ ] 測試 recovery exit criteria 未滿足時不得恢復 autonomy。
-- [ ] 測試相同 contradiction class 在沒有新 evidence 時不得立即重跑相同 recovery。
-- [ ] 測試 governance minimality 會避免小任務啟動過重 governance chain。
-- [ ] 測試 Tier 3+ cognitive optimization 不會阻塞 Tier 0-2 safe execution。
-- [ ] 測試 meta-governance mechanism 不會在無 concrete failure 時 promotion 到 runtime。
+- [x] 測試 assumption 被當成 fact 的失效模式。
+- [x] 測試 hook/log success 不能覆蓋 UI / contract contradiction。
+- [x] 測試 repeated patch 後必須降 autonomy 或進 recovery。
+- [x] 測試 local evidence 被壓縮成 global claim 時會被阻擋。
+- [x] 測試 stale execution frame 跨 domain reuse 會觸發 cognitive contamination。
+- [x] 測試 current action 脫離 original goal 時會觸發 intent stability gate。
+- [x] 測試底層 assumption 被推翻時相依 checkpoint 會被 invalidated。
+- [x] 測試 recovery exit criteria 未滿足時不得恢復 autonomy。
+- [x] 測試相同 contradiction class 在沒有新 evidence 時不得立即重跑相同 recovery。
+- [x] 測試 governance minimality 會避免小任務啟動過重 governance chain。
+- [x] 測試 Tier 3+ cognitive optimization 不會阻塞 Tier 0-2 safe execution。
+- [x] 測試 meta-governance mechanism 不會在無 concrete failure 時 promotion 到 runtime。
 
 ### Phase 6 — Plan Completion Closure
 
 Tasks:
 
-- [ ] 確認所有 phase 完成或標 blocked。
-- [ ] 執行適用 validator。
-- [ ] 檢查 linked updates。
-- [ ] 更新 `plans/README.md` 狀態。
-- [ ] 若完成，搬移至 `plans/archived/`。
-- [ ] Commit / push / readback / clean status。
+- [x] 確認所有 phase 完成或標 blocked。
+- [x] 執行適用 validator。
+- [x] 檢查 linked updates。
+- [x] 更新 `plans/README.md` 狀態。
+- [x] 若完成，搬移至 `plans/archived/`。
+- [x] Commit / push / readback / clean status。
 
 ---
 

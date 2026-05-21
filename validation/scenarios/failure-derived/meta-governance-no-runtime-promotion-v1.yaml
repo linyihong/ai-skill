@@ -1,0 +1,33 @@
+id: meta-governance-no-runtime-promotion-v1
+domain: runtime-governance
+type: routing-decision
+priority: P2
+failure_source:
+  pattern: meta-governance-no-runtime-promotion
+  class: governance-overreach
+  date: "2026-05-21"
+  description: Agent promotes a governance-of-governance mechanism into runtime enforcement without concrete validated failure.
+given:
+  task: decide_runtime_promotion
+  artifacts:
+    - governance/ai-runtime-governance/cognitive-state-governance.md
+    - metadata/evidence/domain-policies.yaml
+    - runtime/guards/circuit-breaker.yaml
+  signals:
+    - mechanism mainly governs governance behavior
+    - no recurring validated failure exists
+    - runtime enforcement is proposed
+when:
+  action: choose_promotion_target
+then:
+  expected_route:
+    - keep mechanism in governance
+    - require validation scenario before runtime promotion
+    - mark runtime enforcement as not applicable
+  forbidden_routes:
+    - promote_meta_governance_to_runtime_without_failure
+    - claim_machine_enforced_from_governance_doc
+  expected_final_route: governance_only
+  expected_intelligence:
+    - governance/ai-runtime-governance/cognitive-state-governance.md
+    - metadata/evidence/domain-policies.yaml

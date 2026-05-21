@@ -482,6 +482,38 @@ records:
       compression_level: summary-first
       reason: 先讀 scenario governance 與 source intelligence；建立或修改 scenario 時再展開 validation format 與 failure-learning source。
 
+  - id: route.governance.cognitive-state-evidence
+    task_intent: 處理 assumption、evidence quality、confidence decay、claim scope、intent drift、cognitive contamination 或 autonomy downgrade 的治理決策
+    primary_source: governance/ai-runtime-governance/cognitive-state-governance.md
+    required_dependencies:
+      - enforcement/evidence-hierarchy.md
+      - enforcement/escalation-policy.md
+      - metadata/evidence/README.md
+      - metadata/evidence/domain-policies.yaml
+      - runtime/guards/circuit-breaker.yaml
+    candidate_sources:
+      - intelligence/engineering/agent-architecture/cognitive-boundaries.md
+      - intelligence/engineering/agent-architecture/failure-recovery.md
+      - intelligence/engineering/agent-architecture/context-collapse.md
+      - validation/scenarios/failure-derived/
+    source_of_truth_gate: governance-cognitive-state-active
+    ranking_reason: cognitive-state-governance 將 assumption lifecycle、evidence qualification、confidence integrity、claim scope、intent stability、autonomy mode 與 contamination boundary 收斂成 governance-first policy；runtime 僅接收壓縮後的 minimal primitives。
+    validation_signal: Claim scope、evidence owner、confidence integrity、contradiction propagation、runtime primitive boundary 與 scenario coverage 已檢查。
+    metadata:
+      priority: P1
+      confidence: medium
+      context_cost:
+        estimated_tokens: 1400
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          task: 1
+      compatibility_state: candidate
+    model:
+      profile: medium
+      compression_level: summary-first
+      reason: 先讀治理主文與 evidence hierarchy；只有修改 runtime guard、metadata evidence 或 validation scenario 時才展開相關 source。
+
   - id: route.metadata.knowledge-atom-schema
     task_intent: 設計或評估 Knowledge Atom metadata
     primary_source: metadata/schema.md

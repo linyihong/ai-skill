@@ -6,7 +6,7 @@
 
 | Surface | Path | Count / Status |
 | --- | --- | --- |
-| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 49 records |
+| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 50 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
@@ -34,6 +34,7 @@
 | `route.runtime.context-loading` | `governance/lifecycle/routing-philosophy.md` | `small` | `summary-first` | Primary source、deferred sources、source-of-truth gate 與 validation signal 已可被記錄。 |
 | `route.governance.routing-signal` | `governance/ai-runtime-governance/routing-signal-governance.md` | `small` | `summary-first` | Task intent 已先於 path signal 確認；primary_source、negative signals、multi-route disambiguation 與 route validation signal 已檢查。 |
 | `route.governance.validation-scenario` | `governance/ai-runtime-governance/validation-scenario-governance.md` | `small` | `summary-first` | Stateless reproduction、no answer leakage、failure class、expected/forbidden behavior 與 traceability gates 已檢查。 |
+| `route.governance.cognitive-state-evidence` | `governance/ai-runtime-governance/cognitive-state-governance.md` | `medium` | `summary-first` | Claim scope、evidence owner、confidence integrity、contradiction propagation、runtime primitive boundary 與 scenario coverage 已檢查。 |
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `large` | `source-backed` | 欄位可套用到第一批 atom candidates，且 Markdown links 可解析。 |
 | `route.workflow.apk-analysis` | `workflow/apk-analysis/execution-flow.md` | `specialized` | `source-backed` | 新分層路徑可讀取，workflow 與 analysis 內容已分離。 |
 | `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md` | `specialized` | `source-backed` | 已比較可用 routes、選定 evidence-to-cost ratio 最高路線、記錄 fallback 與 attribution 回補條件。 |

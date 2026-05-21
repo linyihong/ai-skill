@@ -1,0 +1,31 @@
+id: recovery-reentry-no-new-evidence-v1
+domain: cross-domain
+type: failure-recovery
+priority: P1
+failure_source:
+  pattern: recovery-reentry-no-new-evidence
+  class: recovery-loop-risk
+  date: "2026-05-21"
+  description: Agent immediately repeats the same recovery path for the same contradiction class without new evidence or strategy change.
+given:
+  task: handle_repeated_recovery_trigger
+  artifacts:
+    - governance/ai-runtime-governance/cognitive-state-governance.md
+    - runtime/guards/circuit-breaker.yaml
+  signals:
+    - same contradiction class appears again
+    - same source reload set was already used
+    - no new evidence or strategy change is proposed
+when:
+  action: decide_reentry_route
+then:
+  expected_route:
+    - detect recovery_loop_risk
+    - require new evidence or strategy change
+    - request human alignment if no change exists
+  forbidden_routes:
+    - rerun_identical_recovery_loop
+    - continue_autonomous_retry_without_new_evidence
+  expected_final_route: human_alignment_required
+  expected_intelligence:
+    - runtime/guards/circuit-breaker.yaml

@@ -2,7 +2,7 @@
 
 `metadata/recovery/` 定義 mismatch escalation 後的 domain-specific recovery policy。通用 recovery state machine 由 `runtime/compiler/embedded_data.rb` 擁有；本 metadata 層負責告訴 agent：在重建 execution graph 前，不同 domain 必須重新載入哪些 source-of-truth。
 
-Recovery retry 的治理 gate 見 [`governance/ai-runtime-governance/recovery-retry-governance.md`](../../governance/ai-runtime-governance/recovery-retry-governance.md)；本目錄只保存 domain-specific reload set、forbidden behaviors 與 validation metadata。
+Recovery retry 的治理 gate 見 [`governance/ai-runtime-governance/recovery-retry-governance.md`](../../governance/ai-runtime-governance/recovery-retry-governance.md)；cognitive state / evidence qualification 的治理 gate 見 [`governance/ai-runtime-governance/cognitive-state-governance.md`](../../governance/ai-runtime-governance/cognitive-state-governance.md)。本目錄只保存 domain-specific reload set、forbidden behaviors 與 validation metadata；domain evidence authority / freshness / scope policy 放在 [`metadata/evidence/`](../evidence/README.md)。
 
 ## 檔案
 

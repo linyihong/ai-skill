@@ -27,6 +27,17 @@ Guardrails:
 | `route.feedback.promotion-pipeline` | Primary: `feedback/promotion/README.md`<br>Compression: `source-backed`<br>Required: `enforcement/feedback-lessons.md`<br>`enforcement/reusable-guidance-boundary.md`<br>`enforcement/sanitization.md`<br>`enforcement/failure-learning-system.md`<br>`governance/lifecycle/README.md`<br>`governance/validation/README.md`<br>Validation: 原 lesson source 保留、promotion target 明確、runtime surfaces 與 close-loop validation 已同步。 |
 | `route.models.model-aware-routing` | Primary: `models/profiles/README.md`<br>Compression: `source-backed`<br>Required: `models/compression/README.md`<br>`runtime/router/`<br>`metadata/ranking/README.md`<br>`knowledge/summaries/README.md`<br>Validation: Profile、compression level、primary source、deferred sources 與 validation signal 可被記錄。 |
 
+### `medium`
+
+Guardrails:
+
+- 先確認 registry record 的 model profile。
+- 依 `models/profiles/README.md` 與 `models/compression/README.md` 選讀取深度。
+
+| Route | Checklist |
+| --- | --- |
+| `route.governance.cognitive-state-evidence` | Primary: `governance/ai-runtime-governance/cognitive-state-governance.md`<br>Compression: `summary-first`<br>Required: `enforcement/evidence-hierarchy.md`<br>`enforcement/escalation-policy.md`<br>`metadata/evidence/README.md`<br>`metadata/evidence/domain-policies.yaml`<br>`runtime/guards/circuit-breaker.yaml`<br>Validation: Claim scope、evidence owner、confidence integrity、contradiction propagation、runtime primitive boundary 與 scenario coverage 已檢查。 |
+
 ### `small`
 
 Guardrails:

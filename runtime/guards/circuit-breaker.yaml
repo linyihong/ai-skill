@@ -90,6 +90,50 @@
     :message: 依 enforcement/escalation-policy.md 重建 execution graph。
   - :action: rediscovery_required
     :message: 重新讀 workflow primary source、owner docs、artifact gates 與必要 source-of-truth。
+:execution_reliability_degradation:
+  :description: 壓縮 cognitive-state governance signals；在 confidence decay、claim scope overreach、intent drift 或 contamination risk 影響 execution 前降 autonomy。
+  :primitive_signals:
+  - :signal: evidence_quality_mismatch
+    :covers:
+    - low_quality_evidence_supports_high_scope_claim
+    - evidence_ownership_conflict
+    - stale_or_invalid_source_used_as_current
+    :minimum_action: validation_required
+  - :signal: claim_scope_overreach
+    :covers:
+    - local_evidence_used_for_global_claim
+    - single_hook_or_test_used_as_feature_success
+    :minimum_action: narrow_claim_or_validate
+  - :signal: intent_instability
+    :covers:
+    - current_action_detached_from_original_goal
+    - repeated_patch_without_validation_reconnect
+    :minimum_action: limited_autonomy
+  - :signal: recovery_loop_risk
+    :covers:
+    - same_contradiction_class_reentered_without_new_evidence
+    - recovery_exit_criteria_unmet
+    :minimum_action: human_alignment_required
+  - :signal: cognitive_contamination_risk
+    :covers:
+    - stale_execution_frame_crosses_workflow_domain_or_session_boundary
+    - context_compaction_preserves_conclusion_without_evidence
+    :minimum_action: rediscovery_or_read_only
+  :check_on:
+  - before_completion_claim
+  - before_retry_after_failure
+  - after_user_contradiction
+  - after_context_compaction
+  - before_resuming_from_recovery
+  :actions:
+  - :action: validation_required
+    :message: "⚠️ Evidence quality or claim scope mismatch detected. Validate or narrow the claim before continuing."
+  - :action: limited_autonomy
+    :message: Confidence or intent degraded. Limit execution to source reload, targeted edit, and validation.
+  - :action: human_alignment_required
+    :message: Recovery loop or ownership ambiguity requires human alignment before autonomous execution.
+  - :action: rediscovery_or_read_only
+    :message: Cognitive contamination risk detected. Re-enter discovery or read-only mode before editing.
 :conflict_rules:
   :description: 偵測目前 context 中的規則衝突
   :check_on: task_start

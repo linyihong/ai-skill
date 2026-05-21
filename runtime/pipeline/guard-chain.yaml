@@ -141,8 +141,24 @@
       :warning: warn
       :critical: suspend_execution + enter_recovery + rediscovery_required
     :source: runtime/guards/circuit-breaker.yaml
-  - :id: conversation_length
+  - :id: execution_reliability_degradation
     :order: 7
+    :severity: high
+    :description: 檢查 evidence quality mismatch、claim scope overreach、intent instability、recovery loop risk 與 cognitive contamination risk。
+    :check:
+      :frequency: per_task_boundary
+      :triggers:
+      - evidence_quality_mismatch
+      - claim_scope_overreach
+      - intent_instability
+      - recovery_loop_risk
+      - cognitive_contamination_risk
+    :action_on_violation:
+      :warning: validation_required + limited_autonomy
+      :critical: human_alignment_required + rediscovery_or_read_only
+    :source: runtime/guards/circuit-breaker.yaml
+  - :id: conversation_length
+    :order: 8
     :severity: high
     :description: 檢查對話長度是否超過限制
     :check:
@@ -151,7 +167,7 @@
     :action_on_violation: warn + suggest_new_session
     :source: runtime/guards/context-pollution.yaml
   - :id: conflict_rules
-    :order: 8
+    :order: 9
     :severity: medium
     :description: 檢查執行期間是否有規則衝突
     :check:
@@ -159,7 +175,7 @@
     :action_on_violation: warn + suggest_resolution
     :source: runtime/guards/circuit-breaker.yaml
   - :id: repetitive_edits
-    :order: 9
+    :order: 10
     :severity: medium
     :description: 檢查是否對同一檔案反覆修改
     :check:
@@ -168,7 +184,7 @@
     :action_on_violation: warn + suggest_review
     :source: runtime/guards/context-pollution.yaml
   - :id: module_count
-    :order: 10
+    :order: 11
     :severity: medium
     :description: 檢查載入的模組數量
     :check:
@@ -177,7 +193,7 @@
     :action_on_violation: warn + suggest_prune
     :source: runtime/guards/context-pollution.yaml
   - :id: cross_reference_depth
-    :order: 11
+    :order: 12
     :severity: medium
     :description: 檢查依賴鏈深度
     :check:
@@ -186,7 +202,7 @@
     :action_on_violation: warn + suggest_simplify
     :source: runtime/guards/context-pollution.yaml
   - :id: token_utilization
-    :order: 12
+    :order: 13
     :severity: medium
     :description: 檢查 token 使用率
     :check:

@@ -8,6 +8,7 @@
 - [`rules/`](rules/README.md)：metadata 子規則索引，連到 ranking、confidence、compatibility 與 enforcement rule metadata。
 - [`ranking/`](ranking/README.md)：用 priority、status、confidence、context cost 與 depends/conflicts 排定讀取順序。
 - [`confidence/`](confidence/README.md)：定義 low / medium / high 信心與 lifecycle state 的關係。
+- [`evidence/`](evidence/README.md)：定義 domain-specific evidence authority、freshness、validity、scope 與 observability policy。
 - [`compatibility/`](compatibility/README.md)：記錄 old entrypoint 與 new layer path 的相容狀態。
 - [`recovery/`](recovery/README.md)：定義 mismatch escalation 後的 domain-specific reload set、L1-L5 metadata 與 recovery policy。
 - [`architecture/`](architecture/README.md)：定義 architecture fit、DDD adoption、overengineering 與 bounded context 的 metadata-only heuristics。
@@ -17,6 +18,7 @@
 - Knowledge Atom schema 與 required / optional fields。
 - Ranking、priority、confidence、stability、complexity 與 context cost 規則。
 - Compatibility、model suitability、depends、related 與 conflicts metadata。
+- Domain evidence qualification policy（authority、freshness、validity、scope、observability）。
 - **Enforcement Rule metadata**：`metadata/rules/enforcement-rule-spec.md` 定義 spec，`metadata/rules/*.yaml` 為各 rule 的 metadata 實例。
 - Runtime loading、promotion、cleanup 與 graph construction 所需的控制資料。
 - Recovery escalation 後的 domain-specific source-of-truth reload policy。

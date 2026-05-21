@@ -1,0 +1,105 @@
+schema_version: evidence-domain-policies/v1
+status: candidate
+owner_layer: metadata/evidence
+source_path: metadata/evidence/domain-policies.yaml
+summary: Domain-specific evidence qualification policy for claim scope, authority, freshness, validity, and observability.
+
+policies:
+  - domain: software-delivery
+    title: Software Delivery Evidence Policy
+    applies_when:
+      - implementation, tests, BDD, contract, or docs are used to justify completion
+      - local validation is being generalized to feature or workflow correctness
+      - user asks whether a plan, implementation, or migration is complete
+    authority_order:
+      - user goal and accepted plan for requested scope
+      - owner contract, product brief, BDD, or workflow primary source
+      - executable tests, lints, builds, or manual acceptance evidence
+      - current repository source
+      - generated docs, summaries, or inferred architecture
+      - memory or prior conversation recap
+    freshness_requirements:
+      - rerun validation after source, runtime config, generated surfaces, or binaries change
+      - reread owner docs after user contradiction or plan scope change
+      - refresh claim scope after context compaction or recovery
+    scope_boundaries:
+      - unit test pass proves the tested behavior only
+      - go test pass proves package-level checks only, not product acceptance unless mapped
+      - diff review proves changed files only
+      - generated report refresh proves generation health, not semantic correctness of every source
+    invalid_claims:
+      - local_test_pass_implies_global_feature_correctness
+      - grep_presence_implies_implementation_complete
+      - generated_docs_current_implies_runtime_behavior_verified
+      - committed_change_implies_pushed_or_readback_complete
+    validation:
+      - completion claim names tests or manual validation actually run
+      - uncovered paths are stated when validation is partial
+      - linked docs and generated surfaces are refreshed when they are affected
+
+  - domain: apk-analysis
+    title: APK Analysis Evidence Policy
+    applies_when:
+      - UI, Frida, MITM, pcap, decompile, or fixture evidence is used for attribution
+      - captured events are being mapped to feature behavior
+      - automation crosses screen, package, or timing boundaries
+    authority_order:
+      - live foreground package and screen observation for UI route
+      - synchronized capture window with feature checkpoint
+      - API response and traffic timing evidence
+      - Frida hook event with timestamp and call context
+      - decompiled code or static signature
+      - logs, summaries, or inferred route
+    freshness_requirements:
+      - recapture after app restart, login/session reset, cache clear, or navigation change
+      - invalidate capture windows when foreground package leaves target scope
+      - treat stale Frida events as startup/preload unless feature checkpoint is synchronized
+    scope_boundaries:
+      - hook hit proves code path activity, not UI attribution
+      - traffic request proves network activity, not user-triggered feature flow without timing and screen evidence
+      - decompile evidence proves possible behavior, not runtime execution
+    invalid_claims:
+      - frida_hit_implies_ui_feature_success
+      - traffic_seen_implies_feature_attribution
+      - external_package_window_implies_valid_app_evidence
+      - startup_event_implies_user_navigation
+    validation:
+      - evidence window includes screen, package, timestamp, and feature checkpoint
+      - ambiguous events are classified as startup, preload, cache, background, or feature-triggered
+      - sanitized output boundary is stated before reusable docs are updated
+
+  - domain: runtime-governance
+    title: Runtime Governance Evidence Policy
+    applies_when:
+      - runtime state, generated surface, guard, recovery, or validation scenario is changed
+      - agent claims that runtime governance is enforced
+      - governance prose is promoted to runtime guard behavior
+    authority_order:
+      - source YAML / Markdown owner file
+      - compiler source and generated `runtime/runtime.db`
+      - runtime refresh / validate command output
+      - Go tests or scenario validation
+      - generated report summaries
+      - plan notes or conversation recap
+    freshness_requirements:
+      - rerun runtime refresh after source governance surfaces change
+      - rerun runtime validate after generated DB or indexes change
+      - reread source and generated surfaces after commit / push when writeback rules require it
+    scope_boundaries:
+      - governance document defines policy but is not runtime enforcement by itself
+      - runtime DB proves compiled state only for compiler-supported sources
+      - validation scenario proves expected routing behavior, not automatic enforcement
+    invalid_claims:
+      - governance_doc_implies_machine_enforcement
+      - runtime_db_present_implies_all_yaml_compiled
+      - scenario_exists_implies_scenario_runner_executed
+      - refresh_pass_implies_no_semantic_gap
+    validation:
+      - enforcement claim names the compiled surface or marks it governance-only
+      - runtime refresh and validate are run when supported surfaces changed
+      - scenario additions are listed in `validation/README.md`
+
+selection_rules:
+  - If multiple policies match, apply all matching invalid_claims and the strongest authority owner for each belief.
+  - If no policy matches, use `enforcement/evidence-hierarchy.md` and record the metadata evidence policy gap.
+  - Evidence policy supplements recovery policy; it does not replace escalation level classification.

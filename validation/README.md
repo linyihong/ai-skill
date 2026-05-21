@@ -48,6 +48,21 @@ validation/
 - `software-delivery/behavior-scope-overclaim.yaml` — single scenario pass 不得宣稱 global feature correctness。
 - `software-delivery/mutation-testing-effectiveness.yaml` — high coverage 不得直接等同測試有效；高風險邏輯用 targeted mutants / negative checks 驗證測試能抓錯。
 
+## Cognitive State / Evidence Scenarios
+
+- `failure-derived/assumption-as-fact-v1.yaml` — unvalidated assumption 不得作為 execution fact。
+- `failure-derived/hook-log-overrides-ui-contradiction-v1.yaml` — hook/log success 不得覆蓋 live UI / contract contradiction。
+- `failure-derived/repeated-patch-autonomy-downgrade-v1.yaml` — repeated patch 無新證據時必須降 autonomy 或進 recovery。
+- `failure-derived/local-evidence-global-claim-v1.yaml` — local evidence 不得支撐 global completion claim。
+- `failure-derived/stale-frame-cross-domain-contamination-v1.yaml` — stale execution frame 跨 domain reuse 必須觸發 rediscovery。
+- `failure-derived/intent-stability-drift-v1.yaml` — current action 脫離 original goal / validation target 時必須 realign。
+- `failure-derived/contradiction-propagates-checkpoint-v1.yaml` — upstream assumption 被推翻時 downstream checkpoint 必須 invalidated。
+- `failure-derived/recovery-exit-without-criteria-v1.yaml` — recovery exit criteria 未滿足時不得恢復 autonomy。
+- `failure-derived/recovery-reentry-no-new-evidence-v1.yaml` — 同 contradiction class 無新 evidence 時不得重跑相同 recovery。
+- `failure-derived/governance-minimality-small-task-v1.yaml` — 小型低風險任務不應啟動過重 governance chain。
+- `failure-derived/tier3-does-not-block-tier0-tier2-v1.yaml` — Tier 3 cognitive optimization 不得阻塞 Tier 0-2。
+- `failure-derived/meta-governance-no-runtime-promotion-v1.yaml` — 無具體 validated failure 時 meta-governance 不 promotion 到 runtime。
+
 ## Scenario 格式
 
 每個 scenario 定義在 `scenarios/<domain>/<id>.yaml`：

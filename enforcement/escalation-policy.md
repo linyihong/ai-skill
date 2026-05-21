@@ -20,7 +20,7 @@ Recovery retry 的治理 gate 見 [`governance/ai-runtime-governance/recovery-re
 | --- | --- | --- | --- |
 | `repeated-failure` | 同一路徑、同一 automation、同一 checkpoint 連續失敗 2 次 | L3 | 停止 retry，reload source-of-truth |
 | `user-contradiction` | 使用者指出「不是這樣」「你沒看文件」「你又在猜」 | L4 | 進入 recovery，重建 execution graph |
-| `evidence-conflict` | UI / API / repo structure 與 workflow、contract 或 README 衝突 | L4 | reload workflow primary source 與 owner docs |
+| `evidence-conflict` | UI / API / repo structure 與 workflow、contract、README 或 evidence hierarchy 衝突 | L4 | reload workflow primary source、owner docs，並依 `evidence-hierarchy.md` 降權不合格 evidence |
 | `assumption-drift` | agent 開始靠猜 route、猜座標、沿用 stale checklist | L3 | suspend assumption，補 source reading |
 | `source-of-truth-miss` | 重要操作前未讀 canonical workflow / UI map / contract / owner docs | L4 | rediscovery + dependency read ledger |
 | `automation-drift` | 腳本反覆 patch 但 checkpoint 截圖、foreground、feature context 不對 | L4 | 禁止繼續自動操作，回到 navigation graph |
@@ -45,6 +45,7 @@ Recovery retry 的治理 gate 見 [`governance/ai-runtime-governance/recovery-re
 - 不重建 execution graph。
 - 沿用已被反證的 checklist。
 - 把 log、Frida event、partial API evidence 或 target PID 當成 UI / workflow checkpoint 成功證據。
+- 讓 low-scope evidence 支持 global success claim，或讓 unsupported confidence 繼續驅動 execution。
 
 ## Required Recovery Output
 
@@ -83,6 +84,10 @@ Escalation 後的回覆或工作筆記必須能回答：
 | 不可取代 | 不能當作長期 prevention | 不能取代 real-time recovery |
 
 若 mismatch 已造成可重用失效模式，完成 recovery 後再依 [`failure-learning-system.md`](failure-learning-system.md) 分類與沉澱。
+
+## 與 Evidence Hierarchy 的關係
+
+[`evidence-hierarchy.md`](evidence-hierarchy.md) 用來判斷 evidence 是否足以支撐 belief、claim scope 或 autonomy。當 evidence hierarchy 判定出 ownership conflict、claim scope overreach、unsupported confidence 或 stale assumption，且該問題影響 execution graph 時，升級到本檔的 `evidence-conflict`、`assumption-drift` 或 `source-of-truth-miss` trigger。
 
 ## 驗證
 
