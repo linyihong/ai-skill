@@ -154,6 +154,25 @@ func TestCloseLoopMissingGitBlocks(t *testing.T) {
 	}
 }
 
+func TestCloseLoopCommitMissingGitBlocksBeforeWriteMode(t *testing.T) {
+	t.Setenv("PATH", emptyPathDir(t))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"close-loop", "--repo", t.TempDir(), "--commit", "--json"}, &stdout, &stderr)
+	if code != ExitMissingDependency {
+		t.Fatalf("expected missing dependency, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Error == nil || result.Error.Code != "missing_git" {
+		t.Fatalf("expected missing_git before write-mode block, got %#v", result.Error)
+	}
+}
+
 func TestCloseLoopCommitModeBlockedUntilParity(t *testing.T) {
 	repo := initTempGitRepo(t)
 

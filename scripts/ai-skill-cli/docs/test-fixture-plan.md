@@ -37,6 +37,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - `ai-skill close-loop --commit` 回傳 `missing_dependency`。
 - 輸出包含安裝指引。
 - 不修改任何檔案、index、commit、push、hook、mirror 或 runtime DB。
+- Phase 2 已用 isolated PATH tests 覆蓋 `doctor --require-git`、`close-loop --dry-run` 與 `close-loop --commit` 的 `missing_git` 阻斷；`close-loop --commit` 缺 Git 必須優先回 `missing_git`，不得只回 write mode 未完成。
 
 ## Runtime DB assertion fixture
 

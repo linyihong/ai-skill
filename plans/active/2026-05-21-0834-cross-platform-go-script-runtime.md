@@ -257,7 +257,7 @@ Tasks：
 
 - [x] 用 fixtures 模擬新專案初始化，不寫入真實使用者目錄。
 - [x] 用 temporary git repo 測試 close-loop、dirty owner group、lock、merge/rebase state、dry-run。
-- [ ] 用 missing-git fixture 測試 linked-update / close-loop 命令會阻斷並提醒使用者安裝 Git。
+- [x] 用 missing-git fixture 測試 linked-update / close-loop 命令會阻斷並提醒使用者安裝 Git。
 - [x] 對 symlink / copy fallback 建立 Windows 行為策略。
 - [x] 更新 `scripts/README.md`，標示舊 script 與新 CLI 的對應關係與 deletion / deprecation policy。
 
@@ -269,6 +269,7 @@ Progress notes：
 - `ai-skill close-loop --dry-run` 已建立 native inspection slice，支援 `--repo`、JSON / plain output、Git missing block、temporary git repo clean / dirty owner group / active lock / merge / rebase fixture；`--commit` / `--push` 仍阻斷，待 commit/push parity 完成後再開啟。
 - `ai-skill hooks install --dry-run` 已建立 native planner，支援 `--repo`、`--force`、JSON / plain output、`.githooks/` source 檢查、`.git/hooks/` target 檢查、既有 target conflict、merge/rebase warning、missing Git fixture，且 tests 證明不寫入 temporary repo；copy / chmod write mode 仍阻斷，待 hook parity 完成後再開啟。
 - `ai-skill sync-cursor-bundle --dry-run` 已建立 explicit-target planner，支援 `--repo`、`--target`、JSON / plain output、target 不可在 repo 內、copy-fallback mirror strategy、fake Cursor root 無寫入 tests；Windows / 權限受限環境預設 copy fallback，symlink 僅作未來明確 opt-in。
+- Missing Git fixture 已覆蓋 `doctor --require-git`、`close-loop --dry-run` 與 `close-loop --commit`；`close-loop --commit` 缺 Git 時必須優先回 `missing_git`，避免 linked-update / writeback 流程在缺 Git 時產生半套 close-loop。
 
 Completion criteria：
 
