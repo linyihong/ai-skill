@@ -23,7 +23,7 @@
 | `ai-skill hooks install` | 安裝本 repo git hooks | 是 | 是 | Phase 2 |
 | `ai-skill sync-cursor-bundle` | 同步 Cursor bundle / mirror | 是 | 否 | Phase 2 |
 | `ai-skill close-loop` | 檢查 dirty owner group、commit、push、readback | 是 | 是 | Phase 2 |
-| `ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index|`ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index | 是 | 否 | Phase 3 |
+| `ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index | 是 | 否 | Phase 3 |
 | `ai-skill runtime compile` | 編譯 `runtime/runtime.db` | 是 | 否 | Phase 3 |
 | `ai-skill runtime validate` | 驗證 runtime.db、knowledge runtime、SQLite assertions | 否 | 否 | Phase 3 |
 | `ai-skill runtime query` | 查詢 runtime index / generated surfaces | 否 | 否 | Phase 3 |
@@ -337,7 +337,7 @@
 
 ## 舊 Script 對應
 
-完整功能盤點、side effects、外部依賴與測試證據見 [`script-parity-inventory.md`](script-parity-inventory.md)。本節只保留命令契約層的摘要映射；不得用本表取代 parity 驗收。
+完整功能盤點、side effects、外部依賴與測試證據見 [`script-parity-inventory.md`](script-parity-inventory.md)。開發者 handoff map 見 [`legacy-to-go-migration-map.md`](legacy-to-go-migration-map.md)。本節只保留命令契約層的摘要映射；不得用本表取代 parity 驗收。
 
 | 現有 script / 入口 | CLI 命令 | 遷移定位 |
 | --- | --- | --- |

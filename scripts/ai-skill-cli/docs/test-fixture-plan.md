@@ -33,6 +33,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/runtime-index-native-validator` | native runtime index validator | valid index、missing table、stale checksum、FTS count mismatch、git-ignore boundary 均有固定結果 |
 | `fixture/release-artifacts` | cross-platform release build | Windows/macOS/Linux artifacts 與 `SHA256SUMS` 可由 Go release builder 產生 |
 | `fixture/legacy-script-parity` | 舊腳本覆蓋率驗證 | 每個 native target / wrapper first 舊入口都有命令映射與測試證據 |
+| `fixture/legacy-to-go-migration-map` | legacy surface 刪除前的文件 gate | 每個刪除列都有 new owner、source-of-truth、validation evidence，並連到 parity/disposition docs |
 
 ## 缺 Git fixture
 
@@ -95,6 +96,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - 每個舊入口都有目標 CLI 命令、parity 狀態與必要驗證。
 - 若舊入口會寫檔、動 git、寫 runtime DB、寫 tool mirror 或寫使用者設定，必須有 dry-run 或 fake-root fixture。
 - `deferred` 與 `tool-specific` 條目不得被當成已替代；輸出必須明確標示不在目前 Phase 範圍。
+- `legacy-to-go-migration-map.md` 必須能反查每個刪除 surface 的 Go command/package、source-of-truth 與 validation evidence。
 
 ## Windows path fixture
 

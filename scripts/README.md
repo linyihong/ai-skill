@@ -11,7 +11,7 @@
 
 ## Go CLI migration map
 
-跨平台 Go CLI 的 source 在 [`ai-skill-cli/`](ai-skill-cli/README.md)。完整 parity source-of-truth 是 [`ai-skill-cli/docs/script-parity-inventory.md`](ai-skill-cli/docs/script-parity-inventory.md)；本表只列 scripts 入口的使用者導覽。
+跨平台 Go CLI 的 source 在 [`ai-skill-cli/`](ai-skill-cli/README.md)。開發者 handoff map 是 [`ai-skill-cli/docs/legacy-to-go-migration-map.md`](ai-skill-cli/docs/legacy-to-go-migration-map.md)，完整 parity source-of-truth 是 [`ai-skill-cli/docs/script-parity-inventory.md`](ai-skill-cli/docs/script-parity-inventory.md)；本表只列 scripts 入口的使用者導覽。
 
 | 現有入口 | 目標 CLI | 目前狀態 | 收尾政策 |
 | --- | --- | --- | --- |
@@ -21,6 +21,7 @@
 | `sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | explicit-target dry-run planner 已實作；managed mirror write mode 待 parity | 保留條件需寫明 owner、期限與移除條件；不得成為通用 CLI 預設行為。 |
 | `ai-skill-close-loop.sh` | `ai-skill close-loop` | dry-run inspection 已實作；commit / push 待 parity | close-loop lock、dirty group、merge/rebase、dry-run、commit/push parity 通過後刪除或降為短期 thin wrapper。 |
 | runtime Ruby helpers | `ai-skill runtime ...` | 已刪除 runtime report/index/query/validation/migration/state/sync Ruby entrypoints；`runtime validate`、`runtime refresh`、`runtime query`、`runtime compile` 的 desktop path 預設都走 Go-native，不依賴 Ruby、Python 或 `sqlite3` CLI。 | 已完成 native 覆蓋或易誤用的 scripts 直接刪除；runtime compiler source 已恢復為 YAML，Go compiler 是唯一 active compile path。 |
+| deleted Roo Python helper | `ai-skill roo set-global-custom-instructions` | 已刪除 `scripts/set-roo-global-custom-instructions.py`；guarded tool adapter 由 Go CLI 實作。 | fake VS Code SQLite DB tests 通過後刪除，避免未來錯誤引用 Python helper。 |
 
 Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`](ai-skill-cli/docs/legacy-script-disposition.md) 是舊 shell / Ruby / Python entrypoints 的最終 disposition source；runtime desktop CLI 已是 primary，已覆蓋的 runtime Ruby/Python scripts 已刪除，尚未完整 parity 的 write-mode shell adapters 不在本輪直接刪除。
 

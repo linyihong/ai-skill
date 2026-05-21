@@ -588,9 +588,9 @@ ai-skill runtime validate
 □ Step 8:  [強制] 執行 Linked Updates（linked-updates.md）
            ⛔ lesson 的 Required Linked Updates 欄位未填不得進行 commit
 □ Step 9:  [強制] 更新 Runtime Surfaces（Step 5 或 Step 8 有修改時）
-           ↳ routing-registry.yaml、summaries/、graphs/、runtime scripts
+           ↳ routing-registry.yaml、summaries/、graphs/、runtime YAML sources
            ⛔ 若 modified files 命中 runtime.db generated_surfaces.source_path，
-             必須跑 compiler-engine、`ai-skill runtime validate`、SQLite content assertion，
+             必須跑 `ai-skill runtime compile`、`ai-skill runtime validate`、SQLite content assertion，
              並將 runtime/runtime.db 納入同輪 commit
 □ Step 10: [強制] 驗證（diff review、去敏、link check、lint）
 □ Step 11: [強制] Commit / Push / Readback（dependency-reading.md）

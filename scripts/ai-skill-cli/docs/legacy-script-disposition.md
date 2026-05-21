@@ -4,6 +4,8 @@
 
 The Go CLI is now the primary desktop runtime entrypoint. Runtime Ruby report/index/query/validation entrypoints, the Ruby runtime compiler, and the Roo Python adapter have been deleted after native CLI coverage became the default. Some non-runtime shell surfaces remain because they still require write-mode parity.
 
+Developer migration details live in [`legacy-to-go-migration-map.md`](legacy-to-go-migration-map.md). Before deleting another legacy surface, update that map first so future maintainers can see the new Go owner, editable source, and validation evidence.
+
 ## Disposition Table
 
 | Legacy Entry | Disposition | Reason / Removal Condition |

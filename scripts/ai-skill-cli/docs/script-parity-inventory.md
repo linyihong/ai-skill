@@ -2,7 +2,7 @@
 
 > **上游計畫**：[`2026-05-21-0834-cross-platform-go-script-runtime.md`](../../../plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md)
 
-本文件補上 Phase 0 的舊功能覆蓋率盤點。任何 Go CLI 實作若宣稱替代既有腳本，必須能從本文件反查：舊腳本做了什麼、未來命令接到哪裡、目前 parity 狀態、需要哪個 fixture 或測試證明。
+本文件補上 Phase 0 的舊功能覆蓋率盤點。任何 Go CLI 實作若宣稱替代既有腳本，必須能從本文件反查：舊腳本做了什麼、未來命令接到哪裡、目前 parity 狀態、需要哪個 fixture 或測試證明。開發者若要快速查「舊 surface 搬到哪個 Go command/package、未來該改哪個 source」，先讀 [`legacy-to-go-migration-map.md`](legacy-to-go-migration-map.md)。
 
 ## 狀態分類
 
@@ -21,6 +21,7 @@
 - 每個現有腳本至少要有一列 parity disposition；不得以「未盤點」進入 Go implementation。
 - 會寫檔、commit、push、同步 tool mirror、更新 runtime.db、更新 generated reports 或寫入使用者設定的腳本，必須有 fixture 或 BDD scenario。
 - `close-loop`、`runtime refresh`、`runtime compile`、`init-project`、`sync-cursor-bundle` 是高風險路徑；缺少 parity 測試時不得宣稱 replacement 完成。
+- 刪除任何 legacy surface 前，必須先更新 [`legacy-to-go-migration-map.md`](legacy-to-go-migration-map.md)，明列 new owner、source-of-truth 與 validation。
 - 手機與桌面支援決策不能只看新 CLI；必須確認舊腳本在該平台的不可攜假設已被新命令處理或明確排除。
 - Phase 6 closure 預設刪除 replacement 範圍內的舊 shell / Ruby / Python script。只有 `hook adapter`、`tool-specific` adapter 或明確短期 thin wrapper 可保留；保留時必須寫明 owner、移除條件與期限。
 

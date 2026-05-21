@@ -46,6 +46,14 @@
 **And** 高風險路徑必須連到 `test-fixture-plan.md` 中的 fixture
 **And** 若 parity 被標為 `deferred` 或 `tool-specific`，必須說明為何不阻擋目前 Phase。
 
+## 場景：刪除 Legacy Surface 前先有 Go Migration Map
+
+**Given** agent 準備刪除或移植舊 shell / Ruby / Python surface
+**When** 對應 Go CLI command 或 package 尚未在 `legacy-to-go-migration-map.md` 記錄
+**Then** 不得刪除 legacy surface
+**And** 必須先補上 old surface、new owner、source-of-truth、validation evidence
+**And** 再同步 `script-parity-inventory.md` 與 `legacy-script-disposition.md`。
+
 ## 場景：不安全 repo 狀態阻斷 commit
 
 **Given** repository 處於 merge、rebase 或 cherry-pick 狀態
@@ -66,6 +74,7 @@
 - Dry-run 命令不得修改 file system、git index、commits、hooks、mirrors 或 runtime DB。
 - Runtime compile 能以 content assertions 證明 source-to-DB propagation。
 - 每個被取代的舊腳本能力都有 parity disposition 與最低測試證據。
+- 每個被刪除的 legacy surface 都能從 migration map 反查新的 Go owner 與 source-of-truth。
 - Mobile support 決策不承諾 iOS 任意 native binary。
 
 ## 驗證目標
