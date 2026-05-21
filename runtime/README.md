@@ -94,7 +94,7 @@ All committed runtime config is stored in SQLite. Do not keep a committed YAML m
 
 | Table | Canonical Source | Purpose |
 |-------|--------|---------|
-| `runtime_config_documents` | `runtime.db` | Full canonical JSON documents replacing former SQLite canonical runtime documents |
+| `runtime_config_documents` | `runtime.db` | Full canonical JSON documents replacing former runtime YAML documents |
 | `runtime_config_projections` | `runtime.db` | Projection metadata from canonical documents to runtime tables |
 | `runtime_source_files` | `runtime.db` | Compatibility manifest for former source paths, marked `source_kind='db'` |
 | `phases`, `phase_transitions` | `runtime_config_documents` | Execution phase definitions and transition rules |

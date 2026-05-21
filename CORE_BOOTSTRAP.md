@@ -22,7 +22,7 @@
    - `obligation_ledger` / `obligations`：本 phase 的未完成義務
    - `blocking_gates` / `gates`：本 phase 的阻斷閘門
    - `generated_surfaces`：知識更新與 governance surface 快速路徑
-   - Runtime config 的 committed canonical copy 是 `runtime/runtime.db`；不要保留 `runtime/runtime.db canonical documents` mirror。若需修改 phase / obligation / gate / recovery 定義，更新 SQLite canonical config document，然後用 `ai-skill runtime compile` refresh projections。
+   - Runtime config 的 committed canonical copy 是 `runtime/runtime.db`；不要保留 `runtime/**/*.yaml` mirror。若需修改 phase / obligation / gate / recovery 定義，更新 SQLite canonical config document，然後用 `ai-skill runtime compile` refresh projections。
    - 若 phase 為 bootstrap → 繼續往下；若為其他 phase → 先檢查 blocking gates
 4. [Output Governance 初始化] 從 SQLite 載入輸出規則：
    - `runtime/runtime.db → language_policy` — 語言強制規則
@@ -41,7 +41,7 @@
 8. 需要時才展開完整 source
 ```
 
-> **Runtime Config 以 SQLite 為 canonical**：committed runtime config 只保留在 `runtime/runtime.db`，並透過 `runtime_config_documents` 保存完整 canonical documents、透過專屬表格（如 `phase_machine`、`obligation_ledger`、`blocking_gates`、`language_policy`、`output_rules`、`governance_gates` 等）提供查詢。不要提交 `runtime/runtime.db canonical documents` mirror。
+> **Runtime Config 以 SQLite 為 canonical**：committed runtime config 只保留在 `runtime/runtime.db`，並透過 `runtime_config_documents` 保存完整 canonical documents、透過專屬表格（如 `phase_machine`、`obligation_ledger`、`blocking_gates`、`language_policy`、`output_rules`、`governance_gates` 等）提供查詢。不要提交 `runtime/**/*.yaml` mirror。
 
 > **Governance Translation 已升級**：可重用判斷智慧優先放在 `intelligence/`，AI runtime gate 放在 `governance/ai-runtime-governance/`，具體操作順序放在 `workflow/`，可機讀或可驗證狀態再進 `runtime/` / `validation/`。遇到任務分層或治理疑義時，先讀 [`governance/ai-runtime-governance/README.md`](governance/ai-runtime-governance/README.md)。
 

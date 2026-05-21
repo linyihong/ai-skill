@@ -17,7 +17,7 @@ At session start or when taking over a task, load the **Core Bootstrap** (3 rule
    - `phase_machine` / `phases` — current phase state
    - `obligation_ledger` / `obligations` — phase obligations
    - `blocking_gates` / `gates` — phase blocking gates
-   - Runtime phase / obligation / gate / recovery committed canonical config lives in `runtime_config_documents`; do not keep committed `runtime/runtime.db canonical documents` mirrors.
+   - Runtime phase / obligation / gate / recovery committed canonical config lives in `runtime_config_documents`; do not keep committed `runtime/**/*.yaml` mirrors.
 6. Load Output Governance initialization:
    - [runtime/runtime.db](../../runtime/runtime.db) `language_policy` — language enforcement rules
    - [runtime/runtime.db](../../runtime/runtime.db) `output_rules` — document output rules
