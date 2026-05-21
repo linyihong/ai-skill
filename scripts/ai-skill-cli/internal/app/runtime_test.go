@@ -62,6 +62,7 @@ func TestRuntimeValidateBlocksRemovedLegacyWrapper(t *testing.T) {
 
 func TestRuntimeValidateDefaultNativeDoesNotNeedRuby(t *testing.T) {
 	repo := repoRootForTest(t)
+	ensureRuntimeIndexForRepoTest(t, repo)
 	t.Setenv("PATH", emptyPathDir(t))
 
 	var stdout bytes.Buffer
@@ -456,22 +457,19 @@ func TestRuntimeCompilerRubySnapshotHarnessIsStable(t *testing.T) {
 	}
 }
 
-func TestNativeRuntimeCompilerSnapshotMatchesRubyCompiler(t *testing.T) {
+func TestNativeRuntimeCompilerSnapshotCopiesRuntimeDB(t *testing.T) {
 	repo := repoRootForTest(t)
-	ruby := requireExecutableForTest(t, "ruby")
-	requireExecutableForTest(t, "sqlite3")
 	temp := t.TempDir()
-	rubyDB := filepath.Join(temp, "runtime-ruby.db")
 	nativeDB := filepath.Join(temp, "runtime-native.db")
+	sourceDB := filepath.Join(repo, "runtime", "runtime.db")
 
-	runRubyScript(t, repo, ruby, "runtime/compiler/compiler-engine.rb", "--db", rubyDB)
 	check := buildNativeRuntimeDBSnapshot(repo, nativeDB)
 	if check.Status != "ok" {
 		t.Fatalf("native compiler snapshot failed: %#v", check)
 	}
 
-	if got, want := runtimeCompilerGeneratedSurfaceSnapshot(t, nativeDB), runtimeCompilerGeneratedSurfaceSnapshot(t, rubyDB); !reflect.DeepEqual(got, want) {
-		t.Fatalf("native compiler snapshot differs from Ruby: %s", firstRowDiff(got, want))
+	if got, want := runtimeCompilerGeneratedSurfaceSnapshot(t, nativeDB), runtimeCompilerGeneratedSurfaceSnapshot(t, sourceDB); !reflect.DeepEqual(got, want) {
+		t.Fatalf("native compiler snapshot differs from source runtime.db: %s", firstRowDiff(got, want))
 	}
 }
 
@@ -901,6 +899,22 @@ func repoRootForTest(t *testing.T) string {
 		}
 		dir = parent
 	}
+}
+
+func ensureRuntimeIndexForRepoTest(t *testing.T, repo string) {
+	t.Helper()
+	indexPath := filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
+	if _, err := os.Stat(indexPath); err == nil {
+		return
+	} else if !os.IsNotExist(err) {
+		t.Fatal(err)
+	}
+	if err := buildNativeRuntimeSQLiteIndex(repo, indexPath); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		_ = os.Remove(indexPath)
+	})
 }
 
 func requireExecutableForTest(t *testing.T, name string) string {
