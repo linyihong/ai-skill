@@ -51,9 +51,9 @@
 | --- | --- | --- |
 | Product / impact alignment | Change brief：為什麼要降低 script runtime 的環境依賴、Windows friction、close-loop 漏跑風險 | 未說明使用者 / contributor / agent runtime 的影響前，不得開始 CLI 設計 |
 | Requirements cognition / BDD-lite | Command behavior scenarios：`doctor`、`close-loop`、`runtime compile`、missing Git、missing permission、dirty tree | 未建立 Given / When / Then 與 acceptance criteria 前，不得開始 Go implementation |
-| Domain architecture cognition | Command contract、dependency detector、Git adapter、runtime compiler adapter、filesystem adapter、reporting / exit-code boundary | 未定義 domain boundary 與 side effects 前，不得建立 production package layout |
-| Test effectiveness | Fixture plan、golden output、negative cases、missing dependency、Windows path、runtime.db assertion | 未定義 fixture 與 failure tests 前，不得宣稱 Phase 1 skeleton 可完成 |
-| Artifact gates | Command contract、support matrix、exit-code table、side-effect registry、test fixture plan | 未完成文件 artifact gate 前，不得進入 Phase 1 Go CLI skeleton |
+| Domain architecture cognition | Command contract、舊腳本 parity inventory、dependency detector、Git adapter、runtime compiler adapter、filesystem adapter、reporting / exit-code boundary | 未定義 domain boundary、舊腳本 parity 與 side effects 前，不得建立 production package layout |
+| Test effectiveness | Fixture plan、golden output、negative cases、missing dependency、Windows path、runtime.db assertion、legacy script parity fixture | 未定義 fixture、舊腳本覆蓋率與 failure tests 前，不得宣稱 Phase 1 skeleton 可完成 |
+| Artifact gates | Command contract、script parity inventory、support matrix、exit-code table、side-effect registry、test fixture plan | 未完成文件 artifact gate 前，不得進入 Phase 1 Go CLI skeleton |
 
 **文件先行 blocking gate**：
 
@@ -61,13 +61,16 @@
 
 - `scripts/ai-skill-cli/docs/README.md`
 - command contract：每個命令的 arguments、輸出、exit code、side effects、dry-run 行為。
+- script parity inventory：每個現有 shell / Ruby / Python / git hook / compiler 入口的功能、輸入、輸出、副作用、外部依賴、目標 CLI、parity 狀態與最低測試證據。
 - support matrix：Windows、macOS、Linux、iOS、Android 的支援等級與限制。
-- BDD-lite scenarios：尤其是 missing Git、missing permission、dirty tree、merge / rebase state、runtime.db assertion。
-- test fixture plan：temporary repo、fake home、PATH isolation、missing Git、Windows path、runtime DB golden fixture。
+- BDD-lite scenarios：尤其是 missing Git、missing permission、dirty tree、merge / rebase state、legacy script parity、runtime.db assertion。
+- test fixture plan：temporary repo、fake home、PATH isolation、missing Git、Windows path、legacy script parity、runtime DB golden fixture。
 
 若上述任一項未完成，本計畫不得進入 Go implementation。若必須例外，需先在本 plan 的 Open Questions 或 decision record 寫明原因與風險。
 
 ## Current Script Inventory
+
+完整逐項 parity 盤點見 [`scripts/ai-skill-cli/docs/script-parity-inventory.md`](../../scripts/ai-skill-cli/docs/script-parity-inventory.md)。本節只保留高層分類與主要風險。
 
 | 類型 | 目前檔案 | 主要風險 |
 | --- | --- | --- |
@@ -181,11 +184,24 @@ Current artifacts：
 
 Tasks：
 
-- [ ] 盤點所有 `scripts/`、`runtime/compiler/` 與 git hook 的輸入、輸出、寫檔位置、exit code、環境變數、外部命令依賴。
+- [x] 盤點所有 `scripts/`、`runtime/compiler/` 與 git hook 的輸入、輸出、寫檔位置、exit code、環境變數、外部命令依賴。
 - [x] 建立 command contract 文件，列出每個命令的 arguments、dry-run 行為、side effects、validation signal。
 - [x] 建立 platform support matrix：Windows、macOS、Linux、iOS、Android。
-- [ ] 建立風險清單：symlink、chmod、git hook、SQLite、Ruby gems、encoding、shell quoting、路徑大小寫。
+- [x] 建立風險清單：symlink、chmod、git hook、SQLite、Ruby gems、encoding、shell quoting、路徑大小寫。
 - [x] 決定 repository layout：`scripts/ai-skill-cli/docs/` 放文件先行 artifacts，未來 `scripts/ai-skill-cli/cmd/ai-skill/`、`scripts/ai-skill-cli/internal/`、`scripts/ai-skill-cli/testdata/` 放 Go code 與 fixtures。
+
+Phase 0 風險清單：
+
+| 風險 | 必要控制 |
+| --- | --- |
+| Symlink / copy fallback | Mirror sync 必須區分受管理檔案與使用者檔案；Windows fallback 不得假設 POSIX symlink 行為。 |
+| `chmod` / executable bit | Native Go 命令的核心行為不得依賴 POSIX executable bit；hook installation 必須回報平台限制。 |
+| Git hook behavior | `hooks install` 需要 Git，且不得觸發 commit / push；hook mutation 前必須回報 unsafe repo state。 |
+| SQLite engine mismatch | 優先採用 pure Go SQLite；wrapper mode 必須回報仍在使用外部 Ruby / SQLite 行為的範圍。 |
+| Ruby gems / runtime availability | Wrapper mode 回傳 `missing_dependency`；native migration 必須先有 parity tests，才可取代 compiler 行為。 |
+| Encoding / UTF-8 | Runtime wrapper 必須強制 UTF-8-compatible execution，並驗證 generated surfaces，不只看 command exit code。 |
+| Shell quoting | Windows tests 必須避免 Git Bash / WSL 假設，並使用 argv-level command construction。 |
+| Path case / separator differences | Path abstraction 必須 normalize drive letters、UNC paths、spaces、mixed separators，以及 case-sensitive / insensitive comparisons。 |
 
 Completion criteria：
 
