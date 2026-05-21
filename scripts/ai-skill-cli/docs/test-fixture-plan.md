@@ -20,6 +20,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/cursor-mirror-copy-fallback` | Cursor mirror 策略 | Windows / 權限受限環境預設 copy fallback；symlink 只允許明確 opt-in |
 | `fixture/runtime-source-change` | runtime.db assertion | source keyword 出現在 generated surface |
 | `fixture/runtime-golden-generated-surfaces` | runtime refresh / compile generated surfaces | 同一份 source 可產出 runtime report、model reports、SQLite index、`runtime.db` assertions，且不寫 production artifacts |
+| `fixture/runtime-refresh-ordered-steps` | runtime refresh wrapper orchestration | generator / validator steps 順序固定；任一步失敗時停止後續 steps 並回 failure |
 | `fixture/native-sqlite-file-proof` | pure Go SQLite proof | temporary DB 可 create / insert / query / integrity check，且不依賴外部 `sqlite3` CLI |
 | `fixture/runtime-db-native-validator` | native runtime.db validator | valid DB、missing required table、invalid JSON column、stale compiler metadata warning 均有固定結果 |
 | `fixture/runtime-query-index` | native runtime index query | ranking、filter、limit、empty result、missing DB 均有固定結果 |
@@ -67,6 +68,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - Phase 3 已新增 `runtime-query-graph` Go fixture，覆蓋 `query-knowledge-graph.rb` 的 source / target / type / keyword filters、limit、empty result 與 missing filter 行為。
 - Phase 3 已新增 `runtime-index-native-validator` Go fixture，覆蓋 SQLite runtime index valid case、missing table、stale checksum、FTS count mismatch、git-ignore boundary；git-ignore boundary 以 Go 呼叫 external Git 檢查。
 - Phase 3 已新增 `runtime-golden-generated-surfaces` integration fixture：以同一份 canonical source 產生 runtime report、model context report、model checklists、臨時 SQLite index、臨時 `runtime.db`，並固定檢查 report anchors、index row counts、FTS hit、`generated_surfaces` 與 compiler metadata；fixture 只寫入測試 temp dir。
+- Phase 3 已新增 `runtime-refresh-ordered-steps` fixture：`runtime refresh` Go wrapper mode 依序執行 model context report、model checklists、runtime report、SQLite index、SQLite index validation、knowledge runtime validation；第一個 failing step 會阻斷並不執行後續 steps。
 
 ## 舊腳本 parity fixture
 

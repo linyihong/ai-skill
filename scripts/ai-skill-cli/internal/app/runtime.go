@@ -40,6 +40,12 @@ type runtimeValidator struct {
 	path string
 }
 
+type runtimeRefreshStep struct {
+	name string
+	path string
+	args []string
+}
+
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
 		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query> [flags]")
@@ -236,20 +242,20 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 		return result
 	}
 
-	for _, script := range runtimeRefreshScripts(repo) {
-		result.PlannedActions = append(result.PlannedActions, "run ruby refresh step: "+script)
-		if _, err := os.Stat(script); err != nil {
+	steps := runtimeRefreshSteps(repo)
+	for _, step := range steps {
+		result.PlannedActions = append(result.PlannedActions, "run ruby refresh step: "+runtimeScriptInvocation(step.path, step.args))
+		if _, err := os.Stat(step.path); err != nil {
 			result.Status = "blocked"
 			result.ExitCode = ExitValidationFailed
-			result.Error = &CommandError{Code: "missing_runtime_script", Message: script, Remediation: "Run from a complete Ai-skill checkout."}
-			result.Checks = append(result.Checks, Check{Name: filepath.Base(script), Status: "missing", Message: script})
+			result.Error = &CommandError{Code: "missing_runtime_script", Message: step.path, Remediation: "Run from a complete Ai-skill checkout."}
+			result.Checks = append(result.Checks, Check{Name: step.name, Status: "missing", Message: step.path})
 			return result
 		}
 	}
 
-	wrapper := filepath.Join(repo, "scripts", "refresh-knowledge-runtime.rb")
 	if opts.dryRun {
-		result.Checks = append(result.Checks, Check{Name: "wrapper_mode", Status: "ok", Message: "dry-run only; refresh wrapper not executed"})
+		result.Checks = append(result.Checks, Check{Name: "wrapper_mode", Status: "ok", Message: "dry-run only; refresh steps not executed"})
 		return result
 	}
 
@@ -282,13 +288,15 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 	}
 	_ = git
 
-	check := runRuntimeScript(repo, ruby, "runtime_refresh", wrapper)
-	result.Checks = append(result.Checks, check)
-	if check.Status != "ok" {
-		result.Status = "blocked"
-		result.ExitCode = ExitValidationFailed
-		result.Error = &CommandError{Code: "runtime_refresh_failed", Message: check.Message, Remediation: "Inspect refresh output and fix the failing generator or validator."}
-		return result
+	for _, step := range steps {
+		check := runRuntimeScript(repo, ruby, step.name, step.path, step.args...)
+		result.Checks = append(result.Checks, check)
+		if check.Status != "ok" {
+			result.Status = "blocked"
+			result.ExitCode = ExitValidationFailed
+			result.Error = &CommandError{Code: "runtime_refresh_failed", Message: "refresh step failed: " + step.name + ": " + check.Message, Remediation: "Inspect refresh output and fix the failing generator or validator."}
+			return result
+		}
 	}
 
 	return result
@@ -450,21 +458,16 @@ func runtimeValidators(repo string) []runtimeValidator {
 	}
 }
 
-func runtimeRefreshScripts(repo string) []string {
-	names := []string{
-		"generate-model-context-report.rb",
-		"generate-model-checklists.rb",
-		"generate-knowledge-runtime-report.rb",
-		"generate-runtime-sqlite-index.rb",
-		"validate-runtime-sqlite-index.rb",
-		"validate-knowledge-runtime.rb",
-		"refresh-knowledge-runtime.rb",
+func runtimeRefreshSteps(repo string) []runtimeRefreshStep {
+	steps := []runtimeRefreshStep{
+		{name: "model_context_report", path: filepath.Join(repo, "scripts", "generate-model-context-report.rb"), args: []string{"--write"}},
+		{name: "model_checklists", path: filepath.Join(repo, "scripts", "generate-model-checklists.rb"), args: []string{"--write"}},
+		{name: "knowledge_runtime_report", path: filepath.Join(repo, "scripts", "generate-knowledge-runtime-report.rb"), args: []string{"--write"}},
+		{name: "runtime_sqlite_index", path: filepath.Join(repo, "scripts", "generate-runtime-sqlite-index.rb")},
+		{name: "runtime_sqlite_index_validation", path: filepath.Join(repo, "scripts", "validate-runtime-sqlite-index.rb")},
+		{name: "knowledge_runtime_validation", path: filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb")},
 	}
-	scripts := make([]string, 0, len(names))
-	for _, name := range names {
-		scripts = append(scripts, filepath.Join(repo, "scripts", name))
-	}
-	return scripts
+	return steps
 }
 
 func runtimeQueryDBPath(repo string, dbPath string) string {
@@ -1069,8 +1072,8 @@ func runRuntimeValidator(repo string, ruby string, validator runtimeValidator) C
 	return runRuntimeScript(repo, ruby, validator.name, validator.path)
 }
 
-func runRuntimeScript(repo string, ruby string, name string, path string) Check {
-	cmd := exec.Command(ruby, path)
+func runRuntimeScript(repo string, ruby string, name string, path string, args ...string) Check {
+	cmd := exec.Command(ruby, append([]string{path}, args...)...)
 	cmd.Dir = repo
 	cmd.Env = runtimeWrapperEnv(os.Environ())
 	output, err := cmd.CombinedOutput()
@@ -1085,6 +1088,13 @@ func runRuntimeScript(repo string, ruby string, name string, path string) Check 
 		message = "ok"
 	}
 	return Check{Name: name, Status: "ok", Message: message}
+}
+
+func runtimeScriptInvocation(path string, args []string) string {
+	if len(args) == 0 {
+		return path
+	}
+	return path + " " + strings.Join(args, " ")
 }
 
 func runtimeWrapperEnv(base []string) []string {

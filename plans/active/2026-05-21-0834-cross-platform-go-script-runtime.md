@@ -292,6 +292,7 @@ Tasks：
 - [x] 建立 `runtime query` native SQLite index slice：Go native 查詢 `query-runtime-index.rb` 的 keyword、filter、limit、empty result、missing DB 行為；knowledge graph query 待補。
 - [x] 建立 `runtime validate` native SQLite index validator slice：Go native 檢查 missing DB / table、integrity、row counts、atom source references、source checksums、FTS count、basic ranked query、git-ignore boundary。
 - [x] 建立 `runtime query --graph` native knowledge graph slice：Go native 查詢 `query-knowledge-graph.rb` 的 source / target / type / keyword filter、limit、empty result、missing filter 行為。
+- [x] 補 `runtime refresh` ordered step / partial failure fixture：Go wrapper mode 依固定順序執行 Ruby generator / validator steps，失敗時停在第一個 failing step 並回 `runtime_refresh_failed`。
 - [ ] 若開始移植 compiler，先建立 Ruby vs Go parity test，不得直接替換 production compiler。
 
 Progress notes：
@@ -306,6 +307,7 @@ Progress notes：
 - `ai-skill runtime validate` 已新增 Go native SQLite runtime index validator：檢查 index integrity、required tables、atoms / sources / edges / fts counts、atom source references、source SHA-256 checksums、FTS count、basic ranked query 與 git-ignore boundary；unit tests 覆蓋 valid index、missing table、stale checksum、FTS count mismatch、ignored / unignored boundary。git-ignore boundary 以 Go 呼叫 external Git 檢查。
 - `ai-skill runtime query --graph` 已新增 Go native knowledge graph query：支援 `--source`、`--target`、`--type`、`--keyword` / positional query、`--limit`、JSON / plain output，且不寫入 graph YAML；unit tests 覆蓋 graph filters、empty result 與 missing filter。
 - Runtime golden fixture 已新增 integration test：同一份 canonical source 透過 Ruby generators 產出 runtime report、model context report、model checklists、臨時 SQLite runtime index 與臨時 `runtime.db`，並驗證固定 anchors、row counts、FTS hit、`generated_surfaces` 與 compiler metadata；測試輸出全部落在 stdout 或 temp DB，不寫 production generated artifacts。
+- `ai-skill runtime refresh` wrapper mode 已改為逐步執行 Ruby refresh steps，而非只呼叫整包 orchestrator；JSON checks 會記錄 model context report、model checklists、runtime report、SQLite index、SQLite index validation、knowledge runtime validation 的 ordered evidence，並在第一個失敗 step 阻斷，避免 partial refresh 被誤報 success。
 
 Completion criteria：
 

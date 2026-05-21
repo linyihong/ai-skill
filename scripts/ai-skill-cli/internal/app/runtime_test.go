@@ -76,11 +76,91 @@ func TestRuntimeRefreshDryRunPlansWrapperCommands(t *testing.T) {
 	if result.Command != "runtime refresh" || result.Mode != "dry_run" {
 		t.Fatalf("unexpected result identity: %#v", result)
 	}
-	if len(result.PlannedActions) != 7 {
-		t.Fatalf("expected seven planned refresh scripts, got %#v", result.PlannedActions)
+	if len(result.PlannedActions) != 6 {
+		t.Fatalf("expected six planned refresh steps, got %#v", result.PlannedActions)
+	}
+	if !strings.Contains(result.PlannedActions[0], "generate-model-context-report.rb --write") {
+		t.Fatalf("expected first planned step to write model context report, got %#v", result.PlannedActions)
 	}
 	if len(result.Mutations) != 0 {
 		t.Fatalf("runtime refresh dry-run must not mutate, got %#v", result.Mutations)
+	}
+}
+
+func TestRuntimeRefreshExecutesOrderedSteps(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	requireExecutableForTest(t, "ruby")
+	requireExecutableForTest(t, "sqlite3")
+	requireExecutableForTest(t, "git")
+	writeRuntimeRefreshRecorderScripts(t, repo, "")
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	for _, step := range runtimeRefreshSteps(repo) {
+		if !hasCheckStatus(result.Checks, step.name, "ok") {
+			t.Fatalf("expected ok check for %s, got %#v", step.name, result.Checks)
+		}
+	}
+
+	log := readTestFile(t, filepath.Join(repo, "refresh.log"))
+	expected := strings.Join([]string{
+		"model_context_report --write",
+		"model_checklists --write",
+		"knowledge_runtime_report --write",
+		"runtime_sqlite_index",
+		"runtime_sqlite_index_validation",
+		"knowledge_runtime_validation",
+	}, "\n") + "\n"
+	if log != expected {
+		t.Fatalf("unexpected refresh order:\n%s", log)
+	}
+}
+
+func TestRuntimeRefreshStopsOnFirstFailedStep(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	requireExecutableForTest(t, "ruby")
+	requireExecutableForTest(t, "sqlite3")
+	requireExecutableForTest(t, "git")
+	writeRuntimeRefreshRecorderScripts(t, repo, "knowledge_runtime_report")
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitValidationFailed {
+		t.Fatalf("expected validation failure, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Status != "blocked" || result.Error == nil || result.Error.Code != "runtime_refresh_failed" {
+		t.Fatalf("expected runtime_refresh_failed block, got %#v", result)
+	}
+	if !hasCheckStatus(result.Checks, "knowledge_runtime_report", "failed") {
+		t.Fatalf("expected failed check for knowledge_runtime_report, got %#v", result.Checks)
+	}
+	if hasCheckStatus(result.Checks, "runtime_sqlite_index", "ok") {
+		t.Fatalf("runtime_sqlite_index should not run after failed report step: %#v", result.Checks)
+	}
+
+	log := readTestFile(t, filepath.Join(repo, "refresh.log"))
+	expected := strings.Join([]string{
+		"model_context_report --write",
+		"model_checklists --write",
+		"knowledge_runtime_report --write",
+	}, "\n") + "\n"
+	if log != expected {
+		t.Fatalf("unexpected refresh order before failure:\n%s", log)
 	}
 }
 
@@ -558,6 +638,30 @@ func fakeRuntimeRepo(t *testing.T) string {
 	copyFile(t, createNativeRuntimeDBFixture(t), filepath.Join(repo, "runtime", "runtime.db"))
 	createRuntimeIndexFixture(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
 	return repo
+}
+
+func writeRuntimeRefreshRecorderScripts(t *testing.T, repo string, failStep string) {
+	t.Helper()
+	for _, step := range runtimeRefreshSteps(repo) {
+		failLine := ""
+		if step.name == failStep {
+			failLine = "exit 7\n"
+		}
+		writeFile(t, step.path, fmt.Sprintf(`#!/usr/bin/env ruby
+line = ([%q] + ARGV).join(" ").strip
+File.open(File.join(Dir.pwd, "refresh.log"), "a") { |file| file.puts(line) }
+puts "#{line} ok"
+%s`, step.name, failLine))
+	}
+}
+
+func readTestFile(t *testing.T, path string) string {
+	t.Helper()
+	content, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(content)
 }
 
 func createNativeRuntimeDBFixture(t *testing.T) string {

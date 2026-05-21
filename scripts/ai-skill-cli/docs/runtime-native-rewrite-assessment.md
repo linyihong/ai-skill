@@ -23,7 +23,7 @@
 | `scripts/generate-knowledge-runtime-report.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定 runtime report anchors，且以 stdout 產生避免寫 production report。 | routing registry / summaries / graphs golden anchors 已覆蓋。 |
 | `scripts/generate-model-context-report.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定 model context report anchors。 | profile / compression grouping anchors 已覆蓋。 |
 | `scripts/generate-model-checklists.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定 checklist report anchors。 | per-model checklist anchors 已覆蓋。 |
-| `scripts/refresh-knowledge-runtime.rb` | `ai-skill runtime refresh` | 低 | 保持 wrapper orchestrator，直到各 generator / validator native 後再改成 Go orchestrator。 | partial failure blocks success、ordered step summary、no partial success fixture。 |
+| `scripts/refresh-knowledge-runtime.rb` | `ai-skill runtime refresh` | 低 | 保持 Ruby entrypoint，但 Go wrapper mode 已逐步執行同一批 generator / validator steps，以取得 ordered evidence 與 first-failure block。 | partial failure blocks success、ordered step summary、no partial success fixture 已覆蓋。 |
 | `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | 低 | 保持 wrapper。不得直接替換 production compiler；先建立 Ruby vs Go parity test。 | runtime source keyword、`--check` no-op、`runtime.db` generated surface assertion、schema parity。 |
 | `scripts/migrate-runtime-config-to-sqlite.rb` | `ai-skill runtime migrate` / `compile` | Deferred | 暫不改寫，現有 compiler path 已吸收大部分需求。 | idempotent migration fixture。 |
 | `scripts/init-runtime-state-db.rb` | `ai-skill runtime state init` | Deferred | 等 mutable runtime-state scope 明確後再處理。 | custom DB path、idempotent schema fixture。 |
@@ -31,6 +31,6 @@
 
 ## 下一步
 
-1. 補 runtime generators 的 ordered step / partial failure fixture，支撐之後 Go orchestrator 化。
-2. 若開始 Go generator / compiler slice，先建立 Ruby vs Go parity test；不得只靠 golden anchors 直接替換 production compiler。
-3. Generator / compiler 只能在 golden fixture 與 Ruby vs Go parity test 都通過後替換。
+1. 若開始 Go generator / compiler slice，先建立 Ruby vs Go parity test；不得只靠 golden anchors 或 ordered-step wrapper fixture 直接替換 production compiler。
+2. Generator / compiler 只能在 golden fixture 與 Ruby vs Go parity test 都通過後替換。
+3. 後續可先補 generator-level Ruby vs Go parity，從 read-mostly report generators 開始，不先碰 compiler。
