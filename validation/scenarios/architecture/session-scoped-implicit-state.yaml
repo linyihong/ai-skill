@@ -1,0 +1,40 @@
+id: session-scoped-implicit-state
+category: architecture
+version: v1
+type: anti-pattern-obedience
+priority: P2
+source_atom: intelligence/engineering/anti-patterns/session-scoped-implicit-state.md
+
+given:
+  task: design_execution_context_passing_for_agent_runtime
+  artifacts:
+    - intelligence/engineering/anti-patterns/session-scoped-implicit-state.md
+    - intelligence/engineering/agent-architecture/README.md
+  signals:
+    - execution_unit_may_be_replayed
+    - execution_unit_may_be_forked_or_parallel
+    - state_includes_user_phase_or_tenant
+  constraints:
+    - runtime_is_sqlite_as_canonical
+    - agent_invocation_can_come_from_multiple_callers
+
+when:
+  action: choose_state_propagation_mechanism
+
+then:
+  expected_route:
+    - load_session_scoped_implicit_state_anti_pattern
+    - prefer_explicit_run_context_parameter
+    - reject_ambient_thread_local_or_session_service
+  expected_heuristics:
+    - explicit_context_over_ambient_state
+    - snapshot_immutable_at_function_entry
+  forbidden_routes:
+    - inject_session_service_into_domain_layer
+    - read_current_phase_from_sqlite_inside_agent_function
+    - rely_on_async_local_for_request_scoped_state
+  expected_final_route: explicit_run_context_with_phase_id_tenant_id_user_id
+  expected_intelligence:
+    - intelligence/engineering/anti-patterns/session-scoped-implicit-state.md
+  unexpected_intelligence:
+    - runtime/runtime.db

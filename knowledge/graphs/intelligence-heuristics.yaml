@@ -4,7 +4,8 @@ status: candidate
 summary: >
    連接 engineering heuristics 層的所有 atoms：premature-optimization、abstraction-threshold、
    retry-smell、single-responsibility-heuristic、test-driven-heuristic、
-   field-confidence-judgment、magic-bytes-reference、document-priority-hierarchy。
+   field-confidence-judgment、magic-bytes-reference、document-priority-hierarchy、
+   cross-layer-identifier-stability。
    每個 atom 是獨立 intelligence，但共享 heuristics 目錄的 README 索引與技能路由。
 edges:
   - type: depends_on
@@ -43,6 +44,10 @@ edges:
     target: intelligence/engineering/heuristics/document-priority-hierarchy.md
     reason: 文件優先順序階層經驗法則 — 文件衝突時更新管轄文件，而不是默默地只修正其中一個來源。
     validation: atom 定義 6 層優先順序階層、衝突分類流程與常見誤用表。
+  - type: related_to
+    target: intelligence/engineering/heuristics/cross-layer-identifier-stability.md
+    reason: 跨層識別碼穩定性經驗法則 — 概念跨 ≥ 3 個 artifact 層存在時，stable opaque ID 優於 semantic naming。
+    validation: atom 定義層數門檻、判斷流程與對 phase/obligation/gate 跨 SQLite/YAML/Markdown 的應用。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.intelligence.heuristics record。
@@ -51,4 +56,4 @@ metadata:
   priority: P2
   confidence: medium
   compatibility_state: new-layer-promoted
-  last_checked: 2026-05-12
+  last_checked: 2026-05-21

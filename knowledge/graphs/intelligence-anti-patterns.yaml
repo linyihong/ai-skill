@@ -2,8 +2,9 @@ id: graph.intelligence-anti-patterns
 source: intelligence/engineering/anti-patterns/generic-repository-overuse.md
 status: candidate
 summary: >
-  連接 anti-patterns intelligence atom（generic-repository-overuse）與相關的 architecture、
-  domain、根目錄 anti-patterns 層，以及 runtime routing。
+  連接 anti-patterns intelligence atoms（generic-repository-overuse、cargo-cult-ddd、
+  session-scoped-implicit-state 等）與相關的 architecture、domain、agent-architecture、
+  根目錄 anti-patterns 層，以及 runtime routing。
 edges:
   - type: depends_on
     target: intelligence/engineering/anti-patterns/README.md
@@ -29,6 +30,14 @@ edges:
     target: intelligence/engineering/anti-patterns/cargo-cult-ddd.md
     reason: Cargo-cult DDD 是 software-delivery architecture governance 要阻止的核心反模式。
     validation: anti-pattern 要求回到 architecture fit analysis。
+  - type: related_to
+    target: intelligence/engineering/anti-patterns/session-scoped-implicit-state.md
+    reason: 將執行上下文塞進 session-scoped service 或 ambient context，對 agent runtime / replay / 並發是隱形依賴災難。
+    validation: anti-pattern 定義何時必須升級為 explicit context，與對 SQLite-as-canonical governance runtime 的應用守則。
+  - type: related_to
+    target: intelligence/engineering/agent-architecture/README.md
+    reason: session-scoped implicit state 直接影響 agent runtime 的 replay / fork / 並發行為。
+    validation: agent-architecture atoms 與本 anti-pattern 共同定義 explicit context 設計原則。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.intelligence.anti-patterns record。
@@ -37,4 +46,4 @@ metadata:
   priority: P2
   confidence: medium
   compatibility_state: new-layer-promoted
-  last_checked: 2026-05-12
+  last_checked: 2026-05-21

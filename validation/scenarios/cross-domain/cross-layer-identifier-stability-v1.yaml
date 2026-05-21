@@ -1,0 +1,42 @@
+id: cross-layer-identifier-stability
+category: cross-domain
+version: v1
+type: heuristic-obedience
+priority: P2
+source_atom: intelligence/engineering/heuristics/cross-layer-identifier-stability.md
+
+given:
+  task: design_identifier_strategy_for_concept_spanning_multiple_artifacts
+  artifacts:
+    - intelligence/engineering/heuristics/cross-layer-identifier-stability.md
+  signals:
+    - concept_appears_in_three_or_more_layers
+    - concept_expected_to_evolve_split_merge_or_rename
+    - audit_or_replay_traceability_required
+  constraints:
+    - existing_references_use_semantic_name_only
+
+when:
+  action: choose_identifier_strategy
+
+then:
+  expected_route:
+    - load_cross_layer_identifier_stability_heuristic
+    - assign_stable_opaque_id_as_join_key
+    - keep_semantic_name_as_display_label
+  expected_heuristics:
+    - opaque_id_for_join_semantic_name_for_display
+    - rename_only_label_never_id
+  forbidden_routes:
+    - use_semantic_name_as_foreign_key_across_three_layers
+    - grep_and_replace_rename_across_layers
+    - cross_document_reference_via_heading_text_only
+  expected_final_route: stable_opaque_id_with_label_table
+  expected_intelligence:
+    - intelligence/engineering/heuristics/cross-layer-identifier-stability.md
+  unexpected_intelligence:
+    - runtime/runtime.db
+
+notes: |
+  本專案 phase / obligation / gate 同時存在於 runtime.db、routing-registry.yaml、README、
+  workflow / intelligence atoms 等 ≥ 3 層，已滿足條件。任何新增跨層概念都應預設配 opaque ID。

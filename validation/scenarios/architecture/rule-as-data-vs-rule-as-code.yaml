@@ -1,0 +1,44 @@
+id: rule-as-data-vs-rule-as-code
+category: architecture
+version: v1
+type: tradeoff-obedience
+priority: P2
+source_atom: intelligence/engineering/tradeoffs/rule-as-data-vs-rule-as-code.md
+
+given:
+  task: decide_whether_to_externalize_business_rules_as_data
+  artifacts:
+    - intelligence/engineering/tradeoffs/rule-as-data-vs-rule-as-code.md
+    - intelligence/engineering/architecture/architectural-fit/README.md
+  signals:
+    - candidate_rule_data_format_json_yaml_or_db_rows
+    - team_considers_pluggable_rule_engine
+  constraints:
+    - rule_change_frequency_unknown_or_low
+    - rule_authors_are_engineers
+
+when:
+  action: choose_rule_storage_strategy
+
+then:
+  expected_route:
+    - load_rule_as_data_tradeoff
+    - evaluate_threshold_conditions
+    - prefer_rule_as_code_when_threshold_not_met
+  expected_heuristics:
+    - require_two_of_four_threshold_conditions
+    - account_for_schema_drift_and_engine_data_upgrade_ordering
+  forbidden_routes:
+    - default_to_rule_as_data_for_flexibility
+    - introduce_expression_or_script_field_in_rule_data
+    - skip_rule_schema_versioning
+  expected_final_route: rule_as_code_with_named_constants_or_rule_as_data_with_governance_commitments
+  expected_intelligence:
+    - intelligence/engineering/tradeoffs/rule-as-data-vs-rule-as-code.md
+  unexpected_intelligence:
+    - runtime/runtime.db
+
+notes: |
+  本專案 obligation_ledger / governance_gates / language_policy / output_rules 已跨過 rule-as-data
+  門檻；但任何「新規則資料表設計」仍應顯式驗證三項治理投資（schema version、evaluation trace、
+  engine ↔ rule data 升級 ordering）是否到位。

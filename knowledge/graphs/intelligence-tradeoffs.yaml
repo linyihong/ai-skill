@@ -2,8 +2,8 @@ id: graph.intelligence-tradeoffs
 source: intelligence/engineering/tradeoffs/postgres-vs-mongodb.md
 status: candidate
 summary: >
-  連接 tradeoffs intelligence atom（postgres-vs-mongodb）與相關的 architecture、
-  domain、anti-patterns 層，以及 runtime routing。
+  連接 tradeoffs intelligence atoms（postgres-vs-mongodb、rule-as-data-vs-rule-as-code 等）
+  與相關的 architecture、domain、anti-patterns 層，以及 runtime routing。
 edges:
   - type: depends_on
     target: intelligence/engineering/tradeoffs/README.md
@@ -21,6 +21,14 @@ edges:
     target: intelligence/engineering/distributed-systems/eventual-consistency-patterns.md
     reason: 資料庫的 consistency model 影響分散式系統的設計。
     validation: MongoDB 的 eventual consistency 與 PostgreSQL 的 strong consistency 是關鍵取捨。
+  - type: related_to
+    target: intelligence/engineering/tradeoffs/rule-as-data-vs-rule-as-code.md
+    reason: 規則外部化（JSON/YAML/DB + engine）vs 規則寫死在程式碼的取捨，是 governance / policy / multi-tenant 設計的核心 architecture 決策。
+    validation: atom 定義收益門檻（變動頻率、作者非工程師、規則即產品、規模）、隱性成本與對 SQLite-as-canonical governance runtime 的應用守則。
+  - type: related_to
+    target: intelligence/engineering/architecture/architectural-fit/README.md
+    reason: rule-as-data 是 architecture-level 取捨，與 DDD / CQRS 並列為 selectable strategy。
+    validation: architectural-fit 框架負責判斷何時值得付 rule-as-data 的長期治理成本。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.intelligence.tradeoffs record。
@@ -29,4 +37,4 @@ metadata:
   priority: P2
   confidence: medium
   compatibility_state: new-layer-promoted
-  last_checked: 2026-05-12
+  last_checked: 2026-05-21
