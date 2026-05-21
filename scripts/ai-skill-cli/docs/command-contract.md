@@ -285,7 +285,8 @@
 - 必須區分 missing dependency、schema invalid、assertion failed、dirty generated surface。
 - Phase 3 初始切片使用 wrapper mode 呼叫既有 Ruby validators，必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`。
 - wrapper mode 缺 Ruby 或 `sqlite3` CLI 時必須回傳 `missing_dependency`，並說明該能力尚未 native。
-- `runtime.db` native slice 已用 Go / `modernc.org/sqlite` 檢查 integrity、required tables、minimum row counts、JSON columns、compiler metadata 與 stale metadata warning；stale warning 不阻斷成功狀態，Ruby validators 暫時仍保留作 parity guard。
+- `runtime.db` native slice 已用 Go / `modernc.org/sqlite` 檢查 integrity、required tables、minimum row counts、JSON columns、compiler metadata 與 stale metadata warning；stale warning 不阻斷成功狀態。
+- SQLite runtime index native slice 已用 Go / `modernc.org/sqlite` 檢查 missing DB、integrity、required tables、row counts、atom source references、source checksums、FTS count 與 basic ranked FTS query；git-ignore boundary 暫由 Ruby validator / Git 保留作 parity guard。
 
 ### `ai-skill runtime query`
 

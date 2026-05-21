@@ -1,6 +1,7 @@
 package app
 
 import (
+	"crypto/sha256"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -141,6 +142,15 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 		result.Status = "blocked"
 		result.ExitCode = ExitValidationFailed
 		result.Error = &CommandError{Code: "runtime_db_native_failed", Message: nativeDBCheck.Message, Remediation: "Fix runtime/runtime.db or run runtime compile before wrapper validators."}
+		return result
+	}
+
+	nativeIndexCheck := nativeRuntimeIndexValidation(repo, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
+	result.Checks = append(result.Checks, nativeIndexCheck)
+	if nativeIndexCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "runtime_index_native_failed", Message: nativeIndexCheck.Message, Remediation: "Fix knowledge/runtime/sqlite/runtime-index.sqlite or run runtime refresh before wrapper validators."}
 		return result
 	}
 
@@ -502,6 +512,161 @@ LIMIT ?`
 func runtimeFTSMatchLiteral(keyword string) string {
 	escaped := strings.ReplaceAll(keyword, `"`, `""`)
 	return `"` + escaped + `"`
+}
+
+func nativeRuntimeIndexValidation(repo string, path string) Check {
+	if _, err := os.Stat(path); err != nil {
+		return Check{Name: "runtime_index_native", Status: "failed", Message: "runtime index not found: " + path}
+	}
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		return Check{Name: "runtime_index_native", Status: "failed", Message: err.Error()}
+	}
+	defer db.Close()
+
+	if err := nativeIntegrityCheck(db); err != nil {
+		return Check{Name: "runtime_index_native", Status: "failed", Message: err.Error()}
+	}
+	if err := nativeRuntimeIndexTablesCheck(db); err != nil {
+		return Check{Name: "runtime_index_native", Status: "failed", Message: err.Error()}
+	}
+	counts, err := nativeRuntimeIndexCountsCheck(db)
+	if err != nil {
+		return Check{Name: "runtime_index_native", Status: "failed", Message: err.Error()}
+	}
+	if err := nativeRuntimeIndexSourceReferencesCheck(db); err != nil {
+		return Check{Name: "runtime_index_native", Status: "failed", Message: err.Error()}
+	}
+	if err := nativeRuntimeIndexChecksumsCheck(repo, db); err != nil {
+		return Check{Name: "runtime_index_native", Status: "failed", Message: err.Error()}
+	}
+	if err := nativeRuntimeIndexFTSCheck(db); err != nil {
+		return Check{Name: "runtime_index_native", Status: "failed", Message: err.Error()}
+	}
+	return Check{Name: "runtime_index_native", Status: "ok", Message: fmt.Sprintf("SQLite runtime index checks passed: atoms=%d sources=%d edges=%d fts=%d", counts["atoms"], counts["sources"], counts["edges"], counts["fts"])}
+}
+
+func nativeRuntimeIndexTablesCheck(db *sql.DB) error {
+	rows, err := db.Query("SELECT name FROM sqlite_master WHERE type IN ('table', 'virtual')")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	tables := map[string]bool{}
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return err
+		}
+		tables[name] = true
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	for _, table := range []string{"atoms", "sources", "edges", "fts"} {
+		if !tables[table] {
+			return fmt.Errorf("missing table: %s", table)
+		}
+	}
+	return nil
+}
+
+func nativeRuntimeIndexCountsCheck(db *sql.DB) (map[string]int, error) {
+	counts := map[string]int{}
+	for _, table := range []string{"atoms", "sources", "edges", "fts"} {
+		var count int
+		if err := db.QueryRow("SELECT COUNT(*) FROM " + table).Scan(&count); err != nil {
+			return nil, fmt.Errorf("%s count failed: %w", table, err)
+		}
+		counts[table] = count
+	}
+	if counts["atoms"] == 0 {
+		return nil, fmt.Errorf("atoms table is empty")
+	}
+	if counts["sources"] == 0 {
+		return nil, fmt.Errorf("sources table is empty")
+	}
+	if counts["fts"] != counts["atoms"] {
+		return nil, fmt.Errorf("fts count does not match atoms count")
+	}
+	return counts, nil
+}
+
+func nativeRuntimeIndexSourceReferencesCheck(db *sql.DB) error {
+	rows, err := db.Query("SELECT source_path FROM atoms WHERE source_path NOT IN (SELECT source_path FROM sources) LIMIT 10")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	missing := []string{}
+	for rows.Next() {
+		var sourcePath string
+		if err := rows.Scan(&sourcePath); err != nil {
+			return err
+		}
+		missing = append(missing, sourcePath)
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("atoms reference missing sources: %s", strings.Join(missing, ", "))
+	}
+	return nil
+}
+
+func nativeRuntimeIndexChecksumsCheck(repo string, db *sql.DB) error {
+	rows, err := db.Query("SELECT source_path, checksum FROM sources WHERE checksum IS NOT NULL AND checksum != ''")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var sourcePath, checksum string
+		if err := rows.Scan(&sourcePath, &checksum); err != nil {
+			return err
+		}
+		path := filepath.Join(repo, sourcePath)
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("source path missing on disk: %s", sourcePath)
+		}
+		current := fmt.Sprintf("%x", sha256.Sum256(content))
+		if current != checksum {
+			return fmt.Errorf("stale checksum for %s", sourcePath)
+		}
+	}
+	return rows.Err()
+}
+
+func nativeRuntimeIndexFTSCheck(db *sql.DB) error {
+	var feedbackHits int
+	if err := db.QueryRow("SELECT COUNT(*) FROM fts WHERE fts MATCH ?", runtimeFTSMatchLiteral("feedback")).Scan(&feedbackHits); err != nil {
+		return err
+	}
+	if feedbackHits == 0 {
+		return fmt.Errorf("expected feedback FTS hits")
+	}
+	var routeHits int
+	if err := db.QueryRow("SELECT COUNT(*) FROM fts WHERE fts MATCH ?", runtimeFTSMatchLiteral("route")).Scan(&routeHits); err != nil {
+		return err
+	}
+	if routeHits == 0 {
+		return fmt.Errorf("expected route FTS hits")
+	}
+	var rankedRoute string
+	err := db.QueryRow(`SELECT atoms.id FROM fts
+JOIN atoms ON atoms.id = fts.id
+WHERE fts MATCH ?
+ORDER BY bm25(fts), CASE atoms.priority WHEN 'P0' THEN 0 WHEN 'P1' THEN 1 WHEN 'P2' THEN 2 ELSE 3 END
+LIMIT 1`, runtimeFTSMatchLiteral("feedback")).Scan(&rankedRoute)
+	if err != nil || rankedRoute == "" {
+		return fmt.Errorf("expected ranked query result")
+	}
+	return nil
 }
 
 var nativeRuntimeRequiredTables = []string{

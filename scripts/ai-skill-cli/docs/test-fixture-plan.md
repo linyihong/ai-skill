@@ -22,6 +22,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/native-sqlite-file-proof` | pure Go SQLite proof | temporary DB 可 create / insert / query / integrity check，且不依賴外部 `sqlite3` CLI |
 | `fixture/runtime-db-native-validator` | native runtime.db validator | valid DB、missing required table、invalid JSON column、stale compiler metadata warning 均有固定結果 |
 | `fixture/runtime-query-index` | native runtime index query | ranking、filter、limit、empty result、missing DB 均有固定結果 |
+| `fixture/runtime-index-native-validator` | native runtime index validator | valid index、missing table、stale checksum、FTS count mismatch 均有固定結果；git-ignore boundary 待補 |
 | `fixture/legacy-script-parity` | 舊腳本覆蓋率驗證 | 每個 native target / wrapper first 舊入口都有命令映射與測試證據 |
 
 ## 缺 Git fixture
@@ -61,6 +62,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - Phase 3 已用 `doctor --check-runtime` / Go unit tests 覆蓋 `native-sqlite-file-proof`：pure Go SQLite 可對 temporary DB 執行 create / insert / query / `PRAGMA integrity_check`，不需外部 `sqlite3` CLI。
 - Phase 3 已新增 `runtime-db-native-validator` Go fixture，覆蓋 valid `runtime.db`、missing required table、invalid JSON column、stale compiler metadata warning；stale warning 不阻斷 `runtime validate` 成功狀態。
 - Phase 3 已新增 `runtime-query-index` Go fixture，覆蓋 `query-runtime-index.rb` 的 ranking、layer / type / status filters、limit、empty result 與 missing DB 行為；`query-knowledge-graph.rb` fixture 待補。
+- Phase 3 已新增 `runtime-index-native-validator` Go fixture，覆蓋 SQLite runtime index valid case、missing table、stale checksum、FTS count mismatch；git-ignore boundary fixture 待補，因為該檢查仍需 external Git decision。
 
 ## 舊腳本 parity fixture
 

@@ -2,6 +2,7 @@ package app
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -149,7 +150,6 @@ func TestRuntimeCompileBlocksMissingRubyBeforeWrapper(t *testing.T) {
 
 func TestRuntimeQueryReturnsRankedResults(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
-	createRuntimeIndexFixture(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -178,7 +178,6 @@ func TestRuntimeQueryReturnsRankedResults(t *testing.T) {
 
 func TestRuntimeQueryFiltersByLayerTypeStatus(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
-	createRuntimeIndexFixture(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -198,7 +197,6 @@ func TestRuntimeQueryFiltersByLayerTypeStatus(t *testing.T) {
 
 func TestRuntimeQueryEmptyResultSucceeds(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
-	createRuntimeIndexFixture(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -218,6 +216,9 @@ func TestRuntimeQueryEmptyResultSucceeds(t *testing.T) {
 
 func TestRuntimeQueryBlocksMissingIndex(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
+	if err := os.Remove(filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")); err != nil {
+		t.Fatal(err)
+	}
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -335,6 +336,67 @@ func TestNativeRuntimeDBValidationReportsStaleCompilerMetadata(t *testing.T) {
 	}
 }
 
+func TestNativeRuntimeIndexValidationAcceptsValidFixture(t *testing.T) {
+	repo := t.TempDir()
+	path := filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
+	createRuntimeIndexFixture(t, path)
+
+	check := nativeRuntimeIndexValidation(repo, path)
+	if check.Status != "ok" {
+		t.Fatalf("expected native index validation ok, got %#v", check)
+	}
+}
+
+func TestNativeRuntimeIndexValidationBlocksMissingTable(t *testing.T) {
+	repo := t.TempDir()
+	path := filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
+	createRuntimeIndexFixture(t, path)
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, err := db.Exec("DROP TABLE edges"); err != nil {
+		t.Fatal(err)
+	}
+
+	check := nativeRuntimeIndexValidation(repo, path)
+	if check.Status != "failed" || !strings.Contains(check.Message, "missing table: edges") {
+		t.Fatalf("expected missing table failure, got %#v", check)
+	}
+}
+
+func TestNativeRuntimeIndexValidationBlocksStaleChecksum(t *testing.T) {
+	repo := t.TempDir()
+	path := filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
+	createRuntimeIndexFixture(t, path)
+	writeFile(t, filepath.Join(repo, "runtime", "compiler", "embedded_data.rb"), "changed\n")
+
+	check := nativeRuntimeIndexValidation(repo, path)
+	if check.Status != "failed" || !strings.Contains(check.Message, "stale checksum") {
+		t.Fatalf("expected stale checksum failure, got %#v", check)
+	}
+}
+
+func TestNativeRuntimeIndexValidationBlocksFTSCountMismatch(t *testing.T) {
+	repo := t.TempDir()
+	path := filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
+	createRuntimeIndexFixture(t, path)
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, err := db.Exec("DELETE FROM fts WHERE id = 'workflow-phase-guide'"); err != nil {
+		t.Fatal(err)
+	}
+
+	check := nativeRuntimeIndexValidation(repo, path)
+	if check.Status != "failed" || !strings.Contains(check.Message, "fts count does not match atoms count") {
+		t.Fatalf("expected FTS count failure, got %#v", check)
+	}
+}
+
 func fakeRuntimeRepo(t *testing.T) string {
 	t.Helper()
 	repo := t.TempDir()
@@ -352,6 +414,7 @@ func fakeRuntimeRepo(t *testing.T) string {
 	}
 	writeFile(t, filepath.Join(repo, "runtime", "compiler", "compiler-engine.rb"), "#!/usr/bin/env ruby\nputs 'compiled'\n")
 	copyFile(t, createNativeRuntimeDBFixture(t), filepath.Join(repo, "runtime", "runtime.db"))
+	createRuntimeIndexFixture(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
 	return repo
 }
 
@@ -422,6 +485,12 @@ func copyFile(t *testing.T, source string, target string) {
 
 func createRuntimeIndexFixture(t *testing.T, path string) {
 	t.Helper()
+	repo := filepath.Dir(filepath.Dir(filepath.Dir(filepath.Dir(path))))
+	phaseSource := "phase machine runtime source feedback route\n"
+	workflowSource := "phase workflow guide route feedback\n"
+	writeFile(t, filepath.Join(repo, "runtime", "compiler", "embedded_data.rb"), phaseSource)
+	writeFile(t, filepath.Join(repo, "workflow", "software-delivery", "execution-flow.md"), workflowSource)
+
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -442,16 +511,34 @@ CREATE TABLE atoms (
   context_cost TEXT,
   summary TEXT
 );
+CREATE TABLE sources (
+  source_path TEXT PRIMARY KEY,
+  checksum TEXT
+);
+CREATE TABLE edges (
+  source_id TEXT,
+  target_id TEXT,
+  type TEXT
+);
 CREATE VIRTUAL TABLE fts USING fts5(id UNINDEXED, content);
 INSERT INTO atoms VALUES
   ('phase-machine', 'runtime/compiler/embedded_data.rb', 'runtime', 'reference', 'validated', 'P0', 'high', 'low', 'Phase machine runtime source.'),
   ('workflow-phase-guide', 'workflow/software-delivery/execution-flow.md', 'workflow', 'guide', 'candidate', 'P2', 'medium', 'medium', 'Workflow phase guide.');
+INSERT INTO sources VALUES
+  ('runtime/compiler/embedded_data.rb', ?),
+  ('workflow/software-delivery/execution-flow.md', ?);
+INSERT INTO edges VALUES
+  ('phase-machine', 'workflow-phase-guide', 'relates_to');
 INSERT INTO fts VALUES
-  ('phase-machine', 'phase phase phase machine runtime source'),
-  ('workflow-phase-guide', 'phase workflow guide');
-`); err != nil {
+  ('phase-machine', 'phase phase phase machine runtime source feedback route'),
+  ('workflow-phase-guide', 'phase workflow guide feedback route');
+`, testChecksum(phaseSource), testChecksum(workflowSource)); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func testChecksum(content string) string {
+	return fmt.Sprintf("%x", sha256.Sum256([]byte(content)))
 }
 
 func containsEnv(env []string, item string) bool {

@@ -290,6 +290,7 @@ Tasks：
 - [x] 評估哪些 Ruby validator 適合原生 Go 重寫，哪些應保留 Ruby。
 - [x] 建立 `runtime validate` native DB validator slice：Go native 檢查 `runtime.db` integrity、required tables、row counts、JSON columns、compiler metadata、stale metadata warning；Ruby validators 暫保留作 parity guard。
 - [x] 建立 `runtime query` native SQLite index slice：Go native 查詢 `query-runtime-index.rb` 的 keyword、filter、limit、empty result、missing DB 行為；knowledge graph query 待補。
+- [x] 建立 `runtime validate` native SQLite index validator slice：Go native 檢查 missing DB / table、integrity、row counts、atom source references、source checksums、FTS count、basic ranked query；git-ignore boundary 待補。
 - [ ] 若開始移植 compiler，先建立 Ruby vs Go parity test，不得直接替換 production compiler。
 
 Progress notes：
@@ -301,6 +302,7 @@ Progress notes：
 - [`runtime-native-rewrite-assessment.md`](../../scripts/ai-skill-cli/docs/runtime-native-rewrite-assessment.md) 已完成 Ruby runtime tooling 原生化評估：`validate-runtime-db.rb`、`validate-runtime-sqlite-index.rb` 與 runtime query 優先 native；generator / compiler 維持 wrapper-first，待 golden fixture 與 Ruby vs Go parity test 完成後再替換。
 - `ai-skill runtime validate` 已新增第一段 Go native `runtime.db` validator：用 `modernc.org/sqlite` 檢查 integrity、required tables、minimum row counts、JSON columns、compiler metadata 與 stale metadata warning；unit tests 覆蓋 valid DB、missing table、invalid JSON、stale metadata warning，且 stale warning 不阻斷成功狀態。
 - `ai-skill runtime query` 已新增第一段 Go native SQLite index query：支援 positional query / `--keyword`、`--db`、`--layer`、`--type`、`--status`、`--limit`、JSON / plain output，且不寫入 DB；unit tests 覆蓋 ranking、filters、empty result 與 missing DB。`query-knowledge-graph.rb` 尚未移植。
+- `ai-skill runtime validate` 已新增 Go native SQLite runtime index validator：檢查 index integrity、required tables、atoms / sources / edges / fts counts、atom source references、source SHA-256 checksums、FTS count 與 basic ranked query；unit tests 覆蓋 valid index、missing table、stale checksum、FTS count mismatch。git-ignore boundary 仍由 Ruby validator / Git parity guard 保留。
 
 Completion criteria：
 
