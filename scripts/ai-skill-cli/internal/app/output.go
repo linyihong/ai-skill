@@ -43,6 +43,13 @@ type QueryResult struct {
 	ContextCost string  `json:"context_cost"`
 	Summary     string  `json:"summary"`
 	MatchReason string  `json:"match_reason"`
+	GraphID     string  `json:"graph_id,omitempty"`
+	GraphSource string  `json:"graph_source,omitempty"`
+	EdgeType    string  `json:"edge_type,omitempty"`
+	Target      string  `json:"target,omitempty"`
+	Reason      string  `json:"reason,omitempty"`
+	Validation  string  `json:"validation,omitempty"`
+	GraphFile   string  `json:"graph_file,omitempty"`
 }
 
 func writeJSON(w io.Writer, result Result) error {

@@ -236,6 +236,76 @@ func TestRuntimeQueryBlocksMissingIndex(t *testing.T) {
 	}
 }
 
+func TestRuntimeGraphQueryFiltersEdges(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	createKnowledgeGraphFixture(t, repo)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "query", "--graph", "--repo", repo, "--source", "workflow/software-delivery", "--target", "artifact-gates", "--type", "related_to", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Command != "runtime query" || result.Mode != "native" {
+		t.Fatalf("unexpected result identity: %#v", result)
+	}
+	if len(result.Results) != 1 {
+		t.Fatalf("expected one graph result, got %#v", result.Results)
+	}
+	got := result.Results[0]
+	if got.GraphID != "graph.test" || got.EdgeType != "related_to" || got.Target != "workflow/software-delivery/artifact-gates.md" {
+		t.Fatalf("unexpected graph result: %#v", got)
+	}
+	if got.GraphFile != "knowledge/graphs/test-graph.yaml" {
+		t.Fatalf("expected graph file path, got %#v", got)
+	}
+}
+
+func TestRuntimeGraphQueryEmptyResultSucceeds(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	createKnowledgeGraphFixture(t, repo)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "query", "--graph", "--repo", repo, "--keyword", "not-present", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if len(result.Results) != 0 {
+		t.Fatalf("expected empty graph results, got %#v", result.Results)
+	}
+}
+
+func TestRuntimeGraphQueryRequiresFilter(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	createKnowledgeGraphFixture(t, repo)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "query", "--graph", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitInvalidUsage {
+		t.Fatalf("expected invalid usage, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Error == nil || result.Error.Code != "missing_graph_filter" {
+		t.Fatalf("expected missing graph filter, got %#v", result.Error)
+	}
+}
+
 func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
 	repo := t.TempDir()
 	writeFile(t, filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb"), "# ok\n")
@@ -539,6 +609,23 @@ INSERT INTO fts VALUES
 
 func testChecksum(content string) string {
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(content)))
+}
+
+func createKnowledgeGraphFixture(t *testing.T, repo string) {
+	t.Helper()
+	writeFile(t, filepath.Join(repo, "knowledge", "graphs", "test-graph.yaml"), `id: graph.test
+source: workflow/software-delivery/README.md
+status: candidate
+edges:
+  - type: related_to
+    target: workflow/software-delivery/artifact-gates.md
+    reason: Artifact gates define delivery outputs.
+    validation: Fixture validates graph query filters.
+  - type: depends_on
+    target: analysis/development-guidance/README.md
+    reason: Analysis guidance supports workflow decisions.
+    validation: Fixture validates empty query behavior.
+`)
 }
 
 func containsEnv(env []string, item string) bool {

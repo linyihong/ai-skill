@@ -291,6 +291,7 @@ Tasks：
 - [x] 建立 `runtime validate` native DB validator slice：Go native 檢查 `runtime.db` integrity、required tables、row counts、JSON columns、compiler metadata、stale metadata warning；Ruby validators 暫保留作 parity guard。
 - [x] 建立 `runtime query` native SQLite index slice：Go native 查詢 `query-runtime-index.rb` 的 keyword、filter、limit、empty result、missing DB 行為；knowledge graph query 待補。
 - [x] 建立 `runtime validate` native SQLite index validator slice：Go native 檢查 missing DB / table、integrity、row counts、atom source references、source checksums、FTS count、basic ranked query；git-ignore boundary 待補。
+- [x] 建立 `runtime query --graph` native knowledge graph slice：Go native 查詢 `query-knowledge-graph.rb` 的 source / target / type / keyword filter、limit、empty result、missing filter 行為。
 - [ ] 若開始移植 compiler，先建立 Ruby vs Go parity test，不得直接替換 production compiler。
 
 Progress notes：
@@ -303,6 +304,7 @@ Progress notes：
 - `ai-skill runtime validate` 已新增第一段 Go native `runtime.db` validator：用 `modernc.org/sqlite` 檢查 integrity、required tables、minimum row counts、JSON columns、compiler metadata 與 stale metadata warning；unit tests 覆蓋 valid DB、missing table、invalid JSON、stale metadata warning，且 stale warning 不阻斷成功狀態。
 - `ai-skill runtime query` 已新增第一段 Go native SQLite index query：支援 positional query / `--keyword`、`--db`、`--layer`、`--type`、`--status`、`--limit`、JSON / plain output，且不寫入 DB；unit tests 覆蓋 ranking、filters、empty result 與 missing DB。`query-knowledge-graph.rb` 尚未移植。
 - `ai-skill runtime validate` 已新增 Go native SQLite runtime index validator：檢查 index integrity、required tables、atoms / sources / edges / fts counts、atom source references、source SHA-256 checksums、FTS count 與 basic ranked query；unit tests 覆蓋 valid index、missing table、stale checksum、FTS count mismatch。git-ignore boundary 仍由 Ruby validator / Git parity guard 保留。
+- `ai-skill runtime query --graph` 已新增 Go native knowledge graph query：支援 `--source`、`--target`、`--type`、`--keyword` / positional query、`--limit`、JSON / plain output，且不寫入 graph YAML；unit tests 覆蓋 graph filters、empty result 與 missing filter。
 
 Completion criteria：
 

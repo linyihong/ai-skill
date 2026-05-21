@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 type runtimeOptions struct {
@@ -24,6 +26,9 @@ type runtimeOptions struct {
 	layer         string
 	queryType     string
 	statusFilter  string
+	source        string
+	target        string
+	graphQuery    bool
 	limit         int
 	jsonOutput    bool
 	plainOutput   bool
@@ -56,6 +61,9 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs.StringVar(&opts.layer, "layer", "", "filter runtime query results by layer")
 	fs.StringVar(&opts.queryType, "type", "", "filter runtime query results by type")
 	fs.StringVar(&opts.statusFilter, "status", "", "filter runtime query results by status")
+	fs.StringVar(&opts.source, "source", "", "filter runtime graph query results by source")
+	fs.StringVar(&opts.target, "target", "", "filter runtime graph query results by target")
+	fs.BoolVar(&opts.graphQuery, "graph", false, "query knowledge graph YAML edges instead of the SQLite runtime index")
 	fs.IntVar(&opts.limit, "limit", 8, "maximum runtime query results")
 	fs.BoolVar(&opts.jsonOutput, "json", false, "write machine-readable JSON output")
 	fs.BoolVar(&opts.plainOutput, "plain", false, "write human-readable output")
@@ -367,6 +375,16 @@ func buildRuntimeQueryResult(opts runtimeOptions) Result {
 		return result
 	}
 
+	if opts.limit < 1 {
+		result.Status = "blocked"
+		result.ExitCode = ExitInvalidUsage
+		result.Error = &CommandError{Code: "invalid_limit", Message: "--limit must be greater than zero.", Remediation: "Pass --limit with a positive integer."}
+		return result
+	}
+	if opts.graphQuery {
+		return buildRuntimeGraphQueryResult(result, repo, opts)
+	}
+
 	keyword := strings.TrimSpace(opts.keyword)
 	if keyword == "" && len(opts.positionals) > 0 {
 		keyword = strings.TrimSpace(opts.positionals[0])
@@ -375,12 +393,6 @@ func buildRuntimeQueryResult(opts runtimeOptions) Result {
 		result.Status = "blocked"
 		result.ExitCode = ExitInvalidUsage
 		result.Error = &CommandError{Code: "missing_keyword", Message: "runtime query requires --keyword or a positional query.", Remediation: "Pass a search term, for example: ai-skill runtime query --keyword phase."}
-		return result
-	}
-	if opts.limit < 1 {
-		result.Status = "blocked"
-		result.ExitCode = ExitInvalidUsage
-		result.Error = &CommandError{Code: "invalid_limit", Message: "--limit must be greater than zero.", Remediation: "Pass --limit with a positive integer."}
 		return result
 	}
 
@@ -512,6 +524,137 @@ LIMIT ?`
 func runtimeFTSMatchLiteral(keyword string) string {
 	escaped := strings.ReplaceAll(keyword, `"`, `""`)
 	return `"` + escaped + `"`
+}
+
+func buildRuntimeGraphQueryResult(result Result, repo string, opts runtimeOptions) Result {
+	keyword := strings.TrimSpace(opts.keyword)
+	if keyword == "" && len(opts.positionals) > 0 {
+		keyword = strings.TrimSpace(opts.positionals[0])
+	}
+	if keyword == "" && opts.source == "" && opts.target == "" && opts.queryType == "" {
+		result.Status = "blocked"
+		result.ExitCode = ExitInvalidUsage
+		result.Error = &CommandError{Code: "missing_graph_filter", Message: "runtime graph query requires --source, --target, --type, --keyword, or a positional query.", Remediation: "Pass at least one graph filter."}
+		return result
+	}
+
+	graphDir := filepath.Join(repo, "knowledge", "graphs")
+	result.Checks = append(result.Checks, Check{Name: "knowledge_graphs", Status: "ok", Message: graphDir})
+	result.PlannedActions = append(result.PlannedActions, "query native knowledge graph edges: "+graphDir)
+	if opts.dryRun {
+		result.Checks = append(result.Checks, Check{Name: "query_mode", Status: "ok", Message: "dry-run only; knowledge graph files not queried"})
+		return result
+	}
+
+	results, err := runKnowledgeGraphQuery(repo, graphDir, keyword, opts)
+	if err != nil {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "runtime_graph_query_failed", Message: err.Error(), Remediation: "Inspect knowledge/graphs YAML files and query filters."}
+		result.Checks = append(result.Checks, Check{Name: "knowledge_graph_query", Status: "failed", Message: err.Error()})
+		return result
+	}
+	result.Results = results
+	result.Checks = append(result.Checks, Check{Name: "knowledge_graph_query", Status: "ok", Message: fmt.Sprintf("%d result(s)", len(results))})
+	return result
+}
+
+type knowledgeGraphFile struct {
+	ID     string               `yaml:"id"`
+	Source string               `yaml:"source"`
+	Status string               `yaml:"status"`
+	Edges  []knowledgeGraphEdge `yaml:"edges"`
+}
+
+type knowledgeGraphEdge struct {
+	Type       string `yaml:"type"`
+	Target     string `yaml:"target"`
+	Reason     string `yaml:"reason"`
+	Validation string `yaml:"validation"`
+}
+
+func runKnowledgeGraphQuery(repo string, graphDir string, keyword string, opts runtimeOptions) ([]QueryResult, error) {
+	entries, err := os.ReadDir(graphDir)
+	if err != nil {
+		return nil, err
+	}
+	results := []QueryResult{}
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".yaml") {
+			continue
+		}
+		path := filepath.Join(graphDir, entry.Name())
+		graph, err := readKnowledgeGraphFile(path)
+		if err != nil {
+			return nil, err
+		}
+		graphFile, err := filepath.Rel(repo, path)
+		if err != nil {
+			return nil, err
+		}
+		for _, edge := range graph.Edges {
+			item := QueryResult{
+				ID:          graph.ID,
+				SourcePath:  graph.Source,
+				Type:        edge.Type,
+				Status:      graph.Status,
+				GraphID:     graph.ID,
+				GraphSource: graph.Source,
+				EdgeType:    edge.Type,
+				Target:      edge.Target,
+				Reason:      edge.Reason,
+				Validation:  edge.Validation,
+				GraphFile:   filepath.ToSlash(graphFile),
+				MatchReason: "knowledge graph filter match",
+			}
+			if !knowledgeGraphResultMatches(item, keyword, opts) {
+				continue
+			}
+			results = append(results, item)
+			if len(results) >= opts.limit {
+				return results, nil
+			}
+		}
+	}
+	return results, nil
+}
+
+func readKnowledgeGraphFile(path string) (knowledgeGraphFile, error) {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return knowledgeGraphFile{}, err
+	}
+	var graph knowledgeGraphFile
+	if err := yaml.Unmarshal(content, &graph); err != nil {
+		return knowledgeGraphFile{}, err
+	}
+	return graph, nil
+}
+
+func knowledgeGraphResultMatches(item QueryResult, keyword string, opts runtimeOptions) bool {
+	if !containsFold(item.GraphSource, opts.source) {
+		return false
+	}
+	if !containsFold(item.Target, opts.target) {
+		return false
+	}
+	if !containsFold(item.EdgeType, opts.queryType) {
+		return false
+	}
+	if keyword != "" {
+		haystack := strings.Join([]string{item.GraphID, item.GraphSource, item.EdgeType, item.Target, item.Reason, item.Validation}, " ")
+		if !containsFold(haystack, keyword) {
+			return false
+		}
+	}
+	return true
+}
+
+func containsFold(value string, needle string) bool {
+	if needle == "" {
+		return true
+	}
+	return strings.Contains(strings.ToLower(value), strings.ToLower(needle))
 }
 
 func nativeRuntimeIndexValidation(repo string, path string) Check {
