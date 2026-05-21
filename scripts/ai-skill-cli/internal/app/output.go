@@ -1,0 +1,68 @@
+package app
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+)
+
+type Check struct {
+	Name        string `json:"name"`
+	Status      string `json:"status"`
+	Message     string `json:"message,omitempty"`
+	Remediation string `json:"remediation,omitempty"`
+}
+
+type CommandError struct {
+	Code        string `json:"code"`
+	Message     string `json:"message"`
+	Remediation string `json:"remediation,omitempty"`
+}
+
+type Result struct {
+	Command        string        `json:"command"`
+	Mode           string        `json:"mode"`
+	Status         string        `json:"status"`
+	ExitCode       int           `json:"exit_code"`
+	Checks         []Check       `json:"checks"`
+	PlannedActions []string      `json:"planned_actions"`
+	Mutations      []string      `json:"mutations"`
+	Error          *CommandError `json:"error,omitempty"`
+}
+
+func writeJSON(w io.Writer, result Result) error {
+	encoder := json.NewEncoder(w)
+	encoder.SetIndent("", "  ")
+	return encoder.Encode(result)
+}
+
+func writePlain(w io.Writer, result Result) error {
+	if _, err := fmt.Fprintf(w, "ai-skill %s: %s (exit %d)\n", result.Command, result.Status, result.ExitCode); err != nil {
+		return err
+	}
+
+	for _, check := range result.Checks {
+		if check.Message == "" {
+			if _, err := fmt.Fprintf(w, "- %s: %s\n", check.Name, check.Status); err != nil {
+				return err
+			}
+			continue
+		}
+		if _, err := fmt.Fprintf(w, "- %s: %s - %s\n", check.Name, check.Status, check.Message); err != nil {
+			return err
+		}
+	}
+
+	if result.Error != nil {
+		if _, err := fmt.Fprintf(w, "Error: %s\n", result.Error.Message); err != nil {
+			return err
+		}
+		if result.Error.Remediation != "" {
+			if _, err := fmt.Fprintf(w, "Remediation: %s\n", result.Error.Remediation); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}

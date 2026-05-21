@@ -66,8 +66,8 @@
 
 在新增 `scripts/ai-skill-cli/go.mod`、`scripts/ai-skill-cli/cmd/ai-skill/` 或 production Go 實作前，必須滿足：
 
-- [ ] 本文件每個舊入口都有狀態與目標命令。
-- [ ] 每個 `native target` 或 `wrapper first` 舊入口都有最低測試證據或 fixture 名稱。
-- [ ] 高風險路徑已在 [`bdd-scenarios.md`](bdd-scenarios.md) 或 [`test-fixture-plan.md`](test-fixture-plan.md) 中出現。
-- [ ] 若某舊能力被 `deferred` 或 `tool-specific`，已說明為何不阻擋 Phase 1。
-- [ ] `command-contract.md` 只保留摘要表；完整 parity 以本文件為 source-of-truth。
+- [x] 本文件每個舊入口都有狀態與目標命令。
+- [x] 每個 `native target` 或 `wrapper first` 舊入口都有最低測試證據或 fixture 名稱。
+- [x] 高風險路徑已在 [`bdd-scenarios.md`](bdd-scenarios.md) 或 [`test-fixture-plan.md`](test-fixture-plan.md) 中出現。
+- [x] 若某舊能力被 `deferred` 或 `tool-specific`，已說明為何不阻擋 Phase 1。
+- [x] `command-contract.md` 只保留摘要表；完整 parity 以本文件為 source-of-truth。

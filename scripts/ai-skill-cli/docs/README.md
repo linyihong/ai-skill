@@ -23,4 +23,4 @@
 - [x] `test-fixture-plan.md` 已覆蓋缺 Git、不安全 repo、Windows path、fake home、runtime.db assertion。
 - [x] 文件標題、表格欄位、說明段落與 checklist 已使用繁體中文；只保留命令、flag、JSON 欄位、路徑與固定術語英文。
 
-完成上述項目前，不得新增 `scripts/ai-skill-cli/go.mod`、`scripts/ai-skill-cli/cmd/ai-skill/` 或 production Go 實作。
+上述 Phase 0 gate 已完成；後續新增或修改 Go implementation 時，仍必須先對照本目錄的 command contract、parity inventory、BDD scenarios 與 fixture plan。

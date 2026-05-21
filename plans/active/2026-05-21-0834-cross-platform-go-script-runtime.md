@@ -215,13 +215,19 @@ Completion criteria：
 
 Tasks：
 
-- [ ] 在 `scripts/ai-skill-cli/` 新增 `go.mod` 與 CLI skeleton。
+- [x] 在 `scripts/ai-skill-cli/` 新增 `go.mod` 與 CLI skeleton。
 - [ ] 建立 dependency policy：pure Go dependency 優先；需要 CGO、外部 binary 或平台 SDK 時必須列為 exception。
 - [ ] 選型 SQLite library，預設評估 `modernc.org/sqlite`，並記錄是否排除 `mattn/go-sqlite3` 作為預設方案。
 - [ ] 實作 `ai-skill doctor`：檢查 Git external dependency、SQLite、Ruby、Python、repo root、write permission、hooksPath、PATH；其中缺 Git 必須明確提示安裝。
 - [ ] 實作 path / OS abstraction，禁止散落 OS-specific string manipulation。
-- [ ] 建立 `--json` / `--plain` output contract。
+- [x] 建立 `--json` / `--plain` output contract。
 - [ ] 建立基本 unit tests 與 GitHub Actions matrix：Windows、macOS、Linux。
+
+Progress notes：
+
+- 已建立最小 `doctor` slice：platform、Git discovery、repo root、write permission 與 runtime DB presence checks；缺 Git 且傳入 `--require-git` 時回傳 `missing_dependency` / `missing_git`，且不產生 mutations。
+- 已建立 `doctor` unit tests，覆蓋缺 Git、`--require-git --json`、plain output 與 unknown command；尚未建立 GitHub Actions matrix。
+- `doctor` 尚未完成 SQLite pure-Go proof、Ruby / Python wrapper-mode diagnostics、hooksPath 與完整 PATH policy，因此主 task 保持未完成。
 
 Completion criteria：
 
