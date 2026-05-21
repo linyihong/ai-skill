@@ -8,7 +8,7 @@
 | --- | --- |
 | [`docs/`](docs/README.md) | 文件先行產物：命令契約、舊腳本 parity 盤點、支援矩陣、BDD-lite 場景、fixture 計畫 |
 | `cmd/ai-skill/` | Go CLI 入口；Phase 1 已建立 `doctor` skeleton |
-| `internal/` | Go internal packages；目前包含 command dispatch、`doctor` checks、JSON / plain output 與 exit code |
+| `internal/` | Go internal packages；目前包含 command dispatch、`doctor` checks、path normalization、JSON / plain output 與 exit code |
 | `testdata/` | 未來測試 fixtures / golden 輸出（尚未建立） |
 
 ## 開發 gate

@@ -219,7 +219,7 @@ Tasks：
 - [x] 建立 dependency policy：pure Go dependency 優先；需要 CGO、外部 binary 或平台 SDK 時必須列為 exception。
 - [x] 選型 SQLite library，預設評估 `modernc.org/sqlite`，並記錄是否排除 `mattn/go-sqlite3` 作為預設方案。
 - [x] 實作 `ai-skill doctor`：檢查 Git external dependency、SQLite、Ruby、Python、repo root、write permission、hooksPath、PATH；其中缺 Git 必須明確提示安裝。
-- [ ] 實作 path / OS abstraction，禁止散落 OS-specific string manipulation。
+- [x] 實作 path / OS abstraction，禁止散落 OS-specific string manipulation。
 - [x] 建立 `--json` / `--plain` output contract。
 - [ ] 建立基本 unit tests 與 GitHub Actions matrix：Windows、macOS、Linux。
 
@@ -230,6 +230,7 @@ Progress notes：
 - 已新增 [`dependency-policy.md`](../../scripts/ai-skill-cli/docs/dependency-policy.md)，確認 pure Go dependency 優先、Git 作為 external dependency、`modernc.org/sqlite` 作為預設 SQLite engine，且 `mattn/go-sqlite3` 不作為預設。
 - `doctor --check-runtime` 已用 `modernc.org/sqlite` 建立 in-memory query proof，並在找到 `runtime.db` 時執行 integrity check。
 - `doctor` 已回報 PATH、Git、repo root、hooksPath、write permission、Ruby / Python wrapper-mode dependency diagnostics；Ruby / Python 只作為 wrapper-mode optional dependency，不列為長期核心依賴。
+- 已新增 `internal/pathutil`，集中處理 report path normalization 與 PATH summary；unit tests 覆蓋 Windows drive、UNC path、mixed separators、spaces 與 relative paths。
 
 Completion criteria：
 

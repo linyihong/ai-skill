@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/linyihong/Ai-skill/scripts/ai-skill-cli/internal/pathutil"
 	_ "modernc.org/sqlite"
 )
 
@@ -148,23 +149,17 @@ func pathCheck() Check {
 		}
 	}
 
-	entries := filepath.SplitList(pathValue)
-	emptyEntries := 0
-	for _, entry := range entries {
-		if strings.TrimSpace(entry) == "" {
-			emptyEntries++
-		}
-	}
-	if emptyEntries > 0 {
+	summary := pathutil.SummarizePathList(pathValue)
+	if summary.EmptyEntries > 0 {
 		return Check{
 			Name:        "path",
 			Status:      "warning",
-			Message:     fmt.Sprintf("%d PATH entries, %d empty", len(entries), emptyEntries),
+			Message:     fmt.Sprintf("%d PATH entries, %d empty", summary.Entries, summary.EmptyEntries),
 			Remediation: "Remove empty PATH entries to avoid platform-specific command lookup surprises.",
 		}
 	}
 
-	return Check{Name: "path", Status: "ok", Message: fmt.Sprintf("%d entries", len(entries))}
+	return Check{Name: "path", Status: "ok", Message: fmt.Sprintf("%d entries", summary.Entries)}
 }
 
 func checkGit() Check {
@@ -191,7 +186,11 @@ func repoRootCheck() Check {
 	if err != nil {
 		return Check{Name: "repo_root", Status: "failed", Message: "not inside a Git work tree"}
 	}
-	return Check{Name: "repo_root", Status: "ok", Message: strings.TrimSpace(string(output))}
+	normalized, err := pathutil.NormalizeForReport(strings.TrimSpace(string(output)))
+	if err != nil {
+		return Check{Name: "repo_root", Status: "failed", Message: err.Error()}
+	}
+	return Check{Name: "repo_root", Status: "ok", Message: normalized}
 }
 
 func hooksPathCheck() Check {
@@ -203,7 +202,11 @@ func hooksPathCheck() Check {
 	if value == "" {
 		return Check{Name: "hooks_path", Status: "unset", Message: "core.hooksPath is empty"}
 	}
-	return Check{Name: "hooks_path", Status: "ok", Message: value}
+	normalized, err := pathutil.NormalizeForReport(value)
+	if err != nil {
+		return Check{Name: "hooks_path", Status: "failed", Message: err.Error()}
+	}
+	return Check{Name: "hooks_path", Status: "ok", Message: normalized}
 }
 
 func checkWritePermission(dir string) Check {
@@ -267,7 +270,11 @@ func runtimeDBIntegrityCheck(path string) Check {
 	if result != "ok" {
 		return Check{Name: "runtime_db", Status: "failed", Message: result}
 	}
-	return Check{Name: "runtime_db", Status: "ok", Message: path}
+	normalized, err := pathutil.NormalizeForReport(path)
+	if err != nil {
+		return Check{Name: "runtime_db", Status: "failed", Message: err.Error()}
+	}
+	return Check{Name: "runtime_db", Status: "ok", Message: normalized}
 }
 
 func rubyCheck() Check {

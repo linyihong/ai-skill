@@ -83,6 +83,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - Path normalization 具穩定可重現結果。
 - JSON 輸出使用穩定的 path 表示。
 - 命令不需要 Git Bash / WSL。
+- Phase 1 已以 `internal/pathutil` unit tests 覆蓋 drive letter、UNC path、mixed separators、spaces 與 relative path normalization。
 
 ## Fake home fixture
 
