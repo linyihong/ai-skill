@@ -181,6 +181,24 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 	}
 	_ = sqlite
 
+	git, gitCheck := requiredExecutable("git", []string{"--version"}, "Install Git because runtime validate checks generated SQLite index git-ignore boundaries.")
+	result.Checks = append(result.Checks, gitCheck)
+	if gitCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitMissingDependency
+		result.Error = &CommandError{Code: "missing_git", Message: "Git is required for runtime validate wrapper mode.", Remediation: gitCheck.Remediation}
+		return result
+	}
+
+	nativeGitIgnoreCheck := nativeRuntimeIndexGitIgnoreCheck(repo, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"), git)
+	result.Checks = append(result.Checks, nativeGitIgnoreCheck)
+	if nativeGitIgnoreCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "runtime_index_gitignore_failed", Message: nativeGitIgnoreCheck.Message, Remediation: "Ensure generated runtime index files are ignored by Git."}
+		return result
+	}
+
 	for _, validator := range validators {
 		check := runRuntimeValidator(repo, ruby, validator)
 		result.Checks = append(result.Checks, check)
@@ -810,6 +828,23 @@ LIMIT 1`, runtimeFTSMatchLiteral("feedback")).Scan(&rankedRoute)
 		return fmt.Errorf("expected ranked query result")
 	}
 	return nil
+}
+
+func nativeRuntimeIndexGitIgnoreCheck(repo string, path string, git string) Check {
+	rel, err := filepath.Rel(repo, path)
+	if err != nil {
+		return Check{Name: "runtime_index_git_ignore", Status: "failed", Message: err.Error()}
+	}
+	rel = filepath.ToSlash(rel)
+	output, err := exec.Command(git, "-C", repo, "check-ignore", rel).CombinedOutput()
+	message := strings.TrimSpace(string(output))
+	if err != nil || message == "" {
+		if message == "" {
+			message = "generated DB is not ignored by git: " + rel
+		}
+		return Check{Name: "runtime_index_git_ignore", Status: "failed", Message: message}
+	}
+	return Check{Name: "runtime_index_git_ignore", Status: "ok", Message: rel + " is ignored by git"}
 }
 
 var nativeRuntimeRequiredTables = []string{

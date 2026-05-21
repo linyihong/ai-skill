@@ -16,7 +16,7 @@
 | 舊入口 | 目前 CLI | Native 優先度 | 建議處置 | 必要 parity |
 | --- | --- | --- | --- | --- |
 | `scripts/validate-runtime-db.rb` | `ai-skill runtime validate` | 高 | 已開始 Go native slice。`modernc.org/sqlite` 已覆蓋 integrity、required tables、row count、JSON、compiler metadata 與 stale metadata warning；Ruby validator 暫保留作 parity guard。 | invalid DB、missing table、invalid JSON、stale metadata fixture 已覆蓋。 |
-| `scripts/validate-runtime-sqlite-index.rb` | `ai-skill runtime validate` | 高 | 已開始 Go native slice。SQLite integrity、tables、row counts、source references、checksum、FTS count 與 basic ranked query 已 native；Git ignore 邊界仍需 external Git / Ruby parity guard。 | missing DB / table、stale checksum、FTS count mismatch 已覆蓋；git-ignore boundary fixture 待補。 |
+| `scripts/validate-runtime-sqlite-index.rb` | `ai-skill runtime validate` | 高 | 已開始 Go native slice。SQLite integrity、tables、row counts、source references、checksum、FTS count、basic ranked query 與 git-ignore boundary 已 native；git-ignore boundary 仍需 external Git。 | missing DB / table、stale checksum、FTS count mismatch、git-ignore boundary fixture 已覆蓋。 |
 | `scripts/query-runtime-index.rb` | `ai-skill runtime query` | 高 | 已開始 Go native slice。查詢 SQLite / FTS、filter、limit 與 empty result 行為已可直接測；不依賴外部 `sqlite3` CLI。 | ranking / filter / empty result / missing DB fixture 已覆蓋。 |
 | `scripts/query-knowledge-graph.rb` | `ai-skill runtime query --graph` | 中 | 已開始 Go native slice。YAML parsing、source / target / type / keyword filters、empty result 與 missing filter 已固定。 | source / target / type / keyword filter、empty result fixture 已覆蓋。 |
 | `scripts/generate-runtime-sqlite-index.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper，建立 golden SQLite index 後再 native。寫入 git-ignored DB，需驗證 deterministic rows / checksums / FTS。 | golden DB row counts、checksum、FTS fixture。 |
@@ -31,6 +31,6 @@
 
 ## 下一步
 
-1. 補 `runtime validate` 的 SQLite index git-ignore boundary fixture，決定保留 external Git check 或以 Go 呼叫 Git。
-2. 開始建立 golden fixture：同一組 source 產出固定 runtime report、model reports、SQLite index 與 `runtime.db` assertions。
+1. 開始建立 golden fixture：同一組 source 產出固定 runtime report、model reports、SQLite index 與 `runtime.db` assertions。
+2. 補 runtime generators 的 ordered step / partial failure fixture，支撐之後 Go orchestrator 化。
 3. Generator / compiler 只能在 golden fixture 與 Ruby vs Go parity test 完成後替換。

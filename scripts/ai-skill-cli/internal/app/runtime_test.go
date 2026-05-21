@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -464,6 +465,39 @@ func TestNativeRuntimeIndexValidationBlocksFTSCountMismatch(t *testing.T) {
 	check := nativeRuntimeIndexValidation(repo, path)
 	if check.Status != "failed" || !strings.Contains(check.Message, "fts count does not match atoms count") {
 		t.Fatalf("expected FTS count failure, got %#v", check)
+	}
+}
+
+func TestNativeRuntimeIndexGitIgnoreCheckAcceptsIgnoredIndex(t *testing.T) {
+	repo := initTempGitRepo(t)
+	writeFile(t, filepath.Join(repo, ".gitignore"), "knowledge/runtime/sqlite/\n")
+	runGit(t, repo, "add", ".gitignore")
+	runGit(t, repo, "commit", "-m", "ignore runtime index")
+	path := filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
+	createRuntimeIndexFixture(t, path)
+
+	git, err := exec.LookPath("git")
+	if err != nil {
+		t.Skip("git is required for git-ignore boundary test")
+	}
+	check := nativeRuntimeIndexGitIgnoreCheck(repo, path, git)
+	if check.Status != "ok" {
+		t.Fatalf("expected git-ignore check ok, got %#v", check)
+	}
+}
+
+func TestNativeRuntimeIndexGitIgnoreCheckBlocksTrackedBoundary(t *testing.T) {
+	repo := initTempGitRepo(t)
+	path := filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
+	createRuntimeIndexFixture(t, path)
+
+	git, err := exec.LookPath("git")
+	if err != nil {
+		t.Skip("git is required for git-ignore boundary test")
+	}
+	check := nativeRuntimeIndexGitIgnoreCheck(repo, path, git)
+	if check.Status != "failed" || !strings.Contains(check.Message, "generated DB is not ignored by git") {
+		t.Fatalf("expected git-ignore boundary failure, got %#v", check)
 	}
 }
 

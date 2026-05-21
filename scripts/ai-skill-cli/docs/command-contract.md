@@ -286,7 +286,7 @@
 - Phase 3 初始切片使用 wrapper mode 呼叫既有 Ruby validators，必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`。
 - wrapper mode 缺 Ruby 或 `sqlite3` CLI 時必須回傳 `missing_dependency`，並說明該能力尚未 native。
 - `runtime.db` native slice 已用 Go / `modernc.org/sqlite` 檢查 integrity、required tables、minimum row counts、JSON columns、compiler metadata 與 stale metadata warning；stale warning 不阻斷成功狀態。
-- SQLite runtime index native slice 已用 Go / `modernc.org/sqlite` 檢查 missing DB、integrity、required tables、row counts、atom source references、source checksums、FTS count 與 basic ranked FTS query；git-ignore boundary 暫由 Ruby validator / Git 保留作 parity guard。
+- SQLite runtime index native slice 已用 Go / `modernc.org/sqlite` 檢查 missing DB、integrity、required tables、row counts、atom source references、source checksums、FTS count 與 basic ranked FTS query；git-ignore boundary 以 Go 呼叫 Git 檢查，缺 Git 時回 `missing_dependency`。
 
 ### `ai-skill runtime query`
 
@@ -371,6 +371,6 @@
 | `close-loop` | git status、repo files、rules | git index、commits、remote branch | Git |
 | `runtime refresh` | `knowledge/`、`feedback/`、runtime sources | generated reports、SQLite index | wrapper mode 可能需要 Ruby |
 | `runtime compile` | runtime compiler sources、prose sources | `runtime/runtime.db` | wrapper mode 可能需要 Ruby |
-| `runtime validate` | generated reports、runtime.db | 無 | native migration 後無外部依賴 |
+| `runtime validate` | generated reports、runtime.db | 無 | wrapper parity guard 仍需 Ruby / `sqlite3`；SQLite index git-ignore boundary 需 Git |
 | `runtime query` | `knowledge/runtime/sqlite/runtime-index.sqlite` 或 `--db` 指定 SQLite index | 無 | 無 |
 | `runtime query --graph` | `knowledge/graphs/*.yaml` | 無 | 無 |
