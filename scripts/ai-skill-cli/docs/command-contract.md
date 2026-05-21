@@ -249,12 +249,12 @@
 副作用：
 
 - 可能更新 `knowledge/runtime/runtime-report.md`、`knowledge/runtime/model-context-report.md`、`knowledge/runtime/model-checklists.md` 與本機 SQLite index。
-- 預設 native mode 不依賴 Ruby 或 `sqlite3` CLI；`--legacy-wrapper` 才呼叫 Ruby scripts。
+- 預設 native mode 不依賴 Ruby 或 `sqlite3` CLI；`--legacy-wrapper` 對 refresh 已移除。
 
 必要行為：
 
 - 必須回報哪些 generated surfaces 被更新、哪些 validator 被執行。
-- 若明確使用 `--legacy-wrapper` 且 Ruby 缺失，回傳 `missing_dependency`。
+- 若明確使用 `--legacy-wrapper`，回傳 `legacy_runtime_refresh_removed`。
 - 不得只更新部分 generated surface 後回傳 success。
 - 預設 native mode 寫入 Go-generated Markdown reports 與 SQLite index，並執行 native runtime DB / index / knowledge runtime checks；dry-run 只列出將執行的 native actions，不寫入 generated surfaces。
 - `--legacy-wrapper` 對 `runtime refresh` 已移除；必須回傳 `legacy_runtime_refresh_removed`，提示使用者改用 native refresh。
