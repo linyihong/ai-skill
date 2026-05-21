@@ -59,13 +59,18 @@ The Roo command is a guarded tool adapter, not a general onboarding default. It 
 | `scripts/git-hooks/pre-commit` | Calls repo-local `ai-skill runtime compile` and `ai-skill runtime validate`; no Ruby compiler call remains. |
 | `scripts/ai-skill-cli/bin/*` | Rebuilt only after CLI source changes; `go test ./...` verifies `BUILDINFO`, `SHA256SUMS`, and host binary smoke. |
 
+## Deleted Shell Surfaces
+
+| Legacy surface | Go owner | Current Go coverage | Follow-up |
+| --- | --- | --- | --- |
+| `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` / `internal/app/sync_cursor_bundle.go` | Dry-run planning, explicit target requirement, target-outside-repo check, copy-fallback strategy, skill mirror planning | Future Cursor mirror writes must be implemented as Go write mode with managed mirror writes, fake home fixture, unmanaged target safety, copy fallback, and symlink policy |
+
 ## Retained Shell Surfaces
 
 These shell files are legacy-retained surfaces, not places for new functionality. New behavior must be added to the Go CLI first.
 
 | Legacy surface | Go owner | Current Go coverage | Deletion condition |
 | --- | --- | --- | --- |
-| `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` / `internal/app/sync_cursor_bundle.go` | Dry-run planning, explicit target requirement, target-outside-repo check, copy-fallback strategy, skill mirror planning | Delete after Go write mode supports managed mirror writes, fake home fixture, unmanaged target safety, copy fallback, and symlink policy |
 | `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` / `internal/app/close_loop.go` | Dry-run inspection, missing Git block, unsafe Git state block, active lock block, dirty owner grouping | Delete or reduce to a short binary bootstrap wrapper after Go supports commit, push, private-path scan, plan closure, optional Cursor sync, and readback parity |
 
 ## Required Close Loop

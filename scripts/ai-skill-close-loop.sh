@@ -3,7 +3,7 @@
 #
 # Default mode is dry-run: inspect status, detect active lock, and print commit groups.
 # Use --commit to create grouped commits. Use --push with --commit to push after commits.
-# Cursor bundle sync is opt-in via AI_SKILL_SYNC_CURSOR_BUNDLE=1.
+# Cursor bundle sync shell helper has been deleted; Go write-mode parity is pending.
 set -euo pipefail
 
 COMMIT=0
@@ -308,9 +308,9 @@ main() {
   done
 
   if [[ "${AI_SKILL_SYNC_CURSOR_BUNDLE:-0}" == "1" ]]; then
-    ./scripts/sync-cursor-bundle.sh
+    echo "Skipping Cursor bundle sync: legacy shell sync was deleted; implement ai-skill sync-cursor-bundle write mode before re-enabling."
   else
-    echo "Skipping Cursor bundle sync (reference-only default). Set AI_SKILL_SYNC_CURSOR_BUNDLE=1 to sync local Cursor bundles."
+    echo "Skipping Cursor bundle sync (reference-only default)."
   fi
 
   if [[ "${PUSH}" -eq 1 ]]; then

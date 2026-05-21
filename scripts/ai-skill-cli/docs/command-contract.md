@@ -345,7 +345,7 @@
 | `scripts/init-new-project.sh` | `ai-skill init-project` | Phase 2 native 候選 |
 | `scripts/agent-goals.sh` | `ai-skill goals` | Phase 2 native 候選 |
 | deleted `scripts/install-hooks.sh` / `.githooks/` | `ai-skill hooks install` | dry-run planner uses `scripts/git-hooks/`; write mode still blocked until fixture-backed |
-| `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | legacy retained；Go dry-run 已有，write mode parity 完成後刪除 |
+| deleted `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | shell 已刪；Go dry-run 已有，write mode 待 Go parity |
 | `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` | legacy retained；Go dry-run 已有，commit / push parity 完成後刪除或降為短期 bootstrap wrapper |
 | Runtime report / SQLite generators | `ai-skill runtime refresh` | Native completed; old Ruby entrypoints deleted |
 | Runtime validators | `ai-skill runtime validate` | Native completed; old Ruby entrypoints deleted |

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Ai-skill：可選的 Cursor bundle refresh；reference-only 不需要同步。
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
-SCRIPT="${ROOT}/scripts/sync-cursor-bundle.sh"
-if [[ "${AI_SKILL_SYNC_CURSOR_BUNDLE:-0}" == "1" && -x "${SCRIPT}" ]]; then
-  "${SCRIPT}" || true
+# Ai-skill：reference-only 不需要同步。Legacy Cursor bundle shell sync was deleted;
+# re-enable post-commit mirror refresh only after ai-skill sync-cursor-bundle has Go write-mode parity.
+if [[ "${AI_SKILL_SYNC_CURSOR_BUNDLE:-0}" == "1" ]]; then
+  echo "AI_SKILL_SYNC_CURSOR_BUNDLE is ignored until ai-skill sync-cursor-bundle write mode is implemented." >&2
 fi
