@@ -298,6 +298,7 @@ Tasks：
 - [x] 建立第三個 generator-level Ruby vs Go parity test：`generate-knowledge-runtime-report.rb` stdout 與 Go-native builder byte-for-byte 一致；尚未切換 production refresh。
 - [x] 建立 `runtime refresh --native-reports` opt-in path：明確指定時以 Go 寫三個 Markdown reports，後續 SQLite index / validators 仍走 Ruby wrapper；預設 refresh 不切換。
 - [x] 建立 `generate-runtime-sqlite-index.rb` Ruby vs Go parity guard：測試中產生 Ruby temp DB 與 Go temp DB，比對 atoms / sources / edges / fts row counts、source checksum map 與 FTS hit counts；尚未切換 production refresh。
+- [x] 建立 `runtime refresh --native-index` opt-in path：明確指定時以 Go 寫 SQLite index，後續 validators 仍走 Ruby wrapper；預設 refresh 不切換，可不帶 flag rollback。
 - [ ] 若開始移植 compiler，先建立 Ruby vs Go parity test，不得直接替換 production compiler。
 
 Progress notes：
@@ -318,6 +319,7 @@ Progress notes：
 - `generate-knowledge-runtime-report.rb` 已有第三個 Go-native builder parity guard：Go 端讀 routing registry、summaries、graphs 與 refresh policy，產生與 Ruby stdout byte-for-byte 相同的 runtime report；目前僅作 test guard，不接 production `runtime refresh`。
 - `ai-skill runtime refresh --native-reports` 已建立明確 opt-in path：先確認後續 Ruby / sqlite3 / Git 依賴與剩餘 scripts，再用 Go 寫 `runtime-report.md`、`model-context-report.md`、`model-checklists.md`，最後執行 Ruby SQLite index generation / validation；unit test 證明預設路徑未切換，opt-in 模式只跳過三個 Markdown report Ruby scripts。
 - `generate-runtime-sqlite-index.rb` 已有第一段 Go-native DB parity guard：測試以 canonical source 分別產生 Ruby temp DB 與 Go temp DB，固定比對 atoms / sources / edges / fts row counts、source checksum map，以及 `runtime` / `feedback` / `route` FTS hit counts；目前僅作替換前護欄，不接 production `runtime refresh`。
+- `ai-skill runtime refresh --native-index` 已建立明確 opt-in path：Go 端寫 `knowledge/runtime/sqlite/runtime-index.sqlite`，再執行 Ruby SQLite index / knowledge runtime validators；parity guard 已擴充 row-level table content 與 nested feedback-history fixture，rollback 是不帶 `--native-index` 重新執行 refresh。
 
 Completion criteria：
 

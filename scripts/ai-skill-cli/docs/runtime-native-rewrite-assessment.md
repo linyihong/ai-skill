@@ -19,7 +19,7 @@
 | `scripts/validate-runtime-sqlite-index.rb` | `ai-skill runtime validate` | 高 | 已開始 Go native slice。SQLite integrity、tables、row counts、source references、checksum、FTS count、basic ranked query 與 git-ignore boundary 已 native；git-ignore boundary 仍需 external Git。 | missing DB / table、stale checksum、FTS count mismatch、git-ignore boundary fixture 已覆蓋。 |
 | `scripts/query-runtime-index.rb` | `ai-skill runtime query` | 高 | 已開始 Go native slice。查詢 SQLite / FTS、filter、limit 與 empty result 行為已可直接測；不依賴外部 `sqlite3` CLI。 | ranking / filter / empty result / missing DB fixture 已覆蓋。 |
 | `scripts/query-knowledge-graph.rb` | `ai-skill runtime query --graph` | 中 | 已開始 Go native slice。YAML parsing、source / target / type / keyword filters、empty result 與 missing filter 已固定。 | source / target / type / keyword filter、empty result fixture 已覆蓋。 |
-| `scripts/generate-runtime-sqlite-index.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定臨時 SQLite index row counts 與 FTS hit；Go-native prototype 已有 row count / checksum / FTS Ruby parity guard，但 production refresh 尚未切換。 | golden DB row counts、FTS fixture 已覆蓋；Ruby vs Go atoms / sources / edges / fts row counts、source checksum map、FTS hit counts 已覆蓋；row-level content diff 與 rollback 說明仍待補。 |
+| `scripts/generate-runtime-sqlite-index.rb` | `ai-skill runtime refresh` | 中 | Go-native builder 已可由 `runtime refresh --native-index` 明確 opt-in 寫入；預設仍 wrapper-first，rollback 方式是不帶 `--native-index` 重新執行 refresh。 | golden DB row counts、FTS fixture 已覆蓋；Ruby vs Go atoms / sources / edges / fts row counts、row-level content、source checksum map、FTS hit counts 與 recursive feedback fixture 已覆蓋。 |
 | `scripts/generate-knowledge-runtime-report.rb` | `ai-skill runtime refresh` | 中 | Go-native builder 已建立 byte-for-byte Ruby stdout parity guard，並可由 `runtime refresh --native-reports` 明確 opt-in 寫入；預設仍 wrapper-first。 | routing registry / summaries / graphs golden anchors 已覆蓋；Ruby vs Go exact output parity 已覆蓋；opt-in native report write 已覆蓋。 |
 | `scripts/generate-model-context-report.rb` | `ai-skill runtime refresh` | 中 | Go-native builder 已建立 byte-for-byte Ruby stdout parity guard，並可由 `runtime refresh --native-reports` 明確 opt-in 寫入；預設仍 wrapper-first。 | profile / compression grouping anchors 已覆蓋；Ruby vs Go exact output parity 已覆蓋；opt-in native report write 已覆蓋。 |
 | `scripts/generate-model-checklists.rb` | `ai-skill runtime refresh` | 中 | Go-native builder 已建立 byte-for-byte Ruby stdout parity guard，並可由 `runtime refresh --native-reports` 明確 opt-in 寫入；預設仍 wrapper-first。 | per-model checklist anchors 已覆蓋；Ruby vs Go exact output parity 已覆蓋；opt-in native report write 已覆蓋。 |
@@ -32,5 +32,5 @@
 ## 下一步
 
 1. 若要把 report generators 設為預設 Go path，先跑 `runtime refresh --native-reports` against golden fixture，並保留 fallback / rollback 說明。
-2. SQLite index generator 已有 row count / checksum / FTS parity guard；切換前仍需補 row-level content diff、feedback-history recursive fixture 與 fallback / rollback 說明。
+2. SQLite index generator 已有 opt-in native write path；若要設為預設，先在 CI / release gate 中跑 native refresh smoke，並保留不帶 `--native-index` 的 Ruby rollback 說明。
 3. Compiler 仍不得直接替換；需另建 schema / generated surface parity test。

@@ -22,6 +22,7 @@ type runtimeOptions struct {
 	repoPath      string
 	dryRun        bool
 	nativeReports bool
+	nativeIndex   bool
 	assertSource  string
 	assertKeyword string
 	keyword       string
@@ -144,6 +145,7 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs.StringVar(&opts.repoPath, "repo", ".", "Ai-skill repository path")
 	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview runtime wrapper scripts without executing")
 	fs.BoolVar(&opts.nativeReports, "native-reports", false, "opt in to Go-native Markdown report generation during runtime refresh")
+	fs.BoolVar(&opts.nativeIndex, "native-index", false, "opt in to Go-native SQLite index generation during runtime refresh")
 	fs.StringVar(&opts.assertSource, "assert-source", "", "source path expected in generated surfaces")
 	fs.StringVar(&opts.assertKeyword, "assert-keyword", "", "keyword expected in generated surfaces")
 	fs.StringVar(&opts.keyword, "keyword", "", "keyword or phrase to query in the runtime index")
@@ -316,8 +318,8 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 	if opts.dryRun {
 		result.Mode = "dry_run"
 	}
-	if opts.nativeReports && !opts.dryRun {
-		result.Mode = "wrapper_native_reports"
+	if (opts.nativeReports || opts.nativeIndex) && !opts.dryRun {
+		result.Mode = runtimeRefreshMode(opts)
 	}
 
 	repo, repoCheck := resolveExistingDir("repo", opts.repoPath)
@@ -336,7 +338,13 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 		for _, target := range nativeTargets {
 			result.PlannedActions = append(result.PlannedActions, "write native refresh report: "+target.path)
 		}
-		steps = runtimeRefreshRemainingRubySteps(repo)
+		steps = runtimeRefreshStepsWithoutNativeReports(repo)
+	}
+	nativeIndexPath := ""
+	if opts.nativeIndex {
+		nativeIndexPath = filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
+		result.PlannedActions = append(result.PlannedActions, "write native runtime SQLite index: "+nativeIndexPath)
+		steps = runtimeRefreshStepsWithoutNativeIndex(steps)
 	}
 	for _, step := range steps {
 		result.PlannedActions = append(result.PlannedActions, "run ruby refresh step: "+runtimeScriptInvocation(step.path, step.args))
@@ -393,6 +401,17 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 			return result
 		}
 		result.Mutations = append(result.Mutations, target.path)
+	}
+	if opts.nativeIndex {
+		check := writeNativeRuntimeSQLiteIndex(repo, nativeIndexPath)
+		result.Checks = append(result.Checks, check)
+		if check.Status != "ok" {
+			result.Status = "blocked"
+			result.ExitCode = ExitValidationFailed
+			result.Error = &CommandError{Code: "runtime_refresh_failed", Message: "native SQLite index failed: " + check.Message, Remediation: "Inspect native index output and rerun without --native-index to fall back to the Ruby generator."}
+			return result
+		}
+		result.Mutations = append(result.Mutations, nativeIndexPath)
 	}
 
 	for _, step := range steps {
@@ -577,11 +596,35 @@ func runtimeRefreshSteps(repo string) []runtimeRefreshStep {
 	return steps
 }
 
-func runtimeRefreshRemainingRubySteps(repo string) []runtimeRefreshStep {
+func runtimeRefreshStepsWithoutNativeReports(repo string) []runtimeRefreshStep {
 	return []runtimeRefreshStep{
 		{name: "runtime_sqlite_index", path: filepath.Join(repo, "scripts", "generate-runtime-sqlite-index.rb")},
 		{name: "runtime_sqlite_index_validation", path: filepath.Join(repo, "scripts", "validate-runtime-sqlite-index.rb")},
 		{name: "knowledge_runtime_validation", path: filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb")},
+	}
+}
+
+func runtimeRefreshStepsWithoutNativeIndex(steps []runtimeRefreshStep) []runtimeRefreshStep {
+	filtered := []runtimeRefreshStep{}
+	for _, step := range steps {
+		if step.name == "runtime_sqlite_index" {
+			continue
+		}
+		filtered = append(filtered, step)
+	}
+	return filtered
+}
+
+func runtimeRefreshMode(opts runtimeOptions) string {
+	switch {
+	case opts.nativeReports && opts.nativeIndex:
+		return "wrapper_native_reports_index"
+	case opts.nativeReports:
+		return "wrapper_native_reports"
+	case opts.nativeIndex:
+		return "wrapper_native_index"
+	default:
+		return "wrapper"
 	}
 }
 
@@ -605,6 +648,13 @@ func writeNativeRuntimeReport(repo string, target runtimeNativeReportTarget) Che
 		return Check{Name: target.name, Status: "failed", Message: err.Error()}
 	}
 	return Check{Name: target.name, Status: "ok", Message: target.path}
+}
+
+func writeNativeRuntimeSQLiteIndex(repo string, path string) Check {
+	if err := buildNativeRuntimeSQLiteIndex(repo, path); err != nil {
+		return Check{Name: "runtime_sqlite_index", Status: "failed", Message: err.Error()}
+	}
+	return Check{Name: "runtime_sqlite_index", Status: "ok", Message: path}
 }
 
 func buildNativeRuntimeSQLiteIndex(repo string, path string) error {
@@ -1995,8 +2045,78 @@ func rubyLikeString(value any) string {
 	case string:
 		return typed
 	default:
+		return rubyInspect(typed)
+	}
+}
+
+func rubyInspect(value any) string {
+	switch typed := value.(type) {
+	case nil:
+		return "nil"
+	case string:
+		return `"` + strings.ReplaceAll(typed, `"`, `\"`) + `"`
+	case bool:
+		if typed {
+			return "true"
+		}
+		return "false"
+	case int, int64, float64:
+		return fmt.Sprint(typed)
+	case []any:
+		parts := make([]string, 0, len(typed))
+		for _, item := range typed {
+			parts = append(parts, rubyInspect(item))
+		}
+		return "[" + strings.Join(parts, ", ") + "]"
+	case map[string]any:
+		keys := orderedRuntimeMetadataKeys(typed)
+		parts := make([]string, 0, len(keys))
+		for _, key := range keys {
+			parts = append(parts, rubyInspect(key)+"=>"+rubyInspect(typed[key]))
+		}
+		return "{" + strings.Join(parts, ", ") + "}"
+	case map[any]any:
+		normalized := map[string]any{}
+		for key, item := range typed {
+			normalized[fmt.Sprint(key)] = item
+		}
+		return rubyInspect(normalized)
+	default:
 		return fmt.Sprint(typed)
 	}
+}
+
+func orderedRuntimeMetadataKeys(values map[string]any) []string {
+	preferred := []string{
+		"estimated_tokens",
+		"load_strategy",
+		"cacheable",
+		"read_frequency",
+		"invalidation_triggers",
+		"ttl",
+		"provider_cache",
+		"provider_cache_candidate",
+		"prefix_stability",
+		"cache_position",
+		"churn_risk",
+		"notes",
+	}
+	keys := []string{}
+	seen := map[string]bool{}
+	for _, key := range preferred {
+		if _, ok := values[key]; ok {
+			keys = append(keys, key)
+			seen[key] = true
+		}
+	}
+	remaining := []string{}
+	for key := range values {
+		if !seen[key] {
+			remaining = append(remaining, key)
+		}
+	}
+	sort.Strings(remaining)
+	return append(keys, remaining...)
 }
 
 func nonEmptyStrings(values ...string) []string {

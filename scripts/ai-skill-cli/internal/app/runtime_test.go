@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -213,6 +214,48 @@ func TestRuntimeRefreshNativeReportsWritesGoReportsThenRunsRemainingRubySteps(t 
 	if got := readTestFile(t, filepath.Join(repo, "knowledge", "runtime", "runtime-report.md")); got != expectedRuntimeReport {
 		t.Fatalf("native runtime report content mismatch")
 	}
+}
+
+func TestRuntimeRefreshNativeReportsAndIndexSkipsRubyGenerators(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	requireExecutableForTest(t, "ruby")
+	requireExecutableForTest(t, "sqlite3")
+	requireExecutableForTest(t, "git")
+	writeRuntimeRefreshRecorderScripts(t, repo, "")
+	writeRuntimeNativeReportSourceFixture(t, repo)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--native-reports", "--native-index", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Mode != "wrapper_native_reports_index" {
+		t.Fatalf("expected wrapper_native_reports_index mode, got %#v", result.Mode)
+	}
+	for _, name := range []string{"knowledge_runtime_report", "model_context_report", "model_checklists", "runtime_sqlite_index", "runtime_sqlite_index_validation", "knowledge_runtime_validation"} {
+		if !hasCheckStatus(result.Checks, name, "ok") {
+			t.Fatalf("expected ok check for %s, got %#v", name, result.Checks)
+		}
+	}
+	if len(result.Mutations) != 4 {
+		t.Fatalf("expected four native mutations, got %#v", result.Mutations)
+	}
+
+	log := readTestFile(t, filepath.Join(repo, "refresh.log"))
+	expected := strings.Join([]string{
+		"runtime_sqlite_index_validation",
+		"knowledge_runtime_validation",
+	}, "\n") + "\n"
+	if log != expected {
+		t.Fatalf("unexpected remaining Ruby step order:\n%s", log)
+	}
+	assertSQLiteCountAtLeast(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"), "atoms", 1)
 }
 
 func TestRuntimeRefreshBlocksMissingRubyBeforeWrapper(t *testing.T) {
@@ -545,10 +588,50 @@ func TestNativeRuntimeSQLiteIndexMatchesRubyInvariants(t *testing.T) {
 	if got, want := sqliteSourceChecksums(t, goPath), sqliteSourceChecksums(t, rubyPath); !reflect.DeepEqual(got, want) {
 		t.Fatalf("source checksums mismatch")
 	}
+	for _, table := range []string{"atoms", "sources", "edges", "fts"} {
+		if got, want := sqliteRows(t, goPath, table), sqliteRows(t, rubyPath, table); !reflect.DeepEqual(got, want) {
+			t.Fatalf("%s row-level mismatch: %s", table, firstRowDiff(got, want))
+		}
+	}
 	for _, keyword := range []string{"runtime", "feedback", "route"} {
 		query := "SELECT COUNT(*) FROM fts WHERE fts MATCH " + sqliteQuote(runtimeFTSMatchLiteral(keyword))
 		if got, want := sqliteScalarInt(t, goPath, query), sqliteScalarInt(t, rubyPath, query); got != want {
 			t.Fatalf("FTS hit mismatch for %q: go=%d ruby=%d", keyword, got, want)
+		}
+	}
+}
+
+func TestNativeRuntimeSQLiteIndexMatchesRubyRecursiveFeedback(t *testing.T) {
+	ruby := requireExecutableForTest(t, "ruby")
+	requireExecutableForTest(t, "sqlite3")
+	sourceRepo := repoRootForTest(t)
+	repo := t.TempDir()
+	copyFile(t, filepath.Join(sourceRepo, "scripts", "generate-runtime-sqlite-index.rb"), filepath.Join(repo, "scripts", "generate-runtime-sqlite-index.rb"))
+	writeFile(t, filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"), "records: []\n")
+	writeFile(t, filepath.Join(repo, "skills", "demo", "feedback_history", "nested", "lesson.md"), `# Feedback Lesson
+
+### Recursive Feedback Title
+
+Status: promoted
+
+#### One-line Summary
+Recursive feedback summary.
+`)
+	temp := t.TempDir()
+	rubyPath := filepath.Join(temp, "ruby-feedback.sqlite")
+	goPath := filepath.Join(temp, "go-feedback.sqlite")
+	rubyRel, err := filepath.Rel(repo, rubyPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	runRubyScript(t, repo, ruby, "scripts/generate-runtime-sqlite-index.rb", "--output", filepath.ToSlash(rubyRel))
+	if err := buildNativeRuntimeSQLiteIndex(repo, goPath); err != nil {
+		t.Fatal(err)
+	}
+	for _, table := range []string{"atoms", "sources", "edges", "fts"} {
+		if got, want := sqliteRows(t, goPath, table), sqliteRows(t, rubyPath, table); !reflect.DeepEqual(got, want) {
+			t.Fatalf("%s recursive feedback rows mismatch: %s", table, firstRowDiff(got, want))
 		}
 	}
 }
@@ -1124,6 +1207,62 @@ func sqliteSourceChecksums(t *testing.T, path string) map[string]string {
 		t.Fatal(err)
 	}
 	return checksums
+}
+
+func sqliteRows(t *testing.T, path string, table string) []string {
+	t.Helper()
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	rows, err := db.Query("SELECT * FROM " + table)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	columns, err := rows.Columns()
+	if err != nil {
+		t.Fatal(err)
+	}
+	result := []string{}
+	for rows.Next() {
+		values := make([]sql.NullString, len(columns))
+		scan := make([]any, len(columns))
+		for index := range values {
+			scan[index] = &values[index]
+		}
+		if err := rows.Scan(scan...); err != nil {
+			t.Fatal(err)
+		}
+		cells := make([]string, len(values))
+		for index, value := range values {
+			if value.Valid {
+				cells[index] = value.String
+			} else {
+				cells[index] = "<NULL>"
+			}
+		}
+		result = append(result, strings.Join(cells, "\x1f"))
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatal(err)
+	}
+	sort.Strings(result)
+	return result
+}
+
+func firstRowDiff(got []string, want []string) string {
+	limit := len(got)
+	if len(want) < limit {
+		limit = len(want)
+	}
+	for index := 0; index < limit; index++ {
+		if got[index] != want[index] {
+			return fmt.Sprintf("first row diff at %d: got=%q want=%q", index, got[index], want[index])
+		}
+	}
+	return fmt.Sprintf("row count mismatch: got=%d want=%d", len(got), len(want))
 }
 
 func sqliteQuote(value string) string {
