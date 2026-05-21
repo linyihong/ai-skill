@@ -221,7 +221,7 @@ Tasks：
 - [x] 實作 `ai-skill doctor`：檢查 Git external dependency、SQLite、Ruby、Python、repo root、write permission、hooksPath、PATH；其中缺 Git 必須明確提示安裝。
 - [x] 實作 path / OS abstraction，禁止散落 OS-specific string manipulation。
 - [x] 建立 `--json` / `--plain` output contract。
-- [ ] 建立基本 unit tests 與 GitHub Actions matrix：Windows、macOS、Linux。
+- [x] 建立基本 unit tests 與 GitHub Actions matrix：Windows、macOS、Linux。
 
 Progress notes：
 
@@ -231,6 +231,7 @@ Progress notes：
 - `doctor --check-runtime` 已用 `modernc.org/sqlite` 建立 in-memory query proof，並在找到 `runtime.db` 時執行 integrity check。
 - `doctor` 已回報 PATH、Git、repo root、hooksPath、write permission、Ruby / Python wrapper-mode dependency diagnostics；Ruby / Python 只作為 wrapper-mode optional dependency，不列為長期核心依賴。
 - 已新增 `internal/pathutil`，集中處理 report path normalization 與 PATH summary；unit tests 覆蓋 Windows drive、UNC path、mixed separators、spaces 與 relative paths。
+- 已新增 `.github/workflows/ai-skill-cli.yml`，在 Windows、macOS、Linux 執行 `go test ./...`、`doctor --json` 與 `doctor --check-runtime --json` smoke。
 
 Completion criteria：
 

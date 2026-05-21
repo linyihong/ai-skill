@@ -26,4 +26,6 @@ go run ./cmd/ai-skill doctor --check-runtime --json
 
 Phase 1 採用 [`modernc.org/sqlite`](docs/dependency-policy.md) 作為 pure Go SQLite engine。Git 維持 desktop external dependency；Shell / Ruby / Python 只允許作為 wrapper-mode 過渡依賴。
 
+GitHub Actions：`.github/workflows/ai-skill-cli.yml` 會在 Windows、macOS、Linux 執行 `go test ./...` 與 `doctor` smoke checks。
+
 上游計畫：[`plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md`](../../plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md)
