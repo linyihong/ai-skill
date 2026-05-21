@@ -264,6 +264,7 @@ Tasks：
 Progress notes：
 
 - `ai-skill init-project --dry-run` 已建立 planner，支援 `--project`、`--tools`、`--force`、JSON / plain output、既有檔案 conflict detection，且 tests 證明不寫入 fake project；write mode 仍阻斷，待完整 template parity 後再開啟。
+- `ai-skill goals status` 已建立 read-only ledger inspection；`goals init --dry-run` 已建立 planner，列出 `.agent-goals/goals`、`.agent-goals/locks`、`.agent-goals/README.md` 與 `.git/info/exclude` 更新，且 tests 證明不寫入 fake project；write mode 仍阻斷，待 parity fixture 完成後再開啟。
 
 Completion criteria：
 

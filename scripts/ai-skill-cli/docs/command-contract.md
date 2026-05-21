@@ -121,6 +121,7 @@
 
 - 讀寫 `<PROJECT_ROOT>/.agent-goals/`。
 - 建立或清理 lock directory。
+- Phase 2 初始切片只開放 `status` read-only 與 `init --dry-run` planner；write mode 在 fixture parity 完成前必須回傳 `partial_close_loop_blocked`。
 
 必要行為：
 
