@@ -24,7 +24,7 @@
 - pure Go，符合單一 binary 與跨平台部署目標。
 - 不要求使用者安裝 `sqlite3` CLI、SQLite development headers 或 C compiler。
 - Windows、macOS、Linux 的 build friction 低於 CGO SQLite。
-- Phase 1 已用 `doctor --check-runtime` 建立 in-memory query proof，並可用同一 driver 檢查 `runtime.db` integrity。
+- Phase 1 / Phase 3 已用 `doctor --check-runtime` 建立 in-memory query 與 temporary file-backed create / insert / query / integrity proof，並可用同一 driver 檢查 `runtime.db` integrity。
 
 `mattn/go-sqlite3` 不作為預設，因為它需要 CGO 與平台 C toolchain。只有在 `modernc.org/sqlite` 出現無法接受的 compatibility 或 performance 缺口時，才可另開 ADR 評估 CGO 例外。
 

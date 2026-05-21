@@ -28,7 +28,7 @@ go run ./cmd/ai-skill runtime compile --repo ../.. --dry-run --json
 go run ./cmd/ai-skill runtime validate --repo ../.. --dry-run --json
 ```
 
-Phase 1 採用 [`modernc.org/sqlite`](docs/dependency-policy.md) 作為 pure Go SQLite engine。Git 維持 desktop external dependency；Shell / Ruby / Python 只允許作為 wrapper-mode 過渡依賴。
+Phase 1 / Phase 3 採用 [`modernc.org/sqlite`](docs/dependency-policy.md) 作為 pure Go SQLite engine；`doctor --check-runtime` 已覆蓋 in-memory 與 temporary file-backed write / query / integrity proof。Git 維持 desktop external dependency；Shell / Ruby / Python 只允許作為 wrapper-mode 過渡依賴。
 
 GitHub Actions：`.github/workflows/ai-skill-cli.yml` 會在 Windows、macOS、Linux 執行 `go test ./...` 與 `doctor` smoke checks。
 

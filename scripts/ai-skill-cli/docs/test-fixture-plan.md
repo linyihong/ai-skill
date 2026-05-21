@@ -19,6 +19,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/windows-paths` | path separator 與 drive 處理 | 正規化後路徑符合 contract |
 | `fixture/cursor-mirror-copy-fallback` | Cursor mirror 策略 | Windows / 權限受限環境預設 copy fallback；symlink 只允許明確 opt-in |
 | `fixture/runtime-source-change` | runtime.db assertion | source keyword 出現在 generated surface |
+| `fixture/native-sqlite-file-proof` | pure Go SQLite proof | temporary DB 可 create / insert / query / integrity check，且不依賴外部 `sqlite3` CLI |
 | `fixture/legacy-script-parity` | 舊腳本覆蓋率驗證 | 每個 native target / wrapper first 舊入口都有命令映射與測試證據 |
 
 ## 缺 Git fixture
@@ -55,6 +56,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - `generated_surfaces` 包含預期 source path。
 - `data` 包含預期 keyword。
 - keyword 缺失時回傳 `validation_failed`。
+- Phase 3 已用 `doctor --check-runtime` / Go unit tests 覆蓋 `native-sqlite-file-proof`：pure Go SQLite 可對 temporary DB 執行 create / insert / query / `PRAGMA integrity_check`，不需外部 `sqlite3` CLI。
 
 ## 舊腳本 parity fixture
 

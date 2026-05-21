@@ -106,6 +106,9 @@ func TestDoctorCheckRuntimeUsesNativeSQLite(t *testing.T) {
 	if !hasCheckStatus(result.Checks, "native_sqlite", "ok") {
 		t.Fatalf("expected native_sqlite ok check, got %#v", result.Checks)
 	}
+	if !hasCheckMessageContains(result.Checks, "native_sqlite", "file-backed") {
+		t.Fatalf("expected native_sqlite file-backed proof message, got %#v", result.Checks)
+	}
 	if !hasCheckStatus(result.Checks, "runtime_db", "missing") {
 		t.Fatalf("expected runtime_db missing check from isolated cwd, got %#v", result.Checks)
 	}
@@ -163,6 +166,15 @@ func emptyPathDir(t *testing.T) string {
 func hasCheckStatus(checks []Check, name string, status string) bool {
 	for _, check := range checks {
 		if check.Name == name && check.Status == status {
+			return true
+		}
+	}
+	return false
+}
+
+func hasCheckMessageContains(checks []Check, name string, needle string) bool {
+	for _, check := range checks {
+		if check.Name == name && strings.Contains(check.Message, needle) {
 			return true
 		}
 	}

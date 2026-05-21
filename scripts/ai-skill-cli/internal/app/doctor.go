@@ -253,7 +253,55 @@ func nativeSQLiteCheck() Check {
 	if value != 1 {
 		return Check{Name: "native_sqlite", Status: "failed", Message: "unexpected SQLite result"}
 	}
-	return Check{Name: "native_sqlite", Status: "ok", Message: "modernc.org/sqlite in-memory query succeeded"}
+
+	fileCheck := nativeSQLiteFileBackedProof()
+	if fileCheck.Status != "ok" {
+		return fileCheck
+	}
+	return Check{Name: "native_sqlite", Status: "ok", Message: "modernc.org/sqlite in-memory and file-backed write/query/integrity checks succeeded"}
+}
+
+func nativeSQLiteFileBackedProof() Check {
+	file, err := os.CreateTemp("", "ai-skill-sqlite-proof-*.db")
+	if err != nil {
+		return Check{Name: "native_sqlite", Status: "failed", Message: err.Error()}
+	}
+	path := file.Name()
+	if err := file.Close(); err != nil {
+		_ = os.Remove(path)
+		return Check{Name: "native_sqlite", Status: "failed", Message: err.Error()}
+	}
+	defer os.Remove(path)
+
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		return Check{Name: "native_sqlite", Status: "failed", Message: err.Error()}
+	}
+	defer db.Close()
+
+	if _, err := db.Exec("CREATE TABLE proof (id INTEGER PRIMARY KEY, label TEXT NOT NULL)"); err != nil {
+		return Check{Name: "native_sqlite", Status: "failed", Message: err.Error()}
+	}
+	if _, err := db.Exec("INSERT INTO proof (label) VALUES (?)", "native"); err != nil {
+		return Check{Name: "native_sqlite", Status: "failed", Message: err.Error()}
+	}
+
+	var label string
+	if err := db.QueryRow("SELECT label FROM proof WHERE id = 1").Scan(&label); err != nil {
+		return Check{Name: "native_sqlite", Status: "failed", Message: err.Error()}
+	}
+	if label != "native" {
+		return Check{Name: "native_sqlite", Status: "failed", Message: "unexpected file-backed SQLite result"}
+	}
+
+	var integrity string
+	if err := db.QueryRow("PRAGMA integrity_check").Scan(&integrity); err != nil {
+		return Check{Name: "native_sqlite", Status: "failed", Message: err.Error()}
+	}
+	if integrity != "ok" {
+		return Check{Name: "native_sqlite", Status: "failed", Message: integrity}
+	}
+	return Check{Name: "native_sqlite", Status: "ok"}
 }
 
 func runtimeDBIntegrityCheck(path string) Check {
