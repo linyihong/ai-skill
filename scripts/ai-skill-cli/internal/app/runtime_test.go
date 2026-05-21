@@ -164,6 +164,56 @@ func TestRuntimeRefreshStopsOnFirstFailedStep(t *testing.T) {
 	}
 }
 
+func TestRuntimeRefreshNativeReportsWritesGoReportsThenRunsRemainingRubySteps(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	requireExecutableForTest(t, "ruby")
+	requireExecutableForTest(t, "sqlite3")
+	requireExecutableForTest(t, "git")
+	writeRuntimeRefreshRecorderScripts(t, repo, "")
+	writeRuntimeNativeReportSourceFixture(t, repo)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--native-reports", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Mode != "wrapper_native_reports" {
+		t.Fatalf("expected wrapper_native_reports mode, got %#v", result.Mode)
+	}
+	for _, name := range []string{"knowledge_runtime_report", "model_context_report", "model_checklists", "runtime_sqlite_index", "runtime_sqlite_index_validation", "knowledge_runtime_validation"} {
+		if !hasCheckStatus(result.Checks, name, "ok") {
+			t.Fatalf("expected ok check for %s, got %#v", name, result.Checks)
+		}
+	}
+	if len(result.Mutations) != 3 {
+		t.Fatalf("expected three native report mutations, got %#v", result.Mutations)
+	}
+
+	log := readTestFile(t, filepath.Join(repo, "refresh.log"))
+	expected := strings.Join([]string{
+		"runtime_sqlite_index",
+		"runtime_sqlite_index_validation",
+		"knowledge_runtime_validation",
+	}, "\n") + "\n"
+	if log != expected {
+		t.Fatalf("unexpected remaining Ruby step order:\n%s", log)
+	}
+
+	expectedRuntimeReport, err := buildNativeKnowledgeRuntimeReport(repo)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := readTestFile(t, filepath.Join(repo, "knowledge", "runtime", "runtime-report.md")); got != expectedRuntimeReport {
+		t.Fatalf("native runtime report content mismatch")
+	}
+}
+
 func TestRuntimeRefreshBlocksMissingRubyBeforeWrapper(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
 	t.Setenv("PATH", emptyPathDir(t))
@@ -695,6 +745,44 @@ File.open(File.join(Dir.pwd, "refresh.log"), "a") { |file| file.puts(line) }
 puts "#{line} ok"
 %s`, step.name, failLine))
 	}
+}
+
+func writeRuntimeNativeReportSourceFixture(t *testing.T, repo string) {
+	t.Helper()
+	writeFile(t, filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"), `records:
+  - id: route.test.small
+    primary_source: README.md
+    required_dependencies:
+      - CORE_BOOTSTRAP.md
+      - README.md
+    validation_signal: small route validated
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: small reason
+  - id: route.test.large
+    primary_source: workflow/test.md
+    required_dependencies:
+      - workflow/test.md
+    validation_signal: large route validated
+    model:
+      profile: large
+      compression_level: source-backed
+      reason: large reason
+`)
+	writeFile(t, filepath.Join(repo, "knowledge", "runtime", "refresh-policy.yaml"), `status: candidate
+decision_values:
+  - refresh_now
+  - no_update_needed
+`)
+	writeFile(t, filepath.Join(repo, "knowledge", "summaries", "test-summary.md"), "# test.summary\n\n| 欄位 | 值 |\n| --- | --- |\n| Atom ID | `test.summary` |\n| Lifecycle | `validated` |\n| Summary | Test summary text. |\n")
+	writeFile(t, filepath.Join(repo, "knowledge", "graphs", "test-graph.yaml"), `id: graph.test
+source: README.md
+status: candidate
+edges:
+  - type: depends_on
+    target: CORE_BOOTSTRAP.md
+`)
 }
 
 func readTestFile(t *testing.T, path string) string {

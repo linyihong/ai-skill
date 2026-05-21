@@ -296,6 +296,7 @@ Tasks：
 - [x] 建立第一個 generator-level Ruby vs Go parity test：`generate-model-context-report.rb` stdout 與 Go-native builder byte-for-byte 一致；尚未切換 production refresh。
 - [x] 建立第二個 generator-level Ruby vs Go parity test：`generate-model-checklists.rb` stdout 與 Go-native builder byte-for-byte 一致；尚未切換 production refresh。
 - [x] 建立第三個 generator-level Ruby vs Go parity test：`generate-knowledge-runtime-report.rb` stdout 與 Go-native builder byte-for-byte 一致；尚未切換 production refresh。
+- [x] 建立 `runtime refresh --native-reports` opt-in path：明確指定時以 Go 寫三個 Markdown reports，後續 SQLite index / validators 仍走 Ruby wrapper；預設 refresh 不切換。
 - [ ] 若開始移植 compiler，先建立 Ruby vs Go parity test，不得直接替換 production compiler。
 
 Progress notes：
@@ -314,6 +315,7 @@ Progress notes：
 - `generate-model-context-report.rb` 已有第一個 Go-native builder parity guard：Go 端讀 `knowledge/runtime/routing-registry.yaml`，產生與 Ruby stdout byte-for-byte 相同的 model context report；目前僅作 test guard，不接 production `runtime refresh`。
 - `generate-model-checklists.rb` 已有第二個 Go-native builder parity guard：Go 端讀 `knowledge/runtime/routing-registry.yaml`，產生與 Ruby stdout byte-for-byte 相同的 per-model checklist report；目前僅作 test guard，不接 production `runtime refresh`。
 - `generate-knowledge-runtime-report.rb` 已有第三個 Go-native builder parity guard：Go 端讀 routing registry、summaries、graphs 與 refresh policy，產生與 Ruby stdout byte-for-byte 相同的 runtime report；目前僅作 test guard，不接 production `runtime refresh`。
+- `ai-skill runtime refresh --native-reports` 已建立明確 opt-in path：先確認後續 Ruby / sqlite3 / Git 依賴與剩餘 scripts，再用 Go 寫 `runtime-report.md`、`model-context-report.md`、`model-checklists.md`，最後執行 Ruby SQLite index generation / validation；unit test 證明預設路徑未切換，opt-in 模式只跳過三個 Markdown report Ruby scripts。
 
 Completion criteria：
 

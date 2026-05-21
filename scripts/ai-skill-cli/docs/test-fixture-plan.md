@@ -22,6 +22,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/runtime-golden-generated-surfaces` | runtime refresh / compile generated surfaces | 同一份 source 可產出 runtime report、model reports、SQLite index、`runtime.db` assertions，且不寫 production artifacts |
 | `fixture/runtime-refresh-ordered-steps` | runtime refresh wrapper orchestration | generator / validator steps 順序固定；任一步失敗時停止後續 steps 並回 failure |
 | `fixture/runtime-generator-parity` | Ruby vs Go generator parity | Go-native generator output 必須與 Ruby stdout byte-for-byte 相同，通過前不得接 production refresh |
+| `fixture/runtime-native-reports-opt-in` | opt-in native report writes | `--native-reports` 只改用 Go 寫三個 Markdown reports；SQLite index / validators 仍走 Ruby steps |
 | `fixture/native-sqlite-file-proof` | pure Go SQLite proof | temporary DB 可 create / insert / query / integrity check，且不依賴外部 `sqlite3` CLI |
 | `fixture/runtime-db-native-validator` | native runtime.db validator | valid DB、missing required table、invalid JSON column、stale compiler metadata warning 均有固定結果 |
 | `fixture/runtime-query-index` | native runtime index query | ranking、filter、limit、empty result、missing DB 均有固定結果 |
@@ -71,6 +72,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - Phase 3 已新增 `runtime-golden-generated-surfaces` integration fixture：以同一份 canonical source 產生 runtime report、model context report、model checklists、臨時 SQLite index、臨時 `runtime.db`，並固定檢查 report anchors、index row counts、FTS hit、`generated_surfaces` 與 compiler metadata；fixture 只寫入測試 temp dir。
 - Phase 3 已新增 `runtime-refresh-ordered-steps` fixture：`runtime refresh` Go wrapper mode 依序執行 model context report、model checklists、runtime report、SQLite index、SQLite index validation、knowledge runtime validation；第一個 failing step 會阻斷並不執行後續 steps。
 - Phase 3 已新增 `runtime-generator-parity` fixtures：`generate-knowledge-runtime-report.rb`、`generate-model-context-report.rb` 與 `generate-model-checklists.rb` stdout 均與各自 Go-native builder byte-for-byte 一致；這些 fixtures 只建立替換前護欄，尚不改 production refresh path。
+- Phase 3 已新增 `runtime-native-reports-opt-in` fixture：`runtime refresh --native-reports` 先以 Go 寫三個 Markdown reports，再執行 Ruby SQLite index / validator steps；預設 `runtime refresh` 不切換。
 
 ## 舊腳本 parity fixture
 

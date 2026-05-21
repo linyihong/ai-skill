@@ -20,6 +20,7 @@ type runtimeOptions struct {
 	command       string
 	repoPath      string
 	dryRun        bool
+	nativeReports bool
 	assertSource  string
 	assertKeyword string
 	keyword       string
@@ -45,6 +46,12 @@ type runtimeRefreshStep struct {
 	name string
 	path string
 	args []string
+}
+
+type runtimeNativeReportTarget struct {
+	name  string
+	path  string
+	build func(string) (string, error)
 }
 
 type runtimeRoutingRegistry struct {
@@ -99,6 +106,7 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs := newFlagSet("runtime "+opts.command, stderr)
 	fs.StringVar(&opts.repoPath, "repo", ".", "Ai-skill repository path")
 	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview runtime wrapper scripts without executing")
+	fs.BoolVar(&opts.nativeReports, "native-reports", false, "opt in to Go-native Markdown report generation during runtime refresh")
 	fs.StringVar(&opts.assertSource, "assert-source", "", "source path expected in generated surfaces")
 	fs.StringVar(&opts.assertKeyword, "assert-keyword", "", "keyword expected in generated surfaces")
 	fs.StringVar(&opts.keyword, "keyword", "", "keyword or phrase to query in the runtime index")
@@ -271,6 +279,9 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 	if opts.dryRun {
 		result.Mode = "dry_run"
 	}
+	if opts.nativeReports && !opts.dryRun {
+		result.Mode = "wrapper_native_reports"
+	}
 
 	repo, repoCheck := resolveExistingDir("repo", opts.repoPath)
 	result.Checks = append(result.Checks, repoCheck)
@@ -282,6 +293,14 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 	}
 
 	steps := runtimeRefreshSteps(repo)
+	nativeTargets := []runtimeNativeReportTarget{}
+	if opts.nativeReports {
+		nativeTargets = runtimeNativeReportTargets(repo)
+		for _, target := range nativeTargets {
+			result.PlannedActions = append(result.PlannedActions, "write native refresh report: "+target.path)
+		}
+		steps = runtimeRefreshRemainingRubySteps(repo)
+	}
 	for _, step := range steps {
 		result.PlannedActions = append(result.PlannedActions, "run ruby refresh step: "+runtimeScriptInvocation(step.path, step.args))
 		if _, err := os.Stat(step.path); err != nil {
@@ -326,6 +345,18 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 		return result
 	}
 	_ = git
+
+	for _, target := range nativeTargets {
+		check := writeNativeRuntimeReport(repo, target)
+		result.Checks = append(result.Checks, check)
+		if check.Status != "ok" {
+			result.Status = "blocked"
+			result.ExitCode = ExitValidationFailed
+			result.Error = &CommandError{Code: "runtime_refresh_failed", Message: "native report failed: " + target.name + ": " + check.Message, Remediation: "Inspect native report output and fix the runtime source or generator parity."}
+			return result
+		}
+		result.Mutations = append(result.Mutations, target.path)
+	}
 
 	for _, step := range steps {
 		check := runRuntimeScript(repo, ruby, step.name, step.path, step.args...)
@@ -507,6 +538,36 @@ func runtimeRefreshSteps(repo string) []runtimeRefreshStep {
 		{name: "knowledge_runtime_validation", path: filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb")},
 	}
 	return steps
+}
+
+func runtimeRefreshRemainingRubySteps(repo string) []runtimeRefreshStep {
+	return []runtimeRefreshStep{
+		{name: "runtime_sqlite_index", path: filepath.Join(repo, "scripts", "generate-runtime-sqlite-index.rb")},
+		{name: "runtime_sqlite_index_validation", path: filepath.Join(repo, "scripts", "validate-runtime-sqlite-index.rb")},
+		{name: "knowledge_runtime_validation", path: filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb")},
+	}
+}
+
+func runtimeNativeReportTargets(repo string) []runtimeNativeReportTarget {
+	return []runtimeNativeReportTarget{
+		{name: "knowledge_runtime_report", path: filepath.Join(repo, "knowledge", "runtime", "runtime-report.md"), build: buildNativeKnowledgeRuntimeReport},
+		{name: "model_context_report", path: filepath.Join(repo, "knowledge", "runtime", "model-context-report.md"), build: buildNativeModelContextReport},
+		{name: "model_checklists", path: filepath.Join(repo, "knowledge", "runtime", "model-checklists.md"), build: buildNativeModelChecklists},
+	}
+}
+
+func writeNativeRuntimeReport(repo string, target runtimeNativeReportTarget) Check {
+	content, err := target.build(repo)
+	if err != nil {
+		return Check{Name: target.name, Status: "failed", Message: err.Error()}
+	}
+	if err := os.MkdirAll(filepath.Dir(target.path), 0o755); err != nil {
+		return Check{Name: target.name, Status: "failed", Message: err.Error()}
+	}
+	if err := os.WriteFile(target.path, []byte(content), 0o644); err != nil {
+		return Check{Name: target.name, Status: "failed", Message: err.Error()}
+	}
+	return Check{Name: target.name, Status: "ok", Message: target.path}
 }
 
 func runtimeQueryDBPath(repo string, dbPath string) string {
