@@ -16,6 +16,17 @@
 2. 任務若只是定位入口、查詢狀態或使用已驗證 checklist，可使用 `small` profile。
 3. 任務若需要 APK、app guidance、travel planning 或 tool adapter 的專門流程，使用 `specialized` profile，但仍要先遵守 enforcement bootstrap。
 4. Profile 只決定 context loading 深度，不決定規則權重。規則衝突仍依 `enforcement/rule-weight.md`。
+5. Profile 不是 provider model selector。若工具無法明確切換模型，依 [`../routing/fallback-routing.md`](../routing/fallback-routing.md) 使用 behavior-only adaptation。
+
+## Capability Refinement
+
+`small`、`large`、`specialized` 是粗略 defaults。實際 execution strategy 應再檢查 [`../capabilities/`](../capabilities/README.md)：
+
+- Reasoning depth：是否能處理跨層 tradeoff、contradiction、migration 或 recovery。
+- Context stability：是否能在長 context / compaction 後維持 goal、source、validation target。
+- Tool reliability：是否能安全完成 validation、commit、push、readback。
+- Hallucination risk：是否需要 source-backed evidence 與 claim scope downgrade。
+- Compression resilience：是否能從 summary / checklist 工作，或必須讀 full source。
 
 ## Metadata Mapping
 

@@ -5,6 +5,8 @@
 ## 目前入口
 
 - [`profiles/`](profiles/README.md)：定義 `small`、`large`、`specialized` model profiles 與 context loading 深度。
+- [`routing/`](routing/README.md)：定義 task class、cognitive state、tool capability 與 fallback 對應的 execution strategy。
+- [`capabilities/`](capabilities/README.md)：把粗略 profile 拆成 reasoning depth、context stability、tool reliability、hallucination risk 與 compression resilience 等能力維度。
 - [`compression/`](compression/README.md)：定義 index-only、summary-first、checklist-first、source-backed、graph-assisted 等壓縮層級。
 - [`../knowledge/runtime/model-context-report.md`](../knowledge/runtime/model-context-report.md)：由 routing registry 產生的 model-aware context loading view。
 - [`../knowledge/runtime/model-checklists.md`](../knowledge/runtime/model-checklists.md)：由 routing registry 產生的 per-model context-loading checklist。
@@ -12,13 +14,15 @@
 ## 放什麼
 
 - Model capability profile 與適用任務類型。
-- Large-model、small-model 與 specialized-model 的 routing strategy。
+- Task class、cognitive state、autonomy mode 與 model capability 對 execution strategy 的影響。
+- Large-model、small-model 與 specialized-model 的 context loading defaults。
 - Context compression、summary loading 與 checklist-first strategy。
 - Prompt adaptation 與 model-aware workflow design。
 
 ## 不放什麼
 
 - 特定工具的 model selector UI 或設定路徑；放到 `ai-tools/`。
+- 未經工具證實的「實際模型已切換」主張；只能記錄 behavior-only adaptation。
 - Skill workflow 正文；放到 `workflow/` 或仍保留在 `skills/`。
 - Metadata schema 欄位定義；放到 `metadata/`。
 - 對模型能力的未驗證主張；需先標示 confidence 或留在 TODO。
@@ -32,11 +36,21 @@
 ## 與既有層的關係
 
 - `metadata/` 可記錄知識適合哪些 model profile。
-- `runtime/` 會使用本層 profile 做 task routing 與 context loading。
+- `runtime/` 只能在 validation 後接收 minimal routing primitives；初期 model-aware routing 保持 design-layer-only。
 - `workflow/` 可引用本層策略，定義大模型與小模型的不同讀取深度。
 - `ai-tools/` 保存工具如何實際選用或設定模型。
 - `knowledge/runtime/model-context-report.md` 可用來快速檢視目前 route 分別採用的 profile 與 compression level；它是 generated view，不取代 profiles / compression source。
 - `knowledge/runtime/model-checklists.md` 可作為 agent 執行前的壓縮 checklist；需要修改或高信心判斷時仍讀回 profiles / compression source。
+
+## Phase 0-2 Contract
+
+Model-aware routing 目前是 execution strategy contract：
+
+1. 先用 [`routing/task-routing.md`](routing/task-routing.md) 判斷 task class。
+2. 再用 [`routing/autonomy-routing.md`](routing/autonomy-routing.md) 套用 cognitive state / autonomy mode。
+3. 用 [`capabilities/README.md`](capabilities/README.md) 把粗略 profile 轉成可驗證能力維度。
+4. 若工具不能實際選 model，依 [`routing/fallback-routing.md`](routing/fallback-routing.md) 使用 behavior-only adaptation。
+5. 只有 tool adapter 證實可指定模型時，才依 [`routing/multi-model-handoff.md`](routing/multi-model-handoff.md) 進行 explicit model / subagent handoff。
 
 ## 第一批候選遷移來源
 

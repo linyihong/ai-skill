@@ -20,6 +20,18 @@
 | `large` | `source-backed` | 需要跨 layer dependency、promotion、deprecation 或 graph reasoning。 |
 | `specialized` | `source-backed` + domain workflow | 任務需要 tool adapter、domain technique、live evidence 或 project-specific artifact。 |
 
+## Capability Adjustment
+
+Capability dimensions 可以收緊 compression：
+
+| Capability signal | Compression adjustment |
+| --- | --- |
+| Low reasoning depth | 只有 bounded low-risk tasks 才優先 checklist-first；其他情況 source-backed。 |
+| Low context stability | Edits 前 reread primary source，並縮小 claim scope。 |
+| Unknown tool reliability | Tool capability validated 前，避免 close-loop automation。 |
+| Medium / high hallucination risk | 使用 source-backed validation 與 evidence hierarchy。 |
+| Low compression resilience | 不把 generated reports 或 summaries 當作 source replacement。 |
+
 ## Escalation Rules
 
 從壓縮內容升級到 full source 的條件：

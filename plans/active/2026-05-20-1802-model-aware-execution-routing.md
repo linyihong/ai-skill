@@ -246,21 +246,21 @@ Do not use subagent when:
 
 ### Phase 0 — Boundary Confirmation
 
-Status: draft.
+Status: completed.
 
 Tasks:
 
-- [ ] Confirm `models/` controls execution strategy, not guaranteed provider model selection.
-- [ ] Confirm tool-specific model names and selector behavior belong in `ai-tools/`.
-- [ ] Confirm model routing does not replace `workflow/`, `.agent-goals/`, `runtime/`, or cognitive-state governance.
-- [ ] Confirm cognitive-state plan provides autonomy / state semantics before runtime model routing promotion.
-- [ ] Confirm memory plan uses model routing only for context budget / replay strategy after memory boundaries are stable.
+- [x] Confirm `models/` controls execution strategy, not guaranteed provider model selection.
+- [x] Confirm tool-specific model names and selector behavior belong in `ai-tools/`.
+- [x] Confirm model routing does not replace `workflow/`, `.agent-goals/`, `runtime/`, or cognitive-state governance.
+- [x] Confirm cognitive-state plan provides autonomy / state semantics before runtime model routing promotion.
+- [x] Confirm memory plan uses model routing only for context budget / replay strategy after memory boundaries are stable.
 
 Exit criteria:
 
-- [ ] Execution strategy vs actual model selection boundary written.
-- [ ] Active plan execution order documented.
-- [ ] Candidate directories scoped to minimal first slice.
+- [x] Execution strategy vs actual model selection boundary written.
+- [x] Active plan execution order documented.
+- [x] Candidate directories scoped to minimal first slice.
 
 ### Phase 1 — Models Routing Contract
 
@@ -274,11 +274,11 @@ Candidate files:
 
 Tasks:
 
-- [ ] Define task class → strategy mapping.
-- [ ] Define cognitive state / autonomy mode → strategy mapping.
-- [ ] Define fallback routing when explicit model selection is unavailable.
-- [ ] Define subagent / multi-model handoff contract.
-- [ ] Update `models/README.md` to point to routing.
+- [x] Define task class → strategy mapping.
+- [x] Define cognitive state / autonomy mode → strategy mapping.
+- [x] Define fallback routing when explicit model selection is unavailable.
+- [x] Define subagent / multi-model handoff contract.
+- [x] Update `models/README.md` to point to routing.
 
 ### Phase 2 — Capability Dimensions
 
@@ -293,9 +293,9 @@ Candidate files:
 
 Tasks:
 
-- [ ] Replace overly broad `small` / `large` assumptions with capability dimensions.
-- [ ] Mark unverified capability claims as confidence-scoped.
-- [ ] Define how capability dimensions influence context loading and workflow adaptation.
+- [x] Replace overly broad `small` / `large` assumptions with capability dimensions.
+- [x] Mark unverified capability claims as confidence-scoped.
+- [x] Define how capability dimensions influence context loading and workflow adaptation.
 
 ### Phase 3 — Workflow Adaptation
 
