@@ -3,8 +3,8 @@
 > **✅ Migration Complete**: Compiler v1.1.0 now outputs to [`runtime.db`](../runtime.db) (SQLite).
 > The legacy YAML files have been removed. All agents should query `runtime.db` directly via SQLite.
 
-本目錄先前存放由 [`runtime/compiler/compiler-engine.rb`](../compiler/compiler-engine.rb) 從 canonical prose source 編譯產生的 YAML 檔案。
-Compiler v1.1.0 已將輸出目標從 YAML 遷移至 SQLite（[`runtime.db`](../runtime.db)），
+本目錄先前存放由 Go-native [`runtime_compiler.go`](../../scripts/ai-skill-cli/internal/app/runtime_compiler.go) 從 canonical prose source 編譯產生的 YAML 檔案。
+Compiler v2 已將輸出目標從 YAML 遷移至 SQLite（[`runtime.db`](../runtime.db)），
 所有 legacy YAML 檔案已於 2026-05-17 刪除。
 
 ## 設計原則

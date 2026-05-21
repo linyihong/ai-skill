@@ -5,7 +5,7 @@
 # the repo-local ai-skill runtime validator to catch errors before commit.
 #
 # When staged changes touch runtime/ YAML sources or compiler rules, run
-# compiler-engine.rb to regenerate runtime.db.
+# repo-local ai-skill runtime compile to regenerate runtime.db.
 #
 # Enable with:
 #   git config core.hooksPath scripts/git-hooks
@@ -43,7 +43,7 @@ ai_skill_cli() {
 # --- Compiler: regenerate runtime.db when runtime YAML/compiler sources change ---
 if echo "$CHANGED" | grep -qE '^(runtime/(phases|obligations|gates|transactions|router|discovery|compiler|budget|context|guards|health|intelligence|output-governance|pipeline|prompt-artifacts|recovery|scheduler|distributed)/|scripts/git-hooks/pre-commit)'; then
   echo "--- Runtime sources changed, compiling runtime.db ---"
-  ruby "${ROOT}/runtime/compiler/compiler-engine.rb" || {
+  "$(ai_skill_cli)" runtime compile --repo "${ROOT}" || {
     echo ""
     echo "ERROR: Runtime compiler failed."
     echo "Fix the errors above, then stage and commit again."

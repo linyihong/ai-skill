@@ -14,7 +14,7 @@
 | Pure Go dependency | 可使用；需記錄用途與替代方案 | SQLite 採用 `modernc.org/sqlite` |
 | CGO dependency | 預設不使用；若要使用，必須有 ADR、CI matrix、Windows 安裝成本與 fallback | `mattn/go-sqlite3` 不作為預設 |
 | 外部 desktop binary | 只在使用者環境語意不可替代時允許 | Git 保持 external dependency |
-| Shell / Ruby / Python | 只能是 legacy wrapper / parity / rollback 依賴；不得成為核心 desktop path 依賴 | Runtime validate / refresh / compile / query 已是 native default；Ruby 透過 `--legacy-wrapper` 保留 |
+| Shell adapters | 只能是尚未完成 write-mode parity 的外層 adapter；不得成為核心 desktop path 依賴 | Runtime validate / refresh / compile / query 與 Roo setting adapter 已是 native default |
 | Tool-specific API / path | 放在 tool adapter，不進通用 CLI 預設 | Cursor / Roo Code 設定 helper 維持 tool-specific |
 
 ## SQLite 決策
@@ -38,11 +38,11 @@ Git 不包進 binary。需要 commit、push、hooks、credential helper、SSH ke
 - `close-loop`、linked-update、hook install 與任何 commit / push 命令缺 Git 時必須阻斷。
 - 不得用 Go git library 假裝完成 commit / push 行為，除非另有明確 contract 與 parity tests。
 
-## Wrapper Mode 限制
+## Adapter 限制
 
-Phase 3 保留 `--legacy-wrapper` 包裝既有 Ruby compiler / validators 作 rollback / parity，但 wrapper mode 必須：
+Runtime core path 不保留 Ruby / Python adapter mode。仍存在的 shell adapters 必須：
 
-- 清楚回報 legacy path 仍依賴 Ruby / Python / 外部工具。
+- 清楚回報外部依賴與 side effects。
 - 在 dependency 缺失時回傳 `missing_dependency`，不得 partial success。
-- 保留 parity fixture；native replacement 通過前不得刪除舊 compiler / validator。
+- 保留 parity fixture；native replacement 通過前不得宣稱已完成。
 - 最終 closure 仍以刪除 replacement 範圍內的舊 script 為預設。

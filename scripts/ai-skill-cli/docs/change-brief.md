@@ -35,7 +35,7 @@
 ### 範圍外
 
 - 本文件不建立 `scripts/ai-skill-cli/go.mod`、`scripts/ai-skill-cli/cmd/ai-skill/` 或 production Go 程式碼。
-- 本文件不替換現有 Ruby compiler 或 shell scripts。
+- 本文件不替換尚未完成 parity 的 shell scripts。
 - 本文件不承諾 iOS 任意 native binary。
 - 本文件不決定 release binary 是否提交到 repo；此為 Phase 4 決策。
 

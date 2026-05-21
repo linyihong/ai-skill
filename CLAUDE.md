@@ -9,7 +9,7 @@
    - [runtime/runtime.db](runtime/runtime.db) → `phase_machine` / `phases` — 目前 phase 狀態
    - [runtime/runtime.db](runtime/runtime.db) → `obligation_ledger` / `obligations` — 本 phase 義務
    - [runtime/runtime.db](runtime/runtime.db) → `blocking_gates` / `gates` — 本 phase blocking gates
-   - Runtime phase / obligation / gate / recovery 的 source 在 [runtime/compiler/embedded_data.rb](runtime/compiler/embedded_data.rb)；不要引用已移除的 `runtime/phases/`、`runtime/obligations/`、`runtime/gates/` 或 `runtime/recovery/` YAML。
+   - Runtime phase / obligation / gate / recovery 的 source 在 `runtime/phases/`、`runtime/obligations/`、`runtime/gates/`、`runtime/recovery/` YAML；修改後用 `ai-skill runtime compile` 重建 `runtime/runtime.db`。
 6. 載入 Output Governance 初始化（YAML 為 source-of-truth，同時已編譯至 SQLite）：
    - [runtime/output-governance/language-policy.yaml](runtime/output-governance/language-policy.yaml) → `language_policy` 表 — 語言強制規則
    - [runtime/output-governance/output-rules.yaml](runtime/output-governance/output-rules.yaml) → `output_rules` 表 — 文件輸出規則

@@ -41,25 +41,6 @@ func TestRuntimeValidateDryRunPlansValidators(t *testing.T) {
 	}
 }
 
-func TestRuntimeValidateBlocksRemovedLegacyWrapper(t *testing.T) {
-	repo := fakeRuntimeRepo(t)
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "validate", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
-	if code != ExitInvalidUsage {
-		t.Fatalf("expected invalid usage, got %d; stderr=%s", code, stderr.String())
-	}
-
-	var result Result
-	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		t.Fatalf("decode JSON: %v", err)
-	}
-	if result.Error == nil || result.Error.Code != "legacy_runtime_validate_removed" {
-		t.Fatalf("expected legacy_runtime_validate_removed, got %#v", result.Error)
-	}
-}
-
 func TestRuntimeValidateDefaultNativeDoesNotNeedRuby(t *testing.T) {
 	repo := repoRootForTest(t)
 	ensureRuntimeIndexForRepoTest(t, repo)
@@ -146,31 +127,12 @@ func TestRuntimeRefreshDefaultNativeDoesNotNeedRuby(t *testing.T) {
 	}
 }
 
-func TestRuntimeRefreshBlocksRemovedLegacyWrapper(t *testing.T) {
-	repo := fakeRuntimeRepo(t)
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
-	if code != ExitInvalidUsage {
-		t.Fatalf("expected invalid usage, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
-	}
-
-	var result Result
-	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		t.Fatalf("decode JSON: %v", err)
-	}
-	if result.Error == nil || result.Error.Code != "legacy_runtime_refresh_removed" {
-		t.Fatalf("expected legacy_runtime_refresh_removed, got %#v", result.Error)
-	}
-}
-
 func TestRuntimeCompileDryRunPlansCompiler(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "compile", "--repo", repo, "--legacy-wrapper", "--dry-run", "--assert-source", "runtime/compiler/embedded_data.rb", "--assert-keyword", "phase", "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "compile", "--repo", repo, "--dry-run", "--assert-source", "runtime/phases/phase-machine.yaml", "--assert-keyword", "phase", "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
 	}
@@ -185,13 +147,13 @@ func TestRuntimeCompileDryRunPlansCompiler(t *testing.T) {
 	if len(result.Mutations) != 0 {
 		t.Fatalf("runtime compile dry-run must not mutate, got %#v", result.Mutations)
 	}
-	if !hasCheckStatus(result.Checks, "wrapper_mode", "ok") {
-		t.Fatalf("expected wrapper_mode ok, got %#v", result.Checks)
+	if !hasCheckStatus(result.Checks, "runtime_compile_native", "ok") {
+		t.Fatalf("expected runtime_compile_native ok, got %#v", result.Checks)
 	}
 }
 
-func TestRuntimeCompileNativeCompilerWritesSnapshotWithoutRuby(t *testing.T) {
-	repo := fakeRuntimeRepo(t)
+func TestRuntimeCompileNativeCompilerWritesRuntimeDBWithoutRuby(t *testing.T) {
+	repo := repoRootForTest(t)
 	t.Setenv("PATH", emptyPathDir(t))
 	outputDB := filepath.Join(t.TempDir(), "runtime-native.db")
 
@@ -218,26 +180,6 @@ func TestRuntimeCompileNativeCompilerWritesSnapshotWithoutRuby(t *testing.T) {
 	assertSQLiteCountAtLeast(t, outputDB, "phases", 1)
 }
 
-func TestRuntimeCompileBlocksMissingRubyBeforeWrapper(t *testing.T) {
-	repo := fakeRuntimeRepo(t)
-	t.Setenv("PATH", emptyPathDir(t))
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "compile", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
-	if code != ExitMissingDependency {
-		t.Fatalf("expected missing dependency, got %d; stderr=%s", code, stderr.String())
-	}
-
-	var result Result
-	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		t.Fatalf("decode JSON: %v", err)
-	}
-	if result.Error == nil || result.Error.Code != "missing_ruby" {
-		t.Fatalf("expected missing_ruby, got %#v", result.Error)
-	}
-}
-
 func TestRuntimeQueryReturnsRankedResults(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
 
@@ -258,7 +200,7 @@ func TestRuntimeQueryReturnsRankedResults(t *testing.T) {
 	if len(result.Results) != 1 {
 		t.Fatalf("expected one result, got %#v", result.Results)
 	}
-	if result.Results[0].ID != "phase-machine" || result.Results[0].SourcePath != "runtime/compiler/embedded_data.rb" {
+	if result.Results[0].ID != "phase-machine" || result.Results[0].SourcePath != "runtime/phases/phase-machine.yaml" {
 		t.Fatalf("unexpected top result: %#v", result.Results[0])
 	}
 	if len(result.Mutations) != 0 {
@@ -398,8 +340,6 @@ func TestRuntimeGraphQueryRequiresFilter(t *testing.T) {
 
 func TestRuntimeGoldenFixtureCoversGeneratedSurfaces(t *testing.T) {
 	repo := repoRootForTest(t)
-	ruby := requireExecutableForTest(t, "ruby")
-	requireExecutableForTest(t, "sqlite3")
 
 	runtimeReport, err := buildNativeKnowledgeRuntimeReport(repo)
 	if err != nil {
@@ -435,42 +375,46 @@ func TestRuntimeGoldenFixtureCoversGeneratedSurfaces(t *testing.T) {
 	assertSQLiteScalar(t, indexPath, "SELECT COUNT(*) FROM fts WHERE fts MATCH '\"runtime\"'", "nonzero")
 
 	runtimeDBPath := filepath.Join(temp, "runtime.db")
-	runRubyScript(t, repo, ruby, "runtime/compiler/compiler-engine.rb", "--db", runtimeDBPath)
+	check := buildNativeRuntimeDBFromSources(repo, runtimeDBPath)
+	if check.Status != "ok" {
+		t.Fatalf("native compiler failed: %#v", check)
+	}
 	assertSQLiteCountAtLeast(t, runtimeDBPath, "generated_surfaces", 1)
 	assertSQLiteScalar(t, runtimeDBPath, "SELECT COUNT(*) FROM generated_surfaces WHERE source_path = 'plans/active/*.md'", "nonzero")
 	assertSQLiteScalar(t, runtimeDBPath, "SELECT COUNT(*) FROM compiler_metadata WHERE key = 'compiler_version'", "nonzero")
 }
 
-func TestRuntimeCompilerRubySnapshotHarnessIsStable(t *testing.T) {
+func TestRuntimeCompilerGoSnapshotHarnessIsStable(t *testing.T) {
 	repo := repoRootForTest(t)
-	ruby := requireExecutableForTest(t, "ruby")
-	requireExecutableForTest(t, "sqlite3")
 	temp := t.TempDir()
 	firstDB := filepath.Join(temp, "runtime-a.db")
 	secondDB := filepath.Join(temp, "runtime-b.db")
 
-	runRubyScript(t, repo, ruby, "runtime/compiler/compiler-engine.rb", "--db", firstDB)
-	runRubyScript(t, repo, ruby, "runtime/compiler/compiler-engine.rb", "--db", secondDB)
+	if check := buildNativeRuntimeDBFromSources(repo, firstDB); check.Status != "ok" {
+		t.Fatalf("native compiler first run failed: %#v", check)
+	}
+	if check := buildNativeRuntimeDBFromSources(repo, secondDB); check.Status != "ok" {
+		t.Fatalf("native compiler second run failed: %#v", check)
+	}
 
 	if got, want := runtimeCompilerSnapshot(t, firstDB), runtimeCompilerSnapshot(t, secondDB); !reflect.DeepEqual(got, want) {
-		t.Fatalf("Ruby compiler snapshots differ: %s", firstRowDiff(got, want))
+		t.Fatalf("Go compiler snapshots differ: %s", firstRowDiff(got, want))
 	}
 }
 
-func TestNativeRuntimeCompilerSnapshotCopiesRuntimeDB(t *testing.T) {
+func TestNativeRuntimeCompilerBuildsFromSources(t *testing.T) {
 	repo := repoRootForTest(t)
 	temp := t.TempDir()
 	nativeDB := filepath.Join(temp, "runtime-native.db")
-	sourceDB := filepath.Join(repo, "runtime", "runtime.db")
 
-	check := buildNativeRuntimeDBSnapshot(repo, nativeDB)
+	check := buildNativeRuntimeDBFromSources(repo, nativeDB)
 	if check.Status != "ok" {
-		t.Fatalf("native compiler snapshot failed: %#v", check)
+		t.Fatalf("native compiler failed: %#v", check)
 	}
 
-	if got, want := runtimeCompilerGeneratedSurfaceSnapshot(t, nativeDB), runtimeCompilerGeneratedSurfaceSnapshot(t, sourceDB); !reflect.DeepEqual(got, want) {
-		t.Fatalf("native compiler snapshot differs from source runtime.db: %s", firstRowDiff(got, want))
-	}
+	assertSQLiteCountAtLeast(t, nativeDB, "generated_surfaces", 1)
+	assertSQLiteCountAtLeast(t, nativeDB, "compiler_rules", 1)
+	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM compiler_metadata WHERE value = '2.0.0'", "nonzero")
 }
 
 func TestNativeRuntimeSQLiteIndexHasStableInvariants(t *testing.T) {
@@ -636,7 +580,7 @@ func TestNativeRuntimeIndexValidationBlocksStaleChecksum(t *testing.T) {
 	repo := t.TempDir()
 	path := filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
 	createRuntimeIndexFixture(t, path)
-	writeFile(t, filepath.Join(repo, "runtime", "compiler", "embedded_data.rb"), "changed\n")
+	writeFile(t, filepath.Join(repo, "runtime", "phases", "phase-machine.yaml"), "changed\n")
 
 	check := nativeRuntimeIndexValidation(repo, path)
 	if check.Status != "failed" || !strings.Contains(check.Message, "stale checksum") {
@@ -699,7 +643,6 @@ func TestNativeRuntimeIndexGitIgnoreCheckBlocksTrackedBoundary(t *testing.T) {
 func fakeRuntimeRepo(t *testing.T) string {
 	t.Helper()
 	repo := t.TempDir()
-	writeFile(t, filepath.Join(repo, "runtime", "compiler", "compiler-engine.rb"), "#!/usr/bin/env ruby\nputs 'compiled'\n")
 	copyFile(t, createNativeRuntimeDBFixture(t), filepath.Join(repo, "runtime", "runtime.db"))
 	createRuntimeIndexFixture(t, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite"))
 	return repo
@@ -813,7 +756,7 @@ func createRuntimeIndexFixture(t *testing.T, path string) {
 	repo := filepath.Dir(filepath.Dir(filepath.Dir(filepath.Dir(path))))
 	phaseSource := "phase machine runtime source feedback route\n"
 	workflowSource := "phase workflow guide route feedback\n"
-	writeFile(t, filepath.Join(repo, "runtime", "compiler", "embedded_data.rb"), phaseSource)
+	writeFile(t, filepath.Join(repo, "runtime", "phases", "phase-machine.yaml"), phaseSource)
 	writeFile(t, filepath.Join(repo, "workflow", "software-delivery", "execution-flow.md"), workflowSource)
 
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
@@ -847,10 +790,10 @@ CREATE TABLE edges (
 );
 CREATE VIRTUAL TABLE fts USING fts5(id UNINDEXED, content);
 INSERT INTO atoms VALUES
-  ('phase-machine', 'runtime/compiler/embedded_data.rb', 'runtime', 'reference', 'validated', 'P0', 'high', 'low', 'Phase machine runtime source.'),
+  ('phase-machine', 'runtime/phases/phase-machine.yaml', 'runtime', 'reference', 'validated', 'P0', 'high', 'low', 'Phase machine runtime source.'),
   ('workflow-phase-guide', 'workflow/software-delivery/execution-flow.md', 'workflow', 'guide', 'candidate', 'P2', 'medium', 'medium', 'Workflow phase guide.');
 INSERT INTO sources VALUES
-  ('runtime/compiler/embedded_data.rb', ?),
+  ('runtime/phases/phase-machine.yaml', ?),
   ('workflow/software-delivery/execution-flow.md', ?);
 INSERT INTO edges VALUES
   ('phase-machine', 'workflow-phase-guide', 'relates_to');
@@ -924,18 +867,6 @@ func requireExecutableForTest(t *testing.T, name string) string {
 		t.Skipf("%s is required for golden fixture integration test", name)
 	}
 	return path
-}
-
-func runRubyScript(t *testing.T, repo string, ruby string, script string, args ...string) string {
-	t.Helper()
-	cmd := exec.Command(ruby, append([]string{script}, args...)...)
-	cmd.Dir = repo
-	cmd.Env = runtimeWrapperEnv(os.Environ())
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		t.Fatalf("ruby %s failed: %v\n%s", script, err, string(output))
-	}
-	return string(output)
 }
 
 func assertSQLiteCountAtLeast(t *testing.T, path string, table string, minimum int) {

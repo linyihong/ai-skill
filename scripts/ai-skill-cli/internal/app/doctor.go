@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 
 	"github.com/linyihong/Ai-skill/scripts/ai-skill-cli/internal/pathutil"
@@ -115,8 +114,6 @@ func buildDoctorResult(opts doctorOptions) Result {
 	if opts.checkRuntime {
 		result.Checks = append(result.Checks, nativeSQLiteCheck())
 		result.Checks = append(result.Checks, runtimeDBCheck())
-		result.Checks = append(result.Checks, rubyCheck())
-		result.Checks = append(result.Checks, pythonCheck())
 	}
 
 	return result
@@ -323,30 +320,4 @@ func runtimeDBIntegrityCheck(path string) Check {
 		return Check{Name: "runtime_db", Status: "failed", Message: err.Error()}
 	}
 	return Check{Name: "runtime_db", Status: "ok", Message: normalized}
-}
-
-func rubyCheck() Check {
-	return executableVersionCheck("ruby", []string{"--version"}, "Ruby is only required for wrapper-mode runtime compiler.")
-}
-
-func pythonCheck() Check {
-	if check := executableVersionCheck("python3", []string{"--version"}, "Python is only required for wrapper-mode helpers."); check.Status == "ok" {
-		check.Name = "python"
-		return check
-	}
-	check := executableVersionCheck("python", []string{"--version"}, "Python is only required for wrapper-mode helpers.")
-	check.Name = "python"
-	return check
-}
-
-func executableVersionCheck(name string, args []string, remediation string) Check {
-	path, err := exec.LookPath(name)
-	if err != nil {
-		return Check{Name: name, Status: "missing_optional", Message: name + " not found in PATH", Remediation: remediation}
-	}
-	output, err := exec.Command(path, args...).CombinedOutput()
-	if err != nil {
-		return Check{Name: name, Status: "failed", Message: strconv.Quote(strings.TrimSpace(string(output)))}
-	}
-	return Check{Name: name, Status: "ok", Message: strings.TrimSpace(string(output))}
 }

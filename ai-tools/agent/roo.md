@@ -61,63 +61,18 @@ Language Preference: Default to English, but always match the user's language in
 
 **寫入欄位**：在 JSON blob 中加入 `customInstructions` 欄位
 
-**建議使用專用腳本**（內含 VS Code 執行中檢查）：
+**建議使用 repo-local CLI**（內含 VS Code 執行中檢查）：
 
 ```bash
 # 1. 先關閉 VS Code（Cmd+Q）
-# 2. 執行腳本
-python3 scripts/set-roo-global-custom-instructions.py
+# 2. 執行 guarded CLI command
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 roo set-global-custom-instructions
 # 3. 重新開啟 VS Code
 ```
 
-腳本路徑：[`scripts/set-roo-global-custom-instructions.py`](scripts/set-roo-global-custom-instructions.py)
+請依主機平台選擇 `scripts/ai-skill-cli/bin/` 下的 repo-local binary；command path 是 `roo set-global-custom-instructions`。
 
-**手動 Python 寫入範例**（供參考）：
-
-```python
-import json, sqlite3, os, subprocess
-
-CUSTOM_INSTRUCTIONS = """你是一個運行在 Roo Code（VS Code AI extension）的 AI agent。
-
-開始工作前，請依 <AI_SKILL_REPO>/CORE_BOOTSTRAP.md 的啟動流程載入核心規則與 OS layout。
-
-Language Preference: Default to English, but always match the user's language in conversation. If the user writes in Chinese, respond in Chinese. If the user writes in Japanese, respond in Japanese. If the user switches languages, follow their switch.
-
-語言一致性強制規則：所有輸出（包含 attempt_completion 結果、技術分析、表格欄位、章節標題、commit message）都必須與使用者當前語言一致。如果使用者使用中文，所有內容（包括技術關鍵詞、程式碼註解、分析報告）都必須使用中文。在 attempt_completion 前必須先確認語言一致性。"""
-
-DB_PATH = os.path.expanduser(
-    "~/Library/Application Support/Code/User/globalStorage/state.vscdb"
-)
-
-# 步驟 1：檢查 VS Code 是否正在執行
-result = subprocess.run(["pgrep", "-f", "Visual Studio Code"],
-                        capture_output=True, text=True, timeout=5)
-if result.returncode == 0 and len(result.stdout.strip()) > 0:
-    print("⚠️  VS Code 正在執行中！請先關閉 VS Code 再執行。")
-    exit(1)
-
-# 步驟 2：讀取現有 JSON
-conn = sqlite3.connect(DB_PATH)
-cursor = conn.cursor()
-cursor.execute("SELECT value FROM ItemTable WHERE key = 'RooVeterinaryInc.roo-cline'")
-row = cursor.fetchone()
-data = json.loads(row[0])
-
-# 步驟 3：寫入 customInstructions
-data["customInstructions"] = CUSTOM_INSTRUCTIONS
-new_value = json.dumps(data, ensure_ascii=False)
-cursor.execute(
-    "UPDATE ItemTable SET value = ? WHERE key = 'RooVeterinaryInc.roo-cline'",
-    (new_value,)
-)
-conn.commit()
-
-# 步驟 4：強制 WAL checkpoint
-conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
-conn.close()
-
-print("✅ 寫入成功！請重新開啟 VS Code。")
-```
+可用 `--db <path>` 指向 fake 或非預設 VS Code `state.vscdb`，也可用 `--instructions-file <path>` 明確提供 custom instructions 內容。
 
 **注意事項**：
 1. **必須先關閉 VS Code**，否則寫入會被 VS Code 覆寫
@@ -285,7 +240,7 @@ VS Code Extension 全域設定的通用查詢/修改方法見 [`intelligence/ide
 
 **Goal ledger 操作流程已由 runtime 管理**，請參考：
 - [`runtime/runtime.db`](../../runtime/runtime.db) — `phase_machine` / `obligation_ledger` / `blocking_gates` 快速查詢
-- [`runtime/compiler/embedded_data.rb`](../../runtime/compiler/embedded_data.rb) — phase / obligation / gate / transaction / recovery 的 embedded source
+- [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — phase / obligation / gate / transaction / recovery 的 embedded source
 - [`scripts/agent-goals.sh`](../../scripts/agent-goals.sh) — goal ledger CLI helper
 
 Roo Code 專屬注意事項：
@@ -299,7 +254,7 @@ Roo Code 專屬注意事項：
 **Knowledge update flow 已由 runtime 管理**，請參考：
 - `runtime/runtime.db → generated_surfaces (type='knowledge_update_phases')` — 11 個步驟的結構化記錄（快速路徑）
 - `runtime/runtime.db → recovery_strategies / phase_reconciliation / state_repair` — runtime recovery strategy（快速路徑）
-- [`runtime/compiler/embedded_data.rb`](../../runtime/compiler/embedded_data.rb) — recovery / transaction state machine 的 source
+- [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — recovery / transaction state machine 的 source
 
 Roo Code 專屬注意事項：
 - 無 hooks 機制，需在 Custom Instructions 中手動提醒

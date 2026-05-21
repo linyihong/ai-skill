@@ -39,7 +39,7 @@
 
 ## Generated Surface
 
-本目錄的 4 個操作流程已由 [`runtime/compiler/compiler-engine.rb`](../../runtime/compiler/compiler-engine.rb) 編譯為 [`generated-phases.yaml`](generated-phases.yaml)，包含：
+本目錄的 4 個操作流程已由 [`scripts/ai-skill-cli/internal/app/runtime_compiler.go`](../../scripts/ai-skill-cli/internal/app/runtime_compiler.go) 編譯為 [`generated-phases.yaml`](generated-phases.yaml)，包含：
 
 - 各 workflow 的步驟定義（step title + source line）
 - 前置準備項目（prerequisites）

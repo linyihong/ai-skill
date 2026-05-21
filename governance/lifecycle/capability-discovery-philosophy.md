@@ -36,13 +36,13 @@ Discovery 使用 [`knowledge/graphs/`](../../knowledge/graphs/README.md) 的 edg
 
 | 元件 | 整合方式 |
 |------|---------|
-| [`runtime/runtime.db`](../../runtime/runtime.db) / [`embedded_data.rb`](../../runtime/compiler/embedded_data.rb) | checkpoint phase、`run_capability_discovery` allowed_action、obligation 與 gate 的 compiled source |
+| [`runtime/runtime.db`](../../runtime/runtime.db) / [`runtime/discovery/capability-checkpoints.yaml`](../../runtime/discovery/capability-checkpoints.yaml) | checkpoint phase、`run_capability_discovery` allowed_action、obligation 與 gate 的 compiled source |
 | `capability_checkpoints` table | Phase-aware discovery checkpoint definitions |
 
 ## 與既有文件的關係
 
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Compiled discovery checkpoint runtime surface
-- [`runtime/compiler/embedded_data.rb`](../../runtime/compiler/embedded_data.rb) — Embedded fallback source for discovery checkpoints
+- [`runtime/discovery/capability-checkpoints.yaml`](../../runtime/discovery/capability-checkpoints.yaml) — Source for discovery checkpoints
 - [`runtime/router/activation-rules.yaml`](../../runtime/router/activation-rules.yaml) — 被動 lazy-loading，與 discovery 互補
 - [`knowledge/graphs/README.md`](../../knowledge/graphs/README.md) — Graph edges 作為 discovery 的搜尋索引
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — Task intent routing table 作為 discovery 的快速路徑

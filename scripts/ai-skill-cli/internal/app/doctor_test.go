@@ -112,12 +112,6 @@ func TestDoctorCheckRuntimeUsesNativeSQLite(t *testing.T) {
 	if !hasCheckStatus(result.Checks, "runtime_db", "missing") {
 		t.Fatalf("expected runtime_db missing check from isolated cwd, got %#v", result.Checks)
 	}
-	if !hasCheckStatus(result.Checks, "ruby", "missing_optional") {
-		t.Fatalf("expected ruby missing_optional check, got %#v", result.Checks)
-	}
-	if !hasCheckStatus(result.Checks, "python", "missing_optional") {
-		t.Fatalf("expected python missing_optional check, got %#v", result.Checks)
-	}
 }
 
 func TestDoctorReportsEmptyPath(t *testing.T) {

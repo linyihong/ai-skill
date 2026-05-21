@@ -1,6 +1,6 @@
 # Ai-skill CLI Runtime
 
-本目錄是跨平台 `ai-skill` CLI / runtime toolchain 的開發根目錄。目標是把現有 `scripts/` 中依賴 shell、Ruby、Python 與本機環境假設的流程，逐步升級成 Windows、macOS、Linux 可執行的單一 Go binary。
+本目錄是跨平台 `ai-skill` CLI / runtime toolchain 的開發根目錄。目標是把現有 `scripts/` 中依賴 shell 或本機環境假設的流程，逐步升級成 Windows、macOS、Linux 可執行的單一 Go binary；runtime Ruby/Python surfaces 已移除。
 
 ## 目錄分層
 
@@ -24,7 +24,7 @@
 ./bin/ai-skill-darwin-arm64 runtime validate --repo ../.. --json
 ```
 
-Phase 1 / Phase 3 採用 [`modernc.org/sqlite`](docs/dependency-policy.md) 作為 pure Go SQLite engine；`doctor --check-runtime` 已覆蓋 in-memory 與 temporary file-backed write / query / integrity proof。Git 維持 desktop external dependency；Shell / Ruby / Python 只允許作為 wrapper-mode 過渡依賴。
+Phase 1 / Phase 3 採用 [`modernc.org/sqlite`](docs/dependency-policy.md) 作為 pure Go SQLite engine；`doctor --check-runtime` 已覆蓋 in-memory 與 temporary file-backed write / query / integrity proof。Git 維持 desktop external dependency；runtime core path 不依賴 Ruby、Python 或外部 `sqlite3` CLI。
 
 ## Repo-local binaries
 

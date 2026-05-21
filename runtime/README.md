@@ -30,18 +30,18 @@ Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 |--------|------|-------------|
 | Activation | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Lazy-load rules with activation conditions |
 | Routing | [`router/`](router/) | Task intent → knowledge index → metadata → source-of-truth gate |
-| Discovery | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Phase-aware capability discovery checkpoints (embedded source; compiled to `runtime.db`) |
-| Phases | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Execution phase state machine (embedded source; compiled to `runtime.db`) |
-| Obligations | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Per-phase atomic duties (embedded source; compiled to `runtime.db`) |
-| Gates | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Phase transition prerequisites (embedded source; compiled to `runtime.db`) |
-| Compiler | [`compiler/compiler-engine.rb`](compiler/compiler-engine.rb) | Prose → SQLite compilation |
+| Discovery | [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml) | Phase-aware capability discovery checkpoints |
+| Phases | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Execution phase state machine |
+| Obligations | [`obligations/obligation-ledger.yaml`](obligations/obligation-ledger.yaml) | Per-phase atomic duties |
+| Gates | [`gates/blocking-gates.yaml`](gates/blocking-gates.yaml) | Phase transition prerequisites |
+| Compiler | [`compiler/compiler-rules.yaml`](compiler/compiler-rules.yaml) + `ai-skill runtime compile` | Prose/YAML → SQLite compilation |
 | Runtime DB | [`runtime.db`](runtime.db) | Compiled immutable runtime registry — **must be committed** when changed |
 | State DB | [`runtime-state.db`](runtime-state.db) | Mutable execution state (`.gitignore`) |
 | Generated | [`generated/`](generated/) | Compiled runtime surfaces (legacy, migrated to SQLite) |
-| Transactions | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Writeback transaction state machine (embedded source; compiled to `runtime.db`) |
+| Transactions | [`transactions/`](transactions/) | Writeback transaction state machine and templates |
 | Pipeline | [`pipeline/`](pipeline/) | Context flow, guard chain, relevance engine |
-| Recovery | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Recovery state machine, escalation levels, output schema, phase reconciliation, state repair, obligation rebuild (embedded source; compiled to `runtime.db`) |
-| Scheduler | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Execution queue, priority scheduler (embedded source; compiled to `runtime.db`) |
+| Recovery | [`recovery/`](recovery/) | Recovery strategy, phase reconciliation, state repair, obligation rebuild |
+| Scheduler | [`scheduler/`](scheduler/) | Execution queue, priority scheduler |
 | Guards | [`guards/`](guards/) | Circuit breaker, context pollution, mismatch escalation |
 | Onboarding | [`onboarding/`](onboarding/) | New project/task setup guidance |
 | Output Governance | [`output-governance/`](output-governance/) | Language policy, output rules, governance gates |
@@ -54,17 +54,17 @@ Executable runtime layer. Machine-oriented, query-oriented, deterministic.
 
 ## Recovery Source Map
 
-Runtime recovery 現在不是 standalone `runtime/recovery/*.yaml`。Agent 要處理 blocking gate、phase drift、stale generated surface 或 recovery retry 時，依下列分層讀取：
+Runtime recovery 的 machine-readable source 已恢復為 standalone `runtime/recovery/*.yaml`。Agent 要處理 blocking gate、phase drift、stale generated surface 或 recovery retry 時，依下列分層讀取：
 
 | Need | Read |
 | --- | --- |
 | 即時 escalation / recovery output | [`../enforcement/escalation-policy.md`](../enforcement/escalation-policy.md) |
 | Retry limit、strategy change、source reload、validation gate | [`../governance/ai-runtime-governance/recovery-retry-governance.md`](../governance/ai-runtime-governance/recovery-retry-governance.md) |
 | Domain-specific reload set / forbidden behaviors | [`../metadata/recovery/`](../metadata/recovery/) |
-| Machine-readable recovery strategy / phase reconciliation / state repair | [`runtime.db`](runtime.db) tables: `recovery_strategies`, `phase_reconciliation`, `state_repair`, `obligation_rebuild` |
-| 修改 runtime recovery 定義 | [`compiler/embedded_data.rb`](compiler/embedded_data.rb)，修改後重新編譯 `runtime.db` |
+| Machine-readable recovery strategy / phase reconciliation / state repair | [`recovery/`](recovery/) YAML（SQLite quick path: `runtime.db` tables） |
+| 修改 runtime recovery 定義 | 修改 [`recovery/`](recovery/) YAML，然後執行 `ai-skill runtime compile` |
 
-不要引用已移除的 `runtime/recovery/recovery-strategies.yaml`、`runtime/recovery/phase-reconciliation.yaml`、`runtime/phases/phase-machine.yaml`、`runtime/obligations/obligation-ledger.yaml` 或 `runtime/gates/blocking-gates.yaml` 作為 standalone source。
+不要修改 `runtime/runtime.db` 取代 source YAML；`runtime.db` 是編譯輸出。
 
 ## Inbound References
 
@@ -75,8 +75,8 @@ Runtime recovery 現在不是 standalone `runtime/recovery/*.yaml`。Agent 要�
 - [`route.models.model-aware-routing`](../knowledge/runtime/routing-registry.yaml:319)
 - [`route.runtime.router-flow`](../knowledge/runtime/routing-registry.yaml:348)
 - [`route.runtime.context-ttl-doc`](../knowledge/runtime/routing-registry.yaml:407)
-- `gate.checkpoint.capability_discovery_completed` in [`runtime.db`](runtime.db) / [`compiler/embedded_data.rb`](compiler/embedded_data.rb)
-- `obligation.checkpoint.run_capability_discovery` in [`runtime.db`](runtime.db) / [`compiler/embedded_data.rb`](compiler/embedded_data.rb)
+- `gate.checkpoint.capability_discovery_completed` in [`runtime.db`](runtime.db) / [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml)
+- `obligation.checkpoint.run_capability_discovery` in [`runtime.db`](runtime.db) / [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml)
 
 ## Databases
 
@@ -84,9 +84,9 @@ Runtime uses two SQLite databases with different lifecycles:
 
 ### `runtime.db` (Immutable — Compiled Registry)
 
-Generated by [`compiler-engine.rb`](compiler/compiler-engine.rb) from runtime YAML sources and embedded runtime data in [`compiler/embedded_data.rb`](compiler/embedded_data.rb). When a runtime YAML source exists, the compiler reads that YAML first; embedded data is the fallback for legacy domains whose standalone YAML source has not been restored. Rebuilt on every commit that touches runtime sources. **Do not edit manually.**
+Generated by Go-native `ai-skill runtime compile` from runtime YAML sources and deterministic prose mappings in [`compiler/compiler-rules.yaml`](compiler/compiler-rules.yaml). Rebuilt on every commit that touches runtime sources. **Do not edit manually.**
 
-Some legacy runtime YAML sources have been embedded into `compiler/embedded_data.rb` and no longer exist as standalone files. When the `Source` column below points to `compiler/embedded_data.rb`, edit the embedded source and recompile `runtime.db`; do not create a new YAML file with the old path unless a dedicated source restoration migration is planned. When the `Source` column points to an existing YAML file, edit the YAML and recompile; do not update only `embedded_data.rb`.
+All runtime config sources are standalone YAML files. When the `Source` column points to YAML, edit that YAML and recompile; do not update `runtime.db` directly.
 
 > **⚠️ Commit 規則：`runtime.db` 必須包含在 commit 中。**
 > 當 runtime YAML 來源或 compiler 規則變更時，pre-commit hook 會自動重新編譯並 `git add runtime.db`。
@@ -95,18 +95,18 @@ Some legacy runtime YAML sources have been embedded into `compiler/embedded_data
 
 | Table | Source | Purpose |
 |-------|--------|---------|
-| `phases` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Execution phase definitions with entry conditions, allowed/forbidden actions |
-| `phase_transitions` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Phase transition rules (blocked transitions, recovery rules) |
-| `obligations` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Per-phase atomic duties with verification criteria |
-| `gates` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Phase transition prerequisites with severity and failure actions |
-| `transaction_states` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Transaction state definitions |
-| `transaction_transitions` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Allowed state transitions |
-| `transaction_rules` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Transaction rules (lock check, canonical first, etc.) |
-| `transaction_templates` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Transaction templates (skill_update, new_skill, feedback_lesson) |
+| `phases` | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Execution phase definitions with entry conditions, allowed/forbidden actions |
+| `phase_transitions` | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Phase transition rules (blocked transitions, recovery rules) |
+| `obligations` | [`obligations/obligation-ledger.yaml`](obligations/obligation-ledger.yaml) | Per-phase atomic duties with verification criteria |
+| `gates` | [`gates/blocking-gates.yaml`](gates/blocking-gates.yaml) | Phase transition prerequisites with severity and failure actions |
+| `transaction_states` | [`transactions/transaction-machine.yaml`](transactions/transaction-machine.yaml) | Transaction state definitions |
+| `transaction_transitions` | [`transactions/transaction-machine.yaml`](transactions/transaction-machine.yaml) | Allowed state transitions |
+| `transaction_rules` | [`transactions/transaction-machine.yaml`](transactions/transaction-machine.yaml) | Transaction rules (lock check, canonical first, etc.) |
+| `transaction_templates` | [`transactions/transaction-templates.yaml`](transactions/transaction-templates.yaml) | Transaction templates (skill_update, new_skill, feedback_lesson) |
 | `activation_rules` | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Lazy-load rule definitions with activation conditions |
 | `core_bootstrap_rules` | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Core bootstrap rules (always loaded) |
-| `discovery_checkpoints` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Phase-aware capability discovery checkpoints |
-| `discovery_search_strategy` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Search strategy configuration |
+| `discovery_checkpoints` | [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml) | Phase-aware capability discovery checkpoints |
+| `discovery_search_strategy` | [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml) | Search strategy configuration |
 | `generated_surfaces` | Compiled from prose sources | Extracted structured data from workflow, enforcement, governance documents |
 | `compiler_metadata` | Auto-generated | Compiler version, compilation timestamp, schema version |
 | `runtime_budget` | [`budget/token-budget.yaml`](budget/token-budget.yaml) | Per-model token budget configuration |
@@ -115,30 +115,30 @@ Some legacy runtime YAML sources have been embedded into `compiler/embedded_data
 | `context_pollution` | [`guards/context-pollution.yaml`](guards/context-pollution.yaml) | Context pollution detection signals |
 | `context_health_score` | [`health/context-health-score.yaml`](health/context-health-score.yaml) | Context health scoring dimensions |
 | `intelligence_routing` | [`intelligence/intelligence-routing.yaml`](intelligence/intelligence-routing.yaml) | Intelligence routing rules |
-| `obligation_ledger` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Obligation ledger entries |
+| `obligation_ledger` | [`obligations/obligation-ledger.yaml`](obligations/obligation-ledger.yaml) | Obligation ledger entries |
 | `language_policy` | [`output-governance/language-policy.yaml`](output-governance/language-policy.yaml) | Language enforcement rules |
 | `output_rules` | [`output-governance/output-rules.yaml`](output-governance/output-rules.yaml) | Document output formatting rules |
 | `governance_gates` | [`output-governance/governance-gates.yaml`](output-governance/governance-gates.yaml) | Output governance blocking gates |
-| `blocking_gates` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Blocking gates (runtime config mirror) |
-| `phase_machine` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Phase machine (runtime config mirror) |
+| `blocking_gates` | [`gates/blocking-gates.yaml`](gates/blocking-gates.yaml) | Blocking gates (runtime config mirror) |
+| `phase_machine` | [`phases/phase-machine.yaml`](phases/phase-machine.yaml) | Phase machine (runtime config mirror) |
 | `pipeline_context_flow` | [`pipeline/context-flow.yaml`](pipeline/context-flow.yaml) | Progressive context expansion levels |
 | `guard_chain` | [`pipeline/guard-chain.yaml`](pipeline/guard-chain.yaml) | Guard execution order per stage |
 | `relevance_engine` | [`pipeline/relevance-engine.yaml`](pipeline/relevance-engine.yaml) | Skill relevance scoring configuration |
 | `session_lifecycle` | [`pipeline/session-lifecycle.yaml`](pipeline/session-lifecycle.yaml) | Session lifecycle stage definitions |
 | `prompt_artifact_templates` | [`prompt-artifacts/artifact-templates.yaml`](prompt-artifacts/artifact-templates.yaml) | Task type prompt artifact templates |
 | `prompt_composition_rules` | [`prompt-artifacts/composition-rules.yaml`](prompt-artifacts/composition-rules.yaml) | Prompt composition rules |
-| `recovery_strategies` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Recovery state machine, escalation levels, output schema, and strategy definitions |
-| `state_repair` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | State repair procedures |
-| `obligation_rebuild` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Obligation rebuild procedures |
-| `phase_reconciliation` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Phase reconciliation procedures |
-| `execution_queue` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Task execution queue configuration |
-| `priority_scheduler` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Priority scheduling levels |
+| `recovery_strategies` | [`recovery/recovery-strategies.yaml`](recovery/recovery-strategies.yaml) | Recovery state machine, escalation levels, output schema, and strategy definitions |
+| `state_repair` | [`recovery/state-repair.yaml`](recovery/state-repair.yaml) | State repair procedures |
+| `obligation_rebuild` | [`recovery/obligation-rebuild.yaml`](recovery/obligation-rebuild.yaml) | Obligation rebuild procedures |
+| `phase_reconciliation` | [`recovery/phase-reconciliation.yaml`](recovery/phase-reconciliation.yaml) | Phase reconciliation procedures |
+| `execution_queue` | [`scheduler/execution-queue.yaml`](scheduler/execution-queue.yaml) | Task execution queue configuration |
+| `priority_scheduler` | [`scheduler/priority-scheduler.yaml`](scheduler/priority-scheduler.yaml) | Priority scheduling levels |
 | `activation_rules_mirror` | [`router/activation-rules.yaml`](router/activation-rules.yaml) | Activation rules (runtime config mirror) |
-| `transaction_templates_ext` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Transaction templates (runtime config mirror) |
+| `transaction_templates_ext` | [`transactions/transaction-machine.yaml`](transactions/transaction-machine.yaml) | Transaction templates (runtime config mirror) |
 | `distributed_locks` | [`distributed/distributed-locks.yaml`](distributed/distributed-locks.yaml) | Distributed lock/lease definitions |
 | `multi_agent_coordination` | [`distributed/multi-agent-coordination.yaml`](distributed/multi-agent-coordination.yaml) | Multi-agent coordination rules |
 | `async_job_lifecycle` | [`distributed/async-job-lifecycle.yaml`](distributed/async-job-lifecycle.yaml) | Async job lifecycle state definitions |
-| `capability_checkpoints` | [`compiler/embedded_data.rb`](compiler/embedded_data.rb) | Capability discovery checkpoints (runtime config mirror) |
+| `capability_checkpoints` | [`discovery/capability-checkpoints.yaml`](discovery/capability-checkpoints.yaml) | Capability discovery checkpoints (runtime config mirror) |
 
 ### `runtime-state.db` (Mutable — Execution State)
 

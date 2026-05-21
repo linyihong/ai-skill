@@ -1,0 +1,323 @@
+# Restored during compiler source migration.
+# Source of truth for Go-native ai-skill runtime compile.
+description: |
+    AI session execution phase state machine. 定義從 bootstrap 到 close-loop 的完整 phase 轉換圖。每個 phase 包含 entry_conditions、allowed/forbidden actions、 blocking gates、obligations 與 phase transition 規則。 Agent 必須在每次 action 前重新讀取此檔案，確認目前 phase 的 allowed actions。
+metadata:
+    compatibility_state: new
+    confidence: high
+    last_checked: "2026-05-15"
+    priority: P0
+owner_layer: runtime/phases
+phase_machine_version: v1
+phase_transition_rules:
+    - blocked: true
+      description: 禁止跳過 validation 直接 commit
+      from: phase.execution
+      reason: Execution 完成後必須先經過 Validation，不能直接 commit
+      to: phase.commit
+    - blocked: true
+      description: 禁止跳過 commit 直接 push
+      from: phase.validation
+      reason: Validation 完成後必須先 commit，不能直接 push
+      to: phase.push
+    - blocked: true
+      description: 禁止從 execution 直接 finalize
+      from: phase.execution
+      reason: Execution 完成後必須經過 validation → commit → push → readback 才能 finalize
+      to: phase.finalize
+    - blocked: false
+      description: Recovery 可從任何 phase 進入
+      from: '*'
+      reason: State inconsistency 可發生在任何 phase，recovery 必須能隨時介入
+      to: phase.recovery
+    - blocked: false
+      description: Recovery 完成後必須回到 checkpoint
+      from: phase.recovery
+      reason: 修復完成後需要重新確認 state
+      to: phase.checkpoint
+phases:
+    - allowed_actions:
+        - read_runtime_config
+        - read_bootstrap
+        - check_git_status
+        - init_obligation_ledger
+      blocking_gates:
+        - gate.bootstrap.core_rules_loaded
+        - gate.bootstrap.layout_loaded
+      description: |
+        Session 啟動階段。載入最小必要知識（CORE_BOOTSTRAP.md 3 rules）， 建立 session context，初始化 runtime state。
+      entry_conditions:
+        - session_start: true
+      forbidden_actions:
+        - execute_workflow
+        - commit
+        - push
+        - finalize
+      id: phase.bootstrap
+      name: Bootstrap
+      next_phase: phase.checkpoint
+      obligations:
+        - obligation.bootstrap.init_ledger
+      phase_transition_triggers:
+        - auto_transition: true
+          condition: core_rules_loaded == true AND layout_loaded == true
+    - allowed_actions:
+        - read_obligation_ledger
+        - read_phase_machine
+        - read_blocking_gates
+        - read_knowledge_update_phases
+        - read_system_upgrade_governance
+        - run_capability_discovery
+        - diff_review
+        - update_knowledge
+        - plan_next_actions
+      blocking_gates:
+        - gate.checkpoint.obligation_ledger_loaded
+        - gate.checkpoint.blocking_gates_checked
+        - gate.checkpoint.knowledge_update_checked
+        - gate.checkpoint.system_upgrade_governance_checked
+        - gate.checkpoint.capability_discovery_completed
+      description: |
+        每輪工作開始前的檢查點。確認目前 state、讀取 obligation ledger、 檢查 blocking gates、執行知識更新檢查（快速路徑： 查詢 runtime.db generated_surfaces 表）、決定本輪要做什麼。
+      entry_conditions:
+        - bootstrap_complete: true
+        - OR:
+            - session_start: true
+            - previous_phase_complete: true
+      forbidden_actions:
+        - finalize
+        - commit
+        - push
+      id: phase.checkpoint
+      name: Checkpoint
+      next_phase: phase.execution
+      obligations:
+        - obligation.checkpoint.review_pending_obligations
+        - obligation.checkpoint.check_knowledge_update_needed
+        - obligation.checkpoint.check_system_upgrade_governance
+        - obligation.checkpoint.run_capability_discovery
+      phase_transition_triggers:
+        - auto_transition: false
+          condition: obligation_ledger_loaded == true AND blocking_gates_checked == true AND knowledge_update_checked == true AND system_upgrade_governance_checked == true AND capability_discovery_completed == true
+          requires_confirmation: true
+    - allowed_actions:
+        - read_file
+        - write_file
+        - apply_diff
+        - execute_command
+        - search_files
+        - read_workflow_prose
+        - read_domain_knowledge
+      blocking_gates:
+        - gate.execution.goal_defined
+        - gate.execution.scope_clear
+      description: |
+        主要執行階段。執行本輪的 allowed actions，產出對應的 artifacts。 此階段是唯一允許修改檔案和執行命令的 phase。
+      entry_conditions:
+        - checkpoint_complete: true
+        - blocking_gates_passed: true
+      forbidden_actions:
+        - commit
+        - push
+        - finalize
+        - transition_phase
+      id: phase.execution
+      name: Execution
+      next_phase: phase.validation
+      obligations:
+        - obligation.execution.log_actions
+        - obligation.execution.track_artifacts
+      phase_transition_triggers:
+        - auto_transition: false
+          condition: execution_complete == true
+          requires_confirmation: true
+    - allowed_actions:
+        - read_file
+        - diff_review
+        - run_validator
+        - check_linked_updates
+        - verify_obligations
+        - check_output_governance
+      blocking_gates:
+        - gate.validation.all_obligations_met
+        - gate.validation.linked_updates_complete
+        - gate.validation.artifacts_complete
+        - gate.validation.no_forbidden_actions_used
+        - gate.output.language_consistency
+        - gate.output.sanitization_check
+        - gate.output.tool_neutrality
+        - gate.output.neutral_language
+      description: |
+        驗證階段。檢查 execution 的產出是否符合 gates、obligations 是否完成、 linked updates 是否完整、output governance 是否通過。 此階段不允許修改檔案。
+      entry_conditions:
+        - execution_complete: true
+      forbidden_actions:
+        - write_file
+        - apply_diff
+        - execute_command
+        - commit
+        - push
+        - finalize
+      id: phase.validation
+      name: Validation
+      next_phase: phase.commit
+      obligations:
+        - obligation.validation.run_knowledge_runtime_validator
+        - obligation.validation.check_linked_updates
+        - obligation.validation.check_output_governance
+      phase_transition_triggers:
+        - auto_transition: false
+          condition: all_gates_passed == true
+          requires_confirmation: true
+        - auto_transition: false
+          condition: all_gates_passed == false
+          requires_confirmation: true
+          target_phase: phase.execution
+    - allowed_actions:
+        - git_add
+        - git_commit
+        - read_file
+        - diff_review
+      blocking_gates:
+        - gate.commit.staging_complete
+        - gate.commit.commit_message_valid
+        - gate.commit.pre_commit_hooks_passed
+      description: |
+        提交階段。執行 git add、git commit，確保所有變更被正確記錄。 此階段是 writeback transaction 的一部分。
+      entry_conditions:
+        - validation_passed: true
+      forbidden_actions:
+        - write_file
+        - apply_diff
+        - execute_command
+        - finalize
+      id: phase.commit
+      name: Commit
+      next_phase: phase.push
+      obligations:
+        - obligation.commit.write_commit_message
+        - obligation.commit.verify_pre_commit_hooks
+      phase_transition_triggers:
+        - auto_transition: false
+          condition: commit_successful == true
+          requires_confirmation: true
+    - allowed_actions:
+        - git_push
+        - read_file
+      blocking_gates:
+        - gate.push.remote_reachable
+        - gate.push.push_successful
+      description: |
+        推送階段。執行 git push，將本地 commit 推送到遠端。
+      entry_conditions:
+        - commit_successful: true
+      forbidden_actions:
+        - write_file
+        - apply_diff
+        - execute_command
+        - finalize
+      id: phase.push
+      name: Push
+      next_phase: phase.readback
+      obligations:
+        - obligation.push.verify_push_success
+      phase_transition_triggers:
+        - auto_transition: false
+          condition: push_successful == true
+          requires_confirmation: true
+    - allowed_actions:
+        - git_status
+        - git_log
+        - read_file
+        - diff_review
+      blocking_gates:
+        - gate.readback.working_tree_clean
+        - gate.readback.remote_synced
+      description: |
+        讀回階段。push 完成後執行 git status 確認工作樹乾淨， 並讀回遠端狀態確認同步成功。這是 writeback transaction 的最後一步。
+      entry_conditions:
+        - push_successful: true
+      forbidden_actions:
+        - write_file
+        - apply_diff
+        - execute_command
+        - finalize
+      id: phase.readback
+      name: Readback
+      next_phase: phase.finalize
+      obligations:
+        - obligation.readback.verify_clean_tree
+        - obligation.readback.confirm_sync
+      phase_transition_triggers:
+        - auto_transition: false
+          condition: working_tree_clean == true AND remote_synced == true
+          requires_confirmation: true
+    - allowed_actions:
+        - close_obligation_ledger
+        - update_knowledge
+        - summarize_completion
+        - check_output_governance
+      blocking_gates:
+        - gate.finalize.all_obligations_closed
+        - gate.finalize.knowledge_updated
+        - gate.output.final_language_check
+        - gate.output.final_sanitization_check
+      description: |
+        最終階段。關閉 writeback transaction，清理 obligation ledger， 標記本輪完成。此階段後 session 可結束或回到 checkpoint 開始下一輪。 執行最終 output governance 檢查（語言一致性、去敏狀態）。
+      entry_conditions:
+        - readback_complete: true
+      forbidden_actions:
+        - write_file
+        - apply_diff
+        - execute_command
+        - commit
+        - push
+      id: phase.finalize
+      name: Finalize
+      next_phase: phase.checkpoint
+      obligations:
+        - obligation.finalize.close_ledger
+        - obligation.finalize.run_knowledge_checkpoint
+        - obligation.finalize.verify_output_governance
+      phase_transition_triggers:
+        - auto_transition: false
+          condition: finalize_complete == true
+          requires_confirmation: true
+        - auto_transition: false
+          condition: session_end == true
+          requires_confirmation: true
+          target_phase: null
+    - allowed_actions:
+        - read_file
+        - write_file
+        - apply_diff
+        - execute_command
+        - run_validator
+        - rebuild_obligation_ledger
+        - reconcile_phase
+      blocking_gates:
+        - gate.recovery.repair_strategy_defined
+      description: |
+        恢復階段。當偵測到 state inconsistency、phase drift、或 obligation 遺失時， 進入此階段執行修復。此階段有最高的 action 權限。
+      entry_conditions:
+        - OR:
+            - state_inconsistency_detected: true
+            - phase_drift_detected: true
+            - obligation_missing: true
+            - generated_surface_stale: true
+      forbidden_actions:
+        - commit
+        - push
+        - finalize
+      id: phase.recovery
+      name: Recovery
+      next_phase: phase.checkpoint
+      obligations:
+        - obligation.recovery.diagnose_root_cause
+        - obligation.recovery.apply_repair
+        - obligation.recovery.verify_repair
+      phase_transition_triggers:
+        - auto_transition: false
+          condition: repair_complete == true AND verified == true
+          requires_confirmation: true
+status: active

@@ -1,0 +1,110 @@
+# Restored during compiler source migration.
+# Source of truth for Go-native ai-skill runtime compile.
+last_updated: "2026-05-15"
+owner_layer: runtime/recovery
+rebuild_procedures:
+    - description: |
+        從頭重建完整的 obligation ledger。 適用於 ledger 完全遺失或嚴重損毀的情況。
+      id: rebuild.obligation.full_rebuild
+      name: Full Obligation Ledger Rebuild
+      procedure:
+        - action: LOAD_PHASE_MACHINE
+          command: 讀取 runtime/runtime.db:phase_machine
+          description: 載入 runtime.db phase_machine 取得所有 phase 定義
+          step: 1
+        - action: ITERATE_ALL_PHASES
+          command: 依 phase 順序（bootstrap→checkpoint→execution→validation→commit→push→readback→finalize→recovery）
+          description: 遍歷所有 9 個 phase
+          step: 2
+        - action: EXTRACT_OBLIGATIONS_PER_PHASE
+          command: 讀取 runtime.db phase_machine 中各 phase 的 obligations 列表
+          description: 從每個 phase 的 obligations 欄位提取義務
+          step: 3
+        - action: MAP_TO_LEDGER_FORMAT
+          command: 對每個 obligation 填入：id、phase、name、description、verification_criteria、severity、depends_on、linked_gates
+          description: 將 obligations 轉換為 ledger 格式
+          step: 4
+        - action: SET_INITIAL_STATE
+          command: 所有 obligations 初始狀態設為 pending
+          description: 設定初始狀態（全部為 pending）
+          step: 5
+        - action: VERIFY_LEDGER_INTEGRITY
+          command: 檢查是否有遺漏的 phase 或 obligation
+          description: 驗證重建後的 ledger 完整性
+          step: 6
+      trigger_conditions:
+        - runtime.db obligation_ledger 無法讀取
+        - 所有 obligations 狀態皆為 unknown
+        - recovery phase 首次進入
+      verify:
+        - 所有 9 個 phase 皆有對應的 obligations
+        - 每個 obligation 有完整的 id、phase、name、verification_criteria
+        - severity 皆為有效值（critical/high/medium）
+        - depends_on 與 linked_gates 的引用可解析
+    - description: |
+        只重建特定 phase 的 obligations。 適用於單一 phase 的 obligation 狀態損毀。
+      id: rebuild.obligation.phase_partial
+      name: Partial Phase Obligation Rebuild
+      procedure:
+        - action: IDENTIFY_TARGET_PHASE
+          command: 讀取目前 current_phase 或指定 phase
+          description: 確認需要重建的 phase
+          step: 1
+        - action: LOAD_PHASE_OBLIGATIONS
+          command: 從 runtime.db phase_machine 中該 phase 的 obligations 欄位提取
+          description: 載入該 phase 的 obligations
+          step: 2
+        - action: CROSS_REFERENCE_LEDGER
+          command: 從 runtime.db obligation_ledger 中過濾 phase 對應的 obligations
+          description: 對照 runtime.db obligation_ledger 確認完整定義
+          step: 3
+        - action: SET_PHASE_OBLIGATIONS
+          command: 所有 obligations 設為 pending，等待執行
+          description: 設定該 phase 的 obligations 狀態
+          step: 4
+        - action: CHECK_DEPENDENCIES
+          command: 對每個 obligation 檢查 depends_on 中的上游 obligation 是否已完成
+          description: 檢查 dependencies 是否已滿足
+          step: 5
+      trigger_conditions:
+        - 特定 phase 的 obligations 狀態遺失
+        - phase transition 後新 phase 的 obligations 未初始化
+      verify:
+        - 目標 phase 的所有 obligations 已重建
+        - dependencies 鏈完整無斷裂
+        - linked_gates 可解析
+    - description: |
+        驗證並修復 obligation 之間的 dependency 鏈。 確保沒有 circular dependency 或 dangling reference。
+      id: rebuild.obligation.dependency_chain
+      name: Dependency Chain Verification
+      procedure:
+        - action: BUILD_DEPENDENCY_GRAPH
+          command: 從 runtime.db obligation_ledger 中提取所有 depends_on 關係
+          description: 建立完整的 dependency 圖
+          step: 1
+        - action: DETECT_CIRCULAR
+          command: 使用拓撲排序檢查是否有環
+          description: 檢測 circular dependency
+          step: 2
+        - action: DETECT_DANGLING
+          command: 檢查所有 depends_on 與 linked_gates 的目標是否存在
+          description: 檢測 dangling reference
+          step: 3
+        - action: REPAIR_BROKEN_LINKS
+          command: 移除或修正無法解析的 depends_on/linked_gates
+          description: 修復斷裂的引用
+          step: 4
+        - action: REBUILD_ORDERED_LIST
+          command: 依拓撲排序重建執行順序
+          description: 重建依賴順序的 obligation 列表
+          step: 5
+      trigger_conditions:
+        - obligation 的 depends_on 引用不存在的 obligation
+        - 偵測到 circular dependency
+        - linked_gates 引用不存在的 gate
+      verify:
+        - 無 circular dependency
+        - 所有 depends_on 與 linked_gates 可解析
+        - 拓撲排序可產生合法的執行順序
+status: candidate
+version: 1

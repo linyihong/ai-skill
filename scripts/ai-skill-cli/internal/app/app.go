@@ -29,6 +29,8 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runSyncCursorBundle(args[1:], stdout, stderr)
 	case "runtime":
 		return runRuntime(args[1:], stdout, stderr)
+	case "roo":
+		return runRoo(args[1:], stdout, stderr)
 	case "help", "-h", "--help":
 		printUsage(stdout)
 		return ExitSuccess
@@ -50,6 +52,7 @@ func printUsage(w io.Writer) {
 	_, _ = fmt.Fprintln(w, "  hooks    inspect or plan Git hook installation")
 	_, _ = fmt.Fprintln(w, "  sync-cursor-bundle    plan Cursor bundle mirror sync")
 	_, _ = fmt.Fprintln(w, "  runtime    wrap or inspect runtime tooling")
+	_, _ = fmt.Fprintln(w, "  roo    manage guarded Roo Code settings")
 }
 
 func newFlagSet(name string, stderr io.Writer) *flag.FlagSet {

@@ -2,7 +2,7 @@
 
 ## Closure Decision
 
-The Go CLI is now the primary desktop runtime entrypoint. Legacy scripts are not all deleted in this closure because several non-runtime surfaces still require write-mode parity. Runtime Ruby report/index/query/validation entrypoints have been deleted after native CLI coverage became the default. The Ruby compiler engine remains only because the Go compiler is still snapshot mode, not a true source-to-DB compiler.
+The Go CLI is now the primary desktop runtime entrypoint. Runtime Ruby report/index/query/validation entrypoints, the Ruby runtime compiler, and the Roo Python adapter have been deleted after native CLI coverage became the default. Some non-runtime shell surfaces remain because they still require write-mode parity.
 
 ## Disposition Table
 
@@ -15,11 +15,11 @@ The Go CLI is now the primary desktop runtime entrypoint. Legacy scripts are not
 | `scripts/ai-skill-close-loop.sh` | Retained, pending parity | Delete or thin-wrap after commit/push/private-path parity |
 | Runtime report/index/query Ruby scripts | Deleted | Replaced by `ai-skill runtime refresh` and `ai-skill runtime query`; `--legacy-wrapper` is removed for refresh |
 | Runtime validators | Deleted | Replaced by `ai-skill runtime validate`; `--legacy-wrapper` is removed for validate |
-| `runtime/compiler/compiler-engine.rb` | Retained as compiler source/parity reference | Delete only after true source-to-DB Go compiler parity, not just snapshot mode |
+| `runtime/compiler/compiler-engine.rb` | Deleted | Replaced by Go-native `ai-skill runtime compile` source-to-DB compiler using runtime YAML and `runtime/compiler/compiler-rules.yaml` |
 | `scripts/migrate-runtime-config-to-sqlite.rb` | Deleted | Obsolete migration helper; supported path is `ai-skill runtime compile` / compiler integration |
 | `scripts/init-runtime-state-db.rb` | Deleted | Mutable runtime-state scope is not active; future support must be Go-native |
 | `scripts/sync-runtime-yaml-from-embedded.rb` | Deleted | Prevents accidental rollback from embedded data into stale YAML; restore only via a dedicated source restoration plan |
-| `scripts/set-roo-global-custom-instructions.py` | Tool-specific adapter retained | User editor globalStorage mutation is not a general CLI default |
+| `scripts/set-roo-global-custom-instructions.py` | Deleted | Replaced by guarded `ai-skill roo set-global-custom-instructions` with fake VS Code SQLite DB tests |
 | `scripts/git-hooks/*` | Hook adapter retained | Git hook surface remains an adapter installed by CLI |
 
 ## Removal Policy
@@ -33,4 +33,4 @@ Future deletion is allowed only when all are true:
 
 ## Current Closure Scope
 
-This plan closes the cross-platform desktop runtime migration and deletes the runtime Ruby scripts that now have native CLI coverage. Remaining script deletion is limited to non-runtime write-mode parity, tool adapters, and the Ruby compiler engine follow-up.
+This plan closes the cross-platform desktop runtime migration and deletes runtime Ruby/Python scripts that now have native CLI coverage. Remaining script deletion is limited to non-runtime shell write-mode parity and tool adapters that are intentionally not yet native.

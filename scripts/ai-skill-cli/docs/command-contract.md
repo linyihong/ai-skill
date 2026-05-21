@@ -10,7 +10,7 @@
 - **穩定 exit code**：相同失敗類型在所有 OS 上回傳相同 exit code。
 - **明確 side effect**：每個命令必須列出讀取路徑、寫入路徑、外部依賴與 git 操作。
 - **禁止 partial close-loop**：linked-update、writeback、commit、push、runtime sync 若缺 Git 或 repo 狀態不安全，必須阻斷。
-- **Native default**：Phase 3 後 runtime core commands 預設走 Go-native path；Ruby / `sqlite3` CLI 僅能透過 `--legacy-wrapper` 作 rollback / parity。
+- **Native default**：Runtime core commands 預設走 Go-native path；Ruby、Python 與外部 `sqlite3` CLI 不屬於 active runtime dependency。
 
 ## 初始命令範圍
 
@@ -23,10 +23,11 @@
 | `ai-skill hooks install` | 安裝本 repo git hooks | 是 | 是 | Phase 2 |
 | `ai-skill sync-cursor-bundle` | 同步 Cursor bundle / mirror | 是 | 否 | Phase 2 |
 | `ai-skill close-loop` | 檢查 dirty owner group、commit、push、readback | 是 | 是 | Phase 2 |
-| `ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index | 是 | 否 | Phase 3 |
+| `ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index|`ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index | 是 | 否 | Phase 3 |
 | `ai-skill runtime compile` | 編譯 `runtime/runtime.db` | 是 | 否 | Phase 3 |
 | `ai-skill runtime validate` | 驗證 runtime.db、knowledge runtime、SQLite assertions | 否 | 否 | Phase 3 |
 | `ai-skill runtime query` | 查詢 runtime index / generated surfaces | 否 | 否 | Phase 3 |
+| `ai-skill roo set-global-custom-instructions` | guarded 寫入 Roo Code 全域 Custom Instructions | 是 | 否 | Tool adapter |
 
 ## 共通輸出契約
 
@@ -83,10 +84,8 @@
 - Repo root 是否存在且可讀。
 - Git 是否存在、版本是否符合最低需求、是否可執行 `git rev-parse` / `git status`。
 - SQLite native path 是否可用；Phase 1 後應使用 pure Go SQLite，不依賴 `sqlite3` CLI。
-- Ruby / Python 僅在 wrapper mode 需要時提示，不應是長期核心依賴。
 - PATH、write permission、hooksPath、平台支援狀態。
 - `--check-runtime` 必須使用 native SQLite driver 做 smoke query；若找到 `runtime.db`，執行 integrity check。
-- Ruby / Python 只作為 wrapper-mode optional diagnostics；缺失時不可阻擋 native-only command。
 
 缺 Git 行為：
 
@@ -249,28 +248,26 @@
 副作用：
 
 - 可能更新 `knowledge/runtime/runtime-report.md`、`knowledge/runtime/model-context-report.md`、`knowledge/runtime/model-checklists.md` 與本機 SQLite index。
-- 預設 native mode 不依賴 Ruby 或 `sqlite3` CLI；`--legacy-wrapper` 對 refresh 已移除。
+- 預設 native mode 不依賴 Ruby、Python 或外部 `sqlite3` CLI。
 
 必要行為：
 
 - 必須回報哪些 generated surfaces 被更新、哪些 validator 被執行。
-- 若明確使用 `--legacy-wrapper`，回傳 `legacy_runtime_refresh_removed`。
 - 不得只更新部分 generated surface 後回傳 success。
 - 預設 native mode 寫入 Go-generated Markdown reports 與 SQLite index，並執行 native runtime DB / index / knowledge runtime checks；dry-run 只列出將執行的 native actions，不寫入 generated surfaces。
-- `--legacy-wrapper` 對 `runtime refresh` 已移除；必須回傳 `legacy_runtime_refresh_removed`，提示使用者改用 native refresh。
 - 任一 native refresh step 失敗時，CLI 必須停止後續 steps、回傳 `runtime_refresh_failed`，且 JSON checks 必須保留已執行 steps 與 failing step。
 - `--native-reports` / `--native-index` 已是預設 native refresh 行為；保留 flags 供舊 automation 顯式表示意圖。
 
 ### `ai-skill runtime compile`
 
-目的：編譯 `runtime/runtime.db`，未來可從 Ruby wrapper 過渡到 Go native compiler。
+目的：用 Go-native compiler 從 runtime YAML 與 deterministic prose mappings 編譯 `runtime/runtime.db`。
 
 輸入：
 
 - `--dry-run`
 - `--repo <path>`
 - `--db <path>`
-- `--native-compiler`
+- `--native-compiler`（deprecated no-op；compile 已是 native）
 - `--assert-source <path>`
 - `--assert-keyword <keyword>`
 - `--json`
@@ -278,15 +275,14 @@
 副作用：
 
 - 可能更新 `runtime/runtime.db`。
-- 預設 native snapshot mode 不依賴 Ruby 或 `sqlite3` CLI；`--legacy-wrapper` 才呼叫 Ruby compiler。
+- 預設 native source-to-DB mode 不依賴 Ruby、Python 或外部 `sqlite3` CLI。
 
 驗證：
 
 - `runtime/runtime.db` integrity check。
 - `generated_surfaces` content assertion。
 - compiler version / schema version 存在。
-- 預設 native snapshot mode 用 repository 既有 `runtime/runtime.db` 產生指定 `--db` output，並通過 native runtime DB validation；`--native-compiler` 保留為顯式意圖 flag。
-- `--legacy-wrapper` 使用 Ruby compiler；wrapper mode 必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`，缺 Ruby 或 `sqlite3` CLI 時必須回傳 `missing_dependency`。
+- Go compiler 讀取 `runtime/compiler/compiler-rules.yaml`、runtime YAML source、以及 deterministic prose sources，產生指定 `--db` output，並通過 native runtime DB validation。
 
 ### `ai-skill runtime validate`
 
@@ -307,8 +303,7 @@
 
 - 驗證失敗時不得修改檔案。
 - 必須區分 missing dependency、schema invalid、assertion failed、dirty generated surface。
-- 預設 native mode 執行 Go runtime DB、SQLite index 與 knowledge runtime checks，不依賴 Ruby 或 `sqlite3` CLI。
-- `--legacy-wrapper` 對 `runtime validate` 已移除；必須回傳 `legacy_runtime_validate_removed`，提示使用者改用 native validation。
+- 預設 native mode 執行 Go runtime DB、SQLite index 與 knowledge runtime checks，不依賴 Ruby、Python 或外部 `sqlite3` CLI。
 - `runtime.db` native slice 已用 Go / `modernc.org/sqlite` 檢查 integrity、required tables、minimum row counts、JSON columns、compiler metadata 與 stale metadata warning；stale warning 不阻斷成功狀態。
 - SQLite runtime index native slice 已用 Go / `modernc.org/sqlite` 檢查 missing DB、integrity、required tables、row counts、atom source references、source checksums、FTS count 與 basic ranked FTS query；git-ignore boundary 以 Go 呼叫 Git 檢查，缺 Git 時回 `missing_dependency`。
 
@@ -351,12 +346,12 @@
 | deleted `scripts/install-hooks.sh` / `.githooks/` | `ai-skill hooks install` | dry-run planner uses `scripts/git-hooks/`; write mode still blocked until fixture-backed |
 | `scripts/sync-cursor-bundle.sh` | `ai-skill sync-cursor-bundle` | Phase 2 native 候選，需 mirror safety gate |
 | `scripts/ai-skill-close-loop.sh` | `ai-skill close-loop` | Phase 2 先 wrapper，owner-group parity 後 native |
-| Runtime report / SQLite generators | `ai-skill runtime refresh` | Native default completed; old Ruby entrypoints deleted |
-| Runtime validators | `ai-skill runtime validate` | Native default completed; old Ruby entrypoints deleted |
+| Runtime report / SQLite generators | `ai-skill runtime refresh` | Native completed; old Ruby entrypoints deleted |
+| Runtime validators | `ai-skill runtime validate` | Native completed; old Ruby entrypoints deleted |
 | Runtime query helpers | `ai-skill runtime query` | Native completed; old Ruby entrypoints deleted |
-| `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | Phase 3 先 wrapper；parity tests 通過後才 native |
+| Runtime compiler | `ai-skill runtime compile` | Go-native source-to-DB compiler completed; old Ruby compiler deleted |
 | Runtime migration / state helpers | future Go-native runtime commands | old Ruby helpers deleted; reintroduce only with command contract and fixtures |
-| Tool-specific global setting helper | 無通用 CLI 預設 | tool-specific adapter |
+| Roo global setting helper | `ai-skill roo set-global-custom-instructions` | guarded tool-specific adapter with fake DB tests |
 
 ## Exit Code 表
 
@@ -394,7 +389,8 @@
 | `sync-cursor-bundle` | Ai-skill source | Cursor bundle / mirror path | filesystem permissions |
 | `close-loop` | git status、repo files、rules | git index、commits、remote branch | Git |
 | `runtime refresh` | `knowledge/`、`feedback/`、runtime sources | generated reports、SQLite index | 無 |
-| `runtime compile` | runtime compiler sources、prose sources | `runtime/runtime.db` | wrapper mode 可能需要 Ruby |
+| `runtime compile` | runtime YAML、compiler rules、prose sources | `runtime/runtime.db` | 無 |
+| `roo set-global-custom-instructions` | VS Code `state.vscdb`、optional instructions file | VS Code `state.vscdb` | 無 |
 | `runtime validate` | generated reports、runtime.db | 無 | SQLite index git-ignore boundary 需 Git |
 | `runtime query` | `knowledge/runtime/sqlite/runtime-index.sqlite` 或 `--db` 指定 SQLite index | 無 | 無 |
 | `runtime query --graph` | `knowledge/graphs/*.yaml` | 無 | 無 |

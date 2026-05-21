@@ -50,7 +50,7 @@ Claude Code 的設定方式與 Roo Code 不同，沒有「全域 Custom Instruct
 
 **Goal ledger 操作流程已由 runtime 管理**，請參考：
 - [`runtime/runtime.db`](../../runtime/runtime.db) — `phase_machine` / `obligation_ledger` / `blocking_gates` 快速查詢
-- [`runtime/compiler/embedded_data.rb`](../../runtime/compiler/embedded_data.rb) — phase / obligation / gate / transaction / recovery 的 embedded source
+- [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — phase / obligation / gate / transaction / recovery 的 embedded source
 - [`scripts/agent-goals.sh`](../../scripts/agent-goals.sh) — goal ledger CLI helper
 
 Claude Code 專屬注意事項：
@@ -64,7 +64,7 @@ Claude Code 專屬注意事項：
 **Knowledge update flow 已由 runtime 管理**，請參考：
 - `runtime/runtime.db → generated_surfaces (type='knowledge_update_phases')` — 11 個步驟的結構化記錄（快速路徑）
 - `runtime/runtime.db → recovery_strategies / phase_reconciliation / state_repair` — runtime recovery strategy（快速路徑）
-- [`runtime/compiler/embedded_data.rb`](../../runtime/compiler/embedded_data.rb) — recovery / transaction state machine 的 source
+- [`runtime/compiler/compiler-rules.yaml`](../../runtime/compiler/compiler-rules.yaml) — recovery / transaction state machine 的 source
 
 Claude Code 專屬注意事項：
 - 無 hooks 機制，需在 `CLAUDE.md` 中手動加入 checkpoint 提醒

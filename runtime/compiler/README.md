@@ -2,15 +2,14 @@
 
 ## Files
 
-- [`compiler-engine.rb`](compiler-engine.rb) — Prose-to-SQLite compiler engine
-- [`embedded_data.rb`](embedded_data.rb) — All runtime YAML data embedded as Ruby hash constants
-- [`compiler-rules.yaml`](compiler-rules.yaml) — Compiler rules and mapping (embedded in `embedded_data.rb`)
+- [`compiler-rules.yaml`](compiler-rules.yaml) — Compiler rules and source-to-target mapping for Go-native `ai-skill runtime compile`
+- Go implementation: [`../../scripts/ai-skill-cli/internal/app/runtime_compiler.go`](../../scripts/ai-skill-cli/internal/app/runtime_compiler.go)
 
 ## Inbound References
 
-- `obligation.checkpoint.run_compiler` in [`runtime.db`](../runtime.db) / [`embedded_data.rb`](embedded_data.rb)
-- `gate.checkpoint.compiler_executed` in [`runtime.db`](../runtime.db) / [`embedded_data.rb`](embedded_data.rb)
-- `phase.checkpoint` in [`runtime.db`](../runtime.db) / [`embedded_data.rb`](embedded_data.rb) — allowed_actions includes `run_compiler`
+- `obligation.checkpoint.run_compiler` in [`runtime.db`](../runtime.db) / [`../obligations/obligation-ledger.yaml`](../obligations/obligation-ledger.yaml)
+- `gate.checkpoint.compiler_executed` in [`runtime.db`](../runtime.db) / [`../gates/blocking-gates.yaml`](../gates/blocking-gates.yaml)
+- `phase.checkpoint` in [`runtime.db`](../runtime.db) / [`../phases/phase-machine.yaml`](../phases/phase-machine.yaml) — allowed_actions includes `run_compiler`
 
 ## Source-of-Truth
 

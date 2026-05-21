@@ -17,7 +17,7 @@ given:
   artifacts:
     - scripts/git-hooks/pre-commit
     - runtime/compiler/compiler-rules.yaml
-    - runtime/compiler/compiler-engine.rb
+    - scripts/ai-skill-cli/internal/app/runtime_compiler.go
     - scripts/git-hooks/pre-commit
   signals:
     - workflow/software-delivery/execution-flow.md 被修改（新增或修改 gate 描述）

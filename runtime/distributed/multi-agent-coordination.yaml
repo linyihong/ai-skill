@@ -33,7 +33,7 @@
 - :id: coord.rule.obligation_ledger_sync
   :name: Obligation Ledger Sync
   :description: 修改 obligation runtime source 前先取得 lock
-  :rule: 'Agent 在修改 obligation runtime source（目前為 runtime/compiler/embedded_data.rb，並編譯至 runtime/runtime.db）前，必須先取得 lock.obligation_ledger。修改完成後釋放 lock。如果無法取得 lock， 表示有其他 agent 正在操作，需等待或進入 recovery。
+  :rule: 'Agent 在修改 obligation runtime source（runtime/obligations/obligation-ledger.yaml，並編譯至 runtime/runtime.db）前，必須先取得 lock.obligation_ledger。修改完成後釋放 lock。如果無法取得 lock， 表示有其他 agent 正在操作，需等待或進入 recovery。
 
 '
   :severity: critical
@@ -57,7 +57,7 @@
 - :id: coord.rule.stale_state_recovery
   :name: Stale State Recovery
   :description: 偵測到 stale state 時執行 recovery
-  :rule: '如果 agent 偵測到 phase inconsistency、obligation drift、或 generated surface stale，必須先查詢 runtime/runtime.db 的 phase_reconciliation / recovery_strategies，必要時讀 runtime/compiler/embedded_data.rb 的 source，完成 reconciliation 後才能繼續執行。
+  :rule: '如果 agent 偵測到 phase inconsistency、obligation drift、或 generated surface stale，必須先查詢 runtime/runtime.db 的 phase_reconciliation / recovery_strategies，必要時讀 runtime/recovery/ 的 source，完成 reconciliation 後才能繼續執行。
 
 '
   :severity: critical

@@ -1,0 +1,279 @@
+# Restored during compiler source migration.
+# Source of truth for Go-native ai-skill runtime compile.
+last_updated: "2026-05-15"
+owner_layer: runtime/transactions
+status: candidate
+templates:
+    - applicable_scenarios:
+        - 修改 dependency-reading.md
+        - 修改 goal-action-validation.md
+        - 修改 failure-learning-system.md
+        - 新增 enforcement/failure-patterns/ 下的 pattern
+      description: 修改 enforcement/ 下的 enforcement rule
+      id: template.enforcement_rule_update
+      name: Enforcement Rule Update
+      post_checks:
+        - git status clean
+        - branch 無 ahead/behind
+        - 所有 linked updates 已完成
+      pre_checks:
+        - 確認修改不違反 rule-weight 的 P0/P1/P2/P3 權重體系
+        - 確認修改不破壞 reference-first 原則
+        - 確認修改不破壞 activation model
+      steps:
+        - action: LOCATE_CANONICAL_SOURCE
+          command: git rev-parse --show-toplevel
+          description: 確認 canonical repo 路徑
+          step: 1
+        - action: MAKE_CHANGES
+          command: 編輯 enforcement/ 下對應檔案
+          description: 在 canonical source 中修改
+          step: 2
+        - action: CHECK_LINKED_UPDATES
+          command: 依 enforcement/linked-updates.md 檢查
+          description: 檢查需要連動更新的檔案
+          step: 3
+        - action: RUN_SANITIZATION
+          command: 依 enforcement/sanitization.md 檢查
+          description: 執行去敏檢查
+          step: 4
+        - action: UPDATE_ROUTING_REGISTRY
+          command: 檢查是否需要更新 knowledge/runtime/routing-registry.yaml
+          description: 更新 routing-registry.yaml（如需要）
+          step: 5
+        - action: GIT_ADD
+          command: git add -A
+          description: stage 所有變更
+          step: 6
+        - action: GIT_COMMIT
+          command: 'git commit -m ''rule: ...'''
+          description: 提交變更
+          step: 7
+        - action: GIT_PUSH
+          command: git push
+          description: 推送至遠端
+          step: 8
+        - action: REREAD
+          command: 讀取 CORE_BOOTSTRAP.md、routing-registry.yaml
+          description: 重新讀取更新檔案
+          step: 9
+        - action: VERIFY_CLEAN
+          command: git status --short --branch
+          description: 確認 git status clean
+          step: 10
+    - applicable_scenarios:
+        - 新增 runtime.db phase_machine
+        - 新增 runtime.db obligation_ledger
+        - 新增 runtime.db blocking_gates
+        - 新增 recovery/ 下的檔案
+        - 新增 scheduler/ 下的檔案
+        - 新增 transactions/ 下的檔案
+      description: 新增或修改 runtime/ 下的元件
+      id: template.runtime_component_update
+      name: Runtime Component Update
+      post_checks:
+        - git status clean
+        - branch 無 ahead/behind
+        - routing-registry.yaml 包含新 route record
+        - CORE_BOOTSTRAP.md 已更新（如需要）
+      pre_checks:
+        - 確認新元件與現有 runtime.db phase_machine 的 phase 定義一致
+        - 確認新元件的 id 不與現有 routing-registry.yaml 衝突
+        - 確認新元件遵循 generated YAML 格式（如適用）
+      steps:
+        - action: CREATE_COMPONENT
+          command: 在 runtime/ 下建立對應 YAML 檔案
+          description: 建立新 runtime 元件
+          step: 1
+        - action: UPDATE_ROUTING_REGISTRY
+          command: 新增 route.runtime.{component} 記錄
+          description: 在 routing-registry.yaml 新增 route record
+          step: 2
+        - action: UPDATE_CORE_BOOTSTRAP
+          command: 如果元件需在 bootstrap 階段載入，更新啟動流程
+          description: 更新 CORE_BOOTSTRAP.md（如需要）
+          step: 3
+        - action: CHECK_INTEGRATION
+          command: 確認新元件的 references 可解析
+          description: 檢查與現有元件的整合
+          step: 4
+        - action: GIT_ADD
+          command: git add -A
+          description: stage 所有變更
+          step: 5
+        - action: GIT_COMMIT
+          command: 'git commit -m ''feat(runtime): ...'''
+          description: 提交變更
+          step: 6
+        - action: GIT_PUSH
+          command: git push
+          description: 推送至遠端
+          step: 7
+        - action: REREAD
+          command: 讀取 CORE_BOOTSTRAP.md、routing-registry.yaml
+          description: 重新讀取更新檔案
+          step: 8
+        - action: VERIFY_CLEAN
+          command: git status --short --branch
+          description: 確認 git status clean
+          step: 9
+    - applicable_scenarios:
+        - 修改 workflow/apk-analysis/execution-flow.md
+        - 修改 workflow/software-delivery/development-process.md
+        - 修改 workflow/travel-planning/execution-flow.md
+      description: 修改 workflow/ 下的 prose 文件
+      id: template.workflow_update
+      name: Workflow Update
+      post_checks:
+        - git status clean
+        - branch 無 ahead/behind
+        - prose 與 generated YAML 一致（如適用）
+      pre_checks:
+        - 確認修改不破壞 workflow 的 reference-first 原則
+        - 確認修改與對應的 artifact-gates.md 一致
+      steps:
+        - action: LOCATE_CANONICAL_SOURCE
+          command: git rev-parse --show-toplevel
+          description: 確認 canonical repo 路徑
+          step: 1
+        - action: MAKE_CHANGES
+          command: 編輯 workflow/ 下對應檔案
+          description: 修改 workflow prose
+          step: 2
+        - action: CHECK_GENERATED_SURFACES
+          command: 查詢 runtime.db 確認對應的 generated_surfaces 記錄是否存在
+          description: 檢查是否有對應的 generated surface（runtime.db）需要更新
+          step: 3
+        - action: UPDATE_GENERATED_YAML
+          command: 執行 compiler 或手動同步
+          description: 更新 generated YAML（如存在）
+          step: 4
+        - action: GIT_ADD
+          command: git add -A
+          description: stage 所有變更
+          step: 5
+        - action: GIT_COMMIT
+          command: 'git commit -m ''workflow: ...'''
+          description: 提交變更
+          step: 6
+        - action: GIT_PUSH
+          command: git push
+          description: 推送至遠端
+          step: 7
+        - action: REREAD
+          command: 讀取更新後的 workflow 檔案
+          description: 重新讀取更新檔案
+          step: 8
+        - action: VERIFY_CLEAN
+          command: git status --short --branch
+          description: 確認 git status clean
+          step: 9
+    - applicable_scenarios:
+        - 記錄新的 feedback lesson
+        - 更新現有 feedback lesson
+      description: 寫入 feedback lesson 到 feedback/history/
+      id: template.feedback_lesson_write
+      name: Feedback Lesson Write
+      post_checks:
+        - git status clean
+        - branch 無 ahead/behind
+        - lesson 已去敏
+        - promotion target 已更新（如需要）
+      pre_checks:
+        - 確認 lesson 已去敏（無 project-specific evidence、絕對路徑、使用者名稱）
+        - 確認 lesson 已分類（domain/category）
+      steps:
+        - action: DETERMINE_PATH
+          command: feedback/history/<domain>/<category>/<date>-<title>.md
+          description: 決定 lesson 存放路徑
+          step: 1
+        - action: WRITE_LESSON
+          command: 依 feedback-lessons.md 格式撰寫
+          description: 寫入 lesson 內容
+          step: 2
+        - action: RUN_SANITIZATION
+          command: 依 sanitization.md 檢查
+          description: 執行去敏檢查
+          step: 3
+        - action: CHECK_PROMOTION
+          command: 依 intelligence-extraction-pipeline.md 判斷
+          description: 檢查是否需要 promotion
+          step: 4
+        - action: GIT_ADD
+          command: git add -A
+          description: stage 所有變更
+          step: 5
+        - action: GIT_COMMIT
+          command: 'git commit -m ''feedback: ...'''
+          description: 提交變更
+          step: 6
+        - action: GIT_PUSH
+          command: git push
+          description: 推送至遠端
+          step: 7
+        - action: REREAD
+          command: 讀取 feedback/README.md、promotion targets
+          description: 重新讀取更新檔案
+          step: 8
+        - action: VERIFY_CLEAN
+          command: git status --short --branch
+          description: 確認 git status clean
+          step: 9
+    - applicable_scenarios:
+        - 修改 workflow 同時更新對應的 enforcement rules
+        - 新增 skill 同時更新 routing-registry.yaml
+        - 重構目錄結構同時更新所有 cross-references
+      description: 同時修改多個層級的檔案（例如：修改 workflow 同時更新 enforcement）
+      id: template.multi_file_change
+      name: Multi-File Change
+      post_checks:
+        - git status clean
+        - branch 無 ahead/behind
+        - 所有 cross-references 可解析
+        - 所有 linked updates 已完成
+      pre_checks:
+        - 列出所有受影響的檔案
+        - 確認變更範圍不超出任務 scope
+        - 確認無 circular dependency between changes
+      steps:
+        - action: LIST_ALL_FILES
+          command: 依 linked-updates.md 找出所有連動檔案
+          description: 列出所有需要修改的檔案
+          step: 1
+        - action: ORDER_CHANGES
+          command: 先修改 canonical source，再修改 references
+          description: 依相依關係排序修改順序
+          step: 2
+        - action: MAKE_ALL_CHANGES
+          command: 從相依關係的 root 開始修改
+          description: 依序修改所有檔案
+          step: 3
+        - action: VERIFY_CROSS_REFERENCES
+          command: 檢查所有檔案間的 link 是否正確
+          description: 驗證 cross-references 可解析
+          step: 4
+        - action: RUN_SANITIZATION
+          command: 依 sanitization.md 檢查所有修改檔案
+          description: 執行去敏檢查
+          step: 5
+        - action: GIT_ADD
+          command: git add -A
+          description: stage 所有變更
+          step: 6
+        - action: GIT_COMMIT
+          command: git commit -m '...'
+          description: 提交變更
+          step: 7
+        - action: GIT_PUSH
+          command: git push
+          description: 推送至遠端
+          step: 8
+        - action: REREAD
+          command: 讀取所有修改過的主要檔案
+          description: 重新讀取所有更新檔案
+          step: 9
+        - action: VERIFY_CLEAN
+          command: git status --short --branch
+          description: 確認 git status clean
+          step: 10
+version: 1

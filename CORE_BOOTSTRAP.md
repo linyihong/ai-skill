@@ -22,7 +22,7 @@
    - `obligation_ledger` / `obligations`：本 phase 的未完成義務
    - `blocking_gates` / `gates`：本 phase 的阻斷閘門
    - `generated_surfaces`：知識更新與 governance surface 快速路徑
-   - 若需修改 phase / obligation / gate / recovery 定義，source 是 [`runtime/compiler/embedded_data.rb`](runtime/compiler/embedded_data.rb)，不是已移除的 `runtime/phases/`、`runtime/obligations/`、`runtime/gates/` 或 `runtime/recovery/` YAML。
+   - 若需修改 phase / obligation / gate / recovery 定義，source 是 `runtime/phases/`、`runtime/obligations/`、`runtime/gates/`、`runtime/recovery/` 等 YAML；修改後用 `ai-skill runtime compile` 重建 `runtime/runtime.db`。
    - 若 phase 為 bootstrap → 繼續往下；若為其他 phase → 先檢查 blocking gates
 4. [Output Governance 初始化] 載入輸出規則（YAML 或 SQLite 皆可）：
    - 讀取 runtime/output-governance/language-policy.yaml（或查 SQLite language_policy 表）— 語言強制規則

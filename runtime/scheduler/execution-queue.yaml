@@ -1,0 +1,222 @@
+# Restored during compiler source migration.
+# Source of truth for Go-native ai-skill runtime compile.
+last_updated: "2026-05-15"
+owner_layer: runtime/scheduler
+queue_examples:
+    - execution_order:
+        - queue.execution.gate.01 (P0, no dependencies)
+        - queue.execution.obligation.01 (P2, no dependencies)
+        - queue.execution.obligation.02 (P2, no dependencies)
+      initial_queue:
+        - depends_on: []
+          estimated_cost:
+            steps: 1
+            tokens: 100
+          id: queue.execution.gate.01
+          priority: P0
+          ref: gate.phase_execution.all_obligations_met
+          status: pending
+          type: gate
+        - depends_on: []
+          estimated_cost:
+            steps: 1
+            tokens: 50
+          id: queue.execution.obligation.01
+          priority: P2
+          ref: obl.execution.log_actions
+          status: pending
+          type: obligation
+        - depends_on: []
+          estimated_cost:
+            steps: 2
+            tokens: 80
+          id: queue.execution.obligation.02
+          priority: P2
+          ref: obl.execution.track_artifacts
+          status: pending
+          type: obligation
+      phase: execution
+    - execution_order:
+        - queue.validation.gate.01 (P0, no dependencies)
+        - queue.validation.gate.02 (P0, no dependencies)
+        - queue.validation.obligation.01 (P1, no dependencies)
+        - queue.validation.obligation.02 (P1, depends on gate.01)
+      initial_queue:
+        - depends_on: []
+          estimated_cost:
+            steps: 1
+            tokens: 100
+          id: queue.validation.gate.01
+          priority: P0
+          ref: gate.phase_validation.linked_updates_complete
+          status: pending
+          type: gate
+        - depends_on: []
+          estimated_cost:
+            steps: 1
+            tokens: 100
+          id: queue.validation.gate.02
+          priority: P0
+          ref: gate.phase_validation.artifacts_complete
+          status: pending
+          type: gate
+        - depends_on: []
+          estimated_cost:
+            steps: 3
+            tokens: 200
+          id: queue.validation.obligation.01
+          priority: P1
+          ref: obl.validation.run_knowledge_runtime_validator
+          status: pending
+          type: obligation
+        - depends_on:
+            - queue.validation.gate.01
+          estimated_cost:
+            steps: 2
+            tokens: 150
+          id: queue.validation.obligation.02
+          priority: P1
+          ref: obl.validation.check_linked_updates
+          status: pending
+          type: obligation
+      phase: validation
+    - execution_order:
+        - queue.recovery.action.01 (P0, no dependencies)
+        - queue.recovery.repair.01 (P0, depends on action.01)
+        - queue.recovery.reconciliation.01 (P1, depends on repair.01)
+      initial_queue:
+        - depends_on: []
+          estimated_cost:
+            steps: 4
+            tokens: 300
+          id: queue.recovery.action.01
+          priority: P0
+          ref: strategy.unknown_failure
+          status: pending
+          type: action
+        - depends_on:
+            - queue.recovery.action.01
+          estimated_cost:
+            steps: 4
+            tokens: 200
+          id: queue.recovery.repair.01
+          priority: P0
+          ref: repair.state.current_phase_corrupted
+          status: pending
+          type: repair
+        - depends_on:
+            - queue.recovery.repair.01
+          estimated_cost:
+            steps: 5
+            tokens: 250
+          id: queue.recovery.reconciliation.01
+          priority: P1
+          ref: reconcile.phase.full_state_reconciliation
+          status: pending
+          type: reconciliation
+      phase: recovery
+queue_management_rules:
+    - description: 進入新 phase 時初始化 execution queue
+      id: queue.rule.init_on_phase_entry
+      name: Initialize Queue on Phase Entry
+      rule: |
+        載入 runtime.db phase_machine 中該 phase 的 blocking_gates 與 obligations， 加上 runtime.db blocking_gates 與 runtime.db obligation_ledger 的完整定義， 建立初始 queue。
+      trigger: phase transition
+    - description: queue 依 priority 降序排列
+      id: queue.rule.sort_by_priority
+      name: Sort by Priority
+      rule: P0 > P1 > P2 > P3，同 priority 內依 deadline 升序
+      trigger: 每次 queue 變更
+    - description: 有 depends_on 的項目必須在上游完成後才能執行
+      id: queue.rule.resolve_dependencies
+      name: Resolve Dependencies
+      rule: 如果 depends_on 中有未完成的項目，該項目設為 blocked
+      trigger: 每次 queue 變更
+    - description: 取出 queue 中 priority 最高且 dependencies 已滿足的項目
+      id: queue.rule.dequeue_next
+      name: Dequeue Next Runnable
+      rule: 過濾 status=pending 且所有 depends_on 皆為 completed 的項目，取 priority 最高者
+      trigger: 目前項目完成時
+    - description: 當項目執行失敗時的處理
+      id: queue.rule.handle_failure
+      name: Handle Item Failure
+      rule: |
+        如果 severity=critical → 阻斷 phase transition，進入 recovery phase。 如果 severity=high → 阻斷 transition 但可進入 recovery。 如果 severity=medium → 記錄 warning，繼續執行。
+      trigger: 項目 status=failed
+    - description: recovery phase 的 queue 優先於所有其他 queue
+      id: queue.rule.recovery_override
+      name: Recovery Override
+      rule: 當 current_phase=recovery 時，recovery queue 的項目提升至 P0
+      trigger: phase=recovery
+queue_structure:
+    description: |
+        每個 phase 有一個 execution queue，包含該 phase 的所有待執行項目。 Queue 是動態的：完成一個項目可能新增相依項目到 queue 中。
+    fields:
+        - description: 項目唯一識別碼
+          format: queue.{phase}.{type}.{seq}
+          name: id
+          type: string
+        - description: 所屬 phase
+          enum:
+            - bootstrap
+            - checkpoint
+            - execution
+            - validation
+            - commit
+            - push
+            - readback
+            - finalize
+            - recovery
+          name: phase
+          type: string
+        - description: 項目類型
+          enum:
+            - gate
+            - obligation
+            - action
+            - repair
+            - reconciliation
+          name: type
+          type: string
+        - description: 引用 runtime.db blocking_gates、runtime.db obligation_ledger 或 recovery 中的 id
+          name: ref
+          type: string
+        - description: 優先級
+          enum:
+            - P0
+            - P1
+            - P2
+            - P3
+          name: priority
+          type: string
+        - description: 執行狀態
+          enum:
+            - pending
+            - running
+            - completed
+            - failed
+            - skipped
+          name: status
+          type: string
+        - description: 此項目依賴的其他 queue item id
+          name: depends_on
+          type: list[string]
+        - description: 估計的資源消耗
+          name: estimated_cost
+          properties:
+            steps: integer
+            tokens: integer
+          type: object
+        - description: 應在多少步驟內完成（null = 無期限）
+          name: deadline
+          type: integer
+        - description: 執行結果
+          name: result
+          properties:
+            message: string
+            status: string
+            timestamp: string
+          type: object
+    name: Phase Execution Queue
+status: candidate
+version: 1

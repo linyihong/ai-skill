@@ -19,14 +19,14 @@
 | ID | Primary source | Model | Compression | Validation signal |
 | --- | --- | --- | --- | --- |
 | `route.bootstrap.ai-skill` | `CORE_BOOTSTRAP.md` | `small` | `summary-first` | Core Bootstrap 3 rules 已讀，git status 已檢查。 |
-| `route.runtime.phase-machine` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 目前 phase 已確認，allowed_actions 與 forbidden_actions 已載入，phase transition rules 已檢查。 |
-| `route.runtime.obligation-ledger` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 本 phase 的 obligations 已確認，pending obligations 已記錄，blocking gates 已檢查。 |
-| `route.runtime.blocking-gates` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 本 phase 的 blocking gates 已檢查，無未通過的 critical/high gates，phase transition 可進行。 |
-| `route.runtime.recovery` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 阻斷 gate 已對應到 strategy；retry limit、strategy change、domain policy、required reload set、execution graph rebuild 與 recovery validation 已檢查。 |
-| `route.runtime.scheduler` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | Queue 已依 priority 排序，blocking gates 優先於 obligations，dependencies 已解析。 |
-| `route.runtime.transactions` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | Transaction state 正確，所有 rules 已檢查，templates 已套用。 |
+| `route.runtime.phase-machine` | `runtime/phases/phase-machine.yaml` | `small` | `source-backed` | 目前 phase 已確認，allowed_actions 與 forbidden_actions 已載入，phase transition rules 已檢查。 |
+| `route.runtime.obligation-ledger` | `runtime/obligations/obligation-ledger.yaml` | `small` | `source-backed` | 本 phase 的 obligations 已確認，pending obligations 已記錄，blocking gates 已檢查。 |
+| `route.runtime.blocking-gates` | `runtime/gates/blocking-gates.yaml` | `small` | `source-backed` | 本 phase 的 blocking gates 已檢查，無未通過的 critical/high gates，phase transition 可進行。 |
+| `route.runtime.recovery` | `runtime/recovery/recovery-strategies.yaml` | `small` | `source-backed` | 阻斷 gate 已對應到 strategy；retry limit、strategy change、domain policy、required reload set、execution graph rebuild 與 recovery validation 已檢查。 |
+| `route.runtime.scheduler` | `runtime/scheduler/priority-scheduler.yaml` | `small` | `source-backed` | Queue 已依 priority 排序，blocking gates 優先於 obligations，dependencies 已解析。 |
+| `route.runtime.transactions` | `runtime/transactions/transaction-machine.yaml` | `small` | `source-backed` | Transaction state 正確，所有 rules 已檢查，templates 已套用。 |
 | `route.skill.discovery` | `knowledge/runtime/routing-registry.yaml` | `small` | `index-only` | Task intent 已對應到 routing-registry.yaml 的 triggers，entrypoint 與 summary path 可解析。 |
-| `route.runtime.activation-rules` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。 |
+| `route.runtime.activation-rules` | `runtime/router/activation-rules.yaml` | `small` | `index-only` | 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。 |
 | `route.runtime.context-ttl` | `governance/ai-runtime-governance/context-attention-governance.md` | `small` | `summary-first` | Summary-first、attention budget、decision externalization、recap checkpoint 與 task-boundary prune 已檢查；必要時再讀 TTL policy。 |
 | `route.runtime.prompt-cache-alignment` | `runtime/context/prompt-cache-playbook.md` | `small` | `summary-first` | Prompt cache playbook、enforcement rule、metadata provider_cache 欄位與 activation rule 已同步。 |
 | `route.governance.durable-goal-boundary` | `enforcement/conversation-goal-ledger.md` | `large` | `source-backed` | 長期狀態已落到 durable planning 文件，且 active goal 完成後才刪除。 |
@@ -63,8 +63,8 @@
 | `route.tools.metadata-routing` | `tools/README.md` | `small` | `index-only` | Tool metadata 已定義，compression 策略與 routing 規則已建立。 |
 | `route.traces.decision-traces` | `traces/README.md` | `small` | `index-only` | Trace 記錄已依 scenario 分類存放，格式與 template 一致。 |
 | `route.anti-patterns.runtime-patterns` | `anti-patterns/README.md` | `small` | `summary-first` | Anti-pattern 已依格式記錄，症狀、預防與恢復方式已定義。 |
-| `route.runtime.compiler` | `runtime/compiler/embedded_data.rb` | `small` | `source-backed` | 所有 modified sources 已編譯，runtime.db 的 generated_surfaces 表包含最新記錄，`ai-skill runtime validate` 回傳 exit 0。 |
-| `route.runtime.intelligence-routing` | `runtime/compiler/embedded_data.rb` | `small` | `index-only` | Task intent 已對應到 intelligence-routing.yaml 的 domain，applicable_phases 已檢查，domain README 已載入。 |
+| `route.runtime.compiler` | `runtime/compiler/compiler-rules.yaml` | `small` | `source-backed` | 所有 modified sources 已編譯，runtime.db 的 generated_surfaces 表包含最新記錄，`ai-skill runtime validate` 回傳 exit 0。 |
+| `route.runtime.intelligence-routing` | `runtime/intelligence/intelligence-routing.yaml` | `small` | `index-only` | Task intent 已對應到 intelligence-routing.yaml 的 domain，applicable_phases 已檢查，domain README 已載入。 |
 | `route.runtime.output-governance` | `runtime/output-governance/` | `small` | `source-backed` | Language consistency 已確認，sanitization 已通過，tool neutrality 已檢查， format compliance 已驗證，governance gates 全部通過。  |
 | `route.runtime.distributed` | `runtime/distributed/` | `small` | `source-backed` | Distributed locks 已正確 acquire/release，multi-agent coordination rules 已遵守， async job lifecycle 狀態轉換正確，無 deadlock 或 stale state。  |
 | `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.md` | `small` | `source-backed` | 目前 knowledge update 的步驟已確認，entry conditions 已滿足，exit conditions 已檢查，reference sources 已載入；linked update completeness gates 已通過， 下一步驟已決定。  |

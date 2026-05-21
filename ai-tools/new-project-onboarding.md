@@ -97,7 +97,7 @@ code .   # 或 cursor . 或 claude .
 
 | 工具 | 方式 | 狀態 |
 |------|------|------|
-| **Roo Code** | 全域 Custom Instructions（VS Code SQLite `state.vscdb`）→ 指向 `CORE_BOOTSTRAP.md` | 需關閉 VS Code 後執行 [`scripts/set-roo-global-custom-instructions.py`](../scripts/set-roo-global-custom-instructions.py) |
+| **Roo Code** | 全域 Custom Instructions（VS Code SQLite `state.vscdb`）→ 指向 `CORE_BOOTSTRAP.md` | 需關閉 VS Code 後執行 `ai-skill roo set-global-custom-instructions` |
 | **Cursor** | User Rules（`~/.cursor/rules/`）→ alwaysApply `CORE_BOOTSTRAP.md` | 手動設定一次，所有專案生效 |
 | **Claude Code** | 無全域機制 | 只能靠專案 `CLAUDE.md` |
 
@@ -105,7 +105,7 @@ code .   # 或 cursor . 或 claude .
 
 ```bash
 # Roo Code 全域設定（需先關閉 VS Code）
-./scripts/set-roo-global-custom-instructions.py
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 roo set-global-custom-instructions
 
 # Cursor 全域設定
 mkdir -p ~/.cursor/rules
@@ -179,7 +179,7 @@ ls -la /path/to/project/.agent-goals/README.md
 ## 與既有文件的關係
 
 - [`scripts/init-new-project.sh`](../scripts/init-new-project.sh) — 初始化腳本本體
-- [`scripts/set-roo-global-custom-instructions.py`](../scripts/set-roo-global-custom-instructions.py) — Roo Code 全域設定寫入腳本
+- [`ai-skill roo set-global-custom-instructions`](../ai-skill roo set-global-custom-instructions) — Roo Code 全域設定寫入腳本
 - [`scripts/sync-cursor-bundle.sh`](../scripts/sync-cursor-bundle.sh) — Cursor bundle 同步（可選）
 - [`ai-tools/agent-onboarding.md`](agent-onboarding.md) — 新 AI 工具 onboarding（不是新專案）
 - [`ai-tools/agent/roo.md`](agent/roo.md) — Roo Code 使用說明

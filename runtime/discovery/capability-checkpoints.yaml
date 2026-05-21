@@ -1,0 +1,125 @@
+# Restored during compiler source migration.
+# Source of truth for Go-native ai-skill runtime compile.
+checkpoints:
+    - description: |
+        在進入 execution 前，搜尋與本輪任務相關的能力。 此 checkpoint 確保 agent 不會因為不知道某個 workflow 或 intelligence atom 而採用次佳策略。
+      discovery_targets:
+        - description: 搜尋與任務意圖相關的工作流程
+          failure_action: warn + continue
+          min_confidence: medium
+          search_sources:
+            - knowledge/indexes/README.md
+            - knowledge/runtime/routing-registry.yaml
+          type: workflow
+        - description: 搜尋與任務領域相關的 intelligence atoms
+          failure_action: warn + continue
+          min_confidence: low
+          search_sources:
+            - knowledge/graphs/README.md
+            - intelligence/README.md
+          type: intelligence
+        - description: 搜尋與任務相關的驗證規則與 failure patterns
+          failure_action: ignore
+          min_confidence: low
+          search_sources:
+            - enforcement/failure-patterns/README.md
+            - validation/README.md
+          type: validation_rules
+        - description: 搜尋與任務相關的治理規則（系統升級、知識更新等）
+          failure_action: ignore
+          min_confidence: low
+          search_sources:
+            - governance/lifecycle/README.md
+            - governance/validation/README.md
+          type: governance
+        - description: 搜尋與任務領域相關的分析方法與觀察框架（analysis/）。當任務涉及分析外部系統、工具、程式庫或新領域時，應檢查 analysis/ 下是否有對應的分析方法。
+          failure_action: warn + continue
+          min_confidence: medium
+          search_sources:
+            - analysis/README.md
+          type: analysis
+      phase: phase.checkpoint
+      trigger: before_execution
+    - description: |
+        在執行過程中，當遇到未知領域或技術問題時，主動搜尋相關 intelligence。 此 checkpoint 是「on-demand discovery」，只在需要時觸發。
+      discovery_targets:
+        - description: 搜尋與當前程式語言相關的 intelligence atoms
+          failure_action: ignore
+          min_confidence: low
+          search_sources:
+            - intelligence/engineering/language-specific/README.md
+          type: language_specific
+        - description: 搜尋與當前分析任務相關的啟發式規則
+          failure_action: ignore
+          min_confidence: low
+          search_sources:
+            - intelligence/engineering/analytical-reasoning/README.md
+          type: analytical_reasoning
+        - description: 搜尋與當前操作相關的已知失效模式
+          failure_action: ignore
+          min_confidence: low
+          search_sources:
+            - enforcement/failure-patterns/README.md
+          type: failure_patterns
+      phase: phase.execution
+      trigger: during_execution
+    - description: |
+        在執行驗證前，搜尋與本輪產出相關的驗證規則與 scenarios。 此 checkpoint 確保 agent 不會遺漏重要的驗證項目。
+      discovery_targets:
+        - description: 搜尋與本輪產出相關的 validation scenarios
+          failure_action: warn + continue
+          min_confidence: medium
+          search_sources:
+            - validation/README.md
+          type: validation_scenarios
+        - description: 搜尋 output governance 規則
+          failure_action: warn + continue
+          min_confidence: medium
+          search_sources:
+            - runtime/output-governance/README.md
+          type: output_governance
+        - description: 搜尋需要連動更新的相關檔案
+          failure_action: warn + continue
+          min_confidence: high
+          search_sources:
+            - enforcement/linked-updates.md
+          type: linked_updates
+      phase: phase.validation
+      trigger: before_validation
+    - description: |
+        在完成前，搜尋 writeback 需求與 transaction 相關規則。 此 checkpoint 確保 agent 不會遺漏回寫步驟。
+      discovery_targets:
+        - description: 搜尋回寫需求與 transaction gates
+          failure_action: warn + continue
+          min_confidence: high
+          search_sources:
+            - runtime/runtime.db:transaction_states
+            - enforcement/dependency-reading.md
+          type: writeback_requirements
+        - description: 搜尋完成條件與 close-loop 規則
+          failure_action: warn + continue
+          min_confidence: high
+          search_sources:
+            - enforcement/conversation-goal-ledger.md
+            - scripts/ai-skill-close-loop.sh
+          type: completion_criteria
+      phase: phase.finalize
+      trigger: before_finalize
+description: |
+    Phase-aware capability discovery checkpoints. 定義 agent 在每個 phase 中 應主動探索的能力類型與搜尋來源。Discovery 是 meta-cognitive 層的操作， 與 lazy-loading（activation rules）互補：activation 被動回應已知條件， discovery 主動搜尋未知能力。
+discovery_checkpoints_version: v1
+owner_layer: runtime/compiler
+search_strategy:
+    fallback:
+        - description: 掃描相關目錄結構，尋找未在索引中註冊的檔案
+          max_depth: 2
+          type: directory_scan
+        - description: 使用 regex 搜尋關鍵字
+          max_results: 10
+          type: grep_search
+    min_confidence_threshold: low
+    priority_order:
+        - knowledge/indexes/README.md
+        - knowledge/graphs/README.md
+        - knowledge/runtime/routing-registry.yaml
+status: active

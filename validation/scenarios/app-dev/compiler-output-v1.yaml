@@ -1,11 +1,11 @@
 # Compiler Output Scenario
-# 測試 compiler-engine.rb 是否能從 workflow/software-delivery/execution-flow.md
+# 測試 Go-native runtime compiler 是否能從 workflow/software-delivery/execution-flow.md
 # 正確提取 phase definitions、allowed_actions、blocking_gates、tables
 # 並產出結構化的 runtime.db（generated_surfaces 表）
 #
 # 來源 compiler rule:
 #   - runtime/compiler/compiler-rules.yaml (source_target_mapping[0])
-#   - runtime/compiler/compiler-engine.rb (compile_workflow_phases)
+#   - scripts/ai-skill-cli/internal/app/runtime_compiler.go (compile_workflow_phases)
 
 id: compiler-output-v1
 domain: app-dev
@@ -16,7 +16,7 @@ given:
   task: compile_workflow_phases
   artifacts:
     - runtime/compiler/compiler-rules.yaml
-    - runtime/compiler/compiler-engine.rb
+    - scripts/ai-skill-cli/internal/app/runtime_compiler.go
     - workflow/software-delivery/execution-flow.md
     - runtime/runtime.db
   signals:
@@ -25,10 +25,10 @@ given:
     - 部分章節包含 blocking conditions（如「是阻擋項」）
     - compiler-rules.yaml 宣告 extract: [phase_definitions, allowed_actions, forbidden_actions, blocking_gates]
   constraints:
-    - compiler-engine.rb 的 extract_phase_sections 按 ## N. 標題分割區塊
-    - compiler-engine.rb 的 extract_allowed_actions_from_section 從表格和 bullet list 提取
-    - compiler-engine.rb 的 extract_blocking_gates_from_section 從「阻擋項」和「禁止」條件提取
-    - compiler-engine.rb 的 extract_tables_from_section 提取結構化 markdown 表格
+    - Go compiler 的 workflow phase extraction 按 ## N. 標題分割區塊
+    - Go compiler 從表格和 bullet list 提取 allowed_actions
+    - Go compiler 從「阻擋項」和「禁止」條件提取 blocking_gates
+    - Go compiler 提取結構化 markdown 表格
     - "強化後的 generated YAML 的 gates 不為空陣列"
 
 when:

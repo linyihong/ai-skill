@@ -17,7 +17,7 @@ At session start or when taking over a task, load the **Core Bootstrap** (3 rule
    - `phase_machine` / `phases` — current phase state
    - `obligation_ledger` / `obligations` — phase obligations
    - `blocking_gates` / `gates` — phase blocking gates
-   - Runtime phase / obligation / gate / recovery source is [runtime/compiler/embedded_data.rb](../../runtime/compiler/embedded_data.rb); do not reference removed `runtime/phases/`, `runtime/obligations/`, `runtime/gates/`, or `runtime/recovery/` YAML.
+   - Runtime phase / obligation / gate / recovery source is `runtime/phases/`, `runtime/obligations/`, `runtime/gates/`, and `runtime/recovery/` YAML; rebuild [runtime/runtime.db](../../runtime/runtime.db) with `ai-skill runtime compile` after source edits.
 6. Load Output Governance initialization:
    - [runtime/output-governance/language-policy.yaml](../../runtime/output-governance/language-policy.yaml) — language enforcement rules
    - [runtime/output-governance/output-rules.yaml](../../runtime/output-governance/output-rules.yaml) — document output rules
