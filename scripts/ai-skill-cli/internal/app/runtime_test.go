@@ -53,6 +53,51 @@ func TestRuntimeValidateBlocksMissingRubyBeforeWrapper(t *testing.T) {
 	}
 }
 
+func TestRuntimeRefreshDryRunPlansWrapperCommands(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--dry-run", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Command != "runtime refresh" || result.Mode != "dry_run" {
+		t.Fatalf("unexpected result identity: %#v", result)
+	}
+	if len(result.PlannedActions) != 7 {
+		t.Fatalf("expected seven planned refresh scripts, got %#v", result.PlannedActions)
+	}
+	if len(result.Mutations) != 0 {
+		t.Fatalf("runtime refresh dry-run must not mutate, got %#v", result.Mutations)
+	}
+}
+
+func TestRuntimeRefreshBlocksMissingRubyBeforeWrapper(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	t.Setenv("PATH", emptyPathDir(t))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitMissingDependency {
+		t.Fatalf("expected missing dependency, got %d; stderr=%s", code, stderr.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Error == nil || result.Error.Code != "missing_ruby" {
+		t.Fatalf("expected missing_ruby, got %#v", result.Error)
+	}
+}
+
 func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
 	repo := t.TempDir()
 	writeFile(t, filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb"), "# ok\n")
@@ -68,7 +113,7 @@ func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
 func TestRuntimeUnsupportedSubcommandReturnsInvalidUsage(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "compile"}, &stdout, &stderr)
 	if code != ExitInvalidUsage {
 		t.Fatalf("expected invalid usage, got %d", code)
 	}
@@ -91,6 +136,11 @@ func fakeRuntimeRepo(t *testing.T) string {
 	t.Helper()
 	repo := t.TempDir()
 	for _, name := range []string{
+		"generate-model-context-report.rb",
+		"generate-model-checklists.rb",
+		"generate-knowledge-runtime-report.rb",
+		"generate-runtime-sqlite-index.rb",
+		"refresh-knowledge-runtime.rb",
 		"validate-knowledge-runtime.rb",
 		"validate-runtime-db.rb",
 		"validate-runtime-sqlite-index.rb",

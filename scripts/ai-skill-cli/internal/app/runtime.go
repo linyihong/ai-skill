@@ -24,18 +24,18 @@ type runtimeValidator struct {
 
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime validate [flags]")
+		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh> [flags]")
 		return ExitInvalidUsage
 	}
 	opts := runtimeOptions{command: args[0]}
-	if opts.command != "validate" {
+	if opts.command != "validate" && opts.command != "refresh" {
 		_, _ = fmt.Fprintf(stderr, "unsupported runtime command: %s\n", opts.command)
 		return ExitInvalidUsage
 	}
 
-	fs := newFlagSet("runtime validate", stderr)
+	fs := newFlagSet("runtime "+opts.command, stderr)
 	fs.StringVar(&opts.repoPath, "repo", ".", "Ai-skill repository path")
-	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview runtime validators without executing")
+	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview runtime wrapper scripts without executing")
 	fs.BoolVar(&opts.jsonOutput, "json", false, "write machine-readable JSON output")
 	fs.BoolVar(&opts.plainOutput, "plain", false, "write human-readable output")
 	if err := fs.Parse(args[1:]); err != nil {
@@ -46,7 +46,7 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 		return ExitInvalidUsage
 	}
 
-	result := buildRuntimeValidateResult(opts)
+	result := buildRuntimeResult(opts)
 	if opts.jsonOutput {
 		if err := writeJSON(stdout, result); err != nil {
 			_, _ = fmt.Fprintf(stderr, "write output: %v\n", err)
@@ -59,6 +59,15 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 		return ExitGeneralFailure
 	}
 	return result.ExitCode
+}
+
+func buildRuntimeResult(opts runtimeOptions) Result {
+	switch opts.command {
+	case "refresh":
+		return buildRuntimeRefreshResult(opts)
+	default:
+		return buildRuntimeValidateResult(opts)
+	}
 }
 
 func buildRuntimeValidateResult(opts runtimeOptions) Result {
@@ -134,12 +143,110 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 	return result
 }
 
+func buildRuntimeRefreshResult(opts runtimeOptions) Result {
+	result := Result{
+		Command:        "runtime refresh",
+		Mode:           "wrapper",
+		Status:         "success",
+		ExitCode:       ExitSuccess,
+		Checks:         []Check{},
+		PlannedActions: []string{},
+		Mutations:      []string{},
+	}
+	if opts.dryRun {
+		result.Mode = "dry_run"
+	}
+
+	repo, repoCheck := resolveExistingDir("repo", opts.repoPath)
+	result.Checks = append(result.Checks, repoCheck)
+	if repoCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitInvalidUsage
+		result.Error = &CommandError{Code: "invalid_repo", Message: repoCheck.Message, Remediation: "Pass --repo with the Ai-skill repository root."}
+		return result
+	}
+
+	for _, script := range runtimeRefreshScripts(repo) {
+		result.PlannedActions = append(result.PlannedActions, "run ruby refresh step: "+script)
+		if _, err := os.Stat(script); err != nil {
+			result.Status = "blocked"
+			result.ExitCode = ExitValidationFailed
+			result.Error = &CommandError{Code: "missing_runtime_script", Message: script, Remediation: "Run from a complete Ai-skill checkout."}
+			result.Checks = append(result.Checks, Check{Name: filepath.Base(script), Status: "missing", Message: script})
+			return result
+		}
+	}
+
+	wrapper := filepath.Join(repo, "scripts", "refresh-knowledge-runtime.rb")
+	if opts.dryRun {
+		result.Checks = append(result.Checks, Check{Name: "wrapper_mode", Status: "ok", Message: "dry-run only; refresh wrapper not executed"})
+		return result
+	}
+
+	ruby, rubyCheck := requiredExecutable("ruby", []string{"--version"}, "Install Ruby to use wrapper-mode runtime refresh until native Go refresh replaces it.")
+	result.Checks = append(result.Checks, rubyCheck)
+	if rubyCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitMissingDependency
+		result.Error = &CommandError{Code: "missing_ruby", Message: "Ruby is required for runtime refresh wrapper mode.", Remediation: rubyCheck.Remediation}
+		return result
+	}
+
+	sqlite, sqliteCheck := requiredExecutable("sqlite3", []string{"--version"}, "Install sqlite3 CLI for wrapper-mode runtime refresh until native Go SQLite refresh replaces it.")
+	result.Checks = append(result.Checks, sqliteCheck)
+	if sqliteCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitMissingDependency
+		result.Error = &CommandError{Code: "missing_sqlite3", Message: "sqlite3 CLI is required for runtime refresh wrapper mode.", Remediation: sqliteCheck.Remediation}
+		return result
+	}
+	_ = sqlite
+
+	git, gitCheck := requiredExecutable("git", []string{"--version"}, "Install Git because wrapper-mode runtime refresh validates generated SQLite index git-ignore boundaries.")
+	result.Checks = append(result.Checks, gitCheck)
+	if gitCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitMissingDependency
+		result.Error = &CommandError{Code: "missing_git", Message: "Git is required for runtime refresh wrapper mode.", Remediation: gitCheck.Remediation}
+		return result
+	}
+	_ = git
+
+	check := runRuntimeScript(repo, ruby, "runtime_refresh", wrapper)
+	result.Checks = append(result.Checks, check)
+	if check.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "runtime_refresh_failed", Message: check.Message, Remediation: "Inspect refresh output and fix the failing generator or validator."}
+		return result
+	}
+
+	return result
+}
+
 func runtimeValidators(repo string) []runtimeValidator {
 	return []runtimeValidator{
 		{name: "knowledge_runtime", path: filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb")},
 		{name: "runtime_db", path: filepath.Join(repo, "scripts", "validate-runtime-db.rb")},
 		{name: "runtime_sqlite_index", path: filepath.Join(repo, "scripts", "validate-runtime-sqlite-index.rb")},
 	}
+}
+
+func runtimeRefreshScripts(repo string) []string {
+	names := []string{
+		"generate-model-context-report.rb",
+		"generate-model-checklists.rb",
+		"generate-knowledge-runtime-report.rb",
+		"generate-runtime-sqlite-index.rb",
+		"validate-runtime-sqlite-index.rb",
+		"validate-knowledge-runtime.rb",
+		"refresh-knowledge-runtime.rb",
+	}
+	scripts := make([]string, 0, len(names))
+	for _, name := range names {
+		scripts = append(scripts, filepath.Join(repo, "scripts", name))
+	}
+	return scripts
 }
 
 func requiredExecutable(name string, args []string, remediation string) (string, Check) {
@@ -155,7 +262,11 @@ func requiredExecutable(name string, args []string, remediation string) (string,
 }
 
 func runRuntimeValidator(repo string, ruby string, validator runtimeValidator) Check {
-	cmd := exec.Command(ruby, validator.path)
+	return runRuntimeScript(repo, ruby, validator.name, validator.path)
+}
+
+func runRuntimeScript(repo string, ruby string, name string, path string) Check {
+	cmd := exec.Command(ruby, path)
 	cmd.Dir = repo
 	cmd.Env = runtimeWrapperEnv(os.Environ())
 	output, err := cmd.CombinedOutput()
@@ -164,12 +275,12 @@ func runRuntimeValidator(repo string, ruby string, validator runtimeValidator) C
 		if message == "" {
 			message = err.Error()
 		}
-		return Check{Name: validator.name, Status: "failed", Message: message}
+		return Check{Name: name, Status: "failed", Message: message}
 	}
 	if message == "" {
 		message = "ok"
 	}
-	return Check{Name: validator.name, Status: "ok", Message: message}
+	return Check{Name: name, Status: "ok", Message: message}
 }
 
 func runtimeWrapperEnv(base []string) []string {

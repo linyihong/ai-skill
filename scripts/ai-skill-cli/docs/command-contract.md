@@ -221,6 +221,7 @@
 輸入：
 
 - `--dry-run`
+- `--repo <path>`
 - `--json`
 - `--plain`
 - `--assert-source <path>`
@@ -235,6 +236,8 @@
 - 必須回報哪些 generated surfaces 被更新、哪些 validator 被執行。
 - 若仍處 wrapper mode 且 Ruby 缺失，回傳 `missing_dependency` 並說明該能力尚未 native。
 - 不得只更新部分 generated surface 後回傳 success。
+- Phase 3 初始切片使用 wrapper mode 呼叫 `refresh-knowledge-runtime.rb`；dry-run 只列出將執行的 generator / validator scripts，不寫入 generated surfaces。
+- wrapper mode 必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`，缺 Ruby、`sqlite3` CLI 或 Git 時必須回傳 `missing_dependency`。
 
 ### `ai-skill runtime compile`
 
