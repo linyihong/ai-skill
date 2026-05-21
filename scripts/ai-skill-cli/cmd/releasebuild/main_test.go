@@ -97,7 +97,7 @@ func readBuildInfo(t *testing.T, path string) map[string]string {
 	for _, line := range strings.Split(string(content), "\n") {
 		key, value, ok := strings.Cut(line, "=")
 		if ok {
-			result[key] = value
+			result[strings.TrimSpace(key)] = strings.TrimSpace(value)
 		}
 	}
 	return result
