@@ -161,6 +161,7 @@
 輸入：
 
 - `--dry-run`
+- `--repo <path>`
 - `--target <path>`
 - `--json`
 - `--plain`
@@ -169,12 +170,15 @@
 
 - dry-run：列出會同步的來源與目標。
 - 寫入模式：可能建立、更新或刪除目標 mirror 內的受管理檔案。
+- Phase 2 初始切片只開放 dry-run planner；write mode 在 managed mirror 與 symlink/copy fallback parity 完成前必須回傳 `partial_close_loop_blocked`。
 
 必要行為：
 
 - Reference-only 工作流不應自動執行此命令。
+- `--target` 必須明確傳入 Cursor root / fake Cursor root，不得預設寫入真實 `$HOME`。
 - 必須區分 managed mirror content 與使用者自訂檔案，避免刪除非本工具管理的內容。
 - 權限不足時回傳 `permission_denied`，不得半同步後宣稱完成。
+- Windows / 權限受限環境的預設策略是 copy fallback；symlink 只能作為未來明確 opt-in 並通過權限 fixture 後啟用。
 
 ### `ai-skill close-loop`
 

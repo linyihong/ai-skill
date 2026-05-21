@@ -56,3 +56,11 @@ Android 可行性必須分開評估：
 | 缺寫入權限 | 阻斷寫入命令 |
 | merge / rebase / cherry-pick 狀態 | 阻斷 commit / push |
 | 不支援的平台 | 回傳穩定的 `unsupported_platform` exit code |
+
+## Mirror 策略
+
+`sync-cursor-bundle` 的跨平台預設策略是 copy fallback：
+
+- Windows、受限權限或未明確允許 symlink 的環境，一律規劃 copy / replace managed mirror content。
+- symlink 只作為未來明確 opt-in；啟用前必須有權限檢查與 managed / unmanaged target fixture。
+- dry-run 必須以明確 `--target` 指向 fake Cursor root 或使用者指定 root，不得預設寫入真實 `$HOME`。

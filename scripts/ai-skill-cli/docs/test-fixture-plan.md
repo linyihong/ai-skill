@@ -17,6 +17,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/missing-git-path` | PATH 中沒有 Git | `doctor` / `close-loop` 阻斷並提供安裝指引 |
 | `fixture/fake-home` | home / Cursor bundle 隔離 | 不寫入真實使用者 home |
 | `fixture/windows-paths` | path separator 與 drive 處理 | 正規化後路徑符合 contract |
+| `fixture/cursor-mirror-copy-fallback` | Cursor mirror 策略 | Windows / 權限受限環境預設 copy fallback；symlink 只允許明確 opt-in |
 | `fixture/runtime-source-change` | runtime.db assertion | source keyword 出現在 generated surface |
 | `fixture/legacy-script-parity` | 舊腳本覆蓋率驗證 | 每個 native target / wrapper first 舊入口都有命令映射與測試證據 |
 
@@ -103,6 +104,7 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 - Phase 2 已用 `init-project --dry-run` fake project tests 覆蓋 planned actions、既有檔案 conflict、`--force`、plain output 與無寫入 assertion。
 - Phase 2 已用 temporary git repo tests 覆蓋 `close-loop --dry-run` clean repo、dirty owner group、active lock、merge/rebase state、unknown path block 與 missing Git block；commit / push write mode 仍阻斷，待 parity fixture 完成後再開啟。
 - Phase 2 已用 temporary git repo tests 覆蓋 `hooks install --dry-run` source / target / conflict / force、merge state warning、missing Git 與無寫入 assertion；copy / chmod write mode 仍阻斷，待 parity fixture 完成後再開啟。
+- Phase 2 已用 fake target tests 覆蓋 `sync-cursor-bundle --dry-run` 明確 target、target 不可在 repo 內、copy-fallback mirror strategy、技能 mirror planning 與無寫入 assertion；write mode 仍阻斷，待 managed mirror parity 完成後再開啟。
 
 ## 產物關卡
 

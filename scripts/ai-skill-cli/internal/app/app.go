@@ -23,6 +23,8 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runCloseLoop(args[1:], stdout, stderr)
 	case "hooks":
 		return runHooks(args[1:], stdout, stderr)
+	case "sync-cursor-bundle":
+		return runSyncCursorBundle(args[1:], stdout, stderr)
 	case "help", "-h", "--help":
 		printUsage(stdout)
 		return ExitSuccess
@@ -41,6 +43,7 @@ func printUsage(w io.Writer) {
 	_, _ = fmt.Fprintln(w, "  goals    inspect or plan project-local goal ledger changes")
 	_, _ = fmt.Fprintln(w, "  close-loop    inspect repository close-loop readiness")
 	_, _ = fmt.Fprintln(w, "  hooks    inspect or plan Git hook installation")
+	_, _ = fmt.Fprintln(w, "  sync-cursor-bundle    plan Cursor bundle mirror sync")
 }
 
 func newFlagSet(name string, stderr io.Writer) *flag.FlagSet {
