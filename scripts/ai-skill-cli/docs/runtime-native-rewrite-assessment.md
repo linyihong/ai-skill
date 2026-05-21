@@ -22,7 +22,7 @@
 | `scripts/generate-runtime-sqlite-index.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定臨時 SQLite index row counts 與 FTS hit；完整 native 前仍需 Ruby vs Go parity。 | golden DB row counts、FTS fixture 已覆蓋；checksum parity 待 Go generator slice。 |
 | `scripts/generate-knowledge-runtime-report.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定 runtime report anchors，且以 stdout 產生避免寫 production report。 | routing registry / summaries / graphs golden anchors 已覆蓋。 |
 | `scripts/generate-model-context-report.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定 model context report anchors；Go-native builder 已建立 byte-for-byte Ruby stdout parity guard，但尚未接 production refresh。 | profile / compression grouping anchors 已覆蓋；Ruby vs Go exact output parity 已覆蓋。 |
-| `scripts/generate-model-checklists.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定 checklist report anchors。 | per-model checklist anchors 已覆蓋。 |
+| `scripts/generate-model-checklists.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定 checklist report anchors；Go-native builder 已建立 byte-for-byte Ruby stdout parity guard，但尚未接 production refresh。 | per-model checklist anchors 已覆蓋；Ruby vs Go exact output parity 已覆蓋。 |
 | `scripts/refresh-knowledge-runtime.rb` | `ai-skill runtime refresh` | 低 | 保持 Ruby entrypoint，但 Go wrapper mode 已逐步執行同一批 generator / validator steps，以取得 ordered evidence 與 first-failure block。 | partial failure blocks success、ordered step summary、no partial success fixture 已覆蓋。 |
 | `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | 低 | 保持 wrapper。不得直接替換 production compiler；先建立 Ruby vs Go parity test。 | runtime source keyword、`--check` no-op、`runtime.db` generated surface assertion、schema parity。 |
 | `scripts/migrate-runtime-config-to-sqlite.rb` | `ai-skill runtime migrate` / `compile` | Deferred | 暫不改寫，現有 compiler path 已吸收大部分需求。 | idempotent migration fixture。 |
@@ -31,6 +31,6 @@
 
 ## 下一步
 
-1. 繼續補 generator-level Ruby vs Go parity：下一個 read-mostly target 可選 `generate-model-checklists.rb` 或 `generate-knowledge-runtime-report.rb`。
+1. 繼續補 generator-level Ruby vs Go parity：下一個 read-mostly target 可選 `generate-knowledge-runtime-report.rb`。
 2. Generator / compiler 只能在 golden fixture 與 Ruby vs Go parity test 都通過後替換。
 3. Compiler 仍不得直接替換；需另建 schema / generated surface parity test。

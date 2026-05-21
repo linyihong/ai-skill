@@ -52,9 +52,11 @@ type runtimeRoutingRegistry struct {
 }
 
 type runtimeRouteRecord struct {
-	ID            string            `yaml:"id"`
-	PrimarySource string            `yaml:"primary_source"`
-	Model         runtimeRouteModel `yaml:"model"`
+	ID                   string            `yaml:"id"`
+	PrimarySource        string            `yaml:"primary_source"`
+	RequiredDependencies []string          `yaml:"required_dependencies"`
+	ValidationSignal     string            `yaml:"validation_signal"`
+	Model                runtimeRouteModel `yaml:"model"`
 }
 
 type runtimeRouteModel struct {
@@ -1204,6 +1206,88 @@ func buildNativeModelContextReport(repo string) (string, error) {
 	return strings.Join(lines, "\n"), nil
 }
 
+func buildNativeModelChecklists(repo string) (string, error) {
+	registry, err := readRuntimeRoutingRegistry(filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"))
+	if err != nil {
+		return "", err
+	}
+	records := registry.Records
+	lines := []string{
+		"# Model Checklists",
+		"",
+		"本檔由 `ruby scripts/generate-model-checklists.rb --write` 產生，將 routing registry 中的 model profile / compression level 轉成 agent 可直接使用的 context-loading checklist。",
+		"",
+		"## Source Surfaces",
+		"",
+		"| Surface | Path | Purpose |",
+		"| --- | --- | --- |",
+		"| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 提供 route、primary source、dependencies、model profile 與 compression level。 |",
+		"| Model profiles | [`../../models/profiles/README.md`](../../models/profiles/README.md) | 定義 profile guardrails。 |",
+		"| Compression strategy | [`../../models/compression/README.md`](../../models/compression/README.md) | 定義 escalation rules。 |",
+		"",
+		"## Profile Checklists",
+		"",
+	}
+
+	for _, profile := range sortedRouteGroupKeys(records, func(record runtimeRouteRecord) string {
+		return record.Model.Profile
+	}) {
+		displayProfile := profile
+		if displayProfile == "" {
+			displayProfile = "unspecified"
+		}
+		lines = append(lines,
+			"### `"+runtimeMDEscape(displayProfile)+"`",
+			"",
+			"Guardrails:",
+			"",
+		)
+		for _, item := range runtimeProfileGuardrails(profile) {
+			lines = append(lines, "- "+item)
+		}
+		lines = append(lines,
+			"",
+			"| Route | Checklist |",
+			"| --- | --- |",
+		)
+		for _, record := range records {
+			if record.Model.Profile != profile {
+				continue
+			}
+			dependencies := []string{}
+			for _, path := range record.RequiredDependencies {
+				dependencies = append(dependencies, "`"+path+"`")
+			}
+			checklist := strings.Join([]string{
+				"Primary: `" + record.PrimarySource + "`",
+				"Compression: `" + record.Model.CompressionLevel + "`",
+				"Required: " + strings.Join(dependencies, "<br>"),
+				"Validation: " + runtimeMDEscape(record.ValidationSignal),
+			}, "<br>")
+			lines = append(lines, "| `"+runtimeMDEscape(record.ID)+"` | "+checklist+" |")
+		}
+		lines = append(lines, "")
+	}
+
+	lines = append(lines,
+		"## Escalation Checklist",
+		"",
+		"- Summary / registry 與 source-of-truth 可能不一致時，讀全文。",
+		"- 任務需要修改、commit、push、readback 或 promotion 時，升級到 `source-backed`。",
+		"- 涉及 safety、secrets、authorization、source/mirror 或 destructive actions 時，升級到 full source 和 enforcement rules。",
+		"- Routing registry 指向 candidate path，但 old entrypoint 仍 active 時，保留 old entrypoint gate。",
+		"- Validation signal 不足以支持結論時，停止並讀 required dependencies。",
+		"",
+		"## Validation",
+		"",
+		"- 產生前應先確認 `routing-registry.yaml` 可通過 `ruby scripts/validate-knowledge-runtime.rb`。",
+		"- 產生後應重新執行 `ruby scripts/validate-knowledge-runtime.rb`，檢查本 report links。",
+		"- 本檔是 generated view，不取代 model source docs 或 routing registry。",
+		"",
+	)
+	return strings.Join(lines, "\n"), nil
+}
+
 func readRuntimeRoutingRegistry(path string) (runtimeRoutingRegistry, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
@@ -1246,6 +1330,34 @@ func runtimeCompressionEscalationNote(level string) string {
 		return "需要 graph records 輔助 dependency / conflict / promotion reasoning。"
 	default:
 		return "依 `models/compression/README.md` 的 escalation rules 判斷。"
+	}
+}
+
+func runtimeProfileGuardrails(profile string) []string {
+	switch profile {
+	case "small":
+		return []string{
+			"先讀 index、registry、summary 或 generated lookup。",
+			"不可跳過 required bootstrap、source-of-truth gate 或 validation signal。",
+			"需要修改 canonical source、遇到 conflict、缺 validation signal 時升級。",
+		}
+	case "large":
+		return []string{
+			"讀 primary source、required dependencies 與 task-relevant related sources。",
+			"回報 deferred sources 與 validation signal。",
+			"涉及 writeback、promotion、enforcement rules 或 migration 時保持 source-backed。",
+		}
+	case "specialized":
+		return []string{
+			"先讀 routing registry 與 primary source，再讀 domain workflow / technique / adapter。",
+			"不得讓工具能力覆蓋 enforcement rules、authorization 或 source-of-truth。",
+			"保留 domain-specific validation 與 project evidence boundary。",
+		}
+	default:
+		return []string{
+			"先確認 registry record 的 model profile。",
+			"依 `models/profiles/README.md` 與 `models/compression/README.md` 選讀取深度。",
+		}
 	}
 }
 
