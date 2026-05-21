@@ -519,6 +519,22 @@ func TestRuntimeGoldenFixtureCoversGeneratedSurfaces(t *testing.T) {
 	assertSQLiteScalar(t, runtimeDBPath, "SELECT COUNT(*) FROM compiler_metadata WHERE key = 'compiler_version'", "nonzero")
 }
 
+func TestRuntimeCompilerRubySnapshotHarnessIsStable(t *testing.T) {
+	repo := repoRootForTest(t)
+	ruby := requireExecutableForTest(t, "ruby")
+	requireExecutableForTest(t, "sqlite3")
+	temp := t.TempDir()
+	firstDB := filepath.Join(temp, "runtime-a.db")
+	secondDB := filepath.Join(temp, "runtime-b.db")
+
+	runRubyScript(t, repo, ruby, "runtime/compiler/compiler-engine.rb", "--db", firstDB)
+	runRubyScript(t, repo, ruby, "runtime/compiler/compiler-engine.rb", "--db", secondDB)
+
+	if got, want := runtimeCompilerSnapshot(t, firstDB), runtimeCompilerSnapshot(t, secondDB); !reflect.DeepEqual(got, want) {
+		t.Fatalf("Ruby compiler snapshots differ: %s", firstRowDiff(got, want))
+	}
+}
+
 func TestNativeModelContextReportMatchesRubyGenerator(t *testing.T) {
 	repo := repoRootForTest(t)
 	ruby := requireExecutableForTest(t, "ruby")
@@ -1250,6 +1266,51 @@ func sqliteRows(t *testing.T, path string, table string) []string {
 	}
 	sort.Strings(result)
 	return result
+}
+
+func runtimeCompilerSnapshot(t *testing.T, path string) []string {
+	t.Helper()
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	snapshot := []string{}
+	for _, table := range nativeRuntimeRequiredTables {
+		var count int
+		if err := db.QueryRow("SELECT COUNT(*) FROM " + table).Scan(&count); err != nil {
+			t.Fatalf("count %s: %v", table, err)
+		}
+		snapshot = append(snapshot, fmt.Sprintf("count:%s=%d", table, count))
+	}
+	rows, err := db.Query(`SELECT source_path, target_key, compile_rule, status, data FROM generated_surfaces ORDER BY source_path, target_key`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var sourcePath string
+		var targetKey string
+		var compileRule string
+		var status string
+		var data string
+		if err := rows.Scan(&sourcePath, &targetKey, &compileRule, &status, &data); err != nil {
+			t.Fatal(err)
+		}
+		snapshot = append(snapshot, strings.Join([]string{"surface", sourcePath, targetKey, compileRule, status, data}, "\x1f"))
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatal(err)
+	}
+	for _, key := range []string{"compiler_version", "schema_version"} {
+		var value string
+		if err := db.QueryRow("SELECT value FROM compiler_metadata WHERE key = ?", key).Scan(&value); err != nil {
+			t.Fatalf("metadata %s: %v", key, err)
+		}
+		snapshot = append(snapshot, "metadata:"+key+"="+value)
+	}
+	sort.Strings(snapshot)
+	return snapshot
 }
 
 func firstRowDiff(got []string, want []string) string {

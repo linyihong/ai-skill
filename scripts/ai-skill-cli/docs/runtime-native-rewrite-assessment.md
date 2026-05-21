@@ -24,7 +24,7 @@
 | `scripts/generate-model-context-report.rb` | `ai-skill runtime refresh` | 中 | Go-native builder 已建立 byte-for-byte Ruby stdout parity guard，並可由 `runtime refresh --native-reports` 明確 opt-in 寫入；預設仍 wrapper-first。 | profile / compression grouping anchors 已覆蓋；Ruby vs Go exact output parity 已覆蓋；opt-in native report write 已覆蓋。 |
 | `scripts/generate-model-checklists.rb` | `ai-skill runtime refresh` | 中 | Go-native builder 已建立 byte-for-byte Ruby stdout parity guard，並可由 `runtime refresh --native-reports` 明確 opt-in 寫入；預設仍 wrapper-first。 | per-model checklist anchors 已覆蓋；Ruby vs Go exact output parity 已覆蓋；opt-in native report write 已覆蓋。 |
 | `scripts/refresh-knowledge-runtime.rb` | `ai-skill runtime refresh` | 低 | 保持 Ruby entrypoint，但 Go wrapper mode 已逐步執行同一批 generator / validator steps，以取得 ordered evidence 與 first-failure block。 | partial failure blocks success、ordered step summary、no partial success fixture 已覆蓋。 |
-| `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | 低 | 保持 wrapper。不得直接替換 production compiler；先建立 Ruby vs Go parity test。 | runtime source keyword、`--check` no-op、`runtime.db` generated surface assertion、schema parity。 |
+| `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | 低 | 保持 wrapper。Ruby compiler snapshot parity harness 已建立；不得直接替換 production compiler，native compiler 必須先接上同一 snapshot comparison。 | runtime source keyword、`--check` no-op、`runtime.db` generated surface assertion、schema / row count / generated surface snapshot parity。 |
 | `scripts/migrate-runtime-config-to-sqlite.rb` | `ai-skill runtime migrate` / `compile` | Deferred | 暫不改寫，現有 compiler path 已吸收大部分需求。 | idempotent migration fixture。 |
 | `scripts/init-runtime-state-db.rb` | `ai-skill runtime state init` | Deferred | 等 mutable runtime-state scope 明確後再處理。 | custom DB path、idempotent schema fixture。 |
 | `scripts/sync-runtime-yaml-from-embedded.rb` | `ai-skill runtime sync-yaml` | Deferred | 屬於 source sync / recovery 工具，需先確認 lifecycle owner。 | embedded-to-yaml golden fixture。 |
@@ -33,4 +33,4 @@
 
 1. 若要把 report generators 設為預設 Go path，先跑 `runtime refresh --native-reports` against golden fixture，並保留 fallback / rollback 說明。
 2. SQLite index generator 已有 opt-in native write path；若要設為預設，先在 CI / release gate 中跑 native refresh smoke，並保留不帶 `--native-index` 的 Ruby rollback 說明。
-3. Compiler 仍不得直接替換；需另建 schema / generated surface parity test。
+3. Compiler 仍不得直接替換；下一步需讓 Go-native compiler output 通過既有 schema / generated surface snapshot parity。
