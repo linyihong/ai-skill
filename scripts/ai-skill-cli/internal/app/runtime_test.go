@@ -21,7 +21,7 @@ func TestRuntimeValidateDryRunPlansValidators(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "validate", "--repo", repo, "--dry-run", "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "validate", "--repo", repo, "--legacy-wrapper", "--dry-run", "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
 	}
@@ -47,7 +47,7 @@ func TestRuntimeValidateBlocksMissingRubyBeforeWrapper(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "validate", "--repo", repo, "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "validate", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
 	if code != ExitMissingDependency {
 		t.Fatalf("expected missing dependency, got %d; stderr=%s", code, stderr.String())
 	}
@@ -61,12 +61,35 @@ func TestRuntimeValidateBlocksMissingRubyBeforeWrapper(t *testing.T) {
 	}
 }
 
+func TestRuntimeValidateDefaultNativeDoesNotNeedRuby(t *testing.T) {
+	repo := repoRootForTest(t)
+	t.Setenv("PATH", emptyPathDir(t))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "validate", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Mode != "native" {
+		t.Fatalf("expected native mode, got %#v", result.Mode)
+	}
+	if !hasCheckStatus(result.Checks, "knowledge_runtime_native", "ok") {
+		t.Fatalf("expected native knowledge runtime validation, got %#v", result.Checks)
+	}
+}
+
 func TestRuntimeRefreshDryRunPlansWrapperCommands(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--dry-run", "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--dry-run", "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
 	}
@@ -89,6 +112,40 @@ func TestRuntimeRefreshDryRunPlansWrapperCommands(t *testing.T) {
 	}
 }
 
+func TestRuntimeRefreshDefaultNativeDoesNotNeedRuby(t *testing.T) {
+	repo := fakeRuntimeRepo(t)
+	t.Setenv("PATH", emptyPathDir(t))
+	writeRuntimeNativeReportSourceFixture(t, repo)
+	writeFile(t, filepath.Join(repo, "README.md"), "# Test Repo\n")
+	writeFile(t, filepath.Join(repo, "CORE_BOOTSTRAP.md"), "# Core\n")
+	writeFile(t, filepath.Join(repo, "workflow", "test.md"), "# Workflow Test\n")
+	writeFile(t, filepath.Join(repo, "knowledge", "summaries", "README.md"), "# knowledge summaries\n")
+	writeFile(t, filepath.Join(repo, "skills", "demo", "feedback_history", "lesson.md"), "# Feedback\n\n### Feedback Lesson\n\n#### One-line Summary\nfeedback route lesson\n")
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Mode != "native_refresh" {
+		t.Fatalf("expected native_refresh mode, got %#v", result.Mode)
+	}
+	if hasCheckStatus(result.Checks, "ruby", "ok") || hasCheckStatus(result.Checks, "sqlite3", "ok") {
+		t.Fatalf("native refresh should not check Ruby/sqlite3, got %#v", result.Checks)
+	}
+	for _, name := range []string{"knowledge_runtime_report", "model_context_report", "model_checklists", "runtime_sqlite_index", "runtime_index_native", "knowledge_runtime_native"} {
+		if !hasCheckStatus(result.Checks, name, "ok") {
+			t.Fatalf("expected ok check for %s, got %#v", name, result.Checks)
+		}
+	}
+}
+
 func TestRuntimeRefreshExecutesOrderedSteps(t *testing.T) {
 	repo := fakeRuntimeRepo(t)
 	requireExecutableForTest(t, "ruby")
@@ -98,7 +155,7 @@ func TestRuntimeRefreshExecutesOrderedSteps(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
 	}
@@ -136,7 +193,7 @@ func TestRuntimeRefreshStopsOnFirstFailedStep(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
 	if code != ExitValidationFailed {
 		t.Fatalf("expected validation failure, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
 	}
@@ -176,7 +233,7 @@ func TestRuntimeRefreshNativeReportsWritesGoReportsThenRunsRemainingRubySteps(t 
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--native-reports", "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--native-reports", "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
 	}
@@ -226,7 +283,7 @@ func TestRuntimeRefreshNativeReportsAndIndexSkipsRubyGenerators(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--native-reports", "--native-index", "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--native-reports", "--native-index", "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
 	}
@@ -264,7 +321,7 @@ func TestRuntimeRefreshBlocksMissingRubyBeforeWrapper(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "refresh", "--repo", repo, "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "refresh", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
 	if code != ExitMissingDependency {
 		t.Fatalf("expected missing dependency, got %d; stderr=%s", code, stderr.String())
 	}
@@ -283,7 +340,7 @@ func TestRuntimeCompileDryRunPlansCompiler(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "compile", "--repo", repo, "--dry-run", "--assert-source", "runtime/compiler/embedded_data.rb", "--assert-keyword", "phase", "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "compile", "--repo", repo, "--legacy-wrapper", "--dry-run", "--assert-source", "runtime/compiler/embedded_data.rb", "--assert-keyword", "phase", "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
 	}
@@ -310,7 +367,7 @@ func TestRuntimeCompileNativeCompilerWritesSnapshotWithoutRuby(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "compile", "--repo", repo, "--native-compiler", "--db", outputDB, "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "compile", "--repo", repo, "--db", outputDB, "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected success, got %d; stderr=%s; stdout=%s", code, stderr.String(), stdout.String())
 	}
@@ -337,7 +394,7 @@ func TestRuntimeCompileBlocksMissingRubyBeforeWrapper(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "compile", "--repo", repo, "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "compile", "--repo", repo, "--legacy-wrapper", "--json"}, &stdout, &stderr)
 	if code != ExitMissingDependency {
 		t.Fatalf("expected missing dependency, got %d; stderr=%s", code, stderr.String())
 	}
@@ -705,7 +762,7 @@ func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Run([]string{"runtime", "validate", "--repo", repo, "--dry-run", "--json"}, &stdout, &stderr)
+	code := Run([]string{"runtime", "validate", "--repo", repo, "--legacy-wrapper", "--dry-run", "--json"}, &stdout, &stderr)
 	if code != ExitValidationFailed {
 		t.Fatalf("expected validation failure, got %d; stderr=%s", code, stderr.String())
 	}

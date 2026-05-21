@@ -10,6 +10,7 @@
 - **穩定 exit code**：相同失敗類型在所有 OS 上回傳相同 exit code。
 - **明確 side effect**：每個命令必須列出讀取路徑、寫入路徑、外部依賴與 git 操作。
 - **禁止 partial close-loop**：linked-update、writeback、commit、push、runtime sync 若缺 Git 或 repo 狀態不安全，必須阻斷。
+- **Native default**：Phase 3 後 runtime core commands 預設走 Go-native path；Ruby / `sqlite3` CLI 僅能透過 `--legacy-wrapper` 作 rollback / parity。
 
 ## 初始命令範圍
 
@@ -230,18 +231,17 @@
 副作用：
 
 - 可能更新 `knowledge/runtime/runtime-report.md`、`knowledge/runtime/model-context-report.md`、`knowledge/runtime/model-checklists.md` 與本機 SQLite index。
-- wrapper mode 可能呼叫 Ruby scripts；native mode 不應依賴 Ruby。
+- 預設 native mode 不依賴 Ruby 或 `sqlite3` CLI；`--legacy-wrapper` 才呼叫 Ruby scripts。
 
 必要行為：
 
 - 必須回報哪些 generated surfaces 被更新、哪些 validator 被執行。
-- 若仍處 wrapper mode 且 Ruby 缺失，回傳 `missing_dependency` 並說明該能力尚未 native。
+- 若明確使用 `--legacy-wrapper` 且 Ruby 缺失，回傳 `missing_dependency`。
 - 不得只更新部分 generated surface 後回傳 success。
-- Phase 3 wrapper mode 依 `refresh-knowledge-runtime.rb` 的順序逐步呼叫 Ruby generator / validator scripts；dry-run 只列出將執行的 generator / validator scripts，不寫入 generated surfaces。
-- wrapper mode 必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`，缺 Ruby、`sqlite3` CLI 或 Git 時必須回傳 `missing_dependency`。
+- 預設 native mode 寫入 Go-generated Markdown reports 與 SQLite index，並執行 native runtime DB / index / knowledge runtime checks；dry-run 只列出將執行的 native actions，不寫入 generated surfaces。
+- `--legacy-wrapper` 依 `refresh-knowledge-runtime.rb` 的順序逐步呼叫 Ruby generator / validator scripts；wrapper mode 必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`，缺 Ruby、`sqlite3` CLI 或 Git 時必須回傳 `missing_dependency`。
 - 任一 refresh step 失敗時，CLI 必須停止後續 steps、回傳 `runtime_refresh_failed`，且 JSON checks 必須保留已執行 steps 與 failing step。
-- `--native-reports` 是明確 opt-in：只將三個 Markdown reports 改由 Go builder 寫入；預設 refresh 不使用 native reports。
-- `--native-index` 是明確 opt-in：只將 SQLite index generation 改由 Go builder 寫入，後續 SQLite index / knowledge runtime validators 仍走 Ruby wrapper；若需 rollback，重新執行不帶 `--native-index` 的 `runtime refresh` 會回到 Ruby generator path。
+- `--native-reports` / `--native-index` 已是預設 native refresh 行為；保留 flags 供舊 automation 顯式表示意圖。若需 rollback，使用 `--legacy-wrapper`。
 
 ### `ai-skill runtime compile`
 
@@ -260,16 +260,15 @@
 副作用：
 
 - 可能更新 `runtime/runtime.db`。
-- wrapper mode 可能呼叫 Ruby compiler；native mode 不應依賴 Ruby。
+- 預設 native snapshot mode 不依賴 Ruby 或 `sqlite3` CLI；`--legacy-wrapper` 才呼叫 Ruby compiler。
 
 驗證：
 
 - `runtime/runtime.db` integrity check。
 - `generated_surfaces` content assertion。
 - compiler version / schema version 存在。
-- Phase 3 初始切片使用 wrapper mode 呼叫 `runtime/compiler/compiler-engine.rb`；dry-run 只列出 compiler / `--diff` 計畫，不寫入 `runtime.db`。
-- wrapper mode 必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`，缺 Ruby 或 `sqlite3` CLI 時必須回傳 `missing_dependency`。
-- `--native-compiler` 是明確 opt-in snapshot mode：用 repository 既有 `runtime/runtime.db` 產生指定 `--db` output，並通過 native runtime DB validation；若需 rollback，重新執行不帶 `--native-compiler` 的 `runtime compile` 會回到 Ruby compiler path。
+- 預設 native snapshot mode 用 repository 既有 `runtime/runtime.db` 產生指定 `--db` output，並通過 native runtime DB validation；`--native-compiler` 保留為顯式意圖 flag。
+- `--legacy-wrapper` 使用 Ruby compiler；wrapper mode 必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`，缺 Ruby 或 `sqlite3` CLI 時必須回傳 `missing_dependency`。
 
 ### `ai-skill runtime validate`
 
@@ -290,8 +289,8 @@
 
 - 驗證失敗時不得修改檔案。
 - 必須區分 missing dependency、schema invalid、assertion failed、dirty generated surface。
-- Phase 3 初始切片使用 wrapper mode 呼叫既有 Ruby validators，必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`。
-- wrapper mode 缺 Ruby 或 `sqlite3` CLI 時必須回傳 `missing_dependency`，並說明該能力尚未 native。
+- 預設 native mode 執行 Go runtime DB、SQLite index 與 knowledge runtime checks，不依賴 Ruby 或 `sqlite3` CLI。
+- `--legacy-wrapper` 呼叫既有 Ruby validators，必須固定 `LANG=C.UTF-8` 與 `LC_ALL=C.UTF-8`；缺 Ruby 或 `sqlite3` CLI 時必須回傳 `missing_dependency`。
 - `runtime.db` native slice 已用 Go / `modernc.org/sqlite` 檢查 integrity、required tables、minimum row counts、JSON columns、compiler metadata 與 stale metadata warning；stale warning 不阻斷成功狀態。
 - SQLite runtime index native slice 已用 Go / `modernc.org/sqlite` 檢查 missing DB、integrity、required tables、row counts、atom source references、source checksums、FTS count 與 basic ranked FTS query；git-ignore boundary 以 Go 呼叫 Git 檢查，缺 Git 時回 `missing_dependency`。
 

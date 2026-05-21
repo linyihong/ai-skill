@@ -21,6 +21,7 @@ type runtimeOptions struct {
 	command        string
 	repoPath       string
 	dryRun         bool
+	legacyWrapper  bool
 	nativeReports  bool
 	nativeIndex    bool
 	nativeCompiler bool
@@ -145,6 +146,7 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs := newFlagSet("runtime "+opts.command, stderr)
 	fs.StringVar(&opts.repoPath, "repo", ".", "Ai-skill repository path")
 	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview runtime wrapper scripts without executing")
+	fs.BoolVar(&opts.legacyWrapper, "legacy-wrapper", false, "use legacy Ruby wrapper mode for runtime commands that have native defaults")
 	fs.BoolVar(&opts.nativeReports, "native-reports", false, "opt in to Go-native Markdown report generation during runtime refresh")
 	fs.BoolVar(&opts.nativeIndex, "native-index", false, "opt in to Go-native SQLite index generation during runtime refresh")
 	fs.BoolVar(&opts.nativeCompiler, "native-compiler", false, "opt in to Go-native runtime compiler snapshot mode during runtime compile")
@@ -201,7 +203,7 @@ func buildRuntimeResult(opts runtimeOptions) Result {
 func buildRuntimeValidateResult(opts runtimeOptions) Result {
 	result := Result{
 		Command:        "runtime validate",
-		Mode:           "wrapper",
+		Mode:           "native",
 		Status:         "success",
 		ExitCode:       ExitSuccess,
 		Checks:         []Check{},
@@ -210,6 +212,9 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 	}
 	if opts.dryRun {
 		result.Mode = "dry_run"
+	}
+	if opts.legacyWrapper && !opts.dryRun {
+		result.Mode = "wrapper"
 	}
 
 	repo, repoCheck := resolveExistingDir("repo", opts.repoPath)
@@ -222,15 +227,21 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 	}
 
 	validators := runtimeValidators(repo)
-	for _, validator := range validators {
-		result.PlannedActions = append(result.PlannedActions, "run ruby validator: "+validator.path)
-		if _, err := os.Stat(validator.path); err != nil {
-			result.Status = "blocked"
-			result.ExitCode = ExitValidationFailed
-			result.Error = &CommandError{Code: "missing_validator", Message: validator.path, Remediation: "Run from a complete Ai-skill checkout."}
-			result.Checks = append(result.Checks, Check{Name: validator.name, Status: "missing", Message: validator.path})
-			return result
+	if opts.legacyWrapper {
+		for _, validator := range validators {
+			result.PlannedActions = append(result.PlannedActions, "run ruby validator: "+validator.path)
+			if _, err := os.Stat(validator.path); err != nil {
+				result.Status = "blocked"
+				result.ExitCode = ExitValidationFailed
+				result.Error = &CommandError{Code: "missing_validator", Message: validator.path, Remediation: "Run from a complete Ai-skill checkout."}
+				result.Checks = append(result.Checks, Check{Name: validator.name, Status: "missing", Message: validator.path})
+				return result
+			}
 		}
+	} else {
+		result.PlannedActions = append(result.PlannedActions, "run native runtime DB validation")
+		result.PlannedActions = append(result.PlannedActions, "run native runtime SQLite index validation")
+		result.PlannedActions = append(result.PlannedActions, "run native knowledge runtime validation")
 	}
 
 	if opts.dryRun {
@@ -253,6 +264,18 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 		result.Status = "blocked"
 		result.ExitCode = ExitValidationFailed
 		result.Error = &CommandError{Code: "runtime_index_native_failed", Message: nativeIndexCheck.Message, Remediation: "Fix knowledge/runtime/sqlite/runtime-index.sqlite or run runtime refresh before wrapper validators."}
+		return result
+	}
+
+	if !opts.legacyWrapper {
+		knowledgeRuntimeCheck := nativeKnowledgeRuntimeValidation(repo)
+		result.Checks = append(result.Checks, knowledgeRuntimeCheck)
+		if knowledgeRuntimeCheck.Status != "ok" {
+			result.Status = "blocked"
+			result.ExitCode = ExitValidationFailed
+			result.Error = &CommandError{Code: "knowledge_runtime_native_failed", Message: knowledgeRuntimeCheck.Message, Remediation: "Fix knowledge runtime sources or generated reports before wrapper validators."}
+			return result
+		}
 		return result
 	}
 
@@ -308,9 +331,13 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 }
 
 func buildRuntimeRefreshResult(opts runtimeOptions) Result {
+	if !opts.legacyWrapper {
+		opts.nativeReports = true
+		opts.nativeIndex = true
+	}
 	result := Result{
 		Command:        "runtime refresh",
-		Mode:           "wrapper",
+		Mode:           "native_refresh",
 		Status:         "success",
 		ExitCode:       ExitSuccess,
 		Checks:         []Check{},
@@ -322,6 +349,9 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 	}
 	if (opts.nativeReports || opts.nativeIndex) && !opts.dryRun {
 		result.Mode = runtimeRefreshMode(opts)
+	}
+	if opts.legacyWrapper && !opts.dryRun && !opts.nativeReports && !opts.nativeIndex {
+		result.Mode = "wrapper"
 	}
 
 	repo, repoCheck := resolveExistingDir("repo", opts.repoPath)
@@ -348,6 +378,11 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 		result.PlannedActions = append(result.PlannedActions, "write native runtime SQLite index: "+nativeIndexPath)
 		steps = runtimeRefreshStepsWithoutNativeIndex(steps)
 	}
+	if !opts.legacyWrapper {
+		result.PlannedActions = append(result.PlannedActions, "run native runtime SQLite index validation")
+		result.PlannedActions = append(result.PlannedActions, "run native knowledge runtime validation")
+		steps = []runtimeRefreshStep{}
+	}
 	for _, step := range steps {
 		result.PlannedActions = append(result.PlannedActions, "run ruby refresh step: "+runtimeScriptInvocation(step.path, step.args))
 		if _, err := os.Stat(step.path); err != nil {
@@ -360,38 +395,32 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 	}
 
 	if opts.dryRun {
-		result.Checks = append(result.Checks, Check{Name: "wrapper_mode", Status: "ok", Message: "dry-run only; refresh steps not executed"})
+		result.Checks = append(result.Checks, Check{Name: "refresh_mode", Status: "ok", Message: "dry-run only; refresh steps not executed"})
 		return result
 	}
 
-	ruby, rubyCheck := requiredExecutable("ruby", []string{"--version"}, "Install Ruby to use wrapper-mode runtime refresh until native Go refresh replaces it.")
-	result.Checks = append(result.Checks, rubyCheck)
-	if rubyCheck.Status != "ok" {
-		result.Status = "blocked"
-		result.ExitCode = ExitMissingDependency
-		result.Error = &CommandError{Code: "missing_ruby", Message: "Ruby is required for runtime refresh wrapper mode.", Remediation: rubyCheck.Remediation}
-		return result
-	}
+	ruby := ""
+	if len(steps) > 0 {
+		var rubyCheck Check
+		ruby, rubyCheck = requiredExecutable("ruby", []string{"--version"}, "Install Ruby to use legacy wrapper-mode runtime refresh.")
+		result.Checks = append(result.Checks, rubyCheck)
+		if rubyCheck.Status != "ok" {
+			result.Status = "blocked"
+			result.ExitCode = ExitMissingDependency
+			result.Error = &CommandError{Code: "missing_ruby", Message: "Ruby is required for legacy runtime refresh wrapper mode.", Remediation: rubyCheck.Remediation}
+			return result
+		}
 
-	sqlite, sqliteCheck := requiredExecutable("sqlite3", []string{"--version"}, "Install sqlite3 CLI for wrapper-mode runtime refresh until native Go SQLite refresh replaces it.")
-	result.Checks = append(result.Checks, sqliteCheck)
-	if sqliteCheck.Status != "ok" {
-		result.Status = "blocked"
-		result.ExitCode = ExitMissingDependency
-		result.Error = &CommandError{Code: "missing_sqlite3", Message: "sqlite3 CLI is required for runtime refresh wrapper mode.", Remediation: sqliteCheck.Remediation}
-		return result
+		sqlite, sqliteCheck := requiredExecutable("sqlite3", []string{"--version"}, "Install sqlite3 CLI for legacy wrapper-mode runtime refresh.")
+		result.Checks = append(result.Checks, sqliteCheck)
+		if sqliteCheck.Status != "ok" {
+			result.Status = "blocked"
+			result.ExitCode = ExitMissingDependency
+			result.Error = &CommandError{Code: "missing_sqlite3", Message: "sqlite3 CLI is required for legacy runtime refresh wrapper mode.", Remediation: sqliteCheck.Remediation}
+			return result
+		}
+		_ = sqlite
 	}
-	_ = sqlite
-
-	git, gitCheck := requiredExecutable("git", []string{"--version"}, "Install Git because wrapper-mode runtime refresh validates generated SQLite index git-ignore boundaries.")
-	result.Checks = append(result.Checks, gitCheck)
-	if gitCheck.Status != "ok" {
-		result.Status = "blocked"
-		result.ExitCode = ExitMissingDependency
-		result.Error = &CommandError{Code: "missing_git", Message: "Git is required for runtime refresh wrapper mode.", Remediation: gitCheck.Remediation}
-		return result
-	}
-	_ = git
 
 	for _, target := range nativeTargets {
 		check := writeNativeRuntimeReport(repo, target)
@@ -426,14 +455,31 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 			return result
 		}
 	}
+	if len(steps) == 0 {
+		for _, check := range []Check{
+			nativeRuntimeIndexValidation(repo, nativeIndexPath),
+			nativeKnowledgeRuntimeValidation(repo),
+		} {
+			result.Checks = append(result.Checks, check)
+			if check.Status != "ok" {
+				result.Status = "blocked"
+				result.ExitCode = ExitValidationFailed
+				result.Error = &CommandError{Code: "runtime_refresh_failed", Message: check.Message, Remediation: "Inspect native refresh output and source files."}
+				return result
+			}
+		}
+	}
 
 	return result
 }
 
 func buildRuntimeCompileResult(opts runtimeOptions) Result {
+	if !opts.legacyWrapper {
+		opts.nativeCompiler = true
+	}
 	result := Result{
 		Command:        "runtime compile",
-		Mode:           "wrapper",
+		Mode:           "native_compiler",
 		Status:         "success",
 		ExitCode:       ExitSuccess,
 		Checks:         []Check{},
@@ -445,6 +491,9 @@ func buildRuntimeCompileResult(opts runtimeOptions) Result {
 	}
 	if opts.nativeCompiler && !opts.dryRun {
 		result.Mode = "native_compiler"
+	}
+	if opts.legacyWrapper && !opts.nativeCompiler && !opts.dryRun {
+		result.Mode = "wrapper"
 	}
 
 	repo, repoCheck := resolveExistingDir("repo", opts.repoPath)
@@ -685,6 +734,9 @@ func runtimeRefreshStepsWithoutNativeIndex(steps []runtimeRefreshStep) []runtime
 }
 
 func runtimeRefreshMode(opts runtimeOptions) string {
+	if !opts.legacyWrapper {
+		return "native_refresh"
+	}
 	switch {
 	case opts.nativeReports && opts.nativeIndex:
 		return "wrapper_native_reports_index"
@@ -1234,6 +1286,48 @@ func nativeRuntimeIndexValidation(repo string, path string) Check {
 		return Check{Name: "runtime_index_native", Status: "failed", Message: err.Error()}
 	}
 	return Check{Name: "runtime_index_native", Status: "ok", Message: fmt.Sprintf("SQLite runtime index checks passed: atoms=%d sources=%d edges=%d fts=%d", counts["atoms"], counts["sources"], counts["edges"], counts["fts"])}
+}
+
+func nativeKnowledgeRuntimeValidation(repo string) Check {
+	registry, err := readRuntimeRoutingRegistry(filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"))
+	if err != nil {
+		return Check{Name: "knowledge_runtime_native", Status: "failed", Message: err.Error()}
+	}
+	if len(registry.Records) == 0 {
+		return Check{Name: "knowledge_runtime_native", Status: "failed", Message: "routing registry has no records"}
+	}
+	summaries, err := runtimeSummaryRecords(repo)
+	if err != nil {
+		return Check{Name: "knowledge_runtime_native", Status: "failed", Message: err.Error()}
+	}
+	if len(summaries) == 0 {
+		return Check{Name: "knowledge_runtime_native", Status: "failed", Message: "knowledge summaries are empty"}
+	}
+	graphs, err := runtimeGraphRecords(repo)
+	if err != nil {
+		return Check{Name: "knowledge_runtime_native", Status: "failed", Message: err.Error()}
+	}
+	if len(graphs) == 0 {
+		return Check{Name: "knowledge_runtime_native", Status: "failed", Message: "knowledge graphs are empty"}
+	}
+	reportAnchors := map[string]string{
+		filepath.Join(repo, "knowledge", "runtime", "runtime-report.md"):       "# Knowledge Runtime Report",
+		filepath.Join(repo, "knowledge", "runtime", "model-context-report.md"): "# Model Context Report",
+		filepath.Join(repo, "knowledge", "runtime", "model-checklists.md"):     "# Model Checklists",
+		filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"):   "records:",
+		filepath.Join(repo, "knowledge", "runtime", "refresh-policy.yaml"):     "decision_values:",
+		filepath.Join(repo, "knowledge", "summaries", "README.md"):             "knowledge",
+	}
+	for path, anchor := range reportAnchors {
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return Check{Name: "knowledge_runtime_native", Status: "failed", Message: err.Error()}
+		}
+		if !strings.Contains(string(content), anchor) {
+			return Check{Name: "knowledge_runtime_native", Status: "failed", Message: filepath.ToSlash(path) + " missing anchor " + anchor}
+		}
+	}
+	return Check{Name: "knowledge_runtime_native", Status: "ok", Message: fmt.Sprintf("Knowledge runtime checks passed: registry_records=%d summaries=%d graphs=%d", len(registry.Records), len(summaries), len(graphs))}
 }
 
 func nativeRuntimeIndexTablesCheck(db *sql.DB) error {
