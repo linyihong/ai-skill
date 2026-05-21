@@ -1,6 +1,6 @@
-# Cross-Platform Go Script Runtime Artifacts
+# Ai-skill CLI Runtime Docs
 
-本目錄保存 [`2026-05-21-0834-cross-platform-go-script-runtime.md`](../../active/2026-05-21-0834-cross-platform-go-script-runtime.md) 的文件先行 artifacts。這些文件是 Phase 0 的 source-of-truth；未完成前不得開始 Go implementation。
+本目錄保存 [`Ai-skill CLI Runtime`](../README.md) 的文件先行 artifacts。這些文件是 Phase 0 的 source-of-truth；未完成前不得開始 Go implementation。
 
 ## 何時讀哪個文件
 
@@ -20,4 +20,4 @@
 - [ ] `bdd-scenarios.md` 已覆蓋 high-risk success / failure paths。
 - [ ] `test-fixture-plan.md` 已覆蓋 missing Git、unsafe repo、Windows path、fake home、runtime.db assertion。
 
-完成上述項目前，不得新增 `go.mod`、`cmd/ai-skill/` 或 production Go implementation。
+完成上述項目前，不得新增 `scripts/ai-skill-cli/go.mod`、`scripts/ai-skill-cli/cmd/ai-skill/` 或 production Go implementation。

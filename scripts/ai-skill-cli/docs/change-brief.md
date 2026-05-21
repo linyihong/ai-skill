@@ -1,6 +1,6 @@
-# Change Brief：Cross-Platform Go Script Runtime
+# Change Brief：Ai-skill CLI Runtime
 
-> **上游計畫**：[`2026-05-21-0834-cross-platform-go-script-runtime.md`](../../active/2026-05-21-0834-cross-platform-go-script-runtime.md)
+> **上游計畫**：[`2026-05-21-0834-cross-platform-go-script-runtime.md`](../../../plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md)
 > **對齊流程**：[`workflow/software-delivery/`](../../../workflow/software-delivery/README.md)
 
 ## Metadata
@@ -33,7 +33,7 @@
 
 ### Out of Scope
 
-- 本文件不建立 `go.mod`、`cmd/ai-skill/` 或 production Go code。
+- 本文件不建立 `scripts/ai-skill-cli/go.mod`、`scripts/ai-skill-cli/cmd/ai-skill/` 或 production Go code。
 - 本文件不替換現有 Ruby compiler 或 shell scripts。
 - 本文件不承諾 iOS native arbitrary binary。
 - 本文件不決定 release binary 是否提交到 repo；此為 Phase 4 decision。

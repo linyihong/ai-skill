@@ -5,6 +5,7 @@
 | [`init-new-project.sh`](init-new-project.sh) | **新專案初始化**：在目標專案目錄中一次建立 Roo Code（`.roomodes`）、Cursor（`.cursor/rules/`）、Claude Code（`CLAUDE.md`）的設定檔，全部指向 Ai-skill 知識庫；bootstrap 內含 **專案 durable Markdown 預設**（寫入 `docs/`、`README.md` 等前先讀 `workflow/documentation/`）。開新專案時跑一次就好。 |
 | [`sync-cursor-bundle.sh`](sync-cursor-bundle.sh) | 可選的 Cursor symlink / bundle bridge：把本庫同步到 **`~/.cursor/bundles/enforcement`**（共用規則）與 **`~/.cursor/bundles/ai-skill/`**（workflow / analysis / intelligence source）。Reference-only 不需要執行。 |
 | [`ai-skill-close-loop.sh`](ai-skill-close-loop.sh) | 保守收尾工具：偵測 active close-loop lock、列出 dirty 檔案 owner group；預設 dry-run，`--commit` 才分組提交，`--push` 才推遠端。 |
+| [`ai-skill-cli/`](ai-skill-cli/README.md) | 跨平台 Go CLI / runtime toolchain 的開發根目錄；`docs/` 放文件先行 artifacts，未來 `cmd/`、`internal/`、`testdata/` 放程式碼與 fixtures。 |
 | [`agent-goals.sh`](agent-goals.sh) | 工具中立的專案暫存 goal ledger helper：在 `<PROJECT_ROOT>/.agent-goals/` 建立、更新、拆解、暫停、完成刪除對話目標；不提交 goal 檔。 |
 | [`validate-knowledge-runtime.rb`](validate-knowledge-runtime.rb) | 驗證 knowledge runtime generated surfaces：routing registry、refresh policy、summaries 與 graph records 的 YAML / Markdown 格式、必要欄位與 canonical path。 |
 | [`generate-knowledge-runtime-report.rb`](generate-knowledge-runtime-report.rb) | 從 routing registry、summaries、graphs 與 refresh policy 產生 deterministic runtime report。 |

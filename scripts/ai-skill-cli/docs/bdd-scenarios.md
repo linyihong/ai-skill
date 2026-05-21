@@ -1,6 +1,6 @@
-# BDD-Lite Scenarios：Cross-Platform Go Script Runtime
+# BDD-Lite Scenarios：Ai-skill CLI Runtime
 
-> **上游計畫**：[`2026-05-21-0834-cross-platform-go-script-runtime.md`](../../active/2026-05-21-0834-cross-platform-go-script-runtime.md)
+> **上游計畫**：[`2026-05-21-0834-cross-platform-go-script-runtime.md`](../../../plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md)
 
 ## Requirement Link
 

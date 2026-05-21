@@ -57,9 +57,9 @@
 
 **文件先行 blocking gate**：
 
-在新增 `go.mod`、`cmd/ai-skill/` 或任何 production Go implementation 前，必須先完成並 review：
+在新增 `scripts/ai-skill-cli/go.mod`、`scripts/ai-skill-cli/cmd/ai-skill/` 或任何 production Go implementation 前，必須先完成並 review：
 
-- `plans/artifacts/cross-platform-go-script-runtime/README.md`
+- `scripts/ai-skill-cli/docs/README.md`
 - command contract：每個命令的 arguments、輸出、exit code、side effects、dry-run 行為。
 - support matrix：Windows、macOS、Linux、iOS、Android 的支援等級與限制。
 - BDD-lite scenarios：尤其是 missing Git、missing permission、dirty tree、merge / rebase state、runtime.db assertion。
@@ -80,7 +80,7 @@
 
 ### 1. Go CLI 作為穩定入口
 
-建立 `cmd/ai-skill` 或 `tools/ai-skill-cli`：
+建立 `scripts/ai-skill-cli/cmd/ai-skill`：
 
 ```text
 ai-skill
@@ -172,12 +172,12 @@ Desktop 平台不應把 Git 包進 `ai-skill` binary。Git 是成熟且使用者
 
 Current artifacts：
 
-- [`README.md`](../artifacts/cross-platform-go-script-runtime/README.md)：Phase 0 artifact index。
-- [`change-brief.md`](../artifacts/cross-platform-go-script-runtime/change-brief.md)：change brief 與 scope / blocker。
-- [`command-contract.md`](../artifacts/cross-platform-go-script-runtime/command-contract.md)：command surface、exit codes、side effects。
-- [`support-matrix.md`](../artifacts/cross-platform-go-script-runtime/support-matrix.md)：desktop / mobile 支援矩陣。
-- [`bdd-scenarios.md`](../artifacts/cross-platform-go-script-runtime/bdd-scenarios.md)：BDD-lite scenarios。
-- [`test-fixture-plan.md`](../artifacts/cross-platform-go-script-runtime/test-fixture-plan.md)：fixture plan。
+- [`README.md`](../../scripts/ai-skill-cli/docs/README.md)：Phase 0 artifact index。
+- [`change-brief.md`](../../scripts/ai-skill-cli/docs/change-brief.md)：change brief 與 scope / blocker。
+- [`command-contract.md`](../../scripts/ai-skill-cli/docs/command-contract.md)：command surface、exit codes、side effects。
+- [`support-matrix.md`](../../scripts/ai-skill-cli/docs/support-matrix.md)：desktop / mobile 支援矩陣。
+- [`bdd-scenarios.md`](../../scripts/ai-skill-cli/docs/bdd-scenarios.md)：BDD-lite scenarios。
+- [`test-fixture-plan.md`](../../scripts/ai-skill-cli/docs/test-fixture-plan.md)：fixture plan。
 
 Tasks：
 
@@ -185,7 +185,7 @@ Tasks：
 - [x] 建立 command contract 文件，列出每個命令的 arguments、dry-run 行為、side effects、validation signal。
 - [x] 建立 platform support matrix：Windows、macOS、Linux、iOS、Android。
 - [ ] 建立風險清單：symlink、chmod、git hook、SQLite、Ruby gems、encoding、shell quoting、路徑大小寫。
-- [ ] 決定 repository layout：`cmd/ai-skill`、`internal/`、`pkg/`、`testdata/`、`docs/` 或其他命名。
+- [x] 決定 repository layout：`scripts/ai-skill-cli/docs/` 放文件先行 artifacts，未來 `scripts/ai-skill-cli/cmd/ai-skill/`、`scripts/ai-skill-cli/internal/`、`scripts/ai-skill-cli/testdata/` 放 Go code 與 fixtures。
 
 Completion criteria：
 
@@ -199,7 +199,7 @@ Completion criteria：
 
 Tasks：
 
-- [ ] 新增 `go.mod` 與 CLI skeleton。
+- [ ] 在 `scripts/ai-skill-cli/` 新增 `go.mod` 與 CLI skeleton。
 - [ ] 建立 dependency policy：pure Go dependency 優先；需要 CGO、外部 binary 或平台 SDK 時必須列為 exception。
 - [ ] 選型 SQLite library，預設評估 `modernc.org/sqlite`，並記錄是否排除 `mattn/go-sqlite3` 作為預設方案。
 - [ ] 實作 `ai-skill doctor`：檢查 Git external dependency、SQLite、Ruby、Python、repo root、write permission、hooksPath、PATH；其中缺 Git 必須明確提示安裝。
@@ -381,8 +381,8 @@ Completion criteria：
 Implementation phase 必須同步建立或更新：
 
 - `scripts/README.md`：CLI 使用方式、舊 script 對應表、環境需求、dry-run、錯誤處理。
-- `docs` 或 `scripts/` 下的 command contract 文件：每個命令的輸入、輸出、side effects、exit code。
-- `go` package / module README：build、test、release、cross-compile。
+- `scripts/ai-skill-cli/docs/` 下的 command contract 文件：每個命令的輸入、輸出、side effects、exit code。
+- `scripts/ai-skill-cli/README.md`：build、test、release、cross-compile。
 - `governance/lifecycle/knowledge-update-flow.md` 或相關 validator 文件：若完整更新流程改由 CLI 統一執行，需同步更新 Step 9-11。
 - `ai-tools/`：只有當工具 mirror / Cursor bundle / hook 行為有變更時才更新。
 
@@ -391,14 +391,14 @@ Implementation phase 必須同步建立或更新：
 | 檔案 | 變更類型 | Phase |
 | --- | --- | --- |
 | `plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md` | 新增計畫 | Phase 0 |
-| `plans/artifacts/cross-platform-go-script-runtime/` | 新增文件先行 artifacts：change brief、command contract、support matrix、BDD-lite scenarios、test fixture plan | Phase 0 |
+| `scripts/ai-skill-cli/` | 新增 CLI runtime 開發根目錄；`docs/` 放文件先行 artifacts，未來 `cmd/` / `internal/` / `testdata/` 放 Go implementation 與 fixtures | Phase 0 / Phase 1 |
 | `plans/README.md` | 新增 active plan 索引 | Phase 0 |
 | `scripts/README.md` | 未來更新 CLI mapping / deprecation policy | Phase 2 / Phase 6 |
 | `scripts/*.sh` | 未來 wrapper / deprecation / replacement | Phase 2 / Phase 6 |
 | `scripts/*.rb` | 未來 wrapper / parity migration | Phase 3 |
 | `runtime/compiler/compiler-engine.rb` | 若移植 compiler，需建立 parity gate | Phase 3 |
-| `cmd/ai-skill/` 或等效 Go CLI 目錄 | 未來新增 | Phase 1 |
-| `go.mod` / `go.sum` | 未來新增 | Phase 1 |
+| `scripts/ai-skill-cli/cmd/ai-skill/` | 未來新增 | Phase 1 |
+| `scripts/ai-skill-cli/go.mod` / `scripts/ai-skill-cli/go.sum` | 未來新增 | Phase 1 |
 | `bin/` 或 GitHub Releases artifact layout | 未來決策 | Phase 4 |
 | `.github/workflows/` 或既有 CI 設定 | 未來新增跨 OS 測試 | Phase 1 / Phase 4 |
 
@@ -414,7 +414,7 @@ Implementation phase 必須同步建立或更新：
 
 ## Open Questions
 
-- Go CLI 是否放在 repository root 的 `cmd/ai-skill`，或放在 `tools/ai-skill-cli` 以避免與知識文件混淆？
+- Go CLI root 已決定放在 `scripts/ai-skill-cli/`；後續 open question 是 package boundary 要如何拆分為 `cmd/`、`internal/` 與 `testdata/`。
 - Binary artifact 是否應命名為 `ai-skill`、`runtime`，或拆成 `ai-skill` CLI 與 `runtime` subcommand？目前傾向單一 `ai-skill` binary，避免多工具分裂。
 - SQLite library 是否採用 `modernc.org/sqlite` 作為預設？若採用 CGO SQLite，哪些 compatibility / performance 證據足以抵消部署成本？
 - 是否允許把 release binary commit 到 `bin/`，或只透過 GitHub Releases / CI artifacts 發佈？若 commit binary，需評估 repo size、review 與安全掃描成本。
