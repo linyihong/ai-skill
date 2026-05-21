@@ -18,6 +18,7 @@
 | [`field-confidence-judgment.md`](field-confidence-judgment.md) | 在不確定時使用明確標記（confirmed/candidate/needs capture/meaning unknown），不要 invent 不存在的資訊。 | `candidate-intelligence` | 從 `intelligence/engineering/analytical-reasoning/heuristics/api-documentation-completeness.md` 提取的跨領域通用部分 |
 | [`magic-bytes-reference.md`](magic-bytes-reference.md) | 檔案 extension 不可信；magic bytes 是判斷容器類型的最可靠方式。 | `candidate-intelligence` | 從 `intelligence/engineering/analytical-reasoning/signals/media-type-detection.md` 提取的跨領域通用部分 |
 | [`document-priority-hierarchy.md`](document-priority-hierarchy.md) | 文件衝突時更新管轄文件，而不是默默地只修正其中一個來源。 | `candidate-intelligence` | 從 `intelligence/engineering/development/contract-governance-heuristic.md` 提取的跨領域通用部分 |
+| [`cross-layer-identifier-stability.md`](cross-layer-identifier-stability.md) | 一個概念跨 ≥ 3 個 artifact 層存在時，stable opaque ID 優於 semantic naming：可讀性 -1，可追蹤性 +5。 | `candidate-intelligence` | 跨層 refactor drift 觀察 + governance runtime 跨 SQLite/YAML/Markdown 對齊需求 |
 
 ## 與其他層的關係
 

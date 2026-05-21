@@ -14,6 +14,7 @@
 | [`bdd-cost-model.md`](bdd-cost-model.md) | 判斷 BDD-lite / full BDD runner 的成本邊界。 |
 | [`architecture-overengineering.md`](architecture-overengineering.md) | 偵測 architecture / DDD overengineering。 |
 | [`delivery-friction-analysis.md`](delivery-friction-analysis.md) | 分析 requirements、architecture、validation 與 recovery 的 delivery friction。 |
+| [`rule-as-data-vs-rule-as-code.md`](rule-as-data-vs-rule-as-code.md) | 規則外部化（JSON/YAML/DB + engine）vs 規則寫死在程式碼的取捨；定義何時划算與長期治理成本。 |
 
 ## 範例內容
 

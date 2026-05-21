@@ -17,6 +17,7 @@ AI 自動避雷。
 - [`repository-abstraction-overuse.md`](repository-abstraction-overuse.md) — Repository abstraction 沒有 aggregate boundary 或 query intent 價值。
 - [`architecture-absolutism.md`](architecture-absolutism.md) — 把單一架構風格當 universal default。
 - [`migration-seeder-anti-patterns.md`](migration-seeder-anti-patterns.md) — 把大量業務資料以巨型 INSERT 包進 schema migration，使資料 lifecycle 被綁定到 schema lifecycle。
+- [`session-scoped-implicit-state.md`](session-scoped-implicit-state.md) — 將 user / phase / tenant 等執行上下文塞進 session-scoped service 或 ambient context，對 agent runtime / replay / 並發場景是隱形依賴災難。
 
 ## 與根目錄 `anti-patterns/` 的差異
 

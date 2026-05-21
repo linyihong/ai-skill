@@ -16,3 +16,7 @@
 ## 修正
 
 回到 architecture fit analysis。若 complexity 低，改用 CRUD、vertical slice 或 simple service layer；若 complexity 中等，採 DDD Lite。
+
+## 相關決策範圍
+
+「資料夾結構應以業務軸為外層 vs 技術軸（Controllers/Services/Repos）為外層」的判斷，**歸入本 atom 與 `architecture/domain-modeling` 的 bounded context 討論**，不另立 tradeoff atom。判斷句：當業務模組數 ≥ ~8 且 bounded context 已浮現，業務軸應為外層；反之，DDD 本身就不該被引入。

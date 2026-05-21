@@ -773,6 +773,7 @@ records:
       - intelligence/engineering/heuristics/retry-smell.md
       - intelligence/engineering/heuristics/single-responsibility-heuristic.md
       - intelligence/engineering/heuristics/test-driven-heuristic.md
+      - intelligence/engineering/heuristics/cross-layer-identifier-stability.md
       - knowledge/graphs/intelligence-heuristics.yaml
     source_of_truth_gate: design-layer-only
     ranking_reason: 通用工程 heuristics 不依賴特定 skill entrypoint，可直接從 intelligence 層載入。
@@ -1272,6 +1273,8 @@ records:
       - intelligence/engineering/architecture/architectural-fit/ddd-lite-vs-full-ddd.md
       - intelligence/engineering/architecture/domain-modeling/bounded-context.md
       - intelligence/engineering/anti-patterns/cargo-cult-ddd.md
+      - intelligence/engineering/anti-patterns/session-scoped-implicit-state.md
+      - intelligence/engineering/tradeoffs/rule-as-data-vs-rule-as-code.md
       - metadata/architecture/architecture-fit-matrix.yaml
       - metadata/architecture/ddd-adoption-signals.yaml
       - knowledge/graphs/ddd-architecture-governance.yaml
@@ -1379,6 +1382,7 @@ records:
       - intelligence/engineering/agent-architecture/linked-updates-completeness.md
       - intelligence/engineering/agent-architecture/decomposition-strategy-selection.md
       - intelligence/engineering/agent-architecture/stateless-validation-necessity.md
+      - intelligence/engineering/anti-patterns/session-scoped-implicit-state.md
       - enforcement/failure-patterns/README.md
       - enforcement/decision-efficiency.md
     source_of_truth_gate: design-layer-only
