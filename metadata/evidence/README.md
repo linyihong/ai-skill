@@ -16,7 +16,7 @@
 | Cognitive governance model | `governance/ai-runtime-governance/cognitive-state-governance.md` |
 | Domain recovery reload sets | `metadata/recovery/domain-policies.yaml` |
 | Domain evidence qualification | `metadata/evidence/domain-policies.yaml` |
-| Runtime enforcement | `runtime/guards/` only after explicit promotion |
+| Runtime enforcement | `runtime/README.md` only after explicit promotion |
 
 ## Policy Schema
 

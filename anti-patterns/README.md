@@ -51,7 +51,7 @@ AI 在長時間運作中容易陷入特定失效模式：
 {發生後如何處理}
 
 ## 相關 Guards
-- runtime/guards/{相關 guard}
+- runtime/README.md{相關 guard}
 ```
 
 ## 誰會參考這裡（Inbound References）
@@ -62,10 +62,10 @@ AI 在長時間運作中容易陷入特定失效模式：
 |------|------|
 | [`route.anti-patterns.runtime-patterns`](../knowledge/runtime/routing-registry.yaml) | Routing registry record，agent 依此找到 anti-patterns/ |
 | [`enforcement/failure-patterns/`](../enforcement/failure-patterns/README.md) | 操作層級 failure patterns 與本層互補 |
-| [`runtime/guards/`](../runtime/guards/) | Runtime guards 實作本層 anti-pattern 的預防方式 |
+| [`runtime/README.md`](../runtime/README.md) | Runtime guards 實作本層 anti-pattern 的預防方式 |
 
 ## 與既有層的關係
 
 - `enforcement/failure-patterns/`：現有的 failure patterns（偏重操作層級）
 - `anti-patterns/`：更高層級的 runtime anti-patterns（偏重系統層級）
-- `runtime/guards/`：對應的 runtime guards（自動防護）
+- `runtime/README.md`：對應的 runtime guards（自動防護）

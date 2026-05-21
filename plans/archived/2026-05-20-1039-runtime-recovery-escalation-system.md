@@ -49,7 +49,7 @@ Agent 已開始執行
 | `runtime/discovery/` | 初始 routing、context loading、workflow discovery、dependency loading | mismatch 後的認知重建策略 |
 | `enforcement/escalation-policy.md` | mismatch trigger、recovery activation condition、forbidden behavior | 具體 workflow 的完整操作步驟 |
 | `runtime/recovery/` | rediscovery、source-of-truth rebuild、execution graph replanning | 長篇解釋與 project evidence |
-| `runtime/guards/` | execution 中段偵測 repeated failure / evidence conflict / source miss | domain-specific 操作知識 |
+| `runtime/README.md` | execution 中段偵測 repeated failure / evidence conflict / source miss | domain-specific 操作知識 |
 | `metadata/recovery/` | domain policy、recovery levels、required reload set | prose 教學 |
 | `workflow/*/execution-flow.md` | domain-specific mismatch handling hook | runtime state machine 細節 |
 | `validation/scenarios/failure-derived/` | 驗證 agent 是否會升級，而不是繼續 patch | project raw evidence |
@@ -221,9 +221,9 @@ Exit criteria:
 | Blocking gates | no | `runtime/compiler/embedded_data.rb` (`GATES_BLOCKING_GATES`) | `gates = 23` |
 | Obligations | no | `runtime/compiler/embedded_data.rb` | `obligations = 21` |
 | Recovery strategies / state repair / reconciliation | no | `runtime/compiler/embedded_data.rb` | `recovery_strategies = 1`, `state_repair = 6`, `phase_reconciliation = 5` |
-| Guards / pipeline / context / budget | yes | `runtime/guards/*.yaml`, `runtime/pipeline/*.yaml`, `runtime/context/*.yaml`, `runtime/budget/*.yaml` | compiled into matching runtime tables |
+| Guards / pipeline / context / budget | yes | `runtime/**/*.yaml`, `runtime/**/*.yaml`, `runtime/context/*.yaml`, `runtime/budget/*.yaml` | compiled into matching runtime tables |
 
-**Decision**: Phase 1 may proceed in `enforcement/` because it is prose policy. Phase 2 may add a new `runtime/guards/*.yaml` because `runtime/guards/` still exists as SQLite canonical document. Phase 3 must not directly add files under missing `runtime/recovery/` unless a separate source restoration migration is approved; for now, recovery runtime extensions should target `runtime/compiler/embedded_data.rb` plus compiler/runtime.db updates.
+**Decision**: Phase 1 may proceed in `enforcement/` because it is prose policy. Phase 2 may add a new `runtime/**/*.yaml` because `runtime/README.md` still exists as SQLite canonical document. Phase 3 must not directly add files under missing `runtime/recovery/` unless a separate source restoration migration is approved; for now, recovery runtime extensions should target `runtime/compiler/embedded_data.rb` plus compiler/runtime.db updates.
 
 **Linked update completed**: `runtime/README.md` now marks embedded-only runtime domains as sourced from `runtime/compiler/embedded_data.rb` rather than broken standalone YAML links.
 
@@ -296,7 +296,7 @@ Exit criteria:
 | 欄位 | 結果 |
 | --- | --- |
 | Trigger | 開始執行 Phase 2 — Runtime Guard Integration |
-| Checked sources | `plans/README.md`、`runtime/README.md`、`runtime/guards/README.md`、`runtime/runtime.db`、`runtime/runtime.db`、`runtime/compiler/compiler-engine.rb` |
+| Checked sources | `plans/README.md`、`runtime/README.md`、`runtime/README.md`、`runtime/runtime.db`、`runtime/runtime.db`、`runtime/compiler/compiler-engine.rb` |
 | Conflicts | `runtime/guards/mismatch-escalation.yaml` 尚不存在，且 compiler 目前只編譯已知 guard source；不新增獨立 YAML，改將 `mismatch_escalation` 放入已編譯的 `runtime/runtime.db`，並擴充 compiler guard key。 |
 | Decision | proceed with revised source placement |
 | Validation | YAML parse、runtime compiler、`runtime.db` query、`validate-runtime-db.rb`、knowledge runtime refresh |
@@ -532,7 +532,7 @@ Phase 7 result:
 ## 11. Open Questions
 
 - `runtime/recovery/` 等目錄是否應恢復為 SQLite canonical document，或保留在 compiler embedded data？
-- Recovery levels 是否應屬於 `runtime/guards/`、`metadata/recovery/`，還是兩者分工？
+- Recovery levels 是否應屬於 `runtime/README.md`、`metadata/recovery/`，還是兩者分工？
 - 是否需要 runtime-state.db 記錄 mismatch counter？
 - Validation scenario 要測 prose output shape，還是只測 route / required source selection？
 - Escalation trigger 是否要接入 tool adapters，讓 IDE / CLI 在連續失敗時提示 agent？

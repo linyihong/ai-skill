@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`runtime/router/` 負責 **context routing 決策邏輯**。Agent 在 session 啟動後，透過本層決定哪些知識需要載入、哪些可以 deferred。
+`runtime/README.md` 負責 **context routing 決策邏輯**。Agent 在 session 啟動後，透過本層決定哪些知識需要載入、哪些可以 deferred。
 
 ## Routing Flow
 
@@ -44,7 +44,7 @@ Go CLI 若未來新增 activation query 命令，應以 `activation-rules.yaml` 
 
 ## 與既有文件的關係
 
-- [`runtime/router/`](../../runtime/router/) — Runtime navigation entry point (data files: `activation-rules.yaml`, `activation-table.md`)
+- [`runtime/README.md`](../../runtime/README.md) — Runtime navigation entry point (data files: `activation-rules.yaml`, `activation-table.md`)
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Lazy-load rules with activation conditions
 - [`runtime/router/activation-table.md`](../../runtime/router/activation-table.md) — Situation → Activated Rules table
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing records

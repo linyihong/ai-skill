@@ -47,7 +47,7 @@
 | `route.runtime.context-loading` | `governance/lifecycle/routing-philosophy.md` | `summary-first` | routing decision 可先用 registry、index、summary；修改 source 時再升級。 |
 | `route.governance.routing-signal` | `governance/ai-runtime-governance/routing-signal-governance.md` | `summary-first` | 多數路由疑義先讀治理 gate 與 source intelligence；只有修改 workflow/routing surface 時再展開 registry 和 activation table。 |
 | `route.governance.validation-scenario` | `governance/ai-runtime-governance/validation-scenario-governance.md` | `summary-first` | 先讀 scenario governance 與 source intelligence；建立或修改 scenario 時再展開 validation format 與 failure-learning source。 |
-| `route.runtime.router-flow` | `runtime/router/` | `index-only` | Router flow 是設計文件，需要 routing 決策時才讀。 |
+| `route.runtime.router-flow` | `runtime/README.md` | `index-only` | Router flow 是設計文件，需要 routing 決策時才讀。 |
 | `route.intelligence.engineering.heuristics` | `intelligence/engineering/heuristics/README.md` | `index-only` | 通用 heuristics 在需要對應判斷時才讀取完整 atom。 |
 | `route.runtime.context-ttl-doc` | `governance/lifecycle/context-ttl-philosophy.md` | `index-only` | TTL doc 是設計文件，需要 prune context 時才讀。 |
 | `route.workflow.documentation-ai-native` | `workflow/documentation/README.md` | `summary-first` | 多數任務只需 workflow README 與 execution-flow；policy 全文留在 enforcement。 |
@@ -64,8 +64,8 @@
 | `route.anti-patterns.runtime-patterns` | `anti-patterns/README.md` | `summary-first` | anti-patterns/ 在需要查詢 runtime 失效模式或預防方式時才讀取。 |
 | `route.runtime.compiler` | `runtime/runtime.db` | `source-backed` | Compiler 在 workflow/enforcement 文件變更後才需要執行，不佔用 bootstrap 預算。 |
 | `route.runtime.intelligence-routing` | `runtime/runtime.db` | `index-only` | Intelligence routing 在需要領域知識時才載入，不佔用 bootstrap 預算。 |
-| `route.runtime.output-governance` | `runtime/output-governance/` | `source-backed` | Output Governance 在 validation 與 finalize phase 時才需要載入，不佔用 bootstrap 預算。 |
-| `route.runtime.distributed` | `runtime/distributed/` | `source-backed` | Distributed Runtime 在 multi-agent 協作或 async job 執行時才需要載入，不佔用 bootstrap 預算。 |
+| `route.runtime.output-governance` | `runtime/README.md` | `source-backed` | Output Governance 在 validation 與 finalize phase 時才需要載入，不佔用 bootstrap 預算。 |
+| `route.runtime.distributed` | `runtime/README.md` | `source-backed` | Distributed Runtime 在 multi-agent 協作或 async job 執行時才需要載入，不佔用 bootstrap 預算。 |
 | `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.md` | `source-backed` | Knowledge Update Flow 在 checkpoint 或 finalize phase 需要執行知識更新時才載入，不佔用 bootstrap 預算。 |
 
 ### `specialized`
@@ -77,7 +77,7 @@
 | `route.workflow.software-delivery` | `workflow/software-delivery/execution-flow.md` | `source-backed` | App development guidance 需要 workflow、analysis methods 與 domain-specific controls/checklists routing。triggers 已擴充以支援中途切換。 |
 | `route.workflow.greenfield` | `workflow/greenfield/execution-flow.md` | `source-backed` | Greenfield 需要 workflow、templates 與 software-delivery 的 BDD Closure 整合。 |
 | `route.workflow.travel-planning` | `workflow/travel-planning/execution-flow.md` | `source-backed` | Travel planning 需要 workflow、analysis methods 與 domain-specific intelligence routing。 |
-| `route.runtime.onboarding` | `runtime/onboarding/README.md` | `summary-first` | Onboarding 文件在需要執行對應 workflow 的完整流程時才讀取。 |
+| `route.runtime.onboarding` | `runtime/onboarding/apk-analysis-setup.md` | `summary-first` | Onboarding 文件在需要執行對應 workflow 的完整流程時才讀取。 |
 | `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `summary-first` | 需要執行對應操作流程時才讀取完整 workflow。 |
 | `route.analysis.web` | `analysis/web/README.md` | `summary-first` | Web Scraping analysis 在需要從網頁提取資料時才讀取，不佔用 bootstrap 預算。 |
 | `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/apk-analysis/README.md` | `summary-first` | 需要對應決策智慧時才讀取完整 atom。 |

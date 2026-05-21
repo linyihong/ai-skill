@@ -10,7 +10,7 @@
 | `workflow/` | 執行流程步驟 | 如何將步驟組合成 prompt |
 | `intelligence/` | 工程智慧 atoms | 何時在 prompt 中引用哪些 atoms |
 | `analysis/` | 分析方法 | 如何在 prompt 中引用方法 |
-| `runtime/pipeline/` | Session lifecycle | 每個 stage 的 prompt 產出格式 |
+| `runtime/README.md` | Session lifecycle | 每個 stage 的 prompt 產出格式 |
 
 **Prompt Artifact Generator** 填補這個缺口：讓 AI 在 routing stage 之後、execution stage 之前，自動組裝出一個**針對當前任務類型優化的 prompt artifact**。
 
@@ -43,11 +43,11 @@ Execution Stage (uses composed artifact as prompt)
 
 ## 與既有文件的關係
 
-- [`runtime/prompt-artifacts/`](../../runtime/prompt-artifacts/) — Runtime navigation entry point (data files: `artifact-templates.yaml`, `composition-rules.yaml`)
+- [`runtime/README.md`](../../runtime/README.md) — Runtime navigation entry point (data files: `artifact-templates.yaml`, `composition-rules.yaml`)
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Task type artifact template definitions
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Composition rules
 - [`workflow/`](../../workflow/) — 提供執行步驟（what to do）
 - [`intelligence/`](../../intelligence/) — 提供判斷依據（how to think）
 - [`analysis/`](../../analysis/) — 提供分析方法（how to do）
 - [`metadata/schema.md`](../../metadata/schema.md) — 提供 context cost 估算
-- [`runtime/pipeline/`](../../runtime/pipeline/) — 提供 session lifecycle 整合點
+- [`runtime/README.md`](../../runtime/README.md) — 提供 session lifecycle 整合點

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`governance/lifecycle/routing-philosophy.md`（本檔）與 `runtime/router/` 定義 agent 如何為任務選擇要載入的 Ai-skill knowledge。這是 routing design layer，不是 executable policy。
+`governance/lifecycle/routing-philosophy.md`（本檔）與 `runtime/README.md` 定義 agent 如何為任務選擇要載入的 Ai-skill knowledge。這是 routing design layer，不是 executable policy。
 
 ## Routing Pipeline
 
@@ -77,7 +77,7 @@ task intent
 
 ## 與既有文件的關係
 
-- [`runtime/router/`](../../runtime/router/) — Activation 與 router 資料（`activation-table.md`、`activation-rules.yaml`）
+- [`runtime/README.md`](../../runtime/README.md) — Activation 與 router 資料（`activation-table.md`、`activation-rules.yaml`）
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — Task intent routing table
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Machine-readable routing records
 - [`metadata/ranking/README.md`](../../metadata/ranking/README.md) — Metadata ranking rules

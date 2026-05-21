@@ -31,7 +31,7 @@
 | ❌ 不應放入工具文件 | ✅ 已在何處 |
 |---|---|
 | Core Bootstrap 流程（讀 CORE_BOOTSTRAP.md → README.md → ...） | [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md) |
-| Pipeline 階段（Bootstrap → Routing → Execution → Close-loop） | [`runtime/pipeline/`](../runtime/pipeline/) |
+| Pipeline 階段（Bootstrap → Routing → Execution → Close-loop） | [`runtime/README.md`](../runtime/README.md) |
 | Context expansion 層級（Summary → Module → Detailed → Raw） | [`runtime/runtime.db`](../runtime/runtime.db) |
 | Relevance scoring 邏輯 | [`runtime/runtime.db`](../runtime/runtime.db) |
 | Guard chain 執行順序 | [`runtime/runtime.db`](../runtime/runtime.db) |

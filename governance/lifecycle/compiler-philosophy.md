@@ -25,7 +25,7 @@
 
 ## 與既有文件的關係
 
-- [`runtime/compiler/README.md`](../../runtime/compiler/README.md) — Runtime navigation entry point
+- [`runtime/README.md`](../../runtime/README.md) — Runtime navigation entry point
 - [`scripts/ai-skill-cli/internal/app/runtime_compiler.go`](../../scripts/ai-skill-cli/internal/app/runtime_compiler.go) — Compiler implementation
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Source-target mapping rules
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Compiled SQLite surfaces (replaces `runtime/generated/`)

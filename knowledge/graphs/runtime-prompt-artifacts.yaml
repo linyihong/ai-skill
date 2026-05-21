@@ -1,12 +1,12 @@
 id: graph.runtime-prompt-artifacts
-source: runtime/prompt-artifacts/
+source: runtime/README.md
 status: candidate
 summary: >
   連接 prompt artifact generator 的所有元件：artifact-templates、composition-rules，
   以及相關的 workflow、intelligence、analysis、pipeline 層。
 edges:
   - type: depends_on
-    target: runtime/prompt-artifacts/
+    target: runtime/README.md
     reason: Prompt artifacts 目錄提供概覽、設計與使用方式。
     validation: 目錄定義 artifact composition flow 與各層的關係。
   - type: depends_on
@@ -36,7 +36,7 @@ edges:
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.runtime.prompt-artifacts record。
-    validation: registry record 的 primary_source 指向 runtime/prompt-artifacts/。
+    validation: registry record 的 primary_source 指向 runtime/README.md。
 metadata:
   priority: P2
   confidence: medium

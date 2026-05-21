@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`runtime/guards/` 負責「AI Runtime 安全護欄」。本層保存 circuit breaker、context pollution detection 等 runtime 保護機制，防止 agent 陷入遞迴循環、tool explosion、context 失控或 hallucination 高風險情境。
+`runtime/README.md` 負責「AI Runtime 安全護欄」。本層保存 circuit breaker、context pollution detection 等 runtime 保護機制，防止 agent 陷入遞迴循環、tool explosion、context 失控或 hallucination 高風險情境。
 
 ## Current Guards
 
@@ -11,7 +11,7 @@
 
 ## 與既有文件的關係
 
-- [`runtime/guards/`](../../runtime/guards/) — Runtime navigation entry point (data files: `circuit-breaker.yaml`, `context-pollution.yaml`)
+- [`runtime/README.md`](../../runtime/README.md) — Runtime navigation entry point (data files: `circuit-breaker.yaml`, `context-pollution.yaml`)
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Circuit breaker definitions
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Context pollution detection
 - [`anti-patterns/`](../../anti-patterns/) — Runtime anti-patterns 的症狀與預防方式

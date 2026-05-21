@@ -13,7 +13,7 @@
 
 ## 與既有文件的關係
 
-- [`runtime/distributed/`](../../runtime/distributed/) — Runtime navigation entry point (data files: `distributed-locks.yaml`, `multi-agent-coordination.yaml`, `async-job-lifecycle.yaml`)
+- [`runtime/README.md`](../../runtime/README.md) — Runtime navigation entry point (data files: `distributed-locks.yaml`, `multi-agent-coordination.yaml`, `async-job-lifecycle.yaml`)
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Distributed lock / lease 機制
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Multi-agent 協調規則
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Background job / async task lifecycle

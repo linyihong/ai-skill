@@ -1,7 +1,7 @@
 # Activation Table（Situation → Activated Rules）
 
 本表提供人類可讀的 activation 對照，涵蓋所有常見情境。
-程式化 source-of-truth 是 `activation-rules.yaml`；已移除舊 Ruby activation engine，避免 agent 誤用 stale script。
+程式化 source-of-truth 是 `runtime/runtime.db` 的 `activation_rules` / `activation_rules_mirror` tables；已移除舊 Ruby activation engine 與 committed YAML mirror，避免 agent 誤用 stale source。
 
 ## 通用原則
 

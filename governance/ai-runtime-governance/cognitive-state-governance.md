@@ -14,7 +14,7 @@ This is governance source, not a persistent runtime state model. Runtime promoti
 | Assumption, evidence, confidence, claim scope, autonomy, and contamination governance | This document |
 | Executable MUST / forbidden behavior | `enforcement/evidence-hierarchy.md` and `enforcement/escalation-policy.md` |
 | Domain-specific reload and evidence policy | `metadata/recovery/` and `metadata/evidence/` |
-| Machine-enforced runtime guards | `runtime/guards/` after signal compression |
+| Machine-enforced runtime guards | `runtime/README.md` after signal compression |
 | Failure reproduction | `validation/scenarios/failure-derived/` |
 
 ## Cognitive Governance Model

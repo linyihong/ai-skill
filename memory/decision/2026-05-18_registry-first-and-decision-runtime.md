@@ -22,5 +22,5 @@ accepted
 ## Related
 
 - [ADR-006](../../decisions/ADR-006-registry-first-workflow-activation.md)
-- [`runtime/decisions/README.md`](../../runtime/decisions/README.md)
+- [`runtime/README.md`](../../runtime/README.md)
 - [`feedback/.../2026-05-18_160000-registry-first-workflow-activation.md`](../../feedback/history/development-guidance/common/2026-05-18_160000-registry-first-workflow-activation.md)

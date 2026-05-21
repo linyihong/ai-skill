@@ -38,8 +38,8 @@
 - **README 拆分**：根 `README.md` 縮短為 ~80 行超短入口。
 - **Rule Lazy-load 機制**：`enforcement/README.md` 引入 Runtime Activation Model，15 條 lazy-load rules 定義觸發條件。
 - **Skill Index**：`skills-index.yaml` 建立（13 skills，含 triggers、cost metadata、entrypoint、summary path）。
-- **Runtime Router**：`runtime/runtime.db`（15 activation rules）、`runtime/router/README.md`（routing decision flow）。
-- **Context TTL**：`runtime/runtime.db`（20 context types）、`runtime/context/README.md`（prune strategy）。
+- **Runtime Router**：`runtime/runtime.db`（15 activation rules）、`runtime/README.md`（routing decision flow）。
+- **Context TTL**：`runtime/runtime.db`（20 context types）、`runtime/README.md`（prune strategy）。
 - **Context Cost Metadata**：`metadata/schema.md` 的 `context_cost` 升級為 object（estimated_tokens、load_strategy、cacheable、ttl）。
 - **Routing Registry 升級**：`knowledge/runtime/routing-registry.yaml` 升級 v2，所有 records 含 cost metadata。
 - **Summary Layer 擴充**：新增 8 個 summaries（app-development-guidance、travel-planning、repo-governance、knowledge-navigation、runtime-operations、model-routing、memory-operations、context-cost-optimization），總數從 6 → 14。
@@ -65,7 +65,7 @@
 
 將所有 Runtime Quality & Safety 元件串接成可執行的 orchestration flow：
 
-- **Pipeline 概覽**：[`runtime/pipeline/README.md`](../runtime/pipeline/README.md) — 元件接線圖（bootstrap → routing → execution → close-loop）、跨階段通訊表（10 個觸發事件，如 Token usage > 90% → Context Pollution auto-archive、Recursive depth > 4 → Force close-loop）
+- **Pipeline 概覽**：[`runtime/README.md`](../runtime/README.md) — 元件接線圖（bootstrap → routing → execution → close-loop）、跨階段通訊表（10 個觸發事件，如 Token usage > 90% → Context Pollution auto-archive、Recursive depth > 4 → Force close-loop）
 - **Session Lifecycle**：[`runtime/runtime.db`](../runtime/runtime.db) — 4 階段定義：Bootstrap（2000 tokens, 2 guards）、Routing（2500 tokens, 3 guards）、Execution（100000 tokens, 11 guards）、Close-loop（1000 tokens, 1 guard）
 - **Progressive Context Expansion**：[`runtime/runtime.db`](../runtime/runtime.db) — 4 層級（summary ~500 → module summary ~1500 → detailed source ~4500 → raw source ~10000 tokens），每層有 cache policy（session/task TTL）、entry/exit conditions、no-skip-levels rule
 - **Guard Chain**：[`runtime/runtime.db`](../runtime/runtime.db) — 每 stage 的 guard 執行順序（ordered by severity）、檢查頻率（per_tool_call / per_task / per_edit）、layered violation 行為（critical → halt, high/medium → warn）
@@ -94,7 +94,7 @@
 ### 已完成：Phase 13-16
 
 - **Phase 13：Intelligence atoms 填充** — 在全部 8 個子目錄（architecture、tradeoffs、failure、domain、anti-patterns、distributed-systems、business、travel）各建立 1 個 candidate intelligence atom，遵循 principle → rationale → when to apply → decision flow → common misuse → token impact 格式。
-- **Phase 14：Task-specific prompt artifact generator** — 建立 `runtime/prompt-artifacts/` 層，含 7 個 task type templates（apk-analysis、app-development-guidance、repo-analysis、travel-planning、repo-governance、knowledge-navigation、feedback-promotion）與 4 個 composition rules（workflow-steps、intelligence-atoms、analysis-methods、knowledge-summary），支援 priority-based culling 與 conflict resolution。
+- **Phase 14：Task-specific prompt artifact generator** — 建立 `runtime/README.md` 層，含 7 個 task type templates（apk-analysis、app-development-guidance、repo-analysis、travel-planning、repo-governance、knowledge-navigation、feedback-promotion）與 4 個 composition rules（workflow-steps、intelligence-atoms、analysis-methods、knowledge-summary），支援 priority-based culling 與 conflict resolution。
 - **Phase 15：Knowledge graph records** — 建立 17 個完整 graph records：10 個 intelligence atom graphs、2 個 runtime graphs（pipeline、prompt-artifacts）、5 個 layer subdirectory graphs（workflow、analysis、governance、feedback、decisions），含 edges、validation、metadata。
 - **Phase 16：Skill content extraction** — 從 `skills/apk-analysis/` 提取以下內容到新分層：
   - `TOOLS.md` → `analysis/apk/tools-and-failures.md`：媒體驗證工具、自動化腳本安全邊界
@@ -156,7 +156,7 @@
 |--------|----------|
 | [`runtime/onboarding/apk-analysis-setup.md`](runtime/onboarding/apk-analysis-setup.md) | 放置位置、開場提示詞、自動回饋提示 |
 | [`runtime/onboarding/apk-analysis-completion.md`](runtime/onboarding/apk-analysis-completion.md) | 完成定義、第一輪分析順序 |
-| [`runtime/onboarding/README.md`](runtime/onboarding/README.md) | 目錄索引與 scope 定義 |
+| [`runtime/onboarding/apk-analysis-setup.md`](runtime/onboarding/apk-analysis-setup.md) | 目錄索引與 scope 定義 |
 
 ### ✅ 已完成：Phase 26 — Extract app-development-guidance subdirectories
 
@@ -402,7 +402,7 @@ Pilot 成功 = AI 開始能做 decision routing：
 | 32d | 提取 app-development-guidance SKILL.md Quick Start → `runtime/onboarding/app-development-guidance-quickstart.md` | ✅（已刪除：內容已回歸 workflow/software-delivery/） |
 | 32e | 提取 travel-planning SKILL.md Quick Start → `runtime/onboarding/travel-planning-quickstart.md` | ✅（已刪除：內容已回歸 workflow/travel-planning/） |
 | 32f | 瘦身 3 個 SKILL.md 為純 routing 文件 | ✅ |
-| 32g | 更新 `runtime/onboarding/README.md` + `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` | ✅ |
+| 32g | 更新 `runtime/onboarding/apk-analysis-setup.md` + `plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md` | ✅ |
 | 32h | 提交 + push | ✅ |
 
 **建立的新檔案**（1 個）：
@@ -695,7 +695,7 @@ runtime/
 - **context health scoring**（`runtime/runtime.db`）。
 - **circuit breaker & guards**（`runtime/runtime.db`、`runtime/runtime.db`）。
 - **session lifecycle management**（`runtime/runtime.db`）。
-- **prompt artifact generation**（`runtime/prompt-artifacts/`）— 根據 task type 自動組合 prompt 結構，引用 workflow/ 的執行步驟、intelligence/ 的工程智慧、analysis/ 的分析方法，產出針對當前任務優化的 prompt artifact。
+- **prompt artifact generation**（`runtime/README.md`）— 根據 task type 自動組合 prompt 結構，引用 workflow/ 的執行步驟、intelligence/ 的工程智慧、analysis/ 的分析方法，產出針對當前任務優化的 prompt artifact。
 
 ### `tools/`
 
@@ -1148,8 +1148,8 @@ Status: ✅ **已完成**。所有子項目已實作完畢。
 - `decisions/README.md` — Decision System（ADR lifecycle、naming convention）。
 - `anti-patterns/README.md` + 5 patterns — Anti-patterns。
 - `skills-index.yaml` — Skills Metadata v2（weight/domains/dependencies/conflicts/priority.runtime）。
-- `runtime/pipeline/README.md` — Runtime Pipeline（7 階段 pipeline 架構與元件間通訊）。
-- `runtime/context/README.md` — Context TTL & Pruning（session/task/conversation TTL 類型與 prune 策略）。
+- `runtime/README.md` — Runtime Pipeline（7 階段 pipeline 架構與元件間通訊）。
+- `runtime/README.md` — Context TTL & Pruning（session/task/conversation TTL 類型與 prune 策略）。
 
 定義：
 

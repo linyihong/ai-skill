@@ -41,14 +41,14 @@
 | `route.feedback.promotion-pipeline` | `feedback/promotion/README.md` | `large` | `source-backed` | 原 lesson source 保留、promotion target 明確、runtime surfaces 與 close-loop validation 已同步。 |
 | `route.models.model-aware-routing` | `models/README.md` | `large` | `source-backed` | Strategy、capability dimensions、compression、fallback behavior、workflow shape 與 validation target 可被記錄，且 validation/scenarios/models 覆蓋主要 routing cases。 |
 | `route.memory.retrieval-activation` | `memory/README.md` | `large` | `source-backed` | Memory activation decision 能記錄 trigger、candidate memory、qualification、replay budget、current-source revalidation 與 discard / promotion decision。 |
-| `route.runtime.router-flow` | `runtime/router/` | `small` | `index-only` | Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。 |
+| `route.runtime.router-flow` | `runtime/README.md` | `small` | `index-only` | Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。 |
 | `route.intelligence.engineering.heuristics` | `intelligence/engineering/heuristics/README.md` | `small` | `index-only` | 各 atom 有明確原則與決策表，可反查驗證。 |
 | `route.runtime.context-ttl-doc` | `governance/lifecycle/context-ttl-philosophy.md` | `small` | `index-only` | TTL policy 已套用，prune strategy 已理解。 |
 | `route.workflow.software-delivery` | `workflow/software-delivery/execution-flow.md` | `specialized` | `source-backed` | Change intake、requirements cognition、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence、same-session closure 與 architecture fit analysis 已檢查；workflow、analysis、intelligence、metadata 與 governance 內容已分離。 |
 | `route.workflow.greenfield` | `workflow/greenfield/execution-flow.md` | `specialized` | `source-backed` | 新分層路徑可讀取，workflow 與 templates 內容完整。 |
 | `route.workflow.travel-planning` | `workflow/travel-planning/execution-flow.md` | `specialized` | `source-backed` | 新分層路徑可讀取，workflow 與 analysis 內容已分離。 |
 | `route.workflow.documentation-ai-native` | `workflow/documentation/README.md` | `small` | `summary-first` | 新文件或目錄具 index-first 導航、分類維度（kind/audience/stability）已標註； README-as-router、停止條件與單一真相已符合 documentation context governance； 長文已按 document-sizing 拆分；語言與工具敘述依專案自訂 policy（本 route 不預設 tool-neutral）。  |
-| `route.runtime.onboarding` | `runtime/onboarding/README.md` | `specialized` | `summary-first` | 各 quickstart 的步驟可依序執行，且與對應 workflow 的內容一致。 |
+| `route.runtime.onboarding` | `runtime/onboarding/apk-analysis-setup.md` | `specialized` | `summary-first` | 各 quickstart 的步驟可依序執行，且與對應 workflow 的內容一致。 |
 | `route.analysis.apk.workflows` | `analysis/apk/workflows/README.md` | `specialized` | `summary-first` | 各 workflow 有明確步驟與產出格式，可依序執行。 |
 | `route.analysis.web` | `analysis/web/README.md` | `specialized` | `summary-first` | 目標網站已評估（技術棧、JS 需求、anti-bot 保護），工具已選擇（HTTP/Dynamic/Stealth）， 提取策略已設計（selector/adaptive parsing），風險已評估（legal/technical/data quality）。  |
 | `route.intelligence.apk-analysis.atoms` | `intelligence/engineering/apk-analysis/README.md` | `specialized` | `summary-first` | 各 atom 有明確決策表或信號表，可反查驗證。 |
@@ -66,8 +66,8 @@
 | `route.anti-patterns.runtime-patterns` | `anti-patterns/README.md` | `small` | `summary-first` | Anti-pattern 已依格式記錄，症狀、預防與恢復方式已定義。 |
 | `route.runtime.compiler` | `runtime/runtime.db` | `small` | `source-backed` | 所有 modified sources 已編譯，runtime.db 的 generated_surfaces 表包含最新記錄，`ai-skill runtime validate` 回傳 exit 0。 |
 | `route.runtime.intelligence-routing` | `runtime/runtime.db` | `small` | `index-only` | Task intent 已對應到 intelligence-routing.yaml 的 domain，applicable_phases 已檢查，domain README 已載入。 |
-| `route.runtime.output-governance` | `runtime/output-governance/` | `small` | `source-backed` | Language consistency 已確認，sanitization 已通過，tool neutrality 已檢查， format compliance 已驗證，governance gates 全部通過。  |
-| `route.runtime.distributed` | `runtime/distributed/` | `small` | `source-backed` | Distributed locks 已正確 acquire/release，multi-agent coordination rules 已遵守， async job lifecycle 狀態轉換正確，無 deadlock 或 stale state。  |
+| `route.runtime.output-governance` | `runtime/README.md` | `small` | `source-backed` | Language consistency 已確認，sanitization 已通過，tool neutrality 已檢查， format compliance 已驗證，governance gates 全部通過。  |
+| `route.runtime.distributed` | `runtime/README.md` | `small` | `source-backed` | Distributed locks 已正確 acquire/release，multi-agent coordination rules 已遵守， async job lifecycle 狀態轉換正確，無 deadlock 或 stale state。  |
 | `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.md` | `small` | `source-backed` | 目前 knowledge update 的步驟已確認，entry conditions 已滿足，exit conditions 已檢查，reference sources 已載入；linked update completeness gates 已通過， 下一步驟已決定。  |
 
 ## Summary Records
@@ -121,9 +121,9 @@
 | `memory-operations` | `memory/README.md` | `candidate` | 6 | [`memory-operations.yaml`](../graphs/memory-operations.yaml) |
 | `graph.metadata-navigation` | `metadata/schema.md` | `candidate` | 8 | [`metadata-navigation.yaml`](../graphs/metadata-navigation.yaml) |
 | `graph.requirements-cognition` | `intelligence/engineering/requirements/README.md` | `candidate` | 11 | [`requirements-cognition.yaml`](../graphs/requirements-cognition.yaml) |
-| `graph.runtime-onboarding` | `runtime/onboarding/README.md` | `candidate` | 4 | [`runtime-onboarding.yaml`](../graphs/runtime-onboarding.yaml) |
-| `graph.runtime-pipeline` | `runtime/pipeline/` | `candidate` | 12 | [`runtime-pipeline.yaml`](../graphs/runtime-pipeline.yaml) |
-| `graph.runtime-prompt-artifacts` | `runtime/prompt-artifacts/` | `candidate` | 8 | [`runtime-prompt-artifacts.yaml`](../graphs/runtime-prompt-artifacts.yaml) |
+| `graph.runtime-onboarding` | `runtime/onboarding/apk-analysis-setup.md` | `candidate` | 4 | [`runtime-onboarding.yaml`](../graphs/runtime-onboarding.yaml) |
+| `graph.runtime-pipeline` | `runtime/README.md` | `candidate` | 12 | [`runtime-pipeline.yaml`](../graphs/runtime-pipeline.yaml) |
+| `graph.runtime-prompt-artifacts` | `runtime/README.md` | `candidate` | 8 | [`runtime-prompt-artifacts.yaml`](../graphs/runtime-prompt-artifacts.yaml) |
 | `graph.source-boundary` | `governance/lifecycle/README.md` | `candidate` | 6 | [`source-boundary.yaml`](../graphs/source-boundary.yaml) |
 | `graph.workflow-layers` | `workflow/README.md` | `candidate` | 20 | [`workflow-layers.yaml`](../graphs/workflow-layers.yaml) |
 | `graph.workflow-software-delivery-architecture` | `workflow/software-delivery/architecture/README.md` | `candidate` | 7 | [`workflow-software-delivery-architecture.yaml`](../graphs/workflow-software-delivery-architecture.yaml) |

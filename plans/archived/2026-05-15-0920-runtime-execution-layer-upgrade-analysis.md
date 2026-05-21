@@ -18,7 +18,7 @@
 | Transaction Runtime | Completed via compiled runtime | `transaction_states`, `transaction_transitions`, `transaction_rules` in `runtime/runtime.db`. |
 | Runtime Compiler / Projection | Completed with SQLite target | `runtime/compiler/compiler-engine.rb`, `runtime/compiler/embedded_data.rb`, `runtime/runtime.db`, and `generated_surfaces`. |
 | State Repair / Recovery | Completed in later recovery plan | `plans/archived/2026-05-20-1039-runtime-recovery-escalation-system.md`, `governance/ai-runtime-governance/recovery-retry-governance.md`, `metadata/recovery/`. |
-| Output Governance | Completed | `runtime/output-governance/` and `runtime/runtime.db` governance tables. |
+| Output Governance | Completed | `runtime/README.md` and `runtime/runtime.db` governance tables. |
 | Workflow / runtime boundary | Superseded by later decisions | `workflow/workflow-routing.md`, ADR-006 registry-first workflow activation, and current routing registry. |
 | Agent VM | Deferred | Still a long-term direction; current closure focuses on execution reliability, not VM abstraction. |
 
@@ -297,7 +297,7 @@ runtime/generated/
 
 **新增檔案**：
 ```
-runtime/intelligence/
+runtime/README.md
 ├── README.md                    # Intelligence Routing 概覽
 └── intelligence-routing.yaml    # required_intelligence 清單
 ```
@@ -1477,7 +1477,7 @@ LLM Runtime
 
 ### 14.2 目標
 
-建立 `runtime/output-governance/` 元件，將語言與文件輸出規則升級為 declarative YAML，讓 runtime 可以：
+建立 `runtime/README.md` 元件，將語言與文件輸出規則升級為 declarative YAML，讓 runtime 可以：
 
 1. **統一控制語言行為**：定義語言強制規則（跟隨使用者語言、防漂移機制、各工具的語言設定方式）
 2. **統一控制文件輸出**：定義文件輸出規則（格式要求、內容邊界、去敏規則、工具中立性）
@@ -1487,7 +1487,7 @@ LLM Runtime
 ### 14.3 建議檔案結構
 
 ```
-runtime/output-governance/
+runtime/README.md
 ├── README.md                          # 設計原則與使用說明
 ├── language-policy.yaml               # 語言強制規則
 │   ├── core_rules:                     # 核心原則（跟隨使用者語言、無預設語言）
@@ -1525,7 +1525,7 @@ runtime/output-governance/
 
 | Phase | 內容 | 依賴 |
 |-------|------|------|
-| P2.5 | `runtime/output-governance/README.md` + `language-policy.yaml` | 無 |
+| P2.5 | `runtime/README.md` + `language-policy.yaml` | 無 |
 | P2.5 | `runtime/runtime.db` | 無 |
 | P2.5 | `runtime/runtime.db` | `runtime/runtime.db` |
 | P3 | Compiler 整合 output governance check | `runtime/runtime.db` |

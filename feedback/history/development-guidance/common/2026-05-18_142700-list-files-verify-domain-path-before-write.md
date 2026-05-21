@@ -64,4 +64,4 @@ Agent 在長時間對話中容易累積過時的內部記憶（例如某個 doma
 
 - 已依 [`linked-updates.md`](../../../enforcement/linked-updates.md) 檢查：
   - `feedback/feedback-lessons.md`：需在判斷流程 Step 2 後加入「確認目錄存在」的子步驟
-  - `runtime/generated/README.md`：可加入寫 feedback 前的提醒查詢
+  - `runtime/README.md`：可加入寫 feedback 前的提醒查詢

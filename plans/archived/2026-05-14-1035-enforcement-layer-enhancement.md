@@ -117,7 +117,7 @@ Related: [`metadata/schema.md`](../../metadata/schema.md), [`runtime/runtime.db`
   - 狀態從 `candidate` 改為 `validated`
   - 所有 `source` 路徑從 `enforcement/` 改為 `enforcement/`
   - 加入 `rule_id` 與 `metadata/rules/` 中 `.yaml` 檔案的對應
-- [ ] 更新 `runtime/router/README.md` 加入 activation engine 的使用說明
+- [ ] 更新 `runtime/README.md` 加入 activation engine 的使用說明
 - [ ] 驗證：activation engine 能正確判斷 5 個以上測試情境
 
 ---

@@ -78,43 +78,43 @@ edges:
     target: governance/lifecycle/distributed-runtime-philosophy.md
     reason: >
       Distributed runtime philosophy 解釋多 agent 協調、分散式鎖、async job 的設計原理。
-      runtime/distributed/ 只存放 structured YAML，概念說明歸 governance 層。
+      runtime/README.md 只存放 structured YAML，概念說明歸 governance 層。
     validation: distributed-runtime-philosophy.md 說明目的、設計原則、與 transaction runtime 的關係。
   - type: related_to
     target: governance/lifecycle/runtime-guards-philosophy.md
     reason: >
       Runtime guards philosophy 解釋 circuit breaker 與 context pollution detection 的設計原理。
-      runtime/guards/ 只存放 structured YAML，概念說明歸 governance 層。
+      runtime/README.md 只存放 structured YAML，概念說明歸 governance 層。
     validation: runtime-guards-philosophy.md 說明 guards 的目的、目前 guards 的設計。
   - type: related_to
     target: governance/lifecycle/intelligence-routing-philosophy.md
     reason: >
       Intelligence routing philosophy 解釋 intelligence domain 對應與 routing 流程的設計原理。
-      runtime/intelligence/ 只存放 intelligence-routing.yaml，概念說明歸 governance 層。
+      runtime/README.md 只存放 intelligence-routing.yaml，概念說明歸 governance 層。
     validation: intelligence-routing-philosophy.md 說明設計原則、domain 對照表、routing 流程。
   - type: related_to
     target: governance/lifecycle/output-governance-philosophy.md
     reason: >
       Output governance philosophy 解釋語言政策、輸出規則、governance gates 的設計原理。
-      runtime/output-governance/ 只存放 structured YAML，概念說明歸 governance 層。
+      runtime/README.md 只存放 structured YAML，概念說明歸 governance 層。
     validation: output-governance-philosophy.md 說明目的、設計原則、與 compiler 的整合。
   - type: related_to
     target: governance/lifecycle/pipeline-philosophy.md
     reason: >
       Pipeline philosophy 解釋 context flow、guard chain、relevance engine 的設計原理。
-      runtime/pipeline/ 只存放 structured YAML，概念說明歸 governance 層。
+      runtime/README.md 只存放 structured YAML，概念說明歸 governance 層。
     validation: pipeline-philosophy.md 說明為什麼需要 pipeline、架構、元件間通訊。
   - type: related_to
     target: governance/lifecycle/prompt-artifacts-philosophy.md
     reason: >
       Prompt artifacts philosophy 解釋 artifact 組合式 prompt 結構的設計原理。
-      runtime/prompt-artifacts/ 只存放 templates 與 composition rules，概念說明歸 governance 層。
+      runtime/README.md 只存放 templates 與 composition rules，概念說明歸 governance 層。
     validation: prompt-artifacts-philosophy.md 說明為什麼需要、核心概念、與既有層的關係。
   - type: related_to
     target: governance/lifecycle/router-philosophy.md
     reason: >
       Router philosophy 解釋 activation rules 與路由決策的設計原理。
-      runtime/router/ 只存放 rules 與 table，概念說明歸 governance 層。
+      runtime/README.md 只存放 rules 與 table，概念說明歸 governance 層。
     validation: router-philosophy.md 說明路由流程、決策表、activation rules 使用方式。
   - type: related_to
     target: governance/lifecycle/routing-philosophy.md

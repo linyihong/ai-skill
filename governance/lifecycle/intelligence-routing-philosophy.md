@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`runtime/intelligence/` 定義 agent 如何根據目前 phase 與 task context，路由到 `intelligence/` 層的領域知識。這是 runtime 與 intelligence 之間的邊界層。
+`runtime/README.md` 定義 agent 如何根據目前 phase 與 task context，路由到 `intelligence/` 層的領域知識。這是 runtime 與 intelligence 之間的邊界層。
 
 ## Design Principles
 
@@ -46,7 +46,7 @@ Task Intent Identified
 
 ## 與既有文件的關係
 
-- [`runtime/intelligence/`](../../runtime/intelligence/) — Runtime navigation entry point (data file: `intelligence-routing.yaml`)
+- [`runtime/README.md`](../../runtime/README.md) — Runtime navigation entry point (data file: `intelligence-routing.yaml`)
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Machine-readable routing rules
 - [`intelligence/README.md`](../../intelligence/README.md) — Intelligence layer overview
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) — Global routing registry

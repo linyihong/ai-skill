@@ -1,12 +1,12 @@
 id: graph.runtime-onboarding
-source: runtime/onboarding/README.md
+source: runtime/onboarding/apk-analysis-setup.md
 status: candidate
 summary: >
   連接 runtime/onboarding/ 的 onboarding 檔案：apk-analysis-setup、
   apk-analysis-completion，以及相關的 skills、workflow 層。
 edges:
   - type: depends_on
-    target: runtime/onboarding/README.md
+    target: runtime/onboarding/apk-analysis-setup.md
     reason: Onboarding README 提供目錄索引、scope 與各 onboarding 文件的關係。
     validation: README 定義 onboarding 層的放什麼/不放什麼。
 
@@ -23,7 +23,7 @@ edges:
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.runtime.onboarding record。
-    validation: registry record 的 primary_source 指向 runtime/onboarding/README.md。
+    validation: registry record 的 primary_source 指向 runtime/onboarding/apk-analysis-setup.md。
 
 metadata:
   priority: P2

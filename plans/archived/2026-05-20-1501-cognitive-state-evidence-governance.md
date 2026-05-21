@@ -66,7 +66,7 @@ agent 還沒有失敗
 | Assumption / evidence / confidence 的治理 gate | `governance/ai-runtime-governance/cognitive-state-governance.md` | 不直接寫 tool-specific 操作。 |
 | Intent stability、claim scope、contradiction propagation、belief ownership、minimality、cognitive cost、tier boundary 的治理 gate | `governance/ai-runtime-governance/cognitive-state-governance.md` | 不取代 workflow success criteria；不讓 governance 遞迴膨脹。 |
 | Evidence qualification、low-quality override 禁止規則 | `enforcement/evidence-hierarchy.md` | 不放 domain-specific reload set。 |
-| Confidence decay、autonomy mode、recovery budget、re-entry safety、human alignment trigger | `runtime/guards/` 或 `runtime/compiler/embedded_data.rb` | 若要 machine enforcement，必須確認 compiler 會讀到 source。 |
+| Confidence decay、autonomy mode、recovery budget、re-entry safety、human alignment trigger | `runtime/README.md` 或 `runtime/compiler/embedded_data.rb` | 若要 machine enforcement，必須確認 compiler 會讀到 source。 |
 | Domain-specific evidence priority / freshness policy | `metadata/recovery/` 或新增 `metadata/evidence/` | metadata-only 時不得假裝已編入 `runtime.db`。 |
 | Failure-derived scenario | `validation/scenarios/failure-derived/` | 測 route / source selection / forbidden behavior，不測私有 project evidence。 |
 

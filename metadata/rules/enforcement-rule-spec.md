@@ -9,7 +9,7 @@
 | Schema version | `enforcement-rule/v1` |
 | Lifecycle | `candidate` |
 | Owner layer | `metadata/rules/` |
-| Primary consumers | `runtime/router/`, `knowledge/graphs/rules/`, `governance/lifecycle/` |
+| Primary consumers | `runtime/README.md`, `knowledge/graphs/rules/`, `governance/lifecycle/` |
 
 ## 繼承欄位（來自 Knowledge Atom schema）
 

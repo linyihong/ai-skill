@@ -1,12 +1,12 @@
 id: graph.runtime-pipeline
-source: runtime/pipeline/
+source: runtime/README.md
 status: candidate
 summary: >
   連接 runtime pipeline 的所有元件：session-lifecycle、context-flow、guard-chain、
   relevance-engine，以及相關的 runtime router、budget、health、guards 層。
 edges:
   - type: depends_on
-    target: runtime/pipeline/
+    target: runtime/README.md
     reason: Pipeline 目錄提供架構概覽、流程圖與元件間通訊表。
     validation: pipeline 目錄定義 pipeline 架構與所有元件的關係。
   - type: depends_on
@@ -52,7 +52,7 @@ edges:
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.runtime.pipeline record。
-    validation: registry record 的 primary_source 指向 runtime/pipeline/。
+    validation: registry record 的 primary_source 指向 runtime/README.md。
 metadata:
   priority: P1
   confidence: medium

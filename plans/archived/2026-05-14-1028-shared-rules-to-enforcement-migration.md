@@ -170,7 +170,7 @@ Related: [`enforcement/README.md`](../../enforcement/README.md), [`runtime/READM
   - 「不放什麼」：`enforcement/` → `enforcement/`
   - 「與既有層的關係」：`enforcement/` → `enforcement/`
 - [ ] 更新 `runtime/routing/README.md`（若有 shared-rules 引用）
-- [ ] 更新 `runtime/onboarding/README.md`（若有 shared-rules 引用）
+- [ ] 更新 `runtime/onboarding/apk-analysis-setup.md`（若有 shared-rules 引用）
 
 **scripts/:**
 - [ ] 更新 `scripts/validate-knowledge-runtime.rb`：

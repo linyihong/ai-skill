@@ -23,7 +23,7 @@ Pipeline 將這些元件串接成**單一可執行流程**，確保：
 ## Pipeline Architecture
 
 ```
-runtime/pipeline/
+runtime/README.md
   session-lifecycle.yaml     ← Session lifecycle stages
   context-flow.yaml          ← Progressive context expansion
   guard-chain.yaml           ← Guard execution order
@@ -47,7 +47,7 @@ runtime/pipeline/
 
 ## 與既有文件的關係
 
-- [`runtime/pipeline/`](../../runtime/pipeline/) — Runtime navigation entry point (data files: `context-flow.yaml`, `guard-chain.yaml`, `relevance-engine.yaml`, `session-lifecycle.yaml`)
+- [`runtime/README.md`](../../runtime/README.md) — Runtime navigation entry point (data files: `context-flow.yaml`, `guard-chain.yaml`, `relevance-engine.yaml`, `session-lifecycle.yaml`)
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Session lifecycle stages
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Progressive context expansion
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Guard execution order

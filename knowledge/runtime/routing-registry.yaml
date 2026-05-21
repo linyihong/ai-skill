@@ -275,7 +275,7 @@ records:
       - intelligence/engineering/agent-architecture/attention-budgeting.md
       - governance/lifecycle/context-ttl-philosophy.md
     candidate_sources:
-      - runtime/context/README.md
+      - runtime/README.md
       - runtime/runtime.db
       - knowledge/runtime/README.md
       - knowledge/runtime/routing-registry.yaml
@@ -307,7 +307,7 @@ records:
     candidate_sources:
       - knowledge/summaries/prompt-cache-alignment.md
       - knowledge/summaries/context-cost-optimization.md
-      - runtime/context/README.md
+      - runtime/README.md
       - runtime/runtime.db
       - runtime/runtime.db
     source_of_truth_gate: prompt-cache-playbook-active
@@ -607,7 +607,7 @@ records:
     candidate_sources:
       - knowledge/summaries/apk-highest-leverage-analysis.md
       - knowledge/graphs/apk-highest-leverage-analysis.yaml
-      - runtime/router/
+      - runtime/README.md
       - enforcement/decision-efficiency.md
     source_of_truth_gate: new-layer-promoted
     ranking_reason: 此 intelligence atom 抽象化已進入 workflow 的 route selection judgment。舊 skills/ 結構已於 2026-05-13 標記為 deprecated。
@@ -669,7 +669,7 @@ records:
       - models/compression/README.md
       - models/workflow-adaptation/README.md
       - models/governance/README.md
-      - runtime/router/
+      - runtime/README.md
       - metadata/ranking/README.md
       - knowledge/summaries/README.md
     candidate_sources:
@@ -733,7 +733,7 @@ records:
 
   - id: route.runtime.router-flow
     task_intent: 了解 context routing 決策流程
-    primary_source: runtime/router/
+    primary_source: runtime/README.md
     required_dependencies:
       - runtime/runtime.db
       - runtime/runtime.db
@@ -742,7 +742,7 @@ records:
       - knowledge/summaries/runtime-operations.md
       - knowledge/runtime/README.md
     source_of_truth_gate: design-layer-only
-    ranking_reason: runtime/router/ 定義完整的 routing decision flow（Bootstrap → Layout → Skill routing → Rule activation → Summary → Full source）。
+    ranking_reason: runtime/README.md 定義完整的 routing decision flow（Bootstrap → Layout → Skill routing → Rule activation → Summary → Full source）。
     validation_signal: Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。
     metadata:
       priority: P2
@@ -1078,7 +1078,7 @@ records:
 
   - id: route.runtime.onboarding
     task_intent: 新 session 或新專案的快速啟動指引
-    primary_source: runtime/onboarding/README.md
+    primary_source: runtime/onboarding/apk-analysis-setup.md
     required_dependencies:
       - workflow/apk-analysis/execution-flow.md
       - workflow/software-delivery/execution-flow.md
@@ -1443,7 +1443,7 @@ records:
         - ADR
     primary_source: runtime/runtime.db
     required_dependencies:
-      - runtime/decisions/README.md
+      - runtime/README.md
       - decisions/README.md
     candidate_sources:
       - memory/decision/README.md
@@ -1622,7 +1622,7 @@ records:
       - anti-patterns/stale-summary.md
       - anti-patterns/skill-pollution.md
       - enforcement/failure-patterns/README.md
-      - runtime/guards/
+      - runtime/README.md
     source_of_truth_gate: anti-patterns-readme-active
     ranking_reason: anti-patterns/README.md 提供 runtime anti-patterns 的 entry point，列出所有 anti-pattern 與嚴重度。
     validation_signal: Anti-pattern 已依格式記錄，症狀、預防與恢復方式已定義。
@@ -1651,8 +1651,8 @@ records:
       - runtime/runtime.db
     candidate_sources:
       - scripts/ai-skill-cli/internal/app/runtime_compiler.go
-      - runtime/compiler/README.md
-      - runtime/generated/README.md
+      - runtime/README.md
+      - runtime/README.md
     source_of_truth_gate: runtime-compiler-active
     ranking_reason: Runtime Compiler 定義 deterministic-only 編譯範圍、source-target mappings 與編譯規則。Go-native `ai-skill runtime compile` 將 runtime YAML 與 deterministic prose surfaces 寫入 runtime.db。
     validation_signal: 所有 modified sources 已編譯，runtime.db 的 generated_surfaces 表包含最新記錄，`ai-skill runtime validate` 回傳 exit 0。
@@ -1677,7 +1677,7 @@ records:
     required_dependencies:
       - runtime/runtime.db
     candidate_sources:
-      - runtime/intelligence/
+      - runtime/README.md
       - intelligence/README.md
     source_of_truth_gate: runtime-intelligence-routing-active
     ranking_reason: Intelligence Routing 定義 11 個 domain 的 routing rules（analytical_reasoning、agent_architecture、development、heuristics、anti-patterns、tradeoffs、distributed_systems、domain、failure、travel、business、IDE），每個 domain 有 applicable_phases、task_intent_patterns、load_strategy。Fallback 到 intelligence/README.md 全文搜尋。
@@ -1701,7 +1701,7 @@ records:
 
   - id: route.runtime.output-governance
     task_intent: 載入語言強制規則與文件輸出規則，確保輸出品質
-    primary_source: runtime/output-governance/
+    primary_source: runtime/README.md
     required_dependencies:
       - runtime/runtime.db
       - runtime/runtime.db
@@ -1739,7 +1739,7 @@ records:
 
   - id: route.runtime.distributed
     task_intent: 載入 distributed runtime 鎖定機制、multi-agent 協調規則、async job 生命週期管理
-    primary_source: runtime/distributed/
+    primary_source: runtime/README.md
     required_dependencies:
       - runtime/runtime.db
       - runtime/runtime.db
@@ -1784,7 +1784,7 @@ records:
       - enforcement/linked-updates.md
       - runtime/runtime.db
       - runtime/runtime.db
-      - runtime/generated/README.md
+      - runtime/README.md
     candidate_sources:
       - runtime/runtime.db
       - enforcement/feedback-lessons.md

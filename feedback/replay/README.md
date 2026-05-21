@@ -38,7 +38,7 @@
    ├─ Session summary（memory/summary/）
    ├─ Failure record（enforcement/failure-patterns/ 或 feedback_history/）
    ├─ Decision record（memory/decision/ 或 decisions/）
-   └─ Context health / circuit breaker 記錄（runtime/health/、runtime/guards/）
+   └─ Context health / circuit breaker 記錄（runtime/health/、runtime/README.md）
 
 3. 分析模式
    ├─ 這是已知 failure pattern 的變體？

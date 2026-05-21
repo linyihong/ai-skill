@@ -668,7 +668,7 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 
 將所有 Runtime Quality & Safety 元件串接成可執行的 orchestration flow：
 
-1. 建立 Pipeline 概覽 → [`runtime/pipeline/README.md`](../runtime/pipeline/README.md) — 元件接線圖、跨階段通訊表（10 個觸發事件）
+1. 建立 Pipeline 概覽 → [`runtime/README.md`](../runtime/README.md) — 元件接線圖、跨階段通訊表（10 個觸發事件）
 2. 建立 Session Lifecycle → [`runtime/runtime.db`](../runtime/runtime.db) — 4 階段（bootstrap → routing → execution → close-loop），每階段有 token budget、guard chain、進入/離開條件
 3. 建立 Progressive Context Expansion → [`runtime/runtime.db`](../runtime/runtime.db) — 4 層級（summary → module summary → detailed source → raw source），每層有 cache policy、entry/exit conditions
 4. 建立 Guard Chain → [`runtime/runtime.db`](../runtime/runtime.db) — 每 stage 的 guard 執行順序（ordered by severity）、檢查頻率（per_tool_call / per_task / per_edit）、中斷行為
@@ -721,7 +721,7 @@ Semantic Retrieval 負責選出相關 context；Provider Prompt Cache Alignment 
 | Context TTL | `runtime/context/` | 新增子層 |
 | Token Budget System | `runtime/budget/` | 新增子層 |
 | Context Health Score | `runtime/health/` | 新增子層 |
-| Circuit Breaker / Guards | `runtime/guards/` | 新增子層 |
+| Circuit Breaker / Guards | `runtime/README.md` | 新增子層 |
 | Tool Metadata / Routing / Compression | `tools/` | 新增層 |
 | Memory 子層 | `memory/working/`, `memory/summary/`, `memory/decision/` | 拆分現有 memory 層 |
 | Decision System | `decisions/` | 新增層 |
