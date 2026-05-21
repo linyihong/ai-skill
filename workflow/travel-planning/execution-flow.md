@@ -170,7 +170,8 @@
 
 1. 對於每個開車前往的目的地，在可用時搜尋 Mapcode。如果不可用，提供電話號碼、地址、官方設施名稱或地圖連結作為備用導航輸入。
    - **Mapcode 粒度規則**：同一景點內若有多個停車點且彼此相距 2km 以上（如溪流、海岸線、高原沿線景點），每個停車點必須有獨立的 Mapcode 行，不得以「大景點 1 行」概括。同一天有兩個以上不同目的地時，各目的地亦需各自一行，無論距離遠近。
-   - **Mapcode 查詢工具鏈**（依優先順序）：① `mapfan.com/spots/[code]` → ② Mapion 電話帳（`mapion.co.jp/phonebook/[category]/[area]/[id]/`）→ ③ 旅行部落格（WebSearch 搜尋「[景點名] マップコード [預估前三碼]」）→ ④ 最近バス停代替（Mapion 電話帳搜尋「M12001」類別）。注意：`mapfan.com` 與 `mapion.co.jp` 在 Chrome extension 中通常為封鎖域名，使用 WebFetch 或 WebSearch 替代。
+   - **Mapcode 查詢前提（Step 0）**：行程中若某停靠點只有料理ジャンル（如「稲庭うどん」「活イカ料理」）而無具體店名，必須先搜尋候選店家並確定目的地，再查 Mapcode。若餐廳位於同日已有 Mapcode 景點的步行圈內（< 500m），不需獨立行，備註「〇〇駐車場から徒歩」即可。
+   - **Mapcode 查詢工具鏈**（依優先順序）：① `mapfan.com/spots/[code]` → ② Mapion 電話帳（`mapion.co.jp/phonebook/[category]/[area]/[id]/`；飲食店は M01027 郷土料理等）→ ③ 旅行部落格（WebSearch 搜尋「[景點名] マップコード [預估前三碼]」）→ ④ 最近バス停代替（Mapion 電話帳搜尋「M12001」類別）。注意：`mapfan.com` 與 `mapion.co.jp` 在 Chrome extension 中通常為封鎖域名，使用 WebFetch 或 WebSearch 替代。
    - **無 Mapcode 時**：在表格中加入代替最近バス停或停車場的 Mapcode，並在備註欄標注「[代替地點名]付近」；若完全無法取得，標記「要確認（Tel XXXX）」並告知使用者。
 2. 對於每個開車前往的停留點，當該點與景點、餐廳、步道起點、神社/寺廟、浴室或設施入口不同時，將 Google Maps 駕駛點設為最近確認的訪客可用停車場或官方指定停車場。
 3. 交叉比對 Mapcode、Google Maps 確切地點/標記、官方地址和停車/交通頁面。如果它們指向不同的入口或停車場，描述差異並為路線選擇最佳的停車/導航目標。
