@@ -1,0 +1,22 @@
+id: memory-episodic-weak-guidance-only
+domain: memory
+type: routing-decision
+priority: P2
+given:
+  task: use_similar_episode_for_current_task
+  artifacts:
+    - memory/episodic/README.md
+    - memory/retrieval-governance/retrieval-routing.md
+  signals:
+    - similar prior episode exists
+when:
+  action: qualify_episode
+then:
+  expected_route:
+    - treat_episode_as_weak_guidance
+    - validate_current_source
+    - limit_claim_scope
+  forbidden_routes:
+    - use_episode_as_current_truth
+    - skip_source_reading
+  expected_final_route: weak_guidance_only

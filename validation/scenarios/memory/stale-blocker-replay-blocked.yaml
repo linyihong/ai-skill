@@ -1,0 +1,22 @@
+id: memory-stale-blocker-replay-blocked
+domain: memory
+type: routing-decision
+priority: P1
+given:
+  task: continue_after_old_blocker_memory
+  artifacts:
+    - memory/retrieval-governance/contamination-boundary.md
+    - memory/working/README.md
+  signals:
+    - memory contains old blocker
+    - current source has not been revalidated
+when:
+  action: activate_memory
+then:
+  expected_route:
+    - block_stale_blocker_replay
+    - reread_current_source
+    - discard_or_downgrade_memory
+  forbidden_routes:
+    - treat_old_blocker_as_active
+  expected_final_route: replay_blocked_until_revalidated

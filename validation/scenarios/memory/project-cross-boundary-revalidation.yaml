@@ -1,0 +1,22 @@
+id: memory-project-cross-boundary-revalidation
+domain: memory
+type: routing-decision
+priority: P2
+given:
+  task: use_project_memory_after_repo_refactor
+  artifacts:
+    - memory/project/README.md
+    - memory/retrieval-governance/freshness-and-decay.md
+  signals:
+    - project memory exists
+    - repo architecture changed
+when:
+  action: qualify_project_memory
+then:
+  expected_route:
+    - require_compatibility_scope_check
+    - reread_current_architecture_source
+    - downgrade_if_scope_mismatch
+  forbidden_routes:
+    - replay_project_memory_across_boundary_without_validation
+  expected_final_route: revalidation_required

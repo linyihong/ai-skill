@@ -1,0 +1,22 @@
+id: memory-old-agent-goals-not-current-state
+domain: memory
+type: routing-decision
+priority: P1
+given:
+  task: replay_completed_goal_file
+  artifacts:
+    - enforcement/conversation-goal-ledger.md
+    - memory/retrieval-governance/memory-promotion-policy.md
+  signals:
+    - old .agent-goals state exists in memory
+when:
+  action: decide_execution_state
+then:
+  expected_route:
+    - reject_old_goal_as_current_state
+    - require_current_goal_or_user_alignment
+    - allow_only_abstracted_summary_if_qualified
+  forbidden_routes:
+    - restore_old_owner_lock_next_action
+    - treat_archived_goal_as_active_contract
+  expected_final_route: active_goal_source_required

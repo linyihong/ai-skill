@@ -6,13 +6,13 @@
 
 | Surface | Path | Count / Status |
 | --- | --- | --- |
-| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 50 records |
+| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 51 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
 | SQLite runtime index | [`sqlite/`](sqlite/) | generated lookup cache prototype |
 | Summaries | [`../summaries/`](../summaries/) | 17 files |
-| Graph records | [`../graphs/`](../graphs/) | 32 files |
+| Graph records | [`../graphs/`](../graphs/) | 33 files |
 
 ## Routing Records
 
@@ -39,7 +39,8 @@
 | `route.workflow.apk-analysis` | `workflow/apk-analysis/execution-flow.md` | `specialized` | `source-backed` | 新分層路徑可讀取，workflow 與 analysis 內容已分離。 |
 | `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md` | `specialized` | `source-backed` | 已比較可用 routes、選定 evidence-to-cost ratio 最高路線、記錄 fallback 與 attribution 回補條件。 |
 | `route.feedback.promotion-pipeline` | `feedback/promotion/README.md` | `large` | `source-backed` | 原 lesson source 保留、promotion target 明確、runtime surfaces 與 close-loop validation 已同步。 |
-| `route.models.model-aware-routing` | `models/profiles/README.md` | `large` | `source-backed` | Profile、compression level、primary source、deferred sources 與 validation signal 可被記錄。 |
+| `route.models.model-aware-routing` | `models/README.md` | `large` | `source-backed` | Strategy、capability dimensions、compression、fallback behavior、workflow shape 與 validation target 可被記錄，且 validation/scenarios/models 覆蓋主要 routing cases。 |
+| `route.memory.retrieval-activation` | `memory/README.md` | `large` | `source-backed` | Memory activation decision 能記錄 trigger、candidate memory、qualification、replay budget、current-source revalidation 與 discard / promotion decision。 |
 | `route.runtime.router-flow` | `runtime/router/` | `small` | `index-only` | Routing flow 已理解，activation rules 與 TTL policy 已對應到對應階段。 |
 | `route.intelligence.engineering.heuristics` | `intelligence/engineering/heuristics/README.md` | `small` | `index-only` | 各 atom 有明確原則與決策表，可反查驗證。 |
 | `route.runtime.context-ttl-doc` | `governance/lifecycle/context-ttl-philosophy.md` | `small` | `index-only` | TTL policy 已套用，prune strategy 已理解。 |
@@ -81,9 +82,9 @@
 | `feedback.promotion.pipeline` | `candidate` | [`feedback-promotion-pipeline.md`](../summaries/feedback-promotion-pipeline.md) | 定義 feedback lesson 從 skill-local history 推進到 workflow、intelligence、enforcement、memory 或 runtime surfaces 的 promotion / downgrade gate。 |
 | `governance.goal-ledger-boundary` | `validated` | [`goal-ledger-boundary.md`](../summaries/goal-ledger-boundary.md) | `.agent-goals/` 只保存 active conversation goals；長期 roadmap、phase、migration、promotion、deprecation 與治理狀態必須落到 durable planning 文件。 |
 | `knowledge.navigation` | `validated` | [`knowledge-navigation.md`](../summaries/knowledge-navigation.md) | 知識導航系統：indexes（任務路由）、summaries（300-500 token 摘要）、graphs（知識圖譜邊）、runtime（routing registry、refresh policy、SQLite lookup cache）。讓 agent 用最小 token 成本找到正確知識。 |
-| `memory.operations` | `candidate` | [`memory-operations.md`](../summaries/memory-operations.md) | 長期記憶層：short-term（目前 task context）、episodic（過去 task 關鍵決策與結果）、project（專案歷史脈絡）、failure（反覆失效模式）。支援 similarity-based retrieval。 |
+| `memory.operations` | `candidate` | [`memory-operations.md`](../summaries/memory-operations.md) | Memory 是 selective replay system：working buffer、summary、episodic、project、failure、decision 與 retrieval-governance。Replay 需要 trigger、qualification、budget、freshness/scope check 與 current source revalidation。 |
 | `metadata.schema.knowledge-atom` | `validated` | [`metadata-schema.md`](../summaries/metadata-schema.md) | Knowledge Atom metadata schema v1，定義 atom 的必填欄位、選填欄位、受控值、YAML 範本、驗證規則與 provider prompt cache hints。 |
-| `models.routing` | `candidate` | [`model-routing.md`](../summaries/model-routing.md) | 多模型協作架構：capability profile（small/large/specialized）、compression strategy（checklist/compressed/full）、model-aware context report。根據 task 複雜度選擇模型與 context 策略。 |
+| `models.routing` | `candidate` | [`model-routing.md`](../summaries/model-routing.md) | Model-aware execution strategy：profiles、capabilities、routing、workflow adaptation、governance、runtime primitives 與 compression。用於選擇 behavior shape，不宣稱 provider model 已切換。 |
 | `runtime.prompt-cache-alignment` | `candidate` | [`prompt-cache-alignment.md`](../summaries/prompt-cache-alignment.md) | Provider prompt cache 對齊規範。定義 stable prefix、semi-stable middle、volatile suffix 的 context layout，並說明 `cacheable` 與 `provider_cache_candidate` 的邊界。 |
 | `governance.repo-maintenance` | `validated` | [`repo-governance.md`](../summaries/repo-governance.md) | 本系統的維護、升級、遷移與治理。涵蓋 lifecycle management、validation、cleanup、splitting rules、dependency maintenance。 |
 | `intelligence.requirements-cognition` | `candidate` | [`requirements-cognition.md`](../summaries/requirements-cognition.md) | Requirements cognition 先用 Impact Map × Customer Journey Map 對齊 product impact，再用 BDD-lite 處理 ambiguity、actor intent、behavior boundary、acceptance criteria、traceability、validation target 與 test effectiveness，而不是 Gherkin everywhere。 |
@@ -117,6 +118,7 @@
 | `graph.intelligence-repo-analysis` | `intelligence/engineering/analytical-reasoning/README.md` | `candidate` | 8 | [`intelligence-repo-analysis.yaml`](../graphs/intelligence-repo-analysis.yaml) |
 | `graph.intelligence-tradeoffs` | `intelligence/engineering/tradeoffs/postgres-vs-mongodb.md` | `candidate` | 5 | [`intelligence-tradeoffs.yaml`](../graphs/intelligence-tradeoffs.yaml) |
 | `graph.intelligence-travel` | `intelligence/travel/README.md` | `candidate` | 7 | [`intelligence-travel.yaml`](../graphs/intelligence-travel.yaml) |
+| `memory-operations` | `memory/README.md` | `candidate` | 6 | [`memory-operations.yaml`](../graphs/memory-operations.yaml) |
 | `graph.metadata-navigation` | `metadata/schema.md` | `candidate` | 8 | [`metadata-navigation.yaml`](../graphs/metadata-navigation.yaml) |
 | `graph.requirements-cognition` | `intelligence/engineering/requirements/README.md` | `candidate` | 11 | [`requirements-cognition.yaml`](../graphs/requirements-cognition.yaml) |
 | `graph.runtime-onboarding` | `runtime/onboarding/README.md` | `candidate` | 4 | [`runtime-onboarding.yaml`](../graphs/runtime-onboarding.yaml) |

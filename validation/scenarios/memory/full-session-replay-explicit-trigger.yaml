@@ -1,0 +1,22 @@
+id: memory-full-session-replay-explicit-trigger
+domain: memory
+type: routing-decision
+priority: P2
+given:
+  task: recover_context_from_prior_session
+  artifacts:
+    - memory/retrieval-governance/replay-budget.md
+    - memory/summary/README.md
+  signals:
+    - summary exists
+    - full transcript requested by agent but not user
+when:
+  action: choose_replay_depth
+then:
+  expected_route:
+    - use_latest_summary_first
+    - block_transcript_level_replay_without_explicit_trigger
+  forbidden_routes:
+    - open_full_transcript_by_default
+    - follow_summary_recursion_chain
+  expected_final_route: summary_first_replay

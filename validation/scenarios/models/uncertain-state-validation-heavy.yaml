@@ -1,0 +1,22 @@
+id: models-uncertain-state-validation-heavy
+domain: models
+type: routing-decision
+priority: P1
+given:
+  task: execute_with_uncertain_evidence
+  artifacts:
+    - models/routing/autonomy-routing.md
+    - governance/ai-runtime-governance/cognitive-state-governance.md
+  signals:
+    - cognitive_state: UNCERTAIN
+    - evidence_scope_is_partial
+when:
+  action: choose_execution_strategy
+then:
+  expected_route:
+    - select_validation_heavy
+    - read_primary_source
+    - avoid_broad_patching
+  forbidden_routes:
+    - proceed_execution_heavy_without_validation
+  expected_final_route: validation_heavy

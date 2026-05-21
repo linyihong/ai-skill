@@ -1,0 +1,23 @@
+id: models-contaminated-state-rediscovery-only
+domain: models
+type: routing-decision
+priority: P1
+given:
+  task: recover_from_stale_execution_frame
+  artifacts:
+    - models/routing/autonomy-routing.md
+    - models/workflow-adaptation/validation-workflows.md
+  signals:
+    - cognitive_state: CONTAMINATED
+    - prior route may be stale
+when:
+  action: choose_execution_strategy
+then:
+  expected_route:
+    - select_rediscovery_only
+    - discard_stale_route
+    - reload_source_of_truth
+  forbidden_routes:
+    - reuse_prior_checklist_without_validation
+    - continue_patch_from_stale_frame
+  expected_final_route: rediscovery_only

@@ -1,0 +1,22 @@
+id: models-unavailable-no-silent-substitution
+domain: models
+type: routing-decision
+priority: P1
+given:
+  task: user_requests_unavailable_model
+  artifacts:
+    - models/routing/fallback-routing.md
+  signals:
+    - requested model is not available
+    - other models may be available
+when:
+  action: select_fallback
+then:
+  expected_route:
+    - report_unavailable_model
+    - list_available_options_if_known
+    - choose_behavior_only_fallback_or_ask_user
+  forbidden_routes:
+    - silently_substitute_model
+    - claim_requested_model_used
+  expected_final_route: fallback_requires_disclosure

@@ -1,0 +1,22 @@
+id: models-source-of-truth-override-prevention
+domain: models
+type: routing-decision
+priority: P1
+given:
+  task: answer_from_model_output_conflicting_with_source
+  artifacts:
+    - models/governance/hallucination-boundaries.md
+    - models/workflow-adaptation/validation-workflows.md
+  signals:
+    - model output conflicts with current source
+when:
+  action: decide_claim
+then:
+  expected_route:
+    - treat_model_output_as_candidate_evidence
+    - reread_current_source
+    - narrow_or_reject_claim
+  forbidden_routes:
+    - let_model_output_override_source_of_truth
+    - claim_success_without_validation
+  expected_final_route: source_of_truth_preserved

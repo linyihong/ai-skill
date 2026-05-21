@@ -34,7 +34,7 @@ Memory 是 selective replay system，不是 always-loaded context。每次 repla
 - [`route.decisions.adr`](../knowledge/runtime/routing-registry.yaml:696) — candidate_sources 引用 `memory/decision/README.md`
 - [`enforcement/failure-learning-system.md`](../enforcement/failure-learning-system.md) — 定義 failure memory 的 storage 與 promotion 規則
 - [`plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md`](../plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md) — 引用 memory/ 的設計概念
-- [`plans/active/2026-05-20-1745-memory-retrieval-activation-governance.md`](../plans/active/2026-05-20-1745-memory-retrieval-activation-governance.md) — 定義 selective cognitive replay system 的執行計畫
+- [`plans/archived/2026-05-20-1745-memory-retrieval-activation-governance.md`](../plans/archived/2026-05-20-1745-memory-retrieval-activation-governance.md) — 定義 selective cognitive replay system 的執行計畫
 
 ## 與既有層的關係
 

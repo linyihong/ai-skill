@@ -7,6 +7,9 @@
 - [`profiles/`](profiles/README.md)：定義 `small`、`large`、`specialized` model profiles 與 context loading 深度。
 - [`routing/`](routing/README.md)：定義 task class、cognitive state、tool capability 與 fallback 對應的 execution strategy。
 - [`capabilities/`](capabilities/README.md)：把粗略 profile 拆成 reasoning depth、context stability、tool reliability、hallucination risk 與 compression resilience 等能力維度。
+- [`workflow-adaptation/`](workflow-adaptation/README.md)：定義 checklist-first、source-backed、coding、architecture 與 validation workflow shapes。
+- [`governance/`](governance/README.md)：定義 model selection、hallucination、context budget 與 confidence governance。
+- [`runtime/`](runtime/README.md)：定義可供 lookup 使用的 minimal routing primitives，不保存 provider model state。
 - [`compression/`](compression/README.md)：定義 index-only、summary-first、checklist-first、source-backed、graph-assisted 等壓縮層級。
 - [`../knowledge/runtime/model-context-report.md`](../knowledge/runtime/model-context-report.md)：由 routing registry 產生的 model-aware context loading view。
 - [`../knowledge/runtime/model-checklists.md`](../knowledge/runtime/model-checklists.md)：由 routing registry 產生的 per-model context-loading checklist。
@@ -51,6 +54,15 @@ Model-aware routing 目前是 execution strategy contract：
 3. 用 [`capabilities/README.md`](capabilities/README.md) 把粗略 profile 轉成可驗證能力維度。
 4. 若工具不能實際選 model，依 [`routing/fallback-routing.md`](routing/fallback-routing.md) 使用 behavior-only adaptation。
 5. 只有 tool adapter 證實可指定模型時，才依 [`routing/multi-model-handoff.md`](routing/multi-model-handoff.md) 進行 explicit model / subagent handoff。
+
+## Phase 3-6 Surfaces
+
+後續 workflow / governance / runtime / validation 接入遵守：
+
+- Workflow adaptation 只調整 execution shape，不取代 workflow primary source。
+- Governance 禁止 unsupported model switch claims 與 silent substitution。
+- Runtime surface 只保存 minimal strategy primitives，不保存 provider state。
+- Validation scenarios 必須覆蓋 unavailable model、explicit model request、uncertain / contaminated state、small-model workflow、architecture workflow 與 source-of-truth override prevention。
 
 ## 第一批候選遷移來源
 

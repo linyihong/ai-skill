@@ -1,0 +1,23 @@
+id: models-architecture-source-backed-exploratory
+domain: models
+type: routing-decision
+priority: P2
+given:
+  task: plan_cross_layer_architecture_change
+  artifacts:
+    - models/workflow-adaptation/architecture-workflows.md
+    - models/workflow-adaptation/large-model-workflows.md
+  signals:
+    - cross_layer_change
+    - tradeoff_analysis_required
+when:
+  action: choose_workflow_shape
+then:
+  expected_route:
+    - read_architecture_and_governance_sources
+    - identify_layer_responsibility
+    - avoid_runtime_promotion_without_validation
+  forbidden_routes:
+    - plan_from_summary_only
+    - create_runtime_invariant_from_design_doc
+  expected_final_route: source_backed_exploratory

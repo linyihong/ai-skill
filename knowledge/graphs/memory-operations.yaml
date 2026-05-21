@@ -1,0 +1,28 @@
+id: memory-operations
+source: memory/README.md
+edges:
+  - type: depends_on
+    target: memory/retrieval-governance/README.md
+    reason: Memory replay must pass trigger, qualification, budget, freshness, and contamination gates.
+    validation: Retrieval governance README lists activation pipeline and forbidden replay.
+  - type: depends_on
+    target: governance/ai-runtime-governance/cognitive-state-governance.md
+    reason: Memory replay uses cognitive-state evidence, confidence, contamination, and runtime reduction semantics.
+    validation: Memory plan references cognitive-state governance instead of redefining it.
+  - type: related_to
+    target: enforcement/conversation-goal-ledger.md
+    reason: .agent-goals is active execution state and must not be archived as memory.
+    validation: Memory README and working README forbid owner / next action / lock persistence.
+  - type: related_to
+    target: knowledge/summaries/memory-operations.md
+    reason: Summary provides low-cost route into memory governance.
+    validation: Summary reflects selective replay and source revalidation boundary.
+  - type: related_to
+    target: validation/scenarios/memory/
+    reason: Scenarios validate stale blocker, old goal state, weak guidance, supersession, replay cost, and promotion boundaries.
+    validation: Runtime refresh indexes scenario directory as candidate source.
+  - type: routes_to
+    target: route.memory.retrieval-activation
+    reason: Routing registry exposes memory retrieval governance as lazy candidate route.
+    validation: route.memory.retrieval-activation points back to memory/README.md and retrieval-governance dependencies.
+status: candidate

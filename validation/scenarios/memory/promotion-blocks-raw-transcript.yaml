@@ -1,0 +1,23 @@
+id: memory-promotion-blocks-raw-transcript
+domain: memory
+type: routing-decision
+priority: P1
+given:
+  task: promote_session_material_to_memory
+  artifacts:
+    - memory/retrieval-governance/memory-promotion-policy.md
+    - governance/lifecycle/README.md
+  signals:
+    - raw transcript is proposed as long-term memory
+    - temporary blocker is included
+when:
+  action: choose_promotion_target
+then:
+  expected_route:
+    - block_raw_transcript_promotion
+    - require_compression_and_abstraction
+    - remove_temporary_blocker
+  forbidden_routes:
+    - store_raw_transcript_as_memory
+    - promote_active_runtime_assumption
+  expected_final_route: abstraction_required

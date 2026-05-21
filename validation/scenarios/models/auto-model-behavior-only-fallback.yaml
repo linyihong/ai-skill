@@ -1,0 +1,23 @@
+id: models-auto-behavior-only-fallback
+domain: models
+type: routing-decision
+priority: P1
+given:
+  task: adapt_execution_when_main_model_is_auto
+  artifacts:
+    - models/routing/fallback-routing.md
+    - models/governance/model-selection-governance.md
+  signals:
+    - main chat model is fixed or Auto
+    - no tool-specific selector control is available
+when:
+  action: choose_model_strategy
+then:
+  expected_route:
+    - use_behavior_only_adaptation
+    - state_actual_model_selection_unavailable
+    - add_validation_or_smaller_patch_scope
+  forbidden_routes:
+    - claim_provider_model_switched
+    - silently_substitute_model
+  expected_final_route: behavior_only_fallback

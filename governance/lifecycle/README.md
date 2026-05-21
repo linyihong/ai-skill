@@ -65,6 +65,30 @@
 - 需要修改、promotion、debug、failure learning 或高信心判斷時，必須回到 canonical Markdown / YAML。
 - 若 generated lookup 與 source 不一致，降級 lookup confidence 並重新產生，不要改 source 去迎合 cache。
 
+## Memory Promotion / Pruning Boundary
+
+Memory 是 historical replay archive，不是 active execution state。`memory/working/` 的內容只有在 compression、qualification、abstraction 與 contamination check 後，才可 promotion 到 `memory/summary/`、`memory/episodic/`、`memory/project/`、`memory/decision/` 或 `memory/failure/`。
+
+Promotion 到更穩定 layer 時遵守：
+
+| Destination | Gate |
+| --- | --- |
+| `knowledge/` | 已抽象成 reusable navigation / summary / graph，且不依賴單一 incident。 |
+| `intelligence/` | 已抽象成可重用 reasoning / heuristic。 |
+| `workflow/` | 已成為可重複流程或 artifact gate。 |
+| `enforcement/` | 有 recurring validated failure，且需要可執行 policy。 |
+
+禁止 promotion：
+
+- Raw transcript。
+- Temporary blocker。
+- Old `.agent-goals/` owner、lock、next action 或 active blocker。
+- Unstable execution graph。
+- Unresolved contradiction。
+- Project-secret / private evidence。
+
+Memory pruning 時若仍需保留經驗，只保留 generalized lesson、compatibility scope 與 source revalidation note。
+
 ### 驗證（Validation）
 
 冷資料歸檔啟用或更新後，至少驗證：

@@ -1,6 +1,6 @@
 # Memory Retrieval & Activation Governance
 
-> **狀態**: in-progress
+> **狀態**: completed
 > **建立日期**: 2026-05-20
 > **目的**: 將 `memory/` 從「歷史資料分類」升級為 selective cognitive replay system，補足 retrieval、activation、replay cost、freshness、contamination boundary、working-memory buffer 與 promotion pipeline，同時避免與既有 cognitive state / evidence governance 重複。
 
@@ -35,7 +35,7 @@
 | Field | Content |
 | --- | --- |
 | Trigger | 使用者提供 Memory Layer Upgrade Plan，要求先建立計畫、檢查是否與 active plan 重複，並具體拆分。 |
-| Checked sources | `plans/archived/2026-05-20-1501-cognitive-state-evidence-governance.md`、`plans/active/2026-05-20-1802-model-aware-execution-routing.md`、`plans/README.md`、`memory/README.md`、`memory/working/README.md`、`memory/summary/README.md`、`memory/episodic/README.md`、`memory/project/README.md`、`memory/failure/README.md`、`memory/decision/README.md`、`knowledge/README.md`、`runtime/README.md`、`governance/lifecycle/README.md`、`enforcement/conversation-goal-ledger.md`。 |
+| Checked sources | `plans/archived/2026-05-20-1501-cognitive-state-evidence-governance.md`、`plans/archived/2026-05-20-1802-model-aware-execution-routing.md`、`plans/README.md`、`memory/README.md`、`memory/working/README.md`、`memory/summary/README.md`、`memory/episodic/README.md`、`memory/project/README.md`、`memory/failure/README.md`、`memory/decision/README.md`、`knowledge/README.md`、`runtime/README.md`、`governance/lifecycle/README.md`、`enforcement/conversation-goal-ledger.md`。 |
 | Conflicts | 既有 active plan 已涵蓋 memory 作為 evidence source、stale execution memory、cognitive contamination、temporal confidence decay、belief GC、governance minimality 與 runtime reduction。本 plan 不重寫那些 cognitive-state governance；只定義 `memory/` 內部 retrieval / activation / replay / promotion lifecycle，以及其與 `knowledge/`、`working memory`、`.agent-goals/`、`runtime/` 的分層邊界。 |
 | Decision | Proceed as separate active plan。Scope 應保持 memory-layer governance，不直接新增 runtime state machine，也不取代 cognitive-state plan 的 evidence/confidence governance。 |
 | Validation | Plan readback、diff review、link check、ReadLints。若後續 phase 修改 `knowledge/runtime/routing-registry.yaml`、runtime compiler source 或 generated surfaces，必須執行 `ai-skill runtime refresh` 與相關 validator。 |
@@ -60,7 +60,7 @@
 1. 先執行 `plans/archived/2026-05-20-1501-cognitive-state-evidence-governance.md`（已完成 / archived）。
    - 原因：先定義 evidence qualification、confidence integrity、claim scope、intent stability、cognitive contamination、runtime reduction 與 minimal runtime principle。
    - Memory replay 的 freshness、confidence、contamination boundary 應引用這些通用治理語意，而不是在 `memory/` 重新發明一套。
-2. 再執行 `plans/active/2026-05-20-1802-model-aware-execution-routing.md` 的 Phase 0-2。
+2. 再執行 `plans/archived/2026-05-20-1802-model-aware-execution-routing.md` 的 Phase 0-2。
    - 先建立 model-aware execution contract、capability dimensions、tool capability boundary。
    - 此階段可與本 plan Batch A 平行，但不得把 model routing runtime 化。
 3. 接著執行本 plan 的 Batch A / Phase 0-2。
@@ -422,11 +422,11 @@ Candidate files:
 
 Tasks:
 
-- [ ] 更新 memory operations summary，加入 retrieval / activation / replay economics。
-- [ ] 決定是否新增 memory retrieval route；若新增，列出 candidate sources。
-- [ ] 若新增或更新 route，執行 knowledge runtime refresh。
-- [ ] 視需要建立 memory graph，連結 memory type、retrieval governance、promotion target、runtime boundary。
-- [ ] 確認 generated surfaces 與 source 一致。
+- [x] 更新 memory operations summary，加入 retrieval / activation / replay economics。
+- [x] 決定是否新增 memory retrieval route；若新增，列出 candidate sources。
+- [x] 若新增或更新 route，執行 knowledge runtime refresh。
+- [x] 視需要建立 memory graph，連結 memory type、retrieval governance、promotion target、runtime boundary。
+- [x] 確認 generated surfaces 與 source 一致。
 
 ### Phase 4 — Governance / Enforcement Boundary Updates
 
@@ -439,10 +439,10 @@ Candidate files:
 
 Tasks:
 
-- [ ] 在 lifecycle governance 補上 memory promotion / cold lookup / pruning 的 durable boundary。
-- [ ] 如需可執行規則，補充 `.agent-goals/` 不得長期化成 memory 的 forbidden behavior。
-- [ ] 確認 failure learning promotion 與 memory promotion policy 不重複。
-- [ ] 若 cognitive-state plan 已處理 contamination / confidence，這裡只連結，不重寫。
+- [x] 在 lifecycle governance 補上 memory promotion / cold lookup / pruning 的 durable boundary。
+- [x] 如需可執行規則，補充 `.agent-goals/` 不得長期化成 memory 的 forbidden behavior。
+- [x] 確認 failure learning promotion 與 memory promotion policy 不重複。
+- [x] 若 cognitive-state plan 已處理 contamination / confidence，這裡只連結，不重寫。
 
 ### Phase 5 — Validation Scenarios
 
@@ -453,25 +453,25 @@ Candidate files:
 
 Tasks:
 
-- [ ] 測試 stale blocker replay 被阻止。
-- [ ] 測試 old `.agent-goals/` state 不會被當成 current execution state。
-- [ ] 測試 episodic memory 只能 weak guidance。
-- [ ] 測試 project memory 跨 repo / architecture boundary 時需 revalidation。
-- [ ] 測試 decision memory superseded 時不得被直接採用。
-- [ ] 測試 full session replay 需要 explicit on-demand trigger。
-- [ ] 測試 replay cost governance 阻止不必要的 context inflation。
-- [ ] 測試 promotion pipeline 阻止 raw transcript / temporary blocker 進入 long-term memory。
+- [x] 測試 stale blocker replay 被阻止。
+- [x] 測試 old `.agent-goals/` state 不會被當成 current execution state。
+- [x] 測試 episodic memory 只能 weak guidance。
+- [x] 測試 project memory 跨 repo / architecture boundary 時需 revalidation。
+- [x] 測試 decision memory superseded 時不得被直接採用。
+- [x] 測試 full session replay 需要 explicit on-demand trigger。
+- [x] 測試 replay cost governance 阻止不必要的 context inflation。
+- [x] 測試 promotion pipeline 阻止 raw transcript / temporary blocker 進入 long-term memory。
 
 ### Phase 6 — Plan Completion Closure
 
 Tasks:
 
-- [ ] 確認所有 phase 完成或標 blocked。
-- [ ] 執行適用 validator：ReadLints、Markdown link check、`ai-skill runtime refresh`（若修改 routing / knowledge runtime）。
-- [ ] 檢查 linked updates。
-- [ ] 更新 `plans/README.md` 狀態。
-- [ ] 若完成，搬移至 `plans/archived/`。
-- [ ] Commit / push / readback / clean status。
+- [x] 確認所有 phase 完成或標 blocked。
+- [x] 執行適用 validator：ReadLints、Markdown link check、`ai-skill runtime refresh`（若修改 routing / knowledge runtime）。
+- [x] 檢查 linked updates。
+- [x] 更新 `plans/README.md` 狀態。
+- [x] 若完成，搬移至 `plans/archived/`。
+- [x] Commit / push / readback / clean status。
 
 ---
 

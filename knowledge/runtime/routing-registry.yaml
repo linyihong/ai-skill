@@ -662,23 +662,29 @@ records:
 
   - id: route.models.model-aware-routing
     task_intent: 建立或使用 model-aware routing / compression strategy
-    primary_source: models/profiles/README.md
+    primary_source: models/README.md
     required_dependencies:
+      - models/routing/README.md
+      - models/capabilities/README.md
       - models/compression/README.md
+      - models/workflow-adaptation/README.md
+      - models/governance/README.md
       - runtime/router/
       - metadata/ranking/README.md
       - knowledge/summaries/README.md
     candidate_sources:
       - knowledge/runtime/README.md
+      - models/runtime/README.md
       - metadata/schema.md
+      - validation/scenarios/models/
     source_of_truth_gate: design-layer-only
-    ranking_reason: models/profiles 定義 small / large / specialized 的 context loading 深度，models/compression 定義 compression levels 與 escalation rules。
-    validation_signal: Profile、compression level、primary source、deferred sources 與 validation signal 可被記錄。
+    ranking_reason: models/README.md 彙整 profiles、routing、capabilities、workflow adaptation、governance、runtime primitives 與 compression；實際 model selector 行為仍屬 tool adapter。
+    validation_signal: Strategy、capability dimensions、compression、fallback behavior、workflow shape 與 validation target 可被記錄，且 validation/scenarios/models 覆蓋主要 routing cases。
     metadata:
       priority: P2
-      confidence: medium
+      confidence: high
       context_cost:
-        estimated_tokens: 1200
+        estimated_tokens: 2200
         load_strategy: lazy
         cacheable: true
         ttl:
@@ -688,6 +694,42 @@ records:
       profile: large
       compression_level: source-backed
       reason: 修改 model strategy 會影響 runtime routing，需讀 profiles、compression 與 routing source。
+
+  - id: route.memory.retrieval-activation
+    task_intent: 建立或使用 memory retrieval / activation / replay governance
+    primary_source: memory/README.md
+    required_dependencies:
+      - memory/retrieval-governance/README.md
+      - memory/working/README.md
+      - memory/summary/README.md
+      - memory/episodic/README.md
+      - memory/project/README.md
+      - memory/failure/README.md
+      - memory/decision/README.md
+      - governance/ai-runtime-governance/cognitive-state-governance.md
+    candidate_sources:
+      - knowledge/summaries/memory-operations.md
+      - knowledge/graphs/memory-operations.yaml
+      - validation/scenarios/memory/
+      - enforcement/conversation-goal-ledger.md
+      - governance/lifecycle/README.md
+    source_of_truth_gate: memory-replay-candidate-only
+    ranking_reason: memory/README.md 定義 selective replay boundary，retrieval-governance 定義 trigger、qualification、budget、freshness、contamination 與 promotion policy。
+    validation_signal: Memory activation decision 能記錄 trigger、candidate memory、qualification、replay budget、current-source revalidation 與 discard / promotion decision。
+    metadata:
+      priority: P2
+      confidence: high
+      context_cost:
+        estimated_tokens: 2200
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          conversation: true
+      compatibility_state: active-reference
+    model:
+      profile: large
+      compression_level: source-backed
+      reason: Memory replay 會影響 context budget、evidence scope 與 contamination risk，需讀 source-backed governance。
 
   - id: route.runtime.router-flow
     task_intent: 了解 context routing 決策流程

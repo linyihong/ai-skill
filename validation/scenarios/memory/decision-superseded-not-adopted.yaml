@@ -1,0 +1,20 @@
+id: memory-decision-superseded-not-adopted
+domain: memory
+type: routing-decision
+priority: P1
+given:
+  task: apply_historical_decision
+  artifacts:
+    - memory/decision/README.md
+    - memory/retrieval-governance/retrieval-routing.md
+  signals:
+    - decision status is superseded
+when:
+  action: use_decision_memory
+then:
+  expected_route:
+    - read_successor_decision_first
+    - reject_superseded_decision_as_current_context
+  forbidden_routes:
+    - apply_superseded_decision_directly
+  expected_final_route: successor_required

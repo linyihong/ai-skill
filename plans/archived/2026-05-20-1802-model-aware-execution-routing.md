@@ -1,5 +1,7 @@
 # Model-Aware Execution Routing
 
+> **狀態**: completed
+
 > **狀態**: draft
 > **建立日期**: 2026-05-20
 > **目的**: 將 `models/` 從 model profile / compression documentation 升級為 model-aware execution strategy layer，讓 agent 能依 task complexity、cognitive state、autonomy mode、context budget 與 tool capability 選擇合適的 execution strategy；若工具支援 explicit model selection，再進一步選用具體模型或 subagent。
@@ -32,7 +34,7 @@
 | Field | Content |
 | --- | --- |
 | Trigger | 使用者指出 `models/` 目前像 documentation layer，缺少 execution routing、workflow adaptation 與 runtime routing contract，要求建立 plan、檢查是否與現行框架衝突、寫入建議 active plan 執行順序，並 commit / push。 |
-| Checked sources | `models/README.md`、`models/profiles/README.md`、`models/compression/README.md`、`knowledge/runtime/routing-registry.yaml` 的 `route.models.model-aware-routing`、`runtime/README.md`、`plans/README.md`、`plans/archived/2026-05-20-1501-cognitive-state-evidence-governance.md`、`plans/active/2026-05-20-1745-memory-retrieval-activation-governance.md`。 |
+| Checked sources | `models/README.md`、`models/profiles/README.md`、`models/compression/README.md`、`knowledge/runtime/routing-registry.yaml` 的 `route.models.model-aware-routing`、`runtime/README.md`、`plans/README.md`、`plans/archived/2026-05-20-1501-cognitive-state-evidence-governance.md`、`plans/archived/2026-05-20-1745-memory-retrieval-activation-governance.md`。 |
 | Conflicts | 不應宣稱 `models/` 能強制 Cursor Auto 或任何工具的主對話模型切換。Actual model selection 屬於 tool capability / `ai-tools/` 邊界；`models/` 應定義 tool-neutral execution strategy。若工具支援 explicit model selection 或 subagent model selection，才可由 routing contract 建議具體模型。 |
 | Decision | Proceed as separate active plan。Scope 應聚焦 model-aware execution strategy、routing contract、workflow adaptation、context budget orchestration 與 governance。不要直接新增 provider-specific model names 到 reusable core；必要時只在 tool adapter 或 runtime capability matrix 記錄可用性。 |
 | Validation | Plan readback、diff review、ReadLints、Markdown link check。後續若修改 `knowledge/runtime/routing-registry.yaml`、generated model reports 或 runtime source，必須執行 `ai-skill runtime refresh` 與相關 validator。 |
@@ -57,7 +59,7 @@
 2. 再執行本 plan 的 Phase 0-2。
    - 先建立 model-aware execution contract、capability dimensions、tool capability boundary。
    - 此階段可以與 memory plan Batch A 平行，但不得把 model routing runtime 化。
-3. 接著執行 `plans/active/2026-05-20-1745-memory-retrieval-activation-governance.md` 的 Batch A / Phase 0-2。
+3. 接著執行 `plans/archived/2026-05-20-1745-memory-retrieval-activation-governance.md` 的 Batch A / Phase 0-2。
    - 原因：memory working buffer 與 model context budget 會互相影響，但兩者都依賴 cognitive-state 的上游治理。
 4. 最後執行本 plan 的 Phase 3-6 與 memory plan 的 Batch B / C。
    - 先完成 model routing primitives 與 workflow adaptation，再接 knowledge/runtime routing、generated reports、validation scenarios。
@@ -310,11 +312,11 @@ Candidate files:
 
 Tasks:
 
-- [ ] Define checklist-first workflow shape for small / constrained models.
-- [ ] Define source-backed / exploratory workflow shape for high reasoning tasks.
-- [ ] Define coding workflow boundaries: diff precision, tests, lints, patch scope.
-- [ ] Define architecture workflow boundaries: planning, tradeoff, contradiction analysis.
-- [ ] Define validation workflow boundaries: evidence-first, claim scope, no premature success.
+- [x] Define checklist-first workflow shape for small / constrained models.
+- [x] Define source-backed / exploratory workflow shape for high reasoning tasks.
+- [x] Define coding workflow boundaries: diff precision, tests, lints, patch scope.
+- [x] Define architecture workflow boundaries: planning, tradeoff, contradiction analysis.
+- [x] Define validation workflow boundaries: evidence-first, claim scope, no premature success.
 
 ### Phase 4 — Governance and Tool Boundary
 
@@ -329,11 +331,11 @@ Candidate files:
 
 Tasks:
 
-- [ ] Define model selection governance without provider-specific assumptions.
-- [ ] Define when agent must say model selection is unavailable or behavior-only.
-- [ ] Define hallucination boundary for low-confidence model outputs.
-- [ ] Define context budget governance for long tasks.
-- [ ] Add tool adapter notes only where actual tool behavior matters.
+- [x] Define model selection governance without provider-specific assumptions.
+- [x] Define when agent must say model selection is unavailable or behavior-only.
+- [x] Define hallucination boundary for low-confidence model outputs.
+- [x] Define context budget governance for long tasks.
+- [x] Add tool adapter notes only where actual tool behavior matters.
 
 ### Phase 5 — Runtime / Knowledge Integration
 
@@ -350,11 +352,11 @@ Candidate files:
 
 Tasks:
 
-- [ ] Define minimal model routing primitives.
-- [ ] Update `route.models.model-aware-routing` candidate sources.
-- [ ] Decide whether generated model reports need new fields for execution strategy.
-- [ ] Run knowledge runtime refresh if routing registry or generated views change.
-- [ ] Avoid provider-specific runtime state unless tool capability source exists.
+- [x] Define minimal model routing primitives.
+- [x] Update `route.models.model-aware-routing` candidate sources.
+- [x] Decide whether generated model reports need new fields for execution strategy.
+- [x] Run knowledge runtime refresh if routing registry or generated views change.
+- [x] Avoid provider-specific runtime state unless tool capability source exists.
 
 ### Phase 6 — Validation Scenarios
 
@@ -364,25 +366,25 @@ Candidate files:
 
 Tasks:
 
-- [ ] Test Auto/fixed main model fallback to behavior-only adaptation.
-- [ ] Test user-requested explicit model routes to subagent when available.
-- [ ] Test unavailable model does not get silently substituted.
-- [ ] Test uncertain state selects validation-heavy strategy.
-- [ ] Test contaminated state selects rediscovery-only strategy.
-- [ ] Test small-model workflow uses checklist-first and bounded context.
-- [ ] Test architecture task uses source-backed / exploratory strategy.
-- [ ] Test model routing does not override source-of-truth or enforcement rules.
+- [x] Test Auto/fixed main model fallback to behavior-only adaptation.
+- [x] Test user-requested explicit model routes to subagent when available.
+- [x] Test unavailable model does not get silently substituted.
+- [x] Test uncertain state selects validation-heavy strategy.
+- [x] Test contaminated state selects rediscovery-only strategy.
+- [x] Test small-model workflow uses checklist-first and bounded context.
+- [x] Test architecture task uses source-backed / exploratory strategy.
+- [x] Test model routing does not override source-of-truth or enforcement rules.
 
 ### Phase 7 — Plan Completion Closure
 
 Tasks:
 
-- [ ] Confirm all phases complete or marked blocked.
-- [ ] Run ReadLints, Markdown link check, and `ai-skill runtime refresh` if routing / generated surfaces changed.
-- [ ] Check linked updates.
-- [ ] Update `plans/README.md` status.
-- [ ] Move plan to `plans/archived/` if completed.
-- [ ] Commit / push / readback / clean status.
+- [x] Confirm all phases complete or marked blocked.
+- [x] Run ReadLints, Markdown link check, and `ai-skill runtime refresh` if routing / generated surfaces changed.
+- [x] Check linked updates.
+- [x] Update `plans/README.md` status.
+- [x] Move plan to `plans/archived/` if completed.
+- [x] Commit / push / readback / clean status.
 
 ---
 

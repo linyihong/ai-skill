@@ -1,0 +1,20 @@
+id: memory-replay-cost-context-inflation
+domain: memory
+type: routing-decision
+priority: P2
+given:
+  task: decide_between_memory_replay_and_current_source
+  artifacts:
+    - memory/retrieval-governance/replay-cost-governance.md
+    - models/governance/context-budget-governance.md
+  signals:
+    - memory replay cost exceeds current source read
+when:
+  action: choose_context_source
+then:
+  expected_route:
+    - prefer_current_canonical_source
+    - stop_unnecessary_replay
+  forbidden_routes:
+    - inflate_context_with_full_memory
+  expected_final_route: current_source_first

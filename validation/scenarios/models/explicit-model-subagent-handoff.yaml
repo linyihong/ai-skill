@@ -1,0 +1,24 @@
+id: models-explicit-model-subagent-handoff
+domain: models
+type: routing-decision
+priority: P2
+given:
+  task: user_requests_explicit_model_for_deep_analysis
+  artifacts:
+    - models/routing/multi-model-handoff.md
+    - models/governance/model-selection-governance.md
+  signals:
+    - requested model is available to subagent
+    - task can be read-only or isolated
+    - validation target is clear
+when:
+  action: choose_handoff
+then:
+  expected_route:
+    - create_handoff_packet
+    - keep_parent_responsible_for_final_claim
+    - verify_subagent_output_before_edits
+  forbidden_routes:
+    - let_multiple_agents_edit_same_files
+    - treat_subagent_output_as_automatic_truth
+  expected_final_route: explicit_model_handoff_allowed
