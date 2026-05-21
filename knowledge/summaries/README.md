@@ -32,6 +32,9 @@ Summaries 用來協助 agent：
 | `architecture.context-cost-optimization` | Token 成本優化規劃（含 Phase 2.5 prompt cache alignment）。 | [`context-cost-optimization.md`](context-cost-optimization.md) |
 | `intelligence.architectural-fit` | Architecture fit analysis 與 DDD adoption boundary。 | [`architectural-fit.md`](architectural-fit.md) |
 | `intelligence.requirements-cognition` | Requirements cognition、BDD-lite、acceptance 與 validation target boundary。 | [`requirements-cognition.md`](requirements-cognition.md) |
+| `intelligence.migration-seeder-anti-patterns` | 業務資料硬塞進 schema migration 的反模式與替代方案。 | [`migration-seeder-anti-patterns.md`](migration-seeder-anti-patterns.md) |
+| `intelligence.vendor-integration-architecture` | 多廠商整合策略選型（Adapter / compile-time module / SPI / out-of-process / hybrid）。 | [`vendor-integration-architecture.md`](vendor-integration-architecture.md) |
+| `analysis.dual-token-audit` | 雙簽章/雙加密 token 並存的審計方法（觀察點、五步流程、failure signals）。 | [`dual-token-audit.md`](dual-token-audit.md) |
 
 ## Summary 格式
 

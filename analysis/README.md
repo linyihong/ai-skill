@@ -12,6 +12,7 @@
 - [`production/`](production/README.md)：Production 問題分析與根因追蹤方法（incident 分類、觀測性資料判讀、RCA 流程、效能診斷）。
 - [`issue/`](issue/README.md)：Issue 分類與優先級判斷方法（triage 流程、優先級計算、初步診斷、重複偵測）。
 - [`web/`](web/README.md)：Web Scraping 分析方法（網站結構觀察、反爬機制判讀、動態內容分析、MCP 工具設計評估）。
+- [`security/`](security/README.md)：安全相關分析方法（token 流向、簽章一致性、雙簽章/雙加密 token 並存的審計）。
 
 ## 放什麼
 

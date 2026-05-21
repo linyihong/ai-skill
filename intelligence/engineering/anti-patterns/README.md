@@ -16,6 +16,7 @@ AI 自動避雷。
 - [`aggregate-explosion.md`](aggregate-explosion.md) — Aggregate 數量超過 invariant / domain concept，造成一致性與理解成本膨脹。
 - [`repository-abstraction-overuse.md`](repository-abstraction-overuse.md) — Repository abstraction 沒有 aggregate boundary 或 query intent 價值。
 - [`architecture-absolutism.md`](architecture-absolutism.md) — 把單一架構風格當 universal default。
+- [`migration-seeder-anti-patterns.md`](migration-seeder-anti-patterns.md) — 把大量業務資料以巨型 INSERT 包進 schema migration，使資料 lifecycle 被綁定到 schema lifecycle。
 
 ## 與根目錄 `anti-patterns/` 的差異
 

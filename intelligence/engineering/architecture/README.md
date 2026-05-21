@@ -18,6 +18,7 @@
 | [`coupling-tradeoffs/`](coupling-tradeoffs/README.md) | Tight/loose coupling、coordination cost、abstraction cost。 |
 | [`consistency-models/`](consistency-models/README.md) | ACID、eventual consistency、compensation、idempotency、ordering。 |
 | [`modular-monolith-vs-microservices.md`](modular-monolith-vs-microservices.md) | Microservices increase operational complexity rapidly. |
+| [`vendor-integration-architecture.md`](vendor-integration-architecture.md) | 多廠商整合的整合策略選型（Adapter / compile-time module / SPI / out-of-process / hybrid）；N ≥ 10 必須跳出 compile-time module per vendor。 |
 
 ## 與其他層的關係
 
