@@ -285,7 +285,7 @@ Tasks：
 
 - [x] 先建立 Go wrapper：`ai-skill runtime refresh`、`runtime validate`、`runtime compile`。
 - [x] Wrapper 必須固定 UTF-8 環境，並在缺 Ruby / SQLite 時給明確修復建議。
-- [ ] 建立 golden fixture：同一組 source 產出固定 `runtime-report.md`、model reports、SQLite index、`runtime.db` assertion。
+- [x] 建立 golden fixture：同一組 source 產出固定 `runtime-report.md`、model reports、SQLite index、`runtime.db` assertion。
 - [x] 建立 native SQLite proof-of-concept：用 pure Go SQLite 開啟、查詢、寫入測試 DB，確認 Windows / macOS / Linux 無外部 sqlite3 CLI 依賴。
 - [x] 評估哪些 Ruby validator 適合原生 Go 重寫，哪些應保留 Ruby。
 - [x] 建立 `runtime validate` native DB validator slice：Go native 檢查 `runtime.db` integrity、required tables、row counts、JSON columns、compiler metadata、stale metadata warning；Ruby validators 暫保留作 parity guard。
@@ -305,6 +305,7 @@ Progress notes：
 - `ai-skill runtime query` 已新增第一段 Go native SQLite index query：支援 positional query / `--keyword`、`--db`、`--layer`、`--type`、`--status`、`--limit`、JSON / plain output，且不寫入 DB；unit tests 覆蓋 ranking、filters、empty result 與 missing DB。`query-knowledge-graph.rb` 尚未移植。
 - `ai-skill runtime validate` 已新增 Go native SQLite runtime index validator：檢查 index integrity、required tables、atoms / sources / edges / fts counts、atom source references、source SHA-256 checksums、FTS count、basic ranked query 與 git-ignore boundary；unit tests 覆蓋 valid index、missing table、stale checksum、FTS count mismatch、ignored / unignored boundary。git-ignore boundary 以 Go 呼叫 external Git 檢查。
 - `ai-skill runtime query --graph` 已新增 Go native knowledge graph query：支援 `--source`、`--target`、`--type`、`--keyword` / positional query、`--limit`、JSON / plain output，且不寫入 graph YAML；unit tests 覆蓋 graph filters、empty result 與 missing filter。
+- Runtime golden fixture 已新增 integration test：同一份 canonical source 透過 Ruby generators 產出 runtime report、model context report、model checklists、臨時 SQLite runtime index 與臨時 `runtime.db`，並驗證固定 anchors、row counts、FTS hit、`generated_surfaces` 與 compiler metadata；測試輸出全部落在 stdout 或 temp DB，不寫 production generated artifacts。
 
 Completion criteria：
 

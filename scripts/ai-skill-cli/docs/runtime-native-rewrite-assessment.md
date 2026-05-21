@@ -19,10 +19,10 @@
 | `scripts/validate-runtime-sqlite-index.rb` | `ai-skill runtime validate` | 高 | 已開始 Go native slice。SQLite integrity、tables、row counts、source references、checksum、FTS count、basic ranked query 與 git-ignore boundary 已 native；git-ignore boundary 仍需 external Git。 | missing DB / table、stale checksum、FTS count mismatch、git-ignore boundary fixture 已覆蓋。 |
 | `scripts/query-runtime-index.rb` | `ai-skill runtime query` | 高 | 已開始 Go native slice。查詢 SQLite / FTS、filter、limit 與 empty result 行為已可直接測；不依賴外部 `sqlite3` CLI。 | ranking / filter / empty result / missing DB fixture 已覆蓋。 |
 | `scripts/query-knowledge-graph.rb` | `ai-skill runtime query --graph` | 中 | 已開始 Go native slice。YAML parsing、source / target / type / keyword filters、empty result 與 missing filter 已固定。 | source / target / type / keyword filter、empty result fixture 已覆蓋。 |
-| `scripts/generate-runtime-sqlite-index.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper，建立 golden SQLite index 後再 native。寫入 git-ignored DB，需驗證 deterministic rows / checksums / FTS。 | golden DB row counts、checksum、FTS fixture。 |
-| `scripts/generate-knowledge-runtime-report.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper，建立 golden Markdown output 後再 native。 | routing registry / summaries / graphs golden report。 |
-| `scripts/generate-model-context-report.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper，建立 model grouping golden output 後再 native。 | profile / compression grouping fixture。 |
-| `scripts/generate-model-checklists.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper，建立 checklist golden output 後再 native。 | per-model checklist fixture。 |
+| `scripts/generate-runtime-sqlite-index.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定臨時 SQLite index row counts 與 FTS hit；完整 native 前仍需 Ruby vs Go parity。 | golden DB row counts、FTS fixture 已覆蓋；checksum parity 待 Go generator slice。 |
+| `scripts/generate-knowledge-runtime-report.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定 runtime report anchors，且以 stdout 產生避免寫 production report。 | routing registry / summaries / graphs golden anchors 已覆蓋。 |
+| `scripts/generate-model-context-report.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定 model context report anchors。 | profile / compression grouping anchors 已覆蓋。 |
+| `scripts/generate-model-checklists.rb` | `ai-skill runtime refresh` | 中 | 先 wrapper。Golden fixture 已固定 checklist report anchors。 | per-model checklist anchors 已覆蓋。 |
 | `scripts/refresh-knowledge-runtime.rb` | `ai-skill runtime refresh` | 低 | 保持 wrapper orchestrator，直到各 generator / validator native 後再改成 Go orchestrator。 | partial failure blocks success、ordered step summary、no partial success fixture。 |
 | `runtime/compiler/compiler-engine.rb` | `ai-skill runtime compile` | 低 | 保持 wrapper。不得直接替換 production compiler；先建立 Ruby vs Go parity test。 | runtime source keyword、`--check` no-op、`runtime.db` generated surface assertion、schema parity。 |
 | `scripts/migrate-runtime-config-to-sqlite.rb` | `ai-skill runtime migrate` / `compile` | Deferred | 暫不改寫，現有 compiler path 已吸收大部分需求。 | idempotent migration fixture。 |
@@ -31,6 +31,6 @@
 
 ## 下一步
 
-1. 開始建立 golden fixture：同一組 source 產出固定 runtime report、model reports、SQLite index 與 `runtime.db` assertions。
-2. 補 runtime generators 的 ordered step / partial failure fixture，支撐之後 Go orchestrator 化。
-3. Generator / compiler 只能在 golden fixture 與 Ruby vs Go parity test 完成後替換。
+1. 補 runtime generators 的 ordered step / partial failure fixture，支撐之後 Go orchestrator 化。
+2. 若開始 Go generator / compiler slice，先建立 Ruby vs Go parity test；不得只靠 golden anchors 直接替換 production compiler。
+3. Generator / compiler 只能在 golden fixture 與 Ruby vs Go parity test 都通過後替換。

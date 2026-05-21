@@ -307,6 +307,44 @@ func TestRuntimeGraphQueryRequiresFilter(t *testing.T) {
 	}
 }
 
+func TestRuntimeGoldenFixtureCoversGeneratedSurfaces(t *testing.T) {
+	repo := repoRootForTest(t)
+	ruby := requireExecutableForTest(t, "ruby")
+	requireExecutableForTest(t, "sqlite3")
+
+	runtimeReport := runRubyScript(t, repo, ruby, "scripts/generate-knowledge-runtime-report.rb")
+	if !strings.Contains(runtimeReport, "# Knowledge Runtime Report") || !strings.Contains(runtimeReport, "`route.bootstrap.ai-skill`") {
+		t.Fatalf("runtime report missing golden anchors")
+	}
+
+	modelReport := runRubyScript(t, repo, ruby, "scripts/generate-model-context-report.rb")
+	if !strings.Contains(modelReport, "# Model Context Report") || !strings.Contains(modelReport, "## Profile View") {
+		t.Fatalf("model context report missing golden anchors")
+	}
+
+	modelChecklists := runRubyScript(t, repo, ruby, "scripts/generate-model-checklists.rb")
+	if !strings.Contains(modelChecklists, "# Model Checklists") || !strings.Contains(modelChecklists, "## Profile Checklists") {
+		t.Fatalf("model checklists missing golden anchors")
+	}
+
+	temp := t.TempDir()
+	indexPath := filepath.Join(temp, "runtime-index.sqlite")
+	indexRel, err := filepath.Rel(repo, indexPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	runRubyScript(t, repo, ruby, "scripts/generate-runtime-sqlite-index.rb", "--output", filepath.ToSlash(indexRel))
+	assertSQLiteCountAtLeast(t, indexPath, "atoms", 60)
+	assertSQLiteCountAtLeast(t, indexPath, "sources", 50)
+	assertSQLiteScalar(t, indexPath, "SELECT COUNT(*) FROM fts WHERE fts MATCH '\"runtime\"'", "nonzero")
+
+	runtimeDBPath := filepath.Join(temp, "runtime.db")
+	runRubyScript(t, repo, ruby, "runtime/compiler/compiler-engine.rb", "--db", runtimeDBPath)
+	assertSQLiteCountAtLeast(t, runtimeDBPath, "generated_surfaces", 1)
+	assertSQLiteScalar(t, runtimeDBPath, "SELECT COUNT(*) FROM generated_surfaces WHERE source_path = 'plans/active/*.md'", "nonzero")
+	assertSQLiteScalar(t, runtimeDBPath, "SELECT COUNT(*) FROM compiler_metadata WHERE key = 'compiler_version'", "nonzero")
+}
+
 func TestRuntimeValidateBlocksMissingValidator(t *testing.T) {
 	repo := t.TempDir()
 	writeFile(t, filepath.Join(repo, "scripts", "validate-knowledge-runtime.rb"), "# ok\n")
@@ -660,6 +698,77 @@ edges:
     reason: Analysis guidance supports workflow decisions.
     validation: Fixture validates empty query behavior.
 `)
+}
+
+func repoRootForTest(t *testing.T) string {
+	t.Helper()
+	dir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "scripts", "generate-knowledge-runtime-report.rb")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			t.Fatal("could not locate Ai-skill repo root")
+		}
+		dir = parent
+	}
+}
+
+func requireExecutableForTest(t *testing.T, name string) string {
+	t.Helper()
+	path, err := exec.LookPath(name)
+	if err != nil {
+		t.Skipf("%s is required for golden fixture integration test", name)
+	}
+	return path
+}
+
+func runRubyScript(t *testing.T, repo string, ruby string, script string, args ...string) string {
+	t.Helper()
+	cmd := exec.Command(ruby, append([]string{script}, args...)...)
+	cmd.Dir = repo
+	cmd.Env = runtimeWrapperEnv(os.Environ())
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("ruby %s failed: %v\n%s", script, err, string(output))
+	}
+	return string(output)
+}
+
+func assertSQLiteCountAtLeast(t *testing.T, path string, table string, minimum int) {
+	t.Helper()
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	var count int
+	if err := db.QueryRow("SELECT COUNT(*) FROM " + table).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	if count < minimum {
+		t.Fatalf("%s row count = %d, expected at least %d", table, count, minimum)
+	}
+}
+
+func assertSQLiteScalar(t *testing.T, path string, query string, expectation string) {
+	t.Helper()
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	var count int
+	if err := db.QueryRow(query).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	if expectation == "nonzero" && count == 0 {
+		t.Fatalf("query returned zero: %s", query)
+	}
 }
 
 func containsEnv(env []string, item string) bool {
