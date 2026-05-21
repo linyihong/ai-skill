@@ -493,6 +493,21 @@ sqlite3 runtime/runtime.db \
 
 若修改內容應反映在 compiled surface，必須再用 `sqlite3` 查詢 `data` 欄位確認新關鍵字存在、舊錯誤內容不存在。只看到 compiler 成功不夠；必須確認內容真的進入 `runtime.db`。若 `runtime.db` 產生 diff，必須與 source 變更同一輪 commit。
 
+**⛔ 環境阻斷處理（強制）**：
+
+當本步驟的任何指令（`ai-skill runtime compile`、`ai-skill runtime validate`、`sqlite3` 等）因環境問題無法執行時（如工具未安裝、Ruby 缺失、CLI 找不到）：
+
+1. **立即停止**，不得繼續執行 Step 10 或 Step 11
+2. **將完整錯誤訊息（原文）顯示給使用者**
+3. **說明影響**：告知此為強制步驟，跳過會導致 runtime.db 與實際知識內容不同步
+4. **提出選項**，等待使用者選擇後再繼續：
+   - 安裝缺少的工具（如 Ruby、ai-skill CLI）後重新執行
+   - 手動驗證替代：直接用 `sqlite3` 查詢確認 compiled surface 內容
+   - 暫緩本步驟，記錄為 open issue，後續補做
+5. 不得自行決定「這是環境限制，略過並備註」
+
+> 相關 failure pattern：[`enforcement/failure-patterns/mandatory-step-blocker-bypass.md`](../../enforcement/failure-patterns/mandatory-step-blocker-bypass.md)
+
 **必須更新的 surfaces**：
 
 | Surface | 更新方式 |

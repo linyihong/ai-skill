@@ -16,6 +16,7 @@
 | [Failure-to-validator closure](failure-to-validator-closure.md) | `validation-gap` / `process-gap` | validated | 防止 agent 修復錯誤後，沒有把錯誤模式抽象化為可重複檢測的 validator 測試案例。 |
 | [Refactor parity feedback miss](refactor-parity-feedback-miss.md) | `validation-gap` / `dependency-miss` | candidate | 防止 agent 只在單一計畫補新舊功能對照，卻沒有把 replacement / refactor parity gate 回饋到 software-delivery workflow。 |
 | [Commit/push before writeback transaction close](commit-before-validation-skip.md) | `validation-gap` | candidate | 防止 agent 在 commit/push 前跳過 Ai-skill writeback transaction 關閉條件（依 dependency-reading.md §Writeback Transaction Guard）。 |
+| [Mandatory step blocker bypass](mandatory-step-blocker-bypass.md) | `process-gap` / `validation-gap` | validated | 防止 agent 遇到強制步驟的環境阻斷（如工具未安裝）時自行判斷「環境限制」而靜默跳過，應立即停止並通知使用者。 |
 
 ## 維護
 

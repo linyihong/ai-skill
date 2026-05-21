@@ -11,7 +11,7 @@
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
 | SQLite runtime index | [`sqlite/`](sqlite/) | generated lookup cache prototype |
-| Summaries | [`../summaries/`](../summaries/) | 17 files |
+| Summaries | [`../summaries/`](../summaries/) | 20 files |
 | Graph records | [`../graphs/`](../graphs/) | 33 files |
 
 ## Routing Records
@@ -79,11 +79,13 @@
 | `intelligence.architectural-fit` | `candidate` | [`architectural-fit.md`](../summaries/architectural-fit.md) | Architecture selection 先評估 business complexity、invariant density、integration pressure、lifecycle 與 team boundary，再選 CRUD、DDD Lite、Full DDD、event-driven 或 microservices。DDD 是 selectable architecture strategy，不是 runtime invariant。 |
 | `architecture.context-cost-optimization` | `validated` | [`context-cost-optimization.md`](../summaries/context-cost-optimization.md) | Token 成本優化規劃。Phase 1（立即省錢）：Bootstrap 極小化（~800 tokens）、README 拆分、Rule lazy-load、Summary layer。Phase 2（架構升級）：Runtime Context Router、Context Cost Metadata、Skill Index、Context TTL。Phase 2.5（規範層已實作）：Provider Prompt Cache Alignment，定義 stable prefix / volatile suffix 與 provider cache metadata。Phase 3（長期）：Semantic Retrieval、Episodic Memory、Multi-model Routing。 |
 | `workflow.software-delivery` | `validated` | [`development-guidance.md`](../summaries/development-guidance.md) | 將授權 App/API/Embedded/Firmware 觀察轉成開發 guidance、實作模式、控制項、檢查清單。涵蓋 mobile（Android/iOS/Flutter/React Native）、backend API、embedded firmware 的安全控制、實作模式與 release gate。原 `skills/app-development-guidance/` 已刪除，所有內容已遷移至新分層。提供 5 個標準化輸出模板（change-brief / contract / bdd-scenario / implementation-plan / review-report），位於 `workflow/software-delivery/templates/`。另提供 Greenfield 標準化流程（`workflow/greenfield/`）與 Slash Command 模式（`ai-tools/slash-commands.md`）。 |
+| `analysis.dual-token-audit` | `candidate` | [`dual-token-audit.md`](../summaries/dual-token-audit.md) | 系統內同時存在兩套以上 token 機制（JWT + JWE、HMAC + 對稱加密、平台 token + 廠商回調 token）時的審計方法。觀察點：代碼結構、key 管理、algorithm 宣告、token 流向、validation 一致性、replay 防護、log 外洩、error 訊息。Audit 五步：列 token universe → 畫 flow → key/alg matrix → 接縫盤點 → failure mode 對照。 |
 | `feedback.promotion.pipeline` | `candidate` | [`feedback-promotion-pipeline.md`](../summaries/feedback-promotion-pipeline.md) | 定義 feedback lesson 從 skill-local history 推進到 workflow、intelligence、enforcement、memory 或 runtime surfaces 的 promotion / downgrade gate。 |
 | `governance.goal-ledger-boundary` | `validated` | [`goal-ledger-boundary.md`](../summaries/goal-ledger-boundary.md) | `.agent-goals/` 只保存 active conversation goals；長期 roadmap、phase、migration、promotion、deprecation 與治理狀態必須落到 durable planning 文件。 |
 | `knowledge.navigation` | `validated` | [`knowledge-navigation.md`](../summaries/knowledge-navigation.md) | 知識導航系統：indexes（任務路由）、summaries（300-500 token 摘要）、graphs（知識圖譜邊）、runtime（routing registry、refresh policy、SQLite lookup cache）。讓 agent 用最小 token 成本找到正確知識。 |
 | `memory.operations` | `candidate` | [`memory-operations.md`](../summaries/memory-operations.md) | Memory 是 selective replay system：working buffer、summary、episodic、project、failure、decision 與 retrieval-governance。Replay 需要 trigger、qualification、budget、freshness/scope check 與 current source revalidation。 |
 | `metadata.schema.knowledge-atom` | `validated` | [`metadata-schema.md`](../summaries/metadata-schema.md) | Knowledge Atom metadata schema v1，定義 atom 的必填欄位、選填欄位、受控值、YAML 範本、驗證規則與 provider prompt cache hints。 |
+| `intelligence.migration-seeder-anti-patterns` | `candidate` | [`migration-seeder-anti-patterns.md`](../summaries/migration-seeder-anti-patterns.md) | 把大量業務資料（廠商目錄、商品/SKU、遊戲清單、權限矩陣）以巨型 `INSERT` 包進 schema migration，使資料 lifecycle 與 schema lifecycle 被強制綁定。訊號：單檔 >50KB、檔名含 dataSeeder、業務人員想改資料要工程師寫 migration。替代方案依資料性質：列舉留 migration、目錄走 application seeder/admin、大量參考資料用外部 CSV + bulk loader。 |
 | `models.routing` | `candidate` | [`model-routing.md`](../summaries/model-routing.md) | Model-aware execution strategy：profiles、capabilities、routing、workflow adaptation、governance、runtime primitives 與 compression。用於選擇 behavior shape，不宣稱 provider model 已切換。 |
 | `runtime.prompt-cache-alignment` | `candidate` | [`prompt-cache-alignment.md`](../summaries/prompt-cache-alignment.md) | Provider prompt cache 對齊規範。定義 stable prefix、semi-stable middle、volatile suffix 的 context layout，並說明 `cacheable` 與 `provider_cache_candidate` 的邊界。 |
 | `governance.repo-maintenance` | `validated` | [`repo-governance.md`](../summaries/repo-governance.md) | 本系統的維護、升級、遷移與治理。涵蓋 lifecycle management、validation、cleanup、splitting rules、dependency maintenance。 |
@@ -91,6 +93,7 @@
 | `root.bootstrap.ai-skill` | `validated` | [`root-bootstrap.md`](../summaries/root-bootstrap.md) | Ai-skill 工作的 bootstrap 入口。Root README 定義 OS layout 與 cost-aware 啟動流程；CORE_BOOTSTRAP.md 定義 3 條核心規則（~800 tokens）；enforcement README 定義 Runtime Activation Model 與 lazy-load rules。 |
 | `runtime.operations` | `validated` | [`runtime-operations.md`](../summaries/runtime-operations.md) | Runtime 層負責 context routing、dynamic loading、context pruning、agent coordination 與 orchestration。包含 router（activation rules、cost budget）、context（TTL policy、prune strategy、prompt cache layout）。 |
 | `workflow.travel-planning` | `candidate` | [`travel-planning.md`](../summaries/travel-planning.md) | 依目的地、日期、交通與玩法規劃行程，包含營業時間查證、交通比較、住宿與備案。支援 itinerary 結構化輸出與可行性檢查。日本自駕含 Mapcode 粒度規則（沿線景點 2km+ 需各停車點獨立一行）與查詢工具鏈。 |
+| `intelligence.vendor-integration-architecture` | `candidate` | [`vendor-integration-architecture.md`](../summaries/vendor-integration-architecture.md) | 整合超過 3 個外部廠商（支付聚合、社群登入、IM、博弈聚合、廣告聯播等）時的整合策略選型。五種策略：A. Adapter/Strategy（單模組多實作）/ B. Compile-time submodule per vendor / C. Plugin SPI（runtime 載入）/ D. Out-of-process service / E. Hybrid 分層。N ≥ 10 必須跳出 compile-time module per vendor 模式，否則編譯時間、IDE、升級成本爆炸。 |
 
 ## Graph Records
 
