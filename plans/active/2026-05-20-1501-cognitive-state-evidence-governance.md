@@ -1,6 +1,6 @@
 # Cognitive State & Evidence Governance
 
-> **狀態**: draft
+> **狀態**: in-progress
 > **建立日期**: 2026-05-20
 > **目的**: 補足 Runtime Recovery & Escalation System 尚未覆蓋的「假設、證據、信心、來源新鮮度」治理層，讓 agent 在外部 failure 發生前就能偵測 belief drift、降速或停止自動執行。
 
@@ -711,39 +711,71 @@ X. **是否需要 meta-stop rule？**
 
 ### Phase 0 — Compatibility Review
 
-Status: draft.
+Status: completed (2026-05-21).
 
 Tasks:
 
-- [ ] 確認 assumption ledger 不取代 goal ledger / dependency read ledger。
-- [ ] 確認 belief / assumption 採 ephemeral cognitive governance，不進 persistent runtime state。
-- [ ] 確認 evidence qualification 與 recovery metadata 的邊界。
-- [ ] 確認 belief ownership / override authority 的初版 owner table。
-- [ ] 確認 confidence decay 是否擴充 `circuit-breaker.yaml` 或新增 guard source。
-- [ ] 確認 temporal confidence decay 只在 long session / stale context 啟用。
-- [ ] 確認 confidence integrity 與 claim scope governance 的 runtime / enforcement 邊界。
-- [ ] 確認 execution intent stability 不取代 goal ledger / workflow success criteria。
-- [ ] 確認 evidence lineage 與 contradiction propagation 的最小可行 scope。
-- [ ] 確認 autonomy modes 是否作為 runtime guard action target。
-- [ ] 確認 recovery exit contract 是否屬於 governance、runtime recovery config 或 validation scenario。
-- [ ] 確認 recovery re-entry safety / cooldown 的最小規則。
-- [ ] 確認 cognitive runtime state model 先作 conceptual consolidation，不 persistent。
-- [ ] 確認 cognitive contamination 的 propagation boundary。
-- [ ] 確認 human alignment threshold，避免 autonomy collapse。
-- [ ] 確認 belief GC 是否只在 execution frame 內執行。
-- [ ] 確認 governance minimality / cognitive cost governance，避免小任務觸發過重治理或 governance recursion。
-- [ ] 確認 tier boundary，限制 Tier 3+ cognitive optimization / meta-governance 不阻塞 Tier 0-2 execution。
-- [ ] 確認 compression pass，把重疊 signals normalise 為較少的 runtime primitives。
-- [ ] 確認 runtime reduction：先把 12+ conceptual signals 壓成 3-5 個 runtime primitives，不再新增 lifecycle / state / governance layer。
-- [ ] 確認 minimal runtime principle 與 meta-stop rule。
-- [ ] 確認 recovery budget 是否需要 runtime-state counter。
-- [ ] 與使用者討論 §7 open questions。
+- [x] 確認 assumption ledger 不取代 goal ledger / dependency read ledger。
+- [x] 確認 belief / assumption 採 ephemeral cognitive governance，不進 persistent runtime state。
+- [x] 確認 evidence qualification 與 recovery metadata 的邊界。
+- [x] 確認 belief ownership / override authority 的初版 owner table。
+- [x] 確認 confidence decay 是否擴充 `circuit-breaker.yaml` 或新增 guard source。
+- [x] 確認 temporal confidence decay 只在 long session / stale context 啟用。
+- [x] 確認 confidence integrity 與 claim scope governance 的 runtime / enforcement 邊界。
+- [x] 確認 execution intent stability 不取代 goal ledger / workflow success criteria。
+- [x] 確認 evidence lineage 與 contradiction propagation 的最小可行 scope。
+- [x] 確認 autonomy modes 是否作為 runtime guard action target。
+- [x] 確認 recovery exit contract 是否屬於 governance、runtime recovery config 或 validation scenario。
+- [x] 確認 recovery re-entry safety / cooldown 的最小規則。
+- [x] 確認 cognitive runtime state model 先作 conceptual consolidation，不 persistent。
+- [x] 確認 cognitive contamination 的 propagation boundary。
+- [x] 確認 human alignment threshold，避免 autonomy collapse。
+- [x] 確認 belief GC 是否只在 execution frame 內執行。
+- [x] 確認 governance minimality / cognitive cost governance，避免小任務觸發過重治理或 governance recursion。
+- [x] 確認 tier boundary，限制 Tier 3+ cognitive optimization / meta-governance 不阻塞 Tier 0-2 execution。
+- [x] 確認 compression pass，把重疊 signals normalise 為較少的 runtime primitives。
+- [x] 確認 runtime reduction：先把 12+ conceptual signals 壓成 3-5 個 runtime primitives，不再新增 lifecycle / state / governance layer。
+- [x] 確認 minimal runtime principle 與 meta-stop rule。
+- [x] 確認 recovery budget 是否需要 runtime-state counter。
+- [x] 依使用者「可以開始」指示，將 §7 open questions 收斂為 Phase 0 initial decisions；後續 phase 若遇到互斥選項再回問使用者。
 
 Exit criteria:
 
-- [ ] Layer boundary 已確認。
-- [ ] Runtime source-of-truth path 已確認。
-- [ ] 需要 runtime compiler / validator 的後續 phase 已標出。
+- [x] Layer boundary 已確認。
+- [x] Runtime source-of-truth path 已確認。
+- [x] 需要 runtime compiler / validator 的後續 phase 已標出。
+
+
+#### Phase 0 Decision Ledger (2026-05-21)
+
+| Field | Decision |
+| --- | --- |
+| Trigger | Start implementation for this active plan before Phase 1 governance translation. |
+| Checked sources | `plans/README.md`, `governance/ai-runtime-governance/README.md`, `governance/ai-runtime-governance/recovery-retry-governance.md`, `runtime/README.md`, `metadata/recovery/README.md`, `runtime/guards/circuit-breaker.yaml`, `runtime/pipeline/guard-chain.yaml`, `enforcement/README.md`, `enforcement/dependency-reading.md`, `enforcement/linked-updates.md`, `enforcement/content-layering.md`, `enforcement/rule-weight.md`, `enforcement/conversation-goal-ledger.md`. |
+| Conflicts | No blocking conflict. Current architecture supports a governance-first implementation. `runtime/recovery/*.yaml` remains removed; recovery runtime source is `runtime/compiler/embedded_data.rb` and compiled `runtime/runtime.db`. `metadata/recovery/` is metadata-only. Existing `mismatch_escalation` and `hallucination_risk` guards overlap with confidence decay, so Phase 3 must normalize signals before adding runtime guard keys. |
+| Decision | Proceed. Phase 1 should create the governance translation first. Phase 2 may promote only crisp MUST / forbidden behavior into enforcement. Phase 3 may touch runtime guard sources only after compression to 3-5 runtime primitives. |
+| Validation | Use diff review, linked-update check, `ai-skill runtime refresh`, `go test ./...` for CLI guard safety when runtime scripts are involved, commit / push / readback, and clean `git status --short --branch`. |
+
+#### Phase 0 Architecture Decisions
+
+| Topic | Phase 0 decision | Follow-up phase |
+| --- | --- | --- |
+| Assumption ledger boundary | Keep assumption ledger execution-scoped and lightweight. It does not replace `.agent-goals/`, the dependency-read ledger, or durable planning docs. | Phase 1 governance wording; Phase 5 scenarios. |
+| Belief persistence | Do not persist belief / assumption state in `runtime-state.db` in this plan. Treat cognitive state as conceptual consolidation until invalidation and GC rules are validated. | Phase 1; possible future runtime-state plan. |
+| Evidence qualification vs recovery metadata | Generic evidence qualification belongs in governance / enforcement. Domain-specific reload sets stay in `metadata/recovery/` unless a later compiler target is explicitly added. | Phase 2 and Phase 4. |
+| Belief ownership | Use the plan's owner table as initial governance. Lower-owner evidence may trigger review but cannot silently overwrite higher-owner belief. | Phase 1 and Phase 2. |
+| Confidence decay runtime source | Do not add a new runtime guard yet. First compress confidence decay, intent instability, stale belief, contradiction accumulation, and contamination into `execution_reliability_degradation` primitives. | Phase 3. |
+| Temporal confidence decay | Enable only for long sessions, multi-recovery chains, expired evidence windows, stale memory reuse, or context compaction without evidence. Trivial tasks remain exempt. | Phase 1 and Phase 3. |
+| Claim scope and confidence integrity | Governance owns the model. Enforcement may add a narrow rule: local evidence cannot justify global success claims. Runtime stays runtime-lite unless validation scenarios prove repeated failure. | Phase 1, Phase 2, Phase 5. |
+| Intent stability | Intent stability checks current action against original goal / validation target. It does not replace goal ledger or workflow success criteria. | Phase 1 and Phase 2. |
+| Lineage and contradiction propagation | Minimum viable scope is dependent execution claims and checkpoints, not every thought or note. | Phase 1 and Phase 5. |
+| Autonomy modes | Autonomy modes are valid runtime guard action targets, but the allowed / forbidden action table should be defined in governance first. | Phase 1 and Phase 3. |
+| Recovery exit and re-entry safety | Treat recovery exit as a blocking governance contract; runtime promotion requires compiler-source updates. Re-entry cooldown should be minimal and evidence-based. | Phase 1, Phase 3, Phase 5. |
+| Human alignment threshold | Human alignment is ambiguity / autonomy boundary, not only L5 escalation. Threshold must consider risk and interruption cost to avoid autonomy collapse. | Phase 1 and Phase 3. |
+| Cognitive contamination boundary | Use workflow-local / domain-local / session-global boundaries. Default action is rediscovery and assumption downgrade, not full session reset. | Phase 1 and Phase 5. |
+| Belief GC | Keep GC inside the execution or recovery frame; do not create persistent garbage collection state. | Phase 1. |
+| Governance minimality / tier boundary | Tier 3+ optimization and Tier 4 meta-governance do not block Tier 0-2 execution unless concrete failures promote them. | Phase 1 and Phase 5. |
+| Recovery budget | Do not add a `runtime-state.db` counter yet. Start with governance thresholds and validation scenarios; evaluate stateful counters only if repeated recovery loops remain unbounded. | Phase 3 and future runtime-state plan. |
 
 ### Phase 1 — Governance Translation
 
