@@ -149,10 +149,10 @@ final_status_report: []
 
 ### Phase 1：P0 / P1 Enforcement Contracts
 
-- [ ] YAML 化 `dependency-reading` 的 required read ledger、source-of-truth miss escalation、writeback final status gate。
+- [x] YAML 化 `dependency-reading` 的 required read ledger、source-of-truth miss escalation、writeback final status gate。
 - [ ] YAML 化 `authorization-scope` 的 activation、allowed / forbidden data collection、failure action。
 - [ ] YAML 化 `sanitization` 的 blocker fields、redaction criteria、commit gate。
-- [ ] YAML 化 `linked-updates` 的 changed path matrix、required linked checks、runtime compile / readback / dirty status gates。
+- [x] YAML 化 `linked-updates` 的 changed path matrix、required linked checks、runtime compile / readback / dirty status gates。
 - [ ] YAML 化 `goal-action-validation` 的 goal / action / validation closure，並重新評估是否應為 P1 gate。
 - [ ] YAML 化 `evidence-hierarchy` 的 evidence precedence、confidence threshold、escalation condition。
 

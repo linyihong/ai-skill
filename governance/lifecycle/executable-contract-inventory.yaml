@@ -88,12 +88,16 @@ inventory:
       contract: ai-tools/new-project-onboarding.yaml
       state: contract_exists
       reason: Project initialization has repeatable setup steps and runtime validation requirements.
+    - source: enforcement/dependency-reading.md
+      contract: enforcement/dependency-reading.yaml
+      state: contract_exists
+      reason: Required reads, source-of-truth miss escalation, writeback transaction boundaries, and final status checks now have an owner-layer executable contract.
+    - source: enforcement/linked-updates.md
+      contract: enforcement/linked-updates.yaml
+      state: contract_exists
+      reason: Linked update completeness, runtime sync, writeback closure, and final status checks now have an owner-layer executable contract.
 
   contract_required:
-    - source: enforcement/dependency-reading.md
-      suggested_contract: enforcement/dependency-reading.yaml
-      priority: P0
-      reason: Required reads, source-of-truth miss escalation, writeback transaction boundaries, and final status checks are agent behavior gates.
     - source: enforcement/authorization-scope.md
       suggested_contract: enforcement/authorization-scope.yaml
       priority: P0
@@ -102,10 +106,6 @@ inventory:
       suggested_contract: enforcement/sanitization.yaml
       priority: P0
       reason: Secrets, local paths, private evidence, and project-specific details are commit blockers.
-    - source: enforcement/linked-updates.md
-      suggested_contract: enforcement/linked-updates.yaml
-      priority: P1
-      reason: Linked update completeness, runtime compile, readback, dirty status, and push state are close-loop gates.
     - source: enforcement/goal-action-validation.md
       suggested_contract: enforcement/goal-action-validation.yaml
       priority: P1

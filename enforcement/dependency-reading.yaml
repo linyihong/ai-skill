@@ -1,0 +1,145 @@
+schema_version: executable-contract/v1
+id: enforcement.dependency-reading.contract
+title: Dependency reading executable contract
+owner_layer: enforcement
+source_markdown: enforcement/dependency-reading.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.dependency_reading.contract
+  surface_type: executable_yaml_contract
+  execution_scope: repo_writeback
+
+activation:
+  events:
+    - session_start
+    - workflow_or_rule_changed
+    - tool_adapter_changed
+    - template_or_feedback_lesson_changed
+    - active_plan_execution_started
+    - source_of_truth_miss_detected
+    - ai_skill_writeback_started
+  required_when:
+    - A workflow, enforcement rule, tool-specific rule, template, or feedback lesson has changed, will be changed, or may affect the task.
+    - A user asks to reload a workflow or points out missed dependency reads.
+    - An agent starts implementation for `plans/active/*.md`.
+    - A reusable Ai-skill file is modified and the writeback transaction must be closed.
+
+required_sources:
+  core:
+    - CORE_BOOTSTRAP.md
+    - README.md
+    - enforcement/README.md
+    - enforcement/dependency-reading.md
+    - enforcement/linked-updates.md
+    - enforcement/conversation-goal-ledger.md
+  when_modifying_enforcement:
+    - enforcement/README.md
+    - enforcement/content-layering.md
+    - enforcement/linked-updates.md
+    - enforcement/rule-weight.md
+  when_executing_active_plan:
+    - plans/README.md
+    - plans/active/<plan>.md
+    - related layer README files
+    - related runtime/compiler/metadata/workflow sources
+
+steps:
+  - id: classify_trigger
+    order: 1
+    action: Identify whether the current task touches a workflow, enforcement rule, tool adapter, template, feedback lesson, active plan, or reusable Ai-skill source.
+    outputs:
+      - dependency_read_trigger
+      - affected_owner_layers
+  - id: build_required_set
+    order: 2
+    action: Use the minimum-read table in the Markdown source to build the required dependency set.
+    required_sources:
+      - enforcement/dependency-reading.md
+    outputs:
+      - required_set
+  - id: read_or_mark_not_applicable
+    order: 3
+    action: Read every required file, or explicitly mark missing files as not_applicable / source_missing.
+    gates:
+      - gate.dependency_read.required_set_closed
+    outputs:
+      - dependency_read_ledger
+  - id: handle_source_of_truth_miss
+    order: 4
+    action: If a canonical source was missed, stop implementation, load the source, and rebuild the execution graph.
+    required_if:
+      - source_of_truth_miss_detected
+    gates:
+      - gate.dependency_read.source_of_truth_recovered
+  - id: run_writeback_closure
+    order: 5
+    action: For Ai-skill writes, close the writeback transaction with diff review, linked updates, validation, commit, push/readback when authorized, and final status.
+    required_if:
+      - ai_skill_repo_modified
+    required_sources:
+      - enforcement/linked-updates.md
+      - runtime/runtime.db
+    gates:
+      - gate.writeback.diff_review_done
+      - gate.writeback.linked_updates_done
+      - gate.writeback.validation_done
+      - gate.writeback.final_status_checked
+
+gates:
+  - id: gate.dependency_read.required_set_closed
+    blocks: implementation_or_completion_claim
+    pass_when:
+      - every required dependency is read
+      - missing dependencies are recorded as not_applicable or source_missing
+      - deferred dependencies have an explicit blocker or user decision
+    fail_when:
+      - agent claims rule/workflow compliance while required files remain unread
+  - id: gate.dependency_read.source_of_truth_recovered
+    blocks: patch_or_automation
+    pass_when:
+      - missed canonical source has been read
+      - execution graph is rebuilt
+      - current action is realigned to source-of-truth
+    fail_when:
+      - agent continues patching based on guessed workflow or stale context
+  - id: gate.writeback.final_status_checked
+    blocks: final_completion_response
+    pass_when:
+      - git status is checked
+      - dirty, staged, untracked, ahead, or behind state is reported or resolved
+      - validation and linked updates are summarized
+
+required_evidence:
+  - dependency_read_ledger with trigger, required set, read files, not-applicable files, deferred/blocked items, and validation method
+  - diff review summary for Ai-skill writes
+  - validation command output summary or explicit blocker
+  - final git status summary
+
+success_criteria:
+  - Required dependencies are loaded before conclusions, edits, or completion claims.
+  - Metadata, workflow, enforcement, and tool adapter changes cannot bypass linked update checks.
+  - Source-of-truth miss triggers recovery before implementation continues.
+  - Final status reports do not hide dirty, staged, untracked, ahead, or behind repository state.
+
+failure_modes:
+  - id: single_file_conclusion
+    detection: Agent reads only one changed source and skips required dependencies.
+    recovery: Build dependency read ledger and read or mark every required file.
+  - id: source_of_truth_miss
+    detection: Agent starts patching before reading canonical workflow, owner docs, runtime source, or routing registry.
+    recovery: Stop patching, load source-of-truth, rebuild execution graph.
+  - id: writeback_incomplete
+    detection: Agent reports Ai-skill changes complete while validation, linked updates, commit, push/readback, or final status remain open.
+    recovery: Re-enter writeback closure and report blocker if push is not authorized.
+
+final_status_report:
+  required_fields:
+    - dependency_read_summary
+    - linked_update_summary
+    - validation_method
+    - git_status
+    - push_or_readback_status

@@ -50,6 +50,15 @@
 
 本索引採用 **runtime activation model**：規則分為 **Core Bootstrap**（每個 session 必讀）與 **Lazy-load**（只在特定條件 activate）。
 
+## Executable YAML Contracts
+
+部分 enforcement rule 有 companion YAML contract，供 agent 先讀結構化 activation、required sources、steps、gates、failure modes 與 final status requirements；Markdown 仍保留完整說明與維護脈絡。
+
+| Rule | Contract | 用途 |
+| --- | --- | --- |
+| [`dependency-reading.md`](dependency-reading.md) | [`dependency-reading.yaml`](dependency-reading.yaml) | 依賴讀取 ledger、source-of-truth miss recovery、writeback final status gate。 |
+| [`linked-updates.md`](linked-updates.md) | [`linked-updates.yaml`](linked-updates.yaml) | 連動更新矩陣、runtime sync、writeback closure 與 final report gate。 |
+
 ### Core Bootstrap（每個 session 必讀）
 
 每次 session 啟動時，先讀 [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md)，包含 3 條核心規則：

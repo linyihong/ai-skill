@@ -68,11 +68,13 @@ initial_inventory:
     - source: governance/lifecycle/knowledge-update-flow.md
       contract: governance/lifecycle/knowledge-update-flow.yaml
       reason: 11-step master flow with blocking gates and sub-pipeline boundaries.
-  candidates:
     - source: enforcement/dependency-reading.md
-      suggested_contract: enforcement/dependency-reading.yaml
-      priority: P0
-      reason: Defines writeback transaction guard, required reads, commit/push/readback gates.
+      contract: enforcement/dependency-reading.yaml
+      reason: Required reads, source-of-truth miss recovery, writeback closure, and final status gates.
+    - source: enforcement/linked-updates.md
+      contract: enforcement/linked-updates.yaml
+      reason: Linked update matrix, runtime sync, writeback closure, and final report gates.
+  candidates:
     - source: enforcement/goal-action-validation.md
       suggested_contract: enforcement/goal-action-validation.yaml
       priority: P1
@@ -89,10 +91,6 @@ initial_inventory:
       suggested_contract: enforcement/decision-efficiency.yaml
       priority: P2
       reason: Defines decision cost and escalation gates.
-    - source: enforcement/linked-updates.md
-      suggested_contract: enforcement/linked-updates.yaml
-      priority: P1
-      reason: Defines required linked-update checks and commit blockers.
     - source: governance/lifecycle/directory-structure-governance.md
       suggested_contract: governance/lifecycle/directory-structure-governance.yaml
       priority: P2
