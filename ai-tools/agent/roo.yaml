@@ -1,0 +1,113 @@
+schema_version: executable-contract/v1
+id: ai-tools.agent.roo.contract
+title: Roo Code agent adapter contract
+owner_layer: ai-tools
+source_markdown: ai-tools/agent/roo.md
+status: active
+contract_type: onboarding_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: ai_tools.agent_roo.contract
+  surface_type: executable_yaml_contract
+  execution_scope: agent_behavior
+
+activation:
+  events:
+    - roo_code_session_started
+    - roo_adapter_changed
+    - roomodes_changed
+    - roo_global_settings_changed
+  required_when:
+    - Roo Code operates in this repository or a project using Ai-skill.
+    - .roomodes, Roo global settings, or ai-tools/agent/roo.md changes.
+    - Roo modes, file restrictions, language behavior, goal ledger, or checkpoint behavior is reviewed.
+
+required_sources:
+  - .roomodes
+  - CORE_BOOTSTRAP.md
+  - README.md
+  - ai-tools/agent/roo.md
+  - ai-tools/README.md
+  - runtime/runtime.db
+  - enforcement/tool-neutral-documentation.md
+  - enforcement/conversation-goal-ledger.md
+  - intelligence/ide/vscode-extension-global-state.md
+
+steps:
+  - id: load_roo_instructions
+    order: 1
+    action: Use Roo custom instructions or .roomodes as the Roo Code bootstrap entrypoint.
+  - id: load_core_bootstrap
+    order: 2
+    action: Read CORE_BOOTSTRAP.md and README.md before expanding detailed sources.
+  - id: load_roo_adapter
+    order: 3
+    action: Read ai-tools/agent/roo.md for Roo-specific custom instructions, modes, file restrictions, settings, and language behavior.
+  - id: use_runtime_sqlite
+    order: 4
+    action: Use runtime/runtime.db for phase state, obligations, gates, output governance, canonical runtime documents, and generated surfaces.
+  - id: preserve_mode_override_semantics
+    order: 5
+    action: Treat .roomodes customInstructions as overriding global custom instructions and ensure required shared bootstrap content is present when used.
+    gates:
+      - gate.roo.roomodes_override_safe
+  - id: protect_vscode_state_writes
+    order: 6
+    action: Modify Roo global SQLite settings only through guarded flow that handles VS Code process state and WAL checkpoint.
+    required_if:
+      - roo_global_settings_changed
+    gates:
+      - gate.roo.global_settings_guarded
+
+gates:
+  - id: gate.roo.roomodes_override_safe
+    blocks: roomodes_change
+    pass_when:
+      - .roomodes customInstructions include required bootstrap and language behavior because they override global custom instructions
+      - per-mode file restrictions do not block required reads for that mode's intended scope
+  - id: gate.roo.global_settings_guarded
+    blocks: global_settings_write
+    pass_when:
+      - VS Code is closed or the guarded CLI verifies it is safe
+      - WAL checkpoint is handled when writing state.vscdb
+      - change is validated by reopening or checking persisted state
+  - id: gate.roo.tool_specific_boundary
+    blocks: reusable_doc_change
+    pass_when:
+      - Roo-specific custom instructions, modes, settings, SQLite paths, and UI steps stay in ai-tools/agent/roo.md, .roomodes, or tool config
+      - shared enforcement and workflow docs remain tool-neutral
+
+required_evidence:
+  - Roo adapter sources read
+  - .roomodes readback when changed
+  - guarded global settings validation when state.vscdb changes
+  - runtime validation when execution-affecting adapter contract changes
+  - final git status after writeback
+
+success_criteria:
+  - Roo Code starts from custom instructions or .roomodes, CORE_BOOTSTRAP.md, README.md, ai-tools/agent/roo.md, and runtime/runtime.db as appropriate.
+  - .roomodes override semantics are explicit and do not accidentally drop core bootstrap requirements.
+  - Roo global setting writes are guarded and validated.
+  - Roo-specific details stay in the adapter layer.
+  - Execution-affecting adapter changes are projected and validated.
+
+failure_modes:
+  - id: roomodes_drops_global_bootstrap
+    detection: .roomodes customInstructions override global instructions but omit required bootstrap or language behavior.
+    recovery: Add required content to every relevant mode or remove the overriding project mode.
+  - id: unsafe_vscode_state_write
+    detection: Agent writes Roo global state while VS Code may overwrite it or without WAL checkpoint.
+    recovery: Use guarded CLI flow and validate persisted setting.
+  - id: roo_specific_content_leaks_to_shared_rule
+    detection: Generic enforcement or workflow doc makes Roo modes, settings, or SQLite paths universal.
+    recovery: Move detail back to ai-tools/agent/roo.md, .roomodes, or tool config.
+
+final_status_report:
+  required_fields:
+    - adapter_sources_read
+    - roomodes_status
+    - global_settings_status
+    - runtime_validation_status
+    - git_status

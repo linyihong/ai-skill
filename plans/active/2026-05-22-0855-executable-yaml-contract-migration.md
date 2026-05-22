@@ -124,7 +124,7 @@ final_status_report: []
 | P2 | `enforcement/decision-efficiency.md` | `enforcement/decision-efficiency.yaml` or upgraded metadata contract | 決定何時少讀 / 多讀 / escalation，會影響 context loading。 | Metadata YAML exists；缺 runtime projection。 |
 | P2 | `workflow/*/execution-flow.md` | `workflow/<domain>/execution-flow.yaml` | 現在多靠 prose-derived generated surface；應補 companion YAML 給 agent 直接執行。 | generated surfaces exist；缺 owner-layer YAML。 |
 | P2 | `workflow/*/artifact-gates.md` | `workflow/<domain>/artifact-gates.yaml` | artifact completeness、required evidence、exit criteria 需要結構化。 | generated surfaces exist；缺 owner-layer YAML。 |
-| P2 | `ai-tools/agent/*.md` | `ai-tools/agent/<tool>.yaml` | 不同 agent adapter bootstrap 應有統一 required reads / forbidden duplication contract。 | `agent-onboarding.yaml` exists；per-tool YAML missing。 |
+| P2 | `ai-tools/agent/*.md` | `ai-tools/agent/<tool>.yaml` | 不同 agent adapter bootstrap 應有統一 required reads / forbidden duplication contract。 | `codex.yaml`、`claude.yaml`、`cursor.yaml`、`roo.yaml` exist；runtime projection covered。 |
 
 ### Priority Normalization Notes
 
@@ -161,7 +161,7 @@ final_status_report: []
 ### Phase 2：Conversation / Tool / Routing Contracts
 
 - [x] YAML 化 `conversation-goal-ledger` 的 goal lifecycle、lock decision、completion deletion gate。
-- [ ] 為 `ai-tools/agent/codex.md`、`claude.md`、`cursor.md`、`roo.md` 建立 adapter contract，統一 bootstrap required reads 與 forbidden duplicated rules。
+- [x] 為 `ai-tools/agent/codex.md`、`claude.md`、`cursor.md`、`roo.md` 建立 adapter contract，統一 bootstrap required reads 與 forbidden duplicated rules。
 - [ ] 將 `knowledge/runtime/routing-registry.yaml` 的 route activation 與 source-of-truth gate 檢查接入 validation。
 
 ### Phase 3：Workflow Contracts

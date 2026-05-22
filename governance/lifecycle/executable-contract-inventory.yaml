@@ -116,6 +116,22 @@ inventory:
       contract: enforcement/conversation-goal-ledger.yaml
       state: contract_exists
       reason: Goal lifecycle, owner/lock, handoff, and completion deletion gates now have an owner-layer executable contract.
+    - source: ai-tools/agent/codex.md
+      contract: ai-tools/agent/codex.yaml
+      state: contract_exists
+      reason: Codex bootstrap, runtime SQLite boundary, owner-layer contract projection, and root AGENTS.md duplication guard now have an adapter contract.
+    - source: ai-tools/agent/claude.md
+      contract: ai-tools/agent/claude.yaml
+      state: contract_exists
+      reason: Claude Code entrypoint, settings boundary, no-hook limitation, and tool-specific content boundary now have an adapter contract.
+    - source: ai-tools/agent/cursor.md
+      contract: ai-tools/agent/cursor.yaml
+      state: contract_exists
+      reason: Cursor always-apply rule, hook boundary, and tool-specific path boundary now have an adapter contract.
+    - source: ai-tools/agent/roo.md
+      contract: ai-tools/agent/roo.yaml
+      state: contract_exists
+      reason: Roo custom instructions, .roomodes override semantics, guarded global settings writes, and mode boundaries now have an adapter contract.
 
   contract_required:
     - source: governance/lifecycle/directory-structure-governance.md

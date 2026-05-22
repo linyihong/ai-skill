@@ -70,4 +70,11 @@ Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating
 | Codex | [`agent/codex.md`](agent/codex.md) | `AGENTS.md` 自動載入入口、runtime SQLite source-of-truth、YAML contract projection、commit / push 更新流程。 |
 | **新增工具指引** | [`agent-onboarding.md`](agent-onboarding.md) | 新 AI agent 工具加入時的設定 checklist，含必要項目與參考來源對照。 |
 
+Agent adapter executable contracts:
+
+- Claude Code: [`agent/claude.yaml`](agent/claude.yaml)
+- Cursor: [`agent/cursor.yaml`](agent/cursor.yaml)
+- Roo Code: [`agent/roo.yaml`](agent/roo.yaml)
+- Codex: [`agent/codex.yaml`](agent/codex.yaml)
+
 ← [回到根目錄](../README.md)

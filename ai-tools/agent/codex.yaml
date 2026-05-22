@@ -1,0 +1,101 @@
+schema_version: executable-contract/v1
+id: ai-tools.agent.codex.contract
+title: Codex agent adapter contract
+owner_layer: ai-tools
+source_markdown: ai-tools/agent/codex.md
+status: active
+contract_type: onboarding_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: ai_tools.agent_codex.contract
+  surface_type: executable_yaml_contract
+  execution_scope: agent_behavior
+
+activation:
+  events:
+    - codex_session_started
+    - codex_adapter_changed
+    - root_agents_md_changed
+    - runtime_or_contract_boundary_changed
+  required_when:
+    - Codex is operating in this repository or a project using Ai-skill.
+    - AGENTS.md or ai-tools/agent/codex.md changes.
+    - Codex behavior depends on runtime SQLite, executable YAML projection, or commit/push workflow.
+
+required_sources:
+  - AGENTS.md
+  - CORE_BOOTSTRAP.md
+  - README.md
+  - ai-tools/agent/codex.md
+  - ai-tools/README.md
+  - runtime/runtime.db
+  - enforcement/tool-neutral-documentation.md
+
+steps:
+  - id: load_thin_entrypoint
+    order: 1
+    action: Use AGENTS.md only as a thin bootstrap pointer.
+  - id: load_core_and_layout
+    order: 2
+    action: Read CORE_BOOTSTRAP.md and README.md before expanding detailed sources.
+  - id: load_codex_adapter
+    order: 3
+    action: Read ai-tools/agent/codex.md for Codex-specific behavior.
+  - id: use_runtime_sqlite
+    order: 4
+    action: Use runtime/runtime.db for phase, obligation, gate, output governance, canonical runtime documents, and generated surfaces.
+    gates:
+      - gate.codex.runtime_source_of_truth
+  - id: preserve_owner_layer_contracts
+    order: 5
+    action: Keep governance, enforcement, workflow, ai-tools, and metadata executable contracts in owner layers and rely on runtime projection.
+    gates:
+      - gate.codex.no_runtime_yaml_mirror
+
+gates:
+  - id: gate.codex.runtime_source_of_truth
+    blocks: runtime_config_claim
+    pass_when:
+      - runtime/runtime.db is treated as canonical runtime config
+      - runtime/**/*.yaml committed mirrors are not created
+  - id: gate.codex.no_runtime_yaml_mirror
+    blocks: adapter_or_contract_change
+    pass_when:
+      - executable contracts remain in owner layers
+      - runtime_projection.enabled contracts are projected through runtime compile
+  - id: gate.codex.no_duplicate_root_rules
+    blocks: agents_md_change
+    pass_when:
+      - AGENTS.md remains a pointer to ai-tools/agent/codex.md
+      - reusable Codex rules live in ai-tools/agent/codex.md or shared enforcement sources
+
+required_evidence:
+  - dependency read summary
+  - runtime compile / refresh / validate when execution-affecting contracts change
+  - git status after writeback
+
+success_criteria:
+  - Codex starts from CORE_BOOTSTRAP.md, README.md, ai-tools/agent/codex.md, and runtime/runtime.db.
+  - Root AGENTS.md stays thin and does not duplicate reusable adapter rules.
+  - Runtime SQLite remains canonical; no committed runtime YAML mirror is introduced.
+  - Execution-affecting adapter changes are projected and validated.
+
+failure_modes:
+  - id: root_agents_rule_duplication
+    detection: AGENTS.md grows independent Codex rules instead of pointing to ai-tools/agent/codex.md.
+    recovery: Move reusable content to ai-tools/agent/codex.md and keep AGENTS.md as bootstrap pointer.
+  - id: runtime_yaml_mirror_created
+    detection: Codex flow creates committed runtime YAML config mirror.
+    recovery: Remove mirror and update runtime/runtime.db through the approved runtime flow.
+  - id: metadata_yaml_as_contract
+    detection: Codex treats metadata-only YAML as executable contract.
+    recovery: Require executable-contract/v1 fields and runtime_projection.enabled.
+
+final_status_report:
+  required_fields:
+    - adapter_sources_read
+    - runtime_validation_status
+    - root_entrypoint_status
+    - git_status
