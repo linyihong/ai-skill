@@ -1,7 +1,9 @@
 # Activation Table（Situation → Activated Rules）
 
 本表提供人類可讀的 activation 對照，涵蓋所有常見情境。
-程式化 source-of-truth 是 `runtime/runtime.db` 的 `activation_rules` / `activation_rules_mirror` tables；已移除舊 Ruby activation engine 與 committed YAML mirror，避免 agent 誤用 stale source。
+程式化 activation lookup 是 `runtime/runtime.db` 的 `activation_rules` / `activation_rules_mirror` tables；已移除舊 Ruby activation engine 與 committed YAML mirror，避免 agent 誤用 stale source。
+
+`activation_rules` 是 lookup/index，不是 enforcement rule body。若某條 rule 已有 owner-layer executable contract，agent 應先讀該 contract，再讀 companion Markdown；activation table 只負責觸發判斷。YAML placement 的 canonical policy 見 [`../../governance/lifecycle/executable-contract-boundary.md`](../../governance/lifecycle/executable-contract-boundary.md)。
 
 ## 通用原則
 

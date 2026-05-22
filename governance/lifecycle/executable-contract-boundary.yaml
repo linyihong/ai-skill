@@ -10,13 +10,13 @@ runtime_projection:
   surface: generated_surfaces
 
 purpose: >
-  Defines which Markdown/YAML sources require machine-readable executable
-  contracts and which contracts must be projected into runtime.db.
+  定義哪些 Markdown / YAML source 需要 machine-readable executable
+  contract，以及哪些 contract 必須投影到 runtime.db。
 
 boundary_rules:
   source_ownership:
     rule: keep_contract_source_in_owner_layer
-    description: Governance, enforcement, and workflow contracts stay beside their owning sources.
+    description: Governance、enforcement 與 workflow contract 留在 owner source 旁邊。
     forbidden:
       - moving governance source into runtime/
       - moving enforcement source into runtime/
@@ -28,7 +28,21 @@ boundary_rules:
     target: runtime/runtime.db generated_surfaces
   markdown_companion:
     rule: markdown_explains_yaml_executes
-    description: Markdown carries rationale and maintenance context; YAML carries executable triggers, steps, gates, and evidence.
+    description: Markdown 承載理由與維護脈絡；YAML 承載可執行 triggers、steps、gates 與 evidence。
+  canonical_policy:
+    rule: executable_contract_boundary_md_is_yaml_placement_policy
+    description: governance/lifecycle/executable-contract-boundary.md 定義 Ai-skill YAML 應放在哪裡；schema 與 inventory 文件不得重新定義 placement policy。
+    supporting_sources:
+      schema: metadata/executable-contract-schema.md
+      inventory: governance/lifecycle/executable-contract-inventory.yaml
+      runtime_boundary: runtime/README.md
+  activation_lookup:
+    rule: activation_rules_is_lookup_not_rule_body
+    description: runtime.db activation_rules 可以路由 lazy-load triggers；但當 owner-layer contract 存在時，executable steps、gates、failure modes 與 final report requirements 屬於該 contract。
+    contract_first_when:
+      - owner_layer_executable_contract_exists
+      - contract_contains_activation
+    transition_exception: 尚未有 executable contract 時，activation_rules 可暫時指向 Markdown；YAML promotion 後必須改為 contract-first 或 compiler-derived。
 
 yaml_required_when:
   - ordered_steps
@@ -52,64 +66,32 @@ placement:
     contract_location: governance/**/*.yaml
     runtime_projection: required_when_execution_affecting
   enforcement:
-    contract_location:
-      - enforcement/**/*.yaml
-      - metadata/rules/*.yaml
+    contract_location: enforcement/**/*.yaml
     runtime_projection: required_when_execution_affecting
+    activation_rule_boundary: activation_rules 是 lookup / index；當 contract 存在時，executable enforcement semantics 屬於 enforcement/*.yaml。
   workflow:
     contract_location: workflow/**/*.yaml
     runtime_projection: required_when_execution_affecting
+  ai_tools:
+    contract_location: ai-tools/**/*.yaml
+    runtime_projection: required_when_execution_affecting
+  metadata_rules:
+    contract_location: metadata/rules/*.yaml
+    default_role: metadata_only
+    runtime_projection: forbidden_unless_full_executable_contract
+    allowed_exception: Metadata YAML 只有在具備 schema_version executable-contract/v1、contract_type、blocking_level、activation、execution-bearing fields，且 runtime_projection.enabled 為 true 時，才可承載 executable contract。
   runtime_internal_config:
     contract_location: runtime/runtime.db
     runtime_projection: already_runtime_owned
 
-initial_inventory:
-  contract_exists:
-    - source: governance/lifecycle/knowledge-update-flow.md
-      contract: governance/lifecycle/knowledge-update-flow.yaml
-      reason: 11-step master flow with blocking gates and sub-pipeline boundaries.
-    - source: enforcement/dependency-reading.md
-      contract: enforcement/dependency-reading.yaml
-      reason: Required reads, source-of-truth miss recovery, writeback closure, and final status gates.
-    - source: enforcement/linked-updates.md
-      contract: enforcement/linked-updates.yaml
-      reason: Linked update matrix, runtime sync, writeback closure, and final report gates.
-    - source: enforcement/authorization-scope.md
-      contract: enforcement/authorization-scope.yaml
-      reason: Authorization, third-party data, and scope boundaries can block execution.
-    - source: enforcement/sanitization.md
-      contract: enforcement/sanitization.yaml
-      reason: Secrets, local paths, project incident evidence, and prompt injection surfaces block reusable writes and commits.
-    - source: enforcement/goal-action-validation.md
-      contract: enforcement/goal-action-validation.yaml
-      reason: Important work units require goal, action, validation, and claim-scope alignment.
-    - source: enforcement/evidence-hierarchy.md
-      contract: enforcement/evidence-hierarchy.yaml
-      reason: Evidence precedence, claim scope, confidence integrity, and escalation conditions are agent behavior gates.
-    - source: enforcement/conversation-goal-ledger.md
-      contract: enforcement/conversation-goal-ledger.yaml
-      reason: Active goal lifecycle, owner/lock, handoff, and completion deletion gates.
-    - source: governance/lifecycle/directory-structure-governance.md
-      contract: governance/lifecycle/directory-structure-governance.yaml
-      reason: Directory creation, rename, boundary, naming, reference impact, and validation checkpoints.
-    - source: governance/ai-runtime-governance/linked-update-governance.md
-      contract: governance/ai-runtime-governance/linked-update-governance.yaml
-      reason: Linked update completeness, generated surface decision, and commit boundary gates.
-    - source: governance/ai-runtime-governance/validation-scenario-governance.md
-      contract: governance/ai-runtime-governance/validation-scenario-governance.yaml
-      reason: Stateless validation scenario promotion, answer leakage, and traceability gates.
-  candidates:
-    - source: enforcement/decision-efficiency.md
-      suggested_contract: enforcement/decision-efficiency.yaml
-      priority: P2
-      reason: Defines decision cost and escalation gates.
-  markdown_only:
-    - source: governance/lifecycle/runtime-guards-philosophy.md
-      reason: Philosophy and design rationale; executable gates belong in a derived contract.
-    - source: governance/lifecycle/routing-philosophy.md
-      reason: Conceptual routing pipeline unless promoted into route-specific contract.
-    - source: constitution/README.md
-      reason: ADR navigation and lifecycle, not runtime execution.
+inventory_reference:
+  canonical_source: governance/lifecycle/executable-contract-inventory.yaml
+  rule: 不在 boundary contract 中維護 contract inventory rows。
+  allowed_states:
+    - contract_exists
+    - contract_required
+    - markdown_only
+    - not_applicable
 
 agent_update_rule:
   if_markdown_has_executable_signals_without_yaml:

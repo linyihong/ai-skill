@@ -2,16 +2,18 @@
 
 本文件定義 owner-layer executable YAML contract 的共同欄位。它用來區分「metadata YAML」與「agent 可直接執行的流程契約」。
 
+YAML 放置政策的 canonical source 是 [`../governance/lifecycle/executable-contract-boundary.md`](../governance/lifecycle/executable-contract-boundary.md)。本檔只定義欄位 schema，不決定 contract 應放在 `enforcement/`、`workflow/`、`governance/`、`ai-tools/`、`metadata/` 或 runtime projection table。
+
 ## 適用範圍
 
-當 `governance/`、`enforcement/`、`workflow/`、`ai-tools/` 或 `metadata/rules/` 的 YAML 會影響 agent 執行時，必須設定：
+當 owner-layer YAML 會影響 agent 執行時，必須設定：
 
 ```yaml
 runtime_projection:
   enabled: true
 ```
 
-設定後，runtime compiler 會將該 YAML 投影到 `runtime/runtime.db` 的 `generated_surfaces`。一般 metadata、routing、graph 或背景說明 YAML 不應設定此欄位。
+設定後，runtime compiler 會將該 YAML 投影到 `runtime/runtime.db` 的 `generated_surfaces`。一般 metadata、routing、graph 或背景說明 YAML 不應設定此欄位。`metadata/rules/*.yaml` 預設仍是 metadata-only；只有符合本 schema 並明確啟用 runtime projection 時，才是 executable contract 的例外放置。
 
 ## 必填欄位
 

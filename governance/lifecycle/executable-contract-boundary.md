@@ -1,10 +1,10 @@
 # Executable Contract Boundary
 
-This document defines when a governance, enforcement, or workflow document needs a machine-readable YAML contract and how that contract reaches runtime.
+本文件是 Ai-skill YAML 放置政策的 canonical 規章。它定義哪些 YAML 是 owner-layer executable contract、哪些 YAML 只是 metadata 或 runtime config，以及影響執行的 contract 如何進入 `runtime/runtime.db`。
 
-## Core Rule
+## 核心規則
 
-Source ownership stays with the layer that owns the concept. Runtime execution surfaces are projected into `runtime/runtime.db`.
+Source ownership 留在擁有該概念的 layer。Runtime execution surface 只投影到 `runtime/runtime.db`。
 
 ```text
 owner-layer Markdown / YAML contract
@@ -12,39 +12,55 @@ owner-layer Markdown / YAML contract
   -> runtime.db generated_surfaces / projection tables
 ```
 
-Do not move governance, enforcement, or workflow source files into `runtime/` just because they affect execution. `runtime/` remains the runtime engine and SQLite registry boundary.
+不要因為 governance、enforcement 或 workflow source 會影響執行，就把它搬進 `runtime/`。`runtime/` 仍然是 runtime engine 與 SQLite registry boundary。
 
-## When YAML Is Required
+## 責任地圖
 
-A document needs a YAML contract when agents must execute it as a workflow or gate.
+| 檔案或 table | 責任 | 不負責 |
+| --- | --- | --- |
+| `governance/lifecycle/executable-contract-boundary.md` | 人類可讀的 YAML placement policy 與 source-of-truth boundary。 | 維護逐檔 inventory 狀態。 |
+| `governance/lifecycle/executable-contract-boundary.yaml` | 給 agent 執行的 placement / projection gates。 | 取代人類可讀 policy。 |
+| `metadata/executable-contract-schema.md` | executable contract 欄位 schema。 | 決定 YAML 應放在哪個 layer。 |
+| `governance/lifecycle/executable-contract-inventory.yaml` | Inventory state：`contract_exists`、`contract_required`、`markdown_only`、`not_applicable`。 | 重新定義 placement policy。 |
+| `runtime/runtime.db generated_surfaces` | owner-layer executable contracts 與 deterministic generated surfaces 的 projection。 | 擁有 governance、enforcement、workflow 或 ai-tools source content。 |
+| `runtime/runtime.db activation_rules` | lazy-load trigger 與 entrypoint selection 的 runtime lookup。 | 維護 enforcement rule body 或 executable contract semantics 的第二份副本。 |
+| `runtime/runtime.db runtime_config_documents` | runtime-owned config documents 的 canonical copy。 | 擁有非 runtime 的 governance、enforcement、workflow 或 ai-tools contracts。 |
 
-Required signals:
+## 何時需要 YAML
+
+當 agent 必須把文件當成 workflow 或 gate 執行時，該文件需要 YAML contract。
+
+需要 YAML 的訊號：
 
 - Ordered steps
-- Trigger or activation conditions
-- Required reads or dependencies
+- Trigger 或 activation conditions
+- Required reads 或 dependencies
 - `depends_on` relationships
 - Exit conditions
 - Blocking gates
 - Required evidence
 - Failure actions
-- Final status/report requirements
+- Final status / report requirements
 
-If a document only explains philosophy, background, tradeoffs, or design rationale, keep it Markdown-only unless a later workflow extracts executable gates from it.
+如果文件只說明哲學、背景、tradeoff 或設計理由，保持 Markdown-only；除非後續 workflow 從中抽出可執行 gates。
 
-## Placement Rule
+## 放置規則
 
-| Source type | YAML contract location | Runtime projection |
+| Source 類型 | YAML contract 位置 | Runtime projection |
 | --- | --- | --- |
-| Governance lifecycle flow | `governance/**/*.yaml` | Required when execution-affecting |
-| Enforcement policy contract | `enforcement/**/*.yaml` or `metadata/rules/*.yaml` | Required when execution-affecting |
-| Workflow execution flow | `workflow/**/*.yaml` | Required when execution-affecting |
-| Runtime internal config | `runtime.db` canonical documents | Already runtime-owned |
-| Philosophy / rationale / ADR | Markdown only | Not required |
+| Governance lifecycle flow | `governance/**/*.yaml` | 影響執行時必須投影 |
+| Enforcement policy contract | `enforcement/**/*.yaml` | 影響執行時必須投影 |
+| Workflow execution flow | `workflow/**/*.yaml` | 影響執行時必須投影 |
+| AI tool adapter flow | `ai-tools/**/*.yaml` | 影響執行時必須投影 |
+| Rule metadata | `metadata/rules/*.yaml` | 除非明確 promotion 成完整 executable contract，否則不投影 |
+| Runtime internal config | `runtime.db` canonical documents | 已由 runtime 擁有 |
+| Philosophy / rationale / ADR | Markdown only | 不需要 |
 
-## Runtime Projection Rule
+`metadata/rules/*.yaml` 預設是 metadata。只有在明確例外情況下，且包含完整 executable contract schema、execution-bearing fields 與 `runtime_projection.enabled: true`，才可以承載 executable contract。
 
-YAML contracts that affect agent execution must include:
+## Runtime Projection 規則
+
+會影響 agent 執行的 YAML contract 必須包含：
 
 ```yaml
 runtime_projection:
@@ -53,30 +69,48 @@ runtime_projection:
   surface: generated_surfaces
 ```
 
-The compiler only projects contracts that opt in with `runtime_projection.enabled: true`. This prevents ordinary metadata, graph, and validation YAML from becoming runtime noise.
+Compiler 只投影明確設定 `runtime_projection.enabled: true` 的 contract。這避免一般 metadata、graph 與 validation YAML 變成 runtime noise。
 
-## Schema Rule
+Projection 不會轉移 ownership。若 `enforcement/authorization-scope.yaml` 被投影到 `generated_surfaces`，source 仍然是 `enforcement/authorization-scope.yaml`；`runtime.db` 裡的 row 只是 compiled runtime surface。
 
-New executable contracts should follow [`../../metadata/executable-contract-schema.md`](../../metadata/executable-contract-schema.md). Metadata YAML is not an executable contract unless it defines contract fields such as `contract_type`, `blocking_level`, `activation`, execution-bearing fields, and `runtime_projection.enabled: true`.
+## Activation Lookup 規則
 
-## Agent Rule
+`activation_rules` 是 lookup / index layer。它可以判斷何時載入某條 rule 或 workflow，但不得成為 executable steps、gates、failure modes 或 final report requirements 的第二份 source。
 
-When a Markdown file says a process must be run as a workflow, the agent must load the companion YAML contract first, then use the Markdown for explanation and maintenance context.
+當 owner-layer executable contract 已存在且包含 `activation` 時，activation path 採 contract-first：
 
-If no YAML contract exists but the document has executable signals, the agent must treat that as a linked-update gap and either create the contract or record why it is not applicable.
+```text
+activation lookup
+  -> owner-layer executable YAML contract
+  -> companion Markdown for rationale and maintenance context
+```
+
+Migration 期間，尚未有 executable contract 的 rule 可暫時由 `activation_rules` 指向 Markdown。一旦 rule 已有 executable contract，activation entry 應改為由 contract 派生，或指向 contract 作為 primary source；Markdown 則透過 `source_markdown` 或 `required_sources` 引用。
+
+## Schema 規則
+
+新的 executable contract 應遵守 [`../../metadata/executable-contract-schema.md`](../../metadata/executable-contract-schema.md)。Metadata YAML 不是 executable contract；除非它定義 `contract_type`、`blocking_level`、`activation`、execution-bearing fields，且設定 `runtime_projection.enabled: true`。
+
+## Agent 規則
+
+當 Markdown 文件要求某流程必須作為 workflow 執行時，agent 必須先載入 companion YAML contract，再使用 Markdown 作為解釋與維護脈絡。
+
+當 `activation_rules` 與 owner-layer executable contract 同時描述同一個 activation 時，executable contract 對 execution semantics 具有權威性。Activation table 只能保留 trigger / index data，除非它是從 contract 產生。
+
+如果文件有 executable signals 但沒有 YAML contract，agent 必須把它視為 linked-update gap，建立 contract 或記錄為何不適用。
 
 ## Contract Inventory
 
-The active inventory lives in [`executable-contract-inventory.yaml`](executable-contract-inventory.yaml). It marks current documents as:
+Active inventory 位於 [`executable-contract-inventory.yaml`](executable-contract-inventory.yaml)。它把目前文件標記為：
 
-- `contract_exists`: YAML already exists.
-- `contract_required`: needs YAML contract next.
-- `markdown_only`: intentionally not executable.
-- `not_applicable`: template, example, deprecated stub, or non-owner source.
+- `contract_exists`：YAML 已存在。
+- `contract_required`：下一步需要 YAML contract。
+- `markdown_only`：刻意保持非 executable。
+- `not_applicable`：template、example、deprecated stub 或非 owner source。
 
-[`executable-contract-boundary.yaml`](executable-contract-boundary.yaml) keeps the boundary rules and initial seed inventory.
+[`executable-contract-boundary.yaml`](executable-contract-boundary.yaml) 保存 executable boundary gates。[`executable-contract-inventory.yaml`](executable-contract-inventory.yaml) 保存目前 inventory decisions；需要更新清單時，應更新 inventory 文件，不要擴寫 boundary contract 的 seed inventory。
 
-## Related
+## 相關文件
 
 - [`knowledge-update-flow.yaml`](knowledge-update-flow.yaml)
 - [`executable-contract-inventory.yaml`](executable-contract-inventory.yaml)
