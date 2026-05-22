@@ -37,6 +37,7 @@ Summaries 用來協助 agent：
 | `intelligence.vendor-integration-architecture` | 多廠商整合策略選型（Adapter / compile-time module / SPI / out-of-process / hybrid）。 | [`vendor-integration-architecture.md`](vendor-integration-architecture.md) |
 | `analysis.dual-token-audit` | 雙簽章/雙加密 token 並存的審計方法（觀察點、五步流程、failure signals）。 | [`dual-token-audit.md`](dual-token-audit.md) |
 | `intelligence.migration-feature-bundling` | 大型 migration 把搬遷與新功能綁進同一階段交付的反模式；應採 Parity-First Migration；對 stakeholder 翻譯為「失望總比絕望好」。 | [`migration-feature-bundling.md`](migration-feature-bundling.md) |
+| `intelligence.module-count-discipline` | Repo 模組數量紀律；N 對應健康做法（≤5 直寫 / 5-30 模板+門檻 / 30-100 plugin/SPI/catalog / ≥100 警報）；新增 module 五道判斷；build system 中立。 | [`module-count-discipline.md`](module-count-discipline.md) |
 
 ## Summary 格式
 

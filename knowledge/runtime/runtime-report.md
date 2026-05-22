@@ -11,7 +11,7 @@
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
 | SQLite runtime index | [`sqlite/`](sqlite/) | generated lookup cache prototype |
-| Summaries | [`../summaries/`](../summaries/) | 22 files |
+| Summaries | [`../summaries/`](../summaries/) | 23 files |
 | Graph records | [`../graphs/`](../graphs/) | 33 files |
 
 ## Routing Records
@@ -93,6 +93,7 @@
 | `intelligence.migration-feature-bundling` | `candidate` | [`migration-feature-bundling.md`](../summaries/migration-feature-bundling.md) | 大型 migration / rewrite / platform 升級時把搬遷（refactor）與新功能（behavior change）綁進同一階段交付的反模式。後果是驗證失去 ground truth（Verification Identity Crisis）— bug 來源無法定位、時程不可預測、回滾不可行。正確路徑是 Parity-First Migration：Phase 1 達成新版 = 舊版等價並通過舊測試套件，Phase 2 才加新功能。對 stakeholder 的有效翻譯是「失望總比絕望好」。 |
 | `intelligence.migration-seeder-anti-patterns` | `candidate` | [`migration-seeder-anti-patterns.md`](../summaries/migration-seeder-anti-patterns.md) | 把大量業務資料（廠商目錄、商品/SKU、遊戲清單、權限矩陣）以巨型 `INSERT` 包進 schema migration，使資料 lifecycle 與 schema lifecycle 被強制綁定。訊號：單檔 >50KB、檔名含 dataSeeder、業務人員想改資料要工程師寫 migration。替代方案依資料性質：列舉留 migration、目錄走 application seeder/admin、大量參考資料用外部 CSV + bulk loader。 |
 | `models.routing` | `candidate` | [`model-routing.md`](../summaries/model-routing.md) | Model-aware execution strategy：profiles、capabilities、routing、workflow adaptation、governance、runtime primitives 與 compression。用於選擇 behavior shape，不宣稱 provider model 已切換。 |
+| `intelligence.module-count-discipline` | `candidate` | [`module-count-discipline.md`](../summaries/module-count-discipline.md) | Repo 內 module（Maven / Gradle / npm workspace / Cargo / Go multi-module / Bazel / .NET / pnpm / Lerna / Nx / poetry workspace）數量是工程成本，N 失控時 build time、IDE 載入、升級擴散、refactor 成本線性以上增長。N 對應健康做法：≤5 直接寫、5-30 模板+門檻、30-100 plugin/SPI/catalog、≥100 結構味道警報。新增 module 必須通過 lifecycle / classpath / external use / N 警戒 / data-vs-code 五道判斷。 |
 | `runtime.prompt-cache-alignment` | `candidate` | [`prompt-cache-alignment.md`](../summaries/prompt-cache-alignment.md) | Provider prompt cache 對齊規範。定義 stable prefix、semi-stable middle、volatile suffix 的 context layout，並說明 `cacheable` 與 `provider_cache_candidate` 的邊界。 |
 | `governance.repo-maintenance` | `validated` | [`repo-governance.md`](../summaries/repo-governance.md) | 本系統的維護、升級、遷移與治理。涵蓋 lifecycle management、validation、cleanup、splitting rules、dependency maintenance。 |
 | `intelligence.requirements-cognition` | `candidate` | [`requirements-cognition.md`](../summaries/requirements-cognition.md) | Requirements cognition 先用 Impact Map × Customer Journey Map 對齊 product impact，再用 BDD-lite 處理 ambiguity、actor intent、behavior boundary、acceptance criteria、traceability、validation target 與 test effectiveness，而不是 Gherkin everywhere。 |
