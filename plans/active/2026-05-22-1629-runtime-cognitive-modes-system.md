@@ -27,7 +27,7 @@
 | 建議 mode | 既有對應 | 缺口性質 |
 |------|------|------|
 | execution mode (FAST/NORMAL/DEEP/FORENSIC/RECOVERY) | `runtime.db phase_machine` 有 phase 概念，但**沒有 cognitive depth 維度** | 60% 新（FORENSIC/RECOVERY 為真新增） |
-| context mode (INDEX_ONLY/SUMMARY_FIRST/CHECKLIST_FIRST/SOURCE_BACKED/FULL_TRACE) | `models/compression/` 5 個 level 名稱幾乎一樣（小寫） | 5% 新（rename + 提升為 runtime primitive） |
+| context mode (INDEX_ONLY/SUMMARY_FIRST/CHECKLIST_FIRST/SOURCE_BACKED/GRAPH_ASSISTED) | `models/compression/` 5 個 level 名稱幾乎一樣（小寫） | 5% 新（rename + 提升為 runtime primitive） |
 | governance mode (LIGHT/STANDARD/STRICT/LOCKDOWN) | 既有 governance 是 binary（gate 或無 gate） | **80% 新** — 真正缺口 |
 | memory mode (NONE/EPISODIC/DECISION_REPLAY/FAILURE_REPLAY/PROJECT_CONTEXT) | `memory/` 子層存在但無 activation flag | **70% 新** — 把 memory 子層提升為 runtime mode |
 
@@ -39,12 +39,14 @@
 
 ```
 execution_mode  ∈ {FAST, NORMAL, DEEP, FORENSIC, RECOVERY}
-context_mode    ∈ {INDEX_ONLY, SUMMARY_FIRST, CHECKLIST_FIRST, SOURCE_BACKED, FULL_TRACE}
+context_mode    ∈ {INDEX_ONLY, SUMMARY_FIRST, CHECKLIST_FIRST, SOURCE_BACKED, GRAPH_ASSISTED}
 governance_mode ∈ {LIGHT, STANDARD, STRICT, LOCKDOWN}
 memory_mode     ∈ {NONE, EPISODIC, DECISION_REPLAY, FAILURE_REPLAY, PROJECT_CONTEXT}
 ```
 
 組合空間 = 5 × 5 × 4 × 5 = 500 種 cognitive state。
+
+> **Naming alignment**（per Open Question 1 resolved）：`context_mode` 5 級對應既有 [`models/compression/`](../../models/compression/README.md) 的 5 級（`index-only`、`summary-first`、`checklist-first`、`source-backed`、`graph-assisted`）；UPPERCASE 為 runtime primitive，lowercase 視為 alias。`compression/` 文件改為「`context_mode.<LEVEL>` 的實作策略 reference」，由 Phase 3.2 執行。
 
 #### 2. Discovery 用快速啟發式，不查文件
 
@@ -52,7 +54,9 @@ memory_mode     ∈ {NONE, EPISODIC, DECISION_REPLAY, FAILURE_REPLAY, PROJECT_CO
 任務進來
   ↓
 快速 discovery（純訊號計算，< 50 tokens）：
-  - user keyword、file diff scope、git status、session 長度、contradiction risk
+  - user keyword、file diff scope、git status、session turn 數、recent failure、
+    phase_machine 當前 phase、active goals 狀態、token_budget 剩餘、
+    modified files 命中 generated_surfaces（完整訊號表見 Phase 2 §2.1）
   ↓
 單一 SQLite 查詢解析 mode
   ↓
@@ -96,14 +100,15 @@ memory_mode     ∈ {NONE, EPISODIC, DECISION_REPLAY, FAILURE_REPLAY, PROJECT_CO
 
 ### ADR Promotion Criteria（completed 時驗證）
 
-升級為 accepted ADR 的條件（per ADR-007 §ADR Boundary）：
+升級為 accepted ADR 的條件（per ADR-007 §ADR Boundary）。**Promotion gate 設在 Phase 3 完成時**（per Open Question 5 resolved）：
 
 - [ ] foundational + cross-session + cross-project + expensive-to-reverse + explains-why 全中
-- [ ] Phase 1 完成（cognitive mode primitives 已運作）
-- [ ] Phase 2-3 至少其一完成（discovery 或 activation 驗證可行）
-- [ ] 5 個 Open Questions 全解
+- [ ] **Phase 3 完成**（4 subsystem 真實 activation 驗證可行）
+- [ ] ~~5 個 Open Questions 全解~~ ✅ 已於 2026-05-22 resolved（見 §Open Questions）
 - [ ] 沒有更輕的 promotion target 適用（runtime gate / enforcement / intelligence）
-- [ ] 系統真實使用此 contract，至少 5 個 task 在 final report 列 Cognitive Mode 驗證
+- [ ] 系統真實使用此 contract，**Phase 3 完成後至少 5 個 task 在 final report 列 Cognitive Mode** 驗證
+
+Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3 即可評估 ADR promotion。
 
 ### Consequences（預期）
 
@@ -138,11 +143,17 @@ memory_mode     ∈ {NONE, EPISODIC, DECISION_REPLAY, FAILURE_REPLAY, PROJECT_CO
 
 ## Open Questions（completed 前需釐清）
 
-1. `context_mode` 與 `compression level` 是否合併命名（避免雙詞彙）？建議：合併為 `context_mode`，`compression/` 文件改稱「context mode 的詳細策略文件」。
-2. Discovery signal 從哪些來源讀？目前候選：user keyword、file paths、git status、session 長度、recent failure count。是否還缺？
-3. `governance_mode LOCKDOWN` 與既有 `runtime.db blocking_gates` 的關係？建議：LOCKDOWN 是「全部 gates + 阻擋寫入」的 superset。
-4. `memory_mode` 與 `memory/retrieval-governance/` 的 activation threshold 是否整合？建議：retrieval-governance 是 threshold，mode 是 activation switch；兩者 compose。
-5. ADR promotion gate 設在哪個 phase 完成時？建議：Phase 3 完成（已有 activation 驗證）。
+**全部於 2026-05-22 resolved**。決議摘要：
+
+| # | Question | Resolution | 內文位置 |
+|---|----------|-----------|---------|
+| 1 | `context_mode` vs `compression` 命名統一？ | ✅ **resolved**：統一為 5 級 UPPERCASE `context_mode`（INDEX_ONLY / SUMMARY_FIRST / CHECKLIST_FIRST / SOURCE_BACKED / **GRAPH_ASSISTED**）；既有 `compression/` lowercase 視為 alias；Phase 3.2 改寫 compression 文件成 implementation reference | §Decision §1 Naming alignment note |
+| 2 | Discovery signal 來源是否還缺？ | ✅ **resolved**：加 4 個訊號（phase_machine state / active_goals / token_budget / generated_surfaces hit）；移除 `contradiction risk`（屬 derived signal，Phase 5 adaptive 才接） | Phase 2 §2.1 訊號表 |
+| 3 | `LOCKDOWN` vs `blocking_gates` 關係？ | ✅ **resolved**：governance_mode 是 gate set selector，LOCKDOWN = STRICT 全集 + `additional_actions: [block_file_writes_until_human_approval]` | Phase 1 §1.1 gate_activation |
+| 4 | `memory_mode` 與 `retrieval-governance threshold` 整合方式？ | ✅ **resolved**：mode 是 category switch、threshold 是 within-category activation；兩者 AND 邏輯 compose | Phase 3.4 |
+| 5 | ADR promotion gate 設在哪 phase 完成？ | ✅ **resolved**：**Phase 3 完成時**評估 ADR Promotion Criteria；Phase 4-5 是優化非架構，不延後 ADR | Phase 3 完成條件 + §ADR Promotion Criteria |
+
+新的 open questions 可於 Phase 0 Pre-Build Interrogation 補充。
 
 ---
 
@@ -240,7 +251,7 @@ modes:
     values: [FAST, NORMAL, DEEP, FORENSIC, RECOVERY]
     default: NORMAL
   context:
-    values: [INDEX_ONLY, SUMMARY_FIRST, CHECKLIST_FIRST, SOURCE_BACKED, FULL_TRACE]
+    values: [INDEX_ONLY, SUMMARY_FIRST, CHECKLIST_FIRST, SOURCE_BACKED, GRAPH_ASSISTED]
     default: SUMMARY_FIRST
   governance:
     values: [LIGHT, STANDARD, STRICT, LOCKDOWN]
@@ -288,19 +299,28 @@ CREATE TABLE cognitive_modes (
 
 **目標**：定義訊號 → mode 映射，不靠文件查詢。
 
-### 2.1 訊號來源
+### 2.1 訊號來源（per Open Question 2 resolved）
 
-| 訊號 | 例 | 對應 mode 暗示 |
-|------|------|------|
-| user keyword | 「快速」「typo」「修一下」 | execution=FAST |
-| user keyword | 「分析」「跨層」「migration」 | execution=DEEP |
-| user keyword | 「recover」「失誤」「重做」 | execution=RECOVERY |
-| file diff scope | `enforcement/` / `governance/` | governance=STRICT |
-| file diff scope | `notes/` / `memory/working/` | governance=LIGHT |
-| git status | dirty + 多 owner group | governance=STRICT |
-| session 長度 | > 50 turns | memory=PROJECT_CONTEXT |
-| recent failure | failure_repeat ≥ 2 | execution=RECOVERY, memory=FAILURE_REPLAY |
-| contradiction risk | conflicting sources | context=FULL_TRACE, governance=STRICT |
+| 訊號 | 例 | 對應 mode 暗示 | 來源 |
+|------|------|------|------|
+| user keyword | 「快速」「typo」「修一下」 | execution=FAST | conversation parse |
+| user keyword | 「分析」「跨層」「migration」 | execution=DEEP | conversation parse |
+| user keyword | 「recover」「失誤」「重做」 | execution=RECOVERY | conversation parse |
+| file diff scope | `enforcement/` / `governance/` | governance=STRICT | git diff |
+| file diff scope | `notes/` / `memory/working/` | governance=LIGHT | git diff |
+| git status | dirty + 多 owner group | governance=STRICT | git status |
+| session turn 數 | > 50 turns | memory=PROJECT_CONTEXT | runtime self |
+| recent failure | failure_repeat ≥ 2 | execution=RECOVERY, memory=FAILURE_REPLAY | runtime self |
+| **phase_machine 當前 phase** | bootstrap / execution / validation | bootstrap → governance=LIGHT；validation → governance=STRICT | `runtime.db phases` |
+| **active goals 狀態** | 有 owner/lock 或 ≥2 active | governance=STRICT | `.agent-goals/` |
+| **token_budget 剩餘** | < 30% budget | context 降級（GRAPH_ASSISTED → SOURCE_BACKED → SUMMARY_FIRST） | runtime self |
+| **modified files 命中 generated_surfaces** | 任一檔命中 | governance=STRICT；強制 runtime compile | `sqlite3 runtime.db` |
+
+**Deferred to Phase 5 adaptive triggers**（這些是 derived signal，非 raw signal）：
+
+- contradiction risk（從多源比對推導）
+- tool call repeat pattern（從歷史推導）
+- cross-session memory hit rate（從 memory retrieval 統計推導）
 
 ### 2.2 Discovery YAML contract
 
@@ -343,8 +363,11 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 - [ ] 4 subsystem 各有對應 mode-driven activation 邏輯
 - [ ] 失敗測試：mode 未解析就執行 → 被阻擋
-- [ ] Documentation 更新
-- [ ] **ADR Promotion Criteria 重新評估**：Phase 3 完成是 ADR promotion 候選 trigger
+- [ ] Documentation 更新（含 `models/compression/` 改寫為 `context_mode` implementation reference，per Open Question 1）
+- [ ] Phase 3 完成後至少 5 個任務的 final report 列 Cognitive Mode（用於 ADR promotion 評估）
+- [ ] **ADR Promotion Criteria 評估**（per Open Question 5 resolved）：
+  - 通過 → 建立 ADR（直接 accepted），引用本 plan 作為 evidence
+  - 不通過 → 在 plan 內記錄「決定不升 ADR 的理由」+ 改用更輕 promotion target（runtime gate / enforcement / intelligence）
 
 ---
 
@@ -359,12 +382,12 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 | FAST + INDEX_ONLY + LIGHT + NONE | ≤ 1000 tokens |
 | NORMAL + SUMMARY_FIRST + STANDARD + EPISODIC | ≤ 5000 tokens |
 | DEEP + SOURCE_BACKED + STRICT + DECISION_REPLAY | ≤ 20000 tokens |
-| FORENSIC + FULL_TRACE + STRICT + FAILURE_REPLAY | ≤ 50000 tokens |
+| FORENSIC + GRAPH_ASSISTED + STRICT + FAILURE_REPLAY | ≤ 50000 tokens |
 
 ### 4.2 Budget gate
 
 超 budget 時：
-1. 自動降級 context_mode（FULL_TRACE → SOURCE_BACKED → SUMMARY_FIRST）
+1. 自動降級 context_mode（GRAPH_ASSISTED → SOURCE_BACKED → SUMMARY_FIRST）
 2. 若無法降級，阻擋並要求 user 確認
 3. 記錄 budget overflow 為 failure pattern
 
@@ -382,12 +405,14 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 ### 5.1 Adaptive triggers
 
-| 訊號 | 動作 |
-|------|------|
-| Token budget 接近上限 | 降級 context_mode |
-| 偵測到 contradiction | 升 governance_mode + 升 context_mode |
-| 連續 failure ≥ 2 | 切到 RECOVERY |
-| 跨 phase transition | 重新 evaluate mode |
+| 訊號 | 來源 | 動作 |
+|------|------|------|
+| Token budget 接近上限 | runtime self | 降級 context_mode（GRAPH_ASSISTED → SOURCE_BACKED → SUMMARY_FIRST） |
+| **偵測到 contradiction risk**（多源衝突） | derived from cross-source compare | 升 governance_mode + 升 context_mode |
+| 連續 failure ≥ 2 | runtime self | 切到 execution=RECOVERY, memory=FAILURE_REPLAY |
+| 跨 phase transition | phase_machine | 重新 evaluate 全部 4 個 mode |
+| **Tool call repeat pattern**（loop detection） | derived from call history | 升 governance_mode + 觸發 recovery escalation |
+| **Cross-session memory hit rate** | derived from memory retrieval 統計 | 調整 memory_mode 強度 |
 
 ### 5.2 Adaptive YAML contract
 
@@ -403,13 +428,18 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 ## Stakeholder 同意項目
 
-待 review。需要 user 與後續 contributors 對下列事項 sign-off：
+已於 2026-05-22 與 user 確認下列項目：
 
-- [ ] 同意採 4 維 mode primitive 而非單一 enum
-- [ ] 同意不重寫 `models/`，採 backward-compat
-- [ ] 同意分 5 phase 漸進實作
-- [ ] 同意 ADR promotion 候選 trigger 設在 Phase 3 完成
-- [ ] 同意 Open Question 1（context_mode vs compression 命名統一）的方向
+- [x] 同意採 4 維 mode primitive 而非單一 enum
+- [x] 同意不重寫 `models/`，採 backward-compat
+- [x] 同意分 5 phase 漸進實作
+- [x] 同意 ADR promotion gate 設在 Phase 3 完成
+- [x] 同意 Open Questions 1-5 全部 resolved 方向（見 §Open Questions）
+
+剩餘待 sign-off（plan 進 Phase 0 前需確認）：
+
+- [ ] Phase 0 Pre-Build Interrogation 草稿審閱
+- [ ] Phase 1 實作前 candidate files 與 runtime.db schema 擴充影響範圍評估
 
 ---
 
