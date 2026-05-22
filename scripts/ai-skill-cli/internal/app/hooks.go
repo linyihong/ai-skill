@@ -1,13 +1,16 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/linyihong/Ai-skill/scripts/ai-skill-cli/internal/pathutil"
 )
@@ -260,6 +263,7 @@ func runPrePushHook(result Result, root string) Result {
 		result.Checks = append(result.Checks, Check{Name: "cli_ci_preflight", Status: "skipped", Message: "no CLI, hook, or workflow changes since upstream"})
 		return result
 	}
+	result.Checks = append(result.Checks, githubWorkflowHistoryCheck(root))
 	cmd := exec.Command("go", "test", "./...")
 	cmd.Dir = filepath.Join(root, "scripts", "ai-skill-cli")
 	output, err := cmd.CombinedOutput()
@@ -275,6 +279,76 @@ func runPrePushHook(result Result, root string) Result {
 	}
 	result.Checks = append(result.Checks, Check{Name: "cli_ci_preflight", Status: "ok", Message: "go test ./... passed"})
 	return result
+}
+
+type githubWorkflowRunsResponse struct {
+	WorkflowRuns []struct {
+		Status     string `json:"status"`
+		Conclusion string `json:"conclusion"`
+		HTMLURL    string `json:"html_url"`
+		HeadSHA    string `json:"head_sha"`
+	} `json:"workflow_runs"`
+}
+
+func githubWorkflowHistoryCheck(root string) Check {
+	remote, err := exec.Command("git", "-C", root, "config", "--get", "remote.origin.url").Output()
+	if err != nil {
+		return Check{Name: "github_workflow_history", Status: "skipped", Message: "remote.origin.url unavailable"}
+	}
+	owner, repo, ok := parseGitHubRemote(strings.TrimSpace(string(remote)))
+	if !ok {
+		return Check{Name: "github_workflow_history", Status: "skipped", Message: "origin is not a GitHub remote"}
+	}
+	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/actions/workflows/ai-skill-cli.yml/runs?per_page=1&status=completed", owner, repo)
+	client := http.Client{Timeout: 5 * time.Second}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return Check{Name: "github_workflow_history", Status: "skipped", Message: err.Error()}
+	}
+	req.Header.Set("User-Agent", "ai-skill-cli-pre-push")
+	resp, err := client.Do(req)
+	if err != nil {
+		return Check{Name: "github_workflow_history", Status: "warning", Message: "could not query latest completed GitHub workflow: " + err.Error(), Remediation: "Continuing with local Go preflight; check GitHub Actions manually if needed."}
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return Check{Name: "github_workflow_history", Status: "warning", Message: fmt.Sprintf("GitHub workflow query returned HTTP %d", resp.StatusCode), Remediation: "Continuing with local Go preflight; check GitHub Actions manually if needed."}
+	}
+	var runs githubWorkflowRunsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&runs); err != nil {
+		return Check{Name: "github_workflow_history", Status: "warning", Message: "could not decode GitHub workflow response: " + err.Error(), Remediation: "Continuing with local Go preflight; check GitHub Actions manually if needed."}
+	}
+	if len(runs.WorkflowRuns) == 0 {
+		return Check{Name: "github_workflow_history", Status: "skipped", Message: "no completed ai-skill CLI workflow runs found"}
+	}
+	run := runs.WorkflowRuns[0]
+	message := fmt.Sprintf("latest completed run %s at %s", run.Conclusion, run.HTMLURL)
+	if run.Conclusion != "success" {
+		return Check{Name: "github_workflow_history", Status: "warning", Message: message, Remediation: "Previous completed GitHub workflow is red; local go test must pass before pushing a fix."}
+	}
+	return Check{Name: "github_workflow_history", Status: "ok", Message: message}
+}
+
+func parseGitHubRemote(remote string) (string, string, bool) {
+	remote = strings.TrimSuffix(strings.TrimSpace(remote), ".git")
+	switch {
+	case strings.HasPrefix(remote, "https://github.com/"):
+		parts := strings.Split(strings.TrimPrefix(remote, "https://github.com/"), "/")
+		if len(parts) >= 2 {
+			return parts[0], parts[1], true
+		}
+	case strings.HasPrefix(remote, "git@github.com:"):
+		parts := strings.Split(strings.TrimPrefix(remote, "git@github.com:"), "/")
+		if len(parts) >= 2 {
+			return parts[0], parts[1], true
+		}
+	case strings.HasPrefix(remote, "ssh://git@github.com/"):
+		parts := strings.Split(strings.TrimPrefix(remote, "ssh://git@github.com/"), "/")
+		if len(parts) >= 2 {
+			return parts[0], parts[1], true
+		}
+	}
+	return "", "", false
 }
 
 func cliCIPrePushPaths(root string) ([]string, string, error) {

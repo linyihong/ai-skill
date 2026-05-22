@@ -56,6 +56,6 @@ Push 前可手動執行與 hook 相同的 CI preflight：
 ./bin/ai-skill-darwin-arm64 hooks run pre-push --repo ../.. --json
 ```
 
-若上一輪 GitHub Actions 失敗，下一次 push 前至少先跑 `cd scripts/ai-skill-cli && go test ./...`，再跑上面的 pre-push hook runner。
+若上一輪 GitHub Actions 失敗，下一次 push 前至少先跑 `cd scripts/ai-skill-cli && go test ./...`，再跑上面的 pre-push hook runner。`pre-push` 只在本分支相對 upstream 改到 CLI、git hooks 或 CLI workflow 時查詢 GitHub 上最近一次 **completed** 的 `ai-skill CLI` workflow；若上一個 completed run 是紅燈，它會顯示 run URL，但不等待本次 push 的新 run。是否放行仍以本機 `go test ./...` 為準，避免 GitHub runner 太慢造成 workflow。
 
 上游計畫：[`plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md`](../../plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md)

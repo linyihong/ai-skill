@@ -182,6 +182,23 @@ func TestHasCLICIPreflightChange(t *testing.T) {
 	}
 }
 
+func TestParseGitHubRemote(t *testing.T) {
+	cases := []string{
+		"https://github.com/linyihong/Ai-skill.git",
+		"git@github.com:linyihong/Ai-skill.git",
+		"ssh://git@github.com/linyihong/Ai-skill.git",
+	}
+	for _, input := range cases {
+		owner, repo, ok := parseGitHubRemote(input)
+		if !ok || owner != "linyihong" || repo != "Ai-skill" {
+			t.Fatalf("parseGitHubRemote(%q) = %q %q %v", input, owner, repo, ok)
+		}
+	}
+	if _, _, ok := parseGitHubRemote("https://example.com/linyihong/Ai-skill.git"); ok {
+		t.Fatal("non-GitHub remote should not parse")
+	}
+}
+
 func TestListHookFilesIgnoresDirectories(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, filepath.Join(dir, "pre-commit"), "#!/bin/sh\n")

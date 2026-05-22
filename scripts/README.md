@@ -201,3 +201,5 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 hooks run pre-push --repo . --jso
 ```
 
 這會在本分支相對 upstream 修改 CLI、git hooks 或 CLI workflow 時，先執行 `cd scripts/ai-skill-cli && go test ./...`，用來在 push 前攔截 GitHub Actions 會報的 stale binary / checksum / workflow regression。
+
+不要用「幾分鐘內」作為主要條件。GitHub Actions 排隊與 Windows runner 時間不穩，時間窗會造成假安全感。正確條件是：本次 push 是否修改會觸發 script CI 的 path；若有，查最近一次已完成的同 workflow run 作為 context，然後用本機可重現檢查決定是否放行。
