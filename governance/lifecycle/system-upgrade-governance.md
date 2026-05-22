@@ -50,6 +50,7 @@
 ### 2.3 架構文件更新
 
 - [ ] **architecture/ 文件**：如有架構變更，是否更新了對應的架構文件？
+- [ ] **新世代 architecture 文件**：如果本次升級涉及**系統名稱變更**（§1 第一項條件），是否在 `architecture/` 建立新文件 `architecture/<new-system-slug>.md` 作為新世代 canonical navigation 入口？同時把舊世代文件加上 historical header？（規則 6）
 - [ ] **CORE_BOOTSTRAP.md**：啟動流程是否因升級而需要修改？
 - [ ] **ADR 記錄**：是否建立了 Architecture Decision Record 記錄本次升級的關鍵決策？
 
@@ -131,6 +132,28 @@
 **教訓**：修改 prose 檔案後忘記執行 repo-local `ai-skill runtime compile --native-compiler` / runtime validation，導致 generated runtime surface 與 canonical source 不一致。
 
 **強制**：任何修改 prose 檔案的升級，在 commit 前必須執行 compiler 重新編譯 generated YAML。
+
+### 規則 6：新世代系統必須有對應的 architecture/ canonical 文件
+
+**教訓**：Knowledge Operating System → Cognitive Execution System 的升級雖然更新了根 `README.md` 標題，但 `architecture/ai-native-knowledge-operating-system.md` 仍以舊世代名稱與內容存在，被誤認為「architecture/ 唯一文件」造成讀者混淆。直到 2026-05-22 才被發現並補建第三代 navigation 文件。
+
+**強制**：如果升級涉及**系統名稱變更**（§1 第一項條件），計畫書必須明確包含以下項目：
+
+```
+## 完成條件
+- [ ] architecture/ 建立新世代 canonical navigation 文件
+      檔名格式：architecture/<new-system-slug>.md
+      內容：系統世代演化表、當前 canonical 入口列表、核心機制概述（指向真正 source-of-truth）、演化里程碑（引用相關 archived plans）
+      不寫成自包含 spec — 真正 source-of-truth 是 YAML contracts + philosophy 文件 + runtime.db
+- [ ] 舊世代文件加 historical header，指向新世代文件
+- [ ] architecture/README.md 更新「目前文件」表，標清楚每世代狀態（current / historical）
+- [ ] 補充「與 intelligence/engineering/architecture/ 的邊界」說明，避免 OS 架構與工程架構混淆
+```
+
+**為什麼是必要的**：
+- 每世代系統有自己的 canonical 入口，新人或 agent 不需要從散落的 philosophy / YAML / plans 拼湊當前設計
+- 歷史世代文件不被覆寫，提供 traceability
+- `architecture/README.md` 的定位明確為「每世代 canonical 入口」，避免「永久文件」這種與升級事實矛盾的描述
 
 ---
 

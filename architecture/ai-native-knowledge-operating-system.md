@@ -1,5 +1,19 @@
 # AI-native Knowledge Operating System
 
+> ⚠️ **HISTORICAL DOCUMENT — 第二代系統文件**
+>
+> 本檔對應**第二代** AI-native Knowledge Operating System 的設計。系統已於 2026-05-15 升級為**第三代** AI-native Cognitive Execution System，本檔僅供歷史回溯，不再代表當前系統。
+>
+> **當前世代 canonical 入口**：[`ai-native-cognitive-execution-system.md`](ai-native-cognitive-execution-system.md)
+>
+> **升級記錄**：[`plans/archived/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md`](../plans/archived/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md)
+>
+> **升級治理**：[`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md)
+>
+> 以下內容反映第二代系統設計（`skills/` 為 canonical capability 層、Default Bootstrap 12 條、prose 為 source-of-truth），與當前系統不一致的部分以新世代文件為準。
+
+---
+
 本文件定義 AI-native Knowledge Operating System 的 repository-level architecture direction。它是 roadmap 與 boundary document，不是 executable shared rule。可執行政策仍放在 `enforcement/`；工具專屬設定仍放在 `ai-tools/`。
 
 下一階段完整升級規劃見 [`next-stage-upgrade-plan.md`](../plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md)。
