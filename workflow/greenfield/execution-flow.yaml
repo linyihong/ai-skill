@@ -1,0 +1,127 @@
+schema_version: executable-contract/v1
+id: workflow.greenfield.execution-flow.contract
+title: Greenfield execution flow contract
+owner_layer: workflow
+source_markdown: workflow/greenfield/execution-flow.md
+status: active
+contract_type: workflow_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: workflow.greenfield.execution_flow.contract
+  surface_type: executable_yaml_contract
+  execution_scope: workflow_execution
+
+activation:
+  events:
+    - greenfield_project_started
+    - new_feature_spec_requested
+    - implementation_plan_requested
+    - task_breakdown_requested
+    - spec_plan_tasks_implementation_flow_needed
+  required_when:
+    - Starting a new project or feature from user requirements through specification, plan, tasks, and implementation.
+
+required_sources:
+  - workflow/greenfield/execution-flow.md
+  - workflow/greenfield/templates/spec-template.md
+  - workflow/greenfield/templates/plan-template.md
+  - workflow/greenfield/templates/tasks-template.md
+  - workflow/software-delivery/execution-flow.md
+  - workflow/software-delivery/templates/bdd-scenario-template.md
+  - workflow/software-delivery/templates/review-report-template.md
+
+steps:
+  - id: specify
+    order: 1
+    action: Parse user requirements into independent user stories, acceptance scenarios, edge cases, functional requirements, success criteria, and assumptions.
+    outputs:
+      - feature_specification
+    gates:
+      - gate.greenfield.spec_ready
+  - id: plan
+    order: 2
+    action: Build implementation plan with technical context, constitution check, project structure, and complexity tracking.
+    outputs:
+      - implementation_plan
+    gates:
+      - gate.greenfield.plan_ready
+  - id: tasks
+    order: 3
+    action: Break implementation into setup, foundational, user story, and polish tasks with dependencies, paths, parallel markers, and strategy.
+    outputs:
+      - task_breakdown
+    gates:
+      - gate.greenfield.tasks_ready
+  - id: implement
+    order: 4
+    action: Implement in task order, validate each user story independently, run BDD closure and code review via software-delivery workflow.
+    outputs:
+      - code
+      - tests
+      - documentation
+    gates:
+      - gate.greenfield.implementation_complete
+
+gates:
+  - id: gate.greenfield.spec_ready
+    blocks: planning_phase
+    pass_when:
+      - all user stories have priority
+      - every P1 story has at least one acceptance scenario
+      - functional requirements are listed
+      - success criteria are measurable
+  - id: gate.greenfield.plan_ready
+    blocks: task_breakdown_phase
+    pass_when:
+      - technical context is complete
+      - constitution check passes or violations are justified
+      - project structure is defined
+  - id: gate.greenfield.tasks_ready
+    blocks: implementation_phase
+    pass_when:
+      - every user story has task groups
+      - tasks have concrete file paths
+      - dependencies and execution order are defined
+      - implementation strategy is chosen
+  - id: gate.greenfield.implementation_complete
+    blocks: final_completion_response
+    pass_when:
+      - all P1 user stories are complete and tested
+      - BDD closure ran where behavior is affected
+      - code review or equivalent review is complete
+      - documentation is updated
+
+required_evidence:
+  - feature specification path
+  - implementation plan path
+  - task breakdown path
+  - test / BDD / review evidence
+  - documentation update status
+
+success_criteria:
+  - Greenfield work proceeds through specify, plan, tasks, and implementation without skipping gates.
+  - User stories are independently testable and deliverable.
+  - Implementation tasks are ordered, scoped, and traceable to user stories.
+  - P1 behavior is validated and documented before completion.
+
+failure_modes:
+  - id: implementation_before_spec
+    detection: Code starts before P1 user stories, acceptance scenarios, requirements, and success criteria are defined.
+    recovery: Pause implementation and complete specify gate.
+  - id: tasks_without_file_paths
+    detection: Task breakdown lacks concrete files or dependency order.
+    recovery: Complete task gate before coding.
+  - id: p1_not_independently_validated
+    detection: P1 user story is marked done without test, BDD, or review evidence.
+    recovery: Run validation and update documentation before final claim.
+
+final_status_report:
+  required_fields:
+    - spec_status
+    - plan_status
+    - task_status
+    - implementation_status
+    - validation_status
+    - documentation_status

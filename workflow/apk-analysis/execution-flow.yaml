@@ -1,0 +1,117 @@
+schema_version: executable-contract/v1
+id: workflow.apk-analysis.execution-flow.contract
+title: APK analysis execution flow contract
+owner_layer: workflow
+source_markdown: workflow/apk-analysis/execution-flow.md
+status: active
+contract_type: workflow_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: workflow.apk_analysis.execution_flow.contract
+  surface_type: executable_yaml_contract
+  execution_scope: workflow_execution
+
+activation:
+  events:
+    - apk_analysis_requested
+    - frida_or_mitm_capture_requested
+    - ui_to_api_mapping_requested
+    - sdk_or_client_handoff_requested
+    - apk_feedback_lesson_detected
+  required_when:
+    - An authorized APK, traffic, hook, replay, UI/API mapping, feature reconstruction, or SDK/client handoff analysis is requested.
+    - Capture windows, Frida hooks, MITM/pcap evidence, UI maps, or reusable APK analysis lessons are produced.
+
+required_sources:
+  - workflow/apk-analysis/README.md
+  - workflow/apk-analysis/execution-flow.md
+  - workflow/apk-analysis/artifact-gates.md
+  - runtime/onboarding/apk-analysis-completion.md
+  - analysis/apk/traffic-triage.md
+  - enforcement/authorization-scope.md
+  - enforcement/sanitization.md
+  - enforcement/evidence-hierarchy.md
+
+steps:
+  - id: confirm_scope_and_authorization
+    order: 1
+    action: Record APK identity, package, CPU architecture, device/emulator, root state, allowed tools, test account, and authorization scope.
+    gates:
+      - gate.apk_analysis.authorization_confirmed
+  - id: establish_reset_baseline
+    order: 2
+    action: Choose reset level and split reset/startup/navigation/feature/documentation windows when analyzing app-start-to-feature flows.
+  - id: triage_network_path
+    order: 3
+    action: Start from network path triage, then load specific analysis methods only after evidence points to the right technique.
+  - id: validate_ui_evidence_package
+    order: 4
+    action: Validate foreground package, activity, and feature context before using screenshots or hierarchy as UI/API evidence.
+    gates:
+      - gate.apk_analysis.ui_evidence_valid
+  - id: capture_feature_windows
+    order: 5
+    action: Use Frida/MITM/pcap/replay windows with package and feature guards; label startup, navigation, feature-triggered, cache, or ambiguous traffic.
+  - id: build_durable_assets
+    order: 6
+    action: Produce UI map, operation/API matrix, redacted API docs, domain/runtime baseline, feature handoff, fixtures, or contract tests.
+    gates:
+      - gate.apk_analysis.durable_assets_ready
+  - id: close_with_feedback
+    order: 7
+    action: Add reusable feedback lesson in the same round when a generalized technique or failure mode is discovered.
+
+gates:
+  - id: gate.apk_analysis.authorization_confirmed
+    blocks: capture_or_publication
+    pass_when:
+      - target APK and authorization scope are explicit
+      - third-party or unrelated traffic is excluded
+      - secrets, cookies, device IDs, and private keys are not saved
+  - id: gate.apk_analysis.ui_evidence_valid
+    blocks: ui_api_claim
+    pass_when:
+      - screenshot/hierarchy package and feature context belong to target app
+      - external or wrong in-app windows are marked invalid for target feature
+      - repeated navigation mismatch enters recovery
+  - id: gate.apk_analysis.durable_assets_ready
+    blocks: completion_claim
+    pass_when:
+      - core traffic stack, request metadata, response shape, decrypt point or blocker, sanitized samples, and documentation location are known
+      - SDK/client handoff has domain/runtime baseline or an explicit blocker
+
+required_evidence:
+  - authorization and scope record
+  - reset baseline and capture window labels
+  - package / feature-context validation
+  - sanitized pcap / MITM / hook / replay / screenshot / hierarchy references
+  - UI map, API docs, domain/runtime baseline, or feature handoff status
+
+success_criteria:
+  - APK analysis stays within authorized target and excludes unrelated data.
+  - UI/API evidence is package- and feature-validated before attribution.
+  - Feature/API claims distinguish startup, navigation, feature-triggered, cache, and ambiguous requests.
+  - Durable project assets are updated before completion.
+  - Reusable techniques are generalized and sanitized.
+
+failure_modes:
+  - id: external_ui_window_used_as_feature_evidence
+    detection: Screenshot or hierarchy belongs to launcher, browser, settings, permission page, or wrong in-app screen.
+    recovery: Mark window invalid, fix navigation/checkpoint, and re-capture before claiming UI/API mapping.
+  - id: startup_request_misattributed
+    detection: Startup, preload, session recovery, or background request is claimed as current feature trigger.
+    recovery: Split windows and relabel traffic before mapping.
+  - id: raw_secret_or_host_promoted
+    detection: Reusable workflow contains raw token, cookie, device ID, private host, or target-specific secret.
+    recovery: Redact and move raw evidence to project-controlled docs.
+
+final_status_report:
+  required_fields:
+    - scope_and_authorization
+    - capture_windows
+    - evidence_observed
+    - ruled_out
+    - durable_assets
+    - unknowns_and_next_action

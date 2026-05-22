@@ -172,8 +172,10 @@ final_status_report: []
 - [x] 先用 `workflow/documentation/` 驗證 YAMLization Decision Standard：`execution-flow.md` 含讀者 / 生命週期、分類維度、檔案形狀、驗證與完成訊號，應建立 `workflow/documentation/execution-flow.yaml` companion contract。
 - [x] 更新 `workflow/documentation/execution-flow.md` 的文件化流程，加入「其他專案何時只寫 Markdown / front-matter，何時需要 companion YAML 或等價 structured contract」的判斷步驟。
 - [x] 更新 `workflow/documentation/README.md`，說明 YAMLization Decision Standard 是 project documentation standard 的一部分，可套用於其他 repository 的 docs / runbook / ADR / workflow 文件。
-- [ ] 為 `workflow/apk-analysis/`、`workflow/travel-planning/`、`workflow/greenfield/` 建立 companion YAML；若某 workflow 只保留 philosophy / routing index，明確標 `markdown_only`。
-- [ ] 讓 workflow YAML 明確列出 activation、required sources、blocking gates、success criteria、final report fields。
+- [x] 為 `workflow/apk-analysis/`、`workflow/travel-planning/`、`workflow/greenfield/` 建立 companion YAML；若某 workflow 只保留 philosophy / routing index，明確標 `markdown_only`。
+- [x] 讓 workflow YAML 明確列出 activation、required sources、blocking gates、success criteria、final report fields。
+
+**Phase 3 output**：`workflow/documentation/`、`workflow/software-delivery/`、`workflow/apk-analysis/`、`workflow/travel-planning/` 與 `workflow/greenfield/` 的 execution / artifact gates 已有 owner-layer executable YAML contract；純 index README 與 templates 在 inventory 中維持 `markdown_only` / `not_applicable`。
 
 ### Phase 4：Governance Promotion Contracts
 

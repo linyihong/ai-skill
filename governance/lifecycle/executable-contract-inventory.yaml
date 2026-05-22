@@ -144,6 +144,26 @@ inventory:
       contract: workflow/software-delivery/artifact-gates.yaml
       state: contract_exists
       reason: Software delivery artifact shape, owner layer, sanitization, linked updates, and quality gates now have a workflow contract.
+    - source: workflow/apk-analysis/execution-flow.md
+      contract: workflow/apk-analysis/execution-flow.yaml
+      state: contract_exists
+      reason: APK authorization, reset baseline, capture windows, UI evidence validation, durable assets, and feedback loop now have a workflow contract.
+    - source: workflow/apk-analysis/artifact-gates.md
+      contract: workflow/apk-analysis/artifact-gates.yaml
+      state: contract_exists
+      reason: APK UI maps, API catalogs, domain/runtime baseline, feature handoff, sanitization, and development readiness gates now have a workflow contract.
+    - source: workflow/travel-planning/execution-flow.md
+      contract: workflow/travel-planning/execution-flow.yaml
+      state: contract_exists
+      reason: Travel intake, source triage, exact location, transport, lodging, route feasibility, and confidence gates now have a workflow contract.
+    - source: workflow/travel-planning/artifact-gates.md
+      contract: workflow/travel-planning/artifact-gates.yaml
+      state: contract_exists
+      reason: Travel output completeness, exact location, source validation, feasibility, confidence labels, and next action gates now have a workflow contract.
+    - source: workflow/greenfield/execution-flow.md
+      contract: workflow/greenfield/execution-flow.yaml
+      state: contract_exists
+      reason: Greenfield specify, plan, tasks, implement stages and phase gates now have a workflow contract.
 
   contract_required:
     - source: governance/lifecycle/directory-structure-governance.md
@@ -158,26 +178,6 @@ inventory:
       suggested_contract: governance/ai-runtime-governance/validation-scenario-governance.yaml
       priority: P1
       reason: Failure promotion into validation scenarios has repeatable gates and expected artifacts.
-    - source: workflow/apk-analysis/execution-flow.md
-      suggested_contract: workflow/apk-analysis/execution-flow.yaml
-      priority: P2
-      reason: APK analysis flow has ordered analysis steps and evidence requirements.
-    - source: workflow/apk-analysis/artifact-gates.md
-      suggested_contract: workflow/apk-analysis/artifact-gates.yaml
-      priority: P2
-      reason: APK analysis deliverables and evidence gates need structured checks.
-    - source: workflow/travel-planning/execution-flow.md
-      suggested_contract: workflow/travel-planning/execution-flow.yaml
-      priority: P2
-      reason: Travel planning flow has repeatable planning, validation, and output gates.
-    - source: workflow/travel-planning/artifact-gates.md
-      suggested_contract: workflow/travel-planning/artifact-gates.yaml
-      priority: P2
-      reason: Travel planning artifacts define required output completeness.
-    - source: workflow/greenfield/execution-flow.md
-      suggested_contract: workflow/greenfield/execution-flow.yaml
-      priority: P2
-      reason: Greenfield workflow has repeatable planning and execution stages.
 
   markdown_only:
     - source: governance/lifecycle/runtime-guards-philosophy.md

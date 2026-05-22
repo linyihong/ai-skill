@@ -1,0 +1,109 @@
+schema_version: executable-contract/v1
+id: workflow.travel-planning.execution-flow.contract
+title: Travel planning execution flow contract
+owner_layer: workflow
+source_markdown: workflow/travel-planning/execution-flow.md
+status: active
+contract_type: workflow_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: workflow.travel_planning.execution_flow.contract
+  surface_type: executable_yaml_contract
+  execution_scope: workflow_execution
+
+activation:
+  events:
+    - travel_plan_requested
+    - itinerary_review_requested
+    - transport_or_lodging_comparison_requested
+    - road_trip_or_car_sleeping_plan_requested
+    - calendar_ready_itinerary_requested
+  required_when:
+    - User asks for itinerary planning, transport comparison, route feasibility, lodging base logic, road trip support, or travel artifact review.
+
+required_sources:
+  - workflow/travel-planning/README.md
+  - workflow/travel-planning/execution-flow.md
+  - workflow/travel-planning/artifact-gates.md
+  - enforcement/evidence-hierarchy.md
+
+steps:
+  - id: collect_trip_intake
+    order: 1
+    action: Capture destination, dates, party, constraints, transport mode, style, must-do/must-avoid, budget, weather tolerance, and country-specific needs.
+    gates:
+      - gate.travel_planning.intake_complete
+  - id: triage_sources
+    order: 2
+    action: Match each important claim type to official/current sources and mark community-only inputs as needs confirmation.
+  - id: compare_model_routes
+    order: 3
+    action: Use travel agency packages or official model routes as direct package options or benchmarks, then revalidate current facts.
+  - id: verify_exact_locations
+    order: 4
+    action: Verify each stop with precise map/place/coordinate markers, official names/addresses, parking pins, and country-specific navigation data.
+    gates:
+      - gate.travel_planning.location_precise
+  - id: plan_stops_weather_transport_lodging
+    order: 5
+    action: Build stops, food, weather backups, long-distance transport comparison, transport mode, lodging base, route shape, and country/region-specific checks.
+  - id: finalize_feasible_itinerary
+    order: 6
+    action: Produce route/order with feasibility, fallback plans, confidence labels, exact locations, next actions, and practical booking checks.
+    gates:
+      - gate.travel_planning.feasibility_checked
+
+gates:
+  - id: gate.travel_planning.intake_complete
+    blocks: final_itinerary
+    pass_when:
+      - trip frame has destination or candidate region, dates/flexibility, party constraints, transport mode, travel style, must-do/must-avoid, budget, weather tolerance, and country-specific needs
+      - missing feasibility-critical details are asked or clearly assumed
+  - id: gate.travel_planning.location_precise
+    blocks: route_finalization
+    pass_when:
+      - each recommended stop has exact place link or coordinate pin
+      - driving targets use confirmed visitor parking or official parking when relevant
+      - ambiguous locations are labeled with safer alternatives
+  - id: gate.travel_planning.feasibility_checked
+    blocks: final_itinerary
+    pass_when:
+      - schedule includes travel time, stay duration, buffers, meals, last entry/check-in constraints, weather and fatigue risk
+      - long transfers compare viable transport options
+      - route shape avoids hidden backtracking or explains tradeoffs
+
+required_evidence:
+  - trip assumptions
+  - source validation summary
+  - exact location notes
+  - transport comparison for long-distance segments
+  - route feasibility and fallback notes
+  - confidence labels
+
+success_criteria:
+  - The itinerary is feasible, source-backed, location-precise, and honest about uncertainty.
+  - Weather, road, crowd, transit, lodging, and fallback risks are integrated before final ordering.
+  - Transport recommendations include door-to-door time, total cost, burden, reservations, and risk when relevant.
+  - Country/region-specific navigation and parking requirements are applied.
+
+failure_modes:
+  - id: vague_location_recommendation
+    detection: Stop uses search URL or vague area without exact place, entrance, parking, or coordinate.
+    recovery: Verify exact marker or label location needs confirmation with safer alternative.
+  - id: time_sensitive_fact_unsourced
+    detection: Hours, closure, weather, road condition, booking window, or last admission lacks current source.
+    recovery: Add official/current source or downgrade confidence.
+  - id: hidden_backtracking
+    detection: Route doubles back without explanation.
+    recovery: Reorder, move lodging base, or label backtracking warning with reason.
+
+final_status_report:
+  required_fields:
+    - trip_frame
+    - source_validation
+    - itinerary_feasibility
+    - exact_location_status
+    - transport_and_lodging_tradeoffs
+    - confidence_and_next_actions

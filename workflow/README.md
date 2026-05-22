@@ -13,11 +13,17 @@
 ## 目前入口
 
 - [`apk-analysis/`](apk-analysis/README.md)：APK 分析的 tool-neutral workflow。已從舊 `skills/apk-analysis/` 遷移至本層。
+  - [`apk-analysis/execution-flow.yaml`](apk-analysis/execution-flow.yaml)：APK analysis execution executable contract。
+  - [`apk-analysis/artifact-gates.yaml`](apk-analysis/artifact-gates.yaml)：APK analysis artifact gates executable contract。
 - [`software-delivery/`](software-delivery/README.md)：軟體交付的執行流程（design review、code review、release review、security review）。
   - [`software-delivery/execution-flow.yaml`](software-delivery/execution-flow.yaml)：software delivery execution executable contract。
   - [`software-delivery/artifact-gates.yaml`](software-delivery/artifact-gates.yaml)：software delivery artifact gates executable contract。
+- [`greenfield/`](greenfield/README.md)：新專案從 specify、plan、tasks 到 implement 的標準化流程。
+  - [`greenfield/execution-flow.yaml`](greenfield/execution-flow.yaml)：greenfield execution executable contract。
 - [`repo-analysis/`](repo-analysis/README.md)：Repository 分析的執行流程（new onboarding、deep codebase analysis、migration impact、tech debt assessment）。選路見 [`workflow-routing.md`](./workflow-routing.md)；routing 條目以 registry 為準。
 - [`travel-planning/`](travel-planning/README.md)：旅遊規劃的執行流程（itinerary planning、transportation research、budget planning）。
+  - [`travel-planning/execution-flow.yaml`](travel-planning/execution-flow.yaml)：travel planning execution executable contract。
+  - [`travel-planning/artifact-gates.yaml`](travel-planning/artifact-gates.yaml)：travel planning artifact gates executable contract。
 - [`documentation/`](documentation/README.md)：跨專案 **agent 友善文件** 的撰寫與分類流程（index-first、降低無效 token、與 `enforcement/` / `governance/` 對齊）。
   - [`documentation/execution-flow.yaml`](documentation/execution-flow.yaml)：documentation workflow 的 executable contract，包含 YAMLization decision gate。
 

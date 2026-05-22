@@ -4,6 +4,7 @@
 
 - [`README.md`](README.md) — 本文件，entry point
 - [`execution-flow.md`](execution-flow.md) — 4 階段執行流程（Specify → Plan → Tasks → Implement）
+- [`execution-flow.yaml`](execution-flow.yaml) — 4 階段 executable contract 與 gate
 - [`templates/spec-template.md`](templates/spec-template.md) — Feature Specification 模板
 - [`templates/plan-template.md`](templates/plan-template.md) — Implementation Plan 模板
 - [`templates/tasks-template.md`](templates/tasks-template.md) — Task Breakdown 模板

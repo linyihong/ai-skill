@@ -1,0 +1,102 @@
+schema_version: executable-contract/v1
+id: workflow.apk-analysis.artifact-gates.contract
+title: APK analysis artifact gates contract
+owner_layer: workflow
+source_markdown: workflow/apk-analysis/artifact-gates.md
+status: active
+contract_type: workflow_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: workflow.apk_analysis.artifact_gates.contract
+  surface_type: executable_yaml_contract
+  execution_scope: workflow_execution
+
+activation:
+  events:
+    - apk_ui_map_created
+    - apk_api_catalog_created
+    - apk_domain_runtime_baseline_needed
+    - apk_feature_handoff_needed
+    - apk_analysis_completion_claimed
+  required_when:
+    - APK analysis produces UI architecture maps, API catalogs, domain/runtime baselines, feature reconstruction handoffs, or analysis notes.
+    - User asks whether API coverage is complete or whether SDK/client/mock work can start.
+
+required_sources:
+  - workflow/apk-analysis/artifact-gates.md
+  - workflow/apk-analysis/execution-flow.md
+  - runtime/onboarding/apk-analysis-completion.md
+  - enforcement/sanitization.md
+  - enforcement/evidence-hierarchy.md
+
+steps:
+  - id: create_ui_architecture_map
+    order: 1
+    action: For named page/tab/module analysis, create page-level UI map with entry path, UI blocks, scroll/pagination, API chain, SDK mapping, validation evidence, and follow-up template.
+  - id: create_api_catalog
+    order: 2
+    action: For API lists, SDK/client mapping, mock API, or contract test goals, create API catalog with groups, operation docs, coverage matrix, UI/API mapping, and sanitization status.
+  - id: create_domain_runtime_baseline
+    order: 3
+    action: Before SDK/client/app tool/live integration development, record endpoint/path family, adapter strategy, session/bootstrap, opaque params, signing/gateway, decrypt boundary, pagination, errors, and replay checklist.
+    gates:
+      - gate.apk_artifacts.development_ready
+  - id: create_feature_handoff
+    order: 4
+    action: For feature reconstruction, record capability, UI behavior, domain concepts, API/interface contract, state/error handling, data lifecycle, evidence, and unknowns.
+  - id: validate_artifact_completion
+    order: 5
+    action: Check completeness, sanitization, trigger confidence, coverage gaps, and blocker/open-question status before completion.
+
+gates:
+  - id: gate.apk_artifacts.development_ready
+    blocks: sdk_or_client_development_start
+    pass_when:
+      - domain/runtime baseline includes route binding, identity/session readiness, signing/gateway, decrypt/unwrap boundary, pagination ground truth, error/session recovery, and replay checklist
+      - missing factors are blockers or explicitly scoped out
+  - id: gate.apk_artifacts.api_catalog_complete
+    blocks: api_coverage_completion_claim
+    pass_when:
+      - API root links to groups, coverage/gaps, UI map, decoder/wrapper, and SDK/client docs
+      - observed APIs are grouped and high-value APIs have operation docs
+      - request, response, field meaning, evidence, validation, and open questions are recorded
+  - id: gate.apk_artifacts.sanitized
+    blocks: artifact_commit
+    pass_when:
+      - screenshots, UI hierarchy, API docs, logs, samples, and fixtures are sanitized or stored in controlled project evidence
+
+required_evidence:
+  - UI map path or not-applicable reason
+  - API catalog and coverage/gap matrix status
+  - domain/runtime baseline status
+  - feature handoff status
+  - sanitization summary
+  - validation evidence and open questions
+
+success_criteria:
+  - APK artifacts support future human or agent reconstruction without relying on chat memory.
+  - API completeness claims are backed by catalog, coverage, evidence, and gap matrix.
+  - SDK/client readiness is blocked until domain/runtime baseline is sufficient.
+  - Raw sensitive evidence is not committed into reusable or public artifacts.
+
+failure_modes:
+  - id: endpoint_list_without_feature_handoff
+    detection: Feature reconstruction goal has only endpoints and no UI behavior, domain concepts, state/error, or data lifecycle.
+    recovery: Create feature handoff before claiming reconstruction readiness.
+  - id: sdk_started_without_baseline
+    detection: SDK/client/live integration starts with only skeleton API docs.
+    recovery: Complete baseline or record explicit blockers.
+  - id: raw_api_sample_committed
+    detection: Artifact contains raw token, host, payload, ID, or user data.
+    recovery: Redact and move raw evidence to controlled project evidence.
+
+final_status_report:
+  required_fields:
+    - ui_map_status
+    - api_catalog_status
+    - baseline_status
+    - feature_handoff_status
+    - sanitization_status
+    - open_questions

@@ -1,0 +1,91 @@
+schema_version: executable-contract/v1
+id: workflow.travel-planning.artifact-gates.contract
+title: Travel planning artifact gates contract
+owner_layer: workflow
+source_markdown: workflow/travel-planning/artifact-gates.md
+status: active
+contract_type: workflow_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: workflow.travel_planning.artifact_gates.contract
+  surface_type: executable_yaml_contract
+  execution_scope: workflow_execution
+
+activation:
+  events:
+    - travel_plan_output_created
+    - itinerary_artifact_reviewed
+    - calendar_ready_output_requested
+    - travel_plan_completion_claimed
+  required_when:
+    - Producing or reviewing a travel plan, itinerary, route comparison, road trip support plan, or calendar/app-ready output.
+
+required_sources:
+  - workflow/travel-planning/artifact-gates.md
+  - workflow/travel-planning/execution-flow.md
+  - enforcement/evidence-hierarchy.md
+
+steps:
+  - id: include_required_output_items
+    order: 1
+    action: Include trip assumptions, day-by-day itinerary, source-backed validation, confidence labels, exact location notes, risks, transport plan, lodging, route-shape notes, support points, and next actions.
+    gates:
+      - gate.travel_artifacts.required_items_present
+  - id: validate_location_precision
+    order: 2
+    action: Check place links/coordinate pins, visitor parking, official parking, and Mapcode where relevant.
+  - id: validate_source_and_feasibility
+    order: 3
+    action: Check time-sensitive sources, schedule feasibility, fallback plans, and long-distance transport comparison.
+    gates:
+      - gate.travel_artifacts.source_and_feasibility
+  - id: label_confidence_and_next_actions
+    order: 4
+    action: Label confirmed, likely, needs day-before check, or unknown items; list practical booking, ticket, route-save, and departure checks.
+
+gates:
+  - id: gate.travel_artifacts.required_items_present
+    blocks: travel_plan_completion
+    pass_when:
+      - output includes the required items relevant to trip scope
+      - omitted items have clear not-applicable reason
+  - id: gate.travel_artifacts.source_and_feasibility
+    blocks: travel_plan_completion
+    pass_when:
+      - time-sensitive facts are source-backed or downgraded
+      - daily schedule has travel time, buffer, meals, closing/last-entry/check-in, fatigue, and fallback notes
+      - long-distance segments compare multiple transport modes when applicable
+
+required_evidence:
+  - required output checklist
+  - exact location and parking validation
+  - source-backed validation status
+  - feasibility and fallback summary
+  - confidence labels and next actions
+
+success_criteria:
+  - Travel output is actionable and can be followed without hidden feasibility gaps.
+  - Exact location, transport, lodging, fallback, and weather/road risks are explicit.
+  - Calendar/app-ready outputs include time zone, place, notes, reminder, booking references, and recheck status when requested.
+
+failure_modes:
+  - id: itinerary_missing_practical_checks
+    detection: Plan has attractions but lacks feasibility, transport, location, fallback, or next-action details.
+    recovery: Add the missing artifact sections or mark them not applicable.
+  - id: confidence_not_labeled
+    detection: Unverified or time-sensitive claims are presented as certain.
+    recovery: Add confidence label and source or recheck action.
+  - id: calendar_ready_without_recheck_status
+    detection: Calendar/app-ready output includes uncertain items without reminders or confirmation notes.
+    recovery: Add recheck status, reminder, or exclude unsafe-to-import item.
+
+final_status_report:
+  required_fields:
+    - required_items_status
+    - location_precision_status
+    - source_validation_status
+    - feasibility_status
+    - fallback_status
+    - next_actions

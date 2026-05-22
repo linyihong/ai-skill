@@ -23,10 +23,10 @@
 | 工作流程關注點 | 原始來源 | 提取狀態 |
 | --- | --- | --- |
 | Skill 觸發和授權邊界 | `../../skills/apk-analysis/SKILL.md`（已刪除） | ✅ 內容已遷移至本層 |
-| 預設決策樹 | `../../skills/apk-analysis/WORKFLOW.md`（已刪除） | ✅ 已提取到 [`execution-flow.md`](execution-flow.md) |
-| 捕獲窗口詳細規則 | `../../skills/apk-analysis/WORKFLOW.md`（已刪除） | ✅ 已提取到 [`execution-flow.md`](execution-flow.md) |
+| 預設決策樹 | `../../skills/apk-analysis/WORKFLOW.md`（已刪除） | ✅ 已提取到 [`execution-flow.md`](execution-flow.md)；contract 見 [`execution-flow.yaml`](execution-flow.yaml) |
+| 捕獲窗口詳細規則 | `../../skills/apk-analysis/WORKFLOW.md`（已刪除） | ✅ 已提取到 [`execution-flow.md`](execution-flow.md)；contract 見 [`execution-flow.yaml`](execution-flow.yaml) |
 | 環境和工具準備 | `../../skills/apk-analysis/TOOLS.md`（已刪除） | ✅ 從 `analysis/apk/` 參考 |
-| 文件和產出規範 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
+| 文件和產出規範 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md)；contract 見 [`artifact-gates.yaml`](artifact-gates.yaml) |
 | SDK 即時自我生成審計 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
 | 身份資料自我生成審計 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |
 | UI 架構圖模板 | `../../skills/apk-analysis/DOCUMENTATION.md`（已刪除） | ✅ 已提取到 [`artifact-gates.md`](artifact-gates.md) |

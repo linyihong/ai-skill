@@ -42,7 +42,9 @@
 | 檔案 | 來源 | 說明 |
 |------|------|------|
 | [`execution-flow.md`](execution-flow.md) | `WORKFLOW.md` §1-17 | 完整 17 步驟執行流程：Intake、Source Triage、Agency Benchmark、Location Verification、Stop Planning、Weather、Transport、Lodging、Route Shape、Country Checks、Feasibility、Schedule、Calendar Output、車中泊、Recommendation Pass、Final Verification |
+| [`execution-flow.yaml`](execution-flow.yaml) | `execution-flow.md` | Travel planning execution executable contract：intake、sources、locations、transport、lodging、feasibility gates |
 | [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md` | 14 個產出模板與 final verification checklist：Itinerary Summary、Day Plan、Weather Strategy、Source Table、Calendar/App Table、Offline Checklist、Agency Benchmark Table、Stop Experience Table、Restaurant Table、Location Table、Transport Plan、Cost Estimate、車中泊 Quietness Table、Verification Checklist |
+| [`artifact-gates.yaml`](artifact-gates.yaml) | `artifact-gates.md` | Travel planning artifact executable contract：required output items、exact location、source validation、feasibility、confidence labels |
 
 ## 建議 Workflow 流程
 
