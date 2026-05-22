@@ -1,4 +1,4 @@
-version=repo-b0f0a6c
-source_commit=b0f0a6c
-built_at=2026-05-22T04:24:03Z
+version=dev
+source_commit=f2c046a
+built_at=2026-05-22T04:33:36Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
