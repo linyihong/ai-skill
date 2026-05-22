@@ -95,7 +95,6 @@ func createGoRuntimeSchema(db *sql.DB) error {
 		`CREATE TABLE transaction_rules (id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT, rule TEXT, severity TEXT DEFAULT 'high');`,
 		`CREATE TABLE transaction_templates (id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT, typical_steps TEXT, content TEXT DEFAULT '{}');`,
 		`CREATE TABLE compiler_rules (id INTEGER PRIMARY KEY AUTOINCREMENT, rule_id TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
-		`CREATE TABLE activation_rules (rule_id TEXT PRIMARY KEY, description TEXT, activation_when TEXT, load_strategy TEXT DEFAULT 'lazy', load_priority TEXT DEFAULT 'P2', load_estimated_tokens INTEGER DEFAULT 0, load_source TEXT, metadata TEXT, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE core_bootstrap_rules (rule_id TEXT PRIMARY KEY, ordinal INTEGER DEFAULT 0);`,
 		`CREATE TABLE discovery_checkpoints (id INTEGER PRIMARY KEY AUTOINCREMENT, phase TEXT NOT NULL, trigger TEXT NOT NULL, description TEXT, discovery_targets TEXT, metadata TEXT);`,
 		`CREATE TABLE discovery_search_strategy (id INTEGER PRIMARY KEY AUTOINCREMENT, priority_order TEXT, fallback TEXT, min_confidence_threshold TEXT);`,
@@ -129,7 +128,6 @@ func createGoRuntimeSchema(db *sql.DB) error {
 		`CREATE TABLE phase_reconciliation (id INTEGER PRIMARY KEY AUTOINCREMENT, procedure_id TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE execution_queue (id INTEGER PRIMARY KEY AUTOINCREMENT, queue_name TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE priority_scheduler (id INTEGER PRIMARY KEY AUTOINCREMENT, priority_level TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
-		`CREATE TABLE activation_rules_mirror (id INTEGER PRIMARY KEY AUTOINCREMENT, rule_id TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE transaction_templates_ext (id INTEGER PRIMARY KEY AUTOINCREMENT, template_name TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE distributed_locks (id INTEGER PRIMARY KEY AUTOINCREMENT, lock_name TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE multi_agent_coordination (id INTEGER PRIMARY KEY AUTOINCREMENT, rule_id TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
@@ -232,16 +230,9 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB, docs map[string]ma
 			return err
 		}
 	}
-	for _, rule := range runtimeSliceOfMaps(activationRules["rules"]) {
-		activation := runtimeMap(rule["activation"])
-		load := runtimeMap(rule["load"])
-		if _, err := db.Exec(`INSERT INTO activation_rules (rule_id, description, activation_when, load_strategy, load_priority, load_estimated_tokens, load_source, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-			runtimeString(rule["rule_id"]), runtimeString(rule["description"]), runtimeJSON(activation["when"]), runtimeDefaultString(load["strategy"], "lazy"), runtimeDefaultString(load["priority"], "P2"), runtimeInt(load["estimated_tokens"]), runtimeString(load["source"]), runtimeJSON(rule["metadata"]),
-		); err != nil {
-			return err
-		}
+	if err := insertRuntimeSourceFile(db, "runtime/router/activation-rules.yaml", "core_bootstrap_rules", "core_bootstrap_order_config"); err != nil {
+		return err
 	}
-
 	discoveryCheckpoints, err := runtimeCanonicalDocument(docs, "runtime/discovery/capability-checkpoints.yaml")
 	if err != nil {
 		return err
@@ -329,7 +320,6 @@ func runtimeConfigMappings() []runtimeConfigMapping {
 		{"runtime/recovery/phase-reconciliation.yaml", "phase_reconciliation", "procedure_id", "reconciliation_procedures", []string{"name", "id"}},
 		{"runtime/scheduler/execution-queue.yaml", "execution_queue", "queue_name", "queue_structure", []string{"name", "id"}},
 		{"runtime/scheduler/priority-scheduler.yaml", "priority_scheduler", "priority_level", "levels", []string{"name", "level"}},
-		{"runtime/router/activation-rules.yaml", "activation_rules_mirror", "rule_id", "rules", []string{"rule_id", "name"}},
 		{"runtime/transactions/transaction-machine.yaml", "transaction_templates_ext", "template_name", "transaction_templates", []string{"id", "name"}},
 	}
 }

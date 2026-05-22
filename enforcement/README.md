@@ -52,7 +52,7 @@
 
 ## Executable YAML Contracts
 
-所有 active enforcement rule 都有 companion YAML contract，供 agent 先讀結構化 activation、required sources、steps、gates、failure modes 與 final status requirements；Markdown 保留完整說明與維護脈絡。Runtime `activation_rules` 不再維護 enforcement activation rows，避免與 owner-layer contract 雙寫。
+所有 active enforcement rule 都有 companion YAML contract，供 agent 先讀結構化 activation、required sources、steps、gates、failure modes 與 final status requirements；Markdown 保留完整說明與維護脈絡。Runtime 不再維護 `activation_rules` / `activation_rules_mirror` tables，避免與 owner-layer contract 雙寫。
 
 | Rule | Contract | 用途 |
 | --- | --- | --- |

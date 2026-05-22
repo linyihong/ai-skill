@@ -1,9 +1,9 @@
 # Activation Table（Situation → Activated Rules）
 
 本表提供人類可讀的 activation 對照，涵蓋所有常見情境。
-程式化 enforcement activation 由 owner-layer executable YAML contracts 負責，投影到 `runtime/runtime.db generated_surfaces`。`activation_rules` / `activation_rules_mirror` 保留為 runtime 相容 table；目前不再維護 enforcement rule activation rows。
+程式化 enforcement activation 由 owner-layer executable YAML contracts 負責，投影到 `runtime/runtime.db generated_surfaces`。舊 `activation_rules` / `activation_rules_mirror` tables 已移除，不再維護 enforcement rule activation rows。
 
-`activation_rules` 是 lookup/index，不是 enforcement rule body。所有 enforcement rule 已有 owner-layer executable contract 時，agent 應先讀該 contract，再讀 companion Markdown；activation table 只保留人類導讀。YAML placement 的 canonical policy 見 [`../../governance/lifecycle/executable-contract-boundary.md`](../../governance/lifecycle/executable-contract-boundary.md)。
+所有 enforcement rule 已有 owner-layer executable contract 時，agent 應先讀該 contract，再讀 companion Markdown；本表只保留人類導讀。YAML placement 的 canonical policy 見 [`../../governance/lifecycle/executable-contract-boundary.md`](../../governance/lifecycle/executable-contract-boundary.md)。
 
 ## 通用原則
 
@@ -11,11 +11,11 @@
 |---------|------|---------|
 | **Core Bootstrap**（永遠 preload） | rule-weight, dependency-reading, conversation-goal-ledger | Session 啟動時自動載入，~800 tokens |
 | **Contract-backed activation** | `enforcement/*.yaml` executable contracts | 依各 contract 的 `activation` 欄位判斷，投影於 `generated_surfaces` |
-| **Runtime compatibility table** | `activation_rules` / `activation_rules_mirror` | 保留 schema 與舊查詢相容；不維護 enforcement activation rows |
+| **Core bootstrap order** | `core_bootstrap_rules` | 只保存 core bootstrap 載入順序 |
 
 ## Contract-backed enforcement activations
 
-以下規則已由 owner-layer executable YAML contract 接管 activation，不再維護於 `activation_rules`，避免 runtime lookup 與 enforcement contract 雙寫：
+以下規則已由 owner-layer executable YAML contract 接管 activation，不再維護 runtime lookup table，避免 runtime 與 enforcement contract 雙寫：
 
 | Contract | Activation source |
 | --- | --- |
@@ -106,6 +106,6 @@
 ## 驗證
 
 - 每個 enforcement activation 情境至少對應一個 contract 的 `activation` 欄位
-- `activation_rules` 不維護 enforcement activation rows
+- 舊 `activation_rules` / `activation_rules_mirror` tables 不再存在
 - Contract-backed enforcement activation 不在 runtime lookup 維護第二份 rule body
 - Core Bootstrap 3 條規則不在此表（永遠 preload）

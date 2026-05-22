@@ -1,7 +1,7 @@
 # Workflow Activation Scenario
 # 測試 AI 在處理到一半發現需要開發時，是否能正確載入 software-delivery workflow
-# 來源 activation rule:
-#   - runtime/runtime.db (workflow.software-delivery)
+# 來源 activation route:
+#   - knowledge/runtime/routing-registry.yaml (route.workflow.software-delivery)
 
 id: workflow-activation-v1
 domain: app-dev
@@ -21,7 +21,7 @@ given:
   constraints:
     - 目前 session 已載入 Core Bootstrap
     - 尚未載入 software-delivery workflow
-    - activation-rules.yaml 可用於判斷
+    - routing-registry.yaml 的 workflow activation_triggers 可用於判斷
 
 when:
   action: detect_workflow_switch
@@ -31,8 +31,8 @@ then:
     primary: activate_software_delivery_workflow
     steps:
       - 偵測到 task_intent 包含「實作」「寫程式」等開發相關詞彙
-      - 查詢 activation-rules.yaml 的 workflow.software-delivery rule
-      - 比對 task_intent 或 user_signal 符合 activation 條件
+      - 查詢 routing-registry.yaml 的 route.workflow.software-delivery
+      - 比對 task_intent 或 user_signal 符合 activation_triggers
       - 載入 workflow/software-delivery/execution-flow.md
       - 先讀 knowledge/summaries/development-guidance.md（摘要）
       - 依 execution-flow.md 的 Step 1（Start From Evidence）開始

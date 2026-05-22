@@ -12,7 +12,7 @@ At session start or when taking over a task, load the **Core Bootstrap** (3 rule
 1. Read [CORE_BOOTSTRAP.md](../../CORE_BOOTSTRAP.md) — 3 core rules: `rule-weight.md`, `dependency-reading.md`, `conversation-goal-ledger.md`
 2. Read [README.md](../../README.md) — OS layout & quickstart
 3. Match task intent against [routing-registry.yaml](../../knowledge/runtime/routing-registry.yaml) to find the relevant route
-4. Check [runtime/runtime.db](../../runtime/runtime.db) (`activation_rules` / `activation_rules_mirror`) for which lazy-load rules to activate
+4. Check contract-backed activation: [enforcement/*.yaml](../../enforcement/) executable contracts and [routing-registry.yaml](../../knowledge/runtime/routing-registry.yaml)
 5. Load Runtime Phase initialization from [runtime/runtime.db](../../runtime/runtime.db):
    - `phase_machine` / `phases` — current phase state
    - `obligation_ledger` / `obligations` — phase obligations

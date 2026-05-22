@@ -6,7 +6,7 @@
     "core": "CORE_BOOTSTRAP.md",
     "layout": "README.md",
     "skill_index": "knowledge/runtime/routing-registry.yaml",
-    "activation_rules": "runtime/runtime.db"
+    "contract_activation": "runtime/runtime.db generated_surfaces"
   },
 
   "reference": {

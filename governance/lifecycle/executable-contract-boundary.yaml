@@ -37,12 +37,12 @@ boundary_rules:
       inventory: governance/lifecycle/executable-contract-inventory.yaml
       runtime_boundary: runtime/README.md
   activation_lookup:
-    rule: activation_rules_is_lookup_not_rule_body
-    description: runtime.db activation_rules 可以路由 lazy-load triggers；但當 owner-layer contract 存在時，executable steps、gates、failure modes 與 final report requirements 屬於該 contract。
+    rule: contract_backed_activation_replaces_activation_rules_tables
+    description: owner-layer executable YAML contract 定義 activation；runtime.db 只保存 generated_surfaces projection，不再維護 activation_rules / activation_rules_mirror tables。
     contract_first_when:
       - owner_layer_executable_contract_exists
       - contract_contains_activation
-    transition_exception: 尚未有 executable contract 時，activation_rules 可暫時指向 Markdown；YAML promotion 後必須改為 contract-first 或 compiler-derived。
+    transition_exception: 若未來新增非 enforcement activation lookup，必須先建立 owner-layer contract 或明確 governance exception，不得恢復雙寫。
 
 yaml_required_when:
   - ordered_steps
@@ -68,7 +68,7 @@ placement:
   enforcement:
     contract_location: enforcement/**/*.yaml
     runtime_projection: required_when_execution_affecting
-    activation_rule_boundary: activation_rules 是 lookup / index；當 contract 存在時，executable enforcement semantics 屬於 enforcement/*.yaml。
+    activation_rule_boundary: executable enforcement semantics 屬於 enforcement/*.yaml；runtime 只保存 generated_surfaces projection。
   workflow:
     contract_location: workflow/**/*.yaml
     runtime_projection: required_when_execution_affecting

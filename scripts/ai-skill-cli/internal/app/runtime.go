@@ -1299,7 +1299,7 @@ func nativeRuntimeIndexGitIgnoreCheck(repo string, path string, git string) Chec
 var nativeRuntimeRequiredTables = []string{
 	"phases", "phase_transitions", "obligations", "gates",
 	"transaction_states", "transaction_transitions", "transaction_rules", "transaction_templates",
-	"activation_rules", "core_bootstrap_rules",
+	"core_bootstrap_rules",
 	"discovery_checkpoints", "discovery_search_strategy",
 	"decision_recording", "runtime_config_documents", "runtime_config_projections",
 	"runtime_source_files", "generated_surfaces", "compiler_metadata",
@@ -1309,14 +1309,14 @@ var nativeRuntimeRequiredTables = []string{
 	"phase_machine", "pipeline_context_flow", "guard_chain", "relevance_engine",
 	"session_lifecycle", "prompt_artifact_templates", "prompt_composition_rules",
 	"recovery_strategies", "state_repair", "obligation_rebuild", "phase_reconciliation",
-	"execution_queue", "priority_scheduler", "activation_rules_mirror",
+	"execution_queue", "priority_scheduler",
 	"transaction_templates_ext", "distributed_locks", "multi_agent_coordination",
 	"async_job_lifecycle", "capability_checkpoints",
 	"compiler_rules",
 }
 
 var nativeRuntimeMinimumRows = map[string]int{
-	"phases": 8, "obligations": 15, "gates": 15, "activation_rules": 0,
+	"phases": 8, "obligations": 15, "gates": 15,
 	"core_bootstrap_rules": 2, "discovery_checkpoints": 3, "compiler_metadata": 2,
 	"decision_recording": 1, "runtime_config_documents": 30, "runtime_config_projections": 30,
 	"runtime_source_files": 30, "runtime_budget": 1, "context_ttl_policy": 1, "circuit_breaker": 1,
@@ -1327,8 +1327,8 @@ var nativeRuntimeMinimumRows = map[string]int{
 	"session_lifecycle": 1, "prompt_artifact_templates": 1, "prompt_composition_rules": 1,
 	"recovery_strategies": 1, "state_repair": 1, "obligation_rebuild": 1,
 	"phase_reconciliation": 1, "execution_queue": 1, "priority_scheduler": 1,
-	"activation_rules_mirror": 1, "transaction_templates_ext": 1,
-	"distributed_locks": 1, "multi_agent_coordination": 1, "async_job_lifecycle": 1,
+	"transaction_templates_ext": 1,
+	"distributed_locks":         1, "multi_agent_coordination": 1, "async_job_lifecycle": 1,
 	"capability_checkpoints": 1, "compiler_rules": 1,
 }
 
@@ -1336,7 +1336,6 @@ var nativeRuntimeJSONColumns = map[string][]string{
 	"phases":                []string{"entry_conditions", "allowed_actions", "forbidden_actions", "blocking_gates", "obligations", "phase_transition_triggers"},
 	"obligations":           []string{"verification", "depends_on", "linked_gates"},
 	"transaction_states":    []string{"entry_conditions", "allowed_actions", "forbidden_actions", "blocking_gates"},
-	"activation_rules":      []string{"activation_when"},
 	"discovery_checkpoints": []string{"discovery_targets"},
 }
 

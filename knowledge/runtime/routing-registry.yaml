@@ -240,33 +240,6 @@ records:
       compression_level: index-only
       reason: Routing registry 輕量（~300 tokens），可在整個對話中 cache。
 
-  - id: route.runtime.activation-rules
-    task_intent: 決定哪些 lazy-load rules 需要 activate
-    primary_source: runtime/runtime.db
-    required_dependencies:
-      - CORE_BOOTSTRAP.md
-      - knowledge/runtime/routing-registry.yaml
-    candidate_sources:
-      - runtime/runtime.db
-      - knowledge/runtime/README.md
-    source_of_truth_gate: activation-rules-active
-    ranking_reason: Activation rules 定義每個 lazy-load rule 的觸發條件，Agent 依目前 task 比對後決定載入哪些規則。
-    validation_signal: 目前 task 已比對 activation-rules.yaml，符合條件的 rules 已載入，不符合的已 deferred。
-    metadata:
-      priority: P1
-      confidence: medium
-      context_cost:
-        estimated_tokens: 500
-        load_strategy: preload
-        cacheable: true
-        ttl:
-          conversation: true
-      compatibility_state: new-layer-promoted
-    model:
-      profile: small
-      compression_level: index-only
-      reason: Activation rules 輕量（~500 tokens），可在整個對話中 cache。
-
   - id: route.runtime.context-ttl
     task_intent: 管理 context 生命週期，防止 token 膨脹
     primary_source: governance/ai-runtime-governance/context-attention-governance.md

@@ -47,8 +47,8 @@ edges:
     validation: ttl-policy.yaml 定義 TTL 類型與 prune 策略。
   - type: related_to
     target: runtime/runtime.db
-    reason: Activation rules 在 pipeline 的 routing stage 中被檢查。
-    validation: activation-rules.yaml 定義 lazy-load rules 的觸發條件。
+    reason: Contract-backed activation surfaces 在 pipeline 的 routing stage 中被檢查。
+    validation: generated_surfaces 中的 owner-layer executable contracts 定義 activation 條件。
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
     reason: Registry 應提供 route.runtime.pipeline record。

@@ -52,7 +52,7 @@ Runtime compiler 會把這類 contract 投影到 `runtime.db` 的 `generated_sur
 
 | 領域 | 位置 | 用途 |
 |--------|------|-------------|
-| Activation | `activation_rules`, `activation_rules_mirror`, `core_bootstrap_rules` | lazy-load rule 與 activation condition |
+| Activation | `core_bootstrap_rules` + `generated_surfaces` 中的 owner-layer executable contracts | Core bootstrap order 與 contract-backed activation |
 | Routing | `runtime.db` activation/runtime config tables | runtime routing support；knowledge routing 仍在 `knowledge/runtime/` |
 | Discovery | `discovery_checkpoints`, `capability_checkpoints` | phase-aware capability discovery checkpoint |
 | Phases | `phases`, `phase_machine`, `phase_transitions` | execution phase state machine |
@@ -92,7 +92,6 @@ Runtime recovery 的 machine-readable source 已收斂到 `runtime/runtime.db` c
 
 ## 主要入口引用
 
-- [`route.runtime.activation-rules`](../knowledge/runtime/routing-registry.yaml:77)
 - [`route.runtime.context-ttl`](../knowledge/runtime/routing-registry.yaml:102)
 - [`route.runtime.context-loading`](../knowledge/runtime/routing-registry.yaml:161)
 - [`route.metadata.knowledge-atom-schema`](../knowledge/runtime/routing-registry.yaml:191)
@@ -125,7 +124,7 @@ Runtime 使用兩種 SQLite database，生命週期不同：
 | `obligations`, `obligation_ledger` | `runtime_config_documents` | 每個 phase 的 duties 與 verification criteria |
 | `gates`, `blocking_gates` | `runtime_config_documents` | phase transition prerequisites 與 failure actions |
 | `transaction_states`, `transaction_transitions`, `transaction_rules`, `transaction_templates`, `transaction_templates_ext` | `runtime_config_documents` | transaction state、rules、templates |
-| `activation_rules`, `activation_rules_mirror`, `core_bootstrap_rules` | `runtime_config_documents` | 相容 lookup tables 與 core bootstrap order；enforcement activation 由 owner-layer executable contracts 管理，不在此維護第二份 rule body |
+| `core_bootstrap_rules` | `runtime_config_documents` | Core Bootstrap 載入順序；enforcement activation 由 owner-layer executable contracts 投影到 `generated_surfaces` 管理 |
 | `discovery_checkpoints`, `discovery_search_strategy`, `capability_checkpoints` | `runtime_config_documents` | phase-aware capability discovery checkpoints |
 | `generated_surfaces` | owner-layer executable contracts and deterministic source mappings | 保存 `governance/`、`enforcement/`、`workflow/`、`ai-tools/` 等 source 的 runtime projection；不取代 owner-layer source |
 | `compiler_metadata` | auto-generated | compiler version、compiled timestamp、schema version |

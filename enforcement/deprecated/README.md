@@ -30,7 +30,7 @@ Enforcement rule 的 deprecation 分為 4 個階段：
    > 請參閱 [`enforcement/<new-rule>.md`](../<new-rule>.md) 取代。
    ```
 
-3. **更新 activation-rules.yaml**：將該 rule 從 `rules` 列表中移除，或標註 `status: deprecated`。
+3. **更新 executable contract**：若該 rule 有 `enforcement/<rule>.yaml`，將 contract 標註為 deprecated，或移除對應 runtime projection。
 
 ### 階段 2：公告（Announce）
 
@@ -38,7 +38,7 @@ Enforcement rule 的 deprecation 分為 4 個階段：
 
 1. **更新 `enforcement/README.md`**：在規則索引中標記該規則為 deprecated。
 2. **更新 `knowledge/graphs/rules/`**：在 graph 記錄中標記該 rule 的 `status` 為 `deprecated`。
-3. **更新 `runtime/runtime.db`**：移除或註解掉 deprecated rule。
+3. **更新 `runtime/runtime.db`**：重新 compile runtime，確認 deprecated contract 不再投影成 active surface。
 4. **檢查 linked updates**：執行 `enforcement/linked-updates.md` 的連動更新檢查。
 
 ### 階段 3：緩衝期（Buffer）
@@ -100,7 +100,7 @@ active ──→ deprecated ──→ removed
 
 | 時機 | 動作 |
 |------|------|
-| 標記 deprecation 時 | 更新 metadata、原始檔案 notice、activation-rules.yaml |
+| 標記 deprecation 時 | 更新 metadata、原始檔案 notice、executable contract |
 | 緩衝期內 | 逐步更新所有外部引用指向新規則 |
 | 搬移至 deprecated/ 時 | 移動檔案、建立 redirect notice、更新所有索引 |
 | 最終移除時 | 刪除 redirect notice、確認無任何外部引用指向舊路徑 |

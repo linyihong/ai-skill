@@ -6,9 +6,9 @@
 | Source path | `plans/archived/2026-05-12-1101-context-cost-optimization.md` |
 | Lifecycle | `validated` |
 | Summary | Token 成本優化規劃。Phase 1（立即省錢）：Bootstrap 極小化（~800 tokens）、README 拆分、Rule lazy-load、Summary layer。Phase 2（架構升級）：Runtime Context Router、Context Cost Metadata、Skill Index、Context TTL。Phase 2.5（規範層已實作）：Provider Prompt Cache Alignment，定義 stable prefix / volatile suffix 與 provider cache metadata。Phase 3（長期）：Semantic Retrieval、Episodic Memory、Multi-model Routing。 |
-| When to read | 需要了解 token 成本優化策略、Bootstrap 拆分原則、或 lazy-load activation model 時。 |
+| When to read | 需要了解 token 成本優化策略、Bootstrap 拆分原則、或 contract-backed activation model 時。 |
 | Do not use for | 不可取代 plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md 的完整架構分層規劃。不可用於日常 skill 操作。 |
 | Context cost | ~350 tokens |
 | Estimated full cost | ~4500 tokens |
-| Validation signal | Plan 中的 migration steps 已部分完成（CORE_BOOTSTRAP、routing registry / workflow index、activation-rules、ttl-policy、prompt-cache playbook）。 |
+| Validation signal | Plan 中的 migration steps 已完成或遷移（CORE_BOOTSTRAP、routing registry / workflow index、contract-backed activation、ttl-policy、prompt-cache playbook）。 |
 | Last checked | 2026-05-19 |

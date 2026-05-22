@@ -2,7 +2,7 @@
 
 ## Problem
 
-現有系統的 lazy-loading 機制（[`activation-rules.yaml`](../../runtime/runtime.db) + [`routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml)）非常有效——它確保 agent 只載入需要的知識。但這也帶來一個根本問題：
+現有系統的 contract-backed activation（owner-layer executable YAML contracts + [`routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml)）非常有效——它確保 agent 只載入需要的知識。但這也帶來一個根本問題：
 
 > **Agent 不知道自己不知道什麼。**
 
@@ -12,15 +12,15 @@
 
 Discovery Runtime 在每個 phase 的關鍵時機插入**主動探索檢查點**，讓 agent 在執行前搜尋可能相關但尚未載入的能力。
 
-### 與 Activation Rules 的互補關係
+### 與 Contract Activation 的互補關係
 
-| 面向 | Activation Rules（被動） | Discovery Runtime（主動） |
+| 面向 | Contract Activation（被動） | Discovery Runtime（主動） |
 |------|--------------------------|--------------------------|
 | 觸發方式 | 根據已知條件（file_change、task_intent、user_signal） | 根據 phase 時機（before_execution、before_validation） |
-| 搜尋範圍 | 已知的 activation rules（14 條） | 未知的能力（workflow、intelligence、validation） |
+| 搜尋範圍 | 已知的 executable contract activation | 未知的能力（workflow、intelligence、validation） |
 | 載入策略 | 精準載入（精確匹配條件） | 廣泛搜尋（探索可能相關） |
 | 失敗處理 | block 或 warn | warn + continue（不阻擋流程） |
-| 知識來源 | activation-rules.yaml | knowledge indexes、graphs、routing registry |
+| 知識來源 | owner-layer executable YAML contracts / generated_surfaces | knowledge indexes、graphs、routing registry |
 
 ### 與 Knowledge Graphs 的整合
 

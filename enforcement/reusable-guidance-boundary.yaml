@@ -55,7 +55,7 @@ required_evidence:
   - gates passed or blocker/recovery was reported
 
 success_criteria:
-  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - contract activation is evaluated from this YAML, not duplicated in runtime lookup tables
   - agent can name required sources, steps, gates, and failure modes before claiming compliance
 
 failure_modes:
