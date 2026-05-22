@@ -160,7 +160,7 @@ final_status_report: []
 
 ### Phase 2：Conversation / Tool / Routing Contracts
 
-- [ ] YAML 化 `conversation-goal-ledger` 的 goal lifecycle、lock decision、completion deletion gate。
+- [x] YAML 化 `conversation-goal-ledger` 的 goal lifecycle、lock decision、completion deletion gate。
 - [ ] 為 `ai-tools/agent/codex.md`、`claude.md`、`cursor.md`、`roo.md` 建立 adapter contract，統一 bootstrap required reads 與 forbidden duplicated rules。
 - [ ] 將 `knowledge/runtime/routing-registry.yaml` 的 route activation 與 source-of-truth gate 檢查接入 validation。
 

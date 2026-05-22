@@ -112,12 +112,12 @@ inventory:
       contract: enforcement/evidence-hierarchy.yaml
       state: contract_exists
       reason: Evidence precedence, confidence threshold, escalation, and autonomy downgrade now have an owner-layer executable contract.
+    - source: enforcement/conversation-goal-ledger.md
+      contract: enforcement/conversation-goal-ledger.yaml
+      state: contract_exists
+      reason: Goal lifecycle, owner/lock, handoff, and completion deletion gates now have an owner-layer executable contract.
 
   contract_required:
-    - source: enforcement/conversation-goal-ledger.md
-      suggested_contract: enforcement/conversation-goal-ledger.yaml
-      priority: P1
-      reason: Goal lifecycle, owner/lock, handoff, and completion deletion gates need structure for multi-step agent work.
     - source: governance/lifecycle/directory-structure-governance.md
       suggested_contract: governance/lifecycle/directory-structure-governance.yaml
       priority: P2

@@ -57,6 +57,7 @@
 | Rule | Contract | 用途 |
 | --- | --- | --- |
 | [`authorization-scope.md`](authorization-scope.md) | [`authorization-scope.yaml`](authorization-scope.yaml) | 授權範圍、第三方資料與可重用證據安全 gate。 |
+| [`conversation-goal-ledger.md`](conversation-goal-ledger.md) | [`conversation-goal-ledger.yaml`](conversation-goal-ledger.yaml) | Active goal lifecycle、owner/lock、handoff、completion/delete gate。 |
 | [`dependency-reading.md`](dependency-reading.md) | [`dependency-reading.yaml`](dependency-reading.yaml) | 依賴讀取 ledger、source-of-truth miss recovery、writeback final status gate。 |
 | [`evidence-hierarchy.md`](evidence-hierarchy.md) | [`evidence-hierarchy.yaml`](evidence-hierarchy.yaml) | Evidence quality、claim scope、confidence integrity 與 autonomy downgrade gate。 |
 | [`goal-action-validation.md`](goal-action-validation.md) | [`goal-action-validation.yaml`](goal-action-validation.yaml) | 重要工作單元的目標、執行、驗證與 completion claim gate。 |

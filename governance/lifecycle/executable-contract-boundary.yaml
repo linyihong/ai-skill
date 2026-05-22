@@ -86,6 +86,9 @@ initial_inventory:
     - source: enforcement/evidence-hierarchy.md
       contract: enforcement/evidence-hierarchy.yaml
       reason: Evidence precedence, claim scope, confidence integrity, and escalation conditions are agent behavior gates.
+    - source: enforcement/conversation-goal-ledger.md
+      contract: enforcement/conversation-goal-ledger.yaml
+      reason: Active goal lifecycle, owner/lock, handoff, and completion deletion gates.
   candidates:
     - source: enforcement/decision-efficiency.md
       suggested_contract: enforcement/decision-efficiency.yaml

@@ -1,0 +1,151 @@
+schema_version: executable-contract/v1
+id: enforcement.conversation-goal-ledger.contract
+title: Conversation goal ledger executable contract
+owner_layer: enforcement
+source_markdown: enforcement/conversation-goal-ledger.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.conversation_goal_ledger.contract
+  surface_type: executable_yaml_contract
+  execution_scope: agent_behavior
+
+activation:
+  events:
+    - session_start
+    - multi_step_task_started
+    - user_requested_continue
+    - todo_list_created_or_resumed
+    - dirty_working_tree_detected
+    - context_compaction_or_handoff_expected
+    - user_redirected_goal
+    - multi_agent_overlap_detected
+  required_when:
+    - Work spans more than one action, tool call, goal, or completion criterion.
+    - The user asks to continue prior work.
+    - A tool-level todo list exists or is resumed.
+    - The active project has modified, staged, untracked, ahead, behind, or otherwise pending state and the agent plans to continue work.
+    - The task may be interrupted, handed off, parallelized, paused, blocked, or superseded.
+
+required_sources:
+  - enforcement/conversation-goal-ledger.md
+  - enforcement/dependency-reading.md
+  - enforcement/goal-action-validation.md
+  - enforcement/document-todo-list.md
+
+steps:
+  - id: check_existing_goal_state
+    order: 1
+    action: Check or initialize project-local `.agent-goals/` state before substantive multi-step work.
+    outputs:
+      - active_goal_status
+      - owner_lock_state
+      - parallelization_mode
+  - id: compare_latest_user_request
+    order: 2
+    action: Compare existing active goals with the latest user request, accepted plan, visible files, and tool todo list.
+    gates:
+      - gate.goal_ledger.latest_request_aligned
+  - id: create_or_update_goal
+    order: 3
+    action: Create or update a goal file when work is multi-step, resumable, dirty, blocked, redirected, or has active todos.
+    outputs:
+      - goal_file
+      - main_goal_table_row
+  - id: record_handoff_structure
+    order: 4
+    action: Record priority, status, owner, lock decision, parallelization, planning/todo links, missing work, decisions, next action, completion criteria, and validation.
+    gates:
+      - gate.goal_ledger.handoff_fields_complete
+  - id: coordinate_lock
+    order: 5
+    action: Use lock directories for overlapping single-owner or non-parallelizable work and stop on active conflicting locks.
+    gates:
+      - gate.goal_ledger.lock_safe
+  - id: transfer_or_supersede_goal
+    order: 6
+    action: When the user redirects work, pause or supersede the old goal and promote the new active goal.
+    required_if:
+      - user_redirected_goal
+  - id: close_and_delete_goal
+    order: 7
+    action: After completion and validation, delete the goal file and refresh the main goal table instead of archiving completed rows.
+    gates:
+      - gate.goal_ledger.completion_delete_allowed
+
+gates:
+  - id: gate.goal_ledger.latest_request_aligned
+    blocks: stale_goal_execution
+    pass_when:
+      - latest user request clearly matches the active goal
+      - or old goal is paused/superseded and new goal is promoted
+      - unrelated project or stale ledger state is not followed silently
+    fail_when:
+      - agent switches project or task because of stale `.agent-goals/` state
+  - id: gate.goal_ledger.handoff_fields_complete
+    blocks: substantive_file_edits
+    pass_when:
+      - goal has priority, status, parallelization mode, owner, owner/lock decision, source, scope, planning/todo links, open work, dependencies, next action, completion criteria, and validation
+      - missing work, decision needed, and needs strengthening are concrete or explicitly `none`
+    fail_when:
+      - tool todo list is used as a substitute for goal ledger on resumable work
+  - id: gate.goal_ledger.lock_safe
+    blocks: overlapping_edits
+    pass_when:
+      - no conflicting active lock exists
+      - or stale lock was verified inactive
+      - or user explicitly approved takeover
+    fail_when:
+      - another owner has an active lock for the same goal or shared state
+  - id: gate.goal_ledger.completion_delete_allowed
+    blocks: goal_file_deletion
+    pass_when:
+      - completion criteria are satisfied
+      - validation ran or user accepted the result
+      - no child goal remains active, blocked, or needs-validation
+      - durable roadmap / lifecycle / governance state has been written to formal planning docs or issue tracker
+      - final answer or handoff states the outcome
+    fail_when:
+      - validation is missing
+      - durable follow-up state exists only in `.agent-goals/`
+
+required_evidence:
+  - active goal status or not-applicable reason for one-shot work
+  - owner / lock decision
+  - parallelization mode and overlap risk
+  - planning or TodoWrite links when present
+  - completion criteria and validation status
+  - deletion or needs-validation decision at closeout
+
+success_criteria:
+  - Resumable user-visible work has project-local goal state before substantive edits.
+  - Latest user request controls task selection; stale ledger rows cannot silently redirect work.
+  - Multi-agent overlap is blocked or explicitly authorized.
+  - Completed goals are deleted after validation and durable state writeback.
+  - "`.agent-goals/` remains temporary project state and is not committed as reusable knowledge."
+
+failure_modes:
+  - id: stale_goal_project_switch
+    detection: Agent follows an old ledger row that points to a different project or task than the latest user request.
+    recovery: Stop wrong work, report dirty files, update or pause stale goal, and return to the user-requested project.
+  - id: todo_replaces_goal_ledger
+    detection: Multi-step or resumable work has only tool todos and no user-visible goal state.
+    recovery: Create or update `.agent-goals/` with handoff fields and link todos.
+  - id: unsafe_parallel_edit
+    detection: Agent edits files covered by another owner, active lock, single-owner goal, or non-parallelizable workflow.
+    recovery: Stop, report lock owner/age/affected files, and ask whether to wait, take over, or split work.
+  - id: completed_goal_archived
+    detection: Completed goal remains as an active or completed archive row after validation.
+    recovery: Delete the goal file, refresh the main table, and move durable state to formal planning docs if needed.
+
+final_status_report:
+  required_fields:
+    - active_goal
+    - owner_lock_status
+    - parallelization_mode
+    - todo_or_plan_links
+    - completion_or_handoff_status
+    - deletion_or_retention_reason
