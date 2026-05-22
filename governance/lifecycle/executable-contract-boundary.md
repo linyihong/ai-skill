@@ -55,6 +55,10 @@ runtime_projection:
 
 The compiler only projects contracts that opt in with `runtime_projection.enabled: true`. This prevents ordinary metadata, graph, and validation YAML from becoming runtime noise.
 
+## Schema Rule
+
+New executable contracts should follow [`../../metadata/executable-contract-schema.md`](../../metadata/executable-contract-schema.md). Metadata YAML is not an executable contract unless it defines contract fields such as `contract_type`, `blocking_level`, `activation`, execution-bearing fields, and `runtime_projection.enabled: true`.
+
 ## Agent Rule
 
 When a Markdown file says a process must be run as a workflow, the agent must load the companion YAML contract first, then use the Markdown for explanation and maintenance context.

@@ -57,17 +57,32 @@
 
 若上述規則開始被其它 workflow 重複引用，不在本檔擴寫治理原理；回到 [`documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md) 補充 gate，workflow 只保留操作順序。
 
+## 3a. 判斷是否需要結構化流程契約
+
+其他專案不需要把所有文件都 YAML 化。寫入或整理文件時，先做以下判斷：
+
+| 文件內容 | 標準做法 |
+| --- | --- |
+| 說明、背景、決策脈絡、設計理由、操作備忘 | 保持 Markdown；可用專案既有 front-matter 或父層 README 索引。 |
+| 文件只需要人類閱讀，agent 不會反覆依它執行步驟 | 保持 Markdown，並在導航區寫清楚讀者與停止條件。 |
+| 文件定義 agent 要反覆執行的流程、runbook、release checklist、required evidence、failure action 或 blocking gate | 建立 companion YAML 或專案等價 structured contract。 |
+| 專案已有 front-matter / workflow schema | 將欄位映射到 activation、required sources、steps、gates、success criteria、failure modes、final report。 |
+
+Ai-skill 本庫的欄位語意見 [`../../metadata/executable-contract-schema.md`](../../metadata/executable-contract-schema.md)。其他專案可用自己的格式，但必須保留同等判斷語意：`contract_required`、`markdown_only` 或 `not_applicable`。
+
 ## 4. 驗證與連動
 
 - **Link**：從本檔或 `README` 出去的相對連結可點、無斷鏈。
 - **路由**：父層 README 的表格含新子檔；routing registry、workflow index 或專案內索引若有對應列，一併更新。
 - **分層**：若新增的是 why / 治理 gate，而不是操作步驟，回到 [`index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md) 或 [`documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md)，不要在 workflow 重複全文。
+- **結構化流程契約**：若 Step 3a 判定為 `contract_required`，確認 companion YAML 或等價 structured contract 已建立；若暫不建立，記錄缺口與理由。
 - **Ai-skill 本庫**：若同步規則或模板，依 [`../../enforcement/dependency-reading.md`](../../enforcement/dependency-reading.md) 與 [`../../enforcement/linked-updates.md`](../../enforcement/linked-updates.md) 走完整閉環。
 
 ## 5. 完成訊號（給 agent 自查）
 
 - [ ] 新文件有 `kind` / `audience` / `stability`（或父 README 等價欄位）。
 - [ ] 有 `index` 或導航區；長文已拆 `leaf`。
+- [ ] 已判斷 `contract_required` / `markdown_only` / `not_applicable`，必要時有 companion YAML 或等價 structured contract。
 - [ ] 無重複規範全文；斷鏈已修。
 - [ ] 本輪暫存與長期 durable 分界清楚。
 - [ ] Workflow 只保留操作步驟；可重用 why / gate 已連回 intelligence 或 governance。

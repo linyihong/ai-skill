@@ -1,6 +1,6 @@
 # Executable YAML Contract Migration Plan
 
-> **狀態**：draft
+> **狀態**：in-progress
 > **建立時間**：2026-05-22 08:55 JST
 > **目的**：把目前仍主要依賴 Markdown prose 的流程、gate、required reads、failure actions 與 final status requirements，整理成 owner-layer YAML executable contracts，讓 ChatGPT 以外的 agent 也能用結構化欄位遵守規則，並透過 `runtime/runtime.db` 的 generated surfaces 驗證是否同步。
 
@@ -137,13 +137,13 @@ final_status_report: []
 
 ### Phase 0：Schema, Validator & Inventory Contract
 
-- [ ] 定義 executable contract schema，放在 governance 或 metadata schema owner layer。
+- [x] 定義 executable contract schema，放在 governance 或 metadata schema owner layer。
 - [ ] 決定 enforcement contract 是新增 `enforcement/*.yaml`，還是升級既有 `metadata/rules/*.yaml`；預設先用 `enforcement/*.yaml`，除非 schema 能清楚區分 metadata vs executable contract。
-- [ ] 確認 runtime compiler 既有 owner-layer YAML 投影行為，補 validator / tests，而不是重複建立平行 compiler path。
-- [ ] 新增 schema completeness validation：enabled contract 必須有 `schema_version`、`contract_type`、`blocking_level`、`runtime_projection.target_key`、`activation`、`required_sources`、`gates` 或明確 not-applicable reason。
-- [ ] 新增 content assertion validation：SQLite `generated_surfaces.data` 必須包含 contract 的關鍵 gates / failure_modes / final_status_report，不只檢查 target key synced。
+- [x] 確認 runtime compiler 既有 owner-layer YAML 投影行為，補 validator / tests，而不是重複建立平行 compiler path。
+- [x] 新增 schema completeness validation：enabled contract 必須有 `schema_version`、`contract_type`、`blocking_level`、`runtime_projection.target_key`、`activation`、`required_sources`、`gates` 或明確 not-applicable reason。
+- [x] 新增 content assertion validation：SQLite `generated_surfaces.data` 必須包含 contract 的關鍵 gates / failure_modes / final_status_report，不只檢查 target key synced。
 - [ ] 依 `YAMLization Decision Standard` 盤點 system governance 與 workflow 文件，輸出 `contract_required` / `markdown_only` / `not_applicable`。
-- [ ] 新增 validation scenario：metadata YAML 不等於 executable contract，agent 必須先讀 contract。
+- [x] 新增 validation scenario：metadata YAML 不等於 executable contract，agent 必須先讀 contract。
 
 ### Phase 1：P0 / P1 Enforcement Contracts
 

@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Metadata YAML Is Not Executable Contract Scenario
+# 測試 AI 不得把 metadata/rules/*.yaml 摘要誤當成可執行流程契約。
+
+id: metadata-yaml-not-executable-contract-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: source-of-truth-miss
+  description: >
+    Agent 看到 metadata YAML 後誤以為 executable contract 已存在，
+    未檢查 contract_type、runtime_projection、steps、gates 與 generated surface。
+
+given:
+  task: update_execution_affecting_rule
+  artifacts:
+    - metadata/rules/dependency-reading.yaml
+    - enforcement/dependency-reading.md
+    - metadata/executable-contract-schema.md
+    - governance/lifecycle/executable-contract-boundary.md
+  signals:
+    - metadata YAML exists for the rule
+    - Markdown contains required reads, gates, failure actions, or final status requirements
+    - no companion executable contract with runtime_projection.enabled is present
+
+when:
+  action: decide_whether_yaml_contract_exists
+
+then:
+  expected_route:
+    primary: require_executable_contract_decision
+    steps:
+      - Read executable contract boundary and schema.
+      - Check whether YAML has contract_type, runtime_projection.enabled, activation, execution-bearing fields, and target_key.
+      - If missing, classify as metadata_only and create or record a contract_required gap.
+      - Validate projection with runtime compile / runtime validate once contract is added.
+    reject:
+      - metadata_yaml_as_contract: "把 metadata/rules/*.yaml 當作完整 executable contract"
+      - markdown_only_completion: "只更新 Markdown，未記錄 YAML contract gap"
+      - target_key_only_validation: "只查 generated_surfaces target_key，不檢查 data 內容"
+  validation:
+    - metadata YAML 與 executable contract 已明確區分
+    - contract_required / markdown_only / not_applicable 決策已記錄
+    - 若新增 contract，runtime generated surface data 已含 execution-bearing fields

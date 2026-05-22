@@ -5,6 +5,7 @@
 ## 目前入口
 
 - [`schema.md`](schema.md)：Knowledge Atom metadata schema v1，包含 required / optional fields、controlled values、YAML template 與 example atom。
+- [`executable-contract-schema.md`](executable-contract-schema.md)：owner-layer executable YAML contract 的共同欄位與 runtime projection validation 規則。
 - [`rules/`](rules/README.md)：metadata 子規則索引，連到 ranking、confidence、compatibility 與 enforcement rule metadata。
 - [`ranking/`](ranking/README.md)：用 priority、status、confidence、context cost 與 depends/conflicts 排定讀取順序。
 - [`confidence/`](confidence/README.md)：定義 low / medium / high 信心與 lifecycle state 的關係。
@@ -16,6 +17,7 @@
 ## 放什麼
 
 - Knowledge Atom schema 與 required / optional fields。
+- Executable YAML contract schema 與 metadata YAML / executable contract 的邊界。
 - Ranking、priority、confidence、stability、complexity 與 context cost 規則。
 - Compatibility、model suitability、depends、related 與 conflicts metadata。
 - Domain evidence qualification policy（authority、freshness、validity、scope、observability）。

@@ -62,6 +62,7 @@ validation/
 - `failure-derived/governance-minimality-small-task-v1.yaml` — 小型低風險任務不應啟動過重 governance chain。
 - `failure-derived/tier3-does-not-block-tier0-tier2-v1.yaml` — Tier 3 cognitive optimization 不得阻塞 Tier 0-2。
 - `failure-derived/meta-governance-no-runtime-promotion-v1.yaml` — 無具體 validated failure 時 meta-governance 不 promotion 到 runtime。
+- `failure-derived/metadata-yaml-not-executable-contract-v1.yaml` — metadata YAML 不得被誤判為 executable contract；必須檢查 contract fields 與 runtime projection data。
 
 ## Scenario 格式
 

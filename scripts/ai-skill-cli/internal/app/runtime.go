@@ -211,6 +211,7 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 	}
 
 	result.PlannedActions = append(result.PlannedActions, "run native runtime DB validation")
+	result.PlannedActions = append(result.PlannedActions, "validate owner-layer executable YAML contract projections")
 	result.PlannedActions = append(result.PlannedActions, "validate SQLite canonical runtime documents")
 	result.PlannedActions = append(result.PlannedActions, "run native runtime SQLite index validation")
 	result.PlannedActions = append(result.PlannedActions, "run native knowledge runtime validation")
@@ -226,6 +227,15 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 		result.Status = "blocked"
 		result.ExitCode = ExitValidationFailed
 		result.Error = &CommandError{Code: "runtime_db_native_failed", Message: nativeDBCheck.Message, Remediation: "Fix runtime/runtime.db canonical documents or run runtime compile."}
+		return result
+	}
+
+	executableContractsCheck := nativeExecutableContractsValidation(repo, filepath.Join(repo, "runtime", "runtime.db"))
+	result.Checks = append(result.Checks, executableContractsCheck)
+	if executableContractsCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "executable_contracts_failed", Message: executableContractsCheck.Message, Remediation: "Fix owner-layer YAML contracts or run runtime compile."}
 		return result
 	}
 
@@ -1270,6 +1280,169 @@ func nativeRuntimeDBValidation(path string) Check {
 		message += "; warning: " + warning
 	}
 	return Check{Name: "runtime_db_native", Status: "ok", Message: message}
+}
+
+func nativeExecutableContractsValidation(repo string, dbPath string) Check {
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return Check{Name: "executable_contracts", Status: "failed", Message: err.Error()}
+	}
+	defer db.Close()
+
+	if err := nativeExecutableContractsCheck(repo, db); err != nil {
+		return Check{Name: "executable_contracts", Status: "failed", Message: err.Error()}
+	}
+	return Check{Name: "executable_contracts", Status: "ok", Message: "owner-layer executable YAML contracts are projected and contain execution-bearing data"}
+}
+
+func nativeExecutableContractsCheck(repo string, db *sql.DB) error {
+	sourceRoots := []string{
+		"governance",
+		"enforcement",
+		"workflow",
+		"ai-tools",
+		filepath.ToSlash(filepath.Join("metadata", "rules")),
+	}
+	checked := 0
+	for _, root := range sourceRoots {
+		rootPath := filepath.Join(repo, filepath.FromSlash(root))
+		if _, err := os.Stat(rootPath); err != nil {
+			continue
+		}
+		if err := filepath.WalkDir(rootPath, func(path string, entry os.DirEntry, walkErr error) error {
+			if walkErr != nil {
+				return walkErr
+			}
+			if entry.IsDir() || filepath.Ext(path) != ".yaml" {
+				return nil
+			}
+			rel, err := filepath.Rel(repo, path)
+			if err != nil {
+				return err
+			}
+			rel = filepath.ToSlash(rel)
+			content, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			var parsed map[string]any
+			if err := yaml.Unmarshal(content, &parsed); err != nil {
+				return fmt.Errorf("%s: %w", rel, err)
+			}
+			contract := runtimeMap(runtimeNormalizeYAML(parsed))
+			projection := runtimeMap(contract["runtime_projection"])
+			if !runtimeBool(projection["enabled"]) {
+				return nil
+			}
+			checked++
+			return nativeExecutableContractProjected(repo, db, rel, contract, projection)
+		}); err != nil {
+			return err
+		}
+	}
+	if checked == 0 {
+		return fmt.Errorf("no owner-layer executable YAML contracts found")
+	}
+	return nil
+}
+
+func nativeExecutableContractProjected(repo string, db *sql.DB, rel string, contract map[string]any, projection map[string]any) error {
+	for _, field := range []string{"id", "owner_layer", "source_markdown", "status"} {
+		if strings.TrimSpace(runtimeString(contract[field])) == "" {
+			return fmt.Errorf("%s missing required field %s", rel, field)
+		}
+	}
+	targetKey := runtimeDefaultString(projection["target_key"], runtimeString(contract["id"]))
+	if strings.TrimSpace(targetKey) == "" {
+		return fmt.Errorf("%s missing runtime_projection.target_key", rel)
+	}
+	sourceMarkdown := runtimeString(contract["source_markdown"])
+	if sourceMarkdown != "" {
+		if _, err := os.Stat(filepath.Join(repo, filepath.FromSlash(sourceMarkdown))); err != nil {
+			return fmt.Errorf("%s source_markdown missing: %s", rel, sourceMarkdown)
+		}
+	}
+	if runtimeString(contract["schema_version"]) == "executable-contract/v1" {
+		if err := nativeExecutableContractV1Completeness(rel, contract); err != nil {
+			return err
+		}
+	}
+	var status string
+	var data string
+	err := db.QueryRow(`SELECT status, data FROM generated_surfaces WHERE source_path = ? AND target_key = ?`, rel, targetKey).Scan(&status, &data)
+	if err != nil {
+		return fmt.Errorf("%s not projected to generated_surfaces target_key=%s: %w", rel, targetKey, err)
+	}
+	if status != "synced" {
+		return fmt.Errorf("%s generated surface status is %s, expected synced", rel, status)
+	}
+	var projected map[string]any
+	if err := json.Unmarshal([]byte(data), &projected); err != nil {
+		return fmt.Errorf("%s generated surface data is invalid JSON: %w", rel, err)
+	}
+	projected = runtimeMap(projected)
+	if runtimeString(projected["id"]) != runtimeString(contract["id"]) {
+		return fmt.Errorf("%s generated surface id mismatch", rel)
+	}
+	if len(runtimeMap(projected["runtime_projection"])) == 0 {
+		return fmt.Errorf("%s generated surface missing runtime_projection data", rel)
+	}
+	if !nativeHasExecutionBearingField(projected) {
+		return fmt.Errorf("%s generated surface missing execution-bearing fields", rel)
+	}
+	return nil
+}
+
+func nativeExecutableContractV1Completeness(rel string, contract map[string]any) error {
+	for _, field := range []string{"title", "contract_type", "blocking_level", "activation"} {
+		value := contract[field]
+		if strings.TrimSpace(runtimeString(value)) == "" && len(runtimeMap(value)) == 0 {
+			return fmt.Errorf("%s executable-contract/v1 missing required field %s", rel, field)
+		}
+	}
+	if !nativeHasExecutionBearingField(contract) {
+		return fmt.Errorf("%s executable-contract/v1 missing execution-bearing fields", rel)
+	}
+	return nil
+}
+
+func nativeHasExecutionBearingField(contract map[string]any) bool {
+	for _, field := range []string{
+		"steps",
+		"gates",
+		"required_sources",
+		"required_evidence",
+		"success_criteria",
+		"failure_modes",
+		"final_status_report",
+		"boundary_rules",
+		"promotion_targets",
+		"execution_rules",
+		"yaml_required_when",
+		"blocking_rules",
+		"exit_gate",
+		"required_status_evidence",
+	} {
+		if value, ok := contract[field]; ok && nativeRuntimeValuePresent(value) {
+			return true
+		}
+	}
+	return false
+}
+
+func nativeRuntimeValuePresent(value any) bool {
+	switch typed := value.(type) {
+	case nil:
+		return false
+	case string:
+		return strings.TrimSpace(typed) != ""
+	case []any:
+		return len(typed) > 0
+	case map[string]any:
+		return len(typed) > 0
+	default:
+		return true
+	}
 }
 
 func nativeRuntimeConfigDocumentsCheck(db *sql.DB) error {

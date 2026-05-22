@@ -33,8 +33,8 @@ func TestRuntimeValidateDryRunPlansValidators(t *testing.T) {
 	if result.Command != "runtime validate" || result.Mode != "dry_run" {
 		t.Fatalf("unexpected result identity: %#v", result)
 	}
-	if len(result.PlannedActions) != 4 {
-		t.Fatalf("expected four planned validators, got %#v", result.PlannedActions)
+	if len(result.PlannedActions) != 5 {
+		t.Fatalf("expected five planned validators, got %#v", result.PlannedActions)
 	}
 	if len(result.Mutations) != 0 {
 		t.Fatalf("runtime validate dry-run must not mutate, got %#v", result.Mutations)
@@ -422,6 +422,9 @@ func TestNativeRuntimeCompilerBuildsFromSources(t *testing.T) {
 	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM runtime_budget WHERE model_name LIKE 'on_hard_stop:%'", "nonzero")
 	assertRuntimeCanonicalDocumentsProjected(t, nativeDB)
 	assertSQLiteScalar(t, nativeDB, "SELECT COUNT(*) FROM compiler_metadata WHERE value = '2.0.0'", "nonzero")
+	if check := nativeExecutableContractsValidation(repo, nativeDB); check.Status != "ok" {
+		t.Fatalf("executable contract validation failed: %#v", check)
+	}
 }
 
 func TestRuntimeValidateChecksCanonicalRuntimeDocuments(t *testing.T) {

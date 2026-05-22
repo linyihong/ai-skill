@@ -2,6 +2,8 @@
 
 `workflow/documentation/` 負責「在 **業務專案或其他 repository** 撰寫、整理、分類文件時，讓內容對 **人類與 AI agent** 都好讀、好路由、且 **降低無效 token**」。本層只保存**可執行的步驟與分類表**；背後的 index-first 判斷智慧見 [`index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md)，AI runtime 治理 gate 見 [`documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md)，拆檔與篇幅閾值見 [`governance/document-sizing.md`](../../governance/document-sizing.md)。**語言與是否工具中立**不由本 workflow 預設，由業務專案自訂（見 [不取代什麼](#不取代什麼)）。
 
+本 workflow 也提供 project documentation 的結構化契約判斷：一般說明、背景、決策脈絡保留 Markdown；若文件定義 agent 要反覆執行的流程、runbook、release checklist、required evidence、failure action 或 blocking gate，應建立 companion YAML 或專案等價 structured contract。欄位語意可對照 [`../../metadata/executable-contract-schema.md`](../../metadata/executable-contract-schema.md)，但不強制其他專案照抄 Ai-skill schema。
+
 ## 何時讀這裡
 
 - 要在 `<PROJECT_ROOT>` 建立或擴充 `docs/`、`wiki/`、ADR、onboarding、runbook、知識庫型筆記。
@@ -32,6 +34,7 @@
 | 檔案 | 用途 |
 | --- | --- |
 | [`execution-flow.md`](execution-flow.md) | 從分類、選位、檔案形狀到驗證與連動更新的執行步驟與分類維度表。 |
+| [`../../metadata/executable-contract-schema.md`](../../metadata/executable-contract-schema.md) | 判斷其他專案文件何時需要 companion YAML 或等價 structured contract 的欄位語意。 |
 | [`../../intelligence/engineering/agent-architecture/index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md) | 為什麼 agent-facing 文件要 index-first 的判斷智慧。 |
 | [`../../governance/ai-runtime-governance/documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md) | 文件 context、分類、停止條件與單一真相的 AI runtime governance。 |
 
