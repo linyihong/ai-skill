@@ -137,7 +137,9 @@
 
 **教訓**：Knowledge Operating System → Cognitive Execution System 的升級雖然更新了根 `README.md` 標題，但 `architecture/ai-native-knowledge-operating-system.md` 仍以舊世代名稱與內容存在，被誤認為「architecture/ 唯一文件」造成讀者混淆。直到 2026-05-22 才被發現並補建第三代 navigation 文件。
 
-**強制**：如果升級涉及**系統名稱變更**（§1 第一項條件），計畫書必須明確包含以下項目：
+**強制**：如果升級涉及**系統名稱變更**（§1 第一項條件），計畫書必須明確包含以下項目。
+
+> ⚠️ **時機**（2026-05-22 修訂）：依 [`decision-promotion-pipeline.md`](decision-promotion-pipeline.md) §No-Proposed-ADR Rule，下列 ADR 與 architecture/ 文件的建立時機**從升級開始時改為 plan completed 時**。升級開始時 plan 只需含「Architecture Doc Plan section」記錄將寫什麼；實際寫 architecture/<gen>.md 與 ADR 在 plan completed 後執行（ADR 直接 accepted，不經 proposed 階段）。
 
 ```
 ## 完成條件

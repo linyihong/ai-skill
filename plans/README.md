@@ -14,6 +14,56 @@
 3. **計畫檔案命名規則**：`YYYY-MM-DD-HHMM-<slug>.md`，日期時間前綴讓檔案按時間排序（精確到分鐘），slug 需能反映計畫核心目標
 4. **每個計畫必須在檔頭標註狀態**：`draft` / `in-progress` / `completed`
 5. **計畫完成後，若從中提煉出可重用的系統經驗，應建立對應的 intelligence atom**
+6. **架構提案在 plan 內處理，不寫 proposed ADR**：依 [`governance/lifecycle/decision-promotion-pipeline.md`](../governance/lifecycle/decision-promotion-pipeline.md) §No-Proposed-ADR Rule，constitution/ 只放 accepted ADRs；提案、討論、alternatives 評估全在本 plan 的 `Decision Rationale` section 進行；plan completed 且通過 `ADR Promotion Criteria` 後才建立 accepted ADR。
+
+## Plan 模板必填章節
+
+任何涉及架構變更、新流程、跨層改動的 plan 必須包含下列章節（簡單修補類 plan 可省略 Decision Rationale）：
+
+| 章節 | 必填條件 | 用途 |
+|------|---------|------|
+| `Status` 標頭 | 全部 plan | 標 `draft` / `in-progress` / `completed` |
+| `Decision Rationale` | 架構/流程/跨層 plan | 取代「proposed ADR」的提案內容；含 Problem & Why Now / Decision / Alternatives Considered / Why Not an ADR Yet / ADR Promotion Criteria / Consequences |
+| `Open Questions` | 架構/流程 plan | 列出 completed 前需釐清的問題 |
+| `完成條件` | 全部 plan | 依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §2 checklist 子集 |
+| `Phase 0` Pre-Build Interrogation | 架構/流程/跨層 plan | per §Architecture Compatibility Preflight |
+| `Phase 1-N` | 全部 plan | 實作步驟 + 各 phase 完成條件 |
+| `Stakeholder 同意項目` | 架構/流程 plan | 列出 sign-off 項 |
+| `與其他 plans 的關係` | 全部 plan | Cross-reference |
+
+### `Decision Rationale` section 內容規範
+
+當 plan 含 Decision Rationale 時，子章節須涵蓋：
+
+```markdown
+## Decision Rationale
+
+### Problem & Why Now
+（現狀問題 + 為什麼這個時間點要動）
+
+### Decision
+（具體決定做什麼）
+
+### Alternatives Considered
+- A. 維持現狀：reject because ...
+- B. 完全重寫 X：reject because ...
+- C. 漸進改造（accept）
+
+### Why Not an ADR Yet
+（為什麼這個階段不適合寫 ADR：未驗證、scope 還會調、open questions 未解、可能有更輕 promotion target）
+
+### ADR Promotion Criteria（completed 時驗證）
+- [ ] foundational + cross-session + cross-project + expensive-to-reverse + explains-why 全中
+- [ ] Plan 結果證實 decision 可行
+- [ ] Open Questions 全解
+- [ ] 沒有更輕的 promotion target 適用（per ADR-007）
+- [ ] 系統真實使用此 contract（具體 evidence 指標）
+
+### Consequences（預期）
+#### 正面
+#### 負面
+#### 風險
+```
 
 ## Plan 執行前架構相容性檢查（Architecture Compatibility Preflight）
 

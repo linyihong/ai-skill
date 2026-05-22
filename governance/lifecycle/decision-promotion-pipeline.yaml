@@ -97,6 +97,11 @@ blocking_rules:
   - id: project_decision_stays_project_local
     rule: Project-specific decisions stay in <PROJECT_ROOT>/docs/decisions/ unless generalized.
     failure_action: sanitize_and_generalize_before_ai_skill_promotion
+  - id: no_proposed_adr
+    rule: constitution/ only contains accepted ADRs. Proposal phase lives in plans/active/<plan>.md §Decision Rationale. ADR is written only after plan completed and ADR Promotion Criteria pass.
+    failure_action: convert_proposed_adr_to_plan_decision_rationale
+    related_failure_pattern: enforcement/failure-patterns/premature-adr-promotion.md
+    effective_date: "2026-05-22"
 
 exit_gate:
   - promotion target selected by content type

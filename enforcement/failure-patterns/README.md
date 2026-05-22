@@ -19,6 +19,7 @@
 | [Commit/push before writeback transaction close](commit-before-validation-skip.md) | `validation-gap` | candidate | 防止 agent 在 commit/push 前跳過 Ai-skill writeback transaction 關閉條件（依 dependency-reading.md §Writeback Transaction Guard）。 |
 | [Mandatory step blocker bypass](mandatory-step-blocker-bypass.md) | `process-gap` / `validation-gap` | validated | 防止 agent 遇到強制步驟的環境阻斷（如工具未安裝）時自行判斷「環境限制」而靜默跳過，應立即停止並通知使用者。 |
 | [Knowledge-update-flow bypassed by sub-pipeline](knowledge-update-flow-bypassed-by-sub-pipeline.md) | `process-gap` / `validation-gap` | validated | 防止 agent 在新增 intelligence atom / failure pattern / scenario 時，只讀 sub-pipeline 文件（如 intelligence-extraction-pipeline）並把它當完整流程，跳過 master `knowledge-update-flow.md` 的 Step 4/7/9/11。 |
+| [Premature ADR promotion](premature-adr-promotion.md) | `process-gap` / `governance-drift` | validated | 防止 agent 在 plan completed 前就建立 proposed/draft ADR，違反 constitution/ 只放 accepted ADRs 的定位；架構提案階段應在 `plans/active/<plan>.md` §Decision Rationale 完成，依新規則（2026-05-22）只在 plan completed 且通過 ADR Promotion Criteria 後才建立 accepted ADR。 |
 
 ## 維護
 

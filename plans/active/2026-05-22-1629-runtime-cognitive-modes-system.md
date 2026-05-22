@@ -1,42 +1,158 @@
 # Runtime Cognitive Modes System
 
 **Status**: `draft`
-**ADR**: [ADR-008](../../constitution/ADR-008-runtime-cognitive-modes.md)（proposed）
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-22
+**最後更新**：2026-05-22（原 ADR-008 proposed 已撤回，內容整併入本 plan）
 
-> ⚠️ **本 plan 為 draft 階段**，依賴 [ADR-008](../../constitution/ADR-008-runtime-cognitive-modes.md) accepted 後才可進入 Phase 0 architecture compatibility preflight 與 Phase 1 實作。
+> ⚠️ 本 plan 為 draft 階段。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
+>
+> 若 plan completed 且通過 §ADR Promotion Criteria，才升級為 accepted ADR（屆時取編號）。
 
 ---
 
-## 緣起與動機
+## Decision Rationale（原 ADR-008 提案內容）
 
-### 觸發來源
+### Problem & Why Now
 
-2026-05-22 外部架構審查指出 `models/` 層目前是 documentation layer 而非 runtime activation layer。本 session agent 從未 query model-context-report 就執行任務即為實證。詳細 context 見 [ADR-008 §Context](../../constitution/ADR-008-runtime-cognitive-modes.md#context)。
+2026-05-22 外部架構審查指出 `models/` 層目前是 **documentation layer 而非 runtime activation layer**。具體證據：
 
-### 核心問題
+1. **沒有 blocking gate 強制查詢**：agent 在執行任務時不會自動查 `routing-registry.yaml` → `model-context-report.md` → `model-checklists.md`。`knowledge-update-flow.yaml` 11 步沒有任何一步要求查詢 model profile。
+2. **本 session 實證**：本 session 內 agent 加入 4 個 intelligence atoms、修正 ADR-007 語言、寫第三代 architecture 文件、ADR 雙向連結等工作，**沒有一次**查詢 model-context-report 就直接執行；profile 報告 / Read / Deferred / Validation signal 從未出現在 final report。
+3. **Document lookup runtime 不可行**：對方批評「每次 full resolution 一定爆」是真實 token cost 問題。若加 Step 0「每任務 query registry + profile + report + checklist」，每次 ~2000 tokens overhead 無法承受。
+4. **真正的缺口**：對照 4 個 cognitive primitive 維度，**governance mode 強度差異化**與 **memory mode activation flag** 是 Gen 3 既有 infrastructure 沒覆蓋到的真實缺口。
 
-| 問題 | 證據 |
+對照現有系統：
+
+| 建議 mode | 既有對應 | 缺口性質 |
+|------|------|------|
+| execution mode (FAST/NORMAL/DEEP/FORENSIC/RECOVERY) | `runtime.db phase_machine` 有 phase 概念，但**沒有 cognitive depth 維度** | 60% 新（FORENSIC/RECOVERY 為真新增） |
+| context mode (INDEX_ONLY/SUMMARY_FIRST/CHECKLIST_FIRST/SOURCE_BACKED/FULL_TRACE) | `models/compression/` 5 個 level 名稱幾乎一樣（小寫） | 5% 新（rename + 提升為 runtime primitive） |
+| governance mode (LIGHT/STANDARD/STRICT/LOCKDOWN) | 既有 governance 是 binary（gate 或無 gate） | **80% 新** — 真正缺口 |
+| memory mode (NONE/EPISODIC/DECISION_REPLAY/FAILURE_REPLAY/PROJECT_CONTEXT) | `memory/` 子層存在但無 activation flag | **70% 新** — 把 memory 子層提升為 runtime mode |
+
+### Decision
+
+引入 **Runtime Cognitive Modes** 作為 Gen 3 runtime infrastructure 的**子系統擴充**，核心三點：
+
+#### 1. 4 維 mode primitive 而非 flat profile
+
+```
+execution_mode  ∈ {FAST, NORMAL, DEEP, FORENSIC, RECOVERY}
+context_mode    ∈ {INDEX_ONLY, SUMMARY_FIRST, CHECKLIST_FIRST, SOURCE_BACKED, FULL_TRACE}
+governance_mode ∈ {LIGHT, STANDARD, STRICT, LOCKDOWN}
+memory_mode     ∈ {NONE, EPISODIC, DECISION_REPLAY, FAILURE_REPLAY, PROJECT_CONTEXT}
+```
+
+組合空間 = 5 × 5 × 4 × 5 = 500 種 cognitive state。
+
+#### 2. Discovery 用快速啟發式，不查文件
+
+```
+任務進來
+  ↓
+快速 discovery（純訊號計算，< 50 tokens）：
+  - user keyword、file diff scope、git status、session 長度、contradiction risk
+  ↓
+單一 SQLite 查詢解析 mode
+  ↓
+4 個 mode 寫入 runtime state
+  ↓
+各 subsystem 依 mode 決定 activation
+```
+
+#### 3. 與既有 infrastructure 整合，不重寫
+
+| 既有 | 整合方式 |
 |------|------|
-| Model layer 沒有 runtime activation | knowledge-update-flow 11 步無任何「查 model profile」步驟 |
-| Discovery cost 無法用 document lookup 解決 | 每任務 ~2000 tokens overhead 不可行 |
-| Governance 無強度差異化 | 既有 governance gate 是 binary（gate / no-gate） |
-| Memory 子層無 activation flag | memory/ 子層完整但 agent 不知何時 activate |
+| `runtime.db phase_machine` | 新增 `cognitive_modes` 表，與 phase_machine join |
+| `models/compression/` | Rename levels 為 UPPERCASE，提升為 `context_mode` 的實作層 |
+| `models/profiles/` | 保留為 reference doc；mark 為「backward-compat label」 |
+| `memory/<subdir>/` | 子層不動，新增 `memory_mode` 作為 activation flag |
+| `governance/` | 不動現有 gate；新增 `governance_mode` 作為 gate 強度 selector |
 
-### 解決方向
+**不刪除任何既有檔。**
 
-引入 4 維 cognitive mode primitives（execution / context / governance / memory），與既有 runtime infrastructure 整合，**不重寫** models/。
+#### 4. 漸進實作（5 phase）
+
+詳見下方 §Phase 1-5。
+
+### Alternatives Considered
+
+- **A. 維持現狀（models/ 純 documentation）**：拒絕 — 已證實 agent 不 activate。
+- **B. 完全重寫 `models/`**：拒絕 — 既有 compression / capabilities / routing 有獨立 reference 價值。
+- **C. 只加 governance mode 解決最緊迫缺口**：拒絕 — 單一 dimension 無法 compose 解決問題。
+- **D. 加進 knowledge-update-flow Step 0「每任務查 profile」**：拒絕 — token cost 不可行。
+- **E. 4 mode + 整合既有 + 5 phase 漸進**：**accept**（本 plan 採用）。
+
+### Why Not an ADR Yet
+
+依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) §No-Proposed-ADR Rule：
+
+- **未驗證**：Phase 1-5 未執行，不知道實際效果
+- **Scope 可能調整**：5 個 Open Questions 可能改變 Decision shape
+- **沒有更輕的 promotion target 已被檢驗**：可能 cognitive mode 應該是 runtime gate（不需 ADR）而非 architectural decision
+- **依新規則**：constitution/ 只放 accepted ADRs；proposed 階段在 plan 內
+
+### ADR Promotion Criteria（completed 時驗證）
+
+升級為 accepted ADR 的條件（per ADR-007 §ADR Boundary）：
+
+- [ ] foundational + cross-session + cross-project + expensive-to-reverse + explains-why 全中
+- [ ] Phase 1 完成（cognitive mode primitives 已運作）
+- [ ] Phase 2-3 至少其一完成（discovery 或 activation 驗證可行）
+- [ ] 5 個 Open Questions 全解
+- [ ] 沒有更輕的 promotion target 適用（runtime gate / enforcement / intelligence）
+- [ ] 系統真實使用此 contract，至少 5 個 task 在 final report 列 Cognitive Mode 驗證
+
+### Consequences（預期）
+
+#### 正面
+
+- **真正 runtime activation**：mode 寫入 runtime state，subsystem 強制依 mode 行動
+- **Token cost 可控**：discovery 靠訊號不靠文件；activation 是 conditional
+- **Governance 強度差異化**：LIGHT / STANDARD / STRICT / LOCKDOWN 對應不同 gate set
+- **Memory mode activation**：明確區分「不查記憶」與「查 episodic」「replay decision」狀態
+- **4 維 composable**：500 種狀態組合
+- **Backward compat**：既有 profile / compression / memory 文件保留
+
+#### 負面
+
+- **runtime.db schema 擴充**：新增 `cognitive_modes` + `discovery_signals` 表
+- **Discovery heuristic 維護成本**：訊號 → mode 映射規則需校準
+- **詞彙重疊風險**：`context_mode` 與既有 `compression` 名稱重疊（Open Question 1）
+- **5 phase 大改動**：可能需 1-3 個月推進
+- **教學負擔**：新概念需文件化
+
+#### 風險
+
+| 風險 | 緩解 |
+|------|------|
+| 4 mode 互動空間 500 種難以全測試 | Phase 1 先定義「常見組合」，未列組合走 default fallback |
+| Discovery heuristic 誤判 → 用錯 mode | Mode 內加 escalation 規則，偵測訊號矛盾時自動升級 |
+| 與既有 phase_machine 概念衝突 | Phase 3 整合時明確定義「phase = transaction state，mode = cognitive state」邊界 |
+| 重構期間既有任務行為改變 | Phase 1-2 只新增 surface，不改現有 activation；Phase 3 起才切換 |
+| 對方批評變成 paper plan 不執行 | 每 phase 設明確 completion gate，未過不開下一 phase |
+
+---
+
+## Open Questions（completed 前需釐清）
+
+1. `context_mode` 與 `compression level` 是否合併命名（避免雙詞彙）？建議：合併為 `context_mode`，`compression/` 文件改稱「context mode 的詳細策略文件」。
+2. Discovery signal 從哪些來源讀？目前候選：user keyword、file paths、git status、session 長度、recent failure count。是否還缺？
+3. `governance_mode LOCKDOWN` 與既有 `runtime.db blocking_gates` 的關係？建議：LOCKDOWN 是「全部 gates + 阻擋寫入」的 superset。
+4. `memory_mode` 與 `memory/retrieval-governance/` 的 activation threshold 是否整合？建議：retrieval-governance 是 threshold，mode 是 activation switch；兩者 compose。
+5. ADR promotion gate 設在哪個 phase 完成時？建議：Phase 3 完成（已有 activation 驗證）。
 
 ---
 
 ## 完成條件（per system-upgrade-governance §2）
 
-本 plan 是 Gen 3 子系統擴充，**不是世代升級**，所以系統名稱不變。但仍涉及架構分層擴充 + 核心流程變更，需執行 §2 checklist 的子集。
+本 plan 是 Gen 3 子系統擴充，**不是世代升級**，所以系統名稱不變。但涉及架構分層擴充 + 核心流程變更，需執行 §2 checklist 子集。
 
 ### 計畫書本身
 
-- [ ] 計畫書狀態：draft → in-progress（ADR-008 accepted 後）→ completed
+- [ ] 計畫書狀態：draft → in-progress（Phase 0 通過後）→ completed
 - [ ] 記錄完成日期
 - [ ] 記錄偏離（如有）
 - [ ] 歸檔至 `plans/archived/`
@@ -47,10 +163,11 @@
 - [ ] `architecture/ai-native-cognitive-execution-system.md` 核心機制章節新增 cognitive modes
 - [ ] `models/README.md` 加說明：profile 與 mode 的關係（backward-compat）
 
-### 架構文件
+### 架構文件（per system-upgrade-governance §3 規則 6）
 
-- [ ] `constitution/ADR-008` 由 proposed → accepted
-- [ ] `architecture/ai-native-cognitive-execution-system.md` 「本世代相關 ADR」加 ADR-008 列
+- [ ] Plan completed 時評估 ADR Promotion Criteria
+- [ ] 若符合 → 建立 ADR（直接 accepted）並更新 `constitution/README.md` 與 `architecture/ai-native-cognitive-execution-system.md` §本世代相關 ADR
+- [ ] 若不符合 → 在 plan 結尾記錄「決定不升 ADR 的理由」+ 改用 runtime gate / enforcement / intelligence 作為 promotion target
 
 ### 索引與路由
 
@@ -62,7 +179,7 @@
 
 - [ ] 新增 `runtime/cognitive-modes.yaml`（executable YAML contract）
 - [ ] `runtime/runtime.db` 新增 `cognitive_modes` + `discovery_signals` 表
-- [ ] Compiler 規則更新，將 yaml 投影到 `generated_surfaces`
+- [ ] Compiler 規則更新，投影到 `generated_surfaces`
 - [ ] `runtime/runtime.db` 的 `phase_machine` / `obligation_ledger` / `blocking_gates` 對接 mode
 
 ### Linked Updates
@@ -81,20 +198,9 @@
 
 ---
 
-## Phase 0: ADR Acceptance + Pre-Build Interrogation
+## Phase 0: Pre-Build Interrogation + Architecture Compatibility Preflight
 
-**前置條件**：ADR-008 accepted 後才開始。
-
-依 [`plans/README.md` §Architecture Compatibility Preflight](../README.md) 完成：
-
-| 欄位 | 內容 |
-|------|------|
-| Trigger | 開始實作 cognitive modes system |
-| Checked sources | runtime.db schema、phase_machine、compression、memory、governance 既有結構 |
-| Conflicts | 待 Phase 0 執行時填寫 |
-| Interrogation | Goal / Scope / Non-goals / Acceptance / Framework discovery / Duplication risk / Open questions |
-| Decision | 待 Phase 0 執行時填寫 |
-| Validation | runtime query、validator、link check、readback |
+**前置條件**：本 plan 從 draft → in-progress 後才開始。依 [`plans/README.md` §Architecture Compatibility Preflight](../README.md) 完成。
 
 ### Interrogation 草稿
 
@@ -103,11 +209,11 @@
 - **Non-goals**：
   - 不重寫 `models/profiles/` / `compression/` / `capabilities/`
   - 不改世代命名（保持 Gen 3）
-  - 不改 knowledge-update-flow.yaml 11 步基本結構（mode resolution 視 Phase 3 結果決定加 step）
+  - 不改 knowledge-update-flow.yaml 11 步基本結構
 - **Acceptance**：Phase 1 完成後，至少一個任務能在 final report 列 `Mode: {execution, context, governance, memory}` 並由 runtime.db 強制
 - **Framework discovery**：執行前須讀 runtime.db 既有 schema、所有 `models/` 文件、`memory/retrieval-governance/`、`governance/ai-runtime-governance/`
-- **Duplication risk**：context_mode vs compression level 命名重複；需在 Phase 1 決定合併或保留兩個詞彙
-- **Open questions**：見 ADR-008 §Open Questions 1-5
+- **Duplication risk**：context_mode vs compression level 命名重複；需在 Phase 1 決定合併或保留
+- **Open questions**：見上方 §Open Questions
 - **Assumptions**：runtime.db 可擴充 schema 而不破壞既有 generated surfaces
 
 ---
@@ -133,16 +239,9 @@ modes:
   execution:
     values: [FAST, NORMAL, DEEP, FORENSIC, RECOVERY]
     default: NORMAL
-    descriptions:
-      FAST: 快速回答、不查 source；適用 typo / 簡單問答
-      NORMAL: 標準流程；checklist + source 視需要
-      DEEP: 跨層分析、完整 dependency；適用 migration / promotion
-      FORENSIC: 高 lineage tracing；適用 incident analysis / audit
-      RECOVERY: 高 validation、阻擋寫入；適用 failure recovery
   context:
     values: [INDEX_ONLY, SUMMARY_FIRST, CHECKLIST_FIRST, SOURCE_BACKED, FULL_TRACE]
     default: SUMMARY_FIRST
-    # 與既有 models/compression/ 對應
   governance:
     values: [LIGHT, STANDARD, STRICT, LOCKDOWN]
     default: STANDARD
@@ -154,18 +253,9 @@ modes:
   memory:
     values: [NONE, EPISODIC, DECISION_REPLAY, FAILURE_REPLAY, PROJECT_CONTEXT]
     default: NONE
-
-resolution:
-  required_when:
-    - any task starts
-  output:
-    - execution_mode
-    - context_mode
-    - governance_mode
-    - memory_mode
 ```
 
-### 1.2 設計 `runtime.db cognitive_modes` 表
+### 1.2 `runtime.db cognitive_modes` 表
 
 ```sql
 CREATE TABLE cognitive_modes (
@@ -235,7 +325,7 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 ### 3.2 context_mode → compression
 
-合併 `models/compression/` levels 為 `context_mode` 的實作層。決定保留兩個詞彙或統一（依 ADR-008 §Open Question 1）。
+合併 `models/compression/` levels 為 `context_mode` 的實作層。決定保留兩個詞彙或統一（依 §Open Question 1）。
 
 ### 3.3 governance_mode → blocking_gates
 
@@ -247,13 +337,14 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 ### 3.5 knowledge-update-flow 整合
 
-決定是否加 Step 0「mode resolution」。建議：**不加 step，改在 Step 1 entry 自動觸發**（避免膨脹 11 步）。
+決定是否加 Step 0「mode resolution」。建議：**不加 step，改在 Step 1 entry 自動觸發**。
 
 ### Phase 3 完成條件
 
 - [ ] 4 subsystem 各有對應 mode-driven activation 邏輯
 - [ ] 失敗測試：mode 未解析就執行 → 被阻擋
 - [ ] Documentation 更新
+- [ ] **ADR Promotion Criteria 重新評估**：Phase 3 完成是 ADR promotion 候選 trigger
 
 ---
 
@@ -261,7 +352,7 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 **目標**：Source 載入由 mode 控制，超 budget 自動降級或阻擋。
 
-### 4.1 Token budget per mode
+### 4.1 Token budget per mode 組合
 
 | Mode 組合 | Budget |
 |------|------|
@@ -310,24 +401,6 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 ---
 
-## 風險與緩解
-
-| 風險 | 緩解 |
-|------|------|
-| 4 mode 互動空間 500 種狀態難全測試 | Phase 1 先定義「常見組合」表，未列組合走 default |
-| Discovery heuristic 誤判 | Mode 內加 escalation；遇到矛盾時自動升級 |
-| 與 phase_machine 概念衝突 | Phase 3 明確定義邊界：phase = transaction state, mode = cognitive state |
-| Phase 1-2 重構期間既有行為改變 | Phase 1-2 只新增 surface 不改 activation；Phase 3 起才切換 |
-| 對方批評變成 paper plan 不執行 | 每 phase 設明確 completion gate，未過不開下一 phase |
-
-## Open Questions（與 ADR-008 同步）
-
-1. `context_mode` vs `compression` 命名統一？
-2. Discovery signal 來源是否還有缺？
-3. `governance_mode LOCKDOWN` 與既有 `blocking_gates` 關係？
-4. `memory_mode` 與 `retrieval-governance` 整合方式？
-5. ADR-008 promotion gate 設在哪個 phase 完成時？
-
 ## Stakeholder 同意項目
 
 待 review。需要 user 與後續 contributors 對下列事項 sign-off：
@@ -335,7 +408,8 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 - [ ] 同意採 4 維 mode primitive 而非單一 enum
 - [ ] 同意不重寫 `models/`，採 backward-compat
 - [ ] 同意分 5 phase 漸進實作
-- [ ] 同意 ADR-008 從 proposed → accepted 的 gate 設在 Phase 1 完成
+- [ ] 同意 ADR promotion 候選 trigger 設在 Phase 3 完成
+- [ ] 同意 Open Question 1（context_mode vs compression 命名統一）的方向
 
 ---
 
@@ -343,7 +417,7 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 | Plan | 關係 |
 |------|------|
-| [`plans/archived/2026-05-20-1802-model-aware-execution-routing.md`](../archived/2026-05-20-1802-model-aware-execution-routing.md) | 前作；定義 model-aware routing 設計層；本 plan 把它推進到 runtime activation 層 |
+| [`plans/archived/2026-05-20-1802-model-aware-execution-routing.md`](../archived/2026-05-20-1802-model-aware-execution-routing.md) | 前作；定義 model-aware routing 設計層；本 plan 推進到 runtime activation 層 |
 | [`plans/archived/2026-05-22-0855-executable-yaml-contract-migration.md`](../archived/2026-05-22-0855-executable-yaml-contract-migration.md) | 提供 executable contract 機制基礎；本 plan 依賴此機制 |
 | [`plans/archived/2026-05-20-1745-memory-retrieval-activation-governance.md`](../archived/2026-05-20-1745-memory-retrieval-activation-governance.md) | 提供 memory activation 邊界；本 plan 將 retrieve threshold 與 memory_mode 整合 |
 | [`plans/archived/2026-05-20-1039-runtime-recovery-escalation-system.md`](../archived/2026-05-20-1039-runtime-recovery-escalation-system.md) | RECOVERY mode 對應此 system |

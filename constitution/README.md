@@ -18,10 +18,17 @@ ADR 解決這個問題：
 ## ADR 生命週期
 
 ```text
-proposed → accepted → deprecated → superseded
-                ↓
-          (不再修改)
+accepted → deprecated → superseded
+              ↓
+        (不再修改)
 ```
+
+**No proposed ADRs**：constitution/ 只放 **accepted** ADRs。架構決策的提案、討論、alternatives 評估在對應 `plans/active/` 的 `Decision Rationale` section 完成；plan completed 且通過 `ADR Promotion Criteria` 後才升級為 accepted ADR。此規則於 2026-05-22 確立，理由：
+
+- ADR-007 §Decision 已明文「ADR is NOT the default endpoint」
+- Proposed ADR 是「未驗證的憲法」— 與 constitution 性質矛盾
+- 改用 plan-first / ADR-after-completion 避免「廢棄憲法」累積
+- 完整規則見 [`governance/lifecycle/decision-promotion-pipeline.md`](../governance/lifecycle/decision-promotion-pipeline.md) §No-Proposed-ADR Rule
 
 ## 現有 ADR
 
@@ -34,7 +41,6 @@ proposed → accepted → deprecated → superseded
 | [ADR-005](ADR-005-memory-architecture.md) | Memory Architecture（6 子層記憶模型） | accepted | 2026-05-12 | Gen 3 確立 |
 | [ADR-006](ADR-006-registry-first-workflow-activation.md) | Registry-First Workflow Activation | accepted | 2026-05-18 | Gen 3 |
 | [ADR-007](ADR-007-constitution-and-decision-promotion-boundary.md) | Constitution and Decision Promotion Boundary | accepted | 2026-05-21 | Gen 3 |
-| [ADR-008](ADR-008-runtime-cognitive-modes.md) | Runtime Cognitive Modes | **proposed** | 2026-05-22 | Gen 3 子系統擴充（proposed；對應 plan [`plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md`](../plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md) status draft） |
 
 每個 ADR 內含 `Framework Generation` section，標註世代分類與當前世代文件連結。新增世代時依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §3 規則 7 評估每個 ADR 的延伸狀態。
 
