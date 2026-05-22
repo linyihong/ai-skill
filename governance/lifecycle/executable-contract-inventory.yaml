@@ -104,16 +104,16 @@ inventory:
       contract: enforcement/sanitization.yaml
       state: contract_exists
       reason: Secrets, local paths, project incident evidence, and prompt injection surfaces now have an owner-layer executable contract.
+    - source: enforcement/goal-action-validation.md
+      contract: enforcement/goal-action-validation.yaml
+      state: contract_exists
+      reason: Important work units now have structured goal, action, validation, and claim-scope gates.
+    - source: enforcement/evidence-hierarchy.md
+      contract: enforcement/evidence-hierarchy.yaml
+      state: contract_exists
+      reason: Evidence precedence, confidence threshold, escalation, and autonomy downgrade now have an owner-layer executable contract.
 
   contract_required:
-    - source: enforcement/goal-action-validation.md
-      suggested_contract: enforcement/goal-action-validation.yaml
-      priority: P1
-      reason: Important work units need goal, action, and validation closure to prevent premature implementation or completion claims.
-    - source: enforcement/evidence-hierarchy.md
-      suggested_contract: enforcement/evidence-hierarchy.yaml
-      priority: P1
-      reason: Evidence precedence, confidence, and escalation conditions determine whether validation claims are allowed.
     - source: enforcement/conversation-goal-ledger.md
       suggested_contract: enforcement/conversation-goal-ledger.yaml
       priority: P1

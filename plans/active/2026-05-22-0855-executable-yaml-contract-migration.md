@@ -153,8 +153,10 @@ final_status_report: []
 - [x] YAML 化 `authorization-scope` 的 activation、allowed / forbidden data collection、failure action。
 - [x] YAML 化 `sanitization` 的 blocker fields、redaction criteria、commit gate。
 - [x] YAML 化 `linked-updates` 的 changed path matrix、required linked checks、runtime compile / readback / dirty status gates。
-- [ ] YAML 化 `goal-action-validation` 的 goal / action / validation closure，並重新評估是否應為 P1 gate。
-- [ ] YAML 化 `evidence-hierarchy` 的 evidence precedence、confidence threshold、escalation condition。
+- [x] YAML 化 `goal-action-validation` 的 goal / action / validation closure，並重新評估是否應為 P1 gate。
+- [x] YAML 化 `evidence-hierarchy` 的 evidence precedence、confidence threshold、escalation condition。
+
+**Phase 1 output**：`enforcement/` 現有 P0/P1 close-loop、safety、validation 與 evidence rules 已有 owner-layer executable YAML contract，並在 inventory 中移至 `contract_exists`。
 
 ### Phase 2：Conversation / Tool / Routing Contracts
 

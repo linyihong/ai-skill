@@ -80,15 +80,13 @@ initial_inventory:
     - source: enforcement/sanitization.md
       contract: enforcement/sanitization.yaml
       reason: Secrets, local paths, project incident evidence, and prompt injection surfaces block reusable writes and commits.
-  candidates:
     - source: enforcement/goal-action-validation.md
-      suggested_contract: enforcement/goal-action-validation.yaml
-      priority: P1
-      reason: Defines goal/action/validation blocking checks.
+      contract: enforcement/goal-action-validation.yaml
+      reason: Important work units require goal, action, validation, and claim-scope alignment.
     - source: enforcement/evidence-hierarchy.md
-      suggested_contract: enforcement/evidence-hierarchy.yaml
-      priority: P1
-      reason: Defines evidence precedence, confidence, and escalation conditions.
+      contract: enforcement/evidence-hierarchy.yaml
+      reason: Evidence precedence, claim scope, confidence integrity, and escalation conditions are agent behavior gates.
+  candidates:
     - source: enforcement/decision-efficiency.md
       suggested_contract: enforcement/decision-efficiency.yaml
       priority: P2

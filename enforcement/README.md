@@ -58,6 +58,8 @@
 | --- | --- | --- |
 | [`authorization-scope.md`](authorization-scope.md) | [`authorization-scope.yaml`](authorization-scope.yaml) | 授權範圍、第三方資料與可重用證據安全 gate。 |
 | [`dependency-reading.md`](dependency-reading.md) | [`dependency-reading.yaml`](dependency-reading.yaml) | 依賴讀取 ledger、source-of-truth miss recovery、writeback final status gate。 |
+| [`evidence-hierarchy.md`](evidence-hierarchy.md) | [`evidence-hierarchy.yaml`](evidence-hierarchy.yaml) | Evidence quality、claim scope、confidence integrity 與 autonomy downgrade gate。 |
+| [`goal-action-validation.md`](goal-action-validation.md) | [`goal-action-validation.yaml`](goal-action-validation.yaml) | 重要工作單元的目標、執行、驗證與 completion claim gate。 |
 | [`linked-updates.md`](linked-updates.md) | [`linked-updates.yaml`](linked-updates.yaml) | 連動更新矩陣、runtime sync、writeback closure 與 final report gate。 |
 | [`sanitization.md`](sanitization.md) | [`sanitization.yaml`](sanitization.yaml) | secrets、本機路徑、project incident evidence 與 prompt injection 去敏 gate。 |
 

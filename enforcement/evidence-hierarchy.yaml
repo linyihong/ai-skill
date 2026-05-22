@@ -1,0 +1,126 @@
+schema_version: executable-contract/v1
+id: enforcement.evidence-hierarchy.contract
+title: Evidence hierarchy executable contract
+owner_layer: enforcement
+source_markdown: enforcement/evidence-hierarchy.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.evidence_hierarchy.contract
+  surface_type: executable_yaml_contract
+  execution_scope: agent_behavior
+
+activation:
+  events:
+    - evidence_conflict_detected
+    - claim_scope_broader_than_evidence
+    - assumption_used_as_fact
+    - repeated_patch_without_new_evidence
+    - user_correction_received
+    - success_claim_prepared
+  required_when:
+    - Evidence conflicts or has unclear ownership.
+    - A claim is broader than the observed evidence.
+    - Confidence has decayed because evidence is stale, missing, contradicted, or narrow.
+    - A final response asserts completion or correctness.
+
+required_sources:
+  - enforcement/evidence-hierarchy.md
+  - enforcement/escalation-policy.md
+  - enforcement/goal-action-validation.md
+
+steps:
+  - id: qualify_evidence
+    order: 1
+    action: Evaluate evidence by authority, freshness, validity, scope, and observability.
+    outputs:
+      - evidence_qualification
+  - id: compare_claim_scope
+    order: 2
+    action: Compare the exact claim against supporting evidence and uncovered areas.
+    gates:
+      - gate.evidence.claim_scope_aligned
+  - id: assign_confidence_integrity
+    order: 3
+    action: Classify confidence as aligned, inflated, degraded, or unsupported.
+    outputs:
+      - confidence_integrity
+  - id: resolve_conflicts_or_escalate
+    order: 4
+    action: Suspend contradicted beliefs and enter escalation/recovery when ownership conflict or source miss exists.
+    required_if:
+      - evidence_conflict_detected
+      - source_of_truth_miss_detected
+    gates:
+      - gate.evidence.contradictions_reconciled
+  - id: align_autonomy_mode
+    order: 5
+    action: Downgrade autonomy when evidence is unsupported, inflated, ambiguous, repeatedly contradicted, or contaminated.
+    gates:
+      - gate.evidence.autonomy_matches_confidence
+
+gates:
+  - id: gate.evidence.claim_scope_aligned
+    blocks: success_claim
+    pass_when:
+      - claim scope is local to the supporting evidence
+      - uncovered areas are named
+      - broader claims have additional validation
+    fail_when:
+      - one passing test is used to claim untested actors, paths, or error modes
+      - search presence is used as proof of implementation completeness
+      - local evidence is used for a global completion claim
+  - id: gate.evidence.contradictions_reconciled
+    blocks: dependent_execution
+    pass_when:
+      - contradicted assumptions are suspended or removed
+      - source-of-truth is read or marked missing
+      - dependent checkpoints are revalidated
+    fail_when:
+      - agent continues patching after user contradiction without reloading source-of-truth
+  - id: gate.evidence.autonomy_matches_confidence
+    blocks: autonomous_execution_or_completion_claim
+    pass_when:
+      - unsupported or inflated claims enter validation-required mode
+      - ownership ambiguity enters human alignment when sources cannot resolve it
+      - repeated patching without new evidence enters limited autonomy or recovery
+
+required_evidence:
+  - claim
+  - claim scope
+  - supporting evidence
+  - uncovered areas
+  - confidence integrity
+  - autonomy mode when confidence is degraded, inflated, or unsupported
+
+success_criteria:
+  - Assumptions remain marked until validated.
+  - Lower-quality or lower-scope evidence cannot override stronger contradiction.
+  - Completion claims match exact supporting evidence.
+  - Evidence conflicts enter escalation/recovery instead of silent merge.
+  - Recovery does not exit until contradicted assumptions and validation evidence are reconciled.
+
+failure_modes:
+  - id: inflated_completion_claim
+    detection: Agent claims system/workflow success from local, narrow, stale, or single-signal evidence.
+    recovery: Narrow the claim or gather evidence for the claimed scope.
+  - id: assumption_as_fact
+    detection: Unvalidated inference is treated as known state.
+    recovery: Mark assumption, validate, or remove dependent claim.
+  - id: weak_evidence_overrides_contradiction
+    detection: Search, memory, or stale checklist overrides live/user/source-of-truth contradiction.
+    recovery: Suspend belief and enter escalation recovery.
+  - id: confidence_decay_ignored
+    detection: Repeated patching, stale source, or contradiction does not downgrade autonomy.
+    recovery: Move to validation-required, limited-autonomy, or human-alignment mode.
+
+final_status_report:
+  required_fields:
+    - claim
+    - supporting_evidence
+    - uncovered_areas
+    - confidence_integrity
+    - autonomy_or_escalation_status

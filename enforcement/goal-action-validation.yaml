@@ -1,0 +1,115 @@
+schema_version: executable-contract/v1
+id: enforcement.goal-action-validation.contract
+title: Goal action validation executable contract
+owner_layer: enforcement
+source_markdown: enforcement/goal-action-validation.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.goal_action_validation.contract
+  surface_type: executable_yaml_contract
+  execution_scope: workflow_execution
+
+activation:
+  events:
+    - important_work_unit_started
+    - document_or_code_modified
+    - analysis_conclusion_produced
+    - plan_created
+    - no_change_decision_made
+    - completion_claim_prepared
+  required_when:
+    - A visible conclusion, plan, document change, code change, or no-change decision is produced.
+    - A reusable rule, feedback lesson, template, or workflow is added or changed.
+    - A user points out incomplete closure or missing validation.
+
+required_sources:
+  - enforcement/goal-action-validation.md
+  - enforcement/evidence-hierarchy.md
+  - enforcement/linked-updates.md
+  - runtime/runtime.db
+
+steps:
+  - id: define_goal
+    order: 1
+    action: State what the work unit must answer, change, produce, or decide.
+    outputs:
+      - goal_statement
+  - id: record_action
+    order: 2
+    action: Record what was read, checked, edited, executed, or decided.
+    outputs:
+      - action_summary
+  - id: select_validation_method
+    order: 3
+    action: Select test, lint, link check, diff review, fixture, source reference, evidence cross-check, or manual inspection.
+    gates:
+      - gate.goal_action.validation_method_selected
+  - id: execute_or_report_validation
+    order: 4
+    action: Run validation when available; otherwise report reference sources, inference boundary, or blocker.
+    gates:
+      - gate.goal_action.validation_complete_or_blocked
+  - id: align_completion_claim
+    order: 5
+    action: Ensure final claim scope matches validation evidence and open risks.
+    required_sources:
+      - enforcement/evidence-hierarchy.md
+    gates:
+      - gate.goal_action.claim_matches_validation
+
+gates:
+  - id: gate.goal_action.validation_method_selected
+    blocks: completion_claim
+    pass_when:
+      - validation method or reference-source method is named
+      - pure judgment tasks include inference boundaries and reverse-check path
+    fail_when:
+      - agent says complete / no change needed without a validation method or reference source
+  - id: gate.goal_action.validation_complete_or_blocked
+    blocks: final_completion_response
+    pass_when:
+      - validation was run and summarized
+      - or validation is explicitly not run with reason and blocker / risk stated
+    fail_when:
+      - unrun tests or checks are described as passed
+  - id: gate.goal_action.claim_matches_validation
+    blocks: broad_success_claim
+    pass_when:
+      - final claim scope does not exceed supporting validation
+      - open questions or untested areas are reported
+
+required_evidence:
+  - goal statement
+  - action summary
+  - validation method or reference-source method
+  - validation result, blocker, or inference boundary
+  - claim scope alignment
+
+success_criteria:
+  - Every important work unit has goal, action, and validation / reference-source coverage.
+  - Pure analysis and planning outputs include references, inference boundaries, and reverse-check path.
+  - Completion claims do not overstate validation.
+  - Failed validation loops back to correction, blocker, or scoped deferral.
+
+failure_modes:
+  - id: completion_without_validation
+    detection: Agent reports done without tests, diff review, source references, or explicit blocker.
+    recovery: Add validation or narrow the claim.
+  - id: fake_validation_claim
+    detection: Agent says tests/lints/checks passed when they were not run.
+    recovery: Correct status and run validation or report not-run reason.
+  - id: no_change_without_evidence
+    detection: Agent says no change is needed without naming checked sources or evidence boundary.
+    recovery: Cite checked sources and explain sufficiency or open questions.
+
+final_status_report:
+  required_fields:
+    - goal
+    - actions_taken
+    - validation_performed
+    - validation_not_run_reason
+    - claim_scope
