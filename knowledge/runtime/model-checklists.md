@@ -110,6 +110,16 @@ Guardrails:
 | `route.intelligence.apk-analysis.atoms` | Primary: `intelligence/engineering/apk-analysis/README.md`<br>Compression: `summary-first`<br>Required: `intelligence/engineering/analytical-reasoning/README.md`<br>`workflow/apk-analysis/execution-flow.md`<br>`analysis/apk/README.md`<br>Validation: 各 atom 有明確決策表或信號表，可反查驗證。 |
 | `route.validation.ai-decision-contract` | Primary: `validation/README.md`<br>Compression: `summary-first`<br>Required: `validation/scenarios/apk-analysis/flutter-aot-hooking-v1.yaml`<br>`validation/scenarios/apk-analysis/local-proxy-vs-pinning-v1.yaml`<br>`validation/scenarios/apk-analysis/early-hook-prevention-v1.yaml`<br>`validation/scenarios/failure-derived/entrypoint-drift-v1.yaml`<br>`validation/scenarios/failure-derived/source-mirror-write-v1.yaml`<br>`validation/scenarios/failure-derived/shared-rules-architecture-drift-v1.yaml`<br>`validation/scenarios/failure-derived/feedback-history-consolidation-v1.yaml`<br>`validation/scenarios/failure-derived/runtime-recovery-navigation-mismatch.yaml`<br>`validation/scenarios/failure-derived/runtime-recovery-user-contradiction.yaml`<br>`validation/scenarios/failure-derived/runtime-recovery-source-miss.yaml`<br>`validation/scenarios/architecture/cargo-cult-ddd.yaml`<br>`validation/scenarios/architecture/architecture-fit-mismatch.yaml`<br>`validation/scenarios/architecture/overengineering-detection.yaml`<br>`validation/scenarios/architecture/bounded-context-collapse.yaml`<br>`validation/scenarios/architecture/aggregate-explosion.yaml`<br>`validation/scenarios/software-delivery/requirement-contradiction.yaml`<br>`validation/scenarios/software-delivery/product-impact-misalignment.yaml`<br>`validation/scenarios/software-delivery/missing-validation-target.yaml`<br>`validation/scenarios/software-delivery/stale-acceptance-criteria.yaml`<br>`validation/scenarios/software-delivery/behavior-scope-overclaim.yaml`<br>`validation/scenarios/software-delivery/mutation-testing-effectiveness.yaml`<br>Validation: Scenario 的 expected_route 與 actual trace 可比對；forbidden_routes 未被使用。 |
 
+## Executable Contract Checklist-First Path
+
+當任務涉及 owner-layer executable YAML contract，small / weaker agents 應先用以下 checklist，不得只讀 Markdown 或 metadata YAML：
+
+1. 讀 [`../../metadata/executable-contract-schema.md`](../../metadata/executable-contract-schema.md)，確認 `schema_version: executable-contract/v1`、`runtime_projection.enabled`、`target_key` 與 execution-bearing fields。
+2. 讀 [`../../governance/lifecycle/executable-contract-inventory.yaml`](../../governance/lifecycle/executable-contract-inventory.yaml)，確認 source 是 `contract_exists`、`contract_required`、`markdown_only` 或 `not_applicable`。
+3. 若有 companion YAML，讀 YAML 的 `activation`、`required_sources`、`steps`、`gates`、`failure_modes`、`final_status_report`；Markdown 只提供背景與維護脈絡。
+4. 新增或修改 executable contract 後，執行 `ai-skill runtime compile`、`ai-skill runtime refresh`、`ai-skill runtime validate`，並查 `runtime/runtime.db generated_surfaces` 的 `source_path`、`target_key`、`status`。
+5. 若只看到 `metadata/rules/*.yaml`、front-matter、graph 或 routing YAML，不得當成 executable contract，除非補齊 schema 並啟用 runtime projection。
+
 ## Escalation Checklist
 
 - Summary / registry 與 source-of-truth 可能不一致時，讀全文。

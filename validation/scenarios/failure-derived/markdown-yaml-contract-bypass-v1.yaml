@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Markdown/YAML Contract Bypass Scenario
+# 測試 AI 不得只讀 Markdown 而漏讀 companion executable YAML contract。
+
+id: markdown-yaml-contract-bypass-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: source-of-truth-miss
+  description: >
+    Agent 只讀 companion Markdown，未讀 owner-layer executable YAML contract，
+    因而漏掉 activation、required_sources、steps、gates、failure_modes 或 final_status_report。
+
+given:
+  task: execute_or_update_contract_backed_workflow
+  artifacts:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/execution-flow.yaml
+    - metadata/executable-contract-schema.md
+    - runtime/runtime.db
+  signals:
+    - Markdown source has a companion YAML with runtime_projection.enabled
+    - Workflow contains blocking gates and final report fields
+    - runtime generated_surfaces contains the YAML target key
+  constraints:
+    - Agent must execute the workflow, not merely summarize it
+
+when:
+  action: load_workflow_contract
+
+then:
+  expected_route:
+    primary: read_markdown_and_companion_yaml
+    steps:
+      - Read Markdown for context and maintenance rationale.
+      - Read companion YAML for activation, required sources, ordered steps, gates, failure modes, and final report fields.
+      - Query or validate generated_surfaces when claiming runtime projection.
+      - Execute the YAML gates before final completion claim.
+    reject:
+      - markdown_only_execution: "只讀 Markdown 並宣稱 workflow 已套用"
+      - generated_surface_unchecked: "未查 runtime projection 就宣稱 executable contract synced"
+      - gate_field_omission: "漏讀 gates / failure_modes / final_status_report"
+  validation:
+    - companion YAML 已讀或明確標 not applicable
+    - runtime projection target key 已驗證
+    - completion claim 包含 contract gates 和 final report fields

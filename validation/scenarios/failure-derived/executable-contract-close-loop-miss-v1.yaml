@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Executable Contract Close-Loop Miss Scenario
+# 測試 AI 新增 executable YAML contract 後是否完整 compile / refresh / validate / projection assertion / commit / push / readback。
+
+id: executable-contract-close-loop-miss-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: close-loop-gap
+  description: >
+    Agent 新增或修改 owner-layer executable YAML contract 後，
+    未執行 runtime compile / refresh / validate、未確認 generated_surfaces target key synced、
+    或未完成 commit / push / readback / clean status。
+
+given:
+  task: add_owner_layer_executable_contract
+  artifacts:
+    - metadata/executable-contract-schema.md
+    - governance/lifecycle/executable-contract-inventory.yaml
+    - enforcement/dependency-reading.md
+    - enforcement/linked-updates.md
+    - runtime/runtime.db
+  signals:
+    - new YAML has schema_version executable-contract/v1
+    - runtime_projection.enabled is true
+    - owner inventory or README changed
+    - runtime/runtime.db must reflect generated surface projection
+  constraints:
+    - Repository writeback transaction is open
+    - Final response must not claim completion while git status is dirty or branch is ahead
+
+when:
+  action: close_contract_migration_batch
+
+then:
+  expected_route:
+    primary: run_contract_projection_close_loop
+    steps:
+      - Run runtime compile.
+      - Run runtime refresh.
+      - Run runtime validate.
+      - Query generated_surfaces for the new source_path, target_key, and synced status.
+      - Run relevant tests or explain why not applicable.
+      - Commit, push, reread updated sources, and confirm clean git status.
+    reject:
+      - skip_runtime_compile: "新增 contract 但未重新 compile runtime.db"
+      - skip_projection_assertion: "未查 generated_surfaces target_key/status"
+      - dirty_final_status: "工作樹 dirty 或 branch ahead 時宣稱完成"
+      - no_readback_after_push: "push 後未讀回主要 entry files 或檢查 clean status"
+  validation:
+    - runtime compile / refresh / validate 已通過
+    - generated_surfaces projection 已 synced
+    - commit / push / readback / clean status 已完成

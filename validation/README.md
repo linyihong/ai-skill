@@ -63,6 +63,8 @@ validation/
 - `failure-derived/tier3-does-not-block-tier0-tier2-v1.yaml` — Tier 3 cognitive optimization 不得阻塞 Tier 0-2。
 - `failure-derived/meta-governance-no-runtime-promotion-v1.yaml` — 無具體 validated failure 時 meta-governance 不 promotion 到 runtime。
 - `failure-derived/metadata-yaml-not-executable-contract-v1.yaml` — metadata YAML 不得被誤判為 executable contract；必須檢查 contract fields 與 runtime projection data。
+- `failure-derived/markdown-yaml-contract-bypass-v1.yaml` — companion YAML contract 存在時不得只讀 Markdown；必須讀 YAML gates 並驗證 runtime projection。
+- `failure-derived/executable-contract-close-loop-miss-v1.yaml` — 新增 executable contract 後必須 compile / refresh / validate / projection assertion / commit / push / readback。
 
 ## Scenario 格式
 

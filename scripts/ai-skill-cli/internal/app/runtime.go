@@ -1898,6 +1898,16 @@ func buildNativeModelChecklists(repo string) (string, error) {
 	}
 
 	lines = append(lines,
+		"## Executable Contract Checklist-First Path",
+		"",
+		"當任務涉及 owner-layer executable YAML contract，small / weaker agents 應先用以下 checklist，不得只讀 Markdown 或 metadata YAML：",
+		"",
+		"1. 讀 [`../../metadata/executable-contract-schema.md`](../../metadata/executable-contract-schema.md)，確認 `schema_version: executable-contract/v1`、`runtime_projection.enabled`、`target_key` 與 execution-bearing fields。",
+		"2. 讀 [`../../governance/lifecycle/executable-contract-inventory.yaml`](../../governance/lifecycle/executable-contract-inventory.yaml)，確認 source 是 `contract_exists`、`contract_required`、`markdown_only` 或 `not_applicable`。",
+		"3. 若有 companion YAML，讀 YAML 的 `activation`、`required_sources`、`steps`、`gates`、`failure_modes`、`final_status_report`；Markdown 只提供背景與維護脈絡。",
+		"4. 新增或修改 executable contract 後，執行 `ai-skill runtime compile`、`ai-skill runtime refresh`、`ai-skill runtime validate`，並查 `runtime/runtime.db generated_surfaces` 的 `source_path`、`target_key`、`status`。",
+		"5. 若只看到 `metadata/rules/*.yaml`、front-matter、graph 或 routing YAML，不得當成 executable contract，除非補齊 schema 並啟用 runtime projection。",
+		"",
 		"## Escalation Checklist",
 		"",
 		"- Summary / registry 與 source-of-truth 可能不一致時，讀全文。",

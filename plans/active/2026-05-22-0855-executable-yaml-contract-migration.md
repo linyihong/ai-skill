@@ -188,10 +188,10 @@ final_status_report: []
 
 ### Phase 5：Validation & Close Loop
 
-- [ ] 每批新增 contract 後執行 runtime compile / refresh / validate。
-- [ ] 查詢 `runtime/runtime.db generated_surfaces`，確認 target key synced。
-- [ ] 新增 failure-derived scenarios：agent 只讀 Markdown、不讀 YAML、把 metadata YAML 當 executable contract、漏跑 close-loop。
-- [ ] 更新 `knowledge/runtime/model-checklists.md` 或 routing report，讓 small / weaker agents 有 checklist-first path。
+- [x] 每批新增 contract 後執行 runtime compile / refresh / validate。
+- [x] 查詢 `runtime/runtime.db generated_surfaces`，確認 target key synced。
+- [x] 新增 failure-derived scenarios：agent 只讀 Markdown、不讀 YAML、把 metadata YAML 當 executable contract、漏跑 close-loop。
+- [x] 更新 `knowledge/runtime/model-checklists.md` 或 routing report，讓 small / weaker agents 有 checklist-first path。
 - [ ] 完成後執行 Plan Completion Closure，更新 `plans/README.md` 並移至 `archived/`。
 
 ## Implementation Order
