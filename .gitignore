@@ -11,3 +11,6 @@ knowledge/runtime/sqlite/*.db-*
 # Generated runtime state database; mutable per-session state, not committed.
 runtime/runtime-state.db
 runtime/runtime-state.db-*
+
+# Claude Code 本地設定（per-machine，不進版控）
+.claude/settings.local.json
