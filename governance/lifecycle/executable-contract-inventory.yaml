@@ -136,6 +136,14 @@ inventory:
       contract: workflow/documentation/execution-flow.yaml
       state: contract_exists
       reason: Documentation workflow classification, index-first shape, YAMLization decision, validation, and final report gates now have a workflow contract.
+    - source: workflow/software-delivery/execution-flow.md
+      contract: workflow/software-delivery/execution-flow.yaml
+      state: contract_exists
+      reason: Software delivery change intake, requirements, BDD closure, parity, performance, and validation gates now have a workflow contract.
+    - source: workflow/software-delivery/artifact-gates.md
+      contract: workflow/software-delivery/artifact-gates.yaml
+      state: contract_exists
+      reason: Software delivery artifact shape, owner layer, sanitization, linked updates, and quality gates now have a workflow contract.
 
   contract_required:
     - source: governance/lifecycle/directory-structure-governance.md
@@ -150,14 +158,6 @@ inventory:
       suggested_contract: governance/ai-runtime-governance/validation-scenario-governance.yaml
       priority: P1
       reason: Failure promotion into validation scenarios has repeatable gates and expected artifacts.
-    - source: workflow/software-delivery/execution-flow.md
-      suggested_contract: workflow/software-delivery/execution-flow.yaml
-      priority: P2
-      reason: Software delivery execution flow has repeatable phases, required sources, gates, and final reporting.
-    - source: workflow/software-delivery/artifact-gates.md
-      suggested_contract: workflow/software-delivery/artifact-gates.yaml
-      priority: P2
-      reason: Artifact completeness and verification gates are execution-affecting.
     - source: workflow/apk-analysis/execution-flow.md
       suggested_contract: workflow/apk-analysis/execution-flow.yaml
       priority: P2

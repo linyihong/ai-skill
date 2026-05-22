@@ -1,0 +1,166 @@
+schema_version: executable-contract/v1
+id: workflow.software-delivery.execution-flow.contract
+title: Software delivery execution flow contract
+owner_layer: workflow
+source_markdown: workflow/software-delivery/execution-flow.md
+status: active
+contract_type: workflow_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: workflow.software_delivery.execution_flow.contract
+  surface_type: executable_yaml_contract
+  execution_scope: workflow_execution
+
+activation:
+  events:
+    - software_change_requested
+    - code_review_requested
+    - design_review_requested
+    - release_review_requested
+    - behavior_change_requested
+    - refactor_or_replacement_requested
+    - sdk_defect_reported
+    - performance_sensitive_change_detected
+  required_when:
+    - Work involves development, implementation, code modification, code review, design review, release review, security review, or contract governance review.
+    - A change may alter observable behavior, public contract, domain invariant, error handling, storage, security, performance, or tests.
+    - A refactor, migration, replacement, new entrypoint, tool rewrite, or architecture split may replace existing capability.
+
+required_sources:
+  - workflow/software-delivery/README.md
+  - workflow/software-delivery/execution-flow.md
+  - workflow/software-delivery/artifact-gates.md
+  - workflow/software-delivery/development-process.md
+  - workflow/software-delivery/requirements/README.md
+  - workflow/software-delivery/architecture/README.md
+  - enforcement/goal-action-validation.md
+  - enforcement/evidence-hierarchy.md
+  - enforcement/sanitization.md
+  - enforcement/linked-updates.md
+
+steps:
+  - id: start_from_evidence
+    order: 1
+    action: Define goal, action, validation, observed behavior, evidence layer, and confidence before promoting guidance or changing code.
+    gates:
+      - gate.software_delivery.evidence_classified
+  - id: run_change_intake
+    order: 2
+    action: Read planning artifacts and classify the request as new behavior, bug fix, refactor/replacement, hardening, architecture decision, performance change, or documentation conflict.
+    gates:
+      - gate.software_delivery.change_intake_complete
+  - id: run_requirements_checkpoint
+    order: 3
+    action: For observable behavior, run requirements stage for product impact, behavior boundary, acceptance definition, ambiguity disposition, and validation target.
+    required_if:
+      - observable_behavior_change
+  - id: produce_replacement_parity_inventory
+    order: 4
+    action: For replacement or migration work, list old entrypoints, capabilities, side effects, dependencies, new entrypoints, parity status, and validation evidence before implementation.
+    required_if:
+      - refactor_or_replacement_requested
+    gates:
+      - gate.software_delivery.replacement_parity_ready
+  - id: keep_docs_first_bdd_closure
+    order: 5
+    action: Update owner contracts, human-readable behavior specs, executable behavior tests, implementation, and traceability in the same batch when behavior changes.
+    required_if:
+      - observable_behavior_change
+    gates:
+      - gate.software_delivery.bdd_closure_complete
+  - id: handle_sdk_defect_closure
+    order: 6
+    action: Reproduce SDK defects through supported public surfaces, sanitize evidence, and lock behavior with specs and regression tests when needed.
+    required_if:
+      - sdk_defect_reported
+  - id: define_test_strategy
+    order: 7
+    action: Define old behavior regression, new behavior proof, mutation/negative checks, persistence/integration tests, and hardware/performance evidence when relevant.
+    gates:
+      - gate.software_delivery.validation_target_defined
+  - id: run_performance_gate
+    order: 8
+    action: For performance-sensitive changes, define latency, throughput, error-rate, and resource budgets plus load/stress/spike/soak evidence.
+    required_if:
+      - performance_sensitive_change_detected
+  - id: validate_and_close
+    order: 9
+    action: Run at least one validation method, check blockers, update durable docs, feed reusable lessons when appropriate, and report scope honestly.
+    gates:
+      - gate.software_delivery.validation_complete
+
+gates:
+  - id: gate.software_delivery.evidence_classified
+    blocks: implementation_or_completion_claim
+    pass_when:
+      - goal, action, and validation method are stated
+      - observed behavior and evidence layer are identified
+      - target-specific secrets, tokens, device IDs, raw user data, or project incident details are not copied into reusable guidance
+  - id: gate.software_delivery.change_intake_complete
+    blocks: code_change
+    pass_when:
+      - planning/product/issue/design/BDD/API contract source was read or a lightweight change brief was created
+      - major claims are marked validated, assumption, open question, scoped out, or invalidated
+      - blocker questions are asked before affected implementation continues
+  - id: gate.software_delivery.replacement_parity_ready
+    blocks: replacement_implementation
+    pass_when:
+      - parity inventory covers old entrypoints, capabilities, side effects, external dependencies, target new entrypoints, parity status, and validation evidence
+      - deferred, not planned, or tool-specific gaps have non-blocking rationale
+  - id: gate.software_delivery.bdd_closure_complete
+    blocks: behavior_change_completion
+    pass_when:
+      - owner contract, human-readable behavior spec, executable behavior test, implementation, and traceability move together
+      - scoped documentation debt is explicitly recorded if any part is deferred
+  - id: gate.software_delivery.validation_target_defined
+    blocks: validation_phase
+    pass_when:
+      - old behavior protection and new behavior proof are separated
+      - relevant contract, integration, fixture, mutation, property, persistence, generated-client, host, target, or hardware-in-loop checks are chosen
+  - id: gate.software_delivery.validation_complete
+    blocks: final_completion_response
+    pass_when:
+      - at least one validation method ran or a blocker is reported
+      - unresolved blockers affecting behavior, contract, error handling, security, storage, ownership, or tests are not hidden
+      - completion claim scope matches evidence
+
+required_evidence:
+  - goal / action / validation statement
+  - change intake classification
+  - requirements or behavior boundary evidence when observable behavior changes
+  - parity inventory when replacing existing capability
+  - BDD / contract / test traceability when behavior changes
+  - performance budget evidence when performance-sensitive
+  - validation result or blocker
+
+success_criteria:
+  - Software changes start from evidence and owner contracts rather than implementation guesses.
+  - Behavior changes keep docs, BDD/contracts, tests, implementation, and traceability aligned.
+  - Replacement and migration work preserves observable capability or records scoped gaps.
+  - Validation distinguishes old behavior still protected from new behavior proven.
+  - Reusable lessons are sanitized and linked to the correct owner layer.
+
+failure_modes:
+  - id: implementation_as_source_of_truth
+    detection: Agent treats passing code or tests as the only source when product, BDD, API, or owner contract conflicts.
+    recovery: Stop patching, reload owner sources, rebuild execution graph, and update contracts before continuing.
+  - id: replacement_without_parity
+    detection: New entrypoint, migration, refactor, or tool rewrite starts without old/new capability inventory.
+    recovery: Produce parity inventory and validation evidence before implementation.
+  - id: green_tests_stale_docs
+    detection: Tests pass but owner docs, BDD, contracts, or traceability still describe old behavior.
+    recovery: Update durable docs in the same batch or record scoped documentation debt.
+  - id: performance_claim_without_budget
+    detection: Agent says performance is fine from functional tests or average latency only.
+    recovery: Define P95/P99, throughput, error-rate, resource budget, and appropriate performance test evidence.
+
+final_status_report:
+  required_fields:
+    - change_type
+    - sources_read
+    - contracts_or_bdd_updated
+    - parity_status
+    - validation_performed
+    - blockers_or_deferred_scope

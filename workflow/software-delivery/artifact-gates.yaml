@@ -1,0 +1,138 @@
+schema_version: executable-contract/v1
+id: workflow.software-delivery.artifact-gates.contract
+title: Software delivery artifact gates contract
+owner_layer: workflow
+source_markdown: workflow/software-delivery/artifact-gates.md
+status: active
+contract_type: workflow_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: workflow.software_delivery.artifact_gates.contract
+  surface_type: executable_yaml_contract
+  execution_scope: workflow_execution
+
+activation:
+  events:
+    - reusable_guidance_created
+    - development_guidance_promoted
+    - software_delivery_artifact_reviewed
+    - linked_update_statement_needed
+    - project_evidence_promoted_to_guidance
+  required_when:
+    - Converting APK analysis, implementation observation, embedded/firmware observation, hardware lesson, or design review into reusable development guidance.
+    - Reviewing software-delivery documentation artifacts for completeness, sanitization, owner layer, linked updates, or quality criteria.
+    - A reusable note could affect controls, implementation, checklists, process, templates, or project documentation.
+
+required_sources:
+  - workflow/software-delivery/artifact-gates.md
+  - workflow/software-delivery/README.md
+  - workflow/software-delivery/templates/README.md
+  - enforcement/reusable-guidance-boundary.md
+  - enforcement/sanitization.md
+  - enforcement/linked-updates.md
+  - enforcement/goal-action-validation.md
+
+steps:
+  - id: choose_artifact_shape
+    order: 1
+    action: Choose reusable note, product/process artifact, review report, parity inventory, performance evidence, or project-local evidence shape.
+    outputs:
+      - artifact_shape
+  - id: fill_reusable_note_structure
+    order: 2
+    action: For reusable guidance, include title, status, observed risk, development consequence, recommended control, validation, and limits.
+    required_if:
+      - reusable_guidance_created
+    gates:
+      - gate.artifact_gates.required_sections_present
+  - id: classify_owner_layer
+    order: 3
+    action: Place content into controls, platforms, languages, implementation, checklists, feedback history, analysis, workflow, project docs, or ignored local notes.
+    gates:
+      - gate.artifact_gates.owner_layer_correct
+  - id: sanitize_project_evidence
+    order: 4
+    action: Remove project-specific names, modules, endpoints, payloads, class/test names, local paths, hosts, live data, secrets, credentials, or private customer data from reusable guidance.
+    gates:
+      - gate.artifact_gates.sanitized
+  - id: write_linked_update_statement
+    order: 5
+    action: State which related controls, implementation docs, checklists, process docs, templates, or indexes were updated or checked and why.
+    gates:
+      - gate.artifact_gates.linked_updates_recorded
+  - id: check_good_guidance_criteria
+    order: 6
+    action: Ensure guidance is executable, owner-layer clear, testable, honest about limits, sanitized, parity-aware, and performance-aware when needed.
+    gates:
+      - gate.artifact_gates.good_guidance
+
+gates:
+  - id: gate.artifact_gates.required_sections_present
+    blocks: reusable_guidance_completion
+    pass_when:
+      - title, status, observed risk, development consequence, recommended implementation/control, validation, and limits are present
+      - validation states how the control exists or fails safely
+  - id: gate.artifact_gates.owner_layer_correct
+    blocks: artifact_publication
+    pass_when:
+      - reusable rule, implementation detail, review flow, project evidence, or local note is placed in the correct owner layer
+      - APK methods stay in analysis/apk or workflow/apk-analysis
+      - project-specific evidence stays in project docs
+  - id: gate.artifact_gates.sanitized
+    blocks: reusable_guidance_commit
+    pass_when:
+      - no target-specific secrets, hosts, endpoints, sample IDs, local paths, class/test names, live result, credentials, customer data, or raw vendor private material remain
+      - reusable text keeps only generalized risk, rule, control, and validation
+  - id: gate.artifact_gates.linked_updates_recorded
+    blocks: reusable_guidance_commit
+    pass_when:
+      - required linked update statement names affected controls, implementation docs, checklists, process docs, templates, or indexes
+      - not-applicable linked updates include reasons
+  - id: gate.artifact_gates.good_guidance
+    blocks: artifact_completion_claim
+    pass_when:
+      - artifact is executable by engineers or agents
+      - owner layer is explicit
+      - guidance can translate to code, config, test, or review checklist
+      - residual risk and limits are stated
+      - replacement/parity and performance evidence are included when relevant
+
+required_evidence:
+  - artifact shape decision
+  - owner layer decision
+  - sanitization review summary
+  - linked update statement
+  - validation method
+  - residual risk / limits
+
+success_criteria:
+  - Software-delivery artifacts are complete enough for engineers and agents to execute.
+  - Reusable guidance contains generalized lessons and validation, not project incident raw evidence.
+  - Content lands in the correct owner layer and updates linked indexes or docs.
+  - Parity and performance evidence are required when the artifact makes replacement or performance claims.
+  - Completion claims include validation and residual risk.
+
+failure_modes:
+  - id: raw_project_evidence_in_reusable_guidance
+    detection: Reusable note includes project names, hosts, endpoints, payload fragments, samples, class/test names, local paths, live output, credentials, or customer data.
+    recovery: Move raw evidence to project docs and keep generalized guidance only.
+  - id: linked_updates_missing
+    detection: Reusable guidance affects controls, implementation, checklists, process, templates, or indexes without linked update statement.
+    recovery: Update linked files or record not-applicable reasons before commit.
+  - id: owner_layer_drift
+    detection: Analysis method, project evidence, implementation pattern, or review checklist is placed in the wrong layer.
+    recovery: Move content to owner layer and leave a link from the previous location when useful.
+  - id: unverifiable_guidance
+    detection: Guidance recommends a control but lacks validation, limits, or safe-failure criteria.
+    recovery: Add validation method, limits, and residual risk before promotion.
+
+final_status_report:
+  required_fields:
+    - artifact_shape
+    - owner_layer
+    - sanitization_status
+    - linked_update_status
+    - validation_status
+    - residual_risk

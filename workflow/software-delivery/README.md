@@ -73,7 +73,9 @@
 | 檔案 | 來源 | 說明 |
 |------|------|------|
 | [`execution-flow.md`](execution-flow.md) | `WORKFLOW.md` §1, §5-8（已刪除） | Start From Evidence、Change Intake、BDD Closure Loop、SDK Defect Closure、Same-Session Closure、Performance Gate、Backfill Rules、Validate |
+| [`execution-flow.yaml`](execution-flow.yaml) | `execution-flow.md` | Software delivery execution executable contract：change intake、requirements、BDD closure、parity、performance、validation gates |
 | [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md`（已刪除） | Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria |
+| [`artifact-gates.yaml`](artifact-gates.yaml) | `artifact-gates.md` | Software delivery artifact executable contract：artifact shape、owner layer、sanitization、linked updates、quality gates |
 | [`analysis/development-guidance/risk-translation.md`](../../analysis/development-guidance/risk-translation.md) | `WORKFLOW.md` §2-5（已刪除） | Risk Translation Table、Owner Layer Selection、Control Definition、Guidance Classification、Linked Updates |
 | [`review-checklist.md`](review-checklist.md) | `skills/app-development-guidance/checklists/`（已刪除） | 6 種審查 checklist 的 catalog（Mobile Design Review、Mobile PR Review、Mobile Release Review、API Security Review、Contract Governance Review、Embedded Firmware Review） |
 | [`development-process.md`](development-process.md) | `skills/app-development-guidance/process/README.md`（已刪除） | Contract-first 開發流程：Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill、Contract-First Rules、Definition of Ready/Done |
