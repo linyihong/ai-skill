@@ -34,6 +34,7 @@ proposed → accepted → deprecated → superseded
 | [ADR-005](ADR-005-memory-architecture.md) | Memory Architecture（6 子層記憶模型） | accepted | 2026-05-12 | Gen 3 確立 |
 | [ADR-006](ADR-006-registry-first-workflow-activation.md) | Registry-First Workflow Activation | accepted | 2026-05-18 | Gen 3 |
 | [ADR-007](ADR-007-constitution-and-decision-promotion-boundary.md) | Constitution and Decision Promotion Boundary | accepted | 2026-05-21 | Gen 3 |
+| [ADR-008](ADR-008-runtime-cognitive-modes.md) | Runtime Cognitive Modes | **proposed** | 2026-05-22 | Gen 3 子系統擴充（proposed；對應 plan [`plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md`](../plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md) status draft） |
 
 每個 ADR 內含 `Framework Generation` section，標註世代分類與當前世代文件連結。新增世代時依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §3 規則 7 評估每個 ADR 的延伸狀態。
 

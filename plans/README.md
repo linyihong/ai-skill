@@ -88,6 +88,7 @@
 
 | 檔案 | 狀態 | 說明 |
 |------|------|------|
+| [`active/2026-05-22-1629-runtime-cognitive-modes-system.md`](active/2026-05-22-1629-runtime-cognitive-modes-system.md) | draft | Runtime Cognitive Modes System：把 `models/` 從 documentation layer 提升為 runtime activation；引入 4 維 cognitive mode primitive（execution / context / governance / memory）；整合既有 phase_machine、compression、memory、governance；分 5 phase 漸進實作。依賴 [ADR-008](../constitution/ADR-008-runtime-cognitive-modes.md)（proposed）。 |
 | [`archived/2026-05-22-0855-executable-yaml-contract-migration.md`](archived/2026-05-22-0855-executable-yaml-contract-migration.md) | ✅ completed | Executable YAML Contract Migration：盤點哪些流程、gate、required reads、failure actions 應升級為 owner-layer YAML contract，並投影到 runtime generated surfaces，降低非 ChatGPT agent 漏跑流程的風險 |
 | [`archived/2026-05-11-1112-next-stage-upgrade-plan.md`](archived/2026-05-11-1112-next-stage-upgrade-plan.md) | ✅ completed | 全局升級路線圖（所有 Phase 1-33 已執行完畢） |
 | [`archived/2026-05-11-1129-apk-analysis-pilot-migration.md`](archived/2026-05-11-1129-apk-analysis-pilot-migration.md) | ✅ completed | APK Analysis Pilot Migration 狀態圖（原 architecture/） |
