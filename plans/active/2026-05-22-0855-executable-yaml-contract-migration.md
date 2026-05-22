@@ -162,7 +162,9 @@ final_status_report: []
 
 - [x] YAML 化 `conversation-goal-ledger` 的 goal lifecycle、lock decision、completion deletion gate。
 - [x] 為 `ai-tools/agent/codex.md`、`claude.md`、`cursor.md`、`roo.md` 建立 adapter contract，統一 bootstrap required reads 與 forbidden duplicated rules。
-- [ ] 將 `knowledge/runtime/routing-registry.yaml` 的 route activation 與 source-of-truth gate 檢查接入 validation。
+- [x] 將 `knowledge/runtime/routing-registry.yaml` 的 route activation 與 source-of-truth gate 檢查接入 validation。
+
+**Phase 2 output**：`conversation-goal-ledger` 與四個 agent adapter 已有 owner-layer executable YAML contract；`runtime validate` 已檢查 routing registry 的 route ID、primary source、source-of-truth gate、validation signal、workflow activation triggers 與 source path 可解析性。
 
 ### Phase 3：Workflow Contracts
 

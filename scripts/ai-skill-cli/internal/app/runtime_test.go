@@ -33,8 +33,8 @@ func TestRuntimeValidateDryRunPlansValidators(t *testing.T) {
 	if result.Command != "runtime validate" || result.Mode != "dry_run" {
 		t.Fatalf("unexpected result identity: %#v", result)
 	}
-	if len(result.PlannedActions) != 5 {
-		t.Fatalf("expected five planned validators, got %#v", result.PlannedActions)
+	if len(result.PlannedActions) != 6 {
+		t.Fatalf("expected six planned validators, got %#v", result.PlannedActions)
 	}
 	if len(result.Mutations) != 0 {
 		t.Fatalf("runtime validate dry-run must not mutate, got %#v", result.Mutations)
@@ -62,6 +62,59 @@ func TestRuntimeValidateDefaultNativeDoesNotNeedRuby(t *testing.T) {
 	}
 	if !hasCheckStatus(result.Checks, "knowledge_runtime_native", "ok") {
 		t.Fatalf("expected native knowledge runtime validation, got %#v", result.Checks)
+	}
+}
+
+func TestNativeRoutingRegistryValidationRequiresSourceOfTruthGate(t *testing.T) {
+	repo := t.TempDir()
+	writeFile(t, filepath.Join(repo, "README.md"), "# Test Repo\n")
+	registry := runtimeRoutingRegistry{Records: []runtimeRouteRecord{
+		{
+			ID:               "route.test.missing-gate",
+			TaskIntent:       "test missing gate",
+			PrimarySource:    "README.md",
+			RankingReason:    "README is the test primary source.",
+			ValidationSignal: "test validation signal",
+			Metadata: runtimeRouteMetadata{
+				Priority:           "P1",
+				Confidence:         "high",
+				CompatibilityState: "test-active",
+			},
+			Model: runtimeRouteModel{
+				Profile:          "small",
+				CompressionLevel: "summary-first",
+			},
+		},
+	}}
+	if err := nativeRoutingRegistryValidation(repo, registry); err == nil || !strings.Contains(err.Error(), "missing source_of_truth_gate") {
+		t.Fatalf("expected missing source_of_truth_gate failure, got %v", err)
+	}
+}
+
+func TestNativeRoutingRegistryValidationRequiresWorkflowActivation(t *testing.T) {
+	repo := t.TempDir()
+	writeFile(t, filepath.Join(repo, "workflow", "demo", "execution-flow.md"), "# Demo workflow\n")
+	registry := runtimeRoutingRegistry{Records: []runtimeRouteRecord{
+		{
+			ID:                "route.workflow.demo",
+			TaskIntent:        "demo workflow",
+			PrimarySource:     "workflow/demo/execution-flow.md",
+			SourceOfTruthGate: "demo-workflow-active",
+			RankingReason:     "Workflow demo primary source.",
+			ValidationSignal:  "Demo workflow route validated.",
+			Metadata: runtimeRouteMetadata{
+				Priority:           "P2",
+				Confidence:         "high",
+				CompatibilityState: "new-layer-promoted",
+			},
+			Model: runtimeRouteModel{
+				Profile:          "large",
+				CompressionLevel: "source-backed",
+			},
+		},
+	}}
+	if err := nativeRoutingRegistryValidation(repo, registry); err == nil || !strings.Contains(err.Error(), "workflow route missing activation_triggers") {
+		t.Fatalf("expected missing workflow activation failure, got %v", err)
 	}
 }
 
@@ -694,20 +747,34 @@ func writeRuntimeNativeReportSourceFixture(t *testing.T, repo string) {
 	t.Helper()
 	writeFile(t, filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"), `records:
   - id: route.test.small
+    task_intent: test small route
     primary_source: README.md
     required_dependencies:
       - CORE_BOOTSTRAP.md
       - README.md
+    source_of_truth_gate: test-small-active
+    ranking_reason: README is the primary source for the small test route.
     validation_signal: small route validated
+    metadata:
+      priority: P1
+      confidence: high
+      compatibility_state: test-active
     model:
       profile: small
       compression_level: summary-first
       reason: small reason
   - id: route.test.large
+    task_intent: test large route
     primary_source: workflow/test.md
     required_dependencies:
       - workflow/test.md
+    source_of_truth_gate: test-large-active
+    ranking_reason: workflow/test.md is the primary source for the large test route.
     validation_signal: large route validated
+    metadata:
+      priority: P2
+      confidence: medium
+      compatibility_state: test-active
     model:
       profile: large
       compression_level: source-backed

@@ -10,7 +10,7 @@
 - [`model-context-report.md`](model-context-report.md)：由 generator 產生的 model profile / compression loading view。
 - [`model-checklists.md`](model-checklists.md)：由 generator 產生的 per-model context-loading checklist。
 - [`sqlite/`](sqlite/README.md)：SQLite / FTS generated lookup cache prototype，用於低 token 搜尋 candidate sources。
-- `ai-skill runtime validate`：檢查 generated surfaces 的 YAML / Markdown 格式、必要欄位與 canonical path。
+- `ai-skill runtime validate`：檢查 generated surfaces 的 YAML / Markdown 格式、必要欄位、canonical path、routing registry activation triggers 與 source-of-truth gates。
 - `ai-skill runtime refresh`：一鍵重建 reports、model context、model checklists、SQLite index 並執行 validators。
 - `ai-skill runtime query`：低成本查詢 runtime SQLite index。
 - `ai-skill runtime query --graph`：低成本查詢 graph edges，輔助 dependency / promotion / routing lookup。
@@ -64,7 +64,7 @@ Runtime view 應回答：
 - SQLite / FTS 只能是 generated lookup cache；查詢結果只作 candidate list，不取代 canonical Markdown / YAML。
 - Graph query 結果只作 candidate edge list；需要修改或高信心判斷時仍讀 graph YAML 與 canonical source。
 - 修改 registry、summaries、graphs、refresh policy、model profiles、model docs 或 SQLite source inputs 後，重新執行 `ai-skill runtime refresh`。
-- 修改 registry、refresh policy、summaries 或 graphs 後，執行 `ai-skill runtime validate`，再做 lints、Markdown link check、close-loop dry run 與 commit / push / readback。
+- 修改 registry、refresh policy、summaries 或 graphs 後，執行 `ai-skill runtime validate`，確認 route activation、primary source、source-of-truth gate、validation signal 與 required dependencies 可解析，再做 lints、Markdown link check、close-loop dry run 與 commit / push / readback。
 
 ## 尚未實作
 

@@ -53,12 +53,21 @@ type runtimeRoutingRegistry struct {
 type runtimeRouteRecord struct {
 	ID                   string               `yaml:"id"`
 	TaskIntent           string               `yaml:"task_intent"`
+	ActivationTriggers   runtimeRouteTriggers `yaml:"activation_triggers"`
 	PrimarySource        string               `yaml:"primary_source"`
 	RequiredDependencies []string             `yaml:"required_dependencies"`
+	CandidateSources     []string             `yaml:"candidate_sources"`
+	SourceOfTruthGate    string               `yaml:"source_of_truth_gate"`
 	RankingReason        string               `yaml:"ranking_reason"`
 	ValidationSignal     string               `yaml:"validation_signal"`
 	Metadata             runtimeRouteMetadata `yaml:"metadata"`
 	Model                runtimeRouteModel    `yaml:"model"`
+}
+
+type runtimeRouteTriggers struct {
+	TaskIntents     []string `yaml:"task_intents"`
+	UserSignals     []string `yaml:"user_signals"`
+	FileChangeGlobs []string `yaml:"file_change_globs"`
 }
 
 type runtimeRouteMetadata struct {
@@ -214,6 +223,7 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 	result.PlannedActions = append(result.PlannedActions, "validate owner-layer executable YAML contract projections")
 	result.PlannedActions = append(result.PlannedActions, "validate SQLite canonical runtime documents")
 	result.PlannedActions = append(result.PlannedActions, "run native runtime SQLite index validation")
+	result.PlannedActions = append(result.PlannedActions, "validate routing registry activation and source-of-truth gates")
 	result.PlannedActions = append(result.PlannedActions, "run native knowledge runtime validation")
 
 	if opts.dryRun {
@@ -1023,6 +1033,9 @@ func nativeKnowledgeRuntimeValidation(repo string) Check {
 	if len(registry.Records) == 0 {
 		return Check{Name: "knowledge_runtime_native", Status: "failed", Message: "routing registry has no records"}
 	}
+	if err := nativeRoutingRegistryValidation(repo, registry); err != nil {
+		return Check{Name: "knowledge_runtime_native", Status: "failed", Message: err.Error()}
+	}
 	summaries, err := runtimeSummaryRecords(repo)
 	if err != nil {
 		return Check{Name: "knowledge_runtime_native", Status: "failed", Message: err.Error()}
@@ -1055,6 +1068,92 @@ func nativeKnowledgeRuntimeValidation(repo string) Check {
 		}
 	}
 	return Check{Name: "knowledge_runtime_native", Status: "ok", Message: fmt.Sprintf("Knowledge runtime checks passed: registry_records=%d summaries=%d graphs=%d", len(registry.Records), len(summaries), len(graphs))}
+}
+
+func nativeRoutingRegistryValidation(repo string, registry runtimeRoutingRegistry) error {
+	seen := map[string]bool{}
+	for _, record := range registry.Records {
+		if strings.TrimSpace(record.ID) == "" {
+			return fmt.Errorf("routing registry record missing id")
+		}
+		if seen[record.ID] {
+			return fmt.Errorf("routing registry duplicate id: %s", record.ID)
+		}
+		seen[record.ID] = true
+		if !strings.HasPrefix(record.ID, "route.") {
+			return fmt.Errorf("%s id must start with route.", record.ID)
+		}
+		if strings.TrimSpace(record.TaskIntent) == "" && !runtimeRouteTriggersPresent(record.ActivationTriggers) {
+			return fmt.Errorf("%s missing task_intent or activation_triggers", record.ID)
+		}
+		if strings.TrimSpace(record.PrimarySource) == "" {
+			return fmt.Errorf("%s missing primary_source", record.ID)
+		}
+		if strings.TrimSpace(record.SourceOfTruthGate) == "" {
+			return fmt.Errorf("%s missing source_of_truth_gate", record.ID)
+		}
+		if strings.TrimSpace(record.RankingReason) == "" {
+			return fmt.Errorf("%s missing ranking_reason", record.ID)
+		}
+		if strings.TrimSpace(record.ValidationSignal) == "" {
+			return fmt.Errorf("%s missing validation_signal", record.ID)
+		}
+		if record.Metadata.Priority == "" || record.Metadata.Confidence == "" || record.Metadata.CompatibilityState == "" {
+			return fmt.Errorf("%s missing metadata priority/confidence/compatibility_state", record.ID)
+		}
+		if record.Model.Profile == "" || record.Model.CompressionLevel == "" {
+			return fmt.Errorf("%s missing model profile/compression_level", record.ID)
+		}
+		if strings.HasPrefix(record.ID, "route.workflow.") {
+			if !runtimeRouteTriggersPresent(record.ActivationTriggers) {
+				return fmt.Errorf("%s workflow route missing activation_triggers", record.ID)
+			}
+			if !strings.HasPrefix(record.PrimarySource, "workflow/") {
+				return fmt.Errorf("%s workflow route primary_source must stay under workflow/", record.ID)
+			}
+		}
+		if runtimeRouteTriggersConfigured(record.ActivationTriggers) && !runtimeRouteTriggersPresent(record.ActivationTriggers) {
+			return fmt.Errorf("%s activation_triggers configured but empty", record.ID)
+		}
+		if err := nativeRouteSourcePathExists(repo, record.PrimarySource); err != nil {
+			return fmt.Errorf("%s primary_source: %w", record.ID, err)
+		}
+		for _, dep := range record.RequiredDependencies {
+			if err := nativeRouteSourcePathExists(repo, dep); err != nil {
+				return fmt.Errorf("%s required_dependency %s: %w", record.ID, dep, err)
+			}
+		}
+		if record.SourceOfTruthGate == "new-layer-promoted" && strings.HasPrefix(record.PrimarySource, "skills/") {
+			return fmt.Errorf("%s new-layer-promoted primary_source must not point at retired skills/", record.ID)
+		}
+	}
+	return nil
+}
+
+func runtimeRouteTriggersConfigured(triggers runtimeRouteTriggers) bool {
+	return triggers.TaskIntents != nil || triggers.UserSignals != nil || triggers.FileChangeGlobs != nil
+}
+
+func runtimeRouteTriggersPresent(triggers runtimeRouteTriggers) bool {
+	return len(triggers.TaskIntents) > 0 || len(triggers.UserSignals) > 0 || len(triggers.FileChangeGlobs) > 0
+}
+
+func nativeRouteSourcePathExists(repo string, source string) error {
+	source = strings.TrimSpace(source)
+	if source == "" {
+		return fmt.Errorf("empty source path")
+	}
+	if strings.ContainsAny(source, "*?[]") {
+		return nil
+	}
+	clean := filepath.Clean(source)
+	if filepath.IsAbs(clean) || strings.HasPrefix(clean, "..") {
+		return fmt.Errorf("source path must be repo-relative: %s", source)
+	}
+	if _, err := os.Stat(filepath.Join(repo, clean)); err != nil {
+		return err
+	}
+	return nil
 }
 
 func nativeRuntimeIndexTablesCheck(db *sql.DB) error {
