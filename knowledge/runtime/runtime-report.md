@@ -11,7 +11,7 @@
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
 | SQLite runtime index | [`sqlite/`](sqlite/) | generated lookup cache prototype |
-| Summaries | [`../summaries/`](../summaries/) | 21 files |
+| Summaries | [`../summaries/`](../summaries/) | 22 files |
 | Graph records | [`../graphs/`](../graphs/) | 33 files |
 
 ## Routing Records
@@ -90,6 +90,7 @@
 | `knowledge.navigation` | `validated` | [`knowledge-navigation.md`](../summaries/knowledge-navigation.md) | 知識導航系統：indexes（任務路由）、summaries（300-500 token 摘要）、graphs（知識圖譜邊）、runtime（routing registry、refresh policy、SQLite lookup cache）。讓 agent 用最小 token 成本找到正確知識。 |
 | `memory.operations` | `candidate` | [`memory-operations.md`](../summaries/memory-operations.md) | Memory 是 selective replay system：working buffer、summary、episodic、project、failure、decision 與 retrieval-governance。Replay 需要 trigger、qualification、budget、freshness/scope check 與 current source revalidation。 |
 | `metadata.schema.knowledge-atom` | `validated` | [`metadata-schema.md`](../summaries/metadata-schema.md) | Knowledge Atom metadata schema v1，定義 atom 的必填欄位、選填欄位、受控值、YAML 範本、驗證規則與 provider prompt cache hints。 |
+| `intelligence.migration-feature-bundling` | `candidate` | [`migration-feature-bundling.md`](../summaries/migration-feature-bundling.md) | 大型 migration / rewrite / platform 升級時把搬遷（refactor）與新功能（behavior change）綁進同一階段交付的反模式。後果是驗證失去 ground truth（Verification Identity Crisis）— bug 來源無法定位、時程不可預測、回滾不可行。正確路徑是 Parity-First Migration：Phase 1 達成新版 = 舊版等價並通過舊測試套件，Phase 2 才加新功能。對 stakeholder 的有效翻譯是「失望總比絕望好」。 |
 | `intelligence.migration-seeder-anti-patterns` | `candidate` | [`migration-seeder-anti-patterns.md`](../summaries/migration-seeder-anti-patterns.md) | 把大量業務資料（廠商目錄、商品/SKU、遊戲清單、權限矩陣）以巨型 `INSERT` 包進 schema migration，使資料 lifecycle 與 schema lifecycle 被強制綁定。訊號：單檔 >50KB、檔名含 dataSeeder、業務人員想改資料要工程師寫 migration。替代方案依資料性質：列舉留 migration、目錄走 application seeder/admin、大量參考資料用外部 CSV + bulk loader。 |
 | `models.routing` | `candidate` | [`model-routing.md`](../summaries/model-routing.md) | Model-aware execution strategy：profiles、capabilities、routing、workflow adaptation、governance、runtime primitives 與 compression。用於選擇 behavior shape，不宣稱 provider model 已切換。 |
 | `runtime.prompt-cache-alignment` | `candidate` | [`prompt-cache-alignment.md`](../summaries/prompt-cache-alignment.md) | Provider prompt cache 對齊規範。定義 stable prefix、semi-stable middle、volatile suffix 的 context layout，並說明 `cacheable` 與 `provider_cache_candidate` 的邊界。 |

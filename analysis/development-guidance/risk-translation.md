@@ -96,3 +96,48 @@
 | `process/` 治理或回填規則 | `templates/`、`CHECKLIST.md`、`WORKFLOW.md` 和相關的 `implementation/` 文件 |
 
 如果不需要連結更新，說明原因。不要將必要的連結更新稱為可選。
+
+## 6. 對 Stakeholder 翻譯（業務語的風險陳述）
+
+§1 把觀察翻成「開發者風險陳述」；本節再翻一層 — 把開發者風險翻成 stakeholder（PM / 業務 / 客戶）聽得懂的具象話術。工程上的論證若停在開發者語彙，往往無法說服 stakeholder 接受 scope 限制或階段延後。
+
+### 翻譯原則
+
+| 從 | 到 |
+| --- | --- |
+| 抽象工程概念（ground truth、validation、coverage） | 具象後果（看不到、不確定、爆炸、回不來） |
+| 量化效益（驗證成本指數成長） | 情緒對比（短期 vs 長期、可控 vs 失控） |
+| 教科書詞彙（idempotency、parity） | 日常比喻（重複按按鈕、新版跟舊版做一樣的事） |
+
+### 案例：Migration 不要綁新功能
+
+**情境**：大型系統改版的 kickoff，客戶要求「既然要重寫，順便加 OOO 吧」。
+
+**開發者風險陳述**（§1 風格）：
+
+> 同時加新功能會讓驗證失去 ground truth。新版出現的行為差異無法判斷來源是搬遷錯、新功能 bug 還是兩者互動，回歸成本指數增長。
+
+**Stakeholder 反駁**：「不加新功能的話，使用者會很失望耶。」
+
+**Stakeholder 翻譯**：
+
+> **失望總比絕望好**
+
+為什麼這話術有效：
+
+1. **抽象 → 具象**：把「驗證失去 ground truth」翻成「失望 vs 絕望」的情緒對比
+2. **不需要技術背景就能理解**
+3. **錨點留在「絕望」**：對方會記住後果嚴重性（系統崩塌、無法回滾、時程黑洞）
+4. **時間框架對比**：短期失望（沒新功能）vs 長期絕望（系統壞了無法定位）
+
+完整論證請見 [`intelligence/engineering/anti-patterns/migration-feature-bundling.md`](../../intelligence/engineering/anti-patterns/migration-feature-bundling.md)。
+
+### 寫話術時的 checklist
+
+| 檢查 | 通過條件 |
+|------|------|
+| 是否具象 | 對方腦中能形成畫面或感覺，不是抽象名詞 |
+| 是否避免術語 | 不含 idempotent、parity、coverage、ground truth 等開發者詞彙 |
+| 是否有時間框架 | 短期 vs 長期、現在 vs 之後 |
+| 是否留錨點 | 對方記住一個關鍵詞（如「絕望」「爆炸」「黑洞」） |
+| 是否不誇大 | 翻譯不能把可控風險講成不可控（中性化不能改變結論） |

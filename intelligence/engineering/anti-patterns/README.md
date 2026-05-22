@@ -18,6 +18,7 @@ AI 自動避雷。
 - [`architecture-absolutism.md`](architecture-absolutism.md) — 把單一架構風格當 universal default。
 - [`migration-seeder-anti-patterns.md`](migration-seeder-anti-patterns.md) — 把大量業務資料以巨型 INSERT 包進 schema migration，使資料 lifecycle 被綁定到 schema lifecycle。
 - [`session-scoped-implicit-state.md`](session-scoped-implicit-state.md) — 將 user / phase / tenant 等執行上下文塞進 session-scoped service 或 ambient context，對 agent runtime / replay / 並發場景是隱形依賴災難。
+- [`migration-feature-bundling.md`](migration-feature-bundling.md) — 大型 migration / rewrite 時把搬遷與新功能綁進同一階段交付，使驗證失去 ground truth；應採 Parity-First Migration（Phase 1 等價、Phase 2 新功能）。
 
 ## 與根目錄 `anti-patterns/` 的差異
 

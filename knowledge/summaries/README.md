@@ -36,6 +36,7 @@ Summaries 用來協助 agent：
 | `intelligence.migration-seeder-anti-patterns` | 業務資料硬塞進 schema migration 的反模式與替代方案。 | [`migration-seeder-anti-patterns.md`](migration-seeder-anti-patterns.md) |
 | `intelligence.vendor-integration-architecture` | 多廠商整合策略選型（Adapter / compile-time module / SPI / out-of-process / hybrid）。 | [`vendor-integration-architecture.md`](vendor-integration-architecture.md) |
 | `analysis.dual-token-audit` | 雙簽章/雙加密 token 並存的審計方法（觀察點、五步流程、failure signals）。 | [`dual-token-audit.md`](dual-token-audit.md) |
+| `intelligence.migration-feature-bundling` | 大型 migration 把搬遷與新功能綁進同一階段交付的反模式；應採 Parity-First Migration；對 stakeholder 翻譯為「失望總比絕望好」。 | [`migration-feature-bundling.md`](migration-feature-bundling.md) |
 
 ## Summary 格式
 
