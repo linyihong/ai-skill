@@ -138,12 +138,14 @@ final_status_report: []
 ### Phase 0：Schema, Validator & Inventory Contract
 
 - [x] 定義 executable contract schema，放在 governance 或 metadata schema owner layer。
-- [ ] 決定 enforcement contract 是新增 `enforcement/*.yaml`，還是升級既有 `metadata/rules/*.yaml`；預設先用 `enforcement/*.yaml`，除非 schema 能清楚區分 metadata vs executable contract。
+- [x] 決定 enforcement contract 是新增 `enforcement/*.yaml`，還是升級既有 `metadata/rules/*.yaml`；預設先用 `enforcement/*.yaml`，除非 schema 能清楚區分 metadata vs executable contract。
 - [x] 確認 runtime compiler 既有 owner-layer YAML 投影行為，補 validator / tests，而不是重複建立平行 compiler path。
 - [x] 新增 schema completeness validation：enabled contract 必須有 `schema_version`、`contract_type`、`blocking_level`、`runtime_projection.target_key`、`activation`、`required_sources`、`gates` 或明確 not-applicable reason。
 - [x] 新增 content assertion validation：SQLite `generated_surfaces.data` 必須包含 contract 的關鍵 gates / failure_modes / final_status_report，不只檢查 target key synced。
-- [ ] 依 `YAMLization Decision Standard` 盤點 system governance 與 workflow 文件，輸出 `contract_required` / `markdown_only` / `not_applicable`。
+- [x] 依 `YAMLization Decision Standard` 盤點 system governance 與 workflow 文件，輸出 `contract_required` / `markdown_only` / `not_applicable`。
 - [x] 新增 validation scenario：metadata YAML 不等於 executable contract，agent 必須先讀 contract。
+
+**Phase 0 output**：`metadata/executable-contract-schema.md` 定義 schema；`governance/lifecycle/executable-contract-inventory.yaml` 保存 location decision 與 `contract_required` / `markdown_only` / `not_applicable` inventory；`runtime validate` 已新增 executable contract projection + data assertion。
 
 ### Phase 1：P0 / P1 Enforcement Contracts
 

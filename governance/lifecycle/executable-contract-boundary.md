@@ -65,18 +65,21 @@ When a Markdown file says a process must be run as a workflow, the agent must lo
 
 If no YAML contract exists but the document has executable signals, the agent must treat that as a linked-update gap and either create the contract or record why it is not applicable.
 
-## Initial Contract Inventory
+## Contract Inventory
 
-The initial inventory lives in [`executable-contract-boundary.yaml`](executable-contract-boundary.yaml). It marks current documents as:
+The active inventory lives in [`executable-contract-inventory.yaml`](executable-contract-inventory.yaml). It marks current documents as:
 
 - `contract_exists`: YAML already exists.
-- `candidate`: needs YAML contract next.
+- `contract_required`: needs YAML contract next.
 - `markdown_only`: intentionally not executable.
-- `runtime_db_only`: runtime-internal config already belongs in SQLite.
+- `not_applicable`: template, example, deprecated stub, or non-owner source.
+
+[`executable-contract-boundary.yaml`](executable-contract-boundary.yaml) keeps the boundary rules and initial seed inventory.
 
 ## Related
 
 - [`knowledge-update-flow.yaml`](knowledge-update-flow.yaml)
+- [`executable-contract-inventory.yaml`](executable-contract-inventory.yaml)
 - [`compiler-philosophy.md`](compiler-philosophy.md)
 - [`../../runtime/README.md`](../../runtime/README.md)
 - [`../../scripts/ai-skill-cli/internal/app/runtime_compiler.go`](../../scripts/ai-skill-cli/internal/app/runtime_compiler.go)

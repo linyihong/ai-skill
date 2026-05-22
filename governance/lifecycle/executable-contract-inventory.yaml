@@ -1,0 +1,241 @@
+schema_version: executable-contract/v1
+id: governance.lifecycle.executable-contract-inventory
+title: Executable contract inventory
+owner_layer: governance
+source_markdown: governance/lifecycle/executable-contract-boundary.md
+status: active
+contract_type: schema_contract
+blocking_level: advisory
+
+runtime_projection:
+  enabled: true
+  target_key: governance.executable_contract_inventory.contract
+  surface_type: executable_yaml_contract
+  execution_scope: contract_migration_planning
+
+activation:
+  events:
+    - executable_contract_migration
+    - workflow_documentation_standard_update
+    - enforcement_rule_yamlization
+    - runtime_projection_validation
+  required_when:
+    - Deciding whether a Markdown or metadata YAML source requires companion executable YAML.
+    - Starting implementation for `plans/active/2026-05-22-0855-executable-yaml-contract-migration.md`.
+    - Reviewing an agent change that claims a process is covered by YAML.
+
+location_decisions:
+  enforcement_contracts:
+    decision: use_owner_layer_companion_yaml
+    default_location: enforcement/*.yaml
+    rationale: >
+      Enforcement metadata in `metadata/rules/*.yaml` summarizes rules for routing and loading.
+      It should not be upgraded in place until schema and validator coverage can prevent
+      weaker agents from treating metadata-only YAML as an executable contract.
+    allowed_exception: >
+      `metadata/rules/*.yaml` may host an executable contract only when it includes
+      `schema_version: executable-contract/v1`, `contract_type`, `blocking_level`,
+      execution-bearing fields, and `runtime_projection.enabled: true`.
+  workflow_contracts:
+    decision: use_workflow_companion_yaml
+    default_location: workflow/<domain>/<source>.yaml
+    rationale: Workflow ownership stays with the workflow domain; runtime receives projections only.
+  project_documentation_contracts:
+    decision: allow_project_local_structured_contract
+    default_location: project_convention
+    rationale: >
+      Other repositories can map the Ai-skill field semantics to their own front-matter,
+      companion YAML, or structured contract format. Ai-skill defines the decision standard,
+      not a forced downstream file layout.
+
+decision_states:
+  contract_required:
+    meaning: Source contains executable signals and needs companion YAML or equivalent structured contract.
+    required_followup:
+      - create_or_update_owner_layer_yaml
+      - enable_runtime_projection_if_execution_affecting
+      - run_runtime_compile_refresh_validate
+  markdown_only:
+    meaning: Source is rationale, background, navigation, or human explanation without repeatable execution gates.
+    required_followup:
+      - keep_markdown_canonical
+      - do_not_create_runtime_noise
+  not_applicable:
+    meaning: Source is a template, example, generated report, deprecated stub, or project-local output where executable contract ownership is elsewhere.
+    required_followup:
+      - record_reason
+      - link_to_owner_contract_when_available
+
+inventory:
+  contract_exists:
+    - source: governance/lifecycle/knowledge-update-flow.md
+      contract: governance/lifecycle/knowledge-update-flow.yaml
+      state: contract_exists
+      reason: Master knowledge update flow has ordered steps, blocking gates, required reads, runtime surface checks, and final report requirements.
+    - source: governance/lifecycle/executable-contract-boundary.md
+      contract: governance/lifecycle/executable-contract-boundary.yaml
+      state: contract_exists
+      reason: Defines executable contract boundary and source ownership rules.
+    - source: governance/lifecycle/decision-promotion-pipeline.md
+      contract: governance/lifecycle/decision-promotion-pipeline.yaml
+      state: contract_exists
+      reason: Routes decisions to runtime, workflow, enforcement, memory, project docs, or ADR targets.
+    - source: ai-tools/agent-onboarding.md
+      contract: ai-tools/agent-onboarding.yaml
+      state: contract_exists
+      reason: Agent adapter onboarding has repeatable steps, gates, validation commands, and failure modes.
+    - source: ai-tools/new-project-onboarding.md
+      contract: ai-tools/new-project-onboarding.yaml
+      state: contract_exists
+      reason: Project initialization has repeatable setup steps and runtime validation requirements.
+
+  contract_required:
+    - source: enforcement/dependency-reading.md
+      suggested_contract: enforcement/dependency-reading.yaml
+      priority: P0
+      reason: Required reads, source-of-truth miss escalation, writeback transaction boundaries, and final status checks are agent behavior gates.
+    - source: enforcement/authorization-scope.md
+      suggested_contract: enforcement/authorization-scope.yaml
+      priority: P0
+      reason: Authorization and scope boundaries can block execution and data collection.
+    - source: enforcement/sanitization.md
+      suggested_contract: enforcement/sanitization.yaml
+      priority: P0
+      reason: Secrets, local paths, private evidence, and project-specific details are commit blockers.
+    - source: enforcement/linked-updates.md
+      suggested_contract: enforcement/linked-updates.yaml
+      priority: P1
+      reason: Linked update completeness, runtime compile, readback, dirty status, and push state are close-loop gates.
+    - source: enforcement/goal-action-validation.md
+      suggested_contract: enforcement/goal-action-validation.yaml
+      priority: P1
+      reason: Important work units need goal, action, and validation closure to prevent premature implementation or completion claims.
+    - source: enforcement/evidence-hierarchy.md
+      suggested_contract: enforcement/evidence-hierarchy.yaml
+      priority: P1
+      reason: Evidence precedence, confidence, and escalation conditions determine whether validation claims are allowed.
+    - source: enforcement/conversation-goal-ledger.md
+      suggested_contract: enforcement/conversation-goal-ledger.yaml
+      priority: P1
+      reason: Goal lifecycle, owner/lock, handoff, and completion deletion gates need structure for multi-step agent work.
+    - source: governance/lifecycle/directory-structure-governance.md
+      suggested_contract: governance/lifecycle/directory-structure-governance.yaml
+      priority: P2
+      reason: Directory creation and rename checkpoints affect layer boundaries, routing, and global references.
+    - source: governance/ai-runtime-governance/linked-update-governance.md
+      suggested_contract: governance/ai-runtime-governance/linked-update-governance.yaml
+      priority: P1
+      reason: Linked update completeness is a governance gate and must align with enforcement linked-update rules.
+    - source: governance/ai-runtime-governance/validation-scenario-governance.md
+      suggested_contract: governance/ai-runtime-governance/validation-scenario-governance.yaml
+      priority: P1
+      reason: Failure promotion into validation scenarios has repeatable gates and expected artifacts.
+    - source: workflow/documentation/execution-flow.md
+      suggested_contract: workflow/documentation/execution-flow.yaml
+      priority: P1
+      reason: Documentation workflow now includes project documentation classification, structured contract decisions, validation, and completion signals.
+    - source: workflow/software-delivery/execution-flow.md
+      suggested_contract: workflow/software-delivery/execution-flow.yaml
+      priority: P2
+      reason: Software delivery execution flow has repeatable phases, required sources, gates, and final reporting.
+    - source: workflow/software-delivery/artifact-gates.md
+      suggested_contract: workflow/software-delivery/artifact-gates.yaml
+      priority: P2
+      reason: Artifact completeness and verification gates are execution-affecting.
+    - source: workflow/apk-analysis/execution-flow.md
+      suggested_contract: workflow/apk-analysis/execution-flow.yaml
+      priority: P2
+      reason: APK analysis flow has ordered analysis steps and evidence requirements.
+    - source: workflow/apk-analysis/artifact-gates.md
+      suggested_contract: workflow/apk-analysis/artifact-gates.yaml
+      priority: P2
+      reason: APK analysis deliverables and evidence gates need structured checks.
+    - source: workflow/travel-planning/execution-flow.md
+      suggested_contract: workflow/travel-planning/execution-flow.yaml
+      priority: P2
+      reason: Travel planning flow has repeatable planning, validation, and output gates.
+    - source: workflow/travel-planning/artifact-gates.md
+      suggested_contract: workflow/travel-planning/artifact-gates.yaml
+      priority: P2
+      reason: Travel planning artifacts define required output completeness.
+    - source: workflow/greenfield/execution-flow.md
+      suggested_contract: workflow/greenfield/execution-flow.yaml
+      priority: P2
+      reason: Greenfield workflow has repeatable planning and execution stages.
+
+  markdown_only:
+    - source: governance/lifecycle/runtime-guards-philosophy.md
+      state: markdown_only
+      reason: Philosophy and design rationale; executable gates belong in derived contracts.
+    - source: governance/lifecycle/routing-philosophy.md
+      state: markdown_only
+      reason: Conceptual routing philosophy unless promoted into route-specific contracts.
+    - source: constitution/README.md
+      state: markdown_only
+      reason: ADR navigation and lifecycle index, not an execution flow.
+    - source: workflow/README.md
+      state: markdown_only
+      reason: Workflow index and navigation surface; execution contracts live in domain workflow files.
+    - source: workflow/workflow-routing.md
+      state: markdown_only
+      reason: Route selection guidance; runtime activation remains in routing registry and workflow contracts.
+    - source: workflow/documentation/README.md
+      state: markdown_only
+      reason: Documentation workflow index; execution flow contract belongs to `workflow/documentation/execution-flow.md`.
+    - source: workflow/software-delivery/README.md
+      state: markdown_only
+      reason: Domain workflow index; execution-bearing content lives in execution-flow and artifact-gates.
+    - source: workflow/apk-analysis/README.md
+      state: markdown_only
+      reason: Domain workflow index; execution-bearing content lives in execution-flow and artifact-gates.
+    - source: workflow/travel-planning/README.md
+      state: markdown_only
+      reason: Domain workflow index; execution-bearing content lives in execution-flow and artifact-gates.
+    - source: workflow/greenfield/README.md
+      state: markdown_only
+      reason: Domain workflow index; execution-bearing content lives in execution-flow.
+    - source: workflow/repo-analysis/README.md
+      state: markdown_only
+      reason: Navigation for repo-analysis guidance; no companion execution flow has been selected in this migration batch.
+
+  not_applicable:
+    - source: workflow/software-delivery/templates/*.md
+      state: not_applicable
+      reason: Templates are consumed by workflow contracts and artifact gates but are not themselves execution contracts.
+    - source: workflow/greenfield/templates/*.md
+      state: not_applicable
+      reason: Templates are project output shapes, not repeatable agent control flows.
+    - source: workflow/software-delivery/examples/EXAMPLES.md
+      state: not_applicable
+      reason: Examples support humans and agents but do not define blocking execution behavior.
+    - source: enforcement/deprecated/README.md
+      state: not_applicable
+      reason: Deprecated index; active contracts belong to non-deprecated enforcement sources.
+
+gates:
+  - id: metadata_yaml_not_executable_contract
+    rule: Metadata YAML is not an executable contract unless it satisfies the executable contract schema and enables runtime projection.
+    failure_action: classify_as_metadata_only_and_create_or_record_contract_gap
+  - id: owner_layer_contract_location
+    rule: New enforcement contracts default to `enforcement/*.yaml`; workflow contracts default to `workflow/<domain>/*.yaml`.
+    failure_action: move_contract_to_owner_layer_before_runtime_compile
+  - id: projection_content_assertion
+    rule: Runtime validation must check generated surface data, not only synced target keys.
+    failure_action: run_runtime_compile_and_validate_before_close_loop
+
+success_criteria:
+  - Inventory decisions use `contract_exists`, `contract_required`, `markdown_only`, or `not_applicable`.
+  - Contract-required entries name a suggested owner-layer contract path.
+  - Metadata-only YAML cannot close a contract-required gap.
+  - Runtime validation checks enabled contracts against generated surface data.
+
+failure_modes:
+  - id: metadata_yaml_as_contract
+    detection: Agent claims `metadata/rules/*.yaml` satisfies executable contract requirements without contract fields.
+    recovery: Use `enforcement/*.yaml` or add full executable contract fields and runtime projection.
+  - id: markdown_only_runtime_noise
+    detection: Philosophy or index docs are converted to YAML only because they mention process concepts.
+    recovery: Keep Markdown-only and extract only concrete gates into a separate contract when needed.
+  - id: project_docs_forced_schema
+    detection: Agent forces another project to copy Ai-skill file layout instead of mapping field semantics.
+    recovery: Preserve project-local format while mapping activation, steps, gates, evidence, and success criteria.

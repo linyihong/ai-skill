@@ -16,6 +16,15 @@
 
 它們在提升之前不得靜默取代舊 skill 行為。
 
+## Executable Contract Inventory
+
+流程或 gate 是否需要 companion YAML，以 [`executable-contract-boundary.md`](executable-contract-boundary.md) 與 [`executable-contract-inventory.yaml`](executable-contract-inventory.yaml) 為準。Inventory 使用：
+
+- `contract_exists`：已有 owner-layer executable YAML contract。
+- `contract_required`：含 ordered steps、required reads、blocking gates、required evidence、failure action 或 final report，需補 companion YAML。
+- `markdown_only`：哲學、背景、tradeoff、設計理由或索引，不投影 runtime。
+- `not_applicable`：template、example、deprecated stub 或非 owner source。
+
 ## 持久目標邊界（Durable Goal Boundary）
 
 長期生命週期狀態應放在持久規劃檔案中，而不是 `.agent-goals/`。

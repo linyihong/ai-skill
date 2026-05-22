@@ -7,6 +7,7 @@
 - [`contributing.md`](contributing.md)：人類維護者與 PR 的驗證流程入口（指令索引與權威文件連結）。
 - [`lifecycle/`](lifecycle/README.md)：定義舊入口退役、新分層 lifecycle、promotion gates 與 source-of-truth 保護。
   - [`directory-structure-governance.md`](lifecycle/directory-structure-governance.md)：目錄結構治理流程 — 新增/改名目錄前的 5 步驟 Checkpoint（名稱衝突、邊界清晰度、慣性命名、路徑深度、全域引用影響）。
+  - [`executable-contract-inventory.yaml`](lifecycle/executable-contract-inventory.yaml)：可執行 YAML contract 盤點，標記 `contract_required`、`markdown_only` 與 `not_applicable`。
 - [`validation/`](validation/README.md)：定義新分層變更的 validation gates、migration checklist 與 pass / block rules。
 - [`cleanup/`](cleanup/README.md)：定義知識重複偵測、拆分規則與所有權邊界。
 - [`dependency/`](dependency/README.md)：定義知識依賴圖的維護規則與連動更新流程。
