@@ -1,0 +1,149 @@
+schema_version: executable-contract/v1
+id: workflow.documentation.execution-flow.contract
+title: Documentation workflow execution flow contract
+owner_layer: workflow
+source_markdown: workflow/documentation/execution-flow.md
+status: active
+contract_type: workflow_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: workflow.documentation.execution_flow.contract
+  surface_type: executable_yaml_contract
+  execution_scope: workflow_execution
+
+activation:
+  events:
+    - project_documentation_created
+    - project_documentation_reorganized
+    - docs_wiki_adr_runbook_or_onboarding_requested
+    - agent_facing_documentation_needed
+    - documentation_yamlization_decision_needed
+  required_when:
+    - Creating or reorganizing docs, wiki, ADR, onboarding, runbook, or knowledge-base files in a project.
+    - A document will be repeatedly loaded by agents and needs index-first shape.
+    - A document may define repeatable agent workflow, required evidence, failure action, or blocking gates.
+    - Applying the YAMLization Decision Standard to downstream project documentation.
+
+required_sources:
+  - workflow/documentation/README.md
+  - workflow/documentation/execution-flow.md
+  - metadata/executable-contract-schema.md
+  - intelligence/engineering/agent-architecture/index-first-documentation.md
+  - governance/ai-runtime-governance/documentation-context-governance.md
+  - governance/document-sizing.md
+  - enforcement/content-layering.md
+  - enforcement/linked-updates.md
+
+steps:
+  - id: clarify_reader_and_lifecycle
+    order: 1
+    action: Identify reader and lifecycle before writing durable documentation.
+    outputs:
+      - reader_classification
+      - lifecycle_classification
+  - id: classify_document_shape
+    order: 2
+    action: Choose one or two classification dimensions for kind, audience, stability, and routing.
+    outputs:
+      - kind
+      - audience
+      - stability
+      - routing
+  - id: choose_location_and_filename
+    order: 3
+    action: Map content intent to the project documentation layout and choose a kebab-case topic name.
+    required_sources:
+      - enforcement/content-layering.md
+  - id: shape_index_first_document
+    order: 4
+    action: Add a short navigation area, keep parent README files as routers, split long leaf content, and avoid duplicate source-of-truth text.
+    gates:
+      - gate.documentation.index_first_shape
+  - id: decide_structured_contract_need
+    order: 5
+    action: Classify the document as contract_required, markdown_only, or not_applicable.
+    required_sources:
+      - metadata/executable-contract-schema.md
+    gates:
+      - gate.documentation.yamlization_decision_recorded
+  - id: create_or_link_companion_contract
+    order: 6
+    action: Create companion YAML or project-local equivalent structured contract when the decision is contract_required.
+    required_if:
+      - contract_required
+    gates:
+      - gate.documentation.required_contract_exists
+  - id: validate_and_update_links
+    order: 7
+    action: Check links, parent README routing, registry/index rows, layering, and Ai-skill linked updates when applicable.
+    gates:
+      - gate.documentation.validation_complete
+
+gates:
+  - id: gate.documentation.index_first_shape
+    blocks: documentation_completion_claim
+    pass_when:
+      - document has reader, lifecycle, kind, audience, stability, and routing metadata or parent README equivalent
+      - parent README remains an index/router and detailed content lives in leaf files
+      - duplicate rule or source-of-truth text is replaced with links
+  - id: gate.documentation.yamlization_decision_recorded
+    blocks: documentation_completion_claim
+    pass_when:
+      - decision is contract_required, markdown_only, or not_applicable
+      - decision reason is recorded in the document, parent README, plan, or linked update record
+    fail_when:
+      - agent assumes all Markdown needs YAML
+      - agent treats ordinary front-matter as executable contract
+  - id: gate.documentation.required_contract_exists
+    blocks: documentation_completion_claim
+    pass_when:
+      - companion YAML or equivalent structured contract exists
+      - contract maps activation, required sources, steps, gates, success criteria, failure modes, and final report semantics
+      - deferred contract gap has explicit owner, reason, and follow-up
+  - id: gate.documentation.validation_complete
+    blocks: close_loop
+    pass_when:
+      - relative links resolve or unresolved links are documented blockers
+      - parent README or project index includes the new child file
+      - routing registry, workflow index, or project-local index is updated when applicable
+      - Ai-skill changes follow dependency-reading and linked-updates close-loop
+
+required_evidence:
+  - reader and lifecycle classification
+  - kind / audience / stability / routing classification
+  - contract_required / markdown_only / not_applicable decision and reason
+  - companion structured contract path or deferral reason
+  - link and index update summary
+  - validation and linked-update summary
+
+success_criteria:
+  - Project documentation is index-first and routeable by humans and agents.
+  - Long or detailed content is split into leaf files with parent README routing.
+  - The YAMLization Decision Standard is applied without forcing every document into YAML.
+  - Contract-required docs have companion YAML or project-equivalent structured contract.
+  - Workflow docs keep operational steps and link governance or intelligence for rationale.
+
+failure_modes:
+  - id: markdown_everything_yamlized
+    detection: Agent creates executable YAML for background, rationale, or human-only notes.
+    recovery: Reclassify as markdown_only and keep runtime surfaces clean.
+  - id: executable_process_hidden_in_markdown
+    detection: Runbook, checklist, required evidence, failure action, or blocking gate exists only in prose.
+    recovery: Create companion YAML or record contract_required gap.
+  - id: parent_readme_becomes_leaf
+    detection: Parent README accumulates detailed content instead of routing to child files.
+    recovery: Split details into leaf files and restore README as index.
+  - id: project_schema_forced
+    detection: Agent forces downstream project to copy Ai-skill YAML layout instead of mapping field semantics.
+    recovery: Use project-local structured format while preserving activation, steps, gates, evidence, and success criteria semantics.
+
+final_status_report:
+  required_fields:
+    - documentation_scope
+    - classification_decision
+    - yamlization_decision
+    - companion_contract_status
+    - link_and_index_validation
+    - linked_update_status

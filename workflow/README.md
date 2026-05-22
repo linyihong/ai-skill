@@ -17,6 +17,7 @@
 - [`repo-analysis/`](repo-analysis/README.md)：Repository 分析的執行流程（new onboarding、deep codebase analysis、migration impact、tech debt assessment）。選路見 [`workflow-routing.md`](./workflow-routing.md)；routing 條目以 registry 為準。
 - [`travel-planning/`](travel-planning/README.md)：旅遊規劃的執行流程（itinerary planning、transportation research、budget planning）。
 - [`documentation/`](documentation/README.md)：跨專案 **agent 友善文件** 的撰寫與分類流程（index-first、降低無效 token、與 `enforcement/` / `governance/` 對齊）。
+  - [`documentation/execution-flow.yaml`](documentation/execution-flow.yaml)：documentation workflow 的 executable contract，包含 YAMLization decision gate。
 
 ## 放什麼
 

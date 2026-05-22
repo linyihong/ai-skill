@@ -132,6 +132,10 @@ inventory:
       contract: ai-tools/agent/roo.yaml
       state: contract_exists
       reason: Roo custom instructions, .roomodes override semantics, guarded global settings writes, and mode boundaries now have an adapter contract.
+    - source: workflow/documentation/execution-flow.md
+      contract: workflow/documentation/execution-flow.yaml
+      state: contract_exists
+      reason: Documentation workflow classification, index-first shape, YAMLization decision, validation, and final report gates now have a workflow contract.
 
   contract_required:
     - source: governance/lifecycle/directory-structure-governance.md
@@ -146,10 +150,6 @@ inventory:
       suggested_contract: governance/ai-runtime-governance/validation-scenario-governance.yaml
       priority: P1
       reason: Failure promotion into validation scenarios has repeatable gates and expected artifacts.
-    - source: workflow/documentation/execution-flow.md
-      suggested_contract: workflow/documentation/execution-flow.yaml
-      priority: P1
-      reason: Documentation workflow now includes project documentation classification, structured contract decisions, validation, and completion signals.
     - source: workflow/software-delivery/execution-flow.md
       suggested_contract: workflow/software-delivery/execution-flow.yaml
       priority: P2

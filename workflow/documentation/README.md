@@ -34,6 +34,7 @@
 | 檔案 | 用途 |
 | --- | --- |
 | [`execution-flow.md`](execution-flow.md) | 從分類、選位、檔案形狀到驗證與連動更新的執行步驟與分類維度表。 |
+| [`execution-flow.yaml`](execution-flow.yaml) | 本 workflow 的 executable contract，結構化 reader/lifecycle、classification、YAMLization decision、validation 與 final report gates。 |
 | [`../../metadata/executable-contract-schema.md`](../../metadata/executable-contract-schema.md) | 判斷其他專案文件何時需要 companion YAML 或等價 structured contract 的欄位語意。 |
 | [`../../intelligence/engineering/agent-architecture/index-first-documentation.md`](../../intelligence/engineering/agent-architecture/index-first-documentation.md) | 為什麼 agent-facing 文件要 index-first 的判斷智慧。 |
 | [`../../governance/ai-runtime-governance/documentation-context-governance.md`](../../governance/ai-runtime-governance/documentation-context-governance.md) | 文件 context、分類、停止條件與單一真相的 AI runtime governance。 |
