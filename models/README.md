@@ -11,6 +11,7 @@
 - [`governance/`](governance/README.md)：定義 model selection、hallucination、context budget 與 confidence governance。
 - [`runtime/`](runtime/README.md)：定義可供 lookup 使用的 minimal routing primitives，不保存 provider model state。
 - [`compression/`](compression/README.md)：定義 index-only、summary-first、checklist-first、source-backed、graph-assisted 等壓縮層級。
+- [`cognitive-modes/`](cognitive-modes/README.md)：**Phase D trial（doc-only）**。4 維 cognitive mode primitive（execution / context / governance / memory）的手動套用契約；agent 在 final report 列 Cognitive Mode 報告。完整 runtime 實作見 [`plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md`](../plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md)。
 - [`../knowledge/runtime/model-context-report.md`](../knowledge/runtime/model-context-report.md)：由 routing registry 產生的 model-aware context loading view。
 - [`../knowledge/runtime/model-checklists.md`](../knowledge/runtime/model-checklists.md)：由 routing registry 產生的 per-model context-loading checklist。
 

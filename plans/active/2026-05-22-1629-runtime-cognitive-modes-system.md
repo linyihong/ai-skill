@@ -1,9 +1,9 @@
 # Runtime Cognitive Modes System
 
-**Status**: `draft`
+**Status**: `in-progress`（Phase D 進行中）
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-22
-**最後更新**：2026-05-22（原 ADR-008 proposed 已撤回，內容整併入本 plan）
+**最後更新**：2026-05-22（Phase D 啟動 — documentation-contract trial）
 
 > ⚠️ 本 plan 為 draft 階段。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
 >
@@ -209,9 +209,69 @@ Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3
 
 ---
 
+## Phase D: Documentation-Contract Trial（先行 trial，無 runtime 程式碼）
+
+**目標**：在進入 Phase 0-5 runtime 實作前，先以**純文件契約**方式驗證 4 維 cognitive mode 設計是否實用。Agent 手動套用 mode，在 final report 回報。
+
+**Status**: in-progress（2026-05-22 啟動）
+
+### 為什麼先做 Phase D
+
+- Phase 1-5 是大改動（runtime.db schema、compiler 規則、discovery YAML、subsystem 整合），實作成本高
+- 4 個 mode 的設計從未真實運作過，不知道組合是否實用
+- Token cost 與既有 phase_machine 衝突風險未知
+- Doc-only trial 可在數天內累積實證，撤回成本極低（`git revert` 即可）
+
+### Phase D 範圍
+
+| 動作 | 範圍 |
+|------|------|
+| 建立 `models/cognitive-modes/README.md` | 4 維 mode primitive 定義 + discovery 速查表 + final report 範本 + rollback 指引 |
+| 更新 `models/README.md` | 加 cognitive-modes/ 入口 |
+| Agent final report 列 Cognitive Mode 報告 | 每個任務必填 4 維值 + 理由欄 |
+| 累積 trial runs | ≥ 5-10 個任務，記錄在 git history |
+| Phase D 結束評估 | 通過 → Phase 0；不通過 → 修設計或撤回 |
+
+### Phase D **不做**的事
+
+- ❌ 寫 `runtime/cognitive-modes.yaml` executable contract
+- ❌ 加 `runtime.db cognitive_modes` 表
+- ❌ 寫 compiler 規則
+- ❌ 寫 discovery YAML 機器化
+- ❌ 改 `models/compression/` 或其他既有 models/ 子層
+- ❌ 改 phase_machine / blocking_gates / retrieval-governance 任何 runtime state
+
+### Phase D 評估指標（trial 結束時驗證）
+
+| 指標 | 通過條件 |
+|------|------|
+| 累積任務數 | ≥ 5 個 final report 含 Cognitive Mode 區塊 |
+| Mode 組合多樣性 | 至少覆蓋 3 種不同 execution + 3 種不同 context + 2 種 governance |
+| 誤判率 | ≤ 20% 的 mode 選擇被使用者糾正 |
+| Raw signal 完整性 | 沒有「找不到適合 signal 表達」的情況 |
+| 設計穩定性 | mode 定義在 5 個任務內未變動超過 2 次 |
+
+### Phase D 完成條件
+
+- [x] `models/cognitive-modes/README.md` 寫入
+- [x] `models/README.md` 加入口
+- [x] Plan 加 Phase D 段落（本段）
+- [x] 至少 1 個任務（本 commit 即是）在 final report 列 Cognitive Mode
+- [ ] 累積 5 個任務的 mode 報告
+- [ ] 評估指標通過
+- [ ] 決定下一步：進 Phase 0 / 修設計 / 撤回 plan
+
+### Phase D Rollback
+
+| 完整撤回 | `git revert <Phase D commit hash>` 移除 cognitive-modes/README.md、models/README 入口、本段落；無 runtime state 變更 |
+| 暫停 trial | 在本段加 `paused` 標記，agent final report 不再列 Cognitive Mode |
+| 修 mode 定義 | 編輯 `models/cognitive-modes/README.md`；下次任務套用新定義 |
+
+---
+
 ## Phase 0: Pre-Build Interrogation + Architecture Compatibility Preflight
 
-**前置條件**：本 plan 從 draft → in-progress 後才開始。依 [`plans/README.md` §Architecture Compatibility Preflight](../README.md) 完成。
+**前置條件**：Phase D 完成且通過評估指標後才開始。依 [`plans/README.md` §Architecture Compatibility Preflight](../README.md) 完成。
 
 ### Interrogation 草稿
 
@@ -436,9 +496,11 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 - [x] 同意 ADR promotion gate 設在 Phase 3 完成
 - [x] 同意 Open Questions 1-5 全部 resolved 方向（見 §Open Questions）
 
-剩餘待 sign-off（plan 進 Phase 0 前需確認）：
+剩餘待 sign-off：
 
-- [ ] Phase 0 Pre-Build Interrogation 草稿審閱
+- [x] **同意先走 Phase D doc-only trial**（2026-05-22 確認）
+- [ ] Phase D trial 結束後評估指標
+- [ ] Phase 0 Pre-Build Interrogation 草稿審閱（Phase D 通過後）
 - [ ] Phase 1 實作前 candidate files 與 runtime.db schema 擴充影響範圍評估
 
 ---
