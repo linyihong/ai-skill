@@ -35,7 +35,7 @@ func runHooks(args []string, stdout io.Writer, stderr io.Writer) int {
 	name := "hooks " + opts.command
 	if opts.command == "run" {
 		if len(args) < 2 {
-			_, _ = fmt.Fprintln(stderr, "usage: ai-skill hooks run <pre-commit|post-commit> [flags]")
+			_, _ = fmt.Fprintln(stderr, "usage: ai-skill hooks run <pre-commit|post-commit|pre-push> [flags]")
 			return ExitInvalidUsage
 		}
 		opts.command = "run " + args[1]
@@ -130,7 +130,7 @@ func buildHooksInstallResult(opts hooksOptions) Result {
 		return result
 	}
 
-	hooks := []string{"pre-commit", "post-commit"}
+	hooks := []string{"pre-commit", "post-commit", "pre-push"}
 	for _, hook := range hooks {
 		result.PlannedActions = append(result.PlannedActions, fmt.Sprintf("install Go hook adapter: %s", filepath.Join(targetDir, hook)))
 	}
@@ -194,6 +194,8 @@ func buildHooksRunResult(opts hooksOptions) Result {
 			result.Checks = append(result.Checks, Check{Name: "cursor_bundle_sync", Status: "skipped", Message: "reference-only default"})
 		}
 		return result
+	case "run pre-push":
+		return runPrePushHook(result, root)
 	default:
 		result.Status = "blocked"
 		result.ExitCode = ExitInvalidUsage
@@ -244,6 +246,63 @@ func runPreCommitHook(result Result, root string) Result {
 		result.Checks = append(result.Checks, Check{Name: "pre_commit", Status: "ok", Message: "no runtime or knowledge hook action required"})
 	}
 	return result
+}
+
+func runPrePushHook(result Result, root string) Result {
+	changed, upstream, err := cliCIPrePushPaths(root)
+	if err != nil {
+		result.Checks = append(result.Checks, Check{Name: "cli_ci_scope", Status: "warning", Message: err.Error(), Remediation: "Running Go tests conservatively because changed paths could not be resolved."})
+		changed = []string{"scripts/ai-skill-cli/"}
+	} else {
+		result.Checks = append(result.Checks, Check{Name: "cli_ci_scope", Status: "ok", Message: "compared against " + upstream})
+	}
+	if !hasCLICIPreflightChange(changed) {
+		result.Checks = append(result.Checks, Check{Name: "cli_ci_preflight", Status: "skipped", Message: "no CLI, hook, or workflow changes since upstream"})
+		return result
+	}
+	cmd := exec.Command("go", "test", "./...")
+	cmd.Dir = filepath.Join(root, "scripts", "ai-skill-cli")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{
+			Code:        "cli_go_test_failed",
+			Message:     compactSummary(string(output)),
+			Remediation: "Run `cd scripts/ai-skill-cli && go test ./...`; if repo-local binaries are stale, rebuild `bin/` with `go run ./cmd/releasebuild --stable-names --version \"repo-$(git rev-parse --short HEAD)\" --commit \"$(git rev-parse --short HEAD)\" --dist bin`.",
+		}
+		return result
+	}
+	result.Checks = append(result.Checks, Check{Name: "cli_ci_preflight", Status: "ok", Message: "go test ./... passed"})
+	return result
+}
+
+func cliCIPrePushPaths(root string) ([]string, string, error) {
+	upstreamOutput, err := exec.Command("git", "-C", root, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}").Output()
+	if err != nil {
+		changed, fallbackErr := gitLines(root, "diff", "--name-only", "HEAD^...HEAD")
+		if fallbackErr != nil {
+			return []string{}, "HEAD", nil
+		}
+		return changed, "HEAD^...HEAD", nil
+	}
+	upstream := strings.TrimSpace(string(upstreamOutput))
+	changed, err := gitLines(root, "diff", "--name-only", upstream+"...HEAD")
+	if err != nil {
+		return nil, upstream, err
+	}
+	return changed, upstream, nil
+}
+
+func hasCLICIPreflightChange(paths []string) bool {
+	for _, path := range paths {
+		if strings.HasPrefix(path, "scripts/ai-skill-cli/") ||
+			strings.HasPrefix(path, "scripts/git-hooks/") ||
+			path == ".github/workflows/ai-skill-cli.yml" {
+			return true
+		}
+	}
+	return false
 }
 
 func gitLines(root string, args ...string) ([]string, error) {

@@ -184,3 +184,20 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime query --graph --type depe
 - `knowledge/runtime/runtime-report.md` 與 `knowledge/runtime/model-context-report.md` 的 Markdown links。
 
 這個 helper 只做 deterministic validation；它不自動修改 summaries、graphs 或 registry。若檢查失敗，先修 source / generated surface，再執行 lints、Markdown link check、close-loop dry run 與 commit / push / readback。
+
+## Script CI / GitHub workflow guard
+
+修改 `scripts/ai-skill-cli/**`、`scripts/git-hooks/**`、repo-local binaries 或 script CI 行為時，必須同步檢查 `.github/workflows/ai-skill-cli.yml`：
+
+- workflow `paths` 是否涵蓋被修改的 script surface。
+- `go test ./...` 是否仍覆蓋 repo-local binary checksum / `BUILDINFO` parity。
+- artifact build step 是否仍產出五個平台 binary 與 `SHA256SUMS`。
+- 若 CLI source 變更，先 commit source，再用該 source commit 重建 `scripts/ai-skill-cli/bin/`，最後用第二個 commit 提交 binary refresh。
+
+Push 前可跑：
+
+```bash
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 hooks run pre-push --repo . --json
+```
+
+這會在本分支相對 upstream 修改 CLI、git hooks 或 CLI workflow 時，先執行 `cd scripts/ai-skill-cli && go test ./...`，用來在 push 前攔截 GitHub Actions 會報的 stale binary / checksum / workflow regression。

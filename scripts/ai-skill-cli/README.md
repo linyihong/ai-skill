@@ -44,10 +44,18 @@ Use the binary matching the host OS/architecture. Rebuild these files only after
 go run ./cmd/releasebuild --stable-names --version "repo-$(git rev-parse --short HEAD)" --commit "$(git rev-parse --short HEAD)" --dist bin
 ```
 
-`go test ./...` verifies `bin/SHA256SUMS`, checks `bin/BUILDINFO` against the latest CLI source commit, and smoke-tests the current host binary. If CLI source changes, rebuild `bin/` before committing.
+`go test ./...` verifies `bin/SHA256SUMS`, checks `bin/BUILDINFO` against the latest CLI source commit, and smoke-tests the current host binary. If CLI source changes, commit the source change first, rebuild `bin/` from that source commit, then commit the binary refresh. This two-commit sequence is required because the source commit hash does not exist before the source commit is created.
 
 Release artifacts：`go run ./cmd/releasebuild` 會輸出 Windows amd64、macOS amd64/arm64、Linux amd64/arm64 binaries 與 `SHA256SUMS`。`ai-skill version` 支援 `-ldflags` 注入 version / commit / date。
 
-GitHub Actions：`.github/workflows/ai-skill-cli.yml` 會在 Windows、macOS、Linux 執行 `go test ./...` 與 `doctor` smoke checks。
+GitHub Actions：`.github/workflows/ai-skill-cli.yml` 會在 Windows、macOS、Linux 執行 `go test ./...` 與 `doctor` smoke checks。修改 `scripts/ai-skill-cli/**`、`scripts/git-hooks/**` 或 workflow 行為時，必須同步檢查 `.github/workflows/ai-skill-cli.yml` 的 trigger、matrix、test command 與 artifact build steps。
+
+Push 前可手動執行與 hook 相同的 CI preflight：
+
+```bash
+./bin/ai-skill-darwin-arm64 hooks run pre-push --repo ../.. --json
+```
+
+若上一輪 GitHub Actions 失敗，下一次 push 前至少先跑 `cd scripts/ai-skill-cli && go test ./...`，再跑上面的 pre-push hook runner。
 
 上游計畫：[`plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md`](../../plans/active/2026-05-21-0834-cross-platform-go-script-runtime.md)

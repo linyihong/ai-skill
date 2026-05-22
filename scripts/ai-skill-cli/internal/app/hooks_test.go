@@ -25,8 +25,8 @@ func TestHooksInstallDryRunPlansWithoutWriting(t *testing.T) {
 	if result.Command != "hooks install" {
 		t.Fatalf("unexpected command: %q", result.Command)
 	}
-	if len(result.PlannedActions) != 2 {
-		t.Fatalf("expected two planned hook installs, got %#v", result.PlannedActions)
+	if len(result.PlannedActions) != 3 {
+		t.Fatalf("expected three planned hook installs, got %#v", result.PlannedActions)
 	}
 	if pathExists(filepath.Join(repo, ".git", "hooks", "pre-commit")) {
 		t.Fatal("dry-run wrote hook target")
@@ -48,6 +48,13 @@ func TestHooksInstallWriteModeInstallsAdapters(t *testing.T) {
 	}
 	if !bytes.Contains(content, []byte("hooks run pre-commit")) {
 		t.Fatalf("expected Go hook runner adapter, got %s", string(content))
+	}
+	prePushContent, err := os.ReadFile(filepath.Join(repo, ".git", "hooks", "pre-push"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Contains(prePushContent, []byte("hooks run pre-push")) {
+		t.Fatalf("expected Go pre-push hook runner adapter, got %s", string(prePushContent))
 	}
 }
 
@@ -142,6 +149,36 @@ func TestHooksRunPostCommitReferenceOnly(t *testing.T) {
 	code := Run([]string{"hooks", "run", "post-commit", "--repo", repo, "--json"}, &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected post-commit success, got %d; stderr=%s stdout=%s", code, stderr.String(), stdout.String())
+	}
+}
+
+func TestHooksRunPrePushSkipsWithoutCLIChanges(t *testing.T) {
+	repo := initTempGitRepo(t)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"hooks", "run", "pre-push", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected pre-push success, got %d; stderr=%s stdout=%s", code, stderr.String(), stdout.String())
+	}
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if !hasCheckStatus(result.Checks, "cli_ci_preflight", "skipped") {
+		t.Fatalf("expected skipped cli_ci_preflight, got %#v", result.Checks)
+	}
+}
+
+func TestHasCLICIPreflightChange(t *testing.T) {
+	if !hasCLICIPreflightChange([]string{"scripts/ai-skill-cli/internal/app/hooks.go"}) {
+		t.Fatal("expected CLI source to trigger preflight")
+	}
+	if !hasCLICIPreflightChange([]string{".github/workflows/ai-skill-cli.yml"}) {
+		t.Fatal("expected workflow to trigger preflight")
+	}
+	if hasCLICIPreflightChange([]string{"scripts/README.md"}) {
+		t.Fatal("scripts README alone should not trigger Go preflight")
 	}
 }
 

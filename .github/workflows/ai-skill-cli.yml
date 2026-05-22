@@ -3,10 +3,12 @@ name: ai-skill CLI
 on:
   push:
     paths:
+      - "scripts/**"
       - "scripts/ai-skill-cli/**"
       - ".github/workflows/ai-skill-cli.yml"
   pull_request:
     paths:
+      - "scripts/**"
       - "scripts/ai-skill-cli/**"
       - ".github/workflows/ai-skill-cli.yml"
 
@@ -38,7 +40,7 @@ jobs:
           go-version-file: scripts/ai-skill-cli/go.mod
           cache-dependency-path: scripts/ai-skill-cli/go.sum
 
-      - name: Run tests
+      - name: Run tests and repo-local binary parity
         run: go test ./...
 
       - name: Smoke version JSON
