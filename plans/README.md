@@ -84,7 +84,7 @@
 
 | 檔案 | 狀態 | 說明 |
 |------|------|------|
-| [`active/2026-05-22-0855-executable-yaml-contract-migration.md`](active/2026-05-22-0855-executable-yaml-contract-migration.md) | in-progress | Executable YAML Contract Migration：盤點哪些流程、gate、required reads、failure actions 應升級為 owner-layer YAML contract，並投影到 runtime generated surfaces，降低非 ChatGPT agent 漏跑流程的風險 |
+| [`archived/2026-05-22-0855-executable-yaml-contract-migration.md`](archived/2026-05-22-0855-executable-yaml-contract-migration.md) | ✅ completed | Executable YAML Contract Migration：盤點哪些流程、gate、required reads、failure actions 應升級為 owner-layer YAML contract，並投影到 runtime generated surfaces，降低非 ChatGPT agent 漏跑流程的風險 |
 | [`archived/2026-05-11-1112-next-stage-upgrade-plan.md`](archived/2026-05-11-1112-next-stage-upgrade-plan.md) | ✅ completed | 全局升級路線圖（所有 Phase 1-33 已執行完畢） |
 | [`archived/2026-05-11-1129-apk-analysis-pilot-migration.md`](archived/2026-05-11-1129-apk-analysis-pilot-migration.md) | ✅ completed | APK Analysis Pilot Migration 狀態圖（原 architecture/） |
 | [`archived/2026-05-12-1101-context-cost-optimization.md`](archived/2026-05-12-1101-context-cost-optimization.md) | ✅ completed | Phase 1：Context Cost Optimization 執行計畫（原 architecture/） |

@@ -1,6 +1,6 @@
 # Executable YAML Contract Migration Plan
 
-> **狀態**：in-progress
+> **狀態**：completed
 > **建立時間**：2026-05-22 08:55 JST
 > **目的**：把目前仍主要依賴 Markdown prose 的流程、gate、required reads、failure actions 與 final status requirements，整理成 owner-layer YAML executable contracts，讓 ChatGPT 以外的 agent 也能用結構化欄位遵守規則，並透過 `runtime/runtime.db` 的 generated surfaces 驗證是否同步。
 
@@ -192,7 +192,7 @@ final_status_report: []
 - [x] 查詢 `runtime/runtime.db generated_surfaces`，確認 target key synced。
 - [x] 新增 failure-derived scenarios：agent 只讀 Markdown、不讀 YAML、把 metadata YAML 當 executable contract、漏跑 close-loop。
 - [x] 更新 `knowledge/runtime/model-checklists.md` 或 routing report，讓 small / weaker agents 有 checklist-first path。
-- [ ] 完成後執行 Plan Completion Closure，更新 `plans/README.md` 並移至 `archived/`。
+- [x] 完成後執行 Plan Completion Closure，更新 `plans/README.md` 並移至 `archived/`。
 
 ## Implementation Order
 
