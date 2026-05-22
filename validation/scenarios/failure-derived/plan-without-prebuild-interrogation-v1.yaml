@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Plan Without Pre-build Interrogation Scenario
+# 測試 AI 對模糊需求或行為變更不得直接產生 implementation plan。
+
+id: plan-without-prebuild-interrogation-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: requirements-cognition-gap
+  description: >
+    Agent 收到模糊需求、行為變更或 plan request 後，未先執行 pre-build
+    interrogation，直接產生 implementation plan，導致 goal、scope、non-goals、
+    acceptance、validation target 或 open questions 不明確。
+
+given:
+  task: ambiguous_plan_or_behavior_change
+  artifacts:
+    - workflow/software-delivery/requirements/pre-build-interrogation.md
+    - workflow/software-delivery/requirements/pre-build-interrogation.yaml
+    - workflow/software-delivery/execution-flow.yaml
+    - workflow/software-delivery/templates/implementation-plan-template.md
+  signals:
+    - user asks for a plan, implementation, behavior change, migration, or architecture change
+    - request lacks acceptance criteria or validation target
+    - scope, non-goals, or blocker questions are not explicit
+  constraints:
+    - Implementation plan must not start until blocking questions are resolved or assumptions are recorded
+
+when:
+  action: create_implementation_plan
+
+then:
+  expected_route:
+    primary: run_pre_build_interrogation_before_plan
+    steps:
+      - Read the pre-build interrogation contract and Markdown source.
+      - Classify the request intent and affected surfaces.
+      - Ask blocker questions when goal, scope, acceptance, validation, or risk is unclear.
+      - Record safe assumptions, scoped-out items, and validation targets before producing a plan.
+    reject:
+      - direct_plan_from_ambiguous_request: "模糊需求未拷問就產生 implementation plan"
+      - missing_validation_target: "acceptance criteria 沒有 validation target"
+      - hidden_assumptions: "agent 自行補需求但未記錄 assumptions"
+  validation:
+    - pre-build interrogation summary exists before implementation plan
+    - blocker questions were asked or assumptions were explicitly recorded
+    - implementation plan includes acceptance and validation targets

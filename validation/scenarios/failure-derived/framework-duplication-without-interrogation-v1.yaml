@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Framework Duplication Without Interrogation Scenario
+# 測試 AI 修改 framework / runtime / governance 前是否先確認 canonical source 與 duplicate surface。
+
+id: framework-duplication-without-interrogation-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: source-of-truth-duplication
+  description: >
+    Agent 執行 framework、runtime、governance、workflow 或 executable contract migration
+    時，沒有先執行 pre-build interrogation 來確認 canonical source、projection boundary、
+    mirror / generated surface 與 duplicate rule body，導致同一語意留下兩份 source-of-truth。
+
+given:
+  task: framework_or_runtime_migration
+  artifacts:
+    - workflow/software-delivery/requirements/pre-build-interrogation.md
+    - governance/lifecycle/executable-contract-boundary.md
+    - governance/lifecycle/executable-contract-boundary.yaml
+    - governance/lifecycle/README.md
+    - runtime/runtime.db
+  signals:
+    - change touches workflow, governance, runtime, metadata, validation, compiler, generated report, or tool adapter
+    - old and new surfaces may both describe rule activation, gates, schema, or final report requirements
+    - runtime projection or generated surface may be confused with owner-layer source
+  constraints:
+    - Agent must not implement until source-of-truth and duplicate surface handling are explicit
+
+when:
+  action: execute_framework_change
+
+then:
+  expected_route:
+    primary: run_framework_interrogation_and_duplication_check
+    steps:
+      - Identify canonical owner source and generated/projection surfaces.
+      - List old entrypoints, compatibility tables, mirrors, runtime rows, generated reports, and tool adapters that describe the same semantics.
+      - Decide whether each duplicate is removed, deprecated, explicitly lower priority, or intentionally retained with a compatibility reason.
+      - Include validation that stale duplicate surfaces are gone or non-authoritative.
+    reject:
+      - edit_projection_as_source: "直接改 generated/runtime projection，未更新 owner source"
+      - leave_dual_rule_body: "新舊 rule body 同時 active 且沒有 precedence/deprecation"
+      - skip_duplicate_validation: "只驗證新 surface 存在，未驗證舊 duplicate 已移除或降級"
+  validation:
+    - framework discovery names canonical source, projection, mirrors, and linked updates
+    - duplication risk has remove/deprecate/precedence decision
+    - runtime compile / refresh / validate or equivalent projection proof is included when runtime surfaces change

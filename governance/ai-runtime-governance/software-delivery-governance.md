@@ -11,7 +11,7 @@ source_intelligence:
 - [`workflow/software-delivery/requirements/README.md`](../../workflow/software-delivery/requirements/README.md)
 - [`workflow/software-delivery/development-process.md`](../../workflow/software-delivery/development-process.md)
 
-本文件把 product alignment、requirements cognition、docs-first BDD closure、contract-first development 與 development guidance 的風險翻譯方法轉譯成 AI runtime software-delivery governance。原始 intelligence 回答「如何確認產品方向、穩定 observable behavior、acceptance、traceability 與 validation target」；本文件定義 change intake、product alignment、requirements cognition、contract precedence、BDD closure、artifact completeness、performance evidence 與 same-session documentation closure 的治理 gate。
+本文件把 pre-build interrogation、product alignment、requirements cognition、docs-first BDD closure、contract-first development 與 development guidance 的風險翻譯方法轉譯成 AI runtime software-delivery governance。原始 intelligence 回答「如何確認產品方向、穩定 observable behavior、acceptance、traceability 與 validation target」；本文件定義 change intake、pre-build interrogation、product alignment、requirements cognition、contract precedence、BDD closure、artifact completeness、performance evidence 與 same-session documentation closure 的治理 gate。
 
 ## 觸發時機
 
@@ -27,6 +27,7 @@ source_intelligence:
 | Gate | 通過條件 |
 | --- | --- |
 | Change intake | 已分類為新需求、bug、refactor / replacement、安全/強化、performance 或 planning-only，並確認 code 前需要的 artifacts。 |
+| Pre-build interrogation | Plan 或 implementation 前已釐清 goal、scope、non-goals、acceptance、validation target、framework source-of-truth、duplication risk、open questions 與 assumptions。 |
 | Brief validation | Product brief 的主要 claim 已標記 `validated`、`assumption`、`open question`、`scoped out` 或 `invalidated`。 |
 | Product alignment | Impact Map 的 Why / Who / How / What 已與 Customer Journey 的 actor、timing、pain point、blocker 交叉驗證。 |
 | Requirements cognition | Observable behavior 已有 actor intent、behavior boundary、acceptance criteria、validation target 與 ambiguity disposition。 |
@@ -53,6 +54,7 @@ source_intelligence:
 ## Workflow Mapping
 
 - [`workflow/software-delivery/requirements/README.md`](../../workflow/software-delivery/requirements/README.md) — product alignment and requirements cognition stage。
+- [`workflow/software-delivery/requirements/pre-build-interrogation.md`](../../workflow/software-delivery/requirements/pre-build-interrogation.md) — plan / implementation 前的需求拷問、framework discovery 與 source-of-truth duplication gate。
 - [`workflow/software-delivery/execution-flow.md`](../../workflow/software-delivery/execution-flow.md) — software-delivery workflow entry and execution order。
 - [`workflow/software-delivery/development-process.md`](../../workflow/software-delivery/development-process.md) — contract-first development process and detailed gates。
 - [`workflow/software-delivery/artifact-gates.md`](../../workflow/software-delivery/artifact-gates.md) — reusable note structure and artifact quality gates。
@@ -65,6 +67,8 @@ source_intelligence:
 - `product_goal_mismatch`：business goal、target actor、journey pain 或 feature investment 不一致。
 - `feature_without_impact`：feature list 缺少 Why / Who / How impact chain。
 - `requirement_contradiction`：requirements、BDD、contract、implementation 或 tests 出現互斥 claim。
+- `missing_pre_build_interrogation`：模糊需求、plan、framework 改動或 source-of-truth 風險未先經過需求拷問。
+- `framework_source_duplication`：同一 executable semantics 同時存在兩份 rule body、activation path、runtime table、mirror 或 generated surface。
 - `missing_validation_target`：acceptance criteria 沒有可執行或可審查的 proof target。
 - `stale_acceptance_criteria`：product intent、domain invariant 或 implementation truth 改變後，acceptance baseline 未同步。
 - `behavior_scope_overclaim`：local scenario pass 被宣稱為 global feature correctness。
@@ -76,6 +80,8 @@ source_intelligence:
 後續若要 promotion 到 `validation/`，可建立 scenario 檢查：
 
 - Requirement / BDD / tests 互相矛盾卻繼續 implementation。
+- 模糊需求或 framework 改動沒有 pre-build interrogation 就產出 implementation plan。
+- Framework 改動沒有識別 canonical source / projection / duplicate surface 就開始實作。
 - Product goal、target actor、journey pain 或 feature investment 不一致卻直接產生 implementation plan。
 - Acceptance criteria 缺 validation target 卻宣稱 ready。
 - Observable behavior change 只改 code，未更新 owning contract / BDD / tests。

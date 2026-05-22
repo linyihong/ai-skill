@@ -19,6 +19,8 @@
 
 開始執行任何 `active/` plan 前，agent **必須**先確認 plan 與現行架構相容。此檢查是 blocking gate；未完成前不得進入 implementation phase。
 
+在架構相容性檢查前，若 plan 會導向 code、workflow、governance、runtime、validation、schema、generated artifact 或 tool adapter 改動，必須先完成 [`workflow/software-delivery/requirements/pre-build-interrogation.md`](../workflow/software-delivery/requirements/pre-build-interrogation.md)。此 gate 用來確認 goal、scope、non-goals、acceptance、validation target、framework source-of-truth、duplication risk 與 blocker questions，避免 stale plan 直接進入實作。
+
 ### 檢查清單
 
 | # | 檢查項目 | 說明 |
@@ -27,8 +29,9 @@
 | 2 | **Source-of-truth 一致性** | 確認應修改的是 canonical source、SQLite canonical document、embedded source、compiler source 或 generated DB；不得只改不生效的 mirror / generated output |
 | 3 | **Layer responsibility** | plan 是否把 policy、runtime state、workflow、metadata、analysis、intelligence 放在正確 layer |
 | 4 | **Compiler / generated surface** | 涉及 `runtime/`、`knowledge/`、`metadata/`、`validation/` 時，確認 compiler / validator 會讀到該 source，並列出需要重新生成的 artifact |
-| 5 | **Linked updates** | 依 [`enforcement/linked-updates.md`](../enforcement/linked-updates.md) 確認相關 README、metadata、activation rules、templates、runtime DB 或 validators 是否要同步 |
-| 6 | **Execution decision** | 若發現架構衝突，先暫停執行並更新 plan / 詢問使用者；不得邊實作邊假設 plan 仍正確 |
+| 5 | **Pre-build interrogation** | 若 plan 來自模糊需求或 framework 改動，確認已記錄需求拷問、source-of-truth discovery、duplication risk、open questions 與 assumptions |
+| 6 | **Linked updates** | 依 [`enforcement/linked-updates.md`](../enforcement/linked-updates.md) 確認相關 README、metadata、contract inventory、routing registry、templates、runtime DB 或 validators 是否要同步 |
+| 7 | **Execution decision** | 若發現架構衝突、未解 blocker question 或 source-of-truth duplication risk，先暫停執行並更新 plan / 詢問使用者；不得邊實作邊假設 plan 仍正確 |
 
 ### 最低記錄格式
 
@@ -39,15 +42,16 @@
 | Trigger | 要開始執行哪個 plan / phase |
 | Checked sources | 讀過哪些 current architecture sources |
 | Conflicts | 無衝突，或列出 candidate path / source-of-truth / compiler / layer 衝突 |
+| Interrogation | goal、scope、non-goals、acceptance、framework discovery、duplication risk、open questions / assumptions |
 | Decision | proceed / revise plan first / ask user / blocked |
 | Validation | 用什麼方式確認（diff、runtime query、validator、link check、readback） |
 
 ### 強制執行規則
 
-1. **任何 active plan 的 Phase 1 或 implementation phase 開始前，都必須先完成 Architecture Compatibility Preflight。**
+1. **任何 active plan 的 Phase 1 或 implementation phase 開始前，都必須先完成 Pre-build Interrogation 與 Architecture Compatibility Preflight。**
 2. 若 plan 已有 Phase 0，Phase 0 必須包含此檢查；若沒有，agent 必須先補做 preflight，再決定是否需要更新 plan。
-3. 若 preflight 發現 plan 與 current architecture 衝突，必須先修正 plan 或取得使用者確認，不得直接繼續執行。
-4. 涉及 `runtime.db`、generated reports、SQLite index 或 compiler outputs 時，preflight 必須確認「source 變更是否真的進入 generated surface」。
+3. 若 preflight 發現 plan 與 current architecture 衝突、blocking question 未解，或會產生雙份 source-of-truth，必須先修正 plan 或取得使用者確認，不得直接繼續執行。
+4. 涉及 `runtime.db`、generated reports、SQLite index 或 compiler outputs 時，preflight 必須確認「source 變更是否真的進入 generated surface」，以及舊 duplicate surface 是否已刪除、deprecate 或明確降級。
 
 ## Plan 完成閉環（Plan Completion Closure）
 

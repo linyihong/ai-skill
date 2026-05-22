@@ -805,6 +805,9 @@ records:
         - design-review
         - architecture-review
         - architecture-plan
+        - pre-build-interrogation
+        - grill-me
+        - requirements-grilling
         - bdd
         - requirements
         - acceptance-criteria
@@ -829,6 +832,11 @@ records:
         - 領域模型
         - bounded context
         - 架構選型
+        - 需求拷問
+        - 需求釐清
+        - 框架改動
+        - source-of-truth duplication
+        - duplicate rule
       file_change_globs:
         - "**/*-sdk/**"
         - "**/sdk-platform/**"
@@ -845,6 +853,7 @@ records:
     candidate_sources:
       - workflow/software-delivery/development-process.md
       - workflow/software-delivery/requirements/README.md
+      - workflow/software-delivery/requirements/pre-build-interrogation.md
       - workflow/software-delivery/requirements/behavior-driven-discovery/README.md
       - workflow/software-delivery/requirements/acceptance-definition/README.md
       - workflow/software-delivery/requirements/ambiguity-resolution/README.md
@@ -892,10 +901,10 @@ records:
     ranking_reason: >
       app-development-guidance 已遷移至 workflow/software-delivery/ 為 **唯一 Workflow 進入點**（含 SDK/plan/契約實作）。
       software-delivery-governance 承接 docs-first BDD closure intelligence，作為 change intake、
-      contract precedence、BDD closure、artifact completeness、test strategy 與 performance evidence gate。
+      pre-build interrogation、contract precedence、BDD closure、artifact completeness、test strategy 與 performance evidence gate。
       觸發由 workflow/software-delivery/README.md 定義；**不**另立 route.project.*。
       若 repo 含 apk-analysis-sdk/runtime/workflow-activation.yaml，在進入本 workflow 後載入 project_overlays（專案 gate，非平行 routing）。
-    validation_signal: Change intake、requirements cognition、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence、same-session closure 與 architecture fit analysis 已檢查；workflow、analysis、intelligence、metadata 與 governance 內容已分離。
+    validation_signal: Pre-build interrogation、change intake、requirements cognition、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence、same-session closure 與 architecture fit analysis 已檢查；workflow、analysis、intelligence、metadata 與 governance 內容已分離。
     metadata:
       priority: P1
       confidence: high
@@ -1871,6 +1880,7 @@ records:
     primary_source: governance/lifecycle/executable-contract-boundary.yaml
     required_dependencies:
       - governance/lifecycle/executable-contract-boundary.md
+      - workflow/software-delivery/requirements/pre-build-interrogation.md
       - governance/lifecycle/compiler-philosophy.md
       - runtime/README.md
       - runtime/runtime.db
@@ -1879,14 +1889,15 @@ records:
       - scripts/ai-skill-cli/internal/app/runtime_compiler.go
       - enforcement/README.md
       - workflow/workflow-routing.md
+      - workflow/software-delivery/requirements/pre-build-interrogation.yaml
     source_of_truth_gate: governance-executable-contract-boundary-active
     ranking_reason: >
       Executable Contract Boundary 定義 source ownership 留在 owner layer、
       executable YAML contract 以 runtime_projection.enabled opt in、
-      runtime compiler 投影到 runtime.db generated_surfaces，並列出第一批需要 YAML 化的候選文件。
+      runtime compiler 投影到 runtime.db generated_surfaces，並要求 framework contract / projection 變更先做 pre-build interrogation。
     validation_signal: >
-      YAML contract inventory 已載入；runtime_projection.enabled contract 已由 compiler 投影到 runtime.db；
-      普通 metadata / graph / validation YAML 不會自動進 runtime。
+      YAML contract inventory 已載入；pre-build interrogation 已確認 canonical owner、projection boundary 與 duplication risk；
+      runtime_projection.enabled contract 已由 compiler 投影到 runtime.db；普通 metadata / graph / validation YAML 不會自動進 runtime。
     metadata:
       priority: P1
       confidence: medium

@@ -43,6 +43,14 @@ boundary_rules:
       - owner_layer_executable_contract_exists
       - contract_contains_activation
     transition_exception: 若未來新增非 enforcement activation lookup，必須先建立 owner-layer contract 或明確 governance exception，不得恢復雙寫。
+  pre_build_interrogation:
+    rule: framework_contract_changes_require_interrogation
+    description: 修改 executable contract placement、runtime projection 或 framework source-of-truth 前，必須先執行 pre-build interrogation，確認 canonical owner、projection boundary、duplication risk 與 validation target。
+    required_source: workflow/software-delivery/requirements/pre-build-interrogation.md
+    blocks:
+      - migration_without_source_discovery
+      - duplicate_runtime_projection
+      - ambiguous_contract_owner
 
 yaml_required_when:
   - ordered_steps

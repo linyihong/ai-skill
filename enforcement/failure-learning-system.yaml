@@ -16,11 +16,11 @@ runtime_projection:
 activation:
   priority: P1
   triggers:
-    - {"matches":["失誤","漏讀","忘記","錯誤","failure","miss","漏做","閉環不完整"],"type":"user_signal"}
+    - {"matches":["失誤","漏讀","忘記","錯誤","failure","miss","漏做","閉環不完整","雙寫","兩份","source-of-truth"],"type":"user_signal"}
     - {"matches":["close-loop","commit","push","sync","dirty","ahead","behind"],"type":"validation_gap"}
     - {"matches":["debug","troubleshoot","fix-error"],"type":"task_intent"}
   required_when:
-    - "The user points out an agent mistake, close-loop gap, source/mirror drift, missed dependency, incomplete validation, forgotten goal, or unsafe parallel work."
+    - "The user points out an agent mistake, close-loop gap, source/mirror drift, source-of-truth duplication, missed dependency, incomplete validation, forgotten goal, or unsafe parallel work."
     - "A failure pattern may recur across agents, tools, projects, or workflows."
 
 required_sources:
@@ -33,7 +33,7 @@ steps:
     action: "記錄發生什麼、在哪裡被發現、造成什麼 user-facing risk。"
   - id: classify_failure
     order: 2
-    action: "用 failure taxonomy 命名 class。"
+    action: "用 failure taxonomy 命名 class；framework 雙寫或 duplicate projection 優先檢查 source-of-truth-duplication / requirements-cognition-gap。"
   - id: contain_current_risk
     order: 3
     action: "先控制當前風險，再做 promotion。"

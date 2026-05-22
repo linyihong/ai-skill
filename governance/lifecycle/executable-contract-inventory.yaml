@@ -188,6 +188,10 @@ inventory:
       contract: workflow/software-delivery/artifact-gates.yaml
       state: contract_exists
       reason: Software delivery artifact shape, owner layer, sanitization, linked updates, and quality gates now have a workflow contract.
+    - source: workflow/software-delivery/requirements/pre-build-interrogation.md
+      contract: workflow/software-delivery/requirements/pre-build-interrogation.yaml
+      state: contract_exists
+      reason: Pre-build planning, framework source discovery, duplicate source-of-truth prevention, blocker questions, and validation target gates now have a workflow contract.
     - source: workflow/apk-analysis/execution-flow.md
       contract: workflow/apk-analysis/execution-flow.yaml
       state: contract_exists

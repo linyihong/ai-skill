@@ -6,6 +6,16 @@
 - [ ] Layer responsibility is consistent with current architecture.
 - [ ] Compiler / validator impact is known before implementation starts.
 
+## Pre-build Interrogation
+- **Goal**: <what user/system outcome this plan must achieve>
+- **Scope**: <affected behavior, files, workflow, runtime surface, tool adapter, or generated artifact>
+- **Non-goals**: <explicitly out of scope>
+- **Acceptance / validation target**: <test, runtime validate, scenario, query, review, link check>
+- **Framework discovery**: <canonical source, owner layer, projection, mirror/cache/generated output, linked updates>
+- **Duplication risk**: <none | remove duplicate | deprecate old path | explicit precedence>
+- **Open questions**: <blocker_question | safe_assumption | scoped_out | invalidated>
+- **Decision**: <proceed | ask_user | revise_plan | blocked>
+
 ## Refactor / Replacement Parity Preflight
 - [ ] Not applicable, or parity inventory exists before implementation.
 - [ ] Legacy surfaces, inputs, outputs / side effects and external dependencies are mapped to target surfaces.

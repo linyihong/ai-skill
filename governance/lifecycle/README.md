@@ -16,6 +16,22 @@
 
 它們在提升之前不得靜默取代舊 skill 行為。
 
+## Framework 改動前需求拷問
+
+修改 Ai-skill framework、governance、runtime、workflow、metadata、validation、schema、generated artifact 或 tool adapter 前，必須先執行 [`../../workflow/software-delivery/requirements/pre-build-interrogation.md`](../../workflow/software-delivery/requirements/pre-build-interrogation.md)。這是 plan / implementation 前的 blocking gate，用來避免尚未釐清 source-of-truth 就開始 migration。
+
+最低檢查：
+
+| 面向 | 必須回答 |
+| --- | --- |
+| Goal / scope | 這次 framework 改動要防止哪個 failure，哪些 layer 在範圍內，哪些不做？ |
+| Canonical source | 真正要改的是 owner Markdown/YAML、SQLite canonical document、compiler source、generated report 還是 tool adapter？ |
+| Projection boundary | `runtime.db`、`generated_surfaces`、SQLite index、reports 或 tool config 是 source 還是 projection？ |
+| Duplication risk | 是否會留下兩份 rule body、兩條 activation path、mirror、compatibility table 或 stale generated output？ |
+| Close-loop | 哪些 README、routing registry、contract inventory、validation scenario、runtime compile / refresh / validate 或 tool sync 必須同步？ |
+
+若任一答案未知且會影響 execution semantics，先問使用者或停在 planning，不得直接進入 implementation。
+
 ## Executable Contract Inventory
 
 流程或 gate 是否需要 companion YAML，以 [`executable-contract-boundary.md`](executable-contract-boundary.md) 與 [`executable-contract-inventory.yaml`](executable-contract-inventory.yaml) 為準。Inventory 使用：

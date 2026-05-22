@@ -41,6 +41,18 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 
 > **輸出模板**：Change Intake 完成後，使用 [`templates/change-brief-template.md`](templates/change-brief-template.md) 記錄變更簡報。
 
+### Pre-build Interrogation Gate
+
+在 change intake 之後、implementation plan 或 framework migration 之前，讀取 [`requirements/pre-build-interrogation.md`](requirements/pre-build-interrogation.md)。若請求會變成 plan、code、workflow、governance、runtime、validation、schema、generated artifact 或 tool adapter 改動，必須先記錄：
+
+- Goal、scope、non-goals 與 expected behavior / expected framework outcome。
+- Acceptance criteria 與 validation target。
+- Framework discovery：canonical source、owner layer、runtime projection、mirror / cache / generated output、compiler 與 linked updates。
+- Duplication risk：是否會產生第二份 rule body、第二條 activation path、stale projection 或 ambiguous source-of-truth。
+- Unknown disposition：`blocker_question`、`safe_assumption`、`scoped_out` 或 `invalidated`。
+
+若仍有會影響 behavior、contract、runtime surface、source-of-truth、validation 或安全性的 `blocker_question`，不得產生 implementation plan；先向使用者提問或停在 planning。
+
 ### Requirements Cognition Checkpoint
 
 在進入 architecture 或 implementation 前，若任務涉及 observable behavior，讀取 [`requirements/`](requirements/README.md)：

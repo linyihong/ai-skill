@@ -1,0 +1,136 @@
+schema_version: executable-contract/v1
+id: workflow.software-delivery.requirements.pre-build-interrogation.contract
+title: Pre-build interrogation gate contract
+owner_layer: workflow
+source_markdown: workflow/software-delivery/requirements/pre-build-interrogation.md
+status: active
+contract_type: workflow_flow
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: workflow.software_delivery.pre_build_interrogation.contract
+  surface_type: executable_yaml_contract
+  execution_scope: pre_implementation_planning
+
+activation:
+  events:
+    - plan_requested
+    - implementation_requested
+    - ambiguous_requirement_detected
+    - framework_change_requested
+    - governance_change_requested
+    - runtime_surface_change_requested
+    - source_of_truth_duplication_risk
+  required_when:
+    - A user request may become an implementation plan or code change.
+    - A change may alter observable behavior, public contract, runtime surface, workflow, governance, validation, schema, generated artifact, or tool adapter behavior.
+    - A framework change may create duplicate rule bodies, activation paths, projections, mirrors, generated reports, or ambiguous source-of-truth.
+
+required_sources:
+  - workflow/software-delivery/requirements/pre-build-interrogation.md
+  - workflow/software-delivery/requirements/README.md
+  - workflow/software-delivery/execution-flow.md
+  - workflow/software-delivery/development-process.md
+  - plans/README.md
+  - governance/lifecycle/README.md
+  - governance/lifecycle/executable-contract-boundary.md
+  - enforcement/dependency-reading.md
+  - enforcement/linked-updates.md
+
+steps:
+  - id: classify_request_intent
+    order: 1
+    action: "判斷請求是新能力、bug、refactor、migration、architecture、workflow、governance、runtime、validation、tool adapter 或 planning-only。"
+    gates:
+      - gate.pre_build_interrogation.intent_classified
+  - id: ask_scope_and_non_goals
+    order: 2
+    action: "釐清 in-scope、non-goals、affected surfaces、compatibility requirement 與 project-specific evidence boundary。"
+  - id: define_acceptance_and_validation
+    order: 3
+    action: "把 expected behavior 或 framework outcome 轉成 acceptance criteria 與 validation target。"
+    gates:
+      - gate.pre_build_interrogation.validation_target_defined
+  - id: run_framework_discovery
+    order: 4
+    action: "若改動 Ai-skill framework，識別 canonical source、owner layer、runtime projection、mirror/cache/generated output、compiler 與 linked update surfaces。"
+    required_if:
+      - framework_change_requested
+      - governance_change_requested
+      - runtime_surface_change_requested
+      - workflow_change_requested
+    gates:
+      - gate.pre_build_interrogation.framework_source_identified
+  - id: check_duplication_risk
+    order: 5
+    action: "檢查是否會形成第二份 executable semantics、第二條 activation path、stale projection 或 ambiguous source-of-truth。"
+    gates:
+      - gate.pre_build_interrogation.duplication_risk_resolved
+  - id: classify_unknowns
+    order: 6
+    action: "將未知項分成 blocker_question、safe_assumption、scoped_out 或 invalidated；blocking question 未解前不得進入受影響實作。"
+    gates:
+      - gate.pre_build_interrogation.unknowns_dispositioned
+  - id: record_interrogation_summary
+    order: 7
+    action: "在 plan、change brief 或回覆中記錄 goal、scope、non-goals、acceptance、framework discovery、duplication risk、open questions、assumptions 與 decision。"
+
+gates:
+  - id: gate.pre_build_interrogation.intent_classified
+    blocks: implementation_plan
+    pass_when:
+      - request type is classified before choosing workflow or implementation path
+      - the reason for treating the task as planning-only, implementation, migration, or framework change is explicit
+  - id: gate.pre_build_interrogation.validation_target_defined
+    blocks: implementation_plan
+    pass_when:
+      - each acceptance criterion has a validation target or is marked not applicable with rationale
+      - completion evidence is not limited to agent confidence or green tests when docs/contracts/runtime surfaces are affected
+  - id: gate.pre_build_interrogation.framework_source_identified
+    blocks: framework_implementation
+    pass_when:
+      - canonical source, owner layer, runtime projection, generated surfaces, mirrors, and tool adapter impacts are identified
+      - source-of-truth and generated outputs are not confused
+  - id: gate.pre_build_interrogation.duplication_risk_resolved
+    blocks: framework_implementation
+    pass_when:
+      - duplicate rule bodies, activation paths, runtime tables, mirrors, generated reports, or compatibility surfaces are removed, deprecated, or given explicit precedence
+      - validation includes proof that stale duplicate surfaces are gone or intentionally non-authoritative
+  - id: gate.pre_build_interrogation.unknowns_dispositioned
+    blocks: affected_implementation
+    pass_when:
+      - blocking questions have been asked or the affected work is paused
+      - safe assumptions, scoped-out items, and invalidated assumptions are explicitly recorded
+
+required_evidence:
+  - interrogation summary with goal, scope, non-goals, acceptance, validation target, questions, assumptions, and decision
+  - framework discovery notes when framework/runtime/governance/workflow surfaces are affected
+  - duplication risk decision when a change touches source-of-truth, projection, mirror, generated artifact, activation, or routing
+  - validation target before implementation plan
+
+success_criteria:
+  - ambiguous requests are clarified before implementation plans are produced
+  - framework changes identify canonical source and generated surfaces before edits
+  - duplicate executable semantics are removed, deprecated, or explicitly ranked before completion
+  - agents ask blocker questions instead of silently filling requirement gaps
+
+failure_modes:
+  - id: implementation_plan_without_interrogation
+    detection: "Agent creates an implementation plan from an ambiguous or behavior-changing request without recording goal, scope, non-goals, acceptance, and unknown disposition."
+    recovery: "Stop implementation planning, run pre-build interrogation, ask blocking questions, then revise the plan."
+  - id: framework_change_without_source_discovery
+    detection: "Agent edits workflow, governance, runtime, metadata, validation, compiler, or tool adapter surfaces without identifying canonical source and generated projections."
+    recovery: "Reload owner docs, runtime boundary, routing registry, compiler or generated surface rules; rebuild the plan before editing."
+  - id: duplicate_source_of_truth_created
+    detection: "A change leaves two active rule bodies, activation paths, runtime tables, mirrors, or generated reports describing the same executable semantics."
+    recovery: "Select the canonical owner, remove or deprecate duplicate surfaces, refresh generated artifacts, and validate stale surfaces are gone."
+
+final_status_report:
+  required_fields:
+    - interrogation_decision
+    - blocker_questions
+    - assumptions_or_scoped_out_items
+    - framework_discovery
+    - duplication_risk_status
+    - validation_target

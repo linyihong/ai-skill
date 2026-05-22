@@ -12,7 +12,7 @@
 3. 需要 artifact 規範時參考 [`artifact-gates.md`](artifact-gates.md)
 4. 需要審查檢查清單時參考 [`review-checklist.md`](review-checklist.md)
 5. 需要完整開發流程時參考 [`development-process.md`](development-process.md)
-6. 需要 product impact alignment / requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
+6. 需要 pre-build interrogation / product impact alignment / requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
 7. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
 8. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)
 
@@ -22,7 +22,7 @@
 
 ### 開發流程
 
-- **Requirements Stage**：Product impact alignment + BDD-lite / requirements cognition，包含 Impact Map × Customer Journey Map、behavior-driven discovery、acceptance definition、ambiguity resolution、traceability 與 validation target。
+- **Requirements Stage**：Pre-build interrogation + product impact alignment + BDD-lite / requirements cognition，包含需求拷問、framework source-of-truth discovery、duplication risk check、Impact Map × Customer Journey Map、behavior-driven discovery、acceptance definition、ambiguity resolution、traceability 與 validation target。
 - **Architecture Stage**：domain architecture cognition，包含 DDD fit、bounded context discovery、consistency boundary design、architecture escalation。
 - **Contract-First Development Process**：從企劃書到實作的完整開發流程，包含 Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill 等。
 - **Refactor / Replacement Parity**：當新入口、平台遷移、工具改寫或架構重組要取代舊能力時，先建立新舊能力 parity inventory，逐項列出舊入口、現有能力、副作用、外部依賴、新入口、parity 狀態與測試證據。
@@ -74,6 +74,7 @@
 |------|------|------|
 | [`execution-flow.md`](execution-flow.md) | `WORKFLOW.md` §1, §5-8（已刪除） | Start From Evidence、Change Intake、BDD Closure Loop、SDK Defect Closure、Same-Session Closure、Performance Gate、Backfill Rules、Validate |
 | [`execution-flow.yaml`](execution-flow.yaml) | `execution-flow.md` | Software delivery execution executable contract：change intake、requirements、BDD closure、parity、performance、validation gates |
+| [`requirements/pre-build-interrogation.md`](requirements/pre-build-interrogation.md) | mattpocock/skills `/grill-me` pattern + Ai-skill framework failure learning | Plan / implementation 前的需求拷問、framework discovery 與 source-of-truth duplication gate |
 | [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md`（已刪除） | Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria |
 | [`artifact-gates.yaml`](artifact-gates.yaml) | `artifact-gates.md` | Software delivery artifact executable contract：artifact shape、owner layer、sanitization、linked updates、quality gates |
 | [`analysis/development-guidance/risk-translation.md`](../../analysis/development-guidance/risk-translation.md) | `WORKFLOW.md` §2-5（已刪除） | Risk Translation Table、Owner Layer Selection、Control Definition、Guidance Classification、Linked Updates |
@@ -88,6 +89,7 @@
 1. 確認審查範圍（新功能 / 架構變更 / API 變更）。
 2. 讀取設計文件或 RFC。
 3. 檢查設計是否涵蓋：
+   ├─ Pre-build interrogation：goal、scope、non-goals、acceptance、framework source-of-truth、duplication risk。
    ├─ Requirements cognition：actor intent、behavior boundary、acceptance criteria、ambiguity disposition。
    ├─ API contract（request/response 格式、錯誤處理）。
    ├─ Domain / architecture fit：bounded context、invariant、consistency boundary、CRUD / DDD Lite / Full DDD decision。

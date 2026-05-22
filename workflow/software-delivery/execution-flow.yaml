@@ -34,6 +34,7 @@ required_sources:
   - workflow/software-delivery/artifact-gates.md
   - workflow/software-delivery/development-process.md
   - workflow/software-delivery/requirements/README.md
+  - workflow/software-delivery/requirements/pre-build-interrogation.md
   - workflow/software-delivery/architecture/README.md
   - enforcement/goal-action-validation.md
   - enforcement/evidence-hierarchy.md
@@ -51,42 +52,52 @@ steps:
     action: Read planning artifacts and classify the request as new behavior, bug fix, refactor/replacement, hardening, architecture decision, performance change, or documentation conflict.
     gates:
       - gate.software_delivery.change_intake_complete
-  - id: run_requirements_checkpoint
+  - id: run_pre_build_interrogation
     order: 3
+    action: For plans, implementation, and framework changes, run pre-build interrogation for goal, scope, non-goals, acceptance, framework source-of-truth, duplication risk, and unknown disposition.
+    required_if:
+      - plan_requested
+      - observable_behavior_change
+      - framework_change_requested
+      - ambiguous_requirement_detected
+    gates:
+      - gate.software_delivery.pre_build_interrogation_complete
+  - id: run_requirements_checkpoint
+    order: 4
     action: For observable behavior, run requirements stage for product impact, behavior boundary, acceptance definition, ambiguity disposition, and validation target.
     required_if:
       - observable_behavior_change
   - id: produce_replacement_parity_inventory
-    order: 4
+    order: 5
     action: For replacement or migration work, list old entrypoints, capabilities, side effects, dependencies, new entrypoints, parity status, and validation evidence before implementation.
     required_if:
       - refactor_or_replacement_requested
     gates:
       - gate.software_delivery.replacement_parity_ready
   - id: keep_docs_first_bdd_closure
-    order: 5
+    order: 6
     action: Update owner contracts, human-readable behavior specs, executable behavior tests, implementation, and traceability in the same batch when behavior changes.
     required_if:
       - observable_behavior_change
     gates:
       - gate.software_delivery.bdd_closure_complete
   - id: handle_sdk_defect_closure
-    order: 6
+    order: 7
     action: Reproduce SDK defects through supported public surfaces, sanitize evidence, and lock behavior with specs and regression tests when needed.
     required_if:
       - sdk_defect_reported
   - id: define_test_strategy
-    order: 7
+    order: 8
     action: Define old behavior regression, new behavior proof, mutation/negative checks, persistence/integration tests, and hardware/performance evidence when relevant.
     gates:
       - gate.software_delivery.validation_target_defined
   - id: run_performance_gate
-    order: 8
+    order: 9
     action: For performance-sensitive changes, define latency, throughput, error-rate, and resource budgets plus load/stress/spike/soak evidence.
     required_if:
       - performance_sensitive_change_detected
   - id: validate_and_close
-    order: 9
+    order: 10
     action: Run at least one validation method, check blockers, update durable docs, feed reusable lessons when appropriate, and report scope honestly.
     gates:
       - gate.software_delivery.validation_complete
@@ -104,6 +115,12 @@ gates:
       - planning/product/issue/design/BDD/API contract source was read or a lightweight change brief was created
       - major claims are marked validated, assumption, open question, scoped out, or invalidated
       - blocker questions are asked before affected implementation continues
+  - id: gate.software_delivery.pre_build_interrogation_complete
+    blocks: implementation_plan_or_framework_change
+    pass_when:
+      - goal, scope, non-goals, acceptance, validation target, open questions, assumptions, and decision are recorded
+      - framework changes identify canonical source, owner layer, runtime projection, generated surfaces, mirrors, compiler impact, and linked updates
+      - duplicate rule body, activation path, runtime table, mirror, generated report, or ambiguous source-of-truth risk is removed, deprecated, or explicitly ranked
   - id: gate.software_delivery.replacement_parity_ready
     blocks: replacement_implementation
     pass_when:
@@ -129,7 +146,9 @@ gates:
 required_evidence:
   - goal / action / validation statement
   - change intake classification
+  - pre-build interrogation decision for plans, ambiguous requests, and framework changes
   - requirements or behavior boundary evidence when observable behavior changes
+  - framework source-of-truth and duplication risk evidence when framework/runtime/governance/workflow surfaces change
   - parity inventory when replacing existing capability
   - BDD / contract / test traceability when behavior changes
   - performance budget evidence when performance-sensitive
@@ -137,6 +156,7 @@ required_evidence:
 
 success_criteria:
   - Software changes start from evidence and owner contracts rather than implementation guesses.
+  - Plans and framework changes pass pre-build interrogation before implementation work begins.
   - Behavior changes keep docs, BDD/contracts, tests, implementation, and traceability aligned.
   - Replacement and migration work preserves observable capability or records scoped gaps.
   - Validation distinguishes old behavior still protected from new behavior proven.
@@ -146,6 +166,9 @@ failure_modes:
   - id: implementation_as_source_of_truth
     detection: Agent treats passing code or tests as the only source when product, BDD, API, or owner contract conflicts.
     recovery: Stop patching, reload owner sources, rebuild execution graph, and update contracts before continuing.
+  - id: plan_without_pre_build_interrogation
+    detection: Agent produces an implementation plan or framework migration without goal, scope, non-goals, acceptance, source-of-truth, duplication risk, and unknown disposition.
+    recovery: Stop implementation planning, run pre-build interrogation, ask blocker questions, and revise the plan.
   - id: replacement_without_parity
     detection: New entrypoint, migration, refactor, or tool rewrite starts without old/new capability inventory.
     recovery: Produce parity inventory and validation evidence before implementation.
@@ -160,6 +183,7 @@ final_status_report:
   required_fields:
     - change_type
     - sources_read
+    - pre_build_interrogation
     - contracts_or_bdd_updated
     - parity_status
     - validation_performed

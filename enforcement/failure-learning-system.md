@@ -37,7 +37,9 @@
 | Class | 意義 | 常見 prevention |
 | --- | --- | --- |
 | `source-mirror-drift` | Agent 更新了 local tool mirror、project `.cursor`、runtime copy 或 generated bundle，而不是 canonical source repository。 | 要求 canonical repo check、source-first edit，再做 tool sync。 |
+| `source-of-truth-duplication` | Agent 沒有先釐清 canonical source / projection / mirror 邊界，導致兩份 rule body、activation path、runtime table 或 generated surface 同時 active。 | Pre-build interrogation、owner-layer selection、duplicate surface removal / deprecation / precedence gate。 |
 | `dependency-miss` | Agent 修改或使用 rule/skill 時沒有讀 required linked dependencies。 | 補強 dependency read ledger 與 linked updates。 |
+| `requirements-cognition-gap` | Agent 對模糊需求、plan 或 framework 改動未先拷問 goal、scope、non-goals、acceptance、validation target 與 blocker questions。 | Pre-build interrogation，未解 blocker question 前停在 planning。 |
 | `goal-ledger-miss` | Multi-step 或可恢復 user goal 沒有正確記錄、更新、拆分、暫停或完成。 | 繼續前更新 `.agent-goals/`，並連到 todos/plans。 |
 | `validation-gap` | Agent 未做 diff review、lints、tests、link check、source check、sync、push、readback 或 clean status 就宣稱完成。 | 加入具體 validation gate，並回報實際跑了什麼。 |
 | `scope-drift` | Agent 把無關變更、project incident details 或 local absolute paths 混進 reusable docs。 | 套用 reusable guidance boundary 與 sanitization。 |
@@ -113,6 +115,7 @@ Pattern records 要短。若 pattern 變長，將 examples 拆成較小 pattern 
 | Skill-specific repeated mistake | 該 skill 的 `feedback_history/`，成熟後再推進 workflow/checklist |
 | Tool-specific execution failure | `ai-tools/<tool>.md`、tool config 或 skill tool adapter |
 | **架構重構後 enforcement 未同步** | **`enforcement/failure-patterns/shared-rules-architecture-drift.md`** + 執行 `governance/lifecycle/intelligence-extraction-pipeline.md` Step 7a |
+| **框架改動造成 source-of-truth duplication** | **`enforcement/failure-patterns/framework-duplication-without-interrogation.md`** + pre-build interrogation + validation scenario |
 | **AI 系統面執行錯誤**（routing 錯誤、heuristic 誤用、forbidden route 被選中） | **`validation/scenarios/failure-derived/`** — 建立 stateless scenario，未來可自動驗證同類錯誤是否重演 |
 
 ### Failure → Validation Scenario 條件

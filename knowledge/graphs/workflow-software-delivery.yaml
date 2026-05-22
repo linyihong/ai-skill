@@ -21,6 +21,11 @@ edges:
     validation: artifact-gates.md 定義 6 個 artifact sections，從 skills/app-development-guidance/DOCUMENTATION.md（已刪除）提取。
 
   - type: related_to
+    target: workflow/software-delivery/requirements/pre-build-interrogation.md
+    reason: Pre-build interrogation gate 在 plan / implementation 前要求 goal、scope、non-goals、acceptance、framework source-of-truth、duplication risk 與 unknown disposition。
+    validation: pre-build-interrogation.md 定義 blocking questions、framework discovery、duplication risk 和 ready gate；companion YAML contract 可投影到 runtime generated_surfaces。
+
+  - type: related_to
     target: workflow/software-delivery/development-process.md
     reason: Contract-first 開發流程 — Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Test Strategy Gate、Definition of Ready/Done。
     validation: development-process.md 定義 14 個流程階段，從 skills/app-development-guidance/process/README.md（已刪除）提取。
