@@ -1,0 +1,103 @@
+schema_version: executable-contract/v1
+id: enforcement.authorization-scope.contract
+title: Authorization and scope executable contract
+owner_layer: enforcement
+source_markdown: enforcement/authorization-scope.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.authorization_scope.contract
+  surface_type: executable_yaml_contract
+  execution_scope: agent_behavior
+
+activation:
+  events:
+    - new_analysis_task_started
+    - third_party_data_detected
+    - authorization_boundary_unclear
+    - data_collection_or_publication_requested
+  required_when:
+    - Starting APK, product, traffic, user-data, or system analysis.
+    - Collecting, publishing, or summarizing evidence that may include third-party traffic or personal data.
+    - The requested action may exceed the authorized target or scope.
+
+required_sources:
+  - enforcement/authorization-scope.md
+  - enforcement/sanitization.md
+  - enforcement/reusable-guidance-boundary.md
+
+steps:
+  - id: identify_authorized_target
+    order: 1
+    action: Identify the target APK, product, system, repository, or dataset that the user authorized.
+    outputs:
+      - authorized_target
+  - id: classify_requested_data
+    order: 2
+    action: Classify whether the task involves third-party traffic, personal data, unrelated systems, or unauthorized targets.
+    outputs:
+      - data_scope_classification
+  - id: decide_allow_block_or_ask
+    order: 3
+    action: Allow in-scope work, block clearly out-of-scope work, or ask for authorization when scope is ambiguous.
+    gates:
+      - gate.authorization.scope_confirmed
+  - id: sanitize_before_reuse
+    order: 4
+    action: If any authorized evidence is promoted into reusable guidance, sanitize and generalize it first.
+    required_sources:
+      - enforcement/sanitization.md
+      - enforcement/reusable-guidance-boundary.md
+    gates:
+      - gate.authorization.reusable_evidence_safe
+
+gates:
+  - id: gate.authorization.scope_confirmed
+    blocks: data_collection_or_publication
+    pass_when:
+      - target is explicitly authorized
+      - action stays within target and task scope
+      - unrelated third-party data is not collected or published
+    fail_when:
+      - target authorization is missing
+      - requested data belongs to unrelated systems or people
+      - agent would publish unauthorized third-party traffic or personal data
+  - id: gate.authorization.reusable_evidence_safe
+    blocks: reusable_document_write
+    pass_when:
+      - authorized evidence is generalized
+      - private identifiers and project-specific details are removed
+      - reusable guidance does not expose incident raw data
+
+required_evidence:
+  - authorized target or explicit user-provided scope
+  - data scope classification
+  - allow / block / ask decision
+  - sanitization summary when reusable docs are written
+
+success_criteria:
+  - Agent operates only inside authorized target and task scope.
+  - Unauthorized third-party traffic, personal data, or unrelated system data is not collected or published.
+  - Ambiguous authorization results in a question, not a guess.
+  - Reusable guidance contains only generalized rules and safe placeholders.
+
+failure_modes:
+  - id: implicit_authorization_assumption
+    detection: Agent assumes authorization because data is technically accessible.
+    recovery: Stop and ask for explicit target/scope confirmation.
+  - id: third_party_data_leak
+    detection: Output includes unrelated traffic, personal data, or unauthorized system details.
+    recovery: Remove data, summarize only in-scope evidence, and apply sanitization.
+  - id: reusable_incident_leak
+    detection: Reusable guidance contains project-specific target, host, payload, sample, or live run detail.
+    recovery: Move raw evidence to project docs and keep only generalized rule.
+
+final_status_report:
+  required_fields:
+    - authorization_scope
+    - data_scope_decision
+    - blocked_or_asked_items
+    - sanitization_status

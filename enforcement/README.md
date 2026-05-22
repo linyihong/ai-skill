@@ -56,8 +56,10 @@
 
 | Rule | Contract | 用途 |
 | --- | --- | --- |
+| [`authorization-scope.md`](authorization-scope.md) | [`authorization-scope.yaml`](authorization-scope.yaml) | 授權範圍、第三方資料與可重用證據安全 gate。 |
 | [`dependency-reading.md`](dependency-reading.md) | [`dependency-reading.yaml`](dependency-reading.yaml) | 依賴讀取 ledger、source-of-truth miss recovery、writeback final status gate。 |
 | [`linked-updates.md`](linked-updates.md) | [`linked-updates.yaml`](linked-updates.yaml) | 連動更新矩陣、runtime sync、writeback closure 與 final report gate。 |
+| [`sanitization.md`](sanitization.md) | [`sanitization.yaml`](sanitization.yaml) | secrets、本機路徑、project incident evidence 與 prompt injection 去敏 gate。 |
 
 ### Core Bootstrap（每個 session 必讀）
 

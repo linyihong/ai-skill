@@ -1,0 +1,119 @@
+schema_version: executable-contract/v1
+id: enforcement.sanitization.contract
+title: Sanitization and placeholder executable contract
+owner_layer: enforcement
+source_markdown: enforcement/sanitization.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.sanitization.contract
+  surface_type: executable_yaml_contract
+  execution_scope: repo_writeback
+
+activation:
+  events:
+    - reusable_document_write
+    - feedback_lesson_write
+    - commit_preparation
+    - web_content_extracted_for_ai
+    - project_incident_promoted
+  required_when:
+    - Writing or modifying reusable Ai-skill documents, feedback lessons, templates, workflow guidance, or enforcement rules.
+    - Reviewing git diff before commit.
+    - Passing scraped or browser-extracted web content into an AI model.
+    - Promoting project incident evidence into reusable guidance.
+
+required_sources:
+  - enforcement/sanitization.md
+  - enforcement/reusable-guidance-boundary.md
+  - enforcement/authorization-scope.md
+
+steps:
+  - id: classify_content_surface
+    order: 1
+    action: Determine whether the content is reusable guidance, project-local evidence, web content, or internal trusted content.
+    outputs:
+      - content_surface_type
+  - id: scan_for_forbidden_material
+    order: 2
+    action: Scan for secrets, raw tokens, cookies, keys, raw requests/responses, local absolute paths, usernames, private workdirs, hosts, endpoints, payload fragments, sample IDs, class/test names, live run results, or environment quirks.
+    gates:
+      - gate.sanitization.forbidden_material_absent
+  - id: replace_with_placeholders
+    order: 3
+    action: Replace local or private details with `<AI_SKILL_REPO>`, `<PROJECT_ROOT>`, `<WORKSPACE>`, or generalized placeholders.
+    required_if:
+      - reusable_document_write
+      - feedback_lesson_write
+  - id: sanitize_web_content
+    order: 4
+    action: Remove prompt injection surfaces from web content before passing it to AI.
+    required_if:
+      - web_content_extracted_for_ai
+    gates:
+      - gate.sanitization.prompt_injection_removed
+  - id: diff_review_before_commit
+    order: 5
+    action: Review staged and unstaged diff for forbidden material before commit.
+    required_if:
+      - commit_preparation
+    gates:
+      - gate.sanitization.diff_safe_to_commit
+
+gates:
+  - id: gate.sanitization.forbidden_material_absent
+    blocks: reusable_document_write
+    pass_when:
+      - no secrets, raw tokens, session cookies, private keys, or raw request/response data remain
+      - no true local absolute paths, usernames, private workdirs, or clone paths remain
+      - no project incident raw evidence remains in reusable guidance
+    fail_when:
+      - reusable doc contains host, endpoint, payload, sample ID, class/test name, live result, or environment quirk from a specific project
+  - id: gate.sanitization.prompt_injection_removed
+    blocks: ai_model_input_from_web
+    pass_when:
+      - CSS-hidden, aria-hidden, zero-width, HTML comment, template tag, script tag, event handler, meta refresh, and base64 hidden content risks are removed or neutralized
+  - id: gate.sanitization.diff_safe_to_commit
+    blocks: commit
+    pass_when:
+      - git diff has been reviewed for forbidden material
+      - reusable docs use placeholders or generalized language
+      - any retained foreign or raw-looking fragment has a documented reason
+
+required_evidence:
+  - content surface classification
+  - forbidden material scan result
+  - placeholder replacement summary
+  - web content sanitization summary when applicable
+  - diff review summary before commit
+
+success_criteria:
+  - Reusable documents contain only generalized rules, safe placeholders, and sanitized examples.
+  - Project incident raw evidence remains in project docs, issues, runbooks, or integration notes.
+  - Web content passed to AI has prompt injection surfaces removed.
+  - Commits are blocked until diff review confirms no secrets, private paths, or project-specific evidence remain.
+
+failure_modes:
+  - id: secret_or_token_leak
+    detection: Diff includes authorization headers, tokens, cookies, keys, or raw private requests.
+    recovery: Remove or replace with synthetic placeholders; rotate secret if exposure occurred.
+  - id: local_path_leak
+    detection: Reusable doc includes a real local absolute path, username, private workdir, or clone location.
+    recovery: Replace with `<AI_SKILL_REPO>`, `<PROJECT_ROOT>`, or `<WORKSPACE>`.
+  - id: project_incident_raw_evidence
+    detection: Reusable source contains a specific project name, endpoint, host, payload, sample ID, class/test name, live result, or environment quirk.
+    recovery: Move raw evidence to project-local docs and keep only generalized rule.
+  - id: prompt_injection_surface
+    detection: Scraped content contains hidden or executable web content that could be interpreted as model instructions.
+    recovery: Strip hidden/script/template/event content before model input.
+
+final_status_report:
+  required_fields:
+    - sanitization_scope
+    - placeholders_used
+    - removed_or_blocked_material
+    - prompt_injection_status
+    - diff_review_status

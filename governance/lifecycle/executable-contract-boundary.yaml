@@ -74,15 +74,17 @@ initial_inventory:
     - source: enforcement/linked-updates.md
       contract: enforcement/linked-updates.yaml
       reason: Linked update matrix, runtime sync, writeback closure, and final report gates.
+    - source: enforcement/authorization-scope.md
+      contract: enforcement/authorization-scope.yaml
+      reason: Authorization, third-party data, and scope boundaries can block execution.
+    - source: enforcement/sanitization.md
+      contract: enforcement/sanitization.yaml
+      reason: Secrets, local paths, project incident evidence, and prompt injection surfaces block reusable writes and commits.
   candidates:
     - source: enforcement/goal-action-validation.md
       suggested_contract: enforcement/goal-action-validation.yaml
       priority: P1
       reason: Defines goal/action/validation blocking checks.
-    - source: enforcement/authorization-scope.md
-      suggested_contract: enforcement/authorization-scope.yaml
-      priority: P0
-      reason: Defines permission and authorization boundaries that block execution.
     - source: enforcement/evidence-hierarchy.md
       suggested_contract: enforcement/evidence-hierarchy.yaml
       priority: P1

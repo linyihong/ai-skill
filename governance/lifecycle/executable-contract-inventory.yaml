@@ -96,16 +96,16 @@ inventory:
       contract: enforcement/linked-updates.yaml
       state: contract_exists
       reason: Linked update completeness, runtime sync, writeback closure, and final status checks now have an owner-layer executable contract.
+    - source: enforcement/authorization-scope.md
+      contract: enforcement/authorization-scope.yaml
+      state: contract_exists
+      reason: Authorization, third-party data, and scope boundaries now have an owner-layer executable contract.
+    - source: enforcement/sanitization.md
+      contract: enforcement/sanitization.yaml
+      state: contract_exists
+      reason: Secrets, local paths, project incident evidence, and prompt injection surfaces now have an owner-layer executable contract.
 
   contract_required:
-    - source: enforcement/authorization-scope.md
-      suggested_contract: enforcement/authorization-scope.yaml
-      priority: P0
-      reason: Authorization and scope boundaries can block execution and data collection.
-    - source: enforcement/sanitization.md
-      suggested_contract: enforcement/sanitization.yaml
-      priority: P0
-      reason: Secrets, local paths, private evidence, and project-specific details are commit blockers.
     - source: enforcement/goal-action-validation.md
       suggested_contract: enforcement/goal-action-validation.yaml
       priority: P1
