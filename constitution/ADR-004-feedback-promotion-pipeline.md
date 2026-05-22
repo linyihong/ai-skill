@@ -4,6 +4,12 @@
 
 **Accepted**
 
+## Framework Generation
+
+- **世代分類**：cross-generation（起源 Gen 2，原則延伸至 Gen 3）
+- **當前世代文件**：[`architecture/ai-native-cognitive-execution-system.md`](../architecture/ai-native-cognitive-execution-system.md)
+- **適用狀態**：5 階段 promotion pipeline（replay → extraction → refinement → promotion → archive）仍為 Gen 3 lesson promotion 核心；路徑詞彙演化見下方 Vocabulary Evolution。
+
 ## Context
 
 Feedback lessons 是系統演化的核心原料。每次 agent 在執行任務時學到的經驗教訓，都應該有機會被系統吸收、泛化、並推廣到其他情境。
@@ -73,6 +79,21 @@ Target Layers: workflow/ | intelligence/ | enforcement/ | memory/ | skill-doc/
 - **直接 promotion**：從 feedback_history 直接寫入目標層，跳過 replay/extraction/refinement。但 lesson 未經泛化，可能包含專案特定細節。不採用。
 - **純人工 promotion**：完全依賴開發者判斷。無法規模化。不採用。
 - **只保留 feedback_history**：維持現狀，不建立 pipeline。但 lesson 無法跨 skill 推廣。不採用。
+
+## Vocabulary Evolution
+
+> 本 section 不修改上方 immutable 正文，僅標註 Gen 2 → Gen 3 的路徑詞彙演化。Pipeline 結構與 scoring 邏輯保留。
+
+| 原文路徑 | Gen 3 對應 | 說明 |
+|---------|----------|------|
+| `skills/*/feedback_history/` | `feedback/history/<domain>/<category>/` | Feedback lesson 統一目標路徑，2026-05-13 完成搬遷；舊路徑已刪除 |
+| `skill-doc/`（promotion target） | `analysis/<domain>/` 或 `workflow/<domain>/` | Skill-specific 改進建議的承接層改變 |
+
+**Pipeline 與 scoring 不變**：
+- 5 階段 pipeline（replay → extraction → refinement → promotion → archive）保留
+- 5 維度 scoring（impact 0.30 + maturity 0.25 + frequency 0.20 + freshness 0.15 + urgency 0.10）保留
+- Promotion threshold（0.7 立即 / 0.5 backlog）保留
+- 增加 promotion target 多元化：enforcement / intelligence / workflow / runtime.db / constitution / memory（見 [ADR-007](ADR-007-constitution-and-decision-promotion-boundary.md)）
 
 ## Related
 

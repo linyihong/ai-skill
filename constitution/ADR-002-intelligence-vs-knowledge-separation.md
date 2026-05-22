@@ -4,6 +4,12 @@
 
 **Accepted**
 
+## Framework Generation
+
+- **世代分類**：Gen 3 確立
+- **當前世代文件**：[`architecture/ai-native-cognitive-execution-system.md`](../architecture/ai-native-cognitive-execution-system.md)
+- **適用狀態**：`intelligence/` 與 `knowledge/` 平行分離原則在 Gen 3 完全有效，無詞彙演化。
+
 ## Context
 
 在設計新分層時，需要決定「工程智慧」與「百科知識」的邊界。最初的想法是將所有內容放在 `knowledge/` 下，但隨著 `intelligence/` 概念的出現，需要明確區分兩者的責任。

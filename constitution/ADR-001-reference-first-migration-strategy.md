@@ -4,6 +4,12 @@
 
 **Accepted**
 
+## Framework Generation
+
+- **世代分類**：cross-generation（起源 Gen 2 → Gen 3 過渡，原則延伸至 Gen 3）
+- **當前世代文件**：[`architecture/ai-native-cognitive-execution-system.md`](../architecture/ai-native-cognitive-execution-system.md)
+- **適用狀態**：reference-first 仍是 Gen 3 預設載入策略；`skills/` 已完成搬遷至 `workflow/` + `analysis/` + `intelligence/`，原始決策的「保留舊路徑為 source of truth」過渡規則已不適用（搬遷已完成），但「不破壞既有 entrypoint」的 graph edge 語意（`preserves_entrypoint`）仍為通用原則。
+
 ## Context
 
 本 repository 原本是單一 `skills/` 目錄結構，所有內容（workflow、analysis methods、engineering intelligence、templates、feedback lessons）都放在 skill 目錄下。隨著內容增長，出現以下問題：

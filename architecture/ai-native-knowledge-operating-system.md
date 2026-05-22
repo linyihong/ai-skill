@@ -14,6 +14,18 @@
 
 ---
 
+## 本世代相關 ADR（部分延伸到第三代）
+
+| ADR | Gen 2 角色 | Gen 3 狀態 |
+|-----|----------|------------|
+| [ADR-001](../constitution/ADR-001-reference-first-migration-strategy.md) Reference-First Migration | reference-first 為 Gen 2 → Gen 3 過渡的搬遷策略；`skills/` 為 source of truth | 搬遷已完成；reference-first 載入原則延伸至 Gen 3 |
+| [ADR-003](../constitution/ADR-003-three-layer-architecture.md) Three-Layer Architecture | Knowledge / **Skills** / Intelligence 三層分離 | **Skills 已 deprecated**；三層分離核心精神保留，演化為 Knowledge / (Workflow + Analysis) / Intelligence，見 ADR-003 §Vocabulary Evolution |
+| [ADR-004](../constitution/ADR-004-feedback-promotion-pipeline.md) Feedback Promotion Pipeline | 5 階段 pipeline；`skills/*/feedback_history/` 為 raw source | Pipeline 結構保留；路徑改為 `feedback/history/<domain>/<category>/` |
+
+未列在上表的 ADR-002 / 005 / 006 / 007 為 Gen 3 確立的決策，本世代文件未涵蓋；請見 [`ai-native-cognitive-execution-system.md`](ai-native-cognitive-execution-system.md) §本世代相關 ADR。
+
+---
+
 本文件定義 AI-native Knowledge Operating System 的 repository-level architecture direction。它是 roadmap 與 boundary document，不是 executable shared rule。可執行政策仍放在 `enforcement/`；工具專屬設定仍放在 `ai-tools/`。
 
 下一階段完整升級規劃見 [`next-stage-upgrade-plan.md`](../plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md)。

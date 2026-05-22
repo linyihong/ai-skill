@@ -155,6 +155,49 @@
 - 歷史世代文件不被覆寫，提供 traceability
 - `architecture/README.md` 的定位明確為「每世代 canonical 入口」，避免「永久文件」這種與升級事實矛盾的描述
 
+### 規則 7：世代升級時必須評估每個既有 ADR 並建立雙向連結
+
+**教訓**：Knowledge OS → Cognitive Execution System 升級後，constitution/ 內 7 個 ADR 沒有任何標註說明屬於哪個世代。ADR-003 標題仍使用「Knowledge / **Skills** / Intelligence」，但 Skills 在 Gen 3 已 deprecated；ADR-004 仍引用 `skills/*/feedback_history/` 路徑（已搬到 `feedback/history/<domain>/`）。讀者無法判斷 ADR 是否仍適用、哪些詞彙已演化。架構文件與 ADR 之間缺乏 traceability。2026-05-22 才被使用者指出並補建雙向連結。
+
+**強制**：如果升級涉及**系統名稱變更**（§1 第一項條件）或**架構分層變更**（§1 第二項條件），計畫書必須包含以下項目：
+
+```
+## 完成條件 — ADR 與架構連動
+
+1. 評估每個既有 ADR 的延伸狀態
+   - [ ] 對 constitution/ADR-* 逐份判斷以下三種狀態之一：
+       - Gen N 確立（決策起源於本世代）
+       - cross-generation（決策跨世代延伸）
+       - Gen N-1 / Gen N transition（詞彙或路徑演化但核心精神保留）
+       - superseded（決策被新 ADR 推翻 — 走 ADR supersession 流程）
+
+2. 在每個 ADR 加入 Framework Generation section（在 Status 後 Context 前）
+   - [ ] 世代分類
+   - [ ] 當前世代文件連結
+   - [ ] 適用狀態簡述（仍 active / 詞彙演化 / 已 superseded）
+
+3. 對需要詞彙或路徑演化說明的 ADR 加入 Vocabulary Evolution section
+   - [ ] 不修改既有 immutable 正文
+   - [ ] 列出原文用詞 → Gen N 對應 + 說明
+   - [ ] 明寫「核心精神保留」+「為什麼不 supersede 本 ADR」
+
+4. 在新世代 architecture/<gen>.md 加入「本世代相關 ADR」表
+   - [ ] 列出本世代涵蓋的 ADR + 性質（Gen 確立 / cross-generation / transition）
+   - [ ] 簡述每個 ADR 在本世代的角色
+
+5. 在歷史世代 architecture/<old-gen>.md 加入「本世代相關 ADR（部分延伸到下一代）」表
+   - [ ] 標清楚 Gen N 與 Gen N+1 狀態對比
+
+6. 更新 constitution/README.md ADR 表格
+   - [ ] 加入「Framework Generation」欄
+   - [ ] 每個 ADR 填寫世代分類
+```
+
+**為什麼是必要的**：
+- ADR 是 immutable 的，但系統會演化；沒有 Vocabulary Evolution 機制，新 agent 讀 ADR 會以為過時詞彙仍是 canonical
+- Architecture ↔ ADR 雙向連結讓「知道 Gen 3 由哪些 ADR 構成」與「知道某個 ADR 屬於哪個 Gen」都能在一步內完成
+- ADR supersession 是「決策被推翻」，Vocabulary Evolution 是「決策保留但標籤演化」— 兩個邊界清楚才不會誤用 supersession 流程
+
 ---
 
 ## 4. 升級流程圖

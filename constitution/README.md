@@ -25,15 +25,17 @@ proposed → accepted → deprecated → superseded
 
 ## 現有 ADR
 
-| ADR | Title | Status | Date |
-| --- | --- | --- | --- |
-| [ADR-001](ADR-001-reference-first-migration-strategy.md) | Reference-First Migration Strategy | accepted | 2026-05-12 |
-| [ADR-002](ADR-002-intelligence-vs-knowledge-separation.md) | Intelligence vs Knowledge Separation | accepted | 2026-05-12 |
-| [ADR-003](ADR-003-three-layer-architecture.md) | Three-Layer Architecture（Knowledge / Skills / Intelligence） | accepted | 2026-05-12 |
-| [ADR-004](ADR-004-feedback-promotion-pipeline.md) | Feedback Promotion Pipeline | accepted | 2026-05-12 |
-| [ADR-005](ADR-005-memory-architecture.md) | Memory Architecture（6 子層記憶模型） | accepted | 2026-05-12 |
-| [ADR-006](ADR-006-registry-first-workflow-activation.md) | Registry-First Workflow Activation | accepted | 2026-05-18 |
-| [ADR-007](ADR-007-constitution-and-decision-promotion-boundary.md) | Constitution and Decision Promotion Boundary | accepted | 2026-05-21 |
+| ADR | Title | Status | Date | Framework Generation |
+| --- | --- | --- | --- | --- |
+| [ADR-001](ADR-001-reference-first-migration-strategy.md) | Reference-First Migration Strategy | accepted | 2026-05-12 | cross-generation（Gen 2 起延伸至 Gen 3；skills/ 路徑已搬遷） |
+| [ADR-002](ADR-002-intelligence-vs-knowledge-separation.md) | Intelligence vs Knowledge Separation | accepted | 2026-05-12 | Gen 3 確立 |
+| [ADR-003](ADR-003-three-layer-architecture.md) | Three-Layer Architecture（Knowledge / Skills / Intelligence） | accepted | 2026-05-12 | **Gen 2 / Gen 3 transition**（核心精神保留，Skills 已演化為 workflow/+analysis/，見 ADR-003 §Vocabulary Evolution） |
+| [ADR-004](ADR-004-feedback-promotion-pipeline.md) | Feedback Promotion Pipeline | accepted | 2026-05-12 | cross-generation（pipeline 結構保留，路徑詞彙演化，見 ADR-004 §Vocabulary Evolution） |
+| [ADR-005](ADR-005-memory-architecture.md) | Memory Architecture（6 子層記憶模型） | accepted | 2026-05-12 | Gen 3 確立 |
+| [ADR-006](ADR-006-registry-first-workflow-activation.md) | Registry-First Workflow Activation | accepted | 2026-05-18 | Gen 3 |
+| [ADR-007](ADR-007-constitution-and-decision-promotion-boundary.md) | Constitution and Decision Promotion Boundary | accepted | 2026-05-21 | Gen 3 |
+
+每個 ADR 內含 `Framework Generation` section，標註世代分類與當前世代文件連結。新增世代時依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §3 規則 7 評估每個 ADR 的延伸狀態。
 
 ## 格式
 

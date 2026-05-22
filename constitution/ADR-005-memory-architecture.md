@@ -4,6 +4,12 @@
 
 **Accepted**
 
+## Framework Generation
+
+- **世代分類**：Gen 3 確立
+- **當前世代文件**：[`architecture/ai-native-cognitive-execution-system.md`](../architecture/ai-native-cognitive-execution-system.md)
+- **適用狀態**：6 子層 memory 模型（working / summary / episodic / project / decision / failure）在 Gen 3 完全有效，並由 `memory/retrieval-governance/` 補上 activation threshold 與 budget 治理。
+
 ## Context
 
 AI agent 需要記憶來維持跨 session 的上下文連續性。最初只有一個 `memory/` 目錄，所有類型的記憶混在一起，導致：

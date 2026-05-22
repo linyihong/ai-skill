@@ -4,6 +4,12 @@
 
 **Accepted**
 
+## Framework Generation
+
+- **世代分類**：Gen 3
+- **當前世代文件**：[`architecture/ai-native-cognitive-execution-system.md`](../architecture/ai-native-cognitive-execution-system.md)
+- **適用狀態**：constitution/ 命名與 promotion target 規則為 Gen 3 確立，runtime decision-recording canonical config 已對齊架構層命名。
+
 ## Context
 
 原本外層的 `decisions/` 目錄存放正式 ADR，而 `memory/decision/` 存放 session 等級的決策記憶。`decisions/` 這個名稱太廣，容易與 runtime decisions、project decisions 或 memory decisions 混淆。

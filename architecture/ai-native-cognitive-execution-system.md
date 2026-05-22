@@ -21,6 +21,24 @@
 
 ---
 
+## 本世代相關 ADR
+
+每個 ADR 內含 `Framework Generation` section 標註與本世代的關係。
+
+| ADR | 性質 | 在本世代的角色 |
+|-----|------|---------------|
+| [ADR-001](../constitution/ADR-001-reference-first-migration-strategy.md) Reference-First Migration | cross-generation 基礎原則 | reference-first 仍為 Gen 3 預設載入策略；舊 `skills/` 路徑已搬遷完成 |
+| [ADR-002](../constitution/ADR-002-intelligence-vs-knowledge-separation.md) Intelligence vs Knowledge Separation | Gen 3 確立 | `intelligence/` 與 `knowledge/` 平行分離原則 |
+| [ADR-003](../constitution/ADR-003-three-layer-architecture.md) Three-Layer Architecture | Gen 2 / Gen 3 transition | **詞彙演化**：核心精神（事實/流程/判斷三層）保留；具體分層演化為 `knowledge/` + (`workflow/` + `analysis/`) + `intelligence/`，見 ADR-003 §Vocabulary Evolution |
+| [ADR-004](../constitution/ADR-004-feedback-promotion-pipeline.md) Feedback Promotion Pipeline | cross-generation | 5 階段 pipeline + 5 維度 scoring 保留；路徑由 `skills/*/feedback_history/` 演化為 `feedback/history/<domain>/<category>/` |
+| [ADR-005](../constitution/ADR-005-memory-architecture.md) Memory Architecture | Gen 3 | 6 子層 memory 模型（working / summary / episodic / project / decision / failure） |
+| [ADR-006](../constitution/ADR-006-registry-first-workflow-activation.md) Registry-First Workflow Activation | Gen 3 | registry-first activation 為 workflow 進入點預設 |
+| [ADR-007](../constitution/ADR-007-constitution-and-decision-promotion-boundary.md) Constitution and Decision Promotion Boundary | Gen 3 | `constitution/` 命名 + promotion target 內容路由規則 |
+
+新增世代時依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §3 規則 7 重新評估每個 ADR 的延伸狀態。
+
+---
+
 ## 系統定位
 
 讓 agent 以 **runtime state machine** 驅動知識路由、phase 執行與閉環驗證的認知執行系統。相較第二代「Knowledge OS」聚焦於知識載入與閉環，第三代強調：

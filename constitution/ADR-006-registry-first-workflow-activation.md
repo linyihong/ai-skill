@@ -4,6 +4,12 @@
 
 **Accepted**（2026-05-18）
 
+## Framework Generation
+
+- **世代分類**：Gen 3
+- **當前世代文件**：[`architecture/ai-native-cognitive-execution-system.md`](../architecture/ai-native-cognitive-execution-system.md)
+- **適用狀態**：registry-first activation 仍為 Gen 3 workflow 進入點預設；activation-table #27 + `route.workflow.*.activation_triggers` + `workflow/workflow-routing.md` 歧義表的三層分工不變。
+
 ## Context
 
 Workflow 進入點曾出現三種維護方式並存：
