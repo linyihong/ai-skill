@@ -1,0 +1,69 @@
+schema_version: executable-contract/v1
+id: enforcement.content-layering.contract
+title: "Content layering executable contract"
+owner_layer: enforcement
+source_markdown: enforcement/content-layering.md
+status: active
+contract_type: policy_gate
+blocking_level: advisory
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.content_layering.contract
+  surface_type: executable_yaml_contract
+  execution_scope: repo_content_placement
+
+activation:
+  priority: P2
+  triggers:
+    - {"matches":["migration","restructure","content-organization"],"type":"task_intent"}
+    - {"count":">=3","pattern":"**/README.md","type":"file_change"}
+  required_when:
+    - "New reusable guidance, workflow, analysis, intelligence, feedback, runtime, or project-specific content is created or moved."
+    - "A change restructures README, documentation, or reusable rule locations."
+
+required_sources:
+  - enforcement/content-layering.md
+  - enforcement/dependency-reading.md
+
+steps:
+  - id: classify_content_intent
+    order: 1
+    action: "判斷內容是架構方向、runtime enforcement、workflow、analysis、intelligence、feedback lesson、tool adapter 或 project-specific evidence。"
+  - id: select_owner_layer
+    order: 2
+    action: "依 content-layering table 選擇 canonical owner layer，不把 project-specific evidence 寫入 reusable source。"
+  - id: check_document_size
+    order: 3
+    action: "若文件變大或混合多主題，依 governance/document-sizing.md 拆分。"
+  - id: update_indexes
+    order: 4
+    action: "更新對應 README、routing 或 linked references，避免只搬內容不更新入口。"
+
+gates:
+  - id: gate.content_layering.owner_layer_selected
+    rule: "每個新增或移動內容都有明確 owner layer。"
+  - id: gate.content_layering.project_evidence_separated
+    rule: "Project-specific evidence 未混入 reusable docs。"
+
+required_evidence:
+  - activation trigger matched or task context explains why this contract is required
+  - required sources were read or marked not applicable
+  - gates passed or blocker/recovery was reported
+
+success_criteria:
+  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - agent can name required sources, steps, gates, and failure modes before claiming compliance
+
+failure_modes:
+  - id: wrong_layer_write
+    detection: "內容寫到不屬於該責任的 layer。"
+    recovery: "移到正確 owner layer，並更新引用。"
+  - id: project_evidence_leak
+    detection: "專案特例、host、sample 或 live result 被寫進 reusable source。"
+    recovery: "移回 project docs，留下泛化規則。"
+
+final_status_report:
+  - contract_loaded
+  - gates_checked
+  - validation_or_blocker

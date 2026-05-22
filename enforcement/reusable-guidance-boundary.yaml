@@ -1,0 +1,72 @@
+schema_version: executable-contract/v1
+id: enforcement.reusable-guidance-boundary.contract
+title: "Reusable guidance boundary executable contract"
+owner_layer: enforcement
+source_markdown: enforcement/reusable-guidance-boundary.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.reusable_guidance_boundary.contract
+  surface_type: executable_yaml_contract
+  execution_scope: reusable_knowledge_boundary
+
+activation:
+  priority: P2
+  triggers:
+    - {"matches":["write-feedback","create-lesson","promote-to-enforcement-rule"],"type":"task_intent"}
+    - {"matches":["泛化","可重用","reusable","抽象化"],"type":"user_signal"}
+  required_when:
+    - "A feedback lesson, template, checklist, enforcement rule, workflow, or reusable guidance is created or promoted."
+    - "Project incident evidence may be copied into reusable docs."
+
+required_sources:
+  - enforcement/reusable-guidance-boundary.md
+  - enforcement/dependency-reading.md
+
+steps:
+  - id: separate_reusable_from_project_specific
+    order: 1
+    action: "區分可重用原因/規則/驗證與 project-specific evidence。"
+  - id: analyze_closure_gap
+    order: 2
+    action: "使用者指出閉環不完整或專案特例時，先分析原因。"
+  - id: sanitize_and_generalize
+    order: 3
+    action: "移除 project name/path/endpoint/class/sample/live result，改成 generalized rule。"
+  - id: select_durable_location
+    order: 4
+    action: "選擇 enforcement、feedback/history、intelligence、workflow 或 project docs。"
+  - id: check_linked_updates
+    order: 5
+    action: "依 linked-updates.md 更新入口、索引或 prevention target。"
+
+gates:
+  - id: gate.reusable_boundary.no_project_specific_evidence
+    rule: "Reusable docs 不含 project-specific evidence。"
+  - id: gate.reusable_boundary.generalized_reason_present
+    rule: "沉澱內容包含可重用原因與驗證方法。"
+
+required_evidence:
+  - activation trigger matched or task context explains why this contract is required
+  - required sources were read or marked not applicable
+  - gates passed or blocker/recovery was reported
+
+success_criteria:
+  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - agent can name required sources, steps, gates, and failure modes before claiming compliance
+
+failure_modes:
+  - id: project_incident_copied
+    detection: "把專案 incident 證據直接寫進 reusable source。"
+    recovery: "移回 project docs 並泛化。"
+  - id: fix_without_cause_analysis
+    detection: "只刪字串或補檔案，沒有分析為何漏。"
+    recovery: "補原因分析與 prevention gate。"
+
+final_status_report:
+  - contract_loaded
+  - gates_checked
+  - validation_or_blocker

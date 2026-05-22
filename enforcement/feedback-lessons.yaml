@@ -1,0 +1,65 @@
+schema_version: executable-contract/v1
+id: enforcement.feedback-lessons.contract
+title: "Feedback lessons redirect executable contract"
+owner_layer: enforcement
+source_markdown: enforcement/feedback-lessons.md
+status: active
+contract_type: policy_gate
+blocking_level: advisory
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.feedback_lessons.contract
+  surface_type: executable_yaml_contract
+  execution_scope: feedback_rule_redirect
+
+activation:
+  priority: P2
+  triggers:
+    - {"matches":["write-feedback","create-lesson","promote-lesson","review-feedback"],"type":"task_intent"}
+    - {"pattern":"**/feedback_history/**","type":"file_change"}
+  required_when:
+    - "A task writes, promotes, reviews, or indexes feedback lessons through the old enforcement path."
+
+required_sources:
+  - enforcement/feedback-lessons.md
+  - enforcement/dependency-reading.md
+
+steps:
+  - id: follow_redirect
+    order: 1
+    action: "使用 enforcement/feedback-lessons.md 時，轉讀 feedback/feedback-lessons.md。"
+  - id: keep_legacy_reference_short
+    order: 2
+    action: "舊 enforcement 檔只保留 redirect，不新增規則正文。"
+  - id: update_references_when_touched
+    order: 3
+    action: "修改引用時改指向 feedback/feedback-lessons.md。"
+
+gates:
+  - id: gate.feedback_lessons.redirect_followed
+    rule: "已讀 feedback/feedback-lessons.md 作為唯一正文。"
+  - id: gate.feedback_lessons.no_new_legacy_body
+    rule: "沒有在 enforcement redirect 裡新增規則正文。"
+
+required_evidence:
+  - activation trigger matched or task context explains why this contract is required
+  - required sources were read or marked not applicable
+  - gates passed or blocker/recovery was reported
+
+success_criteria:
+  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - agent can name required sources, steps, gates, and failure modes before claiming compliance
+
+failure_modes:
+  - id: legacy_rule_body_added
+    detection: "在已搬遷 redirect 檔新增規則全文。"
+    recovery: "移到 feedback/feedback-lessons.md。"
+  - id: redirect_ignored
+    detection: "仍把 enforcement/feedback-lessons.md 當唯一正文。"
+    recovery: "改讀 feedback/feedback-lessons.md。"
+
+final_status_report:
+  - contract_loaded
+  - gates_checked
+  - validation_or_blocker

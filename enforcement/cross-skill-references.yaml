@@ -1,0 +1,69 @@
+schema_version: executable-contract/v1
+id: enforcement.cross-skill-references.contract
+title: "Cross-workflow references executable contract"
+owner_layer: enforcement
+source_markdown: enforcement/cross-skill-references.md
+status: active
+contract_type: policy_gate
+blocking_level: advisory
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.cross_skill_references.contract
+  surface_type: executable_yaml_contract
+  execution_scope: workflow_handoff
+
+activation:
+  priority: P2
+  triggers:
+    - {"matches":["cross-workflow","multi-workflow","workflow-integration"],"type":"task_intent"}
+    - {"count":">=2","pattern":"workflow/**","type":"file_change"}
+  required_when:
+    - "A workflow consumes another workflow output contract, template, checklist, or handoff artifact."
+    - "A requested output must be handed to another workflow."
+
+required_sources:
+  - enforcement/cross-skill-references.md
+  - enforcement/dependency-reading.md
+
+steps:
+  - id: identify_target_workflow
+    order: 1
+    action: "確認 target workflow 與要讀的 entrypoint。"
+  - id: define_trigger_and_artifact
+    order: 2
+    action: "寫明何時讀 target workflow，以及要傳遞的 artifact / checklist / contract。"
+  - id: preserve_ownership_boundary
+    order: 3
+    action: "說明目前 workflow 與 target workflow 各自保留的責任。"
+  - id: update_both_sides_if_needed
+    order: 4
+    action: "必要時更新 referring workflow 與 target workflow 入口。"
+
+gates:
+  - id: gate.cross_workflow.reference_fields_complete
+    rule: "Target workflow、trigger、expected input/output、ownership boundary 與 sanitization boundary 已明確。"
+  - id: gate.cross_workflow.no_full_copy
+    rule: "沒有複製 target workflow 全文。"
+
+required_evidence:
+  - activation trigger matched or task context explains why this contract is required
+  - required sources were read or marked not applicable
+  - gates passed or blocker/recovery was reported
+
+success_criteria:
+  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - agent can name required sources, steps, gates, and failure modes before claiming compliance
+
+failure_modes:
+  - id: full_workflow_copy
+    detection: "把另一個 workflow 的完整規則貼進目前 workflow。"
+    recovery: "改成短 cross-link 與 handoff contract。"
+  - id: missing_handoff_boundary
+    detection: "沒有說清 artifact ownership 或 sanitization boundary。"
+    recovery: "補 target/current ownership 與資料邊界。"
+
+final_status_report:
+  - contract_loaded
+  - gates_checked
+  - validation_or_blocker

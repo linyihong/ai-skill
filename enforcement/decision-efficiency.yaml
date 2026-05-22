@@ -1,0 +1,71 @@
+schema_version: executable-contract/v1
+id: enforcement.decision-efficiency.contract
+title: "Decision efficiency executable contract"
+owner_layer: enforcement
+source_markdown: enforcement/decision-efficiency.md
+status: active
+contract_type: policy_gate
+blocking_level: advisory
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.decision_efficiency.contract
+  surface_type: executable_yaml_contract
+  execution_scope: context_and_route_selection
+
+activation:
+  priority: P2
+  triggers:
+    - {"routes":">=3","type":"task_complexity"}
+    - {"matches":["選擇","路線","priority","先做哪個","哪條路","比較"],"type":"user_signal"}
+    - {"matches":["route-selection","cost-benefit","trade-off"],"type":"task_intent"}
+  required_when:
+    - "There are three or more plausible routes."
+    - "The user asks which route, priority, or trade-off to choose."
+    - "Context loading or exploration may become broad."
+
+required_sources:
+  - enforcement/decision-efficiency.md
+  - enforcement/dependency-reading.md
+
+steps:
+  - id: state_current_unknown
+    order: 1
+    action: "用一句話寫出目前未知。"
+  - id: compare_evidence_routes
+    order: 2
+    action: "依 time-to-evidence、semantic distance、safety、validation signal、context cost 與 user value 比較路線。"
+  - id: choose_highest_leverage_route
+    order: 3
+    action: "選擇 evidence-to-cost ratio 最高的下一步，而不是讀完所有來源。"
+  - id: record_deferred_sources
+    order: 4
+    action: "記錄延後讀取的來源與重新路由條件。"
+
+gates:
+  - id: gate.decision_efficiency.current_unknown_named
+    rule: "目前未知已命名。"
+  - id: gate.decision_efficiency.route_choice_has_validation_signal
+    rule: "選定路線有明確驗證信號。"
+
+required_evidence:
+  - activation trigger matched or task context explains why this contract is required
+  - required sources were read or marked not applicable
+  - gates passed or blocker/recovery was reported
+
+success_criteria:
+  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - agent can name required sources, steps, gates, and failure modes before claiming compliance
+
+failure_modes:
+  - id: context_overread
+    detection: "為了保險讀取大量無關 context。"
+    recovery: "回到目前未知，縮小到最高收益路線。"
+  - id: first_available_route_bias
+    detection: "採用第一個可用工具或 checklist，而不是最高收益路徑。"
+    recovery: "重新比較 evidence-to-cost ratio。"
+
+final_status_report:
+  - contract_loaded
+  - gates_checked
+  - validation_or_blocker

@@ -1,0 +1,72 @@
+schema_version: executable-contract/v1
+id: enforcement.escalation-policy.contract
+title: "Escalation policy executable contract"
+owner_layer: enforcement
+source_markdown: enforcement/escalation-policy.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.escalation_policy.contract
+  surface_type: executable_yaml_contract
+  execution_scope: runtime_recovery_control
+
+activation:
+  priority: P1
+  triggers:
+    - {"matches":["不是這樣","你沒看","你又在猜","反覆失敗","一直失敗","evidence conflict","source-of-truth"],"type":"user_signal"}
+    - {"matches":["repeated-failure","user-contradiction","evidence-conflict","source-of-truth-miss","automation-drift"],"type":"validation_gap"}
+    - {"matches":["runtime-recovery","escalation","rediscovery","execution-graph-rebuild","mismatch-recovery"],"type":"task_intent"}
+  required_when:
+    - "Repeated failure, user contradiction, evidence conflict, source-of-truth miss, automation drift, or stale assumption appears during execution."
+
+required_sources:
+  - enforcement/escalation-policy.md
+  - enforcement/dependency-reading.md
+
+steps:
+  - id: classify_trigger_level
+    order: 1
+    action: "命名 escalation trigger class 與 L1-L5 level。"
+  - id: suspend_invalid_assumption
+    order: 2
+    action: "L3 以上停止沿用舊 mental model，不繼續局部 patch。"
+  - id: reload_source_of_truth
+    order: 3
+    action: "重讀 owner docs、workflow primary source、contract 或 evidence hierarchy。"
+  - id: rebuild_execution_graph
+    order: 4
+    action: "重建 goal -> route -> dependencies -> checkpoint -> validation。"
+  - id: produce_recovery_output
+    order: 5
+    action: "回報原假設、反證、新 source-of-truth、新 execution graph、下一步與 validation。"
+
+gates:
+  - id: gate.escalation.assumption_suspended
+    rule: "L3 以上已停止錯路線。"
+  - id: gate.escalation.execution_graph_rebuilt
+    rule: "新的 execution graph 已重建。"
+
+required_evidence:
+  - activation trigger matched or task context explains why this contract is required
+  - required sources were read or marked not applicable
+  - gates passed or blocker/recovery was reported
+
+success_criteria:
+  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - agent can name required sources, steps, gates, and failure modes before claiming compliance
+
+failure_modes:
+  - id: retry_loop_after_contradiction
+    detection: "使用者反證後仍繼續 patch 或猜測。"
+    recovery: "停止、reload source-of-truth、重建 graph。"
+  - id: missing_recovery_output
+    detection: "Escalation 後沒有交代反證與新依據。"
+    recovery: "補 required recovery output。"
+
+final_status_report:
+  - contract_loaded
+  - gates_checked
+  - validation_or_blocker

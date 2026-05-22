@@ -52,17 +52,28 @@
 
 ## Executable YAML Contracts
 
-部分 enforcement rule 有 companion YAML contract，供 agent 先讀結構化 activation、required sources、steps、gates、failure modes 與 final status requirements；Markdown 仍保留完整說明與維護脈絡。
+所有 active enforcement rule 都有 companion YAML contract，供 agent 先讀結構化 activation、required sources、steps、gates、failure modes 與 final status requirements；Markdown 保留完整說明與維護脈絡。Runtime `activation_rules` 不再維護 enforcement activation rows，避免與 owner-layer contract 雙寫。
 
 | Rule | Contract | 用途 |
 | --- | --- | --- |
 | [`authorization-scope.md`](authorization-scope.md) | [`authorization-scope.yaml`](authorization-scope.yaml) | 授權範圍、第三方資料與可重用證據安全 gate。 |
+| [`content-layering.md`](content-layering.md) | [`content-layering.yaml`](content-layering.yaml) | 內容 owner layer、project evidence boundary 與索引更新 gate。 |
 | [`conversation-goal-ledger.md`](conversation-goal-ledger.md) | [`conversation-goal-ledger.yaml`](conversation-goal-ledger.yaml) | Active goal lifecycle、owner/lock、handoff、completion/delete gate。 |
+| [`cross-skill-references.md`](cross-skill-references.md) | [`cross-skill-references.yaml`](cross-skill-references.yaml) | Cross-workflow reference、handoff artifact、ownership 與 sanitization boundary gate。 |
+| [`decision-efficiency.md`](decision-efficiency.md) | [`decision-efficiency.yaml`](decision-efficiency.yaml) | 決策點、路線比較、context cost 與 validation signal gate。 |
 | [`dependency-reading.md`](dependency-reading.md) | [`dependency-reading.yaml`](dependency-reading.yaml) | 依賴讀取 ledger、source-of-truth miss recovery、writeback final status gate。 |
+| [`document-todo-list.md`](document-todo-list.md) | [`document-todo-list.yaml`](document-todo-list.yaml) | Document-local TODO placement、linking 與 completion validation gate。 |
+| [`escalation-policy.md`](escalation-policy.md) | [`escalation-policy.yaml`](escalation-policy.yaml) | Escalation trigger、source reload、execution graph rebuild 與 recovery output gate。 |
 | [`evidence-hierarchy.md`](evidence-hierarchy.md) | [`evidence-hierarchy.yaml`](evidence-hierarchy.yaml) | Evidence quality、claim scope、confidence integrity 與 autonomy downgrade gate。 |
+| [`failure-learning-system.md`](failure-learning-system.md) | [`failure-learning-system.yaml`](failure-learning-system.yaml) | Failure capture、classification、durable promotion、guardrail strengthening 與 validation gate。 |
+| [`feedback-lessons.md`](feedback-lessons.md) | [`feedback-lessons.yaml`](feedback-lessons.yaml) | 舊 feedback lesson redirect 與 canonical feedback source gate。 |
 | [`goal-action-validation.md`](goal-action-validation.md) | [`goal-action-validation.yaml`](goal-action-validation.yaml) | 重要工作單元的目標、執行、驗證與 completion claim gate。 |
 | [`linked-updates.md`](linked-updates.md) | [`linked-updates.yaml`](linked-updates.yaml) | 連動更新矩陣、runtime sync、writeback closure 與 final report gate。 |
+| [`neutral-language.md`](neutral-language.md) | [`neutral-language.yaml`](neutral-language.yaml) | 可重用文件語言一致性、中性用語與敏感詞處理 gate。 |
+| [`prompt-cache-efficiency.md`](prompt-cache-efficiency.md) | [`prompt-cache-efficiency.yaml`](prompt-cache-efficiency.yaml) | Context layout、stable prefix、provider cache metadata 與 required-read preservation gate。 |
+| [`reusable-guidance-boundary.md`](reusable-guidance-boundary.md) | [`reusable-guidance-boundary.yaml`](reusable-guidance-boundary.yaml) | 可重用 guidance 與 project evidence boundary、sanitization 與 durable location gate。 |
 | [`sanitization.md`](sanitization.md) | [`sanitization.yaml`](sanitization.yaml) | secrets、本機路徑、project incident evidence 與 prompt injection 去敏 gate。 |
+| [`tool-neutral-documentation.md`](tool-neutral-documentation.md) | [`tool-neutral-documentation.yaml`](tool-neutral-documentation.yaml) | Tool-neutral reusable docs、adapter isolation 與 tool-specific detail boundary gate。 |
 
 ### Core Bootstrap（每個 session 必讀）
 
@@ -78,7 +89,7 @@
 
 ### Lazy-load Rules（依條件 activate）
 
-以下規則**不預設載入**，只在符合 [`runtime/runtime.db`](../runtime/runtime.db) 定義的條件時才 activate：
+以下規則**不預設載入**，只在符合各自 companion YAML contract 的 `activation` 條件時才 activate；contract projection 可在 [`runtime/runtime.db`](../runtime/runtime.db) 的 `generated_surfaces` 查詢：
 
 | 規則 | 觸發條件範例 | 預估 tokens | 優先權 |
 | --- | --- | --- | --- |
@@ -105,9 +116,9 @@
 
 ```
 1. 讀取 CORE_BOOTSTRAP.md（3 條核心規則）
-2. 檢查 runtime/runtime.db：
-   - 目前 task 是否符合任何 rule 的 activation.when 條件？
-   - 符合 → 載入該 rule 全文
+2. 檢查 enforcement companion YAML contracts：
+   - 目前 task 是否符合任何 contract 的 `activation` 條件？
+   - 符合 → 先載入該 YAML contract，再依 `source_markdown` / `required_sources` 載入 Markdown
    - 不符合 → deferred，不載入
 3. 先讀 knowledge/summaries/ 對應 summary（300-500 tokens）
 4. 需要時才展開完整 source

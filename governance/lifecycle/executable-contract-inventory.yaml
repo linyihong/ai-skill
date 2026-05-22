@@ -116,6 +116,50 @@ inventory:
       contract: enforcement/conversation-goal-ledger.yaml
       state: contract_exists
       reason: Goal lifecycle, owner/lock, handoff, and completion deletion gates now have an owner-layer executable contract.
+    - source: enforcement/content-layering.md
+      contract: enforcement/content-layering.yaml
+      state: contract_exists
+      reason: Content placement, owner-layer selection, project evidence boundary, and index update gates now have an owner-layer executable contract.
+    - source: enforcement/cross-skill-references.md
+      contract: enforcement/cross-skill-references.yaml
+      state: contract_exists
+      reason: Cross-workflow reference trigger, artifact, ownership, sanitization, and linked update gates now have an owner-layer executable contract.
+    - source: enforcement/decision-efficiency.md
+      contract: enforcement/decision-efficiency.yaml
+      state: contract_exists
+      reason: Decision point naming, route comparison, context cost, and validation signal gates now have an owner-layer executable contract.
+    - source: enforcement/document-todo-list.md
+      contract: enforcement/document-todo-list.yaml
+      state: contract_exists
+      reason: Document-local TODO placement, linking, and completion validation gates now have an owner-layer executable contract.
+    - source: enforcement/escalation-policy.md
+      contract: enforcement/escalation-policy.yaml
+      state: contract_exists
+      reason: Escalation trigger classification, source reload, execution graph rebuild, and recovery output gates now have an owner-layer executable contract.
+    - source: enforcement/failure-learning-system.md
+      contract: enforcement/failure-learning-system.yaml
+      state: contract_exists
+      reason: Failure capture, classification, durable promotion, guardrail strengthening, and validation gates now have an owner-layer executable contract.
+    - source: enforcement/feedback-lessons.md
+      contract: enforcement/feedback-lessons.yaml
+      state: contract_exists
+      reason: Legacy feedback lesson redirect and canonical feedback source gates now have an owner-layer executable contract.
+    - source: enforcement/neutral-language.md
+      contract: enforcement/neutral-language.yaml
+      state: contract_exists
+      reason: Reusable document language, neutral wording, sensitive term handling, and language consistency gates now have an owner-layer executable contract.
+    - source: enforcement/prompt-cache-efficiency.md
+      contract: enforcement/prompt-cache-efficiency.yaml
+      state: contract_exists
+      reason: Context layout, stable prefix, provider cache metadata, and required-read preservation gates now have an owner-layer executable contract.
+    - source: enforcement/reusable-guidance-boundary.md
+      contract: enforcement/reusable-guidance-boundary.yaml
+      state: contract_exists
+      reason: Reusable guidance boundary, project evidence separation, sanitization, and durable location gates now have an owner-layer executable contract.
+    - source: enforcement/tool-neutral-documentation.md
+      contract: enforcement/tool-neutral-documentation.yaml
+      state: contract_exists
+      reason: Tool-neutral reusable documentation, adapter isolation, and tool-specific detail boundary gates now have an owner-layer executable contract.
     - source: ai-tools/agent/codex.md
       contract: ai-tools/agent/codex.yaml
       state: contract_exists

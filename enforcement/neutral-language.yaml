@@ -1,0 +1,73 @@
+schema_version: executable-contract/v1
+id: enforcement.neutral-language.contract
+title: "Neutral language executable contract"
+owner_layer: enforcement
+source_markdown: enforcement/neutral-language.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.neutral_language.contract
+  surface_type: executable_yaml_contract
+  execution_scope: reusable_document_language
+
+activation:
+  priority: P2
+  triggers:
+    - {"matches":["write-documentation","review-documentation","translate"],"type":"task_intent"}
+    - {"pattern":"enforcement/**","type":"file_change"}
+    - {"pattern":"workflow/**/README.md","type":"file_change"}
+  required_when:
+    - "Reusable documentation, enforcement, workflow, analysis, intelligence, feedback, knowledge, memory, models, governance, or templates are written or reviewed."
+    - "A document may include high-risk terms, private product names, secrets, personal data, or mixed-language prose."
+
+required_sources:
+  - enforcement/neutral-language.md
+  - enforcement/dependency-reading.md
+
+steps:
+  - id: detect_target_language
+    order: 1
+    action: "讀目標文件標題、首段與相鄰章節，確認正文主要語言。"
+  - id: classify_sensitive_terms
+    order: 2
+    action: "檢查高風險詞、私有產品名、host、credentials、個資或未授權語境。"
+  - id: rewrite_with_neutral_terms
+    order: 3
+    action: "用中性分類、placeholder 與授權/合規/測試語境描述。"
+  - id: preserve_required_terms_only
+    order: 4
+    action: "只保留路徑、命令、API 欄位、專有名詞等必要原詞。"
+  - id: review_language_consistency
+    order: 5
+    action: "Diff review 檢查是否產生整句外語正文或混語段落。"
+
+gates:
+  - id: gate.neutral_language.target_language_confirmed
+    rule: "目標文件語言已確認。"
+  - id: gate.neutral_language.reusable_text_sanitized
+    rule: "Reusable text 使用中性語境且未含私有資訊。"
+
+required_evidence:
+  - activation trigger matched or task context explains why this contract is required
+  - required sources were read or marked not applicable
+  - gates passed or blocker/recovery was reported
+
+success_criteria:
+  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - agent can name required sources, steps, gates, and failure modes before claiming compliance
+
+failure_modes:
+  - id: language_drift
+    detection: "可重用文件正文語言與目標文件不一致。"
+    recovery: "改回目標文件語言，保留必要術語。"
+  - id: sensitive_term_leak
+    detection: "標題、slug、摘要或正文含不必要高風險詞或私有資訊。"
+    recovery: "改成中性分類與 placeholder。"
+
+final_status_report:
+  - contract_loaded
+  - gates_checked
+  - validation_or_blocker

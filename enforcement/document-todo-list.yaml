@@ -1,0 +1,69 @@
+schema_version: executable-contract/v1
+id: enforcement.document-todo-list.contract
+title: "Document TODO list executable contract"
+owner_layer: enforcement
+source_markdown: enforcement/document-todo-list.md
+status: active
+contract_type: policy_gate
+blocking_level: advisory
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.document_todo_list.contract
+  surface_type: executable_yaml_contract
+  execution_scope: document_completion_tracking
+
+activation:
+  priority: P2
+  triggers:
+    - {"matches":["update-document","complete-document","review-document"],"type":"task_intent"}
+    - {"pattern":"**/*.md","type":"file_has_todo"}
+  required_when:
+    - "A reusable document has unfinished sections, missing examples, open questions, or validation gaps."
+    - "A document is claimed complete and may still have local TODOs."
+
+required_sources:
+  - enforcement/document-todo-list.md
+  - enforcement/dependency-reading.md
+
+steps:
+  - id: detect_document_local_open_work
+    order: 1
+    action: "檢查文件是否有未完成章節、缺例子、缺 links、待驗證 claims 或 open questions。"
+  - id: place_todo_near_top
+    order: 2
+    action: "需要 TODO 時，放在 overview 後、正文前。"
+  - id: link_each_todo
+    order: 3
+    action: "每個 TODO 連到章節、檔案、goal、issue 或 source-of-truth。"
+  - id: close_only_after_validation
+    order: 4
+    action: "只有 linked work 完成並驗證後，才移除或標 done。"
+
+gates:
+  - id: gate.document_todo.visible_before_body
+    rule: "Document TODO 在正文前可掃描。"
+  - id: gate.document_todo.linked_and_actionable
+    rule: "TODO 具體且有可行動 link。"
+
+required_evidence:
+  - activation trigger matched or task context explains why this contract is required
+  - required sources were read or marked not applicable
+  - gates passed or blocker/recovery was reported
+
+success_criteria:
+  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - agent can name required sources, steps, gates, and failure modes before claiming compliance
+
+failure_modes:
+  - id: hidden_open_work
+    detection: "文件仍有 open work 但藏在尾端或未標示。"
+    recovery: "補前段 TODO 表。"
+  - id: todo_removed_without_validation
+    detection: "未完成驗證就刪除 TODO。"
+    recovery: "恢復 TODO 或補驗證證據。"
+
+final_status_report:
+  - contract_loaded
+  - gates_checked
+  - validation_or_blocker

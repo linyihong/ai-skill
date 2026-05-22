@@ -125,7 +125,7 @@ Runtime 使用兩種 SQLite database，生命週期不同：
 | `obligations`, `obligation_ledger` | `runtime_config_documents` | 每個 phase 的 duties 與 verification criteria |
 | `gates`, `blocking_gates` | `runtime_config_documents` | phase transition prerequisites 與 failure actions |
 | `transaction_states`, `transaction_transitions`, `transaction_rules`, `transaction_templates`, `transaction_templates_ext` | `runtime_config_documents` | transaction state、rules、templates |
-| `activation_rules`, `activation_rules_mirror`, `core_bootstrap_rules` | `runtime_config_documents` | lazy-load trigger lookup 與 activation conditions；不是 enforcement rule body 的第二份 source |
+| `activation_rules`, `activation_rules_mirror`, `core_bootstrap_rules` | `runtime_config_documents` | 相容 lookup tables 與 core bootstrap order；enforcement activation 由 owner-layer executable contracts 管理，不在此維護第二份 rule body |
 | `discovery_checkpoints`, `discovery_search_strategy`, `capability_checkpoints` | `runtime_config_documents` | phase-aware capability discovery checkpoints |
 | `generated_surfaces` | owner-layer executable contracts and deterministic source mappings | 保存 `governance/`、`enforcement/`、`workflow/`、`ai-tools/` 等 source 的 runtime projection；不取代 owner-layer source |
 | `compiler_metadata` | auto-generated | compiler version、compiled timestamp、schema version |

@@ -1,0 +1,73 @@
+schema_version: executable-contract/v1
+id: enforcement.tool-neutral-documentation.contract
+title: "Tool-neutral documentation executable contract"
+owner_layer: enforcement
+source_markdown: enforcement/tool-neutral-documentation.md
+status: active
+contract_type: policy_gate
+blocking_level: advisory
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.tool_neutral_documentation.contract
+  surface_type: executable_yaml_contract
+  execution_scope: tool_neutral_reusable_docs
+
+activation:
+  priority: P2
+  triggers:
+    - {"matches":["write-documentation","create-template","update-readme","create-enforcement-rule"],"type":"task_intent"}
+    - {"pattern":"enforcement/**","type":"file_change"}
+    - {"pattern":"workflow/**/execution-flow.md","type":"file_change"}
+  required_when:
+    - "Reusable rules, skills, templates, indexes, feedback lessons, workflow docs, or analysis/intelligence docs are created or updated."
+    - "Tool-specific paths, hooks, commands, UI labels, or sync steps appear in reusable docs."
+
+required_sources:
+  - enforcement/tool-neutral-documentation.md
+  - enforcement/dependency-reading.md
+
+steps:
+  - id: write_portable_behavior_first
+    order: 1
+    action: "先描述可攜行為、決策規則、workflow 或 artifact。"
+  - id: isolate_tool_specific_details
+    order: 2
+    action: "把工具專屬設定、hooks、UI、sync、troubleshooting 放入 ai-tools 或 adapter。"
+  - id: use_generic_terms
+    order: 3
+    action: "使用 agent、AI tool、tool-specific adapter、project tool config 等通用詞。"
+  - id: link_to_adapter
+    order: 4
+    action: "需要具體工具步驟時，連到 ai-tools 或 tools/adapters，不在 reusable docs 複製全文。"
+  - id: review_for_tool_lock_in
+    order: 5
+    action: "檢查 root、workflow、analysis、intelligence、feedback 是否誤把單一工具寫成必要條件。"
+
+gates:
+  - id: gate.tool_neutral.core_docs_portable
+    rule: "Reusable docs 不依賴單一 IDE 或 agent 產品。"
+  - id: gate.tool_neutral.tool_details_isolated
+    rule: "工具細節只在 ai-tools、adapter 或工具設定檔。"
+
+required_evidence:
+  - activation trigger matched or task context explains why this contract is required
+  - required sources were read or marked not applicable
+  - gates passed or blocker/recovery was reported
+
+success_criteria:
+  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - agent can name required sources, steps, gates, and failure modes before claiming compliance
+
+failure_modes:
+  - id: tool_specific_path_in_reusable_doc
+    detection: "在 generic rule 放入 .cursor、hook 或工具 UI 步驟。"
+    recovery: "移到 ai-tools 或 adapter 並留下連結。"
+  - id: adapter_copies_core_workflow
+    detection: "工具 adapter 複製完整核心 workflow。"
+    recovery: "把共同內容移回核心文件，adapter 只保留差異。"
+
+final_status_report:
+  - contract_loaded
+  - gates_checked
+  - validation_or_blocker

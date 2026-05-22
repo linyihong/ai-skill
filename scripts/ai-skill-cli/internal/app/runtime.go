@@ -1316,7 +1316,7 @@ var nativeRuntimeRequiredTables = []string{
 }
 
 var nativeRuntimeMinimumRows = map[string]int{
-	"phases": 8, "obligations": 15, "gates": 15, "activation_rules": 10,
+	"phases": 8, "obligations": 15, "gates": 15, "activation_rules": 0,
 	"core_bootstrap_rules": 2, "discovery_checkpoints": 3, "compiler_metadata": 2,
 	"decision_recording": 1, "runtime_config_documents": 30, "runtime_config_projections": 30,
 	"runtime_source_files": 30, "runtime_budget": 1, "context_ttl_policy": 1, "circuit_breaker": 1,

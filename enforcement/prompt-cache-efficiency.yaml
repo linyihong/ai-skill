@@ -1,0 +1,73 @@
+schema_version: executable-contract/v1
+id: enforcement.prompt-cache-efficiency.contract
+title: "Prompt cache efficiency executable contract"
+owner_layer: enforcement
+source_markdown: enforcement/prompt-cache-efficiency.md
+status: active
+contract_type: policy_gate
+blocking_level: advisory
+
+runtime_projection:
+  enabled: true
+  target_key: enforcement.prompt_cache_efficiency.contract
+  surface_type: executable_yaml_contract
+  execution_scope: context_layout
+
+activation:
+  priority: P2
+  triggers:
+    - {"matches":["prompt-cache","prefix-cache","cached-tokens","context-loading","prompt-composition","token-cost-optimization"],"type":"task_intent"}
+    - {"matches":["prompt cache","prefix cache","cached token","緩存命中","快取命中","token 消耗"],"type":"user_signal"}
+    - {"pattern":"runtime/context/**","type":"file_change"}
+    - {"pattern":"metadata/schema.md","type":"file_change"}
+  required_when:
+    - "Bootstrap, context loading, routing, token cost optimization, prompt composition, prompt cache, or cached-token strategy is discussed or changed."
+
+required_sources:
+  - enforcement/prompt-cache-efficiency.md
+  - enforcement/dependency-reading.md
+
+steps:
+  - id: partition_context
+    order: 1
+    action: "依 stable prefix、semi-stable middle、volatile suffix 分區。"
+  - id: preserve_stable_prefix
+    order: 2
+    action: "不要把時間戳、git status、tool output 或一次性要求插入 stable prefix。"
+  - id: use_summary_first
+    order: 3
+    action: "先用 summary / index 判斷是否需要 full source。"
+  - id: respect_required_reads
+    order: 4
+    action: "不得為 cache hit 跳過 dependency-reading、validation gates、safety rules 或使用者要求。"
+  - id: check_provider_cache_metadata
+    order: 5
+    action: "區分 cacheable 與 provider_cache_candidate。"
+
+gates:
+  - id: gate.prompt_cache.stable_prefix_preserved
+    rule: "Stable prefix 內容與順序保持穩定。"
+  - id: gate.prompt_cache.required_reads_preserved
+    rule: "沒有為 cache hit 跳過必要 reads。"
+
+required_evidence:
+  - activation trigger matched or task context explains why this contract is required
+  - required sources were read or marked not applicable
+  - gates passed or blocker/recovery was reported
+
+success_criteria:
+  - contract activation is evaluated from this YAML, not duplicated in activation_rules
+  - agent can name required sources, steps, gates, and failure modes before claiming compliance
+
+failure_modes:
+  - id: volatile_prefix_pollution
+    detection: "將 volatile context 寫入 stable prefix。"
+    recovery: "移到 volatile suffix。"
+  - id: cache_over_safety
+    detection: "為 cache 命中跳過 required dependency 或 safety gate。"
+    recovery: "恢復必要 reads 與 validation。"
+
+final_status_report:
+  - contract_loaded
+  - gates_checked
+  - validation_or_blocker
