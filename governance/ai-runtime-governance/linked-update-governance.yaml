@@ -1,0 +1,105 @@
+schema_version: executable-contract/v1
+id: governance.ai-runtime.linked-update-governance.contract
+title: Linked update governance contract
+owner_layer: governance
+source_markdown: governance/ai-runtime-governance/linked-update-governance.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: governance.linked_update_governance.contract
+  surface_type: executable_yaml_contract
+  execution_scope: governance_promotion
+
+activation:
+  events:
+    - reusable_source_changed
+    - route_summary_graph_template_or_workflow_changed
+    - stale_route_or_index_detected
+    - user_reported_missing_linked_update
+    - generated_surface_may_be_stale
+  required_when:
+    - Reusable docs, directories, routes, summaries, graphs, templates, workflows, enforcement, governance, intelligence, knowledge, or runtime sources change.
+    - A change may affect README tables, routing registry, knowledge index, graph, summary, runtime report, SQLite index, or runtime.db.
+
+required_sources:
+  - governance/ai-runtime-governance/linked-update-governance.md
+  - intelligence/engineering/agent-architecture/linked-updates-completeness.md
+  - enforcement/linked-updates.md
+  - enforcement/dependency-reading.md
+  - governance/lifecycle/knowledge-update-flow.md
+  - governance/validation/README.md
+
+steps:
+  - id: discover_references
+    order: 1
+    action: Search new and old paths, slugs, route IDs, titles, anchors, and owner surfaces for inbound references.
+    gates:
+      - gate.linked_update_governance.references_discovered
+  - id: update_owner_surfaces
+    order: 2
+    action: Update owner README, root/index README, routing registry, knowledge index, graph, summary, or record not-applicable reason.
+  - id: decide_generated_surfaces
+    order: 3
+    action: Decide whether summaries, graphs, runtime reports, SQLite index, and runtime.db need refresh; run refresh or record explicit non-update.
+    gates:
+      - gate.linked_update_governance.generated_surface_decision
+  - id: preserve_source_of_truth
+    order: 4
+    action: Keep full rule text in one owner source; secondary surfaces contain summary and links.
+  - id: keep_commit_boundary
+    order: 5
+    action: Commit primary change with required linked updates, not as optional later work.
+    gates:
+      - gate.linked_update_governance.commit_boundary_closed
+
+gates:
+  - id: gate.linked_update_governance.references_discovered
+    blocks: linked_update_claim
+    pass_when:
+      - new/old paths, slugs, route IDs, titles, and anchors were searched or scoped not applicable
+      - inbound references are updated, preserved intentionally, or documented as not applicable
+  - id: gate.linked_update_governance.generated_surface_decision
+    blocks: validation_claim
+    pass_when:
+      - refresh/revalidate/downgrade/no-update decision is recorded for generated summaries, graphs, reports, runtime.db, and SQLite index when affected
+      - required refresh/compile/validate commands ran when needed
+  - id: gate.linked_update_governance.commit_boundary_closed
+    blocks: commit_or_final_response
+    pass_when:
+      - primary change and required linked updates are in the same commit or explicitly blocked
+      - no required linked update is deferred silently
+
+required_evidence:
+  - reference discovery summary
+  - owner surface updates or not-applicable reasons
+  - generated surface decision and commands
+  - source-of-truth preservation statement
+  - commit boundary status
+
+success_criteria:
+  - Linked updates are discovered by source impact, not memory.
+  - Generated runtime/knowledge surfaces are refreshed or explicitly marked not affected.
+  - Secondary docs link to owner sources rather than duplicating full rules.
+  - Required linked updates close in the same change batch.
+
+failure_modes:
+  - id: stale_route_or_index
+    detection: Source changed but routing registry, README index, summary, graph, or SQLite index still points to old state.
+    recovery: Update surface and run runtime refresh/validate.
+  - id: silent_non_update
+    detection: Agent claims linked updates complete without checking or explaining unchanged surfaces.
+    recovery: Record not-applicable reasons or perform updates.
+  - id: duplicated_source_of_truth
+    detection: Same rule is maintained as full text in multiple surfaces.
+    recovery: Keep one owner source and convert other copies to summary links.
+
+final_status_report:
+  required_fields:
+    - changed_sources
+    - references_checked
+    - owner_surfaces_updated
+    - generated_surface_decision
+    - commit_boundary_status

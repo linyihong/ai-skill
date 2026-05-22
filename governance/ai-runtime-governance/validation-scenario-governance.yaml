@@ -1,0 +1,111 @@
+schema_version: executable-contract/v1
+id: governance.ai-runtime.validation-scenario-governance.contract
+title: Validation scenario governance contract
+owner_layer: governance
+source_markdown: governance/ai-runtime-governance/validation-scenario-governance.md
+status: active
+contract_type: promotion_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: governance.validation_scenario_governance.contract
+  surface_type: executable_yaml_contract
+  execution_scope: governance_promotion
+
+activation:
+  events:
+    - validation_scenario_created_or_changed
+    - routing_or_rule_obedience_failure_detected
+    - failure_pattern_repeated
+    - model_or_routing_registry_changed
+    - workflow_layering_changed
+  required_when:
+    - A failure may be promoted into validation/scenarios, validation/rules, validation/traces, or validation/evaluations.
+    - A model, routing, workflow, or rule change needs regression coverage for agent decision behavior.
+
+required_sources:
+  - governance/ai-runtime-governance/validation-scenario-governance.md
+  - intelligence/engineering/agent-architecture/stateless-validation-necessity.md
+  - intelligence/engineering/agent-architecture/failure-to-scenario-closure.md
+  - enforcement/failure-learning-system.md
+  - validation/README.md
+  - validation/scenarios/failure-derived/
+
+steps:
+  - id: classify_failure_candidate
+    order: 1
+    action: Determine whether failure is routing, heuristic obedience, rule obedience, recovery behavior, or non-reproducible tool/environment issue.
+  - id: test_stateless_reproduction
+    order: 2
+    action: Ensure scenario given/input contains complete decision conditions without conversation memory, previous session state, or hidden transcript dependence.
+    gates:
+      - gate.validation_scenario.stateless
+  - id: prevent_answer_leakage
+    order: 3
+    action: Keep expected route, forbidden route, evaluator answer hints, and gold labels out of agent-visible scenario input.
+    gates:
+      - gate.validation_scenario.no_answer_leakage
+  - id: define_expected_and_forbidden_behavior
+    order: 4
+    action: Record expected route or heuristic plus at least one forbidden route or forbidden behavior for evaluator use.
+  - id: ensure_traceability
+    order: 5
+    action: Require trace output for signals, loaded intelligence, rejected routes, and final route.
+    gates:
+      - gate.validation_scenario.traceable
+  - id: decide_promotion_or_not_applicable
+    order: 6
+    action: Promote repeated/stateless failures to scenario or record not-applicable reason for one-off, environment-dependent, or unreplayable events.
+
+gates:
+  - id: gate.validation_scenario.stateless
+    blocks: scenario_promotion
+    pass_when:
+      - given/input includes all relevant decision conditions
+      - scenario does not require prior chat, memory, or hidden agent state
+  - id: gate.validation_scenario.no_answer_leakage
+    blocks: scenario_promotion
+    pass_when:
+      - agent-visible input does not reveal expected route, forbidden route, or evaluator-only hints
+  - id: gate.validation_scenario.traceable
+    blocks: validation_completion
+    pass_when:
+      - scenario can produce trace with signals, loaded intelligence, rejected routes, and final route
+      - failure class and source lesson/pattern are linked
+
+required_evidence:
+  - failure class
+  - source lesson or pattern
+  - stateless reproduction notes
+  - no-answer-leakage review
+  - expected and forbidden behavior
+  - traceability target
+  - promotion or not-applicable decision
+
+success_criteria:
+  - Validation scenarios reproduce agent decision failures without conversation memory.
+  - Scenario input does not leak evaluator answers.
+  - Expected and forbidden behavior are testable and traceable.
+  - One-off or environment-dependent events are not promoted as brittle scenarios.
+  - Repeated failure patterns have scenario coverage or explicit not-applicable reasons.
+
+failure_modes:
+  - id: conversation_state_dependency
+    detection: Scenario relies on phrases like remember earlier or previous chat context.
+    recovery: Add full given state or reject promotion.
+  - id: answer_leakage
+    detection: Scenario input includes expected route, forbidden route, or answer hint.
+    recovery: Move answer material to evaluator-only expected fields.
+  - id: repeated_failure_without_scenario
+    detection: Failure pattern marked repeated but has no scenario or not-applicable reason.
+    recovery: Promote scenario or record why it cannot be replayed.
+
+final_status_report:
+  required_fields:
+    - failure_class
+    - stateless_status
+    - answer_leakage_status
+    - expected_forbidden_behavior
+    - traceability_status
+    - promotion_decision

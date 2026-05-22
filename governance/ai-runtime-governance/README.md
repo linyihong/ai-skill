@@ -42,6 +42,11 @@ intelligence source
 | [`software-delivery-governance.md`](software-delivery-governance.md) | [`docs-first-bdd-closure.md`](../../intelligence/engineering/development/docs-first-bdd-closure.md) | 將 change intake、contract precedence、BDD closure、artifact completeness、test strategy 與 performance evidence 轉成 software delivery gate。 |
 | [`software-delivery-architecture-governance.md`](software-delivery-architecture-governance.md) | [`architectural-fit/`](../../intelligence/engineering/architecture/architectural-fit/README.md), [`domain-modeling/`](../../intelligence/engineering/architecture/domain-modeling/README.md) | 將 architecture fit analysis、DDD Lite / Full DDD selection、minimality 與 overengineering detection 轉成 software-delivery architecture gate；不 promotion 成 runtime invariant。 |
 
+Executable governance contracts:
+
+- [`linked-update-governance.yaml`](linked-update-governance.yaml)
+- [`validation-scenario-governance.yaml`](validation-scenario-governance.yaml)
+
 ## 放什麼
 
 - AI runtime governance principles。

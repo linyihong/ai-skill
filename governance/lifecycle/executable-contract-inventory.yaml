@@ -164,20 +164,20 @@ inventory:
       contract: workflow/greenfield/execution-flow.yaml
       state: contract_exists
       reason: Greenfield specify, plan, tasks, implement stages and phase gates now have a workflow contract.
+    - source: governance/lifecycle/directory-structure-governance.md
+      contract: governance/lifecycle/directory-structure-governance.yaml
+      state: contract_exists
+      reason: Directory creation, rename, boundary, naming, reference impact, and validation checkpoints now have a governance contract.
+    - source: governance/ai-runtime-governance/linked-update-governance.md
+      contract: governance/ai-runtime-governance/linked-update-governance.yaml
+      state: contract_exists
+      reason: Reference discovery, owner surface updates, generated surface decisions, and commit boundary gates now have a governance contract.
+    - source: governance/ai-runtime-governance/validation-scenario-governance.md
+      contract: governance/ai-runtime-governance/validation-scenario-governance.yaml
+      state: contract_exists
+      reason: Stateless reproduction, answer leakage, failure class, expected/forbidden behavior, traceability, and promotion decision gates now have a governance contract.
 
   contract_required:
-    - source: governance/lifecycle/directory-structure-governance.md
-      suggested_contract: governance/lifecycle/directory-structure-governance.yaml
-      priority: P2
-      reason: Directory creation and rename checkpoints affect layer boundaries, routing, and global references.
-    - source: governance/ai-runtime-governance/linked-update-governance.md
-      suggested_contract: governance/ai-runtime-governance/linked-update-governance.yaml
-      priority: P1
-      reason: Linked update completeness is a governance gate and must align with enforcement linked-update rules.
-    - source: governance/ai-runtime-governance/validation-scenario-governance.md
-      suggested_contract: governance/ai-runtime-governance/validation-scenario-governance.yaml
-      priority: P1
-      reason: Failure promotion into validation scenarios has repeatable gates and expected artifacts.
 
   markdown_only:
     - source: governance/lifecycle/runtime-guards-philosophy.md

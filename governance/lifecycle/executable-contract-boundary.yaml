@@ -89,15 +89,20 @@ initial_inventory:
     - source: enforcement/conversation-goal-ledger.md
       contract: enforcement/conversation-goal-ledger.yaml
       reason: Active goal lifecycle, owner/lock, handoff, and completion deletion gates.
+    - source: governance/lifecycle/directory-structure-governance.md
+      contract: governance/lifecycle/directory-structure-governance.yaml
+      reason: Directory creation, rename, boundary, naming, reference impact, and validation checkpoints.
+    - source: governance/ai-runtime-governance/linked-update-governance.md
+      contract: governance/ai-runtime-governance/linked-update-governance.yaml
+      reason: Linked update completeness, generated surface decision, and commit boundary gates.
+    - source: governance/ai-runtime-governance/validation-scenario-governance.md
+      contract: governance/ai-runtime-governance/validation-scenario-governance.yaml
+      reason: Stateless validation scenario promotion, answer leakage, and traceability gates.
   candidates:
     - source: enforcement/decision-efficiency.md
       suggested_contract: enforcement/decision-efficiency.yaml
       priority: P2
       reason: Defines decision cost and escalation gates.
-    - source: governance/lifecycle/directory-structure-governance.md
-      suggested_contract: governance/lifecycle/directory-structure-governance.yaml
-      priority: P2
-      reason: Defines a five-checkpoint directory creation/rename gate.
   markdown_only:
     - source: governance/lifecycle/runtime-guards-philosophy.md
       reason: Philosophy and design rationale; executable gates belong in a derived contract.

@@ -1,0 +1,114 @@
+schema_version: executable-contract/v1
+id: governance.lifecycle.directory-structure-governance.contract
+title: Directory structure governance contract
+owner_layer: governance
+source_markdown: governance/lifecycle/directory-structure-governance.md
+status: active
+contract_type: policy_gate
+blocking_level: advisory
+
+runtime_projection:
+  enabled: true
+  target_key: governance.directory_structure_governance.contract
+  surface_type: executable_yaml_contract
+  execution_scope: governance_promotion
+
+activation:
+  events:
+    - directory_created
+    - directory_renamed
+    - directory_merged_or_split
+    - path_confusion_detected
+    - knowledge_update_checkpoint
+  required_when:
+    - Creating, renaming, merging, or splitting reusable knowledge directories.
+    - A path, layer, or sibling directory boundary is ambiguous.
+    - Directory structure changes may affect indexes, routing, generated surfaces, validators, or tool adapters.
+
+required_sources:
+  - governance/lifecycle/directory-structure-governance.md
+  - enforcement/content-layering.md
+  - enforcement/dependency-reading.md
+  - enforcement/linked-updates.md
+  - intelligence/README.md
+  - analysis/README.md
+  - knowledge/runtime/routing-registry.yaml
+
+steps:
+  - id: check_name_conflicts
+    order: 1
+    action: Check same-layer, cross-layer, semantically similar, deprecated, or migrating directory name conflicts.
+  - id: check_boundary_clarity
+    order: 2
+    action: Explain what belongs here, what does not, and how this directory differs from parent, sibling, cross-layer, and enforcement surfaces.
+    gates:
+      - gate.directory_structure.boundary_clear
+  - id: check_inertial_naming
+    order: 3
+    action: Reject names inherited from old skills, source history, implementation detail, or overly generic buckets when they do not reflect content nature.
+  - id: check_depth_and_flattening
+    order: 4
+    action: Check layer placement, path depth, single-child over-splitting, and whether promotion or flattening is clearer.
+  - id: assess_reference_impact
+    order: 5
+    action: Search inbound references, generated surfaces, tool adapters, runtime indexes, and validators before directory refactor.
+    gates:
+      - gate.directory_structure.references_assessed
+  - id: validate_after_change
+    order: 6
+    action: Confirm README boundaries, update routes/indexes, rebuild generated indexes, and remove old path references.
+    gates:
+      - gate.directory_structure.validation_complete
+
+gates:
+  - id: gate.directory_structure.boundary_clear
+    blocks: directory_publication
+    pass_when:
+      - directory purpose can be explained without historical reasons
+      - put / do-not-put boundary is documented in README when reusable
+      - sibling and cross-layer differences are clear
+  - id: gate.directory_structure.references_assessed
+    blocks: rename_or_move
+    pass_when:
+      - inbound references to old path, slug, title, and route ID were searched
+      - generated SQLite/runtime surfaces and tool adapter dependencies were considered
+      - high-impact rename has staged migration or compatibility rationale
+  - id: gate.directory_structure.validation_complete
+    blocks: completion_claim
+    pass_when:
+      - no stale old-path references remain or accepted compatibility path is documented
+      - route registry and knowledge index are updated when affected
+      - generated indexes/runtime surfaces are refreshed when affected
+
+required_evidence:
+  - name conflict check
+  - boundary statement
+  - naming rationale
+  - path depth / flattening decision
+  - inbound reference impact summary
+  - post-change validation
+
+success_criteria:
+  - Directory names reflect content nature rather than historical source.
+  - Boundaries are understandable to agents before reading deep files.
+  - Refactors update indexes, routing, generated surfaces, and references.
+  - Directory changes do not introduce stale paths or ambiguous ownership.
+
+failure_modes:
+  - id: cross_layer_name_collision
+    detection: Similar or identical directory names exist across layers with different meaning.
+    recovery: Rename or document boundaries until routing is unambiguous.
+  - id: historical_skill_naming
+    detection: Directory name follows old skill source instead of current content layer.
+    recovery: Rename by content nature and update references.
+  - id: stale_path_after_refactor
+    detection: Old path remains in docs, routing, generated surfaces, or tool adapters.
+    recovery: Update references and refresh runtime/index surfaces.
+
+final_status_report:
+  required_fields:
+    - directory_change
+    - boundary_decision
+    - reference_impact
+    - linked_updates
+    - validation_status

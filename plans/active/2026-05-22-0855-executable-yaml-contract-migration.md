@@ -179,10 +179,12 @@ final_status_report: []
 
 ### Phase 4：Governance Promotion Contracts
 
-- [ ] YAML 化 directory structure governance。
-- [ ] YAML 化 linked update governance。
-- [ ] YAML 化 validation scenario governance。
-- [ ] 對照 `executable-contract-boundary.yaml`，將 candidates 移到 `contract_exists` 或明確標記 markdown-only。
+- [x] YAML 化 directory structure governance。
+- [x] YAML 化 linked update governance。
+- [x] YAML 化 validation scenario governance。
+- [x] 對照 `executable-contract-boundary.yaml`，將 candidates 移到 `contract_exists` 或明確標記 markdown-only。
+
+**Phase 4 output**：directory structure、linked update completeness 與 validation scenario promotion 已有 governance executable contract；inventory 對應 candidates 已移至 `contract_exists`。
 
 ### Phase 5：Validation & Close Loop
 
