@@ -28,7 +28,7 @@ Agent 沒有先做 pre-build interrogation，就直接設計或實作 framework 
 
 Framework 改動不得直接進 implementation。必須先通過 pre-build interrogation 的 framework discovery 與 duplication risk gates；若有 blocker question，先問使用者。
 
-## 驗證
+## Validation
 
 - `validation/scenarios/failure-derived/framework-duplication-without-interrogation-v1.yaml`
 - `validation/scenarios/failure-derived/plan-without-prebuild-interrogation-v1.yaml`

@@ -64,7 +64,7 @@ Class: `process-gap` / `governance-drift`
 
 若回答不確定，**先讀** [`governance/lifecycle/decision-promotion-pipeline.md`](../../governance/lifecycle/decision-promotion-pipeline.md) §No-Proposed-ADR Rule。
 
-## 驗證
+## Validation
 
 符合下列條件時，此 pattern 已被防止：
 
@@ -86,5 +86,10 @@ Class: `process-gap` / `governance-drift`
 - [`plans/README.md`](../../plans/README.md) — Plan 模板必填 §Decision Rationale section
 - [`constitution/ADR-007-constitution-and-decision-promotion-boundary.md`](../../constitution/ADR-007-constitution-and-decision-promotion-boundary.md) — ADR 不是 default endpoint 原則
 - [`knowledge-update-flow-bypassed-by-sub-pipeline.md`](knowledge-update-flow-bypassed-by-sub-pipeline.md) — 同性質的 process-gap 失誤
+
+## Linked Validation Scenarios
+
+- `validate_constitution_only_accepted_status` — 檢查 `constitution/` 內所有 ADR 的 Status 為 `accepted` / `deprecated` / `superseded`，不含 `proposed` / `draft` / `pending`
+- `validate_plan_decision_rationale_section` — 檢查涉及架構/流程/跨層 plan 含完整 `§Decision Rationale` section（Problem & Why Now / Decision / Alternatives Considered / Why Not an ADR Yet / ADR Promotion Criteria / Consequences）
 
 ← [Back to failure patterns](README.md)

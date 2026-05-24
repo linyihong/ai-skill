@@ -41,12 +41,27 @@ Sub-pipeline 文件是「某個 master step 的內部展開」，不是完整流
 4. Step 6 / 7 / 9 的「強制判斷」必須明文寫出「是/否 + 理由」，不可省略
 5. Commit message 必須含 11 個 step 對照註記（做了 / 不適用 / 原因），讓閉環缺口無法沉默跳過
 
-## Prevention
+## Prevention Gate
 
 - **首讀順序強制**：任何「新知識寫入」任務的 first Read 必須命中 `knowledge-update-flow.md`
 - **Commit message 模板**：包含「本次 master flow 11 step 對照」段落（即使某些 step 不適用也要明列）
 - **Step 6a / Step 7 判斷表格逐欄對照**：不得直覺判定，必須對照表格的「應/不應」兩欄
 - **Step 9 阻斷處理**：sqlite3 / ai-skill CLI 不可用時，依 `enforcement/failure-patterns/mandatory-step-blocker-bypass.md` 立即停下並通知使用者
+
+## Validation
+
+符合下列條件時，此 pattern 已被防止：
+
+- Commit message 含 11 個 step 對照註記（done / not_applicable / blocked + 理由）
+- 同一 commit 含對應 `feedback/history/` lesson（若 reusable knowledge）
+- Step 9 命中 `generated_surfaces` 時 `runtime/runtime.db` 已加入同 commit
+- Push 後 readback 已執行
+- Final `git status` clean 且 branch 不 ahead/behind
+
+## Linked Validation Scenarios
+
+- `validate_master_flow_step_coverage` — 檢查 commit message 是否含 11 step 對照
+- `validate_sub_pipeline_not_substituted` — 偵測「只跑 sub-pipeline 跳過 master」的訊號
 
 ## Detection Signals
 
