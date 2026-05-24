@@ -115,12 +115,46 @@ Agent 完成任務時，final report **必須**含此區塊：
 
 ## Rollback
 
-| 動作 | 操作 |
-|------|------|
-| 完全撤回 Phase D | `git revert <commit-hash>` — 移除本 README 與 plan §Phase D 段落；無 runtime state 變更 |
-| 暫停手動套用 | 在 plan §Phase D 加 `paused` 標記，agent final report 不再列 Cognitive Mode |
-| 修改 mode 定義 | 編輯本 README + plan 對應 mode 描述；下次任務套用新定義 |
-| 升級到 Phase 1 runtime 實作 | 本 README 仍保留為 source-of-truth doc；Phase 1 建立 `runtime/cognitive-modes.yaml` 引用本 README |
+| 動作 | 操作 | 實證狀態 |
+|------|------|---------|
+| 完全撤回 Phase D（單一 commit） | `git revert <Phase D commit>` — 移除本 README 與 plan §Phase D 段落；無 runtime state 變更 | ✅ Clean **僅在後續無修改本 README 或 plan 時**成立 |
+| 完全撤回 Phase D + 後續所有修改 | 反向順序逐 commit revert：先 revert 最新，再 revert Phase D commit | ✅ T5 演練驗證；`--abort` 可隨時取消 |
+| 暫停手動套用 | 在 plan §Phase D 加 `paused` 標記，agent final report 不再列 Cognitive Mode | ✅ 純文件變更，無風險 |
+| 修改 mode 定義 | 編輯本 README + plan 對應 mode 描述；下次任務套用新定義 | ✅ |
+| 升級到 Phase 1 runtime 實作 | 本 README 仍保留為 source-of-truth doc；Phase 1 建立 `runtime/cognitive-modes.yaml` 引用本 README | ⏳ Phase 1 開始時驗證 |
+
+### T5 Rollback Dry-Run 實證（2026-05-22）
+
+依 plan §Phase D §T5 設計演練：
+
+```bash
+git revert --no-commit 9df20ae   # 嘗試直接 revert Phase D 啟動 commit
+# 結果：CONFLICT — models/cognitive-modes/README.md 在 HEAD 被後續 T1 (f98d6e4) 修改
+# 衝突類型：UD（deleted in revert target / modified in HEAD）
+
+git revert --abort               # 取消 revert
+# 結果：✅ 工作樹回到原狀，無殘留
+```
+
+**發現**：當 Phase D 啟動 commit 之後有任何 commit 修改 `models/cognitive-modes/README.md` 或 plan §Phase D 段落，**單一 commit `git revert` 會 conflict**。Conflict 本身可解（接受 HEAD 版或先 revert 後續 commits），但「100% safe rollback」的承諾應改為「依累積修改情況的多步 rollback」。
+
+**推導出的真實 rollback 路徑**（截至 2026-05-22）：
+
+```bash
+# 反向順序撤回所有 Phase D 相關 commits：
+git revert df37b1a   # T2: README 索引修補
+git revert f98d6e4   # T1: stale 描述修正
+git revert 9df20ae   # Phase D 啟動
+
+# 或一次三個 revert commit（會產生 3 個 inverse commits）：
+git revert df37b1a f98d6e4 9df20ae
+```
+
+**`--abort` 安全性**：✅ 已驗證 — 任何 conflict 狀態下 `git revert --abort` 都能清乾淨回到原狀。
+
+**對未來 commits 的建議**：
+- 若 commit 改動 `models/cognitive-modes/` 或 plan §Phase D，commit message 列出 rollback 順序
+- 若想保留「單一 commit 一鍵 rollback」能力，避免後續 commit 修改 Phase D 相關檔案 — 或在新 commit 中明確標註「此 commit 後 Phase D rollback 需多步」
 
 ## 不放什麼
 
