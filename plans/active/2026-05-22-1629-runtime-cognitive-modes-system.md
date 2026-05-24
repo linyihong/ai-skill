@@ -5,7 +5,7 @@
 **建立日期**：2026-05-22
 **最後更新**：2026-05-22（Phase D 啟動 — documentation-contract trial）
 
-> ⚠️ 本 plan 為 draft 階段。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
+> ⚠️ 本 plan 處於 `in-progress`（Phase D 進行中）階段。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
 >
 > 若 plan completed 且通過 §ADR Promotion Criteria，才升級為 accepted ADR（屆時取編號）。
 

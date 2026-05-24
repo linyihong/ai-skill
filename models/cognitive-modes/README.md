@@ -106,7 +106,7 @@ Agent 完成任務時，final report **必須**含此區塊：
 
 本層的「手動套用」trial：
 
-- ✅ 每次 final report 列 Cognitive Mode（已在 ADR-008 撤回後的 commits 開始實施）
+- ✅ 每次 final report 列 Cognitive Mode（已於 commit `db9b515` 之後的 commits 開始實施）
 - ⏳ 累積 ≥ 5-10 個任務的 mode 報告，驗證設計
 - ⏳ 蒐集「mode 不夠用」「組合誤判」「raw signal 不足」等實證
 - ⏳ Phase D completed 後決定：
