@@ -8,9 +8,9 @@ AI 自動避雷。
 
 ## 範例內容
 
-- `generic-repository-overuse.md` — Generic repositories often hide query intent and reduce performance visibility.
-- `shared-database-microservices.md` — Shared DB across services creates hidden coupling.
-- `god-service-pattern.md` — Large service classes signal missing domain boundaries.
+- [`generic-repository-overuse.md`](generic-repository-overuse.md) — Generic repositories often hide query intent and reduce performance visibility.
+- `shared-database-microservices.md` — Shared DB across services creates hidden coupling.（候選，尚未撰寫）
+- `god-service-pattern.md` — Large service classes signal missing domain boundaries.（候選，尚未撰寫）
 - [`cargo-cult-ddd.md`](cargo-cult-ddd.md) — DDD pattern 被套用到低 complexity 專案，但沒有 business complexity evidence。
 - [`premature-cqrs.md`](premature-cqrs.md) — 沒有 read/write divergence 或 scale requirement 就導入 CQRS。
 - [`aggregate-explosion.md`](aggregate-explosion.md) — Aggregate 數量超過 invariant / domain concept，造成一致性與理解成本膨脹。

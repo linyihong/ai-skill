@@ -20,6 +20,8 @@
 | [Mandatory step blocker bypass](mandatory-step-blocker-bypass.md) | `process-gap` / `validation-gap` | validated | 防止 agent 遇到強制步驟的環境阻斷（如工具未安裝）時自行判斷「環境限制」而靜默跳過，應立即停止並通知使用者。 |
 | [Knowledge-update-flow bypassed by sub-pipeline](knowledge-update-flow-bypassed-by-sub-pipeline.md) | `process-gap` / `validation-gap` | validated | 防止 agent 在新增 intelligence atom / failure pattern / scenario 時，只讀 sub-pipeline 文件（如 intelligence-extraction-pipeline）並把它當完整流程，跳過 master `knowledge-update-flow.md` 的 Step 4/7/9/11。 |
 | [Premature ADR promotion](premature-adr-promotion.md) | `process-gap` / `governance-drift` | validated | 防止 agent 在 plan completed 前就建立 proposed/draft ADR，違反 constitution/ 只放 accepted ADRs 的定位；架構提案階段應在 `plans/active/<plan>.md` §Decision Rationale 完成，依新規則（2026-05-22）只在 plan completed 且通過 ADR Promotion Criteria 後才建立 accepted ADR。 |
+| [Analysis domain discovery gap](analysis-domain-discovery-gap.md) | `discovery-gap` / `routing-miss` | candidate | 防止 agent 分析外部 library / 工具時只放入 `intelligence/`，忽略該工具可能代表全新分析領域；應先檢查 `analysis/` 是否有對應入口。Discovery checkpoint `search_sources` 需含 `analysis/`。 |
+| [Skill classification boundary confusion](skill-classification-boundary-confusion.md) | `scope-drift` | candidate | 防止 agent 在處理多 skill feedback lessons 時，把 A skill 的 analysis technique 放到 B skill 的 feedback_history；放置位置由 skill scope 決定，不是 lesson 技術主題。 |
 
 ## 維護
 
