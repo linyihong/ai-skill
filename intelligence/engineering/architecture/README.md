@@ -19,6 +19,7 @@
 | [`consistency-models/`](consistency-models/README.md) | ACID、eventual consistency、compensation、idempotency、ordering。 |
 | [`modular-monolith-vs-microservices.md`](modular-monolith-vs-microservices.md) | Microservices increase operational complexity rapidly. |
 | [`vendor-integration-architecture.md`](vendor-integration-architecture.md) | 多廠商整合的整合策略選型（Adapter / compile-time module / SPI / out-of-process / hybrid）；N ≥ 10 必須跳出 compile-time module per vendor。 |
+| [`plan-first-decision-promotion.md`](plan-first-decision-promotion.md) | 架構決策提案在 `plans/active/` §Decision Rationale 完成，plan completed + ADR Promotion Criteria 通過後才寫 accepted ADR；憲法層只放已驗證決策。 |
 
 ## 與其他層的關係
 
