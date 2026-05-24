@@ -1,0 +1,66 @@
+# Source: ADR-007 + premature-adr-promotion.md — referenced in §Linked Validation Scenarios but not materialized
+id: plan-decision-rationale-section-v1
+domain: cross-domain
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: missing-decision-rationale-in-plan
+  class: governance-drift
+  date: "2026-05-22"
+  description: |
+    Plans involving architecture/process/cross-layer changes lack §Decision Rationale
+    section. Per plans/README.md plan template requirements, this section is mandatory
+    for architectural plans (replaces the role of proposed ADR).
+
+given:
+  task: scan_active_plans_for_decision_rationale
+  artifacts:
+    - plans/active/<plan>.md
+    - plans/README.md §Plan 模板必填章節
+
+when:
+  action: validate_plan_template_compliance
+
+then:
+  expected_route:
+    - architecture/process/cross-layer plans contain §Decision Rationale with 6 subsections
+    - subsections: Problem & Why Now / Decision / Alternatives Considered / Why Not an ADR Yet / ADR Promotion Criteria / Consequences
+  expected_heuristics:
+    - decision_rationale_replaces_proposed_adr
+    - plan_template_completeness_required
+  forbidden_routes:
+    - architecture_plan_without_decision_rationale
+    - mark_plan_in_progress_without_alternatives_considered
+
+required_subsections:
+  - "### Problem & Why Now"
+  - "### Decision"
+  - "### Alternatives Considered"
+  - "### Why Not an ADR Yet"
+  - "### ADR Promotion Criteria"
+  - "### Consequences"
+
+scope:
+  applies_to:
+    - architecture changes (new layer, new boundary)
+    - cross-layer changes (touches >2 layers)
+    - process changes (knowledge-update-flow / decision-promotion / lifecycle changes)
+    - governance changes (system-upgrade-governance / enforcement rules / failure-patterns)
+  exemptions:
+    - typo fixes
+    - single-file documentation polish
+    - tooling-only changes (CLI / hook / script)
+    - bug fixes without rule change
+
+validation:
+  detection_command: |
+    for plan in plans/active/*.md; do
+      # only check plans tagged as architectural
+      grep -q "架構\|architecture\|cross-layer\|governance\|framework" "$plan" || continue
+      for sub in "Problem & Why Now" "Decision" "Alternatives Considered" "Why Not an ADR Yet" "ADR Promotion Criteria" "Consequences"; do
+        grep -q "### $sub" "$plan" || echo "$plan missing §Decision Rationale subsection: $sub"
+      done
+    done
+  pass_criteria: empty output (all architectural plans have complete §Decision Rationale)
+  reference_failure_pattern: enforcement/failure-patterns/premature-adr-promotion.md

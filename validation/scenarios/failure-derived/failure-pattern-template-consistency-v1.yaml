@@ -1,0 +1,68 @@
+# Source: Phase D Trial T4 (commit 7dc96d2) — 發現 4 個 failure pattern 結構不一致
+id: failure-pattern-template-consistency-v1
+domain: cross-domain
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: failure-pattern-template-drift
+  class: template-inconsistency
+  date: "2026-05-22"
+  description: |
+    New failure pattern files use ad-hoc section names (e.g. ## 驗證 vs ## Validation,
+    ## Prevention vs ## Prevention Gate, all-Chinese section vs English template),
+    breaking grep-based scanning and template alignment.
+
+given:
+  task: create_or_modify_enforcement_failure_pattern
+  artifacts:
+    - enforcement/failure-patterns/<pattern>.md
+    - enforcement/failure-patterns/README.md
+  signals:
+    - new failure pattern file under enforcement/failure-patterns/
+    - section headers may not match canonical template
+
+when:
+  action: write_failure_pattern_file
+
+then:
+  expected_route:
+    - read existing failure pattern (e.g. correction-loop-bypass.md) as template reference
+    - use canonical section names exactly
+    - include all required sections
+    - update enforcement/failure-patterns/README.md index
+  expected_heuristics:
+    - canonical_section_names_only
+    - english_section_headers_consistent_with_template
+    - linked_validation_scenarios_required
+  forbidden_routes:
+    - use_chinese_section_names_in_template_aligned_files
+    - omit_validation_section
+    - omit_linked_validation_scenarios_section
+
+canonical_template:
+  required_sections:
+    - "# <Pattern Name>"
+    - "Status: candidate | validated | deprecated"
+    - "Class: `<category>`"
+    - "## Trigger"
+    - "## Failure Mode"
+    - "## Risk" # optional but recommended
+    - "## Required Agent Action"
+    - "## Prevention Gate"
+    - "## Validation"
+    - "## Linked Rules" # or "## Related"
+    - "## Linked Validation Scenarios"
+    - "## Source" # incident reference
+  optional_sections:
+    - "## Detection Signals"
+
+validation:
+  detection_command: |
+    for f in enforcement/failure-patterns/*.md; do
+      [ "$(basename $f)" = "README.md" ] && continue
+      for required in "## Trigger" "## Failure Mode" "## Required Agent Action" "## Prevention Gate" "## Validation" "## Linked Validation Scenarios"; do
+        grep -q "^$required" "$f" || echo "$f missing: $required"
+      done
+    done
+  pass_criteria: empty output (all patterns template-aligned)

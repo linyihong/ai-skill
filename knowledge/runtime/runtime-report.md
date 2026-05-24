@@ -11,7 +11,7 @@
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
 | SQLite runtime index | [`sqlite/`](sqlite/) | generated lookup cache prototype |
-| Summaries | [`../summaries/`](../summaries/) | 23 files |
+| Summaries | [`../summaries/`](../summaries/) | 24 files |
 | Graph records | [`../graphs/`](../graphs/) | 33 files |
 
 ## Routing Records
@@ -93,6 +93,7 @@
 | `intelligence.migration-seeder-anti-patterns` | `candidate` | [`migration-seeder-anti-patterns.md`](../summaries/migration-seeder-anti-patterns.md) | 把大量業務資料（廠商目錄、商品/SKU、遊戲清單、權限矩陣）以巨型 `INSERT` 包進 schema migration，使資料 lifecycle 與 schema lifecycle 被強制綁定。訊號：單檔 >50KB、檔名含 dataSeeder、業務人員想改資料要工程師寫 migration。替代方案依資料性質：列舉留 migration、目錄走 application seeder/admin、大量參考資料用外部 CSV + bulk loader。 |
 | `models.routing` | `candidate` | [`model-routing.md`](../summaries/model-routing.md) | Model-aware execution strategy：profiles、capabilities、routing、workflow adaptation、governance、runtime primitives 與 compression。用於選擇 behavior shape，不宣稱 provider model 已切換。 |
 | `intelligence.module-count-discipline` | `candidate` | [`module-count-discipline.md`](../summaries/module-count-discipline.md) | Repo 內 module（Maven / Gradle / npm workspace / Cargo / Go multi-module / Bazel / .NET / pnpm / Lerna / Nx / poetry workspace）數量是工程成本，N 失控時 build time、IDE 載入、升級擴散、refactor 成本線性以上增長。N 對應健康做法：≤5 直接寫、5-30 模板+門檻、30-100 plugin/SPI/catalog、≥100 結構味道警報。新增 module 必須通過 lifecycle / classpath / external use / N 警戒 / data-vs-code 五道判斷。 |
+| `intelligence.plan-first-decision-promotion` | `candidate` | [`plan-first-decision-promotion.md`](../summaries/plan-first-decision-promotion.md) | 架構決策的提案、討論、alternatives 評估在 `plans/active/<plan>.md` §Decision Rationale 完成；只有 plan completed 且通過 ADR Promotion Criteria 後才升級為 accepted ADR 寫入 constitution。憲法層只放已驗證決策，不放 proposed/draft。避免「廢棄憲法」累積、狀態爆炸、平行維護成本。Plan 模板強制 §Decision Rationale 6 子章節（Problem & Why Now / Decision / Alternatives Considered / Why Not an ADR Yet / ADR Promotion Criteria / Consequences）。 |
 | `runtime.prompt-cache-alignment` | `candidate` | [`prompt-cache-alignment.md`](../summaries/prompt-cache-alignment.md) | Provider prompt cache 對齊規範。定義 stable prefix、semi-stable middle、volatile suffix 的 context layout，並說明 `cacheable` 與 `provider_cache_candidate` 的邊界。 |
 | `governance.repo-maintenance` | `validated` | [`repo-governance.md`](../summaries/repo-governance.md) | 本系統的維護、升級、遷移與治理。涵蓋 lifecycle management、validation、cleanup、splitting rules、dependency maintenance。 |
 | `intelligence.requirements-cognition` | `candidate` | [`requirements-cognition.md`](../summaries/requirements-cognition.md) | Requirements cognition 先用 pre-build interrogation 釐清 goal、scope、non-goals、acceptance、framework source-of-truth 與 duplication risk，再用 Impact Map × Customer Journey Map 對齊 product impact，並用 BDD-lite 處理 ambiguity、actor intent、behavior boundary、traceability、validation target 與 test effectiveness，而不是 Gherkin everywhere。 |

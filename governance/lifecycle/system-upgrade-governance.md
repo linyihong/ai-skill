@@ -157,7 +157,51 @@
 - 歷史世代文件不被覆寫，提供 traceability
 - `architecture/README.md` 的定位明確為「每世代 canonical 入口」，避免「永久文件」這種與升級事實矛盾的描述
 
-### 規則 7：世代升級時必須評估每個既有 ADR 並建立雙向連結
+### 規則 7：世代升級時必須評估每個既有 ADR 並建立雙向連結（內容詳見下方）
+
+（已詳列於後續段落，略）
+
+### 規則 8：升級計畫必須明列 runtime execution path + validation scenarios + 測試通過
+
+**教訓**（2026-05-22）：多次發現「計畫宣告新框架但只停在 documentation layer，未接入 runtime execute layer」的失誤：
+
+- ADR-008 Runtime Cognitive Modes 提案 — Phase 1-5 設計完整但**無 runtime 投影、無 generated_surfaces 命中、無 validation scenarios**
+- Cognitive Modes Phase D 啟動 — 純 doc layer，agent 手動套用，但**未明寫「此 plan 不接入 runtime」與未來接入時機**
+- 一般升級計畫 — 描述「應該怎麼做」但不明列「在哪個 runtime 觸發、validation scenarios 在哪、是否通過測試」
+
+結果：知識停在文件層，沒有 runtime 強制機制，靠 agent 自律觸發。
+
+**強制**：如果升級涉及 **framework / runtime / governance / workflow / validation / scenario / metadata / compiler / generated artifact** 改動，計畫書必須包含以下章節：
+
+```markdown
+## Runtime Execution Path
+
+| 欄位 | 內容 |
+|------|------|
+| Runtime owner | phase_machine / obligation_ledger / blocking_gates / generated_surfaces / cognitive_modes / 等具體 runtime layer |
+| Trigger location | 哪個 event 觸發 — phase entry / file_diff / user_signal / commit_attempt / push_attempt / cron / 等 |
+| Activation contract | 對應的 YAML executable contract 路徑（或「無 — 屬 doc-only trial」） |
+| Generated surface | 是否投影到 runtime.db generated_surfaces（target_key + source_path） |
+| Validation scenarios | validation/scenarios/<domain>/<scenario-id>-v1.yaml 列表 |
+| Test passing evidence | 驗證 scenario 通過的方式（CLI command、commit hash、自動測試） |
+
+如果 plan 是純 doc layer trial（沒接入 runtime），必須明寫：
+- 「此 plan 不接入 runtime」+ 理由
+- 「未來何時 / 在哪個 phase 接入」（具體 phase 名稱與條件）
+- 「doc-only 期間如何避免漂移」（agent 手動套用契約、commit message 強制檢查、等）
+```
+
+**為什麼是必要的**：
+
+- 文件層的契約若無 runtime 強制執行，靠 agent 自律觸發 — 一旦 agent 忽略，整個框架失效（本 session 多次發生）
+- Validation scenarios 是「測試而非聲明」— scenario 通過代表行為真實發生，scenario 失敗會 block close-loop
+- 「不接入 runtime」是合法選項（如 Phase D doc-only trial），但必須**明確聲明**而非隱含；明確聲明後續才能規劃接入時機
+
+**對既有計畫的回溯適用**：
+
+- 既有 active plans 在下次更新時補上 §Runtime Execution Path
+- 既有 archived plans 不強制回溯（但建立 retrospective audit 任務時可標 TODO）
+- 若 plan 已 archived 但仍是 active runtime contract 的 source（如 executable-yaml-contract-migration），應追溯補上
 
 **教訓**：Knowledge OS → Cognitive Execution System 升級後，constitution/ 內 7 個 ADR 沒有任何標註說明屬於哪個世代。ADR-003 標題仍使用「Knowledge / **Skills** / Intelligence」，但 Skills 在 Gen 3 已 deprecated；ADR-004 仍引用 `skills/*/feedback_history/` 路徑（已搬到 `feedback/history/<domain>/`）。讀者無法判斷 ADR 是否仍適用、哪些詞彙已演化。架構文件與 ADR 之間缺乏 traceability。2026-05-22 才被使用者指出並補建雙向連結。
 

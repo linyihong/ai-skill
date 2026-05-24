@@ -1,0 +1,53 @@
+# Source: Phase D Trial T5 (commit 57ec8fc) — 發現「100% safe rollback」承諾因後續 commit 而失效
+id: rollback-claim-accuracy-v1
+domain: cross-domain
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  pattern: over-optimistic-rollback-claim
+  class: documentation-drift
+  date: "2026-05-22"
+  description: |
+    Commit message claims "single-commit safe rollback" but later commits modify
+    the same files, making single `git revert` produce conflicts. The original
+    rollback promise becomes inaccurate without correction.
+
+given:
+  task: write_commit_message_with_rollback_claim
+  artifacts:
+    - commit message
+    - subsequent commits modifying same files
+  signals:
+    - commit message contains "safe rollback" / "100% revert" / "clean rollback" / similar claim
+    - subsequent commits modify the same file paths
+
+when:
+  action: claim_rollback_safety_in_commit_or_docs
+
+then:
+  expected_route:
+    - distinguish single-commit-rollback vs cumulative-rollback in claim
+    - if later commits touch same files, update the rollback documentation
+    - list reverse-order revert path explicitly when multiple commits stack
+    - verify rollback with dry-run (`git revert --no-commit ... && git revert --abort`)
+  expected_heuristics:
+    - rollback_claim_accounts_for_future_commits
+    - single_commit_safety_only_when_no_subsequent_modification
+    - dry_run_verification_before_strong_claim
+  forbidden_routes:
+    - claim_100_percent_safe_without_verification
+    - leave_stale_rollback_promise_after_followup_commits
+    - assume_single_revert_works_after_file_modified_again
+
+validation:
+  detection_command: |
+    # find commits claiming rollback safety
+    git log --grep="100%.*safe\|safe.*rollback\|clean.*revert" --format="%h %s" -- '*.md'
+    # for each such commit, check if same files were modified in subsequent commits
+    # if yes, check if the rollback doc was updated
+  pass_criteria: |
+    Either:
+    (a) no subsequent commits modify same files after rollback-claiming commit, OR
+    (b) rollback documentation explicitly handles cumulative rollback path
+  exemption: doc-only trial layer (no runtime impact)

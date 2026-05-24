@@ -141,6 +141,38 @@ Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3
 
 ---
 
+## Runtime Execution Path
+
+依 [`governance/lifecycle/system-upgrade-governance.md`](../../governance/lifecycle/system-upgrade-governance.md) §3 規則 8：
+
+| 欄位 | 內容 |
+|------|------|
+| Runtime owner | **Phase D**: 無 — doc-only trial / **Phase 1-5**: `runtime.db cognitive_modes` 表 + `phase_machine` integration |
+| Trigger location | **Phase D**: agent 手動 resolve + final report / **Phase 2+**: task entry signal-based discovery |
+| Activation contract | **Phase D**: 無 / **Phase 1+**: `runtime/cognitive-modes.yaml`（將建立） |
+| Generated surface | **Phase D**: 無 / **Phase 1+**: `runtime.db generated_surfaces.cognitive_modes.contract` |
+| Validation scenarios | [`validation/scenarios/failure-derived/plan-runtime-execution-path-v1.yaml`](../../validation/scenarios/failure-derived/plan-runtime-execution-path-v1.yaml)（本 plan 對應 governance rule 8 的測試）<br>Phase D specific：尚未建立（doc-only trial 期間不強制）<br>Phase 1+ 將建立：`cognitive-mode-resolution-bypass-v1.yaml`、`cognitive-mode-discovery-signal-coverage-v1.yaml` |
+| Test passing evidence | Phase D: agent 在 final report 列 Cognitive Mode 區塊（累積 5+ commits 證實）<br>Phase 1+: runtime compile + validate 通過 |
+
+### Doc-only Trial 聲明（Phase D 階段）
+
+> ⚠️ **此 plan 目前為 doc-only trial（Phase D），尚未接入 runtime execute layer。**
+>
+> 理由：
+> - Phase 1-5 是大改動（runtime.db schema、compiler 規則、discovery YAML、subsystem 整合），實作成本高
+> - 4 個 mode 從未真實運作，先以 doc-only 累積實證較安全
+> - Token cost 與既有 phase_machine 衝突風險未知
+>
+> 未來接入時機：
+> - **Phase D 完成且通過評估指標**後進 Phase 0 Pre-Build Interrogation
+> - **Phase 1 完成**後 cognitive_modes 表寫入 runtime.db
+> - **Phase 3 完成**後 4 subsystem 真實 activation，此 plan 完全離開 doc-only 狀態
+>
+> Doc-only 期間如何避免漂移：
+> - agent 每個 final report 強制列 Cognitive Mode 區塊（manual application contract）
+> - commit message 含 mode 報告（即本 plan 從 Phase D 啟動以來的所有 commit）
+> - Phase D 評估指標包含「mode 定義穩定性」（5 任務內未變動超過 2 次）
+
 ## Open Questions（completed 前需釐清）
 
 **全部於 2026-05-22 resolved**。決議摘要：

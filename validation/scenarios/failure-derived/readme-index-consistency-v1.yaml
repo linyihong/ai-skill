@@ -1,0 +1,49 @@
+# Source: Phase D Trial T2 (commit df37b1a) — 發現 anti-patterns/README + failure-patterns/README 缺漏條目
+id: readme-index-consistency-v1
+domain: cross-domain
+type: routing-stability
+priority: P2
+
+failure_source:
+  pattern: stale-readme-index
+  class: linked-updates-gap
+  date: "2026-05-22"
+  description: README index 列出的條目與該目錄實際 .md 檔案不一致 — 新增/刪除 .md 後 README 未同步更新
+
+given:
+  task: add_or_remove_md_file_in_indexed_directory
+  artifacts:
+    - <target-dir>/README.md
+    - <target-dir>/*.md
+  signals:
+    - new .md file created in directory with README index
+    - existing .md file deleted but README still references it
+    - README plain text reference exists but should be markdown link
+
+when:
+  action: complete_file_change_commit
+
+then:
+  expected_route:
+    - read <target-dir>/README.md before commit
+    - update README index entry for new/removed file
+    - convert plain reference to markdown link when file exists
+    - mark non-existent file references explicitly (e.g. 「候選，尚未撰寫」)
+  expected_heuristics:
+    - readme_index_matches_actual_files
+    - markdown_link_for_existing_files
+    - explicit_placeholder_for_planned_files
+  forbidden_routes:
+    - commit_without_index_update
+    - leave_dead_link_in_readme
+    - assume_index_self_maintains
+
+validation:
+  detection_command: |
+    for f in <target-dir>/*.md; do
+      base=$(basename "$f" .md)
+      [ "$base" = "README" ] && continue
+      grep -q "($base.md)" <target-dir>/README.md || echo "missing: $base"
+    done
+  pass_criteria: empty output (all files indexed)
+  exemption: explicit placeholder marker like 「候選，尚未撰寫」

@@ -1,0 +1,46 @@
+# Source: ADR-007 + premature-adr-promotion.md — referenced in §Linked Validation Scenarios but not materialized
+id: constitution-only-accepted-status-v1
+domain: cross-domain
+type: routing-stability
+priority: P0
+
+failure_source:
+  pattern: premature-adr-promotion
+  class: governance-drift
+  date: "2026-05-22"
+  description: |
+    constitution/ contains ADR files with Status: proposed / draft / pending.
+    Violates No-Proposed-ADR Rule established 2026-05-22; constitution should
+    only hold accepted ADRs.
+
+given:
+  task: scan_constitution_directory
+  artifacts:
+    - constitution/ADR-*.md
+    - governance/lifecycle/decision-promotion-pipeline.md §No-Proposed-ADR Rule
+
+when:
+  action: validate_constitution_status_integrity
+
+then:
+  expected_route:
+    - all ADRs in constitution/ have Status in {accepted, deprecated, superseded}
+    - any ADR with proposed/draft/pending status is moved to plans/active/<plan>.md §Decision Rationale
+  expected_heuristics:
+    - constitution_only_accepted
+    - proposal_phase_lives_in_plan
+  forbidden_routes:
+    - allow_proposed_adr_in_constitution
+    - mix_validated_and_unvalidated_decisions_in_one_layer
+
+validation:
+  detection_command: |
+    for adr in constitution/ADR-*.md; do
+      status=$(grep -m1 "^**Accepted**\|^**Deprecated**\|^**Superseded**\|^proposed\|^draft\|^pending\|^Status:" "$adr" | head -1)
+      case "$status" in
+        *Accepted*|*Deprecated*|*Superseded*) ;;
+        *) echo "$adr has invalid status: $status" ;;
+      esac
+    done
+  pass_criteria: empty output (all ADRs are accepted/deprecated/superseded)
+  reference_failure_pattern: enforcement/failure-patterns/premature-adr-promotion.md
