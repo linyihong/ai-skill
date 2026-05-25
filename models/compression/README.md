@@ -4,13 +4,25 @@
 
 ## Compression Levels
 
-| Level | 使用內容 | 適用情境 | 不可省略 |
-| --- | --- | --- | --- |
-| `index-only` | `knowledge/indexes/README.md`、`knowledge/runtime/routing-registry.yaml` | 快速定位 primary source 或列出下一步。 | 若要執行變更，仍需讀 primary source。 |
-| `summary-first` | Index + registry + `knowledge/summaries/<atom>.md` | 判斷是否需要深入讀 source、低風險問答、handoff 概覽。 | Source-of-truth gate、validation signal。 |
-| `checklist-first` | Summary checklist + required validation rules | 小模型執行格式化、檢查或簡短 close-out。 | Required bootstrap、linked updates、diff review。 |
-| `source-backed` | Primary source + required dependencies + relevant summaries | 文件修改、規則更新、migration、commit/push 任務。 | Full source 與 validation gate。 |
-| `graph-assisted` | Source-backed + graph records + related sources | 跨層衝突、promotion / deprecation、dependency graph 維護。 | Conflict resolution 與 old entrypoint check。 |
+> **Runtime primitive alias**（per [`runtime/cognitive-modes.yaml`](../../runtime/cognitive-modes.yaml) Phase 3.2）：
+> 各 lowercase level 是對應 `context_mode` UPPERCASE primitive 的 implementation reference。
+> `context_mode` 是 runtime activation layer；`compression/` 是其執行策略的詳細說明。
+>
+> | Compression level | `context_mode` primitive |
+> |---|---|
+> | `index-only` | `INDEX_ONLY` |
+> | `summary-first` | `SUMMARY_FIRST` |
+> | `checklist-first` | `CHECKLIST_FIRST` |
+> | `source-backed` | `SOURCE_BACKED` |
+> | `graph-assisted` | `GRAPH_ASSISTED` |
+
+| Level | `context_mode` | 使用內容 | 適用情境 | 不可省略 |
+| --- | --- | --- | --- | --- |
+| `index-only` | `INDEX_ONLY` | `knowledge/indexes/README.md`、`knowledge/runtime/routing-registry.yaml` | 快速定位 primary source 或列出下一步。 | 若要執行變更，仍需讀 primary source。 |
+| `summary-first` | `SUMMARY_FIRST` | Index + registry + `knowledge/summaries/<atom>.md` | 判斷是否需要深入讀 source、低風險問答、handoff 概覽。 | Source-of-truth gate、validation signal。 |
+| `checklist-first` | `CHECKLIST_FIRST` | Summary checklist + required validation rules | 小模型執行格式化、檢查或簡短 close-out。 | Required bootstrap、linked updates、diff review。 |
+| `source-backed` | `SOURCE_BACKED` | Primary source + required dependencies + relevant summaries | 文件修改、規則更新、migration、commit/push 任務。 | Full source 與 validation gate。 |
+| `graph-assisted` | `GRAPH_ASSISTED` | Source-backed + graph records + related sources | 跨層衝突、promotion / deprecation、dependency graph 維護。 | Conflict resolution 與 old entrypoint check。 |
 
 ## Profile Defaults
 

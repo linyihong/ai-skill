@@ -1,0 +1,126 @@
+schema_version: "1.0"
+id: runtime.cognitive-modes-memory-integration
+status: active
+owner_layer: runtime
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.cognitive_modes.memory_integration
+  surface: generated_surfaces
+
+purpose: >
+  Integration contract: memory_mode (category switch) × retrieval-governance
+  thresholds (within-category activation limit). Composition rule: AND logic —
+  memory_mode enables a category; retrieval-governance threshold governs depth
+  within that category.
+
+  Per plan Open Question 4 resolved: mode is the switch (which subdir to
+  activate), threshold is the limit (how deep within that subdir to go).
+
+  This is a YAML-level contract (Phase 3.4). Enforcement wiring into memory
+  retrieval calls is deferred to Phase 3.4-B or Phase 5 adaptive runtime.
+
+memory_mode_activation:
+  NONE:
+    description: >
+      No memory retrieval. Skip all memory/ subdirs. Read current source
+      and canonical documents only. Default mode.
+    subdir: null
+    retrieval_allowed: false
+    activation_threshold_override: none
+    compose_with_retrieval_governance: false
+    note: >
+      NONE is the safe default. Agent must not read any memory/ subdir
+      when memory_mode=NONE, even if memory content seems relevant.
+      Discovery signal session_turns_high auto-escalates to PROJECT_CONTEXT.
+
+  EPISODIC:
+    description: >
+      Episodic session memory. Read memory/episodic/ for recent session
+      context. Activation threshold must be ≥ scoped_context per
+      retrieval-governance/activation-thresholds.md.
+    subdir: memory/episodic/
+    retrieval_allowed: true
+    minimum_activation_threshold: scoped_context
+    compose_with_retrieval_governance: true
+    note: >
+      EPISODIC is appropriate when user references prior session work and
+      current source alone is insufficient. Content must be revalidated
+      against current canonical source before use.
+
+  DECISION_REPLAY:
+    description: >
+      Decision history replay. Read memory/decision/ for accepted decisions
+      and ADR context. Activation threshold must be ≥ decision_reference.
+    subdir: memory/decision/
+    retrieval_allowed: true
+    minimum_activation_threshold: decision_reference
+    compose_with_retrieval_governance: true
+    note: >
+      DECISION_REPLAY activates when task involves promotion, supersession,
+      or cross-phase decision consistency check. Must verify decision has
+      not been superseded before using as context.
+
+  FAILURE_REPLAY:
+    description: >
+      Failure pattern replay. Read memory/failure/ for repeated failure
+      classes and recovery frames. Activation threshold must be ≥ recovery_frame.
+      Auto-activated by RECOVERY execution_mode and recent_failure≥2 signal.
+    subdir: memory/failure/
+    retrieval_allowed: true
+    minimum_activation_threshold: recovery_frame
+    compose_with_retrieval_governance: true
+    note: >
+      FAILURE_REPLAY is the highest-urgency memory mode. Replay only the
+      minimum failure summary needed to identify root cause. Do not replay
+      full failure history — focus on the repeated pattern class.
+
+  PROJECT_CONTEXT:
+    description: >
+      Project-wide context. Read memory/project/ for long-running goals,
+      active decisions, and cross-session continuity. Activation threshold
+      must be ≥ scoped_context. Auto-activated by session_turns>50 signal.
+    subdir: memory/project/
+    retrieval_allowed: true
+    minimum_activation_threshold: scoped_context
+    compose_with_retrieval_governance: true
+    note: >
+      PROJECT_CONTEXT is appropriate for long sessions or multi-phase work.
+      Must confirm project memory is not stale (check updated_at vs current
+      source timestamp). Superseded decisions must not be replayed.
+
+compose_rules:
+  and_logic: >
+    memory_mode enables a category (which subdir). retrieval-governance
+    activation threshold governs depth within that subdir. Both must be
+    satisfied before retrieval proceeds:
+      (1) memory_mode ≠ NONE  →  subdir is enabled
+      (2) retrieval-governance threshold ≥ minimum_activation_threshold  →  retrieval proceeds
+    If (1) is satisfied but (2) is not, retrieval is blocked (wrong signal strength).
+  escalation_from_NONE: >
+    memory_mode=NONE can only be escalated (not set) by discovery signals.
+    If session_turns_high fires → PROJECT_CONTEXT. If recent_failure_repeat fires
+    → FAILURE_REPLAY (overrides PROJECT_CONTEXT if both fire; FAILURE_REPLAY wins).
+  anti_patterns:
+    - reading_memory_subdir_when_mode_is_NONE
+    - using_memory_as_canonical_source_replacement
+    - replaying_superseded_decisions_as_active_context
+    - skipping_retrieval_governance_threshold_check
+
+retrieval_governance_reference:
+  source: memory/retrieval-governance/activation-thresholds.md
+  threshold_levels_in_order:
+    - none
+    - weak_hint
+    - scoped_context
+    - decision_reference
+    - recovery_frame
+  note: >
+    threshold levels are ordered lowest→highest. minimum_activation_threshold
+    defines the floor — actual threshold must be ≥ floor for retrieval to proceed.
+
+related:
+  contract: runtime/cognitive-modes.yaml §memory
+  retrieval_governance: memory/retrieval-governance/activation-thresholds.md
+  plan: plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md §3.4
+  pre_written_scenarios_commit: 0a1a91c

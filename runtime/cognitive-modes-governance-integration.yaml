@@ -1,0 +1,112 @@
+schema_version: "1.0"
+id: runtime.cognitive-modes-governance-integration
+status: active
+owner_layer: runtime
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.cognitive_modes.governance_integration
+  surface: generated_surfaces
+
+purpose: >
+  Integration contract: governance_mode → blocking_gates gate set activation.
+  governance_mode is a gate set selector — it determines which subset of the
+  existing runtime.db blocking_gates are enforced for the current task.
+
+  This is a YAML-level contract (Phase 3.3); enforcement wiring into
+  blocking_gates query logic is deferred to Phase 3.3-B or Phase 4.
+
+  Source of gate definitions: runtime/gates/blocking-gates.yaml (canonical).
+  This contract defines WHICH gate categories activate per mode, not the gate
+  rules themselves.
+
+gate_set_activation:
+  LIGHT:
+    description: >
+      Minimal governance. Only sanitization gates active. Appropriate for
+      ephemeral notes, working memory edits, or low-stakes quick tasks.
+    active_gate_categories:
+      - sanitization
+    skipped_gate_categories:
+      - language_policy
+      - output_rules
+      - linked_updates
+      - runtime_surfaces
+      - tool_neutral
+    note: >
+      LIGHT is only auto-selected for tasks where discovery signals
+      file_diff_notes_ephemeral or phase_machine_bootstrap. Never auto-selected
+      when diff touches governance/, enforcement/, or runtime/.
+
+  STANDARD:
+    description: >
+      Normal governance. Sanitization + language policy + output rules active.
+      Default mode for most tasks.
+    active_gate_categories:
+      - sanitization
+      - language_policy
+      - output_rules
+    skipped_gate_categories:
+      - linked_updates
+      - runtime_surfaces
+      - tool_neutral
+    note: Default gate set. Applies when no escalating signal is detected.
+
+  STRICT:
+    description: >
+      Full governance. All gate categories active including linked updates
+      and runtime surface validation. Required for any task touching
+      governance/, enforcement/, runtime/, or compiler code.
+    active_gate_categories:
+      - sanitization
+      - language_policy
+      - output_rules
+      - linked_updates
+      - runtime_surfaces
+      - tool_neutral
+    skipped_gate_categories: []
+    note: >
+      STRICT is auto-selected by discovery signals: file_diff_governance_enforcement,
+      file_diff_runtime_schema, recent_failure_repeat, phase_machine_validation,
+      active_goals_locked_or_multiple. Any DEEP execution_mode forces STRICT.
+
+  LOCKDOWN:
+    description: >
+      Maximum governance. STRICT gate set plus write blocking. No file writes
+      permitted until human explicitly approves. Used for critical incidents,
+      ADR supersession attempts, or explicitly requested by user.
+    inherits: STRICT
+    active_gate_categories:
+      - sanitization
+      - language_policy
+      - output_rules
+      - linked_updates
+      - runtime_surfaces
+      - tool_neutral
+    additional_actions:
+      - block_file_writes_until_human_approval
+    note: >
+      LOCKDOWN is not auto-selected by discovery signals. Must be explicitly
+      requested by user or triggered by FORENSIC execution_mode + conflict
+      detection (Phase 5 adaptive trigger). In LOCKDOWN, agent must obtain
+      explicit approval before any Edit/Write tool call.
+
+compose_rules:
+  with_execution_mode: >
+    If execution_mode has a governance_mode_floor (e.g. DEEP→STRICT,
+    RECOVERY→STRICT), the floor is applied AFTER discovery resolves
+    governance_mode. The higher of (discovery result, floor) wins.
+  with_blocking_gates: >
+    agent queries runtime.db blocking_gates WHERE gate_category IN
+    (active_gate_categories for current governance_mode). Gates outside
+    the active set are skipped for this task.
+  escalation: >
+    governance_mode can only escalate during a task, never de-escalate.
+    If a new signal fires mid-task that would require STRICT but current
+    mode is LIGHT, escalate immediately.
+
+related:
+  contract: runtime/cognitive-modes.yaml §governance.gate_activation
+  gates_source: runtime/gates/blocking-gates.yaml
+  plan: plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md §3.3
+  pre_written_scenarios_commit: 0a1a91c

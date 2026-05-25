@@ -1,9 +1,9 @@
 # Runtime Cognitive Modes System
 
-**Status**: `in-progress`（Phase D ✅ + Phase 0 ✅ + Phase 1 ✅ + **Phase 2 完成**（4/4 scenarios pass）；Phase 3 Subsystem 整合待啟動）
+**Status**: `in-progress`（Phase D ✅ + Phase 0 ✅ + Phase 1 ✅ + Phase 2 ✅ + **Phase 3.1-3.4 完成**（4/4 scenarios pass）；Phase 3 ADR evaluation + linked updates 待下次 session）
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-22
-**最後更新**：2026-05-25（Phase 2: discovery YAML + discovery_signals table（14 rows, 8 signal types）+ 4 scenarios all PASS）
+**最後更新**：2026-05-25（Phase 3: 4 subsystem integration contracts + compression alias + 4 scenarios all PASS；enforcement wiring deferred）
 
 > ⚠️ 本 plan 處於 `in-progress` 階段：**Phase D documentation-contract trial 已完成並通過評估指標**；Phase 0 (Pre-Build Interrogation) 與 Phase 1-5 runtime 實作待 user 決定是否啟動。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
 >
@@ -544,13 +544,17 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 ### Phase 3 完成條件
 
-- [ ] 4 subsystem 各有對應 mode-driven activation 邏輯
-- [ ] 失敗測試：mode 未解析就執行 → 被阻擋
-- [ ] Documentation 更新（含 `models/compression/` 改寫為 `context_mode` implementation reference，per Open Question 1）
-- [ ] Phase 3 完成後至少 5 個任務的 final report 列 Cognitive Mode（用於 ADR promotion 評估）
-- [ ] **ADR Promotion Criteria 評估**（per Open Question 5 resolved）：
+- [x] 4 subsystem 各有對應 mode-driven activation 邏輯（YAML contract level，2026-05-25）
+  - [x] 3.1 execution_mode → phase_machine（`runtime/cognitive-modes-phase-integration.yaml`，含 5 mode 的 allowed/forbidden_actions floor）
+  - [x] 3.2 context_mode → compression（`models/compression/README.md` 加 alias 表 + context_mode column）
+  - [x] 3.3 governance_mode → blocking_gates（`runtime/cognitive-modes-governance-integration.yaml`，含 LOCKDOWN block_file_writes）
+  - [x] 3.4 memory_mode → retrieval-governance（`runtime/cognitive-modes-memory-integration.yaml`，含 AND 邏輯 compose）
+- [ ] 失敗測試：mode 未解析就執行 → 被阻擋（enforcement wiring，deferred to Phase 3-B）
+- [x] Documentation 更新（`models/compression/README.md` alias annotation，per Open Question 1）
+- [ ] Phase 3 完成後至少 5 個任務的 final report 列 Cognitive Mode（用於 ADR promotion 評估）← 待累積
+- [ ] **ADR Promotion Criteria 評估**（per Open Question 5 resolved）← 待下次 session
   - 通過 → 建立 ADR（直接 accepted），引用本 plan 作為 evidence
-  - 不通過 → 在 plan 內記錄「決定不升 ADR 的理由」+ 改用更輕 promotion target（runtime gate / enforcement / intelligence）
+  - 不通過 → 在 plan 內記錄「決定不升 ADR 的理由」+ 改用更輕 promotion target
 
 ---
 

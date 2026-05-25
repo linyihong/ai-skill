@@ -1,0 +1,115 @@
+schema_version: "1.0"
+id: runtime.cognitive-modes-phase-integration
+status: active
+owner_layer: runtime
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.cognitive_modes.phase_integration
+  surface: generated_surfaces
+
+purpose: >
+  Integration contract: execution_mode → phase_machine behavior adjustments.
+  Defines how each execution_mode modifies allowed_actions and forbidden_actions
+  when phase_machine enters a phase. This is a YAML-level contract (Phase 3.1);
+  enforcement wiring into phase_machine Go code is deferred to Phase 3.1-B.
+
+  Compose rule: phase_machine base allowed/forbidden_actions AND execution_mode
+  adjustments are merged. Mode restrictions are additive — RECOVERY can only
+  restrict, not expand, the base phase permissions.
+
+execution_mode_adjustments:
+  FAST:
+    description: >
+      Quick turnaround. Skip deep source reads; use summaries and indexes only.
+      Not permitted for tasks touching governance/, enforcement/, or runtime/.
+    additional_allowed_actions:
+      - skip_source_read_if_summary_sufficient
+    additional_forbidden_actions:
+      - deep_cross_layer_analysis
+      - adr_promotion
+      - runtime_schema_change
+    context_mode_floor: SUMMARY_FIRST
+    governance_mode_floor: null
+    note: >
+      FAST is blocked by signal file_diff_runtime_schema in discovery —
+      governance/enforcement diffs auto-escalate to STRICT regardless of FAST.
+
+  NORMAL:
+    description: >
+      Standard execution. Follow phase_machine base rules without modification.
+      Source reads as required; checklist validation at close-loop.
+    additional_allowed_actions: []
+    additional_forbidden_actions: []
+    context_mode_floor: null
+    governance_mode_floor: null
+    note: Default — no adjustment to phase_machine base behavior.
+
+  DEEP:
+    description: >
+      Cross-layer analysis. Expand source reads to include dependency graph
+      and related sources. Linked updates must be fully resolved.
+    additional_allowed_actions:
+      - read_graph_records
+      - read_cross_layer_dependencies
+    additional_forbidden_actions:
+      - skip_linked_updates
+      - skip_dependency_read
+    context_mode_floor: SOURCE_BACKED
+    governance_mode_floor: STRICT
+    note: >
+      DEEP requires governance_mode ≥ STRICT. Discovery signal
+      file_diff_runtime_schema auto-sets DEEP when runtime/ is touched.
+
+  FORENSIC:
+    description: >
+      Audit / incident analysis. Full lineage tracing required. No writes
+      until analysis complete. All sources read before any action.
+    additional_allowed_actions:
+      - read_full_git_history
+      - read_all_linked_documents
+    additional_forbidden_actions:
+      - write_before_analysis_complete
+      - skip_git_blame
+      - skip_cross_reference_check
+    context_mode_floor: GRAPH_ASSISTED
+    governance_mode_floor: STRICT
+    note: >
+      FORENSIC is typically triggered by explicit user request or by
+      repeated failure signals (≥3). Not auto-triggered by discovery.
+
+  RECOVERY:
+    description: >
+      Failure recovery. Block all writes until root cause identified.
+      Checklist-first validation before any state mutation. Memory replay
+      of failure patterns required.
+    additional_allowed_actions:
+      - replay_failure_patterns
+      - read_recovery_strategies
+    additional_forbidden_actions:
+      - write_without_root_cause
+      - skip_validation_checklist
+      - skip_failure_replay
+      - adr_promotion
+      - runtime_schema_change
+    context_mode_floor: CHECKLIST_FIRST
+    governance_mode_floor: STRICT
+    memory_mode_floor: FAILURE_REPLAY
+    note: >
+      RECOVERY is the most restrictive mode. Triggered by recent_failure≥2
+      discovery signal or explicit user recovery keyword. All forbidden_actions
+      stack on top of phase_machine base forbidden_actions.
+
+compose_rules:
+  priority: execution_mode_adjustments_are_additive_to_phase_base
+  conflict: execution_mode_restriction_wins_over_phase_base_allowance
+  floor_enforcement: >
+    context_mode_floor and governance_mode_floor define minimum mode values —
+    if discovery resolved a lower mode, it is escalated to the floor.
+    Floors are enforced at phase entry, not at discovery time.
+
+related:
+  contract: runtime/cognitive-modes.yaml
+  discovery: runtime/cognitive-modes-discovery.yaml
+  plan: plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md §3.1
+  pre_written_scenarios_commit: 0a1a91c
