@@ -1,4 +1,4 @@
-version=repo-pending
-source_commit=pending
-built_at=2026-05-25T23:14:09Z
+version=repo-c1fcb38
+source_commit=c1fcb38
+built_at=2026-05-25T23:14:57Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
