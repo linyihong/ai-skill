@@ -524,6 +524,6 @@ knowledge/glossary/
 
 | Plan | 關係 |
 | --- | --- |
-| `plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md` | 必須引用 glossary canonical definitions for runtime semantic vocabulary；`context_mode`、`compression`、`memory_mode`、`reasoning_mode` 不得在 cognitive modes plan 內形成 subsystem-local semantics。 |
+| `plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md` | 必須引用 glossary canonical definitions for runtime semantic vocabulary；`context_mode`、`compression`、`memory_mode`、`reasoning_mode` 不得在 cognitive modes plan 內形成 subsystem-local semantics。 |
 | `plans/archived/2026-05-22-0855-executable-yaml-contract-migration.md` | 若 glossary 未來成為 executable contract，需遵守 owner-layer YAML projection 規範。 |
 | `plans/archived/2026-05-20-1635-bdd-ddd-cognition-aligned-reframe.md` | Requirements cognition 與 DDD cognition 的 shared language 邊界來源。 |

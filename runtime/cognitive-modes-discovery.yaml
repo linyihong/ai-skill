@@ -187,5 +187,5 @@ resolution_rules:
 
 related:
   contract: runtime/cognitive-modes.yaml
-  plan: plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md §Phase 2
+  plan: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md §Phase 2
   pre_written_scenarios_commit: 06f52ab

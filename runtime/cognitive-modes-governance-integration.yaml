@@ -108,5 +108,5 @@ compose_rules:
 related:
   contract: runtime/cognitive-modes.yaml §governance.gate_activation
   gates_source: runtime/gates/blocking-gates.yaml
-  plan: plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md §3.3
+  plan: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md §3.3
   pre_written_scenarios_commit: 0a1a91c

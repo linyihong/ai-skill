@@ -1,13 +1,14 @@
 # Runtime Cognitive Modes System
 
-**Status**: `in-progress`（Phase D ✅ + Phase 0 ✅ + Phase 1 ✅ + Phase 2 ✅ + **Phase 3 governance-structure 完成**（5/5 scenarios pass）；behavioral enforcement + linked updates + ADR evaluation 待下次 session）
+**Status**: `completed`（Phase D + Phase 0-5 全部 ✅；ADR-008 已 promotion 為 accepted）
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-22
-**最後更新**：2026-05-25（Phase 3-B: enforcement obligation + gate 寫入 runtime.db；deferred items 完整記錄於 §Phase 3 Deferred Items）
+**完成日期**：2026-05-25
+**最後更新**：2026-05-25（Phase 5 完成 + ADR-008 promotion）
 
-> ⚠️ 本 plan 處於 `in-progress` 階段：**Phase D documentation-contract trial 已完成並通過評估指標**；Phase 0 (Pre-Build Interrogation) 與 Phase 1-5 runtime 實作待 user 決定是否啟動。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
+> ✅ **本 plan 已 completed 並 archived**。Phase D doc-only trial（8 commits）+ Phase 0 pre-build interrogation + Phase 1 cognitive_modes table + Phase 2 discovery YAML + Phase 3 subsystem integration（含 3.1-B/3.3-B/3.4-B behavioral wiring）+ Phase 3-B obligation/gate + Phase 4 token budget + Phase 5 adaptive triggers 全部上線。19 個 validation scenarios PASS。
 >
-> 若 plan completed 且通過 §ADR Promotion Criteria，才升級為 accepted ADR（屆時取編號）。
+> 對應 accepted ADR：[`constitution/ADR-008-runtime-cognitive-modes.md`](../../constitution/ADR-008-runtime-cognitive-modes.md)（依 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) §No-Proposed-ADR Rule，從 plan 完成後直接 promotion 到 accepted，無 proposed 階段）。
 
 ---
 

@@ -34,6 +34,7 @@
 | [ADR-005](../constitution/ADR-005-memory-architecture.md) Memory Architecture | Gen 3 | 6 子層 memory 模型（working / summary / episodic / project / decision / failure） |
 | [ADR-006](../constitution/ADR-006-registry-first-workflow-activation.md) Registry-First Workflow Activation | Gen 3 | registry-first activation 為 workflow 進入點預設 |
 | [ADR-007](../constitution/ADR-007-constitution-and-decision-promotion-boundary.md) Constitution and Decision Promotion Boundary | Gen 3 | `constitution/` 命名 + promotion target 內容路由規則 |
+| [ADR-008](../constitution/ADR-008-runtime-cognitive-modes.md) Runtime Cognitive Modes | Gen 3 子系統擴充 | 4 維 cognitive mode primitive（execution/context/governance/memory）+ discovery + subsystem integration + token budget + adaptive triggers |
 
 新增世代時依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §3 規則 7 重新評估每個 ADR 的延伸狀態。
 
@@ -189,7 +190,7 @@ Runtime canonical：
 
 Enforcement：`obligation.execution.resolve_cognitive_mode` + `gate.execution.cognitive_mode_resolved` 已在 `obligations` / `gates` 表。
 
-Go behavioral enforcement（pre-commit hook）已延後至 Phase 4（見 [`plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md`](../plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md)）。
+Go behavioral enforcement 已上線於 `commit-msg` hook（`scripts/ai-skill-cli/internal/app/hooks.go`）：6 validators 覆蓋 mode block 必填、Phase 3 floors / governance consistency / memory subdir、token budget、adaptive triggers、plan status sync。完整設計與 ADR 見 [`constitution/ADR-008-runtime-cognitive-modes.md`](../constitution/ADR-008-runtime-cognitive-modes.md) 與 [`plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md`](../plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md)。
 
 ---
 
@@ -218,7 +219,7 @@ Go behavioral enforcement（pre-commit hook）已延後至 Phase 4（見 [`plans
 | 2026-05-20 | Model-aware Execution Routing | [`model-aware-execution-routing`](../plans/archived/2026-05-20-1802-model-aware-execution-routing.md) |
 | 2026-05-21 | Cross-platform Go Script Runtime | [`cross-platform-go-script-runtime`](../plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md) |
 | 2026-05-22 | **Executable YAML Contract Migration**（最近一次主要升級） | [`executable-yaml-contract-migration`](../plans/archived/2026-05-22-0855-executable-yaml-contract-migration.md) |
-| 2026-05-22 | **Runtime Cognitive Modes System**（Phase 1-3 完成；Phase 4 behavioral enforcement 延後） | [`runtime-cognitive-modes-system`](../plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md) |
+| 2026-05-22 | **Runtime Cognitive Modes System**（Phase D + Phase 0-5 全部完成；ADR-008 已 promotion） | [`runtime-cognitive-modes-system`](../plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md) + [`ADR-008`](../constitution/ADR-008-runtime-cognitive-modes.md) |
 
 ---
 

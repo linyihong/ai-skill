@@ -4,7 +4,7 @@
 >
 > 本層**僅為文件契約**，無 runtime 程式碼、無 `runtime.db` 投影、無 compiler 整合。Agent **手動套用**此 contract 並在 final report 列 Cognitive Mode 報告。執行記錄留在 git history。
 >
-> 完整實作（Phase 1-5：YAML executable contract、runtime.db `cognitive_modes` 表、discovery heuristics、subsystem 整合、adaptive runtime）見 [`plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md`](../../plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md)。
+> 完整實作（Phase 1-5：YAML executable contract、runtime.db `cognitive_modes` 表、discovery heuristics、subsystem 整合、adaptive runtime）見 [`plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md`](../../plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md)。
 >
 > **Rollback**：本層為 doc-only trial，撤回直接 `git revert` 對應 commit 即可；無 runtime state / 無 schema 變更 / 無 migration。
 
@@ -57,7 +57,7 @@
 
 ## Discovery（手動套用版）
 
-Agent 任務開始時，依**raw signals**快速 resolve 4 個 mode。signal 表完整版見 [plan §Phase 2.1](../../plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md)。
+Agent 任務開始時，依**raw signals**快速 resolve 4 個 mode。signal 表完整版見 [plan §Phase 2.1](../../plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md)。
 
 ### Mapping 速查（常見組合）
 
@@ -169,6 +169,6 @@ git revert df37b1a f98d6e4 9df20ae
 
 完整 5 phase 實作藍圖、Open Questions 全部 resolved 內容、ADR Promotion Criteria 見：
 
-→ [`plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md`](../../plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md)
+→ [`plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md`](../../plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md)
 
 ← [回到 models/](../README.md)

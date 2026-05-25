@@ -15,7 +15,7 @@ purpose: >
   Phase 1.B: cognitive_modes table in runtime.db schema (requires Go rebuild;
   deferred to next session).
   Phase 2+: discovery heuristics, subsystem integration, budget gates, adaptive
-  runtime — see plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md.
+  runtime — see plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md.
 
 activation:
   applies_when:
@@ -140,5 +140,5 @@ related:
   intelligence_atom: intelligence/engineering/development/test-first-framework-upgrade.md
   governance_rule: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
   doc_contract: models/cognitive-modes/README.md
-  plan: plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md
+  plan: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
   pre_written_scenarios_commit: 395a0d9

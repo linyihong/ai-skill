@@ -122,5 +122,5 @@ retrieval_governance_reference:
 related:
   contract: runtime/cognitive-modes.yaml §memory
   retrieval_governance: memory/retrieval-governance/activation-thresholds.md
-  plan: plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md §3.4
+  plan: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md §3.4
   pre_written_scenarios_commit: 0a1a91c
