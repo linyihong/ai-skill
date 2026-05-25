@@ -557,7 +557,43 @@ func compileProseRuntimeSources(repo string, db *sql.DB, docs map[string]map[str
 	if err := compileCognitiveModeEnforcementRules(db); err != nil {
 		return err
 	}
+	if err := compileBootstrapEnforcementRules(db); err != nil {
+		return err
+	}
 	return nil
+}
+
+func compileBootstrapEnforcementRules(db *sql.DB) error {
+	_, err := db.Exec(
+		`INSERT OR IGNORE INTO obligations (id, phase, name, description, verification, severity, depends_on, linked_gates, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		"obligation.bootstrap.receipt_acknowledged",
+		"phase.bootstrap",
+		"Bootstrap Receipt Acknowledged",
+		"Session start（含 resume from summary）first-turn 必須輸出 Bootstrap Receipt（rules=✓ phase=<id> obligations=<n> gates=<n>），證明已讀 CORE_BOOTSTRAP.md + README.md 並查過 runtime.db。",
+		`["bootstrap_receipt_emitted == true","first_message_contains 'Bootstrap: rules=✓ phase='","resume_sessions_not_exempt"]`,
+		"high",
+		`["gate.bootstrap.core_rules_loaded","gate.bootstrap.layout_loaded"]`,
+		`["gate.bootstrap.receipt_present"]`,
+		`{"source":"CLAUDE.md + CORE_BOOTSTRAP.md","contract":"Bootstrap Receipt clause","applies_to":"new + resume sessions"}`,
+	)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(
+		`INSERT OR IGNORE INTO gates (id, phase, name, description, severity, check_type, check_target, check_verification, failure_action, failure_message, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		"gate.bootstrap.receipt_present",
+		"phase.bootstrap",
+		"Bootstrap Receipt Present",
+		"執行任何非-Read 工具（Edit/Write/Bash/git/...）前，first user-facing message 必須含 Bootstrap Receipt。Resume from summary 不豁免。",
+		"high",
+		"verification",
+		"first_message contains 'Bootstrap: rules=✓ phase='",
+		"bootstrap_receipt_emitted == true",
+		"block_execution",
+		"Bootstrap Receipt 未輸出：請先讀 CORE_BOOTSTRAP.md + README.md，查 runtime.db 取得 phase/obligations/gates，然後在 first message 輸出 'Bootstrap: rules=✓ phase=<id> obligations=<n> gates=<n>'。Resume from summary 同樣適用。",
+		`{"source":"CLAUDE.md","contract":"Bootstrap Receipt clause","failure_pattern":"bootstrap-bypass-on-resume","deferred":"behavioral first-turn detection"}`,
+	)
+	return err
 }
 
 func compileCognitiveModeEnforcementRules(db *sql.DB) error {

@@ -291,12 +291,28 @@ func initProjectFileContent(file plannedFile, repo string) (string, error) {
 func initProjectBootstrapText(repo string) string {
 	return fmt.Sprintf(`本專案使用 Ai-skill 知識庫：%s
 
-## 啟動流程
+> **IMPORTANT — MUST RUN BEFORE ANY OTHER ACTION**
+> 本流程為強制 first-turn obligation。執行任何非-Read 工具（Edit/Write/Bash/git/...）前，必須完成下列步驟並輸出 Bootstrap Receipt。
+> Resume / continuation session 同樣適用：summary 的「Resume directly」是對話 framing 指示，**不豁免** runtime / governance bootstrap。
+
+## 強制啟動流程
 
 1. 讀取 Core Bootstrap：%s
 2. 了解 OS layout：%s
-3. 依任務 intent 查詢 routing-registry：%s
-4. 依 activation rules 載入必要 lazy-load 文件。
+3. 查 %s 取得 phase / obligations count / gates count
+4. 依任務 intent 查詢 routing-registry：%s
+5. 輸出 Bootstrap Receipt（見下方格式）
+6. 依 activation rules 載入必要 lazy-load 文件。
+
+## Bootstrap Receipt（強制 first-turn 輸出）
+
+完成步驟 1-3 後，**在 first user-facing message 中包含一行**：
+
+%s
+
+範例：%s
+
+未輸出即執行非-Read 工具，違反 obligation.bootstrap.receipt_acknowledged，命中 gate.bootstrap.receipt_present。
 
 ## 語言強制規則
 
@@ -314,7 +330,10 @@ func initProjectBootstrapText(repo string) string {
 `, repo,
 		filepath.Join(repo, "CORE_BOOTSTRAP.md"),
 		filepath.Join(repo, "README.md"),
+		filepath.Join(repo, "runtime", "runtime.db"),
 		filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"),
+		"`Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>`",
+		"`Bootstrap: rules=✓ phase=phase.bootstrap obligations=1 gates=2`",
 		filepath.Join(repo, "workflow", "documentation", "README.md"),
 		filepath.Join(repo, "workflow", "documentation", "execution-flow.md"),
 		filepath.Join(repo, "governance", "document-sizing.md"))

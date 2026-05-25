@@ -59,8 +59,30 @@
 - `dependency-reading` 的 dependency read ledger 與 writeback transaction 不變
 - `conversation-goal-ledger` 的 `.agent-goals/` 使用方式不變
 
+## Bootstrap Receipt（強制 first-turn 輸出）
+
+> **IMPORTANT**：完成上述啟動流程後，**必須**在 first user-facing message 包含一行 Bootstrap Receipt，才能執行任何非-Read 工具（Edit/Write/Bash/git/...）。Resume / continuation session 同樣適用 — summary 的「Resume directly」**不豁免**此 obligation。
+
+格式：
+
+```
+Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
+```
+
+範例：`Bootstrap: rules=✓ phase=phase.bootstrap obligations=1 gates=2`
+
+| 欄位 | 來源 |
+|---|---|
+| `rules=✓` | CORE_BOOTSTRAP.md 3 條 + README.md 已讀 |
+| `phase=<id>` | `SELECT id FROM phase_machine WHERE active=1` |
+| `obligations=<n>` | `SELECT COUNT(*) FROM obligations WHERE phase=<current>` |
+| `gates=<n>` | `SELECT COUNT(*) FROM gates WHERE phase=<current>` |
+
+未輸出即執行非-Read 工具，違反 `obligation.bootstrap.receipt_acknowledged`，命中 `gate.bootstrap.receipt_present`，並觸發 [`enforcement/failure-patterns/bootstrap-bypass-on-resume.md`](enforcement/failure-patterns/bootstrap-bypass-on-resume.md)。
+
 ## 驗證
 
 - Core Bootstrap 三條規則已讀
 - 新專案檢查已完成（若為新專案，已詢問使用者是否初始化）
 - Lazy-load rules 的 activation conditions 已檢查
+- **Bootstrap Receipt 已輸出**（first-turn 條款）

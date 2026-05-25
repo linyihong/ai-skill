@@ -24,6 +24,7 @@
 | [Template drift](template-drift.md) | `template-inconsistency` / `governance-drift` | validated | 防止 agent 建立 reusable layer 文件時憑直覺寫 section header，造成 canonical template 漂移；應先 list_files + Read 同類既有檔，依 canonical section list 寫入。對應 scenario：`failure-pattern-template-consistency-v1`。 |
 | [Skill classification boundary confusion](skill-classification-boundary-confusion.md) | `scope-drift` | candidate | 防止 agent 在處理多 skill feedback lessons 時，把 A skill 的 analysis technique 放到 B skill 的 feedback_history；放置位置由 skill scope 決定，不是 lesson 技術主題。 |
 | [Cognitive mode resolution bypass](cognitive-mode-resolution-bypass.md) | `process-gap` / `governance-drift` | candidate | 防止 agent 跳過 cognitive mode 解析（execution/context/governance/memory）直接執行，導致壓縮策略錯誤、governance gate 未激活、memory isolation 失效。 |
+| [Bootstrap bypass on resume](bootstrap-bypass-on-resume.md) | `process-gap` / `governance-drift` | validated | 防止 agent 從 conversation summary 被喚起時，把 "Resume directly" 對話 framing 當成 runtime/governance bootstrap 豁免，跳過 CORE_BOOTSTRAP.md / runtime.db 查詢與 Bootstrap Receipt 輸出。 |
 
 ## 維護
 
