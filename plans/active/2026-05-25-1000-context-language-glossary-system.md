@@ -3,7 +3,7 @@
 **Status**: `draft`
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-25
-**最後更新**：2026-05-25（建立 draft plan；尚未開始 implementation）
+**最後更新**：2026-05-25（補入 Glossary Entry Schema、Semantic Ownership、Vocabulary Resolution Priority、Drift Detection 與 Semantic Governance Boundary）
 
 > 本 plan 回應外部 `CONTEXT.md / ubiquitous language` 建議，參考 [mattpocock/skills](https://github.com/mattpocock/skills/tree/main) 將 shared language 作為 agent alignment 技巧；但在 Ai-skill 中不建立 root `CONTEXT.md` 作為第二份 source-of-truth，而是依 Gen 3 分層落到 `knowledge/glossary/` 與 project-local memory 邊界。
 
@@ -27,6 +27,9 @@ Ai-skill 目前已有相關 intelligence：
 2. **Memory 被誤當 current truth**：`memory/README.md` 明確規定 memory 不保存 canonical source / current truth。
 3. **Workflow 找不到可查 source**：behavior-driven discovery 目前只說「對齊 shared language」，但沒有穩定路徑可讀。
 4. **框架詞彙漂移**：近期 active plan 已出現 `context_mode` / `compression` 詞彙重疊風險；需要更明確的 glossary owner。
+5. **詞條形狀未定義**：若沒有 Glossary Entry Schema，agent 可能把詞條寫成一句話、ADR、runtime spec、incident record 或 temporary implementation note。
+6. **Semantic split-brain**：`context_mode`、`compression`、`memory_mode`、`generated_surface`、`projection` 可能被 runtime、workflow、knowledge、contract 文件各自重新定義。
+7. **Resolution order 不明**：agent 面對 project glossary、knowledge glossary、ADR、workflow docs、intelligence heuristics、memory replay 時，可能讓 memory 或舊 ADR 覆蓋 active glossary。
 
 ### Decision
 
@@ -38,8 +41,65 @@ Ai-skill 目前已有相關 intelligence：
 | 單一專案、跨 session 但非 canonical 的語言脈絡 | `<PROJECT_ROOT>/memory/project/context-language.md` 或專案等價文件 | 只作 selective replay，不取代專案正式 docs 或 Ai-skill glossary。 |
 | 判斷何時需要 shared language | `intelligence/engineering/requirements/behavior-modeling/` 與 `intelligence/engineering/architecture/domain-modeling/` | 保留為 reasoning source。 |
 | 執行何時讀 glossary | `workflow/software-delivery/requirements/behavior-driven-discovery/` 與 `pre-build-interrogation` | Workflow gate 觸發 glossary 使用。 |
+| Semantic governance | `governance/semantic/`（Phase 2 視 validation 決定是否建立） | 定義 naming、ownership、deprecation、aliasing、resolution order、drift detection 與 semantic conflict resolution。 |
 
-`knowledge/glossary/` 不做百科全書；只收會影響 behavior、contract、runtime surface、validation、routing 或 framework decision 的詞。
+`knowledge/glossary/` 不做百科全書；只收會影響 behavior、contract、runtime surface、validation、routing 或 framework decision 的詞。每個詞條必須有 schema 與 semantic owner；其他文件只能引用 owner definition，不能重新定義同一詞。
+
+### Glossary Entry Schema（計畫要求）
+
+Phase 2 的 `knowledge/glossary/README.md` 必須先定義詞條 schema，再建立任何 glossary entries。
+
+Required:
+
+- `term`
+- `status`
+- `meaning`
+- `affects`
+- `owner-layer`
+
+Optional:
+
+- `aliases`
+- `anti-meaning`
+- `related-terms`
+- `introduced-by`
+- `deprecated-by`
+
+Forbidden:
+
+- project-specific hosts、paths、class/test names、sample IDs 或 incident evidence
+- temporary implementation detail
+- current runtime state
+- raw historical transcript / memory replay
+- executable contract semantics that belong in workflow / enforcement / runtime source
+
+### Semantic Ownership（計畫要求）
+
+每個 glossary term 必須指定 `owner-layer`。例如：
+
+```text
+Term: context_mode
+Owner-layer: runtime-cognition
+```
+
+Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alias 或標記 local usage，不得重新定義。若同一詞在不同 context 有不同 meaning，必須拆 bounded context 或改名，不能讓同一 term 承載兩個 canonical meanings。
+
+### Vocabulary Resolution Priority（計畫要求）
+
+當多個 source 對同一詞有不同說法時，agent 必須依下列順序解析：
+
+1. Active project canonical docs（僅限該專案語境）
+2. `knowledge/glossary/`
+3. Accepted ADRs / `constitution/`
+4. Workflow docs
+5. Intelligence heuristics
+6. Memory replay
+
+限制：
+
+- Project docs 只能覆蓋 project-local usage，不得改寫 Ai-skill framework term。
+- Memory replay 永遠不能覆蓋 glossary / ADR / workflow current source。
+- 舊 ADR 若與 active runtime docs 衝突，必須檢查 Framework Generation / Vocabulary Evolution section，不可直接採舊詞義。
 
 ### Alternatives Considered
 
@@ -47,6 +107,7 @@ Ai-skill 目前已有相關 intelligence：
 - **B. 放 `memory/project/context-language.md` 作 canonical**：拒絕。Memory 是 selective replay，不是 current truth；可作 project-local replay，但不可作 Ai-skill canonical。
 - **C. 只保留 intelligence，不新增 glossary**：拒絕。Intelligence 只回答何時需要 ubiquitous language，不提供 agent 可查的穩定詞彙 source。
 - **D. 建 `knowledge/glossary/` 作 canonical，memory 只作 project replay**：接受。
+- **E. 只建 glossary，不建 semantic governance**：暫拒。系統規模已足以產生 semantic split-brain；至少需要先在 plan 中定義 governance boundary，Phase 2 再決定是否建立 `governance/semantic/`。
 
 ### Why Not an ADR Yet
 
@@ -59,6 +120,8 @@ Ai-skill 目前已有相關 intelligence：
 ### ADR Promotion Criteria（completed 時驗證）
 
 - [ ] `knowledge/glossary/` 已被 workflow 或 routing 實際使用。
+- [ ] `knowledge/glossary/README.md` 已定義 Entry Schema、Semantic Ownership 與 Vocabulary Resolution Priority。
+- [ ] Semantic drift validation 能偵測 duplicate meaning、conflicting ownership、alias loops、deprecated term resurrection。
 - [ ] `memory/project/context-language.md` 邊界未被誤用為 canonical source。
 - [ ] 至少一個 validation scenario 能防止 glossary source duplication 或 memory-as-truth。
 - [ ] Open Questions 全解。
@@ -87,6 +150,8 @@ Ai-skill 目前已有相關 intelligence：
 | Memory 被當 canonical | 在 memory README、glossary README 與 validation scenario 明確禁止。 |
 | 與 intelligence/domain-modeling 重複 | Intelligence 保留判斷原則；glossary 保存穩定詞條。 |
 | 與 active runtime cognitive modes plan 詞彙衝突 | Phase 0 先盤點 `context_mode` / `compression` / `memory_mode`，避免先寫兩套。 |
+| Semantic split-brain | 每個 term 有 `owner-layer`；其他 layer 只能引用，不得重新定義。 |
+| Alias / deprecated term 復活 | Phase 1 先寫 `semantic-term-overlap-v1.yaml`，Phase 2 定義 alias / deprecation lifecycle。 |
 
 ---
 
@@ -94,11 +159,11 @@ Ai-skill 目前已有相關 intelligence：
 
 | 欄位 | 內容 |
 | --- | --- |
-| Runtime owner | Phase 1-2：無，doc / knowledge layer plan；Phase 3 後視結果決定是否新增 `generated_surfaces` glossary index 或只走 knowledge runtime refresh。 |
+| Runtime owner | Phase 1-3：無，doc / knowledge layer plan；Phase 5 後視結果決定是否新增 `generated_surfaces` glossary index 或只走 knowledge runtime refresh。 |
 | Trigger location | `workflow/software-delivery/requirements/behavior-driven-discovery/`、`pre-build-interrogation`、`route.workflow.software-delivery`、未來 glossary route。 |
-| Activation contract | 初期無新 executable contract；使用既有 `workflow.software_delivery.pre_build_interrogation.contract` 作 plan 前 gate。若 Phase 3 決定 glossary 使用需要 blocking gate，再補 owner-layer YAML。 |
+| Activation contract | 初期無新 executable contract；使用既有 `workflow.software_delivery.pre_build_interrogation.contract` 作 plan 前 gate。若 Phase 5 決定 glossary 使用需要 blocking gate，再補 owner-layer YAML。 |
 | Generated surface | 初期不投影 executable contract；`knowledge/runtime/sqlite/runtime-index.sqlite` 與 runtime reports 會收錄 glossary source。若新增 executable contract，target_key 需另定。 |
-| Validation scenarios | Phase 1 先新增：`validation/scenarios/failure-derived/glossary-source-duplication-v1.yaml`、`validation/scenarios/failure-derived/memory-context-language-as-canonical-v1.yaml`。 |
+| Validation scenarios | Phase 1 先新增：`validation/scenarios/failure-derived/glossary-source-duplication-v1.yaml`、`validation/scenarios/failure-derived/memory-context-language-as-canonical-v1.yaml`、`validation/scenarios/failure-derived/semantic-term-overlap-v1.yaml`。 |
 | Test passing evidence | `ai-skill runtime refresh --native-index --native-reports`、`ai-skill runtime validate --json`、scenario / lints / diff review。 |
 
 ### Doc-only Trial 聲明
@@ -111,7 +176,7 @@ Ai-skill 目前已有相關 intelligence：
 
 未來接入時機：
 
-- Phase 3 證明 agent 需要 glossary route 或 blocking gate 才能穩定使用時，新增 routing / generated surface / executable contract。
+- Phase 5 證明 agent 需要 glossary route 或 blocking gate 才能穩定使用時，新增 routing / generated surface / executable contract。
 
 ---
 
@@ -125,8 +190,8 @@ Ai-skill 目前已有相關 intelligence：
 | Scope | Plan only；規劃 `knowledge/glossary/`、project memory boundary、workflow/routing/validation linked updates。 |
 | Non-goals | 本 plan 不立即建立完整 glossary、不中斷 active runtime cognitive modes plan、不建立 proposed ADR、不新增 root `CONTEXT.md`。 |
 | Acceptance | Plan 符合新 `plans/README.md` 必填章節；明確回答 `knowledge/glossary/` vs `memory/project/context-language.md`；列出 test-first validation。 |
-| Framework discovery | `knowledge/` 是 navigation / atom / glossary source 候選；`memory/` 不保存 current truth；`intelligence/` 保存判斷原則；`workflow/` 保存執行 gate。 |
-| Duplication risk | Root `CONTEXT.md`、memory canonical、knowledge glossary 三者不可並存為同一語彙 source。Plan 採 `knowledge/glossary/` canonical + memory replay 非 canonical。 |
+| Framework discovery | `knowledge/` 是 navigation / atom / glossary source 候選；`memory/` 不保存 current truth；`intelligence/` 保存判斷原則；`workflow/` 保存執行 gate；`governance/semantic/` 是 semantic lifecycle / conflict resolution 候選。 |
+| Duplication risk | Root `CONTEXT.md`、memory canonical、knowledge glossary 三者不可並存為同一語彙 source。Plan 採 `knowledge/glossary/` canonical + memory replay 非 canonical；每個 term 另需 `owner-layer` 防止 semantic split-brain。 |
 | Open questions | 見下一節。 |
 | Decision | proceed with draft plan；implementation 需另行啟動。 |
 
@@ -138,7 +203,9 @@ Ai-skill 目前已有相關 intelligence：
 2. Project-local `context-language.md` 是否由 Ai-skill 提供 template，或只寫規範讓 downstream project 自行建立？
 3. Glossary 是否需要 companion YAML contract，或維持 Markdown + generated knowledge index 即可？
 4. 是否需要在 active `runtime-cognitive-modes-system` plan 中加入詞彙對齊 dependency，避免 `context_mode` 與 `compression` 分叉？
-5. Glossary entry 是否需要 status 欄位：`canonical` / `candidate` / `deprecated` / `project-local`？
+5. Glossary `status` 是否固定為 `canonical` / `candidate` / `deprecated` / `project-local`，或需加 `alias-only` / `superseded`？
+6. `owner-layer` 的值域是否沿用現有 owner layers（knowledge / runtime / workflow / governance / intelligence / memory），或新增 semantic domain（如 `runtime-cognition`）？
+7. `governance/semantic/` 是否應在 Phase 2 建立為獨立 governance boundary，或先放在 `knowledge/glossary/README.md` 內直到 drift 實證出現？
 
 ---
 
@@ -151,11 +218,13 @@ Ai-skill 目前已有相關 intelligence：
 - Agent 不會建 root `CONTEXT.md` 作 Ai-skill canonical glossary。
 - Agent 不會把 `memory/project/context-language.md` 當 current truth。
 - Agent 在 framework / requirements plan 中能找到 `knowledge/glossary/` 作 shared language source。
+- Agent 能偵測 near-duplicate terms、conflicting owner-layer、alias loops 與 deprecated term resurrection。
 
 ### Tasks
 
 - [ ] 新增 `validation/scenarios/failure-derived/glossary-source-duplication-v1.yaml`
 - [ ] 新增 `validation/scenarios/failure-derived/memory-context-language-as-canonical-v1.yaml`
+- [ ] 新增 `validation/scenarios/failure-derived/semantic-term-overlap-v1.yaml`
 - [ ] 更新 relevant graph / summary / routing candidate（若 scenario 需要）
 
 ### Phase 1 完成條件
@@ -166,7 +235,26 @@ Ai-skill 目前已有相關 intelligence：
 
 ---
 
-## Phase 2 Knowledge Glossary Structure
+## Phase 2 Glossary Schema And Semantic Governance Boundary
+
+### Tasks
+
+- [ ] 建立 `knowledge/glossary/README.md`，先定義 Entry Shape，不先建立大量詞條。
+- [ ] 定義 required / optional / forbidden fields。
+- [ ] 定義 `owner-layer` semantics：owner 擁有 canonical meaning，其他 layer 只能引用或 alias。
+- [ ] 定義 Vocabulary Resolution Priority。
+- [ ] 定義 drift detection categories：duplicate meaning、conflicting ownership、alias loop、deprecated term resurrection、near-duplicate concept fork。
+- [ ] 決定是否建立 `governance/semantic/README.md`；若暫不建立，在 plan 中記錄 not-yet reason 與 promotion trigger。
+
+### Phase 2 完成條件
+
+- [ ] 任何 glossary entry 建立前，schema 已存在。
+- [ ] Semantic ownership 與 resolution priority 已寫明。
+- [ ] `governance/semantic/` 是否建立已有明確 decision；若 deferred，已列 promotion trigger。
+
+---
+
+## Phase 3 Knowledge Glossary Structure
 
 ### Proposed files
 
@@ -180,21 +268,21 @@ knowledge/glossary/
 
 ### Tasks
 
-- [ ] 建立 `knowledge/glossary/README.md`，定義 glossary scope、entry shape、status、non-goals。
 - [ ] 建立 `knowledge/glossary/ai-skill.md`，收 Ai-skill framework 詞彙。
 - [ ] 視 Open Question 1 決定是否同批建立 `software-delivery.md` / `runtime.md`。
 - [ ] 更新 `knowledge/README.md`，將 glossary 加入目前入口。
 - [ ] 更新 `knowledge/graphs/`，把 glossary 連到 requirements / domain modeling / software delivery。
 
-### Phase 2 完成條件
+### Phase 3 完成條件
 
 - [ ] Glossary 只收影響 behavior / contract / validation / runtime decision 的詞。
+- [ ] 每個 term 都符合 Entry Schema，且有 `owner-layer`。
 - [ ] 沒有把 project-specific 詞、host、class、incident evidence 寫入 reusable glossary。
 - [ ] `knowledge/README.md` 可導向 glossary。
 
 ---
 
-## Phase 3 Workflow And Memory Boundary Integration
+## Phase 4 Workflow And Memory Boundary Integration
 
 ### Tasks
 
@@ -203,16 +291,18 @@ knowledge/glossary/
 - [ ] 更新 `memory/README.md` 或 `memory/project/README.md`：project context-language 只作 replay，不作 canonical。
 - [ ] 更新 `intelligence/engineering/requirements/behavior-modeling/ubiquitous-language-alignment.md`：判斷原則指向 glossary 作 source。
 - [ ] 更新 `intelligence/engineering/architecture/domain-modeling/ubiquitous-language.md`：domain glossary 與 Ai-skill glossary 的邊界。
+- [ ] 若建立 `governance/semantic/`，更新 lifecycle / routing / linked updates 的 semantic governance boundary。
 
 ### Phase 3 完成條件
 
 - [ ] Workflow、memory、intelligence 三層沒有互相取代。
 - [ ] `memory/project/context-language.md` 的用途被限制為 project-local replay / context aid。
 - [ ] Agent 能從 behavior-driven discovery 找到 canonical glossary source。
+- [ ] Resolution priority 已在 workflow / memory / intelligence 引用。
 
 ---
 
-## Phase 4 Routing, Runtime Reports, And Generated Lookup
+## Phase 5 Routing, Runtime Reports, And Generated Lookup
 
 ### Tasks
 
@@ -226,10 +316,11 @@ knowledge/glossary/
 - [ ] Runtime reports / SQLite index 可找到 glossary source。
 - [ ] 若無 runtime executable contract，已記錄原因：glossary 是 knowledge source，不是 workflow gate。
 - [ ] 若有 contract，`generated_surfaces` target_key 已 synced。
+- [ ] Semantic drift scenarios 進入 validation inventory 或 runtime reports 可查來源。
 
 ---
 
-## Phase 5 Close Loop
+## Phase 6 Close Loop
 
 ### Tasks
 
@@ -244,6 +335,8 @@ knowledge/glossary/
 ### 完成條件
 
 - [ ] `knowledge/glossary/` canonical placement 已建立或明確 deferred。
+- [ ] Glossary Entry Schema、Semantic Ownership、Vocabulary Resolution Priority 已建立或明確 deferred with blocker。
+- [ ] Semantic drift validation scenario 已建立。
 - [ ] `memory/project/context-language.md` 非 canonical 邊界已寫入。
 - [ ] Validation scenarios 可防止 root `CONTEXT.md` / memory canonical duplication。
 - [ ] Runtime refresh / validate 通過。
