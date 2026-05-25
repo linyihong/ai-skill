@@ -554,7 +554,43 @@ func compileProseRuntimeSources(repo string, db *sql.DB, docs map[string]map[str
 	if err := compileDiscoverySignals(repo, db); err != nil {
 		return err
 	}
+	if err := compileCognitiveModeEnforcementRules(db); err != nil {
+		return err
+	}
 	return nil
+}
+
+func compileCognitiveModeEnforcementRules(db *sql.DB) error {
+	_, err := db.Exec(
+		`INSERT OR IGNORE INTO obligations (id, phase, name, description, verification, severity, depends_on, linked_gates, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		"obligation.execution.resolve_cognitive_mode",
+		"phase.execution",
+		"Resolve Cognitive Mode",
+		"任務開始前必須解析 4 維 cognitive mode（execution/context/governance/memory），並記錄到 cognitive_modes 表或 final report。",
+		`["cognitive_mode_resolved == true","cognitive_modes table has row OR final_report includes Cognitive Mode block"]`,
+		"high",
+		`[]`,
+		`["gate.execution.cognitive_mode_resolved"]`,
+		`{"source":"cognitive-modes-phase-integration","contract":"runtime/cognitive-modes.yaml"}`,
+	)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(
+		`INSERT OR IGNORE INTO gates (id, phase, name, description, severity, check_type, check_target, check_verification, failure_action, failure_message, metadata) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		"gate.execution.cognitive_mode_resolved",
+		"phase.execution",
+		"Cognitive Mode Resolved",
+		"執行任何 close-loop 動作前，cognitive mode 必須已解析。NONE 解析等同於未解析（除非是 Phase D doc-only）。",
+		"high",
+		"verification",
+		"cognitive_modes table OR final_report Cognitive Mode block",
+		"cognitive_mode_resolved == true",
+		"block_execution",
+		"Cognitive mode 未解析：請先執行 mode discovery 並記錄 4 維 mode 值，再繼續 close-loop。",
+		`{"source":"cognitive-modes-governance-integration","contract":"runtime/cognitive-modes-governance-integration.yaml","deferred":"behavioral pre-commit wiring"}`,
+	)
+	return err
 }
 
 func compileDiscoverySignals(repo string, db *sql.DB) error {

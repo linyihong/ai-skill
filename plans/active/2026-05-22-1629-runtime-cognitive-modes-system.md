@@ -1,9 +1,9 @@
 # Runtime Cognitive Modes System
 
-**Status**: `in-progress`（Phase D ✅ + Phase 0 ✅ + Phase 1 ✅ + Phase 2 ✅ + **Phase 3.1-3.4 完成**（4/4 scenarios pass）；Phase 3 ADR evaluation + linked updates 待下次 session）
+**Status**: `in-progress`（Phase D ✅ + Phase 0 ✅ + Phase 1 ✅ + Phase 2 ✅ + **Phase 3 governance-structure 完成**（5/5 scenarios pass）；behavioral enforcement + linked updates + ADR evaluation 待下次 session）
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-22
-**最後更新**：2026-05-25（Phase 3: 4 subsystem integration contracts + compression alias + 4 scenarios all PASS；enforcement wiring deferred）
+**最後更新**：2026-05-25（Phase 3-B: enforcement obligation + gate 寫入 runtime.db；deferred items 完整記錄於 §Phase 3 Deferred Items）
 
 > ⚠️ 本 plan 處於 `in-progress` 階段：**Phase D documentation-contract trial 已完成並通過評估指標**；Phase 0 (Pre-Build Interrogation) 與 Phase 1-5 runtime 實作待 user 決定是否啟動。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
 >
@@ -549,12 +549,32 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
   - [x] 3.2 context_mode → compression（`models/compression/README.md` 加 alias 表 + context_mode column）
   - [x] 3.3 governance_mode → blocking_gates（`runtime/cognitive-modes-governance-integration.yaml`，含 LOCKDOWN block_file_writes）
   - [x] 3.4 memory_mode → retrieval-governance（`runtime/cognitive-modes-memory-integration.yaml`，含 AND 邏輯 compose）
-- [ ] 失敗測試：mode 未解析就執行 → 被阻擋（enforcement wiring，deferred to Phase 3-B）
+- [x] 失敗測試：mode 未解析就執行 → 被阻擋（governance-structure level，2026-05-25）
+  - [x] `obligation.execution.resolve_cognitive_mode` 寫入 runtime.db `obligations` 表（Go compiler 直接 INSERT）
+  - [x] `gate.execution.cognitive_mode_resolved` 寫入 runtime.db `gates` 表
+  - [x] Scenario `cognitive-modes-enforcement-gate-exists-v1` → **PASS** ✅
+  - [ ] **Behavioral enforcement**（deferred）：pre-commit hook 實際查 `cognitive_modes` 表是否有本次 session row → 沒有就 block commit。需改 pre-commit hook Go 邏輯（`scripts/ai-skill-cli/internal/app/` pre-commit 相關 function）＋ rebuild。
 - [x] Documentation 更新（`models/compression/README.md` alias annotation，per Open Question 1）
-- [ ] Phase 3 完成後至少 5 個任務的 final report 列 Cognitive Mode（用於 ADR promotion 評估）← 待累積
+- [ ] **Phase 3 完成後至少 5 個任務的 final report 列 Cognitive Mode**（用於 ADR promotion 評估）← 待累積（每次 task commit 含 final report Cognitive Mode 區塊）
 - [ ] **ADR Promotion Criteria 評估**（per Open Question 5 resolved）← 待下次 session
   - 通過 → 建立 ADR（直接 accepted），引用本 plan 作為 evidence
   - 不通過 → 在 plan 內記錄「決定不升 ADR 的理由」+ 改用更輕 promotion target
+
+### Phase 3 Deferred Items（完整記錄，下次 session 繼續）
+
+以下項目已在本 plan 範圍內，但因 token budget 限制在 2026-05-25 session 中斷：
+
+| 項目 | 說明 | 前置條件 |
+|------|------|---------|
+| **Behavioral enforcement**（pre-commit hook） | 修改 pre-commit hook Go code，在 commit 前查 `cognitive_modes` 表是否有當次 task row；沒有則 block。需理解 hook 架構 + rebuild + 驗證 blocking 真實發生。 | 了解 `scripts/ai-skill-cli/internal/app/` pre-commit handler 入口 |
+| **3.1-B Go enforcement**（execution_mode floors） | 在 phase_machine 進入 phase 時，依 execution_mode floors（e.g. DEEP→STRICT governance floor）實際調整 allowed_actions。目前是 YAML contract only，無 Go 強制。 | 需改 `compileStructuredRuntimeSources` 或 phase_machine 查詢邏輯 |
+| **3.3-B Go enforcement**（governance_mode gate query） | 實際在 gate 查詢時過濾 active_gate_categories（依 governance_mode）。目前 gate 查詢回傳全部 gates，未依 mode 篩選。 | 需改 gate validation 查詢邏輯 |
+| **3.4-B Go enforcement**（memory subdir activation） | 實際在 memory retrieval 時依 memory_mode 限制只讀對應 subdir。目前是 YAML contract only。 | 需了解 memory retrieval 觸發點 |
+| **Linked updates**（routing-registry） | `knowledge/runtime/routing-registry.yaml` 新增 `route.runtime.cognitive-modes` entry | Phase 3 完成前應補 |
+| **Linked updates**（knowledge graph） | `knowledge/graphs/` 新增 cognitive-modes 與 phase/compression/memory/governance 的 edges | Phase 3 完成前應補 |
+| **Linked updates**（README OS layout） | `README.md` OS Layout 表格新增 cognitive modes 機制簡述 | Phase 3 完成前應補 |
+| **5 tasks final report 累積** | 每次 commit 的 final report 含 Cognitive Mode 區塊計入；目前本 plan commits 已含（從 Phase 1.B 起），需累積到 5 個非 phase-setup tasks | 自然累積，不需額外工作 |
+| **ADR Promotion Criteria 評估** | 5 criteria 全中才升 ADR；Phase 3 完成後評估 | 5 tasks 累積 + Behavioral enforcement 完成後 |
 
 ---
 
