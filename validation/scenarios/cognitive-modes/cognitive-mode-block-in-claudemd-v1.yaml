@@ -1,0 +1,63 @@
+# Source: Fix A — per-turn Cognitive Mode block obligation in CLAUDE.md
+# Test-first per system-upgrade-governance §3 Rule 9
+id: cognitive-mode-block-in-claudemd-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-mode-resolution-bypass
+  class: process-gap / governance-drift
+  date: "2026-05-25"
+  description: |
+    Behavioral test in new session (2026-05-25) confirmed that A2 Cognitive
+    Mode block obligation was NOT triggered in agent's final-report response,
+    even though Phase D plan §285 declares "Agent final report 列 Cognitive
+    Mode 報告 | 每個任務必填 4 維值 + 理由欄".
+
+    Root cause: the obligation existed only in models/cognitive-modes/README.md
+    and the plan, not in CLAUDE.md (the file Claude Code auto-loads as agent
+    context). Bootstrap Receipt obligation works because it IS in CLAUDE.md
+    with IMPORTANT prefix; Cognitive Mode block obligation didn't get the
+    same treatment.
+
+    Fix A: add a per-turn Cognitive Mode block obligation to CLAUDE.md and
+    CORE_BOOTSTRAP.md with IMPORTANT framing identical to Bootstrap Receipt.
+    Propagate to scripts/ai-skill-cli/internal/app/init_project.go bootstrap
+    text so downstream projects get the same obligation.
+
+given:
+  task: fix_a_cognitive_mode_block_obligation_in_bootstrap_docs
+  artifacts:
+    - CLAUDE.md (repo root)
+    - CORE_BOOTSTRAP.md (repo root)
+    - scripts/ai-skill-cli/internal/app/init_project.go
+  signals:
+    - CLAUDE.md contains "Cognitive Mode 報告" + per-turn obligation language
+    - CORE_BOOTSTRAP.md contains "Cognitive Mode 報告" + per-turn obligation language
+    - init_project.go initProjectBootstrapText contains the obligation
+
+when:
+  action: fix_a_completion_check
+
+then:
+  expected_route:
+    - CLAUDE.md grep "Cognitive Mode 報告"
+    - CLAUDE.md grep "per-turn" or "每一輪"
+    - CORE_BOOTSTRAP.md grep "Cognitive Mode 報告"
+    - init_project.go grep "Cognitive Mode 報告"
+  forbidden_routes:
+    - claim_done_without_claude_md_update
+    - claim_done_without_core_bootstrap_update
+    - claim_done_without_init_project_update
+
+validation:
+  detection_command: |
+    cl=$(grep -c "Cognitive Mode 報告" CLAUDE.md 2>/dev/null)
+    cl_per_turn=$(grep -c "每一輪\|per-turn\|每次 final user-facing" CLAUDE.md 2>/dev/null)
+    cb=$(grep -c "Cognitive Mode 報告" CORE_BOOTSTRAP.md 2>/dev/null)
+    ip=$(grep -c "Cognitive Mode 報告" scripts/ai-skill-cli/internal/app/init_project.go 2>/dev/null)
+    [ "${cl:-0}" -ge 1 ] && [ "${cl_per_turn:-0}" -ge 1 ] && [ "${cb:-0}" -ge 1 ] && [ "${ip:-0}" -ge 1 ] && echo "PASS" || echo "FAIL cl=${cl:-0} cl_per_turn=${cl_per_turn:-0} cb=${cb:-0} ip=${ip:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（none of the three files yet has the obligation）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
