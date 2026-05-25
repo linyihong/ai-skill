@@ -1913,6 +1913,71 @@ records:
       compression_level: source-backed
       reason: Executable Contract Boundary 在新增流程、gate、policy contract 或調整 runtime projection 時才需要載入。
 
+  - id: route.governance.system-upgrade
+    task_intent: 執行 framework / runtime / governance / workflow / validation / metadata / compiler / generated artifact 升級治理，避免升級只停在 document layer
+    activation_triggers:
+      task_intents:
+        - framework-upgrade
+        - system-upgrade
+        - runtime-upgrade
+        - governance-upgrade
+        - workflow-upgrade
+        - architecture-plan
+        - generated-surface-change
+        - executable-contract-yamlization
+      user_signals:
+        - 框架升級
+        - 系統升級
+        - runtime path
+        - trigger flow
+        - document layer
+        - YAML化
+        - yaml化
+        - 只停在文件層
+        - generated_surfaces
+      file_change_globs:
+        - "governance/lifecycle/system-upgrade-governance.md"
+        - "governance/lifecycle/system-upgrade-governance.yaml"
+        - "plans/active/*.md"
+        - "runtime/**"
+        - "validation/scenarios/**"
+        - "scripts/ai-skill-cli/**"
+    primary_source: governance/lifecycle/system-upgrade-governance.yaml
+    required_dependencies:
+      - governance/lifecycle/system-upgrade-governance.md
+      - governance/lifecycle/executable-contract-boundary.yaml
+      - workflow/software-delivery/requirements/pre-build-interrogation.yaml
+      - plans/README.md
+      - enforcement/linked-updates.md
+      - runtime/runtime.db
+    candidate_sources:
+      - validation/scenarios/failure-derived/plan-runtime-execution-path-v1.yaml
+      - validation/scenarios/failure-derived/system-upgrade-governance-contract-projected-v1.yaml
+      - governance/lifecycle/executable-contract-inventory.yaml
+      - scripts/ai-skill-cli/internal/app/runtime_compiler.go
+    source_of_truth_gate: governance-system-upgrade-contract-active
+    ranking_reason: >
+      System Upgrade Governance 是大型 framework/runtime/governance/workflow/validation/compiler/generated artifact
+      升級的 blocking contract；它要求 pre-build interrogation、runtime trigger flow、test-first scenarios、
+      linked updates、runtime validation 與 close-loop readback，防止升級只留下 Markdown。
+    validation_signal: >
+      system-upgrade-governance.yaml 已載入並投影到 runtime.db generated_surfaces；
+      active plan 具備 Runtime Execution Path + Trigger flow；runtime refresh/validate 與 close-loop evidence 已記錄。
+    metadata:
+      priority: P0
+      confidence: high
+      context_cost:
+        estimated_tokens: 900
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: Framework 升級或 runtime path 變更會影響執行語意，需要直接讀 executable contract 而非只讀 routing entry。
+
   - id: route.governance.knowledge-update-flow
     task_intent: 載入知識更新流程的 11 個步驟定義，決定目前 knowledge update 走到哪一步
     primary_source: governance/lifecycle/knowledge-update-flow.yaml

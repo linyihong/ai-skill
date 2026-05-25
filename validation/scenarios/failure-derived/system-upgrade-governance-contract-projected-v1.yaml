@@ -1,0 +1,70 @@
+# Source: 2026-05-25 user request — system-upgrade-governance must become an executable YAML contract
+id: system-upgrade-governance-contract-projected-v1
+domain: governance
+type: runtime-projection
+priority: P0
+
+failure_source:
+  pattern: system-upgrade-governance-stays-markdown-only
+  class: governance-drift
+  date: "2026-05-25"
+  description: |
+    System upgrade governance contains blocking rules for framework/runtime/governance
+    upgrades, but without a companion executable YAML contract and runtime projection,
+    agents can treat it as documentation only and miss the runtime trigger flow gate.
+
+given:
+  task: framework_upgrade_or_runtime_path_governance_change
+  artifacts:
+    - governance/lifecycle/system-upgrade-governance.md
+    - governance/lifecycle/system-upgrade-governance.yaml
+    - governance/lifecycle/executable-contract-inventory.yaml
+    - knowledge/runtime/routing-registry.yaml
+    - runtime/runtime.db
+  signals:
+    - framework upgrade governance changed
+    - runtime trigger flow requirement changed
+    - user asks to YAMLize system-upgrade-governance
+
+when:
+  action: finalize_governance_yamlization
+
+then:
+  expected_route:
+    - governance/lifecycle/system-upgrade-governance.yaml exists
+    - executable contract inventory lists system-upgrade-governance.md as contract_exists
+    - routing registry has route.governance.system-upgrade pointing to the YAML contract
+    - runtime.db generated_surfaces includes target_key governance.system_upgrade_governance.contract
+    - ai-skill runtime validate passes
+  expected_heuristics:
+    - markdown_explains_yaml_executes
+    - owner_layer_contract_projects_to_runtime
+    - routing_record_is_activation_surface_not_source_of_truth
+  forbidden_routes:
+    - keep_system_upgrade_governance_markdown_only
+    - add_routing_record_without_executable_contract
+    - claim_yamlization_without_runtime_projection
+
+required_contract_fields:
+  - schema_version
+  - id
+  - title
+  - owner_layer
+  - source_markdown
+  - runtime_projection.enabled
+  - runtime_projection.target_key
+  - activation
+  - steps
+  - gates
+  - failure_modes
+  - final_status_report
+
+validation:
+  detection_command: |
+    test -f governance/lifecycle/system-upgrade-governance.yaml
+    grep -q "governance.system_upgrade_governance.contract" governance/lifecycle/system-upgrade-governance.yaml
+    grep -q "governance/lifecycle/system-upgrade-governance.yaml" governance/lifecycle/executable-contract-inventory.yaml
+    grep -q "route.governance.system-upgrade" knowledge/runtime/routing-registry.yaml
+    scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime validate --json
+  pass_criteria: contract file, inventory row, routing row, runtime projection, and runtime validation all pass
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 8

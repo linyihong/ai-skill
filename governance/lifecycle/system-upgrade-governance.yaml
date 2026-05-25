@@ -1,0 +1,232 @@
+schema_version: executable-contract/v1
+id: governance.lifecycle.system-upgrade-governance
+title: System upgrade governance contract
+owner_layer: governance
+source_markdown: governance/lifecycle/system-upgrade-governance.md
+status: active
+contract_type: policy_gate
+blocking_level: blocking
+
+runtime_projection:
+  enabled: true
+  target_key: governance.system_upgrade_governance.contract
+  surface_type: executable_yaml_contract
+  execution_scope: framework_upgrade_governance
+
+purpose: >
+  Ensure framework, runtime, governance, workflow, validation, metadata, compiler,
+  and generated-artifact upgrades do not remain document-only. Upgrade plans must
+  define executable trigger flow, test-first scenarios, linked updates, runtime
+  validation, and close-loop evidence before implementation or completion claims.
+
+activation:
+  events:
+    - framework_upgrade_requested
+    - runtime_governance_workflow_or_validation_changed
+    - schema_metadata_compiler_or_generated_artifact_changed
+    - active_plan_created_or_updated_for_architectural_scope
+    - plan_completion_or_close_loop_claimed
+    - user_reports_document_layer_only_upgrade_risk
+  required_when:
+    - A task changes Ai-skill framework, runtime, governance, workflow, validation, scenario, metadata, compiler, generated artifact, architecture generation, or source-of-truth semantics.
+    - A plan in `plans/active/` proposes a new framework capability, runtime surface, governance rule, workflow gate, validation scenario, or generated surface.
+    - A user asks whether a governance Markdown source should become executable YAML.
+    - An agent claims a framework upgrade is complete.
+
+required_sources:
+  - governance/lifecycle/system-upgrade-governance.md
+  - governance/lifecycle/executable-contract-boundary.md
+  - governance/lifecycle/executable-contract-inventory.yaml
+  - workflow/software-delivery/requirements/pre-build-interrogation.md
+  - workflow/software-delivery/requirements/pre-build-interrogation.yaml
+  - plans/README.md
+  - enforcement/linked-updates.md
+  - runtime/runtime.db
+
+steps:
+  - id: classify_upgrade_scope
+    order: 1
+    action: Decide whether the change is a major system upgrade or architecture-affecting plan.
+    must_check:
+      - system_name_change
+      - architecture_layer_change
+      - core_flow_change
+      - external_entrypoint_or_readme_change
+      - old_structure_deprecation
+      - framework_runtime_governance_workflow_validation_metadata_compiler_or_generated_artifact_change
+    gates:
+      - gate.system_upgrade.scope_classified
+
+  - id: run_pre_build_interrogation
+    order: 2
+    action: Complete pre-build interrogation before implementation work.
+    required_if: change affects framework source-of-truth, executable contract placement, runtime projection, or duplicate activation risk.
+    must_answer:
+      - goal_scope_and_non_goals
+      - canonical_source_owner
+      - projection_boundary
+      - source_of_truth_duplication_risk
+      - runtime_trigger_flow_or_doc_only_reason
+      - validation_targets
+    gates:
+      - gate.system_upgrade.pre_build_interrogation_complete
+
+  - id: require_upgrade_plan_sections
+    order: 3
+    action: Ensure the active plan contains the required upgrade sections before implementation.
+    required_sections:
+      - Status
+      - Decision Rationale
+      - Runtime Execution Path
+      - Phase 0 Pre-Build Interrogation
+      - Phase N Test-First Order
+      - Completion Criteria
+      - Linked Updates
+    gates:
+      - gate.system_upgrade.plan_sections_complete
+
+  - id: define_runtime_trigger_flow
+    order: 4
+    action: Define an executable runtime trigger flow, or explicitly declare a bounded doc-only trial.
+    required_chain:
+      - event_or_signal
+      - detector_route_query_hook_or_validation_command
+      - loaded_source_or_executable_contract
+      - runtime_action_or_blocking_gate
+      - observable_evidence
+    forbidden:
+      - routing_only_without_detector_or_action
+      - agent_will_read_when_needed
+      - future_runtime_route_without_phase_or_entry_condition
+      - file_paths_without_event_detector_action_and_evidence
+    doc_only_trial_requires:
+      - explicit_statement_this_plan_does_not_enter_runtime
+      - reason
+      - future_activation_phase_and_entry_condition
+      - drift_prevention_during_trial
+    gates:
+      - gate.system_upgrade.runtime_trigger_flow_complete
+
+  - id: write_test_first_scenarios
+    order: 5
+    action: Write validation scenarios before implementation for each phase with runtime or governance behavior.
+    required_if: change affects runtime, governance, workflow, validation, scenario, metadata, compiler, generated artifact, or framework naming.
+    must_do_before_implementation:
+      - list_expected_observable_behavior
+      - create_validation_scenarios
+      - run_detection_commands_and_confirm_fail_by_absence
+      - commit_scenarios_separately_when_phase_work_starts
+    gates:
+      - gate.system_upgrade.test_first_scenarios_ready
+
+  - id: execute_linked_updates
+    order: 6
+    action: Update linked surfaces and generated/runtime surfaces in the same change batch.
+    must_check:
+      - root_and_layer_readmes
+      - routing_registry
+      - executable_contract_inventory
+      - validation_scenarios
+      - knowledge_graphs_and_summaries
+      - runtime_compile_refresh_validate
+      - tool_sync_when_tool_mirror_is_changed
+    gates:
+      - gate.system_upgrade.linked_updates_complete
+
+  - id: close_loop
+    order: 7
+    action: Validate, commit, push, read back changed sources, and confirm clean status before completion claim.
+    must_run:
+      - diff_review
+      - repo_local_runtime_compile_refresh_validate_when_affected
+      - git_commit
+      - git_push
+      - readback_updated_sources
+      - git_status_short_branch
+    gates:
+      - gate.system_upgrade.close_loop_complete
+
+gates:
+  - id: gate.system_upgrade.scope_classified
+    blocks: implementation_start
+    pass_when:
+      - upgrade scope decision is recorded
+      - non-major upgrade exemption is explicit when claimed
+
+  - id: gate.system_upgrade.pre_build_interrogation_complete
+    blocks: implementation_start
+    pass_when:
+      - pre-build interrogation answers canonical owner, projection boundary, duplication risk, and validation targets
+      - unresolved execution semantics are escalated before implementation
+
+  - id: gate.system_upgrade.plan_sections_complete
+    blocks: implementation_start
+    pass_when:
+      - required active plan sections exist or are explicitly not applicable with reason
+      - completion criteria include README/index/runtime/validation/close-loop checks when relevant
+
+  - id: gate.system_upgrade.runtime_trigger_flow_complete
+    blocks: plan_completion
+    pass_when:
+      - non-doc-only plans define event to evidence trigger flow
+      - doc-only trials define reason, future activation phase, and drift prevention
+
+  - id: gate.system_upgrade.test_first_scenarios_ready
+    blocks: phase_implementation
+    pass_when:
+      - validation scenarios are created before implementation for runtime-affecting phases
+      - fail-by-absence evidence is recorded unless an allowed exemption applies
+
+  - id: gate.system_upgrade.linked_updates_complete
+    blocks: commit_or_completion_claim
+    pass_when:
+      - required linked surfaces are updated or explicitly marked not applicable
+      - generated/runtime surfaces are refreshed and validated when affected
+
+  - id: gate.system_upgrade.close_loop_complete
+    blocks: final_response
+    pass_when:
+      - diff reviewed, validation passed, commit pushed, sources reread, and git status is clean
+
+required_evidence:
+  - upgrade scope decision
+  - pre-build interrogation answers or not-applicable reason
+  - Runtime Execution Path with trigger flow or doc-only trial declaration
+  - validation scenarios and test-first evidence
+  - linked update summary
+  - runtime compile/refresh/validate result or not-affected reason
+  - commit hash, push result, readback sources, and clean git status
+
+success_criteria:
+  - Framework upgrades cannot be completed with only documentation-layer prose.
+  - Runtime trigger flow names the event, detector, source/contract, action/blocker, and evidence.
+  - Test-first scenarios exist before implementation for runtime-affecting phases.
+  - Companion YAML is projected to runtime.db generated_surfaces when execution-affecting.
+  - Final status reports include validation and close-loop evidence.
+
+failure_modes:
+  - id: routing_only_trigger_flow
+    detection: Plan says routing registry will trigger behavior without detector, query/hook, loaded source, runtime action, or evidence.
+    recovery: Add explicit trigger flow or declare a bounded doc-only trial.
+  - id: document_layer_only_upgrade
+    detection: Framework upgrade adds Markdown guidance but no runtime projection, validation scenario, or doc-only trial boundary.
+    recovery: Add YAML contract, runtime projection, scenario, or explicit doc-only trial phase.
+  - id: implementation_before_scenarios
+    detection: Runtime-affecting phase implementation starts before scenarios exist and fail by absence.
+    recovery: Stop implementation, write scenarios, record fail-by-absence, then resume.
+  - id: missing_linked_update
+    detection: Source changes without inventory, routing, README, summary, graph, or runtime surface update/check.
+    recovery: Complete linked updates or record not-applicable reasons before commit.
+  - id: close_loop_without_readback
+    detection: Agent claims completion after commit/push without rereading updated sources and clean git status.
+    recovery: Reread updated sources, rerun status, and report exact validation evidence.
+
+final_status_report:
+  required_fields:
+    - scope_decision
+    - trigger_flow_status
+    - test_first_status
+    - linked_updates
+    - runtime_validation
+    - commit_and_push_status
+    - readback_and_clean_status

@@ -216,6 +216,10 @@ inventory:
       contract: governance/lifecycle/directory-structure-governance.yaml
       state: contract_exists
       reason: Directory creation, rename, boundary, naming, reference impact, and validation checkpoints now have a governance contract.
+    - source: governance/lifecycle/system-upgrade-governance.md
+      contract: governance/lifecycle/system-upgrade-governance.yaml
+      state: contract_exists
+      reason: Framework upgrade scope, pre-build interrogation, runtime trigger flow, test-first scenarios, linked updates, and close-loop gates now have a governance contract.
     - source: governance/ai-runtime-governance/linked-update-governance.md
       contract: governance/ai-runtime-governance/linked-update-governance.yaml
       state: contract_exists

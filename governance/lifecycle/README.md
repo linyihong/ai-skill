@@ -41,7 +41,7 @@
 - `markdown_only`：哲學、背景、tradeoff、設計理由或索引，不投影 runtime。
 - `not_applicable`：template、example、deprecated stub 或非 owner source。
 
-Lifecycle executable contracts include [`directory-structure-governance.yaml`](directory-structure-governance.yaml), [`knowledge-update-flow.yaml`](knowledge-update-flow.yaml), [`executable-contract-boundary.yaml`](executable-contract-boundary.yaml), and [`executable-contract-inventory.yaml`](executable-contract-inventory.yaml).
+Lifecycle executable contracts include [`directory-structure-governance.yaml`](directory-structure-governance.yaml), [`system-upgrade-governance.yaml`](system-upgrade-governance.yaml), [`knowledge-update-flow.yaml`](knowledge-update-flow.yaml), [`executable-contract-boundary.yaml`](executable-contract-boundary.yaml), and [`executable-contract-inventory.yaml`](executable-contract-inventory.yaml).
 
 ## 持久目標邊界（Durable Goal Boundary）
 

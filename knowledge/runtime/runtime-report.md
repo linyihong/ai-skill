@@ -6,7 +6,7 @@
 
 | Surface | Path | Count / Status |
 | --- | --- | --- |
-| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 54 records |
+| Routing registry | [`routing-registry.yaml`](routing-registry.yaml) | 55 records |
 | Refresh policy | [`refresh-policy.yaml`](refresh-policy.yaml) | candidate |
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
@@ -71,6 +71,7 @@
 | `route.runtime.output-governance` | `runtime/README.md` | `small` | `source-backed` | Language consistency 已確認，sanitization 已通過，tool neutrality 已檢查， format compliance 已驗證，governance gates 全部通過。  |
 | `route.runtime.distributed` | `runtime/README.md` | `small` | `source-backed` | Distributed locks 已正確 acquire/release，multi-agent coordination rules 已遵守， async job lifecycle 狀態轉換正確，無 deadlock 或 stale state。  |
 | `route.governance.executable-contract-boundary` | `governance/lifecycle/executable-contract-boundary.yaml` | `small` | `source-backed` | YAML contract inventory 已載入；pre-build interrogation 已確認 canonical owner、projection boundary 與 duplication risk； runtime_projection.enabled contract 已由 compiler 投影到 runtime.db；普通 metadata / graph / validation YAML 不會自動進 runtime。  |
+| `route.governance.system-upgrade` | `governance/lifecycle/system-upgrade-governance.yaml` | `small` | `source-backed` | system-upgrade-governance.yaml 已載入並投影到 runtime.db generated_surfaces； active plan 具備 Runtime Execution Path + Trigger flow；runtime refresh/validate 與 close-loop evidence 已記錄。  |
 | `route.governance.knowledge-update-flow` | `governance/lifecycle/knowledge-update-flow.yaml` | `small` | `source-backed` | 目前 knowledge update 的步驟已確認，entry conditions 已滿足，exit conditions 已檢查，reference sources 已載入；linked update completeness gates 已通過， 下一步驟已決定。  |
 
 ## Summary Records
