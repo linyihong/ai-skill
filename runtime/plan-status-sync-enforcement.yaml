@@ -1,0 +1,102 @@
+schema_version: "1.0"
+id: runtime.plan-status-sync
+status: active
+owner_layer: runtime
+source_markdown: null
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.plan_status_sync.contract
+  surface: generated_surfaces
+
+purpose: >
+  Machine-checkable executable contract. Prevents the failure mode where a
+  commit claims phase / milestone completion but does not update the
+  corresponding plan file in the same commit, allowing plan status to
+  drift away from runtime evidence.
+
+  Trigger rule: if a commit body uses completion vocabulary AND references
+  an active plan file by path, that plan file MUST be in the commit's
+  staged files. Enforced by the commit-msg hook.
+
+trigger:
+  completion_phrases:
+    # English
+    - "complete"
+    - "completed"
+    - "completes"
+    - "done"
+    - "finish"
+    - "finished"
+    # Chinese
+    - "完成"
+    - "結案"
+    - "結束"
+    # Visual markers
+    - "✅"
+
+  phase_phrases:
+    # Detects when completion vocabulary is anchored to a phase / milestone
+    - regex: 'Phase\s+\d+(?:\.\d+)?(?:[\.-][A-Za-z]+)?'
+    - regex: 'phase\s+\d+(?:\.\d+)?(?:[\.-][A-Za-z]+)?'
+
+  plan_path_regex: 'plans/active/[^\s)"\]]+\.md'
+
+  composition: |
+    Trigger fires when:
+      (commit body matches >=1 completion_phrase)
+      AND
+      (commit body matches >=1 phase_phrases regex)
+      AND
+      (commit body references >=1 plan_path)
+
+enforcement:
+  rule: |
+    When trigger fires, every plan_path mentioned in the commit body
+    MUST also appear in the commit's staged files. The plan file is
+    expected to record the completion (status table, ✅ marker, or
+    similar evidence) so that runtime evidence and plan state stay
+    synchronized.
+  failure_action: block_commit
+  failure_code: plan_status_not_synced
+  failure_message: |
+    Commit body claims phase / milestone completion and references a plan
+    file, but that plan file is not in the staged set. Update the plan's
+    Phase / milestone section in the same commit so plan status stays in
+    sync with runtime evidence.
+  remediation:
+    - "git add <plan-file>"
+    - "Update the Phase / milestone section status indicator (✅ / completed / done)"
+    - "Re-commit"
+
+  opt_out_marker: "[skip-plan-status-sync]"
+  opt_out_rationale: >
+    Rare cases (post-mortem reports, retrospectives that intentionally
+    reference past completions without mutating the plan) may opt out
+    via a standalone trailer line. Mechanical opt-outs should be rare.
+
+scope_boundaries:
+  applies_to:
+    - commit-msg hook execution path
+    - any commit whose body references plans/active/*.md with completion vocabulary
+  does_not_apply_to:
+    - merge commits (auto-skipped earlier in commit-msg hook)
+    - commits with [skip-cognitive-mode] marker (already skipped before this validator)
+    - commits whose body references archived plans (plans/archived/) — no enforcement needed
+    - commits that mention a plan but use non-completion vocabulary (e.g. "see plans/...")
+
+failure_pattern_linkage:
+  related:
+    - enforcement/failure-patterns/knowledge-update-flow-bypassed-by-sub-pipeline.md
+    - enforcement/failure-patterns/correction-loop-bypass.md
+
+acceptance:
+  - scenario plan-status-sync-enforcement-v1 PASS
+  - commit-msg hook calls validatePlanStatusSync after Cognitive Mode block check
+  - YAML contract projected to generated_surfaces (target_key = runtime.plan_status_sync.contract)
+
+source: >
+  2026-05-25 session. User feedback after Phase 3 deferred items were
+  carried across multiple commits without same-commit plan status update:
+  「phase 4如果已經完成了 要在那輪對話 就更新狀態 你調整一下 runtime(yaml)
+  不要讓這件事情再發生了」.

@@ -1,0 +1,66 @@
+# Source: runtime.plan-status-sync executable contract behavioral wiring
+# Test-first per system-upgrade-governance §3 Rule 9
+id: plan-status-sync-enforcement-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: knowledge-update-flow-bypassed-by-sub-pipeline
+  class: process-gap / drift
+  date: "2026-05-25"
+  description: |
+    Failure mode: commit claims phase / milestone completion (uses completion
+    vocabulary near "Phase N" mention AND references plans/active/<f>.md)
+    but does NOT include that plan file in staged set. Plan state drifts
+    away from runtime evidence over time.
+
+    User feedback after Phase 3 Deferred Items were marked completed in
+    a separate commit cycle (not in the same commits that did the work):
+    「phase 4如果已經完成了 要在那輪對話 就更新狀態 你調整一下 runtime(yaml)
+    不要讓這件事情再發生了」
+
+    Enforcement design:
+    1. runtime/plan-status-sync-enforcement.yaml — executable contract
+       projected to runtime.plan_status_sync.contract in generated_surfaces
+    2. validatePlanStatusSync in hooks.go — fires inside commit-msg hook
+       after Cognitive Mode block check. When trigger matches and plan
+       file is not staged, block.
+
+given:
+  task: plan_status_sync_enforcement_completion_check
+  artifacts:
+    - runtime/plan-status-sync-enforcement.yaml
+    - scripts/ai-skill-cli/internal/app/hooks.go
+    - runtime/runtime.db (generated_surfaces)
+  signals:
+    - YAML contract file exists
+    - validatePlanStatusSync function in hooks.go
+    - runCommitMsgHook calls validatePlanStatusSync
+    - generated_surfaces row with target_key = runtime.plan_status_sync.contract
+
+when:
+  action: plan_status_sync_completion_check
+
+then:
+  expected_route:
+    - runtime/plan-status-sync-enforcement.yaml exists
+    - hooks.go contains validatePlanStatusSync
+    - runCommitMsgHook calls it
+    - generated_surfaces projected (target_key = runtime.plan_status_sync.contract)
+  forbidden_routes:
+    - claim_done_without_yaml_contract
+    - claim_done_without_validator
+    - claim_done_without_runCommitMsgHook_call
+    - claim_done_without_projection
+
+validation:
+  detection_command: |
+    y=$(test -f runtime/plan-status-sync-enforcement.yaml && echo 1 || echo 0)
+    v=$(grep -c 'func validatePlanStatusSync' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validatePlanStatusSync')
+    p=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.plan_status_sync.contract';" 2>/dev/null)
+    [ "${y:-0}" -ge 1 ] && [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && [ "${p:-0}" -ge 1 ] && echo "PASS" || echo "FAIL y=${y:-0} v=${v:-0} rch=${rch:-0} p=${p:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（validator/runCommitMsgHook call/projection not yet present）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
