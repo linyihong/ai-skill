@@ -1,9 +1,9 @@
 # Runtime Cognitive Modes System
 
-**Status**: `in-progress`（Phase D ✅ + Phase 0 ✅ + **Phase 1 完成**（4/4 scenarios pass）；Phase 2 Discovery Heuristics 待啟動）
+**Status**: `in-progress`（Phase D ✅ + Phase 0 ✅ + Phase 1 ✅ + **Phase 2 完成**（4/4 scenarios pass）；Phase 3 Subsystem 整合待啟動）
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-22
-**最後更新**：2026-05-25（Phase 1.B: Go rebuild + cognitive_modes table + generated_surfaces projection + 4 scenarios all PASS）
+**最後更新**：2026-05-25（Phase 2: discovery YAML + discovery_signals table（14 rows, 8 signal types）+ 4 scenarios all PASS）
 
 > ⚠️ 本 plan 處於 `in-progress` 階段：**Phase D documentation-contract trial 已完成並通過評估指標**；Phase 0 (Pre-Build Interrogation) 與 Phase 1-5 runtime 實作待 user 決定是否啟動。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
 >
@@ -509,12 +509,12 @@ CREATE TABLE cognitive_modes (
 
 `runtime/cognitive-modes-discovery.yaml`，將訊號 → mode 規則機器化。
 
-### Phase 2 完成條件
+### Phase 2 完成條件（2026-05-25 completed）
 
-- [ ] Discovery 訊號規則表完整
-- [ ] 在 runtime.db `discovery_signals` 表中可查詢
-- [ ] 規則 fallback：訊號不命中時用 default mode
-- [ ] POC：5 個常見任務類型測試 discovery 輸出符合預期
+- [x] Discovery 訊號規則表完整（14 rules，8 signal types，覆蓋 plan §2.1 全部訊號）
+- [x] 在 runtime.db `discovery_signals` 表中可查詢（compiler 從 YAML 投影）
+- [x] 規則 fallback：訊號不命中時用 default mode（fallback section 明確定義）
+- [x] POC：5 個常見任務類型測試 discovery 輸出符合預期（8 distinct signal_type PASS）
 
 ---
 

@@ -1,0 +1,191 @@
+schema_version: "1.0"
+id: runtime.cognitive-modes-discovery
+status: active
+owner_layer: runtime
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.cognitive_modes.discovery
+  surface: generated_surfaces
+
+purpose: >
+  Signal → mode mapping rules for cognitive mode discovery.
+  Phase 2: signals are evaluated at task entry to resolve 4 mode dimensions
+  without document lookup (< 50 tokens overhead).
+  Phase 3+: subsystem integration uses resolved modes to adapt behavior.
+
+  Signal types cover plan §2.1 taxonomy: user_keyword, file_diff_scope,
+  git_status, session_turns, recent_failure, phase_machine_state,
+  active_goals, token_budget.
+
+signals:
+  # ── user_keyword signals ────────────────────────────────────────────────
+  - name: user_keyword_fast
+    signal_type: user_keyword
+    pattern: "快速|typo|修一下|簡單|quick|minor|fix typo"
+    execution_mode: FAST
+    context_mode: SUMMARY_FIRST
+    governance_mode: null
+    memory_mode: null
+    priority: 10
+    description: User signals a quick / low-stakes task
+
+  - name: user_keyword_deep
+    signal_type: user_keyword
+    pattern: "分析|跨層|migration|重構|refactor|架構|design|全面|trace"
+    execution_mode: DEEP
+    context_mode: SOURCE_BACKED
+    governance_mode: STRICT
+    memory_mode: null
+    priority: 10
+    description: User signals deep analysis or cross-layer work
+
+  - name: user_keyword_recovery
+    signal_type: user_keyword
+    pattern: "recover|失誤|重做|rollback|回退|undo|oops|mistake"
+    execution_mode: RECOVERY
+    context_mode: CHECKLIST_FIRST
+    governance_mode: STRICT
+    memory_mode: FAILURE_REPLAY
+    priority: 15
+    description: User signals a recovery or rollback situation
+
+  # ── file_diff_scope signals ─────────────────────────────────────────────
+  - name: file_diff_governance_enforcement
+    signal_type: file_diff_scope
+    pattern: "^enforcement/|^governance/"
+    execution_mode: null
+    context_mode: null
+    governance_mode: STRICT
+    memory_mode: null
+    priority: 20
+    description: Diff touches enforcement or governance layer → STRICT gate set
+
+  - name: file_diff_notes_ephemeral
+    signal_type: file_diff_scope
+    pattern: "^notes/|^memory/working/"
+    execution_mode: null
+    context_mode: null
+    governance_mode: LIGHT
+    memory_mode: null
+    priority: 5
+    description: Diff only touches ephemeral notes → LIGHT governance
+
+  - name: file_diff_runtime_schema
+    signal_type: file_diff_scope
+    pattern: "^runtime/|^scripts/ai-skill-cli/"
+    execution_mode: DEEP
+    context_mode: SOURCE_BACKED
+    governance_mode: STRICT
+    memory_mode: null
+    priority: 25
+    description: Diff touches runtime or compiler → DEEP + STRICT (generated surface risk)
+
+  # ── git_status signals ──────────────────────────────────────────────────
+  - name: git_status_multi_owner_dirty
+    signal_type: git_status
+    pattern: "dirty_multi_owner"
+    execution_mode: null
+    context_mode: null
+    governance_mode: STRICT
+    memory_mode: null
+    priority: 20
+    description: Dirty working tree spanning multiple owner groups → STRICT
+
+  # ── session_turns signals ───────────────────────────────────────────────
+  - name: session_turns_high
+    signal_type: session_turns
+    pattern: ">50"
+    execution_mode: null
+    context_mode: null
+    governance_mode: null
+    memory_mode: PROJECT_CONTEXT
+    priority: 8
+    description: Long session (>50 turns) → load project context memory
+
+  # ── recent_failure signals ──────────────────────────────────────────────
+  - name: recent_failure_repeat
+    signal_type: recent_failure
+    pattern: "failure_repeat>=2"
+    execution_mode: RECOVERY
+    context_mode: CHECKLIST_FIRST
+    governance_mode: STRICT
+    memory_mode: FAILURE_REPLAY
+    priority: 30
+    description: Repeated failure (≥2) → RECOVERY mode with failure replay
+
+  # ── phase_machine_state signals ─────────────────────────────────────────
+  - name: phase_machine_bootstrap
+    signal_type: phase_machine_state
+    pattern: "bootstrap"
+    execution_mode: NORMAL
+    context_mode: SUMMARY_FIRST
+    governance_mode: LIGHT
+    memory_mode: null
+    priority: 5
+    description: Bootstrap phase → LIGHT governance (setup tasks)
+
+  - name: phase_machine_validation
+    signal_type: phase_machine_state
+    pattern: "validation|checkpoint"
+    execution_mode: null
+    context_mode: CHECKLIST_FIRST
+    governance_mode: STRICT
+    memory_mode: null
+    priority: 20
+    description: Validation / checkpoint phase → STRICT governance
+
+  # ── active_goals signals ────────────────────────────────────────────────
+  - name: active_goals_locked_or_multiple
+    signal_type: active_goals
+    pattern: "has_lock|active_count>=2"
+    execution_mode: null
+    context_mode: null
+    governance_mode: STRICT
+    memory_mode: null
+    priority: 20
+    description: Active goals with lock or ≥2 concurrent → STRICT governance
+
+  # ── token_budget signals ────────────────────────────────────────────────
+  - name: token_budget_low
+    signal_type: token_budget
+    pattern: "<30%"
+    execution_mode: null
+    context_mode: SUMMARY_FIRST
+    governance_mode: null
+    memory_mode: null
+    priority: 25
+    description: Token budget <30% → downgrade context to SUMMARY_FIRST
+
+  - name: token_budget_critical
+    signal_type: token_budget
+    pattern: "<15%"
+    execution_mode: null
+    context_mode: INDEX_ONLY
+    governance_mode: null
+    memory_mode: NONE
+    priority: 30
+    description: Token budget <15% → INDEX_ONLY context, clear memory mode
+
+fallback:
+  description: >
+    No signal matched. Use 4 mode defaults from cognitive-modes.yaml.
+    Agent must still manually resolve and record in final report.
+  execution_mode: NORMAL
+  context_mode: SUMMARY_FIRST
+  governance_mode: STANDARD
+  memory_mode: NONE
+
+resolution_rules:
+  conflict_resolution: highest_priority_wins
+  null_mode_means: no_override_keep_current_or_use_fallback
+  multiple_signals_same_dimension: highest_priority_signal_wins
+  note: >
+    When multiple signals fire for the same mode dimension, the one with
+    the highest priority value wins. null mode values in a signal mean
+    "do not override that dimension" — use another signal's value or fallback.
+
+related:
+  contract: runtime/cognitive-modes.yaml
+  plan: plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md §Phase 2
+  pre_written_scenarios_commit: 06f52ab

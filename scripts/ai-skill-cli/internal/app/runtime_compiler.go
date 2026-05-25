@@ -134,6 +134,7 @@ func createGoRuntimeSchema(db *sql.DB) error {
 		`CREATE TABLE async_job_lifecycle (id INTEGER PRIMARY KEY AUTOINCREMENT, state TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE capability_checkpoints (id INTEGER PRIMARY KEY AUTOINCREMENT, checkpoint_id TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE cognitive_modes (id INTEGER PRIMARY KEY, task_id TEXT, execution_mode TEXT, context_mode TEXT, governance_mode TEXT, memory_mode TEXT, resolved_at TEXT, source TEXT);`,
+		`CREATE TABLE discovery_signals (id INTEGER PRIMARY KEY AUTOINCREMENT, signal_name TEXT NOT NULL, signal_type TEXT NOT NULL, pattern TEXT, execution_mode TEXT, context_mode TEXT, governance_mode TEXT, memory_mode TEXT, priority INTEGER DEFAULT 0, description TEXT);`,
 	}
 	for _, statement := range statements {
 		if _, err := db.Exec(statement); err != nil {
@@ -550,6 +551,45 @@ func compileProseRuntimeSources(repo string, db *sql.DB, docs map[string]map[str
 	if err := compileExecutableYAMLContracts(repo, db); err != nil {
 		return err
 	}
+	if err := compileDiscoverySignals(repo, db); err != nil {
+		return err
+	}
+	return nil
+}
+
+func compileDiscoverySignals(repo string, db *sql.DB) error {
+	yamlPath := filepath.Join(repo, "runtime", "cognitive-modes-discovery.yaml")
+	content, err := os.ReadFile(yamlPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	var data map[string]any
+	if err := yaml.Unmarshal(content, &data); err != nil {
+		return fmt.Errorf("compile discovery signals: %w", err)
+	}
+	for _, sig := range runtimeSliceOfMaps(data["signals"]) {
+		priority := 0
+		if p, ok := sig["priority"].(int); ok {
+			priority = p
+		}
+		if _, err := db.Exec(
+			`INSERT INTO discovery_signals (signal_name, signal_type, pattern, execution_mode, context_mode, governance_mode, memory_mode, priority, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			runtimeString(sig["name"]),
+			runtimeString(sig["signal_type"]),
+			runtimeString(sig["pattern"]),
+			runtimeNullableString(sig["execution_mode"]),
+			runtimeNullableString(sig["context_mode"]),
+			runtimeNullableString(sig["governance_mode"]),
+			runtimeNullableString(sig["memory_mode"]),
+			priority,
+			runtimeString(sig["description"]),
+		); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -952,6 +992,17 @@ func runtimeString(value any) string {
 	default:
 		return fmt.Sprint(typed)
 	}
+}
+
+func runtimeNullableString(value any) any {
+	if value == nil {
+		return nil
+	}
+	s := runtimeString(value)
+	if s == "" {
+		return nil
+	}
+	return s
 }
 
 func runtimeDefaultString(value any, fallback string) string {
