@@ -644,9 +644,24 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 ### Phase 5 完成條件
 
-- [ ] Adaptive 規則表
-- [ ] runtime 偵測訊號 → 自動切 mode
-- [ ] 測試 case：模擬 contradiction / failure / budget overflow 三種情境
+- [x] Adaptive 規則表 — `runtime/cognitive-modes-adaptive.yaml` 6 triggers（3 commit-msg-detectable + 3 out-of-scope for commit-msg layer）；projected to `generated_surfaces` (target_key=`runtime.cognitive_modes.adaptive`)
+- [x] runtime 偵測訊號 → 自動切 mode — `validateAdaptiveTriggers` in `scripts/ai-skill-cli/internal/app/hooks.go` 由 commit-msg hook 觸發；3 commit-msg-detectable triggers 已 enforced（contradiction_risk block / repeated_failure block / budget_near_ceiling warning）
+- [x] 測試 case：模擬 contradiction / failure / budget overflow 三種情境 — `TestValidateAdaptiveTriggers` 3 case PASS；scenario `phase5-adaptive-triggers-v1` PASS
+
+**Phase 5 完成日期**：2026-05-25
+
+**Scope boundary at commit-msg layer**：
+
+| Trigger | Commit-msg 偵測 | 動作 |
+|---|---|---|
+| contradiction_risk | ✅ keyword + ≥2 distinct source refs | block 若 governance<STRICT 或 context<SOURCE_BACKED |
+| repeated_failure | ✅ ≥2 failure-pattern refs OR ≥2 revert/hotfix/retry | block 若 execution≠RECOVERY 或 memory≠FAILURE_REPLAY |
+| budget_near_ceiling | ✅ Token Estimate ≥80% budget | warning（advisory） |
+| tool_call_loop_detection | ❌ 需 per-tool-call interception | 不在 commit-msg 範圍 |
+| cross_session_memory_hit_rate | ❌ 需 cross-session stats | 不在 commit-msg 範圍 |
+| phase_transition_remap | ❌ 需 phase transition events | 不在 commit-msg 範圍 |
+
+**Plan 整體完成**：Phase D + Phase 0-5 全部 ✅。剩餘 deferred items（ADR Promotion Criteria 評估、5 tasks 累積）為自然進行項，無 implementation work。
 
 ---
 

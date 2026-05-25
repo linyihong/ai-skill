@@ -347,3 +347,58 @@ func TestValidateTokenBudget(t *testing.T) {
 		t.Fatalf("expected no enforcement for unknown mode, got %q", v)
 	}
 }
+
+func TestValidateAdaptiveTriggers(t *testing.T) {
+	// Case 1: contradiction_risk fires when keyword + ≥2 distinct sources
+	modes := map[string]string{"execution_mode": "NORMAL", "context_mode": "SUMMARY_FIRST", "governance_mode": "STANDARD", "memory_mode": "EPISODIC"}
+	body := "feat: reconcile contradict plans/active/a.md vs constitution/ADR-001.md"
+	v := validateAdaptiveTriggers(modes, body)
+	if v == "" {
+		t.Fatal("expected contradiction_risk violation")
+	}
+	// Same body but with STRICT + SOURCE_BACKED → ok
+	modes2 := map[string]string{"execution_mode": "DEEP", "context_mode": "SOURCE_BACKED", "governance_mode": "STRICT", "memory_mode": "DECISION_REPLAY"}
+	v = validateAdaptiveTriggers(modes2, body)
+	if v != "" {
+		t.Fatalf("expected no violation with STRICT+SOURCE_BACKED, got %q", v)
+	}
+
+	// Case 2: repeated_failure — 2 failure-pattern refs
+	body2 := "fix: address enforcement/failure-patterns/foo.md and enforcement/failure-patterns/bar.md"
+	v = validateAdaptiveTriggers(modes, body2)
+	if v == "" {
+		t.Fatal("expected repeated_failure violation")
+	}
+	// Same body with RECOVERY + FAILURE_REPLAY → ok
+	modes3 := map[string]string{"execution_mode": "RECOVERY", "context_mode": "CHECKLIST_FIRST", "governance_mode": "STRICT", "memory_mode": "FAILURE_REPLAY"}
+	v = validateAdaptiveTriggers(modes3, body2)
+	if v != "" {
+		t.Fatalf("expected no violation with RECOVERY+FAILURE_REPLAY, got %q", v)
+	}
+
+	// Case 3: budget_near_ceiling — Token Estimate at 90% of NORMAL budget (5000)
+	body3 := "feat: medium work\n\nToken Estimate: 4500\n"
+	v = validateAdaptiveTriggers(modes, body3)
+	if v == "" {
+		t.Fatal("expected near-ceiling warning")
+	}
+	if !contains(v, "≥80%") {
+		t.Fatalf("expected near-ceiling warning text, got %q", v)
+	}
+
+	// Opt-out marker skips all
+	v = validateAdaptiveTriggers(modes, body+"\n\n[skip-adaptive]\n")
+	if v != "" {
+		t.Fatalf("expected no violation with opt-out, got %q", v)
+	}
+}
+
+func contains(s, sub string) bool { return len(s) >= len(sub) && (s == sub || (len(s) > 0 && (func() bool {
+	for i := 0; i+len(sub) <= len(s); i++ {
+		if s[i:i+len(sub)] == sub {
+			return true
+		}
+	}
+	return false
+}())))
+}

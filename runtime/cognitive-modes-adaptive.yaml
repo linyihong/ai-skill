@@ -1,0 +1,153 @@
+schema_version: "1.0"
+id: runtime.cognitive-modes.adaptive
+status: active
+owner_layer: runtime
+source_markdown: null
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.cognitive_modes.adaptive
+  surface: generated_surfaces
+
+purpose: >
+  Adaptive trigger table for cognitive mode adjustment per plan §Phase 5.1.
+  Mode resolution is no longer purely fixed at task start; specific runtime
+  signals demand mode adjustment.
+
+  Scope: at commit-msg hook layer, 3 of 6 triggers are practically detectable
+  from commit body / staged files context. The other 3 (tool-call loop
+  detection, cross-session memory hit rate, phase transition) require
+  per-tool-call interception infrastructure that is out of scope for the
+  commit-msg layer; they are listed for completeness as design contract
+  but enforced behaviorally only when adaptive runtime infrastructure
+  exists (no plan for that infrastructure currently).
+
+triggers:
+  # ── Commit-msg layer detectable ──
+  - id: contradiction_risk
+    detectable_at: commit_msg
+    source: cross-source compare (body mentions of "contradiction", "conflict", "mismatch", "discrepancy" near multiple plan / decision references)
+    detection_signals:
+      keywords:
+        - contradiction
+        - conflict
+        - mismatch
+        - discrepancy
+        - contradicts
+        - conflicting
+        - 衝突
+        - 矛盾
+        - 不一致
+      additional_context_required: |
+        Keyword presence alone is too noisy. Validator should fire only
+        when contradiction-class keyword appears AND commit body references
+        2+ distinct sources (plans/, constitution/, decisions/) within close
+        proximity.
+    expected_action:
+      governance_mode_floor: STRICT
+      context_mode_floor: SOURCE_BACKED
+    failure_message_template: |
+      Commit body indicates contradiction risk (keyword=<kw>) but declared
+      governance_mode=<gov> or context_mode=<ctx> below the required floor
+      (governance_mode≥STRICT, context_mode≥SOURCE_BACKED). Upgrade and
+      re-commit, or split the work.
+
+  - id: repeated_failure
+    detectable_at: commit_msg
+    source: commit body mentions ≥2 failure patterns OR ≥2 recent revert / hotfix references
+    detection_signals:
+      patterns:
+        - "enforcement/failure-patterns/.+\\.md"
+        - "(?i)revert"
+        - "(?i)hotfix"
+        - "(?i)retry"
+      threshold: 2
+    expected_action:
+      execution_mode_required: RECOVERY
+      memory_mode_required: FAILURE_REPLAY
+    failure_message_template: |
+      Commit body mentions ≥2 failure patterns / reverts (matches=<n>) but
+      execution_mode=<exec> ≠ RECOVERY or memory_mode=<mem> ≠ FAILURE_REPLAY.
+      Repeated failure signal requires recovery posture.
+
+  - id: budget_near_ceiling
+    detectable_at: commit_msg
+    source: Token Estimate ≥ 80% of declared mode tuple budget
+    detection_signals:
+      threshold_ratio: 0.80
+    expected_action:
+      downgrade_context_mode_one_step: true
+      downgrade_path:
+        - GRAPH_ASSISTED
+        - SOURCE_BACKED
+        - CHECKLIST_FIRST
+        - SUMMARY_FIRST
+        - INDEX_ONLY
+    failure_message_template: |
+      Token Estimate=<n> is ≥80% of budget=<max> for mode tuple. Downgrade
+      context_mode one step along the downgrade_path, OR split the work.
+      (Not yet blocking — warning level; promotion to block once Phase 5+
+       gains adaptive infrastructure.)
+    severity_at_commit_msg: warning
+
+  # ── Out of scope at commit-msg layer ──
+  - id: tool_call_loop_detection
+    detectable_at: adaptive_runtime  # NOT commit-msg
+    source: per-tool-call history (≥3 identical or near-identical calls in a row)
+    expected_action:
+      governance_mode_upgrade_required: true
+      escalation_to_recovery: true
+    note: |
+      Requires tool-call interception infrastructure. Documented for
+      completeness; not enforced at commit-msg layer.
+
+  - id: cross_session_memory_hit_rate
+    detectable_at: adaptive_runtime  # NOT commit-msg
+    source: memory retrieval statistics across sessions
+    expected_action:
+      adjust_memory_mode_strength: true
+    note: |
+      Requires cross-session statistics storage. Out of scope.
+
+  - id: phase_transition_remap
+    detectable_at: adaptive_runtime  # NOT commit-msg
+    source: phase_machine phase change event
+    expected_action:
+      reevaluate_all_4_modes: true
+    note: |
+      Requires phase transition events visible to validator. Out of scope.
+
+enforcement:
+  validator: validateAdaptiveTriggers
+  validator_location: scripts/ai-skill-cli/internal/app/hooks.go
+  applies_to:
+    - commits whose Cognitive Mode block declares execution_mode/context_mode/governance_mode/memory_mode
+  does_not_apply_to:
+    - merge commits (auto-skipped earlier in commit-msg)
+    - commits with [skip-cognitive-mode] or [skip-adaptive] marker
+  opt_out_marker: "[skip-adaptive]"
+
+scope_boundaries:
+  at_commit_msg_layer:
+    enforced:
+      - contradiction_risk (block if floor violated)
+      - repeated_failure (block if mode not RECOVERY/FAILURE_REPLAY)
+      - budget_near_ceiling (warning only)
+    not_enforced:
+      - tool_call_loop_detection
+      - cross_session_memory_hit_rate
+      - phase_transition_remap
+
+failure_pattern_linkage:
+  related:
+    - enforcement/failure-patterns/cognitive-mode-resolution-bypass.md
+    - enforcement/failure-patterns/cognitive-budget-overflow.md
+
+acceptance:
+  - scenario phase5-adaptive-triggers-v1 PASS
+  - YAML projected to generated_surfaces (target_key = runtime.cognitive_modes.adaptive)
+  - validateAdaptiveTriggers called from runCommitMsgHook
+  - 3 unit test cases (TestValidateAdaptiveTriggers): contradiction / failure / budget overflow
+
+source: >
+  2026-05-25 session. Plan §Phase 5.1-5.2 deliverables.

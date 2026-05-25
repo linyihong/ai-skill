@@ -310,6 +310,9 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		if v := validateTokenBudget(modes, text); v != "" {
 			violations = append(violations, v)
 		}
+		if v := validateAdaptiveTriggers(modes, text); v != "" {
+			violations = append(violations, v)
+		}
 		if len(violations) > 0 {
 			result.Status = "blocked"
 			result.ExitCode = ExitValidationFailed
@@ -697,6 +700,116 @@ func itoa(n int) string {
 		buf[i] = '-'
 	}
 	return string(buf[i:])
+}
+
+// validateAdaptiveTriggers implements runtime/cognitive-modes-adaptive.yaml:
+// 3 commit-msg-detectable adaptive triggers.
+//
+//  1. contradiction_risk — body contains contradiction-class keyword AND
+//     references ≥2 distinct sources (plans/, constitution/, decisions/).
+//     Requires governance_mode≥STRICT AND context_mode in {SOURCE_BACKED, GRAPH_ASSISTED}.
+//
+//  2. repeated_failure — body references ≥2 failure patterns OR uses
+//     revert/hotfix/retry vocabulary ≥2 times. Requires
+//     execution_mode=RECOVERY AND memory_mode=FAILURE_REPLAY.
+//
+//  3. budget_near_ceiling — Token Estimate ≥ 80% of mode tuple budget.
+//     Warning level (not blocking).
+//
+// Opt-out: standalone "[skip-adaptive]" trailer line.
+var (
+	contradictionKeywordsRE = regexp.MustCompile(`(?i)contradict\w*|conflict\w*|mismatch\w*|discrepan\w*|衝突|矛盾|不一致`)
+	failurePatternRefRE     = regexp.MustCompile(`enforcement/failure-patterns/[\w-]+\.md`)
+	revertHotfixRE          = regexp.MustCompile(`(?i)\b(revert|hotfix|retry)\b`)
+	sourceClassRE           = regexp.MustCompile(`(plans/|constitution/|decisions/)[^\s)"\]]+`)
+)
+
+func validateAdaptiveTriggers(modes map[string]string, text string) string {
+	// Opt-out marker on its own line
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-adaptive]" {
+			return ""
+		}
+	}
+
+	exec := modes["execution_mode"]
+	ctx := modes["context_mode"]
+	gov := modes["governance_mode"]
+	mem := modes["memory_mode"]
+
+	var violations []string
+
+	// Trigger 1: contradiction_risk
+	if contradictionKeywordsRE.MatchString(text) {
+		// Count distinct source references
+		refs := sourceClassRE.FindAllString(text, -1)
+		distinct := map[string]bool{}
+		for _, r := range refs {
+			distinct[r] = true
+		}
+		if len(distinct) >= 2 {
+			govOK := gov == "STRICT" || gov == "LOCKDOWN"
+			ctxOK := ctx == "SOURCE_BACKED" || ctx == "GRAPH_ASSISTED"
+			if !govOK || !ctxOK {
+				violations = append(violations,
+					"adaptive: contradiction risk detected (cross-source keywords + ≥2 distinct source refs) but governance_mode="+
+						gov+" / context_mode="+ctx+
+						" below required floor (governance_mode≥STRICT, context_mode in {SOURCE_BACKED, GRAPH_ASSISTED}). Upgrade modes per runtime/cognitive-modes-adaptive.yaml §contradiction_risk.")
+			}
+		}
+	}
+
+	// Trigger 2: repeated_failure
+	failureRefs := len(failurePatternRefRE.FindAllString(text, -1))
+	revertHits := len(revertHotfixRE.FindAllString(text, -1))
+	if failureRefs >= 2 || revertHits >= 2 {
+		if exec != "RECOVERY" || mem != "FAILURE_REPLAY" {
+			violations = append(violations,
+				"adaptive: repeated failure signal (failure-pattern refs="+itoa(failureRefs)+
+					", revert/hotfix/retry hits="+itoa(revertHits)+
+					") requires execution_mode=RECOVERY and memory_mode=FAILURE_REPLAY (declared: execution_mode="+
+					exec+", memory_mode="+mem+
+					"). Adjust mode tuple per runtime/cognitive-modes-adaptive.yaml §repeated_failure.")
+		}
+	}
+
+	// Trigger 3: budget_near_ceiling — warning only; emitted as a violation
+	// line so it surfaces in commit-msg output, but agents should treat it
+	// as advisory until adaptive infrastructure exists. Conservative: only
+	// fire when an explicit Token Estimate is declared.
+	match := tokenEstimateRE.FindStringSubmatch(text)
+	if len(match) >= 2 {
+		estimate := 0
+		for _, c := range match[1] {
+			estimate = estimate*10 + int(c-'0')
+		}
+		// Reuse the same budget table as validateTokenBudget
+		exactBudgets := map[string]int{
+			"FAST|INDEX_ONLY|LIGHT|NONE":                    1000,
+			"NORMAL|SUMMARY_FIRST|STANDARD|EPISODIC":        5000,
+			"DEEP|SOURCE_BACKED|STRICT|DECISION_REPLAY":     20000,
+			"FORENSIC|GRAPH_ASSISTED|STRICT|FAILURE_REPLAY": 50000,
+		}
+		execDefaults := map[string]int{
+			"FAST": 1000, "NORMAL": 5000, "DEEP": 20000, "FORENSIC": 50000, "RECOVERY": 50000,
+		}
+		key := exec + "|" + ctx + "|" + gov + "|" + mem
+		budget, ok := exactBudgets[key]
+		if !ok {
+			budget, ok = execDefaults[exec]
+		}
+		if ok && estimate >= (budget*80/100) && estimate <= budget {
+			violations = append(violations,
+				"adaptive[warning]: Token Estimate="+itoa(estimate)+
+					" is ≥80% of budget="+itoa(budget)+
+					"; consider downgrading context_mode one step along the downgrade_path (GRAPH_ASSISTED → SOURCE_BACKED → CHECKLIST_FIRST → SUMMARY_FIRST → INDEX_ONLY) OR split the work. Suppress this notice with [skip-adaptive].")
+		}
+	}
+
+	if len(violations) == 0 {
+		return ""
+	}
+	return strings.Join(violations, "\n  - ")
 }
 
 func runPrePushHook(result Result, root string) Result {
