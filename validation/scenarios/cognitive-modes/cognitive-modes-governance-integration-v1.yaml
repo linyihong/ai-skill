@@ -1,0 +1,57 @@
+# Source: Phase 3.3 Cognitive Modes — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 3.3 not yet started)
+id: cognitive-modes-governance-integration-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-modes-governance-integration-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-25"
+  description: |
+    Phase 3.3 must produce runtime/cognitive-modes-governance-integration.yaml
+    mapping governance_mode → gate set activation. Without this contract,
+    governance_mode values (LIGHT/STANDARD/STRICT/LOCKDOWN) have no integration
+    path to the existing blocking_gates subsystem.
+
+given:
+  task: phase_3_3_governance_mode_blocking_gates_integration
+  artifacts:
+    - runtime/cognitive-modes-governance-integration.yaml
+  signals:
+    - plan §3.3: runtime.db blocking_gates 依 governance_mode 啟用對應 gate set
+    - gate_activation already defined in cognitive-modes.yaml per mode
+    - LOCKDOWN additional_actions: block_file_writes_until_human_approval
+    - 4 governance modes: LIGHT / STANDARD / STRICT / LOCKDOWN
+
+when:
+  action: phase_3_completion_check
+
+then:
+  expected_route:
+    - runtime/cognitive-modes-governance-integration.yaml exists
+    - file has id: runtime.cognitive-modes-governance-integration
+    - file has runtime_projection.enabled: true
+    - file has target_key: runtime.cognitive_modes.governance_integration
+    - file has gate_set_activation section with LIGHT/STANDARD/STRICT/LOCKDOWN
+    - LOCKDOWN section includes block_file_writes or equivalent
+    - generated_surfaces has row with target_key=runtime.cognitive_modes.governance_integration
+  forbidden_routes:
+    - claim_phase_3_3_done_without_contract
+    - missing_LOCKDOWN_block_writes_entry
+
+validation:
+  detection_command: |
+    test -f runtime/cognitive-modes-governance-integration.yaml && \
+      grep -q "^id: runtime.cognitive-modes-governance-integration" runtime/cognitive-modes-governance-integration.yaml && \
+      grep -q "target_key: runtime.cognitive_modes.governance_integration" runtime/cognitive-modes-governance-integration.yaml && \
+      grep -q "gate_set_activation:" runtime/cognitive-modes-governance-integration.yaml && \
+      grep -q "LOCKDOWN:" runtime/cognitive-modes-governance-integration.yaml && \
+      grep -q "block_file_writes" runtime/cognitive-modes-governance-integration.yaml && \
+      count=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.cognitive_modes.governance_integration';" 2>/dev/null) && \
+      [ "$count" -ge 1 ] && \
+      echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — file does not exist yet）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

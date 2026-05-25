@@ -1,0 +1,56 @@
+# Source: Phase 3.1 Cognitive Modes — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 3.1 not yet started)
+id: cognitive-modes-phase-integration-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-modes-phase-integration-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-25"
+  description: |
+    Phase 3.1 must produce runtime/cognitive-modes-phase-integration.yaml
+    defining how execution_mode adjusts phase_machine behavior (allowed_actions /
+    forbidden_actions per mode). Without this contract, execution_mode has no
+    integration path to the existing phase_machine subsystem.
+
+given:
+  task: phase_3_1_execution_mode_phase_machine_integration
+  artifacts:
+    - runtime/cognitive-modes-phase-integration.yaml
+  signals:
+    - plan §3.1: phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions/forbidden_actions
+    - 5 execution modes: FAST / NORMAL / DEEP / FORENSIC / RECOVERY
+    - integration is YAML contract level (enforcement wiring in later phase)
+
+when:
+  action: phase_3_completion_check
+
+then:
+  expected_route:
+    - runtime/cognitive-modes-phase-integration.yaml exists
+    - file has schema_version: "1.0"
+    - file has id: runtime.cognitive-modes-phase-integration
+    - file has runtime_projection.enabled: true
+    - file has runtime_projection.target_key: runtime.cognitive_modes.phase_integration
+    - file has execution_mode_adjustments section with all 5 modes defined
+    - generated_surfaces has row with target_key=runtime.cognitive_modes.phase_integration
+  forbidden_routes:
+    - claim_phase_3_1_done_without_contract
+    - partial_mode_coverage_missing_FORENSIC_or_RECOVERY
+
+validation:
+  detection_command: |
+    test -f runtime/cognitive-modes-phase-integration.yaml && \
+      grep -q "^id: runtime.cognitive-modes-phase-integration" runtime/cognitive-modes-phase-integration.yaml && \
+      grep -q "target_key: runtime.cognitive_modes.phase_integration" runtime/cognitive-modes-phase-integration.yaml && \
+      grep -q "execution_mode_adjustments:" runtime/cognitive-modes-phase-integration.yaml && \
+      grep -q "FORENSIC:" runtime/cognitive-modes-phase-integration.yaml && \
+      grep -q "RECOVERY:" runtime/cognitive-modes-phase-integration.yaml && \
+      count=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.cognitive_modes.phase_integration';" 2>/dev/null) && \
+      [ "$count" -ge 1 ] && \
+      echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — file does not exist yet）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

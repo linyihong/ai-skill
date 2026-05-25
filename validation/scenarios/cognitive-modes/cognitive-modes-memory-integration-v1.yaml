@@ -1,0 +1,60 @@
+# Source: Phase 3.4 Cognitive Modes — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 3.4 not yet started)
+id: cognitive-modes-memory-integration-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-modes-memory-integration-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-25"
+  description: |
+    Phase 3.4 must produce runtime/cognitive-modes-memory-integration.yaml
+    composing memory_mode (category switch) with retrieval-governance thresholds
+    (within-category activation limit). Without this contract, memory_mode
+    values have no integration path to the existing memory/retrieval-governance/
+    subsystem, and memory activation remains ungoverned.
+
+given:
+  task: phase_3_4_memory_mode_retrieval_governance_integration
+  artifacts:
+    - runtime/cognitive-modes-memory-integration.yaml
+  signals:
+    - plan §3.4: memory_mode = category switch; threshold = within-category limit
+    - plan Open Question 4 resolved: mode AND threshold → AND logic compose
+    - 5 memory modes: NONE/EPISODIC/DECISION_REPLAY/FAILURE_REPLAY/PROJECT_CONTEXT
+    - existing subdirs: memory/episodic/, memory/decision/, memory/failure/, memory/project/
+    - compose_with: memory/retrieval-governance/activation-thresholds.md
+
+when:
+  action: phase_3_completion_check
+
+then:
+  expected_route:
+    - runtime/cognitive-modes-memory-integration.yaml exists
+    - file has id: runtime.cognitive-modes-memory-integration
+    - file has runtime_projection.enabled: true
+    - file has target_key: runtime.cognitive_modes.memory_integration
+    - file has memory_mode_activation section with all 5 modes
+    - file references memory/retrieval-governance/ compose relationship
+    - NONE mode specifies no retrieval (skip memory entirely)
+    - generated_surfaces has row with target_key=runtime.cognitive_modes.memory_integration
+  forbidden_routes:
+    - claim_phase_3_4_done_without_contract
+    - missing_NONE_mode_no_retrieval_rule
+
+validation:
+  detection_command: |
+    test -f runtime/cognitive-modes-memory-integration.yaml && \
+      grep -q "^id: runtime.cognitive-modes-memory-integration" runtime/cognitive-modes-memory-integration.yaml && \
+      grep -q "target_key: runtime.cognitive_modes.memory_integration" runtime/cognitive-modes-memory-integration.yaml && \
+      grep -q "memory_mode_activation:" runtime/cognitive-modes-memory-integration.yaml && \
+      grep -q "NONE:" runtime/cognitive-modes-memory-integration.yaml && \
+      grep -q "retrieval.governance\|retrieval-governance" runtime/cognitive-modes-memory-integration.yaml && \
+      count=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.cognitive_modes.memory_integration';" 2>/dev/null) && \
+      [ "$count" -ge 1 ] && \
+      echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — file does not exist yet）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

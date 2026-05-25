@@ -1,0 +1,51 @@
+# Source: Phase 3.2 Cognitive Modes — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 3.2 not yet started)
+id: cognitive-modes-compression-alias-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P2
+
+failure_source:
+  pattern: cognitive-modes-compression-alias-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-25"
+  description: |
+    Phase 3.2 must annotate models/compression/README.md so each compression
+    level is marked as the implementation reference for its corresponding
+    context_mode UPPERCASE alias. Without this annotation, the two vocabularies
+    remain disconnected and agents may treat compression/ and context_mode as
+    separate systems.
+
+given:
+  task: phase_3_2_context_mode_compression_alias
+  artifacts:
+    - models/compression/README.md
+  signals:
+    - plan §3.2: 合併 models/compression/ levels 為 context_mode 的實作層
+    - Open Question 1 resolved: lowercase = alias; UPPERCASE = runtime primitive
+    - 5 pairs: index-only↔INDEX_ONLY, summary-first↔SUMMARY_FIRST,
+      checklist-first↔CHECKLIST_FIRST, source-backed↔SOURCE_BACKED,
+      graph-assisted↔GRAPH_ASSISTED
+
+when:
+  action: phase_3_completion_check
+
+then:
+  expected_route:
+    - models/compression/README.md contains context_mode alias annotation
+    - file references "context_mode" (the runtime primitive)
+    - file references "INDEX_ONLY" or equivalent UPPERCASE mapping
+    - file references cognitive-modes.yaml or context_mode UPPERCASE vocabulary
+  forbidden_routes:
+    - no_alias_annotation_in_compression_readme
+    - compression_readme_treats_levels_as_independent_system
+
+validation:
+  detection_command: |
+    test -f models/compression/README.md && \
+      grep -qi "context_mode" models/compression/README.md && \
+      grep -q "INDEX_ONLY\|SUMMARY_FIRST\|SOURCE_BACKED" models/compression/README.md && \
+      echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — alias annotation not yet added）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
