@@ -1,0 +1,79 @@
+# Source: tool-entry thinness rule + commit-msg enforcement
+# Test-first per system-upgrade-governance §3 Rule 9
+id: bootstrap-entry-thinness-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: bootstrap-entry-bloat
+  class: process-gap / governance-drift / source-of-truth-duplication
+  date: "2026-05-25"
+  description: |
+    Each AI tool has a session-start entry file (Claude Code: repo-root
+    CLAUDE.md; Cursor: .cursor/rules/*.mdc; Roo Code: .roomodes). These
+    are NOT canonical content — they should be thin pointers to
+    CORE_BOOTSTRAP.md + ai-tools/agent/<tool>.md.
+
+    Recent regression (Fix A 2026-05-25 commit 8970d4d): adding the
+    Cognitive Mode block obligation to CLAUDE.md duplicated 30 lines
+    that already live in CORE_BOOTSTRAP.md. Same for Bootstrap Receipt
+    format. init_project.go generates the same bloat into downstream
+    projects' CLAUDE.md / .cursor / .roomodes.
+
+    User feedback (2026-05-25):
+    「不要都把各個東西特殊化的設定(claude.md)都設定在那裡 不然其他工具用了
+     還是會有這個問題 ... 只希望要薄薄的設定入口就好 ... 改成強制 或是使用yaml」
+
+    Enforcement design:
+    1. runtime/bootstrap-entry-points.yaml — executable contract
+       declaring entry file list + thinness rule + forbidden content
+    2. validateBootstrapEntryThinness in hooks.go — fires inside
+       commit-msg when entry file is staged AND violates thinness
+
+given:
+  task: bootstrap_entry_thinness_completion_check
+  artifacts:
+    - runtime/bootstrap-entry-points.yaml
+    - enforcement/failure-patterns/bootstrap-entry-bloat.md
+    - scripts/ai-skill-cli/internal/app/hooks.go (validateBootstrapEntryThinness)
+    - runtime/runtime.db (generated_surfaces row)
+  signals:
+    - YAML contract exists and projected
+    - failure pattern file exists
+    - validator function present + called from runCommitMsgHook
+    - repo-root CLAUDE.md refactored to thin pointer (<=30 lines, no obligation format)
+    - generated_surfaces row with target_key = runtime.bootstrap_entry_points
+
+when:
+  action: thinness_rule_completion_check
+
+then:
+  expected_route:
+    - runtime/bootstrap-entry-points.yaml exists
+    - enforcement/failure-patterns/bootstrap-entry-bloat.md exists
+    - hooks.go contains validateBootstrapEntryThinness
+    - runCommitMsgHook calls validateBootstrapEntryThinness
+    - generated_surfaces projected (target_key = runtime.bootstrap_entry_points)
+    - CLAUDE.md <= 30 lines AND does not contain "FAST/NORMAL/DEEP" enum mention
+  forbidden_routes:
+    - claim_done_without_yaml
+    - claim_done_without_failure_pattern
+    - claim_done_without_validator
+    - claim_done_without_runCommitMsgHook_call
+    - claim_done_without_projection
+    - claim_done_without_CLAUDE_md_thinness
+
+validation:
+  detection_command: |
+    y=$(test -f runtime/bootstrap-entry-points.yaml && echo 1 || echo 0)
+    f=$(test -f enforcement/failure-patterns/bootstrap-entry-bloat.md && echo 1 || echo 0)
+    v=$(grep -c 'func validateBootstrapEntryThinness' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validateBootstrapEntryThinness')
+    p=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.bootstrap_entry_points';" 2>/dev/null)
+    cl_lines=$(wc -l < CLAUDE.md 2>/dev/null | tr -d ' ')
+    cl_enum=$(grep -c 'FAST/NORMAL/DEEP/FORENSIC/RECOVERY\|INDEX_ONLY/SUMMARY_FIRST' CLAUDE.md 2>/dev/null)
+    [ "${y:-0}" -ge 1 ] && [ "${f:-0}" -ge 1 ] && [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && [ "${p:-0}" -ge 1 ] && [ "${cl_lines:-999}" -le 30 ] && [ "${cl_enum:-1}" -eq 0 ] && echo "PASS" || echo "FAIL y=${y:-0} f=${f:-0} v=${v:-0} rch=${rch:-0} p=${p:-0} cl_lines=${cl_lines:-999} cl_enum=${cl_enum:-1}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（components not yet present；CLAUDE.md currently 68 lines with enum mentions）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
