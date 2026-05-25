@@ -112,36 +112,29 @@ resolution:
 
 phase_status:
   phase_1_a:
-    state: partial-complete (this commit)
+    state: complete (commit aa5bc68)
     completion_criteria:
       - runtime/cognitive-modes.yaml exists and is schema-valid  # PASS
-      - generated_surfaces has target_key=runtime.cognitive_modes.contract  # BLOCKED
+      - generated_surfaces has target_key=runtime.cognitive_modes.contract  # PASS (after 1.B)
     scenarios:
       cognitive-modes-yaml-contract-exists-v1.yaml: PASS
-      cognitive-modes-generated-surface-projected-v1.yaml: BLOCKED
-    blocker_detail: |
-      `compileExecutableYAMLContracts` sourceRoots (in
-      `scripts/ai-skill-cli/internal/app/runtime_compiler.go` ~L555) only
-      scans: governance / enforcement / workflow / ai-tools / metadata/rules.
-      The `runtime/` directory is NOT scanned, so projection to
-      generated_surfaces does not happen automatically.
-      Fix requires adding "runtime" to sourceRoots + Go binary rebuild
-      (same scope as Phase 1.B Go work).
+      cognitive-modes-generated-surface-projected-v1.yaml: PASS (resolved in Phase 1.B)
 
   phase_1_b:
-    state: deferred (next session)
-    blockers:
-      - requires Go binary rebuild (scripts/ai-skill-cli/internal/app/runtime_compiler.go)
-      - need to add "runtime" to sourceRoots (for projection blocker above)
-      - need to add CREATE TABLE cognitive_modes statement to createGoRuntimeSchema
+    state: complete (2026-05-25)
     completion_criteria:
-      - sourceRoots includes "runtime" → cognitive-modes.yaml auto-projects
-      - runtime.db cognitive_modes table exists with schema
-      - at least 1 POC row inserted
-    deferred_scenarios:
-      - cognitive-modes-generated-surface-projected-v1.yaml  # blocked by sourceRoots
-      - cognitive-modes-runtime-table-exists-v1.yaml  # blocked by schema add
-      - cognitive-modes-poc-task-record-v1.yaml  # depends on table
+      - sourceRoots includes "runtime" → cognitive-modes.yaml auto-projects  # DONE
+      - runtime.db cognitive_modes table exists with schema  # DONE
+      - at least 1 POC row inserted  # DONE
+    scenarios:
+      cognitive-modes-generated-surface-projected-v1.yaml: PASS
+      cognitive-modes-runtime-table-exists-v1.yaml: PASS
+      cognitive-modes-poc-task-record-v1.yaml: PASS
+    fix_applied: |
+      Added "runtime" to compileExecutableYAMLContracts sourceRoots
+      (scripts/ai-skill-cli/internal/app/runtime_compiler.go ~L561).
+      Added CREATE TABLE cognitive_modes to createGoRuntimeSchema (~L137).
+      Rebuilt 5 platform binaries. ai-skill runtime compile + validate pass.
 
 related:
   intelligence_atom: intelligence/engineering/development/test-first-framework-upgrade.md

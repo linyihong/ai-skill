@@ -1,9 +1,9 @@
 # Runtime Cognitive Modes System
 
-**Status**: `in-progress`（Phase D ✅ + Phase 0 ✅ + **Phase 1.A 部分完成**（1/2 scenarios pass，1 blocked by Go rebuild）；Phase 1.B 需 Go binary rebuild，deferred 下次 session）
+**Status**: `in-progress`（Phase D ✅ + Phase 0 ✅ + **Phase 1 完成**（4/4 scenarios pass）；Phase 2 Discovery Heuristics 待啟動）
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-22
-**最後更新**：2026-05-22（Phase 1.A scenarios pre-written + YAML 寫入；發現 compiler sourceRoots 不含 runtime/ → Phase 1.B Go work 範圍擴大）
+**最後更新**：2026-05-25（Phase 1.B: Go rebuild + cognitive_modes table + generated_surfaces projection + 4 scenarios all PASS）
 
 > ⚠️ 本 plan 處於 `in-progress` 階段：**Phase D documentation-contract trial 已完成並通過評估指標**；Phase 0 (Pre-Build Interrogation) 與 Phase 1-5 runtime 實作待 user 決定是否啟動。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
 >
@@ -463,18 +463,18 @@ CREATE TABLE cognitive_modes (
 - [ ] Scenario `cognitive-modes-generated-surface-projected-v1` → **BLOCKED**
   （`compileExecutableYAMLContracts` sourceRoots 不含 `runtime/`，需 Go rebuild）
 
-**Phase 1.B**（需 Go binary rebuild，deferred 下次 session）：
-- [ ] 加 `"runtime"` 到 `compileExecutableYAMLContracts` sourceRoots
-  （`scripts/ai-skill-cli/internal/app/runtime_compiler.go` ~L555）
-- [ ] 加 `CREATE TABLE cognitive_modes` 到 `createGoRuntimeSchema`
-  （同檔 ~L87）
-- [ ] Rebuild 5 個 platform binaries（darwin-arm64/amd64、linux-arm64/amd64、windows-amd64）
-- [ ] `ai-skill runtime compile --native-compiler` 投影 cognitive-modes.yaml 到 generated_surfaces
-- [ ] `ai-skill runtime validate` 通過
-- [ ] Scenario `cognitive-modes-generated-surface-projected-v1` → PASS
-- [ ] Scenario `cognitive-modes-runtime-table-exists-v1` → PASS
-- [ ] 至少手動寫入一個 task 的 mode resolution（POC）
-- [ ] Scenario `cognitive-modes-poc-task-record-v1` → PASS
+**Phase 1.B**（2026-05-25 completed）：
+- [x] 加 `"runtime"` 到 `compileExecutableYAMLContracts` sourceRoots
+  （`scripts/ai-skill-cli/internal/app/runtime_compiler.go` ~L556）
+- [x] 加 `CREATE TABLE cognitive_modes` 到 `createGoRuntimeSchema`
+  （同檔 ~L136）
+- [x] Rebuild 5 個 platform binaries（darwin-arm64/amd64、linux-arm64/amd64、windows-amd64）
+- [x] `ai-skill runtime compile --native-compiler` 投影 cognitive-modes.yaml 到 generated_surfaces
+- [x] `ai-skill runtime validate` 通過
+- [x] Scenario `cognitive-modes-generated-surface-projected-v1` → **PASS** ✅
+- [x] Scenario `cognitive-modes-runtime-table-exists-v1` → **PASS** ✅
+- [x] 至少手動寫入一個 task 的 mode resolution（POC）
+- [x] Scenario `cognitive-modes-poc-task-record-v1` → **PASS** ✅
 
 ---
 

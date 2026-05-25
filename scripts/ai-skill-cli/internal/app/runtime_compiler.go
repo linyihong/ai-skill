@@ -133,6 +133,7 @@ func createGoRuntimeSchema(db *sql.DB) error {
 		`CREATE TABLE multi_agent_coordination (id INTEGER PRIMARY KEY AUTOINCREMENT, rule_id TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE async_job_lifecycle (id INTEGER PRIMARY KEY AUTOINCREMENT, state TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE capability_checkpoints (id INTEGER PRIMARY KEY AUTOINCREMENT, checkpoint_id TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
+		`CREATE TABLE cognitive_modes (id INTEGER PRIMARY KEY, task_id TEXT, execution_mode TEXT, context_mode TEXT, governance_mode TEXT, memory_mode TEXT, resolved_at TEXT, source TEXT);`,
 	}
 	for _, statement := range statements {
 		if _, err := db.Exec(statement); err != nil {
@@ -559,6 +560,7 @@ func compileExecutableYAMLContracts(repo string, db *sql.DB) error {
 		"workflow",
 		"ai-tools",
 		filepath.ToSlash(filepath.Join("metadata", "rules")),
+		"runtime",
 	}
 	return filepath.Walk(repo, func(path string, info os.FileInfo, walkErr error) error {
 		if walkErr != nil {

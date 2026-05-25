@@ -1,4 +1,4 @@
 version=dev
-source_commit=f2c046a
-built_at=2026-05-22T04:33:36Z
+source_commit=f0f7f7b
+built_at=2026-05-25T04:43:03Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
