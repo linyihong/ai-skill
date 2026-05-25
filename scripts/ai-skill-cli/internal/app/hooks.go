@@ -285,25 +285,32 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		return result
 	}
 
-	// Explicit opt-out for mechanical commits (chore: rebuild bin/, gitignore tweaks, etc.)
-	if strings.Contains(text, "[skip-cognitive-mode]") {
-		result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "skipped", Message: "[skip-cognitive-mode] opt-out marker present"})
+	// Primary path: Cognitive Mode 報告 block present → PASS.
+	// Checked BEFORE opt-out marker to avoid false positives when commit body
+	// documents/quotes the opt-out token (e.g. "Opt-out via '[skip-cognitive-mode]'").
+	if strings.Contains(text, "### Cognitive Mode 報告") {
+		result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "ok", Message: "Cognitive Mode 報告 present"})
 		return result
 	}
 
-	// Block if Cognitive Mode 報告 block is missing.
-	if !strings.Contains(text, "### Cognitive Mode 報告") {
-		result.Status = "blocked"
-		result.ExitCode = ExitValidationFailed
-		result.Error = &CommandError{
-			Code:        "cognitive_mode_block_missing",
-			Message:     "Commit message body must include '### Cognitive Mode 報告' block (4-dim execution/context/governance/memory resolution).",
-			Remediation: "Add the block per models/cognitive-modes/README.md template, or add '[skip-cognitive-mode]' to the body for mechanical commits.",
+	// Fallback path: opt-out marker on its own line (require leading whitespace or BOL
+	// to reduce false positives from prose mentions). Mechanical commits should
+	// place the marker as a standalone trailer line.
+	for _, line := range strings.Split(text, "\n") {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "[skip-cognitive-mode]" {
+			result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "skipped", Message: "[skip-cognitive-mode] opt-out marker present on its own line"})
+			return result
 		}
-		return result
 	}
 
-	result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "ok", Message: "Cognitive Mode 報告 present"})
+	result.Status = "blocked"
+	result.ExitCode = ExitValidationFailed
+	result.Error = &CommandError{
+		Code:        "cognitive_mode_block_missing",
+		Message:     "Commit message body must include '### Cognitive Mode 報告' block (4-dim execution/context/governance/memory resolution).",
+		Remediation: "Add the block per models/cognitive-modes/README.md template, or add a standalone '[skip-cognitive-mode]' trailer line for mechanical commits.",
+	}
 	return result
 }
 

@@ -1,4 +1,4 @@
-version=repo-d6c280a
-source_commit=d6c280a
-built_at=2026-05-25T11:20:03Z
+version=repo-e94ec71
+source_commit=e94ec71
+built_at=2026-05-25T11:23:05Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
