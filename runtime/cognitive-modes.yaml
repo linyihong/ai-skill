@@ -1,0 +1,151 @@
+schema_version: "1.0"
+id: runtime.cognitive-modes
+status: active
+owner_layer: runtime
+source_markdown: models/cognitive-modes/README.md
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.cognitive_modes.contract
+  surface: generated_surfaces
+
+purpose: >
+  Executable YAML contract for the 4-dimension cognitive mode primitives.
+  Phase 1.A: contract + projection only (this file).
+  Phase 1.B: cognitive_modes table in runtime.db schema (requires Go rebuild;
+  deferred to next session).
+  Phase 2+: discovery heuristics, subsystem integration, budget gates, adaptive
+  runtime — see plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md.
+
+activation:
+  applies_when:
+    - any task starts execution
+    - agent prepares final report
+  first_read_required: runtime/cognitive-modes.yaml
+  companion_read_required: models/cognitive-modes/README.md
+
+modes:
+  execution:
+    values:
+      - FAST
+      - NORMAL
+      - DEEP
+      - FORENSIC
+      - RECOVERY
+    default: NORMAL
+    descriptions:
+      FAST: 快速回答、不查 source；適用 typo / 簡單問答
+      NORMAL: 標準流程；checklist + source 視需要
+      DEEP: 跨層分析、完整 dependency；適用 migration / promotion
+      FORENSIC: 高 lineage tracing；適用 incident analysis / audit
+      RECOVERY: 高 validation、阻擋寫入；適用 failure recovery
+
+  context:
+    values:
+      - INDEX_ONLY
+      - SUMMARY_FIRST
+      - CHECKLIST_FIRST
+      - SOURCE_BACKED
+      - GRAPH_ASSISTED
+    default: SUMMARY_FIRST
+    aliases_to_models_compression:
+      INDEX_ONLY: index-only
+      SUMMARY_FIRST: summary-first
+      CHECKLIST_FIRST: checklist-first
+      SOURCE_BACKED: source-backed
+      GRAPH_ASSISTED: graph-assisted
+
+  governance:
+    values:
+      - LIGHT
+      - STANDARD
+      - STRICT
+      - LOCKDOWN
+    default: STANDARD
+    gate_activation:
+      LIGHT:
+        - sanitization
+      STANDARD:
+        - sanitization
+        - language_policy
+        - output_rules
+      STRICT:
+        - sanitization
+        - language_policy
+        - output_rules
+        - linked_updates
+        - runtime_surfaces
+        - tool_neutral
+      LOCKDOWN:
+        inherits: STRICT
+        additional_actions:
+          - block_file_writes_until_human_approval
+
+  memory:
+    values:
+      - NONE
+      - EPISODIC
+      - DECISION_REPLAY
+      - FAILURE_REPLAY
+      - PROJECT_CONTEXT
+    default: NONE
+    subdir_mapping:
+      NONE: null
+      EPISODIC: memory/episodic/
+      DECISION_REPLAY: memory/decision/
+      FAILURE_REPLAY: memory/failure/
+      PROJECT_CONTEXT: memory/project/
+    compose_with: memory/retrieval-governance/activation-thresholds.md
+
+resolution:
+  required_when:
+    - any task starts
+  output_record_target:
+    table: cognitive_modes
+    note: |
+      Table will be added to runtime.db schema in Phase 1.B (requires Go
+      compiler rebuild). Until then, mode resolution is recorded in agent
+      final report only (per Phase D doc-only contract).
+  fallback_when_table_unavailable:
+    behavior: agent_final_report_only
+    reference: models/cognitive-modes/README.md §Final Report Cognitive Mode 區塊範本
+
+phase_status:
+  phase_1_a:
+    state: partial-complete (this commit)
+    completion_criteria:
+      - runtime/cognitive-modes.yaml exists and is schema-valid  # PASS
+      - generated_surfaces has target_key=runtime.cognitive_modes.contract  # BLOCKED
+    scenarios:
+      cognitive-modes-yaml-contract-exists-v1.yaml: PASS
+      cognitive-modes-generated-surface-projected-v1.yaml: BLOCKED
+    blocker_detail: |
+      `compileExecutableYAMLContracts` sourceRoots (in
+      `scripts/ai-skill-cli/internal/app/runtime_compiler.go` ~L555) only
+      scans: governance / enforcement / workflow / ai-tools / metadata/rules.
+      The `runtime/` directory is NOT scanned, so projection to
+      generated_surfaces does not happen automatically.
+      Fix requires adding "runtime" to sourceRoots + Go binary rebuild
+      (same scope as Phase 1.B Go work).
+
+  phase_1_b:
+    state: deferred (next session)
+    blockers:
+      - requires Go binary rebuild (scripts/ai-skill-cli/internal/app/runtime_compiler.go)
+      - need to add "runtime" to sourceRoots (for projection blocker above)
+      - need to add CREATE TABLE cognitive_modes statement to createGoRuntimeSchema
+    completion_criteria:
+      - sourceRoots includes "runtime" → cognitive-modes.yaml auto-projects
+      - runtime.db cognitive_modes table exists with schema
+      - at least 1 POC row inserted
+    deferred_scenarios:
+      - cognitive-modes-generated-surface-projected-v1.yaml  # blocked by sourceRoots
+      - cognitive-modes-runtime-table-exists-v1.yaml  # blocked by schema add
+      - cognitive-modes-poc-task-record-v1.yaml  # depends on table
+
+related:
+  intelligence_atom: intelligence/engineering/development/test-first-framework-upgrade.md
+  governance_rule: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
+  doc_contract: models/cognitive-modes/README.md
+  plan: plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md
+  pre_written_scenarios_commit: 395a0d9
