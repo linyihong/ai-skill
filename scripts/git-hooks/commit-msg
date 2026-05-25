@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+# Minimal Git hook adapter. Business logic lives in `ai-skill hooks run commit-msg`.
+# $1 is the path to the commit message file; pass it through via "$@".
+set -eu
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+BIN="${AI_SKILL_CLI:-$ROOT/scripts/ai-skill-cli/bin/ai-skill}"
+if [ ! -x "$BIN" ]; then
+  os="$(uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]')"
+  arch="$(uname -m 2>/dev/null || echo unknown)"
+  case "$os" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac
+  case "$arch" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac
+  suffix=""
+  [ "$os" = "windows" ] && suffix=".exe"
+  BIN="$ROOT/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix"
+fi
+exec "$BIN" hooks run commit-msg --repo "$ROOT" "$@"

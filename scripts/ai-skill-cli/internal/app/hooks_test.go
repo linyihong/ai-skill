@@ -25,8 +25,8 @@ func TestHooksInstallDryRunPlansWithoutWriting(t *testing.T) {
 	if result.Command != "hooks install" {
 		t.Fatalf("unexpected command: %q", result.Command)
 	}
-	if len(result.PlannedActions) != 3 {
-		t.Fatalf("expected three planned hook installs, got %#v", result.PlannedActions)
+	if len(result.PlannedActions) != 4 {
+		t.Fatalf("expected four planned hook installs (pre-commit/commit-msg/post-commit/pre-push), got %#v", result.PlannedActions)
 	}
 	if pathExists(filepath.Join(repo, ".git", "hooks", "pre-commit")) {
 		t.Fatal("dry-run wrote hook target")

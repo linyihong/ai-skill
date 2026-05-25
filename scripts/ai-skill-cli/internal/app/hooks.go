@@ -22,6 +22,7 @@ type hooksOptions struct {
 	force       bool
 	jsonOutput  bool
 	plainOutput bool
+	positional  []string
 }
 
 func runHooks(args []string, stdout io.Writer, stderr io.Writer) int {
@@ -38,7 +39,7 @@ func runHooks(args []string, stdout io.Writer, stderr io.Writer) int {
 	name := "hooks " + opts.command
 	if opts.command == "run" {
 		if len(args) < 2 {
-			_, _ = fmt.Fprintln(stderr, "usage: ai-skill hooks run <pre-commit|post-commit|pre-push> [flags]")
+			_, _ = fmt.Fprintln(stderr, "usage: ai-skill hooks run <pre-commit|commit-msg|post-commit|pre-push> [flags]")
 			return ExitInvalidUsage
 		}
 		opts.command = "run " + args[1]
@@ -53,6 +54,7 @@ func runHooks(args []string, stdout io.Writer, stderr io.Writer) int {
 	if err := fs.Parse(args[1:]); err != nil {
 		return ExitInvalidUsage
 	}
+	opts.positional = fs.Args()
 	if opts.jsonOutput && opts.plainOutput {
 		_, _ = fmt.Fprintln(stderr, "--json and --plain are mutually exclusive")
 		return ExitInvalidUsage
@@ -133,7 +135,7 @@ func buildHooksInstallResult(opts hooksOptions) Result {
 		return result
 	}
 
-	hooks := []string{"pre-commit", "post-commit", "pre-push"}
+	hooks := []string{"pre-commit", "commit-msg", "post-commit", "pre-push"}
 	for _, hook := range hooks {
 		result.PlannedActions = append(result.PlannedActions, fmt.Sprintf("install Go hook adapter: %s", filepath.Join(targetDir, hook)))
 	}
@@ -190,6 +192,8 @@ func buildHooksRunResult(opts hooksOptions) Result {
 	switch opts.command {
 	case "run pre-commit":
 		return runPreCommitHook(result, root)
+	case "run commit-msg":
+		return runCommitMsgHook(result, root, opts.positional)
 	case "run post-commit":
 		if os.Getenv("AI_SKILL_SYNC_CURSOR_BUNDLE") == "1" {
 			result.Checks = append(result.Checks, Check{Name: "cursor_bundle_sync", Status: "skipped", Message: "Go sync-cursor-bundle write mode is not enabled"})
@@ -248,6 +252,58 @@ func runPreCommitHook(result Result, root string) Result {
 	if len(result.Mutations) == 0 {
 		result.Checks = append(result.Checks, Check{Name: "pre_commit", Status: "ok", Message: "no runtime or knowledge hook action required"})
 	}
+	return result
+}
+
+// runCommitMsgHook enforces Phase 4 behavioral wiring of
+// gate.execution.cognitive_mode_resolved. Commit message body must contain
+// the literal '### Cognitive Mode 報告' block (template defined in
+// models/cognitive-modes/README.md). Mechanical commits may opt out via
+// '[skip-cognitive-mode]' in the body. Merge commits auto-skip.
+func runCommitMsgHook(result Result, root string, positional []string) Result {
+	if len(positional) == 0 {
+		// Hook called without message file path; cannot enforce, fail open with warning.
+		result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "warning", Message: "no commit message file passed; check skipped"})
+		return result
+	}
+	msgPath := positional[0]
+	if !filepath.IsAbs(msgPath) {
+		msgPath = filepath.Join(root, msgPath)
+	}
+	body, err := os.ReadFile(msgPath)
+	if err != nil {
+		result.Status = "blocked"
+		result.ExitCode = ExitGeneralFailure
+		result.Error = &CommandError{Code: "commit_msg_read_failed", Message: err.Error()}
+		return result
+	}
+	text := string(body)
+
+	// Auto-skip merge commits (git auto-generated header)
+	if strings.HasPrefix(strings.TrimLeft(text, " \t\n"), "Merge ") {
+		result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "skipped", Message: "merge commit auto-skipped"})
+		return result
+	}
+
+	// Explicit opt-out for mechanical commits (chore: rebuild bin/, gitignore tweaks, etc.)
+	if strings.Contains(text, "[skip-cognitive-mode]") {
+		result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "skipped", Message: "[skip-cognitive-mode] opt-out marker present"})
+		return result
+	}
+
+	// Block if Cognitive Mode 報告 block is missing.
+	if !strings.Contains(text, "### Cognitive Mode 報告") {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{
+			Code:        "cognitive_mode_block_missing",
+			Message:     "Commit message body must include '### Cognitive Mode 報告' block (4-dim execution/context/governance/memory resolution).",
+			Remediation: "Add the block per models/cognitive-modes/README.md template, or add '[skip-cognitive-mode]' to the body for mechanical commits.",
+		}
+		return result
+	}
+
+	result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "ok", Message: "Cognitive Mode 報告 present"})
 	return result
 }
 
@@ -436,7 +492,7 @@ if [ ! -x "$BIN" ]; then
   [ "$os" = "windows" ] && suffix=".exe"
   BIN="$ROOT/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix"
 fi
-exec "$BIN" hooks run %s --repo "$ROOT"
+exec "$BIN" hooks run %s --repo "$ROOT" "$@"
 `, hook)
 }
 

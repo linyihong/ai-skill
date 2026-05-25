@@ -1,0 +1,60 @@
+# Source: Phase 4 behavioral enforcement — commit-msg hook blocks commit without Cognitive Mode block
+# Test-first per system-upgrade-governance §3 Rule 9
+id: cognitive-mode-block-required-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-mode-resolution-bypass
+  class: process-gap / governance-drift
+  date: "2026-05-25"
+  description: |
+    Phase 3-B added obligation.execution.resolve_cognitive_mode + gate.execution.cognitive_mode_resolved
+    to runtime.db as structural metadata, but NO Go code reads these rows to actually enforce.
+    Plan §Phase 3 Deferred Items lists "Behavioral enforcement (pre-commit hook)" as deferred.
+
+    Phase 4 behavioral wiring: a commit-msg hook checks the commit message body for the literal
+    string '### Cognitive Mode 報告' (the block template defined in models/cognitive-modes/README.md).
+    Missing → block commit (exit != 0).
+
+    Opt-out: mechanical commits (chore: rebuild bin/, merge commits, etc.) may include
+    '[skip-cognitive-mode]' in the body to bypass. Merge commits auto-skip.
+
+given:
+  task: phase_4_behavioral_cognitive_mode_enforcement
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go (commit-msg handler)
+    - scripts/ai-skill-cli/internal/app/hooks_test.go OR runtime test
+    - .git/hooks/commit-msg installed by ai-skill hooks install
+  signals:
+    - commit-msg hook registered in hooks dispatch (case "run commit-msg")
+    - commit-msg listed in installHooks
+    - hook script template passes the message file path argument through
+    - body without '### Cognitive Mode' → hook exits non-zero
+    - body with '[skip-cognitive-mode]' → hook passes
+    - merge commit → hook passes
+
+when:
+  action: phase_4_completion_check
+
+then:
+  expected_route:
+    - hooks.go contains "case \"run commit-msg\":" dispatch
+    - hooks.go contains runCommitMsgHook function
+    - installHooks includes "commit-msg" in the hooks slice
+    - hook script template supports passing message file path via "$@"
+  forbidden_routes:
+    - claim_done_without_commit_msg_handler
+    - claim_done_without_install_registration
+    - claim_done_without_argument_passthrough
+
+validation:
+  detection_command: |
+    h=$(grep -c 'runCommitMsgHook' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    d=$(grep -c 'case "run commit-msg":' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    i=$(grep -c '"commit-msg"' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    [ "${h:-0}" -ge 1 ] && [ "${d:-0}" -ge 1 ] && [ "${i:-0}" -ge 1 ] && echo "PASS" || echo "FAIL h=${h:-0} d=${d:-0} i=${i:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — commit-msg handler/dispatch/registration not yet added）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
