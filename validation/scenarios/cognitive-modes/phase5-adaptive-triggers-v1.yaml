@@ -1,0 +1,66 @@
+# Source: Phase 5 — Adaptive Runtime
+# Test-first per system-upgrade-governance §3 Rule 9
+id: phase5-adaptive-triggers-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: adaptive-trigger-ignored
+  class: process-gap / governance-drift
+  date: "2026-05-25"
+  description: |
+    Phase 5 deliverables per plan §Phase 5.1-5.2:
+    1. runtime/cognitive-modes-adaptive.yaml — adaptive trigger table.
+    2. Go validator validateAdaptiveTriggers in hooks.go — detects
+       commit-msg-layer adaptive signals (contradiction risk / repeated
+       failure mention / near-budget) and flags mode mismatch.
+    3. 3 test cases via unit tests: contradiction / failure / budget overflow.
+
+    Out of scope at commit-msg layer (deferred to true adaptive runtime
+    infrastructure if ever built): tool-call loop detection, per-tool
+    token accumulation, cross-session memory hit rate, phase transition
+    re-evaluation. These require runtime tool interception unavailable
+    in commit-msg hook.
+
+given:
+  task: phase_5_completion_check
+  artifacts:
+    - runtime/cognitive-modes-adaptive.yaml
+    - scripts/ai-skill-cli/internal/app/hooks.go (validateAdaptiveTriggers)
+    - runtime/runtime.db (generated_surfaces row)
+  signals:
+    - YAML contract file exists
+    - validateAdaptiveTriggers function in hooks.go
+    - runCommitMsgHook calls validateAdaptiveTriggers
+    - generated_surfaces row with target_key = runtime.cognitive_modes.adaptive
+    - 3 unit tests for adaptive triggers exist
+
+when:
+  action: phase_5_completion_check
+
+then:
+  expected_route:
+    - runtime/cognitive-modes-adaptive.yaml exists
+    - hooks.go contains validateAdaptiveTriggers
+    - runCommitMsgHook calls validateAdaptiveTriggers
+    - generated_surfaces projected (target_key = runtime.cognitive_modes.adaptive)
+    - hooks_test.go contains TestValidateAdaptiveTriggers
+  forbidden_routes:
+    - claim_done_without_yaml_contract
+    - claim_done_without_validator
+    - claim_done_without_runCommitMsgHook_call
+    - claim_done_without_projection
+    - claim_done_without_unit_tests
+
+validation:
+  detection_command: |
+    y=$(test -f runtime/cognitive-modes-adaptive.yaml && echo 1 || echo 0)
+    v=$(grep -c 'func validateAdaptiveTriggers' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validateAdaptiveTriggers')
+    p=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.cognitive_modes.adaptive';" 2>/dev/null)
+    t=$(grep -c 'TestValidateAdaptiveTriggers' scripts/ai-skill-cli/internal/app/hooks_test.go 2>/dev/null)
+    [ "${y:-0}" -ge 1 ] && [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && [ "${p:-0}" -ge 1 ] && [ "${t:-0}" -ge 1 ] && echo "PASS" || echo "FAIL y=${y:-0} v=${v:-0} rch=${rch:-0} p=${p:-0} t=${t:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（all 5 components not yet present）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
