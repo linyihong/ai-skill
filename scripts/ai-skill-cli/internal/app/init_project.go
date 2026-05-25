@@ -292,57 +292,26 @@ func initProjectBootstrapText(repo string) string {
 	return fmt.Sprintf(`本專案使用 Ai-skill 知識庫：%s
 
 > **IMPORTANT — MUST RUN BEFORE ANY OTHER ACTION**
-> 本流程為強制 first-turn obligation。執行任何非-Read 工具（Edit/Write/Bash/git/...）前，必須完成下列步驟並輸出 Bootstrap Receipt。
-> Resume / continuation session 同樣適用：summary 的「Resume directly」是對話 framing 指示，**不豁免** runtime / governance bootstrap。
+> 本檔為 **thin tool-entry pointer**。所有 obligation / format / enum / example 的 canonical 來源在 %s。Session 啟動 first turn 必須讀 CORE_BOOTSTRAP.md 並遵守其中**所有** obligations（含 Bootstrap Receipt、Cognitive Mode 報告 per-turn block、語言強制、knowledge-update-flow 等）。
+> Summary 的「Resume directly」是對話 framing，**不豁免** runtime / governance bootstrap。Resume / continuation session 同樣須走完 bootstrap。
 
-## 強制啟動流程
+## 啟動序列
 
-1. 讀取 Core Bootstrap：%s
-2. 了解 OS layout：%s
-3. 查 %s 取得 phase / obligations count / gates count
+1. 讀 %s — 必讀規則 + Bootstrap Receipt + Cognitive Mode 報告 + 全部 per-session / per-turn obligations
+2. 讀 %s — OS layout
+3. 查 %s — 目前 phase / obligations / gates
 4. 依任務 intent 查詢 routing-registry：%s
-5. 輸出 Bootstrap Receipt（見下方格式）
-6. 依 activation rules 載入必要 lazy-load 文件。
 
-## Bootstrap Receipt（強制 first-turn 輸出）
+## 修改本檔的規則
 
-完成步驟 1-3 後，**在 first user-facing message 中包含一行**：
-
-%s
-
-範例：%s
-
-未輸出即執行非-Read 工具，違反 obligation.bootstrap.receipt_acknowledged，命中 gate.bootstrap.receipt_present。
-
-## Cognitive Mode 報告（強制 per-turn 輸出）
-
-> **IMPORTANT**：每次 final user-facing response 必須含 ` + "`### Cognitive Mode 報告`" + ` 4 維表格（execution_mode / context_mode / governance_mode / memory_mode + 理由欄）。這是 first-turn 之後**每一輪**對話的 per-turn obligation，不是只在 commit 時。
-
-格式：4 列表格，dim / value / 理由。Mode value 速查見 Ai-skill repo 的 ` + "`models/cognitive-modes/README.md`" + `。Trivial 任務可全 NORMAL/SUMMARY_FIRST/STANDARD/NONE。Commit 階段由 commit-msg hook 機械強制（缺則 exit 30）；per-turn response 階段未自動強制但同樣是 constitution/ADR-008 baseline。
-
-## 語言強制規則
-
-- 強制跟隨使用者語言。
-- 無預設語言，不可自行切換。
-- 完成前確認輸出語言與使用者最後一次提問一致。
-
-## 知識更新流程 Checkpoint
-
-每輪工作結束前，檢查是否新增可重用技巧、validation rule、replay knob、hook/runner guard、錯誤模式或閉環缺口；若有，依 governance/lifecycle/knowledge-update-flow.md 完成連動更新、驗證、commit/push/readback。
-
-## 專案 durable Markdown 預設
-
-新增或大幅改寫長期保存的 Markdown 前，先讀 %s 與 %s，並依 %s 控制拆分與篇幅。
+本檔是 entry pointer，不是 canonical content。修改前先讀 %s。新 obligation 加到 CORE_BOOTSTRAP.md（cross-tool）或 ai-tools/agent/<tool>.md（tool-specific）— 不加到本檔。Commit-msg hook 會擋下違反 thinness 的修改。
 `, repo,
+		filepath.Join(repo, "CORE_BOOTSTRAP.md"),
 		filepath.Join(repo, "CORE_BOOTSTRAP.md"),
 		filepath.Join(repo, "README.md"),
 		filepath.Join(repo, "runtime", "runtime.db"),
 		filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"),
-		"`Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>`",
-		"`Bootstrap: rules=✓ phase=phase.bootstrap obligations=1 gates=2`",
-		filepath.Join(repo, "workflow", "documentation", "README.md"),
-		filepath.Join(repo, "workflow", "documentation", "execution-flow.md"),
-		filepath.Join(repo, "governance", "document-sizing.md"))
+		filepath.Join(repo, "runtime", "bootstrap-entry-points.yaml"))
 }
 
 func initProjectRooContent(repo string) string {

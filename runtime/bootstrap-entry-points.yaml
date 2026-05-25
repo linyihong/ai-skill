@@ -1,0 +1,115 @@
+schema_version: "1.0"
+id: runtime.bootstrap-entry-points
+status: active
+owner_layer: runtime
+source_markdown: null
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.bootstrap_entry_points
+  surface: generated_surfaces
+
+purpose: >
+  Cross-tool layering rule for AI-tool session-start entry files.
+
+  Each AI tool has a file the tool auto-loads at session start:
+    - Claude Code:        repo-root CLAUDE.md
+    - Cursor:             .cursor/rules/ai-skill-bootstrap.mdc
+    - Roo Code:           .roomodes (and downstream variant)
+    - Codex (downstream): per init_project.go output
+
+  These are NOT canonical content. They are **thin entry pointers** to:
+    - CORE_BOOTSTRAP.md          — cross-tool obligations (Bootstrap Receipt,
+                                    Cognitive Mode 報告, Resume clause,
+                                    knowledge-update-flow, etc.)
+    - ai-tools/agent/<tool>.md   — tool-specific usage notes
+    - runtime/cognitive-modes-*.yaml + runtime/runtime.db — contracts
+
+  Duplicating obligation content into tool entries causes drift: when
+  one entry is edited, others fall behind (Fix A 2026-05-25 was a real
+  example). Thin entries push agents to the canonical source.
+
+entry_files:
+  # Repo-level (this Ai-skill repo)
+  - path: CLAUDE.md
+    tool: Claude Code
+    role: repo-root auto-load
+  # Downstream-project entries (created by ai-skill init-project)
+  - path: CLAUDE.md
+    tool: Claude Code
+    role: downstream auto-load (per project)
+  - path: .cursor/rules/ai-skill-bootstrap.mdc
+    tool: Cursor
+    role: downstream auto-load (per project)
+  - path: .roomodes
+    tool: Roo Code
+    role: downstream auto-load (per project)
+
+thinness_rule:
+  required_content:
+    - reference to CORE_BOOTSTRAP.md (markdown link or path mention)
+    - IMPORTANT framing telling agent to follow ALL obligations in canonical source
+    - statement that summary "Resume directly" does NOT exempt bootstrap
+
+  forbidden_content:
+    # These belong in canonical sources, not in tool entry files
+    - reason: "Mode enum values belong in models/cognitive-modes/ + runtime/cognitive-modes.yaml"
+      pattern_substring:
+        - "FAST/NORMAL/DEEP/FORENSIC/RECOVERY"
+        - "INDEX_ONLY/SUMMARY_FIRST/CHECKLIST_FIRST/SOURCE_BACKED/GRAPH_ASSISTED"
+        - "LIGHT/STANDARD/STRICT/LOCKDOWN"
+        - "NONE/EPISODIC/DECISION_REPLAY/FAILURE_REPLAY/PROJECT_CONTEXT"
+    - reason: "Receipt format example belongs in CORE_BOOTSTRAP.md only"
+      pattern_substring:
+        - "Bootstrap: rules=✓ phase=phase.bootstrap obligations="
+    - reason: "Cognitive Mode 報告 full table example belongs in CORE_BOOTSTRAP.md + models/cognitive-modes/"
+      pattern_substring:
+        - "| 維度 | 值 | 理由 |"
+
+  size_constraint:
+    max_lines: 30
+    rationale: |
+      30 lines is generous enough for IMPORTANT framing + reference list
+      + 3-5 tool-specific notes. Anything beyond is a sign of obligation
+      duplication or specific-format leakage.
+
+enforcement:
+  validator: validateBootstrapEntryThinness
+  validator_location: scripts/ai-skill-cli/internal/app/hooks.go
+  applies_to:
+    - commits that stage any entry_files path
+  does_not_apply_to:
+    - merge commits (auto-skipped earlier in commit-msg)
+    - commits with [skip-bootstrap-thinness] marker
+  opt_out_marker: "[skip-bootstrap-thinness]"
+  opt_out_rationale: >
+    Rare migrations or template restructure that legitimately exceed
+    the size cap for a single transitional commit may opt out. Should
+    be rare; reviewer must verify content thins out in next commit.
+
+modification_rule:
+  description: |
+    Anyone editing this YAML, the validator, or the entry file list must
+    also update:
+      1. enforcement/failure-patterns/bootstrap-entry-bloat.md (failure pattern doc)
+      2. CORE_BOOTSTRAP.md (the canonical obligation source — if a new obligation is being added)
+      3. scripts/ai-skill-cli/internal/app/init_project.go (if downstream entry templates change)
+    Adding a new tool entry file: add to entry_files list, update validator
+    if path pattern needs special-casing, add test fixture in hooks_test.go.
+
+failure_pattern_linkage:
+  related:
+    - enforcement/failure-patterns/bootstrap-entry-bloat.md
+    - enforcement/failure-patterns/source-mirror-write-drift.md
+
+acceptance:
+  - scenario bootstrap-entry-thinness-v1 PASS
+  - YAML projected to generated_surfaces (target_key = runtime.bootstrap_entry_points)
+  - validator wired into runCommitMsgHook
+  - repo-root CLAUDE.md refactored to thin form (<=30 lines, no enum content)
+
+source: >
+  2026-05-25 session. User feedback after Fix A bloated CLAUDE.md with
+  Cognitive Mode block format that already lived in CORE_BOOTSTRAP.md.
+  Quote: 「不要都把各個東西特殊化的設定(claude.md)都設定在那裡 不然其他工具用了
+  還是會有這個問題 ... 只希望要薄薄的設定入口就好 ... 改成強制 或是使用yaml」

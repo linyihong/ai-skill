@@ -1,4 +1,4 @@
-version=repo-8970d4d
-source_commit=8970d4d
-built_at=2026-05-25T23:44:38Z
+version=repo-pending
+source_commit=pending
+built_at=2026-05-25T23:52:42Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64

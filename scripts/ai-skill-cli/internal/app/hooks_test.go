@@ -402,3 +402,51 @@ func contains(s, sub string) bool { return len(s) >= len(sub) && (s == sub || (l
 	return false
 }())))
 }
+
+func TestValidateBootstrapEntryThinness(t *testing.T) {
+	// Build a temp repo with a thin CLAUDE.md → no violation
+	tmp := t.TempDir()
+	thin := "# entry\n\nRead CORE_BOOTSTRAP.md. That's the canonical source.\n"
+	if err := os.WriteFile(filepath.Join(tmp, "CLAUDE.md"), []byte(thin), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	v := validateBootstrapEntryThinness("feat: x", []string{"CLAUDE.md"}, tmp)
+	if v != "" {
+		t.Fatalf("expected no violation for thin file, got %q", v)
+	}
+
+	// Add forbidden enum content → violation
+	bloated := thin + "\nMode values: FAST/NORMAL/DEEP/FORENSIC/RECOVERY\n"
+	if err := os.WriteFile(filepath.Join(tmp, "CLAUDE.md"), []byte(bloated), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	v = validateBootstrapEntryThinness("feat: x", []string{"CLAUDE.md"}, tmp)
+	if v == "" {
+		t.Fatal("expected violation for enum content")
+	}
+
+	// Over line count → violation
+	manyLines := ""
+	for i := 0; i < 40; i++ {
+		manyLines += "line\n"
+	}
+	if err := os.WriteFile(filepath.Join(tmp, "CLAUDE.md"), []byte(manyLines), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	v = validateBootstrapEntryThinness("feat: x", []string{"CLAUDE.md"}, tmp)
+	if v == "" {
+		t.Fatal("expected violation for >30 lines")
+	}
+
+	// Opt-out skips even bloated file
+	v = validateBootstrapEntryThinness("feat: x\n\n[skip-bootstrap-thinness]\n", []string{"CLAUDE.md"}, tmp)
+	if v != "" {
+		t.Fatalf("expected no violation with opt-out, got %q", v)
+	}
+
+	// Non-entry file staged → no enforcement
+	v = validateBootstrapEntryThinness("feat: x", []string{"README.md"}, tmp)
+	if v != "" {
+		t.Fatalf("expected no enforcement on non-entry file, got %q", v)
+	}
+}

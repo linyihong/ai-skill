@@ -313,6 +313,9 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		if v := validateAdaptiveTriggers(modes, text); v != "" {
 			violations = append(violations, v)
 		}
+		if v := validateBootstrapEntryThinness(text, staged, root); v != "" {
+			violations = append(violations, v)
+		}
 		if len(violations) > 0 {
 			result.Status = "blocked"
 			result.ExitCode = ExitValidationFailed
@@ -806,6 +809,102 @@ func validateAdaptiveTriggers(modes map[string]string, text string) string {
 		}
 	}
 
+	if len(violations) == 0 {
+		return ""
+	}
+	return strings.Join(violations, "\n  - ")
+}
+
+// validateBootstrapEntryThinness implements runtime/bootstrap-entry-points.yaml:
+// when a commit stages an AI-tool entry file (repo-root CLAUDE.md,
+// .cursor/rules/ai-skill-bootstrap.mdc, .roomodes), enforce that the file
+// remains a thin pointer to canonical sources.
+//
+// Checks:
+//   - Line count ≤ 30
+//   - No mode enum substrings (FAST/NORMAL/DEEP/FORENSIC/RECOVERY etc.)
+//   - No Bootstrap Receipt format example with the literal phase pattern
+//   - No full Cognitive Mode 報告 markdown table (the "| 維度 | 值 | 理由 |" header)
+//
+// Opt-out: standalone "[skip-bootstrap-thinness]" trailer line.
+var bootstrapEntryPaths = []string{
+	"CLAUDE.md",
+	".cursor/rules/ai-skill-bootstrap.mdc",
+	".roomodes",
+}
+
+func validateBootstrapEntryThinness(text string, staged []string, root string) string {
+	// Opt-out marker on its own line
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-bootstrap-thinness]" {
+			return ""
+		}
+	}
+
+	// Identify staged entry files
+	stagedEntries := []string{}
+	for _, s := range staged {
+		for _, p := range bootstrapEntryPaths {
+			if s == p {
+				stagedEntries = append(stagedEntries, s)
+				break
+			}
+		}
+	}
+	if len(stagedEntries) == 0 {
+		return ""
+	}
+
+	// Forbidden substrings (each substring is enough to fail)
+	forbiddenSubs := []string{
+		"FAST/NORMAL/DEEP/FORENSIC/RECOVERY",
+		"INDEX_ONLY/SUMMARY_FIRST/CHECKLIST_FIRST/SOURCE_BACKED/GRAPH_ASSISTED",
+		"LIGHT/STANDARD/STRICT/LOCKDOWN",
+		"NONE/EPISODIC/DECISION_REPLAY/FAILURE_REPLAY/PROJECT_CONTEXT",
+		"Bootstrap: rules=✓ phase=phase.bootstrap obligations=",
+		"| 維度 | 值 | 理由 |",
+	}
+
+	const maxLines = 30
+	var violations []string
+	for _, path := range stagedEntries {
+		fullPath := path
+		if !filepath.IsAbs(fullPath) {
+			fullPath = filepath.Join(root, fullPath)
+		}
+		body, err := os.ReadFile(fullPath)
+		if err != nil {
+			// File might be staged for deletion; ignore
+			continue
+		}
+		content := string(body)
+		// Line count check (count lines including trailing-newline content)
+		lineCount := 1
+		for _, b := range content {
+			if b == '\n' {
+				lineCount++
+			}
+		}
+		// Strip count if file ends with newline
+		if strings.HasSuffix(content, "\n") {
+			lineCount--
+		}
+		if lineCount > maxLines {
+			violations = append(violations,
+				"bootstrap-entry-thinness: "+path+" is "+itoa(lineCount)+
+					" lines (max "+itoa(maxLines)+"); move obligation content to CORE_BOOTSTRAP.md or ai-tools/agent/<tool>.md per runtime/bootstrap-entry-points.yaml.")
+			continue
+		}
+		// Forbidden substring check
+		for _, sub := range forbiddenSubs {
+			if strings.Contains(content, sub) {
+				violations = append(violations,
+					"bootstrap-entry-thinness: "+path+" contains canonical content fragment '"+
+						sub+"'; this belongs in CORE_BOOTSTRAP.md / models/cognitive-modes/, not in tool entries.")
+				break // one violation per file is enough
+			}
+		}
+	}
 	if len(violations) == 0 {
 		return ""
 	}
