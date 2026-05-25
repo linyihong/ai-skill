@@ -1,0 +1,68 @@
+# Source: Bootstrap Receipt Enforcement (A+B+C) — test-first per system-upgrade-governance §3 Rule 9
+# Pre-implementation scenario (initially failing until obligation + gate compiled into runtime.db)
+id: bootstrap-receipt-enforcement-v1
+domain: bootstrap
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: bootstrap-bypass-on-resume
+  class: process-gap
+  date: "2026-05-25"
+  description: |
+    Session start (含 resume from summary) 必須先讀 CORE_BOOTSTRAP.md + README.md，
+    查 runtime.db 的 phase / obligations / gates，並於 first-turn 輸出 Bootstrap Receipt
+    （`Bootstrap: rules=✓ phase=<id> obligations=<n> gates=<n>`）才能進入任務執行。
+
+    現況：CLAUDE.md 與 CORE_BOOTSTRAP.md 是 prose 提示，無 forcing function。
+    Summary 的 "Resume directly" 容易被誤判為可跳過 runtime bootstrap。
+
+    Phase A+B+C 修正：
+    - A：CLAUDE.md / CORE_BOOTSTRAP.md / init-project bootstrap text 加 IMPORTANT/MUST 與 Resume clause
+    - B：first-turn 必須輸出 Bootstrap Receipt 才能 call 非-Read tool
+    - C：runtime.db 加 obligation.bootstrap.receipt_acknowledged + gate.bootstrap.receipt_present
+
+    Note: governance-structure 層（obligation + gate 存在）由本 scenario 驗證。
+    Behavioral 層（agent 實際是否輸出 receipt）為後續 phase 的人工 audit 任務。
+
+given:
+  task: phase_abc_bootstrap_enforcement_structure
+  artifacts:
+    - runtime/runtime.db (obligations table, gates table)
+    - CLAUDE.md (root)
+    - CORE_BOOTSTRAP.md (root)
+  signals:
+    - obligation must exist: obligation.bootstrap.receipt_acknowledged
+    - gate must exist: gate.bootstrap.receipt_present
+    - both must be in phase.bootstrap scope
+    - CLAUDE.md must contain literal string "Bootstrap Receipt"
+    - CORE_BOOTSTRAP.md must contain literal string "Bootstrap Receipt"
+
+when:
+  action: phase_abc_completion_check
+
+then:
+  expected_route:
+    - obligations table has row with id=obligation.bootstrap.receipt_acknowledged
+    - obligations table row has phase=phase.bootstrap
+    - gates table has row with id=gate.bootstrap.receipt_present
+    - gates table row has phase=phase.bootstrap and severity=high
+    - CLAUDE.md contains "Bootstrap Receipt"
+    - CORE_BOOTSTRAP.md contains "Bootstrap Receipt"
+  forbidden_routes:
+    - claim_enforcement_done_without_obligation_row
+    - claim_enforcement_done_without_gate_row
+    - claim_enforcement_done_without_claude_md_clause
+    - claim_enforcement_done_without_core_bootstrap_clause
+
+validation:
+  detection_command: |
+    ob=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM obligations WHERE id='obligation.bootstrap.receipt_acknowledged';" 2>/dev/null) && \
+    gt=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM gates WHERE id='gate.bootstrap.receipt_present';" 2>/dev/null) && \
+    cl=$(grep -c "Bootstrap Receipt" CLAUDE.md 2>/dev/null) && \
+    cb=$(grep -c "Bootstrap Receipt" CORE_BOOTSTRAP.md 2>/dev/null) && \
+    [ "$ob" -ge 1 ] && [ "$gt" -ge 1 ] && [ "$cl" -ge 1 ] && [ "$cb" -ge 1 ] && \
+    echo "PASS" || echo "FAIL ob=${ob:-0} gt=${gt:-0} cl=${cl:-0} cb=${cb:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — obligation/gate/clauses not yet present）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
