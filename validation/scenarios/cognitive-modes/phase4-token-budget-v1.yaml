@@ -1,0 +1,67 @@
+# Source: Phase 4 — Selective Loading + Token Budget Gate
+# Test-first per system-upgrade-governance §3 Rule 9
+id: phase4-token-budget-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-budget-overflow
+  class: process-gap / resource-bound
+  date: "2026-05-25"
+  description: |
+    Phase 4 deliverables per plan §Phase 4:
+    1. Budget table per mode combination written to runtime.db (executable
+       YAML projected to generated_surfaces).
+    2. Optional behavioral validator: if commit body declares
+       'token_estimate: <n>' trailer and declared mode combination has
+       a known budget, hook blocks when over budget.
+    3. Failure pattern enforcement/failure-patterns/cognitive-budget-overflow.md
+       documents the recurring failure mode.
+
+    Per-tool-call enforcement is deferred to Phase 5 adaptive runtime.
+    commit-msg layer enforces declared-budget consistency, not actual
+    runtime token usage.
+
+given:
+  task: phase_4_completion_check
+  artifacts:
+    - runtime/cognitive-modes-token-budget.yaml
+    - enforcement/failure-patterns/cognitive-budget-overflow.md
+    - scripts/ai-skill-cli/internal/app/hooks.go (validateTokenBudget)
+    - runtime/runtime.db (generated_surfaces row)
+  signals:
+    - YAML contract file exists
+    - failure pattern file exists
+    - validateTokenBudget function in hooks.go
+    - runCommitMsgHook calls validateTokenBudget
+    - generated_surfaces row with target_key = runtime.cognitive_modes.token_budget
+
+when:
+  action: phase_4_completion_check
+
+then:
+  expected_route:
+    - runtime/cognitive-modes-token-budget.yaml exists
+    - enforcement/failure-patterns/cognitive-budget-overflow.md exists
+    - hooks.go contains validateTokenBudget
+    - runCommitMsgHook calls validateTokenBudget
+    - generated_surfaces projected (target_key = runtime.cognitive_modes.token_budget)
+  forbidden_routes:
+    - claim_done_without_yaml_contract
+    - claim_done_without_failure_pattern
+    - claim_done_without_validator
+    - claim_done_without_runCommitMsgHook_call
+    - claim_done_without_projection
+
+validation:
+  detection_command: |
+    y=$(test -f runtime/cognitive-modes-token-budget.yaml && echo 1 || echo 0)
+    f=$(test -f enforcement/failure-patterns/cognitive-budget-overflow.md && echo 1 || echo 0)
+    v=$(grep -c 'func validateTokenBudget' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validateTokenBudget')
+    p=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.cognitive_modes.token_budget';" 2>/dev/null)
+    [ "${y:-0}" -ge 1 ] && [ "${f:-0}" -ge 1 ] && [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && [ "${p:-0}" -ge 1 ] && echo "PASS" || echo "FAIL y=${y:-0} f=${f:-0} v=${v:-0} rch=${rch:-0} p=${p:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（all 5 components not yet present）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
