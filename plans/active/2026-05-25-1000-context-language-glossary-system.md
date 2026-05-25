@@ -1,9 +1,9 @@
 # Context Language Glossary System
 
-**Status**: `draft`
+**Status**: `in-progress`
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-25
-**最後更新**：2026-05-25（收斂 Open Questions：framework-only glossary、non-canonical project template、Markdown + SQLite projection、declared references only）
+**最後更新**：2026-05-26（Phase 0 Pre-Build Interrogation 已執行；補強 Phase 3 retro-own archived cognitive vocabulary；尚未進入 Phase 1）
 
 > 本 plan 回應外部 `CONTEXT.md / ubiquitous language` 建議，參考 [mattpocock/skills](https://github.com/mattpocock/skills/tree/main) 將 shared language 作為 agent alignment 技巧；但在 Ai-skill 中不建立 root `CONTEXT.md` 作為第二份 source-of-truth，而是依 Gen 3 分層落到 `knowledge/glossary/` 與 project-local memory 邊界。
 
@@ -413,6 +413,7 @@ knowledge/glossary/
 ### Tasks
 
 - [ ] 建立 `knowledge/glossary/ai-skill.md`，收 Ai-skill framework 詞彙。
+- [ ] **Retro-own archived cognitive vocabulary**：`ai-skill.md` 必須涵蓋 `plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md` 引入的 cognitive vocabulary（至少 `context_mode`、`compression`、`memory_mode`、`reasoning_mode`），每詞補上 `owner-layer`（候選：`runtime-cognition`）；否則這些詞會在 archived plan 中成為 silent owner，違反 §Semantic Ownership。來源依據：Phase 0 Pre-Build Interrogation §7 risk 重新檢視。
 - [ ] 明確禁止第一批建立 `software-delivery.md` / `runtime.md` / `validation.md`，除非 Phase 3 完成後另有 validation evidence。
 - [ ] 更新 `knowledge/README.md`，將 glossary 加入目前入口。
 - [ ] 更新 `knowledge/graphs/`，把 glossary 連到 requirements / domain modeling / software delivery。
@@ -421,6 +422,7 @@ knowledge/glossary/
 
 - [ ] Glossary 只收影響 behavior / contract / validation / runtime decision 的詞。
 - [ ] 第一批 glossary 只收 Ai-skill framework terms、runtime semantics、cognitive vocabulary、architecture contracts。
+- [ ] Archived `runtime-cognitive-modes-system.md` 引入的 cognitive vocabulary 已 retro-own，無 silent owner。
 - [ ] 每個 term 都符合 Entry Schema，且有 `owner-layer`。
 - [ ] 沒有把 project-specific 詞、host、class、incident evidence 寫入 reusable glossary。
 - [ ] 沒有建立 software-delivery mega glossary。
@@ -527,3 +529,44 @@ knowledge/glossary/
 | `plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md` | 必須引用 glossary canonical definitions for runtime semantic vocabulary；`context_mode`、`compression`、`memory_mode`、`reasoning_mode` 不得在 cognitive modes plan 內形成 subsystem-local semantics。 |
 | `plans/archived/2026-05-22-0855-executable-yaml-contract-migration.md` | 若 glossary 未來成為 executable contract，需遵守 owner-layer YAML projection 規範。 |
 | `plans/archived/2026-05-20-1635-bdd-ddd-cognition-aligned-reframe.md` | Requirements cognition 與 DDD cognition 的 shared language 邊界來源。 |
+
+---
+
+## Session Handoff（下次接手必讀）
+
+**目前進度斷點**：Phase 0 已執行完成，**尚未進入 Phase 1**。沒有檔案系統實際變更（除本 plan 自身）。
+
+### 已完成
+- ✅ Phase 0 Pre-Build Interrogation 已驗證：所有 checked sources 存在；`knowledge/glossary/`、`governance/semantic/`、`templates/`、`memory/project/context-language.md`、root `CONTEXT.md` **全部尚未存在**（greenfield，符合預期）。
+- ✅ Open Questions 9 題全部 resolved（2026-05-25）。
+- ✅ 與其他 plans cross-reference 已核實：`runtime-cognitive-modes-system.md`、`executable-yaml-contract-migration.md`、`bdd-ddd-cognition-aligned-reframe.md` 全在 `plans/archived/`，無 active 衝突。
+- ✅ Phase 3 補強：retro-own archived cognitive vocabulary（`context_mode` / `compression` / `memory_mode` / `reasoning_mode`）— 防 silent owner。
+
+### 下一個動作（從這裡開始）
+**Phase 1 Test-First Validation** — 建立 4 個 validation scenarios（**先**寫 scenarios，**再**建 glossary 結構）：
+1. `validation/scenarios/failure-derived/glossary-source-duplication-v1.yaml`
+2. `validation/scenarios/failure-derived/memory-context-language-as-canonical-v1.yaml`
+3. `validation/scenarios/failure-derived/semantic-term-overlap-v1.yaml`
+4. `validation/scenarios/failure-derived/glossary-semantic-projection-shape-v1.yaml`
+
+Schema 在 `validation/scenario.schema.json`；參考既有 `validation/scenarios/failure-derived/*.yaml` 取得格式範例。完成後跑：
+```
+ai-skill runtime refresh --native-index --native-reports
+ai-skill runtime validate --json
+```
+
+### 不可重開的封閉決議（碰到請拒絕）
+- ❌ 不建 root `CONTEXT.md`
+- ❌ 第一批不建 software-delivery / runtime / validation mega glossary
+- ❌ 不做 repo-wide semantic crawling 作 canonical usage
+- ❌ 不導入 vector DB / embeddings（Gen 3 結束前）
+- ❌ Memory 永遠不能 override glossary / ADR / workflow current source
+
+### Runtime State 提醒
+本 plan 觸發的 runtime phase 流程：`phase.bootstrap → phase.checkpoint → phase.execution`（Phase 1 起算）。每個 session 啟動仍須 Bootstrap Receipt（見 [CORE_BOOTSTRAP.md](../../CORE_BOOTSTRAP.md)）。
+
+### 關鍵檔案速查
+- 本 plan：`plans/active/2026-05-25-1000-context-language-glossary-system.md`
+- Schema 參照：`validation/scenario.schema.json`
+- Pre-build gate（已通過）：`workflow/software-delivery/requirements/pre-build-interrogation.md`
+- 待 retro-own 的 archived plan：`plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md`
