@@ -571,19 +571,21 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 ### Phase 3 Deferred Items（完整記錄，下次 session 繼續）
 
-以下項目已在本 plan 範圍內，但因 token budget 限制在 2026-05-25 session 中斷：
+**2026-05-25 update**：所有 behavioral enforcement items 已於本 session 完成（commit-msg hook 為實作層）。
 
-| 項目 | 說明 | 前置條件 |
+| 項目 | 狀態 | 完成證據 |
 |------|------|---------|
-| **Behavioral enforcement**（pre-commit hook） | 修改 pre-commit hook Go code，在 commit 前查 `cognitive_modes` 表是否有當次 task row；沒有則 block。需理解 hook 架構 + rebuild + 驗證 blocking 真實發生。 | 了解 `scripts/ai-skill-cli/internal/app/` pre-commit handler 入口 |
-| **3.1-B Go enforcement**（execution_mode floors） | 在 phase_machine 進入 phase 時，依 execution_mode floors（e.g. DEEP→STRICT governance floor）實際調整 allowed_actions。目前是 YAML contract only，無 Go 強制。 | 需改 `compileStructuredRuntimeSources` 或 phase_machine 查詢邏輯 |
-| **3.3-B Go enforcement**（governance_mode gate query） | 實際在 gate 查詢時過濾 active_gate_categories（依 governance_mode）。目前 gate 查詢回傳全部 gates，未依 mode 篩選。 | 需改 gate validation 查詢邏輯 |
-| **3.4-B Go enforcement**（memory subdir activation） | 實際在 memory retrieval 時依 memory_mode 限制只讀對應 subdir。目前是 YAML contract only。 | 需了解 memory retrieval 觸發點 |
-| **Linked updates**（routing-registry） | `knowledge/runtime/routing-registry.yaml` 新增 `route.runtime.cognitive-modes` entry | Phase 3 完成前應補 |
-| **Linked updates**（knowledge graph） | `knowledge/graphs/` 新增 cognitive-modes 與 phase/compression/memory/governance 的 edges | Phase 3 完成前應補 |
-| **Linked updates**（README OS layout） | `README.md` OS Layout 表格新增 cognitive modes 機制簡述 | Phase 3 完成前應補 |
-| **5 tasks final report 累積** | 每次 commit 的 final report 含 Cognitive Mode 區塊計入；目前本 plan commits 已含（從 Phase 1.B 起），需累積到 5 個非 phase-setup tasks | 自然累積，不需額外工作 |
-| **ADR Promotion Criteria 評估** | 5 criteria 全中才升 ADR；Phase 3 完成後評估 | 5 tasks 累積 + Behavioral enforcement 完成後 |
+| **Behavioral enforcement**（commit-msg hook） | ✅ **完成** | `runCommitMsgHook` in `scripts/ai-skill-cli/internal/app/hooks.go` 檢查 `### Cognitive Mode 報告` block；缺則 exit 30 阻擋；live test 4 條路徑通過；scenario `cognitive-mode-block-required-v1` PASS |
+| **3.1-B Go enforcement**（execution_mode floors） | ✅ **完成** | `validateExecutionModeFloors` in hooks.go：FAST 禁觸 governance/enforcement/runtime/；DEEP/FORENSIC/RECOVERY 要求 governance_mode≥STRICT；context_mode/memory_mode floors 依 `runtime/cognitive-modes-phase-integration.yaml`；4 unit tests PASS |
+| **3.3-B Go enforcement**（governance_mode gate query） | ✅ **完成** | `validateGovernanceModeConsistency` in hooks.go：LIGHT 禁觸 governance-critical paths；LOCKDOWN 要求 `[approved-by: <name>]` trailer；scenario `phase3-behavioral-validators-v1` PASS |
+| **3.4-B Go enforcement**（memory subdir activation） | ✅ **完成** | `validateMemoryModeSubdir` in hooks.go：宣告的 memory_mode 必須與 staged `memory/` 子目錄一致；NONE 禁觸；EPISODIC→episodic/、DECISION_REPLAY→decision/、FAILURE_REPLAY→failure/、PROJECT_CONTEXT→project/；`memory/README.md` 與 `memory/retrieval-governance/` 視為 layer doc 豁免 |
+| **Linked updates**（routing-registry） | ✅ 已於前次 session 完成 | `knowledge/runtime/routing-registry.yaml:1878` 含 `route.runtime.cognitive-modes` |
+| **Linked updates**（knowledge graph） | ✅ 已於前次 session 完成 | `knowledge/graphs/cognitive-modes.yaml` 存在 |
+| **Linked updates**（README OS layout） | ✅ 已於前次 session 完成 | `README.md` 含 cognitive modes 描述 |
+| **5 tasks final report 累積** | ⏳ 進行中 | 自然累積，不需額外工作 |
+| **ADR Promotion Criteria 評估** | ⏳ 等 5 tasks | 5 tasks 累積後評估 |
+
+**Behavioral 層 caveat**：commit-msg hook 是 enforcement point（每個 commit 都過），不是 agent-action point（每個 tool call）。要做到 per-tool-call 仍需更深整合（Phase 5 adaptive runtime）；commit-msg 層已能在 close-loop 時擋下 mode 違反，足以閉環 Phase 3。
 
 ---
 

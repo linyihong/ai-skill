@@ -210,3 +210,75 @@ func TestListHookFilesIgnoresDirectories(t *testing.T) {
 		t.Fatalf("expected only regular hook file, got %#v", hooks)
 	}
 }
+
+func TestParseCognitiveModeBlock(t *testing.T) {
+	text := "feat: example\n\n### Cognitive Mode 報告\n\n| 維度 | 值 | 理由 |\n|------|------|------|\n| execution_mode | DEEP | rationale |\n| context_mode | SOURCE_BACKED | rationale |\n| governance_mode | STRICT | rationale |\n| memory_mode | EPISODIC | rationale |\n"
+	modes := parseCognitiveModeBlock(text)
+	if modes["execution_mode"] != "DEEP" || modes["context_mode"] != "SOURCE_BACKED" || modes["governance_mode"] != "STRICT" || modes["memory_mode"] != "EPISODIC" {
+		t.Fatalf("parse mismatch: %#v", modes)
+	}
+}
+
+func TestValidateExecutionModeFloors(t *testing.T) {
+	// FAST forbidden when touching enforcement/
+	v := validateExecutionModeFloors(map[string]string{"execution_mode": "FAST"}, []string{"enforcement/foo.md"})
+	if v == "" {
+		t.Fatal("expected FAST violation when touching enforcement/")
+	}
+	// DEEP without STRICT governance
+	v = validateExecutionModeFloors(map[string]string{"execution_mode": "DEEP", "governance_mode": "STANDARD", "context_mode": "SOURCE_BACKED"}, nil)
+	if v == "" {
+		t.Fatal("expected DEEP violation without STRICT governance")
+	}
+	// DEEP + STRICT + SOURCE_BACKED → OK
+	v = validateExecutionModeFloors(map[string]string{"execution_mode": "DEEP", "governance_mode": "STRICT", "context_mode": "SOURCE_BACKED"}, nil)
+	if v != "" {
+		t.Fatalf("expected no violation, got %q", v)
+	}
+	// RECOVERY requires FAILURE_REPLAY memory
+	v = validateExecutionModeFloors(map[string]string{"execution_mode": "RECOVERY", "governance_mode": "STRICT", "context_mode": "CHECKLIST_FIRST", "memory_mode": "EPISODIC"}, nil)
+	if v == "" {
+		t.Fatal("expected RECOVERY violation without FAILURE_REPLAY memory")
+	}
+}
+
+func TestValidateGovernanceModeConsistency(t *testing.T) {
+	// LIGHT touching enforcement/
+	v := validateGovernanceModeConsistency(map[string]string{"governance_mode": "LIGHT"}, []string{"enforcement/x.md"}, "feat: x")
+	if v == "" {
+		t.Fatal("expected LIGHT violation")
+	}
+	// LOCKDOWN without approval
+	v = validateGovernanceModeConsistency(map[string]string{"governance_mode": "LOCKDOWN"}, nil, "feat: critical")
+	if v == "" {
+		t.Fatal("expected LOCKDOWN violation without approval")
+	}
+	// LOCKDOWN with approval trailer
+	v = validateGovernanceModeConsistency(map[string]string{"governance_mode": "LOCKDOWN"}, nil, "feat: critical\n\n[approved-by: alice]\n")
+	if v != "" {
+		t.Fatalf("expected no violation with approval, got %q", v)
+	}
+}
+
+func TestValidateMemoryModeSubdir(t *testing.T) {
+	// NONE but touching memory/episodic/
+	v := validateMemoryModeSubdir(map[string]string{"memory_mode": "NONE"}, []string{"memory/episodic/foo.md"})
+	if v == "" {
+		t.Fatal("expected NONE violation when touching memory/episodic/")
+	}
+	// EPISODIC touching memory/decision/ — wrong subdir
+	v = validateMemoryModeSubdir(map[string]string{"memory_mode": "EPISODIC"}, []string{"memory/decision/foo.md"})
+	if v == "" {
+		t.Fatal("expected EPISODIC violation when touching memory/decision/")
+	}
+	// EPISODIC touching memory/episodic/ — OK
+	v = validateMemoryModeSubdir(map[string]string{"memory_mode": "EPISODIC"}, []string{"memory/episodic/foo.md"})
+	if v != "" {
+		t.Fatalf("expected no violation, got %q", v)
+	}
+	// Layer doc exempt
+	v = validateMemoryModeSubdir(map[string]string{"memory_mode": "NONE"}, []string{"memory/README.md", "memory/retrieval-governance/activation-thresholds.md"})
+	if v != "" {
+		t.Fatalf("expected no violation for layer docs, got %q", v)
+	}
+}
