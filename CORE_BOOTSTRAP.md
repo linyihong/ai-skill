@@ -80,6 +80,12 @@ Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
 
 未輸出即執行非-Read 工具，違反 `obligation.bootstrap.receipt_acknowledged`，命中 `gate.bootstrap.receipt_present`，並觸發 [`enforcement/failure-patterns/bootstrap-bypass-on-resume.md`](enforcement/failure-patterns/bootstrap-bypass-on-resume.md)。
 
+## Cognitive Mode 報告（強制 per-turn 輸出）
+
+> **IMPORTANT**：每次 final user-facing response **必須**含 `### Cognitive Mode 報告` 4 維表格（execution_mode / context_mode / governance_mode / memory_mode + 理由欄）。這是 first-turn 之後**每一輪**對話的 per-turn obligation，不是只在 commit 時。Trivial 任務可全 NORMAL/SUMMARY_FIRST/STANDARD/NONE。
+
+格式與 mode value 速查見 [`models/cognitive-modes/README.md`](models/cognitive-modes/README.md)。Mode 間 consistency 與 budget 規則由 `runtime/cognitive-modes-*.yaml` contracts 定義；commit 階段由 `commit-msg` hook 機械強制，per-turn response 階段未自動強制但同樣是 [`constitution/ADR-008`](constitution/ADR-008-runtime-cognitive-modes.md) baseline。
+
 ## 驗證
 
 - Core Bootstrap 三條規則已讀

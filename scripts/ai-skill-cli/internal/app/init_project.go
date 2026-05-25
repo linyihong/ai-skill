@@ -314,6 +314,12 @@ func initProjectBootstrapText(repo string) string {
 
 未輸出即執行非-Read 工具，違反 obligation.bootstrap.receipt_acknowledged，命中 gate.bootstrap.receipt_present。
 
+## Cognitive Mode 報告（強制 per-turn 輸出）
+
+> **IMPORTANT**：每次 final user-facing response 必須含 ` + "`### Cognitive Mode 報告`" + ` 4 維表格（execution_mode / context_mode / governance_mode / memory_mode + 理由欄）。這是 first-turn 之後**每一輪**對話的 per-turn obligation，不是只在 commit 時。
+
+格式：4 列表格，dim / value / 理由。Mode value 速查見 Ai-skill repo 的 ` + "`models/cognitive-modes/README.md`" + `。Trivial 任務可全 NORMAL/SUMMARY_FIRST/STANDARD/NONE。Commit 階段由 commit-msg hook 機械強制（缺則 exit 30）；per-turn response 階段未自動強制但同樣是 constitution/ADR-008 baseline。
+
 ## 語言強制規則
 
 - 強制跟隨使用者語言。
