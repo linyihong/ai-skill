@@ -160,7 +160,8 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 | 欄位 | 內容 |
 | --- | --- |
 | Runtime owner | Phase 1-3：無，doc / knowledge layer plan；Phase 5 後視結果決定是否新增 `generated_surfaces` glossary index 或只走 knowledge runtime refresh。 |
-| Trigger location | `workflow/software-delivery/requirements/behavior-driven-discovery/`、`pre-build-interrogation`、`route.workflow.software-delivery`、未來 glossary route。 |
+| Trigger flow | Phase 1-3：user asks for framework / workflow / term / source-of-truth clarification → `pre-build-interrogation` or software-delivery route loads candidate sources → glossary source is manually read as dependency evidence → plan final report lists glossary decision / no duplication evidence.<br>Phase 5 candidate runtime path：file_diff or user_signal contains glossary / term conflict / ubiquitous language / source-of-truth wording → `route.knowledge.glossary` or runtime index query detects glossary candidate → load `knowledge/glossary/README.md` + matching term file → run glossary drift / semantic overlap scenarios → block completion if canonical owner or memory/project boundary conflicts. |
+| Trigger location | Phase 1-3：`pre-build-interrogation`、`route.workflow.software-delivery`、agent dependency-read ledger；Phase 5 candidate：`file_diff`、`user_signal`、runtime index lookup、未來 glossary route。 |
 | Activation contract | 初期無新 executable contract；使用既有 `workflow.software_delivery.pre_build_interrogation.contract` 作 plan 前 gate。若 Phase 5 決定 glossary 使用需要 blocking gate，再補 owner-layer YAML。 |
 | Generated surface | 初期不投影 executable contract；`knowledge/runtime/sqlite/runtime-index.sqlite` 與 runtime reports 會收錄 glossary source。若新增 executable contract，target_key 需另定。 |
 | Validation scenarios | Phase 1 先新增：`validation/scenarios/failure-derived/glossary-source-duplication-v1.yaml`、`validation/scenarios/failure-derived/memory-context-language-as-canonical-v1.yaml`、`validation/scenarios/failure-derived/semantic-term-overlap-v1.yaml`。 |

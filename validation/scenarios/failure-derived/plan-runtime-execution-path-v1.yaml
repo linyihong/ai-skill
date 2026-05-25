@@ -10,9 +10,9 @@ failure_source:
   date: "2026-05-22"
   description: |
     Plans involving framework/runtime/governance/workflow/validation/scenario/metadata
-    changes are documented but lack explicit runtime execution path, trigger location,
-    validation scenarios, and test-passing evidence. Result: contracts stay in
-    documentation layer; agents fail to activate them at runtime.
+    changes are documented but lack explicit runtime execution path, trigger flow,
+    trigger location, validation scenarios, and test-passing evidence. Result:
+    contracts stay in documentation layer; agents fail to activate them at runtime.
 
 given:
   task: create_or_update_active_plan_with_architectural_scope
@@ -22,7 +22,7 @@ given:
     - validation/scenarios/<domain>/
   signals:
     - plan touches framework / runtime / governance / workflow / validation / scenario / metadata / compiler / generated artifact
-    - plan describes "what to do" without "where runtime executes" or "where trigger fires"
+    - plan describes "what to do" without "which event triggers, which detector/route/query catches it, which contract/source loads, and what runtime action/evidence follows"
     - no validation scenarios listed in plan
     - no test-passing evidence
 
@@ -32,15 +32,18 @@ when:
 then:
   expected_route:
     - plan must contain §Runtime Execution Path section
-    - section lists: runtime owner, trigger location, activation contract, generated surface, validation scenarios, test passing evidence
+    - section lists: runtime owner, trigger flow, trigger location, activation contract, generated surface, validation scenarios, test passing evidence
+    - trigger flow lists an event/signal, detector/route/query/hook, loaded source or executable contract, runtime action/blocker, and observable evidence
     - if plan is doc-only trial, must explicitly state "此 plan 不接入 runtime" + future activation phase
     - validation scenarios must exist as YAML files in validation/scenarios/
   expected_heuristics:
     - runtime_execution_path_required_for_architectural_plans
+    - trigger_flow_must_not_be_routing_only
     - doc_only_trial_must_state_future_runtime_path
     - validation_scenarios_required_before_in_progress
   forbidden_routes:
     - mark_plan_in_progress_without_runtime_execution_path
+    - write_routing_registry_only_without_trigger_flow
     - claim_plan_completed_without_validation_scenarios_passing
     - leave_doc_only_indefinitely_without_runtime_plan
 
@@ -48,6 +51,7 @@ required_plan_sections:
   - heading: "## Runtime Execution Path"
     required_fields:
       - Runtime owner
+      - Trigger flow
       - Trigger location
       - Activation contract
       - Generated surface
@@ -61,10 +65,24 @@ doc_only_exemption:
     - future activation phase name + entry conditions
     - drift prevention during doc-only period
 
+trigger_flow_requirements:
+  required_chain:
+    - event_or_signal
+    - detector_or_route_or_query_or_hook
+    - loaded_source_or_executable_contract
+    - runtime_action_or_blocker
+    - observable_evidence
+  reject_patterns:
+    - "routing registry will handle it"
+    - "agent reads when needed"
+    - "future runtime route"
+    - "TBD trigger"
+
 validation:
   detection_command: |
     for plan in plans/active/*.md; do
       grep -q "## Runtime Execution Path" "$plan" || echo "$plan missing §Runtime Execution Path"
+      grep -q "Trigger flow" "$plan" || echo "$plan missing Trigger flow"
     done
   pass_criteria: empty output (all active plans have §Runtime Execution Path)
   reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 8

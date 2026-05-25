@@ -161,13 +161,13 @@
 
 （已詳列於後續段落，略）
 
-### 規則 8：升級計畫必須明列 runtime execution path + validation scenarios + 測試通過
+### 規則 8：升級計畫必須明列 runtime execution path + trigger flow + validation scenarios + 測試通過
 
 **教訓**（2026-05-22）：多次發現「計畫宣告新框架但只停在 documentation layer，未接入 runtime execute layer」的失誤：
 
 - ADR-008 Runtime Cognitive Modes 提案 — Phase 1-5 設計完整但**無 runtime 投影、無 generated_surfaces 命中、無 validation scenarios**
 - Cognitive Modes Phase D 啟動 — 純 doc layer，agent 手動套用，但**未明寫「此 plan 不接入 runtime」與未來接入時機**
-- 一般升級計畫 — 描述「應該怎麼做」但不明列「在哪個 runtime 觸發、validation scenarios 在哪、是否通過測試」
+- 一般升級計畫 — 描述「應該怎麼做」但不明列「哪個 event 觸發、哪個 runtime / route 接住、哪個 contract 執行、validation scenarios 在哪、是否通過測試」
 
 結果：知識停在文件層，沒有 runtime 強制機制，靠 agent 自律觸發。
 
@@ -178,8 +178,9 @@
 
 | 欄位 | 內容 |
 |------|------|
-| Runtime owner | phase_machine / obligation_ledger / blocking_gates / generated_surfaces / cognitive_modes / 等具體 runtime layer |
-| Trigger location | 哪個 event 觸發 — phase entry / file_diff / user_signal / commit_attempt / push_attempt / cron / 等 |
+| Runtime owner | phase_machine / obligation_ledger / blocking_gates / generated_surfaces / cognitive_modes / routing-registry / knowledge index / 等具體 runtime layer |
+| Trigger flow | 實際觸發鏈：event / signal → detector / route / query → loaded contract or source → runtime action / blocking gate。不得只寫「routing 會處理」。 |
+| Trigger location | 哪個 event 觸發 — phase entry / file_diff / user_signal / commit_attempt / push_attempt / cron / validation failure / semantic conflict / 等 |
 | Activation contract | 對應的 YAML executable contract 路徑（或「無 — 屬 doc-only trial」） |
 | Generated surface | 是否投影到 runtime.db generated_surfaces（target_key + source_path） |
 | Validation scenarios | validation/scenarios/<domain>/<scenario-id>-v1.yaml 列表 |
@@ -188,12 +189,37 @@
 如果 plan 是純 doc layer trial（沒接入 runtime），必須明寫：
 - 「此 plan 不接入 runtime」+ 理由
 - 「未來何時 / 在哪個 phase 接入」（具體 phase 名稱與條件）
-- 「doc-only 期間如何避免漂移」（agent 手動套用契約、commit message 強制檢查、等）
+- 「doc-only 期間如何避免漂移」（agent 手動套用契約、commit message 強制檢查、routing candidate、validation scenario、等）
 ```
+
+#### Trigger flow 最低格式
+
+每個非 doc-only upgrade plan 必須用文字、表格或 Mermaid 明列至少一條可執行觸發鏈：
+
+```text
+<event / signal>
+  -> <detector / routing record / runtime query / hook / validation command>
+  -> <loaded source or executable contract>
+  -> <runtime action: load / block / escalate / refresh / validate / write state>
+  -> <observable evidence: generated surface row / scenario pass / final report field / DB row>
+```
+
+**不合格寫法**：
+
+- 「routing registry 會觸發」
+- 「agent 需要時會讀」
+- 「未來可接 runtime」
+- 只列檔案路徑，沒有 event、detector、contract、runtime action、evidence
+
+**合格寫法**：
+
+- `file_diff touches knowledge/glossary/** -> route.knowledge.glossary activation_triggers -> load knowledge/glossary/README.md -> run semantic-term-overlap scenario -> block completion if owner-layer conflict exists`
+- `commit_attempt -> pre-commit hook -> ai-skill runtime validate -> generated_surfaces target_key check -> block commit on missing projection`
+- `phase entry:validation -> runtime.db blocking_gates query -> enforcement contract loaded -> final report must include validation evidence`
 
 **為什麼是必要的**：
 
-- 文件層的契約若無 runtime 強制執行，靠 agent 自律觸發 — 一旦 agent 忽略，整個框架失效（本 session 多次發生）
+- 文件層的契約若無 runtime 強制執行，靠 agent 自律觸發 — 一旦 agent 忽略，整個框架失效（本 session 多次發生）。只寫 routing record 不等於觸發；必須說明誰查 routing、何時查、查完會載入什麼、如何阻擋或驗證。
 - Validation scenarios 是「測試而非聲明」— scenario 通過代表行為真實發生，scenario 失敗會 block close-loop
 - 「不接入 runtime」是合法選項（如 Phase D doc-only trial），但必須**明確聲明**而非隱含；明確聲明後續才能規劃接入時機
 

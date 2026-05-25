@@ -148,6 +148,7 @@ Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3
 | 欄位 | 內容 |
 |------|------|
 | Runtime owner | **Phase D**: 無 — doc-only trial / **Phase 1-5**: `runtime.db cognitive_modes` 表 + `phase_machine` integration |
+| Trigger flow | **Phase D**: user / agent task begins → agent manually resolves mode from plan heuristic → final report includes Cognitive Mode block → commit history / Phase D metrics provide evidence.<br>**Phase 2+**: task entry signal or file diff → signal discovery table / runtime query → `runtime/cognitive-modes.yaml` contract loaded → cognitive mode written / selected → subsystem gates adapt behavior → final report and validation scenarios prove mode was applied. |
 | Trigger location | **Phase D**: agent 手動 resolve + final report / **Phase 2+**: task entry signal-based discovery |
 | Activation contract | **Phase D**: 無 / **Phase 1+**: `runtime/cognitive-modes.yaml`（將建立） |
 | Generated surface | **Phase D**: 無 / **Phase 1+**: `runtime.db generated_surfaces.cognitive_modes.contract` |

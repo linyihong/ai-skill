@@ -24,7 +24,7 @@
 |------|---------|------|
 | `Status` 標頭 | 全部 plan | 標 `draft` / `in-progress` / `completed` |
 | `Decision Rationale` | 架構/流程/跨層 plan | 取代「proposed ADR」的提案內容；含 Problem & Why Now / Decision / Alternatives Considered / Why Not an ADR Yet / ADR Promotion Criteria / Consequences |
-| `Runtime Execution Path` | 涉及 framework/runtime/governance/workflow/validation/scenario/metadata/compiler 改動 | 明列 runtime owner、trigger location、activation contract、generated surface、validation scenarios、test passing evidence；doc-only trial 必須明寫「不接入 runtime」+ 未來接入時機 — 詳見 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §3 規則 8 |
+| `Runtime Execution Path` | 涉及 framework/runtime/governance/workflow/validation/scenario/metadata/compiler 改動 | 明列 runtime owner、trigger flow、trigger location、activation contract、generated surface、validation scenarios、test passing evidence；trigger flow 必須說明 event → detector / route / query → loaded contract/source → runtime action / blocker → evidence，不能只寫「routing 會處理」；doc-only trial 必須明寫「不接入 runtime」+ 未來接入時機 — 詳見 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §3 規則 8 |
 | `Open Questions` | 架構/流程 plan | 列出 completed 前需釐清的問題 |
 | `完成條件` | 全部 plan | 依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §2 checklist 子集 |
 | `Phase 0` Pre-Build Interrogation | 架構/流程/跨層 plan | per §Architecture Compatibility Preflight |
