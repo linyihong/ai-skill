@@ -557,10 +557,32 @@ func compileProseRuntimeSources(repo string, db *sql.DB, docs map[string]map[str
 	if err := compileCognitiveModeEnforcementRules(db); err != nil {
 		return err
 	}
+	if err := compileCognitiveModePOCSeed(db); err != nil {
+		return err
+	}
 	if err := compileBootstrapEnforcementRules(db); err != nil {
 		return err
 	}
 	return nil
+}
+
+func compileCognitiveModePOCSeed(db *sql.DB) error {
+	// Seed the Phase 1 POC task record per plan acceptance criterion (d):
+	// "至少 1 個 POC task 的 cognitive_modes row 寫入 runtime.db".
+	// Since compile wipes the table, the seed must be re-inserted each compile
+	// until behavioral runtime (Phase 4) populates rows from real task resolutions.
+	_, err := db.Exec(
+		`INSERT OR IGNORE INTO cognitive_modes (id, task_id, execution_mode, context_mode, governance_mode, memory_mode, resolved_at, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		1,
+		"phase1.poc.cognitive_modes_bootstrap",
+		"NORMAL",
+		"SUMMARY_FIRST",
+		"STANDARD",
+		"NONE",
+		"2026-05-22T00:00:00Z",
+		"plan:2026-05-22-1629-runtime-cognitive-modes-system §Phase 1 POC seed (compile-time)",
+	)
+	return err
 }
 
 func compileBootstrapEnforcementRules(db *sql.DB) error {
