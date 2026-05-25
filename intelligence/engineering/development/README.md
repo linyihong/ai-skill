@@ -9,6 +9,7 @@
 | [`docs-first-bdd-closure.md`](docs-first-bdd-closure.md) | 文件優先 BDD 閉環：observable behavior 變更前必須先更新管轄契約 |
 | [`risk-translation-heuristic.md`](risk-translation-heuristic.md) | 風險轉譯：將攻擊者視角的觀察轉譯為開發者行動 |
 | [`contract-governance-heuristic.md`](contract-governance-heuristic.md) | 契約治理：文件衝突時的優先順序與解決方法 |
+| [`test-first-framework-upgrade.md`](test-first-framework-upgrade.md) | Framework / runtime / governance 升級時 scenarios 必須寫在實作之前；scenarios 是 acceptance contract 不是事後 verification。互補通用 TDD heuristic（設計回饋）。 |
 
 ## 與其他層的關係
 

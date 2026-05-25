@@ -11,7 +11,7 @@
 | Model context report | [`model-context-report.md`](model-context-report.md) | generated view |
 | Model checklists | [`model-checklists.md`](model-checklists.md) | generated view |
 | SQLite runtime index | [`sqlite/`](sqlite/) | generated lookup cache prototype |
-| Summaries | [`../summaries/`](../summaries/) | 24 files |
+| Summaries | [`../summaries/`](../summaries/) | 25 files |
 | Graph records | [`../graphs/`](../graphs/) | 33 files |
 
 ## Routing Records
@@ -99,6 +99,7 @@
 | `intelligence.requirements-cognition` | `candidate` | [`requirements-cognition.md`](../summaries/requirements-cognition.md) | Requirements cognition 先用 pre-build interrogation 釐清 goal、scope、non-goals、acceptance、framework source-of-truth 與 duplication risk，再用 Impact Map × Customer Journey Map 對齊 product impact，並用 BDD-lite 處理 ambiguity、actor intent、behavior boundary、traceability、validation target 與 test effectiveness，而不是 Gherkin everywhere。 |
 | `root.bootstrap.ai-skill` | `validated` | [`root-bootstrap.md`](../summaries/root-bootstrap.md) | Ai-skill 工作的 bootstrap 入口。Root README 定義 OS layout 與 cost-aware 啟動流程；CORE_BOOTSTRAP.md 定義 3 條核心規則（~800 tokens）；enforcement README 定義 Runtime Activation Model 與 lazy-load rules。 |
 | `runtime.operations` | `validated` | [`runtime-operations.md`](../summaries/runtime-operations.md) | Runtime 層負責 context routing、contract projection、context pruning、agent coordination 與 orchestration。包含 router（contract-backed activation、cost budget）、context（TTL policy、prune strategy、prompt cache layout）。 |
+| `intelligence.test-first-framework-upgrade` | `candidate` | [`test-first-framework-upgrade.md`](../summaries/test-first-framework-upgrade.md) | Framework / runtime / governance 升級時 validation scenarios 必須寫在 runtime 實作之前，scenarios 是 acceptance contract 不是事後 verification。流程：列期望可觀察行為 → 寫 YAML scenarios → 驗證目前 fail → 開始實作 → 完成 = scenarios pass。與通用 TDD heuristic 互補（設計回饋 vs 順序原則）。Doc-only trial / typo / spike 可豁免；runtime.db schema / enforcement rule / compiler 改動不可豁免。 |
 | `workflow.travel-planning` | `candidate` | [`travel-planning.md`](../summaries/travel-planning.md) | 依目的地、日期、交通與玩法規劃行程，包含營業時間查證、交通比較、住宿與備案。支援 itinerary 結構化輸出與可行性檢查。日本自駕含 Mapcode 粒度規則（沿線景點 2km+ 需各停車點獨立一行）與查詢工具鏈。 |
 | `intelligence.vendor-integration-architecture` | `candidate` | [`vendor-integration-architecture.md`](../summaries/vendor-integration-architecture.md) | 整合超過 3 個外部廠商（支付聚合、社群登入、IM、博弈聚合、廣告聯播等）時的整合策略選型。五種策略：A. Adapter/Strategy（單模組多實作）/ B. Compile-time submodule per vendor / C. Plugin SPI（runtime 載入）/ D. Out-of-process service / E. Hybrid 分層。N ≥ 10 必須跳出 compile-time module per vendor 模式，否則編譯時間、IDE、升級成本爆炸。 |
 

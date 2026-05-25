@@ -39,6 +39,7 @@ Summaries 用來協助 agent：
 | `intelligence.migration-feature-bundling` | 大型 migration 把搬遷與新功能綁進同一階段交付的反模式；應採 Parity-First Migration；對 stakeholder 翻譯為「失望總比絕望好」。 | [`migration-feature-bundling.md`](migration-feature-bundling.md) |
 | `intelligence.module-count-discipline` | Repo 模組數量紀律；N 對應健康做法（≤5 直寫 / 5-30 模板+門檻 / 30-100 plugin/SPI/catalog / ≥100 警報）；新增 module 五道判斷；build system 中立。 | [`module-count-discipline.md`](module-count-discipline.md) |
 | `intelligence.plan-first-decision-promotion` | Plan-first / ADR-after-completion：提案在 plan §Decision Rationale，憲法在驗證後；constitution/ 只放 accepted ADRs。 | [`plan-first-decision-promotion.md`](plan-first-decision-promotion.md) |
+| `intelligence.test-first-framework-upgrade` | Framework / runtime / governance 升級時 scenarios 必須寫在實作之前；scenarios 是 acceptance contract 不是事後 verification。 | [`test-first-framework-upgrade.md`](test-first-framework-upgrade.md) |
 
 ## Summary 格式
 

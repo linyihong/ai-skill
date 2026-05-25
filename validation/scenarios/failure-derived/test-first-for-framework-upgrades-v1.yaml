@@ -1,0 +1,78 @@
+# Source: 2026-05-22 user observation — Cognitive Modes plan ef305bf 寫 scenarios 早於 Phase 1 實作成功案例
+id: test-first-for-framework-upgrades-v1
+domain: cross-domain
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: test-after-instead-of-test-first
+  class: process-ordering-gap
+  date: "2026-05-22"
+  description: |
+    Framework / runtime / governance upgrade plans implement Phase N first
+    and write validation scenarios afterwards. Scenarios become verification
+    artifacts instead of acceptance contracts; rework risk and scope creep
+    risk are higher.
+
+given:
+  task: execute_phase_n_implementation_for_framework_upgrade
+  artifacts:
+    - plans/active/<plan>.md
+    - validation/scenarios/<domain>/
+    - runtime/runtime.db
+    - git log
+  signals:
+    - plan touches framework / runtime / governance / workflow / validation / scenario / metadata / compiler
+    - plan Phase N requires implementation
+    - acceptance criteria stated in plan
+
+when:
+  action: begin_phase_n_implementation
+
+then:
+  expected_route:
+    - verify validation/scenarios/<domain>/ contains scenarios covering Phase N acceptance criteria
+    - verify those scenarios currently fail (fail-by-absence, not fail-by-error)
+    - only after scenarios are written, begin implementation
+    - implementation commit must reference scenarios commit hash and "now passing" state
+  expected_heuristics:
+    - test_first_for_framework_upgrades
+    - scenarios_are_acceptance_contract_not_verification
+    - fail_first_before_implement
+  forbidden_routes:
+    - implement_before_writing_scenarios
+    - write_scenarios_after_implementation_to_match
+    - mark_phase_complete_without_pre_written_scenarios
+
+required_artifacts:
+  before_implementation:
+    - validation/scenarios/<domain>/<scenario-id>-v1.yaml (covering acceptance criteria)
+    - commit creating scenarios (separate from implementation commit)
+  after_implementation:
+    - implementation commit referencing scenarios commit hash
+    - commit message contains "scenarios pre-written: <hash>" and "now passing"
+
+exemption:
+  cases:
+    - doc-only trial (no runtime behavior to test)
+    - bug fix / hotfix (existing coverage protects)
+    - typo / wording fix (no behavior change)
+    - exploratory spike (throwaway prototype)
+  documentation_required: |
+    Exemption must be explicitly stated in plan or commit message with reason.
+
+validation:
+  detection_command: |
+    # for each Phase N implementation commit in active plans:
+    # 1. extract referenced scenarios commit hash from message
+    # 2. verify scenarios commit hash exists in git log and is ancestor
+    # 3. verify scenarios commit modified validation/scenarios/<domain>/
+    # 4. verify Phase N commit modified runtime/ or relevant layer
+    # 5. confirm "now passing" appears in Phase N commit message
+    grep -lE "scenarios pre-written:" <git log range> | wc -l
+  pass_criteria: |
+    Every framework/runtime/governance implementation commit either:
+    (a) references a pre-written scenarios commit with "now passing" claim, OR
+    (b) is explicitly exempt with documented reason
+  reference_intelligence: intelligence/engineering/development/test-first-framework-upgrade.md
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

@@ -203,6 +203,64 @@
 - 既有 archived plans 不強制回溯（但建立 retrospective audit 任務時可標 TODO）
 - 若 plan 已 archived 但仍是 active runtime contract 的 source（如 executable-yaml-contract-migration），應追溯補上
 
+### 規則 9：Framework 升級必須 test-first — scenarios 寫於實作之前
+
+**教訓**（2026-05-22）：Cognitive Modes plan 在 `ef305bf` 寫入 6 個 validation scenarios，**早於** Phase 1 runtime 實作。實證：scenarios 在實作前先跑揭露 11 個既有 failure pattern 結構漂移 + 1 個 plan 缺 section，在實作前就修補（commits `3a38e49` / `2ca5b4f`）。使用者觀察「先測試再實作 比 先實作再寫測試 更能增加框架穩定性」。
+
+此模式比規則 8 更嚴格 — 規則 8 要求 plan 含 scenarios，規則 9 進一步要求**順序**：scenarios commit 必須早於 implementation commit。
+
+**強制**：升級涉及 **framework / runtime / governance / workflow / validation / scenario / metadata / compiler / generated artifact** 改動，Phase N 實作前必須完成下列順序：
+
+```markdown
+## Phase N Test-First Order
+
+1. **列出 Phase N 期望可觀察行為**
+   - 哪些檔案會被建立 / 修改？
+   - runtime.db 哪些 tables / surfaces 會被觸動？
+   - 哪些 agent action 會啟用 / 阻擋？
+
+2. **寫對應 validation/scenarios/<domain>/<id>-v1.yaml**
+   - 每個期望行為 = 1 scenario
+   - 含 `given` / `when` / `then` / `detection_command` / `pass_criteria`
+
+3. **驗證 scenarios 目前 fail**
+   - 跑 `detection_command` 確認 fail-by-absence（不是 fail-by-error）
+   - 在獨立 commit 記錄 scenarios，commit message 註明「pre-implementation, currently failing」
+
+4. **才開始 Phase N 實作**
+   - 實作 commit 與 scenarios commit 分離
+   - 實作期間反覆跑 scenarios
+
+5. **Phase N 完成條件**
+   - 對應 scenarios 全部 pass
+   - Commit message 含「scenarios pre-written: <scenarios commit hash>」+「now passing」
+```
+
+**豁免情況**（必須在 plan 或 commit message 明寫理由）：
+
+- **Doc-only trial**：純 documentation contract，無 runtime 行為可測（如 Cognitive Modes Phase D）— 改用 manual application checks
+- **Bug fix / hotfix**：已有測試覆蓋的修補
+- **Typo / wording 修正**：無 runtime 行為變更
+- **探索性 spike**：明確 throwaway prototype
+
+**不可豁免**（必須 test-first）：
+
+- 任何進入 `runtime/runtime.db` 的 schema / table 改動
+- 任何新增 / 修改 `governance/` enforcement rule 或 `enforcement/` blocking gate
+- 任何修改 compiler / `generated_surfaces` 投影邏輯
+- 任何 framework 命名變更或世代升級
+
+**為什麼是必要的**：
+
+- Scenarios 是 acceptance contract，不是事後 verification
+- 實作前先 fail，能在實作中即時偵測 break；實作後才測，break 訊號出現太晚
+- Scope creep 防護：新需求需先加 scenarios，再實作 — 避免邊做邊加
+- Doc-runtime drift 防護：scenarios 在 runtime 層強制檢查，避免文件與實作脫節
+- Cognitive Modes 實證：scenarios 揭露的 11 個 pattern drift + 1 個 plan gap 都在實作前發現
+
+完整原則見 [`intelligence/engineering/development/test-first-framework-upgrade.md`](../../intelligence/engineering/development/test-first-framework-upgrade.md)；
+對應 validation scenario [`validation/scenarios/failure-derived/test-first-for-framework-upgrades-v1.yaml`](../../validation/scenarios/failure-derived/test-first-for-framework-upgrades-v1.yaml)。
+
 **教訓**：Knowledge OS → Cognitive Execution System 升級後，constitution/ 內 7 個 ADR 沒有任何標註說明屬於哪個世代。ADR-003 標題仍使用「Knowledge / **Skills** / Intelligence」，但 Skills 在 Gen 3 已 deprecated；ADR-004 仍引用 `skills/*/feedback_history/` 路徑（已搬到 `feedback/history/<domain>/`）。讀者無法判斷 ADR 是否仍適用、哪些詞彙已演化。架構文件與 ADR 之間缺乏 traceability。2026-05-22 才被使用者指出並補建雙向連結。
 
 **強制**：如果升級涉及**系統名稱變更**（§1 第一項條件）或**架構分層變更**（§1 第二項條件），計畫書必須包含以下項目：
