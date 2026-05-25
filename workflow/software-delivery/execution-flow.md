@@ -144,6 +144,24 @@ Blocking rule：任何舊入口若狀態為 `deferred`、`not planned` 或 `tool
 | 這是嵌入式或硬體支援的？ | 分開主機可重複測試與僅目標或硬體在迴路中的證據；記錄板子、接線、引腳/匯流排設定、韌體版本、日誌和觀察到的偏差 |
 | 這個變更是否涉及效能？ | 首先添加一個小的、可重複的效能檢查；根據風險選擇負載、壓力、尖峰或浸泡測試。追蹤 P95/P99 延遲、吞吐量、錯誤率和資源使用率，而不僅是平均延遲 |
 
+### Test-First Ordering（Framework / Runtime / Governance 升級強制）
+
+> ⚠️ 上方策略表中「在可行時在生產程式碼之前撰寫 BDD 和失敗測試」對一般開發為**建議**；但若變更涉及 **framework / runtime / governance / workflow / validation / scenario / metadata / compiler / generated artifact** 改動，由 [`governance/lifecycle/system-upgrade-governance.md`](../../governance/lifecycle/system-upgrade-governance.md) §3 規則 9 升級為**強制**順序：
+
+```
+1. 列出 Phase N 期望可觀察行為（檔案、runtime.db、agent action）
+2. 寫對應 validation/scenarios/<domain>/<id>-v1.yaml
+3. 驗證 scenarios 目前 fail（fail-by-absence）
+4. 才開始 Phase N 實作
+5. Commit message 含「scenarios pre-written: <hash>, now passing」
+```
+
+**豁免**（須明寫理由）：doc-only trial / bug fix / typo / 探索性 spike
+**不可豁免**：runtime.db schema、enforcement rule、blocking gate、compiler、`generated_surfaces`
+
+完整原則見 [`intelligence/engineering/development/test-first-framework-upgrade.md`](../../intelligence/engineering/development/test-first-framework-upgrade.md)；
+對應 validation scenario [`validation/scenarios/failure-derived/test-first-for-framework-upgrades-v1.yaml`](../../validation/scenarios/failure-derived/test-first-for-framework-upgrades-v1.yaml)。
+
 ## 5. 效能測試關卡（Performance Test Gate）
 
 當變更可能影響回應時間、吞吐量、資源使用、啟動工作、背景處理、資料庫存取、外部 API 扇出、快取、批次處理或並發性時，功能正確性是不夠的。當使用者體驗、成本、可靠性或營運容量依賴於它時，將效能視為發布合約的一部分。
