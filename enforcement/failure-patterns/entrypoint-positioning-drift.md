@@ -34,7 +34,7 @@ Agent 更新了 secondary references、mid-document sections、links 或 filenam
 - Root indexes 與 architecture/tool indexes 是否指向新的 canonical file？
 - 搜尋 old names 與 old slugs 時，是否只剩 intentional historical references？
 
-## 驗證
+## Validation
 
 從第 1 行讀回 root entrypoint 與已變更的 architecture/tool/shared indexes。對 old name 與 old slug 做 exact search。Commit/push/readback 後確認 `git status --short --branch` 乾淨。
 

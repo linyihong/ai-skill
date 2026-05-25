@@ -59,7 +59,7 @@ Agent 基於假設或記憶提出工具配置設計，而不是從 `ai-tools/<to
 
 若無法清楚回答，先讀 `ai-tools/<tool>.md` 的完整內容。
 
-## 驗證
+## Validation
 
 符合下列條件時，此 pattern 已被驗證：
 

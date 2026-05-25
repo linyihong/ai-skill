@@ -42,7 +42,7 @@ Agent 編輯目前工具看得到的 copy，而不是 canonical `<AI_SKILL_REPO>
 
 若任何答案未知，不要編輯 mirror。先讀 [`dependency-reading.md`](../dependency-reading.md) 與相關 `ai-tools/` 文件。
 
-## 驗證
+## Validation
 
 符合下列條件時，此 pattern 已被驗證：
 

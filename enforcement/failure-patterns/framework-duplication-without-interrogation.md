@@ -30,9 +30,14 @@ Framework 改動不得直接進 implementation。必須先通過 pre-build inter
 
 ## Validation
 
+- 修改 framework/runtime/governance 前已完成 pre-build interrogation
+- Runtime / generated surface 變更時，執行 compile / refresh / validate，並查證新 surface synced、舊 duplicate 已移除或非 authoritative
+- Source-of-truth discovery ledger 已記錄 candidate paths、duplication risk、open questions
+
+## Linked Validation Scenarios
+
 - `validation/scenarios/failure-derived/framework-duplication-without-interrogation-v1.yaml`
 - `validation/scenarios/failure-derived/plan-without-prebuild-interrogation-v1.yaml`
-- Runtime / generated surface 變更時，執行 compile / refresh / validate，並查證新 surface synced、舊 duplicate 已移除或非 authoritative。
 
 ## Linked Rules
 

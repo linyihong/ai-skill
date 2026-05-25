@@ -55,7 +55,7 @@ Agent 把 Ai-skill writeback transaction 的關閉條件視為「只有影響 ru
 - 新增/修改的文件是否已檢查去敏？
 - Validator 是否已執行且通過？
 
-## 驗證
+## Validation
 
 1. Commit log 中應有明確記錄「已關閉 Ai-skill writeback transaction」
 2. 若發現 commit 前沒有 transaction 關閉記錄，視為違反本規則

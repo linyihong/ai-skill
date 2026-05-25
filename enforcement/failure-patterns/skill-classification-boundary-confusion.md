@@ -62,7 +62,7 @@ Agent 把某個 skill 的 analysis technique lesson 放到另一個不相關 ski
 | Lesson 的層級歸屬 | 屬於 workflow / analysis / intelligence 哪一層？（僅已遷移 skill） |
 | 路徑確認 | 最終路徑是否符合 `feedback-lessons.md` 的規則？ |
 
-## 驗證
+## Validation
 
 - 所有新 lesson 都放在正確的 skill 路徑下
 - 已遷移 skill 的 lesson 不在舊 `skills/<name>/feedback_history/` 中

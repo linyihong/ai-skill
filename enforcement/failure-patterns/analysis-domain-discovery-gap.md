@@ -1,40 +1,31 @@
 # Analysis Domain Discovery Gap（分析領域發現缺口）
 
-## Linked Validation Scenarios
+Status: validated
+Class: `discovery-gap` / `routing-miss`
 
-- `validate_failure_pattern_validator_coverage` — 檢查每個 failure pattern 的 Linked Validation Scenarios 是否為空
-- `validate_new_category_registration` — 驗證 agent 在遇到新領域時是否會檢查 `analysis/README.md` 並建立對應入口
-
-## 症狀
+## Trigger
 
 當 agent 分析一個外部 library 或工具時，只考慮將其中的知識放入 `intelligence/`（工程知識），而忽略了該工具可能代表一個全新的**分析領域**，應該在 `analysis/` 下建立對應的入口。
 
-## 具體案例
+### 具體案例
 
 分析 [Scrapling](https://github.com/D4Vinci/Scrapling)（Python Web Scraping 框架）時：
+
 - ❌ 只想到 Adaptive Parsing → `intelligence/web-scraping/`
 - ❌ 只想到 MCP Server → `intelligence/engineering/`
 - ✅ 應該先想到：Web Scraping 是一個分析領域 → `analysis/web/`
 
-## 根本原因
+## Failure Mode
 
-1. **Discovery checkpoint 的 `search_sources` 缺少 `analysis/`**：`phase.checkpoint` 的 discovery_targets 只搜尋 `workflow`、`intelligence`、`validation_rules`、`governance`，沒有 `analysis` 類型。所以 agent 不會被引導去檢查 `analysis/` 下是否有對應領域。
+Agent 把外部 library/tool 的知識直接歸類為 engineering intelligence，跳過「這是否是一個新的分析領域」的檢查。新領域應該先在 `analysis/` 建立入口，再從中萃取 engineering knowledge 到 `intelligence/`，順序顛倒會導致 analysis 層永遠缺乏對應領域。
 
+## Risk
+
+1. **Discovery checkpoint 的 `search_sources` 缺少 `analysis/`**：`phase.checkpoint` 的 discovery_targets 只搜尋 `workflow`、`intelligence`、`validation_rules`、`governance`，沒有 `analysis` 類型。agent 不會被引導去檢查 `analysis/` 下是否有對應領域。
 2. **`knowledge/indexes/README.md` 缺少對應路由**：即使 discovery 搜尋了 indexes，也沒有「Web Scraping 分析」這條路由。
-
 3. **Agent 的思考捷徑**：看到「library/tool」直接對應到「engineering knowledge」，跳過了「這是否是一個新的分析領域」的檢查。
 
-## 預防方式
-
-### 1. Discovery 層（系統性）
-
-在 `phase.checkpoint` 的 discovery_targets 中加入 `analysis` 類型，搜尋 `analysis/README.md`。
-
-### 2. Indexes 層（系統性）
-
-在 `knowledge/indexes/README.md` 中加入新分析領域的路由。
-
-### 3. Agent 思考流程（個人）
+## Required Agent Action
 
 當分析一個外部 library/tool 時，強制執行以下檢查順序：
 
@@ -52,6 +43,14 @@ Step 3: 從這個 library/tool 可以萃取出哪些「工程知識」？
   → 這些是從分析中學到的可重用 pattern
 ```
 
+## Prevention Gate
+
+| 層 | 防護機制 |
+|----|--------|
+| Discovery（系統性） | 在 `phase.checkpoint` 的 discovery_targets 中加入 `analysis` 類型，搜尋 `analysis/README.md` |
+| Indexes（系統性） | 在 `knowledge/indexes/README.md` 中加入新分析領域的路由 |
+| Agent 思考流程（個人） | 強制執行上方 Step 1-3 檢查順序 |
+
 ### 檢查清單
 
 - [ ] 這個外部資源代表一個「分析/觀察/拆解」的領域嗎？
@@ -59,29 +58,46 @@ Step 3: 從這個 library/tool 可以萃取出哪些「工程知識」？
 - [ ] 如果沒有，先建立 `analysis/<domain>/README.md` 再萃取 intelligence
 - [ ] Discovery checkpoint 的 search_sources 包含 `analysis/README.md` 嗎？
 
-## 檢測
+## Validation
 
 - 當 agent 只把外部知識放到 `intelligence/` 而沒有檢查 `analysis/` 時，觸發警告
 - 定期檢查 `analysis/README.md` 的「目前入口」列表 vs `intelligence/` 下的領域知識是否對應
+- Discovery checkpoint 的 search_sources 含 `analysis/README.md`
 
-## 恢復
+## Recovery
 
-如果已經犯了這個錯（如本案例）：
+如果已經犯了這個錯：
+
 1. 在 `analysis/` 下建立對應的領域入口
 2. 更新 `analysis/README.md` 的「目前入口」列表
 3. 將原本放在 `intelligence/` 的知識標註為「從 analysis/<domain> 萃取」
 4. 更新 discovery checkpoint 的 search_sources
 5. 更新 `knowledge/indexes/README.md` 的路由
 
-## 修復狀態（2026-05-18）
+## Linked Rules
 
-本 failure pattern 已透過以下變更修復：
+- [`enforcement/dependency-reading.md`](../dependency-reading.md)
+- [`enforcement/failure-learning-system.md`](../failure-learning-system.md)
+- [`analysis/README.md`](../../analysis/README.md)
+- [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md)
+
+## Linked Validation Scenarios
+
+- `validate_failure_pattern_validator_coverage` — 檢查每個 failure pattern 的 Linked Validation Scenarios 是否為空
+- `validate_new_category_registration` — 驗證 agent 在遇到新領域時是否會檢查 `analysis/README.md` 並建立對應入口
+
+## Source
+
+修復狀態（2026-05-18）：本 failure pattern 已透過以下變更修復：
 
 | # | 變更 | 檔案 | 狀態 |
 |---|------|------|------|
-| 1 | Discovery checkpoint 加入 `analysis` 類型 | [`runtime/runtime.db`](../../runtime/runtime.db:674) | ✅ 已新增 `analysis` discovery_target，搜尋 `analysis/README.md` |
-| 2 | 路由索引加入 Web Scraping analysis | [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md:54) | ✅ 已新增「執行 Web Scraping 分析」路由 |
-| 3 | Analysis 入口加入 web/ | [`analysis/README.md`](../../analysis/README.md:12) | ✅ 已新增 `web/` 到「目前入口」列表 |
+| 1 | Discovery checkpoint 加入 `analysis` 類型 | [`runtime/runtime.db`](../../runtime/runtime.db) | ✅ 已新增 `analysis` discovery_target，搜尋 `analysis/README.md` |
+| 2 | 路由索引加入 Web Scraping analysis | [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) | ✅ 已新增「執行 Web Scraping 分析」路由 |
+| 3 | Analysis 入口加入 web/ | [`analysis/README.md`](../../analysis/README.md) | ✅ 已新增 `web/` 到「目前入口」列表 |
 | 4 | Failure pattern 記錄 | 本檔案 | ✅ 已記錄修復狀態 |
+| 5 | 結構對齊 canonical template | 本檔案 | ✅ 2026-05-22 重組為英文 template（原中文 section 全保留內容） |
 
 下次遇到類似情境（分析外部 library/tool）時，discovery checkpoint 會自動引導 agent 檢查 `analysis/README.md`，避免再次遺漏。
+
+← [Back to failure patterns](README.md)
