@@ -1,0 +1,123 @@
+schema_version: "1.0"
+id: runtime.cognitive-modes.token-budget
+status: active
+owner_layer: runtime
+source_markdown: null
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.cognitive_modes.token_budget
+  surface: generated_surfaces
+
+purpose: >
+  Machine-checkable token budget per (execution_mode, context_mode,
+  governance_mode, memory_mode) combination per plan §Phase 4.1.
+
+  Provides upper-bound budget per cognitive mode tuple. Over-budget
+  detection is enforced behaviorally in commit-msg hook IF the commit
+  body declares an explicit token_estimate. Per-tool-call enforcement
+  (intercept Read / Bash calls and accumulate) is deferred to Phase 5.
+
+budgets:
+  # Plan §Phase 4.1 canonical table
+  - execution_mode: FAST
+    context_mode: INDEX_ONLY
+    governance_mode: LIGHT
+    memory_mode: NONE
+    max_tokens: 1000
+    rationale: >
+      Quick triage / typo fixes / lookups. Index-only context means no
+      source expansion; LIGHT governance skips most gates.
+
+  - execution_mode: NORMAL
+    context_mode: SUMMARY_FIRST
+    governance_mode: STANDARD
+    memory_mode: EPISODIC
+    max_tokens: 5000
+    rationale: >
+      Standard task with summary-first reading. Episodic memory may
+      pull session context. Default budget for most work.
+
+  - execution_mode: DEEP
+    context_mode: SOURCE_BACKED
+    governance_mode: STRICT
+    memory_mode: DECISION_REPLAY
+    max_tokens: 20000
+    rationale: >
+      Cross-layer analysis. Full source reads + decision replay.
+      Strict governance requires evidence at every step.
+
+  - execution_mode: FORENSIC
+    context_mode: GRAPH_ASSISTED
+    governance_mode: STRICT
+    memory_mode: FAILURE_REPLAY
+    max_tokens: 50000
+    rationale: >
+      Audit / incident analysis. Graph traversal expands context;
+      failure replay loads historical patterns. Highest budget tier.
+
+# Default budget when an exact tuple match is not found. Used as a
+# soft cap reflecting the most-restrictive applicable execution_mode.
+default_budgets_by_execution_mode:
+  FAST: 1000
+  NORMAL: 5000
+  DEEP: 20000
+  FORENSIC: 50000
+  RECOVERY: 50000  # RECOVERY shares FORENSIC's high budget for thorough analysis
+
+enforcement:
+  declared_estimate_format: |
+    Optional trailer line in commit body:
+      Token Estimate: <n>
+    (case-insensitive; integer >= 0)
+
+  rule: |
+    When a commit body declares a Token Estimate AND the declared mode
+    tuple has a budget (exact match or execution_mode default), the
+    estimate must be <= max_tokens. Otherwise commit is blocked.
+
+  failure_action: block_commit
+  failure_code: token_budget_exceeded
+  failure_message_template: |
+    Declared token_estimate=<estimate> exceeds budget=<max> for mode tuple
+    (execution_mode=<exec>, context_mode=<ctx>, governance_mode=<gov>, memory_mode=<mem>).
+    Either downgrade context_mode (e.g. GRAPH_ASSISTED → SOURCE_BACKED → SUMMARY_FIRST)
+    or split the work across multiple commits.
+
+  downgrade_path:
+    - GRAPH_ASSISTED
+    - SOURCE_BACKED
+    - CHECKLIST_FIRST
+    - SUMMARY_FIRST
+    - INDEX_ONLY
+
+  opt_out_marker: "[skip-token-budget]"
+  opt_out_rationale: >
+    Bulk migration / refactor commits that legitimately exceed budget but
+    are part of an approved larger operation may opt out via a standalone
+    trailer line. Should be rare.
+
+scope_boundaries:
+  applies_to:
+    - commits whose Cognitive Mode block declares all 4 modes
+    - commits whose body includes 'Token Estimate: <n>' trailer
+  does_not_apply_to:
+    - commits without a Token Estimate declaration (validator is no-op)
+    - merge commits (auto-skipped earlier)
+    - commits with [skip-cognitive-mode] or [skip-token-budget] marker
+    - per-tool-call interception (deferred to Phase 5 adaptive runtime)
+
+failure_pattern_linkage:
+  related:
+    - enforcement/failure-patterns/cognitive-budget-overflow.md
+    - enforcement/failure-patterns/cognitive-mode-resolution-bypass.md
+
+acceptance:
+  - scenario phase4-token-budget-v1 PASS
+  - YAML projected to generated_surfaces (target_key = runtime.cognitive_modes.token_budget)
+  - failure pattern doc exists
+  - validateTokenBudget called from runCommitMsgHook
+
+source: >
+  2026-05-25 session. Plan §Phase 4.1-4.2 deliverables. User requested
+  "keep" to continue after Phase 3 closure.

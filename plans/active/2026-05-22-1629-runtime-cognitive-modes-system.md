@@ -611,9 +611,15 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 ### Phase 4 完成條件
 
-- [ ] Budget table 寫入 runtime.db
-- [ ] Budget gate 在 runtime 強制
-- [ ] Failure pattern `cognitive-budget-overflow.md` 建立
+- [x] Budget table 寫入 runtime.db — `runtime/cognitive-modes-token-budget.yaml` projected to `generated_surfaces` (target_key=`runtime.cognitive_modes.token_budget`)
+- [x] Budget gate 在 runtime 強制 — `validateTokenBudget` in `scripts/ai-skill-cli/internal/app/hooks.go` 由 commit-msg hook 觸發，當 commit body 宣告 `Token Estimate: <n>` 超 budget 即 block；scenario `phase4-token-budget-v1` PASS；6 unit tests PASS
+- [x] Failure pattern `cognitive-budget-overflow.md` 建立 — `enforcement/failure-patterns/cognitive-budget-overflow.md`
+
+**Phase 4 完成日期**：2026-05-25
+
+**Behavioral 層 caveat**（與 Phase 3 一致）：commit-msg 是 enforcement point，validator 只在 commit body 宣告 `Token Estimate:` trailer 時 fire；per-tool-call **實際**用量偵測等 Phase 5 adaptive runtime。
+
+**Downgrade path**（YAML contract 定義）：當預估超 budget 應依序 `GRAPH_ASSISTED → SOURCE_BACKED → CHECKLIST_FIRST → SUMMARY_FIRST → INDEX_ONLY` 降級，最後才用 `[skip-token-budget]` opt-out。
 
 ---
 

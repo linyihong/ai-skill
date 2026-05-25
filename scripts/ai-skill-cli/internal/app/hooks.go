@@ -307,6 +307,9 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		if v := validatePlanStatusSync(text, staged); v != "" {
 			violations = append(violations, v)
 		}
+		if v := validateTokenBudget(modes, text); v != "" {
+			violations = append(violations, v)
+		}
 		if len(violations) > 0 {
 			result.Status = "blocked"
 			result.ExitCode = ExitValidationFailed
@@ -594,6 +597,106 @@ func validatePlanStatusSync(text string, staged []string) string {
 	return "plan-status-sync: commit body claims phase completion and references " +
 		strings.Join(missing, ", ") +
 		" but the plan file is not in the staged set. Update the plan's Phase section in the same commit (runtime/plan-status-sync-enforcement.yaml). Use a [skip-plan-status-sync] trailer for retrospective references."
+}
+
+// validateTokenBudget implements runtime/cognitive-modes-token-budget.yaml:
+// when a commit body declares a Token Estimate trailer AND the declared
+// cognitive mode combination has a known budget, the estimate must not
+// exceed max_tokens.
+//
+// Trigger: body contains "Token Estimate: <n>" (case-insensitive) AND
+// Cognitive Mode block declared execution_mode.
+//
+// Budget table is hardcoded here to keep the hook self-contained;
+// canonical source is runtime/cognitive-modes-token-budget.yaml. If the
+// YAML budgets change, this function must be updated in sync.
+//
+// Opt-out: standalone "[skip-token-budget]" trailer line.
+var tokenEstimateRE = regexp.MustCompile(`(?i)Token\s+Estimate:\s*(\d+)`)
+
+func validateTokenBudget(modes map[string]string, text string) string {
+	// Opt-out marker on its own line
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-token-budget]" {
+			return ""
+		}
+	}
+
+	match := tokenEstimateRE.FindStringSubmatch(text)
+	if len(match) < 2 {
+		// No declared estimate → no-op (validator is opt-in for this turn)
+		return ""
+	}
+	estimate := 0
+	for _, c := range match[1] {
+		estimate = estimate*10 + int(c-'0')
+	}
+
+	exec := modes["execution_mode"]
+	ctx := modes["context_mode"]
+	gov := modes["governance_mode"]
+	mem := modes["memory_mode"]
+
+	// Exact tuple budgets per runtime/cognitive-modes-token-budget.yaml §budgets
+	exactBudgets := map[string]int{
+		"FAST|INDEX_ONLY|LIGHT|NONE":                       1000,
+		"NORMAL|SUMMARY_FIRST|STANDARD|EPISODIC":           5000,
+		"DEEP|SOURCE_BACKED|STRICT|DECISION_REPLAY":        20000,
+		"FORENSIC|GRAPH_ASSISTED|STRICT|FAILURE_REPLAY":    50000,
+	}
+	// Default budget by execution_mode (when exact tuple not found)
+	execDefaults := map[string]int{
+		"FAST":     1000,
+		"NORMAL":   5000,
+		"DEEP":     20000,
+		"FORENSIC": 50000,
+		"RECOVERY": 50000,
+	}
+
+	key := exec + "|" + ctx + "|" + gov + "|" + mem
+	budget, ok := exactBudgets[key]
+	if !ok {
+		budget, ok = execDefaults[exec]
+		if !ok {
+			// Unknown execution_mode → no enforcement
+			return ""
+		}
+	}
+
+	if estimate > budget {
+		return "token_budget: declared Token Estimate=" + itoa(estimate) +
+			" exceeds budget=" + itoa(budget) +
+			" for mode tuple (execution_mode=" + exec +
+			", context_mode=" + ctx +
+			", governance_mode=" + gov +
+			", memory_mode=" + mem +
+			"). Downgrade context_mode (GRAPH_ASSISTED → SOURCE_BACKED → CHECKLIST_FIRST → SUMMARY_FIRST → INDEX_ONLY) or split the work. Use [skip-token-budget] only if exceptional."
+	}
+	return ""
+}
+
+// itoa avoids importing strconv solely for one call site.
+func itoa(n int) string {
+	if n == 0 {
+		return "0"
+	}
+	negative := false
+	if n < 0 {
+		negative = true
+		n = -n
+	}
+	buf := [20]byte{}
+	i := len(buf)
+	for n > 0 {
+		i--
+		buf[i] = byte('0' + n%10)
+		n /= 10
+	}
+	if negative {
+		i--
+		buf[i] = '-'
+	}
+	return string(buf[i:])
 }
 
 func runPrePushHook(result Result, root string) Result {

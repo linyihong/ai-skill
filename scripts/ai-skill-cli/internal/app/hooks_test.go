@@ -312,3 +312,38 @@ func TestValidatePlanStatusSync(t *testing.T) {
 		t.Fatalf("expected no violation with opt-out marker, got %q", v)
 	}
 }
+
+func TestValidateTokenBudget(t *testing.T) {
+	// No Token Estimate trailer → no-op
+	v := validateTokenBudget(map[string]string{"execution_mode": "DEEP"}, "feat: x")
+	if v != "" {
+		t.Fatalf("expected no-op without estimate, got %q", v)
+	}
+	// Within budget
+	modes := map[string]string{"execution_mode": "NORMAL", "context_mode": "SUMMARY_FIRST", "governance_mode": "STANDARD", "memory_mode": "EPISODIC"}
+	v = validateTokenBudget(modes, "feat: x\n\nToken Estimate: 3000\n")
+	if v != "" {
+		t.Fatalf("expected no violation within budget, got %q", v)
+	}
+	// Exceeds tuple budget
+	v = validateTokenBudget(modes, "feat: x\n\nToken Estimate: 9999\n")
+	if v == "" {
+		t.Fatal("expected violation when over tuple budget")
+	}
+	// Exceeds execution_mode default (no exact tuple match)
+	modes2 := map[string]string{"execution_mode": "FAST", "context_mode": "SUMMARY_FIRST", "governance_mode": "LIGHT", "memory_mode": "NONE"}
+	v = validateTokenBudget(modes2, "feat: x\n\nToken Estimate: 1500\n")
+	if v == "" {
+		t.Fatal("expected violation when over FAST default budget")
+	}
+	// Opt-out trailer skips
+	v = validateTokenBudget(modes, "feat: x\n\nToken Estimate: 999999\n\n[skip-token-budget]\n")
+	if v != "" {
+		t.Fatalf("expected no violation with opt-out, got %q", v)
+	}
+	// Unknown execution_mode → no enforcement
+	v = validateTokenBudget(map[string]string{"execution_mode": "WEIRD"}, "feat: x\n\nToken Estimate: 99999\n")
+	if v != "" {
+		t.Fatalf("expected no enforcement for unknown mode, got %q", v)
+	}
+}
