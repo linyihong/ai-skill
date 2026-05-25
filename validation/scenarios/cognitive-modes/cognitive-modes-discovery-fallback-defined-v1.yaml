@@ -1,0 +1,56 @@
+# Source: Phase 2 Cognitive Modes Discovery — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 2 not yet started)
+id: cognitive-modes-discovery-fallback-defined-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-modes-discovery-fallback-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-25"
+  description: |
+    Phase 2 must define a fallback rule in the discovery contract: when no
+    signal matches, resolution must default to the 4 mode defaults defined in
+    cognitive-modes.yaml (NORMAL / SUMMARY_FIRST / STANDARD / NONE). Without
+    an explicit fallback, unmatched tasks have undefined behavior.
+
+given:
+  task: phase_2_cognitive_modes_discovery_fallback
+  artifacts:
+    - runtime/cognitive-modes-discovery.yaml
+  signals:
+    - plan §2 states "規則 fallback：訊號不命中時用 default mode"
+    - cognitive-modes.yaml defines 4 mode defaults (NORMAL/SUMMARY_FIRST/STANDARD/NONE)
+    - fallback must be explicit in YAML (not implicit)
+
+when:
+  action: phase_2_completion_check
+
+then:
+  expected_route:
+    - fallback section exists in runtime/cognitive-modes-discovery.yaml
+    - fallback specifies execution_mode: NORMAL
+    - fallback specifies context_mode: SUMMARY_FIRST
+    - fallback specifies governance_mode: STANDARD
+    - fallback specifies memory_mode: NONE
+  expected_heuristics:
+    - fallback_values_match_cognitive_modes_yaml_defaults
+    - fallback_is_explicit_not_implicit
+  forbidden_routes:
+    - missing_fallback_section
+    - fallback_with_values_not_in_cognitive_modes_yaml_enums
+
+validation:
+  detection_command: |
+    test -f runtime/cognitive-modes-discovery.yaml && \
+      grep -q "^fallback:" runtime/cognitive-modes-discovery.yaml && \
+      grep -A 10 "^fallback:" runtime/cognitive-modes-discovery.yaml | grep -q "execution_mode: NORMAL" && \
+      grep -A 10 "^fallback:" runtime/cognitive-modes-discovery.yaml | grep -q "context_mode: SUMMARY_FIRST" && \
+      grep -A 10 "^fallback:" runtime/cognitive-modes-discovery.yaml | grep -q "governance_mode: STANDARD" && \
+      grep -A 10 "^fallback:" runtime/cognitive-modes-discovery.yaml | grep -q "memory_mode: NONE" && \
+      echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — file does not exist yet）
+  reference_intelligence: intelligence/engineering/development/test-first-framework-upgrade.md
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

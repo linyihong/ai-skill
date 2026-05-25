@@ -1,0 +1,58 @@
+# Source: Phase 2 Cognitive Modes Discovery — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 2 not yet started)
+id: cognitive-modes-discovery-signals-projected-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-modes-discovery-signals-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-25"
+  description: |
+    Phase 2 must add discovery_signals table to runtime.db and populate it
+    by compiling runtime/cognitive-modes-discovery.yaml. Without this table,
+    runtime cannot evaluate signals to resolve cognitive modes — agent still
+    relies on manual judgment.
+
+given:
+  task: phase_2_cognitive_modes_discovery_signals_table
+  artifacts:
+    - runtime/runtime.db (discovery_signals table)
+  signals:
+    - phase 2 plan requires discovery_signals table with signal rules
+    - plan §2.1 defines 8+ signal types covering keyword / diff / git / session / failure / phase / goals / token
+    - table schema: id, signal_name, signal_type, pattern, execution_mode,
+      context_mode, governance_mode, memory_mode, priority, description
+
+when:
+  action: phase_2_completion_check
+
+then:
+  expected_route:
+    - discovery_signals table exists in runtime.db
+    - table has required columns: id, signal_name, signal_type, pattern,
+      execution_mode, context_mode, governance_mode, memory_mode, priority, description
+    - table has at least 5 rows (signal rules from discovery YAML)
+    - generated_surfaces has row with target_key=runtime.cognitive_modes.discovery
+  expected_heuristics:
+    - sqlite_schema_consistent_with_existing_runtime_tables
+    - signal_rules_compiled_from_discovery_yaml
+  forbidden_routes:
+    - claim_phase_2_done_without_discovery_signals_rows
+    - table_exists_but_empty
+
+validation:
+  detection_command: |
+    schema=$(sqlite3 runtime/runtime.db ".schema discovery_signals" 2>&1) && \
+    [ -n "$schema" ] && \
+    echo "$schema" | grep -q "signal_name" && \
+    echo "$schema" | grep -q "signal_type" && \
+    echo "$schema" | grep -q "execution_mode" && \
+    count=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM discovery_signals;" 2>/dev/null) && \
+    [ "$count" -ge 5 ] && \
+    echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — table does not exist yet）
+  reference_intelligence: intelligence/engineering/development/test-first-framework-upgrade.md
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

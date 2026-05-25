@@ -1,0 +1,52 @@
+# Source: Phase 2 Cognitive Modes Discovery — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 2 not yet started)
+id: cognitive-modes-discovery-poc-coverage-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P2
+
+failure_source:
+  pattern: cognitive-modes-discovery-poc-insufficient
+  class: framework-upgrade-acceptance
+  date: "2026-05-25"
+  description: |
+    Phase 2 POC: discovery_signals table must cover at least 5 distinct signal
+    types from plan §2.1, ensuring the mapping rules are comprehensive enough to
+    handle common task patterns (fast edit, deep analysis, governance-sensitive
+    diff, recovery, project-context session).
+
+given:
+  task: phase_2_cognitive_modes_discovery_poc_coverage
+  artifacts:
+    - runtime/runtime.db (discovery_signals table)
+  signals:
+    - plan §2.1 defines 8 signal types: user_keyword, file_diff_scope,
+      git_status, session_turns, recent_failure, phase_machine_state,
+      active_goals, token_budget
+    - POC requires coverage of at least 5 distinct signal_type values
+
+when:
+  action: phase_2_completion_check
+
+then:
+  expected_route:
+    - discovery_signals table has rows with at least 5 distinct signal_type values
+    - covered types should include at minimum: user_keyword, file_diff_scope,
+      recent_failure, phase_machine_state, token_budget
+    - each row has at least one mode column populated (non-null)
+  expected_heuristics:
+    - signal_type_diversity_matches_plan_2_1_taxonomy
+    - mode_values_match_cognitive_modes_yaml_enums
+  forbidden_routes:
+    - only_one_signal_type_covered
+    - mode_values_outside_yaml_contract_enums
+
+validation:
+  detection_command: |
+    distinct=$(sqlite3 runtime/runtime.db "SELECT COUNT(DISTINCT signal_type) FROM discovery_signals;" 2>/dev/null) && \
+    [ "$distinct" -ge 5 ] && \
+    echo "PASS" || echo "FAIL distinct=${distinct:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — table does not exist yet）
+  reference_intelligence: intelligence/engineering/development/test-first-framework-upgrade.md
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

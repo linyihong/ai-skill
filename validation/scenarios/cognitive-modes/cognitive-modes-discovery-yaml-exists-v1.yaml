@@ -1,0 +1,58 @@
+# Source: Phase 2 Cognitive Modes Discovery — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 2 not yet started)
+id: cognitive-modes-discovery-yaml-exists-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-modes-discovery-yaml-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-25"
+  description: |
+    Phase 2 must produce runtime/cognitive-modes-discovery.yaml as the
+    executable YAML contract for signal → mode mapping rules. Without this
+    file, mode resolution still relies on agent manual judgment rather than
+    runtime signal evaluation.
+
+given:
+  task: phase_2_cognitive_modes_discovery_yaml
+  artifacts:
+    - runtime/cognitive-modes-discovery.yaml
+  signals:
+    - phase 2 plan requires runtime/cognitive-modes-discovery.yaml
+    - existing cognitive-modes.yaml as structural template
+    - signal table from plan §2.1 (8 signal types defined)
+
+when:
+  action: phase_2_completion_check
+
+then:
+  expected_route:
+    - runtime/cognitive-modes-discovery.yaml exists
+    - file has schema_version: "1.0"
+    - file has id: runtime.cognitive-modes-discovery
+    - file has runtime_projection.enabled: true
+    - file has runtime_projection.target_key: runtime.cognitive_modes.discovery
+    - file has signals list with at least 5 entries
+    - file has fallback section defining default mode behavior
+  expected_heuristics:
+    - executable_yaml_contract_pattern_consistent_with_cognitive_modes_yaml
+    - signal_list_covers_plan_2_1_signal_types
+  forbidden_routes:
+    - claim_phase_2_done_without_discovery_yaml
+    - discovery_yaml_without_signals_list
+
+validation:
+  detection_command: |
+    test -f runtime/cognitive-modes-discovery.yaml && \
+      grep -q "^schema_version:" runtime/cognitive-modes-discovery.yaml && \
+      grep -q "^id: runtime.cognitive-modes-discovery" runtime/cognitive-modes-discovery.yaml && \
+      grep -q "target_key: runtime.cognitive_modes.discovery" runtime/cognitive-modes-discovery.yaml && \
+      grep -q "^signals:" runtime/cognitive-modes-discovery.yaml && \
+      grep -q "^fallback:" runtime/cognitive-modes-discovery.yaml && \
+      echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — file does not exist yet）
+  reference_intelligence: intelligence/engineering/development/test-first-framework-upgrade.md
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
