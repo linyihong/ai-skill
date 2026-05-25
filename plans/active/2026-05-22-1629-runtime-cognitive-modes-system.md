@@ -138,6 +138,7 @@ Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3
 | 與既有 phase_machine 概念衝突 | Phase 3 整合時明確定義「phase = transaction state，mode = cognitive state」邊界 |
 | 重構期間既有任務行為改變 | Phase 1-2 只新增 surface，不改現有 activation；Phase 3 起才切換 |
 | 對方批評變成 paper plan 不執行 | 每 phase 設明確 completion gate，未過不開下一 phase |
+| Cognitive vocabulary 形成 subsystem-local semantics | 必須引用 `plans/active/2026-05-25-1000-context-language-glossary-system.md` 的 glossary canonical definitions；`context_mode`、`compression`、`memory_mode`、`reasoning_mode` 不得在 runtime、workflow、memory 各自重新定義。 |
 
 ---
 
@@ -154,6 +155,17 @@ Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3
 | Generated surface | **Phase D**: 無 / **Phase 1+**: `runtime.db generated_surfaces.cognitive_modes.contract` |
 | Validation scenarios | [`validation/scenarios/failure-derived/plan-runtime-execution-path-v1.yaml`](../../validation/scenarios/failure-derived/plan-runtime-execution-path-v1.yaml)（本 plan 對應 governance rule 8 的測試）<br>Phase D specific：尚未建立（doc-only trial 期間不強制）<br>Phase 1+ 將建立：`cognitive-mode-resolution-bypass-v1.yaml`、`cognitive-mode-discovery-signal-coverage-v1.yaml` |
 | Test passing evidence | Phase D: agent 在 final report 列 Cognitive Mode 區塊（累積 5+ commits 證實）<br>Phase 1+: runtime compile + validate 通過 |
+
+### Semantic Dependency Boundary
+
+Runtime cognitive modes must reference glossary canonical definitions for runtime semantic vocabulary. This is not optional because `context_mode`, `compression`, `memory_mode`, and future `reasoning_mode` are high-risk semantic terms shared across runtime, workflow, memory, validation, and model routing.
+
+Rules:
+
+- `context_mode`、`compression`、`memory_mode`、`reasoning_mode` 的 canonical meaning 必須由 glossary owner definition 或本 plan 的 pre-glossary placeholder 明確標記。
+- 本 plan 可以定義 runtime implementation behavior，但不得重新定義 glossary-owned semantic meaning。
+- 若 glossary term 尚未建立，Phase 1 必須列為 pending semantic dependency，並在 glossary Phase 3 建立時回填 canonical link。
+- 若 cognitive modes implementation 發現詞義需要改名、alias 或 deprecate，必須回到 glossary plan 的 semantic ownership / status lifecycle，不得只在 runtime YAML 內局部修正。
 
 ### Doc-only Trial 聲明（Phase D 階段）
 
@@ -626,3 +638,4 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 | [`plans/archived/2026-05-20-1745-memory-retrieval-activation-governance.md`](../archived/2026-05-20-1745-memory-retrieval-activation-governance.md) | 提供 memory activation 邊界；本 plan 將 retrieve threshold 與 memory_mode 整合 |
 | [`plans/archived/2026-05-20-1039-runtime-recovery-escalation-system.md`](../archived/2026-05-20-1039-runtime-recovery-escalation-system.md) | RECOVERY mode 對應此 system |
 | [`plans/archived/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md`](../archived/2026-05-15-0920-runtime-execution-layer-upgrade-analysis.md) | Gen 3 升級分析；本 plan 是 Gen 3 子系統擴充 |
+| [`plans/active/2026-05-25-1000-context-language-glossary-system.md`](2026-05-25-1000-context-language-glossary-system.md) | 必須提供 runtime semantic vocabulary 的 canonical definitions；本 plan 的 `context_mode`、`compression`、`memory_mode`、`reasoning_mode` 不得形成 subsystem-local semantics |
