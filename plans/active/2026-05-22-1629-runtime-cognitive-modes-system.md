@@ -1,11 +1,11 @@
 # Runtime Cognitive Modes System
 
-**Status**: `in-progress`（Phase D 進行中）
+**Status**: `in-progress`（Phase D ✅ **已完成**，待 user 決定下一步 / Phase 0+ 尚未啟動）
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-22
-**最後更新**：2026-05-22（Phase D 啟動 — documentation-contract trial）
+**最後更新**：2026-05-22（Phase D evaluation 完成；T1-T5 + governance rule 8 + A/B 補完，5/5 automatable scenarios PASS）
 
-> ⚠️ 本 plan 處於 `in-progress`（Phase D 進行中）階段。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
+> ⚠️ 本 plan 處於 `in-progress` 階段：**Phase D documentation-contract trial 已完成並通過評估指標**；Phase 0 (Pre-Build Interrogation) 與 Phase 1-5 runtime 實作待 user 決定是否啟動。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
 >
 > 若 plan completed 且通過 §ADR Promotion Criteria，才升級為 accepted ADR（屆時取編號）。
 
@@ -275,13 +275,16 @@ Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3
 
 ### Phase D 評估指標（trial 結束時驗證）
 
-| 指標 | 通過條件 |
-|------|------|
-| 累積任務數 | ≥ 5 個 final report 含 Cognitive Mode 區塊 |
-| Mode 組合多樣性 | 至少覆蓋 3 種不同 execution + 3 種不同 context + 2 種 governance |
-| 誤判率 | ≤ 20% 的 mode 選擇被使用者糾正 |
-| Raw signal 完整性 | 沒有「找不到適合 signal 表達」的情況 |
-| 設計穩定性 | mode 定義在 5 個任務內未變動超過 2 次 |
+| 指標 | 通過條件 | **實際結果**（2026-05-22）|
+|------|------|------|
+| 累積任務數 | ≥ 5 個 final report 含 Cognitive Mode 區塊 | **8 個** ✅（9df20ae / f98d6e4 / df37b1a / 57ec8fc / 7dc96d2 / 84e736d / ef305bf / 3a38e49） |
+| Mode 組合多樣性 | 至少覆蓋 3 種不同 execution + 3 種不同 context + 2 種 governance | **5/5 execution + 4/5 context + 4/4 governance + 3/5 memory** ✅ |
+| 誤判率 | ≤ 20% 的 mode 選擇被使用者糾正 | **0% 糾正**（user 未糾正過 mode 選擇）✅ |
+| Raw signal 完整性 | 沒有「找不到適合 signal 表達」的情況 | **0 case 缺 signal**；T5 額外揭露「rollback claim drift」signal，已加入 Phase 5 adaptive ✅ |
+| 設計穩定性 | mode 定義在 5 個任務內未變動超過 2 次 | **8 任務內 0 次變動**（FULL_TRACE→GRAPH_ASSISTED 是 Open Question 1 resolve，發生在 trial 開始前的設計階段）✅ |
+| Validation scenarios | scenarios 全部通過 | **5/5 automatable PASS + 1 heuristic N/A** ✅ |
+
+**評估結論**：Phase D 全部指標通過 ✅
 
 ### Phase D 完成條件
 
@@ -289,9 +292,28 @@ Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3
 - [x] `models/README.md` 加入口
 - [x] Plan 加 Phase D 段落（本段）
 - [x] 至少 1 個任務（本 commit 即是）在 final report 列 Cognitive Mode
-- [ ] 累積 5 個任務的 mode 報告
-- [ ] 評估指標通過
-- [ ] 決定下一步：進 Phase 0 / 修設計 / 撤回 plan
+- [x] 累積 5 個任務的 mode 報告（達成 **8 個**，commits 列於上方評估指標表）
+- [x] 評估指標通過（6/6 ✅）
+- [ ] 決定下一步：進 Phase 0 / 修設計 / 撤回 plan **← 待 user 決定**
+
+### Phase D Trial 副產品（commit chain 沉澱的成果）
+
+| Trial commit | 副產品 |
+|--------------|--------|
+| `f98d6e4` T1 | 2 處 stale 描述修正（plan + cognitive-modes README） |
+| `df37b1a` T2 | anti-patterns README + failure-patterns README 索引補齊 |
+| `57ec8fc` T5 | Rollback path 真實實證（揭露 over-optimistic claim） |
+| `7dc96d2` T4 | 4 個 failure pattern 結構修正（部分） |
+| `84e736d` T3 | Intelligence atom `plan-first-decision-promotion` + feedback lesson |
+| `ef305bf` | Governance rule 8（升級計畫必須含 runtime execution path）+ 6 validation scenarios |
+| `3a38e49` A+B | 11 個 failure pattern 結構全對齊 + 新 failure pattern `template-drift` |
+
+**Phase D 對 governance 的正面影響**：
+- 1 個新 governance rule（system-upgrade-governance §3 規則 8）
+- 1 個新 intelligence atom（plan-first-decision-promotion）
+- 2 個新 failure patterns（premature-adr-promotion、template-drift）
+- 6 個 validation scenarios
+- 既有 11 個 failure pattern 結構對齊
 
 ### Phase D Rollback
 
@@ -531,8 +553,8 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 剩餘待 sign-off：
 
 - [x] **同意先走 Phase D doc-only trial**（2026-05-22 確認）
-- [ ] Phase D trial 結束後評估指標
-- [ ] Phase 0 Pre-Build Interrogation 草稿審閱（Phase D 通過後）
+- [x] **Phase D trial 結束後評估指標 通過**（2026-05-22，6/6 指標全 PASS — 詳見 §Phase D 評估指標）
+- [ ] **Phase 0 Pre-Build Interrogation 草稿審閱** ← 進 Phase 0 前需確認
 - [ ] Phase 1 實作前 candidate files 與 runtime.db schema 擴充影響範圍評估
 
 ---
