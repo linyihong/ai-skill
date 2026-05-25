@@ -1,0 +1,50 @@
+# Source: Phase 1 Cognitive Modes — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 1 not yet started)
+id: cognitive-modes-generated-surface-projected-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-modes-projection-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-22"
+  description: |
+    Phase 1 must compile runtime/cognitive-modes.yaml into runtime.db
+    generated_surfaces with target_key="runtime.cognitive_modes.contract".
+    Without projection, agents cannot lookup contract via runtime SQLite.
+
+given:
+  task: phase_1_cognitive_modes_projection
+  artifacts:
+    - runtime/cognitive-modes.yaml
+    - runtime/runtime.db (generated_surfaces table)
+  signals:
+    - phase 1 plan requires generated_surfaces projection
+    - target_key naming convention: <owner>.<contract>.<aspect>
+    - existing 70+ target_keys in generated_surfaces as reference
+
+when:
+  action: phase_1_completion_check
+
+then:
+  expected_route:
+    - generated_surfaces has row with target_key=runtime.cognitive_modes.contract
+    - source_path points to runtime/cognitive-modes.yaml
+    - data column contains the YAML content (as compiled representation)
+    - compile_rule and compiled_at columns populated
+  expected_heuristics:
+    - projection_pattern_consistent_with_existing_70_target_keys
+    - source_path_yaml_contract_one_to_one
+  forbidden_routes:
+    - claim_phase_1_done_without_projection
+    - duplicate_target_key_with_different_source
+
+validation:
+  detection_command: |
+    count=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.cognitive_modes.contract';")
+    [ "$count" -ge 1 ] && echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — projection not yet compiled）
+  reference_intelligence: intelligence/engineering/development/test-first-framework-upgrade.md
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

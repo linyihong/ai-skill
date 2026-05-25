@@ -1,0 +1,58 @@
+# Source: Phase 1 Cognitive Modes — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 1 not yet started)
+id: cognitive-modes-yaml-contract-exists-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-modes-yaml-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-22"
+  description: |
+    Phase 1 must produce runtime/cognitive-modes.yaml as the canonical executable
+    YAML contract for the 4-dimension cognitive mode primitives. Without this file
+    or with incomplete schema, runtime cannot resolve modes from any task.
+
+given:
+  task: phase_1_cognitive_modes_yaml_contract
+  artifacts:
+    - runtime/cognitive-modes.yaml
+  signals:
+    - phase 1 plan requires runtime/cognitive-modes.yaml
+    - existing YAML contracts (decision-promotion-pipeline.yaml) as template
+
+when:
+  action: phase_1_completion_check
+
+then:
+  expected_route:
+    - runtime/cognitive-modes.yaml exists
+    - file has schema_version: "1.0"
+    - file has id: runtime.cognitive-modes
+    - file has runtime_projection.enabled: true
+    - file has runtime_projection.target_key: runtime.cognitive_modes.contract
+    - file has modes section with 4 keys: execution / context / governance / memory
+    - each mode has values list + default
+  expected_heuristics:
+    - executable_yaml_contract_pattern_consistent_with_decision_promotion_pipeline
+    - 4_mode_primitive_dimensions_defined
+  forbidden_routes:
+    - claim_phase_1_done_without_yaml
+    - skip_runtime_projection_enabled_flag
+
+validation:
+  detection_command: |
+    test -f runtime/cognitive-modes.yaml && \
+      grep -q "^schema_version:" runtime/cognitive-modes.yaml && \
+      grep -q "^id: runtime.cognitive-modes" runtime/cognitive-modes.yaml && \
+      grep -q "target_key: runtime.cognitive_modes.contract" runtime/cognitive-modes.yaml && \
+      grep -q "^  execution:" runtime/cognitive-modes.yaml && \
+      grep -q "^  context:" runtime/cognitive-modes.yaml && \
+      grep -q "^  governance:" runtime/cognitive-modes.yaml && \
+      grep -q "^  memory:" runtime/cognitive-modes.yaml && \
+      echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — file does not exist yet）
+  reference_intelligence: intelligence/engineering/development/test-first-framework-upgrade.md
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

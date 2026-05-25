@@ -1,0 +1,57 @@
+# Source: Phase 1 Cognitive Modes — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 1 not yet started)
+id: cognitive-modes-runtime-table-exists-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-modes-table-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-22"
+  description: |
+    Phase 1 must add cognitive_modes table to runtime.db. Without this table,
+    no task can record its resolved modes for runtime gate enforcement.
+
+given:
+  task: phase_1_cognitive_modes_runtime_table
+  artifacts:
+    - runtime/runtime.db
+  signals:
+    - phase 1 plan requires cognitive_modes table
+    - existing 47 tables in runtime.db (e.g. phase_machine, generated_surfaces)
+      as schema-style template
+
+when:
+  action: phase_1_completion_check
+
+then:
+  expected_route:
+    - cognitive_modes table exists in runtime.db
+    - table has required columns: id, task_id, execution_mode, context_mode,
+      governance_mode, memory_mode, resolved_at, source
+    - id column is INTEGER PRIMARY KEY
+    - mode columns are TEXT
+    - table follows existing runtime.db naming convention (snake_case)
+  expected_heuristics:
+    - sqlite_schema_consistent_with_existing_47_tables
+    - 4_mode_columns_match_yaml_contract
+  forbidden_routes:
+    - claim_phase_1_done_without_table
+    - mismatch_column_names_between_yaml_and_table
+
+validation:
+  detection_command: |
+    schema=$(sqlite3 runtime/runtime.db ".schema cognitive_modes" 2>&1)
+    [ -n "$schema" ] && \
+      echo "$schema" | grep -q "task_id" && \
+      echo "$schema" | grep -q "execution_mode" && \
+      echo "$schema" | grep -q "context_mode" && \
+      echo "$schema" | grep -q "governance_mode" && \
+      echo "$schema" | grep -q "memory_mode" && \
+      echo "$schema" | grep -q "resolved_at" && \
+      echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — table does not exist yet）
+  reference_intelligence: intelligence/engineering/development/test-first-framework-upgrade.md
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

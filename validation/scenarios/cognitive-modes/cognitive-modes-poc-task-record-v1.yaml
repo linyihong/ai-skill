@@ -1,0 +1,48 @@
+# Source: Phase 1 Cognitive Modes — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 1 not yet started)
+id: cognitive-modes-poc-task-record-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P2
+
+failure_source:
+  pattern: cognitive-modes-poc-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-22"
+  description: |
+    Phase 1 POC: at least 1 task row must be inserted into cognitive_modes table
+    to demonstrate end-to-end working — runtime.db can actually record agent's
+    resolved modes. Without POC row, Phase 1 has only contract + schema but no
+    proof of write path.
+
+given:
+  task: phase_1_cognitive_modes_poc
+  artifacts:
+    - runtime/runtime.db (cognitive_modes table)
+  signals:
+    - phase 1 plan requires manual POC insertion
+    - Phase 2 will add discovery heuristics; Phase 1 demonstrates write capability only
+
+when:
+  action: phase_1_completion_check
+
+then:
+  expected_route:
+    - at least 1 row exists in cognitive_modes table
+    - row has all 4 mode columns populated with valid values from YAML contract
+    - source column identifies the POC origin (e.g. "phase-1-poc")
+  expected_heuristics:
+    - end_to_end_write_path_proven
+    - mode_values_match_yaml_contract_enum
+  forbidden_routes:
+    - claim_phase_1_done_without_poc_row
+    - insert_invalid_mode_values_not_in_contract
+
+validation:
+  detection_command: |
+    count=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM cognitive_modes WHERE task_id IS NOT NULL AND execution_mode IS NOT NULL AND context_mode IS NOT NULL AND governance_mode IS NOT NULL AND memory_mode IS NOT NULL;" 2>&1)
+    [ "$count" -ge 1 ] 2>/dev/null && echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — no rows yet）
+  reference_intelligence: intelligence/engineering/development/test-first-framework-upgrade.md
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
