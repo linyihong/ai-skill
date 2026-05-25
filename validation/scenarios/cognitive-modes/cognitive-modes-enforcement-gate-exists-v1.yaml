@@ -1,0 +1,53 @@
+# Source: Phase 3-B Cognitive Modes Enforcement — test-first per system-upgrade-governance §3 規則 9
+# Pre-implementation scenario (currently failing — Phase 3-B not yet started)
+id: cognitive-modes-enforcement-gate-exists-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-modes-enforcement-structure-missing
+  class: framework-upgrade-acceptance
+  date: "2026-05-25"
+  description: |
+    Phase 3-B must add a blocking gate and obligation to runtime.db that
+    enforce cognitive mode resolution at task execution time. Without these
+    entries in the gates and obligations tables, the governance structure has
+    no runtime enforcement record — mode resolution is aspirational only.
+
+    Note: this is governance-structure enforcement (gate + obligation exist in
+    runtime.db). Behavioral enforcement (pre-commit hook actually checking
+    cognitive_modes table per session) is deferred to a later phase.
+
+given:
+  task: phase_3b_cognitive_mode_enforcement_structure
+  artifacts:
+    - runtime/runtime.db (obligations table, gates table)
+  signals:
+    - plan §3 completion criteria: "失敗測試 mode 未解析就執行 → 被阻擋"
+    - obligation must exist: obligation.execution.resolve_cognitive_mode
+    - gate must exist: gate.execution.cognitive_mode_resolved
+    - both must be in phase.execution scope
+
+when:
+  action: phase_3b_completion_check
+
+then:
+  expected_route:
+    - obligations table has row with id=obligation.execution.resolve_cognitive_mode
+    - obligations table row has phase=phase.execution
+    - gates table has row with id=gate.execution.cognitive_mode_resolved
+    - gates table row has phase=phase.execution and severity=high
+  forbidden_routes:
+    - claim_enforcement_done_without_obligation_row
+    - claim_enforcement_done_without_gate_row
+
+validation:
+  detection_command: |
+    ob=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM obligations WHERE id='obligation.execution.resolve_cognitive_mode';" 2>/dev/null) && \
+    gt=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM gates WHERE id='gate.execution.cognitive_mode_resolved';" 2>/dev/null) && \
+    [ "$ob" -ge 1 ] && [ "$gt" -ge 1 ] && \
+    echo "PASS" || echo "FAIL ob=${ob:-0} gt=${gt:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（fail-by-absence — entries not yet compiled into runtime.db）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
