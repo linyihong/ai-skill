@@ -1,9 +1,9 @@
 # Runtime Cognitive Modes System
 
-**Status**: `in-progress`（Phase D ✅ **已完成**，待 user 決定下一步 / Phase 0+ 尚未啟動）
+**Status**: `in-progress`（Phase D ✅ + Phase 0 ✅ **已完成**，待 user 啟動 Phase 1 runtime 實作）
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-22
-**最後更新**：2026-05-22（Phase D evaluation 完成；T1-T5 + governance rule 8 + A/B 補完，5/5 automatable scenarios PASS）
+**最後更新**：2026-05-22（Phase 0 Pre-Build Interrogation + Architecture Compatibility Preflight 完成；7 checks 通過、無衝突；可進 Phase 1）
 
 > ⚠️ 本 plan 處於 `in-progress` 階段：**Phase D documentation-contract trial 已完成並通過評估指標**；Phase 0 (Pre-Build Interrogation) 與 Phase 1-5 runtime 實作待 user 決定是否啟動。原 `constitution/ADR-008-runtime-cognitive-modes.md`（proposed）已於 2026-05-22 撤回；依新 [`decision-promotion-pipeline`](../../governance/lifecycle/decision-promotion-pipeline.md) 規則，constitution/ 只放 accepted ADRs，提案階段在本 plan 內處理。
 >
@@ -325,21 +325,63 @@ Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3
 
 ## Phase 0: Pre-Build Interrogation + Architecture Compatibility Preflight
 
-**前置條件**：Phase D 完成且通過評估指標後才開始。依 [`plans/README.md` §Architecture Compatibility Preflight](../README.md) 完成。
+**前置條件**：Phase D 完成且通過評估指標 ✅（2026-05-22）
 
-### Interrogation 草稿
+**Status**: ✅ **completed**（2026-05-22）
 
-- **Goal**：將 models/ 從 design layer 提升為 runtime activation layer，補 governance/memory 強度差異化缺口
-- **Scope**：4 維 cognitive mode primitive + discovery heuristics + runtime.db 投影 + 5 個 subsystem 整合
-- **Non-goals**：
-  - 不重寫 `models/profiles/` / `compression/` / `capabilities/`
-  - 不改世代命名（保持 Gen 3）
-  - 不改 knowledge-update-flow.yaml 11 步基本結構
-- **Acceptance**：Phase 1 完成後，至少一個任務能在 final report 列 `Mode: {execution, context, governance, memory}` 並由 runtime.db 強制
-- **Framework discovery**：執行前須讀 runtime.db 既有 schema、所有 `models/` 文件、`memory/retrieval-governance/`、`governance/ai-runtime-governance/`
-- **Duplication risk**：context_mode vs compression level 命名重複；需在 Phase 1 決定合併或保留
-- **Open questions**：見上方 §Open Questions
-- **Assumptions**：runtime.db 可擴充 schema 而不破壞既有 generated surfaces
+### Architecture Compatibility Preflight Ledger（per `plans/README.md`）
+
+| 欄位 | 內容 |
+|------|------|
+| Trigger | 開始實作 Cognitive Modes Phase 1（runtime primitive 落地） |
+| Checked sources | `runtime/runtime.db` schema（47 tables）+ `scripts/ai-skill-cli/internal/app/runtime_compiler.go` + `models/cognitive-modes/README.md` + `models/compression/README.md` + `memory/retrieval-governance/` 結構 + `governance/ai-runtime-governance/` 結構 |
+| Conflicts | **無衝突** — 詳見下方 §Preflight 7 Checks |
+| Interrogation | 詳見下方 §Pre-Build Interrogation Result |
+| Decision | **proceed to Phase 1**（待 user 啟動）|
+| Validation | `sqlite3 runtime.db ".tables"` 確認 47 tables 不含 cognitive_modes/discovery_signals；既有 compiler rules pattern 可擴展 |
+
+### Preflight 7 Checks
+
+| # | 檢查項目 | 結果 |
+|---|---------|------|
+| 1 | **Candidate files 存在性** | `runtime/cognitive-modes.yaml`（Phase 1 將建立，目前不存在 ✅）/ `runtime.db cognitive_modes` table（不存在 ✅，Phase 1 新增）/ `runtime.db discovery_signals` table（不存在 ✅，Phase 2 新增）/ `scripts/ai-skill-cli/internal/app/runtime_compiler.go`（存在，將擴展）|
+| 2 | **Source-of-truth 一致性** | YAML canonical = `runtime/cognitive-modes.yaml`；projection target = `runtime.db generated_surfaces (target_key='runtime.cognitive_modes.contract')`；compiler canonical = `runtime_compiler.go`。與既有 16+ executable YAML contracts 命名/投影 pattern 完全一致 |
+| 3 | **Layer responsibility** | runtime primitive → `runtime/`（YAML + runtime.db table）✅ / doc-only contract → `models/cognitive-modes/`（Phase D 已建立）✅ / validation → `validation/scenarios/`（Phase 1 將新增）✅ / 無放錯層風險 |
+| 4 | **Compiler / generated surface** | 新 target_key `runtime.cognitive_modes.contract` 不與既有 70+ target_keys 衝突；compile rule 將在 `runtime_compiler.go` 加新 case，pattern 與 `decision-promotion-pipeline.yaml` 等既有 YAML 投影完全一致 |
+| 5 | **Pre-build interrogation** | 見下方 §Pre-Build Interrogation Result，含 framework discovery、duplication risk、open questions、assumptions 全部記錄 |
+| 6 | **Linked updates** | Phase 1 需更新：`models/README.md`（cognitive-modes entry 已存在，Phase 1 補 runtime 投影連結）/ `architecture/ai-native-cognitive-execution-system.md` §核心機制（加 cognitive_modes table）/ Phase 2 需更新：`knowledge/runtime/routing-registry.yaml`（加 route）/ `knowledge/summaries/`（加 summary）/ `knowledge/graphs/`（加 edges）|
+| 7 | **Execution decision** | **proceed to Phase 1** — 無架構衝突、無未解 blocker、無 source-of-truth duplication；Open Questions 1-5 已 resolved；Phase D 8 個 trial commits 已累積實證 |
+
+### Pre-Build Interrogation Result
+
+| 維度 | 答案 |
+|------|------|
+| **Goal** | 將 `models/cognitive-modes/` 從 Phase D documentation-contract 升級為 Phase 1 runtime activation layer；補 governance / memory 強度差異化缺口 |
+| **Scope** | Phase 1 only: (a) `runtime/cognitive-modes.yaml` executable contract 寫入；(b) `runtime.db cognitive_modes` table 加入；(c) `runtime_compiler.go` 加新 compile rule；(d) 投影到 `generated_surfaces` (target_key=`runtime.cognitive_modes.contract`)；(e) Phase 1 POC：至少 1 個任務手動寫入 mode 並由 runtime.db 強制 |
+| **Non-goals**（Phase 1） | 不寫 discovery YAML（Phase 2）；不接 phase_machine / blocking_gates / memory subsystem（Phase 3）；不寫 token budget gate（Phase 4）；不寫 adaptive triggers（Phase 5）；不改 `models/profiles/` / `compression/` / `capabilities/` |
+| **Acceptance（Phase 1）** | (a) `runtime/cognitive-modes.yaml` schema-valid + 通過 `ai-skill runtime validate`；(b) `runtime.db cognitive_modes` table 存在且可寫入；(c) `generated_surfaces` 含 `runtime.cognitive_modes.contract` row；(d) 至少 1 個 POC task 的 cognitive_modes row 寫入 runtime.db；(e) commit 含 final report Cognitive Mode 區塊 |
+| **Framework discovery findings** | runtime.db 47 tables 已盤點，無 cognitive_modes / discovery_signals 既存；compiler entry = `runtime_compiler.go`；target_key 命名規則 = `<owner>.<contract>.<aspect>`；既有 YAML contract（e.g. `decision-promotion-pipeline.yaml`）為 reference template |
+| **Duplication risk** | context_mode vs compression：Open Question 1 已 resolved 為 UPPERCASE primitive + lowercase alias；Phase 3.2 才實際改寫 compression docs，**Phase 1 不觸發此 duplication** |
+| **Open questions** | 5 個 Open Questions 全部 resolved（見 §Open Questions section），無新增 |
+| **Assumptions** | (a) runtime.db schema 可擴充（既有 47 tables 自由新增第 48 個無風險）；(b) compiler pattern 一致（如 decision-promotion-pipeline 之 compile），新增 compile rule 不破壞既有；(c) Phase D doc-contract 為 source-of-truth，Phase 1 YAML 引用之 |
+| **Conflicts** | 無 — runtime table、compiler rule、generated surface 命名、layer responsibility 全部 unique 且符合既有 pattern |
+
+### Phase 0 完成條件
+
+- [x] Architecture Compatibility Preflight Ledger 完成（7 checks 全通過）
+- [x] Pre-Build Interrogation Result 詳細記錄
+- [x] 確認無架構衝突、無 source-of-truth duplication
+- [x] 確認 Open Questions 全部 resolved
+- [x] 確認 candidate files 不衝突（cognitive_modes / discovery_signals tables 不存在）
+- [x] 決定：**proceed to Phase 1**
+- [ ] Phase 1 啟動 ← **待 user 確認啟動 Phase 1**
+
+### Phase 0 Rollback
+
+| 動作 | 操作 |
+|------|------|
+| 完全撤回 Phase 0（保留 Phase D） | `git revert <Phase 0 commit>` — 移除本 Ledger / Interrogation Result / 完成條件；Phase D 不受影響 |
+| 重新做 Preflight | 編輯本 section 重新填 7 checks（不必撤回）|
 
 ---
 
@@ -554,8 +596,9 @@ phase_machine 進入 phase 時，依 execution_mode 調整 allowed_actions / for
 
 - [x] **同意先走 Phase D doc-only trial**（2026-05-22 確認）
 - [x] **Phase D trial 結束後評估指標 通過**（2026-05-22，6/6 指標全 PASS — 詳見 §Phase D 評估指標）
-- [ ] **Phase 0 Pre-Build Interrogation 草稿審閱** ← 進 Phase 0 前需確認
-- [ ] Phase 1 實作前 candidate files 與 runtime.db schema 擴充影響範圍評估
+- [x] **Phase 0 Pre-Build Interrogation 草稿審閱 + Architecture Compatibility Preflight 通過**（2026-05-22，7 checks 全 PASS — 詳見 §Phase 0）
+- [x] **Phase 1 實作前 candidate files 與 runtime.db schema 擴充影響範圍評估**（無衝突，既有 47 tables 不含 cognitive_modes / discovery_signals；compiler pattern 可擴展）
+- [ ] **Phase 1 啟動** ← 待 user 確認
 
 ---
 
