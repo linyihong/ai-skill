@@ -1,4 +1,4 @@
-version=repo-b35c87d-pending
-source_commit=b35c87d-pending
-built_at=2026-05-25T11:37:53Z
+version=repo-12383e7
+source_commit=12383e7
+built_at=2026-05-25T11:38:53Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
