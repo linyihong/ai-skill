@@ -1,0 +1,65 @@
+# Source: Phase 3 behavioral wiring — 3.1-B + 3.3-B + 3.4-B commit-msg validators
+# Test-first per system-upgrade-governance §3 Rule 9
+id: phase3-behavioral-validators-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: cognitive-mode-resolution-bypass
+  class: process-gap / governance-drift
+  date: "2026-05-25"
+  description: |
+    Phase 3.1 / 3.3 / 3.4 added YAML integration contracts (cognitive-modes-phase-integration.yaml,
+    cognitive-modes-governance-integration.yaml, cognitive-modes-memory-integration.yaml) but
+    NO Go code reads them at runtime to enforce.
+
+    Phase 3 behavioral wiring (3.1-B + 3.3-B + 3.4-B) adds three validators that run inside
+    commit-msg hook AFTER the Cognitive Mode block is found:
+
+    - validateExecutionModeFloors: DEEP/FORENSIC/RECOVERY require governance_mode ≥ STRICT,
+      FAST forbidden when staged files include governance/, enforcement/, runtime/
+    - validateGovernanceModeConsistency: LIGHT forbidden when staged files include
+      governance/enforcement/runtime/validation/; LOCKDOWN requires [approved-by: ...] trailer
+    - validateMemoryModeSubdir: declared memory_mode must match the memory/ subdirs touched
+      by the commit (NONE → no memory/ files; EPISODIC → only memory/episodic/; etc.)
+
+    Each violation produces a clear error message + remediation.
+
+given:
+  task: phase_3_behavioral_completion_check
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go
+  signals:
+    - parseCognitiveModeBlock function present
+    - validateExecutionModeFloors function present
+    - validateGovernanceModeConsistency function present
+    - validateMemoryModeSubdir function present
+    - all 3 validators called from runCommitMsgHook after block-present check
+
+when:
+  action: phase_3_behavioral_completion_check
+
+then:
+  expected_route:
+    - hooks.go contains parseCognitiveModeBlock
+    - hooks.go contains validateExecutionModeFloors
+    - hooks.go contains validateGovernanceModeConsistency
+    - hooks.go contains validateMemoryModeSubdir
+    - all 4 referenced from runCommitMsgHook body
+  forbidden_routes:
+    - claim_done_without_parser
+    - claim_done_without_three_validators
+    - claim_done_without_runCommitMsgHook_calls
+
+validation:
+  detection_command: |
+    p=$(grep -c 'func parseCognitiveModeBlock' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    e=$(grep -c 'func validateExecutionModeFloors' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    g=$(grep -c 'func validateGovernanceModeConsistency' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    m=$(grep -c 'func validateMemoryModeSubdir' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    rch=$(awk '/^func runCommitMsgHook/,/^func [a-z]/' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validateExecutionModeFloors\|validateGovernanceModeConsistency\|validateMemoryModeSubdir')
+    [ "${p:-0}" -ge 1 ] && [ "${e:-0}" -ge 1 ] && [ "${g:-0}" -ge 1 ] && [ "${m:-0}" -ge 1 ] && [ "${rch:-0}" -ge 3 ] && echo "PASS" || echo "FAIL p=${p:-0} e=${e:-0} g=${g:-0} m=${m:-0} rch=${rch:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（parser + 3 validators not yet implemented）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
