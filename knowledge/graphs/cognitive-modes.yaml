@@ -1,0 +1,87 @@
+id: graph.cognitive-modes
+source: runtime/cognitive-modes.yaml
+status: active
+summary: >
+  Cognitive Modes 子系統（Gen 3 擴充）的依賴關係圖。連接 4 維 mode primitives
+  與 phase_machine、blocking_gates、compression、retrieval-governance 等既有
+  subsystems，以及 discovery signals、enforcement obligation/gate、validation scenarios。
+
+edges:
+  # ── 核心合約 ──
+  - type: depends_on
+    target: runtime/cognitive-modes.yaml
+    reason: Canonical executable YAML contract，定義 4 維 mode primitives + defaults + gate_activation。
+    validation: generated_surfaces 含 target_key=runtime.cognitive_modes.contract。
+
+  - type: depends_on
+    target: runtime/cognitive-modes-discovery.yaml
+    reason: Discovery signal rules，14 signals 覆蓋 8 signal_type，從 raw signals 解析 mode 不靠文件查詢。
+    validation: discovery_signals 表有 ≥14 rows，8 distinct signal_type。
+
+  # ── Phase 3 subsystem integration contracts ──
+  - type: depends_on
+    target: runtime/cognitive-modes-phase-integration.yaml
+    reason: execution_mode → phase_machine 整合：5 mode 各有 allowed/forbidden_actions floor 定義。
+    validation: generated_surfaces 含 target_key=runtime.cognitive_modes.phase_integration。
+
+  - type: depends_on
+    target: runtime/cognitive-modes-governance-integration.yaml
+    reason: governance_mode → blocking_gates 整合：LIGHT/STANDARD/STRICT/LOCKDOWN gate_set_activation。
+    validation: generated_surfaces 含 target_key=runtime.cognitive_modes.governance_integration。
+
+  - type: depends_on
+    target: runtime/cognitive-modes-memory-integration.yaml
+    reason: memory_mode → retrieval-governance 整合：AND logic compose，NONE=no retrieval。
+    validation: generated_surfaces 含 target_key=runtime.cognitive_modes.memory_integration。
+
+  # ── 既有 subsystem 連結 ──
+  - type: integrates_with
+    target: runtime/runtime.db
+    reason: >
+      cognitive_modes 表（mode resolution records）、discovery_signals 表（signal rules）、
+      obligation.execution.resolve_cognitive_mode（obligations 表）、
+      gate.execution.cognitive_mode_resolved（gates 表）全部在 runtime.db。
+    validation: sqlite3 runtime.db ".tables" 含 cognitive_modes、discovery_signals。
+
+  - type: integrates_with
+    target: runtime/runtime.db
+    reason: phase_machine 表提供 phase_machine_state discovery signal 的資料來源。
+    validation: discovery signal phase_machine_bootstrap/phase_machine_validation 參照 phases 表。
+
+  - type: integrates_with
+    target: runtime/runtime.db
+    reason: blocking_gates 表：governance_mode 決定哪些 gates 啟用（gate_set_activation 定義）。
+    validation: gate.execution.cognitive_mode_resolved 在 gates 表存在。
+
+  - type: integrates_with
+    target: memory/retrieval-governance/activation-thresholds.md
+    reason: memory_mode（category switch）AND threshold（within-category limit）compose 邏輯。
+    validation: cognitive-modes-memory-integration.yaml 引用 activation-thresholds.md。
+
+  - type: integrates_with
+    target: models/compression/README.md
+    reason: context_mode UPPERCASE primitives 是 compression lowercase levels 的 runtime alias（Phase 3.2）。
+    validation: compression/README.md 含 context_mode alias 表 + context_mode 欄位。
+
+  # ── Doc-only trial 起源 ──
+  - type: depends_on
+    target: models/cognitive-modes/README.md
+    reason: Phase D doc-only contract，4 維 mode 定義、discovery 速查表、final report 範本。
+    validation: Phase D 8 個 trial commits 已驗證 mode 設計穩定性。
+
+  # ── Validation ──
+  - type: validated_by
+    target: validation/scenarios/cognitive-modes/
+    reason: >
+      8 個 acceptance scenarios（Phase 1-3）：yaml-contract-exists、generated-surface-projected、
+      runtime-table-exists、poc-task-record、discovery-yaml-exists、
+      discovery-signals-projected、discovery-fallback-defined、discovery-poc-coverage、
+      phase-integration、compression-alias、governance-integration、memory-integration、
+      enforcement-gate-exists。
+    validation: 全部 scenarios PASS（13/13）。
+
+  # ── Plan ──
+  - type: governed_by
+    target: plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md
+    reason: 本子系統的 5-phase 實作計畫，含 Open Questions、ADR promotion criteria、deferred items。
+    validation: plan status = in-progress；Phase 1-3 governance-structure 完成。

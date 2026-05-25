@@ -98,17 +98,26 @@ memory_mode     ∈ {NONE, EPISODIC, DECISION_REPLAY, FAILURE_REPLAY, PROJECT_CO
 - **沒有更輕的 promotion target 已被檢驗**：可能 cognitive mode 應該是 runtime gate（不需 ADR）而非 architectural decision
 - **依新規則**：constitution/ 只放 accepted ADRs；proposed 階段在 plan 內
 
-### ADR Promotion Criteria（completed 時驗證）
+### ADR Promotion Criteria（2026-05-25 評估）
 
 升級為 accepted ADR 的條件（per ADR-007 §ADR Boundary）。**Promotion gate 設在 Phase 3 完成時**（per Open Question 5 resolved）：
 
-- [ ] foundational + cross-session + cross-project + expensive-to-reverse + explains-why 全中
-- [ ] **Phase 3 完成**（4 subsystem 真實 activation 驗證可行）
-- [ ] ~~5 個 Open Questions 全解~~ ✅ 已於 2026-05-22 resolved（見 §Open Questions）
-- [ ] 沒有更輕的 promotion target 適用（runtime gate / enforcement / intelligence）
-- [ ] 系統真實使用此 contract，**Phase 3 完成後至少 5 個 task 在 final report 列 Cognitive Mode** 驗證
+| 條件 | 狀態 | 評估說明 |
+|------|------|---------|
+| foundational + cross-session + cross-project + expensive-to-reverse + explains-why 全中 | ✅ | 4 維 mode primitive 是跨 session / cross-project 的 cognitive architecture 決策；expensive-to-reverse（改變 500 種 mode 組合的 composition logic）；explains-why（4 個 rationale 記錄在 §Decision Rationale） |
+| **Phase 3 完成**（4 subsystem 真實 activation 驗證可行） | ⚠️ **部分** | YAML-contract level 完成（4 integration contracts + generated_surfaces 投影）；但 **behavioral enforcement**（pre-commit hook + Go 強制）尚未完成 — 4 subsystem 有合約但無真實 Go-level activation blocking |
+| ~~5 個 Open Questions 全解~~ | ✅ | 已於 2026-05-22 resolved（見 §Open Questions） |
+| 沒有更輕的 promotion target 適用 | ✅ | 4 維 mode primitive 是 architectural decision（非 runtime gate / enforcement / intelligence atom）；500 種 compose space + ADR-level cross-session 影響，無法用更輕 target 代替 |
+| 系統真實使用此 contract，Phase 3 後至少 5 個 task final report 列 Cognitive Mode | ⚠️ **待累積** | Phase 1.B 起的 commit 含 Cognitive Mode（3 個 phase-setup tasks）；需累積 2 個以上的 non-setup user tasks |
 
-Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3 即可評估 ADR promotion。
+**評估結論（2026-05-25）**：**ADR promotion 尚未達標，原因 2 個**：
+
+1. **Phase 3 behavioral enforcement 未完成**：4 subsystem integration 是 YAML-only，Go-level activation blocking（execution_mode floor 強制、governance_mode gate 過濾、memory subdir 限制）尚未實作。ADR 宣稱「真實 runtime activation」，但目前仍是 YAML contract layer。
+2. **5 task final report 累積未達**：需在 non-setup tasks 中再累積 2 個以上含 Cognitive Mode 的 final report。
+
+**ADR promotion 重新評估時機**：Phase 3 behavioral enforcement（pre-commit hook + Go gates）完成後，且 5 tasks 累積達標，重新評估。此時 promotion 幾乎確定通過。
+
+Phase 4-5 是優化（cost、adaptive），不是架構驗證 — 完成 Phase 3 behavioral enforcement 即可重評 ADR promotion。
 
 ### Consequences（預期）
 

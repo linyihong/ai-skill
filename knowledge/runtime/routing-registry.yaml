@@ -1875,6 +1875,46 @@ records:
       compression_level: source-backed
       reason: Distributed Runtime 在 multi-agent 協作或 async job 執行時才需要載入，不佔用 bootstrap 預算。
 
+  - id: route.runtime.cognitive-modes
+    task_intent: 載入 cognitive mode 定義、discovery signal 規則、subsystem integration contracts；任務開始前解析 4 維 mode（execution/context/governance/memory）
+    primary_source: runtime/cognitive-modes.yaml
+    required_dependencies:
+      - runtime/cognitive-modes-discovery.yaml
+      - runtime/runtime.db
+    candidate_sources:
+      - runtime/cognitive-modes-phase-integration.yaml
+      - runtime/cognitive-modes-governance-integration.yaml
+      - runtime/cognitive-modes-memory-integration.yaml
+      - models/cognitive-modes/README.md
+      - models/compression/README.md
+    source_of_truth_gate: runtime-cognitive-modes-active
+    ranking_reason: >
+      Cognitive Modes 定義 4 維 mode primitives（execution×context×governance×memory，
+      500 種組合）、14 個 discovery signals（8 signal_type 覆蓋 user_keyword/file_diff_scope/
+      git_status/session_turns/recent_failure/phase_machine_state/active_goals/token_budget）、
+      4 個 subsystem integration contracts（phase_machine/blocking_gates/compression/
+      retrieval-governance）、enforcement obligation + gate。任務開始前必須解析 mode，
+      resolution 記錄到 cognitive_modes 表或 final report Cognitive Mode 區塊。
+    validation_signal: >
+      cognitive_modes table 有本 task row，或 final report 含 Cognitive Mode 區塊（4 維值
+      + 理由）。generated_surfaces 含 runtime.cognitive_modes.contract /
+      runtime.cognitive_modes.discovery / runtime.cognitive_modes.phase_integration /
+      runtime.cognitive_modes.governance_integration / runtime.cognitive_modes.memory_integration。
+    metadata:
+      priority: P2
+      confidence: high
+      context_cost:
+        estimated_tokens: 400
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-subsystem-phase3
+    model:
+      profile: small
+      compression_level: summary-first
+      reason: Cognitive modes contract 本身是 YAML；summary-first 足夠解析 mode；只有需要 subsystem integration 細節時才展開 integration YAMLs。
+
   - id: route.governance.executable-contract-boundary
     task_intent: 判斷治理、規則或 workflow 文件何時必須提供 YAML contract，以及哪些 contract 必須投影到 runtime.db
     primary_source: governance/lifecycle/executable-contract-boundary.yaml

@@ -25,7 +25,7 @@ AI 認知執行系統 — 讓 agent 以 runtime state machine 驅動知識路由
 | 📐 **Architecture** | [`architecture/`](architecture/) | Roadmap、升級規劃、成本優化 |
 | ⚙️ **Shared Rules** | [`enforcement/`](enforcement/README.md) | 共用作業規則（含 contract-backed activation） |
 | 🔧 **Tool Adapters** | [`ai-tools/`](ai-tools/README.md) | Claude Code、Cursor 等工具配置 |
-| 🔄 **Runtime** | [`runtime/`](runtime/README.md) | Context routing、contract projections、TTL |
+| 🔄 **Runtime** | [`runtime/`](runtime/README.md) | Context routing、contract projections、TTL；**Cognitive Modes**（4 維 mode primitives + discovery signals + subsystem integration） |
 | 🧭 **Knowledge** | [`knowledge/`](knowledge/README.md) | Indexes、summaries、graphs、runtime surfaces |
 | 📊 **Metadata** | [`metadata/`](metadata/README.md) | Knowledge Atom schema、ranking、confidence |
 | 🧪 **Analysis** | [`analysis/`](analysis/README.md) | 觀察、拆解、pattern extraction |
