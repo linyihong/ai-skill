@@ -282,3 +282,33 @@ func TestValidateMemoryModeSubdir(t *testing.T) {
 		t.Fatalf("expected no violation for layer docs, got %q", v)
 	}
 }
+
+func TestValidatePlanStatusSync(t *testing.T) {
+	// Trigger fires: completion + Phase + plan ref, but plan not staged → block
+	body := "feat: Phase 3 完成\n\nSee plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md"
+	v := validatePlanStatusSync(body, []string{"scripts/ai-skill-cli/internal/app/hooks.go"})
+	if v == "" {
+		t.Fatal("expected violation when plan completion claimed but plan not staged")
+	}
+	// Same body but plan IS staged → ok
+	v = validatePlanStatusSync(body, []string{"plans/active/2026-05-22-1629-runtime-cognitive-modes-system.md"})
+	if v != "" {
+		t.Fatalf("expected no violation when plan is staged, got %q", v)
+	}
+	// No completion vocabulary → no trigger
+	v = validatePlanStatusSync("docs: see plans/active/foo.md for context\n\nPhase 3 context", nil)
+	if v != "" {
+		t.Fatalf("expected no violation without completion vocabulary, got %q", v)
+	}
+	// No phase mention → no trigger
+	v = validatePlanStatusSync("feat: completed plans/active/foo.md feature\n", nil)
+	if v != "" {
+		t.Fatalf("expected no violation without Phase N mention, got %q", v)
+	}
+	// Opt-out trailer skips
+	body2 := "post-mortem: Phase 3 完成 looking back at plans/active/foo.md\n\n[skip-plan-status-sync]\n"
+	v = validatePlanStatusSync(body2, nil)
+	if v != "" {
+		t.Fatalf("expected no violation with opt-out marker, got %q", v)
+	}
+}

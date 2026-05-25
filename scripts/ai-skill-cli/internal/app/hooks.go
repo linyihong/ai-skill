@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -303,6 +304,9 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		if v := validateMemoryModeSubdir(modes, staged); v != "" {
 			violations = append(violations, v)
 		}
+		if v := validatePlanStatusSync(text, staged); v != "" {
+			violations = append(violations, v)
+		}
 		if len(violations) > 0 {
 			result.Status = "blocked"
 			result.ExitCode = ExitValidationFailed
@@ -513,6 +517,83 @@ func validateMemoryModeSubdir(modes map[string]string, staged []string) string {
 		}
 	}
 	return ""
+}
+
+// validatePlanStatusSync implements runtime/plan-status-sync-enforcement.yaml:
+// when a commit body claims phase/milestone completion AND references an active
+// plan file by path, that plan file MUST be in the staged set.
+//
+// Trigger composition (all three required to fire):
+//   1. ≥1 completion vocabulary word
+//   2. ≥1 "Phase <num>" / "phase <num>" reference
+//   3. ≥1 plans/active/<f>.md path reference
+//
+// Opt-out: standalone "[skip-plan-status-sync]" trailer line.
+var (
+	planPathRE        = regexp.MustCompile(`plans/active/[^\s)"\]]+\.md`)
+	phaseMentionRE    = regexp.MustCompile(`(?i)Phase\s+\d+(?:\.\d+)?(?:[\.-][A-Za-z]+)?`)
+	completionPhrases = []string{
+		"complete", "completed", "completes", "done", "finish", "finished",
+		"完成", "結案", "結束", "✅",
+	}
+)
+
+func validatePlanStatusSync(text string, staged []string) string {
+	// Opt-out marker on its own line
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-plan-status-sync]" {
+			return ""
+		}
+	}
+
+	// Trigger 1: completion vocabulary
+	hasCompletion := false
+	lowered := strings.ToLower(text)
+	for _, phrase := range completionPhrases {
+		if strings.Contains(lowered, strings.ToLower(phrase)) {
+			hasCompletion = true
+			break
+		}
+	}
+	if !hasCompletion {
+		return ""
+	}
+
+	// Trigger 2: Phase N mention
+	if !phaseMentionRE.MatchString(text) {
+		return ""
+	}
+
+	// Trigger 3: plans/active/*.md reference
+	planRefs := planPathRE.FindAllString(text, -1)
+	if len(planRefs) == 0 {
+		return ""
+	}
+
+	// Trigger fired. Each referenced plan must be in staged set.
+	stagedSet := make(map[string]bool, len(staged))
+	for _, s := range staged {
+		stagedSet[s] = true
+	}
+	var missing []string
+	seen := map[string]bool{}
+	for _, ref := range planRefs {
+		// Normalize: strip trailing markdown link garbage
+		clean := strings.TrimRight(ref, "),]\"")
+		if seen[clean] {
+			continue
+		}
+		seen[clean] = true
+		if !stagedSet[clean] {
+			missing = append(missing, clean)
+		}
+	}
+	if len(missing) == 0 {
+		return ""
+	}
+	return "plan-status-sync: commit body claims phase completion and references " +
+		strings.Join(missing, ", ") +
+		" but the plan file is not in the staged set. Update the plan's Phase section in the same commit (runtime/plan-status-sync-enforcement.yaml). Use a [skip-plan-status-sync] trailer for retrospective references."
 }
 
 func runPrePushHook(result Result, root string) Result {
