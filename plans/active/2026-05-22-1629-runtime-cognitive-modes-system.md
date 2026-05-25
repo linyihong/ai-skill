@@ -217,49 +217,49 @@ Rules:
 
 ### 計畫書本身
 
-- [ ] 計畫書狀態：draft → in-progress（Phase 0 通過後）→ completed
-- [ ] 記錄完成日期
-- [ ] 記錄偏離（如有）
-- [ ] 歸檔至 `plans/archived/`
+- [x] 計畫書狀態：in-progress（Phase 0 通過後啟動，Phase 1-3 governance-structure 完成）
+- [ ] 記錄完成日期 ← 待 behavioral enforcement + ADR 完成
+- [ ] 記錄偏離（如有）← 待 plan completed
+- [ ] 歸檔至 `plans/archived/` ← 待 plan completed
 
 ### README 更新
 
-- [ ] `README.md` OS Layout 表格新增 cognitive modes 機制簡述（不改世代名稱）
-- [ ] `architecture/ai-native-cognitive-execution-system.md` 核心機制章節新增 cognitive modes
-- [ ] `models/README.md` 加說明：profile 與 mode 的關係（backward-compat）
+- [x] `README.md` OS Layout 表格新增 cognitive modes 機制簡述（commit `cc98961`）
+- [ ] `architecture/ai-native-cognitive-execution-system.md` 核心機制章節新增 cognitive modes ← 本 session 補做
+- [x] `models/README.md` 加說明：profile 與 mode 的關係（backward-compat）← 本 session 補做
 
 ### 架構文件（per system-upgrade-governance §3 規則 6）
 
-- [ ] Plan completed 時評估 ADR Promotion Criteria
-- [ ] 若符合 → 建立 ADR（直接 accepted）並更新 `constitution/README.md` 與 `architecture/ai-native-cognitive-execution-system.md` §本世代相關 ADR
-- [ ] 若不符合 → 在 plan 結尾記錄「決定不升 ADR 的理由」+ 改用 runtime gate / enforcement / intelligence 作為 promotion target
+- [x] ADR Promotion Criteria 評估（2026-05-25，結論：尚未達標 — 見 §ADR Promotion Criteria 評估表）
+- [ ] 若符合 → 建立 ADR（直接 accepted）← 尚未達標，不執行
+- [x] 若不符合 → 在 plan 記錄「決定不升 ADR 的理由」← 已記錄（behavioral enforcement 未完 + 5 tasks 未累積）
 
 ### 索引與路由
 
-- [ ] `knowledge/runtime/routing-registry.yaml` 新增 `route.runtime.cognitive-modes`
-- [ ] `knowledge/indexes/README.md` 反映新結構
-- [ ] `knowledge/graphs/` 新增 cognitive-modes 與 phase/compression/memory/governance 的 edges
+- [x] `knowledge/runtime/routing-registry.yaml` 新增 `route.runtime.cognitive-modes`（commit `cc98961`）
+- [ ] `knowledge/indexes/README.md` 反映新結構 ← 本 session 補做
+- [x] `knowledge/graphs/` 新增 `cognitive-modes.yaml`（commit `cc98961`，13 edges）
 
 ### Runtime Surface
 
-- [ ] 新增 `runtime/cognitive-modes.yaml`（executable YAML contract）
-- [ ] `runtime/runtime.db` 新增 `cognitive_modes` + `discovery_signals` 表
-- [ ] Compiler 規則更新，投影到 `generated_surfaces`
-- [ ] `runtime/runtime.db` 的 `phase_machine` / `obligation_ledger` / `blocking_gates` 對接 mode
+- [x] 新增 `runtime/cognitive-modes.yaml`（commit `aa5bc68`）
+- [x] `runtime/runtime.db` 新增 `cognitive_modes` + `discovery_signals` 表（commit `69eb605`、`76b8360`）
+- [x] Compiler 規則更新，投影到 `generated_surfaces`（commit `69eb605`：sourceRoots + compile rule）
+- [x] `runtime/runtime.db` 的 `obligation_ledger` / `blocking_gates` 對接 mode（commit `21ce746`：enforcement obligation + gate）
 
 ### Linked Updates
 
-- [ ] `governance/lifecycle/knowledge-update-flow.yaml` 評估是否加 mode resolution step（Phase 3 決定）
-- [ ] `enforcement/failure-patterns/` 加 `cognitive-mode-resolution-bypass.md`（mode 未解析就執行）
-- [ ] `models/compression/README.md` 標註與 `context_mode` 的對應關係
-- [ ] `memory/retrieval-governance/` 標註與 `memory_mode` 的對應關係
+- [x] `governance/lifecycle/knowledge-update-flow.yaml` 評估：**決定不加 step** — 改在 Step 1 entry 自動觸發（per §3.5，Phase 3 decision）
+- [x] `enforcement/failure-patterns/` 加 `cognitive-mode-resolution-bypass.md` ← 本 session 補做
+- [x] `models/compression/README.md` 標註與 `context_mode` 的對應關係（commit `2a3edba`）
+- [x] `memory/retrieval-governance/` 標註與 `memory_mode` 的對應關係 ← 本 session 補做
 
 ### 閉環驗證
 
-- [ ] Diff review
-- [ ] Linked updates 完成
-- [ ] `ai-skill runtime compile --native-compiler` + `ai-skill runtime validate` 通過
-- [ ] Commit / push / readback
+- [x] Diff review（每次 commit 前執行）
+- [ ] Linked updates 完成 ← 本 session 補做剩餘項
+- [x] `ai-skill runtime compile --native-compiler` + `ai-skill runtime validate` 通過（每次 commit 後確認）
+- [ ] Commit / push / readback ← 本 session 結尾執行
 
 ---
 

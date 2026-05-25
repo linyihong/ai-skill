@@ -29,6 +29,22 @@ Memory replay 不是 default context loading。只有目前 task 真的需要 hi
 - Memory 會覆蓋使用者最新目標。
 - Memory 會讓 agent 跳過 source-of-truth gate。
 
+## Compose with memory_mode
+
+`memory_mode`（Cognitive Modes 的第 4 維）決定 **哪個 memory subdir** 可以開啟，activation threshold 則決定 **開啟深度**。兩者 AND-compose：
+
+| `memory_mode` | 允許進入的 subdir | 最低 activation 要求 |
+|---|---|---|
+| `NONE` | 無 | 任何 level 均禁止讀 memory |
+| `EPISODIC` | `memory/episodic/` | `scoped_context`（至少 repo/workflow 匹配） |
+| `DECISION_REPLAY` | `memory/decision/` | `decision_reference`（accepted decision 仍相容） |
+| `FAILURE_REPLAY` | `memory/failure/` | `weak_hint` 以上（失敗 class 再現即允許） |
+| `PROJECT_CONTEXT` | `memory/project/` | `scoped_context` 以上（repo / active project 匹配） |
+
+若 `memory_mode = NONE`，無論 activation level 多高，**禁止讀任何 memory subdir**。
+
+`memory_mode` 的 runtime canonical 定義見 [`runtime/cognitive-modes-memory-integration.yaml`](../../runtime/cognitive-modes-memory-integration.yaml)。
+
 ## Gate
 
 Activation 前至少確認：
