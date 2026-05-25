@@ -3,7 +3,7 @@
 **Status**: `draft`
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-25
-**最後更新**：2026-05-25（補入 Glossary Entry Schema、Semantic Ownership、Vocabulary Resolution Priority、Drift Detection 與 Semantic Governance Boundary）
+**最後更新**：2026-05-25（補入 Markdown canonical source + SQLite semantic projection、relation / usage index、semantic routing roadmap）
 
 > 本 plan 回應外部 `CONTEXT.md / ubiquitous language` 建議，參考 [mattpocock/skills](https://github.com/mattpocock/skills/tree/main) 將 shared language 作為 agent alignment 技巧；但在 Ai-skill 中不建立 root `CONTEXT.md` 作為第二份 source-of-truth，而是依 Gen 3 分層落到 `knowledge/glossary/` 與 project-local memory 邊界。
 
@@ -30,6 +30,8 @@ Ai-skill 目前已有相關 intelligence：
 5. **詞條形狀未定義**：若沒有 Glossary Entry Schema，agent 可能把詞條寫成一句話、ADR、runtime spec、incident record 或 temporary implementation note。
 6. **Semantic split-brain**：`context_mode`、`compression`、`memory_mode`、`generated_surface`、`projection` 可能被 runtime、workflow、knowledge、contract 文件各自重新定義。
 7. **Resolution order 不明**：agent 面對 project glossary、knowledge glossary、ADR、workflow docs、intelligence heuristics、memory replay 時，可能讓 memory 或舊 ADR 覆蓋 active glossary。
+8. **Document lookup 不足**：agent 需要回答「這個詞誰擁有、哪些 workflow / validation / route / plan 使用它、哪些 alias 或 deprecated term 指向它」，不是只找 Markdown 檔案。
+9. **語義關聯未索引**：`context_mode`、`memory_mode`、`compression`、`projection`、`generated_surface`、`runtime_refresh`、`owner-layer` 這類短詞高度專案特化且 relationship-heavy，單靠全文搜尋或 embedding 不穩。
 
 ### Decision
 
@@ -41,6 +43,7 @@ Ai-skill 目前已有相關 intelligence：
 | 單一專案、跨 session 但非 canonical 的語言脈絡 | `<PROJECT_ROOT>/memory/project/context-language.md` 或專案等價文件 | 只作 selective replay，不取代專案正式 docs 或 Ai-skill glossary。 |
 | 判斷何時需要 shared language | `intelligence/engineering/requirements/behavior-modeling/` 與 `intelligence/engineering/architecture/domain-modeling/` | 保留為 reasoning source。 |
 | 執行何時讀 glossary | `workflow/software-delivery/requirements/behavior-driven-discovery/` 與 `pre-build-interrogation` | Workflow gate 觸發 glossary 使用。 |
+| Runtime semantic projection | `knowledge/runtime/sqlite/glossary.sqlite`（Phase 5 建立） | 從 Markdown canonical glossary 生成 normalized semantic index，用於 owner lookup、alias resolution、dependency traversal、drift detection 與 semantic routing。 |
 | Semantic governance | `governance/semantic/`（Phase 2 視 validation 決定是否建立） | 定義 naming、ownership、deprecation、aliasing、resolution order、drift detection 與 semantic conflict resolution。 |
 
 `knowledge/glossary/` 不做百科全書；只收會影響 behavior、contract、runtime surface、validation、routing 或 framework decision 的詞。每個詞條必須有 schema 與 semantic owner；其他文件只能引用 owner definition，不能重新定義同一詞。
@@ -101,6 +104,85 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 - Memory replay 永遠不能覆蓋 glossary / ADR / workflow current source。
 - 舊 ADR 若與 active runtime docs 衝突，必須檢查 Framework Generation / Vocabulary Evolution section，不可直接採舊詞義。
 
+### Semantic SQLite Projection（計畫要求）
+
+Glossary 的 canonical source 仍是 Markdown，因為它需要 human readable、reviewable、git diffable 與 PR friendly。但 runtime 不應只做全文 cache；Phase 5 必須建立 **semantic-normalized SQLite projection**，把 glossary 轉成可查詢的語義索引層。
+
+Projection 原則：
+
+- `knowledge/glossary/*.md` 是 canonical source-of-truth。
+- `knowledge/runtime/sqlite/glossary.sqlite` 是 generated runtime projection，不保存第二份 rule body。
+- SQLite 只保存 normalized semantic fields、relations、usage index 與 validation metadata。
+- 不採用 `term/content` 單表全文 cache 作為主要設計；全文搜尋可以是輔助，不是核心。
+- 不過早導入 vector DB / embeddings；先用 ownership、relations、lifecycle、routing、dependency 這些 strongly typed semantics。
+
+Minimum tables（Phase 5 詳化）：
+
+```sql
+CREATE TABLE glossary_terms (
+  term TEXT PRIMARY KEY,
+  meaning TEXT NOT NULL,
+  status TEXT NOT NULL,
+  owner_layer TEXT NOT NULL,
+  canonical_source TEXT NOT NULL,
+  introduced_at TEXT,
+  deprecated_at TEXT
+);
+
+CREATE TABLE glossary_relations (
+  source_term TEXT NOT NULL,
+  relation_type TEXT NOT NULL,
+  target_term TEXT NOT NULL,
+  source_file TEXT NOT NULL
+);
+
+CREATE TABLE glossary_usage (
+  term TEXT NOT NULL,
+  source_file TEXT NOT NULL,
+  source_type TEXT NOT NULL,
+  usage_context TEXT
+);
+```
+
+Allowed `glossary_relations.relation_type` values start with:
+
+- `alias_of`
+- `related_to`
+- `conflicts_with`
+- `owned_by`
+- `used_by`
+- `deprecated_by`
+- `replaced_by`
+
+Allowed `glossary_usage.source_type` values start with:
+
+- `workflow`
+- `validation`
+- `runtime`
+- `knowledge`
+- `adr`
+- `plan`
+- `memory`
+
+Runtime queries this projection should support:
+
+- 這個詞誰擁有？
+- 哪些 workflow / validation scenario / runtime route / active plan 使用它？
+- 哪些 alias 指向它？
+- 哪些 term 已 deprecated 或被 replaced？
+- 哪些詞 meaning 相近但 owner 不同，可能構成 semantic split-brain？
+- 使用者問 `compression runtime issue` 時，應載入哪些 glossary owner、workflow、validation scenarios、active plans 與 runtime contracts？
+
+### Evolution Roadmap（計畫要求）
+
+| Generation | Capability | Completion Signal |
+| --- | --- | --- |
+| Gen 3.1 | Markdown canonical glossary + SQLite projection | `knowledge/glossary/*.md` 可產生 `knowledge/runtime/sqlite/glossary.sqlite`，並可查 owner / status / canonical source。 |
+| Gen 3.2 | Semantic relation graph | `glossary_relations` 支援 alias、related、conflict、deprecation、replacement 查詢。 |
+| Gen 3.3 | Runtime semantic routing | 使用者訊號或 file diff 可透過 glossary 找 owner-layer、related workflows、validation scenarios 與 active plans。 |
+| Gen 3.4 | Glossary drift auto-detection | Validation 可自動偵測 owner missing、alias loop、deprecated term resurrection、conflicting meanings。 |
+| Gen 4 | Context-aware cognitive loading | Agent 先查 touched semantic domains，再決定載入哪些 knowledge、workflow、runtime contracts 與 validation rules。 |
+
 ### Alternatives Considered
 
 - **A. 建 root `CONTEXT.md`**：拒絕。Root context 容易變成 always-loaded 大檔，且會與 `knowledge/`、`workflow/`、`memory/` 形成平行 source。
@@ -135,10 +217,13 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 - Framework 詞彙如 `context_mode`、`generated_surfaces`、`owner-layer contract` 可集中定義。
 - Requirements / BDD / domain modeling 可引用同一 glossary，降低語義漂移。
 - Project memory 與 canonical knowledge 邊界清楚。
+- SQLite semantic projection 讓 agent 查語義關聯，而不是只查檔案路徑。
+- 未來可支援 runtime semantic routing：由 term 找 owner-layer、workflow、validation、active plan 與 runtime contract。
 
 #### 負面
 
 - 新增 `knowledge/glossary/` 需要 routing、graph、summary 與 README 連動。
+- 新增 `knowledge/runtime/sqlite/glossary.sqlite` 需要 compiler / refresh 邏輯或 dedicated generator，避免 projection drift。
 - 若 glossary 過度膨脹，會變成低價值百科，需要嚴格 scope。
 - Project-local glossary template 需要說清楚「專案 source 優先」，避免污染 reusable docs。
 
@@ -152,6 +237,8 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 | 與 active runtime cognitive modes plan 詞彙衝突 | Phase 0 先盤點 `context_mode` / `compression` / `memory_mode`，避免先寫兩套。 |
 | Semantic split-brain | 每個 term 有 `owner-layer`；其他 layer 只能引用，不得重新定義。 |
 | Alias / deprecated term 復活 | Phase 1 先寫 `semantic-term-overlap-v1.yaml`，Phase 2 定義 alias / deprecation lifecycle。 |
+| SQLite 變成 Markdown cache | Phase 5 明確禁止 `term/content` 單表作核心設計；必須 normalized terms + relations + usage index。 |
+| 過早 vectorization | Gen 3.x 先做 structured semantics；只有在 relation / usage index 無法滿足查詢時才評估 embeddings。 |
 
 ---
 
@@ -159,11 +246,11 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 
 | 欄位 | 內容 |
 | --- | --- |
-| Runtime owner | Phase 1-3：無，doc / knowledge layer plan；Phase 5 後視結果決定是否新增 `generated_surfaces` glossary index 或只走 knowledge runtime refresh。 |
-| Trigger flow | Phase 1-3：user asks for framework / workflow / term / source-of-truth clarification → `pre-build-interrogation` or software-delivery route loads candidate sources → glossary source is manually read as dependency evidence → plan final report lists glossary decision / no duplication evidence.<br>Phase 5 candidate runtime path：file_diff or user_signal contains glossary / term conflict / ubiquitous language / source-of-truth wording → `route.knowledge.glossary` or runtime index query detects glossary candidate → load `knowledge/glossary/README.md` + matching term file → run glossary drift / semantic overlap scenarios → block completion if canonical owner or memory/project boundary conflicts. |
-| Trigger location | Phase 1-3：`pre-build-interrogation`、`route.workflow.software-delivery`、agent dependency-read ledger；Phase 5 candidate：`file_diff`、`user_signal`、runtime index lookup、未來 glossary route。 |
+| Runtime owner | Phase 1-4：Markdown canonical source + manual workflow reads；Phase 5：`knowledge/runtime/sqlite/glossary.sqlite` semantic projection + runtime reports；Phase 5+ 若需要 blocking gate，再新增 owner-layer executable contract。 |
+| Trigger flow | Phase 1-4：user asks for framework / workflow / term / source-of-truth clarification → `pre-build-interrogation` or software-delivery route loads candidate sources → glossary source is manually read as dependency evidence → plan final report lists glossary decision / no duplication evidence.<br>Phase 5 semantic projection：file_diff or user_signal contains glossary / term conflict / ubiquitous language / source-of-truth wording → `route.knowledge.glossary` or semantic index query detects glossary candidate → query `glossary_terms` / `glossary_relations` / `glossary_usage` → load canonical `knowledge/glossary/*.md` owner entry + related workflow / validation / plan sources → run glossary drift / semantic overlap scenarios → block completion if owner, alias, deprecated term, or memory/project boundary conflicts. |
+| Trigger location | Phase 1-4：`pre-build-interrogation`、`route.workflow.software-delivery`、agent dependency-read ledger；Phase 5：`file_diff`、`user_signal`、runtime semantic index lookup、future `route.knowledge.glossary`。 |
 | Activation contract | 初期無新 executable contract；使用既有 `workflow.software_delivery.pre_build_interrogation.contract` 作 plan 前 gate。若 Phase 5 決定 glossary 使用需要 blocking gate，再補 owner-layer YAML。 |
-| Generated surface | 初期不投影 executable contract；`knowledge/runtime/sqlite/runtime-index.sqlite` 與 runtime reports 會收錄 glossary source。若新增 executable contract，target_key 需另定。 |
+| Generated surface | 初期不投影 executable contract；Phase 5 建立 `knowledge/runtime/sqlite/glossary.sqlite` 作 semantic projection，並在 runtime reports 記錄 glossary source / route / validation coverage。若新增 executable contract，target_key 需另定。 |
 | Validation scenarios | Phase 1 先新增：`validation/scenarios/failure-derived/glossary-source-duplication-v1.yaml`、`validation/scenarios/failure-derived/memory-context-language-as-canonical-v1.yaml`、`validation/scenarios/failure-derived/semantic-term-overlap-v1.yaml`。 |
 | Test passing evidence | `ai-skill runtime refresh --native-index --native-reports`、`ai-skill runtime validate --json`、scenario / lints / diff review。 |
 
@@ -173,11 +260,11 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 
 - Shared language 先是 knowledge source，不是 blocking runtime gate。
 - 現有 `pre-build-interrogation` 已能在 plan 前阻擋 source-of-truth duplication。
-- 若未先驗證 glossary scope，直接做 runtime contract 會增加 noise。
+- 若未先驗證 glossary scope，直接做 runtime blocking contract 會增加 noise。
 
 未來接入時機：
 
-- Phase 5 證明 agent 需要 glossary route 或 blocking gate 才能穩定使用時，新增 routing / generated surface / executable contract。
+- Phase 5 建立 semantic SQLite projection；若 projection + validation 仍不足以穩定阻擋 drift，再新增 glossary owner-layer executable contract。
 
 ---
 
@@ -188,10 +275,10 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 | Trigger | 使用者要求把 `CONTEXT.md / ubiquitous language system` 寫成計畫，並提醒架構已調整需重讀規則。 |
 | Checked sources | `CORE_BOOTSTRAP.md`、`enforcement/dependency-reading.md`、`enforcement/linked-updates.md`、`workflow/software-delivery/requirements/pre-build-interrogation.md`、`plans/README.md`、`governance/lifecycle/system-upgrade-governance.md`、`architecture/README.md`、ADR-007、knowledge / memory README、ubiquitous language intelligence。 |
 | Goal | 建立 shared language canonical placement plan，吸收 `CONTEXT.md` 技巧但不引入第二份 source-of-truth。 |
-| Scope | Plan only；規劃 `knowledge/glossary/`、project memory boundary、workflow/routing/validation linked updates。 |
+| Scope | Plan only；規劃 `knowledge/glossary/`、project memory boundary、semantic SQLite projection、workflow/routing/validation linked updates。 |
 | Non-goals | 本 plan 不立即建立完整 glossary、不中斷 active runtime cognitive modes plan、不建立 proposed ADR、不新增 root `CONTEXT.md`。 |
 | Acceptance | Plan 符合新 `plans/README.md` 必填章節；明確回答 `knowledge/glossary/` vs `memory/project/context-language.md`；列出 test-first validation。 |
-| Framework discovery | `knowledge/` 是 navigation / atom / glossary source 候選；`memory/` 不保存 current truth；`intelligence/` 保存判斷原則；`workflow/` 保存執行 gate；`governance/semantic/` 是 semantic lifecycle / conflict resolution 候選。 |
+| Framework discovery | `knowledge/` 是 navigation / atom / glossary source 候選；`knowledge/runtime/sqlite/` 可作 generated semantic projection；`memory/` 不保存 current truth；`intelligence/` 保存判斷原則；`workflow/` 保存執行 gate；`governance/semantic/` 是 semantic lifecycle / conflict resolution 候選。 |
 | Duplication risk | Root `CONTEXT.md`、memory canonical、knowledge glossary 三者不可並存為同一語彙 source。Plan 採 `knowledge/glossary/` canonical + memory replay 非 canonical；每個 term 另需 `owner-layer` 防止 semantic split-brain。 |
 | Open questions | 見下一節。 |
 | Decision | proceed with draft plan；implementation 需另行啟動。 |
@@ -202,11 +289,13 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 
 1. `knowledge/glossary/` 是否先只放 Ai-skill framework glossary，還是同時放 software-delivery glossary？
 2. Project-local `context-language.md` 是否由 Ai-skill 提供 template，或只寫規範讓 downstream project 自行建立？
-3. Glossary 是否需要 companion YAML contract，或維持 Markdown + generated knowledge index 即可？
+3. Glossary 是否需要 companion YAML contract，或維持 Markdown canonical source + semantic SQLite projection 即可？
 4. 是否需要在 active `runtime-cognitive-modes-system` plan 中加入詞彙對齊 dependency，避免 `context_mode` 與 `compression` 分叉？
 5. Glossary `status` 是否固定為 `canonical` / `candidate` / `deprecated` / `project-local`，或需加 `alias-only` / `superseded`？
 6. `owner-layer` 的值域是否沿用現有 owner layers（knowledge / runtime / workflow / governance / intelligence / memory），或新增 semantic domain（如 `runtime-cognition`）？
 7. `governance/semantic/` 是否應在 Phase 2 建立為獨立 governance boundary，或先放在 `knowledge/glossary/README.md` 內直到 drift 實證出現？
+8. `knowledge/runtime/sqlite/glossary.sqlite` 應整合進現有 runtime index generator，還是建立 dedicated glossary projection command？
+9. `glossary_usage` 的 source scanning 應先只掃 declared references，還是允許 repo-wide term usage discovery？
 
 ---
 
@@ -220,12 +309,14 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 - Agent 不會把 `memory/project/context-language.md` 當 current truth。
 - Agent 在 framework / requirements plan 中能找到 `knowledge/glossary/` 作 shared language source。
 - Agent 能偵測 near-duplicate terms、conflicting owner-layer、alias loops 與 deprecated term resurrection。
+- Agent 能偵測 semantic projection 設計是否退化為 `term/content` Markdown cache。
 
 ### Tasks
 
 - [ ] 新增 `validation/scenarios/failure-derived/glossary-source-duplication-v1.yaml`
 - [ ] 新增 `validation/scenarios/failure-derived/memory-context-language-as-canonical-v1.yaml`
 - [ ] 新增 `validation/scenarios/failure-derived/semantic-term-overlap-v1.yaml`
+- [ ] 新增 `validation/scenarios/failure-derived/glossary-semantic-projection-shape-v1.yaml`
 - [ ] 更新 relevant graph / summary / routing candidate（若 scenario 需要）
 
 ### Phase 1 完成條件
@@ -244,6 +335,8 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 - [ ] 定義 required / optional / forbidden fields。
 - [ ] 定義 `owner-layer` semantics：owner 擁有 canonical meaning，其他 layer 只能引用或 alias。
 - [ ] 定義 Vocabulary Resolution Priority。
+- [ ] 定義 relation lifecycle：`alias_of`、`related_to`、`conflicts_with`、`owned_by`、`used_by`、`deprecated_by`、`replaced_by`。
+- [ ] 定義 usage index source types：`workflow`、`validation`、`runtime`、`knowledge`、`adr`、`plan`、`memory`。
 - [ ] 定義 drift detection categories：duplicate meaning、conflicting ownership、alias loop、deprecated term resurrection、near-duplicate concept fork。
 - [ ] 決定是否建立 `governance/semantic/README.md`；若暫不建立，在 plan 中記錄 not-yet reason 與 promotion trigger。
 
@@ -251,6 +344,7 @@ Owner layer 擁有該詞的 canonical meaning；其他 layer 只能引用、alia
 
 - [ ] 任何 glossary entry 建立前，schema 已存在。
 - [ ] Semantic ownership 與 resolution priority 已寫明。
+- [ ] Relation types 與 usage source types 已寫明。
 - [ ] `governance/semantic/` 是否建立已有明確 decision；若 deferred，已列 promotion trigger。
 
 ---
@@ -294,7 +388,7 @@ knowledge/glossary/
 - [ ] 更新 `intelligence/engineering/architecture/domain-modeling/ubiquitous-language.md`：domain glossary 與 Ai-skill glossary 的邊界。
 - [ ] 若建立 `governance/semantic/`，更新 lifecycle / routing / linked updates 的 semantic governance boundary。
 
-### Phase 3 完成條件
+### Phase 4 完成條件
 
 - [ ] Workflow、memory、intelligence 三層沒有互相取代。
 - [ ] `memory/project/context-language.md` 的用途被限制為 project-local replay / context aid。
@@ -303,18 +397,23 @@ knowledge/glossary/
 
 ---
 
-## Phase 5 Routing, Runtime Reports, And Generated Lookup
+## Phase 5 Semantic Projection, Routing, And Runtime Reports
 
 ### Tasks
 
 - [ ] 更新 `knowledge/runtime/routing-registry.yaml`，新增或擴充 glossary route。
 - [ ] 更新 `knowledge/summaries/requirements-cognition.md` / `development-guidance.md` / related summaries。
-- [ ] 執行 `ai-skill runtime refresh --native-index --native-reports`，讓 glossary 進 generated lookup。
+- [ ] 建立或規劃 `knowledge/runtime/sqlite/glossary.sqlite` projection，至少支援 `glossary_terms`、`glossary_relations`、`glossary_usage`。
+- [ ] 確認 projection 從 `knowledge/glossary/*.md` 生成，不成為第二份 canonical source。
+- [ ] 執行 `ai-skill runtime refresh --native-index --native-reports`，讓 glossary source、semantic projection 與 route 進 generated lookup。
+- [ ] 補查詢驗證：owner lookup、alias resolution、usage traversal、deprecated / replaced term lookup、owner missing drift query。
 - [ ] 若決定需要 executable contract，再補 `knowledge/glossary/*.yaml` 或 owner-layer contract；否則明確記錄 Markdown-only / knowledge source。
 
-### Phase 4 完成條件
+### Phase 5 完成條件
 
 - [ ] Runtime reports / SQLite index 可找到 glossary source。
+- [ ] `knowledge/runtime/sqlite/glossary.sqlite` 可查 term owner、status、canonical source、relations 與 usage。
+- [ ] Projection schema 不是 `term/content` Markdown cache。
 - [ ] 若無 runtime executable contract，已記錄原因：glossary 是 knowledge source，不是 workflow gate。
 - [ ] 若有 contract，`generated_surfaces` target_key 已 synced。
 - [ ] Semantic drift scenarios 進入 validation inventory 或 runtime reports 可查來源。
@@ -337,6 +436,7 @@ knowledge/glossary/
 
 - [ ] `knowledge/glossary/` canonical placement 已建立或明確 deferred。
 - [ ] Glossary Entry Schema、Semantic Ownership、Vocabulary Resolution Priority 已建立或明確 deferred with blocker。
+- [ ] Semantic SQLite projection 已建立或明確 deferred with blocker。
 - [ ] Semantic drift validation scenario 已建立。
 - [ ] `memory/project/context-language.md` 非 canonical 邊界已寫入。
 - [ ] Validation scenarios 可防止 root `CONTEXT.md` / memory canonical duplication。
@@ -351,6 +451,7 @@ knowledge/glossary/
 - [ ] 接受 `memory/project/context-language.md` 只作 project-local replay / context aid。
 - [ ] 接受不建立 root `CONTEXT.md`。
 - [ ] 接受先 test-first scenarios，再建立 glossary source。
+- [ ] 接受先做 structured semantic projection，不過早導入 vector DB / embeddings。
 
 ---
 
