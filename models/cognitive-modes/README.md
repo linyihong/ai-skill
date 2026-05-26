@@ -73,22 +73,46 @@ Agent 任務開始時，依**raw signals**快速 resolve 4 個 mode。signal 表
 | 連續 failure ≥ 2 | RECOVERY | SOURCE_BACKED | LOCKDOWN | FAILURE_REPLAY |
 | Long session 跨專案 context | depends | depends | depends | PROJECT_CONTEXT |
 
-## Final Report Cognitive Mode 區塊範本
+## Final Report Cognitive Mode 區塊範本（v2）
 
-Agent 完成任務時，final report **必須**含此區塊：
+Agent 完成任務時，final report **必須**含此區塊。使用 compact form 或 full form，依任務性質選擇。
+
+### Compact form（全 6 維均為預設值時使用）
+
+預設值：execution=NORMAL, context=SUMMARY_FIRST, governance=STANDARD, memory=NONE, validation=CHECKLIST, cost=LOW。
+
+```
+Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:<signal_from_discovery_yaml>
+```
+
+### Full form（任一維度非預設，或高風險 mode）
+
+高風險：execution_mode ∈ {DEEP, FORENSIC, RECOVERY} 或 governance_mode ∈ {STRICT, LOCKDOWN}。
 
 ```markdown
 ### Cognitive Mode 報告
 
 | 維度 | 值 | 理由 |
 |------|------|------|
-| execution_mode | <FAST/NORMAL/DEEP/FORENSIC/RECOVERY> | <為何選此> |
-| context_mode | <INDEX_ONLY/SUMMARY_FIRST/CHECKLIST_FIRST/SOURCE_BACKED/GRAPH_ASSISTED> | <為何選此> |
-| governance_mode | <LIGHT/STANDARD/STRICT/LOCKDOWN> | <為何選此> |
-| memory_mode | <NONE/EPISODIC/DECISION_REPLAY/FAILURE_REPLAY/PROJECT_CONTEXT> | <為何選此> |
+| execution_mode    | <FAST/NORMAL/DEEP/FORENSIC/RECOVERY> | <reason or raw signal> |
+| context_mode      | <INDEX_ONLY/SUMMARY_FIRST/CHECKLIST_FIRST/SOURCE_BACKED/GRAPH_ASSISTED> | <reason> |
+| governance_mode   | <LIGHT/STANDARD/STRICT/LOCKDOWN> | <reason> |
+| memory_mode       | <NONE/EPISODIC/DECISION_REPLAY/FAILURE_REPLAY/PROJECT_CONTEXT> | <reason> |
+| validation_mode   | <SKIP/CHECKLIST/SOURCE_BACKED/GRAPH_TRACED> | <reason> |
+| cognitive_cost    | <LOW/MEDIUM/HIGH/VERY_HIGH> | derived |
+
+activation_reason:
+  - <signal_name from runtime/cognitive-modes-discovery.yaml>
 ```
 
-理由欄位可引用 raw signal（例：「file diff in enforcement/ → STRICT」「typo 修正 → FAST」）。
+高風險 mode 時附加 capability snippet（2 行）：
+
+```
+Capability summary:
+  <mode>=<value> → <1-2 line capability description from integration YAML>
+```
+
+理由欄位引用 raw signal（例：「file diff in enforcement/ → STRICT」「typo 修正 → FAST」）。`activation_reason` 的 signal name 必須是 `runtime/cognitive-modes-discovery.yaml` 定義的 14 個 known signals 之一。
 
 ## 與其他 models/ 入口的關係
 

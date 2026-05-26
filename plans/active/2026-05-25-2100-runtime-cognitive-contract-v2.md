@@ -1,9 +1,9 @@
 # Runtime Cognitive Contract v2
 
-**Status**: `in-progress`（Phase 0 ✅ done 2026-05-25 / Phase 1 ✅ done 2026-05-26）
+**Status**: `in-progress`（Phase 0 ✅ done 2026-05-25 / Phase 1 ✅ done 2026-05-26 / Phase 2 ✅ done 2026-05-26）
 **世代**：Gen 3 子系統演進（ADR-008 amendment 或 superseding，pending Phase 7 評估）
 **建立日期**：2026-05-25
-**最後更新**：2026-05-26
+**最後更新**：2026-05-26（Phase 2）
 
 > 本 plan 回應 2026-05-25 外部反饋：「Cognitive Mode 報告」目前是 debug telemetry，還不是穩定的 cognitive contract。Mode 是 label without capability semantics，agent self-describes 容易 inflated reporting，verbosity inflation 造成 cognitive fatigue。要把現在的 mode block 升級為 **Runtime Cognitive Contract**，加入 validation_mode + cognitive_cost、compact/full adaptive form、activation_reason 必須引 discovery signals。
 
@@ -166,7 +166,7 @@ Capability summary:
 
 | # | Question | Status |
 |---|---|---|
-| 1 | Compact form trigger boundary：「全 default」如何精確定義？是否包括 cognitive_cost=LOW 或 validation_mode=CHECKLIST? | TBD Phase 2 |
+| 1 | Compact form trigger boundary：「全 default」如何精確定義？是否包括 cognitive_cost=LOW 或 validation_mode=CHECKLIST? | ✅ Resolved Phase 2：全 6 維 all-default = execution=NORMAL, context=SUMMARY_FIRST, governance=STANDARD, memory=NONE, validation=CHECKLIST, cost=LOW。cognitive_cost=LOW 和 validation_mode=CHECKLIST 是預設值一部分；任一不同 → full form required。Hook 只跳過 cognitive_cost 的 non-default check（derived；Phase 3 adds cost class check）。 |
 | 2 | Capability snippet 從 integration YAMLs 動態取 vs hook 內 hardcode lookup? | TBD Phase 5 |
 | 3 | `activation_reason` 可否為 user-provided override（user 指定 signal name 而非 agent infer）? | TBD Phase 4 |
 | 4 | Existing v1 commits 不 retroactive 改 — 是否要加 deprecation timeline? | TBD Phase 6 |
@@ -253,16 +253,17 @@ Capability summary:
 
 ### Tasks
 
-- [ ] 更新 `runtime/cognitive-modes.yaml` 加入 v2 section：6 維定義 + compact form spec + full form spec + capability snippet trigger rule
-- [ ] 更新 `CORE_BOOTSTRAP.md` Cognitive Mode block 範本：列出 compact form + full form + 何時用哪種
-- [ ] 更新 `models/cognitive-modes/README.md` 同步範本
-- [ ] 確認 commit-msg hook `validateCognitiveModeBlock` 接受兩種 form
+- [x] 更新 `runtime/cognitive-modes.yaml` 加入 v2 section：6 維定義 + compact form spec + full form spec + capability snippet trigger rule
+- [x] 更新 `CORE_BOOTSTRAP.md` Cognitive Mode block 範本：列出 compact form + full form + 何時用哪種
+- [x] 更新 `models/cognitive-modes/README.md` 同步範本
+- [x] 確認 commit-msg hook `validateCognitiveModeBlock` 接受兩種 form（compact + full；compact with non-default dims blocked）
 
 ### Phase 2 完成條件
 
-- [ ] YAML 更新通過 `runtime validate`
-- [ ] CORE_BOOTSTRAP / models 文件 updated
-- [ ] Scenario `phase6-cognitive-contract-v2-compact-form-v1` PASS
+- [x] YAML 更新通過 `runtime validate`
+- [x] CORE_BOOTSTRAP / models 文件 updated
+- [x] Scenario `phase6-cognitive-contract-v2-compact-form-v1` PASS
+- [x] Scenario `phase6-cognitive-contract-v2-full-form-v1` PASS（validation_mode + cognitive_cost in parser）
 
 ---
 

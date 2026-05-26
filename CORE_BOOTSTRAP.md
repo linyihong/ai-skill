@@ -25,7 +25,10 @@
 ## Obligations（query YAML for format / examples / enum）
 
 - **Bootstrap Receipt**（first-turn）— format / example / fields 見 `runtime/core-bootstrap.yaml` §`per_session_obligations[obligation.bootstrap.receipt]`；未輸出即執行非-Read 工具命中 [`gate.bootstrap.receipt_present`](enforcement/failure-patterns/bootstrap-bypass-on-resume.md)
-- **Cognitive Mode 報告**（per-turn）— format / mode value enums / compact-vs-full 見 `runtime/core-bootstrap.yaml` §`per_turn_obligations[obligation.cognitive.mode_report]` + [`models/cognitive-modes/README.md`](models/cognitive-modes/README.md)；commit 階段由 `commit-msg` hook 機械強制（[ADR-008](constitution/ADR-008-runtime-cognitive-modes.md)）
+- **Cognitive Mode 報告**（per-turn, v2）— 兩種形式：
+  - **Compact**（全 6 維預設）：`Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:<signal>`
+  - **Full table**（任一維度非預設 或 高風險 mode）：`### Cognitive Mode 報告` + 6-dim markdown table + `activation_reason`
+  - 完整 format / enum / template 見 `runtime/core-bootstrap.yaml` §`per_turn_obligations[obligation.cognitive.mode_report]` + [`models/cognitive-modes/README.md`](models/cognitive-modes/README.md)；commit 階段由 `commit-msg` hook 機械強制（[ADR-008](constitution/ADR-008-runtime-cognitive-modes.md)）
 - **Close-loop 終局檢查**（per-task）— 在回報任務完成或結束對話前，**必須**確認 `git status` 為 clean 且所有 commit 已推送（`git log origin/<branch>..HEAD` 為空）。若 push 未獲授權，必須明確說明 pending 狀態。見 `enforcement/linked-updates.yaml` §`gate.linked_updates.writeback_closed`。
 - **Per-commit validators**（11 個 enumerated in YAML）— `ai-skill runtime obligations` 列當前 active list；validator dispatch via registry in `scripts/ai-skill-cli/internal/app/hooks.go`
 

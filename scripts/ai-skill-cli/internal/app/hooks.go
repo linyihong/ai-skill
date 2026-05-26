@@ -257,11 +257,63 @@ func runPreCommitHook(result Result, root string) Result {
 	return result
 }
 
+// cognitiveV2Defaults are the 6 default dim values for the v2 compact form.
+// Compact form is only valid when all 6 dims match these defaults exactly.
+var cognitiveV2Defaults = map[string]string{
+	"execution_mode":  "NORMAL",
+	"context_mode":    "SUMMARY_FIRST",
+	"governance_mode": "STANDARD",
+	"memory_mode":     "NONE",
+	"validation_mode": "CHECKLIST",
+	"cognitive_cost":  "LOW",
+}
+
+// parseCompactCognitiveLine parses a v2 compact Cognitive Contract line:
+//
+//	"Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:<signal>"
+//
+// Returns a map with the 6 dim values, or nil if the line is not a valid compact form.
+func parseCompactCognitiveLine(line string) map[string]string {
+	line = strings.TrimSpace(line)
+	if !strings.HasPrefix(line, "Cognitive: ") {
+		return nil
+	}
+	rest := strings.TrimPrefix(line, "Cognitive: ")
+	segments := strings.Split(rest, " / ")
+	if len(segments) < 3 {
+		return nil
+	}
+	dims := strings.Split(segments[0], "·")
+	if len(dims) < 4 {
+		return nil
+	}
+	modes := map[string]string{
+		"execution_mode":  dims[0],
+		"context_mode":    dims[1],
+		"governance_mode": dims[2],
+		"memory_mode":     dims[3],
+	}
+	for _, seg := range segments[1:] {
+		switch {
+		case strings.HasPrefix(seg, "V:"):
+			modes["validation_mode"] = strings.TrimPrefix(seg, "V:")
+		case strings.HasPrefix(seg, "Cost:"):
+			modes["cognitive_cost"] = strings.TrimPrefix(seg, "Cost:")
+		}
+	}
+	return modes
+}
+
+// validateCognitiveContractFormat is the v2 entry-point name used in
+// per_commit_obligations (core-bootstrap.yaml). The enforcement logic lives in
+// runCommitMsgHook which accepts both compact and full form.
+const validateCognitiveContractFormat = "obligation.commit.cognitive_mode_block"
+
 // runCommitMsgHook enforces Phase 4 behavioral wiring of
 // gate.execution.cognitive_mode_resolved. Commit message body must contain
-// the literal '### Cognitive Mode 報告' block (template defined in
-// models/cognitive-modes/README.md). Mechanical commits may opt out via
-// '[skip-cognitive-mode]' in the body. Merge commits auto-skip.
+// either a v2 compact Cognitive line or a '### Cognitive Mode 報告' full table
+// (template defined in models/cognitive-modes/README.md v2). Mechanical commits
+// may opt out via '[skip-cognitive-mode]' in the body. Merge commits auto-skip.
 func runCommitMsgHook(result Result, root string, positional []string) Result {
 	if len(positional) == 0 {
 		// Hook called without message file path; cannot enforce, fail open with warning.
@@ -287,7 +339,36 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		return result
 	}
 
-	// Primary path: Cognitive Mode 報告 block present → run Phase 3 behavioral validators.
+	// v2 compact form path: "Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<sig>"
+	// Valid only when all 6 dims are at their default values. Non-default dims require full form.
+	for _, line := range strings.Split(text, "\n") {
+		if compactModes := parseCompactCognitiveLine(line); compactModes != nil {
+			var nonDefault []string
+			for dim, val := range compactModes {
+				if dim == "cognitive_cost" {
+					continue // derived — not validated here; Phase 3 adds cost class check
+				}
+				if def, ok := cognitiveV2Defaults[dim]; ok && val != def {
+					nonDefault = append(nonDefault, dim+"="+val)
+				}
+			}
+			if len(nonDefault) > 0 {
+				sort.Strings(nonDefault)
+				result.Status = "blocked"
+				result.ExitCode = ExitValidationFailed
+				result.Error = &CommandError{
+					Code:        "cognitive_compact_non_default",
+					Message:     "Compact form used but non-default dims detected: " + strings.Join(nonDefault, ", ") + ". Compact form is only valid when all 6 dims are at default values.",
+					Remediation: "Replace the compact line with a full ### Cognitive Mode 報告 table (6-dim v2 format) per models/cognitive-modes/README.md.",
+				}
+				return result
+			}
+			result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "ok", Message: "Cognitive Contract v2 compact form present (all dims at default)"})
+			return result
+		}
+	}
+
+	// Primary path: full form '### Cognitive Mode 報告' block → run Phase 3 behavioral validators.
 	// Checked BEFORE opt-out marker to avoid false positives when commit body
 	// documents/quotes the opt-out token (e.g. "Opt-out via '[skip-cognitive-mode]'").
 	if strings.Contains(text, "### Cognitive Mode 報告") {
@@ -346,8 +427,8 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 	result.ExitCode = ExitValidationFailed
 	result.Error = &CommandError{
 		Code:        "cognitive_mode_block_missing",
-		Message:     "Commit message body must include '### Cognitive Mode 報告' block (4-dim execution/context/governance/memory resolution).",
-		Remediation: "Add the block per models/cognitive-modes/README.md template, or add a standalone '[skip-cognitive-mode]' trailer line for mechanical commits.",
+		Message:     "Commit message body must include a Cognitive Contract v2 block: compact single-line form (all-default dims) or full '### Cognitive Mode 報告' table (6-dim, non-default or high-risk).",
+		Remediation: "Add compact form 'Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:<signal>' for trivial commits, or full table per models/cognitive-modes/README.md v2 template. For mechanical commits, add a standalone '[skip-cognitive-mode]' trailer line.",
 	}
 	return result
 }
@@ -391,7 +472,8 @@ func parseCognitiveModeBlock(text string) map[string]string {
 			continue
 		}
 		switch dim {
-		case "execution_mode", "context_mode", "governance_mode", "memory_mode":
+		case "execution_mode", "context_mode", "governance_mode", "memory_mode",
+			"validation_mode", "cognitive_cost":
 			modes[dim] = val
 		}
 	}

@@ -136,6 +136,80 @@ phase_status:
       Added CREATE TABLE cognitive_modes to createGoRuntimeSchema (~L137).
       Rebuilt 5 platform binaries. ai-skill runtime compile + validate pass.
 
+v2:
+  contract_version: "2.0"
+  plan: plans/active/2026-05-25-2100-runtime-cognitive-contract-v2.md
+  phase_status: phase_2_spec_complete
+
+  dimensions:
+    validation_mode:
+      values:
+        - SKIP
+        - CHECKLIST
+        - SOURCE_BACKED
+        - GRAPH_TRACED
+      default: CHECKLIST
+      note: validation depth decoupled from execution_mode; added in v2
+
+    cognitive_cost:
+      values:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - VERY_HIGH
+      default: LOW
+      derived: true
+      note: derived from (execution × context) lookup in cognitive-modes-cost-class.yaml; not agent-claimed
+
+  compact_form:
+    trigger: all_6_dims_at_default
+    default_values:
+      execution_mode: NORMAL
+      context_mode: SUMMARY_FIRST
+      governance_mode: STANDARD
+      memory_mode: NONE
+      validation_mode: CHECKLIST
+      cognitive_cost: LOW
+    format: "Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:<signal>"
+    note: single-line form; any non-default dim requires full table form
+
+  full_form:
+    trigger: any_dim_non_default OR high_risk_mode
+    high_risk_values:
+      execution_mode: [DEEP, FORENSIC, RECOVERY]
+      governance_mode: [STRICT, LOCKDOWN]
+    required_fields:
+      - execution_mode
+      - context_mode
+      - governance_mode
+      - memory_mode
+      - validation_mode
+      - cognitive_cost
+      - activation_reason
+    format: |
+      ### Cognitive Mode 報告
+
+      | 維度 | 值 | 理由 |
+      |------|------|------|
+      | execution_mode    | <value> | <reason> |
+      | context_mode      | <value> | <reason> |
+      | governance_mode   | <value> | <reason> |
+      | memory_mode       | <value> | <reason> |
+      | validation_mode   | <value> | <reason> |
+      | cognitive_cost    | <value> | derived |
+
+      activation_reason:
+        - <signal_from_cognitive-modes-discovery.yaml>
+
+  capability_snippet:
+    trigger_when:
+      execution_mode_in: [DEEP, FORENSIC, RECOVERY]
+      governance_mode_in: [STRICT, LOCKDOWN]
+    source: runtime/cognitive-modes-{phase,governance,memory}-integration.yaml
+    format: |
+      Capability summary:
+        <mode>=<value> → <1-2 line capability description>
+
 related:
   intelligence_atom: intelligence/engineering/development/test-first-framework-upgrade.md
   governance_rule: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
