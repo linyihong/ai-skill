@@ -21,15 +21,18 @@
 | `ai-skill doctor` | 檢查 runtime、Git、repo root、PATH、write permission、hooksPath 與平台支援 | 否 | 可選檢查 | Phase 1 |
 | `ai-skill init-project` | 建立新專案 AI tool bootstrap 設定 | 是 | 否 | Phase 2 |
 | `ai-skill goals` | 管理 `.agent-goals/` 暫存目標 | 是 | 否 | Phase 2 |
-| `ai-skill hooks install` | 安裝本 repo git hooks | 是 | 是 | Phase 2 |
-| `ai-skill hooks run pre-commit` | 執行 Git pre-commit hook logic，不依賴 shell script business logic | 是 | 是 | Shell To Go |
-| `ai-skill hooks run post-commit` | 執行 Git post-commit hook logic，不依賴 shell script business logic | 否 | 是 | Shell To Go |
+| `ai-skill hooks install` | 安裝本 repo git hooks（4 hooks：pre-commit / commit-msg / post-commit / pre-push） | 是 | 是 | Phase 2 |
+| `ai-skill hooks run pre-commit` | 執行 Git pre-commit hook logic（runtime source 變更時自動 recompile + stage runtime.db） | 是 | 是 | Shell To Go |
+| `ai-skill hooks run commit-msg` | 執行 Git commit-msg hook logic：commit body 必須含 Cognitive Mode 報告，並通過 7 個 behavioral validators（executionModeFloors / governanceModeConsistency / memoryModeSubdir / planStatusSync / tokenBudget / adaptiveTriggers / bootstrapEntryThinness） | 否 | 是 | ADR-008 / bootstrap-yaml-migration |
+| `ai-skill hooks run post-commit` | 執行 Git post-commit hook logic（cursor bundle sync 等） | 否 | 是 | Shell To Go |
+| `ai-skill hooks run pre-push` | 執行 Git pre-push hook logic：CLI source 變動時 go test ./... preflight | 否 | 是 | Shell To Go |
 | `ai-skill sync-cursor-bundle` | 同步 Cursor bundle / mirror | 是 | 否 | Phase 2 |
 | `ai-skill close-loop` | 檢查 dirty owner group、commit、push、readback | 是 | 是 | Phase 2 |
 | `ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index | 是 | 否 | Phase 3 |
 | `ai-skill runtime compile` | 編譯 `runtime/runtime.db` | 是 | 否 | Phase 3 |
 | `ai-skill runtime validate` | 驗證 runtime.db、knowledge runtime、SQLite assertions | 否 | 否 | Phase 3 |
 | `ai-skill runtime query` | 查詢 runtime index / generated surfaces | 否 | 否 | Phase 3 |
+| `ai-skill runtime obligations` | 列出目前 active bootstrap obligations（per_session / per_turn / per_commit），從 `generated_surfaces[runtime.core_bootstrap.contract]` 讀取 | 否 | 否 | bootstrap-yaml-migration Phase 3 |
 | `ai-skill roo set-global-custom-instructions` | guarded 寫入 Roo Code 全域 Custom Instructions | 是 | 否 | Tool adapter |
 
 ## 共通輸出契約
@@ -241,26 +244,27 @@
 
 ### `ai-skill hooks run`
 
-目的：讓 Git hook adapter 將業務邏輯交給 Go，避免 pre-commit / post-commit 依賴 shell 實作。
+目的：讓 Git hook adapter 將業務邏輯交給 Go，避免 hook 依賴 shell 實作。
 
 輸入：
 
-- `pre-commit`
-- `post-commit`
+- `pre-commit` / `commit-msg` / `post-commit` / `pre-push`
 - `--repo <path>`
-- `--json`
-- `--plain`
+- `--json` / `--plain`
+- positional：commit-msg 收 `<commit-msg-file-path>`（由 git 透過 `"$@"` 從 adapter 傳入）
 
 副作用：
 
 - `pre-commit`：當 staged `runtime/runtime.db` 或 knowledge / validation surface 改動時執行 `runtime validate`；不再因 committed runtime YAML mirror 觸發 compile。
-- `post-commit`：reference-only 預設 no-op；若 `AI_SKILL_SYNC_CURSOR_BUNDLE=1`，只回報 Go mirror write mode 狀態，不呼叫 deleted shell。
+- `commit-msg`：讀 commit message file，依 `runtime/cognitive-modes-*.yaml` + `runtime/plan-status-sync-enforcement.yaml` + `runtime/cognitive-modes-token-budget.yaml` + `runtime/cognitive-modes-adaptive.yaml` + `runtime/bootstrap-entry-points.yaml` contracts 執行 7 個 validators。Validator block 時 exit 30。Opt-out trailers：`[skip-cognitive-mode]` / `[skip-plan-status-sync]` / `[skip-token-budget]` / `[skip-adaptive]` / `[skip-bootstrap-thinness]`。
+- `post-commit`：reference-only 預設 no-op；若 `AI_SKILL_SYNC_CURSOR_BUNDLE=1`，只回報 Go mirror write mode 狀態。
+- `pre-push`：CLI source（`scripts/ai-skill-cli/...`、GitHub workflows、Git hooks）變動時跑 `go test ./...` preflight；其他情況跳過。
 
 必要行為：
 
 - 不使用 shell grep / uname 判斷業務邏輯。
-- Staged-file decision、runtime DB validation、knowledge validation 都在 Go 中完成。
-- Hook adapter 若保留，內容只能解析 repo root / binary path 並呼叫此 command。
+- Staged-file decision、runtime DB validation、knowledge validation、commit-msg parsing 都在 Go 中完成。
+- Hook adapter 只解析 repo root / binary path，並把 git 傳的 positional args（如 commit-msg file path）透過 `"$@"` 轉發給 Go runner。
 
 ### `ai-skill runtime refresh`
 
@@ -364,6 +368,24 @@
 - `--json` results 必須包含 source path、rank / priority（若有）、match reason 與 validation signal（若有）。
 - Native query 覆蓋舊 runtime index query：keyword / positional query、`--db`、`--layer`、`--type`、`--status`、`--limit`、empty result 與 missing DB。
 - `--graph` native query 覆蓋舊 knowledge graph query：`--source`、`--target`、`--type`、`--keyword` / positional query、`--limit`、empty result 與 missing filter。
+
+### `ai-skill runtime obligations`
+
+目的：列出目前 active bootstrap obligations，從 `runtime/runtime.db` 的 `generated_surfaces[runtime.core_bootstrap.contract]` JSON 讀取。Source-of-truth 是 [`runtime/core-bootstrap.yaml`](../../../runtime/core-bootstrap.yaml)；本 command read-only。
+
+輸入：
+
+- `--repo <path>`
+- `--json` / `--plain`
+
+副作用：無。
+
+必要行為：
+
+- 列出 `per_session_obligations` / `per_turn_obligations` / `per_commit_obligations` 各自的 obligation IDs。
+- 若 `runtime.core_bootstrap.contract` projection 不存在 → exit 30 並提示執行 `ai-skill runtime compile + refresh`。
+- 不可修改 runtime.db 或 generated surfaces。
+- 用途：debug "為什麼 commit-msg hook 擋我" + Phase 6 per-obligation dispatcher 對齊 hook 與 contract。
 
 ## 舊 Script 對應
 
