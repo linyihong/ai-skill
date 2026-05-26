@@ -1,0 +1,39 @@
+# Source: bootstrap-contract-yaml-migration Phase 3 — obligations machine-iterable
+id: bootstrap-obligations-enumerable-v1
+domain: bootstrap
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: bootstrap-prose-only
+  class: source-of-truth-duplication
+  date: "2026-05-26"
+  description: |
+    Phase 3 verifies that obligations declared in runtime/core-bootstrap.yaml
+    can be enumerated from runtime.db via JSON1 query. This enables
+    per-obligation validator dispatch in Phase 6.
+
+given:
+  artifacts:
+    - runtime/runtime.db (generated_surfaces row with JSON data)
+
+when:
+  action: obligations_enumeration_query
+
+then:
+  expected_route:
+    - per_turn_obligations array enumerable via json_extract
+    - per_session_obligations array enumerable via json_extract
+    - per_commit_obligations array enumerable via json_extract
+  forbidden_routes:
+    - claim_done_without_enumerable_json
+
+validation:
+  detection_command: |
+    pt=$(sqlite3 runtime/runtime.db "SELECT json_array_length(json_extract(data,'\$.per_turn_obligations')) FROM generated_surfaces WHERE target_key='runtime.core_bootstrap.contract';" 2>/dev/null)
+    ps=$(sqlite3 runtime/runtime.db "SELECT json_array_length(json_extract(data,'\$.per_session_obligations')) FROM generated_surfaces WHERE target_key='runtime.core_bootstrap.contract';" 2>/dev/null)
+    pc=$(sqlite3 runtime/runtime.db "SELECT json_array_length(json_extract(data,'\$.per_commit_obligations')) FROM generated_surfaces WHERE target_key='runtime.core_bootstrap.contract';" 2>/dev/null)
+    [ "${pt:-0}" -ge 1 ] && [ "${ps:-0}" -ge 1 ] && [ "${pc:-0}" -ge 1 ] && echo "PASS" || echo "FAIL pt=${pt:-0} ps=${ps:-0} pc=${pc:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-2/3 (no projection yet)
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

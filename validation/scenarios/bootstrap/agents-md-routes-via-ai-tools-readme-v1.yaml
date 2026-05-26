@@ -1,0 +1,41 @@
+# Source: bootstrap-contract-yaml-migration Phase 4 — AGENTS.md routing
+id: agents-md-routes-via-ai-tools-readme-v1
+domain: bootstrap
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: bootstrap-entry-bloat
+  class: source-of-truth-duplication
+  date: "2026-05-26"
+  description: |
+    AGENTS.md is generic agent entry (not Codex-only). Phase 4 rewrites
+    it to route via ai-tools/README.md so any agent (Codex, Cursor partial,
+    Aider, Cline, future) picks its own tool customization.
+
+    Must contain link to ai-tools/README.md AND must NOT directly link
+    to ai-tools/agent/codex.md (which would lock generic entry to Codex).
+
+given:
+  artifacts:
+    - AGENTS.md
+
+when:
+  action: agents_md_routing_check
+
+then:
+  expected_route:
+    - AGENTS.md links to ai-tools/README.md
+    - AGENTS.md does NOT directly link to ai-tools/agent/codex.md
+  forbidden_routes:
+    - AGENTS_md_locked_to_codex
+    - AGENTS_md_skips_routing_hub
+
+validation:
+  detection_command: |
+    route=$(grep -c 'ai-tools/README.md' AGENTS.md 2>/dev/null)
+    direct_codex=$(grep -c 'ai-tools/agent/codex.md' AGENTS.md 2>/dev/null)
+    [ "${route:-0}" -ge 1 ] && [ "${direct_codex:-1}" -eq 0 ] && echo "PASS" || echo "FAIL route=${route:-0} direct_codex=${direct_codex:-1}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-4 (current AGENTS.md links direct to agent/codex.md)
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

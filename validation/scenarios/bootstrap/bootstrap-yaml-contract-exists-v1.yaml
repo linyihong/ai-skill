@@ -1,0 +1,45 @@
+# Source: bootstrap-contract-yaml-migration Phase 1 — YAML contract presence
+id: bootstrap-yaml-contract-exists-v1
+domain: bootstrap
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: bootstrap-prose-only
+  class: source-of-truth-duplication / governance-drift
+  date: "2026-05-26"
+  description: |
+    CORE_BOOTSTRAP.md is prose-only; obligations cannot be machine-iterated.
+    Phase 2 of plans/active/2026-05-25-2200-bootstrap-contract-yaml-migration.md
+    creates runtime/core-bootstrap.yaml as executable contract.
+
+given:
+  artifacts:
+    - runtime/core-bootstrap.yaml
+  signals:
+    - file exists
+    - runtime_projection.enabled true
+    - target_key runtime.core_bootstrap.contract
+
+when:
+  action: bootstrap_yaml_presence_check
+
+then:
+  expected_route:
+    - runtime/core-bootstrap.yaml exists
+    - file contains runtime_projection enabled true
+    - file contains target_key runtime.core_bootstrap.contract
+  forbidden_routes:
+    - claim_done_without_yaml_file
+    - claim_done_without_projection_enabled
+
+validation:
+  detection_command: |
+    y=$(test -f runtime/core-bootstrap.yaml && echo 1 || echo 0)
+    p=$(grep -c 'runtime_projection:' runtime/core-bootstrap.yaml 2>/dev/null)
+    e=$(grep -c 'enabled: true' runtime/core-bootstrap.yaml 2>/dev/null)
+    k=$(grep -c 'target_key: runtime.core_bootstrap.contract' runtime/core-bootstrap.yaml 2>/dev/null)
+    [ "${y:-0}" -ge 1 ] && [ "${p:-0}" -ge 1 ] && [ "${e:-0}" -ge 1 ] && [ "${k:-0}" -ge 1 ] && echo "PASS" || echo "FAIL y=${y:-0} p=${p:-0} e=${e:-0} k=${k:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-2
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

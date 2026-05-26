@@ -1,0 +1,49 @@
+# Source: bootstrap-contract-yaml-migration Phase 4 — 4 entries all thin
+id: all-tool-entries-thin-v1
+domain: bootstrap
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: bootstrap-entry-bloat
+  class: source-of-truth-duplication
+  date: "2026-05-26"
+  description: |
+    After Phase 4, all 4 tool entries (CLAUDE.md / .cursor/rules/*.mdc /
+    .roomodes / AGENTS.md) must satisfy thinness rule. AGENTS.md was
+    previously prose-rich; Phase 4 rewrites it thin.
+
+    NOTE: repo-root only has CLAUDE.md and AGENTS.md present (this is
+    Ai-skill itself, not a downstream project). Downstream-only entries
+    (.cursor/rules/*.mdc, .roomodes) are checked via init_project.go
+    template inspection separately.
+
+given:
+  artifacts:
+    - CLAUDE.md
+    - AGENTS.md
+  signals:
+    - each file <= 30 lines
+    - each file contains no forbidden mode enum strings
+
+when:
+  action: tool_entries_thinness_check
+
+then:
+  expected_route:
+    - CLAUDE.md <= 30 lines, no enum
+    - AGENTS.md <= 30 lines, no enum
+  forbidden_routes:
+    - any_entry_over_30_lines
+    - any_entry_contains_mode_enum
+
+validation:
+  detection_command: |
+    cl=$(wc -l < CLAUDE.md 2>/dev/null | tr -d ' ')
+    cl_enum=$(grep -c 'FAST/NORMAL/DEEP/FORENSIC/RECOVERY\|INDEX_ONLY/SUMMARY_FIRST' CLAUDE.md 2>/dev/null)
+    am=$(wc -l < AGENTS.md 2>/dev/null | tr -d ' ')
+    am_enum=$(grep -c 'FAST/NORMAL/DEEP/FORENSIC/RECOVERY\|INDEX_ONLY/SUMMARY_FIRST' AGENTS.md 2>/dev/null)
+    [ "${cl:-999}" -le 30 ] && [ "${cl_enum:-1}" -eq 0 ] && [ "${am:-999}" -le 30 ] && [ "${am_enum:-1}" -eq 0 ] && echo "PASS" || echo "FAIL cl=${cl:-999} cl_enum=${cl_enum:-1} am=${am:-999} am_enum=${am_enum:-1}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-4 (AGENTS.md is currently >30 lines or has Codex-specific content)
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

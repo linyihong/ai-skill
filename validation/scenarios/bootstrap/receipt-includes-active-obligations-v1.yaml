@@ -1,0 +1,42 @@
+# Source: bootstrap-contract-yaml-migration Phase 5 — Receipt enhancement
+id: receipt-includes-active-obligations-v1
+domain: bootstrap
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: bootstrap-prose-only
+  class: governance-drift
+  date: "2026-05-26"
+  description: |
+    Phase 5 enhances Bootstrap Receipt format to include "Active per-turn
+    obligations:" line so agent first turn sees obligation names from
+    runtime.db, not from prose.
+
+    runtime/core-bootstrap.yaml format_template field declares the new
+    receipt shape; this scenario checks the YAML enumerates it AND the
+    companion CORE_BOOTSTRAP.md docs the new format.
+
+given:
+  artifacts:
+    - runtime/core-bootstrap.yaml
+    - CORE_BOOTSTRAP.md (companion)
+
+when:
+  action: receipt_format_enhancement_check
+
+then:
+  expected_route:
+    - YAML format_template includes 'Active per-turn obligations'
+    - CORE_BOOTSTRAP.md companion mentions the enhanced format
+  forbidden_routes:
+    - claim_done_without_format_update
+
+validation:
+  detection_command: |
+    y=$(grep -c 'Active per-turn obligations' runtime/core-bootstrap.yaml 2>/dev/null)
+    m=$(grep -c 'Active per-turn obligations' CORE_BOOTSTRAP.md 2>/dev/null)
+    [ "${y:-0}" -ge 1 ] && [ "${m:-0}" -ge 1 ] && echo "PASS" || echo "FAIL y=${y:-0} m=${m:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-5
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

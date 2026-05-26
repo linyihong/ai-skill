@@ -1,0 +1,34 @@
+# Source: bootstrap-contract-yaml-migration Phase 1 — projection to runtime.db
+id: bootstrap-yaml-projected-v1
+domain: bootstrap
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: bootstrap-prose-only
+  class: source-of-truth-duplication
+  date: "2026-05-26"
+  description: |
+    Phase 2 must project runtime/core-bootstrap.yaml to generated_surfaces
+    so agent can query obligations via SQLite instead of reading prose.
+
+given:
+  artifacts:
+    - runtime/runtime.db (generated_surfaces table)
+
+when:
+  action: bootstrap_yaml_projection_check
+
+then:
+  expected_route:
+    - generated_surfaces has row target_key=runtime.core_bootstrap.contract
+  forbidden_routes:
+    - claim_done_without_projection_row
+
+validation:
+  detection_command: |
+    n=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.core_bootstrap.contract';" 2>/dev/null)
+    [ "${n:-0}" -ge 1 ] && echo "PASS" || echo "FAIL n=${n:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-2 compile
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

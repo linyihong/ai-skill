@@ -1,0 +1,38 @@
+# Source: bootstrap-contract-yaml-migration Phase 4 — AGENTS.md as entry
+id: agents-md-in-entry-list-v1
+domain: bootstrap
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: bootstrap-entry-bloat
+  class: source-of-truth-duplication
+  date: "2026-05-26"
+  description: |
+    runtime/bootstrap-entry-points.yaml currently lists 3 entries
+    (CLAUDE.md / .cursor / .roomodes) but omits AGENTS.md. Phase 4
+    adds AGENTS.md and marks it generic agent (not Codex-only).
+
+given:
+  artifacts:
+    - runtime/bootstrap-entry-points.yaml
+
+when:
+  action: entry_list_inclusion_check
+
+then:
+  expected_route:
+    - bootstrap-entry-points.yaml entry_files contains AGENTS.md
+    - AGENTS.md entry tool field indicates generic agent (not Codex-specific)
+  forbidden_routes:
+    - claim_done_without_AGENTS_md_entry
+    - AGENTS_md_marked_codex_only
+
+validation:
+  detection_command: |
+    p=$(grep -c 'path: AGENTS.md' runtime/bootstrap-entry-points.yaml 2>/dev/null)
+    g=$(grep -A 3 'path: AGENTS.md' runtime/bootstrap-entry-points.yaml 2>/dev/null | grep -ic 'generic')
+    [ "${p:-0}" -ge 1 ] && [ "${g:-0}" -ge 1 ] && echo "PASS" || echo "FAIL p=${p:-0} g=${g:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-4
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
