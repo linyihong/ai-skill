@@ -1,4 +1,4 @@
-version=repo-d8894df
-source_commit=d8894df
-built_at=2026-05-26T06:30:49Z
+version=repo-36ea903
+source_commit=36ea903
+built_at=2026-05-26T11:27:43Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
