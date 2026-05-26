@@ -108,9 +108,26 @@ companion_role: human-readable rationale + examples; YAML is canonical
 
 像 `knowledge-update-flow.md` 對 `.yaml` — 解釋背景、提供範例，但 canonical contract 在 YAML。所有舊 link 不動（向後相容）。
 
-#### 3. AGENTS.md 加進 bootstrap-entry-points.yaml
+#### 3. AGENTS.md 升級為 generic agent entry + 加進 bootstrap-entry-points.yaml
 
-把 AGENTS.md 補進 entry_files，bootstrap-entry-thinness validator 自動覆蓋。
+**Context shift**：AGENTS.md 原本只當 Codex 入口，但 2026 年實際情況是多個 agent 工具（Cursor 部分模式、Aider、Cline、其他 IDE agent）也採用 `AGENTS.md` 慣例作為通用 agent 入口。維持 Codex-only 視角會錯失這些 agent 的覆蓋面。
+
+**Decision**：把 AGENTS.md 升級為 **generic agent bootstrap entry**，啟動流程為：
+
+```
+AGENTS.md (thin generic entry)
+  → CORE_BOOTSTRAP.md / runtime.db generated_surfaces[runtime.core_bootstrap]  (必讀 obligations)
+  → ai-tools/README.md  (routing hub — 看 reader 用哪個工具)
+  → ai-tools/agent/<tool>.md  (tool-specific adapter — claude / cursor / roo / codex / future)
+```
+
+關鍵差異：**AGENTS.md 不再直接 link 到 codex.md**，而是 route through `ai-tools/README.md` 讓 agent 自主選擇對應的 tool adapter。Codex 仍可用（透過 `ai-tools/README.md` → `agent/codex.md`），但其他 agent 也能用同樣入口。
+
+實作要點：
+- 更新 repo-root `AGENTS.md` 內容（thin + generic）
+- 加進 `bootstrap-entry-points.yaml` entry_files，與其他 3 entry 同樣套 thinness 規則
+- `init_project.go` 產出的下游 AGENTS.md 同樣 thin + generic
+- 既有 Codex 用戶不影響（仍可透過 routing 到 `agent/codex.md`）
 
 #### 4. Bootstrap Receipt 升級
 
@@ -196,6 +213,8 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 | 3 | Agent 真的會 query generated_surfaces 嗎？還是直接讀 .md companion？需要 Receipt 提示？ | TBD Phase 4 |
 | 4 | Lazy-load rules（9 條）也要結構化還是只 Phase 1 處理必讀 3 條 + 2 個 obligations？ | TBD Phase 2 |
 | 5 | 既有 CORE_BOOTSTRAP.md prose obligations 與 v2 cognitive-contract plan 重疊區的所有權邊界？ | TBD Phase 2 |
+| 6 | AGENTS.md generic 化後，原 Codex 用戶是否需要 explicit migration 通知？或透過 routing 就 backward-compatible？ | TBD Phase 4 |
+| 7 | 是否要把 ai-tools/README.md 視為 entry routing 一級結構（projected to runtime.db）？ | TBD Phase 4 — 暫不，保持文件即可 |
 
 ---
 
@@ -251,10 +270,11 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 - [ ] Scenario `agents-md-in-entry-list-v1` — `runtime/bootstrap-entry-points.yaml` entry_files 含 AGENTS.md
 - [ ] Scenario `receipt-includes-active-obligations-v1` — commit-msg hook OR Receipt validator 可檢查 Receipt 含 active obligations 行（softness：可能是建議而非強制）
 - [ ] Scenario `all-tool-entries-thin-v1` — 4 個 entry points（含 AGENTS.md）都通過 thinness check
+- [ ] Scenario `agents-md-routes-via-ai-tools-readme-v1` — AGENTS.md 內容含 link 到 `ai-tools/README.md`，不含直接 link 到 `ai-tools/agent/codex.md`（generic 不偏向特定 tool）
 
 ### Phase 1 完成條件
 
-- [ ] 6 scenarios 寫好且 initial state = FAIL
+- [ ] 7 scenarios 寫好且 initial state = FAIL
 - [ ] Atomic test-first commit
 
 ---
@@ -294,17 +314,29 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 
 ### Tasks
 
-- [ ] 更新 `runtime/bootstrap-entry-points.yaml` 加 AGENTS.md（含 description + tool=Codex）
-- [ ] 更新 `validateBootstrapEntryThinness` 對 AGENTS.md 同 30-line + forbidden_substring check
-- [ ] 4 個 entry files 內容檢查：CLAUDE.md / `.cursor/rules/*.mdc` / `.roomodes` / AGENTS.md 是否都符合 thinness + 都 point to CORE_BOOTSTRAP companion + 都提示 query runtime.db generated_surfaces
-- [ ] 更新 `init_project.go` 對 4 個下游 entries 的 template 一致
-- [ ] Scenarios `agents-md-in-entry-list-v1` + `all-tool-entries-thin-v1` PASS
+- [ ] 更新 `runtime/bootstrap-entry-points.yaml`：
+  - 加 AGENTS.md（tool=`generic agent (Codex / Aider / Cline / other AGENTS.md-aware tools)`）
+  - role 註明為 "generic agent bootstrap entry"
+- [ ] 更新 `validateBootstrapEntryThinness` 對 AGENTS.md 同 30-line + forbidden_substring check（與 CLAUDE.md 同樣處理）
+- [ ] **改寫 repo-root `AGENTS.md`** 為 generic agent entry：
+  - Thin pointer，≤ 30 lines
+  - 步驟：CORE_BOOTSTRAP → ai-tools/README.md（routing hub）→ pick tool
+  - **不直接 link 到** `ai-tools/agent/codex.md`（讓 routing 由 ai-tools/README.md 決定）
+- [ ] 4 個 entry files 內容檢查：CLAUDE.md / `.cursor/rules/*.mdc` / `.roomodes` / AGENTS.md 是否都符合 thinness + 都 point to CORE_BOOTSTRAP companion + AGENTS.md 額外 route 到 ai-tools/README.md
+- [ ] 更新 `init_project.go` 對 4 個下游 entries 的 template：
+  - CLAUDE.md：thin → CORE_BOOTSTRAP（既有）
+  - .cursor/rules/ai-skill-bootstrap.mdc：thin → CORE_BOOTSTRAP（既有）
+  - .roomodes：thin → CORE_BOOTSTRAP（既有）
+  - **AGENTS.md**：thin → CORE_BOOTSTRAP → ai-tools/README.md（**新增 routing step**）
+- [ ] 更新 `ai-tools/agent/codex.md` README pointer 註明 「Codex 用戶可從 AGENTS.md 經 ai-tools/README.md route 進來」（已存在但要驗證）
+- [ ] Scenarios `agents-md-in-entry-list-v1` + `all-tool-entries-thin-v1` + 新 `agents-md-routes-via-ai-tools-readme-v1` PASS
 
 ### Phase 4 完成條件
 
 - [ ] 4 個 entry points 通過 thinness
-- [ ] init_project.go 產出 4 個 thin entries
-- [ ] AGENTS.md 進 bootstrap-entry-points
+- [ ] init_project.go 產出 4 個 thin entries（含 AGENTS.md 含 routing step）
+- [ ] AGENTS.md 進 bootstrap-entry-points 並標 generic agent
+- [ ] AGENTS.md 內容 route through ai-tools/README.md 而非直 link codex.md
 
 ---
 
@@ -368,6 +400,7 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 - [ ] User confirms: AGENTS.md 需補進 bootstrap-entry-points
 - [ ] User confirms: Bootstrap Receipt 升級為含 active obligations（可能加 30-50 tokens / session）
 - [ ] User confirms: 4 個 entry files 都改 query runtime.db 而非 dock to prose
+- [ ] **User confirms: AGENTS.md 升級為 generic agent entry**（不只 Codex），routing 經 ai-tools/README.md 而非直接 link agent/codex.md
 
 ---
 
