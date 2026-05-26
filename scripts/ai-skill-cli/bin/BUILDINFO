@@ -1,4 +1,4 @@
-version=repo-5d4fbab
-source_commit=5d4fbab
-built_at=2026-05-26T05:41:20Z
+version=repo-d8894df
+source_commit=d8894df
+built_at=2026-05-26T06:30:49Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64

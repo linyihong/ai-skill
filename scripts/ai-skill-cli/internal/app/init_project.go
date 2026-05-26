@@ -30,7 +30,7 @@ func runInitProject(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs := newFlagSet("init-project", stderr)
 	opts := initProjectOptions{}
 	fs.StringVar(&opts.projectPath, "project", "", "target project directory")
-	fs.StringVar(&opts.tools, "tools", "roo,cursor,claude,codex", "comma-separated tools: roo,cursor,claude,codex")
+	fs.StringVar(&opts.tools, "tools", "roo,cursor,claude,gemini,codex", "comma-separated tools: roo,cursor,claude,gemini,codex")
 	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview planned files without writing")
 	fs.BoolVar(&opts.force, "force", false, "allow overwriting existing files")
 	fs.BoolVar(&opts.jsonOutput, "json", false, "write machine-readable JSON output")
@@ -206,7 +206,7 @@ func resolveTargetProject(projectPath string) (string, Check) {
 }
 
 func parseInitTools(value string) ([]string, Check) {
-	supported := map[string]bool{"roo": true, "cursor": true, "claude": true, "codex": true}
+	supported := map[string]bool{"roo": true, "cursor": true, "claude": true, "gemini": true, "codex": true}
 	seen := map[string]bool{}
 	ignored := []string{}
 	for _, part := range strings.Split(value, ",") {
@@ -248,6 +248,8 @@ func initProjectPlannedFiles(target string, tools []string) []plannedFile {
 			)
 		case "claude":
 			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "CLAUDE.md"), description: "Claude Code settings"})
+		case "gemini":
+			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "GEMINI.md"), description: "Gemini CLI settings"})
 		case "codex":
 			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "AGENTS.md"), description: "Generic agent entry (AGENTS.md — Codex / Aider / Cline / other AGENTS.md-aware)"})
 		}
@@ -271,18 +273,20 @@ func writeInitProjectFile(path string, content []byte, force bool) error {
 func initProjectFileContent(file plannedFile, repo string) (string, error) {
 	switch file.tool {
 	case "roo":
-		return initProjectRooContent(repo), nil
+		return initProjectRooContent(repo)
 	case "cursor":
 		if strings.HasSuffix(file.path, "hooks.json") {
-			return initProjectCursorHooksContent(), nil
+			return initProjectCursorHooksContent()
 		}
-		return initProjectCursorRuleContent(repo), nil
+		return initProjectCursorRuleContent(repo)
 	case "claude":
-		return initProjectClaudeContent(repo), nil
+		return initProjectClaudeContent(repo)
+	case "gemini":
+		return initProjectGeminiContent(repo)
 	case "codex":
-		return initProjectCodexContent(repo), nil
+		return initProjectCodexContent(repo)
 	case "common":
-		return initProjectGoalsReadmeContent(repo), nil
+		return initProjectGoalsReadmeContent(repo)
 	default:
 		return "", fmt.Errorf("unsupported init-project template: %s", file.tool)
 	}
@@ -314,7 +318,7 @@ func initProjectBootstrapText(repo string) string {
 		filepath.ToSlash(filepath.Join(repo, "runtime", "bootstrap-entry-points.yaml")))
 }
 
-func initProjectRooContent(repo string) string {
+func initProjectRooContent(repo string) (string, error) {
 	text := strings.ReplaceAll(initProjectBootstrapText(repo), "\n", "\\n")
 	return fmt.Sprintf(`{
   "customModes": [
@@ -334,10 +338,10 @@ func initProjectRooContent(repo string) string {
     }
   ]
 }
-`, text, text)
+`, text, text), nil
 }
 
-func initProjectCursorRuleContent(repo string) string {
+func initProjectCursorRuleContent(repo string) (string, error) {
 	return fmt.Sprintf(`---
 description: Ai-skill 知識庫啟動流程
 globs:
@@ -346,10 +350,10 @@ alwaysApply: true
 
 # Ai-skill Bootstrap
 
-%s`, initProjectBootstrapText(repo))
+%s`, initProjectBootstrapText(repo)), nil
 }
 
-func initProjectCursorHooksContent() string {
+func initProjectCursorHooksContent() (string, error) {
 	return `{
   "sessionStart": [
     {
@@ -358,14 +362,18 @@ func initProjectCursorHooksContent() string {
     }
   ]
 }
-`
+`, nil
 }
 
-func initProjectClaudeContent(repo string) string {
-	return fmt.Sprintf("# Claude Code Auto-Bootstrap\n\n%s", initProjectBootstrapText(repo))
+func initProjectClaudeContent(repo string) (string, error) {
+	return fmt.Sprintf("# Claude Code Auto-Bootstrap\n\n%s", initProjectBootstrapText(repo)), nil
 }
 
-func initProjectCodexContent(repo string) string {
+func initProjectGeminiContent(repo string) (string, error) {
+	return fmt.Sprintf("# Gemini CLI Auto-Bootstrap\n\n%s", initProjectBootstrapText(repo)), nil
+}
+
+func initProjectCodexContent(repo string) (string, error) {
 	// Use forward slashes for displayed paths (cross-platform consistency).
 	// filepath.Join produces backslashes on Windows which break substring
 	// matching in markdown links and downstream tests.
@@ -389,10 +397,10 @@ func initProjectCodexContent(repo string) string {
 `, join(repo, "CORE_BOOTSTRAP.md"),
 		join(repo, "README.md"),
 		join(repo, "ai-tools", "README.md"),
-		join(repo, "runtime", "runtime.db"))
+		join(repo, "runtime", "runtime.db")), nil
 }
 
-func initProjectGoalsReadmeContent(repo string) string {
+func initProjectGoalsReadmeContent(repo string) (string, error) {
 	return fmt.Sprintf(`# Agent Goals
 
 本目錄由 Ai-skill 對話目標帳本管理：%s
@@ -401,5 +409,5 @@ func initProjectGoalsReadmeContent(repo string) string {
 ## 目前目標
 
 （尚無 active goal）
-`, filepath.ToSlash(filepath.Join(repo, "enforcement", "conversation-goal-ledger.md")))
+`, filepath.ToSlash(filepath.Join(repo, "enforcement", "conversation-goal-ledger.md"))), nil
 }
