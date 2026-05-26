@@ -10,7 +10,7 @@ Linked-update completeness 的治理 gate 見 [`governance/ai-runtime-governance
 2. 若有連動文件，**必須**同步修改或明確寫下「已檢查，無需更新」的理由。
 3. 第一次寫入 Ai-skill 或其工具同步路徑時，依 [`dependency-reading.md`](dependency-reading.md) 開啟 writeback transaction；連動更新、sync、commit、push、讀回與 clean status 都完成後才可關閉。
 4. 若本輪明確使用或更新本機工具 mirror / symlink / copy snapshot，**必須**執行對應 tool sync；reference-only 策略不需要同步，具體工具命令放在 [`ai-tools/`](../ai-tools/README.md)。
-5. 若改動 Ai-skill repo，除非使用者明講不要提交，**必須** `git add` → `commit` → `push`。
+5. 若改動 Ai-skill repo，除非使用者明講不要提交，**必須** `git add` → `commit` → `push`。同一輪可為獨立邏輯單元建立多個 commit；不必每個 commit 後立刻 push，但任務完成、切換新任務或最終回覆前必須 push、讀回，並確認沒有未推送 commit。
 6. Commit/push 與必要 tool sync 完成後，**必須**依 [`dependency-reading.md`](dependency-reading.md) 重新讀取本次更新過的 skill/enforcement-rule 入口與主要依賴文件，確認 agent context 已載入最新版；reference-only 時 tool sync 記為不適用。
 7. 最終回覆前必須再次執行 `git status --short --branch`；若仍有 modified/untracked/staged changes，或 branch ahead/behind remote，不得回覆「完成」，必須處理到乾淨或明確說明阻塞。
 8. 回覆使用者時要說明已做了哪些連動更新；如果某些相關文件不用改，也要簡短說明原因。

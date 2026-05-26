@@ -81,7 +81,7 @@ steps:
       - gate.linked_updates.runtime_synced
   - id: close_writeback
     order: 5
-    action: Ensure diff review, validation, staging, commit, authorized push/readback, and final clean/ahead status handling are complete.
+    action: Ensure diff review, validation, staging, one or more logical commits, authorized push before conversation close, readback, and final clean/ahead status handling are complete.
     gates:
       - gate.linked_updates.writeback_closed
 
@@ -109,6 +109,9 @@ gates:
       - diff review completed
       - validation completed or blocker reported
       - commit completed when authorized
+      - multiple commits are allowed only when each commit is a logical unit
+      - push/readback completed before task completion, task switch, final summary, or writeback transaction closure
+      - git log origin/<branch>..HEAD is empty before completion is claimed
       - push/readback status and final git status are reported
 
 required_evidence:
@@ -117,12 +120,13 @@ required_evidence:
   - runtime compile / refresh / validate summaries when applicable
   - generated surface target key and data assertion for executable contracts
   - final git status
+  - post-push readback status and origin/<branch>..HEAD empty confirmation
 
 success_criteria:
   - No required linked update is left implicit.
   - Runtime and knowledge generated surfaces are refreshed when source mappings require it.
   - Executable contract additions update inventory, runtime projection, validation, and relevant indexes.
-  - Final response reports pending ahead/behind or dirty state when push is not authorized.
+  - Final response reports pending ahead/behind, dirty state, or unpushed commits when push is not authorized.
 
 failure_modes:
   - id: optional_linked_update_language
