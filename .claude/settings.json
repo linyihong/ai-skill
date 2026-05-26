@@ -1,11 +1,18 @@
 {
-  "description": "Claude Code shared settings (thin pointer). Bootstrap canonical: repo-root CLAUDE.md (Claude Code auto-load) → CORE_BOOTSTRAP.md (companion) → runtime/core-bootstrap.yaml (executable contract, projected to runtime.db generated_surfaces). User-specific permissions and overrides live in .claude/settings.local.json (gitignored). Do not duplicate obligations / format / enum content here; that lives in the canonical YAML. Hooks below strengthen per-turn obligation visibility (D strategy from bootstrap-contract-yaml-migration archive).",
+  "description": "Claude Code shared settings (thin pointer). Bootstrap canonical: repo-root CLAUDE.md (Claude Code auto-load) → CORE_BOOTSTRAP.md (companion) → runtime/core-bootstrap.yaml (executable contract, projected to runtime.db generated_surfaces). User-specific permissions and overrides live in .claude/settings.local.json (gitignored). Do not duplicate obligations / format / enum content here; that lives in the canonical YAML. Hooks below strengthen per-turn obligation visibility (D strategy from archived bootstrap-contract-yaml-migration plan): UserPromptSubmit pre-injects reminder; Stop validates last assistant message contains the required block before allowing stop.",
   "hooks": {
     "UserPromptSubmit": [
       {
         "type": "command",
         "command": "bash -c 'cat <<\"EOF\"\n[ai-skill per-turn obligation] Final response MUST end with `### Cognitive Mode 報告` block (compact 1-line for trivial tasks: `Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>`; full 6-row markdown table otherwise). First-turn ALSO outputs Bootstrap Receipt (`Bootstrap: rules=✓ phase=<id> obligations=<n> gates=<n>` + `Active per-turn obligations: <ids>`). Query active obligations: `ai-skill runtime obligations`. Canonical format spec: runtime/core-bootstrap.yaml.\nEOF'",
         "timeout": 30
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "./.claude/hooks/check-cognitive-mode.sh",
+        "timeout": 10
       }
     ]
   }
