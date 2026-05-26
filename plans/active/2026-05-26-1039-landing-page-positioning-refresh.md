@@ -28,8 +28,9 @@
    - 更接近：把人的工程經驗轉成可攜、可版本化、可驗證、可被不同 AI agent 重複執行的 cognitive structure。
 
 4. **工具變動速度高於知識生命週期**
-   - Claude、Cursor、Codex、Gemini CLI、自訂 agent 都可能變。
+   - Claude、Cursor、Codex、自訂 agent 與未來 runtime 都可能變。
    - 工程知識不應被鎖在特定模型、特定 agent、特定 hosted memory 或單一 vendor runtime。
+   - 尚未實際接入並累積使用經驗的工具（例如 Gemini CLI）不列入 `Works With`；先歸在 future AI runtimes。
 
 ### Decision
 
