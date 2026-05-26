@@ -58,6 +58,7 @@ steps:
       - ai-tools/agent/claude.md
       - ai-tools/agent/cursor.md
       - ai-tools/agent/roo.md
+      - ai-tools/agent/gemini-cli.md
       - ai-tools/agent/codex.md
     output: tool_adapter_setup
 

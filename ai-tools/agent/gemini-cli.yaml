@@ -1,0 +1,49 @@
+schema_version: "1.0"
+id: ai_tools.agent.gemini_cli
+title: Gemini CLI Tool Adapter
+owner_layer: ai-tools
+source_markdown: ai-tools/agent/gemini-cli.md
+status: active
+contract_type: tool_adapter_contract
+
+runtime_projection:
+  enabled: true
+  target_key: ai_tools.agent.gemini_cli.contract
+  surface_type: executable_yaml_contract
+  execution_scope: agent_behavior
+
+activation:
+  events:
+    - session_start
+    - gemini_md_detected
+  required_when:
+    - 使用 Gemini CLI 進入 Ai-skill 專案
+
+required_sources:
+  - GEMINI.md
+  - CORE_BOOTSTRAP.md
+  - README.md
+  - ai-tools/README.md
+
+steps:
+  - id: bootstrap
+    action: 讀取 GEMINI.md 並跟隨 CORE_BOOTSTRAP.md 啟動流程
+    order: 1
+  - id: report_status
+    action: 輸出 Bootstrap Receipt 與 Cognitive Mode 報告 (v2)
+    order: 2
+  - id: goal_sync
+    action: 檢查 .agent-goals/ 同步當前目標
+    order: 3
+
+gates:
+  - id: gate.gemini_cli.bootstrap_receipt
+    severity: critical
+    description: 啟動時必須輸出符合格式的 Bootstrap Receipt
+  - id: gate.gemini_cli.cognitive_mode_v2
+    severity: high
+    description: 每輪輸出必須包含符合 v2 格式的 Cognitive Mode 報告
+
+success_criteria:
+  - Gemini CLI 成功載入核心規則並回報正確的 phase
+  - 任務輸出符合語言一致性與 v2 報告規範

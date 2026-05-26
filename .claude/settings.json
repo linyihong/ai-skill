@@ -1,35 +1,3 @@
 {
-  "description": "Claude Code configuration entry point - reference only",
-  "ai_skill_repo": "/home/user/Ai-skill",
-
-  "bootstrap": {
-    "core": "CORE_BOOTSTRAP.md",
-    "layout": "README.md",
-    "skill_index": "knowledge/runtime/routing-registry.yaml",
-    "contract_activation": "runtime/runtime.db generated_surfaces"
-  },
-
-  "reference": {
-    "claude_usage": "ai-tools/claude.md",
-    "bootstrap_rules": "enforcement/README.md",
-    "task_routing": "knowledge/indexes/README.md",
-    "goal_tracking": ".agent-goals/",
-    "failure_learning": "enforcement/failure-learning-system.md",
-    "token_budget": "runtime/runtime.db",
-    "context_health": "runtime/runtime.db",
-    "circuit_breaker": "runtime/runtime.db",
-    "tool_metadata": "tools/metadata/README.md",
-    "tool_compression": "tools/compression/README.md",
-    "memory_working": "memory/working/README.md",
-    "memory_summary": "memory/summary/README.md",
-    "memory_decision": "memory/decision/README.md",
-    "decisions": "decisions/README.md",
-    "anti_patterns": "anti-patterns/README.md"
-  },
-
-  "git": {
-    "commit_branch": "claude/review-dev-rules-ndnTH",
-    "push_format": "git push -u origin {branch}",
-    "verify_clean_status": true
-  }
+  "description": "Claude Code shared settings (thin pointer). Bootstrap canonical: repo-root CLAUDE.md (Claude Code auto-load) → CORE_BOOTSTRAP.md (companion) → runtime/core-bootstrap.yaml (executable contract, projected to runtime.db generated_surfaces). User-specific permissions and overrides live in .claude/settings.local.json (gitignored). Do not duplicate obligations / format / enum content here; that lives in the canonical YAML."
 }

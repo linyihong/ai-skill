@@ -68,6 +68,7 @@ Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating
 | Cursor | [`agent/cursor.md`](agent/cursor.md) | `.cursor/rules/*.mdc` 自動載入、`.cursor/hooks.json` 設定、對話目標閉環（含 hooks 範本）。 |
 | Roo Code | [`agent/roo.md`](agent/roo.md) | Custom instructions 手動設定、多 modes 與 file restrictions、`.roomodes` 自訂 mode 定義、對話目標閉環、語言偏好雙層設定。 |
 | Codex | [`agent/codex.md`](agent/codex.md) | `AGENTS.md` 自動載入入口、runtime SQLite source-of-truth、YAML contract projection、commit / push 更新流程。 |
+| Gemini CLI | [`agent/gemini-cli.md`](agent/gemini-cli.md) | `GEMINI.md` 自動載入入口、特有能力（web_fetch / search / sub-agents）規範、語言一致性強制規則。 |
 | **新增工具指引** | [`agent-onboarding.md`](agent-onboarding.md) | 新 AI agent 工具加入時的設定 checklist，含必要項目與參考來源對照。 |
 
 Agent adapter executable contracts:
@@ -76,5 +77,6 @@ Agent adapter executable contracts:
 - Cursor: [`agent/cursor.yaml`](agent/cursor.yaml)
 - Roo Code: [`agent/roo.yaml`](agent/roo.yaml)
 - Codex: [`agent/codex.yaml`](agent/codex.yaml)
+- Gemini CLI: [`agent/gemini-cli.yaml`](agent/gemini-cli.yaml)
 
 ← [回到根目錄](../README.md)
