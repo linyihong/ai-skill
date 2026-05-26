@@ -1,6 +1,7 @@
 package app
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -293,37 +294,28 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		modes := parseCognitiveModeBlock(text)
 		staged, _ := gitLines(root, "diff", "--cached", "--name-only")
 
-		// Phase 3.1-B / 3.3-B / 3.4-B behavioral validators
+		// Phase 6 dispatcher: read per_commit_obligations order from
+		// generated_surfaces[runtime.core_bootstrap.contract] and dispatch
+		// validators by id via registry. Fallback to hardcoded order if
+		// runtime.db is unavailable or not yet projected (e.g. fresh clone
+		// before first `runtime compile`).
+		ctx := commitMsgCtx{text: text, staged: staged, root: root, modes: modes}
+		order := readPerCommitObligationsOrder(root)
+		if len(order) == 0 {
+			order = defaultCommitMsgDispatchOrder
+		}
 		var violations []string
-		if v := validateExecutionModeFloors(modes, staged); v != "" {
-			violations = append(violations, v)
-		}
-		if v := validateGovernanceModeConsistency(modes, staged, text); v != "" {
-			violations = append(violations, v)
-		}
-		if v := validateMemoryModeSubdir(modes, staged); v != "" {
-			violations = append(violations, v)
-		}
-		if v := validatePlanStatusSync(text, staged); v != "" {
-			violations = append(violations, v)
-		}
-		if v := validateTokenBudget(modes, text); v != "" {
-			violations = append(violations, v)
-		}
-		if v := validateAdaptiveTriggers(modes, text); v != "" {
-			violations = append(violations, v)
-		}
-		if v := validateBootstrapEntryThinness(text, staged, root); v != "" {
-			violations = append(violations, v)
-		}
-		if v := validateCLIDocSync(text, staged, root); v != "" {
-			violations = append(violations, v)
-		}
-		if v := validateRuntimeYamlProjects(text, staged, root); v != "" {
-			violations = append(violations, v)
-		}
-		if v := validateMarkdownYamlSync(text, staged, root); v != "" {
-			violations = append(violations, v)
+		for _, id := range order {
+			validator, ok := commitMsgValidatorRegistry[id]
+			if !ok {
+				// Obligation declared in YAML but no Go validator registered.
+				// Skip silently (allows YAML to declare future-planned
+				// obligations without breaking hook).
+				continue
+			}
+			if v := validator(ctx); v != "" {
+				violations = append(violations, v)
+			}
 		}
 		if len(violations) > 0 {
 			result.Status = "blocked"
@@ -1065,6 +1057,118 @@ func validateMarkdownYamlSync(text string, staged []string, root string) string 
 		return ""
 	}
 	return strings.Join(violations, "\n  - ")
+}
+
+// commitMsgCtx is the uniform context for per-obligation validators
+// dispatched from per_commit_obligations in
+// generated_surfaces[runtime.core_bootstrap.contract]. Phase 6 of
+// bootstrap-contract-yaml-migration.
+type commitMsgCtx struct {
+	text   string
+	staged []string
+	root   string
+	modes  map[string]string
+}
+
+// commitMsgValidatorRegistry maps obligation IDs (matching
+// per_commit_obligations[].id in runtime/core-bootstrap.yaml) to
+// adapter closures that call the actual validator with the right
+// arguments. Obligations declared in YAML but not registered here
+// are silently skipped (allows YAML to declare future-planned
+// obligations without breaking the hook). Conversely, validators
+// registered here that lack a YAML obligation will not fire unless
+// they appear in defaultCommitMsgDispatchOrder fallback.
+//
+// obligation.commit.cognitive_mode_block is the GATE (block-presence
+// check); it is handled inline before dispatch and is NOT in this
+// registry.
+var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
+	"obligation.commit.execution_mode_floors": func(c commitMsgCtx) string {
+		return validateExecutionModeFloors(c.modes, c.staged)
+	},
+	"obligation.commit.governance_mode_consistency": func(c commitMsgCtx) string {
+		return validateGovernanceModeConsistency(c.modes, c.staged, c.text)
+	},
+	"obligation.commit.memory_mode_subdir": func(c commitMsgCtx) string {
+		return validateMemoryModeSubdir(c.modes, c.staged)
+	},
+	"obligation.commit.plan_status_sync": func(c commitMsgCtx) string {
+		return validatePlanStatusSync(c.text, c.staged)
+	},
+	"obligation.commit.token_budget": func(c commitMsgCtx) string {
+		return validateTokenBudget(c.modes, c.text)
+	},
+	"obligation.commit.adaptive_triggers": func(c commitMsgCtx) string {
+		return validateAdaptiveTriggers(c.modes, c.text)
+	},
+	"obligation.commit.bootstrap_entry_thinness": func(c commitMsgCtx) string {
+		return validateBootstrapEntryThinness(c.text, c.staged, c.root)
+	},
+	"obligation.commit.cli_doc_sync": func(c commitMsgCtx) string {
+		return validateCLIDocSync(c.text, c.staged, c.root)
+	},
+	"obligation.commit.runtime_yaml_projects": func(c commitMsgCtx) string {
+		return validateRuntimeYamlProjects(c.text, c.staged, c.root)
+	},
+	"obligation.commit.markdown_yaml_sync": func(c commitMsgCtx) string {
+		return validateMarkdownYamlSync(c.text, c.staged, c.root)
+	},
+}
+
+// defaultCommitMsgDispatchOrder is the fallback order if
+// runtime.core_bootstrap.contract is not available (fresh clone /
+// pre-compile). Mirrors per_commit_obligations[] order in
+// runtime/core-bootstrap.yaml, excluding cognitive_mode_block (gate).
+var defaultCommitMsgDispatchOrder = []string{
+	"obligation.commit.execution_mode_floors",
+	"obligation.commit.governance_mode_consistency",
+	"obligation.commit.memory_mode_subdir",
+	"obligation.commit.plan_status_sync",
+	"obligation.commit.token_budget",
+	"obligation.commit.adaptive_triggers",
+	"obligation.commit.bootstrap_entry_thinness",
+	"obligation.commit.cli_doc_sync",
+	"obligation.commit.runtime_yaml_projects",
+	"obligation.commit.markdown_yaml_sync",
+}
+
+// readPerCommitObligationsOrder reads the per_commit_obligations id
+// list from generated_surfaces[runtime.core_bootstrap.contract], in
+// the order declared in runtime/core-bootstrap.yaml. The gate obligation
+// (cognitive_mode_block) is filtered out; only post-gate validators
+// are returned. Returns nil if any step fails (runtime.db missing,
+// contract not projected, JSON malformed) — caller should fall back
+// to defaultCommitMsgDispatchOrder.
+func readPerCommitObligationsOrder(root string) []string {
+	dbPath := filepath.Join(root, "runtime", "runtime.db")
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return nil
+	}
+	defer db.Close()
+	var raw string
+	err = db.QueryRow("SELECT data FROM generated_surfaces WHERE target_key='runtime.core_bootstrap.contract' LIMIT 1").Scan(&raw)
+	if err != nil {
+		return nil
+	}
+	var doc map[string]any
+	if err := json.Unmarshal([]byte(raw), &doc); err != nil {
+		return nil
+	}
+	arr, _ := doc["per_commit_obligations"].([]any)
+	ids := make([]string, 0, len(arr))
+	for _, item := range arr {
+		m, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		id, _ := m["id"].(string)
+		if id == "" || id == "obligation.commit.cognitive_mode_block" {
+			continue
+		}
+		ids = append(ids, id)
+	}
+	return ids
 }
 
 func runPrePushHook(result Result, root string) Result {

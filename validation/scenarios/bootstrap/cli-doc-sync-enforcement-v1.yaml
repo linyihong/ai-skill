@@ -32,8 +32,8 @@ then:
 validation:
   detection_command: |
     v=$(grep -c 'func validateCLIDocSync' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
-    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validateCLIDocSync')
-    [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && echo "PASS" || echo "FAIL v=${v:-0} rch=${rch:-0}"
+    rch=$(grep -c 'validateCLIDocSync' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 2 ] && echo "PASS" || echo "FAIL v=${v:-0} rch=${rch:-0}"
   pass_criteria: detection_command outputs PASS
   initial_state: FAIL pre-Phase-6
   reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

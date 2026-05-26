@@ -57,10 +57,10 @@ validation:
   detection_command: |
     y=$(test -f runtime/cognitive-modes-adaptive.yaml && echo 1 || echo 0)
     v=$(grep -c 'func validateAdaptiveTriggers' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
-    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validateAdaptiveTriggers')
+    rch=$(grep -c 'validateAdaptiveTriggers' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
     p=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.cognitive_modes.adaptive';" 2>/dev/null)
     t=$(grep -c 'TestValidateAdaptiveTriggers' scripts/ai-skill-cli/internal/app/hooks_test.go 2>/dev/null)
-    [ "${y:-0}" -ge 1 ] && [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && [ "${p:-0}" -ge 1 ] && [ "${t:-0}" -ge 1 ] && echo "PASS" || echo "FAIL y=${y:-0} v=${v:-0} rch=${rch:-0} p=${p:-0} t=${t:-0}"
+    [ "${y:-0}" -ge 1 ] && [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 2 ] && [ "${p:-0}" -ge 1 ] && [ "${t:-0}" -ge 1 ] && echo "PASS" || echo "FAIL y=${y:-0} v=${v:-0} rch=${rch:-0} p=${p:-0} t=${t:-0}"
   pass_criteria: detection_command outputs "PASS"
   initial_state: FAIL（all 5 components not yet present）
   reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

@@ -305,13 +305,13 @@ func initProjectBootstrapText(repo string) string {
 ## 修改本檔的規則
 
 本檔是 entry pointer，不是 canonical content。修改前先讀 %s。新 obligation 加到 CORE_BOOTSTRAP.md（cross-tool）或 ai-tools/agent/<tool>.md（tool-specific）— 不加到本檔。Commit-msg hook 會擋下違反 thinness 的修改。
-`, repo,
-		filepath.Join(repo, "CORE_BOOTSTRAP.md"),
-		filepath.Join(repo, "CORE_BOOTSTRAP.md"),
-		filepath.Join(repo, "README.md"),
-		filepath.Join(repo, "runtime", "runtime.db"),
-		filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"),
-		filepath.Join(repo, "runtime", "bootstrap-entry-points.yaml"))
+`, filepath.ToSlash(repo),
+		filepath.ToSlash(filepath.Join(repo, "CORE_BOOTSTRAP.md")),
+		filepath.ToSlash(filepath.Join(repo, "CORE_BOOTSTRAP.md")),
+		filepath.ToSlash(filepath.Join(repo, "README.md")),
+		filepath.ToSlash(filepath.Join(repo, "runtime", "runtime.db")),
+		filepath.ToSlash(filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml")),
+		filepath.ToSlash(filepath.Join(repo, "runtime", "bootstrap-entry-points.yaml")))
 }
 
 func initProjectRooContent(repo string) string {
@@ -366,6 +366,12 @@ func initProjectClaudeContent(repo string) string {
 }
 
 func initProjectCodexContent(repo string) string {
+	// Use forward slashes for displayed paths (cross-platform consistency).
+	// filepath.Join produces backslashes on Windows which break substring
+	// matching in markdown links and downstream tests.
+	join := func(parts ...string) string {
+		return filepath.ToSlash(filepath.Join(parts...))
+	}
 	return fmt.Sprintf(`# AGENTS.md — Generic Agent Bootstrap Entry
 
 本檔為 thin generic agent entry。適用 Codex、Cursor partial、Aider、Cline 等遵循 ` + "`AGENTS.md`" + ` 慣例的 AI agent。Canonical obligations 在 Ai-skill repo 的 ` + "`CORE_BOOTSTRAP.md`" + ` + ` + "`runtime/core-bootstrap.yaml`" + `。
@@ -380,10 +386,10 @@ func initProjectCodexContent(repo string) string {
 ## 修改規則
 
 不在本檔加單一工具規則 — 用 routing hub 指向的對應 ` + "`ai-tools/agent/<tool>.md`" + `。本檔保持 thin。
-`, filepath.Join(repo, "CORE_BOOTSTRAP.md"),
-		filepath.Join(repo, "README.md"),
-		filepath.Join(repo, "ai-tools", "README.md"),
-		filepath.Join(repo, "runtime", "runtime.db"))
+`, join(repo, "CORE_BOOTSTRAP.md"),
+		join(repo, "README.md"),
+		join(repo, "ai-tools", "README.md"),
+		join(repo, "runtime", "runtime.db"))
 }
 
 func initProjectGoalsReadmeContent(repo string) string {
@@ -395,5 +401,5 @@ func initProjectGoalsReadmeContent(repo string) string {
 ## 目前目標
 
 （尚無 active goal）
-`, filepath.Join(repo, "enforcement", "conversation-goal-ledger.md"))
+`, filepath.ToSlash(filepath.Join(repo, "enforcement", "conversation-goal-ledger.md")))
 }

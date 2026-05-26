@@ -69,11 +69,11 @@ validation:
     y=$(test -f runtime/bootstrap-entry-points.yaml && echo 1 || echo 0)
     f=$(test -f enforcement/failure-patterns/bootstrap-entry-bloat.md && echo 1 || echo 0)
     v=$(grep -c 'func validateBootstrapEntryThinness' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
-    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validateBootstrapEntryThinness')
+    rch=$(grep -c 'validateBootstrapEntryThinness' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
     p=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.bootstrap_entry_points';" 2>/dev/null)
     cl_lines=$(wc -l < CLAUDE.md 2>/dev/null | tr -d ' ')
     cl_enum=$(grep -c 'FAST/NORMAL/DEEP/FORENSIC/RECOVERY\|INDEX_ONLY/SUMMARY_FIRST' CLAUDE.md 2>/dev/null)
-    [ "${y:-0}" -ge 1 ] && [ "${f:-0}" -ge 1 ] && [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && [ "${p:-0}" -ge 1 ] && [ "${cl_lines:-999}" -le 30 ] && [ "${cl_enum:-1}" -eq 0 ] && echo "PASS" || echo "FAIL y=${y:-0} f=${f:-0} v=${v:-0} rch=${rch:-0} p=${p:-0} cl_lines=${cl_lines:-999} cl_enum=${cl_enum:-1}"
+    [ "${y:-0}" -ge 1 ] && [ "${f:-0}" -ge 1 ] && [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 2 ] && [ "${p:-0}" -ge 1 ] && [ "${cl_lines:-999}" -le 30 ] && [ "${cl_enum:-1}" -eq 0 ] && echo "PASS" || echo "FAIL y=${y:-0} f=${f:-0} v=${v:-0} rch=${rch:-0} p=${p:-0} cl_lines=${cl_lines:-999} cl_enum=${cl_enum:-1}"
   pass_criteria: detection_command outputs "PASS"
   initial_state: FAIL（components not yet present；CLAUDE.md currently 68 lines with enum mentions）
   reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

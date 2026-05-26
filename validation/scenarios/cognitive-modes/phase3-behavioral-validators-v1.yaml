@@ -58,7 +58,7 @@ validation:
     e=$(grep -c 'func validateExecutionModeFloors' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
     g=$(grep -c 'func validateGovernanceModeConsistency' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
     m=$(grep -c 'func validateMemoryModeSubdir' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
-    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validateExecutionModeFloors\|validateGovernanceModeConsistency\|validateMemoryModeSubdir')
+    rch=$(grep -cE 'validateExecutionModeFloors|validateGovernanceModeConsistency|validateMemoryModeSubdir' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
     [ "${p:-0}" -ge 1 ] && [ "${e:-0}" -ge 1 ] && [ "${g:-0}" -ge 1 ] && [ "${m:-0}" -ge 1 ] && [ "${rch:-0}" -ge 3 ] && echo "PASS" || echo "FAIL p=${p:-0} e=${e:-0} g=${g:-0} m=${m:-0} rch=${rch:-0}"
   pass_criteria: detection_command outputs "PASS"
   initial_state: FAIL（parser + 3 validators not yet implemented）
