@@ -26,6 +26,50 @@ Runtime compiler 會把這類 contract 投影到 `runtime.db` 的 `generated_sur
 
 不要再新增或提交 `runtime/**/*.yaml` mirror。若需要人類可讀 diff，可用臨時匯出檔檢視，但不要把匯出 mirror commit 回 repo。
 
+## 雙層 Source-of-Truth（A 類 vs B 類）
+
+`runtime/` 下有兩種 config 來源，**規則不同**：
+
+| 類別 | Source | Runtime.db 落點 | 上面「不再提交 YAML mirror」規則對象？ |
+|---|---|---|---|
+| **A. Runtime internal config**（phase_machine、language_policy、output_rules、governance_gates、blocking_gates 等） | 直接寫進 `runtime_config_documents` 表 | `runtime_config_documents` + 專屬 projection tables | ✅ **是** — 禁止 YAML mirror（DB 是 canonical） |
+| **B. Executable YAML contracts**（11 個 `runtime/*.yaml`：core-bootstrap / cognitive-modes-* / plan-status-sync / bootstrap-entry-points / cli-modification-policy） | `runtime/*.yaml` 是 source | `generated_surfaces` projection | ❌ **否** — YAML 是 source code，DB 是 build output；兩者必須共存 |
+
+### B 類為什麼 YAML + DB 都必須有
+
+```
+runtime/*.yaml (source)  →  ai-skill runtime compile  →  generated_surfaces (projection)
+```
+
+- 沒 YAML → compile 後 generated_surfaces 對應 row 不存在
+- 沒 DB projection → agent / hook 查不到 contract（compile 把 wipe + rebuild）
+- 兩者並存是「source code + binary」的標準雙層
+
+### B 類**必須**符合的 contract 形式
+
+```yaml
+runtime_projection:
+  enabled: true
+  target_key: runtime.<unique-key>
+```
+
+少 enabled / target_key → compiler silent skip → drift。Phase 6 of bootstrap-contract-yaml-migration 已 wire `validateRuntimeYamlProjects` commit-msg hook 機械強制：
+
+- Staged `runtime/*.yaml` 缺 `enabled: true` 或 `target_key:` → block exit 30
+- 例外（plan-declared deferred projection）→ commit body 加 `[skip-runtime-yaml-projection]` standalone trailer + 在 plan §`Deferred Runtime Projection` section 寫明 reason + 預定 project phase
+
+### 工作流區分
+
+| 場景 | 看哪個 |
+|---|---|
+| Agent / hook 查 obligation / contract content | **runtime.db `generated_surfaces`** 或 `ai-skill runtime obligations`（fast、compiled）|
+| 人類修改規則 / PR review / git history | **`runtime/*.yaml`**（source、diffable）|
+| 改 contract 流程 | 改 YAML → `ai-skill runtime compile + refresh` → DB 同步 → commit 含 `runtime.db` |
+
+### 舊規則延伸不適用於 B 類
+
+「不再提交 runtime YAML mirror」（上方規則）的對象是 **A 類 canonical-in-DB**（phase_machine 等）。**B 類 executable contracts**（cognitive-modes 等）的 YAML 不是 mirror，是 source — 必須保留。如果不小心混淆 A 與 B 而刪除 B 類 YAML，會導致 compile 後 generated_surfaces 缺對應 row → 所有依賴該 contract 的 validator / hook 失效。
+
 ## 放什麼
 
 - SQLite runtime database：`runtime.db`
