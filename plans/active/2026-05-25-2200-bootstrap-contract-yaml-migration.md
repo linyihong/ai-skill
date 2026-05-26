@@ -370,11 +370,15 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 - [ ] 對每條 per_commit_obligations 個別 dispatch validator（取代目前 hardcode list）
 - [ ] 既有 6 個 validators 保留為 per-obligation handlers
 - [ ] Failure pattern `bootstrap-yaml-bypass.md`（agent 跳過 query generated_surfaces 直接讀 .md prose）
+- [ ] **`validateCLIDocSync` validator**（per `runtime/cli-modification-policy.yaml`）：commit 含 `scripts/ai-skill-cli/internal/app/*.go` 新增 `case "<cmd>":` 或 `func runXxxHook` 時，必須 stage `scripts/ai-skill-cli/docs/command-contract.md`；scenario `cli-doc-sync-enforcement-v1`；failure pattern `cli-doc-drift.md`
+- [ ] **`runtime/cli-modification-policy.yaml`** 已建立並 projected（連結 `workflow/software-delivery/` 為 parent workflow）
 
 ### Phase 6 完成條件
 
 - [ ] Hook 從 runtime.db 動態載入 obligation list
 - [ ] Failure pattern 文件
+- [ ] `validateCLIDocSync` 上線 + scenario PASS
+- [ ] CLI modification policy YAML 已 cross-link 到 software-delivery workflow
 
 ---
 

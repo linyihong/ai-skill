@@ -1,0 +1,125 @@
+schema_version: "1.0"
+id: runtime.cli-modification-policy
+status: active
+owner_layer: runtime
+source_markdown: null
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.cli_modification_policy.contract
+  surface: generated_surfaces
+
+purpose: >
+  Executable policy for modifying ai-skill CLI (scripts/ai-skill-cli/).
+  Every CLI change is a software-delivery task; this contract specifies
+  the CLI-specific gates layered on top of the generic
+  workflow/software-delivery/ execution flow.
+
+  Triggered by 2026-05-26 observation: hooks run commit-msg / pre-push /
+  runtime obligations subcommands shipped without command-contract.md
+  updates (multi-day documentation drift). YAML defines the gates so
+  future modifications follow the same closure.
+
+parent_workflow:
+  path: workflow/software-delivery/execution-flow.md
+  yaml: workflow/software-delivery/execution-flow.yaml
+  role: |
+    CLI changes inherit the full software-delivery flow:
+    1. Start From Evidence
+    2. Docs-First BDD Closure Loop
+    3. Acceptance + Validation
+    4. Linked updates + close-loop
+    This contract adds CLI-specific gates as required artifacts within
+    that flow.
+
+applies_when:
+  - staged_path_glob: scripts/ai-skill-cli/internal/**/*.go
+  - staged_path_glob: scripts/ai-skill-cli/cmd/**/*.go
+  - staged_path_glob: scripts/ai-skill-cli/internal/app/*.go
+
+cli_specific_gates:
+  - id: gate.cli.command_contract_synced
+    description: |
+      Adding / renaming / removing a CLI subcommand or hook handler MUST
+      update scripts/ai-skill-cli/docs/command-contract.md in the SAME
+      commit (table row + per-command section). Internal validator
+      functions called from existing hooks do not require contract row
+      updates but should be mentioned in the affected hook section.
+    detection_signals:
+      - new `case "<command>":` dispatch added in Go
+      - new `runXxxHook` or `buildRuntimeXxxResult` function added
+      - new subcommand value added to allowed-command list
+    enforcement_layer: commit_msg_hook
+    validator: validateCLIDocSync
+    severity: block
+    opt_out_marker: "[skip-cli-doc-sync]"
+
+  - id: gate.cli.go_tests_pass
+    description: |
+      go test ./scripts/ai-skill-cli/... must pass before commit.
+      Currently enforced via pre-push hook's cli_ci_preflight; this
+      gate documents the explicit requirement.
+    enforcement_layer: pre_push_hook
+    severity: block
+
+  - id: gate.cli.bin_rebuild_for_HEAD
+    description: |
+      When CLI source changes, scripts/ai-skill-cli/bin/* must be rebuilt
+      with HEAD commit SHA before push. Enforced by
+      TestRepoLocalBinariesMatchChecksumsAndCurrentSource pre-push test.
+    enforcement_layer: pre_push_hook
+    severity: block
+    canonical_command: |
+      cd scripts/ai-skill-cli && go run ./cmd/releasebuild \
+        --stable-names --version "repo-$(git rev-parse --short HEAD)" \
+        --commit "$(git rev-parse --short HEAD)" --dist bin
+
+  - id: gate.cli.scenario_or_unit_test
+    description: |
+      New behavioral validators / hook handlers / runtime subcommands
+      need either (a) a validation scenario in validation/scenarios/ OR
+      (b) a Go unit test in scripts/ai-skill-cli/internal/app/*_test.go.
+      Pure refactors are exempt.
+    enforcement_layer: review (manual + future CI)
+    severity: warning
+
+  - id: gate.cli.runtime_compile_when_yaml_touched
+    description: |
+      If the CLI change touches runtime/*.yaml schemas or compileXxx
+      functions in runtime_compiler.go, the same commit must include
+      runtime.db recompile + staged.
+    enforcement_layer: pre_commit_hook (already wired via hooks.go
+      runtime source change detection)
+    severity: block
+
+modification_rule:
+  description: |
+    When editing this YAML / validator / gate list:
+    1. Update workflow/software-delivery/execution-flow.md cross-link
+       (if a new gate is added to that flow).
+    2. Update scripts/ai-skill-cli/docs/command-contract.md if the new
+       gate produces a CLI surface.
+    3. Add a failure pattern at enforcement/failure-patterns/cli-doc-drift.md
+       if the failure is new.
+    4. Failing scenario test-first per system-upgrade-governance §3 Rule 9.
+
+related_failure_patterns:
+  - enforcement/failure-patterns/source-mirror-write-drift.md
+  - enforcement/failure-patterns/framework-duplication-without-interrogation.md
+  - enforcement/failure-patterns/bootstrap-entry-bloat.md
+  - planned: enforcement/failure-patterns/cli-doc-drift.md (Phase 6 of bootstrap-yaml-migration)
+
+linked_plans:
+  - plans/active/2026-05-25-2200-bootstrap-contract-yaml-migration.md (Phase 6 adds validateCLIDocSync)
+  - plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md (parent CLI build-out)
+
+acceptance:
+  - YAML projected to generated_surfaces[runtime.cli_modification_policy.contract]
+  - Phase 6 of bootstrap-yaml-migration implements validateCLIDocSync per this contract
+  - workflow/software-delivery/ retains canonical execution-flow ownership
+
+source: >
+  2026-05-26 user feedback: hooks run commit-msg / pre-push / runtime
+  obligations shipped without command-contract.md updates. Need a YAML
+  contract so future ai-skill-cli changes follow the same closure,
+  linking to software-delivery workflow as parent.
