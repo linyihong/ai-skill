@@ -372,6 +372,8 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 - [ ] Failure pattern `bootstrap-yaml-bypass.md`（agent 跳過 query generated_surfaces 直接讀 .md prose）
 - [ ] **`validateCLIDocSync` validator**（per `runtime/cli-modification-policy.yaml`）：commit 含 `scripts/ai-skill-cli/internal/app/*.go` 新增 `case "<cmd>":` 或 `func runXxxHook` 時，必須 stage `scripts/ai-skill-cli/docs/command-contract.md`；scenario `cli-doc-sync-enforcement-v1`；failure pattern `cli-doc-drift.md`
 - [ ] **`runtime/cli-modification-policy.yaml`** 已建立並 projected（連結 `workflow/software-delivery/` 為 parent workflow）
+- [ ] **`validateRuntimeYamlProjects` validator**（registered 2026-05-26）：commit 含 staged `runtime/*.yaml` 時，每個 YAML 必須含 `runtime_projection.enabled: true` 且 `target_key` 已設。否則 block。Compiler 目前 silent-skip 缺 enabled 的 YAML → drift risk。原因：本 session audit 發現「runtime YAML 必須 project 到 runtime.db」規則沒機械強制，使用者提醒才檢查（11/11 目前 PASS，但需 enforcement 防止未來缺）。scenario `runtime-yaml-projects-v1`；failure pattern `runtime-yaml-unprojected.md`
+- [ ] **Plan template rule**：在 `plans/README.md` §Plan 模板必填章節 表加「若 plan 建立 `runtime/*.yaml` 但**不立即 project** 到 `runtime.db`（外放 → 後續收斂模式），必須在 §Decision Rationale 或 §Runtime Execution Path 明寫 (a) 不 project 的 reason、(b) 預定 project 的 phase / 條件」
 
 ### Phase 6 完成條件
 
