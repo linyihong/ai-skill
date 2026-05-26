@@ -116,6 +116,7 @@ success_criteria:
   - canonical 規則仍在 `ai-tools/`、`enforcement/`、`governance/`、`workflow/` 或 `runtime/runtime.db`
   - 新工具若影響 project initialization，`ai-tools/new-project-onboarding.md` 與 `ai-tools/new-project-onboarding.yaml` 已同步
   - 語言政策符合使用者語言與可重用文件繁體中文規則
+  - Close-loop 終局檢查：工具 adapter 已包含 git clean status 與 push 驗證提醒
   - runtime projection 為 synced
 
 failure_modes:

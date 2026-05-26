@@ -16,6 +16,7 @@ runtime_projection:
 activation:
   events:
     - multi_file_change
+    - file_addition
     - architecture_update
     - enforcement_rule_added_or_changed
     - workflow_changed
@@ -25,6 +26,7 @@ activation:
   required_when:
     - A change can affect another document, index, workflow entrypoint, runtime surface, template, or tool adapter.
     - A new executable YAML contract is added or an owner-layer executable rule changes.
+    - Any new file is added to the repository (Close-loop requirement).
     - Runtime compiler mappings, `runtime/runtime.db`, knowledge runtime sources, or validation scenarios change.
 
 required_sources:
@@ -105,6 +107,7 @@ gates:
       - runtime.db changes are left unstaged
   - id: gate.linked_updates.writeback_closed
     blocks: final_completion_response
+    severity: critical
     pass_when:
       - diff review completed
       - validation completed or blocker reported
@@ -113,6 +116,10 @@ gates:
       - push/readback completed before task completion, task switch, final summary, or writeback transaction closure
       - git log origin/<branch>..HEAD is empty before completion is claimed
       - push/readback status and final git status are reported
+    fail_when:
+      - git status is dirty before final response
+      - unpushed commits exist without authorization
+      - final response claims completion without reporting git status
 
 required_evidence:
   - changed path matrix

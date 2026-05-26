@@ -91,6 +91,17 @@ per_turn_obligations:
       response layer is best-effort (no infrastructure to intercept
       response pre-emission); the v2 plan (runtime-cognitive-contract-v2)
       lowers compliance friction via compact form.
+  - id: obligation.finality.close_loop_check
+    fires: task_completion_or_session_end
+    action: |
+      Verify `git status` is clean and `git log origin/<branch>..HEAD`
+      is empty.
+    severity: critical
+    blocking_gate_id: gate.linked_updates.writeback_closed
+    note: |
+      This obligation prevents "dirty-repo final responses". Agent must
+      ensure all changes are committed and pushed (or record authorized
+      pending state) before claiming task completion.
 
 per_commit_obligations:
   # Enumerated 2026-05-26 (Phase 6 of bootstrap-contract-yaml-migration):
