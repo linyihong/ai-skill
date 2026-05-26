@@ -196,6 +196,8 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project /path/to/p
 
 更新 `ai-skill init-project`、project-level bootstrap files、工具清單 or `ai-tools/agent/<tool>.md` 並影響新專案初始化時，必須同步檢查本文件與 YAML activation contract。
 
+**重要義務**：當新增支援的 AI 工具時，**必須同時更新根目錄的 `README.md`** 中的「Works With」區塊，確保系統能力透明。
+
 目前 `ai-skill init-project` 支援的工具：
 
 | 工具 | Project bootstrap file | Canonical adapter |

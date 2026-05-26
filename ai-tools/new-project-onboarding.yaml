@@ -95,6 +95,7 @@ success_criteria:
   - 新專案 bootstrap files 只指向 canonical source，不複製規則全文
   - selected tools 與 `ai-tools/agent/` adapter 清單一致
   - 新增工具時同步更新 agent onboarding 與 project onboarding
+  - 根目錄 README.md 已同步更新工具清單
   - runtime projection 為 synced
 
 failure_modes:
