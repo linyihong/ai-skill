@@ -1,111 +1,101 @@
 # AI-native Cognitive Execution System
 
-AI 認知執行系統 — 讓 agent 以 runtime state machine 驅動知識路由、phase 執行與閉環驗證。
+AI-native cognitive execution framework for portable engineering knowledge.
 
-## 🚀 Quickstart
+可攜式工程知識的 AI-native 認知執行框架。
 
-```text
-1. Read CORE_BOOTSTRAP.md  (3 rules, ~800 tokens)
-2. Read this README         (OS layout)
-3. Check contract-backed activation (enforcement/*.yaml + routing registry)
-4. Read knowledge summary   (300-500 tokens, then expand if needed)
-```
+AI-native Cognitive Execution System 是一套用來累積工程知識、降低工具綁定風險的認知執行框架。它把人的工程經驗整理成可攜、可版本化、可驗證、可被不同 AI agent 重複執行的結構，而不是把知識鎖在單一模型、單一 IDE、單一 hosted memory 或單一 agent runtime 裡。
 
-詳細啟動流程：[`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md)
+> Note: this project currently lives in the `Ai-skill` GitHub repository. `Ai-skill` is the current repo slug, not the formal public system name.
 
-## 維護本 repository（人類貢獻者）
+## 為什麼需要它
 
-`knowledge/indexes/` 等索引主要給 **agent 依任務路由**；若你要**修改 Ai-skill 本庫**（PR、治理、驗證指令），請從 **[`governance/contributing.md`](governance/contributing.md)** 進入（內含與 [`scripts/README.md`](scripts/README.md)、[`governance/validation/README.md`](governance/validation/README.md) 的連結）。GitHub 慣例入口：[`CONTRIBUTING.md`](CONTRIBUTING.md)。
+AI 工具變動很快，但工程判斷、團隊慣例、驗證流程和失敗教訓的生命週期比工具更長。只把這些知識寫在 prompt、聊天記憶、IDE 規則或某個 agent 的私有 runtime 裡，會讓知識難以遷移、難以審查，也難以知道 agent 是否真的照做。
 
-## 📂 OS Layout
+AI-native Cognitive Execution System 的目標是讓團隊擁有自己的工程知識，並讓任何相容的 agent 都能讀取、執行和驗證它。
 
-| 層級 | 路徑 | 用途 |
-| --- | --- | --- |
-| 🎯 **Core Bootstrap** | [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | 最小必讀啟動集合（3 rules, ~800 tokens） |
-| 📐 **Architecture** | [`architecture/`](architecture/) | Roadmap、升級規劃、成本優化 |
-| ⚙️ **Shared Rules** | [`enforcement/`](enforcement/README.md) | 共用作業規則（含 contract-backed activation） |
-| 🔧 **Tool Adapters** | [`ai-tools/`](ai-tools/README.md) | Claude Code、Cursor 等工具配置 |
-| 🔄 **Runtime** | [`runtime/`](runtime/README.md) | Context routing、contract projections、TTL；**Cognitive Modes**（4 維 mode primitives + discovery signals + subsystem integration） |
-| 🧭 **Knowledge** | [`knowledge/`](knowledge/README.md) | Indexes、summaries、graphs、runtime surfaces |
-| 📊 **Metadata** | [`metadata/`](metadata/README.md) | Knowledge Atom schema、ranking、confidence |
-| 🧪 **Analysis** | [`analysis/`](analysis/README.md) | 觀察、拆解、pattern extraction |
-| 💡 **Intelligence** | [`intelligence/`](intelligence/README.md) | Engineering decision、trade-off、anti-pattern |
-| 🔄 **Workflow** | [`workflow/`](workflow/README.md) | Planning、decomposition、execution flow |
-| 💾 **Memory** | [`memory/`](memory/README.md) | Episodic、project、failure memory |
-| 📝 **Feedback** | [`feedback/`](feedback/README.md) | Lesson extraction、promotion、feedback loop |
-| 🤖 **Models** | [`models/`](models/README.md) | Model capability profile、routing、compression |
-| 🏛️ **Governance** | [`governance/`](governance/README.md) | Lifecycle、cleanup、validation |
-| 📜 **Scripts** | [`scripts/`](scripts/README.md) | Close-loop automation、runtime refresh |
+## 它讓你做到什麼
 
-## 🧭 Agent 作業流程
+- **Knowledge Ownership**：把工程規則、workflow、判斷準則、失敗模式和驗證方式放在可版本化的 repository 中。
+- **Agent Portability**：同一套知識可以被 Cursor、Claude Code、Codex、Roo Code 或自訂 agent 讀取，而不是綁死在單一工具。
+- **Human Experience Compounding**：把一次次 review、debug、架構決策與 agent 失誤整理成可重複使用的 cognitive structure。
+- **Executable Governance**：重要流程不只寫成說明，也能用 contract、runtime state、gates 和 validation loop 驗證。
 
-```
-Session Start
-  │
-  ├─ 1. Read CORE_BOOTSTRAP.md (3 rules, ~800 tokens)
-  │
-  ├─ 2. Read README.md (OS layout)
-  │
-  ├─ 3. Check contract-backed activation → load matching executable contracts
-  │
-  ├─ 4. Read knowledge summary (300-500 tokens)
-  │
-  ├─ 5. Expand to full source only if needed
-  │
-  └─ 6. Use .agent-goals/ for multi-step tasks
-```
+## Works With
 
-## 🛠️ AI Tools
+目前此 repo 已有下列工具入口與 adapter：
 
-| Tool | Config |
+| 工具 | 入口 |
 | --- | --- |
-| **Roo Code** | [`ai-tools/agent/roo.md`](ai-tools/agent/roo.md) |
-| **Cursor** | [`ai-tools/agent/cursor.md`](ai-tools/agent/cursor.md) |
-| **Claude Code** | [`ai-tools/agent/claude.md`](ai-tools/agent/claude.md) |
+| Cursor | [`ai-tools/agent/cursor.md`](ai-tools/agent/cursor.md) |
+| Claude Code | [`ai-tools/agent/claude.md`](ai-tools/agent/claude.md) |
+| Codex / generic agents | [`AGENTS.md`](AGENTS.md) |
+| Roo Code | [`ai-tools/agent/roo.md`](ai-tools/agent/roo.md) |
+| 自訂 agent / runtime | 從 [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) 與 [`knowledge/runtime/routing-registry.yaml`](knowledge/runtime/routing-registry.yaml) 接入 |
 
-## 📖 Key Documents
+尚未實際接入並累積使用經驗的工具，先視為 future AI runtimes，不列入已支援工具。
 
-| Document | Purpose |
-| --- | --- |
-| [`governance/contributing.md`](governance/contributing.md) | 人類維護入口：驗證指令、PR gate、文件索引 |
-| [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) | Minimal bootstrap (3 rules, ~800 tokens) |
-| [`plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md`](plans/archived/2026-05-11-1112-next-stage-upgrade-plan.md) | ✅ 已完成：本系統升級 |
-| [`plans/archived/2026-05-12-1101-context-cost-optimization.md`](plans/archived/2026-05-12-1101-context-cost-optimization.md) | Token cost optimization plan |
-| [`runtime/runtime.db`](runtime/runtime.db) | Lazy-load activation rules |
-| [`runtime/runtime.db`](runtime/runtime.db) | Context TTL policy |
+## 它不是什麼
 
-## 📌 新專案快速啟用
+- 不是 chatbot，也不是 SaaS 產品。
+- 不是 prompt collection；prompt 只是可執行知識的一種輸入形態。
+- 不是 MCP replacement；MCP 解決工具與資料連接，本系統解決工程知識如何被 agent 穩定執行。
+- 不是 LangGraph 或 agent framework replacement；它可以接到不同 runtime，核心是知識 ownership、routing、governance 和 validation。
+- 不是 hosted memory；它把長期可重用知識留在可審查的 source repository。
 
-### 給人類（開新專案的人）
+## 為什麼不同
 
-如果你開了一個**全新的專案**，想讓它使用此知識庫，執行 repo-local Go CLI 一次設定所有 AI 工具：
+一般 AI workflow 常把知識分散在聊天紀錄、prompt、工具設定和個人習慣裡。這套系統把它們整理成分層的 source-of-truth：
+
+- `workflow/` 保存可執行流程。
+- `analysis/` 保存觀察與拆解方法。
+- `intelligence/` 保存可重用判斷智慧。
+- `enforcement/` 保存 agent 必須遵守的共用規則。
+- `runtime/` 保存 machine-readable state、contracts 和 gates。
+- `knowledge/` 保存 routing、summaries 和 graphs，讓 agent 先讀對的部分。
+
+```mermaid
+flowchart LR
+    HumanKnowledge["Human engineering knowledge"] --> CognitiveSystem["Portable cognitive structures"]
+    CognitiveSystem --> Runtime["Cognitive runtime and routing"]
+    Runtime --> Agents["Cursor / Claude / Codex / Custom agents"]
+    Agents --> Verification["Structured verification loop"]
+    Verification --> CognitiveSystem
+```
+
+## Quick Start
+
+如果你想把這套系統接到一個新專案，從新專案初始化流程開始：
 
 ```bash
-# 從 Ai-skill repo 目錄執行
-scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project /path/to/your/new-project
-
-# 範例
-scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project /path/to/your/project
 ```
 
-這會在目標專案中建立：
+完整說明見 [`ai-tools/new-project-onboarding.md`](ai-tools/new-project-onboarding.md)。
 
-| 工具 | 產出 | 效果 |
-|------|------|------|
-| **Roo Code** | `.roomodes` | 5 個 mode，含語言規則 + 知識更新 checkpoint |
-| **Cursor** | `.cursor/rules/ai-skill-bootstrap.mdc` | alwaysApply 規則，自動載入 |
-| **Claude Code** | `CLAUDE.md` | 自動載入 Core Bootstrap |
-| **通用** | `.agent-goals/` | 對話目標帳本 |
+想先理解整體概念，讀 [`docs/overview.md`](docs/overview.md)。想看目前世代的架構入口，讀 [`architecture/ai-native-cognitive-execution-system.md`](architecture/ai-native-cognitive-execution-system.md)。
 
-詳細說明：[`ai-tools/new-project-onboarding.md`](ai-tools/new-project-onboarding.md)
+## For Agents
 
-### 給 AI agent（session 啟動時）
+如果你是 AI agent，請從 [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) 進入。Bootstrap 的 machine-readable obligations 由 [`runtime/core-bootstrap.yaml`](runtime/core-bootstrap.yaml) 投影到 `runtime/runtime.db`；本 README 只提供 public overview，不複製 bootstrap contract。
 
-啟動流程已在 [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) 定義（含新專案自動偵測），依序執行即可。
+## Repository Map
 
-## 📋 Rules
+| 路徑 | 用途 |
+| --- | --- |
+| [`docs/`](docs/README.md) | Public overview 與人類讀者入口 |
+| [`architecture/`](architecture/README.md) | 系統世代與 canonical architecture navigation |
+| [`ai-tools/`](ai-tools/README.md) | Tool adapters 與新專案 onboarding |
+| [`enforcement/`](enforcement/README.md) | Agent 必須遵守的共用規則 |
+| [`workflow/`](workflow/README.md) | 可執行 workflow |
+| [`analysis/`](analysis/README.md) | 分析方法與觀察流程 |
+| [`intelligence/`](intelligence/README.md) | 可重用工程判斷 |
+| [`runtime/`](runtime/README.md) | Runtime state、contracts、gates |
+| [`knowledge/`](knowledge/README.md) | Routing registry、summaries、graphs |
+| [`governance/`](governance/README.md) | Lifecycle、validation、contribution governance |
 
-- **Reference-first**: Agent 直接讀本 repository，不依賴 tool mirror。
-- **Path convention**: 使用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>` 占位符，不寫入本機絕對路徑。
-- **Close-loop**: 修改後必須 diff review、linked updates、commit、push、readback、clean status。
-- **Cost-aware**: 優先讀 summary（300-500 tokens），需要才展開全文。
+## Maintainers
+
+若你要修改這個 repository，從 [`governance/contributing.md`](governance/contributing.md) 開始。那裡連到 validation gates、runtime refresh、linked updates、diff review 和 close-loop 規則。
+
+GitHub 慣例入口仍保留在 [`CONTRIBUTING.md`](CONTRIBUTING.md)。

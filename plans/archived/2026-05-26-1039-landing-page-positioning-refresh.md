@@ -1,6 +1,6 @@
 # AI-native Cognitive Execution System Landing Page Refresh
 
-**Status**: `draft`
+**Status**: `completed`（2026-05-26 executed：root README landing page + `docs/` public overview）
 **世代**：Gen 3 communication layer refresh
 **建立日期**：2026-05-26
 **最後更新**：2026-05-26
@@ -140,12 +140,12 @@ AI-native cognitive execution framework for portable engineering knowledge.
 
 ## 完成條件
 
-- [ ] 根 `README.md` 第一屏能在 30 秒內回答 What / Why / Why Different。
-- [ ] README 保留或連到 `CORE_BOOTSTRAP.md`、`architecture/ai-native-cognitive-execution-system.md`、`ai-tools/new-project-onboarding.md`、`governance/contributing.md`。
-- [ ] 若新增 `docs/overview.md`，同時新增 `docs/README.md` 作為 router。
-- [ ] 不複製 `runtime/core-bootstrap.yaml` 的 required reads、obligations、receipt format、per-turn rules、runtime gates、SQLite table semantics 或 cognitive mode enum 詳細規則。
-- [ ] 符合 `governance/document-sizing.md`：README 不再成為混合多主題 dump。
-- [ ] 完成 link check / diff review / linked-updates 檢查。
+- [x] 根 `README.md` 第一屏能在 30 秒內回答 What / Why / Why Different。
+- [x] README 保留或連到 `CORE_BOOTSTRAP.md`、`architecture/ai-native-cognitive-execution-system.md`、`ai-tools/new-project-onboarding.md`、`governance/contributing.md`。
+- [x] 若新增 `docs/overview.md`，同時新增 `docs/README.md` 作為 router。
+- [x] 不複製 `runtime/core-bootstrap.yaml` 的 required reads、obligations、receipt format、per-turn rules、runtime gates、SQLite table semantics 或 cognitive mode enum 詳細規則。
+- [x] 符合 `governance/document-sizing.md`：README 不再成為混合多主題 dump。
+- [x] 完成 link check / diff review / linked-updates 檢查。
 
 ---
 
@@ -191,7 +191,7 @@ Out of scope:
 - [x] User 確認 tagline 方向。
 - [x] User 確認新增 `docs/overview.md`，並放入 Phase 2。
 - [x] User 確認 README 語言主軸：中文為主、英文為輔。
-- [ ] Candidate files 仍存在且 responsibility 清楚。
+- [x] Candidate files 仍存在且 responsibility 清楚。
 
 ---
 
@@ -244,18 +244,18 @@ flowchart LR
 ```markdown
 ## For Agents
 
-如果你是 AI agent，請從 [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) 進入。Bootstrap 的 machine-readable obligations 由 [`runtime/core-bootstrap.yaml`](runtime/core-bootstrap.yaml) 投影到 `runtime/runtime.db`；本 README 只提供 public overview，不複製 bootstrap contract。
+如果你是 AI agent，請從 [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md) 進入。Bootstrap 的 machine-readable obligations 由 [`runtime/core-bootstrap.yaml`](../../runtime/core-bootstrap.yaml) 投影到 `runtime/runtime.db`；本 README 只提供 public overview，不複製 bootstrap contract。
 ```
 
 ### Phase 1 完成條件
 
-- [ ] README 第一屏完成。
-- [ ] README 以中文正文為主，英文保留 tagline、工具名、專有名詞與 public ecosystem term。
-- [ ] README 含 `What It Is Not` 區塊。
-- [ ] README 含輕量 architecture map 簡圖。
-- [ ] bootstrap / OS layout 下移並縮成 `For Agents` 最短入口，不保留完整 agent workflow。
-- [ ] Quick Start 連到 `ai-tools/new-project-onboarding.md`。
-- [ ] Maintainer path 連到 `governance/contributing.md`。
+- [x] README 第一屏完成。
+- [x] README 以中文正文為主，英文保留 tagline、工具名、專有名詞與 public ecosystem term。
+- [x] README 含 `What It Is Not` 區塊。
+- [x] README 含輕量 architecture map 簡圖。
+- [x] bootstrap / OS layout 下移並縮成 `For Agents` 最短入口，不保留完整 agent workflow。
+- [x] Quick Start 連到 `ai-tools/new-project-onboarding.md`。
+- [x] Maintainer path 連到 `governance/contributing.md`。
 
 ---
 
@@ -285,10 +285,10 @@ flowchart LR
 
 ### Phase 2 完成條件
 
-- [ ] `docs/README.md` 是 router，不放長篇內容。
-- [ ] `docs/overview.md` 不複製 runtime tables 或 executable contract details。
-- [ ] `docs/overview.md` 不描述 bootstrap obligations、Receipt format、per-turn obligations 或 entry-file thinness rules；只連回 `CORE_BOOTSTRAP.md` / `runtime/core-bootstrap.yaml`。
-- [ ] README 正確連到 overview。
+- [x] `docs/README.md` 是 router，不放長篇內容。
+- [x] `docs/overview.md` 不複製 runtime tables 或 executable contract details。
+- [x] `docs/overview.md` 不描述 bootstrap obligations、Receipt format、per-turn obligations 或 entry-file thinness rules；只連回 `CORE_BOOTSTRAP.md` / `runtime/core-bootstrap.yaml`。
+- [x] README 正確連到 overview。
 
 ---
 
@@ -296,19 +296,27 @@ flowchart LR
 
 ### Tasks
 
-- [ ] Diff review：確認沒有改動 runtime semantics。
-- [ ] Link check：README / docs links 可解析。
-- [ ] Document sizing：README 與 overview 各自目的單一。
-- [ ] Neutral language：正文語言一致，英文只保留 tagline、固定術語、工具名。
-- [ ] Linked updates：檢查 `architecture/README.md`、`governance/contributing.md`、`ai-tools/new-project-onboarding.md` 是否需要同步；若無需更新，記錄理由。
-- [ ] Bootstrap boundary：確認 README / overview 沒有複製 `runtime/core-bootstrap.yaml` 的 required reads、obligations、Receipt format 或 per-turn rules。
-- [ ] 若只改 Markdown 且不碰 runtime / knowledge / validation，不執行 runtime refresh；若連動更新涉及 routing 或 validation，再補跑。
+- [x] Diff review：確認沒有改動 runtime semantics。
+- [x] Link check：README / docs links 可解析。
+- [x] Document sizing：README 與 overview 各自目的單一。
+- [x] Neutral language：正文語言一致，英文只保留 tagline、固定術語、工具名。
+- [x] Linked updates：檢查 `architecture/README.md`、`governance/contributing.md`、`ai-tools/new-project-onboarding.md` 是否需要同步；若無需更新，記錄理由。
+- [x] Bootstrap boundary：確認 README / overview 沒有複製 `runtime/core-bootstrap.yaml` 的 required reads、obligations、Receipt format 或 per-turn rules。
+- [x] 若只改 Markdown 且不碰 runtime / knowledge / validation，不執行 runtime refresh；若連動更新涉及 routing 或 validation，再補跑。
 
 ### Phase 3 完成條件
 
-- [ ] 所有 validation items 有 evidence。
-- [ ] Plan status 可從 `draft` 更新為 `completed` 或保留 `in-progress` 等下一輪。
-- [ ] 依 `plans/README.md` Plan Completion Closure 決定是否 archived。
+- [x] 所有 validation items 有 evidence。
+- [x] Plan status 可從 `draft` 更新為 `completed` 或保留 `in-progress` 等下一輪。
+- [x] 依 `plans/README.md` Plan Completion Closure 決定是否 archived。
+
+### Closeout Evidence
+
+- Diff scope：`README.md`、`docs/README.md`、`docs/overview.md`、plan status/index。
+- Validation：`git diff --check` passed；touched Markdown link check passed；ReadLints returned no diagnostics；document sizing check shows `README.md` 101 lines、`docs/README.md` 23 lines、`docs/overview.md` 82 lines。
+- Runtime boundary：未修改 `runtime/`、`knowledge/runtime/`、compiler source 或 generated surfaces；runtime refresh 不適用。
+- Linked updates：`architecture/README.md`、`governance/contributing.md`、`ai-tools/new-project-onboarding.md` 已檢查；本次定位改版只新增 public-facing landing/overview，不改 architecture canonical navigation、maintainer workflow 或 onboarding command semantics，因此無需同步改正文。
+- Tool sync：reference-first；未使用或更新 tool mirror / symlink / copy snapshot，不適用。
 
 ---
 
