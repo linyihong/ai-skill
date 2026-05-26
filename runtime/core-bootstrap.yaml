@@ -1,0 +1,130 @@
+schema_version: "1.0"
+id: runtime.core-bootstrap
+status: active
+owner_layer: runtime
+source_markdown: CORE_BOOTSTRAP.md
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.core_bootstrap.contract
+  surface: generated_surfaces
+
+purpose: >
+  Canonical executable contract for Ai-skill session bootstrap. Migrates
+  the prose-only CORE_BOOTSTRAP.md into a machine-readable schema that
+  declares required_reads, per_session_obligations, per_turn_obligations,
+  per_commit_obligations, and phase_state_init.
+
+  CORE_BOOTSTRAP.md remains as human-readable companion (rationale +
+  examples) but this YAML is canonical for obligation enumeration.
+  validators and tool entries should query
+  generated_surfaces[runtime.core_bootstrap.contract] rather than parse
+  prose.
+
+  Scope (Phase 1 of bootstrap-contract-yaml-migration): 3 required_reads
+  + 3 obligations (Bootstrap Receipt, Cognitive Mode block per-turn,
+  Cognitive Mode block per-commit). Lazy-load rules (9) and detailed
+  format examples remain in companion .md for now.
+
+required_reads:
+  - id: rule-weight
+    path: enforcement/rule-weight.md
+    role: P0/P1/P2/P3 weight system (rule conflict resolution priority)
+    estimated_tokens: 300
+  - id: dependency-reading
+    path: enforcement/dependency-reading.md
+    role: dependency rule + Ai-skill writeback transaction
+    estimated_tokens: 400
+  - id: conversation-goal-ledger
+    path: enforcement/conversation-goal-ledger.md
+    role: .agent-goals/ usage and conversation goal closure
+    estimated_tokens: 100
+
+per_session_obligations:
+  - id: obligation.bootstrap.receipt
+    fires: first_turn_before_any_non_read_tool
+    format_template: "Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>"
+    enforcement_layer: behavioral_forcing
+    forcing_function: numeric values require runtime.db query (cannot be memorized)
+    severity: high
+    blocking_gate_id: gate.bootstrap.receipt_present
+    obligation_ledger_id: obligation.bootstrap.receipt_acknowledged
+    resume_exempt: false
+    note: |
+      Summary "Resume directly" does NOT exempt this obligation; resume
+      sessions still emit Receipt on first user-facing message.
+
+per_turn_obligations:
+  - id: obligation.cognitive.mode_report
+    fires: every_user_facing_response
+    format_options:
+      compact: "Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>"
+      full: "### Cognitive Mode 報告 + 4-6 row markdown table"
+    trigger_full_when:
+      - any_dim_non_default
+      - high_risk_mode (DEEP, FORENSIC, RECOVERY, STRICT, LOCKDOWN)
+    enforcement_layer: commit_msg_hook + behavioral_per_turn
+    severity: high
+    note: |
+      Per-turn enforcement at commit-msg layer is mechanical via
+      validateCognitiveContractFormat. Per-turn enforcement at chat-
+      response layer is best-effort (no infrastructure to intercept
+      response pre-emission); the v2 plan (runtime-cognitive-contract-v2)
+      lowers compliance friction via compact form.
+
+per_commit_obligations:
+  - id: obligation.commit.cognitive_mode_block
+    fires: every_commit
+    validator: validateCognitiveContractFormat
+    severity: block
+    opt_out_marker: "[skip-cognitive-mode]"
+    note: Mechanical commit-msg hook enforcement; block missing → exit 30
+
+phase_state_init:
+  source: runtime/runtime.db
+  required_tables:
+    - phase_machine
+    - phases
+    - obligations
+    - gates
+    - language_policy
+    - output_rules
+    - governance_gates
+    - generated_surfaces
+  load_order:
+    - phase_machine (current phase)
+    - obligations (active per current phase)
+    - gates (blocking per current phase)
+    - language_policy + output_rules + governance_gates (output framing)
+
+receipt_format_enhancement_pending:
+  description: |
+    Phase 5 of bootstrap-contract-yaml-migration plan will extend
+    format_template to include an "Active per-turn obligations:" line
+    listing per_turn_obligations[].id values. Until Phase 5 lands, the
+    legacy single-line Receipt remains the canonical form.
+  enhanced_format_preview: |
+    Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
+    Active per-turn obligations: cognitive.mode_report
+  status: deferred_to_phase_5
+
+companion_markdown: CORE_BOOTSTRAP.md
+companion_role: |
+  Human-readable rationale, full Bootstrap Receipt examples, Cognitive
+  Mode format reference, lazy-load rules narrative. YAML is canonical
+  for obligation enumeration; markdown is canonical for rationale.
+
+failure_pattern_linkage:
+  related:
+    - enforcement/failure-patterns/bootstrap-bypass-on-resume.md
+    - enforcement/failure-patterns/bootstrap-entry-bloat.md
+    - enforcement/failure-patterns/cognitive-mode-resolution-bypass.md
+
+acceptance:
+  - scenario bootstrap-yaml-contract-exists-v1 PASS
+  - scenario bootstrap-yaml-projected-v1 PASS
+  - scenario bootstrap-obligations-enumerable-v1 PASS
+
+source: >
+  2026-05-26 session. Plan plans/active/2026-05-25-2200-bootstrap-contract-
+  yaml-migration.md Phase 2.

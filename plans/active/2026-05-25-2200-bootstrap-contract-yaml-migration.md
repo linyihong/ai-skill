@@ -1,6 +1,6 @@
 # Bootstrap Contract YAML Migration
 
-**Status**: `draft`
+**Status**: `in-progress`（Phase 0 ✅ + Phase 1 ✅ + Phase 2 ✅ done 2026-05-26；Phase 3+ 待續）
 **世代**：Gen 3 子系統演進
 **建立日期**：2026-05-25
 **最後更新**：2026-05-25
@@ -290,8 +290,11 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 
 ### Phase 2 完成條件
 
-- [ ] YAML 通過 `ai-skill runtime compile + validate`
-- [ ] Scenarios `bootstrap-yaml-contract-exists-v1` + `bootstrap-yaml-projected-v1` PASS
+- [x] YAML 通過 `ai-skill runtime compile + validate`
+- [x] Scenarios `bootstrap-yaml-contract-exists-v1` + `bootstrap-yaml-projected-v1` PASS
+- [x] Bonus: `bootstrap-obligations-enumerable-v1` + `receipt-includes-active-obligations-v1` 也 PASS（YAML 內已含 Active per-turn obligations 字串 + JSON1 enumeration 可運作）
+- [x] CORE_BOOTSTRAP.md 加 companion header 標明 canonical contract 在 YAML
+- [x] Compiler auto-walk runtime/ 已涵蓋（無需改 sourceRoots）
 
 ---
 
