@@ -1,0 +1,36 @@
+# Source: bootstrap-yaml-migration Phase 6 — validateRuntimeYamlProjects
+id: runtime-yaml-projects-v1
+domain: bootstrap
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: runtime-yaml-unprojected
+  class: source-of-truth-duplication / governance-drift
+  date: "2026-05-26"
+  description: |
+    Default rule: every runtime/*.yaml must declare runtime_projection.enabled: true
+    AND target_key. Compiler silently skips YAMLs without enabled flag → drift.
+    Exception: plan-declared "Deferred Runtime Projection" path; validator
+    accepts opt-out marker [skip-runtime-yaml-projection].
+
+given:
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go
+
+when:
+  action: phase6_completion_check
+
+then:
+  expected_route:
+    - validateRuntimeYamlProjects function in hooks.go
+    - runCommitMsgHook calls validateRuntimeYamlProjects
+
+validation:
+  detection_command: |
+    v=$(grep -c 'func validateRuntimeYamlProjects' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validateRuntimeYamlProjects')
+    [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && echo "PASS" || echo "FAIL v=${v:-0} rch=${rch:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-6
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

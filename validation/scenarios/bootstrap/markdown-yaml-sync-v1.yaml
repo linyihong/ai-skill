@@ -1,0 +1,38 @@
+# Source: bootstrap-yaml-migration Phase 6 — validateMarkdownYamlSync
+id: markdown-yaml-sync-v1
+domain: bootstrap
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: markdown-yaml-sync-drift
+  class: source-of-truth-duplication
+  date: "2026-05-26"
+  description: |
+    When commit stages a canonical doc markdown that has a sibling YAML
+    companion (e.g. governance/lifecycle/foo.md + governance/lifecycle/foo.yaml),
+    the YAML must also be staged in the same commit. Prevents the
+    markdown-without-YAML drift discovered twice in 2026-05-26 session
+    (command-contract drift + system-upgrade-governance.yaml drift).
+    Opt-out marker: [skip-markdown-yaml-sync].
+
+given:
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go
+
+when:
+  action: phase6_completion_check
+
+then:
+  expected_route:
+    - validateMarkdownYamlSync function in hooks.go
+    - runCommitMsgHook calls validateMarkdownYamlSync
+
+validation:
+  detection_command: |
+    v=$(grep -c 'func validateMarkdownYamlSync' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null)
+    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go | grep -c 'validateMarkdownYamlSync')
+    [ "${v:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && echo "PASS" || echo "FAIL v=${v:-0} rch=${rch:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-6
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
