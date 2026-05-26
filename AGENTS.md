@@ -1,19 +1,16 @@
-# Codex Adapter Bootstrap
+# AGENTS.md — Generic Agent Bootstrap Entry
 
-本文件只是 repo-level Codex 自動載入入口，必須遵守 `ai-tools/` 裡的 canonical AI tool 規則。
+> **本檔為 thin generic agent entry**。適用任何遵循 `AGENTS.md` 慣例的 AI agent（Codex、Cursor partial、Aider、Cline、其他 AGENTS.md-aware tools）。Canonical bootstrap obligations 在 [`runtime/core-bootstrap.yaml`](runtime/core-bootstrap.yaml) + [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) companion。
 
-啟動時，Codex 必須依序讀取：
+## 啟動序列
 
-1. [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) - 最小核心規則。
-2. [`README.md`](README.md) - OS layout 入口。
-3. [`ai-tools/agent/codex.md`](ai-tools/agent/codex.md) - Codex 專屬 adapter 規則。
-4. [`runtime/runtime.db`](runtime/runtime.db) - runtime phase、obligation、gate、output governance 與 lazy-load routing 的 SQLite source-of-truth。
+1. 讀 [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) 與 [`runtime/runtime.db`](runtime/runtime.db) — 必讀規則 + 所有 obligations（Bootstrap Receipt、Cognitive Mode 報告 per-turn block 等）
+2. 讀 [`README.md`](README.md) — OS layout
+3. 讀 [`ai-tools/README.md`](ai-tools/README.md) — **routing hub**：選擇你的 AI 工具對應的 adapter（claude / cursor / roo / codex / future tools）
+4. 依 routing hub 指示讀對應的 tool adapter 取得 tool-specific 操作注意事項
 
-Runtime config canonical source：
+## 修改本檔的規則
 
-- committed runtime config 只存在 `runtime/runtime.db`。
-- canonical runtime documents 存在 `runtime_config_documents` 與 projection tables。
-- 不要建立或提交 `runtime/**/*.yaml` mirror。
-- governance、enforcement、workflow、ai-tools 或 metadata 擁有的 executable contract 必須留在 owner layer；只有 YAML 設定 `runtime_projection.enabled: true` 時才投影到 `runtime.db`。
+本檔是 entry pointer，不是 canonical content。修改前先讀 [`runtime/bootstrap-entry-points.yaml`](runtime/bootstrap-entry-points.yaml) §thinness_rule。新 obligation 加到 [`runtime/core-bootstrap.yaml`](runtime/core-bootstrap.yaml) + CORE_BOOTSTRAP.md（cross-tool）— 不加到本檔。Commit-msg hook 會擋下違反 thinness 的修改。
 
-不要在本文件維護獨立 Codex 規則；請更新 [`ai-tools/agent/codex.md`](ai-tools/agent/codex.md) 與相關 `ai-tools/` 文件。
+本檔不 link 到單一工具的 adapter，避免把 generic entry 鎖死到特定工具。Routing 統一經 `ai-tools/README.md`。

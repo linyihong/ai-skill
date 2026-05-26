@@ -125,8 +125,14 @@ func TestInitProjectWritesCodexBootstrap(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(content), "ai-tools/agent/codex.md") {
-		t.Fatalf("expected Codex adapter pointer, got %s", string(content))
+	// AGENTS.md is now generic agent entry that routes via ai-tools/README.md
+	// (not direct to ai-tools/agent/codex.md). Codex users reach the adapter
+	// through the routing hub. See bootstrap-contract-yaml-migration plan.
+	if !strings.Contains(string(content), "ai-tools/README.md") {
+		t.Fatalf("expected AGENTS.md to route via ai-tools/README.md, got %s", string(content))
+	}
+	if strings.Contains(string(content), "ai-tools/agent/codex.md") {
+		t.Fatalf("AGENTS.md must NOT direct-link to codex.md (generic entry locks would break multi-agent use), got %s", string(content))
 	}
 }
 

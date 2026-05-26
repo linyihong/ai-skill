@@ -44,6 +44,11 @@ entry_files:
   - path: .roomodes
     tool: Roo Code
     role: downstream auto-load (per project)
+  # Repo-level + downstream (AGENTS.md is generic agent convention — used by
+  # Codex, Cursor partial, Aider, Cline, and other AGENTS.md-aware tools)
+  - path: AGENTS.md
+    tool: generic agent (Codex / Aider / Cline / other AGENTS.md-aware tools)
+    role: generic agent bootstrap entry; routes to ai-tools/README.md for tool-specific customization
 
 thinness_rule:
   required_content:

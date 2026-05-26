@@ -1,6 +1,6 @@
 # Bootstrap Contract YAML Migration
 
-**Status**: `in-progress`（Phase 0 ✅ + Phase 1 ✅ + Phase 2 ✅ done 2026-05-26；Phase 3+ 待續）
+**Status**: `in-progress`（Phase 0 ✅ + Phase 1 ✅ + Phase 2 ✅ + Phase 4 ✅ done 2026-05-26；Phase 3 (helper CLI) + Phase 5/6/7 待續）
 **世代**：Gen 3 子系統演進
 **建立日期**：2026-05-25
 **最後更新**：2026-05-25
@@ -336,10 +336,12 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 
 ### Phase 4 完成條件
 
-- [ ] 4 個 entry points 通過 thinness
-- [ ] init_project.go 產出 4 個 thin entries（含 AGENTS.md 含 routing step）
-- [ ] AGENTS.md 進 bootstrap-entry-points 並標 generic agent
-- [ ] AGENTS.md 內容 route through ai-tools/README.md 而非直 link codex.md
+- [x] 4 個 entry points 通過 thinness（含 AGENTS.md 進 validateBootstrapEntryThinness paths list）
+- [x] init_project.go 產出 4 個 thin entries（含 AGENTS.md 路由經 ai-tools/README.md）
+- [x] AGENTS.md 進 bootstrap-entry-points 並標 generic agent (Codex / Aider / Cline / other)
+- [x] AGENTS.md 內容 route through ai-tools/README.md 而非直 link codex.md
+- [x] Scenarios `agents-md-in-entry-list-v1` + `agents-md-routes-via-ai-tools-readme-v1` PASS
+- [x] init_project_test.go TestInitProjectWritesCodexBootstrap 改為驗證 generic routing（不再驗證 codex.md direct link）
 
 ---
 

@@ -249,7 +249,7 @@ func initProjectPlannedFiles(target string, tools []string) []plannedFile {
 		case "claude":
 			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "CLAUDE.md"), description: "Claude Code settings"})
 		case "codex":
-			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "AGENTS.md"), description: "Codex settings"})
+			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "AGENTS.md"), description: "Generic agent entry (AGENTS.md — Codex / Aider / Cline / other AGENTS.md-aware)"})
 		}
 	}
 	files = append(files, plannedFile{tool: "common", path: filepath.Join(target, ".agent-goals", "README.md"), description: "agent goals ledger"})
@@ -366,21 +366,23 @@ func initProjectClaudeContent(repo string) string {
 }
 
 func initProjectCodexContent(repo string) string {
-	return fmt.Sprintf(`# Codex Adapter Bootstrap
+	return fmt.Sprintf(`# AGENTS.md — Generic Agent Bootstrap Entry
 
-本文件是 project-level Codex 自動載入入口，只負責指向 Ai-skill canonical source，不保存獨立規則副本。
+本檔為 thin generic agent entry。適用 Codex、Cursor partial、Aider、Cline 等遵循 ` + "`AGENTS.md`" + ` 慣例的 AI agent。Canonical obligations 在 Ai-skill repo 的 ` + "`CORE_BOOTSTRAP.md`" + ` + ` + "`runtime/core-bootstrap.yaml`" + `。
 
-啟動時，Codex 必須依序讀取：
+## 啟動序列
 
-1. %s
-2. %s
-3. %s
-4. %s
+1. %s — 必讀規則 + 所有 obligations
+2. %s — OS layout
+3. %s — routing hub（選擇對應 AI 工具的 adapter）
+4. %s — runtime canonical（phase / obligations / gates）
 
-若需要更新 Codex adapter 規則，請修改 Ai-skill repo 的 `+"`ai-tools/agent/codex.md`"+`，不要在本專案複製一套平行規則。
+## 修改規則
+
+不在本檔加單一工具規則 — 用 routing hub 指向的對應 ` + "`ai-tools/agent/<tool>.md`" + `。本檔保持 thin。
 `, filepath.Join(repo, "CORE_BOOTSTRAP.md"),
 		filepath.Join(repo, "README.md"),
-		filepath.Join(repo, "ai-tools", "agent", "codex.md"),
+		filepath.Join(repo, "ai-tools", "README.md"),
 		filepath.Join(repo, "runtime", "runtime.db"))
 }
 

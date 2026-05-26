@@ -831,6 +831,9 @@ var bootstrapEntryPaths = []string{
 	"CLAUDE.md",
 	".cursor/rules/ai-skill-bootstrap.mdc",
 	".roomodes",
+	// AGENTS.md is generic agent entry (Codex, Cursor partial, Aider, Cline,
+	// other AGENTS.md-aware tools); thinness applies equally.
+	"AGENTS.md",
 }
 
 func validateBootstrapEntryThinness(text string, staged []string, root string) string {

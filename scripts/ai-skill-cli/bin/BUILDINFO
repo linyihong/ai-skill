@@ -1,4 +1,4 @@
-version=repo-5eb0d9a
-source_commit=5eb0d9a
-built_at=2026-05-25T23:53:19Z
+version=repo-e96bb1e
+source_commit=e96bb1e
+built_at=2026-05-26T04:16:06Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
