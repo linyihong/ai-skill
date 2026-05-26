@@ -42,12 +42,31 @@
 
 ## 系統定位
 
-讓 agent 以 **runtime state machine** 驅動知識路由、phase 執行與閉環驗證的認知執行系統。相較第二代「Knowledge OS」聚焦於知識載入與閉環，第三代強調：
+AI-native Cognitive Execution System 是一套 AI-native 認知執行框架，用可攜、可版本化、可演化的結構累積工程知識，而不被單一 Agent、模型或工具綁架。
+
+它讓 agent 以 **runtime state machine** 驅動知識路由、phase 執行與閉環驗證。相較第二代「Knowledge OS」聚焦於知識載入與閉環，第三代強調：
 
 1. **可執行契約**：核心流程不再只靠 prose 描述，而由 YAML contracts + SQLite generated surfaces 機器強制
 2. **認知執行 runtime**：phase machine / obligation ledger / blocking gates 由 `runtime/runtime.db` 統一管理
 3. **多模型協作**：依任務難度與 context cost 在 small / large / specialized profile 之間路由
 4. **失效學習自閉環**：agent failure → failure pattern → validation scenario → runtime guard 的完整 pipeline
+
+---
+
+## Public Positioning
+
+現代 AI workflow 常把團隊規則散在 IDE rules、聊天記憶、prompt snippets、agent-specific settings 或 hosted memory 裡；換工具時難以遷移，review/debug/incident 學到的經驗也不一定會變成下一個 agent 穩定遵守的規則。
+
+本系統把工程知識留在可審查的 source repository，並用 routing、contracts、gates 與 validation loop 讓不同 agent 可以重複執行。
+
+| 核心價值 | 說明 |
+| --- | --- |
+| Knowledge Ownership | 工程規則、workflow、判斷準則、失敗模式與驗證方式放在可 version control 的 repository，而不是單一工具的私有狀態。 |
+| Agent Portability | 同一套 source 可由 Cursor、Claude Code、Codex、Roo Code 或自訂 agent 讀取。 |
+| Human Experience Compounding | review、debug、架構決策與 agent 失誤可沉澱成下一次執行會用到的 cognitive structure。 |
+| Executable Governance | 重要流程不只寫成說明，也能被 contract、runtime state、gate 和 validator 檢查。 |
+
+它不是 prompt collection、MCP replacement、LangGraph replacement 或 hosted memory。Prompt、MCP、agent framework 與 memory 都可以成為接入面；本系統的核心是工程知識本身如何被組織、路由、執行、驗證與遷移。
 
 ---
 

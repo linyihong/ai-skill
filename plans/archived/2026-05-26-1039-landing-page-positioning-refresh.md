@@ -1,6 +1,6 @@
 # AI-native Cognitive Execution System Landing Page Refresh
 
-**Status**: `completed`（2026-05-26 executed：root README landing page + `docs/` public overview）
+**Status**: `completed`（2026-05-26 executed：root README landing page + architecture public overview consolidation）
 **世代**：Gen 3 communication layer refresh
 **建立日期**：2026-05-26
 **最後更新**：2026-05-26
@@ -312,11 +312,15 @@ flowchart LR
 
 ### Closeout Evidence
 
-- Diff scope：`README.md`、`docs/README.md`、`docs/overview.md`、plan status/index。
-- Validation：`git diff --check` passed；touched Markdown link check passed；ReadLints returned no diagnostics；document sizing check shows `README.md` 101 lines、`docs/README.md` 23 lines、`docs/overview.md` 82 lines。
+- Diff scope：`README.md`、`architecture/ai-native-cognitive-execution-system.md`、plan status/index；root `docs/` router removed after follow-up consolidation。
+- Validation：`git diff --check` passed；touched Markdown link check passed；ReadLints returned no diagnostics；document sizing remains within threshold。
 - Runtime boundary：未修改 `runtime/`、`knowledge/runtime/`、compiler source 或 generated surfaces；runtime refresh 不適用。
 - Linked updates：`architecture/README.md`、`governance/contributing.md`、`ai-tools/new-project-onboarding.md` 已檢查；本次定位改版只新增 public-facing landing/overview，不改 architecture canonical navigation、maintainer workflow 或 onboarding command semantics，因此無需同步改正文。
 - Tool sync：reference-first；未使用或更新 tool mirror / symlink / copy snapshot，不適用。
+
+### Follow-up Consolidation
+
+- 2026-05-26：`docs/overview.md` 與 architecture canonical entrypoint 內容重疊，已將 public positioning 整合進 `architecture/ai-native-cognitive-execution-system.md`，並移除 root `docs/` router，避免維護第二份系統 overview。
 
 ---
 

@@ -73,7 +73,7 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project /path/to/y
 
 完整說明見 [`ai-tools/new-project-onboarding.md`](ai-tools/new-project-onboarding.md)。
 
-想先理解整體概念，讀 [`docs/overview.md`](docs/overview.md)。想看目前世代的架構入口，讀 [`architecture/ai-native-cognitive-execution-system.md`](architecture/ai-native-cognitive-execution-system.md)。
+想先理解整體概念與目前世代架構，讀 [`architecture/ai-native-cognitive-execution-system.md`](architecture/ai-native-cognitive-execution-system.md)。
 
 ## For Agents
 
@@ -83,7 +83,6 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project /path/to/y
 
 | 路徑 | 用途 |
 | --- | --- |
-| [`docs/`](docs/README.md) | Public overview 與人類讀者入口 |
 | [`architecture/`](architecture/README.md) | 系統世代與 canonical architecture navigation |
 | [`ai-tools/`](ai-tools/README.md) | Tool adapters 與新專案 onboarding |
 | [`enforcement/`](enforcement/README.md) | Agent 必須遵守的共用規則 |
