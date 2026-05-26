@@ -2,7 +2,7 @@
 
 > **本檔為 companion markdown**。Canonical executable contract 在 [`runtime/core-bootstrap.yaml`](runtime/core-bootstrap.yaml)（projected to `runtime/runtime.db generated_surfaces[runtime.core_bootstrap.contract]`）。Agent 應 query SQLite 取得 machine-readable required_reads / per_session_obligations / per_turn_obligations / per_commit_obligations / phase_state_init。本 .md 提供 human-readable rationale、範例與 lazy-load 9 條規則敘述。
 >
-> 修改 obligations / required_reads 規則時必須先改 YAML，本檔同步說明。Phase 5 of `plans/active/2026-05-25-2200-bootstrap-contract-yaml-migration.md` 將擴充 Bootstrap Receipt 加入 `Active per-turn obligations:` 行。
+> 修改 obligations / required_reads 規則時必須先改 YAML，本檔同步說明。Phase 5 of `plans/archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md` 將擴充 Bootstrap Receipt 加入 `Active per-turn obligations:` 行。
 
 本文件是本系統的**最小必讀啟動集合**。本系統已升級為以 runtime state machine、routing registry、governance translation 與 validation gates 驅動的認知執行系統。每個 session 啟動時，Agent 只需載入這 3 條核心規則，其餘規則依任務 lazy-load。
 

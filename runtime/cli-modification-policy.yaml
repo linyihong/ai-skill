@@ -110,7 +110,7 @@ related_failure_patterns:
   - planned: enforcement/failure-patterns/cli-doc-drift.md (Phase 6 of bootstrap-yaml-migration)
 
 linked_plans:
-  - plans/active/2026-05-25-2200-bootstrap-contract-yaml-migration.md (Phase 6 adds validateCLIDocSync)
+  - plans/archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md (Phase 6 adds validateCLIDocSync)
   - plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md (parent CLI build-out)
 
 acceptance:

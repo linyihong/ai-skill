@@ -183,7 +183,7 @@ Out of scope:
 | `governance/document-sizing.md` | README 不膨脹、必要時拆 overview。 |
 | `enforcement/linked-updates.md` | root README 改動的連動更新檢查。 |
 | `enforcement/neutral-language.md` | 本庫可重用文件語言一致性。 |
-| `plans/active/2026-05-25-2200-bootstrap-contract-yaml-migration.md` | 確認 README 不和 bootstrap YAML migration 的 source-of-truth 邊界衝突。 |
+| `plans/archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md` | 確認 README 不和 bootstrap YAML migration 的 source-of-truth 邊界衝突。 |
 | `runtime/core-bootstrap.yaml` | Bootstrap obligations canonical contract；README / overview 不複製其內容。 |
 
 ### Phase 0 完成條件

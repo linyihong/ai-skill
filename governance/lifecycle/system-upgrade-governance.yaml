@@ -97,7 +97,7 @@ steps:
           defer projection (doc-only trial, schema in flux, multi-session evidence
           required) must declare the convergence trajectory up-front to prevent
           silent drift. Mechanical enforcement: validateRuntimeYamlProjects
-          validator (Phase 6 of plans/active/2026-05-25-2200-bootstrap-contract-yaml-migration.md).
+          validator (Phase 6 of plans/archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md).
         added_at: "2026-05-26"
         added_reason: User reminded that 'runtime YAMLs must project to runtime.db' rule was not in plan template; this codifies the exception path.
     gates:

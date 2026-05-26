@@ -219,5 +219,4 @@ acceptance:
   - scenario bootstrap-obligations-enumerable-v1 PASS
 
 source: >
-  2026-05-26 session. Plan plans/active/2026-05-25-2200-bootstrap-contract-
-  yaml-migration.md Phase 2.
+  2026-05-26 session. Plan plans/archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md Phase 2.

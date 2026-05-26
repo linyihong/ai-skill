@@ -10,7 +10,7 @@ failure_source:
   date: "2026-05-26"
   description: |
     CORE_BOOTSTRAP.md is prose-only; obligations cannot be machine-iterated.
-    Phase 2 of plans/active/2026-05-25-2200-bootstrap-contract-yaml-migration.md
+    Phase 2 of plans/archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md
     creates runtime/core-bootstrap.yaml as executable contract.
 
 given:

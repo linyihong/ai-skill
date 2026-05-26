@@ -48,7 +48,7 @@ Canonical contract: [`runtime/cli-modification-policy.yaml`](../../runtime/cli-m
 
 ## Source
 
-- 2026-05-26 session：3 個 subcommand 上線後多日漏 doc；使用者提醒才補 commit `2b106e9`。Phase 6 of [`bootstrap-contract-yaml-migration`](../../plans/active/2026-05-25-2200-bootstrap-contract-yaml-migration.md) 加入 `validateCLIDocSync` 機械強制。
+- 2026-05-26 session：3 個 subcommand 上線後多日漏 doc；使用者提醒才補 commit `2b106e9`。Phase 6 of [`bootstrap-contract-yaml-migration`](../../plans/archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md) 加入 `validateCLIDocSync` 機械強制。
 
 ## Related
 
