@@ -82,6 +82,24 @@ steps:
       - Phase N Test-First Order
       - Completion Criteria
       - Linked Updates
+    conditional_sections:
+      - name: Deferred Runtime Projection
+        required_when: |
+          Plan creates runtime/*.yaml that is not immediately projected
+          (runtime_projection.enabled false or omitted, intentional doc-only or
+          staged-projection trajectory).
+        must_declare:
+          - reason for not projecting
+          - planned projection phase / condition
+        rationale: |
+          Default rule: runtime/*.yaml must declare runtime_projection.enabled: true
+          and project to runtime.db generated_surfaces. Plans that intentionally
+          defer projection (doc-only trial, schema in flux, multi-session evidence
+          required) must declare the convergence trajectory up-front to prevent
+          silent drift. Mechanical enforcement: validateRuntimeYamlProjects
+          validator (Phase 6 of plans/active/2026-05-25-2200-bootstrap-contract-yaml-migration.md).
+        added_at: "2026-05-26"
+        added_reason: User reminded that 'runtime YAMLs must project to runtime.db' rule was not in plan template; this codifies the exception path.
     gates:
       - gate.system_upgrade.plan_sections_complete
 
