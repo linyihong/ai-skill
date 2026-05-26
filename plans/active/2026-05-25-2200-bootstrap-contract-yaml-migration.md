@@ -1,6 +1,6 @@
 # Bootstrap Contract YAML Migration
 
-**Status**: `in-progress`（Phase 0/1/2/3/4/5 ✅ done 2026-05-26；Phase 6/7 待續）
+**Status**: `in-progress`（Phase 0/1/2/3/4/5/6-partial ✅ done 2026-05-26；Phase 6 dispatcher refactor + 4th failure pattern deferred；Phase 7 待續）
 **世代**：Gen 3 子系統演進
 **建立日期**：2026-05-25
 **最後更新**：2026-05-25
@@ -381,12 +381,12 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 
 ### Phase 6 完成條件
 
-- [ ] Hook 從 runtime.db 動態載入 obligation list
-- [ ] Failure pattern 文件
-- [ ] `validateCLIDocSync` 上線 + scenario PASS
-- [ ] `validateRuntimeYamlProjects` 上線 + scenario PASS（containing runtime/*.yaml + missing enabled → block）
-- [ ] `validateMarkdownYamlSync` 上線 + scenario PASS（canonical doc markdown change requires YAML companion update）
-- [ ] CLI modification policy YAML 已 cross-link 到 software-delivery workflow
+- [⏳] Hook 從 runtime.db 動態載入 obligation list — **partial**：per_commit_obligations 已 enumerated 11 個（machine-iterable from runtime.db）；Go dispatcher refactor 留 Phase 7 或 follow-on plan
+- [⏳] Failure pattern 文件 — **3/4 done**（cli-doc-drift、runtime-yaml-unprojected、markdown-yaml-sync-drift 已建；`bootstrap-yaml-bypass.md` deferred，跟 dispatcher refactor 一起做）
+- [x] `validateCLIDocSync` 上線 + scenario PASS
+- [x] `validateRuntimeYamlProjects` 上線 + scenario PASS（containing runtime/*.yaml + missing enabled → block）
+- [x] `validateMarkdownYamlSync` 上線 + scenario PASS（canonical doc markdown change requires YAML companion update）
+- [x] CLI modification policy YAML 已 cross-link 到 software-delivery workflow
 
 ---
 

@@ -93,12 +93,85 @@ per_turn_obligations:
       lowers compliance friction via compact form.
 
 per_commit_obligations:
+  # Enumerated 2026-05-26 (Phase 6 of bootstrap-contract-yaml-migration):
+  # this list is the machine-iterable source-of-truth for commit-msg hook
+  # validators. The dispatcher refactor (read this list → call validator
+  # by name via Go registry map) is deferred to Phase 7 / next session;
+  # currently hooks.go hardcodes the same 11 calls in runCommitMsgHook.
   - id: obligation.commit.cognitive_mode_block
     fires: every_commit
     validator: validateCognitiveContractFormat
     severity: block
     opt_out_marker: "[skip-cognitive-mode]"
-    note: Mechanical commit-msg hook enforcement; block missing → exit 30
+    contract_source: runtime/core-bootstrap.yaml + runtime/cognitive-modes.yaml
+  - id: obligation.commit.execution_mode_floors
+    fires: every_commit_with_cognitive_block
+    validator: validateExecutionModeFloors
+    severity: block
+    contract_source: runtime/cognitive-modes-phase-integration.yaml
+  - id: obligation.commit.governance_mode_consistency
+    fires: every_commit_with_cognitive_block
+    validator: validateGovernanceModeConsistency
+    severity: block
+    contract_source: runtime/cognitive-modes-governance-integration.yaml
+  - id: obligation.commit.memory_mode_subdir
+    fires: every_commit_with_cognitive_block
+    validator: validateMemoryModeSubdir
+    severity: block
+    contract_source: runtime/cognitive-modes-memory-integration.yaml
+  - id: obligation.commit.plan_status_sync
+    fires: every_commit
+    validator: validatePlanStatusSync
+    severity: block
+    opt_out_marker: "[skip-plan-status-sync]"
+    contract_source: runtime/plan-status-sync-enforcement.yaml
+  - id: obligation.commit.token_budget
+    fires: every_commit_with_cognitive_block_and_estimate
+    validator: validateTokenBudget
+    severity: block
+    opt_out_marker: "[skip-token-budget]"
+    contract_source: runtime/cognitive-modes-token-budget.yaml
+  - id: obligation.commit.adaptive_triggers
+    fires: every_commit_with_cognitive_block
+    validator: validateAdaptiveTriggers
+    severity: block
+    opt_out_marker: "[skip-adaptive]"
+    contract_source: runtime/cognitive-modes-adaptive.yaml
+  - id: obligation.commit.bootstrap_entry_thinness
+    fires: every_commit_staging_entry_files
+    validator: validateBootstrapEntryThinness
+    severity: block
+    opt_out_marker: "[skip-bootstrap-thinness]"
+    contract_source: runtime/bootstrap-entry-points.yaml
+  - id: obligation.commit.cli_doc_sync
+    fires: every_commit_staging_ai_skill_cli_go
+    validator: validateCLIDocSync
+    severity: block
+    opt_out_marker: "[skip-cli-doc-sync]"
+    contract_source: runtime/cli-modification-policy.yaml
+  - id: obligation.commit.runtime_yaml_projects
+    fires: every_commit_staging_runtime_yaml
+    validator: validateRuntimeYamlProjects
+    severity: block
+    opt_out_marker: "[skip-runtime-yaml-projection]"
+    contract_source: runtime/core-bootstrap.yaml + governance/lifecycle/system-upgrade-governance.yaml
+  - id: obligation.commit.markdown_yaml_sync
+    fires: every_commit_staging_md_with_sibling_yaml
+    validator: validateMarkdownYamlSync
+    severity: block
+    opt_out_marker: "[skip-markdown-yaml-sync]"
+    contract_source: runtime/core-bootstrap.yaml (enumeration); enforcement/failure-patterns/markdown-yaml-sync-drift.md (rationale)
+
+per_commit_dispatcher_status:
+  machine_iterable: true
+  go_dispatch_refactor: deferred
+  reason: |
+    hooks.go runCommitMsgHook currently hardcodes 11 validator calls in
+    a fixed order. Future dispatcher refactor will read per_commit_obligations
+    list, look up validator by name via a Go registry map, dispatch in
+    declared order. Refactor risk is non-trivial (must preserve ordering,
+    opt-out semantics, error aggregation) and is deferred to Phase 7 of
+    bootstrap-contract-yaml-migration or a follow-on plan.
 
 phase_state_init:
   source: runtime/runtime.db
