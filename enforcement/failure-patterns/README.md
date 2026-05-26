@@ -25,6 +25,9 @@
 | [Skill classification boundary confusion](skill-classification-boundary-confusion.md) | `scope-drift` | candidate | 防止 agent 在處理多 skill feedback lessons 時，把 A skill 的 analysis technique 放到 B skill 的 feedback_history；放置位置由 skill scope 決定，不是 lesson 技術主題。 |
 | [Cognitive mode resolution bypass](cognitive-mode-resolution-bypass.md) | `process-gap` / `governance-drift` | candidate | 防止 agent 跳過 cognitive mode 解析（execution/context/governance/memory）直接執行，導致壓縮策略錯誤、governance gate 未激活、memory isolation 失效。 |
 | [Bootstrap bypass on resume](bootstrap-bypass-on-resume.md) | `process-gap` / `governance-drift` | validated | 防止 agent 從 conversation summary 被喚起時，把 "Resume directly" 對話 framing 當成 runtime/governance bootstrap 豁免，跳過 CORE_BOOTSTRAP.md / runtime.db 查詢與 Bootstrap Receipt 輸出。 |
+| [CLI doc drift](cli-doc-drift.md) | `source-of-truth-duplication` / `governance-drift` | validated | 防止 Go 改了 CLI subcommand / hook handler 但 `scripts/ai-skill-cli/docs/command-contract.md` 沒同步。對應 validator: `validateCLIDocSync`；canonical rule: `runtime/cli-modification-policy.yaml`。 |
+| [Runtime YAML unprojected](runtime-yaml-unprojected.md) | `source-of-truth-duplication` / `governance-drift` | validated | 防止 `runtime/*.yaml` 沒設 `runtime_projection.enabled: true` 或缺 `target_key`，compiler silent skip 導致規則寫了不生效。對應 validator: `validateRuntimeYamlProjects`；plan 例外路徑: §Deferred Runtime Projection。 |
+| [Markdown / YAML sync drift](markdown-yaml-sync-drift.md) | `source-of-truth-duplication` / `governance-drift` | validated | 防止改 canonical doc markdown 但沒同步改 sibling YAML companion。對應 validator: `validateMarkdownYamlSync`（sibling-pair only；cross-path mapping 列入 Phase 7 backlog）。 |
 
 ## 維護
 
