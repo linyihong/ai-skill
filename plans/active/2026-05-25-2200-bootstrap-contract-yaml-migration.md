@@ -1,6 +1,6 @@
 # Bootstrap Contract YAML Migration
 
-**Status**: `in-progress`（Phase 0 ✅ + Phase 1 ✅ + Phase 2 ✅ + Phase 4 ✅ done 2026-05-26；Phase 3 (helper CLI) + Phase 5/6/7 待續）
+**Status**: `in-progress`（Phase 0/1/2/3/4 ✅ done 2026-05-26；Phase 5/6/7 待續）
 **世代**：Gen 3 子系統演進
 **建立日期**：2026-05-25
 **最後更新**：2026-05-25
@@ -308,8 +308,8 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 
 ### Phase 3 完成條件
 
-- [ ] Obligations 可從 runtime.db 個別取出
-- [ ] CLI helper 通過
+- [x] Obligations 可從 runtime.db 個別取出（JSON1 query 已驗證；Phase 2 中 scenario `bootstrap-obligations-enumerable-v1` PASS）
+- [x] CLI helper：`ai-skill runtime obligations` 列出 per_session / per_turn / per_commit obligation IDs（read-only observability surface）
 
 ---
 

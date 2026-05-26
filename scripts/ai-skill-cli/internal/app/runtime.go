@@ -131,11 +131,11 @@ type runtimeIndexEdge struct {
 
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query> [flags]")
+		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query|obligations> [flags]")
 		return ExitInvalidUsage
 	}
 	opts := runtimeOptions{command: args[0], limit: 8}
-	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" && opts.command != "query" {
+	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" && opts.command != "query" && opts.command != "obligations" {
 		_, _ = fmt.Fprintf(stderr, "unsupported runtime command: %s\n", opts.command)
 		return ExitInvalidUsage
 	}
@@ -191,9 +191,87 @@ func buildRuntimeResult(opts runtimeOptions) Result {
 		return buildRuntimeQueryResult(opts)
 	case "refresh":
 		return buildRuntimeRefreshResult(opts)
+	case "obligations":
+		return buildRuntimeObligationsResult(opts)
 	default:
 		return buildRuntimeValidateResult(opts)
 	}
+}
+
+// buildRuntimeObligationsResult implements bootstrap-contract-yaml-migration
+// Phase 3: read runtime.db generated_surfaces[runtime.core_bootstrap.contract]
+// and list per_session / per_turn / per_commit obligations as a flat
+// observability surface. Source-of-truth for the data is
+// runtime/core-bootstrap.yaml; this CLI is read-only.
+func buildRuntimeObligationsResult(opts runtimeOptions) Result {
+	result := Result{
+		Command:        "runtime obligations",
+		Mode:           "native",
+		Status:         "success",
+		ExitCode:       ExitSuccess,
+		Checks:         []Check{},
+		PlannedActions: []string{},
+		Mutations:      []string{},
+	}
+	root, repoCheck := closeLoopRepoRoot(opts.repoPath)
+	result.Checks = append(result.Checks, repoCheck)
+	if repoCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitInvalidUsage
+		result.Error = &CommandError{Code: "invalid_repo", Message: repoCheck.Message}
+		return result
+	}
+	dbPath := filepath.Join(root, "runtime", "runtime.db")
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		result.Status = "blocked"
+		result.ExitCode = ExitGeneralFailure
+		result.Error = &CommandError{Code: "runtime_db_open_failed", Message: err.Error()}
+		return result
+	}
+	defer db.Close()
+	var raw string
+	err = db.QueryRow("SELECT data FROM generated_surfaces WHERE target_key='runtime.core_bootstrap.contract' LIMIT 1").Scan(&raw)
+	if err != nil {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{
+			Code:        "core_bootstrap_contract_missing",
+			Message:     "runtime.core_bootstrap.contract not found in generated_surfaces: " + err.Error(),
+			Remediation: "Run `ai-skill runtime compile + refresh` to project runtime/core-bootstrap.yaml.",
+		}
+		return result
+	}
+	var doc map[string]any
+	if err := json.Unmarshal([]byte(raw), &doc); err != nil {
+		result.Status = "blocked"
+		result.ExitCode = ExitGeneralFailure
+		result.Error = &CommandError{Code: "core_bootstrap_json_invalid", Message: err.Error()}
+		return result
+	}
+	listIDs := func(key string) []string {
+		arr, _ := doc[key].([]any)
+		ids := make([]string, 0, len(arr))
+		for _, item := range arr {
+			m, ok := item.(map[string]any)
+			if !ok {
+				continue
+			}
+			if id, ok := m["id"].(string); ok {
+				ids = append(ids, id)
+			}
+		}
+		return ids
+	}
+	perSession := listIDs("per_session_obligations")
+	perTurn := listIDs("per_turn_obligations")
+	perCommit := listIDs("per_commit_obligations")
+	result.Checks = append(result.Checks,
+		Check{Name: "per_session_obligations", Status: "ok", Message: strings.Join(perSession, ", ")},
+		Check{Name: "per_turn_obligations", Status: "ok", Message: strings.Join(perTurn, ", ")},
+		Check{Name: "per_commit_obligations", Status: "ok", Message: strings.Join(perCommit, ", ")},
+	)
+	return result
 }
 
 func buildRuntimeValidateResult(opts runtimeOptions) Result {
