@@ -1,11 +1,11 @@
-# Landing Page Positioning Refresh
+# AI-native Cognitive Execution System Landing Page Refresh
 
 **Status**: `draft`
 **世代**：Gen 3 communication layer refresh
 **建立日期**：2026-05-26
 **最後更新**：2026-05-26
 
-> 本 plan 回應外部反饋：目前根 `README.md` 比較像 framework internal brain dump，對第一次進入的 outsider cognitive load 太高。目標是把第一屏改成 public-facing landing page，先說清楚 Ai-skill 是什麼、為什麼存在、和一般 prompt / agent framework 有什麼不同，再把 runtime、bootstrap、治理與維護細節分流到既有 canonical 文件。
+> 本 plan 回應外部反饋：目前根 `README.md` 比較像 framework internal brain dump，對第一次進入的 outsider cognitive load 太高。目標是把第一屏改成 public-facing landing page，先說清楚 **AI-native Cognitive Execution System** 是什麼、為什麼存在、和一般 prompt / agent framework 有什麼不同，再把 runtime、bootstrap、治理與維護細節分流到既有 canonical 文件。`Ai-skill` 目前只視為尚未改名的 GitHub repo slug / bootstrap repo 名稱，不作為正式 public system name。
 
 ---
 
@@ -17,14 +17,14 @@
 
 1. **第一屏直接進 internal bootstrap**
    - 目前開頭是 `AI-native Cognitive Execution System`、Quickstart、OS Layout。
-   - 對已經知道 Ai-skill 的 agent 有用，但 outsider 還不知道「這到底是什麼」。
+   - 對已經知道本 repo 的 agent 有用，但 outsider 還不知道「這到底是什麼」。
 
 2. **定位語言不夠 public-facing**
    - 現有文件強調 runtime state machine、routing、obligation、gates、generated surfaces。
    - 這些是系統能力，但不是第一個 GitHub reader 需要先理解的 mental entry point。
 
 3. **核心價值尚未被壓縮**
-   - Ai-skill 的強點不是「又一個 agent 工具」。
+   - AI-native Cognitive Execution System 的強點不是「又一個 agent 工具」。
    - 更接近：把人的工程經驗轉成可攜、可版本化、可驗證、可被不同 AI agent 重複執行的 cognitive structure。
 
 4. **工具變動速度高於知識生命週期**
@@ -36,20 +36,21 @@
 
 將根 `README.md` 改成 public-facing landing page，第一屏先回答：
 
-- What: Ai-skill 是什麼。
+- What: AI-native Cognitive Execution System 是什麼。
+- Naming: 正式名稱是 `AI-native Cognitive Execution System`；`Ai-skill` 只是目前 repo slug，直到 GitHub repo rename 完成。
 - Why: 為什麼現代 AI workflow 需要它。
 - Why Different: 它和 prompt collection、MCP、LangGraph、agent framework、hosted memory 的差異。
 
 核心定位：
 
 ```text
-Ai-skill is an AI-native cognitive execution framework for accumulating engineering knowledge without vendor lock-in.
+AI-native Cognitive Execution System is a framework for accumulating engineering knowledge without vendor lock-in.
 ```
 
 中文定位：
 
 ```text
-Ai-skill 是一套 AI-native 認知執行框架，用可攜、可版本化、可演化的結構累積工程知識，而不被單一 Agent、模型或工具綁架。
+AI-native Cognitive Execution System 是一套 AI-native 認知執行框架，用可攜、可版本化、可演化的結構累積工程知識，而不被單一 Agent、模型或工具綁架。
 ```
 
 第一屏採中英雙標語：
@@ -79,7 +80,7 @@ AI-native cognitive execution framework for portable engineering knowledge.
 
 這是 communication layer 與 public entrypoint 改版，不改變 runtime contract、workflow semantics、source-of-truth 或 architectural invariant。
 
-若未來決定「Ai-skill 的正式產品定位、命名、public taxonomy」成為 cross-project、long-lived、expensive-to-reverse 的架構決策，再評估是否 promotion 到 ADR 或 constitution-level decision。
+若未來決定「AI-native Cognitive Execution System 的正式產品定位、命名、public taxonomy」成為 cross-project、long-lived、expensive-to-reverse 的架構決策，再評估是否 promotion 到 ADR 或 constitution-level decision。GitHub repo slug 從 `Ai-skill` 改名可作為後續 repo migration task，不在本 plan 直接處理。
 
 ### ADR Promotion Criteria（completed 時驗證）
 
@@ -92,7 +93,7 @@ AI-native cognitive execution framework for portable engineering knowledge.
 
 #### 正面
 
-- 新讀者先理解「Ai-skill 是什麼」，再進入 runtime 細節。
+- 新讀者先理解「AI-native Cognitive Execution System 是什麼」，再進入 runtime 細節。
 - README 第一屏降低 cognitive load。
 - Knowledge Ownership、Agent Portability、Human Experience Compounding 三個核心差異更明確。
 - 內部 bootstrap / runtime 細節仍保留在 `CORE_BOOTSTRAP.md` companion、`runtime/core-bootstrap.yaml` 與 `runtime/runtime.db`，不造成 source-of-truth duplication。
@@ -198,13 +199,13 @@ Out of scope:
 
 ### 目標結構
 
-1. Hero: `Ai-skill` + 中英 tagline。
+1. Hero: `AI-native Cognitive Execution System` + 中英 tagline。
 2. One paragraph positioning。
 3. The Problem。
 4. The Goal。
-5. What Ai-skill Enables。
+5. What The System Enables。
 6. Works With。
-7. What Ai-skill Is Not。
+7. What It Is Not。
 8. Why Different。
 9. Quick Start。
 10. Architecture Overview + 簡圖。
@@ -214,26 +215,28 @@ Out of scope:
 ### Draft Hero Copy
 
 ```markdown
-# Ai-skill
+# AI-native Cognitive Execution System
 
 AI-native cognitive execution framework for portable engineering knowledge.
 
 可攜式工程知識的 AI-native 認知執行框架。
 
-Ai-skill is an AI-native cognitive execution framework for accumulating engineering knowledge without vendor lock-in.
+AI-native Cognitive Execution System is a framework for accumulating engineering knowledge without vendor lock-in.
 
-Instead of locking knowledge inside a specific AI tool, model, hosted memory, or agent runtime, Ai-skill stores engineering experience as portable, versionable, reusable cognitive structures.
+Instead of locking knowledge inside a specific AI tool, model, hosted memory, or agent runtime, it stores engineering experience as portable, versionable, reusable cognitive structures.
+
+Note: this project currently lives in the `Ai-skill` GitHub repository. The repository name has not been renamed yet.
 ```
 
 ### README 簡圖草案
 
 ```mermaid
 flowchart LR
-    HumanKnowledge["Human engineering knowledge"] --> AiSkill["Ai-skill portable cognitive structures"]
-    AiSkill --> Runtime["Cognitive runtime and routing"]
+    HumanKnowledge["Human engineering knowledge"] --> CognitiveSystem["Portable cognitive structures"]
+    CognitiveSystem --> Runtime["Cognitive runtime and routing"]
     Runtime --> Agents["Cursor / Claude / Codex / Custom agents"]
     Agents --> Verification["Structured verification loop"]
-    Verification --> AiSkill
+    Verification --> CognitiveSystem
 ```
 
 ### For Agents 最短入口草案
@@ -248,7 +251,7 @@ flowchart LR
 
 - [ ] README 第一屏完成。
 - [ ] README 以中文正文為主，英文保留 tagline、工具名、專有名詞與 public ecosystem term。
-- [ ] README 含 `What Ai-skill Is Not` 區塊。
+- [ ] README 含 `What It Is Not` 區塊。
 - [ ] README 含輕量 architecture map 簡圖。
 - [ ] bootstrap / OS layout 下移並縮成 `For Agents` 最短入口，不保留完整 agent workflow。
 - [ ] Quick Start 連到 `ai-tools/new-project-onboarding.md`。
@@ -271,7 +274,7 @@ flowchart LR
 
 ### `docs/overview.md` 建議章節
 
-1. Ai-skill 是什麼。
+1. AI-native Cognitive Execution System 是什麼。
 2. 解決什麼問題。
 3. 核心價值：Knowledge Ownership / Agent Portability / Human Experience Compounding。
 4. 與 prompt engineering 的差異。
