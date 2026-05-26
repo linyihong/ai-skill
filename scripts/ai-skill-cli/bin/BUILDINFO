@@ -1,4 +1,4 @@
-version=repo-4a0d406-pending
-source_commit=4a0d406-pending
-built_at=2026-05-26T05:02:27Z
+version=repo-97282f4
+source_commit=97282f4
+built_at=2026-05-26T05:05:03Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
