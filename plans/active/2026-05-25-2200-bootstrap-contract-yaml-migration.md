@@ -374,12 +374,15 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 - [ ] **`runtime/cli-modification-policy.yaml`** 已建立並 projected（連結 `workflow/software-delivery/` 為 parent workflow）
 - [ ] **`validateRuntimeYamlProjects` validator**（registered 2026-05-26）：commit 含 staged `runtime/*.yaml` 時，每個 YAML 必須含 `runtime_projection.enabled: true` 且 `target_key` 已設。否則 block。Compiler 目前 silent-skip 缺 enabled 的 YAML → drift risk。原因：本 session audit 發現「runtime YAML 必須 project 到 runtime.db」規則沒機械強制，使用者提醒才檢查（11/11 目前 PASS，但需 enforcement 防止未來缺）。scenario `runtime-yaml-projects-v1`；failure pattern `runtime-yaml-unprojected.md`
 - [ ] **Plan template rule**：在 `plans/README.md` §Plan 模板必填章節 表加「若 plan 建立 `runtime/*.yaml` 但**不立即 project** 到 `runtime.db`（外放 → 後續收斂模式），必須在 §Decision Rationale 或 §Runtime Execution Path 明寫 (a) 不 project 的 reason、(b) 預定 project 的 phase / 條件」
+- [ ] **`validateMarkdownYamlSync` validator**（registered 2026-05-26）：commit 修改 governance / plan / contract 類 markdown 含 required-section list、obligation 內容、template rule 等 canonical content 時，必須同 commit 修改對應 `.yaml` companion（如 `governance/lifecycle/system-upgrade-governance.yaml`、`runtime/core-bootstrap.yaml` 等）。原因：本 session 連續兩次同類失誤（commit-contract.md drift `2b106e9`、system-upgrade-governance.yaml drift `ff941c3`）證明 markdown-only 修改是 systemic gap。實作方向：detect markdown changes in known canonical doc paths（governance/lifecycle/*.md、plans/README.md、CORE_BOOTSTRAP.md 等）→ 對應 `.yaml` 同名 / 同 owner_layer 必須一同 staged。scenario `markdown-yaml-sync-v1`；failure pattern `markdown-yaml-sync-drift.md`
 
 ### Phase 6 完成條件
 
 - [ ] Hook 從 runtime.db 動態載入 obligation list
 - [ ] Failure pattern 文件
 - [ ] `validateCLIDocSync` 上線 + scenario PASS
+- [ ] `validateRuntimeYamlProjects` 上線 + scenario PASS（containing runtime/*.yaml + missing enabled → block）
+- [ ] `validateMarkdownYamlSync` 上線 + scenario PASS（canonical doc markdown change requires YAML companion update）
 - [ ] CLI modification policy YAML 已 cross-link 到 software-delivery workflow
 
 ---
