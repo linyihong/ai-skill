@@ -1,6 +1,6 @@
 # Runtime Cognitive Contract v2
 
-**Status**: `draft`
+**Status**: `in-progress`（Phase 0 ✅ done 2026-05-25）
 **世代**：Gen 3 子系統演進（ADR-008 amendment 或 superseding，pending Phase 7 評估）
 **建立日期**：2026-05-25
 **最後更新**：2026-05-25
@@ -210,9 +210,20 @@ Capability summary:
 
 ### Phase 0 完成條件
 
-- [ ] 上面 4 tasks all done
-- [ ] No breaking-change conflict surfaced
-- [ ] 若有 conflict，更新 plan §Decision 或新增 Open Question
+- [x] 上面 4 tasks all done
+- [x] No breaking-change conflict surfaced
+- [x] 若有 conflict，更新 plan §Decision 或新增 Open Question
+
+### Phase 0 Findings（2026-05-25）
+
+1. **Schema compat ✓**：6 個 cognitive-modes-*.yaml 使用 4-dim 值（FAST/NORMAL/...）但無 dim 名稱 conflict；v2 加 `validation_mode` + `cognitive_cost` 是純 additive 擴充
+2. **Signal vocabulary ✓**：discovery YAML 含 14 signals（`user_keyword_fast/_deep/_recovery`、`file_diff_governance_enforcement/_notes_ephemeral/_runtime_schema`、`git_status_multi_owner_dirty`、`session_turns_high`、`recent_failure_repeat`、`phase_machine_bootstrap/_validation`、`active_goals_locked_or_multiple`、`token_budget_low/_critical`）— 全部可直接作 `activation_reason` value
+3. **Hook 入口確認**：現有 7 validators（block presence inline + 6 individual validators）。v2 需要：
+   - 提取 inline block presence check 為 `validateCognitiveContractFormat`（接受 compact 或 full）
+   - 新增 `validateActivationSignals`（signal name ∈ 14 known list，從 generated_surfaces 動態讀）
+   - 新增 `validateCognitiveCost`（declared cost vs derived from execution × context lookup）
+   - 新增 `validateCapabilitySnippet`（high-risk mode 必含 snippet）
+4. **Canonical template**：[`models/cognitive-modes/README.md`](../../models/cognitive-modes/README.md) §Final Report Cognitive Mode 區塊範本（line 76）為 v2 block template 主要更新點 — Phase 2 task
 
 ---
 
