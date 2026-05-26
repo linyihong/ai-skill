@@ -1,6 +1,6 @@
 # Bootstrap Contract YAML Migration
 
-**Status**: `in-progress`（Phase 0/1/2/3/4 ✅ done 2026-05-26；Phase 5/6/7 待續）
+**Status**: `in-progress`（Phase 0/1/2/3/4/5 ✅ done 2026-05-26；Phase 6/7 待續）
 **世代**：Gen 3 子系統演進
 **建立日期**：2026-05-25
 **最後更新**：2026-05-25
@@ -254,9 +254,9 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 
 ### Phase 0 完成條件
 
-- [ ] 5 tasks all done
-- [ ] No breaking-change conflict
-- [ ] 若有 conflict 更新 §Decision 或加 Open Question
+- [x] 5 tasks all done（inventory 4 tools + schema 對齊 + JSON1 確認可用 + YAML 放 runtime/ 不改 sourceRoots + Receipt format 升級規劃）
+- [x] No breaking-change conflict
+- [x] 若有 conflict 更新 §Decision 或加 Open Question（無 conflict，無新增 OQ）
 
 ---
 
@@ -274,8 +274,8 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 
 ### Phase 1 完成條件
 
-- [ ] 7 scenarios 寫好且 initial state = FAIL
-- [ ] Atomic test-first commit
+- [x] 7 scenarios 寫好且 initial state = FAIL（6 FAIL + 1 benign PASS due to size cap）
+- [x] Atomic test-first commit（`0dcbd88`）
 
 ---
 
@@ -357,8 +357,11 @@ Agent first turn 就看到自己這 session 要遵守哪些 per-turn obligations
 
 ### Phase 5 完成條件
 
-- [ ] Receipt 升級 backward-compat
-- [ ] Scenario PASS
+- [x] Receipt 升級 backward-compat（YAML 同時保留 `format_template` enhanced + `format_template_legacy` 舊形式）
+- [x] Scenario `receipt-includes-active-obligations-v1` PASS（YAML + .md companion 都含 "Active per-turn obligations" 字串）
+- [x] Open Question 2 resolved（列名 over 計數）
+- [x] CORE_BOOTSTRAP.md companion 範例升級為 two-line enhanced 形式
+- [x] runtime/core-bootstrap.yaml `receipt_format_enhancement_pending` section 改為 `receipt_format_enhancement.status: landed_2026_05_26`
 
 ---
 

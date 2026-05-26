@@ -65,15 +65,23 @@
 
 ## Bootstrap Receipt（強制 first-turn 輸出）
 
-> **IMPORTANT**：完成上述啟動流程後，**必須**在 first user-facing message 包含一行 Bootstrap Receipt，才能執行任何非-Read 工具（Edit/Write/Bash/git/...）。Resume / continuation session 同樣適用 — summary 的「Resume directly」**不豁免**此 obligation。
+> **IMPORTANT**：完成上述啟動流程後，**必須**在 first user-facing message 包含 Bootstrap Receipt，才能執行任何非-Read 工具（Edit/Write/Bash/git/...）。Resume / continuation session 同樣適用 — summary 的「Resume directly」**不豁免**此 obligation。
 
-格式：
+格式（2026-05-26 起 enhanced two-line 為 canonical preferred）：
 
 ```
 Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
+Active per-turn obligations: <comma-separated obligation ids>
 ```
 
-範例：`Bootstrap: rules=✓ phase=phase.bootstrap obligations=1 gates=2`
+範例：
+
+```
+Bootstrap: rules=✓ phase=phase.bootstrap obligations=1 gates=2
+Active per-turn obligations: obligation.cognitive.mode_report
+```
+
+**Backward compat**：legacy 單行 Receipt（無 `Active per-turn obligations` 行）仍接受，但新 session 應採 enhanced 形式。
 
 | 欄位 | 來源 |
 |---|---|
@@ -81,6 +89,9 @@ Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
 | `phase=<id>` | `SELECT id FROM phase_machine WHERE active=1` |
 | `obligations=<n>` | `SELECT COUNT(*) FROM obligations WHERE phase=<current>` |
 | `gates=<n>` | `SELECT COUNT(*) FROM gates WHERE phase=<current>` |
+| `Active per-turn obligations` | `ai-skill runtime obligations` → `per_turn_obligations` 欄位，或 SQLite JSON1 `json_extract(data, '$.per_turn_obligations[*].id')` from `generated_surfaces[runtime.core_bootstrap.contract]` |
+
+**為什麼列名而非計數**（Open Question 2 resolution）：agent first-turn 必須看到 obligation **名字**才會內化；只看 count 不知道要做什麼。Token 成本 ≈ 50-80 / Receipt 可接受。
 
 未輸出即執行非-Read 工具，違反 `obligation.bootstrap.receipt_acknowledged`，命中 `gate.bootstrap.receipt_present`，並觸發 [`enforcement/failure-patterns/bootstrap-bypass-on-resume.md`](enforcement/failure-patterns/bootstrap-bypass-on-resume.md)。
 

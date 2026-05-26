@@ -43,13 +43,33 @@ required_reads:
 per_session_obligations:
   - id: obligation.bootstrap.receipt
     fires: first_turn_before_any_non_read_tool
-    format_template: "Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>"
+    format_template: |
+      Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
+      Active per-turn obligations: <comma-separated obligation ids from per_turn_obligations>
+    format_template_legacy: "Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>"
+    format_backward_compat: |
+      Legacy single-line Receipt (without "Active per-turn obligations:" line)
+      remains accepted. Enhanced two-line form is the canonical preferred
+      format from 2026-05-26 onward (Phase 5 of bootstrap-contract-yaml-migration).
     enforcement_layer: behavioral_forcing
-    forcing_function: numeric values require runtime.db query (cannot be memorized)
+    forcing_function: |
+      Numeric values require runtime.db query (cannot be memorized).
+      Active per-turn obligations list requires querying
+      generated_surfaces[runtime.core_bootstrap.contract].per_turn_obligations
+      via `ai-skill runtime obligations` (or equivalent SQLite JSON1 query).
     severity: high
     blocking_gate_id: gate.bootstrap.receipt_present
     obligation_ledger_id: obligation.bootstrap.receipt_acknowledged
     resume_exempt: false
+    open_question_2_resolved: |
+      List obligation IDs (names), not counts. Rationale: agent first
+      turn must see the actual obligation names to internalize them; a
+      count is opaque ("3 obligations" doesn't tell agent what they are).
+      Token cost ≈ 50-80 tokens per Receipt, acceptable for the
+      visibility gain.
+    example_enhanced: |
+      Bootstrap: rules=✓ phase=phase.bootstrap obligations=1 gates=2
+      Active per-turn obligations: obligation.cognitive.mode_report
     note: |
       Summary "Resume directly" does NOT exempt this obligation; resume
       sessions still emit Receipt on first user-facing message.
@@ -97,16 +117,16 @@ phase_state_init:
     - gates (blocking per current phase)
     - language_policy + output_rules + governance_gates (output framing)
 
-receipt_format_enhancement_pending:
-  description: |
-    Phase 5 of bootstrap-contract-yaml-migration plan will extend
-    format_template to include an "Active per-turn obligations:" line
-    listing per_turn_obligations[].id values. Until Phase 5 lands, the
-    legacy single-line Receipt remains the canonical form.
-  enhanced_format_preview: |
-    Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
-    Active per-turn obligations: cognitive.mode_report
-  status: deferred_to_phase_5
+receipt_format_enhancement:
+  status: landed_2026_05_26
+  phase: bootstrap-contract-yaml-migration Phase 5
+  see: per_session_obligations[obligation.bootstrap.receipt].format_template
+  open_question_2_resolution: |
+    List obligation IDs (names) rather than counts. Agent first-turn
+    visibility outweighs the ~50-80 token cost.
+  backward_compat: |
+    Legacy single-line Receipt accepted; enhanced two-line form is
+    canonical preferred from 2026-05-26.
 
 companion_markdown: CORE_BOOTSTRAP.md
 companion_role: |
