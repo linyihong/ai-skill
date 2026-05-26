@@ -1,0 +1,69 @@
+# Source: Phase 1 — Runtime Cognitive Contract v2 (test-first)
+# Test-first per system-upgrade-governance §3 Rule 9
+id: phase6-cognitive-contract-v2-full-form-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: label-without-contract
+  class: process-gap / governance-drift
+  date: "2026-05-26"
+  description: |
+    v1 block contains 4 dimensions (execution, context, governance, memory).
+    v2 adds 2 new dimensions: validation_mode and cognitive_cost. When any
+    of the 6 dimensions is non-default, the full table form is required,
+    including an activation_reason field citing ≥1 known discovery signal.
+
+    Full form is required when any dim ≠ default value OR task is high-risk
+    (execution_mode ∈ {DEEP, FORENSIC, RECOVERY} or governance_mode ∈
+    {STRICT, LOCKDOWN}).
+
+    Expected full form structure:
+      | execution_mode    | <value>      |
+      | context_mode      | <value>      |
+      | governance_mode   | <value>      |
+      | memory_mode       | <value>      |
+      | validation_mode   | <value>      |  ← new in v2
+      | cognitive_cost    | <value>      |  ← new in v2
+      activation_reason:
+        - <signal_name>
+
+    Phase 2 implementation will add validation_mode + cognitive_cost dims
+    to the validateCognitiveModeBlock parser.
+
+given:
+  task: phase_6_full_form_check
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go (validateCognitiveModeBlock)
+    - runtime/cognitive-modes.yaml (v2 section with 6-dim full form spec)
+  signals:
+    - hooks.go parses 6-dim full form (including validation_mode, cognitive_cost)
+    - runtime/cognitive-modes.yaml specifies full form with 6 dims
+    - non-default dim commits must use full form (hook enforces)
+
+when:
+  action: phase_6_full_form_check
+
+then:
+  expected_route:
+    - hooks.go parses validation_mode row in full table
+    - hooks.go parses cognitive_cost row in full table
+    - full form with non-default dim → hook PASS (if signals + cost valid)
+    - compact form with non-default dim → hook BLOCK
+    - runtime/cognitive-modes.yaml v2 section contains full_form spec with 6 dims
+  forbidden_routes:
+    - validation_mode_row_ignored_silently
+    - cognitive_cost_row_ignored_silently
+    - compact_accepted_when_non_default_dim_present
+    - claim_done_without_6_dim_parser
+
+validation:
+  detection_command: |
+    hk_vm=$(grep -c 'validation_mode' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null || echo 0)
+    hk_cc=$(grep -c 'cognitive_cost' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null || echo 0)
+    yaml_6=$(grep -c 'validation_mode' runtime/cognitive-modes.yaml 2>/dev/null || echo 0)
+    [ "${hk_vm:-0}" -ge 1 ] && [ "${hk_cc:-0}" -ge 1 ] && [ "${yaml_6:-0}" -ge 1 ] && echo "PASS" || echo "FAIL hk_vm=${hk_vm:-0} hk_cc=${hk_cc:-0} yaml_6=${yaml_6:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（validation_mode and cognitive_cost dims not yet in hooks.go or yaml）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

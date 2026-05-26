@@ -1,0 +1,69 @@
+# Source: Phase 1 — Runtime Cognitive Contract v2 (test-first)
+# Test-first per system-upgrade-governance §3 Rule 9
+id: phase6-cognitive-contract-v2-activation-signal-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: self-describing-drift
+  class: inflated-reporting / governance-drift
+  date: "2026-05-26"
+  description: |
+    v1 has no enforcement on activation_reason content. Agent can write any
+    free-form text or omit activation_reason entirely. This allows inflated
+    cognitive reporting — agent declares DEEP mode with no traceable signal.
+
+    v2 requires activation_reason to cite ≥1 signal from the 14 known signals
+    in runtime/cognitive-modes-discovery.yaml. Unknown signal name → hook BLOCK.
+    The 14 known signals are:
+      user_keyword_fast, user_keyword_deep, user_keyword_recovery,
+      file_diff_governance_enforcement, file_diff_notes_ephemeral,
+      file_diff_runtime_schema, git_status_multi_owner_dirty,
+      session_turns_high, recent_failure_repeat,
+      phase_machine_bootstrap, phase_machine_validation,
+      active_goals_locked_or_multiple, token_budget_low, token_budget_critical.
+
+    Hook must read known signal list from generated_surfaces (dynamic) rather
+    than hardcode, so signal vocabulary stays in sync with discovery YAML.
+
+    Phase 4 implementation will add validateActivationSignals to hooks.go.
+
+given:
+  task: phase_6_activation_signal_check
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go (validateActivationSignals)
+    - runtime/runtime.db (generated_surfaces row for cognitive_modes.discovery)
+    - scripts/ai-skill-cli/internal/app/hooks_test.go (activation signal tests)
+  signals:
+    - validateActivationSignals function exists in hooks.go
+    - runCommitMsgHook calls validateActivationSignals
+    - generated_surfaces contains projected discovery signal list
+    - unit tests cover: valid signal → PASS, unknown signal → BLOCK, empty activation_reason on non-trivial → BLOCK
+
+when:
+  action: phase_6_activation_signal_check
+
+then:
+  expected_route:
+    - commit with activation_reason citing known signal → hook PASS
+    - commit with activation_reason citing unknown/free-form signal → hook BLOCK
+    - full form without activation_reason on non-compact → hook BLOCK
+    - hooks.go reads known signal list from generated_surfaces (not hardcoded)
+    - 3+ unit tests for activation signal validation
+  forbidden_routes:
+    - unknown_signal_name_accepted_silently
+    - activation_reason_optional_with_no_enforcement
+    - signal_list_hardcoded_in_validator
+    - claim_done_without_validateActivationSignals
+
+validation:
+  detection_command: |
+    fn=$(grep -c 'func validateActivationSignals' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null || echo 0)
+    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null | grep -c 'validateActivationSignals' || echo 0)
+    gs=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key LIKE '%cognitive_modes.discovery%';" 2>/dev/null || echo 0)
+    ut=$(grep -c 'TestValidateActivationSignals\|activation.*signal\|unknown.*signal' scripts/ai-skill-cli/internal/app/hooks_test.go 2>/dev/null || echo 0)
+    [ "${fn:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && [ "${gs:-0}" -ge 1 ] && [ "${ut:-0}" -ge 3 ] && echo "PASS" || echo "FAIL fn=${fn:-0} rch=${rch:-0} gs=${gs:-0} ut=${ut:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（validateActivationSignals not yet implemented）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

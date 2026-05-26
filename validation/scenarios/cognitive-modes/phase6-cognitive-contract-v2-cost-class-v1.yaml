@@ -1,0 +1,76 @@
+# Source: Phase 1 — Runtime Cognitive Contract v2 (test-first)
+# Test-first per system-upgrade-governance §3 Rule 9
+id: phase6-cognitive-contract-v2-cost-class-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: self-describing-cognitive-cost
+  class: inflated-reporting / governance-drift
+  date: "2026-05-26"
+  description: |
+    cognitive_cost is currently self-reported by agent (v1 uses Token Estimate
+    which is agent-claimed). v2 derives cognitive_cost from a lookup table:
+      execution × context → cost class
+    The mapping (runtime/cognitive-modes-cost-class.yaml):
+      FAST × INDEX_ONLY → LOW
+      FAST × any other → MEDIUM
+      NORMAL × {INDEX_ONLY, SUMMARY_FIRST} → LOW
+      NORMAL × {CHECKLIST_FIRST, SOURCE_BACKED} → MEDIUM
+      DEEP × any → HIGH
+      FORENSIC × any → VERY_HIGH
+      RECOVERY × any → VERY_HIGH
+
+    Hook validates: derive cost from declared (execution, context) pair →
+    compare with declared cognitive_cost → if mismatch → BLOCK.
+
+    Phase 3 implementation will:
+    1. Create runtime/cognitive-modes-cost-class.yaml with lookup table.
+    2. Add deriveCognitiveCost(execution, context) helper to hooks.go.
+    3. Add validateCognitiveCost validator to hooks.go + call from runCommitMsgHook.
+    4. Add 6 unit tests covering the cost lookup combinations.
+
+given:
+  task: phase_6_cost_class_check
+  artifacts:
+    - runtime/cognitive-modes-cost-class.yaml (new lookup table)
+    - scripts/ai-skill-cli/internal/app/hooks.go (deriveCognitiveCost + validateCognitiveCost)
+    - runtime/runtime.db (generated_surfaces row for cognitive_modes.cost_class)
+    - scripts/ai-skill-cli/internal/app/hooks_test.go (6 cost lookup unit tests)
+  signals:
+    - cognitive-modes-cost-class.yaml exists with lookup table
+    - deriveCognitiveCost function in hooks.go
+    - validateCognitiveCost in hooks.go called from runCommitMsgHook
+    - generated_surfaces row for runtime.cognitive_modes.cost_class
+    - 6+ unit tests for cost derivation
+
+when:
+  action: phase_6_cost_class_check
+
+then:
+  expected_route:
+    - NORMAL × SUMMARY_FIRST with declared cost=LOW → hook PASS
+    - DEEP × SOURCE_BACKED with declared cost=LOW → hook BLOCK (mismatch: derived=HIGH)
+    - FAST × INDEX_ONLY with declared cost=LOW → hook PASS
+    - runtime/cognitive-modes-cost-class.yaml exists
+    - hooks.go contains deriveCognitiveCost helper
+    - generated_surfaces row for runtime.cognitive_modes.cost_class exists
+    - 6+ cost-class unit tests pass
+  forbidden_routes:
+    - agent_claimed_cost_accepted_without_verification
+    - declared_cost_not_compared_to_derived
+    - claim_done_without_cost_class_yaml
+    - claim_done_without_validateCognitiveCost
+
+validation:
+  detection_command: |
+    yaml=$(test -f runtime/cognitive-modes-cost-class.yaml && echo 1 || echo 0)
+    derive=$(grep -c 'func deriveCognitiveCost' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null || echo 0)
+    validate=$(grep -c 'func validateCognitiveCost' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null || echo 0)
+    gs=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key='runtime.cognitive_modes.cost_class';" 2>/dev/null || echo 0)
+    ut=$(grep -c 'TestDeriveCognitiveCost\|TestValidateCognitiveCost\|cost.*class\|cost.*lookup' scripts/ai-skill-cli/internal/app/hooks_test.go 2>/dev/null || echo 0)
+    [ "${yaml:-0}" -ge 1 ] && [ "${derive:-0}" -ge 1 ] && [ "${validate:-0}" -ge 1 ] && [ "${gs:-0}" -ge 1 ] && [ "${ut:-0}" -ge 6 ] && echo "PASS" || echo "FAIL yaml=${yaml:-0} derive=${derive:-0} validate=${validate:-0} gs=${gs:-0} ut=${ut:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（cost-class yaml and validators not yet implemented）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

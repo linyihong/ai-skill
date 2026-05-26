@@ -1,9 +1,9 @@
 # Runtime Cognitive Contract v2
 
-**Status**: `in-progress`（Phase 0 ✅ done 2026-05-25）
+**Status**: `in-progress`（Phase 0 ✅ done 2026-05-25 / Phase 1 ✅ done 2026-05-26）
 **世代**：Gen 3 子系統演進（ADR-008 amendment 或 superseding，pending Phase 7 評估）
 **建立日期**：2026-05-25
-**最後更新**：2026-05-25
+**最後更新**：2026-05-26
 
 > 本 plan 回應 2026-05-25 外部反饋：「Cognitive Mode 報告」目前是 debug telemetry，還不是穩定的 cognitive contract。Mode 是 label without capability semantics，agent self-describes 容易 inflated reporting，verbosity inflation 造成 cognitive fatigue。要把現在的 mode block 升級為 **Runtime Cognitive Contract**，加入 validation_mode + cognitive_cost、compact/full adaptive form、activation_reason 必須引 discovery signals。
 
@@ -235,16 +235,16 @@ Capability summary:
 
 ### Tasks
 
-- [ ] `phase6-cognitive-contract-v2-compact-form-v1.yaml` — trivial commit 用 compact form，hook 通過
-- [ ] `phase6-cognitive-contract-v2-full-form-v1.yaml` — non-default mode 用 full form，hook 通過
-- [ ] `phase6-cognitive-contract-v2-activation-signal-v1.yaml` — declared signal ∈ known 14 signals → PASS；unknown signal → BLOCK
-- [ ] `phase6-cognitive-contract-v2-cost-class-v1.yaml` — declared cost vs derived cost 不一致 → BLOCK
-- [ ] `phase6-cognitive-contract-v2-capability-snippet-v1.yaml` — high-risk mode 缺 capability snippet → BLOCK
-- [ ] `phase6-cognitive-contract-v2-inflated-rejection-v1.yaml` — typo commit 報 DEEP → cost mismatch → BLOCK
+- [x] `phase6-cognitive-contract-v2-compact-form-v1.yaml` — trivial commit 用 compact form，hook 通過
+- [x] `phase6-cognitive-contract-v2-full-form-v1.yaml` — non-default mode 用 full form，hook 通過
+- [x] `phase6-cognitive-contract-v2-activation-signal-v1.yaml` — declared signal ∈ known 14 signals → PASS；unknown signal → BLOCK
+- [x] `phase6-cognitive-contract-v2-cost-class-v1.yaml` — declared cost vs derived cost 不一致 → BLOCK
+- [x] `phase6-cognitive-contract-v2-capability-snippet-v1.yaml` — high-risk mode 缺 capability snippet → BLOCK
+- [x] `phase6-cognitive-contract-v2-inflated-rejection-v1.yaml` — typo commit 報 DEEP → cost mismatch → BLOCK
 
 ### Phase 1 完成條件
 
-- [ ] 6 scenarios 全部寫好且 initial state = FAIL（pre-implementation）
+- [x] 6 scenarios 全部寫好且 initial state = FAIL（pre-implementation）
 - [ ] Scenarios commit 為一個 atomic test-first commit（[skip-cognitive-mode] / [skip-token-budget] opt-out 因為這個 commit 是 meta-scenario，不是真實 task）
 
 ---

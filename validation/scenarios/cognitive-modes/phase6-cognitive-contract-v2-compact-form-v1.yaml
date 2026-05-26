@@ -1,0 +1,71 @@
+# Source: Phase 1 — Runtime Cognitive Contract v2 (test-first)
+# Test-first per system-upgrade-governance §3 Rule 9
+id: phase6-cognitive-contract-v2-compact-form-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: verbosity-inflation
+  class: process-gap / governance-drift
+  date: "2026-05-26"
+  description: |
+    v1 block format always emits a 4-row table, even for trivial commits
+    (typo fix, doc tweak, whitespace). Every turn produces ~5 lines of
+    Cognitive Mode block regardless of task weight — 600+ repeated tokens
+    per session. v2 introduces a compact single-line form for commits where
+    all 6 dimensions are at their default values.
+
+    Compact form trigger condition: all 6 dims at default →
+      execution_mode=NORMAL, context_mode=SUMMARY_FIRST,
+      governance_mode=STANDARD, memory_mode=NONE,
+      validation_mode=CHECKLIST, cognitive_cost=LOW.
+    If any dim is non-default, full form is required (separate scenario).
+
+    Expected compact output (single line):
+      Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:<signal>
+
+    Phase 2 implementation will:
+    1. Update validateCognitiveModeBlock in hooks.go to accept compact form.
+    2. Update runtime/cognitive-modes.yaml with v2 compact-form spec.
+    3. Update CORE_BOOTSTRAP.md and models/cognitive-modes/README.md templates.
+
+given:
+  task: phase_6_compact_form_check
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go (validateCognitiveModeBlock or validateCognitiveContractFormat)
+    - runtime/cognitive-modes.yaml (v2 section)
+    - CORE_BOOTSTRAP.md (compact form template)
+    - models/cognitive-modes/README.md (compact form template)
+  signals:
+    - hooks.go accepts compact single-line Cognitive block
+    - runtime/cognitive-modes.yaml contains v2 compact-form spec
+    - CORE_BOOTSTRAP.md compact form example present
+    - models/cognitive-modes/README.md compact form example present
+
+when:
+  action: phase_6_compact_form_check
+
+then:
+  expected_route:
+    - hooks.go parses compact form without error
+    - compact form with all-default dims → hook PASS
+    - runtime/cognitive-modes.yaml v2 section exists with compact_form key
+    - CORE_BOOTSTRAP.md contains compact form example line
+    - models/cognitive-modes/README.md contains compact form example line
+  forbidden_routes:
+    - compact_form_rejected_as_invalid_format
+    - full_table_required_for_all_default_dims
+    - claim_done_without_hooks_update
+    - claim_done_without_yaml_v2_section
+
+validation:
+  detection_command: |
+    hk=$(grep -c 'compact\|NORMAL·SUMMARY_FIRST\|validateCognitiveContractFormat' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null || echo 0)
+    yaml_v2=$(grep -c 'compact_form\|compact-form\|v2' runtime/cognitive-modes.yaml 2>/dev/null || echo 0)
+    bootstrap=$(grep -c 'NORMAL·SUMMARY_FIRST' CORE_BOOTSTRAP.md 2>/dev/null || echo 0)
+    models=$(grep -c 'NORMAL·SUMMARY_FIRST' models/cognitive-modes/README.md 2>/dev/null || echo 0)
+    [ "${hk:-0}" -ge 1 ] && [ "${yaml_v2:-0}" -ge 1 ] && [ "${bootstrap:-0}" -ge 1 ] && [ "${models:-0}" -ge 1 ] && echo "PASS" || echo "FAIL hk=${hk:-0} yaml_v2=${yaml_v2:-0} bootstrap=${bootstrap:-0} models=${models:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（compact form not yet implemented in hooks.go or yaml）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

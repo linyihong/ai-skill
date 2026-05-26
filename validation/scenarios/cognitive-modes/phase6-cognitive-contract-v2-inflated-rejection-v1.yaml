@@ -1,0 +1,74 @@
+# Source: Phase 1 — Runtime Cognitive Contract v2 (test-first)
+# Test-first per system-upgrade-governance §3 Rule 9
+id: phase6-cognitive-contract-v2-inflated-rejection-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: self-describing-drift
+  class: inflated-reporting / governance-drift
+  date: "2026-05-26"
+  description: |
+    End-to-end rejection scenario for inflated cognitive reporting. A typo-fix
+    commit that declares execution_mode=DEEP is the canonical inflation case:
+      - DEEP × any context → cognitive_cost should be HIGH (from lookup table)
+      - but declared cost is LOW (agent wrote LOW to match the trivial task feel)
+      → cost mismatch → hook BLOCK
+
+    Alternatively the agent might declare DEEP + cost=HIGH but the only changed
+    file is a one-letter typo:
+      - activation_reason must cite a known signal; for a typo fix no signals
+        from the 14 known signals naturally trigger DEEP
+      - agent would have to cite a signal it cannot justify → fabricated signal
+      - fabricated / unknown signal name → hook BLOCK via validateActivationSignals
+
+    This scenario verifies the combined enforcement: cost mismatch + unknown signal
+    together block inflated reporting. At least one of these two checks must fire
+    for a typo commit claiming DEEP.
+
+    Concrete test cases:
+    1. Typo fix, declares DEEP + LOW → deriveCognitiveCost(DEEP, SUMMARY_FIRST) = HIGH
+       → declared LOW ≠ derived HIGH → BLOCK (cost mismatch)
+    2. Typo fix, declares DEEP + HIGH + activation_reason: made_up_signal
+       → made_up_signal ∉ 14 known signals → BLOCK (unknown signal)
+    3. Valid commit, declares NORMAL + LOW + activation_reason: file_diff_notes_ephemeral
+       → derived = LOW, signal known → PASS
+
+    Phase 4 + Phase 3 combined implementation required.
+
+given:
+  task: phase_6_inflated_rejection_check
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go (validateCognitiveCost + validateActivationSignals)
+    - scripts/ai-skill-cli/internal/app/hooks_test.go (3 inflated-rejection test cases)
+  signals:
+    - validateCognitiveCost blocks cost mismatch
+    - validateActivationSignals blocks unknown signal names
+    - combined enforcement rejects at least one inflation vector for typo-fix commits
+    - 3+ unit tests cover the inflated-rejection scenarios
+
+when:
+  action: phase_6_inflated_rejection_check
+
+then:
+  expected_route:
+    - typo commit declaring DEEP + LOW → hook BLOCK (cost mismatch)
+    - typo commit declaring DEEP + HIGH + unknown signal → hook BLOCK (unknown signal)
+    - legitimate NORMAL commit with known signal + correct cost → hook PASS
+    - 3+ inflated-rejection unit tests exist and pass
+  forbidden_routes:
+    - inflated_DEEP_declaration_accepted_without_validation
+    - cost_mismatch_not_detected
+    - unknown_signal_accepted_silently
+    - claim_done_without_inflated_rejection_unit_tests
+
+validation:
+  detection_command: |
+    cost_v=$(grep -c 'func validateCognitiveCost' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null || echo 0)
+    sig_v=$(grep -c 'func validateActivationSignals' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null || echo 0)
+    ut=$(grep -c 'TestInflatedRejection\|inflated.*rejection\|typo.*DEEP\|DEEP.*typo\|mismatch.*BLOCK\|unknown.*signal.*BLOCK' scripts/ai-skill-cli/internal/app/hooks_test.go 2>/dev/null || echo 0)
+    [ "${cost_v:-0}" -ge 1 ] && [ "${sig_v:-0}" -ge 1 ] && [ "${ut:-0}" -ge 3 ] && echo "PASS" || echo "FAIL cost_v=${cost_v:-0} sig_v=${sig_v:-0} ut=${ut:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（validators not yet implemented, no inflated-rejection unit tests）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

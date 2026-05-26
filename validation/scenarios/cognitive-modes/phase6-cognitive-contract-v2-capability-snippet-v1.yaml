@@ -1,0 +1,75 @@
+# Source: Phase 1 — Runtime Cognitive Contract v2 (test-first)
+# Test-first per system-upgrade-governance §3 Rule 9
+id: phase6-cognitive-contract-v2-capability-snippet-v1
+domain: cognitive-modes
+type: routing-stability
+priority: P1
+
+failure_source:
+  pattern: label-without-contract
+  class: process-gap / governance-drift
+  date: "2026-05-26"
+  description: |
+    High-risk mode commits (execution_mode ∈ {DEEP, FORENSIC, RECOVERY} or
+    governance_mode ∈ {STRICT, LOCKDOWN}) currently report only abstract labels.
+    Reader must look up integration YAMLs to know what those labels actually
+    enforce. v2 requires a capability snippet in the report for high-risk commits.
+
+    Example capability snippet (appended after full table):
+      Capability summary:
+        governance_mode=STRICT → source-backed required, validation_before_patch, no_global_claims
+        execution_mode=DEEP → source-backed reads + dependency graph + linked updates fully resolved
+
+    Snippet content comes from integration YAMLs:
+      runtime/cognitive-modes-{phase,governance,memory}-integration.yaml
+    Hook validates: if mode tuple contains high-risk value AND capability snippet
+    section is absent → BLOCK.
+
+    Open Question 2 (TBD Phase 5): snippet generated dynamically from integration
+    YAMLs via generated_surfaces vs hook-internal hardcode lookup. Recommendation
+    is dynamic from generated_surfaces to track contract evolution.
+
+    Phase 5 implementation will:
+    1. Add capability snippet generator (reads integration YAMLs via generated_surfaces).
+    2. Add validateCapabilitySnippet to hooks.go, called from runCommitMsgHook.
+    3. Unit tests covering: high-risk with snippet → PASS, high-risk without snippet → BLOCK,
+       low-risk without snippet → PASS (no snippet required).
+
+given:
+  task: phase_6_capability_snippet_check
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go (validateCapabilitySnippet)
+    - runtime/runtime.db (generated_surfaces with capability summaries from integration YAMLs)
+    - scripts/ai-skill-cli/internal/app/hooks_test.go (capability snippet unit tests)
+  signals:
+    - validateCapabilitySnippet function in hooks.go
+    - runCommitMsgHook calls validateCapabilitySnippet
+    - generated_surfaces contains capability summaries from integration YAMLs
+    - 3+ unit tests for capability snippet validation
+
+when:
+  action: phase_6_capability_snippet_check
+
+then:
+  expected_route:
+    - high-risk commit with capability snippet → hook PASS
+    - high-risk commit without capability snippet → hook BLOCK
+    - low-risk (NORMAL/STANDARD) commit without snippet → hook PASS (snippet not required)
+    - hooks.go reads capability summaries from generated_surfaces
+    - 3+ capability snippet unit tests pass
+  forbidden_routes:
+    - high_risk_commit_accepted_without_snippet
+    - snippet_required_for_all_commits_regardless_of_risk
+    - snippet_content_hardcoded_in_validator_bypassing_yaml
+    - claim_done_without_validateCapabilitySnippet
+
+validation:
+  detection_command: |
+    fn=$(grep -c 'func validateCapabilitySnippet' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null || echo 0)
+    rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null | grep -c 'validateCapabilitySnippet' || echo 0)
+    gs=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key LIKE '%capability%' OR content LIKE '%Capability summary%';" 2>/dev/null || echo 0)
+    ut=$(grep -c 'TestValidateCapabilitySnippet\|capability.*snippet\|Capability summary' scripts/ai-skill-cli/internal/app/hooks_test.go 2>/dev/null || echo 0)
+    [ "${fn:-0}" -ge 1 ] && [ "${rch:-0}" -ge 1 ] && [ "${gs:-0}" -ge 1 ] && [ "${ut:-0}" -ge 3 ] && echo "PASS" || echo "FAIL fn=${fn:-0} rch=${rch:-0} gs=${gs:-0} ut=${ut:-0}"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL（validateCapabilitySnippet not yet implemented）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9
