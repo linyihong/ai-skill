@@ -450,3 +450,59 @@ func TestValidateBootstrapEntryThinness(t *testing.T) {
 		t.Fatalf("expected no enforcement on non-entry file, got %q", v)
 	}
 }
+
+func TestValidateRuntimeYamlProjects(t *testing.T) {
+	tmp := t.TempDir()
+	os.MkdirAll(filepath.Join(tmp, "runtime"), 0o755)
+	goodYAML := "runtime_projection:\n  enabled: true\n  target_key: runtime.test.contract\n"
+	badYAML := "runtime_projection:\n  enabled: false\n"
+	os.WriteFile(filepath.Join(tmp, "runtime", "good.yaml"), []byte(goodYAML), 0o644)
+	os.WriteFile(filepath.Join(tmp, "runtime", "bad.yaml"), []byte(badYAML), 0o644)
+
+	// Good only → pass
+	v := validateRuntimeYamlProjects("feat: x", []string{"runtime/good.yaml"}, tmp)
+	if v != "" {
+		t.Fatalf("expected pass for projected yaml, got %q", v)
+	}
+	// Bad → block
+	v = validateRuntimeYamlProjects("feat: x", []string{"runtime/bad.yaml"}, tmp)
+	if v == "" {
+		t.Fatal("expected violation for non-projected yaml")
+	}
+	// Opt-out
+	v = validateRuntimeYamlProjects("feat: x\n\n[skip-runtime-yaml-projection]\n", []string{"runtime/bad.yaml"}, tmp)
+	if v != "" {
+		t.Fatalf("expected opt-out to bypass, got %q", v)
+	}
+}
+
+func TestValidateMarkdownYamlSync(t *testing.T) {
+	tmp := t.TempDir()
+	os.MkdirAll(filepath.Join(tmp, "governance"), 0o755)
+	// Create a paired md+yaml; staging md alone should violate
+	os.WriteFile(filepath.Join(tmp, "governance", "foo.md"), []byte("# foo"), 0o644)
+	os.WriteFile(filepath.Join(tmp, "governance", "foo.yaml"), []byte("id: foo"), 0o644)
+	// Create md without yaml sibling; should not violate
+	os.WriteFile(filepath.Join(tmp, "governance", "orphan.md"), []byte("# orphan"), 0o644)
+
+	// md alone (with sibling existing) → block
+	v := validateMarkdownYamlSync("feat: x", []string{"governance/foo.md"}, tmp)
+	if v == "" {
+		t.Fatal("expected violation when sibling yaml exists but not staged")
+	}
+	// both staged → pass
+	v = validateMarkdownYamlSync("feat: x", []string{"governance/foo.md", "governance/foo.yaml"}, tmp)
+	if v != "" {
+		t.Fatalf("expected pass when both staged, got %q", v)
+	}
+	// md without sibling → pass
+	v = validateMarkdownYamlSync("feat: x", []string{"governance/orphan.md"}, tmp)
+	if v != "" {
+		t.Fatalf("expected pass for orphan md, got %q", v)
+	}
+	// opt-out
+	v = validateMarkdownYamlSync("feat: x\n\n[skip-markdown-yaml-sync]\n", []string{"governance/foo.md"}, tmp)
+	if v != "" {
+		t.Fatalf("expected opt-out to bypass, got %q", v)
+	}
+}

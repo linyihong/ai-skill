@@ -316,6 +316,15 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		if v := validateBootstrapEntryThinness(text, staged, root); v != "" {
 			violations = append(violations, v)
 		}
+		if v := validateCLIDocSync(text, staged, root); v != "" {
+			violations = append(violations, v)
+		}
+		if v := validateRuntimeYamlProjects(text, staged, root); v != "" {
+			violations = append(violations, v)
+		}
+		if v := validateMarkdownYamlSync(text, staged, root); v != "" {
+			violations = append(violations, v)
+		}
 		if len(violations) > 0 {
 			result.Status = "blocked"
 			result.ExitCode = ExitValidationFailed
@@ -906,6 +915,150 @@ func validateBootstrapEntryThinness(text string, staged []string, root string) s
 						sub+"'; this belongs in CORE_BOOTSTRAP.md / models/cognitive-modes/, not in tool entries.")
 				break // one violation per file is enough
 			}
+		}
+	}
+	if len(violations) == 0 {
+		return ""
+	}
+	return strings.Join(violations, "\n  - ")
+}
+
+// validateCLIDocSync enforces runtime/cli-modification-policy.yaml
+// gate.cli.command_contract_synced: when staged Go files under
+// scripts/ai-skill-cli/internal/app/ contain newly added subcommand
+// dispatch (`case "run X":` or `case "X":` for runtime subcommands) OR
+// new public `runXxxHook` / `buildRuntimeXxxResult` function, the
+// command-contract.md must also be staged.
+//
+// Heuristic: scan staged Go files for `case "run ` / new func patterns
+// via `git diff --cached`. Conservative — false negatives preferred
+// over false positives.
+//
+// Opt-out: standalone `[skip-cli-doc-sync]` trailer line.
+func validateCLIDocSync(text string, staged []string, root string) string {
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-cli-doc-sync]" {
+			return ""
+		}
+	}
+	cliSourceStaged := false
+	docStaged := false
+	for _, s := range staged {
+		if strings.HasPrefix(s, "scripts/ai-skill-cli/internal/app/") && strings.HasSuffix(s, ".go") {
+			cliSourceStaged = true
+		}
+		if s == "scripts/ai-skill-cli/docs/command-contract.md" {
+			docStaged = true
+		}
+	}
+	if !cliSourceStaged || docStaged {
+		return ""
+	}
+	// CLI Go file staged but command-contract.md not staged. Check
+	// git diff for newly added subcommand dispatch or hook handler
+	// patterns. If none, skip (pure refactor).
+	cmd := exec.Command("git", "-C", root, "diff", "--cached", "--", "scripts/ai-skill-cli/internal/app/")
+	out, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	diff := string(out)
+	patterns := []string{
+		`+\tcase "run `,
+		`+\tcase "obligations"`,
+		`+func runCommitMsgHook`,
+		`+func runPrePushHook`,
+		`+func runPreCommitHook`,
+		`+func buildRuntimeObligationsResult`,
+	}
+	for _, p := range patterns {
+		if strings.Contains(diff, p) {
+			return "cli-doc-sync: CLI source change adds subcommand dispatch / hook handler but scripts/ai-skill-cli/docs/command-contract.md is not staged. Per runtime/cli-modification-policy.yaml gate.cli.command_contract_synced. Use [skip-cli-doc-sync] for non-contract-affecting refactors."
+		}
+	}
+	// Also flag generic new `case "` addition + `runXxxHook` function names.
+	if regexp.MustCompile(`(?m)^\+func run[A-Z][A-Za-z]+Hook\b`).MatchString(diff) {
+		return "cli-doc-sync: CLI source change adds new runXxxHook function but command-contract.md not staged. See runtime/cli-modification-policy.yaml."
+	}
+	return ""
+}
+
+// validateRuntimeYamlProjects enforces the rule "every runtime/*.yaml
+// must declare runtime_projection.enabled: true AND target_key". Plans
+// that intentionally defer projection must include §Deferred Runtime
+// Projection in plan AND use [skip-runtime-yaml-projection] opt-out.
+//
+// Opt-out: standalone `[skip-runtime-yaml-projection]` trailer line.
+func validateRuntimeYamlProjects(text string, staged []string, root string) string {
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-runtime-yaml-projection]" {
+			return ""
+		}
+	}
+	var violations []string
+	for _, s := range staged {
+		if !strings.HasPrefix(s, "runtime/") || !strings.HasSuffix(s, ".yaml") {
+			continue
+		}
+		full := s
+		if !filepath.IsAbs(full) {
+			full = filepath.Join(root, s)
+		}
+		body, err := os.ReadFile(full)
+		if err != nil {
+			continue
+		}
+		content := string(body)
+		hasProjection := strings.Contains(content, "runtime_projection:") &&
+			(strings.Contains(content, "enabled: true") || strings.Contains(content, "enabled:true"))
+		hasTargetKey := strings.Contains(content, "target_key:")
+		if !hasProjection || !hasTargetKey {
+			violations = append(violations,
+				"runtime-yaml-projects: "+s+" missing runtime_projection.enabled:true or target_key. Default rule: runtime/*.yaml must project to runtime.db. If intentional deferral, declare §Deferred Runtime Projection in plan + use [skip-runtime-yaml-projection].")
+		}
+	}
+	if len(violations) == 0 {
+		return ""
+	}
+	return strings.Join(violations, "\n  - ")
+}
+
+// validateMarkdownYamlSync enforces sibling-pair markdown/YAML
+// synchronization: if a staged .md file has a sibling .yaml in the same
+// directory (same path stem), the .yaml must also be staged in the same
+// commit. Cross-path companion pairs (e.g. plans/README.md ↔
+// governance/lifecycle/system-upgrade-governance.yaml) require explicit
+// mapping; not yet covered by this validator.
+//
+// Opt-out: standalone `[skip-markdown-yaml-sync]` trailer line.
+func validateMarkdownYamlSync(text string, staged []string, root string) string {
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-markdown-yaml-sync]" {
+			return ""
+		}
+	}
+	stagedSet := make(map[string]bool, len(staged))
+	for _, s := range staged {
+		stagedSet[s] = true
+	}
+	var violations []string
+	for _, s := range staged {
+		if !strings.HasSuffix(s, ".md") {
+			continue
+		}
+		stem := strings.TrimSuffix(s, ".md")
+		sibling := stem + ".yaml"
+		siblingFull := sibling
+		if !filepath.IsAbs(siblingFull) {
+			siblingFull = filepath.Join(root, sibling)
+		}
+		if _, err := os.Stat(siblingFull); err != nil {
+			// Sibling YAML does not exist on disk; no companion enforcement.
+			continue
+		}
+		if !stagedSet[sibling] {
+			violations = append(violations,
+				"markdown-yaml-sync: "+s+" staged but sibling companion "+sibling+" not staged. Canonical .md edits typically need YAML companion update. If markdown-only change is intentional, use [skip-markdown-yaml-sync].")
 		}
 	}
 	if len(violations) == 0 {
