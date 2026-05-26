@@ -25,7 +25,7 @@
 | `Status` 標頭 | 全部 plan | 標 `draft` / `in-progress` / `completed` |
 | `Decision Rationale` | 架構/流程/跨層 plan | 取代「proposed ADR」的提案內容；含 Problem & Why Now / Decision / Alternatives Considered / Why Not an ADR Yet / ADR Promotion Criteria / Consequences |
 | `Runtime Execution Path` | 涉及 framework/runtime/governance/workflow/validation/scenario/metadata/compiler 改動 | 明列 runtime owner、trigger flow、trigger location、activation contract、generated surface、validation scenarios、test passing evidence；trigger flow 必須說明 event → detector / route / query → loaded contract/source → runtime action / blocker → evidence，不能只寫「routing 會處理」；doc-only trial 必須明寫「不接入 runtime」+ 未來接入時機 — 詳見 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §3 規則 8 |
-| `Deferred Runtime Projection`（外放→收斂宣告） | plan 建立 `runtime/*.yaml` 但**不立即 project 到 `runtime.db`** 時 | 預設規則：`runtime/` 下 YAML 必須含 `runtime_projection.enabled: true` 並 project；外放是例外。若 plan 採「外放→後續收斂」模式（doc-only trial、schema 演進中、multi-session evidence 需要），必須在 §Decision Rationale 或 §Runtime Execution Path 明寫 (a) **不 project 的 reason**、(b) **預定 project 的 phase / 條件**。沒寫明 → reviewer 必擋。Phase 6 of [`bootstrap-contract-yaml-migration`](active/2026-05-25-2200-bootstrap-contract-yaml-migration.md) 會落地 `validateRuntimeYamlProjects` commit-msg validator 機械強制此規則。 |
+| `Deferred Runtime Projection`（外放→收斂宣告） | plan 建立 `runtime/*.yaml` 但**不立即 project 到 `runtime.db`** 時 | 預設規則：`runtime/` 下 YAML 必須含 `runtime_projection.enabled: true` 並 project；外放是例外。若 plan 採「外放→後續收斂」模式（doc-only trial、schema 演進中、multi-session evidence 需要），必須在 §Decision Rationale 或 §Runtime Execution Path 明寫 (a) **不 project 的 reason**、(b) **預定 project 的 phase / 條件**。沒寫明 → reviewer 必擋。Phase 6 of [`bootstrap-contract-yaml-migration`](archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md) 會落地 `validateRuntimeYamlProjects` commit-msg validator 機械強制此規則。 |
 | `Open Questions` | 架構/流程 plan | 列出 completed 前需釐清的問題 |
 | `完成條件` | 全部 plan | 依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §2 checklist 子集 |
 | `Phase 0` Pre-Build Interrogation | 架構/流程/跨層 plan | per §Architecture Compatibility Preflight |
@@ -140,9 +140,9 @@
 
 | 檔案 | 狀態 | 說明 |
 |------|------|------|
-| [`active/2026-05-26-1039-landing-page-positioning-refresh.md`](active/2026-05-26-1039-landing-page-positioning-refresh.md) | draft | AI-native Cognitive Execution System Landing Page Refresh：將根 README 從內部 bootstrap / OS layout 入口重構為 public-facing landing page，正式名稱使用 AI-native Cognitive Execution System；`Ai-skill` 僅作為尚未改名的 repo slug，agent bootstrap 只保留最短入口 |
+| [`archived/2026-05-26-1039-landing-page-positioning-refresh.md`](archived/2026-05-26-1039-landing-page-positioning-refresh.md) | ✅ completed | AI-native Cognitive Execution System Landing Page Refresh：根 README 已重構為 public-facing landing page，新增 `docs/README.md` 與 `docs/overview.md`；正式名稱使用 AI-native Cognitive Execution System，`Ai-skill` 僅作為尚未改名的 repo slug |
 | [`active/2026-05-25-1000-context-language-glossary-system.md`](active/2026-05-25-1000-context-language-glossary-system.md) | draft | Context Language Glossary System：吸收 mattpocock/skills `CONTEXT.md` / ubiquitous language 技巧，規劃 `knowledge/glossary/` 作 canonical shared language source，並界定 `memory/project/context-language.md` 只作 project-local replay |
-| [`active/2026-05-22-1629-runtime-cognitive-modes-system.md`](active/2026-05-22-1629-runtime-cognitive-modes-system.md) | draft | Runtime Cognitive Modes System：把 `models/` 從 documentation layer 提升為 runtime activation；引入 4 維 cognitive mode primitive（execution / context / governance / memory）；整合既有 phase_machine、compression、memory、governance；分 5 phase 漸進實作。依賴 [ADR-008](../constitution/ADR-008-runtime-cognitive-modes.md)（proposed）。 |
+| [`archived/2026-05-22-1629-runtime-cognitive-modes-system.md`](archived/2026-05-22-1629-runtime-cognitive-modes-system.md) | ✅ completed | Runtime Cognitive Modes System：把 `models/` 從 documentation layer 提升為 runtime activation；引入 4 維 cognitive mode primitive（execution / context / governance / memory）；整合既有 phase_machine、compression、memory、governance。依賴 [ADR-008](../constitution/ADR-008-runtime-cognitive-modes.md)。 |
 | [`archived/2026-05-22-0855-executable-yaml-contract-migration.md`](archived/2026-05-22-0855-executable-yaml-contract-migration.md) | ✅ completed | Executable YAML Contract Migration：盤點哪些流程、gate、required reads、failure actions 應升級為 owner-layer YAML contract，並投影到 runtime generated surfaces，降低非 ChatGPT agent 漏跑流程的風險 |
 | [`archived/2026-05-11-1112-next-stage-upgrade-plan.md`](archived/2026-05-11-1112-next-stage-upgrade-plan.md) | ✅ completed | 全局升級路線圖（所有 Phase 1-33 已執行完畢） |
 | [`archived/2026-05-11-1129-apk-analysis-pilot-migration.md`](archived/2026-05-11-1129-apk-analysis-pilot-migration.md) | ✅ completed | APK Analysis Pilot Migration 狀態圖（原 architecture/） |
@@ -169,7 +169,7 @@
 
 ## 誰會參考這裡（Inbound References）
 
-- [`route.governance.durable-goal-boundary`](../knowledge/runtime/routing-registry.yaml:129) — candidate_sources 引用 `scripts/README.md`
+- [`route.governance.durable-goal-boundary`](../knowledge/runtime/routing-registry.yaml) — candidate_sources 引用 `scripts/README.md`
 - [`enforcement/conversation-goal-ledger.md`](../enforcement/conversation-goal-ledger.md) — 定義 active goal 與 durable planning 的邊界
 - [`enforcement/linked-updates.md`](../enforcement/linked-updates.md) — 計畫完成後需執行連動更新檢查
 

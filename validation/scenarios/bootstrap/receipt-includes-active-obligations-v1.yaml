@@ -28,14 +28,19 @@ when:
 then:
   expected_route:
     - YAML format_template includes 'Active per-turn obligations'
-    - CORE_BOOTSTRAP.md companion mentions the enhanced format
+    - CORE_BOOTSTRAP.md companion delegates to YAML (does NOT need to inline
+      the full format example after the 2026-05-26 slim-down — YAML is
+      canonical for format examples; .md is companion only)
   forbidden_routes:
     - claim_done_without_format_update
 
 validation:
   detection_command: |
+    # YAML is canonical for format examples (post 2026-05-26 slim-down).
+    # Companion .md just needs to delegate to YAML; doesn't need to inline
+    # the enhanced-format string itself.
     y=$(grep -c 'Active per-turn obligations' runtime/core-bootstrap.yaml 2>/dev/null)
-    m=$(grep -c 'Active per-turn obligations' CORE_BOOTSTRAP.md 2>/dev/null)
+    m=$(grep -c 'core-bootstrap.yaml\|runtime obligations' CORE_BOOTSTRAP.md 2>/dev/null)
     [ "${y:-0}" -ge 1 ] && [ "${m:-0}" -ge 1 ] && echo "PASS" || echo "FAIL y=${y:-0} m=${m:-0}"
   pass_criteria: detection_command outputs PASS
   initial_state: FAIL pre-Phase-5
