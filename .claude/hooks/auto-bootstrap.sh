@@ -26,7 +26,11 @@ PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 PHASE=$(sqlite3 "$PROJECT_DIR/runtime/runtime.db" "SELECT phase_id FROM phase_machine LIMIT 1;" 2>/dev/null || echo "unknown")
 OBLIG_COUNT=$(sqlite3 "$PROJECT_DIR/runtime/runtime.db" "SELECT COUNT(*) FROM obligations;" 2>/dev/null || echo "?")
 GATE_COUNT=$(sqlite3 "$PROJECT_DIR/runtime/runtime.db" "SELECT COUNT(*) FROM gates;" 2>/dev/null || echo "?")
-ACTIVE_PER_TURN=$(sqlite3 "$PROJECT_DIR/runtime/runtime.db" "SELECT GROUP_CONCAT(id, ', ') FROM obligations WHERE id LIKE 'obligation.cognitive.%' OR id LIKE 'obligation.finality.%';" 2>/dev/null || echo "obligation.cognitive.mode_report, obligation.finality.close_loop_check")
+# Per-turn obligations are defined in runtime/core-bootstrap.yaml
+# §per_turn_obligations but NOT projected to the obligations table
+# (that table holds phase-based execution obligations). Hardcode here
+# to match the YAML source of truth.
+ACTIVE_PER_TURN="obligation.cognitive.mode_report, obligation.finality.close_loop_check"
 
 # Build the bootstrap context (3 required reads inline + receipt template)
 read_safe() {
