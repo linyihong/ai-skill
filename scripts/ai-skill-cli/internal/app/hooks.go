@@ -1,6 +1,8 @@
 package app
 
 import (
+	"bufio"
+	"crypto/md5"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -41,7 +43,7 @@ func runHooks(args []string, stdout io.Writer, stderr io.Writer) int {
 	name := "hooks " + opts.command
 	if opts.command == "run" {
 		if len(args) < 2 {
-			_, _ = fmt.Fprintln(stderr, "usage: ai-skill hooks run <pre-commit|commit-msg|post-commit|pre-push> [flags]")
+			_, _ = fmt.Fprintln(stderr, "usage: ai-skill hooks run <pre-commit|commit-msg|post-commit|pre-push|session-start|pre-tool-use|post-tool-use|user-prompt-submit|stop> [flags]")
 			return ExitInvalidUsage
 		}
 		opts.command = "run " + args[1]
@@ -60,6 +62,34 @@ func runHooks(args []string, stdout io.Writer, stderr io.Writer) int {
 	if opts.jsonOutput && opts.plainOutput {
 		_, _ = fmt.Fprintln(stderr, "--json and --plain are mutually exclusive")
 		return ExitInvalidUsage
+	}
+
+	// Claude Code hooks: bypass git/repo checks and the Result machinery.
+	// They write raw JSON or plain text to stdout/stderr and return exit codes directly.
+	// Project directory comes from CLAUDE_PROJECT_DIR env var (set by Claude Code).
+	if strings.HasPrefix(opts.command, "run ") {
+		projectDir := os.Getenv("CLAUDE_PROJECT_DIR")
+		if projectDir == "" {
+			projectDir = opts.repoPath
+			if projectDir == "." {
+				if cwd, err := os.Getwd(); err == nil {
+					projectDir = cwd
+				}
+			}
+		}
+		switch opts.command {
+		case "run session-start":
+			return runSessionStartHook(projectDir, stdout, stderr)
+		case "run pre-tool-use":
+			return runPreToolUseHook(projectDir, stdout, stderr)
+		case "run post-tool-use":
+			return runPostToolUseHook(projectDir, stdout, stderr)
+		case "run user-prompt-submit":
+			return runUserPromptSubmitHook(projectDir, stdout, stderr)
+		case "run stop":
+			return runStopHook(projectDir, stdout, stderr)
+		}
+		// Fall through to buildHooksRunResult for git hooks (pre-commit, commit-msg, etc.)
 	}
 
 	var result Result
@@ -302,6 +332,423 @@ func validateNoNewShellScripts(root string, staged []string) string {
 	}
 	return "new shell script(s) staged: " + strings.Join(newShells, ", ") +
 		" — cross-platform policy requires Go implementation instead of .sh"
+}
+
+// ---------------------------------------------------------------------------
+// Claude Code hook helpers
+// ---------------------------------------------------------------------------
+
+// appendLog appends a line to a diagnostic log file (best-effort, no-op on error).
+func appendLog(path, msg string) {
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	_, _ = fmt.Fprintln(f, msg)
+}
+
+// readFileSafe returns file contents or a "(missing: <path>)" placeholder.
+func readFileSafe(path string) string {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "(missing: " + path + ")"
+	}
+	return string(data)
+}
+
+// md5Short returns the first 12 hex chars of the MD5 hash of s.
+func md5Short(s string) string {
+	h := md5.Sum([]byte(s))
+	return fmt.Sprintf("%x", h)[:12]
+}
+
+// claudeFileExists reports whether path exists on disk.
+func claudeFileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
+
+// extractAssistantTexts scans a JSONL transcript file and returns all assistant
+// message text bodies in document order.  Each element is the joined text of
+// one assistant turn.
+func extractAssistantTexts(transcriptPath string) []string {
+	f, err := os.Open(transcriptPath)
+	if err != nil {
+		return nil
+	}
+	defer f.Close()
+
+	var results []string
+	scanner := bufio.NewScanner(f)
+	scanner.Buffer(make([]byte, 2*1024*1024), 2*1024*1024)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
+		var entry map[string]json.RawMessage
+		if err := json.Unmarshal([]byte(line), &entry); err != nil {
+			continue
+		}
+		roleField := entry["type"]
+		if roleField == nil {
+			roleField = entry["role"]
+		}
+		var role string
+		if roleField != nil {
+			_ = json.Unmarshal(roleField, &role)
+		}
+		if role != "assistant" {
+			continue
+		}
+		var chunks []string
+		if msgRaw, ok := entry["message"]; ok {
+			var msg map[string]json.RawMessage
+			if err := json.Unmarshal(msgRaw, &msg); err == nil {
+				if cRaw, ok := msg["content"]; ok {
+					var s string
+					if err := json.Unmarshal(cRaw, &s); err == nil {
+						chunks = append(chunks, s)
+					} else {
+						var items []json.RawMessage
+						if err := json.Unmarshal(cRaw, &items); err == nil {
+							for _, item := range items {
+								var m map[string]json.RawMessage
+								if err := json.Unmarshal(item, &m); err == nil {
+									if tRaw, ok := m["text"]; ok {
+										var t string
+										if err := json.Unmarshal(tRaw, &t); err == nil {
+											chunks = append(chunks, t)
+										}
+									}
+								} else {
+									var s string
+									if err := json.Unmarshal(item, &s); err == nil {
+										chunks = append(chunks, s)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} else if cRaw, ok := entry["content"]; ok {
+			var s string
+			if err := json.Unmarshal(cRaw, &s); err == nil {
+				chunks = append(chunks, s)
+			}
+		}
+		if len(chunks) > 0 {
+			results = append(results, strings.Join(chunks, "\n"))
+		}
+	}
+	return results
+}
+
+// ---------------------------------------------------------------------------
+// Claude Code hooks (SessionStart / PreToolUse / PostToolUse / UserPromptSubmit / Stop)
+// Cross-platform Go replacement for .claude/hooks/*.sh per
+// plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md.
+// ---------------------------------------------------------------------------
+
+// runSessionStartHook implements the Claude Code SessionStart hook.
+// Queries runtime.db for phase/obligation/gate counts, reads 4 bootstrap files,
+// emits hookSpecificOutput JSON, and writes a TTL flag for runPreToolUseHook.
+func runSessionStartHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
+	const logFile = "/tmp/ai-skill-sessionstart-hook.log"
+	ts := time.Now().Format("2006-01-02T15:04:05")
+	appendLog(logFile, "=== "+ts+" SessionStart hook fired (Go) ===")
+
+	phase, obligCount, gateCount := "unknown", "?", "?"
+	dbPath := filepath.Join(projectDir, "runtime", "runtime.db")
+	if db, err := sql.Open("sqlite", dbPath); err == nil {
+		defer db.Close()
+		if row := db.QueryRow("SELECT phase_id FROM phase_machine LIMIT 1"); row != nil {
+			_ = row.Scan(&phase)
+		}
+		if row := db.QueryRow("SELECT COUNT(*) FROM obligations"); row != nil {
+			_ = row.Scan(&obligCount)
+		}
+		if row := db.QueryRow("SELECT COUNT(*) FROM gates"); row != nil {
+			_ = row.Scan(&gateCount)
+		}
+	}
+	const activePerTurn = "obligation.cognitive.mode_report, obligation.finality.close_loop_check"
+
+	coreBootstrap := readFileSafe(filepath.Join(projectDir, "CORE_BOOTSTRAP.md"))
+	ruleWeight := readFileSafe(filepath.Join(projectDir, "enforcement", "rule-weight.md"))
+	dependency := readFileSafe(filepath.Join(projectDir, "enforcement", "dependency-reading.md"))
+	goalLedger := readFileSafe(filepath.Join(projectDir, "enforcement", "conversation-goal-ledger.md"))
+
+	context := fmt.Sprintf(
+		"[ai-skill SessionStart] Bootstrap auto-loaded. The agent does NOT need to read these files again "+
+			"— they are already in context. Your first user-facing response MUST begin with this Bootstrap "+
+			"Receipt (verbatim), then proceed to answer the user:\n\n"+
+			"Bootstrap: rules=✓ phase=%s obligations=%s gates=%s\n"+
+			"Active per-turn obligations: %s\n\n"+
+			"Final response MUST also end with a Cognitive Mode 報告 block (compact form is fine for trivial "+
+			"tasks). Per-turn enforcement: see runtime/core-bootstrap.yaml §per_turn_obligations.\n\n"+
+			"--- CORE_BOOTSTRAP.md (companion) ---\n%s\n\n"+
+			"--- enforcement/rule-weight.md ---\n%s\n\n"+
+			"--- enforcement/dependency-reading.md ---\n%s\n\n"+
+			"--- enforcement/conversation-goal-ledger.md ---\n%s",
+		phase, obligCount, gateCount, activePerTurn,
+		coreBootstrap, ruleWeight, dependency, goalLedger,
+	)
+
+	output := map[string]interface{}{
+		"hookSpecificOutput": map[string]interface{}{
+			"hookEventName":     "SessionStart",
+			"additionalContext": context,
+		},
+	}
+	if err := json.NewEncoder(stdout).Encode(output); err != nil {
+		_, _ = fmt.Fprintln(stderr, "encode error:", err)
+		return ExitGeneralFailure
+	}
+
+	projectHash := md5Short(projectDir)
+	flagFile := "/tmp/ai-skill-sessionstart-" + projectHash + ".flag"
+	_ = os.WriteFile(flagFile, []byte(fmt.Sprintf("%d", time.Now().Unix())), 0o644)
+	appendLog(logFile, "wrote sessionstart flag: "+flagFile)
+	appendLog(logFile, fmt.Sprintf("phase=%s obligations=%s gates=%s", phase, obligCount, gateCount))
+	return ExitSuccess
+}
+
+// runPreToolUseHook implements the Claude Code PreToolUse hook.
+// Blocks non-Read tool calls until "Bootstrap:" is found in an assistant message.
+// Uses cache file + SessionStart TTL flag to avoid redundant transcript scans.
+func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
+	const logFile = "/tmp/ai-skill-bootstrap-hook.log"
+	ts := time.Now().Format("2006-01-02T15:04:05")
+	appendLog(logFile, "=== "+ts+" PreToolUse hook fired (Go) ===")
+
+	raw, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_BAD_INPUT:", err)
+		return ExitSuccess
+	}
+	var payload map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &payload); err != nil {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_BAD_INPUT:", err)
+		return ExitSuccess
+	}
+
+	var toolName, transcriptPath string
+	if v, ok := payload["tool_name"]; ok {
+		_ = json.Unmarshal(v, &toolName)
+	}
+	if v, ok := payload["transcript_path"]; ok {
+		_ = json.Unmarshal(v, &transcriptPath)
+	}
+	appendLog(logFile, fmt.Sprintf("DIAG tool=%q transcript=%q", toolName, transcriptPath))
+	_, _ = fmt.Fprintf(stderr, "DIAG tool=%q transcript=%q\n", toolName, transcriptPath)
+
+	if toolName == "Read" {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_READ_TOOL:", toolName)
+		return ExitSuccess
+	}
+
+	if transcriptPath == "" || !claudeFileExists(transcriptPath) {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_NO_TRANSCRIPT:", transcriptPath)
+		return ExitSuccess
+	}
+
+	cacheKey := md5Short(transcriptPath)
+	cacheFile := "/tmp/ai-skill-bootstrap-" + cacheKey + ".done"
+	if claudeFileExists(cacheFile) {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_CACHED")
+		return ExitSuccess
+	}
+
+	if projectDir != "" {
+		projectHash := md5Short(projectDir)
+		flagFile := "/tmp/ai-skill-sessionstart-" + projectHash + ".flag"
+		if data, err := os.ReadFile(flagFile); err == nil {
+			var flagTs int64
+			if _, err2 := fmt.Sscanf(strings.TrimSpace(string(data)), "%d", &flagTs); err2 == nil {
+				if time.Now().Unix()-flagTs < 120 {
+					_ = os.WriteFile(cacheFile, []byte{}, 0o644)
+					_, _ = fmt.Fprintln(stderr, "ALLOW_SESSIONSTART_FLAG")
+					appendLog(logFile, "exit_code: 0 (sessionstart flag)")
+					return ExitSuccess
+				}
+			}
+		}
+	}
+
+	for _, text := range extractAssistantTexts(transcriptPath) {
+		if strings.Contains(text, "Bootstrap:") {
+			_ = os.WriteFile(cacheFile, []byte{}, 0o644)
+			_, _ = fmt.Fprintln(stderr, "ALLOW_RECEIPT_FOUND")
+			appendLog(logFile, "exit_code: 0 (receipt found)")
+			return ExitSuccess
+		}
+	}
+
+	_, _ = fmt.Fprintln(stderr, "BLOCK_NO_RECEIPT")
+	appendLog(logFile, "exit_code: 2 (block no receipt)")
+	_, _ = fmt.Fprint(stderr, `[ai-skill PreToolUse hook] Bootstrap Receipt missing.
+
+Before calling any tool other than Read, you MUST:
+1. Read CORE_BOOTSTRAP.md
+2. Query runtime/runtime.db for phase / obligations / gates
+3. Read the 3 required_reads: enforcement/rule-weight.md, enforcement/dependency-reading.md, enforcement/conversation-goal-ledger.md
+4. Output the Bootstrap Receipt in your first user-facing response:
+   Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
+   Active per-turn obligations: <obligation ids>
+
+Only Read tool calls are allowed before the Receipt is emitted.
+`)
+	return ExitValidationFailed
+}
+
+// runPostToolUseHook implements the Claude Code PostToolUse hook.
+// Injects a Bootstrap Receipt reminder when the receipt is not yet present.
+// Always exits 0 (PostToolUse cannot reliably block without breaking tool results).
+func runPostToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
+	raw, _ := io.ReadAll(os.Stdin)
+	var payload map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &payload); err != nil {
+		return ExitSuccess
+	}
+
+	var transcriptPath string
+	if v, ok := payload["transcript_path"]; ok {
+		_ = json.Unmarshal(v, &transcriptPath)
+	}
+
+	if transcriptPath != "" {
+		cacheKey := md5Short(transcriptPath)
+		cacheFile := "/tmp/ai-skill-bootstrap-" + cacheKey + ".done"
+		if claudeFileExists(cacheFile) {
+			_, _ = fmt.Fprintln(stderr, "CACHED_DONE")
+			return ExitSuccess
+		}
+		if claudeFileExists(transcriptPath) {
+			for _, text := range extractAssistantTexts(transcriptPath) {
+				if strings.Contains(text, "Bootstrap:") {
+					_ = os.WriteFile(cacheFile, []byte{}, 0o644)
+					_, _ = fmt.Fprintln(stderr, "RECEIPT_FOUND")
+					return ExitSuccess
+				}
+			}
+		}
+	}
+
+	reminder := "[ai-skill PostToolUse] Bootstrap Receipt not yet emitted. " +
+		"Before writing your next response, you MUST:\n" +
+		"1. Read CORE_BOOTSTRAP.md\n" +
+		"2. Query runtime/runtime.db (phase / obligations / gates)\n" +
+		"3. Read enforcement/rule-weight.md, enforcement/dependency-reading.md, enforcement/conversation-goal-ledger.md\n" +
+		"4. Output Bootstrap Receipt as the first line of your response:\n" +
+		"   Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>\n" +
+		"   Active per-turn obligations: <obligation ids>"
+	output := map[string]interface{}{
+		"hookSpecificOutput": map[string]interface{}{
+			"hookEventName":     "PostToolUse",
+			"additionalContext": reminder,
+		},
+	}
+	if err := json.NewEncoder(stdout).Encode(output); err == nil {
+		_, _ = fmt.Fprintln(stderr, "INJECTED_REMINDER")
+	}
+	return ExitSuccess
+}
+
+// runUserPromptSubmitHook implements the Claude Code UserPromptSubmit hook.
+// Injects per-turn obligation reminder + CORE_BOOTSTRAP.md as additionalContext.
+func runUserPromptSubmitHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
+	const logFile = "/tmp/ai-skill-prompt-hook.log"
+	appendLog(logFile, time.Now().Format("2006-01-02T15:04:05")+" UserPromptSubmit fired (Go)")
+
+	bootstrap := readFileSafe(filepath.Join(projectDir, "CORE_BOOTSTRAP.md"))
+	combined := "[ai-skill per-turn obligation] Final response MUST end with ### Cognitive Mode 報告 block. " +
+		"First-turn ALSO outputs Bootstrap Receipt. Canonical spec: runtime/core-bootstrap.yaml.\n\n---\n" +
+		bootstrap
+
+	output := map[string]interface{}{
+		"hookSpecificOutput": map[string]interface{}{
+			"hookEventName":     "UserPromptSubmit",
+			"additionalContext": combined,
+		},
+	}
+	if err := json.NewEncoder(stdout).Encode(output); err != nil {
+		_, _ = fmt.Fprintln(stderr, "encode error:", err)
+	}
+	return ExitSuccess
+}
+
+// runStopHook implements the Claude Code Stop hook.
+// Blocks stop if the last assistant message lacks a Cognitive Mode block
+// (either compact "Cognitive: X..." or full "### Cognitive Mode 報告").
+func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
+	const logFile = "/tmp/ai-skill-stop-hook.log"
+	ts := time.Now().Format("2006-01-02T15:04:05")
+	appendLog(logFile, "=== "+ts+" Stop hook fired (Go) ===")
+
+	raw, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_BAD_INPUT:", err)
+		return ExitSuccess
+	}
+	appendLog(logFile, "input_json: "+string(raw))
+
+	var payload map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &payload); err != nil {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_BAD_INPUT:", err)
+		return ExitSuccess
+	}
+
+	if v, ok := payload["stop_hook_active"]; ok {
+		var active bool
+		if err := json.Unmarshal(v, &active); err == nil && active {
+			_, _ = fmt.Fprintln(stderr, "ALLOW_LOOP_GUARD")
+			return ExitSuccess
+		}
+	}
+
+	var transcriptPath string
+	if v, ok := payload["transcript_path"]; ok {
+		_ = json.Unmarshal(v, &transcriptPath)
+	}
+	if transcriptPath == "" || !claudeFileExists(transcriptPath) {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_NO_TRANSCRIPT: path="+transcriptPath)
+		return ExitSuccess
+	}
+
+	texts := extractAssistantTexts(transcriptPath)
+	if len(texts) == 0 {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_NO_ASSISTANT_MSG")
+		return ExitSuccess
+	}
+	lastText := texts[len(texts)-1]
+
+	tail := lastText
+	if len(tail) > 200 {
+		tail = tail[len(tail)-200:]
+	}
+	diagMsg := fmt.Sprintf("DIAG last_msg_len=%d tail=%q", len(lastText), tail)
+	appendLog(logFile, diagMsg)
+	_, _ = fmt.Fprintln(stderr, diagMsg)
+
+	cogRe := regexp.MustCompile(`(### Cognitive Mode 報告|(?:^|\n)Cognitive: [A-Z])`)
+	if cogRe.MatchString(lastText) {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_BLOCK_PRESENT")
+		appendLog(logFile, "exit_code: 0")
+		return ExitSuccess
+	}
+
+	_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING")
+	appendLog(logFile, "exit_code: 2")
+	_, _ = fmt.Fprint(stderr, "[ai-skill Stop hook] Missing obligation: your final response did not include the `### Cognitive Mode 報告` block.\n\n"+
+		"Per runtime/core-bootstrap.yaml §per_turn_obligations[obligation.cognitive.mode_report], every final user-facing "+
+		"response MUST end with a Cognitive Mode block (compact 1-line for trivial all-default tasks: "+
+		"`Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>`; full 6-row markdown table otherwise).\n\n"+
+		"Please append the block to your response now, then stop again. Canonical format spec: runtime/core-bootstrap.yaml. "+
+		"Query active obligations: `ai-skill runtime obligations`.\n")
+	return ExitValidationFailed
 }
 
 // cognitiveV2Defaults are the 6 default dim values for the v2 compact form.

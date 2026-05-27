@@ -1,5 +1,5 @@
 {
-  "description": "Claude Code shared settings (canonical three-level nested hook format with matcher field). Bootstrap canonical: repo-root CLAUDE.md (Claude Code auto-load) → CORE_BOOTSTRAP.md (companion) → runtime/core-bootstrap.yaml (executable contract, projected to runtime.db generated_surfaces). User-specific permissions and overrides live in .claude/settings.local.json (gitignored). Do not duplicate obligations / format / enum content here; that lives in the canonical YAML. Hooks: SessionStart auto-loads bootstrap context so users never have to type /bootstrap; UserPromptSubmit pre-injects per-turn reminder; PreToolUse blocks non-Read tools until Receipt emitted; PostToolUse reminds if Receipt missing; Stop validates last assistant message contains Cognitive Mode block. All hooks write diagnostic logs to /tmp/ai-skill-*-hook.log for debugging.",
+  "description": "Claude Code shared settings (canonical three-level nested hook format with matcher field). Bootstrap canonical: repo-root CLAUDE.md (Claude Code auto-load) → CORE_BOOTSTRAP.md (companion) → runtime/core-bootstrap.yaml (executable contract, projected to runtime.db generated_surfaces). User-specific permissions and overrides live in .claude/settings.local.json (gitignored). Hooks: 5 Claude Code events (SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop) all delegate to the Go binary scripts/ai-skill-cli/bin/ai-skill-<os>-<arch> for cross-platform parity (no bash/python/jq required at runtime). The inline `sh -c` wrapper detects OS/arch via `uname` and selects the right binary; this wrapper itself is the only POSIX-shell dependency. Per plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md cross-platform Go script runtime policy. Diagnostic logs at /tmp/ai-skill-*-hook.log.",
   "hooks": {
     "SessionStart": [
       {
@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-bootstrap.sh\"",
+            "command": "sh -c 'ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$ROOT/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run session-start --repo \"$ROOT\"'",
             "timeout": 30
           }
         ]
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'echo \"$(date +%Y-%m-%dT%H:%M:%S) UserPromptSubmit fired\" >> /tmp/ai-skill-prompt-hook.log; bootstrap=$(cat \"${CLAUDE_PROJECT_DIR}/CORE_BOOTSTRAP.md\" 2>/dev/null); reminder=\"[ai-skill per-turn obligation] Final response MUST end with ### Cognitive Mode 報告 block. First-turn ALSO outputs Bootstrap Receipt. Canonical spec: runtime/core-bootstrap.yaml.\"; combined=$(printf \"%s\\n\\n---\\n%s\" \"$reminder\" \"$bootstrap\"); printf \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"UserPromptSubmit\\\",\\\"additionalContext\\\":%s}}\" \"$(/opt/homebrew/bin/jq -Rs . <<< \"$combined\")\"'",
+            "command": "sh -c 'ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$ROOT/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run user-prompt-submit --repo \"$ROOT\"'",
             "timeout": 30
           }
         ]
@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/check-bootstrap-receipt.sh\"",
+            "command": "sh -c 'ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$ROOT/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run pre-tool-use --repo \"$ROOT\"'",
             "timeout": 10
           }
         ]
@@ -43,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/remind-bootstrap-receipt.sh\"",
+            "command": "sh -c 'ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$ROOT/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run post-tool-use --repo \"$ROOT\"'",
             "timeout": 10
           }
         ]
@@ -55,7 +55,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/check-cognitive-mode.sh\"",
+            "command": "sh -c 'ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$ROOT/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run stop --repo \"$ROOT\"'",
             "timeout": 10
           }
         ]

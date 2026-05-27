@@ -26,6 +26,11 @@
 | `ai-skill hooks run commit-msg` | 執行 Git commit-msg hook logic：commit body 必須含 Cognitive Contract v2 報告，並通過 behavioral validators（execution floors、governance consistency、memory subdir、cognitive cost、activation signals、capability snippet、plan sync、token budget、adaptive triggers、bootstrap thinness、CLI doc sync、runtime YAML projection、Markdown/YAML sync） | 否 | 是 | ADR-008 / runtime-cognitive-contract-v2 |
 | `ai-skill hooks run post-commit` | 執行 Git post-commit hook logic（cursor bundle sync 等） | 否 | 是 | Shell To Go |
 | `ai-skill hooks run pre-push` | 執行 Git pre-push hook logic：CLI source 變動時 go test ./... preflight | 否 | 是 | Shell To Go |
+| `ai-skill hooks run session-start` | 執行 Claude Code SessionStart hook：query runtime.db、讀 4 個 bootstrap 文件、輸出 hookSpecificOutput JSON、寫 SessionStart flag（TTL 120s） | 是（`/tmp/ai-skill-sessionstart-<hash>.flag`） | 否 | Cross-platform Go script runtime |
+| `ai-skill hooks run pre-tool-use` | 執行 Claude Code PreToolUse hook：scan transcript for Bootstrap Receipt；Read tool 一律 allow，其他 tool 在 Receipt 出現前 block（exit 2） | 是（`/tmp/ai-skill-bootstrap-<hash>.done`） | 否 | Cross-platform Go script runtime |
+| `ai-skill hooks run post-tool-use` | 執行 Claude Code PostToolUse hook：Bootstrap Receipt 不在 transcript 時注入 reminder via hookSpecificOutput；always exit 0 | 是（cache file） | 否 | Cross-platform Go script runtime |
+| `ai-skill hooks run user-prompt-submit` | 執行 Claude Code UserPromptSubmit hook：每次 user turn 注入 per-turn obligation reminder + CORE_BOOTSTRAP.md as additionalContext | 否 | 否 | Cross-platform Go script runtime |
+| `ai-skill hooks run stop` | 執行 Claude Code Stop hook：檢查 last assistant message 含 Cognitive Mode block（compact 或 full table）；缺少時 block（exit 2） | 否 | 否 | Cross-platform Go script runtime |
 | `ai-skill sync-cursor-bundle` | 同步 Cursor bundle / mirror | 是 | 否 | Phase 2 |
 | `ai-skill close-loop` | 檢查 dirty owner group、commit、push、readback | 是 | 是 | Phase 2 |
 | `ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index | 是 | 否 | Phase 3 |
