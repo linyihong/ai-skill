@@ -11,6 +11,17 @@
 3. **報告模式**：輸出 **Cognitive Mode 報告 (v2)**，記錄 discovery signals。
 4. **追蹤目標**：讀取 [`.agent-goals/README.md`](.agent-goals/README.md) 同步當前任務。
 
+## 本專案強制回覆規則
+
+本檔不是完整規則，只是 bootstrap pointer。Gemini 必須在處理任務前完成：
+
+1. 使用本 repo root 作為 Ai-skill repo。
+2. 讀本 repo 的 `CORE_BOOTSTRAP.md`。
+3. 讀本 repo 的 `runtime/core-bootstrap.yaml`，以 YAML canonical contract 為準。
+4. 每個 user-facing response 結尾都必須依 active per-turn obligations 附上 Cognitive Mode reporting。
+
+不能只停在本檔摘要；必須 dereference pointer 到 canonical files。
+
 ## 特殊能力規範
 
 Gemini CLI 具備外部檢索與子代理能力，詳細規範見 [`ai-tools/agent/gemini-cli.md`](ai-tools/agent/gemini-cli.md)。

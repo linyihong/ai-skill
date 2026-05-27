@@ -15,6 +15,16 @@ Before any non-read action in this repo, load:
 1. [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md) — human-readable companion and entry.
 2. [`runtime/core-bootstrap.yaml`](../../runtime/core-bootstrap.yaml) — canonical bootstrap contract.
 
+Mandatory project-local obligations:
+
+1. Use this repository root as the Ai-skill repo.
+2. Read `CORE_BOOTSTRAP.md` and `runtime/core-bootstrap.yaml` before any
+   non-read action.
+3. Do not stop at this rule summary. The canonical contract is the YAML file.
+4. Every user-facing response in this repo must end with Cognitive Mode
+   reporting according to the active per-turn obligations from
+   `runtime/core-bootstrap.yaml`.
+
 Then follow the obligations declared by the runtime bootstrap contract, including
 Bootstrap Receipt, Cognitive Mode reporting, and close-loop checks.
 
