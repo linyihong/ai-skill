@@ -37,6 +37,29 @@ cd ~/projects/my-new-app
 code .   # 或 cursor . 或 claude .
 ```
 
+## 本機環境變數
+
+`AI_SKILL_REPO` 是 project-local bootstrap files 連回 Ai-skill knowledge repo 的唯一約定。它是每台機器自己的設定，不應寫入會 commit 的專案檔或 `.env`。
+
+`init-project` 會自動建立：
+
+- `.ai-skill/local.env`：本機設定，內容包含 `AI_SKILL_REPO=<目前 Ai-skill repo>`，權限為 `0600`
+- `.ai-skill/.gitignore`：忽略 `local.env`，避免本機路徑被 commit
+
+Claude hooks 會先讀 process environment；如果沒有 `AI_SKILL_REPO`，會 source `.ai-skill/local.env`，所以剛初始化後不用重開 shell 也能連回 Ai-skill。
+
+```bash
+# macOS / Linux / WSL
+export AI_SKILL_REPO=/path/to/ai-skill
+```
+
+```powershell
+# Windows PowerShell
+[Environment]::SetEnvironmentVariable("AI_SKILL_REPO", "C:\path\to\Ai-skill", "User")
+```
+
+長期建議做法：macOS / Linux / WSL 放在 shell profile（例如 `~/.zshrc`、`~/.bashrc`）；Windows 放在 User environment variable。Project files 只保留 `<AI_SKILL_REPO>` placeholder，讓同一份 repo 可以在不同 OS / 使用者路徑上共用。
+
 ## 進階用法
 
 ### 只設定特定工具

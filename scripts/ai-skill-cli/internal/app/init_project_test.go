@@ -29,8 +29,8 @@ func TestInitProjectDryRunPlansFilesWithoutWriting(t *testing.T) {
 	if len(result.Mutations) != 0 {
 		t.Fatalf("dry-run must not mutate, got %#v", result.Mutations)
 	}
-	if len(result.PlannedActions) != 4 {
-		t.Fatalf("expected 4 planned actions, got %#v", result.PlannedActions)
+	if len(result.PlannedActions) != 6 {
+		t.Fatalf("expected 6 planned actions, got %#v", result.PlannedActions)
 	}
 	if pathExists(filepath.Join(project, ".roomodes")) {
 		t.Fatal("dry-run wrote .roomodes")
@@ -90,7 +90,7 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
 		t.Fatalf("decode JSON: %v", err)
 	}
-	if result.Mode != "write" || len(result.Mutations) != 5 {
+	if result.Mode != "write" || len(result.Mutations) != 7 {
 		t.Fatalf("expected write mutations, got %#v", result)
 	}
 	claudePath := filepath.Join(project, "CLAUDE.md")
@@ -111,6 +111,9 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if !strings.Contains(string(claudeContent), "<AI_SKILL_REPO>/CORE_BOOTSTRAP.md") {
 		t.Fatalf("expected portable placeholder in CLAUDE.md, got %s", string(claudeContent))
 	}
+	if !strings.Contains(string(claudeContent), "AI_SKILL_REPO") || !strings.Contains(string(claudeContent), "Windows PowerShell") {
+		t.Fatalf("expected cross-platform AI_SKILL_REPO setup guidance in CLAUDE.md, got %s", string(claudeContent))
+	}
 	claudeSettingsPath := filepath.Join(project, ".claude", "settings.json")
 	if !pathExists(claudeSettingsPath) {
 		t.Fatal("write mode did not create Claude Code hook settings")
@@ -125,6 +128,9 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if !strings.Contains(string(claudeSettings), "user-prompt-submit") || !strings.Contains(string(claudeSettings), "AI_SKILL_REPO") {
 		t.Fatalf("expected Claude hooks to call Ai-skill Go runner, got %s", string(claudeSettings))
 	}
+	if !strings.Contains(string(claudeSettings), ".ai-skill/local.env") {
+		t.Fatalf("expected Claude hooks to source project-local env, got %s", string(claudeSettings))
+	}
 	if !pathExists(filepath.Join(project, ".cursor", "rules", "ai-skill-bootstrap.mdc")) {
 		t.Fatal("write mode did not create Cursor rule")
 	}
@@ -137,6 +143,27 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	}
 	if !strings.Contains(string(goals), "ai-skill goals") {
 		t.Fatalf("expected Go CLI goals guidance, got %s", string(goals))
+	}
+	localIgnore, err := os.ReadFile(filepath.Join(project, ".ai-skill", ".gitignore"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(localIgnore), "local.env") && !strings.Contains(string(localIgnore), "*") {
+		t.Fatalf("expected .ai-skill/.gitignore to ignore local files, got %s", string(localIgnore))
+	}
+	localEnvInfo, err := os.Stat(filepath.Join(project, ".ai-skill", "local.env"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if localEnvInfo.Mode().Perm() != 0o600 {
+		t.Fatalf("expected local.env mode 0600, got %o", localEnvInfo.Mode().Perm())
+	}
+	localEnv, err := os.ReadFile(filepath.Join(project, ".ai-skill", "local.env"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(localEnv), "export AI_SKILL_REPO=") || !strings.Contains(string(localEnv), repo) {
+		t.Fatalf("expected local.env to set current Ai-skill repo, got %s", string(localEnv))
 	}
 }
 
@@ -169,6 +196,9 @@ func TestInitProjectWritesCodexBootstrap(t *testing.T) {
 	}
 	if strings.Contains(string(content), filepath.ToSlash(repo)) {
 		t.Fatalf("AGENTS.md must not contain local absolute Ai-skill path, got %s", string(content))
+	}
+	if !strings.Contains(string(content), "AI_SKILL_REPO") || !strings.Contains(string(content), "Windows PowerShell") {
+		t.Fatalf("expected cross-platform AI_SKILL_REPO setup guidance in AGENTS.md, got %s", string(content))
 	}
 }
 

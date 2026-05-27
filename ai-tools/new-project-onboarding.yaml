@@ -95,6 +95,7 @@ steps:
 success_criteria:
   - 新專案 bootstrap files 只指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml` 等 canonical bootstrap source，不複製規則全文
   - project-local bootstrap files do not embed the local Ai-skill repository absolute path; use `<AI_SKILL_REPO>` placeholder and `AI_SKILL_REPO` environment variable instead
+  - init-project creates `.ai-skill/local.env` as an ignored machine-local bridge file and `.ai-skill/.gitignore` to prevent committing the local path
   - Claude Code project setup includes `.claude/settings.json` hook wiring to Ai-skill Go runner for per-turn Cognitive Mode and nested Git report enforcement
   - selected tools 與 `ai-tools/agent/` adapter 清單一致
   - 新增工具時同步更新 agent onboarding 與 project onboarding

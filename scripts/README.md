@@ -36,7 +36,7 @@ export AI_SKILL_REPO=/path/to/ai-skill
 scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app
 ```
 
-`init-project` 產生的 project files 不寫本機 Ai-skill repo 絕對路徑；文件使用 `<AI_SKILL_REPO>` placeholder，Claude hooks 讀 `AI_SKILL_REPO` 環境變數並用 portable fallback。
+`init-project` 產生的 committed project files 不寫本機 Ai-skill repo 絕對路徑；文件使用 `<AI_SKILL_REPO>` placeholder。初始化會另外建立 `.ai-skill/local.env` 作為 machine-local bridge，並建立 `.ai-skill/.gitignore` 排除它；Claude hooks 會讀 `AI_SKILL_REPO` 環境變數、`.ai-skill/local.env`，最後才用 portable fallback。
 
 這會在目標專案中建立：
 

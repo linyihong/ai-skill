@@ -25,6 +25,7 @@ type plannedFile struct {
 	tool        string
 	path        string
 	description string
+	private     bool
 }
 
 func runInitProject(args []string, stdout io.Writer, stderr io.Writer) int {
@@ -258,7 +259,11 @@ func initProjectPlannedFiles(target string, tools []string) []plannedFile {
 			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "AGENTS.md"), description: "Generic agent entry (AGENTS.md — Codex / Aider / Cline / other AGENTS.md-aware)"})
 		}
 	}
-	files = append(files, plannedFile{tool: "common", path: filepath.Join(target, ".agent-goals", "README.md"), description: "agent goals ledger"})
+	files = append(files,
+		plannedFile{tool: "common", path: filepath.Join(target, ".agent-goals", "README.md"), description: "agent goals ledger"},
+		plannedFile{tool: "common", path: filepath.Join(target, ".ai-skill", ".gitignore"), description: "Ai-skill local config ignore rules"},
+		plannedFile{tool: "common", path: filepath.Join(target, ".ai-skill", "local.env"), description: "Ai-skill local environment", private: true},
+	)
 	return files
 }
 
@@ -271,7 +276,11 @@ func writeInitProjectFile(path string, content []byte, force bool) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(path, content, 0o644)
+	mode := os.FileMode(0o644)
+	if filepath.Base(path) == "local.env" {
+		mode = 0o600
+	}
+	return os.WriteFile(path, content, mode)
 }
 
 func initProjectFileContent(file plannedFile, repo string) (string, error) {
@@ -293,6 +302,12 @@ func initProjectFileContent(file plannedFile, repo string) (string, error) {
 	case "codex":
 		return initProjectCodexContent(repo)
 	case "common":
+		if strings.HasSuffix(file.path, filepath.Join(".ai-skill", ".gitignore")) {
+			return initProjectLocalGitignoreContent()
+		}
+		if strings.HasSuffix(file.path, filepath.Join(".ai-skill", "local.env")) {
+			return initProjectLocalEnvContent(repo)
+		}
 		return initProjectGoalsReadmeContent(repo)
 	default:
 		return "", fmt.Errorf("unsupported init-project template: %s", file.tool)
@@ -303,6 +318,24 @@ const aiSkillRepoPlaceholder = "<AI_SKILL_REPO>"
 
 func initProjectBootstrapText(repo string) string {
 	return fmt.Sprintf(`本專案使用 Ai-skill 知識庫。請在本機設定環境變數 `+"`AI_SKILL_REPO`"+` 指向 Ai-skill repository；文件中以 `+"`%s`"+` 表示該路徑。
+
+## 本機設定
+
+不要把本機 Ai-skill repo 絕對路徑 commit 進專案。啟用順序：
+
+1. 優先讀本機環境變數 `+"`AI_SKILL_REPO`"+`
+2. 如果環境變數不存在，讀 `+"`.ai-skill/local.env`"+`（由 `+"`ai-skill init-project`"+` 產生，已被 `+"`.ai-skill/.gitignore`"+` 排除）
+3. Claude hook 會再嘗試 $HOME/Documents/Ai-skill 等 portable fallback
+
+每台機器可用自己的環境變數設定：
+
+    # macOS / Linux / WSL
+    export AI_SKILL_REPO=/path/to/ai-skill
+
+    # Windows PowerShell
+    [Environment]::SetEnvironmentVariable("AI_SKILL_REPO", "C:\path\to\Ai-skill", "User")
+
+建議把 macOS / Linux / WSL 設定放在 shell profile（例如 ~/.zshrc、~/.bashrc），Windows 則用 User environment variable。不要提交 .env、.ai-skill/local.env 或任何含個人路徑的檔案。
 
 > **IMPORTANT — MUST RUN BEFORE ANY OTHER ACTION**
 > 本檔為 **thin tool-entry pointer**。所有 obligation / format / enum / example 的 canonical 來源在 `+"`%s/runtime/core-bootstrap.yaml`"+`；`+"`%s/CORE_BOOTSTRAP.md`"+` 是 human-readable companion。Session 啟動 first turn 必須讀取 companion 並依 canonical contract 執行 Bootstrap Receipt、Cognitive Mode 報告與 close-loop obligations。
@@ -377,7 +410,7 @@ func initProjectClaudeContent(repo string) (string, error) {
 
 func initProjectClaudeSettingsContent(repo string) (string, error) {
 	command := func(event string) string {
-		return fmt.Sprintf("sh -c 'ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; if [ -z \"${AI_SKILL_REPO:-}\" ]; then for candidate in \"$HOME/Documents/Ai-skill\" \"$HOME/Ai-skill\" \"$PWD/../Ai-skill\"; do if [ -d \"$candidate/scripts/ai-skill-cli/bin\" ]; then AI_SKILL_REPO=\"$candidate\"; break; fi; done; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then echo \"AI_SKILL_REPO is not set; skipping Ai-skill hook %s\" >&2; exit 0; fi; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run %s --repo \"$AI_SKILL_REPO\"'", event, event)
+		return fmt.Sprintf("sh -c 'ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; if [ -z \"${AI_SKILL_REPO:-}\" ] && [ -f \"$ROOT/.ai-skill/local.env\" ]; then . \"$ROOT/.ai-skill/local.env\"; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then for candidate in \"$HOME/Documents/Ai-skill\" \"$HOME/Ai-skill\" \"$PWD/../Ai-skill\"; do if [ -d \"$candidate/scripts/ai-skill-cli/bin\" ]; then AI_SKILL_REPO=\"$candidate\"; break; fi; done; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then echo \"AI_SKILL_REPO is not set; skipping Ai-skill hook %s\" >&2; exit 0; fi; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run %s --repo \"$AI_SKILL_REPO\"'", event, event)
 	}
 	settings := map[string]any{
 		"description": "Claude Code project-local Ai-skill hooks. Commands execute the canonical Ai-skill repo-local Go binary and use CLAUDE_PROJECT_DIR as the target project root for nested Git reports.",
@@ -420,6 +453,24 @@ func initProjectCodexContent(repo string) (string, error) {
 
 本檔為 thin generic agent entry。適用 Codex、Cursor partial、Aider、Cline 等遵循 `+"`AGENTS.md`"+` 慣例的 AI agent。Canonical obligations 在 Ai-skill repo 的 `+"`CORE_BOOTSTRAP.md`"+` + `+"`runtime/core-bootstrap.yaml`"+`。
 
+## 本機設定
+
+不要把本機 Ai-skill repo 絕對路徑 commit 進專案。啟用順序：
+
+1. 優先讀本機環境變數 `+"`AI_SKILL_REPO`"+`
+2. 如果環境變數不存在，讀 `+"`.ai-skill/local.env`"+`（由 `+"`ai-skill init-project`"+` 產生，已被 `+"`.ai-skill/.gitignore`"+` 排除）
+3. Claude hook 會再嘗試 $HOME/Documents/Ai-skill 等 portable fallback
+
+每台機器可用自己的 `+"`AI_SKILL_REPO`"+` 環境變數設定：
+
+    # macOS / Linux / WSL
+    export AI_SKILL_REPO=/path/to/ai-skill
+
+    # Windows PowerShell
+    [Environment]::SetEnvironmentVariable("AI_SKILL_REPO", "C:\path\to\Ai-skill", "User")
+
+文件中以 `+"`<AI_SKILL_REPO>`"+` 表示該路徑。建議把 macOS / Linux / WSL 設定放在 shell profile，Windows 則用 User environment variable。不要提交 .env、.ai-skill/local.env 或任何含個人路徑的檔案。
+
 ## 啟動序列
 
 1. %s — 必讀規則 + 所有 obligations
@@ -446,4 +497,22 @@ func initProjectGoalsReadmeContent(repo string) (string, error) {
 
 （尚無 active goal）
 `, aiSkillRepoPlaceholder), nil
+}
+
+func initProjectLocalGitignoreContent() (string, error) {
+	return `*
+!.gitignore
+`, nil
+}
+
+func initProjectLocalEnvContent(repo string) (string, error) {
+	return fmt.Sprintf(`# Local Ai-skill bootstrap configuration.
+# This file contains a machine-local path and is ignored by .ai-skill/.gitignore.
+# Do not commit this file.
+export AI_SKILL_REPO=%s
+`, shellSingleQuote(repo)), nil
+}
+
+func shellSingleQuote(value string) string {
+	return "'" + strings.ReplaceAll(value, "'", "'\\''") + "'"
 }
