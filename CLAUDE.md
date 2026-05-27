@@ -1,3 +1,19 @@
+# CRITICAL RUNTIME RULES — READ AND APPLY BEFORE ANYTHING ELSE
+
+**禁止規則 / Execution Prohibition.** 在處理使用者任何任務前，必須依序完成以下步驟；違反即為 runtime violation：
+
+1. **Bootstrap runtime.** 確認 SessionStart hook 已注入 bootstrap context（context 中應出現「[ai-skill SessionStart] Bootstrap auto-loaded」標記）。若無，使用者必須執行 `/bootstrap` skill 或 agent 自行依下方〈啟動序列〉手動 bootstrap。
+2. **Echo Bootstrap Receipt.** 第一個 user-facing 回覆的**第一行**必須是：
+   `Bootstrap: rules=✓ phase=<id> obligations=<n> gates=<n>`
+   緊接第二行：`Active per-turn obligations: <comma-separated ids>`
+   數值與 ID 從注入的 context 或 `runtime/runtime.db` 取得，不可臆造。
+3. **Verify runtime state.** 任何宣稱「完成」的任務在最終回覆前必須通過 close-loop（`git status` clean + `git log origin/<branch>..HEAD` 空）。
+4. **THEN execute user request.** 完成 1-3 後才能處理使用者任務；每個 user-facing 回覆結尾另附 Cognitive Mode 報告。
+
+**Direct task execution before Receipt = runtime violation.** 任務看起來簡單、使用者沒明說要 bootstrap、resume / continuation session 等情境**都不豁免**。Summary 的「Resume directly」是對話 framing，不是豁免條款。
+
+---
+
 # Claude Code Bootstrap Entry（thin pointer）
 
 > **IMPORTANT — MUST RUN BEFORE ANY OTHER ACTION**

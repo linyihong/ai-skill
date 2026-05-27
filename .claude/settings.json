@@ -1,32 +1,64 @@
 {
-  "description": "Claude Code shared settings (thin pointer). Bootstrap canonical: repo-root CLAUDE.md (Claude Code auto-load) → CORE_BOOTSTRAP.md (companion) → runtime/core-bootstrap.yaml (executable contract, projected to runtime.db generated_surfaces). User-specific permissions and overrides live in .claude/settings.local.json (gitignored). Do not duplicate obligations / format / enum content here; that lives in the canonical YAML. Hooks below strengthen per-turn obligation visibility (D strategy from archived bootstrap-contract-yaml-migration plan): UserPromptSubmit pre-injects reminder; Stop validates last assistant message contains the required block before allowing stop. Both hooks write diagnostic logs to /tmp/ai-skill-*-hook.log for debugging.",
+  "description": "Claude Code shared settings (canonical three-level nested hook format with matcher field). Bootstrap canonical: repo-root CLAUDE.md (Claude Code auto-load) → CORE_BOOTSTRAP.md (companion) → runtime/core-bootstrap.yaml (executable contract, projected to runtime.db generated_surfaces). User-specific permissions and overrides live in .claude/settings.local.json (gitignored). Do not duplicate obligations / format / enum content here; that lives in the canonical YAML. Hooks: SessionStart auto-loads bootstrap context so users never have to type /bootstrap; UserPromptSubmit pre-injects per-turn reminder; PreToolUse blocks non-Read tools until Receipt emitted; PostToolUse reminds if Receipt missing; Stop validates last assistant message contains Cognitive Mode block. All hooks write diagnostic logs to /tmp/ai-skill-*-hook.log for debugging.",
   "hooks": {
-    "PostToolUse": [
+    "SessionStart": [
       {
-        "type": "command",
-        "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/remind-bootstrap-receipt.sh\"",
-        "timeout": 10
-      }
-    ],
-    "PreToolUse": [
-      {
-        "type": "command",
-        "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/check-bootstrap-receipt.sh\"",
-        "timeout": 10
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-bootstrap.sh\"",
+            "timeout": 30
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
       {
-        "type": "command",
-        "command": "bash -c 'echo \"$(date +%Y-%m-%dT%H:%M:%S) UserPromptSubmit fired\" >> /tmp/ai-skill-prompt-hook.log; bootstrap=$(cat /Users/larrylin/Documents/Ai-skill/CORE_BOOTSTRAP.md 2>/dev/null); reminder=\"[ai-skill per-turn obligation] Final response MUST end with ### Cognitive Mode 報告 block. First-turn ALSO outputs Bootstrap Receipt. Canonical spec: runtime/core-bootstrap.yaml.\"; combined=$(printf \"%s\n\n---\n%s\" \"$reminder\" \"$bootstrap\"); printf \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"UserPromptSubmit\\\",\\\"additionalContext\\\":%s}}\" \"$(/opt/homebrew/bin/jq -Rs . <<< \"$combined\")\"'",
-        "timeout": 30
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'echo \"$(date +%Y-%m-%dT%H:%M:%S) UserPromptSubmit fired\" >> /tmp/ai-skill-prompt-hook.log; bootstrap=$(cat \"${CLAUDE_PROJECT_DIR}/CORE_BOOTSTRAP.md\" 2>/dev/null); reminder=\"[ai-skill per-turn obligation] Final response MUST end with ### Cognitive Mode 報告 block. First-turn ALSO outputs Bootstrap Receipt. Canonical spec: runtime/core-bootstrap.yaml.\"; combined=$(printf \"%s\\n\\n---\\n%s\" \"$reminder\" \"$bootstrap\"); printf \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"UserPromptSubmit\\\",\\\"additionalContext\\\":%s}}\" \"$(/opt/homebrew/bin/jq -Rs . <<< \"$combined\")\"'",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/check-bootstrap-receipt.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/remind-bootstrap-receipt.sh\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "Stop": [
       {
-        "type": "command",
-        "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/check-cognitive-mode.sh\"",
-        "timeout": 10
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/check-cognitive-mode.sh\"",
+            "timeout": 10
+          }
+        ]
       }
     ]
   }
