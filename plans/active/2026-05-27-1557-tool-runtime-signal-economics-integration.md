@@ -12,12 +12,13 @@ draft
 
 - `tools/` 提供 tool catalog / usage-pattern docs，不直接決定 runtime。
 - `runtime/economics/` 或等效 executable contract 層負責「值不值得這樣思考 / 這樣執行」。
-- Cognitive Mode 報告升級為 runtime introspection surface：不只是 status report，而是 Runtime Cognitive State / Cognitive Execution State snapshot。
+- Runtime Cognitive State / Cognitive Execution State 成為 runtime introspection surface：不只是 status report，而是可推導、可驗證的 state snapshot。
 - Cognitive Mode 不直接依賴 tool catalog，只消費 economics / tool-derived signals，並回報可推導、可驗證、可影響 runtime 的 state。
 - Cognitive Mode core 仍由 `runtime/cognitive-modes*.yaml` 管理。
 - Runtime Cognitive Mode core 是 deterministic control plane：定義 mode contract、allowed depth、validation requirement、discovery policy、escalation policy；不得整個搬到 ecosystem。
 - Ecosystem cognition layer 承載 adaptation / economics / pressure / telemetry：決定「什麼情況值得選 DEEP / SOURCE_BACKED / STRICT / compression / escalation」。
 - 需要引入 ecosystem interaction layer 的概念：`models/`、`tools/`、`memory/`、`workflow/` 保留 source-of-truth；新層只處理 cross-layer resource interaction、pressure、economics、adaptation、feedback。
+- Knowledge acquisition 必須進入後續設計：Runtime Cognitive State 不只描述 mode，也要說明是否引入新知識、哪些 analysis / workflow / intelligence 被啟用、成本與必要性是否合理。
 
 ## Decision Rationale
 
@@ -69,6 +70,16 @@ Economic Decision Layer
 
 若不拆開，`runtime/cognitive-modes.yaml` 會同時承載 orchestration、adaptation、economics、observability、reasoning policy，最後變得難測試、難維護、難演進。
 
+此外，現有 Cognitive Mode 報告的下一版 Runtime Cognitive State 仍缺一個關鍵閉環：knowledge acquisition。Agent 不只要回報「用了什麼 mode」，還要能回答：
+
+- 有沒有發現新 domain / 新 architecture / 新 heuristic？
+- 有沒有觸發新 workflow、analysis、intelligence？
+- 有沒有造成 context expansion 或 token economics 改變？
+- 這次 knowledge loading 是否必要？
+- 是否需要 promotion 到 `analysis/`、`workflow/`、`intelligence/`、`memory/` 或 governance/enforcement？
+
+這是 `governance/lifecycle/knowledge-update-flow.md` 目前的 Step 1-8 所在方向，但尚未和 Cognitive State / economics layer 形成同一個 runtime signal。
+
 ### Decision
 
 把原 plan 從 `Tool Runtime Integration` 升級成：
@@ -85,6 +96,7 @@ Tool Runtime Signal & Economics Integration
 4. Runtime orchestration layer：負責 discovery、activation、validation、recovery、execution。
 5. Cognitive Mode discovery：只消費 derived signals，不直接擁有 tool catalog、model catalog、memory semantics 或 economics model。
 6. Cognitive Mode report：拆成 runtime state + ecosystem state + adaptation rationale，避免把 economics 塞回 runtime core。
+7. Knowledge acquisition layer：在 ecosystem / cognitive state 中回報 knowledge_mode、discovery_mode、intelligence_mode，以及 activated / deferred knowledge。
 
 第一版不做完整 telemetry database，但要設計 feedback loop 的 contract boundary，讓未來可從 static heuristics 升級到 evidence-adaptive runtime。
 
@@ -95,10 +107,12 @@ Tool Runtime Signal & Economics Integration
 - C. 建立獨立 `economics/` top-level layer：defer。概念清楚，但會新增一個 repo owner layer；先評估 runtime ownership 是否足夠。
 - D. 建立 `runtime/economics/` 或等效 runtime executable contracts：accept as draft direction。它最接近 runtime decision layer，但 Phase 0 必須檢查目前 `runtime/README.md` 對 runtime YAML source 的限制。
 - E. 只保留現有 Cognitive Mode 報告：reject。會讓 report 成為 ritualized verbosity，無法支撐 runtime economics 或 scenario validation。
-- F. 把 Cognitive Mode 報告升級為 Cognitive Execution State：accept。保留現有 6 維 state vector，同時增加 economics / runtime / adaptation surfaces。
+- F. 把 Cognitive Mode 報告升級為 Runtime Cognitive State / Cognitive Execution State：accept。保留現有 6 維 state vector，同時增加 economics / runtime / adaptation surfaces。
 - G. 新增 top-level `ecosystem/`：defer but keep as candidate。概念最準，適合承載 interaction ecology，但可能過早新增 owner layer；Phase 0 需先判斷是否比 `runtime/economics/` 更合適。
 - H. 把 Cognitive Mode core 整個搬到 ecosystem：reject。runtime phase machine、execution orchestration、validation gates、recovery flow 仍依賴 deterministic mode contract。
 - I. 拆成 runtime Cognitive Mode Core + ecosystem Cognitive Adaptation/Economics：accept。runtime 管「可以做什麼」，ecosystem 管「什麼情況值得這樣做」。
+- J. 把 knowledge acquisition 當成 knowledge-update-flow 的人工 checkpoint：reject as insufficient。它需要保留在 governance flow，但 Cognitive State 也應提供 runtime signal。
+- K. 將 knowledge acquisition 作為 ecosystem/cognitive-state 的後續維度：accept。它回報新知識必要性、activation、成本、promotion target 與 deferred knowledge。
 
 ### Why Not an ADR Yet
 
@@ -111,7 +125,7 @@ Tool Runtime Signal & Economics Integration
 - [ ] runtime validate / scenario tests 能驗證 contract
 - [ ] hook 或 CLI validator 真實使用該 contract
 - [ ] feedback loop 有最小 evidence path，而非只停在 static docs
-- [ ] Cognitive Mode 報告可映射到 economics tuple / split costs / adaptation rationale
+- [ ] Runtime Cognitive State 可映射到 economics tuple / split costs / adaptation rationale
 - [ ] Cognitive state output 可被 scenario 測試，不只是漂亮 log
 - [ ] Open Questions 全部解決
 
@@ -121,10 +135,11 @@ Tool Runtime Signal & Economics Integration
 
 - 把「思考成本」正式當成 architecture，而不是口頭約束
 - tool routing、compression、token budget、recursion guard 可共用同一 economics layer
-- Cognitive Mode 報告可反映 tool usage / context expansion / retry pressure，但核心 contract 維持乾淨
-- Cognitive Mode 報告從 status report 升級成 runtime introspection / self-governance evidence
+- Runtime Cognitive State 可反映 tool usage / context expansion / retry pressure，但核心 contract 維持乾淨
+- Runtime Cognitive State 從 status report 升級成 runtime introspection / self-governance evidence
 - `runtime/cognitive-modes.yaml` 不會因 adaptation / telemetry / economics 持續膨脹
 - models / tools / memory / workflow 的交互成本有地方承載，不再散落在各 layer 說明文件
+- Knowledge loading / acquisition / promotion 與 Cognitive State 形成閉環，減少「讀了很多但不知道為什麼」的假 observability
 - 為 adaptive runtime cognition system 打基礎
 
 #### 負面
@@ -140,7 +155,8 @@ Tool Runtime Signal & Economics Integration
 - 若 runtime control plane 與 ecosystem adaptation 邊界不清，Cognitive Mode core 仍會肥大化
 - economics schema 若過細，會變成 premature execution VM
 - 若只做 static YAML，仍然只是 contract system，不會形成 feedback loop
-- 若 Cognitive report 不可推導、不可驗證、不可影響 runtime，會變成 fake observability
+- 若 Runtime Cognitive State 不可推導、不可驗證、不可影響 runtime，會變成 fake observability
+- 若 knowledge acquisition signals 未接入 governance/enforcement，agent 可能只回報「有新知識」但不執行 promotion / linked updates / validation closure
 
 ## Runtime Execution Path
 
@@ -179,8 +195,9 @@ Draft owner candidates:
    - validation checkpoint required
    - recovery / escalation
 8. Cognitive Mode discovery consumes economics-derived signals.
-9. Runtime Cognitive State / Cognitive Execution State report separates runtime state, ecosystem state, and adaptation rationale.
-10. Runtime scenarios can compare expected vs actual cognitive state to detect governance drift, reasoning drift, execution mismatch, or economic overrun.
+9. Knowledge acquisition layer evaluates whether new knowledge was discovered, which sources/routes were activated, and whether promotion / linked updates are required.
+10. Runtime Cognitive State / Cognitive Execution State report separates runtime state, ecosystem state, knowledge acquisition state, and adaptation rationale.
+11. Runtime scenarios can compare expected vs actual cognitive state to detect governance drift, reasoning drift, execution mismatch, economic overrun, or knowledge acquisition mismatch.
 
 ### Proposed flow
 
@@ -198,7 +215,8 @@ flowchart TD
   runtimeMonitoring --> feedbackLoop["Cost Feedback Loop"]
   feedbackLoop --> economicFit
   economicFit --> cognitiveDiscovery["Cognitive Discovery Signals"]
-  cognitiveDiscovery --> cognitiveState["Cognitive Execution State"]
+  cognitiveDiscovery --> knowledgeAcquisition["Knowledge Acquisition Signals"]
+  knowledgeAcquisition --> cognitiveState["Cognitive Execution State"]
   cognitiveState --> feedbackLoop
 ```
 
@@ -217,6 +235,7 @@ ecosystem.resource_interactions.contract
 ecosystem.pressure_models.contract
 ecosystem.adaptation.contract
 ecosystem.cognitive_adaptation.contract
+ecosystem.knowledge_acquisition.contract
 ```
 
 ### Validation scenarios
@@ -232,6 +251,9 @@ ecosystem.cognitive_adaptation.contract
 - `ecosystem-pressure-models-contract-v1`
 - `cognitive-core-control-plane-boundary-v1`
 - `cognitive-adaptation-ecosystem-boundary-v1`
+- `knowledge-acquisition-cognitive-state-fields-v1`
+- `knowledge-acquisition-promotion-target-valid-v1`
+- `knowledge-acquisition-linked-updates-required-v1`
 
 ## Target Architecture
 
@@ -304,6 +326,51 @@ ecosystem/
 ```
 
 This layer may recommend a mode, but runtime validates that recommendation against `runtime/cognitive-modes*.yaml`.
+
+### Knowledge Acquisition（ecosystem / governance bridge）
+
+Knowledge acquisition is the bridge between Cognitive State and knowledge-update governance. It answers:
+
+```text
+Did this task introduce new knowledge?
+Did it activate analysis / workflow / intelligence?
+Was the knowledge load necessary?
+What was deferred?
+Does it require promotion, memory, validation, governance, or enforcement updates?
+```
+
+Candidate modes:
+
+```yaml
+knowledge_mode:
+  values:
+    - REUSE_ONLY
+    - SOURCE_REFRESH
+    - DISCOVERY_REQUIRED
+    - CROSS_DOMAIN_SYNTHESIS
+    - FAILURE_LEARNING
+    - MEMORY_PROMOTION
+
+discovery_mode:
+  values:
+    - STATIC_ROUTE
+    - HEURISTIC_DISCOVERY
+    - ARCHAEOLOGY
+    - DOMAIN_MAPPING
+    - TOOL_CAPABILITY_DISCOVERY
+    - KNOWLEDGE_GAP_DETECTION
+
+intelligence_mode:
+  values:
+    - ATOM_ONLY
+    - WORKFLOW_GUIDED
+    - HEURISTIC_ENFORCED
+    - CROSS_INTELLIGENCE
+    - FAILURE_AUGMENTED
+    - DOMAIN_REASONING
+```
+
+This layer does not own knowledge content. It records activation and acquisition signals, then delegates writeback to `governance/lifecycle/knowledge-update-flow.md`.
 
 ### Ecosystem interaction layer
 
@@ -440,7 +507,7 @@ This stack prevents `ecosystem/` from becoming a dumping ground while still givi
 
 ### Runtime Cognitive State surface
 
-The existing Cognitive Mode 報告 should become a structured introspection surface:
+The existing Cognitive Mode 報告 should become Runtime Cognitive State / Cognitive Execution State, a structured introspection surface:
 
 ```yaml
 runtime_state:
@@ -451,6 +518,9 @@ runtime_state:
 ecosystem_state:
   selected_context_mode: SOURCE_BACKED
   selected_memory_mode: PROJECT_CONTEXT
+  knowledge_mode: DISCOVERY_REQUIRED
+  discovery_mode: ARCHAEOLOGY
+  intelligence_mode: CROSS_INTELLIGENCE
   context_pressure: MEDIUM
   governance_pressure: HIGH
   token_budget_pressure: LOW
@@ -477,6 +547,25 @@ runtime:
     - route.tools.metadata-routing
   blocked_routes: []
 
+knowledge:
+  knowledge_signals:
+    - architecture_mismatch_detected
+    - bounded_context_unclear
+    - workflow_gap_detected
+  activated_intelligence:
+    - architecture-fit-analysis
+    - backend-archaeology
+  activated_workflows:
+    - route.workflow.repo-analysis
+  activated_analysis:
+    - repo-structure-analysis
+  deferred_knowledge:
+    - full-security-audit
+  promotion_target: intelligence
+  linked_updates_required:
+    - governance/lifecycle/knowledge-update-flow.md
+    - enforcement/linked-updates.md
+
 adaptation:
   selected_context_mode: SOURCE_BACKED
   why_not_deeper:
@@ -498,6 +587,7 @@ This is not meant to make every chat response verbose. The output can remain com
 - `thinking_cost`: reasoning depth, recursive analysis, validation chain
 - `context_cost`: source-backed reads, graph traversal, memory loading, routing lookup
 - `execution_cost`: tool calls, mutation, validation, runtime refresh, tests
+- `knowledge_cost`: discovery, source refresh, cross-domain synthesis, intelligence activation, memory promotion
 
 The existing `cognitive_cost` can remain as a public summary / compatibility field, derived from split costs.
 
@@ -515,6 +605,8 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Confirm non-goal: do not rewrite Cognitive Mode core or implement full telemetry DB in v1.
 - [ ] Confirm Cognitive Mode report naming: keep public name or introduce `Runtime Cognitive State` / `Cognitive Execution State` as internal contract.
 - [ ] Confirm anti-verbosity rule: expanded cognitive telemetry must be derivable/testable without forcing every response into a huge report.
+- [ ] Confirm knowledge acquisition is added after this plan's core economics/ecosystem boundary, not before Phase 0-3 ownership decisions.
+- [ ] Confirm governance/enforcement linked updates likely required: `governance/lifecycle/knowledge-update-flow.md`, `enforcement/linked-updates.md`, and possibly `enforcement/dependency-reading.md`.
 
 ## Phase 1: Define Runtime Economics Boundary
 
@@ -630,6 +722,7 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 - [ ] Define runtime_state fields from runtime control plane
 - [ ] Define ecosystem_state fields from economics / pressure / adaptation layer
+- [ ] Define knowledge acquisition fields: knowledge_mode, discovery_mode, intelligence_mode, knowledge_signals, activated_intelligence, activated_workflows, activated_analysis, deferred_knowledge
 - [ ] Define economics fields: estimated token cost, estimated latency, recursion risk, compression pressure, evidence depth
 - [ ] Define split costs: thinking cost, context cost, execution cost
 - [ ] Define resource ecology fields: model pressure, tool pressure, memory pressure, workflow pressure
@@ -639,11 +732,31 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 完成條件：
 
-- [ ] Cognitive report becomes derivable from runtime contracts
+- [ ] Runtime Cognitive State becomes derivable from runtime contracts
 - [ ] Scenario can validate expected vs actual cognitive state
 - [ ] Report remains useful, not ritualized verbosity
 
-## Phase 9: Add Minimal Runtime Cost Feedback Loop
+## Phase 9: Define Knowledge Acquisition Signals
+
+- [ ] Define `knowledge_mode`
+- [ ] Define `discovery_mode`
+- [ ] Define `intelligence_mode`
+- [ ] Define `knowledge_signals`
+- [ ] Define `activated_intelligence`
+- [ ] Define `activated_workflows`
+- [ ] Define `activated_analysis`
+- [ ] Define `deferred_knowledge`
+- [ ] Define `promotion_target`
+- [ ] Define `linked_updates_required`
+- [ ] Define how this maps to `governance/lifecycle/knowledge-update-flow.md`
+
+完成條件：
+
+- [ ] Cognitive State can answer whether new knowledge was introduced
+- [ ] Knowledge acquisition can trigger knowledge-update-flow, linked updates, validation, or memory promotion
+- [ ] Analysis / workflow / intelligence activations are visible in the report without making every response verbose
+
+## Phase 10: Add Minimal Runtime Cost Feedback Loop
 
 - [ ] Define `execution-feedback` static contract
 - [ ] Model average token burn
@@ -653,12 +766,13 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Model tool output amplification
 - [ ] Model compression effectiveness
 - [ ] Model model/tool/memory/workflow pressure deltas
+- [ ] Model knowledge acquisition cost and usefulness
 
 完成條件：
 
 - [ ] Feedback loop is defined as contract boundary even if first implementation remains static
 
-## Phase 10: Document Source Layer and Ecosystem Boundaries
+## Phase 11: Document Source Layer, Ecosystem, and Knowledge Acquisition Boundaries
 
 - [ ] Update `runtime/README.md` or related contract docs with Cognitive Core vs Ecosystem Adaptation boundary if accepted
 - [ ] Update `models/README.md` if ecosystem references model capability fit
@@ -666,21 +780,28 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Update `tools/metadata/README.md`
 - [ ] Update `tools/routing/README.md`
 - [ ] Update `memory/README.md` if ecosystem references memory loading / staleness cost
+- [ ] Update `governance/lifecycle/knowledge-update-flow.md` if knowledge acquisition becomes part of Cognitive State / runtime checkpoint
+- [ ] Update `enforcement/linked-updates.md` if knowledge acquisition signals require linked-update closure
+- [ ] Update `enforcement/dependency-reading.md` if knowledge acquisition changes dependency read ledger requirements
+- [ ] Update relevant `analysis/`, `workflow/`, and `intelligence/` READMEs if activated knowledge reporting becomes a shared convention
 - [ ] Clarify `tools/` is human-readable catalog / usage-pattern layer
 - [ ] Clarify source layers own truths; ecosystem / economics owns interaction
+- [ ] Clarify knowledge acquisition owns activation signals, not knowledge content
 
 完成條件：
 
 - [ ] Docs no longer imply `tools/README.md` itself is runtime executable source
 - [ ] Docs do not imply ecosystem owns model/tool/memory/workflow truths
+- [ ] Governance and enforcement docs define when knowledge acquisition requires writeback / linked updates / memory promotion
 
-## Phase 11: Validation and Closure
+## Phase 12: Validation and Closure
 
 - [ ] Add or update validation scenarios
 - [ ] Run `ai-skill runtime refresh --repo . --json`
 - [ ] Run `ai-skill runtime validate --repo . --json`
 - [ ] Run `go test ./...` if CLI validators change
 - [ ] Query generated surfaces for economics / ecosystem / tool-routing keys
+- [ ] Add or update scenarios that prevent knowledge acquisition from becoming unclosed "interesting finding" logs
 - [ ] Execute Plan Completion Closure if all phases complete
 
 ## Open Questions
@@ -696,6 +817,9 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - Should `ecosystem/` be created in this plan, or kept as a conceptual target until runtime/economics validates the need?
 - Should Cognitive Adaptation live under `ecosystem/cognition/` while Cognitive Core remains under `runtime/`?
 - Should `context_mode` remain part of runtime core, or should selected context strategy be reported as ecosystem adaptation while runtime only defines allowed context modes?
+- Should `knowledge_mode`, `discovery_mode`, and `intelligence_mode` be public report fields, or internal telemetry surfaced only when non-default/high-risk?
+- Should knowledge acquisition signals trigger `knowledge-update-flow` every time, or only when `promotion_target` is non-null?
+- What is the boundary between `memory_mode` and `knowledge_mode: MEMORY_PROMOTION`?
 
 ## Stakeholder 同意項目
 
@@ -705,8 +829,10 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Ecosystem interaction layer, if created, owns only cross-layer pressure / adaptation / feedback
 - [ ] Runtime Cognitive Mode Core remains deterministic control plane
 - [ ] Cognitive Adaptation / Economics / Telemetry moves to ecosystem or equivalent interaction layer
+- [ ] Knowledge Acquisition is added after core economics/ecosystem ownership is settled
+- [ ] Knowledge Acquisition can trigger governance/enforcement flow without owning knowledge content
 - [ ] Cognitive Mode only consumes derived signals
-- [ ] Cognitive Mode report evolves into Runtime Cognitive State / Cognitive Execution State without becoming verbose ritual
+- [ ] Runtime Cognitive State / Cognitive Execution State replaces Cognitive Mode report without becoming verbose ritual
 - [ ] No full telemetry database in v1
 - [ ] Owner path is chosen after Phase 0 compatibility check
 
@@ -726,8 +852,9 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Economics contracts exist and are projected
 - [ ] Runtime Cognitive State / Cognitive Execution State contract is defined
 - [ ] Split costs feed the existing `cognitive_cost` summary
+- [ ] Knowledge acquisition fields are defined and mapped to governance/enforcement writeback flow
 - [ ] `models/`, `tools/`, `memory/`, and `workflow/` docs state their relationship to economics / ecosystem contracts
-- [ ] Cognitive discovery has tool-derived, model-derived, memory-derived, workflow-derived, and economics-derived signals
+- [ ] Cognitive discovery has tool-derived, model-derived, memory-derived, workflow-derived, knowledge-derived, and economics-derived signals
 - [ ] Validation scenarios pass
 - [ ] Runtime refresh/validate pass
 - [ ] Plan Completion Closure executed
