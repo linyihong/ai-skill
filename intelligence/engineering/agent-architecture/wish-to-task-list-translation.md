@@ -99,6 +99,79 @@ User: 「想讓網路變快」
    你的『快』有具體目標嗎？例如下載 100Mbps 以上、ping < 30ms？」
 ```
 
+## Worked Example：網路速度優化
+
+來自 2025 infographic「想讓網路變快，不要靠感覺」，作為 wish → task list 翻譯的具體範例。展示同一個 wish 在 agent 兩種處理路徑下的差異。
+
+### User wish
+
+> 「想讓網路快一點。」
+
+### Wish 信號判斷
+
+- 動詞「想」「快」→ 模糊
+- 「快」未量化（多快？哪個指標？）
+- 無 success criteria
+- 無 baseline 引用
+- → 4/4 wish 信號命中，**必須翻譯為 task list 才能執行**
+
+### Agent 翻譯後的 task list（measure → process → verify）
+
+**Measure（baseline）**
+
+| 指標 | 工具 | 目的 |
+|---|---|---|
+| 下載 / 上傳速度 | `speedtest-cli` | 量化目前頻寬 |
+| DNS 解析時間 | `dig` / `nslookup` | 抓 DNS layer 延遲 |
+| MTU / 封包遺失 | `ping -s` / `mtr` | 抓 L2-L3 健康度 |
+| Wi-Fi 訊號 / 干擾 | OS 工具 | 抓無線層問題 |
+
+→ 完成後手上有 4 個 baseline 數字，且使用者已確認「目標」（例如下載 > 100Mbps、ping < 30ms）。
+
+**Process（單變數變更，最多 3 個假設）**
+
+依 baseline 找到 3 個最可能的瓶頸（不要 8 個全部一次改 —— 那是 shotgun debugging）：
+
+1. 移除舊的 / 衝突的 network profiles
+2. 關閉吃頻寬的背景程式
+3. 優化 mDNS（若有 .local 解析慢的訊號）
+
+每個變更**分別執行**，每次只動一個變數。
+
+**Verify（after baseline + 對照）**
+
+跑回 measure 階段同樣的 4 個指標，逐項對照 before / after。
+
+### 反例：Agent 直接執行 wish
+
+```
+User: 「想讓網路快一點」
+Agent 直接動手：
+  → 重設 DNS
+  → 重啟 Wi-Fi
+  → 升級驅動
+  → 移除 profile
+  → 關閉背景程式
+  → 改 MTU
+  → 重開 router
+  → 跑 speedtest
+Result: 「我做完了，你試試看」
+```
+
+問題：
+- 沒 baseline → 不知道「快多少才算修好」
+- 沒單變數變更 → 不知道哪個動作真的有效
+- 沒對照 → 下次再慢無法從同樣的指標開始查
+- → 命中 [`shotgun-debugging`](../anti-patterns/shotgun-debugging.md)
+
+### 為什麼這個 example 適合放這裡
+
+1. **跨領域**：infographic 本身是 IT 維護領域，但 wish-to-task-list translation 是 agent 通用 pattern，這個 example 證明 atom 不只適用 software-delivery
+2. **明顯的 wish 訊號**：4 個 wish 信號全中，是教學範例的好材料
+3. **measure / process / verify 三段清楚**：infographic 把流程顯式畫出來，可直接搬到本 atom 不需再加工
+
+如果未來 repo 真的需要服務多種 troubleshooting 任務（網路 / 效能 / 系統設定 / 硬體調校），再把本段抽到 `workflow/troubleshooting/measure-process-verify.md` + 多個 worked examples。目前以 incremental 為主，不開新 workflow domain。
+
 ## 與 shotgun-debugging 的關係
 
 兩個 atom 是同一現象的兩面：
