@@ -251,10 +251,57 @@ func runPreCommitHook(result Result, root string) Result {
 		}
 		result.Checks = append(result.Checks, Check{Name: "runtime_validation", Status: "ok", Message: "staged runtime/knowledge/validation changes passed"})
 	}
+	// Gate: new shell scripts must be implemented in Go instead (cross-platform policy).
+	// Detects only newly Added (.sh) files; modifications to existing scripts are allowed
+	// while they await migration (mark with [skip-go-migration] to suppress).
+	if msg := validateNoNewShellScripts(root, staged); msg != "" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{
+			Code:        "new_shell_script_forbidden",
+			Message:     msg,
+			Remediation: "Implement the hook/script logic in Go (scripts/ai-skill-cli/internal/app/hooks.go or a new subcommand). See plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md §platform-governance and enforcement/failure-patterns/shell-script-added-without-go-migration.md. To suppress for a transitional .sh wrapper, add '[skip-go-migration]' as a standalone line in the commit message body.",
+		}
+		return result
+	}
+
 	if len(result.Mutations) == 0 {
 		result.Checks = append(result.Checks, Check{Name: "pre_commit", Status: "ok", Message: "no runtime or knowledge hook action required"})
 	}
 	return result
+}
+
+// validateNoNewShellScripts returns a non-empty error message if any newly Added
+// .sh files appear in the staged set, enforcing the cross-platform Go-first policy.
+// Modifications to existing .sh files are allowed (they are pending migration).
+// Opt-out: '[skip-go-migration]' standalone line in commit message body.
+func validateNoNewShellScripts(root string, staged []string) string {
+	// Check for opt-out marker in commit message (COMMIT_EDITMSG)
+	msgPath := filepath.Join(root, ".git", "COMMIT_EDITMSG")
+	if data, err := os.ReadFile(msgPath); err == nil {
+		for _, line := range strings.Split(string(data), "\n") {
+			if strings.TrimSpace(line) == "[skip-go-migration]" {
+				return ""
+			}
+		}
+	}
+
+	// Get only Added (new) files from staged set
+	added, err := gitLines(root, "diff", "--cached", "--diff-filter=A", "--name-only")
+	if err != nil {
+		return "" // fail-open: don't block on git error
+	}
+	var newShells []string
+	for _, f := range added {
+		if strings.HasSuffix(f, ".sh") {
+			newShells = append(newShells, f)
+		}
+	}
+	if len(newShells) == 0 {
+		return ""
+	}
+	return "new shell script(s) staged: " + strings.Join(newShells, ", ") +
+		" — cross-platform policy requires Go implementation instead of .sh"
 }
 
 // cognitiveV2Defaults are the 6 default dim values for the v2 compact form.

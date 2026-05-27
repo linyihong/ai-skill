@@ -30,6 +30,7 @@
 | [Markdown / YAML sync drift](markdown-yaml-sync-drift.md) | `source-of-truth-duplication` / `governance-drift` | validated | 防止改 canonical doc markdown 但沒同步改 sibling YAML companion。對應 validator: `validateMarkdownYamlSync`（sibling-pair only；cross-path mapping 列入 Phase 7 backlog）。 |
 | [Bootstrap YAML bypass](bootstrap-yaml-bypass.md) | `governance-drift` / `source-of-truth-duplication` | validated | 防止 agent / hook 跳過 `generated_surfaces[runtime.core_bootstrap.contract]` query 直接讀 `CORE_BOOTSTRAP.md` prose，導致 obligation 列表落後 YAML schema 變更。對應 prevention: Phase 6 per-obligation dispatcher refactor + enhanced Bootstrap Receipt（含 `Active per-turn obligations:` 行）。 |
 | [Intelligence layer bypass via tool adapter](intelligence-layer-bypass-via-tool-adapter.md) | `process-gap` / `knowledge-routing-miss` | validated | 防止 agent 因任務主題「關於某工具」而把跨工具可重用的設計洞見直接寫進 `ai-tools/<tool>.md`（P3），繞過 knowledge-update-flow Step 1 觸發，intelligence 層從未建立。Tool adapter 應只含工具專屬細節，設計原理必須先在 intelligence atom 再引用。 |
+| [Shell script added without Go migration](shell-script-added-without-go-migration.md) | `process-gap` / `platform-governance-miss` | validated | 防止 agent 新增 `.sh` 腳本而非實作 Go CLI，違反跨平台治理政策。對應 validator: `validateNoNewShellScripts`；opt-out: `[skip-go-migration]`；canonical rule: `runtime/cli-modification-policy.yaml §gate.cli.no_new_shell_scripts`。 |
 
 ## 維護
 

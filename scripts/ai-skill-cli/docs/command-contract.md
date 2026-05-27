@@ -255,7 +255,7 @@
 
 副作用：
 
-- `pre-commit`：當 staged `runtime/runtime.db` 或 knowledge / validation surface 改動時執行 `runtime validate`；不再因 committed runtime YAML mirror 觸發 compile。
+- `pre-commit`：當 staged `runtime/runtime.db` 或 knowledge / validation surface 改動時執行 `runtime validate`；不再因 committed runtime YAML mirror 觸發 compile。新增 shell script gate：`validateNoNewShellScripts` 偵測 staged Added（`--diff-filter=A`）`.sh` 檔案，發現新建 `.sh` 時以 `new_shell_script_forbidden` block；修改既有 `.sh` 不觸發。Opt-out：commit message 含獨立一行 `[skip-go-migration]`（僅用於短暫過渡 wrapper，必須在 commit message 說明 Go migration plan）。
 - `commit-msg`：讀 commit message file，依 `runtime/cognitive-modes-*.yaml` + `runtime/plan-status-sync-enforcement.yaml` + `runtime/cognitive-modes-token-budget.yaml` + `runtime/cognitive-modes-adaptive.yaml` + `runtime/bootstrap-entry-points.yaml` + `runtime/cli-modification-policy.yaml` + `runtime/core-bootstrap.yaml` contracts 執行 10 個 validators（cognitive-mode block / executionFloors / governanceConsistency / memorySubdir / planStatusSync / tokenBudget / adaptiveTriggers / bootstrapEntryThinness / **cliDocSync** / **runtimeYamlProjects** / **markdownYamlSync**）。Validator block 時 exit 30。Opt-out trailers：`[skip-cognitive-mode]` / `[skip-plan-status-sync]` / `[skip-token-budget]` / `[skip-adaptive]` / `[skip-bootstrap-thinness]` / `[skip-cli-doc-sync]` / `[skip-runtime-yaml-projection]` / `[skip-markdown-yaml-sync]`。
 - `post-commit`：reference-only 預設 no-op；若 `AI_SKILL_SYNC_CURSOR_BUNDLE=1`，只回報 Go mirror write mode 狀態。
 - `pre-push`：CLI source（`scripts/ai-skill-cli/...`、GitHub workflows、Git hooks）變動時跑 `go test ./...` preflight；其他情況跳過。

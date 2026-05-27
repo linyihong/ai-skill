@@ -92,6 +92,27 @@ cli_specific_gates:
       runtime source change detection)
     severity: block
 
+  - id: gate.cli.no_new_shell_scripts
+    description: |
+      New .sh script files are forbidden. Per cross-platform Go script
+      runtime policy (plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md),
+      all new script logic MUST be implemented in Go CLI
+      (scripts/ai-skill-cli/internal/app/hooks.go or new subcommand).
+      ai-skill hooks install writes platform-correct binary path to
+      .claude/settings.json.
+
+      Modifying existing .sh files (pending migration) does NOT trigger.
+      Short-lived transition wrappers may opt out with [skip-go-migration]
+      as a standalone line in commit message body, but MUST include a
+      Go migration plan in the commit message.
+    detection_signals:
+      - git diff --cached --diff-filter=A --name-only | grep '\.sh$'
+    enforcement_layer: pre_commit_hook
+    validator: validateNoNewShellScripts
+    severity: block
+    opt_out_marker: "[skip-go-migration]"
+    failure_pattern: enforcement/failure-patterns/shell-script-added-without-go-migration.md
+
 modification_rule:
   description: |
     When editing this YAML / validator / gate list:
@@ -108,6 +129,7 @@ related_failure_patterns:
   - enforcement/failure-patterns/framework-duplication-without-interrogation.md
   - enforcement/failure-patterns/bootstrap-entry-bloat.md
   - planned: enforcement/failure-patterns/cli-doc-drift.md (Phase 6 of bootstrap-yaml-migration)
+  - enforcement/failure-patterns/shell-script-added-without-go-migration.md
 
 linked_plans:
   - plans/archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md (Phase 6 adds validateCLIDocSync)
