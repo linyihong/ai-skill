@@ -23,6 +23,7 @@ AI 不是黑盒子 — 它的行為模式可以被觀察、分類、預測、改
 | [`stateless-validation-necessity.md`](stateless-validation-necessity.md) | AI decision path validation must be stateless — it cannot depend on conversation memory. | `candidate-intelligence` | 本系統實際運作經驗 |
 | [`index-first-documentation.md`](index-first-documentation.md) | Documentation that agents repeatedly read should expose routeable indexes before detailed prose. | `candidate-intelligence` | documentation workflow extraction |
 | [`multi-layer-enforcement.md`](multi-layer-enforcement.md) | 可靠強制 agent obligation 需三層協同：context 注入（資料精確性）、禁止 prompt（意識觸發）、機械關卡（兜底）— 每層防止不同失效模式，單層均不足。 | `candidate-intelligence` | Bootstrap 三層架構 empirical 測試 2026-05-27 |
+| [`wish-to-task-list-translation.md`](wish-to-task-list-translation.md) | 當 user prompt 是 wish（模糊願望）時，agent 必須先翻譯為 measure / process / verify 三段任務單再執行，否則進入 shotgun mode。 | `candidate-intelligence` | 外部 infographic「Prompt 與其寫成願望，不如寫成任務單」沉澱 2026-05-27 |
 
 ## 與其他層的關係
 
