@@ -77,5 +77,16 @@ EOF
   }
 }'
 
+# Write a SessionStart flag so PreToolUse can skip transcript scan on the
+# first turn, preventing double-bootstrap when agent outputs text + calls
+# tools in the same turn (text not yet committed to transcript when hook fires).
+# TTL: 120 seconds — after that, PreToolUse falls back to transcript scan.
+PROJECT_HASH=$(python3 -c "import hashlib; print(hashlib.md5('${PROJECT_DIR}'.encode()).hexdigest()[:12])" 2>/dev/null || echo "")
+if [[ -n "$PROJECT_HASH" ]]; then
+    FLAG="/tmp/ai-skill-sessionstart-${PROJECT_HASH}.flag"
+    date +%s > "$FLAG"
+    echo "wrote sessionstart flag: $FLAG" >> "$LOG"
+fi
+
 echo "phase=$PHASE obligations=$OBLIG_COUNT gates=$GATE_COUNT" >> "$LOG"
 exit 0

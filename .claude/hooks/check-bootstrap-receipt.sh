@@ -57,6 +57,28 @@ if os.path.exists(cache_file):
     print("ALLOW_CACHED", file=sys.stderr)
     sys.exit(0)
 
+# Check SessionStart flag: if SessionStart fired < 120s ago for this project,
+# treat bootstrap context as already injected and allow through.
+# This prevents double-bootstrap when agent outputs text + calls tools in
+# the same turn (tool fires before text is committed to transcript).
+project_dir = os.environ.get("CLAUDE_PROJECT_DIR", "")
+if project_dir:
+    import time
+    project_hash = hashlib.md5(project_dir.encode()).hexdigest()[:12]
+    flag_file = f"/tmp/ai-skill-sessionstart-{project_hash}.flag"
+    if os.path.exists(flag_file):
+        try:
+            flag_ts = int(open(flag_file).read().strip())
+            if time.time() - flag_ts < 120:
+                try:
+                    open(cache_file, "w").close()
+                except Exception:
+                    pass
+                print("ALLOW_SESSIONSTART_FLAG", file=sys.stderr)
+                sys.exit(0)
+        except Exception:
+            pass
+
 # Scan transcript for Bootstrap Receipt in any assistant message
 RECEIPT_MARKER = "Bootstrap:"
 found = False

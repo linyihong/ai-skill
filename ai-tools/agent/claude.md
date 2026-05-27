@@ -70,6 +70,7 @@ Claude Code 的 bootstrap 自動化由**三層協同**達成（對應 multi-laye
 
 - SessionStart hook 在 Claude Code 不同版本上的 matcher 支援度不一；目前驗證有效的 matcher 字串：`"startup|resume|clear"`
 - Per-turn obligations 定義在 `runtime/core-bootstrap.yaml`，**未** projected 到 `runtime/runtime.db` 的 `obligations` table；auto-bootstrap.sh 直接 hardcode 與 YAML source 一致
+- ~~雙重 bootstrap~~（已修）：agent 在同一 turn 同時輸出 Receipt 文字 + 呼叫工具時，工具比文字先 fire，PreToolUse 掃 transcript 找不到 Receipt 而 block。修法：SessionStart 成功後寫 `/tmp/ai-skill-sessionstart-{project_hash}.flag`（TTL 120s），PreToolUse 優先檢查 flag，避免重讀 3 個檔案
 
 ## Claude Code 配置實作
 
