@@ -842,6 +842,15 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - Related to `plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md`
 - Related to `plans/archived/2026-05-22-0855-executable-yaml-contract-migration.md`
 - Related to `plans/archived/2026-05-20-1802-model-aware-execution-routing.md`
+- **Upstream dependency**：`plans/active/2026-05-25-1000-context-language-glossary-system.md`。Glossary plan 於 Phase 1 / 2 / 3 已預架構下列項目，本 plan 執行時應直接引用而非重新定義：
+  - **Validation scenario**（glossary Phase 1）：`validation/scenarios/failure-derived/cognitive-core-vs-ecosystem-boundary-v1.yaml` — 可直接服務本 plan Phase 2 完成條件（Cognitive Core vs Ecosystem Adaptation Boundary）。
+  - **Candidate semantic owner domains**（glossary Phase 2）：`ecosystem-adaptation`、`runtime-economics`（status=`candidate`）。本 plan Phase 1 決定 owner path 後，需將被採用的 domain 從 `candidate` promote 到 `canonical`；未被採用者標 `deprecated`。
+  - **Candidate glossary terms**（glossary Phase 3，all status=`candidate`）：
+    - `cognitive_cost`（owner: `runtime-cognition`）
+    - `thinking_cost`、`context_cost`、`execution_cost`、`knowledge_cost`（owner: `ecosystem-adaptation`）— 對應本 plan §Split cost model
+    - `knowledge_mode`、`discovery_mode`、`intelligence_mode`（owner: `ecosystem-adaptation`）— 對應本 plan Phase 9
+    - `ecosystem`、`pressure_model`（owner: `ecosystem-adaptation`）
+  - **Promotion 義務**：本 plan Phase 1-3 完成 owner path 與 ecosystem boundary 決策後，必須回頭 promote 上述 candidate terms 到 `canonical`（或標 `deprecated` / `superseded`），並更新 `knowledge/glossary/ai-skill.md`。此 promotion 屬 linked update，不可省略。
 
 ## 完成條件
 

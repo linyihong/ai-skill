@@ -356,6 +356,7 @@ Usage discovery policy:
 - [ ] 新增 `validation/scenarios/failure-derived/memory-context-language-as-canonical-v1.yaml`
 - [ ] 新增 `validation/scenarios/failure-derived/semantic-term-overlap-v1.yaml`
 - [ ] 新增 `validation/scenarios/failure-derived/glossary-semantic-projection-shape-v1.yaml`
+- [ ] 新增 `validation/scenarios/failure-derived/cognitive-core-vs-ecosystem-boundary-v1.yaml`（cross-plan pre-architecture：同時服務 `plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md` Phase 2 — 防 `runtime/cognitive-modes*.yaml` 被塞入 adaptation/economics 邏輯，且防 `ecosystem/` 或 `runtime/economics/` 被誤用成第二個 runtime control plane。在 glossary plan 屬 semantic ownership boundary 驗證；在 economics plan 屬 Phase 2 前置 scenario。）
 - [ ] 更新 relevant graph / summary / routing candidate（若 scenario 需要）
 
 ### Phase 1 完成條件
@@ -374,6 +375,7 @@ Usage discovery policy:
 - [ ] 定義 required / optional / forbidden fields。
 - [ ] 定義 `owner-layer` semantics：owner 擁有 canonical meaning，其他 layer 只能引用或 alias。
 - [ ] 定義初始 semantic owner domains：`runtime-cognition`、`semantic-routing`、`workflow-orchestration`、`validation-governance`、`memory-replay`、`runtime-projection`、`architecture-contracts`。
+- [ ] **Cross-plan pre-architecture**：同步定義 candidate semantic owner domains，status=`candidate`：`ecosystem-adaptation`（承載 economics / pressure / adaptation 詞彙）、`runtime-economics`（若 economics plan Phase 0 確認 `runtime/economics/` 路徑則 activate）。此舉讓 `plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md` Phase 1 不必回頭改 glossary owner domain；若 economics plan 最終選用 `ecosystem/` top-level layer，`runtime-economics` 可降為 deprecated。
 - [ ] 定義 Vocabulary Resolution Priority。
 - [ ] 定義最小 status set：`canonical`、`candidate`、`deprecated`、`superseded`、`alias-only`、`experimental`、`project-local`。
 - [ ] 定義 relation lifecycle：`alias_of`、`related_to`、`conflicts_with`、`owned_by`、`used_by`、`deprecated_by`、`replaced_by`。
@@ -414,6 +416,13 @@ knowledge/glossary/
 
 - [ ] 建立 `knowledge/glossary/ai-skill.md`，收 Ai-skill framework 詞彙。
 - [ ] **Retro-own archived cognitive vocabulary**：`ai-skill.md` 必須涵蓋 `plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md` 引入的 cognitive vocabulary（至少 `context_mode`、`compression`、`memory_mode`、`reasoning_mode`），每詞補上 `owner-layer`（候選：`runtime-cognition`）；否則這些詞會在 archived plan 中成為 silent owner，違反 §Semantic Ownership。來源依據：Phase 0 Pre-Build Interrogation §7 risk 重新檢視。
+- [ ] **Cross-plan pre-architecture — Economics-adjacent candidate terms**：為避免 `plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md` 執行時詞彙真空，於 `ai-skill.md` 預收下列詞條，全部 status=`candidate`（等 economics plan Phase 1 確認 owner path 再 promote 到 `canonical`）：
+  - `cognitive_cost`（owner-layer: `runtime-cognition`）— 現行 6-dim report 已有，補 canonical 定義
+  - `thinking_cost`、`context_cost`、`execution_cost`、`knowledge_cost`（owner-layer: `ecosystem-adaptation`）— split cost model 子項
+  - `knowledge_mode`、`discovery_mode`、`intelligence_mode`（owner-layer: `ecosystem-adaptation`）— economics plan Phase 9 引入
+  - `ecosystem`（owner-layer: `ecosystem-adaptation`）— cross-layer interaction layer 概念
+  - `pressure_model`（owner-layer: `ecosystem-adaptation`）— 例：`context_explosion`、`memory_amplification`
+  Anti-scope：不為 economics plan 預建 `runtime/economics/` 或 `ecosystem/` 結構；不把上述詞條設為 `canonical`（economics plan 尚未驗證 owner path）。
 - [ ] 明確禁止第一批建立 `software-delivery.md` / `runtime.md` / `validation.md`，除非 Phase 3 完成後另有 validation evidence。
 - [ ] 更新 `knowledge/README.md`，將 glossary 加入目前入口。
 - [ ] 更新 `knowledge/graphs/`，把 glossary 連到 requirements / domain modeling / software delivery。
@@ -529,6 +538,7 @@ knowledge/glossary/
 | `plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md` | 必須引用 glossary canonical definitions for runtime semantic vocabulary；`context_mode`、`compression`、`memory_mode`、`reasoning_mode` 不得在 cognitive modes plan 內形成 subsystem-local semantics。 |
 | `plans/archived/2026-05-22-0855-executable-yaml-contract-migration.md` | 若 glossary 未來成為 executable contract，需遵守 owner-layer YAML projection 規範。 |
 | `plans/archived/2026-05-20-1635-bdd-ddd-cognition-aligned-reframe.md` | Requirements cognition 與 DDD cognition 的 shared language 邊界來源。 |
+| `plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md` | **Downstream consumer**。本 plan 預先在 Phase 1 / 2 / 3 為 economics plan 架設 candidate scenario（`cognitive-core-vs-ecosystem-boundary-v1`）、candidate owner domains（`ecosystem-adaptation`、`runtime-economics`）與 candidate terms（split cost model、`knowledge_mode` / `discovery_mode` / `intelligence_mode`、`ecosystem`、`pressure_model`）。Economics plan 執行時可直接引用，不需要回頭擴 glossary schema。 |
 
 ---
 
