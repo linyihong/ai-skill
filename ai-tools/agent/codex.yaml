@@ -27,27 +27,26 @@ activation:
 required_sources:
   - AGENTS.md
   - CORE_BOOTSTRAP.md
-  - README.md
+  - runtime/core-bootstrap.yaml
   - ai-tools/agent/codex.md
   - ai-tools/README.md
-  - runtime/runtime.db
   - enforcement/tool-neutral-documentation.md
 
 steps:
   - id: load_thin_entrypoint
     order: 1
     action: Use AGENTS.md only as a thin bootstrap pointer.
-  - id: load_core_and_layout
+  - id: load_core_contract
     order: 2
-    action: Read CORE_BOOTSTRAP.md and README.md before expanding detailed sources.
+    action: Load CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml as the only bootstrap entry sources before expanding detailed sources.
   - id: load_codex_adapter
     order: 3
-    action: Read ai-tools/agent/codex.md for Codex-specific behavior.
-  - id: use_runtime_sqlite
+    action: Read ai-tools/agent/codex.md only for Codex-specific behavior and generic AGENTS-aware tool differences.
+  - id: enforce_thin_adapter_boundary
     order: 4
-    action: Use runtime/runtime.db for phase, obligation, gate, output governance, canonical runtime documents, and generated surfaces.
+    action: Do not duplicate canonical bootstrap obligations, runtime phase details, or shared enforcement text in AGENTS.md or the Codex adapter.
     gates:
-      - gate.codex.runtime_source_of_truth
+      - gate.codex.thin_adapter_boundary
   - id: preserve_owner_layer_contracts
     order: 5
     action: Keep governance, enforcement, workflow, ai-tools, and metadata executable contracts in owner layers and rely on runtime projection.
@@ -55,21 +54,22 @@ steps:
       - gate.codex.no_runtime_yaml_mirror
 
 gates:
-  - id: gate.codex.runtime_source_of_truth
-    blocks: runtime_config_claim
-    pass_when:
-      - runtime/runtime.db is treated as canonical runtime config
-      - runtime/**/*.yaml committed mirrors are not created
   - id: gate.codex.no_runtime_yaml_mirror
     blocks: adapter_or_contract_change
     pass_when:
       - executable contracts remain in owner layers
       - runtime_projection.enabled contracts are projected through runtime compile
+  - id: gate.codex.thin_adapter_boundary
+    blocks: adapter_or_entrypoint_change
+    pass_when:
+      - AGENTS.md points to CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml without duplicating their obligations.
+      - ai-tools/agent/codex.md records only Codex-specific differences.
+      - Bootstrap Receipt, Cognitive Mode, close-loop, goal ledger, and runtime phase details remain in canonical sources.
   - id: gate.codex.no_duplicate_root_rules
     blocks: agents_md_change
     pass_when:
-      - AGENTS.md remains a pointer to ai-tools/agent/codex.md
-      - reusable Codex rules live in ai-tools/agent/codex.md or shared enforcement sources
+      - AGENTS.md remains a thin bootstrap pointer.
+      - reusable Codex rules live in shared enforcement sources or this adapter only when Codex-specific.
 
 required_evidence:
   - dependency read summary
@@ -77,15 +77,18 @@ required_evidence:
   - git status after writeback
 
 success_criteria:
-  - Codex starts from CORE_BOOTSTRAP.md, README.md, ai-tools/agent/codex.md, and runtime/runtime.db.
-  - Root AGENTS.md stays thin and does not duplicate reusable adapter rules.
+  - Codex starts from AGENTS.md, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, and ai-tools/agent/codex.md as appropriate.
+  - Root AGENTS.md stays thin and does not duplicate bootstrap or reusable adapter rules.
   - Runtime SQLite remains canonical; no committed runtime YAML mirror is introduced.
   - Execution-affecting adapter changes are projected and validated.
 
 failure_modes:
   - id: root_agents_rule_duplication
-    detection: AGENTS.md grows independent Codex rules instead of pointing to ai-tools/agent/codex.md.
-    recovery: Move reusable content to ai-tools/agent/codex.md and keep AGENTS.md as bootstrap pointer.
+    detection: AGENTS.md grows independent rules instead of pointing to CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml.
+    recovery: Move reusable content to canonical sources or Codex-only deltas to ai-tools/agent/codex.md, then keep AGENTS.md as bootstrap pointer.
+  - id: codex_adapter_bootstrap_duplication
+    detection: Codex adapter repeats bootstrap obligations, formats, or runtime phase details instead of pointing to canonical sources.
+    recovery: Replace duplicated prose with links to CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml.
   - id: runtime_yaml_mirror_created
     detection: Codex flow creates committed runtime YAML config mirror.
     recovery: Remove mirror and update runtime/runtime.db through the approved runtime flow.

@@ -5,8 +5,10 @@ alwaysApply: true
 
 # Ai-skill Bootstrap Entry
 
-This Cursor rule is a thin entry pointer. Do not duplicate bootstrap obligations,
-formats, enums, examples, or dependency checklists here.
+This Cursor rule is a thin entry pointer. Agent entrypoints should stay thin by
+default: do not duplicate bootstrap obligations, formats, enums, examples,
+dependency checklists, close-loop details, or runtime phase descriptions here
+unless a tool adapter documents and validates a tool-specific exception.
 
 Before any non-read action in this repo, load:
 
@@ -17,4 +19,5 @@ Then follow the obligations declared by the runtime bootstrap contract, includin
 Bootstrap Receipt, Cognitive Mode reporting, and close-loop checks.
 
 When changing bootstrap behavior, update `runtime/core-bootstrap.yaml` and refresh
-runtime surfaces. Keep this file as an adapter pointer only.
+runtime surfaces. Keep this file and tool adapters as pointers to canonical
+sources, with only tool-specific differences in `ai-tools/agent/`.

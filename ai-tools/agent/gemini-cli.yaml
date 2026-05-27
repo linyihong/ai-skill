@@ -22,28 +22,42 @@ activation:
 required_sources:
   - GEMINI.md
   - CORE_BOOTSTRAP.md
-  - README.md
+  - runtime/core-bootstrap.yaml
+  - ai-tools/agent/gemini-cli.md
   - ai-tools/README.md
+  - enforcement/tool-neutral-documentation.md
 
 steps:
-  - id: bootstrap
-    action: 讀取 GEMINI.md 並跟隨 CORE_BOOTSTRAP.md 啟動流程
+  - id: load_thin_entrypoint
+    action: Use GEMINI.md only as a thin bootstrap pointer.
     order: 1
-  - id: report_status
-    action: 輸出 Bootstrap Receipt 與 Cognitive Mode 報告 (v2)
+  - id: load_core_contract
+    action: Load CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml as the only bootstrap entry sources before expanding detailed sources.
     order: 2
-  - id: goal_sync
-    action: 檢查 .agent-goals/ 同步當前目標
+  - id: load_gemini_adapter
+    action: Read ai-tools/agent/gemini-cli.md only for Gemini CLI-specific entrypoint, tool capability, and config differences.
     order: 3
+  - id: enforce_thin_adapter_boundary
+    action: Do not duplicate canonical bootstrap obligations, runtime phase details, or shared enforcement text in GEMINI.md or the Gemini CLI adapter.
+    order: 4
+    gates:
+      - gate.gemini_cli.thin_adapter_boundary
 
 gates:
-  - id: gate.gemini_cli.bootstrap_receipt
-    severity: critical
-    description: 啟動時必須輸出符合格式的 Bootstrap Receipt
-  - id: gate.gemini_cli.cognitive_mode_v2
+  - id: gate.gemini_cli.thin_adapter_boundary
     severity: high
-    description: 每輪輸出必須包含符合 v2 格式的 Cognitive Mode 報告
+    description: GEMINI.md and the Gemini CLI adapter stay thin and point to CORE_BOOTSTRAP.md plus runtime/core-bootstrap.yaml for canonical bootstrap behavior.
+    pass_when:
+      - GEMINI.md points to CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml without duplicating their obligations.
+      - ai-tools/agent/gemini-cli.md records only Gemini CLI-specific differences.
+      - Bootstrap Receipt, Cognitive Mode, close-loop, goal ledger, and runtime phase details remain in canonical sources.
 
 success_criteria:
-  - Gemini CLI 成功載入核心規則並回報正確的 phase
-  - 任務輸出符合語言一致性與 v2 報告規範
+  - Gemini CLI starts from GEMINI.md, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, and ai-tools/agent/gemini-cli.md as appropriate.
+  - Gemini-specific details stay in the adapter layer and canonical bootstrap content is not duplicated.
+  - Execution-affecting adapter changes are projected and validated.
+
+failure_modes:
+  - id: gemini_adapter_bootstrap_duplication
+    detection: GEMINI.md or the Gemini CLI adapter repeats bootstrap obligations, formats, or runtime phase details instead of pointing to canonical sources.
+    recovery: Replace duplicated prose with links to CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml.

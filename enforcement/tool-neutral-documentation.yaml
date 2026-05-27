@@ -18,10 +18,12 @@ activation:
   triggers:
     - {"matches":["write-documentation","create-template","update-readme","create-enforcement-rule"],"type":"task_intent"}
     - {"pattern":"enforcement/**","type":"file_change"}
+    - {"pattern":"ai-tools/agent/**","type":"file_change"}
     - {"pattern":"workflow/**/execution-flow.md","type":"file_change"}
   required_when:
     - "Reusable rules, skills, templates, indexes, feedback lessons, workflow docs, or analysis/intelligence docs are created or updated."
     - "Tool-specific paths, hooks, commands, UI labels, or sync steps appear in reusable docs."
+    - "Agent entrypoints or ai-tools/agent adapters are created or updated."
 
 required_sources:
   - enforcement/tool-neutral-documentation.md
@@ -40,8 +42,11 @@ steps:
   - id: link_to_adapter
     order: 4
     action: "需要具體工具步驟時，連到 ai-tools 或 tools/adapters，不在 reusable docs 複製全文。"
-  - id: review_for_tool_lock_in
+  - id: keep_agent_entrypoints_thin
     order: 5
+    action: "Agent entrypoint 預設只指向 CORE_BOOTSTRAP.md 與 runtime/core-bootstrap.yaml，不複製 bootstrap obligations、format、enum、examples、goal ledger、close-loop 或 runtime phase 細節；tool-specific 例外必須在 adapter 中說明並驗證。"
+  - id: review_for_tool_lock_in
+    order: 6
     action: "檢查 root、workflow、analysis、intelligence、feedback 是否誤把單一工具寫成必要條件。"
 
 gates:
@@ -49,6 +54,8 @@ gates:
     rule: "Reusable docs 不依賴單一 IDE 或 agent 產品。"
   - id: gate.tool_neutral.tool_details_isolated
     rule: "工具細節只在 ai-tools、adapter 或工具設定檔。"
+  - id: gate.tool_neutral.agent_entrypoint_thin
+    rule: "Agent entrypoint 與 ai-tools/agent adapter 預設不複製 canonical bootstrap 或 runtime phase 內容，只連回 CORE_BOOTSTRAP.md 與 runtime/core-bootstrap.yaml；例外必須有 tool-specific rationale 與 validation。"
 
 required_evidence:
   - activation trigger matched or task context explains why this contract is required
@@ -66,6 +73,9 @@ failure_modes:
   - id: adapter_copies_core_workflow
     detection: "工具 adapter 複製完整核心 workflow。"
     recovery: "把共同內容移回核心文件，adapter 只保留差異。"
+  - id: agent_entrypoint_copies_bootstrap
+    detection: "工具入口或 ai-tools/agent adapter 複製 Bootstrap Receipt、Cognitive Mode、close-loop、goal ledger 或 runtime phase 細節，且沒有 tool-specific rationale 與 validation。"
+    recovery: "刪除複製內容，改成 thin pointer 指向 CORE_BOOTSTRAP.md 與 runtime/core-bootstrap.yaml；或把已驗證例外隔離在對應 adapter。"
 
 final_status_report:
   - contract_loaded

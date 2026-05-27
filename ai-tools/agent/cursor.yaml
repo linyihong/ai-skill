@@ -28,35 +28,30 @@ required_sources:
   - .cursor/rules/dependency-reading.mdc
   - CORE_BOOTSTRAP.md
   - runtime/core-bootstrap.yaml
-  - README.md
   - ai-tools/agent/cursor.md
   - ai-tools/README.md
   - enforcement/tool-neutral-documentation.md
-  - enforcement/conversation-goal-ledger.md
 
 steps:
   - id: load_cursor_always_apply_rule
     order: 1
-    action: Use .cursor/rules/dependency-reading.mdc as a thin Cursor always-apply bootstrap pointer.
+    action: Use .cursor/rules/dependency-reading.mdc only as a thin Cursor always-apply bootstrap pointer.
   - id: load_core_bootstrap
     order: 2
-    action: Read CORE_BOOTSTRAP.md, then load runtime/core-bootstrap.yaml as the canonical bootstrap contract before expanding detailed sources.
+    action: Load CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml as the only bootstrap entry sources before expanding detailed sources.
   - id: load_cursor_adapter
     order: 3
-    action: Read ai-tools/agent/cursor.md for Cursor-specific setup, workspace, rules, hooks, and sync behavior.
-  - id: use_runtime_sqlite
-    order: 4
-    action: Use runtime/runtime.db for phase state, obligations, gates, output governance, canonical runtime documents, and generated surfaces.
+    action: Read ai-tools/agent/cursor.md only for Cursor-specific rules, hooks, workspace, and config differences.
   - id: apply_cursor_hook_boundary
-    order: 5
+    order: 4
     action: Treat Cursor hooks as optional reminders/checks unless a team explicitly enables automation.
     gates:
       - gate.cursor.hooks_fail_open
-  - id: keep_cursor_details_in_adapter
-    order: 6
-    action: Keep Cursor-specific paths, hooks, rules, and UI behavior in ai-tools/agent/cursor.md, .cursor/rules, or .cursor hooks.
+  - id: enforce_thin_adapter_boundary
+    order: 5
+    action: Do not duplicate canonical bootstrap obligations, runtime phase details, or shared enforcement text in Cursor adapter files.
     gates:
-      - gate.cursor.tool_specific_boundary
+      - gate.cursor.thin_adapter_boundary
 
 gates:
   - id: gate.cursor.hooks_fail_open
@@ -65,11 +60,12 @@ gates:
       - Cursor hooks are described as reminders/checks by default
       - hooks do not silently edit or close goals unless explicitly configured
       - hook behavior is fail-open unless the team intentionally makes it blocking
-  - id: gate.cursor.tool_specific_boundary
+  - id: gate.cursor.thin_adapter_boundary
     blocks: reusable_doc_change
     pass_when:
-      - Cursor-specific paths, hooks, and UI details stay in ai-tools/agent/cursor.md or .cursor config
-      - shared enforcement and workflow docs remain tool-neutral
+      - Cursor-specific paths, hooks, and UI details stay in ai-tools/agent/cursor.md or .cursor config.
+      - Bootstrap Receipt, Cognitive Mode, close-loop, goal ledger, and runtime phase details remain in CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, or their canonical sources.
+      - Shared enforcement and workflow docs remain tool-neutral.
   - id: gate.cursor.always_apply_bootstrap_current
     blocks: cursor_rule_change
     pass_when:
@@ -83,9 +79,9 @@ required_evidence:
   - final git status after writeback
 
 success_criteria:
-  - Cursor starts from .cursor/rules/dependency-reading.mdc, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, README.md, and ai-tools/agent/cursor.md as appropriate.
+  - Cursor starts from .cursor/rules/dependency-reading.mdc, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, and ai-tools/agent/cursor.md as appropriate.
   - Cursor hooks remain optional reminders/checks unless explicitly configured otherwise.
-  - Cursor-specific details stay in the adapter layer.
+  - Cursor-specific details stay in the adapter layer and canonical bootstrap content is not duplicated.
   - Execution-affecting adapter changes are projected and validated.
 
 failure_modes:
@@ -95,6 +91,9 @@ failure_modes:
   - id: cursor_path_leaks_to_shared_rule
     detection: Generic enforcement or workflow doc makes .cursor paths universal.
     recovery: Move path and UI detail back to ai-tools/agent/cursor.md or .cursor config.
+  - id: cursor_adapter_bootstrap_duplication
+    detection: Cursor adapter repeats bootstrap obligations, formats, or runtime phase details instead of pointing to canonical sources.
+    recovery: Replace duplicated prose with links to CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml.
   - id: cursor_bootstrap_stale
     detection: Cursor always-apply rule no longer points to core bootstrap and runtime source-of-truth.
     recovery: Update .cursor/rules/dependency-reading.mdc and validate linked updates.

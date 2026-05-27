@@ -18,15 +18,15 @@
 
 | 層級 | 位置 | 內容 |
 |------|------|------|
-| **自動載入入口** | 工具專屬入口檔（如 `CLAUDE.md`、`.cursor/rules/*.mdc`） | Thin pointer，指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml` |
+| **自動載入入口** | 工具專屬入口檔（如 `CLAUDE.md`、`AGENTS.md`、`GEMINI.md`、`.cursor/rules/*.mdc`、`.roomodes`） | 預設 thin pointer，只指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml`；tool-specific 例外必須在 adapter 中說明 |
 | **工具配置** | 工具配置檔（如 `.claude/settings.json`） | 僅放 permissions、hooks 等工具特定設定 |
-| **工具使用說明** | `ai-tools/<tool>.md` | 此工具的配置實作與特殊操作注意 |
+| **工具使用說明** | `ai-tools/agent/<tool>.md` | 只記錄此工具和其他工具不同的入口、配置、覆蓋語意與操作注意 |
 | **共用規則** | `enforcement/` | 所有規則本體，集中管理 |
 | **知識庫入口** | `README.md` | OS layout 與導航，所有工具的共同起點 |
 
 ### 工具文件不得重複中央庫內容
 
-`ai-tools/<tool>.md` **只能記錄該工具特有的差異**，不得包含以下已在中央庫可發現的內容：
+`ai-tools/agent/<tool>.md` **只能記錄該工具特有的差異**，不得包含以下已在中央庫可發現的內容：
 
 | ❌ 不應放入工具文件 | ✅ 已在何處 |
 |---|---|
@@ -41,7 +41,7 @@
 | Goal ledger 操作流程 | [`enforcement/conversation-goal-ledger.md`](../enforcement/conversation-goal-ledger.md) |
 | Close-loop 流程（commit/push/readback） | [`enforcement/dependency-reading.md`](../enforcement/dependency-reading.md) |
 
-**原則**：每個工具文件應假設 reader 已讀過 `CORE_BOOTSTRAP.md`，並以 `runtime/core-bootstrap.yaml` 取得 obligations 與後續 runtime 載入要求。工具文件只回答：「這個工具跟其他工具有什麼不同？它的入口檔、配置檔、特殊操作要注意什麼？」
+**原則**：每個工具入口與工具文件預設都保持薄。入口只指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml`；工具文件只回答：「這個工具跟其他工具有什麼不同？它的入口檔、配置檔、覆蓋語意與特殊操作要注意什麼？」Claude Code 目前有已驗證的 tool-specific enforcement 例外，記錄在 Claude adapter 中，不作為其他工具預設。
 
 **不應放在工具配置或工具說明中的內容：**
 - Bootstrap 規則清單（由 `enforcement/README.md` 管理）
@@ -65,10 +65,10 @@ Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating
 | 工具 | 文件 | 用途（僅記錄該工具特有差異） |
 | --- | --- | --- |
 | Claude Code | [`agent/claude.md`](agent/claude.md) | `CLAUDE.md` 自動載入入口、`.claude/settings.json` 工具配置、tool adapter 機制、對話目標閉環。 |
-| Cursor | [`agent/cursor.md`](agent/cursor.md) | `.cursor/rules/*.mdc` 自動載入、`.cursor/hooks.json` 設定、對話目標閉環（含 hooks 範本）。 |
-| Roo Code | [`agent/roo.md`](agent/roo.md) | Custom instructions 手動設定、多 modes 與 file restrictions、`.roomodes` 自訂 mode 定義、對話目標閉環、語言偏好雙層設定。 |
-| Codex | [`agent/codex.md`](agent/codex.md) | `AGENTS.md` 自動載入入口、runtime SQLite source-of-truth、YAML contract projection、commit / push 更新流程。 |
-| Gemini CLI | [`agent/gemini-cli.md`](agent/gemini-cli.md) | `GEMINI.md` 自動載入入口、特有能力（web_fetch / search / sub-agents）規範、語言一致性強制規則。 |
+| Cursor | [`agent/cursor.md`](agent/cursor.md) | `.cursor/rules/*.mdc` 入口、hooks 與 workspace 差異。 |
+| Roo Code | [`agent/roo.md`](agent/roo.md) | Custom Instructions、`.roomodes` 覆蓋語意、modes / file restrictions 與 VS Code settings 差異。 |
+| Codex | [`agent/codex.md`](agent/codex.md) | `AGENTS.md` 入口與 generic AGENTS-aware tool 差異。 |
+| Gemini CLI | [`agent/gemini-cli.md`](agent/gemini-cli.md) | `GEMINI.md` 入口、Gemini CLI 工具能力與設定差異。 |
 | **新增工具指引** | [`agent-onboarding.md`](agent-onboarding.md) | 新 AI agent 工具加入時的設定 checklist，含必要項目與參考來源對照。 |
 
 Agent adapter executable contracts:

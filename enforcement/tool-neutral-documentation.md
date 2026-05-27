@@ -13,6 +13,7 @@
 5. 工具層級設定放在對應的 `ai-tools/<tool>.md`。
 6. skill-specific 工具執行差異只在確實屬於該 skill 時，放入小型 skill-local adapter 文件。
 7. 使用者需要具體設定步驟時，從可重用文件連到 `ai-tools/` 或 skill-local adapter。
+8. Agent entry point 預設必須保持 thin pointer：只指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml`，不得複製 bootstrap obligations、format、enum、examples、goal ledger、close-loop 或 runtime phase 細節；若工具因已驗證的 enforcement 機制需要例外，必須在該 tool adapter 中說明理由與驗證方式。
 
 ## 允許工具專屬內容的位置
 
@@ -47,6 +48,22 @@
 ## 與既有工具文件的關係
 
 可重用文件可以把工具當作範例提及，但不可把工具寫成預設要求；除非該文件本來就在該工具的文件區域內。工具專屬設定與路徑應集中在 `ai-tools/agent/` 中各工具文件。
+
+## Agent Entry Point Thinness
+
+每個工具的自動載入入口只負責把 agent 帶到 canonical bootstrap sources：
+
+```text
+<tool entrypoint>
+  -> CORE_BOOTSTRAP.md
+  -> runtime/core-bootstrap.yaml
+```
+
+工具入口包含 `CLAUDE.md`、`AGENTS.md`、`GEMINI.md`、`.cursor/rules/*.mdc`、`.roomodes` 或其他 tool-specific Custom Instructions。這些入口可以說明「到哪裡讀」，但不可把中央庫內容複製進去。
+
+Claude Code 目前因 SessionStart / PreToolUse hook 與 onboarding 行為有已驗證的 tool-specific enforcement 例外；此類例外只放在 Claude adapter，不作為其他工具入口的預設模式。
+
+工具 adapter（例如 `ai-tools/agent/<tool>.md`）只回答該工具和其他工具有什麼不同：入口位置、設定檔、覆蓋語意、hooks / modes / UI 差異、工具能力限制與同步注意事項。若內容變成共用規則、runtime obligation、workflow 或 validation gate，應移回 `enforcement/`、`runtime/core-bootstrap.yaml`、`workflow/` 或其他 owner layer。
 
 ## Strategy-style Tool Adapters
 
@@ -97,5 +114,6 @@ tools/
 - Generic rule 是否先使用「configured tool sync」，並連到 `ai-tools/` 取得具體命令？
 - 如果 skill 需要 tool-specific 行為，是否隔離在 `tool-adapters/<tool>.md`，並連回核心 workflow？
 - 新增的 skill 或 enforcement rule 是否誤複製工具專屬設定章節，而不是連到工具文件？
+- Agent entry point 與 `ai-tools/agent/<tool>.md` 是否預設只指向 `CORE_BOOTSTRAP.md` / `runtime/core-bootstrap.yaml`，沒有複製 bootstrap obligation 或 runtime phase 細節；若有例外，是否有 tool-specific rationale 與 validation？
 
 ← [Back to enforcement index](README.md)
