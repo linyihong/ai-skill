@@ -10,23 +10,16 @@ default: do not duplicate bootstrap obligations, formats, enums, examples,
 dependency checklists, close-loop details, or runtime phase descriptions here
 unless a tool adapter documents and validates a tool-specific exception.
 
-Before any non-read action in this repo, load:
-
-1. [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md) — human-readable companion and entry.
-2. [`runtime/core-bootstrap.yaml`](../../runtime/core-bootstrap.yaml) — canonical bootstrap contract.
-
-Mandatory project-local obligations:
+Before any non-read action in this repo:
 
 1. Use this repository root as the Ai-skill repo.
-2. Read `CORE_BOOTSTRAP.md` and `runtime/core-bootstrap.yaml` before any
-   non-read action.
-3. Do not stop at this rule summary. The canonical contract is the YAML file.
-4. Every user-facing response in this repo must end with Cognitive Mode
-   reporting according to the active per-turn obligations from
-   `runtime/core-bootstrap.yaml`.
-
-Then follow the obligations declared by the runtime bootstrap contract, including
-Bootstrap Receipt, Cognitive Mode reporting, and close-loop checks.
+2. Load [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md) and
+   [`runtime/core-bootstrap.yaml`](../../runtime/core-bootstrap.yaml).
+3. Treat `runtime/core-bootstrap.yaml` as the canonical contract; do not stop at
+   this rule summary.
+4. Follow the active obligations declared there, including Bootstrap Receipt,
+   close-loop checks, and Cognitive Mode reporting at the end of every
+   user-facing response in this repo.
 
 When changing bootstrap behavior, update `runtime/core-bootstrap.yaml` and refresh
 runtime surfaces. Keep this file and tool adapters as pointers to canonical
