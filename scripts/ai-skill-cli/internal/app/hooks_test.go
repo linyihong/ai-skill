@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -216,6 +217,65 @@ func TestParseCognitiveModeBlock(t *testing.T) {
 	modes := parseCognitiveModeBlock(text)
 	if modes["execution_mode"] != "DEEP" || modes["context_mode"] != "SOURCE_BACKED" || modes["governance_mode"] != "STRICT" || modes["memory_mode"] != "EPISODIC" {
 		t.Fatalf("parse mismatch: %#v", modes)
+	}
+}
+
+func TestFormatDirtyGitRepoReportCombinesNestedRepos(t *testing.T) {
+	workspace := t.TempDir()
+	repoA := filepath.Join(workspace, "TATA")
+	repoB := filepath.Join(workspace, "mr.HS")
+	os.MkdirAll(repoA, 0o755)
+	os.MkdirAll(repoB, 0o755)
+	runGit(t, repoA, "init")
+	runGit(t, repoA, "config", "user.email", "test@example.invalid")
+	runGit(t, repoA, "config", "user.name", "Test User")
+	writeFile(t, filepath.Join(repoA, "README.md"), "# A\n")
+	runGit(t, repoA, "add", "README.md")
+	runGit(t, repoA, "commit", "-m", "initial")
+	runGit(t, repoB, "init")
+	runGit(t, repoB, "config", "user.email", "test@example.invalid")
+	runGit(t, repoB, "config", "user.name", "Test User")
+	writeFile(t, filepath.Join(repoB, "README.md"), "# B\n")
+	runGit(t, repoB, "add", "README.md")
+	runGit(t, repoB, "commit", "-m", "initial")
+
+	writeFile(t, filepath.Join(repoA, "dirty.txt"), "dirty\n")
+	writeFile(t, filepath.Join(repoB, "dirty.txt"), "dirty\n")
+
+	report := formatDirtyGitRepoReport(workspace)
+	if !strings.Contains(report, "TATA") || !strings.Contains(report, "mr.HS") {
+		t.Fatalf("expected combined nested repo report, got:\n%s", report)
+	}
+	if !strings.Contains(report, "### Project Git Report") {
+		t.Fatalf("expected final response report instruction, got:\n%s", report)
+	}
+}
+
+func TestRunUserPromptSubmitHookIncludesNestedGitReport(t *testing.T) {
+	workspace := t.TempDir()
+	writeFile(t, filepath.Join(workspace, "CORE_BOOTSTRAP.md"), "# Bootstrap\n")
+	repo := filepath.Join(workspace, "nested")
+	os.MkdirAll(repo, 0o755)
+	runGit(t, repo, "init")
+	runGit(t, repo, "config", "user.email", "test@example.invalid")
+	runGit(t, repo, "config", "user.name", "Test User")
+	writeFile(t, filepath.Join(repo, "README.md"), "# Nested\n")
+	runGit(t, repo, "add", "README.md")
+	runGit(t, repo, "commit", "-m", "initial")
+	writeFile(t, filepath.Join(repo, "dirty.txt"), "dirty\n")
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	if code := runUserPromptSubmitHook(workspace, &stdout, &stderr); code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode hook output: %v\n%s", err, stdout.String())
+	}
+	ctx := output["hookSpecificOutput"]["additionalContext"]
+	if !strings.Contains(ctx, "nested") || !strings.Contains(ctx, "### Project Git Report") {
+		t.Fatalf("expected nested git report in context, got:\n%s", ctx)
 	}
 }
 

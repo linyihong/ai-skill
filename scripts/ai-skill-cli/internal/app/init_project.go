@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -247,7 +248,10 @@ func initProjectPlannedFiles(target string, tools []string) []plannedFile {
 				plannedFile{tool: tool, path: filepath.Join(target, ".cursor", "hooks.json"), description: "Cursor hooks"},
 			)
 		case "claude":
-			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "CLAUDE.md"), description: "Claude Code settings"})
+			files = append(files,
+				plannedFile{tool: tool, path: filepath.Join(target, "CLAUDE.md"), description: "Claude Code settings"},
+				plannedFile{tool: tool, path: filepath.Join(target, ".claude", "settings.json"), description: "Claude Code hooks"},
+			)
 		case "gemini":
 			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "GEMINI.md"), description: "Gemini CLI settings"})
 		case "codex":
@@ -280,6 +284,9 @@ func initProjectFileContent(file plannedFile, repo string) (string, error) {
 		}
 		return initProjectCursorRuleContent(repo)
 	case "claude":
+		if strings.HasSuffix(file.path, filepath.Join(".claude", "settings.json")) {
+			return initProjectClaudeSettingsContent(repo)
+		}
 		return initProjectClaudeContent(repo)
 	case "gemini":
 		return initProjectGeminiContent(repo)
@@ -364,6 +371,43 @@ func initProjectCursorHooksContent() (string, error) {
 
 func initProjectClaudeContent(repo string) (string, error) {
 	return fmt.Sprintf("# Claude Code Auto-Bootstrap\n\n%s", initProjectBootstrapText(repo)), nil
+}
+
+func initProjectClaudeSettingsContent(repo string) (string, error) {
+	command := func(event string) string {
+		repoPath := filepath.ToSlash(repo)
+		return fmt.Sprintf("sh -c 'AI_SKILL_REPO=%q; ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run %s --repo \"$AI_SKILL_REPO\"'", repoPath, event)
+	}
+	settings := map[string]any{
+		"description": "Claude Code project-local Ai-skill hooks. Commands execute the canonical Ai-skill repo-local Go binary and use CLAUDE_PROJECT_DIR as the target project root for nested Git reports.",
+		"hooks": map[string]any{
+			"SessionStart": []map[string]any{{
+				"matcher": "startup|resume|clear",
+				"hooks":   []map[string]any{{"type": "command", "command": command("session-start"), "timeout": 30}},
+			}},
+			"UserPromptSubmit": []map[string]any{{
+				"matcher": "",
+				"hooks":   []map[string]any{{"type": "command", "command": command("user-prompt-submit"), "timeout": 30}},
+			}},
+			"PreToolUse": []map[string]any{{
+				"matcher": "",
+				"hooks":   []map[string]any{{"type": "command", "command": command("pre-tool-use"), "timeout": 10}},
+			}},
+			"PostToolUse": []map[string]any{{
+				"matcher": "",
+				"hooks":   []map[string]any{{"type": "command", "command": command("post-tool-use"), "timeout": 10}},
+			}},
+			"Stop": []map[string]any{{
+				"matcher": "",
+				"hooks":   []map[string]any{{"type": "command", "command": command("stop"), "timeout": 10}},
+			}},
+		},
+	}
+	data, err := json.MarshalIndent(settings, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(data) + "\n", nil
 }
 
 func initProjectGeminiContent(repo string) (string, error) {

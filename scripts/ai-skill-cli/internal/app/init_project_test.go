@@ -90,11 +90,22 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
 		t.Fatalf("decode JSON: %v", err)
 	}
-	if result.Mode != "write" || len(result.Mutations) != 4 {
+	if result.Mode != "write" || len(result.Mutations) != 5 {
 		t.Fatalf("expected write mutations, got %#v", result)
 	}
 	if !pathExists(filepath.Join(project, "CLAUDE.md")) {
 		t.Fatal("write mode did not create CLAUDE.md")
+	}
+	claudeSettingsPath := filepath.Join(project, ".claude", "settings.json")
+	if !pathExists(claudeSettingsPath) {
+		t.Fatal("write mode did not create Claude Code hook settings")
+	}
+	claudeSettings, err := os.ReadFile(claudeSettingsPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(claudeSettings), "user-prompt-submit") || !strings.Contains(string(claudeSettings), "AI_SKILL_REPO") {
+		t.Fatalf("expected Claude hooks to call Ai-skill Go runner, got %s", string(claudeSettings))
 	}
 	if !pathExists(filepath.Join(project, ".cursor", "rules", "ai-skill-bootstrap.mdc")) {
 		t.Fatal("write mode did not create Cursor rule")

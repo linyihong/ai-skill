@@ -357,6 +357,35 @@ func readFileSafe(path string) string {
 	return string(data)
 }
 
+func resolveClaudeAiSkillRepo(projectDir string) string {
+	candidates := []string{}
+	if env := strings.TrimSpace(os.Getenv("AI_SKILL_REPO")); env != "" {
+		candidates = append(candidates, env)
+	}
+	candidates = append(candidates, projectDir)
+	if cwd, err := os.Getwd(); err == nil {
+		for {
+			candidates = append(candidates, cwd)
+			parent := filepath.Dir(cwd)
+			if parent == cwd {
+				break
+			}
+			cwd = parent
+		}
+	}
+	for _, candidate := range candidates {
+		if candidate == "" {
+			continue
+		}
+		if _, err := os.Stat(filepath.Join(candidate, "CORE_BOOTSTRAP.md")); err == nil {
+			if _, err := os.Stat(filepath.Join(candidate, "runtime", "core-bootstrap.yaml")); err == nil {
+				return candidate
+			}
+		}
+	}
+	return projectDir
+}
+
 // md5Short returns the first 12 hex chars of the MD5 hash of s.
 func md5Short(s string) string {
 	h := md5.Sum([]byte(s))
@@ -446,6 +475,136 @@ func extractAssistantTexts(transcriptPath string) []string {
 	return results
 }
 
+type gitRepoStatusReport struct {
+	Root  string
+	Rel   string
+	Lines []string
+}
+
+func collectDirtyGitRepoReports(projectDir string) []gitRepoStatusReport {
+	seen := map[string]bool{}
+	var repos []string
+	if root, err := hookGitOutput(projectDir, "rev-parse", "--show-toplevel"); err == nil {
+		root = strings.TrimSpace(root)
+		if root != "" {
+			repos = append(repos, root)
+			seen[root] = true
+		}
+	}
+	_ = filepath.WalkDir(projectDir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		name := d.Name()
+		if d.IsDir() {
+			switch name {
+			case ".git":
+				root := filepath.Dir(path)
+				if !seen[root] {
+					repos = append(repos, root)
+					seen[root] = true
+				}
+				return filepath.SkipDir
+			case "node_modules", ".cache", "tmp", "vendor":
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if name == ".git" {
+			root := filepath.Dir(path)
+			if !seen[root] {
+				repos = append(repos, root)
+				seen[root] = true
+			}
+		}
+		return nil
+	})
+	sort.Strings(repos)
+
+	var reports []gitRepoStatusReport
+	for _, repo := range repos {
+		out, err := hookGitOutput(repo, "status", "--short", "--branch")
+		if err != nil {
+			continue
+		}
+		lines := nonEmptyLines(out)
+		if !gitStatusNeedsReport(lines) {
+			continue
+		}
+		rel, err := filepath.Rel(projectDir, repo)
+		if err != nil || rel == "." {
+			rel = filepath.Base(repo)
+		}
+		reports = append(reports, gitRepoStatusReport{Root: repo, Rel: filepath.ToSlash(rel), Lines: lines})
+	}
+	return reports
+}
+
+func nonEmptyLines(s string) []string {
+	var lines []string
+	for _, line := range strings.Split(s, "\n") {
+		line = strings.TrimRight(line, "\r")
+		if strings.TrimSpace(line) != "" {
+			lines = append(lines, line)
+		}
+	}
+	return lines
+}
+
+func gitStatusNeedsReport(lines []string) bool {
+	if len(lines) == 0 {
+		return false
+	}
+	if len(lines) > 1 {
+		return true
+	}
+	branch := lines[0]
+	return strings.Contains(branch, "ahead") ||
+		strings.Contains(branch, "behind") ||
+		strings.Contains(branch, "gone") ||
+		strings.Contains(branch, "diverged")
+}
+
+func formatDirtyGitRepoReport(projectDir string) string {
+	reports := collectDirtyGitRepoReports(projectDir)
+	if len(reports) == 0 {
+		return ""
+	}
+	var b strings.Builder
+	b.WriteString("[ai-skill nested git report]\n")
+	b.WriteString("Dirty Git repositories were detected under the project root. The final response MUST include a combined `### Project Git Report` section. ")
+	b.WriteString("If one repo changed, report that repo; if multiple repos changed, merge them into one section with one bullet per repo. ")
+	b.WriteString("Do not claim a clean close-loop until every listed repo is handled or explicitly marked as pre-existing/unrelated.\n\n")
+	for _, report := range reports {
+		b.WriteString("- ")
+		b.WriteString(report.Rel)
+		b.WriteString("\n")
+		limit := len(report.Lines)
+		if limit > 12 {
+			limit = 12
+		}
+		for i := 0; i < limit; i++ {
+			b.WriteString("  ")
+			b.WriteString(report.Lines[i])
+			b.WriteByte('\n')
+		}
+		if len(report.Lines) > limit {
+			b.WriteString("  ... ")
+			b.WriteString(itoa(len(report.Lines) - limit))
+			b.WriteString(" more status lines\n")
+		}
+	}
+	return b.String()
+}
+
+func hookGitOutput(root string, args ...string) (string, error) {
+	output, err := exec.Command("git", append([]string{"-C", root}, args...)...).Output()
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
+}
+
 // ---------------------------------------------------------------------------
 // Claude Code hooks (SessionStart / PreToolUse / PostToolUse / UserPromptSubmit / Stop)
 // Cross-platform Go replacement for .claude/hooks/*.sh per
@@ -460,8 +619,9 @@ func runSessionStartHook(projectDir string, stdout io.Writer, stderr io.Writer) 
 	ts := time.Now().Format("2006-01-02T15:04:05")
 	appendLog(logFile, "=== "+ts+" SessionStart hook fired (Go) ===")
 
+	aiSkillRepo := resolveClaudeAiSkillRepo(projectDir)
 	phase, obligCount, gateCount := "unknown", "?", "?"
-	dbPath := filepath.Join(projectDir, "runtime", "runtime.db")
+	dbPath := filepath.Join(aiSkillRepo, "runtime", "runtime.db")
 	if db, err := sql.Open("sqlite", dbPath); err == nil {
 		defer db.Close()
 		if row := db.QueryRow("SELECT phase_id FROM phase_machine LIMIT 1"); row != nil {
@@ -476,10 +636,10 @@ func runSessionStartHook(projectDir string, stdout io.Writer, stderr io.Writer) 
 	}
 	const activePerTurn = "obligation.cognitive.mode_report, obligation.finality.close_loop_check"
 
-	coreBootstrap := readFileSafe(filepath.Join(projectDir, "CORE_BOOTSTRAP.md"))
-	ruleWeight := readFileSafe(filepath.Join(projectDir, "enforcement", "rule-weight.md"))
-	dependency := readFileSafe(filepath.Join(projectDir, "enforcement", "dependency-reading.md"))
-	goalLedger := readFileSafe(filepath.Join(projectDir, "enforcement", "conversation-goal-ledger.md"))
+	coreBootstrap := readFileSafe(filepath.Join(aiSkillRepo, "CORE_BOOTSTRAP.md"))
+	ruleWeight := readFileSafe(filepath.Join(aiSkillRepo, "enforcement", "rule-weight.md"))
+	dependency := readFileSafe(filepath.Join(aiSkillRepo, "enforcement", "dependency-reading.md"))
+	goalLedger := readFileSafe(filepath.Join(aiSkillRepo, "enforcement", "conversation-goal-ledger.md"))
 
 	context := fmt.Sprintf(
 		"[ai-skill SessionStart] Bootstrap auto-loaded. The agent does NOT need to read these files again "+
@@ -663,10 +823,15 @@ func runUserPromptSubmitHook(projectDir string, stdout io.Writer, stderr io.Writ
 	const logFile = "/tmp/ai-skill-prompt-hook.log"
 	appendLog(logFile, time.Now().Format("2006-01-02T15:04:05")+" UserPromptSubmit fired (Go)")
 
-	bootstrap := readFileSafe(filepath.Join(projectDir, "CORE_BOOTSTRAP.md"))
+	aiSkillRepo := resolveClaudeAiSkillRepo(projectDir)
+	bootstrap := readFileSafe(filepath.Join(aiSkillRepo, "CORE_BOOTSTRAP.md"))
+	gitReport := formatDirtyGitRepoReport(projectDir)
 	combined := "[ai-skill per-turn obligation] Final response MUST end with ### Cognitive Mode 報告 block. " +
 		"First-turn ALSO outputs Bootstrap Receipt. Canonical spec: runtime/core-bootstrap.yaml.\n\n---\n" +
 		bootstrap
+	if gitReport != "" {
+		combined += "\n\n---\n" + gitReport
+	}
 
 	output := map[string]interface{}{
 		"hookSpecificOutput": map[string]interface{}{
@@ -735,6 +900,16 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 
 	cogRe := regexp.MustCompile(`(### Cognitive Mode 報告|(?:^|\n)Cognitive: [A-Z])`)
 	if cogRe.MatchString(lastText) {
+		if formatDirtyGitRepoReport(projectDir) != "" {
+			gitReportRe := regexp.MustCompile(`(?m)^### (Project Git Report|Git Repo Report|Git Repository Report)\b`)
+			if !gitReportRe.MatchString(lastText) {
+				_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING_PROJECT_GIT_REPORT")
+				appendLog(logFile, "exit_code: 2 (block missing project git report)")
+				_, _ = fmt.Fprint(stderr, "[ai-skill Stop hook] Dirty Git repositories were detected under the project root, but your final response did not include `### Project Git Report`.\n\n"+
+					"If one nested Git repo changed, report that repo. If multiple nested Git repos changed, merge them into one `### Project Git Report` section with one bullet per repo and clearly distinguish current-task changes from pre-existing/unrelated dirty state.\n")
+				return ExitValidationFailed
+			}
+		}
 		_, _ = fmt.Fprintln(stderr, "ALLOW_BLOCK_PRESENT")
 		appendLog(logFile, "exit_code: 0")
 		return ExitSuccess

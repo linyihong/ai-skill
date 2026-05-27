@@ -29,8 +29,8 @@
 | `ai-skill hooks run session-start` | 執行 Claude Code SessionStart hook：query runtime.db、讀 4 個 bootstrap 文件、輸出 hookSpecificOutput JSON、寫 SessionStart flag（TTL 120s） | 是（`/tmp/ai-skill-sessionstart-<hash>.flag`） | 否 | Cross-platform Go script runtime |
 | `ai-skill hooks run pre-tool-use` | 執行 Claude Code PreToolUse hook：scan transcript for Bootstrap Receipt；Read tool 一律 allow，其他 tool 在 Receipt 出現前 block（exit 2） | 是（`/tmp/ai-skill-bootstrap-<hash>.done`） | 否 | Cross-platform Go script runtime |
 | `ai-skill hooks run post-tool-use` | 執行 Claude Code PostToolUse hook：Bootstrap Receipt 不在 transcript 時注入 reminder via hookSpecificOutput；always exit 0 | 是（cache file） | 否 | Cross-platform Go script runtime |
-| `ai-skill hooks run user-prompt-submit` | 執行 Claude Code UserPromptSubmit hook：每次 user turn 注入 per-turn obligation reminder + CORE_BOOTSTRAP.md as additionalContext | 否 | 否 | Cross-platform Go script runtime |
-| `ai-skill hooks run stop` | 執行 Claude Code Stop hook：檢查 last assistant message 含 Cognitive Mode block（compact 或 full table）；缺少時 block（exit 2） | 否 | 否 | Cross-platform Go script runtime |
+| `ai-skill hooks run user-prompt-submit` | 執行 Claude Code UserPromptSubmit hook：每次 user turn 注入 per-turn obligation reminder + CORE_BOOTSTRAP.md as additionalContext；若 project root 底下有 dirty nested Git repos，注入合併 `### Project Git Report` 要求 | 否 | 否 | Cross-platform Go script runtime |
+| `ai-skill hooks run stop` | 執行 Claude Code Stop hook：檢查 last assistant message 含 Cognitive Mode block（compact 或 full table）；若有 dirty root / nested Git repos 也要求 `### Project Git Report`；缺少時 block（exit 2） | 否 | 否 | Cross-platform Go script runtime |
 | `ai-skill sync-cursor-bundle` | 同步 Cursor bundle / mirror | 是 | 否 | Phase 2 |
 | `ai-skill close-loop` | 檢查 dirty owner group、commit、push、readback | 是 | 是 | Phase 2 |
 | `ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index | 是 | 否 | Phase 3 |
@@ -119,7 +119,7 @@
 副作用：
 
 - dry-run：只列出將寫入的檔案。
-- 寫入模式：可能建立 `.roomodes`、`.cursor/rules/`、`.cursor/hooks.json`、`CLAUDE.md`、`.agent-goals/` 或等效 project-local 設定。
+- 寫入模式：可能建立 `.roomodes`、`.cursor/rules/`、`.cursor/hooks.json`、`CLAUDE.md`、`.claude/settings.json`、`.agent-goals/` 或等效 project-local 設定。
 - Phase 2 初始切片只開放 dry-run planner；write mode 在 template parity、fixture 與覆蓋策略完成前必須回傳 `partial_close_loop_blocked`。
 - Shell To Go migration 後，write mode 必須實作並成為預設；舊 `scripts/init-new-project.sh` 必須刪除。
 
@@ -253,7 +253,8 @@
 
 輸入：
 
-- `pre-commit` / `commit-msg` / `post-commit` / `pre-push`
+- Git hooks: `pre-commit` / `commit-msg` / `post-commit` / `pre-push`
+- Claude Code hooks: `session-start` / `user-prompt-submit` / `pre-tool-use` / `post-tool-use` / `stop`
 - `--repo <path>`
 - `--json` / `--plain`
 - positional：commit-msg 收 `<commit-msg-file-path>`（由 git 透過 `"$@"` 從 adapter 傳入）
@@ -264,6 +265,8 @@
 - `commit-msg`：讀 commit message file，依 `runtime/cognitive-modes-*.yaml` + `runtime/cognitive-modes-cost-class.yaml` + `runtime/plan-status-sync-enforcement.yaml` + `runtime/cognitive-modes-token-budget.yaml` + `runtime/cognitive-modes-adaptive.yaml` + `runtime/bootstrap-entry-points.yaml` + `runtime/cli-modification-policy.yaml` + `runtime/core-bootstrap.yaml` contracts 執行 14 個 validators（cognitive contract block / executionFloors / governanceConsistency / memorySubdir / cognitiveCost / activationSignals / capabilitySnippet / planStatusSync / tokenBudget / adaptiveTriggers / bootstrapEntryThinness / **cliDocSync** / **runtimeYamlProjects** / **markdownYamlSync**）。Validator block 時 exit 30。Opt-out trailers：`[skip-cognitive-mode]` / `[skip-plan-status-sync]` / `[skip-token-budget]` / `[skip-adaptive]` / `[skip-bootstrap-thinness]` / `[skip-cli-doc-sync]` / `[skip-runtime-yaml-projection]` / `[skip-markdown-yaml-sync]`。
 - `post-commit`：reference-only 預設 no-op；若 `AI_SKILL_SYNC_CURSOR_BUNDLE=1`，只回報 Go mirror write mode 狀態。
 - `pre-push`：CLI source（`scripts/ai-skill-cli/...`、GitHub workflows、Git hooks）變動時跑 `go test ./...` preflight；其他情況跳過。
+- `user-prompt-submit`：Claude Code hook；注入 per-turn Cognitive Mode obligation，並掃描 project root 底下的 dirty nested Git repositories。若一個 repo dirty，final response 應回報該 repo；若多個 repo dirty，合併成單一 `### Project Git Report` section。
+- `stop`：Claude Code hook；final response 必須包含 Cognitive Mode block。若 project root 或 nested Git repositories dirty，final response 也必須包含 `### Project Git Report`，避免 root 非 git repo 的多 repo workspace 漏報。
 
 必要行為：
 

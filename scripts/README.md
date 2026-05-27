@@ -42,7 +42,7 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects
 | Roo Code | `.roomodes` | Thin bootstrap pointer，指向 Core Bootstrap companion 與 canonical YAML contract |
 | Cursor | `.cursor/rules/ai-skill-bootstrap.mdc` | Thin alwaysApply pointer，指向 Core Bootstrap companion 與 canonical YAML contract |
 | Cursor | `.cursor/hooks.json` | sessionStart hook 提醒 |
-| Claude Code | `CLAUDE.md` | Thin bootstrap pointer，指向 Core Bootstrap companion 與 canonical YAML contract |
+| Claude Code | `CLAUDE.md` + `.claude/settings.json` | Thin bootstrap pointer + Go hook runner，指向 Core Bootstrap companion 與 canonical YAML contract，並強制 per-turn Cognitive Mode / nested Git report |
 | 通用 | `.agent-goals/` | 對話目標帳本目錄 |
 
 只設定特定工具：
