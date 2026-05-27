@@ -37,7 +37,11 @@ if not transcript_path or not os.path.isfile(transcript_path):
     print(f"ALLOW_NO_TRANSCRIPT: path={transcript_path!r}", file=sys.stderr)
     sys.exit(0)
 
-marker = "### Cognitive Mode 報告"
+# Accept both full header form and compact single-line form:
+# Full:    ### Cognitive Mode 報告  (non-default dims or high-risk mode)
+# Compact: Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<sig>
+import re
+MARKER_RE = re.compile(r'(### Cognitive Mode 報告|(?:^|\n)Cognitive: [A-Z])')
 last_assistant_text = None
 try:
     with open(transcript_path, "r", encoding="utf-8") as fh:
@@ -81,7 +85,7 @@ if last_assistant_text is None:
 # Diagnostic: log last assistant text length and tail
 print(f"DIAG last_msg_len={len(last_assistant_text)} tail={last_assistant_text[-200:]!r}", file=sys.stderr)
 
-if marker in last_assistant_text:
+if MARKER_RE.search(last_assistant_text):
     print("ALLOW_BLOCK_PRESENT", file=sys.stderr)
     sys.exit(0)
 
