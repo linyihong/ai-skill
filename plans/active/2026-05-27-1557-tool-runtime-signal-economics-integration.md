@@ -12,7 +12,8 @@ draft
 
 - `tools/` 提供 tool catalog / usage-pattern docs，不直接決定 runtime。
 - `runtime/economics/` 或等效 executable contract 層負責「值不值得這樣思考 / 這樣執行」。
-- Cognitive Mode 不直接依賴 tool catalog，只消費 economics / tool-derived signals。
+- Cognitive Mode 報告升級為 runtime introspection surface：不只是 status report，而是 Runtime Cognitive State / Cognitive Execution State snapshot。
+- Cognitive Mode 不直接依賴 tool catalog，只消費 economics / tool-derived signals，並回報可推導、可驗證、可影響 runtime 的 state。
 - Cognitive Mode core 仍由 `runtime/cognitive-modes*.yaml` 管理。
 
 ## Decision Rationale
@@ -38,6 +39,17 @@ Economic Decision Layer
 
 這些問題本質上不是 workflow 問題，而是 runtime economics 問題。
 
+同時，現有 Cognitive Mode 報告已經具備 runtime introspection 的雛形：
+
+- `execution_mode`
+- `context_mode`
+- `governance_mode`
+- `memory_mode`
+- `validation_mode`
+- `cognitive_cost`
+
+這組欄位已接近 Runtime Cognitive State Vector，但目前仍偏 status report，尚未完整接上 runtime economics、discovery、execution contracts 與 feedback loop。
+
 ### Decision
 
 把原 plan 從 `Tool Runtime Integration` 升級成：
@@ -51,6 +63,7 @@ Tool Runtime Signal & Economics Integration
 1. `tools/`：human-readable tool catalog、metadata docs、usage patterns。
 2. `runtime/economics/` 或等效 runtime executable contracts：token / tool / reasoning / recursion / compression / escalation cost policy。
 3. Cognitive Mode discovery：只消費 derived signals，不直接擁有 tool catalog 或 economics model。
+4. Cognitive Mode report：升級為 Cognitive Execution State surface，回報 state、economics、runtime route decisions 與 adaptation rationale。
 
 第一版不做完整 telemetry database，但要設計 feedback loop 的 contract boundary，讓未來可從 static heuristics 升級到 evidence-adaptive runtime。
 
@@ -60,6 +73,8 @@ Tool Runtime Signal & Economics Integration
 - B. 把 economics 直接塞進 Cognitive Mode core：reject。會讓 Cognitive Mode 變成 tool preset / cost table，而不是 cognitive strategy。
 - C. 建立獨立 `economics/` top-level layer：defer。概念清楚，但會新增一個 repo owner layer；先評估 runtime ownership 是否足夠。
 - D. 建立 `runtime/economics/` 或等效 runtime executable contracts：accept as draft direction。它最接近 runtime decision layer，但 Phase 0 必須檢查目前 `runtime/README.md` 對 runtime YAML source 的限制。
+- E. 只保留現有 Cognitive Mode 報告：reject。會讓 report 成為 ritualized verbosity，無法支撐 runtime economics 或 scenario validation。
+- F. 把 Cognitive Mode 報告升級為 Cognitive Execution State：accept。保留現有 6 維 state vector，同時增加 economics / runtime / adaptation surfaces。
 
 ### Why Not an ADR Yet
 
@@ -72,6 +87,8 @@ Tool Runtime Signal & Economics Integration
 - [ ] runtime validate / scenario tests 能驗證 contract
 - [ ] hook 或 CLI validator 真實使用該 contract
 - [ ] feedback loop 有最小 evidence path，而非只停在 static docs
+- [ ] Cognitive Mode 報告可映射到 economics tuple / split costs / adaptation rationale
+- [ ] Cognitive state output 可被 scenario 測試，不只是漂亮 log
 - [ ] Open Questions 全部解決
 
 ### Consequences
@@ -81,6 +98,7 @@ Tool Runtime Signal & Economics Integration
 - 把「思考成本」正式當成 architecture，而不是口頭約束
 - tool routing、compression、token budget、recursion guard 可共用同一 economics layer
 - Cognitive Mode 報告可反映 tool usage / context expansion / retry pressure，但核心 contract 維持乾淨
+- Cognitive Mode 報告從 status report 升級成 runtime introspection / self-governance evidence
 - 為 adaptive runtime cognition system 打基礎
 
 #### 負面
@@ -94,6 +112,7 @@ Tool Runtime Signal & Economics Integration
 - `runtime/economics/` 若沒有 source-of-truth 規則，可能違反 `runtime/README.md` 的 runtime YAML boundary
 - economics schema 若過細，會變成 premature execution VM
 - 若只做 static YAML，仍然只是 contract system，不會形成 feedback loop
+- 若 Cognitive report 不可推導、不可驗證、不可影響 runtime，會變成 fake observability
 
 ## Runtime Execution Path
 
@@ -124,7 +143,8 @@ Draft owner candidates:
    - validation checkpoint required
    - recovery / escalation
 5. Cognitive Mode discovery consumes economics-derived signals.
-6. Final Cognitive Mode report cites signal source without embedding tool catalog details.
+6. Runtime Cognitive State / Cognitive Execution State report cites signal source without embedding tool catalog details.
+7. Runtime scenarios can compare expected vs actual cognitive state to detect governance drift, reasoning drift, execution mismatch, or economic overrun.
 
 ### Proposed flow
 
@@ -139,7 +159,8 @@ flowchart TD
   runtimeMonitoring --> feedbackLoop["Cost Feedback Loop"]
   feedbackLoop --> economicFit
   economicFit --> cognitiveDiscovery["Cognitive Discovery Signals"]
-  cognitiveDiscovery --> cognitiveReport["Cognitive Mode Report"]
+  cognitiveDiscovery --> cognitiveState["Cognitive Execution State"]
+  cognitiveState --> feedbackLoop
 ```
 
 ### Generated surfaces
@@ -152,6 +173,7 @@ runtime.economics.token_costs
 runtime.economics.tool_cost_model
 runtime.economics.cognitive_budget_policy
 runtime.economics.execution_feedback
+runtime.cognitive_state.telemetry_contract
 ```
 
 ### Validation scenarios
@@ -161,6 +183,8 @@ runtime.economics.execution_feedback
 - `tool-derived-cognitive-signal-valid-v1`
 - `economics-derived-cognitive-signal-valid-v1`
 - `execution-feedback-loop-static-contract-v1`
+- `cognitive-state-economics-fields-valid-v1`
+- `cognitive-state-adaptation-rationale-valid-v1`
 
 ## Target Architecture
 
@@ -220,6 +244,62 @@ tool_patterns:
 
 These patterns are not tool presets. They are runtime cognition heuristics.
 
+### Runtime Cognitive State surface
+
+The existing Cognitive Mode 報告 should become a structured introspection surface:
+
+```yaml
+cognitive_state:
+  execution_mode: NORMAL
+  context_mode: SOURCE_BACKED
+  governance_mode: STRICT
+  memory_mode: PROJECT_CONTEXT
+  validation_mode: CHECKLIST
+
+economics:
+  thinking_cost: MEDIUM
+  context_cost: HIGH
+  execution_cost: LOW
+  estimated_token_cost: MEDIUM
+  estimated_latency: LOW
+  recursion_risk: LOW
+  compression_pressure: MEDIUM
+  evidence_depth: SOURCE_BACKED
+
+runtime:
+  triggered_by:
+    - file_diff_runtime_schema
+  discovery_signals:
+    - tool_usage_high_risk_mutation
+  activated_routes:
+    - route.runtime.cognitive-modes
+  deferred_routes:
+    - route.tools.metadata-routing
+  blocked_routes: []
+
+adaptation:
+  why_not_deeper:
+    - task bounded
+    - no architecture mutation
+  why_not_shallower:
+    - source-backed answer required
+  why_not_parallel:
+    - single-source plan update
+  escalation_reason: null
+```
+
+This is not meant to make every chat response verbose. The output can remain compact, but the runtime contract should make the state derivable and testable.
+
+### Split cost model
+
+`cognitive_cost` currently compresses multiple costs into one class. Economics integration should split it internally:
+
+- `thinking_cost`: reasoning depth, recursive analysis, validation chain
+- `context_cost`: source-backed reads, graph traversal, memory loading, routing lookup
+- `execution_cost`: tool calls, mutation, validation, runtime refresh, tests
+
+The existing `cognitive_cost` can remain as a public summary / compatibility field, derived from split costs.
+
 ## Phase 0: Pre-Build Interrogation
 
 - [ ] Confirm scope: static economics contracts + signal wiring first; no full telemetry DB in v1.
@@ -229,6 +309,8 @@ These patterns are not tool presets. They are runtime cognition heuristics.
 - [ ] Confirm linked updates: `tools/README.md`, `tools/metadata/README.md`, `tools/routing/README.md`, `runtime/README.md`, routing registry / generated reports if needed.
 - [ ] Confirm validation targets: runtime refresh/validate, generated surface query, scenario tests.
 - [ ] Confirm non-goal: do not rewrite Cognitive Mode core or implement full telemetry DB in v1.
+- [ ] Confirm Cognitive Mode report naming: keep public name or introduce `Runtime Cognitive State` / `Cognitive Execution State` as internal contract.
+- [ ] Confirm anti-verbosity rule: expanded cognitive telemetry must be derivable/testable without forcing every response into a huge report.
 
 ## Phase 1: Define Runtime Economics Boundary
 
@@ -237,6 +319,8 @@ These patterns are not tool presets. They are runtime cognition heuristics.
 - [ ] Define generated surface keys
 - [ ] Define relationship to `runtime/cognitive-modes-token-budget.yaml`
 - [ ] Define relationship to `tools/metadata/README.md`
+- [ ] Define relationship to current `runtime/cognitive-modes-cost-class.yaml`
+- [ ] Define compatibility path from `cognitive_cost` to split economics costs
 
 完成條件：
 
@@ -290,13 +374,30 @@ These patterns are not tool presets. They are runtime cognition heuristics.
 - [ ] Add `economic_pressure_high`
 - [ ] Add `context_expansion_rate_high`
 - [ ] Add `retry_cost_exceeded`
+- [ ] Add `compression_pressure_high`
+- [ ] Add `evidence_depth_mismatch`
 
 完成條件：
 
 - [ ] Cognitive discovery consumes economics-derived signals only as input
 - [ ] Cognitive Mode core remains strategy-oriented, not tool-catalog-oriented
 
-## Phase 6: Add Minimal Runtime Cost Feedback Loop
+## Phase 6: Define Runtime Cognitive State / Cognitive Execution State
+
+- [ ] Extend the plan for `runtime/cognitive-modes.yaml` or a companion contract to describe cognitive state telemetry fields
+- [ ] Define economics fields: estimated token cost, estimated latency, recursion risk, compression pressure, evidence depth
+- [ ] Define split costs: thinking cost, context cost, execution cost
+- [ ] Define runtime route fields: triggered_by, discovery_signals, activated_routes, deferred_routes, blocked_routes
+- [ ] Define adaptation rationale: why_not_deeper, why_not_shallower, why_not_parallel, escalation_reason
+- [ ] Keep public report compact unless high-risk / non-default / scenario requires full state
+
+完成條件：
+
+- [ ] Cognitive report becomes derivable from runtime contracts
+- [ ] Scenario can validate expected vs actual cognitive state
+- [ ] Report remains useful, not ritualized verbosity
+
+## Phase 7: Add Minimal Runtime Cost Feedback Loop
 
 - [ ] Define `execution-feedback` static contract
 - [ ] Model average token burn
@@ -310,7 +411,7 @@ These patterns are not tool presets. They are runtime cognition heuristics.
 
 - [ ] Feedback loop is defined as contract boundary even if first implementation remains static
 
-## Phase 7: Document Tools Layer Boundary
+## Phase 8: Document Tools Layer Boundary
 
 - [ ] Update `tools/README.md`
 - [ ] Update `tools/metadata/README.md`
@@ -322,7 +423,7 @@ These patterns are not tool presets. They are runtime cognition heuristics.
 
 - [ ] Docs no longer imply `tools/README.md` itself is runtime executable source
 
-## Phase 8: Validation and Closure
+## Phase 9: Validation and Closure
 
 - [ ] Add or update validation scenarios
 - [ ] Run `ai-skill runtime refresh --repo . --json`
@@ -338,12 +439,16 @@ These patterns are not tool presets. They are runtime cognition heuristics.
 - Should compression defaults stay in tool routing v1, or be split into a dedicated economics / compression contract from the start?
 - Should `execution-feedback` be static contract first, or should it define a future mutable `runtime-state.db` table?
 - What is the minimum useful evidence for “economic fit” without overbuilding an execution VM?
+- Should `Cognitive Mode 報告` remain the user-facing term while `Runtime Cognitive State` becomes the internal contract name?
+- How much adaptation rationale should appear in normal final responses vs only high-risk / non-default reports?
+- Should `cognitive_cost` remain a single derived summary after split costs are introduced?
 
 ## Stakeholder 同意項目
 
 - [ ] `tools/` remains documentation / human navigation / usage-pattern layer
 - [ ] Runtime economics becomes the decision layer for cost / risk / compression / recursion
 - [ ] Cognitive Mode only consumes derived signals
+- [ ] Cognitive Mode report evolves into Runtime Cognitive State / Cognitive Execution State without becoming verbose ritual
 - [ ] No full telemetry database in v1
 - [ ] Owner path is chosen after Phase 0 compatibility check
 
@@ -359,6 +464,8 @@ These patterns are not tool presets. They are runtime cognition heuristics.
 - [ ] Economics owner path chosen and documented
 - [ ] Tool routing / cost contract exists and is projected
 - [ ] Economics contracts exist and are projected
+- [ ] Runtime Cognitive State / Cognitive Execution State contract is defined
+- [ ] Split costs feed the existing `cognitive_cost` summary
 - [ ] `tools/` docs point to runtime executable source
 - [ ] Cognitive discovery has tool-derived and economics-derived signals
 - [ ] Validation scenarios pass
