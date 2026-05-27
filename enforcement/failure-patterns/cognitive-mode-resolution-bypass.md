@@ -73,12 +73,15 @@ Class: `process-gap` / `governance-drift`
 
 - [`runtime/cognitive-modes.yaml`](../../runtime/cognitive-modes.yaml) — 4 維 mode primitives + defaults + gate_activation
 - [`runtime/cognitive-modes-discovery.yaml`](../../runtime/cognitive-modes-discovery.yaml) — 14 discovery signals，決定 mode 不靠文件查詢
+- [`runtime/cognitive-modes-cost-class.yaml`](../../runtime/cognitive-modes-cost-class.yaml) — v2 cognitive_cost derivation，避免 agent self-claim cost
 - [`runtime/cognitive-modes-governance-integration.yaml`](../../runtime/cognitive-modes-governance-integration.yaml) — governance_mode → gate_set_activation
 - [`runtime/cognitive-modes-memory-integration.yaml`](../../runtime/cognitive-modes-memory-integration.yaml) — memory_mode → subdir + AND compose
 - [`memory/retrieval-governance/activation-thresholds.md`](../../memory/retrieval-governance/activation-thresholds.md) — memory activation levels + memory_mode compose
+- [`inflated-cognitive-mode-reporting.md`](inflated-cognitive-mode-reporting.md) — v2 防止 mode / cost / activation_reason 被 agent 自我膨脹
 
 ## Linked Validation Scenarios
 
 - `cognitive-modes-enforcement-gate-exists-v1` — 驗證 `gate.execution.cognitive_mode_resolved` 在 `gates` 表存在
+- `phase6-cognitive-contract-v2-inflated-rejection-v1` — 驗證 inflated reporting 被 cost / signal validators 擋下
 
 ← [Back to failure patterns](README.md)

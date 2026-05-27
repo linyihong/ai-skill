@@ -1,0 +1,63 @@
+schema_version: "1.0"
+id: runtime.cognitive-modes-cost-class
+status: active
+owner_layer: runtime
+source_plan: plans/archived/2026-05-25-2100-runtime-cognitive-contract-v2.md
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.cognitive_modes.cost_class
+  surface: generated_surfaces
+
+purpose: >
+  Derive Runtime Cognitive Contract v2 cognitive_cost from execution_mode and
+  context_mode. cognitive_cost is computed, not agent-claimed.
+
+dimensions:
+  execution_mode:
+    values: [FAST, NORMAL, DEEP, FORENSIC, RECOVERY]
+  context_mode:
+    values: [INDEX_ONLY, SUMMARY_FIRST, CHECKLIST_FIRST, SOURCE_BACKED, GRAPH_ASSISTED]
+  cognitive_cost:
+    values: [LOW, MEDIUM, HIGH, VERY_HIGH]
+
+defaults:
+  execution_mode: NORMAL
+  context_mode: SUMMARY_FIRST
+  cognitive_cost: LOW
+
+lookup:
+  - execution_mode: FAST
+    context_mode: INDEX_ONLY
+    cognitive_cost: LOW
+  - execution_mode: FAST
+    context_mode: "*"
+    cognitive_cost: MEDIUM
+  - execution_mode: NORMAL
+    context_mode: [INDEX_ONLY, SUMMARY_FIRST]
+    cognitive_cost: LOW
+  - execution_mode: NORMAL
+    context_mode: [CHECKLIST_FIRST, SOURCE_BACKED, GRAPH_ASSISTED]
+    cognitive_cost: MEDIUM
+  - execution_mode: DEEP
+    context_mode: "*"
+    cognitive_cost: HIGH
+  - execution_mode: FORENSIC
+    context_mode: "*"
+    cognitive_cost: VERY_HIGH
+  - execution_mode: RECOVERY
+    context_mode: "*"
+    cognitive_cost: VERY_HIGH
+
+validation:
+  hook: scripts/ai-skill-cli/internal/app/hooks.go
+  validator: validateCognitiveCost
+  behavior:
+    - derive cost from declared execution_mode and context_mode
+    - compare derived cost with declared cognitive_cost
+    - block commit when declared and derived values differ
+
+related:
+  cognitive_contract: runtime/cognitive-modes.yaml
+  discovery_contract: runtime/cognitive-modes-discovery.yaml
+  plan: plans/archived/2026-05-25-2100-runtime-cognitive-contract-v2.md

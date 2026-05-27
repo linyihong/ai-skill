@@ -147,6 +147,21 @@ per_commit_obligations:
     validator: validateMemoryModeSubdir
     severity: block
     contract_source: runtime/cognitive-modes-memory-integration.yaml
+  - id: obligation.commit.cognitive_cost
+    fires: every_commit_with_cognitive_block
+    validator: validateCognitiveCost
+    severity: block
+    contract_source: runtime/cognitive-modes-cost-class.yaml
+  - id: obligation.commit.activation_signals
+    fires: every_commit_with_cognitive_block
+    validator: validateActivationSignals
+    severity: block
+    contract_source: runtime/cognitive-modes-discovery.yaml
+  - id: obligation.commit.capability_snippet
+    fires: every_commit_with_cognitive_block_high_risk
+    validator: validateCapabilitySnippet
+    severity: block
+    contract_source: runtime/cognitive-modes.yaml + runtime/cognitive-modes-*-integration.yaml
   - id: obligation.commit.plan_status_sync
     fires: every_commit
     validator: validatePlanStatusSync

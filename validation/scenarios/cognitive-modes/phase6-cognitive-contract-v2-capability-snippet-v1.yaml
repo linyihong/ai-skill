@@ -67,7 +67,7 @@ validation:
   detection_command: |
     fn=$(grep -c 'func validateCapabilitySnippet' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null || echo 0)
     rch=$(awk '/^func runCommitMsgHook/{flag=1; next} flag && /^func [a-z]/{flag=0} flag' scripts/ai-skill-cli/internal/app/hooks.go 2>/dev/null | grep -c 'validateCapabilitySnippet' || echo 0)
-    gs=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key LIKE '%capability%' OR content LIKE '%Capability summary%';" 2>/dev/null || echo 0)
+    gs=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM generated_surfaces WHERE target_key LIKE '%capability%' OR data LIKE '%Capability summary%';" 2>/dev/null || echo 0)
     ut=$(grep -c 'TestValidateCapabilitySnippet\|capability.*snippet\|Capability summary' scripts/ai-skill-cli/internal/app/hooks_test.go 2>/dev/null || echo 0)
     [ "${fn:-0}" -ge 1 ] && [ "${rch:-0}" -ge 2 ] && [ "${gs:-0}" -ge 1 ] && [ "${ut:-0}" -ge 3 ] && echo "PASS" || echo "FAIL fn=${fn:-0} rch=${rch:-0} gs=${gs:-0} ut=${ut:-0}"
   pass_criteria: detection_command outputs "PASS"

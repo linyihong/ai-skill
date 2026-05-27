@@ -346,6 +346,8 @@ func parseCompactCognitiveLine(line string) map[string]string {
 			modes["validation_mode"] = strings.TrimPrefix(seg, "V:")
 		case strings.HasPrefix(seg, "Cost:"):
 			modes["cognitive_cost"] = strings.TrimPrefix(seg, "Cost:")
+		case strings.HasPrefix(seg, "Sig:"):
+			modes["activation_signal"] = strings.TrimPrefix(seg, "Sig:")
 		}
 	}
 	return modes
@@ -410,6 +412,30 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 				}
 				return result
 			}
+			ctx := commitMsgCtx{text: text, staged: nil, root: root, modes: compactModes}
+			var violations []string
+			if v := validateCognitiveCost(ctx.modes); v != "" {
+				violations = append(violations, v)
+			}
+			if v := validateActivationSignals(ctx); v != "" {
+				violations = append(violations, v)
+			}
+			if len(violations) > 0 {
+				result.Status = "blocked"
+				result.ExitCode = ExitValidationFailed
+				result.Error = &CommandError{
+					Code:        "cognitive_compact_violations",
+					Message:     "Declared compact Cognitive Contract conflicts with v2 validation:\n  - " + strings.Join(violations, "\n  - "),
+					Remediation: "Use a known discovery signal and the derived cognitive_cost for the declared execution/context tuple.",
+				}
+				return result
+			}
+			if v := validateCapabilitySnippet(ctx.modes, ctx.text); v != "" {
+				result.Status = "blocked"
+				result.ExitCode = ExitValidationFailed
+				result.Error = &CommandError{Code: "cognitive_compact_capability_violation", Message: v}
+				return result
+			}
 			result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "ok", Message: "Cognitive Contract v2 compact form present (all dims at default)"})
 			return result
 		}
@@ -428,6 +454,26 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		// runtime.db is unavailable or not yet projected (e.g. fresh clone
 		// before first `runtime compile`).
 		ctx := commitMsgCtx{text: text, staged: staged, root: root, modes: modes}
+		v2Violations := []string{}
+		if v := validateCognitiveCost(ctx.modes); v != "" {
+			v2Violations = append(v2Violations, v)
+		}
+		if v := validateActivationSignals(ctx); v != "" {
+			v2Violations = append(v2Violations, v)
+		}
+		if v := validateCapabilitySnippet(ctx.modes, ctx.text); v != "" {
+			v2Violations = append(v2Violations, v)
+		}
+		if len(v2Violations) > 0 {
+			result.Status = "blocked"
+			result.ExitCode = ExitValidationFailed
+			result.Error = &CommandError{
+				Code:        "cognitive_contract_v2_violations",
+				Message:     "Declared Cognitive Contract v2 block conflicts with validation:\n  - " + strings.Join(v2Violations, "\n  - "),
+				Remediation: "Use known activation_reason signals, derived cognitive_cost, and Capability summary for high-risk modes.",
+			}
+			return result
+		}
 		order := readPerCommitObligationsOrder(root)
 		if len(order) == 0 {
 			order = defaultCommitMsgDispatchOrder
@@ -663,9 +709,9 @@ func validateMemoryModeSubdir(modes map[string]string, staged []string) string {
 // plan file by path, that plan file MUST be in the staged set.
 //
 // Trigger composition (all three required to fire):
-//   1. ≥1 completion vocabulary word
-//   2. ≥1 "Phase <num>" / "phase <num>" reference
-//   3. ≥1 plans/active/<f>.md path reference
+//  1. ≥1 completion vocabulary word
+//  2. ≥1 "Phase <num>" / "phase <num>" reference
+//  3. ≥1 plans/active/<f>.md path reference
 //
 // Opt-out: standalone "[skip-plan-status-sync]" trailer line.
 var (
@@ -775,10 +821,10 @@ func validateTokenBudget(modes map[string]string, text string) string {
 
 	// Exact tuple budgets per runtime/cognitive-modes-token-budget.yaml §budgets
 	exactBudgets := map[string]int{
-		"FAST|INDEX_ONLY|LIGHT|NONE":                       1000,
-		"NORMAL|SUMMARY_FIRST|STANDARD|EPISODIC":           5000,
-		"DEEP|SOURCE_BACKED|STRICT|DECISION_REPLAY":        20000,
-		"FORENSIC|GRAPH_ASSISTED|STRICT|FAILURE_REPLAY":    50000,
+		"FAST|INDEX_ONLY|LIGHT|NONE":                    1000,
+		"NORMAL|SUMMARY_FIRST|STANDARD|EPISODIC":        5000,
+		"DEEP|SOURCE_BACKED|STRICT|DECISION_REPLAY":     20000,
+		"FORENSIC|GRAPH_ASSISTED|STRICT|FAILURE_REPLAY": 50000,
 	}
 	// Default budget by execution_mode (when exact tuple not found)
 	execDefaults := map[string]int{
@@ -807,6 +853,153 @@ func validateTokenBudget(modes map[string]string, text string) string {
 			", governance_mode=" + gov +
 			", memory_mode=" + mem +
 			"). Downgrade context_mode (GRAPH_ASSISTED → SOURCE_BACKED → CHECKLIST_FIRST → SUMMARY_FIRST → INDEX_ONLY) or split the work. Use [skip-token-budget] only if exceptional."
+	}
+	return ""
+}
+
+// deriveCognitiveCost implements runtime/cognitive-modes-cost-class.yaml:
+// cognitive_cost is derived from execution_mode × context_mode, not claimed by
+// the agent.
+func deriveCognitiveCost(executionMode, contextMode string) string {
+	switch executionMode {
+	case "FAST":
+		if contextMode == "INDEX_ONLY" {
+			return "LOW"
+		}
+		return "MEDIUM"
+	case "NORMAL":
+		if contextMode == "INDEX_ONLY" || contextMode == "SUMMARY_FIRST" {
+			return "LOW"
+		}
+		if contextMode == "CHECKLIST_FIRST" || contextMode == "SOURCE_BACKED" || contextMode == "GRAPH_ASSISTED" {
+			return "MEDIUM"
+		}
+	case "DEEP":
+		return "HIGH"
+	case "FORENSIC", "RECOVERY":
+		return "VERY_HIGH"
+	}
+	return ""
+}
+
+func validateCognitiveCost(modes map[string]string) string {
+	declared := modes["cognitive_cost"]
+	if declared == "" {
+		return "cognitive_cost missing from Cognitive Contract v2 block"
+	}
+	derived := deriveCognitiveCost(modes["execution_mode"], modes["context_mode"])
+	if derived == "" {
+		return "cognitive_cost: cannot derive cost for execution_mode=" + modes["execution_mode"] + " context_mode=" + modes["context_mode"]
+	}
+	if declared != derived {
+		return "cognitive_cost mismatch: declared=" + declared + " derived=" + derived + " for execution_mode=" + modes["execution_mode"] + " context_mode=" + modes["context_mode"]
+	}
+	return ""
+}
+
+func parseActivationSignals(text string, modes map[string]string) []string {
+	if sig := strings.TrimSpace(modes["activation_signal"]); sig != "" {
+		return []string{sig}
+	}
+	lines := strings.Split(text, "\n")
+	inBlock := false
+	var signals []string
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "activation_reason:" {
+			inBlock = true
+			continue
+		}
+		if !inBlock {
+			continue
+		}
+		if trimmed == "" || strings.HasPrefix(trimmed, "##") || strings.HasPrefix(trimmed, "Capability summary:") {
+			break
+		}
+		if strings.HasPrefix(trimmed, "- ") {
+			sig := strings.TrimSpace(strings.TrimPrefix(trimmed, "- "))
+			if idx := strings.Index(sig, "#"); idx >= 0 {
+				sig = strings.TrimSpace(sig[:idx])
+			}
+			if sig != "" {
+				signals = append(signals, sig)
+			}
+		}
+	}
+	return signals
+}
+
+func readKnownCognitiveSignals(root string) map[string]bool {
+	known := map[string]bool{}
+	dbPath := filepath.Join(root, "runtime", "runtime.db")
+	if db, err := sql.Open("sqlite", dbPath); err == nil {
+		defer db.Close()
+		var raw string
+		if err := db.QueryRow("SELECT data FROM generated_surfaces WHERE target_key='runtime.cognitive_modes.discovery' LIMIT 1").Scan(&raw); err == nil {
+			var doc map[string]any
+			if json.Unmarshal([]byte(raw), &doc) == nil {
+				if signals, ok := doc["signals"].([]any); ok {
+					for _, item := range signals {
+						if m, ok := item.(map[string]any); ok {
+							if name, ok := m["name"].(string); ok && name != "" {
+								known[name] = true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if len(known) > 0 {
+		return known
+	}
+	// Fallback for fresh clones before runtime.db is compiled. The canonical
+	// signal vocabulary remains runtime/cognitive-modes-discovery.yaml.
+	body, err := os.ReadFile(filepath.Join(root, "runtime", "cognitive-modes-discovery.yaml"))
+	if err != nil {
+		return known
+	}
+	nameRE := regexp.MustCompile(`^\s*-\s+name:\s*([A-Za-z0-9_]+)\s*$`)
+	for _, line := range strings.Split(string(body), "\n") {
+		m := nameRE.FindStringSubmatch(line)
+		if len(m) == 2 {
+			known[m[1]] = true
+		}
+	}
+	return known
+}
+
+func validateActivationSignals(ctx commitMsgCtx) string {
+	signals := parseActivationSignals(ctx.text, ctx.modes)
+	if len(signals) == 0 {
+		return "activation_reason missing: Cognitive Contract v2 requires at least one discovery signal"
+	}
+	known := readKnownCognitiveSignals(ctx.root)
+	if len(known) == 0 {
+		return "activation_reason: known discovery signal list unavailable from runtime generated surface or YAML source"
+	}
+	var unknown []string
+	for _, sig := range signals {
+		if !known[sig] {
+			unknown = append(unknown, sig)
+		}
+	}
+	if len(unknown) > 0 {
+		sort.Strings(unknown)
+		return "activation_reason contains unknown discovery signal(s): " + strings.Join(unknown, ", ")
+	}
+	return ""
+}
+
+func validateCapabilitySnippet(modes map[string]string, text string) string {
+	exec := modes["execution_mode"]
+	gov := modes["governance_mode"]
+	highRisk := exec == "DEEP" || exec == "FORENSIC" || exec == "RECOVERY" || gov == "STRICT" || gov == "LOCKDOWN"
+	if !highRisk {
+		return ""
+	}
+	if !strings.Contains(text, "Capability summary:") {
+		return "capability snippet missing: high-risk Cognitive Contract modes require a Capability summary section"
 	}
 	return ""
 }
@@ -1221,6 +1414,15 @@ var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
 	"obligation.commit.memory_mode_subdir": func(c commitMsgCtx) string {
 		return validateMemoryModeSubdir(c.modes, c.staged)
 	},
+	"obligation.commit.cognitive_cost": func(c commitMsgCtx) string {
+		return validateCognitiveCost(c.modes)
+	},
+	"obligation.commit.activation_signals": func(c commitMsgCtx) string {
+		return validateActivationSignals(c)
+	},
+	"obligation.commit.capability_snippet": func(c commitMsgCtx) string {
+		return validateCapabilitySnippet(c.modes, c.text)
+	},
 	"obligation.commit.plan_status_sync": func(c commitMsgCtx) string {
 		return validatePlanStatusSync(c.text, c.staged)
 	},
@@ -1252,6 +1454,9 @@ var defaultCommitMsgDispatchOrder = []string{
 	"obligation.commit.execution_mode_floors",
 	"obligation.commit.governance_mode_consistency",
 	"obligation.commit.memory_mode_subdir",
+	"obligation.commit.cognitive_cost",
+	"obligation.commit.activation_signals",
+	"obligation.commit.capability_snippet",
 	"obligation.commit.plan_status_sync",
 	"obligation.commit.token_budget",
 	"obligation.commit.adaptive_triggers",

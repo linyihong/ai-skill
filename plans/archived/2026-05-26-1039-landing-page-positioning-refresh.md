@@ -338,6 +338,6 @@ flowchart LR
 
 | Plan | 關係 |
 |---|---|
-| `plans/active/2026-05-25-2100-runtime-cognitive-contract-v2.md` | Independent；該 plan 改 runtime cognitive contract，本 plan 只改 public communication layer。 |
+| `plans/archived/2026-05-25-2100-runtime-cognitive-contract-v2.md` | Independent；該 plan 改 runtime cognitive contract，本 plan 只改 public communication layer。 |
 | `plans/active/2026-05-25-1000-context-language-glossary-system.md` | Related but independent；glossary 可能後續支援 public terminology consistency，但本 plan 不建立 glossary source-of-truth。 |
 | `architecture/ai-native-cognitive-execution-system.md` | Source-backed positioning input；README 應連到它，不複製其 runtime navigation detail。 |

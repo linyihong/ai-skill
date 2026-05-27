@@ -71,6 +71,25 @@ memory_mode     ∈ {NONE, EPISODIC, DECISION_REPLAY,
 
 並由 commit-msg hook（Go validators in `scripts/ai-skill-cli/internal/app/hooks.go`）行為層強制：每個 commit body 必須含 `### Cognitive Mode 報告` block；mode 之間必須符合 floor / consistency / subdir constraint；超 budget block；adaptive trigger 失配 block。
 
+### 4. Runtime Cognitive Contract v2（2026-05-27 amendment）
+
+ADR-008 的 reporting contract 升級為 6 維 + adaptive disclosure：
+
+```
+execution_mode / context_mode / governance_mode / memory_mode
+validation_mode / cognitive_cost
+```
+
+新增規則：
+
+- `validation_mode` 將 validation depth 與 execution depth 解耦。
+- `cognitive_cost` 由 `runtime/cognitive-modes-cost-class.yaml` 的 execution × context lookup 推導，不接受 agent self-claim。
+- 全 6 維 default 時可用 compact single-line form；任一非 default 或 high-risk mode 必須用 full form。
+- `activation_reason` 必須引用 `runtime/cognitive-modes-discovery.yaml` 的 known signal。
+- high-risk mode（DEEP / FORENSIC / RECOVERY / STRICT / LOCKDOWN）必須附 `Capability summary`，讓 mode label 連回 capability semantics。
+
+此 amendment 保留 ADR-008 的 4 維 runtime primitive 與 subsystem integration，只升級 reporting / validation contract；不建立 ADR-009。
+
 ## Consequences
 
 ### 正面
@@ -111,13 +130,14 @@ memory_mode     ∈ {NONE, EPISODIC, DECISION_REPLAY,
 
 ## Linked Validation Scenarios
 
-`validation/scenarios/cognitive-modes/` 與 `validation/scenarios/bootstrap/` 共 19 個 scenarios，全 PASS：
+`validation/scenarios/cognitive-modes/` 與 `validation/scenarios/bootstrap/` 共 26 個 cognitive scenarios，全 PASS；v2 新增 scenarios 覆蓋 compact / full / activation signal / cost class / capability snippet / inflated rejection：
 
 - yaml-contract-exists / generated-surface-projected / runtime-table-exists / poc-task-record
 - discovery-yaml-exists / discovery-signals-projected / discovery-fallback-defined / discovery-poc-coverage
 - phase-integration / compression-alias / governance-integration / memory-integration / enforcement-gate-exists
 - cognitive-mode-block-required / phase3-behavioral-validators / plan-status-sync-enforcement
 - phase4-token-budget / phase5-adaptive-triggers / bootstrap-receipt-enforcement
+- phase6-cognitive-contract-v2-compact-form / full-form / activation-signal / cost-class / capability-snippet / inflated-rejection
 
 ## Related ADRs
 

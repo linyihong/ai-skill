@@ -348,6 +348,110 @@ func TestValidateTokenBudget(t *testing.T) {
 	}
 }
 
+func TestDeriveCognitiveCost(t *testing.T) {
+	cases := []struct {
+		exec string
+		ctx  string
+		want string
+	}{
+		// cost lookup: FAST × INDEX_ONLY -> LOW
+		{"FAST", "INDEX_ONLY", "LOW"},
+		// cost lookup: FAST × other context -> MEDIUM
+		{"FAST", "SUMMARY_FIRST", "MEDIUM"},
+		// cost lookup: NORMAL × INDEX_ONLY -> LOW
+		{"NORMAL", "INDEX_ONLY", "LOW"},
+		// cost lookup: NORMAL × SUMMARY_FIRST -> LOW
+		{"NORMAL", "SUMMARY_FIRST", "LOW"},
+		// cost lookup: NORMAL × CHECKLIST_FIRST -> MEDIUM
+		{"NORMAL", "CHECKLIST_FIRST", "MEDIUM"},
+		// cost lookup: NORMAL × SOURCE_BACKED -> MEDIUM
+		{"NORMAL", "SOURCE_BACKED", "MEDIUM"},
+		// cost lookup: DEEP × any context -> HIGH
+		{"DEEP", "SOURCE_BACKED", "HIGH"},
+		// cost lookup: FORENSIC × any context -> VERY_HIGH
+		{"FORENSIC", "GRAPH_ASSISTED", "VERY_HIGH"},
+		// cost lookup: RECOVERY × any context -> VERY_HIGH
+		{"RECOVERY", "CHECKLIST_FIRST", "VERY_HIGH"},
+	}
+	for _, tt := range cases {
+		if got := deriveCognitiveCost(tt.exec, tt.ctx); got != tt.want {
+			t.Fatalf("deriveCognitiveCost(%s, %s) = %s, want %s", tt.exec, tt.ctx, got, tt.want)
+		}
+	}
+}
+
+func TestValidateCognitiveCost(t *testing.T) {
+	valid := map[string]string{"execution_mode": "NORMAL", "context_mode": "SUMMARY_FIRST", "cognitive_cost": "LOW"}
+	if v := validateCognitiveCost(valid); v != "" {
+		t.Fatalf("expected valid cost, got %q", v)
+	}
+	mismatch := map[string]string{"execution_mode": "DEEP", "context_mode": "SOURCE_BACKED", "cognitive_cost": "LOW"}
+	if v := validateCognitiveCost(mismatch); v == "" {
+		t.Fatal("expected cost mismatch BLOCK for DEEP + LOW")
+	}
+	missing := map[string]string{"execution_mode": "NORMAL", "context_mode": "SUMMARY_FIRST"}
+	if v := validateCognitiveCost(missing); v == "" {
+		t.Fatal("expected missing cognitive_cost violation")
+	}
+}
+
+func TestValidateActivationSignals(t *testing.T) {
+	root := t.TempDir()
+	os.MkdirAll(filepath.Join(root, "runtime"), 0o755)
+	discovery := "signals:\n  - name: file_diff_runtime_schema\n  - name: user_keyword_deep\n"
+	os.WriteFile(filepath.Join(root, "runtime", "cognitive-modes-discovery.yaml"), []byte(discovery), 0o644)
+
+	validText := "feat: x\n\n### Cognitive Mode 報告\n\nactivation_reason:\n  - file_diff_runtime_schema\n"
+	if v := validateActivationSignals(commitMsgCtx{text: validText, root: root, modes: map[string]string{}}); v != "" {
+		t.Fatalf("expected known activation signal to pass, got %q", v)
+	}
+	unknownText := "feat: x\n\n### Cognitive Mode 報告\n\nactivation_reason:\n  - made_up_signal\n"
+	if v := validateActivationSignals(commitMsgCtx{text: unknownText, root: root, modes: map[string]string{}}); v == "" {
+		t.Fatal("expected unknown signal to BLOCK")
+	}
+	emptyText := "feat: x\n\n### Cognitive Mode 報告\n\n| execution_mode | NORMAL | reason |\n"
+	if v := validateActivationSignals(commitMsgCtx{text: emptyText, root: root, modes: map[string]string{}}); v == "" {
+		t.Fatal("expected empty activation_reason to BLOCK")
+	}
+	compact := map[string]string{"activation_signal": "user_keyword_deep"}
+	if v := validateActivationSignals(commitMsgCtx{text: "feat: x", root: root, modes: compact}); v != "" {
+		t.Fatalf("expected compact Sig to pass, got %q", v)
+	}
+}
+
+func TestValidateCapabilitySnippet(t *testing.T) {
+	highRisk := map[string]string{"execution_mode": "DEEP", "governance_mode": "STRICT"}
+	if v := validateCapabilitySnippet(highRisk, "feat: x\n\n### Cognitive Mode 報告\n"); v == "" {
+		t.Fatal("expected high-risk mode without Capability summary to BLOCK")
+	}
+	withSnippet := "feat: x\n\n### Cognitive Mode 報告\n\nCapability summary:\n  execution_mode=DEEP -> source-backed reads\n"
+	if v := validateCapabilitySnippet(highRisk, withSnippet); v != "" {
+		t.Fatalf("expected high-risk mode with Capability summary to pass, got %q", v)
+	}
+	lowRisk := map[string]string{"execution_mode": "NORMAL", "governance_mode": "STANDARD"}
+	if v := validateCapabilitySnippet(lowRisk, "feat: x\n\n### Cognitive Mode 報告\n"); v != "" {
+		t.Fatalf("expected low-risk mode without snippet to pass, got %q", v)
+	}
+}
+
+func TestInflatedRejection(t *testing.T) {
+	costMismatch := map[string]string{"execution_mode": "DEEP", "context_mode": "SUMMARY_FIRST", "cognitive_cost": "LOW"}
+	if v := validateCognitiveCost(costMismatch); v == "" {
+		t.Fatal("expected typo DEEP + LOW mismatch BLOCK")
+	}
+	root := t.TempDir()
+	os.MkdirAll(filepath.Join(root, "runtime"), 0o755)
+	os.WriteFile(filepath.Join(root, "runtime", "cognitive-modes-discovery.yaml"), []byte("signals:\n  - name: file_diff_notes_ephemeral\n"), 0o644)
+	unknown := "feat: typo\n\n### Cognitive Mode 報告\n\nactivation_reason:\n  - made_up_signal\n"
+	if v := validateActivationSignals(commitMsgCtx{text: unknown, root: root, modes: map[string]string{}}); v == "" {
+		t.Fatal("expected unknown signal BLOCK")
+	}
+	valid := "feat: docs\n\n### Cognitive Mode 報告\n\nactivation_reason:\n  - file_diff_notes_ephemeral\n"
+	if v := validateActivationSignals(commitMsgCtx{text: valid, root: root, modes: map[string]string{}}); v != "" {
+		t.Fatalf("expected legitimate known signal PASS, got %q", v)
+	}
+}
+
 func TestValidateAdaptiveTriggers(t *testing.T) {
 	// Case 1: contradiction_risk fires when keyword + ≥2 distinct sources
 	modes := map[string]string{"execution_mode": "NORMAL", "context_mode": "SUMMARY_FIRST", "governance_mode": "STANDARD", "memory_mode": "EPISODIC"}
@@ -393,14 +497,15 @@ func TestValidateAdaptiveTriggers(t *testing.T) {
 	}
 }
 
-func contains(s, sub string) bool { return len(s) >= len(sub) && (s == sub || (len(s) > 0 && (func() bool {
-	for i := 0; i+len(sub) <= len(s); i++ {
-		if s[i:i+len(sub)] == sub {
-			return true
+func contains(s, sub string) bool {
+	return len(s) >= len(sub) && (s == sub || (len(s) > 0 && (func() bool {
+		for i := 0; i+len(sub) <= len(s); i++ {
+			if s[i:i+len(sub)] == sub {
+				return true
+			}
 		}
-	}
-	return false
-}())))
+		return false
+	}())))
 }
 
 func TestValidateBootstrapEntryThinness(t *testing.T) {

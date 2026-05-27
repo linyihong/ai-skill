@@ -138,7 +138,7 @@ phase_status:
 
 v2:
   contract_version: "2.0"
-  plan: plans/active/2026-05-25-2100-runtime-cognitive-contract-v2.md
+  plan: plans/archived/2026-05-25-2100-runtime-cognitive-contract-v2.md
   phase_status: phase_2_spec_complete
 
   dimensions:
@@ -160,6 +160,7 @@ v2:
       default: LOW
       derived: true
       note: derived from (execution × context) lookup in cognitive-modes-cost-class.yaml; not agent-claimed
+      contract: runtime/cognitive-modes-cost-class.yaml
 
   compact_form:
     trigger: all_6_dims_at_default
@@ -209,6 +210,12 @@ v2:
     format: |
       Capability summary:
         <mode>=<value> → <1-2 line capability description>
+
+  validators:
+    format: validateCognitiveContractFormat
+    cognitive_cost: validateCognitiveCost
+    activation_signals: validateActivationSignals
+    capability_snippet: validateCapabilitySnippet
 
 related:
   intelligence_atom: intelligence/engineering/development/test-first-framework-upgrade.md
