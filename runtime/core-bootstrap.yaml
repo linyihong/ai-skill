@@ -40,6 +40,23 @@ required_reads:
     role: .agent-goals/ usage and conversation goal closure
     estimated_tokens: 100
 
+contextual_activations:
+  - id: activation.document_sizing
+    source: governance/document-sizing.md
+    load_when:
+      - creating_new_markdown
+      - substantially_editing_markdown
+      - markdown_file_over_150_lines
+      - markdown_mixes_multiple_topics
+      - rule_or_workflow_expands_into_steps_exceptions_templates_or_examples
+    purpose: >
+      Load the document-sizing rule only when Markdown growth or mixed-topic
+      structure creates a splitting decision. Bootstrap entries should point
+      here rather than duplicating document-sizing policy in tool-specific rules.
+    validation_signal: >
+      If activated, the agent checks whether the file should remain single-purpose
+      or split into a folder with a README index and focused child files.
+
 per_session_obligations:
   - id: obligation.bootstrap.receipt
     fires: first_turn_before_any_non_read_tool

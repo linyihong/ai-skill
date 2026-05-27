@@ -30,11 +30,12 @@
   - **Full table**（任一維度非預設 或 高風險 mode）：`### Cognitive Mode 報告` + 6-dim markdown table + `activation_reason`
   - 完整 format / enum / template 見 `runtime/core-bootstrap.yaml` §`per_turn_obligations[obligation.cognitive.mode_report]` + [`models/cognitive-modes/README.md`](models/cognitive-modes/README.md)；commit 階段由 `commit-msg` hook 機械強制（[ADR-008](constitution/ADR-008-runtime-cognitive-modes.md)）
 - **Close-loop 終局檢查**（per-task）— 在回報任務完成或結束對話前，**必須**確認 `git status` 為 clean 且所有 commit 已推送（`git log origin/<branch>..HEAD` 為空）。若 push 未獲授權，必須明確說明 pending 狀態。見 `enforcement/linked-updates.yaml` §`gate.linked_updates.writeback_closed`。
+- **Contextual activations**（依情境載入）— `runtime/core-bootstrap.yaml` §`contextual_activations` 定義輕量觸發，例如 Markdown 變大或混多主題時載入 [`governance/document-sizing.md`](governance/document-sizing.md)。
 - **Per-commit validators**（11 個 enumerated in YAML）— `ai-skill runtime obligations` 列當前 active list；validator dispatch via registry in `scripts/ai-skill-cli/internal/app/hooks.go`
 
 ## Lazy-load rules（9 條依情境 activate）
 
-舊 Default Bootstrap 12 條已拆為：core（本檔上方 3 條）+ lazy-load 9 條。Lazy-load 規則依任務情境 activation；詳見 [`enforcement/README.md`](enforcement/README.md) 的 activation model + [`runtime/runtime.db`](runtime/runtime.db) `language_policy` / `output_rules` / `governance_gates` tables。
+舊 Default Bootstrap 12 條已拆為：core（本檔上方 3 條）+ contextual / lazy-load activations。機器可讀觸發先看 `runtime/core-bootstrap.yaml`；完整 lazy-load 說明見 [`enforcement/README.md`](enforcement/README.md) 的 activation model + [`runtime/runtime.db`](runtime/runtime.db) `language_policy` / `output_rules` / `governance_gates` tables。
 
 ## 不變的原則
 

@@ -1,41 +1,20 @@
 ---
-description: Auto-bootstrap Core Bootstrap at session start; require dependency reads on skill/rule changes
+description: Ai-skill bootstrap entry pointer
 alwaysApply: true
 ---
 
-# Auto-Bootstrap & Dependency Reading
+# Ai-skill Bootstrap Entry
 
-## Session Start Bootstrap
+This Cursor rule is a thin entry pointer. Do not duplicate bootstrap obligations,
+formats, enums, examples, or dependency checklists here.
 
-At session start or when taking over a task, load the **Core Bootstrap** (3 rules, ~800 tokens) instead of the old Default Bootstrap (12 rules):
+Before any non-read action in this repo, load:
 
-1. Read [CORE_BOOTSTRAP.md](../../CORE_BOOTSTRAP.md) — 3 core rules: `rule-weight.md`, `dependency-reading.md`, `conversation-goal-ledger.md`
-2. Read [README.md](../../README.md) — OS layout & quickstart
-3. Match task intent against [routing-registry.yaml](../../knowledge/runtime/routing-registry.yaml) to find the relevant route
-4. Check contract-backed activation: [enforcement/*.yaml](../../enforcement/) executable contracts and [routing-registry.yaml](../../knowledge/runtime/routing-registry.yaml)
-5. Load Runtime Phase initialization from [runtime/runtime.db](../../runtime/runtime.db):
-   - `phase_machine` / `phases` — current phase state
-   - `obligation_ledger` / `obligations` — phase obligations
-   - `blocking_gates` / `gates` — phase blocking gates
-   - Runtime phase / obligation / gate / recovery committed canonical config lives in `runtime_config_documents`; do not keep committed `runtime/**/*.yaml` mirrors.
-6. Load Output Governance initialization:
-   - [runtime/runtime.db](../../runtime/runtime.db) `language_policy` — language enforcement rules
-   - [runtime/runtime.db](../../runtime/runtime.db) `output_rules` — document output rules
-   - [runtime/runtime.db](../../runtime/runtime.db) `governance_gates` — output quality blocking gates
-7. Read the skill's summary from `knowledge/summaries/` (300-500 tokens) before expanding to full source
+1. [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md) — human-readable companion and entry.
+2. [`runtime/core-bootstrap.yaml`](../../runtime/core-bootstrap.yaml) — canonical bootstrap contract.
 
-## Dependency Reading
+Then follow the obligations declared by the runtime bootstrap contract, including
+Bootstrap Receipt, Cognitive Mode reporting, and close-loop checks.
 
-- If a skill, shared rule, Cursor rule, template, or feedback lesson has changed, will be changed, or affects the task, read the relevant dependent files before concluding or editing.
-- Always include `shared-rules/` in that dependency read, especially `shared-rules/dependency-reading.md` and `shared-rules/linked-updates.md`.
-- For reusable docs, follow `shared-rules/tool-neutral-documentation.md`: keep root/shared/skill docs tool-neutral and place Cursor-specific paths, hooks, UI, and sync details in `ai-tools/cursor.md` or `.cursor/rules/`.
-- For conversation goal tracking, use `shared-rules/conversation-goal-ledger.md`: active user goals belong in project-local `.agent-goals/` temporary state and do not replace the Ai-skill git writeback transaction.
-- For skill changes, read the skill entry plus related README, workflow, documentation, checklist, templates, feedback indexes, and linked shared rules when they exist.
-- If a dependent file does not exist, mark it as not applicable; do not claim it was checked.
-- When a user asks to reload a workflow or points out that shared rules may have been missed, create a dependency read ledger before returning to project work: trigger, required set, files read, not-applicable files, deferred/blocked items, and validation method.
-- When a user points out a repeated agent mistake, wrong source/mirror update, missed validation, or incomplete close loop, follow `shared-rules/failure-learning-system.md`: classify the failure mode, update the durable prevention target, and validate the new guardrail.
-- Do not claim the updated workflow or rule has been applied while the ledger still has unread required files that are neither read nor explicitly marked not applicable.
-- Before finishing, state the dependency read and validation method: diff review, lints, link check, required linked updates, and tool sync when relevant. Reference-only Cursor usage does not require running bundle sync.
-- After `git commit`, `git push`, and any required tool sync, re-read the updated workflow/shared-rule entry files and main dependencies so the current agent context reflects the pushed version before the final response.
-- On the first write to `shared-rules/`, `workflow/`, `analysis/`, `intelligence/`, `.cursor/rules/`, templates, feedback lessons, sync scripts, or their `~/.cursor` synced paths, immediately open an Ai-skill writeback transaction. Do not return to project work or claim completion until diff review, linked updates, required tool sync, commit, push, reread, and clean `git status --short --branch` have closed it.
-- Before any final response after writing to this repo, run `git status --short --branch`; if there are modified/untracked/staged files or the branch is ahead/behind remote, do not say the Ai-skill update is complete. Finish validation, sync, commit, push, reread, and confirm clean status first, or explicitly report the blocker.
+When changing bootstrap behavior, update `runtime/core-bootstrap.yaml` and refresh
+runtime surfaces. Keep this file as an adapter pointer only.

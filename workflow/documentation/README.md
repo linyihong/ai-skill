@@ -10,7 +10,7 @@
 - 文件會被 **Ai-skill 或 agent 反覆載入**，需要 **index-first**、可選讀子檔，而不是單一巨大 Markdown。
 - 需要 **一致的分類維度**，讓之後搜尋、registry、或人類瀏覽都穩定。
 
-若專案已用 `ai-skill init-project` 接線，Cursor / Claude / Roo 的 bootstrap 內含「專案 durable Markdown 預設」段，會直接指向本目錄與 `execution-flow.md`，**無須**使用者先說「docs/wiki/token」等關鍵字。
+若專案需要把 durable Markdown 寫作設為預設觸發，應在專案自己的 tool config 或 overlay 中指向本目錄與 `execution-flow.md`。`ai-skill init-project` 產生的通用 bootstrap 只保留 thin pointer，不複製此 workflow 規則。
 
 ## 不取代什麼
 

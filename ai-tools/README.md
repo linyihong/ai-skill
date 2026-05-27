@@ -18,7 +18,7 @@
 
 | 層級 | 位置 | 內容 |
 |------|------|------|
-| **自動載入入口** | 工具專屬入口檔（如 `CLAUDE.md`、`.cursorrules`） | 一行，指向 `README.md` |
+| **自動載入入口** | 工具專屬入口檔（如 `CLAUDE.md`、`.cursor/rules/*.mdc`） | Thin pointer，指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml` |
 | **工具配置** | 工具配置檔（如 `.claude/settings.json`） | 僅放 permissions、hooks 等工具特定設定 |
 | **工具使用說明** | `ai-tools/<tool>.md` | 此工具的配置實作與特殊操作注意 |
 | **共用規則** | `enforcement/` | 所有規則本體，集中管理 |
@@ -30,7 +30,7 @@
 
 | ❌ 不應放入工具文件 | ✅ 已在何處 |
 |---|---|
-| Core Bootstrap 流程（讀 CORE_BOOTSTRAP.md → README.md → ...） | [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md) |
+| Core Bootstrap 流程與 obligation 細節 | [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md) + [`runtime/core-bootstrap.yaml`](../runtime/core-bootstrap.yaml) |
 | Pipeline 階段（Bootstrap → Routing → Execution → Close-loop） | [`runtime/README.md`](../runtime/README.md) |
 | Context expansion 層級（Summary → Module → Detailed → Raw） | [`runtime/runtime.db`](../runtime/runtime.db) |
 | Relevance scoring 邏輯 | [`runtime/runtime.db`](../runtime/runtime.db) |
@@ -41,7 +41,7 @@
 | Goal ledger 操作流程 | [`enforcement/conversation-goal-ledger.md`](../enforcement/conversation-goal-ledger.md) |
 | Close-loop 流程（commit/push/readback） | [`enforcement/dependency-reading.md`](../enforcement/dependency-reading.md) |
 
-**原則**：每個工具文件應假設 reader 已讀過 `README.md` 的 OS layout 與 `CORE_BOOTSTRAP.md` 的啟動流程。工具文件只回答：「這個工具跟其他工具有什麼不同？它的入口檔、配置檔、特殊操作要注意什麼？」
+**原則**：每個工具文件應假設 reader 已讀過 `CORE_BOOTSTRAP.md`，並以 `runtime/core-bootstrap.yaml` 取得 obligations 與後續 runtime 載入要求。工具文件只回答：「這個工具跟其他工具有什麼不同？它的入口檔、配置檔、特殊操作要注意什麼？」
 
 **不應放在工具配置或工具說明中的內容：**
 - Bootstrap 規則清單（由 `enforcement/README.md` 管理）

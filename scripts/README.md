@@ -39,10 +39,10 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects
 
 | 工具 | 產出檔案 | 內容 |
 |------|---------|------|
-| Roo Code | `.roomodes` | 5 個 mode（code/architect/ask/debug/orchestrator），含語言規則 + 知識更新 checkpoint |
-| Cursor | `.cursor/rules/ai-skill-bootstrap.mdc` | alwaysApply 規則，含啟動流程 + **專案 durable Markdown 預設**（`workflow/documentation/`）+ 語言規則 + checkpoint |
+| Roo Code | `.roomodes` | Thin bootstrap pointer，指向 Core Bootstrap companion 與 canonical YAML contract |
+| Cursor | `.cursor/rules/ai-skill-bootstrap.mdc` | Thin alwaysApply pointer，指向 Core Bootstrap companion 與 canonical YAML contract |
 | Cursor | `.cursor/hooks.json` | sessionStart hook 提醒 |
-| Claude Code | `CLAUDE.md` | 自動載入 Core Bootstrap + 語言規則 + checkpoint |
+| Claude Code | `CLAUDE.md` | Thin bootstrap pointer，指向 Core Bootstrap companion 與 canonical YAML contract |
 | 通用 | `.agent-goals/` | 對話目標帳本目錄 |
 
 只設定特定工具：
