@@ -13,6 +13,7 @@
 - [`issue/`](issue/README.md)：Issue 分類與優先級判斷方法（triage 流程、優先級計算、初步診斷、重複偵測）。
 - [`web/`](web/README.md)：Web Scraping 分析方法（網站結構觀察、反爬機制判讀、動態內容分析、MCP 工具設計評估）。
 - [`security/`](security/README.md)：安全相關分析方法（token 流向、簽章一致性、雙簽章/雙加密 token 並存的審計）。
+- [`ai-augmented-delivery/`](ai-augmented-delivery/README.md)：AI codegen 工具大幅進入開發流程後的觀察方法、量化資料與問題解剖（缺陷分布、perf test bottleneck anatomy）。
 
 ## 放什麼
 

@@ -15,6 +15,7 @@
 6. 需要 pre-build interrogation / product impact alignment / requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
 7. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
 8. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)
+9. PR 觸動效能敏感路徑或含 AI 生成程式碼時，執行 [`perf-risk-gate.md`](perf-risk-gate.md) 的 5 步檢查（靜態 anti-pattern scan、hot-path micro-benchmark、reviewer perf checklist、pre-deploy observability gate、canary rollout）
 
 ## Scope
 

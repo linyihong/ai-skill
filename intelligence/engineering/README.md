@@ -18,6 +18,7 @@
 | [`analytical-reasoning/`](analytical-reasoning/README.md) | 分析推理智慧（APK analysis、repo analysis、evidence-first routing、heuristics、signals、failure patterns） |
 | [`apk-analysis/`](apk-analysis/README.md) | APK 分析領域專屬工程智慧（hook strategy、混合架構安全層映射、領域專用 heuristics） |
 | [`language-specific/`](language-specific/README.md) | 語言特定知識（Java、JavaScript、Dart 等語言的 failure patterns、techniques） |
+| [`ai-augmented-delivery/`](ai-augmented-delivery/README.md) | AI codegen 工具大幅進入開發流程後的跨工具工程判斷（generation-validation rate parity 等 meta-tool-risk 原則） |
 
 ## 與其他層的關係
 
