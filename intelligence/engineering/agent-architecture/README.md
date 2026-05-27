@@ -22,6 +22,7 @@ AI 不是黑盒子 — 它的行為模式可以被觀察、分類、預測、改
 | [`decomposition-strategy-selection.md`](decomposition-strategy-selection.md) | Not all content benefits from the same extraction strategy; choose based on content structure. | `candidate-intelligence` | Phase 26-33 實際運作經驗 |
 | [`stateless-validation-necessity.md`](stateless-validation-necessity.md) | AI decision path validation must be stateless — it cannot depend on conversation memory. | `candidate-intelligence` | 本系統實際運作經驗 |
 | [`index-first-documentation.md`](index-first-documentation.md) | Documentation that agents repeatedly read should expose routeable indexes before detailed prose. | `candidate-intelligence` | documentation workflow extraction |
+| [`multi-layer-enforcement.md`](multi-layer-enforcement.md) | 可靠強制 agent obligation 需三層協同：context 注入（資料精確性）、禁止 prompt（意識觸發）、機械關卡（兜底）— 每層防止不同失效模式，單層均不足。 | `candidate-intelligence` | Bootstrap 三層架構 empirical 測試 2026-05-27 |
 
 ## 與其他層的關係
 
