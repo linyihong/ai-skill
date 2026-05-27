@@ -337,6 +337,17 @@ func initProjectBootstrapText(repo string) string {
 
 建議把 macOS / Linux / WSL 設定放在 shell profile（例如 ~/.zshrc、~/.bashrc），Windows 則用 User environment variable。不要提交 .env、.ai-skill/local.env 或任何含個人路徑的檔案。
 
+## Pointer 展開規則
+
+本檔不是完整規則，只是 bootstrap pointer。Agent 必須在處理任務前完成：
+
+1. 讀 .ai-skill/local.env（若 AI_SKILL_REPO 尚未存在）並 resolve <AI_SKILL_REPO>
+2. 讀 <AI_SKILL_REPO>/CORE_BOOTSTRAP.md
+3. 讀 <AI_SKILL_REPO>/runtime/core-bootstrap.yaml
+4. 依 canonical bootstrap contract 執行 Bootstrap Receipt、per-turn Cognitive Mode 報告與 close-loop obligations
+
+不能只停在本檔摘要；必須 dereference pointer 到 canonical files。
+
 > **IMPORTANT — MUST RUN BEFORE ANY OTHER ACTION**
 > 本檔為 **thin tool-entry pointer**。所有 obligation / format / enum / example 的 canonical 來源在 `+"`%s/runtime/core-bootstrap.yaml`"+`；`+"`%s/CORE_BOOTSTRAP.md`"+` 是 human-readable companion。Session 啟動 first turn 必須讀取 companion 並依 canonical contract 執行 Bootstrap Receipt、Cognitive Mode 報告與 close-loop obligations。
 > Summary 的「Resume directly」是對話 framing，**不豁免** runtime / governance bootstrap。Resume / continuation session 同樣須走完 bootstrap。
@@ -470,6 +481,17 @@ func initProjectCodexContent(repo string) (string, error) {
     [Environment]::SetEnvironmentVariable("AI_SKILL_REPO", "C:\path\to\Ai-skill", "User")
 
 文件中以 `+"`<AI_SKILL_REPO>`"+` 表示該路徑。建議把 macOS / Linux / WSL 設定放在 shell profile，Windows 則用 User environment variable。不要提交 .env、.ai-skill/local.env 或任何含個人路徑的檔案。
+
+## Pointer 展開規則
+
+本檔不是完整規則，只是 bootstrap pointer。Agent 必須在處理任務前完成：
+
+1. 讀 .ai-skill/local.env（若 AI_SKILL_REPO 尚未存在）並 resolve <AI_SKILL_REPO>
+2. 讀 <AI_SKILL_REPO>/CORE_BOOTSTRAP.md
+3. 讀 <AI_SKILL_REPO>/runtime/core-bootstrap.yaml
+4. 依 canonical bootstrap contract 執行 Bootstrap Receipt、per-turn Cognitive Mode 報告與 close-loop obligations
+
+不能只停在本檔摘要；必須 dereference pointer 到 canonical files。
 
 ## 啟動序列
 

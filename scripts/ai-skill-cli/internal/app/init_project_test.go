@@ -114,6 +114,9 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if !strings.Contains(string(claudeContent), "AI_SKILL_REPO") || !strings.Contains(string(claudeContent), "Windows PowerShell") {
 		t.Fatalf("expected cross-platform AI_SKILL_REPO setup guidance in CLAUDE.md, got %s", string(claudeContent))
 	}
+	if !strings.Contains(string(claudeContent), "Pointer 展開規則") || !strings.Contains(string(claudeContent), "per-turn Cognitive Mode") {
+		t.Fatalf("expected explicit pointer expansion guidance in CLAUDE.md, got %s", string(claudeContent))
+	}
 	claudeSettingsPath := filepath.Join(project, ".claude", "settings.json")
 	if !pathExists(claudeSettingsPath) {
 		t.Fatal("write mode did not create Claude Code hook settings")
@@ -199,6 +202,9 @@ func TestInitProjectWritesCodexBootstrap(t *testing.T) {
 	}
 	if !strings.Contains(string(content), "AI_SKILL_REPO") || !strings.Contains(string(content), "Windows PowerShell") {
 		t.Fatalf("expected cross-platform AI_SKILL_REPO setup guidance in AGENTS.md, got %s", string(content))
+	}
+	if !strings.Contains(string(content), "Pointer 展開規則") || !strings.Contains(string(content), "per-turn Cognitive Mode") {
+		t.Fatalf("expected explicit pointer expansion guidance in AGENTS.md, got %s", string(content))
 	}
 }
 
