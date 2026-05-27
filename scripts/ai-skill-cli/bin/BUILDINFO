@@ -1,4 +1,4 @@
-version=repo-b6792ab
-source_commit=b6792ab
-built_at=2026-05-27T04:16:18Z
+version=repo-88270df
+source_commit=88270df
+built_at=2026-05-27T04:36:23Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
