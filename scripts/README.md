@@ -32,8 +32,11 @@ Legacy script closure policy：[`ai-skill-cli/docs/legacy-script-disposition.md`
 開新專案時，用 repo-local Go CLI 一次設定所有 AI 工具：
 
 ```bash
+export AI_SKILL_REPO=/path/to/ai-skill
 scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects/my-new-app
 ```
+
+`init-project` 產生的 project files 不寫本機 Ai-skill repo 絕對路徑；文件使用 `<AI_SKILL_REPO>` placeholder，Claude hooks 讀 `AI_SKILL_REPO` 環境變數並用 portable fallback。
 
 這會在目標專案中建立：
 

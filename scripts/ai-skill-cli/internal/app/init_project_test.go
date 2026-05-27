@@ -93,8 +93,23 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if result.Mode != "write" || len(result.Mutations) != 5 {
 		t.Fatalf("expected write mutations, got %#v", result)
 	}
-	if !pathExists(filepath.Join(project, "CLAUDE.md")) {
+	claudePath := filepath.Join(project, "CLAUDE.md")
+	if !pathExists(claudePath) {
 		t.Fatal("write mode did not create CLAUDE.md")
+	}
+	repo, repoCheck := resolveInitProjectAiSkillRepo()
+	if repoCheck.Status != "ok" {
+		t.Fatalf("expected repo resolution ok, got %#v", repoCheck)
+	}
+	claudeContent, err := os.ReadFile(claudePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(claudeContent), filepath.ToSlash(repo)) {
+		t.Fatalf("CLAUDE.md must not contain local absolute Ai-skill path, got %s", string(claudeContent))
+	}
+	if !strings.Contains(string(claudeContent), "<AI_SKILL_REPO>/CORE_BOOTSTRAP.md") {
+		t.Fatalf("expected portable placeholder in CLAUDE.md, got %s", string(claudeContent))
 	}
 	claudeSettingsPath := filepath.Join(project, ".claude", "settings.json")
 	if !pathExists(claudeSettingsPath) {
@@ -103,6 +118,9 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	claudeSettings, err := os.ReadFile(claudeSettingsPath)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if strings.Contains(string(claudeSettings), filepath.ToSlash(repo)) {
+		t.Fatalf("Claude settings must not contain local absolute Ai-skill path, got %s", string(claudeSettings))
 	}
 	if !strings.Contains(string(claudeSettings), "user-prompt-submit") || !strings.Contains(string(claudeSettings), "AI_SKILL_REPO") {
 		t.Fatalf("expected Claude hooks to call Ai-skill Go runner, got %s", string(claudeSettings))
@@ -144,6 +162,13 @@ func TestInitProjectWritesCodexBootstrap(t *testing.T) {
 	}
 	if strings.Contains(string(content), "ai-tools/agent/codex.md") {
 		t.Fatalf("AGENTS.md must NOT direct-link to codex.md (generic entry locks would break multi-agent use), got %s", string(content))
+	}
+	repo, repoCheck := resolveInitProjectAiSkillRepo()
+	if repoCheck.Status != "ok" {
+		t.Fatalf("expected repo resolution ok, got %#v", repoCheck)
+	}
+	if strings.Contains(string(content), filepath.ToSlash(repo)) {
+		t.Fatalf("AGENTS.md must not contain local absolute Ai-skill path, got %s", string(content))
 	}
 }
 

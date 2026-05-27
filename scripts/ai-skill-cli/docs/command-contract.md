@@ -120,6 +120,7 @@
 
 - dry-run：只列出將寫入的檔案。
 - 寫入模式：可能建立 `.roomodes`、`.cursor/rules/`、`.cursor/hooks.json`、`CLAUDE.md`、`.claude/settings.json`、`.agent-goals/` 或等效 project-local 設定。
+- 寫入內容不得包含本機 Ai-skill repository 的絕對路徑；以 `<AI_SKILL_REPO>` placeholder 與 `AI_SKILL_REPO` 環境變數連回 canonical repo。
 - Phase 2 初始切片只開放 dry-run planner；write mode 在 template parity、fixture 與覆蓋策略完成前必須回傳 `partial_close_loop_blocked`。
 - Shell To Go migration 後，write mode 必須實作並成為預設；舊 `scripts/init-new-project.sh` 必須刪除。
 

@@ -299,27 +299,29 @@ func initProjectFileContent(file plannedFile, repo string) (string, error) {
 	}
 }
 
+const aiSkillRepoPlaceholder = "<AI_SKILL_REPO>"
+
 func initProjectBootstrapText(repo string) string {
-	return fmt.Sprintf(`本專案使用 Ai-skill 知識庫：%s
+	return fmt.Sprintf(`本專案使用 Ai-skill 知識庫。請在本機設定環境變數 `+"`AI_SKILL_REPO`"+` 指向 Ai-skill repository；文件中以 `+"`%s`"+` 表示該路徑。
 
 > **IMPORTANT — MUST RUN BEFORE ANY OTHER ACTION**
-> 本檔為 **thin tool-entry pointer**。所有 obligation / format / enum / example 的 canonical 來源在 %s；%s 是 human-readable companion。Session 啟動 first turn 必須讀取 companion 並依 canonical contract 執行 Bootstrap Receipt、Cognitive Mode 報告與 close-loop obligations。
+> 本檔為 **thin tool-entry pointer**。所有 obligation / format / enum / example 的 canonical 來源在 `+"`%s/runtime/core-bootstrap.yaml`"+`；`+"`%s/CORE_BOOTSTRAP.md`"+` 是 human-readable companion。Session 啟動 first turn 必須讀取 companion 並依 canonical contract 執行 Bootstrap Receipt、Cognitive Mode 報告與 close-loop obligations。
 > Summary 的「Resume directly」是對話 framing，**不豁免** runtime / governance bootstrap。Resume / continuation session 同樣須走完 bootstrap。
 
 ## 啟動序列
 
-1. 讀 %s — bootstrap companion 與進入點
-2. 載入 %s — canonical bootstrap contract（required reads / per-session / per-turn obligations）
+1. 讀 `+"`%s/CORE_BOOTSTRAP.md`"+` — bootstrap companion 與進入點
+2. 載入 `+"`%s/runtime/core-bootstrap.yaml`"+` — canonical bootstrap contract（required reads / per-session / per-turn obligations）
 
 ## 修改本檔的規則
 
-本檔是 entry pointer，不是 canonical content。修改前先讀 %s。新 obligation 加到 runtime/core-bootstrap.yaml 並 refresh runtime surfaces；工具差異放 ai-tools/agent/<tool>.md。不要把 obligation 全文複製進本檔。
-`, filepath.ToSlash(repo),
-		filepath.ToSlash(filepath.Join(repo, "runtime", "core-bootstrap.yaml")),
-		filepath.ToSlash(filepath.Join(repo, "CORE_BOOTSTRAP.md")),
-		filepath.ToSlash(filepath.Join(repo, "CORE_BOOTSTRAP.md")),
-		filepath.ToSlash(filepath.Join(repo, "runtime", "core-bootstrap.yaml")),
-		filepath.ToSlash(filepath.Join(repo, "runtime", "bootstrap-entry-points.yaml")))
+本檔是 entry pointer，不是 canonical content。修改前先讀 `+"`%s/runtime/bootstrap-entry-points.yaml`"+`。新 obligation 加到 runtime/core-bootstrap.yaml 並 refresh runtime surfaces；工具差異放 ai-tools/agent/<tool>.md。不要把 obligation 全文複製進本檔。
+`, aiSkillRepoPlaceholder,
+		aiSkillRepoPlaceholder,
+		aiSkillRepoPlaceholder,
+		aiSkillRepoPlaceholder,
+		aiSkillRepoPlaceholder,
+		aiSkillRepoPlaceholder)
 }
 
 func initProjectRooContent(repo string) (string, error) {
@@ -375,8 +377,7 @@ func initProjectClaudeContent(repo string) (string, error) {
 
 func initProjectClaudeSettingsContent(repo string) (string, error) {
 	command := func(event string) string {
-		repoPath := filepath.ToSlash(repo)
-		return fmt.Sprintf("sh -c 'AI_SKILL_REPO=%q; ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run %s --repo \"$AI_SKILL_REPO\"'", repoPath, event)
+		return fmt.Sprintf("sh -c 'ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; if [ -z \"${AI_SKILL_REPO:-}\" ]; then for candidate in \"$HOME/Documents/Ai-skill\" \"$HOME/Ai-skill\" \"$PWD/../Ai-skill\"; do if [ -d \"$candidate/scripts/ai-skill-cli/bin\" ]; then AI_SKILL_REPO=\"$candidate\"; break; fi; done; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then echo \"AI_SKILL_REPO is not set; skipping Ai-skill hook %s\" >&2; exit 0; fi; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run %s --repo \"$AI_SKILL_REPO\"'", event, event)
 	}
 	settings := map[string]any{
 		"description": "Claude Code project-local Ai-skill hooks. Commands execute the canonical Ai-skill repo-local Go binary and use CLAUDE_PROJECT_DIR as the target project root for nested Git reports.",
@@ -415,12 +416,6 @@ func initProjectGeminiContent(repo string) (string, error) {
 }
 
 func initProjectCodexContent(repo string) (string, error) {
-	// Use forward slashes for displayed paths (cross-platform consistency).
-	// filepath.Join produces backslashes on Windows which break substring
-	// matching in markdown links and downstream tests.
-	join := func(parts ...string) string {
-		return filepath.ToSlash(filepath.Join(parts...))
-	}
 	return fmt.Sprintf(`# AGENTS.md — Generic Agent Bootstrap Entry
 
 本檔為 thin generic agent entry。適用 Codex、Cursor partial、Aider、Cline 等遵循 `+"`AGENTS.md`"+` 慣例的 AI agent。Canonical obligations 在 Ai-skill repo 的 `+"`CORE_BOOTSTRAP.md`"+` + `+"`runtime/core-bootstrap.yaml`"+`。
@@ -435,20 +430,20 @@ func initProjectCodexContent(repo string) (string, error) {
 ## 修改規則
 
 不在本檔加單一工具規則 — 用 routing hub 指向的對應 `+"`ai-tools/agent/<tool>.md`"+`。本檔保持 thin。
-`, join(repo, "CORE_BOOTSTRAP.md"),
-		join(repo, "README.md"),
-		join(repo, "ai-tools", "README.md"),
-		join(repo, "runtime", "runtime.db")), nil
+`, aiSkillRepoPlaceholder+"/CORE_BOOTSTRAP.md",
+		aiSkillRepoPlaceholder+"/README.md",
+		aiSkillRepoPlaceholder+"/ai-tools/README.md",
+		aiSkillRepoPlaceholder+"/runtime/runtime.db"), nil
 }
 
 func initProjectGoalsReadmeContent(repo string) (string, error) {
 	return fmt.Sprintf(`# Agent Goals
 
-本目錄由 Ai-skill 對話目標帳本管理：%s
+本目錄由 Ai-skill 對話目標帳本管理：%s/enforcement/conversation-goal-ledger.md
 用 `+"`ai-skill goals`"+` 操作。
 
 ## 目前目標
 
 （尚無 active goal）
-`, filepath.ToSlash(filepath.Join(repo, "enforcement", "conversation-goal-ledger.md"))), nil
+`, aiSkillRepoPlaceholder), nil
 }
