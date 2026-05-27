@@ -2,6 +2,31 @@
 
 本檔說明 Claude Code 特有的配置與操作注意事項。通用配置原則見 [`ai-tools/README.md`](../README.md)；知識庫入口見 [`README.md`](../../README.md)；啟動流程見 [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md)。
 
+## 使用者快速上手（onboarding）
+
+第一次在這個 repository 用 Claude Code，建議流程：
+
+1. **開啟 Claude Code session**（`claude` CLI 或 IDE 整合）。
+2. **第一句先打** `/bootstrap`，等 Claude 回報 Bootstrap Receipt + Cognitive Mode 報告。
+   - Receipt 範例：`Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25`
+   - 看到這兩個區塊代表規則已載入完成。
+3. **再給實際任務**（例如「review 這次變更」「init 一個新 workflow」）。
+
+若忘記跑 `/bootstrap`，Claude 預期會在第一個回覆**主動提醒**（見 [`CLAUDE.md`](../../CLAUDE.md) §「第一輪使用者互動」）。若沒提醒，代表 Claude 跳過了 onboarding 指示——可手動打 `/bootstrap` 補救。
+
+### 為什麼需要手動觸發
+
+Cursor、Roo Code 等工具有 always-apply rule 可在每個 turn 機械注入規則；Claude Code 的 `CLAUDE.md` 與 `.claude/rules/*.md` 是注入 system prompt 的 prose，模型可能在「任務看起來簡單」時跳過 bootstrap 序列。`/bootstrap` slash command 是使用者明確觸發，是目前最可靠的方式。
+
+`.claude/hooks/` 雖然提供 PreToolUse / Stop 等機械 gate，但實測在部分環境下不穩定觸發（依 Claude Code 版本而異），不能取代手動 `/bootstrap`。
+
+### 可用的 slash commands
+
+| Command | 用途 |
+|---|---|
+| `/bootstrap` | 完整執行 CORE_BOOTSTRAP.md + 3 條必讀規則 + runtime.db 查詢，並輸出 Bootstrap Receipt |
+| 其他 | 在 Claude Code 介面輸入 `/` 可看到所有可用 commands（含 `.claude/commands/` 自訂） |
+
 ## Claude Code 配置實作
 
 ### 自動載入入口：`CLAUDE.md`
