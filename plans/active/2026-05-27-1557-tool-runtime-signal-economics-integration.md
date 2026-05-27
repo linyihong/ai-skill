@@ -15,6 +15,8 @@ draft
 - Cognitive Mode 報告升級為 runtime introspection surface：不只是 status report，而是 Runtime Cognitive State / Cognitive Execution State snapshot。
 - Cognitive Mode 不直接依賴 tool catalog，只消費 economics / tool-derived signals，並回報可推導、可驗證、可影響 runtime 的 state。
 - Cognitive Mode core 仍由 `runtime/cognitive-modes*.yaml` 管理。
+- Runtime Cognitive Mode core 是 deterministic control plane：定義 mode contract、allowed depth、validation requirement、discovery policy、escalation policy；不得整個搬到 ecosystem。
+- Ecosystem cognition layer 承載 adaptation / economics / pressure / telemetry：決定「什麼情況值得選 DEEP / SOURCE_BACKED / STRICT / compression / escalation」。
 - 需要引入 ecosystem interaction layer 的概念：`models/`、`tools/`、`memory/`、`workflow/` 保留 source-of-truth；新層只處理 cross-layer resource interaction、pressure、economics、adaptation、feedback。
 
 ## Decision Rationale
@@ -60,6 +62,13 @@ Economic Decision Layer
 
 這些交互形成 actual cognitive cost，不屬於單一 layer。它們需要一個 ecosystem interaction layer 或 runtime ecology layer 來承載。
 
+同時必須避免把兩種責任混在一起：
+
+- 系統規則：例如 `STRICT` 必須啟動 validation / gate set。這是 runtime control plane。
+- 系統判斷：例如這次值不值得 `STRICT`、為什麼不 `DEEP`、為什麼用 compression。這是 ecosystem adaptation / economics。
+
+若不拆開，`runtime/cognitive-modes.yaml` 會同時承載 orchestration、adaptation、economics、observability、reasoning policy，最後變得難測試、難維護、難演進。
+
 ### Decision
 
 把原 plan 從 `Tool Runtime Integration` 升級成：
@@ -71,10 +80,11 @@ Tool Runtime Signal & Economics Integration
 分三層處理：
 
 1. Source-of-truth layers：`models/`、`tools/`、`memory/`、`workflow/` 保持各自 canonical responsibilities。
-2. Ecosystem interaction layer：建模 resource interaction、economic pressure、cross-layer behavior、adaptation、feedback。
-3. Runtime orchestration layer：負責 discovery、activation、validation、recovery、execution。
-4. Cognitive Mode discovery：只消費 derived signals，不直接擁有 tool catalog、model catalog、memory semantics 或 economics model。
-5. Cognitive Mode report：升級為 Cognitive Execution State surface，回報 state、economics、runtime route decisions 與 adaptation rationale。
+2. Runtime control plane：`runtime/cognitive-modes*.yaml` 保留 deterministic mode contracts、gate activation、validation、recovery、phase integration。
+3. Ecosystem interaction layer：建模 resource interaction、economic pressure、cross-layer behavior、adaptation、feedback。
+4. Runtime orchestration layer：負責 discovery、activation、validation、recovery、execution。
+5. Cognitive Mode discovery：只消費 derived signals，不直接擁有 tool catalog、model catalog、memory semantics 或 economics model。
+6. Cognitive Mode report：拆成 runtime state + ecosystem state + adaptation rationale，避免把 economics 塞回 runtime core。
 
 第一版不做完整 telemetry database，但要設計 feedback loop 的 contract boundary，讓未來可從 static heuristics 升級到 evidence-adaptive runtime。
 
@@ -87,6 +97,8 @@ Tool Runtime Signal & Economics Integration
 - E. 只保留現有 Cognitive Mode 報告：reject。會讓 report 成為 ritualized verbosity，無法支撐 runtime economics 或 scenario validation。
 - F. 把 Cognitive Mode 報告升級為 Cognitive Execution State：accept。保留現有 6 維 state vector，同時增加 economics / runtime / adaptation surfaces。
 - G. 新增 top-level `ecosystem/`：defer but keep as candidate。概念最準，適合承載 interaction ecology，但可能過早新增 owner layer；Phase 0 需先判斷是否比 `runtime/economics/` 更合適。
+- H. 把 Cognitive Mode core 整個搬到 ecosystem：reject。runtime phase machine、execution orchestration、validation gates、recovery flow 仍依賴 deterministic mode contract。
+- I. 拆成 runtime Cognitive Mode Core + ecosystem Cognitive Adaptation/Economics：accept。runtime 管「可以做什麼」，ecosystem 管「什麼情況值得這樣做」。
 
 ### Why Not an ADR Yet
 
@@ -111,6 +123,7 @@ Tool Runtime Signal & Economics Integration
 - tool routing、compression、token budget、recursion guard 可共用同一 economics layer
 - Cognitive Mode 報告可反映 tool usage / context expansion / retry pressure，但核心 contract 維持乾淨
 - Cognitive Mode 報告從 status report 升級成 runtime introspection / self-governance evidence
+- `runtime/cognitive-modes.yaml` 不會因 adaptation / telemetry / economics 持續膨脹
 - models / tools / memory / workflow 的交互成本有地方承載，不再散落在各 layer 說明文件
 - 為 adaptive runtime cognition system 打基礎
 
@@ -124,6 +137,7 @@ Tool Runtime Signal & Economics Integration
 
 - `runtime/economics/` 若沒有 source-of-truth 規則，可能違反 `runtime/README.md` 的 runtime YAML boundary
 - `ecosystem/` 若太早建立，可能變成第二個 runtime 或 dumping ground
+- 若 runtime control plane 與 ecosystem adaptation 邊界不清，Cognitive Mode core 仍會肥大化
 - economics schema 若過細，會變成 premature execution VM
 - 若只做 static YAML，仍然只是 contract system，不會形成 feedback loop
 - 若 Cognitive report 不可推導、不可驗證、不可影響 runtime，會變成 fake observability
@@ -134,6 +148,7 @@ Tool Runtime Signal & Economics Integration
 
 Draft owner candidates:
 
+- Runtime control plane remains in `runtime/cognitive-modes*.yaml`.
 - Preferred: `runtime/economics/*.yaml` for executable economics contracts, if Phase 0 confirms runtime owner-layer rule allows subdirectory contracts.
 - Fallback: `runtime/tool-routing.yaml` + `runtime/economics-feedback.yaml` at runtime root, following existing B-class executable YAML pattern.
 - Alternative: top-level `economics/` owner layer with `runtime_projection.enabled: true`, if `runtime/` ownership should stay narrow.
@@ -142,8 +157,9 @@ Draft owner candidates:
 ### Trigger flow
 
 1. Agent receives goal or task intent.
-2. Runtime discovery identifies capability fit.
-3. Ecosystem / economics layer evaluates economic fit:
+2. Runtime control plane exposes allowed modes / validation / escalation contracts.
+3. Runtime discovery identifies capability fit.
+4. Ecosystem / economics layer evaluates economic fit:
    - token burn estimate
    - model capability / latency / context-window fit
    - tool cost / side-effect risk
@@ -154,24 +170,29 @@ Draft owner candidates:
    - retry pressure
    - compression pressure
    - latency / output amplification
-4. Runtime creates execution hints:
+5. Ecosystem adaptation recommends mode / context / compression / escalation.
+6. Runtime validates recommendation against deterministic mode contract.
+7. Runtime creates execution hints:
    - shallow discovery
    - source-backed expansion
    - compression required
    - validation checkpoint required
    - recovery / escalation
-5. Cognitive Mode discovery consumes economics-derived signals.
-6. Runtime Cognitive State / Cognitive Execution State report cites signal source without embedding tool catalog details.
-7. Runtime scenarios can compare expected vs actual cognitive state to detect governance drift, reasoning drift, execution mismatch, or economic overrun.
+8. Cognitive Mode discovery consumes economics-derived signals.
+9. Runtime Cognitive State / Cognitive Execution State report separates runtime state, ecosystem state, and adaptation rationale.
+10. Runtime scenarios can compare expected vs actual cognitive state to detect governance drift, reasoning drift, execution mismatch, or economic overrun.
 
 ### Proposed flow
 
 ```mermaid
 flowchart TD
   goal["Goal"] --> discovery["Discovery"]
-  discovery --> capabilityFit["Capability Fit"]
+  discovery --> runtimeCore["Runtime Cognitive Mode Core"]
+  runtimeCore --> capabilityFit["Capability Fit"]
   capabilityFit --> economicFit["Economic Fit"]
-  economicFit --> executionPlan["Execution Plan"]
+  economicFit --> adaptation["Ecosystem Adaptation"]
+  adaptation --> runtimeGuard["Runtime Contract Check"]
+  runtimeGuard --> executionPlan["Execution Plan"]
   executionPlan --> adaptiveCompression["Adaptive Compression"]
   executionPlan --> runtimeMonitoring["Runtime Monitoring"]
   runtimeMonitoring --> feedbackLoop["Cost Feedback Loop"]
@@ -195,6 +216,7 @@ runtime.cognitive_state.telemetry_contract
 ecosystem.resource_interactions.contract
 ecosystem.pressure_models.contract
 ecosystem.adaptation.contract
+ecosystem.cognitive_adaptation.contract
 ```
 
 ### Validation scenarios
@@ -208,6 +230,8 @@ ecosystem.adaptation.contract
 - `cognitive-state-adaptation-rationale-valid-v1`
 - `ecosystem-resource-interaction-contract-v1`
 - `ecosystem-pressure-models-contract-v1`
+- `cognitive-core-control-plane-boundary-v1`
+- `cognitive-adaptation-ecosystem-boundary-v1`
 
 ## Target Architecture
 
@@ -223,6 +247,63 @@ workflow/  -> execution depth, validation burden, governance pressure
 ```
 
 The ecosystem / economics layer must not duplicate these truths. It models their interactions.
+
+### Cognitive Mode Core（runtime control plane）
+
+`runtime/cognitive-modes.yaml` and related integration contracts remain in runtime. They define deterministic execution control:
+
+```yaml
+modes:
+  execution_mode:
+    values: [FAST, NORMAL, DEEP, FORENSIC, RECOVERY]
+  context_mode:
+    values: [INDEX_ONLY, SUMMARY_FIRST, CHECKLIST_FIRST, SOURCE_BACKED, GRAPH_ASSISTED]
+  governance_mode:
+    values: [LIGHT, STANDARD, STRICT, LOCKDOWN]
+  memory_mode:
+    values: [NONE, EPISODIC, DECISION_REPLAY, FAILURE_REPLAY, PROJECT_CONTEXT]
+
+contracts:
+  allowed_depth: runtime-owned
+  validation_requirement: runtime-owned
+  discovery_policy: runtime-owned
+  escalation_policy: runtime-owned
+  gate_activation: runtime-owned
+```
+
+Runtime answers:
+
+```text
+What is allowed?
+What gates activate?
+What validation is required?
+What recovery/escalation contract applies?
+```
+
+### Cognitive Economics / Adaptation（ecosystem candidate）
+
+Ecosystem answers:
+
+```text
+When is DEEP worth it?
+When is SOURCE_BACKED worth it?
+When should compression be aggressive?
+When should discovery stay shallow?
+When should governance escalate?
+```
+
+Candidate structure:
+
+```text
+ecosystem/
+  cognition/
+    economics.yaml
+    adaptation.yaml
+    pressure-models.yaml
+    telemetry.yaml
+```
+
+This layer may recommend a mode, but runtime validates that recommendation against `runtime/cognitive-modes*.yaml`.
 
 ### Ecosystem interaction layer
 
@@ -362,12 +443,18 @@ This stack prevents `ecosystem/` from becoming a dumping ground while still givi
 The existing Cognitive Mode 報告 should become a structured introspection surface:
 
 ```yaml
-cognitive_state:
+runtime_state:
   execution_mode: NORMAL
-  context_mode: SOURCE_BACKED
-  governance_mode: STRICT
-  memory_mode: PROJECT_CONTEXT
   validation_mode: CHECKLIST
+  governance_contract: STANDARD
+
+ecosystem_state:
+  selected_context_mode: SOURCE_BACKED
+  selected_memory_mode: PROJECT_CONTEXT
+  context_pressure: MEDIUM
+  governance_pressure: HIGH
+  token_budget_pressure: LOW
+  recursion_risk: LOW
 
 economics:
   thinking_cost: MEDIUM
@@ -391,6 +478,7 @@ runtime:
   blocked_routes: []
 
 adaptation:
+  selected_context_mode: SOURCE_BACKED
   why_not_deeper:
     - task bounded
     - no architecture mutation
@@ -418,6 +506,8 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Confirm scope: static economics contracts + signal wiring first; no full telemetry DB in v1.
 - [ ] Confirm source-of-truth: `runtime/economics/`, runtime-root YAML, top-level `economics/`, or top-level `ecosystem/`.
 - [ ] Confirm whether models/tools/memory/workflow should remain source-of-truth layers while ecosystem only owns interaction.
+- [ ] Confirm Cognitive Mode Core remains in runtime as deterministic control plane.
+- [ ] Confirm Cognitive Adaptation / Economics / Telemetry belongs in ecosystem or equivalent interaction layer.
 - [ ] Confirm compatibility with `runtime/README.md` B-class executable YAML rules.
 - [ ] Confirm whether `runtime/**/*.yaml` under subdirectories is allowed by compiler / validators.
 - [ ] Confirm linked updates: `models/README.md`, `tools/README.md`, `memory/README.md`, `workflow/`, `runtime/README.md`, routing registry / generated reports if needed.
@@ -436,12 +526,26 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Define relationship to `models/`, `memory/`, and `workflow/`
 - [ ] Define relationship to current `runtime/cognitive-modes-cost-class.yaml`
 - [ ] Define compatibility path from `cognitive_cost` to split economics costs
+- [ ] Define runtime control plane vs ecosystem adaptation boundary
 
 完成條件：
 
 - [ ] Plan records owner path decision and source-of-truth boundary
 
-## Phase 2: Define Ecosystem Interaction Boundary
+## Phase 2: Define Cognitive Core vs Ecosystem Adaptation Boundary
+
+- [ ] Define what stays in `runtime/cognitive-modes*.yaml`
+- [ ] Define what moves to ecosystem / economics / adaptation contracts
+- [ ] Define deterministic runtime fields: mode contracts, validation requirement, discovery policy, escalation policy, gate activation
+- [ ] Define adaptive ecosystem fields: economics, pressure, telemetry, why/why-not rationale
+- [ ] Define report split: runtime_state, ecosystem_state, adaptation
+
+完成條件：
+
+- [ ] Cognitive Mode core remains runtime control plane
+- [ ] Cognitive adaptation / economics / telemetry has a separate owner
+
+## Phase 3: Define Ecosystem Interaction Boundary
 
 - [ ] Define source-of-truth layers: models / tools / memory / workflow
 - [ ] Define ecosystem-owned concepts: interaction, economics, pressure, adaptation, feedback
@@ -453,7 +557,7 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 - [ ] Cross-layer phenomena have an owner without duplicating source truths
 
-## Phase 3: Create Tool Routing / Tool Cost Contract
+## Phase 4: Create Tool Routing / Tool Cost Contract
 
 - [ ] Add executable tool routing / tool cost contract
 - [ ] Define tool id / category / avg token cost / side-effect risk / recursive risk
@@ -466,7 +570,7 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 - [ ] Tool routing / cost contract appears in generated surfaces after runtime refresh
 
-## Phase 4: Create Economics Policy Contracts
+## Phase 5: Create Economics Policy Contracts
 
 - [ ] Add token cost policy
 - [ ] Add reasoning depth policy
@@ -482,7 +586,7 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 - [ ] Economics contracts define when to expand, compress, stop, recover, or escalate
 
-## Phase 5: Add Ecosystem Pressure Models and Tool Behavioral Patterns
+## Phase 6: Add Ecosystem Pressure Models and Tool Behavioral Patterns
 
 - [ ] Add recursive search pattern
 - [ ] Add code mutation pattern
@@ -499,7 +603,7 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Tool behavior is modeled as runtime heuristics, not tool presets
 - [ ] Cross-layer pressure is modeled as interaction, not duplicated source truth
 
-## Phase 6: Wire Economics/Ecosystem-Derived Cognitive Signals
+## Phase 7: Wire Economics/Ecosystem-Derived Cognitive Signals
 
 - [ ] Update `runtime/cognitive-modes-discovery.yaml`
 - [ ] Add `tool_usage_recursive_search`
@@ -514,15 +618,18 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Add `model_capability_mismatch`
 - [ ] Add `memory_amplification_high`
 - [ ] Add `governance_overhead_high`
+- [ ] Add `ecosystem_recommends_deep`
+- [ ] Add `ecosystem_recommends_shallow_discovery`
 
 完成條件：
 
 - [ ] Cognitive discovery consumes economics-derived signals only as input
 - [ ] Cognitive Mode core remains strategy-oriented, not tool-catalog-oriented
 
-## Phase 7: Define Runtime Cognitive State / Cognitive Execution State
+## Phase 8: Define Runtime Cognitive State / Cognitive Execution State
 
-- [ ] Extend the plan for `runtime/cognitive-modes.yaml` or a companion contract to describe cognitive state telemetry fields
+- [ ] Define runtime_state fields from runtime control plane
+- [ ] Define ecosystem_state fields from economics / pressure / adaptation layer
 - [ ] Define economics fields: estimated token cost, estimated latency, recursion risk, compression pressure, evidence depth
 - [ ] Define split costs: thinking cost, context cost, execution cost
 - [ ] Define resource ecology fields: model pressure, tool pressure, memory pressure, workflow pressure
@@ -536,7 +643,7 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Scenario can validate expected vs actual cognitive state
 - [ ] Report remains useful, not ritualized verbosity
 
-## Phase 8: Add Minimal Runtime Cost Feedback Loop
+## Phase 9: Add Minimal Runtime Cost Feedback Loop
 
 - [ ] Define `execution-feedback` static contract
 - [ ] Model average token burn
@@ -551,8 +658,9 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 - [ ] Feedback loop is defined as contract boundary even if first implementation remains static
 
-## Phase 9: Document Source Layer and Ecosystem Boundaries
+## Phase 10: Document Source Layer and Ecosystem Boundaries
 
+- [ ] Update `runtime/README.md` or related contract docs with Cognitive Core vs Ecosystem Adaptation boundary if accepted
 - [ ] Update `models/README.md` if ecosystem references model capability fit
 - [ ] Update `tools/README.md`
 - [ ] Update `tools/metadata/README.md`
@@ -566,7 +674,7 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Docs no longer imply `tools/README.md` itself is runtime executable source
 - [ ] Docs do not imply ecosystem owns model/tool/memory/workflow truths
 
-## Phase 10: Validation and Closure
+## Phase 11: Validation and Closure
 
 - [ ] Add or update validation scenarios
 - [ ] Run `ai-skill runtime refresh --repo . --json`
@@ -586,6 +694,8 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - How much adaptation rationale should appear in normal final responses vs only high-risk / non-default reports?
 - Should `cognitive_cost` remain a single derived summary after split costs are introduced?
 - Should `ecosystem/` be created in this plan, or kept as a conceptual target until runtime/economics validates the need?
+- Should Cognitive Adaptation live under `ecosystem/cognition/` while Cognitive Core remains under `runtime/`?
+- Should `context_mode` remain part of runtime core, or should selected context strategy be reported as ecosystem adaptation while runtime only defines allowed context modes?
 
 ## Stakeholder 同意項目
 
@@ -593,6 +703,8 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] `models/`, `tools/`, `memory/`, and `workflow/` remain source-of-truth layers for their own domains
 - [ ] Runtime economics becomes the decision layer for cost / risk / compression / recursion
 - [ ] Ecosystem interaction layer, if created, owns only cross-layer pressure / adaptation / feedback
+- [ ] Runtime Cognitive Mode Core remains deterministic control plane
+- [ ] Cognitive Adaptation / Economics / Telemetry moves to ecosystem or equivalent interaction layer
 - [ ] Cognitive Mode only consumes derived signals
 - [ ] Cognitive Mode report evolves into Runtime Cognitive State / Cognitive Execution State without becoming verbose ritual
 - [ ] No full telemetry database in v1
@@ -609,6 +721,7 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 - [ ] Economics owner path chosen and documented
 - [ ] Ecosystem interaction boundary chosen and documented
+- [ ] Cognitive Core vs Cognitive Adaptation boundary chosen and documented
 - [ ] Tool routing / cost contract exists and is projected
 - [ ] Economics contracts exist and are projected
 - [ ] Runtime Cognitive State / Cognitive Execution State contract is defined
