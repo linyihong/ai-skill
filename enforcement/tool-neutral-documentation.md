@@ -59,9 +59,7 @@
   -> runtime/core-bootstrap.yaml
 ```
 
-工具入口包含 `CLAUDE.md`、`AGENTS.md`、`GEMINI.md`、`.cursor/rules/*.mdc`、`.roomodes` 或其他 tool-specific Custom Instructions。這些入口可以說明「到哪裡讀」，但不可把中央庫內容複製進去。
-
-Claude Code 目前因 SessionStart / PreToolUse hook 與 onboarding 行為有已驗證的 tool-specific enforcement 例外；此類例外只放在 Claude adapter，不作為其他工具入口的預設模式。
+工具入口包含 `CLAUDE.md`、`AGENTS.md`、`GEMINI.md`、`.cursor/rules/*.mdc`、`.roomodes` 或其他 tool-specific Custom Instructions。這些入口可以說明「到哪裡讀」，但不可把中央庫內容複製進去。若某工具因已驗證的 enforcement 機制需要例外，只在該工具 adapter 中說明，不寫進 shared rule。
 
 工具 adapter（例如 `ai-tools/agent/<tool>.md`）只回答該工具和其他工具有什麼不同：入口位置、設定檔、覆蓋語意、hooks / modes / UI 差異、工具能力限制與同步注意事項。若內容變成共用規則、runtime obligation、workflow 或 validation gate，應移回 `enforcement/`、`runtime/core-bootstrap.yaml`、`workflow/` 或其他 owner layer。
 

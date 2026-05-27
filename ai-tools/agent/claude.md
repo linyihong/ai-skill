@@ -7,18 +7,18 @@
 第一次在這個 repository 用 Claude Code，建議流程：
 
 1. **開啟 Claude Code session**（`claude` CLI 或 IDE 整合）。
-2. **第一句先打** `/bootstrap`，等 Claude 回報 Bootstrap Receipt + Cognitive Mode 報告。
+2. 第一個 assistant response 應直接回報 Bootstrap Receipt + Cognitive Mode 報告；SessionStart hook 會預先注入 receipt 所需資料。
    - Receipt 範例：`Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25`
    - 看到這兩個區塊代表規則已載入完成。
 3. **再給實際任務**（例如「review 這次變更」「init 一個新 workflow」）。
 
-若忘記跑 `/bootstrap`，Claude 預期會在第一個回覆**主動提醒**（見 [`CLAUDE.md`](../../CLAUDE.md) §「第一輪使用者互動」）。若沒提醒，代表 Claude 跳過了 onboarding 指示——可手動打 `/bootstrap` 補救。
+若 SessionStart hook 沒有觸發，或第一個 response 沒有 receipt，可手動執行 `/bootstrap` 補救。
 
-### 為什麼需要手動觸發
+### 為什麼仍保留 `/bootstrap`
 
-Cursor、Roo Code 等工具有 always-apply rule 可在每個 turn 機械注入規則；Claude Code 的 `CLAUDE.md` 與 `.claude/rules/*.md` 是注入 system prompt 的 prose，模型可能在「任務看起來簡單」時跳過 bootstrap 序列。`/bootstrap` slash command 是使用者明確觸發，是目前最可靠的方式。
+Claude Code 的主要路徑現在是 hooks 自動化：SessionStart 注入 bootstrap context、PreToolUse 阻擋 receipt 前的非讀取工具、PostToolUse 補提醒、Stop 檢查 Cognitive Mode。`/bootstrap` 保留為 fallback，避免 Claude Code 版本差異、hook 未註冊或使用者在非標準環境執行時卡住。
 
-`.claude/hooks/` 雖然提供 PreToolUse / Stop 等機械 gate，但實測在部分環境下不穩定觸發（依 Claude Code 版本而異），不能取代手動 `/bootstrap`。
+`.claude/hooks/` 是本 repo 的 Claude-specific enforcement 例外；這些細節只放在 Claude adapter 與 `.claude/` 設定，不推廣到其他工具入口。
 
 ### 可用的 slash commands
 
@@ -116,7 +116,7 @@ Claude Code 的設定方式與 Roo Code 不同，沒有「全域 Custom Instruct
 
 ## Claude Code 與對話目標閉環
 
-工具中立規則見 [`enforcement/conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md)。Claude Code 是 CLI 工具，沒有 hooks 機制，但可以透過 `CLAUDE.md` 中的 Custom Instructions 加入 goal ledger 提醒。
+工具中立規則見 [`enforcement/conversation-goal-ledger.md`](../../enforcement/conversation-goal-ledger.md)。Claude Code hooks 目前只處理 bootstrap receipt、per-turn reminder、PreToolUse gate 與 Cognitive Mode stop check；goal ledger 的 truth 仍在 `<PROJECT_ROOT>/.agent-goals/` 與 runtime / CLI helper，不放進 Claude adapter 重述。
 
 **Goal ledger 操作流程已由 runtime 管理**，請參考：
 - [`runtime/runtime.db`](../../runtime/runtime.db) — `phase_machine` / `obligation_ledger` / `blocking_gates` 快速查詢
@@ -124,12 +124,12 @@ Claude Code 的設定方式與 Roo Code 不同，沒有「全域 Custom Instruct
 - `ai-skill goals`（source: [`scripts/ai-skill-cli/internal/app/goals.go`](../../scripts/ai-skill-cli/internal/app/goals.go)）— goal ledger CLI helper
 
 Claude Code 專屬注意事項：
-- 無 hooks 機制，需在 `CLAUDE.md` 中手動加入 goal ledger 提醒
-- `CLAUDE.md` 已包含基本 goal ledger 提醒
+- hook 可以提醒與阻擋部分 bootstrap / output contract 問題，但不會自動完成或刪除 `.agent-goals/`。
+- goal ledger 的完成與刪除仍需依共用規則驗證。
 
 ## Claude Code 與知識更新流程 Checkpoint
 
-工具中立規則見 [`governance/lifecycle/knowledge-update-flow.md`](../../governance/lifecycle/knowledge-update-flow.md)。**快速路徑**請優先查詢 runtime.db：[`runtime/runtime.db`](../../runtime/runtime.db)（`generated_surfaces` 表）。Claude Code 是 CLI 工具，沒有 hooks 機制，但可以透過 `CLAUDE.md` 中的 Custom Instructions 加入 checkpoint 提醒。
+工具中立規則見 [`governance/lifecycle/knowledge-update-flow.md`](../../governance/lifecycle/knowledge-update-flow.md)。**快速路徑**請優先查詢 runtime.db：[`runtime/runtime.db`](../../runtime/runtime.db)（`generated_surfaces` 表）。Claude Code hooks 只提供 bootstrap / output enforcement，不取代 knowledge-update-flow 的 source checks、linked updates、runtime refresh 或 close-loop。
 
 **Knowledge update flow 已由 runtime 管理**，請參考：
 - `runtime/runtime.db → generated_surfaces (type='knowledge_update_phases')` — 11 個步驟的結構化記錄（快速路徑）
@@ -137,7 +137,8 @@ Claude Code 專屬注意事項：
 - [`runtime/runtime.db`](../../runtime/runtime.db) — recovery / transaction state machine 的 source
 
 Claude Code 專屬注意事項：
-- 無 hooks 機制，需在 `CLAUDE.md` 中手動加入 checkpoint 提醒
+- 如果修改 `.claude/settings.json` 或 `.claude/hooks/*`，必須實測 hook 是否 fire，不能只看設定檔。
+- Knowledge update checkpoint 的內容仍由 runtime / governance source 決定，不在 hook script 中複製。
 
 ## 與 Tool Adapter 的關係
 

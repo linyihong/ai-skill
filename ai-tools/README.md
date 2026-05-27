@@ -41,7 +41,7 @@
 | Goal ledger 操作流程 | [`enforcement/conversation-goal-ledger.md`](../enforcement/conversation-goal-ledger.md) |
 | Close-loop 流程（commit/push/readback） | [`enforcement/dependency-reading.md`](../enforcement/dependency-reading.md) |
 
-**原則**：每個工具入口與工具文件預設都保持薄。入口只指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml`；工具文件只回答：「這個工具跟其他工具有什麼不同？它的入口檔、配置檔、覆蓋語意與特殊操作要注意什麼？」Claude Code 目前有已驗證的 tool-specific enforcement 例外，記錄在 Claude adapter 中，不作為其他工具預設。
+**原則**：每個工具入口與工具文件預設都保持薄。入口只指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml`；工具文件只回答：「這個工具跟其他工具有什麼不同？它的入口檔、配置檔、覆蓋語意與特殊操作要注意什麼？」若某工具有已驗證的例外，只記錄在該工具 adapter，不推廣成其他工具預設。
 
 **不應放在工具配置或工具說明中的內容：**
 - Bootstrap 規則清單（由 `enforcement/README.md` 管理）

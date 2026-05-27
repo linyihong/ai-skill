@@ -21,37 +21,36 @@ activation:
     - claude_settings_changed
   required_when:
     - Claude Code operates in this repository or a project using Ai-skill.
-    - CLAUDE.md, .claude/settings.json, or ai-tools/agent/claude.md changes.
-    - Claude-specific goal ledger, checkpoint, or language behavior is reviewed.
+    - CLAUDE.md, .claude/settings.json, .claude/hooks/*, or ai-tools/agent/claude.md changes.
+    - Claude-specific bootstrap, hook, output, or language behavior is reviewed.
 
 required_sources:
   - CLAUDE.md
   - CORE_BOOTSTRAP.md
-  - README.md
+  - runtime/core-bootstrap.yaml
   - ai-tools/agent/claude.md
   - ai-tools/README.md
-  - runtime/runtime.db
+  - .claude/settings.json
   - enforcement/tool-neutral-documentation.md
-  - enforcement/conversation-goal-ledger.md
 
 steps:
   - id: load_claude_entrypoint
     order: 1
-    action: Use CLAUDE.md as the Claude Code auto-bootstrap entrypoint.
+    action: Use CLAUDE.md as the Claude Code repo entrypoint while keeping canonical bootstrap content in CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml.
   - id: load_core_bootstrap
     order: 2
-    action: Read CORE_BOOTSTRAP.md and README.md before expanding detailed sources.
-  - id: load_claude_adapter
+    action: Load CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml as the canonical bootstrap sources before expanding detailed sources.
+  - id: load_claude_hooks
     order: 3
-    action: Read ai-tools/agent/claude.md for Claude-specific setup, settings, and limitations.
-  - id: use_runtime_sqlite
+    action: Read .claude/settings.json and relevant .claude/hooks/* when reviewing Claude hook behavior.
+  - id: load_claude_adapter
     order: 4
-    action: Use runtime/runtime.db for phase state, obligations, gates, output governance, canonical runtime documents, and generated surfaces.
-  - id: apply_claude_limitations
+    action: Read ai-tools/agent/claude.md for Claude-specific hook setup, settings format, fallback behavior, and limitations.
+  - id: verify_hook_claims
     order: 5
-    action: Treat Claude Code as CLI-first with no native hooks; use CLAUDE.md reminders and runtime checks for goal ledger and checkpoint behavior.
+    action: Claude hook claims must match .claude/settings.json and scripts; tested exceptions stay in this adapter instead of shared docs.
     gates:
-      - gate.claude.no_hook_assumption
+      - gate.claude.hook_claim_matches_config
   - id: keep_tool_specific_content_in_adapter
     order: 6
     action: Keep Claude-specific paths, settings, and UI details in ai-tools/agent/claude.md or tool config.
@@ -59,11 +58,12 @@ steps:
       - gate.claude.tool_specific_boundary
 
 gates:
-  - id: gate.claude.no_hook_assumption
+  - id: gate.claude.hook_claim_matches_config
     blocks: automation_claim
     pass_when:
-      - Claude Code goal ledger or checkpoint support is described as reminder/manual/runtime-query based
-      - no native hook behavior is claimed unless implemented elsewhere
+      - Claude Code hook behavior documented in ai-tools/agent/claude.md matches .claude/settings.json.
+      - Hook enforcement claims identify the implemented hook script and event.
+      - Manual /bootstrap is documented as fallback, not the primary path when hooks are active.
   - id: gate.claude.tool_specific_boundary
     blocks: reusable_doc_change
     pass_when:
@@ -72,26 +72,31 @@ gates:
   - id: gate.claude.entrypoint_thin
     blocks: claude_md_change
     pass_when:
-      - CLAUDE.md remains a bootstrap entrypoint and links to ai-tools/agent/claude.md for details
+      - CLAUDE.md remains a Claude-specific bootstrap entrypoint with any enforcement exception documented in ai-tools/agent/claude.md.
+      - Shared thin-entrypoint policy does not need to name Claude-specific exceptions.
 
 required_evidence:
   - CLAUDE.md and ai-tools/agent/claude.md readback when changed
+  - .claude/settings.json and touched hook scripts readback when hook behavior changes
   - runtime validation when execution-affecting adapter contract changes
   - final git status after writeback
 
 success_criteria:
-  - Claude Code loads CLAUDE.md, CORE_BOOTSTRAP.md, README.md, ai-tools/agent/claude.md, and runtime/runtime.db as appropriate.
-  - Claude-specific limitations are explicit and do not overwrite shared enforcement rules.
+  - Claude Code loads CLAUDE.md, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, ai-tools/agent/claude.md, and .claude settings as appropriate.
+  - Claude-specific hook enforcement is explicit, implemented, and isolated from shared thin-entrypoint rules.
   - Tool-specific content stays in the adapter layer.
   - Execution-affecting adapter changes are projected and validated.
 
 failure_modes:
-  - id: claude_hook_capability_assumed
-    detection: Documentation claims Claude Code hooks enforce goal ledger or checkpoint automatically.
-    recovery: Reword as CLAUDE.md reminder, runtime query, or external script behavior.
+  - id: claude_hook_capability_drift
+    detection: Documentation claims Claude Code hook behavior that .claude/settings.json or .claude/hooks/* does not implement.
+    recovery: Update the adapter docs to match implemented hooks or add and validate the missing hook.
   - id: claude_rules_duplicated_in_root
     detection: CLAUDE.md duplicates long adapter rules instead of linking to ai-tools/agent/claude.md.
     recovery: Move detail to adapter doc and keep CLAUDE.md as bootstrap entrypoint.
+  - id: claude_exception_leaks_to_shared_rule
+    detection: Shared ai-tools or enforcement docs name Claude-specific hook exceptions instead of leaving the exception in the Claude adapter.
+    recovery: Move the exception rationale back to ai-tools/agent/claude.md and keep shared docs generic.
   - id: tool_specific_content_leaks_to_shared_rule
     detection: Claude-only path, setting, or UI detail is added to generic enforcement or workflow docs.
     recovery: Move detail back to ai-tools/agent/claude.md and keep shared docs tool-neutral.

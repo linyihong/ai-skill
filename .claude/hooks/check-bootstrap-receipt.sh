@@ -33,12 +33,8 @@ transcript_path = payload.get("transcript_path", "")
 
 print(f"DIAG tool={tool_name!r} transcript={transcript_path!r}", file=sys.stderr)
 
-# Read-family tools are always allowed (needed for bootstrap itself)
-READ_TOOLS = {"Read", "Glob", "Grep", "LS", "Bash"}
-# Allow bash only when it looks like a read-only command — we can't inspect args
-# here easily, so we allow Bash through and rely on behavioral obligation.
-# The key gate is: first non-trivial tool must come after Bootstrap Receipt.
-# We treat Read as the only always-safe passthrough; all others require receipt.
+# Read is the only always-safe passthrough before Bootstrap Receipt.
+# Other tools require receipt, except the short-lived SessionStart flag path below.
 ALWAYS_ALLOW = {"Read"}
 
 if tool_name in ALWAYS_ALLOW:

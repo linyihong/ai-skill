@@ -104,7 +104,7 @@ if [[ $exit_code -eq 0 ]]; then
 fi
 
 cat >&2 <<'REASON'
-[ai-skill Stop hook] Missing obligation: your final response did not include the `### Cognitive Mode 報告` block.
+[ai-skill Stop hook] Missing obligation: your final response did not include a Cognitive Mode report.
 
 Per runtime/core-bootstrap.yaml §per_turn_obligations[obligation.cognitive.mode_report], every final user-facing response MUST end with a Cognitive Mode block (compact 1-line for trivial all-default tasks: `Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>`; full 6-row markdown table otherwise).
 

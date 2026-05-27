@@ -18,12 +18,11 @@ activation:
   triggers:
     - {"matches":["write-documentation","create-template","update-readme","create-enforcement-rule"],"type":"task_intent"}
     - {"pattern":"enforcement/**","type":"file_change"}
-    - {"pattern":"ai-tools/agent/**","type":"file_change"}
     - {"pattern":"workflow/**/execution-flow.md","type":"file_change"}
   required_when:
     - "Reusable rules, skills, templates, indexes, feedback lessons, workflow docs, or analysis/intelligence docs are created or updated."
     - "Tool-specific paths, hooks, commands, UI labels, or sync steps appear in reusable docs."
-    - "Agent entrypoints or ai-tools/agent adapters are created or updated."
+    - "Agent entrypoints or ai-tools/agent adapters start duplicating shared bootstrap, workflow, or enforcement content."
 
 required_sources:
   - enforcement/tool-neutral-documentation.md
