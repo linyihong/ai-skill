@@ -1,0 +1,11 @@
+id: agent.copilot
+name: copilot-adapter
+description: Thin adapter for Copilot startup; points to canonical bootstrap sources
+start_command: scripts/ai-skill-cli/ai-skill-cli  # replace with project-local start command if present
+healthcheck: "echo ok"
+required_files:
+  - CORE_BOOTSTRAP.md
+  - runtime/core-bootstrap.yaml
+notes: |
+  - Use <AI_SKILL_REPO> or <repo-root> placeholders instead of absolute paths.
+  - Do not include secrets or local-only paths. Keep adapter thin; point to central sources.
