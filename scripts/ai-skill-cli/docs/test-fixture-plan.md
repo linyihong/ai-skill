@@ -101,7 +101,8 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 
 - 讀取 [`script-parity-inventory.md`](script-parity-inventory.md)。
 - 對每個標記為 `native target` 或 `wrapper first` 的舊入口建立 fixture expectation。
-- 對高風險路徑建立至少一個正向或負向案例：`init-project`、`goals`、`hooks install`、`sync-cursor-bundle`、`close-loop`、`runtime refresh`、`runtime compile`、`runtime validate`、`runtime query`。
+- 對高風險路徑建立至少一個正向或負向案例：`init-project`、`goals`、`hooks install`、`sync-cursor-bundle`、`close-loop`、`runtime refresh`、`runtime compile`、`runtime validate`、`runtime query`、`runtime audit`。
+- `runtime audit` fixture 必須覆蓋 4-way 分類路徑（auto-detected / consumed / intentionally-manual / orphan）、markdown 與 `--json` 雙渲染、pipe 字元 escape，以及 `runtime validate` 引用 audit 為 warning-only check 的整合。
 
 斷言：
 

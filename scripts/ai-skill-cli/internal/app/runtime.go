@@ -133,11 +133,11 @@ type runtimeIndexEdge struct {
 
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query|obligations> [flags]")
+		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query|obligations|audit> [flags]")
 		return ExitInvalidUsage
 	}
 	opts := runtimeOptions{command: args[0], limit: 8}
-	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" && opts.command != "query" && opts.command != "obligations" {
+	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" && opts.command != "query" && opts.command != "obligations" && opts.command != "audit" {
 		_, _ = fmt.Fprintf(stderr, "unsupported runtime command: %s\n", opts.command)
 		return ExitInvalidUsage
 	}
@@ -168,6 +168,10 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	if opts.jsonOutput && opts.plainOutput {
 		_, _ = fmt.Fprintln(stderr, "--json and --plain are mutually exclusive")
 		return ExitInvalidUsage
+	}
+
+	if opts.command == "audit" {
+		return runRuntimeAudit(opts, stdout, stderr)
 	}
 
 	result := buildRuntimeResult(opts)
@@ -360,6 +364,10 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 		}
 		return result
 	}
+
+	auditCheck := nativeRuntimeAuditWarning(repo)
+	result.Checks = append(result.Checks, auditCheck)
+	result.PlannedActions = append(result.PlannedActions, "summarise runtime audit orphans as a warning")
 
 	return result
 }

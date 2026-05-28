@@ -38,6 +38,7 @@
 | `ai-skill runtime validate` | 驗證 runtime.db、knowledge runtime、SQLite assertions | 否 | 否 | Phase 3 |
 | `ai-skill runtime query` | 查詢 runtime index / generated surfaces | 否 | 否 | Phase 3 |
 | `ai-skill runtime obligations` | 列出目前 active bootstrap obligations（per_session / per_turn / per_commit），從 `generated_surfaces[runtime.core_bootstrap.contract]` 讀取 | 否 | 否 | bootstrap-yaml-migration Phase 3 |
+| `ai-skill runtime audit` | 4-way 分類 routes / generated_surfaces / scenarios（auto-detected / consumed / intentionally-manual / orphan）。預設 markdown 報告；`--json` 切換 JSON。`runtime validate` 自動以 warning-only check 引用其 orphan 統計 | 否 | 否 | gen3-runtime-trigger-audit Phase 2 |
 | `ai-skill glossary validate` | 驗證 `knowledge/glossary/*.md` 的 entry schema、status / owner / relation enum、naming convention、alias 規則、`introduced-by` / `deprecated-by` 形狀、symmetric relation 對稱性與 `excludes` 引用 | 否 | 否 | context-language-glossary-system Phase 2 |
 | `ai-skill roo set-global-custom-instructions` | guarded 寫入 Roo Code 全域 Custom Instructions | 是 | 否 | Tool adapter |
 | `ai-skill copilot start` | 產生 GitHub Copilot 新 session 第一則 bootstrap prompt | 否 | 否 | Tool adapter |
@@ -419,6 +420,30 @@
 - 若 `runtime.core_bootstrap.contract` projection 不存在 → exit 30 並提示執行 `ai-skill runtime compile + refresh`。
 - 不可修改 runtime.db 或 generated surfaces。
 - 用途：debug "為什麼 commit-msg hook 擋我" + Phase 6 per-obligation dispatcher 對齊 hook 與 contract。
+
+### `ai-skill runtime audit`
+
+目的：對 `knowledge/runtime/routing-registry.yaml` routes、`runtime/runtime.db` `generated_surfaces` 與 `validation/scenarios/**/*.yaml` 進行 4-way 分類（auto-detected / consumed / intentionally-manual / orphan），以揭露違反 `governance/lifecycle/system-upgrade-governance.yaml` §`define_runtime_trigger_flow` forbidden rules 的 orphan 條目。Source-of-truth 是上述三個 surface；本 command read-only。
+
+輸入：
+
+- `--repo <path>`
+- `--json`（預設輸出 markdown 報告；`--json` 切換 JSON inventory）
+- `--plain`
+
+副作用：無。
+
+必要行為：
+
+- 預設輸出三表 markdown 報告（routes / generated surfaces / validation scenarios）+ summary 計數表 + orphan_total。
+- `--json` 輸出 `Inventory` struct（含 `routes` / `surfaces` / `scenarios` / `summary` / `warnings` 欄位）。
+- 分類規則：
+  - **manual_activation**：routing-registry entry 含 `manual_activation: { reason: ... }` annotation。
+  - **auto-detected via signal**：`runtime/cognitive-modes-discovery.yaml` 任一 signal description / pattern 提及該 route id。
+  - **consumed**：`scripts/ai-skill-cli/**/*.go` 任一 Go 檔案內容包含該 route id / target_key / scenario id。
+  - **orphan**：以上皆否。
+- `ai-skill runtime validate` 自動以 warning-only check `runtime_audit_warning` 引用其 orphan 統計；audit 自身失敗不阻斷 validate。
+- 不可修改 runtime.db、routing-registry 或 generated surfaces。
 
 ### `ai-skill glossary validate`
 
