@@ -294,3 +294,58 @@ final_status_report:
     - runtime_validation
     - commit_and_push_status
     - readback_and_clean_status
+
+pre_2026_05_28_doc_only_completion:
+  status: active
+  introduced_by: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md (Phase 3)
+  rationale: |
+    The §define_runtime_trigger_flow forbidden rules were strengthened on
+    2026-05-28 to ban routing_registry_entry_without_discovery_signal_or_commit_validator
+    and sqlite_projection_without_routable_or_validator_consumer. Several
+    archived plans completed before that date carry routes / generated
+    surfaces / scenarios that satisfy the old "completed" bar but violate
+    the strengthened bar (no consumer / no signal). This flag exempts
+    those plans from retroactive re-opening while plans/README.md
+    re-labels them as "⚠️ completed (doc-only / pre-2026-strengthened)"
+    so the discrepancy stays visible.
+  primary_sunset: "2026-08-31"
+  conditional_extension_sunset: "2026-11-30"
+  conditional_extension_trigger:
+    description: |
+      The primary_sunset auto-extends to conditional_extension_sunset
+      iff at least one of these conditions holds on 2026-08-15
+      (two weeks before primary sunset):
+    conditions:
+      - audit_tool_age_lt_60_days
+      - phase_4_high_priority_wires_incomplete
+  post_sunset_evaluation_rule: |
+    On the active sunset date, every doc-only plan listed below must
+    either (a) be wired so its route / surface / scenario classifies
+    as auto-detected / consumed / intentionally-manual under
+    `ai-skill runtime audit`, or (b) be downgraded to orphan and
+    removed from routing-registry.yaml + generated_surfaces. No
+    indefinite extension; the flag itself is sunsetted on this date
+    regardless of remaining doc-only items.
+  covered_plans:
+    - path: plans/archived/2026-05-20-1501-cognitive-state-evidence-governance.md
+      orphan_surfaces:
+        - route.governance.cognitive-state-evidence
+        - enforcement.evidence_hierarchy.contract
+      phase_4_candidate: true
+      wire_plan: add validateEvidenceHierarchy commit-msg validator (must wire candidate per plan §Phase 4)
+    - path: plans/archived/2026-05-20-1745-memory-retrieval-activation-governance.md
+      orphan_surfaces:
+        - route.memory.retrieval-activation
+      phase_4_candidate: true
+      wire_plan: add discovery signal in runtime/cognitive-modes-discovery.yaml OR Go consumer
+    - path: plans/archived/2026-05-20-1802-model-aware-execution-routing.md
+      orphan_surfaces:
+        - route.models.model-aware-routing
+      phase_4_candidate: true
+      wire_plan: add commit-msg validator referencing model selection contract OR discovery signal
+    - path: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
+      orphan_surfaces:
+        - route.runtime.cognitive-modes
+      phase_4_candidate: false
+      wire_plan: candidate for manual_activation annotation (route is consumed by validators that match on file path, not by route lookup)
+  related_scenario: validation/scenarios/failure-derived/pre-2026-grandfather-coverage-v1.yaml

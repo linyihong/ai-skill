@@ -299,16 +299,16 @@ observable evidence:
 
 ### Tasks
 
-- [ ] `governance/lifecycle/system-upgrade-governance.yaml` 新增 §`pre_2026_05_28_doc_only_completion` section：列出受 grandfather 保護的 archived plans + sunset deadline **2026-08-31** + 條件式延展條款（若 `ai-skill runtime audit` tool age < 60 天 OR Phase 4 未完成，自動延至 **2026-11-30**）+ sunset 後評估規則（剩餘 doc-only items 須升 auto-detected/consumed 或降 orphan 下架）
-- [ ] `plans/README.md` 模板更新：plan 狀態 enum 從 `✅ completed` / `🚧 draft` 擴成 4-way（`✅ completed (auto-detected)` / `⚠️ completed (doc-only / pre-2026-strengthened)` / `🚧 in-progress` / `❌ orphan`）
-- [ ] 既有 archived plans 中受 grandfather 保護者，標 `⚠️ completed (doc-only)`；以 `cognitive-state-evidence-governance` 為首案
-- [ ] Run scenario `pre-2026-grandfather-coverage-v1` 驗證
+- [x] `governance/lifecycle/system-upgrade-governance.yaml` 新增 §`pre_2026_05_28_doc_only_completion` section：列出 4 個受 grandfather 保護的 archived plans + sunset deadline **2026-08-31** + 條件式延展條款（若 `ai-skill runtime audit` tool age < 60 天 OR Phase 4 未完成，自動延至 **2026-11-30**）+ sunset 後評估規則
+- [x] `plans/README.md` 原則 4 更新為 4-way enum（`draft` / `in-progress` / `completed (auto-detected)` / `completed (doc-only / pre-2026-strengthened)`）
+- [x] 4 個 archived plans 重新標 `⚠️ completed (doc-only / pre-2026-strengthened)`：cognitive-state-evidence-governance / memory-retrieval-activation-governance / model-aware-execution-routing / runtime-cognitive-modes-system
+- [ ] Run scenario `pre-2026-grandfather-coverage-v1` 驗證（執行於 Phase 4 補 wire 後）
 
 ### Phase 3 完成條件
 
-- [ ] Grandfather YAML active
-- [ ] plans/README.md 4-way enum 上線
-- [ ] 至少 3 個 archived plans 重新標記
+- [x] Grandfather YAML active
+- [x] plans/README.md 4-way enum 上線
+- [x] 4 個 archived plans 重新標記（超過下限 3 個）
 
 ---
 
