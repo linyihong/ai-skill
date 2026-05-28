@@ -22,6 +22,7 @@
 ./bin/ai-skill-darwin-arm64 doctor --json
 ./bin/ai-skill-darwin-arm64 doctor --check-runtime --json
 ./bin/ai-skill-darwin-arm64 runtime validate --repo ../.. --json
+./bin/ai-skill-darwin-arm64 glossary validate --repo ../.. --json
 ```
 
 Phase 1 / Phase 3 採用 [`modernc.org/sqlite`](docs/dependency-policy.md) 作為 pure Go SQLite engine；`doctor --check-runtime` 已覆蓋 in-memory 與 temporary file-backed write / query / integrity proof。Git 維持 desktop external dependency；runtime core path 不依賴 Ruby、Python 或外部 `sqlite3` CLI。
