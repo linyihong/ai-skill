@@ -114,14 +114,34 @@ steps:
       - observable_evidence
     forbidden:
       - routing_only_without_detector_or_action
+      - routing_registry_entry_without_discovery_signal_or_commit_validator
+      - sqlite_projection_without_routable_or_validator_consumer
       - agent_will_read_when_needed
       - future_runtime_route_without_phase_or_entry_condition
       - file_paths_without_event_detector_action_and_evidence
+    forbidden_detail:
+      routing_registry_entry_without_discovery_signal_or_commit_validator: >
+        Adding a `route.*` entry to knowledge/runtime/routing-registry.yaml is
+        insufficient on its own. The plan must also wire at least one of
+        (a) a discovery signal in runtime/cognitive-modes-discovery.yaml that
+        causes the routing system to load this route automatically, or
+        (b) a commit-msg / pre-commit validator that activates when the
+        relevant file diff is staged. A bare route entry is "routing only
+        without detector or action" and rejected.
+      sqlite_projection_without_routable_or_validator_consumer: >
+        Projecting data into runtime/runtime.db generated_surfaces or into
+        a SQLite index table is not, by itself, runtime integration. The
+        plan must also declare at least one consumer: a CLI / hook /
+        validator that queries the projection, or a routable lookup that
+        activates the projection in response to a signal. Otherwise the
+        projection is decoration, not enforcement.
     doc_only_trial_requires:
       - explicit_statement_this_plan_does_not_enter_runtime
       - reason
       - future_activation_phase_and_entry_condition
       - drift_prevention_during_trial
+      - graduation_deadline_or_signal_no_indefinite_trial
+      - explicit_acknowledgement_doc_only_trial_does_not_count_as_runtime_integration
     gates:
       - gate.system_upgrade.runtime_trigger_flow_complete
 

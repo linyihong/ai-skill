@@ -296,18 +296,26 @@ Usage discovery policy:
 | Runtime owner | Phase 1-4：Markdown canonical source + manual workflow reads；Phase 5：existing runtime index generator + framework-approved semantic projection + runtime reports；Phase 5+ 若需要 blocking gate，再新增 owner-layer executable contract。 |
 | Trigger flow | Phase 1-4：user asks for framework / workflow / term / source-of-truth clarification → `pre-build-interrogation` or software-delivery route loads candidate sources → glossary source is manually read as dependency evidence → plan final report lists glossary decision / no duplication evidence.<br>Phase 5 semantic projection：file_diff or user_signal contains glossary / term conflict / ubiquitous language / source-of-truth wording → `route.knowledge.glossary` or semantic index query detects glossary candidate → query `glossary_terms` / `glossary_relations` / `glossary_usage` → load canonical `knowledge/glossary/*.md` owner entry + related workflow / validation / plan sources → run glossary drift / semantic overlap scenarios → block completion if owner, alias, deprecated term, or memory/project boundary conflicts. |
 | Trigger location | Phase 1-4：`pre-build-interrogation`、`route.workflow.software-delivery`、agent dependency-read ledger；Phase 5：`file_diff`、`user_signal`、runtime semantic index lookup、future `route.knowledge.glossary`。 |
-| Activation contract | 初期無新 executable contract；使用既有 `workflow.software_delivery.pre_build_interrogation.contract` 作 plan 前 gate。若 Phase 5 決定 glossary 使用需要 blocking gate，再補 owner-layer YAML。 |
+| Activation contract | Phase 1-5：無新 executable contract；使用既有 `workflow.software_delivery.pre_build_interrogation.contract` 作 plan 前 gate。Phase 6：新增 (a) `cognitive-modes-discovery.yaml` 中 `file_diff_glossary_touched` + `user_keyword_term_conflict` 兩個 discovery signals 與 `route.knowledge.glossary` 關聯；(b) `commit-msg` validator `validateGlossaryRetroOwn`，當 staged diff 動到 `runtime/cognitive-modes*.yaml` / `runtime/economics/**` / `ecosystem/**` 但沒同時 stage `knowledge/glossary/ai-skill.md` 時 block，opt-out marker `[skip-glossary-retro-own]`。 |
 | Generated surface | 初期不投影 executable contract；Phase 5 建立 framework-approved semantic projection（候選為 dedicated SQLite、既有 runtime index extension 或 runtime-owned projection table），並在 runtime reports 記錄 glossary source / route / validation coverage。若新增 executable contract，target_key 需另定。 |
 | Validation scenarios | Phase 1 先新增：`validation/scenarios/failure-derived/glossary-source-duplication-v1.yaml`、`validation/scenarios/failure-derived/memory-context-language-as-canonical-v1.yaml`、`validation/scenarios/failure-derived/semantic-term-overlap-v1.yaml`。 |
 | Test passing evidence | `ai-skill runtime refresh --native-index --native-reports`、`ai-skill runtime validate --json`、scenario / lints / diff review。 |
 
-### Doc-only Trial 聲明
+### Doc-only Trial 聲明（Phase 1-5）+ Runtime Graduation（Phase 6）
 
-本 plan 初期不接入新的 runtime execute layer。理由：
+**Phase 1-5 為 doc-only trial**，初期不接入新的 runtime execute layer。理由：
 
 - Shared language 先是 knowledge source，不是 blocking runtime gate。
 - 現有 `pre-build-interrogation` 已能在 plan 前阻擋 source-of-truth duplication。
 - 若未先驗證 glossary scope，直接做 runtime blocking contract 會增加 noise。
+
+**Graduation 條件已達成（2026-05-28）**：
+
+- Schema spec、validator、19 entries、SQLite projection 與 5 條 query 已全綠
+- `route.knowledge.glossary` 已存在於 `routing-registry.yaml`
+- 沒有 entry schema 之外的機械強制 → 仍構成 [`governance/lifecycle/system-upgrade-governance.yaml`](../../governance/lifecycle/system-upgrade-governance.yaml) §`define_runtime_trigger_flow` 的 `routing_only_without_detector_or_action` 與 `sqlite_projection_without_routable_or_validator_consumer` 違規
+
+→ 因此本 plan **不能在 Phase 5 後直接 close-loop**，必須先完成 **Phase 6 Runtime Auto-Detect Integration**（見下方）才能 graduate；否則違反 doc-only trial 的 `graduation_deadline_or_signal` 與 `explicit_acknowledgement_doc_only_trial_does_not_count_as_runtime_integration` 規則。
 
 未來接入時機：
 
@@ -534,7 +542,40 @@ knowledge/glossary/
 
 ---
 
-## Phase 6 Close Loop
+## Phase 6 Runtime Auto-Detect Integration（graduation gate）
+
+> 為什麼新增此 phase：Phase 5 完成 SQLite projection 與 `route.knowledge.glossary` 後，[`system-upgrade-governance.yaml`](../../governance/lifecycle/system-upgrade-governance.yaml) §`define_runtime_trigger_flow` 的 `routing_only_without_detector_or_action` 與 `sqlite_projection_without_routable_or_validator_consumer` 仍未被滿足 — route 存在但無 detector / projection 存在但無 consumer。本 phase 把 trigger chain（event → detector → loaded source → runtime action → evidence）的缺失環節補齊。
+
+### Trigger Chain（為何此 phase 是必要的）
+
+| Chain 元素 | Phase 5 完成度 | Phase 6 補上 |
+| --- | --- | --- |
+| event_or_signal | ❌ 沒 signal | ✅ `file_diff_glossary_touched`、`user_keyword_term_conflict` |
+| detector | ⚠️ route 有，但沒 signal 拉它 | ✅ discovery signal wire route + `validateGlossaryRetroOwn` commit-msg validator |
+| loaded_source_or_executable_contract | ✅ `route.knowledge.glossary` 已在 routing-registry | （已完成）|
+| runtime_action_or_blocking_gate | ❌ 無 | ✅ Validator `validateGlossaryRetroOwn` block commit；signal escalate `context_mode` 至 `SOURCE_BACKED` |
+| observable_evidence | ⚠️ 只能用 SQL 手動驗 | ✅ 新 validation scenario `glossary-retro-own-missing-v1.yaml` |
+
+### Tasks
+
+- [ ] 新增 discovery signal：在 [`runtime/cognitive-modes-discovery.yaml`](../../runtime/cognitive-modes-discovery.yaml) 加 `file_diff_glossary_touched`（trigger: staged diff includes `knowledge/glossary/**` 或 `runtime/cognitive-modes*.yaml`）與 `user_keyword_term_conflict`（trigger: user prompt 含 "glossary" / "term conflict" / "ubiquitous language" / "shared language" / "owner-layer"）；兩個 signal 都 escalate `context_mode → SOURCE_BACKED` 並 load `route.knowledge.glossary`。
+- [ ] 新增 commit-msg validator `validateGlossaryRetroOwn`：staged diff 動到 `runtime/cognitive-modes*.yaml` / `runtime/economics/**` / 未來 `ecosystem/**` 但沒同時 stage `knowledge/glossary/ai-skill.md` → block with exit 30；opt-out trailer `[skip-glossary-retro-own]`，需在 commit message 說明為何此次 framework 改動不需 retro-own term。Validator dispatch 走 `scripts/ai-skill-cli/internal/app/hooks.go` registry。
+- [ ] 新增 validation scenario `validation/scenarios/failure-derived/glossary-retro-own-missing-v1.yaml`：framework term 引入 runtime YAML 但無對應 glossary entry → 預期被 validator block。
+- [ ] 升級 [`runtime/cli-modification-policy.yaml`](../../runtime/cli-modification-policy.yaml)：把 `gate.glossary.retro_own_required` 列入 commit-msg gates，opt-out marker `[skip-glossary-retro-own]`。
+- [ ] 更新 [`scripts/ai-skill-cli/docs/command-contract.md`](../../scripts/ai-skill-cli/docs/command-contract.md) 加新 validator description；更新 [`bdd-scenarios.md`](../../scripts/ai-skill-cli/docs/bdd-scenarios.md) 加 retro-own 場景；更新 [`test-fixture-plan.md`](../../scripts/ai-skill-cli/docs/test-fixture-plan.md) 加 fixture。
+- [ ] Go tests for `validateGlossaryRetroOwn` (happy path / block path / opt-out path)；bin rebuild 兩段 commit。
+
+### Phase 6 完成條件
+
+- [ ] Discovery signals 已 wire 並可被 `cognitive-modes-discovery.yaml` parser 讀到；route auto-load 可由 file_diff 觸發
+- [ ] `validateGlossaryRetroOwn` commit-msg hook 上線；本地 sample test 證明 block + opt-out
+- [ ] `glossary-retro-own-missing-v1.yaml` scenario 通過 `runtime validate`
+- [ ] §Runtime Execution Path Activation contract 描述與實際 wired 行為一致
+- [ ] [`governance/lifecycle/system-upgrade-governance.yaml`](../../governance/lifecycle/system-upgrade-governance.yaml) §`define_runtime_trigger_flow` 的 5-element chain 全部滿足，無 forbidden 違規
+
+---
+
+## Phase 7 Close Loop
 
 ### Tasks
 
