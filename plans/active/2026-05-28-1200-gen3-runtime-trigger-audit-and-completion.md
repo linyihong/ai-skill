@@ -1,6 +1,6 @@
 # Gen 3 Runtime Trigger Audit & Completion
 
-**Status**: `draft`
+**Status**: `in-progress` (Phase 1 + Phase 2 完成；Phase 3 起跑中)
 **世代**：Gen 3 收斂（不是 Gen 4 forward；是「把第三代真正做完」）
 **建立日期**：2026-05-28
 **最後更新**：2026-05-28（Open Questions → Resolved Decisions）
@@ -253,21 +253,21 @@ observable evidence:
 
 ### Tasks
 
-- [ ] 新增 `validation/scenarios/failure-derived/orphan-routing-entry-v1.yaml`
-- [ ] 新增 `validation/scenarios/failure-derived/orphan-projection-target-key-v1.yaml`
-- [ ] 新增 `validation/scenarios/failure-derived/orphan-scenario-unreferenced-v1.yaml`
-- [ ] 新增 `validation/scenarios/failure-derived/pre-2026-grandfather-coverage-v1.yaml`
-- [ ] 新增 `validation/scenarios/failure-derived/framework-glossary-candidate-missing-v1.yaml`
-- [ ] 鎖定 `validation/scenario.schema.json` 為 5 個 scenarios 的 single source；schema 變更走 governance §3 規則 8
-- [ ] 每個 scenario 綁定一個 Go fixture test stub（在 Phase 2 / 5 填實作），CI 驗證 YAML ↔ hook 行為一致
-- [ ] `ai-skill runtime refresh` + `runtime validate` 確認 scenarios 進 inventory
+- [x] 新增 `validation/scenarios/failure-derived/orphan-routing-entry-v1.yaml`（commit `be87b63`）
+- [x] 新增 `validation/scenarios/failure-derived/orphan-projection-target-key-v1.yaml`（commit `be87b63`）
+- [x] 新增 `validation/scenarios/failure-derived/orphan-scenario-unreferenced-v1.yaml`（commit `be87b63`）
+- [x] 新增 `validation/scenarios/failure-derived/pre-2026-grandfather-coverage-v1.yaml`（commit `be87b63`）
+- [x] 新增 `validation/scenarios/failure-derived/framework-glossary-candidate-missing-v1.yaml`（commit `be87b63`）
+- [x] 鎖定 `validation/scenario.schema.json` 為 5 個 scenarios 的 single source；governance YAML §`write_test_first_scenarios` 加 `scenario_schema_single_source` 子句（commit `be87b63`）
+- [x] 每個 scenario 綁定 Go fixture test stub（`scripts/ai-skill-cli/internal/audit/scenarios_stub_test.go`，commit `be87b63`）
+- [x] `ai-skill runtime refresh` + `runtime validate` 全綠
 
 ### Phase 1 完成條件
 
-- [ ] 5 個 scenarios 符合 `validation/scenario.schema.json`
-- [ ] Schema lock 條款寫入 governance YAML
-- [ ] 每個 scenario 對應 fixture test stub 存在
-- [ ] Runtime validate 通過
+- [x] 5 個 scenarios 符合 `validation/scenario.schema.json`
+- [x] Schema lock 條款寫入 governance YAML（§`write_test_first_scenarios.scenario_schema_single_source`）
+- [x] 每個 scenario 對應 fixture test stub 存在
+- [x] Runtime validate 通過
 
 ---
 
@@ -275,21 +275,23 @@ observable evidence:
 
 ### Tasks
 
-- [ ] 新 Go package `scripts/ai-skill-cli/internal/audit/`：parser for routing-registry / cognitive-modes-discovery / runtime.db generated_surfaces / hooks.go validators / scenarios dir
-- [ ] 定義 4-way classification rules：(a) auto-detected via signal, (b) consumed via validator/hook, (c) intentionally manual（explicit `manual_activation` annotation in source）, (d) orphan
-- [ ] 加入 glossary coverage warning pass：讀 `knowledge/runtime/sqlite/runtime-index.sqlite` 的 `glossary_terms` / aliases，掃 staged 或 active plan diff 中 `plans/active/`、`architecture/`、`workflow/`、`analysis/`、`intelligence/`、`runtime/`、`ecosystem/` 的 backtick snake_case / framework-looking terms；只輸出 candidate warnings，不寫入 glossary、不阻擋 commit
-- [ ] 新增 `ai-skill runtime audit` subcommand：**預設輸出 markdown 報告**（routes / surfaces / scenarios 三表，供 PR review 直接 render），`--json` flag 切換 JSON 輸出（供 CI / tool 消費）；Go 端共用同一 inventory struct，雙渲染
-- [ ] Glossary coverage term heuristic 限制：只掃 backtick-wrapped terms + snake_case ≥ 2 segments；自然語言短詞（單一英文單字、中文等）排除以避免 false positive
-- [ ] 接入 `ai-skill runtime validate`：把 audit warnings 列為 checks（warning 不 block）
-- [ ] Update CLI docs（command-contract / bdd-scenarios / test-fixture-plan）
-- [ ] Go tests
+- [x] 新 Go package `scripts/ai-skill-cli/internal/audit/`：parser for routing-registry / cognitive-modes-discovery / runtime.db generated_surfaces / hooks.go validators / scenarios dir（commit `0f53e91`）
+- [x] 定義 4-way classification rules：(a) auto-detected via signal, (b) consumed via validator/hook, (c) intentionally manual（explicit `manual_activation` annotation in source）, (d) orphan
+- [x] 加入 glossary coverage warning pass：讀 `glossary_terms` / aliases，掃 7 個路徑下 backtick / snake_case ≥ 2 segments terms；warning-only（commit `642bfe2`）
+- [x] 新增 `ai-skill runtime audit` subcommand：預設 markdown，`--json` flag 切換；Go 端共用 inventory struct 雙渲染
+- [x] Glossary coverage term heuristic 限制：backtick-wrapped + snake_case ≥ 2 segments；含 `/` 的 path references、單一英文短詞排除
+- [x] 接入 `ai-skill runtime validate`：`runtime_audit_warning` warning-only check
+- [x] Update CLI docs（command-contract ✓、test-fixture-plan ✓、bdd-scenarios ✓）
+- [x] Go tests（24 個全綠）
 
 ### Phase 2 完成條件（Graduation #1）
 
-- [ ] `ai-skill runtime audit --json` exit 0 + 完整分類報告
-- [ ] `ai-skill runtime validate` checks 含 audit warnings
-- [ ] Go tests cover happy / orphan-detected / classification-edge-cases
-- [ ] Glossary coverage warning tests cover: missing candidate, existing glossary term, alias match, workflow / intelligence / analysis path coverage
+- [x] `ai-skill runtime audit --json` exit 0 + 完整分類報告
+- [x] `ai-skill runtime validate` checks 含 audit warnings
+- [x] Go tests cover happy / orphan-detected / classification-edge-cases
+- [x] Glossary coverage warning tests cover: missing candidate, existing glossary term, alias match, workflow / intelligence / analysis path coverage
+
+**Baseline audit 結果**：routes 55/57 orphan、surfaces 67/73 orphan、scenarios 120/125 orphan、orphan_total=242（驗證 plan §Decision Rationale 對 doc-only 比例的假設）。
 
 ---
 
@@ -332,6 +334,7 @@ observable evidence:
 
 ### Tasks
 
+- [ ] **新增 `validatePlanCheckboxSync` Go validator**（sibling validator, 第 17 個 commit-msg validator）：當 staged diff 含 source code / test / scenario / generated_surface 變動且 commit message body 引用 `plans/active/<plan>.md`，檢查該 plan 同時 stage 且至少有一個 `[ ]` → `[x]` transition；缺則 emit warning（不 block，加 `[skip-plan-checkbox-sync]` opt-out 給純 hotfix）。理由：避免 agent / 開發者推進 phase 卻忘記翻 checkbox（本 plan 自身 Phase 1 + Phase 2 完成後正是這樣漏掉）
 - [ ] 新增 `validateRuntimeTriggerWiring` Go validator 在 `scripts/ai-skill-cli/internal/app/hooks.go`
 - [ ] 觸發條件：staged diff includes new `route.*` entry OR new `target_key` in runtime/*.yaml AND no paired discovery signal / validator / intentional manual annotation
 - [ ] Opt-out: `[skip-runtime-trigger-wiring]` for legitimate doc-only / refactor / annotation-only changes
@@ -344,10 +347,11 @@ observable evidence:
 
 ### Phase 5 完成條件（Graduation #2）
 
-- [ ] 第 16 個 commit-msg validator active
-- [ ] per_commit_obligations 含 `obligation.commit.runtime_trigger_wiring`
+- [ ] 第 16 個 commit-msg validator `validateRuntimeTriggerWiring` active
+- [ ] 第 17 個 commit-msg validator `validatePlanCheckboxSync` active（warning-only）
+- [ ] per_commit_obligations 含 `obligation.commit.runtime_trigger_wiring` 與 `obligation.commit.plan_checkbox_sync`
 - [ ] cli-modification-policy 新 gate active
-- [ ] Fixture tests green（含 block default / opt-out trailer）
+- [ ] Fixture tests green（含 block default / opt-out trailer / plan-checkbox transition 案例）
 
 ---
 

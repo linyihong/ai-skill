@@ -93,6 +93,34 @@
 **Then** 命令以 `unsafe_repo_state` 結束
 **And** 不建立 commit。
 
+## 場景：Runtime audit 4-way 分類產出 markdown 報告
+
+**Given** repo 含 `knowledge/runtime/routing-registry.yaml` routes、`runtime/runtime.db` `generated_surfaces` 與 `validation/scenarios/**/*.yaml`
+**When** 執行 `ai-skill runtime audit`（無 flag）
+**Then** stdout 為 markdown 報告，含三表（Routes / Generated surfaces / Validation scenarios）+ Summary count 表 + `Orphan total` 行
+**And** 每筆條目分類為 `auto-detected` / `consumed` / `intentionally-manual` / `orphan` 之一
+**And** evidence 欄位說明分類依據（discovery signal / Go consumer / manual_activation annotation / 缺消費者）
+**And** `--json` flag 切換成 `Inventory` JSON 結構，含 `routes` / `surfaces` / `scenarios` / `summary` / `warnings` 欄位
+**And** 命令不修改 runtime.db、routing-registry 或 generated surfaces。
+
+## 場景：Runtime validate 引用 audit warning 但不阻斷
+
+**Given** repo 中存在 orphan routes 或 surfaces
+**When** 執行 `ai-skill runtime validate`
+**Then** checks 含 `runtime_audit_warning` 條目，status `ok`，message 報出 `orphan_total=N (routes=A, surfaces=B, scenarios=C)`
+**And** validate 整體 status 仍為 success，exit 0
+**And** 詳細分類由 `ai-skill runtime audit` 取得。
+
+## 場景：Glossary coverage warning 提示新 framework 詞彙
+
+**Given** `plans/active/` / `architecture/` / `workflow/` / `analysis/` / `intelligence/` / `runtime/` / `ecosystem/` 路徑下某文件含 backtick-wrapped 或 snake_case ≥ 2 segments term
+**And** 該 term 不在 `knowledge/runtime/sqlite/runtime-index.sqlite` 的 `glossary_terms.term` / `aliases`
+**When** 執行 `ai-skill runtime audit`
+**Then** `inventory.warnings` 含 `glossary candidate ... (×N, first at <path>:<line>) not in glossary_terms or aliases` 條目
+**And** 條目依出現頻次降序排列，最多 50 條，超出者以截斷提示一行帶過
+**And** 純路徑（含 `/`）、單一英文短詞、< 3 char terms 不觸發 warning
+**And** 命令不修改 glossary，使用者自行決定補入或記錄理由。
+
 ## 場景：Glossary entry 通過 schema
 
 **Given** `knowledge/glossary/ai-skill.md` 包含一個 H2 heading（snake_case term）緊接 YAML code block，且 YAML 內 `term` / `status` / `meaning` / `affects` / `owner-layer` 皆合法
