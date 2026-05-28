@@ -7,6 +7,7 @@
 - [`indexes/`](indexes/README.md)：第一版 task intent routing table 與 navigation index format。
 - [`summaries/`](summaries/README.md)：未來 Knowledge Atom 與 source-of-truth 文件摘要格式；目前只定義格式。
 - [`graphs/`](graphs/README.md)：未來 atom、source、dependency、conflict、promotion 關係圖格式；目前只定義格式。
+- [`glossary/`](glossary/README.md)：Ai-skill framework / runtime / cognitive / architecture 共享語彙的 canonical 定義；schema spec + entries（`ai-skill.md`）；由 `ai-skill glossary validate` 機械強制。
 - [`runtime/`](runtime/README.md)：runtime-facing knowledge view 格式、邊界與第一版 machine-readable routing registry。
   - [`runtime/sqlite/`](runtime/sqlite/README.md)：SQLite / FTS generated lookup cache 規劃；用於低 token 搜尋候選 source，不作 source-of-truth。
 
