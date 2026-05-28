@@ -167,6 +167,27 @@ signals:
     priority: 30
     description: Token budget <15% → INDEX_ONLY context, clear memory mode
 
+  # ── glossary auto-detect signals (Phase 6 of context-language-glossary-system) ─
+  - name: file_diff_glossary_touched
+    signal_type: file_diff_scope
+    pattern: "^knowledge/glossary/|^runtime/cognitive-modes"
+    execution_mode: null
+    context_mode: SOURCE_BACKED
+    governance_mode: null
+    memory_mode: null
+    priority: 22
+    description: Diff touches knowledge/glossary/ or runtime/cognitive-modes → load glossary canonical (route.knowledge.glossary) + SOURCE_BACKED context
+
+  - name: user_keyword_term_conflict
+    signal_type: user_keyword
+    pattern: "glossary|term conflict|ubiquitous language|shared language|owner-layer|owner_layer|semantic drift|canonical term"
+    execution_mode: null
+    context_mode: SOURCE_BACKED
+    governance_mode: null
+    memory_mode: null
+    priority: 15
+    description: User signals glossary / term conflict / shared language alignment → load glossary canonical + SOURCE_BACKED context
+
 fallback:
   description: >
     No signal matched. Use 4 mode defaults from cognitive-modes.yaml.
