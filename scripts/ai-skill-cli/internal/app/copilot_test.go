@@ -38,6 +38,8 @@ func TestCopilotStartOutputsBootstrapPrompt(t *testing.T) {
 		"<AI_SKILL_REPO>/runtime/core-bootstrap.yaml",
 		"<AI_SKILL_REPO>/ai-tools/agent/copilot.md",
 		"Bootstrap Receipt",
+		"Before answering any user request",
+		"simple file listings",
 		"ai-skill runtime validate",
 	} {
 		if !strings.Contains(prompt, expected) {

@@ -29,4 +29,6 @@ notes: |
   Copilot instruction files and guided startup prompts guide the model back to
   canonical sources but do not reliably enforce runtime gates. Keep instructions
   thin, avoid local absolute paths, and rely on repository validation for hard
-  enforcement.
+  enforcement. Bootstrap reads are required before answering any user request;
+  simple file listings, read-only queries, explanation-only requests, and
+  resumed context are not exemptions.

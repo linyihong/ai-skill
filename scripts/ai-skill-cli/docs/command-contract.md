@@ -148,6 +148,7 @@
 必要行為：
 
 - prompt 必須指向 `<AI_SKILL_REPO>/CORE_BOOTSTRAP.md`、`<AI_SKILL_REPO>/runtime/core-bootstrap.yaml` 與 `<AI_SKILL_REPO>/ai-tools/agent/copilot.md`。
+- prompt 必須要求 Copilot 在回覆任何使用者請求前完成 bootstrap，不得把簡單列檔、read-only query、說明原因或 resumed context 視為豁免。
 - prompt 必須明確說明 Copilot instructions 是 guided startup，不是 hard enforcement；runtime gates 仍由 hooks、CI、`ai-skill runtime validate` 負責。
 - `init-project --tools copilot` 可產生 `.copilot/start-copilot.sh` 作為 temporary thin wrapper；wrapper 只能呼叫 repo-local `ai-skill copilot start`，並必須寫明 deletion/removal condition。
 

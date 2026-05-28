@@ -539,6 +539,10 @@ func initProjectCopilotInstructionsContent(repo string) (string, error) {
 
 本檔為 Copilot project-wide custom instructions 的 thin pointer。不要在此複製 bootstrap obligations、格式、enum、examples、goal ledger、close-loop 或 runtime phase 細節。
 
+## Mandatory Startup
+
+在回覆任何使用者請求前，必須先完成下方 Required Reads 並依 canonical bootstrap contract 回報 Bootstrap Receipt。不得因為請求看似只是列檔、簡單查詢、read-only、說明原因或已由對話摘要提供 context 而跳過 bootstrap。
+
 ## Local Resolution
 
 本專案由 `+"`ai-skill init-project`"+` 建立 `+"`.ai-skill/local.env`"+`。若 `+"`AI_SKILL_REPO`"+` 尚未存在，先讀該檔以 resolve `+"`%s`"+`，但不要把本機絕對路徑寫入此檔。
@@ -562,7 +566,7 @@ applyTo: "**"
 
 This scoped instruction file is a thin pointer for GitHub Copilot. Do not copy shared rules, bootstrap formats, runtime phase details, goal ledger procedures, or close-loop checklists here.
 
-Before acting on this repository, read:
+Before answering any user request in this repository, read these files and complete the canonical Bootstrap Receipt. Do not treat simple file listings, read-only queries, explanation-only requests, or resumed context as exemptions:
 
 1. `+"`%s/CORE_BOOTSTRAP.md`"+`
 2. `+"`%s/runtime/core-bootstrap.yaml`"+`

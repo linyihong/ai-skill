@@ -77,7 +77,7 @@ func buildCopilotStartResult(opts copilotOptions) Result {
 	prompt := copilotBootstrapPrompt(copilotProjectDisplay(project), repoHint.Message)
 	result.PlannedActions = append(result.PlannedActions,
 		"paste the generated bootstrap prompt as the first message in a new Copilot session",
-		"ask Copilot to read the canonical bootstrap sources before any non-read action",
+		"ask Copilot to read the canonical bootstrap sources before answering any user request",
 		"rely on repository hooks, CI, and ai-skill runtime validate as hard enforcement boundaries",
 	)
 	result.Results = append(result.Results, QueryResult{
@@ -126,7 +126,7 @@ func copilotBootstrapPrompt(project string, repoHint string) string {
 Project: %s
 Ai-skill repo: %s
 
-Before any non-read action:
+Before answering any user request, including simple file listings, read-only queries, explanation-only requests, or resumed-context follow-ups:
 
 1. Read <AI_SKILL_REPO>/CORE_BOOTSTRAP.md.
 2. Read <AI_SKILL_REPO>/runtime/core-bootstrap.yaml.

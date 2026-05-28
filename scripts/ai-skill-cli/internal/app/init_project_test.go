@@ -268,6 +268,14 @@ func TestInitProjectWritesCopilotBootstrap(t *testing.T) {
 			t.Fatalf("Copilot instructions must not copy Bootstrap Receipt examples, got %s", content)
 		}
 	}
+	if !strings.Contains(string(projectInstructions), "在回覆任何使用者請求前") ||
+		!strings.Contains(string(projectInstructions), "不得因為請求看似只是列檔") {
+		t.Fatalf("expected project instructions to make bootstrap mandatory before any request, got %s", string(projectInstructions))
+	}
+	if !strings.Contains(string(scopedInstructions), "Before answering any user request") ||
+		!strings.Contains(string(scopedInstructions), "simple file listings") {
+		t.Fatalf("expected scoped instructions to reject simple-query bootstrap exemptions, got %s", string(scopedInstructions))
+	}
 	for path, content := range map[string]string{
 		projectInstructionsPath: string(projectInstructions),
 		scopedInstructionsPath:  string(scopedInstructions),
