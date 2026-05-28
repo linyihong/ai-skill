@@ -53,6 +53,7 @@
 3. **Grandfather Flag**：governance YAML 加 `pre_2026_05_28_doc_only_completion` 註記；既有 archived plans 不溯及，但須在 plans/README.md 表格標 `⚠️ doc-only completion` 而不是 `✅ completed`
 4. **Wire High-Priority Orphans**：本 plan 不修全部 41 個 manual routes，只挑 5–10 個 **high-value** 補 signal / validator（criteria: blocking_level=blocking 但無 consumer / 高引用 governance contract / 經 audit tool 判定為高 drift 風險）；其他（intentionally manual）顯式標註
 5. **Future-Proofing**：所有未來新 plan 必須在 commit 時通過 `validateRuntimeTriggerWiring`（commit-msg validator，第 16 個）— 若 staged 新增 `route.*` 但無新 signal / validator stage，或新增 projection target_key 但無 consumer，block
+6. **Glossary Coverage Guardrail（warning-only）**：本 plan 不做全 repo blocking semantic scan，但 audit / plan-template 必須補一個 glossary impact check。當 staged diff 或 active plan 新增 framework-looking terms（snake_case / owner-layer / runtime-surface style）且不在 `glossary_terms` 或 aliases 中時，產生 candidate warning；掃描範圍包含 `plans/active/`、`architecture/`、`workflow/`、`analysis/`、`intelligence/`、`runtime/`、`ecosystem/`。此 guardrail 只提示「可能需要更新 `knowledge/glossary/ai-skill.md`」，不自動 canonicalize、不阻擋 commit。
 
 ### Alternatives Considered
 
@@ -180,6 +181,7 @@ observable evidence:
 | `runtime.audit.inventory_contract` | `ai-skill runtime audit` CLI + `ai-skill runtime validate` warning channel | CLI + runtime warning |
 | `runtime.audit.classification_rules` | `validateRuntimeTriggerWiring` commit-msg validator + scenario `orphan-routing-entry-v1` | commit-msg validator + scenario |
 | `runtime.audit.grandfather_flag` | plans/README.md status table renderer + scenario `pre-2026-grandfather-coverage-v1` | doc rendering + scenario |
+| `runtime.audit.glossary_coverage_warning` | `ai-skill runtime audit` warning channel + future plan template glossary impact row | CLI warning + plan review |
 
 ### Validation scenarios
 
@@ -187,12 +189,14 @@ observable evidence:
 - `orphan-projection-target-key-v1`：新 projection target_key 無 consumer → audit warn / commit-msg block
 - `orphan-scenario-unreferenced-v1`：新增 scenario 無 hook 引用 → audit warn（不 block，scenario 本身有獨立價值）
 - `pre-2026-grandfather-coverage-v1`：grandfather flag 範圍與 archived plans 一致 / sunset deadline 已設
+- `framework-glossary-candidate-missing-v1`：`plans/active/`、`architecture/`、`workflow/`、`analysis/`、`intelligence/`、`runtime/`、`ecosystem/` 新增 framework-looking term，但 `glossary_terms` / aliases 查不到 → audit warn（不 block，避免短詞 false positive）
 
 ### Test passing evidence
 
 - `ai-skill runtime audit --json` 輸出 4-way 分類報告
 - `ai-skill runtime validate` 將 audit warnings 納入 checks
 - `validateRuntimeTriggerWiring` fixture tests（happy / block / opt-out / warning-only mode）
+- Glossary coverage warning fixture：新增一個未收錄 snake_case framework term 時產生 candidate warning；已存在於 `glossary_terms` 或 alias 時不警告
 - 既有 archived plans 在 plans/README.md 表格顯示新 4-way status enum
 
 ---
@@ -207,6 +211,7 @@ observable evidence:
 | 4 | 4-way 分類的「intentionally manual」邊界 — workflow 性質的 route 全部算嗎？ | Phase 2 |
 | 5 | Audit tool 是否要產出 markdown 報告供 PR review 使用，或只 JSON？ | Phase 2 |
 | 6 | 新 scenario 是否要走 `runtime/audit/*.yaml` executable contract，或純 markdown？ | Phase 1 |
+| 7 | Glossary coverage warning 的 term heuristic 要多保守？是否只掃 snake_case / backtick terms，避免自然語言短詞 false positive？ | Phase 2 / Phase 6 |
 
 ---
 
@@ -220,6 +225,8 @@ observable evidence:
 - [ ] Grandfather flag 在 governance YAML + plans/README.md 同步
 - [ ] plans/README.md 表格新 4-way status enum（`✅ completed (auto-detected)` / `⚠️ completed (doc-only / pre-2026-strengthened)` / `🚧 in-progress` / `❌ orphan`）
 - [ ] 新 plan 模板加 §Per-surface consumer 表為 required section
+- [ ] 新 plan 模板加 §Glossary Impact row：有無新增 framework vocabulary；若有，更新 `knowledge/glossary/ai-skill.md` 或記錄不需新增的理由
+- [ ] `ai-skill runtime audit` 能對 `plans/active/`、`architecture/`、`workflow/`、`analysis/`、`intelligence/`、`runtime/`、`ecosystem/` 的未收錄 framework-looking terms 產生 warning-only candidates
 
 ---
 
@@ -230,9 +237,9 @@ observable evidence:
 | Trigger | 使用者要求審視整個系統是否符合新 forbidden 規則、`cognitive-state-evidence-governance` 案例揭露 doc-only completion 問題 |
 | Checked sources | `governance/lifecycle/system-upgrade-governance.yaml` / `plans/README.md` / `knowledge/runtime/routing-registry.yaml` / `runtime/cognitive-modes-discovery.yaml` / `runtime/runtime.db` / `validation/scenarios/failure-derived/` / `scripts/ai-skill-cli/internal/app/hooks.go` |
 | Goal | 補 Gen 3 完成定義 + 防回流 |
-| Scope | Audit + classify + grandfather + wire high-priority + future-proof validator |
-| Non-goals | 不重做 41 個 manual routes；不重寫既有 archived plans；不延伸 Gen 4 forward 工作 |
-| Acceptance | 4-way 分類完整、validator 上線、grandfather 明確、≥ 5 high-priority wired |
+| Scope | Audit + classify + grandfather + wire high-priority + future-proof validator + warning-only glossary coverage guardrail |
+| Non-goals | 不重做 41 個 manual routes；不重寫既有 archived plans；不延伸 Gen 4 forward 工作；不做全 repo blocking semantic scan |
+| Acceptance | 4-way 分類完整、validator 上線、grandfather 明確、≥ 5 high-priority wired、new plan template 含 glossary impact row |
 | Framework discovery | 既有 trigger chain 5 元素（event / detector / source / action / evidence）為驗證標的；audit JSON 為 derived projection；不重新定義 trigger chain |
 | Duplication risk | 不重複 routing-registry 既有資料；audit 只 read + classify。Wire 階段補 consumer 而不重新定義 contract |
 | Open questions | 見 §Open Questions |
@@ -248,11 +255,12 @@ observable evidence:
 - [ ] 新增 `validation/scenarios/failure-derived/orphan-projection-target-key-v1.yaml`
 - [ ] 新增 `validation/scenarios/failure-derived/orphan-scenario-unreferenced-v1.yaml`
 - [ ] 新增 `validation/scenarios/failure-derived/pre-2026-grandfather-coverage-v1.yaml`
+- [ ] 新增 `validation/scenarios/failure-derived/framework-glossary-candidate-missing-v1.yaml`
 - [ ] `ai-skill runtime refresh` + `runtime validate` 確認 scenarios 進 inventory
 
 ### Phase 1 完成條件
 
-- [ ] 4 個 scenarios 符合 `validation/scenario.schema.json`
+- [ ] 5 個 scenarios 符合 `validation/scenario.schema.json`
 - [ ] Runtime validate 通過
 
 ---
@@ -263,6 +271,7 @@ observable evidence:
 
 - [ ] 新 Go package `scripts/ai-skill-cli/internal/audit/`：parser for routing-registry / cognitive-modes-discovery / runtime.db generated_surfaces / hooks.go validators / scenarios dir
 - [ ] 定義 4-way classification rules：(a) auto-detected via signal, (b) consumed via validator/hook, (c) intentionally manual（explicit `manual_activation` annotation in source）, (d) orphan
+- [ ] 加入 glossary coverage warning pass：讀 `knowledge/runtime/sqlite/runtime-index.sqlite` 的 `glossary_terms` / aliases，掃 staged 或 active plan diff 中 `plans/active/`、`architecture/`、`workflow/`、`analysis/`、`intelligence/`、`runtime/`、`ecosystem/` 的 backtick snake_case / framework-looking terms；只輸出 candidate warnings，不寫入 glossary、不阻擋 commit
 - [ ] 新增 `ai-skill runtime audit` subcommand：輸出 JSON + plain 報告（routes / surfaces / scenarios 三表）
 - [ ] 接入 `ai-skill runtime validate`：把 audit warnings 列為 checks（warning 不 block）
 - [ ] Update CLI docs（command-contract / bdd-scenarios / test-fixture-plan）
@@ -273,6 +282,7 @@ observable evidence:
 - [ ] `ai-skill runtime audit --json` exit 0 + 完整分類報告
 - [ ] `ai-skill runtime validate` checks 含 audit warnings
 - [ ] Go tests cover happy / orphan-detected / classification-edge-cases
+- [ ] Glossary coverage warning tests cover: missing candidate, existing glossary term, alias match, workflow / intelligence / analysis path coverage
 
 ---
 
@@ -340,6 +350,7 @@ observable evidence:
 ### Tasks
 
 - [ ] `plans/README.md` 模板新增 §Per-surface consumer 表為 required section（仿 economics plan 的 audit-fix consumer 表）
+- [ ] `plans/README.md` 模板新增 §Glossary Impact row：新框架詞彙是否引入；是否更新 `knowledge/glossary/ai-skill.md`；若沒有，明確填 `no new framework vocabulary`
 - [ ] 加上 `Watch-Out List` citation requirement — 新 plan 須 cite 對應 Gen 4 vision §Watch-Out List 的 wall
 - [ ] 更新 `governance/lifecycle/system-upgrade-governance.yaml` linked update
 
@@ -376,6 +387,7 @@ observable evidence:
 - [ ] 接受既有 archived plans（含 `cognitive-state-evidence-governance`）被重新標 `⚠️ completed (doc-only)`
 - [ ] 接受 `ai-skill runtime audit` subcommand 加入 CLI surface
 - [ ] 接受 `validateRuntimeTriggerWiring` 為第 16 個 commit-msg validator
+- [ ] 接受 glossary coverage 先採 warning-only，不做全 repo blocking semantic scan
 - [ ] 接受 grandfather flag 有 sunset deadline（不是永久例外）
 - [ ] 接受 audit plan 優先於 economics integration plan 執行
 
@@ -396,13 +408,13 @@ observable evidence:
 
 | Phase | 變動 | 大致 LOC |
 |---|---|---|
-| Phase 1 | 4 validation scenarios | ~150 行 YAML |
-| Phase 2 | Audit Go package + CLI integration + tests | ~600 行 Go |
+| Phase 1 | 5 validation scenarios（含 glossary coverage warning） | ~180 行 YAML |
+| Phase 2 | Audit Go package + CLI integration + tests + glossary coverage warning pass | ~700 行 Go |
 | Phase 3 | Grandfather YAML + plans/README enum | ~50 行 |
 | Phase 4 | ≥ 5 wires（signal / validator / consumer） | ~200–400 行 |
 | Phase 5 | validateRuntimeTriggerWiring + policy + docs + tests | ~250 行 |
-| Phase 6 | plans/README template | ~30 行 |
+| Phase 6 | plans/README template + glossary impact row | ~40 行 |
 | Phase 7 | Archive | minimal |
-| **Total** | | **~1300–1500 行**，4–6 commits |
+| **Total** | | **~1450–1650 行**，4–6 commits |
 
 對比 economics plan 估 ~2500+ 行 / 多 phase / 多 commit — 本 plan 規模約其 50–60%，且做完後 economics plan 落地受保護，整體 ROI 較高。
