@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Memory Context Language As Canonical Scenario
+# 防止 memory/ 被當作 current truth / canonical source，違反 memory/README.md 與
+# plans/active/2026-05-25-1000-context-language-glossary-system.md §Vocabulary Resolution Priority。
+
+id: memory-context-language-as-canonical-v1
+domain: memory-replay
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: memory-as-current-truth
+  origin_plan: plans/active/2026-05-25-1000-context-language-glossary-system.md
+  description: >
+    Agent 引用 memory/project/context-language.md 或其他 memory replay 文件作為
+    canonical term definition、framework rule 或 architecture contract，覆蓋
+    knowledge/glossary/、accepted ADR、constitution、active workflow 或 runtime source。
+    Memory 是 selective replay，不是 current truth。
+
+given:
+  task: resolve_term_meaning_or_apply_rule
+  artifacts:
+    - memory/README.md
+    - memory/project/README.md
+    - knowledge/glossary/README.md
+    - knowledge/glossary/ai-skill.md
+    - constitution/
+    - workflow/
+  signals:
+    - user or task references "memory says", "I told you before", "project context language", or prior-session vocabulary
+    - same term has different meaning in memory replay vs knowledge/glossary/ or ADR
+    - memory entry mentions framework-wide vocabulary (context_mode, compression, owner-layer, etc.)
+  constraints:
+    - Memory must never override knowledge/glossary/, ADR, constitution, or active workflow source.
+    - Project-local context language is replay aid, not canonical.
+    - Vocabulary resolution priority is fixed (see plan §Vocabulary Resolution Priority).
+
+when:
+  action: pick_term_definition_source
+
+then:
+  expected_route:
+    primary: follow_vocabulary_resolution_priority
+    order:
+      - 1: active project canonical docs (project scope only)
+      - 2: knowledge/glossary/ (Ai-skill canonical)
+      - 3: accepted ADRs / constitution/
+      - 4: workflow docs
+      - 5: intelligence heuristics
+      - 6: memory replay (lowest priority, never canonical)
+    steps:
+      - Verify whether the term is Ai-skill framework or project-local.
+      - Read knowledge/glossary/ owner entry before referencing any memory.
+      - If memory disagrees with current canonical, trust canonical and update or remove the memory entry.
+  forbidden_routes:
+    - quote_memory_replay_as_canonical_definition
+    - override_glossary_with_project_memory
+    - skip_glossary_lookup_because_memory_already_loaded
+    - re_canonicalize_deprecated_term_from_memory
+  validation:
+    - final answer cites knowledge/glossary/ (or ADR / constitution / workflow) as source, not memory
+    - if memory entry conflicted with current canonical, the memory entry is flagged for update or removal
+    - project-local context-language.md is only used as replay aid, with explicit non-canonical disclaimer

@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Glossary Source Duplication Scenario
+# 防止同一語彙在 root CONTEXT.md / memory canonical / knowledge glossary 之間
+# 形成第二份 source-of-truth，違反 plans/active/2026-05-25-1000-context-language-glossary-system.md
+# §Decision Rationale §Alternatives Considered。
+
+id: glossary-source-duplication-v1
+domain: knowledge-glossary
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: source-of-truth-duplication
+  origin_plan: plans/active/2026-05-25-1000-context-language-glossary-system.md
+  description: >
+    Agent 在新增或修改 shared language / ubiquitous language / framework vocabulary 時，
+    把同一詞彙的 canonical meaning 同時放進 root CONTEXT.md、memory canonical、
+    knowledge/glossary/ 或其他 reusable docs，導致 source-of-truth 漂移與 vocabulary drift。
+
+given:
+  task: add_or_modify_shared_language_source
+  artifacts:
+    - knowledge/glossary/README.md
+    - knowledge/glossary/ai-skill.md
+    - memory/README.md
+    - memory/project/README.md
+    - plans/active/2026-05-25-1000-context-language-glossary-system.md
+  signals:
+    - user requests "shared language" / "ubiquitous language" / "CONTEXT.md" / "context language" / "glossary"
+    - change touches knowledge/glossary/, memory/, root README, or framework / requirements / behavior-modeling docs
+    - term has framework-wide impact (e.g. context_mode, compression, memory_mode, owner-layer, generated_surface, projection)
+  constraints:
+    - Agent must not create root CONTEXT.md as Ai-skill canonical glossary.
+    - Agent must not let memory canonical and knowledge glossary both own the same term.
+    - Each term must have exactly one canonical owner-layer.
+
+when:
+  action: place_shared_language_source
+
+then:
+  expected_route:
+    primary: route_term_to_single_canonical_owner
+    steps:
+      - Identify whether the term is Ai-skill framework vocabulary or project-local context.
+      - Framework vocabulary → knowledge/glossary/ (canonical) with single owner-layer.
+      - Project-local context → <PROJECT_ROOT>/memory/project/context-language.md (non-canonical, replay only) using templates/project/context-language.template.md.
+      - Reject any path that creates root CONTEXT.md as Ai-skill source.
+      - Reject any path that lets memory canonical and knowledge glossary describe the same term.
+  forbidden_routes:
+    - create_root_context_md_as_canonical
+    - promote_memory_context_language_to_canonical
+    - duplicate_term_across_glossary_and_memory
+    - inline_redefine_term_in_workflow_or_intelligence
+  expected_intelligence:
+    - intelligence/engineering/requirements/behavior-modeling/ubiquitous-language-alignment.md
+    - intelligence/engineering/architecture/domain-modeling/ubiquitous-language.md
+  validation:
+    - new or modified term has exactly one canonical entry under knowledge/glossary/
+    - other layers (workflow, intelligence, memory, plan, ADR) only reference the owner entry; they do not redefine meaning
+    - no root CONTEXT.md introduced
+    - if project-local context language is needed, template is used and marked non-canonical

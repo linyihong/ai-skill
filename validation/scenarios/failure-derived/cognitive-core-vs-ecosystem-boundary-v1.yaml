@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Cognitive Core vs Ecosystem Boundary Scenario
+# Cross-plan：同時服務 glossary plan §Semantic Ownership 與 economics plan Phase 2。
+# 防止 runtime/cognitive-modes*.yaml 被塞入 adaptation / economics / telemetry 邏輯，
+# 且防止 ecosystem/ 或 runtime/economics/ 被誤用成第二個 runtime control plane。
+# 來源：
+#   - plans/active/2026-05-25-1000-context-language-glossary-system.md Phase 1
+#   - plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md Phase 2
+
+id: cognitive-core-vs-ecosystem-boundary-v1
+domain: runtime-cognition
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: control-plane-boundary-violation
+  origin_plans:
+    - plans/active/2026-05-25-1000-context-language-glossary-system.md
+    - plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
+  description: >
+    Agent 在演化 cognitive modes / runtime contracts / economics layer 時，把
+    adaptation、economics、pressure、telemetry、cost rationale 寫進 runtime control plane
+    （runtime/cognitive-modes*.yaml），或反過來在 ecosystem / runtime/economics 層
+    重複定義 mode contract、validation requirement、escalation policy、gate activation，
+    讓兩層形成 split control plane。
+
+given:
+  task: evolve_runtime_cognition_or_economics_contract
+  artifacts:
+    - runtime/cognitive-modes.yaml
+    - runtime/cognitive-modes-discovery.yaml
+    - runtime/cognitive-modes-token-budget.yaml
+    - runtime/cognitive-modes-cost-class.yaml
+    - knowledge/glossary/README.md
+    - knowledge/glossary/ai-skill.md
+    - plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
+  signals:
+    - change adds economics / pressure / adaptation / telemetry fields to runtime/cognitive-modes*.yaml
+    - change adds mode contract / gate activation / validation requirement / escalation policy to ecosystem/ or runtime/economics/
+    - new YAML duplicates mode enum or contract definitions across runtime core and ecosystem
+    - cognitive mode discovery starts to own tool catalog / model catalog / memory semantics / economics model directly
+    - cost / pressure rationale ("why DEEP", "why SOURCE_BACKED", "why compression") is hard-coded into runtime control plane
+  constraints:
+    - Runtime control plane owns: mode contract, allowed_depth, validation_requirement, discovery_policy, escalation_policy, gate_activation. Deterministic only.
+    - Ecosystem / economics layer owns: economics, pressure_model, adaptation rationale, telemetry, why/why-not signals. Adaptive only.
+    - Cognitive mode discovery only consumes derived signals; it does not own source catalogs.
+    - Each term (mode enum, cost class, pressure type) has exactly one canonical owner-layer in knowledge/glossary/.
+
+when:
+  action: modify_runtime_cognition_or_economics_yaml
+
+then:
+  expected_route:
+    primary: enforce_control_plane_vs_adaptation_split
+    runtime_core_keeps:
+      - mode_contract (execution_mode, context_mode, governance_mode, memory_mode enums)
+      - allowed_depth
+      - validation_requirement
+      - discovery_policy
+      - escalation_policy
+      - gate_activation
+    ecosystem_owns:
+      - economics (token / latency / recursion / compression budgets)
+      - pressure_models (context_explosion, memory_amplification, governance_overhead, ...)
+      - adaptation_rationale (why_not_deeper, why_not_shallower, why_not_parallel, escalation_reason)
+      - telemetry contracts
+      - knowledge acquisition signals (knowledge_mode, discovery_mode, intelligence_mode)
+    steps:
+      - Check whether change belongs to deterministic control plane or adaptive ecosystem; route to the correct owner-layer.
+      - Reject duplication of mode enums or contract definitions across both layers.
+      - If new term introduced (cognitive_cost, thinking_cost, context_cost, execution_cost, knowledge_cost, knowledge_mode, discovery_mode, intelligence_mode, ecosystem, pressure_model), require knowledge/glossary/ entry with single owner-layer before runtime/ecosystem YAML lands.
+      - Cognitive mode discovery may consume ecosystem-derived signals but must not embed catalog source-of-truth.
+  forbidden_routes:
+    - embed_economics_in_runtime_cognitive_modes_yaml
+    - embed_mode_contract_in_ecosystem_or_runtime_economics
+    - duplicate_mode_enum_across_runtime_and_ecosystem
+    - let_cognitive_mode_discovery_own_tool_or_model_or_memory_catalog
+    - hardcode_adaptation_rationale_into_runtime_core
+    - add_economics_term_to_runtime_without_glossary_owner_entry
+  expected_intelligence:
+    - knowledge/glossary/ai-skill.md
+    - runtime/cognitive-modes.yaml
+  validation:
+    - runtime/cognitive-modes*.yaml contains no economics / pressure / adaptation_rationale / telemetry fields
+    - ecosystem/ or runtime/economics/ contracts contain no mode contract / gate activation / validation requirement / escalation policy duplication
+    - any new term added to either layer has matching owner-layer entry in knowledge/glossary/
+    - cognitive mode discovery yaml consumes derived signals only; no direct catalog ownership
+    - cross-layer signals flow: ecosystem recommends → runtime validates against deterministic contract → runtime executes

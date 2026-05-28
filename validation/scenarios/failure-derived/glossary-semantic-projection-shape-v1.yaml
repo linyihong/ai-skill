@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Glossary Semantic Projection Shape Scenario
+# 防止 SQLite projection 退化為 term/content Markdown cache，或過早跳到 vector DB / embeddings，
+# 違反 plans/active/2026-05-25-1000-context-language-glossary-system.md §Semantic SQLite Projection。
+
+id: glossary-semantic-projection-shape-v1
+domain: runtime-projection
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  class: projection-shape-regression
+  origin_plan: plans/active/2026-05-25-1000-context-language-glossary-system.md
+  description: >
+    Agent 在實作 glossary semantic projection（Phase 5）時，把 SQLite 設計成
+    單一 term/content 全文 cache 表，或跳過 structured semantics 直接導入
+    vector DB / embeddings 作為主要查詢層。兩者都讓 projection 退化為
+    Markdown cache，無法支援 owner lookup、alias resolution、usage traversal、
+    drift detection 等核心語義查詢。
+
+given:
+  task: design_or_implement_glossary_sqlite_projection
+  artifacts:
+    - knowledge/glossary/README.md
+    - knowledge/runtime/
+    - plans/active/2026-05-25-1000-context-language-glossary-system.md
+  signals:
+    - design proposes single table with (term, content) full-text columns as primary surface
+    - design proposes vector DB / embeddings as primary lookup before structured semantics validated
+    - projection stores rule body or full Markdown text instead of normalized fields
+    - usage index is built from repo-wide textual scan and saved as canonical relations
+    - projection location duplicates rule body outside knowledge/glossary/*.md
+  constraints:
+    - Canonical source remains knowledge/glossary/*.md (Markdown, git-diffable).
+    - SQLite projection must store normalized semantic fields, relations, usage index, validation metadata.
+    - Projection must not become a second canonical source for rule body.
+    - Phase 1 usage index only ingests declared references; repo-wide scan only yields candidate relations.
+    - Vector DB / embeddings are deferred until structured semantics prove insufficient.
+
+when:
+  action: define_or_extend_glossary_projection_schema
+
+then:
+  expected_route:
+    primary: enforce_structured_semantic_projection
+    required_tables_minimum:
+      - glossary_terms (term PK, meaning, status, owner_layer, canonical_source, introduced_at, deprecated_at)
+      - glossary_relations (source_term, relation_type, target_term, source_file)
+      - glossary_usage (term, source_file, source_type, usage_context)
+    allowed_relation_types:
+      - alias_of
+      - related_to
+      - conflicts_with
+      - owned_by
+      - used_by
+      - deprecated_by
+      - replaced_by
+    allowed_usage_source_types:
+      - workflow
+      - validation
+      - runtime
+      - knowledge
+      - adr
+      - plan
+      - memory
+    steps:
+      - Prefer extending existing runtime-index.sqlite generator; if separate DB chosen, record architecture preflight rationale.
+      - Ensure projection regenerates from knowledge/glossary/*.md; never edit projection as canonical.
+      - Declared references (related-terms / references / uses / depends-on) become canonical usage rows; repo-wide textual matches become candidate rows only.
+      - Reject term/content full-text-only table as primary design.
+      - Reject vector DB / embeddings as primary lookup in Gen 3.x.
+  forbidden_routes:
+    - design_term_content_single_table_as_primary
+    - introduce_vector_db_as_primary_lookup
+    - canonicalize_repo_wide_textual_match_as_usage_relation
+    - store_full_markdown_body_in_projection
+    - edit_projection_as_source_of_truth
+  validation:
+    - projection schema contains normalized terms / relations / usage tables
+    - relation_type and source_type enums match allowed lists
+    - regeneration produces projection from Markdown, with no rule body duplicated outside knowledge/glossary/
+    - usage index distinguishes declared (canonical) vs heuristic (candidate) relations
+    - architecture preflight notes why projection lives where it does (runtime-index extension, dedicated DB, or runtime-owned)

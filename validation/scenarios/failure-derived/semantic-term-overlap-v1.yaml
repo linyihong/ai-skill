@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Semantic Term Overlap Scenario
+# 偵測 near-duplicate term、conflicting owner-layer、alias loop、deprecated term resurrection
+# 與 near-duplicate concept fork，違反 plans/active/2026-05-25-1000-context-language-glossary-system.md
+# §Semantic Ownership 與 §Glossary Entry Schema。
+
+id: semantic-term-overlap-v1
+domain: knowledge-glossary
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  class: semantic-drift
+  origin_plan: plans/active/2026-05-25-1000-context-language-glossary-system.md
+  description: >
+    Agent 在新增或更新 glossary entry 時，建立與既有詞條語義相近但 owner-layer 不同的條目、
+    形成 alias loop（A alias_of B、B alias_of A）、復活已 deprecated 的詞義，或在不同 owner
+    重新定義同一 term，造成 semantic split-brain。
+
+given:
+  task: add_or_update_glossary_entry
+  artifacts:
+    - knowledge/glossary/README.md
+    - knowledge/glossary/ai-skill.md
+  signals:
+    - new term's meaning overlaps with existing canonical term but proposed owner-layer differs
+    - candidate alias chain forms loop (e.g. A → B → A)
+    - term was marked deprecated / superseded but new entry reintroduces same meaning with canonical status
+    - two glossary entries share same owner-layer but differ on canonical meaning
+    - new term is short / high-frequency (e.g. mode, context, runtime, memory) and matches multiple existing terms
+  constraints:
+    - Each term must have exactly one owner-layer.
+    - Alias must point to a canonical term, not form cycles.
+    - Deprecated / superseded terms must not be re-canonicalized without explicit promotion ADR.
+    - Near-duplicate meaning across owners must trigger bounded-context split or rename, not silent coexistence.
+
+when:
+  action: write_or_promote_glossary_entry
+
+then:
+  expected_route:
+    primary: run_semantic_drift_check_before_write
+    steps:
+      - Query existing glossary entries for overlapping meaning, conflicting owner-layer, alias targets, and deprecation history.
+      - If overlap detected, choose one of: alias to existing canonical, rename, bounded-context split, or reject.
+      - If alias chain detected, normalize to flat alias_of relation; reject cycles.
+      - If deprecated term reappears, require explicit promotion rationale and new entry slug.
+      - Record decision in entry's introduced-by / deprecated-by / aliases / related-terms fields.
+  forbidden_routes:
+    - silently_add_overlapping_meaning_under_different_owner
+    - accept_alias_loop
+    - re_canonicalize_deprecated_term_without_rationale
+    - let_two_entries_share_owner_layer_with_conflicting_meaning
+  validation:
+    - new / updated entry passes drift detection categories: duplicate meaning, conflicting ownership, alias loop, deprecated term resurrection, near-duplicate concept fork
+    - related-terms / aliases / deprecated-by fields are populated when applicable
+    - decision rationale is captured (in entry body, plan, or ADR)
