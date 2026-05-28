@@ -210,6 +210,12 @@ per_commit_obligations:
     severity: block
     opt_out_marker: "[skip-glossary-retro-own]"
     contract_source: runtime/cli-modification-policy.yaml + plans/active/2026-05-25-1000-context-language-glossary-system.md (Phase 6)
+  - id: obligation.commit.plan_checkbox_sync
+    fires: every_commit_referencing_plans_active_with_code_or_scenario_changes
+    validator: validatePlanCheckboxSync
+    severity: block
+    opt_out_marker: "[skip-plan-checkbox-sync]"
+    contract_source: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md (Phase 5)
 
 per_commit_dispatcher_status:
   machine_iterable: true

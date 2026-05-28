@@ -1968,6 +1968,103 @@ func validateGlossaryRetroOwn(text string, staged []string, root string) string 
 // Projection in plan AND use [skip-runtime-yaml-projection] opt-out.
 //
 // Opt-out: standalone `[skip-runtime-yaml-projection]` trailer line.
+// validatePlanCheckboxSync ensures that when a commit references a plan under
+// plans/active/ in its body AND stages real code / scenario / governance work
+// (not just docs), the referenced plan file is staged AND its staged diff
+// includes at least one `[ ]` → `[x]` transition. Rationale: doing the work
+// without flipping the plan checkbox lets `[ ]` linger as a permanent
+// progress drift surface — exactly the failure mode Gen 3 Runtime Trigger
+// Audit is closing for routes/surfaces; this validator extends the same
+// principle to plan progress.
+//
+// Opt-out: standalone `[skip-plan-checkbox-sync]` trailer for hotfixes /
+// refactors / pre-existing-state references that intentionally do not
+// advance a plan phase.
+//
+// Trigger: body contains at least one `plans/active/*.md` reference AND
+// staged set contains at least one Go / scenario / governance / runtime YAML
+// path (heuristic for "real work was done").
+//
+// Plan: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md
+// Phase: 5 (Future-Proof Validator, sibling to validateRuntimeTriggerWiring)
+func validatePlanCheckboxSync(text string, staged []string, root string) string {
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-plan-checkbox-sync]" {
+			return ""
+		}
+	}
+	planRefs := planPathRE.FindAllString(text, -1)
+	if len(planRefs) == 0 {
+		return ""
+	}
+	hasCodeWork := false
+	for _, s := range staged {
+		if strings.HasSuffix(s, ".go") ||
+			strings.HasPrefix(s, "validation/scenarios/") ||
+			strings.HasPrefix(s, "runtime/") ||
+			strings.HasPrefix(s, "governance/") ||
+			strings.HasPrefix(s, "enforcement/") {
+			hasCodeWork = true
+			break
+		}
+	}
+	if !hasCodeWork {
+		return ""
+	}
+	stagedSet := map[string]bool{}
+	for _, s := range staged {
+		stagedSet[s] = true
+	}
+	seen := map[string]bool{}
+	var violations []string
+	for _, ref := range planRefs {
+		clean := strings.TrimRight(ref, "),]\"")
+		if seen[clean] {
+			continue
+		}
+		seen[clean] = true
+		if !stagedSet[clean] {
+			violations = append(violations, clean+" referenced but not staged")
+			continue
+		}
+		cmd := exec.Command("git", "-C", root, "diff", "--cached", "--", clean)
+		out, err := cmd.Output()
+		if err != nil {
+			continue
+		}
+		if !planDiffFlipsCheckbox(string(out)) {
+			violations = append(violations, clean+" staged but no `[ ]` → `[x]` transition detected in staged diff")
+		}
+	}
+	if len(violations) == 0 {
+		return ""
+	}
+	return "plan-checkbox-sync: commit references plans/active/* and stages code / scenario / governance work, but plan progress did not advance:\n    - " +
+		strings.Join(violations, "\n    - ") +
+		"\n  Flip the corresponding `- [ ]` task to `- [x]` in the same commit (cite this commit hash), or add a standalone `[skip-plan-checkbox-sync]` trailer line if this commit intentionally does not advance a plan phase (hotfix / refactor / cross-plan reference)."
+}
+
+// planDiffFlipsCheckbox returns true iff the unified diff text contains a
+// line added (prefix `+`) whose content (after the marker and any
+// indentation) starts with `- [x]`. Pure removals of `- [ ]` without a
+// matching `- [x]` addition do not count.
+func planDiffFlipsCheckbox(diff string) bool {
+	for _, line := range strings.Split(diff, "\n") {
+		if len(line) == 0 || line[0] != '+' {
+			continue
+		}
+		// Skip diff header lines like `+++ b/path`.
+		if strings.HasPrefix(line, "+++") {
+			continue
+		}
+		body := strings.TrimLeft(line[1:], " \t")
+		if strings.HasPrefix(body, "- [x]") || strings.HasPrefix(body, "- [X]") {
+			return true
+		}
+	}
+	return false
+}
+
 func validateRuntimeYamlProjects(text string, staged []string, root string) string {
 	for _, line := range strings.Split(text, "\n") {
 		if strings.TrimSpace(line) == "[skip-runtime-yaml-projection]" {
@@ -2112,6 +2209,9 @@ var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
 	"obligation.commit.glossary_retro_own": func(c commitMsgCtx) string {
 		return validateGlossaryRetroOwn(c.text, c.staged, c.root)
 	},
+	"obligation.commit.plan_checkbox_sync": func(c commitMsgCtx) string {
+		return validatePlanCheckboxSync(c.text, c.staged, c.root)
+	},
 }
 
 // defaultCommitMsgDispatchOrder is the fallback order if
@@ -2133,6 +2233,7 @@ var defaultCommitMsgDispatchOrder = []string{
 	"obligation.commit.runtime_yaml_projects",
 	"obligation.commit.markdown_yaml_sync",
 	"obligation.commit.glossary_retro_own",
+	"obligation.commit.plan_checkbox_sync",
 }
 
 // readPerCommitObligationsOrder reads the per_commit_obligations id

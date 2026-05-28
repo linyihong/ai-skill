@@ -334,7 +334,7 @@ observable evidence:
 
 ### Tasks
 
-- [ ] **新增 `validatePlanCheckboxSync` Go validator**（sibling validator, 第 17 個 commit-msg validator）：當 staged diff 含 source code / test / scenario / generated_surface 變動且 commit message body 引用 `plans/active/<plan>.md`，檢查該 plan 同時 stage 且至少有一個 `[ ]` → `[x]` transition；缺則 emit warning（不 block，加 `[skip-plan-checkbox-sync]` opt-out 給純 hotfix）。理由：避免 agent / 開發者推進 phase 卻忘記翻 checkbox（本 plan 自身 Phase 1 + Phase 2 完成後正是這樣漏掉）
+- [x] **新增 `validatePlanCheckboxSync` Go validator**（第 17 個 commit-msg validator，**改為 block default 而非 warning-only**，與其他 validators 一致；opt-out `[skip-plan-checkbox-sync]`）：當 staged diff 含 source code / test / scenario / governance 變動且 commit message body 引用 `plans/active/<plan>.md`，檢查 plan 同時 stage 且 staged diff 中至少有一個 `[ ]` → `[x]` transition。理由：避免 agent / 開發者推進 phase 卻忘記翻 checkbox（本 plan 自身 Phase 1 + Phase 2 完成後正是這樣漏掉）。實作於 `scripts/ai-skill-cli/internal/app/hooks.go`、`runtime/core-bootstrap.yaml` 加 `obligation.commit.plan_checkbox_sync`、9 個 Go fixture tests 全綠
 - [ ] 新增 `validateRuntimeTriggerWiring` Go validator 在 `scripts/ai-skill-cli/internal/app/hooks.go`
 - [ ] 觸發條件：staged diff includes new `route.*` entry OR new `target_key` in runtime/*.yaml AND no paired discovery signal / validator / intentional manual annotation
 - [ ] Opt-out: `[skip-runtime-trigger-wiring]` for legitimate doc-only / refactor / annotation-only changes
