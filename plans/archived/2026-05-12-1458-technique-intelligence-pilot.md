@@ -90,7 +90,7 @@ analysis/apk/
 
 ### Phase 28f：建立 extraction observations
 
-建立 `notes/intelligence-extraction-observations.md`，記錄：
+建立暫存 `notes/intelligence-extraction-observations.md`，記錄（後續已刪除，內容正式化至 `governance/lifecycle/intelligence-extraction-pipeline.md` 與 `plans/archived/2026-05-12-1506-skill-specific-extraction.md`）：
 
 - extraction 過程
 - 哪些 decision 可以 atomize

@@ -159,5 +159,5 @@
 
 - [`next-stage-upgrade-plan.md`](../active/next-stage-upgrade-plan.md) — Durable Roadmap Goals 引用本文件
 - [`governance/lifecycle/README.md`](governance/lifecycle/README.md) — Skills Deprecation Timeline（Phase D 對應本文件的執行結果）
-- [`notes/intelligence-extraction-observations.md`](notes/intelligence-extraction-observations.md) — Pilot extraction 過程記錄
+- `notes/intelligence-extraction-observations.md`（已刪除） — Pilot extraction 暫存記錄；內容已正式化至本 archived plan 與 extraction pipeline
 - [`plans/technique-intelligence-pilot.md`](plans/technique-intelligence-pilot.md) — Flutter-dart-aot pilot 執行計畫

@@ -500,7 +500,7 @@ grep -rn "intelligence/<domain>/" enforcement/ --include="*.md"
 ## 與既有文件的關係
 
 - [`feedback/extraction/README.md`](../../feedback/extraction/README.md) — 定義 extraction 的核心責任與門檻，本 pipeline 是其具體執行流程
-- [`notes/intelligence-extraction-observations.md`](../../notes/intelligence-extraction-observations.md) — 記錄 extraction 過程中的觀察，本 pipeline 從中抽象
+- [`plans/archived/2026-05-12-1506-skill-specific-extraction.md`](../../plans/archived/2026-05-12-1506-skill-specific-extraction.md) — 記錄 extraction pilot 與 skill-specific extraction 的完成狀態，本 pipeline 從中抽象
 - [`governance/lifecycle/README.md`](../../governance/lifecycle/README.md) — 定義知識生命週期與 deprecation timeline，本 pipeline 的產出會進入 lifecycle
 - [`metadata/schema.md`](../../metadata/schema.md) — 定義 Knowledge Atom metadata schema，intelligence atoms 應符合其格式
 - [`knowledge/indexes/README.md`](../../knowledge/indexes/README.md) — 任務路由索引，extraction 完成後需更新

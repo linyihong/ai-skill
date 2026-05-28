@@ -272,7 +272,7 @@ Phase 28 是策略轉折點：從「搬遷內容」轉為「拆解 techniques，
 | [`intelligence/engineering/analytical-reasoning/anti-patterns/early-hook-instability.md`](../intelligence/engineering/analytical-reasoning/anti-patterns/early-hook-instability.md) | `intelligence/` | 過早 hook 導致不穩定（症狀表） |
 | [`intelligence/engineering/analytical-reasoning/failure/frida-spawn-race.md`](../intelligence/engineering/analytical-reasoning/failure/frida-spawn-race.md) | `intelligence/` | Frida spawn race condition（診斷與緩解） |
 | [`intelligence/engineering/analytical-reasoning/signals/flutter-dart-aot-detection.md`](../intelligence/engineering/analytical-reasoning/signals/flutter-dart-aot-detection.md) | `intelligence/` | Flutter/Dart AOT 辨識信號（信號表） |
-| [`notes/intelligence-extraction-observations.md`](../notes/intelligence-extraction-observations.md) | `notes/` | Extraction 過程記錄與觀察 |
+| `notes/intelligence-extraction-observations.md`（已刪除） | `notes/` | 暫存 extraction 過程記錄；內容已正式化至 extraction pipeline 與 skill-specific extraction archived plan |
 
 #### 更新的既有檔案
 

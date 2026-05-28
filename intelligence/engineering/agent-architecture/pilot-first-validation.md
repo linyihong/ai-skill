@@ -31,7 +31,7 @@
 2. **定義不做範圍** — 在 pilot 計畫中明確列出「不做什麼」，避免 scope creep
 3. **Pilot 後回顧** — 完成 pilot 後，記錄哪些部分需要調整、哪些邊界案例被發現
 4. **逐步泛化** — 不要一次從 1 跳到 N，先做 1 → 2 → 3，確認模式穩定後再抽象化
-5. **保留 pilot 記錄** — Pilot 的執行記錄（如 [`notes/intelligence-extraction-observations.md`](../../../notes/intelligence-extraction-observations.md)）是抽象化的重要輸入
+5. **保留 pilot 記錄** — Pilot 的執行記錄（如 [`plans/archived/2026-05-12-1506-skill-specific-extraction.md`](../../../plans/archived/2026-05-12-1506-skill-specific-extraction.md)）是抽象化的重要輸入
 
 ## 不建議的做法
 
