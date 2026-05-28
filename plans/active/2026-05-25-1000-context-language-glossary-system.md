@@ -378,18 +378,57 @@ Usage discovery policy:
 - [ ] **Cross-plan pre-architecture**：同步定義 candidate semantic owner domains，status=`candidate`：`ecosystem-adaptation`（承載 economics / pressure / adaptation 詞彙）、`runtime-economics`（若 economics plan Phase 0 確認 `runtime/economics/` 路徑則 activate）。此舉讓 `plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md` Phase 1 不必回頭改 glossary owner domain；若 economics plan 最終選用 `ecosystem/` top-level layer，`runtime-economics` 可降為 deprecated。
 - [ ] 定義 Vocabulary Resolution Priority。
 - [ ] 定義最小 status set：`canonical`、`candidate`、`deprecated`、`superseded`、`alias-only`、`experimental`、`project-local`。
-- [ ] 定義 relation lifecycle：`alias_of`、`related_to`、`conflicts_with`、`owned_by`、`used_by`、`deprecated_by`、`replaced_by`。
+- [ ] 定義 relation lifecycle：`alias_of`、`related_to`、`conflicts_with`、`owned_by`、`used_by`、`deprecated_by`、`replaced_by`、`derived_from`、`aggregates`。`derived_from` / `aggregates` 為 economics plan 預留（cross-plan pre-architecture，2026-05-27 confirmed）— `cognitive_cost` aggregates `thinking_cost` + `context_cost` + `execution_cost` + `knowledge_cost`，這層關係必須 first-class 才不會在 Phase 3 entries 落入 free-form `related_to`。
 - [ ] 定義 usage index source types：`workflow`、`validation`、`runtime`、`knowledge`、`adr`、`plan`、`memory`。
 - [ ] 定義 drift detection categories：duplicate meaning、conflicting ownership、alias loop、deprecated term resurrection、near-duplicate concept fork。
 - [ ] 將 semantic governance 暫放在 `knowledge/glossary/README.md`；只記錄未來拆出 `governance/semantic/` 的 promotion triggers。
 
+### Phase 2 Schema Commitments（2026-05-27 confirmed）
+
+下列決策已於 plan execution 前確認，必須寫進 `knowledge/glossary/README.md`，並由 Phase 2 validator 機械強制（見下方 Validator commitment）：
+
+| # | 決策 | 內容 |
+| --- | --- | --- |
+| 1 | **Entry physical shape** | Markdown H2 heading per term + 緊跟一個 YAML code block 承載 schema fields。H2 提供 GitHub anchor link 與人類閱讀層；YAML block 供 Phase 5 SQLite projection parser 機械解析。禁止：純 H2 + 散落欄位列表、單一大 frontmatter / 全文件 YAML array、一 term 一檔。 |
+| 2 | **Schema validation 機制** | Phase 2 必須在 `scripts/ai-skill-cli/` 新增 `glossary validate` subcommand（Go validator），讀 `knowledge/glossary/*.md` 內的 H2 + YAML block，檢查 required / optional / forbidden fields、status enum、owner-layer enum、alias 規則、relation enum、symmetric relation 對稱性。並接進 `ai-skill runtime validate` 流程，使 Phase 2 之後新增 entry 必須通過。純人類 review 不被接受。 |
+| 3 | **Term naming convention** | `term:` 欄位 canonical 寫法為 **snake_case**（例：`context_mode`、`cognitive_cost`）。kebab-case（例：`context-mode`）由 validator 自動列為 alias，無需手動寫入 `aliases:`。Markdown H2 heading 使用 snake_case 與 `term:` 完全一致，確保 GitHub anchor stable。 |
+| 4 | **Alias 表達方式** | Alias 不建獨立 entry。每個 alias 只在 canonical term 的 `aliases:` 欄位列出（flat string array）。Validator 強制：(a) `aliases:` 中的字串不得出現為其他 term 的 `term:` 欄位；(b) alias chain 不得形成 cycle；(c) `status: alias-only` 在新 schema 下視為禁用（已由 `aliases:` 取代）。狀態 set 仍保留 `alias-only` 但僅供 deprecated entry 過渡使用，新 entry 禁用。 |
+| 6 | **`introduced-by` / `deprecated-by` 引用格式** | 只允許兩種值：`plans/<path>`（active 或 archived plan 路徑）或 `constitution/ADR-XXX.md`（accepted ADR）。禁止 commit SHA、issue 編號、PR URL（會 rot 或脫離 repo）。Validator 強制此 enum 形狀。 |
+| 8 | **Relation enum 預留** | 初始 allowed `relation_type` 包含 `derived_from` 與 `aggregates`（為 economics plan §Split cost model 預留），即使 Phase 3 第一批 entries 暫未使用。理由：避免 Phase 3 寫 `cognitive_cost` entry 時退回 free-form `related_to`、損失 split cost 語義。 |
+
+**Pending（待下一輪討論）**：
+
+- **#5** Bidirectional relation 是否強制對稱：已說明成本（projection 自動 derive 反向關係的 SQLite cost ~20-50 行 Go + symmetry 分類表），待使用者決定採用「單向 + projection 推導」或「強制對稱寫入」。
+- **#7** `anti-meaning` 的角色：待使用者在 (A) 合併單欄、(B) 拆 `anti-meaning` + `excludes` 兩欄、(C) 只保留 scope-negative 之間選定。影響 Phase 3 entries 編寫 + drift detection 是否能機械引用。
+
+### Validator Commitment（Phase 2 新增）
+
+Phase 2 必須建立 `scripts/ai-skill-cli/internal/glossary/validator.go`（或等效路徑），由 `ai-skill glossary validate` 與 `ai-skill runtime validate` 兩處入口執行。最小檢查集：
+
+- H2 heading 與 YAML block 配對；H2 文字必須等於 YAML block 的 `term:`
+- Required fields 完整、forbidden patterns 未出現
+- `status` / `owner-layer` / `relation_type` / `aliases` source type 等 enum 合法
+- Term naming convention：`term:` 為 snake_case
+- `introduced-by` / `deprecated-by` 形狀為 `plans/<path>` 或 `constitution/ADR-XXX.md`
+- Alias 規則：alias 不得為另一 canonical term；alias chain 無 cycle
+- Symmetric relation 對稱規則（待 #5 決議後實作；可先 stub）
+
+Linked update：若新增 validator，必須同步更新 `scripts/ai-skill-cli/internal/app/hooks.go` registry、`scripts/ai-skill-cli/README.md`、`runtime/runtime.db` 對應 per-commit validator 條目（若 promotion 為 mandatory）。
+
 ### Phase 2 完成條件
 
 - [ ] 任何 glossary entry 建立前，schema 已存在。
+- [ ] Entry physical shape（H2 + YAML block）已寫明，含 1 個範例。
+- [ ] Schema validation 機制：`glossary validate` subcommand 已存在並通過 sample test。
+- [ ] Term naming convention（snake_case canonical、kebab-case auto alias）已寫明，validator 強制。
+- [ ] Alias 表達方式（flat array、無 alias entry）已寫明，validator 強制。
+- [ ] `introduced-by` / `deprecated-by` 形狀已寫明，validator 強制。
+- [ ] Relation enum 含 `derived_from` / `aggregates`。
 - [ ] Semantic ownership 與 resolution priority 已寫明。
 - [ ] Status set 與 semantic owner domains 已寫明。
 - [ ] Relation types 與 usage source types 已寫明。
 - [ ] `governance/semantic/` 已明確 deferred，且列出 drift incidents、ownership conflicts、deprecation lifecycle、alias explosion、semantic migration 作為 promotion trigger。
+- [ ] Pending #5 / #7 已在 plan §Open Questions 或 §Phase 2 Schema Commitments 標註為待決，未決前不阻塞 Phase 2 收尾（但會延後到 Phase 3 第一批 entries 寫入前必須有結論）。
 
 ---
 
