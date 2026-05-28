@@ -163,6 +163,8 @@ Phase 5 projection 上線前後皆可用的 fallback：
    輸出 term 的 outgoing relations + 由 SQLite 即時 derive 的 incoming relations。
 
 2. **SQL（Phase 5 後）**：
+   Projection DB 位置：`knowledge/runtime/sqlite/runtime-index.sqlite`。
+   例如：
    ```sql
    SELECT source_term FROM glossary_relations
    WHERE target_term = 'compression' AND relation_type = 'alias_of';
