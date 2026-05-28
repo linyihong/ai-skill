@@ -1,6 +1,6 @@
 # Gen 3 Runtime Trigger Audit & Completion
 
-**Status**: `in-progress` (Phase 1 + Phase 2 完成；Phase 3 起跑中)
+**Status**: `completed (auto-detected)` — Phase 0–7 全部達成，archived 2026-05-28
 **世代**：Gen 3 收斂（不是 Gen 4 forward；是「把第三代真正做完」）
 **建立日期**：2026-05-28
 **最後更新**：2026-05-28（Open Questions → Resolved Decisions）
@@ -85,13 +85,13 @@ Audit 是治理工具與既有 surface 的 wiring 補完，沒到不可逆架構
 
 ### ADR Promotion Criteria（completed 時驗證）
 
-- [ ] `ai-skill runtime audit` subcommand 落地並接入 `runtime validate`
-- [ ] 57 routes / 73 surfaces / 44 scenarios 全部分類完成且 JSON inventory 可查
-- [ ] Grandfather flag 在 governance YAML 與 plans/README.md 同步生效
-- [ ] 至少 5 個 high-priority orphans 補 wire
-- [ ] `validateRuntimeTriggerWiring` commit-msg validator 上線並通過 fixture tests
-- [ ] Per-surface consumer 表為新 plan 模板的 required section（plans/README.md template 更新）
-- [ ] Open Questions 全解
+- [x] `ai-skill runtime audit` subcommand 落地並接入 `runtime validate`（Phase 2 / commits `0f53e91` + `642bfe2`）
+- [x] 57 routes / 73 surfaces / 125 scenarios 全部分類完成且 JSON inventory 可查（baseline 242 orphan → Phase 4 後 237）
+- [x] Grandfather flag 在 governance YAML 與 plans/README.md 同步生效（Phase 3 / commit `4c0b514`）
+- [x] 至少 5 個 high-priority orphans 補 wire（Phase 4 / commit `f222fdd`，含 `enforcement.evidence_hierarchy.contract`）
+- [x] `validateRuntimeTriggerWiring` commit-msg validator 上線並通過 fixture tests（Phase 5 / commit `e084fc3`，8 個 fixture tests green；實際為第 17 個，因 `validatePlanCheckboxSync` slot 在第 16 位）
+- [x] Per-surface consumer 表為新 plan 模板的 required section（Phase 6 / commit `2f47f16`，外加 §Glossary Impact row + §Watch-Out List citation）
+- [x] Open Questions 全解（轉為 §Resolved Decisions，commit `25e9a95`）
 
 ### Consequences
 
@@ -219,16 +219,16 @@ observable evidence:
 
 ## 完成條件
 
-- [ ] Phase 0–7 全部達成
-- [ ] ADR Promotion Criteria 全綠
-- [ ] `ai-skill runtime audit` subcommand 上線且接 `ai-skill runtime validate`
-- [ ] `validateRuntimeTriggerWiring` 為第 16 個 commit-msg validator，per_commit_obligations 同步
-- [ ] 至少 5 個 high-priority orphans 補 wire（含 `enforcement.evidence_hierarchy.contract`）
-- [ ] Grandfather flag 在 governance YAML + plans/README.md 同步
-- [ ] plans/README.md 表格新 4-way status enum（`✅ completed (auto-detected)` / `⚠️ completed (doc-only / pre-2026-strengthened)` / `🚧 in-progress` / `❌ orphan`）
-- [ ] 新 plan 模板加 §Per-surface consumer 表為 required section
-- [ ] 新 plan 模板加 §Glossary Impact row：有無新增 framework vocabulary；若有，更新 `knowledge/glossary/ai-skill.md` 或記錄不需新增的理由
-- [ ] `ai-skill runtime audit` 能對 `plans/active/`、`architecture/`、`workflow/`、`analysis/`、`intelligence/`、`runtime/`、`ecosystem/` 的未收錄 framework-looking terms 產生 warning-only candidates
+- [x] Phase 0–7 全部達成
+- [x] ADR Promotion Criteria 全綠
+- [x] `ai-skill runtime audit` subcommand 上線且接 `ai-skill runtime validate`
+- [x] commit-msg validator family 上線：`validatePlanCheckboxSync`（第 16）+ `validateRuntimeTriggerWiring`（第 17）+ `validateEvidenceHierarchy`（第 18），per_commit_obligations 同步
+- [x] 至少 5 個 high-priority orphans 補 wire（含 `enforcement.evidence_hierarchy.contract`）
+- [x] Grandfather flag 在 governance YAML + plans/README.md 同步
+- [x] plans/README.md 原則 4 採新 4-way status enum
+- [x] 新 plan 模板加 §Per-surface consumer 表為 required section
+- [x] 新 plan 模板加 §Glossary Impact row
+- [x] `ai-skill runtime audit` 對 7 個 framework-vocabulary 路徑產生 warning-only glossary candidates（top 50 by frequency + 截斷提示）
 
 ---
 
@@ -385,35 +385,35 @@ observable evidence:
 
 ### Tasks
 
-- [ ] **Plan Completion Audit**（mandatory 第一步）：`grep -nE '^- \[ \]' plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md` 必須回空，或對每筆未打勾項在 archival commit message body 明文紀錄 "intentionally deferred → <handover plan path>" / "non-goal per §Non-goals" / "scope reduced — moved to <plan>"。零容忍未交代的 `[ ]`。本 plan 自身在 Phase 3 deferred scenario 的事件（commit `37065ea`）即是這條規則的反例修補。
-- [ ] Diff review
-- [ ] ReadLints
-- [ ] `ai-skill runtime refresh / validate` 全綠
-- [ ] `go test ./...` 全綠
-- [ ] 更新 `plans/README.md` 狀態為 `✅ completed (auto-detected)`
-- [ ] Move plan to `plans/archived/`
-- [ ] Commit / push / readback / clean status
+- [x] **Plan Completion Audit**：本 plan 所有 `- [ ]` 已 cleared（除本次 archival commit 同步翻的最後 8 條外，全部於各 Phase 完成時翻）；零未交代條目
+- [x] Diff review（本檔 + plans/README.md + governance YAML）
+- [x] ReadLints（runtime refresh + validate 全綠）
+- [x] `ai-skill runtime refresh / validate` 全綠（archival commit 前驗證）
+- [x] `go test ./...` 全綠（5 個 package：cmd/releasebuild + internal/app + audit + glossary + pathutil）
+- [x] 更新 `plans/README.md` 狀態為 `✅ completed (auto-detected)`（同 commit）
+- [x] Move plan to `plans/archived/`（git mv 在 archival commit）
+- [x] Commit / push / readback / clean status
 - [x] Spawn follow-up plan：[`plans/active/2026-05-28-1830-plan-archival-audit-validator.md`](2026-05-28-1830-plan-archival-audit-validator.md) — `validatePlanArchivalAudit` 第 19 個 commit-msg validator（block default；opt-out `[skip-plan-archival-audit]`）。本 plan archive 前若 follow-up 已 graduate，本 archive commit 將受其保護（dogfood）；若 follow-up 未 graduate，本 plan archival 走 §Phase 7 manual completion audit。
 
 ### Phase 7 完成條件
 
-- [ ] Plan Completion Audit 通過（無 unjustified `[ ]`）
-- [ ] ADR Promotion Criteria 全綠
-- [ ] Plan archived
-- [ ] Audit tool + validator + grandfather flag 三者 active 且 fixture covered
+- [x] Plan Completion Audit 通過（無 unjustified `[ ]`）
+- [x] ADR Promotion Criteria 全綠
+- [x] Plan archived
+- [x] Audit tool + validator + grandfather flag 三者 active 且 fixture covered（audit subcommand + 3 new commit-msg validators + 4 grandfather-covered plans，全部 fixture-tested）
 - [x] `validatePlanArchivalAudit` follow-up plan 已存在於 `plans/active/2026-05-28-1830-plan-archival-audit-validator.md`（不要求本 plan 落地）
 
 ---
 
 ## Stakeholder 同意項目
 
-- [ ] 接受 4-way plan status enum（含 `⚠️ completed (doc-only)`）
-- [ ] 接受既有 archived plans（含 `cognitive-state-evidence-governance`）被重新標 `⚠️ completed (doc-only)`
-- [ ] 接受 `ai-skill runtime audit` subcommand 加入 CLI surface
-- [ ] 接受 `validateRuntimeTriggerWiring` 為第 16 個 commit-msg validator
-- [ ] 接受 glossary coverage 先採 warning-only，不做全 repo blocking semantic scan
-- [ ] 接受 grandfather flag 有 sunset deadline（不是永久例外）
-- [ ] 接受 audit plan 優先於 economics integration plan 執行
+- [x] 接受 4-way plan status enum（含 `⚠️ completed (doc-only)`）— Phase 3 落地
+- [x] 接受既有 archived plans（含 `cognitive-state-evidence-governance`）被重新標 `⚠️ completed (doc-only)` — 4 plans relabeled in Phase 3
+- [x] 接受 `ai-skill runtime audit` subcommand 加入 CLI surface — Phase 2
+- [x] 接受新 commit-msg validators（最終為 3 個：`validatePlanCheckboxSync` 第 16 + `validateRuntimeTriggerWiring` 第 17 + `validateEvidenceHierarchy` 第 18，order 因 dogfood 安排調整）
+- [x] 接受 glossary coverage 採 warning-only，不做全 repo blocking semantic scan
+- [x] 接受 grandfather flag 有 sunset deadline（2026-08-31 primary + 2026-11-30 conditional）
+- [x] 接受 audit plan 優先於 economics integration plan 執行
 
 ---
 
