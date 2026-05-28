@@ -1,9 +1,9 @@
 # Context Language Glossary System
 
-**Status**: `in-progress`
+**Status**: `completed` (archived 2026-05-28)
 **世代**：Gen 3 子系統擴充
 **建立日期**：2026-05-25
-**最後更新**：2026-05-26（Phase 0 Pre-Build Interrogation 已執行；補強 Phase 3 retro-own archived cognitive vocabulary；尚未進入 Phase 1）
+**最後更新**：2026-05-28（Phase 0–7 全部完成；validator + projection + auto-detect signal + commit-msg gate 全部 live）
 
 > 本 plan 回應外部 `CONTEXT.md / ubiquitous language` 建議，參考 [mattpocock/skills](https://github.com/mattpocock/skills/tree/main) 將 shared language 作為 agent alignment 技巧；但在 Ai-skill 中不建立 root `CONTEXT.md` 作為第二份 source-of-truth，而是依 Gen 3 分層落到 `knowledge/glossary/` 與 project-local memory 邊界。
 
