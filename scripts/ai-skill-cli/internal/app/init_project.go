@@ -261,6 +261,9 @@ func initProjectPlannedFiles(target string, tools []string) []plannedFile {
 			files = append(files,
 				plannedFile{tool: tool, path: filepath.Join(target, ".github", "copilot-instructions.md"), description: "GitHub Copilot project instructions"},
 				plannedFile{tool: tool, path: filepath.Join(target, ".github", "instructions", "ai-skill.instructions.md"), description: "GitHub Copilot scoped instructions"},
+				plannedFile{tool: tool, path: filepath.Join(target, ".copilot", "README.md"), description: "GitHub Copilot guided startup README"},
+				plannedFile{tool: tool, path: filepath.Join(target, ".copilot", "bootstrap-prompt.md"), description: "GitHub Copilot bootstrap prompt"},
+				plannedFile{tool: tool, path: filepath.Join(target, ".copilot", "start-copilot.sh"), description: "GitHub Copilot Unix startup wrapper"},
 			)
 		}
 	}
@@ -284,6 +287,9 @@ func writeInitProjectFile(path string, content []byte, force bool) error {
 	mode := os.FileMode(0o644)
 	if filepath.Base(path) == "local.env" {
 		mode = 0o600
+	}
+	if filepath.Ext(path) == ".sh" {
+		mode = 0o755
 	}
 	return os.WriteFile(path, content, mode)
 }
@@ -309,6 +315,15 @@ func initProjectFileContent(file plannedFile, repo string) (string, error) {
 	case "copilot":
 		if strings.HasSuffix(file.path, filepath.Join(".github", "instructions", "ai-skill.instructions.md")) {
 			return initProjectCopilotScopedInstructionsContent(repo)
+		}
+		if strings.HasSuffix(file.path, filepath.Join(".copilot", "README.md")) {
+			return initProjectCopilotReadmeContent(repo)
+		}
+		if strings.HasSuffix(file.path, filepath.Join(".copilot", "bootstrap-prompt.md")) {
+			return initProjectCopilotBootstrapPromptContent(repo)
+		}
+		if strings.HasSuffix(file.path, filepath.Join(".copilot", "start-copilot.sh")) {
+			return initProjectCopilotStartScriptContent(repo)
 		}
 		return initProjectCopilotInstructionsContent(repo)
 	case "common":
@@ -555,6 +570,67 @@ Before acting on this repository, read:
 
 If Copilot cannot enforce a required runtime gate directly, report the limitation and rely on repository hooks, CI, and `+"`ai-skill runtime validate`"+` for enforcement.
 `, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder), nil
+}
+
+func initProjectCopilotReadmeContent(repo string) (string, error) {
+	return fmt.Sprintf(`# GitHub Copilot Guided Startup
+
+Copilot custom instructions are advisory. For a new session, start with the generated bootstrap prompt in [`+"`bootstrap-prompt.md`"+`](bootstrap-prompt.md), or run:
+
+`+"```bash"+`
+.copilot/start-copilot.sh
+`+"```"+`
+
+The script is a temporary bootstrap wrapper. It only resolves `+"`AI_SKILL_REPO`"+` / `+"`.ai-skill/local.env`"+` and calls the repo-local `+"`ai-skill copilot start`"+` command. Deletion condition: remove this wrapper after Copilot supports a native automatic bootstrap-on-session setting, or after the project adopts a non-shell launcher with equivalent behavior.
+
+Hard enforcement still lives in repository hooks, CI, and `+"`ai-skill runtime validate`"+`; this startup package only reduces new-session bootstrap misses.
+
+Canonical sources:
+
+1. `+"`%s/CORE_BOOTSTRAP.md`"+`
+2. `+"`%s/runtime/core-bootstrap.yaml`"+`
+3. `+"`%s/ai-tools/agent/copilot.md`"+`
+`, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder), nil
+}
+
+func initProjectCopilotBootstrapPromptContent(repo string) (string, error) {
+	return copilotBootstrapPrompt("<PROJECT_ROOT>", aiSkillRepoPlaceholder) + "\n", nil
+}
+
+func initProjectCopilotStartScriptContent(repo string) (string, error) {
+	return `#!/bin/sh
+set -eu
+
+# Temporary bootstrap wrapper.
+# Deletion condition: remove after Copilot supports native automatic bootstrap-on-session
+# or after this project adopts a non-shell launcher with equivalent behavior.
+# This wrapper only locates and invokes the repo-local ai-skill binary.
+
+ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+if [ -z "${AI_SKILL_REPO:-}" ] && [ -f "$ROOT/.ai-skill/local.env" ]; then
+  . "$ROOT/.ai-skill/local.env"
+fi
+if [ -z "${AI_SKILL_REPO:-}" ]; then
+  echo "AI_SKILL_REPO is not set; configure it or run ai-skill init-project again." >&2
+  exit 1
+fi
+
+case "$(uname -s 2>/dev/null | tr A-Z a-z)" in
+  darwin) os=darwin ;;
+  linux) os=linux ;;
+  mingw*|msys*|cygwin*) os=windows ;;
+  *) os=unknown ;;
+esac
+arch="$(uname -m 2>/dev/null || echo unknown)"
+case "$arch" in
+  arm64|aarch64) arch=arm64 ;;
+  x86_64|amd64) arch=amd64 ;;
+esac
+suffix=""
+[ "$os" = "windows" ] && suffix=".exe"
+
+exec "$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix" copilot start --project "$ROOT" "$@"
+`, nil
 }
 
 func initProjectGoalsReadmeContent(repo string) (string, error) {

@@ -227,11 +227,26 @@ func TestInitProjectWritesCopilotBootstrap(t *testing.T) {
 
 	projectInstructionsPath := filepath.Join(project, ".github", "copilot-instructions.md")
 	scopedInstructionsPath := filepath.Join(project, ".github", "instructions", "ai-skill.instructions.md")
+	copilotReadmePath := filepath.Join(project, ".copilot", "README.md")
+	copilotPromptPath := filepath.Join(project, ".copilot", "bootstrap-prompt.md")
+	copilotScriptPath := filepath.Join(project, ".copilot", "start-copilot.sh")
 	projectInstructions, err := os.ReadFile(projectInstructionsPath)
 	if err != nil {
 		t.Fatal(err)
 	}
 	scopedInstructions, err := os.ReadFile(scopedInstructionsPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	copilotReadme, err := os.ReadFile(copilotReadmePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	copilotPrompt, err := os.ReadFile(copilotPromptPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	copilotScript, err := os.ReadFile(copilotScriptPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -242,17 +257,41 @@ func TestInitProjectWritesCopilotBootstrap(t *testing.T) {
 	for path, content := range map[string]string{
 		projectInstructionsPath: string(projectInstructions),
 		scopedInstructionsPath:  string(scopedInstructions),
+		copilotReadmePath:       string(copilotReadme),
+		copilotPromptPath:       string(copilotPrompt),
+		copilotScriptPath:       string(copilotScript),
 	} {
 		if strings.Contains(content, filepath.ToSlash(repo)) {
 			t.Fatalf("%s must not contain local absolute Ai-skill path, got %s", path, content)
 		}
+		if strings.Contains(content, "phase.bootstrap obligations=") {
+			t.Fatalf("Copilot instructions must not copy Bootstrap Receipt examples, got %s", content)
+		}
+	}
+	for path, content := range map[string]string{
+		projectInstructionsPath: string(projectInstructions),
+		scopedInstructionsPath:  string(scopedInstructions),
+		copilotReadmePath:       string(copilotReadme),
+		copilotPromptPath:       string(copilotPrompt),
+	} {
 		if !strings.Contains(content, "<AI_SKILL_REPO>/CORE_BOOTSTRAP.md") ||
 			!strings.Contains(content, "<AI_SKILL_REPO>/runtime/core-bootstrap.yaml") ||
 			!strings.Contains(content, "ai-tools/agent/copilot.md") {
-			t.Fatalf("expected Copilot instructions to point to canonical sources, got %s", content)
+			t.Fatalf("expected %s to point to canonical sources, got %s", path, content)
 		}
-		if strings.Contains(content, "phase.bootstrap obligations=") {
-			t.Fatalf("Copilot instructions must not copy Bootstrap Receipt examples, got %s", content)
+	}
+	if !strings.Contains(string(copilotScript), "Deletion condition") ||
+		!strings.Contains(string(copilotScript), "repo-local ai-skill binary") ||
+		!strings.Contains(string(copilotScript), "copilot start --project") {
+		t.Fatalf("expected Copilot script to be a temporary repo-local CLI wrapper, got %s", string(copilotScript))
+	}
+	if runtime.GOOS != "windows" {
+		info, err := os.Stat(copilotScriptPath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if info.Mode().Perm() != 0o755 {
+			t.Fatalf("expected start-copilot.sh mode 0755, got %o", info.Mode().Perm())
 		}
 	}
 }

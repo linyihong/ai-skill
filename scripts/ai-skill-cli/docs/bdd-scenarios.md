@@ -70,6 +70,14 @@
 **And** active docs 必須改指向 `ai-skill` Go CLI
 **And** final grep 不得在 active docs 中保留舊 shell 執行指令。
 
+## 場景：Copilot 新 Session 需要 Guided Startup Prompt
+
+**Given** Copilot custom instructions 不能保證在每個新 session 自動完成 bootstrap
+**When** 使用者執行 `ai-skill copilot start --project <project>`
+**Then** 命令輸出可貼到 Copilot 第一則訊息的 bootstrap prompt
+**And** prompt 指向 `<AI_SKILL_REPO>/CORE_BOOTSTRAP.md`、`<AI_SKILL_REPO>/runtime/core-bootstrap.yaml` 與 Copilot adapter
+**And** 命令不修改檔案、不啟動 editor、不假裝 Copilot 有 hard enforcement。
+
 ## 場景：Git hook logic 必須進 Go
 
 **Given** Git hook 需要 pre-commit 或 post-commit 行為

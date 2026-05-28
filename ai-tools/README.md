@@ -69,7 +69,7 @@ Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating
 | Roo Code | [`agent/roo.md`](agent/roo.md) | Custom Instructions、`.roomodes` 覆蓋語意、modes / file restrictions 與 VS Code settings 差異。 |
 | Codex | [`agent/codex.md`](agent/codex.md) | `AGENTS.md` 入口與 generic AGENTS-aware tool 差異。 |
 | Gemini CLI | [`agent/gemini-cli.md`](agent/gemini-cli.md) | `GEMINI.md` 入口、Gemini CLI 工具能力與設定差異。 |
-| GitHub Copilot | [`agent/copilot.md`](agent/copilot.md) | `.github/copilot-instructions.md` 與 `.github/instructions/*.instructions.md` thin pointer；只作 compatibility adapter，enforcement 依 hooks / CI / runtime validate。 |
+| GitHub Copilot | [`agent/copilot.md`](agent/copilot.md) | `.github/copilot-instructions.md`、`.github/instructions/*.instructions.md` 與 `ai-skill copilot start` guided startup；只作 compatibility adapter，enforcement 依 hooks / CI / runtime validate。 |
 | **新增工具指引** | [`agent-onboarding.md`](agent-onboarding.md) | 新 AI agent 工具加入時的設定 checklist，含必要項目與參考來源對照。 |
 
 Agent adapter executable contracts:

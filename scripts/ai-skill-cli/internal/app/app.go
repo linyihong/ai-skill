@@ -31,6 +31,8 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runRuntime(args[1:], stdout, stderr)
 	case "roo":
 		return runRoo(args[1:], stdout, stderr)
+	case "copilot":
+		return runCopilot(args[1:], stdout, stderr)
 	case "glossary":
 		return runGlossary(args[1:], stdout, stderr)
 	case "help", "-h", "--help":
@@ -55,6 +57,7 @@ func printUsage(w io.Writer) {
 	_, _ = fmt.Fprintln(w, "  sync-cursor-bundle    plan Cursor bundle mirror sync")
 	_, _ = fmt.Fprintln(w, "  runtime    wrap or inspect runtime tooling")
 	_, _ = fmt.Fprintln(w, "  roo    manage guarded Roo Code settings")
+	_, _ = fmt.Fprintln(w, "  copilot    generate GitHub Copilot guided bootstrap prompts")
 	_, _ = fmt.Fprintln(w, "  glossary    validate knowledge/glossary/ entries")
 }
 

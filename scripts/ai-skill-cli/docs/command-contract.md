@@ -40,6 +40,7 @@
 | `ai-skill runtime obligations` | 列出目前 active bootstrap obligations（per_session / per_turn / per_commit），從 `generated_surfaces[runtime.core_bootstrap.contract]` 讀取 | 否 | 否 | bootstrap-yaml-migration Phase 3 |
 | `ai-skill glossary validate` | 驗證 `knowledge/glossary/*.md` 的 entry schema、status / owner / relation enum、naming convention、alias 規則、`introduced-by` / `deprecated-by` 形狀、symmetric relation 對稱性與 `excludes` 引用 | 否 | 否 | context-language-glossary-system Phase 2 |
 | `ai-skill roo set-global-custom-instructions` | guarded 寫入 Roo Code 全域 Custom Instructions | 是 | 否 | Tool adapter |
+| `ai-skill copilot start` | 產生 GitHub Copilot 新 session 第一則 bootstrap prompt | 否 | 否 | Tool adapter |
 
 ## 共通輸出契約
 
@@ -131,6 +132,24 @@
 - 不寫入使用者真實 home 或 tool mirror，除非使用者提供明確目標路徑。
 - 若目標檔存在且未傳 `--force`，必須阻斷並列出衝突檔案。
 - 所有 template 中的 Ai-skill reference 必須指向 canonical repo 或可攜 reference；不得寫入一次性本機私有路徑到可重用文件。
+
+### `ai-skill copilot start`
+
+目的：替 GitHub Copilot 新 session 產生第一則 guided bootstrap prompt，降低 Copilot 忽略 project instructions 或 scoped instructions 的機率。
+
+輸入：
+
+- `--project <path>`（預設目前目錄）
+- `--json`
+- `--plain`
+
+副作用：無。此命令只讀取 project path 與 `.ai-skill/local.env` 是否存在，不修改檔案、不啟動外部 editor、不執行 Git。
+
+必要行為：
+
+- prompt 必須指向 `<AI_SKILL_REPO>/CORE_BOOTSTRAP.md`、`<AI_SKILL_REPO>/runtime/core-bootstrap.yaml` 與 `<AI_SKILL_REPO>/ai-tools/agent/copilot.md`。
+- prompt 必須明確說明 Copilot instructions 是 guided startup，不是 hard enforcement；runtime gates 仍由 hooks、CI、`ai-skill runtime validate` 負責。
+- `init-project --tools copilot` 可產生 `.copilot/start-copilot.sh` 作為 temporary thin wrapper；wrapper 只能呼叫 repo-local `ai-skill copilot start`，並必須寫明 deletion/removal condition。
 
 ### `ai-skill goals`
 

@@ -23,6 +23,7 @@ activation:
     - 修改 `ai-tools/agent/<tool>.md` 且影響新專案初始化
     - 修改 project-local tool files 或 durable Markdown setup
     - 修改 GitHub Copilot project instructions 或 scoped instructions
+    - 修改 GitHub Copilot guided startup package 或 `ai-skill copilot start`
 
 inputs:
   required:
@@ -111,7 +112,8 @@ success_criteria:
   - project-local bootstrap files do not embed the local Ai-skill repository absolute path; use `<AI_SKILL_REPO>` placeholder and `AI_SKILL_REPO` environment variable instead
   - init-project creates `.ai-skill/local.env` as an ignored machine-local bridge file and `.ai-skill/.gitignore` to prevent committing the local path
   - Claude Code project setup includes `.claude/settings.json` hook wiring to Ai-skill Go runner for per-turn Cognitive Mode and nested Git report enforcement
-  - GitHub Copilot project setup includes `.github/copilot-instructions.md` and `.github/instructions/ai-skill.instructions.md` as thin pointers only; hard enforcement remains in hooks, CI, and runtime validation
+  - GitHub Copilot project setup includes `.github/copilot-instructions.md`, `.github/instructions/ai-skill.instructions.md`, and `.copilot/` guided startup files as thin pointers only; hard enforcement remains in hooks, CI, and runtime validation
+  - "`ai-skill copilot start` produces a first-message bootstrap prompt for new Copilot sessions without mutating project files or claiming hard enforcement"
   - shell bootstrap helper 若存在，已明確是 thin wrapper、呼叫 repo-local ai-skill binary，且有 deletion/removal condition；否則已改成 Go CLI command
   - selected tools 與 `ai-tools/agent/` adapter 清單一致
   - 新增工具時同步更新 agent onboarding 與 project onboarding
@@ -130,6 +132,10 @@ failure_modes:
   - id: copilot_missing_scoped_instruction
     detection: "`--tools copilot` 只產生 `.github/copilot-instructions.md`，沒有 `.github/instructions/ai-skill.instructions.md`"
     recovery: "同步產生 project-wide 與 scoped thin pointer，並在 docs / tests / init-project code 中列入"
+
+  - id: copilot_missing_guided_startup
+    detection: "`--tools copilot` 沒有產生 `.copilot/bootstrap-prompt.md`，或 `ai-skill copilot start` 無法產生新 session 第一則 bootstrap prompt"
+    recovery: "補齊 `.copilot/` guided startup package、`ai-skill copilot start`、docs 與 tests；若使用 `.sh` wrapper，必須符合 shell bootstrap gate"
 
   - id: shell_bootstrap_without_cli_decision
     detection: "新增 `.sh` project bootstrap/helper，但沒有 Go CLI decision、repo-local ai-skill wrapper boundary 或 deletion/removal condition"

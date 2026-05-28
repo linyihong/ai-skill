@@ -1,22 +1,32 @@
 id: agent.copilot
 name: GitHub Copilot
-description: Compatibility adapter for Copilot custom instructions and scoped instructions
+description: Compatibility adapter for Copilot custom instructions, scoped instructions, and guided startup prompt
 owner_layer: ai-tools
 source_markdown: ai-tools/agent/copilot.md
 status: compatibility
 entrypoints:
   - .github/copilot-instructions.md
   - .github/instructions/ai-skill.instructions.md
+  - .copilot/bootstrap-prompt.md
+  - ai-skill copilot start
 required_files:
   - CORE_BOOTSTRAP.md
   - runtime/core-bootstrap.yaml
   - ai-tools/agent/copilot.md
+guided_startup:
+  command: ai-skill copilot start --project <project>
+  project_files:
+    - .copilot/README.md
+    - .copilot/bootstrap-prompt.md
+    - .copilot/start-copilot.sh
+  shell_wrapper_boundary: temporary thin wrapper to repo-local ai-skill binary with deletion condition
 enforcement_boundary:
   - repository hooks
   - GitHub Actions / PR checks
   - ai-skill runtime validate
   - runtime/core-bootstrap.yaml
 notes: |
-  Copilot instruction files guide the model back to canonical sources but do
-  not reliably enforce runtime gates. Keep instructions thin, avoid local
-  absolute paths, and rely on repository validation for hard enforcement.
+  Copilot instruction files and guided startup prompts guide the model back to
+  canonical sources but do not reliably enforce runtime gates. Keep instructions
+  thin, avoid local absolute paths, and rely on repository validation for hard
+  enforcement.
