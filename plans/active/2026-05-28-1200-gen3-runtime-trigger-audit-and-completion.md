@@ -393,7 +393,7 @@ observable evidence:
 - [ ] 更新 `plans/README.md` 狀態為 `✅ completed (auto-detected)`
 - [ ] Move plan to `plans/archived/`
 - [ ] Commit / push / readback / clean status
-- [ ] Spawn follow-up plan task：`validatePlanArchivalAudit` 第 19 個 commit-msg validator — 當 staged diff 把 `plans/active/*.md` 移到 `plans/archived/*.md` 時，scan archived version 中所有 `- [ ]` 必須在 commit body 明文交代。Out of scope for 本 plan；列為 Gen 4 audit-extension candidate。
+- [x] Spawn follow-up plan：[`plans/active/2026-05-28-1830-plan-archival-audit-validator.md`](2026-05-28-1830-plan-archival-audit-validator.md) — `validatePlanArchivalAudit` 第 19 個 commit-msg validator（block default；opt-out `[skip-plan-archival-audit]`）。本 plan archive 前若 follow-up 已 graduate，本 archive commit 將受其保護（dogfood）；若 follow-up 未 graduate，本 plan archival 走 §Phase 7 manual completion audit。
 
 ### Phase 7 完成條件
 
@@ -401,7 +401,7 @@ observable evidence:
 - [ ] ADR Promotion Criteria 全綠
 - [ ] Plan archived
 - [ ] Audit tool + validator + grandfather flag 三者 active 且 fixture covered
-- [ ] `validatePlanArchivalAudit` follow-up 已記錄為 spawn candidate（不要求本 plan 落地）
+- [x] `validatePlanArchivalAudit` follow-up plan 已存在於 `plans/active/2026-05-28-1830-plan-archival-audit-validator.md`（不要求本 plan 落地）
 
 ---
 
