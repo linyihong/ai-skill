@@ -395,11 +395,8 @@ Usage discovery policy:
 | 4 | **Alias 表達方式** | Alias 不建獨立 entry。每個 alias 只在 canonical term 的 `aliases:` 欄位列出（flat string array）。Validator 強制：(a) `aliases:` 中的字串不得出現為其他 term 的 `term:` 欄位；(b) alias chain 不得形成 cycle；(c) `status: alias-only` 在新 schema 下視為禁用（已由 `aliases:` 取代）。狀態 set 仍保留 `alias-only` 但僅供 deprecated entry 過渡使用，新 entry 禁用。 |
 | 6 | **`introduced-by` / `deprecated-by` 引用格式** | 只允許兩種值：`plans/<path>`（active 或 archived plan 路徑）或 `constitution/ADR-XXX.md`（accepted ADR）。禁止 commit SHA、issue 編號、PR URL（會 rot 或脫離 repo）。Validator 強制此 enum 形狀。 |
 | 8 | **Relation enum 預留** | 初始 allowed `relation_type` 包含 `derived_from` 與 `aggregates`（為 economics plan §Split cost model 預留），即使 Phase 3 第一批 entries 暫未使用。理由：避免 Phase 3 寫 `cognitive_cost` entry 時退回 free-form `related_to`、損失 split cost 語義。 |
-
-**Pending（待下一輪討論）**：
-
-- **#5** Bidirectional relation 是否強制對稱：已說明成本（projection 自動 derive 反向關係的 SQLite cost ~20-50 行 Go + symmetry 分類表），待使用者決定採用「單向 + projection 推導」或「強制對稱寫入」。
-- **#7** `anti-meaning` 的角色：待使用者在 (A) 合併單欄、(B) 拆 `anti-meaning` + `excludes` 兩欄、(C) 只保留 scope-negative 之間選定。影響 Phase 3 entries 編寫 + drift detection 是否能機械引用。
+| 5 | **Relation 對稱性：單向寫入 + projection 推導** | Relation 在 Markdown / YAML 只寫單向。Phase 5 SQLite projection 自動 derive 反向關係（query 時換方向，不寫第二筆 row）。`knowledge/glossary/README.md` 必須包含 **symmetry 分類表**（哪些 relation symmetric、哪些 asymmetric + 反向語義名稱），與 **人類查找反向關係範例**（同時提供 (a) `ai-skill glossary inspect <term>` CLI 預期輸出，顯示 incoming relations；(b) 直接 SQL 範例如 `SELECT source_term FROM glossary_relations WHERE target_term = 'compression' AND relation_type = 'alias_of'`；(c) Markdown 內肉眼查找路徑：去 target term 的 entry 看 `related-terms` 與 alias，或 grep `target_term: <name>` 找上游引用）。Validator 強制 symmetric relation 雙向出現、asymmetric relation 僅單向；symmetry 分類表為 YAML 內嵌（machine-readable），不能只是散文。 |
+| 7 | **`anti-meaning` 拆為兩欄（B 案）** | Schema 拆成兩個 optional 欄位：(a) `anti-meaning` 純為 disambiguator — 「這個詞不是另一個聽起來像它的詞」（純人類閱讀，validator 不強制引用）；(b) `excludes` 為 scope negative — 「這個詞不涵蓋語義鄰居的職責」，必須引用其他 glossary term（validator 強制 `excludes:` 內字串為合法 term name），可被 `cognitive-core-vs-ecosystem-boundary-v1` 等 owner boundary scenario 機械引用。Phase 3 entries 寫入時，若 owner 邊界有風險（例：`context_mode` vs `discovery_mode`），`excludes:` 必填；純命名混淆才用 `anti-meaning`。 |
 
 ### Validator Commitment（Phase 2 新增）
 
@@ -411,7 +408,16 @@ Phase 2 必須建立 `scripts/ai-skill-cli/internal/glossary/validator.go`（或
 - Term naming convention：`term:` 為 snake_case
 - `introduced-by` / `deprecated-by` 形狀為 `plans/<path>` 或 `constitution/ADR-XXX.md`
 - Alias 規則：alias 不得為另一 canonical term；alias chain 無 cycle
-- Symmetric relation 對稱規則（待 #5 決議後實作；可先 stub）
+- Symmetric relation 對稱規則：依 README.md 內 symmetry 分類表，symmetric relation 必須雙向出現於兩端 entry；asymmetric relation 僅單向寫入，反向由 projection 推導
+- `excludes:` 欄位內字串必須為現有合法 term name（防止打字錯誤或孤立引用）
+
+### 反向關係查找（人類路徑，必寫進 README.md）
+
+`knowledge/glossary/README.md` 必須包含下列三條人類查找範例，作為 Phase 5 projection 上線前後皆可用的 fallback：
+
+1. **CLI**：`ai-skill glossary inspect <term>` 預期輸出格式 — 顯示該 term 的 outgoing + incoming relations（incoming 由 SQLite query 即時 derive）。Phase 5 實作完成前先給 stub usage example。
+2. **SQL**：直接查 SQLite，例如 `SELECT source_term FROM glossary_relations WHERE target_term = 'compression' AND relation_type = 'alias_of';` 顯示誰指向 `compression` 作為 alias。
+3. **Markdown 肉眼**：去 target term 的 entry 看 `related-terms` / `aliases` 欄位；或 `grep -r "target_term: compression" knowledge/glossary/` 找上游引用。在 projection 尚未生成時，這是唯一可用路徑。
 
 Linked update：若新增 validator，必須同步更新 `scripts/ai-skill-cli/internal/app/hooks.go` registry、`scripts/ai-skill-cli/README.md`、`runtime/runtime.db` 對應 per-commit validator 條目（若 promotion 為 mandatory）。
 
@@ -424,11 +430,13 @@ Linked update：若新增 validator，必須同步更新 `scripts/ai-skill-cli/i
 - [ ] Alias 表達方式（flat array、無 alias entry）已寫明，validator 強制。
 - [ ] `introduced-by` / `deprecated-by` 形狀已寫明，validator 強制。
 - [ ] Relation enum 含 `derived_from` / `aggregates`。
+- [ ] Symmetry 分類表已內嵌於 README.md（YAML 形式，machine-readable），validator 引用。
+- [ ] 反向關係人類查找三條路徑（CLI / SQL / Markdown 肉眼）已寫進 README.md。
+- [ ] `anti-meaning` / `excludes` 拆兩欄，`excludes` validator 強制引用合法 term。
 - [ ] Semantic ownership 與 resolution priority 已寫明。
 - [ ] Status set 與 semantic owner domains 已寫明。
 - [ ] Relation types 與 usage source types 已寫明。
 - [ ] `governance/semantic/` 已明確 deferred，且列出 drift incidents、ownership conflicts、deprecation lifecycle、alias explosion、semantic migration 作為 promotion trigger。
-- [ ] Pending #5 / #7 已在 plan §Open Questions 或 §Phase 2 Schema Commitments 標註為待決，未決前不阻塞 Phase 2 收尾（但會延後到 Phase 3 第一批 entries 寫入前必須有結論）。
 
 ---
 
