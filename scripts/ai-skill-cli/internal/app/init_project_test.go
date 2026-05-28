@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -158,8 +159,14 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if localEnvInfo.Mode().Perm() != 0o600 {
-		t.Fatalf("expected local.env mode 0600, got %o", localEnvInfo.Mode().Perm())
+	// Windows does not honor Unix-style permission bits on os.WriteFile;
+	// Mode().Perm() returns 0o666 / 0o444 regardless of the requested mode.
+	// The 0o600 security guarantee is still made by initProjectWriteFile;
+	// only the assertion is Unix-specific.
+	if runtime.GOOS != "windows" {
+		if localEnvInfo.Mode().Perm() != 0o600 {
+			t.Fatalf("expected local.env mode 0600, got %o", localEnvInfo.Mode().Perm())
+		}
 	}
 	localEnv, err := os.ReadFile(filepath.Join(project, ".ai-skill", "local.env"))
 	if err != nil {
