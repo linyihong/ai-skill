@@ -4,7 +4,7 @@
 
 | 類別 | 說明 | 包含工具 |
 |------|------|----------|
-| [`agent/`](agent/) | AI Agent 工具（CLI 或 IDE 內建的 AI 助手） | Roo Code、Cursor、Claude Code、Codex |
+| [`agent/`](agent/) | AI Agent 工具（CLI 或 IDE 內建的 AI 助手） | Roo Code、Cursor、Claude Code、Codex、GitHub Copilot |
 
 > **注意**：VS Code Extension 全域設定的通用知識（SQLite 資料庫位置、結構、查詢/修改方法）已昇華到 [`intelligence/ide/vscode-extension-global-state.md`](../intelligence/ide/vscode-extension-global-state.md) 作為可重複使用的工程智慧。各 agent 工具（如 Roo Code）的專屬設定細節留在對應的工具文件中。
 
@@ -18,7 +18,7 @@
 
 | 層級 | 位置 | 內容 |
 |------|------|------|
-| **自動載入入口** | 工具專屬入口檔（如 `CLAUDE.md`、`AGENTS.md`、`GEMINI.md`、`.cursor/rules/*.mdc`、`.roomodes`） | 預設 thin pointer，只指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml`；tool-specific 例外必須在 adapter 中說明 |
+| **自動載入入口** | 工具專屬入口檔（如 `CLAUDE.md`、`AGENTS.md`、`GEMINI.md`、`.cursor/rules/*.mdc`、`.roomodes`、`.github/copilot-instructions.md`） | 預設 thin pointer，只指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml`；tool-specific 例外必須在 adapter 中說明 |
 | **工具配置** | 工具配置檔（如 `.claude/settings.json`） | 僅放 permissions、hooks 等工具特定設定 |
 | **工具使用說明** | `ai-tools/agent/<tool>.md` | 只記錄此工具和其他工具不同的入口、配置、覆蓋語意與操作注意 |
 | **共用規則** | `enforcement/` | 所有規則本體，集中管理 |
@@ -69,7 +69,7 @@ Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating
 | Roo Code | [`agent/roo.md`](agent/roo.md) | Custom Instructions、`.roomodes` 覆蓋語意、modes / file restrictions 與 VS Code settings 差異。 |
 | Codex | [`agent/codex.md`](agent/codex.md) | `AGENTS.md` 入口與 generic AGENTS-aware tool 差異。 |
 | Gemini CLI | [`agent/gemini-cli.md`](agent/gemini-cli.md) | `GEMINI.md` 入口、Gemini CLI 工具能力與設定差異。 |
-| Copilot | [`agent/copilot.md`](agent/copilot.md) | Thin adapter pointer; Copilot auto-reads `.github/copilot-instructions.md` on startup; adapter contract: `ai-tools/agent/copilot.yaml`. |
+| GitHub Copilot | [`agent/copilot.md`](agent/copilot.md) | `.github/copilot-instructions.md` 與 `.github/instructions/*.instructions.md` thin pointer；只作 compatibility adapter，enforcement 依 hooks / CI / runtime validate。 |
 | **新增工具指引** | [`agent-onboarding.md`](agent-onboarding.md) | 新 AI agent 工具加入時的設定 checklist，含必要項目與參考來源對照。 |
 
 Agent adapter executable contracts:
@@ -79,5 +79,6 @@ Agent adapter executable contracts:
 - Roo Code: [`agent/roo.yaml`](agent/roo.yaml)
 - Codex: [`agent/codex.yaml`](agent/codex.yaml)
 - Gemini CLI: [`agent/gemini-cli.yaml`](agent/gemini-cli.yaml)
+- GitHub Copilot: [`agent/copilot.yaml`](agent/copilot.yaml)
 
 ← [回到根目錄](../README.md)

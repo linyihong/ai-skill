@@ -6,7 +6,7 @@
 
 | # | 設定項目 | 強度 | 參考來源 | 說明 |
 |---|---------|------|----------|------|
-| 1 | 自動載入入口 | 必要 | [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md) | 設定工具的自動載入機制，指向 Core Bootstrap 流程。不同工具的入口機制不同（`CLAUDE.md` / `.cursor/rules/*.mdc` / Custom Instructions）。 |
+| 1 | 自動載入入口 | 必要 | [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md) | 設定工具的自動載入機制，指向 Core Bootstrap 流程。不同工具的入口機制不同（`CLAUDE.md` / `.cursor/rules/*.mdc` / Custom Instructions / `.github/copilot-instructions.md`）。 |
 | 2 | 語言偏好 | 必要 | [`enforcement/failure-patterns/language-preference-drift.md`](../enforcement/failure-patterns/language-preference-drift.md) | 設定軟性語言偏好（預設英文但跟隨使用者語言），避免 agent 強制使用固定語言。注意有些工具（如 Roo Code）有雙層設定（Custom Instructions + 全域 SQLite 欄位）。 |
 | 3 | 對話目標閉環 | 必要 | [`enforcement/conversation-goal-ledger.md`](../enforcement/conversation-goal-ledger.md) | 實作 goal ledger 讀取與更新流程，讓 agent 能在中斷、context compaction、multi-agent handoff 後恢復未完成工作。每個工具的實作方式不同（hooks / 操作注意 / custom instructions）。 |
 | 4 | **知識更新流程 Checkpoint** | **必要** | [`governance/lifecycle/knowledge-update-flow.md`](../governance/lifecycle/knowledge-update-flow.md) | 在每輪工作結束前加入 checkpoint，強制 agent 檢查是否有新知識需要回饋到 Ai-skill 系統。必須在 Custom Instructions 或自動載入規則中加入 checkpoint 提醒（見下方 §知識更新流程 Checkpoint 規範）。 |
@@ -16,14 +16,14 @@
 
 ## 各工具實作對照
 
-| 設定項目 | Claude Code | Cursor | Roo Code |
-|---------|------------|--------|----------|
-| 自動載入入口 | `CLAUDE.md` → `CORE_BOOTSTRAP.md` | `.cursor/rules/dependency-reading.mdc`（alwaysApply） | Custom Instructions 或 `.roomodes` |
-| 語言偏好 | `CLAUDE.md` 中設定軟性偏好 | `.cursor/rules/*.mdc` 中設定軟性偏好 | `.roomodes` + SQLite `language` 欄位 |
-| 對話目標閉環 | 操作注意（claude.md） | 完整章節含 hooks 範本（cursor.md） | 操作注意（roo.md） |
-| **知識更新流程 Checkpoint** | **`CLAUDE.md` 中加入 checkpoint 提醒** | **`.cursor/rules/*.mdc` 中加入 checkpoint 提醒，可選 hooks** | **`.roomodes` Custom Instructions 中加入 checkpoint 提醒** |
-| 工具文件 | `ai-tools/agent/claude.md` | `ai-tools/agent/cursor.md` | `ai-tools/agent/roo.md` |
-| 驗證流程 | pre-commit hook（共用） | pre-commit hook（共用） | pre-commit hook（共用） |
+| 設定項目 | Claude Code | Cursor | Roo Code | GitHub Copilot |
+|---------|------------|--------|----------|----------------|
+| 自動載入入口 | `CLAUDE.md` → `CORE_BOOTSTRAP.md` | `.cursor/rules/dependency-reading.mdc`（alwaysApply） | Custom Instructions 或 `.roomodes` | `.github/copilot-instructions.md` + `.github/instructions/*.instructions.md` |
+| 語言偏好 | `CLAUDE.md` 中設定軟性偏好 | `.cursor/rules/*.mdc` 中設定軟性偏好 | `.roomodes` + SQLite `language` 欄位 | custom instructions thin pointer，實際政策回到 runtime contract |
+| 對話目標閉環 | 操作注意（claude.md） | 完整章節含 hooks 範本（cursor.md） | 操作注意（roo.md） | 無可靠內建強制；用 instructions 導流，hard gate 交給 hooks / CI / runtime validate |
+| **知識更新流程 Checkpoint** | **`CLAUDE.md` 中加入 checkpoint 提醒** | **`.cursor/rules/*.mdc` 中加入 checkpoint 提醒，可選 hooks** | **`.roomodes` Custom Instructions 中加入 checkpoint 提醒** | **`.github/instructions/*.instructions.md` 只放 checkpoint pointer** |
+| 工具文件 | `ai-tools/agent/claude.md` | `ai-tools/agent/cursor.md` | `ai-tools/agent/roo.md` | `ai-tools/agent/copilot.md` |
+| 驗證流程 | pre-commit hook（共用） | pre-commit hook（共用） | pre-commit hook（共用） | pre-commit / CI / `ai-skill runtime validate`（共用） |
 
 ## 全域設定 vs 專案設定
 
@@ -88,6 +88,7 @@
 | **Roo Code** | `.roomodes` 每個 mode 的 `customInstructions` | 加入簡短參考（3 行） |
 | **Cursor** | `.cursor/rules/*.mdc`（alwaysApply） | 在規則檔中加入簡短參考 |
 | **Claude Code** | `CLAUDE.md` | 在檔案中加入簡短參考 |
+| **GitHub Copilot** | `.github/instructions/*.instructions.md` | 加入 scoped thin pointer，實際 checkpoint 回到 runtime phase machine |
 
 > 各工具的具體 checkpoint 內容範本，請參考對應的 `ai-tools/agent/<tool>.md` 文件。
 

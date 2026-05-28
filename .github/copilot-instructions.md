@@ -1,17 +1,11 @@
-# Copilot instructions (minimal)
+# GitHub Copilot Bootstrap Entry
 
-請在啟動前閱讀：
-- CORE_BOOTSTRAP.md
-- runtime/core-bootstrap.yaml
-- runtime/runtime.db
+本檔為 Copilot project-wide custom instructions 的 thin pointer。不要在此複製 bootstrap obligations、格式、enum、examples、goal ledger、close-loop 或 runtime phase 細節。
 
-最小啟動步驟：
-1. 讀取 bootstrap 合約（Copilot 在 repository 內會自動讀取 .github/copilot-instructions.md）：
-   ! ai-skill runtime obligations
-2. 在第一個非-讀取工具前輸出 Bootstrap Receipt，範例：
-   Bootstrap: rules=✓ phase=<phase-id> obligations=<comma-separated-obligation-ids> gates=<n>
+## Required Reads
 
-參考檔案：
-- copilot.md
+1. [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md)
+2. [`runtime/core-bootstrap.yaml`](../runtime/core-bootstrap.yaml)
+3. [`ai-tools/agent/copilot.md`](../ai-tools/agent/copilot.md)
 
-備註：避免在檔案中使用絕對路徑或機敏資訊；使用 <repo-root> 占位並確保必要路徑已授權（/add-dir）。
+依 canonical bootstrap contract 執行 required reads、Bootstrap Receipt、per-turn Cognitive Mode reporting 與 close-loop checks。若 Copilot 功能無法強制執行某項 gate，回報限制，並讓 repository hooks / CI / `ai-skill runtime validate` 作為 enforcement boundary。

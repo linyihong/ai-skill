@@ -1,18 +1,26 @@
-# Copilot agent adapter (thin pointer)
+# GitHub Copilot 使用說明
 
-用途
-- 為 Copilot 提供專案啟動時的 thin adapter 指標（不要複製中央規則）。
+本檔只記錄 GitHub Copilot 與其他 agent 工具不同的地方。通用 bootstrap 與 obligation 來源一律是 [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md) 與 [`runtime/core-bootstrap.yaml`](../../runtime/core-bootstrap.yaml)。
 
-必讀（不重複）
-- CORE_BOOTSTRAP.md
-- runtime/core-bootstrap.yaml
+## Thin Entry Point
 
-使用說明
-- adapter contract 在 ai-tools/agent/copilot.yaml
-- Copilot 啟動時會讀取此檔，請勿在此放置絕對路徑或機敏資訊；使用 <AI_SKILL_REPO> 或 <repo-root> 佔位。
+Copilot 的 repo-wide 入口是 `.github/copilot-instructions.md`。它必須保持 thin pointer，只指向：
 
-建議流程
-- 將可執行或啟動腳本放在 scripts/ 或記錄 start_command 到 copilot.yaml
-- 若需本機路徑，使用 `.ai-skill/local.env`（被 .gitignore 忽略）作為機器本地橋接
+1. [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md)
+2. [`runtime/core-bootstrap.yaml`](../../runtime/core-bootstrap.yaml)
+3. 本 adapter 與 companion contract [`copilot.yaml`](copilot.yaml)
 
-如需更多細節，參考 ai-tools/new-project-onboarding.yaml 的 render_project_bootstrap_files 與 apply_tool_specific_adapters 步驟。
+Scoped instructions 可放在 `.github/instructions/*.instructions.md`，但仍只能導流到 canonical bootstrap / enforcement source，不可複製中央規則正文。
+
+## Copilot 差異
+
+- Copilot custom instructions 是提示與上下文 surface，不是可靠 enforcement boundary；行為強制仍依 repository hooks、CI、`ai-skill runtime validate` 與 runtime gates。
+- 某些 Copilot / VS Code agent 功能會依 workspace project detector 啟用，可能只支援特定 language 或 framework project。Ai-skill 這類 knowledge repo 應視為 compatibility adapter，不視為 primary governed runtime。
+- `.github/copilot-instructions.md` 為 project-wide instructions；`.github/instructions/*.instructions.md` 可用 `applyTo` frontmatter 做 scoped pointer。
+- `.github/prompts/*.prompt.md` 若未來加入，只能作為手動任務模板，不可取代 bootstrap contract。
+
+## 配置邊界
+
+Copilot-specific 路徑、instructions、prompts、agent UI 與 project detector 限制留在本檔或 `.github/` 設定。跨工具規則放回 `enforcement/`，runtime contract 放回 `runtime/core-bootstrap.yaml`。
+
+← [回到 AI 工具索引](../README.md)

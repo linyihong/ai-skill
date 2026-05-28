@@ -32,7 +32,7 @@ func runInitProject(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs := newFlagSet("init-project", stderr)
 	opts := initProjectOptions{}
 	fs.StringVar(&opts.projectPath, "project", "", "target project directory")
-	fs.StringVar(&opts.tools, "tools", "roo,cursor,claude,gemini,codex", "comma-separated tools: roo,cursor,claude,gemini,codex")
+	fs.StringVar(&opts.tools, "tools", "roo,cursor,claude,gemini,codex,copilot", "comma-separated tools: roo,cursor,claude,gemini,codex,copilot")
 	fs.BoolVar(&opts.dryRun, "dry-run", false, "preview planned files without writing")
 	fs.BoolVar(&opts.force, "force", false, "allow overwriting existing files")
 	fs.BoolVar(&opts.jsonOutput, "json", false, "write machine-readable JSON output")
@@ -96,7 +96,7 @@ func buildInitProjectResult(opts initProjectOptions) Result {
 		result.Error = &CommandError{
 			Code:        "invalid_tools",
 			Message:     toolsCheck.Message,
-			Remediation: "Use one or more supported tools: roo,cursor,claude,codex.",
+			Remediation: "Use one or more supported tools: roo,cursor,claude,gemini,codex,copilot.",
 		}
 	}
 
@@ -208,7 +208,7 @@ func resolveTargetProject(projectPath string) (string, Check) {
 }
 
 func parseInitTools(value string) ([]string, Check) {
-	supported := map[string]bool{"roo": true, "cursor": true, "claude": true, "gemini": true, "codex": true}
+	supported := map[string]bool{"roo": true, "cursor": true, "claude": true, "gemini": true, "codex": true, "copilot": true}
 	seen := map[string]bool{}
 	ignored := []string{}
 	for _, part := range strings.Split(value, ",") {
@@ -257,6 +257,11 @@ func initProjectPlannedFiles(target string, tools []string) []plannedFile {
 			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "GEMINI.md"), description: "Gemini CLI settings"})
 		case "codex":
 			files = append(files, plannedFile{tool: tool, path: filepath.Join(target, "AGENTS.md"), description: "Generic agent entry (AGENTS.md — Codex / Aider / Cline / other AGENTS.md-aware)"})
+		case "copilot":
+			files = append(files,
+				plannedFile{tool: tool, path: filepath.Join(target, ".github", "copilot-instructions.md"), description: "GitHub Copilot project instructions"},
+				plannedFile{tool: tool, path: filepath.Join(target, ".github", "instructions", "ai-skill.instructions.md"), description: "GitHub Copilot scoped instructions"},
+			)
 		}
 	}
 	files = append(files,
@@ -301,6 +306,11 @@ func initProjectFileContent(file plannedFile, repo string) (string, error) {
 		return initProjectGeminiContent(repo)
 	case "codex":
 		return initProjectCodexContent(repo)
+	case "copilot":
+		if strings.HasSuffix(file.path, filepath.Join(".github", "instructions", "ai-skill.instructions.md")) {
+			return initProjectCopilotScopedInstructionsContent(repo)
+		}
+		return initProjectCopilotInstructionsContent(repo)
 	case "common":
 		if strings.HasSuffix(file.path, filepath.Join(".ai-skill", ".gitignore")) {
 			return initProjectLocalGitignoreContent()
@@ -507,6 +517,44 @@ func initProjectCodexContent(repo string) (string, error) {
 		aiSkillRepoPlaceholder+"/README.md",
 		aiSkillRepoPlaceholder+"/ai-tools/README.md",
 		aiSkillRepoPlaceholder+"/runtime/runtime.db"), nil
+}
+
+func initProjectCopilotInstructionsContent(repo string) (string, error) {
+	return fmt.Sprintf(`# GitHub Copilot Bootstrap Entry
+
+本檔為 Copilot project-wide custom instructions 的 thin pointer。不要在此複製 bootstrap obligations、格式、enum、examples、goal ledger、close-loop 或 runtime phase 細節。
+
+## Local Resolution
+
+本專案由 `+"`ai-skill init-project`"+` 建立 `+"`.ai-skill/local.env`"+`。若 `+"`AI_SKILL_REPO`"+` 尚未存在，先讀該檔以 resolve `+"`%s`"+`，但不要把本機絕對路徑寫入此檔。
+
+## Required Reads
+
+1. `+"`%s/CORE_BOOTSTRAP.md`"+`
+2. `+"`%s/runtime/core-bootstrap.yaml`"+`
+3. `+"`%s/ai-tools/agent/copilot.md`"+`
+
+依 canonical bootstrap contract 執行 required reads、Bootstrap Receipt、per-turn Cognitive Mode reporting 與 close-loop checks。若 Copilot 功能無法強制執行某項 gate，回報限制，並讓 repository hooks / CI / `+"`ai-skill runtime validate`"+` 作為 enforcement boundary。
+`, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder), nil
+}
+
+func initProjectCopilotScopedInstructionsContent(repo string) (string, error) {
+	return fmt.Sprintf(`---
+applyTo: "**"
+---
+
+# Ai-skill Copilot Scoped Pointer
+
+This scoped instruction file is a thin pointer for GitHub Copilot. Do not copy shared rules, bootstrap formats, runtime phase details, goal ledger procedures, or close-loop checklists here.
+
+Before acting on this repository, read:
+
+1. `+"`%s/CORE_BOOTSTRAP.md`"+`
+2. `+"`%s/runtime/core-bootstrap.yaml`"+`
+3. `+"`%s/ai-tools/agent/copilot.md`"+`
+
+If Copilot cannot enforce a required runtime gate directly, report the limitation and rely on repository hooks, CI, and `+"`ai-skill runtime validate`"+` for enforcement.
+`, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder), nil
 }
 
 func initProjectGoalsReadmeContent(repo string) (string, error) {

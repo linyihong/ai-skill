@@ -215,6 +215,48 @@ func TestInitProjectWritesCodexBootstrap(t *testing.T) {
 	}
 }
 
+func TestInitProjectWritesCopilotBootstrap(t *testing.T) {
+	project := t.TempDir()
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"init-project", "--project", project, "--tools", "copilot", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected write success, got %d; stderr=%s", code, stderr.String())
+	}
+
+	projectInstructionsPath := filepath.Join(project, ".github", "copilot-instructions.md")
+	scopedInstructionsPath := filepath.Join(project, ".github", "instructions", "ai-skill.instructions.md")
+	projectInstructions, err := os.ReadFile(projectInstructionsPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	scopedInstructions, err := os.ReadFile(scopedInstructionsPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	repo, repoCheck := resolveInitProjectAiSkillRepo()
+	if repoCheck.Status != "ok" {
+		t.Fatalf("expected repo resolution ok, got %#v", repoCheck)
+	}
+	for path, content := range map[string]string{
+		projectInstructionsPath: string(projectInstructions),
+		scopedInstructionsPath:  string(scopedInstructions),
+	} {
+		if strings.Contains(content, filepath.ToSlash(repo)) {
+			t.Fatalf("%s must not contain local absolute Ai-skill path, got %s", path, content)
+		}
+		if !strings.Contains(content, "<AI_SKILL_REPO>/CORE_BOOTSTRAP.md") ||
+			!strings.Contains(content, "<AI_SKILL_REPO>/runtime/core-bootstrap.yaml") ||
+			!strings.Contains(content, "ai-tools/agent/copilot.md") {
+			t.Fatalf("expected Copilot instructions to point to canonical sources, got %s", content)
+		}
+		if strings.Contains(content, "phase.bootstrap obligations=") {
+			t.Fatalf("Copilot instructions must not copy Bootstrap Receipt examples, got %s", content)
+		}
+	}
+}
+
 func TestInitProjectPlainOutputIncludesPlannedActions(t *testing.T) {
 	project := t.TempDir()
 

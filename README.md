@@ -100,6 +100,7 @@ AI-native Cognitive Execution System 是：
 | Gemini CLI | [`ai-tools/agent/gemini-cli.md`](ai-tools/agent/gemini-cli.md) |
 | Codex / generic agents | [`AGENTS.md`](AGENTS.md) |
 | Roo Code | [`ai-tools/agent/roo.md`](ai-tools/agent/roo.md) |
+| GitHub Copilot（compatibility） | [`ai-tools/agent/copilot.md`](ai-tools/agent/copilot.md) |
 | 自訂 agent / runtime | 從 [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) 與 [`knowledge/runtime/routing-registry.yaml`](knowledge/runtime/routing-registry.yaml) 接入 |
 
 尚未實際接入並累積使用經驗的工具，先視為未來 AI runtime，不列入已支援工具。

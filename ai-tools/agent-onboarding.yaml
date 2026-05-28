@@ -21,6 +21,7 @@ activation:
     - 新增或修改 AI agent 工具設定
     - 新增 `ai-tools/agent/<tool>.md`
     - 修改 root 自動載入入口，例如 `AGENTS.md`、`CLAUDE.md`、`.cursor/rules/*.mdc` 或 `.roomodes`
+    - 修改 GitHub Copilot custom instructions 或 scoped instructions
     - 將流程、checkpoint 或 runtime obligation 接入工具設定
 
 inputs:
@@ -53,6 +54,8 @@ steps:
     action: 在 `ai-tools/agent/` 建立或更新工具專屬 adapter 文件
     required_sources:
       - ai-tools/agent/
+      - .github/copilot-instructions.md
+      - .github/instructions/
     output: adapter_document
 
   - id: sync_new_project_onboarding
@@ -62,6 +65,7 @@ steps:
       - ai-tools/new-project-onboarding.md
       - ai-tools/new-project-onboarding.yaml
       - scripts/ai-skill-cli/internal/app/init_project.go
+      - scripts/ai-skill-cli/internal/app/init_project_test.go
     output: project_onboarding_delta
 
   - id: wire_bootstrap_entrypoint
@@ -71,6 +75,7 @@ steps:
       - CORE_BOOTSTRAP.md
       - README.md
       - runtime/runtime.db
+      - .github/copilot-instructions.md
     output: bootstrap_entrypoint
 
   - id: enforce_language_policy
@@ -135,3 +140,7 @@ failure_modes:
   - id: stale_runtime_projection
     detection: "`runtime validate` 回報 stale checksum 或 generated surface 缺失"
     recovery: "執行 runtime compile、refresh、validate"
+
+  - id: copilot_instructions_became_rule_source
+    detection: "`.github/copilot-instructions.md` 或 `.github/instructions/*.instructions.md` 複製 bootstrap / enforcement 正文"
+    recovery: "改回 thin pointer，將規則正文留在 canonical bootstrap、runtime 或 enforcement source"

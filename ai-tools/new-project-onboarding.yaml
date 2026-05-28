@@ -22,6 +22,7 @@ activation:
     - 新增或移除 project-level AI tool bootstrap
     - 修改 `ai-tools/agent/<tool>.md` 且影響新專案初始化
     - 修改 project-local tool files 或 durable Markdown setup
+    - 修改 GitHub Copilot project instructions 或 scoped instructions
 
 inputs:
   required:
@@ -61,6 +62,7 @@ steps:
       - ai-tools/agent/roo.md
       - ai-tools/agent/gemini-cli.md
       - ai-tools/agent/codex.md
+      - ai-tools/agent/copilot.md
     output: tool_adapter_setup
 
   - id: wire_durable_documentation_flow
@@ -97,6 +99,7 @@ success_criteria:
   - project-local bootstrap files do not embed the local Ai-skill repository absolute path; use `<AI_SKILL_REPO>` placeholder and `AI_SKILL_REPO` environment variable instead
   - init-project creates `.ai-skill/local.env` as an ignored machine-local bridge file and `.ai-skill/.gitignore` to prevent committing the local path
   - Claude Code project setup includes `.claude/settings.json` hook wiring to Ai-skill Go runner for per-turn Cognitive Mode and nested Git report enforcement
+  - GitHub Copilot project setup includes `.github/copilot-instructions.md` and `.github/instructions/ai-skill.instructions.md` as thin pointers only; hard enforcement remains in hooks, CI, and runtime validation
   - selected tools 與 `ai-tools/agent/` adapter 清單一致
   - 新增工具時同步更新 agent onboarding 與 project onboarding
   - 根目錄 README.md 已同步更新工具清單
@@ -110,3 +113,7 @@ failure_modes:
   - id: duplicated_project_rules
     detection: "project bootstrap file 複製大量規則正文"
     recovery: "改成 pointer，指向 `CORE_BOOTSTRAP.md`、`runtime/core-bootstrap.yaml` 與對應 adapter"
+
+  - id: copilot_missing_scoped_instruction
+    detection: "`--tools copilot` 只產生 `.github/copilot-instructions.md`，沒有 `.github/instructions/ai-skill.instructions.md`"
+    recovery: "同步產生 project-wide 與 scoped thin pointer，並在 docs / tests / init-project code 中列入"
