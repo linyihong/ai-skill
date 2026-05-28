@@ -33,11 +33,36 @@ func TestRuntimeValidateDryRunPlansValidators(t *testing.T) {
 	if result.Command != "runtime validate" || result.Mode != "dry_run" {
 		t.Fatalf("unexpected result identity: %#v", result)
 	}
-	if len(result.PlannedActions) != 6 {
-		t.Fatalf("expected six planned validators, got %#v", result.PlannedActions)
+	if len(result.PlannedActions) != 7 {
+		t.Fatalf("expected seven planned validators, got %#v", result.PlannedActions)
 	}
 	if len(result.Mutations) != 0 {
 		t.Fatalf("runtime validate dry-run must not mutate, got %#v", result.Mutations)
+	}
+}
+
+func TestToolBootstrapShellCLIDecisionValidationBlocksUndecidedShell(t *testing.T) {
+	repo := t.TempDir()
+	writeFile(t, filepath.Join(repo, ".copilot", "start-copilot.sh"), "#!/bin/sh\ncopilot /init\n")
+
+	check := nativeToolBootstrapShellCLIDecisionValidation(repo)
+	if check.Status != "failed" || !strings.Contains(check.Message, ".copilot/start-copilot.sh") {
+		t.Fatalf("expected shell CLI decision failure, got %#v", check)
+	}
+}
+
+func TestToolBootstrapShellCLIDecisionValidationAllowsThinWrapper(t *testing.T) {
+	repo := t.TempDir()
+	writeFile(t, filepath.Join(repo, ".copilot", "start-copilot.sh"), `#!/bin/sh
+# Temporary bootstrap wrapper.
+# Deletion condition: remove after ai-skill copilot start reaches write-mode parity.
+# This wrapper only locates and invokes the repo-local ai-skill binary.
+exec "$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-darwin-arm64" copilot start "$@"
+`)
+
+	check := nativeToolBootstrapShellCLIDecisionValidation(repo)
+	if check.Status != "ok" {
+		t.Fatalf("expected thin wrapper accepted, got %#v", check)
 	}
 }
 

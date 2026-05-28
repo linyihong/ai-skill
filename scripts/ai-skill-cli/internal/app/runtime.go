@@ -305,6 +305,7 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 	result.PlannedActions = append(result.PlannedActions, "run native runtime SQLite index validation")
 	result.PlannedActions = append(result.PlannedActions, "validate routing registry activation and source-of-truth gates")
 	result.PlannedActions = append(result.PlannedActions, "run native knowledge runtime validation")
+	result.PlannedActions = append(result.PlannedActions, "validate shell bootstrap wrappers declare a Go CLI decision")
 
 	if opts.dryRun {
 		result.Checks = append(result.Checks, Check{Name: "native_mode", Status: "ok", Message: "dry-run only; validators not executed"})
@@ -344,6 +345,19 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 		result.Status = "blocked"
 		result.ExitCode = ExitValidationFailed
 		result.Error = &CommandError{Code: "knowledge_runtime_native_failed", Message: knowledgeRuntimeCheck.Message, Remediation: "Fix knowledge runtime sources or generated reports."}
+		return result
+	}
+
+	shellBootstrapCheck := nativeToolBootstrapShellCLIDecisionValidation(repo)
+	result.Checks = append(result.Checks, shellBootstrapCheck)
+	if shellBootstrapCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{
+			Code:        "tool_bootstrap_shell_cli_decision_failed",
+			Message:     shellBootstrapCheck.Message,
+			Remediation: "Prefer a Go CLI command. If a shell bootstrap wrapper is unavoidable, make it call the repo-local ai-skill binary and document its deletion/removal condition.",
+		}
 		return result
 	}
 
@@ -1261,6 +1275,63 @@ func nativeKnowledgeRuntimeValidation(repo string) Check {
 		}
 	}
 	return Check{Name: "knowledge_runtime_native", Status: "ok", Message: fmt.Sprintf("Knowledge runtime checks passed: registry_records=%d summaries=%d graphs=%d", len(registry.Records), len(summaries), len(graphs))}
+}
+
+func nativeToolBootstrapShellCLIDecisionValidation(repo string) Check {
+	paths := []string{}
+	if err := filepath.WalkDir(repo, func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if entry.IsDir() {
+			switch entry.Name() {
+			case ".git", "bin", "node_modules", "vendor":
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if filepath.Ext(path) != ".sh" {
+			return nil
+		}
+		rel, err := filepath.Rel(repo, path)
+		if err != nil {
+			return err
+		}
+		paths = append(paths, filepath.ToSlash(rel))
+		return nil
+	}); err != nil {
+		return Check{Name: "tool_bootstrap_shell_cli_decision", Status: "failed", Message: err.Error()}
+	}
+	sort.Strings(paths)
+	violations := []string{}
+	for _, rel := range paths {
+		content, err := os.ReadFile(filepath.Join(repo, filepath.FromSlash(rel)))
+		if err != nil {
+			return Check{Name: "tool_bootstrap_shell_cli_decision", Status: "failed", Message: err.Error()}
+		}
+		text := strings.ToLower(string(content))
+		hasCLI := strings.Contains(text, "ai-skill") && (strings.Contains(text, "repo-local") || strings.Contains(text, "repo local") || strings.Contains(text, "bin/ai-skill") || strings.Contains(text, "ai_skill_repo"))
+		hasDeletionCondition := strings.Contains(text, "deletion condition") ||
+			strings.Contains(text, "removal condition") ||
+			strings.Contains(text, "delete after") ||
+			strings.Contains(text, "remove after") ||
+			strings.Contains(text, "temporary bootstrap wrapper")
+		if !hasCLI || !hasDeletionCondition {
+			violations = append(violations, rel)
+		}
+	}
+	if len(violations) > 0 {
+		return Check{
+			Name:        "tool_bootstrap_shell_cli_decision",
+			Status:      "failed",
+			Message:     "shell bootstrap wrappers missing Go CLI decision/deletion condition: " + strings.Join(violations, ", "),
+			Remediation: "Create or extend a Go CLI command instead of adding shell automation. If retained, the shell file must only locate/invoke repo-local ai-skill and document deletion/removal condition.",
+		}
+	}
+	if len(paths) == 0 {
+		return Check{Name: "tool_bootstrap_shell_cli_decision", Status: "ok", Message: "no shell bootstrap wrappers found"}
+	}
+	return Check{Name: "tool_bootstrap_shell_cli_decision", Status: "ok", Message: fmt.Sprintf("%d shell wrapper(s) declare Go CLI decision", len(paths))}
 }
 
 func nativeRoutingRegistryValidation(repo string, registry runtimeRoutingRegistry) error {

@@ -11,6 +11,8 @@
 
 已完成 parity 的 shell 入口必須刪除；新功能先做成 Go command，再補 fixture、文件與 release gate。
 
+`ai-skill runtime validate` 會檢查 `.sh` bootstrap/helper 是否已做 Go CLI decision：若 shell 不是 thin wrapper、沒有呼叫 repo-local `ai-skill` binary，或沒有寫明 deletion/removal condition，runtime validation 會失敗。
+
 ## Go CLI migration map
 
 跨平台 Go CLI 的 source 在 [`ai-skill-cli/`](ai-skill-cli/README.md)。開發者 handoff map 是 [`ai-skill-cli/docs/legacy-to-go-migration-map.md`](ai-skill-cli/docs/legacy-to-go-migration-map.md)，完整 parity source-of-truth 是 [`ai-skill-cli/docs/script-parity-inventory.md`](ai-skill-cli/docs/script-parity-inventory.md)；本表只列 scripts 入口的使用者導覽。

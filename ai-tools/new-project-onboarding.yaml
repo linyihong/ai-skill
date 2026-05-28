@@ -33,6 +33,7 @@ inputs:
     - force_overwrite
     - dry_run
     - global_tool_setup
+    - bootstrap_wrapper_files
 
 steps:
   - id: select_tools
@@ -65,8 +66,19 @@ steps:
       - ai-tools/agent/copilot.md
     output: tool_adapter_setup
 
-  - id: wire_durable_documentation_flow
+  - id: validate_bootstrap_wrapper_cli_decision
     order: 4
+    action: 若 project setup 想新增 `.sh` 啟動 helper，先確認是否應做成 `ai-skill` Go CLI command；若暫留 shell，只能 thin wrapper 呼叫 repo-local binary，並寫明 deletion/removal condition
+    required_sources:
+      - scripts/README.md
+      - scripts/ai-skill-cli/docs/legacy-to-go-migration-map.md
+      - scripts/ai-skill-cli/internal/app/init_project.go
+    gates:
+      - gate.tool_bootstrap_shell_requires_cli_decision
+    output: bootstrap_wrapper_decision
+
+  - id: wire_durable_documentation_flow
+    order: 5
     action: 不在通用 bootstrap 內複製 durable Markdown workflow；需要時由 project overlay 指向 documentation workflow
     required_sources:
       - workflow/documentation/README.md
@@ -74,7 +86,7 @@ steps:
     output: documentation_overlay_decision
 
   - id: validate_language_and_runtime_policy
-    order: 5
+    order: 6
     action: 套用語言一致性、tool neutrality 與 runtime source-of-truth 規則
     required_sources:
       - runtime/runtime.db
@@ -86,7 +98,7 @@ steps:
     output: policy_validation
 
   - id: run_runtime_validation
-    order: 6
+    order: 7
     action: 執行 runtime compile、refresh、validate
     required_commands:
       - "scripts\\ai-skill-cli\\bin\\ai-skill-windows-amd64.exe runtime compile --repo . --native-compiler --json"
@@ -100,6 +112,7 @@ success_criteria:
   - init-project creates `.ai-skill/local.env` as an ignored machine-local bridge file and `.ai-skill/.gitignore` to prevent committing the local path
   - Claude Code project setup includes `.claude/settings.json` hook wiring to Ai-skill Go runner for per-turn Cognitive Mode and nested Git report enforcement
   - GitHub Copilot project setup includes `.github/copilot-instructions.md` and `.github/instructions/ai-skill.instructions.md` as thin pointers only; hard enforcement remains in hooks, CI, and runtime validation
+  - shell bootstrap helper 若存在，已明確是 thin wrapper、呼叫 repo-local ai-skill binary，且有 deletion/removal condition；否則已改成 Go CLI command
   - selected tools 與 `ai-tools/agent/` adapter 清單一致
   - 新增工具時同步更新 agent onboarding 與 project onboarding
   - 根目錄 README.md 已同步更新工具清單
@@ -117,3 +130,7 @@ failure_modes:
   - id: copilot_missing_scoped_instruction
     detection: "`--tools copilot` 只產生 `.github/copilot-instructions.md`，沒有 `.github/instructions/ai-skill.instructions.md`"
     recovery: "同步產生 project-wide 與 scoped thin pointer，並在 docs / tests / init-project code 中列入"
+
+  - id: shell_bootstrap_without_cli_decision
+    detection: "新增 `.sh` project bootstrap/helper，但沒有 Go CLI decision、repo-local ai-skill wrapper boundary 或 deletion/removal condition"
+    recovery: "優先建立或擴充 Go CLI command；若暫留 shell，只保留 thin wrapper 並寫明移除條件"

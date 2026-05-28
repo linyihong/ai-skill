@@ -33,7 +33,7 @@ Future deletion is allowed only when all are true:
 3. Docs point users to the new CLI command.
 4. `script-parity-inventory.md` row is updated to `deleted`, `hook adapter retained`, `tool-specific adapter retained`, or `explicitly out of scope`.
 
-Future additions are stricter: new repository automation must be implemented in Go CLI first. A new shell entrypoint is allowed only as a Git hook adapter or temporary binary bootstrap wrapper with a documented deletion condition.
+Future additions are stricter: new repository automation must be implemented in Go CLI first. A new shell entrypoint is allowed only as a Git hook adapter or temporary binary bootstrap wrapper with a documented deletion condition. `ai-skill runtime validate` blocks `.sh` bootstrap/helper files that lack this Go CLI decision.
 
 ## Current Closure Scope
 

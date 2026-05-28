@@ -97,4 +97,4 @@ Before deleting or replacing another legacy surface:
 5. Run the relevant Go tests and runtime compile / refresh / validate commands.
 6. Rebuild repo-local binaries if Go CLI source changed.
 
-For new automation, create or extend a Go CLI command instead of adding a shell script. If a hook adapter or bootstrap wrapper is unavoidable, it must only locate and invoke the repo-local binary and must include a deletion condition in this map.
+For new automation, create or extend a Go CLI command instead of adding a shell script. If a hook adapter or bootstrap wrapper is unavoidable, it must only locate and invoke the repo-local binary and must include a deletion condition in this map. `ai-skill runtime validate` enforces this boundary for `.sh` bootstrap/helper files through `gate.tool_bootstrap_shell_requires_cli_decision`.

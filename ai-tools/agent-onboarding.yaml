@@ -33,6 +33,7 @@ inputs:
     - tool_config_files
     - hook_files
     - runtime_tables
+    - bootstrap_wrapper_files
 
 steps:
   - id: identify_agent_tool
@@ -107,8 +108,18 @@ steps:
       - gate.output.tool_neutrality
     output: neutrality_check
 
-  - id: run_runtime_validation
+  - id: validate_bootstrap_wrapper_cli_decision
     order: 9
+    action: 若新增 shell bootstrap helper，先確認是否應做成 Go CLI command；若暫留 shell，只能 thin wrapper 呼叫 repo-local ai-skill binary，並寫明 deletion/removal condition
+    required_sources:
+      - scripts/README.md
+      - scripts/ai-skill-cli/docs/legacy-to-go-migration-map.md
+    gates:
+      - gate.tool_bootstrap_shell_requires_cli_decision
+    output: bootstrap_wrapper_decision
+
+  - id: run_runtime_validation
+    order: 10
     action: 執行 runtime compile、refresh、validate
     required_commands:
       - "scripts\\ai-skill-cli\\bin\\ai-skill-windows-amd64.exe runtime compile --repo . --native-compiler --json"
@@ -122,6 +133,7 @@ success_criteria:
   - 新工具若影響 project initialization，`ai-tools/new-project-onboarding.md` 與 `ai-tools/new-project-onboarding.yaml` 已同步
   - 語言政策符合使用者語言與可重用文件繁體中文規則
   - Close-loop 終局檢查：工具 adapter 已包含 git clean status 與 push 驗證提醒
+  - shell bootstrap helper 若存在，已明確是 thin wrapper、呼叫 repo-local ai-skill binary，且有 deletion/removal condition；否則已改成 Go CLI command
   - runtime projection 為 synced
 
 failure_modes:
@@ -144,3 +156,7 @@ failure_modes:
   - id: copilot_instructions_became_rule_source
     detection: "`.github/copilot-instructions.md` 或 `.github/instructions/*.instructions.md` 複製 bootstrap / enforcement 正文"
     recovery: "改回 thin pointer，將規則正文留在 canonical bootstrap、runtime 或 enforcement source"
+
+  - id: shell_bootstrap_without_cli_decision
+    detection: "新增 `.sh` bootstrap/helper，但沒有 Go CLI decision、repo-local ai-skill wrapper boundary 或 deletion/removal condition"
+    recovery: "優先建立或擴充 Go CLI command；若暫留 shell，只保留 thin wrapper 並寫明移除條件"

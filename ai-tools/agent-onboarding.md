@@ -148,5 +148,6 @@
 | Init-project code | `scripts/ai-skill-cli/internal/app/init_project.go` | `ai-skill init-project --tools` 需要支援新工具或新 bootstrap file |
 | Init-project tests | `scripts/ai-skill-cli/internal/app/init_project_test.go` | init-project behavior 改變 |
 | Runtime projection | [`runtime/runtime.db`](../runtime/runtime.db) | YAML contract 設定 `runtime_projection.enabled: true` |
+| Bootstrap shell helper | `scripts/README.md`、`scripts/ai-skill-cli/docs/legacy-to-go-migration-map.md`、`ai-skill runtime validate` | 新增 `.sh` 啟動 helper、tool bootstrap wrapper 或 shell automation |
 
-若上述任一 execution-affecting surface 改變，必須跑 runtime compile、refresh、validate；若 Go CLI code 改變，也必須跑 `go test ./...` 並重建 repo-local binaries。
+若上述任一 execution-affecting surface 改變，必須跑 runtime compile、refresh、validate；若 Go CLI code 改變，也必須跑 `go test ./...` 並重建 repo-local binaries。新增 `.sh` 啟動 helper 前必須先決定是否應落到 Go CLI command；若暫留 shell，只能作為呼叫 repo-local `ai-skill` binary 的 thin wrapper，且必須寫明 deletion/removal condition。
