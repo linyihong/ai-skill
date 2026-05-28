@@ -1,4 +1,4 @@
-version=repo-a3b45fd
-source_commit=a3b45fd
-built_at=2026-05-28T01:09:19Z
+version=repo-5bd101a
+source_commit=5bd101a
+built_at=2026-05-28T04:28:19Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
