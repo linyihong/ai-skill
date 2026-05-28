@@ -142,6 +142,8 @@ func Build(opts Options) (*Inventory, error) {
 			inv.Summary.SurfaceCounts[ClassOrphan] +
 			inv.Summary.ScenarioCounts[ClassOrphan]
 
+	inv.Warnings = append(inv.Warnings, scanGlossaryCoverage(abs)...)
+
 	sort.Slice(inv.Routes, func(i, j int) bool { return inv.Routes[i].ID < inv.Routes[j].ID })
 	sort.Slice(inv.Surfaces, func(i, j int) bool { return inv.Surfaces[i].TargetKey < inv.Surfaces[j].TargetKey })
 	sort.Slice(inv.Scenarios, func(i, j int) bool { return inv.Scenarios[i].ID < inv.Scenarios[j].ID })

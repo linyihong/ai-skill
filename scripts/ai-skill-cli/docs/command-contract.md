@@ -443,6 +443,7 @@
   - **consumed**：`scripts/ai-skill-cli/**/*.go` 任一 Go 檔案內容包含該 route id / target_key / scenario id。
   - **orphan**：以上皆否。
 - `ai-skill runtime validate` 自動以 warning-only check `runtime_audit_warning` 引用其 orphan 統計；audit 自身失敗不阻斷 validate。
+- 額外 glossary coverage warning pass：掃 `plans/active/`、`architecture/`、`workflow/`、`analysis/`、`intelligence/`、`runtime/`、`ecosystem/` 內的 backtick-wrapped identifiers + snake_case ≥ 2 segments terms；若 `knowledge/runtime/sqlite/runtime-index.sqlite` 的 `glossary_terms.term` / `aliases` 找不到，emit `inventory.warnings`（依出現頻次排序，最多 50 條 + 截斷提示）。Heuristic 排除 path references（含 `/`）、單一英文短詞與 < 3 char terms 以降 false positive。
 - 不可修改 runtime.db、routing-registry 或 generated surfaces。
 
 ### `ai-skill glossary validate`
