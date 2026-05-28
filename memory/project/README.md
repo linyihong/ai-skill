@@ -18,6 +18,17 @@ Project memory 只在 same repo / same project / compatible architecture boundar
 - Active goal、owner、lock、next action → `.agent-goals/`
 - 專案獨立的 architecture decision → `memory/decision/` 或 `constitution/`
 - 可跨專案重用的 intelligence → `intelligence/`
+- Ai-skill framework / runtime / cognitive / architecture 詞彙的 canonical 定義 → [`knowledge/glossary/`](../../knowledge/glossary/README.md)（memory 永遠不能 override canonical glossary）
+
+## Context Language（專案語彙）
+
+若專案有自己的內部詞彙、產品名詞、業務概念，可使用 [`<AI_SKILL_REPO>/templates/project/context-language.template.md`](../../templates/project/context-language.template.md) 在 `<PROJECT_ROOT>/memory/project/context-language.md` 建立 **Non-Canonical** replay aid。
+
+邊界：
+
+- 純 project-local replay，不是 canonical source、不是 runtime truth、不是 architecture contract
+- 不得描寫 Ai-skill framework term（那是 `knowledge/glossary/` 的職責）
+- 詞義衝突依 [`knowledge/glossary/README.md`](../../knowledge/glossary/README.md) §Vocabulary Resolution Priority；memory 永遠在 priority 最後
 - Session 進行中狀態 → `memory/working/`
 
 ## 格式
