@@ -3,7 +3,7 @@
 **Status**: `draft`
 **世代**：Gen 3 收斂（不是 Gen 4 forward；是「把第三代真正做完」）
 **建立日期**：2026-05-28
-**最後更新**：2026-05-28
+**最後更新**：2026-05-28（Open Questions → Resolved Decisions）
 
 > 本 plan 補完 Gen 3 的「completed」定義。當前系統 57 routes / 16 signals / 73 generated_surfaces / 15 commit-msg validators 比例顯示 ~72% routes 與 ~80% projections 沒有 runtime auto-detect 消費者 — 即多數 archived plans 雖標 `completed`，但 strengthened §define_runtime_trigger_flow 規則下實際上是 doc-only graduation。本 plan 系統性 audit 並 wire / 明確標 manual / 移除 orphan，再用機械工具（`ai-skill runtime audit` subcommand）防回流。
 >
@@ -111,10 +111,12 @@ Audit 是治理工具與既有 surface 的 wiring 補完，沒到不可逆架構
 
 | 風險 | 緩解 |
 |---|---|
-| Audit tool 把 intentionally manual routes 誤標 orphan | Phase 2 分類時 explicit `manual_activation: { reason: ... }` 欄位 |
+| Audit tool 把 intentionally manual routes 誤標 orphan | Phase 2 分類時 explicit `manual_activation: { reason: ... }` 欄位；workflow 性質 route 一律須 annotate（見 §Resolved Decisions Q4） |
 | Wire 高優先 orphans 範圍失控變 41 個都做 | Phase 4 設明確 ≤ 10 上限；其餘留待 organic 補 |
-| Validator 阻塞 economics plan 落地 | `validateRuntimeTriggerWiring` 預設 warning（非 block），等 audit 穩定再升 block |
-| Grandfather flag 變成永久例外 | 加 sunset deadline（例如 2026-12-31）；過期後評估是否升 hard rule |
+| Validator 阻塞 economics plan 落地 | `validateRuntimeTriggerWiring` 預設 block；提供 `[skip-runtime-trigger-wiring]` opt-out 給 legitimate doc-only / annotation-only 變更 |
+| Grandfather flag 變成永久例外 | Sunset deadline 2026-08-31 + 條件式延展至 2026-11-30（見 §Resolved Decisions Q2） |
+| Audit executable YAML scenarios drift（文字與 hook 行為脫鉤） | Phase 1 強制每個 scenario 綁定一個 Go fixture test，CI 驗證 YAML ↔ hook 一致 |
+| Scenario schema 蔓延（5 個 scenarios 欄位漂移） | Phase 1 鎖定 `validation/scenario.schema.json` 為 single source；新 scenario 必須通過 schema validation |
 
 ---
 
@@ -201,17 +203,17 @@ observable evidence:
 
 ---
 
-## Open Questions
+## Resolved Decisions
 
-| # | Question | 影響範圍 |
-|---|---|---|
-| 1 | `validateRuntimeTriggerWiring` 預設 warning 還是 block？多久後升 block？ | Phase 4–5 |
-| 2 | Grandfather flag sunset deadline 設多遠？2026-12-31 太短/長？ | Phase 3 |
-| 3 | High-priority orphans 是否包含 `enforcement.evidence_hierarchy.contract`？（這個明確 blocking_level=blocking 卻無 validator）| Phase 4 |
-| 4 | 4-way 分類的「intentionally manual」邊界 — workflow 性質的 route 全部算嗎？ | Phase 2 |
-| 5 | Audit tool 是否要產出 markdown 報告供 PR review 使用，或只 JSON？ | Phase 2 |
-| 6 | 新 scenario 是否要走 `runtime/audit/*.yaml` executable contract，或純 markdown？ | Phase 1 |
-| 7 | Glossary coverage warning 的 term heuristic 要多保守？是否只掃 snake_case / backtick terms，避免自然語言短詞 false positive？ | Phase 2 / Phase 6 |
+| # | Question | 決定 | 落實位置 |
+|---|---|---|---|
+| 1 | `validateRuntimeTriggerWiring` 預設 warning 還是 block？ | **預設 block**，無 warning trial 期；legitimate edge case 走 `[skip-runtime-trigger-wiring]` opt-out | Phase 5 |
+| 2 | Grandfather flag sunset deadline 設多遠？ | **2026-08-31** 為 primary deadline + 條件式延展條款（若 audit tool age < 60 天或 Phase 4 未完成，自動延至 **2026-11-30**） | Phase 3 |
+| 3 | High-priority orphans 是否包含 `enforcement.evidence_hierarchy.contract`？ | **包含**，列為 Phase 4 必補 candidate | Phase 4 |
+| 4 | 4-way 分類的「intentionally manual」邊界？ | workflow / discovery 性質的 route **算 intentionally manual**，但必須在 source 加 `manual_activation: { reason: <workflow_discovery|...> }` annotation；缺 annotation 仍判 orphan | Phase 2 |
+| 5 | Audit tool 報告格式？ | **md 預設 + `--json` flag**；Go 端共用 inventory struct 雙渲染 | Phase 2 |
+| 6 | Scenarios 走 executable YAML？ | **走 `runtime/audit/*.yaml` executable contract**；每個 scenario 必須綁定 Go fixture test；schema 鎖定為 `validation/scenario.schema.json` single source | Phase 1 |
+| 7 | Glossary coverage warning term heuristic 多保守？ | 只掃 `backtick-wrapped` terms + `snake_case` ≥ 2 segments，避免自然語言短詞 false positive；自然語言詞彙明確排除 | Phase 2 / Phase 6 |
 
 ---
 
@@ -242,7 +244,7 @@ observable evidence:
 | Acceptance | 4-way 分類完整、validator 上線、grandfather 明確、≥ 5 high-priority wired、new plan template 含 glossary impact row |
 | Framework discovery | 既有 trigger chain 5 元素（event / detector / source / action / evidence）為驗證標的；audit JSON 為 derived projection；不重新定義 trigger chain |
 | Duplication risk | 不重複 routing-registry 既有資料；audit 只 read + classify。Wire 階段補 consumer 而不重新定義 contract |
-| Open questions | 見 §Open Questions |
+| Open questions | 全數已解，見 §Resolved Decisions |
 | Decision | proceed |
 
 ---
@@ -256,11 +258,15 @@ observable evidence:
 - [ ] 新增 `validation/scenarios/failure-derived/orphan-scenario-unreferenced-v1.yaml`
 - [ ] 新增 `validation/scenarios/failure-derived/pre-2026-grandfather-coverage-v1.yaml`
 - [ ] 新增 `validation/scenarios/failure-derived/framework-glossary-candidate-missing-v1.yaml`
+- [ ] 鎖定 `validation/scenario.schema.json` 為 5 個 scenarios 的 single source；schema 變更走 governance §3 規則 8
+- [ ] 每個 scenario 綁定一個 Go fixture test stub（在 Phase 2 / 5 填實作），CI 驗證 YAML ↔ hook 行為一致
 - [ ] `ai-skill runtime refresh` + `runtime validate` 確認 scenarios 進 inventory
 
 ### Phase 1 完成條件
 
 - [ ] 5 個 scenarios 符合 `validation/scenario.schema.json`
+- [ ] Schema lock 條款寫入 governance YAML
+- [ ] 每個 scenario 對應 fixture test stub 存在
 - [ ] Runtime validate 通過
 
 ---
@@ -272,7 +278,8 @@ observable evidence:
 - [ ] 新 Go package `scripts/ai-skill-cli/internal/audit/`：parser for routing-registry / cognitive-modes-discovery / runtime.db generated_surfaces / hooks.go validators / scenarios dir
 - [ ] 定義 4-way classification rules：(a) auto-detected via signal, (b) consumed via validator/hook, (c) intentionally manual（explicit `manual_activation` annotation in source）, (d) orphan
 - [ ] 加入 glossary coverage warning pass：讀 `knowledge/runtime/sqlite/runtime-index.sqlite` 的 `glossary_terms` / aliases，掃 staged 或 active plan diff 中 `plans/active/`、`architecture/`、`workflow/`、`analysis/`、`intelligence/`、`runtime/`、`ecosystem/` 的 backtick snake_case / framework-looking terms；只輸出 candidate warnings，不寫入 glossary、不阻擋 commit
-- [ ] 新增 `ai-skill runtime audit` subcommand：輸出 JSON + plain 報告（routes / surfaces / scenarios 三表）
+- [ ] 新增 `ai-skill runtime audit` subcommand：**預設輸出 markdown 報告**（routes / surfaces / scenarios 三表，供 PR review 直接 render），`--json` flag 切換 JSON 輸出（供 CI / tool 消費）；Go 端共用同一 inventory struct，雙渲染
+- [ ] Glossary coverage term heuristic 限制：只掃 backtick-wrapped terms + snake_case ≥ 2 segments；自然語言短詞（單一英文單字、中文等）排除以避免 false positive
 - [ ] 接入 `ai-skill runtime validate`：把 audit warnings 列為 checks（warning 不 block）
 - [ ] Update CLI docs（command-contract / bdd-scenarios / test-fixture-plan）
 - [ ] Go tests
@@ -290,7 +297,7 @@ observable evidence:
 
 ### Tasks
 
-- [ ] `governance/lifecycle/system-upgrade-governance.yaml` 新增 §`pre_2026_05_28_doc_only_completion` section：列出受 grandfather 保護的 archived plans + sunset deadline + sunset 後評估規則
+- [ ] `governance/lifecycle/system-upgrade-governance.yaml` 新增 §`pre_2026_05_28_doc_only_completion` section：列出受 grandfather 保護的 archived plans + sunset deadline **2026-08-31** + 條件式延展條款（若 `ai-skill runtime audit` tool age < 60 天 OR Phase 4 未完成，自動延至 **2026-11-30**）+ sunset 後評估規則（剩餘 doc-only items 須升 auto-detected/consumed 或降 orphan 下架）
 - [ ] `plans/README.md` 模板更新：plan 狀態 enum 從 `✅ completed` / `🚧 draft` 擴成 4-way（`✅ completed (auto-detected)` / `⚠️ completed (doc-only / pre-2026-strengthened)` / `🚧 in-progress` / `❌ orphan`）
 - [ ] 既有 archived plans 中受 grandfather 保護者，標 `⚠️ completed (doc-only)`；以 `cognitive-state-evidence-governance` 為首案
 - [ ] Run scenario `pre-2026-grandfather-coverage-v1` 驗證
@@ -330,7 +337,7 @@ observable evidence:
 - [ ] Opt-out: `[skip-runtime-trigger-wiring]` for legitimate doc-only / refactor / annotation-only changes
 - [ ] 註冊 `obligation.commit.runtime_trigger_wiring` 在 `runtime/core-bootstrap.yaml`
 - [ ] 更新 `runtime/cli-modification-policy.yaml` 加 `gate.runtime_trigger_wiring_required`
-- [ ] 預設 severity: warning（trial mode 4 週後升 block；deadline 寫進 cli-modification-policy）
+- [ ] 預設 severity: **block**（無 warning trial 期）；legitimate doc-only / annotation-only / refactor 變更走 `[skip-runtime-trigger-wiring]` opt-out trailer
 - [ ] Update CLI docs
 - [ ] Go fixture tests (happy / block / opt-out / warning-only mode)
 - [ ] bin rebuild
@@ -340,8 +347,7 @@ observable evidence:
 - [ ] 第 16 個 commit-msg validator active
 - [ ] per_commit_obligations 含 `obligation.commit.runtime_trigger_wiring`
 - [ ] cli-modification-policy 新 gate active
-- [ ] Fixture tests green
-- [ ] Sunset deadline（warning → block）寫進 policy
+- [ ] Fixture tests green（含 block default / opt-out trailer）
 
 ---
 
