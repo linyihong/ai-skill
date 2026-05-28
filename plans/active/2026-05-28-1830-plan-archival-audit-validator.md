@@ -2,7 +2,7 @@
 
 **Status**: `draft`
 **建立日期**：2026-05-28
-**最後更新**：2026-05-28
+**最後更新**：2026-05-29
 **Parent**: [`plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md`](2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md) §Phase 7 follow-up
 
 ---
@@ -37,11 +37,13 @@ Parent plan §Phase 7 加了 manual "Plan Completion Audit" 步驟（`grep -nE '
 
 ### ADR Promotion Criteria（completed 時驗證）
 
-- [ ] `validatePlanArchivalAudit` Go validator 上線
+- [ ] `validatePlanArchivalAudit` Go validator 上線（呼叫 `ScanCheckboxesInFile`，不內聯 loop）
+- [ ] `ai-skill scan-checkboxes <file> [--format plain|json] [--exit-code]` CLI subcommand 可用
 - [ ] `obligation.commit.plan_archival_audit` 進 `runtime/core-bootstrap.yaml`
 - [ ] `gate.plan_archival_audit_required` 進 `runtime/cli-modification-policy.yaml`
 - [ ] Fixture tests 全綠（happy / unjustified-[]-block / justified-[]-pass / opt-out / 純內容修改不觸發）
-- [ ] CLI docs（command-contract）更新
+- [ ] Unit tests 全綠（`ScanCheckboxes` pure content / file / all-checked / empty）
+- [ ] CLI docs（command-contract）更新（validator entry + subcommand entry）
 - [ ] Self-test：本 plan archive 時實際走一遍 validator（dogfood，與 gen3 plan 同模式）
 
 ---
@@ -115,7 +117,8 @@ observable evidence:
 - [ ] Phase 0–2 全部達成
 - [ ] ADR Promotion Criteria 全綠
 - [ ] `validatePlanArchivalAudit` 為第 19 個 commit-msg validator
-- [ ] 對應 scenarios + Go fixture tests
+- [ ] `ai-skill scan-checkboxes` CLI subcommand 可跨專案使用（任意 Markdown checklist）
+- [ ] 對應 scenarios + Go fixture tests（validator）+ unit tests（scan utility）
 - [ ] 自身 archive 時通過 validator（dogfood）
 
 ---
@@ -152,25 +155,76 @@ observable evidence:
 
 ---
 
-## Phase 2 — Validator Implementation + Self-Dogfood Archive
+## Phase 2 — Shared Utility + Validator Implementation + Self-Dogfood Archive
+
+### Design: `scan-checkboxes` 三層架構
+
+Phase 2 實作分三層，checkbox 掃描邏輯集中在 `scan_checkboxes.go`，validators 與 CLI 共用同一實作：
+
+```
+Layer 1 — Pure utility（零 shell 依賴，純 Go strings）
+  ScanCheckboxes(content string) CheckboxScanResult
+    → 掃描任意字串，回傳 UncheckedLines / CheckedLines
+
+Layer 2 — File helper
+  ScanCheckboxesInFile(path string) (CheckboxScanResult, error)
+    → 讀檔 + 呼叫 Layer 1，供 hooks.go validator 呼叫
+
+Layer 3 — CLI subcommand
+  ai-skill scan-checkboxes <file> [--format plain|json] [--exit-code]
+    → 呼叫 Layer 2，輸出結果
+    → --exit-code: 有 unchecked 時 exit 1（可用於任何專案的 CI / pre-push hook）
+```
+
+**跨專案用途**：任何專案的 Markdown checklist（release checklist、onboarding checklist、規格確認單）都能用 `ai-skill scan-checkboxes <file> --exit-code` 驗證，讓使用者方便追蹤完成狀態。
+
+**`CheckboxScanResult` struct**：
+
+```go
+type CheckboxScanResult struct {
+    File          string   // 空字串表示 raw content scan
+    UncheckedLines []string // "- [ ] 任務A"
+    CheckedLines   []string // "- [x] 任務B"
+}
+
+func (r CheckboxScanResult) HasUnchecked() bool { return len(r.UncheckedLines) > 0 }
+```
+
+**`validatePlanArchivalAudit` 呼叫方式**：
+```go
+result, _ := ScanCheckboxesInFile(archivedPath)
+if result.HasUnchecked() && !bodyJustifiesUnchecked(commitBody) {
+    return "plan-archival-audit: ..."
+}
+```
 
 ### Tasks
 
-- [ ] 新增 `validatePlanArchivalAudit` 在 `scripts/ai-skill-cli/internal/app/hooks.go`
+- [ ] 新增 `scripts/ai-skill-cli/internal/app/scan_checkboxes.go`
+  - `CheckboxScanResult` struct + `HasUnchecked()`
+  - `ScanCheckboxes(content string) CheckboxScanResult`（Layer 1，純 Go，不呼叫任何 shell）
+  - `ScanCheckboxesInFile(path string) (CheckboxScanResult, error)`（Layer 2）
+  - `runScanCheckboxes(args []string, stdout, stderr io.Writer) int`（Layer 3 CLI handler）
+- [ ] 新增 `scripts/ai-skill-cli/internal/app/scan_checkboxes_test.go`（≥ 4 個 unit tests：pure content / file / all-checked / empty）
+- [ ] 在 `app.go` 加 `case "scan-checkboxes"` + `printUsage` 說明
+- [ ] 新增 `validatePlanArchivalAudit` 在 `hooks.go`（呼叫 `ScanCheckboxesInFile`，不內聯 loop）
+- [ ] 新增 `findArchivedPlans(staged []string) []string`（偵測 active→archived move，純 Go regex，不用 grep）
 - [ ] 註冊 `obligation.commit.plan_archival_audit` 在 `runtime/core-bootstrap.yaml` §per_commit_obligations
 - [ ] 加 `gate.plan_archival_audit_required` 在 `runtime/cli-modification-policy.yaml`
 - [ ] Fixture tests（≥ 5 個：happy / unjustified block / justified pass / opt-out / non-archival commit no-trigger）
-- [ ] 更新 `scripts/ai-skill-cli/docs/command-contract.md` 表格新增第 19 個 validator entry
+- [ ] 更新 `scripts/ai-skill-cli/docs/command-contract.md`：新增第 19 個 validator entry + `scan-checkboxes` subcommand entry
 - [ ] bin rebuild
 - [ ] **Dogfood**：本 plan 自身 archive 時通過 validator（與 gen3 plan 同 pattern）
 
 ### Phase 2 完成條件
 
+- [ ] `scan_checkboxes.go` 含三層實作，零 shell 依賴
+- [ ] `ai-skill scan-checkboxes <file> --exit-code` 可在任何專案使用
 - [ ] 第 19 個 commit-msg validator active
 - [ ] per_commit_obligations 含 `obligation.commit.plan_archival_audit`
 - [ ] cli-modification-policy 含 `gate.plan_archival_audit_required`
-- [ ] 5 fixture tests green
-- [ ] CLI docs updated
+- [ ] Unit tests（scan utility）+ fixture tests（validator）全綠
+- [ ] CLI docs updated（subcommand + validator）
 - [ ] Dogfood self-test 通過
 
 ---
@@ -197,5 +251,5 @@ observable evidence:
 | Phase | 變動 | LOC |
 |---|---|---|
 | Phase 1 | 3 scenarios YAML | ~150 |
-| Phase 2 | Validator + obligation + gate + tests + docs | ~200 |
-| **Total** | | **~350**，2–3 commits |
+| Phase 2 | `scan_checkboxes.go`（utility + CLI）+ validator + obligation + gate + tests + docs | ~350 |
+| **Total** | | **~500**，3–4 commits |
