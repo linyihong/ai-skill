@@ -385,6 +385,7 @@ observable evidence:
 
 ### Tasks
 
+- [ ] **Plan Completion Audit**（mandatory 第一步）：`grep -nE '^- \[ \]' plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md` 必須回空，或對每筆未打勾項在 archival commit message body 明文紀錄 "intentionally deferred → <handover plan path>" / "non-goal per §Non-goals" / "scope reduced — moved to <plan>"。零容忍未交代的 `[ ]`。本 plan 自身在 Phase 3 deferred scenario 的事件（commit `37065ea`）即是這條規則的反例修補。
 - [ ] Diff review
 - [ ] ReadLints
 - [ ] `ai-skill runtime refresh / validate` 全綠
@@ -392,12 +393,15 @@ observable evidence:
 - [ ] 更新 `plans/README.md` 狀態為 `✅ completed (auto-detected)`
 - [ ] Move plan to `plans/archived/`
 - [ ] Commit / push / readback / clean status
+- [ ] Spawn follow-up plan task：`validatePlanArchivalAudit` 第 19 個 commit-msg validator — 當 staged diff 把 `plans/active/*.md` 移到 `plans/archived/*.md` 時，scan archived version 中所有 `- [ ]` 必須在 commit body 明文交代。Out of scope for 本 plan；列為 Gen 4 audit-extension candidate。
 
 ### Phase 7 完成條件
 
+- [ ] Plan Completion Audit 通過（無 unjustified `[ ]`）
 - [ ] ADR Promotion Criteria 全綠
 - [ ] Plan archived
 - [ ] Audit tool + validator + grandfather flag 三者 active 且 fixture covered
+- [ ] `validatePlanArchivalAudit` follow-up 已記錄為 spawn candidate（不要求本 plan 落地）
 
 ---
 
