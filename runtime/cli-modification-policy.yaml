@@ -113,6 +113,32 @@ cli_specific_gates:
     opt_out_marker: "[skip-go-migration]"
     failure_pattern: enforcement/failure-patterns/shell-script-added-without-go-migration.md
 
+  - id: gate.glossary.retro_own_required
+    description: |
+      When staged diff touches framework cognitive vocabulary surface
+      (runtime/cognitive-modes*.yaml, runtime/economics/**, ecosystem/**),
+      knowledge/glossary/ai-skill.md MUST also be staged in the same
+      commit. Prevents subsystem-local term drift — any new signal /
+      enum value / mode name / contract field introduced to the
+      cognitive vocabulary surface must retro-own a canonical glossary
+      entry so the term has single owner-layer per knowledge/glossary/
+      README.md §Semantic Ownership.
+
+      Pure refactor / typo / comment-only changes may opt out via
+      [skip-glossary-retro-own] as a standalone trailer line with
+      explanation in the commit message body.
+    detection_signals:
+      - staged path matches runtime/cognitive-modes*.yaml
+      - staged path matches runtime/economics/**
+      - staged path matches ecosystem/**
+      - knowledge/glossary/ai-skill.md NOT in staged paths
+    enforcement_layer: commit_msg_hook
+    validator: validateGlossaryRetroOwn
+    severity: block
+    opt_out_marker: "[skip-glossary-retro-own]"
+    upstream_plan: plans/active/2026-05-25-1000-context-language-glossary-system.md (Phase 6)
+    related_scenario: validation/scenarios/failure-derived/glossary-retro-own-missing-v1.yaml
+
 modification_rule:
   description: |
     When editing this YAML / validator / gate list:

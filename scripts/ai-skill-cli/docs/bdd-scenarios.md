@@ -102,6 +102,29 @@
 **And** `checks` 回報 entries / aliases / relations 計數
 **And** `knowledge/glossary/` 內任何檔案沒有被修改。
 
+## 場景：Glossary Retro-Own 自動強制 — happy path
+
+**Given** staged diff 動到 `runtime/cognitive-modes-discovery.yaml`（加新 signal），且 `knowledge/glossary/ai-skill.md` 也在 staged 清單
+**When** 執行 `ai-skill hooks run commit-msg`
+**Then** `glossaryRetroOwn` validator 回傳空字串（pass）
+**And** commit-msg hook exit code 為 `0`
+**And** commit 順利建立。
+
+## 場景：Glossary Retro-Own 阻斷 — framework surface 改動但無 glossary stage
+
+**Given** staged diff 只動到 `runtime/cognitive-modes-discovery.yaml` 或 `runtime/economics/*.yaml` 或 `ecosystem/*.yaml`，`knowledge/glossary/ai-skill.md` **不在** staged 清單，且 commit message body 沒含 `[skip-glossary-retro-own]`
+**When** 執行 `ai-skill hooks run commit-msg`
+**Then** `glossaryRetroOwn` validator 回傳非空 error 訊息
+**And** commit-msg hook exit code 為 `30`
+**And** error 訊息引用 `runtime/cli-modification-policy.yaml` `gate.glossary.retro_own_required` 與 upstream plan。
+
+## 場景：Glossary Retro-Own opt-out — 純 refactor / typo 變更
+
+**Given** staged diff 動到 framework cognitive vocabulary surface，但變更為純 comment / typo / refactor（未引入新 term），commit message body 含獨立一行 `[skip-glossary-retro-own]`
+**When** 執行 `ai-skill hooks run commit-msg`
+**Then** `glossaryRetroOwn` validator 回傳空字串（pass）
+**And** commit 順利建立。
+
 ## 場景：Glossary entry schema violation 阻斷
 
 **Given** `knowledge/glossary/ai-skill.md` 內一個 entry 缺少 `owner-layer`、或 `term` 為 kebab-case、或 `aliases:` 內字串等於另一 entry 的 `term`、或 `excludes:` 引用不存在的 term、或 `introduced-by` 為 commit SHA

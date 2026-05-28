@@ -671,3 +671,77 @@ func TestValidateMarkdownYamlSync(t *testing.T) {
 		t.Fatalf("expected opt-out to bypass, got %q", v)
 	}
 }
+
+func TestValidateGlossaryRetroOwn(t *testing.T) {
+	tmp := t.TempDir()
+
+	// Happy path: framework surface + glossary both staged
+	v := validateGlossaryRetroOwn(
+		"feat: add new cognitive signal",
+		[]string{"runtime/cognitive-modes-discovery.yaml", "knowledge/glossary/ai-skill.md"},
+		tmp,
+	)
+	if v != "" {
+		t.Fatalf("expected pass when glossary also staged, got %q", v)
+	}
+
+	// Block: cognitive-modes staged but no glossary
+	v = validateGlossaryRetroOwn(
+		"feat: add new cognitive signal",
+		[]string{"runtime/cognitive-modes-discovery.yaml"},
+		tmp,
+	)
+	if v == "" {
+		t.Fatal("expected block when cognitive-modes staged without glossary")
+	}
+
+	// Block: runtime/economics surface staged but no glossary
+	v = validateGlossaryRetroOwn(
+		"feat: add economics contract",
+		[]string{"runtime/economics/token-costs.yaml"},
+		tmp,
+	)
+	if v == "" {
+		t.Fatal("expected block for runtime/economics/ without glossary")
+	}
+
+	// Block: ecosystem/ surface staged but no glossary
+	v = validateGlossaryRetroOwn(
+		"feat: add ecosystem adaptation",
+		[]string{"ecosystem/cognition/adaptation.yaml"},
+		tmp,
+	)
+	if v == "" {
+		t.Fatal("expected block for ecosystem/ without glossary")
+	}
+
+	// Opt-out: skip marker bypasses block
+	v = validateGlossaryRetroOwn(
+		"chore: typo fix\n\n[skip-glossary-retro-own]\n",
+		[]string{"runtime/cognitive-modes-discovery.yaml"},
+		tmp,
+	)
+	if v != "" {
+		t.Fatalf("expected opt-out to bypass, got %q", v)
+	}
+
+	// No framework surface staged → no enforcement
+	v = validateGlossaryRetroOwn(
+		"feat: unrelated doc change",
+		[]string{"README.md"},
+		tmp,
+	)
+	if v != "" {
+		t.Fatalf("expected no enforcement on non-framework staging, got %q", v)
+	}
+
+	// Other runtime/*.yaml (not cognitive-modes) should not trigger
+	v = validateGlossaryRetroOwn(
+		"feat: tweak unrelated runtime yaml",
+		[]string{"runtime/cli-modification-policy.yaml"},
+		tmp,
+	)
+	if v != "" {
+		t.Fatalf("expected no enforcement on non-cognitive-modes runtime yaml, got %q", v)
+	}
+}

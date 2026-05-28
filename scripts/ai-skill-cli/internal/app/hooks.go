@@ -1919,6 +1919,49 @@ func validateCLIDocSync(text string, staged []string, root string) string {
 	return ""
 }
 
+// validateGlossaryRetroOwn enforces runtime/cli-modification-policy.yaml
+// gate.glossary.retro_own_required: when staged diff touches framework
+// cognitive vocabulary surface (runtime/cognitive-modes*.yaml,
+// runtime/economics/**, ecosystem/**), knowledge/glossary/ai-skill.md
+// MUST also be staged. Forces agents to retro-own newly introduced
+// framework terms in the canonical glossary instead of letting them
+// drift as subsystem-local vocabulary.
+//
+// Opt-out: standalone `[skip-glossary-retro-own]` trailer line. The
+// commit message body should explain why this particular framework
+// surface change does not introduce new vocabulary (e.g., typo fix,
+// refactor of existing field, comment-only change).
+//
+// Source: plans/active/2026-05-25-1000-context-language-glossary-system.md
+// Phase 6.
+func validateGlossaryRetroOwn(text string, staged []string, root string) string {
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-glossary-retro-own]" {
+			return ""
+		}
+	}
+	frameworkSurfaceStaged := false
+	glossaryStaged := false
+	for _, s := range staged {
+		if strings.HasPrefix(s, "runtime/cognitive-modes") && strings.HasSuffix(s, ".yaml") {
+			frameworkSurfaceStaged = true
+		}
+		if strings.HasPrefix(s, "runtime/economics/") {
+			frameworkSurfaceStaged = true
+		}
+		if strings.HasPrefix(s, "ecosystem/") {
+			frameworkSurfaceStaged = true
+		}
+		if s == "knowledge/glossary/ai-skill.md" {
+			glossaryStaged = true
+		}
+	}
+	if !frameworkSurfaceStaged || glossaryStaged {
+		return ""
+	}
+	return "glossary-retro-own: staged change touches framework cognitive vocabulary surface (runtime/cognitive-modes*.yaml, runtime/economics/, ecosystem/) but knowledge/glossary/ai-skill.md is not staged. Per plans/active/2026-05-25-1000-context-language-glossary-system.md Phase 6 and runtime/cli-modification-policy.yaml gate.glossary.retro_own_required, new framework terms must retro-own a canonical glossary entry. Use [skip-glossary-retro-own] (standalone trailer line) if this change is a typo / refactor / comment-only edit and introduces no new term."
+}
+
 // validateRuntimeYamlProjects enforces the rule "every runtime/*.yaml
 // must declare runtime_projection.enabled: true AND target_key". Plans
 // that intentionally defer projection must include §Deferred Runtime
@@ -2066,6 +2109,9 @@ var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
 	"obligation.commit.markdown_yaml_sync": func(c commitMsgCtx) string {
 		return validateMarkdownYamlSync(c.text, c.staged, c.root)
 	},
+	"obligation.commit.glossary_retro_own": func(c commitMsgCtx) string {
+		return validateGlossaryRetroOwn(c.text, c.staged, c.root)
+	},
 }
 
 // defaultCommitMsgDispatchOrder is the fallback order if
@@ -2086,6 +2132,7 @@ var defaultCommitMsgDispatchOrder = []string{
 	"obligation.commit.cli_doc_sync",
 	"obligation.commit.runtime_yaml_projects",
 	"obligation.commit.markdown_yaml_sync",
+	"obligation.commit.glossary_retro_own",
 }
 
 // readPerCommitObligationsOrder reads the per_commit_obligations id

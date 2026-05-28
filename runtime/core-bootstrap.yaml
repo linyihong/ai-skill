@@ -204,6 +204,12 @@ per_commit_obligations:
     severity: block
     opt_out_marker: "[skip-markdown-yaml-sync]"
     contract_source: runtime/core-bootstrap.yaml (enumeration); enforcement/failure-patterns/markdown-yaml-sync-drift.md (rationale)
+  - id: obligation.commit.glossary_retro_own
+    fires: every_commit_staging_framework_cognitive_vocabulary_surface
+    validator: validateGlossaryRetroOwn
+    severity: block
+    opt_out_marker: "[skip-glossary-retro-own]"
+    contract_source: runtime/cli-modification-policy.yaml + plans/active/2026-05-25-1000-context-language-glossary-system.md (Phase 6)
 
 per_commit_dispatcher_status:
   machine_iterable: true

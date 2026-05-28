@@ -43,6 +43,9 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/glossary-introduced-by-shape` | `introduced-by` / `deprecated-by` 形狀 | 合法（`plans/<path>`、`constitution/ADR-XXX.md`）通過；違法（commit SHA、issue 編號、PR URL）阻斷 |
 | `fixture/glossary-excludes-reference` | `excludes:` 引用合法性 | 所有 `excludes:` 字串必為現有 entry 的 `term`，否則 validator exit 30 |
 | `fixture/glossary-symmetric-relation` | symmetric relation 對稱性 | `related_to` / `conflicts_with` 兩端 entry 必須互列；單向出現視為違反，validator exit 30 |
+| `fixture/glossary-retro-own-happy` | `glossaryRetroOwn` validator happy path | staged 同時含 `runtime/cognitive-modes-discovery.yaml` 與 `knowledge/glossary/ai-skill.md` → validator pass |
+| `fixture/glossary-retro-own-block` | `glossaryRetroOwn` 阻斷 framework-surface-only commit | staged 只有 `runtime/cognitive-modes-discovery.yaml`，無 `knowledge/glossary/ai-skill.md`，無 opt-out → validator 回非空訊息、exit 30 |
+| `fixture/glossary-retro-own-opt-out` | `[skip-glossary-retro-own]` opt-out | staged 只有 framework surface，commit message 含 `[skip-glossary-retro-own]` trailer → validator pass |
 
 ## 缺 Git fixture
 

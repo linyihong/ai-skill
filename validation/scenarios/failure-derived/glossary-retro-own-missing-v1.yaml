@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Glossary Retro-Own Missing Scenario
+# 防止 framework cognitive vocabulary surface（runtime/cognitive-modes*.yaml /
+# runtime/economics/** / ecosystem/**）被改動但 knowledge/glossary/ai-skill.md
+# 沒同時 stage，造成新 framework term 漂移為 subsystem-local vocabulary。
+# 由 commit-msg validateGlossaryRetroOwn 機械強制。
+
+id: glossary-retro-own-missing-v1
+domain: runtime-governance
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: framework-vocabulary-drift
+  origin_plan: plans/active/2026-05-25-1000-context-language-glossary-system.md
+  origin_phase: Phase 6 Runtime Auto-Detect Integration
+  description: >
+    Agent 修改 framework cognitive vocabulary surface（runtime/cognitive-modes*.yaml、
+    runtime/economics/**、ecosystem/**）引入新 term、新 signal、新 enum 值、新
+    contract 欄位，但沒同時更新 knowledge/glossary/ai-skill.md retro-own canonical
+    entry，導致新詞彙以 subsystem-local 形式 active 卻無 canonical owner。
+
+given:
+  task: modify_framework_cognitive_vocabulary_surface
+  artifacts:
+    - runtime/cognitive-modes.yaml
+    - runtime/cognitive-modes-discovery.yaml
+    - runtime/cognitive-modes-token-budget.yaml
+    - runtime/cognitive-modes-cost-class.yaml
+    - knowledge/glossary/README.md
+    - knowledge/glossary/ai-skill.md
+    - runtime/cli-modification-policy.yaml
+    - plans/active/2026-05-25-1000-context-language-glossary-system.md
+  signals:
+    - staged diff includes runtime/cognitive-modes*.yaml or runtime/economics/** or ecosystem/**
+    - staged diff introduces a new identifier (signal name, enum value, contract field, mode name)
+    - knowledge/glossary/ai-skill.md is NOT staged in the same commit
+    - commit message body does NOT contain [skip-glossary-retro-own] trailer
+  constraints:
+    - Every new framework cognitive / runtime / ecosystem term must have a canonical entry under knowledge/glossary/ai-skill.md
+    - The retro-own entry must declare owner-layer, status, meaning, affects (per knowledge/glossary/README.md schema)
+    - Pure refactor / typo / comment-only changes may opt out via [skip-glossary-retro-own] with explanation in commit message body
+
+when:
+  action: stage_commit_for_framework_surface
+
+then:
+  expected_route:
+    primary: enforce_retro_own_or_explicit_opt_out
+    steps:
+      - Identify whether the staged framework surface change introduces new vocabulary (signal name, enum value, owner-layer, contract field, mode name).
+      - If yes, add or update knowledge/glossary/ai-skill.md entry (or candidate entry) covering the new term with owner-layer, status, meaning, affects.
+      - Stage knowledge/glossary/ai-skill.md in the same commit as the runtime change.
+      - Run ai-skill glossary validate to confirm schema compliance.
+      - If the change is genuinely vocabulary-free (typo, refactor, comment-only), add [skip-glossary-retro-own] as a standalone trailer line and explain in the commit body.
+  forbidden_routes:
+    - silently_introduce_subsystem_local_term_without_glossary_entry
+    - stage_runtime_yaml_change_without_glossary_md_in_same_commit
+    - use_skip_marker_without_commit_body_justification
+    - retro_own_after_commit_lands_then_drift_window_exists
+  expected_intelligence:
+    - knowledge/glossary/README.md
+    - knowledge/glossary/ai-skill.md
+    - runtime/cli-modification-policy.yaml
+  validation:
+    - commit-msg hook validateGlossaryRetroOwn returns "" (pass) when knowledge/glossary/ai-skill.md is also staged or [skip-glossary-retro-own] is present
+    - commit-msg hook returns non-empty error message + exit 30 when framework surface staged alone
+    - error message cites runtime/cli-modification-policy.yaml gate.glossary.retro_own_required and links the upstream plan
+    - retro-own entry in knowledge/glossary/ai-skill.md passes `ai-skill glossary validate --json` with violations=0
