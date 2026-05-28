@@ -302,7 +302,7 @@ observable evidence:
 - [x] `governance/lifecycle/system-upgrade-governance.yaml` 新增 §`pre_2026_05_28_doc_only_completion` section：列出 4 個受 grandfather 保護的 archived plans + sunset deadline **2026-08-31** + 條件式延展條款（若 `ai-skill runtime audit` tool age < 60 天 OR Phase 4 未完成，自動延至 **2026-11-30**）+ sunset 後評估規則
 - [x] `plans/README.md` 原則 4 更新為 4-way enum（`draft` / `in-progress` / `completed (auto-detected)` / `completed (doc-only / pre-2026-strengthened)`）
 - [x] 4 個 archived plans 重新標 `⚠️ completed (doc-only / pre-2026-strengthened)`：cognitive-state-evidence-governance / memory-retrieval-activation-governance / model-aware-execution-routing / runtime-cognitive-modes-system
-- [ ] Run scenario `pre-2026-grandfather-coverage-v1` 驗證（執行於 Phase 4 補 wire 後）
+- [x] Run scenario `pre-2026-grandfather-coverage-v1` 驗證（手動 cross-check：4 個 covered_plans paths 均存在；YAML covered_plans 與 plans/README.md ⚠️-labels 4/4 完全匹配；primary_sunset `2026-08-31` + conditional `2026-11-30` + trigger conditions `audit_tool_age_lt_60_days` / `phase_4_high_priority_wires_incomplete` 全部 explicit；scenario 全部斷言通過）
 
 ### Phase 3 完成條件
 
