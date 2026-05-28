@@ -2065,3 +2065,38 @@ records:
       profile: small
       compression_level: source-backed
       reason: Knowledge Update Flow 在 checkpoint 或 finalize phase 需要執行知識更新時才載入，不佔用 bootstrap 預算。
+
+  - id: route.knowledge.glossary
+    task_intent: 對齊 Ai-skill framework / runtime / cognitive / architecture 共享語彙；查 term owner、status、aliases、related terms、usage paths；偵測語義漂移
+    primary_source: knowledge/glossary/ai-skill.md
+    required_dependencies:
+      - knowledge/glossary/README.md
+    candidate_sources:
+      - knowledge/glossary/README.md
+      - knowledge/glossary/ai-skill.md
+      - knowledge/runtime/sqlite/runtime-index.sqlite
+    source_of_truth_gate: glossary-canonical-active
+    ranking_reason: >
+      Glossary canonical source 是 knowledge/glossary/*.md（Markdown，git-diffable）。
+      Runtime semantic projection 投影為 SQLite 的 glossary_terms / glossary_relations /
+      glossary_usage 三表，供 owner lookup、alias resolution、usage traversal、
+      drift detection 查詢使用；validator 由 `ai-skill glossary validate` 強制。
+    validation_signal: >
+      Glossary entries 已通過 schema validator；SQLite projection 已 populated；
+      term owner、relations、usage 可被 SQL 查詢；symmetric relation 雙向對稱。
+    metadata:
+      priority: P2
+      confidence: high
+      context_cost:
+        estimated_tokens: 600
+        load_strategy: lazy
+        cacheable: true
+        ttl:
+          session: 1
+      compatibility_state: new-layer-promoted
+    model:
+      profile: small
+      compression_level: source-backed
+      reason: >
+        Glossary 在 plan、BDD discovery、framework discovery、pre-build interrogation
+        遇到詞義衝突或需要 canonical 定義時才載入；不佔用 bootstrap 預算。

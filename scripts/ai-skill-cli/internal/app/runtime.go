@@ -15,6 +15,8 @@ import (
 	"time"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/linyihong/Ai-skill/scripts/ai-skill-cli/internal/glossary"
 )
 
 type runtimeOptions struct {
@@ -647,7 +649,120 @@ CREATE VIRTUAL TABLE fts USING fts5(id, source_path, title, summary, tags, when_
 			return err
 		}
 	}
+	if err := populateGlossaryProjection(db, repo); err != nil {
+		return err
+	}
 	return nil
+}
+
+// populateGlossaryProjection projects knowledge/glossary/*.md entries into
+// glossary_terms / glossary_relations / glossary_usage tables. Canonical
+// source remains the Markdown files; this projection is a normalized
+// semantic index used by route.knowledge.glossary and downstream tooling.
+// See knowledge/glossary/README.md §Semantic SQLite Projection.
+func populateGlossaryProjection(db *sql.DB, repo string) error {
+	if _, err := db.Exec(`
+CREATE TABLE glossary_terms (
+  term TEXT PRIMARY KEY,
+  status TEXT,
+  owner_layer TEXT,
+  meaning TEXT,
+  aliases TEXT,
+  canonical_source TEXT,
+  introduced_by TEXT,
+  deprecated_by TEXT
+);
+CREATE TABLE glossary_relations (
+  source_term TEXT NOT NULL,
+  relation_type TEXT NOT NULL,
+  target_term TEXT NOT NULL,
+  source_file TEXT NOT NULL
+);
+CREATE TABLE glossary_usage (
+  term TEXT NOT NULL,
+  source_file TEXT NOT NULL,
+  source_type TEXT NOT NULL,
+  usage_context TEXT
+);
+CREATE INDEX idx_glossary_relations_target ON glossary_relations(target_term, relation_type);
+CREATE INDEX idx_glossary_relations_source ON glossary_relations(source_term, relation_type);
+CREATE INDEX idx_glossary_usage_source ON glossary_usage(source_file);
+CREATE INDEX idx_glossary_usage_type ON glossary_usage(source_type);
+CREATE INDEX idx_glossary_terms_owner ON glossary_terms(owner_layer);
+CREATE INDEX idx_glossary_terms_status ON glossary_terms(status);
+`); err != nil {
+		return fmt.Errorf("create glossary tables: %w", err)
+	}
+	entries, parseViolations, err := glossary.LoadDir(filepath.Join(repo, "knowledge", "glossary"))
+	if err != nil {
+		return fmt.Errorf("load glossary: %w", err)
+	}
+	if len(parseViolations) > 0 {
+		// Surface as projection-stage failure rather than silently dropping.
+		return fmt.Errorf("glossary parse violations: %d (run `ai-skill glossary validate` for detail)", len(parseViolations))
+	}
+	for _, e := range entries {
+		canonical := relativeRepoPath(repo, e.SourceFile)
+		aliasesJoined := strings.Join(e.Aliases, ",")
+		if _, err := db.Exec(
+			`INSERT INTO glossary_terms VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+			e.Term, e.Status, e.OwnerLayer, e.Meaning, aliasesJoined,
+			canonical, e.IntroducedBy, e.DeprecatedBy,
+		); err != nil {
+			return fmt.Errorf("insert glossary_terms %s: %w", e.Term, err)
+		}
+		for _, rel := range e.RelatedTerms {
+			if _, err := db.Exec(
+				`INSERT INTO glossary_relations VALUES (?, ?, ?, ?)`,
+				e.Term, rel.Type, rel.Target, canonical,
+			); err != nil {
+				return fmt.Errorf("insert glossary_relations %s: %w", e.Term, err)
+			}
+		}
+		for _, affects := range e.Affects {
+			if _, err := db.Exec(
+				`INSERT INTO glossary_usage VALUES (?, ?, ?, ?)`,
+				e.Term, affects, classifyGlossaryUsageSourceType(affects), "affects",
+			); err != nil {
+				return fmt.Errorf("insert glossary_usage %s: %w", e.Term, err)
+			}
+		}
+	}
+	return nil
+}
+
+// classifyGlossaryUsageSourceType maps a path prefix to one of the
+// allowed source_type enum values (workflow / validation / runtime /
+// knowledge / adr / plan / memory). See knowledge/glossary/README.md
+// §Usage Index Source Types.
+func classifyGlossaryUsageSourceType(path string) string {
+	p := strings.ToLower(strings.TrimPrefix(path, "./"))
+	switch {
+	case strings.HasPrefix(p, "workflow/"):
+		return "workflow"
+	case strings.HasPrefix(p, "validation/"):
+		return "validation"
+	case strings.HasPrefix(p, "runtime/"):
+		return "runtime"
+	case strings.HasPrefix(p, "knowledge/"):
+		return "knowledge"
+	case strings.HasPrefix(p, "constitution/"):
+		return "adr"
+	case strings.HasPrefix(p, "plans/"):
+		return "plan"
+	case strings.HasPrefix(p, "memory/"):
+		return "memory"
+	default:
+		return "knowledge"
+	}
+}
+
+func relativeRepoPath(repo, abs string) string {
+	rel, err := filepath.Rel(repo, abs)
+	if err != nil {
+		return abs
+	}
+	return filepath.ToSlash(rel)
 }
 
 func runtimeIndexRecords(repo string) ([]runtimeIndexAtom, error) {
