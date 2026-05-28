@@ -103,17 +103,56 @@ ecosystem/
 ├── telemetry/       # signal capture, observability, runtime emit
 ├── adaptation/      # pressure-based mode selection, rationale capture
 ├── evolution/       # workflow / heuristic / knowledge lifecycle, decay
+├── suppression/     # negative activation — what NOT to load / activate
+├── ecology-boundary/  # what belongs in ecosystem vs runtime vs workflow vs docs
 └── governance/      # governance-of-evolution (meta-governance)
 
 runtime/
 └── execution-engine/  # the former Gen 3 runtime, now a subsystem
 ```
 
+`suppression/` 與 `ecology-boundary/` 是 2026-05-28 第三輪 review 增補：
+
+- **suppression/** 防止「多 activate 即省 token」的反向錯覺。真正省成本不是 activate 對的東西，而是 **不 activate** 不該開的東西。`governance-minimality-small-task-v1` 與 `tier3-does-not-block-tier0-tier2-v1` 的精神在此層機械化。
+- **ecology-boundary/** 防止 ecosystem inflation — 不是所有跨層問題都該進 ecosystem。明確定義「什麼進 ecosystem、什麼留 runtime / workflow / docs」，machine-verifiable 邊界。
+
+---
+
+## Cognitive Kernel Boundary（OS 類比）
+
+第三輪 review 點出本系統實質已接近 **AI OS kernel architecture**。為避免 ecosystem 邊界失控，明列 OS 類比：
+
+| 本系統 | OS kernel 角色 |
+|---|---|
+| `runtime/execution-engine/` | kernel core |
+| `runtime/cognitive-modes*.yaml` | scheduler policy |
+| `tools/` | device drivers |
+| `memory/` | virtual memory |
+| `governance/` | security policy |
+| `workflow/` | process / task |
+| `ecosystem/telemetry/` | observability subsystem |
+| `ecosystem/activation/` | loader / dynamic linker |
+| `ecosystem/economics/` | resource allocator |
+| `ecosystem/discovery/` | dynamic linker（symbol resolution）|
+| `ecosystem/suppression/` | OOM killer / cgroup limits |
+| `ecosystem/ecology-boundary/` | kernel API contract（什麼算 kernel call）|
+
+**Kernel Boundary Rule（防 ecosystem inflation）**：
+
+一個 concept 進入 `ecosystem/` 必須同時滿足：
+
+1. **Cross-layer**：跨 ≥ 2 個 source-of-truth layer（models / tools / memory / workflow / intelligence / knowledge）
+2. **Resource interaction**：影響 cognition cost / activation / decay / pressure
+3. **Machine-verifiable**：有 SQLite query / generated surface / scenario / validator 可驗
+4. **Non-duplicating**：不重新定義既有 source layer 的 canonical 概念
+
+不滿足 4 條的 concept 留在原 layer。Vision 詞彙不算進入 ecosystem，必須降為 `ecology-boundary/` 內的 candidate term 並走 graduation。
+
 ---
 
 ## Threshold Criteria（graduation 必達標準）
 
-達成下列 **≥ 8/11 criteria** 且其餘 3 個有 active plan + 明確 entry condition，才考慮 graduate 本檔為 `current`。每條 criteria 必須是 **machine-verifiable**（generated surface / SQLite query / scenario evidence），不接受純散文宣稱。
+達成下列 **≥ 10/13 criteria** 且其餘 3 個有 active plan + 明確 entry condition，才考慮 graduate 本檔為 `current`。每條 criteria 必須是 **machine-verifiable**（generated surface / SQLite query / scenario evidence），不接受純散文宣稱。
 
 ### A. Cognitive Economics — 活的成本模型
 
@@ -207,15 +246,20 @@ Discovery 不再只是 static routing；6 種模式至少 ≥ 4 種 active：
 - 預算消耗有 evidence trail
 - **Acceptance signal**：`ecosystem.cognitive_budget_policy.contract` projected；commit-msg validator 比對 declared cost class vs actual budget consumption
 
-### K. Knowledge Activation Runtime — 聲明式啟用契約
+### K. Knowledge Activation Graph — 多輸入聲明式啟用契約
 
-Gen 3 是「human knows what to load」（plan 作者寫死 candidate_sources）；Gen 4 是 **runtime discovers what must load**。需要 declarative activation contract：
+Gen 3 是「human knows what to load」（plan 作者寫死 candidate_sources）；Gen 4 是 **runtime discovers what must load**。但 activation 不是單純 signal → load 的 1:1 mapping，而是 **graph convergence**：多個輸入共同決定啟用集合。
 
 ```yaml
 activation:
-  signal:
-    - architecture_complexity_high
-    - vendor_count_large
+  inputs:                      # 多輸入收斂
+    signals: [architecture_complexity_high, vendor_count_large]
+    pressure: context_explosion_low
+    economics: budget_available_high
+    context_shape: cross_domain_synthesis
+    failure_history: no_recent_archaeology_failure
+    role: implementer  # 不是 reviewer / explorer
+    memory_freshness: project_context_stale
   activate:
     - intelligence: vendor-integration-architecture
     - intelligence: bounded-context-analysis
@@ -227,12 +271,48 @@ activation:
 
 要求：
 
-- 至少 ≥ 5 個 activation contract 存在於 `runtime/` 或 `ecosystem/`，每個 contract 把 signals 顯式 map 到 intelligence / workflow / governance 啟用清單 + economics estimate
+- 至少 ≥ 5 個 activation contract 存在於 `ecosystem/activation/`，每個 contract 至少消費 **3 種以上**輸入（signals / pressure / economics / context_shape / failure_history / role / memory_freshness）
 - Runtime 依 contract 自動載入，**不需 plan 作者手動列 candidate_sources**
-- Contract 內 `economics.estimated_cost` 與 actual cost 有 telemetry 比對（與 criterion I 連動）
-- **Acceptance signal**：`SELECT * FROM activation_contracts` 在 runtime SQLite 可查；scenario 證明 signal-only trigger 能自動 activate 對應 intelligence 集合
+- Contract 內 `economics.estimated_cost` 與 actual cost 有 telemetry 比對（criterion I）；偏差累積觸發 contract refinement
+- **Acceptance signal**：`SELECT * FROM activation_graph` 在 runtime SQLite 可查；scenario 證明同 signal 在不同 pressure / role / memory_freshness 下產生不同 activation set
 
-這條與 §The Final Test 直接對應：activation contract 完成 = system「自己決定該讀什麼、該啟動什麼 cognition」的 machine-verifiable proof。
+這條與 §The Final Test 直接對應：activation graph 完成 = system「自己決定該讀什麼、該啟動什麼 cognition」的 machine-verifiable proof。**Discovery ≠ Activation**：discovery 找候選，activation graph 才真正決策。
+
+### L. Telemetry Economics — 觀察的成本不能大於被觀察
+
+Criterion I（Telemetry Layer）有六種 telemetry，但本身會產生 runtime exhaust。若無 economics 控制，會出現 telemetry 成本 > execution 成本 / replay 成本 > 推理成本 / trace 成本 > workflow 成本的「過度自我觀察」病態。
+
+要求：
+
+- Telemetry 自帶 budget：每類 telemetry 有 retention / aggregation / decay 規則
+- 高頻 telemetry 自動降頻或 aggregate（例如：mode selection 每 N 次 sample 一次，不是每次全紀錄）
+- Telemetry decay 與 criterion F（memory decay）共用 lifecycle 模型
+- 有 SQL / scenario 證明 telemetry 自身成本 ≤ 觀察對象成本的某個 ratio（例如 10%）
+- **Acceptance signal**：`ecosystem.telemetry_economics.contract` 在 generated surfaces；scenario 證明 telemetry budget exceedance 觸發 aggregation / suppression / decay
+
+### M. Cognitive Suppression Layer — 負向 activation
+
+Activation 的正向決策（criterion K）只解決一半。**真正省 cognition 不是 activate 對的東西，是不 activate 不該開的東西**。本層機械化「什麼時候 disable validation / 跳過 deep discovery / 略過 architecture review」。
+
+```yaml
+suppression:
+  when:
+    - task_size_small
+    - risk_low
+    - failure_history_clean
+  disable:
+    - workflow: heavy-governance-chain
+    - intelligence: cargo-cult-ddd
+    - validation: exhaustive-discovery
+  why: small low-risk task does not warrant Tier-3 governance
+```
+
+要求：
+
+- 至少 ≥ 3 個 suppression contract 在 `ecosystem/suppression/`
+- 既有 scenarios `governance-minimality-small-task-v1` 與 `tier3-does-not-block-tier0-tier2-v1` 被 suppression contract 機械引用
+- 反向：governance / validation 被 suppress 的事件有 telemetry 紀錄（criterion I 連動）
+- **Acceptance signal**：`SELECT * FROM suppression_events` 在 runtime SQLite 可查；scenario 證明 small low-risk task 被 suppress 後 cognitive_cost 顯著下降
 
 ---
 
@@ -285,9 +365,11 @@ activation:
 | H. Multi-Agent Ecology | ❌ 未開始 | `.agent-goals/` 有 lock 機制但仍 single-owner assumption；無 multi-agent role contract |
 | I. Telemetry Layer | ⚠️ 部分 | commit-msg Cognitive Mode 報告 + `runtime.db generated_surfaces` 是局部 telemetry；無 system-wide observability surface；無 mode-selection history |
 | J. Cognitive Resource Management | ⚠️ 部分 | `runtime/cognitive-modes-token-budget.yaml` 有 token 預算；無 split-cost 分配、無 budget exceedance trigger |
-| K. Knowledge Activation Runtime | ❌ 未開始 | `knowledge/runtime/routing-registry.yaml` 是 task_intent → primary_source 的 manual map，**不是** signal → activation 的 declarative contract；無 economics-aware activation |
+| K. Knowledge Activation Graph | ❌ 未開始 | `knowledge/runtime/routing-registry.yaml` 是 task_intent → primary_source 的 manual map，**不是** multi-input signal → activation 的 declarative graph；無 economics / pressure / role / memory_freshness aware activation |
+| L. Telemetry Economics | ❌ 未開始 | 目前 telemetry 只有 commit-msg cognitive mode block + generated reports；無 retention / aggregation / decay budget；無 self-observation cost 控制 |
+| M. Cognitive Suppression Layer | ⚠️ 詞彙就位 | scenarios `governance-minimality-small-task-v1` + `tier3-does-not-block-tier0-tier2-v1` 已 enforce 部分 suppression；無 declarative suppression contract、無 suppression telemetry |
 
-**綜合判斷**：本系統正站在 Gen 3 → Gen 4 的**轉折起點**，不是中段。**0 ✅ / 4 ⚠️ partial / 7 ❌ 未開始**（共 11 criteria）。Gen 4 詞彙領先 Gen 4 enforcement 約一個世代。要 graduate 為 `current` 至少還需要 4–8 個大型 plan 落地，重心會在 Phase B（K + C + D）與 Phase C（A + B + F + G + I）。
+**綜合判斷**：本系統正站在 Gen 3 → Gen 4 的**轉折起點**，不是中段。**0 ✅ / 5 ⚠️ partial / 8 ❌ 未開始**（共 13 criteria）。Gen 4 詞彙領先 Gen 4 enforcement 約一個世代。要 graduate 為 `current` 至少還需要 4–8 個大型 plan 落地，重心會在 Phase B（K + C + D）、Phase C（A + B + F + G + I）、Phase B′（L + M，與 telemetry 同步）。
 
 ---
 
@@ -336,8 +418,35 @@ User 評價提到本系統已開始出現第二代特徵。誠實對照：
 - 本檔為 **vision document**，**不是** canonical entry。Gen 3 仍為 current。
 - 修改本檔需先確認 graduation criteria 仍 machine-verifiable；不接受純散文加 criteria。
 - 當某條 criteria 從 ❌ → ⚠️ → ✅，需在 §現況評估表記錄 evidence link（plan / commit / contract path）。
-- 達 **≥ 8/11 ✅** 且其他 3 條有 active plan + entry condition 時，依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §1 啟動世代升級流程，本檔 status 從 `vision` 升為 `current`，Gen 3 文件降為 `historical`，重新評估每個 ADR 在 Gen 4 的延伸狀態。
+- 達 **≥ 10/13 ✅** 且其他 3 條有 active plan + entry condition 時，依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §1 啟動世代升級流程，本檔 status 從 `vision` 升為 `current`，Gen 3 文件降為 `historical`，重新評估每個 ADR 在 Gen 4 的延伸狀態。
 - 新加入的 Gen 4 plan 必須遵循 [`governance/lifecycle/system-upgrade-governance.yaml`](../governance/lifecycle/system-upgrade-governance.yaml) §`define_runtime_trigger_flow`，不得以 routing-only 或 projection-only 宣稱已完成 runtime integration（見 plans/README.md §Runtime Execution Path 強化條款）。
+
+---
+
+## Watch-Out List（Gen 4 路上會撞到的牆）
+
+第三輪 review 識別 5 個下一階段必然遇到的反模式。寫進本檔以便未來 plan 主動規避：
+
+| Wall | 風險敘述 | 緩解 |
+|---|---|---|
+| 1. Discovery confused with Activation | 把 routing-registry 當 activation graph，導致系統仍是「人決定載入什麼」 | criterion K 強制 multi-input activation contract；route ≠ activation |
+| 2. Workflow inflation | workflow 越寫越大、越 rigid，最後變 BPMN；agent 失去自主性 | 核心心智模型轉為 cognitive resource management；workflow 是 resource 之一不是中心 |
+| 3. Ecosystem boundary inflation | 所有跨層概念都塞 ecosystem，最後 ecosystem 變第二個 monolith | §Cognitive Kernel Boundary 4 條 rule 機械強制；`ecosystem/ecology-boundary/` 為守門 |
+| 4. Telemetry explosion | telemetry 成本 > execution 成本，系統陷入 over-self-observation | criterion L（Telemetry Economics）強制 retention / aggregation / decay budget |
+| 5. Positive-activation bias | 只想 activate 對的東西，忽略不 activate 不該開的東西 | criterion M（Cognitive Suppression Layer）機械化負向 activation |
+
+每條 wall 對應一個 criterion；新 plan 在 §Decision Rationale 應 cite 自己對應緩解的 wall。
+
+## Public Positioning（系統的真實層級）
+
+外部觀察者已指出本系統實質不是 agent framework 而是 **AI runtime architecture / cognitive operating architecture / adaptive cognition infrastructure**。代價是：
+
+- complexity 會比一般 framework 大數量級
+- governance 會越來越難（meta-governance 比 governance 更難）
+- layering 重要性遠超 features
+- economics 比 features 更重要（cognition resource allocation 是核心問題）
+
+本檔接受此定位。Gen 4 不追求成為更好的 agent framework，追求成為 **可演化的 cognitive OS**。
 
 ---
 
