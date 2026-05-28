@@ -31,6 +31,9 @@
 | `Phase 0` Pre-Build Interrogation | 架構/流程/跨層 plan | per §Architecture Compatibility Preflight |
 | `Phase 1-N` | 全部 plan | 實作步驟 + 各 phase 完成條件 |
 | `Stakeholder 同意項目` | 架構/流程 plan | 列出 sign-off 項 |
+| `Per-surface consumer 表` | 任何 plan 新增 `route.*` entry 或 `runtime_projection.target_key` 或 commit-msg validator | 列出每個新 surface 與其 named consumer（discovery signal / Go validator / routable lookup / `manual_activation` annotation）。表格欄位：`Generated surface key` / `Named consumer(s)` / `Consumer 類型`。**Reviewer 必擋條件**：surface 列出但無對應 consumer（除非顯式 `manual_activation: { reason: ... }`）。本表是 §`define_runtime_trigger_flow` forbidden rules 的 plan-level 對應；commit 時由 `validateRuntimeTriggerWiring` 機械驗證 |
+| `Glossary Impact row` | 全部 plan | 一行（在 §Decision Rationale 或 §完成條件 旁）：`Glossary Impact: <yes / no>`。若 yes，列出新引入的 framework vocabulary terms + 是否已在 `knowledge/glossary/ai-skill.md` 註冊。若 no，明寫 `no new framework vocabulary introduced`。Audit-time `ai-skill runtime audit` 的 glossary coverage warning 會 cross-check 此宣告 |
+| `Watch-Out List citation` | 跨層 / Gen 4 forward plan | 引用對應 Gen 4 vision §Watch-Out List 的 wall（防 scope drift、防 over-engineering）。Path: [`architecture/ai-native-cognitive-ecosystem-system.md`](../architecture/ai-native-cognitive-ecosystem-system.md) §Watch-Out List |
 | `與其他 plans 的關係` | 全部 plan | Cross-reference |
 
 ### `Decision Rationale` section 內容規範

@@ -194,6 +194,8 @@ steps:
       - knowledge_graphs_and_summaries
       - runtime_compile_refresh_validate
       - tool_sync_when_tool_mirror_is_changed
+      - plan_template_per_surface_consumer_table_present_when_surfaces_added
+      - plan_template_glossary_impact_row_present
     gates:
       - gate.system_upgrade.linked_updates_complete
 

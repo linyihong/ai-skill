@@ -369,15 +369,15 @@ observable evidence:
 
 ### Tasks
 
-- [ ] `plans/README.md` 模板新增 §Per-surface consumer 表為 required section（仿 economics plan 的 audit-fix consumer 表）
-- [ ] `plans/README.md` 模板新增 §Glossary Impact row：新框架詞彙是否引入；是否更新 `knowledge/glossary/ai-skill.md`；若沒有，明確填 `no new framework vocabulary`
-- [ ] 加上 `Watch-Out List` citation requirement — 新 plan 須 cite 對應 Gen 4 vision §Watch-Out List 的 wall
-- [ ] 更新 `governance/lifecycle/system-upgrade-governance.yaml` linked update
+- [x] `plans/README.md` 模板新增 §Per-surface consumer 表為 required section（trigger: 新增 `route.*` / `target_key` / commit-msg validator；reviewer 必擋無 consumer 的 surface）
+- [x] `plans/README.md` 模板新增 §Glossary Impact row：新框架詞彙是否引入；若無，明寫 `no new framework vocabulary introduced`；audit glossary coverage warning 會 cross-check
+- [x] 加上 §Watch-Out List citation requirement — 跨層 / Gen 4 forward plan 須 cite [`architecture/ai-native-cognitive-ecosystem-system.md`](../../architecture/ai-native-cognitive-ecosystem-system.md) §Watch-Out List
+- [x] 更新 `governance/lifecycle/system-upgrade-governance.yaml` §`execute_linked_updates.must_check` 加 `plan_template_per_surface_consumer_table_present_when_surfaces_added` + `plan_template_glossary_impact_row_present`
 
 ### Phase 6 完成條件
 
-- [ ] plans/README.md 模板更新
-- [ ] 後續新 plan 可直接 copy 模板過 governance check
+- [x] plans/README.md 模板更新（4 個新 required sections）
+- [x] 後續新 plan 可直接 copy 模板過 governance check（including 本 plan 的 follow-up `2026-05-28-1830-plan-archival-audit-validator.md` 將成為第一個套用新模板的 plan）
 
 ---
 
