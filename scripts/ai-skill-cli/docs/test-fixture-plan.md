@@ -37,6 +37,12 @@ Fixture 必須避開使用者真實 home 目錄、真實 git config、真實 Cur
 | `fixture/go-first-automation-policy` | 新 automation 入口治理 | 新功能不得新增長期 `.sh` / `.rb` / `.py`；若為 hook / bootstrap 例外，必須有 Go owner 與刪除條件 |
 | `fixture/shell-deletion-gate` | 完成 parity 後刪除 `.sh` | `init-new-project.sh`、`agent-goals.sh`、`ai-skill-close-loop.sh` 不再存在；active docs 不再導向 shell commands |
 | `fixture/go-hook-runner` | Git hook logic Go-native | pre-commit staged runtime compile / validate 與 post-commit reference-only 行為由 `ai-skill hooks run` 覆蓋；shell hook 只作 adapter |
+| `fixture/glossary-valid-entry` | `glossary validate` happy path | H2 + YAML block 配對、required fields 完整、owner-layer 合法、無 violation；validator exit 0；無檔案修改 |
+| `fixture/glossary-invalid-entry` | schema violation 阻斷 | 缺 `owner-layer`、kebab-case `term`、forbidden status、非法 enum 值各自獨立子 fixture；每個案例 validator exit 30，JSON 列出 rule id |
+| `fixture/glossary-alias-rules` | alias 規則違反 | (a) `aliases:` 字串等於另一 entry 的 `term`、(b) alias chain 形成 cycle、(c) 新 entry `status: alias-only`；每個案例 validator exit 30 |
+| `fixture/glossary-introduced-by-shape` | `introduced-by` / `deprecated-by` 形狀 | 合法（`plans/<path>`、`constitution/ADR-XXX.md`）通過；違法（commit SHA、issue 編號、PR URL）阻斷 |
+| `fixture/glossary-excludes-reference` | `excludes:` 引用合法性 | 所有 `excludes:` 字串必為現有 entry 的 `term`，否則 validator exit 30 |
+| `fixture/glossary-symmetric-relation` | symmetric relation 對稱性 | `related_to` / `conflicts_with` 兩端 entry 必須互列；單向出現視為違反，validator exit 30 |
 
 ## 缺 Git fixture
 

@@ -38,6 +38,7 @@
 | `ai-skill runtime validate` | 驗證 runtime.db、knowledge runtime、SQLite assertions | 否 | 否 | Phase 3 |
 | `ai-skill runtime query` | 查詢 runtime index / generated surfaces | 否 | 否 | Phase 3 |
 | `ai-skill runtime obligations` | 列出目前 active bootstrap obligations（per_session / per_turn / per_commit），從 `generated_surfaces[runtime.core_bootstrap.contract]` 讀取 | 否 | 否 | bootstrap-yaml-migration Phase 3 |
+| `ai-skill glossary validate` | 驗證 `knowledge/glossary/*.md` 的 entry schema、status / owner / relation enum、naming convention、alias 規則、`introduced-by` / `deprecated-by` 形狀、symmetric relation 對稱性與 `excludes` 引用 | 否 | 否 | context-language-glossary-system Phase 2 |
 | `ai-skill roo set-global-custom-instructions` | guarded 寫入 Roo Code 全域 Custom Instructions | 是 | 否 | Tool adapter |
 
 ## 共通輸出契約
@@ -397,6 +398,43 @@
 - 不可修改 runtime.db 或 generated surfaces。
 - 用途：debug "為什麼 commit-msg hook 擋我" + Phase 6 per-obligation dispatcher 對齊 hook 與 contract。
 
+### `ai-skill glossary validate`
+
+目的：驗證 `knowledge/glossary/*.md` 內的 glossary entries 是否符合 [`knowledge/glossary/README.md`](../../../knowledge/glossary/README.md) 定義的 entry schema、symmetry classification、命名規則與 `excludes` 引用合法性。Source-of-truth 是 README.md 內的 schema spec；本 command read-only validator。
+
+輸入：
+
+- `--repo <path>`（預設 `.`，glossary 根目錄 = `<repo>/knowledge/glossary/`）
+- `--glossary <path>`（覆寫 glossary 根目錄，預設 `<repo>/knowledge/glossary/`）
+- `--json` / `--plain`
+
+副作用：無。
+
+必要行為：
+
+- 解析每個 `knowledge/glossary/*.md`（除 `README.md` 外）內的 H2 heading + 緊接 YAML code block；H2 文字必須與 YAML block 的 `term:` 完全相同。
+- 檢查 required fields：`term`、`status`、`meaning`、`affects`、`owner-layer`。
+- 檢查 optional fields shape：`aliases`、`anti-meaning`、`excludes`、`related-terms`、`introduced-by`、`deprecated-by`。
+- 檢查 enum：
+  - `status` ∈ `canonical` / `candidate` / `deprecated` / `superseded` / `alias-only` / `experimental` / `project-local`
+  - `owner-layer` ∈ README.md `semantic_owner_domains:` 列出的 domains
+  - `relation_type` (in `related-terms`) ∈ `alias_of` / `related_to` / `conflicts_with` / `owned_by` / `used_by` / `deprecated_by` / `replaced_by` / `derived_from` / `aggregates`
+- 檢查 naming：`term:` 必須為 snake_case。
+- 檢查 alias 規則：(a) `aliases:` 中字串不得出現為任何 entry 的 `term:`；(b) alias chain 不得形成 cycle；(c) 新 entry 禁用 `status: alias-only`（僅供 deprecated 過渡）。
+- 檢查 `introduced-by` / `deprecated-by` 形狀：必須為 `plans/<path>` 或 `constitution/ADR-XXX.md`，禁止 commit SHA、issue 編號、PR URL。
+- 檢查 `excludes:` 引用合法性：所有列出的字串必須為現有 entry 的 `term:`。
+- 檢查 symmetry：symmetric relation（`related_to` / `conflicts_with`，依 README.md symmetry 分類表）必須雙向出現於兩端 entry；asymmetric 僅單向。
+- 檢查 forbidden patterns：term body 不得包含 project-specific hosts / paths / class names / sample IDs / incident evidence / executable contract semantics / raw memory replay。
+- 失敗時 exit 30 (`validation_failed`)；JSON `checks` 列出每個 violation 的 entry path、term、rule id、remediation。
+- 通過時 exit 0，並回報 entries / aliases / relations 計數。
+- 不修改 `knowledge/glossary/` 內任何檔案。
+
+驗證：
+
+- Go unit tests in `scripts/ai-skill-cli/internal/glossary/validator_test.go`（或等效路徑），fixture 見 [`test-fixture-plan.md`](test-fixture-plan.md) `fixture/glossary-*`。
+- BDD scenarios 見 [`bdd-scenarios.md`](bdd-scenarios.md) §Glossary。
+- 若未來接入 `ai-skill runtime validate`，須同時更新本檔與 runtime validate 行為說明。
+
 ## 舊 Script 對應
 
 完整功能盤點、side effects、外部依賴與測試證據見 [`script-parity-inventory.md`](script-parity-inventory.md)。開發者 handoff map 見 [`legacy-to-go-migration-map.md`](legacy-to-go-migration-map.md)。本節只保留命令契約層的摘要映射；不得用本表取代 parity 驗收。
@@ -457,3 +495,4 @@
 | `runtime validate` | generated reports、runtime.db | 無 | SQLite index git-ignore boundary 需 Git |
 | `runtime query` | `knowledge/runtime/sqlite/runtime-index.sqlite` 或 `--db` 指定 SQLite index | 無 | 無 |
 | `runtime query --graph` | `knowledge/graphs/*.yaml` | 無 | 無 |
+| `glossary validate` | `knowledge/glossary/*.md`（H2 + YAML block entries） | 無 | 無 |

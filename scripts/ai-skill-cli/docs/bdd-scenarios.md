@@ -85,6 +85,24 @@
 **Then** 命令以 `unsafe_repo_state` 結束
 **And** 不建立 commit。
 
+## 場景：Glossary entry 通過 schema
+
+**Given** `knowledge/glossary/ai-skill.md` 包含一個 H2 heading（snake_case term）緊接 YAML code block，且 YAML 內 `term` / `status` / `meaning` / `affects` / `owner-layer` 皆合法
+**When** 執行 `ai-skill glossary validate --json`
+**Then** exit code 為 `0`
+**And** JSON `status` 為 `success`
+**And** `checks` 回報 entries / aliases / relations 計數
+**And** `knowledge/glossary/` 內任何檔案沒有被修改。
+
+## 場景：Glossary entry schema violation 阻斷
+
+**Given** `knowledge/glossary/ai-skill.md` 內一個 entry 缺少 `owner-layer`、或 `term` 為 kebab-case、或 `aliases:` 內字串等於另一 entry 的 `term`、或 `excludes:` 引用不存在的 term、或 `introduced-by` 為 commit SHA
+**When** 執行 `ai-skill glossary validate --json`
+**Then** exit code 為 `30`（`validation_failed`）
+**And** JSON `error.code = "validation_failed"`
+**And** `checks` 列出每個 violation 的 entry path、term、rule id 與 remediation hint
+**And** 命令不修改任何 `knowledge/glossary/` 內檔案。
+
 ## 場景：iOS native binary 不支援
 
 **Given** 使用者要求在 iOS 上以下載的 native binary 執行 `ai-skill`
