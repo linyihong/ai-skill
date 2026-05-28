@@ -10,6 +10,26 @@
 
 ---
 
+## activation_fitness
+
+```yaml
+term: activation_fitness
+status: candidate
+owner-layer: ecosystem-adaptation
+meaning: >
+  Future fitness evidence for whether a specific activation combination
+  (signals / workflow / intelligence / governance / memory) improved task
+  outcome relative to its cognitive cost. In the current Gen3.5 boundary this
+  is a placeholder vocabulary term, not a live scoring engine.
+affects:
+  - architecture/ai-native-cognitive-ecosystem-system.md
+  - plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
+anti-meaning: >
+  Not an automatic activation policy, not a reinforcement signal, and not a
+  reason to bypass runtime validation.
+introduced-by: plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
+```
+
 ## cognitive_cost
 
 ```yaml
@@ -168,6 +188,26 @@ related-terms:
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```
 
+## fitness_system
+
+```yaml
+term: fitness_system
+status: candidate
+owner-layer: ecosystem-adaptation
+meaning: >
+  Future Gen4 contract family for evaluating whether cognition patterns,
+  activation sets, memory replay, workflow sequences, or textual skill updates
+  improve outcomes relative to their cost. Current usage is interface
+  reservation only; no autonomous scoring engine is active.
+affects:
+  - architecture/ai-native-cognitive-ecosystem-system.md
+  - plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
+anti-meaning: >
+  Not feedback promotion score, not cognitive_cost, and not a live telemetry
+  database.
+introduced-by: plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
+```
+
 ## generated_surface
 
 ```yaml
@@ -299,6 +339,26 @@ anti-meaning: >
 introduced-by: plans/active/2026-05-25-1000-context-language-glossary-system.md
 ```
 
+## optimization_memory
+
+```yaml
+term: optimization_memory
+status: candidate
+owner-layer: ecosystem-adaptation
+meaning: >
+  Future memory lifecycle for successful cognition or textual strategy patterns:
+  successful execution produces a bounded winning pattern, which may later be
+  promoted into a reusable activation heuristic or skill-like instruction after
+  validation. Current status is schema/interface reservation only.
+affects:
+  - architecture/ai-native-cognitive-ecosystem-system.md
+  - plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
+anti-meaning: >
+  Not failure memory, not generic feedback history, and not an automatic
+  self-evolving prompt updater.
+introduced-by: plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
+```
+
 ## pressure_model
 
 ```yaml
@@ -349,6 +409,26 @@ affects:
   - knowledge/runtime/runtime-report.md
   - knowledge/runtime/sqlite/runtime-index.sqlite
 introduced-by: plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md
+```
+
+## rejected_optimization_memory
+
+```yaml
+term: rejected_optimization_memory
+status: candidate
+owner-layer: ecosystem-adaptation
+meaning: >
+  Future memory lifecycle for optimization candidates that were explicitly
+  rejected because they regressed quality, increased token cost, raised
+  governance friction, caused telemetry overhead, or over-activated context.
+  The purpose is to prevent repeated optimization hallucinations.
+affects:
+  - architecture/ai-native-cognitive-ecosystem-system.md
+  - plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
+anti-meaning: >
+  Not a generic failure pattern; it records rejected improvement attempts and
+  their regression or cost evidence.
+introduced-by: plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
 ```
 
 ## thinking_cost

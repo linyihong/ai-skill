@@ -100,6 +100,8 @@ Tool Runtime Signal & Economics Integration
 
 第一版不做完整 telemetry database，但要設計 feedback loop 的 contract boundary，讓未來可從 static heuristics 升級到 evidence-adaptive runtime。
 
+本 plan 不直接實作 Optimization Memory / Fitness Engine。完成 runtime trigger audit 後，本 plan 可提供 economics / telemetry / pressure primitive；後續由 [`2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md`](2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md) 預留 positive optimization memory、rejected optimization memory 與 activation fitness schema。此 sequencing 避免把 Gen4 autonomous evolution 提前塞進 Gen3 economics contract。
+
 ### Alternatives Considered
 
 - A. 維持原 plan，只做 `runtime/tool-routing.yaml`：reject。可以解決 routing，但無法建模 execution economics。
@@ -871,6 +873,7 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - Related to `plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md`
 - Related to `plans/archived/2026-05-22-0855-executable-yaml-contract-migration.md`
 - Related to `plans/archived/2026-05-20-1802-model-aware-execution-routing.md`
+- **Downstream interface reservation**：[`plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md`](2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md) uses this plan's economics / telemetry primitives as inputs for future Optimization Memory, but must not be merged into this plan's implementation scope.
 - **Upstream dependency**：`plans/active/2026-05-25-1000-context-language-glossary-system.md`。Glossary plan 於 Phase 1 / 2 / 3 已預架構下列項目，本 plan 執行時應直接引用而非重新定義：
   - **Validation scenario**（glossary Phase 1）：`validation/scenarios/failure-derived/cognitive-core-vs-ecosystem-boundary-v1.yaml` — 可直接服務本 plan Phase 2 完成條件（Cognitive Core vs Ecosystem Adaptation Boundary）。
   - **Candidate semantic owner domains**（glossary Phase 2）：`ecosystem-adaptation`、`runtime-economics`（status=`candidate`）。本 plan Phase 1 決定 owner path 後，需將被採用的 domain 從 `candidate` promote 到 `canonical`；未被採用者標 `deprecated`。

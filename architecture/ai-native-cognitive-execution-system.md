@@ -51,6 +51,8 @@ AI-native Cognitive Execution System 是一套 AI-native 認知執行框架，�
 3. **多模型協作**：依任務難度與 context cost 在 small / large / specialized profile 之間路由
 4. **失效學習自閉環**：agent failure → failure pattern → validation scenario → runtime guard 的完整 pipeline
 
+> **Gen 4 boundary note**：Optimization Memory、Fitness System、Activation Fitness、Rejected Optimization Memory 屬於 [`ai-native-cognitive-ecosystem-system.md`](ai-native-cognitive-ecosystem-system.md) 的 evolution / adaptation 範圍。Gen 3 可預留 schema / interface，但不得把 autonomous optimizer、self-modifying governance、reinforcement cognition loop 寫成 current runtime capability。
+
 ---
 
 ## Public Positioning

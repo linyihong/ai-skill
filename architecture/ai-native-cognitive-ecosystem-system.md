@@ -29,7 +29,7 @@ Gen 3 的核心問題是「**怎麼讓 AI 正確執行**」：
 
 Gen 4 的核心問題是「**整個 AI 生態如何協作與演化**」：
 
-- Signal → Cognitive Economics → Knowledge Activation → Multi-Agent Ecology → Adaptive Runtime → Memory Evolution → Intelligence Evolution
+- Signal → Cognitive Economics → Knowledge Activation → Multi-Agent Ecology → Adaptive Runtime → Memory Evolution → Intelligence Evolution → Optimization Fitness
 - 它是一個 **Cognitive Ecosystem**，解決 evolution、adaptation、telemetry、fitness、decay、specialization
 
 兩代並非取代關係 — Gen 3 的 execution runtime 仍是 Gen 4 的底層，但**重心**從「正確性」轉移到「演化效率」。Gen 3 的 runtime 在 Gen 4 中會退化成 ecosystem 中的 execution engine 子層，類比：
@@ -61,7 +61,7 @@ Gen 演進對應 5 階成熟度。本系統目前位於 **L3.5 → L4 過渡期*
 
 > **系統開始能自己決定**：該讀什麼、不該讀什麼、該啟動什麼 cognition、哪些知識太昂貴、哪些 workflow 已過時、哪些 memory 值得留下、哪些 heuristics 應 promotion、哪些 governance 過重 — 而不是由人類定義固定 workflow。
 
-Gen 3 是 **human knows what to load**（routing-registry 列哪個 task intent 載入哪個 source）；Gen 4 是 **runtime discovers what must load**（economics + telemetry + activation contract 決定）。10+1 條 threshold criteria 是這句話的 machine-verifiable 拆解。
+Gen 3 是 **human knows what to load**（routing-registry 列哪個 task intent 載入哪個 source）；Gen 4 是 **runtime discovers what must load**（economics + telemetry + activation contract 決定）。14 條 threshold criteria 是這句話的 machine-verifiable 拆解。
 
 ---
 
@@ -98,6 +98,7 @@ ecosystem/
 ├── cognition/       # cognitive resource accounting, mode adaptation
 ├── economics/       # token / latency / recursion / compression / model-fit costs
 ├── intelligence/    # intelligence fitness, decay, promotion
+├── optimization/    # positive / rejected optimization memory, bounded textual improvement candidates
 ├── discovery/       # adaptive discovery, archaeology, gap detection
 ├── orchestration/   # multi-agent ecology, role specialization
 ├── telemetry/       # signal capture, observability, runtime emit
@@ -152,7 +153,7 @@ runtime/
 
 ## Threshold Criteria（graduation 必達標準）
 
-達成下列 **≥ 10/13 criteria** 且其餘 3 個有 active plan + 明確 entry condition，才考慮 graduate 本檔為 `current`。每條 criteria 必須是 **machine-verifiable**（generated surface / SQLite query / scenario evidence），不接受純散文宣稱。
+達成下列 **≥ 10/14 criteria** 且其餘 4 個有 active plan + 明確 entry condition，才考慮 graduate 本檔為 `current`。每條 criteria 必須是 **machine-verifiable**（generated surface / SQLite query / scenario evidence），不接受純散文宣稱。
 
 ### A. Cognitive Economics — 活的成本模型
 
@@ -212,6 +213,19 @@ Discovery 不再只是 static routing；6 種模式至少 ≥ 4 種 active：
 - 多次 failure-after-activation 觸發 deprecation proposal
 - Cross-intelligence synthesis：當兩個 intelligence 常被一起 activate，emit candidate merged atom
 - **Acceptance signal**：`intelligence_mode` enum 已 wired；fitness telemetry 在 runtime reports 可見
+
+### G2. Optimization Memory — 成功與拒絕的優化記憶
+
+SkillOpt 類系統的核心不是只記住「不要再犯」，而是把自然語言 skill / workflow / activation heuristic 當作可優化 artifact：候選修改若在 validation gate 上提升就接受，若 regression 或成本過高就拒絕。本系統目前 failure-derived evolution 很強，但 optimization-derived evolution 仍弱。Gen 4 必須把成功 cognition pattern 與 rejected optimization pattern 都納入 memory lifecycle。
+
+要求：
+
+- `feedback/` 或 future `ecosystem/optimization/` 能區分 `failure-derived`、`optimization-derived`、`activation-derived`、`suppression-derived` evidence
+- 成功案例可作為 positive evidence：`successful_execution -> winning_pattern -> bounded_promotion -> reusable_activation_heuristic`
+- 被拒絕的優化可保留：`candidate_optimization -> validation_regression | token_explosion | governance_friction -> rejected_optimization_memory`
+- Optimization candidate 必須是 bounded textual update，不得整篇重寫 runtime / governance / workflow
+- Fitness 欄位先可為 placeholder（`fitness.score: unknown`），但 schema 必須可承接未來 outcome delta / cost delta / regression evidence
+- **Acceptance signal**：`optimization_memory.contract` 或等效 generated surface 存在；至少一個 scenario 證明 successful pattern 與 rejected optimization 使用不同 retention/promotion path
 
 ### H. Multi-Agent Ecology — 不再假設單一 agent
 
@@ -351,7 +365,7 @@ suppression:
 
 ## 現況評估（2026-05-28）
 
-針對上述 10 criteria 的當前狀態。**沒有任何一條完全達標**；多數仍在 plan 或部分實作。
+針對上述 criteria 的當前狀態。**沒有任何一條完全達標**；多數仍在 plan 或部分實作。
 
 | Criteria | 狀態 | 關鍵證據 / 缺口 |
 |---|---|---|
@@ -362,6 +376,7 @@ suppression:
 | E. Adaptive Runtime | ❌ 未開始 | Mode selection 仍純 deterministic signal → mode；無 pressure-based adaptation；無 feedback loop |
 | F. Memory Economics & Decay | ❌ 未開始 | `memory/retrieval-governance/` 有 selective replay；無 decay scoring、無 cost-of-replay 模型 |
 | G. Intelligence Evolution | ❌ 未開始 | `intelligence_mode` 同 C，是 glossary candidate term；無 fitness score、無 cross-intelligence synthesis |
+| G2. Optimization Memory | ❌ 未開始 | failure-derived memory 很強，但無 positive optimization memory、rejected optimization memory、candidate textual update retention、fitness delta |
 | H. Multi-Agent Ecology | ❌ 未開始 | `.agent-goals/` 有 lock 機制但仍 single-owner assumption；無 multi-agent role contract |
 | I. Telemetry Layer | ⚠️ 部分 | commit-msg Cognitive Mode 報告 + `runtime.db generated_surfaces` 是局部 telemetry；無 system-wide observability surface；無 mode-selection history |
 | J. Cognitive Resource Management | ⚠️ 部分 | `runtime/cognitive-modes-token-budget.yaml` 有 token 預算；無 split-cost 分配、無 budget exceedance trigger |
@@ -369,7 +384,7 @@ suppression:
 | L. Telemetry Economics | ❌ 未開始 | 目前 telemetry 只有 commit-msg cognitive mode block + generated reports；無 retention / aggregation / decay budget；無 self-observation cost 控制 |
 | M. Cognitive Suppression Layer | ⚠️ 詞彙就位 | scenarios `governance-minimality-small-task-v1` + `tier3-does-not-block-tier0-tier2-v1` 已 enforce 部分 suppression；無 declarative suppression contract、無 suppression telemetry |
 
-**綜合判斷**：本系統正站在 Gen 3 → Gen 4 的**轉折起點**，不是中段。**0 ✅ / 5 ⚠️ partial / 8 ❌ 未開始**（共 13 criteria）。Gen 4 詞彙領先 Gen 4 enforcement 約一個世代。要 graduate 為 `current` 至少還需要 4–8 個大型 plan 落地，重心會在 Phase B（K + C + D）、Phase C（A + B + F + G + I）、Phase B′（L + M，與 telemetry 同步）。
+**綜合判斷**：本系統正站在 Gen 3 → Gen 4 的**轉折起點**，不是中段。**0 ✅ / 5 ⚠️ partial / 9 ❌ 未開始**（共 14 criteria）。Gen 4 詞彙領先 Gen 4 enforcement 約一個世代。要 graduate 為 `current` 至少還需要 4–8 個大型 plan 落地，重心會在 Phase B（K + C + D）、Phase C（A + B + F + G + G2 + I）、Phase B′（L + M，與 telemetry 同步）。
 
 ---
 
@@ -397,6 +412,7 @@ User 評價提到本系統已開始出現第二代特徵。誠實對照：
 | `workflow/` | execution flow | 被 `ecosystem/orchestration/` 與 `ecosystem/evolution/` 雙向消費（execute + decay） |
 | `memory/` | selective replay | 加入 `ecosystem/cognition/memory-economics`；entry 有 fitness |
 | `intelligence/` | 判斷準則 | 加入 `ecosystem/intelligence/` evolution；atom 有 fitness、cross-synthesis |
+| `feedback/` | failure-derived lesson capture / promotion | 分裂 failure-derived 與 optimization-derived evidence；成功 pattern 與 rejected optimization 進入不同 lifecycle |
 | `knowledge/` | navigation + glossary | 加入 `ecosystem/discovery/` adaptive lookup；atom usage telemetry |
 | `governance/` | governance rules | 拆 `governance/runtime/` + `ecosystem/governance/`（meta-governance / evolution rules） |
 
@@ -408,8 +424,9 @@ User 評價提到本系統已開始出現第二代特徵。誠實對照：
 
 | Plan | 對 Gen 4 的貢獻 |
 |---|---|
-| [`plans/active/2026-05-25-1000-context-language-glossary-system.md`](../plans/active/2026-05-25-1000-context-language-glossary-system.md) | 提供 ecosystem 共享語彙基礎；Gen 4 概念（ecosystem、pressure_model、knowledge_mode、discovery_mode、intelligence_mode）已 candidate entry |
+| [`plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md`](../plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md) | 先收斂 Gen 3 runtime completion 定義，避免 Gen 4 surfaces 變成 projection-only / routing-only orphan |
 | [`plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md`](../plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md) | 直接攻 criteria A（cognitive economics）+ D 部分（ecosystem signals）+ J 部分（resource management）。是 Gen 4 的核心 plan，但仍 draft，未實作 |
+| [`plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md`](../plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md) | 預留 G2（Optimization Memory）與 fitness schema：positive evidence、rejected optimization memory、activation fitness placeholder；明確禁止 autonomous optimizer / self-modifying governance |
 
 ---
 
@@ -418,14 +435,14 @@ User 評價提到本系統已開始出現第二代特徵。誠實對照：
 - 本檔為 **vision document**，**不是** canonical entry。Gen 3 仍為 current。
 - 修改本檔需先確認 graduation criteria 仍 machine-verifiable；不接受純散文加 criteria。
 - 當某條 criteria 從 ❌ → ⚠️ → ✅，需在 §現況評估表記錄 evidence link（plan / commit / contract path）。
-- 達 **≥ 10/13 ✅** 且其他 3 條有 active plan + entry condition 時，依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §1 啟動世代升級流程，本檔 status 從 `vision` 升為 `current`，Gen 3 文件降為 `historical`，重新評估每個 ADR 在 Gen 4 的延伸狀態。
+- 達 **≥ 10/14 ✅** 且其他 4 條有 active plan + entry condition 時，依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §1 啟動世代升級流程，本檔 status 從 `vision` 升為 `current`，Gen 3 文件降為 `historical`，重新評估每個 ADR 在 Gen 4 的延伸狀態。
 - 新加入的 Gen 4 plan 必須遵循 [`governance/lifecycle/system-upgrade-governance.yaml`](../governance/lifecycle/system-upgrade-governance.yaml) §`define_runtime_trigger_flow`，不得以 routing-only 或 projection-only 宣稱已完成 runtime integration（見 plans/README.md §Runtime Execution Path 強化條款）。
 
 ---
 
 ## Watch-Out List（Gen 4 路上會撞到的牆）
 
-第三輪 review 識別 5 個下一階段必然遇到的反模式。寫進本檔以便未來 plan 主動規避：
+第三輪 review 與後續 SkillOpt 對照識別下一階段必然遇到的反模式。寫進本檔以便未來 plan 主動規避：
 
 | Wall | 風險敘述 | 緩解 |
 |---|---|---|
@@ -434,6 +451,7 @@ User 評價提到本系統已開始出現第二代特徵。誠實對照：
 | 3. Ecosystem boundary inflation | 所有跨層概念都塞 ecosystem，最後 ecosystem 變第二個 monolith | §Cognitive Kernel Boundary 4 條 rule 機械強制；`ecosystem/ecology-boundary/` 為守門 |
 | 4. Telemetry explosion | telemetry 成本 > execution 成本，系統陷入 over-self-observation | criterion L（Telemetry Economics）強制 retention / aggregation / decay budget |
 | 5. Positive-activation bias | 只想 activate 對的東西，忽略不 activate 不該開的東西 | criterion M（Cognitive Suppression Layer）機械化負向 activation |
+| 6. Optimization hallucination | 看到 optimization vocabulary 就急著做 autonomous optimizer / self-modifying governance，造成 Gen4 technical debt | criterion G2 先做 interface reservation；明確 `forbidden`：no autonomous optimizer until runtime/economics/telemetry contracts graduate |
 
 每條 wall 對應一個 criterion；新 plan 在 §Decision Rationale 應 cite 自己對應緩解的 wall。
 
