@@ -1,4 +1,4 @@
-version=repo-pending
-source_commit=pending
-built_at=2026-05-28T11:11:26Z
+version=repo-f222fdd
+source_commit=f222fdd
+built_at=2026-05-28T11:12:21Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
