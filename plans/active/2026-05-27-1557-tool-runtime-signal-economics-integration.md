@@ -122,11 +122,14 @@ Tool Runtime Signal & Economics Integration
 
 - [ ] economics contract 真實投影到 `runtime.db generated_surfaces`
 - [ ] tool-derived / economics-derived signals 被 Cognitive Mode discovery 使用
+- [ ] **每個 generated_surface key 都有 named consumer**（discovery signal / commit-msg validator / hook / scenario），且 consumer 已 wire（per §Generated surfaces consumer 表）
 - [ ] runtime validate / scenario tests 能驗證 contract
 - [ ] hook 或 CLI validator 真實使用該 contract
 - [ ] feedback loop 有最小 evidence path，而非只停在 static docs
 - [ ] Runtime Cognitive State 可映射到 economics tuple / split costs / adaptation rationale
 - [ ] Cognitive state output 可被 scenario 測試，不只是漂亮 log
+- [ ] **Phase 7 graduation acceptance signal 通過**（15 個 discovery signals 在 `runtime/cognitive-modes-discovery.yaml` 並通過 parser）
+- [ ] **Phase 12 graduation acceptance signal 通過**（全部 11 個 generated_surfaces 投影 + named consumer 真實 wire + scenarios 通過）
 - [ ] Open Questions 全部解決
 
 ### Consequences
@@ -159,6 +162,25 @@ Tool Runtime Signal & Economics Integration
 - 若 knowledge acquisition signals 未接入 governance/enforcement，agent 可能只回報「有新知識」但不執行 promotion / linked updates / validation closure
 
 ## Runtime Execution Path
+
+### Doc-only Trial 聲明 + Runtime Graduation（2026-05-28 retro-add per strengthened governance）
+
+**目前狀態（2026-05-28）**：Plan 為 **draft**，Phase 0–12 全部 `[ ]`，**de facto doc-only**。在 Phase 7 完成前，本檔列出的 generated_surfaces / discovery signals / cognitive state fields **不構成 runtime integration**，僅為 design proposal。
+
+**Graduation 階梯**：
+
+| Graduation Phase | 達成後生效的 contract 範圍 | Acceptance signal |
+| --- | --- | --- |
+| **Phase 7 完成** | 15 個 economics/ecosystem discovery signals wired 進 `runtime/cognitive-modes-discovery.yaml`；signals 開始被 routing system 自動拉起 | `runtime/cognitive-modes-discovery.yaml` parser 可讀新 signals；scenario `economics-derived-cognitive-signal-valid-v1` 通過 |
+| **Phase 12 完成** | 全部 11 個 generated_surfaces 投影完成、validators 真實使用、validation scenarios 通過、Plan Completion Closure 跑完 | ADR Promotion Criteria 全綠；本 plan 可進入 `plans/archived/`；ADR 升格評估啟動 |
+
+**Drift prevention during trial**：
+
+- Plan 中 framework / cognitive / ecosystem 詞彙統一引用 [`knowledge/glossary/ai-skill.md`](../../knowledge/glossary/ai-skill.md)（已 candidate entries：`cognitive_cost` / `thinking_cost` / `context_cost` / `execution_cost` / `knowledge_cost` / `knowledge_mode` / `discovery_mode` / `intelligence_mode` / `ecosystem` / `pressure_model`）。Plan 不得 inline redefine 任何 glossary owner term。
+- Generated surface key 命名穩定後不變；變更需走 [`governance/lifecycle/system-upgrade-governance.md`](../../governance/lifecycle/system-upgrade-governance.md) §3 規則 8。
+- 本 plan 在 Phase 7 / Phase 12 graduation 之前**不能宣稱完成 runtime integration**；任何「已實作」claim 必須 cite 對應 phase 完成 evidence。
+
+**明文承認**：本 plan 當前未 enter runtime。在 Phase 7 graduation 前，referencing 本 plan 的 generated_surfaces / discovery signals 等同 reference plan-vocabulary，不等同 referencing runtime contract。本承認符合 [`governance/lifecycle/system-upgrade-governance.yaml`](../../governance/lifecycle/system-upgrade-governance.yaml) §`define_runtime_trigger_flow` `doc_only_trial_requires` 的 `graduation_deadline_or_signal_no_indefinite_trial` 與 `explicit_acknowledgement_doc_only_trial_does_not_count_as_runtime_integration`。
 
 ### Runtime owner
 
@@ -222,21 +244,23 @@ flowchart TD
 
 ### Generated surfaces
 
-Candidate keys:
+每個 candidate key 必須宣告 **named consumer**（per `governance/lifecycle/system-upgrade-governance.yaml` §`define_runtime_trigger_flow` forbidden `sqlite_projection_without_routable_or_validator_consumer`）。沒有 named consumer 的 surface 不得 promote 為 runtime contract。
 
-```text
-runtime.tool_routing.contract
-runtime.economics.token_costs
-runtime.economics.tool_cost_model
-runtime.economics.cognitive_budget_policy
-runtime.economics.execution_feedback
-runtime.cognitive_state.telemetry_contract
-ecosystem.resource_interactions.contract
-ecosystem.pressure_models.contract
-ecosystem.adaptation.contract
-ecosystem.cognitive_adaptation.contract
-ecosystem.knowledge_acquisition.contract
-```
+| Generated surface key | Named consumer(s) | Consumer 類型 |
+| --- | --- | --- |
+| `runtime.tool_routing.contract` | `runtime/cognitive-modes-discovery.yaml` Phase 7 signals + `validateToolRoutingProjection` (Phase 12 hook) + scenario `tool-routing-contract-projected-v1` | discovery signal + commit-msg validator + validation scenario |
+| `runtime.economics.token_costs` | `runtime/cognitive-modes-discovery.yaml` `economic_pressure_high` signal + scenario `economics-contract-projected-v1` | discovery signal + validation scenario |
+| `runtime.economics.tool_cost_model` | `runtime/cognitive-modes-discovery.yaml` `tool_usage_high_risk_mutation` + `tool_output_large` + `tool_loop_detected` signals + scenario `economics-contract-projected-v1` | discovery signals + validation scenario |
+| `runtime.economics.cognitive_budget_policy` | Cognitive Mode 報告 cost class derivation（commit-msg `cognitiveCost` validator） + scenario `cognitive-state-economics-fields-valid-v1` | commit-msg validator + scenario |
+| `runtime.economics.execution_feedback` | Phase 10 feedback contract + scenario `execution-feedback-loop-static-contract-v1` | static contract + scenario |
+| `runtime.cognitive_state.telemetry_contract` | Cognitive Mode 報告 emit（commit-msg `cognitiveModeBlock` validator）+ scenario `cognitive-state-adaptation-rationale-valid-v1` | commit-msg validator + scenario |
+| `ecosystem.resource_interactions.contract` | Cognitive Mode discovery `memory_amplification_high` + `governance_overhead_high` signals + scenario `ecosystem-resource-interaction-contract-v1` | discovery signals + scenario |
+| `ecosystem.pressure_models.contract` | Cognitive Mode discovery `context_expansion_rate_high` + `compression_pressure_high` signals + scenario `ecosystem-pressure-models-contract-v1` | discovery signals + scenario |
+| `ecosystem.adaptation.contract` | Cognitive Mode discovery `ecosystem_recommends_deep` + `ecosystem_recommends_shallow_discovery` signals + scenario `cognitive-adaptation-ecosystem-boundary-v1` | discovery signals + scenario |
+| `ecosystem.cognitive_adaptation.contract` | Cognitive Mode 報告 adaptation rationale fields（commit-msg validator）+ scenario `cognitive-adaptation-ecosystem-boundary-v1` | commit-msg validator + scenario |
+| `ecosystem.knowledge_acquisition.contract` | `governance/lifecycle/knowledge-update-flow.md` writeback + scenarios `knowledge-acquisition-*-v1` (3 條) | governance flow + scenarios |
+
+任一 surface 完成 projection 但對應 consumer 尚未 wire 時，**不得宣稱該 surface 已 enter runtime**。
 
 ### Validation scenarios
 
@@ -697,6 +721,8 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 ## Phase 7: Wire Economics/Ecosystem-Derived Cognitive Signals
 
+> **此 Phase 完成 = Doc-only Trial Graduation #1**。15 個 signals wired 後，本 plan 從「pure design」graduate 為「runtime signals active」。在此之前 plan 列出的 signals 不構成 runtime integration。
+
 - [ ] Update `runtime/cognitive-modes-discovery.yaml`
 - [ ] Add `tool_usage_recursive_search`
 - [ ] Add `tool_usage_high_risk_mutation`
@@ -796,11 +822,14 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 ## Phase 12: Validation and Closure
 
+> **此 Phase 完成 = Doc-only Trial Graduation #2（final）**。全部 11 個 generated_surfaces 投影 + named consumer wired + scenarios 通過後，本 plan 達 ADR Promotion 條件並 graduate 為 full runtime integration。
+
 - [ ] Add or update validation scenarios
 - [ ] Run `ai-skill runtime refresh --repo . --json`
 - [ ] Run `ai-skill runtime validate --repo . --json`
 - [ ] Run `go test ./...` if CLI validators change
 - [ ] Query generated surfaces for economics / ecosystem / tool-routing keys
+- [ ] **Per §Generated surfaces consumer 表，逐 surface 確認 named consumer 已 wire**（discovery signal / commit-msg validator / hook / scenario / governance flow 全部 active）
 - [ ] Add or update scenarios that prevent knowledge acquisition from becoming unclosed "interesting finding" logs
 - [ ] Execute Plan Completion Closure if all phases complete
 
