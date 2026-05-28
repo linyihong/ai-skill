@@ -154,6 +154,32 @@ steps:
       - create_validation_scenarios
       - run_detection_commands_and_confirm_fail_by_absence
       - commit_scenarios_separately_when_phase_work_starts
+    scenario_schema_single_source:
+      canonical: validation/scenario.schema.json
+      rule: >
+        All validation/scenarios/**/*.yaml files MUST validate against
+        validation/scenario.schema.json. The schema is the single source of
+        truth for scenario shape; no parallel schema definitions are allowed
+        in plans, ADRs, or runtime YAMLs. Adding new top-level fields requires
+        a schema PR with reviewer sign-off; field renames or removals require
+        a deprecation period documented in the schema's $comment.
+      enforced_by:
+        - ai-skill runtime validate (refresh-time)
+        - scripts/ai-skill-cli/internal/audit/ (when implemented in Phase 2 of plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md)
+      added_at: "2026-05-28"
+      added_reason: Phase 1 of Gen 3 Runtime Trigger Audit & Completion plan locks the scenario schema to prevent field drift across 5 new audit scenarios.
+    fixture_test_binding:
+      rule: >
+        Every scenario under validation/scenarios/failure-derived/ MUST have at
+        least one Go fixture test referencing the scenario id by exact string,
+        OR be explicitly listed as "narrative-only" in plans/README.md scenario
+        registry. Stub fixture files are acceptable during Phase 1; full
+        implementations land in the phase that wires the matching hook /
+        validator.
+      enforced_by:
+        - ai-skill runtime audit orphan-scenario-unreferenced-v1 (warning-only)
+      added_at: "2026-05-28"
+      added_reason: Phase 1 requires fixture stub binding so YAML ↔ hook behavior stays consistent through Gen 4.
     gates:
       - gate.system_upgrade.test_first_scenarios_ready
 

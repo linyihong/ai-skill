@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Pre-2026 Grandfather Coverage Scenario
+# 確保 governance/lifecycle/system-upgrade-governance.yaml 中
+# §pre_2026_05_28_doc_only_completion grandfather flag 的覆蓋範圍與
+# plans/archived/ 中標 ⚠️ completed (doc-only) 的 plan 集合一致，
+# 且 sunset deadline 已設（2026-08-31 primary + 2026-11-30 conditional extension）。
+
+id: pre-2026-grandfather-coverage-v1
+domain: runtime-governance
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  class: grandfather-flag-coverage-drift
+  origin_plan: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md
+  origin_phase: Phase 3 Grandfather Flag
+  description: >
+    Grandfather flag 在 governance YAML 列出受保護 archived plans 集合，
+    但 plans/archived/ 中標 ⚠️ completed (doc-only) 的 plan 與該集合不一致
+    （多列、漏列、未設 sunset），導致 grandfather 範圍模糊、未來 audit
+    分類失準。Scenario 驗證兩邊一致與 sunset 條款齊備。
+
+given:
+  task: maintain_grandfather_flag_consistency
+  artifacts:
+    - governance/lifecycle/system-upgrade-governance.yaml
+    - plans/README.md
+    - plans/archived/**
+  signals:
+    - governance/lifecycle/system-upgrade-governance.yaml has §pre_2026_05_28_doc_only_completion section
+    - section lists explicit archived plan paths under grandfather
+    - section declares primary_sunset and conditional_extension_sunset fields
+    - plans/archived/*.md plan status enum uses 4-way values from plans/README.md
+  constraints:
+    - Every plan marked ⚠️ completed (doc-only) in plans/README.md status table MUST appear in grandfather YAML coverage list
+    - Every entry in grandfather YAML coverage list MUST be an actual file under plans/archived/
+    - primary_sunset MUST be 2026-08-31; conditional_extension_sunset MUST be 2026-11-30
+    - Extension trigger conditions (audit_tool_age_lt_60_days OR phase_4_incomplete) MUST be explicit
+
+when:
+  action: stage_commit_modifying_grandfather_yaml_or_archived_plan_status
+
+then:
+  expected_route:
+    primary: enforce_grandfather_two_way_consistency
+    steps:
+      - Diff grandfather YAML coverage list against plans/README.md ⚠️ doc-only entries.
+      - Resolve discrepancies: add missing entries, remove stale entries, fix path typos.
+      - Verify primary_sunset = 2026-08-31 and conditional_extension_sunset = 2026-11-30.
+      - Verify extension trigger conditions are listed explicitly.
+      - Run `ai-skill runtime audit` to confirm grandfather coverage report shows zero discrepancies.
+  forbidden_routes:
+    - mark_plan_doc_only_without_adding_to_grandfather_yaml
+    - list_plan_in_grandfather_yaml_without_corresponding_archive_file
+    - remove_sunset_deadline_or_extend_indefinitely
+    - extend_sunset_without_explicit_trigger_condition_met
+  expected_intelligence:
+    - governance/lifecycle/system-upgrade-governance.yaml
+    - plans/README.md
+    - plans/archived/**
+  validation:
+    - ai-skill runtime audit reports grandfather coverage diff = empty
+    - audit fails when primary_sunset missing or != 2026-08-31
+    - audit fails when conditional_extension_sunset missing or != 2026-11-30
+    - audit fails when extension activated without trigger condition documented
+    - Go fixture test covers consistency / sunset / extension paths

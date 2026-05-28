@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Orphan Routing Entry Scenario
+# 防止 knowledge/runtime/routing-registry.yaml 新增 route.* 條目，但既無 discovery
+# signal 拉取、也無 commit-msg validator / hook 消費、也未明確 annotate
+# manual_activation 的孤兒 route。由 ai-skill runtime audit 警告，並由 commit-msg
+# validateRuntimeTriggerWiring 機械強制（block）。
+
+id: orphan-routing-entry-v1
+domain: runtime-governance
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: doc-only-routing-registration
+  origin_plan: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md
+  origin_phase: Phase 1 Test-First Validation
+  description: >
+    Agent 在 knowledge/runtime/routing-registry.yaml 新增 route.* 條目，但沒有對應
+    discovery signal（runtime/cognitive-modes-discovery.yaml）、沒有 commit-msg
+    validator / hook 消費該 route、且 source 中未顯式 annotate
+    manual_activation: { reason: ... }，造成 routing entry 為 doc-only orphan
+    — 規則層宣告「會 route」實際 runtime 永遠不會觸發。
+
+given:
+  task: add_or_modify_routing_registry_entry
+  artifacts:
+    - knowledge/runtime/routing-registry.yaml
+    - runtime/cognitive-modes-discovery.yaml
+    - scripts/ai-skill-cli/internal/app/hooks.go
+    - governance/lifecycle/system-upgrade-governance.yaml
+  signals:
+    - staged diff introduces a new route.* key under knowledge/runtime/routing-registry.yaml
+    - no paired entry in runtime/cognitive-modes-discovery.yaml signals[] references the new route
+    - no commit-msg validator function in scripts/ai-skill-cli/internal/app/hooks.go references the new route or its target surface
+    - the route source block does NOT contain manual_activation: { reason: <workflow_discovery|user_invoked|external_event> }
+    - commit message body does NOT contain [skip-runtime-trigger-wiring] trailer
+  constraints:
+    - Every new routing-registry entry must satisfy one of: (a) discovery signal pulls it, (b) validator/hook consumes it, (c) explicit manual_activation annotation, (d) explicit opt-out marker with justification
+    - manual_activation annotation must include reason enum drawn from governance/lifecycle/system-upgrade-governance.yaml
+
+when:
+  action: stage_commit_introducing_new_route_entry
+
+then:
+  expected_route:
+    primary: enforce_trigger_chain_or_manual_annotation
+    steps:
+      - Determine whether the new route is workflow / discovery / user-invoked nature.
+      - If yes, annotate the route entry with manual_activation: { reason: <enum> } in routing-registry.yaml.
+      - Otherwise, add a discovery signal in runtime/cognitive-modes-discovery.yaml referencing the route, OR add a commit-msg validator / hook consumer in scripts/ai-skill-cli/internal/app/hooks.go.
+      - Run `ai-skill runtime audit` to verify the new route is no longer classified as orphan.
+      - If the change is annotation-only or refactor (no semantic route addition), use [skip-runtime-trigger-wiring] trailer with justification.
+  forbidden_routes:
+    - silently_register_route_without_signal_or_validator_or_manual_annotation
+    - use_skip_marker_for_genuine_new_route_to_bypass_audit
+    - declare_manual_activation_without_reason_enum
+  expected_intelligence:
+    - knowledge/runtime/routing-registry.yaml
+    - runtime/cognitive-modes-discovery.yaml
+    - scripts/ai-skill-cli/internal/app/hooks.go
+    - governance/lifecycle/system-upgrade-governance.yaml
+  validation:
+    - ai-skill runtime audit reports the new route under "auto-detected" or "consumed" or "intentionally-manual" (not "orphan")
+    - commit-msg hook validateRuntimeTriggerWiring returns "" (pass) when trigger chain satisfied OR manual_activation annotated OR opt-out present
+    - commit-msg hook returns non-empty error + exit code when new route lacks any of the four satisfaction paths
+    - error message cites governance/lifecycle/system-upgrade-governance.yaml §define_runtime_trigger_flow and links plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md
+    - Go fixture test in scripts/ai-skill-cli/internal/audit/ covers happy / orphan-detected / manual-activation / opt-out paths

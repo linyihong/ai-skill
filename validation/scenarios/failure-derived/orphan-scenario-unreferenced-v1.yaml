@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Orphan Scenario Unreferenced Scenario
+# Audit-time warning（非 block）：當 validation/scenarios/failure-derived/ 新增
+# scenario 但無 commit-msg hook / Go fixture test / runtime audit 引用，
+# audit 工具發出 warning。Scenario 本身有獨立文件價值，因此不 block，僅提醒。
+
+id: orphan-scenario-unreferenced-v1
+domain: runtime-governance
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  class: doc-only-validation-scenario
+  origin_plan: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md
+  origin_phase: Phase 1 Test-First Validation
+  description: >
+    Agent 新增 validation/scenarios/failure-derived/*.yaml scenario，但既無
+    對應 commit-msg hook validator 參照、亦無 Go fixture test 綁定、亦未在
+    governance / plan §Validation scenarios section 引用，造成 scenario
+    成為純文件，無實際 runtime 驗證效力。Audit 工具發出 warning 提醒補
+    引用；不 block，因為 scenario 自身仍有 narrative documentation 價值。
+
+given:
+  task: add_validation_scenario_yaml
+  artifacts:
+    - validation/scenarios/failure-derived/**
+    - scripts/ai-skill-cli/internal/app/hooks.go
+    - scripts/ai-skill-cli/internal/audit/**
+    - governance/lifecycle/system-upgrade-governance.yaml
+    - plans/active/**
+  signals:
+    - staged diff introduces a new validation/scenarios/failure-derived/*.yaml file
+    - no Go source under scripts/ai-skill-cli/ references the scenario id string
+    - no plan / governance YAML references the scenario id in §Validation scenarios or equivalent
+  constraints:
+    - New scenarios SHOULD be wired to at least one consumer (Go fixture test, hook citation, or plan reference)
+    - Warning is non-blocking; commit may proceed but audit report flags it
+
+when:
+  action: stage_commit_introducing_new_scenario
+
+then:
+  expected_route:
+    primary: warn_and_recommend_consumer_wiring
+    steps:
+      - Identify scenario id and intended consumer.
+      - Reference the scenario id in at least one of: Go fixture test (scripts/ai-skill-cli/internal/.../*_test.go), commit-msg hook error message in scripts/ai-skill-cli/internal/app/hooks.go, plan §Validation scenarios section.
+      - Re-run `ai-skill runtime audit` to confirm the scenario moved out of "unreferenced" warning list.
+      - If scenario is intentionally narrative-only, document this in failure_source.description.
+  forbidden_routes:
+    - claim_scenario_active_without_any_consumer
+    - mark_unreferenced_scenario_as_intentionally_narrative_to_silence_warning_without_justification
+  expected_intelligence:
+    - validation/scenario.schema.json
+    - scripts/ai-skill-cli/internal/audit/**
+  validation:
+    - ai-skill runtime audit lists unreferenced scenarios under warnings section
+    - audit does NOT block commit even when warning fires
+    - Go fixture test covers detection of unreferenced scenarios
+    - warning resolves once scenario id appears in any consumer source

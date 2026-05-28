@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Orphan Projection Target Key Scenario
+# 防止 runtime/*.yaml 新增 runtime_projection.target_key 將內容投影至
+# runtime/runtime.db generated_surfaces，但既無 routable consumer、也無
+# commit-msg validator 消費，造成 SQLite projection 為 doc-only orphan。
+
+id: orphan-projection-target-key-v1
+domain: runtime-governance
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: doc-only-sqlite-projection
+  origin_plan: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md
+  origin_phase: Phase 1 Test-First Validation
+  description: >
+    Agent 在 runtime/*.yaml 設定 runtime_projection.target_key 將某 surface
+    投影到 runtime/runtime.db generated_surfaces table，但沒有任何 routable
+    consumer（routing-registry / cognitive-modes-discovery）或 commit-msg
+    validator / hook 消費該 surface，導致 projection 落地但 runtime 永遠
+    不讀取 — 違反 governance §define_runtime_trigger_flow 的 forbidden
+    rule sqlite_projection_without_routable_or_validator_consumer。
+
+given:
+  task: add_or_modify_runtime_projection_target_key
+  artifacts:
+    - runtime/cognitive-modes.yaml
+    - runtime/cognitive-modes-discovery.yaml
+    - runtime/core-bootstrap.yaml
+    - runtime/economics/**
+    - knowledge/runtime/routing-registry.yaml
+    - scripts/ai-skill-cli/internal/app/hooks.go
+  signals:
+    - staged diff introduces a new runtime_projection.target_key in runtime/*.yaml
+    - no routing-registry entry references the projected surface key
+    - no commit-msg validator / hook function in scripts/ai-skill-cli/internal/app/hooks.go references the target_key or its generated_surface
+    - commit message body does NOT contain [skip-runtime-trigger-wiring] trailer
+  constraints:
+    - Every new runtime_projection.target_key must have at least one named consumer (routable OR validator OR hook)
+    - The §Generated surfaces (with named consumer) table in the owning plan must list the new surface key and its consumer
+
+when:
+  action: stage_commit_introducing_new_projection_target_key
+
+then:
+  expected_route:
+    primary: enforce_projection_consumer_chain
+    steps:
+      - Identify the new target_key and its semantic purpose.
+      - Wire at least one consumer: add routing-registry entry referencing the surface, OR add commit-msg validator / hook consuming the surface.
+      - Update the owning plan's §Generated surfaces (with named consumer) table to list the new surface and its consumer.
+      - Run `ai-skill runtime audit` to verify the new projection is classified as "consumed" (not "orphan").
+      - If the projection is genuinely informational / human-facing only, document explicit consumer = "human_documentation_reference" and add justification.
+  forbidden_routes:
+    - silently_introduce_target_key_without_named_consumer
+    - leave_projection_orphan_after_refresh
+    - claim_consumer_in_plan_doc_without_actual_code_reference
+  expected_intelligence:
+    - runtime/runtime.db
+    - knowledge/runtime/routing-registry.yaml
+    - scripts/ai-skill-cli/internal/app/hooks.go
+    - governance/lifecycle/system-upgrade-governance.yaml
+  validation:
+    - ai-skill runtime audit reports the new target_key under "consumed" or "intentionally-manual" (not "orphan")
+    - commit-msg hook validateRuntimeTriggerWiring returns "" (pass) when consumer wired OR opt-out present
+    - commit-msg hook returns non-empty error + exit code when projection added without consumer wiring
+    - error message cites the forbidden rule sqlite_projection_without_routable_or_validator_consumer
+    - Go fixture test covers happy / orphan-detected / consumer-wired paths

@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Framework Glossary Candidate Missing Scenario
+# Audit-time warning-only：當 plans/active/、architecture/、workflow/、analysis/、
+# intelligence/、runtime/、ecosystem/ 中出現 framework-looking term（backtick-wrapped
+# 或 snake_case ≥ 2 segments）但 knowledge/glossary/ai-skill.md glossary_terms /
+# aliases 查不到，audit 工具發出 candidate warning。不阻擋 commit，避免短詞 false
+# positive；補入 glossary 或 alias 後 warning 自動解除。
+
+id: framework-glossary-candidate-missing-v1
+domain: runtime-governance
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  class: framework-vocabulary-undocumented
+  origin_plan: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md
+  origin_phase: Phase 1 Test-First Validation
+  description: >
+    Agent 在 plans/active/、architecture/、workflow/、analysis/、intelligence/、
+    runtime/、ecosystem/ 文件中引入 framework-looking term（如 backtick-wrapped
+    識別子或 snake_case ≥ 2 segments），但 knowledge/glossary/ai-skill.md
+    glossary_terms 與 aliases 查不到該詞，造成新詞彙未進 canonical glossary，
+    跨文件理解漂移。Audit 工具發出 candidate warning，建議補入 glossary 或
+    記錄不需補的理由；warning-only 不 block，避免自然語言短詞 false positive。
+
+given:
+  task: introduce_framework_looking_term_in_scanned_path
+  artifacts:
+    - plans/active/**
+    - architecture/**
+    - workflow/**
+    - analysis/**
+    - intelligence/**
+    - runtime/**
+    - ecosystem/**
+    - knowledge/glossary/ai-skill.md
+    - knowledge/runtime/sqlite/runtime-index.sqlite
+  signals:
+    - staged or active diff includes new backtick-wrapped term OR snake_case identifier with ≥ 2 segments in scanned paths
+    - the term does not match any entry in glossary_terms or aliases in knowledge/runtime/sqlite/runtime-index.sqlite
+    - the term is not a natural-language short word (single English word, Chinese phrase, common verb)
+  constraints:
+    - Heuristic must be conservative: only flag backtick terms + snake_case ≥ 2 segments
+    - Natural language short words MUST NOT trigger warning
+    - Warning is non-blocking; agent may proceed but should resolve before plan archival
+
+when:
+  action: stage_commit_or_open_active_plan_with_new_term
+
+then:
+  expected_route:
+    primary: warn_and_recommend_glossary_entry
+    steps:
+      - Audit tool extracts candidate terms from staged diff or active plan files in scanned paths.
+      - Filter candidates by heuristic (backtick OR snake_case ≥ 2 segments).
+      - Cross-check against glossary_terms and aliases SQLite tables.
+      - For unmatched terms, emit candidate warning listing term + source file + line.
+      - User resolves by adding entry to knowledge/glossary/ai-skill.md OR documenting in plan §Glossary Impact row that no new framework vocabulary was introduced.
+  forbidden_routes:
+    - emit_warning_for_natural_language_short_words
+    - block_commit_when_only_candidate_warning_present
+    - auto_canonicalize_term_into_glossary_without_user_decision
+  expected_intelligence:
+    - knowledge/glossary/ai-skill.md
+    - knowledge/glossary/README.md
+    - knowledge/runtime/sqlite/runtime-index.sqlite
+  validation:
+    - ai-skill runtime audit emits candidate warnings for unmatched framework-looking terms
+    - audit does NOT block commit when only candidate warnings present
+    - warning resolves once term added to glossary_terms or aliases
+    - Go fixture test covers: backtick match, snake_case match, alias match, glossary hit (no warning), natural language short word (no warning)
+    - tests cover all 7 scanned paths (plans/active/, architecture/, workflow/, analysis/, intelligence/, runtime/, ecosystem/)
