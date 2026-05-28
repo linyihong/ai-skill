@@ -13,6 +13,7 @@
 
 | 文件 | 世代 | 狀態 | 說明 |
 |------|------|------|------|
+| [`ai-native-cognitive-ecosystem-system.md`](ai-native-cognitive-ecosystem-system.md) | 4 | **vision** | 下一代願景文件：從 execution runtime 轉為 cognitive ecosystem；含 10 條 graduation threshold criteria 與當前狀態評估。**尚未 current**，Gen 3 仍是當前世代。 |
 | [`ai-native-cognitive-execution-system.md`](ai-native-cognitive-execution-system.md) | 3 | **current** | 當前世代 canonical 入口：系統定位、canonical 入口表、核心機制、演化里程碑 |
 | [`ai-native-knowledge-operating-system.md`](ai-native-knowledge-operating-system.md) | 2 | historical | 第二代設計文件（`skills/` 為 capability 層、Default Bootstrap 12 條） |
 
