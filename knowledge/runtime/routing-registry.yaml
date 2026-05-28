@@ -1877,6 +1877,10 @@ records:
 
   - id: route.runtime.cognitive-modes
     task_intent: 載入 cognitive mode 定義、discovery signal 規則、subsystem integration contracts；任務開始前解析 4 維 mode（execution/context/governance/memory）
+    manual_activation:
+      reason: validators_consume_by_file_path_not_route_lookup
+      note: >
+        Cognitive modes are consumed by commit-msg validators (validateExecutionModeFloors, validateGovernanceModeConsistency, etc.) and the cognitive_mode_block gate that match staged files by path heuristic. The route exists for human navigation; runtime activation does not flow through this route. Grandfather-flagged per pre_2026_05_28_doc_only_completion until 2026-08-31 + conditional extension to 2026-11-30, then this annotation makes it intentionally-manual permanently.
     primary_source: runtime/cognitive-modes.yaml
     required_dependencies:
       - runtime/cognitive-modes-discovery.yaml

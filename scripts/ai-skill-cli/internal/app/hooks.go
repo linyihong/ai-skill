@@ -1968,6 +1968,69 @@ func validateGlossaryRetroOwn(text string, staged []string, root string) string 
 // Projection in plan AND use [skip-runtime-yaml-projection] opt-out.
 //
 // Opt-out: standalone `[skip-runtime-yaml-projection]` trailer line.
+// validateEvidenceHierarchy consumes the executable contract
+// enforcement.evidence_hierarchy.contract (source:
+// enforcement/evidence-hierarchy.yaml). When a commit message body asserts
+// task completion via success-claim vocabulary AND the staged set contains
+// real work, the body MUST also cite at least one piece of evidence
+// (test pass / fixture green / scenario id / audit/validate output / commit
+// hash reference). Prevents inflated-reporting failure mode where "完成 /
+// done / ✅" is asserted without supporting evidence — exactly the failure
+// case enforcement/evidence-hierarchy.md §confidence_integrity flags.
+//
+// Wires route.governance.cognitive-state-evidence to a commit-msg validator
+// per Phase 4 of plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md.
+//
+// Opt-out: standalone `[skip-evidence-hierarchy]` trailer for genuine
+// recovery / rollback / pre-existing-evidence commits where citing evidence
+// would be circular.
+func validateEvidenceHierarchy(text string, staged []string, root string) string {
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-evidence-hierarchy]" {
+			return ""
+		}
+	}
+	lower := strings.ToLower(text)
+	hasSuccessClaim := false
+	for _, phrase := range []string{"complete", "completed", "done", "✅", "完成", "結案"} {
+		if strings.Contains(lower, strings.ToLower(phrase)) {
+			hasSuccessClaim = true
+			break
+		}
+	}
+	if !hasSuccessClaim {
+		return ""
+	}
+	hasCodeWork := false
+	for _, s := range staged {
+		if strings.HasSuffix(s, ".go") ||
+			strings.HasPrefix(s, "validation/scenarios/") ||
+			strings.HasPrefix(s, "runtime/") ||
+			strings.HasPrefix(s, "governance/") ||
+			strings.HasPrefix(s, "enforcement/") {
+			hasCodeWork = true
+			break
+		}
+	}
+	if !hasCodeWork {
+		return ""
+	}
+	// Honour the enforcement.evidence_hierarchy.contract activation events
+	// from enforcement/evidence-hierarchy.yaml by requiring an evidence
+	// citation in the body. Any of these substrings counts as evidence.
+	evidenceMarkers := []string{
+		"test pass", "tests pass", "tests green", "fixture", "go test", "all green",
+		"exit 0", "scenario", "audit", "runtime validate", "validate pass",
+		"commit ", "based on", "per commit", "evidence", "證據",
+	}
+	for _, m := range evidenceMarkers {
+		if strings.Contains(lower, m) {
+			return ""
+		}
+	}
+	return "evidence-hierarchy: commit body asserts task completion (e.g., 完成 / done / ✅) without citing evidence — required by enforcement.evidence_hierarchy.contract §confidence_integrity (source: enforcement/evidence-hierarchy.yaml). Add at least one evidence reference (test pass / fixture / scenario id / audit/validate output / commit hash). Use `[skip-evidence-hierarchy]` (standalone trailer) for recovery / rollback / pre-existing-evidence commits."
+}
+
 // validatePlanCheckboxSync ensures that when a commit references a plan under
 // plans/active/ in its body AND stages real code / scenario / governance work
 // (not just docs), the referenced plan file is staged AND its staged diff
@@ -2418,6 +2481,9 @@ var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
 	"obligation.commit.runtime_trigger_wiring": func(c commitMsgCtx) string {
 		return validateRuntimeTriggerWiring(c.text, c.staged, c.root)
 	},
+	"obligation.commit.evidence_hierarchy": func(c commitMsgCtx) string {
+		return validateEvidenceHierarchy(c.text, c.staged, c.root)
+	},
 }
 
 // defaultCommitMsgDispatchOrder is the fallback order if
@@ -2441,6 +2507,7 @@ var defaultCommitMsgDispatchOrder = []string{
 	"obligation.commit.glossary_retro_own",
 	"obligation.commit.plan_checkbox_sync",
 	"obligation.commit.runtime_trigger_wiring",
+	"obligation.commit.evidence_hierarchy",
 }
 
 // readPerCommitObligationsOrder reads the per_commit_obligations id

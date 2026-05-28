@@ -222,6 +222,12 @@ per_commit_obligations:
     severity: block
     opt_out_marker: "[skip-runtime-trigger-wiring]"
     contract_source: governance/lifecycle/system-upgrade-governance.yaml §define_runtime_trigger_flow + plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md (Phase 5)
+  - id: obligation.commit.evidence_hierarchy
+    fires: every_commit_asserting_completion_with_code_work
+    validator: validateEvidenceHierarchy
+    severity: block
+    opt_out_marker: "[skip-evidence-hierarchy]"
+    contract_source: enforcement/evidence-hierarchy.yaml (executable contract) + plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md (Phase 4)
 
 per_commit_dispatcher_status:
   machine_iterable: true

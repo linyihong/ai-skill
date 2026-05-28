@@ -188,6 +188,37 @@ signals:
     priority: 15
     description: User signals glossary / term conflict / shared language alignment → load glossary canonical + SOURCE_BACKED context
 
+  # ── Phase 4 high-priority orphan wires (gen3-runtime-trigger-audit) ────
+  - name: user_keyword_evidence_claim
+    signal_type: user_keyword
+    pattern: "完成|completed|✅|done|證據|evidence|claim|confidence|inflated"
+    execution_mode: null
+    context_mode: SOURCE_BACKED
+    governance_mode: STRICT
+    memory_mode: null
+    priority: 18
+    description: User signals success-claim or evidence reasoning → load route.governance.cognitive-state-evidence + enforcement.evidence_hierarchy.contract + STRICT governance to enforce claim-scope vs evidence alignment
+
+  - name: file_diff_memory_layer
+    signal_type: file_diff_scope
+    pattern: "^enforcement/memory-|^enforcement/conversation-goal-ledger|^memory/"
+    execution_mode: null
+    context_mode: SOURCE_BACKED
+    governance_mode: null
+    memory_mode: SELECTIVE_REPLAY
+    priority: 16
+    description: Diff touches memory retrieval / activation surfaces → load route.memory.retrieval-activation + selective replay memory mode per archived memory-retrieval-activation-governance plan
+
+  - name: file_diff_model_selection
+    signal_type: file_diff_scope
+    pattern: "^models/|model-aware|execution-strategy"
+    execution_mode: null
+    context_mode: SOURCE_BACKED
+    governance_mode: null
+    memory_mode: null
+    priority: 14
+    description: Diff touches model selection / execution strategy surfaces → load route.models.model-aware-routing + SOURCE_BACKED context per archived model-aware-execution-routing plan
+
 fallback:
   description: >
     No signal matched. Use 4 mode defaults from cognitive-modes.yaml.
