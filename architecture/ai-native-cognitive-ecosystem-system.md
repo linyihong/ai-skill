@@ -41,6 +41,45 @@ Gen 4 的核心問題是「**整個 AI 生態如何協作與演化**」：
 
 ---
 
+## 成熟度階梯（L1–L5）
+
+Gen 演進對應 5 階成熟度。本系統目前位於 **L3.5 → L4 過渡期**：
+
+| 階段 | 名稱 | 本系統位置 | 主要特徵 |
+|---|---|---|---|
+| L1 | Prompt / Skill System | 已超過 | 散落 prompt + skill 模板，無 runtime |
+| L2 | Agent Runtime System | 已超過 | 有 agent loop + tool calling，無 governance |
+| L3 | **Cognitive Execution System** | **完成大半（Gen 3 current）** | runtime governance、cognitive mode、failure-derived evolution、knowledge/workflow 分離 |
+| L4 | **Cognitive Ecosystem System** | **過渡中（Gen 4 vision）** | knowledge activation runtime、cognitive economics engine、adaptive discovery、intelligence fitness、cross-agent ecology、cognitive telemetry |
+| L5 | Adaptive Cognitive Civilization | 很後期 | 自演化、自治理、自分化的多 agent 生態 |
+
+跨越 L3 → L4 的判定見下方 §The Final Test。
+
+---
+
+## The Final Test（單句判定 Gen 4 是否達成）
+
+> **系統開始能自己決定**：該讀什麼、不該讀什麼、該啟動什麼 cognition、哪些知識太昂貴、哪些 workflow 已過時、哪些 memory 值得留下、哪些 heuristics 應 promotion、哪些 governance 過重 — 而不是由人類定義固定 workflow。
+
+Gen 3 是 **human knows what to load**（routing-registry 列哪個 task intent 載入哪個 source）；Gen 4 是 **runtime discovers what must load**（economics + telemetry + activation contract 決定）。10+1 條 threshold criteria 是這句話的 machine-verifiable 拆解。
+
+---
+
+## 已完成的東西（Gen 3 substantial achievements）
+
+避免 vision document 變成「全是 gap、看不到累積」。本系統在 Gen 3 已建立 4 個 substantial 基礎，**超過大多數 agent framework 的 baseline**：
+
+| 已完成 | 內容 | 證據 |
+|---|---|---|
+| **Runtime Governance** | routing / validation / forbidden routes / heuristics / failure recovery / recovery escalation / governance gates / runtime validate / generated surfaces | `runtime/runtime.db` phase_machine + obligations + gates + 14 commit-msg validators |
+| **Cognitive State Management** | cognitive mode（6 維 vector）/ compression / token budget / memory boundary / context loading / model profiles / discovery signals 14 條 | `runtime/cognitive-modes*.yaml` + ADR-008 + commit-msg cognitive contract block |
+| **Failure-derived Evolution** | Failure → Scenario → Validation → Trace → Governance → Runtime Prevention 完整 pipeline | `validation/scenarios/failure-derived/*.yaml`（35+ scenarios）+ `enforcement/failure-patterns/` + `feedback/history/` + ADR-004 |
+| **Knowledge / Workflow / Intelligence 分離** | knowledge atom（事實導航）/ workflow（執行流程）/ intelligence（判斷準則）/ runtime（contract）/ governance（約束）/ memory（演化）/ models（cognition economics）/ tools（execution capability）各層職責清楚 | ADR-002 / ADR-003 + 8 個 top-level layer 各自 README + routing-registry |
+
+也就是說，本系統的 Gen 3 基礎已經是 **Cognitive Architecture 等級**，不是 skill repo 等級。Gen 4 是在此基礎之上**加 evolution / economics / ecology / telemetry**，不是推翻重做。
+
+---
+
 ## 核心 Pivot：從「Workflow」到「Cognitive Resource Management」
 
 Gen 3 的 mental model 中心是 **workflow**：給定任務，找出該執行的 workflow / route / contract，跑完並驗證。
@@ -74,7 +113,7 @@ runtime/
 
 ## Threshold Criteria（graduation 必達標準）
 
-達成下列 ≥ 7/10 criteria 且其他 3 個有 active plan + 明確 entry condition，才考慮 graduate 本檔為 `current`。每條 criteria 必須是 **machine-verifiable**（generated surface / SQLite query / scenario evidence），不接受純散文宣稱。
+達成下列 **≥ 8/11 criteria** 且其餘 3 個有 active plan + 明確 entry condition，才考慮 graduate 本檔為 `current`。每條 criteria 必須是 **machine-verifiable**（generated surface / SQLite query / scenario evidence），不接受純散文宣稱。
 
 ### A. Cognitive Economics — 活的成本模型
 
@@ -90,12 +129,24 @@ runtime/
 - Promotion pipeline 不是手動 review；有 fitness-based promotion candidate emitter
 - **Acceptance signal**：`SELECT * FROM atom_fitness ORDER BY decay_score DESC` 可查；validator 阻擋引用 decayed atom
 
-### C. Discovery Evolution — 主動發現
+### C. Discovery Evolution — 主動發現（6 種模式）
 
-- Discovery 不再只是 static routing；有 heuristic discovery、archaeology mode、knowledge-gap detection 三種模式 active
-- 新 `discovery_mode` enum 已 wired 到 cognitive-modes-discovery
-- Gap detection 可在 plan execution 時主動建議「缺少 X 類型的 knowledge atom」
-- **Acceptance signal**：`discovery_mode` 為 6 維 cognitive vector 的第七維；有 ≥ 1 個 scenario 證明 gap detection 主動發 promotion candidate
+Discovery 不再只是 static routing；6 種模式至少 ≥ 4 種 active：
+
+| Mode | 意思 |
+|---|---|
+| `architecture_archaeology` | 逆向探勘既有 system / repo，重建未文件化結構 |
+| `bounded_context_discovery` | 從 code / docs 自動 mapping domain bounded context |
+| `workflow_synthesis` | 從既有 workflow 組合新 workflow（不寫死）|
+| `knowledge_gap_detection` | 偵測「應該有但目前沒有」的 atom |
+| `heuristic_discovery` | 從 failure pattern 抽出新 heuristic candidate |
+| `ecosystem_telemetry` | 從 runtime signals 推斷需要的 discovery |
+
+要求：
+
+- `discovery_mode` enum wired 到 `cognitive-modes-discovery.yaml`（成為 cognitive vector 的第七維）
+- Gap detection 可在 plan execution 時主動發 promotion candidate
+- **Acceptance signal**：≥ 1 個 scenario 證明 gap detection 主動發 candidate；`discovery_mode` 出現在 commit-msg cognitive contract block
 
 ### D. Ecosystem Signals — 跨層訊號完整
 
@@ -130,12 +181,24 @@ runtime/
 - `.agent-goals/` 升級為多 agent owner 對齊面
 - **Acceptance signal**：governance YAML 內有 `multi_agent_coordination.contract`；至少一個 scenario 驗證 role conflict resolution
 
-### I. Telemetry Layer — 系統能觀察自己
+### I. Telemetry Layer — 系統能觀察自己（6 類 telemetry）
 
-- Runtime emit telemetry：每次 mode 選擇 / signal 觸發 / cost actual / route activation
+不只是 commit-msg Cognitive Mode 報告 — 是 system-wide observability。6 類 telemetry 至少 ≥ 4 類 active：
+
+| Telemetry | 內容 |
+|---|---|
+| `activation_frequency` | 哪些 intelligence / workflow / atom 常被啟用、哪些幾乎不用 |
+| `token_burn_hotspots` | 哪些 route / workflow / tool 最貴 |
+| `governance_friction` | 哪些 gate 常擋人、opt-out 用得多 |
+| `recovery_loops` | 哪些 failure 反覆出現 |
+| `stale_intelligence` | 哪些知識 / heuristic 過期或衰退 |
+| `context_explosion` | 哪些 route 或載入策略容易炸 token |
+
+要求：
+
+- Runtime emit telemetry：每次 mode 選擇 / signal 觸發 / cost actual / route activation 都有紀錄
 - 有 queryable surface（SQLite table / time-series file / runtime report）
-- 不只是 commit-msg Cognitive Mode 報告 — 是 system-wide observability
-- **Acceptance signal**：`ecosystem.telemetry.contract` 在 generated surfaces；至少一個 SQL 證明可查 mode selection 歷史
+- **Acceptance signal**：`ecosystem.telemetry.contract` 在 generated surfaces；至少一個 SQL 證明可查 mode selection 歷史 + token burn hotspots
 
 ### J. Cognitive Resource Management — 真的有預算分配
 
@@ -143,6 +206,66 @@ runtime/
 - Budget exceedance 觸發 compression / escalation / abort
 - 預算消耗有 evidence trail
 - **Acceptance signal**：`ecosystem.cognitive_budget_policy.contract` projected；commit-msg validator 比對 declared cost class vs actual budget consumption
+
+### K. Knowledge Activation Runtime — 聲明式啟用契約
+
+Gen 3 是「human knows what to load」（plan 作者寫死 candidate_sources）；Gen 4 是 **runtime discovers what must load**。需要 declarative activation contract：
+
+```yaml
+activation:
+  signal:
+    - architecture_complexity_high
+    - vendor_count_large
+  activate:
+    - intelligence: vendor-integration-architecture
+    - intelligence: bounded-context-analysis
+    - governance: architecture-fit-governance
+  economics:
+    estimated_cost: HIGH
+    why: cross-domain synthesis + bounded context discovery
+```
+
+要求：
+
+- 至少 ≥ 5 個 activation contract 存在於 `runtime/` 或 `ecosystem/`，每個 contract 把 signals 顯式 map 到 intelligence / workflow / governance 啟用清單 + economics estimate
+- Runtime 依 contract 自動載入，**不需 plan 作者手動列 candidate_sources**
+- Contract 內 `economics.estimated_cost` 與 actual cost 有 telemetry 比對（與 criterion I 連動）
+- **Acceptance signal**：`SELECT * FROM activation_contracts` 在 runtime SQLite 可查；scenario 證明 signal-only trigger 能自動 activate 對應 intelligence 集合
+
+這條與 §The Final Test 直接對應：activation contract 完成 = system「自己決定該讀什麼、該啟動什麼 cognition」的 machine-verifiable proof。
+
+---
+
+## Migration Roadmap（Phase A / B / C）
+
+從 Gen 3.5（目前）到 Gen 4 graduate，建議分 3 階段。每階段對應若干 criteria。
+
+### Phase A — Strengthen Runtime（**目前位置**）
+
+繼續 Gen 3 的深化：cognitive modes、tool signals、model economics、memory boundary、routing、discovery。
+
+- Active：[`plans/active/2026-05-25-1000-context-language-glossary-system.md`](../plans/active/2026-05-25-1000-context-language-glossary-system.md) Phase 6 加 glossary runtime auto-detect
+- Active：[`plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md`](../plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md) 把 economics 與 ecosystem signals 拉到 runtime
+- 觸及 criteria：A（partial）/ D（partial）/ J（partial）
+
+### Phase B — Cognitive Activation Layer（**下一個大爆炸點**）
+
+建立 declarative activation runtime（criterion K 的實作）。signals → intelligence / workflow / governance / memory 自動 activation。這是 Gen 4 的**結構性轉折**：discovery 從 static route lookup 升級為 contract-driven activation。
+
+- 主要 criterion：**K**（必達）+ C（discovery evolution，連帶 unlock 4+ 個 discovery 模式）+ D（signals 從 14 → 25+ 條，涵蓋 5 大類）
+- 連帶要求：Phase B 一旦上線，使所有 active plans 在 §Runtime Execution Path 的 trigger chain 都能引用 activation contract，而不是手寫 candidate_sources
+- 預估規模：與 glossary system + economics system 同級或更大
+
+### Phase C — Cognitive Economics Engine（**真正進入 Gen 4 ecosystem**）
+
+完成後系統能：評估 cognition 成本、動態調整、淘汰 knowledge、選擇 workflow、管理 memory、控制 governance friction、預測 token burn。
+
+- 主要 criteria：**A**（完成）+ **B**（knowledge decay）+ **F**（memory economics）+ **G**（intelligence fitness）+ **I**（telemetry）
+- 達 ≥ 8/11 criteria 時，graduate 為 `current`
+
+### Phase D（可選）— Cross-Agent Ecology
+
+達到 L5（Adaptive Cognitive Civilization）的前哨。對應 criterion **H**。可在 Gen 4 graduate 後再啟動。
 
 ---
 
@@ -162,8 +285,9 @@ runtime/
 | H. Multi-Agent Ecology | ❌ 未開始 | `.agent-goals/` 有 lock 機制但仍 single-owner assumption；無 multi-agent role contract |
 | I. Telemetry Layer | ⚠️ 部分 | commit-msg Cognitive Mode 報告 + `runtime.db generated_surfaces` 是局部 telemetry；無 system-wide observability surface；無 mode-selection history |
 | J. Cognitive Resource Management | ⚠️ 部分 | `runtime/cognitive-modes-token-budget.yaml` 有 token 預算；無 split-cost 分配、無 budget exceedance trigger |
+| K. Knowledge Activation Runtime | ❌ 未開始 | `knowledge/runtime/routing-registry.yaml` 是 task_intent → primary_source 的 manual map，**不是** signal → activation 的 declarative contract；無 economics-aware activation |
 
-**綜合判斷**：本系統正站在 Gen 3 → Gen 4 的**轉折起點**，不是中段。約 2/10 criteria 達到「⚠️ 部分」，其餘 ≥ 6 條未開始。要 graduate 為 `current` 至少還需要 4–8 個大型 plan 落地。
+**綜合判斷**：本系統正站在 Gen 3 → Gen 4 的**轉折起點**，不是中段。**0 ✅ / 4 ⚠️ partial / 7 ❌ 未開始**（共 11 criteria）。Gen 4 詞彙領先 Gen 4 enforcement 約一個世代。要 graduate 為 `current` 至少還需要 4–8 個大型 plan 落地，重心會在 Phase B（K + C + D）與 Phase C（A + B + F + G + I）。
 
 ---
 
@@ -212,7 +336,7 @@ User 評價提到本系統已開始出現第二代特徵。誠實對照：
 - 本檔為 **vision document**，**不是** canonical entry。Gen 3 仍為 current。
 - 修改本檔需先確認 graduation criteria 仍 machine-verifiable；不接受純散文加 criteria。
 - 當某條 criteria 從 ❌ → ⚠️ → ✅，需在 §現況評估表記錄 evidence link（plan / commit / contract path）。
-- 達 ≥ 7/10 ✅ 且其他 3 條有 active plan + entry condition 時，依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §1 啟動世代升級流程，本檔 status 從 `vision` 升為 `current`，Gen 3 文件降為 `historical`，重新評估每個 ADR 在 Gen 4 的延伸狀態。
+- 達 **≥ 8/11 ✅** 且其他 3 條有 active plan + entry condition 時，依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §1 啟動世代升級流程，本檔 status 從 `vision` 升為 `current`，Gen 3 文件降為 `historical`，重新評估每個 ADR 在 Gen 4 的延伸狀態。
 - 新加入的 Gen 4 plan 必須遵循 [`governance/lifecycle/system-upgrade-governance.yaml`](../governance/lifecycle/system-upgrade-governance.yaml) §`define_runtime_trigger_flow`，不得以 routing-only 或 projection-only 宣稱已完成 runtime integration（見 plans/README.md §Runtime Execution Path 強化條款）。
 
 ---
