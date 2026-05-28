@@ -335,23 +335,23 @@ observable evidence:
 ### Tasks
 
 - [x] **新增 `validatePlanCheckboxSync` Go validator**（第 17 個 commit-msg validator，**改為 block default 而非 warning-only**，與其他 validators 一致；opt-out `[skip-plan-checkbox-sync]`）：當 staged diff 含 source code / test / scenario / governance 變動且 commit message body 引用 `plans/active/<plan>.md`，檢查 plan 同時 stage 且 staged diff 中至少有一個 `[ ]` → `[x]` transition。理由：避免 agent / 開發者推進 phase 卻忘記翻 checkbox（本 plan 自身 Phase 1 + Phase 2 完成後正是這樣漏掉）。實作於 `scripts/ai-skill-cli/internal/app/hooks.go`、`runtime/core-bootstrap.yaml` 加 `obligation.commit.plan_checkbox_sync`、9 個 Go fixture tests 全綠
-- [ ] 新增 `validateRuntimeTriggerWiring` Go validator 在 `scripts/ai-skill-cli/internal/app/hooks.go`
-- [ ] 觸發條件：staged diff includes new `route.*` entry OR new `target_key` in runtime/*.yaml AND no paired discovery signal / validator / intentional manual annotation
-- [ ] Opt-out: `[skip-runtime-trigger-wiring]` for legitimate doc-only / refactor / annotation-only changes
-- [ ] 註冊 `obligation.commit.runtime_trigger_wiring` 在 `runtime/core-bootstrap.yaml`
-- [ ] 更新 `runtime/cli-modification-policy.yaml` 加 `gate.runtime_trigger_wiring_required`
-- [ ] 預設 severity: **block**（無 warning trial 期）；legitimate doc-only / annotation-only / refactor 變更走 `[skip-runtime-trigger-wiring]` opt-out trailer
-- [ ] Update CLI docs
-- [ ] Go fixture tests (happy / block / opt-out / warning-only mode)
-- [ ] bin rebuild
+- [x] 新增 `validateRuntimeTriggerWiring` Go validator 在 `scripts/ai-skill-cli/internal/app/hooks.go`
+- [x] 觸發條件：staged diff includes new `route.*` entry OR new `target_key` in runtime/*.yaml AND no paired discovery signal / validator / intentional manual annotation
+- [x] Opt-out: `[skip-runtime-trigger-wiring]` for legitimate doc-only / refactor / annotation-only changes
+- [x] 註冊 `obligation.commit.runtime_trigger_wiring` 在 `runtime/core-bootstrap.yaml`
+- [x] 更新 `runtime/cli-modification-policy.yaml` 加 `gate.runtime_trigger_wiring_required`（同時加 `gate.plan.checkbox_sync_required`）
+- [x] 預設 severity: **block**；opt-out `[skip-runtime-trigger-wiring]`
+- [x] Update CLI docs（command-contract.md table 第 17/18 行）
+- [x] Go fixture tests（8 個 — happy / block-route / block-target-key / manual-annotation / signal-reference / opt-out / context-line-ignore / multi-target-key）
+- [x] bin rebuild
 
 ### Phase 5 完成條件（Graduation #2）
 
-- [ ] 第 16 個 commit-msg validator `validateRuntimeTriggerWiring` active
-- [ ] 第 17 個 commit-msg validator `validatePlanCheckboxSync` active（warning-only）
-- [ ] per_commit_obligations 含 `obligation.commit.runtime_trigger_wiring` 與 `obligation.commit.plan_checkbox_sync`
-- [ ] cli-modification-policy 新 gate active
-- [ ] Fixture tests green（含 block default / opt-out trailer / plan-checkbox transition 案例）
+- [x] 第 16 個 commit-msg validator `validatePlanCheckboxSync` active（block default；commit `95bb719`）
+- [x] 第 17 個 commit-msg validator `validateRuntimeTriggerWiring` active（block default；本 commit）
+- [x] per_commit_obligations 含 `obligation.commit.plan_checkbox_sync` 與 `obligation.commit.runtime_trigger_wiring`
+- [x] cli-modification-policy 含 `gate.plan.checkbox_sync_required` 與 `gate.runtime_trigger_wiring_required`
+- [x] Fixture tests green（plan_checkbox_sync 9 個 + runtime_trigger_wiring 8 個 = 17 個 Phase 5 tests）
 
 ---
 

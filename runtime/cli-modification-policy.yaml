@@ -139,6 +139,56 @@ cli_specific_gates:
     upstream_plan: plans/active/2026-05-25-1000-context-language-glossary-system.md (Phase 6)
     related_scenario: validation/scenarios/failure-derived/glossary-retro-own-missing-v1.yaml
 
+  - id: gate.plan.checkbox_sync_required
+    description: |
+      When a commit references plans/active/<plan>.md in its body AND
+      stages real work (Go source, validation scenarios, runtime YAML,
+      governance, enforcement), the referenced plan MUST be staged in
+      the same commit AND its staged diff MUST include at least one
+      `- [ ]` → `- [x]` transition. Prevents reality-only-completion
+      drift (work landed but plan checkboxes stay unchecked).
+
+      Pure hotfix / refactor / pre-existing-state edits that do not
+      advance a plan phase may opt out via [skip-plan-checkbox-sync]
+      as a standalone trailer line.
+    detection_signals:
+      - "commit body contains plans/active/*.md reference"
+      - "staged paths include .go / validation/scenarios/ / runtime/ / governance/ / enforcement/ path"
+      - "plan diff lacks any `+- [x]` line addition"
+    enforcement_layer: commit_msg_hook
+    validator: validatePlanCheckboxSync
+    severity: block
+    opt_out_marker: "[skip-plan-checkbox-sync]"
+    upstream_plan: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md (Phase 5)
+
+  - id: gate.runtime_trigger_wiring_required
+    description: |
+      When staged diff adds a new route.* entry to
+      knowledge/runtime/routing-registry.yaml OR a new target_key to
+      any runtime/*.yaml file, the new surface MUST be wired:
+      - new route: discovery signal in runtime/cognitive-modes-discovery.yaml
+        OR commit-msg validator / hook reference in
+        scripts/ai-skill-cli/internal/app/hooks.go OR explicit
+        `manual_activation: { reason: <enum> }` annotation in the same
+        routing-registry entry
+      - new target_key: routing-registry consumer OR Go validator
+        / hook that queries the projection
+
+      Enforces governance/lifecycle/system-upgrade-governance.yaml
+      §define_runtime_trigger_flow forbidden rules at commit time so
+      new orphans cannot land. Doc-only / annotation-only / pre-existing
+      cleanup commits may opt out via [skip-runtime-trigger-wiring] as
+      a standalone trailer line.
+    detection_signals:
+      - "staged path is knowledge/runtime/routing-registry.yaml with added `- id: route.*` line in git diff --cached"
+      - "staged path matches runtime/*.yaml with added `target_key:` line"
+    enforcement_layer: commit_msg_hook
+    validator: validateRuntimeTriggerWiring
+    severity: block
+    opt_out_marker: "[skip-runtime-trigger-wiring]"
+    upstream_plan: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md (Phase 5)
+    related_scenario: validation/scenarios/failure-derived/orphan-routing-entry-v1.yaml + validation/scenarios/failure-derived/orphan-projection-target-key-v1.yaml
+
 modification_rule:
   description: |
     When editing this YAML / validator / gate list:

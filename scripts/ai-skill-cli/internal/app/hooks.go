@@ -2065,6 +2065,209 @@ func planDiffFlipsCheckbox(diff string) bool {
 	return false
 }
 
+// validateRuntimeTriggerWiring blocks commits that add new routing-registry
+// entries or new runtime/*.yaml target_keys without wiring them to a
+// discovery signal, commit-msg validator / hook, or explicit
+// manual_activation annotation. Surfaces the §define_runtime_trigger_flow
+// forbidden rules from governance/lifecycle/system-upgrade-governance.yaml
+// at commit time so new orphans cannot land.
+//
+// Opt-out: standalone `[skip-runtime-trigger-wiring]` trailer for genuine
+// doc-only refactors, annotation-only edits, or pre-existing-state cleanup
+// commits that intentionally do not extend the runtime surface.
+//
+// Trigger: staged set contains knowledge/runtime/routing-registry.yaml OR
+// any runtime/*.yaml file.
+//
+// Plan: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md
+// Phase: 5 (Future-Proof Validator, sibling to validatePlanCheckboxSync)
+func validateRuntimeTriggerWiring(text string, staged []string, root string) string {
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-runtime-trigger-wiring]" {
+			return ""
+		}
+	}
+	hasRoutingDiff := false
+	var runtimeYamls []string
+	for _, s := range staged {
+		if s == "knowledge/runtime/routing-registry.yaml" {
+			hasRoutingDiff = true
+			continue
+		}
+		if strings.HasPrefix(s, "runtime/") && strings.HasSuffix(s, ".yaml") {
+			runtimeYamls = append(runtimeYamls, s)
+		}
+	}
+	if !hasRoutingDiff && len(runtimeYamls) == 0 {
+		return ""
+	}
+
+	var violations []string
+
+	if hasRoutingDiff {
+		added := stagedAddedRouteIDs(root, "knowledge/runtime/routing-registry.yaml")
+		annotated := stagedManualAnnotatedRouteIDs(root, "knowledge/runtime/routing-registry.yaml")
+		for _, id := range added {
+			if annotated[id] {
+				continue
+			}
+			if routeWiredInTree(root, id) {
+				continue
+			}
+			violations = append(violations, "new route `"+id+"` in routing-registry has no discovery signal, Go consumer, or manual_activation annotation")
+		}
+	}
+
+	for _, yamlPath := range runtimeYamls {
+		added := stagedAddedTargetKeys(root, yamlPath)
+		for _, key := range added {
+			if targetKeyConsumedInTree(root, key) {
+				continue
+			}
+			violations = append(violations, "new target_key `"+key+"` in "+yamlPath+" has no consumer (no routing-registry / Go source reference)")
+		}
+	}
+
+	if len(violations) == 0 {
+		return ""
+	}
+	return "runtime-trigger-wiring: staged change introduces orphan runtime surface(s) per governance/lifecycle/system-upgrade-governance.yaml §define_runtime_trigger_flow:\n    - " +
+		strings.Join(violations, "\n    - ") +
+		"\n  Wire each new route to a discovery signal (runtime/cognitive-modes-discovery.yaml) OR a commit-msg validator (scripts/ai-skill-cli/internal/app/hooks.go) OR add a `manual_activation: { reason: <enum> }` annotation. For new target_keys, wire a routing-registry consumer or Go validator that queries the projection. Add `[skip-runtime-trigger-wiring]` (standalone trailer line) for doc-only / annotation-only / pre-existing-state edits."
+}
+
+// stagedAddedRouteIDs returns route ids added to routing-registry.yaml in
+// the staged diff. Matches lines like `+  - id: route.foo` while ignoring
+// pre-existing entries (context lines).
+func stagedAddedRouteIDs(root, rel string) []string {
+	diff, err := stagedDiff(root, rel)
+	if err != nil {
+		return nil
+	}
+	var out []string
+	seen := map[string]bool{}
+	re := regexp.MustCompile(`^\+\s+-\s+id:\s+(route\.[\w.\-]+)\s*$`)
+	for _, line := range strings.Split(diff, "\n") {
+		m := re.FindStringSubmatch(line)
+		if len(m) != 2 {
+			continue
+		}
+		id := m[1]
+		if seen[id] {
+			continue
+		}
+		seen[id] = true
+		out = append(out, id)
+	}
+	return out
+}
+
+// stagedManualAnnotatedRouteIDs returns the set of route ids whose staged
+// diff includes a `manual_activation:` annotation block. Tracks the most
+// recent `- id: route.X` seen and flips its bucket when a subsequent
+// `+    manual_activation:` line appears in the same added hunk.
+func stagedManualAnnotatedRouteIDs(root, rel string) map[string]bool {
+	diff, err := stagedDiff(root, rel)
+	if err != nil {
+		return nil
+	}
+	out := map[string]bool{}
+	idRe := regexp.MustCompile(`^\+\s+-\s+id:\s+(route\.[\w.\-]+)\s*$`)
+	manualRe := regexp.MustCompile(`^\+\s+manual_activation:\s*$`)
+	currentID := ""
+	for _, line := range strings.Split(diff, "\n") {
+		if m := idRe.FindStringSubmatch(line); len(m) == 2 {
+			currentID = m[1]
+			continue
+		}
+		if currentID != "" && manualRe.MatchString(line) {
+			out[currentID] = true
+		}
+	}
+	return out
+}
+
+// stagedAddedTargetKeys returns target_key values added in a runtime/*.yaml
+// staged diff.
+func stagedAddedTargetKeys(root, rel string) []string {
+	diff, err := stagedDiff(root, rel)
+	if err != nil {
+		return nil
+	}
+	var out []string
+	seen := map[string]bool{}
+	re := regexp.MustCompile(`^\+\s+target_key:\s+(\S+)\s*$`)
+	for _, line := range strings.Split(diff, "\n") {
+		m := re.FindStringSubmatch(line)
+		if len(m) != 2 {
+			continue
+		}
+		key := m[1]
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		out = append(out, key)
+	}
+	return out
+}
+
+// routeWiredInTree returns true if the given route id appears in
+// runtime/cognitive-modes-discovery.yaml or any Go source under
+// scripts/ai-skill-cli/. Uses simple substring match; the audit subcommand
+// shares the same heuristic.
+func routeWiredInTree(root, id string) bool {
+	discPath := filepath.Join(root, "runtime", "cognitive-modes-discovery.yaml")
+	if b, err := os.ReadFile(discPath); err == nil && strings.Contains(string(b), id) {
+		return true
+	}
+	return sourceTreeContains(filepath.Join(root, "scripts", "ai-skill-cli"), id)
+}
+
+// targetKeyConsumedInTree returns true if the given target_key appears in
+// any Go source under scripts/ai-skill-cli/ or in routing-registry.yaml.
+func targetKeyConsumedInTree(root, key string) bool {
+	regPath := filepath.Join(root, "knowledge", "runtime", "routing-registry.yaml")
+	if b, err := os.ReadFile(regPath); err == nil && strings.Contains(string(b), key) {
+		return true
+	}
+	return sourceTreeContains(filepath.Join(root, "scripts", "ai-skill-cli"), key)
+}
+
+// sourceTreeContains walks a directory and returns true if any .go file
+// contains the substring.
+func sourceTreeContains(dir, needle string) bool {
+	found := false
+	_ = filepath.Walk(dir, func(p string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return nil
+		}
+		if !strings.HasSuffix(p, ".go") {
+			return nil
+		}
+		b, rerr := os.ReadFile(p)
+		if rerr != nil {
+			return nil
+		}
+		if strings.Contains(string(b), needle) {
+			found = true
+			return filepath.SkipDir
+		}
+		return nil
+	})
+	return found
+}
+
+// stagedDiff returns the unified `git diff --cached` for a single repo-relative path.
+func stagedDiff(root, rel string) (string, error) {
+	cmd := exec.Command("git", "-C", root, "diff", "--cached", "--", rel)
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return string(out), nil
+}
+
 func validateRuntimeYamlProjects(text string, staged []string, root string) string {
 	for _, line := range strings.Split(text, "\n") {
 		if strings.TrimSpace(line) == "[skip-runtime-yaml-projection]" {
@@ -2212,6 +2415,9 @@ var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
 	"obligation.commit.plan_checkbox_sync": func(c commitMsgCtx) string {
 		return validatePlanCheckboxSync(c.text, c.staged, c.root)
 	},
+	"obligation.commit.runtime_trigger_wiring": func(c commitMsgCtx) string {
+		return validateRuntimeTriggerWiring(c.text, c.staged, c.root)
+	},
 }
 
 // defaultCommitMsgDispatchOrder is the fallback order if
@@ -2234,6 +2440,7 @@ var defaultCommitMsgDispatchOrder = []string{
 	"obligation.commit.markdown_yaml_sync",
 	"obligation.commit.glossary_retro_own",
 	"obligation.commit.plan_checkbox_sync",
+	"obligation.commit.runtime_trigger_wiring",
 }
 
 // readPerCommitObligationsOrder reads the per_commit_obligations id
