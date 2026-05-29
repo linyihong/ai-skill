@@ -307,17 +307,53 @@ func TestRunStopHookBlocksCursorOkOnlyPayload(t *testing.T) {
 	}
 }
 
-func TestRunStopHookBlocksMissingAssistantText(t *testing.T) {
+func TestRunStopHookLoopsCursorStopOkOnlyPayload(t *testing.T) {
+	setHookStdin(t, `{"hook_event_name":"stop","assistant_response":"OK"}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cursor stop to loop with success exit, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode Cursor stop output: %v\n%s", err, stdout.String())
+	}
+	if !strings.Contains(output["followup_message"], "Cognitive Mode block") {
+		t.Fatalf("expected followup_message to request Cognitive block, got %#v", output)
+	}
+}
+
+func TestRunStopHookAllowsAfterAgentResponseAuditOnly(t *testing.T) {
 	setHookStdin(t, `{"hook_event_name":"afterAgentResponse"}`)
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	code := runStopHook(t.TempDir(), &stdout, &stderr)
-	if code != ExitValidationFailed {
-		t.Fatalf("expected missing assistant text to fail closed, got %d; stderr=%s", code, stderr.String())
+	if code != ExitSuccess {
+		t.Fatalf("expected afterAgentResponse audit-only hook to pass, got %d; stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "BLOCK_NO_ASSISTANT_TEXT") {
-		t.Fatalf("expected missing assistant text diagnostic, got %s", stderr.String())
+	if !strings.Contains(stderr.String(), "ALLOW_AFTER_AGENT_RESPONSE_AUDIT_ONLY") {
+		t.Fatalf("expected audit-only diagnostic, got %s", stderr.String())
+	}
+}
+
+func TestRunStopHookLoopsCursorStopMissingAssistantText(t *testing.T) {
+	setHookStdin(t, `{"hook_event_name":"stop"}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cursor stop missing assistant text to loop with success exit, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode Cursor stop output: %v\n%s", err, stdout.String())
+	}
+	if !strings.Contains(output["followup_message"], "Missing assistant response text") {
+		t.Fatalf("expected missing assistant text followup, got %#v", output)
 	}
 }
 

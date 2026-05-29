@@ -874,6 +874,12 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 			return ExitSuccess
 		}
 	}
+	cursorStop := isCursorStopPayload(payload)
+	if isCursorAfterAgentResponsePayload(payload) {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_AFTER_AGENT_RESPONSE_AUDIT_ONLY")
+		appendLog(logFile, "exit_code: 0 (afterAgentResponse cannot block; stop hook enforces loopback)")
+		return ExitSuccess
+	}
 
 	var transcriptPath string
 	if v, ok := payload["transcript_path"]; ok {
@@ -882,29 +888,34 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 	if transcriptPath == "" || !claudeFileExists(transcriptPath) {
 		texts := extractStopHookAssistantTexts(payload)
 		if len(texts) == 0 {
-			return blockStopHookMissingAssistantText(stderr, logFile, transcriptPath)
+			return blockStopHookMissingAssistantText(stdout, stderr, logFile, transcriptPath, cursorStop)
 		}
-		return validateStopHookFinalText(projectDir, texts[len(texts)-1], stderr, logFile)
+		return validateStopHookFinalText(projectDir, texts[len(texts)-1], stdout, stderr, logFile, cursorStop)
 	}
 
 	texts := extractAssistantTexts(transcriptPath)
 	if len(texts) == 0 {
-		return blockStopHookMissingAssistantText(stderr, logFile, transcriptPath)
+		return blockStopHookMissingAssistantText(stdout, stderr, logFile, transcriptPath, cursorStop)
 	}
-	return validateStopHookFinalText(projectDir, texts[len(texts)-1], stderr, logFile)
+	return validateStopHookFinalText(projectDir, texts[len(texts)-1], stdout, stderr, logFile, cursorStop)
 }
 
-func blockStopHookMissingAssistantText(stderr io.Writer, logFile string, transcriptPath string) int {
+func blockStopHookMissingAssistantText(stdout io.Writer, stderr io.Writer, logFile string, transcriptPath string, cursorStop bool) int {
 	_, _ = fmt.Fprintln(stderr, "BLOCK_NO_ASSISTANT_TEXT: path="+transcriptPath)
 	appendLog(logFile, "exit_code: 2 (block missing assistant text)")
-	_, _ = fmt.Fprint(stderr, "[ai-skill Stop hook] Missing assistant response text in hook payload.\n\n"+
-		"The final Cognitive Mode check cannot validate an empty or unavailable assistant response. "+
-		"Use a Cursor event that supplies the assistant response payload, such as afterAgentResponse, "+
-		"or provide a transcript_path containing the final assistant message.\n")
+	message := "[ai-skill Stop hook] Missing assistant response text in hook payload.\n\n" +
+		"The final Cognitive Mode check cannot validate an empty or unavailable assistant response. " +
+		"Use a Cursor event that supplies the assistant response payload, such as afterAgentResponse, " +
+		"or provide a transcript_path containing the final assistant message.\n"
+	if cursorStop {
+		writeCursorStopFollowup(stdout, message)
+		return ExitSuccess
+	}
+	_, _ = fmt.Fprint(stderr, message)
 	return ExitValidationFailed
 }
 
-func validateStopHookFinalText(projectDir string, lastText string, stderr io.Writer, logFile string) int {
+func validateStopHookFinalText(projectDir string, lastText string, stdout io.Writer, stderr io.Writer, logFile string, cursorStop bool) int {
 	tail := lastText
 	if len(tail) > 200 {
 		tail = tail[len(tail)-200:]
@@ -920,8 +931,13 @@ func validateStopHookFinalText(projectDir string, lastText string, stderr io.Wri
 			if !gitReportRe.MatchString(lastText) {
 				_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING_PROJECT_GIT_REPORT")
 				appendLog(logFile, "exit_code: 2 (block missing project git report)")
-				_, _ = fmt.Fprint(stderr, "[ai-skill Stop hook] Dirty Git repositories were detected under the project root, but your final response did not include `### Project Git Report`.\n\n"+
-					"If one nested Git repo changed, report that repo. If multiple nested Git repos changed, merge them into one `### Project Git Report` section with one bullet per repo and clearly distinguish current-task changes from pre-existing/unrelated dirty state.\n")
+				message := "[ai-skill Stop hook] Dirty Git repositories were detected under the project root, but your final response did not include `### Project Git Report`.\n\n" +
+					"If one nested Git repo changed, report that repo. If multiple nested Git repos changed, merge them into one `### Project Git Report` section with one bullet per repo and clearly distinguish current-task changes from pre-existing/unrelated dirty state.\n"
+				if cursorStop {
+					writeCursorStopFollowup(stdout, message)
+					return ExitSuccess
+				}
+				_, _ = fmt.Fprint(stderr, message)
 				return ExitValidationFailed
 			}
 		}
@@ -932,13 +948,43 @@ func validateStopHookFinalText(projectDir string, lastText string, stderr io.Wri
 
 	_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING")
 	appendLog(logFile, "exit_code: 2")
-	_, _ = fmt.Fprint(stderr, "[ai-skill Stop hook] Missing obligation: your final response did not include a Cognitive Mode block.\n\n"+
-		"Per runtime/core-bootstrap.yaml §per_turn_obligations[obligation.cognitive.mode_report], every final user-facing "+
-		"response MUST end with a Cognitive Mode block (compact 1-line for trivial all-default tasks: "+
-		"`Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>`; full 6-row markdown table otherwise).\n\n"+
-		"Please append the block to your response now, then stop again. Canonical format spec: runtime/core-bootstrap.yaml. "+
-		"Query active obligations: `ai-skill runtime obligations`.\n")
+	message := "[ai-skill Stop hook] Missing obligation: your final response did not include a Cognitive Mode block.\n\n" +
+		"Per runtime/core-bootstrap.yaml §per_turn_obligations[obligation.cognitive.mode_report], every final user-facing " +
+		"response MUST end with a Cognitive Mode block (compact 1-line for trivial all-default tasks: " +
+		"`Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>`; full 6-row markdown table otherwise).\n\n" +
+		"Please append the block to your response now, then stop again. Canonical format spec: runtime/core-bootstrap.yaml. " +
+		"Query active obligations: `ai-skill runtime obligations`.\n"
+	if cursorStop {
+		writeCursorStopFollowup(stdout, message)
+		return ExitSuccess
+	}
+	_, _ = fmt.Fprint(stderr, message)
 	return ExitValidationFailed
+}
+
+func isCursorStopPayload(payload map[string]json.RawMessage) bool {
+	return cursorHookEventName(payload) == "stop"
+}
+
+func isCursorAfterAgentResponsePayload(payload map[string]json.RawMessage) bool {
+	return cursorHookEventName(payload) == "afteragentresponse"
+}
+
+func cursorHookEventName(payload map[string]json.RawMessage) string {
+	if raw, ok := payload["hook_event_name"]; ok {
+		var event string
+		if err := json.Unmarshal(raw, &event); err == nil {
+			return strings.ToLower(event)
+		}
+	}
+	return ""
+}
+
+func writeCursorStopFollowup(stdout io.Writer, message string) {
+	output := map[string]string{
+		"followup_message": message,
+	}
+	_ = json.NewEncoder(stdout).Encode(output)
 }
 
 func extractStopHookAssistantTexts(payload map[string]json.RawMessage) []string {

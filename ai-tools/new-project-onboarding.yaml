@@ -112,7 +112,7 @@ success_criteria:
   - project-local bootstrap files do not embed the local Ai-skill repository absolute path; use `<AI_SKILL_REPO>` placeholder and `AI_SKILL_REPO` environment variable instead
   - init-project creates `.ai-skill/local.env` as an ignored machine-local bridge file and `.ai-skill/.gitignore` to prevent committing the local path
   - Claude Code project setup includes `.claude/settings.json` hook wiring to Ai-skill Go runner for final Cognitive Mode and nested Git report enforcement
-  - Cursor project setup includes `.cursor/hooks.json` afterAgentResponse / stop hook wiring to the Ai-skill Go runner for final Cognitive Mode close-out enforcement
+  - Cursor project setup includes `.cursor/hooks.json` stop hook wiring to the Ai-skill Go runner for final Cognitive Mode close-out enforcement via `followup_message` loopback
   - GitHub Copilot project setup includes `.github/copilot-instructions.md`, `.github/instructions/ai-skill.instructions.md`, and `.copilot/` guided startup files as thin pointers only; hard enforcement remains in hooks, CI, and runtime validation
   - "`ai-skill copilot start` produces a first-message bootstrap prompt for new Copilot sessions without mutating project files or claiming hard enforcement"
   - shell bootstrap helper 若存在，已明確是 thin wrapper、呼叫 repo-local ai-skill binary，且有 deletion/removal condition；否則已改成 Go CLI command
@@ -139,8 +139,8 @@ failure_modes:
     recovery: "補齊 `.copilot/` guided startup package、`ai-skill copilot start`、docs 與 tests；若使用 `.sh` wrapper，必須符合 shell bootstrap gate"
 
   - id: cursor_missing_final_cognitive_hook
-    detection: "`--tools cursor` 產生 `.cursor/hooks.json`，但沒有 afterAgentResponse / stop hook 呼叫 `ai-skill hooks run stop` 檢查 final Cognitive Mode 報告"
-    recovery: "補齊 Cursor final-response hooks、init-project regression tests、Cursor adapter contract 與 runtime/core-bootstrap.yaml close-out rule"
+    detection: "`--tools cursor` 產生 `.cursor/hooks.json`，但沒有 stop hook 呼叫 `ai-skill hooks run stop` 並用 `followup_message` loopback 檢查 final Cognitive Mode 報告"
+    recovery: "補齊 Cursor stop hook、loopback regression test、Cursor adapter contract 與 runtime/core-bootstrap.yaml close-out rule"
 
   - id: shell_bootstrap_without_cli_decision
     detection: "新增 `.sh` project bootstrap/helper，但沒有 Go CLI decision、repo-local ai-skill wrapper boundary 或 deletion/removal condition"

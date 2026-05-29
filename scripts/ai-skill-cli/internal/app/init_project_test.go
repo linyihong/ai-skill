@@ -146,13 +146,15 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if strings.Contains(string(cursorHooks), filepath.ToSlash(repo)) {
 		t.Fatalf("Cursor hooks must not contain local absolute Ai-skill path, got %s", string(cursorHooks))
 	}
-	if !strings.Contains(string(cursorHooks), `"afterAgentResponse"`) ||
-		!strings.Contains(string(cursorHooks), `"stop"`) ||
+	if !strings.Contains(string(cursorHooks), `"stop"`) ||
 		!strings.Contains(string(cursorHooks), "hooks run stop") ||
 		!strings.Contains(string(cursorHooks), `"failClosed": true`) ||
 		!strings.Contains(string(cursorHooks), ".ai-skill/local.env") ||
 		!strings.Contains(string(cursorHooks), "exit 2") {
 		t.Fatalf("expected Cursor hooks to enforce final Cognitive close-out through Ai-skill CLI, got %s", string(cursorHooks))
+	}
+	if strings.Contains(string(cursorHooks), `"afterAgentResponse"`) {
+		t.Fatalf("afterAgentResponse cannot block or loop final responses; expected only stop enforcement, got %s", string(cursorHooks))
 	}
 	if pathExists(filepath.Join(project, ".roomodes")) {
 		t.Fatal("selected tools unexpectedly wrote .roomodes")
