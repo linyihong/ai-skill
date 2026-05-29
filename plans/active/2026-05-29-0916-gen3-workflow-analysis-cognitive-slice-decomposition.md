@@ -134,7 +134,10 @@ Gen 4 只承接後續：
 |---|---|
 | 把「切片」誤做成 Gen 4 ecosystem layer | 本 plan 明確限定 Gen 3：index、summary、routing、validation；不做 dynamic orchestration |
 | 切太細導致維護成本 > token savings（over-fragmentation） | Phase 1 granularity 原則：slice 最小單位 = 能獨立完成的 cognitive phase，非 step / concept；Phase 2 逐 slice 把關，避免 context hopping / dependency storms（external review 風險2） |
-| Cross-slice dependency explosion（recursive loading / fan-out / hidden activation chains） | Phase 1 slice schema 加 dependency budget（`max_depth: 2`、`max_runtime_dependencies: 4`）；Phase 4 scenario 斷言實際載入深度/廣度未超預算（external review OQ，2026-05-29） |
+| Cross-slice dependency explosion（recursive loading / fan-out / hidden activation chains） | Phase 1 slice schema 加 dependency budget（heuristic default `max_depth:2`/`max_runtime_dependencies:4` + `override_when: task_complexity=high`，非 rigid）；Phase 4 scenario 斷言實際載入深度/廣度未超預算（external review OQ + #3 風險1，2026-05-29） |
+| Example-driven loading contamination（examples 密度高、LLM 易先讀 examples override doctrine） | Phase 1：`type: examples` 預設 `default_load: false`，只在 user 要求範例或偵測 ambiguity 載入；Phase 3 suppression guidance 對齊；對應 Watch-Out Wall 5（external review #3 風險2，2026-05-29） |
+| intelligence layer 吞噬 analysis（heuristic/tradeoff/anti-pattern 灰區倒成 thought dumping ground） | Phase 1 extraction direction rule：analysis 產 observations/signals/evidence，intelligence 只收 validated repeated patterns；升層需 validation 證據（external review #3 風險3，2026-05-29） |
+| routing-registry 變第二個 monolith（route inflation / flat route universe → giant cognition graph） | Phase 3 hierarchical routing 規則：route 採樹狀命名，不平鋪 leaf；新增前先確認可掛既有層級節點（external review #3 風險4，2026-05-29） |
 | Taxonomy explosion / classification obsession | Phase 1 type+tags 收斂：primary `type` 只 4 種（execution/evidence/examples/failure），其餘降為 tags；新增 primary type 需回 plan 重評（external review 風險1） |
 | workflow / analysis / intelligence 邊界模糊 | Phase 1 codify 三層分工：workflow=順序、analysis=證據取得+驗證、intelligence=為何長期有效/失敗；歸層用此判定（external review 風險3） |
 | 過早變「理論宇宙」/ premature ecosystem abstraction | 維持節奏：small runtime hardening → measurable retrieval improvement → loading reduction → validation proof → gradual orchestration；不一次衝 full autonomous ecosystem（external review meta 警告） |
@@ -368,15 +371,27 @@ Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`develop
   - owner_layer
   - canonical_source
   - dependencies
-  - `max_depth`（dependency budget，預設 `2`：slice 依賴鏈最深 2 層）
-  - `max_runtime_dependencies`（dependency budget，預設 `4`：單一 slice 直接 runtime 依賴上限）
+  - `dependency_budget`（**heuristic default + override**，非 rigid governance；見下方規則）
   - summary_path
   - validation_signal
-- [ ] **Dependency budget 規則**：每個 slice 宣告 `max_depth` / `max_runtime_dependencies`，防止 recursive loading / dependency storms / retrieval fan-out（見 §Open Questions Cross-Slice Dependency Explosion）。超出預算需回 plan 重評，不得默默放行。
+- [ ] **Dependency budget 規則（heuristic, not rigid）**：用 default + complexity override，避免 governance rigidity（external review 風險1，2026-05-29）。不同 surface complexity 合理上限不同（small CRUD fix 可能 depth1/deps2；deployment debugging 可能 depth3/deps6），所以**不把單一數字當硬門檻**：
+
+  ```yaml
+  dependency_budget:
+    default:
+      max_depth: 2
+      max_runtime_dependencies: 4
+    override_when:
+      task_complexity: high   # 例：deployment debugging → 放寬至 depth 3 / deps 6
+  ```
+
+  超出 default 須在 slice / scenario 註記 `task_complexity: high` 理由；超出 override 上限才回 plan 重評。目的：防 recursive loading / dependency storms / retrieval fan-out（見 §Open Questions Cross-Slice Dependency Explosion），同時不讓 budget 變僵化治理。
 - [ ] **type+tags 收斂規則**：primary `type` 固定 4 種，不得擴張為 first-class taxonomy；其餘責任一律降為 `tags`。新需求預設加 tag，不加 type。任何想新增第 5 個 primary type 的提議都需回到本 plan 重新評估。
 - [ ] **Granularity 原則**：slice 最小單位 = **能獨立完成一個 cognitive phase**（例如 software-delivery 的 Requirement Intake / Implementation / Validation），**不是** step（Step1/Step2）也不是 concept。判準：該 slice 載入後 agent 能完成一個自足的認知階段而不需瘋狂 cross-reference。Phase 2 切片時逐個 slice 用此判準把關。
 - [ ] **三層邊界規則（codify）**：`workflow` = 「要做什麼順序」；`analysis` = 「如何取得與驗證證據」；`intelligence` = 「為何這種模式長期有效 / 失敗」。slice 歸層時用此三分法判定 owner_layer，三層不得混。
 - [ ] 用三層邊界規則檢查 taxonomy 是否與 `workflow/analysis/intelligence/knowledge/runtime/governance` 重疊。
+- [ ] **Examples suppression bias 規則**：`type: examples` 的 slice 預設 **`default_load: false`**，只在 `user_requested_examples` 或 `ambiguity_detected` 時載入（external review 風險2，2026-05-29）。理由：examples token 密度高、pattern 明顯，LLM 易先讀 examples 而非 canonical execution，造成 **example-driven loading contamination / override doctrine**。這對應 Watch-Out Wall 5（positive-activation bias）。
+- [ ] **Extraction direction rule（analysis → intelligence 單向）**：`analysis` 只產出 `observations / signals / evidence`；`intelligence` **只接受 validated repeated patterns**（external review 風險3，2026-05-29）。heuristic / tradeoff / anti-pattern / routing-heuristic 這類灰區內容，未經重複驗證前留在 analysis，不得直接倒進 intelligence，避免 intelligence 變 random thought dumping ground。slice 標 `tags: extraction-to-intelligence` 僅代表「候選」，升層需有 validation 證據。
 - [x] 是否新增 domain-local `slices/` 子目錄 → **已於 §Open Questions resolved：暫不新增 generic / domain-local `slices/`，優先在既有 owner layer 內用 semantic filename 切分；Phase 4 validation 後重評。** 本 phase 只需確認 pilot 切分落在既有 `workflow/software-delivery/` 內。
 - [ ] 評估命名候選並選定**過渡期 operational wording**（`loading/execution/evidence surface`）；**正式 glossary 註冊延後至 Phase 4**（見 §Open Questions 與 §Glossary Impact）。評估 `capability surface` / `cognitive surface` / `execution surface`（review 觀點：slice 易讓人聯想 arbitrary chunk / static partition，但本質是 routable cognition surface），記錄理由但不在本 phase 鎖定 framework vocabulary。
 
@@ -386,7 +401,8 @@ Phase 1 exit criteria：
 - [ ] primary `type` 恰為 4 種，其餘為 tags（type+tags 收斂規則成立）。
 - [ ] 每個 slice 有明確 `load_when` 和 `do_not_load_when`。
 - [ ] Granularity 原則與三層邊界規則已寫入 taxonomy 文件。
-- [ ] 每個 slice schema 含 `max_depth` / `max_runtime_dependencies`（dependency budget），預設 2 / 4。
+- [ ] Examples suppression bias 規則（`type: examples` 預設 `default_load: false`）與 extraction direction rule（analysis→intelligence 單向，只收 validated repeated patterns）已寫入 taxonomy 文件。
+- [ ] 每個 slice schema 含 `dependency_budget`（heuristic default 2 / 4 + `override_when: task_complexity=high`，非 rigid 硬門檻）。
 - [ ] **Test-first validation target 已草擬**：Phase 4 fixture 形狀（`expected_load` / `forbidden_load` / `dependency_budget`）與 Scenario A/B/C 的 expected/forbidden 清單已先寫出，待 Phase 4 執行。
 - [ ] Glossary / naming decision 已記錄（含是否改用 surface 命名）。
 
@@ -423,6 +439,7 @@ Phase 2 exit criteria：
 - [ ] 為 pilot slices 建立或更新 summary（若適用）。
 - [ ] 檢查 `knowledge/runtime/routing-registry.yaml` 是否需要新增 / 修改 route。
 - [ ] 若新增 route，必須同時定義 named consumer 或 `manual_activation` reason。
+- [ ] **Hierarchical routing 規則**：新 route 採樹狀命名（`workflow.software-delivery.execution`），**不得**鋪成 flat route universe（`workflow.execution.api` / `workflow.execution.refactor` / `analysis.apk.network` / `analysis.apk.hls` … 平攤）。理由：防 route inflation 讓 routing-registry 本身變成第二個 monolith / giant cognition graph（external review 風險4，2026-05-29）。新增 route 前先確認能掛在既有層級節點下，不是平鋪新 leaf。
 - [ ] 為常見 intent 建立 loading guidance：
   - workflow execution
   - artifact validation
@@ -430,12 +447,13 @@ Phase 2 exit criteria：
   - tool procedure lookup
   - failure / caveat diagnosis
   - mixed workflow + analysis task
-- [ ] 明確記錄 suppression guidance：哪些任務不應載入 examples / tool procedures / artifact gates / failure caveats / Gen 4 heavy slices。
+- [ ] 明確記錄 suppression guidance：哪些任務不應載入 examples / tool procedures / artifact gates / failure caveats / Gen 4 heavy slices。**examples slice 預設 suppress（`default_load: false`），只在 user 明確要求範例或偵測到 ambiguity 才載入**（對齊 Phase 1 examples suppression bias 規則）。
 
 Phase 3 exit criteria：
 
 - [ ] 小任務可走 index / summary，不需整份 workflow 或 analysis surface。
 - [ ] 大任務能找到需要的 source。
+- [ ] 新增 route 為 hierarchical（樹狀），無 flat route universe；examples 預設 suppress。
 - [ ] 無 dead route / dead generated surface。
 
 ## Phase 4 — Validation Scenarios
@@ -453,9 +471,9 @@ expected_load:        # 必須出現在載入集合
   - <surface/slice path>
 forbidden_load:       # 必須不出現在載入集合
   - <surface/slice path>
-dependency_budget:    # 對齊 Phase 1 slice schema
-  max_depth: 2
-  max_runtime_dependencies: 4
+dependency_budget:    # 對齊 Phase 1 slice schema（heuristic default + override）
+  default: { max_depth: 2, max_runtime_dependencies: 4 }
+  override_when: { task_complexity: high }   # 高複雜任務（如 Scenario C）放寬
 ```
 
 - [ ] **Scenario A（execution-only）**：小型 API validation 變更。`expected_load` = software-delivery execution-order slice + 對應 artifact-gate slice；`forbidden_load` = full analysis / tool-procedure surface、examples、Gen 4 heavy section。
