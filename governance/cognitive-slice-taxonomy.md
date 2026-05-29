@@ -81,7 +81,7 @@ slice 最小單位 = **能獨立完成一個 cognitive phase**（非 step、非 
 | `sd-implementation` | execution | execution-order, surgical | 實際進行程式碼變更（核心執行順序） | evidence-only / 純分析任務 | execution-flow §3、§4、§驗證前的執行核心 |
 | `sd-surgical-caveats` | failure | caveat, surgical, diff-purity | 進行外科手術式小改、需控制 diff 純度 / orphan | 大型新功能初始實作 | **`surgical-changes.md`（Phase 2 已實體拆檔，原 execution-flow §9.1–9.5）** |
 | `sd-validation` | execution | artifact-gate, validation, performance | 驗證變更 / 效能關卡 | 尚未實作完成前 | execution-flow §5 Perf Gate、§7 Validate |
-| `sd-closure` | execution | closure, handoff, extraction-to-intelligence | 收尾、DoR/DoD 檢核、回饋可重用課程 | 任務中段 | execution-flow §8；development-process §DoR / §DoD |
+| `sd-closure` | execution | closure, handoff, extraction-to-intelligence | 收尾、DoR/DoD 檢核、回饋可重用課程 | 任務中段 | **`closure.md`（Phase 2 已實體拆檔，原 execution-flow §8 + development-process §DoR / §DoD）** |
 | `sd-examples` | examples | (default_load:false) | user 明確要求範例 / 偵測到 ambiguity | 預設一律 suppress（execution-only / mixed） | examples/EXAMPLES.md |
 
 **layer_justification（全 slice 共通）**：每條都規定「做什麼 / 什麼順序 / 過哪些 gate」，通過 workflow membership test；無一承載 evidence 取得方法（非 analysis）或長期模式論證（非 intelligence）。`sd-closure` 的 extraction-to-intelligence 僅為候選標記，升 intelligence 須補 `evidence_refs`≥2。

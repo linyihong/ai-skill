@@ -437,12 +437,19 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 > - taxonomy §7 `sd-contracts` 列 `canonical_source` 已更新指向 `contracts.md`。
 > - **Phase 3 待辦（追加）**：`contracts.md` 同樣需納入 `routing-registry.yaml` required source 與 `execution-flow.yaml` / graph 同步（與 surgical-changes.md 同批處理）。
 > - **後續分批（留待新 session）**：其餘 lifecycle slice（sd-intake / sd-test-strategy / sd-implementation / sd-validation / sd-closure）仍需 execution-flow.md + development-process.md 同批拆檔。
+>
+> **Phase 2 進度補充（2026-05-29，sd-closure 跨檔 slice）**：
+> - 已抽出第三個 focused slice **`workflow/software-delivery/closure.md`**（`sd-closure`，`type: execution`，tags `closure, handoff, extraction-to-intelligence`）。這是**第一個真正跨兩檔同批拆**的 lifecycle slice：合併 execution-flow.md §8 Feed Back Reusable Lessons + development-process.md §Minimum Definition Of Ready / §Minimum Definition Of Done verbatim，驗證了「跨檔同批拆避免 dual source-of-truth」的做法。
+> - execution-flow.md §8 與 development-process.md §DoR/§DoD 均改為指向 `closure.md` 的 redirect stub；execution-flow.md thin-index 的 Closure row 與 Phase 2 進度註記同步更新。
+> - taxonomy §7 `sd-closure` 列 `canonical_source` 已更新指向 `closure.md`。
+> - **剩餘 4 個 lifecycle slice**（sd-intake / sd-test-strategy / sd-implementation / sd-validation）仍待同批拆檔。
+> - **Phase 3 待辦（追加）**：`closure.md` 同樣需納入 routing-registry / execution-flow.yaml / graph 同步。
 
 - [x] 選定 pilot surface → `workflow/software-delivery/execution-flow.md`（routing primary_source，stakeholder 選定先行）。
 - [~] 將 pilot surface 的正文分為 index / execution-order core / caveats（**caveats slice 已抽出**；artifact gates / examples 既已分離；其餘 lifecycle phase 待與 development-process.md 同批）：
   - [x] index / navigation（execution-flow.md 頂部 thin-index 導航）
   - [x] caveats / failure notes（→ `surgical-changes.md`）
-  - [~] execution-order lifecycle phase slices（**sd-contracts 已單檔拆出 → `contracts.md`**；其餘 intake/test-strategy/implementation/validation/closure 待與 development-process.md 同批）
+  - [~] execution-order lifecycle phase slices（**sd-contracts → `contracts.md`（單檔）、sd-closure → `closure.md`（跨 execution-flow + development-process 同批）已拆出**；其餘 intake/test-strategy/implementation/validation 待同批）
   - [ ] artifact gates（既在 `artifact-gates.md`）/ examples（既在 `examples/`）
 - [x] 父層 index 必須說明（execution-flow.md thin-index 導航表已含）：
   - [x] 何時讀哪個 workflow slice（load_when 欄）
