@@ -1,4 +1,4 @@
-version=repo-f222fdd
-source_commit=f222fdd
-built_at=2026-05-28T11:12:21Z
+version=repo-51f71eb
+source_commit=51f71eb
+built_at=2026-05-29T00:21:54Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
