@@ -1,4 +1,4 @@
-version=repo-cce8e83
-source_commit=cce8e83
-built_at=2026-05-29T05:06:21Z
+version=repo-90ad008
+source_commit=90ad008
+built_at=2026-05-29T05:19:17Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
