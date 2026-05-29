@@ -133,7 +133,10 @@ Gen 4 只承接後續：
 | 風險 | 緩解 |
 |---|---|
 | 把「切片」誤做成 Gen 4 ecosystem layer | 本 plan 明確限定 Gen 3：index、summary、routing、validation；不做 dynamic orchestration |
-| 切太細導致維護成本 > token savings | Phase 1 使用 document-sizing threshold 與 high-frequency loading evidence 判斷 |
+| 切太細導致維護成本 > token savings（over-fragmentation） | Phase 1 granularity 原則：slice 最小單位 = 能獨立完成的 cognitive phase，非 step / concept；Phase 2 逐 slice 把關，避免 context hopping / dependency storms（external review 風險2） |
+| Taxonomy explosion / classification obsession | Phase 1 type+tags 收斂：primary `type` 只 4 種（execution/evidence/examples/failure），其餘降為 tags；新增 primary type 需回 plan 重評（external review 風險1） |
+| workflow / analysis / intelligence 邊界模糊 | Phase 1 codify 三層分工：workflow=順序、analysis=證據取得+驗證、intelligence=為何長期有效/失敗；歸層用此判定（external review 風險3） |
+| 過早變「理論宇宙」/ premature ecosystem abstraction | 維持節奏：small runtime hardening → measurable retrieval improvement → loading reduction → validation proof → gradual orchestration；不一次衝 full autonomous ecosystem（external review meta 警告） |
 | 舊 workflow / analysis links drift | Phase 4 必須做 rg link audit + routing registry check |
 | 新 taxonomy 與既有 `workflow/analysis/intelligence/knowledge` 重疊 | Phase 0 先做 owner-layer preflight；每個 slice 只導航，不重定義 canonical source |
 
@@ -147,7 +150,9 @@ Candidate framework vocabulary:
 - `Retrieval Boundary`：agent 在某任務中應停留的載入邊界。
 - `Thin Workflow/Analysis Index`：只負責 navigation / loading guidance，不承載全部 workflow 或 analysis 正文的入口。
 
-Phase 1 必須決定是否註冊到 `knowledge/glossary/ai-skill.md`，或改用既有詞彙避免 vocabulary inflation。
+替代命名候選（external review 2026-05-29）：`capability surface` / `cognitive surface` / `execution surface`，理由是這些更貼近「routable cognition surface」本質，而 `slice` 易被聯想成 arbitrary chunk / static partition。
+
+Phase 1 必須決定是否註冊 `Cognitive Slice` 到 `knowledge/glossary/ai-skill.md`、改用 surface 命名、或改用既有詞彙避免 vocabulary inflation。
 
 ### Watch-Out List Citation
 
@@ -347,8 +352,12 @@ Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`develop
 
 目標：定義 workflow / analysis slice 邊界，不先改內容。
 
+> **External review guardrails（2026-05-29 採納）**：本 phase 採 type+tags 收斂模型、granularity 原則與三層邊界規則，避免 taxonomy explosion / over-fragmentation。詳見 §Decision Rationale 風險表對應列。
+
 - [ ] 定義最小 slice schema：
   - purpose
+  - `type`（primary，**只允許 4 值**：`execution` / `evidence` / `examples` / `failure`）
+  - `tags`（secondary，自由標註：artifact-gate / closure / handoff / templates / observation-triage / tool-procedure / domain-specific / extraction-to-intelligence …）
   - load_when
   - do_not_load_when
   - owner_layer
@@ -356,29 +365,20 @@ Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`develop
   - dependencies
   - summary_path
   - validation_signal
-- [ ] 建立 initial workflow slice taxonomy：
-  - execution-order
-  - artifact-gates
-  - examples
-  - templates
-  - handoff / closure
-  - validation
-- [ ] 建立 initial analysis slice taxonomy：
-  - evidence-acquisition
-  - observation / triage
-  - tool-procedure
-  - failure / caveat
-  - domain-specific method
-  - extraction-to-intelligence
-- [ ] 檢查 taxonomy 是否與 `workflow/analysis/intelligence/knowledge/runtime/governance` 重疊。
+- [ ] **type+tags 收斂規則**：primary `type` 固定 4 種，不得擴張為 first-class taxonomy；其餘責任一律降為 `tags`。新需求預設加 tag，不加 type。任何想新增第 5 個 primary type 的提議都需回到本 plan 重新評估。
+- [ ] **Granularity 原則**：slice 最小單位 = **能獨立完成一個 cognitive phase**（例如 software-delivery 的 Requirement Intake / Implementation / Validation），**不是** step（Step1/Step2）也不是 concept。判準：該 slice 載入後 agent 能完成一個自足的認知階段而不需瘋狂 cross-reference。Phase 2 切片時逐個 slice 用此判準把關。
+- [ ] **三層邊界規則（codify）**：`workflow` = 「要做什麼順序」；`analysis` = 「如何取得與驗證證據」；`intelligence` = 「為何這種模式長期有效 / 失敗」。slice 歸層時用此三分法判定 owner_layer，三層不得混。
+- [ ] 用三層邊界規則檢查 taxonomy 是否與 `workflow/analysis/intelligence/knowledge/runtime/governance` 重疊。
 - [ ] 決定是否需要新增 domain-local `slices/` / `guides/` / `examples/` 子目錄；預設不新增 top-level layer，優先使用現有 layer + index。
-- [ ] 決定 glossary 是否註冊 `Cognitive Slice`。
+- [ ] 決定 glossary 是否註冊 `Cognitive Slice`；**同時評估替代命名候選** `capability surface` / `cognitive surface` / `execution surface`（review 觀點：slice 易讓人聯想 arbitrary chunk / static partition，但本質是 routable cognition surface）。擇一或維持現名，記錄理由。
 
 Phase 1 exit criteria：
 
 - [ ] Taxonomy 不重複 canonical source，且 workflow / analysis 邊界清楚。
+- [ ] primary `type` 恰為 4 種，其餘為 tags（type+tags 收斂規則成立）。
 - [ ] 每個 slice 有明確 `load_when` 和 `do_not_load_when`。
-- [ ] Glossary decision 已記錄。
+- [ ] Granularity 原則與三層邊界規則已寫入 taxonomy 文件。
+- [ ] Glossary / naming decision 已記錄（含是否改用 surface 命名）。
 
 ## Phase 2 — Thin Index + Focused Slices
 
@@ -402,6 +402,7 @@ Phase 1 exit criteria：
 Phase 2 exit criteria：
 
 - [ ] Pilot surface 不再同時承擔 execution order / evidence method / examples / artifacts / caveats 多重責任。
+- [ ] **每個抽出的 slice 通過 granularity 判準**（Phase 1）：是一個能獨立完成的 cognitive phase，不是 step / concept，不需瘋狂 cross-reference。
 - [ ] 每個抽出的 slice 仍能回連 canonical source。
 - [ ] Document-sizing check 通過。
 
