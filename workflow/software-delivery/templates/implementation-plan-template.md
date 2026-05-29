@@ -5,6 +5,7 @@
 - [ ] Source-of-truth and generated surfaces are identified.
 - [ ] Layer responsibility is consistent with current architecture.
 - [ ] Compiler / validator impact is known before implementation starts.
+- [ ] Open questions reconciled: each is marked `resolved` (with preflight evidence) / `still-open` / `deferred`, and resolved ones are written back to the plan — not left answered only in working notes.
 
 ## Pre-build Interrogation
 - **Goal**: <what user/system outcome this plan must achieve>

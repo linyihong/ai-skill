@@ -231,11 +231,11 @@ evidence:
 
 ## Open Questions
 
-- [ ] `workflow/` 與 `analysis/` 中哪些檔案已經是 functional monolith？是否需要優先處理 APK / software-delivery / travel-planning 等高頻 route？
-- [ ] `Cognitive Slice` 是否需要正式 glossary owner，還是先用 `summary-first loading` / `focused source` 既有詞彙即可？
-- [ ] Slice 應落在現有 domain 目錄內，還是需要每個 domain 增加 `slices/` 或 `guides/` 子目錄？預設不新增 top-level layer。
-- [ ] 是否需要保留 public-facing tutorial？若需要，它應只引用 workflow / analysis slices，不複製 canonical source。
-- [ ] execution-only / evidence-only task 的「不交叉載入整包對方 layer」要用哪個 scenario fixture 機械驗證？
+- [x] **[resolved by Phase 0]** `workflow/` 與 `analysis/` 中哪些檔案已經是 functional monolith？是否需要優先處理 APK / software-delivery / travel-planning 等高頻 route？ → Phase 0 Inventory Record 已盤點：`development-process.md`(378, ~12 gate)、`execution-flow.md`(270)、`apk-analysis/artifact-gates.md`(575)、`travel-planning/execution-flow.md`(295) 為 multi-topic monolith；`examples/EXAMPLES.md`(528) 主題單一。Pilot 依 stakeholder 鎖定 software-delivery；APK / travel 延後。
+- [ ] **[deferred → Phase 1]** `Cognitive Slice` 是否需要正式 glossary owner，還是先用 `summary-first loading` / `focused source` 既有詞彙即可？（stakeholder 同意延後至 Phase 1 決定）
+- [ ] **[still-open → Phase 1]** Slice 應落在現有 domain 目錄內，還是需要每個 domain 增加 `slices/` 或 `guides/` 子目錄？預設不新增 top-level layer。
+- [ ] **[still-open → Phase 2]** 是否需要保留 public-facing tutorial？若需要，它應只引用 workflow / analysis slices，不複製 canonical source。
+- [ ] **[still-open → Phase 4]** execution-only / evidence-only task 的「不交叉載入整包對方 layer」要用哪個 scenario fixture 機械驗證？
 
 ---
 
@@ -254,6 +254,23 @@ evidence:
 ---
 
 ## Phase 0 — Architecture Compatibility Preflight
+
+### Phase 0.0 — Open Questions 核對（公版，必填）
+
+逐條核對本 plan §Open Questions，標記處置並回寫：
+
+- [x] 已讀本 plan §Open Questions 全部條目
+- [x] 對每條標記 `resolved` / `still-open` / `deferred`
+- [x] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
+- [x] 若盤點新發現問題，已加入 §Open Questions（本輪無新問題）
+
+| Open Question | 處置 | 證據 / 原因 |
+|---|---|---|
+| 哪些檔是 functional monolith / 是否優先 APK·software-delivery·travel | resolved | Phase 0 Inventory Record 行數 + heading 盤點；pilot 鎖定 software-delivery |
+| `Cognitive Slice` 是否註冊 glossary | deferred → Phase 1 | stakeholder 同意延後 |
+| slice 落在現有 domain 還是新增 `slices/`·`guides/` 子目錄 | still-open → Phase 1 | 屬 taxonomy 決定 |
+| 是否保留 public-facing tutorial | still-open → Phase 2 | 切片成形後再評估 |
+| execution-only / evidence-only 不交叉載入要用哪個 scenario fixture | still-open → Phase 4 | 屬 validation 設計 |
 
 目標：確認這不是「把文件搬一搬」，而是 current Gen 3 execution path / evidence path loading boundary hardening。
 

@@ -28,7 +28,7 @@
 | `Deferred Runtime Projection`（外放→收斂宣告） | plan 建立 `runtime/*.yaml` 但**不立即 project 到 `runtime.db`** 時 | 預設規則：`runtime/` 下 YAML 必須含 `runtime_projection.enabled: true` 並 project；外放是例外。若 plan 採「外放→後續收斂」模式（doc-only trial、schema 演進中、multi-session evidence 需要），必須在 §Decision Rationale 或 §Runtime Execution Path 明寫 (a) **不 project 的 reason**、(b) **預定 project 的 phase / 條件**。沒寫明 → reviewer 必擋。Phase 6 of [`bootstrap-contract-yaml-migration`](archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md) 會落地 `validateRuntimeYamlProjects` commit-msg validator 機械強制此規則。 |
 | `Open Questions` | 架構/流程 plan | 列出 completed 前需釐清的問題 |
 | `完成條件` | 全部 plan | 依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §2 checklist 子集 |
-| `Phase 0` Pre-Build Interrogation | 架構/流程/跨層 plan | per §Architecture Compatibility Preflight |
+| `Phase 0` Pre-Build Interrogation | 架構/流程/跨層 plan | per §Architecture Compatibility Preflight。**Phase 0 必須以 §Phase 0 公版開頭片段（Open Questions 核對）貼上的 checklist 開頭**，確保盤點時逐條核對 Open Questions |
 | `Phase 1-N` | 全部 plan | 實作步驟 + 各 phase 完成條件 |
 | `Stakeholder 同意項目` | 架構/流程 plan | 列出 sign-off 項 |
 | `Per-surface consumer 表` | 任何 plan 新增 `route.*` entry 或 `runtime_projection.target_key` 或 commit-msg validator | 列出每個新 surface 與其 named consumer（discovery signal / Go validator / routable lookup / `manual_activation` annotation）。表格欄位：`Generated surface key` / `Named consumer(s)` / `Consumer 類型`。**Reviewer 必擋條件**：surface 列出但無對應 consumer（除非顯式 `manual_activation: { reason: ... }`）。本表是 §`define_runtime_trigger_flow` forbidden rules 的 plan-level 對應；commit 時由 `validateRuntimeTriggerWiring` 機械驗證 |
@@ -70,6 +70,25 @@
 #### 風險
 ```
 
+### Phase 0 公版開頭片段（Open Questions 核對）
+
+每個 plan 的 Phase 0 **開頭**貼上下列公版 checklist，把「盤點順手解掉 Open Question 卻忘了回寫」變成結構性步驟。完成盤點後逐條回填，並把已解項目同步勾選 / 附註於 §Open Questions：
+
+```markdown
+### Phase 0.0 — Open Questions 核對（公版，必填）
+
+逐條核對本 plan §Open Questions，標記處置並回寫：
+
+- [ ] 已讀本 plan §Open Questions 全部條目
+- [ ] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
+- [ ] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
+- [ ] 若盤點新發現問題，已加入 §Open Questions
+
+| Open Question | 處置 | 證據 / 原因 |
+|---|---|---|
+| <Q1 摘要> | resolved / still-open / deferred | <Phase 0 盤點證據或延後原因> |
+```
+
 ## Plan 執行前架構相容性檢查（Architecture Compatibility Preflight）
 
 開始執行任何 `active/` plan 前，agent **必須**先確認 plan 與現行架構相容。此檢查是 blocking gate；未完成前不得進入 implementation phase。
@@ -86,7 +105,8 @@
 | 4 | **Compiler / generated surface** | 涉及 `runtime/`、`knowledge/`、`metadata/`、`validation/` 時，確認 compiler / validator 會讀到該 source，並列出需要重新生成的 artifact |
 | 5 | **Pre-build interrogation** | 若 plan 來自模糊需求或 framework 改動，確認已記錄需求拷問、source-of-truth discovery、duplication risk、open questions 與 assumptions |
 | 6 | **Linked updates** | 依 [`enforcement/linked-updates.md`](../enforcement/linked-updates.md) 確認相關 README、metadata、contract inventory、routing registry、templates、runtime DB 或 validators 是否要同步 |
-| 7 | **Execution decision** | 若發現架構衝突、未解 blocker question 或 source-of-truth duplication risk，先暫停執行並更新 plan / 詢問使用者；不得邊實作邊假設 plan 仍正確 |
+| 7 | **Open Questions 核對** | 逐條核對本 plan §Open Questions：Phase 0 / preflight 的盤點結果是否已回答、否定或細化任一 Open Question。對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因），並把已解項目同步勾選或附註於 §Open Questions。**不得**只在工作筆記回答 Open Question 卻不回寫 plan |
+| 8 | **Execution decision** | 若發現架構衝突、未解 blocker question 或 source-of-truth duplication risk，先暫停執行並更新 plan / 詢問使用者；不得邊實作邊假設 plan 仍正確 |
 
 ### 最低記錄格式
 
@@ -98,6 +118,7 @@
 | Checked sources | 讀過哪些 current architecture sources |
 | Conflicts | 無衝突，或列出 candidate path / source-of-truth / compiler / layer 衝突 |
 | Interrogation | goal、scope、non-goals、acceptance、framework discovery、duplication risk、open questions / assumptions |
+| Open Questions 核對 | 逐條列出本 plan 每個 Open Question 的處置：`resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）；已解項目須回寫 §Open Questions |
 | Decision | proceed / revise plan first / ask user / blocked |
 | Validation | 用什麼方式確認（diff、runtime query、validator、link check、readback） |
 
@@ -107,6 +128,7 @@
 2. 若 plan 已有 Phase 0，Phase 0 必須包含此檢查；若沒有，agent 必須先補做 preflight，再決定是否需要更新 plan。
 3. 若 preflight 發現 plan 與 current architecture 衝突、blocking question 未解，或會產生雙份 source-of-truth，必須先修正 plan 或取得使用者確認，不得直接繼續執行。
 4. 涉及 `runtime.db`、generated reports、SQLite index 或 compiler outputs 時，preflight 必須確認「source 變更是否真的進入 generated surface」，以及舊 duplicate surface 是否已刪除、deprecate 或明確降級。
+5. **Phase 0 必須以 Open Questions 核對 checklist 開頭**（見 §Plan 模板必填章節 `Phase 0` 列的公版片段）。Phase 0 的盤點若回答了任一 Open Question，必須在同一輪把該 Open Question 標記 `resolved` 並回寫 plan，不得讓盤點結果與 §Open Questions 狀態脫節。此公版片段是「盤點順手解掉 Open Question 卻忘了回寫」失效模式的結構性防呆。
 
 ## Plan 完成閉環（Plan Completion Closure）
 
