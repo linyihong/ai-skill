@@ -1,8 +1,10 @@
 # Plan Archival Audit Validator
 
-**Status**: `in-progress`
+**Status**: `completed-pending-archive`
 **建立日期**：2026-05-28
 **最後更新**：2026-05-29
+**完成 commits**：`51f71eb` (Phase 1+2 impl), `caf0a1b` (binary rebuild)
+**Dogfood deferred**：本 plan archive 時自動驗證（即是 validator 自我驗證）
 **Parent**: [`plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md`](2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md) §Phase 7 follow-up
 
 ---
@@ -37,14 +39,14 @@ Parent plan §Phase 7 加了 manual "Plan Completion Audit" 步驟（`grep -nE '
 
 ### ADR Promotion Criteria（completed 時驗證）
 
-- [ ] `validatePlanArchivalAudit` Go validator 上線（呼叫 `ScanCheckboxesInFile`，不內聯 loop）
-- [ ] `ai-skill scan-checkboxes <file> [--format plain|json] [--exit-code]` CLI subcommand 可用
-- [ ] `obligation.commit.plan_archival_audit` 進 `runtime/core-bootstrap.yaml`
-- [ ] `gate.plan_archival_audit_required` 進 `runtime/cli-modification-policy.yaml`
-- [ ] Fixture tests 全綠（happy / unjustified-[]-block / justified-[]-pass / opt-out / 純內容修改不觸發）
-- [ ] Unit tests 全綠（`ScanCheckboxes` pure content / file / all-checked / empty）
-- [ ] CLI docs（command-contract）更新（validator entry + subcommand entry）
-- [ ] Self-test：本 plan archive 時實際走一遍 validator（dogfood，與 gen3 plan 同模式）
+- [x] `validatePlanArchivalAudit` Go validator 上線（呼叫 `ScanCheckboxesInFile`，不內聯 loop）
+- [x] `ai-skill scan-checkboxes <file> [--format plain|json] [--exit-code]` CLI subcommand 可用
+- [x] `obligation.commit.plan_archival_audit` 進 `runtime/core-bootstrap.yaml`
+- [x] `gate.plan_archival_audit_required` 進 `runtime/cli-modification-policy.yaml`
+- [x] Fixture tests 全綠（happy / unjustified-[]-block / justified-[]-pass / opt-out / 純內容修改不觸發）
+- [x] Unit tests 全綠（`ScanCheckboxes` pure content / file / all-checked / empty）
+- [x] CLI docs（command-contract）更新（validator entry + subcommand entry）
+- [ ] Self-test：本 plan archive 時實際走一遍 validator（dogfood，deferred — 待功能成熟後 archive 時驗證）
 
 ---
 
@@ -114,12 +116,12 @@ observable evidence:
 
 ## 完成條件
 
-- [ ] Phase 0–2 全部達成
-- [ ] ADR Promotion Criteria 全綠
-- [ ] `validatePlanArchivalAudit` 為第 19 個 commit-msg validator
-- [ ] `ai-skill scan-checkboxes` CLI subcommand 可跨專案使用（任意 Markdown checklist）
-- [ ] 對應 scenarios + Go fixture tests（validator）+ unit tests（scan utility）
-- [ ] 自身 archive 時通過 validator（dogfood）
+- [x] Phase 0–2 全部達成（Phase 0 ✅ / Phase 1 ✅ / Phase 2 ✅ 除 dogfood）
+- [x] ADR Promotion Criteria 全綠（除 dogfood，deferred）
+- [x] `validatePlanArchivalAudit` 為第 19 個 commit-msg validator
+- [x] `ai-skill scan-checkboxes` CLI subcommand 可跨專案使用（任意 Markdown checklist）
+- [x] 對應 scenarios + Go fixture tests（validator）+ unit tests（scan utility）
+- [ ] 自身 archive 時通過 validator（dogfood，deferred — 待 plan archive 時自動驗證）
 
 ---
 
@@ -231,9 +233,9 @@ if result.HasUnchecked() && !bodyJustifiesUnchecked(commitBody) {
 
 ## Stakeholder 同意項目
 
-- [ ] 接受新增第 19 個 commit-msg validator
-- [ ] 接受 block default（與 `validateRuntimeTriggerWiring` 一致）
-- [ ] 接受 opt-out trailer `[skip-plan-archival-audit]`
+- [x] 接受新增第 19 個 commit-msg validator
+- [x] 接受 block default（與 `validateRuntimeTriggerWiring` 一致）
+- [x] 接受 opt-out trailer `[skip-plan-archival-audit]`
 
 ---
 
