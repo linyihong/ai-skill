@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Plan Archival with Justified Unchecked Checkbox Scenario
+# 測試 commit body 包含交代關鍵字時 validator 應放行（即使仍有 `- [ ]`）。
+# 來源：plans/active/2026-05-28-1830-plan-archival-audit-validator.md §Validation scenarios
+
+id: plan-archival-justified-checkbox-v1
+domain: plans
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: plan-archival-false-positive
+  description: >
+    Validator 誤 block 有正當理由的 archive：使用者在 commit body 已明文交代
+    未完成項目（deferred / non-goal / scope reduced / handover / 延後 / 拆分），
+    但 validator 仍 block。應放行此類 commit。
+
+given:
+  task: archive_plan_with_justified_open_checkboxes
+  artifacts:
+    - plans/active/2026-05-28-1830-plan-archival-audit-validator.md
+    - scripts/ai-skill-cli/internal/app/hooks.go  # validatePlanArchivalAudit
+  signals:
+    - staged diff contains deletion of plans/active/<name>.md
+    - staged diff contains addition of plans/archived/<name>.md with same basename
+    - archived file content contains one or more "- [ ]" lines
+    - commit body contains at least one justification keyword
+      (deferred / non-goal / scope reduced / handover / 延後 / 拆分)
+  constraints:
+    - no "[skip-plan-archival-audit]" opt-out trailer needed (justification in body suffices)
+
+when:
+  action: git_commit_archiving_plan
+
+then:
+  expected_route:
+    primary: pass_commit_with_justified_unchecked
+    steps:
+      - validatePlanArchivalAudit detects active→archived file move
+      - reads archived file content (ScanCheckboxesInFile)
+      - finds "- [ ]" lines
+      - checks commit body for justification keywords
+      - finds at least one keyword match (e.g. "deferred → follow-up plan")
+      - returns empty string (no block)
+    reject:
+      - block_despite_justification: "body 有交代關鍵字卻仍 block"
+      - require_one_to_one: "要求每個 `- [ ]` 都有獨立對應行（過嚴）"
+  validation:
+    - commit passes validator (empty return value)
+    - no error message emitted for plan-archival-audit

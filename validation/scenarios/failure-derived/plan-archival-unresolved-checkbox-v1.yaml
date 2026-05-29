@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Plan Archival with Unresolved Checkbox Scenario
+# 測試 commit-msg validator 在 plan 被 archive 時仍有未完成 `- [ ]` 且 commit body 無交代時 block。
+# 來源：plans/active/2026-05-28-1830-plan-archival-audit-validator.md §Validation scenarios
+
+id: plan-archival-unresolved-checkbox-v1
+domain: plans
+type: heuristic-obedience
+priority: P1
+
+failure_source:
+  class: plan-archival-drift
+  description: >
+    Agent 或使用者將 plans/active/<plan>.md 移到 plans/archived/<plan>.md，
+    但 archived 版本仍有 `- [ ]` 未完成項目，且 commit body 沒有交代
+    （deferred / non-goal / scope reduced / handover / 延後 / 拆分）。
+    Validator 應 block；若放行，未完成項會永遠消失在 archive。
+
+given:
+  task: archive_plan_with_open_checkboxes
+  artifacts:
+    - plans/active/2026-05-28-1830-plan-archival-audit-validator.md
+    - scripts/ai-skill-cli/internal/app/hooks.go  # validatePlanArchivalAudit
+  signals:
+    - staged diff contains deletion of plans/active/<name>.md
+    - staged diff contains addition of plans/archived/<name>.md with same basename
+    - archived file content contains one or more "- [ ]" lines
+    - commit body contains no justification keyword
+  constraints:
+    - no "[skip-plan-archival-audit]" opt-out trailer present
+
+when:
+  action: git_commit_archiving_plan
+
+then:
+  expected_route:
+    primary: block_commit_with_unresolved_checkboxes
+    steps:
+      - validatePlanArchivalAudit detects active→archived file move via staged paths
+      - reads archived file content (ScanCheckboxesInFile)
+      - finds at least one "- [ ]" line
+      - checks commit body for justification keywords (deferred/non-goal/scope reduced/handover/延後/拆分)
+      - finds no justification
+      - returns non-empty error message blocking the commit
+    reject:
+      - silent_pass: "有 `- [ ]` 且無交代卻放行"
+      - only_line_count: "只數量不看 body justification"
+  validation:
+    - commit is blocked with message citing "plan-archival-audit"
+    - error message identifies the archived plan file
+    - error message suggests adding justification or opt-out trailer

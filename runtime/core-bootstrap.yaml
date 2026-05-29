@@ -228,6 +228,12 @@ per_commit_obligations:
     severity: block
     opt_out_marker: "[skip-evidence-hierarchy]"
     contract_source: enforcement/evidence-hierarchy.yaml (executable contract) + plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md (Phase 4)
+  - id: obligation.commit.plan_archival_audit
+    fires: every_commit_moving_plan_from_active_to_archived
+    validator: validatePlanArchivalAudit
+    severity: block
+    opt_out_marker: "[skip-plan-archival-audit]"
+    contract_source: plans/active/2026-05-28-1830-plan-archival-audit-validator.md (Phase 2)
 
 per_commit_dispatcher_status:
   machine_iterable: true

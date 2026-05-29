@@ -161,6 +161,26 @@ cli_specific_gates:
     opt_out_marker: "[skip-plan-checkbox-sync]"
     upstream_plan: plans/active/2026-05-28-1200-gen3-runtime-trigger-audit-and-completion.md (Phase 5)
 
+  - id: gate.plan_archival_audit_required
+    description: |
+      When a commit moves a plan file from plans/active/<name>.md to
+      plans/archived/<name>.md (detected by staged deletion + addition of
+      the same basename), the archived version MUST have no unresolved
+      `- [ ]` items OR the commit body MUST explicitly justify each
+      open item (deferred / non-goal / scope reduced / handover / 延後 / 拆分).
+
+      Emergency archives may opt out via [skip-plan-archival-audit] as a
+      standalone trailer line.
+    detection_signals:
+      - "staged paths include plans/active/<name>.md (deletion) AND plans/archived/<name>.md (addition) with matching basename"
+      - "archived file content contains one or more '- [ ]' lines"
+      - "commit body lacks justification keyword"
+    enforcement_layer: commit_msg_hook
+    validator: validatePlanArchivalAudit
+    severity: block
+    opt_out_marker: "[skip-plan-archival-audit]"
+    upstream_plan: plans/active/2026-05-28-1830-plan-archival-audit-validator.md (Phase 2)
+
   - id: gate.runtime_trigger_wiring_required
     description: |
       When staged diff adds a new route.* entry to

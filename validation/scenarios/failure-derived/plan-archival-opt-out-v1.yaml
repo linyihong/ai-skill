@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Plan Archival Opt-out Scenario
+# 測試 [skip-plan-archival-audit] trailer 存在時 validator 應完全跳過。
+# 來源：plans/active/2026-05-28-1830-plan-archival-audit-validator.md §Validation scenarios
+
+id: plan-archival-opt-out-v1
+domain: plans
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  class: plan-archival-opt-out-ignored
+  description: >
+    Agent 或 CI 在 commit body 加了 `[skip-plan-archival-audit]` opt-out trailer，
+    表示緊急 archive 或特殊情況，但 validator 仍 block。應完全跳過檢查。
+
+given:
+  task: archive_plan_with_opt_out_trailer
+  artifacts:
+    - plans/active/2026-05-28-1830-plan-archival-audit-validator.md
+    - scripts/ai-skill-cli/internal/app/hooks.go  # validatePlanArchivalAudit
+  signals:
+    - staged diff contains deletion of plans/active/<name>.md
+    - staged diff contains addition of plans/archived/<name>.md with same basename
+    - archived file content contains one or more "- [ ]" lines
+    - commit body contains standalone "[skip-plan-archival-audit]" trailer line
+  constraints:
+    - trailer must be a standalone line (not embedded mid-paragraph)
+
+when:
+  action: git_commit_archiving_plan
+
+then:
+  expected_route:
+    primary: bypass_all_checks_on_opt_out
+    steps:
+      - validatePlanArchivalAudit detects opt-out trailer at start of scan
+      - returns empty string immediately without reading archived file content
+    reject:
+      - block_despite_opt_out: "有 opt-out trailer 卻仍 block"
+      - partial_bypass: "只跳過部分檢查，仍回傳警告"
+  validation:
+    - commit passes validator (empty return value)
+    - no "plan-archival-audit" error emitted

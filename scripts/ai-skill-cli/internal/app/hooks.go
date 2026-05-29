@@ -2128,6 +2128,100 @@ func planDiffFlipsCheckbox(diff string) bool {
 	return false
 }
 
+// findArchivedPlans returns the paths of plans/archived/*.md files in staged
+// whose basename also appears as a deletion of plans/active/*.md — i.e. a
+// file-move that constitutes an archival action. Pure Go, no shell dependency.
+func findArchivedPlans(staged []string) []string {
+	activeDeleted := map[string]bool{}
+	archivedAdded := map[string]bool{}
+	for _, s := range staged {
+		if strings.HasPrefix(s, "plans/active/") && strings.HasSuffix(s, ".md") {
+			base := strings.TrimPrefix(s, "plans/active/")
+			activeDeleted[base] = true
+		}
+		if strings.HasPrefix(s, "plans/archived/") && strings.HasSuffix(s, ".md") {
+			base := strings.TrimPrefix(s, "plans/archived/")
+			archivedAdded[base] = true
+		}
+	}
+	var result []string
+	for base := range archivedAdded {
+		if activeDeleted[base] {
+			result = append(result, "plans/archived/"+base)
+		}
+	}
+	return result
+}
+
+// bodyJustifiesUnchecked returns true if the commit body contains at least one
+// keyword that justifies leaving "- [ ]" items in an archived plan.
+func bodyJustifiesUnchecked(body string) bool {
+	keywords := []string{
+		"deferred", "non-goal", "scope reduced", "handover", "延後", "拆分",
+	}
+	lower := strings.ToLower(body)
+	for _, kw := range keywords {
+		if strings.Contains(lower, strings.ToLower(kw)) {
+			return true
+		}
+	}
+	return false
+}
+
+// validatePlanArchivalAudit is the 19th commit-msg validator. It blocks commits
+// that move a plan from plans/active/ to plans/archived/ when the archived
+// version still contains "- [ ]" lines and the commit body provides no
+// justification (deferred / non-goal / scope reduced / handover / 延後 / 拆分).
+//
+// Opt-out: standalone "[skip-plan-archival-audit]" trailer for emergency archives.
+//
+// Trigger: staged set contains plans/active/<name>.md deleted AND
+// plans/archived/<name>.md added with the same basename.
+//
+// Plan: plans/active/2026-05-28-1830-plan-archival-audit-validator.md
+// Phase: 2 (Validator Implementation)
+func validatePlanArchivalAudit(text string, staged []string, root string) string {
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "[skip-plan-archival-audit]" {
+			return ""
+		}
+	}
+
+	archived := findArchivedPlans(staged)
+	if len(archived) == 0 {
+		return ""
+	}
+
+	var violations []string
+	for _, rel := range archived {
+		abs := rel
+		if root != "" {
+			abs = root + "/" + rel
+		}
+		result, err := ScanCheckboxesInFile(abs)
+		if err != nil {
+			continue
+		}
+		if !result.HasUnchecked() {
+			continue
+		}
+		if bodyJustifiesUnchecked(text) {
+			continue
+		}
+		violations = append(violations,
+			fmt.Sprintf("%s has %d unchecked item(s) with no body justification", rel, len(result.UncheckedLines)),
+		)
+	}
+
+	if len(violations) == 0 {
+		return ""
+	}
+	return "plan-archival-audit: archiving plan(s) with unresolved `- [ ]` items:\n    - " +
+		strings.Join(violations, "\n    - ") +
+		"\n  Either justify in commit body (deferred / non-goal / scope reduced / handover / 延後 / 拆分)" +
+		" or add a standalone `[skip-plan-archival-audit]` trailer for emergency archives."
+}
+
 // validateRuntimeTriggerWiring blocks commits that add new routing-registry
 // entries or new runtime/*.yaml target_keys without wiring them to a
 // discovery signal, commit-msg validator / hook, or explicit
@@ -2484,6 +2578,9 @@ var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
 	"obligation.commit.evidence_hierarchy": func(c commitMsgCtx) string {
 		return validateEvidenceHierarchy(c.text, c.staged, c.root)
 	},
+	"obligation.commit.plan_archival_audit": func(c commitMsgCtx) string {
+		return validatePlanArchivalAudit(c.text, c.staged, c.root)
+	},
 }
 
 // defaultCommitMsgDispatchOrder is the fallback order if
@@ -2508,6 +2605,7 @@ var defaultCommitMsgDispatchOrder = []string{
 	"obligation.commit.plan_checkbox_sync",
 	"obligation.commit.runtime_trigger_wiring",
 	"obligation.commit.evidence_hierarchy",
+	"obligation.commit.plan_archival_audit",
 }
 
 // readPerCommitObligationsOrder reads the per_commit_obligations id
