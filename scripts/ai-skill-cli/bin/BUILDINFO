@@ -1,4 +1,4 @@
-version=repo-7f58778
-source_commit=7f58778
-built_at=2026-05-29T05:01:11Z
+version=repo-cce8e83
+source_commit=cce8e83
+built_at=2026-05-29T05:06:21Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
