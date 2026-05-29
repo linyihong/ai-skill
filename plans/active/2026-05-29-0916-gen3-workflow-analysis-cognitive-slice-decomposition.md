@@ -254,9 +254,9 @@ evidence:
 
 ## 完成條件
 
-- [ ] Status 從 `draft` 更新為 `in-progress` / `completed`，並記錄完成日期。
+- [x] Status 從 `draft` 更新為 `in-progress`（Phase 0–1 完成，Phase 2–5 待續）。
 - [x] Phase 0 完成 workflow / analysis source inventory 與 architecture compatibility preflight。
-- [ ] Phase 1 定義 workflow / analysis slice taxonomy 與 owner-layer decision。
+- [x] Phase 1 定義 workflow / analysis slice taxonomy 與 owner-layer decision（`governance/cognitive-slice-taxonomy.md`，status `phase-1-complete`；software-delivery pilot 8-slice 全 owner_layer:workflow）。
 - [ ] Phase 2 完成至少一個 workflow 或 analysis surface 的 thin index 化。
 - [ ] Phase 3 完成 loading rules、summary links、routing links 或明確 not applicable。
 - [ ] Phase 4 補足 validation scenarios 或明確說明 doc-only trial 的 validation substitute。
@@ -363,9 +363,9 @@ Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`develop
 
 > **External review guardrails（2026-05-29 採納）**：本 phase 採 type+tags 收斂模型、granularity 原則與三層邊界規則，避免 taxonomy explosion / over-fragmentation。詳見 §Decision Rationale 風險表對應列。
 >
-> **Down-payment（2026-05-29，受限預算）**：taxonomy 骨架已建於 [`governance/cognitive-slice-taxonomy.md`](../../governance/cognitive-slice-taxonomy.md)（schema 欄位 + 5 條規則佔位 + 命名/延後項）。**pilot 實際分類與 fixture 草稿仍待完整預算 session 補**。
+> **Phase 1 complete（2026-05-29）**：taxonomy 已完整定義於 [`governance/cognitive-slice-taxonomy.md`](../../governance/cognitive-slice-taxonomy.md)（status `phase-1-complete`）：14 欄 slice schema + 5 條治理規則（type+tags 收斂 / granularity / 三層邊界 + falsifiable placement predicate / examples suppression / extraction direction）+ 命名決定 + **software-delivery pilot 8-slice 盤點**（sd-intake / sd-contracts / sd-test-strategy / sd-implementation / sd-surgical-caveats / sd-validation / sd-closure / sd-examples）+ Phase 4 test-first fixtures（Scenario A/B/C/D 草稿）。**Phase 1 不改任何 pilot 檔案內容；實體拆檔在 Phase 2，scenario 執行在 Phase 4。**
 
-- [ ] 定義最小 slice schema：
+- [x] 定義最小 slice schema（taxonomy §1，14 欄）：
   - purpose
   - `type`（primary，**只允許 4 值**：`execution` / `evidence` / `examples` / `failure`）
   - `tags`（secondary，自由標註：artifact-gate / closure / handoff / templates / observation-triage / tool-procedure / domain-specific / extraction-to-intelligence …）
@@ -379,7 +379,7 @@ Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`develop
   - `dependency_budget`（**heuristic default + override**，非 rigid governance；見下方規則）
   - summary_path
   - validation_signal
-- [ ] **Dependency budget 規則（heuristic, not rigid）**：用 default + complexity override，避免 governance rigidity（external review 風險1，2026-05-29）。不同 surface complexity 合理上限不同（small CRUD fix 可能 depth1/deps2；deployment debugging 可能 depth3/deps6），所以**不把單一數字當硬門檻**：
+- [x] **Dependency budget 規則（heuristic, not rigid）**（taxonomy §1 `dependency_budget` 欄 + §7 全 slice 採 default 2/4）：用 default + complexity override，避免 governance rigidity（external review 風險1，2026-05-29）。不同 surface complexity 合理上限不同（small CRUD fix 可能 depth1/deps2；deployment debugging 可能 depth3/deps6），所以**不把單一數字當硬門檻**：
 
   ```yaml
   dependency_budget:
@@ -391,31 +391,31 @@ Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`develop
   ```
 
   超出 default 須在 slice / scenario 註記 `task_complexity: high` 理由；超出 override 上限才回 plan 重評。目的：防 recursive loading / dependency storms / retrieval fan-out（見 §Open Questions Cross-Slice Dependency Explosion），同時不讓 budget 變僵化治理。
-- [ ] **type+tags 收斂規則**：primary `type` 固定 4 種，不得擴張為 first-class taxonomy；其餘責任一律降為 `tags`。新需求預設加 tag，不加 type。任何想新增第 5 個 primary type 的提議都需回到本 plan 重新評估。
-- [ ] **Granularity 原則**：slice 最小單位 = **能獨立完成一個 cognitive phase**（例如 software-delivery 的 Requirement Intake / Implementation / Validation），**不是** step（Step1/Step2）也不是 concept。判準：該 slice 載入後 agent 能完成一個自足的認知階段而不需瘋狂 cross-reference。Phase 2 切片時逐個 slice 用此判準把關。
-- [ ] **三層邊界規則（codify）**：`workflow` = 「要做什麼順序」；`analysis` = 「如何取得與驗證證據」；`intelligence` = 「為何這種模式長期有效 / 失敗」。slice 歸層時用此三分法判定 owner_layer，三層不得混。
-- [ ] 用三層邊界規則檢查 taxonomy 是否與 `workflow/analysis/intelligence/knowledge/runtime/governance` 重疊。
-- [ ] **Examples suppression bias 規則**：`type: examples` 的 slice 預設 **`default_load: false`**，只在 `user_requested_examples` 或 `ambiguity_detected` 時載入（external review 風險2，2026-05-29）。理由：examples token 密度高、pattern 明顯，LLM 易先讀 examples 而非 canonical execution，造成 **example-driven loading contamination / override doctrine**。這對應 Watch-Out Wall 5（positive-activation bias）。
-- [ ] **Extraction direction rule（analysis → intelligence 單向）**：`analysis` 只產出 `observations / signals / evidence`；`intelligence` **只接受 validated repeated patterns**（external review 風險3，2026-05-29）。heuristic / tradeoff / anti-pattern / routing-heuristic 這類灰區內容，未經重複驗證前留在 analysis，不得直接倒進 intelligence，避免 intelligence 變 random thought dumping ground。slice 標 `tags: extraction-to-intelligence` 僅代表「候選」，升層需有 validation 證據。
-- [ ] **Placement 可驗證規則（falsifiable membership predicate）**：歸層不是 honor-system 標籤，每個 slice 的 `layer_justification` 必須通過二選一判準，否則判定 misplacement：
+- [x] **type+tags 收斂規則**（taxonomy §2，pilot 印證：8 slice 只落在 execution/failure/examples 三型，artifact-gate/contract/bdd 等全降為 tags）：primary `type` 固定 4 種，不得擴張為 first-class taxonomy；其餘責任一律降為 `tags`。新需求預設加 tag，不加 type。任何想新增第 5 個 primary type 的提議都需回到本 plan 重新評估。
+- [x] **Granularity 原則**（taxonomy §3，pilot 印證：9 步 + 12 gate 收斂成 6 生命週期 phase + 1 caveat + 1 examples，不逐步逐 gate 切）：slice 最小單位 = **能獨立完成一個 cognitive phase**（例如 software-delivery 的 Requirement Intake / Implementation / Validation），**不是** step（Step1/Step2）也不是 concept。判準：該 slice 載入後 agent 能完成一個自足的認知階段而不需瘋狂 cross-reference。Phase 2 切片時逐個 slice 用此判準把關。
+- [x] **三層邊界規則（codify）**（taxonomy §4）：`workflow` = 「要做什麼順序」；`analysis` = 「如何取得與驗證證據」；`intelligence` = 「為何這種模式長期有效 / 失敗」。slice 歸層時用此三分法判定 owner_layer，三層不得混。
+- [x] 用三層邊界規則檢查 taxonomy 是否與 `workflow/analysis/intelligence/knowledge/runtime/governance` 重疊（taxonomy §4：8 pilot slice 全通過 workflow membership，無一是 evidence 取得或長期模式）。
+- [x] **Examples suppression bias 規則**（taxonomy §5，pilot：sd-examples 標 default_load:false）：`type: examples` 的 slice 預設 **`default_load: false`**，只在 `user_requested_examples` 或 `ambiguity_detected` 時載入（external review 風險2，2026-05-29）。理由：examples token 密度高、pattern 明顯，LLM 易先讀 examples 而非 canonical execution，造成 **example-driven loading contamination / override doctrine**。這對應 Watch-Out Wall 5（positive-activation bias）。
+- [x] **Extraction direction rule（analysis → intelligence 單向）**（taxonomy §4，pilot：sd-closure 的 Feed Back Lessons 標 tags:extraction-to-intelligence 為候選，未升層）：`analysis` 只產出 `observations / signals / evidence`；`intelligence` **只接受 validated repeated patterns**（external review 風險3，2026-05-29）。heuristic / tradeoff / anti-pattern / routing-heuristic 這類灰區內容，未經重複驗證前留在 analysis，不得直接倒進 intelligence，避免 intelligence 變 random thought dumping ground。slice 標 `tags: extraction-to-intelligence` 僅代表「候選」，升層需有 validation 證據。
+- [x] **Placement 可驗證規則（falsifiable membership predicate）**（taxonomy §4）：歸層不是 honor-system 標籤，每個 slice 的 `layer_justification` 必須通過二選一判準，否則判定 misplacement：
   - **analysis membership test**：內容回答「如何取得 / 驗證證據」，且為 task-instance 級的 observation / signal / evidence；**不得**斷言跨實例通則。
   - **intelligence membership test**：內容是一個 generalization，**且** `evidence_refs` 含 ≥2 個獨立、已驗證、可解析的來源。少於 2 個或無法解析 → 判定 premature promotion，**強制退回 analysis**。
   - 「validated repeated pattern」即以 `evidence_refs` 數量 + 可解析性作為操作型定義（機械可檢查）。
   - **限制聲明**：歸層終究是語意分類，無完全機械 oracle；本規則目標是「讓 misplacement 可偵測、可逆、便宜修正」（falsifiable 判準 + evidence_refs gate + Phase 4 負向 scenario + contamination 探針），非「證明每次都放對」。升 / 降層走 audit trail，可逆。
 - [x] 是否新增 domain-local `slices/` 子目錄 → **已於 §Open Questions resolved：暫不新增 generic / domain-local `slices/`，優先在既有 owner layer 內用 semantic filename 切分；Phase 4 validation 後重評。** 本 phase 只需確認 pilot 切分落在既有 `workflow/software-delivery/` 內。
-- [ ] 評估命名候選並選定**過渡期 operational wording**（`loading/execution/evidence surface`）；**正式 glossary 註冊延後至 Phase 4**（見 §Open Questions 與 §Glossary Impact）。評估 `capability surface` / `cognitive surface` / `execution surface`（review 觀點：slice 易讓人聯想 arbitrary chunk / static partition，但本質是 routable cognition surface），記錄理由但不在本 phase 鎖定 framework vocabulary。
+- [x] 評估命名候選並選定**過渡期 operational wording**（taxonomy §6：採 `execution surface` / `evidence surface`）；**正式 glossary 註冊延後至 Phase 4**（見 §Open Questions 與 §Glossary Impact）。已評估 `capability surface` / `cognitive surface` / `execution surface`（review 觀點：slice 易讓人聯想 arbitrary chunk / static partition，但本質是 routable cognition surface），記錄理由但不在本 phase 鎖定 framework vocabulary。
 
-Phase 1 exit criteria：
+Phase 1 exit criteria（**全部達成，2026-05-29**）：
 
-- [ ] Taxonomy 不重複 canonical source，且 workflow / analysis 邊界清楚。
-- [ ] primary `type` 恰為 4 種，其餘為 tags（type+tags 收斂規則成立）。
-- [ ] 每個 slice 有明確 `load_when` 和 `do_not_load_when`。
-- [ ] Granularity 原則與三層邊界規則已寫入 taxonomy 文件。
-- [ ] Examples suppression bias 規則（`type: examples` 預設 `default_load: false`）與 extraction direction rule（analysis→intelligence 單向，只收 validated repeated patterns）已寫入 taxonomy 文件。
-- [ ] Placement 可驗證規則已寫入：每個 slice 有 `layer_justification` 並通過該層 membership predicate；intelligence slice 的 `evidence_refs` ≥2 且可解析（否則退回 analysis）。
-- [ ] 每個 slice schema 含 `dependency_budget`（heuristic default 2 / 4 + `override_when: task_complexity=high`，非 rigid 硬門檻）。
-- [ ] **Test-first validation target 已草擬**：Phase 4 fixture 形狀（`expected_load` / `forbidden_load` / `dependency_budget`）與 Scenario A/B/C 的 expected/forbidden 清單已先寫出，待 Phase 4 執行。
-- [ ] Glossary / naming decision 已記錄（含是否改用 surface 命名）。
+- [x] Taxonomy 不重複 canonical source，且 workflow / analysis 邊界清楚（taxonomy §1 `canonical_source` 只導航；§7 全 slice 留在既有 owner layer）。
+- [x] primary `type` 恰為 4 種，其餘為 tags（type+tags 收斂規則成立；taxonomy §2）。
+- [x] 每個 slice 有明確 `load_when` 和 `do_not_load_when`（taxonomy §7 盤點表兩欄齊備）。
+- [x] Granularity 原則與三層邊界規則已寫入 taxonomy 文件（taxonomy §3、§4）。
+- [x] Examples suppression bias 規則（`type: examples` 預設 `default_load: false`）與 extraction direction rule（analysis→intelligence 單向，只收 validated repeated patterns）已寫入 taxonomy 文件（§5、§4）。
+- [x] Placement 可驗證規則已寫入：每個 slice 有 `layer_justification` 並通過該層 membership predicate；intelligence slice 的 `evidence_refs` ≥2 且可解析（否則退回 analysis）（taxonomy §1 欄位 + §4 + §7 layer_justification）。
+- [x] 每個 slice schema 含 `dependency_budget`（heuristic default 2 / 4 + `override_when: task_complexity=high`，非 rigid 硬門檻）（taxonomy §1 + §7）。
+- [x] **Test-first validation target 已草擬**：Phase 4 fixture 形狀（`expected_load` / `forbidden_load` / `dependency_budget`）與 Scenario A/B/C/D 的 expected/forbidden 清單已先寫出，待 Phase 4 執行（taxonomy §8）。
+- [x] Glossary / naming decision 已記錄（taxonomy §6：採 surface 命名，glossary 註冊延後至 Phase 4）。
 
 ## Phase 2 — Thin Index + Focused Slices
 
