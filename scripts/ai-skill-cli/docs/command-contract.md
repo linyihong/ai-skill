@@ -30,7 +30,7 @@
 | `ai-skill hooks run pre-tool-use` | 執行 Claude Code PreToolUse hook：scan transcript for Bootstrap Receipt；Read tool 一律 allow，其他 tool 在 Receipt 出現前 block（exit 2） | 是（`/tmp/ai-skill-bootstrap-<hash>.done`） | 否 | Cross-platform Go script runtime |
 | `ai-skill hooks run post-tool-use` | 執行 Claude Code PostToolUse hook：Bootstrap Receipt 不在 transcript 時注入 reminder via hookSpecificOutput；always exit 0 | 是（cache file） | 否 | Cross-platform Go script runtime |
 | `ai-skill hooks run user-prompt-submit` | 執行 Claude Code UserPromptSubmit hook：每次 user turn 注入 final close-out reminder + CORE_BOOTSTRAP.md as additionalContext；若 project root 底下有 dirty nested Git repos，注入合併 `### Project Git Report` 要求 | 否 | 否 | Cross-platform Go script runtime |
-| `ai-skill hooks run stop` | 執行 Stop / final-response hook：從 transcript 或 hook payload 檢查 last assistant message 含 Cognitive Mode block（compact 或 full table）；Claude-style stop 缺少時 block（exit 2）；Cursor stop 缺少時輸出 `followup_message` 並 exit 0 以 loop back；若有 dirty root / nested Git repos 也要求 `### Project Git Report` | 否 | 否 | Cross-platform Go script runtime |
+| `ai-skill hooks run stop` | 執行 Stop / final-response hook：從 transcript 或 hook payload 檢查對話含 Bootstrap Receipt、last assistant message 含 Cognitive Mode block（compact 或 full table）；若有 dirty root / nested Git repos 也要求 `### Project Git Report`；Claude-style stop 缺少時 block（exit 2）；Cursor stop 缺少時一次彙整缺項輸出 `followup_message` 並 exit 0 以 loop back | 否 | 否 | Cross-platform Go script runtime |
 | `ai-skill sync-cursor-bundle` | 同步 Cursor bundle / mirror | 是 | 否 | Phase 2 |
 | `ai-skill close-loop` | 檢查 dirty owner group、commit、push、readback | 是 | 是 | Phase 2 |
 | `ai-skill runtime refresh` | 重建 knowledge runtime reports / SQLite index | 是 | 否 | Phase 3 |

@@ -14,7 +14,7 @@ Class: `process-gap` / `governance-drift`
 - `context_mode` 未設定而使用預設壓縮行為（不等於 DEFAULT fallback 已套用）
 - `governance_mode` 未設定而跳過 gate check
 - `memory_mode = NONE` 被忽略，仍讀了 `memory/` subdir
-- Chat / session final response 沒有 compact `Cognitive:` 或 full `### Cognitive Mode 報告`，或 final-response hook 使用錯誤 blocking protocol 導致缺報仍被顯示，代表 per-turn resolution 沒有 user-facing evidence
+- Chat / session final response 沒有 compact `Cognitive:` 或 full `### Cognitive Mode 報告`，對話缺 Bootstrap Receipt，或 final-response hook 使用錯誤 blocking protocol 導致缺報仍被顯示，代表 bootstrap / per-turn resolution 沒有 user-facing evidence
 
 ## Failure Mode
 
@@ -68,7 +68,7 @@ Class: `process-gap` / `governance-drift`
 - 每個任務執行前有可追蹤的 mode resolution（`cognitive_modes` 表有 row 或 fallback 明確記錄）
 - governance_mode 對應的 gate_set 已激活
 - memory_mode = NONE 時，沒有讀 `memory/` 任何 subdir
-- Cursor / Claude 等支援 stop/final-response hook 的 adapter 有 regression 覆蓋「final response 缺 Cognitive 時會 block 或 loop back」；Cursor stop 必須驗證 `followup_message` protocol
+- Cursor / Claude 等支援 stop/final-response hook 的 adapter 有 regression 覆蓋「缺 Bootstrap Receipt / final Cognitive 時會 block 或 loop back」；Cursor stop 必須驗證 `followup_message` protocol 且一次彙整缺項
 
 ## Source
 

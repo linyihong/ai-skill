@@ -890,14 +890,14 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 		if len(texts) == 0 {
 			return blockStopHookMissingAssistantText(stdout, stderr, logFile, transcriptPath, cursorStop)
 		}
-		return validateStopHookFinalText(projectDir, texts[len(texts)-1], stdout, stderr, logFile, cursorStop)
+		return validateStopHookFinalTexts(projectDir, texts, stdout, stderr, logFile, cursorStop)
 	}
 
 	texts := extractAssistantTexts(transcriptPath)
 	if len(texts) == 0 {
 		return blockStopHookMissingAssistantText(stdout, stderr, logFile, transcriptPath, cursorStop)
 	}
-	return validateStopHookFinalText(projectDir, texts[len(texts)-1], stdout, stderr, logFile, cursorStop)
+	return validateStopHookFinalTexts(projectDir, texts, stdout, stderr, logFile, cursorStop)
 }
 
 func blockStopHookMissingAssistantText(stdout io.Writer, stderr io.Writer, logFile string, transcriptPath string, cursorStop bool) int {
@@ -907,6 +907,64 @@ func blockStopHookMissingAssistantText(stdout io.Writer, stderr io.Writer, logFi
 		"The final Cognitive Mode check cannot validate an empty or unavailable assistant response. " +
 		"Use a Cursor event that supplies the assistant response payload, such as afterAgentResponse, " +
 		"or provide a transcript_path containing the final assistant message.\n"
+	if cursorStop {
+		writeCursorStopFollowup(stdout, message)
+		return ExitSuccess
+	}
+	_, _ = fmt.Fprint(stderr, message)
+	return ExitValidationFailed
+}
+
+func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Writer, stderr io.Writer, logFile string, cursorStop bool) int {
+	lastText := texts[len(texts)-1]
+	tail := lastText
+	if len(tail) > 200 {
+		tail = tail[len(tail)-200:]
+	}
+	diagMsg := fmt.Sprintf("DIAG last_msg_len=%d tail=%q", len(lastText), tail)
+	appendLog(logFile, diagMsg)
+	_, _ = fmt.Fprintln(stderr, diagMsg)
+
+	allAssistantText := strings.Join(texts, "\n\n--- assistant turn ---\n\n")
+	messages := []string{}
+
+	bootstrapRe := regexp.MustCompile(`(?m)^Bootstrap: rules=✓ phase=[^ ]+ obligations=\d+ gates=\d+\s*$`)
+	if !bootstrapRe.MatchString(allAssistantText) {
+		_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING_BOOTSTRAP_RECEIPT")
+		messages = append(messages, "[ai-skill Stop hook] Missing obligation: this conversation did not include the Bootstrap Receipt.\n\n"+
+			"Before continuing, output the Bootstrap Receipt required by runtime/core-bootstrap.yaml, then answer the user. Required shape:\n\n"+
+			"Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>\n"+
+			"Active per-turn obligations: <comma-separated obligation ids>\n")
+	}
+
+	cogRe := regexp.MustCompile(`(### Cognitive Mode 報告|(?:^|\n)Cognitive: [A-Z])`)
+	if !cogRe.MatchString(lastText) {
+		_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING_COGNITIVE")
+		messages = append(messages, "[ai-skill Stop hook] Missing obligation: your final response did not include a Cognitive Mode block.\n\n"+
+			"Per runtime/core-bootstrap.yaml §per_turn_obligations[obligation.cognitive.mode_report], every final user-facing "+
+			"response MUST end with a Cognitive Mode block (compact 1-line for trivial all-default tasks: "+
+			"`Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>`; full 6-row markdown table otherwise).\n")
+	}
+
+	if formatDirtyGitRepoReport(projectDir) != "" {
+		gitReportRe := regexp.MustCompile(`(?m)^### (Project Git Report|Git Repo Report|Git Repository Report)\b`)
+		if !gitReportRe.MatchString(lastText) {
+			_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING_PROJECT_GIT_REPORT")
+			messages = append(messages, "[ai-skill Stop hook] Dirty Git repositories were detected under the project root, but your final response did not include `### Project Git Report`.\n\n"+
+				"If one nested Git repo changed, report that repo. If multiple nested Git repos changed, merge them into one `### Project Git Report` section with one bullet per repo and clearly distinguish current-task changes from pre-existing/unrelated dirty state.\n")
+		}
+	}
+
+	if len(messages) == 0 {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_CLOSE_OUT_PRESENT")
+		appendLog(logFile, "exit_code: 0")
+		return ExitSuccess
+	}
+
+	message := "[ai-skill Stop hook] Close-out validation failed. This is an agent follow-up instruction, not a user request.\n\n" +
+		strings.Join(messages, "\n---\n\n") +
+		"\nPlease produce one corrected final response now that satisfies all missing items in one pass. Canonical format spec: runtime/core-bootstrap.yaml. Query active obligations: `ai-skill runtime obligations`.\n"
+	appendLog(logFile, fmt.Sprintf("exit_code: 2 (block missing close-out items: %d)", len(messages)))
 	if cursorStop {
 		writeCursorStopFollowup(stdout, message)
 		return ExitSuccess

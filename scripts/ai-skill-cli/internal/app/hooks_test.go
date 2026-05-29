@@ -323,6 +323,9 @@ func TestRunStopHookLoopsCursorStopOkOnlyPayload(t *testing.T) {
 	if !strings.Contains(output["followup_message"], "Cognitive Mode block") {
 		t.Fatalf("expected followup_message to request Cognitive block, got %#v", output)
 	}
+	if !strings.Contains(output["followup_message"], "Bootstrap Receipt") {
+		t.Fatalf("expected followup_message to request Bootstrap Receipt, got %#v", output)
+	}
 }
 
 func TestRunStopHookAllowsAfterAgentResponseAuditOnly(t *testing.T) {
@@ -358,7 +361,7 @@ func TestRunStopHookLoopsCursorStopMissingAssistantText(t *testing.T) {
 }
 
 func TestRunStopHookAllowsCursorPayloadWithCompactCognitive(t *testing.T) {
-	setHookStdin(t, `{"assistant_response":"Done.\n\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast"}`)
+	setHookStdin(t, `{"assistant_response":"Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25\nActive per-turn obligations: obligation.cognitive.mode_report, obligation.finality.close_loop_check\n\nDone.\n\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast"}`)
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer

@@ -46,7 +46,7 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects
 |------|---------|------|
 | Roo Code | `.roomodes` | Thin bootstrap pointer，指向 Core Bootstrap companion 與 canonical YAML contract |
 | Cursor | `.cursor/rules/ai-skill-bootstrap.mdc` | Thin alwaysApply pointer，指向 Core Bootstrap companion 與 canonical YAML contract |
-| Cursor | `.cursor/hooks.json` | sessionStart bootstrap prompt + stop close-out hook；stop hook 委派 repo-local `ai-skill hooks run stop`，缺 final Cognitive Mode 報告時以 `followup_message` loop back |
+| Cursor | `.cursor/hooks.json` | sessionStart bootstrap prompt + stop close-out hook；stop hook 委派 repo-local `ai-skill hooks run stop`，缺 Bootstrap Receipt / final Cognitive Mode 報告時以 `followup_message` loop back |
 | Claude Code | `CLAUDE.md` + `.claude/settings.json` | Thin bootstrap pointer + Go hook runner，指向 Core Bootstrap companion 與 canonical YAML contract，並強制 final Cognitive Mode / nested Git report |
 | GitHub Copilot | `.github/` instructions + `.copilot/` guided startup package | Thin bootstrap pointers + `ai-skill copilot start` prompt；hard enforcement 仍在 hooks / CI / runtime validate |
 | 通用 | `.agent-goals/` | 對話目標帳本目錄 |
