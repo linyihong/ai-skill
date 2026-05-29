@@ -1,9 +1,11 @@
 # Gen3 Workflow and Analysis Cognitive Slice Decomposition
 
-**Status**: `draft`
+**Status**: `in-progress`
 **世代**：Gen 3 current hardening；Gen 4 prerequisite
 **建立日期**：2026-05-29
 **最後更新**：2026-05-29
+**Pilot 決定**：`workflow/software-delivery/`（stakeholder 同意 2026-05-29）
+**Glossary 決定**：`Cognitive Slice` 是否註冊延後至 Phase 1（stakeholder 同意 2026-05-29）
 
 > 本 plan 的核心決策：`workflow/` 與 `analysis/` 的 cognitive slice boundary 應在 Gen 3 完成，不等 Gen 4。Gen 3 先把 execution path（workflow）與 evidence path（analysis）切成可獨立載入、驗證與路由的 cognitive units；Gen 4 才在此基礎上做 dynamic activation / ecosystem orchestration。
 
@@ -240,7 +242,7 @@ evidence:
 ## 完成條件
 
 - [ ] Status 從 `draft` 更新為 `in-progress` / `completed`，並記錄完成日期。
-- [ ] Phase 0 完成 workflow / analysis source inventory 與 architecture compatibility preflight。
+- [x] Phase 0 完成 workflow / analysis source inventory 與 architecture compatibility preflight。
 - [ ] Phase 1 定義 workflow / analysis slice taxonomy 與 owner-layer decision。
 - [ ] Phase 2 完成至少一個 workflow 或 analysis surface 的 thin index 化。
 - [ ] Phase 3 完成 loading rules、summary links、routing links 或明確 not applicable。
@@ -255,38 +257,74 @@ evidence:
 
 目標：確認這不是「把文件搬一搬」，而是 current Gen 3 execution path / evidence path loading boundary hardening。
 
-- [ ] 盤點 candidate workflow files：
-  - [ ] `workflow/apk-analysis/artifact-gates.md`
-  - [ ] `workflow/software-delivery/examples/EXAMPLES.md`
-  - [ ] `workflow/software-delivery/development-process.md`
-  - [ ] `workflow/travel-planning/execution-flow.md`
-  - [ ] `workflow/software-delivery/execution-flow.md`
-  - [ ] 其他超過 document-sizing threshold 的 workflow surfaces
-- [ ] 盤點 candidate analysis files：
-  - [ ] `analysis/travel/sources-and-tools.md`
-  - [ ] `analysis/apk/workflows/frida-hook-flow.md`
-  - [ ] `analysis/apk/traffic-triage.md`
-  - [ ] `analysis/apk/tools-and-failures.md`
-  - [ ] `analysis/apk/workflows/media-hls-analysis-flow.md`
-  - [ ] 其他超過 document-sizing threshold 的 analysis surfaces
-- [ ] 檢查每個 candidate 是否超過 150 行且多主題。
-- [ ] 判定每個 candidate 的責任：
-  - workflow execution order
-  - workflow artifact gate / closure
-  - workflow example / template
-  - analysis evidence acquisition
-  - analysis tool procedure
-  - analysis triage / caveat
-  - intelligence / governance / tool adapter spillover
-- [ ] 確認不修改 generated output / mirror copy 作為 canonical source。
-- [ ] 列出可能受影響的 routing registry、summary、README、validation scenario。
-- [ ] 確認 workflow 只引用 analysis，不複製完整 evidence method；analysis 只提供 evidence acquisition，不承擔 orchestration flow。
+- [x] 盤點 candidate workflow files（行數見下表）。
+- [x] 盤點 candidate analysis files（行數見下表）。
+- [x] 檢查每個 candidate 是否超過 150 行且多主題。
+- [x] 判定每個 candidate 的責任（見 Inventory Record 責任欄）。
+- [x] 確認不修改 generated output / mirror copy 作為 canonical source。
+- [x] 列出可能受影響的 routing registry、summary、README、validation scenario。
+- [x] 確認 workflow 只引用 analysis，不複製完整 evidence method；analysis 只提供 evidence acquisition，不承擔 orchestration flow。
 
 Phase 0 exit criteria：
 
-- [ ] Candidate inventory 完成。
-- [ ] 每個 candidate 有 owner-layer decision。
-- [ ] 若發現 source-of-truth 衝突，先更新本 plan，不進 Phase 1。
+- [x] Candidate inventory 完成。
+- [x] 每個 candidate 有 owner-layer decision。
+- [x] 若發現 source-of-truth 衝突，先更新本 plan，不進 Phase 1。
+
+### Phase 0 Inventory Record（2026-05-29）
+
+> 本輪 stakeholder 指示：只跑 Phase 0 盤點，不改內容；pilot 鎖定 `workflow/software-delivery/`。下列盤點皆為 read-only 觀察。
+
+#### Preflight（依 `plans/README.md` §Architecture Compatibility Preflight）
+
+| 欄位 | 內容 |
+|---|---|
+| Trigger | 開始執行本 plan 的 Phase 0（inventory only） |
+| Checked sources | `plans/README.md` preflight、`enforcement/dependency-reading.md`、`workflow/software-delivery/README.md`、各 candidate heading、`knowledge/runtime/routing-registry.yaml` route.workflow.software-delivery、`workflow/software-delivery/{execution-flow,artifact-gates}.yaml` header |
+| Conflicts | 無架構衝突。發現 1 個 source-of-truth 約束（見下「Source-of-truth 邊界」），須在 Phase 2 切片時遵守，但不阻擋 Phase 0。 |
+| Decision | proceed — Phase 0 inventory 完成；依 stakeholder 指示在 Phase 1 前停止 |
+| Validation | read-only 觀察 + `wc -l` 行數 + heading 結構；無檔案內容變更 |
+
+#### Workflow candidates
+
+| 檔案 | 行數 | >150 & multi-topic | 主責任 | Owner-layer decision |
+|---|---|---|---|---|
+| `workflow/software-delivery/development-process.md` | 378 | 是（~12 個 Gate：Default Flow / Required Contracts / Product Brief / Change Intake / Contract Governance / Traceability / BDD / Test Strategy / Embedded / Missing Info / Backfill / DoR-DoD） | execution order + 多個 artifact/governance gate 混在一檔 | **Pilot 首選**：thin index + 個別 gate slice。canonical 仍在 workflow 層 |
+| `workflow/software-delivery/execution-flow.md` | 270 | 是（Step 1-9 + Surgical Changes Rules + Perf Gate + Test Strategy） | execution-order core 混入 surgical-changes caveat 與 perf gate | 切 execution-order slice + caveat/closure slice；為 routing primary_source，動它需同步 registry |
+| `workflow/software-delivery/examples/EXAMPLES.md` | 528 | 行數超標但主題單一（4 組行為範例：Think Before Coding / Simplicity / Surgical / Goal-Driven） | workflow examples slice（已獨立在 `examples/` 子目錄） | 已是 de-facto example slice；可能只需瘦身索引，不必再拆 |
+| `workflow/apk-analysis/artifact-gates.md` | 575 | 是 | apk artifact-gate（非 pilot） | 延後；非本輪 pilot |
+| `workflow/travel-planning/execution-flow.md` | 295 | 是 | travel execution-order（非 pilot） | 延後；非本輪 pilot |
+
+#### Analysis candidates
+
+| 檔案 | 行數 | >150 & multi-topic | 主責任 | Owner-layer decision |
+|---|---|---|---|---|
+| `analysis/travel/sources-and-tools.md` | 312 | 是（~20 個來源類別） | evidence-acquisition（source catalog） | 延後；非 pilot。屬 evidence-acquisition slice |
+| `analysis/apk/tools-and-failures.md` | 169 | 是（基礎工具 + 失敗判讀 + 命令模板 + 自動化安全邊界混合） | tool-procedure + failure/caveat 混合 | 延後；切 tool-procedure / failure-caveat 兩 slice |
+| `analysis/apk/traffic-triage.md` | 178 | 是 | triage/observation | 延後；非 pilot |
+| `analysis/apk/workflows/frida-hook-flow.md` | 190 | 是（步驟流程） | evidence-acquisition step procedure | 延後；非 pilot |
+| `analysis/apk/workflows/media-hls-analysis-flow.md` | 165 | 是（步驟流程） | evidence-acquisition step procedure | 延後；非 pilot |
+
+#### Source-of-truth 邊界（Phase 2 必須遵守）
+
+- `workflow/software-delivery/execution-flow.yaml` 與 `artifact-gates.yaml` header 標 `source_markdown: <對應 .md>`、`owner_layer: workflow`。**`.md` 是 canonical prose，`.yaml` 是衍生 executable contract**。
+- 切片若改動 `.md` 結構，必須檢查 `.yaml` 的 `source_markdown` 對映是否仍正確，並評估是否需 `ai-skill runtime compile + refresh`（Phase 3/5 處理）。
+- 不得把 `.yaml` 或任何 generated surface 當 canonical prose 來切。
+
+#### 受影響的 routing / summary / README
+
+- `knowledge/runtime/routing-registry.yaml` → `route.workflow.software-delivery`：`primary_source = execution-flow.md`，`required_dependencies` 含 `development-process.md`、`artifact-gates.md` 等。動 pilot 檔需在 Phase 3 同步此 route。
+- `knowledge/summaries/development-guidance.md`：對應 summary，Phase 3 需評估更新。
+- `workflow/software-delivery/README.md`：已是 thin-ish 入口（149 行），列出各子檔導航；Phase 2 切片後需更新導航連結。
+
+#### workflow↔analysis 邊界確認
+
+- `workflow/software-delivery/README.md` §「與既有層的關係」明確：workflow 引用 `analysis/development-guidance/`、`analysis/repo/`、`intelligence/`，不複製其正文 → 符合 plan 對「workflow 只引用 analysis」的要求。
+- analysis/apk 與 analysis/travel 提供 evidence acquisition / tool procedure，未承擔 workflow orchestration → 邊界乾淨。
+
+#### Phase 0 結論
+
+Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`development-process.md`（首選，gate 最多）+ `execution-flow.md`（execution-order vs caveat 分離）**，`examples/EXAMPLES.md` 可能僅需瘦身。依 stakeholder 指示在此停止，不進 Phase 1。下一步需 stakeholder 同意 Phase 1 taxonomy 與 glossary 決定後再繼續。
 
 ## Phase 1 — Cognitive Slice Taxonomy
 
