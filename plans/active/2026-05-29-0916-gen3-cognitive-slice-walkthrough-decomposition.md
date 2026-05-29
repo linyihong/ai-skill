@@ -5,7 +5,7 @@
 **建立日期**：2026-05-29
 **最後更新**：2026-05-29
 **Pilot 決定**：`workflow/software-delivery/`（stakeholder 同意 2026-05-29）
-**Glossary 決定**：`Cognitive Slice` 是否註冊延後至 Phase 1（stakeholder 同意 2026-05-29）
+**Glossary 決定**：`Cognitive Slice` 正式註冊刻意延後至 Phase 4 validation 之後；過渡期一律用 `loading/execution/evidence surface` 既有措辭（stakeholder 同意 2026-05-29，external review 採納）
 
 > 本 plan 的核心決策：`workflow/` 與 `analysis/` 的 cognitive slice boundary 應在 Gen 3 完成，不等 Gen 4。Gen 3 先把 execution path（workflow）與 evidence path（analysis）切成可獨立載入、驗證與路由的 cognitive units；Gen 4 才在此基礎上做 dynamic activation / ecosystem orchestration。
 
@@ -134,6 +134,7 @@ Gen 4 只承接後續：
 |---|---|
 | 把「切片」誤做成 Gen 4 ecosystem layer | 本 plan 明確限定 Gen 3：index、summary、routing、validation；不做 dynamic orchestration |
 | 切太細導致維護成本 > token savings（over-fragmentation） | Phase 1 granularity 原則：slice 最小單位 = 能獨立完成的 cognitive phase，非 step / concept；Phase 2 逐 slice 把關，避免 context hopping / dependency storms（external review 風險2） |
+| Cross-slice dependency explosion（recursive loading / fan-out / hidden activation chains） | Phase 1 slice schema 加 dependency budget（`max_depth: 2`、`max_runtime_dependencies: 4`）；Phase 4 scenario 斷言實際載入深度/廣度未超預算（external review OQ，2026-05-29） |
 | Taxonomy explosion / classification obsession | Phase 1 type+tags 收斂：primary `type` 只 4 種（execution/evidence/examples/failure），其餘降為 tags；新增 primary type 需回 plan 重評（external review 風險1） |
 | workflow / analysis / intelligence 邊界模糊 | Phase 1 codify 三層分工：workflow=順序、analysis=證據取得+驗證、intelligence=為何長期有效/失敗；歸層用此判定（external review 風險3） |
 | 過早變「理論宇宙」/ premature ecosystem abstraction | 維持節奏：small runtime hardening → measurable retrieval improvement → loading reduction → validation proof → gradual orchestration；不一次衝 full autonomous ecosystem（external review meta 警告） |
@@ -152,7 +153,7 @@ Candidate framework vocabulary:
 
 替代命名候選（external review 2026-05-29）：`capability surface` / `cognitive surface` / `execution surface`，理由是這些更貼近「routable cognition surface」本質，而 `slice` 易被聯想成 arbitrary chunk / static partition。
 
-Phase 1 必須決定是否註冊 `Cognitive Slice` 到 `knowledge/glossary/ai-skill.md`、改用 surface 命名、或改用既有詞彙避免 vocabulary inflation。
+Phase 1 只評估命名候選（surface vs slice）並選定**過渡期 operational wording**（`loading/execution/evidence surface`）；**正式註冊 `Cognitive Slice` 到 `knowledge/glossary/ai-skill.md` 刻意延後至 Phase 4 validation 證明 taxonomy 穩定後**，避免 premature naming lock-in / vocabulary inflation。
 
 ### Watch-Out List Citation
 
@@ -237,10 +238,13 @@ evidence:
 ## Open Questions
 
 - [x] **[resolved by Phase 0]** `workflow/` 與 `analysis/` 中哪些檔案已經是 functional monolith？是否需要優先處理 APK / software-delivery / travel-planning 等高頻 route？ → Phase 0 Inventory Record 已盤點：`development-process.md`(378, ~12 gate)、`execution-flow.md`(270)、`apk-analysis/artifact-gates.md`(575)、`travel-planning/execution-flow.md`(295) 為 multi-topic monolith；`examples/EXAMPLES.md`(528) 主題單一。Pilot 依 stakeholder 鎖定 software-delivery；APK / travel 延後。
-- [ ] **[deferred → Phase 1]** `Cognitive Slice` 是否需要正式 glossary owner，還是先用 `summary-first loading` / `focused source` 既有詞彙即可？（stakeholder 同意延後至 Phase 1 決定）
-- [ ] **[still-open → Phase 1]** Slice 應落在現有 domain 目錄內，還是需要每個 domain 增加 `slices/` 或 `guides/` 子目錄？預設不新增 top-level layer。
-- [ ] **[still-open → Phase 2]** 是否需要保留 public-facing tutorial？若需要，它應只引用 workflow / analysis slices，不複製 canonical source。
-- [ ] **[still-open → Phase 4]** execution-only / evidence-only task 的「不交叉載入整包對方 layer」要用哪個 scenario fixture 機械驗證？
+- [ ] **[intentionally deferred pending runtime validation]** `Cognitive Slice` 是否需要正式 glossary owner？刻意延後到 Phase 4 validation 證明 slice taxonomy 穩定後再決定是否升格為 framework vocabulary，避免 premature naming lock-in。**Interim operational wording**：在正式註冊前，文件一律用既有的 `loading surface` / `execution surface` / `evidence surface` 描述，不把 `Cognitive Slice` 當已確立詞彙散播。
+- [x] **[resolved]** Slice 應落在現有 domain 目錄內，還是需要每個 domain 增加 `slices/` 子目錄？ → **決定：暫不新增 generic top-level `slices/` 或 domain-local `slices/` 子目錄。優先在既有 owner layer（`workflow/<domain>/`、`analysis/<domain>/`）內用 semantic filename 切分。等 Phase 4 validation evidence 證明確有 routing / 維護需求後再重評。**
+- [x] **[resolved]** 是否需要保留 public-facing tutorial？ → **決定：保留 public-facing tutorial，但 tutorial 必須維持為 non-canonical projection layer。Tutorial 可引用 workflow / analysis slices，但不得複製 execution doctrine 或 evidence procedure 正文；canonical source 永遠在 owner layer。**
+- [ ] **[brought forward → Phase 1/2 test-first, Phase 4 execute]** execution-only / evidence-only task 的「不交叉載入整包對方 layer」要用哪個 scenario fixture 機械驗證？ → 改為 test-first：在 Phase 1/2 先定義 `expected_load` / `forbidden_load` fixture 形狀與 Scenario A/B/C（見 Phase 4），Phase 4 才執行。驗證必須檢查**實際載入的 cognitive surface**，不只檢查 route 是否存在。
+- [ ] **[new → Phase 1 budget, Phase 4 verify]** **Cross-Slice Dependency Explosion**：切片後是否會出現 recursive loading / dependency storms / hidden activation chains / retrieval fan-out（A 依賴 B 依賴 C…一個小任務被拉進整串 slice）？緩解：Phase 1 為 slice schema 加 **dependency budget**（`max_depth: 2`、`max_runtime_dependencies: 4`），Phase 4 scenario 驗證實際載入深度與廣度未超預算。
+
+**處置優先序（external review 2026-05-29）**：先做 validation contract + dependency control（test-first，最早）→ 再做 tutorial projection 約束 + taxonomy naming（中段）→ 最後才做 glossary 正式註冊 + filesystem 子目錄決定（validation 穩定後）。理由：先用 runtime evidence 證明 slice 邊界站得住，再做難逆轉的命名與目錄結構決定。
 
 ---
 
@@ -272,10 +276,11 @@ evidence:
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
 | 哪些檔是 functional monolith / 是否優先 APK·software-delivery·travel | resolved | Phase 0 Inventory Record 行數 + heading 盤點；pilot 鎖定 software-delivery |
-| `Cognitive Slice` 是否註冊 glossary | deferred → Phase 1 | stakeholder 同意延後 |
-| slice 落在現有 domain 還是新增 `slices/`·`guides/` 子目錄 | still-open → Phase 1 | 屬 taxonomy 決定 |
-| 是否保留 public-facing tutorial | still-open → Phase 2 | 切片成形後再評估 |
-| execution-only / evidence-only 不交叉載入要用哪個 scenario fixture | still-open → Phase 4 | 屬 validation 設計 |
+| `Cognitive Slice` 是否註冊 glossary | intentionally deferred → Phase 4 | 待 validation 證明 taxonomy 穩定；過渡期用 `loading/execution/evidence surface`（external review 採納） |
+| slice 落在現有 domain 還是新增 `slices/` 子目錄 | resolved | 暫不新增 `slices/`，用既有 owner layer + semantic filename；Phase 4 後重評 |
+| 是否保留 public-facing tutorial | resolved | 保留但限定為 non-canonical projection，不複製 canonical source |
+| execution-only / evidence-only 不交叉載入要用哪個 scenario fixture | brought forward → Phase 1/2 test-first, Phase 4 execute | expected_load/forbidden_load + Scenario A/B/C；驗證實際載入 surface |
+| Cross-slice dependency explosion（新增） | new → Phase 1 budget, Phase 4 verify | dependency budget max_depth 2 / max_runtime_dependencies 4 |
 
 目標：確認這不是「把文件搬一搬」，而是 current Gen 3 execution path / evidence path loading boundary hardening。
 
@@ -363,14 +368,17 @@ Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`develop
   - owner_layer
   - canonical_source
   - dependencies
+  - `max_depth`（dependency budget，預設 `2`：slice 依賴鏈最深 2 層）
+  - `max_runtime_dependencies`（dependency budget，預設 `4`：單一 slice 直接 runtime 依賴上限）
   - summary_path
   - validation_signal
+- [ ] **Dependency budget 規則**：每個 slice 宣告 `max_depth` / `max_runtime_dependencies`，防止 recursive loading / dependency storms / retrieval fan-out（見 §Open Questions Cross-Slice Dependency Explosion）。超出預算需回 plan 重評，不得默默放行。
 - [ ] **type+tags 收斂規則**：primary `type` 固定 4 種，不得擴張為 first-class taxonomy；其餘責任一律降為 `tags`。新需求預設加 tag，不加 type。任何想新增第 5 個 primary type 的提議都需回到本 plan 重新評估。
 - [ ] **Granularity 原則**：slice 最小單位 = **能獨立完成一個 cognitive phase**（例如 software-delivery 的 Requirement Intake / Implementation / Validation），**不是** step（Step1/Step2）也不是 concept。判準：該 slice 載入後 agent 能完成一個自足的認知階段而不需瘋狂 cross-reference。Phase 2 切片時逐個 slice 用此判準把關。
 - [ ] **三層邊界規則（codify）**：`workflow` = 「要做什麼順序」；`analysis` = 「如何取得與驗證證據」；`intelligence` = 「為何這種模式長期有效 / 失敗」。slice 歸層時用此三分法判定 owner_layer，三層不得混。
 - [ ] 用三層邊界規則檢查 taxonomy 是否與 `workflow/analysis/intelligence/knowledge/runtime/governance` 重疊。
-- [ ] 決定是否需要新增 domain-local `slices/` / `guides/` / `examples/` 子目錄；預設不新增 top-level layer，優先使用現有 layer + index。
-- [ ] 決定 glossary 是否註冊 `Cognitive Slice`；**同時評估替代命名候選** `capability surface` / `cognitive surface` / `execution surface`（review 觀點：slice 易讓人聯想 arbitrary chunk / static partition，但本質是 routable cognition surface）。擇一或維持現名，記錄理由。
+- [x] 是否新增 domain-local `slices/` 子目錄 → **已於 §Open Questions resolved：暫不新增 generic / domain-local `slices/`，優先在既有 owner layer 內用 semantic filename 切分；Phase 4 validation 後重評。** 本 phase 只需確認 pilot 切分落在既有 `workflow/software-delivery/` 內。
+- [ ] 評估命名候選並選定**過渡期 operational wording**（`loading/execution/evidence surface`）；**正式 glossary 註冊延後至 Phase 4**（見 §Open Questions 與 §Glossary Impact）。評估 `capability surface` / `cognitive surface` / `execution surface`（review 觀點：slice 易讓人聯想 arbitrary chunk / static partition，但本質是 routable cognition surface），記錄理由但不在本 phase 鎖定 framework vocabulary。
 
 Phase 1 exit criteria：
 
@@ -378,6 +386,8 @@ Phase 1 exit criteria：
 - [ ] primary `type` 恰為 4 種，其餘為 tags（type+tags 收斂規則成立）。
 - [ ] 每個 slice 有明確 `load_when` 和 `do_not_load_when`。
 - [ ] Granularity 原則與三層邊界規則已寫入 taxonomy 文件。
+- [ ] 每個 slice schema 含 `max_depth` / `max_runtime_dependencies`（dependency budget），預設 2 / 4。
+- [ ] **Test-first validation target 已草擬**：Phase 4 fixture 形狀（`expected_load` / `forbidden_load` / `dependency_budget`）與 Scenario A/B/C 的 expected/forbidden 清單已先寫出，待 Phase 4 執行。
 - [ ] Glossary / naming decision 已記錄（含是否改用 surface 命名）。
 
 ## Phase 2 — Thin Index + Focused Slices
@@ -432,15 +442,32 @@ Phase 3 exit criteria：
 
 目標：用 scenarios 防止切片化只停在文件整理。
 
-- [ ] 建立 execution-only scenario：只需要 workflow execution order，期待不載入 full analysis/tool-procedure surface。
-- [ ] 建立 evidence-only scenario：只需要 analysis evidence acquisition，期待不載入 full workflow/artifact-gate surface。
-- [ ] 建立 mixed workflow+analysis scenario：需要 workflow + specific analysis slice，但不載入 unrelated examples / caveats / Gen 4 vision heavy section。
+> **Test-first 約定（external review 2026-05-29 採納）**：本 phase 的 acceptance contract 不是 Phase 4 才設計，而是在 **Phase 1/2 就先寫好 fixture 形狀與 Scenario A/B/C 的 expected/forbidden 清單**（test-first target），Phase 4 只負責執行與蒐證。驗證必須斷言**實際載入的 cognitive surface**，不能只檢查 route 是否存在。
+
+**Fixture 形狀（每個 scenario 一份）**：
+
+```yaml
+scenario: <id>
+task_intent: <描述任務>
+expected_load:        # 必須出現在載入集合
+  - <surface/slice path>
+forbidden_load:       # 必須不出現在載入集合
+  - <surface/slice path>
+dependency_budget:    # 對齊 Phase 1 slice schema
+  max_depth: 2
+  max_runtime_dependencies: 4
+```
+
+- [ ] **Scenario A（execution-only）**：小型 API validation 變更。`expected_load` = software-delivery execution-order slice + 對應 artifact-gate slice；`forbidden_load` = full analysis / tool-procedure surface、examples、Gen 4 heavy section。
+- [ ] **Scenario B（evidence-only）**：分析 APK 網路行為。`expected_load` = analysis evidence-acquisition / tool-procedure slice；`forbidden_load` = full workflow execution-flow / artifact-gate surface。
+- [ ] **Scenario C（mixed）**：debug 失敗的 deployment pipeline。`expected_load` = workflow execution slice + 特定 analysis failure/caveat slice；`forbidden_load` = unrelated examples / 其他 domain slice / Gen 4 vision section。
+- [ ] 每個 scenario 斷言實際載入集合滿足 `expected_load` ⊆ loaded、`forbidden_load` ∩ loaded = ∅，且載入深度/廣度未超 `dependency_budget`。
 - [ ] 若 Phase 3 改 runtime/routing source，執行 `ai-skill runtime refresh` 或適用 validator。
-- [ ] 記錄 scenario evidence。
+- [ ] 記錄 scenario evidence（實際 loaded surface 清單，非僅 route 宣告）。
 
 Phase 4 exit criteria：
 
-- [ ] 至少 3 個 validation scenarios PASS，或 plan 明確降級為 doc-only trial 並寫出下一階段 runtime validation plan。
+- [ ] Scenario A/B/C 全部 PASS（含 expected_load / forbidden_load / dependency_budget 三項斷言），或 plan 明確降級為 doc-only trial 並寫出下一階段 runtime validation plan。
 
 ## Phase 5 — Linked Updates + Closure
 
