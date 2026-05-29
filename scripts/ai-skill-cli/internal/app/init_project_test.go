@@ -135,6 +135,14 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if !strings.Contains(string(claudeSettings), ".ai-skill/local.env") {
 		t.Fatalf("expected Claude hooks to source project-local env, got %s", string(claudeSettings))
 	}
+	// Regression: hook runner must receive the *project* root as --repo (so nested
+	// Git / project context reports target the workspace), not the Ai-skill repo.
+	if !strings.Contains(string(claudeSettings), `--repo \"$ROOT\"`) {
+		t.Fatalf("expected Claude hooks to pass project root ($ROOT) as --repo, got %s", string(claudeSettings))
+	}
+	if strings.Contains(string(claudeSettings), `--repo \"$AI_SKILL_REPO\"`) {
+		t.Fatalf("Claude hooks must not pass $AI_SKILL_REPO as --repo (would misreport project root), got %s", string(claudeSettings))
+	}
 	if !pathExists(filepath.Join(project, ".cursor", "rules", "ai-skill-bootstrap.mdc")) {
 		t.Fatal("write mode did not create Cursor rule")
 	}
