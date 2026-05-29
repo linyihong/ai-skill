@@ -362,6 +362,8 @@ Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`develop
 目標：定義 workflow / analysis slice 邊界，不先改內容。
 
 > **External review guardrails（2026-05-29 採納）**：本 phase 採 type+tags 收斂模型、granularity 原則與三層邊界規則，避免 taxonomy explosion / over-fragmentation。詳見 §Decision Rationale 風險表對應列。
+>
+> **Down-payment（2026-05-29，受限預算）**：taxonomy 骨架已建於 [`governance/cognitive-slice-taxonomy.md`](../../governance/cognitive-slice-taxonomy.md)（schema 欄位 + 5 條規則佔位 + 命名/延後項）。**pilot 實際分類與 fixture 草稿仍待完整預算 session 補**。
 
 - [ ] 定義最小 slice schema：
   - purpose
