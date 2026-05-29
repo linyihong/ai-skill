@@ -279,6 +279,51 @@ func TestRunUserPromptSubmitHookIncludesNestedGitReport(t *testing.T) {
 	}
 }
 
+func TestRunStopHookBlocksCursorPayloadWithoutCognitive(t *testing.T) {
+	setHookStdin(t, `{"assistant_response":"Done. Tests passed."}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitValidationFailed {
+		t.Fatalf("expected missing Cognitive block to fail, got %d; stderr=%s", code, stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "Missing obligation") {
+		t.Fatalf("expected missing obligation message, got %s", stderr.String())
+	}
+}
+
+func TestRunStopHookAllowsCursorPayloadWithCompactCognitive(t *testing.T) {
+	setHookStdin(t, `{"assistant_response":"Done.\n\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast"}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cognitive block to pass, got %d; stderr=%s", code, stderr.String())
+	}
+}
+
+func setHookStdin(t *testing.T, input string) {
+	t.Helper()
+	previous := os.Stdin
+	reader, writer, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := writer.WriteString(input); err != nil {
+		t.Fatal(err)
+	}
+	if err := writer.Close(); err != nil {
+		t.Fatal(err)
+	}
+	os.Stdin = reader
+	t.Cleanup(func() {
+		os.Stdin = previous
+		_ = reader.Close()
+	})
+}
+
 func TestValidateExecutionModeFloors(t *testing.T) {
 	// FAST forbidden when touching enforcement/
 	v := validateExecutionModeFloors(map[string]string{"execution_mode": "FAST"}, []string{"enforcement/foo.md"})

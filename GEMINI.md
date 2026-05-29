@@ -8,7 +8,7 @@
 
 1. **載入核心規則**：讀取 [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) (3 rules, ~800 tokens)。
 2. **認證狀態**：輸出 **Bootstrap Receipt**，確認 phase 為 `phase.bootstrap`。
-3. **報告模式**：輸出 **Cognitive Mode 報告 (v2)**，記錄 discovery signals。
+3. **報告模式**：在最後回覆 / session close-out 輸出 **Cognitive Mode 報告 (v2)**，記錄 discovery signals。
 4. **追蹤目標**：讀取 [`.agent-goals/README.md`](.agent-goals/README.md) 同步當前任務。
 
 ## 本專案強制回覆規則
@@ -18,7 +18,7 @@
 1. 使用本 repo root 作為 Ai-skill repo。
 2. 讀本 repo 的 `CORE_BOOTSTRAP.md`。
 3. 讀本 repo 的 `runtime/core-bootstrap.yaml`，以 YAML canonical contract 為準。
-4. 每個 user-facing response 結尾都必須依 active per-turn obligations 附上 Cognitive Mode reporting。
+4. 最後回覆 / session close-out 必須附上 Cognitive Mode reporting；中間 progress update 不需要重複輸出。
 
 不能只停在本檔摘要；必須 dereference pointer 到 canonical files。
 

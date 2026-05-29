@@ -93,7 +93,7 @@ per_session_obligations:
 
 per_turn_obligations:
   - id: obligation.cognitive.mode_report
-    fires: every_user_facing_response
+    fires: final_user_facing_response_or_session_stop
     format_options:
       compact: "Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>"
       full: "### Cognitive Mode 報告 + 4-6 row markdown table"
@@ -103,11 +103,12 @@ per_turn_obligations:
     enforcement_layer: commit_msg_hook + behavioral_per_turn
     severity: high
     note: |
-      Per-turn enforcement at commit-msg layer is mechanical via
-      validateCognitiveContractFormat. Per-turn enforcement at chat-
-      response layer is best-effort (no infrastructure to intercept
-      response pre-emission); the v2 plan (runtime-cognitive-contract-v2)
-      lowers compliance friction via compact form.
+      Commit enforcement is mechanical via validateCognitiveContractFormat.
+      Chat/session enforcement applies at final close-out, not every progress
+      update. Tool adapters that can observe a session stop/final-response
+      event MUST install a close-out check that blocks or loops back when the
+      final user-facing response lacks either compact `Cognitive:` form or full
+      `### Cognitive Mode 報告`.
   - id: obligation.finality.close_loop_check
     fires: task_completion_or_session_end
     action: |

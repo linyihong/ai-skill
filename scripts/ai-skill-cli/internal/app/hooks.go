@@ -648,7 +648,7 @@ func runSessionStartHook(projectDir string, stdout io.Writer, stderr io.Writer) 
 			"Bootstrap: rules=✓ phase=%s obligations=%s gates=%s\n"+
 			"Active per-turn obligations: %s\n\n"+
 			"Final response MUST also end with a Cognitive Mode 報告 block (compact form is fine for trivial "+
-			"tasks). Per-turn enforcement: see runtime/core-bootstrap.yaml §per_turn_obligations.\n\n"+
+			"tasks). Close-out enforcement: see runtime/core-bootstrap.yaml §per_turn_obligations.\n\n"+
 			"--- CORE_BOOTSTRAP.md (companion) ---\n%s\n\n"+
 			"--- enforcement/rule-weight.md ---\n%s\n\n"+
 			"--- enforcement/dependency-reading.md ---\n%s\n\n"+
@@ -818,7 +818,7 @@ func runPostToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) i
 }
 
 // runUserPromptSubmitHook implements the Claude Code UserPromptSubmit hook.
-// Injects per-turn obligation reminder + CORE_BOOTSTRAP.md as additionalContext.
+// Injects final close-out reminder + CORE_BOOTSTRAP.md as additionalContext.
 func runUserPromptSubmitHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 	const logFile = "/tmp/ai-skill-prompt-hook.log"
 	appendLog(logFile, time.Now().Format("2006-01-02T15:04:05")+" UserPromptSubmit fired (Go)")
@@ -826,7 +826,7 @@ func runUserPromptSubmitHook(projectDir string, stdout io.Writer, stderr io.Writ
 	aiSkillRepo := resolveClaudeAiSkillRepo(projectDir)
 	bootstrap := readFileSafe(filepath.Join(aiSkillRepo, "CORE_BOOTSTRAP.md"))
 	gitReport := formatDirtyGitRepoReport(projectDir)
-	combined := "[ai-skill per-turn obligation] Final response MUST end with ### Cognitive Mode 報告 block. " +
+	combined := "[ai-skill final close-out obligation] Final response MUST end with a Cognitive Mode 報告 block. " +
 		"First-turn ALSO outputs Bootstrap Receipt. Canonical spec: runtime/core-bootstrap.yaml.\n\n---\n" +
 		bootstrap
 	if gitReport != "" {
@@ -845,9 +845,10 @@ func runUserPromptSubmitHook(projectDir string, stdout io.Writer, stderr io.Writ
 	return ExitSuccess
 }
 
-// runStopHook implements the Claude Code Stop hook.
-// Blocks stop if the last assistant message lacks a Cognitive Mode block
-// (either compact "Cognitive: X..." or full "### Cognitive Mode 報告").
+// runStopHook implements the final-response Stop hook.
+// Claude supplies transcript_path; tools such as Cursor may supply response
+// text directly in the hook payload. In both cases, block stop if the final
+// assistant message lacks a Cognitive Mode block.
 func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 	const logFile = "/tmp/ai-skill-stop-hook.log"
 	ts := time.Now().Format("2006-01-02T15:04:05")
@@ -879,8 +880,12 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 		_ = json.Unmarshal(v, &transcriptPath)
 	}
 	if transcriptPath == "" || !claudeFileExists(transcriptPath) {
-		_, _ = fmt.Fprintln(stderr, "ALLOW_NO_TRANSCRIPT: path="+transcriptPath)
-		return ExitSuccess
+		texts := extractStopHookAssistantTexts(payload)
+		if len(texts) == 0 {
+			_, _ = fmt.Fprintln(stderr, "ALLOW_NO_TRANSCRIPT: path="+transcriptPath)
+			return ExitSuccess
+		}
+		return validateStopHookFinalText(projectDir, texts[len(texts)-1], stderr, logFile)
 	}
 
 	texts := extractAssistantTexts(transcriptPath)
@@ -888,8 +893,10 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 		_, _ = fmt.Fprintln(stderr, "ALLOW_NO_ASSISTANT_MSG")
 		return ExitSuccess
 	}
-	lastText := texts[len(texts)-1]
+	return validateStopHookFinalText(projectDir, texts[len(texts)-1], stderr, logFile)
+}
 
+func validateStopHookFinalText(projectDir string, lastText string, stderr io.Writer, logFile string) int {
 	tail := lastText
 	if len(tail) > 200 {
 		tail = tail[len(tail)-200:]
@@ -917,13 +924,63 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 
 	_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING")
 	appendLog(logFile, "exit_code: 2")
-	_, _ = fmt.Fprint(stderr, "[ai-skill Stop hook] Missing obligation: your final response did not include the `### Cognitive Mode 報告` block.\n\n"+
+	_, _ = fmt.Fprint(stderr, "[ai-skill Stop hook] Missing obligation: your final response did not include a Cognitive Mode block.\n\n"+
 		"Per runtime/core-bootstrap.yaml §per_turn_obligations[obligation.cognitive.mode_report], every final user-facing "+
 		"response MUST end with a Cognitive Mode block (compact 1-line for trivial all-default tasks: "+
 		"`Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>`; full 6-row markdown table otherwise).\n\n"+
 		"Please append the block to your response now, then stop again. Canonical format spec: runtime/core-bootstrap.yaml. "+
 		"Query active obligations: `ai-skill runtime obligations`.\n")
 	return ExitValidationFailed
+}
+
+func extractStopHookAssistantTexts(payload map[string]json.RawMessage) []string {
+	texts := []string{}
+	for key, raw := range payload {
+		collectStopHookAssistantTexts(strings.ToLower(key), raw, &texts)
+	}
+	return texts
+}
+
+func collectStopHookAssistantTexts(key string, raw json.RawMessage, texts *[]string) {
+	var value interface{}
+	if err := json.Unmarshal(raw, &value); err != nil {
+		return
+	}
+	collectStopHookAssistantValue(key, value, texts)
+}
+
+func collectStopHookAssistantValue(key string, value interface{}, texts *[]string) {
+	switch v := value.(type) {
+	case string:
+		if isStopHookAssistantTextKey(key) && strings.TrimSpace(v) != "" {
+			*texts = append(*texts, v)
+		}
+	case []interface{}:
+		for _, item := range v {
+			collectStopHookAssistantValue(key, item, texts)
+		}
+	case map[string]interface{}:
+		for childKey, childValue := range v {
+			mergedKey := strings.ToLower(childKey)
+			if key != "" {
+				mergedKey = key + "." + mergedKey
+			}
+			collectStopHookAssistantValue(mergedKey, childValue, texts)
+		}
+	}
+}
+
+func isStopHookAssistantTextKey(key string) bool {
+	key = strings.ToLower(key)
+	return strings.Contains(key, "assistant") ||
+		strings.Contains(key, "final") ||
+		strings.Contains(key, "response") ||
+		strings.HasSuffix(key, ".content") ||
+		strings.HasSuffix(key, ".text") ||
+		strings.HasSuffix(key, ".output") ||
+		key == "content" ||
+		key == "text" ||
+		key == "output"
 }
 
 // cognitiveV2Defaults are the 6 default dim values for the v2 compact form.

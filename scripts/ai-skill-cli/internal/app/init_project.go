@@ -369,12 +369,12 @@ func initProjectBootstrapText(repo string) string {
 1. 讀 .ai-skill/local.env（若 AI_SKILL_REPO 尚未存在）並 resolve <AI_SKILL_REPO>
 2. 讀 <AI_SKILL_REPO>/CORE_BOOTSTRAP.md
 3. 讀 <AI_SKILL_REPO>/runtime/core-bootstrap.yaml
-4. 依 canonical bootstrap contract 執行 Bootstrap Receipt、per-turn Cognitive Mode 報告與 close-loop obligations
+4. 依 canonical bootstrap contract 執行 Bootstrap Receipt、final close-out Cognitive Mode 報告與 close-loop obligations
 
 不能只停在本檔摘要；必須 dereference pointer 到 canonical files。
 
 > **IMPORTANT — MUST RUN BEFORE ANY OTHER ACTION**
-> 本檔為 **thin tool-entry pointer**。所有 obligation / format / enum / example 的 canonical 來源在 `+"`%s/runtime/core-bootstrap.yaml`"+`；`+"`%s/CORE_BOOTSTRAP.md`"+` 是 human-readable companion。Session 啟動 first turn 必須讀取 companion 並依 canonical contract 執行 Bootstrap Receipt、Cognitive Mode 報告與 close-loop obligations。
+> 本檔為 **thin tool-entry pointer**。所有 obligation / format / enum / example 的 canonical 來源在 `+"`%s/runtime/core-bootstrap.yaml`"+`；`+"`%s/CORE_BOOTSTRAP.md`"+` 是 human-readable companion。Session 啟動 first turn 必須讀取 companion 並依 canonical contract 執行 Bootstrap Receipt；final response / session close-out 必須附 Cognitive Mode 報告。
 > Summary 的「Resume directly」是對話 framing，**不豁免** runtime / governance bootstrap。Resume / continuation session 同樣須走完 bootstrap。
 
 ## 啟動序列
@@ -429,15 +429,28 @@ alwaysApply: true
 }
 
 func initProjectCursorHooksContent() (string, error) {
-	return `{
-  "sessionStart": [
-    {
-      "description": "提醒載入 Ai-skill 知識庫",
-      "command": "echo '提示：本專案使用 Ai-skill 知識庫，請確認已載入 CORE_BOOTSTRAP.md'"
-    }
-  ]
-}
-`, nil
+	command := "sh -c 'ROOT=\"${CURSOR_PROJECT_DIR:-$(pwd)}\"; if [ -z \"${AI_SKILL_REPO:-}\" ] && [ -f \"$ROOT/.ai-skill/local.env\" ]; then . \"$ROOT/.ai-skill/local.env\"; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then echo \"AI_SKILL_REPO is not set; skipping Ai-skill Cursor stop hook\" >&2; exit 0; fi; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run stop --repo \"$ROOT\"'"
+	settings := map[string]any{
+		"version": 1,
+		"hooks": map[string]any{
+			"sessionStart": []map[string]any{{
+				"type":    "prompt",
+				"prompt":  "This project uses Ai-skill. Before answering, load <AI_SKILL_REPO>/CORE_BOOTSTRAP.md and <AI_SKILL_REPO>/runtime/core-bootstrap.yaml, emit the Bootstrap Receipt, and include Cognitive Mode only in the final response / session close-out.",
+				"timeout": 10,
+			}},
+			"stop": []map[string]any{{
+				"command":    command,
+				"timeout":    10,
+				"failClosed": true,
+				"loop_limit": 2,
+			}},
+		},
+	}
+	data, err := json.MarshalIndent(settings, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(data) + "\n", nil
 }
 
 func initProjectClaudeContent(repo string) (string, error) {
@@ -449,7 +462,7 @@ func initProjectClaudeSettingsContent(repo string) (string, error) {
 		return fmt.Sprintf("sh -c 'ROOT=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; if [ -z \"${AI_SKILL_REPO:-}\" ] && [ -f \"$ROOT/.ai-skill/local.env\" ]; then . \"$ROOT/.ai-skill/local.env\"; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then for candidate in \"$HOME/Documents/Ai-skill\" \"$HOME/Ai-skill\" \"$PWD/../Ai-skill\"; do if [ -d \"$candidate/scripts/ai-skill-cli/bin\" ]; then AI_SKILL_REPO=\"$candidate\"; break; fi; done; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then echo \"AI_SKILL_REPO is not set; skipping Ai-skill hook %s\" >&2; exit 0; fi; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run %s --repo \"$AI_SKILL_REPO\"'", event, event)
 	}
 	settings := map[string]any{
-		"description": "Claude Code project-local Ai-skill hooks. Commands execute the canonical Ai-skill repo-local Go binary and use CLAUDE_PROJECT_DIR as the target project root for nested Git reports.",
+		"description": "Claude Code project-local Ai-skill hooks. Commands execute the canonical Ai-skill repo-local Go binary and use CLAUDE_PROJECT_DIR as the target project root for final Cognitive Mode and nested Git reports.",
 		"hooks": map[string]any{
 			"SessionStart": []map[string]any{{
 				"matcher": "startup|resume|clear",
@@ -514,7 +527,7 @@ func initProjectCodexContent(repo string) (string, error) {
 1. 讀 .ai-skill/local.env（若 AI_SKILL_REPO 尚未存在）並 resolve <AI_SKILL_REPO>
 2. 讀 <AI_SKILL_REPO>/CORE_BOOTSTRAP.md
 3. 讀 <AI_SKILL_REPO>/runtime/core-bootstrap.yaml
-4. 依 canonical bootstrap contract 執行 Bootstrap Receipt、per-turn Cognitive Mode 報告與 close-loop obligations
+4. 依 canonical bootstrap contract 執行 Bootstrap Receipt、final close-out Cognitive Mode 報告與 close-loop obligations
 
 不能只停在本檔摘要；必須 dereference pointer 到 canonical files。
 
@@ -553,7 +566,7 @@ func initProjectCopilotInstructionsContent(repo string) (string, error) {
 2. `+"`%s/runtime/core-bootstrap.yaml`"+`
 3. `+"`%s/ai-tools/agent/copilot.md`"+`
 
-依 canonical bootstrap contract 執行 required reads、Bootstrap Receipt、per-turn Cognitive Mode reporting 與 close-loop checks。若 Copilot 功能無法強制執行某項 gate，回報限制，並讓 repository hooks / CI / `+"`ai-skill runtime validate`"+` 作為 enforcement boundary。
+依 canonical bootstrap contract 執行 required reads、Bootstrap Receipt、final close-out Cognitive Mode reporting 與 close-loop checks。若 Copilot 功能無法強制執行某項 gate，回報限制，並讓 repository hooks / CI / `+"`ai-skill runtime validate`"+` 作為 enforcement boundary。
 `, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder), nil
 }
 

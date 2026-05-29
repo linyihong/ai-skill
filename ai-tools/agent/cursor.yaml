@@ -47,8 +47,13 @@ steps:
     action: Treat Cursor hooks as optional reminders/checks unless a team explicitly enables automation.
     gates:
       - gate.cursor.hooks_fail_open
-  - id: enforce_thin_adapter_boundary
+  - id: enforce_cursor_cognitive_close_out
     order: 5
+    action: Ensure init-project Cursor hooks include a stop close-out check that calls the canonical Ai-skill hook runner and fails closed when final Cognitive Mode reporting is missing.
+    gates:
+      - gate.cursor.cognitive_close_out
+  - id: enforce_thin_adapter_boundary
+    order: 6
     action: Do not duplicate canonical bootstrap obligations, runtime phase details, or shared enforcement text in Cursor adapter files.
     gates:
       - gate.cursor.thin_adapter_boundary
@@ -66,6 +71,12 @@ gates:
       - Cursor-specific paths, hooks, and UI details stay in ai-tools/agent/cursor.md or .cursor config.
       - Bootstrap Receipt, Cognitive Mode, close-loop, goal ledger, and runtime phase details remain in CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, or their canonical sources.
       - Shared enforcement and workflow docs remain tool-neutral.
+  - id: gate.cursor.cognitive_close_out
+    blocks: cursor_init_project_template_change
+    pass_when:
+      - init-project Cursor hooks contain a stop/final-response check.
+      - The check delegates to the canonical Ai-skill hook runner rather than duplicating Cognitive Mode parsing in the Cursor template.
+      - Missing final Cognitive Mode reporting fails closed or loops back when Cursor supports the stop event.
   - id: gate.cursor.always_apply_bootstrap_current
     blocks: cursor_rule_change
     pass_when:
@@ -75,12 +86,14 @@ gates:
 required_evidence:
   - Cursor adapter sources read
   - hook/rule linked updates when .cursor config changes
+  - init-project Cursor hook regression when Cursor hook template changes
   - runtime validation when execution-affecting adapter contract changes
   - final git status after writeback
 
 success_criteria:
   - Cursor starts from .cursor/rules/dependency-reading.mdc, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, and ai-tools/agent/cursor.md as appropriate.
-  - Cursor hooks remain optional reminders/checks unless explicitly configured otherwise.
+  - Cursor init-project installs a stop close-out check for final Cognitive Mode reporting.
+  - Cursor hooks remain reminders/checks unless explicitly configured for fail-closed validation.
   - Cursor-specific details stay in the adapter layer and canonical bootstrap content is not duplicated.
   - Execution-affecting adapter changes are projected and validated.
 
@@ -97,6 +110,9 @@ failure_modes:
   - id: cursor_bootstrap_stale
     detection: Cursor always-apply rule no longer points to core bootstrap and runtime source-of-truth.
     recovery: Update .cursor/rules/dependency-reading.mdc and validate linked updates.
+  - id: cursor_final_cognitive_missing
+    detection: Cursor init-project lacks a stop/final-response hook that checks for compact or full Cognitive Mode reporting.
+    recovery: Restore the init-project Cursor stop hook and add a regression test for missing final Cognitive output.
 
 final_status_report:
   required_fields:

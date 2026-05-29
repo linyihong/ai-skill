@@ -115,7 +115,7 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if !strings.Contains(string(claudeContent), "AI_SKILL_REPO") || !strings.Contains(string(claudeContent), "Windows PowerShell") {
 		t.Fatalf("expected cross-platform AI_SKILL_REPO setup guidance in CLAUDE.md, got %s", string(claudeContent))
 	}
-	if !strings.Contains(string(claudeContent), "Pointer 展開規則") || !strings.Contains(string(claudeContent), "per-turn Cognitive Mode") {
+	if !strings.Contains(string(claudeContent), "Pointer 展開規則") || !strings.Contains(string(claudeContent), "final close-out Cognitive Mode") {
 		t.Fatalf("expected explicit pointer expansion guidance in CLAUDE.md, got %s", string(claudeContent))
 	}
 	claudeSettingsPath := filepath.Join(project, ".claude", "settings.json")
@@ -137,6 +137,20 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	}
 	if !pathExists(filepath.Join(project, ".cursor", "rules", "ai-skill-bootstrap.mdc")) {
 		t.Fatal("write mode did not create Cursor rule")
+	}
+	cursorHooksPath := filepath.Join(project, ".cursor", "hooks.json")
+	cursorHooks, err := os.ReadFile(cursorHooksPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(cursorHooks), filepath.ToSlash(repo)) {
+		t.Fatalf("Cursor hooks must not contain local absolute Ai-skill path, got %s", string(cursorHooks))
+	}
+	if !strings.Contains(string(cursorHooks), `"stop"`) ||
+		!strings.Contains(string(cursorHooks), "hooks run stop") ||
+		!strings.Contains(string(cursorHooks), `"failClosed": true`) ||
+		!strings.Contains(string(cursorHooks), ".ai-skill/local.env") {
+		t.Fatalf("expected Cursor hooks to enforce final Cognitive close-out through Ai-skill CLI, got %s", string(cursorHooks))
 	}
 	if pathExists(filepath.Join(project, ".roomodes")) {
 		t.Fatal("selected tools unexpectedly wrote .roomodes")
@@ -210,7 +224,7 @@ func TestInitProjectWritesCodexBootstrap(t *testing.T) {
 	if !strings.Contains(string(content), "AI_SKILL_REPO") || !strings.Contains(string(content), "Windows PowerShell") {
 		t.Fatalf("expected cross-platform AI_SKILL_REPO setup guidance in AGENTS.md, got %s", string(content))
 	}
-	if !strings.Contains(string(content), "Pointer 展開規則") || !strings.Contains(string(content), "per-turn Cognitive Mode") {
+	if !strings.Contains(string(content), "Pointer 展開規則") || !strings.Contains(string(content), "final close-out Cognitive Mode") {
 		t.Fatalf("expected explicit pointer expansion guidance in AGENTS.md, got %s", string(content))
 	}
 }

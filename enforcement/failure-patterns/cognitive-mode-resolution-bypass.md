@@ -14,6 +14,7 @@ Class: `process-gap` / `governance-drift`
 - `context_mode` 未設定而使用預設壓縮行為（不等於 DEFAULT fallback 已套用）
 - `governance_mode` 未設定而跳過 gate check
 - `memory_mode = NONE` 被忽略，仍讀了 `memory/` subdir
+- Chat / session final response 沒有 compact `Cognitive:` 或 full `### Cognitive Mode 報告`，代表 per-turn resolution 沒有 user-facing evidence
 
 ## Failure Mode
 
@@ -24,12 +25,14 @@ Class: `process-gap` / `governance-drift`
 3. **memory 誤讀**：`memory_mode = NONE` 應禁止讀 memory，卻仍進行 replay
 4. **phase_machine floor 被忽略**：DEEP mode 要求 `source_backed_before_decision`，FAST 的 `allowed_actions` floor 不一樣
 5. **後驗難以追蹤**：`cognitive_modes` 表沒有 row，無法事後 audit 哪個 task 用了哪個 mode
+6. **Chat close-out 漏報**：commit hook 之外的 session final response 沒有 Cognitive evidence，使用者無法知道本輪實際套用的 mode / validation depth
 
 ## Risk
 
 - **Silent default contamination**：tool 用錯誤 compression level 載入 context，agent 不知道
 - **Gate bypass accumulation**：多次無 mode 執行後，blocking_gates 的 STRICT/LOCKDOWN category 從未激活
 - **Memory isolation failure**：memory_mode NONE 的場景（contaminated state）被跳過，舊 memory 污染當前判斷
+- **Commit-only blind spot**：只在 commit-msg 驗證 Cognitive，會漏掉 read-only、diagnostic、aborted、或 session final 的 user-facing response
 
 ## Required Agent Action
 
@@ -41,6 +44,7 @@ Class: `process-gap` / `governance-drift`
 4. 若信號不足，套用 **fallback**：NORMAL / SUMMARY_FIRST / STANDARD / NONE
 5. 依 governance_mode 啟用對應 gate_set（LIGHT/STANDARD/STRICT/LOCKDOWN）
 6. 若 memory_mode = NONE，跳過所有 memory subdir
+7. 最終 user-facing response 必須附 compact 或 full Cognitive Mode 報告；工具若支援 stop/final-response hook，必須用 hook 檢查這個 close-out
 
 ## Prevention Gate
 
@@ -53,6 +57,7 @@ Class: `process-gap` / `governance-drift`
 | context_mode 是什麼 | 明確值（FULL/SUMMARY_FIRST/INDEX_ONLY/CHECKLIST_ONLY/GRAPH_ONLY）|
 | governance_mode 對應哪個 gate_set | 已確認 gate_set_activation |
 | memory_mode 是否為 NONE | 若是，已確認不讀任何 memory subdir |
+| final response 是否有 Cognitive evidence | 已附 compact/full block，或 stop hook 會 block/loop back |
 
 若回答不確定，先讀 [`runtime/cognitive-modes.yaml`](../../runtime/cognitive-modes.yaml) + [`runtime/cognitive-modes-discovery.yaml`](../../runtime/cognitive-modes-discovery.yaml)。
 
@@ -63,6 +68,7 @@ Class: `process-gap` / `governance-drift`
 - 每個任務執行前有可追蹤的 mode resolution（`cognitive_modes` 表有 row 或 fallback 明確記錄）
 - governance_mode 對應的 gate_set 已激活
 - memory_mode = NONE 時，沒有讀 `memory/` 任何 subdir
+- Cursor / Claude 等支援 stop/final-response hook 的 adapter 有 regression 覆蓋「final response 缺 Cognitive 時會 block」
 
 ## Source
 
@@ -83,5 +89,6 @@ Class: `process-gap` / `governance-drift`
 
 - `cognitive-modes-enforcement-gate-exists-v1` — 驗證 `gate.execution.cognitive_mode_resolved` 在 `gates` 表存在
 - `phase6-cognitive-contract-v2-inflated-rejection-v1` — 驗證 inflated reporting 被 cost / signal validators 擋下
+- `cursor-stop-hook-final-cognitive-required-v1` — 驗證 Cursor-style final response payload 缺 Cognitive 時由 stop hook 擋下
 
 ← [Back to failure patterns](README.md)

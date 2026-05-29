@@ -134,7 +134,7 @@ Before answering any user request, including simple file listings, read-only que
 4. Treat runtime/core-bootstrap.yaml as the canonical bootstrap contract.
 5. Reply with the Bootstrap Receipt required by the canonical contract.
 
-During the session, keep per-turn Cognitive Mode reporting and close-loop checks active. If Copilot cannot enforce a runtime gate directly, report the limitation and rely on repository hooks, CI, and ai-skill runtime validate as the hard enforcement boundary.`, project, repoHint)
+During the session, keep final close-out Cognitive Mode reporting and close-loop checks active. If Copilot cannot enforce a runtime gate directly, report the limitation and rely on repository hooks, CI, and ai-skill runtime validate as the hard enforcement boundary.`, project, repoHint)
 }
 
 func writeCopilotStartPlain(w io.Writer, result Result) error {

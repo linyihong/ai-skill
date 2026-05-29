@@ -29,7 +29,7 @@
 | `ai-skill hooks run session-start` | 執行 Claude Code SessionStart hook：query runtime.db、讀 4 個 bootstrap 文件、輸出 hookSpecificOutput JSON、寫 SessionStart flag（TTL 120s） | 是（`/tmp/ai-skill-sessionstart-<hash>.flag`） | 否 | Cross-platform Go script runtime |
 | `ai-skill hooks run pre-tool-use` | 執行 Claude Code PreToolUse hook：scan transcript for Bootstrap Receipt；Read tool 一律 allow，其他 tool 在 Receipt 出現前 block（exit 2） | 是（`/tmp/ai-skill-bootstrap-<hash>.done`） | 否 | Cross-platform Go script runtime |
 | `ai-skill hooks run post-tool-use` | 執行 Claude Code PostToolUse hook：Bootstrap Receipt 不在 transcript 時注入 reminder via hookSpecificOutput；always exit 0 | 是（cache file） | 否 | Cross-platform Go script runtime |
-| `ai-skill hooks run user-prompt-submit` | 執行 Claude Code UserPromptSubmit hook：每次 user turn 注入 per-turn obligation reminder + CORE_BOOTSTRAP.md as additionalContext；若 project root 底下有 dirty nested Git repos，注入合併 `### Project Git Report` 要求 | 否 | 否 | Cross-platform Go script runtime |
+| `ai-skill hooks run user-prompt-submit` | 執行 Claude Code UserPromptSubmit hook：每次 user turn 注入 final close-out reminder + CORE_BOOTSTRAP.md as additionalContext；若 project root 底下有 dirty nested Git repos，注入合併 `### Project Git Report` 要求 | 否 | 否 | Cross-platform Go script runtime |
 | `ai-skill hooks run stop` | 執行 Claude Code Stop hook：檢查 last assistant message 含 Cognitive Mode block（compact 或 full table）；若有 dirty root / nested Git repos 也要求 `### Project Git Report`；缺少時 block（exit 2） | 否 | 否 | Cross-platform Go script runtime |
 | `ai-skill sync-cursor-bundle` | 同步 Cursor bundle / mirror | 是 | 否 | Phase 2 |
 | `ai-skill close-loop` | 檢查 dirty owner group、commit、push、readback | 是 | 是 | Phase 2 |
@@ -295,7 +295,7 @@
   **`glossaryRetroOwn` validator**（Phase 6 of context-language-glossary-system）：staged diff 動到 framework cognitive vocabulary surface（`runtime/cognitive-modes*.yaml`、`runtime/economics/**`、`ecosystem/**`）時，`knowledge/glossary/ai-skill.md` 必須同時 stage，避免新 framework term 漂移為 subsystem-local vocabulary。Opt-out `[skip-glossary-retro-own]` 適用於 typo / refactor / comment-only 變更。詳見 [`runtime/cli-modification-policy.yaml`](../../../runtime/cli-modification-policy.yaml) §`gate.glossary.retro_own_required` 與 [`validation/scenarios/failure-derived/glossary-retro-own-missing-v1.yaml`](../../../validation/scenarios/failure-derived/glossary-retro-own-missing-v1.yaml)。
 - `post-commit`：reference-only 預設 no-op；若 `AI_SKILL_SYNC_CURSOR_BUNDLE=1`，只回報 Go mirror write mode 狀態。
 - `pre-push`：CLI source（`scripts/ai-skill-cli/...`、GitHub workflows、Git hooks）變動時跑 `go test ./...` preflight；其他情況跳過。
-- `user-prompt-submit`：Claude Code hook；注入 per-turn Cognitive Mode obligation，並掃描 project root 底下的 dirty nested Git repositories。若一個 repo dirty，final response 應回報該 repo；若多個 repo dirty，合併成單一 `### Project Git Report` section。
+- `user-prompt-submit`：Claude Code hook；注入 final close-out Cognitive Mode reminder，並掃描 project root 底下的 dirty nested Git repositories。若一個 repo dirty，final response 應回報該 repo；若多個 repo dirty，合併成單一 `### Project Git Report` section。
 - `stop`：Claude Code hook；final response 必須包含 Cognitive Mode block。若 project root 或 nested Git repositories dirty，final response 也必須包含 `### Project Git Report`，避免 root 非 git repo 的多 repo workspace 漏報。
 
 必要行為：

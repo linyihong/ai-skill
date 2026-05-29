@@ -4,7 +4,7 @@
 
 ## 啟動序列
 
-1. 讀 [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) 與 [`runtime/runtime.db`](runtime/runtime.db) — 必讀規則 + 所有 obligations（Bootstrap Receipt、Cognitive Mode 報告 per-turn block 等）
+1. 讀 [`CORE_BOOTSTRAP.md`](CORE_BOOTSTRAP.md) 與 [`runtime/runtime.db`](runtime/runtime.db) — 必讀規則 + 所有 obligations（Bootstrap Receipt、final close-out Cognitive Mode 報告等）
 2. 讀 [`README.md`](README.md) — OS layout
 3. 讀 [`ai-tools/README.md`](ai-tools/README.md) — **routing hub**：選擇你的 AI 工具對應的 adapter（claude / cursor / roo / codex / future tools）
 4. 依 routing hub 指示讀對應的 tool adapter 取得 tool-specific 操作注意事項
@@ -16,7 +16,7 @@
 1. 使用本 repo root 作為 Ai-skill repo。
 2. 讀本 repo 的 `CORE_BOOTSTRAP.md`。
 3. 讀本 repo 的 `runtime/core-bootstrap.yaml`，以 YAML canonical contract 為準。
-4. 每個 user-facing response 結尾都必須依 active per-turn obligations 附上 Cognitive Mode reporting。
+4. 最後回覆 / session close-out 必須附上 Cognitive Mode reporting；中間 progress update 不需要重複輸出。
 
 不能只停在本檔摘要；必須 dereference pointer 到 canonical files。
 
