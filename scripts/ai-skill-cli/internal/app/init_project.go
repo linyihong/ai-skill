@@ -429,10 +429,15 @@ alwaysApply: true
 }
 
 func initProjectCursorHooksContent() (string, error) {
-	command := "sh -c 'ROOT=\"${CURSOR_PROJECT_DIR:-$(pwd)}\"; if [ -z \"${AI_SKILL_REPO:-}\" ] && [ -f \"$ROOT/.ai-skill/local.env\" ]; then . \"$ROOT/.ai-skill/local.env\"; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then echo \"AI_SKILL_REPO is not set; skipping Ai-skill Cursor stop hook\" >&2; exit 0; fi; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run stop --repo \"$ROOT\"'"
+	command := "sh -c 'ROOT=\"${CURSOR_PROJECT_DIR:-$(pwd)}\"; if [ -z \"${AI_SKILL_REPO:-}\" ] && [ -f \"$ROOT/.ai-skill/local.env\" ]; then . \"$ROOT/.ai-skill/local.env\"; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then echo \"AI_SKILL_REPO is not set; Ai-skill Cursor close-out hook cannot validate Cognitive Mode\" >&2; exit 2; fi; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run stop --repo \"$ROOT\"'"
 	settings := map[string]any{
 		"version": 1,
 		"hooks": map[string]any{
+			"afterAgentResponse": []map[string]any{{
+				"command":    command,
+				"timeout":    10,
+				"failClosed": true,
+			}},
 			"sessionStart": []map[string]any{{
 				"type":    "prompt",
 				"prompt":  "This project uses Ai-skill. Before answering, load <AI_SKILL_REPO>/CORE_BOOTSTRAP.md and <AI_SKILL_REPO>/runtime/core-bootstrap.yaml, emit the Bootstrap Receipt, and include Cognitive Mode only in the final response / session close-out.",

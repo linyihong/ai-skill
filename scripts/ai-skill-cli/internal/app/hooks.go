@@ -882,18 +882,26 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 	if transcriptPath == "" || !claudeFileExists(transcriptPath) {
 		texts := extractStopHookAssistantTexts(payload)
 		if len(texts) == 0 {
-			_, _ = fmt.Fprintln(stderr, "ALLOW_NO_TRANSCRIPT: path="+transcriptPath)
-			return ExitSuccess
+			return blockStopHookMissingAssistantText(stderr, logFile, transcriptPath)
 		}
 		return validateStopHookFinalText(projectDir, texts[len(texts)-1], stderr, logFile)
 	}
 
 	texts := extractAssistantTexts(transcriptPath)
 	if len(texts) == 0 {
-		_, _ = fmt.Fprintln(stderr, "ALLOW_NO_ASSISTANT_MSG")
-		return ExitSuccess
+		return blockStopHookMissingAssistantText(stderr, logFile, transcriptPath)
 	}
 	return validateStopHookFinalText(projectDir, texts[len(texts)-1], stderr, logFile)
+}
+
+func blockStopHookMissingAssistantText(stderr io.Writer, logFile string, transcriptPath string) int {
+	_, _ = fmt.Fprintln(stderr, "BLOCK_NO_ASSISTANT_TEXT: path="+transcriptPath)
+	appendLog(logFile, "exit_code: 2 (block missing assistant text)")
+	_, _ = fmt.Fprint(stderr, "[ai-skill Stop hook] Missing assistant response text in hook payload.\n\n"+
+		"The final Cognitive Mode check cannot validate an empty or unavailable assistant response. "+
+		"Use a Cursor event that supplies the assistant response payload, such as afterAgentResponse, "+
+		"or provide a transcript_path containing the final assistant message.\n")
+	return ExitValidationFailed
 }
 
 func validateStopHookFinalText(projectDir string, lastText string, stderr io.Writer, logFile string) int {

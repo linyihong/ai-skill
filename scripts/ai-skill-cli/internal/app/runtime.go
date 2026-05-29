@@ -17,6 +17,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/linyihong/Ai-skill/scripts/ai-skill-cli/internal/glossary"
+	"github.com/linyihong/Ai-skill/scripts/ai-skill-cli/internal/pathutil"
 )
 
 type runtimeOptions struct {
@@ -219,7 +220,7 @@ func buildRuntimeObligationsResult(opts runtimeOptions) Result {
 		PlannedActions: []string{},
 		Mutations:      []string{},
 	}
-	root, repoCheck := closeLoopRepoRoot(opts.repoPath)
+	root, repoCheck := resolveRuntimeObligationsRepo(opts.repoPath)
 	result.Checks = append(result.Checks, repoCheck)
 	if repoCheck.Status != "ok" {
 		result.Status = "blocked"
@@ -278,6 +279,76 @@ func buildRuntimeObligationsResult(opts runtimeOptions) Result {
 		Check{Name: "per_commit_obligations", Status: "ok", Message: strings.Join(perCommit, ", ")},
 	)
 	return result
+}
+
+func resolveRuntimeObligationsRepo(repoPath string) (string, Check) {
+	if root, check := closeLoopRepoRoot(repoPath); check.Status == "ok" {
+		return root, check
+	}
+
+	candidates := []string{}
+	if env := strings.TrimSpace(os.Getenv("AI_SKILL_REPO")); env != "" {
+		candidates = append(candidates, env)
+	}
+	if repoPath != "" {
+		if abs, err := filepath.Abs(repoPath); err == nil {
+			candidates = append(candidates, readAiSkillRepoFromLocalEnv(abs))
+			candidates = append(candidates, abs)
+		}
+	}
+	if cwd, err := os.Getwd(); err == nil {
+		candidates = append(candidates, readAiSkillRepoFromLocalEnv(cwd))
+		candidates = append(candidates, cwd)
+	}
+
+	for _, candidate := range candidates {
+		candidate = strings.TrimSpace(candidate)
+		if candidate == "" {
+			continue
+		}
+		if isAiSkillRuntimeRepo(candidate) {
+			normalized, err := pathutil.NormalizeForReport(candidate)
+			if err != nil {
+				normalized = candidate
+			}
+			return candidate, Check{Name: "repo_root", Status: "ok", Message: normalized + " (resolved for read-only runtime obligations)"}
+		}
+	}
+
+	return "", Check{
+		Name:    "repo_root",
+		Status:  "failed",
+		Message: "could not locate Ai-skill repository for runtime obligations; set AI_SKILL_REPO or create .ai-skill/local.env",
+	}
+}
+
+func isAiSkillRuntimeRepo(path string) bool {
+	if path == "" {
+		return false
+	}
+	if _, err := os.Stat(filepath.Join(path, "CORE_BOOTSTRAP.md")); err != nil {
+		return false
+	}
+	if _, err := os.Stat(filepath.Join(path, "runtime", "runtime.db")); err != nil {
+		return false
+	}
+	return true
+}
+
+func readAiSkillRepoFromLocalEnv(projectDir string) string {
+	data, err := os.ReadFile(filepath.Join(projectDir, ".ai-skill", "local.env"))
+	if err != nil {
+		return ""
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if !strings.HasPrefix(line, "export AI_SKILL_REPO=") {
+			continue
+		}
+		value := strings.TrimSpace(strings.TrimPrefix(line, "export AI_SKILL_REPO="))
+		return strings.Trim(value, `"'`)
+	}
+	return ""
 }
 
 func buildRuntimeValidateResult(opts runtimeOptions) Result {

@@ -90,6 +90,31 @@ func TestRuntimeValidateDefaultNativeDoesNotNeedRuby(t *testing.T) {
 	}
 }
 
+func TestRuntimeObligationsResolvesAiSkillRepoFromLocalEnvOutsideGit(t *testing.T) {
+	repo := repoRootForTest(t)
+	workspace := t.TempDir()
+	writeFile(t, filepath.Join(workspace, ".ai-skill", "local.env"), "export AI_SKILL_REPO='"+repo+"'\n")
+	t.Chdir(workspace)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "obligations", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected runtime obligations to resolve Ai-skill repo from local.env, got %d; stderr=%s stdout=%s", code, stderr.String(), stdout.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if !hasCheckStatus(result.Checks, "repo_root", "ok") {
+		t.Fatalf("expected repo_root ok check, got %#v", result.Checks)
+	}
+	if !hasCheckStatus(result.Checks, "per_turn_obligations", "ok") {
+		t.Fatalf("expected per_turn_obligations check, got %#v", result.Checks)
+	}
+}
+
 func TestNativeRoutingRegistryValidationRequiresSourceOfTruthGate(t *testing.T) {
 	repo := t.TempDir()
 	writeFile(t, filepath.Join(repo, "README.md"), "# Test Repo\n")

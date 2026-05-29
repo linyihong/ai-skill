@@ -293,6 +293,34 @@ func TestRunStopHookBlocksCursorPayloadWithoutCognitive(t *testing.T) {
 	}
 }
 
+func TestRunStopHookBlocksCursorOkOnlyPayload(t *testing.T) {
+	setHookStdin(t, `{"assistant_response":"OK"}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitValidationFailed {
+		t.Fatalf("expected OK-only response to fail, got %d; stderr=%s", code, stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "Missing obligation") {
+		t.Fatalf("expected missing obligation message, got %s", stderr.String())
+	}
+}
+
+func TestRunStopHookBlocksMissingAssistantText(t *testing.T) {
+	setHookStdin(t, `{"hook_event_name":"afterAgentResponse"}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitValidationFailed {
+		t.Fatalf("expected missing assistant text to fail closed, got %d; stderr=%s", code, stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "BLOCK_NO_ASSISTANT_TEXT") {
+		t.Fatalf("expected missing assistant text diagnostic, got %s", stderr.String())
+	}
+}
+
 func TestRunStopHookAllowsCursorPayloadWithCompactCognitive(t *testing.T) {
 	setHookStdin(t, `{"assistant_response":"Done.\n\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast"}`)
 
