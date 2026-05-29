@@ -45,7 +45,7 @@
 3. **Review 結果必須 actionable**。每個 finding 應包含：問題描述、風險等級、建議修復方式。
 4. **Review 記錄應可追溯**。每個 review 的 finding、decision 與 resolution 應可追溯到對應的 commit 或 ticket。
 5. **Simplicity First（簡潔優先）**：從最簡單的實作開始。不要預先加入抽象層、Strategy pattern、或 speculative features。當需求證明需要複雜度時再重構。參見 [`examples/EXAMPLES.md`](examples/EXAMPLES.md) §2。
-6. **Surgical Changes（外科手術式修改）**：只改解決問題所需的行。匹配既有 code style，不要順便 refactor 不相關的 code。參見 [`execution-flow.md`](execution-flow.md) §9 和 [`examples/EXAMPLES.md`](examples/EXAMPLES.md) §3。
+6. **Surgical Changes（外科手術式修改）**：只改解決問題所需的行。匹配既有 code style，不要順便 refactor 不相關的 code。參見 [`surgical-changes.md`](surgical-changes.md)（`sd-surgical-caveats` slice）和 [`examples/EXAMPLES.md`](examples/EXAMPLES.md) §3。
 7. **Parity Before Replacement（替換前先對照）**：重構、遷移或 replacement 若會替代既有行為、入口、腳本、API、資料流程或操作能力，先盤點舊能力到新能力的對照與驗證證據，再開始實作。
 
 ## 與既有層的關係

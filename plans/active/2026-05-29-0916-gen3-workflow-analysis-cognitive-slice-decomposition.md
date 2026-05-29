@@ -421,20 +421,25 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 
 目標：把至少一個 monolithic workflow 或 analysis surface 改成 thin index。
 
-- [ ] 選定 pilot surface；優先從 `workflow/` 與 `analysis/` 各選一個，若 scope 過大則先選一個高頻 route。
-- [ ] 將 pilot surface 的正文分為：
-  - index / navigation
-  - execution-order 或 evidence-acquisition core
-  - artifact gates / tool procedure
-  - examples / templates
-  - caveats / failure notes
-- [ ] 父層 index 必須說明：
-  - 何時讀哪個 workflow / analysis slice
-  - execution-only 任務應避免讀哪些 analysis heavy slices
-  - evidence-only 任務應避免讀哪些 workflow heavy slices
-  - governance / runtime / intelligence 的 owner source 在哪
-- [ ] 不在 index 複製 runtime contract、governance rule、analysis method 或 workflow 正文。
-- [ ] 保留舊入口兼容說明或 redirect，避免 links 斷裂。
+> **Phase 2 進度（2026-05-29，execution-flow.md 先行，stakeholder 選定）**：
+> - 已抽出第一個 focused slice **`workflow/software-delivery/surgical-changes.md`**（`sd-surgical-caveats`，`type: failure`，原 execution-flow.md §9.1–9.5 verbatim + slice 欄位 header）。這實現 Phase 0 點名的「execution-order vs caveat 分離」，並驗證 taxonomy 的 `type: failure` + suppression 行為。
+> - `execution-flow.md` 加入 **Cognitive Slice 導航（thin index）**：6 lifecycle phase → 段落 / slice 對映 + load_when + examples suppression 提示；§9 改為指向 `surgical-changes.md` 的 redirect stub（保留舊入口兼容）。
+> - `README.md` §6 Surgical Changes 連結改指 `surgical-changes.md`。
+> - **刻意分批**：其餘 5 個 lifecycle phase（intake / contracts / test-strategy / implementation / validation / closure）的實體拆檔留待與 `development-process.md` **同批**進行——兩檔的 intake / contracts / test-strategy / closure 內容重疊，先拆 execution-flow 單側會造成 dual source-of-truth，違反「不複製 canonical source」。
+> - **Phase 3 待辦（已記於檔內）**：把 `surgical-changes.md` 納入 `routing-registry.yaml` route.workflow.software-delivery 的 required source、`execution-flow.yaml` required_sources；同步 `knowledge/graphs/workflow-software-delivery.yaml` §9 描述。
+
+- [x] 選定 pilot surface → `workflow/software-delivery/execution-flow.md`（routing primary_source，stakeholder 選定先行）。
+- [~] 將 pilot surface 的正文分為 index / execution-order core / caveats（**caveats slice 已抽出**；artifact gates / examples 既已分離；其餘 lifecycle phase 待與 development-process.md 同批）：
+  - [x] index / navigation（execution-flow.md 頂部 thin-index 導航）
+  - [x] caveats / failure notes（→ `surgical-changes.md`）
+  - [ ] execution-order lifecycle phase slices（與 development-process.md 同批）
+  - [ ] artifact gates（既在 `artifact-gates.md`）/ examples（既在 `examples/`）
+- [x] 父層 index 必須說明（execution-flow.md thin-index 導航表已含）：
+  - [x] 何時讀哪個 workflow slice（load_when 欄）
+  - [x] examples 預設 suppress、evidence-only 任務不載入 execution-flow
+  - [x] governance / runtime owner source 指向（governance pointer 保留）
+- [x] 不在 index 複製 runtime contract、governance rule、analysis method 或 workflow 正文（導航只列對映 + load_when，不搬正文）。
+- [x] 保留舊入口兼容說明或 redirect，避免 links 斷裂（§9 redirect stub + README 連結更新）。
 
 Phase 2 exit criteria：
 
