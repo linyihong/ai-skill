@@ -136,7 +136,8 @@ Gen 4 只承接後續：
 | 切太細導致維護成本 > token savings（over-fragmentation） | Phase 1 granularity 原則：slice 最小單位 = 能獨立完成的 cognitive phase，非 step / concept；Phase 2 逐 slice 把關，避免 context hopping / dependency storms（external review 風險2） |
 | Cross-slice dependency explosion（recursive loading / fan-out / hidden activation chains） | Phase 1 slice schema 加 dependency budget（heuristic default `max_depth:2`/`max_runtime_dependencies:4` + `override_when: task_complexity=high`，非 rigid）；Phase 4 scenario 斷言實際載入深度/廣度未超預算（external review OQ + #3 風險1，2026-05-29） |
 | Example-driven loading contamination（examples 密度高、LLM 易先讀 examples override doctrine） | Phase 1：`type: examples` 預設 `default_load: false`，只在 user 要求範例或偵測 ambiguity 載入；Phase 3 suppression guidance 對齊；對應 Watch-Out Wall 5（external review #3 風險2，2026-05-29） |
-| intelligence layer 吞噬 analysis（heuristic/tradeoff/anti-pattern 灰區倒成 thought dumping ground） | Phase 1 extraction direction rule：analysis 產 observations/signals/evidence，intelligence 只收 validated repeated patterns；升層需 validation 證據（external review #3 風險3，2026-05-29） |
+| intelligence layer 吞噬 analysis（heuristic/tradeoff/anti-pattern 灰區倒成 thought dumping ground） | Phase 1 extraction direction rule + **falsifiable placement predicate**（`layer_justification` + intelligence `evidence_refs`≥2 可解析，否則退回 analysis）；Phase 4 Scenario D 負向驗證 + B/C contamination 探針抓誤放（external review #3 風險3 + placement 驗證追問，2026-05-29） |
+| Placement 不可驗證（歸層淪為 honor-system 標籤，誤放無法偵測） | layer membership predicate 機械可檢查（evidence_refs gate）；Phase 4 Scenario D + contamination 間接探針；限制：無完全機械 oracle，目標是誤放可偵測/可逆，非證明每次放對（placement 驗證追問，2026-05-29） |
 | routing-registry 變第二個 monolith（route inflation / flat route universe → giant cognition graph） | Phase 3 hierarchical routing 規則：route 採樹狀命名，不平鋪 leaf；新增前先確認可掛既有層級節點（external review #3 風險4，2026-05-29） |
 | Taxonomy explosion / classification obsession | Phase 1 type+tags 收斂：primary `type` 只 4 種（execution/evidence/examples/failure），其餘降為 tags；新增 primary type 需回 plan 重評（external review 風險1） |
 | workflow / analysis / intelligence 邊界模糊 | Phase 1 codify 三層分工：workflow=順序、analysis=證據取得+驗證、intelligence=為何長期有效/失敗；歸層用此判定（external review 風險3） |
@@ -369,6 +370,8 @@ Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`develop
   - load_when
   - do_not_load_when
   - owner_layer
+  - `layer_justification`（**歸層的 falsifiable 理由**，必須通過該層 membership predicate；見下方 placement 驗證規則）
+  - `evidence_refs`（**僅 intelligence 層必填**：≥2 個獨立、已驗證的 analysis 觀察 / failure case 指標，且須可解析）
   - canonical_source
   - dependencies
   - `dependency_budget`（**heuristic default + override**，非 rigid governance；見下方規則）
@@ -392,6 +395,11 @@ Phase 0 inventory 完成，無阻擋性架構衝突。Pilot 收斂為 **`develop
 - [ ] 用三層邊界規則檢查 taxonomy 是否與 `workflow/analysis/intelligence/knowledge/runtime/governance` 重疊。
 - [ ] **Examples suppression bias 規則**：`type: examples` 的 slice 預設 **`default_load: false`**，只在 `user_requested_examples` 或 `ambiguity_detected` 時載入（external review 風險2，2026-05-29）。理由：examples token 密度高、pattern 明顯，LLM 易先讀 examples 而非 canonical execution，造成 **example-driven loading contamination / override doctrine**。這對應 Watch-Out Wall 5（positive-activation bias）。
 - [ ] **Extraction direction rule（analysis → intelligence 單向）**：`analysis` 只產出 `observations / signals / evidence`；`intelligence` **只接受 validated repeated patterns**（external review 風險3，2026-05-29）。heuristic / tradeoff / anti-pattern / routing-heuristic 這類灰區內容，未經重複驗證前留在 analysis，不得直接倒進 intelligence，避免 intelligence 變 random thought dumping ground。slice 標 `tags: extraction-to-intelligence` 僅代表「候選」，升層需有 validation 證據。
+- [ ] **Placement 可驗證規則（falsifiable membership predicate）**：歸層不是 honor-system 標籤，每個 slice 的 `layer_justification` 必須通過二選一判準，否則判定 misplacement：
+  - **analysis membership test**：內容回答「如何取得 / 驗證證據」，且為 task-instance 級的 observation / signal / evidence；**不得**斷言跨實例通則。
+  - **intelligence membership test**：內容是一個 generalization，**且** `evidence_refs` 含 ≥2 個獨立、已驗證、可解析的來源。少於 2 個或無法解析 → 判定 premature promotion，**強制退回 analysis**。
+  - 「validated repeated pattern」即以 `evidence_refs` 數量 + 可解析性作為操作型定義（機械可檢查）。
+  - **限制聲明**：歸層終究是語意分類，無完全機械 oracle；本規則目標是「讓 misplacement 可偵測、可逆、便宜修正」（falsifiable 判準 + evidence_refs gate + Phase 4 負向 scenario + contamination 探針），非「證明每次都放對」。升 / 降層走 audit trail，可逆。
 - [x] 是否新增 domain-local `slices/` 子目錄 → **已於 §Open Questions resolved：暫不新增 generic / domain-local `slices/`，優先在既有 owner layer 內用 semantic filename 切分；Phase 4 validation 後重評。** 本 phase 只需確認 pilot 切分落在既有 `workflow/software-delivery/` 內。
 - [ ] 評估命名候選並選定**過渡期 operational wording**（`loading/execution/evidence surface`）；**正式 glossary 註冊延後至 Phase 4**（見 §Open Questions 與 §Glossary Impact）。評估 `capability surface` / `cognitive surface` / `execution surface`（review 觀點：slice 易讓人聯想 arbitrary chunk / static partition，但本質是 routable cognition surface），記錄理由但不在本 phase 鎖定 framework vocabulary。
 
@@ -402,6 +410,7 @@ Phase 1 exit criteria：
 - [ ] 每個 slice 有明確 `load_when` 和 `do_not_load_when`。
 - [ ] Granularity 原則與三層邊界規則已寫入 taxonomy 文件。
 - [ ] Examples suppression bias 規則（`type: examples` 預設 `default_load: false`）與 extraction direction rule（analysis→intelligence 單向，只收 validated repeated patterns）已寫入 taxonomy 文件。
+- [ ] Placement 可驗證規則已寫入：每個 slice 有 `layer_justification` 並通過該層 membership predicate；intelligence slice 的 `evidence_refs` ≥2 且可解析（否則退回 analysis）。
 - [ ] 每個 slice schema 含 `dependency_budget`（heuristic default 2 / 4 + `override_when: task_complexity=high`，非 rigid 硬門檻）。
 - [ ] **Test-first validation target 已草擬**：Phase 4 fixture 形狀（`expected_load` / `forbidden_load` / `dependency_budget`）與 Scenario A/B/C 的 expected/forbidden 清單已先寫出，待 Phase 4 執行。
 - [ ] Glossary / naming decision 已記錄（含是否改用 surface 命名）。
@@ -479,6 +488,8 @@ dependency_budget:    # 對齊 Phase 1 slice schema（heuristic default + overri
 - [ ] **Scenario A（execution-only）**：小型 API validation 變更。`expected_load` = software-delivery execution-order slice + 對應 artifact-gate slice；`forbidden_load` = full analysis / tool-procedure surface、examples、Gen 4 heavy section。
 - [ ] **Scenario B（evidence-only）**：分析 APK 網路行為。`expected_load` = analysis evidence-acquisition / tool-procedure slice；`forbidden_load` = full workflow execution-flow / artifact-gate surface。
 - [ ] **Scenario C（mixed）**：debug 失敗的 deployment pipeline。`expected_load` = workflow execution slice + 特定 analysis failure/caveat slice；`forbidden_load` = unrelated examples / 其他 domain slice / Gen 4 vision section。
+- [ ] **Scenario D（placement / misplacement 負向驗證）**：故意放一條「無 evidence 或 evidence_refs < 2 的 heuristic」標成 intelligence，斷言 placement predicate **擋下並要求退回 analysis**（failure-derived validation）。同時驗證一條正確 analysis 證據 slice 的 `layer_justification` 通過 analysis membership test。
+- [ ] **Contamination 作為 misplacement 間接探針**：明確記錄 Scenario B/C 的 `forbidden_load` 同時承擔 placement 驗證——若一條本該是 analysis 證據的 slice 被誤標成 intelligence doctrine，會在 evidence-only / mixed 任務的 `forbidden_load` 洩漏出來，藉此抓出歸層錯誤。
 - [ ] 每個 scenario 斷言實際載入集合滿足 `expected_load` ⊆ loaded、`forbidden_load` ∩ loaded = ∅，且載入深度/廣度未超 `dependency_budget`。
 - [ ] 若 Phase 3 改 runtime/routing source，執行 `ai-skill runtime refresh` 或適用 validator。
 - [ ] 記錄 scenario evidence（實際 loaded surface 清單，非僅 route 宣告）。
@@ -486,6 +497,7 @@ dependency_budget:    # 對齊 Phase 1 slice schema（heuristic default + overri
 Phase 4 exit criteria：
 
 - [ ] Scenario A/B/C 全部 PASS（含 expected_load / forbidden_load / dependency_budget 三項斷言），或 plan 明確降級為 doc-only trial 並寫出下一階段 runtime validation plan。
+- [ ] Scenario D PASS：placement predicate 擋下無證據的 intelligence 升層、放行正確 analysis slice；確認 placement 誤放可被偵測。
 
 ## Phase 5 — Linked Updates + Closure
 
