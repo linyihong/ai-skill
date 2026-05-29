@@ -427,12 +427,20 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 > - `README.md` §6 Surgical Changes 連結改指 `surgical-changes.md`。
 > - **刻意分批**：其餘 5 個 lifecycle phase（intake / contracts / test-strategy / implementation / validation / closure）的實體拆檔留待與 `development-process.md` **同批**進行——兩檔的 intake / contracts / test-strategy / closure 內容重疊，先拆 execution-flow 單側會造成 dual source-of-truth，違反「不複製 canonical source」。
 > - **Phase 3 待辦（已記於檔內）**：把 `surgical-changes.md` 納入 `routing-registry.yaml` route.workflow.software-delivery 的 required source、`execution-flow.yaml` required_sources；同步 `knowledge/graphs/workflow-software-delivery.yaml` §9 描述。
+>
+> **Phase 2 進度補充（2026-05-29，sd-contracts 有界 slice 收尾）**：
+> - 已抽出第二個 focused slice **`workflow/software-delivery/contracts.md`**（`sd-contracts`，`type: execution`，tags `artifact-gate, contract, traceability`，原 development-process.md §Required Contracts / Contract Governance Gate / Traceability Gate / Contract-First Rules verbatim + slice 欄位 header）。
+> - **為何 sd-contracts 可單檔安全拆**：這四節內容完全位於 `development-process.md`，**無 execution-flow.md 對應段落**，因此零 dual-source 風險，是預算內最安全的 bounded slice（不需與 execution-flow.md 同批）。
+> - `development-process.md` 四節改為指向 `contracts.md` 的 redirect stub（保留 heading 與舊入口兼容，移除正文避免 dual source-of-truth）。
+> - taxonomy §7 `sd-contracts` 列 `canonical_source` 已更新指向 `contracts.md`。
+> - **Phase 3 待辦（追加）**：`contracts.md` 同樣需納入 `routing-registry.yaml` required source 與 `execution-flow.yaml` / graph 同步（與 surgical-changes.md 同批處理）。
+> - **後續分批（留待新 session）**：其餘 lifecycle slice（sd-intake / sd-test-strategy / sd-implementation / sd-validation / sd-closure）仍需 execution-flow.md + development-process.md 同批拆檔。
 
 - [x] 選定 pilot surface → `workflow/software-delivery/execution-flow.md`（routing primary_source，stakeholder 選定先行）。
 - [~] 將 pilot surface 的正文分為 index / execution-order core / caveats（**caveats slice 已抽出**；artifact gates / examples 既已分離；其餘 lifecycle phase 待與 development-process.md 同批）：
   - [x] index / navigation（execution-flow.md 頂部 thin-index 導航）
   - [x] caveats / failure notes（→ `surgical-changes.md`）
-  - [ ] execution-order lifecycle phase slices（與 development-process.md 同批）
+  - [~] execution-order lifecycle phase slices（**sd-contracts 已單檔拆出 → `contracts.md`**；其餘 intake/test-strategy/implementation/validation/closure 待與 development-process.md 同批）
   - [ ] artifact gates（既在 `artifact-gates.md`）/ examples（既在 `examples/`）
 - [x] 父層 index 必須說明（execution-flow.md thin-index 導航表已含）：
   - [x] 何時讀哪個 workflow slice（load_when 欄）
