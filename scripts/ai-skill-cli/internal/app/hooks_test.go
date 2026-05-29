@@ -371,6 +371,38 @@ func TestRunStopHookAllowsCursorPayloadWithCompactCognitive(t *testing.T) {
 	}
 }
 
+func TestRunStopHookAllowsExplicitBootstrapAcknowledgementWithoutCanonicalReceipt(t *testing.T) {
+	setHookStdin(t, `{"assistant_response":"已讀 CORE_BOOTSTRAP.md 與 runtime/core-bootstrap.yaml。Active per-turn obligations: obligation.cognitive.mode_report, obligation.finality.close_loop_check\n\nDone.\n\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:repair"}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected explicit bootstrap acknowledgement to pass, got %d; stderr=%s", code, stderr.String())
+	}
+}
+
+func TestRunStopHookRepairPromptSaysCorrectedFinalIsAccepted(t *testing.T) {
+	setHookStdin(t, `{"hook_event_name":"stop","assistant_response":"OK"}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cursor stop to loop with success exit, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode Cursor stop output: %v\n%s", err, stdout.String())
+	}
+	if !strings.Contains(output["followup_message"], "Repair is allowed") {
+		t.Fatalf("expected repairable bootstrap wording, got %#v", output)
+	}
+	if !strings.Contains(output["followup_message"], "corrected final response is accepted as repair") {
+		t.Fatalf("expected corrected final repair wording, got %#v", output)
+	}
+}
+
 func setHookStdin(t *testing.T, input string) {
 	t.Helper()
 	previous := os.Stdin

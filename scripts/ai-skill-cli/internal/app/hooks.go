@@ -572,7 +572,7 @@ func formatDirtyGitRepoReport(projectDir string) string {
 	}
 	var b strings.Builder
 	b.WriteString("[ai-skill nested git report]\n")
-	b.WriteString("Dirty Git repositories were detected under the project root. The final response MUST include a combined `### Project Git Report` section. ")
+	b.WriteString("Dirty Git repositories were detected under the project root. The close-out response should include a combined `### Project Git Report` section. ")
 	b.WriteString("If one repo changed, report that repo; if multiple repos changed, merge them into one section with one bullet per repo. ")
 	b.WriteString("Do not claim a clean close-loop until every listed repo is handled or explicitly marked as pre-existing/unrelated.\n\n")
 	for _, report := range reports {
@@ -643,8 +643,8 @@ func runSessionStartHook(projectDir string, stdout io.Writer, stderr io.Writer) 
 
 	context := fmt.Sprintf(
 		"[ai-skill SessionStart] Bootstrap auto-loaded. The agent does NOT need to read these files again "+
-			"— they are already in context. Your first user-facing response MUST begin with this Bootstrap "+
-			"Receipt (verbatim), then proceed to answer the user:\n\n"+
+			"— they are already in context. Include this Bootstrap Receipt near the start of the first "+
+			"user-facing response when possible. If missed, the same-session corrected final response may repair it:\n\n"+
 			"Bootstrap: rules=✓ phase=%s obligations=%s gates=%s\n"+
 			"Active per-turn obligations: %s\n\n"+
 			"Final response MUST also end with a Cognitive Mode 報告 block (compact form is fine for trivial "+
@@ -755,7 +755,7 @@ Before calling any tool other than Read, you MUST:
 1. Read CORE_BOOTSTRAP.md
 2. Query runtime/runtime.db for phase / obligations / gates
 3. Read the 3 required_reads: enforcement/rule-weight.md, enforcement/dependency-reading.md, enforcement/conversation-goal-ledger.md
-4. Output the Bootstrap Receipt in your first user-facing response:
+4. Output the Bootstrap Receipt in your next user-facing response:
    Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
    Active per-turn obligations: <obligation ids>
 
@@ -802,7 +802,7 @@ func runPostToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) i
 		"1. Read CORE_BOOTSTRAP.md\n" +
 		"2. Query runtime/runtime.db (phase / obligations / gates)\n" +
 		"3. Read enforcement/rule-weight.md, enforcement/dependency-reading.md, enforcement/conversation-goal-ledger.md\n" +
-		"4. Output Bootstrap Receipt as the first line of your response:\n" +
+		"4. Output Bootstrap Receipt near the start of your response (or repair it in the corrected final response):\n" +
 		"   Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>\n" +
 		"   Active per-turn obligations: <obligation ids>"
 	output := map[string]interface{}{
@@ -827,7 +827,7 @@ func runUserPromptSubmitHook(projectDir string, stdout io.Writer, stderr io.Writ
 	bootstrap := readFileSafe(filepath.Join(aiSkillRepo, "CORE_BOOTSTRAP.md"))
 	gitReport := formatDirtyGitRepoReport(projectDir)
 	combined := "[ai-skill final close-out obligation] Final response MUST end with a Cognitive Mode 報告 block. " +
-		"First-turn ALSO outputs Bootstrap Receipt. Canonical spec: runtime/core-bootstrap.yaml.\n\n---\n" +
+		"If bootstrap has not yet been acknowledged, output or repair the Bootstrap Receipt in the same response. Canonical spec: runtime/core-bootstrap.yaml.\n\n---\n" +
 		bootstrap
 	if gitReport != "" {
 		combined += "\n\n---\n" + gitReport
@@ -928,11 +928,10 @@ func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Wri
 	allAssistantText := strings.Join(texts, "\n\n--- assistant turn ---\n\n")
 	messages := []string{}
 
-	bootstrapRe := regexp.MustCompile(`(?m)^Bootstrap: rules=✓ phase=[^ ]+ obligations=\d+ gates=\d+\s*$`)
-	if !bootstrapRe.MatchString(allAssistantText) {
+	if !hasBootstrapAcknowledgement(allAssistantText) {
 		_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING_BOOTSTRAP_RECEIPT")
-		messages = append(messages, "[ai-skill Stop hook] Missing obligation: this conversation did not include the Bootstrap Receipt.\n\n"+
-			"Before continuing, output the Bootstrap Receipt required by runtime/core-bootstrap.yaml, then answer the user. Required shape:\n\n"+
+		messages = append(messages, "[ai-skill Stop hook] Missing obligation: this conversation did not acknowledge the Ai-skill bootstrap.\n\n"+
+			"Repair is allowed in the corrected final response. Output the Bootstrap Receipt required by runtime/core-bootstrap.yaml, or explicitly state that CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml were read and list the active per-turn obligations. Preferred shape:\n\n"+
 			"Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>\n"+
 			"Active per-turn obligations: <comma-separated obligation ids>\n")
 	}
@@ -963,7 +962,7 @@ func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Wri
 
 	message := "[ai-skill Stop hook] Close-out validation failed. This is an agent follow-up instruction, not a user request.\n\n" +
 		strings.Join(messages, "\n---\n\n") +
-		"\nPlease produce one corrected final response now that satisfies all missing items in one pass. Canonical format spec: runtime/core-bootstrap.yaml. Query active obligations: `ai-skill runtime obligations`.\n"
+		"\nPlease produce one corrected final response now that satisfies all missing items in one pass. A corrected final response is accepted as repair; do not repeat the same violation after adding the requested sections. Canonical format spec: runtime/core-bootstrap.yaml. Query active obligations: `ai-skill runtime obligations`.\n"
 	appendLog(logFile, fmt.Sprintf("exit_code: 2 (block missing close-out items: %d)", len(messages)))
 	if cursorStop {
 		writeCursorStopFollowup(stdout, message)
@@ -971,6 +970,17 @@ func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Wri
 	}
 	_, _ = fmt.Fprint(stderr, message)
 	return ExitValidationFailed
+}
+
+func hasBootstrapAcknowledgement(text string) bool {
+	bootstrapRe := regexp.MustCompile(`(?m)^Bootstrap: rules=✓ phase=[^ ]+ obligations=\d+ gates=\d+\s*$`)
+	if bootstrapRe.MatchString(text) {
+		return true
+	}
+	normalized := strings.ToLower(text)
+	return strings.Contains(normalized, "core_bootstrap.md") &&
+		strings.Contains(normalized, "runtime/core-bootstrap.yaml") &&
+		strings.Contains(normalized, "obligation.cognitive.mode_report")
 }
 
 func validateStopHookFinalText(projectDir string, lastText string, stdout io.Writer, stderr io.Writer, logFile string, cursorStop bool) int {

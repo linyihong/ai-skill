@@ -59,7 +59,7 @@ contextual_activations:
 
 per_session_obligations:
   - id: obligation.bootstrap.receipt
-    fires: first_turn_before_any_non_read_tool
+    fires: first_turn_before_any_non_read_tool_or_same_session_repair
     format_template: |
       Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
       Active per-turn obligations: <comma-separated obligation ids from per_turn_obligations>
@@ -68,7 +68,7 @@ per_session_obligations:
       Legacy single-line Receipt (without "Active per-turn obligations:" line)
       remains accepted. Enhanced two-line form is the canonical preferred
       format from 2026-05-26 onward (Phase 5 of bootstrap-contract-yaml-migration).
-    enforcement_layer: behavioral_forcing
+    enforcement_layer: behavioral_forcing + repairable_stop_hook
     forcing_function: |
       Numeric values require runtime.db query (cannot be memorized).
       Active per-turn obligations list requires querying
@@ -89,7 +89,13 @@ per_session_obligations:
       Active per-turn obligations: obligation.cognitive.mode_report
     note: |
       Summary "Resume directly" does NOT exempt this obligation; resume
-      sessions still emit Receipt on first user-facing message.
+      sessions should emit Receipt on the first user-facing message.
+      If the first response misses it but the agent has completed the required
+      reads, the same-session corrected final response may repair the miss by
+      outputting the canonical Receipt or explicitly naming CORE_BOOTSTRAP.md,
+      runtime/core-bootstrap.yaml, and the active per-turn obligations. Stop-hook
+      validation should accept that repair instead of repeatedly blocking on
+      first-line placement alone.
 
 per_turn_obligations:
   - id: obligation.cognitive.mode_report
