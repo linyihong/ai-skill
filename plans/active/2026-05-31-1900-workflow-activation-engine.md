@@ -1,9 +1,9 @@
 # Workflow Activation Engine
 
-**Status**: `draft-v4`
+**Status**: `draft-v6`
 **世代**：Gen 3 runtime hardening（systemic gap remediation）
 **建立日期**：2026-05-31
-**最後更新**：2026-05-31（v5 — sanitization patch：抽掉 v1-v4 殘留的 project incident details，保留架構論述）
+**最後更新**：2026-05-31（v6 — 整合第五輪評審：manual-lock 5th activation_mode、analysis 也改 must-declare、`route_type` ontology 拆三軸風險記為 Q10 + 未來 plan）
 **Empirical trigger**：2026-05-31 session — agent 對一筆 `route.workflow.travel-planning` 範圍的 user 任務跑 review。任務輸入命中該 route 三軸全部訊號（`user_signals` / `context_signals` / 後續會 Read 到的 `artifact_signals`），但 workflow 從未被啟動。使用者連續三次追問才暴露此 gap。具體 project incident（filename / 對話片段 / 領域 artifact 範例）依 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) 留在原 project 文件，不寫入本可重用 plan。
 
 > 本 plan 不修 travel-planning 個案，而是補齊 **Workflow Activation Engine** ——目前 framework 第一次形成「Registry ✓ + Rules ✓ + Docs ✓ + **Activation Engine ✗**」閉環的缺角。
@@ -123,7 +123,7 @@ Feedback (existing: feedback/history/<domain>/)
 | `bootstrap` | `always-on` | `route.bootstrap.*` |
 | `runtime_core` | `always-on` | `route.runtime.{phase-machine, obligation-ledger, blocking-gates, recovery}` |
 | `workflow` | `auto-detect` | `route.workflow.*` |
-| `analysis` | `auto-detect` | `route.analysis.*` |
+| **`analysis`** | **`must-declare`（無預設）** | `route.analysis.*` —— mixed layer（v6 採納評審 #2：與 intelligence 同性質） |
 | **`intelligence`** | **`must-declare`（無預設，必須顯式宣告）** | `route.intelligence.*` —— **mixed layer，見下方特別說明** |
 | `governance` | `on-demand` | `route.governance.*` |
 | `constitution` | `on-demand` | `route.constitution.*` |
@@ -199,18 +199,33 @@ intelligence 層本質是 **mixed layer** —— 介於 analysis / workflow / go
 - 例外覆寫機制保留彈性（極少數 route 需要與 type 預設不同）
 - 沒有「中央表 vs route file」雙寫 drift 風險
 
-##### Phase 0.2b — `activation_mode` Capability Matrix（**v3 新增**，回應評審 #1）
+##### Phase 0.2b — `activation_mode` Capability Matrix（**v3 新增 + v6 加 manual-lock**）
 
-每個 mode 用四個 capability bit 描述行為，避免「`advisory` 是 secondary hint 但具體會發生什麼」這類模糊：
+每個 mode 用 capability bit 描述行為。**v6 新增 5th mode `manual-lock`**（runtime-assigned，非 author-declared）：使用者明確說「本任務 / 本專案接下來用 X workflow」時，target route 進入 manual-lock 狀態，detector 自動裁決全部 yield。
 
-| Capability \ Mode | `always-on` | `auto-detect` | `on-demand` | `advisory` |
-|---|---|---|---|---|
-| `can_preload` | ✅ true | false | false | false |
-| `can_activate`（rule match → 鎖定 RuntimeContext.ActiveRoute） | n/a (always loaded) | ✅ true | true（only on explicit user invocation） | ❌ **false** |
-| `can_reinforce`（hit 後提升另一個 active route 的 confidence / 並列 DetectedRoutes） | n/a | true | false | ✅ **true** |
-| `can_conflict`（多 hit 時參與 `workflow-routing.md` 歧義裁決） | n/a | ✅ true | false | ❌ **false** |
-| `can_suggest_promotion`（如果 advisory route 持續無 auto-detect 同伴 hit → 建議升級成 auto-detect） | n/a | n/a | n/a | ✅ **true** |
-| `requires_activation_triggers` | false | ✅ **true** | false | true（弱訊號 OK） |
+| Capability \ Mode | `always-on` | `auto-detect` | `on-demand` | `advisory` | **`manual-lock`** ⭐ |
+|---|---|---|---|---|---|
+| `can_preload` | ✅ true | false | false | false | false |
+| `can_activate` | n/a (always loaded) | ✅ true（detector） | true（user explicit invocation） | ❌ false | **user only** |
+| `can_reinforce` | n/a | true | false | ✅ true | n/a（已 active） |
+| `can_conflict`（多 hit 時參與 `workflow-routing.md` 歧義裁決） | n/a | ✅ true | false | ❌ false | **❌ false**（user 已裁決） |
+| `can_suggest_promotion` | n/a | n/a | n/a | ✅ true | n/a |
+| `requires_activation_triggers` | false | ✅ true | false | true（弱訊號 OK） | false（user explicit） |
+| `can_override_detector`（detector 命中其他 route 時是否覆寫） | n/a | false（同級裁決） | n/a | false | **✅ true**（user > detector） |
+| `auto_expire`（無顯式 release 時是否自動失效） | n/a | true（task end） | true（per-turn） | true（task end） | **❌ false**（sticky 到顯式 release / session end） |
+
+**`manual-lock` 的關鍵屬性**（v6 採納評審 #3）：
+- **Runtime-assigned, not author-declared**：routing-registry.yaml 不會出現 `activation_mode: manual-lock`。它由 RuntimeContext 在 user 明確 lock 後動態套用，effective override 該 route 原本的 declared mode。
+- **取代 v3 `Status: manually-overridden`**：原本 `Status` 欄位混 lifecycle state 與 activation source，v6 起 `manual-lock` 升格為一階 mode，`Status` 純表 lifecycle（detected / locked / no-match）。
+- **觸發語意**：user message 含 `用 X workflow / 跟我做 X / 這個專案之後都用 Y` 等 sentinel → detector 跳過自動匹配，直接套用 user 指定 route，mode override 為 `manual-lock`。
+- **解除**：user 明確 release（`回到自動偵測 / unlock workflow`），或 session end。
+
+**範例落地（更新 v3 範例 + 加 v6 manual-lock）**：
+- `route.workflow.travel-planning`（auto-detect）：can_activate ✅，can_conflict ✅
+- `route.intelligence.architectural-fit`（must-declare → 建議 auto-detect）：同上
+- `route.runtime.phase-machine`（runtime_core → always-on）：can_preload ✅
+- `route.governance.routing-signal`（governance → on-demand）：can_activate（only user invocation）
+- **v6 新增**：使用者顯式 `「這個專案之後都用 route.workflow.software-delivery」` → 該 route 進入 manual-lock，detector 對其他訊號全部 yield，directly lock RuntimeContext.ActiveRoute = software-delivery
 
 **範例落地**：
 - `route.workflow.travel-planning`（auto-detect）：can_activate ✅，can_conflict ✅ — 命中後鎖定 ActiveRoute，與其他 auto-detect 多 hit 時走 conflict resolver
@@ -330,7 +345,8 @@ type RuntimeContext struct {
     DetectionSource   DetectionSig   // 哪些 signal axis 觸發
     ActivatedAt       time.Time
     LastReinforcedAt  time.Time      // Phase 2 reinforcement 最近一次 hit
-    Status            RuntimeStatus  // detected | locked | no-match | manually-overridden
+    Status            RuntimeStatus  // detected | locked | no-match  (lifecycle only; v6: manually-overridden removed, now expressed as EffectiveMode=manual-lock)
+    EffectiveMode     ActivationMode // v6 NEW: 5-value enum incl. manual-lock for user-explicit lock
 }
 
 type DetectionSig struct {
@@ -361,9 +377,10 @@ Lifecycle（簡化，**移除 implicit keyword-drift invalidation**）：
    - `幫我<action-verb><domain-noun>`（8 chars 級短句）→ contains action_verb + domain_noun → ✅ substantive
    - `hi 早安`（5 chars）→ 無 domain noun / action verb → ❌ not substantive
    - 字數門檻被淘汰因為 8 字中文 message 已可表達完整 task intent，舊 ≥20 chars 規則會誤殺。
-2. **Topic shift detection**（兩種，**取消 implicit drift**）：
+2. **Topic shift detection**（三種，**取消 implicit drift**）：
    - ✅ **顯式 pivot**：user message 含 sentinel（`換任務 / 現在我要 / new task / switch to / 換個話題` 等）→ invalidate + 重跑 detector
-   - ✅ **Manual override**：user 顯式說「用 X workflow / 跟我做 X」→ 直接覆寫 active_route
+   - ✅ **Manual lock**（v6 改名）：user 顯式說「用 X workflow / 跟我做 X / 這個專案之後都用 Y」→ ActiveRoute = X，**EffectiveMode = manual-lock**（sticky 直到顯式 release / session end，detector 全部 yield）
+   - ✅ **Manual unlock**（v6 新增）：user 顯式 `回到自動偵測 / unlock` → EffectiveMode 還原為 declared，detector 重新啟動
    - ❌ **取消**：連續 N turn keyword 流失 → invalidate
 3. **Why no implicit drift**：第二輪評審指出 down-drill 場景會誤殺。範式：使用者鎖定某 workflow 後，後續多 turn 全是該領域內的 sub-question（每 turn 都換不同 sub-topic），連續多 turn 都不會再出現原 workflow 的 trigger keyword，但仍是同一 workflow。Implicit drift 會把這類正常 drill-down 誤判成 topic shift。
 4. **替代方案**：keyword 流失只記 `LastReinforcedAt`，可選擇性 warning（"已 N turn 未見此 workflow 強訊號，是否仍在此 task？"），但**不自動 invalidate**
@@ -505,6 +522,7 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 | Q3 | Conflict resolution 多 route 命中時自動選還是 prompt user？ | **resolved** (v1) → 不自動選，注入 reminder 讓 agent 走 `workflow-routing.md`（v2/v3 close-out 誤標 still-open，v4 修正） |
 | Q8 | `route.intelligence.*` 全部 7 條 audit 結果是什麼？ | **new (v4)，still-open**：Phase 0.2a-special audit table 需 user 逐條 review，產出 acceptance criteria 之一。表中暫定值僅供討論。 |
 | Q9 | v1-v4 寫作期間 sanitization gate 未自我觸發，project incident details 洩漏進 canonical plan 文件。是否要把 mechanical sanitization validator 納入本 plan scope？ | **new (v5)，resolved → out-of-scope**：sanitization gap 本質與 workflow detector gap 同類（behavioral 強制無 mechanical hook），但若併入本 plan 會擴張 scope。**獨立 follow-up plan**：`plans/active/2026-05-31-2000-mechanical-sanitization-validator.md`。v5 patch 已抹除既存洩漏。 |
+| Q10 | `route_type` 把 capability / activation / knowledge_domain 三個正交軸壓進單一 enum，導致 namespace 衝突（`analysis/apk/workflows/` vs `workflow/apk-analysis/` vs `intelligence/apk-analysis/` 三條路徑指同一主題）。長期是否該拆三軸？ | **new (v6)，resolved → out-of-scope，記為 future plan**：診斷正確且影響深遠，但拆三軸是 ontology 級重構，本 plan scope 不容。**未來 plan stub**：`plans/active/<TBD>-route-ontology-split.md`（待開）。本 plan v6 起 `route_type` 文件加註「single-axis，將被 capability_type + activation_type + knowledge_domain 三軸取代」warning，讓新 route 作者預期 future migration。 |
 | Q4 | `workflow_sessions` TTL？跨 session 是否保留？ | **resolved → Phase 4.0**：本 plan 不落 SQLite，TTL 等於 in-memory RuntimeContext 生命週期（process scope）。跨 session 持久化延後到 Phase 4.1 follow-up plan。 |
 | Q5 | Detector miss 是否 fallback 到 Discovery？ | **resolved → Phase 6.1**：採納第二輪評審，**Yes** 但有限制 —— Discovery 只在 detector miss 時 fire（不是 per-turn），結果寫 `route-candidate-proposals.yaml` 供未來 review，不阻擋當前執行流程。 |
 | Q6 | 舊格式（直接 `user_signals` 不在 `any_of` 下）的 deprecation timeline？ | still-open — 建議無限期相容，Phase 2 補新 route 用新格式即可 |
@@ -620,6 +638,35 @@ v1-v4 寫作期間 agent 未自我觸發 sanitization gate，造成 project inci
 **為什麼這次洩漏沒被擋下**：與 workflow detector gap **同性質** —— sanitization 是 behavioral enforcement，PreToolUse / commit-msg pipeline 不掃 Write/Edit 內容是否含 project incident details。`hooks.go` 對「敏感字 / project-specific keyword 出現於寫入 canonical repo path 的 file」**沒任何機械檢查**。
 
 **處置**：v5 此處只做事後 patch（抽象化已寫入的內容），systemic fix 另開 plan，見 Q9 + `plans/active/2026-05-31-2000-mechanical-sanitization-validator.md`。
+
+---
+
+### v6 — Round 5 評審整合
+
+**Round 5 第三方架構評審**（採納於 v6）：
+
+| # | 評審論點 | 採納 | 對應修改 |
+|---|---|---|---|
+| 1 | `route_type` ontology collapse：把 capability / activation / knowledge_domain 三正交軸壓進一個欄位，導致命名空間衝突（同主題出現在 analysis/apk/workflows、workflow/apk-analysis、intelligence/apk-analysis 三處） | ⚠️ **部分採納（記為 Q10 future plan）** | 本 plan scope 不重構 ontology。在 `route_type` 文件加 future-migration warning，Q10 記錄完整提案（拆 capability_type + activation_type + knowledge_domain），另開 plan 處理。本 plan 繼續用單軸 `route_type`，但承認是 interim solution。 |
+| 2 | `intelligence` 全 must-declare 後，`analysis` 也應該 must-declare（同樣 mixed primary/secondary） | ✅ | Phase 0.2a 將 analysis 從預設 `auto-detect` 改 `must-declare`。Phase 0.2a-special audit gate 範圍從 `route.intelligence.*` 7 條擴大涵蓋 `route.analysis.*` 全部。 |
+| 3 | 缺 `manual-lock` activation_mode：user 明確 lock 是一階能力，不該藏在 `RuntimeContext.Status` | ✅ | Phase 0.2b Capability Matrix 加第 5 個 mode `manual-lock`（runtime-assigned，capability：can_activate=user only / can_conflict=false / can_override_detector=true / auto_expire=false）。Phase 4.0 lifecycle 加顯式 lock / unlock transition。Status 欄位純化為 lifecycle，原 `manually-overridden` 改用 `EffectiveMode = manual-lock` 表達。 |
+
+**Round 5 核心觀察（user 原話）**：
+> 目前剩下最大的風險其實不是 Detector，也不是 RuntimeContext，而是 `route_type`。
+
+**為什麼這仍是 interim solution**：本 plan 已從「補 detector」演進到「建立 Capability Routing Runtime」，但底層 ontology 模型（單一 `route_type` 軸）尚未隨之升級。長期看，當 route 數量達 200+，會出現：
+- `analysis.apk.workflows` —— 是 analysis 中的 workflow？還是 workflow 用於 apk analysis？
+- `workflow.apk-analysis` —— 是 apk-analysis 這個 workflow？
+- `intelligence.apk-analysis.atoms` —— apk-analysis 的 intelligence atoms？
+
+三條 path 指 same conceptual area，因為單一軸無法表達「我是 workflow 類型 + 處理 apk 領域」這種正交組合。Q10 + future plan 處理；本 plan 不阻擋。
+
+**進度**：
+- Q3 mismarking 在 v4 已修正
+- Q4 / Q5 在 v3 resolved
+- Q9 在 v5 resolved → 獨立 sanitization validator plan
+- **Q10 在 v6 resolved → 獨立 route ontology split plan（TBD）**
+- 仍 still-open：Q1（route classification user review）/ Q6（舊格式 deprecation）/ Q7（artifact_signals 掃時機）/ Q8（intelligence + 現在 analysis audit 結果）
 
 ## Companion References
 
