@@ -3,8 +3,8 @@
 **Status**: `draft-v4`
 **世代**：Gen 3 runtime hardening（systemic gap remediation）
 **建立日期**：2026-05-31
-**最後更新**：2026-05-31（v4 — 整合第四輪評審：intelligence 不適用單一預設，改 must-declare + Phase 0.2 加 intelligence 全盤審計 gate）
-**Empirical trigger**：2026-05-31 session — agent 對 `docs/20260531-下関.md` 跑 review，doc 標題含「行程」、內容含「Day 1 / 御朱印 / MapCode / 自駕」，命中 `route.workflow.travel-planning.activation_triggers.user_signals` 全部訊號，但 workflow 從未被啟動。使用者連續三次追問才暴露此 gap。
+**最後更新**：2026-05-31（v5 — sanitization patch：抽掉 v1-v4 殘留的 project incident details，保留架構論述）
+**Empirical trigger**：2026-05-31 session — agent 對一筆 `route.workflow.travel-planning` 範圍的 user 任務跑 review。任務輸入命中該 route 三軸全部訊號（`user_signals` / `context_signals` / 後續會 Read 到的 `artifact_signals`），但 workflow 從未被啟動。使用者連續三次追問才暴露此 gap。具體 project incident（filename / 對話片段 / 領域 artifact 範例）依 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) 留在原 project 文件，不寫入本可重用 plan。
 
 > 本 plan 不修 travel-planning 個案，而是補齊 **Workflow Activation Engine** ——目前 framework 第一次形成「Registry ✓ + Rules ✓ + Docs ✓ + **Activation Engine ✗**」閉環的缺角。
 
@@ -53,7 +53,7 @@ Feedback (existing: feedback/history/<domain>/)
 
 | Decision | Rationale |
 |---|---|
-| **Deterministic rule match，不用 weighted scoring** | 規則問題不該變成分數問題。`Day 1` + `Day 2` + `行程` + `自駕` 是 deterministic signal，不需要 confidence threshold。0.62 vs 0.58 的調參地獄是 anti-pattern。 |
+| **Deterministic rule match，不用 weighted scoring** | 規則問題不該變成分數問題。當 N 個明確 keyword 共同出現於 user request + open files，已是 deterministic signal，不需 confidence threshold。0.62 vs 0.58 的調參地獄是 anti-pattern。 |
 | **Two-stage：rule match → conflict resolution** | Stage 1 boolean `any_of` / `artifact_any`，命中為 TRUE。Stage 2 只在多 route 同時 TRUE 時進入 `workflow/workflow-routing.md` 既有歧義裁決。 |
 | **Session state in-memory first，SQLite 延後** | Detector 一個 task 跑一次，結果存 Go `RuntimeContext` struct。**不**直接落 `runtime.db`。SQLite 落地等到出現實際需求（跨 session replay / 統計 / 分析）才做，避免「還沒驗證需求先固化 schema」。詳見 Phase 4。 |
 | **不全部補 50 條 triggers** | 50 條無 trigger 的 route 要先分類為 `activation_mode`：`always-on` / `auto-detect` / `on-demand` / `advisory` —— 不是二元「triggered / reference-only」，因為部分 route（如 `route.intelligence.architectural-fit`）可能 multi-mode。 |
@@ -236,10 +236,10 @@ activation_triggers:
   # Phase 1: Activation signals (pre-Read, 必須在 Read File 之前可取得)
   # ─────────────────────────────────────────
   activation_any_of:
-    user_signals: [行程, itinerary, 旅遊]      # 對話文字（既有，重新命名）
+    user_signals: [<domain-keyword-1>, <domain-keyword-2>, ...]    # 對話文字（既有，重新命名）
     context_signals:                            # 檔名 / 路徑 pattern
-      - "docs/*行程*.md"
-      - "docs/[0-9]{8}-*.md"
+      - "docs/*<domain-suffix>*.md"
+      - "docs/[0-9]{8}-*.md"                   # 日期前綴命名 (date-prefixed) 通用 pattern
   # 任一命中 → activate workflow，detector 鎖定 active_route。
 
   # ─────────────────────────────────────────
@@ -247,14 +247,14 @@ activation_triggers:
   # ─────────────────────────────────────────
   reinforcement_any_of:
     artifact_signals:                           # 已讀檔案內容 pattern
-      - "Day [0-9]+"
-      - "御朱印"
-      - "MapCode"
+      - "<domain-section-marker-regex>"        # e.g. 軟體開發類：`Phase [0-9]+`、`Spec`、`Acceptance`
+      - "<domain-artifact-keyword>"            # 該 workflow 領域常見產出關鍵字
+      - "<domain-format-token>"                # 領域特定的格式 token
   # 已 Read 的檔案命中 reinforcement_any_of → 提升 confidence、不單獨用於 activate；
   # 若 Phase 1 已 activate 則作為「方向正確」確認；若 Phase 1 miss 但 Phase 2 hit，
   # 視為「late-detected」事件，記日誌但不 retroactively rewrite history。
 
-  task_intents: [travel-planning, itinerary]   # 既有，保留
+  task_intents: [<task-intent-1>, <task-intent-2>]   # 既有，保留
 ```
 
 **為什麼要分兩階段（破環依賴）**：第二輪評審指出 — `artifact_signals` 需要先 Read 才有內容，但 workflow activation 的目的之一是**強制 agent 在 Read 之前先讀 workflow primary_source**。若 detector 依賴 artifact_signals，就會出現「要先 Read 才知道該讀 workflow，但 workflow 又要求 Read 前先讀 workflow」的循環依賴。
@@ -358,14 +358,14 @@ Lifecycle（簡化，**移除 implicit keyword-drift invalidation**）：
    ```
 
    範例：
-   - `幫我規劃下關行程`（8 chars）→ contains `規劃` + `行程` → ✅ substantive
+   - `幫我<action-verb><domain-noun>`（8 chars 級短句）→ contains action_verb + domain_noun → ✅ substantive
    - `hi 早安`（5 chars）→ 無 domain noun / action verb → ❌ not substantive
    - 字數門檻被淘汰因為 8 字中文 message 已可表達完整 task intent，舊 ≥20 chars 規則會誤殺。
 2. **Topic shift detection**（兩種，**取消 implicit drift**）：
    - ✅ **顯式 pivot**：user message 含 sentinel（`換任務 / 現在我要 / new task / switch to / 換個話題` 等）→ invalidate + 重跑 detector
    - ✅ **Manual override**：user 顯式說「用 X workflow / 跟我做 X」→ 直接覆寫 active_route
    - ❌ **取消**：連續 N turn keyword 流失 → invalidate
-3. **Why no implicit drift**：第二輪評審指出 down-drill 場景會誤殺。例：旅遊規劃會 drill into「這個停車場可以嗎 / 那住宿呢 / 這神社值得去嗎 / 這邊御朱印呢」，連續多 turn 不會出現「行程 / Day1」等 trigger keyword，但仍是同一 workflow。Implicit drift 會把這類正常 drill-down 誤判成 topic shift。
+3. **Why no implicit drift**：第二輪評審指出 down-drill 場景會誤殺。範式：使用者鎖定某 workflow 後，後續多 turn 全是該領域內的 sub-question（每 turn 都換不同 sub-topic），連續多 turn 都不會再出現原 workflow 的 trigger keyword，但仍是同一 workflow。Implicit drift 會把這類正常 drill-down 誤判成 topic shift。
 4. **替代方案**：keyword 流失只記 `LastReinforcedAt`，可選擇性 warning（"已 N turn 未見此 workflow 強訊號，是否仍在此 task？"），但**不自動 invalidate**
 
 #### Phase 4.1 — SQLite Persistence（**deferred, conditional**）
@@ -504,6 +504,7 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 | Q2 | Detector 的「first substantive message」定義 —— 純打招呼算嗎？ | **resolved (v3) → Phase 4.0 lifecycle**：採 intent vocabulary（domain_nouns ∪ action_verbs）判定，**不**用字數門檻。domain_nouns 自動從 routing-registry 的 `activation_any_of.user_signals` 聚合，registry 改即同步。 |
 | Q3 | Conflict resolution 多 route 命中時自動選還是 prompt user？ | **resolved** (v1) → 不自動選，注入 reminder 讓 agent 走 `workflow-routing.md`（v2/v3 close-out 誤標 still-open，v4 修正） |
 | Q8 | `route.intelligence.*` 全部 7 條 audit 結果是什麼？ | **new (v4)，still-open**：Phase 0.2a-special audit table 需 user 逐條 review，產出 acceptance criteria 之一。表中暫定值僅供討論。 |
+| Q9 | v1-v4 寫作期間 sanitization gate 未自我觸發，project incident details 洩漏進 canonical plan 文件。是否要把 mechanical sanitization validator 納入本 plan scope？ | **new (v5)，resolved → out-of-scope**：sanitization gap 本質與 workflow detector gap 同類（behavioral 強制無 mechanical hook），但若併入本 plan 會擴張 scope。**獨立 follow-up plan**：`plans/active/2026-05-31-2000-mechanical-sanitization-validator.md`。v5 patch 已抹除既存洩漏。 |
 | Q4 | `workflow_sessions` TTL？跨 session 是否保留？ | **resolved → Phase 4.0**：本 plan 不落 SQLite，TTL 等於 in-memory RuntimeContext 生命週期（process scope）。跨 session 持久化延後到 Phase 4.1 follow-up plan。 |
 | Q5 | Detector miss 是否 fallback 到 Discovery？ | **resolved → Phase 6.1**：採納第二輪評審，**Yes** 但有限制 —— Discovery 只在 detector miss 時 fire（不是 per-turn），結果寫 `route-candidate-proposals.yaml` 供未來 review，不阻擋當前執行流程。 |
 | Q6 | 舊格式（直接 `user_signals` 不在 `any_of` 下）的 deprecation timeline？ | still-open — 建議無限期相容，Phase 2 補新 route 用新格式即可 |
@@ -568,7 +569,7 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 | # | 評審論點 | 採納 | 對應修改 |
 |---|---|---|---|
 | 1 | `advisory` 定義模糊（"secondary hint" 不夠 actionable） | ✅ | Phase 0.2b 新增 6-bit Capability Matrix（can_preload / can_activate / can_reinforce / can_conflict / can_suggest_promotion / requires_activation_triggers），每個 mode 明確標 ✅/❌ |
-| 2 | "First substantive message ≥ 20 chars" 規則會誤殺短中文意圖 | ✅ | Phase 4.0 lifecycle 改用 intent vocabulary 判定（domain_nouns ∪ action_verbs），字數門檻取消。"幫我規劃下關行程"（8 chars）現在能正確識別。 |
+| 2 | "First substantive message ≥ 20 chars" 規則會誤殺短中文意圖 | ✅ | Phase 4.0 lifecycle 改用 intent vocabulary 判定（domain_nouns ∪ action_verbs），字數門檻取消。8 字級的中文 task intent（`幫我<verb><noun>`）現在能正確識別。 |
 | 3 | `route-candidate-proposals.yaml` 易變垃圾場（一次性需求污染） | ✅ | Phase 6.1 加 `occurrence_count` + `first_seen` / `last_seen` + 4 狀態機（accumulating → ready_for_review / stale → promoted / rejected）+ promotion threshold (count ≥ 5)。CLI `proposals list --status ready_for_review` 只顯示值得 review 的。 |
 | 4 | 57 routes 人工分類今天可行，120/300 後維護地獄 | ✅ | Phase 0.2a 引入 **self-declared `route_type`**（12 enum）+ type → activation_mode 預設對應表。新 route 作者宣告 type 即自動帶分類，無中央維護表 drift 風險。 |
 
@@ -600,6 +601,25 @@ User 評語：
 > v3 已經從「補 travel-planning detector」進化成「建立 Capability Routing Runtime」。剩下最大架構風險不在 Detector，而是在「intelligence 是否真的能全部預設 advisory」這個分類假設。
 
 **v4 對此風險的處置**：拒絕單一 default，引入 must-declare + Phase 0.2 audit gate，把分類決策從「framework 替你猜」轉為「每條 route 自己負責宣告」。這也是「self-declaring routes」原則的徹底化 —— 連 mode 都不靠 type 猜。
+
+---
+
+### v5 — Sanitization Patch（self-audit）
+
+v1-v4 寫作期間 agent 未自我觸發 sanitization gate，造成 project incident details（specific filename / 對話片段 / 領域 artifact 字串）洩漏進 canonical plan 文件。v5 移除全部洩漏，改為抽象 placeholder。
+
+**洩漏類型對照**：
+
+| 類型 | v1-v4 寫法（已移除） | v5 寫法 |
+|---|---|---|
+| Specific filename | `docs/<actual-task-doc>.md` | `docs/<YYYYMMDD-task-slug>.md` 通用 pattern |
+| User actual phrase | `幫我<verb><domain-specific-noun>` | `幫我<action-verb><domain-noun>` 抽象結構 |
+| Project-specific artifact strings | 領域 keyword 直接列在 schema 範例 | `<domain-artifact-keyword>` placeholder |
+| Drill-down 對話片段 | 真實 sub-question | 「該領域內的 sub-question（每 turn 換不同 sub-topic）」抽象描述 |
+
+**為什麼這次洩漏沒被擋下**：與 workflow detector gap **同性質** —— sanitization 是 behavioral enforcement，PreToolUse / commit-msg pipeline 不掃 Write/Edit 內容是否含 project incident details。`hooks.go` 對「敏感字 / project-specific keyword 出現於寫入 canonical repo path 的 file」**沒任何機械檢查**。
+
+**處置**：v5 此處只做事後 patch（抽象化已寫入的內容），systemic fix 另開 plan，見 Q9 + `plans/active/2026-05-31-2000-mechanical-sanitization-validator.md`。
 
 ## Companion References
 
