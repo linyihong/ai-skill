@@ -639,6 +639,9 @@ Phase 4 exit criteria：
 - [ ] 執行 link / reference audit（例如搜尋舊入口 path / title）。
 - [ ] 若新增 glossary terms，更新 glossary 並檢查 glossary impact。
 - [ ] 若改 routing / validation / runtime source，執行 runtime compile / refresh / validate。
+- [ ] **Follow-up handoff（mandatory before archive）**：Phase 4 Extension 已決定 SPLIT `workflow/apk-analysis/artifact-gates.md`。本 plan archive 前**必須**確認 follow-up plan skeleton 已建立並 commit：
+  - [x] follow-up plan draft 已建立：[`2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md`](2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md)（status `draft-skeleton`，繼承本 plan taxonomy / 三層規則 / dependency_budget / scenario fixture 模板；7 slice 與 acceptance criteria 已預定義）
+  - [ ] follow-up plan 已連回本 plan §Phase 4 Extension 與 Scenario F evidence
 - [ ] 更新本 plan 狀態與完成日期。
 - [ ] 執行 Plan Completion Closure，完成 archive / commit / push / readback。
 
