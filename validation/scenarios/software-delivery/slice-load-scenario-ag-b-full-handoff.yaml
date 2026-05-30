@@ -3,7 +3,7 @@ category: software-delivery
 version: v1
 type: slice-load-boundary
 priority: P2
-source_plan: plans/active/2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md
+source_plan: plans/archived/2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md
 source_phase: phase-4
 
 # Acceptance scenario AG-B: full APK analysis from scratch + complete

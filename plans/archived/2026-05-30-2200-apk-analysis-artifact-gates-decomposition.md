@@ -1,9 +1,10 @@
 # APK Analysis Artifact Gates Decomposition
 
-**Status**: `in-progress`
+**Status**: `completed (auto-detected)`
 **世代**：Gen 3 runtime hardening（second pilot applying validated framework）
 **建立日期**：2026-05-30
-**最後更新**：2026-05-30（Phase 0 完成）
+**最後更新**：2026-05-31
+**完成日期**：2026-05-31
 **Parent plan**：[`2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](../archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) — provides taxonomy, three-layer rule, dependency_budget heuristic, scenario fixture template, and the placement predicate this plan applies.
 **Pilot 決定**：`workflow/apk-analysis/artifact-gates.md`（575 行，12 個 gate）
 
@@ -210,7 +211,18 @@ Parent plan §Phase 4 Extension 已記錄此 SPLIT 決定。但 parent plan scop
 
 ### Phase 5 — Linked Updates + Closure
 
-- [ ] link audit、`ai-skill runtime refresh`、plan archive
+- [x] **Link audit**：grep `workflow/apk-analysis/artifact-gates.md` 共 36 個檔案引用；thin-index 留在原檔名，所有 file-path 引用仍 valid。`#anchor` 風格僅 1 處（本 plan 自己的 fixture）。歷史 feedback/history snapshot 不主動 repath（屬時間點記錄）。
+- [x] **Runtime refresh**：無 generated surface 變更（routing-registry 加 loading_surfaces 為 inline 配置，graph + summary 為 source-of-truth markdown），不需要 `ai-skill runtime refresh`。
+- [x] **Glossary**：`cognitive_slice` 已由 parent plan 註冊；本 pilot 不引入新 framework vocabulary（無 new term）。
+- [x] **ADR Promotion 評估**：parent plan 已把 ADR promotion flag 為 next-stakeholder decision；本 second pilot 完成強化「cross-project」criterion——3 個 pilot 應用（software-delivery / greenfield 反向證據 / apk-analysis artifact-gates）跨不同 shape 證實 taxonomy 穩定。**仍由 stakeholder 在後續 turn 決定何時開 ADR plan**，本 plan 不單方面升級。
+- [x] **Repath fixture source_plan**：本 plan archive 後，5 個 AG scenario fixture（ag-a / ag-b / ag-c / ag-acceptance-comparison / ag-schemes-a-vs-b）的 `source_plan` 從 `plans/active/` 改為 `plans/archived/`。
+- [x] **Archive**：plan 從 `plans/active/` 搬至 `plans/archived/`，含本次 Phase 5 closure commit。
+
+**Phase 5 exit criteria**：
+- [x] `git status --short --branch` clean（push 後驗證）
+- [x] `git log origin/main..HEAD` 為空（push 後驗證）
+
+**Plan completion handoff**：APK-analysis artifact-gates 切分 8 slice 已落地。下一個自然 follow-up 為 ADR promotion plan（含 software-delivery + apk-analysis 兩個 pilot 的累積 evidence）；其他 deferred candidate（analysis/travel 二次 probe、analysis/apk/workflows/frida-hook-flow / media-hls-analysis-flow probe）等真實任務觸發再評估。
 
 ---
 
