@@ -187,6 +187,9 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if !strings.Contains(string(overlay), "Project Ai-skill Overlay") {
 		t.Fatalf("expected project overlay index, got %s", string(overlay))
 	}
+	if !strings.Contains(string(overlay), "Do not add separate project-rule `.mdc` files under `.cursor/rules/`") {
+		t.Fatalf("expected overlay index to avoid Cursor-only project mdc files, got %s", string(overlay))
+	}
 	localIgnore, err := os.ReadFile(filepath.Join(project, ".ai-skill", ".gitignore"))
 	if err != nil {
 		t.Fatal(err)

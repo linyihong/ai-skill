@@ -622,7 +622,7 @@ func initProjectOverlayReadmeContent(repo string) (string, error) {
 
 This directory is reserved for project-local Ai-skill overlay rules. Put project-specific rules in ` + "`rules/`" + ` and link to them from this README.
 
-Tool-specific entry files should point here instead of duplicating project rule bodies.
+Tool-specific bootstrap entries should load this index instead of duplicating project rule bodies. Do not add separate project-rule ` + "`.mdc`" + ` files under ` + "`.cursor/rules/`" + `; keep Cursor on ` + "`.cursor/rules/ai-skill-bootstrap.mdc`" + ` so validation exercises the shared overlay.
 `, nil
 }
 

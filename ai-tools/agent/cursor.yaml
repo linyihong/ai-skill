@@ -38,7 +38,7 @@ steps:
     action: Use .cursor/rules/ai-skill-bootstrap.mdc only as a thin Cursor always-apply bootstrap pointer.
   - id: load_project_overlay
     order: 2
-    action: If <PROJECT_ROOT>/.ai-skill/project/README.md exists, load it as the project-local overlay index; Cursor-specific rule files should point there instead of duplicating project rule bodies.
+    action: If <PROJECT_ROOT>/.ai-skill/project/README.md exists, load it as the project-local overlay index; project-specific rule bodies should be discovered there instead of through extra Cursor project-rule .mdc files.
   - id: load_core_bootstrap
     order: 3
     action: Load CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml as the only bootstrap entry sources before expanding detailed sources.
@@ -85,7 +85,7 @@ gates:
     pass_when:
       - .cursor/rules/ai-skill-bootstrap.mdc remains a thin pointer to CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml
       - Bootstrap obligations, formats, enums, and examples are not duplicated in the Cursor rule
-      - Project-specific rule bodies live in .ai-skill/project/rules/ with Cursor rule files pointing to them
+      - Project-specific rule bodies live in .ai-skill/project/rules/ and are discovered through .ai-skill/project/README.md, not through separate Cursor project-rule .mdc files
 
 required_evidence:
   - Cursor adapter sources read
@@ -97,7 +97,7 @@ required_evidence:
 success_criteria:
   - Cursor starts from .cursor/rules/ai-skill-bootstrap.mdc, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, and ai-tools/agent/cursor.md as appropriate.
   - Cursor init-project installs a stop close-out check for Bootstrap Receipt and final Cognitive Mode reporting.
-  - Project-local custom checks can live in .ai-skill/project/rules/ and remain available to non-Cursor tools.
+  - Project-local custom checks can live in .ai-skill/project/rules/ and remain available to non-Cursor tools without adding separate project-rule .mdc files.
   - Cursor hooks remain reminders/checks unless explicitly configured for fail-closed validation.
   - Cursor-specific details stay in the adapter layer and canonical bootstrap content is not duplicated.
   - Execution-affecting adapter changes are projected and validated.
