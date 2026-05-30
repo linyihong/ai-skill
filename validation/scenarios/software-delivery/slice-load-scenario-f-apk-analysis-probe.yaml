@@ -1,0 +1,92 @@
+id: slice-load-scenario-f-apk-analysis-probe
+category: software-delivery
+version: v1
+type: domain-split-probe
+priority: P2
+source_plan: plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+source_phase: phase-4-extension
+
+# Probe-then-decide for workflow/apk-analysis (artifact-gates.md 575 lines,
+# execution-flow.md 204 lines). Method mirrors Scenario E: run a real APK
+# analysis task end-to-end and record actual loaded surfaces vs total surface
+# area. Output drives split / no-split decision.
+
+given:
+  task_intent: "Real APK analysis: capture a target app's login API, document endpoints + request shape, produce a feature-reconstruction handoff doc. Standard analyst workflow."
+  routing_entry: route.workflow.apk-analysis
+  signals:
+    - apk
+    - real_analysis
+    - api_documentation
+
+when:
+  action: agent_loads_cognitive_surfaces_for_task
+
+observation:
+  loaded_actual:
+    workflow_side:
+      - workflow/apk-analysis/README.md
+      - workflow/apk-analysis/execution-flow.md          # entire 204 lines (sections 1–8 all relevant)
+      - workflow/apk-analysis/artifact-gates.md          # ONLY sections 1 (UI map), 2 (API catalog), 4 (Feature handoff), 6 (evidence chain), 11 (API details), 12 (sanitization) — 6 of 12 gates
+    analysis_side:
+      - analysis/apk/traffic-triage.md
+      - analysis/apk/workflows/local-proxy-hook-flow.md
+      - analysis/apk/workflows/http-api-documentation-flow.md
+      - analysis/apk/tools-and-failures.md
+  total_loaded_lines: ~1100
+  ideal_loaded_lines_if_artifact_gates_were_split: ~700   # only 6/12 gates needed
+  inflation_ratio: ~1.57   # 1100 / 700 if artifact-gates was sliced
+
+  inflation_source_breakdown:
+    artifact-gates.md:
+      total_lines: 575
+      lines_actually_needed_for_this_task: ~280
+      wasted_load: ~295
+      unused_sections: ["3 Domain/Runtime Baseline (partial)", "5 Note template", "7 Failure log", "8 SDK self-gen audit", "9 Identity self-gen audit", "10 UI map template (partial overlap with §1)"]
+    execution-flow.md:
+      total_lines: 204
+      lines_actually_needed_for_this_task: ~180
+      wasted_load: ~24
+      verdict: "borderline; 8 sections all part of one connected execution path — not a slice candidate"
+
+verdict:
+  workflow/apk-analysis/artifact-gates.md:
+    decision: SPLIT_RECOMMENDED
+    severity: high
+    reasoning: |
+      575 lines, 12 distinct gates, real task uses ~6 of them. ~50% over-load
+      observed. Multi-topic monolith per Phase 0 inventory criteria. Matches
+      the same symptom that triggered software-delivery split.
+    proposed_slices:
+      - artifact-gates/ui-architecture-map.md       # §1 + §10 template
+      - artifact-gates/api-catalog.md                # §2 + §11 details
+      - artifact-gates/domain-runtime-baseline.md    # §3
+      - artifact-gates/feature-handoff.md            # §4
+      - artifact-gates/evidence-chain.md             # §5 note template + §6 chain + §7 failure log
+      - artifact-gates/sanitization.md               # §12
+      - artifact-gates/self-generation-audits.md     # §8 SDK + §9 Identity (related, both "self-gen" risk family)
+    estimated_post_split_load_for_same_task: ~280 lines (vs current 575)
+
+  workflow/apk-analysis/execution-flow.md:
+    decision: NO_SPLIT
+    severity: low
+    reasoning: |
+      204 lines, 8 sections, real task uses ~180. Sections are sequential
+      phases of one execution path; splitting would force context hopping
+      without measurable load reduction. Borderline by Phase 1 granularity
+      rule (a "cognitive phase" here IS the full execution flow).
+
+  workflow_analysis_merge_question:
+    decision: KEEP_SEPARATE
+    reasoning: |
+      workflow/apk-analysis = orchestration (8 ordered phases).
+      analysis/apk = evidence acquisition (4 separate flow files).
+      Scenario B + C already proved their boundary holds under real routing.
+      Merging would violate the three-layer rule (workflow=order, analysis=evidence)
+      that Phase 4 just validated. No merge.
+
+evidence:
+  executed_on: 2026-05-30
+  executor: agent_walkthrough
+  result: SPLIT_RECOMMENDED_FOR_ARTIFACT_GATES_ONLY
+  next_action: "Open follow-up plan to slice artifact-gates.md into 7 focused surfaces. Other apk-analysis files retain current shape."

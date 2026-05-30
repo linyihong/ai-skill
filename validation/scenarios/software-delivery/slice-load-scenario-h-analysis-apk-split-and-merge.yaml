@@ -1,0 +1,106 @@
+id: slice-load-scenario-h-analysis-apk-split-and-merge
+category: software-delivery
+version: v1
+type: domain-split-probe
+priority: P2
+source_plan: plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+source_phase: phase-4-extension
+
+# Two-question probe for analysis/apk:
+# (1) Should any analysis/apk file be split? (Phase 0 named tools-and-failures
+#     as a candidate.)
+# (2) Should workflow/apk-analysis + analysis/apk be merged into a single
+#     domain layer? (Recurring user question across this conversation.)
+# Uses cumulative evidence from Scenarios B + C + F.
+
+given:
+  question_1_target: analysis/apk/tools-and-failures.md (169 lines, mixes tool catalog + command templates + failure interpretation + automation safety boundaries per Phase 0 inventory)
+  question_2_target: relationship between workflow/apk-analysis/* and analysis/apk/*
+
+evidence_from_prior_scenarios:
+  scenario_b_loaded_actual:
+    - analysis/apk/workflows/README.md
+    - analysis/apk/README.md
+    - analysis/apk/workflows/local-proxy-hook-flow.md
+    - analysis/apk/traffic-triage.md
+    - analysis/apk/tools-and-failures.md
+    observation: "tools-and-failures.md loaded entirely; ~110 of 169 lines (65%) actually used for evidence-only network triage. ~60 lines (basic tools + automation boundaries) were unused."
+
+  scenario_c_loaded_actual:
+    - analysis/apk/workflows/local-proxy-hook-flow.md
+    - analysis/apk/tools-and-failures.md
+    - analysis/apk/README.md
+    observation: "Cross-layer task — tools-and-failures.md again loaded entirely; ~130 of 169 lines (77%) actually used. Failure section heavily exercised."
+
+  scenario_f_loaded_actual:
+    - analysis/apk/traffic-triage.md
+    - analysis/apk/workflows/local-proxy-hook-flow.md
+    - analysis/apk/workflows/http-api-documentation-flow.md
+    - analysis/apk/tools-and-failures.md
+    observation: "Full APK analysis task — tools-and-failures.md loaded entirely; ~155 of 169 lines (92%) actually used."
+
+  cross_scenario_utilization:
+    tools-and-failures.md:
+      mean_utilization: ~78%
+      min_utilization: 65%
+      max_utilization: 92%
+    workflows/local-proxy-hook-flow.md:
+      mean_utilization: ~85%
+      verdict: focused already
+
+verdict:
+  question_1_split_tools_and_failures:
+    decision: NO_SPLIT
+    severity: low
+    reasoning: |
+      Three independent scenarios show mean ~78% utilization (min 65%, max 92%).
+      The "tools + failures" combination is functionally co-used: an analyst
+      reading about a tool also wants to know how it fails. Splitting would
+      create a forced re-read pattern. Phase 1 granularity rule: the cognitive
+      phase is "operate a tool and recognize its failure modes" — that IS one
+      slice. Below the 50% utilization threshold that would justify split.
+    counter-argument-considered: |
+      Phase 0 inventory proposed splitting into tool-procedure + failure-caveat.
+      Counter-evidence: empirical utilization is high. Phase 0 was a static
+      heading-count assessment; this is runtime evidence. Runtime wins per
+      Phase 1 'test-first' principle.
+
+  question_2_merge_workflow_apk_into_analysis_apk:
+    decision: KEEP_SEPARATE
+    severity: high
+    reasoning: |
+      Three reasons, in order of weight:
+
+      (1) Scenarios B + C + F all show clean cross-layer routing — workflow
+          surfaces and analysis surfaces are loaded with different load_when
+          semantics. Merging collapses two distinct cognitive intents
+          ("what to do next" vs "how to obtain evidence") into one bucket.
+
+      (2) The three-layer rule (workflow=order, analysis=evidence, intelligence
+          =long-term pattern) was VALIDATED in Scenario D's placement predicate.
+          Merging apk-specific surfaces would create an inconsistent precedent:
+          apk-domain collapses but software-delivery does not. Cross-domain
+          asymmetry is a known anti-pattern (Watch-Out Wall 3, ecosystem
+          boundary inflation).
+
+      (3) Practical: analysis/apk is consumed by route.analysis.apk.workflows
+          (P2 route, lazy load). workflow/apk-analysis is consumed by
+          route.workflow.apk-analysis (P2 route, separate entry). They are
+          activated by different triggers. A merge would force one route to
+          load both — net context cost increase, not decrease.
+
+    counter-argument-considered: |
+      "Both belong to APK domain, so should live together." Rebutted: domain
+      affinity ≠ load-time affinity. Phase 1 codified this; Phase 4 empirically
+      proved it. Keep separate.
+
+  related_split_candidate_referred_out:
+    analysis/apk/workflows/frida-hook-flow.md: "190 lines, single procedure — no probe yet. Defer."
+    analysis/apk/workflows/media-hls-analysis-flow.md: "165 lines, single procedure — no probe yet. Defer."
+    analysis/travel/sources-and-tools.md: "Deferred to Scenario G follow-up re-probe."
+
+evidence:
+  executed_on: 2026-05-30
+  executor: aggregated_walkthrough_from_b_c_f
+  result: NO_SPLIT_AND_NO_MERGE
+  next_action: "No immediate work. analysis/apk and workflow/apk-analysis stay separate; tools-and-failures.md stays whole. Frida/media flow re-probe deferred until a real task exercises them in isolation."

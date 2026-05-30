@@ -608,6 +608,29 @@ Phase 4 exit criteria：
 > - [x] Scenario E 執行後，記錄 greenfield 的實際 over-load 證據（有/無）。**結果 2026-05-30**：無 over-load。greenfield route 載入 7 個 surface（execution-flow + README + 3 templates + sd-test-strategy bridge + enforcement/README），未連帶拉入 sd-intake / sd-contracts / sd-validation / sd-closure / sd-surgical 或其他 domain 的 surface。greenfield execution-flow 144 行本身已是清楚 4-phase 結構，無多責任混載症狀。
 > - [x] 依證據決定：**`no-split`**（無 over-load，2026-05-30 confirmed）。greenfield **不升級為第二 pilot**，不進入 Phase 2 排程。理由：(1) 144 行非 monolithic、4-phase 邊界清楚；(2) Scenario E 實測無 retrieval contamination；(3) 強行切分會違反 Phase 1 granularity 原則（over-fragmentation）。若未來 greenfield 真實任務樣本顯示 over-load 才重新評估。
 
+### Phase 4 Extension — Other-Domain Probe（2026-05-30）
+
+> **動機**：本 plan §Open Questions 與 §Phase 0 Inventory 把 `workflow/apk-analysis/` / `workflow/travel-planning/` / `analysis/apk/*` / `analysis/travel/*` 全部標為「延後」，但僅靠 heading 計數判斷有沒有 over-load 等於「想像」。stakeholder 要求用 Scenario E 同樣的 probe-then-decide 方法跑實測，並一併評估 workflow/apk-analysis 與 analysis/apk 是否該整併。
+
+| Probe | Target | Fixture | 結論 |
+|---|---|---|---|
+| **Scenario F** | `workflow/apk-analysis/` 全域 + `artifact-gates.md` 575 行 | [slice-load-scenario-f-apk-analysis-probe.yaml](../../validation/scenarios/software-delivery/slice-load-scenario-f-apk-analysis-probe.yaml) | **SPLIT artifact-gates.md**（real task 用 ~280/575 行，inflation ~50%）；execution-flow.md NO_SPLIT |
+| **Scenario G** | `workflow/travel-planning/` + `analysis/travel/sources-and-tools.md` | [slice-load-scenario-g-travel-planning-probe.yaml](../../validation/scenarios/software-delivery/slice-load-scenario-g-travel-planning-probe.yaml) | **NO_SPLIT** workflow（295 行 17 sections 真實任務用 14，~85% utilization）；analysis catalog 312 行 **DEFER**（再 probe 另一種旅遊類型才能決定） |
+| **Scenario H** | `analysis/apk/tools-and-failures.md` 切分？workflow/apk-analysis ↔ analysis/apk 整併？ | [slice-load-scenario-h-analysis-apk-split-and-merge.yaml](../../validation/scenarios/software-delivery/slice-load-scenario-h-analysis-apk-split-and-merge.yaml) | **NO_SPLIT** tools-and-failures（Scenario B/C/F 平均 78% utilization）；**NO_MERGE** workflow↔analysis（Phase 4 三層規則已驗證；merge 會違反 plan 自身核心 doctrine） |
+
+#### 三項實證決定（不是想像）
+
+1. **`workflow/apk-analysis/artifact-gates.md` → 列為下一個 split pilot**。理由：12 個 gate 真實任務用 6 個，inflation ~50%，與 software-delivery 觸發切分時的症狀一致。建議切成 7 個 focused gate surface（UI map / API catalog / domain baseline / feature handoff / evidence chain / sanitization / self-gen audits）。**不在本 plan 內執行**，另開 follow-up plan。
+2. **`workflow/travel-planning/` 整域維持原狀**。execution-flow 17 sections 是 sequential planning pipeline，~85% utilization；切分淨負擔 > token 節省。analysis/travel catalog 待第二次 probe（另一種旅遊類型）才決定。
+3. **`workflow/apk-analysis` 與 `analysis/apk` 不整併**。三個理由：(a) Scenario B/C/F 證明 cross-layer routing 乾淨；(b) Scenario D 已驗證的三層規則禁止 collapse；(c) 兩者由不同 P2 route 觸發，merge 會增加而非減少 context cost。
+
+#### 還沒 probe 的剩餘 candidate（誠實記錄）
+
+- `analysis/apk/workflows/frida-hook-flow.md`（190 行）、`media-hls-analysis-flow.md`（165 行）：單一程序檔，未被任何 scenario 單獨觸發過，**defer** 到真實任務出現再 probe。
+- `analysis/travel/sources-and-tools.md`：Scenario G 已標 `DEFER`，等第二次 probe。
+
+不為了形式完整現在補測——那會違反 plan 自己的 granularity / probe-then-decide 原則。
+
 ## Phase 5 — Linked Updates + Closure
 
 目標：完成全庫一致性，不留下半套入口。

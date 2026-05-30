@@ -1,0 +1,95 @@
+id: slice-load-scenario-g-travel-planning-probe
+category: software-delivery
+version: v1
+type: domain-split-probe
+priority: P2
+source_plan: plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+source_phase: phase-4-extension
+
+# Probe-then-decide for workflow/travel-planning (execution-flow.md 295 lines,
+# 17 sections covering distinct cognitive phases). Real-task: plan a 5-day
+# Japan road trip with overnight stays — exercises a substantial subset of
+# the 17 sections.
+
+given:
+  task_intent: "Plan a 5-day Japan road trip: 2 overnight stays + 1 car-camp night, 3 prefectures, rental car as primary transport. Standard travel-planning user request."
+  routing_entry: route.workflow.travel-planning
+  signals:
+    - travel
+    - multi-day
+    - road_trip
+    - overnight_planning
+
+when:
+  action: agent_loads_cognitive_surfaces_for_task
+
+observation:
+  loaded_actual:
+    workflow_side:
+      - workflow/travel-planning/README.md                # 104 lines
+      - workflow/travel-planning/execution-flow.md        # 295 lines (sections 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 13, 14, 15, 17 — 14 of 17)
+      - workflow/travel-planning/artifact-gates.md        # 103 lines (single coherent gates list)
+    analysis_side:
+      - analysis/travel/README.md
+      - analysis/travel/sources-and-tools.md              # 312 lines (entire catalog grepped during source triage)
+  total_loaded_lines: ~915
+  ideal_loaded_lines_if_execution_flow_were_split: ~870   # only 14/17 sections needed; modest savings
+  inflation_ratio: ~1.05   # minimal — most sections are genuinely needed
+
+  inflation_source_breakdown:
+    execution-flow.md:
+      total_lines: 295
+      lines_actually_needed_for_this_task: ~250
+      wasted_load: ~45
+      unused_sections: ["7 Long-distance transport (rental car only, no Shinkansen comparison)", "11 Country-specific checks (irrelevant for this task)", "16 Recommendation check (deferred to final step)"]
+      verdict: "14/17 sections used in one connected task — sections form a sequential pipeline, not independent cognitive phases"
+    sources-and-tools.md:
+      total_lines: 312
+      lines_actually_needed_for_this_task: ~200
+      wasted_load: ~112
+      unused_sections: ["Long-distance transport sources (no Shinkansen)", "Restaurant rating sources (covered by stay-experience for this trip type)"]
+      verdict: "20 source categories, used ~13 — but the catalog is index-shaped, agent typically scans the whole thing"
+
+verdict:
+  workflow/travel-planning/execution-flow.md:
+    decision: NO_SPLIT
+    severity: low
+    reasoning: |
+      295 lines, 17 sections, ~85% used in a single real task. Sections form
+      a sequential planning pipeline (intake → triage → location → stops →
+      weather → transport → lodging → route → checks → feasibility → output).
+      Splitting would force context hopping across nearly every slice;
+      reduction would be ~15% load, not worth the routing complexity.
+      Borderline by document-sizing but PASSES Phase 1 granularity rule:
+      the full execution flow IS the cognitive phase for trip planning.
+
+  workflow/travel-planning/artifact-gates.md:
+    decision: NO_SPLIT
+    severity: low
+    reasoning: "103 lines, single coherent gate list. Already focused."
+
+  analysis/travel/sources-and-tools.md:
+    decision: SPLIT_CONDITIONALLY
+    severity: medium
+    reasoning: |
+      312 lines, 20 source categories. ~65% load utilization but the
+      remaining 35% is genuinely unused per task. Could split by travel-type
+      (driving / public transit / regional) but the catalog is heavily
+      cross-referenced — splitting may create stale cross-refs.
+    proposed_action: |
+      Defer. Re-probe with a second task type (urban walking trip with
+      public transit). If utilization drops below 50% in second probe,
+      promote to split candidate. Otherwise keep as catalog.
+
+  workflow_analysis_merge_question:
+    decision: KEEP_SEPARATE
+    reasoning: |
+      Same three-layer rule as APK domain. workflow/travel-planning = order,
+      analysis/travel = sources. Merging would lose the load-time distinction
+      between "what to do next" and "where to find evidence".
+
+evidence:
+  executed_on: 2026-05-30
+  executor: agent_walkthrough
+  result: NO_SPLIT_FOR_WORKFLOW_TRAVEL; DEFER_DECISION_FOR_ANALYSIS_TRAVEL_CATALOG
+  next_action: "No immediate split work. Re-probe analysis/travel/sources-and-tools.md with a different trip type before deciding."
