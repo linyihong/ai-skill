@@ -1,0 +1,92 @@
+id: slice-load-scenario-c-mixed
+category: software-delivery
+version: v1
+type: slice-load-boundary
+priority: P1
+source_plan: plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+source_phase: phase-4
+
+# Test-first fixture defined in Phase 1/2 (taxonomy §8) — Phase 4 executes.
+# Mixed workflow + analysis task: investigates intermittent APK proxy
+# capture failures (analysis) AND lands a surgical doc/flow update (workflow).
+# Critical for proving slice boundaries hold when BOTH layers are active.
+
+given:
+  task_intent: "An APK analyst observes intermittent local-proxy capture failures during traffic triage and decides to update the relevant analysis flow documentation with the failure pattern. Cross-layer task: requires evidence-acquisition + failure caveat (analysis) AND a small, surgical doc edit (workflow)."
+  routing_entry:
+    - route.analysis.apk.workflows           # primary: evidence/failure investigation
+    - route.workflow.software-delivery       # bridge: surgical-change discipline for the doc edit
+  signals:
+    - apk
+    - failure_investigation
+    - doc_update
+    - small_diff
+    - cross_layer
+
+when:
+  action: agent_loads_cognitive_surfaces_for_task
+
+then:
+  expected_load:
+    # analysis side — evidence + failure caveats
+    - analysis/apk/workflows/local-proxy-hook-flow.md   # the failing flow under investigation
+    - analysis/apk/tools-and-failures.md                # failure/caveat slice
+    - analysis/apk/README.md                            # required_dependencies
+    # workflow side — surgical doc edit discipline
+    - workflow/software-delivery/execution-flow.md      # thin index entry
+    - workflow/software-delivery/surgical-changes.md    # type:failure slice for small-diff discipline
+  forbidden_load:
+    # workflow lifecycle surfaces NOT relevant to a doc edit
+    - workflow/software-delivery/intake.md              # no new requirement
+    - workflow/software-delivery/contracts.md           # not changing a contract
+    - workflow/software-delivery/test-strategy.md       # doc edit, no BDD scenario
+    - workflow/software-delivery/validation.md          # doc edit, no perf/completion gate
+    - workflow/software-delivery/closure.md             # not at handoff
+    - workflow/software-delivery/examples/EXAMPLES.md   # default_load:false
+    - workflow/software-delivery/development-process.md # legacy umbrella; focused surfaces preferred
+    # other domains
+    - workflow/greenfield/
+    - workflow/travel-planning/
+    - analysis/travel/
+    # Gen 4
+    - architecture/ai-native-cognitive-ecosystem-system.md
+  dependency_budget:
+    default:
+      max_depth: 2
+      max_runtime_dependencies: 4
+    override_when:
+      task_complexity: high   # cross-route (analysis + workflow) qualifies as high
+
+evidence:
+  executed_on: 2026-05-30
+  executor: agent_walkthrough
+  loaded_actual:
+    analysis_side:
+      - analysis/apk/workflows/local-proxy-hook-flow.md
+      - analysis/apk/tools-and-failures.md
+      - analysis/apk/README.md
+    workflow_side:
+      - workflow/software-delivery/execution-flow.md
+      - workflow/software-delivery/surgical-changes.md
+  routing_evidence:
+    - analysis side: route.analysis.apk.workflows primary_source + tools-and-failures via candidate
+    - workflow side: route.workflow.software-delivery thin index + surgical-caveats loading_surface (load_when: "surgical change discipline, diff purity needed")
+    - intake/contracts/test-strategy/validation/closure all gated by their do_not_load_when (no requirement / no contract / no behavior proof / no perf gate / not at handoff) → correctly suppressed
+  budget_check:
+    actual_depth: 2          # each route entry → its leaf slice; max single-chain depth 2
+    actual_runtime_dependencies: 5
+    within_default_budget: false
+    override_invoked: true
+    override_reason: "Cross-layer task spans route.analysis.apk + route.workflow.software-delivery; qualifies as task_complexity:high per Phase 1 dependency_budget override_when rule."
+    within_override_budget: true     # depth 2 ≤ 3, deps 5 ≤ 6
+  result: PASS
+  notes:
+    - "expected_load ⊆ loaded_actual: satisfied"
+    - "forbidden_load ∩ loaded_actual = ∅: satisfied (verified for all 11 forbidden entries)"
+    - "Critical assertion HELD: mixed task loaded EXACTLY the analysis surfaces it needed + EXACTLY the workflow caveat slice for the doc edit, with zero leakage into unrelated sd lifecycle surfaces or other domains."
+    - "Surgical-changes slice (type: failure) correctly activated on workflow side without dragging intake/contracts/validation/closure along."
+
+decision_inputs_recorded:
+  - id: cross-layer-boundary
+    observation: "Mixed workflow+analysis task routed via two parallel routes; each loaded only its relevant slice plus thin index. No connective inflation."
+    implication: "Hierarchical loading_surfaces + suppression-via-do_not_load_when works under parallel-route conditions, not only single-route. Strengthens evidence for ADR Promotion Criteria #5 (routing surface check)."

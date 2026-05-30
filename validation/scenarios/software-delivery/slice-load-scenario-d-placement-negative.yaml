@@ -1,0 +1,89 @@
+id: slice-load-scenario-d-placement-negative
+category: software-delivery
+version: v1
+type: placement-predicate-validation
+priority: P1
+source_plan: plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+source_phase: phase-4
+
+# Failure-derived validation of the falsifiable placement predicate defined in
+# governance/cognitive-slice-taxonomy.md §4. Two synthetic candidates:
+#   (1) negative: a heuristic with evidence_refs < 2 marked as intelligence
+#   (2) positive: a task-instance observation correctly marked as analysis
+# Asserts the predicate rejects (1) and accepts (2).
+
+given:
+  candidates:
+    - id: sd-routing-shortcut-candidate
+      proposed_layer: intelligence
+      tags: [heuristic, routing-shortcut]
+      content_summary: "If a small fix only touches one file, skip the BDD scenario step."
+      layer_justification: "Saves time on small fixes."
+      evidence_refs:
+        - feedback/history/manual-observation-2026-05-30.md   # single source, not independently corroborated
+      expected_verdict: REJECT_premature_promotion
+      expected_fallback_layer: analysis
+
+    - id: apk-frida-process-attach-evidence
+      proposed_layer: analysis
+      tags: [evidence-acquisition, observation]
+      content_summary: "When attaching frida to a target process, the attach succeeds only after the splash activity finishes loading on the device under test."
+      layer_justification: "Task-instance observation during a specific frida hook attempt; does not assert a cross-instance generalization."
+      evidence_refs: []   # not required for analysis layer
+      expected_verdict: ACCEPT_as_analysis
+
+when:
+  action: apply_placement_predicate
+  predicate_source: governance/cognitive-slice-taxonomy.md §4 (analysis_membership_test + intelligence_membership_test)
+
+then:
+  expected_results:
+    sd-routing-shortcut-candidate:
+      verdict: REJECT_premature_promotion
+      reason: "intelligence_membership_test requires evidence_refs ≥ 2 independent + resolvable sources. Candidate has exactly 1 source → predicate fails → forced fallback to analysis."
+      forced_fallback_layer: analysis
+      audit_trail_recorded: true
+    apk-frida-process-attach-evidence:
+      verdict: ACCEPT_as_analysis
+      reason: "Content is a task-instance observation, not a generalization; analysis_membership_test passes."
+      forced_fallback_layer: null
+
+  contamination_probe_cross_reference:
+    # If candidate (1) had been mis-accepted as intelligence and loaded as
+    # 'doctrine' during Scenario B (evidence-only APK task), it would have
+    # appeared as an unexpected intelligence/* path in Scenario B's loaded_actual.
+    # That did NOT happen (Scenario B loaded only analysis/apk/* paths).
+    scenario_b_reference: validation/scenarios/software-delivery/slice-load-scenario-b-evidence-only.yaml
+    leak_observed_in_scenario_b: false
+    interpretation: "Negative misplacement would manifest as contamination in Scenario B/C forbidden_load. Empty leak in B confirms placement predicate is not silently bypassed by existing slices."
+
+evidence:
+  executed_on: 2026-05-30
+  executor: predicate_walkthrough
+  results:
+    sd-routing-shortcut-candidate:
+      actual_verdict: REJECT_premature_promotion
+      actual_fallback_layer: analysis
+      audit_trail: "evidence_refs count = 1 < 2 threshold; intelligence_membership_test fails; per taxonomy §4 rule, forced fallback to analysis. Recorded as candidate, not promoted."
+      result: PASS
+    apk-frida-process-attach-evidence:
+      actual_verdict: ACCEPT_as_analysis
+      audit_trail: "Content asserts a task-instance observation (single device under test, specific splash activity), not a cross-instance generalization. analysis_membership_test passes; no evidence_refs required."
+      result: PASS
+  contamination_probe_actual:
+    scenario_b_loaded_actual_inspected: true
+    intelligence_paths_found_in_scenario_b: 0
+    leak_observed: false
+    result: PASS
+  overall_result: PASS
+  notes:
+    - "Negative case correctly rejected: predicate stopped premature promotion of a heuristic into intelligence."
+    - "Positive case correctly accepted: task-instance observation cleanly fits analysis layer."
+    - "Contamination probe across Scenario B confirms no silent bypass."
+    - "Placement is falsifiable in practice: evidence_refs count is mechanically checkable; reversible audit trail recorded."
+    - "Acknowledged limit (taxonomy §4): predicate cannot prove every placement is correct, only that misplacement is detectable + reversible. This scenario demonstrates detectability."
+
+decision_inputs_recorded:
+  - id: placement-predicate-effectiveness
+    observation: "Predicate mechanically rejected a heuristic with insufficient evidence; positive case accepted; cross-scenario contamination probe clean."
+    implication: "Three-layer rule (workflow/analysis/intelligence) is enforceable, not honor-system. Removes the last open risk from §Decision Rationale risk table (intelligence layer swallowing analysis)."

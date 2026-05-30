@@ -260,7 +260,7 @@ evidence:
 - [x] Phase 1 定義 workflow / analysis slice taxonomy 與 owner-layer decision（`governance/cognitive-slice-taxonomy.md`，status `phase-1-complete`；software-delivery pilot 8-slice 全 owner_layer:workflow）。
 - [x] Phase 2 完成至少一個 workflow 或 analysis surface 的 thin index 化。
 - [x] Phase 3 完成 loading rules、summary links、routing links 或明確 not applicable。
-- [ ] Phase 4 補足 validation scenarios 或明確說明 doc-only trial 的 validation substitute。
+- [x] Phase 4 補足 validation scenarios 或明確說明 doc-only trial 的 validation substitute。（Scenario A/B/C/D/E 全 PASS，evidence 見 `validation/scenarios/software-delivery/slice-load-scenario-*.yaml`）
 - [ ] Phase 5 完成 linked updates、link audit、runtime refresh（若適用）。
 - [ ] 若引入新 framework vocabulary，更新 glossary 或明確拒絕並說明理由。
 - [ ] Plan Completion Closure：所有 checklist 完成後，執行 `plans/README.md` 的 archival / status / commit / push 閉環。
@@ -580,9 +580,9 @@ dependency_budget:    # 對齊 Phase 1 slice schema（heuristic default + overri
 
 - [x] **Scenario A（execution-only）**：小型 API validation 變更。`expected_load` = software-delivery execution-order slice + 對應 artifact-gate slice；`forbidden_load` = full analysis / tool-procedure surface、examples、Gen 4 heavy section。**執行結果 2026-05-30**：PASS。Fixture + evidence 見 [`validation/scenarios/software-delivery/slice-load-scenario-a-execution-only.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-a-execution-only.yaml)。實際載入 = execution-flow.md (thin index) + test-strategy.md + validation.md + surgical-changes.md；intake / contracts / closure / examples / analysis / 其他 domain / Gen 4 全部正確 suppress。depth 1 / deps 4，within default budget。
 - [x] **Scenario B（evidence-only）**：分析 APK 網路行為。`expected_load` = analysis evidence-acquisition / tool-procedure slice；`forbidden_load` = full workflow execution-flow / artifact-gate surface。**執行結果 2026-05-30**：PASS。Fixture + evidence 見 [`validation/scenarios/software-delivery/slice-load-scenario-b-evidence-only.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-b-evidence-only.yaml)。實際載入 = `analysis/apk/workflows/README.md` + `analysis/apk/README.md` + `local-proxy-hook-flow.md` + `traffic-triage.md` + `tools-and-failures.md`；**zero workflow/software-delivery 洩漏**（驗證 plan 主要邊界假設）。depth 2 / deps 5，多 surface evidence acquisition 觸發 `task_complexity:high` override，within override budget。
-- [ ] **Scenario C（mixed）**：debug 失敗的 deployment pipeline。`expected_load` = workflow execution slice + 特定 analysis failure/caveat slice；`forbidden_load` = unrelated examples / 其他 domain slice / Gen 4 vision section。
-- [ ] **Scenario D（placement / misplacement 負向驗證）**：故意放一條「無 evidence 或 evidence_refs < 2 的 heuristic」標成 intelligence，斷言 placement predicate **擋下並要求退回 analysis**（failure-derived validation）。同時驗證一條正確 analysis 證據 slice 的 `layer_justification` 通過 analysis membership test。
-- [ ] **Contamination 作為 misplacement 間接探針**：明確記錄 Scenario B/C 的 `forbidden_load` 同時承擔 placement 驗證——若一條本該是 analysis 證據的 slice 被誤標成 intelligence doctrine，會在 evidence-only / mixed 任務的 `forbidden_load` 洩漏出來，藉此抓出歸層錯誤。
+- [x] **Scenario C（mixed）**：debug 失敗的 deployment pipeline（具體任務改為「intermittent APK proxy capture failure 調查 + 順手 patch 對應 analysis flow doc」，跨 analysis+workflow 兩 route 但同樣是 mixed 性質）。`expected_load` = workflow execution slice + 特定 analysis failure/caveat slice；`forbidden_load` = unrelated examples / 其他 domain slice / Gen 4 vision section。**執行結果 2026-05-30**：PASS。Fixture + evidence 見 [`validation/scenarios/software-delivery/slice-load-scenario-c-mixed.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-c-mixed.yaml)。實際載入 = analysis side（local-proxy-hook-flow + tools-and-failures + apk/README）+ workflow side（execution-flow thin index + surgical-changes failure slice）；intake/contracts/test-strategy/validation/closure 全部由其 `do_not_load_when` 正確 suppress。depth 2 / deps 5，跨 route 觸發 `task_complexity:high` override，within override budget。
+- [x] **Scenario D（placement / misplacement 負向驗證）**：故意放一條「無 evidence 或 evidence_refs < 2 的 heuristic」標成 intelligence，斷言 placement predicate **擋下並要求退回 analysis**（failure-derived validation）。同時驗證一條正確 analysis 證據 slice 的 `layer_justification` 通過 analysis membership test。**執行結果 2026-05-30**：PASS。Fixture + evidence 見 [`validation/scenarios/software-delivery/slice-load-scenario-d-placement-negative.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-d-placement-negative.yaml)。負向案例（`sd-routing-shortcut-candidate`, evidence_refs=1）被 intelligence_membership_test 機械擋下並強制 fallback 至 analysis；正向案例（`apk-frida-process-attach-evidence`, task-instance observation）通過 analysis_membership_test。
+- [x] **Contamination 作為 misplacement 間接探針**：明確記錄 Scenario B/C 的 `forbidden_load` 同時承擔 placement 驗證——若一條本該是 analysis 證據的 slice 被誤標成 intelligence doctrine，會在 evidence-only / mixed 任務的 `forbidden_load` 洩漏出來，藉此抓出歸層錯誤。**執行結果 2026-05-30**：PASS。Scenario B 的 `loaded_actual` 經 cross-reference 檢查無任何 `intelligence/*` 路徑洩漏（記錄於 Scenario D `contamination_probe_actual`）。
 - [x] **Scenario E（real-task validation：SDD / greenfield workflow）**：用 repo 既有的 `route.workflow.greenfield`（`workflow/greenfield/`，「改編自 github/spec-kit 的 SDD pipeline」，4 階段 Specify→Plan→Tasks→Implement）跑一個**真實 greenfield 任務**作為 slice routing 的 end-to-end 驗證案例。`expected_load` = greenfield execution slice + 對應 templates（spec/plan/tasks）+ 其銜接的 software-delivery BDD-closure slice；`forbidden_load` = software-delivery 其餘 lifecycle slice（intake 以外）、`sd-examples`、full analysis surface、Gen 4 heavy section。這是本 plan §Open Questions「目前零通過 slice-load 測試」的第一個**實際成功案例 target**——不是再造抽象 fixture，而是用一條已存在於 routing-registry 的真路徑證明切分邊界站得住。
   - 動機（2026-05-29，stakeholder 要求）：Scenario A/B/C/D 為合成探針；Scenario E 提供**真實 workflow 端到端證據**，補上「切分功能有沒有實際成功案例」的缺口。
   - 前置：Scenario E 依賴 software-delivery lifecycle slice（尤其 sd-intake、sd-contracts、BDD-closure）已實體拆出（Phase 2 後續分批），否則 `expected_load` 無 slice 可指。
@@ -593,9 +593,9 @@ dependency_budget:    # 對齊 Phase 1 slice schema（heuristic default + overri
 
 Phase 4 exit criteria：
 
-- [ ] Scenario A/B/C 全部 PASS（含 expected_load / forbidden_load / dependency_budget 三項斷言），或 plan 明確降級為 doc-only trial 並寫出下一階段 runtime validation plan。
-- [ ] Scenario D PASS：placement predicate 擋下無證據的 intelligence 升層、放行正確 analysis slice；確認 placement 誤放可被偵測。
-- [ ] **Scenario E PASS**：greenfield/SDD 真實任務只載入應載入的 slice、不洩漏無關 software-delivery lifecycle slice / examples / analysis；這構成本 plan 第一個 slice 切分的**實際成功案例**。
+- [x] Scenario A/B/C 全部 PASS（含 expected_load / forbidden_load / dependency_budget 三項斷言），或 plan 明確降級為 doc-only trial 並寫出下一階段 runtime validation plan。
+- [x] Scenario D PASS：placement predicate 擋下無證據的 intelligence 升層、放行正確 analysis slice；確認 placement 誤放可被偵測。
+- [x] **Scenario E PASS**：greenfield/SDD 真實任務只載入應載入的 slice、不洩漏無關 software-delivery lifecycle slice / examples / analysis；這構成本 plan 第一個 slice 切分的**實際成功案例**。
 
 ### 第二 pilot 評估：greenfield/SDD 是否值得切分（conditional）
 
