@@ -25,8 +25,41 @@ edges:
     target: knowledge/summaries/apk-analysis-pilot.md
     reason: Summary 提供 pilot map 的低成本 preview。
     validation: summary 指向 canonical architecture/apk-analysis-pilot-migration.md，且說明不可當作 replacement。
+  # Phase 3 of follow-up plan 2026-05-30-2200: artifact-gates decomposition surfaces
+  - type: contains_focused_surface
+    target: workflow/apk-analysis/artifact-gates/ui-architecture-map.md
+    reason: page-level UI architecture map + navigation segment library + operation-to-API matrix slice.
+    validation: routing-registry loading_surfaces workflow.apk-analysis.ui-map declares load_when.
+  - type: contains_focused_surface
+    target: workflow/apk-analysis/artifact-gates/api-catalog.md
+    reason: API documentation + catalog completion gate + single-API detail template slice.
+    validation: routing-registry loading_surfaces workflow.apk-analysis.api-catalog declares load_when.
+  - type: contains_focused_surface
+    target: workflow/apk-analysis/artifact-gates/domain-runtime-baseline.md
+    reason: Runtime baseline + development readiness gate slice for SDK/client/live integration.
+    validation: routing-registry loading_surfaces workflow.apk-analysis.domain-runtime-baseline declares load_when.
+  - type: contains_focused_surface
+    target: workflow/apk-analysis/artifact-gates/feature-handoff.md
+    reason: Feature reconstruction handoff slice for "can it be rebuilt" tasks.
+    validation: routing-registry loading_surfaces workflow.apk-analysis.feature-handoff declares load_when.
+  - type: contains_focused_surface
+    target: workflow/apk-analysis/artifact-gates/evidence-chain.md
+    reason: Single-analysis note template + evidence chain + failure log slice.
+    validation: routing-registry loading_surfaces workflow.apk-analysis.evidence-chain declares load_when.
+  - type: contains_focused_surface
+    target: workflow/apk-analysis/artifact-gates/sanitization.md
+    reason: Sanitization rules slice (must-redact / can-keep) for commit/publish gate.
+    validation: routing-registry loading_surfaces workflow.apk-analysis.sanitization declares load_when.
+  - type: contains_focused_surface
+    target: workflow/apk-analysis/artifact-gates/self-generation-audits.md
+    reason: SDK live + authorized identity material self-generation audit slice (type:failure caveat).
+    validation: routing-registry loading_surfaces workflow.apk-analysis.self-generation-audits declares load_when.
+  - type: contains_focused_surface
+    target: workflow/apk-analysis/artifact-gates/documentation-discipline.md
+    reason: Developer guidance + feedback writing tips + backfill rules slice (Scheme B probe override).
+    validation: routing-registry loading_surfaces workflow.apk-analysis.documentation-discipline declares load_when.
 metadata:
   priority: P2
   confidence: medium
   compatibility_state: new-layer-promoted
-  last_checked: 2026-05-19
+  last_checked: 2026-05-31

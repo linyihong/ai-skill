@@ -541,6 +541,14 @@ records:
     primary_source: workflow/apk-analysis/execution-flow.md
     required_dependencies:
       - workflow/apk-analysis/artifact-gates.md
+      - workflow/apk-analysis/artifact-gates/ui-architecture-map.md
+      - workflow/apk-analysis/artifact-gates/api-catalog.md
+      - workflow/apk-analysis/artifact-gates/domain-runtime-baseline.md
+      - workflow/apk-analysis/artifact-gates/feature-handoff.md
+      - workflow/apk-analysis/artifact-gates/evidence-chain.md
+      - workflow/apk-analysis/artifact-gates/sanitization.md
+      - workflow/apk-analysis/artifact-gates/self-generation-audits.md
+      - workflow/apk-analysis/artifact-gates/documentation-discipline.md
       - enforcement/README.md
       - enforcement/dependency-reading.md
       - enforcement/authorization-scope.md
@@ -552,9 +560,63 @@ records:
       - intelligence/engineering/analytical-reasoning/README.md
       - knowledge/summaries/apk-analysis-pilot.md
       - knowledge/graphs/apk-analysis-pilot.yaml
+    loading_surfaces:
+      workflow.apk-analysis.ui-map:
+        source: workflow/apk-analysis/artifact-gates/ui-architecture-map.md
+        load_when:
+          - building or updating page-level UI architecture map, navigation segment library, or operation-to-API matrix
+        do_not_load_when:
+          - pure backend / network-only analysis with no UI observation needed
+      workflow.apk-analysis.api-catalog:
+        source: workflow/apk-analysis/artifact-gates/api-catalog.md
+        load_when:
+          - documenting API endpoints, building SDK/client mappings, mock APIs, contract tests, or feature reconstruction
+        do_not_load_when:
+          - pure behavior observation with no API documentation deliverable
+      workflow.apk-analysis.domain-runtime-baseline:
+        source: workflow/apk-analysis/artifact-gates/domain-runtime-baseline.md
+        load_when:
+          - establishing runtime baseline for SDK/client/app-tool/live-integration development readiness gate
+        do_not_load_when:
+          - pure stateless endpoint analysis or small modification to existing complete baseline
+      workflow.apk-analysis.feature-handoff:
+        source: workflow/apk-analysis/artifact-gates/feature-handoff.md
+        load_when:
+          - producing feature reconstruction handoff, user asks "can it be rebuilt" / "what is the architecture" / "are there API docs"
+        do_not_load_when:
+          - exploration phase, handoff not yet required
+      workflow.apk-analysis.evidence-chain:
+        source: workflow/apk-analysis/artifact-gates/evidence-chain.md
+        load_when:
+          - recording analysis notes, evidence chain, or failure captures; need evidence template
+        do_not_load_when:
+          - pure reference lookup with no new analysis in progress
+      workflow.apk-analysis.sanitization:
+        source: workflow/apk-analysis/artifact-gates/sanitization.md
+        load_when:
+          - sanitizing evidence/samples before commit or publish
+        do_not_load_when:
+          - pure internal exploration, not yet preparing output
+      workflow.apk-analysis.self-generation-audits:
+        source: workflow/apk-analysis/artifact-gates/self-generation-audits.md
+        load_when:
+          - SDK live self-generation or authorized identity material (device id / install id / account / session seed / attestation) operations
+        do_not_load_when:
+          - task has no self-generation / signing / identity risk; passive observation only
+      workflow.apk-analysis.documentation-discipline:
+        source: workflow/apk-analysis/artifact-gates/documentation-discipline.md
+        load_when:
+          - writing/reviewing developer guidance notes, feedback lessons, or backfilling existing project documentation
+        do_not_load_when:
+          - active analysis execution, documentation write-up phase not yet reached
     source_of_truth_gate: new-layer-promoted
-    ranking_reason: apk-analysis 已從舊 skills/ 遷移至新分層，workflow/apk-analysis/ 為 active entrypoint。
-    validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離。
+    ranking_reason: >
+      apk-analysis 已從舊 skills/ 遷移至新分層，workflow/apk-analysis/ 為 active entrypoint。
+      Phase 3 (follow-up plan 2026-05-30-2200) 把 artifact-gates 8 個 focused surfaces 掛在同一
+      hierarchical route 下，不新增 flat leaf routes；agent 先讀 thin-index artifact-gates.md
+      再依 task intent 載入 ui-map / api-catalog / evidence-chain / sanitization / self-generation-audits
+      / documentation-discipline 等 focused surfaces。
+    validation_signal: 新分層路徑可讀取，workflow 與 analysis 內容已分離；artifact-gates focused surfaces 可由同一 hierarchical route 找到。
     metadata:
       priority: P2
       confidence: high

@@ -172,9 +172,19 @@ Parent plan §Phase 4 Extension 已記錄此 SPLIT 決定。但 parent plan scop
 
 ### Phase 3 — Routing + Summary
 
-- [ ] `knowledge/runtime/routing-registry.yaml` route.workflow.apk-analysis 加 `loading_surfaces`（hierarchical，不平攤新 route）
-- [ ] `knowledge/summaries/apk-analysis-pilot.md` 同步
-- [ ] `knowledge/graphs/apk-analysis-pilot.yaml` 同步
+- [x] `knowledge/runtime/routing-registry.yaml` route.workflow.apk-analysis 加 hierarchical `loading_surfaces`（8 個 `workflow.apk-analysis.*`，每個有 load_when / do_not_load_when）+ 8 個 focused surfaces 加入 `required_dependencies`
+- [x] `knowledge/summaries/apk-analysis-pilot.md` 同步：加 §Artifact-gates loading surfaces 章節，列 8 task intent → focused surface 對映；Last checked 更新為 2026-05-31
+- [x] `knowledge/graphs/apk-analysis-pilot.yaml` 同步：加 8 個 `contains_focused_surface` edge，每個 reference routing-registry loading_surface declaration
+- [x] `artifact-gates.yaml` executable contract：`source_markdown` 仍指向 thin-index（檔案路徑不變，content 改為 thin-index 形式）；內部 source-list 兩處引用仍合法，無需更新
+- [x] **Hierarchical routing 規則**：8 個 loading_surface 都掛在既有 `route.workflow.apk-analysis` 下（`workflow.apk-analysis.{ui-map,api-catalog,...}`），不平攤 flat leaf routes，通過 parent plan §Phase 3 hierarchical routing rule
+- [x] **Examples suppression**：本 pilot 無 `type: examples` slice（n/a）；其他 surface 皆有 `default_load` 隱含為 true，需要時才被任務 intent 觸發
+- [x] Loading guidance 在 thin-index `artifact-gates.md` §Cognitive Slice 導航 + summary §Artifact-gates loading surfaces 雙處可見
+
+**Phase 3 exit criteria**：
+- [x] 小任務可走 thin-index + 單一 focused surface，不需整份 575 行 artifact-gates monolith
+- [x] 大任務（full handoff）能找到所有 8 個 source
+- [x] 無新 flat route；hierarchical loading_surfaces 掛在既有 P2 route 下
+- [x] 無 dead route / dead generated surface（artifact-gates.yaml 仍指向 thin-index）
 
 ### Phase 4 — Validation Scenarios
 
