@@ -67,7 +67,8 @@ gate_set_activation:
     skipped_gate_categories: []
     note: >
       STRICT is auto-selected by discovery signals: file_diff_governance_enforcement,
-      file_diff_runtime_schema, recent_failure_repeat, phase_machine_validation,
+      file_diff_runtime_schema, file_diff_runtime_or_routing_wiring,
+      recent_failure_repeat, phase_machine_validation,
       active_goals_locked_or_multiple. Any DEEP execution_mode forces STRICT.
 
   LOCKDOWN:

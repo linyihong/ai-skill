@@ -690,6 +690,55 @@ func TestValidateActivationSignals(t *testing.T) {
 	}
 }
 
+func TestCompactCognitiveContractRunsStagedValidators(t *testing.T) {
+	repo := initTempGitRepo(t)
+	writeFile(t, filepath.Join(repo, "runtime", "cognitive-modes-discovery.yaml"), "signals:\n  - name: user_keyword_fast\n  - name: file_diff_runtime_schema\n")
+	writeFile(t, filepath.Join(repo, "runtime", "runtime.db"), "not-a-real-db-for-hook-fallback\n")
+	runGit(t, repo, "add", "runtime/runtime.db")
+
+	msg := filepath.Join(repo, "COMMIT_EDITMSG")
+	writeFile(t, msg, "docs: touch runtime\n\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast\n")
+	result := runCommitMsgHook(Result{}, repo, []string{msg})
+	if result.Status != "blocked" || result.ExitCode != ExitValidationFailed {
+		t.Fatalf("expected compact form to block on staged runtime file, got status=%q exit=%d error=%#v", result.Status, result.ExitCode, result.Error)
+	}
+	if result.Error == nil || !strings.Contains(result.Error.Message, "execution_mode=NORMAL insufficient") {
+		t.Fatalf("expected staged validator violation in error, got %#v", result.Error)
+	}
+}
+
+func TestFullCognitiveContractAllowsRuntimeDiffWithDeepStrict(t *testing.T) {
+	repo := initTempGitRepo(t)
+	writeFile(t, filepath.Join(repo, "runtime", "cognitive-modes-discovery.yaml"), "signals:\n  - name: file_diff_runtime_schema\n")
+	writeFile(t, filepath.Join(repo, "runtime", "runtime.db"), "not-a-real-db-for-hook-fallback\n")
+	runGit(t, repo, "add", "runtime/runtime.db")
+
+	msg := filepath.Join(repo, "COMMIT_EDITMSG")
+	writeFile(t, msg, `docs: touch runtime
+
+### Cognitive Mode 報告
+
+| 維度 | 值 | 理由 |
+|---|---|---|
+| execution_mode | DEEP | runtime diff |
+| context_mode | SOURCE_BACKED | runtime source |
+| governance_mode | STRICT | generated surface risk |
+| memory_mode | NONE | no replay |
+| validation_mode | SOURCE_BACKED | runtime validation |
+| cognitive_cost | HIGH | derived |
+
+activation_reason:
+  - file_diff_runtime_schema
+
+Capability summary:
+  execution_mode=DEEP -> source-backed reads and linked-update validation.
+`)
+	result := runCommitMsgHook(Result{}, repo, []string{msg})
+	if result.Status == "blocked" || result.ExitCode != 0 {
+		t.Fatalf("expected full DEEP/STRICT form to pass, got status=%q exit=%d error=%#v", result.Status, result.ExitCode, result.Error)
+	}
+}
+
 func TestValidateCapabilitySnippet(t *testing.T) {
 	highRisk := map[string]string{"execution_mode": "DEEP", "governance_mode": "STRICT"}
 	if v := validateCapabilitySnippet(highRisk, "feat: x\n\n### Cognitive Mode 報告\n"); v == "" {

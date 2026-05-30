@@ -14,15 +14,19 @@ failure_source:
     free-form text or omit activation_reason entirely. This allows inflated
     cognitive reporting — agent declares DEEP mode with no traceable signal.
 
-    v2 requires activation_reason to cite ≥1 signal from the 14 known signals
-    in runtime/cognitive-modes-discovery.yaml. Unknown signal name → hook BLOCK.
-    The 14 known signals are:
-      user_keyword_fast, user_keyword_deep, user_keyword_recovery,
+    v2 requires activation_reason to cite ≥1 known signal from
+    runtime/cognitive-modes-discovery.yaml. Unknown signal name → hook BLOCK.
+    Known signals include:
+      user_keyword_fast, user_keyword_deep, user_keyword_active_plan,
+      user_keyword_recovery,
       file_diff_governance_enforcement, file_diff_notes_ephemeral,
-      file_diff_runtime_schema, git_status_multi_owner_dirty,
-      session_turns_high, recent_failure_repeat,
+      file_diff_runtime_schema, file_diff_runtime_or_routing_wiring,
+      git_status_multi_owner_dirty, session_turns_high, recent_failure_repeat,
       phase_machine_bootstrap, phase_machine_validation,
       active_goals_locked_or_multiple, token_budget_low, token_budget_critical.
+    Additional runtime/plan hardening signals may be added in the same YAML;
+    the hook must read the generated signal list dynamically rather than rely
+    on a fixed prose count.
 
     Hook must read known signal list from generated_surfaces (dynamic) rather
     than hardcode, so signal vocabulary stays in sync with discovery YAML.

@@ -21,6 +21,10 @@ failure_source:
       governance_mode=STANDARD, memory_mode=NONE,
       validation_mode=CHECKLIST, cognitive_cost=LOW.
     If any dim is non-default, full form is required (separate scenario).
+    Compact form must still run the staged-file behavioral validators; if the
+    staged diff implies DEEP/STRICT (runtime, routing, workflow executable
+    contract, active plan, governance, enforcement), compact form must block
+    instead of allowing the agent to hide behind default labels.
 
     Expected compact output (single line):
       Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:<signal>
@@ -56,6 +60,8 @@ then:
   forbidden_routes:
     - compact_form_rejected_as_invalid_format
     - full_table_required_for_all_default_dims
+    - compact_form_accepts_runtime_or_routing_diff
+    - compact_form_skips_staged_file_validators
     - claim_done_without_hooks_update
     - claim_done_without_yaml_v2_section
 

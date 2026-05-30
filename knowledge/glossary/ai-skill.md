@@ -112,6 +112,7 @@ excludes:
   - discovery_mode
 related-terms:
   - { type: related_to, target: execution_mode }
+  - { type: related_to, target: discovery_signal }
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```
 
@@ -132,6 +133,33 @@ affects:
 related-terms:
   - { type: related_to, target: knowledge_mode }
 introduced-by: plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
+```
+
+## discovery_signal
+
+```yaml
+term: discovery_signal
+status: canonical
+owner-layer: runtime-cognition
+meaning: >
+  Named runtime-cognition trigger declared in `runtime/cognitive-modes-discovery.yaml`.
+  A discovery signal maps user keywords, staged file scopes, git/session state,
+  active goals or token budget pressure to cognitive mode dimension overrides.
+  Cognitive Contract v2 `activation_reason` / compact `Sig:` must cite known
+  discovery signal names, not free-form labels.
+affects:
+  - runtime/cognitive-modes-discovery.yaml
+  - runtime/cognitive-modes-phase-integration.yaml
+  - runtime/cognitive-modes-governance-integration.yaml
+  - scripts/ai-skill-cli/internal/app/hooks.go
+anti-meaning: >
+  Not a routing registry route, not validation evidence, and not an arbitrary
+  prose explanation for why a task felt complex.
+related-terms:
+  - { type: related_to, target: execution_mode }
+  - { type: related_to, target: context_mode }
+  - { type: related_to, target: governance_mode }
+introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```
 
 ## ecosystem
@@ -185,6 +213,7 @@ anti-meaning: >
   不是 process / thread 的 OS 執行模式；不是 IDE 的 "run / debug" mode。
 related-terms:
   - { type: related_to, target: context_mode }
+  - { type: related_to, target: discovery_signal }
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```
 
@@ -240,6 +269,8 @@ meaning: >
 affects:
   - runtime/cognitive-modes.yaml
   - runtime/cli-modification-policy.yaml
+related-terms:
+  - { type: related_to, target: discovery_signal }
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```
 

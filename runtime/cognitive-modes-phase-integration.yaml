@@ -32,8 +32,9 @@ execution_mode_adjustments:
     context_mode_floor: SUMMARY_FIRST
     governance_mode_floor: null
     note: >
-      FAST is blocked by signal file_diff_runtime_schema in discovery —
-      governance/enforcement diffs auto-escalate to STRICT regardless of FAST.
+      FAST is blocked by discovery signals file_diff_runtime_schema and
+      file_diff_runtime_or_routing_wiring — runtime/compiler/routing/active-plan
+      diffs auto-escalate beyond FAST.
 
   NORMAL:
     description: >
@@ -60,6 +61,8 @@ execution_mode_adjustments:
     note: >
       DEEP requires governance_mode ≥ STRICT. Discovery signal
       file_diff_runtime_schema auto-sets DEEP when runtime/ is touched.
+      file_diff_runtime_or_routing_wiring auto-sets DEEP when routing registry,
+      workflow executable contracts, or active plans are touched.
 
   FORENSIC:
     description: >

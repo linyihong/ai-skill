@@ -1142,6 +1142,17 @@ var cognitiveV2Defaults = map[string]string{
 	"cognitive_cost":  "LOW",
 }
 
+func stagedRequiresDeepStrictCognitiveMode(path string) bool {
+	return strings.HasPrefix(path, "runtime/") ||
+		strings.HasPrefix(path, "scripts/ai-skill-cli/") ||
+		strings.HasPrefix(path, "governance/") ||
+		strings.HasPrefix(path, "enforcement/") ||
+		strings.HasPrefix(path, "validation/") ||
+		path == "knowledge/runtime/routing-registry.yaml" ||
+		(strings.HasPrefix(path, "workflow/") && strings.HasSuffix(path, ".yaml")) ||
+		strings.HasPrefix(path, "plans/active/")
+}
+
 // parseCompactCognitiveLine parses a v2 compact Cognitive Contract line:
 //
 //	"Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:<signal>"
@@ -1239,7 +1250,8 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 				}
 				return result
 			}
-			ctx := commitMsgCtx{text: text, staged: nil, root: root, modes: compactModes}
+			staged, _ := gitLines(root, "diff", "--cached", "--name-only")
+			ctx := commitMsgCtx{text: text, staged: staged, root: root, modes: compactModes}
 			var violations []string
 			if v := validateCognitiveCost(ctx.modes); v != "" {
 				violations = append(violations, v)
@@ -1261,6 +1273,30 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 				result.Status = "blocked"
 				result.ExitCode = ExitValidationFailed
 				result.Error = &CommandError{Code: "cognitive_compact_capability_violation", Message: v}
+				return result
+			}
+			order := readPerCommitObligationsOrder(root)
+			if len(order) == 0 {
+				order = defaultCommitMsgDispatchOrder
+			}
+			var stagedViolations []string
+			for _, id := range order {
+				validator, ok := commitMsgValidatorRegistry[id]
+				if !ok {
+					continue
+				}
+				if v := validator(ctx); v != "" {
+					stagedViolations = append(stagedViolations, v)
+				}
+			}
+			if len(stagedViolations) > 0 {
+				result.Status = "blocked"
+				result.ExitCode = ExitValidationFailed
+				result.Error = &CommandError{
+					Code:        "cognitive_compact_staged_violations",
+					Message:     "Compact Cognitive Contract conflicts with staged changes:\n  - " + strings.Join(stagedViolations, "\n  - "),
+					Remediation: "Use the full ### Cognitive Mode 報告 table when staged files require non-default modes or strict governance.",
+				}
 				return result
 			}
 			result.Checks = append(result.Checks, Check{Name: "cognitive_mode_block", Status: "ok", Message: "Cognitive Contract v2 compact form present (all dims at default)"})
@@ -1412,8 +1448,16 @@ func validateExecutionModeFloors(modes map[string]string, staged []string) strin
 	// FAST cannot touch governance/, enforcement/, or runtime/ (auto-escalation rule)
 	if exec == "FAST" {
 		for _, f := range staged {
-			if strings.HasPrefix(f, "governance/") || strings.HasPrefix(f, "enforcement/") || strings.HasPrefix(f, "runtime/") {
-				return "execution_mode=FAST forbidden when staged files touch governance/, enforcement/, or runtime/ (auto-escalation rule per cognitive-modes-phase-integration.yaml). File: " + f
+			if stagedRequiresDeepStrictCognitiveMode(f) {
+				return "execution_mode=FAST forbidden when staged files touch runtime/routing/workflow-contract/active-plan/governance-critical paths (auto-escalation rule per cognitive-modes-phase-integration.yaml). File: " + f
+			}
+		}
+	}
+
+	if exec == "NORMAL" {
+		for _, f := range staged {
+			if stagedRequiresDeepStrictCognitiveMode(f) {
+				return "execution_mode=NORMAL insufficient when staged files touch runtime/routing/workflow-contract/active-plan/governance-critical paths; use DEEP or higher. File: " + f
 			}
 		}
 	}
@@ -1455,11 +1499,11 @@ func validateGovernanceModeConsistency(modes map[string]string, staged []string,
 		return "governance_mode missing from Cognitive Mode block"
 	}
 
-	// LIGHT: forbidden when staged files touch governance-critical paths
-	if gov == "LIGHT" {
+	// LIGHT/STANDARD: forbidden when staged files touch governance-critical paths
+	if gov == "LIGHT" || gov == "STANDARD" {
 		for _, f := range staged {
-			if strings.HasPrefix(f, "governance/") || strings.HasPrefix(f, "enforcement/") || strings.HasPrefix(f, "runtime/") || strings.HasPrefix(f, "validation/") {
-				return "governance_mode=LIGHT forbidden when staged files include governance-critical paths (governance/, enforcement/, runtime/, validation/). File: " + f
+			if stagedRequiresDeepStrictCognitiveMode(f) {
+				return "governance_mode=" + gov + " forbidden when staged files include runtime/routing/workflow-contract/active-plan/governance-critical paths; use STRICT or LOCKDOWN. File: " + f
 			}
 		}
 	}

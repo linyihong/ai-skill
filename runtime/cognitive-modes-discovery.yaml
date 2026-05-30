@@ -40,6 +40,16 @@ signals:
     priority: 10
     description: User signals deep analysis or cross-layer work
 
+  - name: user_keyword_active_plan
+    signal_type: user_keyword
+    pattern: "active plan|plans/active|接續|phase|Phase|繼續計畫|執行計畫"
+    execution_mode: DEEP
+    context_mode: SOURCE_BACKED
+    governance_mode: STRICT
+    memory_mode: null
+    priority: 18
+    description: User asks to continue or execute an active plan → source-backed plan/routing validation, not compact/default reporting
+
   - name: user_keyword_recovery
     signal_type: user_keyword
     pattern: "recover|失誤|重做|rollback|回退|undo|oops|mistake"
@@ -80,6 +90,16 @@ signals:
     memory_mode: null
     priority: 25
     description: Diff touches runtime or compiler → DEEP + STRICT (generated surface risk)
+
+  - name: file_diff_runtime_or_routing_wiring
+    signal_type: file_diff_scope
+    pattern: "^knowledge/runtime/routing-registry\\.yaml$|^workflow/.+\\.yaml$|^plans/active/"
+    execution_mode: DEEP
+    context_mode: SOURCE_BACKED
+    governance_mode: STRICT
+    memory_mode: null
+    priority: 24
+    description: Diff touches active plans, routing registry, or owner-layer workflow executable contracts → DEEP + STRICT wiring validation
 
   # ── git_status signals ──────────────────────────────────────────────────
   - name: git_status_multi_owner_dirty
