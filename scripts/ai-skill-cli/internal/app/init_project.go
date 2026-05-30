@@ -414,7 +414,7 @@ func initProjectCursorHooksContent() (string, error) {
 		"hooks": map[string]any{
 			"sessionStart": []map[string]any{{
 				"type":    "prompt",
-				"prompt":  "This project uses Ai-skill. Before answering, load <AI_SKILL_REPO>/CORE_BOOTSTRAP.md and <AI_SKILL_REPO>/runtime/core-bootstrap.yaml, emit the Bootstrap Receipt, and include Cognitive Mode only in the final response / session close-out.",
+				"prompt":  "This project uses Ai-skill. Before answering, load <AI_SKILL_REPO>/CORE_BOOTSTRAP.md and <AI_SKILL_REPO>/runtime/core-bootstrap.yaml, emit the Bootstrap Receipt, and include Cognitive Mode only in the final response / session close-out. If dirty root or nested Git repositories are detected at close-out, the final response must include a combined ### Project Git Report.",
 				"timeout": 10,
 			}},
 			"stop": []map[string]any{{

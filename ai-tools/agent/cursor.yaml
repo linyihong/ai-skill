@@ -52,7 +52,7 @@ steps:
       - gate.cursor.hooks_fail_open
   - id: enforce_cursor_cognitive_close_out
     order: 6
-    action: Ensure init-project Cursor hooks include a stop close-out check that calls the canonical Ai-skill hook runner and uses Cursor's followup_message loopback protocol when Bootstrap Receipt, final Cognitive Mode reporting, or required Project Git Report is missing.
+    action: Ensure init-project Cursor hooks include sessionStart dirty repo close-out guidance and a stop close-out check that calls the canonical Ai-skill hook runner and uses Cursor's followup_message loopback protocol when Bootstrap Receipt, final Cognitive Mode reporting, or required Project Git Report is missing.
     gates:
       - gate.cursor.cognitive_close_out
   - id: enforce_thin_adapter_boundary
@@ -77,7 +77,7 @@ gates:
   - id: gate.cursor.cognitive_close_out
     blocks: cursor_init_project_template_change
     pass_when:
-      - init-project Cursor hooks contain a stop/final-response check.
+      - init-project Cursor hooks contain sessionStart guidance for dirty repo close-out and a stop/final-response check.
       - The check delegates to the canonical Ai-skill hook runner rather than duplicating Cognitive Mode parsing in the Cursor template.
       - Missing Bootstrap Receipt, final Cognitive Mode reporting, or required Project Git Report uses Cursor stop `followup_message` loopback with exit 0 instead of relying on exit 2.
   - id: gate.cursor.always_apply_bootstrap_current
@@ -96,7 +96,7 @@ required_evidence:
 
 success_criteria:
   - Cursor starts from .cursor/rules/ai-skill-bootstrap.mdc, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, and ai-tools/agent/cursor.md as appropriate.
-  - Cursor init-project installs a stop close-out check for Bootstrap Receipt and final Cognitive Mode reporting.
+  - Cursor init-project installs sessionStart dirty repo close-out guidance and a stop close-out check for Bootstrap Receipt, final Cognitive Mode reporting, and required Project Git Report.
   - Project-local custom checks can live in .ai-skill/project/rules/ and remain available to non-Cursor tools without adding separate project-rule .mdc files.
   - Cursor hooks remain reminders/checks unless explicitly configured for fail-closed validation.
   - Cursor-specific details stay in the adapter layer and canonical bootstrap content is not duplicated.

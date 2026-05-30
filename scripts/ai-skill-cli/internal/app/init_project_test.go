@@ -164,7 +164,9 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 		!strings.Contains(string(cursorHooks), "hooks run stop") ||
 		!strings.Contains(string(cursorHooks), `"failClosed": true`) ||
 		!strings.Contains(string(cursorHooks), ".ai-skill/local.env") ||
-		!strings.Contains(string(cursorHooks), "exit 2") {
+		!strings.Contains(string(cursorHooks), "exit 2") ||
+		!strings.Contains(string(cursorHooks), "### Project Git Report") ||
+		!strings.Contains(string(cursorHooks), "nested Git repositories") {
 		t.Fatalf("expected Cursor hooks to enforce final Cognitive close-out through Ai-skill CLI, got %s", string(cursorHooks))
 	}
 	if strings.Contains(string(cursorHooks), `"afterAgentResponse"`) {
