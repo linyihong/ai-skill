@@ -521,6 +521,8 @@ Phase 2 exit criteria：
 
 **Phase 2 stabilization decision（2026-05-30）**：`sd-implementation` 暫留 `execution-flow.md` §3/§4 + `development-process.md` embedded / producer-consumer fallback，不建立 `implementation.md`。理由：剩餘內容是 execution core，抽成獨立檔會讓 `execution-flow.md` 變純 index 並牽動 route primary_source；依 stakeholder 決定，留待 Phase 3 routing evidence 或 Phase 4 Scenario A/E 顯示 over-load 時再升級。此決定符合 granularity rule：不為了形式完整而 over-fragment。
 
+**Phase 4 evidence confirms retention（2026-05-30）**：Scenario A 與 Scenario E 兩個實測案例均**未請求 sd-implementation surface**：Scenario A 用 execution-flow thin index + test-strategy / validation / surgical-changes 即完成 execution-only 任務；Scenario E 跨 route bridge 只觸及 sd-test-strategy 而非 sd-implementation。**結論：sd-implementation 確定維持 retained**，不升級為獨立檔。若未來真實任務出現 over-load 證據再重新評估。對應 evidence 見 [`slice-load-scenario-a-execution-only.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-a-execution-only.yaml) §decision_inputs_recorded 與 [`slice-load-scenario-e-greenfield-real-task.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-e-greenfield-real-task.yaml) §decision_inputs_recorded。
+
 ## Phase 3 — Loading Rules, Summary, Routing
 
 目標：讓 agent 能按 task intent 載入 workflow / analysis slices。
@@ -576,14 +578,15 @@ dependency_budget:    # 對齊 Phase 1 slice schema（heuristic default + overri
   override_when: { task_complexity: high }   # 高複雜任務（如 Scenario C）放寬
 ```
 
-- [ ] **Scenario A（execution-only）**：小型 API validation 變更。`expected_load` = software-delivery execution-order slice + 對應 artifact-gate slice；`forbidden_load` = full analysis / tool-procedure surface、examples、Gen 4 heavy section。
+- [x] **Scenario A（execution-only）**：小型 API validation 變更。`expected_load` = software-delivery execution-order slice + 對應 artifact-gate slice；`forbidden_load` = full analysis / tool-procedure surface、examples、Gen 4 heavy section。**執行結果 2026-05-30**：PASS。Fixture + evidence 見 [`validation/scenarios/software-delivery/slice-load-scenario-a-execution-only.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-a-execution-only.yaml)。實際載入 = execution-flow.md (thin index) + test-strategy.md + validation.md + surgical-changes.md；intake / contracts / closure / examples / analysis / 其他 domain / Gen 4 全部正確 suppress。depth 1 / deps 4，within default budget。
 - [ ] **Scenario B（evidence-only）**：分析 APK 網路行為。`expected_load` = analysis evidence-acquisition / tool-procedure slice；`forbidden_load` = full workflow execution-flow / artifact-gate surface。
 - [ ] **Scenario C（mixed）**：debug 失敗的 deployment pipeline。`expected_load` = workflow execution slice + 特定 analysis failure/caveat slice；`forbidden_load` = unrelated examples / 其他 domain slice / Gen 4 vision section。
 - [ ] **Scenario D（placement / misplacement 負向驗證）**：故意放一條「無 evidence 或 evidence_refs < 2 的 heuristic」標成 intelligence，斷言 placement predicate **擋下並要求退回 analysis**（failure-derived validation）。同時驗證一條正確 analysis 證據 slice 的 `layer_justification` 通過 analysis membership test。
 - [ ] **Contamination 作為 misplacement 間接探針**：明確記錄 Scenario B/C 的 `forbidden_load` 同時承擔 placement 驗證——若一條本該是 analysis 證據的 slice 被誤標成 intelligence doctrine，會在 evidence-only / mixed 任務的 `forbidden_load` 洩漏出來，藉此抓出歸層錯誤。
-- [ ] **Scenario E（real-task validation：SDD / greenfield workflow）**：用 repo 既有的 `route.workflow.greenfield`（`workflow/greenfield/`，「改編自 github/spec-kit 的 SDD pipeline」，4 階段 Specify→Plan→Tasks→Implement）跑一個**真實 greenfield 任務**作為 slice routing 的 end-to-end 驗證案例。`expected_load` = greenfield execution slice + 對應 templates（spec/plan/tasks）+ 其銜接的 software-delivery BDD-closure slice；`forbidden_load` = software-delivery 其餘 lifecycle slice（intake 以外）、`sd-examples`、full analysis surface、Gen 4 heavy section。這是本 plan §Open Questions「目前零通過 slice-load 測試」的第一個**實際成功案例 target**——不是再造抽象 fixture，而是用一條已存在於 routing-registry 的真路徑證明切分邊界站得住。
+- [x] **Scenario E（real-task validation：SDD / greenfield workflow）**：用 repo 既有的 `route.workflow.greenfield`（`workflow/greenfield/`，「改編自 github/spec-kit 的 SDD pipeline」，4 階段 Specify→Plan→Tasks→Implement）跑一個**真實 greenfield 任務**作為 slice routing 的 end-to-end 驗證案例。`expected_load` = greenfield execution slice + 對應 templates（spec/plan/tasks）+ 其銜接的 software-delivery BDD-closure slice；`forbidden_load` = software-delivery 其餘 lifecycle slice（intake 以外）、`sd-examples`、full analysis surface、Gen 4 heavy section。這是本 plan §Open Questions「目前零通過 slice-load 測試」的第一個**實際成功案例 target**——不是再造抽象 fixture，而是用一條已存在於 routing-registry 的真路徑證明切分邊界站得住。
   - 動機（2026-05-29，stakeholder 要求）：Scenario A/B/C/D 為合成探針；Scenario E 提供**真實 workflow 端到端證據**，補上「切分功能有沒有實際成功案例」的缺口。
   - 前置：Scenario E 依賴 software-delivery lifecycle slice（尤其 sd-intake、sd-contracts、BDD-closure）已實體拆出（Phase 2 後續分批），否則 `expected_load` 無 slice 可指。
+  - **執行結果 2026-05-30**：PASS。Fixture + evidence 見 [`validation/scenarios/software-delivery/slice-load-scenario-e-greenfield-real-task.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-e-greenfield-real-task.yaml)。實際載入 = greenfield execution-flow + README + 3 templates + sd-test-strategy bridge + enforcement/README；sd-intake / sd-contracts / sd-validation / sd-closure / sd-surgical / sd-examples / analysis / 其他 domain / Gen 4 全部正確 suppress。Cross-route bridge to sd-test-strategy 未連帶拉入其他 sd lifecycle surface — **slice boundary 跨 route 仍站得住**。depth 2 / deps 6，跨 route bridge 觸發 `task_complexity:high` override，within override budget。
 - [ ] 每個 scenario 斷言實際載入集合滿足 `expected_load` ⊆ loaded、`forbidden_load` ∩ loaded = ∅，且載入深度/廣度未超 `dependency_budget`。
 - [ ] 若 Phase 3 改 runtime/routing source，執行 `ai-skill runtime refresh` 或適用 validator。
 - [ ] 記錄 scenario evidence（實際 loaded surface 清單，非僅 route 宣告）。
@@ -602,8 +605,8 @@ Phase 4 exit criteria：
 >
 > **決定（conditional）**：**先做 Scenario E 驗證**，用實際載入證據判斷 greenfield 是否真的有 retrieval contamination / 多責任混載問題；**若 Scenario E 顯示 greenfield 已能乾淨路由、無 over-loading，則不切分**（避免 over-fragmentation，違反 Phase 1 granularity 原則）。只有當證據顯示 greenfield 在真實任務中會連帶拉進無關 surface 時，才升級為第二 pilot 並回 Phase 2 排程。
 >
-> - [ ] Scenario E 執行後，記錄 greenfield 的實際 over-load 證據（有/無）。
-> - [ ] 依證據決定：`no-split`（預設，無 over-load）或 `promote-to-pilot`（有 over-load → 回 Phase 2）。
+> - [x] Scenario E 執行後，記錄 greenfield 的實際 over-load 證據（有/無）。**結果 2026-05-30**：無 over-load。greenfield route 載入 7 個 surface（execution-flow + README + 3 templates + sd-test-strategy bridge + enforcement/README），未連帶拉入 sd-intake / sd-contracts / sd-validation / sd-closure / sd-surgical 或其他 domain 的 surface。greenfield execution-flow 144 行本身已是清楚 4-phase 結構，無多責任混載症狀。
+> - [x] 依證據決定：**`no-split`**（無 over-load，2026-05-30 confirmed）。greenfield **不升級為第二 pilot**，不進入 Phase 2 排程。理由：(1) 144 行非 monolithic、4-phase 邊界清楚；(2) Scenario E 實測無 retrieval contamination；(3) 強行切分會違反 Phase 1 granularity 原則（over-fragmentation）。若未來 greenfield 真實任務樣本顯示 over-load 才重新評估。
 
 ## Phase 5 — Linked Updates + Closure
 

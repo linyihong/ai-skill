@@ -1,0 +1,99 @@
+id: slice-load-scenario-e-greenfield-real-task
+category: software-delivery
+version: v1
+type: slice-load-boundary
+priority: P1
+source_plan: plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+source_phase: phase-4
+
+# Real-task end-to-end validation. Uses repo's existing route.workflow.greenfield
+# (SDD-style Specify → Plan → Tasks → Implement, 4 phases) as the FIRST actual
+# success case proving slice boundaries hold across two routes.
+
+given:
+  task_intent: "Greenfield: build a new minimal feature module from scratch (Specify → Plan → Tasks → Implement) for a single bounded capability."
+  routing_entry: route.workflow.greenfield
+  bridge_routes:
+    - route.workflow.software-delivery   # for BDD closure handoff during Implement phase
+  signals:
+    - greenfield
+    - new-project
+    - specify
+    - spec-kit
+    - from_zero
+
+when:
+  action: agent_loads_cognitive_surfaces_for_task
+
+then:
+  expected_load:
+    - workflow/greenfield/execution-flow.md              # primary_source
+    - workflow/greenfield/README.md                      # required_dependencies
+    - workflow/greenfield/templates/spec-template.md     # Phase 1 Specify
+    - workflow/greenfield/templates/plan-template.md     # Phase 2 Plan
+    - workflow/greenfield/templates/tasks-template.md    # Phase 3 Tasks
+    - workflow/software-delivery/test-strategy.md        # Phase 4 Implement bridge: BDD closure + test-first ordering
+    - enforcement/README.md                              # required_dependencies of greenfield route
+  forbidden_load:
+    # Greenfield owns its own intake (Specify) / architecture (Plan) / breakdown (Tasks).
+    # software-delivery lifecycle surfaces other than test-strategy MUST NOT bleed in.
+    - workflow/software-delivery/intake.md               # greenfield Specify covers requirements intake
+    - workflow/software-delivery/contracts.md            # greenfield Plan covers contract design
+    - workflow/software-delivery/validation.md           # not reached; Implement phase, no perf gate yet
+    - workflow/software-delivery/closure.md              # not at handoff
+    - workflow/software-delivery/surgical-changes.md     # greenfield is not surgical; opposite mode
+    - workflow/software-delivery/examples/EXAMPLES.md    # default_load:false
+    - workflow/software-delivery/development-process.md  # legacy umbrella; loading_surfaces preferred
+    - analysis/                                          # no evidence-acquisition task
+    - workflow/apk-analysis/                             # wrong domain
+    - workflow/travel-planning/                          # wrong domain
+    - architecture/ai-native-cognitive-ecosystem-system.md  # Gen 4 vision, irrelevant
+  dependency_budget:
+    default:
+      max_depth: 2
+      max_runtime_dependencies: 4
+    override_when:
+      task_complexity: high   # greenfield touches 2 routes (greenfield + sd-test-strategy bridge) → may justify override
+
+evidence:
+  executed_on: 2026-05-30
+  executor: agent_walkthrough
+  loaded_actual:
+    phase_1_specify:
+      - workflow/greenfield/execution-flow.md
+      - workflow/greenfield/README.md
+      - workflow/greenfield/templates/spec-template.md
+    phase_2_plan:
+      - workflow/greenfield/execution-flow.md  # re-used, already in context
+      - workflow/greenfield/templates/plan-template.md
+    phase_3_tasks:
+      - workflow/greenfield/templates/tasks-template.md
+    phase_4_implement:
+      - workflow/software-delivery/test-strategy.md   # BDD closure bridge
+      - enforcement/README.md
+  routing_evidence:
+    - knowledge/runtime/routing-registry.yaml#route.workflow.greenfield primary_source + required_dependencies
+    - greenfield route does NOT list any sd-intake/contracts/validation/closure surface as required
+    - candidate_sources lists workflow/software-delivery/execution-flow.md as a thin-index bridge (loaded only as index, not as sd-intake etc.)
+    - sd-test-strategy loaded via route.workflow.software-delivery hierarchical loading_surface workflow.software-delivery.test-strategy (load_when: "BDD closure, test strategy, mutation testing, test-first ordering")
+  budget_check:
+    actual_depth: 2          # route.greenfield → bridge into route.software-delivery → test-strategy surface
+    actual_runtime_dependencies: 6   # 1 primary + 1 readme + 3 templates + 1 bridge surface = 6
+    within_default_budget: false
+    override_invoked: true
+    override_reason: "Two-route bridge (greenfield → software-delivery.test-strategy) crosses route boundary — qualifies as task_complexity:high per Phase 1 dependency_budget override_when rule."
+    within_override_budget: true     # depth 3 / deps 6 under override
+  result: PASS
+  notes:
+    - "expected_load ⊆ loaded_actual: satisfied"
+    - "forbidden_load ∩ loaded_actual = ∅: satisfied (verified for all 11 forbidden entries)"
+    - "Cross-route bridge to sd-test-strategy worked WITHOUT pulling sd-intake / sd-contracts / sd-validation / sd-closure — slice boundary HELD across routes."
+    - "Greenfield route is 144-line non-monolithic and routed cleanly via existing entry; no retrieval contamination observed."
+
+decision_inputs_recorded:
+  - id: greenfield-second-pilot
+    observation: "Greenfield real-task execution loaded only greenfield surfaces + one bridge (sd-test-strategy). No connected over-load into unrelated sd lifecycle surfaces or other domains."
+    implication: "No measurable retrieval contamination → satisfies conditional 'no-split' criterion in plan §Phase 4 'greenfield/SDD 是否值得切分'. Greenfield should NOT be promoted to second pilot."
+  - id: sd-implementation-retention
+    observation: "Greenfield Implement phase reached into sd-test-strategy ONLY; sd-implementation surface was never requested. Bridge across routes works at lifecycle-phase granularity, not at sd-implementation granularity."
+    implication: "Even in cross-route consumption, sd-implementation as a standalone surface offers no incremental routing benefit — reinforces 'retained' decision from Scenario A."

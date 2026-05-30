@@ -1,0 +1,79 @@
+id: slice-load-scenario-a-execution-only
+category: software-delivery
+version: v1
+type: slice-load-boundary
+priority: P1
+source_plan: plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+source_phase: phase-4
+
+# Test-first fixture defined in Phase 1/2 (taxonomy §8) — Phase 4 executes.
+# Asserts loading-boundary correctness for an execution-only small change.
+
+given:
+  task_intent: "Add a server-side validation rule (max-length 64) to an existing API field. Contract stable, no architecture change, no new endpoint."
+  routing_entry: route.workflow.software-delivery
+  signals:
+    - existing_api
+    - small_diff
+    - contract_stable
+    - validation_rule_change
+
+when:
+  action: agent_loads_cognitive_surfaces_for_task
+
+then:
+  expected_load:
+    # Thin index + focused surfaces actually required by this intent
+    - workflow/software-delivery/execution-flow.md       # thin index navigation
+    - workflow/software-delivery/test-strategy.md        # BDD scenario for new rule
+    - workflow/software-delivery/validation.md           # validate old/new behavior + completion gate
+    - workflow/software-delivery/surgical-changes.md     # small-diff discipline
+  forbidden_load:
+    # MUST NOT load — execution-only small change should not pull these in
+    - workflow/software-delivery/intake.md               # contract stable, no new requirement
+    - workflow/software-delivery/contracts.md            # no contract surface change
+    - workflow/software-delivery/closure.md              # not at handoff yet
+    - workflow/software-delivery/examples/EXAMPLES.md    # default_load:false, user did not request examples
+    - workflow/software-delivery/development-process.md  # superseded by focused surfaces for this intent
+    - analysis/                                          # no evidence-acquisition needed
+    - workflow/apk-analysis/                             # wrong domain
+    - workflow/travel-planning/                          # wrong domain
+    - workflow/greenfield/                               # not a greenfield task
+    - architecture/ai-native-cognitive-ecosystem-system.md  # Gen 4 vision, irrelevant
+  dependency_budget:
+    default:
+      max_depth: 2
+      max_runtime_dependencies: 4
+    override_when:
+      task_complexity: high   # not applicable here; this is low-complexity
+
+evidence:
+  executed_on: 2026-05-30
+  executor: agent_walkthrough
+  loaded_actual:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/test-strategy.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/surgical-changes.md
+  routing_evidence:
+    - knowledge/runtime/routing-registry.yaml#route.workflow.software-delivery loading_surfaces
+    - intake.do_not_load_when: "contract is already stable and the task is a pure implementation"  # matches → skip
+    - contracts.do_not_load_when: "no contract or traceability surface changes"                    # matches → skip
+    - closure.do_not_load_when: "task is still in intake, implementation, or validation"           # matches → skip
+    - examples.default_load: false                                                                  # → skip
+    - surgical-caveats.load_when: "diff purity, surgical change discipline needed"                 # matches → load
+  budget_check:
+    actual_depth: 1          # all surfaces are siblings under one route, no recursive expansion
+    actual_runtime_dependencies: 4
+    within_default_budget: true
+  result: PASS
+  notes:
+    - "expected_load ⊆ loaded_actual: satisfied"
+    - "forbidden_load ∩ loaded_actual = ∅: satisfied"
+    - "dependency_budget respected (depth 1 ≤ 2, deps 4 ≤ 4)"
+    - "sd-implementation NOT loaded because its content currently lives inside execution-flow.md core; agent loads the thin-index file, then reads only the lifecycle sections it needs. This is the central evidence point for the Phase 2 stabilization decision."
+
+decision_inputs_recorded:
+  - id: sd-implementation-retention
+    observation: "Execution-only task did not require any standalone implementation surface; the §3/§4 content inside execution-flow.md was sufficient context-bundled with the thin index. No over-load symptom observed."
+    implication: "Promoting sd-implementation to its own file would add a hop without measurable reduction in unrelated context — supports 'retained' decision."
