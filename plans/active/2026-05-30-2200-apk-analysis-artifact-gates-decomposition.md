@@ -137,8 +137,16 @@ Parent plan §Phase 4 Extension 已記錄此 SPLIT 決定。但 parent plan scop
 
 ### Phase 1 — Slice Schema（繼承，無需重定義）
 
-- [ ] 在 [`governance/cognitive-slice-taxonomy.md`](../../governance/cognitive-slice-taxonomy.md) §7 新增 apk-analysis pilot section，列出 7 個 slice 與 Scenario F 已定義的欄位
-- [ ] 每個 slice 套用 parent plan §1 schema（14 欄）+ `dependency_budget` heuristic
+- [x] 在 [`governance/cognitive-slice-taxonomy.md`](../../governance/cognitive-slice-taxonomy.md) **§7.5 新增 apk-analysis pilot section**（採 Scheme B = **8 slice**，非 Scenario F 原列 7；§13/§14/§15 經 probe 證實獨立成 `apk-documentation-discipline`）
+- [x] 每個 slice 套用 parent plan §1 schema（14 欄）+ `dependency_budget` heuristic（全 default 2/4，無 high override）
+- [x] Granularity / placement / examples-suppression / extraction-direction 規則檢查通過（taxonomy §7.5 已記錄）
+
+**Phase 1 exit criteria**：
+- [x] Taxonomy 不重複 canonical source，artifact-gates 範圍內 8 slice 全為 workflow layer
+- [x] type+tags 收斂規則成立（7 execution + 1 failure；artifact-gate 為共通 tag）
+- [x] 每 slice 有明確 load_when / do_not_load_when
+- [x] 三層邊界與 placement predicate 通過：8 slice 均不跨入 analysis（evidence acquisition）或 intelligence（long-term pattern）
+- [x] Scheme A/B probe 完成（see [`slice-load-scenario-ag-schemes-a-vs-b.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-ag-schemes-a-vs-b.yaml)）— Scheme B 採用
 
 ### Phase 2 — Thin Index + Focused Slices
 

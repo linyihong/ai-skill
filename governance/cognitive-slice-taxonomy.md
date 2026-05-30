@@ -90,6 +90,38 @@ slice 最小單位 = **能獨立完成一個 cognitive phase**（非 step、非 
 
 ---
 
+## 7.5 APK-analysis artifact-gates pilot slice 盤點（second pilot，Phase 1 of follow-up plan 2026-05-30-2200）
+
+> 套用既有 taxonomy（§1 schema / §2 type+tags / §3 granularity / §4 三層 + placement / §5 examples suppression）。本 pilot **不引入新 type / 新規則**，僅應用驗證過的框架。所有 slice 留在既有 `workflow/apk-analysis/artifact-gates/` 子目錄（thin-index 旁的同層子資料夾，不新增 `slices/` 抽象層）。`dependency_budget` 全採 default 2/4；APK analysis 任務本身 high-complexity，但**單一 slice 載入**不會吃滿 budget。`canonical_source` 為 Phase 2 拆檔前在 `artifact-gates.md` 內的 heading 範圍對映。
+>
+> Scheme 決定：採 **Scheme B = 8 slice**（含 `documentation-discipline`）。Phase 0 heuristic 推薦 A，但 probe [`slice-load-scenario-ag-schemes-a-vs-b.yaml`](../validation/scenarios/software-delivery/slice-load-scenario-ag-schemes-a-vs-b.yaml) weighted across realistic task mix（65% 標準分析 / 20% doc-discipline 審閱 / 15% 全程含 doc）顯示 B 每 100 sessions 多省 ~7130 行 + 通過 granularity rule。
+
+| id | type | tags | load_when | do_not_load_when | canonical_source（artifact-gates.md heading） |
+|---|---|---|---|---|---|
+| `apk-ui-architecture-map` | execution | artifact-gate, ui | 建立或更新 APK UI architecture map（含 operation-to-API matrix） | 純後台 / 純網路分析無 UI 觀察需要 | §1 UI Architecture Map + §10 UI Architecture Map Template |
+| `apk-api-catalog` | execution | artifact-gate, api | 紀錄 API endpoint、request/response shape、authentication 細節 | 不涉及 API 文件化的純行為觀察 | §2 API Catalog + §11 API Catalog Detail Requirements |
+| `apk-domain-runtime-baseline` | execution | artifact-gate, domain | 紀錄 domain model / runtime baseline（state、cache、session）| 純 stateless 端點分析 | §3 Domain/Runtime Baseline |
+| `apk-feature-handoff` | execution | artifact-gate, handoff | 產出 feature reconstruction handoff（讓另一個 SDK / 應用能重建功能） | 探索期、尚未要 handoff | §4 Feature Reconstruction Handoff |
+| `apk-evidence-chain` | execution | artifact-gate, evidence | 記錄分析筆記 / 證據鏈 / 失敗 capture | 純 reference 查閱、無新 analysis | §5 單次分析筆記模板 + §6 證據鏈要求 + §7 失敗也要記錄 |
+| `apk-sanitization` | execution | artifact-gate, sanitization | 任何要對外公開或 commit 的 evidence / sample 需脫敏 | 純內部探索、尚未準備輸出 | §12 Sanitization Rules |
+| `apk-self-generation-audits` | failure | artifact-gate, security | 涉及 SDK live self-generation 或 authorized identity material 操作 | 任務無 self-generation / signing / identity 風險 | §8 SDK Live Self-Generation Audit + §9 Authorized Identity Material Self-Generation Audit |
+| `apk-documentation-discipline` | execution | artifact-gate, documentation, backfill | 撰寫 / 審閱 developer guidance、feedback lessons、或為既有專案做文件回填 | 純分析執行中、尚未到文件撰寫階段 | §13 Developer Guidance Notes + §14 Feedback Lesson Writing Tips + §15 Backfill Rules |
+
+**layer_justification（全 slice 共通）**：每條都規定「在 artifact-gates 範圍內要產出什麼 artifact、要過哪些 gate」，通過 workflow membership test；無一是 evidence-acquisition 方法（那屬 `analysis/apk/`，已由 parent plan Scenario H 確認 KEEP_SEPARATE）或長期 pattern 論證（非 intelligence）。`apk-self-generation-audits` 用 `type: failure` 因其本質是「不照規矩做會造成 identity / security 失誤」的 caveat / red-line 規則（同 `sd-surgical-caveats` 模式）。
+
+**Granularity check**：
+- 最小 slice 是 `apk-domain-runtime-baseline`（§3，33 行）— 仍是一個獨立 cognitive phase（建立 baseline 而非紀錄具體 endpoint）。
+- 最大 slice 是 `apk-api-catalog`（§2 + §11 = 144 行）— 仍為單一 cognitive phase（產出完整 API 文件），不可再分。
+- `apk-documentation-discipline` 來自 probe override（見上）；§13 / §14 / §15 合計 ~57 行雖小但確為與 evidence-chain 不同的 cognitive phase（meta：怎麼寫好），probe 顯示獨立載入經濟性最佳。
+
+**Dependency budget**：default 2/4；無 slice 需要 high override（每 slice 自足，跨 slice 引用主要是 cross-link 而非 dependency chain）。
+
+**Examples suppression rule（§5）n/a**：本 pilot 無 `type: examples` slice。
+
+**Conditional 子流程（不另開 slice）**：無；APK domain 在 artifact-gates 範圍內無 embedded / backfill 級別的 conditional 分支（backfill 屬於 software-delivery 的 sd-intake）。
+
+---
+
 ## 8. Phase 4 test-first fixtures（草稿，待 Phase 4 執行）
 
 > 形狀對齊 plan §Phase 4。斷言：`expected_load` ⊆ loaded、`forbidden_load` ∩ loaded = ∅、載入深度/廣度未超 `dependency_budget`。驗證須檢查**實際載入的 surface**，非僅 route 存在。
