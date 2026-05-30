@@ -3,7 +3,7 @@ category: software-delivery
 version: v1
 type: slice-load-boundary
 priority: P1
-source_plan: plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+source_plan: plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
 source_phase: phase-4
 
 # Real-task end-to-end validation. Uses repo's existing route.workflow.greenfield

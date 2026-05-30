@@ -1,9 +1,10 @@
 # Gen3 Workflow and Analysis Cognitive Slice Decomposition
 
-**Status**: `in-progress`
+**Status**: `completed (auto-detected)`
 **世代**：Gen 3 current hardening；Gen 4 prerequisite
 **建立日期**：2026-05-29
-**最後更新**：2026-05-29
+**最後更新**：2026-05-30
+**完成日期**：2026-05-30
 **Pilot 決定**：`workflow/software-delivery/`（stakeholder 同意 2026-05-29）
 **Glossary 決定**：`Cognitive Slice` 正式註冊刻意延後至 Phase 4 validation 之後；過渡期一律用 `loading/execution/evidence surface` 既有措辭（stakeholder 同意 2026-05-29，external review 採納）
 
@@ -104,14 +105,16 @@ Gen 4 只承接後續：
 
 ### ADR Promotion Criteria（completed 時驗證）
 
-- [ ] High-frequency `workflow/` 與 `analysis/` surfaces 已完成 inventory。
-- [ ] 至少一個 oversized / multi-topic workflow 或 analysis surface 已轉為 thin index + focused slices。
-- [ ] 每個 slice 都有 `load_when` / owner / dependency / validation signal。
-- [ ] Summary-first loading path 已更新或明確標記 not applicable。
-- [ ] Routing registry / README / architecture links 已檢查並完成必要同步。
-- [ ] 至少 3 個 validation scenarios 覆蓋 execution-only task / evidence-only task / mixed workflow+analysis task。
-- [ ] Open Questions 全部解決或轉為明確 follow-up plan。
-- [ ] 實際 agent session 能證明不再為 execution-only / evidence-only 小任務載入整份 workflow+analysis surface。
+- [x] High-frequency `workflow/` 與 `analysis/` surfaces 已完成 inventory。（Phase 0 + Phase 4 Extension Scenario F/G/H）
+- [x] 至少一個 oversized / multi-topic workflow 或 analysis surface 已轉為 thin index + focused slices。（software-delivery：6 lifecycle surface 已拆，1 retained，1 pre-existing examples）
+- [x] 每個 slice 都有 `load_when` / owner / dependency / validation signal。（taxonomy §7）
+- [x] Summary-first loading path 已更新或明確標記 not applicable。（Phase 3 `knowledge/summaries/development-guidance.md`）
+- [x] Routing registry / README / architecture links 已檢查並完成必要同步。（Phase 3 + Phase 5 link audit 通過）
+- [x] 至少 3 個 validation scenarios 覆蓋 execution-only task / evidence-only task / mixed workflow+analysis task。（**達到 5 個 + 3 個 probe** A/B/C/D/E + F/G/H 全 PASS）
+- [x] Open Questions 全部解決或轉為明確 follow-up plan。（glossary 註冊已執行；apk-analysis artifact-gates 已開 follow-up plan）
+- [x] 實際 agent session 能證明不再為 execution-only / evidence-only 小任務載入整份 workflow+analysis surface。（Scenario A / B 證據）
+
+**ADR Promotion 評估結論（2026-05-30）**：所有 8 條 criteria 全達標。三層邊界規則 + placement predicate + cognitive_slice taxonomy 滿足 foundational + cross-session + cross-project + expensive-to-reverse + explains-why 五要素，建議升 ADR。**但 ADR 撰寫屬難逆轉的 framework decision**，留給 stakeholder 在 follow-up turn 啟動，不在本 plan archive 流程內單方面升級。建議路徑：開新 plan `<date>-cognitive-slice-taxonomy-adr-promotion.md` 處理 ADR 撰寫 + ADR-007 lighter-target 評估。
 
 ### Consequences
 
@@ -261,9 +264,9 @@ evidence:
 - [x] Phase 2 完成至少一個 workflow 或 analysis surface 的 thin index 化。
 - [x] Phase 3 完成 loading rules、summary links、routing links 或明確 not applicable。
 - [x] Phase 4 補足 validation scenarios 或明確說明 doc-only trial 的 validation substitute。（Scenario A/B/C/D/E 全 PASS，evidence 見 `validation/scenarios/software-delivery/slice-load-scenario-*.yaml`）
-- [ ] Phase 5 完成 linked updates、link audit、runtime refresh（若適用）。
-- [ ] 若引入新 framework vocabulary，更新 glossary 或明確拒絕並說明理由。
-- [ ] Plan Completion Closure：所有 checklist 完成後，執行 `plans/README.md` 的 archival / status / commit / push 閉環。
+- [x] Phase 5 完成 linked updates、link audit、runtime refresh（若適用）。（link audit 通過；無 generated surface 變更故不需 runtime refresh）
+- [x] 若引入新 framework vocabulary，更新 glossary 或明確拒絕並說明理由。（`cognitive_slice` 已註冊於 `knowledge/glossary/ai-skill.md`）
+- [x] Plan Completion Closure：所有 checklist 完成後，執行 `plans/README.md` 的 archival / status / commit / push 閉環。
 
 ---
 
@@ -641,9 +644,9 @@ Phase 4 exit criteria：
 - [ ] 若改 routing / validation / runtime source，執行 runtime compile / refresh / validate。
 - [ ] **Follow-up handoff（mandatory before archive）**：Phase 4 Extension 已決定 SPLIT `workflow/apk-analysis/artifact-gates.md`。本 plan archive 前**必須**確認 follow-up plan skeleton 已建立並 commit：
   - [x] follow-up plan draft 已建立：[`2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md`](2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md)（status `draft-skeleton`，繼承本 plan taxonomy / 三層規則 / dependency_budget / scenario fixture 模板；7 slice 與 acceptance criteria 已預定義）
-  - [ ] follow-up plan 已連回本 plan §Phase 4 Extension 與 Scenario F evidence
-- [ ] 更新本 plan 狀態與完成日期。
-- [ ] 執行 Plan Completion Closure，完成 archive / commit / push / readback。
+  - [x] follow-up plan 已連回本 plan §Phase 4 Extension 與 Scenario F evidence（follow-up plan §Decision Rationale 與 §Inheritance 表已連結）
+- [x] 更新本 plan 狀態與完成日期。
+- [x] 執行 Plan Completion Closure，完成 archive / commit / push / readback。
 
 Phase 5 exit criteria：
 

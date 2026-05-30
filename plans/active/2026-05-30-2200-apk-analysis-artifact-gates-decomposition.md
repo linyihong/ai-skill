@@ -4,7 +4,7 @@
 **世代**：Gen 3 runtime hardening（second pilot applying validated framework）
 **建立日期**：2026-05-30
 **最後更新**：2026-05-30
-**Parent plan**：[`2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) — provides taxonomy, three-layer rule, dependency_budget heuristic, scenario fixture template, and the placement predicate this plan applies.
+**Parent plan**：[`2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](../archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) — provides taxonomy, three-layer rule, dependency_budget heuristic, scenario fixture template, and the placement predicate this plan applies.
 **Pilot 決定**：`workflow/apk-analysis/artifact-gates.md`（575 行，12 個 gate）
 
 > 本 plan 不重新設計 framework。它套用 parent plan Phase 1–4 已驗證的 cognitive slice taxonomy（[`governance/cognitive-slice-taxonomy.md`](../../governance/cognitive-slice-taxonomy.md)）把 `workflow/apk-analysis/artifact-gates.md` 切成 focused gate slices。
@@ -109,5 +109,5 @@ Parent plan §Phase 4 Extension 已記錄此 SPLIT 決定。但 parent plan scop
 
 ## 與其他 plans 的關係
 
-- Parent: [`2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md)
+- Parent: [`2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](../archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md)
 - Sibling (potential, deferred): travel-planning 二次 probe plan

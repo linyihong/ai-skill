@@ -55,6 +55,33 @@ related-terms:
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```
 
+## cognitive_slice
+
+```yaml
+term: cognitive_slice
+status: canonical
+owner-layer: governance
+meaning: >
+  可被獨立載入、驗證、路由的最小認知單元（minimum routable cognition unit）。
+  每個 slice 有單一 cognitive phase 責任、明確 load_when / do_not_load_when、
+  owner_layer 歸屬（workflow / analysis / intelligence 三層之一），並通過該層
+  falsifiable membership predicate。
+operational-wording: >
+  對外文件使用 `execution surface` / `evidence surface` / `loading surface`
+  作為較 runtime-oriented 的同義表達。`slice` 為 governance / 內部設計用語。
+schema-spec: governance/cognitive-slice-taxonomy.md §1
+placement-predicate: governance/cognitive-slice-taxonomy.md §4
+affects:
+  - governance/cognitive-slice-taxonomy.md
+  - knowledge/runtime/routing-registry.yaml (loading_surfaces under hierarchical routes)
+  - validation/scenarios/software-delivery/slice-load-scenario-*.yaml
+anti-meaning: >
+  不是 arbitrary chunk / static partition；不是 file split for cosmetic reasons；
+  不是 ecosystem activation graph（Gen 4 vision，非本 term 涵蓋）。
+introduced-by: plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+promoted-at: 2026-05-30 (after Phase 4 validation A/B/C/D/E all PASS proving taxonomy stability)
+```
+
 ## compression
 
 ```yaml

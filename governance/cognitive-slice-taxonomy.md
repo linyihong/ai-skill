@@ -2,7 +2,7 @@
 
 **Status**: `phase-3-loading-linked`（taxonomy 已定義並套用 software-delivery pilot；Phase 2 已抽出 6 個 focused surfaces + 1 pre-existing examples surface，`sd-implementation` 依 stakeholder 決定暫留 execution-flow core；Phase 3 已將 focused surfaces 掛到 existing hierarchical route / executable contract / graph / summary，fixtures 為 test-first 草稿待 Phase 4 執行）
 **Owner layer**: governance
-**來源 plan**: [`plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](../plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) §Phase 1
+**來源 plan**: [`plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](../plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) §Phase 1
 **命名決定**：見 §6。framework vocabulary 正式註冊**延後至 Phase 4 validation**；本檔過渡期一律用 `execution / evidence surface` 措辭。
 
 > 本檔源自 Phase 1 taxonomy 產出：定義 slice schema + 5 條治理規則，並把它們**套用到 software-delivery pilot**（§7 slice 盤點）。Phase 2 已完成 focused surface extraction 的主要部分；Phase 3 已完成 loading/routing link 同步；scenario 執行在 Phase 4。

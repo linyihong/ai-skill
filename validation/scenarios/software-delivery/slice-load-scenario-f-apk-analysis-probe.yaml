@@ -3,7 +3,7 @@ category: software-delivery
 version: v1
 type: domain-split-probe
 priority: P2
-source_plan: plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+source_plan: plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
 source_phase: phase-4-extension
 
 # Probe-then-decide for workflow/apk-analysis (artifact-gates.md 575 lines,
