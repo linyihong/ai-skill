@@ -1,11 +1,11 @@
 # Cognitive Slice / Surface Taxonomy（Phase 1 complete）
 
-**Status**: `phase-1-complete`（taxonomy 已定義並套用 software-delivery pilot；**實體切檔留待 Phase 2**，fixtures 為 test-first 草稿待 Phase 4 執行）
+**Status**: `phase-3-loading-linked`（taxonomy 已定義並套用 software-delivery pilot；Phase 2 已抽出 6 個 focused surfaces + 1 pre-existing examples surface，`sd-implementation` 依 stakeholder 決定暫留 execution-flow core；Phase 3 已將 focused surfaces 掛到 existing hierarchical route / executable contract / graph / summary，fixtures 為 test-first 草稿待 Phase 4 執行）
 **Owner layer**: governance
 **來源 plan**: [`plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](../plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) §Phase 1
 **命名決定**：見 §6。framework vocabulary 正式註冊**延後至 Phase 4 validation**；本檔過渡期一律用 `execution / evidence surface` 措辭。
 
-> 本檔是 Phase 1 的 taxonomy 產出：定義 slice schema + 5 條治理規則，並把它們**套用到 software-delivery pilot**（§7 slice 盤點）。Phase 1 **不改任何 pilot 檔案內容**；實體拆檔在 Phase 2，scenario 執行在 Phase 4。
+> 本檔源自 Phase 1 taxonomy 產出：定義 slice schema + 5 條治理規則，並把它們**套用到 software-delivery pilot**（§7 slice 盤點）。Phase 2 已完成 focused surface extraction 的主要部分；Phase 3 已完成 loading/routing link 同步；scenario 執行在 Phase 4。
 
 ---
 
@@ -78,7 +78,7 @@ slice 最小單位 = **能獨立完成一個 cognitive phase**（非 step、非 
 | `sd-intake` | execution | requirements, parity, intake, domain-specific（backfill） | 接收新需求 / 變更 / 重構意圖、需求認知盤點、product brief 驗證、既有專案回填 | 已有明確 contract、純執行既定改動 | **`intake.md`（Phase 2 已實體拆檔，跨檔同批：原 execution-flow §1 + §6 Backfill + development-process §Initial Doc Pack / §Product Brief Validation Gate / §Change Intake Gate / §Missing Information Gate / §Existing Project Documentation Backfill）** |
 | `sd-contracts` | execution | artifact-gate, contract, traceability | 需建立 / 治理 contract 與可追溯性 | 無 contract 異動的小改 | **`contracts.md`（Phase 2 已實體拆檔，原 development-process §Required Contracts / Contract Governance / Traceability / Contract-First Rules）** |
 | `sd-test-strategy` | execution | artifact-gate, test, bdd | 定義測試策略 / BDD 閉環 / test-first ordering | 不涉測試設計的純文件改動 | **`test-strategy.md`（Phase 2 已實體拆檔，跨檔同批：原 execution-flow §2 + §4 子節「測試策略定義」+「Test-First Ordering」+ development-process §BDD Execution Closure + §Test Strategy Gate 含 Mutation Testing）** |
-| `sd-implementation` | execution | execution-order, surgical | 實際進行程式碼變更（核心執行順序） | evidence-only / 純分析任務 | execution-flow §3、§4、§驗證前的執行核心 |
+| `sd-implementation` | execution | execution-order, domain-specific（embedded） | 實際進行程式碼變更（核心執行順序） | evidence-only / 純分析任務 | **暫留 `execution-flow.md` §3/§4 + `development-process.md` embedded / producer-consumer fallback**。依 stakeholder 2026-05-30 決定，Phase 3/4 用 routing / validation evidence 判斷是否需要獨立 `implementation.md`；目前不拆以避免 over-fragmentation。 |
 | `sd-surgical-caveats` | failure | caveat, surgical, diff-purity | 進行外科手術式小改、需控制 diff 純度 / orphan | 大型新功能初始實作 | **`surgical-changes.md`（Phase 2 已實體拆檔，原 execution-flow §9.1–9.5）** |
 | `sd-validation` | execution | artifact-gate, validation, performance | 驗證變更 / 效能關卡 | 尚未實作完成前 | **`validation.md`（Phase 2 已實體拆檔，原 execution-flow §5 Perf Gate + §7 Validate）** |
 | `sd-closure` | execution | closure, handoff, extraction-to-intelligence | 收尾、DoR/DoD 檢核、回饋可重用課程 | 任務中段 | **`closure.md`（Phase 2 已實體拆檔，原 execution-flow §8 + development-process §DoR / §DoD）** |

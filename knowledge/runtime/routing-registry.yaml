@@ -846,6 +846,12 @@ records:
     required_dependencies:
       - governance/ai-runtime-governance/software-delivery-governance.md
       - workflow/software-delivery/artifact-gates.md
+      - workflow/software-delivery/intake.md
+      - workflow/software-delivery/contracts.md
+      - workflow/software-delivery/test-strategy.md
+      - workflow/software-delivery/validation.md
+      - workflow/software-delivery/closure.md
+      - workflow/software-delivery/surgical-changes.md
       - enforcement/README.md
       - enforcement/linked-updates.md
       - intelligence/engineering/requirements/README.md
@@ -879,6 +885,50 @@ records:
       - knowledge/graphs/workflow-software-delivery.yaml
       - knowledge/graphs/workflow-software-delivery-architecture.yaml
       - knowledge/graphs/ddd-architecture-governance.yaml
+    loading_surfaces:
+      workflow.software-delivery.intake:
+        source: workflow/software-delivery/intake.md
+        load_when:
+          - new requirement, change intake, refactor or replacement parity, requirements cognition, product brief validation, missing information, or existing-project backfill is needed
+        do_not_load_when:
+          - contract is already stable and the task is a pure implementation or evidence-only task
+      workflow.software-delivery.contracts:
+        source: workflow/software-delivery/contracts.md
+        load_when:
+          - contract governance, traceability, API/domain/error contract, or contract-first discipline is needed
+        do_not_load_when:
+          - no contract or traceability surface changes
+      workflow.software-delivery.test-strategy:
+        source: workflow/software-delivery/test-strategy.md
+        load_when:
+          - BDD closure, test strategy, mutation testing, or test-first ordering is needed
+        do_not_load_when:
+          - task does not touch behavior proof or test design
+      workflow.software-delivery.validation:
+        source: workflow/software-delivery/validation.md
+        load_when:
+          - validation, performance gate, old/new behavior proof, or completion evidence is needed
+        do_not_load_when:
+          - implementation has not reached validation or task is evidence-only analysis
+      workflow.software-delivery.closure:
+        source: workflow/software-delivery/closure.md
+        load_when:
+          - Definition of Ready/Done, handoff, close-loop, or reusable lesson feedback is needed
+        do_not_load_when:
+          - task is still in intake, implementation, or validation
+      workflow.software-delivery.surgical-caveats:
+        source: workflow/software-delivery/surgical-changes.md
+        load_when:
+          - surgical change discipline, diff purity, or orphan cleanup boundary is needed
+        do_not_load_when:
+          - large greenfield implementation or evidence-only analysis
+      workflow.software-delivery.examples:
+        source: workflow/software-delivery/examples/EXAMPLES.md
+        default_load: false
+        load_when:
+          - user explicitly asks for examples or ambiguity requires concrete behavior examples
+        do_not_load_when:
+          - default execution-only, evidence-only, or mixed workflow task
     project_overlays:
       - when_repo_contains: apk-analysis-sdk/runtime/workflow-activation.yaml
         load_after_workflow_entry: true
@@ -903,8 +953,10 @@ records:
       software-delivery-governance 承接 docs-first BDD closure intelligence，作為 change intake、
       pre-build interrogation、contract precedence、BDD closure、artifact completeness、test strategy 與 performance evidence gate。
       觸發由 workflow/software-delivery/README.md 定義；**不**另立 route.project.*。
+      Phase 3 loading surfaces 掛在同一 hierarchical route 下，不新增 flat leaf routes；agent 先讀 execution-flow thin index，
+      再依 task intent 載入 intake / contracts / test-strategy / validation / closure / surgical caveats 等 focused surfaces。
       若 repo 含 apk-analysis-sdk/runtime/workflow-activation.yaml，在進入本 workflow 後載入 project_overlays（專案 gate，非平行 routing）。
-    validation_signal: Pre-build interrogation、change intake、requirements cognition、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence、same-session closure 與 architecture fit analysis 已檢查；workflow、analysis、intelligence、metadata 與 governance 內容已分離。
+    validation_signal: Pre-build interrogation、change intake、requirements cognition、contract precedence、BDD closure、artifact completeness、test strategy、performance evidence、same-session closure、surgical-change discipline 與 architecture fit analysis 已檢查；workflow、analysis、intelligence、metadata 與 governance 內容已分離，且 software-delivery focused loading surfaces 可由同一 hierarchical route 找到。
     metadata:
       priority: P1
       confidence: high

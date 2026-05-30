@@ -12,8 +12,38 @@ edges:
 
   - type: related_to
     target: workflow/software-delivery/execution-flow.md
-    reason: App development guidance 的具體執行步驟 — Start From Evidence、Change Intake、Docs-first BDD closure loop、SDK defect closure loop、Same-session closure、Performance test gate、Backfill rules、Validate、Feed Back、Surgical Changes Rules。
-    validation: execution-flow.md 定義 9 個 workflow sections（§9 Surgical Changes Rules 為新增），從 skills/app-development-guidance/WORKFLOW.md（已刪除）提取。
+    reason: Software-delivery execution-order thin index；保留 SDK defect closure 與 same-session implementation core，並路由到 focused loading surfaces。
+    validation: execution-flow.md 定義 software-delivery cognitive phase navigation；intake / test-strategy / validation / closure / surgical caveats 已抽出為 focused surfaces。
+
+  - type: related_to
+    target: workflow/software-delivery/intake.md
+    reason: 需求接收、Change Intake、Pre-build Interrogation、Requirements Cognition、Parity Gate、Product Brief Validation、Missing Information 與既有專案 backfill 的 focused execution surface。
+    validation: intake.md 由 execution-flow.md §1/§6 與 development-process.md 對應 gates 跨檔同批抽出；來源段落保留 redirect stub。
+
+  - type: related_to
+    target: workflow/software-delivery/contracts.md
+    reason: Contract governance、traceability、required contracts 與 contract-first discipline 的 focused execution surface。
+    validation: contracts.md 由 development-process.md 的 Required Contracts、Contract Governance、Traceability 與 Contract-First Rules 抽出；來源段落保留 redirect stub。
+
+  - type: related_to
+    target: workflow/software-delivery/test-strategy.md
+    reason: Docs-first BDD closure、test strategy、mutation testing 與 test-first ordering 的 focused execution surface。
+    validation: test-strategy.md 由 execution-flow.md §2/§4 子節與 development-process.md BDD/Test Strategy gates 跨檔同批抽出；來源段落保留 redirect stub。
+
+  - type: related_to
+    target: workflow/software-delivery/validation.md
+    reason: Validation、performance gate、old/new behavior proof 與 completion evidence 的 focused execution surface。
+    validation: validation.md 由 execution-flow.md §5/§7 抽出；來源段落保留 redirect stub。
+
+  - type: related_to
+    target: workflow/software-delivery/closure.md
+    reason: Definition of Ready/Done、handoff、close-loop 與 reusable lesson feedback 的 focused execution surface。
+    validation: closure.md 由 execution-flow.md §8 與 development-process.md DoR/DoD 跨檔同批抽出；來源段落保留 redirect stub。
+
+  - type: related_to
+    target: workflow/software-delivery/surgical-changes.md
+    reason: Surgical change discipline、diff purity 與 orphan cleanup boundary 的 focused failure surface。
+    validation: surgical-changes.md 由 execution-flow.md §9 抽出；examples remain suppressed unless explicitly requested.
 
   - type: related_to
     target: workflow/software-delivery/artifact-gates.md
@@ -27,8 +57,8 @@ edges:
 
   - type: related_to
     target: workflow/software-delivery/development-process.md
-    reason: Contract-first 開發流程 — Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Test Strategy Gate、Definition of Ready/Done。
-    validation: development-process.md 定義 14 個流程階段，從 skills/app-development-guidance/process/README.md（已刪除）提取。
+    reason: Contract-first 開發流程 index；保留 Default Flow、embedded/hardware flow、producer/consumer fallback 與仍未獨立拆出的 implementation core。
+    validation: development-process.md 的 intake / contracts / test-strategy / closure 內容已改為 focused surface redirects，避免 dual source-of-truth。
 
   - type: related_to
     target: workflow/software-delivery/review-checklist.md
@@ -62,11 +92,11 @@ edges:
 
   - type: routes_to
     target: knowledge/runtime/routing-registry.yaml
-    reason: Registry 應提供 route.workflow.app-development-guidance record。
-    validation: registry record 的 primary_source 指向 workflow/software-delivery/README.md。
+    reason: Registry 提供 route.workflow.software-delivery record 與同一 hierarchical route 下的 focused loading surfaces。
+    validation: registry record 的 primary_source 指向 workflow/software-delivery/execution-flow.md；loading_surfaces 指向 focused software-delivery surfaces，未新增 flat leaf routes。
 
 metadata:
   priority: P2
   confidence: medium
   compatibility_state: new-layer-promoted
-  last_checked: 2026-05-12
+  last_checked: 2026-05-30

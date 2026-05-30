@@ -33,6 +33,12 @@ required_sources:
   - workflow/software-delivery/execution-flow.md
   - workflow/software-delivery/artifact-gates.md
   - workflow/software-delivery/development-process.md
+  - workflow/software-delivery/intake.md
+  - workflow/software-delivery/contracts.md
+  - workflow/software-delivery/test-strategy.md
+  - workflow/software-delivery/validation.md
+  - workflow/software-delivery/closure.md
+  - workflow/software-delivery/surgical-changes.md
   - workflow/software-delivery/requirements/README.md
   - workflow/software-delivery/requirements/pre-build-interrogation.md
   - workflow/software-delivery/architecture/README.md
@@ -41,10 +47,55 @@ required_sources:
   - enforcement/sanitization.md
   - enforcement/linked-updates.md
 
+loading_surfaces:
+  intake:
+    source: workflow/software-delivery/intake.md
+    load_when:
+      - new requirement, change intake, refactor or replacement parity, requirements cognition, product brief validation, missing information, or existing-project backfill is needed
+    do_not_load_when:
+      - contract is stable and task is pure implementation or evidence-only analysis
+  contracts:
+    source: workflow/software-delivery/contracts.md
+    load_when:
+      - contract governance, traceability, API/domain/error contracts, or contract-first discipline is needed
+    do_not_load_when:
+      - no contract or traceability surface changes
+  test_strategy:
+    source: workflow/software-delivery/test-strategy.md
+    load_when:
+      - BDD closure, test strategy, mutation testing, or test-first ordering is needed
+    do_not_load_when:
+      - task does not touch behavior proof or test design
+  validation:
+    source: workflow/software-delivery/validation.md
+    load_when:
+      - validation, performance gate, old/new behavior proof, or completion evidence is needed
+    do_not_load_when:
+      - implementation has not reached validation or task is evidence-only analysis
+  closure:
+    source: workflow/software-delivery/closure.md
+    load_when:
+      - Definition of Ready/Done, handoff, close-loop, or reusable lesson feedback is needed
+    do_not_load_when:
+      - task is still in intake, implementation, or validation
+  surgical_caveats:
+    source: workflow/software-delivery/surgical-changes.md
+    load_when:
+      - surgical change discipline, diff purity, or orphan cleanup boundary is needed
+    do_not_load_when:
+      - large greenfield implementation or evidence-only analysis
+  examples:
+    source: workflow/software-delivery/examples/EXAMPLES.md
+    default_load: false
+    load_when:
+      - user explicitly asks for examples or ambiguity requires concrete behavior examples
+    do_not_load_when:
+      - default execution-only, evidence-only, or mixed workflow task
+
 steps:
   - id: start_from_evidence
     order: 1
-    action: Define goal, action, validation, observed behavior, evidence layer, and confidence before promoting guidance or changing code.
+    action: Load the intake surface when needed, then define goal, action, validation, observed behavior, evidence layer, and confidence before promoting guidance or changing code.
     gates:
       - gate.software_delivery.evidence_classified
   - id: run_change_intake
@@ -76,7 +127,7 @@ steps:
       - gate.software_delivery.replacement_parity_ready
   - id: keep_docs_first_bdd_closure
     order: 6
-    action: Update owner contracts, human-readable behavior specs, executable behavior tests, implementation, and traceability in the same batch when behavior changes.
+    action: Load the test-strategy and contracts surfaces when behavior or contract changes require them, then update owner contracts, human-readable behavior specs, executable behavior tests, implementation, and traceability in the same batch.
     required_if:
       - observable_behavior_change
     gates:
@@ -88,17 +139,17 @@ steps:
       - sdk_defect_reported
   - id: define_test_strategy
     order: 8
-    action: Define old behavior regression, new behavior proof, mutation/negative checks, persistence/integration tests, and hardware/performance evidence when relevant.
+    action: Load the test-strategy surface, then define old behavior regression, new behavior proof, mutation/negative checks, persistence/integration tests, and hardware/performance evidence when relevant.
     gates:
       - gate.software_delivery.validation_target_defined
   - id: run_performance_gate
     order: 9
-    action: For performance-sensitive changes, define latency, throughput, error-rate, and resource budgets plus load/stress/spike/soak evidence.
+    action: Load the validation surface for performance-sensitive changes, then define latency, throughput, error-rate, and resource budgets plus load/stress/spike/soak evidence.
     required_if:
       - performance_sensitive_change_detected
   - id: validate_and_close
     order: 10
-    action: Run at least one validation method, check blockers, update durable docs, feed reusable lessons when appropriate, and report scope honestly.
+    action: Load validation and closure surfaces as needed, run at least one validation method, check blockers, update durable docs, feed reusable lessons when appropriate, and report scope honestly.
     gates:
       - gate.software_delivery.validation_complete
 

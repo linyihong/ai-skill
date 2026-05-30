@@ -7,15 +7,16 @@
 當工作任務需要**開發、實作、修改程式碼、進行 code review / design review / release review** 時，agent 應自行判斷並載入本 workflow。不需要 runtime 觸發——agent 知道什麼時候需要開發。
 
 進入方式：
-1. 讀取 [`execution-flow.md`](execution-flow.md) 了解執行流程
-2. 依流程的 Step 1（Start From Evidence）開始
-3. 需要 artifact 規範時參考 [`artifact-gates.md`](artifact-gates.md)
-4. 需要審查檢查清單時參考 [`review-checklist.md`](review-checklist.md)
-5. 需要完整開發流程時參考 [`development-process.md`](development-process.md)
-6. 需要 pre-build interrogation / product impact alignment / requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
-7. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
-8. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)
-9. PR 觸動效能敏感路徑或含 AI 生成程式碼時，執行 [`perf-risk-gate.md`](perf-risk-gate.md) 的 5 步檢查（靜態 anti-pattern scan、hot-path micro-benchmark、reviewer perf checklist、pre-deploy observability gate、canary rollout）
+1. 讀取 [`execution-flow.md`](execution-flow.md) thin index 了解執行流程與 focused loading surfaces
+2. 依 task intent 載入需要的 execution surface：[`intake.md`](intake.md)、[`contracts.md`](contracts.md)、[`test-strategy.md`](test-strategy.md)、[`validation.md`](validation.md)、[`closure.md`](closure.md)、[`surgical-changes.md`](surgical-changes.md)
+3. 依流程的 Start From Evidence / Change Intake 開始；新需求、重構、parity、缺失資訊或既有專案回填時載入 [`intake.md`](intake.md)
+4. 需要 artifact 規範時參考 [`artifact-gates.md`](artifact-gates.md)
+5. 需要審查檢查清單時參考 [`review-checklist.md`](review-checklist.md)
+6. 需要完整開發流程 overview 或 embedded / producer-consumer fallback 時參考 [`development-process.md`](development-process.md)
+7. 需要 pre-build interrogation / product impact alignment / requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
+8. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
+9. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)；examples 預設 suppress，僅在明確要求範例或 ambiguity 時載入
+10. PR 觸動效能敏感路徑或含 AI 生成程式碼時，執行 [`perf-risk-gate.md`](perf-risk-gate.md) 的 5 步檢查（靜態 anti-pattern scan、hot-path micro-benchmark、reviewer perf checklist、pre-deploy observability gate、canary rollout）
 
 ## Scope
 
@@ -75,6 +76,12 @@
 |------|------|------|
 | [`execution-flow.md`](execution-flow.md) | `WORKFLOW.md` §1, §5-8（已刪除） | Start From Evidence、Change Intake、BDD Closure Loop、SDK Defect Closure、Same-Session Closure、Performance Gate、Backfill Rules、Validate |
 | [`execution-flow.yaml`](execution-flow.yaml) | `execution-flow.md` | Software delivery execution executable contract：change intake、requirements、BDD closure、parity、performance、validation gates |
+| [`intake.md`](intake.md) | `execution-flow.md` §1/§6 + `development-process.md` intake gates | Focused execution surface：需求接收、Change Intake、Pre-build Interrogation、Requirements Cognition、Parity Gate、Product Brief Validation、Missing Information、Backfill |
+| [`contracts.md`](contracts.md) | `development-process.md` contract gates | Focused execution surface：Required Contracts、Contract Governance、Traceability、Contract-First Rules |
+| [`test-strategy.md`](test-strategy.md) | `execution-flow.md` §2/§4 子節 + `development-process.md` BDD/Test Strategy gates | Focused execution surface：Docs-first BDD closure、test strategy、mutation testing、test-first ordering |
+| [`validation.md`](validation.md) | `execution-flow.md` §5/§7 | Focused execution surface：validation、performance gate、old/new behavior proof、completion evidence |
+| [`closure.md`](closure.md) | `execution-flow.md` §8 + `development-process.md` DoR/DoD | Focused execution surface：Definition of Ready/Done、handoff、close-loop、reusable lesson feedback |
+| [`surgical-changes.md`](surgical-changes.md) | `execution-flow.md` §9 | Focused failure surface：surgical change discipline、diff purity、orphan cleanup boundary |
 | [`requirements/pre-build-interrogation.md`](requirements/pre-build-interrogation.md) | mattpocock/skills `/grill-me` pattern + Ai-skill framework failure learning | Plan / implementation 前的需求拷問、framework discovery 與 source-of-truth duplication gate |
 | [`artifact-gates.md`](artifact-gates.md) | `DOCUMENTATION.md`（已刪除） | Reusable Note Structure、Content Classification、Guidance Boundary、Linked Update Statement、Good Guidance Criteria |
 | [`artifact-gates.yaml`](artifact-gates.yaml) | `artifact-gates.md` | Software delivery artifact executable contract：artifact shape、owner layer、sanitization、linked updates、quality gates |

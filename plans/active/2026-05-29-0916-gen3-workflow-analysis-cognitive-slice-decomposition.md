@@ -258,8 +258,8 @@ evidence:
 - [x] Status 從 `draft` 更新為 `in-progress`（Phase 0–1 完成，Phase 2–5 待續）。
 - [x] Phase 0 完成 workflow / analysis source inventory 與 architecture compatibility preflight。
 - [x] Phase 1 定義 workflow / analysis slice taxonomy 與 owner-layer decision（`governance/cognitive-slice-taxonomy.md`，status `phase-1-complete`；software-delivery pilot 8-slice 全 owner_layer:workflow）。
-- [ ] Phase 2 完成至少一個 workflow 或 analysis surface 的 thin index 化。
-- [ ] Phase 3 完成 loading rules、summary links、routing links 或明確 not applicable。
+- [x] Phase 2 完成至少一個 workflow 或 analysis surface 的 thin index 化。
+- [x] Phase 3 完成 loading rules、summary links、routing links 或明確 not applicable。
 - [ ] Phase 4 補足 validation scenarios 或明確說明 doc-only trial 的 validation substitute。
 - [ ] Phase 5 完成 linked updates、link audit、runtime refresh（若適用）。
 - [ ] 若引入新 framework vocabulary，更新 glossary 或明確拒絕並說明理由。
@@ -428,14 +428,14 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 > - `execution-flow.md` 加入 **Cognitive Slice 導航（thin index）**：6 lifecycle phase → 段落 / slice 對映 + load_when + examples suppression 提示；§9 改為指向 `surgical-changes.md` 的 redirect stub（保留舊入口兼容）。
 > - `README.md` §6 Surgical Changes 連結改指 `surgical-changes.md`。
 > - **刻意分批**：其餘 5 個 lifecycle phase（intake / contracts / test-strategy / implementation / validation / closure）的實體拆檔留待與 `development-process.md` **同批**進行——兩檔的 intake / contracts / test-strategy / closure 內容重疊，先拆 execution-flow 單側會造成 dual source-of-truth，違反「不複製 canonical source」。
-> - **Phase 3 待辦（已記於檔內）**：把 `surgical-changes.md` 納入 `routing-registry.yaml` route.workflow.software-delivery 的 required source、`execution-flow.yaml` required_sources；同步 `knowledge/graphs/workflow-software-delivery.yaml` §9 描述。
+> - **Phase 3 已同步（2026-05-30）**：`surgical-changes.md` 已納入 `routing-registry.yaml` route.workflow.software-delivery 的 required source、`execution-flow.yaml` required_sources / loading_surfaces；`knowledge/graphs/workflow-software-delivery.yaml` 已同步描述。
 >
 > **Phase 2 進度補充（2026-05-29，sd-contracts 有界 slice 收尾）**：
 > - 已抽出第二個 focused slice **`workflow/software-delivery/contracts.md`**（`sd-contracts`，`type: execution`，tags `artifact-gate, contract, traceability`，原 development-process.md §Required Contracts / Contract Governance Gate / Traceability Gate / Contract-First Rules verbatim + slice 欄位 header）。
 > - **為何 sd-contracts 可單檔安全拆**：這四節內容完全位於 `development-process.md`，**無 execution-flow.md 對應段落**，因此零 dual-source 風險，是預算內最安全的 bounded slice（不需與 execution-flow.md 同批）。
 > - `development-process.md` 四節改為指向 `contracts.md` 的 redirect stub（保留 heading 與舊入口兼容，移除正文避免 dual source-of-truth）。
 > - taxonomy §7 `sd-contracts` 列 `canonical_source` 已更新指向 `contracts.md`。
-> - **Phase 3 待辦（追加）**：`contracts.md` 同樣需納入 `routing-registry.yaml` required source 與 `execution-flow.yaml` / graph 同步（與 surgical-changes.md 同批處理）。
+> - **Phase 3 已同步（2026-05-30）**：`contracts.md` 已納入 `routing-registry.yaml` required source 與 `execution-flow.yaml` / graph 同步（與其他 focused surfaces 同批處理）。
 > - **後續分批（留待新 session）**：其餘 lifecycle slice（sd-intake / sd-test-strategy / sd-implementation / sd-validation / sd-closure）仍需 execution-flow.md + development-process.md 同批拆檔。
 >
 > **Phase 2 進度補充（2026-05-29，sd-closure 跨檔 slice）**：
@@ -443,7 +443,7 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 > - execution-flow.md §8 與 development-process.md §DoR/§DoD 均改為指向 `closure.md` 的 redirect stub；execution-flow.md thin-index 的 Closure row 與 Phase 2 進度註記同步更新。
 > - taxonomy §7 `sd-closure` 列 `canonical_source` 已更新指向 `closure.md`。
 > - **剩餘 4 個 lifecycle slice**（sd-intake / sd-test-strategy / sd-implementation / sd-validation）仍待同批拆檔。
-> - **Phase 3 待辦（追加）**：`closure.md` 同樣需納入 routing-registry / execution-flow.yaml / graph 同步。
+> - **Phase 3 已同步（2026-05-30）**：`closure.md` 已納入 routing-registry / execution-flow.yaml / graph 同步。
 >
 > **Phase 2 進度補充（2026-05-30，sd-validation 有界 slice）**：
 > - 已抽出第四個 focused slice **`workflow/software-delivery/validation.md`**（`sd-validation`，`type: execution`，tags `artifact-gate, validation, performance`）。來源：execution-flow.md §5 效能測試關卡 + §7 驗證 verbatim。**單檔安全拆**：development-process.md 無對應獨立節（perf 內容在 §Test Strategy Gate 留給 sd-test-strategy 處理），零 dual-source 風險。
@@ -451,7 +451,7 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 > - taxonomy §7 `sd-validation` 列 `canonical_source` 已更新指向 `validation.md`。
 > - **perf gotcha 處置**（見 tracker）：validation.md 擁有 perf gate / 觸發 / 最低指標；perf 策略選型留給未來 sd-test-strategy 拆檔時 cross-link，不重複表格。
 > - **剩餘 3 個 lifecycle slice**（sd-intake / sd-test-strategy / sd-implementation）仍待同批拆檔。
-> - **Phase 3 待辦（追加）**：`validation.md` 同樣需納入 routing-registry / execution-flow.yaml / graph 同步。
+> - **Phase 3 已同步（2026-05-30）**：`validation.md` 已納入 routing-registry / execution-flow.yaml / graph 同步。
 >
 > **Phase 2 進度補充（2026-05-30，sd-test-strategy 跨檔 slice，§4 split 處置）**：
 > - 已抽出第五個 focused slice **`workflow/software-delivery/test-strategy.md`**（`sd-test-strategy`，`type: execution`，tags `artifact-gate, test, bdd`）。**跨檔同批**：execution-flow.md §2 Docs-First BDD Closure Loop + §4 子節「測試策略定義」+「Test-First Ordering」+ development-process.md §BDD Execution Closure + §Test Strategy Gate（含 Mutation Testing）verbatim。
@@ -460,19 +460,19 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 > - 來源章節改為 redirect stub（EF §2 / §4 兩子節 / DP §BDD Closure + §Test Strategy Gate）；thin-index Test strategy row + Phase 2 進度註記同步更新。
 > - taxonomy §7 `sd-test-strategy` 列 `canonical_source` 已更新指向 `test-strategy.md`。
 > - **剩餘 2 個 lifecycle slice**（sd-intake / sd-implementation）仍待同批拆檔。
-> - **Phase 3 待辦（追加）**：`test-strategy.md` 同樣需納入 routing-registry / execution-flow.yaml / graph 同步。
+> - **Phase 3 已同步（2026-05-30）**：`test-strategy.md` 已納入 routing-registry / execution-flow.yaml / graph 同步。
 >
 > **Phase 2 進度補充（2026-05-30，sd-intake 跨檔 slice，gotcha 全處置）**：
 > - 已抽出第六個 focused slice **`workflow/software-delivery/intake.md`**（`sd-intake`，`type: execution`，tags `requirements, parity, intake, domain-specific(backfill)`）。**跨檔同批**：execution-flow.md §1（Start From Evidence + Change Intake + Pre-build Interrogation Gate + Requirements Cognition Checkpoint + 重構/Replacement Parity Gate）+ §6 Backfill；development-process.md §Initial Documentation Pack + §Product Brief Validation Gate（含 Product Impact Alignment Check）+ §Change Intake Gate（含 Refactor/Replacement Parity Inventory）+ §Missing Information Gate + §Existing Project Documentation Backfill verbatim。
 > - **gotcha 處置（tracker 預先標註）**：(1) **Embedded/Hardware Product Flow 不搬**——留在 development-process.md，屬 `sd-implementation`（embedded 條件子流程掛 tag，不另開 slice）；(2) **Default Flow 表不搬**——保留在 development-process.md 開頭當跨階段索引，避免第二份 source-of-truth；(3) **backfill 條件子流程**（EF §6 + DP §Existing Project Documentation Backfill）併入 intake.md §Backfill 掛 `domain-specific,backfill`，不另開 slice。
 > - 來源章節改為 redirect stub（EF §1 / §6；DP §Initial Doc Pack / §Product Brief Validation / §Change Intake / §Missing Information / §Existing Project Backfill）；thin-index Intake row + Phase 2 進度註記同步更新。
 > - taxonomy §7 `sd-intake` 列 `canonical_source` 已更新指向 `intake.md`。
-> - **剩餘 1 個 lifecycle slice**（sd-implementation）待評估是否獨立檔。
-> - **Phase 3 待辦（追加）**：`intake.md` 同樣需納入 routing-registry / execution-flow.yaml / graph 同步。
+> - **剩餘 1 個 lifecycle surface**（sd-implementation）已於 Phase 2 stabilization 決定暫留 execution-flow / development-process core，待 Phase 4 evidence 判斷是否獨立檔。
+> - **Phase 3 已同步（2026-05-30）**：`intake.md` 已納入 routing-registry / execution-flow.yaml / graph 同步。
 
 ### Phase 2 Slice Extraction Tracker（handoff，2026-05-29）
 
-> **給接手的 session**：software-delivery pilot 共 **8 個 slice**（taxonomy §7）。下表是唯一權威進度來源。`status` 圖例：`✅ done`（已實體拆成獨立檔 + 來源改 redirect stub + taxonomy canonical_source 已更新）、`➖ pre-existing`（本來就獨立檔，不需拆）、`⬜ todo`（待拆）。
+> **給接手的 session**：software-delivery pilot 共 **8 個 slice**（taxonomy §7）。下表是唯一權威進度來源。`status` 圖例：`✅ done`（已實體拆成獨立檔 + 來源改 redirect stub + taxonomy canonical_source 已更新）、`➖ pre-existing`（本來就獨立檔，不需拆）、`⏸ retained`（依 granularity / routing evidence 暫留既有核心，不在 Phase 2 拆）。
 >
 > **拆檔鐵則（每個 todo slice 都要做）**：(1) 從**兩個來源檔同批**抽出 verbatim 正文到新 slice 檔（避免 dual source-of-truth）；(2) 來源章節改成指向新檔的 redirect stub（保留 heading 兼容舊入口）；(3) 更新 taxonomy §7 該列 `canonical_source` → 新檔；(4) 更新 execution-flow.md thin-index 對應 row；(5) 新檔加 slice-metadata header 表（仿 `contracts.md` / `closure.md`）；(6) commit 用 `[skip-markdown-yaml-sync]`（execution-flow.yaml 為衍生）+ 視情況 `[skip-evidence-hierarchy]`（commit body 含 "Done" 等字）。
 
@@ -481,15 +481,15 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 | 1 | `sd-intake` | execution | `intake.md` | ✅ done | 跨檔同批：**EF** §1（Start From Evidence + Change Intake + Pre-build Interrogation + Requirements Cognition + Parity Gate）+ §6 Backfill（tag `domain-specific,backfill`）／ **DP** §Initial Documentation Pack + §Product Brief Validation Gate（含 Product Impact Alignment Check）+ §Change Intake Gate（含 Refactor/Replacement Parity Inventory）+ §Missing Information Gate + §Existing Project Documentation Backfill（tag `domain-specific,backfill`）。gotcha 已處置：Embedded flow 留 DP 屬 sd-implementation、Default Flow 表留 DP 當索引、未搬。 |
 | 2 | `sd-contracts` | execution | `contracts.md` | ✅ done | EF：無；DP：§Required Contracts、§Contract Governance Gate、§Traceability Gate、§Contract-First Rules（單檔，零 dual-source） |
 | 3 | `sd-test-strategy` | execution | `test-strategy.md` | ✅ done | 跨檔同批：EF §2 + §4 子節「測試策略定義」+「Test-First Ordering」；DP §BDD Execution Closure + §Test Strategy Gate 含 Mutation Testing。§4 split gotcha 已處置（父節留 EF for sd-implementation，子節入本 slice）；perf 表不複製，cross-link 至 validation.md |
-| 4 | `sd-implementation` | execution | `implementation.md`（待建，或留作 execution-flow 核心） | ⬜ todo | **EF**：§3 SDK 缺陷閉環、§4 同工作階段閉環（父節，**去掉**已歸 test-strategy 的兩個子節）／ **DP**：§When Frontend And Backend Do Not Both Exist、§Embedded/Hardware Product Flow（tag `domain-specific,embedded`）、Default Flow 實作步驟 10–15 |
+| 4 | `sd-implementation` | execution | retained in `execution-flow.md` + `development-process.md` core | ⏸ retained | **EF**：§3 SDK 缺陷閉環、§4 同工作階段閉環（父節，**去掉**已歸 test-strategy 的兩個子節）／ **DP**：§When Frontend And Backend Do Not Both Exist、§Embedded/Hardware Product Flow（tag `domain-specific,embedded`）、Default Flow 實作步驟 10–15。2026-05-30 Phase 2 stabilization 決定：不建立 `implementation.md`，除非 Phase 4 evidence 顯示 over-load。 |
 | 5 | `sd-surgical-caveats` | failure | `surgical-changes.md` | ✅ done | EF：§9.1–9.5（單檔）；DP：無 |
 | 6 | `sd-validation` | execution | `validation.md` | ✅ done | EF：§5 Perf Gate + §7 Validate（單檔）；DP：無獨立節。perf gotcha 處置：本 slice 擁有 perf **執行關卡 / 觸發 / 最低指標**；perf **測試類型選型表**留在 `sd-test-strategy`（DP §Test Strategy Gate），互相 cross-link 不複製。 |
 | 7 | `sd-closure` | execution | `closure.md` | ✅ done | EF：§8 Feed Back Reusable Lessons；DP：§Minimum Definition Of Ready、§Minimum Definition Of Done（跨檔同批） |
 | 8 | `sd-examples` | examples | `examples/EXAMPLES.md` | ➖ pre-existing | 本來就獨立檔；`default_load:false`，不需拆，僅確認 thin-index suppression 提示已在（已在） |
 
-**進度**：8 個中 **6 done**（contracts、surgical-changes、closure、validation、test-strategy、intake）、1 pre-existing（examples）、**1 todo**（implementation）。
+**進度**：8 個中 **6 done**（contracts、surgical-changes、closure、validation、test-strategy、intake）、1 pre-existing（examples）、**1 retained**（implementation，待 Phase 4 evidence 決定是否升級拆檔）。
 
-> **命名重構待辦（external review 建議，2026-05-29）**：採用 `execution surface / evidence surface` 為正式 vocabulary 比 `slice` 更 runtime-oriented。**不在 Phase 2 處理重命名**——現有 4 個已抽出檔（surgical-changes / contracts / closure / validation）若改成 `*-surface.md`，會牽動 taxonomy §7、execution-flow.md thin-index、所有 redirect stub、未來 routing-registry、graph 描述等多處 cross-ref，宜等 3 個 todo slice 抽完後**一輪 sweep refactor**。正式 glossary 註冊本就延後至 Phase 4 validation 之後（見 §Open Questions glossary 條目），重命名 sweep 順勢併入該時點。
+> **命名重構待辦（external review 建議，2026-05-29）**：採用 `execution surface / evidence surface` 為正式 vocabulary 比 `slice` 更 runtime-oriented。**不在 Phase 2/3 處理重命名**——現有已抽出檔若改成 `*-surface.md`，會牽動 taxonomy §7、execution-flow.md thin-index、所有 redirect stub、routing-registry、graph 描述等多處 cross-ref。正式 glossary 註冊本就延後至 Phase 4 validation 之後（見 §Open Questions glossary 條目），重命名 sweep 順勢併入該時點。
 
 **接手時的 gotcha（拆前必讀，否則會踩雷）**：
 - **§4 需切兩半**：~~execution-flow.md §4「同工作階段閉環」父節屬 `sd-implementation`，但其子節「測試策略定義」與「Test-First Ordering」屬 `sd-test-strategy`。~~ **已處置（2026-05-30 sd-test-strategy 拆檔時）**：§4 父節「同工作階段閉環（程式碼 + 持久文件）」留在 execution-flow.md 屬 `sd-implementation` 範圍；兩個子節已抽出至 `test-strategy.md`，§4 內加 redirect 註記。
@@ -497,7 +497,7 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 - **Default Flow 表（DP 開頭）是跨階段 overview**：建議**保留在 development-process.md 當索引**，不搬進任何單一 slice（搬了會變成第二份 source-of-truth）。
 - **sd-implementation 拆檔決定 = 刻意延後（stakeholder 2026-05-30）**：sd-intake 拆完後其 canonical prose 僅剩 execution-flow.md §3（SDK 缺陷閉環）+ §4（同工作階段閉環父節），加上 DP §When Frontend/Backend + §Embedded。stakeholder 選擇「先不決定」是否獨立成 `implementation.md`，留待 **Phase 3（routing 同步時）或 Phase 4（validation 證據顯示是否 over-load）** 再依實證決定。選項與權衡：(A) 留在 execution-flow.md 當 execution 核心（execution-flow.md 兼 thin-index + 核心，Phase 3 routing 改動最小）；(B) 獨立成 implementation.md（execution-flow.md 變純 index，與其他 6 slice 一致，但需改 routing primary_source）。屆時於 taxonomy §7 記錄選定方案與 granularity 理由。
 - **conditional 子流程不另開 slice**：~~embedded/hardware（DP §Embedded Flow）掛 `sd-implementation` tag `domain-specific,embedded`；backfill（EF §6 + DP §Existing Project Documentation Backfill）掛 `sd-intake` tag `domain-specific,backfill`。~~ **backfill 已處置（2026-05-30 sd-intake 拆檔時）**：EF §6 + DP §Existing Project Documentation Backfill 已併入 `intake.md` §Backfill，掛 `tags: domain-specific,backfill`，不另開 slice。**embedded 仍待**：DP §Embedded/Hardware Product Flow 留在 development-process.md，拆 sd-implementation 時掛 `domain-specific,embedded`，不另開 slice。
-- **Phase 3 待辦會累積**：每個新 slice 檔都要在 Phase 3 納入 `routing-registry.yaml` required source、`execution-flow.yaml` source-list、`knowledge/graphs/workflow-software-delivery.yaml` 描述。目前待同步：surgical-changes.md、contracts.md、closure.md、validation.md、test-strategy.md、intake.md（+ 後續 todo 完成者）。
+- **Phase 3 同步狀態**：每個新 surface 檔都已在 Phase 3 納入 `routing-registry.yaml` required source、`execution-flow.yaml` source-list / loading_surfaces、`knowledge/graphs/workflow-software-delivery.yaml` 描述。目前已同步：surgical-changes.md、contracts.md、closure.md、validation.md、test-strategy.md、intake.md。`sd-implementation` 暫留 core，不新增 source。
 
 - [x] 選定 pilot surface → `workflow/software-delivery/execution-flow.md`（routing primary_source，stakeholder 選定先行）。
 - [~] 將 pilot surface 的正文分為 index / execution-order core / caveats（**caveats slice 已抽出**；artifact gates / examples 既已分離；其餘 lifecycle phase 待與 development-process.md 同批）：
@@ -514,34 +514,47 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 
 Phase 2 exit criteria：
 
-- [ ] Pilot surface 不再同時承擔 execution order / evidence method / examples / artifacts / caveats 多重責任。
-- [ ] **每個抽出的 slice 通過 granularity 判準**（Phase 1）：是一個能獨立完成的 cognitive phase，不是 step / concept，不需瘋狂 cross-reference。
-- [ ] 每個抽出的 slice 仍能回連 canonical source。
-- [ ] Document-sizing check 通過。
+- [x] Pilot surface 不再同時承擔 execution order / evidence method / examples / artifacts / caveats 多重責任。`execution-flow.md` 已成 thin index + implementation core；examples / caveats / validation / closure / intake / contracts / test-strategy 已拆出或本來獨立；software-delivery 無 evidence method 內容。
+- [x] **每個抽出的 slice 通過 granularity 判準**（Phase 1）：intake / contracts / test-strategy / validation / closure / surgical-caveats 都是一個能獨立完成的 cognitive phase，不是單一步驟或概念。
+- [x] 每個抽出的 slice 仍能回連 canonical source。來源段落保留 redirect stub，taxonomy §7 canonical_source 已更新。
+- [x] Document-sizing check 通過。`execution-flow.md` 94 行、`development-process.md` 112 行；抽出 surfaces 皆保持 focused（`intake.md` 267 行但主題單一，作為後續可再評估的 exception）。
+
+**Phase 2 stabilization decision（2026-05-30）**：`sd-implementation` 暫留 `execution-flow.md` §3/§4 + `development-process.md` embedded / producer-consumer fallback，不建立 `implementation.md`。理由：剩餘內容是 execution core，抽成獨立檔會讓 `execution-flow.md` 變純 index 並牽動 route primary_source；依 stakeholder 決定，留待 Phase 3 routing evidence 或 Phase 4 Scenario A/E 顯示 over-load 時再升級。此決定符合 granularity rule：不為了形式完整而 over-fragment。
 
 ## Phase 3 — Loading Rules, Summary, Routing
 
 目標：讓 agent 能按 task intent 載入 workflow / analysis slices。
 
-- [ ] 為 pilot slices 建立或更新 summary（若適用）。
-- [ ] 檢查 `knowledge/runtime/routing-registry.yaml` 是否需要新增 / 修改 route。
-- [ ] 若新增 route，必須同時定義 named consumer 或 `manual_activation` reason。
+- [x] 為 pilot slices 建立或更新 summary（若適用）：`knowledge/summaries/development-guidance.md` 已更新，指向 focused loading surfaces 並記錄 examples suppression。
+- [x] 檢查 `knowledge/runtime/routing-registry.yaml` 是否需要新增 / 修改 route：不新增 route；在既有 `route.workflow.software-delivery` 下新增 hierarchical `loading_surfaces` mapping，並把 6 個 focused surfaces 加入 `required_dependencies`。
+- [x] 若新增 route，必須同時定義 named consumer 或 `manual_activation` reason：not applicable，未新增 route / generated surface；consumer 是既有 `route.workflow.software-delivery` manual/agent routing。
 - [ ] **Hierarchical routing 規則**：新 route 採樹狀命名（`workflow.software-delivery.execution`），**不得**鋪成 flat route universe（`workflow.execution.api` / `workflow.execution.refactor` / `analysis.apk.network` / `analysis.apk.hls` … 平攤）。理由：防 route inflation 讓 routing-registry 本身變成第二個 monolith / giant cognition graph（external review 風險4，2026-05-29）。新增 route 前先確認能掛在既有層級節點下，不是平鋪新 leaf。
-- [ ] 為常見 intent 建立 loading guidance：
+- [x] 為常見 intent 建立 loading guidance：
   - workflow execution
   - artifact validation
   - evidence acquisition
   - tool procedure lookup
   - failure / caveat diagnosis
   - mixed workflow + analysis task
-- [ ] 明確記錄 suppression guidance：哪些任務不應載入 examples / tool procedures / artifact gates / failure caveats / Gen 4 heavy slices。**examples slice 預設 suppress（`default_load: false`），只在 user 明確要求範例或偵測到 ambiguity 才載入**（對齊 Phase 1 examples suppression bias 規則）。
+- [x] 明確記錄 suppression guidance：哪些任務不應載入 examples / tool procedures / artifact gates / failure caveats / Gen 4 heavy slices。**examples slice 預設 suppress（`default_load: false`），只在 user 明確要求範例或偵測到 ambiguity 才載入**（對齊 Phase 1 examples suppression bias 規則）。
+
+**Phase 3 execution record（2026-05-30）**：
+
+| Surface | Phase 3 action | Evidence |
+|---|---|---|
+| `route.workflow.software-delivery` | Added hierarchical `loading_surfaces` under the existing route; no flat leaf route added. | `knowledge/runtime/routing-registry.yaml` |
+| executable contract | Added focused surfaces to `required_sources` and `loading_surfaces`; step actions reference surfaces only when needed. | `workflow/software-delivery/execution-flow.yaml` |
+| graph | Added graph edges for `intake.md`, `contracts.md`, `test-strategy.md`, `validation.md`, `closure.md`, `surgical-changes.md`; corrected route validation. | `knowledge/graphs/workflow-software-delivery.yaml` |
+| summary | Updated summary / when-to-read / do-not-use / validation signal for focused surfaces and examples suppression. | `knowledge/summaries/development-guidance.md` |
+| workflow README | Updated entry flow and extracted-content table so old entrypoint readers see the new loading surfaces. | `workflow/software-delivery/README.md` |
+| taxonomy | Marked `sd-implementation` as intentionally retained in execution-flow core pending Phase 4 evidence. | `governance/cognitive-slice-taxonomy.md` |
 
 Phase 3 exit criteria：
 
-- [ ] 小任務可走 index / summary，不需整份 workflow 或 analysis surface。
-- [ ] 大任務能找到需要的 source。
-- [ ] 新增 route 為 hierarchical（樹狀），無 flat route universe；examples 預設 suppress。
-- [ ] 無 dead route / dead generated surface。
+- [x] 小任務可走 index / summary，不需整份 workflow 或 analysis surface。
+- [x] 大任務能找到需要的 source。
+- [x] 新增 route 為 hierarchical（樹狀），無 flat route universe；examples 預設 suppress。實際未新增 route；focused surfaces 掛在既有 route 下。
+- [x] 無 dead route / dead generated surface。未新增 generated surface；routing-registry 只擴充既有 consumer route。
 
 ## Phase 4 — Validation Scenarios
 
