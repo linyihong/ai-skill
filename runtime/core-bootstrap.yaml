@@ -68,13 +68,29 @@ per_session_obligations:
       Legacy single-line Receipt (without "Active per-turn obligations:" line)
       remains accepted. Enhanced two-line form is the canonical preferred
       format from 2026-05-26 onward (Phase 5 of bootstrap-contract-yaml-migration).
-    enforcement_layer: behavioral_forcing + repairable_stop_hook
+    enforcement_layer: behavioral_forcing + repairable_stop_hook + read_log_gate
     forcing_function: |
       Numeric values require runtime.db query (cannot be memorized).
       Bootstrap Receipt values should come from `ai-skill runtime receipt`
       rather than ad-hoc SQLite. Active per-turn obligations list requires querying
       generated_surfaces[runtime.core_bootstrap.contract].per_turn_obligations
       via `ai-skill runtime obligations` (or equivalent SQLite JSON1 query).
+    read_log_requirement: |
+      The PreToolUse hook (gate.bootstrap.receipt_present) now performs a
+      mechanical check against the JSONL transcript: a Receipt is only
+      accepted as authentic when the assistant has invoked the Read tool
+      against BOTH of the following canonical file suffixes earlier in
+      the same transcript:
+        - CORE_BOOTSTRAP.md
+        - runtime/core-bootstrap.yaml
+      Rationale: prior failures involved the agent copying the example
+      Receipt from the SessionStart hook reminder without dereferencing
+      the canonical files. The hook example values can drift from this
+      YAML (observed 2026-05-30: hook displayed obligations=23 gates=25
+      while canonical was obligations=22 gates=2). Requiring Read events
+      forces a fresh dereference at session start.
+      Implementation: scripts/ai-skill-cli/internal/app/hooks.go ::
+      transcriptHasRequiredBootstrapReads + bootstrapRequiredReadSuffixes.
     severity: high
     blocking_gate_id: gate.bootstrap.receipt_present
     obligation_ledger_id: obligation.bootstrap.receipt_acknowledged

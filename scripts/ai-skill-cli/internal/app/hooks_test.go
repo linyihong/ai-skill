@@ -490,6 +490,133 @@ func setHookStdin(t *testing.T, input string) {
 	})
 }
 
+// writeBootstrapTranscript builds a minimal Claude Code JSONL transcript with
+// the supplied assistant text turn and (optionally) Read tool_use blocks for
+// the given file paths. It returns the transcript path.
+func writeBootstrapTranscript(t *testing.T, dir string, assistantText string, readPaths []string) string {
+	t.Helper()
+	path := filepath.Join(dir, "transcript.jsonl")
+	var lines []string
+	if len(readPaths) > 0 {
+		var items []map[string]any
+		for i, p := range readPaths {
+			items = append(items, map[string]any{
+				"type":  "tool_use",
+				"id":    fmt.Sprintf("tu_%d", i),
+				"name":  "Read",
+				"input": map[string]any{"file_path": p},
+			})
+		}
+		entry := map[string]any{
+			"type": "assistant",
+			"message": map[string]any{
+				"content": items,
+			},
+		}
+		buf, err := json.Marshal(entry)
+		if err != nil {
+			t.Fatalf("marshal read entry: %v", err)
+		}
+		lines = append(lines, string(buf))
+	}
+	if assistantText != "" {
+		entry := map[string]any{
+			"type": "assistant",
+			"message": map[string]any{
+				"content": []map[string]any{
+					{"type": "text", "text": assistantText},
+				},
+			},
+		}
+		buf, err := json.Marshal(entry)
+		if err != nil {
+			t.Fatalf("marshal text entry: %v", err)
+		}
+		lines = append(lines, string(buf))
+	}
+	writeFile(t, path, strings.Join(lines, "\n")+"\n")
+	return path
+}
+
+func TestTranscriptHasRequiredBootstrapReadsDetectsBothReads(t *testing.T) {
+	dir := t.TempDir()
+	tr := writeBootstrapTranscript(t, dir, "", []string{
+		"/repo/CORE_BOOTSTRAP.md",
+		"/repo/runtime/core-bootstrap.yaml",
+	})
+	ok, missing := transcriptHasRequiredBootstrapReads(tr, bootstrapRequiredReadSuffixes)
+	if !ok || len(missing) != 0 {
+		t.Fatalf("expected ok=true missing=[]; got ok=%v missing=%v", ok, missing)
+	}
+}
+
+func TestTranscriptHasRequiredBootstrapReadsReportsMissing(t *testing.T) {
+	dir := t.TempDir()
+	tr := writeBootstrapTranscript(t, dir, "", []string{"/repo/CORE_BOOTSTRAP.md"})
+	ok, missing := transcriptHasRequiredBootstrapReads(tr, bootstrapRequiredReadSuffixes)
+	if ok {
+		t.Fatalf("expected ok=false when one required file missing")
+	}
+	if len(missing) != 1 || missing[0] != "runtime/core-bootstrap.yaml" {
+		t.Fatalf("expected missing=[runtime/core-bootstrap.yaml]; got %v", missing)
+	}
+}
+
+func TestTranscriptHasRequiredBootstrapReadsAcceptsWindowsPaths(t *testing.T) {
+	dir := t.TempDir()
+	tr := writeBootstrapTranscript(t, dir, "", []string{
+		`C:\yiHong\Programs\Ai-skill\CORE_BOOTSTRAP.md`,
+		`C:\yiHong\Programs\Ai-skill\runtime\core-bootstrap.yaml`,
+	})
+	ok, missing := transcriptHasRequiredBootstrapReads(tr, bootstrapRequiredReadSuffixes)
+	if !ok {
+		t.Fatalf("expected ok=true for backslash paths; missing=%v", missing)
+	}
+}
+
+func TestPreToolUseHookBlocksReceiptWithoutReads(t *testing.T) {
+	dir := t.TempDir()
+	// Transcript contains a Bootstrap Receipt line but NO Read tool_use entries —
+	// this models the failure case where the agent copies the format from the
+	// SessionStart hook reminder without actually dereferencing the canonical
+	// files. The strengthened gate must block.
+	tr := writeBootstrapTranscript(t, dir,
+		"Bootstrap: rules=✓ phase=phase.bootstrap obligations=2 gates=2\nDone.",
+		nil)
+	payload := fmt.Sprintf(`{"tool_name":"Bash","transcript_path":%q}`, tr)
+	setHookStdin(t, payload)
+
+	var stdout, stderr bytes.Buffer
+	code := runPreToolUseHook(dir, &stdout, &stderr)
+	if code != ExitValidationFailed {
+		t.Fatalf("expected ExitValidationFailed; got %d; stderr=%s", code, stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "BLOCK_RECEIPT_WITHOUT_READS") {
+		t.Fatalf("expected BLOCK_RECEIPT_WITHOUT_READS in stderr; got:\n%s", stderr.String())
+	}
+}
+
+func TestPreToolUseHookAllowsReceiptWithVerifiedReads(t *testing.T) {
+	dir := t.TempDir()
+	tr := writeBootstrapTranscript(t, dir,
+		"Bootstrap: rules=✓ phase=phase.bootstrap obligations=2 gates=2\nDone.",
+		[]string{
+			"/repo/CORE_BOOTSTRAP.md",
+			"/repo/runtime/core-bootstrap.yaml",
+		})
+	payload := fmt.Sprintf(`{"tool_name":"Bash","transcript_path":%q}`, tr)
+	setHookStdin(t, payload)
+
+	var stdout, stderr bytes.Buffer
+	code := runPreToolUseHook(dir, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected ExitSuccess when reads and receipt both present; got %d; stderr=%s", code, stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "ALLOW_RECEIPT_FOUND_WITH_READS") {
+		t.Fatalf("expected ALLOW_RECEIPT_FOUND_WITH_READS in stderr; got:\n%s", stderr.String())
+	}
+}
+
 func TestValidateExecutionModeFloors(t *testing.T) {
 	// FAST forbidden when touching enforcement/
 	v := validateExecutionModeFloors(map[string]string{"execution_mode": "FAST"}, []string{"enforcement/foo.md"})

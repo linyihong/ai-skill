@@ -475,6 +475,136 @@ func extractAssistantTexts(transcriptPath string) []string {
 	return results
 }
 
+// transcriptHasRequiredBootstrapReads scans the JSONL transcript for assistant
+// tool_use blocks of the Read tool and returns true iff Read calls have been
+// recorded for ALL of the supplied required path suffixes.
+//
+// Path suffix match is used (not equality) because Claude Code stores absolute
+// or repo-relative paths in tool_input.file_path; we just need to know whether
+// the agent actually opened the canonical files.
+//
+// The second return value lists suffixes that were NOT seen, so the caller can
+// surface a precise repair message.
+func transcriptHasRequiredBootstrapReads(transcriptPath string, requiredSuffixes []string) (bool, []string) {
+	if transcriptPath == "" || !claudeFileExists(transcriptPath) || len(requiredSuffixes) == 0 {
+		return false, append([]string(nil), requiredSuffixes...)
+	}
+
+	seen := make(map[string]bool, len(requiredSuffixes))
+	for _, s := range requiredSuffixes {
+		seen[s] = false
+	}
+
+	f, err := os.Open(transcriptPath)
+	if err != nil {
+		return false, append([]string(nil), requiredSuffixes...)
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	scanner.Buffer(make([]byte, 2*1024*1024), 2*1024*1024)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
+		var entry map[string]json.RawMessage
+		if err := json.Unmarshal([]byte(line), &entry); err != nil {
+			continue
+		}
+		// Only assistant turns can carry tool_use blocks.
+		roleField := entry["type"]
+		if roleField == nil {
+			roleField = entry["role"]
+		}
+		var role string
+		if roleField != nil {
+			_ = json.Unmarshal(roleField, &role)
+		}
+		if role != "assistant" {
+			continue
+		}
+		msgRaw, ok := entry["message"]
+		if !ok {
+			continue
+		}
+		var msg map[string]json.RawMessage
+		if err := json.Unmarshal(msgRaw, &msg); err != nil {
+			continue
+		}
+		cRaw, ok := msg["content"]
+		if !ok {
+			continue
+		}
+		var items []json.RawMessage
+		if err := json.Unmarshal(cRaw, &items); err != nil {
+			continue
+		}
+		for _, item := range items {
+			var block map[string]json.RawMessage
+			if err := json.Unmarshal(item, &block); err != nil {
+				continue
+			}
+			var blockType string
+			if tr, ok := block["type"]; ok {
+				_ = json.Unmarshal(tr, &blockType)
+			}
+			if blockType != "tool_use" {
+				continue
+			}
+			var toolName string
+			if nr, ok := block["name"]; ok {
+				_ = json.Unmarshal(nr, &toolName)
+			}
+			if toolName != "Read" {
+				continue
+			}
+			inputRaw, ok := block["input"]
+			if !ok {
+				continue
+			}
+			var input map[string]json.RawMessage
+			if err := json.Unmarshal(inputRaw, &input); err != nil {
+				continue
+			}
+			fpRaw, ok := input["file_path"]
+			if !ok {
+				continue
+			}
+			var fp string
+			if err := json.Unmarshal(fpRaw, &fp); err != nil {
+				continue
+			}
+			// Normalize path separators so a Windows-style "\\" path matches
+			// a POSIX-style "/" suffix and vice versa.
+			normalized := strings.ReplaceAll(fp, "\\", "/")
+			for suffix := range seen {
+				if !seen[suffix] && strings.HasSuffix(normalized, suffix) {
+					seen[suffix] = true
+				}
+			}
+		}
+	}
+
+	var missing []string
+	for _, s := range requiredSuffixes {
+		if !seen[s] {
+			missing = append(missing, s)
+		}
+	}
+	return len(missing) == 0, missing
+}
+
+// bootstrapRequiredReadSuffixes is the canonical list of files the agent must
+// Read at session start before its Bootstrap Receipt is considered authentic.
+// Adding to this list strengthens gate.bootstrap.receipt_present; the suffixes
+// must match the trailing path components actually written by Claude Code's
+// Read tool (paths are normalized to forward slashes before comparison).
+var bootstrapRequiredReadSuffixes = []string{
+	"CORE_BOOTSTRAP.md",
+	"runtime/core-bootstrap.yaml",
+}
+
 type gitRepoStatusReport struct {
 	Root  string
 	Rel   string
@@ -728,13 +858,53 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 		}
 	}
 
+	receiptEmitted := false
 	for _, text := range extractAssistantTexts(transcriptPath) {
 		if strings.Contains(text, "Bootstrap:") {
+			receiptEmitted = true
+			break
+		}
+	}
+
+	if receiptEmitted {
+		// gate.bootstrap.receipt_present — strengthened by read-log requirement.
+		// A Receipt is only considered authentic if the agent has Read the
+		// canonical bootstrap files in this transcript. Prevents fabrication
+		// where the agent copies the format shown in the SessionStart hook
+		// reminder without actually dereferencing CORE_BOOTSTRAP.md or
+		// runtime/core-bootstrap.yaml (the example values in the hook output
+		// can drift from the canonical YAML).
+		ok, missing := transcriptHasRequiredBootstrapReads(transcriptPath, bootstrapRequiredReadSuffixes)
+		if ok {
 			_ = os.WriteFile(cacheFile, []byte{}, 0o644)
-			_, _ = fmt.Fprintln(stderr, "ALLOW_RECEIPT_FOUND")
-			appendLog(logFile, "exit_code: 0 (receipt found)")
+			_, _ = fmt.Fprintln(stderr, "ALLOW_RECEIPT_FOUND_WITH_READS")
+			appendLog(logFile, "exit_code: 0 (receipt found + required reads verified)")
 			return ExitSuccess
 		}
+		_, _ = fmt.Fprintln(stderr, "BLOCK_RECEIPT_WITHOUT_READS missing="+strings.Join(missing, ","))
+		appendLog(logFile, "exit_code: 2 (receipt without required reads; missing="+strings.Join(missing, ",")+")")
+		_, _ = fmt.Fprintf(stderr, `[ai-skill PreToolUse hook] Bootstrap Receipt present but unverified.
+
+The transcript contains a "Bootstrap:" line, but the required canonical files
+have NOT been Read in this session. This indicates the Receipt was likely
+copied from the SessionStart hook example or fabricated from memory — the
+numbers shown in the hook reminder are NOT authoritative (they can drift from
+runtime/core-bootstrap.yaml).
+
+Missing Read calls for: %s
+
+To clear this gate:
+1. Read each missing file with the Read tool (absolute path inside
+   $AI_SKILL_REPO is fine; suffix match on the trailing path components).
+2. Count actual obligations and gates from the YAML you just read.
+3. Re-emit the Bootstrap Receipt with the verified numbers in your next
+   user-facing response:
+     Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
+     Active per-turn obligations: <comma-separated obligation ids>
+
+Only Read tool calls are allowed until this gate clears.
+`, strings.Join(missing, ", "))
+		return ExitValidationFailed
 	}
 
 	_, _ = fmt.Fprintln(stderr, "BLOCK_NO_RECEIPT")
@@ -743,11 +913,15 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 
 Before calling any tool other than Read, you MUST:
 1. Read CORE_BOOTSTRAP.md
-2. Query runtime/runtime.db for phase / obligations / gates
+2. Read runtime/core-bootstrap.yaml (count obligations and gates from it)
 3. Read the 3 required_reads: enforcement/rule-weight.md, enforcement/dependency-reading.md, enforcement/conversation-goal-ledger.md
 4. Output the Bootstrap Receipt in your next user-facing response:
    Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
    Active per-turn obligations: <obligation ids>
+
+The Receipt numbers MUST come from the YAML you just Read, NOT from the
+SessionStart hook example (it can be stale). The PreToolUse gate now verifies
+the Read events occurred in the transcript before accepting the Receipt.
 
 Only Read tool calls are allowed before the Receipt is emitted.
 `)
