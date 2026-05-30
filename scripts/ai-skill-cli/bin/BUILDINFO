@@ -1,4 +1,4 @@
-version=repo-f33485f
-source_commit=f33485f
-built_at=2026-05-30T04:42:54Z
+version=repo-dd598a7
+source_commit=dd598a7
+built_at=2026-05-30T12:07:30Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
