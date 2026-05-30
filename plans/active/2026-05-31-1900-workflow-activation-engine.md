@@ -1,9 +1,9 @@
 # Workflow Activation Engine
 
-**Status**: `draft-v3`
+**Status**: `draft-v4`
 **世代**：Gen 3 runtime hardening（systemic gap remediation）
 **建立日期**：2026-05-31
-**最後更新**：2026-05-31（v3 — 整合第三輪架構評審四點修正：advisory 能力矩陣、intent vocab、proposal 防垃圾場、self-declared route_type）
+**最後更新**：2026-05-31（v4 — 整合第四輪評審：intelligence 不適用單一預設，改 must-declare + Phase 0.2 加 intelligence 全盤審計 gate）
 **Empirical trigger**：2026-05-31 session — agent 對 `docs/20260531-下関.md` 跑 review，doc 標題含「行程」、內容含「Day 1 / 御朱印 / MapCode / 自駕」，命中 `route.workflow.travel-planning.activation_triggers.user_signals` 全部訊號，但 workflow 從未被啟動。使用者連續三次追問才暴露此 gap。
 
 > 本 plan 不修 travel-planning 個案，而是補齊 **Workflow Activation Engine** ——目前 framework 第一次形成「Registry ✓ + Rules ✓ + Docs ✓ + **Activation Engine ✗**」閉環的缺角。
@@ -124,7 +124,7 @@ Feedback (existing: feedback/history/<domain>/)
 | `runtime_core` | `always-on` | `route.runtime.{phase-machine, obligation-ledger, blocking-gates, recovery}` |
 | `workflow` | `auto-detect` | `route.workflow.*` |
 | `analysis` | `auto-detect` | `route.analysis.*` |
-| `intelligence` | `advisory` | `route.intelligence.*`（多 context，少單一明確 trigger） |
+| **`intelligence`** | **`must-declare`（無預設，必須顯式宣告）** | `route.intelligence.*` —— **mixed layer，見下方特別說明** |
 | `governance` | `on-demand` | `route.governance.*` |
 | `constitution` | `on-demand` | `route.constitution.*` |
 | `architecture` | `on-demand` | `route.architecture.*` |
@@ -132,6 +132,66 @@ Feedback (existing: feedback/history/<domain>/)
 | `metadata` | `on-demand` | `route.metadata.*`、`route.knowledge.*` |
 | `ai_tools` | `on-demand` | `route.ai-tools.*`、`route.tools.*` |
 | `models` | `advisory` | `route.models.*` |
+
+##### Phase 0.2a-special — `intelligence` 為什麼 must-declare（v4 採納評審 #1）
+
+第四輪評審指出 `intelligence -> advisory` 預設假設危險。具體 case：
+
+- 使用者問「**幫我評審這個系統架構**」→ 命中 `route.intelligence.architectural-fit`
+- 這是**主任務**（primary route），不是 advisory hint
+- 但 `intelligence -> advisory` 預設會讓 `can_activate=false`，detector 不會鎖定，主任務變成永遠不會啟動
+
+intelligence 層本質是 **mixed layer** —— 介於 analysis / workflow / governance 之間：
+- 部分 atom 是 primary route（如 architectural-fit 用於架構評審任務）
+- 部分 atom 是 secondary hint（如 engineering.heuristics 暗藏在實作任務中）
+- 強制單一 default 必然在某一群誤判
+
+**v4 解法**：`intelligence` 不享有自動推導，**每條 route 必須顯式宣告 `activation_mode`**。
+
+```yaml
+# 範例：primary intelligence route
+- id: route.intelligence.architectural-fit
+  route_type: intelligence
+  activation_mode: auto-detect   # 顯式宣告，因為這是評審任務的主路由
+  activation_triggers:
+    activation_any_of:
+      user_signals: [架構評審, architecture review, 評估架構]
+
+# 範例：secondary intelligence route
+- id: route.intelligence.engineering.heuristics
+  route_type: intelligence
+  activation_mode: advisory      # 顯式宣告，作為實作任務的 hint
+```
+
+**Lint rule（commit-msg validator 機械強制）**：
+
+```
+若 route.route_type == "intelligence" AND route.activation_mode 未宣告
+  → commit reject，訊息："intelligence routes must explicitly declare
+    activation_mode (one of: auto-detect / on-demand / advisory) —
+    no automatic default to avoid mis-categorizing primary vs
+    secondary intelligence atoms"
+```
+
+**Phase 0.2 必加 Audit Gate**：所有 `route.intelligence.*`（目前 7 條）在 v4 推進到 Phase 1 之前，**每一條必須個別決策 activation_mode**。產出 audit table 列為 Phase 0.2 acceptance criteria：
+
+| Route ID | 用於什麼任務 | 是 primary 還是 secondary | 決定的 activation_mode |
+|---|---|---|---|
+| route.intelligence.architectural-fit | 系統架構評審 | primary | **auto-detect**（暫定，Phase 0.2 確認） |
+| route.intelligence.requirements-cognition | 需求認知拆解 | primary | **auto-detect**（暫定） |
+| route.intelligence.engineering.heuristics | 實作任務輔助 | secondary | **advisory**（暫定） |
+| route.intelligence.engineering.agent-architecture | agent 設計參考 | mixed | **must-declare per use case** |
+| route.intelligence.apk-analysis.atoms | APK 分析輔助 | secondary | **advisory**（暫定） |
+| route.intelligence.apk-highest-leverage-path | APK 高槓桿路徑分析 | primary | **auto-detect**（暫定） |
+
+> Phase 0.2 acceptance criteria 加一條：**intelligence audit table 已 user-reviewed，每條 route 有明確 activation_mode 決策**，否則 Phase 1+ 不得啟動。
+
+##### Phase 0.2a-extensibility — 未來其他 mixed-layer types
+
+`must-declare` 標記可推廣到其他未來出現的 mixed-layer types。預設機制不是「給每個 type 一個答案」，而是「給每個 type 一個適當的 layer policy」：
+- 單一語意明確 → 預設 mode
+- 混合語意 → must-declare
+- Lint rule 通用化：表格中標 `must-declare` 的 type，commit-msg 都會檢查顯式宣告
 
 **為什麼這比人工 classification 表好**：
 - 新 route 作者最知道自己屬哪類，宣告 cost 低（一行 yaml）
@@ -442,7 +502,8 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 |---|---|---|
 | Q1 | Route classification 是否需要使用者 review 才定案？50 條人工分類有主觀成分 | still-open — 建議 Phase 0.2 產出 draft 後等 user confirm |
 | Q2 | Detector 的「first substantive message」定義 —— 純打招呼算嗎？ | **resolved (v3) → Phase 4.0 lifecycle**：採 intent vocabulary（domain_nouns ∪ action_verbs）判定，**不**用字數門檻。domain_nouns 自動從 routing-registry 的 `activation_any_of.user_signals` 聚合，registry 改即同步。 |
-| Q3 | Conflict resolution 多 route 命中時自動選還是 prompt user？ | resolved → 不自動選，注入 reminder 讓 agent 走 `workflow-routing.md` |
+| Q3 | Conflict resolution 多 route 命中時自動選還是 prompt user？ | **resolved** (v1) → 不自動選，注入 reminder 讓 agent 走 `workflow-routing.md`（v2/v3 close-out 誤標 still-open，v4 修正） |
+| Q8 | `route.intelligence.*` 全部 7 條 audit 結果是什麼？ | **new (v4)，still-open**：Phase 0.2a-special audit table 需 user 逐條 review，產出 acceptance criteria 之一。表中暫定值僅供討論。 |
 | Q4 | `workflow_sessions` TTL？跨 session 是否保留？ | **resolved → Phase 4.0**：本 plan 不落 SQLite，TTL 等於 in-memory RuntimeContext 生命週期（process scope）。跨 session 持久化延後到 Phase 4.1 follow-up plan。 |
 | Q5 | Detector miss 是否 fallback 到 Discovery？ | **resolved → Phase 6.1**：採納第二輪評審，**Yes** 但有限制 —— Discovery 只在 detector miss 時 fire（不是 per-turn），結果寫 `route-candidate-proposals.yaml` 供未來 review，不阻擋當前執行流程。 |
 | Q6 | 舊格式（直接 `user_signals` 不在 `any_of` 下）的 deprecation timeline？ | still-open — 建議無限期相容，Phase 2 補新 route 用新格式即可 |
@@ -516,6 +577,29 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 > v3 → 「Known Capability → Detector / Unknown Capability → Discovery / Discovery → Registry Growth / Runtime → In-Memory Context / Workflow → Activation Lifecycle」
 
 不再只是補洞，而是形成 Runtime 生態。Future maintainability 從 v2 的 B 提升目標：靠 `route_type` 自動分類 + Discovery feedback loop 讓 Registry 自我成長，使 framework 不需中央維護就能 scale。
+
+**Round 4 第三方架構評審**（採納於 v4）：
+
+| # | 評審論點 | 採納 | 對應修改 |
+|---|---|---|---|
+| 1 | `intelligence -> advisory` 預設危險，intelligence 是 mixed layer（part primary, part secondary） | ✅ | Phase 0.2a 將 intelligence 從「預設 advisory」改 `must-declare`（無預設）+ 機械 lint rule。Phase 0.2a-special 新增 intelligence audit gate，7 條 route 逐條決策成為 Phase 1 unlock 條件。Phase 0.2a-extensibility 將 must-declare 機制通用化。 |
+
+**Round 4 評分**（user 給）：
+
+| 項目 | v2 | v3 |
+|---|---|---|
+| Problem Identification | A | A |
+| Root Cause Analysis | A | A |
+| Runtime Design | B+ | A- |
+| Scalability | B | A |
+| Maintainability | B | A- |
+| Registry Evolution | C+ | A |
+| **Overall** | **B+** | **A-** |
+
+User 評語：
+> v3 已經從「補 travel-planning detector」進化成「建立 Capability Routing Runtime」。剩下最大架構風險不在 Detector，而是在「intelligence 是否真的能全部預設 advisory」這個分類假設。
+
+**v4 對此風險的處置**：拒絕單一 default，引入 must-declare + Phase 0.2 audit gate，把分類決策從「framework 替你猜」轉為「每條 route 自己負責宣告」。這也是「self-declaring routes」原則的徹底化 —— 連 mode 都不靠 type 猜。
 
 ## Companion References
 
