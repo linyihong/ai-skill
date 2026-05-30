@@ -403,6 +403,40 @@ func TestRunStopHookRepairPromptSaysCorrectedFinalIsAccepted(t *testing.T) {
 	}
 }
 
+func TestRunStopHookAllowsCursorPlanToolResponseWithoutCloseOutLoop(t *testing.T) {
+	setHookStdin(t, `{"hook_event_name":"stop","assistant_response":"Plan file created at: /tmp/project_overlay_rules.plan.md\n\nYou can read the plan contents from this file. The provided to-dos have been added to the file as well."}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cursor stop to allow non-final plan tool response, got %d; stderr=%s", code, stderr.String())
+	}
+	if stdout.String() != "" {
+		t.Fatalf("expected no followup loop for non-final plan tool response, got %s", stdout.String())
+	}
+	if !strings.Contains(stderr.String(), "ALLOW_CURSOR_NON_FINAL_TOOL_RESPONSE") {
+		t.Fatalf("expected non-final tool response diagnostic, got %s", stderr.String())
+	}
+}
+
+func TestRunStopHookAllowsCursorTodoToolResponseWithoutCloseOutLoop(t *testing.T) {
+	setHookStdin(t, `{"hook_event_name":"stop","assistant_response":"Successfully updated TODOs. Make sure to follow and update your TODO list as you make progress."}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cursor stop to allow non-final todo tool response, got %d; stderr=%s", code, stderr.String())
+	}
+	if stdout.String() != "" {
+		t.Fatalf("expected no followup loop for non-final todo tool response, got %s", stdout.String())
+	}
+	if !strings.Contains(stderr.String(), "ALLOW_CURSOR_NON_FINAL_TOOL_RESPONSE") {
+		t.Fatalf("expected non-final tool response diagnostic, got %s", stderr.String())
+	}
+}
+
 func setHookStdin(t *testing.T, input string) {
 	t.Helper()
 	previous := os.Stdin

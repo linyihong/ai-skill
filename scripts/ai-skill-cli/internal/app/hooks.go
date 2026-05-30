@@ -918,6 +918,12 @@ func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Wri
 	allAssistantText := strings.Join(texts, "\n\n--- assistant turn ---\n\n")
 	messages := []string{}
 
+	if cursorStop && isCursorNonFinalToolResponse(lastText) {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_CURSOR_NON_FINAL_TOOL_RESPONSE")
+		appendLog(logFile, "exit_code: 0 (allow cursor non-final tool response)")
+		return ExitSuccess
+	}
+
 	if !hasBootstrapAcknowledgement(allAssistantText) {
 		_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING_BOOTSTRAP_RECEIPT")
 		messages = append(messages, "[ai-skill Stop hook] Missing obligation: this conversation did not acknowledge the Ai-skill bootstrap.\n\n"+
@@ -960,6 +966,27 @@ func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Wri
 	}
 	_, _ = fmt.Fprint(stderr, message)
 	return ExitValidationFailed
+}
+
+func isCursorNonFinalToolResponse(text string) bool {
+	trimmed := strings.TrimSpace(text)
+	if trimmed == "" {
+		return false
+	}
+	nonFinalMarkers := []string{
+		"Plan file created at:",
+		"You can read the plan contents from this file.",
+		"The provided to-dos have been added",
+		"Successfully updated TODOs.",
+		"Switched composer mode",
+		"Successfully switched",
+	}
+	for _, marker := range nonFinalMarkers {
+		if strings.Contains(trimmed, marker) {
+			return true
+		}
+	}
+	return false
 }
 
 func hasBootstrapAcknowledgement(text string) bool {
