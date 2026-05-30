@@ -128,66 +128,11 @@ Contract / BDD / artifact / performance 的治理 gate 見 [`software-delivery-g
 
 > **Cognitive Slice 重構（Phase 2）**：Contract Governance Gate 與 Traceability Gate 已抽出為 [`contracts.md`](contracts.md)（slice `sd-contracts`）。文件優先順序、衝突分類、雙向可追溯性的 canonical content 在 `contracts.md`，此處不再保留正文以避免 dual source-of-truth。
 
-## BDD Execution Closure（BDD 執行閉環）
+## BDD Execution Closure / Test Strategy Gate → 已抽出為獨立 slice
 
-Narrative BDD 在回填期間是可接受的，但不能被當作完成的測試覆蓋率。對每個關鍵 scenario，記錄以下狀態之一：
-
-| 狀態 | 意義 | 必要下一步 |
-| --- | --- | --- |
-| `automated` | Scenario 由 unit、contract、API、integration、E2E、fixture 或 runner test 覆蓋 | 連結 test path/name |
-| `fixture-backed` | Scenario 由 checked-in input/output fixtures 證明但沒有完整 runner | 連結 fixture 和 assertion 負責人 |
-| `manual-evidence` | Scenario 需要手動、UI、bench 或外部服務證據 | 記錄執行步驟、證據和限制 |
-| `pending-runner` | Gherkin 存在但沒有 runner/step definition 被接上 | 加上 runner 選擇或對應到可執行的 test type |
-| `not-automatable` | Tooling 無法直接強制執行 | 說明手動審查或 release checklist 項目 |
-
-BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求每個關鍵 scenario 有明確的驗證路徑，且沒有模糊的「已記錄但未測試」狀態。
-
-> **輸出模板**：BDD Execution Closure 完成後，使用 [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) 記錄行為場景、acceptance criteria、validation target 與 traceability。
-
-## Test Strategy Gate（測試策略關卡）
-
-在實作前區分「保護舊行為」和「驗證新 code」。高總體覆蓋率可以證明舊行為受到保護，但不能證明新產生或新撰寫的 code 是正確的。
-
-| 目標 | 目的 | 必要驗證 |
-| --- | --- | --- |
-| 既有 / 舊有行為 | 防止 regression 並保護已知 contracts | 執行覆蓋受影響行為的既有 unit、BDD、contract、integration 和 regression tests |
-| 新需求或新 code | 證明新行為正確、安全且與 docs 一致 | 先寫或更新 BDD，然後在可行時在 production code 前加上 failing tests 或 executable specs。將 changed/new-code 覆蓋率與整體專案覆蓋率分開追蹤 |
-| AI 生成的 code | 補償合理但錯誤的 code | 要求 BDD scenario、unit/contract tests，以及專注於 intent、edge cases 和安全/所有權邊界的人類審查 |
-| 業務規則 / 演算法 | 捕捉通過範例但規則錯誤的情況 | 加上 property-based tests、invariant tests、targeted mutation checks 或 table-driven edge cases |
-| 關鍵條件判斷 / 驗證邏輯 | 證明當邏輯錯誤時 tests 會失敗 | 在可行時加上 mutation testing，或手動測試如果 guards 被移除會失敗的 negative cases |
-| 資料庫 / 持久化行為 | 保護真實的狀態轉換和遷移 | 加上 fixture-backed repository tests、migration tests 或針對代表性資料的 integration tests |
-| 效能敏感行為 | 防止功能正確的 code 超出 latency、throughput、error-rate 或資源預算 | 根據風險加上 load、stress、spike 或 soak tests；追蹤 P95/P99 latency、throughput、error rate、CPU、memory、disk、network、database connections、queue depth 和 external-call volume |
-
-新需求的建議順序：
-
-1. BDD scenarios
-2. 針對新行為的 failing unit、contract、property 或 integration tests
-3. Production code
-4. 關鍵規則的 mutation/negative checks
-5. 當變更可能影響 latency、throughput 或資源時的效能 smoke 或 targeted scenario
-6. 將 planning docs、BDD、tests 和效能證據並排進行人類審查
-
-### Mutation Testing / Test Effectiveness Check
-
-Mutation testing 是測試有效性檢查，不是 coverage KPI。當變更涉及 AI 生成邏輯、權限/安全/金流、domain invariant、複雜條件判斷、或 refactor 宣稱無行為變更時，使用 targeted mutant flow：
-
-1. 描述要防止的錯誤或 invariant break。
-2. 產生小型 mutants，例如 boundary、comparison、boolean、nullability、error handling 或 guard 移除。
-3. 過濾 equivalent mutants，避免把語意相同的版本當成測試缺口。
-4. 若 mutant survived，補 BDD / unit / property / contract / fixture test，或縮小 correctness claim。
-
-通過標準不是「mutant 越多越好」，而是至少能殺掉代表真實風險的 mutant；若沒有合適工具，可用手動 negative check 或 code review 方式模擬。
-
-對於效能測試，選擇能證明 release 風險的最小測試：
-
-| 測試類型 | 必要時機 |
-| --- | --- |
-| Load test | 預期流量、job volume 或 batch size 已知且必須保持在預算內 |
-| Stress test | 極限、飽和點或 degradation 行為未知 |
-| Spike test | 突然的 burst、queue pressure、retries、cache misses 或 external-call fan-out 是合理的 |
-| Soak test | 長時間運行的 memory、connection、cache、file-handle、queue 或 database drift 是合理的 |
-
-不要只接受平均 latency 作為效能證據。記錄 percentile latency、throughput、error rate 和資源使用率，以及環境和資料集大小。
+> **Cognitive Slice 重構（Phase 2）**：BDD Execution Closure 與 Test Strategy Gate（含 Mutation Testing / Test Effectiveness Check）已連同 execution-flow.md §2 Docs-First BDD Closure Loop + §4 子節「測試策略定義」+「Test-First Ordering」抽出為 [`test-strategy.md`](test-strategy.md)（slice `sd-test-strategy`，type `execution`，tags `artifact-gate, test, bdd`）。canonical content 在 `test-strategy.md`，此處不再保留正文以避免 dual source-of-truth。
+>
+> **perf 測試類型表**（load / stress / spike / soak）原於本節重複，現已歸 canonical 至 [`validation.md`](validation.md) §1 效能測試關卡（`sd-validation`）；`test-strategy.md` 引用 perf 風險作策略選型考量，不複製選型表。
 
 ## Embedded / Hardware Product Flow（嵌入式/硬體產品流程）
 

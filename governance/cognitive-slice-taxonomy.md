@@ -77,7 +77,7 @@ slice 最小單位 = **能獨立完成一個 cognitive phase**（非 step、非 
 |---|---|---|---|---|---|
 | `sd-intake` | execution | requirements, parity, intake | 接收新需求 / 變更 / 重構意圖、需求認知盤點 | 已有明確 contract、純執行既定改動 | development-process §Change Intake / Product Brief / Initial Doc Pack / Missing Information；execution-flow §1 |
 | `sd-contracts` | execution | artifact-gate, contract, traceability | 需建立 / 治理 contract 與可追溯性 | 無 contract 異動的小改 | **`contracts.md`（Phase 2 已實體拆檔，原 development-process §Required Contracts / Contract Governance / Traceability / Contract-First Rules）** |
-| `sd-test-strategy` | execution | artifact-gate, test, bdd | 定義測試策略 / BDD 閉環 / test-first ordering | 不涉測試設計的純文件改動 | development-process §BDD Closure / Test Strategy / Mutation；execution-flow §2、§測試策略、§Test-First Ordering |
+| `sd-test-strategy` | execution | artifact-gate, test, bdd | 定義測試策略 / BDD 閉環 / test-first ordering | 不涉測試設計的純文件改動 | **`test-strategy.md`（Phase 2 已實體拆檔，跨檔同批：原 execution-flow §2 + §4 子節「測試策略定義」+「Test-First Ordering」+ development-process §BDD Execution Closure + §Test Strategy Gate 含 Mutation Testing）** |
 | `sd-implementation` | execution | execution-order, surgical | 實際進行程式碼變更（核心執行順序） | evidence-only / 純分析任務 | execution-flow §3、§4、§驗證前的執行核心 |
 | `sd-surgical-caveats` | failure | caveat, surgical, diff-purity | 進行外科手術式小改、需控制 diff 純度 / orphan | 大型新功能初始實作 | **`surgical-changes.md`（Phase 2 已實體拆檔，原 execution-flow §9.1–9.5）** |
 | `sd-validation` | execution | artifact-gate, validation, performance | 驗證變更 / 效能關卡 | 尚未實作完成前 | **`validation.md`（Phase 2 已實體拆檔，原 execution-flow §5 Perf Gate + §7 Validate）** |

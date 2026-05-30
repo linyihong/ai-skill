@@ -452,6 +452,15 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 > - **perf gotcha 處置**（見 tracker）：validation.md 擁有 perf gate / 觸發 / 最低指標；perf 策略選型留給未來 sd-test-strategy 拆檔時 cross-link，不重複表格。
 > - **剩餘 3 個 lifecycle slice**（sd-intake / sd-test-strategy / sd-implementation）仍待同批拆檔。
 > - **Phase 3 待辦（追加）**：`validation.md` 同樣需納入 routing-registry / execution-flow.yaml / graph 同步。
+>
+> **Phase 2 進度補充（2026-05-30，sd-test-strategy 跨檔 slice，§4 split 處置）**：
+> - 已抽出第五個 focused slice **`workflow/software-delivery/test-strategy.md`**（`sd-test-strategy`，`type: execution`，tags `artifact-gate, test, bdd`）。**跨檔同批**：execution-flow.md §2 Docs-First BDD Closure Loop + §4 子節「測試策略定義」+「Test-First Ordering」+ development-process.md §BDD Execution Closure + §Test Strategy Gate（含 Mutation Testing）verbatim。
+> - **§4 split gotcha 處置**：§4 父節「同工作階段閉環（程式碼 + 持久文件）」**留在 execution-flow.md** 屬 `sd-implementation` 範圍；兩個子節抽出至 `test-strategy.md`；§4 內以 redirect 註記說明邊界。這是 tracker §gotcha 預先標註的處置點，確認可乾淨切分。
+> - **perf 重複表處置**：DP §Test Strategy Gate 原有的 perf 測試類型表（load/stress/spike/soak）**不複製**進 test-strategy.md，僅在「效能敏感行為」一列引用 perf 風險作策略選型考量；canonical perf 選型表留在 `validation.md` §1（兩 slice cross-link，不再有 dual table）。
+> - 來源章節改為 redirect stub（EF §2 / §4 兩子節 / DP §BDD Closure + §Test Strategy Gate）；thin-index Test strategy row + Phase 2 進度註記同步更新。
+> - taxonomy §7 `sd-test-strategy` 列 `canonical_source` 已更新指向 `test-strategy.md`。
+> - **剩餘 2 個 lifecycle slice**（sd-intake / sd-implementation）仍待同批拆檔。
+> - **Phase 3 待辦（追加）**：`test-strategy.md` 同樣需納入 routing-registry / execution-flow.yaml / graph 同步。
 
 ### Phase 2 Slice Extraction Tracker（handoff，2026-05-29）
 
@@ -463,19 +472,19 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 |---|---|---|---|---|---|
 | 1 | `sd-intake` | execution | `intake.md`（待建） | ⬜ todo | **EF**：§1 從證據開始（Start From Evidence + 變更接收 Change Intake + Pre-build Interrogation Gate + Requirements Cognition Checkpoint + 重構/Replacement Parity Gate）；§6 Backfill Rules（tag `domain-specific,backfill`）／ **DP**：§Initial Documentation Pack、§Product Brief Validation Gate（含 Product Impact Alignment Check）、§Change Intake Gate（含 Refactor/Replacement Parity Inventory）、§Missing Information Gate、§Existing Project Documentation Backfill（tag `domain-specific,backfill`） |
 | 2 | `sd-contracts` | execution | `contracts.md` | ✅ done | EF：無；DP：§Required Contracts、§Contract Governance Gate、§Traceability Gate、§Contract-First Rules（單檔，零 dual-source） |
-| 3 | `sd-test-strategy` | execution | `test-strategy.md`（待建） | ⬜ todo | **EF**：§2 Docs-First BDD Closure Loop、§4 之子節「測試策略定義」+「Test-First Ordering」／ **DP**：§BDD Execution Closure、§Test Strategy Gate（含 Mutation Testing / Test Effectiveness Check） |
+| 3 | `sd-test-strategy` | execution | `test-strategy.md` | ✅ done | 跨檔同批：EF §2 + §4 子節「測試策略定義」+「Test-First Ordering」；DP §BDD Execution Closure + §Test Strategy Gate 含 Mutation Testing。§4 split gotcha 已處置（父節留 EF for sd-implementation，子節入本 slice）；perf 表不複製，cross-link 至 validation.md |
 | 4 | `sd-implementation` | execution | `implementation.md`（待建，或留作 execution-flow 核心） | ⬜ todo | **EF**：§3 SDK 缺陷閉環、§4 同工作階段閉環（父節，**去掉**已歸 test-strategy 的兩個子節）／ **DP**：§When Frontend And Backend Do Not Both Exist、§Embedded/Hardware Product Flow（tag `domain-specific,embedded`）、Default Flow 實作步驟 10–15 |
 | 5 | `sd-surgical-caveats` | failure | `surgical-changes.md` | ✅ done | EF：§9.1–9.5（單檔）；DP：無 |
 | 6 | `sd-validation` | execution | `validation.md` | ✅ done | EF：§5 Perf Gate + §7 Validate（單檔）；DP：無獨立節。perf gotcha 處置：本 slice 擁有 perf **執行關卡 / 觸發 / 最低指標**；perf **測試類型選型表**留在 `sd-test-strategy`（DP §Test Strategy Gate），互相 cross-link 不複製。 |
 | 7 | `sd-closure` | execution | `closure.md` | ✅ done | EF：§8 Feed Back Reusable Lessons；DP：§Minimum Definition Of Ready、§Minimum Definition Of Done（跨檔同批） |
 | 8 | `sd-examples` | examples | `examples/EXAMPLES.md` | ➖ pre-existing | 本來就獨立檔；`default_load:false`，不需拆，僅確認 thin-index suppression 提示已在（已在） |
 
-**進度**：8 個中 **4 done**（contracts、surgical-changes、closure、validation）、1 pre-existing（examples）、**3 todo**（intake、test-strategy、implementation）。
+**進度**：8 個中 **5 done**（contracts、surgical-changes、closure、validation、test-strategy）、1 pre-existing（examples）、**2 todo**（intake、implementation）。
 
 > **命名重構待辦（external review 建議，2026-05-29）**：採用 `execution surface / evidence surface` 為正式 vocabulary 比 `slice` 更 runtime-oriented。**不在 Phase 2 處理重命名**——現有 4 個已抽出檔（surgical-changes / contracts / closure / validation）若改成 `*-surface.md`，會牽動 taxonomy §7、execution-flow.md thin-index、所有 redirect stub、未來 routing-registry、graph 描述等多處 cross-ref，宜等 3 個 todo slice 抽完後**一輪 sweep refactor**。正式 glossary 註冊本就延後至 Phase 4 validation 之後（見 §Open Questions glossary 條目），重命名 sweep 順勢併入該時點。
 
 **接手時的 gotcha（拆前必讀，否則會踩雷）**：
-- **§4 需切兩半**：execution-flow.md §4「同工作階段閉環」父節屬 `sd-implementation`，但其子節「測試策略定義」與「Test-First Ordering」屬 `sd-test-strategy`。拆 test-strategy 與 implementation 時必須同回合處理，否則 §4 會殘留半截或重複。
+- **§4 需切兩半**：~~execution-flow.md §4「同工作階段閉環」父節屬 `sd-implementation`，但其子節「測試策略定義」與「Test-First Ordering」屬 `sd-test-strategy`。~~ **已處置（2026-05-30 sd-test-strategy 拆檔時）**：§4 父節「同工作階段閉環（程式碼 + 持久文件）」留在 execution-flow.md 屬 `sd-implementation` 範圍；兩個子節已抽出至 `test-strategy.md`，§4 內加 redirect 註記。
 - **perf 內容重疊（validation ↔ test-strategy）**：~~load/stress/spike/soak 測試類型表同時出現在 execution-flow.md §5 與 development-process.md §Test Strategy Gate。~~ **已處置（2026-05-29 sd-validation 拆檔時）**：`validation.md` 擁有 perf **執行關卡 / 觸發條件 / 最低指標**（含 perf 測試類型對「何時用」的表，但語境是 gate 觸發）；DP §Test Strategy Gate 內的 perf 內容（測試類型作為 test strategy 選型的一環）留給 `sd-test-strategy` 拆檔時處理，屆時請把 DP §Test Strategy Gate 內的 perf 段定位為「策略視角」並 cross-link 到 `validation.md` 的「gate 視角」，**不重複完整表格**。
 - **Default Flow 表（DP 開頭）是跨階段 overview**：建議**保留在 development-process.md 當索引**，不搬進任何單一 slice（搬了會變成第二份 source-of-truth）。
 - **sd-implementation 可能不值得獨立檔**：其 canonical prose 很薄（多在 Default Flow overview）。接手者可評估讓它留在 execution-flow.md 當「execution 核心」而非另開檔——若如此，taxonomy §7 canonical_source 標明「execution-flow.md §3/§4（核心，不另拆檔）」即可，並在 granularity 判準上記錄理由。
@@ -486,7 +495,7 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
 - [~] 將 pilot surface 的正文分為 index / execution-order core / caveats（**caveats slice 已抽出**；artifact gates / examples 既已分離；其餘 lifecycle phase 待與 development-process.md 同批）：
   - [x] index / navigation（execution-flow.md 頂部 thin-index 導航）
   - [x] caveats / failure notes（→ `surgical-changes.md`）
-  - [~] execution-order lifecycle phase slices（**sd-contracts → `contracts.md`（單檔）、sd-closure → `closure.md`（跨檔同批）、sd-validation → `validation.md`（execution-flow 單側）已拆出**；其餘 intake/test-strategy/implementation 待同批）
+  - [~] execution-order lifecycle phase slices（**sd-contracts → `contracts.md`、sd-closure → `closure.md`、sd-validation → `validation.md`、sd-test-strategy → `test-strategy.md` 已拆出**；其餘 intake / implementation 待同批）
   - [ ] artifact gates（既在 `artifact-gates.md`）/ examples（既在 `examples/`）
 - [x] 父層 index 必須說明（execution-flow.md thin-index 導航表已含）：
   - [x] 何時讀哪個 workflow slice（load_when 欄）

@@ -13,7 +13,7 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 > | 認知階段（cognitive phase） | 本檔對應段落 | slice id | load_when |
 > |---|---|---|---|
 > | Intake（需求接收 / parity） | §1（Start From Evidence、Change Intake、Pre-build Interrogation、Requirements Cognition、Parity Gate）、§6 Backfill | `sd-intake` | 接收新需求 / 變更 / 重構意圖 |
-> | Test strategy（測試策略 / BDD） | §2 Docs-First BDD、§4 測試策略定義、Test-First Ordering | `sd-test-strategy` | 定義測試策略 / BDD 閉環 |
+> | Test strategy（測試策略 / BDD） | **已抽出** → [`test-strategy.md`](test-strategy.md)（含 BDD Closure / Docs-First Loop / Test Strategy Gate / Mutation / Test-First Ordering） | `sd-test-strategy` | 定義測試策略 / BDD 閉環 |
 > | Implementation（執行核心） | §3 SDK 缺陷閉環、§4 同工作階段閉環 | `sd-implementation` | 實際進行程式碼變更 |
 > | Validation（驗證 / 效能） | **已抽出** → [`validation.md`](validation.md)（含 Perf Gate + Validate） | `sd-validation` | 驗證變更 / 效能關卡 |
 > | Closure（收尾 / 回饋） | **已抽出** → [`closure.md`](closure.md)（含 DoR / DoD / Feed Back Lessons） | `sd-closure` | 收尾、DoR/DoD 檢核、回饋可重用課程 |
@@ -21,7 +21,7 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 >
 > **Suppression 提示**：行為範例 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)（`type: examples`）預設 **不載入**，僅在使用者明確要求範例或偵測到 ambiguity 時載入。evidence-only / 純分析任務不應載入本 execution-flow。
 >
-> > **Phase 2 進度**：已抽出 `sd-surgical-caveats`（[`surgical-changes.md`](surgical-changes.md)）、`sd-contracts`（[`contracts.md`](contracts.md)，development-process.md 單側）、`sd-closure`（[`closure.md`](closure.md)，§8 + development-process.md §DoR/§DoD 同批）、`sd-validation`（[`validation.md`](validation.md)，§5 + §7 execution-flow 單側）並建立本導航。其餘 3 個 lifecycle phase（intake / test-strategy / implementation）的實體拆檔留待與 `development-process.md` 同批進行（兩檔內容重疊，分批拆會造成 dual source-of-truth），見 plan Phase 2。routing-registry / execution-flow.yaml 將新 slice 納入 required source 的同步留待 Phase 3。
+> > **Phase 2 進度**：已抽出 `sd-surgical-caveats`（[`surgical-changes.md`](surgical-changes.md)）、`sd-contracts`（[`contracts.md`](contracts.md)）、`sd-closure`（[`closure.md`](closure.md)）、`sd-validation`（[`validation.md`](validation.md)）、`sd-test-strategy`（[`test-strategy.md`](test-strategy.md)，§2 + §4 子節 + development-process.md §BDD Closure/§Test Strategy Gate 跨檔同批）並建立本導航。其餘 2 個 lifecycle phase（intake / implementation）的實體拆檔留待與 `development-process.md` 同批進行，見 plan Phase 2。routing-registry / execution-flow.yaml 將新 slice 納入 required source 的同步留待 Phase 3。
 
 ## 1. 從證據開始（Start From Evidence）
 
@@ -99,23 +99,11 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 
 Blocking rule：任何舊入口若狀態為 `deferred`、`not planned` 或 `tool-specific`，必須寫明為何不阻擋目前 release / phase；任何會產生副作用的舊入口，必須有 dry-run、fake-root、fixture 或等效隔離測試。缺少 parity inventory 時，不得開始 replacement implementation，也不得宣稱新功能已覆蓋舊功能。
 
-## 2. 文件優先 BDD 閉環（Docs-First BDD Closure Loop）
+## 2. 文件優先 BDD 閉環（Docs-First BDD Closure Loop）→ 已抽出為獨立 slice
 
-當在行為由人類可讀規格加上可執行測試管理的儲存庫中工作時，在改變可觀察行為之前保持產出同步：
+Docs-First BDD Closure Loop 連同 BDD Execution Closure、Test Strategy Gate、測試策略定義、Test-First Ordering 已抽出為 focused slice **[`test-strategy.md`](test-strategy.md)**（`sd-test-strategy`，`type: execution`，tags `artifact-gate, test, bdd`）。canonical content 在 `test-strategy.md`，此處不再保留正文以避免 dual source-of-truth。
 
-| 步驟 | 行動 |
-| --- | --- |
-| 1 | 更新**擁有合約**（架構、API/介面、領域模型、錯誤處理、product brief 或同等文件），並在程式碼之前解決或標記開放問題 |
-| 2 | 在專案指定位置添加或編輯**人類可讀的行為規格** |
-| 3 | 在專案的**可執行行為測試**中鏡像相同的 scenarios；保持書面 scenarios 和可執行檢查同步 |
-| 4 | 實作步驟定義、適配器、fixtures 和生產程式碼 |
-| 5 | **完成定義：** 聚合的可執行行為套件或同等驗證在同一次變更中通過，且任何狀態表或可追溯性文件已更新 |
-
-除非團隊已在可追溯的變更記錄中明確範圍化缺失的規格工作，否則不要僅使用**單元測試**而沒有行為規格對齊就合併可觀察行為或共享合約變更。
-
-對於專案特定路徑、測試執行器和狀態表，使用應用程式儲存庫自己的治理文件；不要將這些細節複製到這個可重複使用的技能中。
-
-> **輸出模板**：BDD Closure Loop 完成後，使用 [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) 記錄行為場景、acceptance criteria、validation target 與 traceability。
+定義測試策略 / BDD 閉環 / test-first ordering 時載入該 slice。
 
 ## 3. SDK 缺陷閉環（即時重現 + BDD 回歸）
 
@@ -145,39 +133,9 @@ Blocking rule：任何舊入口若狀態為 `deferred`、`not planned` 或 `tool
 
 > **輸出模板**：Same-Session Closure 完成後，使用 [`templates/implementation-plan-template.md`](templates/implementation-plan-template.md) 記錄實作計畫。
 
-### 測試策略定義
+### 測試策略定義 / Test-First Ordering → 已抽出為獨立 slice
 
-然後定義測試策略：
-
-| 問題 | 必要行動 |
-| --- | --- |
-| 哪些既有行為不能回歸？ | 為受影響的舊行為執行或添加回歸測試 |
-| 引入了什麼新行為？ | 在可行時在生產程式碼之前撰寫 BDD 和失敗測試或可執行規格 |
-| 總覆蓋率是否隱藏了未測試的新程式碼？ | 分別追蹤變更/新程式碼覆蓋率與整個專案覆蓋率 |
-| 邏輯是否規則密集或安全敏感？ | 添加 targeted mutation checks、基於屬性的測試、不變量測試或負面案例 |
-| 測試是否真的能抓到錯誤？ | 對 AI-generated logic、critical branch、domain invariant 或 refactor-no-behavior-change claim，產生小型 mutant 或手動 negative check；若 mutant survived，補 validation target 或縮小完成宣告 |
-| 持久化是否重要？ | 添加 fixture 支援的資料庫/儲存庫/遷移測試或整合測試 |
-| 程式碼是否由 AI 生成？ | 需要測試加上針對規劃文件、BDD、合約和邊緣案例的人類審查 |
-| 這是嵌入式或硬體支援的？ | 分開主機可重複測試與僅目標或硬體在迴路中的證據；記錄板子、接線、引腳/匯流排設定、韌體版本、日誌和觀察到的偏差 |
-| 這個變更是否涉及效能？ | 首先添加一個小的、可重複的效能檢查；根據風險選擇負載、壓力、尖峰或浸泡測試。追蹤 P95/P99 延遲、吞吐量、錯誤率和資源使用率，而不僅是平均延遲 |
-
-### Test-First Ordering（Framework / Runtime / Governance 升級強制）
-
-> ⚠️ 上方策略表中「在可行時在生產程式碼之前撰寫 BDD 和失敗測試」對一般開發為**建議**；但若變更涉及 **framework / runtime / governance / workflow / validation / scenario / metadata / compiler / generated artifact** 改動，由 [`governance/lifecycle/system-upgrade-governance.md`](../../governance/lifecycle/system-upgrade-governance.md) §3 規則 9 升級為**強制**順序：
-
-```
-1. 列出 Phase N 期望可觀察行為（檔案、runtime.db、agent action）
-2. 寫對應 validation/scenarios/<domain>/<id>-v1.yaml
-3. 驗證 scenarios 目前 fail（fail-by-absence）
-4. 才開始 Phase N 實作
-5. Commit message 含「scenarios pre-written: <hash>, now passing」
-```
-
-**豁免**（須明寫理由）：doc-only trial / bug fix / typo / 探索性 spike
-**不可豁免**：runtime.db schema、enforcement rule、blocking gate、compiler、`generated_surfaces`
-
-完整原則見 [`intelligence/engineering/development/test-first-framework-upgrade.md`](../../intelligence/engineering/development/test-first-framework-upgrade.md)；
-對應 validation scenario [`validation/scenarios/failure-derived/test-first-for-framework-upgrades-v1.yaml`](../../validation/scenarios/failure-derived/test-first-for-framework-upgrades-v1.yaml)。
+§4 的兩個子節「測試策略定義」（專案內部問題清單）與「Test-First Ordering」（framework/runtime/governance 升級強制順序）已抽出為 [`test-strategy.md`](test-strategy.md)（`sd-test-strategy`）。canonical content 在 test-strategy.md，此處不再保留正文以避免 dual source-of-truth。本節 §4「同工作階段閉環」父節（程式碼 + 持久文件的閉環紀律）保留於此，屬 `sd-implementation` 範圍。
 
 ## 5. 效能測試關卡（Performance Test Gate）→ 已抽出為獨立 slice
 
