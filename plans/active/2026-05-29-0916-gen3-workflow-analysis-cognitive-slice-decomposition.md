@@ -528,7 +528,7 @@ Phase 2 exit criteria：
 - [x] 為 pilot slices 建立或更新 summary（若適用）：`knowledge/summaries/development-guidance.md` 已更新，指向 focused loading surfaces 並記錄 examples suppression。
 - [x] 檢查 `knowledge/runtime/routing-registry.yaml` 是否需要新增 / 修改 route：不新增 route；在既有 `route.workflow.software-delivery` 下新增 hierarchical `loading_surfaces` mapping，並把 6 個 focused surfaces 加入 `required_dependencies`。
 - [x] 若新增 route，必須同時定義 named consumer 或 `manual_activation` reason：not applicable，未新增 route / generated surface；consumer 是既有 `route.workflow.software-delivery` manual/agent routing。
-- [ ] **Hierarchical routing 規則**：新 route 採樹狀命名（`workflow.software-delivery.execution`），**不得**鋪成 flat route universe（`workflow.execution.api` / `workflow.execution.refactor` / `analysis.apk.network` / `analysis.apk.hls` … 平攤）。理由：防 route inflation 讓 routing-registry 本身變成第二個 monolith / giant cognition graph（external review 風險4，2026-05-29）。新增 route 前先確認能掛在既有層級節點下，不是平鋪新 leaf。
+- [x] **Hierarchical routing 規則**：新 route 採樹狀命名（`workflow.software-delivery.execution`），**不得**鋪成 flat route universe（`workflow.execution.api` / `workflow.execution.refactor` / `analysis.apk.network` / `analysis.apk.hls` … 平攤）。理由：防 route inflation 讓 routing-registry 本身變成第二個 monolith / giant cognition graph（external review 風險4，2026-05-29）。本輪實際未新增 route；focused surfaces 掛在既有 `route.workflow.software-delivery` 的 `loading_surfaces` 下，通過 hierarchical routing 規則。
 - [x] 為常見 intent 建立 loading guidance：
   - workflow execution
   - artifact validation
