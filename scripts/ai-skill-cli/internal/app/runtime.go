@@ -134,11 +134,11 @@ type runtimeIndexEdge struct {
 
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query|obligations|audit> [flags]")
+		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query|obligations|receipt|audit> [flags]")
 		return ExitInvalidUsage
 	}
 	opts := runtimeOptions{command: args[0], limit: 8}
-	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" && opts.command != "query" && opts.command != "obligations" && opts.command != "audit" {
+	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" && opts.command != "query" && opts.command != "obligations" && opts.command != "receipt" && opts.command != "audit" {
 		_, _ = fmt.Fprintf(stderr, "unsupported runtime command: %s\n", opts.command)
 		return ExitInvalidUsage
 	}
@@ -200,9 +200,108 @@ func buildRuntimeResult(opts runtimeOptions) Result {
 		return buildRuntimeRefreshResult(opts)
 	case "obligations":
 		return buildRuntimeObligationsResult(opts)
+	case "receipt":
+		return buildRuntimeReceiptResult(opts)
 	default:
 		return buildRuntimeValidateResult(opts)
 	}
+}
+
+type runtimeBootstrapReceipt struct {
+	Phase       string
+	Obligations int
+	Gates       int
+	PerTurn     []string
+}
+
+func (r runtimeBootstrapReceipt) receiptLine() string {
+	return fmt.Sprintf("Bootstrap: rules=✓ phase=%s obligations=%d gates=%d", r.Phase, r.Obligations, r.Gates)
+}
+
+func (r runtimeBootstrapReceipt) perTurnLine() string {
+	return "Active per-turn obligations: " + strings.Join(r.PerTurn, ", ")
+}
+
+func loadRuntimeBootstrapReceipt(root string) (runtimeBootstrapReceipt, error) {
+	dbPath := filepath.Join(root, "runtime", "runtime.db")
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return runtimeBootstrapReceipt{}, err
+	}
+	defer db.Close()
+
+	receipt := runtimeBootstrapReceipt{}
+	if err := db.QueryRow("SELECT phase_id FROM phase_machine WHERE phase_id <> '__config__' ORDER BY id LIMIT 1").Scan(&receipt.Phase); err != nil {
+		return runtimeBootstrapReceipt{}, err
+	}
+	if err := db.QueryRow("SELECT COUNT(*) FROM obligations").Scan(&receipt.Obligations); err != nil {
+		return runtimeBootstrapReceipt{}, err
+	}
+	if err := db.QueryRow("SELECT COUNT(*) FROM gates").Scan(&receipt.Gates); err != nil {
+		return runtimeBootstrapReceipt{}, err
+	}
+
+	var raw string
+	if err := db.QueryRow("SELECT data FROM generated_surfaces WHERE target_key='runtime.core_bootstrap.contract' LIMIT 1").Scan(&raw); err != nil {
+		return runtimeBootstrapReceipt{}, err
+	}
+	var doc map[string]any
+	if err := json.Unmarshal([]byte(raw), &doc); err != nil {
+		return runtimeBootstrapReceipt{}, err
+	}
+	receipt.PerTurn = runtimeObligationIDs(doc, "per_turn_obligations")
+	return receipt, nil
+}
+
+func runtimeObligationIDs(doc map[string]any, key string) []string {
+	arr, _ := doc[key].([]any)
+	ids := make([]string, 0, len(arr))
+	for _, item := range arr {
+		m, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		if id, ok := m["id"].(string); ok {
+			ids = append(ids, id)
+		}
+	}
+	return ids
+}
+
+func buildRuntimeReceiptResult(opts runtimeOptions) Result {
+	result := Result{
+		Command:        "runtime receipt",
+		Mode:           "native",
+		Status:         "success",
+		ExitCode:       ExitSuccess,
+		Checks:         []Check{},
+		PlannedActions: []string{},
+		Mutations:      []string{},
+	}
+	root, repoCheck := resolveRuntimeObligationsRepo(opts.repoPath)
+	result.Checks = append(result.Checks, repoCheck)
+	if repoCheck.Status != "ok" {
+		result.Status = "blocked"
+		result.ExitCode = ExitInvalidUsage
+		result.Error = &CommandError{Code: "invalid_repo", Message: repoCheck.Message}
+		return result
+	}
+	receipt, err := loadRuntimeBootstrapReceipt(root)
+	if err != nil {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{
+			Code:        "runtime_receipt_unavailable",
+			Message:     err.Error(),
+			Remediation: "Run `ai-skill runtime compile && ai-skill runtime refresh` to rebuild runtime.db projections.",
+		}
+		return result
+	}
+	result.Checks = append(result.Checks,
+		Check{Name: "bootstrap_receipt", Status: "ok", Message: receipt.receiptLine()},
+		Check{Name: "per_turn_obligations", Status: "ok", Message: strings.Join(receipt.PerTurn, ", ")},
+	)
+	return result
 }
 
 // buildRuntimeObligationsResult implements bootstrap-contract-yaml-migration
@@ -256,23 +355,12 @@ func buildRuntimeObligationsResult(opts runtimeOptions) Result {
 		result.Error = &CommandError{Code: "core_bootstrap_json_invalid", Message: err.Error()}
 		return result
 	}
-	listIDs := func(key string) []string {
-		arr, _ := doc[key].([]any)
-		ids := make([]string, 0, len(arr))
-		for _, item := range arr {
-			m, ok := item.(map[string]any)
-			if !ok {
-				continue
-			}
-			if id, ok := m["id"].(string); ok {
-				ids = append(ids, id)
-			}
-		}
-		return ids
+	perSession := runtimeObligationIDs(doc, "per_session_obligations")
+	perTurn := runtimeObligationIDs(doc, "per_turn_obligations")
+	perCommit := runtimeObligationIDs(doc, "per_commit_obligations")
+	if receipt, err := loadRuntimeBootstrapReceipt(root); err == nil {
+		result.Checks = append(result.Checks, Check{Name: "bootstrap_receipt", Status: "ok", Message: receipt.receiptLine()})
 	}
-	perSession := listIDs("per_session_obligations")
-	perTurn := listIDs("per_turn_obligations")
-	perCommit := listIDs("per_commit_obligations")
 	result.Checks = append(result.Checks,
 		Check{Name: "per_session_obligations", Status: "ok", Message: strings.Join(perSession, ", ")},
 		Check{Name: "per_turn_obligations", Status: "ok", Message: strings.Join(perTurn, ", ")},

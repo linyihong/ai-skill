@@ -4,7 +4,7 @@
 
 ## Thin Entry Point
 
-Cursor 的 repo 入口是 `.cursor/rules/dependency-reading.mdc`（`alwaysApply: true`）。它必須保持 thin pointer，只指向：
+Cursor 的 repo 入口是 `.cursor/rules/ai-skill-bootstrap.mdc`（`alwaysApply: true`）。它必須保持 thin pointer，只指向：
 
 1. [`CORE_BOOTSTRAP.md`](../../CORE_BOOTSTRAP.md)
 2. [`runtime/core-bootstrap.yaml`](../../runtime/core-bootstrap.yaml)

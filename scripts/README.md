@@ -176,10 +176,12 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime validate
 scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime query feedback --limit 5
 scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime query feedback --layer feedback --limit 5
 scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime query --graph --type depends_on --limit 5
+scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 runtime receipt --repo . --json
 ```
 
 `runtime refresh` 會更新 `knowledge/runtime/runtime-report.md`、`knowledge/runtime/model-context-report.md`、`knowledge/runtime/model-checklists.md`，並產生被 git ignore 的本機 `knowledge/runtime/sqlite/runtime-index.sqlite`。
 `runtime query` 只輸出候選來源，不取代 canonical Markdown / YAML。
+`runtime receipt` 是 Bootstrap Receipt 的正式讀取入口，agent / hook 不應臨時拼 `sqlite3` 查詢。
 
 此 helper 目前驗證：
 

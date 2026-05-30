@@ -37,7 +37,8 @@
 | `ai-skill runtime compile` | 編譯 `runtime/runtime.db` | 是 | 否 | Phase 3 |
 | `ai-skill runtime validate` | 驗證 runtime.db、knowledge runtime、SQLite assertions | 否 | 否 | Phase 3 |
 | `ai-skill runtime query` | 查詢 runtime index / generated surfaces | 否 | 否 | Phase 3 |
-| `ai-skill runtime obligations` | 列出目前 active bootstrap obligations（per_session / per_turn / per_commit），從 `generated_surfaces[runtime.core_bootstrap.contract]` 讀取 | 否 | 否 | bootstrap-yaml-migration Phase 3 |
+| `ai-skill runtime obligations` | 列出目前 active bootstrap obligations（per_session / per_turn / per_commit）並附 Bootstrap Receipt line，從 `generated_surfaces[runtime.core_bootstrap.contract]` 與 runtime phase/gate tables 讀取 | 否 | 否 | bootstrap-yaml-migration Phase 3 |
+| `ai-skill runtime receipt` | 輸出 canonical Bootstrap Receipt 與 active per-turn obligation IDs，供 hooks / stop repair 使用；避免 agent 臨時拼 SQLite 查詢 | 否 | 否 | bootstrap receipt repair hardening |
 | `ai-skill runtime audit` | 4-way 分類 routes / generated_surfaces / scenarios（auto-detected / consumed / intentionally-manual / orphan）。預設 markdown 報告；`--json` 切換 JSON。`runtime validate` 自動以 warning-only check 引用其 orphan 統計 | 否 | 否 | gen3-runtime-trigger-audit Phase 2 |
 | `ai-skill hooks run commit-msg` validator `validatePlanCheckboxSync` | commit-msg hook 第 16 個 validator：當 commit body 引用 `plans/active/*.md` 且 stage 真工作（Go / scenarios / runtime / governance / enforcement），plan 必須同 stage 且 staged diff 含 `[ ]` → `[x]` transition。block default；opt-out `[skip-plan-checkbox-sync]` | 否 | 是 | gen3-runtime-trigger-audit Phase 5 |
 | `ai-skill hooks run commit-msg` validator `validateRuntimeTriggerWiring` | commit-msg hook 第 17 個 validator：staged diff 新增 `route.*` 或 `target_key:` 但無 discovery signal / Go consumer / `manual_activation` annotation 則 block。enforces governance §`define_runtime_trigger_flow`；opt-out `[skip-runtime-trigger-wiring]` | 否 | 是 | gen3-runtime-trigger-audit Phase 5 |
@@ -409,7 +410,7 @@
 
 ### `ai-skill runtime obligations`
 
-目的：列出目前 active bootstrap obligations，從 `runtime/runtime.db` 的 `generated_surfaces[runtime.core_bootstrap.contract]` JSON 讀取。Source-of-truth 是 [`runtime/core-bootstrap.yaml`](../../../runtime/core-bootstrap.yaml)；本 command read-only。
+目的：列出目前 active bootstrap obligations，從 `runtime/runtime.db` 的 `generated_surfaces[runtime.core_bootstrap.contract]` JSON 讀取，並附上 canonical Bootstrap Receipt line。Source-of-truth 是 [`runtime/core-bootstrap.yaml`](../../../runtime/core-bootstrap.yaml) 與 runtime phase / gate tables；本 command read-only。
 
 輸入：
 
@@ -420,10 +421,29 @@
 
 必要行為：
 
+- 回報 `bootstrap_receipt` check，格式為 `Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>`。
 - 列出 `per_session_obligations` / `per_turn_obligations` / `per_commit_obligations` 各自的 obligation IDs。
 - 若 `runtime.core_bootstrap.contract` projection 不存在 → exit 30 並提示執行 `ai-skill runtime compile + refresh`。
 - 不可修改 runtime.db 或 generated surfaces。
 - 用途：debug "為什麼 commit-msg hook 擋我" + Phase 6 per-obligation dispatcher 對齊 hook 與 contract。
+
+### `ai-skill runtime receipt`
+
+目的：提供 Bootstrap Receipt 的正式 CLI surface，避免 agent 或 hook 直接拼 `sqlite3` 查詢或猜 runtime schema。
+
+輸入：
+
+- `--repo <path>`
+- `--json` / `--plain`
+
+副作用：無。
+
+必要行為：
+
+- 回報 `bootstrap_receipt` check，格式為 `Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>`。
+- 回報 `per_turn_obligations` check，內容為 active per-turn obligation IDs。
+- phase 取 runtime phase machine 的第一個非 `__config__` phase；obligations / gates 取 runtime tables row counts。
+- 若 runtime projection 不存在或 schema 不可讀，阻斷並提示執行 `ai-skill runtime compile && ai-skill runtime refresh`。
 
 ### `ai-skill runtime audit`
 

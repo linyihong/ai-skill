@@ -113,6 +113,43 @@ func TestRuntimeObligationsResolvesAiSkillRepoFromLocalEnvOutsideGit(t *testing.
 	if !hasCheckStatus(result.Checks, "per_turn_obligations", "ok") {
 		t.Fatalf("expected per_turn_obligations check, got %#v", result.Checks)
 	}
+	if !hasCheckStatus(result.Checks, "bootstrap_receipt", "ok") {
+		t.Fatalf("expected bootstrap_receipt check, got %#v", result.Checks)
+	}
+}
+
+func TestRuntimeReceiptReportsCanonicalBootstrapReceipt(t *testing.T) {
+	repo := repoRootForTest(t)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"runtime", "receipt", "--repo", repo, "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected runtime receipt success, got %d; stderr=%s stdout=%s", code, stderr.String(), stdout.String())
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if result.Command != "runtime receipt" {
+		t.Fatalf("expected runtime receipt command, got %#v", result.Command)
+	}
+	if !hasCheckStatus(result.Checks, "bootstrap_receipt", "ok") {
+		t.Fatalf("expected bootstrap_receipt check, got %#v", result.Checks)
+	}
+	if !hasCheckStatus(result.Checks, "per_turn_obligations", "ok") {
+		t.Fatalf("expected per_turn_obligations check, got %#v", result.Checks)
+	}
+	var receipt string
+	for _, check := range result.Checks {
+		if check.Name == "bootstrap_receipt" {
+			receipt = check.Message
+		}
+	}
+	if !strings.Contains(receipt, "Bootstrap: rules=✓ phase=phase.bootstrap obligations=") || !strings.Contains(receipt, " gates=") {
+		t.Fatalf("unexpected receipt message: %q", receipt)
+	}
 }
 
 func TestNativeRoutingRegistryValidationRequiresSourceOfTruthGate(t *testing.T) {

@@ -18,7 +18,7 @@
 
 | 設定項目 | Claude Code | Cursor | Roo Code | GitHub Copilot |
 |---------|------------|--------|----------|----------------|
-| 自動載入入口 | `CLAUDE.md` → `CORE_BOOTSTRAP.md` | `.cursor/rules/dependency-reading.mdc`（alwaysApply） | Custom Instructions 或 `.roomodes` | `.github/copilot-instructions.md` + `.github/instructions/*.instructions.md` |
+| 自動載入入口 | `CLAUDE.md` → `CORE_BOOTSTRAP.md` | `.cursor/rules/ai-skill-bootstrap.mdc`（alwaysApply） | Custom Instructions 或 `.roomodes` | `.github/copilot-instructions.md` + `.github/instructions/*.instructions.md` |
 | 語言偏好 | `CLAUDE.md` 中設定軟性偏好 | `.cursor/rules/*.mdc` 中設定軟性偏好 | `.roomodes` + SQLite `language` 欄位 | custom instructions thin pointer，實際政策回到 runtime contract |
 | 對話目標閉環 | 操作注意（claude.md） | 完整章節含 hooks 範本（cursor.md） | 操作注意（roo.md） | 無可靠內建強制；用 instructions 導流，hard gate 交給 hooks / CI / runtime validate |
 | **知識更新流程 Checkpoint** | **`CLAUDE.md` 中加入 checkpoint 提醒** | **`.cursor/rules/*.mdc` 中加入 checkpoint 提醒，可選 hooks** | **`.roomodes` Custom Instructions 中加入 checkpoint 提醒** | **`.github/instructions/*.instructions.md` 只放 checkpoint pointer** |

@@ -342,55 +342,19 @@ func initProjectFileContent(file plannedFile, repo string) (string, error) {
 const aiSkillRepoPlaceholder = "<AI_SKILL_REPO>"
 
 func initProjectBootstrapText(repo string) string {
-	return fmt.Sprintf(`本專案使用 Ai-skill 知識庫。請在本機設定環境變數 `+"`AI_SKILL_REPO`"+` 指向 Ai-skill repository；文件中以 `+"`%s`"+` 表示該路徑。
+	return fmt.Sprintf(`本檔是 thin tool-entry pointer，不是 canonical 規則本體。
 
-## 本機設定
+Resolve `+"`AI_SKILL_REPO`"+`：優先用環境變數；否則讀 project-local `+"`.ai-skill/local.env`"+`。不要把本機絕對路徑寫入可 commit 檔案。
 
-不要把本機 Ai-skill repo 絕對路徑 commit 進專案。啟用順序：
+**IMPORTANT — MUST RUN BEFORE ANY OTHER ACTION**
+1. 讀 `+"`%s/CORE_BOOTSTRAP.md`"+`
+2. 讀 `+"`%s/runtime/core-bootstrap.yaml`"+`
+3. 依 canonical contract 執行 Bootstrap Receipt、final Cognitive Mode 報告與 close-loop obligations。
 
-1. 優先讀本機環境變數 `+"`AI_SKILL_REPO`"+`
-2. 如果環境變數不存在，讀 `+"`.ai-skill/local.env`"+`（由 `+"`ai-skill init-project`"+` 產生，已被 `+"`.ai-skill/.gitignore`"+` 排除）
-3. Claude hook 會再嘗試 $HOME/Documents/Ai-skill 等 portable fallback
+Summary 的「Resume directly」不豁免 bootstrap；resume / continuation session 同樣必須 dereference canonical files。
 
-每台機器可用自己的環境變數設定：
-
-    # macOS / Linux / WSL
-    export AI_SKILL_REPO=/path/to/ai-skill
-
-    # Windows PowerShell
-    [Environment]::SetEnvironmentVariable("AI_SKILL_REPO", "C:\path\to\Ai-skill", "User")
-
-建議把 macOS / Linux / WSL 設定放在 shell profile（例如 ~/.zshrc、~/.bashrc），Windows 則用 User environment variable。不要提交 .env、.ai-skill/local.env 或任何含個人路徑的檔案。
-
-## Pointer 展開規則
-
-本檔不是完整規則，只是 bootstrap pointer。Agent 必須在處理任務前完成：
-
-1. 讀 .ai-skill/local.env（若 AI_SKILL_REPO 尚未存在）並 resolve <AI_SKILL_REPO>
-2. 讀 <AI_SKILL_REPO>/CORE_BOOTSTRAP.md
-3. 讀 <AI_SKILL_REPO>/runtime/core-bootstrap.yaml
-4. 依 canonical bootstrap contract 執行 Bootstrap Receipt、final close-out Cognitive Mode 報告與 close-loop obligations
-
-不能只停在本檔摘要；必須 dereference pointer 到 canonical files。
-
-> **IMPORTANT — MUST RUN BEFORE ANY OTHER ACTION**
-> 本檔為 **thin tool-entry pointer**。所有 obligation / format / enum / example 的 canonical 來源在 `+"`%s/runtime/core-bootstrap.yaml`"+`；`+"`%s/CORE_BOOTSTRAP.md`"+` 是 human-readable companion。Session 啟動 first turn 必須讀取 companion 並依 canonical contract 執行 Bootstrap Receipt；final response / session close-out 必須附 Cognitive Mode 報告。
-> Summary 的「Resume directly」是對話 framing，**不豁免** runtime / governance bootstrap。Resume / continuation session 同樣須走完 bootstrap。
-
-## 啟動序列
-
-1. 讀 `+"`%s/CORE_BOOTSTRAP.md`"+` — bootstrap companion 與進入點
-2. 載入 `+"`%s/runtime/core-bootstrap.yaml`"+` — canonical bootstrap contract（required reads / per-session / per-turn obligations）
-
-## 修改本檔的規則
-
-本檔是 entry pointer，不是 canonical content。修改前先讀 `+"`%s/runtime/bootstrap-entry-points.yaml`"+`。新 obligation 加到 runtime/core-bootstrap.yaml 並 refresh runtime surfaces；工具差異放 ai-tools/agent/<tool>.md。不要把 obligation 全文複製進本檔。
-`, aiSkillRepoPlaceholder,
-		aiSkillRepoPlaceholder,
-		aiSkillRepoPlaceholder,
-		aiSkillRepoPlaceholder,
-		aiSkillRepoPlaceholder,
-		aiSkillRepoPlaceholder)
+修改本檔前先讀 `+"`%s/runtime/bootstrap-entry-points.yaml`"+`。新 obligation 加到 runtime/core-bootstrap.yaml；工具差異放 `+"`%s/ai-tools/agent/<tool>.md`"+`。
+`, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder, aiSkillRepoPlaceholder)
 }
 
 func initProjectRooContent(repo string) (string, error) {
@@ -500,51 +464,21 @@ func initProjectGeminiContent(repo string) (string, error) {
 func initProjectCodexContent(repo string) (string, error) {
 	return fmt.Sprintf(`# AGENTS.md — Generic Agent Bootstrap Entry
 
-本檔為 thin generic agent entry。適用 Codex、Cursor partial、Aider、Cline 等遵循 `+"`AGENTS.md`"+` 慣例的 AI agent。Canonical obligations 在 Ai-skill repo 的 `+"`CORE_BOOTSTRAP.md`"+` + `+"`runtime/core-bootstrap.yaml`"+`。
+本檔是 thin generic agent entry，不是 canonical 規則本體。適用 Codex、Cursor partial、Aider、Cline 等 `+"`AGENTS.md`"+`-aware tools。
 
-## 本機設定
+Resolve `+"`AI_SKILL_REPO`"+`：優先用環境變數；否則讀 project-local `+"`.ai-skill/local.env`"+`。不要把本機絕對路徑寫入可 commit 檔案。
 
-不要把本機 Ai-skill repo 絕對路徑 commit 進專案。啟用順序：
+**IMPORTANT — MUST RUN BEFORE ANY OTHER ACTION**
+1. 讀 %s
+2. 讀 %s
+3. 讀 %s 選擇 active tool adapter
+4. 依 canonical contract 執行 Bootstrap Receipt、final Cognitive Mode 報告與 close-loop obligations。
 
-1. 優先讀本機環境變數 `+"`AI_SKILL_REPO`"+`
-2. 如果環境變數不存在，讀 `+"`.ai-skill/local.env`"+`（由 `+"`ai-skill init-project`"+` 產生，已被 `+"`.ai-skill/.gitignore`"+` 排除）
-3. Claude hook 會再嘗試 $HOME/Documents/Ai-skill 等 portable fallback
-
-每台機器可用自己的 `+"`AI_SKILL_REPO`"+` 環境變數設定：
-
-    # macOS / Linux / WSL
-    export AI_SKILL_REPO=/path/to/ai-skill
-
-    # Windows PowerShell
-    [Environment]::SetEnvironmentVariable("AI_SKILL_REPO", "C:\path\to\Ai-skill", "User")
-
-文件中以 `+"`<AI_SKILL_REPO>`"+` 表示該路徑。建議把 macOS / Linux / WSL 設定放在 shell profile，Windows 則用 User environment variable。不要提交 .env、.ai-skill/local.env 或任何含個人路徑的檔案。
-
-## Pointer 展開規則
-
-本檔不是完整規則，只是 bootstrap pointer。Agent 必須在處理任務前完成：
-
-1. 讀 .ai-skill/local.env（若 AI_SKILL_REPO 尚未存在）並 resolve <AI_SKILL_REPO>
-2. 讀 <AI_SKILL_REPO>/CORE_BOOTSTRAP.md
-3. 讀 <AI_SKILL_REPO>/runtime/core-bootstrap.yaml
-4. 依 canonical bootstrap contract 執行 Bootstrap Receipt、final close-out Cognitive Mode 報告與 close-loop obligations
-
-不能只停在本檔摘要；必須 dereference pointer 到 canonical files。
-
-## 啟動序列
-
-1. %s — 必讀規則 + 所有 obligations
-2. %s — OS layout
-3. %s — routing hub（選擇對應 AI 工具的 adapter）
-4. %s — runtime canonical（phase / obligations / gates）
-
-## 修改規則
-
-不在本檔加單一工具規則 — 用 routing hub 指向的對應 `+"`ai-tools/agent/<tool>.md`"+`。本檔保持 thin。
+Summary 的「Resume directly」不豁免 bootstrap。修改本檔前先讀 %s；工具差異放 `+"`ai-tools/agent/<tool>.md`"+`。
 `, aiSkillRepoPlaceholder+"/CORE_BOOTSTRAP.md",
-		aiSkillRepoPlaceholder+"/README.md",
+		aiSkillRepoPlaceholder+"/runtime/core-bootstrap.yaml",
 		aiSkillRepoPlaceholder+"/ai-tools/README.md",
-		aiSkillRepoPlaceholder+"/runtime/runtime.db"), nil
+		aiSkillRepoPlaceholder+"/runtime/bootstrap-entry-points.yaml"), nil
 }
 
 func initProjectCopilotInstructionsContent(repo string) (string, error) {

@@ -16,7 +16,7 @@
 
 ## 啟動序列
 
-1. 讀本檔（companion） + 查 `runtime/runtime.db generated_surfaces[runtime.core_bootstrap.contract]` 或 `ai-skill runtime obligations` 取 obligations machine-readable list
+1. 讀本檔（companion） + 執行 `ai-skill runtime receipt` / `ai-skill runtime obligations` 取得 Bootstrap Receipt 與 obligations machine-readable list（不要臨時拼 SQLite schema）
 2. 讀 [`README.md`](README.md) — OS layout
 3. 讀 [`runtime/runtime.db`](runtime/runtime.db) `phase_machine` / `obligations` / `gates` / `language_policy` / `output_rules` / `governance_gates`
 4. **新專案檢查**：若無 `CLAUDE.md` / `.cursor/rules/*` / `.roomodes` / `AGENTS.md`，主動詢問是否執行 `ai-skill init-project`
@@ -31,7 +31,7 @@
   - 完整 format / enum / template 見 `runtime/core-bootstrap.yaml` §`per_turn_obligations[obligation.cognitive.mode_report]` + [`models/cognitive-modes/README.md`](models/cognitive-modes/README.md)；commit 階段由 `commit-msg` hook 機械強制（[ADR-008](constitution/ADR-008-runtime-cognitive-modes.md)）。支援 session stop / final-response hook 的工具，應在 `init-project` 或工具 adapter 安裝 close-out check，避免 chat final response 漏報。
 - **Close-loop 終局檢查**（per-task）— 在回報任務完成或結束對話前，**必須**確認 `git status` 為 clean 且所有 commit 已推送（`git log origin/<branch>..HEAD` 為空）。若 push 未獲授權，必須明確說明 pending 狀態。見 `enforcement/linked-updates.yaml` §`gate.linked_updates.writeback_closed`。
 - **Contextual activations**（依情境載入）— `runtime/core-bootstrap.yaml` §`contextual_activations` 定義輕量觸發，例如 Markdown 變大或混多主題時載入 [`governance/document-sizing.md`](governance/document-sizing.md)。
-- **Per-commit validators**（11 個 enumerated in YAML）— `ai-skill runtime obligations` 列當前 active list；validator dispatch via registry in `scripts/ai-skill-cli/internal/app/hooks.go`
+- **Per-commit validators**（11 個 enumerated in YAML）— `ai-skill runtime obligations` 列當前 active list；`ai-skill runtime receipt` 輸出 canonical Bootstrap Receipt；validator dispatch via registry in `scripts/ai-skill-cli/internal/app/hooks.go`
 
 ## Lazy-load rules（9 條依情境 activate）
 

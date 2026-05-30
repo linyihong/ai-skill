@@ -112,10 +112,13 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if !strings.Contains(string(claudeContent), "<AI_SKILL_REPO>/CORE_BOOTSTRAP.md") {
 		t.Fatalf("expected portable placeholder in CLAUDE.md, got %s", string(claudeContent))
 	}
-	if !strings.Contains(string(claudeContent), "AI_SKILL_REPO") || !strings.Contains(string(claudeContent), "Windows PowerShell") {
-		t.Fatalf("expected cross-platform AI_SKILL_REPO setup guidance in CLAUDE.md, got %s", string(claudeContent))
+	if !strings.Contains(string(claudeContent), "AI_SKILL_REPO") || strings.Contains(string(claudeContent), "Windows PowerShell") {
+		t.Fatalf("expected thin AI_SKILL_REPO pointer without setup tutorial in CLAUDE.md, got %s", string(claudeContent))
 	}
-	if !strings.Contains(string(claudeContent), "Pointer 展開規則") || !strings.Contains(string(claudeContent), "final close-out Cognitive Mode") {
+	if strings.Count(string(claudeContent), "\n")+1 > 30 {
+		t.Fatalf("CLAUDE.md must remain a thin bootstrap entry, got %d lines:\n%s", strings.Count(string(claudeContent), "\n")+1, string(claudeContent))
+	}
+	if !strings.Contains(string(claudeContent), "MUST RUN BEFORE ANY OTHER ACTION") || !strings.Contains(string(claudeContent), "final Cognitive Mode") {
 		t.Fatalf("expected explicit pointer expansion guidance in CLAUDE.md, got %s", string(claudeContent))
 	}
 	claudeSettingsPath := filepath.Join(project, ".claude", "settings.json")
@@ -135,16 +138,16 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if !strings.Contains(string(claudeSettings), ".ai-skill/local.env") {
 		t.Fatalf("expected Claude hooks to source project-local env, got %s", string(claudeSettings))
 	}
-	// Regression: hook runner must receive the *project* root as --repo (so nested
-	// Git / project context reports target the workspace), not the Ai-skill repo.
-	if !strings.Contains(string(claudeSettings), `--repo \"$ROOT\"`) {
-		t.Fatalf("expected Claude hooks to pass project root ($ROOT) as --repo, got %s", string(claudeSettings))
-	}
-	if strings.Contains(string(claudeSettings), `--repo \"$AI_SKILL_REPO\"`) {
-		t.Fatalf("Claude hooks must not pass $AI_SKILL_REPO as --repo (would misreport project root), got %s", string(claudeSettings))
-	}
-	if !pathExists(filepath.Join(project, ".cursor", "rules", "ai-skill-bootstrap.mdc")) {
+	cursorRulePath := filepath.Join(project, ".cursor", "rules", "ai-skill-bootstrap.mdc")
+	if !pathExists(cursorRulePath) {
 		t.Fatal("write mode did not create Cursor rule")
+	}
+	cursorRule, err := os.ReadFile(cursorRulePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Count(string(cursorRule), "\n")+1 > 30 {
+		t.Fatalf("Cursor bootstrap rule must remain thin, got %d lines:\n%s", strings.Count(string(cursorRule), "\n")+1, string(cursorRule))
 	}
 	cursorHooksPath := filepath.Join(project, ".cursor", "hooks.json")
 	cursorHooks, err := os.ReadFile(cursorHooksPath)
@@ -233,10 +236,13 @@ func TestInitProjectWritesCodexBootstrap(t *testing.T) {
 	if strings.Contains(string(content), filepath.ToSlash(repo)) {
 		t.Fatalf("AGENTS.md must not contain local absolute Ai-skill path, got %s", string(content))
 	}
-	if !strings.Contains(string(content), "AI_SKILL_REPO") || !strings.Contains(string(content), "Windows PowerShell") {
-		t.Fatalf("expected cross-platform AI_SKILL_REPO setup guidance in AGENTS.md, got %s", string(content))
+	if !strings.Contains(string(content), "AI_SKILL_REPO") || strings.Contains(string(content), "Windows PowerShell") {
+		t.Fatalf("expected thin AI_SKILL_REPO pointer without setup tutorial in AGENTS.md, got %s", string(content))
 	}
-	if !strings.Contains(string(content), "Pointer 展開規則") || !strings.Contains(string(content), "final close-out Cognitive Mode") {
+	if strings.Count(string(content), "\n")+1 > 30 {
+		t.Fatalf("AGENTS.md must remain a thin bootstrap entry, got %d lines:\n%s", strings.Count(string(content), "\n")+1, string(content))
+	}
+	if !strings.Contains(string(content), "MUST RUN BEFORE ANY OTHER ACTION") || !strings.Contains(string(content), "final Cognitive Mode") {
 		t.Fatalf("expected explicit pointer expansion guidance in AGENTS.md, got %s", string(content))
 	}
 }

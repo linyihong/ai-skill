@@ -620,21 +620,11 @@ func runSessionStartHook(projectDir string, stdout io.Writer, stderr io.Writer) 
 	appendLog(logFile, "=== "+ts+" SessionStart hook fired (Go) ===")
 
 	aiSkillRepo := resolveClaudeAiSkillRepo(projectDir)
-	phase, obligCount, gateCount := "unknown", "?", "?"
-	dbPath := filepath.Join(aiSkillRepo, "runtime", "runtime.db")
-	if db, err := sql.Open("sqlite", dbPath); err == nil {
-		defer db.Close()
-		if row := db.QueryRow("SELECT phase_id FROM phase_machine LIMIT 1"); row != nil {
-			_ = row.Scan(&phase)
-		}
-		if row := db.QueryRow("SELECT COUNT(*) FROM obligations"); row != nil {
-			_ = row.Scan(&obligCount)
-		}
-		if row := db.QueryRow("SELECT COUNT(*) FROM gates"); row != nil {
-			_ = row.Scan(&gateCount)
-		}
+	receipt, err := loadRuntimeBootstrapReceipt(aiSkillRepo)
+	if err != nil {
+		receipt = runtimeBootstrapReceipt{Phase: "unknown", Obligations: 0, Gates: 0}
+		appendLog(logFile, "runtime receipt unavailable: "+err.Error())
 	}
-	const activePerTurn = "obligation.cognitive.mode_report, obligation.finality.close_loop_check"
 
 	coreBootstrap := readFileSafe(filepath.Join(aiSkillRepo, "CORE_BOOTSTRAP.md"))
 	ruleWeight := readFileSafe(filepath.Join(aiSkillRepo, "enforcement", "rule-weight.md"))
@@ -645,15 +635,15 @@ func runSessionStartHook(projectDir string, stdout io.Writer, stderr io.Writer) 
 		"[ai-skill SessionStart] Bootstrap auto-loaded. The agent does NOT need to read these files again "+
 			"— they are already in context. Include this Bootstrap Receipt near the start of the first "+
 			"user-facing response when possible. If missed, the same-session corrected final response may repair it:\n\n"+
-			"Bootstrap: rules=✓ phase=%s obligations=%s gates=%s\n"+
-			"Active per-turn obligations: %s\n\n"+
+			"%s\n"+
+			"%s\n\n"+
 			"Final response MUST also end with a Cognitive Mode 報告 block (compact form is fine for trivial "+
 			"tasks). Close-out enforcement: see runtime/core-bootstrap.yaml §per_turn_obligations.\n\n"+
 			"--- CORE_BOOTSTRAP.md (companion) ---\n%s\n\n"+
 			"--- enforcement/rule-weight.md ---\n%s\n\n"+
 			"--- enforcement/dependency-reading.md ---\n%s\n\n"+
 			"--- enforcement/conversation-goal-ledger.md ---\n%s",
-		phase, obligCount, gateCount, activePerTurn,
+		receipt.receiptLine(), receipt.perTurnLine(),
 		coreBootstrap, ruleWeight, dependency, goalLedger,
 	)
 
@@ -672,7 +662,7 @@ func runSessionStartHook(projectDir string, stdout io.Writer, stderr io.Writer) 
 	flagFile := "/tmp/ai-skill-sessionstart-" + projectHash + ".flag"
 	_ = os.WriteFile(flagFile, []byte(fmt.Sprintf("%d", time.Now().Unix())), 0o644)
 	appendLog(logFile, "wrote sessionstart flag: "+flagFile)
-	appendLog(logFile, fmt.Sprintf("phase=%s obligations=%s gates=%s", phase, obligCount, gateCount))
+	appendLog(logFile, fmt.Sprintf("phase=%s obligations=%d gates=%d", receipt.Phase, receipt.Obligations, receipt.Gates))
 	return ExitSuccess
 }
 
@@ -962,7 +952,7 @@ func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Wri
 
 	message := "[ai-skill Stop hook] Close-out validation failed. This is an agent follow-up instruction, not a user request.\n\n" +
 		strings.Join(messages, "\n---\n\n") +
-		"\nPlease produce one corrected final response now that satisfies all missing items in one pass. A corrected final response is accepted as repair; do not repeat the same violation after adding the requested sections. Canonical format spec: runtime/core-bootstrap.yaml. Query active obligations: `ai-skill runtime obligations`.\n"
+		"\nPlease produce one corrected final response now that satisfies all missing items in one pass. A corrected final response is accepted as repair; do not repeat the same violation after adding the requested sections. Canonical format spec: runtime/core-bootstrap.yaml. Query receipt values with `ai-skill runtime receipt`; query active obligations with `ai-skill runtime obligations`.\n"
 	appendLog(logFile, fmt.Sprintf("exit_code: 2 (block missing close-out items: %d)", len(messages)))
 	if cursorStop {
 		writeCursorStopFollowup(stdout, message)
@@ -1021,7 +1011,7 @@ func validateStopHookFinalText(projectDir string, lastText string, stdout io.Wri
 		"response MUST end with a Cognitive Mode block (compact 1-line for trivial all-default tasks: " +
 		"`Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>`; full 6-row markdown table otherwise).\n\n" +
 		"Please append the block to your response now, then stop again. Canonical format spec: runtime/core-bootstrap.yaml. " +
-		"Query active obligations: `ai-skill runtime obligations`.\n"
+		"Query receipt values with `ai-skill runtime receipt`; query active obligations with `ai-skill runtime obligations`.\n"
 	if cursorStop {
 		writeCursorStopFollowup(stdout, message)
 		return ExitSuccess

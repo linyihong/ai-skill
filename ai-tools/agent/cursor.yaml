@@ -25,7 +25,7 @@ activation:
     - Cursor goal ledger, checkpoint, or language behavior is reviewed.
 
 required_sources:
-  - .cursor/rules/dependency-reading.mdc
+  - .cursor/rules/ai-skill-bootstrap.mdc
   - CORE_BOOTSTRAP.md
   - runtime/core-bootstrap.yaml
   - ai-tools/agent/cursor.md
@@ -35,7 +35,7 @@ required_sources:
 steps:
   - id: load_cursor_always_apply_rule
     order: 1
-    action: Use .cursor/rules/dependency-reading.mdc only as a thin Cursor always-apply bootstrap pointer.
+    action: Use .cursor/rules/ai-skill-bootstrap.mdc only as a thin Cursor always-apply bootstrap pointer.
   - id: load_core_bootstrap
     order: 2
     action: Load CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml as the only bootstrap entry sources before expanding detailed sources.
@@ -80,7 +80,7 @@ gates:
   - id: gate.cursor.always_apply_bootstrap_current
     blocks: cursor_rule_change
     pass_when:
-      - .cursor/rules/dependency-reading.mdc remains a thin pointer to CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml
+      - .cursor/rules/ai-skill-bootstrap.mdc remains a thin pointer to CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml
       - Bootstrap obligations, formats, enums, and examples are not duplicated in the Cursor rule
 
 required_evidence:
@@ -91,7 +91,7 @@ required_evidence:
   - final git status after writeback
 
 success_criteria:
-  - Cursor starts from .cursor/rules/dependency-reading.mdc, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, and ai-tools/agent/cursor.md as appropriate.
+  - Cursor starts from .cursor/rules/ai-skill-bootstrap.mdc, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, and ai-tools/agent/cursor.md as appropriate.
   - Cursor init-project installs a stop close-out check for Bootstrap Receipt and final Cognitive Mode reporting.
   - Cursor hooks remain reminders/checks unless explicitly configured for fail-closed validation.
   - Cursor-specific details stay in the adapter layer and canonical bootstrap content is not duplicated.
@@ -109,7 +109,7 @@ failure_modes:
     recovery: Replace duplicated prose with links to CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml.
   - id: cursor_bootstrap_stale
     detection: Cursor always-apply rule no longer points to core bootstrap and runtime source-of-truth.
-    recovery: Update .cursor/rules/dependency-reading.mdc and validate linked updates.
+    recovery: Update .cursor/rules/ai-skill-bootstrap.mdc and validate linked updates.
   - id: cursor_final_cognitive_missing
     detection: Cursor init-project lacks a stop final-response hook that checks for Bootstrap Receipt plus compact or full Cognitive Mode reporting with `followup_message` loopback.
     recovery: Restore the init-project Cursor stop hook and add regression tests for missing Bootstrap Receipt and final Cognitive output using Cursor's loopback protocol.

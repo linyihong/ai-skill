@@ -71,7 +71,8 @@ per_session_obligations:
     enforcement_layer: behavioral_forcing + repairable_stop_hook
     forcing_function: |
       Numeric values require runtime.db query (cannot be memorized).
-      Active per-turn obligations list requires querying
+      Bootstrap Receipt values should come from `ai-skill runtime receipt`
+      rather than ad-hoc SQLite. Active per-turn obligations list requires querying
       generated_surfaces[runtime.core_bootstrap.contract].per_turn_obligations
       via `ai-skill runtime obligations` (or equivalent SQLite JSON1 query).
     severity: high
