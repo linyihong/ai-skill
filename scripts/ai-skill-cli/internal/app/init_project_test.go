@@ -30,8 +30,8 @@ func TestInitProjectDryRunPlansFilesWithoutWriting(t *testing.T) {
 	if len(result.Mutations) != 0 {
 		t.Fatalf("dry-run must not mutate, got %#v", result.Mutations)
 	}
-	if len(result.PlannedActions) != 6 {
-		t.Fatalf("expected 6 planned actions, got %#v", result.PlannedActions)
+	if len(result.PlannedActions) != 7 {
+		t.Fatalf("expected 7 planned actions, got %#v", result.PlannedActions)
 	}
 	if pathExists(filepath.Join(project, ".roomodes")) {
 		t.Fatal("dry-run wrote .roomodes")
@@ -91,7 +91,7 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
 		t.Fatalf("decode JSON: %v", err)
 	}
-	if result.Mode != "write" || len(result.Mutations) != 7 {
+	if result.Mode != "write" || len(result.Mutations) != 8 {
 		t.Fatalf("expected write mutations, got %#v", result)
 	}
 	claudePath := filepath.Join(project, "CLAUDE.md")
@@ -120,6 +120,9 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	}
 	if !strings.Contains(string(claudeContent), "MUST RUN BEFORE ANY OTHER ACTION") || !strings.Contains(string(claudeContent), "final Cognitive Mode") {
 		t.Fatalf("expected explicit pointer expansion guidance in CLAUDE.md, got %s", string(claudeContent))
+	}
+	if !strings.Contains(string(claudeContent), ".ai-skill/project/README.md") {
+		t.Fatalf("expected CLAUDE.md to point to project overlay index, got %s", string(claudeContent))
 	}
 	claudeSettingsPath := filepath.Join(project, ".claude", "settings.json")
 	if !pathExists(claudeSettingsPath) {
@@ -177,12 +180,19 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 	if !strings.Contains(string(goals), "ai-skill goals") {
 		t.Fatalf("expected Go CLI goals guidance, got %s", string(goals))
 	}
+	overlay, err := os.ReadFile(filepath.Join(project, ".ai-skill", "project", "README.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(overlay), "Project Ai-skill Overlay") {
+		t.Fatalf("expected project overlay index, got %s", string(overlay))
+	}
 	localIgnore, err := os.ReadFile(filepath.Join(project, ".ai-skill", ".gitignore"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(localIgnore), "local.env") && !strings.Contains(string(localIgnore), "*") {
-		t.Fatalf("expected .ai-skill/.gitignore to ignore local files, got %s", string(localIgnore))
+	if strings.TrimSpace(string(localIgnore)) != "local.env" {
+		t.Fatalf("expected .ai-skill/.gitignore to only ignore local.env, got %s", string(localIgnore))
 	}
 	localEnvInfo, err := os.Stat(filepath.Join(project, ".ai-skill", "local.env"))
 	if err != nil {
@@ -245,6 +255,46 @@ func TestInitProjectWritesCodexBootstrap(t *testing.T) {
 	if !strings.Contains(string(content), "MUST RUN BEFORE ANY OTHER ACTION") || !strings.Contains(string(content), "final Cognitive Mode") {
 		t.Fatalf("expected explicit pointer expansion guidance in AGENTS.md, got %s", string(content))
 	}
+	if !strings.Contains(string(content), ".ai-skill/project/README.md") {
+		t.Fatalf("expected AGENTS.md to point to project overlay index, got %s", string(content))
+	}
+}
+
+func TestInitProjectForcePreservesExistingProjectOverlayIndex(t *testing.T) {
+	project := t.TempDir()
+	overlayPath := filepath.Join(project, ".ai-skill", "project", "README.md")
+	writeFile(t, overlayPath, "# Custom Overlay\n\nKeep this content.\n")
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{"init-project", "--project", project, "--tools", "cursor", "--force", "--json"}, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected write success, got %d; stderr=%s stdout=%s", code, stderr.String(), stdout.String())
+	}
+
+	overlay, err := os.ReadFile(overlayPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(overlay), "Keep this content.") {
+		t.Fatalf("init-project --force must preserve existing project overlay index, got %s", string(overlay))
+	}
+	var result Result
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("decode JSON: %v", err)
+	}
+	if !containsString(result.Mutations, "preserved existing Ai-skill project overlay index: "+overlayPath) {
+		t.Fatalf("expected preserved overlay mutation, got %#v", result.Mutations)
+	}
+}
+
+func containsString(values []string, target string) bool {
+	for _, value := range values {
+		if value == target {
+			return true
+		}
+	}
+	return false
 }
 
 func TestInitProjectWritesCopilotBootstrap(t *testing.T) {

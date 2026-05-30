@@ -15,6 +15,7 @@ Cursor 的 repo 入口是 `.cursor/rules/ai-skill-bootstrap.mdc`（`alwaysApply:
 
 - `.cursor/rules/*.mdc` 可放全域或專案規則；全域規則通常位於 `~/.cursor/rules/`，專案規則位於 `<PROJECT_ROOT>/.cursor/rules/`。
 - 全域與專案 rules 會合併，不是覆蓋關係；專案 overlay 仍應保持薄，只補專案特定約束。
+- Project-specific rule bodies should live in `<PROJECT_ROOT>/.ai-skill/project/rules/`; `.cursor/rules/*.mdc` should be thin pointers to those files so non-Cursor tools can load the same overlay.
 - `.cursor/hooks.json` 與 hooks 只應作為提醒或檢查；除非團隊明確配置，不要讓 hook 靜默修改檔案、關閉 goal 或自動 commit。
 - `ai-skill init-project --tools cursor` 產生的 project hook 必須包含 `stop` close-out check，呼叫 repo-local `ai-skill hooks run stop`。Cursor stop 不能靠 exit 2 loop back；缺少 Bootstrap Receipt、compact `Cognitive:` / full `### Cognitive Mode 報告`，或必要的 `### Project Git Report` 時，hook runner 必須一次彙整缺項，輸出 `followup_message` 並 exit 0。這是 chat/session 層防漏；格式與枚舉仍只在 canonical bootstrap sources。
 - 多資料夾工作區可同時打開業務專案與本 repository，讓 agent 直接讀 canonical source。

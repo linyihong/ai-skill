@@ -22,10 +22,11 @@ type initProjectOptions struct {
 }
 
 type plannedFile struct {
-	tool        string
-	path        string
-	description string
-	private     bool
+	tool             string
+	path             string
+	description      string
+	private          bool
+	preserveExisting bool
 }
 
 func runInitProject(args []string, stdout io.Writer, stderr io.Writer) int {
@@ -109,6 +110,9 @@ func buildInitProjectResult(opts initProjectOptions) Result {
 	for _, file := range files {
 		result.PlannedActions = append(result.PlannedActions, fmt.Sprintf("create %s: %s", file.description, file.path))
 		if _, err := os.Stat(file.path); err == nil {
+			if file.preserveExisting {
+				continue
+			}
 			conflicts = append(conflicts, file.path)
 		}
 	}
@@ -141,6 +145,12 @@ func buildInitProjectResult(opts initProjectOptions) Result {
 		return result
 	}
 	for _, file := range files {
+		if file.preserveExisting {
+			if _, err := os.Stat(file.path); err == nil {
+				result.Mutations = append(result.Mutations, fmt.Sprintf("preserved existing %s: %s", file.description, file.path))
+				continue
+			}
+		}
 		content, err := initProjectFileContent(file, repo)
 		if err != nil {
 			result.Status = "blocked"
@@ -270,6 +280,7 @@ func initProjectPlannedFiles(target string, tools []string) []plannedFile {
 	files = append(files,
 		plannedFile{tool: "common", path: filepath.Join(target, ".agent-goals", "README.md"), description: "agent goals ledger"},
 		plannedFile{tool: "common", path: filepath.Join(target, ".ai-skill", ".gitignore"), description: "Ai-skill local config ignore rules"},
+		plannedFile{tool: "common", path: filepath.Join(target, ".ai-skill", "project", "README.md"), description: "Ai-skill project overlay index", preserveExisting: true},
 		plannedFile{tool: "common", path: filepath.Join(target, ".ai-skill", "local.env"), description: "Ai-skill local environment", private: true},
 	)
 	return files
@@ -330,6 +341,9 @@ func initProjectFileContent(file plannedFile, repo string) (string, error) {
 		if strings.HasSuffix(file.path, filepath.Join(".ai-skill", ".gitignore")) {
 			return initProjectLocalGitignoreContent()
 		}
+		if strings.HasSuffix(file.path, filepath.Join(".ai-skill", "project", "README.md")) {
+			return initProjectOverlayReadmeContent(repo)
+		}
 		if strings.HasSuffix(file.path, filepath.Join(".ai-skill", "local.env")) {
 			return initProjectLocalEnvContent(repo)
 		}
@@ -350,6 +364,7 @@ Resolve `+"`AI_SKILL_REPO`"+`：優先用環境變數；否則讀 project-local 
 1. 讀 `+"`%s/CORE_BOOTSTRAP.md`"+`
 2. 讀 `+"`%s/runtime/core-bootstrap.yaml`"+`
 3. 依 canonical contract 執行 Bootstrap Receipt、final Cognitive Mode 報告與 close-loop obligations。
+4. 若 `+"`<PROJECT_ROOT>/.ai-skill/project/README.md`"+` 存在，bootstrap 後讀取 project overlay index。
 
 Summary 的「Resume directly」不豁免 bootstrap；resume / continuation session 同樣必須 dereference canonical files。
 
@@ -472,7 +487,8 @@ Resolve `+"`AI_SKILL_REPO`"+`：優先用環境變數；否則讀 project-local 
 1. 讀 %s
 2. 讀 %s
 3. 讀 %s 選擇 active tool adapter
-4. 依 canonical contract 執行 Bootstrap Receipt、final Cognitive Mode 報告與 close-loop obligations。
+4. 若 <PROJECT_ROOT>/.ai-skill/project/README.md 存在，bootstrap 後讀取 project overlay index。
+5. 依 canonical contract 執行 Bootstrap Receipt、final Cognitive Mode 報告與 close-loop obligations。
 
 Summary 的「Resume directly」不豁免 bootstrap。修改本檔前先讀 %s；工具差異放 `+"`ai-tools/agent/<tool>.md`"+`。
 `, aiSkillRepoPlaceholder+"/CORE_BOOTSTRAP.md",
@@ -597,8 +613,16 @@ func initProjectGoalsReadmeContent(repo string) (string, error) {
 }
 
 func initProjectLocalGitignoreContent() (string, error) {
-	return `*
-!.gitignore
+	return `local.env
+`, nil
+}
+
+func initProjectOverlayReadmeContent(repo string) (string, error) {
+	return `# Project Ai-skill Overlay
+
+This directory is reserved for project-local Ai-skill overlay rules. Put project-specific rules in ` + "`rules/`" + ` and link to them from this README.
+
+Tool-specific entry files should point here instead of duplicating project rule bodies.
 `, nil
 }
 

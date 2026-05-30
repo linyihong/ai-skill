@@ -111,6 +111,8 @@ success_criteria:
   - 新專案 bootstrap files 只指向 `CORE_BOOTSTRAP.md` 與 `runtime/core-bootstrap.yaml` 等 canonical bootstrap source，不複製規則全文
   - project-local bootstrap files do not embed the local Ai-skill repository absolute path; use `<AI_SKILL_REPO>` placeholder and `AI_SKILL_REPO` environment variable instead
   - init-project creates `.ai-skill/local.env` as an ignored machine-local bridge file and `.ai-skill/.gitignore` to prevent committing the local path
+  - init-project creates or preserves `.ai-skill/project/README.md` as the project-local overlay index; `.ai-skill/.gitignore` ignores `local.env` only so overlay rules can be committed by the project
+  - project-specific custom checks live in `.ai-skill/project/rules/`; tool-specific entries point there instead of duplicating rule bodies
   - Claude Code project setup includes `.claude/settings.json` hook wiring to Ai-skill Go runner for final Cognitive Mode and nested Git report enforcement
   - Cursor project setup includes `.cursor/hooks.json` stop hook wiring to the Ai-skill Go runner for Bootstrap Receipt and final Cognitive Mode close-out enforcement via `followup_message` loopback
   - GitHub Copilot project setup includes `.github/copilot-instructions.md`, `.github/instructions/ai-skill.instructions.md`, and `.copilot/` guided startup files as thin pointers only; hard enforcement remains in hooks, CI, and runtime validation

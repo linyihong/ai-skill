@@ -46,7 +46,8 @@ code .   # 或 cursor . 或 claude .
 `init-project` 會自動建立：
 
 - `.ai-skill/local.env`：本機設定，內容包含 `AI_SKILL_REPO=<目前 Ai-skill repo>`，權限為 `0600`
-- `.ai-skill/.gitignore`：忽略 `local.env`，避免本機路徑被 commit
+- `.ai-skill/.gitignore`：只忽略 `local.env`，避免本機路徑被 commit，同時允許提交 `.ai-skill/project/` project overlay
+- `.ai-skill/project/README.md`：project-local overlay index；專案特有規則應放在 `.ai-skill/project/rules/`，再由工具入口薄薄指向
 
 Claude hooks 會先讀 process environment；如果沒有 `AI_SKILL_REPO`，會 source `.ai-skill/local.env`，所以剛初始化後不用重開 shell 也能連回 Ai-skill。
 
@@ -111,6 +112,8 @@ scripts/ai-skill-cli/bin/ai-skill-darwin-arm64 init-project --project ~/projects
 2. **Canonical contract**：指向 `runtime/core-bootstrap.yaml`
 
 Bootstrap obligations、format、enum、examples、required reads 與 runtime DB 載入不複製在 Cursor rule；由 `runtime/core-bootstrap.yaml` 管理。
+
+若專案有自己的檢查規則，不要把規則本體放進 `.cursor/rules`。將規則本體放在 `.ai-skill/project/rules/`，`.cursor/rules/*.mdc` 只保留 thin pointer，這樣 Claude Code、AGENTS.md-aware tools、Gemini CLI、Roo Code 也能讀到同一份 project overlay。
 
 同時建立 `.cursor/hooks.json`：
 
