@@ -12,7 +12,7 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 >
 > | 認知階段（cognitive phase） | 本檔對應段落 | slice id | load_when |
 > |---|---|---|---|
-> | Intake（需求接收 / parity） | §1（Start From Evidence、Change Intake、Pre-build Interrogation、Requirements Cognition、Parity Gate）、§6 Backfill | `sd-intake` | 接收新需求 / 變更 / 重構意圖 |
+> | Intake（需求接收 / parity） | **已抽出** → [`intake.md`](intake.md)（含 Start From Evidence、Change Intake、Pre-build Interrogation、Requirements Cognition、Parity Gate、Product Brief Validation、Missing Information、Backfill） | `sd-intake` | 接收新需求 / 變更 / 重構意圖 |
 > | Test strategy（測試策略 / BDD） | **已抽出** → [`test-strategy.md`](test-strategy.md)（含 BDD Closure / Docs-First Loop / Test Strategy Gate / Mutation / Test-First Ordering） | `sd-test-strategy` | 定義測試策略 / BDD 閉環 |
 > | Implementation（執行核心） | §3 SDK 缺陷閉環、§4 同工作階段閉環 | `sd-implementation` | 實際進行程式碼變更 |
 > | Validation（驗證 / 效能） | **已抽出** → [`validation.md`](validation.md)（含 Perf Gate + Validate） | `sd-validation` | 驗證變更 / 效能關卡 |
@@ -21,83 +21,13 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 >
 > **Suppression 提示**：行為範例 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)（`type: examples`）預設 **不載入**，僅在使用者明確要求範例或偵測到 ambiguity 時載入。evidence-only / 純分析任務不應載入本 execution-flow。
 >
-> > **Phase 2 進度**：已抽出 `sd-surgical-caveats`（[`surgical-changes.md`](surgical-changes.md)）、`sd-contracts`（[`contracts.md`](contracts.md)）、`sd-closure`（[`closure.md`](closure.md)）、`sd-validation`（[`validation.md`](validation.md)）、`sd-test-strategy`（[`test-strategy.md`](test-strategy.md)，§2 + §4 子節 + development-process.md §BDD Closure/§Test Strategy Gate 跨檔同批）並建立本導航。其餘 2 個 lifecycle phase（intake / implementation）的實體拆檔留待與 `development-process.md` 同批進行，見 plan Phase 2。routing-registry / execution-flow.yaml 將新 slice 納入 required source 的同步留待 Phase 3。
+> > **Phase 2 進度**：已抽出 `sd-surgical-caveats`（[`surgical-changes.md`](surgical-changes.md)）、`sd-contracts`（[`contracts.md`](contracts.md)）、`sd-closure`（[`closure.md`](closure.md)）、`sd-validation`（[`validation.md`](validation.md)）、`sd-test-strategy`（[`test-strategy.md`](test-strategy.md)，§2 + §4 子節 + development-process.md §BDD Closure/§Test Strategy Gate 跨檔同批）、`sd-intake`（[`intake.md`](intake.md)，§1 + §6 Backfill + development-process.md §Initial Doc Pack/§Product Brief Validation/§Change Intake/§Missing Information/§Existing Project Backfill 跨檔同批）並建立本導航。剩餘 1 個 lifecycle phase（implementation）待評估是否獨立檔，見 plan Phase 2。routing-registry / execution-flow.yaml 將新 slice 納入 required source 的同步留待 Phase 3。
 
-## 1. 從證據開始（Start From Evidence）
+## 1. 從證據開始（Start From Evidence）→ 已抽出為獨立 slice
 
-記錄可重複使用的觀察：
+從證據開始、變更接收（Change Intake）、Pre-build Interrogation Gate、Requirements Cognition Checkpoint、重構 / Replacement Parity Gate 已連同 development-process.md 的 Initial Documentation Pack / Product Brief Validation Gate / Change Intake Gate / Missing Information Gate / 既有專案文件回填，跨檔同批抽出為 focused slice **[`intake.md`](intake.md)**（`sd-intake`，`type: execution`，tags `requirements, parity, intake`）。canonical content 在 `intake.md`，此處不再保留正文以避免 dual source-of-truth。
 
-- 這個工作單元的目標是什麼、採取了什麼行動、以及如何驗證？如果驗證不可執行，引用參考來源和推理邊界。
-- 觀察到了什麼行為？
-- 哪一層暴露了它：客戶端程式碼、傳輸層、API 合約、儲存層、日誌、建置配置、韌體、硬體上下文、協定或執行時期行為？
-- 問題是已確認、可疑還是僅為風險模式？
-
-不要將目標特定的端點、令牌、機密、裝置 ID、原始使用者資料或專案事件細節複製到這個技能中。在將觀察提升為可重複使用的指引之前，應用 [`enforcement/reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md)。
-
-### 變更接收（Change Intake）
-
-在程式碼工作之前，執行變更接收：
-
-| 問題 | 必要行動 |
-| --- | --- |
-| 存在什麼規劃產出？ | 閱讀企劃書、product brief、規劃文件、issue、ticket、PRD、設計備註、BDD、API 合約或同等文件 |
-| Product brief 本身是否已驗證？ | 根據證據或明確決策檢查目標、使用者、範圍、non-goals、假設、限制、依賴、風險和成功標準。將每個主要聲明標記為 `validated`（已驗證）、`assumption`（假設）、`open question`（開放問題）、`scoped out`（排除範圍）或 `invalidated`（無效） |
-| 這是新需求還是行為變更？ | 先執行 [`requirements/`](requirements/README.md) stage：product-impact discovery、behavior-driven discovery、acceptance definition、ambiguity resolution；再更新規劃文件、BDD、合約、實作切片和測試 |
-| 這是 bug 修復？ | 確認預期行為 vs 實際行為、重現/證據、受影響的 BDD 或缺失 scenario、受影響的合約/錯誤和回歸測試 |
-| 這是重構？ | 先分類是純內部重構、架構重組、平台遷移、工具替換或舊系統 replacement。若會替代既有功能、腳本、API、資料流程、UI flow、runtime surface 或操作流程，必須在實作前建立新舊能力 parity inventory：舊入口、現有功能、輸入、輸出 / 副作用、外部依賴、目標新入口、parity 狀態、測試 / fixture 證據與 deferred / not planned 理由。只有純內部重構且不改變 observable behavior、public contract 或操作能力時，才可只確認沒有行為變更。 |
-| 這是強化？ | 確認威脅/故障模式、擁有者層、驗證和連結的檢查清單/控制更新 |
-| 這是架構決策或 domain model 變更？ | 先確認 requirements stage 已有 behavior boundary / acceptance criteria / ambiguity disposition，再執行 [`architecture/architecture-fit-analysis.md`](architecture/architecture-fit-analysis.md)，確認 CRUD / DDD Lite / Full DDD / event-driven / microservices 的 fit evidence；不得預設套用 DDD、CQRS 或 event sourcing |
-| 這個變更是否影響延遲、吞吐量、資源使用、啟動、背景工作、資料庫存取、批次處理或外部呼叫量？ | 在程式碼之前定義效能預算和必要的效能測試類型。不要依賴「功能正確」作為變更可發布的證明 |
-| 這個變更是否與現有文件衝突？ | 應用文件優先順序：治理/框架合約、產品計劃、BDD、合約、實作、測試。更新擁有文件，而不是僅默默修正程式碼 |
-
-**Contract / test / implementation mismatch escalation：** 若 product brief、owner contract、BDD、測試、implementation 或使用者指正彼此衝突，不要繼續局部 patch。依 `metadata/recovery/domain-policies.yaml` 的 `software-delivery` policy 進入 recovery：重讀本 workflow、artifact gates、development process、implementation plan template、linked-updates 與 dependency-reading；寫出舊假設、反證、owner contract、行為規格或 BDD、implementation surface、validation gate 與 linked updates。未完成新 execution graph 前，不可用「測試綠了」宣稱完成，也不可把 implementation 當作唯一 source-of-truth。
-
-如果不存在規劃產出且請求會改變行為，在實作之前建立輕量的變更簡報並詢問阻擋性問題。
-
-如果 product brief 存在但包含影響行為、合約、風險、測試、所有權、時程或發布關卡的未驗證聲明，在實作之前將這些聲明視為阻擋項。對於純規劃答案，引用參考來源或推理邊界，而不是假裝 brief 已驗證。
-
-> **輸出模板**：Change Intake 完成後，使用 [`templates/change-brief-template.md`](templates/change-brief-template.md) 記錄變更簡報。
-
-### Pre-build Interrogation Gate
-
-在 change intake 之後、implementation plan 或 framework migration 之前，讀取 [`requirements/pre-build-interrogation.md`](requirements/pre-build-interrogation.md)。若請求會變成 plan、code、workflow、governance、runtime、validation、schema、generated artifact 或 tool adapter 改動，必須先記錄：
-
-- Goal、scope、non-goals 與 expected behavior / expected framework outcome。
-- Acceptance criteria 與 validation target。
-- Framework discovery：canonical source、owner layer、runtime projection、mirror / cache / generated output、compiler 與 linked updates。
-- Duplication risk：是否會產生第二份 rule body、第二條 activation path、stale projection 或 ambiguous source-of-truth。
-- Unknown disposition：`blocker_question`、`safe_assumption`、`scoped_out` 或 `invalidated`。
-
-若仍有會影響 behavior、contract、runtime surface、source-of-truth、validation 或安全性的 `blocker_question`，不得產生 implementation plan；先向使用者提問或停在 planning。
-
-### Requirements Cognition Checkpoint
-
-在進入 architecture 或 implementation 前，若任務涉及 observable behavior，讀取 [`requirements/`](requirements/README.md)：
-
-- Product-impact discovery：Impact Map、Customer Journey Map、cross-check decision。
-- Behavior-driven discovery：actor intent、behavior boundary、shared language。
-- Acceptance definition：acceptance criteria、validation target、regression scope。
-- Ambiguity resolution：將不確定項標成 `assumption`、`open question`、`scoped out` 或 `invalidated`。
-
-沒有 validation target 的 acceptance criteria 不能作為完成宣告基線；requirement contradiction 或 stale acceptance criteria 需要先重建 source-of-truth。
-
-### 重構 / Replacement Parity Gate
-
-當變更目標是重構、遷移、改寫、替換舊工具、拆分架構、搬移 runtime surface 或建立新入口取代舊入口時，不能只寫新設計。實作前必須先產出 parity inventory，讓 reviewer 能逐項確認舊能力沒有遺漏。
-
-最低欄位：
-
-| 欄位 | 必填內容 |
-| --- | --- |
-| 舊入口 | 舊 API、command、script、UI flow、資料表、job、hook、runtime surface 或文件入口。 |
-| 現有能力 | 舊入口目前支援的行為、flags、輸入、輸出、錯誤模式與邊界條件。 |
-| 副作用 | 寫檔、寫 DB、發送請求、commit / push、生成 artifact、同步 mirror、修改使用者設定或其他狀態變更。 |
-| 外部依賴 | runtime、shell、binary、服務、權限、平台假設、環境變數與 credentials boundary。 |
-| 新入口 | 對應的新 API、command、module、adapter 或 replacement surface。 |
-| Parity 狀態 | `covered`、`wrapper first`、`native target`、`deferred`、`not planned` 或 `tool-specific`，並說明原因。 |
-| 驗證證據 | BDD scenario、contract test、fixture、golden output、migration assertion、manual review checklist 或明確的 blocker。 |
-
-Blocking rule：任何舊入口若狀態為 `deferred`、`not planned` 或 `tool-specific`，必須寫明為何不阻擋目前 release / phase；任何會產生副作用的舊入口，必須有 dry-run、fake-root、fixture 或等效隔離測試。缺少 parity inventory 時，不得開始 replacement implementation，也不得宣稱新功能已覆蓋舊功能。
+接收新需求 / 變更 / bug / 重構意圖、需求認知盤點時載入該 slice；已有明確 contract 的純執行改動或 evidence-only 任務不需載入。
 
 ## 2. 文件優先 BDD 閉環（Docs-First BDD Closure Loop）→ 已抽出為獨立 slice
 
@@ -143,25 +73,9 @@ Docs-First BDD Closure Loop 連同 BDD Execution Closure、Test Strategy Gate、
 
 驗證變更 / 效能關卡時載入該 slice；尚未實作完成前不需載入。
 
-## 6. 已實作專案的回填規則（Backfill Rules for Implemented Projects）
+## 6. 已實作專案的回填規則（Backfill Rules for Implemented Projects）→ 已抽出為獨立 slice
 
-如果專案已實作且文件缺失，在提出新的指引之前先進行文件差距審計：
-
-| 文件 | 回填要求 |
-| --- | --- |
-| Product Brief | 僅回填證據支援的目標、使用者、範圍、限制和假設；將不可取得的意圖標記為 `unknown` 或 `open question` |
-| BDD 行為 | **必須完成。** 從可觀察的 UI、API、程式碼、測試、日誌、fixtures 和手動驗證中完成 |
-| 合約 | 從已實作的行為和證據回填領域模型、架構、API/介面、錯誤處理和測試計劃 |
-| 嵌入式/硬體證據 | 從程式碼、日誌、接線筆記和測試中回填 datasheet/協定參考、硬體上下文、驅動程式/服務/應用程式邊界、主機 fixtures 和啟動證據 |
-| 可追溯性 | 將產品/規則 ID 連結到 BDD，BDD 連結到程式碼引用，BDD 連結到測試，API/命令/診斷合約連結到 fixtures，以及生成的客戶端連結到來源合約 |
-
-不要讓缺失的 product brief 阻擋已實作產品的 BDD 回填。
-
-對於先實作優先的專案，也要恢復交付管線：來源產品文件或計劃雷達、文件優先順序、最小文件同步矩陣、OpenAPI/schema/codegen 流程、供應商整合摘錄，以及明確的已取消/延後/排除範圍的決策。
-
-影響行為、領域不變量、API/介面形狀、錯誤處理、安全性、儲存、所有權或測試的缺失資訊是阻擋項。向使用者提問或要求證據，用答案更新文件，然後才繼續開發規劃或實作。非阻擋性的未知項必須標記為什麼它們不改變行為或合約。
-
-對於嵌入式或硬體支援的產品，缺失的 datasheet/協定真相、電氣介面、引腳/匯流排映射、硬體上下文所有權、時間/並發限制、安全行為、fixture 來源或目標驗證方法也是阻擋項，除非明確排除範圍。
+已實作專案的回填規則已連同 development-process.md §Existing Project Documentation Backfill，作為 backfill 條件子流程抽出至 [`intake.md`](intake.md) §Backfill（`sd-intake`，`tags: domain-specific,backfill`）。canonical content 在 `intake.md`，此處不再保留正文以避免 dual source-of-truth。僅在處理「已實作但文件缺失」的專案時載入。
 
 ## 7. 驗證（Validate）→ 已抽出為獨立 slice
 

@@ -32,97 +32,17 @@ Contract / BDD / artifact / performance 的治理 gate 見 [`software-delivery-g
 
 > **Cognitive Slice 重構（Phase 2）**：本節連同 Contract Governance Gate、Traceability Gate、Contract-First Rules 已抽出為 [`contracts.md`](contracts.md)（slice `sd-contracts`，type `execution`，tags `artifact-gate, contract, traceability`）。canonical content 在 `contracts.md`，此處不再保留正文以避免 dual source-of-truth。
 
-## Initial Documentation Pack（初始文件包）
+## Initial Documentation Pack（初始文件包）→ 已抽出為獨立 slice
 
-當這個 workflow 被用於新功能或新專案時，agent 應協助產出第一版草稿，或針對以下文件提問缺失資訊：
+> **Cognitive Slice 重構（Phase 2）**：Initial Documentation Pack、Product Brief Validation Gate（含 Product Impact Alignment Check）、Change Intake Gate（含 Refactor / Replacement Parity Inventory）、Missing Information Gate、Existing Project Documentation Backfill 已連同 execution-flow.md §1 / §6 跨檔同批抽出為 [`intake.md`](intake.md)（slice `sd-intake`，type `execution`，tags `requirements, parity, intake`）。需求接收 / brief 驗證 / parity / 缺失資訊處置 / 既有專案回填的 canonical content 在 `intake.md`，此處不再保留正文以避免 dual source-of-truth。
 
-| 文件 | 目的 | 如果缺失，詢問 |
-| --- | --- | --- |
-| Product Brief | 目標、使用者、範圍、non-goals、假設 | 這是為誰做的？解決什麼問題？明確排除什麼？ |
-| Product Impact Alignment | Impact Map、Customer Journey Map、cross-check decision | 目標是什麼？誰的哪段旅程有痛點？預期改變什麼行為？功能投資是否對準痛點？ |
-| Requirements Cognition Notes | actor intent、behavior boundary、ambiguity disposition | 哪些行為是明確需求？哪些只是推論、假設或 open question？ |
-| BDD Behavior | 使用者/系統行為場景、acceptance criteria、validation target | 關鍵 happy path 和 failure path 是什麼？什麼證據能證明它完成？ |
-| Bounded Context Map | 模組/領域拆分與所有權 | 哪些概念會一起變動？哪些邊界不應洩漏？ |
-| Domain Model Contract | 核心業務物件與 invariants | 什麼必須永遠為真？允許哪些狀態轉換？ |
-| Architecture Contract | 層級、依賴關係、所有權、runtime 限制 | 哪一層擁有資料、side effects、安全性、持久化、外部呼叫？ |
-| API / Interface Contract | Requests、responses、events、commands、public methods | 誰消費這個 contract？相容性如何測試？版本如何管理？ |
-| Error Handling Contract | Error types、recovery、user messaging、logging | 哪些錯誤可 retry、可由使用者修正、致命、或安全敏感？ |
-| Hardware / Firmware Contract | Datasheet/protocol truth、electrical interface、pin/context injection、driver/service/application 邊界、target 限制 | 哪些硬體事實是固定的？每個 board 注入什麼？host/target 測試如何進行？ |
-| Test Plan | Unit、BDD、contract、integration tests | 什麼證明行為、invariants 和 integration contract？ |
+## Product Brief Validation Gate（Product Brief 驗證關卡）→ 已抽出為獨立 slice
 
-這些文件可以從輕量的 Markdown 草稿開始。如果專案很小，放在一個 planning file 中；如果長大，拆成一個資料夾加上 `README.md` 和聚焦的子文件。
+見 [`intake.md`](intake.md) §Product Brief Validation Gate（`sd-intake`）。
 
-## Product Brief Validation Gate（Product Brief 驗證關卡）
+## Change Intake Gate（變更接收關卡）→ 已抽出為獨立 slice
 
-企劃書 / Product Brief 不會因為存在就自動可信。在使用它作為 BDD、contracts、估算、實作切片或測試的來源之前，先把它當作獨立的 artifact 來驗證。
-
-### Product Impact Alignment Check
-
-對新產品、新功能或高成本 feature investment，先用 Impact Map × Customer Journey Map 做 product alignment：
-
-| 檢查 | 必要問題 |
-| --- | --- |
-| Impact Map | Why / Who / How / What 是否清楚？目標是否能追到 actor behavior change？ |
-| Customer Journey Map | 需求是否對準具體 journey stage、pain point、emotional low 或 blocker？ |
-| Cross-check | Impact Map 的 Who / How / What 是否真的出現在 journey 中，且資源投資對準最高摩擦點？ |
-| Decision | `proceed`、`revise`、`reject` 或 `ask_user`；阻擋性缺口不得直接進 BDD / implementation |
-
-若 business goal、target actor、journey pain 或 feature investment 不一致，先修正 product brief 或標記 `open question`。不要用完整的 BDD scenarios 掩蓋 product direction mismatch。
-
-| Brief 項目 | 驗證問題 | 可接受的證據 |
-| --- | --- | --- |
-| Goal / problem | 問題是真實的、具體的、且與使用者/系統結果相關嗎？ | 使用者請求、利害關係人決策、支援 ticket、觀察到的工作流程、metric、分析發現、或明確假設 |
-| Users / actors | Actors 有命名且對應到權限、角色、裝置、系統或外部服務嗎？ | 現有帳號/角色、UI/API 行為、領域文件、組織決策、或 open question |
-| Scope | 能判斷現在要建什麼嗎？ | BDD scenario list、module/context map、已接受的功能列表、API/interface list |
-| Non-goals | 排除的行為夠明確，能防止意外實作嗎？ | 已取消/延後/排除範圍的表格、issue decision、stakeholder 回答 |
-| Assumptions | 假設是可測試的、有時效的、或標記為風險的嗎？ | 證據連結、驗證計畫、負責人、到期/審查日期 |
-| Success criteria | 測試、審查、metric、效能預算或 demo 能證明它有效嗎？ | BDD acceptance criteria、contract tests、P95/P99 latency budget、throughput target、error-rate budget、release checklist、analytics/telemetry query、manual evidence |
-| Constraints | 法律、安全、隱私、平台、硬體、預算、時程、相容性和營運限制有列出嗎？ | Policy、platform docs、architecture contract、risk review、hardware/vendor docs |
-| Dependencies | 外部服務、vendor、團隊、generated clients、遷移、資料或硬體依賴有識別嗎？ | Integration contract、API docs、schema、vendor excerpt、migration plan、owner confirmation |
-| Risks | 濫用、失敗、安全、隱私、replay、資料遺失和營運風險有列出 controls 或 blockers 嗎？ | Threat model、hardening note、controls/checklists、open blocker questions |
-
-如果任何 brief 項目影響行為、domain invariants、API/interface 形狀、錯誤處理、安全性、儲存、所有權、測試、時程或 release gate 且無法驗證，它就是 blocker。在使用者確認、取得證據或明確排除該項目之前，不應繼續開發。
-
-對於已實作優先的專案，根據可觀察的證據驗證回填的 Product Brief。無法恢復的 Product intent 可以保持 `unknown`，但每個已實作的行為仍需要 BDD、contract 和 test 證據。
-
-對每個 major brief claim 使用以下狀態：
-
-| 狀態 | 意義 | 必要行動 |
-| --- | --- | --- |
-| `validated` | 有證據或明確的使用者/利害關係人決策支持 | 連結證據或決策 |
-| `assumption` | 合理但未經證明 | 加上負責人、驗證計畫、以及如果為假的影響 |
-| `open question` | 在實作繼續前需要答案 | 提問並阻止受影響的工作 |
-| `scoped out` | 明確不屬於當前工作範圍 | 記錄 non-goal 並防止意外實作 |
-| `invalidated` | 證據與 brief 矛盾 | 在 code 之前修訂 brief、BDD、contracts 和 tests |
-
-## Change Intake Gate（變更接收關卡）
-
-在任何由這個 workflow 驅動的 code 變更之前，檢查專案的企劃書、product brief、planning docs、issue、ticket、PRD、design note、BDD、API contract 或同等專案 artifact。在實作前分類請求：
-
-| 變更類型 | code 之前需要 |
-| --- | --- |
-| 新需求 / 功能 / 行為變更 | 先執行 requirements stage：product-impact discovery、behavior-driven discovery、acceptance definition、ambiguity resolution；再更新或建立 planning docs：Product Brief 或 change brief、BDD scenarios、受影響的 Domain Model Contract、Architecture Contract、API / Interface Contract、Error Handling Contract、實作切片和 tests。在 blocker questions 解決前不要開始 code |
-| Bug 修復 | 確認預期行為 vs 實際行為、重現步驟或證據、受影響的 BDD scenario 或缺失 scenario、受影響的 contract/error handling、以及 regression test plan。如果修復改變了預期行為或 public contract，也視為新需求 |
-| Refactor / replacement / 內部清理 | 先判斷是否取代既有功能、入口、腳本、API、資料流程、runtime surface 或操作流程。若是 replacement / migration，code 前必須建立新舊能力 parity inventory，列出舊入口、現有能力、輸入、輸出 / 副作用、外部依賴、目標新入口、parity 狀態與測試 / fixture 證據。只有純內部清理且沒有行為或 public contract 變更時，才可只記錄無行為變更；若行為、資料所有權、API、錯誤處理、安全性、儲存或 tests 改變，重新分類為新需求或 bug |
-| 安全 / 強化變更 | 確認威脅或 failure mode、owner layer、必要 control、驗證方法、以及行為/API/contracts/checklists 是否需要改變 |
-
-如果沒有 planning artifact，在實作前建立輕量的 change brief。如果請求是新需求，缺失的 planning docs 是 blockers；向使用者提問並在寫 code 前填寫 BDD/contracts。
-
-> **輸出模板**：Change Intake 完成後，使用 [`templates/change-brief-template.md`](templates/change-brief-template.md) 記錄變更簡報。
-
-### Refactor / Replacement Parity Inventory
-
-當 refactor 實際上會替代舊能力時，parity inventory 是 code 前 artifact，不是 implementation 後補充。它可以放在 change brief、implementation plan 或專案專屬 inventory，但必須能被 reviewer 逐列檢查：
-
-| 欄位 | 用途 |
-| --- | --- |
-| 舊入口 / 舊能力 | 定義不能遺漏的既有 API、command、script、UI flow、job、hook、資料流程或 runtime surface。 |
-| 輸入 / 輸出 / 副作用 | 捕捉 flags、payload、生成物、寫入、同步、網路呼叫、commit / push 或使用者可見狀態變更。 |
-| 外部依賴 | 捕捉 binary、shell、服務、平台、權限、環境變數、credential boundary 或 generated surface。 |
-| 新入口 / 對照狀態 | 標記 `covered`、`wrapper first`、`native target`、`deferred`、`not planned` 或 `tool-specific`。 |
-| 驗證證據 | 連到 BDD、contract test、fixture、golden output、dry-run、fake-root、manual review checklist 或 blocker。 |
-
-任何 `deferred`、`not planned` 或 `tool-specific` 項目都要寫明不阻擋目前 phase 的理由；任何有副作用的舊能力都需要隔離測試或 dry-run 證據。
+見 [`intake.md`](intake.md) §Change Intake Gate（含 Refactor / Replacement Parity Inventory，`sd-intake`）。
 
 ## Contract Governance Gate / Traceability Gate → 已抽出為獨立 slice
 
@@ -158,54 +78,13 @@ Contract / BDD / artifact / performance 的治理 gate 見 [`software-delivery-g
 5. 只在無法在 host 上證明的證據才定義 target 或 hardware-in-loop validation
 6. 記錄 bring-up evidence：board revision、wiring、pins、bus settings、firmware version、logs 和已知偏差
 
-## Missing Information Gate（缺失資訊關卡）
+## Missing Information Gate（缺失資訊關卡）→ 已抽出為獨立 slice
 
-在開發規劃或實作繼續之前，缺失資訊必須被明確處理：
+見 [`intake.md`](intake.md) §Missing Information Gate（`sd-intake`）。canonical content 在 `intake.md`，此處不再保留正文以避免 dual source-of-truth。
 
-| 缺失項目類型 | 必要行動 |
-| --- | --- |
-| 可從證據恢復 | 回填並引用證據來源 |
-| Product intent 無法恢復 | 標記為 `unknown` / `open question`，向使用者提問，不要憑空創造 intent |
-| 影響 BDD behavior、domain invariants、API/interface shape、error handling、security、storage 或 tests | 視為 blocker：在繼續實作前向使用者提問或要求證據 |
-| 不改變行為或 contracts 的 nice-to-have 上下文 | 記錄為非阻塞的 open question，並說明為什麼不阻塞 |
+## Existing Project Documentation Backfill（既有專案文件回填）→ 已抽出為獨立 slice
 
-不要在未解決的 blockers 下繼續開發。Agent 必須將缺失項目列為問題，等待答案或證據，然後在繼續前更新文件。
-
-## Existing Project Documentation Backfill（既有專案文件回填）
-
-當這個 workflow 被用於已經完全或大部分實作的專案時，先審查既有文件並回填任何缺失的開發文件。不要因為實作已經存在就跳過流程。
-
-| 缺失文件 | 回填規則 |
-| --- | --- |
-| Product Brief | 只重建證據支持的內容：可見的目標、使用者/actors、範圍、non-goals、假設和限制。如果原始 intent 不可取得，將欄位標記為 `unknown` 或 `open question`；不要憑空創造業務理由 |
-| Bounded Context Map | 從 code ownership、runtime boundaries、database tables、API groups、UI areas、queues、SDK/public APIs 和 deployment units 推斷模組 |
-| BDD Behavior | **必須完成。** 從已實作的產品、tests、UI、API 行為和 logs 重建關鍵 happy paths、failure paths、權限、空狀態、edge cases 和跨 context 流程 |
-| Domain Model Contract | 從 code、schemas、storage、UI states 和 tests 推斷 entities、value objects、commands、events、invariants 和 state transitions；將不確定的詞彙標記為 candidate |
-| Architecture Contract | 記錄實際的 dependency direction、data ownership、side-effect boundaries、integrations、runtime/deployment shape 和已知違規 |
-| API / Interface Contract | 提取實際的 request/response schemas、public methods、events、commands、auth/session behavior、versioning、compatibility、fixtures 和 consumers |
-| Error Handling Contract | 回填觀察到的 error taxonomy、retry rules、user messages、logging/redaction behavior、security-sensitive failures 和 gaps |
-| Test Plan | 將既有 tests 對應到 behavior/contracts，並列出未覆蓋的 BDD scenarios、invariants、contracts 和 integration paths 所需的 tests |
-
-對於已實作優先的專案，也要恢復 delivery pipeline：
-
-| Pipeline artifact | 回填規則 |
-| --- | --- |
-| Plan index / product radar | 將來源 product docs、PDFs、tickets、screenshots 或 legacy notes 對應到 modules、controllers、screens、commands 或 packages。標記已取消或已取代的需求 |
-| Contract taxonomy | 列出哪些文件管轄 build/run、HTTP/API shape、auth/tenant/session、persistence、domain layering、frontend/backend integration、third-party integration、testing 和 documentation sync |
-| Minimum doc sync matrix | 對每個變更類型，說明最少要更新的 docs/tests：API、permission、database、UI flow、generated client、vendor integration、CLI command、diagnostic rule、release setting |
-| OpenAPI / schema / generated client | 驗證 generated consumer code 來自 source contract，而非手抄 endpoints 或 DTOs |
-| Vendor / third-party integration | 區分 raw vendor docs 與 sanitized integration excerpts、request/response contracts、fixture examples、live-test gates 和 secret handling |
-| Tooling / extension rule catalog | 對應 catalog order、rule IDs、diagnostics/commands、fixtures 和 tests；明確標記 process-only 或 non-enforceable rules |
-
-既有專案的回填順序：
-
-1. 盤點既有 docs、source folders、tests、schemas、API specs、fixtures、release notes 和觀察到的行為
-2. 建立 documentation gap table，狀態為：`exists`、`partial`、`missing` 或 `unknown`
-3. 當 product brief 缺失時先回填 BDD Behavior，因為已實作的行為是最強的可用 truth source
-4. 從已完成的行為和實作證據回填 Domain Model、Architecture、API / Interface 和 Error Handling Contracts
-5. 將未知的 product intent 與觀察到的行為分開標記。未知的 intent 不阻塞 BDD 完成
-6. 如果 BDD 無法從可用證據完成，停止並要求缺失的行為、screen/API 範例、logs、test cases 或使用者決策，然後再繼續開發
-7. 對任何缺乏覆蓋率的關鍵 BDD scenario 加上 tests 或 test TODOs
+> **Cognitive Slice 重構（Phase 2）**：既有專案文件回填已連同 execution-flow.md §6 作為 backfill 條件子流程抽出至 [`intake.md`](intake.md) §Backfill（`sd-intake`，`tags: domain-specific,backfill`）。canonical content 在 `intake.md`，此處不再保留正文以避免 dual source-of-truth。僅在處理「已實作但文件缺失」的專案時載入。
 
 ## Contract-First Rules（合約優先規則）→ 已抽出為獨立 slice
 

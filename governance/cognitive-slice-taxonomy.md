@@ -75,7 +75,7 @@ slice 最小單位 = **能獨立完成一個 cognitive phase**（非 step、非 
 
 | id | type | tags | load_when | do_not_load_when | canonical_source（現況 heading） |
 |---|---|---|---|---|---|
-| `sd-intake` | execution | requirements, parity, intake | 接收新需求 / 變更 / 重構意圖、需求認知盤點 | 已有明確 contract、純執行既定改動 | development-process §Change Intake / Product Brief / Initial Doc Pack / Missing Information；execution-flow §1 |
+| `sd-intake` | execution | requirements, parity, intake, domain-specific（backfill） | 接收新需求 / 變更 / 重構意圖、需求認知盤點、product brief 驗證、既有專案回填 | 已有明確 contract、純執行既定改動 | **`intake.md`（Phase 2 已實體拆檔，跨檔同批：原 execution-flow §1 + §6 Backfill + development-process §Initial Doc Pack / §Product Brief Validation Gate / §Change Intake Gate / §Missing Information Gate / §Existing Project Documentation Backfill）** |
 | `sd-contracts` | execution | artifact-gate, contract, traceability | 需建立 / 治理 contract 與可追溯性 | 無 contract 異動的小改 | **`contracts.md`（Phase 2 已實體拆檔，原 development-process §Required Contracts / Contract Governance / Traceability / Contract-First Rules）** |
 | `sd-test-strategy` | execution | artifact-gate, test, bdd | 定義測試策略 / BDD 閉環 / test-first ordering | 不涉測試設計的純文件改動 | **`test-strategy.md`（Phase 2 已實體拆檔，跨檔同批：原 execution-flow §2 + §4 子節「測試策略定義」+「Test-First Ordering」+ development-process §BDD Execution Closure + §Test Strategy Gate 含 Mutation Testing）** |
 | `sd-implementation` | execution | execution-order, surgical | 實際進行程式碼變更（核心執行順序） | evidence-only / 純分析任務 | execution-flow §3、§4、§驗證前的執行核心 |
