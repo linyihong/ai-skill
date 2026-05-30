@@ -76,21 +76,41 @@ per_session_obligations:
       generated_surfaces[runtime.core_bootstrap.contract].per_turn_obligations
       via `ai-skill runtime obligations` (or equivalent SQLite JSON1 query).
     read_log_requirement: |
-      The PreToolUse hook (gate.bootstrap.receipt_present) now performs a
+      The PreToolUse hook (gate.bootstrap.receipt_present) performs a
       mechanical check against the JSONL transcript: a Receipt is only
       accepted as authentic when the assistant has invoked the Read tool
       against BOTH of the following canonical file suffixes earlier in
       the same transcript:
         - CORE_BOOTSTRAP.md
         - runtime/core-bootstrap.yaml
-      Rationale: prior failures involved the agent copying the example
-      Receipt from the SessionStart hook reminder without dereferencing
-      the canonical files. The hook example values can drift from this
-      YAML (observed 2026-05-30: hook displayed obligations=23 gates=25
-      while canonical was obligations=22 gates=2). Requiring Read events
-      forces a fresh dereference at session start.
       Implementation: scripts/ai-skill-cli/internal/app/hooks.go ::
       transcriptHasRequiredBootstrapReads + bootstrapRequiredReadSuffixes.
+    no_copy_from_hook_reminder: |
+      The SessionStart hook intentionally emits a Receipt TEMPLATE with
+      `<placeholder>` markers rather than the resolved numbers. Prior
+      practice was to inject a fully-rendered Receipt (e.g. "obligations=23
+      gates=25") into the agent's first prompt; agents copied it verbatim
+      without ever calling Read on the canonical files, so the gate fired
+      on a fabricated Receipt. As of the read_log_requirement landing
+      (2026-05-30), the SessionStart hook no longer prints concrete
+      numbers and the PreToolUse gate rejects any Receipt emitted without
+      the prerequisite Read events. The agent MUST query
+      `ai-skill runtime receipt` or count obligations/gates after Reading
+      the canonical files; values in this YAML's example_enhanced are
+      illustrative only.
+    numeric_field_ontology: |
+      `obligations=<n>` and `gates=<n>` in the Receipt reflect the totals
+      from runtime/runtime.db (`SELECT COUNT(*) FROM obligations` and
+      `SELECT COUNT(*) FROM gates`), populated by the phase_machine
+      projections. These are DIFFERENT counts than the obligations defined
+      inline in this YAML file (which has per_session=1, per_turn=2,
+      per_commit=19 = 22 total). The discrepancy is intentional: the YAML
+      defines the bootstrap contract surface; runtime.db tracks the
+      broader phase_machine obligation set (init_ledger, checkpoint,
+      execution, finalize, push, readback, recovery, validation families).
+      The Receipt's numbers come from runtime.db because the agent's
+      live obligation ledger lives there. Use `ai-skill runtime receipt`
+      to get authoritative values; never count by hand from this YAML.
     severity: high
     blocking_gate_id: gate.bootstrap.receipt_present
     obligation_ledger_id: obligation.bootstrap.receipt_acknowledged
@@ -102,8 +122,12 @@ per_session_obligations:
       Token cost ≈ 50-80 tokens per Receipt, acceptable for the
       visibility gain.
     example_enhanced: |
-      Bootstrap: rules=✓ phase=phase.bootstrap obligations=1 gates=2
-      Active per-turn obligations: obligation.cognitive.mode_report
+      # ILLUSTRATIVE ONLY — do not copy these numbers.
+      # The runtime.db totals drift as obligations/gates are added; resolve at
+      # session start via `ai-skill runtime receipt`. As of 2026-05-30 the live
+      # values were obligations=23 gates=25 with two active per-turn obligations.
+      Bootstrap: rules=✓ phase=phase.bootstrap obligations=<from runtime.db> gates=<from runtime.db>
+      Active per-turn obligations: obligation.cognitive.mode_report, obligation.finality.close_loop_check
     note: |
       Summary "Resume directly" does NOT exempt this obligation; resume
       sessions should emit Receipt on the first user-facing message.

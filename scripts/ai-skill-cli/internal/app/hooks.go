@@ -754,6 +754,13 @@ func runSessionStartHook(projectDir string, stdout io.Writer, stderr io.Writer) 
 	if err != nil {
 		receipt = runtimeBootstrapReceipt{Phase: "unknown", Obligations: 0, Gates: 0}
 		appendLog(logFile, "runtime receipt unavailable: "+err.Error())
+	} else {
+		// Log the resolved values for debugging the hook itself, but DO NOT
+		// surface them in the additionalContext that becomes agent prompt —
+		// printing concrete numbers tempts the agent to copy them without
+		// running the actual Read tools, defeating gate.bootstrap.receipt_present.
+		appendLog(logFile, fmt.Sprintf("resolved (NOT exposed to agent) phase=%s obligations=%d gates=%d perTurn=%d",
+			receipt.Phase, receipt.Obligations, receipt.Gates, len(receipt.PerTurn)))
 	}
 
 	coreBootstrap := readFileSafe(filepath.Join(aiSkillRepo, "CORE_BOOTSTRAP.md"))
@@ -761,19 +768,36 @@ func runSessionStartHook(projectDir string, stdout io.Writer, stderr io.Writer) 
 	dependency := readFileSafe(filepath.Join(aiSkillRepo, "enforcement", "dependency-reading.md"))
 	goalLedger := readFileSafe(filepath.Join(aiSkillRepo, "enforcement", "conversation-goal-ledger.md"))
 
+	// IMPORTANT: this hook intentionally emits a Receipt TEMPLATE with placeholders
+	// rather than the resolved numbers. Rationale:
+	//   - Prior practice was to pre-render the Receipt (e.g. "obligations=23 gates=25")
+	//     and inject it into the agent's prompt. Agents copied that line into their
+	//     first user-facing response without ever calling Read on CORE_BOOTSTRAP.md
+	//     or runtime/core-bootstrap.yaml. This made gate.bootstrap.receipt_present
+	//     trivially defeatable via copy-paste.
+	//   - The strengthened gate (PreToolUse) now requires Read events for the
+	//     canonical files in the transcript before accepting a Receipt. To make
+	//     that gate meaningful at session start (not only at the first non-Read
+	//     tool call), this hook removes the pre-rendered answer key entirely.
+	//   - The agent must query `ai-skill runtime receipt` or count obligations /
+	//     gates after Reading the canonical files.
 	context := fmt.Sprintf(
-		"[ai-skill SessionStart] Bootstrap auto-loaded. The agent does NOT need to read these files again "+
-			"— they are already in context. Include this Bootstrap Receipt near the start of the first "+
-			"user-facing response when possible. If missed, the same-session corrected final response may repair it:\n\n"+
-			"%s\n"+
-			"%s\n\n"+
-			"Final response MUST also end with a Cognitive Mode 報告 block (compact form is fine for trivial "+
-			"tasks). Close-out enforcement: see runtime/core-bootstrap.yaml §per_turn_obligations.\n\n"+
+		"[ai-skill SessionStart] Bootstrap files are attached below. The agent MUST emit a Bootstrap "+
+			"Receipt near the start of the first user-facing response.\n\n"+
+			"This hook intentionally does NOT print the resolved numbers — they must come from your own "+
+			"query against runtime/core-bootstrap.yaml + runtime/runtime.db (or `ai-skill runtime receipt`). "+
+			"PreToolUse gate.bootstrap.receipt_present verifies that Read events for CORE_BOOTSTRAP.md "+
+			"and runtime/core-bootstrap.yaml appear in the transcript before accepting your Receipt; "+
+			"copying a pre-rendered template will be rejected.\n\n"+
+			"Required Receipt format (replace each <placeholder> with values you computed):\n\n"+
+			"    Bootstrap: rules=✓ phase=<phase_id from phase_machine_init> obligations=<COUNT(*) FROM obligations> gates=<COUNT(*) FROM gates>\n"+
+			"    Active per-turn obligations: <comma-separated obligation IDs from per_turn_obligations>\n\n"+
+			"Final response MUST also end with a Cognitive Mode 報告 block (compact form is fine for "+
+			"trivial tasks). Close-out enforcement: see runtime/core-bootstrap.yaml §per_turn_obligations.\n\n"+
 			"--- CORE_BOOTSTRAP.md (companion) ---\n%s\n\n"+
 			"--- enforcement/rule-weight.md ---\n%s\n\n"+
 			"--- enforcement/dependency-reading.md ---\n%s\n\n"+
 			"--- enforcement/conversation-goal-ledger.md ---\n%s",
-		receipt.receiptLine(), receipt.perTurnLine(),
 		coreBootstrap, ruleWeight, dependency, goalLedger,
 	)
 
