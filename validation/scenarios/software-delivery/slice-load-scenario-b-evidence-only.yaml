@@ -1,0 +1,82 @@
+id: slice-load-scenario-b-evidence-only
+category: software-delivery
+version: v1
+type: slice-load-boundary
+priority: P1
+source_plan: plans/active/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
+source_phase: phase-4
+
+# Test-first fixture defined in Phase 1/2 (taxonomy §8) — Phase 4 executes.
+# Asserts loading-boundary correctness for an evidence-only analysis task:
+# the agent must NOT pull in workflow/software-delivery lifecycle surfaces.
+
+given:
+  task_intent: "Analyse the network traffic of a target Android app — identify the HTTP endpoints it calls, observe request/response shapes, and triage which traffic is sensitive. No code change, no feature delivery, no contract design."
+  routing_entry: route.analysis.apk.workflows
+  signals:
+    - apk
+    - network_observation
+    - evidence_acquisition
+    - no_code_change
+
+when:
+  action: agent_loads_cognitive_surfaces_for_task
+
+then:
+  expected_load:
+    - analysis/apk/workflows/README.md                # primary_source
+    - analysis/apk/README.md                          # required_dependencies
+    - analysis/apk/workflows/local-proxy-hook-flow.md # network proxy procedure
+    - analysis/apk/traffic-triage.md                  # triage/observation slice for sensitive endpoints
+    - analysis/apk/tools-and-failures.md              # tool-procedure + failure caveats for observation
+  forbidden_load:
+    # Evidence-only task MUST NOT load any workflow/software-delivery lifecycle surface
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/intake.md
+    - workflow/software-delivery/contracts.md
+    - workflow/software-delivery/test-strategy.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/closure.md
+    - workflow/software-delivery/surgical-changes.md
+    - workflow/software-delivery/examples/EXAMPLES.md
+    - workflow/software-delivery/development-process.md
+    - workflow/greenfield/                            # wrong domain
+    - workflow/travel-planning/                       # wrong domain
+    - architecture/ai-native-cognitive-ecosystem-system.md  # Gen 4 vision, irrelevant
+  dependency_budget:
+    default:
+      max_depth: 2
+      max_runtime_dependencies: 4
+    override_when:
+      task_complexity: high   # network triage spans observation + tool-procedure + failure-triage
+
+evidence:
+  executed_on: 2026-05-30
+  executor: agent_walkthrough
+  loaded_actual:
+    - analysis/apk/workflows/README.md
+    - analysis/apk/README.md
+    - analysis/apk/workflows/local-proxy-hook-flow.md
+    - analysis/apk/traffic-triage.md
+    - analysis/apk/tools-and-failures.md
+  routing_evidence:
+    - knowledge/runtime/routing-registry.yaml#route.analysis.apk.workflows primary_source + required_dependencies + candidate_sources
+    - route does NOT list any workflow/software-delivery surface as required or candidate
+    - workflow/apk-analysis/execution-flow.md listed as bridge dep but suppressed here: task is evidence-only, not workflow execution; thin-index bridge not needed for triage scope
+  budget_check:
+    actual_depth: 2          # route entry → workflows/README → specific flow + sibling analysis surfaces
+    actual_runtime_dependencies: 5
+    within_default_budget: false
+    override_invoked: true
+    override_reason: "Evidence acquisition + triage + tool-procedure + failure-caveat is inherently multi-surface (Phase 1 analysis layer split). Qualifies as task_complexity:high."
+    within_override_budget: true     # depth 2 / deps 5 under override (3 / 6)
+  result: PASS
+  notes:
+    - "expected_load ⊆ loaded_actual: satisfied"
+    - "forbidden_load ∩ loaded_actual = ∅: satisfied (verified for all 12 forbidden entries — especially the entire workflow/software-delivery hierarchy)"
+    - "Critical assertion HELD: evidence-only analysis task did NOT contaminate context with any workflow execution surface. This is the inverse of Scenario A and is the primary boundary the plan was designed to enforce."
+
+decision_inputs_recorded:
+  - id: workflow-analysis-boundary
+    observation: "Evidence-only APK task routed entirely within analysis/apk/ + analysis/apk/workflows/; zero software-delivery lifecycle leakage."
+    implication: "The workflow ↔ analysis boundary defined in Phase 1 three-layer rule (workflow=order, analysis=evidence, intelligence=long-term pattern) holds under real route exercise. No layer collapse observed."
