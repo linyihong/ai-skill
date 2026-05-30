@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -593,6 +594,45 @@ func TestPreToolUseHookBlocksReceiptWithoutReads(t *testing.T) {
 	}
 	if !strings.Contains(stderr.String(), "BLOCK_RECEIPT_WITHOUT_READS") {
 		t.Fatalf("expected BLOCK_RECEIPT_WITHOUT_READS in stderr; got:\n%s", stderr.String())
+	}
+}
+
+func TestSessionStartHookEmitsPlaceholderReceiptNotResolvedNumbers(t *testing.T) {
+	// Verifies proposal 2: SessionStart MUST NOT inject a pre-rendered Receipt
+	// with concrete numbers into the agent prompt. Doing so lets the agent copy
+	// the Receipt verbatim without ever Reading canonical files, defeating
+	// gate.bootstrap.receipt_present even after the read-log strengthening.
+	workspace := t.TempDir()
+	writeFile(t, filepath.Join(workspace, "CORE_BOOTSTRAP.md"), "# Bootstrap stub\n")
+
+	var stdout, stderr bytes.Buffer
+	if code := runSessionStartHook(workspace, &stdout, &stderr); code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode: %v\n%s", err, stdout.String())
+	}
+	ctx := output["hookSpecificOutput"]["additionalContext"]
+
+	// Must contain the placeholder template form.
+	for _, want := range []string{
+		"<phase_id from phase_machine_init>",
+		"<COUNT(*) FROM obligations>",
+		"<COUNT(*) FROM gates>",
+		"intentionally does NOT print",
+	} {
+		if !strings.Contains(ctx, want) {
+			t.Errorf("expected SessionStart context to contain %q; got:\n%s", want, ctx)
+		}
+	}
+
+	// Must NOT contain a fully-resolved Receipt — assert no
+	// "Bootstrap: rules=✓ ... obligations=<digits> gates=<digits>" pattern.
+	resolvedRe := regexp.MustCompile(`Bootstrap: rules=✓ phase=\S+ obligations=\d+ gates=\d+`)
+	if resolvedRe.MatchString(ctx) {
+		t.Errorf("SessionStart MUST NOT pre-render a Receipt with concrete digits; matched:\n%s",
+			resolvedRe.FindString(ctx))
 	}
 }
 
