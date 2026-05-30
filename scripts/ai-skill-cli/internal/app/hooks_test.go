@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -434,6 +435,38 @@ func TestRunStopHookAllowsCursorTodoToolResponseWithoutCloseOutLoop(t *testing.T
 	}
 	if !strings.Contains(stderr.String(), "ALLOW_CURSOR_NON_FINAL_TOOL_RESPONSE") {
 		t.Fatalf("expected non-final tool response diagnostic, got %s", stderr.String())
+	}
+}
+
+func TestRunStopHookAllowsCursorSwitchModeResponseWithoutCloseOutLoop(t *testing.T) {
+	cases := []string{
+		"Switched composer mode from agent to plan",
+		"Switched to Agent mode",
+		"Switched to Plan mode",
+		"Switched to Ask mode",
+		"Switched to Debug mode",
+		"You are now in Agent mode.",
+		"You are now in Plan mode.",
+		"You are now in Ask mode.",
+		"You are now in Debug mode.",
+	}
+	for _, assistantResponse := range cases {
+		t.Run(assistantResponse, func(t *testing.T) {
+			setHookStdin(t, fmt.Sprintf(`{"hook_event_name":"stop","assistant_response":%q}`, assistantResponse))
+
+			var stdout bytes.Buffer
+			var stderr bytes.Buffer
+			code := runStopHook(t.TempDir(), &stdout, &stderr)
+			if code != ExitSuccess {
+				t.Fatalf("expected Cursor stop to allow non-final switch-mode response, got %d; stderr=%s", code, stderr.String())
+			}
+			if stdout.String() != "" {
+				t.Fatalf("expected no followup loop for non-final switch-mode response, got %s", stdout.String())
+			}
+			if !strings.Contains(stderr.String(), "ALLOW_CURSOR_NON_FINAL_TOOL_RESPONSE") {
+				t.Fatalf("expected non-final tool response diagnostic, got %s", stderr.String())
+			}
+		})
 	}
 }
 

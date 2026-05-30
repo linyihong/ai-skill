@@ -973,16 +973,25 @@ func isCursorNonFinalToolResponse(text string) bool {
 	if trimmed == "" {
 		return false
 	}
+	normalized := strings.ToLower(trimmed)
 	nonFinalMarkers := []string{
-		"Plan file created at:",
-		"You can read the plan contents from this file.",
-		"The provided to-dos have been added",
-		"Successfully updated TODOs.",
-		"Switched composer mode",
-		"Successfully switched",
+		"plan file created at:",
+		"you can read the plan contents from this file.",
+		"the provided to-dos have been added",
+		"successfully updated todos.",
+		"switched composer mode",
+		"switched to agent mode",
+		"switched to plan mode",
+		"switched to ask mode",
+		"switched to debug mode",
+		"you are now in agent mode",
+		"you are now in plan mode",
+		"you are now in ask mode",
+		"you are now in debug mode",
+		"successfully switched",
 	}
 	for _, marker := range nonFinalMarkers {
-		if strings.Contains(trimmed, marker) {
+		if strings.Contains(normalized, marker) {
 			return true
 		}
 	}
