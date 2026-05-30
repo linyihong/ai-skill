@@ -150,10 +150,25 @@ Parent plan §Phase 4 Extension 已記錄此 SPLIT 決定。但 parent plan scop
 
 ### Phase 2 — Thin Index + Focused Slices
 
-- [ ] 依 Scenario F §proposed_slices 拆 7 個檔案到 `workflow/apk-analysis/artifact-gates/`
-- [ ] `artifact-gates.md` 改為 thin index（保留 redirect stub 兼容舊入口）
-- [ ] 跨檔內容（§1/§10、§2/§11、§5/§6/§7、§8/§9）同批拆，避免 dual source-of-truth
-- [ ] 更新 `artifact-gates.yaml` 的 `source_markdown` mapping
+- [x] 依 Scenario F §proposed_slices + Scheme B probe 拆 **8 個** 檔案到 `workflow/apk-analysis/artifact-gates/`：
+  - `ui-architecture-map.md`（154 行，§1+§10）
+  - `api-catalog.md`（166 行，§2+§11）
+  - `domain-runtime-baseline.md`（55 行，§3）
+  - `feature-handoff.md`（49 行，§4）
+  - `evidence-chain.md`（114 行，§5+§6+§7）
+  - `sanitization.md`（43 行，§12）
+  - `self-generation-audits.md`（87 行，§8+§9）
+  - `documentation-discipline.md`（78 行，§13+§14+§15）
+- [x] `artifact-gates.md` 改為 thin index（**575 → 60 行**），保留舊節 redirect table 兼容外部連結
+- [x] 跨檔內容（§1/§10、§2/§11、§5/§6/§7、§8/§9、§13/§14/§15）同批拆，無 dual source-of-truth
+- [ ] 更新 `artifact-gates.yaml` 的 `source_markdown` mapping（thin index 仍承擔 source_markdown 對映；executable contract 內部 step references Phase 3 再評估是否需指向 focused slice）
+
+**Phase 2 exit criteria 評估**：
+- [x] Pilot surface 不再同時承擔 15 gate 多重責任。`artifact-gates.md` 變 60 行 thin-index；canonical prose 在 8 個 focused slice。
+- [x] 每個抽出的 slice 通過 granularity 判準：最小 43 行（sanitization），最大 166 行（api-catalog）；皆為單一 cognitive phase（per taxonomy §7.5）。
+- [x] 每個 slice 有 slice metadata header + 回連 thin-index + 回連 README。
+- [x] Document-sizing check：thin-index 60 行 ≤ 150；最大 slice 166 行（borderline 但主題單一，per Phase 1 granularity rule 不再拆）。
+- [x] 後 Phase 5 link audit：本 plan §Phase 5 已列入。
 
 ### Phase 3 — Routing + Summary
 
