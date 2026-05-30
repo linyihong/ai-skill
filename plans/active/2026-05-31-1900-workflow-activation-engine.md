@@ -1,9 +1,9 @@
 # Workflow Activation Engine
 
-**Status**: `draft-v2`
+**Status**: `draft-v3`
 **世代**：Gen 3 runtime hardening（systemic gap remediation）
 **建立日期**：2026-05-31
-**最後更新**：2026-05-31（v2 — 整合第二輪架構評審五點修正）
+**最後更新**：2026-05-31（v3 — 整合第三輪架構評審四點修正：advisory 能力矩陣、intent vocab、proposal 防垃圾場、self-declared route_type）
 **Empirical trigger**：2026-05-31 session — agent 對 `docs/20260531-下関.md` 跑 review，doc 標題含「行程」、內容含「Day 1 / 御朱印 / MapCode / 自駕」，命中 `route.workflow.travel-planning.activation_triggers.user_signals` 全部訊號，但 workflow 從未被啟動。使用者連續三次追問才暴露此 gap。
 
 > 本 plan 不修 travel-planning 個案，而是補齊 **Workflow Activation Engine** ——目前 framework 第一次形成「Registry ✓ + Rules ✓ + Docs ✓ + **Activation Engine ✗**」閉環的缺角。
@@ -103,22 +103,68 @@ Feedback (existing: feedback/history/<domain>/)
 - [ ] 確認 `runtime.db` schema 可加 `workflow_sessions` 表而不破壞既有 projection
 - [ ] 確認 `hooks.go` PreToolUse pipeline 可注入新 validator（非阻塞性，僅 detector miss 時 reject）
 
-#### Phase 0.2 — Route Activation Mode 分類（必跑，本 plan 後續所有 phase 的基礎）
+#### Phase 0.2 — Route Type + Activation Mode 分類（**v3 改：self-declared，不再靠人工 classification 表**）
 
-逐條檢視 57 個 route，標記 `activation_mode`（4 種，**非二元**）：
+##### Phase 0.2a — 引入 `route_type`（self-declared，scale-friendly）
 
-| activation_mode | 定義 | 行動 |
+第三輪評審指出：57 routes 今天人工分類還可行，但 120 / 300 routes 後維護地獄。解法 —— 每個 route **自己宣告 `route_type`**，由 type 推導預設 `activation_mode`。新增 route 時自然就帶分類，不需中央表。
+
+```yaml
+- id: route.workflow.travel-planning
+  route_type: workflow                # NEW: self-declared
+  activation_mode: auto-detect        # 可省略 → 由 route_type 推導
+  # 若需 override（罕見），直接寫值即可
+```
+
+**`route_type` enum 與預設 `activation_mode` 對應**：
+
+| route_type | 預設 activation_mode | 範例 prefix |
 |---|---|---|
-| `always-on` | session bootstrap、runtime core、phase machine 等永遠該載入的 | 不需 triggers，標記 `preload: true` |
-| `auto-detect` | 領域型 workflow / analysis，使用者用自然語言觸發 | **必須有 activation_triggers**，由 detector 自動啟動 |
-| `on-demand` | 使用者**明確問起**才讀（governance / constitution / architecture 描述性） | 不進 detector，需要 user 顯式提問才載入 |
-| `advisory` | 多情境可能要進、無單一明確觸發信號（如 `route.intelligence.architectural-fit` 既可在「這架構好不好」也可在「幫我寫 API」時進） | 進 detector 但只當 **secondary hint**，不單獨鎖定 workflow_session；conflict resolution 時優先級降低 |
+| `bootstrap` | `always-on` | `route.bootstrap.*` |
+| `runtime_core` | `always-on` | `route.runtime.{phase-machine, obligation-ledger, blocking-gates, recovery}` |
+| `workflow` | `auto-detect` | `route.workflow.*` |
+| `analysis` | `auto-detect` | `route.analysis.*` |
+| `intelligence` | `advisory` | `route.intelligence.*`（多 context，少單一明確 trigger） |
+| `governance` | `on-demand` | `route.governance.*` |
+| `constitution` | `on-demand` | `route.constitution.*` |
+| `architecture` | `on-demand` | `route.architecture.*` |
+| `feedback` | `advisory` | `route.feedback.*` |
+| `metadata` | `on-demand` | `route.metadata.*`、`route.knowledge.*` |
+| `ai_tools` | `on-demand` | `route.ai-tools.*`、`route.tools.*` |
+| `models` | `advisory` | `route.models.*` |
 
-> **為什麼不用二元 triggered / reference-only**：第二輪評審指出 `route.intelligence.architectural-fit` 是典型 multi-mode case —— 使用者問「這個架構好不好」要進，但問「幫我寫個 API」時也可能要進（暗藏架構決策）。二元分類會逼這類 route 二選一，產生「強制觸發誤殺」或「永不觸發遺漏」兩個 failure mode。`activation_mode` enum 給予 4 種彈性。
+**為什麼這比人工 classification 表好**：
+- 新 route 作者最知道自己屬哪類，宣告 cost 低（一行 yaml）
+- type → mode 對應 table 是一次性決策，鎖定後新 route 自動繼承
+- 例外覆寫機制保留彈性（極少數 route 需要與 type 預設不同）
+- 沒有「中央表 vs route file」雙寫 drift 風險
 
-產出：`routing-registry.yaml` header 加 `activation_mode_spec` schema，每條 route 加 `activation_mode:` 欄位（值為上述 4 enum 之一）。
+##### Phase 0.2b — `activation_mode` Capability Matrix（**v3 新增**，回應評審 #1）
 
-預估分布（待 Phase 0.2 確認）：always-on ~10、auto-detect ~22、on-demand ~17、advisory ~8。
+每個 mode 用四個 capability bit 描述行為，避免「`advisory` 是 secondary hint 但具體會發生什麼」這類模糊：
+
+| Capability \ Mode | `always-on` | `auto-detect` | `on-demand` | `advisory` |
+|---|---|---|---|---|
+| `can_preload` | ✅ true | false | false | false |
+| `can_activate`（rule match → 鎖定 RuntimeContext.ActiveRoute） | n/a (always loaded) | ✅ true | true（only on explicit user invocation） | ❌ **false** |
+| `can_reinforce`（hit 後提升另一個 active route 的 confidence / 並列 DetectedRoutes） | n/a | true | false | ✅ **true** |
+| `can_conflict`（多 hit 時參與 `workflow-routing.md` 歧義裁決） | n/a | ✅ true | false | ❌ **false** |
+| `can_suggest_promotion`（如果 advisory route 持續無 auto-detect 同伴 hit → 建議升級成 auto-detect） | n/a | n/a | n/a | ✅ **true** |
+| `requires_activation_triggers` | false | ✅ **true** | false | true（弱訊號 OK） |
+
+**範例落地**：
+- `route.workflow.travel-planning`（auto-detect）：can_activate ✅，can_conflict ✅ — 命中後鎖定 ActiveRoute，與其他 auto-detect 多 hit 時走 conflict resolver
+- `route.intelligence.architectural-fit`（advisory）：can_activate ❌，can_reinforce ✅ — 命中時不單獨鎖定，但若同時有 auto-detect route hit，會被加入 DetectedRoutes 作為 secondary context；若持續單獨 hit，記 `suggest_promotion` 建議升級
+- `route.runtime.phase-machine`（runtime_core → always-on）：can_preload ✅ — bootstrap 階段自動載入，detector 不參與
+- `route.governance.routing-signal`（governance → on-demand）：can_activate（only user invocation） — 使用者明確問「routing signal 怎麼設」才載入
+
+##### 產出
+
+- [ ] `routing-registry.yaml` header 加：
+  - `route_type_spec`（12 enum + 對應預設 activation_mode 表）
+  - `activation_mode_spec`（4 mode + capability matrix）
+- [ ] 每條 route 加 `route_type:` 欄位（required）+ optional `activation_mode:`（override 用，預設由 type 推導）
+- [ ] 預估初始分布（依 route_type 自動推導）：always-on ~12、auto-detect ~12、on-demand ~25、advisory ~8
 
 ### Phase 1 — Detector Schema 定義（two-phase activation 破環依賴）
 
@@ -238,7 +284,23 @@ type DetectionSig struct {
 
 Lifecycle（簡化，**移除 implicit keyword-drift invalidation**）：
 
-1. **Task start detection**：first substantive user message（≥ 20 chars + 含動詞/名詞）後跑 detector，結果寫 `RuntimeContext`
+1. **Task start detection**：first substantive user message 後跑 detector，結果寫 `RuntimeContext`。**"Substantive" 用 intent vocabulary 判定，不用字數**（v3 採納評審 #2）：
+
+   ```
+   substantive(msg) :=
+     contains_any(msg, domain_nouns) OR contains_any(msg, action_verbs)
+
+   domain_nouns := {旅遊, 行程, 規劃, 架構, 設計, API, APK, 分析, 評審,
+                    governance, workflow, ...}  # 從 routing-registry 所有
+                                                # activation_any_of.user_signals
+                                                # 自動聚合，registry 改即同步
+   action_verbs := {幫我, 規劃, 寫, 做, 找, 比較, 設計, 評估, 檢查, 修, ...}
+   ```
+
+   範例：
+   - `幫我規劃下關行程`（8 chars）→ contains `規劃` + `行程` → ✅ substantive
+   - `hi 早安`（5 chars）→ 無 domain noun / action verb → ❌ not substantive
+   - 字數門檻被淘汰因為 8 字中文 message 已可表達完整 task intent，舊 ≥20 chars 規則會誤殺。
 2. **Topic shift detection**（兩種，**取消 implicit drift**）：
    - ✅ **顯式 pivot**：user message 含 sentinel（`換任務 / 現在我要 / new task / switch to / 換個話題` 等）→ invalidate + 重跑 detector
    - ✅ **Manual override**：user 顯式說「用 X workflow / 跟我做 X」→ 直接覆寫 active_route
@@ -322,7 +384,37 @@ Execution                     graph traversal → 找到相關 governance / work
   - Discovery 處理 unknown capability（expensive, exploratory, **only fires on detector miss**）
   - Discovery 輸出可以 propose Registry growth（candidate route + suggested triggers）
 - [ ] 在 detector miss path 加 fallback hook 呼叫 Discovery（但不阻擋執行流程，warn + continue）
-- [ ] 新建 `runtime/router/route-candidate-proposals.yaml`（pending proposals 暫存區），由 Discovery 寫入，等 user / governance review 決定是否 promote 到 routing-registry.yaml
+- [ ] 新建 `runtime/router/route-candidate-proposals.yaml`（pending proposals 暫存區）—— 採 **occurrence tracking** schema 防垃圾場（v3 採納評審 #3）：
+
+  ```yaml
+  # runtime/router/route-candidate-proposals.yaml
+  schema_version: 1
+  proposals:
+    - candidate_id: governance-audit          # slug，未 promote 前非 route.* id
+      first_seen: 2026-05-31T10:00:00Z
+      last_seen:  2026-06-05T14:30:00Z
+      occurrence_count: 7                     # Discovery 多少次指向同樣 capability 群
+      detected_capabilities:                  # Discovery 找到的相關 atom
+        - governance/lifecycle/...
+        - architecture/...
+        - intelligence/governance-...
+      suggested_user_signals: [audit, governance audit, compliance check]
+      suggested_route_type: workflow
+      status: accumulating                    # accumulating | ready_for_review |
+                                              # promoted | rejected | stale
+  ```
+
+  **Promotion rules（防止一次性需求污染 Registry）**：
+
+  | 狀態轉換 | 條件 |
+  |---|---|
+  | `accumulating` → `ready_for_review` | `occurrence_count >= 5` AND `last_seen` 在過去 30 天內 |
+  | `accumulating` → `stale` | `occurrence_count < 5` AND `last_seen` 超過 60 天 → 自動 archive，不再列入活躍清單 |
+  | `ready_for_review` → `promoted` | User / governance review approve，proposal 內容寫入 `routing-registry.yaml` 成為正式 route，proposal 從 yaml 移除 |
+  | `ready_for_review` → `rejected` | User / governance review reject（例：太細、與既有 route 重疊），記 `rejected_reason` 後 archive |
+
+  **CLI 輔助**：`ai-skill router proposals list --status ready_for_review` —— 只顯示真正值得 review 的，避免使用者面對 100 條一次性 proposal 的垃圾場。
+- [ ] 新建 `ai-skill router proposals {list, promote, reject, gc}` CLI subcommands
 
 ### Phase 7 — Validation Scenarios
 
@@ -349,7 +441,7 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 | # | Question | 處置 |
 |---|---|---|
 | Q1 | Route classification 是否需要使用者 review 才定案？50 條人工分類有主觀成分 | still-open — 建議 Phase 0.2 產出 draft 後等 user confirm |
-| Q2 | Detector 的「first substantive message」定義 —— 純打招呼算嗎？ | still-open — 建議以 ≥ 20 chars + 含動詞 / 名詞為門檻 |
+| Q2 | Detector 的「first substantive message」定義 —— 純打招呼算嗎？ | **resolved (v3) → Phase 4.0 lifecycle**：採 intent vocabulary（domain_nouns ∪ action_verbs）判定，**不**用字數門檻。domain_nouns 自動從 routing-registry 的 `activation_any_of.user_signals` 聚合，registry 改即同步。 |
 | Q3 | Conflict resolution 多 route 命中時自動選還是 prompt user？ | resolved → 不自動選，注入 reminder 讓 agent 走 `workflow-routing.md` |
 | Q4 | `workflow_sessions` TTL？跨 session 是否保留？ | **resolved → Phase 4.0**：本 plan 不落 SQLite，TTL 等於 in-memory RuntimeContext 生命週期（process scope）。跨 session 持久化延後到 Phase 4.1 follow-up plan。 |
 | Q5 | Detector miss 是否 fallback 到 Discovery？ | **resolved → Phase 6.1**：採納第二輪評審，**Yes** 但有限制 —— Discovery 只在 detector miss 時 fire（不是 per-turn），結果寫 `route-candidate-proposals.yaml` 供未來 review，不阻擋當前執行流程。 |
@@ -409,6 +501,21 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 - System Boundary: A
 - Implementation Complexity: B+ → 目標 v2 提升
 - Future Maintainability: B → 目標 v2 提升（in-memory 延後固化、activation_mode 給彈性、Discovery feedback loop 讓 Registry 自我成長）
+
+**Round 3 第三方架構評審**（採納於 v3）：
+
+| # | 評審論點 | 採納 | 對應修改 |
+|---|---|---|---|
+| 1 | `advisory` 定義模糊（"secondary hint" 不夠 actionable） | ✅ | Phase 0.2b 新增 6-bit Capability Matrix（can_preload / can_activate / can_reinforce / can_conflict / can_suggest_promotion / requires_activation_triggers），每個 mode 明確標 ✅/❌ |
+| 2 | "First substantive message ≥ 20 chars" 規則會誤殺短中文意圖 | ✅ | Phase 4.0 lifecycle 改用 intent vocabulary 判定（domain_nouns ∪ action_verbs），字數門檻取消。"幫我規劃下關行程"（8 chars）現在能正確識別。 |
+| 3 | `route-candidate-proposals.yaml` 易變垃圾場（一次性需求污染） | ✅ | Phase 6.1 加 `occurrence_count` + `first_seen` / `last_seen` + 4 狀態機（accumulating → ready_for_review / stale → promoted / rejected）+ promotion threshold (count ≥ 5)。CLI `proposals list --status ready_for_review` 只顯示值得 review 的。 |
+| 4 | 57 routes 人工分類今天可行，120/300 後維護地獄 | ✅ | Phase 0.2a 引入 **self-declared `route_type`**（12 enum）+ type → activation_mode 預設對應表。新 route 作者宣告 type 即自動帶分類，無中央維護表 drift 風險。 |
+
+**Round 3 核心轉變**（user 點評整體結論）：
+> v1 → 「發現 detector 不存在 → 補 detector」
+> v3 → 「Known Capability → Detector / Unknown Capability → Discovery / Discovery → Registry Growth / Runtime → In-Memory Context / Workflow → Activation Lifecycle」
+
+不再只是補洞，而是形成 Runtime 生態。Future maintainability 從 v2 的 B 提升目標：靠 `route_type` 自動分類 + Discovery feedback loop 讓 Registry 自我成長，使 framework 不需中央維護就能 scale。
 
 ## Companion References
 
