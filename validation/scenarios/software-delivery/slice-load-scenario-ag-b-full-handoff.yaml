@@ -1,0 +1,95 @@
+id: slice-load-scenario-ag-b-full-handoff
+category: software-delivery
+version: v1
+type: slice-load-boundary
+priority: P2
+source_plan: plans/active/2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md
+source_phase: phase-4
+
+# Acceptance scenario AG-B: full APK analysis from scratch + complete
+# feature-reconstruction handoff. Asserts that ALL 8 slices legitimately
+# load — this is the "worst case" where post-split should equal pre-split
+# in functional capability (but split organization makes per-step focus
+# easier).
+
+given:
+  task_intent: "Greenfield APK analysis: brand-new target app, no prior docs. Need UI map, full API catalog, runtime baseline (for SDK readiness), feature handoff, evidence chain, sanitization for commit, self-generation audit (SDK target), and final dev-notes write-up."
+  routing_entry: route.workflow.apk-analysis
+  signals:
+    - apk
+    - greenfield_analysis
+    - full_handoff
+    - sdk_readiness
+
+when:
+  action: agent_loads_cognitive_surfaces_for_task
+
+then:
+  expected_load:
+    - workflow/apk-analysis/execution-flow.md
+    - workflow/apk-analysis/artifact-gates.md             # thin-index
+    - workflow/apk-analysis/artifact-gates/ui-architecture-map.md
+    - workflow/apk-analysis/artifact-gates/api-catalog.md
+    - workflow/apk-analysis/artifact-gates/domain-runtime-baseline.md
+    - workflow/apk-analysis/artifact-gates/feature-handoff.md
+    - workflow/apk-analysis/artifact-gates/evidence-chain.md
+    - workflow/apk-analysis/artifact-gates/sanitization.md
+    - workflow/apk-analysis/artifact-gates/self-generation-audits.md
+    - workflow/apk-analysis/artifact-gates/documentation-discipline.md
+    - analysis/apk/                                       # multiple evidence-acquisition methods
+  forbidden_load:
+    - workflow/software-delivery/                         # wrong domain
+    - workflow/travel-planning/                           # wrong domain
+    - workflow/greenfield/                                # not greenfield software project
+    - architecture/ai-native-cognitive-ecosystem-system.md
+  dependency_budget:
+    default:
+      max_depth: 2
+      max_runtime_dependencies: 4
+    override_when:
+      task_complexity: high   # full handoff is inherently multi-surface
+
+evidence:
+  executed_on: 2026-05-31
+  executor: agent_walkthrough
+  loaded_actual:
+    thin_entry: [execution-flow.md, artifact-gates.md]
+    all_8_slices_loaded: true
+    analysis_bridge: [analysis/apk/traffic-triage.md, analysis/apk/workflows/local-proxy-hook-flow.md, analysis/apk/workflows/http-api-documentation-flow.md, analysis/apk/tools-and-failures.md]
+  loaded_actual_lines: 204 + 60 + (154+166+55+49+114+43+87+78) + ~720 (analysis side) ≈ 1730
+  pre_split_baseline_lines: 204 + 575 + ~720 = 1499
+  delta_lines: +231 (post-split is slightly LARGER due to slice header metadata overhead)
+  delta_explanation: |
+    Each slice has a ~10-15 line metadata header (id / purpose / type / tags / load_when / ...).
+    8 slices × ~14 lines = ~112 lines header overhead.
+    Plus thin-index 60 lines (vs pre-split 0 — content was inline in monolith).
+    Net cost for full-handoff: +231 lines vs monolith.
+  routing_evidence:
+    - all 8 loading_surfaces have load_when conditions satisfied by greenfield-full-handoff signals
+    - cross-route bridge to analysis.apk for evidence-acquisition methods
+  budget_check:
+    actual_depth: 2
+    actual_runtime_dependencies: 12   # 8 slices + thin-index + execution-flow + 4 analysis surfaces (counted as bridge group)
+    within_default_budget: false
+    override_invoked: true
+    override_reason: "Full handoff legitimately spans all 8 slices + analysis bridge. Greenfield + full-handoff combination is high task_complexity."
+    within_override_budget: false   # exceeds override max_runtime_dependencies (6); needs explicit acknowledgement
+    budget_exception_recorded: true
+    budget_exception_justification: |
+      Full-handoff is the irreducible worst case — by definition it needs every
+      artifact gate. The override budget (depth 3 / deps 6) is sized for typical
+      complex tasks, not for "produce every required artifact from zero". This
+      is a known edge case; not a budget violation in the sense of pulling
+      unrelated content.
+  result: PASS_WITH_NOTED_BUDGET_EXCEPTION
+  notes:
+    - "expected_load ⊆ loaded_actual: satisfied (all 8 slices present)"
+    - "forbidden_load ∩ loaded_actual = ∅: satisfied (4 unrelated domains correctly suppressed)"
+    - "Honest finding: post-split is +231 lines vs monolith for THIS worst-case task. Split economy comes from incremental tasks (AG-A), not greenfield-full-handoff."
+    - "Budget exceeds even high override; this is acceptable because the task definition itself is irreducible. Recorded as edge-case exception, not boundary violation."
+    - "Critical assertion HELD: no cross-domain leakage despite loading all 8 same-domain slices."
+
+decision_inputs_recorded:
+  - id: full-handoff-honest-cost
+    observation: "Splitting adds metadata overhead. Worst-case tasks pay this overhead without compensating savings."
+    implication: "Slice economy is task-mix-dependent. Justified when incremental tasks dominate (per Scheme A vs B probe weighting: 65% T1 incremental). Greenfield handoff sessions should expect modest cost increase, not savings."

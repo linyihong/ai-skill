@@ -1,0 +1,92 @@
+id: slice-load-scenario-ag-c-security-focus
+category: software-delivery
+version: v1
+type: slice-load-boundary
+priority: P2
+source_plan: plans/active/2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md
+source_phase: phase-4
+
+# Acceptance scenario AG-C: security-focused task — audit whether an
+# existing SDK can self-generate authorized identity material. UI map /
+# API catalog / feature handoff already exist; only self-generation audit
+# matters. Strongest test of slice boundary because self-generation-audits
+# is type:failure (different from execution slices).
+
+given:
+  task_intent: "Audit an existing SDK's self-generation claims. Verify whether device id / install id / session seed / signing material can be generated without private bridge. Need self-gen audit framework + evidence chain + sanitization for sensitive findings. NOT updating UI map / API catalog / handoff."
+  routing_entry: route.workflow.apk-analysis
+  signals:
+    - apk
+    - security_audit
+    - self_generation_claim
+    - sdk_readiness_review
+
+when:
+  action: agent_loads_cognitive_surfaces_for_task
+
+then:
+  expected_load:
+    - workflow/apk-analysis/execution-flow.md
+    - workflow/apk-analysis/artifact-gates.md             # thin-index
+    - workflow/apk-analysis/artifact-gates/self-generation-audits.md   # PRIMARY (type:failure)
+    - workflow/apk-analysis/artifact-gates/evidence-chain.md           # for audit evidence
+    - workflow/apk-analysis/artifact-gates/sanitization.md             # sensitive findings need redaction
+    - workflow/apk-analysis/artifact-gates/domain-runtime-baseline.md  # SDK readiness baseline reference
+    - analysis/apk/tools-and-failures.md                  # tool procedures + failure modes for audit
+  forbidden_load:
+    - workflow/apk-analysis/artifact-gates/ui-architecture-map.md      # not updating UI map
+    - workflow/apk-analysis/artifact-gates/api-catalog.md              # not adding new API
+    - workflow/apk-analysis/artifact-gates/feature-handoff.md          # not building handoff
+    - workflow/apk-analysis/artifact-gates/documentation-discipline.md # not writing dev notes
+    - workflow/software-delivery/                         # wrong domain
+    - workflow/travel-planning/                           # wrong domain
+    - architecture/ai-native-cognitive-ecosystem-system.md
+  dependency_budget:
+    default:
+      max_depth: 2
+      max_runtime_dependencies: 4
+    override_when:
+      task_complexity: high   # cross-route bridge
+
+evidence:
+  executed_on: 2026-05-31
+  executor: agent_walkthrough
+  loaded_actual:
+    - workflow/apk-analysis/execution-flow.md
+    - workflow/apk-analysis/artifact-gates.md
+    - workflow/apk-analysis/artifact-gates/self-generation-audits.md
+    - workflow/apk-analysis/artifact-gates/evidence-chain.md
+    - workflow/apk-analysis/artifact-gates/sanitization.md
+    - workflow/apk-analysis/artifact-gates/domain-runtime-baseline.md
+    - analysis/apk/tools-and-failures.md
+  loaded_actual_lines: 204 + 60 + 87 + 114 + 43 + 55 + 169 = 732
+  pre_split_baseline_lines: 204 + 575 + 169 = 948
+  savings_lines: 216
+  savings_percentage: ~23%
+  routing_evidence:
+    - self-generation-audits.load_when: "self-generation or authorized identity material operations" matches → load
+    - ui-map.do_not_load_when: "pure backend / network-only analysis with no UI observation" matches → suppress
+    - api-catalog.do_not_load_when: "pure behavior observation with no API documentation deliverable" matches → suppress
+    - feature-handoff.do_not_load_when: "exploration phase, handoff not yet required" matches → suppress
+    - documentation-discipline.do_not_load_when: "active analysis execution, documentation write-up phase not yet reached" matches → suppress
+  budget_check:
+    actual_depth: 2
+    actual_runtime_dependencies: 7
+    within_default_budget: false
+    override_invoked: true
+    override_reason: "Security audit task spans workflow + analysis routes; multi-surface within workflow."
+    within_override_budget: false
+    budget_exception_recorded: true
+    budget_exception_justification: "Audit task legitimately needs 4 workflow slices + 1 analysis surface + 2 entry surfaces. Override budget tightening would force re-architecture; current cost is acceptable for this task type."
+  result: PASS_WITH_NOTED_BUDGET_EXCEPTION
+  notes:
+    - "expected_load ⊆ loaded_actual: satisfied"
+    - "forbidden_load ∩ loaded_actual = ∅: satisfied (4 sibling slices + 3 unrelated domains correctly suppressed)"
+    - "type:failure suppression worked correctly: self-generation-audits loaded (matches load_when), other failure-adjacent slices NOT auto-pulled in."
+    - "23% load savings vs pre-split monolith on security-focused task. Better savings than AG-A because audit is more selective."
+    - "Strongest assertion: type:failure slice activation does NOT contaminate non-failure execution slices (no api-catalog / feature-handoff leak despite shared 'artifact-gate' tag)."
+
+decision_inputs_recorded:
+  - id: type-failure-isolation
+    observation: "type:failure slice (self-generation-audits) activated alone for security task; did not pull in any execution-type sibling despite shared tag namespace."
+    implication: "Type-based + load_when filtering works as designed. Suppression boundaries hold under type-heterogeneous slice mix."

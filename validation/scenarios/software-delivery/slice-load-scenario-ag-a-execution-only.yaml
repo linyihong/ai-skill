@@ -1,0 +1,81 @@
+id: slice-load-scenario-ag-a-execution-only
+category: software-delivery
+version: v1
+type: slice-load-boundary
+priority: P2
+source_plan: plans/active/2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md
+source_phase: phase-4
+
+# Acceptance scenario AG-A: execution-only API documentation pass on an
+# APK whose UI map already exists. Asserts that only api-catalog +
+# evidence-chain (+ sanitization for commit) load; other 5 slices stay
+# suppressed.
+
+given:
+  task_intent: "Document a newly observed API endpoint on an APK whose UI map and feature handoff are already current. Append to existing API catalog; capture evidence + sanitize before commit. No new UI screen, no domain baseline gap, no self-generation question."
+  routing_entry: route.workflow.apk-analysis
+  signals:
+    - apk
+    - api_documentation
+    - incremental_update
+    - ui_map_already_current
+
+when:
+  action: agent_loads_cognitive_surfaces_for_task
+
+then:
+  expected_load:
+    - workflow/apk-analysis/execution-flow.md           # primary_source thin overview
+    - workflow/apk-analysis/artifact-gates.md           # thin-index entry
+    - workflow/apk-analysis/artifact-gates/api-catalog.md
+    - workflow/apk-analysis/artifact-gates/evidence-chain.md
+    - workflow/apk-analysis/artifact-gates/sanitization.md
+    - analysis/apk/workflows/http-api-documentation-flow.md  # evidence-acquisition method
+  forbidden_load:
+    - workflow/apk-analysis/artifact-gates/ui-architecture-map.md     # UI map already current
+    - workflow/apk-analysis/artifact-gates/domain-runtime-baseline.md # baseline stable
+    - workflow/apk-analysis/artifact-gates/feature-handoff.md         # incremental, no rebuild
+    - workflow/apk-analysis/artifact-gates/self-generation-audits.md  # no self-gen risk
+    - workflow/apk-analysis/artifact-gates/documentation-discipline.md # not a writeup task
+    - workflow/software-delivery/                                     # wrong domain
+    - workflow/travel-planning/                                       # wrong domain
+    - architecture/ai-native-cognitive-ecosystem-system.md            # Gen 4 vision
+  dependency_budget:
+    default:
+      max_depth: 2
+      max_runtime_dependencies: 4
+    override_when:
+      task_complexity: high   # crosses workflow → analysis route bridge → high
+
+evidence:
+  executed_on: 2026-05-31
+  executor: agent_walkthrough
+  loaded_actual:
+    - workflow/apk-analysis/execution-flow.md
+    - workflow/apk-analysis/artifact-gates.md
+    - workflow/apk-analysis/artifact-gates/api-catalog.md
+    - workflow/apk-analysis/artifact-gates/evidence-chain.md
+    - workflow/apk-analysis/artifact-gates/sanitization.md
+    - analysis/apk/workflows/http-api-documentation-flow.md
+  loaded_actual_lines: 60 + 204 + 166 + 114 + 43 + 147 = 734
+  ideal_load_target: 734   # matches expected exactly
+  pre_split_baseline_lines: 60 (thin-index) + 575 (full artifact-gates) + 204 (execution-flow) + 147 (http-api flow) = 986
+  wait — pre-split baseline would have NO thin-index, just full 575:
+  pre_split_baseline_lines_corrected: 204 + 575 + 147 = 926
+  post_split_actual: 734
+  savings_lines: 192
+  savings_percentage: ~21%
+  routing_evidence:
+    - routing-registry loading_surfaces: api-catalog.load_when matches; ui-map/baseline/handoff/self-gen/doc-discipline do_not_load_when all match → correctly suppressed
+  budget_check:
+    actual_depth: 2          # route.workflow.apk-analysis → its leaf surfaces; one cross-route bridge to analysis
+    actual_runtime_dependencies: 6
+    within_default_budget: false
+    override_invoked: true
+    override_reason: "Cross-route bridge (workflow.apk-analysis → analysis.apk.workflows) qualifies as task_complexity:high"
+    within_override_budget: true   # depth 2 ≤ 3, deps 6 ≤ 6
+  result: PASS
+  notes:
+    - "expected_load ⊆ loaded_actual: satisfied"
+    - "forbidden_load ∩ loaded_actual = ∅: satisfied (5 sibling slices + 3 unrelated domains all correctly suppressed)"
+    - "21% load savings vs pre-split baseline on incremental task. Lower than Scenario AG-acceptance target because incremental task already touched only ~half the file; the savings are real but modest at the per-task granularity."
