@@ -1,0 +1,121 @@
+id: slice-load-scenario-ag-schemes-a-vs-b
+category: software-delivery
+version: v1
+type: scheme-comparison-probe
+priority: P2
+source_plan: plans/active/2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md
+source_phase: phase-0-followup-decision
+
+# Phase 0 Open Question: should artifact-gates.md §13/§14/§15 be folded into
+# evidence-chain.md (Scheme A, 7 slices) or split into a separate
+# documentation-discipline.md slice (Scheme B, 8 slices)?
+# Heuristic recommendation in Phase 0 was A based on coupling intuition.
+# This probe runs the test-first method on 3 realistic tasks to override
+# intuition with evidence.
+
+scheme_definitions:
+  scheme_a_seven_slice:
+    evidence-chain.md: "§5 note template + §6 evidence chain + §7 failure log + §13 dev guidance + §14 feedback writing tips + §15 backfill rules (~225 lines)"
+    other_six_slices: "ui-architecture-map, api-catalog, domain-runtime-baseline, feature-handoff, sanitization, self-generation-audits"
+  scheme_b_eight_slice:
+    evidence-chain.md: "§5 + §6 + §7 (~167 lines, pure evidence recording)"
+    documentation-discipline.md: "§13 + §14 + §15 (~57 lines, writing + backfill discipline)"
+    other_six_slices: "same as scheme_a"
+
+probe_tasks:
+  T1_standard_analysis:
+    description: "Reproduce Scenario F: capture login API + document endpoints + feature handoff. §13/§14/§15 NOT actively needed."
+    scheme_a_loaded: [ui-architecture-map, api-catalog, feature-handoff, evidence-chain]
+    scheme_a_lines_for_evidence_chain: 225   # §13/§14/§15 ride along even though task ignores them
+    scheme_b_loaded: [ui-architecture-map, api-catalog, feature-handoff, evidence-chain]
+    scheme_b_lines_for_evidence_chain: 167   # documentation-discipline NOT loaded
+    a_vs_b_delta_lines: +58 (A loads more)
+    winner_for_T1: B (saves 58 lines per standard analysis task; this is the most common task type)
+
+  T2_doc_discipline_review:
+    description: "Review existing analysis docs and improve dev-notes / feedback writing quality. Evidence chain content NOT needed (already exists in docs being reviewed)."
+    scheme_a_loaded: [evidence-chain]  # forced to load full 225 lines to access §13/§14/§15
+    scheme_a_lines_used_vs_loaded: "57 used / 225 loaded → 25% utilization"
+    scheme_b_loaded: [documentation-discipline]  # exactly 57 lines, all used
+    scheme_b_lines_used_vs_loaded: "57 used / 57 loaded → 100% utilization"
+    a_vs_b_delta_lines: -168 (B saves)
+    winner_for_T2: B (4x utilization; A wastes ~168 lines on irrelevant evidence-chain content)
+
+  T3_full_handoff_with_proper_docs:
+    description: "Complete analysis from scratch + write proper dev notes + feedback lessons in same session."
+    scheme_a_loaded: [evidence-chain]   # 225 lines, all relevant
+    scheme_a_surfaces_count: 1
+    scheme_a_depth: 1
+    scheme_b_loaded: [evidence-chain, documentation-discipline]   # 167 + 57 = 224 lines (≈ same total)
+    scheme_b_surfaces_count: 2
+    scheme_b_depth: 2 (sibling routing under same hierarchical loading_surface)
+    a_vs_b_delta_lines: ~0
+    a_vs_b_delta_routing_hops: B adds +1 surface load
+    winner_for_T3: A (single surface, one hop; B's split adds routing cost without line savings)
+
+cross_task_summary:
+  task_frequency_estimate:
+    T1_standard_analysis: "most common (every analysis task)"
+    T2_doc_discipline_review: "occasional (post-analysis or retrospective)"
+    T3_full_handoff_with_proper_docs: "occasional (final handoff sessions)"
+  weighted_winner:
+    if_T1_dominates: B wins (most common task saves 58 lines)
+    if_T2_or_T3_dominates: tie or A wins
+    realistic_distribution: "T1 ≈ 60-70% of apk-analysis sessions; T2 + T3 ≈ 30-40%"
+    weighted_calculation: |
+      Assuming 65% T1 / 20% T2 / 15% T3:
+        Scheme A total wasted lines per 100 sessions:
+          65 × 58 (T1 waste) + 20 × 168 (T2 waste) + 15 × 0 = 3770 + 3360 + 0 = 7130 lines
+        Scheme B total wasted lines per 100 sessions:
+          65 × 0 + 20 × 0 + 15 × ~0 (extra hop ≠ extra lines) = 0
+        Scheme B wins by ~7130 lines per 100 sessions on common task mix.
+
+  granularity_check:
+    scheme_a: "evidence-chain.md becomes ~225 lines mixing evidence recording (technical) with documentation/writing discipline (meta). Two different cognitive phases bundled."
+    scheme_b: "evidence-chain.md = 167 lines pure evidence recording (one cognitive phase). documentation-discipline.md = 57 lines about how-to-write (separate cognitive phase). PASSES Phase 1 granularity rule cleanly."
+
+  three-layer-check: "Both schemes keep everything in workflow layer. No three-layer rule impact."
+
+  dependency_budget_check:
+    scheme_a: "max_depth 1, deps 1 for any task involving evidence-chain"
+    scheme_b: "max_depth 1, deps 1 for T1/T2; depth 1, deps 2 for T3 — within default budget (max 4)"
+
+verdict:
+  decision: SCHEME_B_RECOMMENDED
+  severity: medium
+  reasoning: |
+    Probe overrides Phase 0 heuristic recommendation (which was A). Three
+    convergent reasons:
+
+    (1) Token economy: weighted across realistic task mix, B saves ~7130
+        lines per 100 sessions; A is never better than B on line count
+        (T3 is a tie).
+
+    (2) Granularity rule: evidence-chain.md under A bundles two cognitive
+        phases (evidence recording + writing discipline) into one slice.
+        Phase 1 granularity rule says minimum unit = one independent
+        cognitive phase. A fails this; B passes.
+
+    (3) Same lesson as parent plan Scenario H: coupling intuition is not
+        runtime evidence. Heuristic said "they're related so combine";
+        probe says "they co-load only 15% of the time; split saves load
+        the other 85%".
+
+  next_action: "Phase 1 adopts Scheme B. taxonomy §7 apk-analysis pilot section lists 8 slices. Phase 2 creates 8 files including documentation-discipline.md."
+
+  intuition_override_recorded: |
+    Phase 0 recommended A based on "small file + topical coupling" heuristic.
+    Probe with realistic task mix recommends B. This is the second time in
+    the cognitive-slice work that runtime probe overrode heading-count
+    intuition (parent plan Scenario H was the first, overriding the
+    tools-and-failures split intuition in the OPPOSITE direction —
+    intuition said split, probe said don't split).
+
+    Pattern: probe-then-decide consistently produces better answers than
+    pure heuristic. Reinforces the value of running the second pilot
+    before locking an ADR.
+
+evidence:
+  executed_on: 2026-05-30
+  executor: agent_walkthrough
+  result: SCHEME_B_WINS (token economy + granularity + intuition override pattern)

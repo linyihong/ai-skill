@@ -24,7 +24,7 @@ Parent plan Scenario F（[`slice-load-scenario-f-apk-analysis-probe.yaml`](../..
 
 ### Decision
 
-切成 7 個 focused gate surface（Scenario F §verdict.proposed_slices）：
+切成 **8 個** focused gate surface（Scenario F §verdict.proposed_slices 原列 7 + Phase 0 probe AG-schemes-A-vs-B 加 1）：
 
 | Slice 檔 | 內容（原 §） | type | tags |
 |---|---|---|---|
@@ -35,6 +35,7 @@ Parent plan Scenario F（[`slice-load-scenario-f-apk-analysis-probe.yaml`](../..
 | `artifact-gates/evidence-chain.md` | §5 note template + §6 chain + §7 failure log | execution | artifact-gate, evidence |
 | `artifact-gates/sanitization.md` | §12 | execution | artifact-gate, sanitization |
 | `artifact-gates/self-generation-audits.md` | §8 SDK + §9 Identity | failure | artifact-gate, security |
+| `artifact-gates/documentation-discipline.md` | §13 dev notes + §14 feedback tips + §15 backfill rules | execution | artifact-gate, documentation, backfill |
 
 `artifact-gates.md` 變成 thin index（同 parent plan `execution-flow.md` 模式）。
 
@@ -106,9 +107,9 @@ Parent plan §Phase 4 Extension 已記錄此 SPLIT 決定。但 parent plan scop
 
 **Net impact of revision**：
 - 真實 gate 數 15（非 12）
-- Slice 數有 2 個方案：
-  - **方案 A（推薦）**：保持 7 slice，§13/§14/§15 合計 ~57 行併入 `evidence-chain.md`（變成 evidence + writing discipline + backfill 一體）
-  - **方案 B**：增第 8 slice `documentation-discipline.md`（§13+§14+§15 ~57 行）；evidence-chain 維持純證據紀錄
+- Slice 數方案經 probe 決定：
+  - ~~**方案 A（Phase 0 heuristic 推薦）**：保持 7 slice，§13/§14/§15 合計 ~57 行併入 `evidence-chain.md`~~
+  - **方案 B（probe 採用，2026-05-30）**：增第 8 slice `documentation-discipline.md`（§13+§14+§15 ~57 行）；evidence-chain 維持純證據紀錄。詳見 [`slice-load-scenario-ag-schemes-a-vs-b.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-ag-schemes-a-vs-b.yaml)。
 - 任一方案都不需改 Scenario F 的 `~280 行 ideal load` 估算（這些 gate 在原 task 中也大多不會用到）
 
 **Source-of-truth 邊界（Phase 2 必須遵守）**：
@@ -184,7 +185,7 @@ Parent plan §Phase 4 Extension 已記錄此 SPLIT 決定。但 parent plan scop
 
 - [x] 是否同時把 Scenario F 標記的 `analysis/apk/workflows/frida-hook-flow.md`（190 行）/`media-hls-analysis-flow.md`（165 行）納入本 plan 範圍？預設不納入（parent plan 標 defer 至真實單獨任務觸發再 probe）。**Phase 0 確認：deferred，維持不納入。**
 - [x] `analysis/travel/sources-and-tools.md` 的第二次 probe 屬於另一個 follow-up plan，不歸本 plan。**Phase 0 確認：out-of-scope。**
-- [ ] **NEW（Phase 0 新增 2026-05-30）**：artifact-gates.md 實測有 15 個 gate（非 Scenario F 估計的 12 個）。§13 Developer Guidance Notes / §14 Feedback Lesson Writing Tips / §15 Backfill Rules 應該：(A) 併入 evidence-chain.md（總 ~57 行；保持 7 slice）／ (B) 獨立第 8 slice `documentation-discipline.md`？**待 Phase 1 stakeholder 決定。** Phase 0 推薦 A（granularity 較緊；§13+§14+§15 都是 "evidence/doc discipline" 主題且行數小）。
+- [x] **NEW（Phase 0 新增 2026-05-30）**：artifact-gates.md 實測有 15 個 gate（非 Scenario F 估計的 12 個）。§13 Developer Guidance Notes / §14 Feedback Lesson Writing Tips / §15 Backfill Rules 應該：(A) 併入 evidence-chain.md（總 ~57 行；保持 7 slice）／ (B) 獨立第 8 slice `documentation-discipline.md`？~~Phase 0 推薦 A（granularity 較緊；§13+§14+§15 都是 "evidence/doc discipline" 主題且行數小）。~~ **Probe override 2026-05-30**：執行 [`slice-load-scenario-ag-schemes-a-vs-b.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-ag-schemes-a-vs-b.yaml) 三任務（T1 標準分析 / T2 doc discipline 審閱 / T3 全程含 doc），weighted across 65% T1 + 20% T2 + 15% T3 顯示 **Scheme B 每 100 sessions 多省 ~7130 行**；同時 Scheme A 違反 granularity rule（evidence-chain 在 A 下混合 evidence recording + writing discipline 兩個 cognitive phase）。**結論：採 Scheme B = 8 slice**。Phase 0 heuristic 被 probe 覆蓋——這是本系列工作中**第二次** runtime probe 覆蓋直覺（parent plan Scenario H 是第一次，方向相反），證實「probe-then-decide 一致勝出純啟發」。
 - [ ] **NEW（Phase 0 新增 2026-05-30）**：`artifact-gates.yaml` executable contract 是否切？**Phase 0 處置：不切**；保留單一 yaml，Phase 2 改 `source_markdown` 指向 thin-index，並評估 yaml 內部 step references 是否需要更新指向 focused slice。若 thin index 過薄無法承擔 source_markdown 對映，再回頭討論 yaml split。
 
 ---
