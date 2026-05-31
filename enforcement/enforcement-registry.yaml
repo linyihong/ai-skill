@@ -1,0 +1,886 @@
+schema_version: 2
+id: enforcement.enforcement-registry
+status: active
+owner_layer: enforcement
+source_markdown: enforcement/enforcement-registry.md
+
+# ─────────────────────────────────────────────────────────────────────
+# Mechanical Enforcement Registry — Layer 2.5 (Meta Governance)
+#
+# Canonical binding table for "Rule ←binding→ Executor ←evidence→ Verification".
+# This file is the SoT for which knowledge-layer rule_class corresponds to which
+# runtime-layer executor (or explicitly declares why no executor exists).
+#
+# Companion markdown: enforcement/enforcement-registry.md (philosophy + writing guide).
+# Source plan: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+# ─────────────────────────────────────────────────────────────────────
+
+purpose: >
+  Cross-cutting binding table that links each rule_class declared in
+  enforcement/, runtime/, or governance/ to its runtime executor (or to an
+  explicit declaration that no executor exists, with required metadata).
+  Compile-time lint enforces the binding so future rules cannot silently
+  leak the "Rule Exists, Executor Missing" failure pattern.
+
+# ─────────────────────────────────────────────────────────────────────
+# Global enforcement policy (resolves Open Questions Q1/Q4/Q6)
+# ─────────────────────────────────────────────────────────────────────
+
+enforcement_mode:
+  orphan_rule: fail        # Q1: hard block, no grace period
+  orphan_executor: fail    # Q1: hard block, no grace period
+  rationale: |
+    Grace period would reintroduce the "warning → ignored → still here in 6
+    months" failure mode the registry exists to prevent. Hard block from
+    day 1 forces backfill to be a one-time cost, not a permanent backlog.
+
+bootstrap_grace:
+  enabled: false           # Q1: no special bootstrap concessions
+
+governance_thresholds:
+  rule_class_soft_target: 24
+  rule_class_hard_limit: 40
+  exceed_soft_target_action: review_split_opportunities
+  exceed_hard_limit_action: governance_review_required
+  current_count: 28
+  rationale: |
+    Q6 + new Q resolution. 24 is the design target (registry stays
+    legible); 40 is the hard ceiling. Between the two, maintainers are
+    asked to review whether classes should be merged or further split.
+    Beyond 40 triggers governance review on the abstraction granularity.
+
+# ─────────────────────────────────────────────────────────────────────
+# Coverage status enum (v4: 6-value)
+# ─────────────────────────────────────────────────────────────────────
+
+coverage_status_spec:
+  mechanical:
+    semantics: "Executor exists and is enforcing the rule"
+    requires: [executors, rationale]
+    verification_required: true
+    lint_behavior: |
+      executors[].symbol must exist in file; coverage_evidence checked
+      against verification_levels thresholds.
+  behavioral_only:
+    semantics: "Intentionally NOT mechanized; depends on agent behavior"
+    requires:
+      - rationale
+      - sunset_decision.revisit_when         # Q2: required (event trigger)
+      - sunset_decision.success_criteria     # Q2: required (objective test)
+      # revisit_owner: recommended (not strictly required)
+    lint_behavior: |
+      Missing revisit_when OR success_criteria → compile fail.
+      Q2 rationale: single-field schema would let behavioral_only decay
+      into "have criteria but no one checks" — more dangerous than "no
+      criteria but checks happen". Dual lock = event trigger + objective
+      test forms the minimum governance closure.
+  not_mechanizable:
+    semantics: "Will NEVER be mechanized (subjective / no objective test)"
+    requires: [rationale, objective_validation_impossible_because]
+    lint_behavior: |
+      Missing impossibility rationale → compile fail. Governance review
+      may challenge whether the class is genuinely not mechanizable.
+  pending_implementation:
+    semantics: "Knows how to mechanize, child plan is active or scheduled"
+    requires: [child_plan, target_promotion]
+    lint_behavior: |
+      child_plan must resolve to a plans/active/*.md file. If
+      target_promotion includes a date and that date has passed without
+      promotion, surface as warning in coverage report.
+  research_required:
+    semantics: "Knows it SHOULD be mechanizable, doesn't yet know HOW"
+    requires: [rationale, research_questions, estimated_unblock_timeline]
+    lint_behavior: |
+      research_questions must list ≥ 1 concrete unresolved question.
+      If estimated_unblock_timeline passes without promotion or demote →
+      governance review trigger.
+  deprecated:
+    semantics: "Class is being removed; either replaced or scheduled for removal"
+    requires_one_of: [replaced_by, removal_date]
+    lint_behavior: |
+      replaced_by must point to an active rule_class id; OR removal_date
+      must be a future ISO-8601 date. Past removal_date with class still
+      present → compile fail.
+
+# ─────────────────────────────────────────────────────────────────────
+# Executor kind whitelist (Q4 resolution)
+# ─────────────────────────────────────────────────────────────────────
+
+executor_kind_spec:
+  enum:
+    - hook_dispatcher_entry      # runSessionStart, runPreToolUse, ...
+    - commit_msg_validator       # validateCognitiveContractFormat, ...
+    - runtime_state_machine_phase # runtime.db phase machine transitions
+    - internal_helper            # parseYaml, normalizePath, ... (exempt)
+  binding_required_for:
+    - hook_dispatcher_entry
+    - commit_msg_validator
+    - runtime_state_machine_phase
+  rationale: |
+    Q4 resolution: not every Go function is an "executor" worth registering.
+    Only functions that are exported through hook dispatchers, registered
+    as commit-msg validators, or implement runtime phase machine
+    transitions count. Helpers (parseYaml, normalizePath, etc.) are
+    explicitly exempt via internal_helper_allowlist to avoid registry
+    bloat. The allowlist is maintained here (yaml) rather than as Go
+    annotations to keep the boundary visible and reviewable.
+
+internal_helper_allowlist:
+  description: |
+    Go symbols in scripts/ai-skill-cli/internal/app/hooks.go that look like
+    they could be executors but are internal helpers. NOT considered
+    orphan executors during lint.
+  symbols:
+    - appendLog
+    - readFileSafe
+    - resolveClaudeAiSkillRepo
+    - md5Short
+    - claudeFileExists
+    - extractAssistantTexts
+    - transcriptHasRequiredBootstrapReads  # called by PreToolUse gate; not an executor itself
+    - collectDirtyGitRepoReports
+    - nonEmptyLines
+    - gitStatusNeedsReport
+    - formatDirtyGitRepoReport
+    - hookGitOutput
+    - blockStopHookMissingAssistantText
+    - isCursorNonFinalToolResponse
+    - hasBootstrapAcknowledgement
+    - isCursorStopPayload
+    - isCursorAfterAgentResponsePayload
+    - cursorHookEventName
+    - writeCursorStopFollowup
+    - extractStopHookAssistantTexts
+    - collectStopHookAssistantTexts
+    - collectStopHookAssistantValue
+    - isStopHookAssistantTextKey
+    - stagedRequiresDeepStrictCognitiveMode
+    - parseCompactCognitiveLine
+    - parseCognitiveModeBlock
+    - deriveCognitiveCost
+    - parseActivationSignals
+    - readKnownCognitiveSignals
+    - itoa
+    - planDiffFlipsCheckbox
+    - findArchivedPlans
+    - bodyJustifiesUnchecked
+    - stagedAddedRouteIDs
+    - stagedManualAnnotatedRouteIDs
+    - stagedAddedTargetKeys
+    - routeWiredInTree
+    - targetKeyConsumedInTree
+    - sourceTreeContains
+    - stagedDiff
+    - readPerCommitObligationsOrder
+    - parseGitHubRemote
+    - cliCIPrePushPaths
+    - hasCLICIPreflightChange
+    - gitLines
+    - hasRuntimeSourceChange
+    - hasRuntimeDBChange
+    - hasKnowledgeValidationChange
+    - hookAdapterContent
+    - hookSourceCheck
+    - gitHooksTargetDir
+    - listHookFiles
+    - existingHookTargets
+    - buildHooksInstallResult
+    - buildHooksRunResult
+
+# ─────────────────────────────────────────────────────────────────────
+# Verification levels (v4: 4-level ladder)
+# ─────────────────────────────────────────────────────────────────────
+
+verification_levels:
+  symbol_exists:
+    check: "executor symbol resolves in declared file"
+    lint: "missing → compile fail (mechanical only)"
+  scenario_exists:
+    check: "validation/scenarios/<area>/<class>*.yaml exists"
+    lint: "missing → compile warning (will become fail in v5)"
+  regression_exists:
+    check: "at least one scenario covers a known historical failure"
+    lint: "missing → compile warning"
+  runtime_observed:
+    check: |
+      runtime.db.executor_observations shows ≥ 1 trigger in last
+      observation_window_days; for classes with instance sets,
+      runtime_observation_pct ≥ expected_observation_pct.
+    lint: |
+      runtime_observation_pct < expected → coverage report warning;
+      < expected/2 → governance review trigger. Not a compile fail
+      because runtime metrics are observational and need human judgment.
+
+# ─────────────────────────────────────────────────────────────────────
+# Runtime metrics spec (v4 NEW)
+# ─────────────────────────────────────────────────────────────────────
+
+runtime_metrics_spec:
+  collection: |
+    Runtime hooks write to runtime.db.executor_observations table on each
+    fire. Schema: { rule_class_id, executor_symbol, fired_at,
+    instance_id (optional), result (pass|warn|block) }.
+    Table creation and write-path wiring is Phase 5 work; this registry
+    declares the contract.
+  default_observation_window_days: 30
+  default_expected_observation_pct: 30
+  per_class_overrides_allowed: true
+
+# ─────────────────────────────────────────────────────────────────────
+# Self-Governance (v4: Phase 4.5)
+# ─────────────────────────────────────────────────────────────────────
+
+self_governance:
+  status_transition_matrix:
+    - from: "(new)"
+      to: pending_implementation
+      requires: [child_plan exists]
+    - from: "(new)"
+      to: research_required
+      requires: [research_questions >= 1, estimated_unblock_timeline]
+    - from: pending_implementation
+      to: mechanical
+      requires: [executor symbol live, coverage_evidence complete, verification thresholds met]
+    - from: research_required
+      to: pending_implementation
+      requires: [all research_questions resolved, child_plan exists]
+    - from: mechanical
+      to: behavioral_only
+      requires: [demotion_rationale, adr_reference]  # demotion needs ADR
+    - from: mechanical
+      to: deprecated
+      requires: [replaced_by points to active mechanical class]
+    - from: behavioral_only
+      to: "(review queue)"
+      trigger: sunset_decision.revisit_when fires
+    - from: deprecated
+      to: "(removed)"
+      trigger: removal_date reached, governance approves actual removal
+  lint_rules:
+    R1: "rule_class status change commit must include [registry-status-change] trailer + rationale: body"
+    R2: "demotion commit must reference an ADR; missing adr_reference → reject"
+    R3: "promotion must show verification_levels met mechanical thresholds; otherwise lint fail"
+    R4: "deprecated past removal_date by 30+ days → governance alert (not blocking)"
+    R5: "research_required past estimated_unblock_timeline → governance review trigger"
+
+# ─────────────────────────────────────────────────────────────────────
+# Rule Classes (28 total)
+#   Distribution: mechanical 14 / pending_implementation 2 /
+#                 behavioral_only 7 / not_mechanizable 2 /
+#                 research_required 2 / deprecated 0  (==28 within 24/40 thresholds)
+# ─────────────────────────────────────────────────────────────────────
+
+rule_classes:
+
+  # ═══ MECHANICAL ═══════════════════════════════════════════════════
+
+  - id: bootstrap_integrity
+    coverage: mechanical
+    source_files:
+      - runtime/core-bootstrap.yaml#per_session_obligations
+      - CORE_BOOTSTRAP.md
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: runPreToolUseHook
+        executor_kind: hook_dispatcher_entry
+        hook_phase: PreToolUse
+        block_or_warn: block
+        notes: "enforces gate.bootstrap.receipt_present via transcriptHasRequiredBootstrapReads"
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: runSessionStartHook
+        executor_kind: hook_dispatcher_entry
+        hook_phase: SessionStart
+        block_or_warn: warn
+        notes: "injects Receipt template + required-reads reminder"
+    rationale: |
+      Bootstrap Receipt is session integrity anchor. Bypass = skipping all
+      required reads. Read-log gate prevents copy-paste fabrication.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: ✓
+      regression_exists: ✓  # bootstrap-bypass-on-resume failure pattern
+      runtime_observed: pending  # runtime.executor_observations table not yet wired
+    coverage_evidence:
+      expected_instance_count: 1
+      validation_scenarios:
+        - validation/scenarios/bootstrap/bootstrap-receipt-required-reads-gate-v1.yaml
+        - validation/scenarios/bootstrap/bootstrap-bypass-on-resume-v1.yaml
+      coverage_target_pct: 100
+
+  - id: cognitive_mode_governance
+    coverage: mechanical
+    source_files:
+      - runtime/core-bootstrap.yaml#per_turn_obligations
+      - runtime/cognitive-modes.yaml
+      - runtime/cognitive-modes-discovery.yaml
+      - runtime/cognitive-modes-phase-integration.yaml
+      - runtime/cognitive-modes-governance-integration.yaml
+      - runtime/cognitive-modes-memory-integration.yaml
+      - runtime/cognitive-modes-cost-class.yaml
+      - runtime/cognitive-modes-adaptive.yaml
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: runCommitMsgHook
+        executor_kind: hook_dispatcher_entry
+        hook_phase: commit-msg
+        block_or_warn: block
+        notes: "dispatcher for all per-commit validators"
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateExecutionModeFloors
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateGovernanceModeConsistency
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateMemoryModeSubdir
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateCognitiveCost
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateActivationSignals
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateCapabilitySnippet
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateTokenBudget
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateAdaptiveTriggers
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      # validateCognitiveContractFormat lives in cognitive_modes pkg (different file);
+      # confirmed via runCommitMsgHook dispatch.
+    rationale: |
+      All cognitive-mode-related commit obligations bundled into one
+      rule_class because they share dispatcher + collectively enforce a
+      single discipline (cognitive mode declaration must be consistent
+      and complete on every commit).
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: ✓
+      regression_exists: partial
+      runtime_observed: pending
+
+  - id: plan_governance
+    coverage: mechanical
+    source_files:
+      - runtime/plan-status-sync-enforcement.yaml
+      - plans/README.md
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validatePlanStatusSync
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validatePlanCheckboxSync
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validatePlanArchivalAudit
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: |
+      Plan lifecycle (status / checkbox / archival) shares the same
+      governance domain — keeping a plan file truthful about what is
+      done, in progress, or archived.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: partial
+      regression_exists: partial
+      runtime_observed: pending
+
+  - id: evidence_hierarchy
+    coverage: mechanical
+    source_files:
+      - enforcement/evidence-hierarchy.yaml
+      - enforcement/evidence-hierarchy.md
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateEvidenceHierarchy
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: |
+      Forces commit messages claiming completion with code work to cite
+      evidence at the appropriate hierarchy level.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: pending
+      runtime_observed: pending
+
+  - id: runtime_trigger_wiring
+    coverage: mechanical
+    source_files:
+      - governance/lifecycle/system-upgrade-governance.yaml
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateRuntimeTriggerWiring
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: |
+      Ensures newly added routes/runtime yaml entries are wired through
+      the runtime trigger flow before commit lands.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: partial
+      regression_exists: pending
+      runtime_observed: pending
+
+  - id: bootstrap_entry_thinness
+    coverage: mechanical
+    source_files:
+      - runtime/bootstrap-entry-points.yaml
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateBootstrapEntryThinness
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: |
+      Prevents the CLAUDE.md / AGENTS.md / .cursor/rules tool-entry files
+      from bloating with content that belongs in canonical sources.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: ✓  # bootstrap-entry-bloat failure pattern
+      runtime_observed: pending
+
+  - id: cli_doc_sync
+    coverage: mechanical
+    source_files:
+      - runtime/cli-modification-policy.yaml
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateCLIDocSync
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: |
+      Ensures CLI source changes are accompanied by doc updates so the
+      CLI surface and its documentation never drift.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: pending
+      runtime_observed: pending
+
+  - id: runtime_yaml_projection
+    coverage: mechanical
+    source_files:
+      - runtime/core-bootstrap.yaml
+      - governance/lifecycle/system-upgrade-governance.yaml
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateRuntimeYamlProjects
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: |
+      Confirms changes to runtime/*.yaml include the runtime.db
+      projection refresh so SQLite mirror cannot fall behind canonical
+      source.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: pending
+      runtime_observed: pending
+
+  - id: markdown_yaml_sync
+    coverage: mechanical
+    source_files:
+      - enforcement/failure-patterns/markdown-yaml-sync-drift.md
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateMarkdownYamlSync
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: |
+      When a .md and sibling .yaml exist, both must move together so
+      companion docs cannot diverge from canonical contract.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: ✓
+      runtime_observed: pending
+
+  - id: glossary_governance
+    coverage: mechanical
+    source_files:
+      - runtime/cli-modification-policy.yaml
+      # plus glossary plan reference
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateGlossaryRetroOwn
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: |
+      Glossary surface changes require retro/own metadata.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: pending
+      runtime_observed: pending
+
+  - id: shell_script_governance
+    coverage: mechanical
+    source_files:
+      - enforcement/escalation-policy.yaml  # (closest existing source; no dedicated yaml)
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateNoNewShellScripts
+        executor_kind: hook_dispatcher_entry  # called via runPreCommitHook
+        hook_phase: pre-commit
+        block_or_warn: block
+    rationale: |
+      Prevents introduction of ad-hoc shell scripts that bypass the Go
+      CLI surface. Pre-commit phase blocks the addition before commit
+      forms.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: pending
+      runtime_observed: pending
+
+  - id: dirty_repo_close_loop
+    coverage: mechanical
+    source_files:
+      - enforcement/dependency-reading.md  # writeback transaction
+      - runtime/core-bootstrap.yaml#per_turn_obligations[obligation.finality.close_loop_check]
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: runStopHook
+        executor_kind: hook_dispatcher_entry
+        hook_phase: Stop
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateStopHookFinalText
+        executor_kind: hook_dispatcher_entry
+        hook_phase: Stop
+        block_or_warn: block
+    rationale: |
+      Final-response check that the working tree is clean and no commits
+      are unpushed. Last line of defense against "claimed done but
+      dirty" failure mode.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: ✓  # dirty-repo-on-claim-done failure pattern
+      runtime_observed: pending
+
+  - id: github_workflow_history
+    coverage: mechanical
+    source_files:
+      - enforcement/escalation-policy.yaml
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: runPrePushHook
+        executor_kind: hook_dispatcher_entry
+        hook_phase: pre-push
+        block_or_warn: warn
+        notes: "wraps githubWorkflowHistoryCheck — surfaces failing CI before push"
+    rationale: |
+      Pre-push gate inspects recent GitHub Actions history to warn when
+      pushing on top of broken CI.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: pending
+      runtime_observed: pending
+
+  - id: linked_updates
+    coverage: mechanical
+    source_files:
+      - enforcement/linked-updates.yaml
+      - enforcement/linked-updates.md  # (if exists; otherwise yaml-only)
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateStopHookFinalText
+        executor_kind: hook_dispatcher_entry
+        hook_phase: Stop
+        block_or_warn: block
+        notes: "enforces gate.linked_updates.writeback_closed via clean status + push verification"
+      - file: runtime/runtime.db
+        symbol: phase.readback
+        executor_kind: runtime_state_machine_phase
+        block_or_warn: block
+        notes: "state.verified → state.closed transition gate"
+    rationale: |
+      Writeback transaction closure is enforced both at session-stop
+      time (Go validator) and inside the runtime state machine
+      (phase.readback gate).
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: partial
+      regression_exists: partial
+      runtime_observed: pending
+
+  # ═══ PENDING IMPLEMENTATION ═══════════════════════════════════════
+
+  - id: workflow_activation
+    coverage: pending_implementation
+    source_files:
+      - knowledge/runtime/routing-registry.yaml#activation_triggers
+    executors_planned:
+      - file: scripts/ai-skill-cli/internal/app/detector.go
+        symbol: DetectWorkflows
+        executor_kind: hook_dispatcher_entry
+        hook_phase: "PreToolUse + RuntimeContext write"
+        block_or_warn: block
+    child_plan: plans/active/2026-05-31-1900-workflow-activation-engine.md
+    target_promotion: "child plan Phase 3-5 land → coverage=mechanical"
+    coverage_evidence:
+      expected_instance_count: 57
+      expected_instance_count_query: |
+        grep -c '^  - id: route\.' knowledge/runtime/routing-registry.yaml
+      validation_scenarios:
+        - validation/scenarios/runtime/workflow-detector-deterministic-match-v1.yaml
+        - validation/scenarios/runtime/workflow-detector-conflict-resolution-v1.yaml
+        - validation/scenarios/runtime/workflow-session-topic-shift-v1.yaml
+        - validation/scenarios/runtime/workflow-detector-travel-planning-regression-v1.yaml
+      coverage_target_pct: 90
+      regression_scenarios:
+        - validation/scenarios/runtime/workflow-detector-travel-planning-regression-v1.yaml
+    runtime_metrics:
+      expected_observation_pct: 30   # at least 30% of routes should fire in 30 days
+      observation_window_days: 30
+    verification_status:
+      symbol_exists: pending  # detector.go not yet written
+      scenario_exists: ✓
+      regression_exists: ✓
+      runtime_observed: not_applicable_until_promoted
+
+  - id: sanitization
+    coverage: pending_implementation
+    source_files:
+      - enforcement/sanitization.yaml
+    executors_planned:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateSanitizationOnWrite
+        executor_kind: hook_dispatcher_entry
+        hook_phase: PreToolUse
+        block_or_warn: warn
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateSanitizationOnCommit
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    child_plan: plans/active/2026-05-31-2000-mechanical-sanitization-validator.md
+    target_promotion: "child plan Phase 3 land → coverage=mechanical"
+    verification_status:
+      symbol_exists: pending
+      scenario_exists: pending
+      regression_exists: pending
+      runtime_observed: not_applicable_until_promoted
+
+  # ═══ BEHAVIORAL ONLY ══════════════════════════════════════════════
+
+  - id: capability_discovery
+    coverage: behavioral_only
+    source_files:
+      - governance/lifecycle/capability-discovery-philosophy.md
+    rationale: |
+      Discovery is the fallback exploration that fires after a detector
+      miss; making it per-turn mechanical would explode token cost. The
+      correct integration is to trigger Discovery from detector miss
+      paths, not to stand it up as an independent mechanical executor.
+    sunset_decision:
+      revisit_when: "workflow_activation child plan Phase 6.1 lands"
+      success_criteria: |
+        Detector miss path can invoke Discovery and produce
+        route_candidate_proposals.yaml. At that point this class merges
+        with workflow_activation (shared executor) and is removed.
+      revisit_owner: "framework maintainer (current: linyihong)"
+
+  - id: rule_weight
+    coverage: behavioral_only
+    source_files:
+      - enforcement/rule-weight.md
+    rationale: |
+      P0/P1/P2/P3 priority adjudication requires case-by-case judgment
+      when rules collide; there is no single mechanical predicate that
+      captures the full ordering.
+    sunset_decision:
+      revisit_when: "≥ 3 mechanically detectable P0 violation patterns surface in failure-patterns/"
+      success_criteria: |
+        Each detectable pattern is extracted into its own rule_class
+        with a dedicated executor; this class then collapses to a
+        pure policy reference (documentation-only).
+      revisit_owner: "governance maintainer"
+
+  - id: dependency_reading
+    coverage: behavioral_only
+    source_files:
+      - enforcement/dependency-reading.md
+      - enforcement/dependency-reading.yaml
+    rationale: |
+      "Did the agent read the required dependencies?" cannot be verified
+      mechanically except for the narrow bootstrap-reads case (handled
+      by bootstrap_integrity). General dependency reading is a
+      behavioral discipline checked via the dependency read ledger.
+    sunset_decision:
+      revisit_when: "transcript-aware read-log tooling generalizes beyond bootstrap files"
+      success_criteria: |
+        For each enforcement rule with a declared dependency set, a
+        hook can verify the transcript shows Read calls to all
+        required-set members before downstream actions.
+      revisit_owner: "framework maintainer"
+
+  - id: conversation_goal_ledger
+    coverage: behavioral_only
+    source_files:
+      - enforcement/conversation-goal-ledger.md
+      - enforcement/conversation-goal-ledger.yaml
+    rationale: |
+      .agent-goals/ is project-local state; deciding when to create,
+      update, or close a goal involves intent that cannot be
+      mechanically inferred.
+    sunset_decision:
+      revisit_when: "≥ 2 failure patterns surface where goal ledger absence caused recoverable harm"
+      success_criteria: |
+        A mechanical predicate exists for at least one trigger
+        (e.g. "multi-step task + no goal file → warn"); that subset
+        becomes a separate mechanical rule_class.
+      revisit_owner: "framework maintainer"
+
+  - id: failure_learning_system
+    coverage: behavioral_only
+    source_files:
+      - enforcement/failure-learning-system.md
+      - enforcement/failure-learning-system.yaml
+    rationale: |
+      Promoting an incident to a reusable failure pattern requires
+      abstraction judgment (what is reusable, what is project-specific
+      detail) that cannot be checked mechanically.
+    sunset_decision:
+      revisit_when: "promotion pipeline gains a mechanical sanitization gate"
+      success_criteria: |
+        New entries to enforcement/failure-patterns/ pass a sanitization
+        + abstraction lint before commit. Class then collapses to
+        sanitization (existing class).
+      revisit_owner: "framework maintainer"
+
+  - id: reusable_guidance_boundary
+    coverage: behavioral_only
+    source_files:
+      - enforcement/reusable-guidance-boundary.md
+      - enforcement/reusable-guidance-boundary.yaml
+    rationale: |
+      "Is this guidance reusable across projects, or specific to one
+      incident?" is a writing-quality judgment. Lint can catch raw
+      project paths but not framing.
+    sunset_decision:
+      revisit_when: "sanitization rule_class promoted to mechanical"
+      success_criteria: |
+        Sanitization lint covers ≥ 80% of historical boundary
+        violations. Remaining cases (framing-only) stay behavioral.
+      revisit_owner: "framework maintainer"
+
+  - id: document_sizing
+    coverage: behavioral_only
+    source_files:
+      - governance/document-sizing.md
+    rationale: |
+      A 250-line cap is mechanical, but the split decision (which
+      sections to extract, what to call the child files) requires
+      writing judgment.
+    sunset_decision:
+      revisit_when: "a deterministic split-suggestion lint is prototyped"
+      success_criteria: |
+        Lint can emit "file X exceeds N lines; suggest splitting at
+        section Y" with ≥ 70% maintainer acceptance rate.
+      revisit_owner: "framework maintainer"
+
+  # ═══ NOT MECHANIZABLE ═════════════════════════════════════════════
+
+  - id: tool_neutral_documentation
+    coverage: not_mechanizable
+    source_files:
+      - enforcement/tool-neutral-documentation.md
+      - enforcement/tool-neutral-documentation.yaml
+    rationale: |
+      Whether prose is tool-neutral is a writing judgment over reader
+      expectations, context, and implicit assumptions.
+    objective_validation_impossible_because: |
+      Surface-level lint can catch specific tool names (e.g., "Cursor",
+      "Claude Code") but cannot judge whether framing presupposes a
+      tool. Forcing mechanization would reward token-evasion rewrites
+      that game the lint without improving neutrality.
+
+  - id: rule_writing_quality
+    coverage: not_mechanizable
+    source_files:
+      - enforcement/conversation-goal-ledger.md  # representative source
+      # plus all other enforcement/*.md
+    rationale: |
+      Whether a rule is clearly written, free of ambiguity, and
+      correctly understood by future agents has no objective metric.
+    objective_validation_impossible_because: |
+      Readability metrics (Flesch, word count) measure surface, not
+      comprehension. Mechanizing would reward gaming the metric with
+      worse rules. Quality is validated through usage (failure
+      patterns) and review, not lint.
+
+  # ═══ RESEARCH REQUIRED ════════════════════════════════════════════
+
+  - id: intelligence_classification
+    coverage: research_required
+    source_files:
+      - knowledge/runtime/routing-registry.yaml  # intelligence routes
+      # plus future intelligence/<domain>/README.md
+    rationale: |
+      Currently each intelligence route declares activation triggers
+      but classification of "primary vs advisory vs experimental" is
+      ad-hoc. Should be mechanical (compile-time enum), but the
+      classification axis itself is under-specified.
+    research_questions:
+      - "Should activation_mode be declared per-route or per-domain?"
+      - "How do we mechanically disambiguate primary vs secondary at registry declaration time without forcing every route author to over-classify?"
+      - "What is the relationship between intelligence.activation_mode and routing-registry route_type?"
+    estimated_unblock_timeline: "2026-Q3"
+
+  - id: routing_registry_evolution
+    coverage: research_required
+    source_files:
+      - knowledge/runtime/routing-registry.yaml
+    rationale: |
+      Routes accumulate over time but no mechanism marks "this route
+      hasn't fired in 6 months — deprecate or fix detector?" The
+      runtime_observed verification level can surface dead routes once
+      runtime_metrics lands, but the policy for what to DO with a dead
+      route (deprecate, investigate, extend) is unspecified.
+    research_questions:
+      - "What runtime_observation_pct threshold triggers deprecation candidate vs investigation?"
+      - "Who owns the decision to deprecate a route (registry author, governance, route consumer)?"
+      - "How do new routes propose activation_triggers without overlapping existing routes?"
+    estimated_unblock_timeline: "2026-Q4 (after runtime_metrics is live for 90+ days)"
+
+  # ═══ DEPRECATED (none yet) ════════════════════════════════════════
+  # No rule_class is currently in deprecated state.
+
+# ─────────────────────────────────────────────────────────────────────
+# Companion / cross-link
+# ─────────────────────────────────────────────────────────────────────
+
+companion_markdown: enforcement/enforcement-registry.md
+companion_role: |
+  Human-readable philosophy (Layer 2.5 framing), writing guide for
+  rule_class authors, 6-value enum reference, and self-governance
+  protocol. YAML is canonical; markdown is canonical for narrative.
+
+failure_pattern_linkage:
+  related:
+    - enforcement/failure-patterns/markdown-yaml-sync-drift.md
+    - enforcement/failure-patterns/bootstrap-bypass-on-resume.md
+    - enforcement/failure-patterns/bootstrap-entry-bloat.md
+    # Phase 6 will add:
+    # - enforcement/failure-patterns/rule-without-executor.md
+
+source: |
+  2026-05-31 session. Plan plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+  Phase 2 (rule_class identification + initial registry).
+  Open Questions Q1/Q2/Q4/Q6 resolutions encoded above.
