@@ -1,0 +1,109 @@
+# Source: Phase 7 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+# This is the meta-pattern regression scenario: replay the 5 historical
+# "Rule Exists, Executor Missing" instances and verify the registry would
+# have detected ALL of them.
+id: 2026-05-31-regression-five-instances-v1
+domain: enforcement
+type: regression-meta-pattern
+priority: P0
+
+failure_source:
+  pattern: rule-without-executor
+  class: meta-governance-gap
+  date: "2026-05-31"
+  description: |
+    2026-05-31 session exposed 5 instances of the same meta-pattern:
+    Knowledge layer has rule, Runtime layer has no executor. This
+    regression scenario verifies the enforcement-registry detects
+    ALL 5 historical instances — not just 1 or 2.
+
+    If a future change breaks the lint for one of these cases, this
+    scenario will fail and block the regression from landing.
+
+  historical_instances:
+    - id: bootstrap_bypass_on_resume
+      knowledge_source: runtime/core-bootstrap.yaml#per_session_obligations
+      what_was_missing: PreToolUse gate enforcing Receipt before non-Read tools
+      how_discovered: "User asked 3+ times across 6 months"
+      registry_expects: rule_class bootstrap_integrity coverage=mechanical with runPreToolUseHook executor
+      status_2026_05_31: ✓ fixed (read-log gate landed)
+
+    - id: workflow_activation_missing
+      knowledge_source: knowledge/runtime/routing-registry.yaml#activation_triggers
+      what_was_missing: detector.go (no Go executor reads activation_triggers)
+      how_discovered: "User asked 3+ times"
+      registry_expects: rule_class workflow_activation coverage=pending_implementation with child_plan
+      status_2026_05_31: pending (child plan 1900 active)
+
+    - id: capability_discovery_fallback_missing
+      knowledge_source: governance/lifecycle/capability-discovery-philosophy.md
+      what_was_missing: fallback mechanism after detector miss
+      how_discovered: "Same session"
+      registry_expects: rule_class capability_discovery coverage=behavioral_only with sunset_decision tied to workflow_activation Phase 6.1
+      status_2026_05_31: ✓ behavioral_only documented
+
+    - id: sanitization_on_canonical_write_missing
+      knowledge_source: enforcement/sanitization.md + enforcement/reusable-guidance-boundary.md
+      what_was_missing: PreToolUse Write hook + commit-msg validator
+      how_discovered: "User asked 5+ times"
+      registry_expects: rule_class sanitization coverage=pending_implementation with child_plan 2000
+      status_2026_05_31: pending (child plan 2000 active)
+
+    - id: intelligence_route_classification_missing
+      knowledge_source: knowledge/runtime/routing-registry.yaml (intelligence routes)
+      what_was_missing: activation semantics for intelligence-class routes
+      how_discovered: "Same session"
+      registry_expects: rule_class intelligence_classification coverage=research_required with research_questions
+      status_2026_05_31: research_required documented
+
+given:
+  task: phase_3_lint_detects_all_five_historical_instances
+  artifacts:
+    - enforcement/enforcement-registry.yaml (must contain all 5 corresponding rule_class entries)
+    - scripts/ai-skill-cli/internal/compile/ (Phase 3 lint)
+
+when:
+  action: query registry for each historical instance + verify presence + coverage value
+
+then:
+  expected_route:
+    - registry contains rule_class id=bootstrap_integrity with coverage=mechanical
+    - registry contains rule_class id=workflow_activation with coverage=pending_implementation AND child_plan=plans/active/2026-05-31-1900-workflow-activation-engine.md
+    - registry contains rule_class id=capability_discovery with coverage=behavioral_only AND sunset_decision.revisit_when AND sunset_decision.success_criteria
+    - registry contains rule_class id=sanitization with coverage=pending_implementation AND child_plan=plans/active/2026-05-31-2000-mechanical-sanitization-validator.md
+    - registry contains rule_class id=intelligence_classification with coverage=research_required AND research_questions (len >= 1)
+    - if any of these rule_class entries is removed → this scenario fails
+    - if a sixth historical instance is identified, it should be added here
+  forbidden_routes:
+    - any of the 5 historical instances lacks a registry binding
+    - any historical instance marked coverage=mechanical but executor symbol doesn't exist
+    - behavioral_only instance lacks sunset_decision fields
+    - pending instance lacks child_plan reference to active plan path
+
+validation:
+  detection_command: |
+    reg=enforcement/enforcement-registry.yaml
+    fail=0
+    for entry in bootstrap_integrity workflow_activation capability_discovery sanitization intelligence_classification; do
+      grep -q "id: $entry$" "$reg" || { echo "MISSING: $entry"; fail=1; }
+    done
+    # Spot-check coverage values
+    grep -A1 "id: bootstrap_integrity$" "$reg" | grep -q "coverage: mechanical" || { echo "WRONG_COVERAGE: bootstrap_integrity"; fail=1; }
+    grep -A1 "id: workflow_activation$" "$reg" | grep -q "coverage: pending_implementation" || { echo "WRONG_COVERAGE: workflow_activation"; fail=1; }
+    grep -A1 "id: capability_discovery$" "$reg" | grep -q "coverage: behavioral_only" || { echo "WRONG_COVERAGE: capability_discovery"; fail=1; }
+    grep -A1 "id: sanitization$" "$reg" | grep -q "coverage: pending_implementation" || { echo "WRONG_COVERAGE: sanitization"; fail=1; }
+    grep -A1 "id: intelligence_classification$" "$reg" | grep -q "coverage: research_required" || { echo "WRONG_COVERAGE: intelligence_classification"; fail=1; }
+    [ "$fail" -eq 0 ] && echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: PASS_AS_OF_2026-05-31 (Phase 2 registry includes all 5 entries; this scenario locks them in)
+  reference_governance:
+    - enforcement/enforcement-registry.yaml (canonical entries)
+    - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md §Empirical Evidence
+    - enforcement/failure-patterns/rule-without-executor.md (Phase 6 deliverable)
+
+meta_purpose: |
+  This is the inaugural regression for the meta-pattern itself. The other
+  4 Phase 7 scenarios test specific lint behaviors; this one tests that
+  the registry continues to bind the 5 instances that motivated its
+  existence. Removing or weakening any of them = breaking the founding
+  promise of Layer 2.5.

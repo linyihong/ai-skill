@@ -1,0 +1,120 @@
+# Source: Phase 7 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+id: registry-lint-behavioral-without-rationale-v1
+domain: enforcement
+type: registry-lint
+priority: P1
+
+failure_source:
+  pattern: behavioral-only-without-sunset-decision
+  class: meta-governance-gap
+  date: "2026-05-31"
+  description: |
+    enforcement-registry.yaml rule_class declares coverage=behavioral_only
+    but omits required sunset_decision fields. Q2 resolution requires BOTH
+    revisit_when AND success_criteria — single-field schema would let
+    behavioral_only decay into "have criteria but no one checks" failure
+    mode (more dangerous than "no criteria but checks happen").
+
+    Lint must reject any of:
+      - missing sunset_decision entirely
+      - missing sunset_decision.revisit_when
+      - missing sunset_decision.success_criteria
+      - either field present but empty string
+
+given:
+  task: phase_3_lint_detects_incomplete_behavioral_only
+  fixtures:
+    bad_case_no_sunset: |
+      - id: __test_bad_no_sunset__
+        coverage: behavioral_only
+        source_files: [enforcement/foo.md]
+        rationale: "暫時不機械化"
+        # missing sunset_decision entirely
+    bad_case_missing_revisit_when: |
+      - id: __test_bad_missing_revisit__
+        coverage: behavioral_only
+        source_files: [enforcement/foo.md]
+        rationale: "暫時不機械化"
+        sunset_decision:
+          success_criteria: "未來會處理"
+          # missing revisit_when
+    bad_case_missing_success_criteria: |
+      - id: __test_bad_missing_criteria__
+        coverage: behavioral_only
+        source_files: [enforcement/foo.md]
+        rationale: "暫時不機械化"
+        sunset_decision:
+          revisit_when: "明年看看"
+          # missing success_criteria
+    bad_case_empty_string: |
+      - id: __test_bad_empty__
+        coverage: behavioral_only
+        source_files: [enforcement/foo.md]
+        rationale: "暫時不機械化"
+        sunset_decision:
+          revisit_when: ""    # empty
+          success_criteria: ""
+    good_case: |
+      - id: __test_good__
+        coverage: behavioral_only
+        source_files: [enforcement/foo.md]
+        rationale: "Discovery is fallback exploration"
+        sunset_decision:
+          revisit_when: "workflow_activation child plan Phase 6.1 lands"
+          success_criteria: |
+            Detector miss path can invoke Discovery and produce
+            route_candidate_proposals.yaml.
+          revisit_owner: "framework maintainer"
+
+when:
+  action: run `ai-skill runtime compile` with each fixture injected separately
+
+then:
+  expected_route:
+    - all 4 bad cases → compile exits non-zero
+    - all 4 bad cases → stderr contains "behavioral_only_incomplete_sunset"
+    - all 4 bad cases → stderr cites the offending rule_class id
+    - all 4 bad cases → stderr names the missing/empty field
+    - good case → compile passes (assuming no other lint errors)
+  forbidden_routes:
+    - any bad case passes lint
+    - lint accepts only success_criteria without revisit_when (Q2 dual-lock enforcement)
+    - lint accepts whitespace-only string for required field
+
+validation:
+  detection_command: |
+    # Test each bad fixture individually
+    for fixture in bad_no_sunset bad_missing_revisit bad_missing_criteria bad_empty; do
+      ai-skill enforcement lint --check behavioral_only --fixture "$fixture" 2>&1 | \
+        grep -q "behavioral_only_incomplete_sunset" || { echo "FAIL: $fixture not detected"; exit 1; }
+    done
+    # Verify good fixture passes
+    ai-skill enforcement lint --check behavioral_only --fixture good 2>&1 | \
+      grep -q "behavioral_only_incomplete_sunset" && { echo "FAIL: good case rejected"; exit 1; }
+    echo "PASS"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL (Phase 3 lint not yet implemented)
+  reference_governance:
+    - enforcement/enforcement-registry.yaml §coverage_status_spec.behavioral_only
+    - Open Question Q2 resolution (revised: dual-required revisit_when + success_criteria)
+
+phase_3_lint_contract:
+  algorithm: |
+    For each rule_class with coverage=behavioral_only:
+      if rule_class.sunset_decision is null:
+        emit behavioral_only_incomplete_sunset (missing: sunset_decision)
+        continue
+      for field in [revisit_when, success_criteria]:
+        if rule_class.sunset_decision[field] is null OR strings.TrimSpace == "":
+          emit behavioral_only_incomplete_sunset (missing: field)
+  recommended_field:
+    revisit_owner: "Not required, but coverage report flags absent revisit_owner as governance risk"
+  error_format: |
+    LINT ERROR [behavioral_only_incomplete_sunset]
+      rule_class: <id>
+      missing_field: <sunset_decision | sunset_decision.revisit_when | sunset_decision.success_criteria>
+      message: behavioral_only requires both revisit_when (event trigger) AND
+               success_criteria (objective test). Single-field schema lets
+               sunset decay into "have criteria but no one checks" — more
+               dangerous than no criteria with checks. Add the missing field
+               or change coverage to not_mechanizable + impossibility rationale.

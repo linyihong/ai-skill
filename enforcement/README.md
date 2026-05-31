@@ -75,6 +75,14 @@
 | [`sanitization.md`](sanitization.md) | [`sanitization.yaml`](sanitization.yaml) | secrets、本機路徑、project incident evidence 與 prompt injection 去敏 gate。 |
 | [`tool-neutral-documentation.md`](tool-neutral-documentation.md) | [`tool-neutral-documentation.yaml`](tool-neutral-documentation.yaml) | Tool-neutral reusable docs、adapter isolation 與 tool-specific detail boundary gate。 |
 
+## Mechanical Enforcement Registry（Layer 2.5）
+
+[`enforcement-registry.yaml`](enforcement-registry.yaml) + companion [`enforcement-registry.md`](enforcement-registry.md) 是 Layer 2.5（Meta Governance / Framework Self-Audit）的 canonical binding 表。每條 rule_class 必須宣告 `coverage` ∈ `mechanical | behavioral_only | not_mechanizable | pending_implementation | research_required | deprecated`，並依 coverage 填對應必填 metadata（mechanical 要 executor symbol、behavioral_only 要雙必填 sunset_decision、pending 要 child_plan、research 要 research_questions、deprecated 要 replaced_by 或 removal_date）。
+
+修改 `enforcement/*.yaml`、`runtime/*.yaml`、`governance/**/*.yaml`、`knowledge/runtime/routing-registry.yaml` 或 `scripts/ai-skill-cli/internal/app/hooks.go` 時，**同一 commit** 必須同步更新 registry binding。Phase 3 compile-time lint 會 hard-fail orphan rule / orphan executor / missing executor symbol / incomplete sunset_decision。
+
+對應 meta-pattern：[`failure-patterns/rule-without-executor.md`](failure-patterns/rule-without-executor.md)。對應 plan：[`plans/active/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/active/2026-05-31-2100-mechanical-enforcement-registry.md)。
+
 ### Core Bootstrap（每個 session 必讀）
 
 每次 session 啟動時，先讀 [`CORE_BOOTSTRAP.md`](../CORE_BOOTSTRAP.md)，包含 3 條核心規則：

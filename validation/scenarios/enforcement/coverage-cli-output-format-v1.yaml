@@ -1,0 +1,98 @@
+# Source: Phase 7 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+id: coverage-cli-output-format-v1
+domain: enforcement
+type: cli-output-contract
+priority: P1
+
+failure_source:
+  pattern: coverage-report-format-drift
+  class: cli-contract
+  date: "2026-05-31"
+  description: |
+    `ai-skill enforcement coverage` is Phase 4's primary deliverable
+    (per plan §Phase 4 "v2: 本 plan 主要交付"). Output format must be
+    stable enough for governance dashboards to parse. This scenario
+    locks down the expected output shape BEFORE Phase 4 implementation
+    so downstream consumers (PR check, governance dashboard) can be
+    written against a known contract.
+
+given:
+  task: phase_4_cli_outputs_coverage_report
+  artifacts:
+    - enforcement/enforcement-registry.yaml (current 28 rule_classes)
+    - scripts/ai-skill-cli/cmd/enforcement.go (Phase 4 implementation)
+
+when:
+  action: run `ai-skill enforcement coverage --format text`
+  action_alternative_1: run `ai-skill enforcement coverage --format json`
+  action_alternative_2: run `ai-skill enforcement coverage --format markdown`
+
+then:
+  expected_route:
+    text_format:
+      - first line matches regex "^Enforcement Coverage Report \\([0-9]{4}-[0-9]{2}-[0-9]{2}\\)$"
+      - second line is "═" repeated
+      - "Total Rule Classes: <N>" appears (N matches actual count)
+      - bucket counts shown for all 6 coverage values
+      - bucket count percentages sum to 100% (rounded)
+      - per-class detail table with columns: "Rule Class | Status | Verification | Runtime (Nd)"
+      - "Pending implementation (active child plans):" section appears if any pending
+      - "Research required (no clear mechanization path):" section appears if any research
+      - "Behavioral_only awaiting sunset review:" section appears if any behavioral_only
+      - "Not_mechanizable (closed, will not appear in review queue):" section if any
+      - "Deprecated (awaiting removal):" section if any
+      - "⚠ Runtime-observed gaps (v4):" section if runtime_metrics show under-observation
+    json_format:
+      - top-level keys: schema_version, generated_at, total_rule_classes, buckets, per_class, alerts
+      - schema_version is numeric (1 for initial Phase 4)
+      - generated_at is ISO-8601 timestamp
+      - buckets is object with 6 keys matching coverage enum
+      - per_class is array of objects with: id, coverage, verification, runtime_observed_pct, alerts
+      - alerts is array (may be empty)
+    markdown_format:
+      - "# Enforcement Coverage Report" h1 header
+      - "## Summary" h2 with bucket table
+      - "## Per-class detail" h2 with markdown table
+      - "## Alerts" h2 if any alerts
+  forbidden_routes:
+    - text output contains ANSI color codes when stdout is not a TTY
+    - json output uses snake_case for some keys and camelCase for others (must be consistent snake_case)
+    - markdown output uses raw HTML
+    - any format omits a non-empty bucket
+    - any format silently drops runtime_observed when metrics are present
+
+validation:
+  detection_command: |
+    # text format smoke test
+    out=$(ai-skill enforcement coverage --format text 2>&1)
+    echo "$out" | head -1 | grep -qE "^Enforcement Coverage Report \([0-9]{4}-[0-9]{2}-[0-9]{2}\)$" || \
+      { echo "FAIL text header"; exit 1; }
+    echo "$out" | grep -q "Total Rule Classes:" || { echo "FAIL text total"; exit 1; }
+
+    # json format smoke test
+    json=$(ai-skill enforcement coverage --format json 2>&1)
+    echo "$json" | jq -e '.schema_version == 1 and (.per_class | type == "array")' >/dev/null || \
+      { echo "FAIL json shape"; exit 1; }
+
+    # markdown format smoke test
+    md=$(ai-skill enforcement coverage --format markdown 2>&1)
+    echo "$md" | grep -q "^# Enforcement Coverage Report$" || { echo "FAIL md header"; exit 1; }
+
+    echo "PASS"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL (Phase 4 CLI not yet implemented)
+  reference_governance:
+    - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md §Phase 4
+    - enforcement/enforcement-registry.yaml (source of truth for rule_classes)
+
+phase_4_cli_contract:
+  subcommands:
+    - "ai-skill enforcement coverage [--format text|json|markdown] [--detail]"
+    - "ai-skill enforcement coverage --diff <base-ref> (compare two registry states)"
+    - "ai-skill enforcement lint (Phase 3 lint subcommand; separate from coverage)"
+  ci_integration: |
+    PR check should run: `ai-skill enforcement coverage --diff origin/main --format json`
+    and fail the check if:
+      - new rule_class added without coverage field
+      - existing rule_class changed coverage without status_transition_matrix compliance
+      - mechanical → behavioral_only without adr_reference (R2 self-governance lint)

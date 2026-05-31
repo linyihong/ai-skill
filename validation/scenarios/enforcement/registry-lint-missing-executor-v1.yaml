@@ -1,0 +1,88 @@
+# Source: Phase 7 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+id: registry-lint-missing-executor-v1
+domain: enforcement
+type: registry-lint
+priority: P1
+
+failure_source:
+  pattern: rule-without-executor
+  class: meta-governance-gap
+  date: "2026-05-31"
+  description: |
+    enforcement-registry.yaml rule_class declares coverage=mechanical with
+    executors[].symbol, but the symbol does not exist in the referenced file
+    (typo, renamed, deleted). Without lint, registry claims mechanical
+    coverage that is actually broken.
+
+    Q4 resolution: binding required only for hook_dispatcher_entry,
+    commit_msg_validator, and runtime_state_machine_phase. Symbols listed
+    in internal_helper_allowlist are exempt.
+
+given:
+  task: phase_3_lint_detects_missing_executor_symbol
+  fixtures:
+    registry_entry: |
+      - id: __test_missing_executor__
+        coverage: mechanical
+        source_files:
+          - enforcement/sanitization.yaml
+        executors:
+          - file: scripts/ai-skill-cli/internal/app/hooks.go
+            symbol: validateNonexistentFakeSymbol  # does not exist
+            executor_kind: commit_msg_validator
+            block_or_warn: block
+        rationale: "Test fixture for missing executor lint"
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go (must NOT contain symbol)
+    - scripts/ai-skill-cli/internal/compile/ (lint implementation)
+
+when:
+  action: run `ai-skill runtime compile` with the fixture rule_class injected
+
+then:
+  expected_route:
+    - compile exits non-zero
+    - stderr contains "missing_executor_symbol"
+    - stderr cites rule_class id (__test_missing_executor__)
+    - stderr cites the expected symbol (validateNonexistentFakeSymbol)
+    - stderr cites the file (scripts/ai-skill-cli/internal/app/hooks.go)
+  forbidden_routes:
+    - compile passes silently
+    - lint validates only file existence (not symbol existence)
+    - symbol check skipped for kinds in binding_required_for (Q4 enforcement)
+
+validation:
+  detection_command: |
+    ai-skill enforcement lint --check missing_executor 2>&1 | \
+      grep -q "__test_missing_executor__.*validateNonexistentFakeSymbol" && \
+      echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS"
+  initial_state: FAIL (Phase 3 lint not yet implemented)
+  reference_governance:
+    - enforcement/enforcement-registry.yaml §executor_kind_spec.binding_required_for
+    - enforcement/enforcement-registry.yaml §verification_levels.symbol_exists
+    - Open Question Q4 resolution (mandatory binding for whitelisted kinds)
+
+phase_3_lint_contract:
+  algorithm: |
+    For each rule_class with coverage=mechanical:
+      For each executor in rule_class.executors:
+        if executor.executor_kind in binding_required_for:
+          if executor.symbol not in internal_helper_allowlist:
+            parse executor.file (Go AST or grep)
+            if symbol not found:
+              emit missing_executor_symbol error
+  edge_cases:
+    - "runtime_state_machine_phase symbols: check runtime.db phases table instead of Go AST"
+    - "internal_helper symbols: skip lint (exempt)"
+    - "coverage=pending_implementation: use executors_planned, do NOT lint symbol existence"
+  error_format: |
+    LINT ERROR [missing_executor_symbol]
+      rule_class: <id>
+      expected_symbol: <symbol>
+      file: <file>
+      executor_kind: <kind>
+      message: rule_class declares mechanical coverage but executor symbol
+               not found. Either implement the symbol, change coverage to
+               pending_implementation with child_plan, or move symbol to
+               internal_helper_allowlist if it is genuinely helper-only.

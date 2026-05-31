@@ -1,0 +1,77 @@
+# Source: Phase 7 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+# Pre-implementation scenario (initially failing until Phase 3 lint compiled into ai-skill runtime compile)
+id: registry-lint-orphan-rule-v1
+domain: enforcement
+type: registry-lint
+priority: P1
+
+failure_source:
+  pattern: rule-without-executor
+  class: meta-governance-gap
+  date: "2026-05-31"
+  description: |
+    Knowledge layer declares a rule_class source (e.g. new enforcement/<name>.yaml
+    with stable `id:` field) but enforcement-registry.yaml has no matching
+    rule_class entry. Without lint, the rule silently exists without binding
+    and no executor is required. Q1 resolution: hard block, no grace period.
+
+    Phase 3 lint MUST detect this by:
+    1. Enumerating all yaml files under enforcement/, runtime/, governance/
+       that declare a stable `id:` field
+    2. Cross-referencing each id (or its rule_class abstraction) against
+       enforcement-registry.yaml `rule_classes[].source_files`
+    3. Any source file not referenced by ANY rule_class entry → orphan_rule
+
+given:
+  task: phase_3_lint_detects_orphan_rule
+  fixtures:
+    - path: enforcement/__test_fixture_orphan__.yaml
+      content: |
+        id: enforcement.test-orphan-rule
+        status: active
+      purpose: "Synthetic rule yaml with no registry binding"
+  artifacts:
+    - enforcement/enforcement-registry.yaml (must NOT list __test_fixture_orphan__)
+    - scripts/ai-skill-cli/internal/compile/ (lint implementation)
+
+when:
+  action: run `ai-skill runtime compile` with the fixture present
+
+then:
+  expected_route:
+    - compile exits non-zero
+    - stderr contains "orphan_rule"
+    - stderr cites the offending file path (enforcement/__test_fixture_orphan__.yaml)
+    - stderr cites the offending rule id (enforcement.test-orphan-rule)
+    - exit code is reserved value for lint failure (recommend: 2)
+  forbidden_routes:
+    - compile passes silently
+    - lint emits only a warning (Q1: must be hard fail)
+    - lint waits for grace period (Q1: bootstrap_grace.enabled=false)
+
+validation:
+  detection_command: |
+    # Phase 3 will provide ai-skill enforcement lint subcommand
+    ai-skill enforcement lint --check orphan_rule \
+      --fixture enforcement/__test_fixture_orphan__.yaml 2>&1 | \
+      grep -q "orphan_rule.*test-orphan-rule" && echo "PASS" || echo "FAIL"
+  pass_criteria: detection_command outputs "PASS" AND `ai-skill runtime compile` exits non-zero with fixture present
+  initial_state: FAIL (Phase 3 lint not yet implemented)
+  reference_governance:
+    - enforcement/enforcement-registry.yaml §enforcement_mode.orphan_rule=fail
+    - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md Phase 3
+    - Open Question Q1 resolution (hard block, no grace period)
+
+phase_3_lint_contract:
+  algorithm: |
+    For each yaml in {enforcement,runtime,governance}/**/*.yaml:
+      if file declares top-level `id:` AND
+         file path not in any rule_class.source_files (across registry):
+        emit orphan_rule error
+  error_format: |
+    LINT ERROR [orphan_rule]
+      file: <relative-path>
+      declared_id: <id-from-yaml>
+      message: rule yaml declares id but no enforcement-registry rule_class
+               binds it. Add a rule_class entry to enforcement/enforcement-registry.yaml
+               or mark coverage=deprecated with replaced_by or removal_date.
