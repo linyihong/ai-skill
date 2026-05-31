@@ -762,12 +762,13 @@ Consequences:
 
 | # | Question | 處置 |
 |---|---|---|
-| Q1 | Phase 1.3 預期 orphan rate 70%；第一次 lint 直接 block compile 還是先 warn 一個 grace period？ | still-open — 建議 grace period 一個 release cycle，期間 backfill bindings + 寫 behavioral_only justifications；之後改 block |
-| Q2 | `behavioral_only` 的 `sunset_decision` 強制格式？開放 free text 容易變空話 | still-open — 建議至少要列「condition 何時 revisit」+ 「revisit owner」，由 compile-time lint 校驗 schema |
+| Q1 | Phase 1.3 預期 orphan rate 70%；第一次 lint 直接 block compile 還是先 warn 一個 grace period？ | **resolved (2026-05-31 session)** → **Hard block，無 grace period**。理由：grace period 會回到「warning → 先放著 → 半年後還在」的失效模式，違背 Prevent > Detect > Repair 哲學。`orphan_rule` 與 `orphan_executor` 都 hard fail；第一次 land 預期需要密集 backfill，但這是 one-time cost。Schema：`enforcement_mode: { orphan_rule: fail, orphan_executor: fail }`，`bootstrap_grace.enabled: false` |
+| Q2 | `behavioral_only` 的 `sunset_decision` 強制格式？開放 free text 容易變空話 | **resolved (2026-05-31 session, revised)** → **`revisit_when` + `success_criteria` 雙必填**；`revisit_owner` recommended。理由：原本只選 success_criteria 會落入「有標準但永遠沒人檢查」的失效模式 —— 比「沒標準但會被檢查」更危險，因為長出虛假安全感。`revisit_when` 是「事件 trigger」，`success_criteria` 是「客觀判定」，雙鎖才能形成治理閉環。Compile lint 校驗兩個欄位都存在且非空 |
 | Q3 | enforcement-registry 與 `runtime/core-bootstrap.yaml` per_*_obligations 的關係？兩者都列 obligation id | resolved → core-bootstrap.yaml 是 phase-aware obligation lifecycle，enforcement-registry 是 cross-phase binding 視圖。兩者互補：bootstrap 講「何時 fire」，registry 講「何處 enforce」 |
-| Q4 | Orphan executor（code 有 validator 但 registry 沒 entry）該強制 binding 還是允許 internal helper？ | still-open — 建議只強制「exported 或被 hook dispatcher 註冊」的 executor 必須有 binding；internal helper 不算 |
+| Q4 | Orphan executor（code 有 validator 但 registry 沒 entry）該強制 binding 還是允許 internal helper？ | **resolved (2026-05-31 session)** → **強制 binding，但限「exported / dispatcher-registered」**。Schema 加 `executor_kind` enum: `[hook_dispatcher_entry, commit_msg_validator, runtime_state_machine_phase, internal_helper]`；`binding_required_for` 白名單只包含前三種。`internal_helper`（parseYaml / normalizePath 等 utility）在 registry 維護顯式 allowlist，避免 code-level annotation 散落 |
 | Q5 | Discovery 在 future plan 是否視為「fallback rule」並進 registry？ | resolved → 是。`capability_discovery_fallback` 已列在 Phase 2 schema 範例為 behavioral_only，等 workflow-activation-engine Phase 6.1 實作後改 mechanical |
-| Q6 | 已有的 11 個 commit-msg validators 是否全部要在 registry 補 binding 才算 audit 完成？ | still-open — 預期 yes，但工作量大，列入 Phase 1.3 audit |
+| Q6 | 已有的 11 個 commit-msg validators 是否全部要在 registry 補 binding 才算 audit 完成？ | **resolved (2026-05-31 session)** → **Phase 1.3 全部 audit**；rule_class 數量採 `soft_target=24 / hard_limit=40` 雙閾值。理由：若只 audit 子集，Coverage Report 會顯示「mechanical 80%」卻其實只覆蓋一半，是假象。盤點實際數量為 28（落在 soft-hard 中間），不需硬塞合併。Schema：`governance_thresholds: { rule_class_soft_target: 24, rule_class_hard_limit: 40 }` |
+| 新 Q | rule_class 數量上限：若實際盤點遠超 24 是否該重新評估抽象粒度？ | **resolved (2026-05-31 session)** → 採雙閾值。`exceed_soft_target` → review_split_opportunities（提醒檢視是否該合併或細分）；`exceed_hard_limit` → governance_review_required（停下來重新評估粒度抽象）。實際 Phase 1.1 盤點為 28，在 soft-hard 區間內 |
 | Q7 | 2026-05-31 session 揭露的 hook injection economics 問題（runUserPromptSubmitHook 過量注入），是否要另開 plan 處理？ | **resolved (v4+)** — 不另開 plan，**併入 Phase 5.x 作為 inaugural self-governance test case**。理由：fix 本身同時 dogfooding 五個 v4 機制（self-gov lint / ADR demotion / verification axis / runtime_metrics / Coverage Report 變化），是 registry 機制最完整的活體測試。詳見 Phase 5.x。 |
 
 ---
