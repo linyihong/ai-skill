@@ -497,6 +497,81 @@ Lint dry-run（registry 未 backfill 狀態）surface **22 findings**：17 個 `
 
 **下一步**：等 user 對 F1-F11 bulk 建議 + F12-F22 個別裁決後，agent backfill registry yaml → re-dry-run 直到 PASS → wire 進 `ai-skill runtime compile` → rebuild 5 platform binaries → commit + push + readback.
 
+#### Phase 3 Round-2 Review — Schema 收緊 + 分類修正（2026-06-01）
+
+User round-2 評審指出 F12-F22 直接 backfill 會 surface 6 個結構性問題；在 backfill 前先 land schema 修正，否則新增的 behavioral_only entries 會成為新的灰色地帶（同 registry 想預防的 failure pattern）。
+
+**問題 → 處置 矩陣**（user priority ranking 已採納）：
+
+| Pri | # | 問題 | 處置 |
+|---|---|---|---|
+| P0 | R1 | F12-F22 schema 已要求 `revisit_owner`（registry.yaml §coverage_status_spec.behavioral_only 把它列 "recommended"，但 user round-2 要求 **upgrade 為 strictly required**） | (a) 修改 `coverage_status_spec.behavioral_only.requires` 加 `sunset_decision.revisit_owner`；(b) 既有 7 個 behavioral_only entry 全部補 `revisit_owner` 欄位；(c) lint `lintBehavioralIncompleteSunset` 加第 3 個必填欄位檢查 |
+| P0 | R2 | Q1 hard-block + Phase 1.3 全量 audit 組合在「成熟 repo 第一次導入」會 deadlock | (a) registry.yaml 加 `bootstrap_mode` 欄位（值：`baseline_snapshot_v1` / `strict`）；(b) `baseline_snapshot_v1` 模式：第一次 compile 時把當下所有 orphan 記入 `baseline_snapshot.{orphan_rules,orphan_executors}`，lint 對 baseline 內 entry 降為 warning；(c) 新增 orphan（不在 baseline 內）仍 hard fail；(d) baseline 必須附 `baseline_created_at` + `baseline_burndown_target_date`；(e) 過 burndown date 仍有 baseline entry → governance review trigger（不直接 fail）；(f) 本 Ai-skill repo 目前 22 finding 在「直接 backfill 一次 land」可承受範圍內，**baseline_snapshot 為 future-proofing 機制，不必本 session 用**，但 schema + lint 必須先 land |
+| P1 | R3 | F19 應該是 `pending_implementation` 而非 `behavioral_only`（registry v3 已含 `coverage_evidence` schema，半機械化中） | (a) F19 改 `coverage=pending_implementation`；(b) 需要 active child_plan 路徑；**user 裁決**：A) 開 stub plan `plans/active/2026-06-01-XXXX-validation-scenario-governance-executor.md`（Phase 0/1 outline only），B) 暫接受 `child_plan: TBD` 但搭配 `pending_grace_until: <ISO date>`（schema 加新欄位允許 30 天內補齊 child_plan），C) 維持 behavioral_only 並在 sunset_decision 內明寫「promote to pending when Phase 4 coverage_evidence machinery is live」。**建議 C**（最小 schema 變動 + 誠實標明 deferred status） |
+| P1 | R4 | `behavioral_only_forever`：surface-legal 的 success_criteria（「100% automation」「≥100 incidents」）lint 抓不到 | (a) registry.yaml `behavioral_only` 新增 `sunset_decision.last_reviewed_at` 必填欄位（ISO-8601）；(b) lint `behavioral_only_review_age`：>12 月未 revisit → warning；>24 月 → fail；(c) lint 算 age = now - last_reviewed_at；(d) entry 首次建立時 `last_reviewed_at = created_at`，每次手動 review 後手動更新 |
+| P2 | R5 | F20 `decision_promotion_pipeline` 與 `failure_learning_system` 都是 promotion 治理，跨界 entry（incident → pattern → decision → constitution）權責不清 | (a) registry.yaml `rule_classes[]` 新增 optional `upstream_classes: []` 欄位，宣告本 class 接收哪些上游 class 的 promotion artifact；(b) F20 `decision_promotion_pipeline.upstream_classes = [failure_learning_system]`；(c) lint `upstream_chain_resolution`：引用 class 必須存在；(d) coverage report future（Phase 4）可視覺化 promotion chain |
+| P2 | R6 | F22 加進 `linked_updates` 可能讓該 class 變超級桶（`linked_updates + knowledge_update_flow + markdown_yaml_sync + cli_doc_sync + runtime_yaml_projection` 全塞同 class） | (a) registry.yaml `governance_thresholds` 新增 `max_source_files_per_class: 5` + `review_when_source_files_gt: 5`；(b) lint `class_size_review_threshold`：source_files 超過 5 條 → warning（不 fail，提醒 maintainer 評估拆分）；(c) **F22 改回新獨立 class `knowledge_update_flow`**（避免立刻觸發 size warning），companion notes 在兩 class 互相 cross-link |
+
+**F12-F22 修正稿（最終版，全部補齊 rationale + revisit_owner + 提高門檻 + 套 R3/R5/R6 修正）**：
+
+| # | yaml | 最終處置 |
+|---|---|---|
+| F1-F11 | (見上方表) | bulk 確認，不變動 |
+| F12 | authorization-scope | 新 class `authorization_scope`, **behavioral_only**. **rationale**: "authorization 範圍涉及主觀的『誰能改什麼』判斷，無單一機械 predicate". revisit_when: "≥2 失效模式累積（authorization escape incident），且至少 1 條可機械偵測". success_criteria: "authorization-detector executor 上線並覆蓋 ≥80% 歷史 incident". revisit_owner: "framework maintainer". last_reviewed_at: "2026-06-01" |
+| F13 | content-layering | 加進 `document_sizing.source_files` |
+| F14 | cross-skill-references | 新 class `cross_skill_references`, **behavioral_only**. **rationale**: "skill ↔ skill 引用涉及 promotion 路徑與 reusability 判斷". revisit_when: "≥3 link-rot incidents（broken cross-link / stale reference / circular promotion）累積". success_criteria: "link-resolver + promotion-target lint 上線並覆蓋三類 incident". revisit_owner: "framework maintainer". last_reviewed_at: "2026-06-01" |
+| F15 | decision-efficiency | 新 class `decision_efficiency`, **not_mechanizable**. objective_validation_impossible_because: "效率判斷脈絡相依，無 absolute metric，強制機械化會獎勵 gaming" |
+| F16 | document-todo-list | 新 class `document_todo_list`, **behavioral_only**. **rationale**: "文件內 TODO 收斂是寫作判斷，無 boolean predicate". revisit_when: "≥3 documented TODO leak incidents". success_criteria: "TODO-lifecycle lint 上線並覆蓋 ≥3 incident pattern". revisit_owner: "framework maintainer". last_reviewed_at: "2026-06-01" |
+| F17 | goal-action-validation | 加進 `conversation_goal_ledger.source_files`（撤回原獨立 class 提案，避免 behavioral_only chain） |
+| F18 | prompt-cache-efficiency | 新獨立 class `prompt_cache_efficiency`, **not_mechanizable**（拆開不與 F15 合併，避免未來 token-lint 出現時被 class 邊界擋住）. objective_validation_impossible_because: "cache 命中受多輪 context 演化影響，無 absolute metric" |
+| F19 | validation-scenario-governance | **R3 處置**：採建議 C，**behavioral_only** + sunset_decision 明寫 "promote to pending_implementation when Phase 4 coverage_evidence machinery is live, then to mechanical when scenario-coverage lint executor 上線". rationale: "目前 scenario 寫作品質與覆蓋判斷無 executor；coverage_evidence schema 已預備但 enforce 邏輯未實作". revisit_when: "Phase 4 CLI `ai-skill enforcement coverage` land". success_criteria: "coverage_evidence.coverage_target_pct 在 compile time 被 enforce". revisit_owner: "framework maintainer". last_reviewed_at: "2026-06-01" |
+| F20 | decision-promotion-pipeline | 新獨立 class `decision_promotion_pipeline`, **behavioral_only**, `upstream_classes: [failure_learning_system]`（R5 處置）. rationale: "ADR/governance 升級與 failure pattern 升級是兩類 promotion，目前皆 behavioral；分開以便將來各自有獨立 executor". revisit_when: "≥2 ADR promotion 失效模式累積 OR constitution 引用追蹤需求". success_criteria: "promotion-chain lint 上線並驗證 upstream_classes 鏈完整". revisit_owner: "governance maintainer". last_reviewed_at: "2026-06-01" |
+| F21 | directory-structure-governance | 新 class, **behavioral_only**. rationale: "目錄結構治理涉及責任分層判斷". revisit_when: "≥3 documented directory drift incidents". success_criteria: "directory-drift lint 上線並覆蓋三類 incident". revisit_owner: "framework maintainer". last_reviewed_at: "2026-06-01" |
+| F22 | knowledge-update-flow | **R6 處置**：新獨立 class `knowledge_update_flow`（不合併進 linked_updates），cross-link to linked_updates in companion notes. **behavioral_only**. rationale: "Knowledge update flow 是 linked-updates 的 step-by-step expansion，但因涉及 cross-layer (enforcement / governance / workflow) 治理，獨立成 class 避免 linked_updates 變超級桶". revisit_when: "Phase 4 後 linked_updates + knowledge_update_flow 共用 executor 是否可行". success_criteria: "兩 class 共用 single executor 而不需個別 dispatcher". revisit_owner: "framework maintainer". last_reviewed_at: "2026-06-01" |
+
+**Schema 變更總清單（在 backfill 之前先 land）**：
+
+1. `coverage_status_spec.behavioral_only.requires` 加 `sunset_decision.revisit_owner`、`sunset_decision.last_reviewed_at`
+2. `rule_classes[]` schema 加 optional `upstream_classes: []`（R5）
+3. registry 加 top-level `bootstrap_mode: strict | baseline_snapshot_v1`（R2，本 session 用 `strict` 因 finding 量可承受；schema + lint 仍須支援 baseline_snapshot 機制）
+4. registry 加 top-level `baseline_snapshot:` 區塊 schema（R2，可空，但 baseline_snapshot_v1 模式需用）
+5. `governance_thresholds` 加 `max_source_files_per_class: 5`、`review_when_source_files_gt: 5`（R6）
+6. 既有 7 條 behavioral_only entry 全部補 `revisit_owner` + `last_reviewed_at`
+
+**Lint 新增 check（schema 修改後同步加）**：
+
+- `behavioral_only_missing_rationale`（補強，原 lint 漏了 rationale 檢查）
+- `behavioral_only_missing_revisit_owner`（R1）
+- `behavioral_only_missing_last_reviewed_at`（R4）
+- `behavioral_only_review_age`（R4: >12 月 warn / >24 月 fail）
+- `behavioral_only_vague_success_criteria`（黑名單 token: `TBD` / `未來` / `future` / `eventually` 等）
+- `behavioral_only_revisit_chain`（revisit_when 引用其他 rule_class id 時，該 class 不得也是 behavioral_only — 避免 F17 類型的 decay chain）
+- `upstream_chain_resolution`（R5: upstream_classes 引用必須解析到 active class）
+- `class_size_review_threshold`（R6: source_files > 5 → warning）
+- `baseline_snapshot_drift`（R2: baseline_snapshot 內 entry 若已自我修復，提醒 burndown）
+
+**執行順序（嚴格）**：
+
+1. Schema patch（registry.yaml 6 處變更）+ companion `enforcement-registry.md` 同步說明
+2. Lint patch（新增 9 個 check）+ unit tests（每個新 check 至少 1 fail + 1 pass）
+3. 既有 7 條 behavioral_only entry 補 revisit_owner + last_reviewed_at
+4. Re-dry-run → 預期 surface F1-F22 + 7 個既有 entry 缺欄位（共約 29 finding）
+5. Backfill F1-F22 per 修正稿
+6. Re-dry-run → 0 findings
+7. Wire 進 `ai-skill runtime compile`
+8. Rebuild 5 platform binaries + BUILDINFO + SHA256SUMS
+9. Run `ai-skill runtime compile` + 5 Phase 7 detection_commands 全 PASS
+10. Owner-grouped commit + push + readback
+
+**Open Question 補登**（這次 round-2 評審 surface 的新 OQ）：
+
+| # | Question | 處置 |
+|---|---|---|
+| Q8 | `last_reviewed_at` 由誰負責更新？人工 commit-msg trailer 觸發？還是定期 governance cron？ | resolved (2026-06-01): 首版採人工更新，commit-msg 加可選 trailer `[registry-review: <class_id>]`；自動化排程列 Phase 5 後考量 |
+| Q9 | `baseline_snapshot_v1` 模式如果 burndown_target_date 到期 entry 還在，governance review 由誰執行？ | open: 待 Phase 4.5 self-governance 章節決定 |
+| Q10 | `upstream_classes` 形成 DAG 但若出現 cycle 怎麼處理？ | resolved (2026-06-01): lint `upstream_chain_resolution` 同時做 cycle detection，發現 cycle → fail |
+| Q11 | F18 拆開的長期成本（兩個 not_mechanizable 都是 efficiency 主題）會不會反噬？ | open: 列入 Phase 4 後追蹤，coverage report 顯示「efficiency 主題 not_mechanizable 數量」作為健康指標 |
+
 #### 原 pseudo-implementation（保留作為設計參考）
 
 在 `scripts/ai-skill-cli/internal/compile/`（或既有 compile pipeline）加 lint pass：
