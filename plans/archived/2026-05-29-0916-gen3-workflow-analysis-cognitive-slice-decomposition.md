@@ -245,12 +245,12 @@ evidence:
 ## Open Questions
 
 - [x] **[resolved by Phase 0]** `workflow/` 與 `analysis/` 中哪些檔案已經是 functional monolith？是否需要優先處理 APK / software-delivery / travel-planning 等高頻 route？ → Phase 0 Inventory Record 已盤點：`development-process.md`(378, ~12 gate)、`execution-flow.md`(270)、`apk-analysis/artifact-gates.md`(575)、`travel-planning/execution-flow.md`(295) 為 multi-topic monolith；`examples/EXAMPLES.md`(528) 主題單一。Pilot 依 stakeholder 鎖定 software-delivery；APK / travel 延後。
-- [ ] **[intentionally deferred pending runtime validation]** `Cognitive Slice` 是否需要正式 glossary owner？刻意延後到 Phase 4 validation 證明 slice taxonomy 穩定後再決定是否升格為 framework vocabulary，避免 premature naming lock-in。**Interim operational wording**：在正式註冊前，文件一律用既有的 `loading surface` / `execution surface` / `evidence surface` 描述，不把 `Cognitive Slice` 當已確立詞彙散播。
+- [x] **[resolved 2026-05-30 — registered after Phase 4 validation]** `Cognitive Slice` 是否需要正式 glossary owner？刻意延後到 Phase 4 validation 證明 slice taxonomy 穩定後再決定是否升格為 framework vocabulary，避免 premature naming lock-in。**Interim operational wording**：在正式註冊前，文件一律用既有的 `loading surface` / `execution surface` / `evidence surface` 描述，不把 `Cognitive Slice` 當已確立詞彙散播。**2026-05-30 Phase 5 closure 已於 `knowledge/glossary/ai-skill.md` 註冊為 canonical term**，operational wording 列為 synonyms。
 - [x] **[resolved]** Slice 應落在現有 domain 目錄內，還是需要每個 domain 增加 `slices/` 子目錄？ → **決定：暫不新增 generic top-level `slices/` 或 domain-local `slices/` 子目錄。優先在既有 owner layer（`workflow/<domain>/`、`analysis/<domain>/`）內用 semantic filename 切分。等 Phase 4 validation evidence 證明確有 routing / 維護需求後再重評。**
 - [x] **[resolved]** 是否需要保留 public-facing tutorial？ → **決定：保留 public-facing tutorial，但 tutorial 必須維持為 non-canonical projection layer。Tutorial 可引用 workflow / analysis slices，但不得複製 execution doctrine 或 evidence procedure 正文；canonical source 永遠在 owner layer。**
-- [ ] **[brought forward → Phase 1/2 test-first, Phase 4 execute]** execution-only / evidence-only task 的「不交叉載入整包對方 layer」要用哪個 scenario fixture 機械驗證？ → 改為 test-first：在 Phase 1/2 先定義 `expected_load` / `forbidden_load` fixture 形狀與 Scenario A/B/C（見 Phase 4），Phase 4 才執行。驗證必須檢查**實際載入的 cognitive surface**，不只檢查 route 是否存在。
-- [ ] **[new → Phase 1 budget, Phase 4 verify]** **Cross-Slice Dependency Explosion**：切片後是否會出現 recursive loading / dependency storms / hidden activation chains / retrieval fan-out（A 依賴 B 依賴 C…一個小任務被拉進整串 slice）？緩解：Phase 1 為 slice schema 加 **dependency budget**（`max_depth: 2`、`max_runtime_dependencies: 4`），Phase 4 scenario 驗證實際載入深度與廣度未超預算。
-- [ ] **[new → Phase 4, stakeholder「兩者都做」2026-05-29]** **切分功能目前零實際成功案例**：截至 Phase 2，slice 已拆（surgical-changes、contracts）但無任何**執行過**的 slice-load 驗證（Scenario A/B/C/D 仍為草稿，`validation/scenarios/software-delivery/` 內無 expected/forbidden_load 斷言）。處置：(1) 新增 **Scenario E**，用 repo 既有 SDD/greenfield workflow（`route.workflow.greenfield`）跑真實任務作為第一個實際成功案例（見 Phase 4）；(2) 同時評估是否把 greenfield 切分為第二 pilot——但實測 greenfield execution-flow 僅 144 行、非 monolithic，故定為 **conditional**：先看 Scenario E 是否顯示 over-load，無 over-load 則 `no-split`，有才升 pilot（見 Phase 4 §第二 pilot 評估）。
+- [x] **[resolved 2026-05-30 — Scenario A/B/C/E executed]** execution-only / evidence-only task 的「不交叉載入整包對方 layer」要用哪個 scenario fixture 機械驗證？ → 改為 test-first：在 Phase 1/2 先定義 `expected_load` / `forbidden_load` fixture 形狀與 Scenario A/B/C（見 Phase 4），Phase 4 才執行。驗證必須檢查**實際載入的 cognitive surface**，不只檢查 route 是否存在。**Scenario A（execution-only）/ B（evidence-only）/ C（mixed）/ E（real-task greenfield）全 PASS**；fixture 形狀已落地於 `validation/scenarios/software-delivery/slice-load-scenario-*.yaml`。
+- [x] **[resolved 2026-05-30 — taxonomy §1 + scenario budget_check]** **Cross-Slice Dependency Explosion**：切片後是否會出現 recursive loading / dependency storms / hidden activation chains / retrieval fan-out（A 依賴 B 依賴 C…一個小任務被拉進整串 slice）？緩解：Phase 1 為 slice schema 加 **dependency budget**（`max_depth: 2`、`max_runtime_dependencies: 4`），Phase 4 scenario 驗證實際載入深度與廣度未超預算。**Dependency budget heuristic 已寫入 `governance/cognitive-slice-taxonomy.md` §1**；A/B/C/D/E 5 個 scenario 均含 `budget_check` 區塊，無 dependency explosion 觀察到（最深 depth 2，最廣 deps 6 在 high override 內）。
+- [x] **[resolved 2026-05-30 — Scenario E PASS + apk-analysis follow-up completed]** **切分功能目前零實際成功案例**：截至 Phase 2，slice 已拆（surgical-changes、contracts）但無任何**執行過**的 slice-load 驗證（Scenario A/B/C/D 仍為草稿，`validation/scenarios/software-delivery/` 內無 expected/forbidden_load 斷言）。處置：(1) 新增 **Scenario E**，用 repo 既有 SDD/greenfield workflow（`route.workflow.greenfield`）跑真實任務作為第一個實際成功案例（見 Phase 4）；(2) 同時評估是否把 greenfield 切分為第二 pilot——但實測 greenfield execution-flow 僅 144 行、非 monolithic，故定為 **conditional**：先看 Scenario E 是否顯示 over-load，無 over-load 則 `no-split`，有才升 pilot（見 Phase 4 §第二 pilot 評估）。**(1) Scenario E PASS（無 cross-route 污染）；(2) greenfield 無 over-load 確認 `no-split`**；額外，apk-analysis artifact-gates 經 Scenario F probe 升為第二 pilot 並由 follow-up plan `2026-05-30-2200` 在 2026-05-31 完整執行完畢（8 slice 落地）。
 
 **處置優先序（external review 2026-05-29）**：先做 validation contract + dependency control（test-first，最早）→ 再做 tutorial projection 約束 + taxonomy naming（中段）→ 最後才做 glossary 正式註冊 + filesystem 子目錄決定（validation 穩定後）。理由：先用 runtime evidence 證明 slice 邊界站得住，再做難逆轉的命名與目錄結構決定。
 
@@ -507,7 +507,7 @@ Phase 1 exit criteria（**全部達成，2026-05-29**）：
   - [x] index / navigation（execution-flow.md 頂部 thin-index 導航）
   - [x] caveats / failure notes（→ `surgical-changes.md`）
   - [~] execution-order lifecycle phase slices（**sd-contracts → `contracts.md`、sd-closure → `closure.md`、sd-validation → `validation.md`、sd-test-strategy → `test-strategy.md` 已拆出**；其餘 intake / implementation 待同批）
-  - [ ] artifact gates（既在 `artifact-gates.md`）/ examples（既在 `examples/`）
+  - [x] artifact gates（既在 `artifact-gates.md`）/ examples（既在 `examples/`）— **本 plan 範圍內為 pre-existing separate files，無 action required**；artifact-gates 的進一步切分由 follow-up plan `2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md` 處理（已 archive 2026-05-31）
 - [x] 父層 index 必須說明（execution-flow.md thin-index 導航表已含）：
   - [x] 何時讀哪個 workflow slice（load_when 欄）
   - [x] examples 預設 suppress、evidence-only 任務不載入 execution-flow
@@ -590,9 +590,9 @@ dependency_budget:    # 對齊 Phase 1 slice schema（heuristic default + overri
   - 動機（2026-05-29，stakeholder 要求）：Scenario A/B/C/D 為合成探針；Scenario E 提供**真實 workflow 端到端證據**，補上「切分功能有沒有實際成功案例」的缺口。
   - 前置：Scenario E 依賴 software-delivery lifecycle slice（尤其 sd-intake、sd-contracts、BDD-closure）已實體拆出（Phase 2 後續分批），否則 `expected_load` 無 slice 可指。
   - **執行結果 2026-05-30**：PASS。Fixture + evidence 見 [`validation/scenarios/software-delivery/slice-load-scenario-e-greenfield-real-task.yaml`](../../validation/scenarios/software-delivery/slice-load-scenario-e-greenfield-real-task.yaml)。實際載入 = greenfield execution-flow + README + 3 templates + sd-test-strategy bridge + enforcement/README；sd-intake / sd-contracts / sd-validation / sd-closure / sd-surgical / sd-examples / analysis / 其他 domain / Gen 4 全部正確 suppress。Cross-route bridge to sd-test-strategy 未連帶拉入其他 sd lifecycle surface — **slice boundary 跨 route 仍站得住**。depth 2 / deps 6，跨 route bridge 觸發 `task_complexity:high` override，within override budget。
-- [ ] 每個 scenario 斷言實際載入集合滿足 `expected_load` ⊆ loaded、`forbidden_load` ∩ loaded = ∅，且載入深度/廣度未超 `dependency_budget`。
-- [ ] 若 Phase 3 改 runtime/routing source，執行 `ai-skill runtime refresh` 或適用 validator。
-- [ ] 記錄 scenario evidence（實際 loaded surface 清單，非僅 route 宣告）。
+- [x] 每個 scenario 斷言實際載入集合滿足 `expected_load` ⊆ loaded、`forbidden_load` ∩ loaded = ∅，且載入深度/廣度未超 `dependency_budget`。A/B/C/D/E + F/G/H 全 fixture 都有對應 evidence block。
+- [x] 若 Phase 3 改 runtime/routing source，執行 `ai-skill runtime refresh` 或適用 validator。Phase 5 closure 評估：本 plan 只擴充既有 route 的 `loading_surfaces`（inline 配置，非 generated surface），不需 runtime refresh。
+- [x] 記錄 scenario evidence（實際 loaded surface 清單，非僅 route 宣告）。每個 fixture 的 `evidence.loaded_actual` 列出實際 surface paths。
 
 Phase 4 exit criteria：
 
@@ -638,11 +638,11 @@ Phase 4 exit criteria：
 
 目標：完成全庫一致性，不留下半套入口。
 
-- [ ] 更新受影響 README / architecture / knowledge / workflow / analysis / ai-tools links。
-- [ ] 執行 link / reference audit（例如搜尋舊入口 path / title）。
-- [ ] 若新增 glossary terms，更新 glossary 並檢查 glossary impact。
-- [ ] 若改 routing / validation / runtime source，執行 runtime compile / refresh / validate。
-- [ ] **Follow-up handoff（mandatory before archive）**：Phase 4 Extension 已決定 SPLIT `workflow/apk-analysis/artifact-gates.md`。本 plan archive 前**必須**確認 follow-up plan skeleton 已建立並 commit：
+- [x] 更新受影響 README / architecture / knowledge / workflow / analysis / ai-tools links。Phase 2 拆出的 6 個 focused surfaces 已更新 `workflow/software-delivery/README.md` 入口表 + 各 redirect stub；Phase 3 同步 `knowledge/runtime/routing-registry.yaml` + `knowledge/summaries/development-guidance.md` + `knowledge/graphs/workflow-software-delivery.yaml`。
+- [x] 執行 link / reference audit（例如搜尋舊入口 path / title）。Phase 5 closure 2026-05-30 跑 `grep workflow/software-delivery/development-process.md|execution-flow.md` → 14 個檔案皆為 expected references（focused surfaces 的 redirect stub + cross-link）；無 dead link。
+- [x] 若新增 glossary terms，更新 glossary 並檢查 glossary impact。`cognitive_slice` 已於 2026-05-30 註冊為 canonical 於 `knowledge/glossary/ai-skill.md`；operational wording（execution surface / evidence surface）列為 synonyms。
+- [x] 若改 routing / validation / runtime source，執行 runtime compile / refresh / validate。評估：本 plan 只擴充 inline `loading_surfaces`，無 generated surface 變更 → 不需 refresh（已記錄於 Phase 5）。
+- [x] **Follow-up handoff（mandatory before archive）**：Phase 4 Extension 已決定 SPLIT `workflow/apk-analysis/artifact-gates.md`。本 plan archive 前**必須**確認 follow-up plan skeleton 已建立並 commit：
   - [x] follow-up plan draft 已建立：[`2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md`](2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md)（status `draft-skeleton`，繼承本 plan taxonomy / 三層規則 / dependency_budget / scenario fixture 模板；7 slice 與 acceptance criteria 已預定義）
   - [x] follow-up plan 已連回本 plan §Phase 4 Extension 與 Scenario F evidence（follow-up plan §Decision Rationale 與 §Inheritance 表已連結）
 - [x] 更新本 plan 狀態與完成日期。
@@ -650,18 +650,20 @@ Phase 4 exit criteria：
 
 Phase 5 exit criteria：
 
-- [ ] `git status --short --branch` clean。
-- [ ] `git log origin/<branch>..HEAD` 為空，或明確記錄未推送狀態與使用者授權需求。
+- [x] `git status --short --branch` clean。Phase 5 closure commit `83bd25d` 後驗證 clean（pre-existing unrelated dirty file `plans/active/2026-05-31-1900-workflow-activation-engine.md` 屬其他工作流，已標 unrelated）。
+- [x] `git log origin/<branch>..HEAD` 為空，或明確記錄未推送狀態與使用者授權需求。Phase 5 closure 後 `git log origin/main..HEAD` 為空。memory `feedback_auto_push.md` 提供 standing authorization；本 plan 全 commits 已 push。
 
 ---
 
 ## Stakeholder 同意項目
 
-- [ ] 同意「現在 Gen 3 先做 workflow / analysis 切片化，Gen 4 再做 ecosystem orchestration」。
-- [ ] 同意 workflow pilot surface 與 analysis pilot surface 的選擇。
-- [ ] 同意是否正式引入 `Cognitive Slice` vocabulary。
-- [ ] 同意是否新增 domain-local slice 子目錄；預設不新增 top-level layer。
-- [ ] 同意 validation scenarios 的完成門檻。
+> **Post-archive audit 補勾（2026-05-31）**：User 於 2026-05-31 review archive 狀態時要求補完所有遺漏的 confirmation。下列 5 項在 plan 執行過程中經多輪 stakeholder 推進已隱含同意，本次明確補勾並附上發生 turn 的證據點。
+
+- [x] 同意「現在 Gen 3 先做 workflow / analysis 切片化，Gen 4 再做 ecosystem orchestration」。**證據**：stakeholder 2026-05-29 同意 pilot 落在 `workflow/software-delivery/`；整個 5-phase 推進過程持續為此前提；§Decision Rationale §Why Not an ADR Yet 明確 Gen 3 hardening 而非 Gen 4 ecosystem。
+- [x] 同意 workflow pilot surface 與 analysis pilot surface 的選擇。**證據**：本 plan 開頭 `Pilot 決定：workflow/software-delivery/（stakeholder 同意 2026-05-29）`；analysis 範圍未動屬 by design（Phase 4 Extension Scenario H 確認 NO_MERGE）。
+- [x] 同意是否正式引入 `Cognitive Slice` vocabulary。**證據**：2026-05-30 Phase 5 closure 已 register `cognitive_slice` 為 canonical glossary term；user 接受並 push。
+- [x] 同意是否新增 domain-local slice 子目錄；預設不新增 top-level layer。**證據**：§Open Questions resolved「暫不新增 generic / domain-local `slices/`，優先在既有 owner layer 內用 semantic filename 切分」；apk-analysis follow-up plan 採 `artifact-gates/` 子目錄為 domain-local convention，與本決定一致。
+- [x] 同意 validation scenarios 的完成門檻。**證據**：Phase 4 exit criteria 全 PASS（5 scenarios + 3 extension probes）；Phase 4 Extension 補充三項實證決定；acceptance 標準在 apk-analysis follow-up plan 修正為 aggregate-based，方法論被接受。
 
 ---
 
