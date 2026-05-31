@@ -1,6 +1,6 @@
 # Cognitive Slice Taxonomy ADR Promotion
 
-**Status**: `draft`
+**Status**: `in-progress`
 **世代**：Gen 3 governance promotion（既有 framework 升 ADR，無新功能）
 **建立日期**：2026-05-31
 **最後更新**：2026-05-31
@@ -126,26 +126,27 @@ Glossary Impact: **no new vocabulary**。`cognitive_slice` 已於 parent plan Ph
 
 ## Phase 0 — Preflight
 
-- [ ] 確認下一個 ADR 編號（ADR-009——constitution/ 目前 1–8）
-- [ ] 確認 ADR-008 結構為最新 template（已驗證：Status / Framework Generation / Date / Source Plan / Context / Decision / ...）
-- [ ] 確認 parent plans 都已 archive（已：2026-05-29-0916 + 2026-05-30-2200）
-- [ ] 確認 archival-audit validator 已生效（commit 82032c6 後生效——本 plan archive 時會被機械驗證）
-- [ ] 確認 governance/cognitive-slice-taxonomy.md 為 active reference（已：被 2 plans + 11 scenarios + glossary 引用）
+- [x] 確認下一個 ADR 編號（ADR-009——constitution/ 目前 1–8）
+- [x] 確認 ADR-008 結構為最新 template（已驗證：Status / Framework Generation / Date / Source Plan / Context / Decision / ...）
+- [x] 確認 parent plans 都已 archive（已：2026-05-29-0916 + 2026-05-30-2200）
+- [x] 確認 archival-audit validator 已生效（commit 82032c6 後生效——本 plan archive 時會被機械驗證）
+- [x] 確認 governance/cognitive-slice-taxonomy.md 為 active reference（已：被 2 plans + 11 scenarios + glossary 引用）
 
 ---
 
 ## Phase 1 — ADR-009 起草
 
-- [ ] 建立 `constitution/ADR-009-cognitive-slice-taxonomy.md`：
-  - Status: Accepted
-  - Framework Generation: Gen 3 governance promotion
-  - Date: 2026-05-31
-  - Source Plans: 兩個 archived plan
-  - Context: framework 動機 + 3 pilot evidence summary
-  - Decision: 引用 governance §1–§6 為 canonical rules（不複製）
-  - Consequences: 正/負/風險（從本 plan §Decision Rationale 提煉）
-  - Future Considerations: deferred items（surface rename / analysis/travel 二次 probe / frida-hook-flow probe）
-  - Validation Evidence: 列 11 scenario fixtures + 2 parent plans + glossary + routing surfaces
+- [x] 建立 `constitution/ADR-009-cognitive-slice-taxonomy.md`：
+  - [x] Status: Accepted
+  - [x] Framework Generation: Gen 3 governance promotion
+  - [x] Date: 2026-05-31
+  - [x] Source Plans: 兩個 archived plan
+  - [x] Context: framework 動機 + 4 大缺口（execution overload / premature promotion / routing-粒度 / summary 壓縮退化）
+  - [x] Decision: 6 條 canonical rules（reference governance §1–§6，不複製 normative content）+ governance ownership boundary + ADR-003/007 約束邊界
+  - [x] Consequences: 正/負/風險 4 條 + alternatives 4 個
+  - [x] Future Considerations: 5 個 deferred items（surface rename / analysis/travel 二次 probe / frida-hook-flow probe / schema validator / aggregate telemetry）
+  - [x] Validation Evidence: 3 pilots + 13 fixtures + 4 類 active consumers + 2 mechanical enforcement points
+  - [x] Vocabulary Evolution + Related sections（cross-link ADR-003/006/007/008 + governance + glossary）
 
 ---
 
