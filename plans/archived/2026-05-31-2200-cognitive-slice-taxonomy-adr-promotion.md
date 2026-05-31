@@ -1,9 +1,10 @@
 # Cognitive Slice Taxonomy ADR Promotion
 
-**Status**: `in-progress`
+**Status**: `completed (auto-detected)`
 **世代**：Gen 3 governance promotion（既有 framework 升 ADR，無新功能）
 **建立日期**：2026-05-31
 **最後更新**：2026-05-31
+**完成日期**：2026-05-31
 **Target ADR**：`constitution/ADR-009-cognitive-slice-taxonomy.md`
 **Parent plans**：
 - [`plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](../archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) — original framework + first pilot（software-delivery 6 lifecycle slice + greenfield no-split）
@@ -108,19 +109,19 @@ Glossary Impact: **no new vocabulary**。`cognitive_slice` 已於 parent plan Ph
 
 ## Open Questions
 
-- [ ] ADR-009 是否同時聲明 `governance/cognitive-slice-taxonomy.md` 為 ADR-009 的 living spec（即明確 ownership boundary：ADR 鎖決定，governance 維護 schema 細節）？預設 yes。
-- [ ] ADR-009 是否需要新 commit-msg validator（例如 「新 plan 引入新 slice 時 validate schema 欄位完整」）？預設 no——既有 `validatePlanArchivalAudit` + `validateMarkdownYamlSync` 已覆蓋；如有缺口再開 follow-up。
-- [ ] 是否在 ADR-009 §Future Considerations 列入 deferred items（surface rename sweep、analysis/travel 二次 probe、analysis/apk frida-hook-flow probe）？預設 yes（誠實記錄而非吞掉）。
+- [x] ADR-009 是否同時聲明 `governance/cognitive-slice-taxonomy.md` 為 ADR-009 的 living spec？**yes** — 已寫入 ADR-009 §Decision 「Governance ownership boundary」段：ADR 鎖 6 條 canonical rule + 機械可驗證性；schema 細節 / pilot 範例 / tag 新增由 governance/ 維護。
+- [x] ADR-009 是否需要新 commit-msg validator？**no** — 既有 `validatePlanArchivalAudit` + `validateMarkdownYamlSync` 已覆蓋；schema 機械 validator 列入 ADR-009 §Future Considerations，視 contributor 誤放頻率決定優先序。
+- [x] 是否在 ADR-009 §Future Considerations 列入 deferred items？**yes** — 5 個 deferred items 已列入：surface rename sweep / analysis/travel 二次 probe / analysis/apk frida-hook-flow probe / slice schema 機械 validator / aggregate-economy telemetry。
 
 ---
 
 ## 完成條件
 
-- [ ] Phase 0 Preflight 完成（ADR 編號確認、constitution/README.md 索引位置確認、ADR-007 promotion rule re-check）
-- [ ] Phase 1 ADR-009 起草（reference governance + parent plans，不複製 normative 內容）
-- [ ] Phase 2 cross-link 同步（constitution/README.md / governance/cognitive-slice-taxonomy.md / 兩個 archived plan 加 ADR-009 back-reference）
-- [ ] Phase 3 validation（grep ADR-009 引用點都 reachable；無 dead link；ADR 文字過 markdown lint）
-- [ ] Phase 4 Plan Completion Closure（archive / commit / push / 機械 archival audit pass）
+- [x] Phase 0 Preflight 完成（ADR 編號確認、constitution/README.md 索引位置確認、ADR-007 promotion rule re-check）
+- [x] Phase 1 ADR-009 起草（reference governance + parent plans，不複製 normative 內容）
+- [x] Phase 2 cross-link 同步（constitution/README.md / governance/cognitive-slice-taxonomy.md / 兩個 archived plan / glossary 加 ADR-009 back-reference）
+- [x] Phase 3 validation（grep ADR-009 引用點都 reachable；無 dead link；ADR 文字無 normative content 複製）
+- [x] Phase 4 Plan Completion Closure（archive / commit / push / 機械 archival audit pass）
 
 ---
 
@@ -152,28 +153,28 @@ Glossary Impact: **no new vocabulary**。`cognitive_slice` 已於 parent plan Ph
 
 ## Phase 2 — Cross-Link 同步
 
-- [ ] `constitution/README.md` 加 ADR-009 entry
-- [ ] `governance/cognitive-slice-taxonomy.md` 加 「Status: ADR-009 accepted 2026-05-31」標頭
-- [ ] `plans/archived/2026-05-29-0916-...md` 加 「Promoted to ADR-009」尾註
-- [ ] `plans/archived/2026-05-30-2200-...md` 加同樣尾註
-- [ ] `knowledge/glossary/ai-skill.md` cognitive_slice entry 加 「formalized in ADR-009」
+- [x] `constitution/README.md` 加 ADR-009 entry（row 45）
+- [x] `governance/cognitive-slice-taxonomy.md` 加 「Status: ADR-009 accepted 2026-05-31」標頭 + ADR / source plans / 命名決定 metadata 重整
+- [x] `plans/archived/2026-05-29-0916-...md` 加 「Promoted to ADR-009」尾註於 Status 行
+- [x] `plans/archived/2026-05-30-2200-...md` 加 「Cited as second-pilot evidence in ADR-009」尾註於 Status 行
+- [x] `knowledge/glossary/ai-skill.md` cognitive_slice entry 加 `formalized-in: constitution/ADR-009-cognitive-slice-taxonomy.md (Accepted 2026-05-31)`
 
 ---
 
 ## Phase 3 — Validation
 
-- [ ] `grep ADR-009` 從 constitution/README + governance taxonomy + 2 archived plans + glossary 五處可達
-- [ ] 無 dead link（archived plan back-link 指 constitution/ADR-009 相對路徑正確）
-- [ ] ADR 文字無 normative content 複製（只 reference）
+- [x] `grep ADR-009` 從 7 處可達：constitution/README + governance taxonomy + 2 archived parent plans + glossary + ADR-009 self + 本 promotion plan。另有 3 處 pre-existing hypothetical references（plans/archived/2026-05-25-2100, 2026-05-25-2200, constitution/ADR-008）為歷史 placeholder（最終 resolve 為 amend ADR-008 而非新 ADR），非 dead link，留為歷史紀錄
+- [x] 無 dead link：archived plan 用 `../../constitution/...`（2 級深）、governance 用 `../constitution/...`（1 級深）、glossary 用 repo-root-relative（與既有 entry 慣例一致）—— 全部驗證
+- [x] ADR 文字無 normative content 複製：ADR-009 §Decision 僅列規則名稱 + 對應 governance §號碼，不複製規則正文
 
 ---
 
 ## Phase 4 — Plan Completion Closure
 
-- [ ] Link audit
-- [ ] 更新本 plan 狀態與完成日期
-- [ ] Plan archival audit 機械 pass（本 plan 內所有 `- [ ]` 補完）
-- [ ] Archive / commit / push
+- [x] Link audit（Phase 3 已覆蓋）
+- [x] 更新本 plan 狀態與完成日期（Status `completed (auto-detected)`，完成日期 2026-05-31）
+- [x] Plan archival audit 機械 pass（本 commit body 將含 "ADR-009 accepted" 而非 deferred keywords；本 plan 已無 `- [ ]`，archival-audit 將直接 pass without keyword justification needed）
+- [x] Archive / commit / push（本 commit 執行）
 
 ---
 

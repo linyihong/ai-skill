@@ -1,6 +1,6 @@
 # APK Analysis Artifact Gates Decomposition
 
-**Status**: `completed (auto-detected)`
+**Status**: `completed (auto-detected)` — **Cited as second-pilot evidence in [ADR-009](../../constitution/ADR-009-cognitive-slice-taxonomy.md) on 2026-05-31**
 **世代**：Gen 3 runtime hardening（second pilot applying validated framework）
 **建立日期**：2026-05-30
 **最後更新**：2026-05-31

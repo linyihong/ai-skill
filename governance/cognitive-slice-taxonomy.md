@@ -1,9 +1,13 @@
-# Cognitive Slice / Surface Taxonomy（Phase 1 complete）
+# Cognitive Slice / Surface Taxonomy
 
-**Status**: `phase-3-loading-linked`（taxonomy 已定義並套用 software-delivery pilot；Phase 2 已抽出 6 個 focused surfaces + 1 pre-existing examples surface，`sd-implementation` 依 stakeholder 決定暫留 execution-flow core；Phase 3 已將 focused surfaces 掛到 existing hierarchical route / executable contract / graph / summary，fixtures 為 test-first 草稿待 Phase 4 執行）
+**Status**: **`ADR-009 accepted 2026-05-31`**（§1–§6 為 [ADR-009](../constitution/ADR-009-cognitive-slice-taxonomy.md) 鎖定的 canonical rules；本檔為 ADR-009 的 **living spec**，schema 細節 / pilot 範例 / tag 新增在本檔即可，6 條 canonical rule 修改須走 ADR supersede 流程）
 **Owner layer**: governance
-**來源 plan**: [`plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](../plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) §Phase 1
-**命名決定**：見 §6。framework vocabulary 正式註冊**延後至 Phase 4 validation**；本檔過渡期一律用 `execution / evidence surface` 措辭。
+**ADR**: [`constitution/ADR-009-cognitive-slice-taxonomy.md`](../constitution/ADR-009-cognitive-slice-taxonomy.md)
+**來源 plans**:
+- [`plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md`](../plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) — framework + first pilot
+- [`plans/archived/2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md`](../plans/archived/2026-05-30-2200-apk-analysis-artifact-gates-decomposition.md) — second pilot (§7.5)
+- [`plans/archived/2026-05-31-2200-cognitive-slice-taxonomy-adr-promotion.md`](../plans/archived/2026-05-31-2200-cognitive-slice-taxonomy-adr-promotion.md) — ADR-009 promotion
+**命名決定**：見 §6。canonical term `cognitive_slice` 已 register 至 `knowledge/glossary/ai-skill.md`；operational synonyms `execution surface` / `evidence surface` / `loading surface`。
 
 > 本檔源自 Phase 1 taxonomy 產出：定義 slice schema + 5 條治理規則，並把它們**套用到 software-delivery pilot**（§7 slice 盤點）。Phase 2 已完成 focused surface extraction 的主要部分；Phase 3 已完成 loading/routing link 同步；scenario 執行在 Phase 4。
 

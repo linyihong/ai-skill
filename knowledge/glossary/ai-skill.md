@@ -80,6 +80,7 @@ anti-meaning: >
   不是 ecosystem activation graph（Gen 4 vision，非本 term 涵蓋）。
 introduced-by: plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
 promoted-at: 2026-05-30 (after Phase 4 validation A/B/C/D/E all PASS proving taxonomy stability)
+formalized-in: constitution/ADR-009-cognitive-slice-taxonomy.md (Accepted 2026-05-31)
 ```
 
 ## compression

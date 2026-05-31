@@ -42,6 +42,7 @@ accepted → deprecated → superseded
 | [ADR-006](ADR-006-registry-first-workflow-activation.md) | Registry-First Workflow Activation | accepted | 2026-05-18 | Gen 3 |
 | [ADR-007](ADR-007-constitution-and-decision-promotion-boundary.md) | Constitution and Decision Promotion Boundary | accepted | 2026-05-21 | Gen 3 |
 | [ADR-008](ADR-008-runtime-cognitive-modes.md) | Runtime Cognitive Modes（4 維 mode primitive + discovery + subsystem integration） | accepted | 2026-05-25 | Gen 3 子系統擴充 |
+| [ADR-009](ADR-009-cognitive-slice-taxonomy.md) | Cognitive Slice Taxonomy（slice schema + 三層 falsifiable placement predicate + dependency_budget heuristic） | accepted | 2026-05-31 | Gen 3 governance promotion（規範 ADR-003 三層架構的載入粒度） |
 
 每個 ADR 內含 `Framework Generation` section，標註世代分類與當前世代文件連結。新增世代時依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §3 規則 7 評估每個 ADR 的延伸狀態。
 

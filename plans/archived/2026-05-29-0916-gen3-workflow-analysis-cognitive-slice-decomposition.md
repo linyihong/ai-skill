@@ -1,9 +1,9 @@
 # Gen3 Workflow and Analysis Cognitive Slice Decomposition
 
-**Status**: `completed (auto-detected)`
+**Status**: `completed (auto-detected)` — **Promoted to [ADR-009](../../constitution/ADR-009-cognitive-slice-taxonomy.md) on 2026-05-31**
 **世代**：Gen 3 current hardening；Gen 4 prerequisite
 **建立日期**：2026-05-29
-**最後更新**：2026-05-30
+**最後更新**：2026-05-31（post-archive audit + ADR-009 back-reference）
 **完成日期**：2026-05-30
 **Pilot 決定**：`workflow/software-delivery/`（stakeholder 同意 2026-05-29）
 **Glossary 決定**：`Cognitive Slice` 正式註冊刻意延後至 Phase 4 validation 之後；過渡期一律用 `loading/execution/evidence surface` 既有措辭（stakeholder 同意 2026-05-29，external review 採納）
