@@ -655,6 +655,94 @@ round-3 增量 (3):
 | Q14 | `last_review_summary` 是否需 "與上次 summary 不同" 機械驗證？ | open，列 Phase 5 增強（commit-msg trailer hook 比對 git diff） |
 | Q15 | `behavioral_only_missing_measurable_signal` whitelist token 是否需要 i18n（中文「個」「條」「次」也算數量）？ | resolved (2026-06-01): whitelist 包含 `\d+` 正則涵蓋所有語言數字；中文 noun (`規則類別`/`執行器`) 因低出現率暫不加入，未來 surface 真實 false negative 再補 |
 
+#### Phase 3 Round-4 Review — 結構性退階 + 分類純度修正（2026-06-01）
+
+User round-4 評審指出 round-2 + round-3 累積出 **2 個結構性趨勢風險**，不是「缺欄位」而是「設計軌跡本身需要回頭」：
+
+1. **behavioral_only 過度制度化**：原本是「例外機制」，現在 7 個 metadata 欄位 + 多條 lint，治理成本可能比 mechanical 還高。
+2. **F19 分類遷就流程**：user 第 3 次提出 F19 應該是 `pending_implementation`，前兩輪都用「不想開 child plan」迴避，這是讓分類遷就流程而非反映真實狀態。
+
+加上 4 個次要結構性問題（baseline_snapshot 治理不對等 / upstream_classes 演化成 DAG / measurable_signal 假陽性 / F22 與 class_size_review 邏輯衝突）。
+
+**問題 → 處置 矩陣**：
+
+| Pri | # | 問題 | 處置 |
+|---|---|---|---|
+| P0 | T1 | F19 第 3 次被指出應為 `pending_implementation`（coverage_evidence schema 已存在，只是 executor 未實作 = 已知 implementation gap，不是 behavioral） | (a) **改採方案 A**：開 stub child plan `plans/active/2026-06-01-0100-validation-scenario-governance-executor.md`（內容僅 Phase 0/1 outline + 預估 scope，不立即實作）；(b) F19 改 `coverage=pending_implementation`，`child_plan` 指向此 stub；(c) 撤回 round-3 對 F19 的 sunset_decision 段落 |
+| P0 | T2 | `behavioral_only` 已累積 7 metadata 欄位（rationale + revisit_when + revisit_owner + last_reviewed_at + last_review_summary + success_criteria + depends_on_rule_classes），治理成本逼近 mechanical | (a) **strip back to 3 hard-required**：`rationale` / `sunset_decision.revisit_when` / `sunset_decision.success_criteria`；(b) 其餘 4 個（revisit_owner / last_reviewed_at / last_review_summary / depends_on_rule_classes）**降為 recommended**；(c) lint 對 recommended 缺失 → warning 而非 fail；(d) coverage report 視覺化 recommended 完成度（governance dashboard 用），但不阻塞 compile；(e) **rationale**：behavioral_only 應該是輕量例外，governance 強度應該 < mechanical，不應變第二套制度 |
+| P1 | T3 | `behavioral_only_missing_measurable_signal` 對「constitution review process formalized」這類明確但無數字的 success_criteria 假陽性 | (a) lint 等級從 P0 fail 降為 **warning**；(b) 黑名單 lint `behavioral_only_vague_success_criteria`（TBD/future/eventually）維持 P0 fail（這些確實是空話）；(c) 雙閘：黑名單擋明顯空話，白名單提示 measurable signal 但不阻塞 |
+| P1 | T4 | `baseline_snapshot_v1` 治理強度反而比 behavioral_only 弱（無 owner、無 review summary） | (a) `baseline_snapshot` 區塊強制加 `baseline_owner` + `baseline_review_summary`（每筆 baseline entry 都有）；(b) lint `baseline_snapshot_missing_governance`：缺 owner/summary → fail；(c) 與 behavioral_only 治理對等，不能用「baseline 是臨時的」當藉口降低治理 |
+| P1 | T5 | `upstream_classes` 演化軌跡是 Governance DAG，需要架構決策避免持續長欄位 | (a) 在 backfill 前寫 ADR `constitution/ADR-XXX-registry-as-governance-dag.md`，明確決定 commit to DAG 或 freeze；(b) **建議 freeze**：upstream_classes 維持單一向上引用 + cycle detection 即可，不加 downstream_classes / promotion_role / artifact_type；(c) Q12 改為 resolved (freeze)；(d) 若未來真需要 DAG，另開 ADR 升級 |
+| P2 | T6 | F22 拆分 vs `class_size_review_threshold` 是 warning 的邏輯衝突 | (a) **F22 回歸 linked_updates**（撤回 round-2/round-3 拆獨立 class 的決定）；(b) rationale：threshold 既然是 warning，linked_updates 多收 1 個 source_file 不是問題；(c) 若 linked_updates source_files 真累積到 >7（hard threshold 候選），届時 governance review 決定是否拆 class，**不是現在 preemptively 拆**；(d) class_size 治理保持輕量；(e) F22 重新歸位後，total class 數從 round-3 的 +5 → +4（cross_skill_references / authorization_scope / decision_promotion_pipeline / directory_structure_governance）+ 加 F19 child plan 後 +1 → +5（含 F19 但不含 knowledge_update_flow） |
+
+**Round-4 修正後 F12-F22 最終版 v3**：
+
+| # | yaml | round-4 final |
+|---|---|---|
+| F12 | authorization-scope | 新 class, **behavioral_only**, 3 hard fields (rationale/revisit_when/success_criteria) + 4 recommended |
+| F13 | content-layering | 加進 `document_sizing.source_files`（不變） |
+| F14 | cross-skill-references | 新 class, **behavioral_only**, 3 hard + 4 recommended |
+| F15 | decision-efficiency | 新 class, **not_mechanizable**（不變） |
+| F16 | document-todo-list | 新 class, **behavioral_only**, 3 hard + 4 recommended |
+| F17 | goal-action-validation | 加進 `conversation_goal_ledger.source_files`（不變） |
+| F18 | prompt-cache-efficiency | 新獨立 class, **not_mechanizable**（不變） |
+| **F19** | validation-scenario-governance | **改 `pending_implementation`**, child_plan 指向新 stub plan 0100 (T1) |
+| F20 | decision-promotion-pipeline | 新 class, **behavioral_only**, `upstream_classes: [failure_learning_system]`（不變） |
+| F21 | directory-structure-governance | 新 class, **behavioral_only**, 3 hard + 4 recommended |
+| **F22** | knowledge-update-flow | **加進 `linked_updates.source_files`**（T6 回歸） |
+
+**Schema 變更 round-4 增量**（取代 round-3 部分定義）：
+
+- `coverage_status_spec.behavioral_only.requires`：縮減為 3 個 hard required（rationale / sunset_decision.revisit_when / sunset_decision.success_criteria）
+- `coverage_status_spec.behavioral_only.recommended`：新增區塊，列 4 個 recommended 欄位
+- `baseline_snapshot` schema 加 `baseline_owner` + 每筆 entry 加 `baseline_review_summary`
+- `upstream_classes` 設計凍結（不加新欄位）
+
+**Lint 變更 round-4 增量**（取代 round-3 部分定義）：
+
+- `behavioral_only_missing_rationale`：保留 (P0)
+- `behavioral_only_missing_revisit_owner`：**降 warning**（從 fail）
+- `behavioral_only_missing_last_reviewed_at`：**降 warning**
+- `behavioral_only_review_age`：保留 (P0)
+- `behavioral_only_vague_success_criteria`：保留 (P0 黑名單)
+- `behavioral_only_missing_measurable_signal`：**降 warning** (T3)
+- `behavioral_only_missing_review_summary`：**降 warning** (recommended 而非 required)
+- `behavioral_only_review_summary_too_short`：**移除**（recommended 欄位不需 length lint）
+- `behavioral_only_revisit_chain`：保留 (P0, 只看 depends_on_rule_classes)
+- `upstream_chain_resolution` + cycle detect：保留 (P0)
+- `class_size_review_threshold`：保留 (warning)
+- `baseline_snapshot_drift`：保留
+- `baseline_snapshot_missing_governance`：**新增 (P0)** (T4)
+
+**最終 lint check 統計**：round-3 的 12 個 → round-4 的 12 個（替換 3 個降級 + 移除 1 個 + 新增 1 個）；P0 fail 從 round-3 的 7 個 → round-4 的 6 個（更精準、更少假陽性）。
+
+**執行順序（10 步維持，內容更新）**：
+
+- Step 0（新增）：寫 ADR `ADR-XXX-registry-as-governance-dag.md`（T5 freeze decision）+ 寫 F19 stub child plan
+- Step 1：Schema patch（round-4 內容覆寫 round-2/3 部分定義）
+- Step 2：Lint patch（12 個 check，round-4 精度版）
+- Step 3-10：原 round-2 步驟不變
+
+**Open Question 更新**：
+
+| # | Question | 處置 |
+|---|---|---|
+| Q12 | upstream_classes 是否升 DAG schema？ | **resolved (round-4 T5)**: freeze，維持單一向上引用 + cycle detect；ADR 鎖定決策 |
+| Q13 | F19 何時 promote 到 pending？ | **resolved (round-4 T1)**: 立即 promote 至 pending_implementation，stub child plan 0100 已開 |
+| Q14 | last_review_summary 是否需 diff 驗證？ | open，但因 last_review_summary 降為 recommended，治理需求降低；列 future 增強 |
+| Q15 | measurable_signal 中文 i18n？ | resolved (round-3) — round-4 後 measurable_signal 已降 warning，i18n 影響更小 |
+| Q16 | behavioral_only 是否該再分層（lightweight vs strict tier）？ | open: round-4 暫採 single tier + 3 hard + 4 recommended；若未來 recommended 欄位仍持續長出，考慮拆 tier |
+
+**為什麼 round-4 是重要的回頭路**：
+
+Round-2/3 一直在加 lint / 加 schema 欄位，是「治 symptom」。Round-4 認識到 root cause：
+
+- behavioral_only 想做「輕量例外」但被當「正式 coverage 類型」治理 → 解法是治理強度退階，恢復例外語意
+- F19 想做「pending_implementation」但因不想開 plan 改塞 behavioral_only → 解法是開 stub plan，分類反映真實狀態
+- upstream_classes 演化軌跡是 DAG → 解法是 ADR freeze 鎖定 scope，避免溫水煮青蛙
+
+**這三條都不是欄位問題，是結構性方向錯誤的修正**。Round-4 應該是本 plan 的 final design baseline；之後若再有 round-5+，應觸發 governance review「為什麼這個 plan 需要 5 輪以上 review」（meta-failure-pattern signal）。
+
 #### 原 pseudo-implementation（保留作為設計參考）
 
 在 `scripts/ai-skill-cli/internal/compile/`（或既有 compile pipeline）加 lint pass：
