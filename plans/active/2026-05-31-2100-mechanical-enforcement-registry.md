@@ -455,6 +455,50 @@ runtime_metrics_spec:
 
 ### Phase 3 — Compile-time Lint
 
+**Status (2026-05-31)**: Lint 已實作於 [`scripts/ai-skill-cli/internal/app/enforcement_registry_lint.go`](../../scripts/ai-skill-cli/internal/app/enforcement_registry_lint.go) + unit tests + scenario-shaped fail/pass coverage（全部 PASS）。**尚未** wire 進 `ai-skill runtime compile` —— 等下方 Findings backfill 與 user 確認後再 wire（避免 main branch 被破壞）。
+
+#### Phase 3 Dry-Run Findings (2026-05-31)
+
+Lint dry-run（registry 未 backfill 狀態）surface **22 findings**：17 個 `orphan_rule` + 5 個 `orphan_executor`。零 `behavioral_only_incomplete_sunset`、零 `missing_executor_symbol`、零 `deprecated_*`。
+
+**Auto-classified（bulk 1-case 建議；待 user 確認後 backfill）**：
+
+| # | Finding | 類型 | 建議處置 |
+|---|---|---|---|
+| F1 | `runtime/cognitive-modes-token-budget.yaml` orphan_rule | bulk | 加進 `cognitive_mode_governance.source_files`（已有 7 個 cognitive-modes-* yaml，少了這一個 token-budget 同源） |
+| F2 | `governance/ai-runtime-governance/linked-update-governance.yaml` orphan_rule | bulk | 加進 `linked_updates.source_files`（同主題） |
+| F3 | `governance/lifecycle/executable-contract-boundary.yaml` orphan_rule | bulk | 加進 `runtime_yaml_projection.source_files`（同主題：yaml ↔ runtime.db projection 邊界） |
+| F4 | `governance/lifecycle/executable-contract-inventory.yaml` orphan_rule | bulk | 加進 `runtime_yaml_projection.source_files`（同主題） |
+| F5 | `enforcement/neutral-language.yaml` orphan_rule | bulk | 新增 rule_class `neutral_language` coverage=`not_mechanizable`（與 `tool_neutral_documentation` 同類，writing judgement） |
+| F6 | `enforcement/feedback-lessons.yaml` orphan_rule | bulk | 加進 `failure_learning_system.source_files`（feedback lessons 屬該系統） |
+| F7 | `validateStopHookFinalTexts` orphan_executor | bulk | 加進 `internal_helper_allowlist`（plural 是 singular `validateStopHookFinalText` 的 collector helper，已綁定於 `dirty_repo_close_loop`） |
+| F8 | `runHooks` orphan_executor | bulk | 加進 `internal_helper_allowlist`（是 `ai-skill hooks` CLI 入口 router，不是執行規則的 executor；類比 `runRuntime`/`runDoctor`） |
+| F9 | `runPostToolUseHook` orphan_executor | bulk | 加為 `bootstrap_integrity.executors[]`（hook_dispatcher_entry, PostToolUse, warn）——目前已主動 emit Bootstrap Receipt reminder） |
+| F10 | `runPreCommitHook` orphan_executor | bulk | 加為 `shell_script_governance.executors[]`（hook_dispatcher_entry, pre-commit；目前該 class 只列被 dispatch 的 validator，少了 dispatcher 自己） |
+| F11 | `runUserPromptSubmitHook` orphan_executor | bulk | 加為 `bootstrap_integrity.executors[]`（hook_dispatcher_entry, UserPromptSubmit, warn）—— Phase 5.x ADR 草稿已預示這條 |
+
+**待 user 裁決（11 條 orphan_rule 沒有明顯歸屬）**：
+
+每條都需要 user 回覆「歸屬哪個 rule_class」或「新增 rule_class」或「mark deprecated」。
+
+| # | yaml | 可能歸屬 | 開放問題 |
+|---|---|---|---|
+| F12 | `enforcement/authorization-scope.yaml` | 新 class `authorization_scope` (mechanical? behavioral_only?) | 是否有 executor 對 sanitization 旁的 authorization 範圍做檢查？若無 → behavioral_only + sunset |
+| F13 | `enforcement/content-layering.yaml` | 加進 `document_sizing.source_files` OR 新 class | 是 document_sizing 的姊妹（layering vs. sizing），同 class 或拆？ |
+| F14 | `enforcement/cross-skill-references.yaml` | 新 class behavioral_only | sunset trigger 寫什麼？ |
+| F15 | `enforcement/decision-efficiency.yaml` | 新 class behavioral_only OR not_mechanizable | 效率判斷無客觀 metric → 傾向 not_mechanizable |
+| F16 | `enforcement/document-todo-list.yaml` | 新 class behavioral_only | 是否有可機械化的「TODO 表存在」lint？目前無 → behavioral_only |
+| F17 | `enforcement/goal-action-validation.yaml` | 新 class behavioral_only | 與 `conversation_goal_ledger` 是否合併？ |
+| F18 | `enforcement/prompt-cache-efficiency.yaml` | 新 class behavioral_only | 同 decision-efficiency 屬於 P3 efficiency；可否合併成單一 `efficiency_governance` class？ |
+| F19 | `governance/ai-runtime-governance/validation-scenario-governance.yaml` | 新 class | validation scenario 治理目前無 executor → behavioral_only 還是 pending_implementation（child plan 建立 scenario lint）？ |
+| F20 | `governance/lifecycle/decision-promotion-pipeline.yaml` | 新 class behavioral_only | 與 `failure_learning_system` 是否合併？ |
+| F21 | `governance/lifecycle/directory-structure-governance.yaml` | 新 class | 目錄結構治理：有 executor 嗎？若無 → behavioral_only |
+| F22 | `governance/lifecycle/knowledge-update-flow.yaml` | 加進 `linked_updates.source_files` OR 新 class | 與 linked_updates 同源還是獨立流程？ |
+
+**下一步**：等 user 對 F1-F11 bulk 建議 + F12-F22 個別裁決後，agent backfill registry yaml → re-dry-run 直到 PASS → wire 進 `ai-skill runtime compile` → rebuild 5 platform binaries → commit + push + readback.
+
+#### 原 pseudo-implementation（保留作為設計參考）
+
 在 `scripts/ai-skill-cli/internal/compile/`（或既有 compile pipeline）加 lint pass：
 
 ```go
