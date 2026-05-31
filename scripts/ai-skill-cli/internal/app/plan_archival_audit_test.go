@@ -19,11 +19,27 @@ func TestFindArchivedPlansDetectsMove(t *testing.T) {
 	}
 }
 
-func TestFindArchivedPlansIgnoresAddWithoutDelete(t *testing.T) {
+// Regression: `git diff --cached --name-only` collapses rename to the new
+// path only, so the old paired-detection silently let real archives through.
+// Plan archive via git mv must now trigger the validator from the archived
+// path alone (verified against commit 83bd25d which archived a plan with
+// 16 unchecked items undetected on 2026-05-30).
+func TestFindArchivedPlansDetectsRenameOnly(t *testing.T) {
 	staged := []string{"plans/archived/my-plan.md"}
 	got := findArchivedPlans(staged)
-	if len(got) != 0 {
-		t.Errorf("expected no match when active not deleted, got %v", got)
+	if len(got) != 1 || got[0] != "plans/archived/my-plan.md" {
+		t.Errorf("expected rename-only archived path to be detected, got %v", got)
+	}
+}
+
+// Modifying an already-archived plan is also now in scope — keeps the gate
+// from being bypassed by "archive empty plan, then fill it with unchecked
+// items in a follow-up commit".
+func TestFindArchivedPlansDetectsPostArchiveEdit(t *testing.T) {
+	staged := []string{"plans/archived/my-already-archived-plan.md"}
+	got := findArchivedPlans(staged)
+	if len(got) != 1 {
+		t.Errorf("expected post-archive edit to be detected, got %v", got)
 	}
 }
 

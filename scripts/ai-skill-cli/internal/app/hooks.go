@@ -2575,26 +2575,22 @@ func planDiffFlipsCheckbox(diff string) bool {
 	return false
 }
 
-// findArchivedPlans returns the paths of plans/archived/*.md files in staged
-// whose basename also appears as a deletion of plans/active/*.md — i.e. a
-// file-move that constitutes an archival action. Pure Go, no shell dependency.
+// findArchivedPlans returns the paths of plans/archived/*.md files present in
+// the staged set. Any archived plan touched in this commit — whether moved
+// in (rename), added fresh, or modified — must pass the unchecked-item audit.
+//
+// History: an earlier version required a paired plans/active/X.md deletion
+// to trigger, but `git diff --cached --name-only` collapses renames to the
+// new path only, so paired detection silently missed every real archive
+// (verified 2026-05-31 against commit 83bd25d which archived a plan with
+// 16 unchecked items undetected). Simplified to gate on archived-side
+// presence; covers archives via rename, archives via add, and post-archive
+// edits that should not leave unchecked items lingering.
 func findArchivedPlans(staged []string) []string {
-	activeDeleted := map[string]bool{}
-	archivedAdded := map[string]bool{}
-	for _, s := range staged {
-		if strings.HasPrefix(s, "plans/active/") && strings.HasSuffix(s, ".md") {
-			base := strings.TrimPrefix(s, "plans/active/")
-			activeDeleted[base] = true
-		}
-		if strings.HasPrefix(s, "plans/archived/") && strings.HasSuffix(s, ".md") {
-			base := strings.TrimPrefix(s, "plans/archived/")
-			archivedAdded[base] = true
-		}
-	}
 	var result []string
-	for base := range archivedAdded {
-		if activeDeleted[base] {
-			result = append(result, "plans/archived/"+base)
+	for _, s := range staged {
+		if strings.HasPrefix(s, "plans/archived/") && strings.HasSuffix(s, ".md") {
+			result = append(result, s)
 		}
 	}
 	return result
