@@ -94,11 +94,27 @@ Parent plans 的 2 個切分 pilot + 1 個 no-split 反向證據 + 1 個 scheme 
 
 ## Future Considerations（不阻擋 Accepted；列為已 deferred 的明確項）
 
-- **Surface rename sweep**：採用 `execution surface` / `evidence surface` 為對外詞彙的 file rename（例如 `surgical-changes.md` → `surgical-changes-surface.md`）。延後至 `cognitive_slice` glossary entry 經 3+ contributor 使用後再評估；當前 file 名仍用 slice / 主題名
-- **Analysis/travel sources-and-tools 二次 probe**：Parent plan Scenario G 標 `SPLIT_CONDITIONALLY`，等第二類旅遊任務（urban walking + 公共交通）真實出現再 probe；如 utilization < 50% 才升 split candidate
-- **Analysis/apk frida-hook-flow / media-hls-analysis-flow probe**：Parent plan §Phase 4 Extension 標 defer；等真實單獨任務觸發再 probe，不為形式完整補測
-- **Slice schema 機械驗證 validator**：目前 placement predicate 為文件規則 + scenario fixture 驗證；未來可加 commit-msg validator 機械檢查新 slice header 欄位完整、`evidence_refs` ≥ 2 for intelligence。視 contributor 誤放頻率決定優先序
-- **Aggregate-economy 量化追蹤**：apk-analysis Phase 4 acceptance retrospective 採 weighted task-mix（65/15/20）；未來若有 telemetry / fitness signal 可實測 task distribution 並調整加權
+每個 deferred item 列 `Trigger to revisit`（觸發再評估的明確條件）+ `Owner at revisit`（誰應該推動），讓任何後續 contributor 讀到時能機械判斷「現在該不該做」，不依賴主動 review。
+
+- **Surface rename sweep**：採用 `execution surface` / `evidence surface` 為對外詞彙的 file rename（例如 `surgical-changes.md` → `surgical-changes-surface.md`）。當前 file 名仍用 slice / 主題名。
+  - **Trigger to revisit**: `knowledge/glossary/ai-skill.md` 的 `cognitive_slice` entry 經 **≥ 3 個非本系列 contributor / session-series** 引用後，且 `slice` 詞彙在新文件中造成「arbitrary chunk / static partition」誤解被觀察到 **≥ 2 次**。
+  - **Owner at revisit**: 觸發 contributor，開新 rename plan（會牽動 governance taxonomy §7 / §7.5 / 多 routing-registry loading_surfaces / 多 scenario fixtures）。
+
+- **Analysis/travel sources-and-tools 二次 probe**：Parent plan Scenario G 標 `SPLIT_CONDITIONALLY`。
+  - **Trigger to revisit**: 真實 **urban walking + 公共交通** 旅遊任務出現，且在該任務中 `analysis/travel/sources-and-tools.md` 載入 **utilization < 50%**（per Scenario G `proposed_action`）。
+  - **Owner at revisit**: 該真實任務的 session agent，按 Scenario G 模板寫第二份 probe fixture；如 utilization 持續 ≥ 50% 則維持 NO_SPLIT。
+
+- **Analysis/apk frida-hook-flow / media-hls-analysis-flow probe**：Parent plan §Phase 4 Extension 標 defer；不為形式完整補測。
+  - **Trigger to revisit**: 真實任務**單獨**觸發 frida-hook-flow.md 或 media-hls-analysis-flow.md（即兩者非與其他 apk surfaces 同批載入），且該 surface 載入 utilization < 50%。
+  - **Owner at revisit**: 該真實任務的 session agent。
+
+- **Slice schema 機械驗證 validator**：目前 placement predicate 為文件規則 + scenario fixture 驗證；未來可加 commit-msg validator 機械檢查新 slice header 欄位完整、`evidence_refs` ≥ 2 for intelligence。
+  - **Trigger to revisit**: 觀察到 contributor **誤放案例 ≥ 月 1 次**（intelligence 升層無 evidence_refs、slice 缺 schema 欄位、type 用了非 4 種 primary）。Tracking 由 `plans/active/2026-05-31-2100-mechanical-enforcement-registry.md` 的 Coverage Report 自然覆蓋。
+  - **Owner at revisit**: P1 mechanical-enforcement-registry plan owner（不在本 ADR scope）。
+
+- **Aggregate-economy 量化追蹤**：apk-analysis Phase 4 acceptance retrospective 採 weighted task-mix（65/15/20）；未來若有 telemetry / fitness signal 可實測 task distribution。
+  - **Trigger to revisit**: `plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md` 落地後，telemetry infrastructure 提供 task-mix distribution 實測數據。
+  - **Owner at revisit**: Gen 4 fitness plan owner；本 ADR 的 65/15/20 加權僅為 weighted estimate，replace 時無需 supersede ADR-009（屬 retrospective 數據 refinement）。
 
 ## Validation Evidence
 

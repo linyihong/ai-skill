@@ -81,6 +81,7 @@ anti-meaning: >
 introduced-by: plans/archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md
 promoted-at: 2026-05-30 (after Phase 4 validation A/B/C/D/E all PASS proving taxonomy stability)
 formalized-in: constitution/ADR-009-cognitive-slice-taxonomy.md (Accepted 2026-05-31)
+deferred-items-tracker: constitution/ADR-009-cognitive-slice-taxonomy.md §Future Considerations (each item has explicit Trigger to revisit + Owner at revisit)
 ```
 
 ## compression
