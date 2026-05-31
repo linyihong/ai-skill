@@ -1,10 +1,11 @@
 # Workflow Activation Engine
 
-**Status**: `draft-v7`
+**Status**: `draft-v8`
 **世代**：Gen 3 runtime hardening（systemic gap remediation）— **meta-pattern 的第一個 instance**
 **建立日期**：2026-05-31
-**最後更新**：2026-05-31（v7 — 標記為 `mechanical-enforcement-registry` parent plan 的 instance；Q11 新增 sunset_decision binding）
-**Parent meta-plan**：[`2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) — 本 plan 屬「Rule Exists, Executor Missing」meta-pattern 的個案修補；parent plan 把模式變成 framework invariant。本 plan 完成後 binding 寫入 `enforcement-registry.yaml` `bindings[workflow_activation]`。
+**最後更新**：2026-05-31（v8 — parent plan v2 升為 P1，本 plan 改 P2；coverage class `workflow_activation` 統一綁定；v7 Q11 已 resolve）
+**Priority**：**P2**（v8 起）—— parent plan `mechanical-enforcement-registry` 為 P1，因其 Coverage Report 會在本 plan 進入 implementation 時強制 lint pass；先做 parent meta，再做本 instance 風險最低。
+**Parent meta-plan**：[`2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) — 本 plan 屬「Rule Exists, Executor Missing」meta-pattern 的個案修補；parent plan 把模式變成 framework invariant。本 plan 完成後 entry 由 `rule_classes[workflow_activation].coverage` 從 `pending` 改 `mechanical`。
 **Empirical trigger**：2026-05-31 session — agent 對一筆 `route.workflow.travel-planning` 範圍的 user 任務跑 review。任務輸入命中該 route 三軸全部訊號（`user_signals` / `context_signals` / 後續會 Read 到的 `artifact_signals`），但 workflow 從未被啟動。使用者連續三次追問才暴露此 gap。具體 project incident（filename / 對話片段 / 領域 artifact 範例）依 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) 留在原 project 文件，不寫入本可重用 plan。
 
 > 本 plan 不修 travel-planning 個案，而是補齊 **Workflow Activation Engine** ——目前 framework 第一次形成「Registry ✓ + Rules ✓ + Docs ✓ + **Activation Engine ✗**」閉環的缺角。

@@ -1,9 +1,10 @@
 # Mechanical Enforcement Registry
 
-**Status**: `draft`
+**Status**: `draft-v2`
 **世代**：Gen 3 runtime hardening（**meta-pattern**：framework-level invariant，非個案修補）
 **建立日期**：2026-05-31
-**最後更新**：2026-05-31（initial draft）
+**最後更新**：2026-05-31（v2 — 整合 round-7 評審：Layer 2.5 framing、Rule Class 取代 rule-level binding、新增 `not_mechanizable` coverage status、priority 反轉為 P1）
+**Priority**：**P1**（v2 起，從原 P2 提升）—— 完成本 plan 後，兩個 child plan 重啟時會被本 plan 的 coverage lint 強制回答 "mechanical / behavioral_only / not_mechanizable / pending" 問題，從根本上預防未來同模式 bug
 
 **Child plans (instances of this meta-pattern)**：
 - [`2026-05-31-1900-workflow-activation-engine.md`](2026-05-31-1900-workflow-activation-engine.md) — sanitizes & operationalizes `routing-registry.yaml` rules with `detector.go` executor
@@ -44,9 +45,28 @@
 
 正確 fix：**讓 framework 自己回答**「目前有哪些規則存在，但沒有對應的 runtime executor？」這就是本 plan。
 
+### Architectural Framing — Missing Layer 2.5
+
+第七輪評審指出 Ai-skill 既有架構是三層：
+
+```
+Layer 1  Knowledge       (enforcement/, governance/, workflow/, ...)
+Layer 2  Runtime         (scripts/ai-skill-cli/, hooks.go, runtime.db)
+Layer 3  Governance      (constitution/, architecture/, plans/)
+```
+
+但缺一層：
+
+```
+Layer 2.5  Coverage Verification   ← NEW (本 plan 建立)
+            Rule ←binding→ Executor 的結構性驗證層
+```
+
+沒有 Layer 2.5 就沒有「rule 寫好、executor 沒接」的結構性偵測機制，所有此類 bug 必須等使用者發現。本 plan 不是「補一個 executor」（child plan 的工作），而是**建立 Layer 2.5 本體**。
+
 ### Decision
 
-建立 **Mechanical Enforcement Registry** + **Coverage Audit** + **Compile-time Lint**：
+建立 **Mechanical Enforcement Registry**（**Rule Class 級**，**非 rule instance 級**）+ **Coverage Report** + **Compile-time Lint**：
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -81,10 +101,11 @@
 
 | Decision | Rationale |
 |---|---|
-| **Rule 與 Executor 雙向 binding**（registry entry 必含兩端） | Rule 沒 executor → 規則只是文本；executor 沒 rule → 行為無 governance 依據。雙向都列才能 audit |
-| **顯式 `behavioral_only: true` 是合法宣告，但需 rationale + sunset_decision** | 不是所有規則都該機械強制（e.g., 軟性語氣建議）。但 behavioral 必須是主動選擇，不是預設遺漏。每條 behavioral_only 要回答「為什麼不機械化」與「何時 revisit」 |
-| **Compile-time lint，非 runtime lint** | `ai-skill runtime compile + refresh` 跑 lint，任何 registered rule 沒對應 executor 直接 compile fail。讓問題出現在「我加新 rule」當下，而非「使用者半年後追問」 |
-| **CLI: `ai-skill enforcement coverage`** | 列當前覆蓋率 + 列舉所有 `behavioral_only: true` 條目 + 列舉所有「rule 存在但 registry 沒 entry」的孤兒。Audit 工具不只用於 lint，也用於 framework health dashboard |
+| **Rule Class 級 binding，非 rule instance 級**（v2 採納評審 #2） | 22 條 `obligation.commit.*` 不應產生 22 條 binding entries；都綁同一個 dispatcher 變成 registry 自我膨脹。改用 `rule_class` 抽象：sanitization / workflow_activation / bootstrap_integrity / routing / commit_governance / discovery / ... 估計 ~20-25 個 class，registry 規模可控 |
+| **4-value coverage enum**（v2 採納評審 #3） | `mechanical` / `behavioral_only` / **`not_mechanizable`** / `pending`。`not_mechanizable` 是 v2 新增的關鍵狀態 —— 隔離「永遠不該機械化」（如主觀寫作品質）與「現在沒機械化但應該機械化」，避免 review queue 永遠塞著無解項目 |
+| **`behavioral_only` 與 `not_mechanizable` 各自要求不同 metadata** | `behavioral_only` 需 `rationale` + `sunset_decision`（何時 revisit）；`not_mechanizable` 需 `rationale` + `objective_validation_impossible_because`（為何永遠不可機械化）。不同 metadata 強制不同思考深度 |
+| **Compile-time lint，非 runtime lint** | `ai-skill runtime compile + refresh` 跑 lint，任何 registered rule_class 缺 coverage 宣告直接 compile fail。讓問題出現在「我加新 rule」當下，而非「使用者半年後追問」 |
+| **CLI `ai-skill enforcement coverage` 是主要產出**（v2 評審 #4 強調） | 不只 audit 既有狀態，更重要的是**強制新規則寫作者回答 coverage 問題**。Phase 4 不是錦上添花，是 framework invariant 真正落地的地方 |
 | **不重寫既有 rule**，只加 binding 層 | 既有 enforcement / runtime / governance markdown + yaml 不動，registry 是 cross-cutting 索引。降低 risk |
 
 ### 為什麼這個 plan 比 child plans 更重要
@@ -119,105 +140,205 @@
 - [ ] 確認既有 `enforcement/`、`runtime/`、`governance/` 的 yaml 是否都已有 stable id field 可作為 registry key
 - [ ] 確認 `hooks.go` validator dispatcher 已有可枚舉的 registry 結構（已知有 11+ commit-msg validators 註冊）
 
-### Phase 1 — 既存 Rule / Executor Inventory（discovery 階段）
+### Phase 1 — Rule Class 識別（**v2 改：不是 instance audit**）
 
-跑一次手動 audit 列出當前狀態：
+第七輪評審指出原 v1 Phase 1 計畫掃 150+ rule instance 是 maintenance trap。v2 改為**識別 rule class**（~20-25 個），每個 class 含多個 instance 但共用 binding。
 
-#### Phase 1.1 — 列舉所有「規則來源」
+#### Phase 1.1 — 從 source 抽 rule class
 
-掃 `enforcement/*.yaml`、`runtime/*.yaml`、`governance/*.yaml`、`routing-registry.yaml`、`*.md` 內聲明的 `obligation.*` / `gate.*` / `rule.*` / `activation_*` id。產出：`enforcement/inventory/rules.yaml`（暫存 audit 結果）。
+逐目錄盤點，把所有 rule instance 歸類為 ~24 個 class：
 
-預估數量：
-- `runtime/core-bootstrap.yaml` per_session / per_turn / per_commit obligations：~22
-- `runtime/runtime.db` obligations / gates：23 + 25 = 48
-- `routing-registry.yaml` route activation：57（其中 7 條有 triggers）
-- `enforcement/sanitization.md` banned content categories：5
-- 其他 enforcement rules：估 ~30+
-- 總計：~150+ 規則項
+| 候選 rule_class | source patterns | 預估 instance 數 |
+|---|---|---|
+| `bootstrap_integrity` | `runtime/core-bootstrap.yaml` per_session_obligations | 1 |
+| `cognitive_mode_governance` | `runtime/cognitive-modes*.yaml`、per_turn_obligations | 1-3 |
+| `commit_governance` | per_commit_obligations 全部（19 個 validator） | 19 |
+| `workflow_activation` | `routing-registry.yaml` activation_triggers | 57 routes × 3 軸 |
+| `capability_discovery` | `governance/lifecycle/capability-discovery-philosophy.md` | 1 |
+| `sanitization` | `enforcement/sanitization.yaml`（待建） | N patterns |
+| `dependency_reading` | `enforcement/dependency-reading.md` 依賴表 | 多條 mapping |
+| `linked_updates` | `enforcement/linked-updates.yaml` writeback gates | 1+ |
+| `rule_weight` | `enforcement/rule-weight.md` P0/P1/P2/P3 | 1（policy 級） |
+| `conversation_goal_ledger` | `.agent-goals/` lifecycle | 1 |
+| `document_sizing` | `governance/document-sizing.md` | 1 |
+| `tool_neutral_documentation` | `enforcement/tool-neutral-documentation.md` | 1 |
+| `reusable_guidance_boundary` | `enforcement/reusable-guidance-boundary.md` | 1 |
+| `failure_learning_system` | `enforcement/failure-learning-system.md` | 1 |
+| `glossary_governance` | glossary system | 1 |
+| `plan_governance` | `plans/README.md`、archival 規則 | 1+ |
+| `evidence_hierarchy` | `enforcement/evidence-hierarchy.yaml` | 1 |
+| `routing_registry_evolution` | route candidate proposals | 1 |
+| `ontology_consistency` | route_type 等分類規則 | 1 |
+| `bootstrap_entry_thinness` | bootstrap entry 規範 | 1 |
+| `runtime_yaml_projection` | yaml ↔ runtime.db projection 規則 | 1 |
+| `cli_doc_sync` | CLI ↔ doc sync | 1 |
+| `markdown_yaml_sync` | md ↔ yaml sibling sync | 1 |
+| `intelligence_classification` | intelligence/analysis activation_mode | 1 |
 
-#### Phase 1.2 — 列舉所有「執行器」
+**預估 24 個 rule_class**（最終視盤點而定）。每個 class 一條 registry entry，不是每個 instance 一條。
 
-掃 `scripts/ai-skill-cli/internal/app/hooks.go` + `runtime/*`：所有 validator 函式、所有 PreToolUse hook、所有 SessionStart hook、所有 commit-msg validator。
+#### Phase 1.2 — Executor 盤點
 
-預估：~30 個 executor symbol。
+掃 `scripts/ai-skill-cli/internal/app/hooks.go` 等 runtime code，列每個 executor symbol。**重要**：以 dispatcher 或 hook handler 級為粒度，不展開內部 helper。預估 ~25-30 個外部可見 executor。
 
-#### Phase 1.3 — 第一次 Coverage Matrix（揭發現況）
+#### Phase 1.3 — 第一次 Coverage Matrix
 
-每條 rule 標記：
-- `bound` — registry 有 binding 且 executor 存在
-- `orphan_rule` — rule 存在但無 executor（這次 session 暴露的 5+ 個都屬此類）
-- `orphan_executor` — executor 存在但無對應 rule（規則文本可能 stale）
+每個 rule_class 標記 4-value coverage status：
+- `mechanical` — 已有 executor 且 enforcing
+- `behavioral_only` — 故意不機械化，需 `rationale` + `sunset_decision`
+- `not_mechanizable` — 永遠不該機械化（主觀 / 無客觀 validation），需 `rationale` + `objective_validation_impossible_because`
+- `pending` — 應該機械化但尚未實作，需指向 implementation plan
 
-Coverage matrix 作為 Phase 2 binding 工作的基礎。預計 orphan_rule 比例 ≥ 30%。
+預估 v1 分布（待 Phase 1.3 確認）：
+- mechanical: ~10（包含已實作的 bootstrap_receipt、commit_governance 等）
+- behavioral_only: ~4
+- not_mechanizable: ~2-3
+- pending: ~7-8（含 workflow_activation、sanitization、capability_discovery 等）
 
-### Phase 2 — 建立 `enforcement-registry.yaml`
+remoteness 從原 v1「掃 150+ rule + 70% orphan」變成「~24 class + 約 1/3 pending」，可管理。
 
-定義 binding schema：
+### Phase 2 — 建立 `enforcement-registry.yaml`（rule_class 級）
 
 ```yaml
 # enforcement/enforcement-registry.yaml
-schema_version: 1
-bindings:
-  - id: bootstrap_receipt
-    rule_source: runtime/core-bootstrap.yaml#per_session_obligations[obligation.bootstrap.receipt]
-    executor:
-      file: scripts/ai-skill-cli/internal/app/hooks.go
-      symbol: validateBootstrapReceiptPresent
-      hook_phase: PreToolUse
-    enforcement_layer: mechanical
-    block_or_warn: block
-    rationale: |
-      Receipt 是 session integrity 的 anchor。bypass 會讓 agent 跳過必讀
-      規則。歷史上 SessionStart hook 注入完整 receipt 反而讓 agent 抄
-      placeholder，因此採用 read-log gate 機械強制。
+schema_version: 2          # v2: rule_class 級而非 rule instance 級
 
+rule_classes:
+  # ─── coverage: mechanical ──────────────────────────────────────
+  - id: bootstrap_integrity
+    coverage: mechanical
+    source_files:
+      - runtime/core-bootstrap.yaml#per_session_obligations
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateBootstrapReceiptPresent
+        hook_phase: PreToolUse
+        block_or_warn: block
+    rationale: |
+      Receipt 是 session integrity anchor，bypass 等同跳過必讀規則。
+
+  - id: commit_governance
+    coverage: mechanical
+    source_files:
+      - runtime/core-bootstrap.yaml#per_commit_obligations
+    executors:
+      # 注意：19 個 commit-msg validators 共用 dispatcher，registry 不展開列每個
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: runCommitMsgHook
+        hook_phase: commit-msg
+        instance_count: 19
+        block_or_warn: block
+    rationale: |
+      所有 commit 階段 obligation 由 runCommitMsgHook 統一 dispatch。
+      Rule_class 級 binding 避免 22 條 obligation.commit.* 各自一條 entry
+      導致 registry 膨脹。
+
+  # ─── coverage: pending (待 child plan 實作) ──────────────────
   - id: workflow_activation
-    rule_source: knowledge/runtime/routing-registry.yaml#activation_triggers
-    executor:
-      file: scripts/ai-skill-cli/internal/app/detector.go
-      symbol: DetectWorkflows
-      hook_phase: PreToolUse + RuntimeContext write
-    enforcement_layer: mechanical
-    block_or_warn: block_on_canonical_workflow_paths
-    status: pending  # 由 child plan workflow-activation-engine 實作
+    coverage: pending
+    source_files:
+      - knowledge/runtime/routing-registry.yaml#activation_triggers
+    executors_planned:
+      - file: scripts/ai-skill-cli/internal/app/detector.go
+        symbol: DetectWorkflows
+        hook_phase: PreToolUse + RuntimeContext write
+        block_or_warn: block
     child_plan: plans/active/2026-05-31-1900-workflow-activation-engine.md
+    target_promotion: child_plan Phase 3-5 完成後改 coverage=mechanical
 
   - id: sanitization
-    rule_source: enforcement/sanitization.yaml#banned_patterns + incident_score
-    executor:
+    coverage: pending
+    source_files:
+      - enforcement/sanitization.yaml
+    executors_planned:
       preflight:
-        file: scripts/ai-skill-cli/internal/app/hooks.go
         symbol: validateSanitizationOnWrite
-        hook_phase: PreToolUse
         block_or_warn: warn
       commit:
-        file: scripts/ai-skill-cli/internal/app/hooks.go
         symbol: validateSanitizationOnCommit
-        hook_phase: commit-msg
         block_or_warn: block
-    enforcement_layer: mechanical
-    status: pending
     child_plan: plans/active/2026-05-31-2000-mechanical-sanitization-validator.md
+    target_promotion: child_plan Phase 3 完成後改 mechanical
 
-  - id: capability_discovery_fallback
-    rule_source: governance/lifecycle/capability-discovery-philosophy.md
-    executor:
-      status: pending
-    enforcement_layer: behavioral_only
+  # ─── coverage: behavioral_only ───────────────────────────────
+  - id: capability_discovery
+    coverage: behavioral_only
+    source_files:
+      - governance/lifecycle/capability-discovery-philosophy.md
     rationale: |
-      Discovery 是「detector miss 後 fallback」的探索動作，不該每 turn 強制。
-      預設行為強制，等實作 detector 後再 binding。
-    sunset_decision: |
-      child_plan workflow-activation-engine Phase 6.1 完成後重新評估是否
-      mechanical。若新規模 ≥ 50 個 active route 時仍未 mechanical，重提
-      sunset review。
+      Discovery 是 detector miss 後 fallback 探索，per-turn 強制成本爆炸。
+      正確做法是 detector 完成後從 hooks 觸發，不獨立成 mechanical executor。
+    sunset_decision:
+      revisit_when: workflow_activation child plan Phase 6.1 land
+      revisit_owner: framework maintainer
+      success_criteria: |
+        Detector miss path 已能呼叫 Discovery 並產出 route_candidate_proposals.yaml；
+        屆時本 class 從 behavioral_only 改 mechanical（與 workflow_activation 共用 executor）
 
-  # ... (continue with all bindings discovered in Phase 1)
+  - id: rule_weight
+    coverage: behavioral_only
+    source_files:
+      - enforcement/rule-weight.md
+    rationale: |
+      P0/P1/P2/P3 排序需要在規則衝突情境下 case-by-case 判斷，
+      無 single mechanical rule 可實作。
+    sunset_decision:
+      revisit_when: 出現 ≥ 3 個可機械偵測的 P0 違反模式時
+      revisit_owner: governance maintainer
+      success_criteria: 為每個可偵測模式抽出獨立 rule_class 後，本 class 收斂為純策略文件
 
-behavioral_only_rules:
-  # 顯式列出「我們選擇不機械化」的規則，每條附 rationale + sunset_decision
-  - id: ...
+  # ─── coverage: not_mechanizable ──────────────────────────────
+  # (v2 新增 enum，回應評審 #3)
+  - id: tool_neutral_documentation
+    coverage: not_mechanizable
+    source_files:
+      - enforcement/tool-neutral-documentation.md
+    rationale: |
+      「文件是否中立」是寫作判斷，沒有可機械驗證的 boolean。
+      可寫 lint 找特定工具名稱，但「neutral writing 結構」整體無法
+      規約化。
+    objective_validation_impossible_because: |
+      Neutrality 涉及讀者預期、語境、隱性假設等主觀面向；機械 lint
+      只能抓表面 token，無法判斷 framing 是否 tool-neutral。
+
+  - id: rule_writing_quality
+    coverage: not_mechanizable
+    source_files:
+      - enforcement/conversation-goal-ledger.md（writing quality 部分）
+      - 其他規則的寫作品質
+    rationale: |
+      規則本身是否寫得清楚、是否易讀、是否避免歧義，無客觀 metric。
+    objective_validation_impossible_because: |
+      可讀性 metric（Flesch / 字數）只測表面，不測「規則是否真的能被 agent 正確理解」。
+      若強行機械化會獎勵 gaming metric 的爛規則。
+
+  # ... (continue for all ~24 rule_classes)
+
+# ─── 4-value enum schema ────────────────────────────────────
+coverage_status_spec:
+  mechanical:
+    requires: [executors[].symbol exists]
+    lint_behavior: source 變更須同步 executors[].symbol 存在
+  pending:
+    requires: [child_plan, target_promotion]
+    lint_behavior: child_plan 必須是 active plan 路徑
+  behavioral_only:
+    requires: [rationale, sunset_decision.revisit_when, sunset_decision.revisit_owner, sunset_decision.success_criteria]
+    lint_behavior: 缺任一欄位 → compile fail
+  not_mechanizable:
+    requires: [rationale, objective_validation_impossible_because]
+    lint_behavior: 缺任一欄位 → compile fail；附帶 governance review 時可挑戰是否真的 not_mechanizable
 ```
+
+**為什麼 4-value enum 而非 3-value**：
+- `behavioral_only` 隱含「應該但暫時沒做」 → review queue 有意義
+- `not_mechanizable` 表達「永遠不該做」 → review queue 應排除，避免 noise
+- 兩者塞同一桶會讓 review queue 永遠塞著無解項目，治理失靈
+
+產出：
+- [ ] schema v2 定稿（4-value enum + 對應 metadata requirements）
+- [ ] enforcement-registry.yaml 初版（~24 rule_classes 全部填）
+- [ ] companion `enforcement/enforcement-registry.md`（philosophy + Layer 2.5 framing + 寫作指南）
 
 產出：
 - [ ] schema 定稿（包含 `behavioral_only` field 與必填的 rationale / sunset_decision）
@@ -277,7 +398,9 @@ func LintEnforcementRegistry(reg EnforcementRegistry, repo Repo) []LintError {
 - [ ] `ai-skill runtime compile` 整合
 - [ ] 第一次 compile run 預期會列出大量 orphan_rule（Phase 1 inventory 已知 ≥ 30%）；不直接 block，先記為 warning + 寫進 Q1 review 清單
 
-### Phase 4 — CLI Coverage Report
+### Phase 4 — CLI Coverage Report（**v2: 本 plan 主要交付**）
+
+第七輪評審：「Registry 的最大價值不是 audit 既有，而是強制新規則作者回答 coverage 問題」。Phase 4 在 v2 升格為 primary deliverable。
 
 新增 `ai-skill enforcement coverage`：
 
@@ -285,29 +408,50 @@ func LintEnforcementRegistry(reg EnforcementRegistry, repo Repo) []LintError {
 $ ai-skill enforcement coverage
 Enforcement Coverage Report (2026-XX-XX)
 ═══════════════════════════════════════
-Total declared rules: 152
-  ├─ Mechanically enforced (bound):   38  (25%)
-  ├─ Behavioral_only (explicit):       7  ( 5%)
-  └─ Orphan rules (no binding):      107  (70%)  ⚠️
+Total Rule Classes: 24
 
-Executor coverage:
-  ├─ Active executors with bindings:   28
-  └─ Orphan executors (no rule):        3  ⚠️
+  ├─ Mechanical:        12  (50%)
+  ├─ Behavioral only:    5  (21%)  — explicit governance choice
+  ├─ Not mechanizable:   3  (12%)  — out of review queue
+  └─ Pending:            4  (17%)  — implementation in progress
 
-Top orphan rules by severity (P0/P1 first):
-  P0  obligation.commit.sanitization_diff   (sanitization plan pending)
-  P0  obligation.workflow.activation_evidence (workflow plan pending)
+Pending (active implementation plans):
+  workflow_activation   → plans/active/2026-05-31-1900-workflow-activation-engine.md
+  sanitization          → plans/active/2026-05-31-2000-mechanical-sanitization-validator.md
+  intelligence_classification → ...
+
+Behavioral_only awaiting sunset review:
+  capability_discovery  — revisit when: workflow_activation Phase 6.1 land
+  rule_weight           — revisit when: 3+ detectable P0 patterns surface
   ...
 
-Behavioral_only rules pending sunset review:
-  capability_discovery_fallback  — sunset: workflow-engine Phase 6.1
+Not_mechanizable (closed, will not appear in review queue):
+  tool_neutral_documentation  — subjective writing judgment
+  rule_writing_quality        — would game readability metrics
   ...
 ```
 
+**強制觸發場景**：
+
+| 場景 | Coverage report 行為 |
+|---|---|
+| 新增 `enforcement/<new-rule>.yaml` 但未在 registry 出現 | compile fail：`new rule class not registered` |
+| Registry 加新 entry 但漏寫 `coverage` field | compile fail：`missing coverage field` |
+| `coverage: behavioral_only` 但 `sunset_decision.success_criteria` 空白 | compile fail：`behavioral_only requires success_criteria` |
+| `coverage: not_mechanizable` 但 `objective_validation_impossible_because` 空白 | compile fail：`not_mechanizable requires impossibility rationale` |
+| 既有 mechanical class 的 executor symbol 在 hooks.go 找不到 | compile fail：`executor symbol missing` |
+| 新增 mechanical executor 但無對應 rule_class | compile warning：`orphan executor` |
+
+這意味未來任何新規則寫作者，在 compile 那一刻就被強制回答：
+> 「這條規則是 mechanical / behavioral_only / not_mechanizable / pending？」
+
+無法迴避、無法 silent leak、無法等使用者半年後追問。
+
 產出：
 - [ ] CLI subcommand 實作
-- [ ] 輸出格式（text + JSON）
+- [ ] 輸出格式（text + JSON + markdown for governance dashboards）
 - [ ] 文件化（README + ai-tools/agent reference）
+- [ ] CI integration：Pull Request 自動跑 coverage diff，新增規則沒填 coverage 直接 PR check 失敗
 
 ### Phase 5 — Bootstrap Integration
 
@@ -379,15 +523,29 @@ Behavioral_only rules pending sunset review:
 
 ---
 
+## v2 改動摘要（Round 7 評審整合）
+
+| # | 評審論點 | 採納 | 對應修改 |
+|---|---|---|---|
+| 1 | 既有架構缺 Layer 2.5 Coverage Verification | ✅ | Decision Rationale 新增 "Architectural Framing — Missing Layer 2.5" 章節 |
+| 2 | Rule instance 級 binding 會讓 registry 自我膨脹（150+ entries），改 Rule Class 級 | ✅ | Phase 1 全部重寫：從「audit 150+ rule」改「識別 ~24 rule_class」。Phase 2 schema 用 `rule_classes` 而非 `bindings`。`commit_governance` 一條 entry 涵蓋 19 個 commit-msg validator |
+| 3 | 新增 `not_mechanizable` coverage status，與 `behavioral_only` 區隔 | ✅ | coverage enum 從 3-value 升 4-value。各狀態有不同 metadata requirements：behavioral_only 要 `sunset_decision`，not_mechanizable 要 `objective_validation_impossible_because` |
+| 4 | 最大價值是 Coverage Report，不是 Registry 本身 | ✅ | Phase 4 升為 primary deliverable，加 6 個 compile-fail 條件確保新規則作者必須回答 coverage 問題 |
+| 5 | Priority 應 reorder，本 plan 升為 P1 | ✅ | Header 加 `Priority: P1`，並說明 child plans 完成本 plan 後重啟時會被 coverage lint 強制觸發完整 binding 宣告 |
+
+**Round 7 核心觀察（user 原話）**：
+> Registry 真正的價值在 Coverage Report —— 強制新規則作者回答「mechanical / behavioral_only / not_mechanizable / pending」。這才是把 "Rule Exists, Executor Missing" 從個案修補提升成框架級不變量。
+
 ## Source
 
-2026-05-31 session：使用者連續 6 輪追問 / 評審，依序暴露：
+2026-05-31 session：使用者連續 7 輪追問 / 評審，依序暴露：
 1. sqlite3 vs ai-skill CLI 認知偏差
 2. workflow activation gap
 3. Discovery vs Detector 混淆
 4. intelligence 預設 advisory 風險
 5. sanitization gate 自我觸發失敗
 6. **本 plan 對應**：以上 5 條共同根因是「Knowledge layer 有規則，Runtime layer 沒執行器」meta-pattern，建議建立 governance-level coverage audit
+7. **Round 7 v2 重構**：v1 寫成 rule instance 級 audit 是維護地獄；改 rule_class 級 + 4-value coverage enum + Coverage Report 為主要交付 + Priority 提升 P1
 
 User 原話（round 6）：
 > Ai-skill 現在最大的風險不是缺規則，而是「Rule Exists, Executor Missing」。

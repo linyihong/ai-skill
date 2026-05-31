@@ -1,12 +1,13 @@
 # Mechanical Sanitization Validator
 
-**Status**: `draft-v2`
+**Status**: `draft-v3`
 **世代**：Gen 3 runtime hardening（systemic gap remediation, 4th instance）
 **建立日期**：2026-05-31
-**最後更新**：2026-05-31（v2 — 整合第二輪評審：weighted incident_score、filesystem_reference 泛化、PreToolUse降級為 warn、明確 instance-of meta-plan）
+**最後更新**：2026-05-31（v3 — parent plan v2 升 P1，本 plan 改 P3；coverage class `sanitization` 統一綁定）
+**Priority**：**P3**（v3 起）—— parent meta-plan P1、sibling activation-engine P2、本 plan P3。順序理由：parent 建好 coverage lint 後，本 plan land executor 時 lint 自動觸發 promotion 流程。
 **Sibling plans**：
-- [`2026-05-31-1900-workflow-activation-engine.md`](2026-05-31-1900-workflow-activation-engine.md) — same pattern (rule-without-executor), 1st instance
-- [`2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) — **parent meta-plan**：把 "rule-without-executor" 系列 bug 從個案修補升級為 framework-level invariant（compile-time lint）。本 plan 是 meta-pattern 第二個顯式 instance。
+- [`2026-05-31-1900-workflow-activation-engine.md`](2026-05-31-1900-workflow-activation-engine.md) — same pattern (rule-without-executor), 1st instance (P2)
+- [`2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) — **parent meta-plan (P1)**：把 "rule-without-executor" 系列 bug 從個案修補升級為 framework-level invariant（compile-time lint）。本 plan 完成後 entry 由 `rule_classes[sanitization].coverage` 從 `pending` 改 `mechanical`。
 **Empirical trigger**：2026-05-31 session — agent 在寫 `workflow-activation-engine` plan v1-v4 期間，向 canonical Ai-skill repo 多次 Write/Edit canonical 文件，內容夾帶 project incident details（specific filename、user 對話片段、領域 artifact 字串）。`enforcement/sanitization.md` + `enforcement/reusable-guidance-boundary.md` 規則明擺著，使用者三次追問才暴露 gap，最終 v5 patch 才人工抹除。
 
 > 本 plan 不修個案 leak，而是補齊 **Mechanical Sanitization Validator** —— Ai-skill 第 4 個被識別出的「規則存在但無 mechanical executor」systemic gap。
