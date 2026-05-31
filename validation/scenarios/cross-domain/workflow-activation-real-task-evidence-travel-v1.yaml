@@ -1,0 +1,126 @@
+id: workflow-activation-real-task-evidence-travel-v1
+category: cross-domain
+version: v1
+type: real-task-rule-enforcement-evidence
+priority: P2
+source_plans:
+  - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md   # parent meta-plan: P1 — "rule exists, executor missing" pattern
+  - plans/active/2026-05-31-1900-workflow-activation-engine.md        # sibling: P2 — workflow_activation coverage class
+source_phase: evidence-collection
+
+# Real-task evidence captured 2026-05-31 from a Japan multi-day road-trip
+# planning task. Adds independent confirmation that the workflow_activation
+# meta-pattern (route signals matched, workflow not activated, artifact
+# gates not enforced) is reproducible on a SECOND route beyond the one
+# that originally triggered the P2 plan.
+#
+# Sanitization (per enforcement/sanitization.md + reusable-guidance-boundary.md):
+#   - No filename, owner, dates, place names, store names, lodging names,
+#     phone numbers, MapCodes, prefectures, or domain-specific artifact
+#     strings from the source planning doc are recorded here.
+#   - Only task SHAPE (route type, section count, scope) and
+#     RULE-VS-OUTPUT comparison COUNTS are kept.
+#
+# This fixture intentionally does NOT close the cognitive-slice taxonomy
+# work — that series is already closed via ADR-009 (Accepted 2026-05-31).
+# The findings here belong to the active P1/P2 evidence pool.
+
+given:
+  task_intent: "Multi-day overseas road-trip planning (5-day, 2-pax, ferry-in / drive / ferry-out, mixed sightseeing + dining + lodging)."
+  routing_entry_that_should_have_activated: route.workflow.travel-planning
+  routing_signals_matched:
+    - task_intent: travel
+    - task_intent: multi-day
+    - task_intent: road_trip
+    - user_signals: overnight_planning
+    - artifact_signal: day-by-day itinerary markdown produced
+  actual_workflow_activation: "not_observed_at_authoring_time"
+
+when:
+  action: "compare authored planning artifact against workflow/travel-planning/{execution-flow.md, artifact-gates.md} 17 sections + 19 required items"
+
+then:
+  expected_artifact_gates_satisfied: 19  # per workflow/travel-planning/artifact-gates.md §1 table
+  actual_satisfaction_distribution:
+    pass_full: 6        # Day-by-day frame, partial stop recommendations, MapCode coverage, pre-departure checklist, practical next actions, car-camping N/A
+    pass_partial: 6     # trip assumptions, feasibility notes, weather/season, transport plan, lodging recommendation, source labels
+    missing_outright: 7
+  missing_outright_items:
+    - item: "Travel agency / model-course benchmark notes"
+      maps_to_workflow_section: "execution-flow.md §3 旅行社與模型路線基準"
+    - item: "Confidence labels (confirmed / likely / needs day-before check / unknown)"
+      maps_to_workflow_section: "artifact-gates.md §1 #7"
+    - item: "Calendar / app-ready event notes"
+      maps_to_workflow_section: "execution-flow.md §14 + artifact-gates.md §1 #9"
+    - item: "Long-distance transport comparison (door-to-door time + total cost)"
+      maps_to_workflow_section: "execution-flow.md §7 + artifact-gates.md §1 #12"
+    - item: "Route-shape notes (one-way / loop / out-and-back check)"
+      maps_to_workflow_section: "execution-flow.md §10 + artifact-gates.md §1 #14"
+    - item: "Driving cost estimate (fuel / tolls / parking / ferry)"
+      maps_to_workflow_section: "artifact-gates.md §1 #17"
+    - item: "Road-trip support points (bath / fuel / restroom / backup lodging)"
+      maps_to_workflow_section: "execution-flow.md §15 + artifact-gates.md §1 #18"
+  quality_threshold_violations:
+    - threshold: "artifact-gates.md §2.1 location precision — Google Maps place link OR coordinate pin per stop"
+      observed: "phone + address + MapCode present, Google Maps place link absent"
+    - threshold: "artifact-gates.md §2.2 source-backed validation for time-sensitive info (operating hours, last entry, reservation window)"
+      observed: "time-sensitive entries inline without source citations; partial coverage in driving-data appendix only"
+    - threshold: "artifact-gates.md §2.3 schedule feasibility check per day (stay duration, transit buffer, fatigue risk)"
+      observed: "one ad-hoc risk note for one stop on one day; not systematic"
+
+classification:
+  pattern: rule-without-executor
+  not_attributable_to: slice-loading-error
+  rationale: |
+    workflow/travel-planning/execution-flow.md is NO_SPLIT (295 lines, single
+    file per parent plan Scenario G decision). artifact-gates.md is a single
+    103-line file. There is no "wrong slice" the agent could have loaded —
+    either the agent loaded the workflow (in which case the 17 sections +
+    19 artifact items were available and were not applied) or did not load
+    the workflow at all (despite signals matching route activation triggers).
+
+    Both branches map to the meta-pattern already documented by P1/P2:
+      - P2 workflow-activation-engine: "registry has route + signals matched
+        but no executor activates the workflow"
+      - P1 mechanical-enforcement-registry: "knowledge layer has rules,
+        runtime layer has no executor enforcing them"
+
+attribution:
+  primary_pattern_owner: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+  secondary_pattern_owner: plans/active/2026-05-31-1900-workflow-activation-engine.md
+  cognitive_slice_relevance: none
+  explanation: |
+    Cognitive-slice taxonomy (ADR-009 Accepted 2026-05-31) is concerned with
+    loading-granularity within a layer. The gap here is one layer above:
+    the workflow is not being activated AND/OR the artifact gates inside
+    the workflow are not being enforced. ADR-009 framework is not the cause
+    of this gap, nor is its scope to fix it.
+
+contribution_to_active_plans:
+  - plan: workflow-activation-engine (P2)
+    contribution: |
+      Independent second-route confirmation (first route was the one cited
+      in P2 plan's empirical_trigger). Strengthens "rule-without-executor"
+      universality claim — this is not a single-route artifact.
+  - plan: mechanical-enforcement-registry (P1)
+    contribution: |
+      Real-task evidence that workflow_activation coverage class is needed.
+      When P1 builds the Coverage Report, the workflow_activation entry
+      will reference both the original trigger (cited in P2) and this
+      cross-route confirmation.
+
+evidence:
+  executed_on: 2026-05-31
+  executor: agent_walkthrough
+  data_kept: counts + section-id mappings + threshold pass/fail
+  data_intentionally_omitted: filename, dates, place names, store names, lodging names, phone numbers, MapCodes, prefectures, domain artifact strings
+  result: PATTERN_CONFIRMED (rule-without-executor; second-route reproduction)
+  next_action: "P1/P2 owners may cite this fixture when justifying coverage class wiring or detector executor implementation. No standalone follow-up plan from this fixture; this fixture IS the closure for the cognitive-slice series side-quest."
+
+cognitive_slice_series_closure_note: |
+  The cognitive-slice taxonomy work series (parent plan 2026-05-29-0916 +
+  follow-up 2026-05-30-2200 + promotion 2026-05-31-2200 → ADR-009 Accepted
+  2026-05-31) is fully closed. This fixture is the side-quest closure: a
+  real-task probe was attempted, the finding was honestly classified as
+  outside cognitive-slice scope, and the evidence was handed off to the
+  active P1/P2 plans where it belongs.
