@@ -1,10 +1,10 @@
 # Mechanical Enforcement Registry
 
-**Status**: `draft-v2`
-**世代**：Gen 3 runtime hardening（**meta-pattern**：framework-level invariant，非個案修補）
+**Status**: `draft-v3`
+**世代**：Gen 3 runtime hardening（**Meta Governance**：framework self-audit layer，非個案修補）
 **建立日期**：2026-05-31
-**最後更新**：2026-05-31（v2 — 整合 round-7 評審：Layer 2.5 framing、Rule Class 取代 rule-level binding、新增 `not_mechanizable` coverage status、priority 反轉為 P1）
-**Priority**：**P1**（v2 起，從原 P2 提升）—— 完成本 plan 後，兩個 child plan 重啟時會被本 plan 的 coverage lint 強制回答 "mechanical / behavioral_only / not_mechanizable / pending" 問題，從根本上預防未來同模式 bug
+**最後更新**：2026-05-31（v3 — 整合 round-8 評審：新增 `deprecated` coverage status、新增 `verification` 維度與 `coverage_evidence`、Coverage Report 多 "Verified" 欄位、定位確認為 Meta Governance / Framework Self-Audit Layer）
+**Priority**：**P1**（v2 起）—— 此 plan 處於 architectural prevention 層級（Prevent > Detect > Repair）；child plans 仍在 Detect/Repair 層級
 
 **Child plans (instances of this meta-pattern)**：
 - [`2026-05-31-1900-workflow-activation-engine.md`](2026-05-31-1900-workflow-activation-engine.md) — sanitizes & operationalizes `routing-registry.yaml` rules with `detector.go` executor
@@ -45,7 +45,7 @@
 
 正確 fix：**讓 framework 自己回答**「目前有哪些規則存在，但沒有對應的 runtime executor？」這就是本 plan。
 
-### Architectural Framing — Missing Layer 2.5
+### Architectural Framing — Missing Layer 2.5 / Meta Governance
 
 第七輪評審指出 Ai-skill 既有架構是三層：
 
@@ -58,11 +58,16 @@ Layer 3  Governance      (constitution/, architecture/, plans/)
 但缺一層：
 
 ```
-Layer 2.5  Coverage Verification   ← NEW (本 plan 建立)
-            Rule ←binding→ Executor 的結構性驗證層
+Layer 2.5  Coverage Verification / Meta Governance   ← NEW (本 plan 建立)
+            Rule ←binding→ Executor ←evidence→ Verification
+            的結構性驗證層
 ```
 
-沒有 Layer 2.5 就沒有「rule 寫好、executor 沒接」的結構性偵測機制，所有此類 bug 必須等使用者發現。本 plan 不是「補一個 executor」（child plan 的工作），而是**建立 Layer 2.5 本體**。
+第八輪評審把這層定位升格為 **Meta Governance / Framework Self-Audit Layer**：
+- Layer 1-3 管「框架的內容」（規則寫了什麼、runtime 跑什麼、治理決策）
+- Layer 2.5 管「框架本身是否真的做到它說會做的」（Governance of Governance）
+
+沒有 Layer 2.5 就沒有「rule 寫好、executor 沒接」「executor 寫了但漏覆蓋某些 instance」的結構性偵測機制。本 plan 不是「補一個 executor」（child plan 的工作），而是**建立 Layer 2.5 本體**。
 
 ### Decision
 
@@ -102,10 +107,11 @@ Layer 2.5  Coverage Verification   ← NEW (本 plan 建立)
 | Decision | Rationale |
 |---|---|
 | **Rule Class 級 binding，非 rule instance 級**（v2 採納評審 #2） | 22 條 `obligation.commit.*` 不應產生 22 條 binding entries；都綁同一個 dispatcher 變成 registry 自我膨脹。改用 `rule_class` 抽象：sanitization / workflow_activation / bootstrap_integrity / routing / commit_governance / discovery / ... 估計 ~20-25 個 class，registry 規模可控 |
-| **4-value coverage enum**（v2 採納評審 #3） | `mechanical` / `behavioral_only` / **`not_mechanizable`** / `pending`。`not_mechanizable` 是 v2 新增的關鍵狀態 —— 隔離「永遠不該機械化」（如主觀寫作品質）與「現在沒機械化但應該機械化」，避免 review queue 永遠塞著無解項目 |
-| **`behavioral_only` 與 `not_mechanizable` 各自要求不同 metadata** | `behavioral_only` 需 `rationale` + `sunset_decision`（何時 revisit）；`not_mechanizable` 需 `rationale` + `objective_validation_impossible_because`（為何永遠不可機械化）。不同 metadata 強制不同思考深度 |
-| **Compile-time lint，非 runtime lint** | `ai-skill runtime compile + refresh` 跑 lint，任何 registered rule_class 缺 coverage 宣告直接 compile fail。讓問題出現在「我加新 rule」當下，而非「使用者半年後追問」 |
-| **CLI `ai-skill enforcement coverage` 是主要產出**（v2 評審 #4 強調） | 不只 audit 既有狀態，更重要的是**強制新規則寫作者回答 coverage 問題**。Phase 4 不是錦上添花，是 framework invariant 真正落地的地方 |
+| **5-value coverage enum**（v3 採納評審 #1） | `mechanical` / `behavioral_only` / `not_mechanizable` / `pending` / **`deprecated`**。`deprecated` 是 v3 新增：規則還存在但已不應使用，等待移除（防止 mechanical/behavioral/not_mechanizable/pending 都「不適合放」的灰色地帶塞進錯桶） |
+| **Each coverage status 不同 metadata 要求** | `behavioral_only`: rationale + sunset_decision；`not_mechanizable`: rationale + objective_validation_impossible_because；`deprecated`: rationale + `replaced_by` (or `removal_date`)；`pending`: child_plan + target_promotion。Compile lint 校驗 schema |
+| **`verification` 維度與 coverage 正交**（**v3 採納評審 #2 + #3，關鍵升級**） | v2 的 mechanical 只驗 "executor 存在"，但 executor 可能漏覆蓋部分 instance（例：`DetectWorkflows()` 忘了 intelligence routes，lint 仍 PASS）。v3 加 `verification` axis：`symbol_exists` / `scenario_exists` / `regression_exists`，加 `coverage_evidence` field（validation_scenarios + expected_instance_count），Coverage Report 顯示 declared vs covered 百分比 |
+| **Compile-time lint，非 runtime lint** | `ai-skill runtime compile + refresh` 跑 lint。新增 lint 條件涵蓋 verification 維度 |
+| **CLI `ai-skill enforcement coverage` 是主要產出**（v2 評審 #4 強調） | 不只 audit 既有狀態，更重要的是**強制新規則寫作者回答 coverage 問題**。v3 加 verification 後，回答的問題從「mechanical 嗎」變成「mechanical 且 verified 嗎」 |
 | **不重寫既有 rule**，只加 binding 層 | 既有 enforcement / runtime / governance markdown + yaml 不動，registry 是 cross-cutting 索引。降低 risk |
 
 ### 為什麼這個 plan 比 child plans 更重要
@@ -314,11 +320,12 @@ rule_classes:
 
   # ... (continue for all ~24 rule_classes)
 
-# ─── 4-value enum schema ────────────────────────────────────
+# ─── 5-value enum schema (v3) ─────────────────────────────
 coverage_status_spec:
   mechanical:
-    requires: [executors[].symbol exists]
-    lint_behavior: source 變更須同步 executors[].symbol 存在
+    requires: [executors[].symbol_exists]
+    verification_required: true   # v3 NEW: 同時驗 symbol 與 coverage_evidence
+    lint_behavior: source 變更須同步 executors[].symbol 存在；verification 維度另查
   pending:
     requires: [child_plan, target_promotion]
     lint_behavior: child_plan 必須是 active plan 路徑
@@ -328,6 +335,60 @@ coverage_status_spec:
   not_mechanizable:
     requires: [rationale, objective_validation_impossible_because]
     lint_behavior: 缺任一欄位 → compile fail；附帶 governance review 時可挑戰是否真的 not_mechanizable
+  deprecated:   # v3 NEW
+    requires: [rationale, replaced_by_or_removal_date]
+    lint_behavior: |
+      `replaced_by` 必須指向 active rule_class id；或 `removal_date` 必須
+      是未來 ISO-8601 日期。compile time 兩者皆缺 → fail；過 removal_date
+      仍存在 → fail（強制不能無限期 deprecated）
+
+# ─── verification dimension (v3 NEW，與 coverage 正交) ────
+# Coverage 講「我們選擇怎麼處理這條規則」；Verification 講「實作真的做到了嗎」。
+# 兩者正交：mechanical + symbol_exists 不夠，還需 scenario_exists +
+# regression_exists 才算 fully verified。
+verification_levels:
+  symbol_exists:
+    check: executor symbol 在 file 中存在
+    lint: 缺 → compile fail（mechanical only）
+  scenario_exists:
+    check: 有對應 validation/scenarios/<class>/*.yaml
+    lint: 缺 → compile warning（mechanical）or fail（v4 開始 fail）
+  regression_exists:
+    check: validation scenario 涵蓋已知歷史失誤
+    lint: 缺 → compile warning
+  coverage_evidence:
+    check: |
+      若 rule_class 有 instance set（如 workflow_activation 有 57 routes），
+      coverage_evidence.expected_instance_count 必須宣告，且
+      validation_scenarios 集合覆蓋率 >= 80%。
+    lint: 覆蓋率 < 80% → compile warning；< 50% → compile fail
+```
+
+### rule_class 範例：含 verification + coverage_evidence（v3 新增 schema）
+
+```yaml
+- id: workflow_activation
+  coverage: pending
+  source_files:
+    - knowledge/runtime/routing-registry.yaml#activation_triggers
+  executors_planned:
+    - symbol: DetectWorkflows
+  child_plan: plans/active/2026-05-31-1900-workflow-activation-engine.md
+  target_promotion: child_plan Phase 3-5 完成後改 coverage=mechanical
+
+  # v3 NEW: 預先宣告 verification 期望，promotion 時 lint 會校驗
+  coverage_evidence:
+    expected_instance_count: 57   # routing-registry 目前 57 routes
+    expected_instance_count_query: |
+      grep -c '^  - id: route\.' knowledge/runtime/routing-registry.yaml
+    validation_scenarios:
+      - validation/scenarios/runtime/workflow-detector-deterministic-match-v1.yaml
+      - validation/scenarios/runtime/workflow-detector-conflict-resolution-v1.yaml
+      - validation/scenarios/runtime/workflow-session-topic-shift-v1.yaml
+      - validation/scenarios/runtime/workflow-detector-travel-planning-regression-v1.yaml
+    coverage_target_pct: 90    # 期望 90%+ routes 被某個 scenario 覆蓋
+    regression_scenarios:
+      - validation/scenarios/runtime/workflow-detector-travel-planning-regression-v1.yaml
 ```
 
 **為什麼 4-value enum 而非 3-value**：
@@ -410,10 +471,29 @@ Enforcement Coverage Report (2026-XX-XX)
 ═══════════════════════════════════════
 Total Rule Classes: 24
 
-  ├─ Mechanical:        12  (50%)
+  ├─ Mechanical:        11  (46%)
+  │   ├─ Verified:       8  (symbol + scenarios + regression)
+  │   └─ Symbol only:    3  ⚠️  (scenarios missing — v3 verification)
   ├─ Behavioral only:    5  (21%)  — explicit governance choice
   ├─ Not mechanizable:   3  (12%)  — out of review queue
-  └─ Pending:            4  (17%)  — implementation in progress
+  ├─ Pending:            4  (17%)  — implementation in progress
+  └─ Deprecated:         1  ( 4%)  — awaiting removal
+
+Per-class verification detail:
+
+  Rule Class                Status         Verification     Instance Coverage
+  ────────────────────────────────────────────────────────────────────────────
+  bootstrap_integrity       mechanical     ✓ full           n/a (singleton)
+  commit_governance         mechanical     ✓ full           19/19 validators
+  cognitive_mode_governance mechanical     ✓ full           n/a
+  routing                   mechanical     ⚠ symbol-only    — no scenarios yet
+  workflow_activation       pending        —                planned: 57 routes
+  sanitization              pending        —                planned: 11 patterns
+  capability_discovery      behavioral_only review queue    n/a
+  rule_weight               behavioral_only review queue    n/a
+  tool_neutral_doc          not_mechanizable n/a            n/a
+  rule_writing_quality      not_mechanizable n/a            n/a
+  old_intelligence_route    deprecated     n/a              replaced_by: intelligence_classification
 
 Pending (active implementation plans):
   workflow_activation   → plans/active/2026-05-31-1900-workflow-activation-engine.md
@@ -429,9 +509,12 @@ Not_mechanizable (closed, will not appear in review queue):
   tool_neutral_documentation  — subjective writing judgment
   rule_writing_quality        — would game readability metrics
   ...
+
+Deprecated (awaiting removal):
+  old_intelligence_route  — replaced_by: intelligence_classification (2026-06-30)
 ```
 
-**強制觸發場景**：
+**強制觸發場景**（v3：含 verification 維度）：
 
 | 場景 | Coverage report 行為 |
 |---|---|
@@ -439,7 +522,12 @@ Not_mechanizable (closed, will not appear in review queue):
 | Registry 加新 entry 但漏寫 `coverage` field | compile fail：`missing coverage field` |
 | `coverage: behavioral_only` 但 `sunset_decision.success_criteria` 空白 | compile fail：`behavioral_only requires success_criteria` |
 | `coverage: not_mechanizable` 但 `objective_validation_impossible_because` 空白 | compile fail：`not_mechanizable requires impossibility rationale` |
+| **v3**：`coverage: deprecated` 但 `replaced_by` / `removal_date` 都缺 | compile fail：`deprecated requires replaced_by or removal_date` |
+| **v3**：`coverage: deprecated` 且 `removal_date` 已過但 rule 仍存在 | compile fail：`deprecated rule past removal_date — actually remove or extend date` |
 | 既有 mechanical class 的 executor symbol 在 hooks.go 找不到 | compile fail：`executor symbol missing` |
+| **v3**：`coverage: mechanical` 但 `coverage_evidence.validation_scenarios` 為空 | compile warning：`mechanical without validation scenarios — verification level: symbol_only` |
+| **v3**：mechanical 且 instance set 已知（如 workflow 57 routes）但 scenarios coverage < 50% | compile fail：`mechanical coverage_evidence under threshold` |
+| **v3**：mechanical 且 scenarios coverage < 80% | compile warning：`mechanical coverage_evidence below target` |
 | 新增 mechanical executor 但無對應 rule_class | compile warning：`orphan executor` |
 
 這意味未來任何新規則寫作者，在 compile 那一刻就被強制回答：
@@ -523,6 +611,23 @@ Not_mechanizable (closed, will not appear in review queue):
 
 ---
 
+## v3 改動摘要（Round 8 評審整合）
+
+| # | 評審論點 | 採納 | 對應修改 |
+|---|---|---|---|
+| 1 | 缺 `deprecated` 5th coverage status | ✅ | enum 從 4-value 升 5-value；新增 metadata requirements（`replaced_by` 或 `removal_date`）；compile lint 校驗 removal_date 未過期 |
+| 2 | `executor exists ≠ executor covers all instances`：lint 只驗 symbol 存在會錯放（DetectWorkflows 漏 intelligence routes 仍 PASS） | ✅ | 新增 `verification` 維度與 coverage 正交：symbol_exists / scenario_exists / regression_exists；新增 `coverage_evidence` schema 含 expected_instance_count + validation_scenarios + coverage_target_pct |
+| 3 | Coverage Report 應顯示 declared vs covered 百分比 | ✅ | Coverage Report 新增 "Verification" + "Instance Coverage" 欄位；example 顯示 mechanical-but-symbol-only 的警告（routing class 範例） |
+| 4 | 定位確認為 "Meta Governance / Framework Self-Audit Layer"（Prevent > Detect > Repair） | ✅ | Decision Rationale 章節將 Layer 2.5 升格為「Meta Governance」；Header `世代` 行同步更新 |
+| 5 | 自然演進方向：Rule ↔ Executor ↔ Verification Registry（三元 binding） | ✅ | v3 schema 已包含 verification 維度 = 三元 binding。Future v4 可能擴展 verification_levels 含 runtime metrics（執行頻率、實際阻擋次數） |
+
+**Round 8 核心觀察（user 原話）**：
+> 從「找缺少 executor 的規則」變成「要求每個 Rule Class 必須宣告自己的 enforcement strategy」—— 看起來像，但是不同層級。
+>
+> v2 的 mechanical 只驗 `Executor Exists`，v3 進化為 `Executor Verified`。
+>
+> 這已經開始形成真正的 Framework Self-Audit Layer。
+
 ## v2 改動摘要（Round 7 評審整合）
 
 | # | 評審論點 | 採納 | 對應修改 |
@@ -546,6 +651,7 @@ Not_mechanizable (closed, will not appear in review queue):
 5. sanitization gate 自我觸發失敗
 6. **本 plan 對應**：以上 5 條共同根因是「Knowledge layer 有規則，Runtime layer 沒執行器」meta-pattern，建議建立 governance-level coverage audit
 7. **Round 7 v2 重構**：v1 寫成 rule instance 級 audit 是維護地獄；改 rule_class 級 + 4-value coverage enum + Coverage Report 為主要交付 + Priority 提升 P1
+8. **Round 8 v3 verification 升級**：v2 的 mechanical 只驗 symbol 存在，可能漏覆蓋；v3 加 `verification` 維度（正交）+ `coverage_evidence` schema + `deprecated` 5th status + 定位升格為 Meta Governance
 
 User 原話（round 6）：
 > Ai-skill 現在最大的風險不是缺規則，而是「Rule Exists, Executor Missing」。
