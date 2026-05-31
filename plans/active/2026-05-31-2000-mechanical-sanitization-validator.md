@@ -1,10 +1,12 @@
 # Mechanical Sanitization Validator
 
-**Status**: `draft`
+**Status**: `draft-v2`
 **世代**：Gen 3 runtime hardening（systemic gap remediation, 4th instance）
 **建立日期**：2026-05-31
-**最後更新**：2026-05-31（initial draft）
-**Sibling plan**：[`2026-05-31-1900-workflow-activation-engine.md`](2026-05-31-1900-workflow-activation-engine.md) — same pattern (rule-without-executor)
+**最後更新**：2026-05-31（v2 — 整合第二輪評審：weighted incident_score、filesystem_reference 泛化、PreToolUse降級為 warn、明確 instance-of meta-plan）
+**Sibling plans**：
+- [`2026-05-31-1900-workflow-activation-engine.md`](2026-05-31-1900-workflow-activation-engine.md) — same pattern (rule-without-executor), 1st instance
+- [`2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) — **parent meta-plan**：把 "rule-without-executor" 系列 bug 從個案修補升級為 framework-level invariant（compile-time lint）。本 plan 是 meta-pattern 第二個顯式 instance。
 **Empirical trigger**：2026-05-31 session — agent 在寫 `workflow-activation-engine` plan v1-v4 期間，向 canonical Ai-skill repo 多次 Write/Edit canonical 文件，內容夾帶 project incident details（specific filename、user 對話片段、領域 artifact 字串）。`enforcement/sanitization.md` + `enforcement/reusable-guidance-boundary.md` 規則明擺著，使用者三次追問才暴露 gap，最終 v5 patch 才人工抹除。
 
 > 本 plan 不修個案 leak，而是補齊 **Mechanical Sanitization Validator** —— Ai-skill 第 4 個被識別出的「規則存在但無 mechanical executor」systemic gap。
@@ -118,23 +120,39 @@ Commit-msg: sanitization-postcheck
 
 ```yaml
 # enforcement/sanitization.yaml
-schema_version: 1
+schema_version: 2          # v2: 整合 round-2 評審
 banned_patterns:
-  absolute_path:
-    - regex: '^[A-Z]:\\'                  # Windows absolute path
-    - regex: '^/(Users|home)/[^/]+/'      # macOS/Linux user home
-    - regex: '^/tmp/[^<]'                 # raw /tmp paths
+  # ─── filesystem_reference（v2 泛化，取代 v1 的 absolute_path）────
+  # v1 只列幾條 regex 會漏 ~/ / ${HOME} / %USERPROFILE% / /mnt/data 等
+  # v2 改用「任何指向本機 / sandbox / 環境 filesystem 的具體 reference」總稱
+  filesystem_reference:
+    - regex: '^[A-Z]:\\'                       # Windows drive root
+    - regex: '\\Users\\[^\\<]+\\'              # Windows user dir
+    - regex: '%USERPROFILE%'
+    - regex: '%APPDATA%'
+    - regex: '^/(Users|home)/[^/<]+/'          # macOS / Linux user home
+    - regex: '~/[^<\s]+'                       # tilde-relative
+    - regex: '\$\{?HOME\}?/'                   # $HOME / ${HOME}
+    - regex: '^/tmp/[^<]'
+    - regex: '^/mnt/[^<]'                      # WSL / container mounts
+    - regex: 'sandbox:/[^<]'                   # sandbox containers
+    - regex: '^/var/folders/[^<]'              # macOS scratch dirs
   username:
-    - regex: '\\Users\\[a-z0-9]+\\'       # Windows user dir
-    - regex: '/Users/[a-z0-9]+/'          # macOS user dir
+    - regex: '\\Users\\[a-z0-9]+\\'
+    - regex: '/Users/[a-z0-9]+/'
+    - regex: '/home/[a-z0-9]+/'
   secrets_token:
     - regex: 'Bearer [A-Za-z0-9_-]{20,}'
-    - regex: 'AKIA[0-9A-Z]{16}'           # AWS access key
-    - regex: 'ghp_[A-Za-z0-9]{36}'        # GitHub PAT
+    - regex: 'AKIA[0-9A-Z]{16}'                # AWS access key
+    - regex: 'ghp_[A-Za-z0-9]{36}'             # GitHub PAT
+    - regex: 'xox[bpoa]-[0-9]+-[0-9]+-[A-Za-z0-9]+'  # Slack tokens
     # ... (extend)
   private_host:
-    - regex: 'https?://\d+\.\d+\.\d+\.\d+'  # raw IPs
+    - regex: 'https?://\d+\.\d+\.\d+\.\d+'     # raw IPs
     - regex: '\.internal\.'
+    - regex: '\.corp\.'
+    - regex: '\.lan/'
+
 canonical_paths:
   - 'enforcement/'
   - 'workflow/'
@@ -148,18 +166,54 @@ canonical_paths:
   - 'constitution/'
   - 'architecture/'
 not_canonical:
-  # validator 不掃這些 path（project-local 或專案 incident docs allowed）
   - '.agent-goals/'
   - 'feedback/history/'   # project-specific lessons 反而需要 evidence
   - 'plans/archived/'     # 已完成 plan 不再修改
-project_incident_signals:
-  # heuristic：當以下 keyword 集中出現於 canonical reusable doc 時 → warn
-  # （這不是禁用列表，而是「太具體可能是 project incident」訊號）
+
+# ─── incident_score（v2 改：weighted heuristic 取代 v1 單一 threshold）───
+# v1 的「5 nouns 段落內」會誤判 route.workflow.travel-planning 正常內容。
+# v2 改用 multi-signal weighted score，只有「filename + quoted user text +
+# artifact string + domain cluster」組合命中才警告，避免誤殺合法內容。
+incident_score:
   description: |
-    Reusable canonical docs 通常用 generic example。當 single domain 的
-    specific noun 在同一段落 cluster 出現（e.g., 5+ travel-specific nouns），
-    暗示作者把 project incident 寫進來了，應提示重寫為抽象範例。
-  threshold: 5  # 同一段落內同領域 specific noun 數量
+    Reusable canonical docs 的 project incident leak 不只是 domain noun
+    多寡，而是多種具體訊號的組合。單一訊號（如某 workflow 的關鍵字）
+    不足以警告；組合訊號（filename + quoted text + cluster）才該警告。
+  signals:
+    filename_pattern:
+      weight: 5
+      patterns:
+        - regex: '`?docs/[0-9]{8}-[^`<\s]+\.md`?'  # specific dated filename
+        - regex: '`?[a-z0-9-]+/[a-z0-9-]+\.(md|yaml|json|go)`?'   # 具體 path 引用，
+                                                                    # 與 sanitization 規則本身的
+                                                                    # 引用區分需 context-aware
+    quoted_user_text:
+      weight: 5
+      heuristic: |
+        段落內出現 6+ 字中文或英文短句，且兩側有引號 / backtick / dash，
+        且不在 schema example 區塊（schema 用 <placeholder> 不算）
+    artifact_string:
+      weight: 3
+      heuristic: |
+        段落內出現具體領域 artifact（如 "Day 1" / 商品名 / 神社名 /
+        特定 API 端點 / 特定 class 名），且不在公開 routing-registry
+        registry entry 中
+    domain_noun_cluster:
+      weight: 1
+      threshold: 5    # 同一段落內 5+ 同領域 specific noun
+  warn_if_total_score_gte: 7
+  examples:
+    - case: "v1-v4 leak L7"
+      signals_hit: [filename_pattern, quoted_user_text, domain_noun_cluster]
+      score: 5+5+1 = 11
+      verdict: warn (caught correctly)
+    - case: "route.workflow.travel-planning normal description"
+      signals_hit: [domain_noun_cluster]
+      score: 1
+      verdict: pass (correctly not warned)
+    - case: "feedback/history/travel/incident-A.md"
+      path: not_canonical
+      verdict: pass (not scanned regardless of content)
 ```
 
 產出：
@@ -167,7 +221,9 @@ project_incident_signals:
 - [ ] `enforcement/sanitization.md` 加 companion 章節指向 yaml + `machine_readable_patterns` 連結
 - [ ] `runtime/runtime.db` compile pipeline 加 `sanitization_patterns` projection
 
-### Phase 2 — PreToolUse Validator
+### Phase 2 — PreToolUse Validator（v2 改：**Warning only，非 blocking**）
+
+第二輪評審指出 PreToolUse 對 Edit 不準（看到整段舊內容易誤判），應降為 warning，blocking 留給 commit validator。
 
 新建 `hooks.go` validator `validateSanitizationOnWrite`：
 
@@ -178,52 +234,75 @@ func validateSanitizationOnWrite(toolName string, params ToolParams) HookResult 
     if toolName != "Write" && toolName != "Edit" { return Pass }
 
     filePath := params.GetString("file_path")
-    if !isCanonicalRepoPath(filePath) { return Pass }  // project-local 不掃
+    if !isCanonicalRepoPath(filePath) { return Pass }
 
-    content := params.GetString("content")  // Write 用
-    if toolName == "Edit" {
+    // v2: Edit 只掃 new_string，不掃 old_string（避免「沒改的舊文已含 leak」誤判）
+    var content string
+    if toolName == "Write" {
+        content = params.GetString("content")
+    } else {  // Edit
         content = params.GetString("new_string")
     }
 
     hits := scanBannedPatterns(content, sanitizationPatterns)
-    if len(hits) > 0 {
-        return Reject(formatRejectionWithSuggestions(hits))
-    }
+    incidentScore := computeIncidentScore(content)
 
+    // v2: Warning，非 Reject。Tool 呼叫繼續，但訊息提示 agent 可能需要 sanitize。
+    if len(hits) > 0 || incidentScore >= warnThreshold {
+        return Warn(formatWarningWithSuggestions(hits, incidentScore))
+    }
     return Pass
 }
 ```
 
-Reject 訊息範例：
-```
-Sanitization gate rejected this write to <canonical-path>:
+**為什麼 Warning 而非 Block**：
+- Edit 工具語意是「修改部分」，agent 寫的 `new_string` 是 final intended 內容
+- 但實作上 hook 可能難判定 final 與 transient 差異
+- Block PreToolUse 會造成「agent 卡 retry loop」反生產力
+- Warning 給 agent 機會 self-correct 但不擋路；commit validator 是真正 last line of defense
 
-Line 7: matched absolute_path pattern `^[A-Z]:\\`
-  Found: "C:\Users\actual-user\..."
+Warning 訊息範例：
+```
+[sanitization warning] Write to <canonical-path>:
+
+Line 7: matched filesystem_reference pattern
+  Found: "C:\Users\xxx\..."
   Suggest: replace with <PROJECT_ROOT> or <WORKSPACE> placeholder
 
-Line 42: matched project_incident_signal (5 travel-specific nouns in same paragraph)
-  Found: paragraph containing [<5 listed terms>]
+Line 42: incident_score=8 (filename:5 + quoted_user_text:5)
+  Detected combination of specific filename + quoted user text in
+  canonical reusable document.
   Suggest: abstract to <domain-keyword> placeholders, move concrete
-           evidence to feedback/history/<domain>/ if it's a reusable lesson
+           evidence to feedback/history/<domain>/ if it's a reusable lesson.
 
+Tool call continues — commit validator will block if leak persists.
 See enforcement/sanitization.md for full rules.
 ```
 
 產出：
-- [ ] `hooks.go` validator + unit tests
+- [ ] `hooks.go` validator + unit tests（含 Warning vs Reject 路徑）
 - [ ] Pattern compile/cache（避免每次 Write 重 parse yaml）
 - [ ] Hook registration in PreToolUse dispatcher
+- [ ] 文件化「PreToolUse = warning, commit = block」分層原則
 
-### Phase 3 — Commit-msg Validator（last line of defense）
+### Phase 3 — Commit-msg Validator（**v2: 真正的 blocking 層，準確率高**）
+
+第二輪評審：commit diff 只看 added lines，準確率高很多，這才該是 block。
 
 新建 `validateSanitizationOnCommit`：
 
-- 掃 staged diff（所有 added / modified lines）
-- 對每行套用 `sanitization.yaml` patterns
-- hit → reject commit + 列出 hit 位置
+- 對 `git diff --staged` 抽 added lines（`+` 開頭，排除 file headers）
+- 過濾掉 `not_canonical` paths 的變更
+- 對每行套用 `sanitization.yaml` `banned_patterns`
+- 對段落級組合（多行 added cluster）套用 `incident_score`
+- hit → **reject commit** + 列出位置與建議
 
-範例 opt-out：`[skip-sanitization]` trailer（極少用，例如 `feedback/history/` 例外，但實際上該目錄已在 `not_canonical` 列表）。
+由於只看 diff 新增內容：
+- 已 committed 的歷史 leak 不會 retroactively 擋住 unrelated commit（避免 dev 被卡）
+- Edit 場景：sanitization 真實寫進去的 final content 才被掃，不會被「舊內容夾雜」誤判
+- 比 PreToolUse 準確一個數量級
+
+範例 opt-out：`[skip-sanitization]` trailer（**極少數**例外，必須附 justification 為 commit message body）。
 
 產出：
 - [ ] `validateSanitizationOnCommit` + unit tests
@@ -299,8 +378,23 @@ Acceptance：五 scenario 全 PASS。
 2026-05-31 session：
 - 使用者連續追問五次，依序暴露：(1) sqlite3 vs ai-skill CLI 認知偏差，(2) `route.workflow.travel-planning` activation gap，(3) Discovery vs Detector 混淆，(4) intelligence 預設 advisory 風險，(5) **sanitization 自我觸發失敗導致 v1-v4 plan 寫作期間 project incident 洩漏**。
 - 第五次追問識別出本 plan 處理的 systemic gap。
+- 第六次評審把這個 gap 抽象成 **meta-pattern**：「Rule Exists, Executor Missing」，催生 `plans/active/2026-05-31-2100-mechanical-enforcement-registry.md` 作為 parent plan。
 
-本 plan 是 sibling `workflow-activation-engine` plan 同模式問題（rule-without-executor）的第二個顯式 case，獨立追蹤是因為 scope 完全不同（sanitization vs routing）。
+本 plan 是 sibling `workflow-activation-engine` plan 同模式問題（rule-without-executor）的第二個顯式 case，獨立追蹤是因為 scope 完全不同（sanitization vs routing）。**v2 起明確標記為 meta-plan 的 instance** —— 從 enforcement-registry 角度，本 plan 是 `sanitization` rule + `validateSanitizationOnWrite/Commit` executor 的綁定範例。
+
+## v2 改動摘要（Round 2 評審整合）
+
+| # | 評審論點 | 採納 | 對應修改 |
+|---|---|---|---|
+| 1 | `project_incident_signals` 單一 threshold 會誤判正常 workflow 內容 | ✅ | Phase 1 schema 改 weighted `incident_score`（filename:5 / quoted_user_text:5 / artifact_string:3 / domain_cluster:1 / warn_if total ≥ 7）+ 三範例驗證 |
+| 2 | Absolute path regex 太弱（漏 ~/、${HOME}、%USERPROFILE%、/mnt/、sandbox:/、C:\Users\） | ✅ | Phase 1 schema 把 `absolute_path` 泛化為 `filesystem_reference`，patterns 從 3 條擴成 11 條 |
+| 3 | PreToolUse 對 Edit 易誤判（看到整段舊內容），應降為 warning；commit validator 才該 block | ✅ | Phase 2 改 Warning（continues）；Phase 3 改 「真正的 blocking 層」並澄清為什麼 commit diff 更準確 |
+| 4 | 這份 plan 本質是「rule exists, executor missing」meta-pattern 的個案；應有 governance-level meta-registry | ✅ | 開新 parent plan `2026-05-31-2100-mechanical-enforcement-registry.md`，本 plan v2 明確 reference 為「meta-pattern 的第二個 instance」 |
+
+**Round 2 評分**（user 給）：
+- Workflow Activation Engine：A-
+- Mechanical Sanitization Validator v1：B+（incident heuristic 不成熟、path coverage 不夠、未抽象成 meta-pattern）
+- v2 目標：抹平所有三項 v1 失分
 
 ## Companion References
 

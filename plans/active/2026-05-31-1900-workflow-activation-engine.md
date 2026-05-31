@@ -1,9 +1,10 @@
 # Workflow Activation Engine
 
-**Status**: `draft-v6`
-**世代**：Gen 3 runtime hardening（systemic gap remediation）
+**Status**: `draft-v7`
+**世代**：Gen 3 runtime hardening（systemic gap remediation）— **meta-pattern 的第一個 instance**
 **建立日期**：2026-05-31
-**最後更新**：2026-05-31（v6 — 整合第五輪評審：manual-lock 5th activation_mode、analysis 也改 must-declare、`route_type` ontology 拆三軸風險記為 Q10 + 未來 plan）
+**最後更新**：2026-05-31（v7 — 標記為 `mechanical-enforcement-registry` parent plan 的 instance；Q11 新增 sunset_decision binding）
+**Parent meta-plan**：[`2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) — 本 plan 屬「Rule Exists, Executor Missing」meta-pattern 的個案修補；parent plan 把模式變成 framework invariant。本 plan 完成後 binding 寫入 `enforcement-registry.yaml` `bindings[workflow_activation]`。
 **Empirical trigger**：2026-05-31 session — agent 對一筆 `route.workflow.travel-planning` 範圍的 user 任務跑 review。任務輸入命中該 route 三軸全部訊號（`user_signals` / `context_signals` / 後續會 Read 到的 `artifact_signals`），但 workflow 從未被啟動。使用者連續三次追問才暴露此 gap。具體 project incident（filename / 對話片段 / 領域 artifact 範例）依 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) 留在原 project 文件，不寫入本可重用 plan。
 
 > 本 plan 不修 travel-planning 個案，而是補齊 **Workflow Activation Engine** ——目前 framework 第一次形成「Registry ✓ + Rules ✓ + Docs ✓ + **Activation Engine ✗**」閉環的缺角。
@@ -523,6 +524,7 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 | Q8 | `route.intelligence.*` 全部 7 條 audit 結果是什麼？ | **new (v4)，still-open**：Phase 0.2a-special audit table 需 user 逐條 review，產出 acceptance criteria 之一。表中暫定值僅供討論。 |
 | Q9 | v1-v4 寫作期間 sanitization gate 未自我觸發，project incident details 洩漏進 canonical plan 文件。是否要把 mechanical sanitization validator 納入本 plan scope？ | **new (v5)，resolved → out-of-scope**：sanitization gap 本質與 workflow detector gap 同類（behavioral 強制無 mechanical hook），但若併入本 plan 會擴張 scope。**獨立 follow-up plan**：`plans/active/2026-05-31-2000-mechanical-sanitization-validator.md`。v5 patch 已抹除既存洩漏。 |
 | Q10 | `route_type` 把 capability / activation / knowledge_domain 三個正交軸壓進單一 enum，導致 namespace 衝突（`analysis/apk/workflows/` vs `workflow/apk-analysis/` vs `intelligence/apk-analysis/` 三條路徑指同一主題）。長期是否該拆三軸？ | **new (v6)，resolved → out-of-scope，記為 future plan**：診斷正確且影響深遠，但拆三軸是 ontology 級重構，本 plan scope 不容。**未來 plan stub**：`plans/active/<TBD>-route-ontology-split.md`（待開）。本 plan v6 起 `route_type` 文件加註「single-axis，將被 capability_type + activation_type + knowledge_domain 三軸取代」warning，讓新 route 作者預期 future migration。 |
+| Q11 | 本 plan 與 parent meta-plan 的 binding 寫入時機？ | **new (v7)，resolved**：parent plan `mechanical-enforcement-registry` Phase 2 schema 已 list 本 plan 為 `bindings[workflow_activation]` with `status: pending` + `child_plan` 指向本 plan。本 plan 任一 phase 進入 implementation 並 land executor 後，registry 對應 entry 改 `status: active`。compile-time lint 在那之前不阻擋（pending 是合法狀態）。 |
 | Q4 | `workflow_sessions` TTL？跨 session 是否保留？ | **resolved → Phase 4.0**：本 plan 不落 SQLite，TTL 等於 in-memory RuntimeContext 生命週期（process scope）。跨 session 持久化延後到 Phase 4.1 follow-up plan。 |
 | Q5 | Detector miss 是否 fallback 到 Discovery？ | **resolved → Phase 6.1**：採納第二輪評審，**Yes** 但有限制 —— Discovery 只在 detector miss 時 fire（不是 per-turn），結果寫 `route-candidate-proposals.yaml` 供未來 review，不阻擋當前執行流程。 |
 | Q6 | 舊格式（直接 `user_signals` 不在 `any_of` 下）的 deprecation timeline？ | still-open — 建議無限期相容，Phase 2 補新 route 用新格式即可 |
