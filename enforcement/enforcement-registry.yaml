@@ -72,23 +72,25 @@ bootstrap_mode: strict
 #                         day 1 (current Ai-skill repo state; 22 findings
 #                         backfilled in single session, manageable)
 #   baseline_snapshot_v1 — first compile records existing orphans in
-#                         baseline_snapshot block below; lint downgrades
+#                         baseline_snapshot.entries; lint downgrades
 #                         baseline entries to warning; NEW orphans
 #                         (not in baseline) still hard-fail. Intended for
 #                         mature repos where initial hard-block would
 #                         deadlock all commits during backfill.
 #
-# Switching strict → baseline_snapshot_v1 requires populating
-# baseline_snapshot.entries and writing baseline_snapshot.baseline_owner
-# + per-entry baseline_review_summary (Round-4 T4 governance parity).
+# Schema patch v2 A2 — bootstrap_mode is the SINGLE source of truth.
+# Removed `baseline_snapshot.enabled` (was duplicate state, could go out
+# of sync with bootstrap_mode and create illegal {strict, enabled=true}
+# combinations). Lint reads bootstrap_mode only; baseline_snapshot
+# fields are required iff bootstrap_mode == baseline_snapshot_v1.
 
 baseline_snapshot:
   # Schema present even when bootstrap_mode=strict so future migrations
-  # don't need re-architecture. Empty when strict mode is in effect.
-  enabled: false
+  # don't need re-architecture. Fields ignored unless bootstrap_mode is
+  # baseline_snapshot_v1.
   baseline_created_at: ~
   baseline_burndown_target_date: ~
-  baseline_owner: ~                  # Round-4 T4: required when enabled
+  baseline_owner: ~                  # Round-4 T4: required when bootstrap_mode=baseline_snapshot_v1
   entries: []
   # entries[] schema (per Round-4 T4):
   #   - finding_type: orphan_rule | orphan_executor | ...
@@ -163,6 +165,11 @@ coverage_status_spec:
           success_criteria. Warning only (not fail) because legitimate
           non-numeric criteria like "constitution review process
           formalized" should not be blocked.
+          NOTE (schema patch v2 C9): this is a TOKEN-LEVEL heuristic.
+          Presence of a keyword does NOT imply the success_criteria is
+          actually measurable; absence does NOT imply it is unmeasurable.
+          The lint is a documentation prompt, not a semantic judge.
+          Maintainers should treat both pass and fail as advisory.
   not_mechanizable:
     semantics: "Will NEVER be mechanized (subjective / no objective test)"
     requires: [rationale, objective_validation_impossible_because]
@@ -177,7 +184,7 @@ coverage_status_spec:
     # technically satisfy child_plan_required but provide no governance
     # value.
     child_plan_validity:
-      a_path_resolves: "child_plan path must resolve to an existing plans/active/*.md file"
+      a_path_resolves: "child_plan path must resolve to an existing plans/active/*.md file. Schema patch v2 B5: path is normalized via `path.split('#')[0]` before resolution to mirror source_files anchor handling."
       b_phase_0_heading: "child_plan body must contain `## Phase 0` heading (minimum implementation outline)"
       c_owner_present: "child_plan frontmatter or body must declare an owner (e.g. `Owner: <name>` or `owner:` in frontmatter)"
       d_acceptance_section: "child_plan must contain non-empty `## Validation Plan` OR `## Acceptance` section"
@@ -366,28 +373,63 @@ self_governance:
     - from: deprecated
       to: "(removed)"
       trigger: removal_date reached, governance approves actual removal
-  lint_rules:
+  # Schema patch v2 A1 — split namespace by execution phase to avoid
+  # mixing commit-msg lint with compile-time lint. Go code dispatches
+  # by reading commit_msg_lint_rules / compile_time_lint_rules
+  # separately, no phase filter needed.
+  commit_msg_lint_rules:
     R1: "rule_class status change commit must include [registry-status-change] trailer + rationale: body"
     R2: "demotion commit must reference an ADR; missing adr_reference → reject"
     R3: "promotion must show verification_levels met mechanical thresholds; otherwise lint fail"
     R4: "deprecated past removal_date by 30+ days → governance alert (not blocking)"
     R5: "research_required past estimated_unblock_timeline → governance review trigger"
-    # Round-4/5 additions (compile-time lint, distinct from above
-    # self-governance commit-msg rules):
-    R6_upstream_chain_resolution: |
+  compile_time_lint_rules:
+    # Renumbered from former R6-R9 (which awkwardly mixed phases). These
+    # run during `ai-skill runtime compile`, not at commit-msg.
+    R1_upstream_chain_resolution: |
       rule_classes[].upstream_classes references must resolve to existing
       rule_class ids; transitive closure must not contain cycles. Cycle
       detected → P0 FAIL.
-    R7_class_size_review_threshold: |
+    R2_class_size_review_threshold: |
       rule_classes[].source_files > governance_thresholds.source_files_review_threshold
-      → WARNING (not fail). Prompts review of split opportunities.
-    R8_baseline_snapshot_missing_governance: |
+      → WARNING. Suppressible by setting
+      rule_classes[].size_review_exemption_rationale: <non-empty string>
+      (Schema patch v2 B6); the WARNING is still emitted but includes
+      the maintainer rationale instead of bare threshold breach.
+    R3_baseline_snapshot_missing_governance: |
       When bootstrap_mode = baseline_snapshot_v1, baseline_snapshot.baseline_owner
       must be set AND every entries[].baseline_review_summary must be
       non-empty (≥ 20 chars). Either missing → P0 FAIL.
-    R9_pending_implementation_child_plan_validity: |
+    R4_pending_implementation_child_plan_validity: |
       See coverage_status_spec.pending_implementation.child_plan_validity
       schema; (a) violation P0 FAIL, (b)/(c)/(d) WARNING.
+
+# ─────────────────────────────────────────────────────────────────────
+# Executor schema (Schema patch v2 A4)
+# ─────────────────────────────────────────────────────────────────────
+# Formal shape for rule_classes[].executors[] and executors_planned[].
+# Previously implicit from examples; formalized to prevent typos like
+# `executor:` / `planned_executor:` / `executors_plan:` and to give Go
+# code a clear unmarshal target.
+
+executor_schema:
+  required:
+    - file        # repo-relative path
+    - symbol      # Go function name (or `phase.<id>` for runtime_state_machine_phase)
+    - executor_kind  # must be in executor_kind_spec.enum
+  optional:
+    - hook_phase    # PreToolUse / SessionStart / commit-msg / pre-commit / Stop / pre-push / etc.
+    - block_or_warn # block | warn
+    - notes         # free-text maintainer notes
+    - instance_count  # for dispatchers managing N validators (e.g. runCommitMsgHook → 19)
+  used_by:
+    - coverage_status_spec.mechanical.executors[]
+    - coverage_status_spec.pending_implementation.executors_planned[]
+  lint_behavior: |
+    Each item in executors[] or executors_planned[] must contain all
+    required keys. Missing required key → P0 FAIL with explicit
+    "executor missing required field <name>" message. Unknown keys
+    → WARNING (forward compat).
 
 # ─────────────────────────────────────────────────────────────────────
 # upstream_classes scope (Round-4 T5 / Round-5 U3, ADR-010)
@@ -397,6 +439,16 @@ upstream_classes_scope:
   governing_adr: constitution/ADR-010-registry-upstream-classes-scope-freeze.md
   schema: |
     rule_classes[].upstream_classes: []  # optional, array of rule_class id
+  # Schema patch v2 A3 — distinguish what lint mechanically enforces
+  # vs what is human-readable documentation only. Prevents readers from
+  # assuming `is_for` / `is_not_for` semantics are checked by lint.
+  mechanically_enforced:
+    - reference_resolution    # R1 compile_time: upstream_classes ids must exist
+    - cycle_detection         # R1 compile_time: transitive closure no cycles
+  documentation_only:
+    - is_for                  # human-readable scope; lint does NOT enforce semantics
+    - is_not_for              # human-readable boundary; reviewers enforce via ADR check
+    - supersession            # process rule, not machine-checkable
   is_for:
     - promotion_traceability
     - cycle_prevention
