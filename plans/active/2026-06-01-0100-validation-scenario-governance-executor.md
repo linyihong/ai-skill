@@ -2,7 +2,7 @@
 
 **Status**: `stub`
 **世代**：Gen 3 Layer 2.5 sub-deliverable
-**Owner**: framework maintainer (linyihong)
+Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-01
 **Source**: [`plans/active/2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) §Phase 3 Round-4 T1 / Round-5 U2
 

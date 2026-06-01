@@ -42,7 +42,7 @@ governance_thresholds:
   rule_class_hard_limit: 40
   exceed_soft_target_action: review_split_opportunities
   exceed_hard_limit_action: governance_review_required
-  current_count: 28
+  current_count: 37   # round-4 backfill: 28 + 9 new classes (F5/F12/F14/F15/F16/F18/F19/F20/F21)
   # Round-4 T6 + Round-5: source_files per rule_class soft signal.
   # NOT a hard cap (renamed from max_source_files_per_class to be honest
   # about being a review trigger, not enforcement). Lint
@@ -303,6 +303,9 @@ internal_helper_allowlist:
     - existingHookTargets
     - buildHooksInstallResult
     - buildHooksRunResult
+    # F7/F8 (round-4 backfill): not rule executors —
+    - runHooks                  # F8: `ai-skill hooks` CLI subcommand router (analogous to runRuntime/runDoctor), not a rule-enforcing hook
+    - validateStopHookFinalTexts  # F7: plural collector helper for validateStopHookFinalText (singular, bound under dirty_repo_close_loop)
 
 # ─────────────────────────────────────────────────────────────────────
 # Verification levels (v4: 4-level ladder)
@@ -466,10 +469,12 @@ upstream_classes_scope:
   adr_revision_policy: supersede_required
 
 # ─────────────────────────────────────────────────────────────────────
-# Rule Classes (28 total)
-#   Distribution: mechanical 14 / pending_implementation 2 /
-#                 behavioral_only 7 / not_mechanizable 2 /
-#                 research_required 2 / deprecated 0  (==28 within 24/40 thresholds)
+# Rule Classes (37 total — round-4 backfill F1-F22)
+#   Distribution: mechanical 14 / pending_implementation 3 /
+#                 behavioral_only 12 / not_mechanizable 5 /
+#                 research_required 2 / deprecated 0  (==37 within 24/40;
+#                 exceeds soft_target 24 → review_split_opportunities action,
+#                 still under hard_limit 40)
 # ─────────────────────────────────────────────────────────────────────
 
 rule_classes:
@@ -494,6 +499,20 @@ rule_classes:
         hook_phase: SessionStart
         block_or_warn: warn
         notes: "injects Receipt template + required-reads reminder"
+      # F9 (round-4 backfill): PostToolUse emits Receipt-not-yet-emitted reminder
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: runPostToolUseHook
+        executor_kind: hook_dispatcher_entry
+        hook_phase: PostToolUse
+        block_or_warn: warn
+        notes: "reminds agent to emit Bootstrap Receipt before next response"
+      # F11 (round-4 backfill): UserPromptSubmit conditional bootstrap injection
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: runUserPromptSubmitHook
+        executor_kind: hook_dispatcher_entry
+        hook_phase: UserPromptSubmit
+        block_or_warn: warn
+        notes: "injects close-out + bootstrap reminder context (see Phase 5.x ADR draft)"
     rationale: |
       Bootstrap Receipt is session integrity anchor. Bypass = skipping all
       required reads. Read-log gate prevents copy-paste fabrication.
@@ -520,6 +539,16 @@ rule_classes:
       - runtime/cognitive-modes-memory-integration.yaml
       - runtime/cognitive-modes-cost-class.yaml
       - runtime/cognitive-modes-adaptive.yaml
+      - runtime/cognitive-modes-token-budget.yaml  # F1 (round-4 backfill)
+    # F1/B6: this class legitimately indexes the full cognitive-modes-*
+    # contract family (9 source files). All belong to one cohesive domain
+    # (cognitive mode declaration + its integration surfaces); splitting
+    # would fragment a single discipline across multiple rule_classes.
+    size_review_exemption_rationale: |
+      cognitive-modes-* yaml family is one cohesive contract surface
+      (mode primitive + phase/governance/memory/cost/adaptive/token-budget
+      integration). Splitting would scatter a single discipline. Reviewed
+      2026-06-01; size is intentional, not accidental sprawl.
     executors:
       - file: scripts/ai-skill-cli/internal/app/hooks.go
         symbol: runCommitMsgHook
@@ -678,6 +707,8 @@ rule_classes:
     source_files:
       - runtime/core-bootstrap.yaml
       - governance/lifecycle/system-upgrade-governance.yaml
+      - governance/lifecycle/executable-contract-boundary.yaml   # F3 (round-4 backfill)
+      - governance/lifecycle/executable-contract-inventory.yaml  # F4 (round-4 backfill)
     executors:
       - file: scripts/ai-skill-cli/internal/app/hooks.go
         symbol: validateRuntimeYamlProjects
@@ -734,6 +765,13 @@ rule_classes:
     source_files:
       - enforcement/escalation-policy.yaml  # (closest existing source; no dedicated yaml)
     executors:
+      # F10 (round-4 backfill): pre-commit dispatcher itself
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: runPreCommitHook
+        executor_kind: hook_dispatcher_entry
+        hook_phase: pre-commit
+        block_or_warn: block
+        notes: "pre-commit dispatcher; invokes validateNoNewShellScripts"
       - file: scripts/ai-skill-cli/internal/app/hooks.go
         symbol: validateNoNewShellScripts
         executor_kind: hook_dispatcher_entry  # called via runPreCommitHook
@@ -800,6 +838,8 @@ rule_classes:
     source_files:
       - enforcement/linked-updates.yaml
       - enforcement/linked-updates.md  # (if exists; otherwise yaml-only)
+      - governance/ai-runtime-governance/linked-update-governance.yaml  # F2 (round-4 backfill)
+      - governance/lifecycle/knowledge-update-flow.yaml  # F22 (round-4 T6: 回歸 linked_updates, not separate class)
     executors:
       - file: scripts/ai-skill-cli/internal/app/hooks.go
         symbol: validateStopHookFinalText
@@ -875,6 +915,27 @@ rule_classes:
     target_promotion: "child plan Phase 3 land → coverage=mechanical"
     verification_status:
       symbol_exists: pending
+      scenario_exists: pending
+      regression_exists: pending
+      runtime_observed: not_applicable_until_promoted
+
+  # F19 (round-4 T1): reclassified behavioral_only → pending_implementation.
+  # coverage_evidence schema already exists; only the executor is missing
+  # = known implementation gap, not "intentionally not mechanized".
+  - id: validation_scenario_governance
+    coverage: pending_implementation
+    source_files:
+      - governance/ai-runtime-governance/validation-scenario-governance.yaml
+    executors_planned:
+      - file: scripts/ai-skill-cli/internal/app/scenario_lint.go
+        symbol: LintValidationScenarios
+        executor_kind: hook_dispatcher_entry
+        hook_phase: "ai-skill runtime compile"
+        block_or_warn: block
+    child_plan: plans/active/2026-06-01-0100-validation-scenario-governance-executor.md
+    target_promotion: "child plan Phase 1 land → coverage=mechanical (scenario lint enforces coverage_evidence.coverage_target_pct)"
+    verification_status:
+      symbol_exists: pending  # scenario_lint.go not yet written
       scenario_exists: pending
       regression_exists: pending
       runtime_observed: not_applicable_until_promoted
@@ -955,10 +1016,13 @@ rule_classes:
     source_files:
       - enforcement/conversation-goal-ledger.md
       - enforcement/conversation-goal-ledger.yaml
+      - enforcement/goal-action-validation.yaml  # F17 (round-4 backfill: goal-action is the execution face of goal ledger)
     rationale: |
       .agent-goals/ is project-local state; deciding when to create,
       update, or close a goal involves intent that cannot be
-      mechanically inferred.
+      mechanically inferred. goal-action-validation is the execution
+      face of the same discipline (declared goal → observable action →
+      validation), so it shares this class rather than spawning its own.
     sunset_decision:
       revisit_when: "≥ 2 failure patterns surface where goal ledger absence caused recoverable harm"
       success_criteria: |
@@ -978,6 +1042,7 @@ rule_classes:
     source_files:
       - enforcement/failure-learning-system.md
       - enforcement/failure-learning-system.yaml
+      - enforcement/feedback-lessons.yaml  # F6 (round-4 backfill: feedback lessons are the artifact of failure learning)
     rationale: |
       Promoting an incident to a reusable failure pattern requires
       abstraction judgment (what is reusable, what is project-specific
@@ -1022,10 +1087,12 @@ rule_classes:
     coverage: behavioral_only
     source_files:
       - governance/document-sizing.md
+      - enforcement/content-layering.yaml  # F13 (round-4 backfill: layering is sibling judgment to sizing)
     rationale: |
       A 250-line cap is mechanical, but the split decision (which
       sections to extract, what to call the child files) requires
-      writing judgment.
+      writing judgment. content-layering is the sibling judgment (what
+      content belongs at which layer) and shares this class.
     sunset_decision:
       revisit_when: "a deterministic split-suggestion lint is prototyped"
       success_criteria: |
@@ -1037,6 +1104,116 @@ rule_classes:
         Initial entry creation (round-4/5 schema). Line-count cap is
         mechanical but split-section decision still judgment; no
         split-suggestion lint prototyped yet. Trigger unchanged.
+      depends_on_rule_classes: []
+
+  # F12 (round-4 backfill)
+  - id: authorization_scope
+    coverage: behavioral_only
+    source_files:
+      - enforcement/authorization-scope.yaml
+    rationale: |
+      Authorization scope ("who may change what") involves subjective
+      judgment about intent and trust boundaries; there is no single
+      mechanical predicate that captures the full authorization model.
+    sunset_decision:
+      revisit_when: "≥ 2 authorization-escape incidents accumulate, at least 1 mechanically detectable"
+      success_criteria: |
+        An authorization-detector executor ships and covers ≥ 80% of
+        historical authorization-escape incidents.
+      revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4 F12). No authorization-escape
+        incident corpus yet; remains behavioral pending incident signal.
+      depends_on_rule_classes: []
+
+  # F14 (round-4 backfill)
+  - id: cross_skill_references
+    coverage: behavioral_only
+    source_files:
+      - enforcement/cross-skill-references.yaml
+    rationale: |
+      Validity of skill ↔ skill references involves promotion-path and
+      reusability judgment, not a simple link-existence check.
+    sunset_decision:
+      revisit_when: "≥ 3 link-rot incidents (broken cross-link / stale reference / circular promotion) accumulate"
+      success_criteria: |
+        A link-resolver + promotion-target lint executor ships and covers
+        the three incident categories above.
+      revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4 F14). No link-rot corpus yet;
+        remains behavioral pending incident signal.
+      depends_on_rule_classes: []
+
+  # F16 (round-4 backfill)
+  - id: document_todo_list
+    coverage: behavioral_only
+    source_files:
+      - enforcement/document-todo-list.yaml
+    rationale: |
+      Whether a document's in-line task-list items should be converged is
+      a writing judgment; there is no boolean predicate for "this item
+      must close now".
+    sunset_decision:
+      revisit_when: "≥ 3 documented task-list-leak incidents accumulate"
+      success_criteria: |
+        A task-list-lifecycle lint executor ships and covers ≥ 3 incident
+        patterns (orphan item / stale item / item-as-commitment).
+      revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4 F16). Incident threshold raised
+        to ≥ 3 (round-4) to avoid rule explosion on a single occurrence.
+        Wording avoids the literal placeholder token to keep
+        vague_success_criteria lint clean (it is a real domain class).
+      depends_on_rule_classes: []
+
+  # F20 (round-4 backfill)
+  - id: decision_promotion_pipeline
+    coverage: behavioral_only
+    source_files:
+      - governance/lifecycle/decision-promotion-pipeline.yaml
+    upstream_classes: [failure_learning_system]
+    rationale: |
+      ADR / governance promotion and failure-pattern promotion are two
+      distinct promotion types, both currently behavioral. Kept as its own
+      class (not merged with failure_learning_system) so each can grow an
+      independent executor later; upstream_classes records that decision
+      artifacts may originate from failure_learning_system.
+    sunset_decision:
+      revisit_when: "≥ 2 ADR-promotion failure modes accumulate OR constitution-reference tracking becomes a hard requirement"
+      success_criteria: |
+        A promotion-chain lint executor ships and verifies the
+        upstream_classes chain is complete and acyclic for promoted decisions.
+      revisit_owner: "governance maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4 F20). upstream_classes points to
+        failure_learning_system (promotion source). ADR-010 freezes the
+        semantic to promotion traceability only.
+      depends_on_rule_classes: []
+
+  # F21 (round-4 backfill)
+  - id: directory_structure_governance
+    coverage: behavioral_only
+    source_files:
+      - governance/lifecycle/directory-structure-governance.yaml
+    rationale: |
+      Directory-structure governance involves responsibility-layering
+      judgment (which layer owns which directory); there is no single
+      mechanical predicate for "this file is in the wrong place".
+    sunset_decision:
+      revisit_when: "≥ 3 documented directory-drift incidents accumulate"
+      success_criteria: |
+        A directory-drift lint executor ships and covers ≥ 3 incident
+        categories (misfiled layer / orphan dir / responsibility overlap).
+      revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4 F21). Incident threshold ≥ 3 to
+        avoid spawning an executor on a single accidental rename.
       depends_on_rule_classes: []
 
   # ═══ NOT MECHANIZABLE ═════════════════════════════════════════════
@@ -1068,6 +1245,49 @@ rule_classes:
       comprehension. Mechanizing would reward gaming the metric with
       worse rules. Quality is validated through usage (failure
       patterns) and review, not lint.
+
+  # F5 (round-4 backfill)
+  - id: neutral_language
+    coverage: not_mechanizable
+    source_files:
+      - enforcement/neutral-language.yaml
+    rationale: |
+      Whether language is neutral (free of loaded / tool-presupposing /
+      culturally-narrow framing) is a writing judgment, the same family
+      as tool_neutral_documentation.
+    objective_validation_impossible_because: |
+      Lint can catch a fixed blacklist of loaded terms but cannot judge
+      whether framing as a whole is neutral. Forcing mechanization would
+      reward token-evasion rewrites that game the lint without improving
+      neutrality.
+
+  # F15 (round-4 backfill)
+  - id: decision_efficiency
+    coverage: not_mechanizable
+    source_files:
+      - enforcement/decision-efficiency.yaml
+    rationale: |
+      Whether a decision process is "efficient" is context-dependent;
+      there is no absolute metric that holds across task types.
+    objective_validation_impossible_because: |
+      Efficiency is relative to task complexity, risk, and reversibility.
+      Any fixed threshold (step count, time) would reward gaming the
+      metric (under-analyzing risky decisions to look efficient).
+
+  # F18 (round-4 backfill — kept separate from decision_efficiency per round-4)
+  - id: prompt_cache_efficiency
+    coverage: not_mechanizable
+    source_files:
+      - enforcement/prompt-cache-efficiency.yaml
+    rationale: |
+      Prompt cache hit rate depends on multi-turn context evolution and
+      cannot be judged from a single rule declaration.
+    objective_validation_impossible_because: |
+      Cache effectiveness is observational and varies with conversation
+      shape; an absolute cache-hit threshold would mislabel legitimately
+      cache-cold sessions as violations. Kept a separate class from
+      decision_efficiency (round-4) so a future token/cache lint isn't
+      blocked by a shared class boundary.
 
   # ═══ RESEARCH REQUIRED ════════════════════════════════════════════
 
