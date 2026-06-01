@@ -945,9 +945,13 @@ func lintBaselineSnapshotGovernance(reg *registrySnapshot) []EnforcementRegistry
 // ─────────────────────────────────────────────────────────────────────
 
 var (
-	phase0Pattern     = regexp.MustCompile(`(?m)^##\s+Phase\s+0\b`)
+	// Phase 0 may live at any heading depth (e.g. `### Phase 0` nested
+	// under a `## Phase Plan` section). Rule (b) only asks that a Phase 0
+	// outline exists, not that it is an h2.
+	phase0Pattern     = regexp.MustCompile(`(?m)^#{2,}\s+Phase\s+0\b`)
 	ownerPattern      = regexp.MustCompile(`(?mi)^(?:owner\s*:|.*\bOwner\s*:)\s*\S`)
-	acceptancePattern = regexp.MustCompile(`(?m)^##\s+(Validation Plan|Acceptance)\b`)
+	// Validation Plan / Acceptance also accepted at any heading depth.
+	acceptancePattern = regexp.MustCompile(`(?m)^#{2,}\s+(Validation Plan|Acceptance)\b`)
 )
 
 func lintPendingImplementationChildPlanValidity(repo string, reg *registrySnapshot) []EnforcementRegistryLintError {

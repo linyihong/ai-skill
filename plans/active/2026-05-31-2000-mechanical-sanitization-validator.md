@@ -1,6 +1,7 @@
 # Mechanical Sanitization Validator
 
 **Status**: `draft-v3`
+Owner: framework maintainer (linyihong)
 **世代**：Gen 3 runtime hardening（systemic gap remediation, 4th instance）
 **建立日期**：2026-05-31
 **最後更新**：2026-05-31（v3 — parent plan v2 升 P1，本 plan 改 P3；coverage class `sanitization` 統一綁定）

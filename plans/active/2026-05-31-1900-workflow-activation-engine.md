@@ -1,6 +1,7 @@
 # Workflow Activation Engine
 
 **Status**: `draft-v8`
+Owner: framework maintainer (linyihong)
 **世代**：Gen 3 runtime hardening（systemic gap remediation）— **meta-pattern 的第一個 instance**
 **建立日期**：2026-05-31
 **最後更新**：2026-05-31（v8 — parent plan v2 升為 P1，本 plan 改 P2；coverage class `workflow_activation` 統一綁定；v7 Q11 已 resolve）
