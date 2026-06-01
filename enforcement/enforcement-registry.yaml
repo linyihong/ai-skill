@@ -897,6 +897,12 @@ rule_classes:
         route_candidate_proposals.yaml. At that point this class merges
         with workflow_activation (shared executor) and is removed.
       revisit_owner: "framework maintainer (current: linyihong)"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4/5 schema). Confirmed discovery
+        remains a detector-miss fallback; revisit tied to workflow_activation
+        Phase 6.1 still accurate.
+      depends_on_rule_classes: [workflow_activation]
 
   - id: rule_weight
     coverage: behavioral_only
@@ -913,6 +919,12 @@ rule_classes:
         with a dedicated executor; this class then collapses to a
         pure policy reference (documentation-only).
       revisit_owner: "governance maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4/5 schema). P0/P1/P2/P3 ordering
+        remains case-by-case; no mechanically detectable P0 pattern set
+        has accumulated yet. Sunset trigger unchanged.
+      depends_on_rule_classes: []
 
   - id: dependency_reading
     coverage: behavioral_only
@@ -931,6 +943,12 @@ rule_classes:
         hook can verify the transcript shows Read calls to all
         required-set members before downstream actions.
       revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4/5 schema). Only the narrow
+        bootstrap-reads case is mechanized (via bootstrap_integrity);
+        general dependency reading still behavioral. Trigger unchanged.
+      depends_on_rule_classes: []
 
   - id: conversation_goal_ledger
     coverage: behavioral_only
@@ -948,6 +966,12 @@ rule_classes:
         (e.g. "multi-step task + no goal file → warn"); that subset
         becomes a separate mechanical rule_class.
       revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4/5 schema). Goal-file create/close
+        intent remains non-mechanizable; no qualifying failure patterns
+        accumulated. Trigger unchanged.
+      depends_on_rule_classes: []
 
   - id: failure_learning_system
     coverage: behavioral_only
@@ -965,6 +989,12 @@ rule_classes:
         + abstraction lint before commit. Class then collapses to
         sanitization (existing class).
       revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4/5 schema). Incident→pattern
+        abstraction still judgment-based; sunset depends on sanitization
+        class reaching mechanical. Trigger unchanged.
+      depends_on_rule_classes: [sanitization]
 
   - id: reusable_guidance_boundary
     coverage: behavioral_only
@@ -981,6 +1011,12 @@ rule_classes:
         Sanitization lint covers ≥ 80% of historical boundary
         violations. Remaining cases (framing-only) stay behavioral.
       revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4/5 schema). Reusable-vs-incident
+        framing judgment still behavioral; sunset depends on sanitization
+        class reaching mechanical. Trigger unchanged.
+      depends_on_rule_classes: [sanitization]
 
   - id: document_sizing
     coverage: behavioral_only
@@ -996,6 +1032,12 @@ rule_classes:
         Lint can emit "file X exceeds N lines; suggest splitting at
         section Y" with ≥ 70% maintainer acceptance rate.
       revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: |
+        Initial entry creation (round-4/5 schema). Line-count cap is
+        mechanical but split-section decision still judgment; no
+        split-suggestion lint prototyped yet. Trigger unchanged.
+      depends_on_rule_classes: []
 
   # ═══ NOT MECHANIZABLE ═════════════════════════════════════════════
 

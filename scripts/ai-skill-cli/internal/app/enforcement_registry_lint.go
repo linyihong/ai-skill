@@ -126,12 +126,14 @@ type registryExecutor struct {
 }
 
 type registrySunset struct {
-	RevisitWhen           string   `yaml:"revisit_when"`
-	SuccessCriteria       string   `yaml:"success_criteria"`
-	RevisitOwner          string   `yaml:"revisit_owner"`
-	LastReviewedAt        string   `yaml:"last_reviewed_at"`
-	LastReviewSummary     string   `yaml:"last_review_summary"`
-	DependsOnRuleClasses  []string `yaml:"depends_on_rule_classes"`
+	RevisitWhen       string `yaml:"revisit_when"`
+	SuccessCriteria   string `yaml:"success_criteria"`
+	RevisitOwner      string `yaml:"revisit_owner"`
+	LastReviewedAt    string `yaml:"last_reviewed_at"`
+	LastReviewSummary string `yaml:"last_review_summary"`
+	// Pointer so the lint can distinguish "field absent" (nil → warning)
+	// from "explicitly declared empty" ([] → conscious no-dependency, OK).
+	DependsOnRuleClasses *[]string `yaml:"depends_on_rule_classes"`
 }
 
 // LintEnforcementRegistry runs the Phase 3 compile-time lint against the
@@ -578,7 +580,9 @@ func lintBehavioralRecommendedFields(reg *registrySnapshot) []EnforcementRegistr
 		check("revisit_owner", s.RevisitOwner)
 		check("last_reviewed_at", s.LastReviewedAt)
 		check("last_review_summary", s.LastReviewSummary)
-		if len(s.DependsOnRuleClasses) == 0 {
+		if s.DependsOnRuleClasses == nil {
+			// nil = field absent. Explicitly empty [] is a conscious
+			// declaration of "no rule_class dependency" and is accepted.
 			errs = append(errs, EnforcementRegistryLintError{
 				Type:     "behavioral_only_missing_depends_on_rule_classes",
 				Severity: SeverityWarn,
@@ -586,7 +590,7 @@ func lintBehavioralRecommendedFields(reg *registrySnapshot) []EnforcementRegistr
 					{"rule_class", rc.ID},
 					{"missing_field", "sunset_decision.depends_on_rule_classes"},
 				},
-				Message: "behavioral_only recommends sunset_decision.depends_on_rule_classes (structured chain; replaces NLP parse of revisit_when). If sunset is triggered by another rule_class state change, list the class ids here.",
+				Message: "behavioral_only recommends sunset_decision.depends_on_rule_classes (structured chain; replaces NLP parse of revisit_when). Declare [] for no dependency, or list class ids if sunset is triggered by another rule_class state change.",
 			})
 		}
 	}
@@ -735,7 +739,10 @@ func lintBehavioralRevisitChain(reg *registrySnapshot) []EnforcementRegistryLint
 		if rc.Coverage != "behavioral_only" || rc.SunsetDecision == nil {
 			continue
 		}
-		for _, depID := range rc.SunsetDecision.DependsOnRuleClasses {
+		if rc.SunsetDecision.DependsOnRuleClasses == nil {
+			continue
+		}
+		for _, depID := range *rc.SunsetDecision.DependsOnRuleClasses {
 			dep, ok := classByID[depID]
 			if !ok {
 				errs = append(errs, EnforcementRegistryLintError{
