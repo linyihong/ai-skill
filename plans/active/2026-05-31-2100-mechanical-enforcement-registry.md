@@ -743,6 +743,64 @@ Round-2/3 一直在加 lint / 加 schema 欄位，是「治 symptom」。Round-4
 
 **這三條都不是欄位問題，是結構性方向錯誤的修正**。Round-4 應該是本 plan 的 final design baseline；之後若再有 round-5+，應觸發 governance review「為什麼這個 plan 需要 5 輪以上 review」（meta-failure-pattern signal）。
 
+#### Phase 3 Round-5 Review — Final Baseline 收尾（2026-06-01）
+
+User round-5 評審確認 **round-4 是 final design baseline**（不是因為「需要更多 round」），明確指出最大改善是「開始承認哪些東西不應該被機械化」。Round-5 不新增 lint / schema 欄位，只**收掉 round-4 留下的 3 個規格空洞**。
+
+> **Meta clarification**：round-5 不觸發前述 meta-failure-pattern signal。Meta-pattern 指的是「持續加 lint / schema 卻仍然有 gap」的死循環；round-5 是 round-4 baseline 的規格收斂，user 已明示認可方向。Round-6+ 才是 trigger。
+
+**問題 → 處置 矩陣**：
+
+| Pri | # | 規格空洞 | 處置 |
+|---|---|---|---|
+| P0 | U1 | `behavioral_only_review_age` (P0 fail >24m) vs `last_reviewed_at` 已降 recommended（缺則 warning）—— 規格沒寫「last_reviewed_at 缺失時 age 如何計算」 | **明確規範**：lint `behavioral_only_review_age` 僅在 `last_reviewed_at` **present** 時觸發；缺失時由 `behavioral_only_missing_last_reviewed_at` (warning) 單獨處理。**不雙觸發**。Rationale：last_reviewed_at 既然 recommended，缺失只應 warning；強制 fail 違反退階意圖。Schema 文件化：「age_unknown=skip, missing=warning」 |
+| P0 | U2 | F19 改 `pending_implementation` 需要 `child_plan`，但「stub plan」是否合法 round-4 沒定義 | **`child_plan` 合法性 schema**：(a) 路徑必須 resolve 到 `plans/active/*.md`；(b) plan 必須包含 `## Phase 0` heading（最低 outline）；(c) plan frontmatter 或內文必須有 owner 標示；(d) plan 必須有非空 `## Validation Plan` 或 `## Acceptance` 區塊（避免「空殼 stub」）。**stub 合法**只要滿足 (a)-(d)。新 lint `pending_implementation_child_plan_validity` (P0 fail)：違反 (a) fail；違反 (b)/(c)/(d) warning（漸進壓力，不立即阻塞 stub） |
+| P0 | U3 | `upstream_classes` freeze ADR 內容若不夠精確，半年後容易被擴張 | **ADR 必填區塊**：(a) 「Scope boundary」明寫 upstream_classes **IS for**: promotion traceability；(b) 「Scope boundary」明寫 upstream_classes **IS NOT for**: execution ordering / dependency injection / runtime orchestration / DAG-based scheduling；(c) 「Supersession clause」：任何跨越此 boundary 的新欄位（downstream_classes / promotion_role / artifact_type / dependency_type 等）必須先寫新 ADR 顯式 supersede 本 ADR，不得 silent 擴張；(d) ADR 標 `status: active` 加 `revision_policy: supersede_required`（registry self-governance lint 可未來檢查此政策） |
+| P2 | U4 | baseline_snapshot 治理（owner + summary 必填）反超 pending_implementation（只 child_plan）—— 治理倒掛 | **記錄為 intentional asymmetry，不立即修**。Rationale：baseline_snapshot 是「technical debt」必須有 owner + summary 才能 burndown；pending_implementation 是「tracked work」child_plan 本身已內含 owner + acceptance（U2 schema 強制）。兩者治理形式不同但實質強度相當，asymmetry 是 surface 差異不是漏洞。Companion .md 文件化此設計選擇 |
+
+**Q16 標為 Single Highest-Priority Open**：
+
+> Q16 (behavioral_only tier separation) 是 round-5 後**唯一需要主動追蹤**的 open question。Trigger 條件：當第 2 個 entry 出現「目前無 executor 但理論可做」（類似原 F19 性質），不應再硬塞 behavioral_only。屆時必須回到 Q16，要嘛開 child plan（如 F19 處置），要嘛拆 tier（如 `behavioral_only_lightweight` / `behavioral_only_strict`），不得第三度遷就分類。
+
+**Round-5 增量 lint（共 1 個，非新治理範疇，只是 U2 規格化）**：
+
+- `pending_implementation_child_plan_validity` (P0)：U2 處置
+
+**最終 lint check 統計**：round-4 的 12 個 → round-5 的 13 個（純增 U2 lint）。P0 fail 從 round-4 的 6 個 → round-5 的 7 個（U2 加回但只在 stub plan 不存在路徑時 fail，存在但缺 outline/owner/acceptance 只 warning）。
+
+**Schema 變更 round-5 增量**：
+
+- `coverage_status_spec.pending_implementation.child_plan_validity` 區塊新增 4 條規則（U2）
+- `coverage_status_spec.behavioral_only.lint_behavior` 明寫 review_age 與 missing_last_reviewed_at 互斥規則（U1）
+- ADR template 加 `revision_policy: supersede_required` 欄位定義（U3 配套）
+
+**執行順序更新**（11 步 → 維持 11 步）：
+
+- Step 0：寫 ADR + F19 stub plan
+  - **Step 0a 新增子步驟**：F19 stub plan 必須通過 U2 schema (a)-(d)；如果只是「title + 一段話」會被新 lint 警告
+  - **Step 0b 新增子步驟**：ADR-XXX-registry-as-governance-dag.md 必須含 U3 三區塊（Scope boundary IS / IS NOT / Supersession clause）
+- Step 1-10：原 round-4 順序不變
+
+**Round 演進總表**：
+
+| Round | 性質 | 主要產出 |
+|---|---|---|
+| Round-1 | 建立 registry | 初版 schema + rule_classes |
+| Round-2 | 補治理欄位（加法） | revisit_owner + bootstrap_mode + upstream_classes + class_size_review |
+| Round-3 | 治理機械化（過頭） | last_review_summary + measurable_signal + depends_on_rule_classes |
+| **Round-4** | **承認機械化邊界（減法）** | **strip behavioral_only to 3 hard + 4 recommended, F19 → pending, F22 回歸** |
+| Round-5 | 收尾規格空洞（精修） | U1/U2/U3 規格化, Q16 標 single open, ADR scope lock |
+
+**Final Baseline 宣告**：
+
+Round-5 land 後，本 plan 進入 **frozen design baseline**。任何 round-6+ review **必須先回答**：
+
+1. 這個 concern 是 round-1 ~ round-5 已 surface 但未解決的，還是真正新的？
+2. 若是新的，是「實作中 surface」還是「pre-implementation review」？
+3. 若是 pre-implementation review 第 6 次，觸發 meta-failure-pattern signal — 寫入 `enforcement/failure-patterns/excessive-pre-implementation-review.md`，繼續執行 round-5 baseline，不再 round-6 修改
+
+**這條 frozen baseline 本身是 registry 治理閉環的一部分**：證明 Layer 2.5 不只治理別人，也治理自己（Q16 不會在實作前無限延伸）。
+
 #### 原 pseudo-implementation（保留作為設計參考）
 
 在 `scripts/ai-skill-cli/internal/compile/`（或既有 compile pipeline）加 lint pass：
