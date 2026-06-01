@@ -801,6 +801,42 @@ Round-5 land 後，本 plan 進入 **frozen design baseline**。任何 round-6+ 
 
 **這條 frozen baseline 本身是 registry 治理閉環的一部分**：證明 Layer 2.5 不只治理別人，也治理自己（Q16 不會在實作前無限延伸）。
 
+#### Phase 3 Step 1 Schema Patch v2 — 自我審查 10 findings（2026-06-01）
+
+Schema patch v1 (commit 2a86fce) land 後，**Step 2 lint 實作開跑前**做了一輪 self-audit，surface 10 個 schema ambiguity。User round-6 評審（不觸發 meta-pattern signal — 此輪是「實作中 surface」非 pre-implementation review）分級確認後，schema patch v2 (commit c9c37b1) 處理 7 個，跳過 3 個。本節記錄審查結果作為治理軌跡。
+
+**Round-6 性質定義**：本輪 review 在 schema patch v1 land 後 + Step 2 開跑前 surface 問題，符合 round-5 §Final Baseline 宣告的「實作中 surface」分類，**不觸發** `excessive-pre-implementation-review` failure pattern。Round-5 baseline 本身未動，只是補規格細節。
+
+**10 findings + 處置矩陣**：
+
+| Pri | # | 問題 | User Grading | 處置 (c9c37b1) |
+|---|---|---|---|---|
+| P0 | A1 | `self_governance.lint_rules` 混 commit-msg phase (R1-R5) 與 compile-time phase (R6-R9)；命名漂移 (`R6_upstream_chain_resolution` 拼接 key) | 必修 | **拆 namespace**: `commit_msg_lint_rules: {R1..R5}` + `compile_time_lint_rules: {R1..R4}` (重編號)。不用 phase 欄位 (Go code 還要 filter)，直接拆 dict |
+| P0 | A2 | `bootstrap_mode` (strict/baseline_snapshot_v1) 與 `baseline_snapshot.enabled` 雙 state source，可出現 illegal 組合 `{strict, enabled=true}` | 必修 (user 強化版) | **砍掉 `baseline_snapshot.enabled`**，`bootstrap_mode` 是 single source。Lint R3 (`baseline_snapshot_missing_governance`) trigger 改 `bootstrap_mode == baseline_snapshot_v1` |
+| P0 | A3 | `upstream_classes_scope.is_for / is_not_for` 看起來像強制規則但 lint 只檢查 cycle + reference，讀者誤導 | 必修 | 新增 `mechanically_enforced: [reference_resolution, cycle_detection]` + `documentation_only: [is_for, is_not_for, supersession]` 區塊明寫邊界 |
+| P0 | A4 | `executors[]` / `executors_planned[]` shape 從未形式化，只靠範例推導，未來必出現 `executor:` / `planned_executor:` / `executors_plan:` typo | 必修 | 新增 top-level `executor_schema` 區塊: required=[file, symbol, executor_kind], optional=[hook_phase, block_or_warn, notes, instance_count], used_by=[mechanical.executors[], pending.executors_planned[]] |
+| P1 | B5 | `child_plan_validity.a_path_resolves` 未處理 anchor (registry 既有 source_files 用 `runtime/core-bootstrap.yaml#per_session_obligations`) | 應改 | (a) 規則加 `path.split('#')[0]` 標準化，mirror source_files anchor handling |
+| P1 | B6 | `source_files_review_threshold: 5` 無 per-class override，F22 backfill 後 linked_updates 可能噪音；最初我提案 `acknowledged_size_warning: bool` 但 user 指出 bool 會被 rubber-stamp | 哲學分歧, user 強化 | 採 user 強化版: `rule_classes[].size_review_exemption_rationale: <string>`，warning **仍 emit** 不 suppress，但含 maintainer rationale 而非 bare threshold breach。強制寫 rationale 避免 rubber-stamp |
+| P2 | C7 | `mechanical.requires: [executors, rationale]` 但既有 mechanical entries 不一定都有 rationale | audit 後決定 | **Audit 結果**: 14/14 mechanical entries 已有 rationale ✓，**skip**，不改 schema |
+| P2 | C8 | ADR-010 與 registry.yaml 都有 `adr_revision_policy: supersede_required`，重複定義 | 可改可不改, user 偏保留 | **保留重複** — registry 是 executable contract, ADR 是歷史決策, lint 不應該解析 ADR markdown |
+| P2 | C9 | `behavioral_only_missing_measurable_signal` whitelist 是 token-level，會被 `"no new lint required"` 否定句繞過 | 建議改 | 加 comment 明寫「TOKEN-LEVEL heuristic. Presence of keyword does NOT imply measurable; absence does NOT imply unmeasurable. Lint 是 documentation prompt, 非 semantic judge.」 |
+| P2 | C10 | 應在 schema 註明「Step 3 之前預期會 surface ≥7 個 recommended-missing warnings」 | 不建議 | **不入 canonical** — 時間性 expectation 幾個月後過時；放 migration plan |
+
+**處置統計**: 必修 7 個 (A1-A4 + B5-B6 + C9) → c9c37b1 全部 land。跳過 3 個 (C7 audit 結果無需改 / C8 哲學偏好保留 / C10 不入 canonical)。
+
+**Lint check 數量更新** (round-5 13 個 → schema patch v2 後仍 13 個，但**命名與 namespace 變更**):
+- commit_msg_lint_rules: R1-R5 (5 個, 不變)
+- compile_time_lint_rules: R1-R4 (4 個, 從 round-5 的 R6-R9 重編號)
+- behavioral_only_* lints: 4 個 hard FAIL + 5 個 WARNING (不變)
+
+**A4 影響 Step 2 實作**: Go code 現在有明確 `executor_schema` 可 unmarshal target，避免 schema patch v1 留下的 typed-struct 模糊。Step 2 enforcement_registry_lint.go 的 `registryExecutor` struct 已有 yaml tags，與 executor_schema 對齊。
+
+**User 哲學原則確認**:
+- **不允許 rubber-stamp suppression** (B6 string vs bool 之選)
+- **executable contract 與 historical decision 邊界清楚** (C8 保留重複)
+- **時間性 expectation 不入 canonical** (C10)
+- **lint 不做 NLP / 語意判斷** (A3 + C9 明寫邊界)
+
 #### 原 pseudo-implementation（保留作為設計參考）
 
 在 `scripts/ai-skill-cli/internal/compile/`（或既有 compile pipeline）加 lint pass：
