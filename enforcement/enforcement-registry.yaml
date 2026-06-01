@@ -43,11 +43,61 @@ governance_thresholds:
   exceed_soft_target_action: review_split_opportunities
   exceed_hard_limit_action: governance_review_required
   current_count: 28
+  # Round-4 T6 + Round-5: source_files per rule_class soft signal.
+  # NOT a hard cap (renamed from max_source_files_per_class to be honest
+  # about being a review trigger, not enforcement). Lint
+  # class_size_review_threshold emits warning only.
+  source_files_review_threshold: 5
   rationale: |
     Q6 + new Q resolution. 24 is the design target (registry stays
     legible); 40 is the hard ceiling. Between the two, maintainers are
     asked to review whether classes should be merged or further split.
     Beyond 40 triggers governance review on the abstraction granularity.
+
+    source_files_review_threshold (round-4 T6 / round-5): when a single
+    rule_class accumulates > 5 source_files, lint emits a warning to
+    prompt review of whether the class should be split. NOT a hard cap —
+    if the class is genuinely cohesive (e.g. linked_updates legitimately
+    indexes many cross-cutting docs), exceeding the threshold is
+    acceptable. The signal is documentation of "this class is getting
+    large, consider splitting", not "this class is forbidden".
+
+# ─────────────────────────────────────────────────────────────────────
+# Bootstrap mode (Round-2 R2 / Round-4): governs first-import behavior
+# ─────────────────────────────────────────────────────────────────────
+
+bootstrap_mode: strict
+# Allowed values:
+#   strict              — orphan_rule / orphan_executor hard-fail from
+#                         day 1 (current Ai-skill repo state; 22 findings
+#                         backfilled in single session, manageable)
+#   baseline_snapshot_v1 — first compile records existing orphans in
+#                         baseline_snapshot block below; lint downgrades
+#                         baseline entries to warning; NEW orphans
+#                         (not in baseline) still hard-fail. Intended for
+#                         mature repos where initial hard-block would
+#                         deadlock all commits during backfill.
+#
+# Switching strict → baseline_snapshot_v1 requires populating
+# baseline_snapshot.entries and writing baseline_snapshot.baseline_owner
+# + per-entry baseline_review_summary (Round-4 T4 governance parity).
+
+baseline_snapshot:
+  # Schema present even when bootstrap_mode=strict so future migrations
+  # don't need re-architecture. Empty when strict mode is in effect.
+  enabled: false
+  baseline_created_at: ~
+  baseline_burndown_target_date: ~
+  baseline_owner: ~                  # Round-4 T4: required when enabled
+  entries: []
+  # entries[] schema (per Round-4 T4):
+  #   - finding_type: orphan_rule | orphan_executor | ...
+  #     identifier: <file path or symbol name>
+  #     baseline_review_summary: |
+  #       What the maintainer found when accepting this into baseline
+  #       (≥ 20 chars, not "TBD" / "future")
+  #     accepted_at: ISO-8601
+  #     burndown_owner: <responsible party, may differ from baseline_owner>
 
 # ─────────────────────────────────────────────────────────────────────
 # Coverage status enum (v4: 6-value)
@@ -63,17 +113,56 @@ coverage_status_spec:
       against verification_levels thresholds.
   behavioral_only:
     semantics: "Intentionally NOT mechanized; depends on agent behavior"
+    # Round-4 T2: strip back to 3 hard required. behavioral_only is an
+    # exception mechanism, not a second-class coverage; over-instrumenting
+    # it makes governance cost exceed mechanical's, defeating the purpose.
     requires:
       - rationale
-      - sunset_decision.revisit_when         # Q2: required (event trigger)
-      - sunset_decision.success_criteria     # Q2: required (objective test)
-      # revisit_owner: recommended (not strictly required)
+      - sunset_decision.revisit_when         # Q2 + Round-4: required (event trigger)
+      - sunset_decision.success_criteria     # Q2 + Round-4: required (objective test)
+    # Round-4 T2: 4 fields downgraded from required to recommended.
+    # Lint emits warning (not fail) when these are missing, preserving
+    # exception-mechanism lightweight semantics while still surfacing
+    # governance gaps in coverage report.
+    recommended:
+      - sunset_decision.revisit_owner         # Round-2 R1: who reviews when revisit_when fires
+      - sunset_decision.last_reviewed_at      # Round-3 + Round-5 U1
+      - sunset_decision.last_review_summary   # Round-3: prevent formal-only date bumps
+      - sunset_decision.depends_on_rule_classes  # Round-3 S1: structured chain (replaces NLP parse)
     lint_behavior: |
-      Missing revisit_when OR success_criteria → compile fail.
+      Required field missing → compile FAIL:
+        - rationale
+        - sunset_decision.revisit_when
+        - sunset_decision.success_criteria
+      Recommended field missing → compile WARNING:
+        - revisit_owner / last_reviewed_at / last_review_summary /
+          depends_on_rule_classes
+
+      Round-5 U1 mutual exclusion:
+        behavioral_only_review_age (P0 fail at >24 months) ONLY fires
+        when last_reviewed_at is present. If last_reviewed_at is missing,
+        behavioral_only_missing_last_reviewed_at (warning) handles the
+        case alone. No double-trigger.
+        Semantics: age_unknown → skip; missing → warning.
+
       Q2 rationale: single-field schema would let behavioral_only decay
-      into "have criteria but no one checks" — more dangerous than "no
-      criteria but checks happen". Dual lock = event trigger + objective
-      test forms the minimum governance closure.
+      into "have criteria but no one checks". Dual lock (revisit_when +
+      success_criteria) forms the minimum governance closure.
+
+      Round-3 S1: behavioral_only_revisit_chain lint reads ONLY
+      sunset_decision.depends_on_rule_classes (structured array).
+      Free-text revisit_when remains human-readable description but is
+      NOT parsed by lint (NLP problem avoided).
+
+      Round-3 S2 + Round-4 T3: dual-gate on success_criteria quality:
+        - behavioral_only_vague_success_criteria (P0 fail, blacklist):
+          rejects "TBD" / "future" / "eventually" / "未來" / "TODO"
+        - behavioral_only_missing_measurable_signal (WARNING, whitelist):
+          flags when none of {\d+, %, rule_class, executor, lint,
+          coverage, validator, hook, scenario, gate} appears in
+          success_criteria. Warning only (not fail) because legitimate
+          non-numeric criteria like "constitution review process
+          formalized" should not be blocked.
   not_mechanizable:
     semantics: "Will NEVER be mechanized (subjective / no objective test)"
     requires: [rationale, objective_validation_impossible_because]
@@ -83,10 +172,31 @@ coverage_status_spec:
   pending_implementation:
     semantics: "Knows how to mechanize, child plan is active or scheduled"
     requires: [child_plan, target_promotion]
+    # Round-5 U2: child_plan validity schema. Stub plans are LEGAL only
+    # if they pass all 4 rules. Prevents "empty shell" plans that
+    # technically satisfy child_plan_required but provide no governance
+    # value.
+    child_plan_validity:
+      a_path_resolves: "child_plan path must resolve to an existing plans/active/*.md file"
+      b_phase_0_heading: "child_plan body must contain `## Phase 0` heading (minimum implementation outline)"
+      c_owner_present: "child_plan frontmatter or body must declare an owner (e.g. `Owner: <name>` or `owner:` in frontmatter)"
+      d_acceptance_section: "child_plan must contain non-empty `## Validation Plan` OR `## Acceptance` section"
     lint_behavior: |
-      child_plan must resolve to a plans/active/*.md file. If
-      target_promotion includes a date and that date has passed without
-      promotion, surface as warning in coverage report.
+      pending_implementation_child_plan_validity:
+        (a) violation → P0 FAIL  (path doesn't resolve = registry pointing
+            at nonexistent plan, hard breakage)
+        (b)/(c)/(d) violation → WARNING  (gradual pressure on stub
+            quality without immediately blocking stub creation; stubs are
+            legitimate as long as they're growing toward implementation)
+
+      target_promotion deadline: if it contains a date and that date has
+      passed without promotion, surface as warning in coverage report
+      (existing behavior, preserved).
+
+      Round-5 U2 rationale: F19 case demonstrated that "stub plan with
+      just title" is too weak — child_plan_validity 4 rules ensure stubs
+      have minimum structure (Phase 0 outline + owner + acceptance) to
+      prevent the schema from being gamed.
   research_required:
     semantics: "Knows it SHOULD be mechanizable, doesn't yet know HOW"
     requires: [rationale, research_questions, estimated_unblock_timeline]
@@ -262,6 +372,46 @@ self_governance:
     R3: "promotion must show verification_levels met mechanical thresholds; otherwise lint fail"
     R4: "deprecated past removal_date by 30+ days → governance alert (not blocking)"
     R5: "research_required past estimated_unblock_timeline → governance review trigger"
+    # Round-4/5 additions (compile-time lint, distinct from above
+    # self-governance commit-msg rules):
+    R6_upstream_chain_resolution: |
+      rule_classes[].upstream_classes references must resolve to existing
+      rule_class ids; transitive closure must not contain cycles. Cycle
+      detected → P0 FAIL.
+    R7_class_size_review_threshold: |
+      rule_classes[].source_files > governance_thresholds.source_files_review_threshold
+      → WARNING (not fail). Prompts review of split opportunities.
+    R8_baseline_snapshot_missing_governance: |
+      When bootstrap_mode = baseline_snapshot_v1, baseline_snapshot.baseline_owner
+      must be set AND every entries[].baseline_review_summary must be
+      non-empty (≥ 20 chars). Either missing → P0 FAIL.
+    R9_pending_implementation_child_plan_validity: |
+      See coverage_status_spec.pending_implementation.child_plan_validity
+      schema; (a) violation P0 FAIL, (b)/(c)/(d) WARNING.
+
+# ─────────────────────────────────────────────────────────────────────
+# upstream_classes scope (Round-4 T5 / Round-5 U3, ADR-010)
+# ─────────────────────────────────────────────────────────────────────
+
+upstream_classes_scope:
+  governing_adr: constitution/ADR-010-registry-upstream-classes-scope-freeze.md
+  schema: |
+    rule_classes[].upstream_classes: []  # optional, array of rule_class id
+  is_for:
+    - promotion_traceability
+    - cycle_prevention
+    - coverage_report_visualization  # future Phase 4
+  is_not_for:
+    - execution_ordering        # → runtime/phases/phase-machine.yaml
+    - dependency_injection      # → Go code
+    - runtime_orchestration     # → runtime/scheduler/
+    - dag_based_scheduling      # → not a task scheduler
+    - generic_graph_metadata    # no downstream_classes / promotion_role / artifact_type
+  supersession: |
+    Any new field crossing the IS NOT boundary requires a new ADR that
+    explicitly supersedes ADR-010. Silent schema expansion is prohibited.
+    See ADR-010 §Supersession Clause for the required ADR contents.
+  adr_revision_policy: supersede_required
 
 # ─────────────────────────────────────────────────────────────────────
 # Rule Classes (28 total)
