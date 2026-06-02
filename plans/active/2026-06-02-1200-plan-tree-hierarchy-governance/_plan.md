@@ -276,8 +276,8 @@ sub_plan_reason: >
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
 | Q1 深度防呆模式 | resolved | 2026-06-02 review v2：改 `warning_at_depth: 3`（非 block），讓真實案例決定上限 |
-| Q2 Archive 順序 | still-open | 待 Phase 0 確認搬移腳本 |
-| Q3 Sub-plan Decision Rationale | still-open | 待 Phase 0 評估模板可繼承 |
+| Q2 Archive 順序 | resolved | 2026-06-02 v2.2：lifecycle / storage 分離；gate 只看 status，folder 搬法為操作自由 |
+| Q3 Sub-plan Decision Rationale | resolved | 2026-06-02 v2.2：主計畫負責 Why、子計畫負責 How；sub-plan 預設繼承 parent rationale，必填僅 Purpose + Acceptance + Runtime Impact |
 | Q4 Validator 強度 | resolved | 2026-06-02 review v2：parent / sub_plan_reason / required_for_completion 缺失為 block；folder shape 為 warning（minimal governance） |
 | Q5 Spike 模板 | still-open | 待 Phase 0 評估最小章節集 |
 
@@ -336,8 +336,8 @@ sub_plan_reason: >
 ## Open Questions
 
 1. **深度防呆模式** — RESOLVED（v2 2026-06-02）：改 `warning_at_depth: 3`，不立硬上限；超過時 CLI 發 warning，建議拆獨立 main plan。原 `max_depth: 2` 是 premature abstraction。
-2. **Archive 順序** — 主計畫 + sub-plan 同 commit 一起搬 archived，還是分次？傾向同 commit（atomic），由 `validatePlanTreeArchiveOrder` 確保順序。
-3. **Sub-plan Decision Rationale 可繼承否** — sub-plan 是否需自己的 §Decision Rationale，或可在 frontmatter 標 `inherits_rationale: parent`？傾向 sub-plan 不需重複 Decision Rationale，但需有 §為什麼存在（簡短）+ §Acceptance。
+2. **Archive 順序** — RESOLVED（v2.2 2026-06-02）：lifecycle 與 storage 已明確分離 — `validatePlanTreeArchiveOrder` 只看 `status`，不看 location。所以「main + child 同 commit 一起搬 folder」「分次搬」都是合法的操作流程，框架不規範。Archive gate 只要求 required child `status: completed` 即可。
+3. **Sub-plan Decision Rationale 可繼承否** — RESOLVED（v2.2 2026-06-02）：明文採「主計畫負責 Why、子計畫負責 How」原則。Sub-plan **不需** §Decision Rationale，**預設繼承 parent**。Sub-plan 必填章節最小集：(a) §Purpose（為什麼存在，簡短）、(b) §Acceptance Criteria、(c) §Runtime Impact（若有 runtime trigger / generated surface 改動）。避免 4 個 child 全部重寫 rationale 的維護負擔。
 4. **Validator 強度** — RESOLVED（v2 2026-06-02）：minimal governance — `parent` / `sub_plan_reason`（空字串視為缺）/ `required_for_completion` 缺失為 block；不審 reason 內容；folder shape 全部為 warning。
 5. **Spike 模板最小集** — `plan_kind: spike` 是否可只有 §Goal + §Acceptance + §結果回寫，免 Phase 0 公版？傾向是，但結果必須回寫主計畫對應 phase。
 6. **Sub-plan dependency 表達**（v2 新增）— 當 sub-plan C 依賴 sub-plan A 完成時，是否需要 `depends_on: [<sub-id>]` 欄位？**Deferred — promotion gate：至少 3 個真實案例**（自然發生 C-depends-on-A 情境）再討論。理由：一旦加 `depends_on` 就會引入 DAG 而非 Tree，topological sort / cycle detection / graph validation 等複雜度成倍。本 plan 目前治理的是 Tree，不是 DAG；不為了通用而通用。
@@ -350,7 +350,7 @@ sub_plan_reason: >
 - [ ] 4 個 sub-plan 全部 `status: completed` 且 archived
 - [ ] Phase 5 收尾項目全 checked
 - [ ] `governance/plan-tree-hierarchy.md` 落地
-- [ ] 3 個新 validator 進 `hooks.go` registry，unit test pass
+- [ ] 5 個 validator 進 `hooks.go` registry（4 block + 1 warning），unit test pass
 - [ ] `ai-skill plans tree` CLI 可用
 - [ ] 至少 1 組真實 parent-child plan 用新格式跑完（可用本 plan 自身作為 dogfood）
 - [ ] Failure pattern 文件化
