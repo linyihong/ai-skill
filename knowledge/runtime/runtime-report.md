@@ -35,7 +35,7 @@
 | `route.governance.validation-scenario` | `governance/ai-runtime-governance/validation-scenario-governance.md` | `small` | `summary-first` | Stateless reproduction、no answer leakage、failure class、expected/forbidden behavior 與 traceability gates 已檢查。 |
 | `route.governance.cognitive-state-evidence` | `governance/ai-runtime-governance/cognitive-state-governance.md` | `medium` | `summary-first` | Claim scope、evidence owner、confidence integrity、contradiction propagation、runtime primitive boundary 與 scenario coverage 已檢查。 |
 | `route.metadata.knowledge-atom-schema` | `metadata/schema.md` | `large` | `source-backed` | 欄位可套用到第一批 atom candidates，且 Markdown links 可解析。 |
-| `route.workflow.apk-analysis` | `workflow/apk-analysis/execution-flow.md` | `specialized` | `source-backed` | 新分層路徑可讀取，workflow 與 analysis 內容已分離。 |
+| `route.workflow.apk-analysis` | `workflow/apk-analysis/execution-flow.md` | `specialized` | `source-backed` | 新分層路徑可讀取，workflow 與 analysis 內容已分離；artifact-gates focused surfaces 可由同一 hierarchical route 找到。 |
 | `route.intelligence.apk-highest-leverage-path` | `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md` | `specialized` | `source-backed` | 已比較可用 routes、選定 evidence-to-cost ratio 最高路線、記錄 fallback 與 attribution 回補條件。 |
 | `route.feedback.promotion-pipeline` | `feedback/promotion/README.md` | `large` | `source-backed` | 原 lesson source 保留、promotion target 明確、runtime surfaces 與 close-loop validation 已同步。 |
 | `route.models.model-aware-routing` | `models/README.md` | `large` | `source-backed` | Strategy、capability dimensions、compression、fallback behavior、workflow shape 與 validation target 可被記錄，且 validation/scenarios/models 覆蓋主要 routing cases。 |
@@ -112,7 +112,7 @@
 | --- | --- | --- | --- | --- |
 | `graph.analysis-layers` | `analysis/README.md` | `candidate` | 22 | [`analysis-layers.yaml`](../graphs/analysis-layers.yaml) |
 | `graph.analysis-repo-methods` | `analysis/repo/README.md` | `candidate` | 6 | [`analysis-repo-methods.yaml`](../graphs/analysis-repo-methods.yaml) |
-| `graph.apk-analysis-pilot` | `plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md` | `new-layer-promoted` | 5 | [`apk-analysis-pilot.yaml`](../graphs/apk-analysis-pilot.yaml) |
+| `graph.apk-analysis-pilot` | `plans/archived/2026-05-11-1129-apk-analysis-pilot-migration.md` | `new-layer-promoted` | 13 | [`apk-analysis-pilot.yaml`](../graphs/apk-analysis-pilot.yaml) |
 | `graph.apk-highest-leverage-analysis` | `intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md` | `candidate` | 4 | [`apk-highest-leverage-analysis.yaml`](../graphs/apk-highest-leverage-analysis.yaml) |
 | `graph.cognitive-modes` | `runtime/cognitive-modes.yaml` | `active` | 13 | [`cognitive-modes.yaml`](../graphs/cognitive-modes.yaml) |
 | `graph.constitution-adr` | `constitution/README.md` | `candidate` | 12 | [`constitution-adr.yaml`](../graphs/constitution-adr.yaml) |
