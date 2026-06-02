@@ -852,6 +852,88 @@ preflight
 	}
 }
 
+// Step 7 wire: buildEnforcementRegistryLintCheck severity-aware behavior.
+
+func TestEnforcementRegistryLintCheck_FailBlocks(t *testing.T) {
+	// A mechanical class with a nonexistent executor symbol → FAIL → blocks.
+	// Note: binding_required_for must include the kind, else missing-symbol
+	// lint skips it (mirrors the real registry's executor_kind_spec).
+	header := `schema_version: 2
+id: enforcement.enforcement-registry
+enforcement_mode:
+  orphan_rule: fail
+  orphan_executor: fail
+executor_kind_spec:
+  binding_required_for:
+    - commit_msg_validator
+internal_helper_allowlist:
+  symbols: []
+`
+	dir := writeRegistryFixture(t, header+`
+rule_classes:
+  - id: broken
+    coverage: mechanical
+    source_files: []
+    rationale: "x"
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: thisSymbolDoesNotExistAnywhere
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+`)
+	// Empty hooks.go so symbol cannot resolve.
+	if err := os.WriteFile(filepath.Join(dir, "scripts", "ai-skill-cli", "internal", "app", "hooks.go"), []byte("package app\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	check, blocks := buildEnforcementRegistryLintCheck(dir)
+	if !blocks {
+		t.Fatalf("expected FAIL to block; check=%+v", check)
+	}
+	if check.Status != "failed" {
+		t.Fatalf("expected status failed; got %q", check.Status)
+	}
+	if !strings.Contains(check.Message, "FAIL:") {
+		t.Fatalf("expected summary with FAIL count; got %q", check.Message)
+	}
+}
+
+func TestEnforcementRegistryLintCheck_WarningDoesNotBlock(t *testing.T) {
+	// class_size warning only → does not block, status warning.
+	dir := writeRegistryFixture(t, v2Header+`
+governance_thresholds:
+  source_files_review_threshold: 2
+rule_classes:
+  - id: big
+    coverage: mechanical
+    source_files: [a.md, b.md, c.md]
+    rationale: "x"
+    executors: []
+`)
+	check, blocks := buildEnforcementRegistryLintCheck(dir)
+	if blocks {
+		t.Fatalf("warning must not block; check=%+v", check)
+	}
+	if check.Status != "warning" {
+		t.Fatalf("expected status warning; got %q (%s)", check.Status, check.Message)
+	}
+	if !strings.Contains(check.Message, "Compile PASSED") {
+		t.Fatalf("expected PASSED summary; got %q", check.Message)
+	}
+}
+
+func TestEnforcementRegistryLintCheck_CleanIsOK(t *testing.T) {
+	dir := writeRegistryFixture(t, v2Header+`
+rule_classes: []
+`)
+	check, blocks := buildEnforcementRegistryLintCheck(dir)
+	if blocks {
+		t.Fatalf("clean registry must not block; %+v", check)
+	}
+	if check.Status != "ok" {
+		t.Fatalf("expected status ok; got %q (%s)", check.Status, check.Message)
+	}
+}
+
 func TestLintPendingImplementationChildPlanValidity_BCD_Warning(t *testing.T) {
 	// path resolves (a OK) but body missing Phase 0 / owner / acceptance → WARNINGs
 	dir := writeRegistryFixture(t, v2Header+`

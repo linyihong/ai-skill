@@ -657,7 +657,73 @@ func buildRuntimeCompileResult(opts runtimeOptions) Result {
 	}
 	result.Mutations = append(result.Mutations, outputDB)
 
+	// Phase 3 (mechanical-enforcement-registry): compile-time lint of
+	// enforcement/enforcement-registry.yaml. FAIL findings block compile
+	// (ExitValidationFailed); WARNING findings print a governance summary
+	// but do not block (severity model: FAIL=contract violation,
+	// WARNING=governance signal).
+	lintCheck, lintBlocks := buildEnforcementRegistryLintCheck(repo)
+	result.Checks = append(result.Checks, lintCheck)
+	if lintBlocks {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "enforcement_registry_lint_failed", Message: lintCheck.Message, Remediation: "Resolve FAIL findings in enforcement/enforcement-registry.yaml (see lint output)."}
+		return result
+	}
+
 	return result
+}
+
+// buildEnforcementRegistryLintCheck runs the Phase 3 enforcement-registry
+// lint and renders a severity-aware summary. Returns the Check plus whether
+// the result should block compile (any FAIL-severity finding).
+func buildEnforcementRegistryLintCheck(repo string) (Check, bool) {
+	errs, err := LintEnforcementRegistry(repo)
+	if err != nil {
+		// Missing/malformed registry is itself a blocking condition.
+		return Check{Name: "enforcement_registry_lint", Status: "failed", Message: err.Error()}, true
+	}
+	var fails, warns []EnforcementRegistryLintError
+	for _, e := range errs {
+		if e.IsFail() {
+			fails = append(fails, e)
+		} else {
+			warns = append(warns, e)
+		}
+	}
+	summary := formatEnforcementRegistryLintSummary(fails, warns)
+	if len(fails) > 0 {
+		return Check{Name: "enforcement_registry_lint", Status: "failed", Message: summary}, true
+	}
+	if len(warns) > 0 {
+		return Check{Name: "enforcement_registry_lint", Status: "warning", Message: summary}, false
+	}
+	return Check{Name: "enforcement_registry_lint", Status: "ok", Message: "Enforcement Registry Lint: FAIL 0 / WARNING 0"}, false
+}
+
+func formatEnforcementRegistryLintSummary(fails, warns []EnforcementRegistryLintError) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "Enforcement Registry Lint\n\nFAIL:    %d\nWARNING: %d\n", len(fails), len(warns))
+	emit := func(title string, list []EnforcementRegistryLintError) {
+		if len(list) == 0 {
+			return
+		}
+		fmt.Fprintf(&b, "\n%s:\n", title)
+		for _, e := range list {
+			fmt.Fprintf(&b, "  [%s]\n", e.Type)
+			for _, f := range e.Fields {
+				fmt.Fprintf(&b, "    %s: %s\n", f.Key, f.Value)
+			}
+		}
+	}
+	emit("Failures", fails)
+	emit("Warnings", warns)
+	if len(fails) == 0 {
+		b.WriteString("\nCompile PASSED (warnings are advisory governance signals)")
+	} else {
+		b.WriteString("\nCompile BLOCKED — resolve FAIL findings above")
+	}
+	return b.String()
 }
 
 func runtimeCompileDBPath(repo string, dbPath string) string {
