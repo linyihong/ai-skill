@@ -77,12 +77,12 @@ parent: null
 **正面**：
 - `ls plans/active/<folder>/` 給人類直觀視覺，但 hierarchy 真實來源是 frontmatter `parent`，folder 放錯不會壞掉
 - Sub-plan 細節與主計畫驗證要點分離，主計畫不再臃腫
-- Validator 機械擋「sub-plan 缺 parent / reason / required_for_completion」與「主計畫 archive 時 required child 未 completed」；folder shape 只發 warning，不擋 commit
-- Tree CLI 從 `parent` pointer 動態建樹，給快速 status overview
+- Validator 機械擋「frontmatter 缺欄位」「archive 時 required child 未 completed」「dangling parent pointer」「duplicate id」；folder shape 只發 warning，不擋 commit
+- Tree CLI 從 `parent` pointer 動態建樹，給快速 status overview；referential integrity 由 validator 保證，不會出現 orphan node
 
 **負面**：
 - 一次性遷移成本（現有 6 個 active plan + N 個 archived plan）
-- 新增 2 條 block validator + 1 條 warning validator，增加 hook 執行時間（但比 v1 三條 block 輕）
+- 新增 4 條 block validator + 1 條 warning validator，增加 hook 執行時間；其中 ParentReference / UniqueID 需要 scan 全 repo plan 集合，evaluator 需做檔案級 cache 避免 N² 成本
 
 **風險**：
 - 過度結構化 — 簡單 plan 被迫塞 folder（mitigation: `plan_kind: spike` 簡化模板）
@@ -107,7 +107,9 @@ parent: null
 | 階段 | Runtime owner | Trigger flow | Loaded contract | Runtime action / blocker | Evidence |
 |------|---------------|--------------|-----------------|--------------------------|----------|
 | 新建 sub-plan commit | `commit-msg` hook | git commit staging plan with `plan_kind: sub` → `validatePlanTreeFrontmatter` | 本 plan §Frontmatter Schema | **Block** 若 `parent` 缺、`sub_plan_reason` 為空或缺、或 `required_for_completion` 缺 | unit test fixture `testdata/plan-tree/sub-missing-parent.md`、`sub-empty-reason.md` |
-| 主計畫 archive commit | `commit-msg` hook | git commit moving `plans/active/<main>/` → `plans/archived/<main>/` → `validatePlanTreeArchiveOrder` | Runtime scan：所有 `parent == <main>` 且 `required_for_completion: true` 的 sub-plan status | **Block** 若有 `required_for_completion: true` 的 sub-plan 仍 `status != completed` 且未 archive | unit test fixture `testdata/plan-tree/archive-with-required-pending.md` |
+| 主計畫 archive commit | `commit-msg` hook | git commit moving `plans/active/<main>/` → `plans/archived/<main>/` → `validatePlanTreeArchiveOrder` | Runtime scan：所有 `parent == <main>` 且 `required_for_completion: true` 的 sub-plan `status` | **Block** 若有 `required_for_completion: true` 的 sub-plan `status != completed`。**只看 lifecycle status，不看 location**（sub-plan completed 但仍在 active/ 不阻擋 parent archive — archive 是儲存位置，completed 是生命週期狀態，不混） | unit test fixture `testdata/plan-tree/archive-with-required-pending.md` |
+| Parent reference 檢查 | `commit-msg` hook | git commit staging sub-plan with `parent: <id>` → `validatePlanTreeParentReference` | 全 repo scan `plans/active/**/*.md` + `plans/archived/**/*.md` 收集 `id` 集合 | **Block** 若 `parent` 指向的 id 在 active + archived 都找不到（dangling pointer / orphan node） | unit test fixture `testdata/plan-tree/parent-orphan.md` |
+| ID 唯一性檢查 | `commit-msg` hook | git commit staging any plan → `validatePlanTreeUniqueID` | 全 repo scan plan frontmatter `id` 欄位 | **Block** 若同一 `id` 出現在 ≥ 2 個檔案（含 active vs archived 跨目錄重複） | unit test fixture `testdata/plan-tree/duplicate-id.md` |
 | Folder shape lint | `commit-msg` hook | git commit staging `plans/active/<x>/**` → `validatePlanTreeFolderConvention` | 本 plan §資料夾 convention | **Warning only**（不 block）— folder 缺 `_plan.md`、檔名不符 `NN-` 前綴、或深度 ≥ 3。輸出建議訊息，不擋 commit | unit test fixture `testdata/plan-tree/depth-3-warning.md` |
 | Tree 渲染 | `ai-skill plans tree` CLI | 使用者執行 → 遞迴讀 `plans/active/` + `plans/archived/` → 解析 frontmatter `parent` → 動態建樹 | 本 plan §Frontmatter Schema | Print 樹狀 + status 進度 + warning（非 blocker）；即使 folder 放錯仍能建出正確 tree | golden test `testdata/plan-tree/tree-output.txt` |
 
@@ -156,9 +158,11 @@ plans/
 - 巢狀深度 ≥ 3 層時發 warning，建議拆出獨立 main plan（不硬擋）。
 - Archive 時建議整個 folder 一起搬。
 
-**Block 規則只有兩條**（在 §Runtime Execution Path）：
+**Block 規則四條**（在 §Runtime Execution Path）：
 1. Sub-plan frontmatter 缺 `parent` / `sub_plan_reason` / `required_for_completion` → block。
-2. 主計畫 archive 時，`required_for_completion: true` 的 sub-plan 未 completed → block。
+2. 主計畫 archive 時，`required_for_completion: true` 的 sub-plan `status != completed` → block。**只看 status，不看 location**。
+3. Sub-plan `parent` 指向的 id 不存在（dangling pointer） → block。
+4. 同一 `id` 出現在 ≥ 2 個檔案（duplicate id） → block。
 
 ---
 
@@ -252,7 +256,7 @@ sub_plan_reason: >
 | Sub-plan | 完成條件摘要 | required_for_completion | 驗證方式 |
 |---|---|---|---|
 | `01-frontmatter-schema` | schema YAML 文件化 + 範例 fixture（main / sub / spike） | true | unit test pass + 本 plan §Frontmatter Schema 對齊 |
-| `02-validator-implementation` | 2 個 block validator + 1 個 warning validator 落地 + dispatch registry | true | `go test ./scripts/ai-skill-cli/internal/app/...` pass |
+| `02-validator-implementation` | 4 個 block validator + 1 個 warning validator 落地 + dispatch registry | true | `go test ./scripts/ai-skill-cli/internal/app/...` pass |
 | `03-cli-tree-subcommand` | `ai-skill plans tree` 從 `parent` pointer 渲染 active + archived | false | golden test + 手動跑 CLI 驗證輸出 |
 | `04-existing-plan-migration` | 盤點 6 個 active plan + 識別 parent-child 並遷移 | true | 遷移後 `ai-skill plans tree` 顯示正確階層 |
 
@@ -298,9 +302,11 @@ sub_plan_reason: >
 
 詳見 [`02-validator-implementation.md`](02-validator-implementation.md)（待建）。本主計畫驗證要點：
 - `validatePlanTreeFrontmatter`（**block**）— sub-plan 缺 `parent` / `sub_plan_reason`（空字串視為缺）/ `required_for_completion`
-- `validatePlanTreeArchiveOrder`（**block**）— 主計畫 archive 時，所有 `parent == <main>` 且 `required_for_completion: true` 的 sub-plan 必須 `status: completed`
+- `validatePlanTreeArchiveOrder`（**block**）— 主計畫 archive 時，所有 `parent == <main>` 且 `required_for_completion: true` 的 sub-plan 必須 `status: completed`（只看 status，不看 location）
+- `validatePlanTreeParentReference`（**block**）— sub-plan `parent` 指向的 id 必須存在於全 repo plan 集合（active + archived）；防 orphan node
+- `validatePlanTreeUniqueID`（**block**）— 全 repo plan `id` 必須唯一；防 parent pointer 指錯
 - `validatePlanTreeFolderConvention`（**warning only**）— folder 缺 `_plan.md`、檔名不符 `NN-` 前綴、或深度 ≥ 3
-- 3 個 validator 進 `hooks.go` registry，dispatch 順序與既有 11 個 validator 不衝突
+- 5 個 validator 進 `hooks.go` registry，dispatch 順序與既有 11 個 validator 不衝突
 
 ---
 
@@ -334,7 +340,7 @@ sub_plan_reason: >
 3. **Sub-plan Decision Rationale 可繼承否** — sub-plan 是否需自己的 §Decision Rationale，或可在 frontmatter 標 `inherits_rationale: parent`？傾向 sub-plan 不需重複 Decision Rationale，但需有 §為什麼存在（簡短）+ §Acceptance。
 4. **Validator 強度** — RESOLVED（v2 2026-06-02）：minimal governance — `parent` / `sub_plan_reason`（空字串視為缺）/ `required_for_completion` 缺失為 block；不審 reason 內容；folder shape 全部為 warning。
 5. **Spike 模板最小集** — `plan_kind: spike` 是否可只有 §Goal + §Acceptance + §結果回寫，免 Phase 0 公版？傾向是，但結果必須回寫主計畫對應 phase。
-6. **Sub-plan dependency 表達**（v2 新增）— 當 sub-plan C 依賴 sub-plan A 完成時，是否需要 `depends_on: [<sub-id>]` 欄位？目前 defer 至真實案例出現再加，避免 premature schema。
+6. **Sub-plan dependency 表達**（v2 新增）— 當 sub-plan C 依賴 sub-plan A 完成時，是否需要 `depends_on: [<sub-id>]` 欄位？**Deferred — promotion gate：至少 3 個真實案例**（自然發生 C-depends-on-A 情境）再討論。理由：一旦加 `depends_on` 就會引入 DAG 而非 Tree，topological sort / cycle detection / graph validation 等複雜度成倍。本 plan 目前治理的是 Tree，不是 DAG；不為了通用而通用。
 
 ---
 
