@@ -1,0 +1,9 @@
+chore(registry): demote __test_demotion__ to behavioral_only
+
+Synthetic commit message paired with new-registry.yaml. Includes
+the required [registry-status-change] trailer (R1) and rationale:
+body so R1 passes; intentionally lacks adr_reference in the
+demoted rule_class entry so R2 (demotion needs ADR) fires.
+
+[registry-status-change]
+rationale: testing R2 enforcement — demotion without ADR must reject

@@ -282,6 +282,12 @@ per_commit_obligations:
     severity: block
     opt_out_marker: "[skip-plan-archival-audit]"
     contract_source: plans/active/2026-05-28-1830-plan-archival-audit-validator.md (Phase 2)
+  - id: obligation.commit.enforcement_registry_transition
+    fires: every_commit_staging_enforcement_registry_yaml_with_coverage_change
+    validator: validateEnforcementRegistryTransition
+    severity: block
+    opt_out_marker: "[skip-registry-transition]"
+    contract_source: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md (Phase 4.5 — Self-Governance Lint Rules R1/R2/R3) + enforcement/enforcement-registry.yaml §self_governance
 
 per_commit_dispatcher_status:
   machine_iterable: true

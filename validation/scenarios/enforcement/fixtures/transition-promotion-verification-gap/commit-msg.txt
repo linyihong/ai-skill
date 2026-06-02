@@ -1,0 +1,10 @@
+feat(registry): promote __test_promotion__ to mechanical
+
+Synthetic commit message paired with new-registry.yaml. Claims the
+class is now mechanical but the executor symbol
+validateNonexistentPromotionTarget does not exist in the fixture
+hooks.go. R3 (promotion verification thresholds) must reject this
+commit.
+
+[registry-status-change]
+rationale: testing R3 enforcement — promotion without verified executor symbol

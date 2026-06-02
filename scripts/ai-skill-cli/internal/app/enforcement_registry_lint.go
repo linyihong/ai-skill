@@ -115,6 +115,13 @@ type registryRuleClass struct {
 	// Schema patch v2 additions:
 	UpstreamClasses             []string           `yaml:"upstream_classes"`
 	SizeReviewExemptionRationale string            `yaml:"size_review_exemption_rationale"`
+	// Phase 4.5 — registry self-governance. Required on rule_class
+	// entries whose coverage value is being demoted (e.g. mechanical →
+	// behavioral_only). Validator validateEnforcementRegistryTransition
+	// blocks demotion commits that lack this field. Format:
+	// `constitution/ADR-<NNN>-<slug>.md` (file must exist under <repo>).
+	AdrReference string `yaml:"adr_reference"`
+	DemotionRationale string `yaml:"demotion_rationale"`
 }
 
 type registryExecutor struct {

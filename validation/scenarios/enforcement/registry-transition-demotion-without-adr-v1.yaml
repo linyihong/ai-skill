@@ -1,0 +1,92 @@
+# Source: Phase 4.5 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+# §Self-Governance Lint Rules — R2 (demotion 必須附 ADR；無 ADR → commit reject)
+id: registry-transition-demotion-without-adr-v1
+domain: enforcement
+type: registry-transition
+priority: P1
+
+# Phase 4.5 (2026-06-02): scenario-driven validator design (per
+# governance → scenario → validator chain). Fixture pair (old + new
+# registry yaml + commit-msg.txt) simulates a staged commit where
+# __test_demotion__ is demoted mechanical → behavioral_only without
+# adr_reference. validateEnforcementRegistryTransition must reject.
+execution_status:
+  runnable: true
+  cli_surface: "ai-skill enforcement transition-check"
+  fixture_root: validation/scenarios/enforcement/fixtures/transition-demotion-without-adr
+
+failure_source:
+  pattern: silent-demotion-without-governance-trace
+  class: meta-governance-gap
+  date: "2026-06-02"
+  description: |
+    Without R2 enforcement, any developer can flip a rule_class from
+    coverage=mechanical to behavioral_only by editing a single yaml
+    line. Demotion erases automated enforcement; if the decision has
+    no ADR trail, future maintainers cannot reconstruct WHY a rule
+    was demechanized. R2 forces an ADR reference at commit time so
+    every demotion leaves an immutable governance trace.
+
+given:
+  task: phase_4_5_validator_rejects_demotion_without_adr
+  artifacts:
+    - validation/scenarios/enforcement/fixtures/transition-demotion-without-adr/old-registry.yaml
+    - validation/scenarios/enforcement/fixtures/transition-demotion-without-adr/new-registry.yaml
+    - validation/scenarios/enforcement/fixtures/transition-demotion-without-adr/commit-msg.txt
+    - scripts/ai-skill-cli/internal/app/enforcement_transition.go (validator + transition-check CLI)
+
+when:
+  action: |
+    Run `ai-skill enforcement transition-check` against the fixture pair
+    + commit-msg.txt. The CLI applies the same R1/R2/R3 engine the
+    commit-msg hook validator will invoke at commit time.
+
+then:
+  expected_route:
+    - transition-check exits non-zero (validation_failed = 30)
+    - output cites violation code R2_demotion_missing_adr
+    - output cites the offending rule_class id (__test_demotion__)
+    - output cites the transition direction (mechanical → behavioral_only)
+    - --expect-violation R2_demotion_missing_adr exits 0 (assertion matched)
+  forbidden_routes:
+    - transition-check exits 0 silently
+    - R1 (trailer + rationale present) blocks before R2 fires (R2 must fire even when R1 passes)
+    - validator misclassifies non-demotion transitions as demotion
+
+validation:
+  # Cross-platform: single CLI invocation; --expect-violation makes the
+  # binary check via exit code.
+  detection_command: |
+    ai-skill enforcement transition-check \
+      --repo validation/scenarios/enforcement/fixtures/transition-demotion-without-adr \
+      --old validation/scenarios/enforcement/fixtures/transition-demotion-without-adr/old-registry.yaml \
+      --new validation/scenarios/enforcement/fixtures/transition-demotion-without-adr/new-registry.yaml \
+      --commit-msg-file validation/scenarios/enforcement/fixtures/transition-demotion-without-adr/commit-msg.txt \
+      --expect-violation R2_demotion_missing_adr
+  pass_criteria: detection_command exits 0 (assertion matched ≥ 1 R2_demotion_missing_adr violation)
+  initial_state: PASS (Phase 4.5 transition-check CLI landed 2026-06-02)
+  reference_governance:
+    - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md §Phase 4.5 Self-Governance Lint Rules R2
+    - enforcement/enforcement-registry.yaml §self_governance.status_transition_matrix (mechanical → behavioral_only requires demotion_rationale + adr_reference)
+    - enforcement/enforcement-registry.md §Self-Governance
+
+phase_4_5_validator_contract:
+  algorithm: |
+    For each rule_class id present in both old and new:
+      if new.coverage is a demotion of old.coverage (per demotion table):
+        if new.adr_reference is empty or not a constitution/ADR-*.md path
+           or the referenced ADR file does not exist:
+          emit R2_demotion_missing_adr
+  demotion_table:
+    - mechanical → behavioral_only
+    - mechanical → not_mechanizable
+    - mechanical → research_required
+    - mechanical → pending_implementation
+    - pending_implementation → behavioral_only
+    - pending_implementation → research_required
+    - behavioral_only → not_mechanizable
+  rationale: |
+    The demotion list is intentionally conservative — only transitions
+    that REDUCE enforcement strength. mechanical → deprecated is NOT
+    a demotion (it is end-of-life, handled by replaced_by + removal_date
+    via the existing Phase 3 deprecated_disposal lint).

@@ -132,29 +132,80 @@ period**（Q1 resolution）。理由：
 
 `enforcement_mode: { orphan_rule: fail, orphan_executor: fail }`。
 
-## Registry Self-Governance（Phase 4.5 將實作）
+## Registry Self-Governance（Phase 4.5）
+
+> **狀態**：Phase 4.5 land 2026-06-02。R1/R2/R3 由 commit-msg validator
+> `validateEnforcementRegistryTransition`（obligation
+> `obligation.commit.enforcement_registry_transition`）機械強制；R4/R5 在
+> `ai-skill enforcement coverage` 的 `## Governance Alerts` 段落 surface，
+> 不阻塞 build（governance review trigger，不是 compile fail）。
 
 Layer 2.5 自己也需要治理。沒有這層，registry 變成「一個沒人管的元數據檔」。
+Self-governance 把「改 registry 一行 yaml」從 silent edit 升級為留下 ADR /
+trailer / verification evidence 軌跡的治理動作。
 
 ### Status Transition Matrix
 
-| From → To | Required action |
-|---|---|
-| `(new)` → `pending_implementation` | 引用 active child plan |
-| `(new)` → `research_required` | 列 `research_questions` ≥ 1 + estimated_unblock |
-| `pending_implementation` → `mechanical` | executor live + coverage_evidence + verification thresholds |
-| `research_required` → `pending_implementation` | research_questions 全 resolved + child plan |
-| `mechanical` → `behavioral_only` | **demotion，需 ADR** |
-| `mechanical` → `deprecated` | `replaced_by` 指向 active mechanical class |
-| `deprecated` `removal_date` 屆期 | governance 決定 actually remove vs extend |
+| From → To | Required action | 強制層 |
+|---|---|---|
+| `(new)` → `pending_implementation` | 引用 active child plan | Phase 3 lint `pending_implementation_child_plan_validity` |
+| `(new)` → `research_required` | 列 `research_questions` ≥ 1 + estimated_unblock | schema lint |
+| `pending_implementation` → `mechanical` | executor symbol live + coverage_evidence + verification thresholds | **Phase 4.5 R3** commit-msg |
+| `research_required` → `pending_implementation` | research_questions 全 resolved + child plan | schema lint |
+| `mechanical` → `behavioral_only` | **demotion，需 ADR** | **Phase 4.5 R2** commit-msg |
+| `mechanical` → `not_mechanizable` | **demotion，需 ADR** | **Phase 4.5 R2** commit-msg |
+| `mechanical` → `deprecated` | `replaced_by` 指向 active mechanical class | Phase 3 lint `deprecated_disposal` |
+| `behavioral_only` → `not_mechanizable` | **demotion，需 ADR** | **Phase 4.5 R2** commit-msg |
+| `deprecated` `removal_date` 屆期 | governance 決定 actually remove vs extend | Phase 4.5 R4 coverage alert |
 
 ### Self-Governance Lint Rules
 
-- **R1**: status 變更 commit 必須有 `[registry-status-change]` trailer + `rationale:` body
-- **R2**: demotion 必須附 ADR；無 ADR → commit reject
-- **R3**: promotion 必須對應 verification_levels 達 mechanical 門檻
-- **R4**: deprecated 過 removal_date 30 天 → governance alert
-- **R5**: research_required 過 estimated_unblock_timeline → governance review trigger
+| Code | Layer | Severity | 行為 |
+|---|---|---|---|
+| **R1** | commit-msg | block | status 變更 commit 必須有 `[registry-status-change]` trailer **and** `rationale: <text>` 行 |
+| **R2** | commit-msg | block | demotion 必須在 rule_class entry 加 `adr_reference: constitution/ADR-NNN-*.md`，且 ADR 檔案必須存在 |
+| **R3** | commit-msg | block | promotion to mechanical 觸發 Phase 3 `missing_executor_symbol` 子集 lint 於該 class；symbol 不存在於 declared file 則 reject |
+| **R4** | coverage report | governance alert | deprecated 過 `removal_date` ≥ 30 天 → `## Governance Alerts` 段標紅；不阻塞 build |
+| **R5** | coverage report | governance alert | research_required 過 `estimated_unblock_timeline` → `## Governance Alerts` 段標紅；不阻塞 build |
+
+**Opt-out**：`[skip-registry-transition]` trailer 跳過 R1/R2/R3（與其他 11
+個 commit-msg validator 相同的 opt-out 慣例；緊急修補時可用，但會留下
+commit-msg 軌跡）。
+
+### 為什麼 demotion 必須附 ADR（R2）
+
+| Without R2 | With R2 |
+|---|---|
+| 任何 dev 改一行 yaml 把 mechanical 改 behavioral_only | 必須先寫 `constitution/ADR-NNN-<slug>.md` 解釋為什麼放棄機械化 |
+| Silent demotion，半年後沒人記得為何降級 | 永久 governance 軌跡，可追溯 decision context |
+| 看 coverage report 以為「7 個 behavioral_only」但每個來源動機不明 | 每個降級都有 supersede 條款 + 邊界條件 |
+
+R2 的設計意圖不是阻擋降級，而是讓「我們決定不機械化某條規則」變成
+governance decision，不是 commit-time afterthought。
+
+### 為什麼 promotion 必須過 verification（R3）
+
+Promotion to mechanical 是 one-way ratchet：一旦 coverage=mechanical
+land，下游消費者（coverage report、governance dashboards、Phase 5 bootstrap
+Receipt 摘要）就會 trust 這個 claim。若實際 executor 還沒寫好，等於
+registry 自己誤導下游。
+
+R3 的最小門檻是 `verification_levels.symbol_exists`（Phase 3 lint
+`missing_executor_symbol` 的 per-class scope 版本）。其他 verification
+layer（scenario_exists / regression_exists / runtime_observed）由 Phase 3
+compile-time lint emit WARNING 或 Phase 5 coverage report surface，
+但不是 R3 的硬門檻 —— promotion 只需保證「symbol 至少真的存在」。
+
+### 開發者快速指南
+
+| 場景 | 必須做的 |
+|---|---|
+| Demote mechanical → behavioral_only | 1) 寫 ADR；2) 加 `adr_reference` 欄位；3) commit body 加 `[registry-status-change]` + `rationale:` 行 |
+| Promote pending → mechanical | 1) 先 land executor symbol（hooks.go 等）；2) 改 coverage=mechanical；3) commit body 加 trailer + rationale |
+| 新增 rule_class | 不觸發 R2/R3（沒有舊狀態可 demote/promote），但若 coverage 初始為 mechanical 也必須通過 symbol_exists 檢查 |
+| 緊急熱修 | `[skip-registry-transition]` opt-out trailer，但需在下個 commit 補 ADR / verification |
+| 想看現況 | `ai-skill enforcement coverage --format text --detail` 看 6-bucket + 每 class verification level + `## Governance Alerts` 段（R4/R5） |
+| 模擬 transition | `ai-skill enforcement transition-check --old <old.yaml> --new <new.yaml> --commit-msg-file <msg.txt>` 跑與 commit-msg 相同的 R1/R2/R3 engine（scenario / CI / local debug 用） |
 
 ## 寫作指南（給 rule_class 作者）
 

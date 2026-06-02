@@ -1,0 +1,93 @@
+# Source: Phase 4.5 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+# §Self-Governance Lint Rules — R3 (promotion 必須對應 verification_levels 達 mechanical 門檻；未達 → lint fail)
+id: registry-transition-promotion-verification-gap-v1
+domain: enforcement
+type: registry-transition
+priority: P1
+
+# Phase 4.5 (2026-06-02): scenario-driven validator design. Fixture pair
+# simulates pending_implementation → mechanical promotion where the
+# declared executor symbol does NOT exist in the fixture hooks.go.
+# validateEnforcementRegistryTransition must reject (R3).
+execution_status:
+  runnable: true
+  cli_surface: "ai-skill enforcement transition-check"
+  fixture_root: validation/scenarios/enforcement/fixtures/transition-promotion-verification-gap
+
+failure_source:
+  pattern: premature-promotion-to-mechanical
+  class: meta-governance-gap
+  date: "2026-06-02"
+  description: |
+    Without R3 enforcement, a rule_class can be flipped to
+    coverage=mechanical before its executor is actually implemented.
+    Result: registry CLAIMS mechanical coverage that downstream
+    consumers (coverage report, governance dashboards, Phase 5 bootstrap
+    Receipt summary) trust, but the rule has no real runtime enforcement.
+    R3 forces verification_levels.symbol_exists to be met at the moment
+    of promotion — promotion is a one-way ratchet that the registry
+    machinery itself must guard.
+
+given:
+  task: phase_4_5_validator_rejects_promotion_with_verification_gap
+  artifacts:
+    - validation/scenarios/enforcement/fixtures/transition-promotion-verification-gap/old-registry.yaml
+    - validation/scenarios/enforcement/fixtures/transition-promotion-verification-gap/new-registry.yaml
+    - validation/scenarios/enforcement/fixtures/transition-promotion-verification-gap/commit-msg.txt
+    - validation/scenarios/enforcement/fixtures/transition-promotion-verification-gap/hooks.go (stub WITHOUT the declared symbol)
+    - scripts/ai-skill-cli/internal/app/enforcement_transition.go (validator + transition-check CLI)
+
+when:
+  action: |
+    Run `ai-skill enforcement transition-check` against the fixture pair.
+    The CLI re-uses the Phase 3 missing_executor_symbol lint against the
+    POST-commit registry state for promoted classes only — if the
+    promoted class would trigger missing_executor_symbol, the promotion
+    is blocked.
+
+then:
+  expected_route:
+    - transition-check exits non-zero (validation_failed = 30)
+    - output cites violation code R3_promotion_missing_executor
+    - output cites rule_class id (__test_promotion__)
+    - output cites the declared symbol (validateNonexistentPromotionTarget)
+    - --expect-violation R3_promotion_missing_executor exits 0
+  forbidden_routes:
+    - transition-check exits 0 silently
+    - R3 fires on demotion transitions (must be promotion-specific)
+    - R3 fires when executor symbol IS present in the declared file
+
+validation:
+  detection_command: |
+    ai-skill enforcement transition-check \
+      --repo validation/scenarios/enforcement/fixtures/transition-promotion-verification-gap \
+      --old validation/scenarios/enforcement/fixtures/transition-promotion-verification-gap/old-registry.yaml \
+      --new validation/scenarios/enforcement/fixtures/transition-promotion-verification-gap/new-registry.yaml \
+      --commit-msg-file validation/scenarios/enforcement/fixtures/transition-promotion-verification-gap/commit-msg.txt \
+      --expect-violation R3_promotion_missing_executor
+  pass_criteria: detection_command exits 0 (assertion matched ≥ 1 R3_promotion_missing_executor violation)
+  initial_state: PASS (Phase 4.5 transition-check CLI landed 2026-06-02)
+  reference_governance:
+    - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md §Phase 4.5 Self-Governance Lint Rules R3
+    - enforcement/enforcement-registry.yaml §self_governance.status_transition_matrix (pending_implementation → mechanical requires executor symbol live + coverage_evidence + verification thresholds)
+    - enforcement/enforcement-registry.yaml §verification_levels.symbol_exists
+    - enforcement/enforcement-registry.md §Self-Governance
+
+phase_4_5_validator_contract:
+  algorithm: |
+    For each rule_class id present in both old and new:
+      if new.coverage == "mechanical" AND old.coverage != "mechanical":
+        run Phase 3 missing_executor_symbol lint against new state for this class:
+          if any executor symbol not found in declared file:
+            emit R3_promotion_missing_executor
+  promotion_table:
+    - "(new) → mechanical"
+    - pending_implementation → mechanical
+    - research_required → mechanical
+    - behavioral_only → mechanical
+  scope_note: |
+    R3 only checks symbol_exists at the moment of promotion. scenario_exists
+    / regression_exists / runtime_observed are checked elsewhere (Phase 3
+    compile-time lint emits WARNING; Phase 5 coverage report surfaces
+    runtime gaps). The minimum bar for promotion is symbol_exists — the
+    rule_class must be at least somewhat real before claiming mechanical.

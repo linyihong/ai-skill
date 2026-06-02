@@ -29,12 +29,15 @@ func runEnforcement(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runEnforcementLint(args[1:], stdout, stderr)
 	case "coverage":
 		return runEnforcementCoverage(args[1:], stdout, stderr)
+	case "transition-check":
+		return runEnforcementTransitionCheck(args[1:], stdout, stderr)
 	case "help", "-h", "--help":
-		_, _ = fmt.Fprintln(stdout, "usage: ai-skill enforcement <lint|coverage> [flags]")
+		_, _ = fmt.Fprintln(stdout, "usage: ai-skill enforcement <lint|coverage|transition-check> [flags]")
 		_, _ = fmt.Fprintln(stdout, "")
 		_, _ = fmt.Fprintln(stdout, "subcommands:")
-		_, _ = fmt.Fprintln(stdout, "  lint        run the enforcement-registry lint engine and report findings")
-		_, _ = fmt.Fprintln(stdout, "  coverage    aggregate rule_class coverage status + verification + runtime observation")
+		_, _ = fmt.Fprintln(stdout, "  lint                run the enforcement-registry lint engine and report findings")
+		_, _ = fmt.Fprintln(stdout, "  coverage            aggregate rule_class coverage status + verification + runtime observation")
+		_, _ = fmt.Fprintln(stdout, "  transition-check    Phase 4.5 R1/R2/R3 — detect rule_class coverage transitions in staged registry diff and block missing-ADR demotions / unverified promotions")
 		return ExitSuccess
 	default:
 		_, _ = fmt.Fprintf(stderr, "unknown enforcement subcommand: %s\n", args[0])
@@ -587,14 +590,36 @@ func buildCoverageReport(repo string, snap *registrySnapshot) *coverageReport {
 			row.RuntimeObservedPct = &pct
 		}
 		// Per-class alerts.
+		today := time.Now().UTC().Format("2006-01-02")
+		// Phase 4.5 R4 — deprecated past removal_date by 30+ days
+		// (governance alert, NOT compile fail per registry self-governance
+		// design: R4-R5 surface here for human review, do not block).
 		if rc.Coverage == "deprecated" && rc.RemovalDate != "" {
-			today := time.Now().UTC().Format("2006-01-02")
 			if rc.RemovalDate < today {
 				row.Alerts = append(row.Alerts, "past_removal_date")
 				report.Alerts = append(report.Alerts, coverageAlert{
 					Kind:      "deprecated_past_removal_date",
 					RuleClass: rc.ID,
 					Message:   fmt.Sprintf("removal_date %s elapsed (today %s); actually remove or extend.", rc.RemovalDate, today),
+				})
+			}
+			if pastByDays(rc.RemovalDate, 30) {
+				row.Alerts = append(row.Alerts, "R4_governance_overdue")
+				report.Alerts = append(report.Alerts, coverageAlert{
+					Kind:      "R4_deprecated_governance_overdue",
+					RuleClass: rc.ID,
+					Message:   fmt.Sprintf("deprecated past removal_date by ≥ 30 days (removal_date=%s); governance decision required: actually remove or extend with new rationale.", rc.RemovalDate),
+				})
+			}
+		}
+		// Phase 4.5 R5 — research_required past estimated_unblock_timeline.
+		if rc.Coverage == "research_required" && strings.TrimSpace(rc.UnblockTimeline) != "" {
+			if isCalendarPast(rc.UnblockTimeline, today) {
+				row.Alerts = append(row.Alerts, "R5_research_timeout")
+				report.Alerts = append(report.Alerts, coverageAlert{
+					Kind:      "R5_research_required_timeout",
+					RuleClass: rc.ID,
+					Message:   fmt.Sprintf("research_required past estimated_unblock_timeline=%s (today %s); promote to pending_implementation or demote with rationale.", rc.UnblockTimeline, today),
 				})
 			}
 		}
@@ -830,15 +855,29 @@ func renderCoverageText(r *coverageReport, detail bool) string {
 	})
 
 	if len(r.Alerts) > 0 {
-		b.WriteString("⚠ Alerts:\n")
-		for _, a := range r.Alerts {
-			if a.RuleClass != "" {
-				fmt.Fprintf(&b, "  [%s] %s: %s\n", a.Kind, a.RuleClass, a.Message)
-			} else {
-				fmt.Fprintf(&b, "  [%s] %s\n", a.Kind, a.Message)
+		gov, other := partitionGovernanceAlerts(r.Alerts)
+		if len(gov) > 0 {
+			b.WriteString("⚠ Governance Alerts (Phase 4.5 R4/R5):\n")
+			for _, a := range gov {
+				if a.RuleClass != "" {
+					fmt.Fprintf(&b, "  [%s] %s: %s\n", a.Kind, a.RuleClass, a.Message)
+				} else {
+					fmt.Fprintf(&b, "  [%s] %s\n", a.Kind, a.Message)
+				}
 			}
+			b.WriteString("\n")
 		}
-		b.WriteString("\n")
+		if len(other) > 0 {
+			b.WriteString("⚠ Alerts:\n")
+			for _, a := range other {
+				if a.RuleClass != "" {
+					fmt.Fprintf(&b, "  [%s] %s: %s\n", a.Kind, a.RuleClass, a.Message)
+				} else {
+					fmt.Fprintf(&b, "  [%s] %s\n", a.Kind, a.Message)
+				}
+			}
+			b.WriteString("\n")
+		}
 	}
 	if r.Diff != nil {
 		fmt.Fprintf(&b, "Changes vs %s:\n", r.Diff.BaseRef)
@@ -916,15 +955,29 @@ func renderCoverageMarkdown(r *coverageReport, detail bool) string {
 	}
 
 	if len(r.Alerts) > 0 {
-		b.WriteString("## Alerts\n\n")
-		for _, a := range r.Alerts {
-			if a.RuleClass != "" {
-				fmt.Fprintf(&b, "- **%s** (`%s`): %s\n", a.Kind, a.RuleClass, a.Message)
-			} else {
-				fmt.Fprintf(&b, "- **%s**: %s\n", a.Kind, a.Message)
+		gov, other := partitionGovernanceAlerts(r.Alerts)
+		if len(gov) > 0 {
+			b.WriteString("## Governance Alerts (Phase 4.5 R4/R5)\n\n")
+			for _, a := range gov {
+				if a.RuleClass != "" {
+					fmt.Fprintf(&b, "- **%s** (`%s`): %s\n", a.Kind, a.RuleClass, a.Message)
+				} else {
+					fmt.Fprintf(&b, "- **%s**: %s\n", a.Kind, a.Message)
+				}
 			}
+			b.WriteString("\n")
 		}
-		b.WriteString("\n")
+		if len(other) > 0 {
+			b.WriteString("## Alerts\n\n")
+			for _, a := range other {
+				if a.RuleClass != "" {
+					fmt.Fprintf(&b, "- **%s** (`%s`): %s\n", a.Kind, a.RuleClass, a.Message)
+				} else {
+					fmt.Fprintf(&b, "- **%s**: %s\n", a.Kind, a.Message)
+				}
+			}
+			b.WriteString("\n")
+		}
 	}
 	if r.Diff != nil {
 		fmt.Fprintf(&b, "## Changes vs %s\n\n", r.Diff.BaseRef)
@@ -1102,4 +1155,60 @@ type selfCheckItem struct {
 	Name    string
 	OK      bool
 	Message string
+}
+
+// partitionGovernanceAlerts splits the alert list into Phase 4.5 R4/R5
+// governance alerts vs everything else, preserving order within each
+// bucket. R4/R5 alerts are surfaced under a dedicated `Governance Alerts`
+// header so they are not lost in the generic alerts noise.
+func partitionGovernanceAlerts(alerts []coverageAlert) (governance, other []coverageAlert) {
+	for _, a := range alerts {
+		if strings.HasPrefix(a.Kind, "R4_") || strings.HasPrefix(a.Kind, "R5_") {
+			governance = append(governance, a)
+		} else {
+			other = append(other, a)
+		}
+	}
+	return
+}
+
+// pastByDays returns true when isoDate (YYYY-MM-DD) is more than `days`
+// days before today. Used by Phase 4.5 R4 (deprecated past removal_date
+// by 30+ days). Returns false for malformed input — alerts only fire on
+// clearly-overdue dates, not on parse errors.
+func pastByDays(isoDate string, days int) bool {
+	ts, err := time.Parse("2006-01-02", strings.TrimSpace(isoDate))
+	if err != nil {
+		return false
+	}
+	cutoff := time.Now().UTC().AddDate(0, 0, -days)
+	return ts.Before(cutoff)
+}
+
+// isCalendarPast accepts loose timeline strings like `2026-Q3`, `2026-12`,
+// or ISO `2026-12-15`. Returns true when the timeline is unambiguously in
+// the past relative to today (YYYY-MM-DD). Conservative: ambiguous inputs
+// return false (do not fire R5 alert on uncertain dates).
+func isCalendarPast(timeline, today string) bool {
+	t := strings.TrimSpace(timeline)
+	// ISO YYYY-MM-DD
+	if _, err := time.Parse("2006-01-02", t); err == nil {
+		return t < today
+	}
+	// YYYY-MM
+	if _, err := time.Parse("2006-01", t); err == nil {
+		return t+"-31" < today
+	}
+	// YYYY-Q[1-4]
+	if len(t) == 7 && t[4:6] == "-Q" {
+		yearPart := t[:4]
+		quarter := t[6]
+		if quarter >= '1' && quarter <= '4' {
+			// End-of-quarter month.
+			monthByQuarter := map[byte]string{'1': "03-31", '2': "06-30", '3': "09-30", '4': "12-31"}
+			end := yearPart + "-" + monthByQuarter[quarter]
+			return end < today
+		}
+	}
+	return false
 }

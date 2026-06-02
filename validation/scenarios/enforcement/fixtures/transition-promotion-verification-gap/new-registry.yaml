@@ -1,0 +1,28 @@
+schema_version: 2
+id: enforcement.enforcement-registry
+status: active
+owner_layer: enforcement
+# Post-commit (staged) state for scenario
+# registry-transition-promotion-verification-gap-v1. __test_promotion__
+# has been promoted pending_implementation → mechanical, but the declared
+# executor symbol validateNonexistentPromotionTarget is NOT present in
+# the fixture hooks.go. Phase 4.5 R3 must reject this promotion.
+enforcement_mode: { orphan_rule: fail, orphan_executor: fail }
+bootstrap_mode: strict
+baseline_snapshot: { entries: [] }
+governance_thresholds: { source_files_review_threshold: 5 }
+executor_kind_spec:
+  binding_required_for:
+    - commit_msg_validator
+internal_helper_allowlist: { symbols: [] }
+rule_classes:
+  - id: __test_promotion__
+    coverage: mechanical                # ← promoted from pending_implementation
+    source_files:
+      - enforcement/bar.yaml
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateNonexistentPromotionTarget   # ❌ still missing in hooks.go
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: "Promoted prematurely; executor symbol does not yet exist in hooks.go (R3 violation)."

@@ -1,0 +1,26 @@
+schema_version: 2
+id: enforcement.enforcement-registry
+status: active
+owner_layer: enforcement
+# Pre-commit state for scenario registry-transition-demotion-without-adr-v1.
+# __test_demotion__ starts at coverage=mechanical; the new-registry.yaml
+# sibling demotes it to behavioral_only WITHOUT adr_reference.
+enforcement_mode: { orphan_rule: fail, orphan_executor: fail }
+bootstrap_mode: strict
+baseline_snapshot: { entries: [] }
+governance_thresholds: { source_files_review_threshold: 5 }
+executor_kind_spec: { binding_required_for: [] }
+internal_helper_allowlist:
+  symbols:
+    - runStub
+rule_classes:
+  - id: __test_demotion__
+    coverage: mechanical
+    source_files:
+      - enforcement/foo.yaml
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: runStub
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: "Synthetic test fixture: starts as mechanical."

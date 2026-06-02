@@ -43,10 +43,12 @@
 | `ai-skill hooks run commit-msg` validator `validatePlanCheckboxSync` | commit-msg hook 第 16 個 validator：當 commit body 引用 `plans/active/*.md` 且 stage 真工作（Go / scenarios / runtime / governance / enforcement），plan 必須同 stage 且 staged diff 含 `[ ]` → `[x]` transition。block default；opt-out `[skip-plan-checkbox-sync]` | 否 | 是 | gen3-runtime-trigger-audit Phase 5 |
 | `ai-skill hooks run commit-msg` validator `validateRuntimeTriggerWiring` | commit-msg hook 第 17 個 validator：staged diff 新增 `route.*` 或 `target_key:` 但無 discovery signal / Go consumer / `manual_activation` annotation 則 block。enforces governance §`define_runtime_trigger_flow`；opt-out `[skip-runtime-trigger-wiring]` | 否 | 是 | gen3-runtime-trigger-audit Phase 5 |
 | `ai-skill hooks run commit-msg` validator `validatePlanArchivalAudit` | commit-msg hook 第 19 個 validator：當 commit 把 `plans/active/<name>.md` 移到 `plans/archived/<name>.md`（staged 同時含刪除與新增同 basename），archived 版本若仍有 `- [ ]` 行且 commit body 無 justification keyword（deferred / non-goal / scope reduced / handover / 延後 / 拆分）則 block。純 Go 掃描（呼叫 `ScanCheckboxesInFile`），零 shell 依賴；opt-out `[skip-plan-archival-audit]` | 否 | 是 | plan-archival-audit-validator Phase 2 |
+| `ai-skill hooks run commit-msg` validator `validateEnforcementRegistryTransition` | commit-msg hook 第 20 個 validator：staged diff 含 `enforcement/enforcement-registry.yaml` 且任一 rule_class 的 `coverage` 值改變時，強制 Phase 4.5 R1/R2/R3：R1 commit body 須含 `[registry-status-change]` trailer + `rationale:` 行；R2 demotion 須附 `adr_reference: constitution/ADR-NNN-*.md` 指向實際存在的 ADR；R3 promotion to mechanical 須通過 per-class `missing_executor_symbol` 子集 lint。block default；opt-out `[skip-registry-transition]` | 否 | 是 | mechanical-enforcement-registry Phase 4.5 |
 | `ai-skill scan-checkboxes <file>` | 掃描任意 Markdown 檔案的 task-list checkboxes（`- [ ]` / `- [x]` / `- [X]`），純 Go 實作，零 shell 依賴，可跨專案使用（release checklist、規格確認單等）。flags：`--format plain\|json`、`--exit-code`（有未完成項時 exit 1，方便 CI / pre-push hooks 使用） | 否 | 否 | plan-archival-audit-validator Phase 2 |
 | `ai-skill glossary validate` | 驗證 `knowledge/glossary/*.md` 的 entry schema、status / owner / relation enum、naming convention、alias 規則、`introduced-by` / `deprecated-by` 形狀、symmetric relation 對稱性與 `excludes` 引用 | 否 | 否 | context-language-glossary-system Phase 2 |
 | `ai-skill enforcement lint` | 對 `enforcement/enforcement-registry.yaml` 跑 13 條 Phase 3 lint check（orphan_rule / missing_executor_symbol / behavioral_only_* / deprecated_* / upstream_chain / class_size / baseline_snapshot / pending_implementation_child_plan_validity）。Thin CLI wrapper 直接複用 `LintEnforcementRegistry` 引擎；支援 `--check <substr>` 過濾、`--registry <path>` 覆寫、`--expect-finding <substr>` 跨平台 assertion mode（scenario 用） | 否 | 否 | mechanical-enforcement-registry Phase 4 |
-| `ai-skill enforcement coverage` | 把 registry 聚合成 6-bucket coverage report（mechanical / behavioral_only / not_mechanizable / pending_implementation / research_required / deprecated）+ verification level 分類 + runtime_observed gap（Phase 5 wire 前回 `null` + alert）。`--format text|json|markdown`、`--diff <ref>` 對比 git revision、`--detail` 開 per-class 表、`--self-check` 跨平台驗 3 個 format schema | 否 | 否 | mechanical-enforcement-registry Phase 4 |
+| `ai-skill enforcement coverage` | 把 registry 聚合成 6-bucket coverage report（mechanical / behavioral_only / not_mechanizable / pending_implementation / research_required / deprecated）+ verification level 分類 + runtime_observed gap（Phase 5 wire 前回 `null` + alert）+ Phase 4.5 `## Governance Alerts` 段（R4 deprecated past removal_date+30d / R5 research_required past estimated_unblock_timeline）。`--format text|json|markdown`、`--diff <ref>` 對比 git revision、`--detail` 開 per-class 表、`--self-check` 跨平台驗 3 個 format schema | 否 | 否 | mechanical-enforcement-registry Phase 4 + 4.5 |
+| `ai-skill enforcement transition-check` | Phase 4.5 R1/R2/R3 引擎的 standalone CLI（commit-msg validator 與此共用 engine）。`--old <yaml> --new <yaml> --commit-msg-file <txt>` 給 scenario / CI / local debug 模擬 staged commit；`--expect-violation <substr>` 跨平台 assertion mode（exit 0/30）；無 `--expect-violation` 則列出全部違規並依 FAIL 數 exit 0/30 | 否 | 否 | mechanical-enforcement-registry Phase 4.5 |
 | `ai-skill roo set-global-custom-instructions` | guarded 寫入 Roo Code 全域 Custom Instructions | 是 | 否 | Tool adapter |
 | `ai-skill copilot start` | 產生 GitHub Copilot 新 session 第一則 bootstrap prompt | 否 | 否 | Tool adapter |
 
@@ -518,6 +520,33 @@
 - **JSON format**：top-level keys `schema_version`（=1，數字）/ `generated_at`（ISO-8601）/ `total_rule_classes` / `observation_window_days` / `buckets`（6 keys）/ `per_class`（array of `{id, coverage, verification, runtime_observed_pct, alerts, ...}`）/ `alerts`（array，可空）/ `diff`（optional）。所有 key snake_case，禁混 camelCase。
 - **Markdown format**：`# Enforcement Coverage Report` h1 + `## Summary` h2 表格 + 條件 `## Per-class detail` / `## Alerts` / `## Changes vs <ref>`，不得含 raw HTML。
 - **Self-check**：內建 9 個 check（text 三項、markdown 兩項、json 四項），驗 first-line regex / schema_version 數字 / per_class array / snake_case keys 等；任一失敗 exit 30。
+- **Phase 4.5 Governance Alerts**（R4/R5）：text 用 `⚠ Governance Alerts (Phase 4.5 R4/R5):` 段、markdown 用 `## Governance Alerts (Phase 4.5 R4/R5)` h2，與普通 alerts 拆分；R4 偵測 `deprecated` 且 `removal_date` 早於今日 - 30 天；R5 偵測 `research_required` 且 `estimated_unblock_timeline`（ISO YYYY-MM-DD / YYYY-MM / YYYY-Q[1-4] 三種寬鬆格式）早於今日。Alerts 純展示，不阻塞 build；JSON 同樣放在 `alerts[]` 陣列中以 `R4_*` / `R5_*` kind 區分。
+
+### `ai-skill enforcement transition-check`
+
+目的：Phase 4.5 R1/R2/R3 self-governance lint 的 standalone CLI。與 commit-msg validator `validateEnforcementRegistryTransition` 共用同一 engine `checkRegistryTransitions`，scenario / CI / local debug 可不經 git stage 直接驗證 transition 違規。
+
+輸入：
+
+- `--repo <path>`（預設 `.`；用於解析 ADR 檔案 + executor 檔案）
+- `--old <path>`（必填，old (HEAD) `enforcement-registry.yaml`）
+- `--new <path>`（必填，new (staged) `enforcement-registry.yaml`）
+- `--commit-msg-file <path>`（commit message 文字檔；與 `--commit-msg` 二擇一）
+- `--commit-msg <inline>`（inline commit message 字串）
+- `--expect-violation <substr>`（assertion mode：exit 0 if 任一 violation code 含 substr，否則 exit 30）
+- `--json` / `--plain`
+
+副作用：無（只讀 yaml + commit msg 檔案）。
+
+必要行為：
+
+- **Transition 偵測**：以 rule_class `id` 為 key 比對 old/new 的 `coverage` 值；不存在於 old 視為 `(new)`。
+- **R1**（commit-msg gate）：任一 transition 存在時 → commit body 必須含 `[registry-status-change]` trailer **and** `rationale: <非空>` 行。違規 code: `R1_missing_trailer` / `R1_missing_rationale`。
+- **R2**（demotion table）：mechanical → {behavioral_only, not_mechanizable, research_required, pending_implementation} / pending_implementation → {behavioral_only, research_required} / behavioral_only → not_mechanizable。降級時 new rule_class 必須有 `adr_reference` 欄位，值符合 `constitution/ADR-NNN-*.md` 格式且檔案存在於 `<repo>` 下。違規 code: `R2_demotion_missing_adr` / `R2_demotion_invalid_adr_format` / `R2_demotion_adr_unresolved`。
+- **R3**（promotion to mechanical）：(new) / pending_implementation / research_required / behavioral_only → mechanical 時，對該 class 單獨跑 Phase 3 `missing_executor_symbol` lint；任一 executor symbol 不存在於 declared file → reject。違規 code: `R3_promotion_missing_executor`。
+- **Opt-out**：`[skip-registry-transition]` trailer 跳過全部 R1/R2/R3 檢查（與 commit-msg validator 行為一致）。
+- **mechanical → deprecated 不算 demotion**：end-of-life 由既有 Phase 3 `deprecated_disposal` lint 處理（要求 `replaced_by` 或 `removal_date`）。
+- 失敗 exit 30；assertion mode 命中 exit 0 未命中 exit 30；非 assertion 模式且零違規 exit 0。
 
 ### `ai-skill glossary validate`
 
@@ -619,3 +648,4 @@
 | `glossary validate` | `knowledge/glossary/*.md`（H2 + YAML block entries） | 無 | 無 |
 | `enforcement lint` | `enforcement/enforcement-registry.yaml` + `enforcement/runtime/governance/**/*.yaml` + `scripts/ai-skill-cli/internal/app/hooks.go` | 僅 `os.TempDir()` shadow repo（使用 `--registry` 時，結束即刪） | 無 |
 | `enforcement coverage` | `enforcement/enforcement-registry.yaml` + `runtime/runtime.db`（檢 `executor_observations`） + `validation/scenarios/`（heuristic scenario 命名比對） + git `show <ref>:enforcement/enforcement-registry.yaml`（`--diff` 模式） | 無 | `--diff` 模式需 Git |
+| `enforcement transition-check` | `--old` / `--new` registry yaml + `--commit-msg-file` (或 `--commit-msg` inline) + `<repo>/constitution/ADR-*.md`（R2 ADR resolve）+ `<repo>/scripts/ai-skill-cli/internal/app/hooks.go`（R3 symbol_exists） | 無 | 無 |

@@ -1,0 +1,30 @@
+schema_version: 2
+id: enforcement.enforcement-registry
+status: active
+owner_layer: enforcement
+# Post-commit (staged) state for scenario
+# registry-transition-demotion-without-adr-v1. __test_demotion__ has been
+# demoted mechanical → behavioral_only with NO adr_reference field.
+# Phase 4.5 R2 must reject this transition (demotion needs ADR).
+enforcement_mode: { orphan_rule: fail, orphan_executor: fail }
+bootstrap_mode: strict
+baseline_snapshot: { entries: [] }
+governance_thresholds: { source_files_review_threshold: 5 }
+executor_kind_spec: { binding_required_for: [] }
+internal_helper_allowlist:
+  symbols:
+    - runStub
+rule_classes:
+  - id: __test_demotion__
+    coverage: behavioral_only       # ← demoted from mechanical
+    source_files:
+      - enforcement/foo.yaml
+    rationale: "Synthetic test fixture: demoted to behavioral_only without ADR (R2 violation)."
+    sunset_decision:
+      revisit_when: "Test trigger event accumulates ≥ 3 instances"
+      success_criteria: "≥ 80% scenario coverage of the demoted rule_class"
+      revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-02"
+      last_review_summary: "Initial demotion test fixture; behavioral_only justified for fixture scope."
+      depends_on_rule_classes: []
+    # ❌ Missing adr_reference — Phase 4.5 R2 should reject this commit.

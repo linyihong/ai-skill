@@ -1,0 +1,28 @@
+schema_version: 2
+id: enforcement.enforcement-registry
+status: active
+owner_layer: enforcement
+# Pre-commit state for scenario
+# registry-transition-promotion-verification-gap-v1. __test_promotion__
+# starts at pending_implementation (executor not yet live).
+enforcement_mode: { orphan_rule: fail, orphan_executor: fail }
+bootstrap_mode: strict
+baseline_snapshot: { entries: [] }
+governance_thresholds: { source_files_review_threshold: 5 }
+executor_kind_spec:
+  binding_required_for:
+    - commit_msg_validator
+internal_helper_allowlist: { symbols: [] }
+rule_classes:
+  - id: __test_promotion__
+    coverage: pending_implementation
+    child_plan: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+    target_promotion: "Promote to mechanical once validateNonexistentPromotionTarget lands"
+    source_files:
+      - enforcement/bar.yaml
+    executors_planned:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateNonexistentPromotionTarget
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: "Synthetic test fixture: pending_implementation awaiting executor."
