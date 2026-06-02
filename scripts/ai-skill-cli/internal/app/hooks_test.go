@@ -266,6 +266,11 @@ func TestRunUserPromptSubmitHookIncludesNestedGitReport(t *testing.T) {
 	runGit(t, repo, "commit", "-m", "initial")
 	writeFile(t, filepath.Join(repo, "dirty.txt"), "dirty\n")
 
+	// ADR-011: hook now drains stdin to look up transcript_path. Empty
+	// payload → transcript not resolvable → conservative path (inject full
+	// bootstrap). Pipe an empty JSON object so the read does not block.
+	setHookStdin(t, `{}`)
+
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	if code := runUserPromptSubmitHook(workspace, &stdout, &stderr); code != ExitSuccess {
@@ -278,6 +283,80 @@ func TestRunUserPromptSubmitHookIncludesNestedGitReport(t *testing.T) {
 	ctx := output["hookSpecificOutput"]["additionalContext"]
 	if !strings.Contains(ctx, "nested") || !strings.Contains(ctx, "### Project Git Report") {
 		t.Fatalf("expected nested git report in context, got:\n%s", ctx)
+	}
+}
+
+// TestRunUserPromptSubmitHookFirstTurnInjectsFullBootstrap is ADR-011 case A:
+// transcript has no Bootstrap Receipt yet → hook must inject the full
+// CORE_BOOTSTRAP.md + the "Receipt not yet observed" prompt alongside the
+// MUST close-out block.
+func TestRunUserPromptSubmitHookFirstTurnInjectsFullBootstrap(t *testing.T) {
+	workspace := t.TempDir()
+	// Force AI_SKILL_REPO so resolveClaudeAiSkillRepo doesn't escape to the
+	// real repo's CORE_BOOTSTRAP.md and let us assert on a controllable marker.
+	bootstrapMarker := "# Bootstrap stub for ADR-011 first-turn test\n"
+	writeFile(t, filepath.Join(workspace, "CORE_BOOTSTRAP.md"), bootstrapMarker)
+	writeFile(t, filepath.Join(workspace, "runtime", "core-bootstrap.yaml"), "schema_version: 1\n")
+	t.Setenv("AI_SKILL_REPO", workspace)
+
+	// Transcript with only a non-Receipt assistant turn — acknowledgment scan
+	// must return false.
+	tr := writeBootstrapTranscript(t, workspace,
+		"Hello, working on the task. No Receipt yet.", nil)
+	setHookStdin(t, fmt.Sprintf(`{"transcript_path":%q}`, tr))
+
+	var stdout, stderr bytes.Buffer
+	if code := runUserPromptSubmitHook(workspace, &stdout, &stderr); code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode hook output: %v\n%s", err, stdout.String())
+	}
+	ctx := output["hookSpecificOutput"]["additionalContext"]
+	if !strings.Contains(ctx, "final close-out obligation") {
+		t.Errorf("MUST block missing from first-turn context:\n%s", ctx)
+	}
+	if !strings.Contains(ctx, "Bootstrap Receipt not yet observed") {
+		t.Errorf("conditional bootstrap prompt missing from first-turn context:\n%s", ctx)
+	}
+	if !strings.Contains(ctx, bootstrapMarker) {
+		t.Errorf("full CORE_BOOTSTRAP.md not injected on first turn; got:\n%s", ctx)
+	}
+}
+
+// TestRunUserPromptSubmitHookSubsequentTurnSkipsBootstrap is ADR-011 case B:
+// transcript already contains a Bootstrap Receipt line in a prior assistant
+// text turn → hook must inject ONLY the MUST close-out block; CORE_BOOTSTRAP.md
+// must NOT be re-injected (this is the ~2-3K token saving).
+func TestRunUserPromptSubmitHookSubsequentTurnSkipsBootstrap(t *testing.T) {
+	workspace := t.TempDir()
+	bootstrapMarker := "# Bootstrap stub for ADR-011 subsequent-turn test\n"
+	writeFile(t, filepath.Join(workspace, "CORE_BOOTSTRAP.md"), bootstrapMarker)
+
+	receiptLine := "Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25\n" +
+		"Active per-turn obligations: obligation.cognitive.mode_report, obligation.finality.close_loop_check\n" +
+		"\nDoing work..."
+	tr := writeBootstrapTranscript(t, workspace, receiptLine, nil)
+	setHookStdin(t, fmt.Sprintf(`{"transcript_path":%q}`, tr))
+
+	var stdout, stderr bytes.Buffer
+	if code := runUserPromptSubmitHook(workspace, &stdout, &stderr); code != ExitSuccess {
+		t.Fatalf("expected success, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode hook output: %v\n%s", err, stdout.String())
+	}
+	ctx := output["hookSpecificOutput"]["additionalContext"]
+	if !strings.Contains(ctx, "final close-out obligation") {
+		t.Errorf("MUST block missing from subsequent-turn context:\n%s", ctx)
+	}
+	if strings.Contains(ctx, "Bootstrap Receipt not yet observed") {
+		t.Errorf("conditional prompt should be omitted when Receipt already in transcript; got:\n%s", ctx)
+	}
+	if strings.Contains(ctx, bootstrapMarker) {
+		t.Errorf("CORE_BOOTSTRAP.md must NOT be re-injected after acknowledgment; got:\n%s", ctx)
 	}
 }
 

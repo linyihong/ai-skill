@@ -1006,17 +1006,47 @@ func runPostToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) i
 }
 
 // runUserPromptSubmitHook implements the Claude Code UserPromptSubmit hook.
-// Injects final close-out reminder + CORE_BOOTSTRAP.md as additionalContext.
+// Injects two independent additionalContext blocks:
+//
+//   - MUST (always): final close-out Cognitive Mode 報告 obligation reminder.
+//   - Conditional (only when transcript shows no Bootstrap Receipt yet):
+//     full CORE_BOOTSTRAP.md plus a "Receipt not yet observed" prompt.
+//
+// ADR-011 (constitution/ADR-011-conditional-bootstrap-injection.md) demoted
+// this executor from "always inject full bootstrap.md" to "transcript-aware
+// conditional inject" because the always-on injection wasted ~2-3K tokens per
+// turn and pushed the acknowledgment conditional onto the agent (resulting in
+// over-emit of the Receipt in resume/compaction flows). Real mechanical
+// enforcement of bootstrap integrity continues to live at PreToolUse via
+// gate.bootstrap.receipt_present.
+//
+// Stdin is parsed tolerantly: empty / malformed / missing transcript_path
+// degrade to the safe path (treat as not acknowledged → full bootstrap inject).
 func runUserPromptSubmitHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 	const logFile = "/tmp/ai-skill-prompt-hook.log"
 	appendLog(logFile, time.Now().Format("2006-01-02T15:04:05")+" UserPromptSubmit fired (Go)")
 
+	transcriptPath := readUserPromptSubmitTranscriptPath()
+
 	aiSkillRepo := resolveClaudeAiSkillRepo(projectDir)
-	bootstrap := readFileSafe(filepath.Join(aiSkillRepo, "CORE_BOOTSTRAP.md"))
 	gitReport := formatDirtyGitRepoReport(projectDir)
-	combined := "[ai-skill final close-out obligation] Final response MUST end with a Cognitive Mode 報告 block. " +
-		"If bootstrap has not yet been acknowledged, output or repair the Bootstrap Receipt in the same response. Canonical spec: runtime/core-bootstrap.yaml.\n\n---\n" +
-		bootstrap
+
+	const mustBlock = "[ai-skill final close-out obligation] Final response MUST end with a Cognitive Mode 報告 block (compact or full form). Canonical spec: runtime/core-bootstrap.yaml."
+
+	var combined string
+	acknowledged := transcriptHasBootstrapAcknowledgment(transcriptPath, 20)
+	if acknowledged {
+		combined = mustBlock
+		appendLog(logFile, "  bootstrap_ack=true skip_bootstrap_md=true")
+	} else {
+		bootstrap := readFileSafe(filepath.Join(aiSkillRepo, "CORE_BOOTSTRAP.md"))
+		combined = mustBlock +
+			"\n\n---\n" +
+			"[ai-skill bootstrap injection] Bootstrap Receipt not yet observed in this session's transcript. Read CORE_BOOTSTRAP.md + runtime/core-bootstrap.yaml then emit a Bootstrap Receipt at the start of your next user-facing response." +
+			"\n\n---\n" +
+			bootstrap
+		appendLog(logFile, "  bootstrap_ack=false inject_full_bootstrap=true")
+	}
 	if gitReport != "" {
 		combined += "\n\n---\n" + gitReport
 	}
@@ -1031,6 +1061,137 @@ func runUserPromptSubmitHook(projectDir string, stdout io.Writer, stderr io.Writ
 		_, _ = fmt.Fprintln(stderr, "encode error:", err)
 	}
 	return ExitSuccess
+}
+
+// readUserPromptSubmitTranscriptPath drains os.Stdin and extracts
+// transcript_path if present. Returns "" on any parse failure, missing
+// payload, or absent field — caller treats "" as "not acknowledged" and
+// falls back to always-inject.
+func readUserPromptSubmitTranscriptPath() string {
+	raw, err := io.ReadAll(os.Stdin)
+	if err != nil || len(raw) == 0 {
+		return ""
+	}
+	var payload map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &payload); err != nil {
+		return ""
+	}
+	v, ok := payload["transcript_path"]
+	if !ok {
+		return ""
+	}
+	var s string
+	if err := json.Unmarshal(v, &s); err != nil {
+		return ""
+	}
+	return s
+}
+
+// bootstrapReceiptPattern matches the canonical Bootstrap Receipt first line
+// emitted by the agent. Kept deliberately loose (whitespace-tolerant, no
+// per_turn_obligations field required) so a slightly malformed but still
+// authentic Receipt is still recognized as acknowledgment. Receipts that
+// pass gate.bootstrap.receipt_present will also match this pattern.
+var bootstrapReceiptPattern = regexp.MustCompile(`Bootstrap:\s*rules=✓\s*phase=\S+\s*obligations=\d+\s*gates=\d+`)
+
+// transcriptHasBootstrapAcknowledgment scans the JSONL transcript for any
+// recent assistant text turn containing a Bootstrap Receipt line. Used by
+// runUserPromptSubmitHook to decide whether the full CORE_BOOTSTRAP.md block
+// still needs to be injected this turn.
+//
+// Structural pattern mirrors transcriptHasRequiredBootstrapReads (assistant
+// turn → message.content[] → match) but inspects "text" blocks rather than
+// "tool_use" Read blocks.
+//
+// lastN bounds the scan to the most recent N assistant text turns to keep
+// hook latency bounded on long sessions; 0 means unlimited. Returns false
+// on any I/O or parse failure (safe default — caller injects full bootstrap).
+func transcriptHasBootstrapAcknowledgment(transcriptPath string, lastN int) bool {
+	if transcriptPath == "" || !claudeFileExists(transcriptPath) {
+		return false
+	}
+	f, err := os.Open(transcriptPath)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+
+	var assistantTexts []string
+	scanner := bufio.NewScanner(f)
+	scanner.Buffer(make([]byte, 2*1024*1024), 2*1024*1024)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
+		var entry map[string]json.RawMessage
+		if err := json.Unmarshal([]byte(line), &entry); err != nil {
+			continue
+		}
+		roleField := entry["type"]
+		if roleField == nil {
+			roleField = entry["role"]
+		}
+		var role string
+		if roleField != nil {
+			_ = json.Unmarshal(roleField, &role)
+		}
+		if role != "assistant" {
+			continue
+		}
+		msgRaw, ok := entry["message"]
+		if !ok {
+			continue
+		}
+		var msg map[string]json.RawMessage
+		if err := json.Unmarshal(msgRaw, &msg); err != nil {
+			continue
+		}
+		cRaw, ok := msg["content"]
+		if !ok {
+			continue
+		}
+		var items []json.RawMessage
+		if err := json.Unmarshal(cRaw, &items); err != nil {
+			continue
+		}
+		var turnText strings.Builder
+		for _, item := range items {
+			var block map[string]json.RawMessage
+			if err := json.Unmarshal(item, &block); err != nil {
+				continue
+			}
+			var blockType string
+			if tr, ok := block["type"]; ok {
+				_ = json.Unmarshal(tr, &blockType)
+			}
+			if blockType != "text" {
+				continue
+			}
+			var txt string
+			if tr, ok := block["text"]; ok {
+				_ = json.Unmarshal(tr, &txt)
+			}
+			if txt != "" {
+				turnText.WriteString(txt)
+				turnText.WriteByte('\n')
+			}
+		}
+		if turnText.Len() > 0 {
+			assistantTexts = append(assistantTexts, turnText.String())
+		}
+	}
+
+	start := 0
+	if lastN > 0 && len(assistantTexts) > lastN {
+		start = len(assistantTexts) - lastN
+	}
+	for _, t := range assistantTexts[start:] {
+		if bootstrapReceiptPattern.MatchString(t) {
+			return true
+		}
+	}
+	return false
 }
 
 // runStopHook implements the final-response Stop hook.

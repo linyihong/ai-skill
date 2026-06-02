@@ -482,7 +482,9 @@ rule_classes:
   # ═══ MECHANICAL ═══════════════════════════════════════════════════
 
   - id: bootstrap_integrity
-    coverage: mechanical
+    coverage: behavioral_only
+    adr_reference: constitution/ADR-011-conditional-bootstrap-injection.md
+    enforcement_changed_at: "2026-06-03"
     source_files:
       - runtime/core-bootstrap.yaml#per_session_obligations
       - CORE_BOOTSTRAP.md
@@ -492,7 +494,7 @@ rule_classes:
         executor_kind: hook_dispatcher_entry
         hook_phase: PreToolUse
         block_or_warn: block
-        notes: "enforces gate.bootstrap.receipt_present via transcriptHasRequiredBootstrapReads"
+        notes: "PreToolUse gate.bootstrap.receipt_present remains mechanical (blocks non-Read tools until Receipt + canonical Reads observed); ADR-011 only demotes the UserPromptSubmit forcing function"
       - file: scripts/ai-skill-cli/internal/app/hooks.go
         symbol: runSessionStartHook
         executor_kind: hook_dispatcher_entry
@@ -506,21 +508,52 @@ rule_classes:
         hook_phase: PostToolUse
         block_or_warn: warn
         notes: "reminds agent to emit Bootstrap Receipt before next response"
-      # F11 (round-4 backfill): UserPromptSubmit conditional bootstrap injection
+      # F11 (round-4 backfill, ADR-011 update): UserPromptSubmit conditional bootstrap injection
       - file: scripts/ai-skill-cli/internal/app/hooks.go
         symbol: runUserPromptSubmitHook
         executor_kind: hook_dispatcher_entry
         hook_phase: UserPromptSubmit
         block_or_warn: warn
-        notes: "injects close-out + bootstrap reminder context (see Phase 5.x ADR draft)"
+        notes: "ADR-011: transcript-aware conditional injection; full bootstrap.md only when Receipt not yet observed in transcript (via transcriptHasBootstrapAcknowledgment)"
     rationale: |
-      Bootstrap Receipt is session integrity anchor. Bypass = skipping all
-      required reads. Read-log gate prevents copy-paste fabrication.
+      Bootstrap Receipt is session integrity anchor. PreToolUse mechanical
+      gate (gate.bootstrap.receipt_present) still blocks bypass. ADR-011
+      demoted the UserPromptSubmit forcing function from "always inject
+      full bootstrap.md" to "transcript-aware conditional inject" — the
+      class as a whole is now behavioral_only because the primary
+      forcing function is conditional, even though one of its executors
+      (PreToolUse) remains hard-block. Read-log gate prevents copy-paste
+      fabrication of the Receipt.
+    sunset_decision:
+      revisit_when: |
+        After 30 days of runtime_metrics observation following ADR-011 land
+        (2026-07-03), evaluate: did Receipt over-emit rate drop AND did
+        PreToolUse continue to catch fabricated Receipts at the previous
+        rate? If both yes, consider re-promoting to mechanical with the
+        conditional-inject executor reclassified as a mechanical
+        forcing function.
+      success_criteria: |
+        Two observable conditions: (1) PreToolUse
+        gate.bootstrap.receipt_present continues to block in regression
+        scenarios (TestPreToolUseHookBlocksReceiptWithoutReads) and at
+        runtime (runtime.executor_observations once wired); (2) Receipt
+        over-emit rate measurably lower in 30-day window than in the
+        always-inject baseline. Objective test: scenario coverage stays
+        ✓ + runtime block count > 0 + over-emit rate decrease > 50%.
+      revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-03"
+      last_review_summary: |
+        Demoted from mechanical to behavioral_only per ADR-011 (Phase 5.x
+        inaugural self-governance test case). PreToolUse hard-block
+        executor preserved. UserPromptSubmit refactored to transcript-aware
+        conditional injection. 30-day runtime_metrics observation window
+        starts 2026-06-03.
+      depends_on_rule_classes: []
     verification_status:
       symbol_exists: ✓
       scenario_exists: ✓
       regression_exists: ✓  # bootstrap-bypass-on-resume failure pattern
-      runtime_observed: pending  # runtime.executor_observations table not yet wired
+      runtime_observed: pending  # 30-day window starts 2026-06-03 per ADR-011 sunset_decision
     coverage_evidence:
       expected_instance_count: 1
       validation_scenarios:
