@@ -1,4 +1,4 @@
-version=repo-381869a
-source_commit=381869a
-built_at=2026-06-02T06:54:29Z
+version=repo-a17c56e
+source_commit=a17c56e
+built_at=2026-06-02T12:12:26Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
