@@ -4,6 +4,16 @@ domain: enforcement
 type: cli-output-contract
 priority: P1
 
+# Step 9 (round-7 review): this scenario tests the `ai-skill enforcement
+# coverage` CLI output contract — entirely a Phase 4 deliverable. No Phase 3
+# equivalent (Phase 3 has no CLI surface); becomes runnable when Phase 4
+# implements the coverage subcommand.
+execution_status:
+  runnable: false
+  requires_capability: enforcement_cli
+  blocked_until: "Phase 4 — ai-skill enforcement coverage CLI"
+  phase3_equivalent: []  # none — pure CLI contract, no Phase 3 engine analogue
+
 failure_source:
   pattern: coverage-report-format-drift
   class: cli-contract

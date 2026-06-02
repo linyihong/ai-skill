@@ -4,6 +4,17 @@ domain: enforcement
 type: registry-lint
 priority: P1
 
+# Step 9 (round-7 review): detection_command uses the Phase 4
+# `ai-skill enforcement lint` CLI. Phase 3 verifies the lint engine via
+# Go test; this scenario is runnable once Phase 4 lands the CLI.
+execution_status:
+  runnable: false
+  requires_capability: enforcement_cli
+  blocked_until: "Phase 4 — ai-skill enforcement lint CLI"
+  phase3_equivalent:
+    - "scripts/ai-skill-cli/internal/app/enforcement_registry_lint_test.go::TestLintMissingExecutorSymbol_Detected"
+    - "scripts/ai-skill-cli/internal/app/enforcement_registry_lint_test.go::TestLintMissingExecutorSymbol_PresentPasses"
+
 failure_source:
   pattern: rule-without-executor
   class: meta-governance-gap

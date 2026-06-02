@@ -5,6 +5,19 @@ domain: enforcement
 type: registry-lint
 priority: P1
 
+# Step 9 (round-7 review): this scenario's detection_command exercises the
+# `ai-skill enforcement lint` CLI, which is a Phase 4 public surface — NOT
+# implemented in Phase 3 (avoids scope leak: arg parser / output formatter
+# / help text / exit-code contract). The Phase 3 lint ENGINE is verified by
+# Go test instead. This scenario becomes runnable once Phase 4 lands the CLI.
+execution_status:
+  runnable: false
+  requires_capability: enforcement_cli
+  blocked_until: "Phase 4 — ai-skill enforcement lint CLI"
+  phase3_equivalent:
+    - "scripts/ai-skill-cli/internal/app/enforcement_registry_lint_test.go::TestLintOrphanRule_Detected"
+    - "scripts/ai-skill-cli/internal/app/enforcement_registry_lint_test.go::TestLintOrphanRule_BoundPasses"
+
 failure_source:
   pattern: rule-without-executor
   class: meta-governance-gap

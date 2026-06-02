@@ -928,9 +928,11 @@ func LintEnforcementRegistry(reg EnforcementRegistry, repo Repo) []LintError {
 整合：`ai-skill runtime compile` 跑 lint，任何 error 直接 exit non-zero。
 
 產出：
-- [ ] Lint 實作 + unit tests（測 4 種 lint type）
-- [ ] `ai-skill runtime compile` 整合
-- [ ] 第一次 compile run 預期會列出大量 orphan_rule（Phase 1 inventory 已知 ≥ 30%）；不直接 block，先記為 warning + 寫進 Q1 review 清單
+- [x] Lint 實作 + unit tests（13 lint checks: 5 v1 + 9 round-4/5; 35 Go tests PASS）— `scripts/ai-skill-cli/internal/app/enforcement_registry_lint.go`
+- [x] `ai-skill runtime compile` 整合（Step 7: severity-aware — FAIL blocks, WARNING prints + exit 0; commit 381869a + binary 5862eba）
+- [x] 第一次 compile run 已處理：Q1 hard-block 下 dry-run 48 findings 全數 backfill 至 FAIL 0 / WARNING 1（class_size, acknowledged exemption）
+
+**Phase 3 land 完成（2026-06-02）**。Step-by-step：Step 0 ADR-010 + F19 stub (ccff2c2) → Step 1 schema patch (2a86fce + c9c37b1) → Step 2 lint 9 checks (599fa05) → Step 3 behavioral backfill (43677a3) → Step 5 F1-F22 backfill (05f4b19) → Step 6 child_plan warning clear (e39ca50) → Step 7 wire compile (381869a) → Step 8 binary rebuild (5862eba) → Step 9 scenario phase-4 marking + verify. 已知 out-of-scope: Phase 4 CLI、Phase 4.5 self-gov lint、Phase 5 bootstrap integration。pre-existing unrelated: runtime-index.sqlite stale checksum (spawn task flagged)。
 
 ### Phase 4 — CLI Coverage Report（**v2: 本 plan 主要交付**）
 
