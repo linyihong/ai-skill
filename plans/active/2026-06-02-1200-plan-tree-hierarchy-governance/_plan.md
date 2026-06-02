@@ -283,18 +283,42 @@ sub_plan_reason: >
 
 ### Phase 0 — Preflight checklist
 
-- [ ] 盤點 `plans/active/` 6 個 plan，標記哪些有隱性 parent-child 關係
-- [ ] 盤點 `plans/archived/` 找出歷史 parent-child 範例（特別是 `bootstrap-contract-yaml-migration` 系列）
-- [ ] 確認 `scripts/ai-skill-cli/internal/app/hooks.go` validator registry 加入新 validator 的相容性
-- [ ] 確認 `plans/README.md` 模板章節需要哪些連動更新
-- [ ] 確認 `enforcement/linked-updates.yaml` 是否需要新規則
-- [ ] 驗證 folder 結構與既有 `validatePlanArchivalAudit`、`validatePlanCheckboxSync`、`validatePlanStatusSync` 不衝突
+- [x] 盤點 `plans/active/` 6 個 plan，標記隱性 parent-child（2026-06-02 完成）
+- [ ] 盤點 `plans/archived/` 找出歷史 parent-child 範例（deferred — Phase 4 migration 啟動時做）
+- [x] 確認 `scripts/ai-skill-cli/internal/app/hooks.go` validator registry 衝突風險（與 registry plan）— 已決議採並行安全路：Phase 2 延後至 registry plan archive
+- [ ] 確認 `plans/README.md` 模板章節需要哪些連動更新（Phase 5 收尾再做）
+- [ ] 確認 `enforcement/linked-updates.yaml` 是否需要新規則（Phase 5 收尾再做）
+- [x] 驗證 folder 結構與既有 `validatePlanArchivalAudit` / `validatePlanCheckboxSync` / `validatePlanStatusSync` 不衝突（新 5 個 validator 為加法，不改既有）
+
+### Phase 0 Inventory 結果
+
+| Cluster | Main | Subs（隱性 parent ref 來源） | Migration target |
+|---|---|---|---|
+| **Cluster 1（Registry tree）** | `2026-05-31-2100-mechanical-enforcement-registry` (P1) | `2026-05-31-1900-workflow-activation-engine` (P2, "parent plan mechanical-enforcement-registry")<br>`2026-05-31-2000-mechanical-sanitization-validator` (P3, "parent meta-plan P1")<br>`2026-06-01-0100-validation-scenario-governance-executor` (stub, "Source: §Phase 3 Round-4 T1") | **Phase 4 dogfood（首選）** — 等該 cluster archive 後遷移成 folder 結構 |
+| **Cluster 2（Plan-tree itself）** | `2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md` | `01-frontmatter-schema.md`（Phase 1 已建）+ 03/04 待建 | Self-dogfood，已用新格式 |
+| Standalone | `2026-05-27-1557-tool-runtime-signal-economics-integration` | — | 無需遷移 |
+| Standalone | `2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation` | — | 無需遷移 |
+
+Cluster 1 是天然 dogfood：3 個既有 plan 都已在檔頭 prose 明寫 parent 關係，遷移成本低（只需加 frontmatter + 建 folder）。
 
 ---
 
 ## Phase 1 — `01-frontmatter-schema`（sub-plan）
 
-詳見 [`01-frontmatter-schema.md`](01-frontmatter-schema.md)（待建）。本主計畫驗證要點：schema 文件化 + ≥ 3 個 fixture（main / sub / spike）。
+**Status**：in-progress（2026-06-02 啟動）
+
+詳見 [`01-frontmatter-schema.md`](01-frontmatter-schema.md)（**已建**）。本主計畫驗證要點：schema 文件化 + ≥ 3 個 fixture（main / sub / spike）。
+
+**Phase 1 已交付**：
+- [x] `01-frontmatter-schema.md` sub-plan（dogfood new schema）
+- [x] `fixtures/main-plan.md`
+- [x] `fixtures/sub-plan.md`
+- [x] `fixtures/spike-plan.md`
+- [x] `governance/lifecycle/plan-tree-hierarchy.md` rule draft
+
+**Phase 1 待完成**：
+- [ ] Sub-plan 自己的 acceptance criteria 全 checked（最後 1 條：Phase 2 重用 fixtures 待 Phase 2 啟動時 verify）
+- [ ] 將 Phase 1 mark completed 後，由 parent `_plan.md` Phase 5 收尾時連動 `plans/README.md`、glossary 註冊
 
 ---
 
