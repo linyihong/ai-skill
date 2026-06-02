@@ -5,15 +5,15 @@ domain: enforcement
 type: registry-lint
 priority: P1
 
-# Step 9 (round-7 review): this scenario's detection_command exercises the
-# `ai-skill enforcement lint` CLI, which is a Phase 4 public surface — NOT
-# implemented in Phase 3 (avoids scope leak: arg parser / output formatter
-# / help text / exit-code contract). The Phase 3 lint ENGINE is verified by
-# Go test instead. This scenario becomes runnable once Phase 4 lands the CLI.
+# Phase 4 (2026-06-02): `ai-skill enforcement lint` CLI landed; scenario
+# flipped to runnable. detection_command uses cross-platform single CLI
+# invocation against a self-contained fixture repo under
+# validation/scenarios/enforcement/fixtures/orphan-rule/, with
+# --expect-finding replacing the original `grep | echo PASS` shell pipeline.
 execution_status:
-  runnable: false
-  requires_capability: enforcement_cli
-  blocked_until: "Phase 4 — ai-skill enforcement lint CLI"
+  runnable: true
+  cli_surface: "ai-skill enforcement lint"
+  fixture_root: validation/scenarios/enforcement/fixtures/orphan-rule
   phase3_equivalent:
     - "scripts/ai-skill-cli/internal/app/enforcement_registry_lint_test.go::TestLintOrphanRule_Detected"
     - "scripts/ai-skill-cli/internal/app/enforcement_registry_lint_test.go::TestLintOrphanRule_BoundPasses"
@@ -63,13 +63,16 @@ then:
     - lint waits for grace period (Q1: bootstrap_grace.enabled=false)
 
 validation:
+  # Cross-platform: single CLI invocation, no shell logic, no jq/grep
+  # dependency. --expect-finding makes the binary itself decide PASS/FAIL
+  # via exit code (0 = matched, 30 = unmatched).
   detection_command: |
-    # Phase 3 will provide ai-skill enforcement lint subcommand
-    ai-skill enforcement lint --check orphan_rule \
-      --fixture enforcement/__test_fixture_orphan__.yaml 2>&1 | \
-      grep -q "orphan_rule.*test-orphan-rule" && echo "PASS" || echo "FAIL"
-  pass_criteria: detection_command outputs "PASS" AND `ai-skill runtime compile` exits non-zero with fixture present
-  initial_state: FAIL (Phase 3 lint not yet implemented)
+    ai-skill enforcement lint \
+      --repo validation/scenarios/enforcement/fixtures/orphan-rule \
+      --check orphan_rule \
+      --expect-finding __test_fixture_orphan__
+  pass_criteria: detection_command exits 0 (assertion mode matched ≥ 1 finding); non-zero indicates lint engine regressed or fixture drift.
+  initial_state: PASS (Phase 4 CLI landed 2026-06-02; fixture repo committed alongside)
   reference_governance:
     - enforcement/enforcement-registry.yaml §enforcement_mode.orphan_rule=fail
     - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md Phase 3

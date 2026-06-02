@@ -4,14 +4,14 @@ domain: enforcement
 type: cli-output-contract
 priority: P1
 
-# Step 9 (round-7 review): this scenario tests the `ai-skill enforcement
-# coverage` CLI output contract — entirely a Phase 4 deliverable. No Phase 3
-# equivalent (Phase 3 has no CLI surface); becomes runnable when Phase 4
-# implements the coverage subcommand.
+# Phase 4 (2026-06-02): `ai-skill enforcement coverage` CLI landed; scenario
+# flipped to runnable. The original shell pipeline (head -1 | grep -qE +
+# jq -e + grep) is replaced by the CLI's built-in --self-check, which
+# renders text/json/markdown internally and validates the 9-point schema
+# contract in pure Go (cross-platform, no jq dependency).
 execution_status:
-  runnable: false
-  requires_capability: enforcement_cli
-  blocked_until: "Phase 4 — ai-skill enforcement coverage CLI"
+  runnable: true
+  cli_surface: "ai-skill enforcement coverage --self-check"
   phase3_equivalent: []  # none — pure CLI contract, no Phase 3 engine analogue
 
 failure_source:
@@ -72,25 +72,15 @@ then:
     - any format silently drops runtime_observed when metrics are present
 
 validation:
+  # Cross-platform: --self-check renders all 3 formats internally and
+  # validates 9 schema checks (text first-line regex + ═ underline +
+  # Total line, markdown h1 + Summary h2, JSON schema_version=1 +
+  # 6-bucket completeness + per_class array + snake_case keys). No shell
+  # pipeline, no jq, single Go binary invocation.
   detection_command: |
-    # text format smoke test
-    out=$(ai-skill enforcement coverage --format text 2>&1)
-    echo "$out" | head -1 | grep -qE "^Enforcement Coverage Report \([0-9]{4}-[0-9]{2}-[0-9]{2}\)$" || \
-      { echo "FAIL text header"; exit 1; }
-    echo "$out" | grep -q "Total Rule Classes:" || { echo "FAIL text total"; exit 1; }
-
-    # json format smoke test
-    json=$(ai-skill enforcement coverage --format json 2>&1)
-    echo "$json" | jq -e '.schema_version == 1 and (.per_class | type == "array")' >/dev/null || \
-      { echo "FAIL json shape"; exit 1; }
-
-    # markdown format smoke test
-    md=$(ai-skill enforcement coverage --format markdown 2>&1)
-    echo "$md" | grep -q "^# Enforcement Coverage Report$" || { echo "FAIL md header"; exit 1; }
-
-    echo "PASS"
-  pass_criteria: detection_command outputs "PASS"
-  initial_state: FAIL (Phase 4 CLI not yet implemented)
+    ai-skill enforcement coverage --self-check
+  pass_criteria: detection_command exits 0 (9/9 internal checks pass). Failure cases enumerated in the self-check output identify which format/schema dimension regressed.
+  initial_state: PASS (Phase 4 CLI landed 2026-06-02)
   reference_governance:
     - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md §Phase 4
     - enforcement/enforcement-registry.yaml (source of truth for rule_classes)

@@ -1,0 +1,20 @@
+schema_version: 2
+id: enforcement.enforcement-registry
+status: active
+owner_layer: enforcement
+# Minimal synthetic fixture for scenario registry-lint-orphan-rule-v1.
+# rule_classes is empty so __test_fixture_orphan__.yaml (sibling) becomes an
+# orphan_rule finding when ai-skill enforcement lint walks enforcement/.
+enforcement_mode:
+  orphan_rule: fail
+  orphan_executor: fail
+bootstrap_mode: strict
+baseline_snapshot:
+  entries: []
+governance_thresholds:
+  source_files_review_threshold: 5
+executor_kind_spec:
+  binding_required_for: []
+internal_helper_allowlist:
+  symbols: []
+rule_classes: []

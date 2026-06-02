@@ -1,0 +1,4 @@
+id: enforcement.test-orphan-rule
+status: active
+# Synthetic rule yaml with no enforcement-registry binding. Drives the
+# orphan_rule lint finding for scenario registry-lint-orphan-rule-v1.

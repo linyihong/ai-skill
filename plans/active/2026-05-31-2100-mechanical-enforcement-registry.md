@@ -1031,10 +1031,11 @@ v3 只看 symbol + scenario 完全看不到這層 reality gap。
 無法迴避、無法 silent leak、無法等使用者半年後追問。
 
 產出：
-- [ ] CLI subcommand 實作
-- [ ] 輸出格式（text + JSON + markdown for governance dashboards）
-- [ ] 文件化（README + ai-tools/agent reference）
-- [ ] CI integration：Pull Request 自動跑 coverage diff，新增規則沒填 coverage 直接 PR check 失敗
+- [x] CLI subcommand 實作 — `ai-skill enforcement lint` + `ai-skill enforcement coverage` (Phase 4 land 2026-06-02, scripts/ai-skill-cli/internal/app/enforcement.go)
+- [x] 輸出格式（text + JSON + markdown for governance dashboards）— 三 format + `--detail` + `--diff <ref>` + `--self-check` 全 land
+- [x] 文件化（command-contract.md）— enforcement lint / coverage 兩段 + 副作用登錄表項目同步；ai-tools/agent reference 留待 Phase 5 一併處理（與 bootstrap integration 同步）
+- [ ] CI integration：Pull Request 自動跑 coverage diff，新增規則沒填 coverage 直接 PR check 失敗 — deferred to Phase 4.5 / Phase 5（CI workflow 變動屬另一 owner group，本 session 範圍只到 CLI land）
+- [x] 4 個 Phase 4-blocked scenario 翻 runnable — orphan-rule / missing-executor / behavioral-without-rationale / coverage-cli-output-format-v1 detection_command 改成單一 cross-platform CLI invocation（exit-code based assertion），fixture repo 提交於 `validation/scenarios/enforcement/fixtures/`
 
 ### Phase 4.5 — Registry Self-Governance（**v4 NEW，採納評審 #3**）
 

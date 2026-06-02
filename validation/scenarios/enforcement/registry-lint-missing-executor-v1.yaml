@@ -4,13 +4,14 @@ domain: enforcement
 type: registry-lint
 priority: P1
 
-# Step 9 (round-7 review): detection_command uses the Phase 4
-# `ai-skill enforcement lint` CLI. Phase 3 verifies the lint engine via
-# Go test; this scenario is runnable once Phase 4 lands the CLI.
+# Phase 4 (2026-06-02): `ai-skill enforcement lint` CLI landed; scenario
+# flipped to runnable. Uses self-contained fixture repo with synthetic
+# registry declaring a mechanical class whose executor.symbol is absent
+# from the fixture's stub hooks.go.
 execution_status:
-  runnable: false
-  requires_capability: enforcement_cli
-  blocked_until: "Phase 4 — ai-skill enforcement lint CLI"
+  runnable: true
+  cli_surface: "ai-skill enforcement lint"
+  fixture_root: validation/scenarios/enforcement/fixtures/missing-executor
   phase3_equivalent:
     - "scripts/ai-skill-cli/internal/app/enforcement_registry_lint_test.go::TestLintMissingExecutorSymbol_Detected"
     - "scripts/ai-skill-cli/internal/app/enforcement_registry_lint_test.go::TestLintMissingExecutorSymbol_PresentPasses"
@@ -63,12 +64,15 @@ then:
     - symbol check skipped for kinds in binding_required_for (Q4 enforcement)
 
 validation:
+  # Cross-platform: single CLI invocation; --expect-finding makes the
+  # binary check via exit code.
   detection_command: |
-    ai-skill enforcement lint --check missing_executor 2>&1 | \
-      grep -q "__test_missing_executor__.*validateNonexistentFakeSymbol" && \
-      echo "PASS" || echo "FAIL"
-  pass_criteria: detection_command outputs "PASS"
-  initial_state: FAIL (Phase 3 lint not yet implemented)
+    ai-skill enforcement lint \
+      --repo validation/scenarios/enforcement/fixtures/missing-executor \
+      --check missing_executor_symbol \
+      --expect-finding validateNonexistentFakeSymbol
+  pass_criteria: detection_command exits 0 (assertion matched ≥ 1 missing_executor_symbol finding)
+  initial_state: PASS (Phase 4 CLI landed 2026-06-02)
   reference_governance:
     - enforcement/enforcement-registry.yaml §executor_kind_spec.binding_required_for
     - enforcement/enforcement-registry.yaml §verification_levels.symbol_exists

@@ -4,13 +4,14 @@ domain: enforcement
 type: registry-lint
 priority: P1
 
-# Step 9 (round-7 review): detection_command uses the Phase 4
-# `ai-skill enforcement lint` CLI. Phase 3 verifies the behavioral_only
-# lint engine via Go test; runnable once Phase 4 lands the CLI.
+# Phase 4 (2026-06-02): `ai-skill enforcement lint` CLI landed; scenario
+# flipped to runnable. Synthetic registry contains 4 bad behavioral_only
+# entries (one per failure mode) + 1 good entry; lint emits at least one
+# behavioral_only_incomplete_sunset finding which the assertion matches.
 execution_status:
-  runnable: false
-  requires_capability: enforcement_cli
-  blocked_until: "Phase 4 — ai-skill enforcement lint CLI"
+  runnable: true
+  cli_surface: "ai-skill enforcement lint"
+  fixture_root: validation/scenarios/enforcement/fixtures/behavioral-no-rationale
   phase3_equivalent:
     - "scripts/ai-skill-cli/internal/app/enforcement_registry_lint_test.go::TestLintBehavioralIncompleteSunset_AllBadCases"
     - "scripts/ai-skill-cli/internal/app/enforcement_registry_lint_test.go::TestLintBehavioralIncompleteSunset_GoodPasses"
@@ -94,18 +95,18 @@ then:
     - lint accepts whitespace-only string for required field
 
 validation:
+  # Cross-platform: single CLI invocation; bash for-loop replaced by a
+  # synthetic registry that already contains all 4 bad cases + 1 good
+  # case. The assertion matches at least one behavioral_only_incomplete_sunset
+  # finding (the good case does not emit one). Per-case granularity is
+  # covered by Go unit tests under phase3_equivalent.
   detection_command: |
-    # Test each bad fixture individually
-    for fixture in bad_no_sunset bad_missing_revisit bad_missing_criteria bad_empty; do
-      ai-skill enforcement lint --check behavioral_only --fixture "$fixture" 2>&1 | \
-        grep -q "behavioral_only_incomplete_sunset" || { echo "FAIL: $fixture not detected"; exit 1; }
-    done
-    # Verify good fixture passes
-    ai-skill enforcement lint --check behavioral_only --fixture good 2>&1 | \
-      grep -q "behavioral_only_incomplete_sunset" && { echo "FAIL: good case rejected"; exit 1; }
-    echo "PASS"
-  pass_criteria: detection_command outputs "PASS"
-  initial_state: FAIL (Phase 3 lint not yet implemented)
+    ai-skill enforcement lint \
+      --repo validation/scenarios/enforcement/fixtures/behavioral-no-rationale \
+      --check behavioral_only \
+      --expect-finding behavioral_only_incomplete_sunset
+  pass_criteria: detection_command exits 0 (assertion matched ≥ 1 behavioral_only_incomplete_sunset finding from the 4 bad cases). Good case isolation verified by phase3_equivalent Go tests.
+  initial_state: PASS (Phase 4 CLI landed 2026-06-02)
   reference_governance:
     - enforcement/enforcement-registry.yaml §coverage_status_spec.behavioral_only
     - Open Question Q2 resolution (revised: dual-required revisit_when + success_criteria)

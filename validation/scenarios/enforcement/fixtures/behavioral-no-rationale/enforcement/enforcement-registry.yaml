@@ -1,0 +1,56 @@
+schema_version: 2
+id: enforcement.enforcement-registry
+status: active
+owner_layer: enforcement
+# Minimal synthetic fixture for scenario registry-lint-behavioral-without-rationale-v1.
+# Declares 4 bad behavioral_only entries (one per failure mode) + 1 good entry.
+# Lint emits behavioral_only_incomplete_sunset / behavioral_only_missing_rationale
+# for the bad cases; the good entry passes the FAIL gate (may still emit
+# WARNINGs for recommended fields, which are advisory).
+enforcement_mode:
+  orphan_rule: fail
+  orphan_executor: fail
+bootstrap_mode: strict
+baseline_snapshot:
+  entries: []
+governance_thresholds:
+  source_files_review_threshold: 5
+executor_kind_spec:
+  binding_required_for: []
+internal_helper_allowlist:
+  symbols: []
+rule_classes:
+  - id: __test_bad_no_sunset__
+    coverage: behavioral_only
+    source_files: ["enforcement/foo.md"]
+    rationale: "Synthetic test fixture (bad: missing sunset_decision entirely)."
+  - id: __test_bad_missing_revisit__
+    coverage: behavioral_only
+    source_files: ["enforcement/foo.md"]
+    rationale: "Synthetic test fixture (bad: missing sunset_decision.revisit_when)."
+    sunset_decision:
+      success_criteria: "Concrete trigger: workflow_activation child plan Phase 6.1 land"
+  - id: __test_bad_missing_criteria__
+    coverage: behavioral_only
+    source_files: ["enforcement/foo.md"]
+    rationale: "Synthetic test fixture (bad: missing sunset_decision.success_criteria)."
+    sunset_decision:
+      revisit_when: "workflow_activation child plan Phase 6.1 land"
+  - id: __test_bad_empty__
+    coverage: behavioral_only
+    source_files: ["enforcement/foo.md"]
+    rationale: "Synthetic test fixture (bad: both fields empty string)."
+    sunset_decision:
+      revisit_when: ""
+      success_criteria: ""
+  - id: __test_good__
+    coverage: behavioral_only
+    source_files: ["enforcement/foo.md"]
+    rationale: "Synthetic test fixture (good: all required behavioral_only fields populated)."
+    sunset_decision:
+      revisit_when: "workflow_activation child plan Phase 6.1 lands"
+      success_criteria: "Detector miss path can invoke Discovery and produce route_candidate_proposals.yaml; ≥ 80% coverage of historical incidents."
+      revisit_owner: "framework maintainer"
+      last_reviewed_at: "2026-06-01"
+      last_review_summary: "Initial entry creation; behavioral_only justified pending workflow_activation Phase 6.1 land."
+      depends_on_rule_classes: []

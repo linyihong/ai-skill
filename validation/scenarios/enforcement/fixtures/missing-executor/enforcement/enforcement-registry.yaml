@@ -1,0 +1,31 @@
+schema_version: 2
+id: enforcement.enforcement-registry
+status: active
+owner_layer: enforcement
+# Minimal synthetic fixture for scenario registry-lint-missing-executor-v1.
+# Declares one mechanical rule_class whose executor.symbol does NOT exist in
+# the fixture's hooks.go, so lint emits missing_executor_symbol.
+enforcement_mode:
+  orphan_rule: fail
+  orphan_executor: fail
+bootstrap_mode: strict
+baseline_snapshot:
+  entries: []
+governance_thresholds:
+  source_files_review_threshold: 5
+executor_kind_spec:
+  binding_required_for:
+    - commit_msg_validator
+internal_helper_allowlist:
+  symbols: []
+rule_classes:
+  - id: __test_missing_executor__
+    coverage: mechanical
+    source_files:
+      - enforcement/__test_target__.yaml
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateNonexistentFakeSymbol
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: "Synthetic test fixture for missing_executor_symbol lint."

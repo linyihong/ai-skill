@@ -45,6 +45,8 @@
 | `ai-skill hooks run commit-msg` validator `validatePlanArchivalAudit` | commit-msg hook 第 19 個 validator：當 commit 把 `plans/active/<name>.md` 移到 `plans/archived/<name>.md`（staged 同時含刪除與新增同 basename），archived 版本若仍有 `- [ ]` 行且 commit body 無 justification keyword（deferred / non-goal / scope reduced / handover / 延後 / 拆分）則 block。純 Go 掃描（呼叫 `ScanCheckboxesInFile`），零 shell 依賴；opt-out `[skip-plan-archival-audit]` | 否 | 是 | plan-archival-audit-validator Phase 2 |
 | `ai-skill scan-checkboxes <file>` | 掃描任意 Markdown 檔案的 task-list checkboxes（`- [ ]` / `- [x]` / `- [X]`），純 Go 實作，零 shell 依賴，可跨專案使用（release checklist、規格確認單等）。flags：`--format plain\|json`、`--exit-code`（有未完成項時 exit 1，方便 CI / pre-push hooks 使用） | 否 | 否 | plan-archival-audit-validator Phase 2 |
 | `ai-skill glossary validate` | 驗證 `knowledge/glossary/*.md` 的 entry schema、status / owner / relation enum、naming convention、alias 規則、`introduced-by` / `deprecated-by` 形狀、symmetric relation 對稱性與 `excludes` 引用 | 否 | 否 | context-language-glossary-system Phase 2 |
+| `ai-skill enforcement lint` | 對 `enforcement/enforcement-registry.yaml` 跑 13 條 Phase 3 lint check（orphan_rule / missing_executor_symbol / behavioral_only_* / deprecated_* / upstream_chain / class_size / baseline_snapshot / pending_implementation_child_plan_validity）。Thin CLI wrapper 直接複用 `LintEnforcementRegistry` 引擎；支援 `--check <substr>` 過濾、`--registry <path>` 覆寫、`--expect-finding <substr>` 跨平台 assertion mode（scenario 用） | 否 | 否 | mechanical-enforcement-registry Phase 4 |
+| `ai-skill enforcement coverage` | 把 registry 聚合成 6-bucket coverage report（mechanical / behavioral_only / not_mechanizable / pending_implementation / research_required / deprecated）+ verification level 分類 + runtime_observed gap（Phase 5 wire 前回 `null` + alert）。`--format text|json|markdown`、`--diff <ref>` 對比 git revision、`--detail` 開 per-class 表、`--self-check` 跨平台驗 3 個 format schema | 否 | 否 | mechanical-enforcement-registry Phase 4 |
 | `ai-skill roo set-global-custom-instructions` | guarded 寫入 Roo Code 全域 Custom Instructions | 是 | 否 | Tool adapter |
 | `ai-skill copilot start` | 產生 GitHub Copilot 新 session 第一則 bootstrap prompt | 否 | 否 | Tool adapter |
 
@@ -470,6 +472,53 @@
 - 額外 glossary coverage warning pass：掃 `plans/active/`、`architecture/`、`workflow/`、`analysis/`、`intelligence/`、`runtime/`、`ecosystem/` 內的 backtick-wrapped identifiers + snake_case ≥ 2 segments terms；若 `knowledge/runtime/sqlite/runtime-index.sqlite` 的 `glossary_terms.term` / `aliases` 找不到，emit `inventory.warnings`（依出現頻次排序，最多 50 條 + 截斷提示）。Heuristic 排除 path references（含 `/`）、單一英文短詞與 < 3 char terms 以降 false positive。
 - 不可修改 runtime.db、routing-registry 或 generated surfaces。
 
+### `ai-skill enforcement lint`
+
+目的：對 `enforcement/enforcement-registry.yaml` 跑 Phase 3 lint 引擎並輸出 severity-grouped 結果。Source-of-truth 是 `enforcement/enforcement-registry.yaml`；本 command read-only。Phase 3 已 wire 進 `ai-skill runtime compile`（FAIL block / WARNING print），本 CLI 是 standalone 入口，方便 scenario / CI / local debug 直接呼叫。
+
+輸入：
+
+- `--repo <path>`（預設 `.`；用於解析 rule yaml 與 executor 檔案位置）
+- `--registry <path>`（覆寫 registry 路徑，預設 `<repo>/enforcement/enforcement-registry.yaml`；scenario 用 synthetic 副本時必填）
+- `--check <substr>`（依 finding type 過濾，substring match；如 `--check orphan_rule`）
+- `--expect-finding <substr>`（assertion mode：若任一 finding 的 type / message / field key/value 含此 substring 則 exit 0，否則 exit 30；cross-platform，無需 shell `grep`）
+- `--expect-severity <FAIL|WARNING>`（窄化 `--expect-finding` 到指定 severity）
+- `--json` / `--plain`
+
+副作用：當提供 `--registry` 時，在 `os.TempDir()` 建立 shadow repo（複製 enforcement / runtime / governance yaml + hooks.go），結束後刪除。
+
+必要行為：
+
+- 預設模式列每個 finding 為 `lint.<type>` Check，按 severity 分組統計 `findings_fail` / `findings_warn`。
+- 任一 FAIL → exit 30 (`validation_failed`)；只有 WARNING → exit 0；零 finding → exit 0。
+- Assertion mode (`--expect-finding`) 改 `mode=assert`，純看是否命中；命中 → exit 0，未命中 → exit 30。
+- 不寫入 `enforcement/enforcement-registry.yaml`、不寫入 `runtime.db`、不執行 git 操作。
+
+### `ai-skill enforcement coverage`
+
+目的：將 `enforcement/enforcement-registry.yaml` 聚合成 6-bucket coverage report + verification level + runtime observation gap，作為 mechanical-enforcement-registry plan §Phase 4 主要交付。Source-of-truth 是 registry yaml；本 command read-only。
+
+輸入：
+
+- `--repo <path>`（預設 `.`）
+- `--registry <path>`（覆寫 registry 路徑）
+- `--format text|json|markdown`（預設 `text`）
+- `--diff <ref>`（與 git revision 比較；`git show <ref>:enforcement/enforcement-registry.yaml` 失敗時轉 alert 不阻斷）
+- `--detail`（text/markdown 模式開 per-class 表；預設只列 summary）
+- `--self-check`（跨平台驗 3 format schema 的內建模式；列每項 check pass/fail，全 pass exit 0，否則 exit 30）
+
+副作用：無。
+
+必要行為：
+
+- **6-bucket enum 鎖死**：`mechanical` / `behavioral_only` / `not_mechanizable` / `pending_implementation` / `research_required` / `deprecated`。即使 count=0 也輸出（JSON schema 穩定）。
+- **Verification level 分類**：`full`（mechanical + scenario file exists）/ `symbol_only`（mechanical 無 scenario）/ `planned`（pending_implementation 或 research_required）/ `behavioral`（behavioral_only）/ `not_applicable`（not_mechanizable 或 deprecated）。
+- **Runtime observation gap**：偵測 `runtime/runtime.db` 是否含 `executor_observations` table（Phase 5 wire 前不存在）。未 wire → `runtime_observed_pct` 一律 `null` + 全域 alert `runtime_observations_not_wired`；wire 後依 `rule_class_id` 查最近 `observation_window_days` 觸發次數。
+- **Text format**：第一行固定 `Enforcement Coverage Report (YYYY-MM-DD)`，第二行為 `═` 重複；之後是 bucket summary + 條件 section（Pending impl / Research required / Behavioral_only / Not_mechanizable / Deprecated）；非 TTY 不得輸出 ANSI escape。
+- **JSON format**：top-level keys `schema_version`（=1，數字）/ `generated_at`（ISO-8601）/ `total_rule_classes` / `observation_window_days` / `buckets`（6 keys）/ `per_class`（array of `{id, coverage, verification, runtime_observed_pct, alerts, ...}`）/ `alerts`（array，可空）/ `diff`（optional）。所有 key snake_case，禁混 camelCase。
+- **Markdown format**：`# Enforcement Coverage Report` h1 + `## Summary` h2 表格 + 條件 `## Per-class detail` / `## Alerts` / `## Changes vs <ref>`，不得含 raw HTML。
+- **Self-check**：內建 9 個 check（text 三項、markdown 兩項、json 四項），驗 first-line regex / schema_version 數字 / per_class array / snake_case keys 等；任一失敗 exit 30。
+
 ### `ai-skill glossary validate`
 
 目的：驗證 `knowledge/glossary/*.md` 內的 glossary entries 是否符合 [`knowledge/glossary/README.md`](../../../knowledge/glossary/README.md) 定義的 entry schema、symmetry classification、命名規則與 `excludes` 引用合法性。Source-of-truth 是 README.md 內的 schema spec；本 command read-only validator。
@@ -568,3 +617,5 @@
 | `runtime query` | `knowledge/runtime/sqlite/runtime-index.sqlite` 或 `--db` 指定 SQLite index | 無 | 無 |
 | `runtime query --graph` | `knowledge/graphs/*.yaml` | 無 | 無 |
 | `glossary validate` | `knowledge/glossary/*.md`（H2 + YAML block entries） | 無 | 無 |
+| `enforcement lint` | `enforcement/enforcement-registry.yaml` + `enforcement/runtime/governance/**/*.yaml` + `scripts/ai-skill-cli/internal/app/hooks.go` | 僅 `os.TempDir()` shadow repo（使用 `--registry` 時，結束即刪） | 無 |
+| `enforcement coverage` | `enforcement/enforcement-registry.yaml` + `runtime/runtime.db`（檢 `executor_observations`） + `validation/scenarios/`（heuristic scenario 命名比對） + git `show <ref>:enforcement/enforcement-registry.yaml`（`--diff` 模式） | 無 | `--diff` 模式需 Git |

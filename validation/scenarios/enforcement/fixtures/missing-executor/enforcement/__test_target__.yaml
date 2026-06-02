@@ -1,0 +1,5 @@
+id: enforcement.test-target
+status: active
+# Bound by __test_missing_executor__ in the synthetic registry; exists only
+# to satisfy the orphan_rule walk so the only surfaced finding is
+# missing_executor_symbol.
