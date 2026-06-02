@@ -394,6 +394,109 @@ func buildTransitionCheckResult(opts enforcementTransitionOptions, violations []
 // commit-msg hook validator: validateEnforcementRegistryTransition
 // ─────────────────────────────────────────────────────────────────────
 
+// validateEnforcementRuleRegistrySync is the Phase 5 commit-msg validator
+// (obligation.commit.enforcement_rule_registry_sync — 21st per_commit
+// validator). It blocks commits that stage an enforcement/*.yaml or
+// enforcement/*.md rule file without simultaneously registering it in
+// enforcement-registry.yaml (either by an existing source_files binding
+// or by staging the registry itself with a new rule_class entry).
+//
+// Relationship with Phase 3 compile-time orphan_rule lint: dual-gate.
+// orphan_rule still fails compile-time on the entire registry; this
+// commit-msg validator catches the same drift earlier with a tighter
+// per-staged-file scope, so the failure surfaces at commit not at the
+// next `ai-skill runtime compile` (which may be hours later).
+//
+// Opt-out: [skip-enforcement-registry-sync] trailer in commit body.
+//
+// Scope choice: only enforcement/ subtree for now. runtime/ and
+// governance/ rule yamls are out of scope because they are typically
+// edited alongside their owning module (their orphan_rule check at
+// compile time is the primary gate). Expanding scope is a Phase 6+
+// extension if the failure pattern surfaces there.
+func validateEnforcementRuleRegistrySync(text string, staged []string, root string) string {
+	if strings.Contains(text, "[skip-enforcement-registry-sync]") {
+		return ""
+	}
+	registryRel := "enforcement/enforcement-registry.yaml"
+	companionRel := "enforcement/enforcement-registry.md"
+
+	registryStaged := false
+	var candidates []string
+	for _, p := range staged {
+		rel := filepath.ToSlash(strings.TrimSpace(p))
+		if rel == "" {
+			continue
+		}
+		if rel == registryRel {
+			registryStaged = true
+			continue
+		}
+		if rel == companionRel {
+			continue
+		}
+		if !strings.HasPrefix(rel, "enforcement/") {
+			continue
+		}
+		if !strings.HasSuffix(rel, ".yaml") && !strings.HasSuffix(rel, ".yml") {
+			continue
+		}
+		candidates = append(candidates, rel)
+	}
+	if len(candidates) == 0 {
+		return ""
+	}
+
+	// Load current registry to check existing bindings. If registry is
+	// missing the rule yaml binding AND the registry itself is staged,
+	// assume the developer is adding the binding in the same commit
+	// (trust + leave compile-time orphan_rule lint as belt).
+	regPath := filepath.Join(root, filepath.FromSlash(registryRel))
+	snap, err := loadRegistrySnapshotFromPath(regPath)
+	if err != nil {
+		// No registry to compare against — let compile-time lint handle it.
+		return ""
+	}
+	bound := map[string]bool{}
+	for _, rc := range snap.RuleClasses {
+		for _, sf := range rc.SourceFiles {
+			bound[normalizeSourcePath(sf)] = true
+		}
+	}
+
+	var unbound []string
+	for _, rel := range candidates {
+		// Only flag files that actually declare a top-level `id:` — README
+		// or notes files under enforcement/ without an id are not rule yamls.
+		content, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(rel)))
+		if err != nil {
+			continue
+		}
+		if extractTopLevelID(string(content)) == "" {
+			continue
+		}
+		if bound[rel] {
+			continue
+		}
+		unbound = append(unbound, rel)
+	}
+	if len(unbound) == 0 {
+		return ""
+	}
+	if registryStaged {
+		// Developer is editing the registry too — trust they are binding
+		// the new files. Compile-time orphan_rule will catch any drift.
+		return ""
+	}
+	var b strings.Builder
+	fmt.Fprintf(&b, "enforcement_rule_registry_sync: %d staged enforcement rule yaml(s) declare top-level id: but are not bound by enforcement-registry.yaml, AND enforcement-registry.yaml is not staged. Either:\n", len(unbound))
+	for _, p := range unbound {
+		fmt.Fprintf(&b, "  - %s\n", p)
+	}
+	b.WriteString("  Add a rule_class entry to enforcement/enforcement-registry.yaml (source_files: [<path>]) in this same commit, or use [skip-enforcement-registry-sync] opt-out.")
+	return strings.TrimRight(b.String(), "\n")
+}
+
 // validateEnforcementRegistryTransition is the commit-msg validator that
 // enforces Phase 4.5 R1/R2/R3 at commit time. Returns empty string on
 // pass; non-empty error description blocks the commit.

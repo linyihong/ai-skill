@@ -3027,6 +3027,9 @@ var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
 	"obligation.commit.enforcement_registry_transition": func(c commitMsgCtx) string {
 		return validateEnforcementRegistryTransition(c.text, c.staged, c.root)
 	},
+	"obligation.commit.enforcement_rule_registry_sync": func(c commitMsgCtx) string {
+		return validateEnforcementRuleRegistrySync(c.text, c.staged, c.root)
+	},
 }
 
 // defaultCommitMsgDispatchOrder is the fallback order if
@@ -3053,6 +3056,7 @@ var defaultCommitMsgDispatchOrder = []string{
 	"obligation.commit.evidence_hierarchy",
 	"obligation.commit.plan_archival_audit",
 	"obligation.commit.enforcement_registry_transition",
+	"obligation.commit.enforcement_rule_registry_sync",
 }
 
 // readPerCommitObligationsOrder reads the per_commit_obligations id

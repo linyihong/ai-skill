@@ -57,6 +57,29 @@ contextual_activations:
       If activated, the agent checks whether the file should remain single-purpose
       or split into a folder with a README index and focused child files.
 
+  - id: activation.enforcement_registry_editing
+    source: enforcement/enforcement-registry.md
+    load_when:
+      - editing_enforcement_rule_yaml_or_md
+      - editing_runtime_rule_yaml_referenced_by_registry_source_files
+      - editing_governance_rule_yaml_referenced_by_registry_source_files
+      - editing_enforcement_registry_yaml_itself
+      - adding_new_rule_class_entry_to_registry
+      - changing_rule_class_coverage_value
+    purpose: >
+      Load enforcement-registry.md before editing any rule yaml/md or the
+      registry itself. The companion documents the Status Transition Matrix
+      (Phase 4.5) + 6-bucket coverage enum + verification ladder + R1-R5
+      self-governance lint behaviour. Skipping this load on a registry edit
+      is the failure mode the registry was built to prevent (silent
+      demotion / orphan rule / unverified promotion).
+    validation_signal: >
+      If activated, the agent verifies (a) any new rule yaml has a
+      matching rule_class entry in enforcement-registry.yaml; (b) any
+      coverage transition follows the Status Transition Matrix (e.g.
+      mechanical -> behavioral_only requires adr_reference); (c)
+      `ai-skill enforcement coverage` shows the expected bucket movement.
+
 per_session_obligations:
   - id: obligation.bootstrap.receipt
     fires: first_turn_before_any_non_read_tool_or_same_session_repair
@@ -288,6 +311,12 @@ per_commit_obligations:
     severity: block
     opt_out_marker: "[skip-registry-transition]"
     contract_source: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md (Phase 4.5 — Self-Governance Lint Rules R1/R2/R3) + enforcement/enforcement-registry.yaml §self_governance
+  - id: obligation.commit.enforcement_rule_registry_sync
+    fires: every_commit_staging_enforcement_rule_yaml_without_registry_update
+    validator: validateEnforcementRuleRegistrySync
+    severity: block
+    opt_out_marker: "[skip-enforcement-registry-sync]"
+    contract_source: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md (Phase 5 — Bootstrap Integration item 3); dual-gate companion to Phase 3 compile-time orphan_rule lint
 
 per_commit_dispatcher_status:
   machine_iterable: true

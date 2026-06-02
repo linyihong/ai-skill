@@ -301,7 +301,43 @@ func buildRuntimeReceiptResult(opts runtimeOptions) Result {
 		Check{Name: "bootstrap_receipt", Status: "ok", Message: receipt.receiptLine()},
 		Check{Name: "per_turn_obligations", Status: "ok", Message: strings.Join(receipt.PerTurn, ", ")},
 	)
+	// Phase 5 — enforcement coverage summary. Tolerates missing registry
+	// (fresh clone before compile) by surfacing a "summary unavailable"
+	// check instead of failing the receipt. Reuses Phase 4 coverage engine.
+	if summary, err := buildEnforcementCoverageSummaryLine(root); err == nil {
+		result.Checks = append(result.Checks, Check{Name: "enforcement_coverage_summary", Status: "ok", Message: summary})
+	} else {
+		result.Checks = append(result.Checks, Check{Name: "enforcement_coverage_summary", Status: "skipped", Message: "registry unavailable: " + err.Error()})
+	}
 	return result
+}
+
+// buildEnforcementCoverageSummaryLine renders the one-line Phase 5
+// receipt enrichment, e.g.:
+//
+//	Enforcement: classes=37 mechanical=14 behavioral=12 not_mech=5 pending=3 research=2 deprecated=0
+//
+// Reuses the Phase 4 buildCoverageReport engine so the receipt and
+// `ai-skill enforcement coverage` always agree on bucket counts.
+func buildEnforcementCoverageSummaryLine(repo string) (string, error) {
+	regPath := filepath.Join(repo, "enforcement", "enforcement-registry.yaml")
+	snap, err := loadRegistrySnapshotFromPath(regPath)
+	if err != nil {
+		return "", err
+	}
+	rep := buildCoverageReport(repo, snap)
+	// Shorten not_mechanizable -> not_mech to keep the line compact for
+	// terminal display; full names remain in JSON coverage output.
+	return fmt.Sprintf(
+		"Enforcement: classes=%d mechanical=%d behavioral=%d not_mech=%d pending=%d research=%d deprecated=%d",
+		rep.TotalRuleClasses,
+		rep.Buckets["mechanical"],
+		rep.Buckets["behavioral_only"],
+		rep.Buckets["not_mechanizable"],
+		rep.Buckets["pending_implementation"],
+		rep.Buckets["research_required"],
+		rep.Buckets["deprecated"],
+	), nil
 }
 
 // buildRuntimeObligationsResult implements bootstrap-contract-yaml-migration
