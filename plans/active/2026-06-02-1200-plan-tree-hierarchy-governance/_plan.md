@@ -5,7 +5,6 @@ status: draft
 owner: linyihong
 created: 2026-06-02
 parent: null
-children: []
 ---
 
 # Plan Tree Hierarchy Governance（主計畫／子計畫樹狀治理）
@@ -14,7 +13,7 @@ children: []
 **Owner**: linyihong
 **建立日期**: 2026-06-02
 **Source**: 2026-06-02 對話 — 使用者反映 `plans/active/` 橫向排列導致 main/sub plan 關係不直覺、難追蹤
-**Glossary Impact**: yes — 新引入 framework vocabulary：`plan_kind` / `sub_plan_trigger` / `completion_blocks_parent` / `plan tree`，須註冊到 `knowledge/glossary/ai-skill.md`
+**Glossary Impact**: yes — 新引入 framework vocabulary：`plan_kind` / `parent` / `required_for_completion` / `sub_plan_reason` / `plan tree`，須註冊到 `knowledge/glossary/ai-skill.md`
 
 > **Watch-Out List citation**：本 plan 對應 [`architecture/ai-native-cognitive-ecosystem-system.md`](../../../architecture/ai-native-cognitive-ecosystem-system.md) §Watch-Out List 的「process bloat」與「premature abstraction」防呆 — 不為了結構而結構，只有當 plan 實際出現拆分需求時才開 sub-plan。
 
@@ -35,27 +34,35 @@ children: []
 
 ### Decision
 
-導入 **plan tree 三件套**：
+導入 **Minimal Governance plan tree**（2026-06-02 review 後 v2）：
 
-- **A. 目錄結構** — 每個主計畫一個 folder，folder 名即 main plan slug；主計畫本體為 `_plan.md`；sub-plan 用 `NN-<slug>.md` 數字前綴排序；孫計畫多時可再包 `NN-<slug>/` 巢狀資料夾。
-- **B. Frontmatter schema** — `plan_kind` / `parent` / `children` / `sub_plan_trigger` / `completion_blocks_parent`。
-- **C. Hard rule + commit-msg validator** — sub-plan 必須在 frontmatter 標明 trigger（對應 §When to Open Sub-Plan 的 #1-#5），validator 機械擋。
-- **D. 主計畫必填 sub-plan 驗證要點表** — 細節留在 sub-plan，主計畫只列「sub-plan slug / 完成條件摘要 / completion_blocks_parent / 驗證方式」。
-- **E. `ai-skill plans tree` CLI subcommand** — 渲染樹狀視圖。
+- **A. Source of truth = frontmatter `id` + `parent`**（單一 truth）。Hierarchy 由 `parent` pointer 決定，CLI 從這裡建樹。
+- **B. Folder + filename 是 UI convention，不是 source of truth**。主計畫 folder + `_plan.md` + `NN-<slug>.md` 前綴只是「人類眼睛友善」的擺放方式；validator 對 folder shape 只發 warning，不 block。
+- **C. Frontmatter schema 最小集**：`id` / `plan_kind` / `parent` / `status` / `owner` / `created` / `required_for_completion`（sub only） / `sub_plan_reason`（sub only, free text）。
+  - **不維護 `children:`** — runtime scan 推導。children 是衍生資料，parent 才是必要資料。
+  - **不用 `completion_blocks_parent`** — 該詞描述了 archive/blocking 機制；改用 `required_for_completion: true|false` 描述業務意義（child 是否屬於 parent acceptance criteria），由 validator 推導出「未完成 → block parent archive」。
+  - **不用 `sub_plan_trigger` enum** — 「為什麼拆 plan」是知識，不是 enum。改用 `sub_plan_reason: <free text>`，validator 只檢查非空。
+- **D. 主計畫只列「sub-plan slug + 驗證要點摘要 + required_for_completion + 驗證方式」表**，細節留在 sub-plan。
+- **E. `ai-skill plans tree` CLI subcommand**：純讀 frontmatter `parent` 動態建樹；即使 folder 放錯，tree 仍正確。
+- **F. Depth 防呆 = `warning_at_depth: 3`**（非 block）— 不立法、讓真實案例決定上限。
 
 ### Alternatives Considered
 
-- **A. 維持現狀（扁平 + frontmatter parent line）** — reject：使用者已明確反映「橫向看不直覺」，純 frontmatter 仍需工具才能看到階層。
-- **B. 純 frontmatter + tree CLI（不動目錄）** — reject as primary：向後相容好但解不了 `ls` 直觀性。可作為 Phase 過渡相容。
-- **C. 改寫成單一 monolithic plan + 內部 sub-section** — reject：sub-plan 需獨立 archive / sign-off / owner / parallelization 時撐不住，違反 `plans/README.md` 對「跨 phase + 獨立 acceptance」的拆分原則。
-- **D. 採用 folder + `_plan.md`（accept）** — `ls plans/active/<folder>/` 即看到主計畫與 sub-plan 共存；前綴排序給人類；frontmatter parent/children 給機器；hard validator 防 trigger 缺失。
+- **A. 維持現狀（扁平 + 無 metadata）** — reject：使用者已明確反映「橫向看不直覺」，且 parent ↔ child 連結只能靠 prose。
+- **B. 純 folder + 無 frontmatter** — reject：folder 放錯時整個 hierarchy 失效，沒有 robust source of truth。
+- **C. 純 frontmatter + 扁平目錄（無 folder）** — reject as primary：解不了 `ls` 直觀性，仍需工具才能看到階層。但 frontmatter 是 truth，folder 是 UI，所以這方案可作為 graceful degradation（folder 缺失時 CLI 仍可建樹）。
+- **D. Folder 結構 + 三軌 source（folder + frontmatter `children` + filename ordering）** — **rejected v1（2026-06-02 review）**：三個地方都在表達階層，會出現 `children: [01-schema]` 但實際 rename 成 `03-validator.md` 的同步問題。誰才是真實來源？
+- **E. Folder 結構 + frontmatter `parent` 單一 truth + folder 為 UI convention（accept）** — `ls plans/active/<folder>/` 給人類友善視覺；frontmatter `parent` 給機器；folder shape validator 只發 warning 不 block；children 由 runtime scan 推導。
+- **F. Hard enum trigger（`sub_plan_trigger: independent-signoff | ...`）** — **rejected v1**：enum 半年後會出現第 6 / 7 / 8 種，每次都要升 framework（enum + validator + glossary + docs）。改 free-text `sub_plan_reason: <非空>`，validator 只擋空字串。
+- **G. `completion_blocks_parent: bool`（描述機制）** — **rejected v1**：重新發明 dependency graph；當 sub-plan 之間有 dependency（C 依賴 A）時不夠用。改 `required_for_completion: bool`（描述業務意義「是否屬 parent acceptance criteria」），validator 推導 archive block 邏輯。
+- **H. `max_depth: 2`（硬限制）** — **rejected v1**：premature abstraction，目前根本沒出現 3 層需求。改 `warning_at_depth: 3`，讓真實案例決定。
 
 ### Why Not an ADR Yet
 
-- 尚未跑過至少一輪「現有 plan 遷移」驗證 folder 結構是否真的解決追蹤痛點。
-- `sub_plan_trigger` 5 條規則是否完整、會不會在實作中發現第 6 條，仍需 implementation phase 證實。
+- 尚未跑過至少一輪「現有 plan 遷移」驗證 folder convention + frontmatter 雙軌是否真的解決追蹤痛點。
+- `sub_plan_reason` free-text 模式是否真能在無 enum 強制下保持品質，仍需 implementation phase 證實。
 - 與 `governance/lifecycle/system-upgrade-governance.yaml` §`define_runtime_trigger_flow` 的 sub-plan validator 整合方式尚未驗證。
-- Open Questions 仍有 5 條未解。
+- Open Questions 仍有 4 條未解（Q4 已 resolved as v2 minimal-governance）。
 
 ### ADR Promotion Criteria（completed 時驗證）
 
@@ -68,19 +75,18 @@ children: []
 ### Consequences
 
 **正面**：
-- `ls plans/active/<folder>/` 直接看到階層
+- `ls plans/active/<folder>/` 給人類直觀視覺，但 hierarchy 真實來源是 frontmatter `parent`，folder 放錯不會壞掉
 - Sub-plan 細節與主計畫驗證要點分離，主計畫不再臃腫
-- Validator 機械擋住「未標 trigger 就開 sub-plan」與「主計畫提前 archive 卻有 child blocker」
-- Tree CLI 給快速 status overview
+- Validator 機械擋「sub-plan 缺 parent / reason / required_for_completion」與「主計畫 archive 時 required child 未 completed」；folder shape 只發 warning，不擋 commit
+- Tree CLI 從 `parent` pointer 動態建樹，給快速 status overview
 
 **負面**：
 - 一次性遷移成本（現有 6 個 active plan + N 個 archived plan）
-- Folder + frontmatter 雙重 source of truth，需 validator 保一致
-- 新增 3 條 commit-msg validator，增加 hook 執行時間
+- 新增 2 條 block validator + 1 條 warning validator，增加 hook 執行時間（但比 v1 三條 block 輕）
 
 **風險**：
 - 過度結構化 — 簡單 plan 被迫塞 folder（mitigation: `plan_kind: spike` 簡化模板）
-- 巢狀資料夾深度失控（mitigation: validator 限制 ≤ 2 層巢狀）
+- 巢狀深度失控（mitigation: `warning_at_depth: 3`，由真實案例決定上限，不立法硬擋）
 - 遷移期 archived plan 仍是扁平結構，CLI tree 需相容兩種格式
 
 ---
@@ -100,10 +106,10 @@ children: []
 
 | 階段 | Runtime owner | Trigger flow | Loaded contract | Runtime action / blocker | Evidence |
 |------|---------------|--------------|-----------------|--------------------------|----------|
-| 新建 sub-plan commit | `commit-msg` hook | git commit staging `plans/active/<main>/NN-*.md` 或 `plans/active/<main>/NN-*/_plan.md` → `validatePlanTreeFrontmatter` | 本 plan §Frontmatter Schema + §When to Open Sub-Plan | Block 若 `parent` 缺、`sub_plan_trigger` 缺、或 trigger 值不在 #1-#5 enum | unit test fixture `testdata/plan-tree/sub-without-trigger.md` |
-| 主計畫 archive commit | `commit-msg` hook | git commit moving `plans/active/<main>/_plan.md` → `plans/archived/<main>/_plan.md` → `validatePlanTreeArchiveOrder` | 主計畫 frontmatter `children[]` + 各 child `completion_blocks_parent` | Block 若有 `completion_blocks_parent: true` 的 child 仍在 `plans/active/` | unit test fixture `testdata/plan-tree/archive-with-pending-child.md` |
-| Folder shape lint | `commit-msg` hook | git commit staging `plans/active/<x>/**` → `validatePlanTreeFolderShape` | 本 plan §資料夾結構 | Block 若 folder 缺 `_plan.md`、檔名不符 `NN-` 前綴、或巢狀 > 2 層 | unit test fixture `testdata/plan-tree/missing-_plan.md` |
-| Tree 渲染 | `ai-skill plans tree` CLI | 使用者執行 → 遞迴讀 `plans/active/` + `plans/archived/` → 解析 frontmatter | 本 plan §Frontmatter Schema | Print 樹狀 + status 進度（非 blocker） | golden test `testdata/plan-tree/tree-output.txt` |
+| 新建 sub-plan commit | `commit-msg` hook | git commit staging plan with `plan_kind: sub` → `validatePlanTreeFrontmatter` | 本 plan §Frontmatter Schema | **Block** 若 `parent` 缺、`sub_plan_reason` 為空或缺、或 `required_for_completion` 缺 | unit test fixture `testdata/plan-tree/sub-missing-parent.md`、`sub-empty-reason.md` |
+| 主計畫 archive commit | `commit-msg` hook | git commit moving `plans/active/<main>/` → `plans/archived/<main>/` → `validatePlanTreeArchiveOrder` | Runtime scan：所有 `parent == <main>` 且 `required_for_completion: true` 的 sub-plan status | **Block** 若有 `required_for_completion: true` 的 sub-plan 仍 `status != completed` 且未 archive | unit test fixture `testdata/plan-tree/archive-with-required-pending.md` |
+| Folder shape lint | `commit-msg` hook | git commit staging `plans/active/<x>/**` → `validatePlanTreeFolderConvention` | 本 plan §資料夾 convention | **Warning only**（不 block）— folder 缺 `_plan.md`、檔名不符 `NN-` 前綴、或深度 ≥ 3。輸出建議訊息，不擋 commit | unit test fixture `testdata/plan-tree/depth-3-warning.md` |
+| Tree 渲染 | `ai-skill plans tree` CLI | 使用者執行 → 遞迴讀 `plans/active/` + `plans/archived/` → 解析 frontmatter `parent` → 動態建樹 | 本 plan §Frontmatter Schema | Print 樹狀 + status 進度 + warning（非 blocker）；即使 folder 放錯仍能建出正確 tree | golden test `testdata/plan-tree/tree-output.txt` |
 
 **Forbidden 自我檢查**（per `define_runtime_trigger_flow`）：
 - (a) 本 plan 不加 `route.*` 到 routing-registry。Validator 直接由 hooks.go registry dispatch，符合「discovery signal / commit-msg validator」要求。
@@ -121,37 +127,42 @@ children: []
 
 ---
 
-## 資料夾結構（規範）
+## 資料夾 Convention（UI 層，非 source of truth）
+
+> **重要**：以下是給人類眼睛友善的擺放方式。Hierarchy 的真實來源是 frontmatter `parent` pointer；folder 放錯時 CLI 仍能建出正確樹。Validator 對本節只發 warning，不 block commit。
 
 ```
 plans/
   active/
-    2026-06-02-1200-plan-tree-hierarchy-governance/   ← 主計畫資料夾，名 = main plan slug
-      _plan.md                                        ← 主計畫本體（檔名固定 _plan.md）
-      01-frontmatter-schema.md                        ← sub-plan，NN- 前綴排序
+    2026-06-02-1200-plan-tree-hierarchy-governance/   ← 主計畫資料夾，名建議 = main plan slug
+      _plan.md                                        ← 主計畫本體（檔名建議 _plan.md）
+      01-frontmatter-schema.md                        ← sub-plan，NN- 前綴給人類排序
       02-validator-implementation.md
-      03-cli-tree-subcommand/                         ← 孫計畫資料夾（當 sub-plan 自己也要拆時）
+      03-cli-tree-subcommand/                         ← sub-plan 自己也要拆時可包資料夾
         _plan.md
         01-renderer.md
         02-golden-tests.md
       04-existing-plan-migration.md
   archived/
-    2026-06-02-1200-plan-tree-hierarchy-governance/   ← archive 時整個資料夾搬移
+    2026-06-02-1200-plan-tree-hierarchy-governance/   ← archive 時整個資料夾搬移（建議）
       _plan.md
-      01-frontmatter-schema.md
       ...
 ```
 
-**規則**：
-- 主計畫 folder 名 = main plan slug（含時間戳）。
-- 主計畫本體檔名固定 `_plan.md`（底線開頭，排序在所有 `NN-` 前面）。
-- Sub-plan 檔名格式：`NN-<slug>.md`（NN 為兩位數字，建議 01/02/03…），或當 sub-plan 自己也要拆時用 `NN-<slug>/_plan.md`。
-- 巢狀深度上限 **2 層**（main → sub → grand-sub），超過時應考慮拆出獨立 main plan。
-- Archive 時整個 folder 從 `plans/active/<slug>/` 搬到 `plans/archived/<slug>/`，folder 名不變。
+**Convention（warning，非 block）**：
+- 主計畫 folder 名建議 = main plan slug（含時間戳）。
+- 主計畫本體檔名建議 `_plan.md`（底線開頭，自然排序在所有 `NN-` 前）。
+- Sub-plan 檔名建議 `NN-<slug>.md`（NN 兩位數字），或 `NN-<slug>/_plan.md`。
+- 巢狀深度 ≥ 3 層時發 warning，建議拆出獨立 main plan（不硬擋）。
+- Archive 時建議整個 folder 一起搬。
+
+**Block 規則只有兩條**（在 §Runtime Execution Path）：
+1. Sub-plan frontmatter 缺 `parent` / `sub_plan_reason` / `required_for_completion` → block。
+2. 主計畫 archive 時，`required_for_completion: true` 的 sub-plan 未 completed → block。
 
 ---
 
-## Frontmatter Schema
+## Frontmatter Schema（Minimal Governance）
 
 **主計畫**：
 
@@ -163,10 +174,6 @@ status: draft | in-progress | completed
 owner: <name>
 created: YYYY-MM-DD
 parent: null
-children:
-  - 01-frontmatter-schema
-  - 02-validator-implementation
-  - 03-cli-tree-subcommand
 ---
 ```
 
@@ -174,45 +181,58 @@ children:
 
 ```yaml
 ---
-id: <main-slug>/NN-<sub-slug>
+id: <slug>                               # 全域唯一，不必包含 parent path
 plan_kind: sub
 status: draft | in-progress | completed
 owner: <name>
 created: YYYY-MM-DD
-parent: <main-slug>
-sub_plan_trigger: independent-signoff | multi-phase-with-own-acceptance | independent-runtime-trigger | parallel-owners | independent-archive-spike
-completion_blocks_parent: true | false
+parent: <main-slug>                      # 指向 parent plan 的 id
+required_for_completion: true | false    # 是否屬於 parent acceptance criteria
+sub_plan_reason: >                       # 為什麼拆 plan（free text，非空）
+  簡述拆分理由與 acceptance 邊界
 ---
 ```
 
-**Spike**（簡化模板，只需 Phase 0 + Acceptance + 結果回寫）：
+**Spike**（簡化模板，只需 Goal + Acceptance + 結果回寫）：
 
 ```yaml
 ---
-id: <main-slug>/NN-<sub-slug>
+id: <slug>
 plan_kind: spike
 status: draft | completed
 owner: <name>
 created: YYYY-MM-DD
 parent: <main-slug>
-sub_plan_trigger: independent-archive-spike
-completion_blocks_parent: false
+required_for_completion: false           # spike 預設不阻擋 parent archive
+sub_plan_reason: >
+  PoC / experiment 目的與時限
 ---
 ```
 
+**設計原則**：
+- `id` 是全域唯一 slug，**不再要求** `id: parent/sub-slug` 這種 path-like 格式（避免 rename 時連動成本）。
+- **沒有 `children:` 欄位** — 由 runtime scan `parent` pointer 推導。
+- **沒有 `completion_blocks_parent:`** — 用 `required_for_completion` 描述業務語意，archive blocker 由 validator 推導。
+- **沒有 `sub_plan_trigger` enum** — 用 `sub_plan_reason` free text，validator 只擋空字串。
+- 未來若需要表達 sub-plan 之間的依賴（C 依賴 A），可加 `depends_on: [<sub-id>]` 欄位（**不在本 plan 範圍**，留待真實案例驅動）。
+
 ---
 
-## When to Open Sub-Plan（hard rule，validator 強制）
+## When to Open Sub-Plan（建議規則，非 enum）
 
-開新 sub-plan 的**強制條件**（`sub_plan_trigger` 必填，必須對應其中一條）：
+**Validator 強制條件**：`sub_plan_reason` 非空字串。**不審內容**。
 
-| Trigger enum 值 | 觸發條件 | 範例 |
+下列為**建議參考**（recommended triggers），寫進 `sub_plan_reason` 時可引用，但不強制：
+
+| Recommended trigger | 觸發條件 | 範例 |
 |---|---|---|
-| `independent-signoff` | 該支線需要獨立 stakeholder sign-off / acceptance 簽核 | DSL schema 設計獨立於 executor wiring |
-| `multi-phase-with-own-acceptance` | 該支線跨 ≥ 3 個 phase 且有自己的 completion criteria | runtime trigger wiring 跨 schema + validator + readback |
-| `independent-runtime-trigger` | 該支線有自己的 runtime trigger flow / generated surface | 新增 `route.validation.executor` 需 wire discovery signal |
-| `parallel-owners` | 兩個 parallel agent / session 需要同時推進，需 owner / lock 分隔 | child 拆給不同 owner 並行 |
-| `independent-archive-spike` | 該工作完成後可獨立 archive（主計畫仍 in-progress） | spike / experiment / 短期 PoC |
+| Independent sign-off | 該支線需要獨立 stakeholder sign-off / acceptance 簽核 | DSL schema 設計獨立於 executor wiring |
+| Multi-phase with own acceptance | 該支線跨 ≥ 3 個 phase 且有自己的 completion criteria | runtime trigger wiring 跨 schema + validator + readback |
+| Independent runtime trigger | 該支線有自己的 runtime trigger flow / generated surface | 新增 `route.validation.executor` 需 wire discovery signal |
+| Parallel owners | 兩個 parallel agent / session 需要同時推進，需 owner / lock 分隔 | child 拆給不同 owner 並行 |
+| Independent archive (spike) | 該工作完成後可獨立 archive（主計畫仍 in-progress） | spike / experiment / 短期 PoC |
+
+未來真實案例如出現第 6 / 7 種情境，**直接寫進 `sub_plan_reason` 即可，不需升 framework**。等該情境重複出現 ≥ 3 次再評估是否要 promote 為 recommended trigger 範例。
 
 **不該開 sub-plan 的情境**（應留在主計畫加 phase 或 checkbox）：
 
@@ -221,17 +241,19 @@ completion_blocks_parent: false
 - 純文件補強、rename、typo → 直接 commit，不開 plan。
 - 同一 acceptance criteria 底下的不同 angle → 同 plan 多 phase。
 
+**設計原則**：「為什麼拆 plan」是知識，不是 enum。Framework 只擋「沒寫理由」，不擋「理由不在白名單」。
+
 ---
 
 ## 主計畫必填：Sub-Plan 驗證要點表
 
 主計畫 §Phases 之後必填下列表，列出每個 sub-plan 的「驗證要點摘要」。細節留在 sub-plan 內。
 
-| Sub-plan | 完成條件摘要 | completion_blocks_parent | 驗證方式 |
+| Sub-plan | 完成條件摘要 | required_for_completion | 驗證方式 |
 |---|---|---|---|
-| `01-frontmatter-schema` | schema YAML 文件化 + 範例 fixture | true | unit test pass + 本 plan §Frontmatter Schema 對齊 |
-| `02-validator-implementation` | 3 個 Go validator 落地 + dispatch registry | true | `go test ./scripts/ai-skill-cli/internal/app/...` pass |
-| `03-cli-tree-subcommand` | `ai-skill plans tree` 渲染 active + archived | false | golden test + 手動跑 CLI 驗證輸出 |
+| `01-frontmatter-schema` | schema YAML 文件化 + 範例 fixture（main / sub / spike） | true | unit test pass + 本 plan §Frontmatter Schema 對齊 |
+| `02-validator-implementation` | 2 個 block validator + 1 個 warning validator 落地 + dispatch registry | true | `go test ./scripts/ai-skill-cli/internal/app/...` pass |
+| `03-cli-tree-subcommand` | `ai-skill plans tree` 從 `parent` pointer 渲染 active + archived | false | golden test + 手動跑 CLI 驗證輸出 |
 | `04-existing-plan-migration` | 盤點 6 個 active plan + 識別 parent-child 並遷移 | true | 遷移後 `ai-skill plans tree` 顯示正確階層 |
 
 ---
@@ -249,10 +271,10 @@ completion_blocks_parent: false
 
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
-| Q1 巢狀深度上限 | still-open | 待 Phase 0 盤點現有 plans 最深巢狀需求 |
+| Q1 深度防呆模式 | resolved | 2026-06-02 review v2：改 `warning_at_depth: 3`（非 block），讓真實案例決定上限 |
 | Q2 Archive 順序 | still-open | 待 Phase 0 確認搬移腳本 |
 | Q3 Sub-plan Decision Rationale | still-open | 待 Phase 0 評估模板可繼承 |
-| Q4 Validator 強度 | resolved | 使用者明確選 hard rule + validator |
+| Q4 Validator 強度 | resolved | 2026-06-02 review v2：parent / sub_plan_reason / required_for_completion 缺失為 block；folder shape 為 warning（minimal governance） |
 | Q5 Spike 模板 | still-open | 待 Phase 0 評估最小章節集 |
 
 ### Phase 0 — Preflight checklist
@@ -275,9 +297,9 @@ completion_blocks_parent: false
 ## Phase 2 — `02-validator-implementation`（sub-plan）
 
 詳見 [`02-validator-implementation.md`](02-validator-implementation.md)（待建）。本主計畫驗證要點：
-- `validatePlanTreeFrontmatter` block sub-plan 缺 `sub_plan_trigger`
-- `validatePlanTreeArchiveOrder` block 主計畫 archive 時 child 未 archive
-- `validatePlanTreeFolderShape` block folder 缺 `_plan.md` 或檔名違規
+- `validatePlanTreeFrontmatter`（**block**）— sub-plan 缺 `parent` / `sub_plan_reason`（空字串視為缺）/ `required_for_completion`
+- `validatePlanTreeArchiveOrder`（**block**）— 主計畫 archive 時，所有 `parent == <main>` 且 `required_for_completion: true` 的 sub-plan 必須 `status: completed`
+- `validatePlanTreeFolderConvention`（**warning only**）— folder 缺 `_plan.md`、檔名不符 `NN-` 前綴、或深度 ≥ 3
 - 3 個 validator 進 `hooks.go` registry，dispatch 順序與既有 11 個 validator 不衝突
 
 ---
@@ -307,11 +329,12 @@ completion_blocks_parent: false
 
 ## Open Questions
 
-1. **巢狀深度上限** — 目前提案 2 層。是否該允許 3 層（main → sub → grand-sub → great-grand-sub）？傾向不允許，超過時拆出獨立 main plan。
-2. **Archive 順序** — 主計畫 + sub-plan 同 commit 一起搬 archived，還是分次？傾向同 commit（atomic），由 validator 確保順序。
+1. **深度防呆模式** — RESOLVED（v2 2026-06-02）：改 `warning_at_depth: 3`，不立硬上限；超過時 CLI 發 warning，建議拆獨立 main plan。原 `max_depth: 2` 是 premature abstraction。
+2. **Archive 順序** — 主計畫 + sub-plan 同 commit 一起搬 archived，還是分次？傾向同 commit（atomic），由 `validatePlanTreeArchiveOrder` 確保順序。
 3. **Sub-plan Decision Rationale 可繼承否** — sub-plan 是否需自己的 §Decision Rationale，或可在 frontmatter 標 `inherits_rationale: parent`？傾向 sub-plan 不需重複 Decision Rationale，但需有 §為什麼存在（簡短）+ §Acceptance。
-4. **Validator 強度** — RESOLVED：使用者選 hard rule + commit-msg validator block。
+4. **Validator 強度** — RESOLVED（v2 2026-06-02）：minimal governance — `parent` / `sub_plan_reason`（空字串視為缺）/ `required_for_completion` 缺失為 block；不審 reason 內容；folder shape 全部為 warning。
 5. **Spike 模板最小集** — `plan_kind: spike` 是否可只有 §Goal + §Acceptance + §結果回寫，免 Phase 0 公版？傾向是，但結果必須回寫主計畫對應 phase。
+6. **Sub-plan dependency 表達**（v2 新增）— 當 sub-plan C 依賴 sub-plan A 完成時，是否需要 `depends_on: [<sub-id>]` 欄位？目前 defer 至真實案例出現再加，避免 premature schema。
 
 ---
 
@@ -333,9 +356,10 @@ completion_blocks_parent: false
 
 ## Stakeholder 同意項目
 
-- [ ] linyihong: 目錄結構 = folder + `_plan.md` + `NN-` 前綴（**已 sign-off 2026-06-02**）
-- [ ] linyihong: 「何時開 sub-plan」用 hard rule + validator（**已 sign-off 2026-06-02**）
-- [ ] linyihong: Open Questions Q1/Q2/Q3/Q5 解法（待 Phase 0 提案後 sign-off）
+- [x] linyihong: 目錄結構 = folder + `_plan.md` + `NN-` 前綴作為 UI convention（hierarchy 真實來源為 frontmatter `parent`）— **sign-off 2026-06-02**
+- [x] linyihong: 「何時開 sub-plan」改用 free-text `sub_plan_reason`（非空 validator）+ recommended trigger 表（不強制）— **sign-off 2026-06-02 v2 review**
+- [x] linyihong: 棄用 `children:` / `completion_blocks_parent` / `sub_plan_trigger enum` / `max_depth: 2`；改用 `parent` / `required_for_completion` / `sub_plan_reason` / `warning_at_depth: 3`（minimal governance）— **sign-off 2026-06-02 v2 review**
+- [ ] linyihong: Open Questions Q2/Q3/Q5/Q6 解法（待 Phase 0 提案後 sign-off）
 - [ ] linyihong: 是否將 plan tree 結構 promote 為 ADR（completed 後評估）
 
 ---
@@ -349,9 +373,10 @@ completion_blocks_parent: false
 | Term | 定義 | 註冊目標 |
 |---|---|---|
 | `plan_kind` | plan 的類型 enum：`main` / `sub` / `spike` | `knowledge/glossary/ai-skill.md` |
-| `sub_plan_trigger` | sub-plan 必填的開啟原因 enum，5 個值見 §When to Open Sub-Plan | `knowledge/glossary/ai-skill.md` |
-| `completion_blocks_parent` | sub-plan 是否阻擋主計畫 archive 的 boolean flag | `knowledge/glossary/ai-skill.md` |
-| `plan tree` | 主計畫 + sub-plan 構成的階層結構 | `knowledge/glossary/ai-skill.md` |
+| `parent` | sub-plan 指向主計畫 id 的 frontmatter pointer，是 plan tree hierarchy 的單一 source of truth | `knowledge/glossary/ai-skill.md` |
+| `required_for_completion` | sub-plan 是否屬於 parent 的 acceptance criteria 的 boolean；validator 由此推導 archive blocking | `knowledge/glossary/ai-skill.md` |
+| `sub_plan_reason` | sub-plan 為什麼存在的 free-text 說明（非空，但不審內容） | `knowledge/glossary/ai-skill.md` |
+| `plan tree` | 主計畫 + sub-plan 構成的階層結構，由 frontmatter `parent` pointer 動態建立 | `knowledge/glossary/ai-skill.md` |
 
 註冊將在 Phase 5 進行。
 
