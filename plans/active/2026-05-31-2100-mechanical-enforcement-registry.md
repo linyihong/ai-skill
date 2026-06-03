@@ -1172,11 +1172,12 @@ Consequences:
 
 ### Phase 7 — Validation Scenarios
 
-- [ ] `validation/scenarios/enforcement/registry-lint-orphan-rule-v1.yaml`
-- [ ] `validation/scenarios/enforcement/registry-lint-missing-executor-v1.yaml`
-- [ ] `validation/scenarios/enforcement/registry-lint-behavioral-without-rationale-v1.yaml`
-- [ ] `validation/scenarios/enforcement/coverage-cli-output-format-v1.yaml`
-- [ ] `validation/scenarios/enforcement/2026-05-31-regression-five-instances-v1.yaml`（回放 session 揭露的 5 個 gap，registry 必須 detect 全部）
+- [x] `validation/scenarios/enforcement/registry-lint-orphan-rule-v1.yaml` — runnable via `ai-skill enforcement lint --expect-finding orphan_rule`，fixture under `validation/scenarios/enforcement/fixtures/orphan-rule/`
+- [x] `validation/scenarios/enforcement/registry-lint-missing-executor-v1.yaml` — runnable，synthetic registry mechanical class with absent symbol fixture
+- [x] `validation/scenarios/enforcement/registry-lint-behavioral-without-rationale-v1.yaml` — runnable，4 bad + 1 good behavioral_only fixture
+- [x] `validation/scenarios/enforcement/coverage-cli-output-format-v1.yaml` — runnable via `ai-skill enforcement coverage --self-check`，CLI-internal 9-point schema contract
+- [x] `validation/scenarios/enforcement/2026-05-31-regression-five-instances-v1.yaml` — 5 historical instances replayed (bootstrap_bypass / workflow_activation / capability_discovery / sanitization / intelligence_classification)，meta-pattern regression P0
+- [x] (bonus, Phase 4.5) `registry-transition-demotion-without-adr-v1.yaml` + `registry-transition-promotion-verification-gap-v1.yaml` — R1/R2/R3 self-governance scenarios
 
 ### Phase 8 — Close-out
 
