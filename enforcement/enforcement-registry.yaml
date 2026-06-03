@@ -306,6 +306,20 @@ internal_helper_allowlist:
     # F7/F8 (round-4 backfill): not rule executors —
     - runHooks                  # F8: `ai-skill hooks` CLI subcommand router (analogous to runRuntime/runDoctor), not a rule-enforcing hook
     - validateStopHookFinalTexts  # F7: plural collector helper for validateStopHookFinalText (singular, bound under dirty_repo_close_loop)
+    # Phase 3 of plan-tree-hierarchy-governance — `ai-skill plans tree` is a
+    # read-only visualization CLI, not an enforcement executor.
+    - runPlans                  # `ai-skill plans` CLI subcommand router
+    - runPlansTree              # `ai-skill plans tree` handler
+    - buildPlanTree             # tree-building helper (frontmatter → nodes)
+    - renderPlanTreeText        # ASCII tree renderer
+    - renderPlanTreeJSON        # JSON renderer
+    - renderPlanTreeMarkdown    # markdown bullet-list renderer
+    - renderNodeText            # text-format leaf helper
+    - renderNodeMarkdown        # markdown-format leaf helper
+    - formatNodeLine            # text-format line composer
+    - markdownExtras            # markdown extras composer
+    - statusOrUnknown           # markdown status fallback helper
+    - planLocation              # plans/active vs plans/archived classifier
 
 # ─────────────────────────────────────────────────────────────────────
 # Verification levels (v4: 4-level ladder)
