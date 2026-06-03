@@ -419,6 +419,72 @@ anti-meaning: >
 introduced-by: plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
 ```
 
+## parent
+
+```yaml
+term: parent
+status: canonical
+owner-layer: validation-governance
+meaning: >
+  Sub-plan / spike frontmatter 指向其主計畫 id 的 pointer，是 plan tree
+  hierarchy 的單一 source of truth。Runtime 由 parent pointer 動態建樹，
+  不維護反向 children 欄位；main plan 的 parent 為 null。
+affects:
+  - governance/lifecycle/plan-tree-hierarchy.md
+  - plans/README.md
+anti-meaning: >
+  不是 folder 路徑（folder 只是 UI convention）；不是 sub-plan 之間的
+  dependency edge（那是未來 depends_on，不在 plan tree 治理範圍）。
+related-terms:
+  - { type: related_to, target: plan_tree }
+introduced-by: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md
+```
+
+## plan_kind
+
+```yaml
+term: plan_kind
+status: canonical
+owner-layer: validation-governance
+meaning: >
+  Plan 的類型 enum：main（主計畫）/ sub（子計畫）/ spike（短期 PoC）。
+  決定 frontmatter 必填欄位集合與 validator 行為（sub / spike 須帶 parent /
+  required_for_completion / sub_plan_reason）。
+affects:
+  - governance/lifecycle/plan-tree-hierarchy.md
+  - plans/README.md
+anti-meaning: >
+  不是 plan status（draft / in-progress / completed 是生命週期）；不是 priority。
+related-terms:
+  - { type: related_to, target: plan_tree }
+introduced-by: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md
+```
+
+## plan_tree
+
+```yaml
+term: plan_tree
+status: canonical
+owner-layer: validation-governance
+meaning: >
+  主計畫與 sub-plan 由 frontmatter parent pointer 動態建立的階層樹結構。
+  `ai-skill plans tree` 純讀 active + archived 兩種狀態的 frontmatter 建樹，
+  即使 folder 放錯仍能渲染正確 hierarchy；referential integrity 由 commit-msg
+  validator 保證。
+affects:
+  - governance/lifecycle/plan-tree-hierarchy.md
+  - plans/README.md
+anti-meaning: >
+  不是 DAG（sub-plan 之間若需 depends_on 依賴將引入 graph，不在本治理範圍）；
+  不是 folder 目錄結構本身（folder 是 UI convention，parent pointer 才是 truth）。
+related-terms:
+  - { type: related_to, target: parent }
+  - { type: related_to, target: plan_kind }
+  - { type: related_to, target: required_for_completion }
+  - { type: related_to, target: sub_plan_reason }
+introduced-by: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md
+```
+
 ## pressure_model
 
 ```yaml
@@ -471,6 +537,28 @@ affects:
 introduced-by: plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md
 ```
 
+## required_for_completion
+
+```yaml
+term: required_for_completion
+status: canonical
+owner-layer: validation-governance
+meaning: >
+  Sub-plan frontmatter boolean，描述該 sub-plan 是否屬於 parent 的 acceptance
+  criteria。validatePlanTreeArchiveOrder 由此推導 archive blocking：主計畫
+  archive 時，所有 required_for_completion: true 的 sub-plan 必須 status:
+  completed（只看 status，不看 location）。
+affects:
+  - governance/lifecycle/plan-tree-hierarchy.md
+  - plans/README.md
+anti-meaning: >
+  不是描述機制的 completion_blocks_parent（已棄用）；描述業務語意，由 validator
+  推導 archive blocker，不直接命名機制。
+related-terms:
+  - { type: related_to, target: plan_tree }
+introduced-by: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md
+```
+
 ## rejected_optimization_memory
 
 ```yaml
@@ -489,6 +577,27 @@ anti-meaning: >
   Not a generic failure pattern; it records rejected improvement attempts and
   their regression or cost evidence.
 introduced-by: plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
+```
+
+## sub_plan_reason
+
+```yaml
+term: sub_plan_reason
+status: canonical
+owner-layer: validation-governance
+meaning: >
+  Sub-plan / spike frontmatter 的 free-text 欄位，說明「為什麼拆出這個
+  sub-plan」。validatePlanTreeFrontmatter 只強制非空字串，不審內容；取代硬
+  enum sub_plan_trigger，避免 framework 隨情境膨脹。
+affects:
+  - governance/lifecycle/plan-tree-hierarchy.md
+  - plans/README.md
+anti-meaning: >
+  不是 enum（沒有白名單；recommended triggers 只是參考不強制）；不是 plan 的
+  Decision Rationale（那是 parent 的職責）。
+related-terms:
+  - { type: related_to, target: plan_tree }
+introduced-by: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md
 ```
 
 ## thinking_cost

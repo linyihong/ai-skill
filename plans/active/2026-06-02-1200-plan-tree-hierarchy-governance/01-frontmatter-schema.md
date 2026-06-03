@@ -1,7 +1,7 @@
 ---
 id: 2026-06-02-1200-plan-tree-frontmatter-schema
 plan_kind: sub
-status: in-progress
+status: completed
 owner: linyihong
 created: 2026-06-02
 parent: 2026-06-02-1200-plan-tree-hierarchy-governance
@@ -24,12 +24,12 @@ sub_plan_reason: >
 ## Acceptance Criteria
 
 - [x] 本 sub-plan 檔案落地（使用 new schema 自證）
-- [ ] `governance/plan-tree-hierarchy.md` rule 文件落地
+- [x] `governance/lifecycle/plan-tree-hierarchy.md` rule 文件落地（Phase 5 status 升 validated）
 - [x] `fixtures/main-plan.md` 範例落地
 - [x] `fixtures/sub-plan.md` 範例落地
 - [x] `fixtures/spike-plan.md` 範例落地
-- [ ] 本 sub-plan 已被 parent `_plan.md` §主計畫必填：Sub-Plan 驗證要點表 引用（已存在）
-- [ ] Phase 2 validator 撰寫時直接重用本目錄 fixtures 作為 unit test testdata
+- [x] 本 sub-plan 已被 parent `_plan.md` §主計畫必填：Sub-Plan 驗證要點表 引用
+- [x] Phase 2 validator 撰寫時直接重用本目錄 fixtures 作為 unit test testdata（Phase 2 completed `6fd1744`）
 
 ## Runtime Impact
 

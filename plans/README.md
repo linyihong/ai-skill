@@ -16,6 +16,32 @@
 5. **計畫完成後，若從中提煉出可重用的系統經驗，應建立對應的 intelligence atom**
 6. **架構提案在 plan 內處理，不寫 proposed ADR**：依 [`governance/lifecycle/decision-promotion-pipeline.md`](../governance/lifecycle/decision-promotion-pipeline.md) §No-Proposed-ADR Rule，constitution/ 只放 accepted ADRs；提案、討論、alternatives 評估全在本 plan 的 `Decision Rationale` section 進行；plan completed 且通過 `ADR Promotion Criteria` 後才建立 accepted ADR。
 
+## Plan Tree Hierarchy（主計畫／子計畫樹狀治理）
+
+當主計畫執行中需要拆出有獨立 acceptance、跨多 phase、需獨立 sign-off 或可獨立 archive 的支線時，用 **plan tree** 表達 main ↔ sub 階層，而不是把 Phase 6/7/8 塞爆主計畫或另開孤立 plan 用 prose 連結。完整治理規則見 [`governance/lifecycle/plan-tree-hierarchy.md`](../governance/lifecycle/plan-tree-hierarchy.md)；落地範例見 [`active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md`](active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md)。
+
+**核心模型（minimal governance）**：
+
+- **Single source of truth = frontmatter `parent` pointer**。Hierarchy 由 `parent` 決定，不維護 `children:`（runtime scan 推導）。
+- **Folder + `_plan.md` + `NN-` 前綴是 UI convention，不是 truth**。folder 放錯時 `ai-skill plans tree` 仍能建出正確樹；folder shape 只發 warning，不 block commit。
+- **Lifecycle 與 storage 分離**：`status` 是生命週期、`plans/active|archived/` 是儲存位置；archive gate 只看 `status`，不看 location。
+
+**Frontmatter（sub-plan 必填）**：`id` / `plan_kind: sub` / `status` / `owner` / `created` / `parent: <main-id>` / `required_for_completion: bool` / `sub_plan_reason: <非空 free text>`。Spike 用 `plan_kind: spike`（建議 `required_for_completion: false`）。詞彙定義見 [`knowledge/glossary/ai-skill.md`](../knowledge/glossary/ai-skill.md)（`plan_kind` / `parent` / `plan_tree` / `required_for_completion` / `sub_plan_reason`）。
+
+**Commit-msg 機械強制（4 block + 1 warning）**：
+
+| Validator | Severity | 規則 |
+|---|---|---|
+| `validatePlanTreeFrontmatter` | block | sub-plan 缺 `parent` / `sub_plan_reason`（空字串視為缺）/ `required_for_completion` |
+| `validatePlanTreeArchiveOrder` | block | 主計畫 archive 時，所有 `parent == <main>` 且 `required_for_completion: true` 的 sub-plan 必須 `status: completed` |
+| `validatePlanTreeParentReference` | block | `parent` 指向的 id 必須存在於 active + archived 全集（防 orphan node） |
+| `validatePlanTreeUniqueID` | block | 全 repo plan `id` 唯一（防 parent pointer 指錯） |
+| `validatePlanTreeFolderConvention` | warning | folder 缺 `_plan.md` / 檔名不符 `NN-` 前綴 / 深度 ≥ 3 |
+
+**何時開 sub-plan**：`sub_plan_reason` 非空為唯一強制條件；recommended triggers（independent sign-off / multi-phase own acceptance / independent runtime trigger / parallel owners / independent spike archive）只是參考，不強制。單一 phase 內 step 細分用 checkbox、< 1 session 工作 inline 寫主計畫、純文件補強直接 commit，**不開 sub-plan**。
+
+**檢視**：`ai-skill plans tree`（`--state active|archived|all`，`--format text|json|markdown`）純讀 frontmatter 動態建樹，顯示 status / 進度 / blocker。
+
 ## Plan 模板必填章節
 
 任何涉及架構變更、新流程、跨層改動的 plan 必須包含下列章節（簡單修補類 plan 可省略 Decision Rationale）：

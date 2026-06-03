@@ -1,8 +1,8 @@
 # Plan Tree Hierarchy（governance rule）
 
-> **Status**：draft（2026-06-02，由 plan `2026-06-02-1200-plan-tree-hierarchy-governance` 落地）
+> **Status**：validated（2026-06-04，plan `2026-06-02-1200-plan-tree-hierarchy-governance` Phase 5 收尾；5 validators 已落地並機械強制）
 > **Canonical source**：本檔為 plan-tree governance 的人類可讀 rule。Schema enum
-> 與 validator dispatch 待 Phase 2 進 `scripts/ai-skill-cli/internal/app/` 後，
+> 與 validator dispatch 已進 `scripts/ai-skill-cli/internal/app/plan_tree.go`，
 > 由 commit-msg hook 機械強制。本檔不重複定義 schema 細節，detail 連 plan。
 
 ## 目的
@@ -55,7 +55,7 @@ Spike：等同 sub-plan，建議 `required_for_completion: false`。
 - 純文件補強 / rename / typo → 直接 commit，不開 plan
 - 同 acceptance 下不同 angle → 同 plan 多 phase
 
-## Validator 行為（Phase 2 待落地）
+## Validator 行為（已落地 `plan_tree.go`）
 
 | Validator | Severity | 規則 |
 |---|---|---|
