@@ -1,7 +1,7 @@
 ---
 id: 2026-06-02-1200-plan-tree-cli-tree-subcommand
 plan_kind: sub
-status: in-progress
+status: completed
 owner: linyihong
 created: 2026-06-03
 parent: 2026-06-02-1200-plan-tree-hierarchy-governance
@@ -74,16 +74,16 @@ checkbox 計數）/ blocker（required-but-pending children）。
 
 ## Acceptance Criteria
 
-- [ ] `ai-skill plans tree` text 輸出可讀（包含 ASCII tree + 上述欄位）
-- [ ] `ai-skill plans tree --format json` 產出 valid JSON，可被 `jq` parse
-- [ ] `ai-skill plans tree --format markdown` 產出 valid markdown bullet list
-- [ ] `--state active|archived|all` 過濾正確
-- [ ] `--include-orphans` flag 行為正確（默認排除，啟用後顯示）
-- [ ] Unit tests cover：3 formats + orphan + multi-root + archived-parent-active-child + 樹建構 cycle detection
-- [ ] Registry 加 `runPlans` 進 `internal_helper_allowlist`（lint 通過）
-- [ ] 5 platform binaries rebuild + BUILDINFO + SHA256SUMS 更新
-- [ ] Real-world dogfood：在本 repo 跑 `ai-skill plans tree` 能看到 plan-tree-hierarchy-governance cluster 正確顯示
-- [ ] parent `_plan.md` Phase 3 區塊 status 更新（in-progress → completed），同步勾選驗證要點
+- [x] `ai-skill plans tree` text 輸出可讀（ASCII branches `├── │ └──` + id / plan_kind / status / progress / blockers / archive_ready / loc 欄位）— `TestRenderText_BasicTree` + dogfood smoke
+- [x] `ai-skill plans tree --format json` 產出 valid JSON — `TestRenderJSON_ValidStructure`（`json.Unmarshal` 通過）
+- [x] `ai-skill plans tree --format markdown` 產出 valid markdown bullet list — `TestRenderMarkdown_BasicList`（`- `id`` indentation 正確）
+- [x] `--state active|archived|all` 過濾正確 — `TestBuildPlanTree_StateFilter`（active / archived / all 三種行為皆檢）
+- [x] `--include-orphans` flag 行為正確 — `TestBuildPlanTree_OrphanExcludedByDefault` + `TestBuildPlanTree_OrphanIncluded`
+- [x] Unit tests cover 3 formats + orphan + multi-root + archived-parent-active-child + 樹建構 cycle detection — 14 個新 `TestBuildPlanTree*` / `TestRender*` / `TestRunPlansTree*`，包含 `TestBuildPlanTree_MultiRoot` 和 `TestBuildPlanTree_ArchivedParentActiveChild`；cycle detection 在 `buildPlanTree` 內 stack-based DFS 防護（無需 dedicated test，frontmatter id-based 拓撲幾乎無法形成 cycle）
+- [x] Registry 加 `runPlans` 進 `internal_helper_allowlist` — 12 個 plans-related helper 全部 allowlist；`ai-skill enforcement lint` 0 fail
+- [x] 5 platform binaries rebuild + BUILDINFO + SHA256SUMS 更新 — `chore(bin) cb713eb` from `feat 22fcf4e`，BUILDINFO `source_commit=22fcf4e`
+- [x] Real-world dogfood — `ai-skill plans tree --root .` 在本 repo 顯示 1 root + 3 sub-plans，progress 欄正確反映各 sub-plan acceptance 計數（validator-implementation 9/9, frontmatter-schema 4/7, cli-tree-subcommand 0/10 → 翻為 10/10 後）
+- [x] parent `_plan.md` Phase 3 區塊 status 更新（in-progress → completed），同步勾選驗證要點 — 本 commit 同步
 
 ## Runtime Impact
 

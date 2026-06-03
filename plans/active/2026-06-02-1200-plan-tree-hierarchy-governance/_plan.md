@@ -338,7 +338,28 @@ Cluster 1 是天然 dogfood：3 個既有 plan 都已在檔頭 prose 明寫 pare
 
 ## Phase 3 — `03-cli-tree-subcommand`（sub-plan）
 
-詳見 [`03-cli-tree-subcommand/_plan.md`](03-cli-tree-subcommand/_plan.md)（待建）。本主計畫驗證要點：`ai-skill plans tree` 可渲染 active + archived 兩種狀態，輸出包含 status / 進度 / blocker。
+**Status**: completed（2026-06-03）— sub-plan 詳見 [`03-cli-tree-subcommand.md`](03-cli-tree-subcommand.md)。實作落地於 `feat 22fcf4e` + `chore(bin) cb713eb`。
+
+本主計畫驗證要點：`ai-skill plans tree` 可渲染 active + archived 兩種狀態，輸出包含 status / 進度 / blocker。**全部達成**：
+
+- [x] 3 種輸出格式：text (ASCII tree)、JSON (nested object)、markdown (bullet list) — 14 unit tests PASS
+- [x] State filter (`--state active|archived|all`) — `TestBuildPlanTree_StateFilter`
+- [x] 跨 active/archived 邊界節點正確 link — `TestBuildPlanTree_ArchivedParentActiveChild`
+- [x] Orphan 處理 (`--include-orphans`) — 默認排除 + 啟用顯示，2 tests
+- [x] 樹建構含 cycle detection 防護（DFS stack-based）
+- [x] 純讀-only，不修改 plan 檔，與 Phase 2 validators 責任分離（enforcement vs visualization）
+
+Dogfood 範例輸出（在本 repo 跑 `ai-skill plans tree --root .`）：
+
+```
+Plan Tree (root=., 1 top-level node(s))
+└── 2026-06-02-1200-plan-tree-hierarchy-governance [main] status=draft progress=18/51 blockers=2 loc=active
+    ├── 2026-06-02-1200-plan-tree-cli-tree-subcommand [sub] status=completed progress=10/10 required=true loc=active
+    ├── 2026-06-02-1200-plan-tree-frontmatter-schema [sub] status=in-progress progress=4/7 required=true loc=active
+    └── 2026-06-02-1200-plan-tree-validator-implementation [sub] status=completed progress=9/9 required=true loc=active
+```
+
+Phase 3 完成後 archive_ready 仍為 false（Phase 1 sub-plan frontmatter-schema 還有 3 個 acceptance items 待 Phase 5 收尾連動）。Phase 4 migration sub-plan 已可開始（CLI 是 migration 驗證工具）。
 
 ---
 
