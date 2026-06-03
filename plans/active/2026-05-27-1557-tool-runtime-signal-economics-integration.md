@@ -1,3 +1,12 @@
+---
+id: 2026-05-27-1557-tool-runtime-signal-economics-integration
+plan_kind: main
+status: in-progress
+owner: linyihong
+created: 2026-05-27
+parent: null
+---
+
 # Tool Runtime Signal & Economics Integration
 
 ## Status

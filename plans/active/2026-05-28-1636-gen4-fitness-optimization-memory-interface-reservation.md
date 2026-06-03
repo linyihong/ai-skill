@@ -1,3 +1,12 @@
+---
+id: 2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation
+plan_kind: main
+status: draft
+owner: linyihong
+created: 2026-05-28
+parent: null
+---
+
 # Gen4 Fitness & Optimization Memory Interface Reservation
 
 **Status**: `draft`

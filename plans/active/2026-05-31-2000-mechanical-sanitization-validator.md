@@ -1,3 +1,20 @@
+---
+id: 2026-05-31-2000-mechanical-sanitization-validator
+plan_kind: sub
+status: in-progress
+owner: linyihong
+created: 2026-05-31
+parent: 2026-05-31-2100-mechanical-enforcement-registry
+required_for_completion: true
+sub_plan_reason: >
+  Instance #2 of the "rule-without-executor" meta-pattern (parent meta-plan).
+  sanitization.md + reusable-guidance-boundary.md state hard rules but lack
+  PreToolUse Write + commit-msg executors; this sub-plan delivers
+  validateSanitizationOnWrite / validateSanitizationOnCommit. Independent
+  scope because sanitization patterns evolve on a different cadence than
+  workflow routing.
+---
+
 # Mechanical Sanitization Validator
 
 **Status**: `draft-v3`

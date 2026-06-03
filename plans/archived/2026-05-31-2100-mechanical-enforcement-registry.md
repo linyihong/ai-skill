@@ -1,3 +1,12 @@
+---
+id: 2026-05-31-2100-mechanical-enforcement-registry
+plan_kind: main
+status: completed
+owner: linyihong
+created: 2026-05-31
+parent: null
+---
+
 # Mechanical Enforcement Registry
 
 **Status**: `draft-v4.1`

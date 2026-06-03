@@ -1,3 +1,19 @@
+---
+id: 2026-06-01-0100-validation-scenario-governance-executor
+plan_kind: sub
+status: draft
+owner: linyihong
+created: 2026-06-01
+parent: 2026-05-31-2100-mechanical-enforcement-registry
+required_for_completion: false
+sub_plan_reason: >
+  Phase 3 Round-4 T1 / Round-5 U2 deliverable of the parent meta-plan,
+  explicitly deferred per round-2 R3 decision (option C — behavioral_only
+  with promote-to-pending sunset_decision). required_for_completion: false
+  because the parent plan archived without this executor being a gate;
+  promotion to mechanical waits on coverage_evidence machinery.
+---
+
 # Validation Scenario Governance Executor
 
 **Status**: `stub`

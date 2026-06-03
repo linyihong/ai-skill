@@ -1,3 +1,19 @@
+---
+id: 2026-05-31-1900-workflow-activation-engine
+plan_kind: sub
+status: in-progress
+owner: linyihong
+created: 2026-05-31
+parent: 2026-05-31-2100-mechanical-enforcement-registry
+required_for_completion: true
+sub_plan_reason: >
+  Instance #1 of the "rule-without-executor" meta-pattern (parent meta-plan).
+  routing-registry.yaml declares activation_triggers but no Go executor reads
+  them; this sub-plan delivers detector.go to mechanically enforce workflow
+  routing. Independent stakeholder sign-off because routing semantics affect
+  every PreToolUse turn, distinct concern from registry binding governance.
+---
+
 # Workflow Activation Engine
 
 **Status**: `draft-v8`
