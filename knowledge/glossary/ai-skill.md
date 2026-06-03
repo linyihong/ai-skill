@@ -60,7 +60,7 @@ introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```yaml
 term: cognitive_slice
 status: canonical
-owner-layer: governance
+owner-layer: validation-governance
 meaning: >
   可被獨立載入、驗證、路由的最小認知單元（minimum routable cognition unit）。
   每個 slice 有單一 cognitive phase 責任、明確 load_when / do_not_load_when、
