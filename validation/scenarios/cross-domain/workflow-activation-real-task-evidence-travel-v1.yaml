@@ -4,7 +4,7 @@ version: v1
 type: real-task-rule-enforcement-evidence
 priority: P2
 source_plans:
-  - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md   # parent meta-plan: P1 — "rule exists, executor missing" pattern
+  - plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md   # parent meta-plan: P1 — "rule exists, executor missing" pattern
   - plans/active/2026-05-31-1900-workflow-activation-engine.md        # sibling: P2 — workflow_activation coverage class
 source_phase: evidence-collection
 
@@ -86,7 +86,7 @@ classification:
         runtime layer has no executor enforcing them"
 
 attribution:
-  primary_pattern_owner: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+  primary_pattern_owner: plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md
   secondary_pattern_owner: plans/active/2026-05-31-1900-workflow-activation-engine.md
   cognitive_slice_relevance: none
   explanation: |

@@ -310,13 +310,13 @@ per_commit_obligations:
     validator: validateEnforcementRegistryTransition
     severity: block
     opt_out_marker: "[skip-registry-transition]"
-    contract_source: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md (Phase 4.5 — Self-Governance Lint Rules R1/R2/R3) + enforcement/enforcement-registry.yaml §self_governance
+    contract_source: plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md (Phase 4.5 — Self-Governance Lint Rules R1/R2/R3) + enforcement/enforcement-registry.yaml §self_governance
   - id: obligation.commit.enforcement_rule_registry_sync
     fires: every_commit_staging_enforcement_rule_yaml_without_registry_update
     validator: validateEnforcementRuleRegistrySync
     severity: block
     opt_out_marker: "[skip-enforcement-registry-sync]"
-    contract_source: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md (Phase 5 — Bootstrap Integration item 3); dual-gate companion to Phase 3 compile-time orphan_rule lint
+    contract_source: plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md (Phase 5 — Bootstrap Integration item 3); dual-gate companion to Phase 3 compile-time orphan_rule lint
 
 per_commit_dispatcher_status:
   machine_iterable: true

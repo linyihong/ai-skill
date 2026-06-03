@@ -416,7 +416,7 @@ Cluster 1 是天然 dogfood：3 個既有 plan 都已在檔頭 prose 明寫 pare
 
 - **Parent**: 無（本 plan 自身為 main plan）。
 - **相關 plan**:
-  - `plans/active/2026-05-31-2100-mechanical-enforcement-registry.md` — registry executors 註冊新 validator 的目標位置（Phase 2 整合）。
+  - `plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md` — registry executors 註冊新 validator 的目標位置（Phase 2 整合）。
   - `plans/active/2026-06-01-0100-validation-scenario-governance-executor.md` — 既有的隱性 parent-child 範例（Phase 4 遷移 target）。
   - `plans/archived/2026-05-25-2200-bootstrap-contract-yaml-migration.md` — 歷史 multi-phase plan，可作為 Phase 4 「歷史 parent-child」 reference。
 - **不衝突**:

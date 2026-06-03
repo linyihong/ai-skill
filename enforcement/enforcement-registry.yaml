@@ -12,7 +12,7 @@ source_markdown: enforcement/enforcement-registry.md
 # runtime-layer executor (or explicitly declares why no executor exists).
 #
 # Companion markdown: enforcement/enforcement-registry.md (philosophy + writing guide).
-# Source plan: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+# Source plan: plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md
 # ─────────────────────────────────────────────────────────────────────
 
 purpose: >
@@ -1378,6 +1378,6 @@ failure_pattern_linkage:
     # - enforcement/failure-patterns/rule-without-executor.md
 
 source: |
-  2026-05-31 session. Plan plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+  2026-05-31 session. Plan plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md
   Phase 2 (rule_class identification + initial registry).
   Open Questions Q1/Q2/Q4/Q6 resolutions encoded above.

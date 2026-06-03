@@ -16,7 +16,7 @@
 
 ## Source Plan
 
-[`plans/active/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/active/2026-05-31-2100-mechanical-enforcement-registry.md) §Phase 3 Round-4/5 Review (T5 / U3)
+[`plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md) §Phase 3 Round-4/5 Review (T5 / U3)
 
 ## Context
 
@@ -111,5 +111,5 @@ adr_revision_policy: supersede_required
 ## Related
 
 - [`enforcement/enforcement-registry.yaml`](../enforcement/enforcement-registry.yaml) §rule_classes[].upstream_classes
-- [`plans/active/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/active/2026-05-31-2100-mechanical-enforcement-registry.md) §Phase 3 Round-4 T5 / Round-5 U3
+- [`plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md) §Phase 3 Round-4 T5 / Round-5 U3
 - [`ADR-006-registry-first-workflow-activation.md`](ADR-006-registry-first-workflow-activation.md) — registry-first principle，本 ADR 延伸其治理邊界規範

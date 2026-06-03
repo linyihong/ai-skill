@@ -8,7 +8,7 @@ Owner: framework maintainer (linyihong)
 **Priority**：**P3**（v3 起）—— parent meta-plan P1、sibling activation-engine P2、本 plan P3。順序理由：parent 建好 coverage lint 後，本 plan land executor 時 lint 自動觸發 promotion 流程。
 **Sibling plans**：
 - [`2026-05-31-1900-workflow-activation-engine.md`](2026-05-31-1900-workflow-activation-engine.md) — same pattern (rule-without-executor), 1st instance (P2)
-- [`2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) — **parent meta-plan (P1)**：把 "rule-without-executor" 系列 bug 從個案修補升級為 framework-level invariant（compile-time lint）。本 plan 完成後 entry 由 `rule_classes[sanitization].coverage` 從 `pending` 改 `mechanical`。
+- [`2026-05-31-2100-mechanical-enforcement-registry.md`](../archived/2026-05-31-2100-mechanical-enforcement-registry.md) — **parent meta-plan (P1)**：把 "rule-without-executor" 系列 bug 從個案修補升級為 framework-level invariant（compile-time lint）。本 plan 完成後 entry 由 `rule_classes[sanitization].coverage` 從 `pending` 改 `mechanical`。
 **Empirical trigger**：2026-05-31 session — agent 在寫 `workflow-activation-engine` plan v1-v4 期間，向 canonical Ai-skill repo 多次 Write/Edit canonical 文件，內容夾帶 project incident details（specific filename、user 對話片段、領域 artifact 字串）。`enforcement/sanitization.md` + `enforcement/reusable-guidance-boundary.md` 規則明擺著，使用者三次追問才暴露 gap，最終 v5 patch 才人工抹除。
 
 > 本 plan 不修個案 leak，而是補齊 **Mechanical Sanitization Validator** —— Ai-skill 第 4 個被識別出的「規則存在但無 mechanical executor」systemic gap。
@@ -380,7 +380,7 @@ Acceptance：五 scenario 全 PASS。
 2026-05-31 session：
 - 使用者連續追問五次，依序暴露：(1) sqlite3 vs ai-skill CLI 認知偏差，(2) `route.workflow.travel-planning` activation gap，(3) Discovery vs Detector 混淆，(4) intelligence 預設 advisory 風險，(5) **sanitization 自我觸發失敗導致 v1-v4 plan 寫作期間 project incident 洩漏**。
 - 第五次追問識別出本 plan 處理的 systemic gap。
-- 第六次評審把這個 gap 抽象成 **meta-pattern**：「Rule Exists, Executor Missing」，催生 `plans/active/2026-05-31-2100-mechanical-enforcement-registry.md` 作為 parent plan。
+- 第六次評審把這個 gap 抽象成 **meta-pattern**：「Rule Exists, Executor Missing」，催生 `plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md` 作為 parent plan。
 
 本 plan 是 sibling `workflow-activation-engine` plan 同模式問題（rule-without-executor）的第二個顯式 case，獨立追蹤是因為 scope 完全不同（sanitization vs routing）。**v2 起明確標記為 meta-plan 的 instance** —— 從 enforcement-registry 角度，本 plan 是 `sanitization` rule + `validateSanitizationOnWrite/Commit` executor 的綁定範例。
 

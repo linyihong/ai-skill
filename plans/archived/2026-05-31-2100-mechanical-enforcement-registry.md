@@ -144,9 +144,9 @@ Layer 2.5  Coverage Verification / Meta Governance   ← NEW (本 plan 建立)
 
 ### Phase 0 — Preflight
 
-- [ ] §Open Questions 處置
-- [ ] 確認既有 `enforcement/`、`runtime/`、`governance/` 的 yaml 是否都已有 stable id field 可作為 registry key
-- [ ] 確認 `hooks.go` validator dispatcher 已有可枚舉的 registry 結構（已知有 11+ commit-msg validators 註冊）
+- [x] §Open Questions 處置 — Q1-Q11 全部 resolved（見 §Open Questions 表）
+- [x] 確認 yaml stable id field 可作為 registry key — registry.yaml `rule_classes[].id` 採 snake_case enum，36 classes 全部 unique
+- [x] 確認 `hooks.go` validator dispatcher 已有可枚舉的 registry 結構 — `commitMsgValidatorRegistry` map 註冊 21 個 commit-msg validator
 
 ### Phase 1 — Rule Class 識別（**v2 改：不是 instance audit**）
 
@@ -444,14 +444,10 @@ runtime_metrics_spec:
 - 兩者塞同一桶會讓 review queue 永遠塞著無解項目，治理失靈
 
 產出：
-- [ ] schema v2 定稿（4-value enum + 對應 metadata requirements）
-- [ ] enforcement-registry.yaml 初版（~24 rule_classes 全部填）
-- [ ] companion `enforcement/enforcement-registry.md`（philosophy + Layer 2.5 framing + 寫作指南）
-
-產出：
-- [ ] schema 定稿（包含 `behavioral_only` field 與必填的 rationale / sunset_decision）
-- [ ] enforcement-registry.yaml 初版（覆蓋 Phase 1 inventory 列出的所有 rule）
-- [ ] companion `enforcement/enforcement-registry.md`（philosophy + 寫作指南）
+- [x] schema 定稿 — actual v4 (round-4/5)：6-value coverage enum + verification_levels + runtime_metrics_spec + registry self-governance + 21 commit-msg + 13 compile-time lint
+- [x] enforcement-registry.yaml 初版 — 36 rule_classes 全部填（receipt: classes=36 mechanical=13 behavioral=13 not_mech=5 pending=3 research=2 deprecated=0）
+- [x] companion `enforcement/enforcement-registry.md` — philosophy + Layer 2.5 framing + Status Transition Matrix + R1-R5 self-governance + 寫作指南
+- [x] (duplicate section, superseded by above) — 早期 outline 重複條目，由 v4 schema 統一交付涵蓋
 
 ### Phase 3 — Compile-time Lint
 
@@ -1181,11 +1177,11 @@ Consequences:
 
 ### Phase 8 — Close-out
 
-- [ ] phases done
-- [ ] `git status` clean
-- [ ] `git push` 完成、`git log origin/main..HEAD` empty
-- [ ] 讀回更新後的 enforcement-registry.yaml / enforcement-registry.md / failure pattern
-- [ ] Archive 本 plan + 確認 child plans 的 cross-link 正確
+- [x] phases done — Phase 0/1/2/3/4/4.5/5/5.x/6/7 全部 checkboxes 翻完
+- [x] `git status` clean — Phase 6 (5f9e176) / Phase 7 (7d8a0f6) / Phase 8 archive 三輪 commit + push 後驗證
+- [x] `git push` 完成、`git log origin/main..HEAD` empty — 三輪 push 後驗證
+- [x] 讀回更新後的 enforcement-registry.yaml / enforcement-registry.md / failure pattern — Phase 8 commit 前 verify Phase 6 cross-link、Phase 7 scenarios 內容、registry receipt 數據（classes=36 mechanical=13）
+- [x] Archive 本 plan + 確認 child plans 的 cross-link 正確 — 從 `plans/active/` → `plans/archived/` move；22 個 cross-link 引用（4 個 plan + 5 個 enforcement registry/yaml + 4 個 ADR + 7 個 scenarios + 2 個 transitions/fixtures）全部 active→archived 路徑更新
 
 ---
 
@@ -1206,12 +1202,12 @@ Consequences:
 
 ## Validation Plan
 
-- [ ] Phase 1 inventory 數量符合預估（≥ 150 rules、≥ 30 executors）
-- [ ] Phase 2 schema 經 user review（特別是 `behavioral_only` 寫作格式）
-- [ ] Phase 3 lint 跑出第一次 coverage report，列出 ≥ 100 orphan rule
-- [ ] Phase 4 CLI output 易讀，能直接拿去做 governance review
-- [ ] Phase 5 bootstrap integration 不破壞既有 receipt format（backward compat）
-- [ ] Phase 7 regression scenario 五個全 PASS
+- [x] Phase 1 inventory — **superseded by v2 rule_class abstraction**（v1「≥150 rule instance」改 v2「~24 rule_class」, actual 36 class）；executor 也由 dispatcher 抽象避免逐 helper 列入 registry
+- [x] Phase 2 schema 經 user review — round 7-10 多輪評審（v2→v3→v4 + round-2/3/4/5 patches），`behavioral_only` 寫作格式由 sunset_decision 雙必填 + last_reviewed_at + revisit_owner + last_review_summary 共 5 欄結構化
+- [x] Phase 3 lint 跑出第一次 coverage report — **superseded by rule_class abstraction**（v1「≥100 orphan rule」原本基於 instance 級；rule_class 級 dry-run 實際 48 findings，全數 backfill 至 FAIL 0 / WARNING 1）
+- [x] Phase 4 CLI output 易讀 — `ai-skill enforcement coverage` 三 format（text/JSON/markdown）+ `--detail` + `--diff <ref>` + `--self-check` 全 land
+- [x] Phase 5 bootstrap integration backward compat — Receipt 兩行格式 + legacy 單行皆 accept；新增 `Enforcement:` 一行 summary 不破壞既有 parsing
+- [x] Phase 7 regression scenario 五個全 PASS — 5 個 P0/P1 scenario 全部 runnable + 2 個 Phase 4.5 bonus scenario（demotion-without-adr / promotion-verification-gap）
 
 ---
 

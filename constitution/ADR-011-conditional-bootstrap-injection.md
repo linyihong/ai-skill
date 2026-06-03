@@ -21,7 +21,7 @@
 
 ## Source Plan
 
-[`plans/active/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/active/2026-05-31-2100-mechanical-enforcement-registry.md)
+[`plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md)
 §Phase 5.x — Hook Injection Economics（inaugural self-governance test case）
 
 ## Context

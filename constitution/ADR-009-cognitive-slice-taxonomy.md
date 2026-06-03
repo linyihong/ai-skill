@@ -96,7 +96,7 @@ Parent plans 的 2 個切分 pilot + 1 個 no-split 反向證據 + 1 個 scheme 
 
 每個 deferred item 列 `Trigger to revisit`（觸發再評估的條件）+ `Owner at revisit`（誰推動）+ `Retirement criterion`（什麼條件下可從本節移除整個 item，視為永久結案）。讓任何後續 contributor 能機械判斷「現在該不該做」「現在該不該繼續看」，不依賴主動 review。
 
-**整體 watch 退場條件（meta-level retirement）**：當 (a) `plans/active/2026-05-31-2100-mechanical-enforcement-registry.md` 的 Coverage Report 正式追蹤 `cognitive_slice` 為 coverage class，**且** (b) 本 ADR Status 升為 `Accepted (multi-source validated)`——本 §Future Considerations 可整段標記為 **`transitional watch retired`**，後續維護回歸 P1 Coverage Report + ADR normal supersede 流程，不再需要本節人工 watch。設計理由：手動 watch 本質是過渡性的，job 是 bridge framework 從 accepted 到「機械覆蓋 OR 經驗證足夠」；若 watch 永遠不能退場，反證 framework 失敗。
+**整體 watch 退場條件（meta-level retirement）**：當 (a) `plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md` 的 Coverage Report 正式追蹤 `cognitive_slice` 為 coverage class，**且** (b) 本 ADR Status 升為 `Accepted (multi-source validated)`——本 §Future Considerations 可整段標記為 **`transitional watch retired`**，後續維護回歸 P1 Coverage Report + ADR normal supersede 流程，不再需要本節人工 watch。設計理由：手動 watch 本質是過渡性的，job 是 bridge framework 從 accepted 到「機械覆蓋 OR 經驗證足夠」；若 watch 永遠不能退場，反證 framework 失敗。
 
 - **Surface rename sweep**：採用 `execution surface` / `evidence surface` 為對外詞彙的 file rename（例如 `surgical-changes.md` → `surgical-changes-surface.md`）。當前 file 名仍用 slice / 主題名。
   - **Trigger to revisit**: `knowledge/glossary/ai-skill.md` 的 `cognitive_slice` entry 經 **≥ 3 個非本系列 contributor / session-series** 引用後，且 `slice` 詞彙在新文件中造成「arbitrary chunk / static partition」誤解被觀察到 **≥ 2 次**。
@@ -114,7 +114,7 @@ Parent plans 的 2 個切分 pilot + 1 個 no-split 反向證據 + 1 個 scheme 
   - **Retirement criterion**: 兩個 surface 各執行過 ≥ 1 次 single-trigger probe（不論 split / no-split），OR ≥ 12 個月無 single-trigger 任務出現 → 從本節移除 item，視為 procedure 檔的粒度問題已歸自然演化處理。
 
 - **Slice schema 機械驗證 validator**：目前 placement predicate 為文件規則 + scenario fixture 驗證；未來可加 commit-msg validator 機械檢查新 slice header 欄位完整、`evidence_refs` ≥ 2 for intelligence。
-  - **Trigger to revisit**: 觀察到 contributor **誤放案例 ≥ 月 1 次**（intelligence 升層無 evidence_refs、slice 缺 schema 欄位、type 用了非 4 種 primary）。Tracking 由 `plans/active/2026-05-31-2100-mechanical-enforcement-registry.md` 的 Coverage Report 自然覆蓋。
+  - **Trigger to revisit**: 觀察到 contributor **誤放案例 ≥ 月 1 次**（intelligence 升層無 evidence_refs、slice 缺 schema 欄位、type 用了非 4 種 primary）。Tracking 由 `plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md` 的 Coverage Report 自然覆蓋。
   - **Owner at revisit**: P1 mechanical-enforcement-registry plan owner（不在本 ADR scope）。
   - **Retirement criterion**: P1 Coverage Report 把 `cognitive_slice` 列為 coverage class 且其 `verification` 維度為 mechanical → 從本節移除 item（P1 接手機械追蹤）。OR ≥ 12 個月無誤放案例 → 移除 item 且 Status 註記「placement predicate 文件規則證實足夠」。
 

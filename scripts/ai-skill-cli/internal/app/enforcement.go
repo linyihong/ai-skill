@@ -16,7 +16,7 @@ import (
 )
 
 // runEnforcement dispatches `ai-skill enforcement <subcommand>`. Phase 4 of
-// plans/active/2026-05-31-2100-mechanical-enforcement-registry.md exposes
+// plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md exposes
 // the existing LintEnforcementRegistry engine and a coverage aggregation
 // as public CLI surfaces.
 func runEnforcement(args []string, stdout io.Writer, stderr io.Writer) int {

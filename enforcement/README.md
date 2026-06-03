@@ -81,7 +81,7 @@
 
 修改 `enforcement/*.yaml`、`runtime/*.yaml`、`governance/**/*.yaml`、`knowledge/runtime/routing-registry.yaml` 或 `scripts/ai-skill-cli/internal/app/hooks.go` 時，**同一 commit** 必須同步更新 registry binding。Phase 3 compile-time lint 會 hard-fail orphan rule / orphan executor / missing executor symbol / incomplete sunset_decision。
 
-對應 meta-pattern：[`failure-patterns/rule-without-executor.md`](failure-patterns/rule-without-executor.md)。對應 plan：[`plans/active/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/active/2026-05-31-2100-mechanical-enforcement-registry.md)。
+對應 meta-pattern：[`failure-patterns/rule-without-executor.md`](failure-patterns/rule-without-executor.md)。對應 plan：[`plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md)。
 
 ### Core Bootstrap（每個 session 必讀）
 

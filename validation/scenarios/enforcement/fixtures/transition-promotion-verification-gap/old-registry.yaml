@@ -16,7 +16,7 @@ internal_helper_allowlist: { symbols: [] }
 rule_classes:
   - id: __test_promotion__
     coverage: pending_implementation
-    child_plan: plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+    child_plan: plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md
     target_promotion: "Promote to mechanical once validateNonexistentPromotionTarget lands"
     source_files:
       - enforcement/bar.yaml

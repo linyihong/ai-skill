@@ -1,4 +1,4 @@
-# Source: Phase 4.5 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+# Source: Phase 4.5 of plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md
 # §Self-Governance Lint Rules — R2 (demotion 必須附 ADR；無 ADR → commit reject)
 id: registry-transition-demotion-without-adr-v1
 domain: enforcement
@@ -66,7 +66,7 @@ validation:
   pass_criteria: detection_command exits 0 (assertion matched ≥ 1 R2_demotion_missing_adr violation)
   initial_state: PASS (Phase 4.5 transition-check CLI landed 2026-06-02)
   reference_governance:
-    - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md §Phase 4.5 Self-Governance Lint Rules R2
+    - plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md §Phase 4.5 Self-Governance Lint Rules R2
     - enforcement/enforcement-registry.yaml §self_governance.status_transition_matrix (mechanical → behavioral_only requires demotion_rationale + adr_reference)
     - enforcement/enforcement-registry.md §Self-Governance
 

@@ -1,4 +1,4 @@
-# Source: Phase 7 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+# Source: Phase 7 of plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md
 # Pre-implementation scenario (initially failing until Phase 3 lint compiled into ai-skill runtime compile)
 id: registry-lint-orphan-rule-v1
 domain: enforcement
@@ -75,7 +75,7 @@ validation:
   initial_state: PASS (Phase 4 CLI landed 2026-06-02; fixture repo committed alongside)
   reference_governance:
     - enforcement/enforcement-registry.yaml §enforcement_mode.orphan_rule=fail
-    - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md Phase 3
+    - plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md Phase 3
     - Open Question Q1 resolution (hard block, no grace period)
 
 phase_3_lint_contract:

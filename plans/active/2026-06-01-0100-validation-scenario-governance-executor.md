@@ -4,7 +4,7 @@
 **世代**：Gen 3 Layer 2.5 sub-deliverable
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-01
-**Source**: [`plans/active/2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) §Phase 3 Round-4 T1 / Round-5 U2
+**Source**: [`plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md`](../archived/2026-05-31-2100-mechanical-enforcement-registry.md) §Phase 3 Round-4 T1 / Round-5 U2
 
 > **Stub Notice**：本 plan 為 stub，僅滿足 enforcement-registry `pending_implementation.child_plan_validity` 的最低門檻（Phase 0 outline + owner + Acceptance）。完整 Decision Rationale、Phase Plan 細節、Open Questions 待 implementation 啟動時擴充。
 

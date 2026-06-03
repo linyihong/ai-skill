@@ -348,6 +348,6 @@ baseline 必須含 `baseline_owner` + 每筆 entry 的 `baseline_review_summary`
 | Phase 8 | Close-out + archive | pending |
 
 詳見
-[`plans/active/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/active/2026-05-31-2100-mechanical-enforcement-registry.md)。
+[`plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md`](../plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md)。
 
 ← [Back to enforcement index](README.md)

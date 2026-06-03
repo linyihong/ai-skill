@@ -1,4 +1,4 @@
-# Source: Phase 7 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+# Source: Phase 7 of plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md
 # This is the meta-pattern regression scenario: replay the 5 historical
 # "Rule Exists, Executor Missing" instances and verify the registry would
 # have detected ALL of them.
@@ -98,7 +98,7 @@ validation:
   initial_state: PASS_AS_OF_2026-05-31 (Phase 2 registry includes all 5 entries; this scenario locks them in)
   reference_governance:
     - enforcement/enforcement-registry.yaml (canonical entries)
-    - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md §Empirical Evidence
+    - plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md §Empirical Evidence
     - enforcement/failure-patterns/rule-without-executor.md (Phase 6 deliverable)
 
 meta_purpose: |

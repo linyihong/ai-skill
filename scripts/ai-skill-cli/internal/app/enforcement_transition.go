@@ -12,7 +12,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Phase 4.5 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+// Phase 4.5 of plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md
 // — Registry Self-Governance.
 //
 // This file implements the engine that powers both:

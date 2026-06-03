@@ -1,4 +1,4 @@
-# Source: Phase 4.5 of plans/active/2026-05-31-2100-mechanical-enforcement-registry.md
+# Source: Phase 4.5 of plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md
 # §Self-Governance Lint Rules — R3 (promotion 必須對應 verification_levels 達 mechanical 門檻；未達 → lint fail)
 id: registry-transition-promotion-verification-gap-v1
 domain: enforcement
@@ -68,7 +68,7 @@ validation:
   pass_criteria: detection_command exits 0 (assertion matched ≥ 1 R3_promotion_missing_executor violation)
   initial_state: PASS (Phase 4.5 transition-check CLI landed 2026-06-02)
   reference_governance:
-    - plans/active/2026-05-31-2100-mechanical-enforcement-registry.md §Phase 4.5 Self-Governance Lint Rules R3
+    - plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md §Phase 4.5 Self-Governance Lint Rules R3
     - enforcement/enforcement-registry.yaml §self_governance.status_transition_matrix (pending_implementation → mechanical requires executor symbol live + coverage_evidence + verification thresholds)
     - enforcement/enforcement-registry.yaml §verification_levels.symbol_exists
     - enforcement/enforcement-registry.md §Self-Governance
