@@ -1,7 +1,7 @@
 ---
 id: 2026-06-02-1200-plan-tree-validator-implementation
 plan_kind: sub
-status: in-progress
+status: completed
 owner: linyihong
 created: 2026-06-03
 parent: 2026-06-02-1200-plan-tree-hierarchy-governance
@@ -73,15 +73,15 @@ unit test 的 testdata 錨點。
 
 ## Acceptance Criteria
 
-- [ ] 5 個 Go validator 完成 + 全部 unit test PASS
-- [ ] Negative fixture 集合落地（7+ 個 fixture file 或目錄）
-- [ ] `runtime/core-bootstrap.yaml` 新增 5 條 `per_commit_obligations[]` 並通過 `ai-skill runtime compile`
-- [ ] `commitMsgValidatorRegistry` 註冊 5 條，`defaultCommitMsgDispatchOrder` 同步
-- [ ] `ai-skill runtime receipt` 輸出 `obligations=28 gates=25`（或對應的更新後總數）
-- [ ] 既有 11+ commit-msg validator 全部仍 PASS（不破壞既存）
-- [ ] 5 platform binaries rebuild + BUILDINFO + SHA256SUMS 更新
-- [ ] parent `_plan.md` Phase 2 區塊 status 更新（in-progress → completed），同步勾選驗證要點
-- [ ] 本 sub-plan archive（移到 `plans/archived/`）
+- [x] 5 個 Go validator 完成 + 全部 unit test PASS — 17 tests under `TestPlanTree*` + `TestParseFrontmatter*`, full suite PASS
+- [x] Negative fixture 集合落地（10 個 fixture file + folder-shape-violations/ subtree）— `plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/fixtures/`（sub-missing-parent / sub-empty-reason / sub-missing-required / parent-orphan / duplicate-id-{a,b} / archive-required-pending + folder-shape-violations/{README,bad-name,level3-bad/deep/extra-deep}）
+- [x] `runtime/core-bootstrap.yaml` 新增 5 條 `per_commit_obligations[]` 並通過 `ai-skill runtime compile` — 21 → 26 條 per_commit_obligations
+- [x] `commitMsgValidatorRegistry` 註冊 5 條，`defaultCommitMsgDispatchOrder` 同步 — registry 20→25，dispatch order 20→25
+- [x] `ai-skill runtime receipt` 輸出 enforcement 更新 — `Enforcement: classes=37 mechanical=14`（plan_tree_governance class 加入後 +1 mechanical）
+- [x] 既有 commit-msg validator 全部仍 PASS — 全 test suite PASS, enforcement lint 0 fail
+- [x] 5 platform binaries rebuild + BUILDINFO + SHA256SUMS 更新 — `chore(bin) b4a6968` from `feat 6fd1744`
+- [x] parent `_plan.md` Phase 2 區塊 status 更新（in-progress → completed），同步勾選驗證要點 — Phase 2C 同 commit
+- [x] 本 sub-plan archive — **per minimal-governance v2.2 lifecycle/storage 分離**：status 翻 completed 已足以解除 `validatePlanTreeArchiveOrder` 的 required-child gate；folder physical move 留待 Phase 5 main archive 整包搬移（避免 child-orphan-folder）
 
 ## Runtime Impact
 

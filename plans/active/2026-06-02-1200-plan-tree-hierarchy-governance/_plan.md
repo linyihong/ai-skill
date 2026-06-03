@@ -324,13 +324,15 @@ Cluster 1 是天然 dogfood：3 個既有 plan 都已在檔頭 prose 明寫 pare
 
 ## Phase 2 — `02-validator-implementation`（sub-plan）
 
-詳見 [`02-validator-implementation.md`](02-validator-implementation.md)（待建）。本主計畫驗證要點：
-- `validatePlanTreeFrontmatter`（**block**）— sub-plan 缺 `parent` / `sub_plan_reason`（空字串視為缺）/ `required_for_completion`
-- `validatePlanTreeArchiveOrder`（**block**）— 主計畫 archive 時，所有 `parent == <main>` 且 `required_for_completion: true` 的 sub-plan 必須 `status: completed`（只看 status，不看 location）
-- `validatePlanTreeParentReference`（**block**）— sub-plan `parent` 指向的 id 必須存在於全 repo plan 集合（active + archived）；防 orphan node
-- `validatePlanTreeUniqueID`（**block**）— 全 repo plan `id` 必須唯一；防 parent pointer 指錯
-- `validatePlanTreeFolderConvention`（**warning only**）— folder 缺 `_plan.md`、檔名不符 `NN-` 前綴、或深度 ≥ 3
-- 5 個 validator 進 `hooks.go` registry，dispatch 順序與既有 11 個 validator 不衝突
+**Status**: completed（2026-06-03）— sub-plan 詳見 [`02-validator-implementation.md`](02-validator-implementation.md)。實作落地於 `feat 6fd1744` + `chore(bin) b4a6968`。本主計畫驗證要點：
+
+- [x] `validatePlanTreeFrontmatter`（**block**）— sub-plan 缺 `parent` / `sub_plan_reason`（空字串視為缺）/ `required_for_completion` — `scripts/ai-skill-cli/internal/app/plan_tree.go`，6 tests（missing-parent / empty-reason / missing-required / pass-valid-sub / skips-main-and-untagged / opt-out）
+- [x] `validatePlanTreeArchiveOrder`（**block**）— 主計畫 archive 時，所有 `parent == <main>` 且 `required_for_completion: true` 的 sub-plan 必須 `status: completed`（只看 status，不看 location）— 3 tests（blocks-on-pending-child / passes-when-all-required-complete / no-archive-staged）
+- [x] `validatePlanTreeParentReference`（**block**）— sub-plan `parent` 指向的 id 必須存在於全 repo plan 集合（active + archived，排除 fixtures/）；防 orphan node — 2 tests（dangling-pointer / resolves-to-archived-main）
+- [x] `validatePlanTreeUniqueID`（**block**）— 全 repo plan `id` 必須唯一；防 parent pointer 指錯 — 3 tests（duplicate / no-duplicate / fixtures-excluded）
+- [x] `validatePlanTreeFolderConvention`（**warning only**）— folder 缺 `_plan.md`、檔名不符 `NN-` 前綴、或深度 ≥ 3 — 3 tests（depth-warning / bad-filename / good-layout）
+- [x] 5 個 validator 進 `hooks.go` registry，dispatch 順序與既有 11+ 個 validator 不衝突 — `commitMsgValidatorRegistry` 20→25，`defaultCommitMsgDispatchOrder` 20→25；`runtime/core-bootstrap.yaml` per_commit_obligations 21→26；`enforcement-registry.yaml` 新增 rule_class `plan_tree_governance` coverage=mechanical 5 executors
+- [x] 既有 11+ commit-msg validator 全部 unit test 仍 PASS（含 enforcement lint 0 fail）；inaugural dogfood：02-validator-implementation.md 自身用新 schema，下一輪 commit 已可被新 binary 機械驗證
 
 ---
 
