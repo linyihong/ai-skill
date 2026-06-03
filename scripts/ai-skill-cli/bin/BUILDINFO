@@ -1,4 +1,4 @@
-version=repo-86720e9
-source_commit=86720e9
-built_at=2026-06-02T21:20:38Z
+version=repo-6fd1744
+source_commit=6fd1744
+built_at=2026-06-03T11:27:27Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
