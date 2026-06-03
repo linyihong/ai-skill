@@ -1166,9 +1166,9 @@ Consequences:
 
 ### Phase 6 — Failure Pattern + Cross-link to Child Plans
 
-- [ ] 新建 `enforcement/failure-patterns/rule-without-executor.md` —— 把 2026-05-31 session 暴露的 5 個 instance 集中記錄，作為 meta-pattern 的 inaugural reference
-- [ ] 兩個 child plan 各加 link 指回本 plan，明示「本 plan 是 meta-pattern 的 instance」
-- [ ] `enforcement/README.md` 加章節「Mechanical Enforcement Registry」指向本 plan + registry yaml
+- [x] 新建 `enforcement/failure-patterns/rule-without-executor.md` —— 把 2026-05-31 session 暴露的 5 個 instance 集中記錄，作為 meta-pattern 的 inaugural reference（land 2026-06-03，5 instance table + 6-value coverage mapping + cross-link 到 Phase 7 scenarios）
+- [x] 兩個 child plan 各加 link 指回本 plan，明示「本 plan 是 meta-pattern 的 instance」（1900 header L9 + 2000 header L11 都已標明 parent meta-plan，2000 §Source 補了 v2 起明確標記為 meta-plan instance 的歷史脈絡）
+- [x] `enforcement/README.md` 加章節「Mechanical Enforcement Registry」指向本 plan + registry yaml（§Mechanical Enforcement Registry（Layer 2.5）L78-84，cross-link 到 rule-without-executor pattern + parent plan）
 
 ### Phase 7 — Validation Scenarios
 
