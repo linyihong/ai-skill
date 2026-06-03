@@ -1,7 +1,7 @@
 ---
 id: 2026-06-02-1200-plan-tree-existing-plan-migration
 plan_kind: sub
-status: in-progress
+status: completed
 owner: linyihong
 created: 2026-06-03
 parent: 2026-06-02-1200-plan-tree-hierarchy-governance
@@ -63,13 +63,13 @@ parent-child cluster，且新 Phase 2 validators（particularly
 
 ## Acceptance Criteria
 
-- [ ] Archived registry main plan 加 frontmatter（id + plan_kind: main）
-- [ ] 3 個 active 子 plan 加 frontmatter（parent 全部指向 registry main）
-- [ ] 2 個 standalone plan 加 frontmatter（plan_kind: main, parent: null）
-- [ ] `ai-skill plans tree --root . --state all` 顯示 ≥ 3 個 root（registry main + 2 standalones + plan-tree-hierarchy-governance）
-- [ ] `validatePlanTreeFrontmatter` / `validatePlanTreeParentReference` / `validatePlanTreeUniqueID` 在 commit 階段對遷移後 staged set 全 PASS（commit 過 commit-msg hook 即驗證）
-- [ ] `ai-skill enforcement lint` 仍 0 fail
-- [ ] parent `_plan.md` Phase 4 區塊 status 更新（待建 → completed），同步勾選驗證要點
+- [x] Archived registry main plan 加 frontmatter — `plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md` 加 `id: 2026-05-31-2100-mechanical-enforcement-registry`, `plan_kind: main`, `status: completed`, `parent: null`
+- [x] 3 個 active 子 plan 加 frontmatter（parent 全部指向 registry main）— 1900 / 2000 / 2026-06-01-0100，每條 `sub_plan_reason` 都寫實際歷史脈絡（meta-pattern instance #1 / #2 / Round-4 T1 deferral）
+- [x] 2 個 standalone plan 加 frontmatter — 2026-05-27-1557 / 2026-05-28-1636，`plan_kind: main, parent: null`
+- [x] `ai-skill plans tree --root . --state all` 顯示 4 個 root（3 standalones + plan-tree governance），其中 registry cluster 正確顯示 archived parent + 3 active children
+- [x] 5 個 plan-tree validators 在 commit 階段對遷移後 staged set 全 PASS — `41d8d57` 通過 commit-msg hook（單一 atomic commit 包含 parent + children，避免 staged 自身互相 block）
+- [x] `ai-skill enforcement lint` 仍 0 fail — 驗證 41d8d57 commit 後
+- [x] parent `_plan.md` Phase 4 區塊 status 更新（待建 → completed），同步勾選驗證要點 — 本 commit 同步
 
 ## Runtime Impact
 

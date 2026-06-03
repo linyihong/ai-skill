@@ -365,7 +365,36 @@ Phase 3 完成後 archive_ready 仍為 false（Phase 1 sub-plan frontmatter-sche
 
 ## Phase 4 — `04-existing-plan-migration`（sub-plan）
 
-詳見 [`04-existing-plan-migration.md`](04-existing-plan-migration.md)（待建）。本主計畫驗證要點：6 個 active plan 全部評估完畢；至少 1 組 parent-child 已用新格式遷移；遷移後 `ai-skill plans tree` 顯示正確階層。
+**Status**: completed（2026-06-03）— sub-plan 詳見 [`04-existing-plan-migration.md`](04-existing-plan-migration.md)。實作落地於 `41d8d57`（單一 atomic migration commit）+ 本 close-out commit。
+
+本主計畫驗證要點：6 個 active plan 全部評估完畢；至少 1 組 parent-child 已用新格式遷移；遷移後 `ai-skill plans tree` 顯示正確階層。**全部達成**：
+
+- [x] 6 個 plan 全部評估：5 個 active + 1 個 archived（registry main）— 全部加 frontmatter
+- [x] Registry cluster (1 parent + 3 children) 已遷移：archived parent + 1900 + 2000 + 2026-06-01-0100
+- [x] 2 個 standalone 已加最小 frontmatter (`plan_kind: main, parent: null`)
+- [x] 5 個 plan-tree validators 對遷移 atomic commit 全 PASS — `41d8d57` 通過 commit-msg hook
+- [x] Cross-boundary linking 正確 — archived parent + active children 在同一棵樹下
+
+Dogfood 後實際渲染（`ai-skill plans tree --root .`）：
+
+```
+Plan Tree (root=., 4 top-level node(s))
+├── 2026-05-27-1557-tool-runtime-signal-economics-integration [main] status=in-progress archive_ready=✓
+├── 2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation [main] status=draft archive_ready=✓
+├── 2026-05-31-2100-mechanical-enforcement-registry [main] status=completed progress=43/44 blockers=2 loc=archived
+│   ├── 2026-05-31-1900-workflow-activation-engine [sub] status=in-progress required=true loc=active
+│   ├── 2026-05-31-2000-mechanical-sanitization-validator [sub] status=in-progress required=true loc=active
+│   └── 2026-06-01-0100-validation-scenario-governance-executor [sub] status=draft loc=active
+└── 2026-06-02-1200-plan-tree-hierarchy-governance [main] status=draft progress=24/57 blockers=2 loc=active
+    ├── 2026-06-02-1200-plan-tree-cli-tree-subcommand [sub] status=completed required=true loc=active
+    ├── 2026-06-02-1200-plan-tree-existing-plan-migration [sub] status=completed required=true loc=active
+    ├── 2026-06-02-1200-plan-tree-frontmatter-schema [sub] status=in-progress required=true loc=active
+    └── 2026-06-02-1200-plan-tree-validator-implementation [sub] status=completed required=true loc=active
+```
+
+Registry main 顯示 `progress=43/44 blockers=2` — 反映：43 of 44 acceptance items 已勾選（1 deferred CI integration）+ 2 個 required: true sub-plans 仍 in-progress。由於 parent 已 archived，blocker 是 informational only（`validatePlanTreeArchiveOrder` 只在 archive 事件當下 fire，不會回頭 retroactively block）。
+
+Phase 5 收尾可開始：CLI / validators / migration 三大基礎均已落地，剩 governance docs / glossary / failure pattern / plan folder archive。
 
 ---
 
