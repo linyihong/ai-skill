@@ -1,4 +1,4 @@
-version=repo-6fd1744
-source_commit=6fd1744
-built_at=2026-06-03T11:27:27Z
+version=repo-22fcf4e
+source_commit=22fcf4e
+built_at=2026-06-03T11:45:13Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
