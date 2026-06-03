@@ -662,6 +662,47 @@ rule_classes:
       regression_exists: partial
       runtime_observed: pending
 
+  - id: plan_tree_governance
+    coverage: mechanical
+    source_files:
+      - plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md
+      - plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/01-frontmatter-schema.md
+      - plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/02-validator-implementation.md
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/plan_tree.go
+        symbol: validatePlanTreeFrontmatter
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/plan_tree.go
+        symbol: validatePlanTreeArchiveOrder
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/plan_tree.go
+        symbol: validatePlanTreeParentReference
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/plan_tree.go
+        symbol: validatePlanTreeUniqueID
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+      - file: scripts/ai-skill-cli/internal/app/plan_tree.go
+        symbol: validatePlanTreeFolderConvention
+        executor_kind: commit_msg_validator
+        block_or_warn: warn
+    rationale: |
+      Plan tree hierarchy governance — sibling to plan_governance but
+      scoped to the parent ↔ child relationship layer (frontmatter
+      parent pointer, archive ordering across the tree, id uniqueness,
+      folder convention). Five commit-msg validators mechanically
+      enforce the minimal-governance schema declared by the parent
+      governance plan; pre-existing plans without frontmatter are
+      silently skipped to allow incremental migration (Phase 4 sub-plan).
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: pending
+      runtime_observed: pending
+
   - id: evidence_hierarchy
     coverage: mechanical
     source_files:

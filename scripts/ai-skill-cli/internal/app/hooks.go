@@ -3191,6 +3191,21 @@ var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
 	"obligation.commit.enforcement_rule_registry_sync": func(c commitMsgCtx) string {
 		return validateEnforcementRuleRegistrySync(c.text, c.staged, c.root)
 	},
+	"obligation.commit.plan_tree_frontmatter": func(c commitMsgCtx) string {
+		return validatePlanTreeFrontmatter(c.text, c.staged, c.root)
+	},
+	"obligation.commit.plan_tree_archive_order": func(c commitMsgCtx) string {
+		return validatePlanTreeArchiveOrder(c.text, c.staged, c.root)
+	},
+	"obligation.commit.plan_tree_parent_reference": func(c commitMsgCtx) string {
+		return validatePlanTreeParentReference(c.text, c.staged, c.root)
+	},
+	"obligation.commit.plan_tree_unique_id": func(c commitMsgCtx) string {
+		return validatePlanTreeUniqueID(c.text, c.staged, c.root)
+	},
+	"obligation.commit.plan_tree_folder_convention": func(c commitMsgCtx) string {
+		return validatePlanTreeFolderConvention(c.text, c.staged, c.root)
+	},
 }
 
 // defaultCommitMsgDispatchOrder is the fallback order if
@@ -3218,6 +3233,11 @@ var defaultCommitMsgDispatchOrder = []string{
 	"obligation.commit.plan_archival_audit",
 	"obligation.commit.enforcement_registry_transition",
 	"obligation.commit.enforcement_rule_registry_sync",
+	"obligation.commit.plan_tree_frontmatter",
+	"obligation.commit.plan_tree_archive_order",
+	"obligation.commit.plan_tree_parent_reference",
+	"obligation.commit.plan_tree_unique_id",
+	"obligation.commit.plan_tree_folder_convention",
 }
 
 // readPerCommitObligationsOrder reads the per_commit_obligations id

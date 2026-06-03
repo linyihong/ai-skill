@@ -317,6 +317,36 @@ per_commit_obligations:
     severity: block
     opt_out_marker: "[skip-enforcement-registry-sync]"
     contract_source: plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md (Phase 5 — Bootstrap Integration item 3); dual-gate companion to Phase 3 compile-time orphan_rule lint
+  - id: obligation.commit.plan_tree_frontmatter
+    fires: every_commit_staging_sub_or_spike_plan_md
+    validator: validatePlanTreeFrontmatter
+    severity: block
+    opt_out_marker: "[skip-plan-tree-frontmatter]"
+    contract_source: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/02-validator-implementation.md (Phase 2)
+  - id: obligation.commit.plan_tree_archive_order
+    fires: every_commit_staging_main_plan_md_under_plans_archived
+    validator: validatePlanTreeArchiveOrder
+    severity: block
+    opt_out_marker: "[skip-plan-tree-archive-order]"
+    contract_source: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/02-validator-implementation.md (Phase 2)
+  - id: obligation.commit.plan_tree_parent_reference
+    fires: every_commit_staging_sub_or_spike_plan_md
+    validator: validatePlanTreeParentReference
+    severity: block
+    opt_out_marker: "[skip-plan-tree-parent-reference]"
+    contract_source: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/02-validator-implementation.md (Phase 2)
+  - id: obligation.commit.plan_tree_unique_id
+    fires: every_commit_staging_plan_md_with_frontmatter_id
+    validator: validatePlanTreeUniqueID
+    severity: block
+    opt_out_marker: "[skip-plan-tree-unique-id]"
+    contract_source: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/02-validator-implementation.md (Phase 2)
+  - id: obligation.commit.plan_tree_folder_convention
+    fires: every_commit_staging_plan_md_in_plan_folder
+    validator: validatePlanTreeFolderConvention
+    severity: warning
+    opt_out_marker: "[skip-plan-tree-folder-convention]"
+    contract_source: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/02-validator-implementation.md (Phase 2)
 
 per_commit_dispatcher_status:
   machine_iterable: true
