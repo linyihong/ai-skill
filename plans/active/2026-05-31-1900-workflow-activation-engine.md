@@ -111,9 +111,9 @@ Feedback (existing: feedback/history/<domain>/)
 
 逐條核對本 plan §Open Questions，標記處置：
 
-- [ ] 已讀本 plan §Open Questions 全部條目
-- [ ] 對每條標記 `resolved` / `still-open` / `deferred`
-- [ ] 新發現問題已加入 §Open Questions
+- [x] 已讀本 plan §Open Questions 全部條目
+- [x] 對每條標記 `resolved` / `still-open` / `deferred`（2026-06-04：resolved Q2/Q3/Q4/Q5/Q9/Q10/Q11；still-open/deferred Q1+Q8=本 Phase 0.2 gate、Q6 舊格式無限期相容、Q7 artifact_signals 掃時機=Phase 3 細節）
+- [x] 新發現問題已加入 §Open Questions（Phase 0.2 執行新發現：plan 12-value `route_type` enum 未涵蓋實際 57 routes/20 prefix → 見下方 Phase 0.2a 落地記錄與 ADR-012）
 
 #### Phase 0.1 — Architecture Compatibility Preflight
 
@@ -192,18 +192,26 @@ intelligence 層本質是 **mixed layer** —— 介於 analysis / workflow / go
     secondary intelligence atoms"
 ```
 
-**Phase 0.2 必加 Audit Gate**：所有 `route.intelligence.*`（目前 7 條）在 v4 推進到 Phase 1 之前，**每一條必須個別決策 activation_mode**。產出 audit table 列為 Phase 0.2 acceptance criteria：
+**Phase 0.2 必加 Audit Gate**：所有 `route.intelligence.*` + `route.analysis.*`（must-declare）在推進到 Phase 1 之前，**每一條必須個別決策 activation_mode**。
 
-| Route ID | 用於什麼任務 | 是 primary 還是 secondary | 決定的 activation_mode |
+**✅ LOCKED 2026-06-04（user-reviewed，registry 實際為 6 intelligence + 2 analysis，非草稿的 7）**：
+
+| Route ID | 用於什麼任務 | session-entry-point？ | **LOCKED activation_mode** |
 |---|---|---|---|
-| route.intelligence.architectural-fit | 系統架構評審 | primary | **auto-detect**（暫定，Phase 0.2 確認） |
-| route.intelligence.requirements-cognition | 需求認知拆解 | primary | **auto-detect**（暫定） |
-| route.intelligence.engineering.heuristics | 實作任務輔助 | secondary | **advisory**（暫定） |
-| route.intelligence.engineering.agent-architecture | agent 設計參考 | mixed | **must-declare per use case** |
-| route.intelligence.apk-analysis.atoms | APK 分析輔助 | secondary | **advisory**（暫定） |
-| route.intelligence.apk-highest-leverage-path | APK 高槓桿路徑分析 | primary | **auto-detect**（暫定） |
+| route.intelligence.architectural-fit | 系統架構選型/評審 | ✅ primary entry | **auto-detect** |
+| route.intelligence.requirements-cognition | 需求認知/BDD/acceptance | ✅ primary entry | **auto-detect** |
+| route.intelligence.apk-highest-leverage-path | APK 分析路線選擇（「先做什麼最有效」可為會話起點） | ✅ primary entry | **auto-detect** |
+| route.analysis.apk.workflows | 執行 APK 分析操作流程 | ✅ primary entry | **auto-detect** |
+| route.analysis.web | 執行 Web Scraping 分析 | ✅ primary entry | **auto-detect** |
+| route.intelligence.apk-analysis.atoms | APK 分析工程智慧（依附 apk 流程） | ❌ secondary | **advisory** |
+| route.intelligence.engineering.heuristics | 通用工程 heuristics（實作任務 hint） | ❌ secondary | **advisory** |
+| route.intelligence.engineering.agent-architecture | AI agent 設計（meta-system-design 級，一般工程不該載入） | ❌ 需顯式 | **on-demand** |
 
-> Phase 0.2 acceptance criteria 加一條：**intelligence audit table 已 user-reviewed，每條 route 有明確 activation_mode 決策**，否則 Phase 1+ 不得啟動。
+> **決策修訂記錄**：apk-highest-leverage-path 由草稿 advisory 提案 → user 修正為 **auto-detect**（理由：「先 Frida 還是先抓 API / 最高槓桿路線是什麼」本身就是 route selection 主任務，可為會話起點，與 architectural-fit / requirements-cognition 同類）。agent-architecture 由 advisory 提案 → user 修正為 **on-demand**（理由：屬 governance/architecture/meta-system-design 層，advisory 易在一般工程任務被誤帶入）。
+>
+> **Classification heuristic（user 提供，已升格為 canonical 規則，寫入 `routing-registry.yaml` §route_type_spec + ADR-012）**：route 可作為使用者獨立任務入口 → primary candidate → 預設 auto-detect；route 必須依附其他 route 才有意義 → secondary candidate → advisory / on-demand。此規則機械可判定，取代主觀 primary/secondary 判斷。
+
+> Phase 0.2 acceptance criteria：**intelligence + analysis audit table 已 user-reviewed（✅ 2026-06-04），每條 route 有明確 activation_mode 決策** → Phase 1 解鎖。
 
 ##### Phase 0.2a-extensibility — 未來其他 mixed-layer types
 
@@ -254,11 +262,12 @@ intelligence 層本質是 **mixed layer** —— 介於 analysis / workflow / go
 
 ##### 產出
 
-- [ ] `routing-registry.yaml` header 加：
-  - `route_type_spec`（12 enum + 對應預設 activation_mode 表）
-  - `activation_mode_spec`（4 mode + capability matrix）
-- [ ] 每條 route 加 `route_type:` 欄位（required）+ optional `activation_mode:`（override 用，預設由 type 推導）
-- [ ] 預估初始分布（依 route_type 自動推導）：always-on ~12、auto-detect ~12、on-demand ~25、advisory ~8
+- [x] `routing-registry.yaml` header 加（2026-06-04）：
+  - `route_type_spec`（**16 enum**（plan 草稿 12 + 落地擴充 4）+ 對應預設 activation_mode 表 + invariant + classification_heuristic + folds + must_declare）
+  - `activation_mode_spec`（**5 mode**（含 manual-lock）+ capability matrix）
+- [x] 每條 route 加 `route_type:` 欄位（required，57/57）+ `activation_mode:`（8 must-declare + 2 override = 10 條顯式）
+- [x] **Enum 擴充裁決（user-approved 2026-06-04，記入 ADR-012）**：plan 草稿 12-value enum 未涵蓋實際 57 routes（20 prefix）。新增 4 type：`runtime_doc`（on-demand，非核心 runtime.* 13+1）、`memory`（on-demand）、`validation`（on-demand，fold evaluations.*）、`anti_patterns`（advisory）。Fold：`skill`→metadata、`traces`→metadata（暫時，>3~5 條再拆 `observability`）、`evaluations`→validation。**16-type enum 標為 interim compatibility layer，非長期 ontology（見 Q10 + ADR-012）**。
+- [x] 實際初始分布（依 route_type 推導 + override）：always-on 5（bootstrap 1 + runtime_core 4）、auto-detect 12（workflow 5 + analysis 2 + intelligence 3 + override 2）、on-demand 32、advisory 8
 
 ### Phase 1 — Detector Schema 定義（two-phase activation 破環依賴）
 
@@ -541,7 +550,7 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 | Q3 | Conflict resolution 多 route 命中時自動選還是 prompt user？ | **resolved** (v1) → 不自動選，注入 reminder 讓 agent 走 `workflow-routing.md`（v2/v3 close-out 誤標 still-open，v4 修正） |
 | Q8 | `route.intelligence.*` 全部 7 條 audit 結果是什麼？ | **new (v4)，still-open**：Phase 0.2a-special audit table 需 user 逐條 review，產出 acceptance criteria 之一。表中暫定值僅供討論。 |
 | Q9 | v1-v4 寫作期間 sanitization gate 未自我觸發，project incident details 洩漏進 canonical plan 文件。是否要把 mechanical sanitization validator 納入本 plan scope？ | **new (v5)，resolved → out-of-scope**：sanitization gap 本質與 workflow detector gap 同類（behavioral 強制無 mechanical hook），但若併入本 plan 會擴張 scope。**獨立 follow-up plan**：`plans/active/2026-05-31-2000-mechanical-sanitization-validator.md`。v5 patch 已抹除既存洩漏。 |
-| Q10 | `route_type` 把 capability / activation / knowledge_domain 三個正交軸壓進單一 enum，導致 namespace 衝突（`analysis/apk/workflows/` vs `workflow/apk-analysis/` vs `intelligence/apk-analysis/` 三條路徑指同一主題）。長期是否該拆三軸？ | **new (v6)，resolved → out-of-scope，記為 future plan**：診斷正確且影響深遠，但拆三軸是 ontology 級重構，本 plan scope 不容。**未來 plan stub**：`plans/active/<TBD>-route-ontology-split.md`（待開）。本 plan v6 起 `route_type` 文件加註「single-axis，將被 capability_type + activation_type + knowledge_domain 三軸取代」warning，讓新 route 作者預期 future migration。 |
+| Q10 | `route_type` 把 capability / activation / knowledge_domain 三個正交軸壓進單一 enum，導致 namespace 衝突（`analysis/apk/workflows/` vs `workflow/apk-analysis/` vs `intelligence/apk-analysis/` 三條路徑指同一主題）。長期是否該拆三軸？ | **new (v6)，resolved → out-of-scope，記為 future plan**：診斷正確且影響深遠，但拆三軸是 ontology 級重構，本 plan scope 不容。**未來 plan stub**：`plans/active/<TBD>-route-ontology-split.md`（待開）。**v8 更新（2026-06-04）**：Phase 0.2 落地時 enum 由 12→16，user 明確要求把「16-type enum is an interim compatibility layer, not the long-term ontology model」+ 長期三軸方向（capability_domain × activation_family × knowledge_domain）+ `route_type` 可能完全消失，durable 記入 **ADR-012**（已寫 + 已入 constitution README 索引），並在 `routing-registry.yaml` §route_type_spec `status: interim-compatibility-layer` 標記。額外 TODO：`traces.*` 暫 fold `metadata`，待 traces/observability 類 > 3~5 條再拆 `observability` type。future plan 開立前，ADR-012 為 interim 決策的 source of truth。 |
 | Q11 | 本 plan 與 parent meta-plan 的 binding 寫入時機？ | **new (v7)，resolved**：parent plan `mechanical-enforcement-registry` Phase 2 schema 已 list 本 plan 為 `bindings[workflow_activation]` with `status: pending` + `child_plan` 指向本 plan。本 plan 任一 phase 進入 implementation 並 land executor 後，registry 對應 entry 改 `status: active`。compile-time lint 在那之前不阻擋（pending 是合法狀態）。 |
 | Q4 | `workflow_sessions` TTL？跨 session 是否保留？ | **resolved → Phase 4.0**：本 plan 不落 SQLite，TTL 等於 in-memory RuntimeContext 生命週期（process scope）。跨 session 持久化延後到 Phase 4.1 follow-up plan。 |
 | Q5 | Detector miss 是否 fallback 到 Discovery？ | **resolved → Phase 6.1**：採納第二輪評審，**Yes** 但有限制 —— Discovery 只在 detector miss 時 fire（不是 per-turn），結果寫 `route-candidate-proposals.yaml` 供未來 review，不阻擋當前執行流程。 |

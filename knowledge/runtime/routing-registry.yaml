@@ -9,8 +9,101 @@ description: >
   舊 skills scaffold 已退役；Agent 仍需依 required_dependencies 讀取必要入口與驗證規則。
 refresh_policy: knowledge/runtime/refresh-policy.yaml
 
+# ─────────────────────────────────────────────────────────────────────────
+# route_type_spec — self-declared Activation Behavior Family (NOT knowledge
+# domain, NOT capability). Each route declares one route_type; the type
+# derives a default activation_mode. See constitution/ADR-012 for the
+# "route_type == activation behavior family" invariant and the interim-layer
+# rationale (16-type enum is a transitional compatibility model, not the
+# long-term ontology — long term splits into capability_domain ×
+# activation_family × knowledge_domain per Open Question Q10).
+# Operational spec: governance/workflow-activation-engine.md.
+# ─────────────────────────────────────────────────────────────────────────
+route_type_spec:
+  invariant: >
+    route_type describes ONLY the activation behavior family (when/how a route
+    becomes active). It must never encode knowledge domain (apk / travel /
+    architecture) or capability. Mixing axes is the Q10 ontology-collapse trap.
+  classification_heuristic: >
+    Session-entry-point test — if a route can stand alone as a user's primary
+    task entry point, it is a primary candidate (default auto-detect). If it
+    only has meaning when attached to another route, it is a secondary
+    candidate (advisory or on-demand). This rule is mechanically decidable and
+    supersedes prose "primary/secondary" judgement as route count scales.
+  status: interim-compatibility-layer  # see ADR-012; not the final model
+  enum:
+    # type -> default activation_mode
+    bootstrap:      always-on
+    runtime_core:   always-on     # only phase-machine/obligation-ledger/blocking-gates/recovery
+    runtime_doc:    on-demand      # NEW v1: non-core runtime.* reference docs
+    workflow:       auto-detect
+    analysis:       must-declare   # mixed primary/secondary -> explicit mode required
+    intelligence:   must-declare   # mixed primary/secondary -> explicit mode required
+    governance:     on-demand
+    constitution:   on-demand
+    architecture:   on-demand
+    feedback:       advisory
+    metadata:       on-demand       # absorbs skill.* and traces.* (interim fold)
+    ai_tools:       on-demand
+    models:         advisory
+    memory:         on-demand       # NEW v1: memory subsystem (1st-class runtime capability)
+    validation:     on-demand       # NEW v1: absorbs evaluations.* (both answer "how do I prove it works")
+    anti_patterns:  advisory        # NEW v1: negative intelligence (known traps / failure signatures)
+  folds:
+    skill: metadata          # skill.discovery == registry metadata
+    evaluations: validation  # eval results are validation evidence
+    traces: metadata         # interim; split to `observability` once traces-class > 3-5 routes (ADR-012 TODO)
+  must_declare_types: [analysis, intelligence]
+  must_declare_lint: >
+    commit-msg validator (deferred to Phase 3 Go work): if route_type in
+    must_declare_types AND activation_mode unset -> reject. Prevents
+    mis-categorizing primary vs secondary mixed-layer routes via a silent
+    default. See plan Phase 0.2a-special.
+
+# ─────────────────────────────────────────────────────────────────────────
+# activation_mode_spec — capability matrix per mode. manual-lock is
+# runtime-assigned (user explicit lock), never author-declared in this file.
+# ─────────────────────────────────────────────────────────────────────────
+activation_mode_spec:
+  modes: [always-on, auto-detect, on-demand, advisory, manual-lock]
+  capability_matrix:
+    always-on:
+      can_preload: true
+      can_activate: n/a            # always loaded
+      can_conflict: false
+      requires_activation_triggers: false
+      auto_expire: false
+    auto-detect:
+      can_preload: false
+      can_activate: true           # detector activates on trigger hit
+      can_reinforce: true
+      can_conflict: true           # multi-hit -> workflow/workflow-routing.md Stage 2
+      requires_activation_triggers: true
+      auto_expire: true            # task end
+    on-demand:
+      can_preload: false
+      can_activate: true           # only on explicit user invocation
+      can_conflict: false
+      requires_activation_triggers: false
+      auto_expire: true            # per-turn
+    advisory:
+      can_preload: false
+      can_activate: false          # never standalone-locks ActiveRoute
+      can_reinforce: true
+      can_conflict: false
+      can_suggest_promotion: true
+      requires_activation_triggers: false  # weak signals OK
+      auto_expire: true            # task end
+    manual-lock:                   # runtime-assigned only (user explicit lock)
+      can_activate: user-only
+      can_conflict: false          # user already adjudicated
+      can_override_detector: true  # user > detector
+      auto_expire: false           # sticky until explicit release / session end
+      author_declarable: false
+
 records:
   - id: route.bootstrap.ai-skill
+    route_type: bootstrap
     task_intent: 啟動或接手 Ai-skill work
     primary_source: CORE_BOOTSTRAP.md
     required_dependencies:
@@ -40,6 +133,7 @@ records:
       reason: Bootstrap 階段只需要 Core Bootstrap 3 rules 與 OS layout，不需要完整 source。
 
   - id: route.runtime.phase-machine
+    route_type: runtime_core
     task_intent: 載入目前 phase 狀態、allowed/forbidden actions、phase transition rules
     primary_source: runtime/runtime.db
     required_dependencies:
@@ -67,6 +161,7 @@ records:
       reason: Phase Machine 是執行階段的核心狀態機，每個 session 啟動後必須載入。
 
   - id: route.runtime.obligation-ledger
+    route_type: runtime_core
     task_intent: 載入本 phase 的未完成義務清單，確認執行前義務已滿足
     primary_source: runtime/runtime.db
     required_dependencies:
@@ -93,6 +188,7 @@ records:
       reason: Obligation Ledger 是執行階段的義務檢查清單，每個 phase entry 時必須載入。
 
   - id: route.runtime.blocking-gates
+    route_type: runtime_core
     task_intent: 載入本 phase 的阻斷閘門，確認 phase transition 是否被允許
     primary_source: runtime/runtime.db
     required_dependencies:
@@ -120,6 +216,7 @@ records:
       reason: Blocking Gates 是執行階段的阻斷檢查，每個 phase transition 前必須載入。
 
   - id: route.runtime.recovery
+    route_type: runtime_core
     task_intent: 載入 phase 修復策略，處理 blocking gate 阻斷或 phase state 損毀
     primary_source: runtime/runtime.db
     required_dependencies:
@@ -159,6 +256,7 @@ records:
       reason: State Repair System 在 blocking gate 阻斷時才需要載入，不佔用 bootstrap 預算。
 
   - id: route.runtime.scheduler
+    route_type: runtime_doc
     task_intent: 載入 execution queue 排程規則，決定 obligations/gates 的執行順序
     primary_source: runtime/runtime.db
     required_dependencies:
@@ -187,6 +285,7 @@ records:
       reason: Scheduler 在 phase entry 時載入，決定 execution queue 的優先順序。
 
   - id: route.runtime.transactions
+    route_type: runtime_doc
     task_intent: 管理 Ai-skill writeback transaction 的生命週期
     primary_source: runtime/runtime.db
     required_dependencies:
@@ -215,6 +314,7 @@ records:
       reason: Transaction Runtime 在需要寫入 Ai-skill 檔案時才載入，不佔用 bootstrap 預算。
 
   - id: route.skill.discovery
+    route_type: metadata
     task_intent: 根據 task intent 找到對應 route
     primary_source: knowledge/runtime/routing-registry.yaml
     required_dependencies:
@@ -241,6 +341,7 @@ records:
       reason: Routing registry 輕量（~300 tokens），可在整個對話中 cache。
 
   - id: route.runtime.context-ttl
+    route_type: runtime_doc
     task_intent: 管理 context 生命週期，防止 token 膨脹
     primary_source: governance/ai-runtime-governance/context-attention-governance.md
     required_dependencies:
@@ -271,6 +372,7 @@ records:
       reason: 多數 context drift 先讀治理 gate 與 source intelligence；修改 runtime policy 時再展開 ttl-policy.yaml。
 
   - id: route.runtime.prompt-cache-alignment
+    route_type: runtime_doc
     task_intent: 管理 provider prompt cache layout，穩定 prefix 並隔離高變動 context
     primary_source: runtime/context/prompt-cache-playbook.md
     required_dependencies:
@@ -307,6 +409,7 @@ records:
       reason: 先讀 prompt-cache summary 與 playbook；修改 metadata 或 enforcement 時再讀 full source。
 
   - id: route.governance.durable-goal-boundary
+    route_type: governance
     task_intent: 維護 active goal 與 durable roadmap goal 邊界
     primary_source: enforcement/conversation-goal-ledger.md
     required_dependencies:
@@ -337,6 +440,7 @@ records:
       reason: Goal 刪除與 durable planning gate 會影響 long-term state，需讀 shared rule source。
 
   - id: route.governance.ai-runtime-five-step
+    route_type: governance
     task_intent: 新增或擴張 skill、workflow、rule、memory、context、automation 或 runtime surface 前，套用 five-step AI runtime governance
     primary_source: governance/ai-runtime-governance/five-step-ai-governance.md
     required_dependencies:
@@ -367,6 +471,7 @@ records:
       reason: 只有 governance / architecture / automation 擴張決策需要讀取完整 five-step governance；一般任務不常駐載入。
 
   - id: route.runtime.context-loading
+    route_type: runtime_doc
     task_intent: 決定 runtime context loading 路線
     primary_source: governance/lifecycle/routing-philosophy.md
     required_dependencies:
@@ -397,6 +502,7 @@ records:
       reason: routing decision 可先用 registry、index、summary；修改 source 時再升級。
 
   - id: route.governance.routing-signal
+    route_type: governance
     task_intent: 防止 routing signal 漂移，確認 task intent、primary source、negative signal 與 multi-route disambiguation
     primary_source: governance/ai-runtime-governance/routing-signal-governance.md
     required_dependencies:
@@ -426,6 +532,7 @@ records:
       reason: 多數路由疑義先讀治理 gate 與 source intelligence；只有修改 workflow/routing surface 時再展開 registry 和 activation table。
 
   - id: route.governance.validation-scenario
+    route_type: governance
     task_intent: 決定 AI failure 是否 promotion 為 stateless validation scenario，或設計 scenario gate
     primary_source: governance/ai-runtime-governance/validation-scenario-governance.md
     required_dependencies:
@@ -456,6 +563,7 @@ records:
       reason: 先讀 scenario governance 與 source intelligence；建立或修改 scenario 時再展開 validation format 與 failure-learning source。
 
   - id: route.governance.cognitive-state-evidence
+    route_type: governance
     task_intent: 處理 assumption、evidence quality、confidence decay、claim scope、intent drift、cognitive contamination 或 autonomy downgrade 的治理決策
     primary_source: governance/ai-runtime-governance/cognitive-state-governance.md
     required_dependencies:
@@ -488,6 +596,7 @@ records:
       reason: 先讀治理主文與 evidence hierarchy；只有修改 runtime guard、metadata evidence 或 validation scenario 時才展開相關 source。
 
   - id: route.metadata.knowledge-atom-schema
+    route_type: metadata
     task_intent: 設計或評估 Knowledge Atom metadata
     primary_source: metadata/schema.md
     required_dependencies:
@@ -520,6 +629,7 @@ records:
       reason: 建立或修改 atom metadata 時需讀 schema 與子規則全文。
 
   - id: route.workflow.apk-analysis
+    route_type: workflow
     task_intent: 執行授權 APK analysis 能力
     activation_triggers:
       task_intents:
@@ -633,6 +743,8 @@ records:
       reason: APK analysis 需要 workflow、analysis methods 與 domain-specific intelligence routing。
 
   - id: route.intelligence.apk-highest-leverage-path
+    route_type: intelligence
+    activation_mode: auto-detect
     task_intent: 選擇 APK 分析最高收益路線
     primary_source: intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md
     required_dependencies:
@@ -663,6 +775,7 @@ records:
       reason: APK route selection 需要 domain workflow、feedback source 與 intelligence judgment 一起判斷。
 
   - id: route.feedback.promotion-pipeline
+    route_type: feedback
     task_intent: 規劃 feedback lesson promotion 或 downgrade
     primary_source: feedback/promotion/README.md
     required_dependencies:
@@ -696,6 +809,7 @@ records:
       reason: Promotion / downgrade 會影響 enforcement rules、skill history、intelligence 與 runtime surfaces，需要讀 full source 與 validation gates。
 
   - id: route.models.model-aware-routing
+    route_type: models
     task_intent: 建立或使用 model-aware routing / compression strategy
     primary_source: models/README.md
     required_dependencies:
@@ -731,6 +845,7 @@ records:
       reason: 修改 model strategy 會影響 runtime routing，需讀 profiles、compression 與 routing source。
 
   - id: route.memory.retrieval-activation
+    route_type: memory
     task_intent: 建立或使用 memory retrieval / activation / replay governance
     primary_source: memory/README.md
     required_dependencies:
@@ -767,6 +882,7 @@ records:
       reason: Memory replay 會影響 context budget、evidence scope 與 contamination risk，需讀 source-backed governance。
 
   - id: route.runtime.router-flow
+    route_type: runtime_doc
     task_intent: 了解 context routing 決策流程
     primary_source: runtime/README.md
     required_dependencies:
@@ -795,6 +911,8 @@ records:
       reason: Router flow 是設計文件，需要 routing 決策時才讀。
 
   - id: route.intelligence.engineering.heuristics
+    route_type: intelligence
+    activation_mode: advisory
     task_intent: 套用通用工程經驗法則（field confidence、magic bytes、document priority、premature optimization 等）
     primary_source: intelligence/engineering/heuristics/README.md
     required_dependencies:
@@ -829,6 +947,7 @@ records:
       reason: 通用 heuristics 在需要對應判斷時才讀取完整 atom。
 
   - id: route.runtime.context-ttl-doc
+    route_type: runtime_doc
     task_intent: 了解 context TTL 與 prune 策略
     primary_source: governance/lifecycle/context-ttl-philosophy.md
     required_dependencies:
@@ -855,6 +974,7 @@ records:
       reason: TTL doc 是設計文件，需要 prune context 時才讀。
 
   - id: route.workflow.software-delivery
+    route_type: workflow
     task_intent: 產出 app/API/embedded development guidance
     activation_triggers:
       task_intents:
@@ -1035,6 +1155,7 @@ records:
       reason: App development guidance 需要 workflow、analysis methods 與 domain-specific controls/checklists routing。triggers 已擴充以支援中途切換。
 
   - id: route.workflow.greenfield
+    route_type: workflow
     task_intent: 從零開始的新專案標準化流程（specify → plan → tasks → implement）
     activation_triggers:
       task_intents:
@@ -1087,6 +1208,7 @@ records:
       reason: Greenfield 需要 workflow、templates 與 software-delivery 的 BDD Closure 整合。
 
   - id: route.workflow.travel-planning
+    route_type: workflow
     task_intent: 規劃 evidence-based travel itinerary
     activation_triggers:
       task_intents:
@@ -1125,6 +1247,7 @@ records:
       reason: Travel planning 需要 workflow、analysis methods 與 domain-specific intelligence routing。
 
   - id: route.workflow.documentation-ai-native
+    route_type: workflow
     task_intent: 在業務專案或其他 repo 撰寫或整理 agent 友善文件、降低無效 token、建立穩定分類與索引
     activation_triggers:
       task_intents:
@@ -1174,6 +1297,7 @@ records:
       reason: 多數任務只需 workflow README 與 execution-flow；policy 全文留在 enforcement。
 
   - id: route.runtime.onboarding
+    route_type: runtime_doc
     task_intent: 新 session 或新專案的快速啟動指引
     primary_source: runtime/onboarding/apk-analysis-setup.md
     required_dependencies:
@@ -1203,6 +1327,8 @@ records:
       reason: Onboarding 文件在需要執行對應 workflow 的完整流程時才讀取。
 
   - id: route.analysis.apk.workflows
+    route_type: analysis
+    activation_mode: auto-detect
     task_intent: 執行 APK 分析操作流程（Frida hook、API 文件化、local proxy、media HLS）
     primary_source: analysis/apk/workflows/README.md
     required_dependencies:
@@ -1234,6 +1360,8 @@ records:
       reason: 需要執行對應操作流程時才讀取完整 workflow。
 
   - id: route.analysis.web
+    route_type: analysis
+    activation_mode: auto-detect
     task_intent: 執行 Web Scraping 分析（網站評估、工具選擇、提取策略設計、風險評估）
     primary_source: analysis/web/README.md
     required_dependencies:
@@ -1267,6 +1395,8 @@ records:
       reason: Web Scraping analysis 在需要從網頁提取資料時才讀取，不佔用 bootstrap 預算。
 
   - id: route.intelligence.apk-analysis.atoms
+    route_type: intelligence
+    activation_mode: advisory
     task_intent: 套用 APK 分析工程智慧（heuristics、anti-patterns、failure、signals）
     primary_source: intelligence/engineering/apk-analysis/README.md
     required_dependencies:
@@ -1305,6 +1435,8 @@ records:
       reason: 需要對應決策智慧時才讀取完整 atom。
 
   - id: route.intelligence.requirements-cognition
+    route_type: intelligence
+    activation_mode: auto-detect
     task_intent: 判斷 product impact alignment、需求理解、BDD-lite、behavior contract、acceptance criteria、ambiguity、requirement traceability、validation target 或 mutation testing test effectiveness
     primary_source: intelligence/engineering/requirements/README.md
     required_dependencies:
@@ -1355,6 +1487,8 @@ records:
       reason: 多數需求任務先讀 requirements README 與 summary；高 ambiguity 時再展開 behavior / specification / validation docs。
 
   - id: route.intelligence.architectural-fit
+    route_type: intelligence
+    activation_mode: auto-detect
     task_intent: 判斷軟體架構選型、DDD adoption、bounded context、CQRS、event sourcing、microservices 或 architecture overengineering
     primary_source: intelligence/engineering/architecture/architectural-fit/README.md
     required_dependencies:
@@ -1397,6 +1531,7 @@ records:
       reason: 先讀 architectural-fit README 與 metadata，只有在 high-complexity 或 DDD 訊號強時展開完整 DDD tactical docs。
 
   - id: route.validation.ai-decision-contract
+    route_type: validation
     task_intent: 驗證 AI 的 decision path、rule obedience、routing stability
     primary_source: validation/README.md
     required_dependencies:
@@ -1462,6 +1597,8 @@ records:
       reason: 需要驗證 AI 決策品質時才讀取完整 scenario 與 rule 定義。
 
   - id: route.intelligence.engineering.agent-architecture
+    route_type: intelligence
+    activation_mode: on-demand
     task_intent: 了解 AI Agent 自身運作智慧（context collapse、rule overload、task routing、attention budgeting、failure recovery、cognitive boundaries、pilot-first validation、failure-to-scenario closure、linked-updates completeness、decomposition strategy、stateless validation）
     primary_source: intelligence/engineering/agent-architecture/README.md
     required_dependencies:
@@ -1500,6 +1637,7 @@ records:
       reason: agent-architecture atoms 在需要理解 AI 行為模式時才讀取完整內容。
 
   - id: route.feedback.history
+    route_type: feedback
     task_intent: 查詢或新增 feedback lesson
     primary_source: feedback/history/README.md
     required_dependencies:
@@ -1530,6 +1668,8 @@ records:
       reason: feedback/history 在需要查詢或新增 lesson 時才讀取。
 
   - id: route.runtime.decision-recording
+    route_type: runtime_doc
+    activation_mode: auto-detect
     task_intent: 記錄或查詢本輪鎖定的設計決策（寫入哪一層、用何格式）
     activation_triggers:
       task_intents:
@@ -1570,6 +1710,7 @@ records:
       reason: 避免決策只留在 plan 或對話；查問題時依 lookup.by_symptom 回溯。
 
   - id: route.constitution.adr
+    route_type: constitution
     task_intent: 查詢或記錄架構決策、了解歷史決策脈絡、或確認某個決策是否已有 ADR
     primary_source: constitution/README.md
     required_dependencies:
@@ -1604,6 +1745,7 @@ records:
       reason: constitution/ 在需要查詢歷史決策或建立新 ADR 時才讀取。
 
   - id: route.governance.decision-promotion-pipeline
+    route_type: governance
     task_intent: Classify runtime, session, project, and architecture decisions into their correct promotion target instead of defaulting to ADR
     primary_source: governance/lifecycle/decision-promotion-pipeline.yaml
     required_dependencies:
@@ -1640,6 +1782,7 @@ records:
       compression_level: source-backed
       reason: Load only when recording, promoting, or reclassifying a decision.
   - id: route.architecture.permanent-docs
+    route_type: architecture
     task_intent: 查詢永久性架構定義、了解 OS 層級設計原則與相容性策略
     primary_source: architecture/README.md
     required_dependencies:
@@ -1668,6 +1811,7 @@ records:
       reason: architecture/ 在需要查詢架構定義或設計原則時才讀取。
 
   - id: route.evaluations.scenario-results
+    route_type: validation
     task_intent: 查詢或記錄 validation scenario 的實際執行結果
     primary_source: evaluations/README.md
     required_dependencies:
@@ -1694,6 +1838,7 @@ records:
       reason: evaluations/ 在需要查詢或記錄 scenario 執行結果時才讀取。
 
   - id: route.ai-tools.agent-onboarding
+    route_type: ai_tools
     task_intent: 新增或修改 AI agent 工具 adapter、root bootstrap 入口、工具設定與 onboarding checklist
     primary_source: ai-tools/agent-onboarding.yaml
     required_dependencies:
@@ -1731,6 +1876,7 @@ records:
       compression_level: source-backed
       reason: 只有在新增或修改 agent 工具設定、adapter 或 bootstrap 入口時才載入。
   - id: route.ai-tools.new-project-onboarding
+    route_type: ai_tools
     task_intent: 新專案初始化、ai-skill init-project、project-level bootstrap files 與工具清單同步
     primary_source: ai-tools/new-project-onboarding.yaml
     required_dependencies:
@@ -1771,6 +1917,7 @@ records:
       reason: 只有在修改新專案初始化、工具清單或 project bootstrap files 時才載入。
 
   - id: route.tools.metadata-routing
+    route_type: ai_tools
     task_intent: 查詢 tool metadata、compression 策略或 routing 規則
     primary_source: tools/README.md
     required_dependencies:
@@ -1799,6 +1946,7 @@ records:
       reason: tools/ 在需要查詢 tool 設定或 routing 規則時才讀取。
 
   - id: route.traces.decision-traces
+    route_type: metadata
     task_intent: 查詢或記錄 AI 的實際 decision trace
     primary_source: traces/README.md
     required_dependencies:
@@ -1825,6 +1973,7 @@ records:
       reason: traces/ 在需要查詢或記錄 decision trace 時才讀取。
 
   - id: route.anti-patterns.runtime-patterns
+    route_type: anti_patterns
     task_intent: 查詢 AI Runtime 常見 anti-patterns 的症狀、預防與恢復方式
     primary_source: anti-patterns/README.md
     required_dependencies:
@@ -1858,6 +2007,7 @@ records:
   # ── P2 Routes ──
 
   - id: route.runtime.compiler
+    route_type: runtime_doc
     task_intent: 編譯 prose workflow/enforcement 文件為 machine-readable YAML
     primary_source: runtime/runtime.db
     required_dependencies:
@@ -1886,6 +2036,7 @@ records:
       reason: Compiler 在 workflow/enforcement 文件變更後才需要執行，不佔用 bootstrap 預算。
 
   - id: route.runtime.intelligence-routing
+    route_type: runtime_doc
     task_intent: 根據 phase + task intent 路由到 intelligence/ 層的領域知識
     primary_source: runtime/runtime.db
     required_dependencies:
@@ -1914,6 +2065,7 @@ records:
   # ── P2.5 Routes ──
 
   - id: route.runtime.output-governance
+    route_type: runtime_doc
     task_intent: 載入語言強制規則與文件輸出規則，確保輸出品質
     primary_source: runtime/README.md
     required_dependencies:
@@ -1952,6 +2104,7 @@ records:
   # ── P3 Routes ──
 
   - id: route.runtime.distributed
+    route_type: runtime_doc
     task_intent: 載入 distributed runtime 鎖定機制、multi-agent 協調規則、async job 生命週期管理
     primary_source: runtime/README.md
     required_dependencies:
@@ -1990,6 +2143,7 @@ records:
       reason: Distributed Runtime 在 multi-agent 協作或 async job 執行時才需要載入，不佔用 bootstrap 預算。
 
   - id: route.runtime.cognitive-modes
+    route_type: runtime_doc
     task_intent: 載入 cognitive mode 定義、discovery signal 規則、subsystem integration contracts；任務開始前解析 4 維 mode（execution/context/governance/memory）
     manual_activation:
       reason: validators_consume_by_file_path_not_route_lookup
@@ -2034,6 +2188,7 @@ records:
       reason: Cognitive modes contract 本身是 YAML；summary-first 足夠解析 mode；只有需要 subsystem integration 細節時才展開 integration YAMLs。
 
   - id: route.governance.executable-contract-boundary
+    route_type: governance
     task_intent: 判斷治理、規則或 workflow 文件何時必須提供 YAML contract，以及哪些 contract 必須投影到 runtime.db
     primary_source: governance/lifecycle/executable-contract-boundary.yaml
     required_dependencies:
@@ -2072,6 +2227,8 @@ records:
       reason: Executable Contract Boundary 在新增流程、gate、policy contract 或調整 runtime projection 時才需要載入。
 
   - id: route.governance.system-upgrade
+    route_type: governance
+    activation_mode: auto-detect
     task_intent: 執行 framework / runtime / governance / workflow / validation / metadata / compiler / generated artifact 升級治理，避免升級只停在 document layer
     activation_triggers:
       task_intents:
@@ -2137,6 +2294,7 @@ records:
       reason: Framework 升級或 runtime path 變更會影響執行語意，需要直接讀 executable contract 而非只讀 routing entry。
 
   - id: route.governance.knowledge-update-flow
+    route_type: governance
     task_intent: 載入知識更新流程的 11 個步驟定義，決定目前 knowledge update 走到哪一步
     primary_source: governance/lifecycle/knowledge-update-flow.yaml
     required_dependencies:
@@ -2185,6 +2343,7 @@ records:
       reason: Knowledge Update Flow 在 checkpoint 或 finalize phase 需要執行知識更新時才載入，不佔用 bootstrap 預算。
 
   - id: route.knowledge.glossary
+    route_type: metadata
     task_intent: 對齊 Ai-skill framework / runtime / cognitive / architecture 共享語彙；查 term owner、status、aliases、related terms、usage paths；偵測語義漂移
     primary_source: knowledge/glossary/ai-skill.md
     required_dependencies:

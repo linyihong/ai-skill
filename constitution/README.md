@@ -43,6 +43,7 @@ accepted → deprecated → superseded
 | [ADR-007](ADR-007-constitution-and-decision-promotion-boundary.md) | Constitution and Decision Promotion Boundary | accepted | 2026-05-21 | Gen 3 |
 | [ADR-008](ADR-008-runtime-cognitive-modes.md) | Runtime Cognitive Modes（4 維 mode primitive + discovery + subsystem integration） | accepted | 2026-05-25 | Gen 3 子系統擴充 |
 | [ADR-009](ADR-009-cognitive-slice-taxonomy.md) | Cognitive Slice Taxonomy（slice schema + 三層 falsifiable placement predicate + dependency_budget heuristic） | accepted | 2026-05-31 | Gen 3 governance promotion（規範 ADR-003 三層架構的載入粒度） |
+| [ADR-012](ADR-012-route-type-activation-behavior-family.md) | `route_type` = Activation Behavior Family（單軸 interim classifier + session-entry-point heuristic + 16-type 過渡相容層） | accepted | 2026-06-04 | Gen 3 runtime hardening（Workflow Activation Engine route classification 基礎） |
 
 每個 ADR 內含 `Framework Generation` section，標註世代分類與當前世代文件連結。新增世代時依 [`governance/lifecycle/system-upgrade-governance.md`](../governance/lifecycle/system-upgrade-governance.md) §3 規則 7 評估每個 ADR 的延伸狀態。
 
