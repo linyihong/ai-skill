@@ -1245,6 +1245,11 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 		}
 	}
 	cursorStop := isCursorStopPayload(payload)
+	if cursorStop && isCursorAbortedPayload(payload) {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_CURSOR_USER_ABORT")
+		appendLog(logFile, "exit_code: 0 (cursor user-aborted stop skips close-out loop)")
+		return ExitSuccess
+	}
 	if isCursorAfterAgentResponsePayload(payload) {
 		_, _ = fmt.Fprintln(stderr, "ALLOW_AFTER_AGENT_RESPONSE_AUDIT_ONLY")
 		appendLog(logFile, "exit_code: 0 (afterAgentResponse cannot block; stop hook enforces loopback)")
@@ -1442,6 +1447,16 @@ func isCursorStopPayload(payload map[string]json.RawMessage) bool {
 
 func isCursorAfterAgentResponsePayload(payload map[string]json.RawMessage) bool {
 	return cursorHookEventName(payload) == "afteragentresponse"
+}
+
+func isCursorAbortedPayload(payload map[string]json.RawMessage) bool {
+	if raw, ok := payload["status"]; ok {
+		var status string
+		if err := json.Unmarshal(raw, &status); err == nil {
+			return strings.ToLower(status) == "aborted"
+		}
+	}
+	return false
 }
 
 func cursorHookEventName(payload map[string]json.RawMessage) string {

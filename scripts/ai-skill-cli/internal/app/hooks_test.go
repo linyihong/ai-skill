@@ -429,6 +429,23 @@ func TestRunStopHookLoopsCursorStopOkOnlyPayload(t *testing.T) {
 	}
 }
 
+func TestRunStopHookAllowsCursorUserAbortedStop(t *testing.T) {
+	setHookStdin(t, `{"hook_event_name":"stop","status":"aborted","assistant_response":"partial progress without close-out"}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected user-aborted Cursor stop to pass, got %d; stderr=%s", code, stderr.String())
+	}
+	if stdout.String() != "" {
+		t.Fatalf("expected no followup loop for user-aborted Cursor stop, got %s", stdout.String())
+	}
+	if !strings.Contains(stderr.String(), "ALLOW_CURSOR_USER_ABORT") {
+		t.Fatalf("expected user-abort diagnostic, got %s", stderr.String())
+	}
+}
+
 func TestRunStopHookAllowsAfterAgentResponseAuditOnly(t *testing.T) {
 	setHookStdin(t, `{"hook_event_name":"afterAgentResponse"}`)
 
