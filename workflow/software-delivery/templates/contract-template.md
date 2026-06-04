@@ -13,6 +13,11 @@
 |----------|--------|---------|----------|-------------|
 | <path> | <GET/POST/PUT/DELETE> | <body/params> | <shape> | <list> |
 
+## Screen Mapping
+| Scenario | Screens / Surfaces | APIs / Events | Tables / Stores | Validation Target |
+|----------|--------------------|---------------|-----------------|-------------------|
+| <BDD scenario> | <screen/route/CLI/SDK/job> | <operation/event/provider> | <table/store/cache/queue> | <BDD/contract/UI/integration proof> |
+
 ## Consumer Contract
 | Consumer | Intent | Needs | Freshness | Loading | Empty / Error Behavior | Permissions |
 |----------|--------|-------|-----------|---------|------------------------|-------------|
@@ -45,7 +50,8 @@
 
 ## Traceability
 - **Upstream**: <link to change-brief-template.md>
-- **Downstream**: → BDD Scenarios → Implementation Plan → Review Report
+- **Downstream**: → BDD Scenarios → Screen Mapping → Implementation Plan → Review Report
+- **Screen Traceability**: <BDD -> Screen -> Consumer -> API/Event -> Table/Store -> Validation Target>
 - **Linked Artifacts**:
   - **Change Brief**: <link>
   - **BDD Scenarios**: <link>

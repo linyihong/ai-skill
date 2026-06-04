@@ -28,7 +28,7 @@
 | --- | --- |
 | 後端/API | 授權、重放防禦、速率限制、詐欺訊號、Token 輪換、審計日誌 |
 | 客戶端 App | 安全儲存、安全預設、必要時的憑證固定、高風險流程的 UX 摩擦、遙測衛生 |
-| 全端合約 | OpenAPI/schema 生成、型別客戶端、Consumer Contract、UI Behavior / Screen / ViewModel Contract、provider/consumer fixture、合約測試、相容性規則 |
+| 全端合約 | OpenAPI/schema 生成、型別客戶端、Screen Mapping、Consumer Contract、UI Behavior / Screen / ViewModel Contract、provider/consumer fixture、合約測試、相容性規則 |
 | 工具/擴充 | 純規則引擎或命令核心、adapter 邊界、診斷/命令、fixture 支援的規則、編輯器/CLI 整合測試 |
 | 第三方整合 | 清理後的供應商摘錄、憑證邊界、即時測試關卡、重放/冪等/webhook/結算行為、審計日誌 |
 | 嵌入式/韌體 | 感測器/協定解析、硬體上下文注入、驅動/服務/應用程式邊界、RTOS/任務擁有權、主機 fixture、硬體迴圈檢查 |
@@ -77,7 +77,7 @@
 | 新程式碼或 AI 生成程式碼的測試策略 | `process/`、`CHECKLIST.md` 和當前規劃文件 |
 | 嵌入式/硬體產品流程 | `platforms/embedded/`、`implementation/embedded/`、`process/` 和硬體感知檢查清單 |
 | OpenAPI/schema/codegen 或全端 provider/consumer 合約 | `implementation/backend/`、`process/`、`CHECKLIST.md` 和相關 API 檢查清單 |
-| Consumer needs、screen states、UI behavior、view model derivation 或 accessibility expectations | `workflow/software-delivery/ui-contracts.md`、`implementation/`、templates 和專案規劃文件 |
+| Screen mapping、consumer needs、screen states、UI behavior、view model derivation、screen traceability 或 accessibility expectations | `workflow/software-delivery/ui-contracts.md`、`implementation/`、templates 和專案規劃文件 |
 | 工具、CLI、IDE 擴充、linter 或靜態分析架構 | `implementation/tooling/`、`process/` 和相關審查檢查清單 |
 | 供應商或第三方 API 整合 | `implementation/backend/`、`controls/`、`checklists/` 和專案特定的清理後文件 |
 

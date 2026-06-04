@@ -14,7 +14,7 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 > |---|---|---|---|
 > | Intake（需求接收 / parity） | **已抽出** → [`intake.md`](intake.md)（含 Start From Evidence、Change Intake、Pre-build Interrogation、Requirements Cognition、Parity Gate、Product Brief Validation、Missing Information、Backfill） | `sd-intake` | 接收新需求 / 變更 / 重構意圖 |
 > | Test strategy（測試策略 / BDD） | **已抽出** → [`test-strategy.md`](test-strategy.md)（含 BDD Closure / Docs-First Loop / Test Strategy Gate / Mutation / Test-First Ordering） | `sd-test-strategy` | 定義測試策略 / BDD 閉環 |
-> | UI contracts（Consumer / Screen / ViewModel） | **已抽出** → [`ui-contracts.md`](ui-contracts.md)（含 Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract） | `sd-ui-contracts` | 前端、行動、CLI、SDK 或其他 consumer surface 需要平行實作或 AI 生成 UI / state / tests |
+> | UI contracts（Screen Mapping / Consumer / Screen / ViewModel） | **已抽出** → [`ui-contracts.md`](ui-contracts.md)（含 Screen Mapping、Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract、Screen Traceability） | `sd-ui-contracts` | 前端、行動、CLI、SDK 或其他 consumer surface 需要平行實作或 AI 生成 UI / state / tests |
 > | Implementation（執行核心） | §3 SDK 缺陷閉環、§4 同工作階段閉環 | `sd-implementation` | 實際進行程式碼變更 |
 > | Validation（驗證 / 效能） | **已抽出** → [`validation.md`](validation.md)（含 Perf Gate + Validate） | `sd-validation` | 驗證變更 / 效能關卡 |
 > | Closure（收尾 / 回饋） | **已抽出** → [`closure.md`](closure.md)（含 DoR / DoD / Feed Back Lessons） | `sd-closure` | 收尾、DoR/DoD 檢核、回饋可重用課程 |

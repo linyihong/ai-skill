@@ -24,8 +24,8 @@
 | 應用形狀 | 優先 contract |
 | --- | --- |
 | 僅後端/API | Domain Model Contract、API Contract、contract tests、與 consumer 的 integration tests |
-| 前端 + 後端 | API Contract、Domain Model Contract、BDD scenarios、Consumer Contract、UI Behavior / Screen / ViewModel Contract |
-| 僅前端應用 | UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、local state/domain contract、mocked API/schema contract |
+| 前端 + 後端 | API Contract、Domain Model Contract、BDD scenarios、Screen Mapping、Consumer Contract、UI Behavior / Screen / ViewModel Contract |
+| 僅前端應用 | Screen Mapping、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、local state/domain contract、mocked API/schema contract |
 | 行動應用 | Screen/flow behavior、ViewModel Contract、local storage/session contract、有遠端服務時加上 Consumer / API Contract |
 | CLI / 桌面 / 工具 | Command contract、input/output schema、consumer needs、domain model、fixture-based tests |
 | Library / SDK | Public API contract、type/schema contract、consumer usage contract、examples、compatibility tests |
@@ -69,7 +69,7 @@
 | BDD -> test refs | 顯示行為如何被驗證，或還有什麼 gap |
 | Contract operation / command / diagnostic -> fixture | 顯示 provider/consumer 相容性和 edge cases |
 | Generated client 或 SDK method -> API/OpenAPI/source contract | 防止手抄 endpoint 和 drift |
-| Screen / UI action -> Consumer / API / ViewModel Contract | 顯示 UI behavior、資料需求與 display derivation 如何被支援 |
+| Screen / UI action -> Screen Mapping / Consumer / API / ViewModel Contract | 顯示 UI behavior、資料需求、provider operation、table/store ownership 與 display derivation 如何被支援 |
 
 Stable IDs 可以是 feature IDs、rule IDs、operation IDs、route names、command names、diagnostic codes、event names 或 scenario tags。如果一個行為被有意識地記錄但未實作，標記為 `TBD`、`noop`、`not enforceable by tool`、`manual-only` 或 `out of scope`，並附上原因和負責人。
 
@@ -79,6 +79,7 @@ Stable IDs 可以是 feature IDs、rule IDs、operation IDs、route names、comm
 - Domain Model Contract 擁有 invariants、業務詞彙和狀態轉換
 - Architecture Contract 擁有依賴方向、runtime boundaries、資料所有權和允許的整合路徑
 - API Contract 擁有整合形狀：request、response、error、auth/session、versioning 和 compatibility
+- Screen Mapping 擁有 BDD scenario 到 screens、APIs、tables / stores 與 validation target 的對照；應在 BDD-lite 後建立，並在 provider/consumer 平行實作前保持可追溯
 - Consumer Contract 擁有 consumer needs、freshness、loading、empty/error behavior、permissions 和 observability；應在 API finalization 前完成或同步審查
 - UI Behavior / Screen / ViewModel Contract 擁有 screen states、actions、validation、feedback、navigation、accessibility 和 API/domain data 到 UI display model 的 derivation；細節見 [`ui-contracts.md`](ui-contracts.md)
 - Error Handling Contract 擁有 failure taxonomy、retry policy、user messaging、logging 和 security redaction

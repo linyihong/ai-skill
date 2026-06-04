@@ -21,15 +21,16 @@
 
 1. Map each Domain Model invariant to provider-side code and unit tests.
 2. Map each API, event, command, or public interface contract to provider/consumer fixtures, mocks, or schema checks.
-3. Map each Consumer Contract need to API/schema/event support, client mocks, generated clients, fixtures, and consumer-side contract tests.
-4. Map each UI Behavior / Screen Contract entry to state transitions, routes, permissions, validation, feedback, navigation behavior, and UI interaction tests.
-5. Map each Frontend ViewModel Contract rule to mapper / selector / presenter code plus source fixture -> view model fixture tests.
-6. Map each Error Handling Contract entry to implementation behavior, logging redaction, user-visible error behavior, and tests.
-7. Keep implementation slices linked to the latest contract before teams or agents build in parallel.
+3. Map each Screen Mapping row to screens / surfaces, API or event support, table / store ownership, and validation target.
+4. Map each Consumer Contract need to API/schema/event support, client mocks, generated clients, fixtures, and consumer-side contract tests.
+5. Map each UI Behavior / Screen Contract entry to state transitions, routes, permissions, validation, feedback, navigation behavior, and UI interaction tests.
+6. Map each Frontend ViewModel Contract rule to mapper / selector / presenter code plus source fixture -> view model fixture tests.
+7. Map each Error Handling Contract entry to implementation behavior, logging redaction, user-visible error behavior, and tests.
+8. Keep implementation slices linked to the latest contract before teams or agents build in parallel.
 
 ## 與其他層的關係
 
 - `analysis/development-guidance/controls-catalog.md` 提供跨平台控制原則，implementation 提供具體實作。
 - `analysis/development-guidance/risk-translation.md` 提供從觀察到控制的流程。
-- `workflow/software-delivery/ui-contracts.md` 提供前端 / consumer 實作前必須對齊的 Consumer、UI Behavior、Screen、ViewModel 與 Accessibility contracts。
+- `workflow/software-delivery/ui-contracts.md` 提供前端 / consumer 實作前必須對齊的 Screen Mapping、Consumer、UI Behavior、Screen、ViewModel、Accessibility 與 Screen Traceability contracts。
 - `skills/app-development-guidance/implementation/` 是原始來源，已刪除。內容已由本文件承接。
