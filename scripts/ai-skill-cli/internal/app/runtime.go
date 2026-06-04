@@ -55,6 +55,8 @@ type runtimeRoutingRegistry struct {
 
 type runtimeRouteRecord struct {
 	ID                   string               `yaml:"id"`
+	RouteType            string               `yaml:"route_type"`
+	ActivationMode       string               `yaml:"activation_mode"`
 	TaskIntent           string               `yaml:"task_intent"`
 	ActivationTriggers   runtimeRouteTriggers `yaml:"activation_triggers"`
 	PrimarySource        string               `yaml:"primary_source"`
@@ -67,10 +69,26 @@ type runtimeRouteRecord struct {
 	Model                runtimeRouteModel    `yaml:"model"`
 }
 
+// runtimeRouteTriggers parses both the legacy flat form (top-level
+// user_signals / file_change_globs) and the Phase 1 two-phase form
+// (activation_any_of / reinforcement_any_of). normalizeRouteTriggers folds
+// the legacy fields into the two-phase model. Schema spec:
+// knowledge/runtime/routing-registry.yaml §activation_triggers_spec.
 type runtimeRouteTriggers struct {
-	TaskIntents     []string `yaml:"task_intents"`
-	UserSignals     []string `yaml:"user_signals"`
-	FileChangeGlobs []string `yaml:"file_change_globs"`
+	TaskIntents        []string                   `yaml:"task_intents"`
+	UserSignals        []string                   `yaml:"user_signals"`         // legacy flat
+	FileChangeGlobs    []string                   `yaml:"file_change_globs"`    // legacy flat
+	ActivationAnyOf    *runtimeActivationAnyOf    `yaml:"activation_any_of"`    // Phase 1 (pre-Read)
+	ReinforcementAnyOf *runtimeReinforcementAnyOf `yaml:"reinforcement_any_of"` // Phase 2 (post-Read)
+}
+
+type runtimeActivationAnyOf struct {
+	UserSignals    []string `yaml:"user_signals"`
+	ContextSignals []string `yaml:"context_signals"`
+}
+
+type runtimeReinforcementAnyOf struct {
+	ArtifactSignals []string `yaml:"artifact_signals"`
 }
 
 type runtimeRouteMetadata struct {

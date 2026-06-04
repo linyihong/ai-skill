@@ -361,9 +361,10 @@ func DetectWorkflows(transcript []Message, openFiles []FileRef) []DetectedRoute
 - **Miss path**：detected.len == 0 → 不阻擋，但記 `workflow_sessions.status = no-match`，未來分析這些 case 可能要加 triggers。
 
 產出：
-- [ ] `detector.go` + unit tests
-- [ ] `hooks.go` 整合
-- [ ] `runtime.db` 加 `workflow_sessions` 表（schema 見 Phase 4）
+- [x] `detector.go` + unit tests（2026-06-04：`DetectWorkflows(registry, transcript, openFiles) []DetectedRoute` 純函式，deterministic any-hit、**無加權**；two-phase（activation_any_of 可 activate、reinforcement_any_of 只 reinforce → late-detected Activated=false）；legacy flat 正規化；自製 glob→regexp（`**`/`*`，無新依賴）。15 unit tests PASS：single/multi/no-match/legacy-flat(user+glob)/two-phase-context/reinforcement-only/regex-alternation/advisory-mode/on-demand-never/effective-mode/glob-edge/merge-dedupe）
+- [ ] `hooks.go` 整合 — **改置於 Phase 4.0**（PreToolUse dedupe 需要 in-memory RuntimeContext 作為「已偵測」store；無 store 就 wiring 等於半成品）。Phase 3 只交付可獨立測試的 detector 核心
+- [x] ~~`runtime.db` 加 `workflow_sessions` 表~~ **取消**：Phase 4.0 決議 in-memory RuntimeContext、NO SQLite（YAGNI，Phase 4.1 deferred）。此產出項為 v-early 草稿殘留，與 Phase 4.0 衝突，正式作廢；dedupe store 改由 Phase 4.0 in-memory 提供
+- 結構擴充（向後相容，additive）：`runtimeRouteRecord` 加 `route_type` / `activation_mode`；`runtimeRouteTriggers` 加 `activation_any_of` / `reinforcement_any_of`（解析兩種 schema 形式）
 
 ### Phase 4 — RuntimeContext State（in-memory first, SQLite deferred）
 
