@@ -1,4 +1,4 @@
-version=repo-c982f61
-source_commit=c982f61
-built_at=2026-06-04T04:20:39Z
+version=repo-d739afd
+source_commit=d739afd
+built_at=2026-06-04T05:44:53Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
