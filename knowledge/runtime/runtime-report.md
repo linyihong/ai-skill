@@ -142,7 +142,7 @@
 | `graph.source-boundary` | `governance/lifecycle/README.md` | `candidate` | 6 | [`source-boundary.yaml`](../graphs/source-boundary.yaml) |
 | `graph.workflow-layers` | `workflow/README.md` | `candidate` | 20 | [`workflow-layers.yaml`](../graphs/workflow-layers.yaml) |
 | `graph.workflow-software-delivery-architecture` | `workflow/software-delivery/architecture/README.md` | `candidate` | 7 | [`workflow-software-delivery-architecture.yaml`](../graphs/workflow-software-delivery-architecture.yaml) |
-| `graph.workflow-app-development-guidance` | `workflow/software-delivery/README.md` | `candidate` | 18 | [`workflow-software-delivery.yaml`](../graphs/workflow-software-delivery.yaml) |
+| `graph.workflow-app-development-guidance` | `workflow/software-delivery/README.md` | `candidate` | 19 | [`workflow-software-delivery.yaml`](../graphs/workflow-software-delivery.yaml) |
 | `graph.workflow-travel-planning` | `workflow/travel-planning/README.md` | `candidate` | 6 | [`workflow-travel-planning.yaml`](../graphs/workflow-travel-planning.yaml) |
 
 ## Refresh Decisions

@@ -1030,6 +1030,7 @@ records:
       - workflow/software-delivery/artifact-gates.md
       - workflow/software-delivery/intake.md
       - workflow/software-delivery/contracts.md
+      - workflow/software-delivery/ui-contracts.md
       - workflow/software-delivery/test-strategy.md
       - workflow/software-delivery/validation.md
       - workflow/software-delivery/closure.md
@@ -1080,6 +1081,13 @@ records:
           - contract governance, traceability, API/domain/error contract, or contract-first discipline is needed
         do_not_load_when:
           - no contract or traceability surface changes
+      workflow.software-delivery.ui-contracts:
+        source: workflow/software-delivery/ui-contracts.md
+        load_when:
+          - frontend, mobile, CLI, SDK, job, test harness, or other consumer surface needs Consumer, UI Behavior, Screen, ViewModel, or Accessibility contracts
+          - provider and consumer teams or agents need to work in parallel from shared contracts
+        do_not_load_when:
+          - no consumer surface exists or the task is provider-internal only
       workflow.software-delivery.test-strategy:
         source: workflow/software-delivery/test-strategy.md
         load_when:

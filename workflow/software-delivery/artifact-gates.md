@@ -51,6 +51,7 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 | 產品特定的 API 主機、端點、schema 或令牌細節 | 專案儲存庫文件 |
 | 原始供應商文件、帳戶特定條款、憑證、沙箱/正式主機、私人 webhook 負載或真實客戶資料 | 專案儲存庫文件，附清理和存取控制 |
 | 生成的客戶端、SDK、fixtures 和提供者/消費者合約檢查 | `implementation/` 和專案儲存庫 |
+| Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract | [`ui-contracts.md`](ui-contracts.md)、templates 和專案儲存庫的 planning / contract artifacts |
 | Product Brief 驗證、Impact Map × Customer Journey Map 對齊、文件優先順序、可追溯性和 BDD 閉環流程 | `process/`、templates 和 checklists |
 | 重構、遷移、replacement 或新入口替代舊入口的新舊能力 parity inventory | 專案規劃文件、implementation plan 或專屬 parity inventory；若是可重用流程缺口，回饋到 `workflow/software-delivery/` |
 | 效能預算、負載/壓力/尖峰/浸泡策略、CI smoke 檢查和發布證據 | `process/`、`CHECKLIST.md`、templates 和專案儲存庫的測試或發布筆記 |
@@ -95,6 +96,7 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 - 誠實面對殘留風險。
 - 已清理且不含目標特定細節。
 - 對 replacement / migration / refactor 類變更，能反查舊入口到新入口的能力覆蓋率、明確 deferred 項目與測試證據。
+- 對 consumer / UI 變更，能反查 consumer needs、screen states、view model derivation、accessibility expectations 與對應 contract / fixture / test。
 - 在需要效能證據時明確，包括指標、預算、環境、執行器和發布關卡。
 
 ## 6. 避免（Avoid）

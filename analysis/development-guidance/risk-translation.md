@@ -15,6 +15,7 @@
 | 本地儲存包含可復原的機密 | 裝置入侵或備份可暴露憑證 |
 | Release build 暴露符號、debug flag 或測試端點 | 逆向工程成本不必要地低 |
 | 生成的客戶端與 OpenAPI/schema 不一致 | 前端、SDK 或工具消費者可能呼叫過時路由或反序列化錯誤形狀 |
+| UI 直接從 API 欄位推導顯示狀態且無 ViewModel Contract | 畫面可能能運作，但 display semantics、permission、error mapping 或 derived fields 會和需求語意漂移 |
 | Gherkin 存在但無可執行連結 | 團隊可能認為行為已測試，但實際上只有文件 |
 | Impact Map 的目標族群與 Customer Journey 的痛點不一致 | 團隊可能快速實作功能，但沒有改善真正影響目標的使用者旅程 |
 | 供應商文件直接複製到產品流程中 | 機密、無關欄位或不穩定的第三方假設可能洩漏到實作和可重用文件中 |
@@ -27,7 +28,7 @@
 | --- | --- |
 | 後端/API | 授權、重放防禦、速率限制、詐欺訊號、Token 輪換、審計日誌 |
 | 客戶端 App | 安全儲存、安全預設、必要時的憑證固定、高風險流程的 UX 摩擦、遙測衛生 |
-| 全端合約 | OpenAPI/schema 生成、型別客戶端、provider/consumer fixture、合約測試、相容性規則 |
+| 全端合約 | OpenAPI/schema 生成、型別客戶端、Consumer Contract、UI Behavior / Screen / ViewModel Contract、provider/consumer fixture、合約測試、相容性規則 |
 | 工具/擴充 | 純規則引擎或命令核心、adapter 邊界、診斷/命令、fixture 支援的規則、編輯器/CLI 整合測試 |
 | 第三方整合 | 清理後的供應商摘錄、憑證邊界、即時測試關卡、重放/冪等/webhook/結算行為、審計日誌 |
 | 嵌入式/韌體 | 感測器/協定解析、硬體上下文注入、驅動/服務/應用程式邊界、RTOS/任務擁有權、主機 fixture、硬體迴圈檢查 |
@@ -76,6 +77,7 @@
 | 新程式碼或 AI 生成程式碼的測試策略 | `process/`、`CHECKLIST.md` 和當前規劃文件 |
 | 嵌入式/硬體產品流程 | `platforms/embedded/`、`implementation/embedded/`、`process/` 和硬體感知檢查清單 |
 | OpenAPI/schema/codegen 或全端 provider/consumer 合約 | `implementation/backend/`、`process/`、`CHECKLIST.md` 和相關 API 檢查清單 |
+| Consumer needs、screen states、UI behavior、view model derivation 或 accessibility expectations | `workflow/software-delivery/ui-contracts.md`、`implementation/`、templates 和專案規劃文件 |
 | 工具、CLI、IDE 擴充、linter 或靜態分析架構 | `implementation/tooling/`、`process/` 和相關審查檢查清單 |
 | 供應商或第三方 API 整合 | `implementation/backend/`、`controls/`、`checklists/` 和專案特定的清理後文件 |
 

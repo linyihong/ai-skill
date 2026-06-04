@@ -5,7 +5,7 @@
 | slice 欄位 | 值 |
 |---|---|
 | `id` | `sd-contracts` |
-| `purpose` | 建立與治理 contract（domain / architecture / API / error / 硬體）、文件優先順序衝突處理與雙向可追溯性 |
+| `purpose` | 建立與治理 contract（domain / architecture / API / error / UI / consumer / 硬體）、文件優先順序衝突處理與雙向可追溯性 |
 | `type` | `execution` |
 | `tags` | artifact-gate, contract, traceability |
 | `load_when` | 需建立 / 治理 contract 與可追溯性、處理文件不一致衝突 |
@@ -13,7 +13,7 @@
 | `owner_layer` | workflow |
 | `layer_justification` | 規定「要產哪些 contract、衝突時哪個 artifact 優先、如何追溯」的 ordering / gate；通過 workflow membership test，不承載 evidence 取得方法（非 analysis），不論證長期模式（非 intelligence） |
 | `canonical_source` | 本檔（原 `development-process.md` §Required Contracts / Contract Governance Gate / Traceability Gate / Contract-First Rules） |
-| `dependencies` | `sd-intake`（先完成 change intake / brief 驗證）、[`templates/contract-template.md`](templates/contract-template.md) |
+| `dependencies` | `sd-intake`（先完成 change intake / brief 驗證）、`sd-ui-contracts`（有 consumer surface 時）、[`templates/contract-template.md`](templates/contract-template.md) |
 | `dependency_budget` | default `max_depth:2` / `max_runtime_dependencies:4` |
 | `validation_signal` | Phase 4 Scenario A（execution-only：無 contract 異動時本 slice 應 **不** 載入） |
 
@@ -23,12 +23,12 @@
 
 | 應用形狀 | 優先 contract |
 | --- | --- |
-| 前端 + 後端 | API Contract、Domain Model Contract、BDD scenarios |
 | 僅後端/API | Domain Model Contract、API Contract、contract tests、與 consumer 的 integration tests |
-| 僅前端應用 | UI behavior contract、local state/domain contract、mocked API/schema contract |
-| 行動應用 | Screen/flow behavior、local storage/session contract、有遠端服務時加上 API Contract |
-| CLI / 桌面 / 工具 | Command contract、input/output schema、domain model、fixture-based tests |
-| Library / SDK | Public API contract、type/schema contract、examples、compatibility tests |
+| 前端 + 後端 | API Contract、Domain Model Contract、BDD scenarios、Consumer Contract、UI Behavior / Screen / ViewModel Contract |
+| 僅前端應用 | UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、local state/domain contract、mocked API/schema contract |
+| 行動應用 | Screen/flow behavior、ViewModel Contract、local storage/session contract、有遠端服務時加上 Consumer / API Contract |
+| CLI / 桌面 / 工具 | Command contract、input/output schema、consumer needs、domain model、fixture-based tests |
+| Library / SDK | Public API contract、type/schema contract、consumer usage contract、examples、compatibility tests |
 | 事件驅動 / worker | Event schema、command/event contract、idempotency 和 retry behavior |
 | Embedded / firmware / 硬體產品 | Datasheet 或 protocol contract、hardware context contract、driver/service/application 邊界、BDD、host fixtures、hardware-in-loop checks |
 | 靜態分析 / IDE extension / 開發者工具 | Rule catalog、diagnostic 或 command contract、pure kernel/adapter 邊界、fixture pairs、editor/CLI integration tests |
@@ -40,7 +40,7 @@
 1. Governance / framework contract：repository 層級的 invariants、必要更新規則、依賴方向、命名、build/run 限制
 2. Product plan / accepted brief：product intent、範圍、non-goals、已取消的需求、業務語言
 3. BDD behavior：可觀察的使用者/系統行為和 acceptance criteria
-4. Domain、architecture、API/interface、error handling、hardware 或 command contracts
+4. Domain、architecture、API/interface、consumer/UI、error handling、hardware 或 command contracts
 5. 實作和 generated clients
 6. Tests、fixtures 和 examples
 
@@ -69,6 +69,7 @@
 | BDD -> test refs | 顯示行為如何被驗證，或還有什麼 gap |
 | Contract operation / command / diagnostic -> fixture | 顯示 provider/consumer 相容性和 edge cases |
 | Generated client 或 SDK method -> API/OpenAPI/source contract | 防止手抄 endpoint 和 drift |
+| Screen / UI action -> Consumer / API / ViewModel Contract | 顯示 UI behavior、資料需求與 display derivation 如何被支援 |
 
 Stable IDs 可以是 feature IDs、rule IDs、operation IDs、route names、command names、diagnostic codes、event names 或 scenario tags。如果一個行為被有意識地記錄但未實作，標記為 `TBD`、`noop`、`not enforceable by tool`、`manual-only` 或 `out of scope`，並附上原因和負責人。
 
@@ -78,6 +79,8 @@ Stable IDs 可以是 feature IDs、rule IDs、operation IDs、route names、comm
 - Domain Model Contract 擁有 invariants、業務詞彙和狀態轉換
 - Architecture Contract 擁有依賴方向、runtime boundaries、資料所有權和允許的整合路徑
 - API Contract 擁有整合形狀：request、response、error、auth/session、versioning 和 compatibility
+- Consumer Contract 擁有 consumer needs、freshness、loading、empty/error behavior、permissions 和 observability；應在 API finalization 前完成或同步審查
+- UI Behavior / Screen / ViewModel Contract 擁有 screen states、actions、validation、feedback、navigation、accessibility 和 API/domain data 到 UI display model 的 derivation；細節見 [`ui-contracts.md`](ui-contracts.md)
 - Error Handling Contract 擁有 failure taxonomy、retry policy、user messaging、logging 和 security redaction
 - Contract Governance 擁有文件優先順序、衝突處理、已取消/延後範圍和最小 linked updates
 - 新需求必須在 code 開始前更新 planning docs、BDD、contracts、實作切片和 tests
@@ -88,6 +91,7 @@ Stable IDs 可以是 feature IDs、rule IDs、operation IDs、route names、comm
 - 只有當共享 contracts 已版本化到足以進行 mock、stub 或 schema-first 工作時，才能平行進行實作
 - 如果 contract 變更，在同一次變更中更新 BDD、實作、mocks 和 tests，或明確記錄為什麼不更新
 - 如果 API/schema contract 變更，從 source contract 重新產生 typed clients 或 SDKs；不要手抄 routes、DTOs 或 operation names
+- 如果 Consumer / UI contract 變更，在同一次變更中更新 API / error contract、mocks、fixtures、view model mapper、screen behavior tests 或明確記錄 deferred scope
 - 如果第三方整合變更，更新 sanitized integration docs、fixtures、live-test gates 和 secret/redaction notes，但不要將私人 vendor 或帳戶細節複製到可重複使用的 guidance 中
 - 對於已實作的專案，BDD 成為必要的行為恢復文件。Product Brief 可能包含 unknowns，但 BDD 必須從可觀察的產品行為和實作證據填寫
 - 任何改變行為、contracts、所有權、錯誤處理、儲存、安全性或 tests 的缺失資訊都會阻塞開發，直到被回答或明確排除範圍

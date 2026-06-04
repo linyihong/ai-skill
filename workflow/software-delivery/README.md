@@ -8,15 +8,16 @@
 
 進入方式：
 1. 讀取 [`execution-flow.md`](execution-flow.md) thin index 了解執行流程與 focused loading surfaces
-2. 依 task intent 載入需要的 execution surface：[`intake.md`](intake.md)、[`contracts.md`](contracts.md)、[`test-strategy.md`](test-strategy.md)、[`validation.md`](validation.md)、[`closure.md`](closure.md)、[`surgical-changes.md`](surgical-changes.md)
+2. 依 task intent 載入需要的 execution surface：[`intake.md`](intake.md)、[`contracts.md`](contracts.md)、[`ui-contracts.md`](ui-contracts.md)、[`test-strategy.md`](test-strategy.md)、[`validation.md`](validation.md)、[`closure.md`](closure.md)、[`surgical-changes.md`](surgical-changes.md)
 3. 依流程的 Start From Evidence / Change Intake 開始；新需求、重構、parity、缺失資訊或既有專案回填時載入 [`intake.md`](intake.md)
 4. 需要 artifact 規範時參考 [`artifact-gates.md`](artifact-gates.md)
 5. 需要審查檢查清單時參考 [`review-checklist.md`](review-checklist.md)
 6. 需要完整開發流程 overview 或 embedded / producer-consumer fallback 時參考 [`development-process.md`](development-process.md)
-7. 需要 pre-build interrogation / product impact alignment / requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
-8. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
-9. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)；examples 預設 suppress，僅在明確要求範例或 ambiguity 時載入
-10. PR 觸動效能敏感路徑或含 AI 生成程式碼時，執行 [`perf-risk-gate.md`](perf-risk-gate.md) 的 5 步檢查（靜態 anti-pattern scan、hot-path micro-benchmark、reviewer perf checklist、pre-deploy observability gate、canary rollout）
+7. 需要前端、行動、CLI、SDK 或其他 consumer surface 的 Consumer / UI Behavior / Screen / ViewModel Contract 時參考 [`ui-contracts.md`](ui-contracts.md)
+8. 需要 pre-build interrogation / product impact alignment / requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
+9. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
+10. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)；examples 預設 suppress，僅在明確要求範例或 ambiguity 時載入
+11. PR 觸動效能敏感路徑或含 AI 生成程式碼時，執行 [`perf-risk-gate.md`](perf-risk-gate.md) 的 5 步檢查（靜態 anti-pattern scan、hot-path micro-benchmark、reviewer perf checklist、pre-deploy observability gate、canary rollout）
 
 ## Scope
 
@@ -27,6 +28,7 @@
 - **Requirements Stage**：Pre-build interrogation + product impact alignment + BDD-lite / requirements cognition，包含需求拷問、framework source-of-truth discovery、duplication risk check、Impact Map × Customer Journey Map、behavior-driven discovery、acceptance definition、ambiguity resolution、traceability 與 validation target。
 - **Architecture Stage**：domain architecture cognition，包含 DDD fit、bounded context discovery、consistency boundary design、architecture escalation。
 - **Contract-First Development Process**：從企劃書到實作的完整開發流程，包含 Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill 等。
+- **UI / Consumer Contract Process**：在 provider/consumer 平行實作前建立 Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract 與 Accessibility Contract，避免 AI agent 只依 API shape 生成語意脫節的前端。
 - **Refactor / Replacement Parity**：當新入口、平台遷移、工具改寫或架構重組要取代舊能力時，先建立新舊能力 parity inventory，逐項列出舊入口、現有能力、副作用、外部依賴、新入口、parity 狀態與測試證據。
 
 ### 審查類型
@@ -78,6 +80,7 @@
 | [`execution-flow.yaml`](execution-flow.yaml) | `execution-flow.md` | Software delivery execution executable contract：change intake、requirements、BDD closure、parity、performance、validation gates |
 | [`intake.md`](intake.md) | `execution-flow.md` §1/§6 + `development-process.md` intake gates | Focused execution surface：需求接收、Change Intake、Pre-build Interrogation、Requirements Cognition、Parity Gate、Product Brief Validation、Missing Information、Backfill |
 | [`contracts.md`](contracts.md) | `development-process.md` contract gates | Focused execution surface：Required Contracts、Contract Governance、Traceability、Contract-First Rules |
+| [`ui-contracts.md`](ui-contracts.md) | `development-process.md` frontend / consumer contract gap | Focused execution surface：Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract |
 | [`test-strategy.md`](test-strategy.md) | `execution-flow.md` §2/§4 子節 + `development-process.md` BDD/Test Strategy gates | Focused execution surface：Docs-first BDD closure、test strategy、mutation testing、test-first ordering |
 | [`validation.md`](validation.md) | `execution-flow.md` §5/§7 | Focused execution surface：validation、performance gate、old/new behavior proof、completion evidence |
 | [`closure.md`](closure.md) | `execution-flow.md` §8 + `development-process.md` DoR/DoD | Focused execution surface：Definition of Ready/Done、handoff、close-loop、reusable lesson feedback |
@@ -144,7 +147,7 @@
 |------|---------|------|
 | [`templates/product-impact-alignment-template.md`](templates/product-impact-alignment-template.md) | Product Impact Discovery | 記錄 Impact Map、Customer Journey Map、cross-check decision 與進入 BDD 前的缺口 |
 | [`templates/change-brief-template.md`](templates/change-brief-template.md) | Change Intake | 記錄變更類型、證據、範圍、blocker 評估 |
-| [`templates/contract-template.md`](templates/contract-template.md) | Contract Governance | 記錄 domain model、架構決策、API 合約、錯誤處理 |
+| [`templates/contract-template.md`](templates/contract-template.md) | Contract Governance | 記錄 domain model、架構決策、API / error / consumer / UI 合約 |
 | [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) | BDD Closure Loop | 記錄 requirement link、behavior boundary、Given/When/Then、acceptance criteria、validation target、regression scope |
 | [`templates/implementation-plan-template.md`](templates/implementation-plan-template.md) | Implementation | 記錄任務拆解、檔案路徑、驗收條件、風險評估 |
 | [`templates/review-report-template.md`](templates/review-report-template.md) | Review（6 種類型） | 記錄 finding、decision、reviewed artifacts |

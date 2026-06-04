@@ -39,6 +39,7 @@ then:
     # workflow lifecycle surfaces NOT relevant to a doc edit
     - workflow/software-delivery/intake.md              # no new requirement
     - workflow/software-delivery/contracts.md           # not changing a contract
+    - workflow/software-delivery/ui-contracts.md        # not changing a consumer/UI contract
     - workflow/software-delivery/test-strategy.md       # doc edit, no BDD scenario
     - workflow/software-delivery/validation.md          # doc edit, no perf/completion gate
     - workflow/software-delivery/closure.md             # not at handoff
@@ -71,7 +72,7 @@ evidence:
   routing_evidence:
     - analysis side: route.analysis.apk.workflows primary_source + tools-and-failures via candidate
     - workflow side: route.workflow.software-delivery thin index + surgical-caveats loading_surface (load_when: "surgical change discipline, diff purity needed")
-    - intake/contracts/test-strategy/validation/closure all gated by their do_not_load_when (no requirement / no contract / no behavior proof / no perf gate / not at handoff) → correctly suppressed
+    - intake/contracts/ui-contracts/test-strategy/validation/closure all gated by their do_not_load_when (no requirement / no contract / no consumer surface / no behavior proof / no perf gate / not at handoff) → correctly suppressed
   budget_check:
     actual_depth: 2          # each route entry → its leaf slice; max single-chain depth 2
     actual_runtime_dependencies: 5
@@ -82,7 +83,7 @@ evidence:
   result: PASS
   notes:
     - "expected_load ⊆ loaded_actual: satisfied"
-    - "forbidden_load ∩ loaded_actual = ∅: satisfied (verified for all 11 forbidden entries)"
+    - "forbidden_load ∩ loaded_actual = ∅: satisfied (verified for all 14 forbidden entries)"
     - "Critical assertion HELD: mixed task loaded EXACTLY the analysis surfaces it needed + EXACTLY the workflow caveat slice for the doc edit, with zero leakage into unrelated sd lifecycle surfaces or other domains."
     - "Surgical-changes slice (type: failure) correctly activated on workflow side without dragging intake/contracts/validation/closure along."
 

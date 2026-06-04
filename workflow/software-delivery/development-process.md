@@ -17,14 +17,16 @@ Contract / BDD / artifact / performance 的治理 gate 見 [`software-delivery-g
 | 5. Domain architecture cognition | Bounded Context map、invariant、consistency boundary、architecture fit | 從行為邊界推導 domain boundary；依複雜度選 CRUD / DDD Lite / Full DDD，不預設 DDD |
 | 6. Domain Model Contract | Entities、value objects、commands、events、invariants | 這是核心 contract；定義必須永遠為真的事項 |
 | 7. Architecture Contract | 邊界、依賴關係、資料所有權、runtime/deployment 形狀 | 定義哪些層可以依賴哪些層、決策落在哪裡 |
-| 8. API Contract | OpenAPI/GraphQL/schema/events/RPC/message contracts | 當多個 surface 或服務整合時至關重要；在實作前先寫好 request/response/error 形狀 |
-| 9. Error Handling Contract | Error taxonomy、retry 規則、驗證錯誤、使用者可見訊息、logging | 在實作前設計 failure 行為；錯誤也是 contract 的一部分 |
-| 10. 平行實作規劃 | 每個 context 和 contract 的工作切片 | 只有當共享 contracts 足夠穩定時，前端/後端才能同時開始 |
-| 11. 後端 / 服務實作 | Behavior + domain + API contract 實作 | 如果沒有後端，用 local service、library、worker 或 platform 實作取代 |
-| 12. 前端 / 客戶端實作 | Mock API、schema-first client、UI 行為 | 如果沒有前端，用 CLI、SDK、mobile screen、job runner 或 consumer integration 取代 |
-| 13. 自動化測試 | Unit、BDD、API contract、schema tests | 測試應證明 behavior correctness、domain invariants 和 contract 相容性 |
-| 14. 效能測試計畫 | Load、stress、spike 或 soak 範圍、metric budget、runner、證據位置 | 當 latency、throughput、資源使用率、concurrency、啟動時間、背景任務、資料庫存取、外部呼叫量、caching 或 batching 可能改變時需要 |
-| 15. 整合測試 | End-to-end 或 component integration 證據 | 驗證真實 adapters、auth/session、錯誤路徑、效能敏感路徑和跨 context 流程 |
+| 8. Consumer Contract | Consumer needs、freshness、loading、empty/error behavior、permissions | 先定義前端/行動/CLI/SDK/job 等 consumer 為了完成行為需要什麼；作為 API finalization gate |
+| 9. API Contract | OpenAPI/GraphQL/schema/events/RPC/message contracts | 當多個 surface 或服務整合時至關重要；依 Consumer Contract 對齊 request/response/error 形狀 |
+| 10. Error Handling Contract | Error taxonomy、retry 規則、驗證錯誤、使用者可見訊息、logging | 在實作前設計 failure 行為；錯誤也是 contract 的一部分，並需映射到 consumer / UI error behavior |
+| 11. UI Behavior / Screen / ViewModel Contract | Screen states、actions、validation、feedback、navigation、view model derivation、accessibility | 當存在 UI 或 consumer surface 時載入 [`ui-contracts.md`](ui-contracts.md)，固定 AI agent 生成 UI 前需要的 screen 與 display semantics |
+| 12. 平行實作規劃 | 每個 context、provider、consumer 和 contract 的工作切片 | 只有當共享 contracts 足夠穩定時，前端/後端或 provider/consumer 才能同時開始 |
+| 13. 後端 / 服務實作 | Behavior + domain + API contract 實作 | 如果沒有後端，用 local service、library、worker 或 platform 實作取代 |
+| 14. 前端 / 客戶端實作 | Mock API、schema-first client、UI behavior、screen contract、view model mapper | 如果沒有前端，用 CLI、SDK、mobile screen、job runner 或 consumer integration 取代 |
+| 15. 自動化測試 | Unit、BDD、API/consumer/UI contract、schema tests | 測試應證明 behavior correctness、domain invariants、provider/consumer 相容性和 UI state transitions |
+| 16. 效能測試計畫 | Load、stress、spike 或 soak 範圍、metric budget、runner、證據位置 | 當 latency、throughput、資源使用率、concurrency、啟動時間、背景任務、資料庫存取、外部呼叫量、caching 或 batching 可能改變時需要 |
+| 17. 整合測試 | End-to-end 或 component integration 證據 | 驗證真實 adapters、auth/session、錯誤路徑、效能敏感路徑、screen flows 和跨 context 流程 |
 
 > **輸出模板**：Default Flow 完成後，使用 [`templates/implementation-plan-template.md`](templates/implementation-plan-template.md) 記錄實作計畫。
 

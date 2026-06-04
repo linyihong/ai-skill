@@ -81,6 +81,7 @@ slice 最小單位 = **能獨立完成一個 cognitive phase**（非 step、非 
 |---|---|---|---|---|---|
 | `sd-intake` | execution | requirements, parity, intake, domain-specific（backfill） | 接收新需求 / 變更 / 重構意圖、需求認知盤點、product brief 驗證、既有專案回填 | 已有明確 contract、純執行既定改動 | **`intake.md`（Phase 2 已實體拆檔，跨檔同批：原 execution-flow §1 + §6 Backfill + development-process §Initial Doc Pack / §Product Brief Validation Gate / §Change Intake Gate / §Missing Information Gate / §Existing Project Documentation Backfill）** |
 | `sd-contracts` | execution | artifact-gate, contract, traceability | 需建立 / 治理 contract 與可追溯性 | 無 contract 異動的小改 | **`contracts.md`（Phase 2 已實體拆檔，原 development-process §Required Contracts / Contract Governance / Traceability / Contract-First Rules）** |
+| `sd-ui-contracts` | execution | artifact-gate, contract, frontend, consumer, ui | 前端、行動、CLI、SDK 或其他 consumer surface 需要 Consumer / UI Behavior / Screen / ViewModel / Accessibility Contract，或 provider/consumer 需平行實作 | 無 consumer surface、純 provider 內部變更、只修不影響 UI 行為的小錯 | **`ui-contracts.md`（2026-06-04 新增，補足 development-process Default Flow 中 frontend / consumer contract-first surface）** |
 | `sd-test-strategy` | execution | artifact-gate, test, bdd | 定義測試策略 / BDD 閉環 / test-first ordering | 不涉測試設計的純文件改動 | **`test-strategy.md`（Phase 2 已實體拆檔，跨檔同批：原 execution-flow §2 + §4 子節「測試策略定義」+「Test-First Ordering」+ development-process §BDD Execution Closure + §Test Strategy Gate 含 Mutation Testing）** |
 | `sd-implementation` | execution | execution-order, domain-specific（embedded） | 實際進行程式碼變更（核心執行順序） | evidence-only / 純分析任務 | **暫留 `execution-flow.md` §3/§4 + `development-process.md` embedded / producer-consumer fallback**。依 stakeholder 2026-05-30 決定，Phase 3/4 用 routing / validation evidence 判斷是否需要獨立 `implementation.md`；目前不拆以避免 over-fragmentation。 |
 | `sd-surgical-caveats` | failure | caveat, surgical, diff-purity | 進行外科手術式小改、需控制 diff 純度 / orphan | 大型新功能初始實作 | **`surgical-changes.md`（Phase 2 已實體拆檔，原 execution-flow §9.1–9.5）** |
@@ -90,7 +91,7 @@ slice 最小單位 = **能獨立完成一個 cognitive phase**（非 step、非 
 
 **layer_justification（全 slice 共通）**：每條都規定「做什麼 / 什麼順序 / 過哪些 gate」，通過 workflow membership test；無一承載 evidence 取得方法（非 analysis）或長期模式論證（非 intelligence）。`sd-closure` 的 extraction-to-intelligence 僅為候選標記，升 intelligence 須補 `evidence_refs`≥2。
 
-**條件性子流程（不另開 slice）**：Embedded / Hardware Product Flow → 掛 `sd-intake` + `sd-implementation` 的 `tags: domain-specific,embedded`；Backfill for existing project（development-process §Backfill、execution-flow §6）→ 掛 `sd-intake` 的 `tags: domain-specific,backfill`。
+**條件性子流程**：Embedded / Hardware Product Flow → 掛 `sd-intake` + `sd-implementation` 的 `tags: domain-specific,embedded`；Backfill for existing project（development-process §Backfill、execution-flow §6）→ 掛 `sd-intake` 的 `tags: domain-specific,backfill`。Consumer / UI contracts 因為是 provider/consumer 平行實作的獨立 cognitive phase，且需要阻塞 API finalization，不視為單純條件子流程，獨立為 `sd-ui-contracts`。
 
 ---
 
@@ -135,21 +136,21 @@ slice 最小單位 = **能獨立完成一個 cognitive phase**（非 step、非 
 scenario: A-execution-only
 task_intent: "為既有 API 加一個輸入驗證，無 contract / 測試策略變動"
 expected_load: [sd-implementation, sd-validation]
-forbidden_load: [sd-examples, sd-intake, sd-contracts, analysis/**, intelligence/**]
+forbidden_load: [sd-examples, sd-intake, sd-contracts, sd-ui-contracts, analysis/**, intelligence/**]
 dependency_budget: { default: { max_depth: 2, max_runtime_dependencies: 4 } }
 
 # Scenario B — evidence-only：分析 APK 網路行為（analysis 層）
 scenario: B-evidence-only
 task_intent: "分析某 APK 的網路流量行為"
 expected_load: ["analysis/apk/<evidence-acquisition surface>"]
-forbidden_load: [sd-intake, sd-contracts, sd-test-strategy, sd-implementation, sd-validation, sd-closure, sd-examples]
+forbidden_load: [sd-intake, sd-contracts, sd-ui-contracts, sd-test-strategy, sd-implementation, sd-validation, sd-closure, sd-examples]
 dependency_budget: { default: { max_depth: 2, max_runtime_dependencies: 4 } }
 
 # Scenario C — mixed：debug 失敗的 deployment pipeline
 scenario: C-mixed
 task_intent: "deployment pipeline 失敗，需同時看執行步驟與失敗證據"
 expected_load: [sd-validation, sd-surgical-caveats, "analysis/<failure-caveat surface>"]
-forbidden_load: [sd-examples, intelligence/**, "其他 domain slice"]
+forbidden_load: [sd-examples, sd-ui-contracts, intelligence/**, "其他 domain slice"]
 dependency_budget: { override_when: { task_complexity: high } }  # 高複雜任務，允許放寬至 depth3/deps6
 
 # Scenario D — placement / misplacement 負向驗證

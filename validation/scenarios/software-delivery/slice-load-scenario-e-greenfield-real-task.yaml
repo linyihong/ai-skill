@@ -39,6 +39,7 @@ then:
     # software-delivery lifecycle surfaces other than test-strategy MUST NOT bleed in.
     - workflow/software-delivery/intake.md               # greenfield Specify covers requirements intake
     - workflow/software-delivery/contracts.md            # greenfield Plan covers contract design
+    - workflow/software-delivery/ui-contracts.md         # no explicit consumer/UI contract bridge in this scenario
     - workflow/software-delivery/validation.md           # not reached; Implement phase, no perf gate yet
     - workflow/software-delivery/closure.md              # not at handoff
     - workflow/software-delivery/surgical-changes.md     # greenfield is not surgical; opposite mode
@@ -73,7 +74,7 @@ evidence:
       - enforcement/README.md
   routing_evidence:
     - knowledge/runtime/routing-registry.yaml#route.workflow.greenfield primary_source + required_dependencies
-    - greenfield route does NOT list any sd-intake/contracts/validation/closure surface as required
+    - greenfield route does NOT list any sd-intake/contracts/ui-contracts/validation/closure surface as required
     - candidate_sources lists workflow/software-delivery/execution-flow.md as a thin-index bridge (loaded only as index, not as sd-intake etc.)
     - sd-test-strategy loaded via route.workflow.software-delivery hierarchical loading_surface workflow.software-delivery.test-strategy (load_when: "BDD closure, test strategy, mutation testing, test-first ordering")
   budget_check:
@@ -86,8 +87,8 @@ evidence:
   result: PASS
   notes:
     - "expected_load ⊆ loaded_actual: satisfied"
-    - "forbidden_load ∩ loaded_actual = ∅: satisfied (verified for all 11 forbidden entries)"
-    - "Cross-route bridge to sd-test-strategy worked WITHOUT pulling sd-intake / sd-contracts / sd-validation / sd-closure — slice boundary HELD across routes."
+    - "forbidden_load ∩ loaded_actual = ∅: satisfied (verified for all 12 forbidden entries)"
+    - "Cross-route bridge to sd-test-strategy worked WITHOUT pulling sd-intake / sd-contracts / sd-ui-contracts / sd-validation / sd-closure — slice boundary HELD across routes."
     - "Greenfield route is 144-line non-monolithic and routed cleanly via existing entry; no retrieval contamination observed."
 
 decision_inputs_recorded:

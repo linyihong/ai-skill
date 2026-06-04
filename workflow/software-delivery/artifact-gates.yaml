@@ -37,7 +37,7 @@ required_sources:
 steps:
   - id: choose_artifact_shape
     order: 1
-    action: Choose reusable note, product/process artifact, review report, parity inventory, performance evidence, or project-local evidence shape.
+    action: Choose reusable note, product/process artifact, UI/consumer contract artifact, review report, parity inventory, performance evidence, or project-local evidence shape.
     outputs:
       - artifact_shape
   - id: fill_reusable_note_structure
@@ -49,7 +49,7 @@ steps:
       - gate.artifact_gates.required_sections_present
   - id: classify_owner_layer
     order: 3
-    action: Place content into controls, platforms, languages, implementation, checklists, feedback history, analysis, workflow, project docs, or ignored local notes.
+    action: Place content into controls, platforms, languages, implementation, UI contracts, checklists, feedback history, analysis, workflow, project docs, or ignored local notes.
     gates:
       - gate.artifact_gates.owner_layer_correct
   - id: sanitize_project_evidence
@@ -64,7 +64,7 @@ steps:
       - gate.artifact_gates.linked_updates_recorded
   - id: check_good_guidance_criteria
     order: 6
-    action: Ensure guidance is executable, owner-layer clear, testable, honest about limits, sanitized, parity-aware, and performance-aware when needed.
+    action: Ensure guidance is executable, owner-layer clear, testable, honest about limits, sanitized, parity-aware, consumer/UI-aware when needed, and performance-aware when needed.
     gates:
       - gate.artifact_gates.good_guidance
 
@@ -97,11 +97,13 @@ gates:
       - owner layer is explicit
       - guidance can translate to code, config, test, or review checklist
       - residual risk and limits are stated
+      - consumer/UI changes can trace consumer needs, screen states, view model derivation, accessibility expectations, and relevant fixtures or tests
       - replacement/parity and performance evidence are included when relevant
 
 required_evidence:
   - artifact shape decision
   - owner layer decision
+  - consumer/UI contract decision when a consumer surface exists
   - sanitization review summary
   - linked update statement
   - validation method

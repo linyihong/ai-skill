@@ -26,6 +26,11 @@ edges:
     validation: contracts.md 由 development-process.md 的 Required Contracts、Contract Governance、Traceability 與 Contract-First Rules 抽出；來源段落保留 redirect stub。
 
   - type: related_to
+    target: workflow/software-delivery/ui-contracts.md
+    reason: Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract 與 Accessibility Contract 的 focused execution surface。
+    validation: ui-contracts.md 補足 development-process.md 的 frontend / consumer contract-first surface，並由 routing registry loading surface 載入。
+
+  - type: related_to
     target: workflow/software-delivery/test-strategy.md
     reason: Docs-first BDD closure、test strategy、mutation testing 與 test-first ordering 的 focused execution surface。
     validation: test-strategy.md 由 execution-flow.md §2/§4 子節與 development-process.md BDD/Test Strategy gates 跨檔同批抽出；來源段落保留 redirect stub。
@@ -99,4 +104,4 @@ metadata:
   priority: P2
   confidence: medium
   compatibility_state: new-layer-promoted
-  last_checked: 2026-05-30
+  last_checked: 2026-06-04

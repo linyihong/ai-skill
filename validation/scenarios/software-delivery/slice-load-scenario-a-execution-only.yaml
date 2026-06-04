@@ -32,6 +32,7 @@ then:
     # MUST NOT load — execution-only small change should not pull these in
     - workflow/software-delivery/intake.md               # contract stable, no new requirement
     - workflow/software-delivery/contracts.md            # no contract surface change
+    - workflow/software-delivery/ui-contracts.md         # no consumer/UI surface change
     - workflow/software-delivery/closure.md              # not at handoff yet
     - workflow/software-delivery/examples/EXAMPLES.md    # default_load:false, user did not request examples
     - workflow/software-delivery/development-process.md  # superseded by focused surfaces for this intent
@@ -59,6 +60,7 @@ evidence:
     - knowledge/runtime/routing-registry.yaml#route.workflow.software-delivery loading_surfaces
     - intake.do_not_load_when: "contract is already stable and the task is a pure implementation"  # matches → skip
     - contracts.do_not_load_when: "no contract or traceability surface changes"                    # matches → skip
+    - ui-contracts.do_not_load_when: "no consumer surface exists or the task is provider-internal only"  # matches → skip
     - closure.do_not_load_when: "task is still in intake, implementation, or validation"           # matches → skip
     - examples.default_load: false                                                                  # → skip
     - surgical-caveats.load_when: "diff purity, surgical change discipline needed"                 # matches → load

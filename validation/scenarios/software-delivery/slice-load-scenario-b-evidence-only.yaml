@@ -34,6 +34,7 @@ then:
     - workflow/software-delivery/execution-flow.md
     - workflow/software-delivery/intake.md
     - workflow/software-delivery/contracts.md
+    - workflow/software-delivery/ui-contracts.md
     - workflow/software-delivery/test-strategy.md
     - workflow/software-delivery/validation.md
     - workflow/software-delivery/closure.md
@@ -73,7 +74,7 @@ evidence:
   result: PASS
   notes:
     - "expected_load ⊆ loaded_actual: satisfied"
-    - "forbidden_load ∩ loaded_actual = ∅: satisfied (verified for all 12 forbidden entries — especially the entire workflow/software-delivery hierarchy)"
+    - "forbidden_load ∩ loaded_actual = ∅: satisfied (verified for all 13 forbidden entries — especially the entire workflow/software-delivery hierarchy)"
     - "Critical assertion HELD: evidence-only analysis task did NOT contaminate context with any workflow execution surface. This is the inverse of Scenario A and is the primary boundary the plan was designed to enforce."
 
 decision_inputs_recorded:

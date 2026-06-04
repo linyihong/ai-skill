@@ -9,6 +9,7 @@
 | 類別 | 範圍 | 原始來源 |
 |------|------|----------|
 | **Backend** | Server/API implementation patterns that mobile and web clients depend on | ``implementation/backend/``（已刪除） |
+| **Frontend / Consumer** | Web UI, client state, screen flows, view models, schema-first clients, CLI/SDK/job consumers, and consumer-side contract tests | `workflow/software-delivery/ui-contracts.md` |
 | **Mobile** | Android, iOS, Flutter, React Native implementation patterns | ``implementation/mobile/``（已刪除） |
 | **Embedded** | Firmware, sensor/protocol, hardware context, driver/service/application, and bring-up implementation patterns | ``implementation/embedded/``（已刪除） |
 | **Tooling** | IDE extensions, CLIs, linters, static analyzers, code generators, and internal automation | ``implementation/tooling/``（已刪除） |
@@ -20,11 +21,15 @@
 
 1. Map each Domain Model invariant to provider-side code and unit tests.
 2. Map each API, event, command, or public interface contract to provider/consumer fixtures, mocks, or schema checks.
-3. Map each Error Handling Contract entry to implementation behavior, logging redaction, and tests.
-4. Keep implementation slices linked to the latest contract before teams or agents build in parallel.
+3. Map each Consumer Contract need to API/schema/event support, client mocks, generated clients, fixtures, and consumer-side contract tests.
+4. Map each UI Behavior / Screen Contract entry to state transitions, routes, permissions, validation, feedback, navigation behavior, and UI interaction tests.
+5. Map each Frontend ViewModel Contract rule to mapper / selector / presenter code plus source fixture -> view model fixture tests.
+6. Map each Error Handling Contract entry to implementation behavior, logging redaction, user-visible error behavior, and tests.
+7. Keep implementation slices linked to the latest contract before teams or agents build in parallel.
 
 ## 與其他層的關係
 
 - `analysis/development-guidance/controls-catalog.md` 提供跨平台控制原則，implementation 提供具體實作。
 - `analysis/development-guidance/risk-translation.md` 提供從觀察到控制的流程。
+- `workflow/software-delivery/ui-contracts.md` 提供前端 / consumer 實作前必須對齊的 Consumer、UI Behavior、Screen、ViewModel 與 Accessibility contracts。
 - `skills/app-development-guidance/implementation/` 是原始來源，已刪除。內容已由本文件承接。

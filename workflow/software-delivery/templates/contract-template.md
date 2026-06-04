@@ -13,6 +13,26 @@
 |----------|--------|---------|----------|-------------|
 | <path> | <GET/POST/PUT/DELETE> | <body/params> | <shape> | <list> |
 
+## Consumer Contract
+| Consumer | Intent | Needs | Freshness | Loading | Empty / Error Behavior | Permissions |
+|----------|--------|-------|-----------|---------|------------------------|-------------|
+| <screen/CLI/SDK/job> | <actor intent> | <data/command/event> | <refresh/cache policy> | <skeleton/progress> | <empty/retry/fallback> | <role/capability> |
+
+## UI Behavior / Screen Contract
+| Screen / Flow | State | Action | Validation | Feedback | Navigation | Events |
+|---------------|-------|--------|------------|----------|------------|--------|
+| <screen id> | <loading/empty/error/success> | <create/edit/delete/submit/retry> | <rules> | <toast/inline/banner/focus> | <route/modal/back> | <emitted/consumed events> |
+
+## Frontend ViewModel Contract
+| ViewModel | Source | Field | Derivation / Formatting | Null / Error Behavior | Fixture |
+|-----------|--------|-------|-------------------------|-----------------------|---------|
+| <VM name> | <API/domain/event/local state> | <display field> | <rule> | <fallback/mapping> | <source -> expected VM> |
+
+## Accessibility Contract
+| Surface | Keyboard / Focus | Semantics | Assistive Feedback | Validation |
+|---------|------------------|-----------|--------------------|------------|
+| <screen/component> | <tab/focus/escape behavior> | <role/label/live region> | <success/error/progress announcement> | <lint/manual/test evidence> |
+
 ## Error Handling
 | Scenario | Error | Handling Strategy |
 |----------|-------|-------------------|
@@ -29,4 +49,5 @@
 - **Linked Artifacts**:
   - **Change Brief**: <link>
   - **BDD Scenarios**: <link>
+  - **UI Contracts**: <link when consumer surface exists>
   - **Implementation Plan**: <link after creation>
