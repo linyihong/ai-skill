@@ -670,6 +670,24 @@ func collectDirtyGitRepoReports(projectDir string) []gitRepoStatusReport {
 	return reports
 }
 
+func isAiSkillRepoRoot(projectDir string) bool {
+	projectDir = strings.TrimSpace(projectDir)
+	if projectDir == "" {
+		return false
+	}
+	requiredFiles := []string{
+		"CORE_BOOTSTRAP.md",
+		filepath.Join("runtime", "core-bootstrap.yaml"),
+		filepath.Join("scripts", "ai-skill-cli"),
+	}
+	for _, file := range requiredFiles {
+		if _, err := os.Stat(filepath.Join(projectDir, file)); err != nil {
+			return false
+		}
+	}
+	return true
+}
+
 func nonEmptyLines(s string) []string {
 	var lines []string
 	for _, line := range strings.Split(s, "\n") {
@@ -696,6 +714,9 @@ func gitStatusNeedsReport(lines []string) bool {
 }
 
 func formatDirtyGitRepoReport(projectDir string) string {
+	if isAiSkillRepoRoot(projectDir) {
+		return ""
+	}
 	reports := collectDirtyGitRepoReports(projectDir)
 	if len(reports) == 0 {
 		return ""

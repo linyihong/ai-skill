@@ -253,6 +253,26 @@ func TestFormatDirtyGitRepoReportCombinesNestedRepos(t *testing.T) {
 	}
 }
 
+func TestFormatDirtyGitRepoReportSkipsAiSkillRepoRoot(t *testing.T) {
+	workspace := t.TempDir()
+	writeFile(t, filepath.Join(workspace, "CORE_BOOTSTRAP.md"), "# Bootstrap\n")
+	writeFile(t, filepath.Join(workspace, "runtime", "core-bootstrap.yaml"), "schema_version: 1\n")
+	if err := os.MkdirAll(filepath.Join(workspace, "scripts", "ai-skill-cli"), 0o755); err != nil {
+		t.Fatalf("mkdir ai-skill cli dir: %v", err)
+	}
+	runGit(t, workspace, "init")
+	runGit(t, workspace, "config", "user.email", "test@example.invalid")
+	runGit(t, workspace, "config", "user.name", "Test User")
+	writeFile(t, filepath.Join(workspace, "README.md"), "# Ai-skill\n")
+	runGit(t, workspace, "add", ".")
+	runGit(t, workspace, "commit", "-m", "initial")
+	writeFile(t, filepath.Join(workspace, "dirty.txt"), "dirty\n")
+
+	if report := formatDirtyGitRepoReport(workspace); report != "" {
+		t.Fatalf("expected Ai-skill repo root to skip Project Git Report, got:\n%s", report)
+	}
+}
+
 func TestRunUserPromptSubmitHookIncludesNestedGitReport(t *testing.T) {
 	workspace := t.TempDir()
 	writeFile(t, filepath.Join(workspace, "CORE_BOOTSTRAP.md"), "# Bootstrap\n")
