@@ -60,9 +60,23 @@ blocked; it is recorded as `no-match` for future trigger-coverage review.
 
 ## Backward Compatibility
 
-The legacy flat form stays valid **indefinitely**. Routes that predate the
-two-phase schema declare triggers directly under `activation_triggers`; the
-detector normalizes them:
+**accepted format ≠ canonical format.** The legacy flat form is permanently
+*accepted* (always parseable, always runnable) but is **not** a second
+first-class schema. The two-phase form is canonical; tooling (compile / export /
+rewrite) normalizes toward it — the same pattern as JSON5/TypeScript: read many
+shapes, emit one. This prevents the flat form from degrading into an
+ever-larger special case as the model grows (`activation_all_of` /
+`activation_none_of` / …). `deprecation_policy.remove_after: never`, but new
+authoring uses the canonical form.
+
+> Executor status: the read-path normalizer (`normalizeRouteTriggers`) is
+> implemented and tested (legacy≡canonical, canonical idempotent, merge+dedupe)
+> — backward-compat is runtime-verified, not just spec-claimed. Emitting
+> canonical on the write path (rewrite-on-export) is a documented future
+> enhancement; no consumer needs it today.
+
+Routes that predate the two-phase schema declare triggers directly under
+`activation_triggers`; the normalizer folds them:
 
 | Legacy flat field | Normalized to |
 | --- | --- |

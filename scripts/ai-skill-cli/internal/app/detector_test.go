@@ -250,6 +250,50 @@ func TestGlobToRegexp_SingleStarDoesNotCrossSegment(t *testing.T) {
 	}
 }
 
+// TestNormalizeRouteTriggers_LegacyEqualsCanonical is the executor-level proof
+// of backward-compat: a legacy flat trigger and its canonical two-phase
+// equivalent MUST normalize to byte-identical results. This is what makes the
+// "accepted_format != canonical_format" policy safe — the runtime, not just the
+// spec, treats them the same.
+func TestNormalizeRouteTriggers_LegacyEqualsCanonical(t *testing.T) {
+	legacy := runtimeRouteTriggers{
+		UserSignals:     []string{"Frida", "抓包"},
+		FileChangeGlobs: []string{"**/scripts/frida/**"},
+	}
+	canonical := runtimeRouteTriggers{
+		ActivationAnyOf: &runtimeActivationAnyOf{
+			UserSignals:    []string{"Frida", "抓包"},
+			ContextSignals: []string{"**/scripts/frida/**"},
+		},
+	}
+	if !reflect.DeepEqual(normalizeRouteTriggers(legacy), normalizeRouteTriggers(canonical)) {
+		t.Fatalf("legacy and canonical must normalize identically:\n legacy=%+v\n canon =%+v",
+			normalizeRouteTriggers(legacy), normalizeRouteTriggers(canonical))
+	}
+}
+
+// TestNormalizeRouteTriggers_CanonicalIdempotent proves normalize(canonical) is
+// stable: re-expressing the normalized result as canonical and normalizing
+// again yields the same value (no drift on the canonical shape).
+func TestNormalizeRouteTriggers_CanonicalIdempotent(t *testing.T) {
+	canonical := runtimeRouteTriggers{
+		ActivationAnyOf: &runtimeActivationAnyOf{
+			UserSignals:    []string{"web scraping"},
+			ContextSignals: []string{"**/analysis/web/**"},
+		},
+		ReinforcementAnyOf: &runtimeReinforcementAnyOf{ArtifactSignals: []string{"anti-bot"}},
+	}
+	n1 := normalizeRouteTriggers(canonical)
+	rebuilt := runtimeRouteTriggers{
+		ActivationAnyOf:    &runtimeActivationAnyOf{UserSignals: n1.userSignals, ContextSignals: n1.contextSignals},
+		ReinforcementAnyOf: &runtimeReinforcementAnyOf{ArtifactSignals: n1.artifactSignals},
+	}
+	n2 := normalizeRouteTriggers(rebuilt)
+	if !reflect.DeepEqual(n1, n2) {
+		t.Fatalf("normalize not idempotent on canonical:\n n1=%+v\n n2=%+v", n1, n2)
+	}
+}
+
 func TestNormalizeRouteTriggers_MergesBothForms(t *testing.T) {
 	n := normalizeRouteTriggers(runtimeRouteTriggers{
 		UserSignals:     []string{"legacy-user"},

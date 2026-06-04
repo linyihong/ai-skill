@@ -141,27 +141,53 @@ activation_triggers_spec:
     task_intents: >
       coarse intent tags (existing field, retained at activation_triggers top
       level — orthogonal to the two phases, used for intent matching).
-    file_change_globs: >
-      legacy field on some routes; treated as context_signals-equivalent
-      (pre-Read path match) by the detector.
+    file_change_globs:
+      deprecated_alias_of: activation_any_of.context_signals
+      note: >
+        Legacy field on some routes. Semantically a pre-Read PATH match (file
+        change path, not file content), so it maps exactly onto context_signals.
+        Accepted indefinitely as an alias; canonical form is
+        activation_any_of.context_signals.
   deterministic_rule: >
     ANY single entry in ANY activation_any_of sub-array hits -> activate.
     No weighting, no scoring, no thresholds (NO weighted scoring — plan
     invariant). Multi-route hits route to workflow/workflow-routing.md Stage 2
     ambiguity adjudication; the detector never auto-picks among conflicts.
   backward_compat:
-    rule: >
+    # accepted_format != canonical_format. The legacy flat form is permanently
+    # ACCEPTED (always parseable, always runnable) but is NOT a second
+    # first-class schema — canonical tooling (compile / export / rewrite) emits
+    # the two-phase form. Cf. JSON5/TS: read many shapes, normalize to one.
+    accepted_format: >
       Legacy flat form (activation_triggers with top-level `user_signals:` /
-      `artifact_signals:` and no activation_any_of/reinforcement_any_of) stays
-      valid INDEFINITELY. The detector normalizes it as:
+      `file_change_globs:` / `artifact_signals:` and no
+      activation_any_of/reinforcement_any_of).
+    canonical_form: two-phase  # activation_any_of / reinforcement_any_of
+    deprecation_policy:
+      remove_after: never        # legacy stays readable + runnable forever
+      canonical_form: two-phase
+      emit: canonical            # compile/export/rewrite normalize to two-phase
+      rationale: >
+        Avoid two co-equal first-class schemas. As the model grows
+        (activation_all_of / activation_none_of …) the flat form would degrade
+        into an ever-larger special case; pinning a single canonical form keeps
+        new authoring and tooling on one shape.
+    normalizer: >
+      normalizeRouteTriggers (scripts/ai-skill-cli/internal/app/detector.go),
+      validated by detector_test.go: legacy->canonical, canonical->canonical
+      (idempotent), and merge+dedupe of mixed forms. Mapping:
       top-level user_signals -> activation_any_of.user_signals;
-      top-level context_signals/file_change_globs -> activation_any_of.context_signals;
+      top-level file_change_globs -> activation_any_of.context_signals;
       top-level artifact_signals -> reinforcement_any_of.artifact_signals.
+    emit_canonical_status: >
+      The normalizer (read path) is implemented + tested. Emitting canonical on
+      compile/export/rewrite (write path) is a documented future enhancement;
+      not yet wired (no consumer needs rewrite-on-export today).
     existing_routes_unchanged: >
-      The 7 routes already carrying activation_triggers (apk-analysis,
-      decision-recording, system-upgrade, + 4 others) are NOT rewritten in
-      Phase 1. They keep the legacy flat form and the normalizer handles them.
-      New triggers (Phase 2) MAY use the explicit two-phase form.
+      The routes already carrying legacy flat activation_triggers (apk-analysis,
+      decision-recording, system-upgrade, + others) are NOT rewritten. They stay
+      accepted; the normalizer handles them. New triggers use the canonical
+      two-phase form.
 
 records:
   - id: route.bootstrap.ai-skill
