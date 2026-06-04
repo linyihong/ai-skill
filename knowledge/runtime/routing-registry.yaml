@@ -707,9 +707,15 @@ records:
         - 逆向
         - APK
       file_change_globs:
-        - "**/TATA/**"
-        - "**/mr.HS/**"
+        # Domain-generic only. Project-specific target-app directory names must
+        # NOT appear in the canonical framework registry (sanitization
+        # discipline; see plan Q9 + governance/workflow-activation-engine.md).
+        # A user's concrete target-app dir belongs in a per-project override,
+        # not here. These patterns match the reverse-engineering domain by
+        # artifact/tooling shape, independent of any project name.
         - "**/scripts/frida/**"
+        - "**/frida/**"
+        - "**/*.apk"
     primary_source: workflow/apk-analysis/execution-flow.md
     required_dependencies:
       - workflow/apk-analysis/artifact-gates.md

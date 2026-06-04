@@ -62,7 +62,7 @@ Recovery re-entry：
 | 情況 | 選哪個 |
 | --- | --- |
 | 在 `unwrapping` 寫 `apk-analysis-sdk` plan + 實作 | **software-delivery**（開發交付）；不是 apk-analysis |
-| 對 TATA APK 做 Frida attach 抓 API | **apk-analysis** |
+| 對目標 APK 做 Frida attach 抓 API | **apk-analysis** |
 | 只改 `docs/plans/*.md` 且會導致之後要寫 SDK | **software-delivery**；純文件架構且明確零行為變更可考慮 **documentation** |
 | 新 repo 從 spec 開始 | **greenfield** → 實作階段 often 再接 **software-delivery** |
 

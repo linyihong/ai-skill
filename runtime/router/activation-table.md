@@ -92,7 +92,7 @@
 | 安全分析 + 跨 skill | security-analysis + cross-skill | `authorization-scope.yaml` contract + cross-skill-references |
 | 寫 feedback + 泛化 | write-feedback + promote-to-enforcement-rule | `sanitization.yaml` contract + `feedback-lessons.yaml`, `reusable-guidance-boundary.yaml` |
 | 改 SDK plan + 實作 | file_change docs/plans/** + task_intent implement | registry → `route.workflow.software-delivery`（含 docs-first、linked-updates） |
-| Frida 抓短劇 API | task_intent frida + file_change TATA/scripts/frida/** | registry → `route.workflow.apk-analysis`（含 `authorization-scope.yaml` contract） |
+| Frida 抓 APK API | task_intent frida + file_change `**/scripts/frida/**` | registry → `route.workflow.apk-analysis`（含 `authorization-scope.yaml` contract） |
 | 多 route 同時命中 | 改 `*-sdk/**` 且開 Frida | §Workflow Discovery 步驟 3 + workflow-routing §歧義 → 通常 software-delivery vs apk-analysis |
 
 ## 優先權參考
