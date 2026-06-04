@@ -35,6 +35,27 @@ BDD closure 不要求每個 scenario 都使用 Cucumber-style runner。它要求
 
 > **輸出模板**：BDD Execution Closure 完成後，使用 [`templates/bdd-scenario-template.md`](templates/bdd-scenario-template.md) 記錄行為場景、acceptance criteria、validation target 與 traceability。
 
+### Gherkin Feature Traceability（Gherkin 可追溯性）
+
+當專案使用 `.feature` / Gherkin 保存行為規格時，每個 `Scenario` / `Scenario Outline` 都必須能直接追到測試與實作：
+
+- 至少一個 `Test ref`：指向可執行測試、fixture、contract test、E2E test、manual checklist，或明確標記為 `pending-runner` / `todo` 的測試位置。
+- 至少一個 `Code ref`：指向實作、adapter、API contract、schema、data migration、UI surface、command handler，或尚未實作時的預期 owner path。
+- 若 scenario 尚未自動化，仍不可省略 refs；`Test ref` 指向待補測試，`Code ref` 指向預期 owner，並在 BDD closure 狀態中標記限制。
+- 不要讓 Gherkin 只成為敘事文件。沒有 Test / Code refs 的 scenario 不能算完成的 acceptance artifact。
+
+建議格式使用 Gherkin comment，避免污染可執行步驟：
+
+```gherkin
+# Refs:
+# Test: <tests/path>::<test or scenario name>
+# Code: <implementation-or-contract-path>
+Scenario: <observable behavior>
+  Given <precondition>
+  When <action>
+  Then <expected outcome>
+```
+
 ## 2. 文件優先 BDD 閉環（Docs-First BDD Closure Loop）
 
 當在行為由人類可讀規格加上可執行測試管理的儲存庫中工作時，在改變可觀察行為之前保持產出同步：

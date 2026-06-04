@@ -73,6 +73,8 @@
 
 Stable IDs 可以是 feature IDs、rule IDs、operation IDs、route names、command names、diagnostic codes、event names 或 scenario tags。如果一個行為被有意識地記錄但未實作，標記為 `TBD`、`noop`、`not enforceable by tool`、`manual-only` 或 `out of scope`，並附上原因和負責人。
 
+對 `.feature` / Gherkin 文件，traceability 不是附加說明。每個 scenario / scenario outline 都必須至少有一個 test ref 與一個 code / contract / schema / adapter ref；尚未實作時，test ref 指向 `pending-runner` / `todo` 測試位置，code ref 指向預期 owner path。缺少任一方向時，該 BDD artifact 只能算草稿，不能作為完成的 acceptance contract。
+
 ## Contract-First Rules（合約優先規則）
 
 - BDD 描述行為；它不應鎖定 framework 或資料庫選擇
