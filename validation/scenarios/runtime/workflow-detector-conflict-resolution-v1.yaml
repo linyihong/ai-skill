@@ -1,0 +1,59 @@
+# Workflow Detector — Conflict (multi-route) Resolution
+# 驗證 >1 route 同時 activate 時，detector 不自動選，ActiveRoute 留空，
+# 交 workflow/workflow-routing.md Stage 2 由 agent 裁決。
+# 來源：
+#   - scripts/ai-skill-cli/internal/app/detector.go / runtime_context.go (Conflict)
+#   - workflow/workflow-routing.md Stage 2
+#   - knowledge/runtime/routing-registry.yaml §activation_triggers_spec.deterministic_rule
+
+id: workflow-detector-conflict-resolution-v1
+domain: runtime
+type: routing-decision
+priority: P1
+
+given:
+  task: detect_workflow_for_task
+  artifacts:
+    - knowledge/runtime/routing-registry.yaml
+    - scripts/ai-skill-cli/internal/app/runtime_context.go
+    - workflow/workflow-routing.md
+  transcript:
+    - role: user
+      text: "用 Frida 抓這個 APK，順便評估要不要導入 DDD 架構"
+  constraints:
+    - 訊息同時命中 APK 分析領域與架構評估領域的 user_signals
+    - detector 不對 conflict 做 tie-break
+
+when:
+  action: run_detector
+
+then:
+  expected_route:
+    primary: none          # 刻意不選
+    status: detected
+    conflict: true
+    steps:
+      - 多個 route 的 user_signals 命中（apk-analysis / architectural-fit / 可能 software-delivery）
+      - activated route 數 > 1 → Conflict=true
+      - ActiveRoute 留空（不 auto-pick）
+      - 注入 reminder 指向 workflow/workflow-routing.md Stage 2 讓 agent 裁決
+    reject:
+      - auto_pick: "detector 自行挑一個 route 鎖定"
+      - silent_first: "用排序後第一個當 active_route"
+      - block_tools: "因為 conflict 就 block 工具呼叫（應 fail-open，交 agent 選）"
+
+  forbidden_routes:
+    - detector_auto_selects_single_route
+    - first_in_sort_order_wins
+
+  expected_final_route: deferred_to_workflow_routing_stage_2
+
+  trace_required:
+    - detected_routes   # 應 ≥ 2
+    - conflict
+    - active_route      # 應為空
+
+  verification:
+    - "ai-skill runtime workflow-context 回 conflict=true、active_route=(none)"
+    - "detected_routes 列出 ≥ 2 條 route"
+    - "planned_actions 含指向 workflow-routing Stage 2 的提示"

@@ -1,0 +1,59 @@
+# Workflow Detector — Travel-Planning Regression (2026-05-31 bug replay)
+# 鎖定本次的 root-cause failure：2026-05-31 session 中，使用者明確要求規劃旅遊
+# 行程，route.workflow.travel-planning 的 activation_triggers 存在且關鍵詞命中，
+# 但全程未觸發（detector 那層當時不存在）。本 scenario 要求 detector 必觸發。
+# 來源：
+#   - enforcement/failure-patterns/workflow-detector-missing.md
+#   - scripts/ai-skill-cli/internal/app/detector.go
+#   - knowledge/runtime/routing-registry.yaml (route.workflow.travel-planning)
+
+id: workflow-detector-travel-planning-regression-v1
+domain: runtime
+type: regression
+priority: P0
+
+given:
+  task: detect_workflow_for_task
+  artifacts:
+    - knowledge/runtime/routing-registry.yaml
+    - scripts/ai-skill-cli/internal/app/detector.go
+    - enforcement/failure-patterns/workflow-detector-missing.md
+  transcript:
+    - role: user
+      text: "幫我規劃下個月去京都的五天旅遊行程，預算有限"
+  constraints:
+    - route.workflow.travel-planning 的 user_signals 含「旅遊」「行程」
+    - 這是 2026-05-31 失效的精確 replay：當時 triggers 存在但無 executor
+    - regression 通過條件 = detector 必須觸發 travel-planning
+
+when:
+  action: run_detector
+
+then:
+  expected_route:
+    primary: route.workflow.travel-planning
+    status: detected
+    conflict: false
+    steps:
+      - travel 任務文字含「旅遊」「行程」
+      - detector 命中 route.workflow.travel-planning 的 user_signals
+      - ActiveRoute = route.workflow.travel-planning
+    reject:
+      - regression_miss: "回 no-match（即原始 2026-05-31 bug）"
+      - wrong_workflow: "鎖定 apk-analysis / software-delivery 等不相關 workflow"
+
+  forbidden_routes:
+    - no_match_on_travel_task     # 原 bug
+    - lock_unrelated_workflow
+
+  expected_final_route: route.workflow.travel-planning
+
+  trace_required:
+    - signals_matched
+    - active_route
+    - status
+
+  verification:
+    - "回放 travel 任務，ai-skill runtime workflow-context 回 active_route=route.workflow.travel-planning"
+    - "status=detected（非 no-match）"
+    - "Go 回歸測試 TestDetectorTravelPlanningRegression 對真實 registry 斷言觸發"

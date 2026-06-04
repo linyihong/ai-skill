@@ -542,13 +542,15 @@ Execution                     graph traversal → 找到相關 governance / work
 
 ### Phase 7 — Validation Scenarios
 
-新建 scenarios：
-- `validation/scenarios/runtime/workflow-detector-deterministic-match-v1.yaml`
-- `validation/scenarios/runtime/workflow-detector-conflict-resolution-v1.yaml`
-- `validation/scenarios/runtime/workflow-session-topic-shift-v1.yaml`
-- `validation/scenarios/runtime/workflow-detector-travel-planning-regression-v1.yaml`（這次 bug 的 regression test）
+新建 scenarios（2026-06-04，全 4 個 BDD scenario YAML + 對真實 registry 的 Go 回歸測試）：
+- [x] `validation/scenarios/runtime/workflow-detector-deterministic-match-v1.yaml` — travel 任務 → 單一 travel-planning，無加權；CLI 實測 active_route=travel-planning
+- [x] `validation/scenarios/runtime/workflow-detector-conflict-resolution-v1.yaml` — multi-hit（apk-analysis + architectural-fit + software-delivery）→ conflict=true、active_route=(none)、不 auto-pick；CLI 實測符合
+- [x] `validation/scenarios/runtime/workflow-session-topic-shift-v1.yaml` — 顯式 pivot 後只偵測 post-pivot（→ analysis.web）、pre-pivot apk 不殘留、NO implicit drift；CLI 實測符合
+- [x] `validation/scenarios/runtime/workflow-detector-travel-planning-regression-v1.yaml`（P0，這次 bug 的 regression）— 對真實 registry 必觸發 travel-planning
 
-Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-planning detector 必須觸發。
+**executable evidence**：`detector_regression_test.go` 對**真實 routing-registry.yaml** 斷言 —— `TestDetectorTravelPlanningRegression`（travel→travel-planning，非 no-match）+ `TestDetectorDeterministicMatchAgainstRealRegistry`（單一命中 + deterministic）。兩者 PASS。
+
+Acceptance：✅ 四個 scenario 全部對真實 registry 驗證一致（CLI `runtime workflow-context` + Go 回歸測試）；2026-05-31 travel-planning regression 確認觸發（原 bug 為 no-match）。
 
 ### Phase 8 — Close-out
 
@@ -587,7 +589,7 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 - [x] Phase 3 detector unit tests 涵蓋：single hit、multi hit、no match、舊格式相容（15 tests，detector_test.go）
 - [x] Phase 4 RuntimeContext lifecycle 經 unit test 驗證（10 tests，runtime_context_test.go；workflow_sessions SQLite 表已作廢改 in-memory，見 Phase 4.0）
 - [x] Phase 5 obligation 不誤殺：當 detector miss 時 tool calls 不被擋（2026-06-04；6 gate tests 證明 miss/conflict/no-repo/no-transcript 皆 fail-open allow，只有「單一 locked route + primary_source 未讀」才 block）
-- [ ] Phase 7 regression scenario：2026-05-31 session 場景 replay 必須觸發 travel-planning
+- [x] Phase 7 regression scenario：2026-05-31 session 場景 replay 必須觸發 travel-planning（2026-06-04；4 scenario YAML + `TestDetectorTravelPlanningRegression` 對真實 registry PASS）
 - [ ] Phase 8 close-loop：所有變更 commit / push / readback
 
 ---

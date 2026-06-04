@@ -1,0 +1,58 @@
+# Workflow Session — Topic Shift (explicit pivot, NO implicit drift)
+# 驗證顯式 pivot 後 detector 只對 post-pivot turns 重偵測，前一 route 不殘留；
+# 且不做 implicit keyword-drift invalidation（drill-down 不被誤殺）。
+# 來源：
+#   - scripts/ai-skill-cli/internal/app/runtime_context.go (BuildRuntimeContext lifecycle)
+#   - governance/workflow-activation-engine.md §RuntimeContext Lifecycle
+
+id: workflow-session-topic-shift-v1
+domain: runtime
+type: routing-decision
+priority: P1
+
+given:
+  task: detect_workflow_across_topic_shift
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/runtime_context.go
+    - knowledge/runtime/routing-registry.yaml
+  transcript:
+    - role: user
+      text: "用 Frida 抓這個 APK 的登入 API"
+    - role: user
+      text: "換任務，現在幫我做 web scraping 抓一個電商網站"
+  constraints:
+    - 第二輪含顯式 pivot sentinel（換任務 / 現在我要 …）
+    - pivot 後只考慮 post-pivot turns 做偵測
+    - 連續 in-domain sub-question 不觸發 implicit drift invalidation
+
+when:
+  action: run_detector
+
+then:
+  expected_route:
+    primary: route.analysis.web
+    status: detected
+    steps:
+      - 掃描 transcript 找最後一個 lifecycle sentinel → pivot 於第 2 輪
+      - 只對 pivot 起的 turns 做 DetectWorkflows
+      - web scraping 的 user_signals 命中 → ActiveRoute = route.analysis.web
+      - 第 1 輪的 apk-analysis 不殘留進 detected_routes
+    reject:
+      - pre_pivot_lingers: "pivot 後仍保留 route.workflow.apk-analysis 為 active"
+      - implicit_drift_kill: "因連續幾輪沒再出現原 workflow 關鍵詞就 invalidate（drill-down 誤殺）"
+
+  forbidden_routes:
+    - keep_pre_pivot_route_active
+    - implicit_keyword_drift_invalidation
+
+  expected_final_route: route.analysis.web
+
+  trace_required:
+    - pivot_detected_at_turn
+    - detected_routes      # 不含 apk-analysis
+    - active_route
+
+  verification:
+    - "對 2-turn transcript 跑 workflow-context，active_route=route.analysis.web"
+    - "detected_routes 不含 route.workflow.apk-analysis"
+    - "drill-down 變體（pivot 後多輪 in-domain sub-question）active_route 不變"

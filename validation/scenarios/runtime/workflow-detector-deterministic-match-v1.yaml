@@ -1,0 +1,62 @@
+# Workflow Detector — Deterministic Single Match
+# 驗證 detector 對單一明確任務做 deterministic any-hit（無加權、無分數、無排名），
+# 鎖定唯一 active_route。
+# 來源：
+#   - knowledge/runtime/routing-registry.yaml §activation_triggers_spec.deterministic_rule
+#   - scripts/ai-skill-cli/internal/app/detector.go (DetectWorkflows)
+#   - governance/workflow-activation-engine.md
+
+id: workflow-detector-deterministic-match-v1
+domain: runtime
+type: routing-decision
+priority: P1
+
+given:
+  task: detect_workflow_for_task
+  artifacts:
+    - knowledge/runtime/routing-registry.yaml
+    - scripts/ai-skill-cli/internal/app/detector.go
+  # Agent/runtime-visible input only — no expected answer here (stateless,
+  # no-answer-leakage per validation-scenario-governance).
+  transcript:
+    - role: user
+      text: "幫我規劃一個四天三夜的東京旅遊行程"
+  constraints:
+    - detector 對 activation_any_of 子陣列任一命中即 activate
+    - 不加權、不算分、不排名（NO weighted scoring）
+    - travel 任務只命中 route.workflow.travel-planning 的 user_signals（旅遊/行程）
+
+when:
+  action: run_detector   # ai-skill runtime workflow-context
+
+then:
+  expected_route:
+    primary: route.workflow.travel-planning
+    status: detected
+    conflict: false
+    steps:
+      - 串接 transcript 文字
+      - 對每個 participating route（auto-detect/advisory）比對 normalized triggers
+      - travel-planning 的 user_signals「旅遊」「行程」命中 → Activated
+      - 唯一 activated route → RuntimeContext.ActiveRoute = route.workflow.travel-planning
+    reject:
+      - weighted_scoring: "對命中數加權或算信心分數再選 route"
+      - ranked_pick: "多 route 命中時用排名挑一個（此案僅單一命中，不應出現）"
+      - miss: "明明 user_signals 命中卻回 no-match"
+
+  forbidden_routes:
+    - score_then_select
+    - ignore_activation_triggers
+
+  expected_final_route: route.workflow.travel-planning
+
+  trace_required:
+    - signals_matched: [旅遊, 行程]
+    - detected_routes
+    - active_route
+    - status
+
+  verification:
+    - "ai-skill runtime workflow-context --repo <repo> --transcript <jsonl> 回 status=detected"
+    - "active_route=route.workflow.travel-planning，conflict=false"
+    - "重跑相同 transcript 得相同結果（deterministic）"
