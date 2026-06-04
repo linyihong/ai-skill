@@ -1,0 +1,36 @@
+# route-candidate-proposals.yaml — Workflow Activation Engine Phase 6.1
+#
+# DATA STORE, NOT a projected runtime contract. This file holds pending
+# route-candidate proposals produced when the detector misses (no known route
+# matched a substantive task) and Capability Discovery suggests a possibly-new
+# capability cluster. It is intentionally NOT projected to runtime.db
+# (no runtime_projection block) — see plan §Deferred Runtime Projection and
+# commit trailer [skip-runtime-yaml-projection].
+#
+# Managed by `ai-skill router proposals {list, record, promote, reject, gc}`.
+# Anti-abuse: occurrence-tracking prevents one-off requests from polluting the
+# registry. A proposal only becomes ready_for_review after it recurs.
+#
+# Promotion state machine (enforced by `router proposals gc`):
+#   accumulating -> ready_for_review : occurrence_count >= 5 AND last_seen within 30d
+#   accumulating -> stale            : occurrence_count < 5 AND last_seen older than 60d
+#   ready_for_review -> promoted     : human/governance review approves (router proposals promote)
+#   ready_for_review -> rejected     : review rejects (router proposals reject --reason ...)
+#   stale (last_seen > 90d)          : hard-pruned by gc
+#
+# `promote` marks status only — it does NOT auto-edit routing-registry.yaml;
+# inserting the canonical route stays a human/governance review action.
+#
+# Proposal shape:
+#   - candidate_id: <slug>            # NOT a route.* id until promoted
+#     first_seen: <RFC3339>
+#     last_seen:  <RFC3339>
+#     occurrence_count: <int>
+#     detected_capabilities: [<atom path>, ...]   # from Discovery graph traversal
+#     suggested_user_signals: [<keyword>, ...]
+#     suggested_route_type: workflow
+#     status: accumulating | ready_for_review | promoted | rejected | stale
+#     rejected_reason: <string>       # only when status=rejected
+
+schema_version: 1
+proposals: []

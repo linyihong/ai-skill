@@ -501,8 +501,8 @@ Execution                     graph traversal → 找到相關 governance / work
 
 產出：
 - [x] 更新 `governance/lifecycle/capability-discovery-philosophy.md`（2026-06-04）—— 加 §「Discovery → Detector Feedback Loop」：known/unknown 分工表 + 回饋環 ASCII + Registry 自我成長 rationale + occurrence-tracking 反濫用 + sunset 綁定（enforcement-registry capability_discovery）
-- [ ] **（Go slice，下一步）** 在 detector miss path 加 fallback hook 呼叫 Discovery（warn + continue，不阻擋）
-- [ ] **（Go slice，下一步）** 新建 `runtime/router/route-candidate-proposals.yaml`（pending proposals 暫存區）—— 採 **occurrence tracking** schema 防垃圾場（v3 採納評審 #3）：
+- [~] 在 detector miss path 加 fallback hook 呼叫 Discovery（warn + continue，不阻擋）—— **write path 已備妥但 hot-hook auto-call 刻意延後**：`recordProposalOccurrence`（router_proposals.go）為 detector-miss→Discovery 的寫入點，已測試並經 `ai-skill router proposals record` 暴露。**不**在 PreToolUse hot hook 每次 miss 自動寫檔，理由：(1) 真正的 Discovery graph traversal（填 `detected_capabilities`）尚未實作，沒有它 auto-proposal 只有空殼 capabilities；(2) 從 hot hook 對每個 miss 寫檔 = noise，正是 occurrence-tracking 反濫用設計要避免的。待 Discovery graph-traversal subsystem 落地再接 hot path。
+- [x] 新建 `runtime/router/route-candidate-proposals.yaml`（2026-06-04，occurrence-tracking data store；schema header + `proposals: []` seed；**data store 非 projected contract**，見下方 §Deferred Runtime Projection）。原 schema：
 
   ```yaml
   # runtime/router/route-candidate-proposals.yaml
@@ -532,9 +532,13 @@ Execution                     graph traversal → 找到相關 governance / work
   | `ready_for_review` → `rejected` | User / governance review reject（例：太細、與既有 route 重疊），記 `rejected_reason` 後 archive |
 
   **CLI 輔助**：`ai-skill router proposals list --status ready_for_review` —— 只顯示真正值得 review 的，避免使用者面對 100 條一次性 proposal 的垃圾場。
-- [ ] **（Go slice，下一步）** 新建 `ai-skill router proposals {list, promote, reject, gc}` CLI subcommands
+- [x] 新建 `ai-skill router proposals {list, record, promote, reject, gc}` CLI subcommands（2026-06-04，router_proposals.go + app.go dispatch；狀態機 + occurrence-tracking；10 unit tests PASS；CLI lifecycle smoke test：record×5→accumulating→gc→ready_for_review→promote→promoted；command-contract.md 已記）
 
-> **Phase 6 分拆（2026-06-04）**：6.0 failure pattern + 6.1 philosophy doc 已完成（純文件，本次 commit）。剩餘 6.1 為 Go-heavy slice（proposals.yaml store + `router proposals` 狀態機 CLI + detector-miss→Discovery wiring），另一 commit 處理：需設計 runtime/router/*.yaml 是 **data store 非 projected contract**（避免誤觸 `validateRuntimeYamlProjects`，可能需 [skip-runtime-yaml-projection] 或 governance 例外），且 detector-miss auto-population 從 hot hook 寫檔有 cost/noise 顧慮，須謹慎。
+> **Phase 6 分拆（2026-06-04）**：6.0 failure pattern + 6.1 philosophy doc 已完成（前一 commit）。本 commit 完成 6.1 Go slice 的 store + CLI 狀態機。**唯一刻意延後**：detector-miss→Discovery 的 hot-hook auto-call（理由見上方 [~] 項：缺真正 Discovery graph traversal + hot-hook 寫檔 noise）。write path（`recordProposalOccurrence`）已備妥可接。
+>
+> #### Deferred Runtime Projection
+>
+> `runtime/router/route-candidate-proposals.yaml` 是 **mutable data store**（proposals 暫存 + 狀態機），不是 declarative 規則來源，刻意**不**設 `runtime_projection`、不投影進 runtime.db —— 它由 `ai-skill router proposals` 讀寫，不被 compiler 編譯。故 commit 以 `[skip-runtime-yaml-projection]` trailer 通過 `validateRuntimeYamlProjects`（對應 failure pattern：runtime-yaml-unprojected 的合法例外）。
 
 ### Phase 7 — Validation Scenarios
 

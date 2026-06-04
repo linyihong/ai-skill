@@ -51,6 +51,7 @@
 | `ai-skill enforcement lint` | 對 `enforcement/enforcement-registry.yaml` 跑 13 條 Phase 3 lint check（orphan_rule / missing_executor_symbol / behavioral_only_* / deprecated_* / upstream_chain / class_size / baseline_snapshot / pending_implementation_child_plan_validity）。Thin CLI wrapper 直接複用 `LintEnforcementRegistry` 引擎；支援 `--check <substr>` 過濾、`--registry <path>` 覆寫、`--expect-finding <substr>` 跨平台 assertion mode（scenario 用） | 否 | 否 | mechanical-enforcement-registry Phase 4 |
 | `ai-skill enforcement coverage` | 把 registry 聚合成 6-bucket coverage report（mechanical / behavioral_only / not_mechanizable / pending_implementation / research_required / deprecated）+ verification level 分類 + runtime_observed gap（Phase 5 wire 前回 `null` + alert）+ Phase 4.5 `## Governance Alerts` 段（R4 deprecated past removal_date+30d / R5 research_required past estimated_unblock_timeline）。`--format text|json|markdown`、`--diff <ref>` 對比 git revision、`--detail` 開 per-class 表、`--self-check` 跨平台驗 3 個 format schema | 否 | 否 | mechanical-enforcement-registry Phase 4 + 4.5 |
 | `ai-skill enforcement transition-check` | Phase 4.5 R1/R2/R3 引擎的 standalone CLI（commit-msg validator 與此共用 engine）。`--old <yaml> --new <yaml> --commit-msg-file <txt>` 給 scenario / CI / local debug 模擬 staged commit；`--expect-violation <substr>` 跨平台 assertion mode（exit 0/30）；無 `--expect-violation` 則列出全部違規並依 FAIL 數 exit 0/30 | 否 | 否 | mechanical-enforcement-registry Phase 4.5 |
+| `ai-skill router proposals {list,record,promote,reject,gc}` | 管理 Workflow Activation Engine 的 route-candidate proposals（`runtime/router/route-candidate-proposals.yaml` data store）。occurrence-tracking + promotion 狀態機（accumulating→ready_for_review→promoted/rejected；stale 過 90d 由 gc 硬清）。promote 只改 status，不自動寫 routing-registry | record/promote/reject/gc 寫檔；list 否 | 否 | workflow-activation-engine Phase 6.1 |
 | `ai-skill roo set-global-custom-instructions` | guarded 寫入 Roo Code 全域 Custom Instructions | 是 | 否 | Tool adapter |
 | `ai-skill copilot start` | 產生 GitHub Copilot 新 session 第一則 bootstrap prompt | 否 | 否 | Tool adapter |
 
@@ -496,6 +497,28 @@
 - `ai-skill runtime validate` 自動以 warning-only check `runtime_audit_warning` 引用其 orphan 統計；audit 自身失敗不阻斷 validate。
 - 額外 glossary coverage warning pass：掃 `plans/active/`、`architecture/`、`workflow/`、`analysis/`、`intelligence/`、`runtime/`、`ecosystem/` 內的 backtick-wrapped identifiers + snake_case ≥ 2 segments terms；若 `knowledge/runtime/sqlite/runtime-index.sqlite` 的 `glossary_terms.term` / `aliases` 找不到，emit `inventory.warnings`（依出現頻次排序，最多 50 條 + 截斷提示）。Heuristic 排除 path references（含 `/`）、單一英文短詞與 < 3 char terms 以降 false positive。
 - 不可修改 runtime.db、routing-registry 或 generated surfaces。
+
+### `ai-skill router proposals`
+
+目的：管理 Workflow Activation Engine Phase 6.1 的 route-candidate proposals —— detector miss 時 Capability Discovery 產生的「可能的新 route」候選，採 occurrence-tracking 防一次性需求污染 registry。
+
+輸入：
+
+- `ai-skill router proposals list [--status <s>]`
+- `ai-skill router proposals record <candidate_id> --signals a,b [--capabilities ...] [--route-type workflow]`
+- `ai-skill router proposals promote <candidate_id>`
+- `ai-skill router proposals reject <candidate_id> --reason <text>`
+- `ai-skill router proposals gc`
+- 共通：`--repo <path>`、`--json` / `--plain`。candidate_id 為 leading positional（flag 可放其後）。
+
+副作用：`record` / `promote` / `reject` / `gc` 寫 `runtime/router/route-candidate-proposals.yaml`；`list` read-only。
+
+必要行為：
+
+- store 是 **data file 非 projected contract**（不進 runtime.db）。
+- promotion 狀態機（`gc` 套用）：`accumulating`→`ready_for_review`（occurrence_count ≥ 5 且 last_seen ≤ 30d）；`accumulating`→`stale`（occurrence_count < 5 且 last_seen > 60d）；`stale` last_seen > 90d 由 gc 硬清。
+- `record` 對既有 candidate bump occurrence_count + 合併 signals/capabilities；`promoted`/`rejected` 為 terminal 不被 record 重開；`stale` 被新 record 重新激活回 `accumulating`。
+- `promote` 只改 status 並提示「需人工/governance 把 route 寫進 routing-registry」—— **不自動編輯 canonical registry**。
 
 ### `ai-skill enforcement lint`
 

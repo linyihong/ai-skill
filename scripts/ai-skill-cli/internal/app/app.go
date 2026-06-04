@@ -41,6 +41,8 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runEnforcement(args[1:], stdout, stderr)
 	case "plans":
 		return runPlans(args[1:], stdout, stderr)
+	case "router":
+		return runRouter(args[1:], stdout, stderr)
 	case "help", "-h", "--help":
 		printUsage(stdout)
 		return ExitSuccess
@@ -68,6 +70,7 @@ func printUsage(w io.Writer) {
 	_, _ = fmt.Fprintln(w, "  scan-checkboxes    scan a Markdown file for unchecked/checked task-list items")
 	_, _ = fmt.Fprintln(w, "  enforcement    run enforcement-registry lint or coverage report (Phase 4)")
 	_, _ = fmt.Fprintln(w, "  plans    render plan-tree hierarchy (Phase 3 of plan-tree-hierarchy-governance)")
+	_, _ = fmt.Fprintln(w, "  router    manage workflow route-candidate proposals (Phase 6.1)")
 }
 
 func newFlagSet(name string, stderr io.Writer) *flag.FlagSet {
