@@ -13,6 +13,7 @@
 - [`dependency/`](dependency/README.md)：定義知識依賴圖的維護規則與連動更新流程。
 - [`ai-runtime-governance/`](ai-runtime-governance/README.md)：將工程哲學轉譯為 AI runtime governance，例如新增 skill / memory / workflow / automation 前的 five-step gate，以及 cognitive state / evidence governance。
 - [`document-sizing.md`](document-sizing.md)：文件大小與拆分原則 — 定義文件拆分門檻、決策流程、拆分後必做事項與建議結構。
+- [`workflow-activation-engine.md`](workflow-activation-engine.md)：Workflow Activation Engine operational spec — registry-driven detector 的 two-phase activation schema（pre-Read activation / post-Read reinforcement）、deterministic rule、backward-compat 正規化、activation_mode capability matrix 與 session-entry-point heuristic。
 
 ## 放什麼
 

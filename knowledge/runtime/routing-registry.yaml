@@ -101,6 +101,68 @@ activation_mode_spec:
       auto_expire: false           # sticky until explicit release / session end
       author_declarable: false
 
+# ─────────────────────────────────────────────────────────────────────────
+# activation_triggers_spec — two-phase activation schema (Phase 1 of the
+# Workflow Activation Engine). Splits signals by WHEN they are observable to
+# break the circular dependency "must Read to know which workflow to read".
+# Full rationale + capability matrix: governance/workflow-activation-engine.md.
+# ─────────────────────────────────────────────────────────────────────────
+activation_triggers_spec:
+  rationale: >
+    artifact_signals require Reading a file before they can match, but a core
+    purpose of workflow activation is forcing the agent to read the workflow
+    primary_source BEFORE touching artifacts. If the detector depended on
+    artifact_signals it would deadlock: Read-to-know-which-workflow vs
+    workflow-requires-read-first. The two-phase schema removes the deadlock by
+    classifying every signal as pre-Read (activation) or post-Read
+    (reinforcement). See ADR-006 (registry-first activation) for the upstream
+    invariant this preserves.
+  phases:
+    activation_any_of:        # Phase 1 — pre-Read, can gate activation
+      observable: pre-Read     # available from inbox text / filenames / cwd, no file content
+      role: activate           # any sub-array hit -> detector locks active_route
+      fields:
+        user_signals: >
+          conversation-text keywords (the existing flat `user_signals` field,
+          re-homed under activation_any_of). Matched against recent user turns.
+        context_signals: >
+          filename / path globs from user-mentioned files, open-files list, or
+          cwd. Matched WITHOUT reading file content.
+    reinforcement_any_of:     # Phase 2 — post-Read, confirmation only
+      observable: post-Read    # requires file content already Read by the agent
+      role: reinforce          # raises confidence; NEVER a standalone activation gate
+      fields:
+        artifact_signals: >
+          regex/keywords over content of files the agent has already Read.
+          A hit confirms "direction correct" when Phase 1 already activated; a
+          Phase-1-miss + Phase-2-hit is logged as a `late-detected` event but
+          does NOT retroactively rewrite activation history.
+  shared_fields:
+    task_intents: >
+      coarse intent tags (existing field, retained at activation_triggers top
+      level — orthogonal to the two phases, used for intent matching).
+    file_change_globs: >
+      legacy field on some routes; treated as context_signals-equivalent
+      (pre-Read path match) by the detector.
+  deterministic_rule: >
+    ANY single entry in ANY activation_any_of sub-array hits -> activate.
+    No weighting, no scoring, no thresholds (NO weighted scoring — plan
+    invariant). Multi-route hits route to workflow/workflow-routing.md Stage 2
+    ambiguity adjudication; the detector never auto-picks among conflicts.
+  backward_compat:
+    rule: >
+      Legacy flat form (activation_triggers with top-level `user_signals:` /
+      `artifact_signals:` and no activation_any_of/reinforcement_any_of) stays
+      valid INDEFINITELY. The detector normalizes it as:
+      top-level user_signals -> activation_any_of.user_signals;
+      top-level context_signals/file_change_globs -> activation_any_of.context_signals;
+      top-level artifact_signals -> reinforcement_any_of.artifact_signals.
+    existing_routes_unchanged: >
+      The 7 routes already carrying activation_triggers (apk-analysis,
+      decision-recording, system-upgrade, + 4 others) are NOT rewritten in
+      Phase 1. They keep the legacy flat form and the normalizer handles them.
+      New triggers (Phase 2) MAY use the explicit two-phase form.
+
 records:
   - id: route.bootstrap.ai-skill
     route_type: bootstrap
