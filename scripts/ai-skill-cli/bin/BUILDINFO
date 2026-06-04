@@ -1,4 +1,4 @@
-version=repo-a16d3d4
-source_commit=a16d3d4
-built_at=2026-06-04T07:03:03Z
+version=repo-4b0c4c7
+source_commit=4b0c4c7
+built_at=2026-06-04T23:56:11Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
