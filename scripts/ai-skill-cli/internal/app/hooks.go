@@ -386,6 +386,74 @@ func resolveClaudeAiSkillRepo(projectDir string) string {
 	return projectDir
 }
 
+// workflowPrimarySourceGate evaluates obligation.workflow.activation_evidence
+// (Phase 5). It returns block=true ONLY when the Workflow Activation Engine
+// detector has locked a SINGLE active_route for this task AND the agent has not
+// yet Read that route's primary_source.
+//
+// SAFETY — fail-open everywhere detection is uncertain. It returns false (no
+// block) when: there is no transcript, the routing registry is unresolvable
+// (hook outside the Ai-skill repo), no route activated (miss), more than one
+// route activated (conflict → Stage 2), or the active route has no
+// primary_source. It only blocks the narrow, unambiguous case so a new/
+// imperfect detector never wedges unrelated tool calls.
+func workflowPrimarySourceGate(transcriptPath, aiSkillRepo string) (block bool, routeID, primarySource string) {
+	if transcriptPath == "" || aiSkillRepo == "" {
+		return false, "", ""
+	}
+	registry, err := readRuntimeRoutingRegistry(filepath.Join(aiSkillRepo, "knowledge", "runtime", "routing-registry.yaml"))
+	if err != nil {
+		return false, "", ""
+	}
+	transcript := extractTranscriptMessages(transcriptPath)
+	if len(transcript) == 0 {
+		return false, "", ""
+	}
+	ctx := BuildRuntimeContext(registry, transcript, nil, time.Now().UTC())
+	if ctx.ActiveRoute == "" { // miss or conflict → never block
+		return false, "", ""
+	}
+	ps := ""
+	for _, rec := range registry.Records {
+		if rec.ID == ctx.ActiveRoute {
+			ps = strings.TrimSpace(rec.PrimarySource)
+			break
+		}
+	}
+	if ps == "" {
+		return false, ctx.ActiveRoute, ""
+	}
+	if ok, _ := transcriptHasRequiredBootstrapReads(transcriptPath, []string{ps}); ok {
+		return false, ctx.ActiveRoute, ps // already read → satisfied
+	}
+	return true, ctx.ActiveRoute, ps
+}
+
+// finishPreToolUse runs the workflow activation-evidence gate after the
+// bootstrap gate is satisfied, then returns the final PreToolUse exit code.
+func finishPreToolUse(transcriptPath, projectDir string, stderr io.Writer) int {
+	block, routeID, ps := workflowPrimarySourceGate(transcriptPath, resolveClaudeAiSkillRepo(projectDir))
+	if !block {
+		return ExitSuccess
+	}
+	_, _ = fmt.Fprintf(stderr, "BLOCK_WORKFLOW_PRIMARY_SOURCE route=%s primary_source=%s\n", routeID, ps)
+	_, _ = fmt.Fprintf(stderr, `[ai-skill PreToolUse hook] Workflow activation evidence missing.
+
+The Workflow Activation Engine detector locked active_route=%s for this task,
+but its primary_source has not been Read yet:
+  %s
+
+Per obligation.workflow.activation_evidence (gate.workflow.primary_source_read),
+Read the workflow primary_source before other tool calls so execution follows
+the activated workflow. Only Read tool calls are allowed until this clears.
+
+This gate fires ONLY on a single locked route; it never blocks on a detector
+miss or a multi-route conflict, and self-clears once you Read the file above
+(or pivot the task so a different route activates).
+`, routeID, ps)
+	return ExitValidationFailed
+}
+
 // md5Short returns the first 12 hex chars of the MD5 hash of s.
 func md5Short(s string) string {
 	h := md5.Sum([]byte(s))
@@ -884,7 +952,7 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 	cacheFile := "/tmp/ai-skill-bootstrap-" + cacheKey + ".done"
 	if claudeFileExists(cacheFile) {
 		_, _ = fmt.Fprintln(stderr, "ALLOW_CACHED")
-		return ExitSuccess
+		return finishPreToolUse(transcriptPath, projectDir, stderr)
 	}
 
 	if projectDir != "" {
@@ -897,7 +965,7 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 					_ = os.WriteFile(cacheFile, []byte{}, 0o644)
 					_, _ = fmt.Fprintln(stderr, "ALLOW_SESSIONSTART_FLAG")
 					appendLog(logFile, "exit_code: 0 (sessionstart flag)")
-					return ExitSuccess
+					return finishPreToolUse(transcriptPath, projectDir, stderr)
 				}
 			}
 		}
@@ -924,7 +992,7 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 			_ = os.WriteFile(cacheFile, []byte{}, 0o644)
 			_, _ = fmt.Fprintln(stderr, "ALLOW_RECEIPT_FOUND_WITH_READS")
 			appendLog(logFile, "exit_code: 0 (receipt found + required reads verified)")
-			return ExitSuccess
+			return finishPreToolUse(transcriptPath, projectDir, stderr)
 		}
 		_, _ = fmt.Fprintln(stderr, "BLOCK_RECEIPT_WITHOUT_READS missing="+strings.Join(missing, ","))
 		appendLog(logFile, "exit_code: 2 (receipt without required reads; missing="+strings.Join(missing, ",")+")")

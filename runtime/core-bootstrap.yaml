@@ -190,6 +190,30 @@ per_turn_obligations:
       This obligation prevents "dirty-repo final responses". Agent must
       ensure all changes are committed and pushed (or record authorized
       pending state) before claiming task completion.
+  - id: obligation.workflow.activation_evidence
+    fires: non_read_tool_after_detector_locks_single_active_route
+    action: |
+      When the Workflow Activation Engine detector locks a SINGLE
+      active_route for the current task (RuntimeContext.ActiveRoute != ""),
+      the agent MUST Read that route's primary_source before other tool
+      calls, so execution follows the activated workflow. The PreToolUse
+      validator (validateWorkflowPrimarySourceRead / workflowPrimarySourceGate
+      in scripts/ai-skill-cli/internal/app/hooks.go) scans the transcript for
+      that Read event, mirroring gate.bootstrap.receipt_present.
+    severity: high
+    blocking_gate_id: gate.workflow.primary_source_read
+    fail_open: true
+    note: |
+      Phase 5 of plans/active/2026-05-31-1900-workflow-activation-engine.md.
+      SAFETY (must hold): this gate fires ONLY after the detector locks a
+      single active_route. It NEVER blocks on a detector miss (no match) or a
+      multi-route conflict (>1 activated → workflow/workflow-routing.md Stage 2
+      adjudication, ActiveRoute stays empty). It also fails open when the
+      routing registry is unresolvable (e.g. hook running outside the Ai-skill
+      repo). It is NOT Discovery and does NOT run per-turn unconditionally —
+      no lock, no block. Read tool calls are always allowed so the agent can
+      comply. RuntimeContext is rebuilt from the transcript each call
+      (deterministic; no SQLite — see Phase 4.0).
 
 per_commit_obligations:
   # Enumerated 2026-05-26 (Phase 6 of bootstrap-contract-yaml-migration):

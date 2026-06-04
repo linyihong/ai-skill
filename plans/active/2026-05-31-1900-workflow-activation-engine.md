@@ -456,6 +456,13 @@ Lifecycle（簡化，**移除 implicit keyword-drift invalidation**）：
 
 **這不是 Discovery、不是每 turn 跑**：只在 detector 已鎖定 active_route 後生效。沒鎖定 = 不阻擋。
 
+產出（2026-06-04）：
+- [x] `runtime/core-bootstrap.yaml` 加 `obligation.workflow.activation_evidence`（per_turn；`fires: non_read_tool_after_detector_locks_single_active_route`；`blocking_gate_id: gate.workflow.primary_source_read`；`fail_open: true`）。compile+refresh 後 projected 進 runtime.db，`ai-skill runtime obligations` / `receipt` 的 per_turn 列已含此 obligation（count 仍 23，因數字取自 obligations table 而非 YAML 列；per numeric_field_ontology）
+- [x] `hooks.go` `workflowPrimarySourceGate(transcriptPath, aiSkillRepo)` + `finishPreToolUse`：build RuntimeContext → 若鎖定**單一** active_route 且其 primary_source 未在 transcript 被 Read → block 非-Read tool（mirror `gate.bootstrap.receipt_present`：用 `transcriptHasRequiredBootstrapReads` 掃 Read 事件）
+- [x] 接線：runPreToolUse 三個 bootstrap-pass 成功路徑（ALLOW_CACHED / ALLOW_SESSIONSTART_FLAG / ALLOW_RECEIPT_FOUND_WITH_READS）改走 `finishPreToolUse`，故 bootstrap 通過後每次 non-Read call 都重評 workflow gate
+- [x] **不誤殺保證（6 unit tests，workflow_gate_test.go）**：locked+unread→block；locked+read→allow；conflict(>1)→allow；miss→allow；repo 不可解析 / registry 缺→fail-open allow；無 transcript→allow。Read tool 永遠放行（agent 可遵從）。registry 在外部 project 不可解析時 fail-open
+- [x] 驗證：go test ./internal/app PASS（含 6 gate tests）、compile PASS（FAIL:0）、validate success
+
 ### Phase 6 — Failure Pattern + Discovery Feedback Loop
 
 #### Phase 6.0 — Failure Pattern 記錄
@@ -576,7 +583,7 @@ Acceptance：四個 scenario 全 PASS，且回放 2026-05-31 session 時 travel-
 - [x] Phase 2 新增 triggers 經抽樣 review（≥ 5 條；user-reviewed audit table + 7 routes 落地）
 - [x] Phase 3 detector unit tests 涵蓋：single hit、multi hit、no match、舊格式相容（15 tests，detector_test.go）
 - [x] Phase 4 RuntimeContext lifecycle 經 unit test 驗證（10 tests，runtime_context_test.go；workflow_sessions SQLite 表已作廢改 in-memory，見 Phase 4.0）
-- [ ] Phase 5 obligation 不誤殺：當 detector miss 時 tool calls 不被擋
+- [x] Phase 5 obligation 不誤殺：當 detector miss 時 tool calls 不被擋（2026-06-04；6 gate tests 證明 miss/conflict/no-repo/no-transcript 皆 fail-open allow，只有「單一 locked route + primary_source 未讀」才 block）
 - [ ] Phase 7 regression scenario：2026-05-31 session 場景 replay 必須觸發 travel-planning
 - [ ] Phase 8 close-loop：所有變更 commit / push / readback
 
