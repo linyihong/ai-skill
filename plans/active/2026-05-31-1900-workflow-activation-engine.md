@@ -467,7 +467,7 @@ Lifecycle（簡化，**移除 implicit keyword-drift invalidation**）：
 
 #### Phase 6.0 — Failure Pattern 記錄
 
-- [ ] 新建 `enforcement/failure-patterns/workflow-detector-missing.md` —— 記錄 2026-05-31 失效為 systemic gap，並把 Detector 設計指回本 plan
+- [x] 新建 `enforcement/failure-patterns/workflow-detector-missing.md`（2026-06-04）—— 記錄 2026-05-31 失效為 systemic gap（`rule-without-executor` instance #2 領域特化），Trigger/Failure/Risk/Required Action/Fix-Landed 表指回 detector.go + Phase 3-5；failure-patterns README index 已加列
 
 #### Phase 6.1 — Discovery → Detector Feedback Loop（**新增，採納第二輪評審**）
 
@@ -500,12 +500,9 @@ Execution                     graph traversal → 找到相關 governance / work
 範例：未來 user 開始做「AI Agent Governance Audit」，現有 Registry 沒對應 route → Detector 全 miss → Discovery fallback → 找到 governance/architecture/compliance 群 atom → 提案新增 `route.workflow.governance-audit` candidate。
 
 產出：
-- [ ] 更新 `governance/lifecycle/capability-discovery-philosophy.md` —— 加章節「Discovery → Detector Feedback Loop」，明確：
-  - Detector 處理 known route 的 known trigger（cheap, deterministic, per-task）
-  - Discovery 處理 unknown capability（expensive, exploratory, **only fires on detector miss**）
-  - Discovery 輸出可以 propose Registry growth（candidate route + suggested triggers）
-- [ ] 在 detector miss path 加 fallback hook 呼叫 Discovery（但不阻擋執行流程，warn + continue）
-- [ ] 新建 `runtime/router/route-candidate-proposals.yaml`（pending proposals 暫存區）—— 採 **occurrence tracking** schema 防垃圾場（v3 採納評審 #3）：
+- [x] 更新 `governance/lifecycle/capability-discovery-philosophy.md`（2026-06-04）—— 加 §「Discovery → Detector Feedback Loop」：known/unknown 分工表 + 回饋環 ASCII + Registry 自我成長 rationale + occurrence-tracking 反濫用 + sunset 綁定（enforcement-registry capability_discovery）
+- [ ] **（Go slice，下一步）** 在 detector miss path 加 fallback hook 呼叫 Discovery（warn + continue，不阻擋）
+- [ ] **（Go slice，下一步）** 新建 `runtime/router/route-candidate-proposals.yaml`（pending proposals 暫存區）—— 採 **occurrence tracking** schema 防垃圾場（v3 採納評審 #3）：
 
   ```yaml
   # runtime/router/route-candidate-proposals.yaml
@@ -535,7 +532,9 @@ Execution                     graph traversal → 找到相關 governance / work
   | `ready_for_review` → `rejected` | User / governance review reject（例：太細、與既有 route 重疊），記 `rejected_reason` 後 archive |
 
   **CLI 輔助**：`ai-skill router proposals list --status ready_for_review` —— 只顯示真正值得 review 的，避免使用者面對 100 條一次性 proposal 的垃圾場。
-- [ ] 新建 `ai-skill router proposals {list, promote, reject, gc}` CLI subcommands
+- [ ] **（Go slice，下一步）** 新建 `ai-skill router proposals {list, promote, reject, gc}` CLI subcommands
+
+> **Phase 6 分拆（2026-06-04）**：6.0 failure pattern + 6.1 philosophy doc 已完成（純文件，本次 commit）。剩餘 6.1 為 Go-heavy slice（proposals.yaml store + `router proposals` 狀態機 CLI + detector-miss→Discovery wiring），另一 commit 處理：需設計 runtime/router/*.yaml 是 **data store 非 projected contract**（避免誤觸 `validateRuntimeYamlProjects`，可能需 [skip-runtime-yaml-projection] 或 governance 例外），且 detector-miss auto-population 從 hot hook 寫檔有 cost/noise 顧慮，須謹慎。
 
 ### Phase 7 — Validation Scenarios
 

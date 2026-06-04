@@ -39,6 +39,42 @@ Discovery 使用 [`knowledge/graphs/`](../../knowledge/graphs/README.md) 的 edg
 | [`runtime/runtime.db`](../../runtime/runtime.db) / [`runtime/runtime.db`](../../runtime/runtime.db) | checkpoint phase、`run_capability_discovery` allowed_action、obligation 與 gate 的 compiled source |
 | `capability_checkpoints` table | Phase-aware discovery checkpoint definitions |
 
+## Discovery → Detector Feedback Loop
+
+Detector 與 Discovery 不是互斥替代，而是 **known vs unknown** 的分工，且在
+detector miss 時形成回饋環（plan 1900 Phase 6.1）：
+
+| | Detector | Capability Discovery |
+|---|---|---|
+| 處理 | known route 的 known trigger | unknown capability（registry 沒有的 route） |
+| 成本 | cheap、deterministic、per-task | expensive、exploratory |
+| 觸發 | 每個 substantive task | **只在 detector miss 時** fire |
+| 輸出 | `RuntimeContext.ActiveRoute` | route-candidate proposal（Registry growth） |
+
+```text
+User Request → Detector
+  ├─ hit  → RuntimeContext.ActiveRoute → Execution
+  └─ miss → Capability Discovery（graph traversal 找相關 atom）
+              → 提案新 route candidate（route-candidate-proposals.yaml）
+              → occurrence 累積到門檻 → user / governance review → promote 成正式 route
+```
+
+**為什麼這樣分工**：detector miss 不代表「沒有 workflow 可用」，可能是 Registry
+還沒收錄此 task type。Discovery 跑 graph traversal 找出可能相關的 capability
+atom；若多次一致指向同一群 capability → 暗示應新增一個 route。這形成 **Registry
+自我成長機制**：使用越多、coverage 越廣，而非靠人預先窮舉所有 route。
+
+**反濫用**：proposals 採 occurrence-tracking schema（`occurrence_count` /
+`first_seen` / `last_seen` / `status`），只有累積到門檻（`occurrence_count >= 5`
+且近 30 天活躍）才升為 `ready_for_review`，避免一次性需求污染 Registry。狀態機
+與 `ai-skill router proposals` CLI 見 plan 1900 Phase 6.1
+（`runtime/router/route-candidate-proposals.yaml`）。
+
+**Sunset 綁定**：本 philosophy 在 `enforcement/enforcement-registry.yaml`
+§`capability_discovery` 的 `behavioral_only` 覆蓋，其 revisit 條件即
+「workflow_activation Phase 6.1 lands」—— Discovery 的 mechanical 整合點正是
+detector 的 miss path，而非把 Discovery 獨立做成 per-turn executor。
+
 ## 與既有文件的關係
 
 - [`runtime/runtime.db`](../../runtime/runtime.db) — Compiled discovery checkpoint runtime surface
