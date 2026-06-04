@@ -1,4 +1,4 @@
-version=repo-d739afd
-source_commit=d739afd
-built_at=2026-06-04T05:44:53Z
+version=repo-90e609d
+source_commit=90e609d
+built_at=2026-06-04T06:08:47Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
