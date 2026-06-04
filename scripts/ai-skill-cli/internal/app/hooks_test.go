@@ -558,6 +558,7 @@ func TestRunStopHookAllowsCursorTodoToolResponseWithoutCloseOutLoop(t *testing.T
 func TestRunStopHookAllowsCursorSwitchModeResponseWithoutCloseOutLoop(t *testing.T) {
 	cases := []string{
 		"Switched composer mode from agent to plan",
+		"Switched composer mode from plan to agent",
 		"Switched to Agent mode",
 		"Switched to Plan mode",
 		"Switched to Ask mode",
@@ -566,6 +567,8 @@ func TestRunStopHookAllowsCursorSwitchModeResponseWithoutCloseOutLoop(t *testing
 		"You are now in Plan mode.",
 		"You are now in Ask mode.",
 		"You are now in Debug mode.",
+		"Successfully switched to Plan mode.",
+		"Mode switched to plan.",
 	}
 	for _, assistantResponse := range cases {
 		t.Run(assistantResponse, func(t *testing.T) {
@@ -584,6 +587,46 @@ func TestRunStopHookAllowsCursorSwitchModeResponseWithoutCloseOutLoop(t *testing
 				t.Fatalf("expected non-final tool response diagnostic, got %s", stderr.String())
 			}
 		})
+	}
+}
+
+func TestRunStopHookAllowsCursorSwitchModeTranscriptWithoutCloseOutLoop(t *testing.T) {
+	dir := t.TempDir()
+	transcriptPath := writeBootstrapTranscript(t, dir, "Successfully switched to Plan mode.", nil)
+	setHookStdin(t, fmt.Sprintf(`{"hook_event_name":"stop","transcript_path":%q}`, transcriptPath))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(dir, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cursor transcript stop to allow non-final switch-mode response, got %d; stderr=%s", code, stderr.String())
+	}
+	if stdout.String() != "" {
+		t.Fatalf("expected no followup loop for non-final switch-mode transcript, got %s", stdout.String())
+	}
+	if !strings.Contains(stderr.String(), "ALLOW_CURSOR_NON_FINAL_TOOL_RESPONSE") {
+		t.Fatalf("expected non-final tool response diagnostic, got %s", stderr.String())
+	}
+}
+
+func TestRunStopHookDoesNotTreatFinalMentioningSwitchModeAsToolStatus(t *testing.T) {
+	setHookStdin(t, `{"hook_event_name":"stop","assistant_response":"The earlier Cursor message said Switched to Plan mode, but this is my final answer without a close-out block."}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cursor stop to loop with success exit, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode Cursor stop output: %v\n%s", err, stdout.String())
+	}
+	if !strings.Contains(output["followup_message"], "Cognitive Mode block") {
+		t.Fatalf("expected close-out followup for final response, got %#v", output)
+	}
+	if strings.Contains(stderr.String(), "ALLOW_CURSOR_NON_FINAL_TOOL_RESPONSE") {
+		t.Fatalf("final response mentioning mode switch must not be treated as non-final: %s", stderr.String())
 	}
 }
 

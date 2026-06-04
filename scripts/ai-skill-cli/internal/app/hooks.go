@@ -1358,25 +1358,37 @@ func isCursorNonFinalToolResponse(text string) bool {
 	if trimmed == "" {
 		return false
 	}
-	normalized := strings.ToLower(trimmed)
-	nonFinalMarkers := []string{
-		"plan file created at:",
-		"you can read the plan contents from this file.",
-		"the provided to-dos have been added",
-		"successfully updated todos.",
-		"switched composer mode",
-		"switched to agent mode",
-		"switched to plan mode",
-		"switched to ask mode",
-		"switched to debug mode",
-		"you are now in agent mode",
-		"you are now in plan mode",
-		"you are now in ask mode",
-		"you are now in debug mode",
-		"successfully switched",
+	normalized := strings.ToLower(strings.Join(strings.Fields(trimmed), " "))
+	if strings.HasPrefix(normalized, "plan file created at:") &&
+		strings.Contains(normalized, "you can read the plan contents from this file") {
+		return true
 	}
-	for _, marker := range nonFinalMarkers {
-		if strings.Contains(normalized, marker) {
+	if strings.HasPrefix(normalized, "successfully updated todos.") {
+		return true
+	}
+	return isCursorModeSwitchStatus(normalized)
+}
+
+func isCursorModeSwitchStatus(normalized string) bool {
+	normalized = strings.TrimSuffix(strings.TrimSpace(normalized), ".")
+	modeSwitchPatterns := []string{
+		"switched composer mode from agent to plan",
+		"switched composer mode from plan to agent",
+		"switched composer mode from agent to ask",
+		"switched composer mode from ask to agent",
+		"switched composer mode from agent to debug",
+		"switched composer mode from debug to agent",
+	}
+	for _, pattern := range modeSwitchPatterns {
+		if normalized == pattern {
+			return true
+		}
+	}
+	for _, mode := range []string{"agent", "plan", "ask", "debug"} {
+		if normalized == "switched to "+mode+" mode" ||
+			normalized == "you are now in "+mode+" mode" ||
+			normalized == "successfully switched to "+mode+" mode" ||
+			normalized == "mode switched to "+mode {
 			return true
 		}
 	}
