@@ -29,7 +29,7 @@ Frida attach 模式無法 hook App 啟動階段的初始化函數（如 Dart AOT
   - `hookInitialize` at offset `0xe5b458` never fires in attach mode
   - Same hook fires correctly in spawn mode（`frida -U -f <package> -l script.js`）
   - `Buffer` is not defined → use `ptr.add(i).readU8()` instead
-- Evidence path: `<PROJECT_ROOT>/TATA/scripts/frida/hook_dispatch_first_call.js`
+- Evidence path: `<PROJECT_ROOT>/<target-app>/scripts/frida/hook_dispatch_first_call.js`
 
 #### Generalized Lesson
 

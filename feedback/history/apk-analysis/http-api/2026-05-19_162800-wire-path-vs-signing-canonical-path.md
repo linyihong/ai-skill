@@ -9,7 +9,7 @@ Status: candidate
 - 實際 HTTP wire URL path：request 送到 server 的 path。
 - 簽章 canonical path：App 內部餵給 `eh` / signature generator 的 path material。
 
-這兩者不一定完全相同。TATA gossip live smoke 中，HTTP wire path 使用 `/v1/api/public/` 才會回到 encrypted JSON；但 `eh` 產生仍使用 App 內部 `api/public/?...` canonical material。若把兩者混成同一個值，server 可能回 HTML/error page，表面上像是授權、簽章或 decrypt 缺口。
+這兩者不一定完全相同。<target-app> gossip live smoke 中，HTTP wire path 使用 `/v1/api/public/` 才會回到 encrypted JSON；但 `eh` 產生仍使用 App 內部 `api/public/?...` canonical material。若把兩者混成同一個值，server 可能回 HTML/error page，表面上像是授權、簽章或 decrypt 缺口。
 
 ## Rule
 
@@ -21,6 +21,6 @@ Status: candidate
 
 ## Evidence
 
-- TATA guest login 文件與既有實作使用 `/v1/api/public/` 作為 wire path。
+- <target-app> guest login 文件與既有實作使用 `/v1/api/public/` 作為 wire path。
 - 既有 `DartEncryptAESProvider` / `GuestLoginClient` 註解顯示 `eh` signing path 使用 `api/public/`，不是 `v1/api/public/`。
 - Gossip live smoke 從 `/api/public` 改為 `/v1/api/public/` 後，categories/articles/detail 由 HTML failure 進入可解析 response，並能下載 detail content image。

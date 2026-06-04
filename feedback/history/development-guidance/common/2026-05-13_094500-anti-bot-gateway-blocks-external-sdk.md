@@ -16,7 +16,7 @@ Status: candidate
 2. 外部 JVM（Java SDK、OkHttp、curl 等）的 TLS fingerprint 與目標 App 的 fingerprint 不同
 3. Gateway 直接拒絕（HTTP 403 / 429 / challenge page），不會進入業務邏輯
 
-**實務案例**：TATA App 使用 PerimeterX 保護 guest login API。外部 Java SDK 發送的請求即使 request body、headers、cookies 完全正確，仍然被 PerimeterX 阻擋（HTTP 403）。繞過方式是利用 `adb forward tcp:18881 tcp:18881` 將裝置上的 Netty proxy 埠轉發到 host，然後透過這個 proxy 發送請求 — proxy 使用 App 本身的 TLS stack，fingerprint 與 App 一致。
+**實務案例**：<target-app> App 使用 PerimeterX 保護 guest login API。外部 Java SDK 發送的請求即使 request body、headers、cookies 完全正確，仍然被 PerimeterX 阻擋（HTTP 403）。繞過方式是利用 `adb forward tcp:18881 tcp:18881` 將裝置上的 Netty proxy 埠轉發到 host，然後透過這個 proxy 發送請求 — proxy 使用 App 本身的 TLS stack，fingerprint 與 App 一致。
 
 #### Trigger
 
@@ -28,7 +28,7 @@ Status: candidate
 
 - Tool: Frida hook (SSL_write/SSL_read), tcpdump capture, Java SDK live test
 - Sanitized excerpt: 外部 JVM 發送 guest login POST 請求 → PerimeterX 回 HTTP 403；透過 `adb forward tcp:18881 tcp:18881` + device proxy 發送相同請求 → HTTP 200 + Set-Cookie
-- Evidence path: `<PROJECT_ROOT>/TATA/docs/domain-baseline.md`（PerimeterX 章節）、`<PROJECT_ROOT>/TATA/api/API列表/public/guest_login.md`（2026-05-13 發現記錄）
+- Evidence path: `<PROJECT_ROOT>/<target-app>/docs/domain-baseline.md`（PerimeterX 章節）、`<PROJECT_ROOT>/<target-app>/api/API列表/public/guest_login.md`（2026-05-13 發現記錄）
 
 #### Generalized Lesson
 

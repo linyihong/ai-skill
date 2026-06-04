@@ -11,7 +11,7 @@ Status: candidate
 
 #### Human Explanation
 
-在 TATA SDK 開發過程中，SDK 核心（typed query、parser、mock transport、BDD 測試）位於公開 reactor 模組。而 private adapter（AES 簽章 mutator、AES 解密 decoder、語言不透明參數提供者、加密材料）需要類似正式環境的機敏值，這些值不能進入公開文件或已發布的 JAR。直覺上可能會想為 adapter 建立一個新的 Maven 模組，但專案規則已經定義了一個測試模組（`tata-sdk-tests`），它具有以下特性：
+在 <target-app> SDK 開發過程中，SDK 核心（typed query、parser、mock transport、BDD 測試）位於公開 reactor 模組。而 private adapter（AES 簽章 mutator、AES 解密 decoder、語言不透明參數提供者、加密材料）需要類似正式環境的機敏值，這些值不能進入公開文件或已發布的 JAR。直覺上可能會想為 adapter 建立一個新的 Maven 模組，但專案規則已經定義了一個測試模組（`targetapp-sdk-tests`），它具有以下特性：
 
 1. 與 parent reactor 分開建置（未列在 `<modules>` 中）。
 2. 已包含 live smoke 測試基礎設施（`LiveExternalGossipFetchTest`、`LiveExternalGossipEnvTest`）。
@@ -30,8 +30,8 @@ Status: candidate
 #### Evidence
 
 - 工具：Maven 模組結構檢視、parent POM 的 `<modules>` 列表、測試模組的 `pom.xml`、現有 live 測試檔案。
-- 去敏摘要：adapter 套件 `com.tata.sdk.tests.live.adapter` 包含 `TataSigningMutator`、`TataDecryptDecoder`、`TataCryptoMaterial`、`TataLanguageProvider`——全部為 test-scoped，程式碼中無正式環境機敏值，由環境變數驅動。
-- 證據路徑：`apk-analysis-sdk/pom.xml` 顯示 `tata-sdk-tests` 不在 `<modules>` 中。`apk-analysis-sdk/tata-sdk-tests/pom.xml` 宣告了對 `tata-sdk` 的依賴。Live 測試已存在於 `src/test/java/com/tata/sdk/tests/live/` 下。
+- 去敏摘要：adapter 套件 `com.targetapp.sdk.tests.live.adapter` 包含 `TataSigningMutator`、`TataDecryptDecoder`、`TataCryptoMaterial`、`TataLanguageProvider`——全部為 test-scoped，程式碼中無正式環境機敏值，由環境變數驅動。
+- 證據路徑：`apk-analysis-sdk/pom.xml` 顯示 `targetapp-sdk-tests` 不在 `<modules>` 中。`apk-analysis-sdk/targetapp-sdk-tests/pom.xml` 宣告了對 `targetapp-sdk` 的依賴。Live 測試已存在於 `src/test/java/com/targetapp/sdk/tests/live/` 下。
 
 #### Generalized Lesson
 
@@ -71,7 +71,7 @@ Status: candidate
 
 - 目標：防止在已有合適測試模組的情況下，為 private adapter 程式碼建立不必要的 Maven 模組。
 - 行動：將 private adapter class 放在現有獨立測試模組中，以 test-scoped 程式碼形式存在。
-- 驗證或參考來源：adapter 在獨立建置測試模組時可編譯且測試通過（`mvn test -pl tata-sdk-tests` 或 `cd tata-sdk-tests && mvn test`）。Adapter class 不會發布到任何公開儲存庫。
+- 驗證或參考來源：adapter 在獨立建置測試模組時可編譯且測試通過（`mvn test -pl targetapp-sdk-tests` 或 `cd targetapp-sdk-tests && mvn test`）。Adapter class 不會發布到任何公開儲存庫。
 
 #### Applies When
 

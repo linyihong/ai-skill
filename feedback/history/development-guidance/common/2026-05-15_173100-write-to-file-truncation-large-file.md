@@ -28,7 +28,7 @@ Status: candidate
 
 - Tool: `write_to_file` with ~1000-line Java file
 - Sanitized excerpt: 檔案在 `if (ehValue !=` 處截斷（line 742 of 1000+），後續約 260 行遺失
-- Evidence path: `<PROJECT_ROOT>/apk-analysis-sdk/tata-sdk/src/test/java/com/tata/sdk/shortdrama/ShortDramaLiveTest.java`
+- Evidence path: `<PROJECT_ROOT>/apk-analysis-sdk/targetapp-sdk/src/test/java/com/targetapp/sdk/shortdrama/ShortDramaLiveTest.java`
 
 #### Generalized Lesson
 

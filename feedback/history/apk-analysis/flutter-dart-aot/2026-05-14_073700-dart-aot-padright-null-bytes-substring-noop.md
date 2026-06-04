@@ -31,7 +31,7 @@ Status: validated
   - `padRight("l65tvNcw", 16)` → `"l65tvNcw\0\0\0\0\0\0\0\0"`（null bytes，非 spaces）
   - `substring(0, 32)` on 16-char string → returns same 16-char string（no crash）
   - Dispatch at `UBFX X0, X0, #12, #20` + `LDR X16, [X21, X0, LSL #3]` + `BLR X16` successfully captures all vtable targets
-- Evidence path: `<PROJECT_ROOT>/TATA/scripts/frida/hook_dispatch_first_call.js`
+- Evidence path: `<PROJECT_ROOT>/<target-app>/scripts/frida/hook_dispatch_first_call.js`
 
 #### Generalized Lesson
 

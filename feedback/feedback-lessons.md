@@ -46,7 +46,7 @@
 
 #### ❌ 錯誤 1：混淆 lesson 的 domain 歸屬
 
-**情境**：從 TATA 專案學到「非標準 TLS bypasses SSL hooks」和「dart:io HttpClient bypasses Java hooks」
+**情境**：從 <target-app> 專案學到「非標準 TLS bypasses SSL hooks」和「dart:io HttpClient bypasses Java hooks」
 
 **錯誤行為**：把這兩個 lesson 放到 `feedback/history/development-guidance/common/`
 

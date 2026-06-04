@@ -10,7 +10,7 @@ Status: candidate
 
 #### Human Explanation
 
-TATA App 的網路架構包含三層代理：
+<target-app> App 的網路架構包含三層代理：
 
 ```
 Dart dart:io HttpClient → 127.0.0.1:55382 (proxy1, plain HTTP via OkHttp)

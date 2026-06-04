@@ -30,7 +30,7 @@ Status: candidate
 
 - Tool: Java JUnit 測試（`probeIdentityFieldValidation()`）
 - Sanitized excerpt: 一個從最小欄位集合（app constants + random device_id）開始的測試，逐步加入每個欄位並使用修改後的值。全部 6 個探針測試都回傳 HTTP 200，證明伺服器不驗證 identity material 的內容。
-- Evidence path: `<PROJECT_ROOT>/apk-analysis-sdk/tata-sdk-tests/src/test/java/com/tata/sdk/tests/live/LiveGuestLoginTest.java` — `probeIdentityFieldValidation()` 方法
+- Evidence path: `<PROJECT_ROOT>/apk-analysis-sdk/targetapp-sdk-tests/src/test/java/com/targetapp/sdk/tests/live/LiveGuestLoginTest.java` — `probeIdentityFieldValidation()` 方法
 
 #### Generalized Lesson
 

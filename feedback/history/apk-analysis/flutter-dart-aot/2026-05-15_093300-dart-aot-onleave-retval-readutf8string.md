@@ -31,7 +31,7 @@ Dart `_OneByteString` 的典型記憶體佈局（`smi32@8/16`）：
 
 - Tool: Frida `Interceptor.attach` with `onLeave` callback
 - Sanitized excerpt: `onLeave: function(retval) { var untagged = retval.sub(1); var len = untagged.add(8).readU32() >> 1; var s = untagged.add(16).readUtf8String(len); }` — 成功讀取 Dart `_OneByteString` 回傳值
-- Evidence path: `<PROJECT_ROOT>/TATA/scripts/frida/hook_decrypt_aes_response.js`
+- Evidence path: `<PROJECT_ROOT>/<target-app>/scripts/frida/hook_decrypt_aes_response.js`
 
 #### Generalized Lesson
 

@@ -12,7 +12,7 @@ Status: candidate
 
 在逆向分析 App 網路通訊時，標準做法是 hook SSL 函式庫的 `SSL_write` / `SSL_read` 來捕獲解密後的明文。但這個做法依賴一個假設：App 使用標準的 TLS 實作（OpenSSL / BoringSSL / Java SSLSocket / Netty SslHandler）。
 
-**實務案例**：TATA App 內部的 Netty proxy 使用非標準的 TLS 實作。Frida 的 `SSL_write` / `SSL_read` hook 在 7 分鐘的 capture 中產生 **0 個事件**，即使 App 確實有 TLS 加密連線到 production API。最終捕獲明文的方式是：
+**實務案例**：<target-app> App 內部的 Netty proxy 使用非標準的 TLS 實作。Frida 的 `SSL_write` / `SSL_read` hook 在 7 分鐘的 capture 中產生 **0 個事件**，即使 App 確實有 TLS 加密連線到 production API。最終捕獲明文的方式是：
 
 1. **hook libc `write` / `sendto`** — 在系統呼叫層級捕獲 Netty 寫入 socket 的資料（但需要自行處理 HTTP 分幀）
 2. **hook Netty `channelRead`** — 在 Netty pipeline 層級捕獲 `HttpObjectAggregator` / `HttpResponseDecoder` 處理後的 HTTP 訊息（已解密、已組裝）

@@ -224,8 +224,8 @@ func TestParseCognitiveModeBlock(t *testing.T) {
 
 func TestFormatDirtyGitRepoReportCombinesNestedRepos(t *testing.T) {
 	workspace := t.TempDir()
-	repoA := filepath.Join(workspace, "TATA")
-	repoB := filepath.Join(workspace, "mr.HS")
+	repoA := filepath.Join(workspace, "repo-alpha")
+	repoB := filepath.Join(workspace, "repo-beta")
 	os.MkdirAll(repoA, 0o755)
 	os.MkdirAll(repoB, 0o755)
 	runGit(t, repoA, "init")
@@ -245,7 +245,7 @@ func TestFormatDirtyGitRepoReportCombinesNestedRepos(t *testing.T) {
 	writeFile(t, filepath.Join(repoB, "dirty.txt"), "dirty\n")
 
 	report := formatDirtyGitRepoReport(workspace)
-	if !strings.Contains(report, "TATA") || !strings.Contains(report, "mr.HS") {
+	if !strings.Contains(report, "repo-alpha") || !strings.Contains(report, "repo-beta") {
 		t.Fatalf("expected combined nested repo report, got:\n%s", report)
 	}
 	if !strings.Contains(report, "### Project Git Report") {

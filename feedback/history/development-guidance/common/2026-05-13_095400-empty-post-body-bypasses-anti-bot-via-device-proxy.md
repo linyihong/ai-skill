@@ -34,7 +34,7 @@ Status: candidate
 
 - Tool: Frida capture, Java SDK live test
 - Sanitized excerpt: 外部 JVM 發送 guest login POST 請求 → anti-bot 回 HTTP 403；透過 `adb forward` + device proxy 發送相同請求（空 body + `eh` header）→ HTTP 200 + `Set-Cookie`
-- Evidence path: `<PROJECT_ROOT>/TATA/api/API列表/public/guest_login.md`（2026-05-13 發現記錄）
+- Evidence path: `<PROJECT_ROOT>/<target-app>/api/API列表/public/guest_login.md`（2026-05-13 發現記錄）
 
 #### Generalized Lesson
 

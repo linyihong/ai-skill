@@ -11,7 +11,7 @@ Status: candidate
 
 #### Human Explanation
 
-在分析 TATA 應用的 guest login HTTP 請求時，發現該請求完全無法透過任何 Java-level Frida hook 捕獲——包括 OkHttp `RealCall.getResponseWithInterceptorChain`、OkHttpClient `newCall`、Netty `ProxyServerHandler.channelRead`、`java.net.Socket.connect`、`javax.net.ssl.SSLSocketFactory.createSocket`、`java.net.URL.openConnection`。
+在分析 <target-app> 應用的 guest login HTTP 請求時，發現該請求完全無法透過任何 Java-level Frida hook 捕獲——包括 OkHttp `RealCall.getResponseWithInterceptorChain`、OkHttpClient `newCall`、Netty `ProxyServerHandler.channelRead`、`java.net.Socket.connect`、`javax.net.ssl.SSLSocketFactory.createSocket`、`java.net.URL.openConnection`。
 
 經過 v8 版本使用原生 libc `connect()` hook 後，才發現 Dart 的 `dart:io` HttpClient 直接透過原生 libc socket 函數發送請求到本地代理（`127.0.0.1:36279`），完全繞過 Java 層。這意味著：
 
@@ -35,7 +35,7 @@ Status: candidate
   - v8：加入 libc `connect()` hook → 捕獲到 `127.0.0.1:36279` 的連線，以及 `user-agent: Dart/3.11 (dart:io)` 的 HTTP 請求。
   - 代理架構：Dart `dart:io` HttpClient → `127.0.0.1:<port>` (proxy) → Netty `ProxyServerHandler.channelRead` → `Handler.a(req, URI)` → `https://api-n.52zyp.com` → TLS encrypted outbound。
 - **證據路徑**：
-  - `TATA/scripts/frida/hook_self_generation_phase1.js` — v8 加入 `hookLibcConnect()` 和 `hookLibcSend()`。
+  - `<target-app>/scripts/frida/hook_self_generation_phase1.js` — v8 加入 `hookLibcConnect()` 和 `hookLibcSend()`。
   - `capture/self_gen_phase1_v8_20260512_130953.log` — 588 events，包含 libc-connect 到 `127.0.0.1:36279` 和 libc-write 帶 `user-agent: Dart/3.11 (dart:io)`。
   - `capture/self_gen_phase1_v8_analysis.md` — 分析文件。
 
@@ -108,5 +108,5 @@ Status: candidate
 #### Required Linked Updates
 
 - 更新 skill feedback 根索引與 `common/README.md`。
-- 如果 lesson 來自特定專案（如 TATA self-generation investigation），將專案特定的 class 名稱、endpoint、port 保留在專案文件中。
+- 如果 lesson 來自特定專案（如 <target-app> self-generation investigation），將專案特定的 class 名稱、endpoint、port 保留在專案文件中。
 - 晉升時，從 Frida hook 策略指引建立 cross-link。

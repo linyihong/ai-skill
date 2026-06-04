@@ -52,7 +52,7 @@ cp "$LOGFILE" "capture/frida_capture_$(date +%Y%m%d_%H%M%S).log"
   - Before: 手動輸入 `adb shell pm clear <package> && frida -U -f <package> -l script.js 2>&1 | tee /tmp/frida_capture_$(date +%s).log`
   - After: `./auto_capture_iv.sh hook_capture_iv.js`
   - Result: 自動 clear → spawn → capture → save log
-- Evidence path: `<PROJECT_ROOT>/TATA/scripts/frida/auto_capture_iv.sh`
+- Evidence path: `<PROJECT_ROOT>/<target-app>/scripts/frida/auto_capture_iv.sh`
 
 #### Generalized Lesson
 
@@ -110,4 +110,4 @@ cp "$LOGFILE" "capture/frida_capture_$(date +%Y%m%d_%H%M%S).log"
 
 #### Required Linked Updates
 
-- `<PROJECT_ROOT>/TATA/scripts/frida/auto_capture_iv.sh` — 已建立
+- `<PROJECT_ROOT>/<target-app>/scripts/frida/auto_capture_iv.sh` — 已建立
