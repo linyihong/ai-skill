@@ -1,4 +1,4 @@
-version=repo-22fcf4e
-source_commit=22fcf4e
-built_at=2026-06-03T11:45:13Z
+version=repo-f3fd8ca
+source_commit=f3fd8ca
+built_at=2026-06-04T01:17:07Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
