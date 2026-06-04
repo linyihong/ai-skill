@@ -39,6 +39,7 @@
 | `ai-skill runtime query` | 查詢 runtime index / generated surfaces | 否 | 否 | Phase 3 |
 | `ai-skill runtime obligations` | 列出目前 active bootstrap obligations（per_session / per_turn / per_commit）並附 Bootstrap Receipt line，從 `generated_surfaces[runtime.core_bootstrap.contract]` 與 runtime phase/gate tables 讀取 | 否 | 否 | bootstrap-yaml-migration Phase 3 |
 | `ai-skill runtime receipt` | 輸出 canonical Bootstrap Receipt 與 active per-turn obligation IDs，供 hooks / stop repair 使用；避免 agent 臨時拼 SQLite 查詢 | 否 | 否 | bootstrap receipt repair hardening |
+| `ai-skill runtime workflow-context` | 由 `--transcript` JSONL 重建 Workflow Activation Engine 的 in-memory RuntimeContext 並 dump（status / active_route / effective_mode / conflict / substantive / detected_routes）；read-only inspection，無持久化 | 否 | 否 | workflow-activation-engine Phase 4.0 |
 | `ai-skill runtime audit` | 4-way 分類 routes / generated_surfaces / scenarios（auto-detected / consumed / intentionally-manual / orphan）。預設 markdown 報告；`--json` 切換 JSON。`runtime validate` 自動以 warning-only check 引用其 orphan 統計 | 否 | 否 | gen3-runtime-trigger-audit Phase 2 |
 | `ai-skill hooks run commit-msg` validator `validatePlanCheckboxSync` | commit-msg hook 第 16 個 validator：當 commit body 引用 `plans/active/*.md` 且 stage 真工作（Go / scenarios / runtime / governance / enforcement），plan 必須同 stage 且 staged diff 含 `[ ]` → `[x]` transition。block default；opt-out `[skip-plan-checkbox-sync]` | 否 | 是 | gen3-runtime-trigger-audit Phase 5 |
 | `ai-skill hooks run commit-msg` validator `validateRuntimeTriggerWiring` | commit-msg hook 第 17 個 validator：staged diff 新增 `route.*` 或 `target_key:` 但無 discovery signal / Go consumer / `manual_activation` annotation 則 block。enforces governance §`define_runtime_trigger_flow`；opt-out `[skip-runtime-trigger-wiring]` | 否 | 是 | gen3-runtime-trigger-audit Phase 5 |
@@ -451,6 +452,25 @@
 - 回報 `per_turn_obligations` check，內容為 active per-turn obligation IDs。
 - phase 取 runtime phase machine 的第一個非 `__config__` phase；obligations / gates 取 runtime tables row counts。
 - 若 runtime projection 不存在或 schema 不可讀，阻斷並提示執行 `ai-skill runtime compile && ai-skill runtime refresh`。
+
+### `ai-skill runtime workflow-context`
+
+目的：dump Workflow Activation Engine 的 in-memory RuntimeContext（Phase 4.0）。因 PreToolUse hook 每次 tool call 為獨立 process，RuntimeContext 由 transcript **每次重建**（detector deterministic，結果一致）→ 不需 store；此即 SQLite persistence 延後（Phase 4.1）的原因。
+
+輸入：
+
+- `--repo <path>`
+- `--transcript <path>`（JSONL；缺省則為空 context）
+- `--json` / `--plain`
+
+副作用：無（read-only inspection；不寫 runtime.db、不持久化）。
+
+必要行為：
+
+- 讀 `knowledge/runtime/routing-registry.yaml`，以 `--transcript` 的 user+assistant turns 呼叫 `BuildRuntimeContext`。
+- 回報 checks：`status`（no-match / detected / locked）、`active_route`、`effective_mode`、`conflict`、`substantive`、`detected_routes`。
+- `conflict=true`（>1 route 同時 activate）時附 planned action 指向 `workflow/workflow-routing.md` Stage 2，**不自動選**。
+- registry 不可解析時阻斷。
 
 ### `ai-skill runtime audit`
 

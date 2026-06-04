@@ -102,6 +102,45 @@ durable in ADR-012):
 This supersedes subjective "primary/secondary" prose as route count scales to
 the hundreds.
 
+## RuntimeContext Lifecycle (Phase 4.0)
+
+`RuntimeContext` is the in-memory workflow-activation state for one task,
+derived from the transcript by `BuildRuntimeContext` (Go: `runtime_context.go`).
+Inspect it with `ai-skill runtime workflow-context --transcript <jsonl>`.
+
+**Persistence model — rebuilt, not stored.** The PreToolUse hook runs as a
+fresh process per tool call, so there is no live in-memory object shared across
+calls. Because the detector is deterministic, the context is *rebuilt from the
+transcript on every invocation* and yields the same answer — no store is
+required for in-task correctness. This is precisely why SQLite persistence is
+deferred (Phase 4.1, conditional): nothing in-task needs it. A store becomes
+necessary only for cross-session replay, analytics, or multi-agent handoff.
+
+**States:** `no-match` → nothing activated; `detected` → ≥1 route activated
+(`ActiveRoute` set iff exactly one; `Conflict=true` when >1, and `ActiveRoute`
+stays empty — the engine never auto-picks); `locked` → user manual-lock.
+
+**Lifecycle rules:**
+
+1. **Substantive gate (vocabulary, not length).** A turn carries task intent if
+   it contains a domain noun (aggregated live from every participating route's
+   `user_signals` — the registry *is* the vocabulary) or an action verb. An
+   8-char Chinese message can be a full task; a longer greeting is not. Length
+   thresholds are explicitly rejected (they mis-fire).
+2. **Explicit pivot** (`換任務` / `現在我要` / `new task` / `switch to` …) →
+   detection re-runs over post-pivot turns only; pre-pivot routes do not linger.
+3. **Manual lock** (`鎖定` / `之後都用` / `lock to` …) → if the lock turn names
+   exactly one participating route's signals, `ActiveRoute` locks with
+   `EffectiveMode=manual-lock` (sticky; the detector yields). Ambiguous locks
+   (zero or >1 matching routes) do **not** lock — no guessing.
+4. **Manual unlock** (`回到自動偵測` / `unlock` / `解鎖` …) → restores
+   auto-detection.
+5. **NO implicit keyword-drift invalidation.** Consecutive turns without the
+   original trigger keyword do NOT invalidate the active route — a normal
+   drill-down (many in-domain sub-questions) would otherwise be mis-read as a
+   topic shift. Keyword absence only updates `LastReinforcedAt` (optional soft
+   warning), never auto-invalidates.
+
 ## Scope Boundaries
 
 **IS for**: the registry schema, the deterministic activation contract, the

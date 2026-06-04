@@ -30,6 +30,7 @@ type runtimeOptions struct {
 	assertSource   string
 	assertKeyword  string
 	keyword        string
+	transcriptPath string
 	dbPath         string
 	layer          string
 	queryType      string
@@ -152,11 +153,11 @@ type runtimeIndexEdge struct {
 
 func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query|obligations|receipt|audit> [flags]")
+		_, _ = fmt.Fprintln(stderr, "usage: ai-skill runtime <validate|refresh|compile|query|obligations|receipt|workflow-context|audit> [flags]")
 		return ExitInvalidUsage
 	}
 	opts := runtimeOptions{command: args[0], limit: 8}
-	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" && opts.command != "query" && opts.command != "obligations" && opts.command != "receipt" && opts.command != "audit" {
+	if opts.command != "validate" && opts.command != "refresh" && opts.command != "compile" && opts.command != "query" && opts.command != "obligations" && opts.command != "receipt" && opts.command != "workflow-context" && opts.command != "audit" {
 		_, _ = fmt.Fprintf(stderr, "unsupported runtime command: %s\n", opts.command)
 		return ExitInvalidUsage
 	}
@@ -170,6 +171,7 @@ func runRuntime(args []string, stdout io.Writer, stderr io.Writer) int {
 	fs.StringVar(&opts.assertSource, "assert-source", "", "source path expected in generated surfaces")
 	fs.StringVar(&opts.assertKeyword, "assert-keyword", "", "keyword expected in generated surfaces")
 	fs.StringVar(&opts.keyword, "keyword", "", "keyword or phrase to query in the runtime index")
+	fs.StringVar(&opts.transcriptPath, "transcript", "", "JSONL transcript path for runtime workflow-context")
 	fs.StringVar(&opts.dbPath, "db", "", "SQLite runtime index path")
 	fs.StringVar(&opts.layer, "layer", "", "filter runtime query results by layer")
 	fs.StringVar(&opts.queryType, "type", "", "filter runtime query results by type")
@@ -220,6 +222,8 @@ func buildRuntimeResult(opts runtimeOptions) Result {
 		return buildRuntimeObligationsResult(opts)
 	case "receipt":
 		return buildRuntimeReceiptResult(opts)
+	case "workflow-context":
+		return buildRuntimeWorkflowContextResult(opts)
 	default:
 		return buildRuntimeValidateResult(opts)
 	}

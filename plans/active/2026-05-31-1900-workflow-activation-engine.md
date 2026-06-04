@@ -429,12 +429,14 @@ Lifecycle（簡化，**移除 implicit keyword-drift invalidation**）：
 
 若觸發，新 plan 設計 `workflow_sessions` 表時可直接 mirror `RuntimeContext` 欄位，migration cost 低。
 
+**落地澄清（2026-06-04）— per-process 現實**：PreToolUse hook 每次 tool call 是獨立 process，無跨 call 的 live in-memory 物件。因 detector deterministic，RuntimeContext 由 transcript **每次重建**即得一致結果 → 不需 store（這正是 4.1 SQLite 延後的根本理由：in-task 無人需要）。故「detector 寫入 / validator 讀取」不是跨 process 共享狀態，而是每個 consumer 各自 `BuildRuntimeContext(transcript)`。
+
 產出：
-- [ ] `runtime_context.go` + unit tests
-- [ ] `hooks.go` 整合：detector 寫入 RuntimeContext，其他 validator 從 RuntimeContext 讀
-- [ ] `ai-skill runtime workflow-context` CLI subcommand（dump 當前 in-memory state）
-- [ ] Lifecycle 文件化（governance/workflow-activation-engine.md §lifecycle）
-- [ ] 明確記錄「SQLite 延後」決策（Phase 4.1 不在 scope）
+- [x] `runtime_context.go` + unit tests（2026-06-04：`BuildRuntimeContext(registry, transcript, openFiles, now) RuntimeContext`；lifecycle = substantive(vocabulary-based, 非長度) + explicit pivot(post-pivot 重偵測) + manual-lock(單一 route 命中才鎖，含 ambiguous 不鎖) + manual-unlock + **NO implicit drift**；status no-match/detected/locked；conflict 不 auto-pick。10 unit tests PASS）
+- [x] `hooks.go`「整合」**重新定義為 per-process builder consumption**：不做跨 process store；Phase 5 的 PreToolUse validator（`validateWorkflowPrimarySourceRead`）將直接呼叫 `BuildRuntimeContext` 取 active_route。Phase 4.0 交付可被 consume 的 builder + CLI surface，避免半成品 hook
+- [x] `ai-skill runtime workflow-context` CLI subcommand（`--transcript` 重建並 dump status/active_route/effective_mode/conflict/substantive/detected_routes；conflict 附 Stage 2 planned action）+ command-contract.md 文件
+- [x] Lifecycle 文件化（governance/workflow-activation-engine.md §RuntimeContext Lifecycle）
+- [x] 明確記錄「SQLite 延後」決策（Phase 4.1 不在 scope）— 已記入 runtime_context.go header + governance doc + 上方落地澄清
 
 ### Phase 5 — Obligation 整合
 
