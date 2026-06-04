@@ -814,6 +814,27 @@ records:
     route_type: intelligence
     activation_mode: auto-detect
     task_intent: 選擇 APK 分析最高收益路線
+    activation_triggers:
+      activation_any_of:
+        user_signals:
+          - 最高槓桿
+          - highest-leverage
+          - 先做什麼最有效
+          - 分析路線
+          - 從哪裡開始分析
+          - evidence-to-cost
+          - 先 Frida 還是先抓 API
+        context_signals:
+          - "**/scripts/frida/**"
+          - "**/*.apk"
+      reinforcement_any_of:
+        artifact_signals:
+          - "highest[- ]?leverage"
+          - "evidence-to-cost"
+          - "leverage (path|route)"
+      task_intents:
+        - route-selection
+        - leverage-analysis
     primary_source: intelligence/engineering/analytical-reasoning/highest-leverage-analysis-path.md
     required_dependencies:
       - workflow/apk-analysis/execution-flow.md
@@ -982,6 +1003,25 @@ records:
     route_type: intelligence
     activation_mode: advisory
     task_intent: 套用通用工程經驗法則（field confidence、magic bytes、document priority、premature optimization 等）
+    # advisory: requires_activation_triggers=false（weak signals OK）。下列 signal
+    # 只用於 detector 的 reinforcement / suggestion，不會單獨 lock active_route。
+    activation_triggers:
+      activation_any_of:
+        user_signals:
+          - 經驗法則
+          - heuristic
+          - magic bytes
+          - field confidence
+          - premature optimization
+          - 過早優化
+          - single responsibility
+      reinforcement_any_of:
+        artifact_signals:
+          - "magic bytes"
+          - "field confidence"
+          - "retry smell"
+      task_intents:
+        - engineering-heuristic
     primary_source: intelligence/engineering/heuristics/README.md
     required_dependencies:
       - intelligence/engineering/README.md
@@ -1406,6 +1446,31 @@ records:
     route_type: analysis
     activation_mode: auto-detect
     task_intent: 執行 APK 分析操作流程（Frida hook、API 文件化、local proxy、media HLS）
+    activation_triggers:
+      activation_any_of:
+        user_signals:
+          - Frida hook
+          - 抓包
+          - API 文件化
+          - local proxy
+          - HLS
+          - 逆向操作
+          - hook flow
+        context_signals:
+          - "**/scripts/frida/**"
+          - "**/frida/**"
+          - "**/*.apk"
+          - "**/analysis/apk/**"
+      reinforcement_any_of:
+        artifact_signals:
+          - "frida"
+          - "HLS|m3u8"
+          - "local[- ]?proxy"
+          - "api-catalog"
+      task_intents:
+        - apk-analysis
+        - frida
+        - protocol-analysis
     primary_source: analysis/apk/workflows/README.md
     required_dependencies:
       - analysis/apk/README.md
@@ -1439,6 +1504,29 @@ records:
     route_type: analysis
     activation_mode: auto-detect
     task_intent: 執行 Web Scraping 分析（網站評估、工具選擇、提取策略設計、風險評估）
+    activation_triggers:
+      activation_any_of:
+        user_signals:
+          - web scraping
+          - 爬蟲
+          - 網頁抓取
+          - 提取資料
+          - scraper
+          - anti-bot
+          - 動態網頁
+        context_signals:
+          - "**/analysis/web/**"
+          - "**/*scraper*"
+          - "**/*.html"
+      reinforcement_any_of:
+        artifact_signals:
+          - "scrap(e|ing)"
+          - "anti-bot"
+          - "selector|xpath"
+          - "stealth"
+      task_intents:
+        - web-scraping
+        - extraction-strategy
     primary_source: analysis/web/README.md
     required_dependencies:
       - analysis/README.md
@@ -1474,6 +1562,25 @@ records:
     route_type: intelligence
     activation_mode: advisory
     task_intent: 套用 APK 分析工程智慧（heuristics、anti-patterns、failure、signals）
+    # advisory: requires_activation_triggers=false（weak signals OK）。signal 僅供
+    # detector reinforcement / suggestion，依附 apk 分析流程而非單獨 activate。
+    activation_triggers:
+      activation_any_of:
+        user_signals:
+          - hook selection
+          - ui-to-api attribution
+          - flutter java hybrid
+          - APK heuristic
+          - evidence-first
+          - live readiness
+      reinforcement_any_of:
+        artifact_signals:
+          - "hook selection"
+          - "attribution"
+          - "flutter|dart"
+          - "evidence-first"
+      task_intents:
+        - apk-intelligence
     primary_source: intelligence/engineering/apk-analysis/README.md
     required_dependencies:
       - intelligence/engineering/analytical-reasoning/README.md
@@ -1514,6 +1621,31 @@ records:
     route_type: intelligence
     activation_mode: auto-detect
     task_intent: 判斷 product impact alignment、需求理解、BDD-lite、behavior contract、acceptance criteria、ambiguity、requirement traceability、validation target 或 mutation testing test effectiveness
+    activation_triggers:
+      activation_any_of:
+        user_signals:
+          - 需求
+          - requirement
+          - BDD
+          - acceptance criteria
+          - 驗收條件
+          - behavior contract
+          - 需求拆解
+          - ambiguity
+        context_signals:
+          - "**/requirements/**"
+          - "**/*.feature"
+          - "**/software-delivery/requirements/**"
+      reinforcement_any_of:
+        artifact_signals:
+          - "Acceptance|驗收"
+          - "Given.+When.+Then"
+          - "behavior contract"
+          - "acceptance criteria"
+      task_intents:
+        - requirements-cognition
+        - bdd
+        - acceptance-modeling
     primary_source: intelligence/engineering/requirements/README.md
     required_dependencies:
       - intelligence/engineering/requirements/product-alignment/README.md
@@ -1566,6 +1698,29 @@ records:
     route_type: intelligence
     activation_mode: auto-detect
     task_intent: 判斷軟體架構選型、DDD adoption、bounded context、CQRS、event sourcing、microservices 或 architecture overengineering
+    activation_triggers:
+      activation_any_of:
+        user_signals:
+          - 架構選型
+          - DDD
+          - bounded context
+          - CQRS
+          - event sourcing
+          - microservices
+          - 領域模型
+          - overengineering
+        context_signals:
+          - "**/architecture/**"
+          - "**/domain-modeling/**"
+      reinforcement_any_of:
+        artifact_signals:
+          - "bounded context"
+          - "CQRS|event sourcing"
+          - "aggregate root"
+          - "DDD"
+      task_intents:
+        - architectural-fit
+        - architecture-selection
     primary_source: intelligence/engineering/architecture/architectural-fit/README.md
     required_dependencies:
       - intelligence/engineering/architecture/README.md
