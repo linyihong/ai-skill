@@ -1,4 +1,4 @@
-version=repo-8fbd200
-source_commit=8fbd200
-built_at=2026-06-04T06:20:27Z
+version=repo-3c1df19
+source_commit=3c1df19
+built_at=2026-06-04T06:39:29Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
