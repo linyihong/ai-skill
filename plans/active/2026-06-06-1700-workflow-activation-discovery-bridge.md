@@ -229,7 +229,8 @@ PostToolUse:Read hook fires (artifact Read by agent)
 
 #### Phase A.2 — runtime.db schema + cache
 
-- [ ] `discovery_proposals` schema：`id` / `task_hash` / `route_candidates_json` / `best_confidence` / `status` (`awaiting_phase_b` / `advised` / `dismissed` / `expired`) / `created_at` / `updated_at`
+- [ ] `discovery_proposals` schema：`id` / `task_hash` / `route_candidates_json`（含 per-candidate `evidence_set`） / `signal_snapshot_json`（Phase A + 累積 Phase B 訊號快照，重算用）/ `scoring_version`（algorithm version tag，e.g. `light-v1`）/ `current_best_confidence`（derived, paired with scoring_version；單獨無語意）/ `status` (`awaiting_phase_b` / `advised` / `dismissed` / `expired`) / `created_at` / `updated_at`
+- [ ] **不可單獨儲存 confidence**：threshold / weight 變更後舊 `0.63 (v1)` ≠ `0.63 (v2)`。Phase D telemetry 必須以 `scoring_version` group-by，跨版本比較須走 re-score on `signal_snapshot_json`
 - [ ] TTL：預設 24h；可由 `runtime.discovery.config` 調
 - [ ] project overlay scan cache：per-session in-memory，cwd 改變時 invalidate
 
@@ -237,6 +238,7 @@ PostToolUse:Read hook fires (artifact Read by agent)
 
 - [ ] `discovery.go` 新建：function `RunLightDiscovery(taskInput, openFiles, cwd) []Candidate`
 - [ ] Signal extractors：user_msg tokenizer、artifact basename parser、frontmatter head reader（≤ 200B）、project overlay scanner
+- [ ] **Source-of-truth guardrail**：project overlay scanner 只產 **signal facts**（e.g. `signal.project.declares_dated_doc_convention=true`、`signal.cwd.matches_overlay_path=true`），**不可**直接產 route candidate。Candidate 一律由 scoring stage 對 `routing-registry.yaml` + `knowledge/summaries/*.md` 評估訊號才產生。`routing-registry.yaml` 維持唯一 route 解釋者地位。違反此 guardrail 等於把 v0 draft 砍掉的 `project_overlay_signals → binds_route_type` 偷渡回實作。
 - [ ] Scoring：weighted sum + normalize
 - [ ] 寫 proposal 到 runtime.db
 - [ ] Unit tests：cross-project（≥ 3 project type）case + threshold edge case + cache invalidation
@@ -272,7 +274,8 @@ PostToolUse:Read hook fires (artifact Read by agent)
 
 - [ ] `discovery.go` 加 `RunDeepDiscovery(content, existingProposal) []Candidate`
 - [ ] Content scan：keyword extract + summary match + atom signature match
-- [ ] Append-only update：每次新 Read 來合併 candidate，confidence 用 max(existing, new) 而非 overwrite
+- [ ] **Evidence accumulation, not confidence max()**：每次新 Read 把新 evidence append 到對應 candidate 的 `evidence_set`（含未在前 candidates 中出現的新 candidate 也加入）；然後對**所有 candidate 從完整 evidence_set 重 score**，產生新 ranking。`max(existing, new)` 會讓 Phase A 早期 false positive 永久鎖死（e.g. Phase A `travel=0.82`，Phase B 看到 `software-delivery` 強訊號 + `travel` 證據不足，max() 仍鎖在 0.82）；evidence accumulation + rescore 允許 ranking 翻盤
+- [ ] Rescore 必須記新 `scoring_version` 或標明 `scored_at` 配對版本，避免下游 telemetry 跨版本誤比
 - [ ] proposal status: awaiting_phase_b → advised（達 threshold 後）
 
 #### Phase B.3 — Advisory re-injection
