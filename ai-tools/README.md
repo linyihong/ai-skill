@@ -65,7 +65,7 @@ Repo-level 載入與同步方向見 [`architecture/ai-native-knowledge-operating
 | 工具 | 文件 | 用途（僅記錄該工具特有差異） |
 | --- | --- | --- |
 | Claude Code | [`agent/claude.md`](agent/claude.md) | `CLAUDE.md` 自動載入入口、`.claude/settings.json` 工具配置、tool adapter 機制、對話目標閉環。 |
-| Cursor | [`agent/cursor.md`](agent/cursor.md) | `.cursor/rules/*.mdc` 入口、hooks 與 workspace 差異。 |
+| Cursor | [`agent/cursor.md`](agent/cursor.md) | `.cursor/rules/*.mdc` 入口、hooks 與 workspace 差異。Cursor 3.4.17 起 `preToolUse` 為 mechanical gate（與 Claude PreToolUse 對等；block via Cursor-native `{"permission":"deny"}`），不再只是提醒。 |
 | Roo Code | [`agent/roo.md`](agent/roo.md) | Custom Instructions、`.roomodes` 覆蓋語意、modes / file restrictions 與 VS Code settings 差異。 |
 | Codex | [`agent/codex.md`](agent/codex.md) | `AGENTS.md` 入口與 generic AGENTS-aware tool 差異。 |
 | Gemini CLI | [`agent/gemini-cli.md`](agent/gemini-cli.md) | `GEMINI.md` 入口、Gemini CLI 工具能力與設定差異。 |

@@ -508,7 +508,7 @@ rule_classes:
         executor_kind: hook_dispatcher_entry
         hook_phase: PreToolUse
         block_or_warn: block
-        notes: "PreToolUse gate.bootstrap.receipt_present remains mechanical (blocks non-Read tools until Receipt + canonical Reads observed); ADR-011 only demotes the UserPromptSubmit forcing function"
+        notes: "PreToolUse gate.bootstrap.receipt_present remains mechanical (blocks non-Read tools until Receipt + canonical Reads observed); ADR-011 only demotes the UserPromptSubmit forcing function. Host-aware via detectPreToolUseHost(payload) → renderPreToolUseDecision dispatch: Claude `permissionDecision:deny` JSON; Cursor `{permission:deny}` JSON — both exit 0 (plan plans/active/2026-06-05-0200-cursor-enforcement-hook-adapter Phase 1-3). Cursor read/search tool allowlist mirrors Claude Read pass-through; beforeReadFile intentionally not wired"
       - file: scripts/ai-skill-cli/internal/app/hooks.go
         symbol: runSessionStartHook
         executor_kind: hook_dispatcher_entry
@@ -1011,6 +1011,7 @@ rule_classes:
         executor_kind: hook_dispatcher_entry
         hook_phase: PreToolUse
         block_or_warn: block
+        notes: "host-aware (Claude + Cursor) via renderPreToolUseDecision(host, ...); deny rendered as Claude `permissionDecision:deny` or Cursor `{permission:deny}` — both exit 0 (plan 2026-06-05-0200 Phase 1-3)"
     coverage_evidence:
       expected_instance_count: 57
       expected_instance_count_query: |

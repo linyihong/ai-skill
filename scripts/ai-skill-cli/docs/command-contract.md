@@ -27,7 +27,7 @@
 | `ai-skill hooks run post-commit` | 執行 Git post-commit hook logic（cursor bundle sync 等） | 否 | 是 | Shell To Go |
 | `ai-skill hooks run pre-push` | 執行 Git pre-push hook logic：CLI source 變動時 go test ./... preflight | 否 | 是 | Shell To Go |
 | `ai-skill hooks run session-start` | 執行 Claude Code SessionStart hook：query runtime.db、讀 4 個 bootstrap 文件、輸出 hookSpecificOutput JSON、寫 SessionStart flag（TTL 120s） | 是（`/tmp/ai-skill-sessionstart-<hash>.flag`） | 否 | Cross-platform Go script runtime |
-| `ai-skill hooks run pre-tool-use` | 執行 Claude Code PreToolUse hook：scan transcript for Bootstrap Receipt；Read tool 一律 allow，其他 tool 在 Receipt 出現前 block（exit 2） | 是（`/tmp/ai-skill-bootstrap-<hash>.done`） | 否 | Cross-platform Go script runtime |
+| `ai-skill hooks run pre-tool-use` | 執行 Claude Code / Cursor PreToolUse hook（host detect via payload `cursor_version`；plan 2026-06-05-0200 Phase 1-3）：scan transcript for Bootstrap Receipt + canonical read-log + workflow `primary_source` Read；Read-class tools allow（Claude `Read`；Cursor `read_file`/`ReadFile`/`functions.ReadFile`/`Glob`/`functions.Glob`/`rg`/`functions.rg`/`SemanticSearch`/`functions.SemanticSearch`/`list_dir`/`grep`/`glob_file_search`/`codebase_search`）；其他 tool 在 Receipt 或 workflow gate 未通過時 block via `exit 0` + host-native deny JSON（Claude `hookSpecificOutput.permissionDecision="deny"`；Cursor `{"permission":"deny",user_message,agent_message}`）—— **不再用 exit 30**（host 視為 non-blocking）。 | 是（`/tmp/ai-skill-bootstrap-<hash>.done`） | 否 | Cross-platform Go script runtime |
 | `ai-skill hooks run post-tool-use` | 執行 Claude Code PostToolUse hook：Bootstrap Receipt 不在 transcript 時注入 reminder via hookSpecificOutput；always exit 0 | 是（cache file） | 否 | Cross-platform Go script runtime |
 | `ai-skill hooks run user-prompt-submit` | 執行 Claude Code UserPromptSubmit hook：每次 user turn 注入 final close-out reminder + CORE_BOOTSTRAP.md as additionalContext；外部 project root 底下有 dirty root / nested Git repos 時，注入合併 `### Project Git Report` 要求；若 project root 本身就是 Ai-skill repo，跳過 Project Git Report 要求 | 否 | 否 | Cross-platform Go script runtime |
 | `ai-skill hooks run stop` | 執行 Stop / final-response hook：從 transcript 或 hook payload 檢查對話含 Bootstrap Receipt、last assistant message 含 Cognitive Mode block（compact 或 full table）；外部 project root 有 dirty root / nested Git repos 時要求 `### Project Git Report`；若 project root 本身就是 Ai-skill repo，跳過 Project Git Report 要求；Claude-style stop 缺少時 block（exit 2）；Cursor stop 缺少時一次彙整缺項輸出 `followup_message` 並 exit 0 以 loop back；Cursor `status:"aborted"`（使用者手動 Stop）與 plan / todo / mode-switch tool-generated 非 final 訊息不觸發 close-out loop | 否 | 否 | Cross-platform Go script runtime |
@@ -291,6 +291,7 @@
 
 - Git hooks: `pre-commit` / `commit-msg` / `post-commit` / `pre-push`
 - Claude Code hooks: `session-start` / `user-prompt-submit` / `pre-tool-use` / `post-tool-use` / `stop`
+- Cursor hooks (Cursor 3.4.17 contract): `session-start` / `pre-tool-use` / `stop` — single `pre-tool-use` runner; host detection via payload `cursor_version`; block protocol uses Cursor-native `{"permission":"deny"}` instead of Claude `hookSpecificOutput.permissionDecision`. See plan 2026-06-05-0200 §Phase 0 Findings.
 - `--repo <path>`
 - `--json` / `--plain`
 - positional：commit-msg 收 `<commit-msg-file-path>`（由 git 透過 `"$@"` 從 adapter 傳入）
