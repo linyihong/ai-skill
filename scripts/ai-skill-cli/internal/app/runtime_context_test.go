@@ -161,6 +161,40 @@ func TestBuildRuntimeContext_ReinforcementOnlyStaysNoMatch(t *testing.T) {
 	}
 }
 
+// TestActivationContractMatrix pins the 3-case can_activate matrix so the
+// advisory contract violation can never regress:
+//
+//	Case 1  auto-detect only        -> active_route set
+//	Case 2  advisory only           -> active_route nil, advisory in DetectedRoutes only
+//	Case 3  auto-detect + advisory  -> active_route = auto-detect; advisory suggestion only
+func TestActivationContractMatrix(t *testing.T) {
+	reg := testRegistry()
+
+	// Case 1 — auto-detect hit locks.
+	c1 := BuildRuntimeContext(reg, rcMsg("幫我做 web scraping"), nil, rcClock)
+	if c1.ActiveRoute != "route.analysis.web" || c1.EffectiveMode != ModeAutoDetect {
+		t.Fatalf("Case1: auto-detect must lock, got active=%q mode=%q", c1.ActiveRoute, c1.EffectiveMode)
+	}
+
+	// Case 2 — advisory only never locks.
+	c2 := BuildRuntimeContext(reg, rcMsg("看一下 magic bytes"), nil, rcClock)
+	if c2.ActiveRoute != "" {
+		t.Fatalf("Case2: advisory-only must NOT lock, got %q", c2.ActiveRoute)
+	}
+	if !hasRoute(c2.DetectedRoutes, "route.intelligence.engineering.heuristics") || len(c2.CandidateRoutes) != 0 {
+		t.Fatalf("Case2: advisory must be a detected suggestion, not a candidate; detected=%v candidates=%v", c2.DetectedRoutes, c2.CandidateRoutes)
+	}
+
+	// Case 3 — auto-detect wins over co-occurring advisory.
+	c3 := BuildRuntimeContext(reg, rcMsg("評估 DDD 架構，順便看 magic bytes"), nil, rcClock)
+	if c3.ActiveRoute != "route.intelligence.architectural-fit" {
+		t.Fatalf("Case3: auto-detect must win, got %q", c3.ActiveRoute)
+	}
+	if !hasRoute(c3.DetectedRoutes, "route.intelligence.engineering.heuristics") {
+		t.Fatalf("Case3: advisory must remain a detected suggestion, got %v", c3.DetectedRoutes)
+	}
+}
+
 // TestAdvisoryNeverLocksActiveRoute is the contract guard for
 // activation_mode_spec `advisory.can_activate: false`. An advisory-only hit
 // must surface as a suggestion (DetectedRoutes) but NEVER lock ActiveRoute —

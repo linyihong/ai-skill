@@ -748,11 +748,66 @@ func TestPreToolUseHookBlocksReceiptWithoutReads(t *testing.T) {
 
 	var stdout, stderr bytes.Buffer
 	code := runPreToolUseHook(dir, &stdout, &stderr)
-	if code != ExitValidationFailed {
-		t.Fatalf("expected ExitValidationFailed; got %d; stderr=%s", code, stderr.String())
+	// Claude Code blocks PreToolUse via exit 0 + permissionDecision:deny (or exit
+	// 2). It does NOT block on other non-zero codes. So a real block MUST be
+	// exit 0 with the deny JSON on stdout — NOT ExitValidationFailed(30), which
+	// silently let the tool run.
+	if code != ExitSuccess {
+		t.Fatalf("expected ExitSuccess (deny carried by JSON); got %d; stderr=%s", code, stderr.String())
 	}
+	assertPreToolUseDeny(t, stdout.String())
 	if !strings.Contains(stderr.String(), "BLOCK_RECEIPT_WITHOUT_READS") {
 		t.Fatalf("expected BLOCK_RECEIPT_WITHOUT_READS in stderr; got:\n%s", stderr.String())
+	}
+}
+
+// assertPreToolUseDeny verifies stdout carries a Claude PreToolUse deny decision
+// (the only thing that actually blocks besides exit 2).
+func assertPreToolUseDeny(t *testing.T, stdout string) {
+	t.Helper()
+	var out struct {
+		HookSpecificOutput struct {
+			HookEventName      string `json:"hookEventName"`
+			PermissionDecision string `json:"permissionDecision"`
+			Reason             string `json:"permissionDecisionReason"`
+		} `json:"hookSpecificOutput"`
+	}
+	if err := json.Unmarshal([]byte(strings.TrimSpace(stdout)), &out); err != nil {
+		t.Fatalf("stdout is not a hook decision JSON: %v\n%s", err, stdout)
+	}
+	if out.HookSpecificOutput.HookEventName != "PreToolUse" {
+		t.Fatalf("hookEventName = %q, want PreToolUse", out.HookSpecificOutput.HookEventName)
+	}
+	if out.HookSpecificOutput.PermissionDecision != "deny" {
+		t.Fatalf("permissionDecision = %q, want deny", out.HookSpecificOutput.PermissionDecision)
+	}
+	if strings.TrimSpace(out.HookSpecificOutput.Reason) == "" {
+		t.Fatalf("deny must carry permissionDecisionReason; got empty")
+	}
+}
+
+func TestRenderClaudePreToolUseDecision_Deny(t *testing.T) {
+	var stdout bytes.Buffer
+	code := renderClaudePreToolUseDecision(&stdout, hookDecision{Deny: true, Reason: "because policy"})
+	// MUST be exit 0 — the block is carried by the JSON, not the exit code.
+	// Returning a non-zero like 30 is the bug: Claude treats it as non-blocking.
+	if code != ExitSuccess {
+		t.Fatalf("deny must return exit 0 (JSON carries the block), got %d", code)
+	}
+	assertPreToolUseDeny(t, stdout.String())
+	if !strings.Contains(stdout.String(), "because policy") {
+		t.Fatalf("reason must be in permissionDecisionReason; got %s", stdout.String())
+	}
+}
+
+func TestRenderClaudePreToolUseDecision_Allow(t *testing.T) {
+	var stdout bytes.Buffer
+	code := renderClaudePreToolUseDecision(&stdout, hookDecision{Deny: false})
+	if code != ExitSuccess {
+		t.Fatalf("allow must be exit 0, got %d", code)
+	}
+	if strings.TrimSpace(stdout.String()) != "" {
+		t.Fatalf("allow must emit NO decision JSON (normal permission flow); got %q", stdout.String())
 	}
 }
 

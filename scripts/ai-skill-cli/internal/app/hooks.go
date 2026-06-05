@@ -429,29 +429,54 @@ func workflowPrimarySourceGate(transcriptPath, aiSkillRepo string) (block bool, 
 	return true, ctx.ActiveRoute, ps
 }
 
+// hookDecision is a transport-agnostic PreToolUse gate outcome. Host adapters
+// render it to the host's block protocol — Claude Code via
+// hookSpecificOutput.permissionDecision, Cursor via permission. Centralizing
+// this keeps the "exit 2 vs deny-JSON vs permission:deny" detail out of the
+// gate logic (Validation Layer → HookDecision → Adapter → Claude/Cursor).
+type hookDecision struct {
+	Deny   bool
+	Reason string // agent-facing explanation; the host shows this on deny
+}
+
+// renderClaudePreToolUseDecision writes a Claude Code PreToolUse decision to
+// stdout and returns the process exit code.
+//
+// CRITICAL (Claude Code hook contract): a PreToolUse block is exit 0 + stdout
+// hookSpecificOutput.permissionDecision="deny" — OR exit 2. Any OTHER non-zero
+// exit code (e.g. the former ExitValidationFailed=30) is a NON-blocking error:
+// Claude shows stderr as a "hook error" notice but RUNS THE TOOL ANYWAY. So
+// returning 30 silently disabled this mechanical gate. We emit the deny JSON on
+// exit 0 (carries permissionDecisionReason, and is isomorphic to Cursor's
+// {permission:"deny"}). See enforcement/failure-patterns/pretooluse-block-wrong-exit-code.md.
+func renderClaudePreToolUseDecision(stdout io.Writer, d hookDecision) int {
+	if !d.Deny {
+		return ExitSuccess
+	}
+	_ = json.NewEncoder(stdout).Encode(map[string]any{
+		"hookSpecificOutput": map[string]any{
+			"hookEventName":            "PreToolUse",
+			"permissionDecision":       "deny",
+			"permissionDecisionReason": d.Reason,
+		},
+	})
+	return ExitSuccess // the JSON deny does the blocking, not the exit code
+}
+
 // finishPreToolUse runs the workflow activation-evidence gate after the
 // bootstrap gate is satisfied, then returns the final PreToolUse exit code.
-func finishPreToolUse(transcriptPath, projectDir string, stderr io.Writer) int {
+func finishPreToolUse(transcriptPath, projectDir string, stdout, stderr io.Writer) int {
 	block, routeID, ps := workflowPrimarySourceGate(transcriptPath, resolveClaudeAiSkillRepo(projectDir))
 	if !block {
 		return ExitSuccess
 	}
 	_, _ = fmt.Fprintf(stderr, "BLOCK_WORKFLOW_PRIMARY_SOURCE route=%s primary_source=%s\n", routeID, ps)
-	_, _ = fmt.Fprintf(stderr, `[ai-skill PreToolUse hook] Workflow activation evidence missing.
-
-The Workflow Activation Engine detector locked active_route=%s for this task,
-but its primary_source has not been Read yet:
-  %s
-
-Per obligation.workflow.activation_evidence (gate.workflow.primary_source_read),
-Read the workflow primary_source before other tool calls so execution follows
-the activated workflow. Only Read tool calls are allowed until this clears.
-
-This gate fires ONLY on a single locked route; it never blocks on a detector
-miss or a multi-route conflict, and self-clears once you Read the file above
-(or pivot the task so a different route activates).
-`, routeID, ps)
-	return ExitValidationFailed
+	reason := fmt.Sprintf("Workflow activation evidence missing (gate.workflow.primary_source_read). "+
+		"The detector locked active_route=%s for this task, but its primary_source has not been Read yet:\n  %s\n"+
+		"Read that workflow primary_source before other (non-Read) tool calls so execution follows the activated "+
+		"workflow. This gate fires ONLY on a single locked route — never on a detector miss or multi-route conflict — "+
+		"and self-clears once you Read the file above (or pivot the task so a different route activates).", routeID, ps)
+	return renderClaudePreToolUseDecision(stdout, hookDecision{Deny: true, Reason: reason})
 }
 
 // md5Short returns the first 12 hex chars of the MD5 hash of s.
@@ -952,7 +977,7 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 	cacheFile := "/tmp/ai-skill-bootstrap-" + cacheKey + ".done"
 	if claudeFileExists(cacheFile) {
 		_, _ = fmt.Fprintln(stderr, "ALLOW_CACHED")
-		return finishPreToolUse(transcriptPath, projectDir, stderr)
+		return finishPreToolUse(transcriptPath, projectDir, stdout, stderr)
 	}
 
 	if projectDir != "" {
@@ -965,7 +990,7 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 					_ = os.WriteFile(cacheFile, []byte{}, 0o644)
 					_, _ = fmt.Fprintln(stderr, "ALLOW_SESSIONSTART_FLAG")
 					appendLog(logFile, "exit_code: 0 (sessionstart flag)")
-					return finishPreToolUse(transcriptPath, projectDir, stderr)
+					return finishPreToolUse(transcriptPath, projectDir, stdout, stderr)
 				}
 			}
 		}
@@ -992,53 +1017,26 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 			_ = os.WriteFile(cacheFile, []byte{}, 0o644)
 			_, _ = fmt.Fprintln(stderr, "ALLOW_RECEIPT_FOUND_WITH_READS")
 			appendLog(logFile, "exit_code: 0 (receipt found + required reads verified)")
-			return finishPreToolUse(transcriptPath, projectDir, stderr)
+			return finishPreToolUse(transcriptPath, projectDir, stdout, stderr)
 		}
 		_, _ = fmt.Fprintln(stderr, "BLOCK_RECEIPT_WITHOUT_READS missing="+strings.Join(missing, ","))
-		appendLog(logFile, "exit_code: 2 (receipt without required reads; missing="+strings.Join(missing, ",")+")")
-		_, _ = fmt.Fprintf(stderr, `[ai-skill PreToolUse hook] Bootstrap Receipt present but unverified.
-
-The transcript contains a "Bootstrap:" line, but the required canonical files
-have NOT been Read in this session. This indicates the Receipt was likely
-copied from the SessionStart hook example or fabricated from memory — the
-numbers shown in the hook reminder are NOT authoritative (they can drift from
-runtime/core-bootstrap.yaml).
-
-Missing Read calls for: %s
-
-To clear this gate:
-1. Read each missing file with the Read tool (absolute path inside
-   $AI_SKILL_REPO is fine; suffix match on the trailing path components).
-2. Count actual obligations and gates from the YAML you just read.
-3. Re-emit the Bootstrap Receipt with the verified numbers in your next
-   user-facing response:
-     Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
-     Active per-turn obligations: <comma-separated obligation ids>
-
-Only Read tool calls are allowed until this gate clears.
-`, strings.Join(missing, ", "))
-		return ExitValidationFailed
+		appendLog(logFile, "deny (receipt without required reads; missing="+strings.Join(missing, ",")+")")
+		reason := fmt.Sprintf("Bootstrap Receipt present but unverified. The transcript has a \"Bootstrap:\" line, "+
+			"but the required canonical files have NOT been Read this session (the numbers may have been copied from "+
+			"the SessionStart example, which is not authoritative). Missing Read calls for: %s. "+
+			"Read each missing file, count obligations/gates from the YAML, then re-emit the Receipt with verified "+
+			"numbers. Only Read tool calls are allowed until this gate clears.", strings.Join(missing, ", "))
+		return renderClaudePreToolUseDecision(stdout, hookDecision{Deny: true, Reason: reason})
 	}
 
 	_, _ = fmt.Fprintln(stderr, "BLOCK_NO_RECEIPT")
-	appendLog(logFile, "exit_code: 2 (block no receipt)")
-	_, _ = fmt.Fprint(stderr, `[ai-skill PreToolUse hook] Bootstrap Receipt missing.
-
-Before calling any tool other than Read, you MUST:
-1. Read CORE_BOOTSTRAP.md
-2. Read runtime/core-bootstrap.yaml (count obligations and gates from it)
-3. Read the 3 required_reads: enforcement/rule-weight.md, enforcement/dependency-reading.md, enforcement/conversation-goal-ledger.md
-4. Output the Bootstrap Receipt in your next user-facing response:
-   Bootstrap: rules=✓ phase=<phase-id> obligations=<n> gates=<n>
-   Active per-turn obligations: <obligation ids>
-
-The Receipt numbers MUST come from the YAML you just Read, NOT from the
-SessionStart hook example (it can be stale). The PreToolUse gate now verifies
-the Read events occurred in the transcript before accepting the Receipt.
-
-Only Read tool calls are allowed before the Receipt is emitted.
-`)
-	return ExitValidationFailed
+	appendLog(logFile, "deny (no receipt)")
+	reason := "Bootstrap Receipt missing. Before calling any tool other than Read you MUST: " +
+		"(1) Read CORE_BOOTSTRAP.md; (2) Read runtime/core-bootstrap.yaml (count obligations and gates from it); " +
+		"(3) Read the 3 required_reads (enforcement/rule-weight.md, dependency-reading.md, conversation-goal-ledger.md); " +
+		"(4) emit the Bootstrap Receipt with numbers from the YAML you just Read (NOT the SessionStart example). " +
+		"Only Read tool calls are allowed before the Receipt is emitted."
+	return renderClaudePreToolUseDecision(stdout, hookDecision{Deny: true, Reason: reason})
 }
 
 // runPostToolUseHook implements the Claude Code PostToolUse hook.

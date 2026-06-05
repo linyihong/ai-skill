@@ -75,6 +75,20 @@ Cursor wiring。修法：PreToolUse block 路徑由 `return ExitValidationFailed
 改為（a）`return 2`，或（b）`exit 0` + emit `permissionDecision:"deny"` JSON
 （後者可帶 reason，且與 Cursor 的 `{permission:deny}` 同構，建議採用）。
 
+> **✅ Claude 端 hotfix 已 landed（2026-06-05，user 選 option B）**：新增
+> transport-agnostic `hookDecision{Deny,Reason}` + `renderClaudePreToolUseDecision`
+> （`exit 0` + `hookSpecificOutput.permissionDecision="deny"`）。bootstrap receipt
+> gate 兩條 block 路徑 + Phase 5 `finishPreToolUse` 全部改用。tests：
+> `TestRenderClaudePreToolUseDecision_{Deny,Allow}` +
+> `TestPreToolUseHookBlocksReceiptWithoutReads`（改 assert deny JSON）。failure
+> pattern `pretooluse-block-wrong-exit-code` + CLAUDE.md L3 已更新。**本 plan 的
+> Cursor adapter（Phase 1-3）將直接重用 `hookDecision` 抽象**，只需加 Cursor
+> render（`{permission:deny}`）+ payload 解析 + init-project wiring。Q2 即此 hotfix。
+>
+> **待驗（Phase 0 保留項）**：Stop hook（`runStopHook`）的 Claude 端 block 是否
+> 也有同樣 exit-30 問題（Claude Stop 亦為 exit 2 才 block）；本 hotfix 只修
+> PreToolUse，Stop 另查。
+
 ## Scope
 
 **IS for**：把既有 PreToolUse gate 邏輯（bootstrap receipt + workflow
