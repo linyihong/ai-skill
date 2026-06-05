@@ -77,10 +77,16 @@ Claude Stop 兩處（皆回 `exit 30`）。
 agent/CLAUDE.md` L3 描述同步修正。Cursor adapter（plan 2026-06-05-0200）將重用同
 一 `hookDecision` 抽象。
 
-**仍待修（同 plan Phase 2）**：Claude **Stop** hook 的 block path 同樣回 `exit 30`
-（`validateStopHookFinalTexts` / `blockStopHookMissingAssistantText` 的 Claude
-path），須改為 `exit 0` + `{"decision":"block",...}`（Stop 用 `decision:block`，
-非 PreToolUse 的 `permissionDecision`）。Cursor stop（followup_message）已正確。
+**Stop hook 同類修正已 landed（2026-06-05，plan Phase 2）**：Claude **Stop** hook
+的 block path 原同樣回 `exit 30`（`validateStopHookFinalTexts` /
+`blockStopHookMissingAssistantText`，以及 dead 的 `validateStopHookFinalText`
+singular），現改用新增的 `renderClaudeStopDecision`（`exit 0` + top-level
+`{"decision":"block","reason":...}`）。Stop 用 `decision:block`，非 PreToolUse 的
+`permissionDecision` → 同一 `hookDecision` 由 per-event render 分流（Capability ≠
+Transport）。`stop_hook_active` re-entry loop guard 仍 allow（防無限 block）。
+測試：`TestRenderClaudeStopDecision_{Deny,Allow}` + `TestRunStopHookBlocksClaude*`
+（assert top-level `decision:block` JSON，非只 exit code）。Cursor stop
+（followup_message）一直正確、未動。
 
 ## Cross-References
 

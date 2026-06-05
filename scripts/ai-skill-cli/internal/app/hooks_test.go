@@ -380,31 +380,51 @@ func TestRunUserPromptSubmitHookSubsequentTurnSkipsBootstrap(t *testing.T) {
 	}
 }
 
-func TestRunStopHookBlocksCursorPayloadWithoutCognitive(t *testing.T) {
+// No hook_event_name => Claude path (cursorStop=false). A Claude Stop block MUST
+// be exit 0 + top-level {"decision":"block","reason":...} (the decision:block JSON
+// does the blocking, NOT exit code 30, which Claude treats as a non-blocking error
+// and stops anyway). Assert the JSON decision field, not just the exit code.
+func TestRunStopHookBlocksClaudePayloadWithoutCognitive(t *testing.T) {
 	setHookStdin(t, `{"assistant_response":"Done. Tests passed."}`)
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	code := runStopHook(t.TempDir(), &stdout, &stderr)
-	if code != ExitValidationFailed {
-		t.Fatalf("expected missing Cognitive block to fail, got %d; stderr=%s", code, stderr.String())
+	if code != ExitSuccess {
+		t.Fatalf("expected Claude Stop block via decision JSON to exit 0, got %d; stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "Missing obligation") {
-		t.Fatalf("expected missing obligation message, got %s", stderr.String())
+	var output map[string]any
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode Claude stop decision: %v\n%s", err, stdout.String())
+	}
+	if output["decision"] != "block" {
+		t.Fatalf("expected decision:block, got %#v", output)
+	}
+	reason, _ := output["reason"].(string)
+	if !strings.Contains(reason, "Missing obligation") {
+		t.Fatalf("expected missing obligation reason, got %#v", output)
 	}
 }
 
-func TestRunStopHookBlocksCursorOkOnlyPayload(t *testing.T) {
+func TestRunStopHookBlocksClaudeOkOnlyPayload(t *testing.T) {
 	setHookStdin(t, `{"assistant_response":"OK"}`)
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	code := runStopHook(t.TempDir(), &stdout, &stderr)
-	if code != ExitValidationFailed {
-		t.Fatalf("expected OK-only response to fail, got %d; stderr=%s", code, stderr.String())
+	if code != ExitSuccess {
+		t.Fatalf("expected Claude Stop block via decision JSON to exit 0, got %d; stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "Missing obligation") {
-		t.Fatalf("expected missing obligation message, got %s", stderr.String())
+	var output map[string]any
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode Claude stop decision: %v\n%s", err, stdout.String())
+	}
+	if output["decision"] != "block" {
+		t.Fatalf("expected decision:block, got %#v", output)
+	}
+	reason, _ := output["reason"].(string)
+	if !strings.Contains(reason, "Missing obligation") {
+		t.Fatalf("expected missing obligation reason, got %#v", output)
 	}
 }
 
@@ -808,6 +828,38 @@ func TestRenderClaudePreToolUseDecision_Allow(t *testing.T) {
 	}
 	if strings.TrimSpace(stdout.String()) != "" {
 		t.Fatalf("allow must emit NO decision JSON (normal permission flow); got %q", stdout.String())
+	}
+}
+
+func TestRenderClaudeStopDecision_Deny(t *testing.T) {
+	var stdout bytes.Buffer
+	code := renderClaudeStopDecision(&stdout, hookDecision{Deny: true, Reason: "because close-out missing"})
+	// MUST be exit 0 — the block is carried by top-level decision:block JSON, not
+	// the exit code. Returning a non-zero like 30 is the bug: Claude treats it as
+	// a non-blocking Stop error and stops anyway.
+	if code != ExitSuccess {
+		t.Fatalf("deny must return exit 0 (JSON carries the block), got %d", code)
+	}
+	var output map[string]any
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode stop decision: %v\n%s", err, stdout.String())
+	}
+	if output["decision"] != "block" {
+		t.Fatalf("Stop block must use top-level decision:block (NOT permissionDecision); got %#v", output)
+	}
+	if reason, _ := output["reason"].(string); !strings.Contains(reason, "because close-out missing") {
+		t.Fatalf("reason must be in the reason field; got %#v", output)
+	}
+}
+
+func TestRenderClaudeStopDecision_Allow(t *testing.T) {
+	var stdout bytes.Buffer
+	code := renderClaudeStopDecision(&stdout, hookDecision{Deny: false})
+	if code != ExitSuccess {
+		t.Fatalf("allow must be exit 0, got %d", code)
+	}
+	if strings.TrimSpace(stdout.String()) != "" {
+		t.Fatalf("allow must emit NO decision JSON (normal stop flow); got %q", stdout.String())
 	}
 }
 

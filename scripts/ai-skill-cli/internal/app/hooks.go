@@ -463,6 +463,33 @@ func renderClaudePreToolUseDecision(stdout io.Writer, d hookDecision) int {
 	return ExitSuccess // the JSON deny does the blocking, not the exit code
 }
 
+// renderClaudeStopDecision writes a Claude Code Stop decision to stdout and
+// returns the process exit code.
+//
+// CRITICAL (Claude Code Stop hook contract): a Stop block is exit 0 + stdout
+// top-level {"decision":"block","reason":...} — OR exit 2. Any OTHER non-zero
+// exit code (e.g. the former ExitValidationFailed=30) is a NON-blocking error:
+// Claude surfaces stderr as a "hook error" notice but STOPS ANYWAY. So returning
+// 30 silently disabled the Stop close-out gate (Bootstrap Receipt / Cognitive
+// Mode / Project Git Report were behavioral-only, never mechanically enforced).
+//
+// Note the Stop protocol uses a TOP-LEVEL decision:block (NOT PreToolUse's
+// hookSpecificOutput.permissionDecision="deny") — that is why the shared
+// hookDecision is rendered per-event. Cursor's Stop equivalent is followup_message
+// (see writeCursorStopFollowup). Capability (the gate outcome) is decoupled from
+// Transport (the host's block protocol). See
+// enforcement/failure-patterns/pretooluse-block-wrong-exit-code.md.
+func renderClaudeStopDecision(stdout io.Writer, d hookDecision) int {
+	if !d.Deny {
+		return ExitSuccess
+	}
+	_ = json.NewEncoder(stdout).Encode(map[string]any{
+		"decision": "block",
+		"reason":   d.Reason,
+	})
+	return ExitSuccess // the decision:block JSON does the blocking, not the exit code
+}
+
 // finishPreToolUse runs the workflow activation-evidence gate after the
 // bootstrap gate is satisfied, then returns the final PreToolUse exit code.
 func finishPreToolUse(transcriptPath, projectDir string, stdout, stderr io.Writer) int {
@@ -1343,17 +1370,17 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 
 func blockStopHookMissingAssistantText(stdout io.Writer, stderr io.Writer, logFile string, transcriptPath string, cursorStop bool) int {
 	_, _ = fmt.Fprintln(stderr, "BLOCK_NO_ASSISTANT_TEXT: path="+transcriptPath)
-	appendLog(logFile, "exit_code: 2 (block missing assistant text)")
 	message := "[ai-skill Stop hook] Missing assistant response text in hook payload.\n\n" +
 		"The final Cognitive Mode check cannot validate an empty or unavailable assistant response. " +
 		"Use a Cursor event that supplies the assistant response payload, such as afterAgentResponse, " +
 		"or provide a transcript_path containing the final assistant message.\n"
 	if cursorStop {
+		appendLog(logFile, "exit_code: 0 (cursor followup: missing assistant text)")
 		writeCursorStopFollowup(stdout, message)
 		return ExitSuccess
 	}
-	_, _ = fmt.Fprint(stderr, message)
-	return ExitValidationFailed
+	appendLog(logFile, "decision: block (missing assistant text)")
+	return renderClaudeStopDecision(stdout, hookDecision{Deny: true, Reason: message})
 }
 
 func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Writer, stderr io.Writer, logFile string, cursorStop bool) int {
@@ -1410,13 +1437,13 @@ func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Wri
 	message := "[ai-skill Stop hook] Close-out validation failed. This is an agent follow-up instruction, not a user request.\n\n" +
 		strings.Join(messages, "\n---\n\n") +
 		"\nPlease produce one corrected final response now that satisfies all missing items in one pass. A corrected final response is accepted as repair; do not repeat the same violation after adding the requested sections. Canonical format spec: runtime/core-bootstrap.yaml. Query receipt values with `ai-skill runtime receipt`; query active obligations with `ai-skill runtime obligations`.\n"
-	appendLog(logFile, fmt.Sprintf("exit_code: 2 (block missing close-out items: %d)", len(messages)))
 	if cursorStop {
+		appendLog(logFile, fmt.Sprintf("exit_code: 0 (cursor followup: missing close-out items: %d)", len(messages)))
 		writeCursorStopFollowup(stdout, message)
 		return ExitSuccess
 	}
-	_, _ = fmt.Fprint(stderr, message)
-	return ExitValidationFailed
+	appendLog(logFile, fmt.Sprintf("decision: block (missing close-out items: %d)", len(messages)))
+	return renderClaudeStopDecision(stdout, hookDecision{Deny: true, Reason: message})
 }
 
 func isCursorNonFinalToolResponse(text string) bool {
@@ -1487,15 +1514,15 @@ func validateStopHookFinalText(projectDir string, lastText string, stdout io.Wri
 			gitReportRe := regexp.MustCompile(`(?m)^### (Project Git Report|Git Repo Report|Git Repository Report)\b`)
 			if !gitReportRe.MatchString(lastText) {
 				_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING_PROJECT_GIT_REPORT")
-				appendLog(logFile, "exit_code: 2 (block missing project git report)")
 				message := "[ai-skill Stop hook] Dirty Git repositories were detected under the project root, but your final response did not include `### Project Git Report`.\n\n" +
 					"If one nested Git repo changed, report that repo. If multiple nested Git repos changed, merge them into one `### Project Git Report` section with one bullet per repo and clearly distinguish current-task changes from pre-existing/unrelated dirty state.\n"
 				if cursorStop {
+					appendLog(logFile, "exit_code: 0 (cursor followup: missing project git report)")
 					writeCursorStopFollowup(stdout, message)
 					return ExitSuccess
 				}
-				_, _ = fmt.Fprint(stderr, message)
-				return ExitValidationFailed
+				appendLog(logFile, "decision: block (missing project git report)")
+				return renderClaudeStopDecision(stdout, hookDecision{Deny: true, Reason: message})
 			}
 		}
 		_, _ = fmt.Fprintln(stderr, "ALLOW_BLOCK_PRESENT")
@@ -1504,7 +1531,6 @@ func validateStopHookFinalText(projectDir string, lastText string, stdout io.Wri
 	}
 
 	_, _ = fmt.Fprintln(stderr, "BLOCK_MISSING")
-	appendLog(logFile, "exit_code: 2")
 	message := "[ai-skill Stop hook] Missing obligation: your final response did not include a Cognitive Mode block.\n\n" +
 		"Per runtime/core-bootstrap.yaml §per_turn_obligations[obligation.cognitive.mode_report], every final user-facing " +
 		"response MUST end with a Cognitive Mode block (compact 1-line for trivial all-default tasks: " +
@@ -1512,11 +1538,12 @@ func validateStopHookFinalText(projectDir string, lastText string, stdout io.Wri
 		"Please append the block to your response now, then stop again. Canonical format spec: runtime/core-bootstrap.yaml. " +
 		"Query receipt values with `ai-skill runtime receipt`; query active obligations with `ai-skill runtime obligations`.\n"
 	if cursorStop {
+		appendLog(logFile, "exit_code: 0 (cursor followup: missing cognitive block)")
 		writeCursorStopFollowup(stdout, message)
 		return ExitSuccess
 	}
-	_, _ = fmt.Fprint(stderr, message)
-	return ExitValidationFailed
+	appendLog(logFile, "decision: block (missing cognitive block)")
+	return renderClaudeStopDecision(stdout, hookDecision{Deny: true, Reason: message})
 }
 
 func isCursorStopPayload(payload map[string]json.RawMessage) bool {

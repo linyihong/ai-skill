@@ -45,6 +45,14 @@ Claude Code 的 bootstrap 自動化由**三層協同**達成（對應 multi-laye
 > error → **工具照常執行**。本 repo 採 `exit 0 + deny JSON`（`renderClaudePreToolUseDecision`），
 > 因其可帶 `permissionDecisionReason` 且與 Cursor 的 `{permission:"deny"}` 同構。
 > 詳見 [`enforcement/failure-patterns/pretooluse-block-wrong-exit-code.md`](../../enforcement/failure-patterns/pretooluse-block-wrong-exit-code.md)。
+>
+> **Stop hook（close-out）同理（2026-06-05 修正）**：Claude 的 Stop hook
+> （Bootstrap Receipt / Cognitive Mode / Project Git Report close-out 檢查）原本也誤回
+> `exit 30` → non-blocking → Claude 照常 stop（檢查實為 behavioral-only）。現改用
+> `renderClaudeStopDecision`（`exit 0` + top-level `{"decision":"block","reason":...}`）。
+> 注意 Stop 用 **top-level `decision:block`**，不是 PreToolUse 的
+> `permissionDecision:"deny"`（同一 `hookDecision` per-event render）；`stop_hook_active`
+> re-entry 仍放行以防無限 loop。Cursor stop 用 `followup_message`，一直正確。
 
 ### 關鍵格式要求（Claude Code 專屬）
 
