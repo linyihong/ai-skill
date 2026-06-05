@@ -20,10 +20,18 @@ Class: `meta-governance-gap` / `enforcement-self-leak`
 
 Host（Claude Code / Cursor）對 PreToolUse 的 block 協定是**精確**的：
 
-| Host | 真正會擋 | 其他 non-zero |
+**block 協定還是 per-event 的** —— 同一 host 不同 event 用不同 JSON 欄位：
+
+| Host / event | 真正會擋 | 其他 non-zero |
 |---|---|---|
-| Claude Code | `exit 2`，或 `exit 0` + stdout `hookSpecificOutput.permissionDecision="deny"` | **non-blocking error → 工具照常執行** |
-| Cursor | `exit 2`，或 stdout `{"permission":"deny"}` | **fail-open → 工具照常執行** |
+| Claude PreToolUse | `exit 2`，或 `exit 0` + `hookSpecificOutput.permissionDecision="deny"` | **non-blocking → 工具照常執行** |
+| Claude Stop | `exit 2`，或 `exit 0` + top-level `{"decision":"block","reason":...}` | **non-blocking → Claude 照常 stop** |
+| Cursor preToolUse | `exit 2`，或 `{"permission":"deny"}` | **fail-open → 工具照常執行** |
+| Cursor stop | `{"followup_message":...}` + exit 0 | （stop 無 exit-2 loop；缺項用 followup） |
+
+⚠️ 用對 event 但用錯**欄位**也會失效（如 Stop 誤用 PreToolUse 的
+`permissionDecision` 而非 `decision:block`）。本 repo 同時中過 PreToolUse 與
+Claude Stop 兩處（皆回 `exit 30`）。
 
 若 executor 回 `exit 30`（如本 repo 曾用的 `ExitValidationFailed`）：host 把它當
 **non-blocking error**，stderr 只當成 `<hook> hook error` notice 顯示，**工具不會
@@ -68,6 +76,11 @@ Host（Claude Code / Cursor）對 PreToolUse 的 block 協定是**精確**的：
 `TestPreToolUseHookBlocksReceiptWithoutReads`（改 assert deny JSON）。`ai-tools/
 agent/CLAUDE.md` L3 描述同步修正。Cursor adapter（plan 2026-06-05-0200）將重用同
 一 `hookDecision` 抽象。
+
+**仍待修（同 plan Phase 2）**：Claude **Stop** hook 的 block path 同樣回 `exit 30`
+（`validateStopHookFinalTexts` / `blockStopHookMissingAssistantText` 的 Claude
+path），須改為 `exit 0` + `{"decision":"block",...}`（Stop 用 `decision:block`，
+非 PreToolUse 的 `permissionDecision`）。Cursor stop（followup_message）已正確。
 
 ## Cross-References
 
