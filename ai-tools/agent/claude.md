@@ -37,7 +37,14 @@ Claude Code 的 bootstrap 自動化由**三層協同**達成（對應 multi-laye
 |---|---|---|
 | **L1 資料注入** | `.claude/hooks/auto-bootstrap.sh`（SessionStart hook） | session 開啟時把預算好的 Receipt 資料注入 context，Claude 才有**精確數值**可以 echo，不需要自己查 |
 | **L2 禁止 prompt** | `CLAUDE.md` 最前面的 `# CRITICAL RUNTIME RULES` | 禁止語氣 + 顯式排序 + execution prohibition，把 Receipt echo 推到第一行 |
-| **L3 機械關卡** | `.claude/hooks/check-bootstrap-receipt.sh`（PreToolUse hook） | Claude 偷跑非-Read 工具時以 `exit 2` 攔截，逼它回去走完整序列 |
+| **L3 機械關卡** | `ai-skill hooks run pre-tool-use`（PreToolUse hook，Go binary） | Claude 偷跑非-Read 工具時以 **deny decision** 攔截（`exit 0` + stdout `hookSpecificOutput.permissionDecision="deny"`），逼它回去走完整序列 |
+
+> **PreToolUse block 契約（重要，2026-06-05 修正）**：Claude Code 的 PreToolUse
+> **只在 `exit 2` 或 `permissionDecision:"deny"` 時才真正攔截**；其他 non-zero
+> exit code（例如本 repo 曾誤用的 `ExitValidationFailed=30`）被視為 non-blocking
+> error → **工具照常執行**。本 repo 採 `exit 0 + deny JSON`（`renderClaudePreToolUseDecision`），
+> 因其可帶 `permissionDecisionReason` 且與 Cursor 的 `{permission:"deny"}` 同構。
+> 詳見 [`enforcement/failure-patterns/pretooluse-block-wrong-exit-code.md`](../../enforcement/failure-patterns/pretooluse-block-wrong-exit-code.md)。
 
 ### 關鍵格式要求（Claude Code 專屬）
 
