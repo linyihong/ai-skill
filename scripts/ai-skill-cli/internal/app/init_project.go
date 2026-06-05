@@ -408,7 +408,15 @@ alwaysApply: true
 }
 
 func initProjectCursorHooksContent() (string, error) {
-	command := "sh -c 'ROOT=\"${CURSOR_PROJECT_DIR:-$(pwd)}\"; if [ -z \"${AI_SKILL_REPO:-}\" ] && [ -f \"$ROOT/.ai-skill/local.env\" ]; then . \"$ROOT/.ai-skill/local.env\"; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then echo \"AI_SKILL_REPO is not set; Ai-skill Cursor close-out hook cannot validate Cognitive Mode\" >&2; exit 2; fi; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run stop --repo \"$ROOT\"'"
+	// stop: when AI_SKILL_REPO is unresolvable the close-out hook fails CLOSED
+	// (exit 2 + failClosed) — a missing repo must not let a session end without
+	// the Cognitive Mode / Project Git Report check.
+	stopCommand := "sh -c 'ROOT=\"${CURSOR_PROJECT_DIR:-$(pwd)}\"; if [ -z \"${AI_SKILL_REPO:-}\" ] && [ -f \"$ROOT/.ai-skill/local.env\" ]; then . \"$ROOT/.ai-skill/local.env\"; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then echo \"AI_SKILL_REPO is not set; Ai-skill Cursor close-out hook cannot validate Cognitive Mode\" >&2; exit 2; fi; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run stop --repo \"$ROOT\"'"
+	// preToolUse: a blockable Cursor event. When AI_SKILL_REPO is unresolvable the
+	// gate fails OPEN (exit 0) — a missing repo must NOT block every tool call.
+	// The binary itself emits {"permission":"deny"} on a real gate hit; allow is
+	// empty stdout + exit 0.
+	preToolUseCommand := "sh -c 'ROOT=\"${CURSOR_PROJECT_DIR:-$(pwd)}\"; if [ -z \"${AI_SKILL_REPO:-}\" ] && [ -f \"$ROOT/.ai-skill/local.env\" ]; then . \"$ROOT/.ai-skill/local.env\"; fi; if [ -z \"${AI_SKILL_REPO:-}\" ]; then echo \"AI_SKILL_REPO is not set; skipping Ai-skill Cursor pre-tool-use gate\" >&2; exit 0; fi; case \"$(uname -s 2>/dev/null | tr A-Z a-z)\" in darwin) os=darwin ;; linux) os=linux ;; mingw*|msys*|cygwin*) os=windows ;; *) os=unknown ;; esac; arch=\"$(uname -m 2>/dev/null || echo unknown)\"; case \"$arch\" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; esac; suffix=\"\"; [ \"$os\" = \"windows\" ] && suffix=\".exe\"; exec \"$AI_SKILL_REPO/scripts/ai-skill-cli/bin/ai-skill-$os-$arch$suffix\" hooks run pre-tool-use --repo \"$ROOT\"'"
 	settings := map[string]any{
 		"version": 1,
 		"hooks": map[string]any{
@@ -417,8 +425,12 @@ func initProjectCursorHooksContent() (string, error) {
 				"prompt":  "This project uses Ai-skill. Before answering, load <AI_SKILL_REPO>/CORE_BOOTSTRAP.md and <AI_SKILL_REPO>/runtime/core-bootstrap.yaml, emit the Bootstrap Receipt, and include Cognitive Mode only in the final response / session close-out. If dirty root or nested Git repositories are detected at close-out, the final response must include a combined ### Project Git Report.",
 				"timeout": 10,
 			}},
+			"preToolUse": []map[string]any{{
+				"command": preToolUseCommand,
+				"timeout": 10,
+			}},
 			"stop": []map[string]any{{
-				"command":    command,
+				"command":    stopCommand,
 				"timeout":    10,
 				"failClosed": true,
 				"loop_limit": 2,

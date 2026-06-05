@@ -169,6 +169,17 @@ func TestInitProjectWriteModeWritesSelectedFiles(t *testing.T) {
 		!strings.Contains(string(cursorHooks), "nested Git repositories") {
 		t.Fatalf("expected Cursor hooks to enforce final Cognitive close-out through Ai-skill CLI, got %s", string(cursorHooks))
 	}
+	// preToolUse gate must be wired (mechanical bootstrap/workflow gate), and it
+	// must FAIL OPEN (exit 0) when AI_SKILL_REPO is unresolvable — a missing repo
+	// must never block every tool call. It must NOT be marked failClosed.
+	if !strings.Contains(string(cursorHooks), `"preToolUse"`) ||
+		!strings.Contains(string(cursorHooks), "hooks run pre-tool-use") ||
+		!strings.Contains(string(cursorHooks), "skipping Ai-skill Cursor pre-tool-use gate") {
+		t.Fatalf("expected Cursor hooks to wire a pre-tool-use mechanical gate, got %s", string(cursorHooks))
+	}
+	if strings.Contains(string(cursorHooks), `"matcher"`) {
+		t.Fatalf("Cursor hooks use no Claude-style matcher field; got %s", string(cursorHooks))
+	}
 	if strings.Contains(string(cursorHooks), `"afterAgentResponse"`) {
 		t.Fatalf("afterAgentResponse cannot block or loop final responses; expected only stop enforcement, got %s", string(cursorHooks))
 	}
