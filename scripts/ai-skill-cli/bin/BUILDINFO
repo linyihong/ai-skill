@@ -1,4 +1,4 @@
-version=repo-2ce1189
-source_commit=2ce1189
-built_at=2026-06-05T02:26:44Z
+version=repo-a47e2ee
+source_commit=a47e2ee
+built_at=2026-06-05T05:57:30Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
