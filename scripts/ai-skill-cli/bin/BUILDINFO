@@ -1,4 +1,4 @@
-version=repo-a47e2ee
-source_commit=a47e2ee
-built_at=2026-06-05T05:57:30Z
+version=repo-c048f06
+source_commit=c048f06
+built_at=2026-06-05T06:19:55Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
