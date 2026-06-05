@@ -10,7 +10,8 @@ sub_plan_reason: >
   Workflow Activation Engine (parent) Phase 6 "Discovery → Detector feedback
   loop" 標 deferred 上線；同一失效模式（detector miss → 無 mechanical
   fallback → 靠 agent 自律 → 自律失敗）於 parent 完成隔日（2026-06-05）
-  在 Travel project travel-planning 任務上原樣重演。本 sub-plan 補上 parent
+  在一個消費 `route.workflow.travel-planning` 的 downstream project 上原樣
+  重演。本 sub-plan 補上 parent
   延後的 Discovery bridge，採 Light → Deep 兩階段漸進架構，避免 detector
   ontology 擴張並維持 parent §Design Principles 的 pre-Read 破環依賴原則。
   Independent sign-off：影響 per-turn cost 模型與 advisory 注入路徑，
@@ -26,7 +27,7 @@ Owner: framework maintainer (linyihong)
 **最後更新**：2026-06-06（v1 draft，rescope 自 v0 多 phase 草稿）
 **Priority**：**P2**
 **Parent plan**：[`2026-05-31-1900-workflow-activation-engine.md`](../archived/2026-05-31-1900-workflow-activation-engine.md)
-**Empirical trigger**：2026-06-05 session — Travel project 內任務「幫我檢驗一下 `<dated-itinerary>.md`」。Detector miss（無 user keyword、無 path match），無 mechanical fallback，agent 直接憑常識做 review。文件命中 travel-planning artifact-gates 19 項中 7~10 項缺漏未被偵測。使用者三輪追問才暴露 gap，與 parent plan 2026-05-31 原 incident 為**同一結構性缺口的兩次採樣**。具體 project artifact 範例依 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) 留在原 project 文件。
+**Empirical trigger**：2026-06-05 session — 某消費 `route.workflow.travel-planning` 的 downstream project 內，使用者要求對一份命名遵循 project-local convention 的 dated artifact 進行 review。Detector miss（無 user keyword、無 path match），無 mechanical fallback，agent 直接憑常識做 review。文件命中 travel-planning artifact-gates 19 項中 7~10 項缺漏未被偵測。使用者三輪追問才暴露 gap，與 parent plan 2026-05-31 原 incident 為**同一結構性缺口的兩次採樣**。具體 project artifact、檔名與對話細節依 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) 留在原 project 文件。
 
 > 本 plan **不擴 detector schema、不改 routing-registry**。範圍嚴格限定在 "detector miss → Discovery → advisory" 的 mechanical bridge。Filename / project metadata 等 semantic surface 議題 park 至條件式 follow-up plan，待本 plan 三週量測後依 miss rate 決定是否開。
 
@@ -36,7 +37,7 @@ Owner: framework maintainer (linyihong)
 
 ### Problem & Why Now
 
-Parent plan v8（2026-06-04 完成）落地 detector + per-turn gate + manual-lock，**mechanical 層只完成一半**：detector hit 時機械擋住，detector miss 時 fail-open 並依賴 agent 自律 fallback 到 Discovery。Parent plan Phase 6 明寫 Discovery feedback loop「hot-hook auto-call 刻意延後」。延後代價在 parent 完成隔日就兌現（2026-06-05 Travel incident）。
+Parent plan v8（2026-06-04 完成）落地 detector + per-turn gate + manual-lock，**mechanical 層只完成一半**：detector hit 時機械擋住，detector miss 時 fail-open 並依賴 agent 自律 fallback 到 Discovery。Parent plan Phase 6 明寫 Discovery feedback loop「hot-hook auto-call 刻意延後」。延後代價在 parent 完成隔日就兌現（2026-06-05 incident）。
 
 失效路徑：
 
@@ -48,7 +49,7 @@ task input → detector(user_signals + context_signals(path)) miss
          → review 用常識做完，artifact-gates 19 項缺 7~10 項
 ```
 
-**Why now**：parent plan archive 收尾 evidence 包含「detector miss 為設計接受的容忍範圍」假設。Travel incident 證明此容忍範圍對 cross-project + project-local-ontology 任務太寬。每加一個 project 就會踩同一個雷。
+**Why now**：parent plan archive 收尾 evidence 包含「detector miss 為設計接受的容忍範圍」假設。2026-06-05 incident 證明此容忍範圍對 cross-project + project-local-ontology 任務太寬。每加一個 downstream project 就會踩同一個雷。
 
 ### Decision
 
@@ -256,7 +257,7 @@ PostToolUse:Read hook fires (artifact Read by agent)
 - 3 個 cross-project replay 至少 2 個 Phase A hit ≥ threshold
 - p95 hook 延遲 budget 達標
 - Unit tests + regression scenario 綠
-- Travel project empirical trigger replay → Phase A 至少寫出 candidate（即使未達 threshold，proposal 應存在）
+- 2026-06-05 empirical trigger replay → Phase A 至少寫出 candidate（即使未達 threshold，proposal 應存在）
 
 ### Phase B — Deep Discovery
 
@@ -282,14 +283,14 @@ PostToolUse:Read hook fires (artifact Read by agent)
 #### Phase B.4 — Cost 量測 + regression
 
 - [ ] Bench：Phase B 跑 100 次（典型 markdown 1000~5000 token）p95 ≤ 50ms
-- [ ] Regression：Travel incident replay → Phase A miss + Phase B hit + advisory 注入下一輪
+- [ ] Regression：2026-06-05 incident replay → Phase A miss + Phase B hit + advisory 注入下一輪
 - [ ] Edge case：Phase B 從錯 artifact（如 README 而非 itinerary）取訊號，下一輪正確 artifact Read 後 candidate 修正
 
 **Phase B acceptance**：
 
 - p95 cost budget 達標
 - 至少 2 個 cross-project replay 證明 Phase B 累積機制有效
-- Travel incident replay 在 Phase A + B 組合下達到 advised 狀態
+- 2026-06-05 incident replay 在 Phase A + B 組合下達到 advised 狀態
 
 ### Phase C — Governance + Documentation
 
@@ -333,7 +334,7 @@ PostToolUse:Read hook fires (artifact Read by agent)
 - [ ] `enforcement/failure-patterns/detector-miss-no-fallback.md` 建立並 cross-link
 - [ ] `knowledge/glossary/ai-skill.md` 6 新 term 註冊
 - [ ] `routing-registry.yaml` 不動（acceptance 條件）
-- [ ] Travel project empirical trigger replay → Phase A or B advised → agent pivot 成功
+- [ ] 2026-06-05 empirical trigger replay → Phase A or B advised → agent pivot 成功
 - [ ] Open Questions 全部 resolve 或 deferred 註記
 - [ ] 至少 3 個 cross-project replay 驗證
 
