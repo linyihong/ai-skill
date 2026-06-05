@@ -1,4 +1,4 @@
-version=repo-9d70f76
-source_commit=9d70f76
-built_at=2026-06-05T06:38:59Z
+version=repo-04d2c97
+source_commit=04d2c97
+built_at=2026-06-05T07:03:25Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
