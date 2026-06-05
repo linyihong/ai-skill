@@ -47,12 +47,12 @@ steps:
     action: Read ai-tools/agent/cursor.md only for Cursor-specific rules, hooks, workspace, and config differences.
   - id: apply_cursor_hook_boundary
     order: 5
-    action: Cursor hooks must never silently edit files, close goals, or auto-commit. The preToolUse gate IS a mechanical block (native permission:deny on a real bootstrap/workflow gate hit) but fails open (exit 0) when AI_SKILL_REPO is unresolvable; the stop check uses followup_message loopback. Do not describe the preToolUse gate as a mere reminder.
+    action: Cursor hooks must never silently edit files, close goals, or auto-commit. The preToolUse gate IS a mechanical block (native permission:deny on a real bootstrap/workflow gate hit) but fails open (exit 0) when AI_SKILL_REPO is unresolvable; Cursor read/search tools are always allowed so bootstrap/workflow reads cannot self-lock. The stop check uses followup_message loopback only for true final close-out validation. Do not describe the preToolUse gate as a mere reminder.
     gates:
       - gate.cursor.hooks_fail_open
   - id: enforce_cursor_cognitive_close_out
     order: 6
-    action: Ensure init-project Cursor hooks include sessionStart dirty repo close-out guidance, a preToolUse mechanical gate (calls the canonical hook runner; native permission:deny on block; read-type tools allowed; fail-open when repo unresolvable), and a stop close-out check that uses Cursor's followup_message loopback when Bootstrap Receipt, final Cognitive Mode reporting, or required Project Git Report is missing.
+    action: Ensure init-project Cursor hooks include sessionStart dirty repo close-out guidance, a preToolUse mechanical gate (calls the canonical hook runner; native permission:deny on block; actual Cursor read/search tools allowed; fail-open when repo unresolvable), and a stop close-out check that uses Cursor's followup_message loopback when Bootstrap Receipt, final Cognitive Mode reporting, or required Project Git Report is missing from a true final assistant response.
     gates:
       - gate.cursor.cognitive_close_out
   - id: enforce_thin_adapter_boundary
@@ -67,7 +67,7 @@ gates:
     pass_when:
       - hooks do not silently edit files, close goals, or auto-commit unless explicitly configured
       - the preToolUse gate blocks via native permission:deny on a real gate hit, and fails open (exit 0) when AI_SKILL_REPO is unresolvable so a missing repo never blocks every tool
-      - the stop check fails closed (exit 2 + failClosed) only for close-out, using followup_message loopback, not exit-2 looping
+      - the stop check fails closed (exit 2 + failClosed) only for close-out bootstrap wiring, while runtime stop validation uses followup_message loopback only for true final assistant responses
   - id: gate.cursor.thin_adapter_boundary
     blocks: reusable_doc_change
     pass_when:
@@ -79,8 +79,8 @@ gates:
     pass_when:
       - init-project Cursor hooks contain sessionStart guidance for dirty repo close-out, a preToolUse mechanical gate, and a stop/final-response check.
       - The preToolUse and stop hooks delegate to the canonical Ai-skill hook runner rather than duplicating gate or Cognitive Mode parsing in the Cursor template.
-      - The preToolUse gate fails open (exit 0) when AI_SKILL_REPO is unresolvable; read-type tools are always allowed.
-      - Missing Bootstrap Receipt, final Cognitive Mode reporting, or required Project Git Report uses Cursor stop `followup_message` loopback with exit 0 instead of relying on exit 2.
+      - The preToolUse gate fails open (exit 0) when AI_SKILL_REPO is unresolvable; actual Cursor read/search tools are always allowed.
+      - Missing Bootstrap Receipt, final Cognitive Mode reporting, or required Project Git Report uses Cursor stop `followup_message` loopback with exit 0 instead of relying on exit 2, but only when a final assistant response is available.
   - id: gate.cursor.always_apply_bootstrap_current
     blocks: cursor_rule_change
     pass_when:

@@ -480,21 +480,20 @@ func TestRunStopHookAllowsAfterAgentResponseAuditOnly(t *testing.T) {
 	}
 }
 
-func TestRunStopHookLoopsCursorStopMissingAssistantText(t *testing.T) {
+func TestRunStopHookAllowsCursorStopMissingAssistantText(t *testing.T) {
 	setHookStdin(t, `{"hook_event_name":"stop"}`)
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	code := runStopHook(t.TempDir(), &stdout, &stderr)
 	if code != ExitSuccess {
-		t.Fatalf("expected Cursor stop missing assistant text to loop with success exit, got %d; stderr=%s", code, stderr.String())
+		t.Fatalf("expected Cursor stop missing assistant text to fail open, got %d; stderr=%s", code, stderr.String())
 	}
-	var output map[string]string
-	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
-		t.Fatalf("decode Cursor stop output: %v\n%s", err, stdout.String())
+	if stdout.String() != "" {
+		t.Fatalf("expected no followup loop without assistant final text, got %s", stdout.String())
 	}
-	if !strings.Contains(output["followup_message"], "Missing assistant response text") {
-		t.Fatalf("expected missing assistant text followup, got %#v", output)
+	if !strings.Contains(stderr.String(), "ALLOW_CURSOR_NO_ASSISTANT_TEXT") {
+		t.Fatalf("expected no-assistant-text fail-open diagnostic, got %s", stderr.String())
 	}
 }
 
@@ -579,16 +578,22 @@ func TestRunStopHookAllowsCursorSwitchModeResponseWithoutCloseOutLoop(t *testing
 	cases := []string{
 		"Switched composer mode from agent to plan",
 		"Switched composer mode from plan to agent",
+		"Switched composer mode from plan to build",
+		"Switched from Plan to Build mode.",
 		"Switched to Agent mode",
 		"Switched to Plan mode",
+		"Switched to Build mode",
 		"Switched to Ask mode",
 		"Switched to Debug mode",
 		"You are now in Agent mode.",
 		"You are now in Plan mode.",
+		"You are now in Build mode.",
 		"You are now in Ask mode.",
 		"You are now in Debug mode.",
 		"Successfully switched to Plan mode.",
+		"Successfully switched to Build mode.",
 		"Mode switched to plan.",
+		"Mode switched to build.",
 	}
 	for _, assistantResponse := range cases {
 		t.Run(assistantResponse, func(t *testing.T) {
@@ -754,6 +759,36 @@ func TestTranscriptHasRequiredBootstrapReadsAcceptsWindowsPaths(t *testing.T) {
 	}
 }
 
+func TestTranscriptHasRequiredBootstrapReadsAcceptsCursorReadFileTools(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "transcript.jsonl")
+	entries := []map[string]any{
+		{
+			"type": "assistant",
+			"message": map[string]any{
+				"content": []map[string]any{
+					{"type": "tool_use", "id": "tu_1", "name": "ReadFile", "input": map[string]any{"path": "/repo/CORE_BOOTSTRAP.md"}},
+					{"type": "tool_use", "id": "tu_2", "name": "functions.ReadFile", "input": map[string]any{"path": "/repo/runtime/core-bootstrap.yaml"}},
+				},
+			},
+		},
+	}
+	var lines []string
+	for _, entry := range entries {
+		buf, err := json.Marshal(entry)
+		if err != nil {
+			t.Fatalf("marshal transcript entry: %v", err)
+		}
+		lines = append(lines, string(buf))
+	}
+	writeFile(t, path, strings.Join(lines, "\n")+"\n")
+
+	ok, missing := transcriptHasRequiredBootstrapReads(path, bootstrapRequiredReadSuffixes)
+	if !ok || len(missing) != 0 {
+		t.Fatalf("expected Cursor ReadFile tool_use entries to satisfy bootstrap reads; ok=%v missing=%v", ok, missing)
+	}
+}
+
 func TestPreToolUseHookBlocksReceiptWithoutReads(t *testing.T) {
 	dir := t.TempDir()
 	// Transcript contains a Bootstrap Receipt line but NO Read tool_use entries —
@@ -866,16 +901,28 @@ func TestDetectPreToolUseHost(t *testing.T) {
 }
 
 func TestPreToolUseReadAllowed(t *testing.T) {
-	for _, tool := range []string{"read_file", "list_dir", "grep", "glob_file_search", "codebase_search"} {
+	for _, tool := range []string{
+		"Read",
+		"read_file",
+		"ReadFile",
+		"functions.ReadFile",
+		"list_dir",
+		"grep",
+		"glob_file_search",
+		"codebase_search",
+		"Glob",
+		"functions.Glob",
+		"rg",
+		"functions.rg",
+		"SemanticSearch",
+		"functions.SemanticSearch",
+	} {
 		if !preToolUseReadAllowed(hostCursor, tool) {
 			t.Fatalf("cursor read tool %q must be allowed", tool)
 		}
 	}
 	if preToolUseReadAllowed(hostCursor, "run_terminal_cmd") {
 		t.Fatalf("cursor non-read tool must NOT be allowed")
-	}
-	if preToolUseReadAllowed(hostCursor, "Read") {
-		t.Fatalf("cursor host must not key off Claude's Read name")
 	}
 	if !preToolUseReadAllowed(hostClaude, "Read") {
 		t.Fatalf("claude Read must be allowed")
@@ -915,21 +962,25 @@ func TestRunPreToolUseHookCursorBlocksWithoutReceipt(t *testing.T) {
 }
 
 func TestRunPreToolUseHookCursorAllowsReadTool(t *testing.T) {
-	dir := t.TempDir()
-	tr := writeBootstrapTranscript(t, dir, "no receipt yet", nil)
-	payload := fmt.Sprintf(`{"hook_event_name":"preToolUse","cursor_version":"3.4.17","tool_name":"read_file","transcript_path":%q}`, tr)
-	setHookStdin(t, payload)
+	for _, toolName := range []string{"read_file", "ReadFile", "functions.ReadFile"} {
+		t.Run(toolName, func(t *testing.T) {
+			dir := t.TempDir()
+			tr := writeBootstrapTranscript(t, dir, "no receipt yet", nil)
+			payload := fmt.Sprintf(`{"hook_event_name":"preToolUse","cursor_version":"3.4.17","tool_name":%q,"transcript_path":%q}`, toolName, tr)
+			setHookStdin(t, payload)
 
-	var stdout, stderr bytes.Buffer
-	code := runPreToolUseHook(dir, &stdout, &stderr)
-	if code != ExitSuccess {
-		t.Fatalf("expected read_file allowed, got %d; stderr=%s", code, stderr.String())
-	}
-	if strings.TrimSpace(stdout.String()) != "" {
-		t.Fatalf("read allow must emit empty stdout; got %q", stdout.String())
-	}
-	if !strings.Contains(stderr.String(), "ALLOW_READ_TOOL") {
-		t.Fatalf("expected ALLOW_READ_TOOL diagnostic; got:\n%s", stderr.String())
+			var stdout, stderr bytes.Buffer
+			code := runPreToolUseHook(dir, &stdout, &stderr)
+			if code != ExitSuccess {
+				t.Fatalf("expected %s allowed, got %d; stderr=%s", toolName, code, stderr.String())
+			}
+			if strings.TrimSpace(stdout.String()) != "" {
+				t.Fatalf("read allow must emit empty stdout; got %q", stdout.String())
+			}
+			if !strings.Contains(stderr.String(), "ALLOW_READ_TOOL") {
+				t.Fatalf("expected ALLOW_READ_TOOL diagnostic; got:\n%s", stderr.String())
+			}
+		})
 	}
 }
 

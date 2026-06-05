@@ -549,8 +549,21 @@ func renderPreToolUseDecision(host hookHost, stdout io.Writer, d hookDecision) i
 // to the separate beforeReadFile event (which we deliberately do NOT wire).
 func preToolUseReadAllowed(host hookHost, toolName string) bool {
 	if host == hostCursor {
-		switch toolName {
-		case "read_file", "list_dir", "grep", "glob_file_search", "codebase_search":
+		switch strings.ToLower(strings.TrimSpace(toolName)) {
+		case "read",
+			"read_file",
+			"readfile",
+			"functions.readfile",
+			"list_dir",
+			"grep",
+			"glob_file_search",
+			"codebase_search",
+			"glob",
+			"functions.glob",
+			"rg",
+			"functions.rg",
+			"semanticsearch",
+			"functions.semanticsearch":
 			return true
 		}
 		return false
@@ -744,7 +757,7 @@ func transcriptHasRequiredBootstrapReads(transcriptPath string, requiredSuffixes
 			if nr, ok := block["name"]; ok {
 				_ = json.Unmarshal(nr, &toolName)
 			}
-			if toolName != "Read" {
+			if !isTranscriptBootstrapReadTool(toolName) {
 				continue
 			}
 			inputRaw, ok := block["input"]
@@ -755,12 +768,8 @@ func transcriptHasRequiredBootstrapReads(transcriptPath string, requiredSuffixes
 			if err := json.Unmarshal(inputRaw, &input); err != nil {
 				continue
 			}
-			fpRaw, ok := input["file_path"]
-			if !ok {
-				continue
-			}
 			var fp string
-			if err := json.Unmarshal(fpRaw, &fp); err != nil {
+			if !transcriptToolInputPath(input, &fp) {
 				continue
 			}
 			// Normalize path separators so a Windows-style "\\" path matches
@@ -781,6 +790,29 @@ func transcriptHasRequiredBootstrapReads(transcriptPath string, requiredSuffixes
 		}
 	}
 	return len(missing) == 0, missing
+}
+
+func isTranscriptBootstrapReadTool(toolName string) bool {
+	switch strings.ToLower(strings.TrimSpace(toolName)) {
+	case "read", "readfile", "functions.readfile", "read_file":
+		return true
+	default:
+		return false
+	}
+}
+
+func transcriptToolInputPath(input map[string]json.RawMessage, dest *string) bool {
+	for _, key := range []string{"file_path", "path"} {
+		raw, ok := input[key]
+		if !ok {
+			continue
+		}
+		if err := json.Unmarshal(raw, dest); err != nil {
+			continue
+		}
+		return strings.TrimSpace(*dest) != ""
+	}
+	return false
 }
 
 // bootstrapRequiredReadSuffixes is the canonical list of files the agent must
@@ -1426,6 +1458,11 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 	if transcriptPath == "" || !claudeFileExists(transcriptPath) {
 		texts := extractStopHookAssistantTexts(payload)
 		if len(texts) == 0 {
+			if cursorStop {
+				_, _ = fmt.Fprintln(stderr, "ALLOW_CURSOR_NO_ASSISTANT_TEXT")
+				appendLog(logFile, "exit_code: 0 (cursor stop without assistant text; not a final close-out)")
+				return ExitSuccess
+			}
 			return blockStopHookMissingAssistantText(stdout, stderr, logFile, transcriptPath, cursorStop)
 		}
 		return validateStopHookFinalTexts(projectDir, texts, stdout, stderr, logFile, cursorStop)
@@ -1537,17 +1574,23 @@ func isCursorModeSwitchStatus(normalized string) bool {
 	modeSwitchPatterns := []string{
 		"switched composer mode from agent to plan",
 		"switched composer mode from plan to agent",
+		"switched composer mode from plan to build",
+		"switched composer mode from build to plan",
+		"switched composer mode from agent to build",
+		"switched composer mode from build to agent",
 		"switched composer mode from agent to ask",
 		"switched composer mode from ask to agent",
 		"switched composer mode from agent to debug",
 		"switched composer mode from debug to agent",
+		"switched from plan to build mode",
+		"switched from build to plan mode",
 	}
 	for _, pattern := range modeSwitchPatterns {
 		if normalized == pattern {
 			return true
 		}
 	}
-	for _, mode := range []string{"agent", "plan", "ask", "debug"} {
+	for _, mode := range []string{"agent", "plan", "build", "ask", "debug"} {
 		if normalized == "switched to "+mode+" mode" ||
 			normalized == "you are now in "+mode+" mode" ||
 			normalized == "successfully switched to "+mode+" mode" ||
