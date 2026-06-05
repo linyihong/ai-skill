@@ -41,6 +41,25 @@ const (
 	ModeManualLock ActivationMode = "manual-lock"
 )
 
+// CanActivate reports whether a route in this mode may take activation
+// ownership of the task — i.e. become RuntimeContext.ActiveRoute via the
+// detector. This mirrors routing-registry.yaml §activation_mode_spec
+// capability_matrix `can_activate` and is the INVARIANT behind active_route:
+//
+//	active_route != "" (detector path)  ⇒  EffectiveMode.CanActivate() == true
+//
+// Only `auto-detect` activates via the detector. `advisory` is reinforce/
+// suggestion ONLY (can_activate=false) — it must never standalone-lock. The
+// detector's DetectedRoute.Activated means "an activation signal MATCHED"
+// (a detector fact), which is NOT the same as "ACTIVATABLE" (a mode policy);
+// conflating the two is the contract violation this guards. `on-demand`
+// activates only by explicit user invocation (never through the detector;
+// such routes are filtered out upstream), `always-on` is always loaded, and
+// `manual-lock` is a user-assigned lock handled on a separate path.
+func (m ActivationMode) CanActivate() bool {
+	return m == ModeAutoDetect
+}
+
 // RuntimeStatus is the RuntimeContext lifecycle status.
 type RuntimeStatus string
 
@@ -60,7 +79,8 @@ type DetectionSig struct {
 // RuntimeContext is the in-memory workflow activation state for one task.
 type RuntimeContext struct {
 	ActiveRoute      string         `json:"active_route"`     // single locked route, "" when none / conflict
-	DetectedRoutes   []string       `json:"detected_routes"`  // all activated routes (incl. advisory)
+	DetectedRoutes   []string       `json:"detected_routes"`  // ALL routes whose signals matched (incl. advisory suggestions)
+	CandidateRoutes  []string       `json:"candidate_routes"` // subset of DetectedRoutes whose mode CanActivate() (auto-detect)
 	DetectionSource  DetectionSig   `json:"detection_source"` // axes that fired for ActiveRoute
 	ActivatedAt      time.Time      `json:"activated_at,omitempty"`
 	LastReinforcedAt time.Time      `json:"last_reinforced_at,omitempty"`
@@ -159,7 +179,7 @@ func containsAny(haystackLower string, needles []string) bool {
 // BuildRuntimeContext derives the workflow activation state from a transcript.
 // `now` is injected for deterministic timestamps in tests.
 func BuildRuntimeContext(registry runtimeRoutingRegistry, transcript []DetectorMessage, openFiles []DetectorFile, now time.Time) RuntimeContext {
-	ctx := RuntimeContext{Status: StatusNoMatch, DetectedRoutes: []string{}}
+	ctx := RuntimeContext{Status: StatusNoMatch, DetectedRoutes: []string{}, CandidateRoutes: []string{}}
 
 	// substantive flag = latest user turn carries task vocabulary
 	for i := len(transcript) - 1; i >= 0; i-- {
@@ -186,6 +206,7 @@ func BuildRuntimeContext(registry runtimeRoutingRegistry, transcript []DetectorM
 			ctx.EffectiveMode = ModeManualLock
 			ctx.Status = StatusLocked
 			ctx.DetectedRoutes = []string{route}
+			ctx.CandidateRoutes = []string{route} // user-assigned lock is the active candidate
 			ctx.DetectionSource = src
 			ctx.ActivatedAt = now
 			return ctx
@@ -194,29 +215,38 @@ func BuildRuntimeContext(registry runtimeRoutingRegistry, transcript []DetectorM
 	// manual-unlock: fall through to normal auto-detection (no lock applied).
 
 	detected := DetectWorkflows(registry, considered, openFiles)
-	var activated []DetectedRoute
+	// Three layers (per activation_mode_spec):
+	//   DetectedRoutes  — every route whose signals matched (incl. advisory).
+	//   candidates      — the ACTIVATABLE subset: Activated AND mode.CanActivate().
+	//                     advisory routes match but are suggestion-only, never here.
+	//   ActiveRoute     — the single selected candidate (none when 0 / conflict).
+	var candidates []DetectedRoute
 	for _, d := range detected {
 		ctx.DetectedRoutes = append(ctx.DetectedRoutes, d.RouteID)
-		if d.Activated {
-			activated = append(activated, d)
+		if d.Activated && ActivationMode(d.EffectiveMode).CanActivate() {
+			candidates = append(candidates, d)
+			ctx.CandidateRoutes = append(ctx.CandidateRoutes, d.RouteID)
 		}
 		if len(d.ArtifactReinforce) > 0 {
 			ctx.LastReinforcedAt = now
 		}
 	}
 	sort.Strings(ctx.DetectedRoutes)
+	sort.Strings(ctx.CandidateRoutes)
 
-	switch len(activated) {
+	switch len(candidates) {
 	case 0:
+		// No activatable route. May still carry advisory suggestions in
+		// DetectedRoutes, but nothing locks — Status stays no-match.
 		ctx.Status = StatusNoMatch
 	case 1:
 		ctx.Status = StatusDetected
-		ctx.ActiveRoute = activated[0].RouteID
-		ctx.EffectiveMode = ActivationMode(activated[0].EffectiveMode)
+		ctx.ActiveRoute = candidates[0].RouteID
+		ctx.EffectiveMode = ActivationMode(candidates[0].EffectiveMode)
 		ctx.DetectionSource = DetectionSig{
-			UserSignalHits:    activated[0].UserSignalHits,
-			ContextSignalHits: activated[0].ContextSignalHits,
-			ArtifactReinforce: activated[0].ArtifactReinforce,
+			UserSignalHits:    candidates[0].UserSignalHits,
+			ContextSignalHits: candidates[0].ContextSignalHits,
+			ArtifactReinforce: candidates[0].ArtifactReinforce,
 		}
 		ctx.ActivatedAt = now
 	default:
@@ -224,6 +254,17 @@ func BuildRuntimeContext(registry runtimeRoutingRegistry, transcript []DetectorM
 		ctx.Status = StatusDetected
 		ctx.Conflict = true
 		ctx.ActivatedAt = now
+	}
+
+	// Invariant guard (active_route ⇒ CanActivate). ActiveRoute is only ever
+	// assigned from `candidates`, which are CanActivate() by construction, so a
+	// violation here is a programming error, not bad input. Fail safe: drop the
+	// illegal lock rather than enforce a false primary_source gate downstream.
+	if ctx.ActiveRoute != "" && ctx.EffectiveMode != ModeManualLock && !ctx.EffectiveMode.CanActivate() {
+		ctx.ActiveRoute = ""
+		ctx.EffectiveMode = ""
+		ctx.Status = StatusNoMatch
+		ctx.DetectionSource = DetectionSig{}
 	}
 	return ctx
 }
@@ -394,6 +435,7 @@ func buildRuntimeWorkflowContextResult(opts runtimeOptions) Result {
 		Check{Name: "conflict", Status: "ok", Message: fmt.Sprintf("%t", rc.Conflict)},
 		Check{Name: "substantive", Status: "ok", Message: fmt.Sprintf("%t", rc.Substantive)},
 		Check{Name: "detected_routes", Status: "ok", Message: orNone(strings.Join(rc.DetectedRoutes, ", "))},
+		Check{Name: "candidate_routes", Status: "ok", Message: orNone(strings.Join(rc.CandidateRoutes, ", "))},
 	)
 	if rc.Conflict {
 		result.PlannedActions = append(result.PlannedActions,

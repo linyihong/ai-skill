@@ -10,6 +10,15 @@ var rcClock = time.Date(2026, 6, 4, 12, 0, 0, 0, time.UTC)
 
 func rcMsg(text string) []DetectorMessage { return []DetectorMessage{{Role: "user", Text: text}} }
 
+func hasRoute(ss []string, want string) bool {
+	for _, s := range ss {
+		if s == want {
+			return true
+		}
+	}
+	return false
+}
+
 func TestBuildRuntimeContext_SingleActivation(t *testing.T) {
 	ctx := BuildRuntimeContext(testRegistry(), rcMsg("幫我做 web scraping"), nil, rcClock)
 	if ctx.Status != StatusDetected {
@@ -149,6 +158,48 @@ func TestBuildRuntimeContext_ReinforcementOnlyStaysNoMatch(t *testing.T) {
 	}
 	if !found {
 		t.Fatal("expected late-detected candidate in DetectedRoutes")
+	}
+}
+
+// TestAdvisoryNeverLocksActiveRoute is the contract guard for
+// activation_mode_spec `advisory.can_activate: false`. An advisory-only hit
+// must surface as a suggestion (DetectedRoutes) but NEVER lock ActiveRoute —
+// otherwise it would falsely trigger the Phase 5 primary_source gate.
+func TestAdvisoryNeverLocksActiveRoute(t *testing.T) {
+	// "magic bytes" hits only route.intelligence.engineering.heuristics (advisory)
+	ctx := BuildRuntimeContext(testRegistry(), rcMsg("看一下 magic bytes 怎麼判斷"), nil, rcClock)
+	if ctx.ActiveRoute != "" {
+		t.Fatalf("advisory route must NOT lock active_route, got %q (mode=%s)", ctx.ActiveRoute, ctx.EffectiveMode)
+	}
+	if ctx.Status != StatusNoMatch {
+		t.Fatalf("advisory-only must be no-match (no lock), got %q", ctx.Status)
+	}
+	// still surfaced as a suggestion, but not a candidate
+	if !hasRoute(ctx.DetectedRoutes, "route.intelligence.engineering.heuristics") {
+		t.Fatalf("advisory route should appear in DetectedRoutes as suggestion, got %v", ctx.DetectedRoutes)
+	}
+	if len(ctx.CandidateRoutes) != 0 {
+		t.Fatalf("advisory route must NOT be a candidate, got %v", ctx.CandidateRoutes)
+	}
+}
+
+// TestAutoDetectPlusAdvisory_AdvisoryIsSuggestionOnly: when both an auto-detect
+// and an advisory route match, the auto-detect one locks and the advisory one
+// is suggestion-only.
+func TestAutoDetectPlusAdvisory_AdvisoryIsSuggestionOnly(t *testing.T) {
+	// "DDD" → architectural-fit (auto-detect); "magic bytes" → heuristics (advisory)
+	ctx := BuildRuntimeContext(testRegistry(), rcMsg("評估 DDD 架構，順便看 magic bytes"), nil, rcClock)
+	if ctx.ActiveRoute != "route.intelligence.architectural-fit" {
+		t.Fatalf("auto-detect route must win the lock, got %q", ctx.ActiveRoute)
+	}
+	if ctx.Conflict {
+		t.Fatal("one auto-detect + one advisory is NOT a conflict (only 1 candidate)")
+	}
+	if !reflect.DeepEqual(ctx.CandidateRoutes, []string{"route.intelligence.architectural-fit"}) {
+		t.Fatalf("candidates must be the auto-detect route only, got %v", ctx.CandidateRoutes)
+	}
+	if !hasRoute(ctx.DetectedRoutes, "route.intelligence.engineering.heuristics") {
+		t.Fatalf("advisory route should still be a detected suggestion, got %v", ctx.DetectedRoutes)
 	}
 }
 

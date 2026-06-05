@@ -102,6 +102,30 @@ engine may do with the route. (Full matrix: registry §`activation_mode_spec`.)
 | `advisory` | never standalone-locks `active_route` | no | yes | no | task end | weak signals OK; may suggest promotion |
 | `manual-lock` | user only (runtime-assigned) | — | — | no (user adjudicated) | sticky | overrides detector; never author-declared |
 
+### Activated ≠ Activatable — the three-layer selection (invariant)
+
+The detector reports a route as `Activated` when an **activation signal
+matched** — a detector fact. That is NOT the same as **Activatable** — whether
+the route's `activation_mode` permits taking activation ownership
+(`can_activate`). Conflating the two lets an `advisory` route lock
+`active_route`, which would falsely trigger the Phase 5 primary_source gate and
+block tool calls (`can_activate: false` silently becoming `true` + `can_block:
+true`). `RuntimeContext` therefore selects in three layers:
+
+| Layer | Field | Meaning |
+| --- | --- | --- |
+| Matched | `DetectedRoutes` | every route whose signals matched (incl. advisory **suggestions**) |
+| Activatable | `CandidateRoutes` | the subset whose `EffectiveMode.CanActivate()` (auto-detect only) |
+| Selected | `ActiveRoute` | the single candidate (empty on 0 / conflict) |
+
+**Invariant:** `ActiveRoute != "" (detector path) ⇒ EffectiveMode.CanActivate()`.
+Advisory routes appear only in `DetectedRoutes` as suggestions; they never
+become candidates, never lock, never fire the gate. Conflict is counted over
+candidates, not over matched routes. The invariant is enforced structurally
+(`ActiveRoute` is only assigned from `CandidateRoutes`) plus a fail-safe guard
+and tests (`TestAdvisoryNeverLocksActiveRoute`,
+`TestAutoDetectPlusAdvisory_AdvisoryIsSuggestionOnly`).
+
 ## Session-Entry-Point Classification Heuristic
 
 To assign a mode to a mixed-layer (`must-declare`) route, apply the mechanical

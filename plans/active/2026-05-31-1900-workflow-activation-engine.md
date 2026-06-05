@@ -437,6 +437,7 @@ Lifecycle（簡化，**移除 implicit keyword-drift invalidation**）：
 - [x] `ai-skill runtime workflow-context` CLI subcommand（`--transcript` 重建並 dump status/active_route/effective_mode/conflict/substantive/detected_routes；conflict 附 Stage 2 planned action）+ command-contract.md 文件
 - [x] Lifecycle 文件化（governance/workflow-activation-engine.md §RuntimeContext Lifecycle）
 - [x] 明確記錄「SQLite 延後」決策（Phase 4.1 不在 scope）— 已記入 runtime_context.go header + governance doc + 上方落地澄清
+- [x] **Contract-violation fix（2026-06-04，user 分類 = activation-mode contract violation / severity high）**：原 `BuildRuntimeContext` 以 `Activated`（signal 命中）而非 `Activatable`（mode `CanActivate()`）挑 active_route，導致 **advisory route 誤鎖 active_route**，違反 `activation_mode_spec` `advisory.can_activate: false`，並會誤觸 Phase 5 primary_source gate（`can_activate=false` 被偷渡成 `can_activate=true + can_block=true`）。修正：`ActivationMode.CanActivate()`（只 auto-detect）+ 三層 `DetectedRoutes`（matched）→ `CandidateRoutes`（activatable）→ `ActiveRoute`（selected）+ 結構性 invariant（ActiveRoute 只從 candidates 取）+ fail-safe guard。conflict 改算 candidates。tests：`TestAdvisoryNeverLocksActiveRoute`（advisory-only → active=(none)、仍列 DetectedRoutes 為 suggestion）、`TestAutoDetectPlusAdvisory_AdvisoryIsSuggestionOnly`（auto-detect 鎖、advisory 只建議）。CLI 實測：「magic bytes」→ no-match / active=(none) / candidate=(none) / detected=heuristics。
 
 ### Phase 5 — Obligation 整合
 
