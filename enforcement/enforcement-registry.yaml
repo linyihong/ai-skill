@@ -953,17 +953,38 @@ rule_classes:
   # ═══ PENDING IMPLEMENTATION ═══════════════════════════════════════
 
   - id: workflow_activation
-    coverage: pending_implementation
+    coverage: mechanical
+    # Promoted pending_implementation -> mechanical 2026-06-04 after child plan
+    # 2026-05-31-1900-workflow-activation-engine Phase 3-5 + Phase 7 landed:
+    # detector + RuntimeContext + PreToolUse gate exist; 4 validation scenarios
+    # + real-registry regression test exist. runtime_observed window not yet
+    # elapsed (just landed) -> runtime_observed: pending.
     source_files:
       - knowledge/runtime/routing-registry.yaml#activation_triggers
-    executors_planned:
+    executors:
       - file: scripts/ai-skill-cli/internal/app/detector.go
         symbol: DetectWorkflows
         executor_kind: hook_dispatcher_entry
-        hook_phase: "PreToolUse + RuntimeContext write"
+        hook_phase: "detector (deterministic, registry-driven)"
+        block_or_warn: warn
+        notes: "deterministic any-hit detector; pure function over the registry"
+      - file: scripts/ai-skill-cli/internal/app/runtime_context.go
+        symbol: BuildRuntimeContext
+        executor_kind: hook_dispatcher_entry
+        hook_phase: "RuntimeContext (active_route lifecycle)"
+        block_or_warn: warn
+        notes: "Activated≠Activatable three-layer selection; advisory never locks"
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: workflowPrimarySourceGate
+        executor_kind: hook_dispatcher_entry
+        hook_phase: PreToolUse
         block_or_warn: block
-    child_plan: plans/active/2026-05-31-1900-workflow-activation-engine.md
-    target_promotion: "child plan Phase 3-5 land → coverage=mechanical"
+        notes: "fail-open; blocks only on single locked active_route with unread primary_source"
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: finishPreToolUse
+        executor_kind: hook_dispatcher_entry
+        hook_phase: PreToolUse
+        block_or_warn: block
     coverage_evidence:
       expected_instance_count: 57
       expected_instance_count_query: |
@@ -980,10 +1001,10 @@ rule_classes:
       expected_observation_pct: 30   # at least 30% of routes should fire in 30 days
       observation_window_days: 30
     verification_status:
-      symbol_exists: pending  # detector.go not yet written
+      symbol_exists: ✓
       scenario_exists: ✓
       regression_exists: ✓
-      runtime_observed: not_applicable_until_promoted
+      runtime_observed: pending  # 30-day observation window starts at promotion (2026-06-04)
 
   - id: sanitization
     coverage: pending_implementation
@@ -1040,17 +1061,24 @@ rule_classes:
       correct integration is to trigger Discovery from detector miss
       paths, not to stand it up as an independent mechanical executor.
     sunset_decision:
-      revisit_when: "workflow_activation child plan Phase 6.1 lands"
+      revisit_when: "Discovery graph-traversal subsystem lands (detector-miss hot-path auto-invoke wired)"
       success_criteria: |
-        Detector miss path can invoke Discovery and produce
-        route_candidate_proposals.yaml. At that point this class merges
-        with workflow_activation (shared executor) and is removed.
+        Detector miss path AUTO-invokes Discovery graph traversal and writes
+        populated route_candidate_proposals.yaml (with detected_capabilities).
+        At that point this class merges with workflow_activation (shared
+        executor) and is removed.
       revisit_owner: "framework maintainer (current: linyihong)"
-      last_reviewed_at: "2026-06-01"
+      last_reviewed_at: "2026-06-04"
       last_review_summary: |
-        Initial entry creation (round-4/5 schema). Confirmed discovery
-        remains a detector-miss fallback; revisit tied to workflow_activation
-        Phase 6.1 still accurate.
+        Reviewed at workflow_activation Phase 6.1 landing. Phase 6.1 delivered
+        the durable infrastructure — route-candidate-proposals.yaml store +
+        `ai-skill router proposals` state machine + the recordProposalOccurrence
+        write path (tested). DELIBERATELY NOT wired the hot PreToolUse miss
+        path to auto-invoke Discovery: real Discovery graph traversal (to fill
+        detected_capabilities) does not exist yet, and auto-writing from every
+        miss is noise (violates the occurrence-tracking anti-abuse intent).
+        Therefore success_criteria NOT yet met; class STAYS behavioral_only.
+        Revisit re-pointed to the Discovery graph-traversal subsystem landing.
       depends_on_rule_classes: [workflow_activation]
 
   - id: rule_weight

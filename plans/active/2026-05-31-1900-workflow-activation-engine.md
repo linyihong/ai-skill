@@ -1,7 +1,7 @@
 ---
 id: 2026-05-31-1900-workflow-activation-engine
 plan_kind: sub
-status: in-progress
+status: completed
 owner: linyihong
 created: 2026-05-31
 parent: 2026-05-31-2100-mechanical-enforcement-registry
@@ -16,7 +16,7 @@ sub_plan_reason: >
 
 # Workflow Activation Engine
 
-**Status**: `draft-v8`
+**Status**: `completed` (v8 — all phases landed 2026-06-04; enforcement-registry `workflow_activation` promoted to mechanical)
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 runtime hardening（systemic gap remediation）— **meta-pattern 的第一個 instance**
 **建立日期**：2026-05-31
@@ -555,11 +555,38 @@ Acceptance：✅ 四個 scenario 全部對真實 registry 驗證一致（CLI `ru
 
 ### Phase 8 — Close-out
 
-- [ ] 全部 phase done
-- [ ] `git status` clean
-- [ ] `git push` 完成、`git log origin/main..HEAD` empty
-- [ ] 讀回更新後的 `routing-registry.yaml` / `core-bootstrap.yaml` / failure pattern
-- [ ] 在本 plan 加 Phase 8 完成記錄 + archive 到 `plans/archived/`
+- [x] 全部 phase done（Phase 0.0–7 + 6.1-Go + advisory contract-fix；frontmatter `status: completed`）
+- [x] `git status` clean（每 phase 收尾皆 close-loop）
+- [x] `git push` 完成、`git log origin/main..HEAD` empty（每 phase 皆 push）
+- [x] 讀回更新後的 `routing-registry.yaml` / `core-bootstrap.yaml` / failure pattern（Phase 8 readback）
+- [x] 在本 plan 加 Phase 8 完成記錄（見下）
+- [x] **enforcement-registry promotion**：`workflow_activation` `pending_implementation` → **`mechanical`**（executors: DetectWorkflows / BuildRuntimeContext / workflowPrimarySourceGate / finishPreToolUse，symbol 皆存在；coverage_evidence = 4 scenarios + regression；runtime_observed: pending 30 天觀察窗起算 2026-06-04）。`capability_discovery` sunset review 更新（Phase 6.1 infra 已 land 但 hot-hook auto-invoke 刻意延後 → 維持 behavioral_only，revisit 改指向 Discovery graph-traversal subsystem）。coverage：mechanical 14→15、pending 3→2。
+- [~] **物理 archive 到 `plans/archived/` — 刻意不在本次執行**：plan-tree 治理為 **location-agnostic**（`plan_tree.go`：`required_for_completion: true` 只需 `status: completed`，still-active 或 archived 皆合格），已滿足。物理移檔會破壞 **10+ inbound 連結**（含 `constitution/ADR-012`「Source Plan」、其他**已 archived** 的 plan、core-bootstrap、failure-patterns、scenarios），且 parent meta-plan 已先 archived（archive-order 反序）。移檔屬高風險 linked-update，留作 user 明示後的獨立 housekeeping，不混進 close-out。
+
+---
+
+## Phase 8 完成記錄（2026-06-04）
+
+**全部交付 landed 且 pushed**：
+
+| Phase | 交付 | 證據 |
+|---|---|---|
+| 0.0–0.2 | Open Questions reconcile / 架構相容 preflight / route_type+activation_mode 分類（HUMAN GATE，user-locked） | 57 routes 分類 + ADR-012 |
+| 1 / 1.5 | two-phase activation_triggers schema + accepted≠canonical 政策 + normalizer executor 驗證 | `activation_triggers_spec` + normalizer tests |
+| 2 | 7 routes 補 triggers（含 analysis 2 + intelligence 5；計數 ~25→7 修訂） | registry |
+| 3 | `detector.go` deterministic、two-phase、legacy normalizer | 15 unit tests |
+| 4.0 | `runtime_context.go` lifecycle（substantive/pivot/manual-lock/NO drift）+ `workflow-context` CLI；advisory contract-fix（Activated≠Activatable 三層） | 12 unit tests |
+| 5 | `obligation.workflow.activation_evidence` + PreToolUse `workflowPrimarySourceGate`（fail-open 不誤殺） | 6 gate tests |
+| 6.0/6.1 | failure pattern `workflow-detector-missing` + Discovery→Detector feedback philosophy + proposals store + `router proposals` CLI 狀態機 | 10 router tests |
+| 7 | 4 BDD scenarios + 真實 registry 回歸測試（travel-planning bug replay） | 2 regression tests |
+| 8 | enforcement-registry promotion → mechanical + close-out | coverage 報告 |
+
+**刻意延後（非未完成，已記 rationale）**：
+- detector-miss → Discovery **hot-hook auto-invoke**：待真正 Discovery graph-traversal subsystem（write path `recordProposalOccurrence` 已備並測試）。
+- SQLite persistence（Phase 4.1）：per-process 重建即足，無 in-task 需求。
+- 物理 archive：location-agnostic 治理已滿足，移檔留作獨立 housekeeping。
+
+**user review 已納入**：backward-compat accepted≠canonical（B+→fix）、file_change_globs alias、normalizer 提前驗證、4-軸正交風險記入 Q10 v9、advisory.can_activate 契約違反修正（severity high）。
 
 ---
 
@@ -591,7 +618,7 @@ Acceptance：✅ 四個 scenario 全部對真實 registry 驗證一致（CLI `ru
 - [x] Phase 4 RuntimeContext lifecycle 經 unit test 驗證（10 tests，runtime_context_test.go；workflow_sessions SQLite 表已作廢改 in-memory，見 Phase 4.0）
 - [x] Phase 5 obligation 不誤殺：當 detector miss 時 tool calls 不被擋（2026-06-04；6 gate tests 證明 miss/conflict/no-repo/no-transcript 皆 fail-open allow，只有「單一 locked route + primary_source 未讀」才 block）
 - [x] Phase 7 regression scenario：2026-05-31 session 場景 replay 必須觸發 travel-planning（2026-06-04；4 scenario YAML + `TestDetectorTravelPlanningRegression` 對真實 registry PASS）
-- [ ] Phase 8 close-loop：所有變更 commit / push / readback
+- [x] Phase 8 close-loop：所有變更 commit / push / readback（每 phase 收尾皆 close-loop；status: completed；enforcement-registry promoted to mechanical）
 
 ---
 
