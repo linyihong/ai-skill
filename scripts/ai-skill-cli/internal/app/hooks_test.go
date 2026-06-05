@@ -1004,6 +1004,207 @@ func TestRunPreToolUseHookCursorFailOpenWithoutTranscript(t *testing.T) {
 	}
 }
 
+// writeCursorE2EAiSkillRepo builds a fake AI_SKILL_REPO directory that satisfies
+// resolveClaudeAiSkillRepo (CORE_BOOTSTRAP.md + runtime/core-bootstrap.yaml) and
+// carries a minimal routing-registry.yaml with two routes:
+//   - route.workflow.web-scrape   (auto-detect; user_signal "web scraping";
+//     primary_source workflow/web-scrape/README.md)
+//   - route.workflow.ddd          (auto-detect; user_signal "DDD"; used for the
+//     miss-vs-conflict matrix — exists so a transcript without web-scrape signals
+//     still has a non-degenerate registry, not so it activates by default)
+//
+// The helper sets AI_SKILL_REPO via t.Setenv so resolveClaudeAiSkillRepo picks up
+// the fake repo instead of walking out to the real Ai-skill checkout (which
+// would pull in the production routing-registry and make assertions registry-
+// dependent).
+func writeCursorE2EAiSkillRepo(t *testing.T) string {
+	t.Helper()
+	repo := t.TempDir()
+	if err := os.WriteFile(filepath.Join(repo, "CORE_BOOTSTRAP.md"), []byte("# fake\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(repo, "runtime"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(repo, "runtime", "core-bootstrap.yaml"), []byte("schema_version: \"1.0\"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(repo, "knowledge", "runtime"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	registry := `registry_version: knowledge-routing/v2
+records:
+  - id: route.workflow.web-scrape
+    route_type: workflow
+    activation_mode: auto-detect
+    task_intent: web scraping
+    activation_triggers:
+      activation_any_of:
+        user_signals:
+          - web scraping
+    primary_source: workflow/web-scrape/README.md
+  - id: route.workflow.ddd
+    route_type: workflow
+    activation_mode: auto-detect
+    task_intent: domain modeling
+    activation_triggers:
+      activation_any_of:
+        user_signals:
+          - DDD architecture review
+    primary_source: workflow/ddd/README.md
+`
+	if err := os.WriteFile(filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"), []byte(registry), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("AI_SKILL_REPO", repo)
+	return repo
+}
+
+// writeCursorE2ETranscript emits a Cursor-flavored JSONL transcript that:
+//   - satisfies the bootstrap read-log gate (Cursor ReadFile tool_use entries for
+//     CORE_BOOTSTRAP.md + runtime/core-bootstrap.yaml),
+//   - satisfies the receipt-present gate (assistant text containing "Bootstrap:"),
+//   - injects userText as the latest user turn (drives the detector),
+//   - optionally records additional Read tool_use paths (e.g. workflow primary_source).
+func writeCursorE2ETranscript(t *testing.T, dir, userText string, extraReads []string) string {
+	t.Helper()
+	path := filepath.Join(dir, "transcript.jsonl")
+	var lines []string
+
+	// Cursor-style bootstrap reads — exercise the ReadFile tool name that the
+	// Bugfix Addendum (plans/active/2026-06-05-0200) added to the read-log gate.
+	bootstrapReads := []map[string]any{
+		{"type": "tool_use", "id": "tu_b1", "name": "ReadFile", "input": map[string]any{"path": "/repo/CORE_BOOTSTRAP.md"}},
+		{"type": "tool_use", "id": "tu_b2", "name": "functions.ReadFile", "input": map[string]any{"path": "/repo/runtime/core-bootstrap.yaml"}},
+	}
+	for i, p := range extraReads {
+		bootstrapReads = append(bootstrapReads, map[string]any{
+			"type":  "tool_use",
+			"id":    fmt.Sprintf("tu_x%d", i),
+			"name":  "ReadFile",
+			"input": map[string]any{"path": p},
+		})
+	}
+	bootstrapEntry := map[string]any{
+		"type":    "assistant",
+		"message": map[string]any{"content": bootstrapReads},
+	}
+	buf, err := json.Marshal(bootstrapEntry)
+	if err != nil {
+		t.Fatalf("marshal bootstrap reads: %v", err)
+	}
+	lines = append(lines, string(buf))
+
+	// Receipt + canonical numbers — drives the receipt-present branch in
+	// runPreToolUseHook so the workflow gate (finishPreToolUse) actually runs.
+	receiptEntry := map[string]any{
+		"type": "assistant",
+		"message": map[string]any{
+			"content": []map[string]any{
+				{"type": "text", "text": "Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25\nWorking on it."},
+			},
+		},
+	}
+	buf, err = json.Marshal(receiptEntry)
+	if err != nil {
+		t.Fatalf("marshal receipt: %v", err)
+	}
+	lines = append(lines, string(buf))
+
+	// User turn last — BuildRuntimeContext scans for the latest user role to
+	// decide substantive + detector input.
+	userEntry := map[string]any{
+		"type": "user",
+		"message": map[string]any{
+			"role":    "user",
+			"content": userText,
+		},
+	}
+	buf, err = json.Marshal(userEntry)
+	if err != nil {
+		t.Fatalf("marshal user: %v", err)
+	}
+	lines = append(lines, string(buf))
+
+	writeFile(t, path, strings.Join(lines, "\n")+"\n")
+	return path
+}
+
+// TestRunPreToolUseHookCursorWorkflowGate_LockedUnreadDenies is the Phase 4 e2e
+// case for "locked active_route + primary_source NOT yet Read → Cursor deny".
+// It composes Cursor payload + Cursor transcript format + workflow gate so a
+// regression in any link (host detection, bootstrap read-log Cursor compat,
+// detector activation, primary_source lookup, Cursor deny render) fails one
+// assertion instead of leaking past all three.
+func TestRunPreToolUseHookCursorWorkflowGate_LockedUnreadDenies(t *testing.T) {
+	dir := t.TempDir()
+	writeCursorE2EAiSkillRepo(t)
+	tr := writeCursorE2ETranscript(t, dir, "幫我做 web scraping 抓網站", nil)
+	payload := fmt.Sprintf(`{"hook_event_name":"preToolUse","cursor_version":"3.4.17","tool_name":"run_terminal_cmd","transcript_path":%q}`, tr)
+	setHookStdin(t, payload)
+
+	var stdout, stderr bytes.Buffer
+	code := runPreToolUseHook(dir, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected ExitSuccess (deny carried by permission JSON); got %d; stderr=%s", code, stderr.String())
+	}
+	assertCursorPreToolUseDeny(t, stdout.String())
+	if !strings.Contains(stderr.String(), "BLOCK_WORKFLOW_PRIMARY_SOURCE") {
+		t.Fatalf("expected BLOCK_WORKFLOW_PRIMARY_SOURCE diagnostic; got:\n%s", stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "route.workflow.web-scrape") {
+		t.Fatalf("expected locked route id in diagnostic; got:\n%s", stderr.String())
+	}
+}
+
+// TestRunPreToolUseHookCursorWorkflowGate_LockedAndReadAllows: same setup as the
+// deny case but the transcript ALSO records a Cursor ReadFile of the route's
+// primary_source. The workflow gate must self-clear → empty stdout allow.
+func TestRunPreToolUseHookCursorWorkflowGate_LockedAndReadAllows(t *testing.T) {
+	dir := t.TempDir()
+	writeCursorE2EAiSkillRepo(t)
+	tr := writeCursorE2ETranscript(t, dir, "幫我做 web scraping 抓網站",
+		[]string{"/repo/workflow/web-scrape/README.md"})
+	payload := fmt.Sprintf(`{"hook_event_name":"preToolUse","cursor_version":"3.4.17","tool_name":"run_terminal_cmd","transcript_path":%q}`, tr)
+	setHookStdin(t, payload)
+
+	var stdout, stderr bytes.Buffer
+	code := runPreToolUseHook(dir, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected allow once primary_source Read; got %d; stderr=%s", code, stderr.String())
+	}
+	if strings.TrimSpace(stdout.String()) != "" {
+		t.Fatalf("workflow-gate allow must emit empty stdout; got %q", stdout.String())
+	}
+	if strings.Contains(stderr.String(), "BLOCK_WORKFLOW_PRIMARY_SOURCE") {
+		t.Fatalf("must NOT block once primary_source Read; stderr=%s", stderr.String())
+	}
+}
+
+// TestRunPreToolUseHookCursorWorkflowGate_MissAllows: bootstrap satisfied but
+// user request matches no route → detector miss → workflow gate fails open.
+// Guards against the failure mode the §SAFETY block in workflowPrimarySourceGate
+// was written for ("never wedge unrelated tool calls on a detector miss").
+func TestRunPreToolUseHookCursorWorkflowGate_MissAllows(t *testing.T) {
+	dir := t.TempDir()
+	writeCursorE2EAiSkillRepo(t)
+	tr := writeCursorE2ETranscript(t, dir, "hi 早安", nil)
+	payload := fmt.Sprintf(`{"hook_event_name":"preToolUse","cursor_version":"3.4.17","tool_name":"run_terminal_cmd","transcript_path":%q}`, tr)
+	setHookStdin(t, payload)
+
+	var stdout, stderr bytes.Buffer
+	code := runPreToolUseHook(dir, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected fail-open allow on detector miss; got %d; stderr=%s", code, stderr.String())
+	}
+	if strings.TrimSpace(stdout.String()) != "" {
+		t.Fatalf("detector-miss allow must emit empty stdout; got %q", stdout.String())
+	}
+	if strings.Contains(stderr.String(), "BLOCK_WORKFLOW_PRIMARY_SOURCE") {
+		t.Fatalf("detector miss must never block workflow gate; stderr=%s", stderr.String())
+	}
+}
+
 func TestRenderClaudePreToolUseDecision_Deny(t *testing.T) {
 	var stdout bytes.Buffer
 	code := renderClaudePreToolUseDecision(&stdout, hookDecision{Deny: true, Reason: "because policy"})
