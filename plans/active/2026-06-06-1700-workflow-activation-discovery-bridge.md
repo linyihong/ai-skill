@@ -75,8 +75,13 @@ task input → detector(user_signals + context_signals(path)) miss
 ### Non-Goals（本 plan 明文封印）
 
 - **Discovery proposals MUST NOT modify `routing-registry.yaml` automatically**。Cross-session proposal aggregation（若日後實作）僅能產生 maintenance suggestion（人類審閱後手動寫 registry），不可自動 promote candidate 為 registry route entry。
-- 理由：proposal accumulation → auto registry evolution = **self-modifying ontology**，屬 ADR 等級議題，本 plan scope 之外。registry 的 route 寫入仍須走人類 sign-off + commit 路徑。
-- Open Question Q6（cross-session aggregation）若推進，**必須**以 advisory-only 形式呈現，不得繞過此封印。
+  - 理由：proposal accumulation → auto registry evolution = **self-modifying ontology**，屬 ADR 等級議題，本 plan scope 之外。registry 的 route 寫入仍須走人類 sign-off + commit 路徑。
+  - Open Question Q6（cross-session aggregation）若推進，**必須**以 advisory-only 形式呈現，不得繞過此封印。
+- **Discovery proposals MUST NOT satisfy `activation_triggers`**（硬 guardrail，防 advisory 偷渡成 soft gate）：
+  - 任何 `if proposal.confidence > X then auto_activate()` 邏輯**永遠禁止**寫入 `detector.go` / `hooks.go` / `routing-registry.yaml`
+  - Activation 路徑只有兩條：(a) detector deterministic match against `routing-registry.activation_triggers`，(b) user manual-lock。Discovery 永不為第三條。
+  - 此封印對應 parent plan §Design Principles「Deterministic rule match，不用 weighted scoring」對 activation gate 的要求；Discovery 是 advisory ranking，scoring 在此語境合法，但**不得跨界**用於 activation。
+  - 系統演化兩三代後最容易踩此線（confidence 高得彷彿可信 → 直接 auto-activate）。明文封印 + 未來 code review 對「proposal.confidence 出現在 activation 條件式」零容忍。
 
 ### Why Not an ADR Yet
 
@@ -239,6 +244,18 @@ PostToolUse:Read hook fires (artifact Read by agent)
 #### Phase A.2 — runtime.db schema + cache
 
 - [ ] `discovery_proposals` schema：`id` / `task_hash` / `route_candidates_json`（含 per-candidate `evidence_set`） / `signal_snapshot_json`（Phase A + 累積 Phase B 訊號快照，重算用）/ `scoring_version`（algorithm version tag，e.g. `light-v1`）/ `current_best_confidence`（derived, paired with scoring_version；單獨無語意）/ `status` (`awaiting_phase_b` / `advised` / `dismissed` / `rejected` / `expired`) / `created_at` / `updated_at`
+- [ ] **Per-candidate `evidence_set` 必須保留 top-N 具體 evidence items**（debug + governance 用），不只 score：
+  - 範例：`{route: travel-planning, score: 0.72, evidence: [{type: filename, value: "<dated-doc>.md"}, {type: token, value: "mapcode"}, {type: cwd_match, value: "<project-root>"}, {type: frontmatter_field, value: "declares_naming_pattern"}]}`
+  - 半年後若 Discovery 提出意外建議（e.g. suggested `software-delivery` for a travel task），無 evidence trace 就無法 debug
+  - N 預設 ≤ 5（避免 proposal row 失控），sanitization 保留（不存 raw private path / user data）
+- [ ] **Discovery 失敗分類（`miss_reason` enum）** — proposal 未生成 / 未達 threshold / 未注入 advisory 時必須記 reason 供 Phase D 量測分類：
+  - `no_artifact_reference` — user message 無 artifact 引用，Phase A signal 完全空
+  - `insufficient_signal` — 訊號有但對所有 route 都太弱（best score 接近 baseline）
+  - `confidence_below_threshold` — 有明顯 top candidate 但未過 threshold
+  - `cost_budget_exceeded` — Phase A/B p95 超預算 fail-open，未完成 scoring
+  - `manual_lock_bypass` — manual-lock active，按設計跳過 Discovery
+  - `eligibility_gate_fail` — discovery_bridge_eligibility 不滿足（user_msg 過短、24h 內已有同 task_hash proposal）
+  - 三週 Phase D 後依分類診斷：threshold 太高 vs signal source 不夠 vs eligibility 過嚴
 - [ ] **`dismissed` vs `rejected` 語意區隔**（telemetry 用，可量測 false positive）：
   - `dismissed`：advisory 注入後 agent / user 未採納（沒 pivot），原因未知 — agent 可能本就掌握上下文、user 略過、advisory 不夠顯眼
   - `rejected`：proposal 後續被證明 wrong — 例如 Phase B 重 score 後 candidate 從 top 跌出，或 manual-lock 鎖定其他 route，或 agent 顯式採納另一 route 的 primary_source
@@ -378,5 +395,9 @@ PostToolUse:Read hook fires (artifact Read by agent)
 
 - **Parent**：[`2026-05-31-1900-workflow-activation-engine.md`](../archived/2026-05-31-1900-workflow-activation-engine.md) — 本 plan 補其 Phase 6 deferred 段；採 Light/Deep 漸進架構而非 parent 原 design note 所述 hot-hook auto-call。
 - **Sibling meta**：[`2026-05-31-2100-mechanical-enforcement-registry.md`](../archived/2026-05-31-2100-mechanical-enforcement-registry.md) — 同樣是「rule-without-executor」meta-pattern 治理；本 plan 是該 meta 第二採樣修補，但因 Discovery 是 advisory layer 而非 mechanical gate，不直接 promote 為 `rule_classes[*].coverage = mechanical`。
-- **Conditional follow-up**：`workflow-activation-semantic-surface`（尚未開）— 若本 plan Phase D 量測顯示 Phase A miss rate 過高（即 cheap signal 不足），才開此 plan 處理 filename_signals / project_metadata_signals。架構預定採「project 產 signal、registry 解釋」分層（避免 v0 draft 中 project_overlay_signals 越過 source-of-truth boundary 的問題）。
+- **Conditional follow-up**：`workflow-activation-semantic-surface`（尚未開）— 架構預定採「project 產 signal、registry 解釋」分層（避免 v0 draft 中 project_overlay_signals 越過 source-of-truth boundary 的問題）。**量化開案 trigger**（避免三個月後重新辯論「到底要不要開」）：
+  - **Trigger A**：Phase A `miss_reason = insufficient_signal` ratio > 40%（cheap signal 不足為主因）
+  - **Trigger B**：`detector_miss AND no_proposal_generated` ratio > 25%（Discovery 完全沒救到的 task 比例過高）
+  - **Trigger C**：Phase D 量測顯示 routing quality plateau（即使調 threshold 也救不回）
+  - 任一 trigger 觸發 → 由 plan owner 起 `workflow-activation-semantic-surface` sub-plan；無 trigger → 接受 baseline，不開案。
 - **Drafting history**：v0 draft 含 Phase 1 (Semantic Pre-Read Surface) + Phase 2 (Discovery Bridge)；review 後 rescope 為 Discovery-only。Rationale：(a) Discovery 為 80% 根因，semantic surface 為 20%；(b) Light Discovery 自然涵蓋 filename/path/project_metadata 為 signal source，未來若需 semantic surface 是擴 Phase A 而非新 detector layer；(c) cheap 訊號層擴張會推 detector 越界。
