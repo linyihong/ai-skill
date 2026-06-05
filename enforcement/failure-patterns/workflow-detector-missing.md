@@ -83,6 +83,6 @@ Class: `meta-governance-gap` / `routing-miss`
 - [`knowledge/runtime/routing-registry.yaml`](../../knowledge/runtime/routing-registry.yaml) §`activation_triggers_spec`
 - [`scripts/ai-skill-cli/internal/app/detector.go`](../../scripts/ai-skill-cli/internal/app/detector.go) — the executor that closes this gap
 - [`governance/workflow-activation-engine.md`](../../governance/workflow-activation-engine.md) — operational spec
-- Source plan：[`plans/active/2026-05-31-1900-workflow-activation-engine.md`](../../plans/active/2026-05-31-1900-workflow-activation-engine.md)
+- Source plan：[`plans/archived/2026-05-31-1900-workflow-activation-engine.md`](../../plans/archived/2026-05-31-1900-workflow-activation-engine.md)
 
 ← [Back to failure-patterns index](README.md)

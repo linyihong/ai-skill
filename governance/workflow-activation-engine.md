@@ -6,7 +6,7 @@
 > Decision record: [`constitution/ADR-012`](../constitution/ADR-012-route-type-activation-behavior-family.md)
 > (route_type semantics) + [`constitution/ADR-006`](../constitution/ADR-006-registry-first-workflow-activation.md)
 > (registry-first activation). Source plan:
-> [`plans/active/2026-05-31-1900-workflow-activation-engine.md`](../plans/active/2026-05-31-1900-workflow-activation-engine.md).
+> [`plans/archived/2026-05-31-1900-workflow-activation-engine.md`](../plans/archived/2026-05-31-1900-workflow-activation-engine.md).
 
 ## Philosophy
 

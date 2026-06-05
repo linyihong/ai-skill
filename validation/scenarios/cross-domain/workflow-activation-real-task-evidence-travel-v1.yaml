@@ -5,7 +5,7 @@ type: real-task-rule-enforcement-evidence
 priority: P2
 source_plans:
   - plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md   # parent meta-plan: P1 — "rule exists, executor missing" pattern
-  - plans/active/2026-05-31-1900-workflow-activation-engine.md        # sibling: P2 — workflow_activation coverage class
+  - plans/archived/2026-05-31-1900-workflow-activation-engine.md      # sibling: P2 — workflow_activation coverage class (archived 2026-06-05)
 source_phase: evidence-collection
 
 # Real-task evidence captured 2026-05-31 from a Japan multi-day road-trip
@@ -87,7 +87,7 @@ classification:
 
 attribution:
   primary_pattern_owner: plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md
-  secondary_pattern_owner: plans/active/2026-05-31-1900-workflow-activation-engine.md
+  secondary_pattern_owner: plans/archived/2026-05-31-1900-workflow-activation-engine.md
   cognitive_slice_relevance: none
   explanation: |
     Cognitive-slice taxonomy (ADR-009 Accepted 2026-05-31) is concerned with

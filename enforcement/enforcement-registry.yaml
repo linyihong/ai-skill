@@ -955,7 +955,7 @@ rule_classes:
   - id: workflow_activation
     coverage: mechanical
     # Promoted pending_implementation -> mechanical 2026-06-04 after child plan
-    # 2026-05-31-1900-workflow-activation-engine Phase 3-5 + Phase 7 landed:
+    # plans/archived/2026-05-31-1900-workflow-activation-engine.md Phase 3-5 + Phase 7 landed:
     # detector + RuntimeContext + PreToolUse gate exist; 4 validation scenarios
     # + real-registry regression test exist. runtime_observed window not yet
     # elapsed (just landed) -> runtime_observed: pending.

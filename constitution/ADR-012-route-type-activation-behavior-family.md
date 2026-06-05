@@ -16,7 +16,7 @@
 
 ## Source Plan
 
-[`plans/active/2026-05-31-1900-workflow-activation-engine.md`](../plans/active/2026-05-31-1900-workflow-activation-engine.md) §Phase 0.2（Route Type + Activation Mode 分類）+ §Open Questions Q10（route_type ontology collapse）
+[`plans/archived/2026-05-31-1900-workflow-activation-engine.md`](../plans/archived/2026-05-31-1900-workflow-activation-engine.md) §Phase 0.2（Route Type + Activation Mode 分類）+ §Open Questions Q10（route_type ontology collapse）
 
 ## Context
 

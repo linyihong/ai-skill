@@ -24,7 +24,7 @@ Owner: framework maintainer (linyihong)
 **最後更新**：2026-05-31（v3 — parent plan v2 升 P1，本 plan 改 P3；coverage class `sanitization` 統一綁定）
 **Priority**：**P3**（v3 起）—— parent meta-plan P1、sibling activation-engine P2、本 plan P3。順序理由：parent 建好 coverage lint 後，本 plan land executor 時 lint 自動觸發 promotion 流程。
 **Sibling plans**：
-- [`2026-05-31-1900-workflow-activation-engine.md`](2026-05-31-1900-workflow-activation-engine.md) — same pattern (rule-without-executor), 1st instance (P2)
+- [`2026-05-31-1900-workflow-activation-engine.md`](../archived/2026-05-31-1900-workflow-activation-engine.md) — same pattern (rule-without-executor), 1st instance (P2, archived 2026-06-05)
 - [`2026-05-31-2100-mechanical-enforcement-registry.md`](../archived/2026-05-31-2100-mechanical-enforcement-registry.md) — **parent meta-plan (P1)**：把 "rule-without-executor" 系列 bug 從個案修補升級為 framework-level invariant（compile-time lint）。本 plan 完成後 entry 由 `rule_classes[sanitization].coverage` 從 `pending` 改 `mechanical`。
 **Empirical trigger**：2026-05-31 session — agent 在寫 `workflow-activation-engine` plan v1-v4 期間，向 canonical Ai-skill repo 多次 Write/Edit canonical 文件，內容夾帶 project incident details（specific filename、user 對話片段、領域 artifact 字串）。`enforcement/sanitization.md` + `enforcement/reusable-guidance-boundary.md` 規則明擺著，使用者三次追問才暴露 gap，最終 v5 patch 才人工抹除。
 
@@ -384,7 +384,7 @@ Acceptance：五 scenario 全 PASS。
 | 欄位 | 內容 |
 |---|---|
 | Trigger | 2026-05-31 session 使用者指出 sibling plan v1-v4 寫作期間 sanitization gate 未觸發、project incident 洩漏 |
-| Required set | `enforcement/sanitization.md`、`enforcement/reusable-guidance-boundary.md`、`enforcement/rule-weight.md`、`enforcement/dependency-reading.md`、`runtime/core-bootstrap.yaml`、`scripts/ai-skill-cli/internal/app/hooks.go`（部分 grep 確認 validator 不存在）、sibling plan `2026-05-31-1900-workflow-activation-engine.md` |
+| Required set | `enforcement/sanitization.md`、`enforcement/reusable-guidance-boundary.md`、`enforcement/rule-weight.md`、`enforcement/dependency-reading.md`、`runtime/core-bootstrap.yaml`、`scripts/ai-skill-cli/internal/app/hooks.go`（部分 grep 確認 validator 不存在）、sibling plan `plans/archived/2026-05-31-1900-workflow-activation-engine.md` |
 | Read | 以上 |
 | Not applicable | 無 |
 | Deferred | Phase 2-3 實作細節 source（hooks.go 完整檔案、commit-msg dispatcher 細節）—— Phase 0.1 進入 implementation 前再補讀 |
@@ -421,4 +421,4 @@ Acceptance：五 scenario 全 PASS。
 - `enforcement/reusable-guidance-boundary.md` —— project incident vs reusable rule 邊界
 - `enforcement/rule-weight.md` §P0 —— sanitization 屬 P0 safety/privacy 邊界
 - `enforcement/failure-patterns/bootstrap-bypass-on-resume.md` —— validator 採同 PreToolUse pattern 範例
-- Sibling plan：`plans/active/2026-05-31-1900-workflow-activation-engine.md` —— 同 systemic gap pattern
+- Sibling plan：`plans/archived/2026-05-31-1900-workflow-activation-engine.md` —— 同 systemic gap pattern（archived 2026-06-05）

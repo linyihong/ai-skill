@@ -68,7 +68,7 @@ when:
 then:
   expected_route:
     - registry contains rule_class id=bootstrap_integrity with coverage=mechanical
-    - registry contains rule_class id=workflow_activation with coverage=pending_implementation AND child_plan=plans/active/2026-05-31-1900-workflow-activation-engine.md
+    - registry contains rule_class id=workflow_activation with coverage=mechanical AND child_plan=plans/archived/2026-05-31-1900-workflow-activation-engine.md
     - registry contains rule_class id=capability_discovery with coverage=behavioral_only AND sunset_decision.revisit_when AND sunset_decision.success_criteria
     - registry contains rule_class id=sanitization with coverage=pending_implementation AND child_plan=plans/active/2026-05-31-2000-mechanical-sanitization-validator.md
     - registry contains rule_class id=intelligence_classification with coverage=research_required AND research_questions (len >= 1)

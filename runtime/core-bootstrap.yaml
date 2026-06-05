@@ -204,7 +204,7 @@ per_turn_obligations:
     blocking_gate_id: gate.workflow.primary_source_read
     fail_open: true
     note: |
-      Phase 5 of plans/active/2026-05-31-1900-workflow-activation-engine.md.
+      Phase 5 of plans/archived/2026-05-31-1900-workflow-activation-engine.md.
       SAFETY (must hold): this gate fires ONLY after the detector locks a
       single active_route. It NEVER blocks on a detector miss (no match) or a
       multi-route conflict (>1 activated → workflow/workflow-routing.md Stage 2

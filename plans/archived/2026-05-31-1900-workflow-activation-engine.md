@@ -117,10 +117,10 @@ Feedback (existing: feedback/history/<domain>/)
 
 #### Phase 0.1 — Architecture Compatibility Preflight
 
-- [ ] 確認 `governance/lifecycle/capability-discovery-philosophy.md` 與本 plan 的 Discovery vs Detector 分工不衝突（companion 章節需註記 "Detector handles known routes, Discovery handles unknown capabilities"）
-- [ ] 確認 `workflow/workflow-routing.md` 既有歧義裁決可作為 Stage 2 conflict resolver
-- [ ] 確認 `runtime.db` schema 可加 `workflow_sessions` 表而不破壞既有 projection
-- [ ] 確認 `hooks.go` PreToolUse pipeline 可注入新 validator（非阻塞性，僅 detector miss 時 reject）
+- [x] 確認 `governance/lifecycle/capability-discovery-philosophy.md` 與本 plan 的 Discovery vs Detector 分工不衝突（archive 收尾 2026-06-05：governance/workflow-activation-engine.md 已 publish，分工生效）
+- [x] 確認 `workflow/workflow-routing.md` 既有歧義裁決可作為 Stage 2 conflict resolver（archive 收尾：detector.go Stage-2 已沿用既有歧義裁決，Phase 3 unit tests 綠）
+- [x] ~~確認 `runtime.db` schema 可加 `workflow_sessions` 表~~ **取消**（Phase 4.0 採 in-memory RuntimeContext，YAGNI；Phase 4.1 SQLite deferred → 本 preflight 失效）
+- [x] 確認 `hooks.go` PreToolUse pipeline 可注入新 validator（archive 收尾：`workflowPrimarySourceGate` / `validateWorkflowPrimarySourceRead` 已 landed，gate.workflow.primary_source_read 在 prod）
 
 #### Phase 0.2 — Route Type + Activation Mode 分類（**v3 改：self-declared，不再靠人工 classification 表**）
 
@@ -362,7 +362,7 @@ func DetectWorkflows(transcript []Message, openFiles []FileRef) []DetectedRoute
 
 產出：
 - [x] `detector.go` + unit tests（2026-06-04：`DetectWorkflows(registry, transcript, openFiles) []DetectedRoute` 純函式，deterministic any-hit、**無加權**；two-phase（activation_any_of 可 activate、reinforcement_any_of 只 reinforce → late-detected Activated=false）；legacy flat 正規化；自製 glob→regexp（`**`/`*`，無新依賴）。15 unit tests PASS：single/multi/no-match/legacy-flat(user+glob)/two-phase-context/reinforcement-only/regex-alternation/advisory-mode/on-demand-never/effective-mode/glob-edge/merge-dedupe）
-- [ ] `hooks.go` 整合 — **改置於 Phase 4.0**（PreToolUse dedupe 需要 in-memory RuntimeContext 作為「已偵測」store；無 store 就 wiring 等於半成品）。Phase 3 只交付可獨立測試的 detector 核心
+- [x] ~~`hooks.go` 整合~~ **moved-to-Phase-4.0**（PreToolUse dedupe 需 in-memory RuntimeContext；Phase 4.0 交付 RuntimeContext + workflowPrimarySourceGate，整合已 landed。本行保留為歷史紀錄）
 - [x] ~~`runtime.db` 加 `workflow_sessions` 表~~ **取消**：Phase 4.0 決議 in-memory RuntimeContext、NO SQLite（YAGNI，Phase 4.1 deferred）。此產出項為 v-early 草稿殘留，與 Phase 4.0 衝突，正式作廢；dedupe store 改由 Phase 4.0 in-memory 提供
 - 結構擴充（向後相容，additive）：`runtimeRouteRecord` 加 `route_type` / `activation_mode`；`runtimeRouteTriggers` 加 `activation_any_of` / `reinforcement_any_of`（解析兩種 schema 形式）
 

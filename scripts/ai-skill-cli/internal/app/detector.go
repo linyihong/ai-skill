@@ -7,7 +7,7 @@ import (
 )
 
 // detector.go implements the deterministic Workflow Activation Engine detector
-// (plan plans/active/2026-05-31-1900-workflow-activation-engine.md Phase 3).
+// (plan plans/archived/2026-05-31-1900-workflow-activation-engine.md Phase 3).
 //
 // Design invariants (do NOT change without updating the plan + ADR-006):
 //   - Deterministic: a route is detected iff at least one of its activation
