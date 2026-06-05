@@ -205,33 +205,54 @@ PostToolUse:Read hook fires (artifact Read by agent)
 
 逐條核對本 plan §Open Questions：
 
-- [ ] 已讀本 plan §Open Questions 全部條目
-- [ ] 對每條標記 `resolved` / `still-open` / `deferred`
-- [ ] `resolved` 條目同步勾選於 §Open Questions
-- [ ] 盤點新發現問題已加入 §Open Questions
+- [x] 已讀本 plan §Open Questions 全部條目（2026-06-06 Phase 0.0 turn 確認 Q1–Q8 8 條皆已涵蓋；初版 dispatch table 漏列 Q7/Q8，本輪補上）
+- [x] 對每條標記 `resolved` / `still-open` / `deferred`（下表）
+- [x] `resolved` 條目同步勾選於 §Open Questions（本輪無 resolved；下表 8 條皆 still-open / deferred / deferred-to-phase-c）
+- [x] 盤點新發現問題已加入 §Open Questions（本輪未發現新問題；Q7/Q8 已存在 §Open Questions 但漏列於本表，已補）
 
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
-| Q1 confidence threshold 初值 | still-open | Phase A.3 量測後決定 |
-| Q2 Phase B hijack 實作層 | still-open | Phase 0.1 + Phase B.1 設計後決定 |
-| Q3 proposal TTL | still-open | Phase A.2 schema 設計時決定 |
-| Q4 Cost budget 超標策略 | still-open | Phase A.4 量測後決定 |
-| Q5 project overlay scan cache 邊界 | still-open | Phase A.2 設計決定 |
-| Q6 cross-session proposal aggregation | deferred | 三週 empirical 後評估 |
+| Q1 confidence threshold 初值 | still-open | Phase A.1 暫定 0.5；Phase A.3 unit test + Phase D empirical 後依 KPI 調 |
+| Q2 Phase B hijack 實作層 | still-open（本 session out of scope） | Phase B.1 spike — 本 session scope 限 Phase 0 + Phase A，Q2 留 next session |
+| Q3 proposal TTL | still-open | Phase A.2 schema 段預設 24h，由 `runtime.discovery.config` 可調；TTL eviction job 設計待 A.2 完成後決定 |
+| Q4 Cost budget 超標策略 | still-open | Phase A.4 量測後決定；傾向 fail-open（不阻塞 agent，maintain advisory non-blocking 屬性），但需明文 |
+| Q5 project overlay scan cache 邊界 | still-open | Phase A.2 設計 per-session in-memory + cwd-change invalidate；per-task 重 scan 待 Phase A.3 量測 |
+| Q6 cross-session proposal aggregation | deferred | 三週 Phase D empirical 後評估；如推進必須走 §Non-Goals 封印（advisory-only，不自動寫 routing-registry） |
+| Q7 Discovery 與 manual-lock 互動 | deferred-to-phase-c | 預設 manual-lock active 時跳過 Discovery (proposal 標 `manual_lock_bypass`)；governance 明文落於 Phase C `governance/workflow-activation-engine.md` 加段；Phase A 程式碼層 enforce eligibility gate |
+| Q8 advisory cumulative token cap | still-open | Phase A.4 advisory 單次 ≤ 200 token 已寫入；cumulative cap 設計（per-task / per-session 累積上限）待 A.4 量測 advisory 注入頻率後決定 |
 
 #### Phase 0.1 — Architecture Compatibility Preflight
 
-- [ ] 確認 parent plan `2026-05-31-1900-workflow-activation-engine.md`（archived）狀態下增量補丁不違反 archive contract（per plans/README.md plan-tree archive_order 規則）
-- [ ] 確認 [`governance/lifecycle/capability-discovery-philosophy.md`](../../governance/lifecycle/capability-discovery-philosophy.md) 對 Discovery hot-hook 啟用之立場與本 plan Light/Deep 模型相容
-- [ ] 確認 `hooks.go` PreToolUse + PostToolUse pipeline 可注入 advisory + 訂閱 Read event；確認 hijack 機制應落 hook 層還是 runtime 層
-- [ ] 確認 `runtime.db` 可加 `discovery_proposals` 表（schema 評估）
-- [ ] cross-check `architecture/ai-native-cognitive-ecosystem-system.md` §Watch-Out List 對應的 wall 名稱
+- [x] 確認 parent plan `2026-05-31-1900-workflow-activation-engine.md`（archived）狀態下增量補丁不違反 archive contract（per plans/README.md plan-tree archive_order 規則）
+  - **證據**：本 sub-plan 在 `plans/active/`，frontmatter `parent: 2026-05-31-1900-workflow-activation-engine`；plan_tree_archive_order 僅在 sub-plan archive 時要求 parent 已 archive — 本 sub 持續 active 期間無 violation。Parent archive 之 evidence trail (`plans/archived/2026-05-31-1900-workflow-activation-engine.md`) 不被 sub-plan 改動 — 本 plan 純 additive。
+- [x] 確認 [`governance/lifecycle/capability-discovery-philosophy.md`](../../governance/lifecycle/capability-discovery-philosophy.md) 對 Discovery hot-hook 啟用之立場與本 plan Light/Deep 模型相容
+  - **證據**：philosophy doc §Discovery → Detector Feedback Loop 明寫「detector miss 時形成回饋環」「Discovery 的 mechanical 整合點正是 detector 的 miss path，而非把 Discovery 獨立做成 per-turn executor」— 與本 plan 「detector miss → Light Discovery → advisory（非 gate）」完全對齊。Light → Deep 漸進方案是 philosophy 中「miss path」的具體實作策略，未越線到「per-turn executor」。
+- [x] 確認 `hooks.go` PreToolUse + PostToolUse pipeline 可注入 advisory + 訂閱 Read event；確認 hijack 機制應落 hook 層還是 runtime 層
+  - **證據**：`runPreToolUseHook` (hooks.go:1067) → `finishPreToolUse` (hooks.go:574) → `workflowPrimarySourceGate` (hooks.go:400)。Advisory injection point = `finishPreToolUse` block=false 路徑（detector miss 或 conflict 時），return ExitSuccess 前用 `hookSpecificOutput.additionalContext` 注入（同 `runPostToolUseHook` line 1212-1218 reminder 模式）。PostToolUse 端 `runPostToolUseHook` (hooks.go:1174) 已 parse `transcript_path` payload + tool_name — Phase B Read hijack 可在此分流新增 `if toolName == "Read" && hasAwaitingPhaseBProposal()` 分支。
+  - **Q2 spike 結論（多 turn 範圍預備）**：傾向 **hook 層**。理由：(a) 與 PreToolUse 現有 pattern 對稱；(b) 不耦合 runtime 至 file-read wrapper；(c) Claude Code PostToolUse:Read delivery 已被 `runPostToolUseHook` 既有路徑驗證為 deterministic；(d) testable isolation 容易。runtime 層耦合度高且需新增 wrapper 層次，benefit 不對稱。**Phase B.1 spike 仍應驗證**：edge cases — 大檔 Read（>5MB content）的 PostToolUse payload 大小限制、tool_result 截斷後是否仍可 scan、與既有 receipt cache 互動。
+- [x] 確認 `runtime.db` 可加 `discovery_proposals` 表（schema 評估）
+  - **證據**：SQLite 標準 CREATE TABLE。同類 precedent: `route-candidate-proposals.yaml` (Phase 6.1 已 land) 採 **YAML data store, not projected**（router_proposals.go:19-21 註解明示「runtime/router/route-candidate-proposals.yaml is a DATA file, not a projected runtime contract」）。**架構決策**：(1) `discovery_proposals` 作為 **runtime.db 中的 raw 表**（per-task ephemeral + TTL 24h，每 task 高頻寫，YAML 不適），與 `route-candidate-proposals.yaml` 不重疊（後者是 cross-session occurrence-tracked promotion store）；(2) `runtime.discovery.config`（threshold/budget）作為 **projected surface** from 新 `runtime/discovery-bridge.yaml`（owner-layer canonical config，低頻變更）。
+- [x] cross-check `architecture/ai-native-cognitive-ecosystem-system.md` §Watch-Out List 對應的 wall 名稱
+  - **證據**：Watch-Out List 實有 6 walls（doc:447-454）：(1) Discovery confused with Activation; (2) Workflow inflation; (3) Ecosystem boundary inflation; (4) Telemetry explosion; (5) Positive-activation bias; (6) Optimization hallucination
+  - **本 plan §Decision Rationale 對應修正**：
+    - 「Discovery 反成主路由（advisory→primary 失控）」= **Wall #1 Discovery confused with Activation**（精準對應；§Non-Goals 封印「Discovery proposals MUST NOT satisfy activation_triggers」直接緩解此 wall）
+    - 「Per-turn cost 預算爆炸」≈ **Wall #4 Telemetry explosion**（部分對應；本 plan 是 compute cost 非 telemetry cost；緩解機制相似 — Phase A 30ms / Phase B 50ms budget 即 criterion L 精神）
+    - 「SQLite 表無 lifecycle 治理」= **無精準對應 wall**；歸類為 wall #4 同類風險（self-observation/state explosion），緩解靠 TTL 24h + Phase D 量測決定 GC 策略
+  - **Watch-out 修正應於 Phase C 補入 plan §Decision Rationale Watch-Out citation**（本 turn 不改，Phase C scope）
 
 #### Phase 0.2 — 既有 Discovery code path 盤點
 
-- [ ] 掃 `scripts/ai-skill-cli/internal/app/` 既有是否已有任何 discovery-related code（避免 double-implement）
-- [ ] 確認 `knowledge/summaries/*.md` 為 Phase A primary scan target；確認 atom summary 格式穩定可解析
-- [ ] 確認 `.ai-skill/project/rules/*.md` 既有 frontmatter convention（若無 metadata field，Phase A 只 scan 標題 + 第一段）
+- [x] 掃 `scripts/ai-skill-cli/internal/app/` 既有是否已有任何 discovery-related code（避免 double-implement）
+  - **發現**：`router_proposals.go` + `runtime/router/route-candidate-proposals.yaml` 已存在（parent plan Phase 6.1 land）。實作 occurrence-tracking promotion state machine（accumulating→ready_for_review→promoted/rejected/stale），thresholds = 5 次 / 30 天 / 60 天 / 90 天。CLI: `ai-skill router proposals {list,record,promote,reject,gc}`。
+  - **與本 plan 的關係**：**非 double-implement，purpose 正交**。
+    - `route-candidate-proposals.yaml` = **cross-session, occurrence-tracked, manual promote → registry candidate** (YAML data store, 慢頻寫)
+    - `discovery_proposals` (本 plan) = **per-task, TTL 24h, evidence + scoring, advisory ranking** (SQLite, 每 task 高頻寫)
+    - 兩者可在 Phase D（out of scope）建立 cross-link：當 `discovery_proposals` 連續 N task 提同 candidate route → 餵給 `router proposals record` 觸發 occurrence count。但本 session 不實作此 bridge；Q6 deferred 已封印。
+  - **§Non-Goals 封印對齊**：本 plan「Discovery proposals MUST NOT modify routing-registry.yaml automatically」與既有 `router_proposals.go` 行為一致（promote 只標 status，不改 registry，需人類 review）。
+- [x] 確認 `knowledge/summaries/*.md` 為 Phase A primary scan target；確認 atom summary 格式穩定可解析
+  - **證據**：30+ summary 檔案，統一格式 `## <Atom ID>` + table 含 `Atom ID / Source path / Summary / When to read / Do not use for / Context cost`. 可解析 — Phase A signal source 將 extract `Atom ID` 作為 candidate route key、`Summary` + `When to read` 作為 keyword bag。註冊在 `knowledge/summaries/README.md` 主表（30 行 Atom ID → file）。
+- [x] 確認 `.ai-skill/project/rules/*.md` 既有 frontmatter convention（若無 metadata field，Phase A 只 scan 標題 + 第一段）
+  - **證據**：`.ai-skill/project/rules/` 目錄不存在於本 repo（overlay 屬 downstream project layer）。Phase A.3 將 implement scanner 為 **defensive**：若目錄不存在 / 為空 → return zero signals（不報錯）；存在 → scan `*.md` frontmatter + 標題 + 第一段。Unit test 須建 fake overlay fixture 模擬 downstream project 結構（per Phase A.3 cross-project test 要求）。
 
 ### Phase A — Light Discovery
 
