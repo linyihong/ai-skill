@@ -812,6 +812,32 @@ rule_classes:
       regression_exists: pending
       runtime_observed: pending
 
+  - id: runtime_index_freshness
+    coverage: mechanical
+    source_files:
+      - runtime/core-bootstrap.yaml
+      - scripts/ai-skill-cli/internal/app/runtime.go  # nativeRuntimeIndexChecksumsCheck (sibling: runtime validate worktree path)
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/runtime_index_freshness.go
+        symbol: validateRuntimeIndexFreshness
+        executor_kind: commit_msg_validator
+        block_or_warn: block
+    rationale: |
+      Commit-time enforcement of the
+      knowledge/runtime/sqlite/runtime-index.sqlite ↔ tracked-markdown
+      checksum invariant. Pre-existing nativeRuntimeIndexChecksumsCheck
+      runs only at `runtime validate` time (post-hoc); this rule fires at
+      commit-msg so stale-index drift cannot land. Uses staged-blob
+      content (git show :path), so partial stage (`git add -p`) and
+      post-stage worktree edits do not false-positive. Also blocks staged
+      markdowns that sit in a directory tracked by the index but have no
+      row, closing the "new-markdown-without-refresh" coverage hole.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: ✓
+      runtime_observed: pending
+
   - id: markdown_yaml_sync
     coverage: mechanical
     source_files:

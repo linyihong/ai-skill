@@ -371,6 +371,19 @@ per_commit_obligations:
     severity: warning
     opt_out_marker: "[skip-plan-tree-folder-convention]"
     contract_source: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/02-validator-implementation.md (Phase 2)
+  - id: obligation.commit.runtime_index_freshness
+    fires: every_commit_staging_markdown_other_than_runtime_index_only
+    validator: validateRuntimeIndexFreshness
+    severity: block
+    opt_out_marker: "[skip-runtime-index-freshness]"
+    contract_source: enforcement/enforcement-registry.yaml §runtime_index_freshness + scripts/ai-skill-cli/internal/app/runtime.go (nativeRuntimeIndexChecksumsCheck — sibling worktree-resolver path)
+    rationale: |
+      Mirrors the runtime_index_native stale-checksum invariant at commit
+      time so drift cannot land. Uses staged-blob content (git show :path),
+      not worktree, so partial-stage (`git add -p`) and post-stage worktree
+      edits do not false-positive. Also blocks staged markdowns that sit in
+      a directory tracked by the index but have no row (the
+      "new-markdown-without-refresh" coverage hole).
 
 per_commit_dispatcher_status:
   machine_iterable: true

@@ -3460,6 +3460,9 @@ var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
 	"obligation.commit.plan_tree_folder_convention": func(c commitMsgCtx) string {
 		return validatePlanTreeFolderConvention(c.text, c.staged, c.root)
 	},
+	"obligation.commit.runtime_index_freshness": func(c commitMsgCtx) string {
+		return validateRuntimeIndexFreshness(c.text, c.staged, c.root)
+	},
 }
 
 // defaultCommitMsgDispatchOrder is the fallback order if
@@ -3492,6 +3495,7 @@ var defaultCommitMsgDispatchOrder = []string{
 	"obligation.commit.plan_tree_parent_reference",
 	"obligation.commit.plan_tree_unique_id",
 	"obligation.commit.plan_tree_folder_convention",
+	"obligation.commit.runtime_index_freshness",
 }
 
 // readPerCommitObligationsOrder reads the per_commit_obligations id
