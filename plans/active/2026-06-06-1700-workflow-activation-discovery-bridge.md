@@ -72,6 +72,12 @@ task input → detector(user_signals + context_signals(path)) miss
 - **C. Disc-2（detector miss → 等 agent 首次 artifact Read → Discovery post-Read）** — reject because 把「第一次 Read 的選擇」當成既定事實。第一次 Read 可能是 user-cited artifact，但真正應該 Read 的 workflow / governance source 可能完全不同（e.g.「請看這個 runtime validator 問題」真正該讀的是 `governance/*`）。Disc-2 silently encodes a guess as fact.
 - **D. Light → Deep 漸進 Discovery（accept）** — Phase A 用 cheap signal 早期斷捨，Phase B 訂閱式累積；不綁第一個 Read，cost 控制良好，未來 semantic surface 議題自然 fold 進 Phase A signal source。
 
+### Non-Goals（本 plan 明文封印）
+
+- **Discovery proposals MUST NOT modify `routing-registry.yaml` automatically**。Cross-session proposal aggregation（若日後實作）僅能產生 maintenance suggestion（人類審閱後手動寫 registry），不可自動 promote candidate 為 registry route entry。
+- 理由：proposal accumulation → auto registry evolution = **self-modifying ontology**，屬 ADR 等級議題，本 plan scope 之外。registry 的 route 寫入仍須走人類 sign-off + commit 路徑。
+- Open Question Q6（cross-session aggregation）若推進，**必須**以 advisory-only 形式呈現，不得繞過此封印。
+
 ### Why Not an ADR Yet
 
 - Phase A confidence threshold 未實測（暫定 0.5，依三週 empirical 量測再調）。
@@ -83,7 +89,10 @@ task input → detector(user_signals + context_signals(path)) miss
 
 - [ ] foundational + cross-session + cross-project + expensive-to-reverse + explains-why 全中
 - [ ] Phase A + Phase B 跑過 ≥ 2 個 project 的 real task 驗證
-- [ ] 三週 empirical：detector miss → Discovery hit → agent pivot 成功率 ≥ 60%
+- [ ] 三週 empirical KPI tiering（**primary 為 routing quality 訊號、tertiary 為 agent 行為觀察，避免混淆**）：
+  - **Primary KPI**：detector miss → proposal generated ≥ 70%（量 Discovery 是否覆蓋 detector miss）
+  - **Secondary KPI**：proposal generated → advisory injected ≥ 50%（量 scoring threshold 是否合理）
+  - **Tertiary observation**：advisory injected → agent pivot — 不設成功門檻，僅觀察。Agent 可能本就掌握上下文、advisory 正確但無 pivot 必要
 - [ ] Phase A p95 cost ≤ 30ms；Phase B p95 cost（hijack 單次 Read）≤ 50ms
 - [ ] Open Questions 全解
 - [ ] 沒有更輕 promotion target（純 enforcement rule 補述）適用
@@ -229,7 +238,11 @@ PostToolUse:Read hook fires (artifact Read by agent)
 
 #### Phase A.2 — runtime.db schema + cache
 
-- [ ] `discovery_proposals` schema：`id` / `task_hash` / `route_candidates_json`（含 per-candidate `evidence_set`） / `signal_snapshot_json`（Phase A + 累積 Phase B 訊號快照，重算用）/ `scoring_version`（algorithm version tag，e.g. `light-v1`）/ `current_best_confidence`（derived, paired with scoring_version；單獨無語意）/ `status` (`awaiting_phase_b` / `advised` / `dismissed` / `expired`) / `created_at` / `updated_at`
+- [ ] `discovery_proposals` schema：`id` / `task_hash` / `route_candidates_json`（含 per-candidate `evidence_set`） / `signal_snapshot_json`（Phase A + 累積 Phase B 訊號快照，重算用）/ `scoring_version`（algorithm version tag，e.g. `light-v1`）/ `current_best_confidence`（derived, paired with scoring_version；單獨無語意）/ `status` (`awaiting_phase_b` / `advised` / `dismissed` / `rejected` / `expired`) / `created_at` / `updated_at`
+- [ ] **`dismissed` vs `rejected` 語意區隔**（telemetry 用，可量測 false positive）：
+  - `dismissed`：advisory 注入後 agent / user 未採納（沒 pivot），原因未知 — agent 可能本就掌握上下文、user 略過、advisory 不夠顯眼
+  - `rejected`：proposal 後續被證明 wrong — 例如 Phase B 重 score 後 candidate 從 top 跌出，或 manual-lock 鎖定其他 route，或 agent 顯式採納另一 route 的 primary_source
+  - Telemetry: `rejected / generated` ratio 直接量 false positive rate；`dismissed / advised` 量 advisory ergonomics 問題
 - [ ] **不可單獨儲存 confidence**：threshold / weight 變更後舊 `0.63 (v1)` ≠ `0.63 (v2)`。Phase D telemetry 必須以 `scoring_version` group-by，跨版本比較須走 re-score on `signal_snapshot_json`
 - [ ] TTL：預設 24h；可由 `runtime.discovery.config` 調
 - [ ] project overlay scan cache：per-session in-memory，cwd 改變時 invalidate
@@ -237,7 +250,10 @@ PostToolUse:Read hook fires (artifact Read by agent)
 #### Phase A.3 — Discovery 實作
 
 - [ ] `discovery.go` 新建：function `RunLightDiscovery(taskInput, openFiles, cwd) []Candidate`
-- [ ] Signal extractors：user_msg tokenizer、artifact basename parser、frontmatter head reader（≤ 200B）、project overlay scanner
+- [ ] Signal extractors 分兩層成本級別，**非實作分層、文件分層**（成本歸因用）：
+  - **Light-0**（零 I/O）：user_msg tokenizer、artifact basename parser、path parser、extension parser、cwd lookup
+  - **Light-1**（低 I/O，但 ≠ free）：frontmatter head reader（≤ 200B per artifact）、project overlay scanner（scan `.ai-skill/project/rules/*.md` frontmatter，per-session cache）
+  - p95 30ms budget 超標時必須先區分 Light-0 vs Light-1 貢獻；不可把 frontmatter / overlay scan 當免費而吃預算
 - [ ] **Source-of-truth guardrail**：project overlay scanner 只產 **signal facts**（e.g. `signal.project.declares_dated_doc_convention=true`、`signal.cwd.matches_overlay_path=true`），**不可**直接產 route candidate。Candidate 一律由 scoring stage 對 `routing-registry.yaml` + `knowledge/summaries/*.md` 評估訊號才產生。`routing-registry.yaml` 維持唯一 route 解釋者地位。違反此 guardrail 等於把 v0 draft 砍掉的 `project_overlay_signals → binds_route_type` 偷渡回實作。
 - [ ] Scoring：weighted sum + normalize
 - [ ] 寫 proposal 到 runtime.db
@@ -304,10 +320,14 @@ PostToolUse:Read hook fires (artifact Read by agent)
 
 ### Phase D — Empirical Validation（三週）
 
-- [ ] 三週 telemetry：detector miss 數 / Discovery proposal 數 / advisory inject 數 / agent pivot 成功數
-- [ ] Pivot 成功定義：advisory 注入後 agent Read 了 advised route 的 primary_source
-- [ ] 目標 hit rate：detector miss → Discovery proposal ≥ 70%；proposal advised → agent pivot ≥ 60%
-- [ ] 若未達標：分析 miss reason，決定 (a) 調 threshold、(b) 補 signal source（觸發 semantic surface follow-up plan）、(c) 接受 baseline
+- [ ] 三週 telemetry：detector miss 數 / proposal generated 數 / advisory injected 數 / pivot 數 / rejected 數 / dismissed 數
+- [ ] Pivot 定義：advisory 注入後 agent Read 了 advised route 的 primary_source
+- [ ] **KPI tiering**（與 ADR Promotion Criteria 對齊）：
+  - Primary: detector miss → proposal generated ≥ 70%（routing quality）
+  - Secondary: proposal generated → advisory injected ≥ 50%（scoring ergonomics）
+  - Tertiary observation: advisory → pivot（agent behavior，不設門檻）
+  - Diagnostic: `rejected / generated` = false positive rate；`dismissed / advised` = advisory ergonomics
+- [ ] 若 Primary 未達標：分析 miss reason，決定 (a) 調 threshold、(b) 補 signal source（觸發 semantic surface follow-up plan）、(c) 接受 baseline
 
 **Phase D acceptance**：三週量測完成，hit rate 報告 + 後續決策建議書
 
@@ -348,7 +368,8 @@ PostToolUse:Read hook fires (artifact Read by agent)
 - [ ] linyihong：approve Light → Deep 漸進架構（不擴 detector schema）
 - [ ] linyihong：approve scoring 僅用於 advisory ranking、從不進入 gate 路徑
 - [ ] linyihong：approve Phase A cost budget 30ms p95 / Phase B 50ms p95
-- [ ] linyihong：approve 三週 empirical 期 + hit rate 目標（detector miss → proposal ≥ 70%；proposal advised → pivot ≥ 60%）
+- [ ] linyihong：approve 三週 empirical 期 + KPI tiering（Primary 70%、Secondary 50%、Tertiary observation only）
+- [ ] linyihong：approve §Non-Goals 對 routing-registry auto-modification 的封印
 - [ ] linyihong：approve Phase D 結束後是否開 semantic surface follow-up plan 的決策權
 
 ---
