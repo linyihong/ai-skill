@@ -490,9 +490,77 @@ func renderClaudeStopDecision(stdout io.Writer, d hookDecision) int {
 	return ExitSuccess // the decision:block JSON does the blocking, not the exit code
 }
 
+// hookHost identifies which agent host invoked a PreToolUse hook, so the same
+// transport-agnostic hookDecision can be rendered to the right block protocol.
+// Detection is by payload shape — only Cursor injects cursor_version into every
+// hook payload (Claude payloads carry hook_event_name too, so that field alone
+// cannot distinguish them). See plan 2026-06-05-0200 §Phase 0 Findings.
+type hookHost int
+
+const (
+	hostClaude hookHost = iota
+	hostCursor
+)
+
+func detectPreToolUseHost(payload map[string]json.RawMessage) hookHost {
+	if _, ok := payload["cursor_version"]; ok {
+		return hostCursor
+	}
+	return hostClaude
+}
+
+// renderCursorPreToolUseDecision writes a Cursor preToolUse decision to stdout
+// and returns the exit code.
+//
+// CRITICAL (Cursor 3.4.17 hook contract): Cursor reads the hook response from
+// stdout as JSON. A block is {"permission":"deny"} (user_message shown to the
+// user, agent_message to the agent); Cursor also maps a bare exit 2 to the same
+// permission:"deny". We emit the native {permission} form rather than relying on
+// Claude's hookSpecificOutput.permissionDecision, whose Cursor compat shim
+// (enableClaudeNestedHookSpecificOutputCompatibility) is OFF by default. On allow
+// we emit nothing (empty stdout = allow; proven by the shipped Cursor stop hook),
+// keeping parity with the Claude renderer.
+func renderCursorPreToolUseDecision(stdout io.Writer, d hookDecision) int {
+	if !d.Deny {
+		return ExitSuccess
+	}
+	_ = json.NewEncoder(stdout).Encode(map[string]any{
+		"permission":    "deny",
+		"user_message":  d.Reason,
+		"agent_message": d.Reason,
+	})
+	return ExitSuccess // the permission:deny JSON does the blocking, not the exit code
+}
+
+// renderPreToolUseDecision dispatches a PreToolUse gate outcome to the invoking
+// host's block protocol. The gate logic is identical across hosts; only the
+// wire format differs (Capability ≠ Transport).
+func renderPreToolUseDecision(host hookHost, stdout io.Writer, d hookDecision) int {
+	if host == hostCursor {
+		return renderCursorPreToolUseDecision(stdout, d)
+	}
+	return renderClaudePreToolUseDecision(stdout, d)
+}
+
+// preToolUseReadAllowed reports whether the tool is a read-only tool that the
+// gate always permits (so the agent can Read the bootstrap files / workflow
+// primary_source it is being asked to read). Claude routes file reads through
+// the "Read" tool; Cursor uses named read tools and routes editor/context reads
+// to the separate beforeReadFile event (which we deliberately do NOT wire).
+func preToolUseReadAllowed(host hookHost, toolName string) bool {
+	if host == hostCursor {
+		switch toolName {
+		case "read_file", "list_dir", "grep", "glob_file_search", "codebase_search":
+			return true
+		}
+		return false
+	}
+	return toolName == "Read"
+}
+
 // finishPreToolUse runs the workflow activation-evidence gate after the
 // bootstrap gate is satisfied, then returns the final PreToolUse exit code.
-func finishPreToolUse(transcriptPath, projectDir string, stdout, stderr io.Writer) int {
+func finishPreToolUse(host hookHost, transcriptPath, projectDir string, stdout, stderr io.Writer) int {
 	block, routeID, ps := workflowPrimarySourceGate(transcriptPath, resolveClaudeAiSkillRepo(projectDir))
 	if !block {
 		return ExitSuccess
@@ -503,7 +571,7 @@ func finishPreToolUse(transcriptPath, projectDir string, stdout, stderr io.Write
 		"Read that workflow primary_source before other (non-Read) tool calls so execution follows the activated "+
 		"workflow. This gate fires ONLY on a single locked route — never on a detector miss or multi-route conflict — "+
 		"and self-clears once you Read the file above (or pivot the task so a different route activates).", routeID, ps)
-	return renderClaudePreToolUseDecision(stdout, hookDecision{Deny: true, Reason: reason})
+	return renderPreToolUseDecision(host, stdout, hookDecision{Deny: true, Reason: reason})
 }
 
 // md5Short returns the first 12 hex chars of the MD5 hash of s.
@@ -980,6 +1048,8 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 		return ExitSuccess
 	}
 
+	host := detectPreToolUseHost(payload)
+
 	var toolName, transcriptPath string
 	if v, ok := payload["tool_name"]; ok {
 		_ = json.Unmarshal(v, &toolName)
@@ -987,10 +1057,10 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 	if v, ok := payload["transcript_path"]; ok {
 		_ = json.Unmarshal(v, &transcriptPath)
 	}
-	appendLog(logFile, fmt.Sprintf("DIAG tool=%q transcript=%q", toolName, transcriptPath))
-	_, _ = fmt.Fprintf(stderr, "DIAG tool=%q transcript=%q\n", toolName, transcriptPath)
+	appendLog(logFile, fmt.Sprintf("DIAG host=%d tool=%q transcript=%q", host, toolName, transcriptPath))
+	_, _ = fmt.Fprintf(stderr, "DIAG host=%d tool=%q transcript=%q\n", host, toolName, transcriptPath)
 
-	if toolName == "Read" {
+	if preToolUseReadAllowed(host, toolName) {
 		_, _ = fmt.Fprintln(stderr, "ALLOW_READ_TOOL:", toolName)
 		return ExitSuccess
 	}
@@ -1004,7 +1074,7 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 	cacheFile := "/tmp/ai-skill-bootstrap-" + cacheKey + ".done"
 	if claudeFileExists(cacheFile) {
 		_, _ = fmt.Fprintln(stderr, "ALLOW_CACHED")
-		return finishPreToolUse(transcriptPath, projectDir, stdout, stderr)
+		return finishPreToolUse(host, transcriptPath, projectDir, stdout, stderr)
 	}
 
 	if projectDir != "" {
@@ -1017,7 +1087,7 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 					_ = os.WriteFile(cacheFile, []byte{}, 0o644)
 					_, _ = fmt.Fprintln(stderr, "ALLOW_SESSIONSTART_FLAG")
 					appendLog(logFile, "exit_code: 0 (sessionstart flag)")
-					return finishPreToolUse(transcriptPath, projectDir, stdout, stderr)
+					return finishPreToolUse(host, transcriptPath, projectDir, stdout, stderr)
 				}
 			}
 		}
@@ -1044,7 +1114,7 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 			_ = os.WriteFile(cacheFile, []byte{}, 0o644)
 			_, _ = fmt.Fprintln(stderr, "ALLOW_RECEIPT_FOUND_WITH_READS")
 			appendLog(logFile, "exit_code: 0 (receipt found + required reads verified)")
-			return finishPreToolUse(transcriptPath, projectDir, stdout, stderr)
+			return finishPreToolUse(host, transcriptPath, projectDir, stdout, stderr)
 		}
 		_, _ = fmt.Fprintln(stderr, "BLOCK_RECEIPT_WITHOUT_READS missing="+strings.Join(missing, ","))
 		appendLog(logFile, "deny (receipt without required reads; missing="+strings.Join(missing, ",")+")")
@@ -1053,7 +1123,7 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 			"the SessionStart example, which is not authoritative). Missing Read calls for: %s. "+
 			"Read each missing file, count obligations/gates from the YAML, then re-emit the Receipt with verified "+
 			"numbers. Only Read tool calls are allowed until this gate clears.", strings.Join(missing, ", "))
-		return renderClaudePreToolUseDecision(stdout, hookDecision{Deny: true, Reason: reason})
+		return renderPreToolUseDecision(host, stdout, hookDecision{Deny: true, Reason: reason})
 	}
 
 	_, _ = fmt.Fprintln(stderr, "BLOCK_NO_RECEIPT")
@@ -1063,7 +1133,7 @@ func runPreToolUseHook(projectDir string, stdout io.Writer, stderr io.Writer) in
 		"(3) Read the 3 required_reads (enforcement/rule-weight.md, dependency-reading.md, conversation-goal-ledger.md); " +
 		"(4) emit the Bootstrap Receipt with numbers from the YAML you just Read (NOT the SessionStart example). " +
 		"Only Read tool calls are allowed before the Receipt is emitted."
-	return renderClaudePreToolUseDecision(stdout, hookDecision{Deny: true, Reason: reason})
+	return renderPreToolUseDecision(host, stdout, hookDecision{Deny: true, Reason: reason})
 }
 
 // runPostToolUseHook implements the Claude Code PostToolUse hook.

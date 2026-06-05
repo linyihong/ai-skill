@@ -806,6 +806,153 @@ func assertPreToolUseDeny(t *testing.T, stdout string) {
 	}
 }
 
+// assertCursorPreToolUseDeny verifies stdout carries a Cursor preToolUse deny
+// decision (native {permission:"deny"} — the Claude permissionDecision compat
+// shim is OFF by default in Cursor, so we must emit the native form).
+func assertCursorPreToolUseDeny(t *testing.T, stdout string) {
+	t.Helper()
+	var out struct {
+		Permission   string `json:"permission"`
+		UserMessage  string `json:"user_message"`
+		AgentMessage string `json:"agent_message"`
+	}
+	if err := json.Unmarshal([]byte(strings.TrimSpace(stdout)), &out); err != nil {
+		t.Fatalf("stdout is not a Cursor permission JSON: %v\n%s", err, stdout)
+	}
+	if out.Permission != "deny" {
+		t.Fatalf("permission = %q, want deny", out.Permission)
+	}
+	if strings.TrimSpace(out.UserMessage) == "" || strings.TrimSpace(out.AgentMessage) == "" {
+		t.Fatalf("deny must carry user_message + agent_message; got %#v", out)
+	}
+}
+
+func TestRenderCursorPreToolUseDecision_Deny(t *testing.T) {
+	var stdout bytes.Buffer
+	code := renderCursorPreToolUseDecision(&stdout, hookDecision{Deny: true, Reason: "read primary_source first"})
+	if code != ExitSuccess {
+		t.Fatalf("deny must return exit 0 (permission JSON carries the block), got %d", code)
+	}
+	assertCursorPreToolUseDeny(t, stdout.String())
+	if !strings.Contains(stdout.String(), "read primary_source first") {
+		t.Fatalf("reason must be in user_message/agent_message; got %s", stdout.String())
+	}
+}
+
+func TestRenderCursorPreToolUseDecision_Allow(t *testing.T) {
+	var stdout bytes.Buffer
+	code := renderCursorPreToolUseDecision(&stdout, hookDecision{Deny: false})
+	if code != ExitSuccess {
+		t.Fatalf("allow must be exit 0, got %d", code)
+	}
+	// Empty stdout == allow in Cursor (proven by the shipped stop hook). We must
+	// NOT emit non-empty invalid output (Cursor errors on stdout that is not JSON).
+	if strings.TrimSpace(stdout.String()) != "" {
+		t.Fatalf("allow must emit NO decision JSON (empty stdout = allow); got %q", stdout.String())
+	}
+}
+
+func TestDetectPreToolUseHost(t *testing.T) {
+	cursor := mustRawPayload(t, `{"hook_event_name":"preToolUse","cursor_version":"3.4.17","tool_name":"run_terminal_cmd"}`)
+	if got := detectPreToolUseHost(cursor); got != hostCursor {
+		t.Fatalf("cursor_version present => hostCursor, got %d", got)
+	}
+	// Claude payloads also carry hook_event_name, so that field must NOT trigger
+	// cursor detection — only cursor_version does.
+	claude := mustRawPayload(t, `{"hook_event_name":"PreToolUse","tool_name":"Bash"}`)
+	if got := detectPreToolUseHost(claude); got != hostClaude {
+		t.Fatalf("no cursor_version => hostClaude, got %d", got)
+	}
+}
+
+func TestPreToolUseReadAllowed(t *testing.T) {
+	for _, tool := range []string{"read_file", "list_dir", "grep", "glob_file_search", "codebase_search"} {
+		if !preToolUseReadAllowed(hostCursor, tool) {
+			t.Fatalf("cursor read tool %q must be allowed", tool)
+		}
+	}
+	if preToolUseReadAllowed(hostCursor, "run_terminal_cmd") {
+		t.Fatalf("cursor non-read tool must NOT be allowed")
+	}
+	if preToolUseReadAllowed(hostCursor, "Read") {
+		t.Fatalf("cursor host must not key off Claude's Read name")
+	}
+	if !preToolUseReadAllowed(hostClaude, "Read") {
+		t.Fatalf("claude Read must be allowed")
+	}
+	if preToolUseReadAllowed(hostClaude, "read_file") {
+		t.Fatalf("claude host must not broaden beyond Read")
+	}
+}
+
+func mustRawPayload(t *testing.T, s string) map[string]json.RawMessage {
+	t.Helper()
+	var p map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(s), &p); err != nil {
+		t.Fatalf("bad payload json: %v", err)
+	}
+	return p
+}
+
+// Cursor preToolUse with a non-read tool and a transcript that lacks a Bootstrap
+// Receipt must block via native {permission:"deny"} — the same gate logic as
+// Claude, rendered to Cursor's transport.
+func TestRunPreToolUseHookCursorBlocksWithoutReceipt(t *testing.T) {
+	dir := t.TempDir()
+	tr := writeBootstrapTranscript(t, dir, "Working on it (no receipt).", nil)
+	payload := fmt.Sprintf(`{"hook_event_name":"preToolUse","cursor_version":"3.4.17","tool_name":"run_terminal_cmd","transcript_path":%q}`, tr)
+	setHookStdin(t, payload)
+
+	var stdout, stderr bytes.Buffer
+	code := runPreToolUseHook(dir, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected ExitSuccess (deny carried by permission JSON); got %d; stderr=%s", code, stderr.String())
+	}
+	assertCursorPreToolUseDeny(t, stdout.String())
+	if !strings.Contains(stderr.String(), "BLOCK_NO_RECEIPT") {
+		t.Fatalf("expected BLOCK_NO_RECEIPT in stderr; got:\n%s", stderr.String())
+	}
+}
+
+func TestRunPreToolUseHookCursorAllowsReadTool(t *testing.T) {
+	dir := t.TempDir()
+	tr := writeBootstrapTranscript(t, dir, "no receipt yet", nil)
+	payload := fmt.Sprintf(`{"hook_event_name":"preToolUse","cursor_version":"3.4.17","tool_name":"read_file","transcript_path":%q}`, tr)
+	setHookStdin(t, payload)
+
+	var stdout, stderr bytes.Buffer
+	code := runPreToolUseHook(dir, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected read_file allowed, got %d; stderr=%s", code, stderr.String())
+	}
+	if strings.TrimSpace(stdout.String()) != "" {
+		t.Fatalf("read allow must emit empty stdout; got %q", stdout.String())
+	}
+	if !strings.Contains(stderr.String(), "ALLOW_READ_TOOL") {
+		t.Fatalf("expected ALLOW_READ_TOOL diagnostic; got:\n%s", stderr.String())
+	}
+}
+
+func TestRunPreToolUseHookCursorFailOpenWithoutTranscript(t *testing.T) {
+	dir := t.TempDir()
+	// No transcript_path: the gate cannot verify and MUST fail open (allow),
+	// matching the Claude path and the plan's Phase 1 contract.
+	payload := `{"hook_event_name":"preToolUse","cursor_version":"3.4.17","tool_name":"run_terminal_cmd"}`
+	setHookStdin(t, payload)
+
+	var stdout, stderr bytes.Buffer
+	code := runPreToolUseHook(dir, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected fail-open allow, got %d; stderr=%s", code, stderr.String())
+	}
+	if strings.TrimSpace(stdout.String()) != "" {
+		t.Fatalf("fail-open allow must emit empty stdout; got %q", stdout.String())
+	}
+	if !strings.Contains(stderr.String(), "ALLOW_NO_TRANSCRIPT") {
+		t.Fatalf("expected ALLOW_NO_TRANSCRIPT diagnostic; got:\n%s", stderr.String())
+	}
+}
+
 func TestRenderClaudePreToolUseDecision_Deny(t *testing.T) {
 	var stdout bytes.Buffer
 	code := renderClaudePreToolUseDecision(&stdout, hookDecision{Deny: true, Reason: "because policy"})
