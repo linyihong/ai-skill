@@ -15,7 +15,7 @@ sub_plan_reason: >
   reproduced 2026-06-06 in commit 214a415 — a downstream-project label
   appeared seven times across plans/active/ shared layer and was only caught
   after manual user inspection. Independent sign-off because the design
-  principles (visibility-derived forbidden tokens, no allowlist, staged-content
+  principles (metadata-derived forbidden tokens, no allowlist, staged-content
   scan, attestation prohibited) differ from sibling sanitization-validator and
   must be governed as an independent surface to avoid silent merge of two
   conflicting executor philosophies.
@@ -46,13 +46,13 @@ Owner: framework maintainer (linyihong)
 
 Parent meta-plan §Empirical Evidence 已將 sanitization 列為 instance #2；sibling `2026-05-31-2000` in-progress 處置該 gap。然而 sibling 採取的「規則先寫進 sanitization.yaml allowlist，executor 比對 allowlist」路徑需要 **長期維護 forbidden-token allowlist**，與 `enforcement/sanitization.md` 既有 prose rule 產生 dual source-of-truth。今日 commit 214a415 再度觸發同模式失效，證明**等 allowlist 路徑成熟之前，沒有任何 mechanical 防線**。
 
-需要一個 **不依賴 allowlist** 的補強：以「**該 token 在 canonical Ai-skill repo 是否可見**」作為 forbidden 判斷基準（visibility-derived），避免雙 SOT。
+需要一個 **不依賴中央 allowlist** 的補強：以 **「該 token 是否被任一 project metadata 宣告為 private」** 作為 forbidden 判斷基準（metadata-derived），避免 framework 端與 prose `sanitization.md` 形成雙 SOT。
 
 ### Design Principles (user-established 2026-06-06)
 
 | # | 原則 | 理由 |
 |---|---|---|
-| P1 | **Metadata-derived forbidden tokens** | 不掃描推導 visibility，而是 project 自己在 metadata 宣告 `visibility: private` + `private_tokens: [...]`。`ai-skill runtime compile` 把所有 project 的宣告 project metadata projection 為 `runtime.db.derived_forbidden_tokens`。Scanner 只查 projection，不做 absence inference。命名理由：「visibility-derived」會暗示 scanner 自動推導，本 plan 明確否決該路線；token 是 metadata-declared，derivation 只發生在 case-variant 展開與 cross-project aggregation。 |
+| P1 | **Metadata-derived forbidden tokens** | 不掃描推導 visibility，而是 project 自己在 metadata 宣告 `visibility: private` + `private_tokens: [...]`。`ai-skill runtime compile` 把所有 project 的宣告 project metadata projection 為 `runtime.db.derived_forbidden_tokens`。Scanner 只查 projection，不做 absence inference。命名理由：早期用過「visibility-derived」一詞會誤導 reviewer 以為 scanner 自動推導 visibility（本 plan 明確否決該路線）；改為 metadata-derived 強調 token 是 project metadata 宣告，derivation 只發生在 case-variant 展開與 cross-project aggregation。 |
 | P2 | **Staged-content scan，不 scan commit message** | `git diff --cached` 的內容；不檢查 `commit -m` 文字。Commit message 由 cognitive mode block + 既有 commit-msg validators 治理；本 plan 不重疊。 |
 | P3 | **覆蓋範圍：shared-layer classification（非 folder name classification）** | `runtime/` 與 `knowledge/runtime/` 邊界會持續模糊；用「該檔是否屬 shared / reusable layer」分類。**Topology surface 獨立於 enforcement**：新建 `runtime/repository-topology.yaml`（canonical），宣告 `shared_layer: true\|false` per source-tree subtree。Scanner 查 topology 而非硬編 folder glob。Topology 將被 sanitization / workflow activation / governance lint / dependency reading 等多個 subsystem 共用 — 不掛 `enforcement-registry.yaml` 避免它變超級桶。 |
 | P4 | **Attestation 禁止** | 不接受 commit body 內 "Sanitization: yes" / "[sanitized]" 自陳。Validator 只做 verification，不做 attestation。理由：自陳是 agent 主觀宣告，與本 plan 要解決的「自律失效」同根。**此原則為 cross-cutting governance，預期被其他 obligation 重用（Dependency Read / Test Executed / Coverage Reviewed 等）。** |
@@ -98,7 +98,7 @@ git pre-commit hook
 **裁決：本 plan supersede sibling `2026-05-31-2000`**。
 
 理由：
-1. Sibling 路線需要每加一個 downstream project 手動更新 allowlist → 與 P1 visibility-derived 原則衝突且 dual SOT
+1. Sibling 路線需要每加一個 downstream project 手動更新 allowlist → 與 P1 metadata-derived 原則衝突且 dual SOT
 2. 2026-06-06 incident 證明 allowlist cold-start window 存在 systemic risk
 3. P6 bootstrap-safe 條件已解決原本傾向 sibling 的「visibility 推論誤殺新概念」風險
 4. Registry rule_class 一個 class 一個 canonical executor，避免 cross-executor verdict drift
@@ -107,10 +107,10 @@ git pre-commit hook
 
 ### Why Not Just Wait for Sibling Plan
 
-| 角度 | Sibling `2026-05-31-2000` (allowlist-based) | This plan (visibility-derived) |
+| 角度 | Sibling `2026-05-31-2000` (allowlist-based) | This plan (metadata-derived) |
 |---|---|---|
-| Source-of-truth | `enforcement/sanitization.yaml` allowlist | 跟著 canonical repo 可見性走，不另建 allowlist |
-| Maintenance cost | 每加一個新 project 要更新 allowlist | 零 — 新 project 進入 `.agent-goals/` 自動被 derive |
+| Source-of-truth | `enforcement/sanitization.yaml` 中央 allowlist | 各 project metadata `private_tokens:` 宣告，projection 為 `derived_forbidden_tokens` |
+| Maintenance cost | 中央 allowlist 必須隨每個新 project 手動更新 | 只有 per-project metadata 維護（owner 在 project 端宣告 `private_tokens`）；framework 端零中央維護、無 cross-project allowlist drift |
 | Drift risk vs `sanitization.md` prose | 中高（dual SOT） | 低（無 dual SOT） |
 | 對 today's incident (214a415) | 若 allowlist 尚未含該 label → miss | 命中（label 在 project-local 出現、在 reusable 缺席） |
 | 與 sibling 共存？ | 兩個 executor 同 rule_class | 視 Q1 裁決 |
@@ -124,7 +124,7 @@ git pre-commit hook
 | 欄位 | 內容 |
 |---|---|
 | Candidate files | 新建 `runtime/sanitization-patterns.yaml`（canonical Phase 2 regex）；新建 `scripts/ai-skill-cli/internal/app/sanitization_scan.go`（scanner）；新建 validator entry in `scripts/ai-skill-cli/internal/app/hooks.go` pre-commit dispatcher；新建 `enforcement/sanitization-mechanical.md`（companion，philosophy + 與 prose `sanitization.md` 邊界）；`enforcement/enforcement-registry.yaml` 更新 `rule_classes[sanitization]` executors block（或新增 second executor entry，依 Q1） |
-| Source-of-truth | `enforcement/sanitization.md` 仍是 prose rule canonical；`runtime/sanitization-patterns.yaml` 是 Phase 2 regex canonical；visibility-derived Phase 1 沒有 forbidden-token canonical（依存可見性查詢） |
+| Source-of-truth | `enforcement/sanitization.md` 仍是 prose rule canonical；`runtime/sanitization-patterns.yaml` 是 Phase 2 regex canonical；Phase 1 forbidden tokens 由各 project metadata `private_tokens:` 宣告，projection 到 `runtime.db.derived_forbidden_tokens`（framework 端無中央 allowlist） |
 | Compiler / generated surfaces | `runtime/sanitization-patterns.yaml` 經 `ai-skill runtime compile` projection 到 `runtime.db.generated_surfaces`；scanner 從 runtime.db 載入 patterns |
 | Layer responsibility | enforcement-mechanical 屬 enforcement layer (rule_class executor)；scanner 屬 runtime layer；pre-commit hook 整合屬 ai-skill-cli layer |
 | 與現行架構衝突 | **與 sibling `2026-05-31-2000` 可能衝突**；Q1 必須先裁決 |
@@ -136,7 +136,7 @@ git pre-commit hook
 
 **In scope**：
 - Pre-commit `git diff --cached` content scanner，scope filter = `plans/** workflow/** enforcement/** governance/** knowledge/**`
-- Phase 1: visibility-derived project label scan
+- Phase 1: metadata-derived project label scan
 - Phase 2: generic regex（email / phone / OS absolute path / credential pattern）
 - Block-on-finding semantics；無 attestation surface
 - `rule_classes[sanitization]` registry entry 更新
@@ -229,7 +229,7 @@ git pre-commit hook
 
 ### Phase 2.5 — Incident-Score Heuristic (warn only, inherited from superseded plan)
 
-補強 Phase 1 visibility-derived 抓不到的「無 private token 但明顯是 project incident」案例（連續的 domain-specific noun cluster、quoted user text、具體 dated filename 引用等）。**warn-only，不 block**，理由：heuristic 性質與 P4 attestation-prohibited 的 deterministic 精神有張力，降為 advisory 守住 deterministic-block 邊界。
+補強 Phase 1 metadata-derived 抓不到的「無 private token 但明顯是 project incident」案例（連續的 domain-specific noun cluster、quoted user text、具體 dated filename 引用等）。**warn-only，不 block**，理由：heuristic 性質與 P4 attestation-prohibited 的 deterministic 精神有張力，降為 advisory 守住 deterministic-block 邊界。
 
 - [ ] 將 sibling plan §Phase 1 `incident_score` weighted-signal schema 整段搬入 `runtime/sanitization-patterns.yaml` `incident_score:` 區段（filename_pattern / quoted_user_text / artifact_string / domain_noun_cluster，weights 5 / 5 / 3 / 1，warn_if_total_score_gte: 7）
 - [ ] Scanner 在 Phase 1+2 全部 pass 時才執行 incident-score；任一 phase block → 跳過（避免 noise）
@@ -254,8 +254,8 @@ git pre-commit hook
 - [ ] Companion `enforcement/sanitization-mechanical.md` cross-link to prose `sanitization.md`
 - [ ] Re-dry-run `ai-skill runtime compile` + enforcement coverage report
 - [ ] Validation scenarios：
-  - `validation/scenarios/runtime/sanitization-visibility-derived-pass-v1.yaml`
-  - `validation/scenarios/runtime/sanitization-visibility-derived-fail-v1.yaml`（commit 214a415 reconstruction）
+  - `validation/scenarios/runtime/sanitization-metadata-derived-pass-v1.yaml`
+  - `validation/scenarios/runtime/sanitization-metadata-derived-fail-v1.yaml`（commit 214a415 reconstruction）
   - `validation/scenarios/runtime/sanitization-placeholder-allowed-v1.yaml`
 - [ ] Owner-grouped commit + push + readback
 
@@ -272,6 +272,7 @@ git pre-commit hook
 | Q5 | ~~`[skip-sanitization-scan]` opt-out marker？~~ | — | **resolved 2026-06-06: reject** | 與 P4 attestation-prohibited 衝突。若未來需要 emergency override，須另開 ADR 設計 admin-override surface（含 owner / reason / time-boxed expiry），不採 commit-message marker。 |
 | Q6 | False-positive 處理機制：suggested_placeholder 是否自動 patch staged content？ | P2 | open | v1 不自動 patch；自動 patch 列 v2 評估。 |
 | Q7 | P4 attestation-prohibited 原則升級為 cross-cutting governance：何時抽出獨立 enforcement rule (`enforcement/verification-not-declaration.md`)，覆蓋 Dependency Read / Test Executed / Coverage Reviewed 等？ | P2 | open | 本 plan 內留 inline；累積 ≥3 個受益 obligation 後 promote 為獨立 rule，列入 parent meta-plan tracking。 |
+| Q8 | Metadata 欄位是否改名 `private_entities` 而非 `private_tokens`？ | P3 (naming) | open | 實際要保護的是 project identity / product names / customer names 等實體；token 是實作層。`private_entities` 語意較準，但 case-variant 展開後的物件仍是字串 token。**非架構級**，Phase 1 metadata schema 設計時收斂。 |
 
 ---
 
@@ -304,7 +305,7 @@ git pre-commit hook
 | 段落 | 棄用理由 |
 |---|---|
 | `sanitization.yaml` 內 `incident_score` block-level threshold | 由 Phase 2.5 warn-level 取代 |
-| 任何 allowlist-style `private_project_names:` / `allowed_tokens:` 設計 | 被 visibility-derived `private_tokens` 取代 |
+| 任何 allowlist-style `private_project_names:` / `allowed_tokens:` 設計 | 被 metadata-derived `private_tokens` 取代 |
 | `[skip-sanitization]` opt-out marker | P4 + Q5 reject |
 | `canonical_paths` / `not_canonical` 硬列清單 | 由 `shared_layer_classification` table 取代 |
 | PreToolUse Write/Edit warning hook | commit-diff-only 立場下不需要（避免 Edit `old_string` 誤判） |
