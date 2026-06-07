@@ -21,7 +21,7 @@ sub_plan_reason: >
   conflicting executor philosophies.
 ---
 
-# Sanitization: Mechanical Enforcement (Visibility-Derived)
+# Sanitization: Mechanical Enforcement (Metadata-Derived)
 
 **Status**: `draft`
 Owner: framework maintainer (linyihong)
@@ -52,12 +52,12 @@ Parent meta-plan §Empirical Evidence 已將 sanitization 列為 instance #2；s
 
 | # | 原則 | 理由 |
 |---|---|---|
-| P1 | **Visibility-derived forbidden tokens** | 不維護 allowlist。判斷規則：若一個 token 只在 single project 出現、且不在 canonical repo 任一 reusable surface 出現過，視為 project-specific evidence 候選。避免「allowlist 與 sanitization.md 雙 SOT 漂移」。 |
+| P1 | **Metadata-derived forbidden tokens** | 不掃描推導 visibility，而是 project 自己在 metadata 宣告 `visibility: private` + `private_tokens: [...]`。`ai-skill runtime compile` 把所有 project 的宣告 project metadata projection 為 `runtime.db.derived_forbidden_tokens`。Scanner 只查 projection，不做 absence inference。命名理由：「visibility-derived」會暗示 scanner 自動推導，本 plan 明確否決該路線；token 是 metadata-declared，derivation 只發生在 case-variant 展開與 cross-project aggregation。 |
 | P2 | **Staged-content scan，不 scan commit message** | `git diff --cached` 的內容；不檢查 `commit -m` 文字。Commit message 由 cognitive mode block + 既有 commit-msg validators 治理；本 plan 不重疊。 |
-| P3 | **覆蓋範圍：shared-layer classification（非 folder name classification）** | `runtime/` 與 `knowledge/runtime/` 邊界會持續模糊；用「該檔是否屬 shared / reusable layer」分類，由 `enforcement-registry.yaml` 宣告 `shared_layer: true\|false` per source-tree subtree，scanner 查 registry 而非硬編 folder glob。Phase 1 同步定義 shared-layer classification table。 |
+| P3 | **覆蓋範圍：shared-layer classification（非 folder name classification）** | `runtime/` 與 `knowledge/runtime/` 邊界會持續模糊；用「該檔是否屬 shared / reusable layer」分類。**Topology surface 獨立於 enforcement**：新建 `runtime/repository-topology.yaml`（canonical），宣告 `shared_layer: true\|false` per source-tree subtree。Scanner 查 topology 而非硬編 folder glob。Topology 將被 sanitization / workflow activation / governance lint / dependency reading 等多個 subsystem 共用 — 不掛 `enforcement-registry.yaml` 避免它變超級桶。 |
 | P4 | **Attestation 禁止** | 不接受 commit body 內 "Sanitization: yes" / "[sanitized]" 自陳。Validator 只做 verification，不做 attestation。理由：自陳是 agent 主觀宣告，與本 plan 要解決的「自律失效」同根。**此原則為 cross-cutting governance，預期被其他 obligation 重用（Dependency Read / Test Executed / Coverage Reviewed 等）。** |
 | P5 | **Phase 順序：label registry → 通用 regex → LLM review (conditional)** | Phase 1 最便宜（純 token 比對）；Phase 2 涵蓋 email / phone / OS path / credential pattern 等可 regex 化的；Phase 3 為前兩階段 surface 不夠時才開（cost / determinism trade-off 留 Phase 3 自己 ADR）。 |
-| P6 | **Bootstrap-safe：visibility 由 project metadata 宣告 derive，非「reusable absent」反推** | 「reusable layer 不存在 → forbidden」會誤殺新概念（e.g. 首次 commit `ActivationBridgeV2` 時 reusable layer 還沒有）。改為兩個必要條件同時成立：(a) token 在 project 宣告的 `visibility: private` metadata 內，AND (b) project-local evidence 出現。新 framework concept 因不在任何 project 的 private metadata 內，自動豁免。 |
+| P6 | **Bootstrap-safe：forbidden 由 project metadata 宣告，非「reusable absent」反推** | 「reusable layer 不存在 → forbidden」會誤殺新概念（e.g. 首次 commit `ActivationBridgeV2` 時 reusable layer 還沒有）。Forbidden 判定改為單一條件：token 出現在某 project 宣告的 `private_tokens` 內。新 framework concept 不在任何 project private_tokens 內 → 自動豁免。完全不做 visibility inference，不做 absence inference。 |
 
 ### Decision
 
@@ -66,11 +66,12 @@ Parent meta-plan §Empirical Evidence 已將 sanitization 列為 instance #2；s
 ```
 git pre-commit hook
   │
-  ├─ Scope filter: shared-layer classification table (registry-driven, not folder glob)
+  ├─ Scope filter: shared-layer classification from runtime/repository-topology.yaml
   │
-  ├─ Phase 1: visibility-derived forbidden token scan
+  ├─ Phase 1: metadata-derived forbidden token scan
   │     derived_forbidden_tokens = compile-time projection from
-  │       project.visibility: private metadata across all known projects
+  │       project metadata `private_tokens: [...]` across all known projects
+  │       (case-variant expansion: CamelCase / kebab-case / SCREAMING_SNAKE)
   │     for each staged file content in shared layer:
   │       for each token in derived_forbidden_tokens:
   │         if token literal/case-variant present:
@@ -86,8 +87,8 @@ git pre-commit hook
 ```
 
 **Source-of-truth (deterministic, not inferred)**：
-- **Forbidden tokens 由 project metadata 宣告**：每個 project (含 `.agent-goals/` project-local 目錄、downstream consumer overlay) 在自身 metadata 內宣告 `visibility: private` 與 `private_tokens: [...]`。`ai-skill runtime compile` 把所有 known project 的 `private_tokens` projection 為 `runtime.db.derived_forbidden_tokens`。Scanner 比對該 table，**不做 absence inference**。新 framework concept（如 `ActivationBridgeV2`）因不在任何 project private_tokens 內，bootstrap-safe 不誤殺。
-- **Shared-layer classification table**：`enforcement/enforcement-registry.yaml` 新增 top-level `shared_layer_classification:` map，宣告 source-tree subtree 是 reusable shared layer (true) 或 implementation/local (false)。Scanner 從 registry 載入而非硬編 folder glob。
+- **Forbidden tokens 由 project metadata 宣告**：每個 project (含 `.agent-goals/` project-local 目錄、downstream consumer overlay) 在自身 metadata 內宣告 `private_tokens: [...]`。`ai-skill runtime compile` 把所有 known project 的 `private_tokens` projection 為 `runtime.db.derived_forbidden_tokens`（含 case-variant expansion + cross-project aggregation）。Scanner 比對該 table，**不做 absence inference、不做 visibility inference**。新 framework concept（如 `ActivationBridgeV2`）因不在任何 project private_tokens 內，bootstrap-safe 不誤殺。
+- **Shared-layer classification**：canonical 來源是 **新建 `runtime/repository-topology.yaml`**（subtree → `shared_layer: true|false` map）。Topology 是 cross-subsystem surface（預期 sanitization / workflow activation / governance lint / dependency reading 共用），刻意不掛 `enforcement-registry.yaml` 避免該 registry 變超級桶。Scanner 從 topology projection 載入，硬編 folder glob 禁止。
 - **Phase 2 regex patterns**：canonical `runtime/sanitization-patterns.yaml`，與 `enforcement/sanitization.md` companion，single SOT。
 
 ### Relationship to sibling 2026-05-31-2000 (supersede)
@@ -162,7 +163,7 @@ git pre-commit hook
 - [ ] Parent meta-plan §Child plans 列表同步更新（移除 sibling 進入 archived 引用，加入本 plan）
 - [ ] Phase 0 不啟動任何 implementation
 
-### Phase 1 — Visibility-Derived Forbidden Token Scanner
+### Phase 1 — Metadata-Derived Forbidden Token Scanner
 
 - [ ] 定義 project metadata schema：`<PROJECT_ROOT>/.ai-skill-project.yaml` (或 overlay 既有 metadata 機制)，欄位：
   ```yaml
@@ -175,8 +176,10 @@ git pre-commit hook
       - <PROJECT_NAME>
       # case variants 自動 derive (CamelCase / kebab / SCREAMING_SNAKE)
   ```
-- [ ] 定義 shared-layer classification table in `enforcement/enforcement-registry.yaml`：
+- [ ] 新建 `runtime/repository-topology.yaml`（canonical cross-subsystem topology surface，**不掛 enforcement-registry**）：
   ```yaml
+  # runtime/repository-topology.yaml
+  schema_version: 1
   shared_layer_classification:
     - subtree: plans/
       shared: true
@@ -196,7 +199,13 @@ git pre-commit hook
       shared: true   # reusable scenarios
     - subtree: .agent-goals/
       shared: false  # project-local
+  expected_consumers:
+    - sanitization (this plan)
+    - workflow_activation (path-signal context)
+    - governance_lint (future)
+    - dependency_reading (future)
   ```
+- [ ] Topology projection target：`runtime.db.repository_topology`（query via `ai-skill runtime ...` CLI）
 - [ ] `ai-skill runtime compile` 階段 projection：所有 known project metadata 的 `private_tokens` → `runtime.db.derived_forbidden_tokens` table (含 case variants expansion)
 - [ ] 實作 scanner core：staged file 落在 shared-layer subtree → 比對 derived_forbidden_tokens → emit finding
 - [ ] **Bootstrap-safe guard**：scanner 不做「reusable layer 是否包含 token」inference；新 framework concept 只要不在任何 project private_tokens 內，自動通過
@@ -259,7 +268,7 @@ git pre-commit hook
 | Q1 | ~~與 sibling 關係~~ | — | **resolved 2026-06-06** | supersede。詳見 §Relationship to sibling。 |
 | Q2 | Visibility metadata 載入機制：scan `<PROJECT_ROOT>/.ai-skill-project.yaml`，還是嵌入既有 routing/overlay metadata？ | P1 | open | Phase 1 ADR；不影響本 plan 接受度。 |
 | Q3 | Phase 3 LLM review 的 miss-rate threshold 是多少才 trigger？ | P2 | open | Phase 3 sub-plan 自己決定。 |
-| Q4 | Shared-layer classification table 進入 `enforcement-registry.yaml` top-level 是否需要 schema migration？ | P1 | open | 預期 additive，不破壞既有 schema。 |
+| Q4 | ~~Shared-layer classification 進 enforcement-registry？~~ | — | **resolved 2026-06-06: 否** | 改建獨立 `runtime/repository-topology.yaml` cross-subsystem surface。Rationale: topology 將被 sanitization / workflow activation / governance lint / dependency reading 共用，掛 enforcement-registry 會讓該 registry 變超級桶（同 parent meta-plan R6 警告的反模式）。 |
 | Q5 | ~~`[skip-sanitization-scan]` opt-out marker？~~ | — | **resolved 2026-06-06: reject** | 與 P4 attestation-prohibited 衝突。若未來需要 emergency override，須另開 ADR 設計 admin-override surface（含 owner / reason / time-boxed expiry），不採 commit-message marker。 |
 | Q6 | False-positive 處理機制：suggested_placeholder 是否自動 patch staged content？ | P2 | open | v1 不自動 patch；自動 patch 列 v2 評估。 |
 | Q7 | P4 attestation-prohibited 原則升級為 cross-cutting governance：何時抽出獨立 enforcement rule (`enforcement/verification-not-declaration.md`)，覆蓋 Dependency Read / Test Executed / Coverage Reviewed 等？ | P2 | open | 本 plan 內留 inline；累積 ≥3 個受益 obligation 後 promote 為獨立 rule，列入 parent meta-plan tracking。 |
