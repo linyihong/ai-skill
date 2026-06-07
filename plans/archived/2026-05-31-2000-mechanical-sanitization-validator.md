@@ -1,11 +1,13 @@
 ---
 id: 2026-05-31-2000-mechanical-sanitization-validator
 plan_kind: sub
-status: in-progress
+status: superseded
+superseded_by: 2026-06-06-1800-sanitization-mechanical-enforcement
+superseded_on: 2026-06-06
 owner: linyihong
 created: 2026-05-31
 parent: 2026-05-31-2100-mechanical-enforcement-registry
-required_for_completion: true
+required_for_completion: false
 sub_plan_reason: >
   Instance #2 of the "rule-without-executor" meta-pattern (parent meta-plan).
   sanitization.md + reusable-guidance-boundary.md state hard rules but lack
