@@ -1,4 +1,4 @@
-version=repo-c5874a8
-source_commit=c5874a8
-built_at=2026-06-05T12:24:00Z
+version=repo-4e9c326
+source_commit=4e9c326
+built_at=2026-06-07T15:50:43Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
