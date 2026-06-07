@@ -1,0 +1,144 @@
+# Workflow Activation Discovery Bridge — Light v1 (Phase A)
+# 鎖定 plan 2026-06-06-1700 Phase A Light Discovery 行為：當 detector miss
+# 時，Discovery Bridge 必須產生 proposal 並（若達 threshold）注入 advisory。
+# 來源：
+#   - plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+#   - scripts/ai-skill-cli/internal/app/discovery.go
+#   - scripts/ai-skill-cli/internal/app/hooks.go (finishPreToolUse → tryDiscoveryAdvisory)
+#   - runtime/discovery-bridge.yaml (config, threshold default 0.5)
+#   - knowledge/runtime/routing-registry.yaml (route.workflow.travel-planning, software-delivery, ...)
+
+id: workflow-discovery-bridge-light-v1
+domain: runtime
+type: regression
+priority: P1
+
+given:
+  task: run_discovery_bridge_on_detector_miss
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/discovery.go
+    - scripts/ai-skill-cli/internal/app/hooks.go
+    - runtime/discovery-bridge.yaml
+    - knowledge/runtime/routing-registry.yaml
+    - knowledge/summaries/travel-planning.md
+  constraints:
+    - "2026-06-05 incident replay：使用者請求對 project-local dated artifact 做 review"
+    - "detector miss（無 user keyword、無 path glob match）→ workflow primary_source gate fail-open"
+    - "本 Phase 不擴 detector schema，純加 Discovery advisory 層"
+    - "Discovery 不得 satisfy activation_triggers（plan §Non-Goals 封印）"
+    - "Discovery 不得自動寫 routing-registry.yaml（plan §Non-Goals 封印）"
+
+scenarios:
+  - id: light_v1_travel_planning_replay
+    description: >
+      2026-06-05 empirical trigger replay。User message 包含 travel 相關名詞
+      + dated artifact basename（如 20260531-下関.md）。Light Discovery
+      必須產 candidate 含 route.workflow.travel-planning，且 score 在
+      threshold 附近（≥ 0.5 視 weights）。即使未達 threshold，proposal row
+      也必須存在於 discovery_proposals（plan Phase A acceptance：proposal
+      應存在）。
+    given:
+      user_message: "幫我 review 這份 20260531-下関.md 的行程內容"
+      detector_state: miss   # 無 active_route
+    when:
+      action: run_discovery_bridge
+    then:
+      proposal_exists: true
+      route_candidates_min: 1
+      best_candidate_includes: route.workflow.travel-planning
+      advisory_injected_when_above_threshold: true
+      proposal_status_one_of:
+        - advised
+        - awaiting_phase_b
+      proposal_status_must_not_be:
+        - dismissed
+        - rejected
+        - expired
+
+  - id: light_v1_cross_project_software_delivery
+    description: >
+      Cross-project case：使用者請求 review 某 SDK 整合中 .ts 檔案的 bug 修復。
+      detector 可能 miss（無 travel keyword、無 file_change_globs），Discovery
+      應提名 route.workflow.software-delivery（extension_hint + keyword match）。
+    given:
+      user_message: "幫我看 src/api/client.ts 這個 SDK 整合 bug 怎麼修"
+      detector_state: miss
+    when:
+      action: run_discovery_bridge
+    then:
+      proposal_exists: true
+      best_candidate_includes: route.workflow.software-delivery
+      advisory_injected_when_above_threshold: true
+
+  - id: light_v1_source_of_truth_guardrail
+    description: >
+      Source-of-truth guardrail：project overlay scanner 只產 signal facts，
+      不可直接產 route candidate。Overlay 寫了 `tags: travel-itinerary` 不
+      代表 Discovery 自動提名 travel-planning — candidate 仍須由 scoring
+      stage 對 routing-registry 評估。
+    given:
+      project_overlay:
+        - path: .ai-skill/project/rules/travel.md
+          content: |
+            ---
+            tags: travel-itinerary
+            ---
+            # Travel rules
+      user_message: "短小無關訊息"   # 不滿足 eligibility
+    when:
+      action: run_discovery_bridge
+    then:
+      proposal_status: expired
+      miss_reason: eligibility_gate_fail
+      reject:
+        - overlay_directly_emits_route_candidate
+        - candidate_proposed_despite_eligibility_fail
+
+  - id: light_v1_advisory_non_blocking
+    description: >
+      Advisory 非阻塞：即使 Discovery 注入 advisory，PreToolUse hook
+      MUST exit 0 + hookSpecificOutput.additionalContext，**不可** emit
+      permissionDecision=deny。
+    given:
+      detector_state: miss
+      discovery_proposal_status: advised
+    when:
+      action: pre_tool_use_hook_fires
+    then:
+      hook_exit_code: 0
+      hook_output_kind: hookSpecificOutput.additionalContext
+      permission_decision_must_not_be: deny
+
+  - id: light_v1_manual_lock_bypass
+    description: >
+      Manual-lock 互動：當 user 手動鎖定 workflow（active manual-lock），
+      Discovery 應跳過 advisory（user 已明示意圖），proposal 標
+      miss_reason=manual_lock_bypass。Q7 deferred-to-phase-c — Phase A
+      程式碼層 enforce eligibility，Phase C 補 governance 明文。
+    given:
+      manual_lock_active: true
+      user_message: "任意內容"
+    when:
+      action: run_discovery_bridge
+    then:
+      proposal_status: expired
+      miss_reason: manual_lock_bypass
+      advisory_injected: false
+
+verification:
+  - "Go unit test TestRunLightDiscovery_TravelPlanningReplay 對真實 registry + summaries 斷言 travel-planning 為 top-1"
+  - "Go unit test TestRunLightDiscovery_SoftwareDelivery_ExtensionHint 斷言 .ts ext 觸發 software-delivery candidate"
+  - "Go unit test TestEligibilityCheck_ShortMessageFails 斷言 short msg → eligibility_gate_fail"
+  - "Go unit test TestRunDiscoveryBridge_ManualLockBypass 斷言 proposal.status=expired + miss_reason=manual_lock_bypass"
+  - "Go unit test TestRunDiscoveryBridge_NonBlocking 斷言 advisory 注入時 hook 仍 exit 0"
+  - "runtime.db 必須有 discovery_proposals 表（runtime_compiler.go::createGoRuntimeSchema 新增）"
+  - "runtime.discovery.config surface 必須由 runtime/discovery-bridge.yaml 投影到 generated_surfaces"
+
+related_plans:
+  - plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+  - plans/archived/2026-05-31-1900-workflow-activation-engine.md  # parent (Phase 6 deferred 補完)
+
+non_goals:
+  - "本 scenario 不涵蓋 Phase B Deep Discovery（PostToolUse Read hijack）"
+  - "本 scenario 不涵蓋 Phase D 三週 empirical KPI 驗證"
+  - "Discovery proposal 不得 modify routing-registry.yaml 自動化（封印）"

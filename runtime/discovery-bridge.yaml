@@ -1,0 +1,114 @@
+schema_version: "1.0"
+id: runtime.discovery-bridge
+status: active
+owner_layer: runtime
+source_markdown: plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.discovery.config
+  surface: generated_surfaces
+
+purpose: >
+  Workflow Activation Discovery Bridge configuration. Holds tunable
+  thresholds and signal weights for Light Discovery (Phase A) and Deep
+  Discovery (Phase B, deferred to next session). Consumed by
+  scripts/ai-skill-cli/internal/app/discovery.go via the projected
+  generated_surfaces[runtime.discovery.config] surface.
+
+  This is CONFIG ONLY, not state. The per-task ephemeral state lives in
+  the runtime.db `discovery_proposals` table (created by
+  runtime_compiler.go::createGoRuntimeSchema, not projected from this YAML).
+
+  Scoring rationale lives in plan §Phase A.1; non-goals (Discovery MUST NOT
+  satisfy activation_triggers, MUST NOT auto-modify routing-registry) live
+  in plan §Decision Rationale §Non-Goals.
+
+phase_a_light:
+  threshold: 0.5
+  budget_p95_ms: 30
+  top_n_candidates: 3
+  evidence_per_candidate_cap: 5
+
+  # Signal weights — see plan §Phase A.1 scoring formula.
+  # Sum is 1.0 by convention; individual match values are normalized [0,1]
+  # so the resulting score lives in [0, ~1.0+] (co-occurring matches add).
+  weights:
+    user_msg_term: 0.30
+    summary_match: 0.25
+    basename_term: 0.15
+    path_segment: 0.10
+    extension_hint: 0.05
+    frontmatter_head: 0.10
+    cwd_overlay: 0.05
+
+  # Extension → route kind hint (used by extension_hint match).
+  # Routes whose primary_source path contains the kind segment get a +1
+  # normalized contribution from this signal.
+  extension_route_hints:
+    ".py": "software-delivery"
+    ".ts": "software-delivery"
+    ".tsx": "software-delivery"
+    ".js": "software-delivery"
+    ".jsx": "software-delivery"
+    ".go": "software-delivery"
+    ".rb": "software-delivery"
+    ".java": "software-delivery"
+    ".kt": "software-delivery"
+    ".swift": "software-delivery"
+    ".rs": "software-delivery"
+
+phase_b_deep:
+  # Phase B is deferred to next session. Values reserved to keep the
+  # config schema stable; discovery.go does not consume these yet.
+  threshold: 0.5
+  budget_p95_ms: 50
+  rescore_on_new_read: true
+
+eligibility:
+  # Discovery Bridge fires ONLY when detector miss AND the task is
+  # substantive enough that proposal generation is worth the cost.
+  # Plan §Runtime Execution Path:eligibility check.
+  min_user_msg_tokens: 6
+  require_artifact_or_imperative: true
+  recent_proposal_dedup_hours: 24
+
+proposal_store:
+  ttl_hours: 24
+  # GC strategy in Phase A: opportunistic eviction on write (same-task_hash
+  # expired rows are DELETEd before INSERTing the new one). A dedicated
+  # GC job is deferred to Phase B/D.
+  on_write_eviction: true
+
+advisory:
+  # Advisory text injected via PreToolUse hookSpecificOutput.additionalContext
+  # when proposal.status=advised.
+  max_tokens_per_inject: 200
+  # Cumulative cap (per-session) — Q8 still-open; Phase A leaves this as a
+  # soft observability target (warn in stderr if exceeded), not enforced.
+  cumulative_cap_per_session: 1000
+  non_blocking: true
+
+# Failure-mode enums consumed by discovery.go.
+miss_reasons:
+  - no_artifact_reference
+  - insufficient_signal
+  - confidence_below_threshold
+  - cost_budget_exceeded
+  - manual_lock_bypass
+  - eligibility_gate_fail
+
+proposal_statuses:
+  - awaiting_phase_b
+  - advised
+  - dismissed
+  - rejected
+  - expired
+
+scoring_version: "light-v1"
+
+# Plan / governance backlinks.
+companion:
+  plan: plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+  consumer_go: scripts/ai-skill-cli/internal/app/discovery.go
+  state_table: discovery_proposals (runtime.db, raw not projected)

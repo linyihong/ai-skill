@@ -1082,11 +1082,22 @@ rule_classes:
     coverage: behavioral_only
     source_files:
       - governance/lifecycle/capability-discovery-philosophy.md
+      - runtime/discovery-bridge.yaml
     rationale: |
       Discovery is the fallback exploration that fires after a detector
       miss; making it per-turn mechanical would explode token cost. The
       correct integration is to trigger Discovery from detector miss
       paths, not to stand it up as an independent mechanical executor.
+
+      Phase A of plan 2026-06-06-1700 (Workflow Activation Discovery
+      Bridge) lands the detector-miss-hot-path auto-invoke + Light
+      Discovery + advisory injection. Persistence target is the per-task
+      `discovery_proposals` SQLite table (not route_candidate_proposals
+      — those remain a separate cross-session promotion store). Success
+      criteria still NOT met (Phase A does not yet write into
+      route_candidate_proposals.yaml); class STAYS behavioral_only until
+      Phase B + Phase D evaluate whether cross-session aggregation is
+      desirable. See plan §Non-Goals封印 and Open Question Q6.
     sunset_decision:
       revisit_when: "Discovery graph-traversal subsystem lands (detector-miss hot-path auto-invoke wired)"
       success_criteria: |

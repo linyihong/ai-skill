@@ -135,6 +135,16 @@ func createGoRuntimeSchema(db *sql.DB) error {
 		`CREATE TABLE capability_checkpoints (id INTEGER PRIMARY KEY AUTOINCREMENT, checkpoint_id TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE cognitive_modes (id INTEGER PRIMARY KEY, task_id TEXT, execution_mode TEXT, context_mode TEXT, governance_mode TEXT, memory_mode TEXT, resolved_at TEXT, source TEXT);`,
 		`CREATE TABLE discovery_signals (id INTEGER PRIMARY KEY AUTOINCREMENT, signal_name TEXT NOT NULL, signal_type TEXT NOT NULL, pattern TEXT, execution_mode TEXT, context_mode TEXT, governance_mode TEXT, memory_mode TEXT, priority INTEGER DEFAULT 0, description TEXT);`,
+		// discovery_proposals: per-task ephemeral state for the Workflow
+		// Activation Discovery Bridge (plan 2026-06-06-1700, Phase A). Raw
+		// data table, NOT projected from a runtime YAML — config lives in
+		// runtime/discovery-bridge.yaml (projected to
+		// generated_surfaces[runtime.discovery.config]), but the proposal
+		// rows themselves are per-task state with TTL 24h.
+		`CREATE TABLE discovery_proposals (id INTEGER PRIMARY KEY AUTOINCREMENT, task_hash TEXT NOT NULL, route_candidates_json TEXT NOT NULL, signal_snapshot_json TEXT NOT NULL, scoring_version TEXT NOT NULL, current_best_confidence REAL NOT NULL, status TEXT NOT NULL, miss_reason TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, expires_at TEXT NOT NULL);`,
+		`CREATE INDEX idx_discovery_proposals_task_hash ON discovery_proposals(task_hash);`,
+		`CREATE INDEX idx_discovery_proposals_status ON discovery_proposals(status);`,
+		`CREATE INDEX idx_discovery_proposals_expires_at ON discovery_proposals(expires_at);`,
 	}
 	for _, statement := range statements {
 		if _, err := db.Exec(statement); err != nil {

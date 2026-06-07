@@ -573,18 +573,137 @@ func preToolUseReadAllowed(host hookHost, toolName string) bool {
 
 // finishPreToolUse runs the workflow activation-evidence gate after the
 // bootstrap gate is satisfied, then returns the final PreToolUse exit code.
+//
+// When the activation-evidence gate does NOT block AND the detector
+// missed (no single locked route), the Discovery Bridge (Phase A Light
+// Discovery, plan 2026-06-06-1700) gets a chance to produce an advisory
+// — non-blocking, injected via hookSpecificOutput.additionalContext.
 func finishPreToolUse(host hookHost, transcriptPath, projectDir string, stdout, stderr io.Writer) int {
-	block, routeID, ps := workflowPrimarySourceGate(transcriptPath, resolveClaudeAiSkillRepo(projectDir))
-	if !block {
+	aiSkillRepo := resolveClaudeAiSkillRepo(projectDir)
+	block, routeID, ps := workflowPrimarySourceGate(transcriptPath, aiSkillRepo)
+	if block {
+		_, _ = fmt.Fprintf(stderr, "BLOCK_WORKFLOW_PRIMARY_SOURCE route=%s primary_source=%s\n", routeID, ps)
+		reason := fmt.Sprintf("Workflow activation evidence missing (gate.workflow.primary_source_read). "+
+			"The detector locked active_route=%s for this task, but its primary_source has not been Read yet:\n  %s\n"+
+			"Read that workflow primary_source before other (non-Read) tool calls so execution follows the activated "+
+			"workflow. This gate fires ONLY on a single locked route — never on a detector miss or multi-route conflict — "+
+			"and self-clears once you Read the file above (or pivot the task so a different route activates).", routeID, ps)
+		return renderPreToolUseDecision(host, stdout, hookDecision{Deny: true, Reason: reason})
+	}
+	// Detector miss / conflict / no-route path: try Discovery Bridge.
+	// Fail-open everywhere — any error path returns ExitSuccess with no
+	// advisory. Discovery is advisory-only; it never blocks.
+	if advisory := tryDiscoveryAdvisory(transcriptPath, aiSkillRepo, stderr); advisory != "" {
+		return renderPreToolUseAdditionalContext(host, stdout, advisory)
+	}
+	return ExitSuccess
+}
+
+// tryDiscoveryAdvisory runs Light Discovery when the detector has missed.
+// Returns the advisory text to inject, or "" if Discovery should not fire
+// or produced nothing. Fail-open: any error returns "".
+func tryDiscoveryAdvisory(transcriptPath, aiSkillRepo string, stderr io.Writer) string {
+	if transcriptPath == "" || aiSkillRepo == "" {
+		return ""
+	}
+	registry, err := readRuntimeRoutingRegistry(filepath.Join(aiSkillRepo, "knowledge", "runtime", "routing-registry.yaml"))
+	if err != nil {
+		return ""
+	}
+	transcript := extractTranscriptMessages(transcriptPath)
+	if len(transcript) == 0 {
+		return ""
+	}
+	ctx := BuildRuntimeContext(registry, transcript, nil, time.Now().UTC())
+	// Only fire on a true miss / multi-route conflict where ActiveRoute is
+	// empty. If detector locked a route, the gate above handled it.
+	if ctx.ActiveRoute != "" {
+		return ""
+	}
+	input := buildDiscoveryInputFromTranscript(transcript)
+	if input.UserMessage == "" {
+		return ""
+	}
+	runtimeDB := filepath.Join(aiSkillRepo, "runtime", "runtime.db")
+	advisory, _, derr := RunDiscoveryBridge(input, aiSkillRepo, runtimeDB, false /* manualLockActive */)
+	if derr != nil {
+		_, _ = fmt.Fprintf(stderr, "DISCOVERY_BRIDGE_ERR: %v\n", derr)
+		return ""
+	}
+	return advisory
+}
+
+// buildDiscoveryInputFromTranscript extracts the latest user message and
+// any artifact-shaped tokens it references.
+func buildDiscoveryInputFromTranscript(transcript []DetectorMessage) DiscoveryInput {
+	var input DiscoveryInput
+	for i := len(transcript) - 1; i >= 0; i-- {
+		if transcript[i].Role == "user" {
+			input.UserMessage = transcript[i].Text
+			break
+		}
+	}
+	if input.UserMessage == "" {
+		return input
+	}
+	basenames, paths, exts := extractArtifactTokens(input.UserMessage)
+	input.Basenames = basenames
+	input.Paths = paths
+	input.Extensions = exts
+	if cwd, err := os.Getwd(); err == nil {
+		input.Cwd = cwd
+	}
+	return input
+}
+
+var artifactPathRE = regexp.MustCompile(`[A-Za-z0-9_\-./\\]+\.[A-Za-z0-9]{1,8}`)
+var versionRE = regexp.MustCompile(`^\d+(\.\d+){1,3}$`)
+
+func extractArtifactTokens(msg string) (basenames, paths, exts []string) {
+	seenBn, seenPath, seenExt := map[string]bool{}, map[string]bool{}, map[string]bool{}
+	for _, m := range artifactPathRE.FindAllString(msg, -1) {
+		if strings.Contains(m, "://") || strings.HasPrefix(m, ".") || strings.HasSuffix(m, ".") {
+			continue
+		}
+		clean := filepath.ToSlash(m)
+		if versionRE.MatchString(clean) {
+			continue
+		}
+		bn := filepath.Base(clean)
+		ext := strings.ToLower(filepath.Ext(bn))
+		if ext == "" || len(ext) > 8 {
+			continue
+		}
+		if !seenBn[bn] {
+			seenBn[bn] = true
+			basenames = append(basenames, bn)
+		}
+		if strings.ContainsRune(clean, '/') && !seenPath[clean] {
+			seenPath[clean] = true
+			paths = append(paths, clean)
+		}
+		if !seenExt[ext] {
+			seenExt[ext] = true
+			exts = append(exts, ext)
+		}
+	}
+	return
+}
+
+// renderPreToolUseAdditionalContext emits an allow-path PreToolUse JSON
+// payload carrying advisory text via hookSpecificOutput.additionalContext.
+// Cursor / unknown hosts skip the JSON write (no equivalent injection).
+func renderPreToolUseAdditionalContext(host hookHost, stdout io.Writer, advisory string) int {
+	if host != hostClaude {
 		return ExitSuccess
 	}
-	_, _ = fmt.Fprintf(stderr, "BLOCK_WORKFLOW_PRIMARY_SOURCE route=%s primary_source=%s\n", routeID, ps)
-	reason := fmt.Sprintf("Workflow activation evidence missing (gate.workflow.primary_source_read). "+
-		"The detector locked active_route=%s for this task, but its primary_source has not been Read yet:\n  %s\n"+
-		"Read that workflow primary_source before other (non-Read) tool calls so execution follows the activated "+
-		"workflow. This gate fires ONLY on a single locked route — never on a detector miss or multi-route conflict — "+
-		"and self-clears once you Read the file above (or pivot the task so a different route activates).", routeID, ps)
-	return renderPreToolUseDecision(host, stdout, hookDecision{Deny: true, Reason: reason})
+	_ = json.NewEncoder(stdout).Encode(map[string]any{
+		"hookSpecificOutput": map[string]any{
+			"hookEventName":     "PreToolUse",
+			"additionalContext": advisory,
+		},
+	})
+	return ExitSuccess
 }
 
 // md5Short returns the first 12 hex chars of the MD5 hash of s.
