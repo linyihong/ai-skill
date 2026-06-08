@@ -10,6 +10,8 @@ source_intelligence:
 - [`intelligence/engineering/requirements/product-alignment/README.md`](../../intelligence/engineering/requirements/product-alignment/README.md)
 - [`workflow/software-delivery/requirements/README.md`](../../workflow/software-delivery/requirements/README.md)
 - [`workflow/software-delivery/development-process.md`](../../workflow/software-delivery/development-process.md)
+- [`workflow/software-delivery/ui-contracts.md`](../../workflow/software-delivery/ui-contracts.md)
+- [`workflow/software-delivery/ui-governance.md`](../../workflow/software-delivery/ui-governance.md)
 
 本文件把 pre-build interrogation、product alignment、requirements cognition、docs-first BDD closure、contract-first development 與 development guidance 的風險翻譯方法轉譯成 AI runtime software-delivery governance。原始 intelligence 回答「如何確認產品方向、穩定 observable behavior、acceptance、traceability 與 validation target」；本文件定義 change intake、pre-build interrogation、product alignment、requirements cognition、contract precedence、BDD closure、artifact completeness、performance evidence 與 same-session documentation closure 的治理 gate。
 
@@ -18,7 +20,7 @@ source_intelligence:
 在下列情況套用本治理：
 
 - 使用者要求 implement、develop、SDK、API、embedded、plan、code review 或 design review。
-- 變更可能影響 observable behavior、public contract、domain invariant、API/schema、error handling、storage、安全性、ownership、tests 或 performance。
+- 變更可能影響 observable behavior、public contract、domain invariant、API/schema、UI / consumer surface、error handling、storage、安全性、ownership、tests 或 performance。
 - Product brief、BDD、contract、implementation 或 tests 之間出現 mismatch。
 - 回填已實作專案的 BDD、contract、test plan、hardware/embedded evidence 或 traceability。
 
@@ -35,6 +37,7 @@ source_intelligence:
 | Docs-first BDD closure | Observable behavior 變更前，owning contract、BDD scenario、executable validation 與 implementation slice 已同步或明確 scope out。 |
 | Refactor parity | 重構、遷移、改寫或 replacement 會替代既有功能、入口、腳本、API、資料流程、runtime surface 或操作流程時，已建立新舊能力 parity inventory，並為每個舊入口標明新入口、parity 狀態、副作用、外部依賴與測試 / fixture 證據。 |
 | Artifact completeness | Change brief、contract、BDD scenario、implementation plan、review report 或 project-local equivalent 已產出或標記 not applicable。 |
+| UI governance advisory projection | UI compliance claim 已載入 `sd-ui-governance`，並分類 governance domain、validation mechanism、evidence class、severity、project-local design-system policy 與 visual / AI review scope；此 gate 在本階段是 workflow / review advisory，不是 runtime hard block。 |
 | Test strategy | 新行為與舊行為 regression 分開驗證；contract、fixture、integration、property、targeted mutation check 或 hardware-in-loop evidence 依風險選擇。 |
 | Performance evidence | 影響 latency、throughput、資源、concurrency、external-call fan-out 時，不以功能測試取代 performance budget / smoke / load / stress / spike / soak evidence。 |
 | Same-session closure | Code、docs、contracts、BDD、tests、generated clients、fixtures 與 linked updates 在同一批次閉環，或留下明確 owner 與 scoped debt。 |
@@ -57,6 +60,8 @@ source_intelligence:
 - [`workflow/software-delivery/requirements/pre-build-interrogation.md`](../../workflow/software-delivery/requirements/pre-build-interrogation.md) — plan / implementation 前的需求拷問、framework discovery 與 source-of-truth duplication gate。
 - [`workflow/software-delivery/execution-flow.md`](../../workflow/software-delivery/execution-flow.md) — software-delivery workflow entry and execution order。
 - [`workflow/software-delivery/development-process.md`](../../workflow/software-delivery/development-process.md) — contract-first development process and detailed gates。
+- [`workflow/software-delivery/ui-contracts.md`](../../workflow/software-delivery/ui-contracts.md) — expected UI / consumer behavior contracts。
+- [`workflow/software-delivery/ui-governance.md`](../../workflow/software-delivery/ui-governance.md) — UI compliance classification surface for domains, mechanisms, evidence, severity, and advisory runtime projection boundary。
 - [`workflow/software-delivery/artifact-gates.md`](../../workflow/software-delivery/artifact-gates.md) — reusable note structure and artifact quality gates。
 - [`analysis/development-guidance/README.md`](../../analysis/development-guidance/README.md) — development guidance analysis methods。
 
@@ -75,6 +80,34 @@ source_intelligence:
 
 任何 promotion 都必須另開 plan，確認 compiler / generated surface；預設維持 metadata-only。
 
+### UI Governance Advisory Candidates
+
+UI governance signals are runtime-lite advisory projections. They name review pressure but do not create a runtime hard block, generated surface, detector, or enforcement rule_class in this landing.
+
+Path:
+
+```text
+event: UI / consumer surface compliance claim
+→ detector / route / query: route.workflow.software-delivery loads execution-flow.md
+→ loaded source: workflow/software-delivery/ui-governance.md
+→ advisory projection: candidate signal named below
+→ evidence: UI governance domain + mechanism + evidence class + severity + project-local policy
+```
+
+Candidate signals:
+
+- `missing_ui_contract_state`：UI contract / screen evidence lacks required loading, empty, error, success, permission, or retry state.
+- `raw_design_token_detected`：project-local policy requires tokens / approved primitives but artifact or review evidence shows raw style escape hatch.
+- `destructive_action_missing_confirmation`：delete, revoke, reset, irreversible submit, or permission-sensitive action lacks objective confirmation / recovery behavior.
+- `visual_claim_without_baseline`：visual quality, regression, or parity is claimed without deterministic baseline, capture context, or scoped review evidence.
+- `ai_visual_validator_without_scope`：AI visual review is used without rubric, prompt scope, warning/research severity, or human/project opt-in boundary.
+
+Promotion boundary:
+
+- Advisory signals may trigger `sd-ui-governance` loading, review checklist attention, or evidence-template completion.
+- Blocking enforcement requires a separate promotion plan naming executor, detector input, evidence threshold, generated surface, registry transition, and rollback path.
+- `enforcement/enforcement-registry.yaml` is intentionally unchanged in the first landing.
+
 ## Validation Candidate
 
 後續若要 promotion 到 `validation/`，可建立 scenario 檢查：
@@ -90,3 +123,5 @@ source_intelligence:
 - Refactor / replacement 只描述新設計，沒有盤點舊入口、舊能力、副作用、外部依賴、new surface mapping 與 parity 測試證據。
 - Performance-sensitive change 只用 unit/functional tests 宣稱可 release。
 - Existing project backfill 憑空創造 product intent，而不是標記 `unknown` 或 `open question`。
+- UI compliance claim 缺少 domain / mechanism / evidence class / severity classification。
+- Visual quality claim 沒有 screenshot baseline 或 AI visual review scope。

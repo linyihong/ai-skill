@@ -12,7 +12,7 @@ priority: P2
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 software-delivery workflow hardening
 **建立日期**：2026-06-08
-**最後更新**：2026-06-08（Phase 3 artifacts and review gates wired）
+**最後更新**：2026-06-08（Phase 4 advisory governance boundary wired）
 **Priority**：**P2**
 
 本 plan 將 UI/UX 風格治理納入 `workflow/software-delivery/`，新增 `sd-ui-governance` cognitive slice，讓現有 `sd-ui-contracts` 產出的 UI contract、screen state、ViewModel、Accessibility expectation 能進一步被 deterministic validator、visual regression evidence、以及 scoped AI visual review 消費。
@@ -393,24 +393,24 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 
 ## Phase 4 — Governance, Routing, and Registry Integration
 
-- [ ] Update `governance/ai-runtime-governance/software-delivery-governance.md` with UI Governance advisory projection boundary, not a blocking runtime gate.
-- [ ] Add runtime-lite advisory candidate signals:
-  - [ ] `missing_ui_contract_state`
-  - [ ] `raw_design_token_detected`
-  - [ ] `destructive_action_missing_confirmation`
-  - [ ] `visual_claim_without_baseline`
-  - [ ] `ai_visual_validator_without_scope`
-- [ ] Update `governance/cognitive-slice-taxonomy.md` software-delivery slice inventory.
-- [ ] Update `knowledge/runtime/routing-registry.yaml` dependencies and triggers if Phase 0 decides it is needed.
-- [ ] Do not add `enforcement/enforcement-registry.yaml` rule_class in the first landing.
-- [ ] If mechanical enforcement later enters scope, open a separate child plan or ADR-backed promotion decision with named executor, evidence thresholds, and registry transition rationale.
+- [x] Update `governance/ai-runtime-governance/software-delivery-governance.md` with UI Governance advisory projection boundary, not a blocking runtime gate.
+- [x] Add runtime-lite advisory candidate signals:
+  - [x] `missing_ui_contract_state`
+  - [x] `raw_design_token_detected`
+  - [x] `destructive_action_missing_confirmation`
+  - [x] `visual_claim_without_baseline`
+  - [x] `ai_visual_validator_without_scope`
+- [x] Update `governance/cognitive-slice-taxonomy.md` software-delivery slice inventory.
+- [x] Review `knowledge/runtime/routing-registry.yaml` dependencies and triggers; no additional change needed because Phase 2 already added `ui-governance.md` as a software-delivery required dependency and Phase 4 keeps runtime-lite signals advisory-only.
+- [x] Do not add `enforcement/enforcement-registry.yaml` rule_class in the first landing.
+- [x] If mechanical enforcement later enters scope, open a separate child plan or ADR-backed promotion decision with named executor, evidence thresholds, and registry transition rationale.
 
 ### Phase 4 Acceptance
 
-- [ ] Runtime path names event → detector / route / query → loaded source → advisory projection → evidence.
-- [ ] No generated surface or rule_class is left without named consumer.
-- [ ] No workflow rule is duplicated between `ui-governance.md` and `software-delivery-governance.md`.
-- [ ] Registry updates are explicitly out of scope unless a follow-up promotion plan is accepted.
+- [x] Runtime path names event → detector / route / query → loaded source → advisory projection → evidence.
+- [x] No generated surface or rule_class is left without named consumer.
+- [x] No workflow rule is duplicated between `ui-governance.md` and `software-delivery-governance.md`.
+- [x] Registry updates are explicitly out of scope unless a follow-up promotion plan is accepted.
 
 ---
 
