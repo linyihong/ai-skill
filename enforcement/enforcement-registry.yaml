@@ -830,9 +830,10 @@ rule_classes:
       runs only at `runtime validate` time (post-hoc); this rule fires at
       commit-msg so stale-index drift cannot land. Uses staged-blob
       content (git show :path), so partial stage (`git add -p`) and
-      post-stage worktree edits do not false-positive. Also blocks staged
-      markdowns that sit in a directory tracked by the index but have no
-      row, closing the "new-markdown-without-refresh" coverage hole.
+      post-stage worktree edits do not false-positive. The runtime index
+      builder's `sources` table is the canonical source inventory: files
+      with source rows must match their staged checksum; files without
+      source rows are outside this validator's freshness scope.
     verification_status:
       symbol_exists: ✓
       scenario_exists: pending

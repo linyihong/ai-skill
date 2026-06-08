@@ -22,6 +22,7 @@ AI 自動避雷。
 - [`shotgun-debugging.md`](shotgun-debugging.md) — Troubleshooting / fix 階段同時改多個 unrelated 變數，沒 baseline / 沒單變數變更 / 沒 after 對照；應走 measure → process → verify 三段式。AI 輔助下被放大十倍。
 - [`mock-completeness-illusion.md`](mock-completeness-illusion.md) — Unit / domain / adapter / API mock 測試看似完整，但 evidence depth 不足以支持 live system claim。
 - [`validation-proxy-trap.md`](validation-proxy-trap.md) — 把 API 200、adapter success、queue publish 等 proxy signal 誤認成最終 business/user proof。
+- [`coverage-boundary-mismatch.md`](coverage-boundary-mismatch.md) — Validator 推論的 coverage 範圍比 source generator 實際產生的 canonical inventory 更大，造成 refresh/validate 成功但 freshness gate 失敗。
 
 ## 與根目錄 `anti-patterns/` 的差異
 

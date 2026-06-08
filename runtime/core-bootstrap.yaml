@@ -438,9 +438,10 @@ per_commit_obligations:
       Mirrors the runtime_index_native stale-checksum invariant at commit
       time so drift cannot land. Uses staged-blob content (git show :path),
       not worktree, so partial-stage (`git add -p`) and post-stage worktree
-      edits do not false-positive. Also blocks staged markdowns that sit in
-      a directory tracked by the index but have no row (the
-      "new-markdown-without-refresh" coverage hole).
+      edits do not false-positive. The runtime index builder's `sources`
+      table is the canonical source inventory: files with source rows must
+      match their staged checksum; files without source rows are outside this
+      validator's freshness scope.
 
 per_commit_dispatcher_status:
   machine_iterable: true

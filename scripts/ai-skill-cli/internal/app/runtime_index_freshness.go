@@ -6,19 +6,17 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"sort"
 	"strings"
 )
 
 // validateRuntimeIndexFreshness is a commit-msg validator that enforces the
-// invariant: the staged tree's tracked markdown files agree (by SHA-256
-// checksum) with the rows recorded in the staged
-// knowledge/runtime/sqlite/runtime-index.sqlite. It also asserts that any
-// staged markdown sitting under a directory already tracked by the index has
-// a matching row, preventing the "new markdown landed without runtime
-// refresh" failure mode.
+// invariant: staged markdown files that are present in the runtime index source
+// inventory agree (by SHA-256 checksum) with the rows recorded in the staged
+// knowledge/runtime/sqlite/runtime-index.sqlite. The runtime index builder is
+// the canonical coverage boundary; this validator must not infer broader
+// coverage from sibling directories.
 //
 // Opt-out: standalone "[skip-runtime-index-freshness]" trailer.
 //
@@ -88,7 +86,7 @@ func validateRuntimeIndexFreshness(text string, staged []string, root string) st
 	}
 	defer db.Close()
 
-	// Build (path → checksum) map and tracked-directory set.
+	// Build the source inventory defined by runtime-index.sqlite.
 	rows, err := db.Query("SELECT source_path, checksum FROM sources WHERE checksum IS NOT NULL AND checksum != ''")
 	if err != nil {
 		// sources table may not exist in degenerate fixtures; skip.
@@ -96,7 +94,6 @@ func validateRuntimeIndexFreshness(text string, staged []string, root string) st
 	}
 	defer rows.Close()
 	indexed := map[string]string{}
-	trackedDirs := map[string]struct{}{}
 	for rows.Next() {
 		var sp, ck string
 		if err := rows.Scan(&sp, &ck); err != nil {
@@ -104,7 +101,6 @@ func validateRuntimeIndexFreshness(text string, staged []string, root string) st
 		}
 		sp = filepath.ToSlash(sp)
 		indexed[sp] = ck
-		trackedDirs[path.Dir(sp)] = struct{}{}
 	}
 	if err := rows.Err(); err != nil {
 		return fmt.Sprintf("runtime-index-freshness: iterate sources failed: %v", err)
@@ -113,7 +109,6 @@ func validateRuntimeIndexFreshness(text string, staged []string, root string) st
 	resolver := newStagedBlobResolver(root)
 
 	var staleViolations []string
-	var missingViolations []string
 
 	// Deterministic ordering for stable error messages.
 	stagedSorted := append([]string(nil), staged...)
@@ -141,17 +136,10 @@ func validateRuntimeIndexFreshness(text string, staged []string, root string) st
 			if actual != expected {
 				staleViolations = append(staleViolations, rel)
 			}
-			continue
-		}
-		// Not tracked — but if a sibling under the same directory IS tracked,
-		// the indexer was expected to cover this directory and refresh would
-		// pick this file up. Block.
-		if _, ok := trackedDirs[path.Dir(rel)]; ok {
-			missingViolations = append(missingViolations, rel)
 		}
 	}
 
-	if len(staleViolations) == 0 && len(missingViolations) == 0 {
+	if len(staleViolations) == 0 {
 		return ""
 	}
 
@@ -159,10 +147,6 @@ func validateRuntimeIndexFreshness(text string, staged []string, root string) st
 	if len(staleViolations) > 0 {
 		parts = append(parts, "stale checksum(s) — staged markdown content disagrees with runtime-index.sqlite:\n    - "+
 			strings.Join(staleViolations, "\n    - "))
-	}
-	if len(missingViolations) > 0 {
-		parts = append(parts, "missing index row(s) — staged markdown sits in a tracked directory but has no row in runtime-index.sqlite:\n    - "+
-			strings.Join(missingViolations, "\n    - "))
 	}
 
 	return "runtime-index-freshness:\n  " + strings.Join(parts, "\n  ") +

@@ -160,7 +160,7 @@ func TestRuntimeIndexFreshnessPartialStageNotFalsePositive(t *testing.T) {
 	}
 }
 
-func TestRuntimeIndexFreshnessMissingRowInTrackedDirBlocked(t *testing.T) {
+func TestRuntimeIndexFreshnessUnindexedSiblingAllowed(t *testing.T) {
 	repo := initTempGitRepo(t)
 
 	existingRel := "enforcement/existing.md"
@@ -171,20 +171,15 @@ func TestRuntimeIndexFreshnessMissingRowInTrackedDirBlocked(t *testing.T) {
 
 	indexAbs := filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")
 	mkParent(t, indexAbs)
-	// Only existing.md is in the index; new.md is in a tracked dir but has no row.
+	// Only existing.md is in the source inventory. A sibling markdown without a
+	// source row is outside the runtime index builder's canonical coverage.
 	seedRuntimeIndex(t, indexAbs, map[string]string{
 		existingRel: "# Existing\n",
 	})
 
 	got := validateRuntimeIndexFreshness("feat: add new rule", []string{existingRel, newRel}, repo)
-	if got == "" {
-		t.Fatalf("expected block for missing row in tracked dir")
-	}
-	if !strings.Contains(got, "missing index row") {
-		t.Errorf("expected missing-row violation, got %q", got)
-	}
-	if !strings.Contains(got, newRel) {
-		t.Errorf("expected violation to cite %s, got %q", newRel, got)
+	if got != "" {
+		t.Errorf("unindexed sibling markdown should be outside freshness scope, got %q", got)
 	}
 }
 
