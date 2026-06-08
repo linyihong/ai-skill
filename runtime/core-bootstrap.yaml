@@ -21,10 +21,10 @@ purpose: >
   generated_surfaces[runtime.core_bootstrap.contract] rather than parse
   prose.
 
-  Scope (Phase 1 of bootstrap-contract-yaml-migration): 3 required_reads
-  + 3 obligations (Bootstrap Receipt, Cognitive Mode block per-turn,
-  Cognitive Mode block per-commit). Lazy-load rules (9) and detailed
-  format examples remain in companion .md for now.
+  Scope: required_reads, contextual activations, per-session obligations,
+  per-turn obligations, per-commit obligations, and phase_state_init. This
+  YAML is the canonical source for obligation IDs, formats, enums, and
+  validator-facing metadata.
 
 required_reads:
   - id: rule-weight
@@ -126,8 +126,8 @@ per_session_obligations:
       from runtime/runtime.db (`SELECT COUNT(*) FROM obligations` and
       `SELECT COUNT(*) FROM gates`), populated by the phase_machine
       projections. These are DIFFERENT counts than the obligations defined
-      inline in this YAML file (which has per_session=1, per_turn=2,
-      per_commit=19 = 22 total). The discrepancy is intentional: the YAML
+      inline in this YAML file (which has per_session=1, per_turn=4,
+      per_commit=19 = 24 total). The discrepancy is intentional: the YAML
       defines the bootstrap contract surface; runtime.db tracks the
       broader phase_machine obligation set (init_ledger, checkpoint,
       execution, finalize, push, readback, recovery, validation families).
@@ -148,9 +148,9 @@ per_session_obligations:
       # ILLUSTRATIVE ONLY — do not copy these numbers.
       # The runtime.db totals drift as obligations/gates are added; resolve at
       # session start via `ai-skill runtime receipt`. As of 2026-05-30 the live
-      # values were obligations=23 gates=25 with two active per-turn obligations.
+      # values were obligations=23 gates=25 before later per-turn additions.
       Bootstrap: rules=✓ phase=phase.bootstrap obligations=<from runtime.db> gates=<from runtime.db>
-      Active per-turn obligations: obligation.cognitive.mode_report, obligation.finality.close_loop_check
+      Active per-turn obligations: obligation.cognitive.mode_report, obligation.feedback.learning_report, obligation.finality.close_loop_check, obligation.workflow.activation_evidence
     note: |
       Summary "Resume directly" does NOT exempt this obligation; resume
       sessions should emit Receipt on the first user-facing message.
@@ -179,6 +179,63 @@ per_turn_obligations:
       event MUST install a close-out check that blocks or loops back when the
       final user-facing response lacks either compact `Cognitive:` form or full
       `### Cognitive Mode 報告`.
+  - id: obligation.feedback.learning_report
+    fires: final_user_facing_response_or_session_stop
+    format_options:
+      compact: |
+        FeedbackDecision: NONE|NEEDED|UNKNOWN
+        RepoContext: LOCAL|NON_LOCAL|UNKNOWN
+        Writeback: COMPLETED|DEFERRED|UNAVAILABLE|N/A
+        Target: feedback-history|intelligence|workflow|enforcement|project-docs  # only when FeedbackDecision: NEEDED
+      full: "### Feedback / Learning Report + markdown table"
+    compact_order:
+      - FeedbackDecision
+      - RepoContext
+      - Writeback
+      - Target
+    enum_values:
+      feedback_decision:
+        - NONE
+        - NEEDED
+        - UNKNOWN
+      repo_context:
+        - LOCAL
+        - NON_LOCAL
+        - UNKNOWN
+      writeback_status:
+        - COMPLETED
+        - DEFERRED
+        - UNAVAILABLE
+        - N/A
+      target:
+        - none
+        - feedback-history
+        - intelligence
+        - workflow
+        - enforcement
+        - project-docs
+    required_field_combinations:
+      - when: "FeedbackDecision == NEEDED"
+        require:
+          - Target
+        note: >
+          NEEDED must name the durable target and report writeback capability.
+      - when: "FeedbackDecision != NEEDED"
+        allow_target: false
+        note: >
+          NONE/UNKNOWN do not require Target; use full form if a reason is
+          needed.
+    enforcement_layer: behavioral_per_turn + stop_hook_schema
+    severity: high
+    note: |
+      This obligation reports learning disposition only: whether the current
+      turn produced reusable knowledge that should be written back, what repo
+      context was visible, and whether writeback was completed/deferred/
+      unavailable. It does not classify knowledge quality, promotion lifecycle,
+      economics, memory, telemetry, or linked-update completion. Stop hooks
+      should validate presence, schema shape, enum values, and required field
+      combinations only; semantic correctness belongs to validation scenarios
+      and review. Commit messages are explicitly out of scope.
   - id: obligation.finality.close_loop_check
     fires: task_completion_or_session_end
     action: |

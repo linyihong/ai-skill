@@ -304,10 +304,12 @@ Phase 0 result: proceed to Phase 1. No architecture conflict found. Existing act
 
 ## Phase 1 — Runtime Contract
 
-- [ ] Add `obligation.feedback.learning_report` to `runtime/core-bootstrap.yaml`.
-- [ ] Update `CORE_BOOTSTRAP.md` companion with compact/full report examples and rationale.
-- [ ] Decide final compact grammar and enum values.
+- [x] Add `obligation.feedback.learning_report` to `runtime/core-bootstrap.yaml`.
+- [x] Update `CORE_BOOTSTRAP.md` companion with compact/full report examples and rationale.
+- [x] Decide final compact grammar and enum values.
 - [x] Decide whether this obligation is chat/session-only or also commit-msg. Decision: chat/session final response only; commit message not required.
+
+Phase 1 result: runtime contract now owns the feedback report obligation, compact key order, enum values, and required field combinations. `CORE_BOOTSTRAP.md` remains companion-only and points to the YAML canonical schema. Hook implementation is intentionally deferred to Phase 2.
 
 ## Phase 2 — Hook Enforcement
 
