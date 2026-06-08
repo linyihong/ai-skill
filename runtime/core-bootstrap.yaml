@@ -221,10 +221,10 @@ per_turn_obligations:
         note: >
           NEEDED must name the durable target and report writeback capability.
       - when: "FeedbackDecision != NEEDED"
-        allow_target: false
+        allow_target: "omitted_or_none"
         note: >
-          NONE/UNKNOWN do not require Target; use full form if a reason is
-          needed.
+          NONE/UNKNOWN do not require Target. Full table form may use
+          `target: none` when keeping a fixed table shape.
     enforcement_layer: behavioral_per_turn + stop_hook_schema
     severity: high
     note: |

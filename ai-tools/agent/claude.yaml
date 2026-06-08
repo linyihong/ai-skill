@@ -83,7 +83,7 @@ required_evidence:
 
 success_criteria:
   - Claude Code loads CLAUDE.md, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, ai-tools/agent/claude.md, and .claude settings as appropriate.
-  - Claude-specific hook enforcement is explicit, implemented, and isolated from shared thin-entrypoint rules.
+  - Claude-specific hook enforcement is explicit, implemented, and isolated from shared thin-entrypoint rules, including final close-out checks for Bootstrap Receipt, Cognitive Mode reporting, Feedback / Learning Report, and required Project Git Report.
   - Tool-specific content stays in the adapter layer.
   - Execution-affecting adapter changes are projected and validated.
 

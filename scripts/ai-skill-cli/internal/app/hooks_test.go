@@ -498,7 +498,7 @@ func TestRunStopHookAllowsCursorStopMissingAssistantText(t *testing.T) {
 }
 
 func TestRunStopHookAllowsCursorPayloadWithCompactCognitive(t *testing.T) {
-	setHookStdin(t, `{"assistant_response":"Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25\nActive per-turn obligations: obligation.cognitive.mode_report, obligation.finality.close_loop_check\n\nDone.\n\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast"}`)
+	setHookStdin(t, fmt.Sprintf(`{"assistant_response":%q}`, validStopCloseOutText()))
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -509,13 +509,111 @@ func TestRunStopHookAllowsCursorPayloadWithCompactCognitive(t *testing.T) {
 }
 
 func TestRunStopHookAllowsExplicitBootstrapAcknowledgementWithoutCanonicalReceipt(t *testing.T) {
-	setHookStdin(t, `{"assistant_response":"已讀 CORE_BOOTSTRAP.md 與 runtime/core-bootstrap.yaml。Active per-turn obligations: obligation.cognitive.mode_report, obligation.finality.close_loop_check\n\nDone.\n\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:repair"}`)
+	text := "已讀 CORE_BOOTSTRAP.md 與 runtime/core-bootstrap.yaml。Active per-turn obligations: obligation.cognitive.mode_report, obligation.feedback.learning_report, obligation.finality.close_loop_check\n\nDone.\n\n" +
+		compactFeedbackReport("NONE", "LOCAL", "N/A", "") +
+		"\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:repair"
+	setHookStdin(t, fmt.Sprintf(`{"assistant_response":%q}`, text))
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	code := runStopHook(t.TempDir(), &stdout, &stderr)
 	if code != ExitSuccess {
 		t.Fatalf("expected explicit bootstrap acknowledgement to pass, got %d; stderr=%s", code, stderr.String())
+	}
+}
+
+func TestRunStopHookBlocksMissingFeedbackLearningReport(t *testing.T) {
+	text := "Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25\n" +
+		"Active per-turn obligations: obligation.cognitive.mode_report, obligation.feedback.learning_report, obligation.finality.close_loop_check\n\n" +
+		"Done.\n\n" +
+		"Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast"
+	setHookStdin(t, fmt.Sprintf(`{"hook_event_name":"stop","assistant_response":%q}`, text))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cursor stop to loop with success exit, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode Cursor stop output: %v\n%s", err, stdout.String())
+	}
+	if !strings.Contains(output["followup_message"], "Feedback / Learning Report") {
+		t.Fatalf("expected followup_message to request Feedback / Learning Report, got %#v", output)
+	}
+}
+
+func TestRunStopHookAllowsFullFeedbackLearningReport(t *testing.T) {
+	text := "Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25\n" +
+		"Active per-turn obligations: obligation.cognitive.mode_report, obligation.feedback.learning_report, obligation.finality.close_loop_check\n\n" +
+		"Done.\n\n" +
+		"### Feedback / Learning Report\n\n" +
+		"| Field | Value |\n" +
+		"| --- | --- |\n" +
+		"| feedback_decision | NEEDED |\n" +
+		"| repo_context | LOCAL |\n" +
+		"| writeback_status | COMPLETED |\n" +
+		"| target | workflow |\n\n" +
+		"Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast"
+	setHookStdin(t, fmt.Sprintf(`{"assistant_response":%q}`, text))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected full Feedback / Learning Report to pass, got %d; stderr=%s", code, stderr.String())
+	}
+	if stdout.String() != "" {
+		t.Fatalf("expected no stop output, got %s", stdout.String())
+	}
+}
+
+func TestRunStopHookBlocksInvalidFeedbackLearningEnum(t *testing.T) {
+	text := "Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25\n" +
+		"Active per-turn obligations: obligation.cognitive.mode_report, obligation.feedback.learning_report, obligation.finality.close_loop_check\n\n" +
+		"Done.\n\n" +
+		compactFeedbackReport("MAYBE", "LOCAL", "N/A", "") +
+		"\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast"
+	setHookStdin(t, fmt.Sprintf(`{"assistant_response":%q}`, text))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Claude stop block via decision JSON to exit 0, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]any
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode Claude stop decision: %v\n%s", err, stdout.String())
+	}
+	reason, _ := output["reason"].(string)
+	if !strings.Contains(reason, "FeedbackDecision") {
+		t.Fatalf("expected invalid FeedbackDecision reason, got %#v", output)
+	}
+}
+
+func TestRunStopHookBlocksFeedbackNeededWithoutTarget(t *testing.T) {
+	text := "Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25\n" +
+		"Active per-turn obligations: obligation.cognitive.mode_report, obligation.feedback.learning_report, obligation.finality.close_loop_check\n\n" +
+		"Done.\n\n" +
+		compactFeedbackReport("NEEDED", "LOCAL", "COMPLETED", "") +
+		"\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast"
+	setHookStdin(t, fmt.Sprintf(`{"assistant_response":%q}`, text))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Claude stop block via decision JSON to exit 0, got %d; stderr=%s", code, stderr.String())
+	}
+	var output map[string]any
+	if err := json.Unmarshal(stdout.Bytes(), &output); err != nil {
+		t.Fatalf("decode Claude stop decision: %v\n%s", err, stdout.String())
+	}
+	reason, _ := output["reason"].(string)
+	if !strings.Contains(reason, "requires a non-`none` `Target`") {
+		t.Fatalf("expected missing target reason, got %#v", output)
 	}
 }
 
@@ -653,6 +751,24 @@ func TestRunStopHookDoesNotTreatFinalMentioningSwitchModeAsToolStatus(t *testing
 	if strings.Contains(stderr.String(), "ALLOW_CURSOR_NON_FINAL_TOOL_RESPONSE") {
 		t.Fatalf("final response mentioning mode switch must not be treated as non-final: %s", stderr.String())
 	}
+}
+
+func validStopCloseOutText() string {
+	return "Bootstrap: rules=✓ phase=phase.bootstrap obligations=23 gates=25\n" +
+		"Active per-turn obligations: obligation.cognitive.mode_report, obligation.feedback.learning_report, obligation.finality.close_loop_check\n\n" +
+		"Done.\n\n" +
+		compactFeedbackReport("NONE", "LOCAL", "N/A", "") +
+		"\nCognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast"
+}
+
+func compactFeedbackReport(decision, repoContext, writeback, target string) string {
+	report := "FeedbackDecision: " + decision + "\n" +
+		"RepoContext: " + repoContext + "\n" +
+		"Writeback: " + writeback
+	if strings.TrimSpace(target) != "" {
+		report += "\nTarget: " + target
+	}
+	return report + "\n"
 }
 
 func setHookStdin(t *testing.T, input string) {

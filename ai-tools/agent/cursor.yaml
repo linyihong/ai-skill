@@ -52,7 +52,7 @@ steps:
       - gate.cursor.hooks_fail_open
   - id: enforce_cursor_cognitive_close_out
     order: 6
-    action: Ensure init-project Cursor hooks include sessionStart dirty repo close-out guidance, a preToolUse mechanical gate (calls the canonical hook runner; native permission:deny on block; actual Cursor read/search tools allowed; fail-open when repo unresolvable), and a stop close-out check that uses Cursor's followup_message loopback when Bootstrap Receipt, final Cognitive Mode reporting, or required Project Git Report is missing from a true final assistant response.
+    action: Ensure init-project Cursor hooks include sessionStart dirty repo close-out guidance, a preToolUse mechanical gate (calls the canonical hook runner; native permission:deny on block; actual Cursor read/search tools allowed; fail-open when repo unresolvable), and a stop close-out check that uses Cursor's followup_message loopback when Bootstrap Receipt, final Cognitive Mode reporting, Feedback / Learning Report, or required Project Git Report is missing from a true final assistant response.
     gates:
       - gate.cursor.cognitive_close_out
   - id: enforce_thin_adapter_boundary
@@ -80,7 +80,7 @@ gates:
       - init-project Cursor hooks contain sessionStart guidance for dirty repo close-out, a preToolUse mechanical gate, and a stop/final-response check.
       - The preToolUse and stop hooks delegate to the canonical Ai-skill hook runner rather than duplicating gate or Cognitive Mode parsing in the Cursor template.
       - The preToolUse gate fails open (exit 0) when AI_SKILL_REPO is unresolvable; actual Cursor read/search tools are always allowed.
-      - Missing Bootstrap Receipt, final Cognitive Mode reporting, or required Project Git Report uses Cursor stop `followup_message` loopback with exit 0 instead of relying on exit 2, but only when a final assistant response is available.
+      - Missing Bootstrap Receipt, final Cognitive Mode reporting, Feedback / Learning Report, or required Project Git Report uses Cursor stop `followup_message` loopback with exit 0 instead of relying on exit 2, but only when a final assistant response is available.
   - id: gate.cursor.always_apply_bootstrap_current
     blocks: cursor_rule_change
     pass_when:
@@ -97,7 +97,7 @@ required_evidence:
 
 success_criteria:
   - Cursor starts from .cursor/rules/ai-skill-bootstrap.mdc, CORE_BOOTSTRAP.md, runtime/core-bootstrap.yaml, and ai-tools/agent/cursor.md as appropriate.
-  - Cursor init-project installs sessionStart dirty repo close-out guidance, a preToolUse mechanical gate, and a stop close-out check for Bootstrap Receipt, final Cognitive Mode reporting, and required Project Git Report.
+  - Cursor init-project installs sessionStart dirty repo close-out guidance, a preToolUse mechanical gate, and a stop close-out check for Bootstrap Receipt, final Cognitive Mode reporting, Feedback / Learning Report, and required Project Git Report.
   - Project-local custom checks can live in .ai-skill/project/rules/ and remain available to non-Cursor tools without adding separate project-rule .mdc files.
   - The Cursor preToolUse gate mechanically blocks (native permission:deny) on a real bootstrap/workflow gate hit while failing open when the repo is unresolvable; hooks never silently edit files, close goals, or auto-commit.
   - Cursor-specific details stay in the adapter layer and canonical bootstrap content is not duplicated.
@@ -117,8 +117,8 @@ failure_modes:
     detection: Cursor always-apply rule no longer points to core bootstrap and runtime source-of-truth.
     recovery: Update .cursor/rules/ai-skill-bootstrap.mdc and validate linked updates.
   - id: cursor_final_cognitive_missing
-    detection: Cursor init-project lacks a stop final-response hook that checks for Bootstrap Receipt plus compact or full Cognitive Mode reporting with `followup_message` loopback.
-    recovery: Restore the init-project Cursor stop hook and add regression tests for missing Bootstrap Receipt and final Cognitive output using Cursor's loopback protocol.
+    detection: Cursor init-project lacks a stop final-response hook that checks for Bootstrap Receipt, Feedback / Learning Report, and compact or full Cognitive Mode reporting with `followup_message` loopback.
+    recovery: Restore the init-project Cursor stop hook and add regression tests for missing Bootstrap Receipt, Feedback / Learning Report, and final Cognitive output using Cursor's loopback protocol.
 
 final_status_report:
   required_fields:

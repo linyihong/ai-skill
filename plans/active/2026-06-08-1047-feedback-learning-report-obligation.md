@@ -313,24 +313,26 @@ Phase 1 result: runtime contract now owns the feedback report obligation, compac
 
 ## Phase 2 — Hook Enforcement
 
-- [ ] Phase 2.0 cross-tool capability preflight: read all active agent adapters and executable contracts before implementation (`cursor`, `claude`, `roo`, `codex`, `gemini-cli`, `copilot`).
-- [ ] Produce a per-tool enforcement matrix before code changes:
+- [x] Phase 2.0 cross-tool capability preflight: read all active agent adapters and executable contracts before implementation (`cursor`, `claude`, `roo`, `codex`, `gemini-cli`, `copilot`).
+- [x] Produce a per-tool enforcement matrix before code changes:
   - Cursor: stop hook can loop via `followup_message` for true final assistant responses.
   - Claude Code: stop hook can block via top-level `{"decision":"block"}`.
   - Roo Code: no current repo-local stop hook transport documented; keep canonical obligation behavioral/tool-adapter until a verified host hook exists.
   - Codex / generic AGENTS-aware tools: no current repo-local stop hook transport documented; rely on canonical final response obligation and repository validation until tool-specific enforcement exists.
   - Gemini CLI: no current repo-local stop hook transport documented; keep adapter thin and avoid Gemini-specific enforcement claims unless implemented.
   - GitHub Copilot: compatibility adapter only; instruction surfaces are not reliable hard enforcement, so hard guarantees remain repository hooks / CI / runtime validate.
-- [ ] The canonical obligation must remain valid even when a host provides no executable stop-hook transport. In such environments, enforce through agent instructions, runtime validation scenarios, repository audits, CI, or future host integrations.
-- [ ] Separate implementation into three layers:
+- [x] The canonical obligation must remain valid even when a host provides no executable stop-hook transport. In such environments, enforce through agent instructions, runtime validation scenarios, repository audits, CI, or future host integrations.
+- [x] Separate implementation into three layers:
   - Canonical validator: presence, schema, enum values, and required field combinations.
   - Host adapter: Cursor / Claude / Roo / Codex / Gemini / Copilot capability mapping.
   - Host transport: `followup_message`, `decision:block`, warning-only, CI failure, repository audit, or future host-specific mechanism.
-- [ ] Do not describe Cursor `followup_message` behavior as universal stop-hook behavior.
-- [ ] Extend stop hook final response validation to require Feedback / Learning Report.
-- [ ] Add repair follow-up wording parallel to missing Cognitive Mode block.
-- [ ] Add tests for missing report, compact report, full report, enum validation, and required field combinations.
-- [ ] Preserve existing Bootstrap Receipt and Cognitive checks.
+- [x] Do not describe Cursor `followup_message` behavior as universal stop-hook behavior.
+- [x] Extend stop hook final response validation to require Feedback / Learning Report.
+- [x] Add repair follow-up wording parallel to missing Cognitive Mode block.
+- [x] Add tests for missing report, compact report, full report, enum validation, and required field combinations.
+- [x] Preserve existing Bootstrap Receipt and Cognitive checks.
+
+Phase 2 result: stop hook now calls a host-neutral Feedback / Learning Report validator for presence, schema, enum values, compact order, and required field combinations. Existing Cursor and Claude transports remain unchanged: Cursor receives `followup_message`; Claude receives top-level `decision:block`. Non-final / audit-only / no-assistant-text paths keep their existing host-specific behavior.
 
 ## Phase 3 — Feedback Learning Routing
 
@@ -349,9 +351,9 @@ Phase 1 result: runtime contract now owns the feedback report obligation, compac
 
 ## Phase 5 — Tool Adapter Docs
 
-- [ ] Update `ai-tools/agent/cursor.md` stop close-out description.
-- [ ] Update `ai-tools/agent/claude.md` if Claude adapter has stop/final behavior.
-- [ ] Update `ai-tools/README.md` only if routing / adapter summary changes.
+- [x] Update `ai-tools/agent/cursor.md` stop close-out description.
+- [x] Update `ai-tools/agent/claude.md` if Claude adapter has stop/final behavior.
+- [x] Update `ai-tools/README.md` only if routing / adapter summary changes. Decision: not needed; routing / adapter summary did not change.
 
 ## 完成條件
 

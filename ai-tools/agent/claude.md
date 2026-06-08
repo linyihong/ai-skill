@@ -47,7 +47,7 @@ Claude Code 的 bootstrap 自動化由**三層協同**達成（對應 multi-laye
 > 詳見 [`enforcement/failure-patterns/pretooluse-block-wrong-exit-code.md`](../../enforcement/failure-patterns/pretooluse-block-wrong-exit-code.md)。
 >
 > **Stop hook（close-out）同理（2026-06-05 修正）**：Claude 的 Stop hook
-> （Bootstrap Receipt / Cognitive Mode / Project Git Report close-out 檢查）原本也誤回
+> （Bootstrap Receipt / Cognitive Mode / Feedback / Learning Report / Project Git Report close-out 檢查）原本也誤回
 > `exit 30` → non-blocking → Claude 照常 stop（檢查實為 behavioral-only）。現改用
 > `renderClaudeStopDecision`（`exit 0` + top-level `{"decision":"block","reason":...}`）。
 > 注意 Stop 用 **top-level `decision:block`**，不是 PreToolUse 的

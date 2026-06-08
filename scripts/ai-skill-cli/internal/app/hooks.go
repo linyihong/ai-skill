@@ -1645,6 +1645,19 @@ func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Wri
 			"`Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<signal>`; full 6-row markdown table otherwise).\n")
 	}
 
+	if feedbackProblems := validateFeedbackLearningReport(lastText); len(feedbackProblems) > 0 {
+		_, _ = fmt.Fprintln(stderr, "BLOCK_INVALID_FEEDBACK_LEARNING_REPORT")
+		messages = append(messages, "[ai-skill Stop hook] Missing or invalid obligation: your final response did not include a valid Feedback / Learning Report.\n\n"+
+			"Per runtime/core-bootstrap.yaml §per_turn_obligations[obligation.feedback.learning_report], every final user-facing "+
+			"response MUST include a Feedback / Learning Report. Compact form uses fixed order:\n\n"+
+			"FeedbackDecision: NONE|NEEDED|UNKNOWN\n"+
+			"RepoContext: LOCAL|NON_LOCAL|UNKNOWN\n"+
+			"Writeback: COMPLETED|DEFERRED|UNAVAILABLE|N/A\n"+
+			"Target: feedback-history|intelligence|workflow|enforcement|project-docs  # only when FeedbackDecision: NEEDED\n\n"+
+			"Full form uses `### Feedback / Learning Report` plus a markdown table. Stop hook validation is mechanical only: presence, schema, enum values, and required field combinations.\n\n"+
+			"Validation issue(s):\n- "+strings.Join(feedbackProblems, "\n- ")+"\n")
+	}
+
 	if formatDirtyGitRepoReport(projectDir) != "" {
 		gitReportRe := regexp.MustCompile(`(?m)^### (Project Git Report|Git Repo Report|Git Repository Report)\b`)
 		if !gitReportRe.MatchString(lastText) {
@@ -1670,6 +1683,171 @@ func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Wri
 	}
 	appendLog(logFile, fmt.Sprintf("decision: block (missing close-out items: %d)", len(messages)))
 	return renderClaudeStopDecision(stdout, hookDecision{Deny: true, Reason: message})
+}
+
+func validateFeedbackLearningReport(text string) []string {
+	fields, found, orderProblems := extractCompactFeedbackReportFields(text)
+	if !found {
+		fields, found = extractFullFeedbackReportFields(text)
+	}
+	if !found {
+		return []string{"missing compact `FeedbackDecision:` block or full `### Feedback / Learning Report` table"}
+	}
+	problems := append([]string{}, orderProblems...)
+	problems = append(problems, validateFeedbackReportFields(fields)...)
+	return problems
+}
+
+func extractCompactFeedbackReportFields(text string) (map[string]string, bool, []string) {
+	fields := map[string]string{}
+	order := []string{}
+	known := map[string]string{
+		"FeedbackDecision": "feedback_decision",
+		"RepoContext":      "repo_context",
+		"Writeback":        "writeback_status",
+		"Target":           "target",
+	}
+	for _, line := range strings.Split(text, "\n") {
+		trimmed := strings.TrimSpace(line)
+		for prefix, key := range known {
+			marker := prefix + ":"
+			if strings.HasPrefix(trimmed, marker) {
+				fields[key] = strings.TrimSpace(strings.TrimPrefix(trimmed, marker))
+				order = append(order, key)
+			}
+		}
+	}
+	if _, ok := fields["feedback_decision"]; !ok {
+		return fields, false, nil
+	}
+	expected := []string{"feedback_decision", "repo_context", "writeback_status", "target"}
+	var problems []string
+	lastIndex := -1
+	for _, key := range order {
+		index := -1
+		for i, expectedKey := range expected {
+			if key == expectedKey {
+				index = i
+				break
+			}
+		}
+		if index >= 0 && index < lastIndex {
+			problems = append(problems, "compact Feedback / Learning Report fields must appear in order: FeedbackDecision, RepoContext, Writeback, optional Target")
+			break
+		}
+		if index > lastIndex {
+			lastIndex = index
+		}
+	}
+	return fields, true, problems
+}
+
+func extractFullFeedbackReportFields(text string) (map[string]string, bool) {
+	header := "### Feedback / Learning Report"
+	idx := strings.Index(text, header)
+	if idx < 0 {
+		return nil, false
+	}
+	section := text[idx+len(header):]
+	if next := strings.Index(section, "\n### "); next >= 0 {
+		section = section[:next]
+	}
+	fields := map[string]string{}
+	for _, line := range strings.Split(section, "\n") {
+		trimmed := strings.TrimSpace(line)
+		if !strings.HasPrefix(trimmed, "|") || !strings.HasSuffix(trimmed, "|") {
+			continue
+		}
+		parts := strings.Split(trimmed, "|")
+		if len(parts) < 4 {
+			continue
+		}
+		key := normalizeFeedbackFieldKey(parts[1])
+		if key == "" {
+			continue
+		}
+		fields[key] = strings.TrimSpace(parts[2])
+	}
+	return fields, true
+}
+
+func normalizeFeedbackFieldKey(raw string) string {
+	key := strings.ToLower(strings.TrimSpace(raw))
+	key = strings.Trim(key, "`")
+	key = strings.ReplaceAll(key, " ", "_")
+	switch key {
+	case "feedback_decision", "feedbackdecision":
+		return "feedback_decision"
+	case "repo_context", "repocontext":
+		return "repo_context"
+	case "writeback_status", "writeback":
+		return "writeback_status"
+	case "target":
+		return "target"
+	default:
+		return ""
+	}
+}
+
+func validateFeedbackReportFields(fields map[string]string) []string {
+	var problems []string
+	decision := normalizeFeedbackEnumValue(fields["feedback_decision"])
+	repoContext := normalizeFeedbackEnumValue(fields["repo_context"])
+	writeback := normalizeFeedbackEnumValue(fields["writeback_status"])
+	target := normalizeFeedbackTargetValue(fields["target"])
+
+	if decision == "" {
+		problems = append(problems, "missing `FeedbackDecision` / `feedback_decision`")
+	} else if !isAllowedFeedbackValue(decision, []string{"NONE", "NEEDED", "UNKNOWN"}) {
+		problems = append(problems, "`FeedbackDecision` must be NONE, NEEDED, or UNKNOWN")
+	}
+	if repoContext == "" {
+		problems = append(problems, "missing `RepoContext` / `repo_context`")
+	} else if !isAllowedFeedbackValue(repoContext, []string{"LOCAL", "NON_LOCAL", "UNKNOWN"}) {
+		problems = append(problems, "`RepoContext` must be LOCAL, NON_LOCAL, or UNKNOWN")
+	}
+	if writeback == "" {
+		problems = append(problems, "missing `Writeback` / `writeback_status`")
+	} else if !isAllowedFeedbackValue(writeback, []string{"COMPLETED", "DEFERRED", "UNAVAILABLE", "N/A"}) {
+		problems = append(problems, "`Writeback` must be COMPLETED, DEFERRED, UNAVAILABLE, or N/A")
+	}
+	if decision == "NEEDED" {
+		if target == "" || target == "none" {
+			problems = append(problems, "`FeedbackDecision: NEEDED` requires a non-`none` `Target`")
+		} else if !isAllowedFeedbackValue(target, []string{"feedback-history", "intelligence", "workflow", "enforcement", "project-docs"}) {
+			problems = append(problems, "`Target` must be feedback-history, intelligence, workflow, enforcement, or project-docs")
+		}
+	} else if target != "" && target != "none" && !isAllowedFeedbackValue(target, []string{"feedback-history", "intelligence", "workflow", "enforcement", "project-docs"}) {
+		problems = append(problems, "`Target` must be none or a known durable target")
+	}
+	return problems
+}
+
+func normalizeFeedbackEnumValue(raw string) string {
+	value := strings.TrimSpace(raw)
+	value = strings.Trim(value, "`")
+	if fields := strings.Fields(value); len(fields) > 0 {
+		value = fields[0]
+	}
+	return strings.ToUpper(value)
+}
+
+func normalizeFeedbackTargetValue(raw string) string {
+	value := strings.TrimSpace(raw)
+	value = strings.Trim(value, "`")
+	if fields := strings.Fields(value); len(fields) > 0 {
+		value = fields[0]
+	}
+	return strings.ToLower(value)
+}
+
+func isAllowedFeedbackValue(value string, allowed []string) bool {
+	for _, candidate := range allowed {
+		if value == candidate {
+			return true
+		}
+	}
+	return false
 }
 
 func isCursorNonFinalToolResponse(text string) bool {

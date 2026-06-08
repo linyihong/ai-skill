@@ -42,7 +42,7 @@ governance_thresholds:
   rule_class_hard_limit: 40
   exceed_soft_target_action: review_split_opportunities
   exceed_hard_limit_action: governance_review_required
-  current_count: 37   # round-4 backfill: 28 + 9 new classes (F5/F12/F14/F15/F16/F18/F19/F20/F21)
+  current_count: 38   # round-4 backfill: 28 + 9 new classes (F5/F12/F14/F15/F16/F18/F19/F20/F21) + feedback_learning_report
   # Round-4 T6 + Round-5: source_files per rule_class soft signal.
   # NOT a hard cap (renamed from max_source_files_per_class to be honest
   # about being a review trigger, not enforcement). Lint
@@ -255,6 +255,7 @@ internal_helper_allowlist:
     - claudeFileExists
     - extractAssistantTexts
     - transcriptHasRequiredBootstrapReads  # called by PreToolUse gate; not an executor itself
+    - validateFeedbackReportFields
     - collectDirtyGitRepoReports
     - nonEmptyLines
     - gitStatusNeedsReport
@@ -925,6 +926,28 @@ rule_classes:
       symbol_exists: ✓
       scenario_exists: pending
       regression_exists: ✓  # dirty-repo-on-claim-done failure pattern
+      runtime_observed: pending
+
+  - id: feedback_learning_report
+    coverage: mechanical
+    source_files:
+      - runtime/core-bootstrap.yaml#per_turn_obligations[obligation.feedback.learning_report]
+      - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+    executors:
+      - file: scripts/ai-skill-cli/internal/app/hooks.go
+        symbol: validateFeedbackLearningReport
+        executor_kind: hook_dispatcher_entry
+        hook_phase: Stop
+        block_or_warn: block
+        notes: "host-neutral validator called by runStopHook before host-specific Cursor/Claude stop rendering"
+    rationale: |
+      Final-response close-out check that the assistant reports learning
+      disposition, repo context, and writeback status without turning the
+      runtime contract into a host-specific Cursor followup implementation.
+    verification_status:
+      symbol_exists: ✓
+      scenario_exists: pending
+      regression_exists: ✓
       runtime_observed: pending
 
   - id: github_workflow_history
