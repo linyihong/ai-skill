@@ -1,6 +1,6 @@
 ---
 id: 2026-06-08-1408-ui-governance-workflow
-status: draft
+status: completed
 owner: linyihong
 created: 2026-06-08
 priority: P2
@@ -8,11 +8,11 @@ priority: P2
 
 # UI Governance Workflow Integration
 
-**Status**: `draft`
+**Status**: `completed`
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 software-delivery workflow hardening
 **建立日期**：2026-06-08
-**最後更新**：2026-06-08（Phase 4 advisory governance boundary wired）
+**最後更新**：2026-06-08（Phase 5 validation scenarios complete）
 **Priority**：**P2**
 
 本 plan 將 UI/UX 風格治理納入 `workflow/software-delivery/`，新增 `sd-ui-governance` cognitive slice，讓現有 `sd-ui-contracts` 產出的 UI contract、screen state、ViewModel、Accessibility expectation 能進一步被 deterministic validator、visual regression evidence、以及 scoped AI visual review 消費。
@@ -416,46 +416,46 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 
 ## Phase 5 — Test-first Validation Scenarios
 
-- [ ] Add scenarios under `validation/scenarios/software-delivery/` before implementation of runtime/governance wiring.
-- [ ] Scenario: UI change with screen contract but missing loading/error state should load `sd-ui-governance` and block or warn according to severity.
-- [ ] Scenario: hard-coded color/font/spacing should surface design token validator evidence.
-- [ ] Scenario: delete action without confirmation should fail behavior pattern validation.
-- [ ] Scenario: visual quality claim without screenshot baseline should warn by default.
-- [ ] Scenario: AI visual validator finding without scoped criteria remains warning/research, not hard block.
-- [ ] Scenario: evidence classes distinguish `ai_review`, `visual_diff`, `accessibility_scan`, and `contract` rather than treating all UI findings as equal.
-- [ ] Run runtime validation/refresh and review generated surfaces.
+- [x] Add scenarios under `validation/scenarios/software-delivery/` before implementation of runtime/governance wiring.
+- [x] Scenario: UI change with screen contract but missing loading/error state should load `sd-ui-governance` and block or warn according to severity.
+- [x] Scenario: hard-coded color/font/spacing should surface design token validator evidence.
+- [x] Scenario: delete action without confirmation should fail behavior pattern validation.
+- [x] Scenario: visual quality claim without screenshot baseline should warn by default.
+- [x] Scenario: AI visual validator finding without scoped criteria remains warning/research, not hard block.
+- [x] Scenario: evidence classes distinguish `ai_review`, `visual_diff`, `accessibility_scan`, and `contract` rather than treating all UI findings as equal.
+- [x] Run runtime validation/refresh and review generated surfaces.
 
 ### Phase 5 Acceptance
 
-- [ ] Scenarios fail by absence before source wiring when applicable.
-- [ ] Scenarios pass after source wiring.
-- [ ] Evidence distinguishes deterministic validators from AI-assisted visual warnings.
-- [ ] Evidence Source Taxonomy prevents Percy / axe / AI review / human review from collapsing into one undifferentiated validator result.
+- [x] Scenarios fail by absence before source wiring when applicable.
+- [x] Scenarios pass after source wiring.
+- [x] Evidence distinguishes deterministic validators from AI-assisted visual warnings.
+- [x] Evidence Source Taxonomy prevents Percy / axe / AI review / human review from collapsing into one undifferentiated validator result.
 
 ---
 
 ## 完成條件
 
-- [ ] `sd-ui-governance` exists and is discoverable from software-delivery workflow.
-- [ ] `sd-ui-contracts` remains a contract definition surface, not an enforcement/checklist dump.
-- [ ] Markdown + YAML executable contracts + governance + taxonomy + routing + artifact gates + templates/checklists are synchronized or explicitly marked not applicable.
-- [ ] Validation scenarios cover loading, deterministic validator classes, and AI visual warning boundary.
-- [ ] Runtime refresh / validate passes.
-- [ ] Linked updates are reviewed and documented.
-- [ ] First landing remains doc + scenario only; no mechanical rule_class is added without a follow-up promotion decision.
-- [ ] No governance domain is represented solely by a validation mechanism.
-- [ ] No validation mechanism is owned by a single governance domain.
-- [ ] Plan Completion Closure executed when all phases are done.
+- [x] `sd-ui-governance` exists and is discoverable from software-delivery workflow.
+- [x] `sd-ui-contracts` remains a contract definition surface, not an enforcement/checklist dump.
+- [x] Markdown + YAML executable contracts + governance + taxonomy + routing + artifact gates + templates/checklists are synchronized or explicitly marked not applicable.
+- [x] Validation scenarios cover loading, deterministic validator classes, and AI visual warning boundary.
+- [x] Runtime refresh / validate passes.
+- [x] Linked updates are reviewed and documented.
+- [x] First landing remains doc + scenario only; no mechanical rule_class is added without a follow-up promotion decision.
+- [x] No governance domain is represented solely by a validation mechanism.
+- [x] No validation mechanism is owned by a single governance domain.
+- [x] Plan Completion Closure executed when all phases are done.
 
 ---
 
 ## Stakeholder 同意項目
 
-- [ ] Accept `sd-ui-governance` as a separate workflow slice after `sd-ui-contracts`.
-- [ ] Accept deterministic validators as blocking candidates and AI visual validator as warning/research by default.
-- [ ] Accept first landing as workflow + scenario only, with mechanical rule_class deferred.
-- [ ] Accept design token policy as project-local first; Ai-skill governs tokenization requirement, not token scale.
-- [ ] Accept focused `ui-governance-template.md` instead of expanding the generic contract template.
+- [x] Accept `sd-ui-governance` as a separate workflow slice after `sd-ui-contracts`.
+- [x] Accept deterministic validators as blocking candidates and AI visual validator as warning/research by default.
+- [x] Accept first landing as workflow + scenario only, with mechanical rule_class deferred.
+- [x] Accept design token policy as project-local first; Ai-skill governs tokenization requirement, not token scale.
+- [x] Accept focused `ui-governance-evidence-template.md` instead of expanding the generic contract template.
 
 ---
 

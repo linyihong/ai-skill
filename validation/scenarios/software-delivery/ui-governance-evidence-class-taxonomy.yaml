@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-evidence-class-taxonomy
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-08-1408-ui-governance-workflow.md
+source_phase: phase-5
+
+given:
+  task_intent: "Summarize UI validation evidence for a release review."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  evidence_inputs:
+    - source: Screen Contract row
+      expected_class: contract
+    - source: axe accessibility scan violation
+      expected_class: accessibility_scan
+    - source: Percy screenshot diff
+      expected_class: visual_diff
+    - source: AI visual reviewer note
+      expected_class: ai_review
+    - source: human design review comment
+      expected_class: human_review
+
+when:
+  action: classify_ui_evidence_sources
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+    - workflow/software-delivery/review-checklist.md
+  expected_route:
+    - classify_each_evidence_source_separately
+    - keep_governance_domain_separate_from_validation_mechanism
+    - keep_evidence_class_separate_from_severity
+  expected_governance:
+    domain: Closure
+    validation_mechanism: manual_review
+    evidence_class: human_review
+    severity: warn
+  forbidden_routes:
+    - collapse_percy_axe_ai_and_human_review_into_generic_validator_result
+    - let_single_mechanism_own_governance_domain
+    - let_single_domain_own_validation_mechanism
+
+pre_source_wiring_expectation:
+  before_evidence_taxonomy: FAIL
+  reason: "UI findings could collapse into one undifferentiated validator result."
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-governance.md#Evidence Classes
+    - workflow/software-delivery/ui-governance.md#Validation Mechanisms
+    - workflow/software-delivery/review-checklist.md#UI Governance Review

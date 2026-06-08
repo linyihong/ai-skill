@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-visual-baseline-warning
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P2
+source_plan: plans/active/2026-06-08-1408-ui-governance-workflow.md
+source_phase: phase-5
+
+given:
+  task_intent: "Claim that a redesigned dashboard has no visual regression."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  signals:
+    - visual_quality_claim
+    - screenshot_without_baseline
+    - no_deterministic_capture_context
+
+when:
+  action: classify_visual_validation_claim
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  expected_route:
+    - detect_visual_claim_without_baseline
+    - classify_visual_diff_as_validation_mechanism
+    - require_baseline_or_warn
+  expected_governance:
+    domain: Design System
+    validation_mechanism: screenshot_diff
+    evidence_class: screenshot
+    severity: warn
+  forbidden_routes:
+    - treat_screenshot_as_visual_diff_without_baseline
+    - hard_block_visual_taste_without_objective_criteria
+
+pre_source_wiring_expectation:
+  before_visual_scope_boundary: FAIL
+  reason: "A screenshot could be overclaimed as deterministic visual regression evidence."
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-governance.md#Validation Mechanisms
+    - workflow/software-delivery/ui-governance.md#Severity Policy
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md#Evidence Notes

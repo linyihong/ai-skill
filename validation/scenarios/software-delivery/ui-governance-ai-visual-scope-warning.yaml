@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-ai-visual-scope-warning
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P2
+source_plan: plans/active/2026-06-08-1408-ui-governance-workflow.md
+source_phase: phase-5
+
+given:
+  task_intent: "Use an AI visual reviewer to evaluate spacing and hierarchy on a new onboarding screen."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  signals:
+    - ai_visual_review_used
+    - rubric_missing_or_unscoped
+    - release_blocking_claim_attempted
+
+when:
+  action: classify_ai_visual_review_scope
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  expected_route:
+    - detect_ai_visual_validator_without_scope
+    - classify_ai_review_as_validation_mechanism
+    - keep_subjective_visual_review_warn_or_research
+  expected_governance:
+    domain: Design System
+    validation_mechanism: ai_review
+    evidence_class: ai_review
+    severity: research
+  forbidden_routes:
+    - treat_ai_review_as_build_failure
+    - treat_ai_review_as_governance_domain
+    - promote_to_block_without_objective_rubric_deterministic_capture_and_project_opt_in
+
+pre_source_wiring_expectation:
+  before_ai_visual_boundary: FAIL
+  reason: "AI visual feedback lacked a scoped severity policy and could be overpromoted to hard block."
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-governance.md#Severity Policy
+    - workflow/software-delivery/ui-governance.md#Evidence Classes
+    - governance/ai-runtime-governance/software-delivery-governance.md#UI Governance Advisory Candidates

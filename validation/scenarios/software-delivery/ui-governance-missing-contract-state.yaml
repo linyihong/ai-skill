@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-missing-contract-state
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-08-1408-ui-governance-workflow.md
+source_phase: phase-5
+
+given:
+  task_intent: "Implement a checkout screen from an existing Screen Contract."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-contracts.md
+    - workflow/software-delivery/ui-governance.md
+  signals:
+    - ui_contract_exists
+    - screen_contract_missing_loading_state
+    - completion_claim_depends_on_ui_compliance
+
+when:
+  action: classify_ui_governance_before_completion_claim
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-contracts.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+  expected_route:
+    - detect_missing_ui_contract_state
+    - classify_governance_domain_contract
+    - require_evidence_class_contract_or_runtime
+  expected_governance:
+    domain: Contract
+    validation_mechanism: deterministic
+    evidence_class: contract
+    severity: block_candidate
+  forbidden_routes:
+    - claim_ui_compliance_without_loading_empty_error_success_states
+    - treat_missing_state_as_visual_taste
+
+pre_source_wiring_expectation:
+  before_ui_governance_slice: FAIL
+  reason: "No focused source existed to classify missing UI state as a UI governance issue."
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/execution-flow.yaml#loading_surfaces.ui_governance
+    - workflow/software-delivery/ui-governance.md#Governance Domains
+    - governance/ai-runtime-governance/software-delivery-governance.md#UI Governance Advisory Candidates

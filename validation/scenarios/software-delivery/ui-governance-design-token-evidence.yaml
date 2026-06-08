@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-design-token-evidence
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-08-1408-ui-governance-workflow.md
+source_phase: phase-5
+
+given:
+  task_intent: "Review a profile page change that claims design-system compliance."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  signals:
+    - project_local_token_policy_exists
+    - raw_color_spacing_or_font_detected
+    - design_system_compliance_claim
+
+when:
+  action: classify_design_system_evidence
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  expected_route:
+    - detect_raw_design_token_detected
+    - classify_governance_domain_design_system
+    - reference_project_local_design_system_policy
+  expected_governance:
+    domain: Design System
+    validation_mechanism: deterministic
+    evidence_class: runtime
+    severity: block_candidate
+  forbidden_routes:
+    - define_global_token_scale
+    - accept_raw_style_escape_hatch_without_project_policy
+
+pre_source_wiring_expectation:
+  before_project_local_policy_boundary: FAIL
+  reason: "Design-token evidence could drift into global token taxonomy instead of project-local compliance."
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-governance.md#Project-local Design System Policy
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md#Project-Local Design System Policy
+    - governance/ai-runtime-governance/software-delivery-governance.md#UI Governance Advisory Candidates

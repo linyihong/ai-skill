@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-destructive-confirmation
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-08-1408-ui-governance-workflow.md
+source_phase: phase-5
+
+given:
+  task_intent: "Review a delete-account flow before marking the UI behavior complete."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-contracts.md
+    - workflow/software-delivery/ui-governance.md
+  signals:
+    - destructive_action
+    - missing_confirmation_or_recovery_path
+    - behavior_pattern_validation_needed
+
+when:
+  action: classify_behavior_pattern_governance
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-contracts.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/review-checklist.md
+  expected_route:
+    - detect_destructive_action_missing_confirmation
+    - classify_governance_domain_behavior
+    - require_objective_confirmation_or_recovery_evidence
+  expected_governance:
+    domain: Behavior
+    validation_mechanism: deterministic
+    evidence_class: contract
+    severity: block_candidate
+  forbidden_routes:
+    - treat_destructive_confirmation_as_subjective_ux_preference
+    - declare_behavior_complete_without_confirmation_evidence
+
+pre_source_wiring_expectation:
+  before_ui_governance_slice: FAIL
+  reason: "Destructive action review lacked a UI governance domain and severity classification."
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-governance.md#Governance Domains
+    - workflow/software-delivery/review-checklist.md#UI Governance Review
+    - governance/ai-runtime-governance/software-delivery-governance.md#UI Governance Advisory Candidates
