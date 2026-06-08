@@ -374,11 +374,13 @@ Phase 3 result: routing is defined without adding knowledge classification, prom
 
 ## Phase 4 — Validation Scenarios
 
-- [ ] Add `validation/scenarios/runtime/feedback-report-required-v1.yaml`.
-- [ ] Add `validation/scenarios/runtime/feedback-report-schema-v1.yaml`.
-- [ ] Add `validation/scenarios/runtime/non-local-repo-feedback-none-allowed-v1.yaml`.
-- [ ] Add `validation/scenarios/failure-derived/feedback-needed-but-not-reported-v1.yaml`.
-- [ ] Run `ai-skill runtime refresh` and `ai-skill runtime validate`.
+- [x] Add `validation/scenarios/runtime/feedback-report-required-v1.yaml`.
+- [x] Add `validation/scenarios/runtime/feedback-report-schema-v1.yaml`.
+- [x] Add `validation/scenarios/runtime/non-local-repo-feedback-none-allowed-v1.yaml`.
+- [x] Add `validation/scenarios/failure-derived/feedback-needed-but-not-reported-v1.yaml`.
+- [x] Run `ai-skill runtime refresh` and `ai-skill runtime validate`.
+
+Phase 4 result: runtime close-out scenarios now cover required report presence, schema/enum/field-combination validation, non-local `NONE` allowance, and failure-derived `NEEDED` reporting after reusable user correction.
 
 ## Phase 5 — Tool Adapter Docs
 

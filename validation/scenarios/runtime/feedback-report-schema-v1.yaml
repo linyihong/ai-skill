@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Feedback / Learning Report Schema Scenario
+# 驗證 Feedback / Learning Report 只做機械 schema / enum / field-combination
+# 檢查，不做語義判斷。
+# 來源：
+#   - runtime/core-bootstrap.yaml §per_turn_obligations[obligation.feedback.learning_report]
+#   - scripts/ai-skill-cli/internal/app/hooks.go (validateFeedbackLearningReport)
+
+id: feedback-report-schema-v1
+domain: runtime
+type: heuristic-obedience
+priority: P1
+
+given:
+  task: validate_feedback_learning_report_schema
+  artifacts:
+    - runtime/core-bootstrap.yaml
+    - scripts/ai-skill-cli/internal/app/hooks.go
+    - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+  transcript:
+    - role: assistant
+      text: |
+        Done.
+
+        FeedbackDecision: MAYBE
+        RepoContext: LOCAL
+        Writeback: N/A
+
+        Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast
+  constraints:
+    - validator must check presence, schema, enum values, compact order, and required field combinations
+    - validator must not decide whether NONE or NEEDED is semantically correct
+    - compact form uses fixed field order
+
+when:
+  action: validate_feedback_report_contract
+
+then:
+  expected_route:
+    primary: reject_invalid_feedback_report_schema
+    steps:
+      - parse compact FeedbackDecision / RepoContext / Writeback fields
+      - compare FeedbackDecision against NONE / NEEDED / UNKNOWN
+      - report enum violation
+      - do not infer semantic correctness from task content
+  forbidden_routes:
+    - accept_unknown_enum_value
+    - semantic_judge_none_vs_needed
+    - require_learning_type_field
+    - require_commit_message_feedback_report
+  expected_final_route: invalid_feedback_report_schema_rejected
+  trace_required:
+    - parsed_feedback_fields
+    - enum_validation
+    - required_field_combination_check
+    - semantic_validation_skipped
+  verification:
+    - "`FeedbackDecision: MAYBE` is rejected."
+    - "A valid report with `FeedbackDecision: NONE` is not rejected merely because the evaluator suspects a lesson."

@@ -66,6 +66,13 @@ validation/
 - `failure-derived/markdown-yaml-contract-bypass-v1.yaml` — companion YAML contract 存在時不得只讀 Markdown；必須讀 YAML gates 並驗證 runtime projection。
 - `failure-derived/executable-contract-close-loop-miss-v1.yaml` — 新增 executable contract 後必須 compile / refresh / validate / projection assertion / commit / push / readback。
 
+## Runtime Close-Out Scenarios
+
+- `runtime/feedback-report-required-v1.yaml` — final close-out 不得缺 Feedback / Learning Report。
+- `runtime/feedback-report-schema-v1.yaml` — Feedback / Learning Report 只做 presence / schema / enum / field-combination 機械檢查，不做語義判斷。
+- `runtime/non-local-repo-feedback-none-allowed-v1.yaml` — non-local repo 仍可在沒有 reusable learning 時回報 `feedback_decision: NONE`。
+- `failure-derived/feedback-needed-but-not-reported-v1.yaml` — user correction / reusable runtime gap 後不得漏報 `feedback_decision: NEEDED`。
+
 ## Scenario 格式
 
 每個 scenario 定義在 `scenarios/<domain>/<id>.yaml`：

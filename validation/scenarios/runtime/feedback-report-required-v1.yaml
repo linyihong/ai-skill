@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Feedback / Learning Report Required Scenario
+# 驗證 final close-out 必須包含 Feedback / Learning Report，不可只輸出
+# execution summary 或 Cognitive Mode report。
+# 來源：
+#   - runtime/core-bootstrap.yaml §per_turn_obligations[obligation.feedback.learning_report]
+#   - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+
+id: feedback-report-required-v1
+domain: runtime
+type: heuristic-obedience
+priority: P1
+
+given:
+  task: validate_final_close_out_report_presence
+  artifacts:
+    - runtime/core-bootstrap.yaml
+    - CORE_BOOTSTRAP.md
+    - scripts/ai-skill-cli/internal/app/hooks.go
+  transcript:
+    - role: user
+      text: "完成這個小修改，驗證後回報結果。"
+    - role: assistant
+      text: |
+        已完成並驗證。
+
+        Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:user_keyword_fast
+  constraints:
+    - final response already has execution summary
+    - final response already has Cognitive Mode report
+    - scenario input does not provide expected repair wording
+
+when:
+  action: validate_final_response_close_out
+
+then:
+  expected_route:
+    primary: request_feedback_learning_report_repair
+    steps:
+      - detect final user-facing response
+      - preserve existing Bootstrap / Cognitive checks
+      - detect missing Feedback / Learning Report
+      - request corrected final response with FeedbackDecision, RepoContext, and Writeback
+  forbidden_routes:
+    - accept_cognitive_report_as_learning_report
+    - treat_feedback_report_as_optional
+    - require_feedback_history_write_for_every_turn
+  expected_final_route: missing_feedback_learning_report_blocks_or_repairs_close_out
+  trace_required:
+    - final_response_detected
+    - feedback_report_presence_check
+    - missing_obligation
+    - repair_instruction
+  verification:
+    - "Stop hook or scenario evaluator rejects a final response that lacks Feedback / Learning Report."
+    - "Repair request names the runtime/core-bootstrap.yaml feedback learning obligation."

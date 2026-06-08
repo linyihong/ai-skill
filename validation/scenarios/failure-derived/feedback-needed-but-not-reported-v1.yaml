@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Feedback Needed But Not Reported Scenario
+# 測試 agent 被使用者指出 reusable workflow / validation gap 後，不能只修
+# 當下內容而漏掉 Feedback / Learning Report。
+# 來源：
+#   - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+#   - enforcement/failure-learning-system.md
+
+id: feedback-needed-but-not-reported-v1
+domain: runtime
+type: failure-recovery
+priority: P1
+
+failure_source:
+  class: validation-gap / feedback-learning-report-miss
+  date: "2026-06-08"
+  description: >
+    User identifies a reusable workflow or validation gap, but the agent
+    closes with only execution and cognitive reporting. The missing learning
+    disposition lets the reusable prevention stay trapped in chat history.
+
+given:
+  task: close_out_after_user_correction
+  artifacts:
+    - runtime/core-bootstrap.yaml
+    - enforcement/failure-learning-system.md
+    - feedback/feedback-lessons.md
+    - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+  transcript:
+    - role: user
+      text: "你剛剛只修 Cursor，沒有考慮 Claude、Roo、Codex、Gemini、Copilot。這個要抽成 cross-tool runtime boundary。"
+    - role: assistant
+      text: |
+        已修正 plan，補上 cross-tool preflight。
+
+        Cognitive: DEEP·SOURCE_BACKED·STRICT·NONE / V:CHECKLIST / Cost:HIGH / Sig:file_diff_governance_enforcement
+  signals:
+    - user correction
+    - reusable runtime boundary
+    - workflow / enforcement gap
+    - cross-tool failure prevention
+  constraints:
+    - correction has reusable prevention value
+    - durable target can be named
+    - scenario input does not reveal the expected target
+
+when:
+  action: validate_learning_disposition_close_out
+
+then:
+  expected_route:
+    primary: require_needed_feedback_report
+    steps:
+      - detect user correction and reusable runtime boundary signal
+      - classify as feedback_decision NEEDED unless the lesson was already fully written
+      - name a durable target and writeback status
+      - preserve separate Cognitive Mode reporting
+  expected_report:
+    feedback_decision: NEEDED
+    repo_context: LOCAL
+    writeback_status: COMPLETED_OR_DEFERRED
+    target_one_of:
+      - workflow
+      - enforcement
+      - project-docs
+  forbidden_routes:
+    - omit_feedback_learning_report
+    - report_feedback_none_after_user_correction
+    - collapse_learning_report_into_cognitive_report
+    - write_project_private_evidence_to_reusable_docs
+  expected_final_route: needed_feedback_report_present
+  expected_intelligence:
+    - enforcement/failure-learning-system.md
+    - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+  trace_required:
+    - user_correction_signal
+    - reusable_learning_decision
+    - durable_target_selection
+    - writeback_status_selection
+  verification:
+    - "Final response includes Feedback / Learning Report with `feedback_decision: NEEDED`."
+    - "Report names a durable target and writeback status."
+    - "Cognitive Mode report alone is not accepted as the learning disposition report."

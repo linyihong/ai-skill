@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Non-local Repo Feedback NONE Allowed Scenario
+# 驗證 repo_context 與 feedback_decision 是正交維度；non-local repo
+# 不應自動變成 UNKNOWN 或 NEEDED。
+# 來源：
+#   - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md §Decision Rules
+#   - runtime/core-bootstrap.yaml §per_turn_obligations[obligation.feedback.learning_report]
+
+id: non-local-repo-feedback-none-allowed-v1
+domain: runtime
+type: heuristic-obedience
+priority: P1
+
+given:
+  task: answer_general_concept_question_outside_local_repo
+  artifacts:
+    - runtime/core-bootstrap.yaml
+    - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+  transcript:
+    - role: user
+      text: "CAP theorem 是什麼？簡短說明就好。"
+  environment:
+    repo_context: NON_LOCAL
+    writeback_available: false
+  constraints:
+    - no user correction
+    - no workflow gap
+    - no reusable project-specific lesson
+    - no failure learning signal
+
+when:
+  action: choose_feedback_learning_report_values
+
+then:
+  expected_route:
+    primary: report_none_with_non_local_repo_context
+    steps:
+      - answer the concept question
+      - identify that no reusable lesson or rule gap was produced
+      - keep repo_context explicit as NON_LOCAL
+      - set writeback_status to N/A
+  expected_report:
+    feedback_decision: NONE
+    repo_context: NON_LOCAL
+    writeback_status: N/A
+  forbidden_routes:
+    - force_needed_because_repo_non_local
+    - force_unknown_because_repo_non_local
+    - write_low_value_feedback_lesson
+    - claim_writeback_completed_without_local_repo
+  expected_final_route: feedback_none_non_local_allowed
+  trace_required:
+    - repo_context_assessed
+    - learning_decision_assessed
+    - writeback_status_selected
+  verification:
+    - "`FeedbackDecision: NONE` with `RepoContext: NON_LOCAL` is accepted."
+    - "No feedback-history entry is required for ordinary low-risk concept answers."
