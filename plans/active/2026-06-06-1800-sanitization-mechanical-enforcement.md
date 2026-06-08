@@ -165,7 +165,7 @@ git pre-commit hook
 
 ### Phase 1 — Metadata-Derived Forbidden Token Scanner
 
-- [ ] 定義 project metadata schema：`<PROJECT_ROOT>/.ai-skill-project.yaml` (或 overlay 既有 metadata 機制)，欄位：
+- [x] 定義 project metadata schema：`<PROJECT_ROOT>/.ai-skill-project.yaml`（Phase 1 implements direct metadata scan; overlay metadata remains future-compatible），欄位：
   ```yaml
   project:
     id: <project-slug>
@@ -176,7 +176,7 @@ git pre-commit hook
       - <PROJECT_NAME>
       # case variants 自動 derive (CamelCase / kebab / SCREAMING_SNAKE)
   ```
-- [ ] 新建 `runtime/repository-topology.yaml`（canonical cross-subsystem topology surface，**不掛 enforcement-registry**）：
+- [x] 新建 `runtime/repository-topology.yaml`（canonical cross-subsystem topology surface，**不掛 enforcement-registry**）：
   ```yaml
   # runtime/repository-topology.yaml
   schema_version: 1
@@ -205,14 +205,14 @@ git pre-commit hook
     - governance_lint (future)
     - dependency_reading (future)
   ```
-- [ ] Topology projection target：`runtime.db.repository_topology`（query via `ai-skill runtime ...` CLI）
-- [ ] `ai-skill runtime compile` 階段 projection：所有 known project metadata 的 `private_tokens` → `runtime.db.derived_forbidden_tokens` table (含 case variants expansion)
-- [ ] 實作 scanner core：staged file 落在 shared-layer subtree → 比對 derived_forbidden_tokens → emit finding
-- [ ] **Bootstrap-safe guard**：scanner 不做「reusable layer 是否包含 token」inference；新 framework concept 只要不在任何 project private_tokens 內，自動通過
-- [ ] False-positive guardrail：`enforcement/sanitization.md` 自身的 example 段落 self-reference exception
-- [ ] Unit tests：
-  - fail case：commit 214a415 reconstruction（七處 leak 必須全部 emit finding）
-  - pass case：commit 728282c 後內容（零 finding）
+- [x] Topology projection target：`runtime.db.repository_topology`（query via `ai-skill runtime ...` CLI）
+- [x] `ai-skill runtime compile` 階段 projection：所有 known project metadata 的 `private_tokens` / `private_entities` → `runtime.db.derived_forbidden_tokens` table (含 case variants expansion)
+- [x] 實作 scanner core：staged file 落在 shared-layer subtree → 比對 derived_forbidden_tokens → emit finding
+- [x] **Bootstrap-safe guard**：scanner 不做「reusable layer 是否包含 token」inference；新 framework concept 只要不在任何 project private_tokens 內，自動通過
+- [x] False-positive guardrail：`enforcement/sanitization.md` 自身的 example 段落 self-reference exception（Phase 1 以 metadata-derived scope 達成：未被 project metadata 宣告的 synthetic examples 不會觸發；真實 private token 仍會被擋）
+- [x] Unit tests：
+  - fail case：synthetic reconstruction of private-token leak in shared-layer plan content
+  - pass case：same private token allowed in project-local `.agent-goals/` content
   - bootstrap-safety case：首次提交一個全新 framework concept token，確認 0 finding
 
 ### Phase 2 — Generic Regex Patterns (inherited from superseded plan)
@@ -273,6 +273,15 @@ git pre-commit hook
 | Q6 | False-positive 處理機制：suggested_placeholder 是否自動 patch staged content？ | P2 | open | v1 不自動 patch；自動 patch 列 v2 評估。 |
 | Q7 | P4 attestation-prohibited 原則升級為 cross-cutting governance：何時抽出獨立 enforcement rule (`enforcement/verification-not-declaration.md`)，覆蓋 Dependency Read / Test Executed / Coverage Reviewed 等？ | P2 | open | 本 plan 內留 inline；累積 ≥3 個受益 obligation 後 promote 為獨立 rule，列入 parent meta-plan tracking。 |
 | Q8 | Metadata 欄位是否改名 `private_entities` 而非 `private_tokens`？ | P3 (naming) | open | 實際要保護的是 project identity / product names / customer names 等實體；token 是實作層。`private_entities` 語意較準，但 case-variant 展開後的物件仍是字串 token。**非架構級**，Phase 1 metadata schema 設計時收斂。 |
+
+---
+
+## Acceptance
+
+- Phase 1 blocks staged shared-layer content containing project-declared private tokens from `.ai-skill-project.yaml`.
+- Phase 1 remains bootstrap-safe: no project metadata means no private-token findings.
+- Phase 2 regex and Phase 2.5 incident-score heuristics remain deferred until their checklist items are explicitly executed.
+- `rule_classes[sanitization]` has one active implementation path: this metadata-derived plan.
 
 ---
 

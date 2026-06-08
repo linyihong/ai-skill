@@ -104,6 +104,8 @@ func createGoRuntimeSchema(db *sql.DB) error {
 		`CREATE TABLE runtime_source_files (source_path TEXT PRIMARY KEY, source_kind TEXT NOT NULL DEFAULT 'db', target_table TEXT NOT NULL, compile_rule TEXT NOT NULL, compiled_at TEXT NOT NULL, compiler_version TEXT NOT NULL, status TEXT NOT NULL);`,
 		`CREATE TABLE compiler_metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);`,
 		`CREATE TABLE generated_surfaces (id INTEGER PRIMARY KEY AUTOINCREMENT, source_path TEXT NOT NULL, target_key TEXT NOT NULL, compile_rule TEXT NOT NULL, compiled_at TEXT NOT NULL, compiler_version TEXT NOT NULL, status TEXT NOT NULL, data TEXT NOT NULL, UNIQUE(source_path, target_key));`,
+		`CREATE TABLE repository_topology (subtree TEXT PRIMARY KEY, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
+		`CREATE TABLE derived_forbidden_tokens (token TEXT NOT NULL, canonical_token TEXT NOT NULL, owning_project_id TEXT NOT NULL, source_metadata_path TEXT NOT NULL, suggested_placeholder TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), PRIMARY KEY (token, owning_project_id, source_metadata_path));`,
 		`CREATE TABLE runtime_budget (id INTEGER PRIMARY KEY AUTOINCREMENT, model_name TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE context_ttl_policy (id INTEGER PRIMARY KEY AUTOINCREMENT, ttl_type TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE circuit_breaker (id INTEGER PRIMARY KEY AUTOINCREMENT, guard_name TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
@@ -298,6 +300,9 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB, docs map[string]ma
 	if err := insertRuntimeSourceFile(db, "runtime/compiler/compiler-rules.yaml", "compiler_rules", "compiler_rules_config"); err != nil {
 		return err
 	}
+	if err := compileDerivedForbiddenTokens(repo, db); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -330,6 +335,7 @@ func runtimeConfigMappings() []runtimeConfigMapping {
 		{"runtime/recovery/state-repair.yaml", "state_repair", "procedure_id", "repair_procedures", []string{"name", "id"}},
 		{"runtime/recovery/obligation-rebuild.yaml", "obligation_rebuild", "procedure_id", "rebuild_procedures", []string{"name", "id"}},
 		{"runtime/recovery/phase-reconciliation.yaml", "phase_reconciliation", "procedure_id", "reconciliation_procedures", []string{"name", "id"}},
+		{"runtime/repository-topology.yaml", "repository_topology", "subtree", "shared_layer_classification", []string{"subtree"}},
 		{"runtime/scheduler/execution-queue.yaml", "execution_queue", "queue_name", "queue_structure", []string{"name", "id"}},
 		{"runtime/scheduler/priority-scheduler.yaml", "priority_scheduler", "priority_level", "levels", []string{"name", "level"}},
 		{"runtime/transactions/transaction-machine.yaml", "transaction_templates_ext", "template_name", "transaction_templates", []string{"id", "name"}},
@@ -890,7 +896,17 @@ func runtimeCompilerDomain(sourcePath string) string {
 
 func loadRuntimeCanonicalDocuments(repo string) (map[string]map[string]any, error) {
 	dbPath := filepath.Join(repo, "runtime", "runtime.db")
-	if docs, err := readRuntimeCanonicalDocumentsFromDB(dbPath); err == nil && len(docs) >= len(runtimeCanonicalDocumentPaths()) {
+	if docs, err := readRuntimeCanonicalDocumentsFromDB(dbPath); err == nil && len(docs) > 0 {
+		for _, rel := range runtimeCanonicalDocumentPaths() {
+			if _, ok := docs[rel]; ok {
+				continue
+			}
+			doc, readErr := readRuntimeYAMLMap(repo, rel)
+			if readErr != nil {
+				return nil, fmt.Errorf("load missing canonical runtime document %s: %w", rel, readErr)
+			}
+			docs[rel] = doc
+		}
 		return docs, nil
 	}
 	return importRuntimeCanonicalDocumentsFromYAML(repo)

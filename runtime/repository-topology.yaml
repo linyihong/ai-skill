@@ -1,0 +1,48 @@
+schema_version: 1
+status: active
+owner_layer: runtime
+source_plan: plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md
+
+runtime_projection:
+  enabled: true
+  target_key: runtime.repository_topology.config
+
+summary: >
+  Canonical repository topology surface for classifying reusable shared-layer
+  paths separately from project-local or implementation-only paths. Sanitization
+  consumes this projection to decide where private project tokens are forbidden.
+
+shared_layer_classification:
+  - subtree: plans/
+    shared: true
+  - subtree: workflow/
+    shared: true
+  - subtree: enforcement/
+    shared: true
+  - subtree: governance/
+    shared: true
+  - subtree: knowledge/
+    shared: true
+  - subtree: runtime/
+    shared: true
+  - subtree: validation/
+    shared: true
+  - subtree: intelligence/
+    shared: true
+  - subtree: scripts/
+    shared: false
+  - subtree: ai-tools/
+    shared: true
+  - subtree: .agent-goals/
+    shared: false
+
+expected_consumers:
+  - sanitization
+  - workflow_activation
+  - governance_lint
+  - dependency_reading
+
+invariants:
+  - Topology is a source-of-truth surface, not a detector heuristic.
+  - Shared-layer classification must not infer project privacy by absence.
+  - Project-local metadata remains the source of private token declarations.

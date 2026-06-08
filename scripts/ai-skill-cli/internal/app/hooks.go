@@ -295,6 +295,17 @@ func runPreCommitHook(result Result, root string) Result {
 		return result
 	}
 
+	if msg := validateSanitizationStagedContent(root, staged); msg != "" {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{
+			Code:        "sanitization_scan_failed",
+			Message:     msg,
+			Remediation: "Replace project-specific tokens with placeholders or move incident evidence to project-local documentation before committing shared-layer files.",
+		}
+		return result
+	}
+
 	if len(result.Mutations) == 0 {
 		result.Checks = append(result.Checks, Check{Name: "pre_commit", Status: "ok", Message: "no runtime or knowledge hook action required"})
 	}
