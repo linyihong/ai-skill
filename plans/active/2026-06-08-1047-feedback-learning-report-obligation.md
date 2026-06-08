@@ -59,7 +59,7 @@ Not every turn must write a feedback lesson.
 - **B. 每次都強制新增 feedback lesson** — reject。會造成 `feedback/history/` 膨脹，把純查詢、已覆蓋規則與低價值紀錄都寫成 durable knowledge。
 - **C. 只在 non-local repo 時要求 report** — reject。Repo context 與 learning decision 是正交資訊；local repo 中使用者指出 failure / workflow gap 時也應回報 learning decision。
 - **D. 用 `NONE` / `CHECK` / `NEEDED` 單一欄位表達所有狀態** — reject。它混合「是否需要學習」「是否能判斷」「是否能寫回」「repo 是否可見」四個不同維度，會製造假訊號。
-- **E. 拆成 `feedback_decision`、`repo_context`、`writeback_status`、`learning_type` 四維 contract** — accept。讓 hook 可做 schema validation，semantic correctness 留給 scenarios。
+- **E. 拆成 `feedback_decision`、`repo_context`、`writeback_status` 三維 contract** — accept。讓 hook 可做 schema validation，semantic correctness 留給 scenarios；knowledge classification 留給 knowledge acquisition / economics / memory plans。
 
 ### Why Not an ADR Yet
 
@@ -89,10 +89,10 @@ Not every turn must write a feedback lesson.
 #### 風險
 
 - 若格式太複雜，agent 可能 ritualize 填報。
-- 若 `learning_type` 定義不清，可能把低價值 observation 寫成 durable lesson。
+- 若本 plan 開始分類 observation / lesson quality，會侵入 Knowledge Acquisition Layer。
 - 若 hook 試圖判斷語義正確性，會把機械 close-out gate 變成 fragile semantic reviewer。
 
-Glossary Impact: yes — proposed terms `feedback_learning_report`, `learning_decision`, `repo_context`, `writeback_status`, `learning_type`; glossary entry 是否需要新增待 Phase 0 決定。
+Glossary Impact: yes — proposed terms `feedback_learning_report`, `learning_decision`, `repo_context`, `writeback_status`; glossary entry 是否需要新增待 Phase 0 決定。
 
 ## Runtime Execution Path
 
@@ -136,19 +136,16 @@ Writeback: N/A
 FeedbackDecision: NEEDED
 RepoContext: LOCAL
 Writeback: COMPLETED
-LearningType: LESSON
 Target: workflow
 
 FeedbackDecision: NEEDED
 RepoContext: NON_LOCAL
 Writeback: UNAVAILABLE
-LearningType: LESSON
 Target: feedback-history
 
 FeedbackDecision: UNKNOWN
 RepoContext: UNKNOWN
 Writeback: N/A
-LearningType: OBSERVATION
 ```
 
 ### Full Form
@@ -163,7 +160,6 @@ Use full form when `FeedbackDecision: NEEDED`, `FeedbackDecision: UNKNOWN`, high
 | feedback_decision | NONE / NEEDED / UNKNOWN |
 | repo_context | LOCAL / NON_LOCAL / UNKNOWN |
 | writeback_status | COMPLETED / DEFERRED / UNAVAILABLE / N/A |
-| learning_type | NONE / OBSERVATION / LESSON |
 | trigger | user correction / validation gap / workflow gap / repeated failure / none |
 | target | none / feedback-history / intelligence / workflow / enforcement / project-docs |
 | reason | <why> |
@@ -178,7 +174,6 @@ Use full form when `FeedbackDecision: NEEDED`, `FeedbackDecision: UNKNOWN`, high
 | `feedback_decision` | `NONE` / `NEEDED` / `UNKNOWN` | 是否有值得沉澱的 learning，以及是否有足夠 evidence 判斷。 |
 | `repo_context` | `LOCAL` / `NON_LOCAL` / `UNKNOWN` | Agent 是否能確認目前 repo context。 |
 | `writeback_status` | `COMPLETED` / `DEFERRED` / `UNAVAILABLE` / `N/A` | 若需要沉澱，是否已能寫回或只能延後。 |
-| `learning_type` | `NONE` / `OBSERVATION` / `LESSON` | 只是觀察，還是需要 durable knowledge。 |
 
 ### Decision Semantics
 
@@ -187,10 +182,8 @@ Use full form when `FeedbackDecision: NEEDED`, `FeedbackDecision: UNKNOWN`, high
 | `feedback_decision: NONE` | 沒有 reusable learning 需要沉澱 | 可與 `repo_context: NON_LOCAL` 同時存在，例如純概念問答。 |
 | `feedback_decision: NEEDED` | 有值得沉澱的 lesson / project feedback / rule gap | 必須提供 `target`，並說明 `writeback_status`。 |
 | `feedback_decision: UNKNOWN` | evidence insufficient / cannot verify / repo inaccessible | 不等於需要沉澱；只是不能可靠判斷。 |
-| `learning_type: OBSERVATION` | 有觀察但不應立刻寫 durable lesson | 避免 user wording correction 等低價值訊號污染 feedback history。 |
-| `learning_type: LESSON` | 需要 durable knowledge 或 project feedback | 適用於 validation rule missing、workflow hole、repeated failure、evidence chain failure。 |
 
-### Triggers for `NEEDED` + `LESSON`
+### Triggers for `NEEDED`
 
 - 使用者指出 agent 漏讀、漏驗證、誤判、重複犯錯。
 - 發現 workflow、validation、evidence chain、routing、close-loop 或 feedback gap。
@@ -246,6 +239,21 @@ Stop hook should not validate semantic correctness:
 
 Commit messages are explicitly out of scope. This report is a chat/session runtime close-out artifact, not a code artifact.
 
+## Out of Scope Boundary
+
+This plan reports learning disposition and writeback capability only. It does not track:
+
+- knowledge classification quality
+- promotion lifecycle
+- knowledge acquisition lifecycle
+- memory integration
+- economics / knowledge cost
+- activation fitness
+- telemetry
+- linked update completion
+
+Those belong to Runtime Cognitive State / Knowledge Acquisition / Economics / Memory / Fitness contracts, especially [`2026-05-27-1557-tool-runtime-signal-economics-integration.md`](2026-05-27-1557-tool-runtime-signal-economics-integration.md) and [`2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md`](2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md).
+
 ## Open Questions
 
 - [ ] `repo_context: LOCAL` 的判斷是否要求 `git status` clean，還是只要求有 local repo root？
@@ -298,8 +306,8 @@ Commit messages are explicitly out of scope. This report is a chat/session runti
 
 ## Phase 3 — Feedback Learning Routing
 
-- [ ] Define how `feedback_decision: NEEDED` and `learning_type: LESSON` map to durable targets: `feedback-history`, `intelligence`, `workflow`, `enforcement`, `project-docs`.
-- [ ] Define `learning_type: OBSERVATION` handling so low-value observations do not pollute durable lesson stores.
+- [ ] Define how `feedback_decision: NEEDED` maps to durable targets: `feedback-history`, `intelligence`, `workflow`, `enforcement`, `project-docs`.
+- [ ] Define how `writeback_status` reports completed / deferred / unavailable writeback capability without tracking promotion lifecycle.
 - [ ] Update feedback / failure learning docs only if Phase 0 finds the existing rules insufficient.
 - [ ] Ensure report does not force writing low-value lessons.
 
