@@ -932,7 +932,7 @@ rule_classes:
     coverage: mechanical
     source_files:
       - runtime/core-bootstrap.yaml#per_turn_obligations[obligation.feedback.learning_report]
-      - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+      - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
     executors:
       - file: scripts/ai-skill-cli/internal/app/hooks.go
         symbol: validateFeedbackLearningReport

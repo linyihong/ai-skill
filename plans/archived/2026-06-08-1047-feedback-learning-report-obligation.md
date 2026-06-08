@@ -1,15 +1,15 @@
 ---
 id: 2026-06-08-1047-feedback-learning-report-obligation
 plan_kind: main
-status: draft
+status: completed (auto-detected)
 owner: linyihong
 created: 2026-06-08
 ---
 
 # Feedback / Learning Report Obligation
 
-**Status**: `draft`
-**Maturity**: Phase 0 checked; ready for Phase 1
+**Status**: `completed (auto-detected)`
+**Maturity**: Completed; archived after Plan Completion Closure
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-08
 **Priority**：P1
@@ -68,11 +68,11 @@ Not every turn must write a feedback lesson.
 
 ### ADR Promotion Criteria
 
-- [ ] `runtime/core-bootstrap.yaml` 新 obligation 已落地並被 tool stop hook 消費。
-- [ ] Cursor / Claude / generic adapter 的 close-out behavior 已同步。
-- [ ] 至少 3 個 validation scenarios 覆蓋：缺 report、enum/schema invalid、需要 feedback 但未回報。
-- [ ] 實際使用一段時間後，沒有造成 feedback lesson spam。
-- [ ] 確認這是 cross-session / cross-agent foundational obligation，而不是單一工具行為。
+- [x] `runtime/core-bootstrap.yaml` 新 obligation 已落地並被 tool stop hook 消費。
+- [x] Cursor / Claude / generic adapter 的 close-out behavior 已同步。
+- [x] 至少 3 個 validation scenarios 覆蓋：缺 report、enum/schema invalid、需要 feedback 但未回報。
+- [ ] 實際使用一段時間後，沒有造成 feedback lesson spam。Deferred: this is an ADR promotion criterion that requires post-use observation, not remaining implementation work.
+- [x] 確認這是 cross-session / cross-agent foundational obligation，而不是單一工具行為。
 
 ### Consequences
 
@@ -93,7 +93,7 @@ Not every turn must write a feedback lesson.
 - 若本 plan 開始分類 observation / lesson quality，會侵入 Knowledge Acquisition Layer。
 - 若 hook 試圖判斷語義正確性，會把機械 close-out gate 變成 fragile semantic reviewer。
 
-Glossary Impact: yes — proposed terms `feedback_learning_report`, `learning_decision`, `repo_context`, `writeback_status`; glossary entry 是否需要新增待 Phase 0 決定。
+Glossary Impact: yes — registered `feedback_learning_report`, `feedback_decision` (alias `learning_decision`), `repo_context`, and `writeback_status` in `knowledge/glossary/ai-skill.md`.
 
 ## Runtime Execution Path
 
@@ -262,7 +262,7 @@ This plan reports learning disposition and writeback capability only. It does no
 - telemetry
 - linked update completion
 
-Those belong to Runtime Cognitive State / Knowledge Acquisition / Economics / Memory / Fitness contracts, especially [`2026-05-27-1557-tool-runtime-signal-economics-integration.md`](2026-05-27-1557-tool-runtime-signal-economics-integration.md) and [`2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md`](2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md).
+Those belong to Runtime Cognitive State / Knowledge Acquisition / Economics / Memory / Fitness contracts, especially [`2026-05-27-1557-tool-runtime-signal-economics-integration.md`](../active/2026-05-27-1557-tool-runtime-signal-economics-integration.md) and [`2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md`](../active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md).
 
 ## Open Questions
 
@@ -390,25 +390,25 @@ Phase 4 result: runtime close-out scenarios now cover required report presence, 
 
 ## 完成條件
 
-- [ ] New per-turn obligation exists in runtime contract.
-- [ ] Final close-out hook blocks or repairs missing Feedback / Learning Report.
-- [ ] Compact and full formats are documented.
-- [ ] Repo context, feedback decision, and writeback status are separate dimensions.
-- [ ] Non-local repo can report `feedback_decision: NONE` when no learning exists.
-- [ ] Hook validates report presence/schema/enums only, not semantic correctness.
-- [ ] Commit message does not require Feedback / Learning Report.
-- [ ] Validation scenarios exist and pass.
-- [ ] Tool adapters document the new final close-out requirement.
-- [ ] No secret, local path, project incident evidence, or private repo detail is written into reusable docs.
-- [ ] Plan Completion Closure executed when implementation finishes.
+- [x] New per-turn obligation exists in runtime contract.
+- [x] Final close-out hook blocks or repairs missing Feedback / Learning Report.
+- [x] Compact and full formats are documented.
+- [x] Repo context, feedback decision, and writeback status are separate dimensions.
+- [x] Non-local repo can report `feedback_decision: NONE` when no learning exists.
+- [x] Hook validates report presence/schema/enums only, not semantic correctness.
+- [x] Commit message does not require Feedback / Learning Report.
+- [x] Validation scenarios exist and pass.
+- [x] Tool adapters document the new final close-out requirement.
+- [x] No secret, local path, project incident evidence, or private repo detail is written into reusable docs.
+- [x] Plan Completion Closure executed when implementation finishes.
 
 ## Stakeholder 同意項目
 
-- [ ] Report is mandatory; writing a feedback lesson is conditional.
-- [ ] Repo context must be explicit in final response.
-- [ ] `Feedback: NONE` remains allowed for ordinary local low-risk turns.
-- [ ] `feedback_decision: NONE` remains allowed for non-local low-risk turns.
-- [ ] `feedback_decision: NEEDED` must name a durable target and writeback status.
+- [x] Report is mandatory; writing a feedback lesson is conditional.
+- [x] Repo context must be explicit in final response.
+- [x] `Feedback: NONE` remains allowed for ordinary local low-risk turns.
+- [x] `feedback_decision: NONE` remains allowed for non-local low-risk turns.
+- [x] `feedback_decision: NEEDED` must name a durable target and writeback status.
 
 ## Per-surface consumer 表
 
@@ -417,10 +417,25 @@ Phase 4 result: runtime close-out scenarios now cover required report presence, 
 | `runtime.core_bootstrap.contract` updated obligation | stop hook final response validator | Go hook consumer |
 | `validation/scenarios/runtime/*feedback*` | runtime audit / validation scenario inventory | validation scenario |
 
+## Plan Completion Closure
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| All phases complete | pass | Phase 0–5 checklists are complete. |
+| Completion criteria complete | pass | §完成條件 all checked. |
+| Runtime contract projected | pass | `ai-skill runtime obligations` lists `obligation.feedback.learning_report`; runtime compile/refresh/validate passed during Phases 1–4. |
+| Hook enforcement implemented | pass | `validateFeedbackLearningReport` is bound in `enforcement/enforcement-registry.yaml`; focused stop-hook tests and full CLI suite passed in Phase 2. |
+| Validation scenarios present | pass | Four runtime / failure-derived scenarios added and indexed. |
+| Tool adapters synchronized | pass | Cursor and Claude docs/contracts updated; other tools remain canonical/behavioral/compatibility surfaces per Phase 2.0 matrix. |
+| Glossary impact handled | pass | `feedback_learning_report`, `feedback_decision`, `repo_context`, `writeback_status` registered in `knowledge/glossary/ai-skill.md`. |
+| Archive action | pass | Plan moved from `plans/active/` to `plans/archived/` after closure. |
+
+ADR note: accepted ADR promotion is deferred until the remaining ADR criterion is met: observe real usage long enough to confirm the report does not create feedback lesson spam.
+
 ## 與其他 plans 的關係
 
-- Related to [`archived/2026-05-25-2100-runtime-cognitive-contract-v2.md`](../archived/2026-05-25-2100-runtime-cognitive-contract-v2.md): mirrors the idea of final response reporting obligation, but for learning decision rather than cognition state.
-- Related to [`2026-05-27-1557-tool-runtime-signal-economics-integration.md`](2026-05-27-1557-tool-runtime-signal-economics-integration.md): that plan discusses knowledge acquisition inside future Runtime Cognitive State / economics surfaces. This plan should run first as a narrow close-out obligation and avoid absorbing the broader economics / telemetry scope.
-- Related to [`2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md`](2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md): fitness / optimization memory remains future Gen4 interface work; this plan only reports learning disposition, not outcome fitness.
-- Related to [`archived/2026-05-31-1900-workflow-activation-engine.md`](../archived/2026-05-31-1900-workflow-activation-engine.md): final close-out hooks are one enforcement surface for runtime agent behavior.
+- Related to [`2026-05-25-2100-runtime-cognitive-contract-v2.md`](2026-05-25-2100-runtime-cognitive-contract-v2.md): mirrors the idea of final response reporting obligation, but for learning decision rather than cognition state.
+- Related to [`2026-05-27-1557-tool-runtime-signal-economics-integration.md`](../active/2026-05-27-1557-tool-runtime-signal-economics-integration.md): that plan discusses knowledge acquisition inside future Runtime Cognitive State / economics surfaces. This plan should run first as a narrow close-out obligation and avoid absorbing the broader economics / telemetry scope.
+- Related to [`2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md`](../active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md): fitness / optimization memory remains future Gen4 interface work; this plan only reports learning disposition, not outcome fitness.
+- Related to [`2026-05-31-1900-workflow-activation-engine.md`](2026-05-31-1900-workflow-activation-engine.md): final close-out hooks are one enforcement surface for runtime agent behavior.
 - Related to feedback/failure learning rules: this plan adds final reporting, not a replacement for failure learning loop.

@@ -246,6 +246,58 @@ related-terms:
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```
 
+## feedback_decision
+
+```yaml
+term: feedback_decision
+status: canonical
+owner-layer: validation-governance
+meaning: >
+  Feedback / Learning Report 的 close-out decision enum（NONE / NEEDED /
+  UNKNOWN），回答本輪是否有值得沉澱的 reusable learning，以及是否有足夠
+  evidence 判斷。它不分類 lesson 品質，也不追蹤 promotion lifecycle。
+affects:
+  - runtime/core-bootstrap.yaml
+  - scripts/ai-skill-cli/internal/app/hooks.go
+  - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
+aliases:
+  - learning_decision
+anti-meaning: >
+  不是 knowledge_mode、不是 memory promotion decision、不是 semantic quality score。
+related-terms:
+  - { type: related_to, target: feedback_learning_report }
+  - { type: related_to, target: repo_context }
+  - { type: related_to, target: writeback_status }
+introduced-by: plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
+```
+
+## feedback_learning_report
+
+```yaml
+term: feedback_learning_report
+status: canonical
+owner-layer: validation-governance
+meaning: >
+  Final close-out obligation that reports learning disposition for the current
+  turn: feedback_decision, repo_context, writeback_status, optional target, and
+  a short reason when needed. It makes learning disposition visible without
+  forcing a durable lesson on every turn.
+affects:
+  - runtime/core-bootstrap.yaml
+  - CORE_BOOTSTRAP.md
+  - scripts/ai-skill-cli/internal/app/hooks.go
+  - validation/scenarios/runtime/feedback-report-required-v1.yaml
+  - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
+anti-meaning: >
+  Not a knowledge acquisition system, not an economics/telemetry surface, and
+  not a replacement for feedback/history lessons or failure learning records.
+related-terms:
+  - { type: related_to, target: feedback_decision }
+  - { type: related_to, target: repo_context }
+  - { type: related_to, target: writeback_status }
+introduced-by: plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
+```
+
 ## fitness_system
 
 ```yaml
@@ -537,6 +589,51 @@ affects:
 introduced-by: plans/archived/2026-05-21-0834-cross-platform-go-script-runtime.md
 ```
 
+## rejected_optimization_memory
+
+```yaml
+term: rejected_optimization_memory
+status: candidate
+owner-layer: ecosystem-adaptation
+meaning: >
+  Future memory lifecycle for optimization candidates that were explicitly
+  rejected because they regressed quality, increased token cost, raised
+  governance friction, caused telemetry overhead, or over-activated context.
+  The purpose is to prevent repeated optimization hallucinations.
+affects:
+  - architecture/ai-native-cognitive-ecosystem-system.md
+  - plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
+anti-meaning: >
+  Not a generic failure pattern; it records rejected improvement attempts and
+  their regression or cost evidence.
+introduced-by: plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
+```
+
+## repo_context
+
+```yaml
+term: repo_context
+status: canonical
+owner-layer: validation-governance
+meaning: >
+  Feedback / Learning Report dimension that states whether the agent can
+  identify the current repository/project context as LOCAL, NON_LOCAL, or
+  UNKNOWN. It is orthogonal to feedback_decision and does not imply git clean,
+  pushed, or readback state.
+affects:
+  - runtime/core-bootstrap.yaml
+  - scripts/ai-skill-cli/internal/app/hooks.go
+  - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
+anti-meaning: >
+  Not git status, not close-loop completion, and not permission to write
+  reusable docs.
+related-terms:
+  - { type: related_to, target: feedback_learning_report }
+  - { type: related_to, target: feedback_decision }
+  - { type: related_to, target: writeback_status }
+introduced-by: plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
+```
+
 ## required_for_completion
 
 ```yaml
@@ -557,26 +654,6 @@ anti-meaning: >
 related-terms:
   - { type: related_to, target: plan_tree }
 introduced-by: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md
-```
-
-## rejected_optimization_memory
-
-```yaml
-term: rejected_optimization_memory
-status: candidate
-owner-layer: ecosystem-adaptation
-meaning: >
-  Future memory lifecycle for optimization candidates that were explicitly
-  rejected because they regressed quality, increased token cost, raised
-  governance friction, caused telemetry overhead, or over-activated context.
-  The purpose is to prevent repeated optimization hallucinations.
-affects:
-  - architecture/ai-native-cognitive-ecosystem-system.md
-  - plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
-anti-meaning: >
-  Not a generic failure pattern; it records rejected improvement attempts and
-  their regression or cost evidence.
-introduced-by: plans/active/2026-05-28-1636-gen4-fitness-optimization-memory-interface-reservation.md
 ```
 
 ## sub_plan_reason
@@ -613,4 +690,28 @@ affects:
   - runtime/cognitive-modes.yaml
   - plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
 introduced-by: plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
+```
+
+## writeback_status
+
+```yaml
+term: writeback_status
+status: canonical
+owner-layer: validation-governance
+meaning: >
+  Feedback / Learning Report dimension that reports current-turn writeback
+  capability/result for a needed durable target: COMPLETED, DEFERRED,
+  UNAVAILABLE, or N/A. It describes this turn's close-out state only.
+affects:
+  - runtime/core-bootstrap.yaml
+  - scripts/ai-skill-cli/internal/app/hooks.go
+  - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
+anti-meaning: >
+  Not promotion lifecycle tracking, not linked update completion, not
+  economics/telemetry, and not evidence that the learning quality was scored.
+related-terms:
+  - { type: related_to, target: feedback_learning_report }
+  - { type: related_to, target: feedback_decision }
+  - { type: related_to, target: repo_context }
+introduced-by: plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
 ```

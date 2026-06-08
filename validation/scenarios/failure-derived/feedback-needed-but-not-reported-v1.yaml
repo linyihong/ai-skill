@@ -3,7 +3,7 @@
 # 測試 agent 被使用者指出 reusable workflow / validation gap 後，不能只修
 # 當下內容而漏掉 Feedback / Learning Report。
 # 來源：
-#   - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+#   - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
 #   - enforcement/failure-learning-system.md
 
 id: feedback-needed-but-not-reported-v1
@@ -25,7 +25,7 @@ given:
     - runtime/core-bootstrap.yaml
     - enforcement/failure-learning-system.md
     - feedback/feedback-lessons.md
-    - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+    - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
   transcript:
     - role: user
       text: "你剛剛只修 Cursor，沒有考慮 Claude、Roo、Codex、Gemini、Copilot。這個要抽成 cross-tool runtime boundary。"
@@ -71,7 +71,7 @@ then:
   expected_final_route: needed_feedback_report_present
   expected_intelligence:
     - enforcement/failure-learning-system.md
-    - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+    - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
   trace_required:
     - user_correction_signal
     - reusable_learning_decision

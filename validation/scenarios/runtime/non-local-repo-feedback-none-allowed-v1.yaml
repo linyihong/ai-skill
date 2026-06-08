@@ -3,7 +3,7 @@
 # 驗證 repo_context 與 feedback_decision 是正交維度；non-local repo
 # 不應自動變成 UNKNOWN 或 NEEDED。
 # 來源：
-#   - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md §Decision Rules
+#   - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md §Decision Rules
 #   - runtime/core-bootstrap.yaml §per_turn_obligations[obligation.feedback.learning_report]
 
 id: non-local-repo-feedback-none-allowed-v1
@@ -15,7 +15,7 @@ given:
   task: answer_general_concept_question_outside_local_repo
   artifacts:
     - runtime/core-bootstrap.yaml
-    - plans/active/2026-06-08-1047-feedback-learning-report-obligation.md
+    - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
   transcript:
     - role: user
       text: "CAP theorem 是什麼？簡短說明就好。"
