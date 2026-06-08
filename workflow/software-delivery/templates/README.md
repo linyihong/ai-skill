@@ -10,6 +10,6 @@ Use these templates as focused artifact shapes. Load only the template that matc
 | [`implementation-plan-template.md`](implementation-plan-template.md) | Planning implementation slices, validation, and same-session closure. |
 | [`review-report-template.md`](review-report-template.md) | Reporting review findings, evidence, residual risk, and closure status. |
 | [`product-impact-alignment-template.md`](product-impact-alignment-template.md) | Aligning product impact, journey evidence, assumptions, and acceptance. |
-| [`ui-governance-evidence-template.md`](ui-governance-evidence-template.md) | Classifying UI compliance evidence by governance domain, validation mechanism, evidence class, severity, and project-local design-system policy. |
+| [`ui-governance-evidence-template.md`](ui-governance-evidence-template.md) | Classifying UI compliance evidence by governance domain, collection method, validation mechanism, evidence class, severity, and project-local design-system policy. |
 
 Do not merge UI governance evidence back into `contract-template.md` unless the artifact is defining expected UI behavior. Compliance evidence belongs in the focused UI governance template.

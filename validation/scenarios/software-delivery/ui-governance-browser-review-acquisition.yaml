@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-browser-review-acquisition
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/archived/2026-06-08-1544-evidence-acquisition-layer.md
+source_phase: phase-2
+
+given:
+  task_intent: "Review a login page after implementation by opening the browser and checking visual hierarchy with an AI reviewer."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  evidence_chain:
+    domain: Design System
+    collection_method: browser_review
+    acquired_artifact: screenshot
+    mechanism: ai_review
+    evidence_class: ai_review
+    severity: warn
+
+when:
+  action: classify_ui_evidence_acquisition
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  expected_route:
+    - classify_browser_review_as_collection_method
+    - classify_ai_review_as_validation_mechanism
+    - keep_screenshot_as_acquired_artifact_or_provisional_evidence_class
+    - keep_design_system_as_governance_domain
+  expected_governance:
+    domain: Design System
+    collection_method: browser_review
+    validation_mechanism: ai_review
+    evidence_class: ai_review
+    severity: warn
+  forbidden_routes:
+    - treat_browser_review_as_governance_domain
+    - treat_browser_review_as_validation_mechanism
+    - treat_browser_review_as_blocking_validator
+    - treat_screenshot_acquisition_as_compliance_proof
+
+pre_source_wiring_expectation:
+  before_evidence_acquisition_layer: FAIL
+  reason: "Browser review had no explicit taxonomy layer and could be mistaken for a validator."
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-governance.md#Collection Methods
+    - workflow/software-delivery/validation.md#Evidence Acquisition Execution

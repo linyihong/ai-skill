@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-missing-collection-method
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/archived/2026-06-08-1544-evidence-acquisition-layer.md
+source_phase: phase-2
+
+given:
+  task_intent: "Claim UI compliance with a visual diff and accessibility scan but no explanation of how evidence was acquired."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+  incomplete_evidence_claim:
+    domain: Closure
+    mechanism:
+      - screenshot_diff
+      - deterministic
+    evidence_class:
+      - visual_diff
+      - accessibility_scan
+    collection_method: missing
+
+when:
+  action: evaluate_ui_completion_evidence_shape
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  expected_route:
+    - require_collection_method_before_ui_completion_claim
+    - report_acquisition_gap_as_warning_or_classification_failure
+    - keep_mechanism_and_evidence_class_from_substituting_for_acquisition
+  expected_governance:
+    domain: Closure
+    collection_method: missing
+    validation_mechanism: screenshot_diff
+    evidence_class: visual_diff
+    severity: warn
+  forbidden_routes:
+    - pass_ui_completion_claim_with_missing_collection_method
+    - infer_browser_review_from_visual_diff_without_evidence
+    - treat_visual_diff_as_collection_method
+    - treat_accessibility_scan_as_collection_method
+
+pre_source_wiring_expectation:
+  before_evidence_acquisition_layer: FAIL
+  reason: "UI evidence shape did not require explaining how evidence was acquired."
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/execution-flow.yaml#gate.software_delivery.ui_governance_complete
+    - workflow/software-delivery/artifact-gates.md#5.1 UI Governance Evidence Shape
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md#Classification

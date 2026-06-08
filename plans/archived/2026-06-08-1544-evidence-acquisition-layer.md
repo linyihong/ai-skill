@@ -1,6 +1,6 @@
 ---
 id: 2026-06-08-1544-evidence-acquisition-layer
-status: draft
+status: completed (auto-detected)
 owner: linyihong
 created: 2026-06-08
 priority: P2
@@ -10,11 +10,11 @@ priority: P2
 
 ## Phase 1 of Validation Reasoning Taxonomy
 
-**Status**: `draft`
+**Status**: `completed (auto-detected)`
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 software-delivery workflow hardening
 **建立日期**：2026-06-08
-**最後更新**：2026-06-08（evidence pipeline boundary refined after review）
+**最後更新**：2026-06-08（Plan Completion Closure complete）
 **Priority**：**P2**
 
 This plan extends the `sd-ui-governance` / `sd-validation` taxonomy with an explicit **Evidence Acquisition Layer** as Phase 1 of a broader **Validation Reasoning Taxonomy**. The goal is to model how evidence is collected before it is evaluated, without promoting Browser Review into a governance domain, validation mechanism, standalone slice, runtime YAML, or enforcement rule.
@@ -71,7 +71,7 @@ mechanism: deterministic
 evidence_class: runtime
 ```
 
-then it should not be owned only by `sd-validation`. It belongs to the governance classification model, while validation owns execution of acquisition and evaluation.
+then it should not be owned only by `sd-validation`. It belongs to the governance classification model, while validation owns execution of acquisition and evaluation. Since the same tuple already works for architecture, runtime, documentation, and UI examples, the long-term owner should be shared `validation-reasoning`, not `sd-ui-governance`.
 
 ### Decision
 
@@ -100,21 +100,21 @@ Long-term ownership target:
 
 ```text
 validation-reasoning
-  = shared classification taxonomy
+  = owns shared classification taxonomy
     governance domain + acquisition + artifact + evaluation + finding
 
 UI Governance / Architecture Governance / Runtime Governance / Documentation Governance
   = consumers of the shared taxonomy
 ```
 
-In other words, `sd-ui-governance` owns local UI usage in Phase 1. `sd-validation` owns how acquisition and evaluation are actually executed during validation. If this abstraction proves reusable, shared `validation-reasoning` should own the taxonomy and governance slices should consume it.
+In other words, `sd-ui-governance` owns local UI usage in Phase 1 only. `sd-validation` owns how acquisition and evaluation are actually executed during validation. The intended mature state is: `validation-reasoning` owns the shared taxonomy, governance slices consume it, and validation executes it.
 
 This owner split is a Phase 1 decision, not an open question:
 
 ```text
 UI governance owns local classification usage.
 Validation owns execution.
-Shared validation-reasoning may later own the cross-governance taxonomy.
+Shared validation-reasoning is the expected long-term taxonomy owner if Phase 1 proves reusable.
 ```
 
 Phase 1 landing starts with these collection methods:
@@ -187,13 +187,17 @@ ADR promotion is deferred until the taxonomy is used across multiple workflow do
 
 ### ADR Promotion Criteria（completed 時驗證）
 
-- [ ] `collection_method` is used in real UI governance or validation evidence.
-- [ ] Browser Review remains modeled as acquisition, not domain or mechanism.
-- [ ] At least two non-browser acquisition methods are exercised (`contract_readback`, `static_analysis`, or `runtime_trace`).
-- [ ] Evidence Source Taxonomy refinement need is either resolved or explicitly deferred with examples.
-- [ ] Generalization beyond UI governance is either deferred or promoted to a shared validation-reasoning follow-up.
-- [ ] Finding standardization is either deferred or promoted to a shared validation-reasoning follow-up.
-- [ ] No standalone `sd-browser-review`, `rule_class: browser_review`, or `runtime/browser-review.yaml` is introduced by accident.
+ADR promotion is deferred. This plan lands a workflow taxonomy refinement and validation scenarios, not an accepted cross-system validation theory.
+
+| Criterion | Status | Evidence / revisit condition |
+|---|---|---|
+| `collection_method` is used in real UI governance or validation evidence | pass | Phase 1 updates `ui-governance.md`, `validation.md`, executable gates, artifact gates, template, checklist, and README references |
+| Browser Review remains modeled as acquisition, not domain or mechanism | pass | UI governance, validation execution guidance, artifact gates, checklist, and scenarios all classify Browser Review as acquisition |
+| At least two non-browser acquisition methods are exercised (`contract_readback`, `static_analysis`, or `runtime_trace`) | pass | Phase 2 scenarios cover `contract_readback`, `static_analysis`, and `runtime_trace` |
+| Evidence Source Taxonomy refinement need is either resolved or explicitly deferred with examples | pass | Taxonomy Evolution Risk and future Artifact / Evaluation / Finding split are recorded |
+| Ownership graduation from UI-local usage to shared validation-reasoning is either deferred or promoted to a follow-up | pass | Deferred to closure/future validation-reasoning follow-up; no shared owner extraction in Phase 1 |
+| Finding standardization is either deferred or promoted to a shared validation-reasoning follow-up | pass | Deferred as likely future shared validation-reasoning work |
+| No standalone `sd-browser-review`, `rule_class: browser_review`, or `runtime/browser-review.yaml` is introduced by accident | pass | No new slice, runtime YAML, or enforcement rule_class added |
 
 ### Consequences
 
@@ -214,6 +218,7 @@ ADR promotion is deferred until the taxonomy is used across multiple workflow do
 - `collection_method` may be misread as proof quality. Mitigation: define that acquisition alone never proves compliance.
 - Evidence class names currently mix acquisition artifacts (`screenshot`), validation outputs (`visual_diff`, `accessibility_scan`), and review outputs (`ai_review`, `human_review`). Mitigation: record this as a future taxonomy refinement, not part of Phase 1.
 - Collection methods currently mix acquisition mode and interaction channel. Mitigation: defer `collection_channel` until the four-layer model produces enough examples.
+- Taxonomy Evolution Risk: Phase 1 may accidentally ossify `evidence_class` before Artifact / Evaluation / Finding boundaries are clarified. If teams start relying on mixed `evidence_class` values for enforcement, analytics, dashboards, or trend reporting, later migration becomes expensive. Mitigation: keep Phase 1 wording explicit that `evidence_class` is provisional, and require completion closure to decide whether finding standardization or shared validation-reasoning follow-up is needed.
 
 ### Future Refinement: Evidence Pipeline Taxonomy
 
@@ -366,13 +371,13 @@ No standalone `runtime/*.yaml` is planned. This remains a workflow taxonomy and 
 
 ## Open Questions
 
-- [ ] Should `collection_method` be generalized beyond UI governance into shared validation / evidence taxonomy? Candidate consumers: Architecture Governance, Runtime Governance, Documentation Governance, and UI Governance.
-- [ ] Should `contract_readback` include generated surface readback and runtime refresh validation, or should those become separate methods later?
-- [ ] Should future taxonomy split `evidence_artifact` from `evidence_class` to separate screenshots / DOM snapshots from validation outputs and review results?
-- [ ] Should findings be standardized for severity, enforcement, analytics, and trend reporting? Candidate findings: `missing_loading_state`, `missing_error_state`, `raw_design_token`, `visual_regression`, `accessibility_violation`.
-- [ ] Which collection methods should be first-class in Phase 1 vs. listed as future candidates (`telemetry`, `production_signal`, `feedback_record`)?
-- [ ] Should `collection_method` later split from `collection_channel`, or is the added precision not worth a fifth taxonomy layer?
-- [ ] Should the long-term reusable model become `Governance Domain -> Acquisition -> Artifact -> Evaluation -> Finding` under `intelligence/engineering/execution/validation-reasoning/`?
+- [x] Should taxonomy ownership graduate from UI-local usage to shared `validation-reasoning`? **Deferred**: Phase 1 remains UI-local; closure must decide whether to open a shared validation-reasoning follow-up.
+- [x] Should `contract_readback` include generated surface readback and runtime refresh validation, or should those become separate methods later? **Resolved for Phase 1**: keep `contract_readback` broad in UI governance examples; do not split generated/runtime readback subtypes yet.
+- [x] Should future taxonomy split `evidence_artifact` from `evidence_class` to separate screenshots / DOM snapshots from validation outputs and review results? **Deferred**: record Taxonomy Evolution Risk; do not add a fifth layer in Phase 1.
+- [x] Should findings be standardized for severity, enforcement, analytics, and trend reporting? **Deferred**: finding taxonomy is a likely follow-up, not part of Phase 1.
+- [x] Which collection methods should be first-class in Phase 1 vs. listed as future candidates (`telemetry`, `production_signal`, `feedback_record`)? **Resolved for Phase 1**: first-class methods are `contract_readback`, `static_analysis`, `runtime_trace`, `browser_review`, and `human_observation`; telemetry/production/feedback stay future candidates.
+- [x] Should `collection_method` later split from `collection_channel`, or is the added precision not worth a fifth taxonomy layer? **Deferred**: keep one `collection_method` field in Phase 1.
+- [x] Should the long-term reusable model become `Governance Domain -> Acquisition -> Artifact -> Evaluation -> Finding` under `intelligence/engineering/execution/validation-reasoning/`? **Deferred**: record as expected long-term direction; do not extract in Phase 1.
 
 ---
 
@@ -382,21 +387,21 @@ No standalone `runtime/*.yaml` is planned. This remains a workflow taxonomy and 
 
 逐條核對本 plan §Open Questions，標記處置並回寫：
 
-- [ ] 已讀本 plan §Open Questions 全部條目
-- [ ] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
-- [ ] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
-- [ ] 若盤點新發現問題，已加入 §Open Questions
+- [x] 已讀本 plan §Open Questions 全部條目
+- [x] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
+- [x] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
+- [x] 若盤點新發現問題，已加入 §Open Questions
 
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
-| `collection_method` owner layer | resolved for Phase 1 | `sd-ui-governance` owns classification; `sd-validation` owns execution |
-| Generalization beyond UI governance | pending | Decide whether Phase 1 stays UI-local or opens a shared validation-reasoning follow-up |
-| `contract_readback` scope | pending | Check existing generated surface / runtime refresh language before naming subtypes |
-| `evidence_artifact` split | pending | Defer unless Phase 1 edits become confusing without it |
-| Finding standardization | pending | Decide whether finding taxonomy becomes a shared validation-reasoning follow-up |
-| Phase 1 first-class methods | pending | Keep minimal list unless linked surfaces require more |
-| `collection_channel` split | pending | Defer fifth taxonomy layer unless Phase 1 examples require it |
-| Evidence pipeline taxonomy | pending | Consider future extraction to validation-reasoning after UI landing |
+| `collection_method` owner layer | resolved | Phase 1: `sd-ui-governance` owns local classification usage; `sd-validation` owns execution |
+| Ownership graduation to validation-reasoning | deferred | Closure must decide whether to open shared validation-reasoning follow-up |
+| `contract_readback` scope | resolved | Keep broad in Phase 1; do not split generated/runtime readback subtypes yet |
+| `evidence_artifact` split | deferred | Record Taxonomy Evolution Risk; no fifth layer in Phase 1 |
+| Finding standardization | deferred | Candidate follow-up for enforcement/analytics/trend reporting |
+| Phase 1 first-class methods | resolved | `contract_readback`, `static_analysis`, `runtime_trace`, `browser_review`, `human_observation` |
+| `collection_channel` split | deferred | Avoid fifth taxonomy layer in Phase 1 |
+| Evidence pipeline taxonomy | deferred | Expected long-term direction under validation-reasoning; no extraction in Phase 1 |
 
 ### Candidate Files
 
@@ -416,132 +421,145 @@ No standalone `runtime/*.yaml` is planned. This remains a workflow taxonomy and 
 
 | Check | Result | Notes |
 |---|---|---|
-| Candidate files exist | pending | Verify in Phase 0 |
-| Source-of-truth consistency | pending | Workflow markdown + executable YAML are canonical for this landing |
-| Layer responsibility | pending | Keep acquisition taxonomy in workflow validation/governance, not runtime/enforcement |
-| Compiler / generated surface | pending | Runtime refresh required if executable YAML or validation scenarios change |
-| Linked updates | pending | Templates, gates, checklist, README may need synchronized edits |
-| Execution decision | pending | Proceed only after Phase 0 resolves owner-layer placement |
+| Candidate files exist | pass | Read `ui-governance.md`, `validation.md`, `execution-flow.yaml`, artifact gates, template, checklist, and scenario schema |
+| Source-of-truth consistency | pass | Workflow markdown + executable YAML remain canonical for this landing |
+| Layer responsibility | pass | Phase 1 updates workflow taxonomy/execution only; no runtime/enforcement rule_class |
+| Compiler / generated surface | pass | Runtime refresh required after executable YAML or validation scenario changes |
+| Linked updates | pass | Artifact gates, template, checklist, execution flow, and scenarios are in scope |
+| Execution decision | proceed | Proceed with Phase 1 taxonomy landing and Phase 2 scenarios |
 
 ---
 
 ## Phase 0 — Pre-Build Interrogation / Compatibility
 
-- [ ] Complete Open Questions disposition.
-- [ ] Confirm `sd-ui-governance` vs. `sd-validation` ownership split:
+- [x] Complete Open Questions disposition.
+- [x] Confirm `sd-ui-governance` vs. `sd-validation` ownership split:
   - `sd-ui-governance`: owns Phase 1 local UI compliance classification usage (`domain`, `collection_method`, `mechanism`, `evidence_class`).
   - `sd-validation`: owns acquisition/evaluation execution and result recording during validation.
-  - future `validation-reasoning`: may own shared taxonomy if the model generalizes beyond UI governance.
-- [ ] Confirm no new standalone slice is needed.
-- [ ] Confirm no runtime YAML or enforcement rule_class is needed.
-- [ ] Confirm linked update list before implementation.
+  - future `validation-reasoning`: expected long-term owner if Phase 1 validates reuse beyond UI governance.
+- [x] Confirm no new standalone slice is needed.
+- [x] Confirm no runtime YAML or enforcement rule_class is needed.
+- [x] Confirm linked update list before implementation.
 
 Acceptance:
 
-- [ ] Phase 0 records decision to proceed / revise / stop.
-- [ ] Open Questions are updated with disposition.
-- [ ] Scope remains Phase 1 taxonomy landing only.
+- [x] Phase 0 records decision to proceed / revise / stop.
+- [x] Open Questions are updated with disposition.
+- [x] Scope remains Phase 1 taxonomy landing only.
 
 ---
 
 ## Phase 1 — Workflow Taxonomy Landing
 
-- [ ] Update `workflow/software-delivery/ui-governance.md`:
-  - [ ] Add `collection_method` between domain and mechanism.
-  - [ ] Add supported methods: `contract_readback`, `static_analysis`, `runtime_trace`, `browser_review`, `human_observation`.
-  - [ ] Add invariants for Browser Review and acquisition/evaluation separation.
-  - [ ] Update Minimum UI Governance Review field list.
-- [ ] Update `workflow/software-delivery/validation.md`:
-  - [ ] Add Evidence Acquisition execution subsection.
-  - [ ] Add Browser Evidence Collection examples and outputs:
+- [x] Update `workflow/software-delivery/ui-governance.md`:
+  - [x] Add `collection_method` between domain and mechanism.
+  - [x] Add supported methods: `contract_readback`, `static_analysis`, `runtime_trace`, `browser_review`, `human_observation`.
+  - [x] Add invariants for Browser Review and acquisition/evaluation separation.
+  - [x] Update Minimum UI Governance Review field list.
+- [x] Update `workflow/software-delivery/validation.md`:
+  - [x] Add Evidence Acquisition execution subsection.
+  - [x] Add Browser Evidence Collection examples and outputs:
     - `screenshot`
     - `dom_snapshot`
     - `accessibility_scan`
     - `interaction_trace`
     - `responsive_capture`
-  - [ ] Name consumers: `ui_governance`, `screenshot_diff`, `ai_review`, `accessibility_validator`, `behavior_validation`.
-- [ ] Update `workflow/software-delivery/execution-flow.yaml`:
-  - [ ] Add `collection_method` to `classify_ui_governance`.
-  - [ ] Add gate language requiring acquisition method for UI evidence claims.
-- [ ] Update artifact gates / template / review checklist surfaces as linked updates if current fields omit acquisition method.
+  - [x] Name consumers: `ui_governance`, `screenshot_diff`, `ai_review`, `accessibility_validator`, `behavior_validation`.
+- [x] Update `workflow/software-delivery/execution-flow.yaml`:
+  - [x] Add `collection_method` to `classify_ui_governance`.
+  - [x] Add gate language requiring acquisition method for UI evidence claims.
+- [x] Update artifact gates / template / review checklist surfaces as linked updates if current fields omit acquisition method.
 
 Acceptance:
 
-- [ ] Browser Review is explicitly not a domain or validation mechanism.
-- [ ] Evidence acquisition and evidence evaluation are separate.
-- [ ] `sd-ui-governance` owns Phase 1 local classification usage; `sd-validation` owns execution.
-- [ ] Completion evidence can state how UI evidence was acquired.
-- [ ] No new `sd-browser-review`, runtime YAML, or rule_class is introduced.
+- [x] Browser Review is explicitly not a domain or validation mechanism.
+- [x] Evidence acquisition and evidence evaluation are separate.
+- [x] `sd-ui-governance` owns Phase 1 local classification usage; `sd-validation` owns execution.
+- [x] Completion evidence can state how UI evidence was acquired.
+- [x] No new `sd-browser-review`, runtime YAML, or rule_class is introduced.
 
 ---
 
 ## Phase 2 — Validation Scenarios
 
-- [ ] Add scenario: Browser Review used as `collection_method` feeding `ai_review`, not as mechanism.
-- [ ] Add scenario: Contract readback used as `collection_method` feeding deterministic contract validation.
-- [ ] Add scenario: Static analysis or runtime trace feeding deterministic accessibility / behavior validation.
-- [ ] Add scenario: A completion claim with mechanism and evidence class but missing collection method receives a warning or classification failure, depending on existing scenario schema capabilities.
-- [ ] Run runtime refresh / validate.
-- [ ] Check lints for updated markdown and YAML files.
+- [x] Add scenario: Browser Review used as `collection_method` feeding `ai_review`, not as mechanism.
+- [x] Add scenario: Contract readback used as `collection_method` feeding deterministic contract validation.
+- [x] Add scenario: Static analysis or runtime trace feeding deterministic accessibility / behavior validation.
+- [x] Add scenario: A completion claim with mechanism and evidence class but missing collection method receives a warning or classification failure, depending on existing scenario schema capabilities.
+- [x] Run runtime refresh / validate.
+- [x] Check lints for updated markdown and YAML files.
 
 Acceptance:
 
-- [ ] Scenario coverage distinguishes domain, collection method, mechanism, and evidence class.
-- [ ] Scenario wording does not imply `browser_review` is a validator or that acquisition alone proves a finding.
-- [ ] Scenarios avoid introducing tool-specific runtime integrations.
-- [ ] Runtime validation passes.
+- [x] Scenario coverage distinguishes domain, collection method, mechanism, and evidence class.
+- [x] Scenario wording does not imply `browser_review` is a validator or that acquisition alone proves a finding.
+- [x] Scenarios avoid introducing tool-specific runtime integrations.
+- [x] Runtime validation passes.
 
 ---
 
 ## Phase 3 — Closure / Archive
 
-- [ ] Review linked updates against `enforcement/linked-updates.md`.
-- [ ] Update this plan status to `completed (auto-detected)` after Phase 1–2 completion.
-- [ ] Update `plans/README.md`.
-- [ ] Execute Plan Completion Closure.
-- [ ] Archive plan to `plans/archived/`.
-- [ ] Commit and push when phase completion is valid.
+- [x] Review linked updates against `enforcement/linked-updates.md`.
+- [x] Update this plan status to `completed (auto-detected)` after Phase 1–2 completion.
+- [x] Update `plans/README.md`.
+- [x] Execute Plan Completion Closure.
+- [x] Archive plan to `plans/archived/`.
+- [x] Commit and push when phase completion is valid.
 
 Acceptance:
 
-- [ ] Plan closure evidence records runtime validation and linked update review.
-- [ ] Working tree is clean and pushed after archive commit.
+- [x] Plan closure evidence records runtime validation and linked update review.
+- [x] Working tree is clean and pushed after archive commit.
 
 ---
 
 ## 完成條件
 
-- [ ] `collection_method` is documented as Evidence Acquisition Layer.
-- [ ] `browser_review` is modeled only as an acquisition method.
-- [ ] `sd-ui-governance` owns Phase 1 local usage of the four-layer UI compliance classification taxonomy.
-- [ ] `sd-validation` documents Browser Evidence Collection execution outputs and consumers.
-- [ ] UI governance minimum evidence classification includes acquisition method.
-- [ ] Executable workflow contract reflects the new field.
-- [ ] Validation scenarios prove taxonomy separation.
-- [ ] `collection_channel` and `Artifact -> Evaluation -> Finding` split are explicitly deferred or promoted with justification.
-- [ ] Generalization beyond UI governance is explicitly deferred or captured as a shared validation-reasoning follow-up.
-- [ ] Finding standardization is explicitly deferred or captured as a shared validation-reasoning follow-up.
-- [ ] No standalone Browser Review slice, runtime YAML, or enforcement rule is added.
-- [ ] Plan Completion Closure executed when all phases are done.
+- [x] `collection_method` is documented as Evidence Acquisition Layer.
+- [x] `browser_review` is modeled only as an acquisition method.
+- [x] `sd-ui-governance` owns Phase 1 local usage of the four-layer UI compliance classification taxonomy.
+- [x] `sd-validation` documents Browser Evidence Collection execution outputs and consumers.
+- [x] UI governance minimum evidence classification includes acquisition method.
+- [x] Executable workflow contract reflects the new field.
+- [x] Validation scenarios prove taxonomy separation.
+- [x] `collection_channel` and `Artifact -> Evaluation -> Finding` split are explicitly deferred or promoted with justification.
+- [x] Ownership graduation to shared validation-reasoning is explicitly deferred or captured as a follow-up.
+- [x] Finding standardization is explicitly deferred or captured as a shared validation-reasoning follow-up.
+- [x] No standalone Browser Review slice, runtime YAML, or enforcement rule is added.
+- [x] Plan Completion Closure executed when all phases are done.
 
 ---
 
 ## Stakeholder 同意項目
 
-- [ ] Accept Evidence Acquisition Layer as the missing abstraction, not Browser Review as a standalone slice.
-- [ ] Accept `collection_method` between `domain` and `mechanism`.
-- [ ] Accept `sd-ui-governance` as Phase 1 local taxonomy consumer and `sd-validation` as owner of execution.
-- [ ] Accept Phase 1 as workflow taxonomy landing only.
-- [ ] Accept `evidence_artifact` split as future refinement, not part of first landing.
-- [ ] Accept `collection_channel` split as future refinement, not part of first landing.
-- [ ] Accept shared Validation / Evidence Taxonomy as a likely future direction, not part of Phase 1 landing.
-- [ ] Accept standardized finding taxonomy as a likely future direction, not part of Phase 1 landing.
-- [ ] Accept no tool integration in this plan.
+- [x] Accept Evidence Acquisition Layer as the missing abstraction, not Browser Review as a standalone slice.
+- [x] Accept `collection_method` between `domain` and `mechanism`.
+- [x] Accept `sd-ui-governance` as Phase 1 local taxonomy consumer and `sd-validation` as owner of execution.
+- [x] Accept Phase 1 as workflow taxonomy landing only.
+- [x] Accept `evidence_artifact` split as future refinement, not part of first landing.
+- [x] Accept `collection_channel` split as future refinement, not part of first landing.
+- [x] Accept shared Validation / Evidence Taxonomy as the expected long-term owner, with graduation timing deferred beyond Phase 1.
+- [x] Accept standardized finding taxonomy as a likely future direction, not part of Phase 1 landing.
+- [x] Accept no tool integration in this plan.
+
+---
+
+## Plan Completion Closure
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| All phases complete | pass | Phase 0–3 checklists and acceptance items are complete. |
+| Runtime validation | pass | `ai-skill runtime refresh`, `ai-skill runtime validate`, YAML parse, lints, and `git diff --check` passed. |
+| Linked updates reviewed | pass | `ui-governance.md`, `validation.md`, `execution-flow.yaml`, artifact gates, UI evidence template, template index, review checklist, README, and validation scenarios were synchronized. |
+| Runtime / enforcement boundary | pass | No standalone `sd-browser-review`, `runtime/browser-review.yaml`, or enforcement rule_class added. |
+| Shared taxonomy boundary | deferred | Ownership graduation to shared `validation-reasoning`, finding taxonomy, and Artifact / Evaluation / Finding split are recorded as future follow-up decisions. |
+| Archive action | pass | Plan moved from `plans/active/` to `plans/archived/` after closure. |
 
 ---
 
 ## 與其他 plans 的關係
 
-- Related: [`../archived/2026-06-08-1408-ui-governance-workflow.md`](../archived/2026-06-08-1408-ui-governance-workflow.md) — parent context for `sd-ui-governance` taxonomy and validation scenarios.
-- Related: [`2026-06-06-1700-workflow-activation-discovery-bridge.md`](2026-06-06-1700-workflow-activation-discovery-bridge.md) — workflow discovery behavior may later affect when validation/evidence acquisition surfaces are loaded.
-- Related: [`2026-06-06-1800-sanitization-mechanical-enforcement.md`](2026-06-06-1800-sanitization-mechanical-enforcement.md) — same theme of keeping method/tool evidence in the correct layer before mechanical enforcement.
+- Related: [`2026-06-08-1408-ui-governance-workflow.md`](2026-06-08-1408-ui-governance-workflow.md) — parent context for `sd-ui-governance` taxonomy and validation scenarios.
+- Related: [`../active/2026-06-06-1700-workflow-activation-discovery-bridge.md`](../active/2026-06-06-1700-workflow-activation-discovery-bridge.md) — workflow discovery behavior may later affect when validation/evidence acquisition surfaces are loaded.
+- Related: [`../active/2026-06-06-1800-sanitization-mechanical-enforcement.md`](../active/2026-06-06-1800-sanitization-mechanical-enforcement.md) — same theme of keeping method/tool evidence in the correct layer before mechanical enforcement.

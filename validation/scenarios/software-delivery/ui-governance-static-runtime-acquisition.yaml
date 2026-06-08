@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-static-runtime-acquisition
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P2
+source_plan: plans/archived/2026-06-08-1544-evidence-acquisition-layer.md
+source_phase: phase-2
+
+given:
+  task_intent: "Validate a UI behavior and accessibility claim using a static scan plus runtime interaction trace."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+  evidence_inputs:
+    - domain: Accessibility
+      collection_method: static_analysis
+      acquired_artifact: accessibility_lint_output
+      mechanism: deterministic
+      evidence_class: accessibility_scan
+      severity: block_candidate
+    - domain: Behavior
+      collection_method: runtime_trace
+      acquired_artifact: interaction_trace
+      mechanism: deterministic
+      evidence_class: runtime
+      severity: block_candidate
+
+when:
+  action: classify_static_and_runtime_evidence_acquisition
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/review-checklist.md
+  expected_route:
+    - classify_static_analysis_as_collection_method
+    - classify_runtime_trace_as_collection_method
+    - allow_deterministic_mechanism_to_consume_multiple_collection_methods
+    - keep_accessibility_and_behavior_domains_separate
+  expected_governance:
+    first_claim:
+      domain: Accessibility
+      collection_method: static_analysis
+      validation_mechanism: deterministic
+      evidence_class: accessibility_scan
+    second_claim:
+      domain: Behavior
+      collection_method: runtime_trace
+      validation_mechanism: deterministic
+      evidence_class: runtime
+  forbidden_routes:
+    - let_deterministic_mechanism_own_accessibility_domain
+    - collapse_static_analysis_and_runtime_trace_into_evidence_class
+    - treat_runtime_trace_acquisition_as_validation_success
+
+pre_source_wiring_expectation:
+  before_evidence_acquisition_layer: FAIL
+  reason: "Static analysis and runtime trace could be mixed into mechanism/evidence without acquisition ownership."
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-governance.md#Collection Methods
+    - workflow/software-delivery/validation.md#Evidence Acquisition Execution

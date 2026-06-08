@@ -100,14 +100,14 @@ gates:
       - guidance can translate to code, config, test, or review checklist
       - residual risk and limits are stated
       - consumer/UI changes can trace consumer needs, screen states, view model derivation, accessibility expectations, and relevant fixtures or tests
-      - UI compliance claims classify governance domain, validation mechanism, evidence class, severity, project-local design-system policy, and visual / AI review scope without duplicating UI contract definitions
+      - UI compliance claims classify governance domain, collection method, validation mechanism, evidence class, severity, project-local design-system policy, and visual / AI review scope without duplicating UI contract definitions
       - replacement/parity and performance evidence are included when relevant
 
 required_evidence:
   - artifact shape decision
   - owner layer decision
   - consumer/UI contract decision when a consumer surface exists
-  - UI governance evidence decision when UI compliance, design-system, accessibility, behavior pattern, visual baseline, or AI visual review is claimed
+  - UI governance evidence decision with collection method when UI compliance, design-system, accessibility, behavior pattern, visual baseline, or AI visual review is claimed
   - sanitization review summary
   - linked update statement
   - validation method
@@ -136,7 +136,10 @@ failure_modes:
     recovery: Add validation method, limits, and residual risk before promotion.
   - id: ui_governance_domain_mechanism_collapse
     detection: UI compliance artifact treats visual diff, AI review, or screenshot as a governance domain instead of a validation mechanism / evidence class.
-    recovery: Reclassify the artifact through ui-governance.md and record domain, mechanism, evidence class, severity, and project-local policy separately.
+    recovery: Reclassify the artifact through ui-governance.md and record domain, collection method, mechanism, evidence class, severity, and project-local policy separately.
+  - id: ui_governance_acquisition_mechanism_collapse
+    detection: UI compliance artifact treats browser_review, screenshot capture, DOM snapshot, accessibility tree, or human observation as a validation mechanism or compliance proof.
+    recovery: Reclassify the artifact through ui-governance.md and validation.md; record collection method separately from validation mechanism, evidence class, severity, and project-local policy.
 
 final_status_report:
   required_fields:

@@ -5,37 +5,46 @@
 | slice 欄位 | 值 |
 |---|---|
 | `id` | `sd-ui-governance` |
-| `purpose` | 在 UI / consumer contract 已存在或正在建立時，定義 UI compliance 如何被評估：governance domain、validation mechanism、evidence class、severity policy 與 runtime projection boundary |
+| `purpose` | 在 UI / consumer contract 已存在或正在建立時，定義 UI compliance 如何被分類：governance domain、collection method、validation mechanism、evidence class、severity policy 與 runtime projection boundary |
 | `type` | `execution` |
 | `tags` | artifact-gate, ui, design-system, accessibility, behavior-governance, visual-validation |
 | `load_when` | UI / consumer surface 需要 design-system enforcement、accessibility evidence、behavior pattern checks、visual baseline review、AI visual review scoping，或 completion claim 依賴 UI compliance |
 | `do_not_load_when` | 無 user-visible consumer surface、純 provider 內部變更、只修不影響 UI behavior / contract / design-system compliance 的小錯 |
 | `owner_layer` | workflow |
-| `layer_justification` | 規定「UI compliance 評估前要分類哪些 domain、mechanism、evidence、severity，並保持 runtime projection advisory-only」的 ordering / gate；通過 workflow membership test，不承載 evidence 取得方法（非 analysis），不論證長期 pattern（非 intelligence） |
+| `layer_justification` | 規定「UI compliance 評估前要分類哪些 domain、collection method、mechanism、evidence、severity，並保持 runtime projection advisory-only」的 ordering / gate；通過 workflow membership test。Phase 1 只擁有 UI-local taxonomy usage；長期 shared taxonomy owner 可能是 validation-reasoning |
 | `canonical_source` | 本檔 |
-| `dependencies` | `sd-ui-contracts`（UI contract expectations）、`sd-test-strategy`（proof target selection）、`sd-validation`（evidence execution） |
+| `dependencies` | `sd-ui-contracts`（UI contract expectations）、`sd-test-strategy`（proof target selection）、`sd-validation`（evidence acquisition / evaluation execution） |
 | `dependency_budget` | default `max_depth:2` / `max_runtime_dependencies:4` |
 | `validation_signal` | UI governance scenarios can prove domain/mechanism separation, evidence classification, and AI visual warning boundary before runtime/enforcement promotion |
 
 ## Boundary
 
-`sd-ui-contracts` defines what the UI should be. `sd-ui-governance` defines how UI compliance is evaluated.
+`sd-ui-contracts` defines what the UI should be. `sd-ui-governance` defines how UI compliance is classified before validation executes acquisition and evaluation.
 
 ```text
 sd-ui-contracts
   = What UI should be
 
 sd-ui-governance
-  = How UI compliance is evaluated
+  = How UI compliance is classified
+
+validation-reasoning (future shared owner)
+  = Cross-governance evidence taxonomy, if Phase 1 proves reusable
 
 sd-validation
-  = How evidence is executed
+  = How evidence is acquired and evaluated
 
 runtime-governance
   = How violations affect execution
 ```
 
 Current scope: workflow governance only. Runtime signals are advisory projections until a separate promotion decision names an executor, consumer, evidence threshold, and registry transition path.
+
+Phase 1 owner boundary:
+
+- `sd-ui-governance` owns local UI compliance classification: domain, collection method, validation mechanism, evidence class, severity, and policy scope.
+- `sd-validation` owns execution: acquiring evidence, running evaluation, and recording results.
+- Future shared `validation-reasoning` may own the cross-governance taxonomy if the same model proves useful for Architecture, Runtime, Documentation, or Security governance.
 
 ## Governance Domains
 
@@ -60,6 +69,38 @@ Contract
 
 Keep this open until scenarios show whether separate handling improves routing or only adds taxonomy cost.
 
+## Collection Methods
+
+Collection methods answer how evidence is acquired before it is evaluated. A collection method is not a governance domain, not a validation mechanism, and not proof of compliance by itself.
+
+```yaml
+supported_collection_methods:
+  - contract_readback
+  - static_analysis
+  - runtime_trace
+  - browser_review
+  - human_observation
+```
+
+| Collection method | Acquires | Typical consumers |
+|---|---|---|
+| `contract_readback` | Screen / Consumer / ViewModel / Accessibility contract rows, generated surface readback, declared policy | deterministic mechanism, Closure domain |
+| `static_analysis` | Code/config/lint/build assertions, token usage, component primitive usage | deterministic mechanism |
+| `runtime_trace` | Component state, route behavior, UI event path, interaction trace | deterministic or manual review mechanisms |
+| `browser_review` | Screenshot, DOM snapshot, accessibility tree, responsive capture, observed interaction state | screenshot_diff, ai_review, deterministic accessibility or behavior validation |
+| `human_observation` | Designer / reviewer observation, UX heuristic note, manual behavior evidence | manual_review mechanism, human_review evidence |
+
+Browser Review invariants:
+
+- Browser Review is not a governance domain.
+- Browser Review is not a validation mechanism.
+- Browser Review is an evidence collection method.
+- A collection method may support multiple mechanisms.
+- A mechanism may consume evidence from multiple collection methods.
+- Evidence acquisition must not imply validation success by itself.
+
+Future refinement: `collection_method` may later split from `collection_channel` if browser / human / telemetry channels need separate treatment. Do not add that fifth taxonomy layer in Phase 1.
+
 ## Validation Mechanisms
 
 Validation mechanisms answer how a governance domain is evaluated. A mechanism can support multiple domains and must not own a domain.
@@ -74,15 +115,17 @@ supported_mechanisms:
 
 | Mechanism | Use when | Boundary |
 |---|---|---|
-| deterministic | Rule can be checked from contract, code, config, lint, fixture, or scan output | Can become block candidate when project policy and evidence are objective |
-| screenshot_diff | UI appearance has deterministic capture and a meaningful baseline | Supports Design System or Behavior; not a governance domain |
+| deterministic | Rule can be checked from contract, code, config, lint, fixture, runtime trace, accessibility tree, or scan output | Can become block candidate when project policy and evidence are objective |
+| screenshot_diff | UI appearance has deterministic capture and a meaningful baseline | Supports Design System or Behavior; not a governance domain or collection method |
 | ai_review | Visual hierarchy, spacing consistency, CTA prominence, or heuristic feedback needs model review | Advisory by default; requires scoped rubric before it can affect release decision |
-| manual_review | Human design / UX judgment is required | Useful evidence, but not mechanical unless mapped to objective checklist items |
+| manual_review | Human design / UX judgment is required | Useful evaluation, but not mechanical unless mapped to objective checklist items |
 
 Two invariants must hold:
 
 - No governance domain is represented solely by a validation mechanism.
 - No validation mechanism is owned by a single governance domain.
+- No collection method is treated as a validation mechanism.
+- No collection method is treated as proof quality by itself.
 
 ## Severity Policy
 
@@ -99,6 +142,8 @@ Do not make "AI thinks the UI looks bad" equivalent to "build failed". Missing l
 ## Evidence Classes
 
 Evidence classes distinguish source trust. They prevent an AI review, a Percy diff, an axe violation, and a contract row from collapsing into one undifferentiated UI finding.
+
+Phase 1 warning: this list is provisional. It currently mixes evidence bodies (`contract`, `runtime`), acquisition artifacts (`screenshot`), evaluation outputs (`accessibility_scan`, `visual_diff`), and review outputs (`ai_review`, `human_review`). Do not use `evidence_class` as a durable finding taxonomy until a future validation-reasoning model splits Artifact / Evaluation / Finding.
 
 | Evidence class | Source examples | Use |
 |---|---|---|
@@ -136,6 +181,7 @@ Before claiming UI compliance, classify:
 | Field | Required answer |
 |---|---|
 | Domain | Contract, Design System, Accessibility, Behavior, Closure |
+| Collection method | contract_readback, static_analysis, runtime_trace, browser_review, human_observation |
 | Mechanism | deterministic, screenshot_diff, ai_review, manual_review |
 | Evidence class | contract, runtime, accessibility_scan, visual_diff, screenshot, ai_review, human_review |
 | Severity | block_candidate, warn, research, not_applicable |
@@ -147,6 +193,8 @@ Before claiming UI compliance, classify:
 - Do not define a global design-token scale.
 - Do not add a runtime/enforcement rule_class in the first landing.
 - Do not treat visual regression or AI review as governance domains.
+- Do not treat Browser Review as a governance domain, validation mechanism, or standalone validator.
 - Do not make AI visual review blocking without objective rubric, deterministic capture, and project opt-in.
+- Do not treat acquired evidence as validated finding without an evaluation mechanism and scoped evidence class.
 - Do not duplicate `sd-ui-contracts`; contracts remain the source for expected UI behavior.
 
