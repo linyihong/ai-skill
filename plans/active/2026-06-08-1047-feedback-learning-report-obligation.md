@@ -313,6 +313,16 @@ Phase 1 result: runtime contract now owns the feedback report obligation, compac
 
 ## Phase 2 — Hook Enforcement
 
+- [ ] Phase 2.0 cross-tool capability preflight: read all active agent adapters and executable contracts before implementation (`cursor`, `claude`, `roo`, `codex`, `gemini-cli`, `copilot`).
+- [ ] Produce a per-tool enforcement matrix before code changes:
+  - Cursor: stop hook can loop via `followup_message` for true final assistant responses.
+  - Claude Code: stop hook can block via top-level `{"decision":"block"}`.
+  - Roo Code: no current repo-local stop hook transport documented; keep canonical obligation behavioral/tool-adapter until a verified host hook exists.
+  - Codex / generic AGENTS-aware tools: no current repo-local stop hook transport documented; rely on canonical final response obligation and repository validation until tool-specific enforcement exists.
+  - Gemini CLI: no current repo-local stop hook transport documented; keep adapter thin and avoid Gemini-specific enforcement claims unless implemented.
+  - GitHub Copilot: compatibility adapter only; instruction surfaces are not reliable hard enforcement, so hard guarantees remain repository hooks / CI / runtime validate.
+- [ ] Separate implementation into a host-neutral Feedback Report validator and host-specific renderers / fallback behavior.
+- [ ] Do not describe Cursor `followup_message` behavior as universal stop-hook behavior.
 - [ ] Extend stop hook final response validation to require Feedback / Learning Report.
 - [ ] Add repair follow-up wording parallel to missing Cognitive Mode block.
 - [ ] Add tests for missing report, compact report, full report, enum validation, and required field combinations.
