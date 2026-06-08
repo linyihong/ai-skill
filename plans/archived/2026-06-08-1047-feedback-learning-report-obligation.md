@@ -249,6 +249,25 @@ Stop hook should not validate semantic correctness:
 
 Commit messages are explicitly out of scope. This report is a chat/session runtime close-out artifact, not a code artifact.
 
+### Post-use Finding: Schema Pass Is Not Semantic Pass
+
+Observed after rollout: a final response can satisfy the stop-hook schema with
+`FeedbackDecision: NONE` even when the user has just identified a validation or
+test coverage gap. This is expected from the hook boundary above, but the agent
+behavior is still wrong.
+
+Required interpretation:
+
+- Stop hook acceptance means only that the report is present and schema-valid.
+- User correction about missed validation, workflow gaps, evidence gaps, or test
+  coverage gaps should drive `FeedbackDecision: NEEDED` unless the durable
+  prevention has already been fully written back and reported.
+- Scenario review, failure-learning rules, and future runtime validation must
+  catch this semantic class; do not expand the stop hook into a fragile semantic
+  reviewer.
+
+Validation scenario: `validation/scenarios/failure-derived/feedback-needed-after-validation-gap-v1.yaml`.
+
 ## Out of Scope Boundary
 
 This plan reports learning disposition and writeback capability only. It does not track:
@@ -378,9 +397,10 @@ Phase 3 result: routing is defined without adding knowledge classification, prom
 - [x] Add `validation/scenarios/runtime/feedback-report-schema-v1.yaml`.
 - [x] Add `validation/scenarios/runtime/non-local-repo-feedback-none-allowed-v1.yaml`.
 - [x] Add `validation/scenarios/failure-derived/feedback-needed-but-not-reported-v1.yaml`.
+- [x] Post-use correction: add `validation/scenarios/failure-derived/feedback-needed-after-validation-gap-v1.yaml` for schema-valid `NONE` after user-identified validation gaps.
 - [x] Run `ai-skill runtime refresh` and `ai-skill runtime validate`.
 
-Phase 4 result: runtime close-out scenarios now cover required report presence, schema/enum/field-combination validation, non-local `NONE` allowance, and failure-derived `NEEDED` reporting after reusable user correction.
+Phase 4 result: runtime close-out scenarios now cover required report presence, schema/enum/field-combination validation, non-local `NONE` allowance, failure-derived `NEEDED` reporting after reusable user correction, and post-use validation-gap corrections where schema-valid `NONE` is semantically wrong.
 
 ## Phase 5 — Tool Adapter Docs
 

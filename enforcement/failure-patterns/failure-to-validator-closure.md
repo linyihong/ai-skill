@@ -85,6 +85,7 @@ Agent 在修復錯誤後，沒有建立對應的 validator 測試，因為：
 
 - `validate_failure_pattern_validator_coverage` — 檢查每個 failure pattern 的 Linked Validation Scenarios 是否為空
 - `validate_intelligence_classification_boundary` — 檢查 intelligence/ 結構圖與實際目錄一致
+- `feedback-needed-after-validation-gap-v1` — 檢查使用者指出 validation / test coverage gap 後，schema-valid `FeedbackDecision: NONE` 不能被當成語意正確
 
 ---
 

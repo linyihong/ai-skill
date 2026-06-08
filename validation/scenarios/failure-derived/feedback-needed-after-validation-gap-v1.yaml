@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Feedback Needed After Validation Gap Scenario
+# 測試或驗證缺口被使用者指出後，agent 不能只修正當下報告，
+# 也不能以 schema-valid 的 `FeedbackDecision: NONE` 規避 learning disposition。
+# 來源：
+#   - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
+#   - enforcement/failure-learning-system.md
+#   - enforcement/failure-patterns/failure-to-validator-closure.md
+
+id: feedback-needed-after-validation-gap-v1
+domain: runtime
+type: failure-recovery
+priority: P1
+
+failure_source:
+  class: validation-gap / feedback-learning-report-miss
+  date: "2026-06-08"
+  description: >
+    User identifies that a completed test or validation pass missed an
+    important browser/runtime behavior. The agent reports a schema-valid
+    Feedback / Learning Report with `FeedbackDecision: NONE`, leaving the
+    validation gap out of durable feedback or project documentation.
+
+given:
+  task: close_out_after_test_gap_correction
+  artifacts:
+    - runtime/core-bootstrap.yaml
+    - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
+    - enforcement/failure-learning-system.md
+    - enforcement/failure-patterns/failure-to-validator-closure.md
+  transcript:
+    - role: assistant
+      text: |
+        The feature now works. Unit tests, contract tests, and integration tests passed.
+
+        Cognitive: NORMAL·SUMMARY_FIRST·STANDARD·NONE / V:CHECKLIST / Cost:LOW / Sig:validation-pass
+        FeedbackDecision: NONE
+        RepoContext: LOCAL
+        Writeback: N/A
+    - role: user
+      text: "The tests still did not cover the browser/runtime behavior that failed. Shouldn't this be feedback?"
+  signals:
+    - user correction
+    - validation gap
+    - test coverage gap
+    - reusable prevention value
+  constraints:
+    - the compact feedback report is schema-valid
+    - the stop hook is mechanical and does not judge NONE vs NEEDED semantics
+    - the correction has enough evidence to name a durable target
+
+when:
+  action: validate_learning_disposition_after_validation_gap
+
+then:
+  expected_route:
+    primary: require_needed_feedback_for_validation_gap
+    steps:
+      - detect that the user correction is about missed validation coverage
+      - classify the close-out as feedback_decision NEEDED, not NONE
+      - name the smallest durable target for prevention
+      - set writeback_status to COMPLETED, DEFERRED, or UNAVAILABLE based on whether writeback happened
+      - preserve separate Cognitive Mode reporting
+  expected_report:
+    feedback_decision: NEEDED
+    repo_context: LOCAL
+    writeback_status: COMPLETED_OR_DEFERRED
+    target_one_of:
+      - project-docs
+      - workflow
+      - enforcement
+      - feedback-history
+  forbidden_routes:
+    - report_feedback_none_after_validation_gap
+    - treat_schema_valid_none_as_semantically_correct
+    - rely_on_stop_hook_to_judge_learning_semantics
+    - omit_durable_target_after_user_correction
+  expected_final_route: needed_feedback_report_present
+  expected_intelligence:
+    - plans/archived/2026-06-08-1047-feedback-learning-report-obligation.md
+    - enforcement/failure-learning-system.md
+    - enforcement/failure-patterns/failure-to-validator-closure.md
+  trace_required:
+    - user_correction_signal
+    - validation_gap_signal
+    - reusable_learning_decision
+    - durable_target_selection
+  verification:
+    - "A schema-valid `FeedbackDecision: NONE` is rejected by scenario review when a user correction identifies a validation gap."
+    - "The corrected final response uses `FeedbackDecision: NEEDED` with a non-empty durable target."
