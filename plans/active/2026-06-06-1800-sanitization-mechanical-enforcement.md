@@ -1,7 +1,7 @@
 ---
 id: 2026-06-06-1800-sanitization-mechanical-enforcement
 plan_kind: sub
-status: draft
+status: in-progress
 owner: linyihong
 created: 2026-06-06
 parent: 2026-05-31-2100-mechanical-enforcement-registry
@@ -23,15 +23,15 @@ sub_plan_reason: >
 
 # Sanitization: Mechanical Enforcement (Metadata-Derived)
 
-**Status**: `draft`
+**Status**: `in-progress`
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 runtime hardening — sanitization 第三採樣
 **建立日期**：2026-06-06
-**最後更新**：2026-06-06（v1 draft）
+**最後更新**：2026-06-08（Phase 0 preflight complete）
 **Priority**：**P1**（升自 P2，因 supersede sibling 並承擔 `rule_classes[sanitization]` canonical executor 職責）
 **Parent plan**：[`2026-05-31-2100-mechanical-enforcement-registry.md`](../archived/2026-05-31-2100-mechanical-enforcement-registry.md)
 **Sibling plans**：
-- [`2026-05-31-2000-mechanical-sanitization-validator.md`](2026-05-31-2000-mechanical-sanitization-validator.md) — in-progress allowlist 路線；**本 plan 建議 supersede 該 plan**（見 Decision §Relationship to sibling）。
+- [`../archived/2026-05-31-2000-mechanical-sanitization-validator.md`](../archived/2026-05-31-2000-mechanical-sanitization-validator.md) — superseded allowlist 路線；本 plan 是 canonical metadata-derived successor（見 Decision §Relationship to sibling）。
 - [`2026-06-06-1700-workflow-activation-discovery-bridge.md`](2026-06-06-1700-workflow-activation-discovery-bridge.md) — same-day sibling，同樣 third-sampling 同模式失效。
 
 **Empirical trigger**：2026-06-06 session commit 214a415 — agent 將某 downstream project 的 label 七處寫入 `plans/active/` shared layer (該 plan 為 `2026-06-06-1700-workflow-activation-discovery-bridge` 的 v0 草稿)。`enforcement/sanitization.md` + `enforcement/reusable-guidance-boundary.md` 明文禁止「project incident 的具體 app / project 名稱」進入可重用文件，但無 mechanical executor 阻擋，agent 自律未生效，使用者手動指認後才 sanitize（commit 728282c）。
@@ -127,7 +127,7 @@ git pre-commit hook
 | Source-of-truth | `enforcement/sanitization.md` 仍是 prose rule canonical；`runtime/sanitization-patterns.yaml` 是 Phase 2 regex canonical；Phase 1 forbidden tokens 由各 project metadata `private_tokens:` 宣告，projection 到 `runtime.db.derived_forbidden_tokens`（framework 端無中央 allowlist） |
 | Compiler / generated surfaces | `runtime/sanitization-patterns.yaml` 經 `ai-skill runtime compile` projection 到 `runtime.db.generated_surfaces`；scanner 從 runtime.db 載入 patterns |
 | Layer responsibility | enforcement-mechanical 屬 enforcement layer (rule_class executor)；scanner 屬 runtime layer；pre-commit hook 整合屬 ai-skill-cli layer |
-| 與現行架構衝突 | **與 sibling `2026-05-31-2000` 可能衝突**；Q1 必須先裁決 |
+| 與現行架構衝突 | Q1 已裁決 supersede；sibling `2026-05-31-2000` 已在 `plans/archived/` 且 frontmatter `status: superseded` |
 | `runtime.db` 影響 | 新增 `sanitization_patterns` projection table；無 schema migration risk（純讀） |
 
 ---
@@ -157,11 +157,11 @@ git pre-commit hook
 
 ### Phase 0 — Preflight & Sibling Supersede
 
-- [ ] User 認可 §Relationship to sibling 的 supersede 裁決
-- [ ] Sibling `2026-05-31-2000` 移入 `plans/archived/` + frontmatter `status: superseded` + `superseded_by: 2026-06-06-1800-sanitization-mechanical-enforcement`
-- [ ] 本 plan frontmatter 升 `priority: P1` + `required_for_completion: true`
-- [ ] Parent meta-plan §Child plans 列表同步更新（移除 sibling 進入 archived 引用，加入本 plan）
-- [ ] Phase 0 不啟動任何 implementation
+- [x] User 認可 §Relationship to sibling 的 supersede 裁決
+- [x] Sibling `2026-05-31-2000` 移入 `plans/archived/` + frontmatter `status: superseded` + `superseded_by: 2026-06-06-1800-sanitization-mechanical-enforcement`
+- [x] 本 plan frontmatter 升 `priority: P1` + `required_for_completion: true`
+- [x] Live registry / index references synchronized; archived parent meta-plan body left historical to avoid re-opening an archived main plan with active required sub-plans
+- [x] Phase 0 不啟動任何 implementation
 
 ### Phase 1 — Metadata-Derived Forbidden Token Scanner
 
@@ -265,7 +265,7 @@ git pre-commit hook
 
 | # | Question | Pri | Status | 處置 |
 |---|---|---|---|---|
-| Q1 | ~~與 sibling 關係~~ | — | **resolved 2026-06-06** | supersede。詳見 §Relationship to sibling。 |
+| Q1 | ~~與 sibling 關係~~ | — | **resolved 2026-06-06 / verified 2026-06-08** | supersede。Sibling already archived with `status: superseded`; this plan is the active successor. |
 | Q2 | Visibility metadata 載入機制：scan `<PROJECT_ROOT>/.ai-skill-project.yaml`，還是嵌入既有 routing/overlay metadata？ | P1 | open | Phase 1 ADR；不影響本 plan 接受度。 |
 | Q3 | Phase 3 LLM review 的 miss-rate threshold 是多少才 trigger？ | P2 | open | Phase 3 sub-plan 自己決定。 |
 | Q4 | ~~Shared-layer classification 進 enforcement-registry？~~ | — | **resolved 2026-06-06: 否** | 改建獨立 `runtime/repository-topology.yaml` cross-subsystem surface。Rationale: topology 將被 sanitization / workflow activation / governance lint / dependency reading 共用，掛 enforcement-registry 會讓該 registry 變超級桶（同 parent meta-plan R6 警告的反模式）。 |
@@ -284,8 +284,8 @@ git pre-commit hook
 | Required set | `enforcement/sanitization.md` / `enforcement/reusable-guidance-boundary.md` / `plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md` / `knowledge/runtime/routing-registry.yaml` (sanitization slots) / `scripts/ai-skill-cli/internal/app/hooks.go` (dispatcher) |
 | Read | ✅ 全部 |
 | Not applicable | — |
-| Deferred / blocked | Q1 裁決前不啟動 Phase 1；sibling plan diff review 留 Q1 之後 |
-| Validation | 本 plan 是 draft；驗證為 user 對 Q1 + Decision Rationale 認可後升 `status: in-progress` |
+| Deferred / blocked | Phase 1 implementation pending; Phase 0 does not start scanner implementation |
+| Validation | Phase 0 preflight verified sibling supersede, active successor status, live index/failure-pattern references, sanitization source rules, and registry child_plan pointer |
 
 ---
 
@@ -312,7 +312,7 @@ git pre-commit hook
 
 ## Handoff Notes
 
-- 本 plan 與 sibling `2026-05-31-2000` 同 coverage class，Q1 不裁決前不可雙線 implementation（避免 registry rule_class 出現 conflicting executor）
+- 本 plan 與 sibling `2026-05-31-2000` 同 coverage class；Q1 已裁決 supersede，後續 implementation 只走本 plan，避免 registry rule_class 出現 conflicting executor
 - Empirical trigger commit 214a415 + 修正 commit 728282c 是 Phase 1 unit test 的 ground truth dataset
 - Phase 4 Registry integration 必須與 sibling 協調 — `enforcement-registry.yaml` 同檔，避免 commit conflict
 - 若 user 將本 plan 升 P1，需同步 archive 或降級 sibling，並更新 parent meta-plan §Child plans 列表
