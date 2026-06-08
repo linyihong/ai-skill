@@ -1,6 +1,6 @@
 ---
 id: 2026-06-08-1408-ui-governance-workflow
-status: completed
+status: completed (auto-detected)
 owner: linyihong
 created: 2026-06-08
 priority: P2
@@ -8,7 +8,7 @@ priority: P2
 
 # UI Governance Workflow Integration
 
-**Status**: `completed`
+**Status**: `completed (auto-detected)`
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 software-delivery workflow hardening
 **建立日期**：2026-06-08
@@ -190,11 +190,15 @@ Current scope: **workflow governance only**. Runtime signals in this plan are ad
 
 ### ADR Promotion Criteria（completed 時驗證）
 
-- [ ] `sd-ui-governance` 在 software-delivery workflow 中被真實任務使用，且能改善 UI contract drift。
-- [ ] 至少 deterministic validator classes 的 severity 與 evidence target 穩定。
-- [ ] AI visual validator 的 warning / research boundary 沒有造成 false blocking 或 aesthetic overreach。
-- [ ] Runtime/routing/generated surfaces 沒有 orphan consumer。
-- [ ] Open Questions 全解，且沒有更輕 promotion target 適用。
+ADR promotion is deferred. This plan lands a workflow extension plus validation scenarios, not an accepted architecture decision. Revisit after real task usage proves the slice improves UI contract drift without overblocking.
+
+| Criterion | Status | Evidence / revisit condition |
+|---|---|---|
+| `sd-ui-governance` 在 software-delivery workflow 中被真實任務使用，且能改善 UI contract drift | deferred | Needs post-landing usage evidence across implementation tasks |
+| 至少 deterministic validator classes 的 severity 與 evidence target 穩定 | deferred | Needs one or more concrete deterministic executor candidates and evidence thresholds |
+| AI visual validator 的 warning / research boundary 沒有造成 false blocking 或 aesthetic overreach | deferred | Needs real review outcomes after advisory use |
+| Runtime/routing/generated surfaces 沒有 orphan consumer | pass | No new runtime generated surface or rule_class added; existing route dependency consumes `ui-governance.md` |
+| Open Questions 全解，且沒有更輕 promotion target 適用 | deferred | Open questions are resolved for workflow landing; ADR criteria remain heavier than current evidence |
 
 ### Consequences
 
@@ -272,10 +276,10 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 
 逐條核對本 plan §Open Questions，標記處置並回寫：
 
-- [ ] 已讀本 plan §Open Questions 全部條目
-- [ ] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
-- [ ] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
-- [ ] 若盤點新發現問題，已加入 §Open Questions
+- [x] 已讀本 plan §Open Questions 全部條目
+- [x] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
+- [x] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
+- [x] 若盤點新發現問題，已加入 §Open Questions
 
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
@@ -459,9 +463,22 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 
 ---
 
+## Plan Completion Closure
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| All phases complete | pass | Phase 1–5 checklists and acceptance items are complete. |
+| Runtime validation | pass | `ai-skill runtime refresh` and `ai-skill runtime validate` passed after Phase 5 scenarios. |
+| Linked updates reviewed | pass | Workflow slice, loading surfaces, artifact gates, templates, review checklist, governance, taxonomy, routing dependency, and validation scenarios were synchronized. |
+| Mechanical promotion boundary | pass | First landing remains doc + scenario only; no `enforcement/enforcement-registry.yaml` rule_class added. |
+| ADR promotion | deferred | Criteria require real usage evidence and stable deterministic/AI visual boundaries; no accepted ADR is created in this closure. |
+| Archive action | pass | Plan moved from `plans/active/` to `plans/archived/` after closure. |
+
+---
+
 ## 與其他 plans 的關係
 
-- Related: [`2026-06-06-1700-workflow-activation-discovery-bridge.md`](2026-06-06-1700-workflow-activation-discovery-bridge.md) — workflow activation and advisory loading behavior may affect how `sd-ui-governance` is discovered.
-- Related: [`2026-06-06-1800-sanitization-mechanical-enforcement.md`](2026-06-06-1800-sanitization-mechanical-enforcement.md) — same broader theme of moving behavioral rules toward mechanical enforcement without duplicating source-of-truth.
-- Related: [`../archived/2026-05-31-2100-mechanical-enforcement-registry.md`](../archived/2026-05-31-2100-mechanical-enforcement-registry.md) — if UI governance becomes a rule_class, registry transition and coverage rules apply.
+- Related: [`../active/2026-06-06-1700-workflow-activation-discovery-bridge.md`](../active/2026-06-06-1700-workflow-activation-discovery-bridge.md) — workflow activation and advisory loading behavior may affect how `sd-ui-governance` is discovered.
+- Related: [`../active/2026-06-06-1800-sanitization-mechanical-enforcement.md`](../active/2026-06-06-1800-sanitization-mechanical-enforcement.md) — same broader theme of moving behavioral rules toward mechanical enforcement without duplicating source-of-truth.
+- Related: [`2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) — if UI governance becomes a rule_class, registry transition and coverage rules apply.
 

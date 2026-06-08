@@ -5,7 +5,7 @@ domain: software-delivery
 version: v1
 type: routing-decision
 priority: P2
-source_plan: plans/active/2026-06-08-1408-ui-governance-workflow.md
+source_plan: plans/archived/2026-06-08-1408-ui-governance-workflow.md
 source_phase: phase-5
 
 given:
