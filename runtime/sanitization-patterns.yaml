@@ -18,6 +18,28 @@ placeholder_allowlist:
   - <AI_SKILL_REPO>
   - <WORKSPACE>
 
+incident_score:
+  enabled: true
+  block_or_warn: warn
+  warn_if_total_score_gte: 7
+  skip_when_blocking_finding_exists: true
+  signals:
+    filename_pattern:
+      weight: 5
+      patterns:
+        - regex: '`?docs/[0-9]{8}-[^`<\s]+\.md`?'
+        - regex: '`?[a-z0-9-]+/[a-z0-9-]+\.(md|yaml|json|go)`?'
+    quoted_user_text:
+      weight: 5
+      min_runes: 6
+    artifact_string:
+      weight: 3
+      patterns:
+        - regex: '`[^`<\s]+\.(md|yaml|json|go)`'
+    domain_noun_cluster:
+      weight: 1
+      min_dash_terms: 3
+
 pattern_families:
   - category: email
     block_or_warn: block

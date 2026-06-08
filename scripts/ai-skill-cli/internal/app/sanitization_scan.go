@@ -42,6 +42,7 @@ type sanitizationRuntimeData struct {
 	Topology map[string]bool
 	Tokens   []derivedForbiddenToken
 	Patterns []compiledSanitizationPattern
+	Incident incidentScoreConfig
 }
 
 type compiledSanitizationPattern struct {
@@ -49,6 +50,22 @@ type compiledSanitizationPattern struct {
 	ID         string
 	Regex      *regexp.Regexp
 	Suggestion string
+}
+
+type incidentScoreConfig struct {
+	Enabled          bool
+	WarnThreshold    int
+	Signals          []incidentScoreSignal
+	QuotedTextWeight int
+	QuotedMinRunes   int
+	DashTermsWeight  int
+	DashTermsMin     int
+}
+
+type incidentScoreSignal struct {
+	Name    string
+	Weight  int
+	Pattern *regexp.Regexp
 }
 
 const repositoryTopologyRuntimeTargetKey = "runtime.repository_topology.config"
@@ -132,6 +149,37 @@ func validateSanitizationStagedContent(root string, staged []string) string {
 		"\n  Remediation: replace project-specific details with placeholders such as `<PROJECT_ROOT>` or the suggested placeholder; keep incident evidence in project-local docs."
 }
 
+func warnSanitizationIncidentScore(root string, staged []string) string {
+	if root == "" || len(staged) == 0 {
+		return ""
+	}
+	data, err := loadSanitizationRuntimeData(filepath.Join(root, "runtime", "runtime.db"))
+	if err != nil || !data.Incident.Enabled || len(data.Topology) == 0 {
+		return ""
+	}
+	resolver := newStagedBlobResolver(root)
+	var warnings []string
+	stagedSorted := append([]string(nil), staged...)
+	sort.Strings(stagedSorted)
+	for _, rel := range stagedSorted {
+		rel = filepath.ToSlash(rel)
+		if !sanitizationTextPath(rel) || !sanitizationPathIsShared(rel, data.Topology) {
+			continue
+		}
+		content, err := resolver.Read(rel)
+		if err != nil {
+			continue
+		}
+		if warning := sanitizationIncidentWarning(rel, string(content), data.Incident); warning != "" {
+			warnings = append(warnings, warning)
+		}
+	}
+	if len(warnings) == 0 {
+		return ""
+	}
+	return "sanitization incident-score warning(s): " + strings.Join(warnings, "; ")
+}
+
 func discoverProjectMetadataFiles(repo string) ([]string, error) {
 	var files []string
 	err := filepath.WalkDir(repo, func(path string, d os.DirEntry, err error) error {
@@ -199,7 +247,11 @@ func loadSanitizationRuntimeData(dbPath string) (sanitizationRuntimeData, error)
 	if err != nil {
 		return sanitizationRuntimeData{}, err
 	}
-	return sanitizationRuntimeData{Topology: topology, Tokens: tokens, Patterns: patterns}, nil
+	incident, err := loadIncidentScoreConfig(db)
+	if err != nil {
+		return sanitizationRuntimeData{}, err
+	}
+	return sanitizationRuntimeData{Topology: topology, Tokens: tokens, Patterns: patterns, Incident: incident}, nil
 }
 
 func generatedSurfaceTargetExists(db *sql.DB, targetKey string) (bool, error) {
@@ -301,6 +353,56 @@ func loadSanitizationPatterns(db *sql.DB) ([]compiledSanitizationPattern, error)
 	return patterns, rows.Err()
 }
 
+func loadIncidentScoreConfig(db *sql.DB) (incidentScoreConfig, error) {
+	var raw string
+	if err := db.QueryRow(`SELECT content FROM sanitization_patterns WHERE category = '__config__'`).Scan(&raw); err != nil {
+		return incidentScoreConfig{}, nil
+	}
+	var config struct {
+		IncidentScore struct {
+			Enabled             bool `json:"enabled"`
+			WarnIfTotalScoreGTE int  `json:"warn_if_total_score_gte"`
+			Signals             map[string]struct {
+				Weight       int `json:"weight"`
+				MinRunes     int `json:"min_runes"`
+				MinDashTerms int `json:"min_dash_terms"`
+				Patterns     []struct {
+					Regex string `json:"regex"`
+				} `json:"patterns"`
+			} `json:"signals"`
+		} `json:"incident_score"`
+	}
+	if err := json.Unmarshal([]byte(raw), &config); err != nil {
+		return incidentScoreConfig{}, err
+	}
+	incident := incidentScoreConfig{
+		Enabled:       config.IncidentScore.Enabled,
+		WarnThreshold: config.IncidentScore.WarnIfTotalScoreGTE,
+	}
+	if incident.WarnThreshold == 0 {
+		incident.WarnThreshold = 7
+	}
+	for name, signal := range config.IncidentScore.Signals {
+		switch name {
+		case "quoted_user_text":
+			incident.QuotedTextWeight = signal.Weight
+			incident.QuotedMinRunes = signal.MinRunes
+		case "domain_noun_cluster":
+			incident.DashTermsWeight = signal.Weight
+			incident.DashTermsMin = signal.MinDashTerms
+		default:
+			for _, pattern := range signal.Patterns {
+				compiled, err := regexp.Compile(pattern.Regex)
+				if err != nil {
+					return incidentScoreConfig{}, fmt.Errorf("incident-score %s: %w", name, err)
+				}
+				incident.Signals = append(incident.Signals, incidentScoreSignal{Name: name, Weight: signal.Weight, Pattern: compiled})
+			}
+		}
+	}
+	return incident, nil
+}
+
 func sanitizationPathIsShared(rel string, topology map[string]bool) bool {
 	bestLen := -1
 	shared := false
@@ -370,6 +472,60 @@ func sanitizationAllowedPlaceholderMatch(match string) bool {
 		}
 	}
 	return false
+}
+
+func sanitizationIncidentWarning(rel string, content string, config incidentScoreConfig) string {
+	total := 0
+	hits := []string{}
+	for _, signal := range config.Signals {
+		if signal.Pattern.MatchString(content) {
+			total += signal.Weight
+			hits = append(hits, signal.Name)
+		}
+	}
+	if config.QuotedTextWeight > 0 && sanitizationHasQuotedText(content, config.QuotedMinRunes) {
+		total += config.QuotedTextWeight
+		hits = append(hits, "quoted_user_text")
+	}
+	if config.DashTermsWeight > 0 && sanitizationHasDashTermCluster(content, config.DashTermsMin) {
+		total += config.DashTermsWeight
+		hits = append(hits, "domain_noun_cluster")
+	}
+	if total < config.WarnThreshold {
+		return ""
+	}
+	return fmt.Sprintf("%s incident_score=%d (%s)", rel, total, strings.Join(hits, "+"))
+}
+
+func sanitizationHasQuotedText(content string, minRunes int) bool {
+	if minRunes == 0 {
+		minRunes = 6
+	}
+	for _, re := range []*regexp.Regexp{
+		regexp.MustCompile(`"([^"]+)"`),
+		regexp.MustCompile("「([^」]+)」"),
+		regexp.MustCompile("`([^`]+)`"),
+	} {
+		for _, match := range re.FindAllStringSubmatch(content, -1) {
+			if len([]rune(match[1])) >= minRunes && !strings.Contains(match[1], "<") {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func sanitizationHasDashTermCluster(content string, minTerms int) bool {
+	if minTerms == 0 {
+		minTerms = 3
+	}
+	count := 0
+	for _, token := range regexp.MustCompile(`[a-z][a-z0-9]+(?:-[a-z0-9]+)+`).FindAllString(strings.ToLower(content), -1) {
+		if strings.Count(token, "-")+1 >= minTerms {
+			count++
+		}
+	}
+	return count > 0
 }
 
 func sanitizationTokenVariants(token string) []string {

@@ -305,6 +305,9 @@ func runPreCommitHook(result Result, root string) Result {
 		}
 		return result
 	}
+	if msg := warnSanitizationIncidentScore(root, staged); msg != "" {
+		result.Checks = append(result.Checks, Check{Name: "sanitization_incident_score", Status: "warning", Message: msg})
+	}
 
 	if len(result.Mutations) == 0 {
 		result.Checks = append(result.Checks, Check{Name: "pre_commit", Status: "ok", Message: "no runtime or knowledge hook action required"})

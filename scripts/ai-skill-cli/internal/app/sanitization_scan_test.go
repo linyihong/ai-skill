@@ -166,6 +166,43 @@ func TestSanitizationScanAllowsPatternDocumentationLine(t *testing.T) {
 	}
 }
 
+func TestSanitizationIncidentScoreWarnsWithoutBlocking(t *testing.T) {
+	repo := initTempGitRepo(t)
+	seedSanitizationRuntimeDB(t, repo, map[string]bool{"plans/": true}, nil)
+	seedSanitizationPatterns(t, repo)
+
+	rel := "plans/active/incident.md"
+	writeFile(t, filepath.Join(repo, rel), "Review `docs/20260606-private-flow.md` because user said \"please inspect this broken project flow\".\n")
+	stageAll(t, repo, rel)
+
+	if got := validateSanitizationStagedContent(repo, []string{rel}); got != "" {
+		t.Fatalf("incident score must not block, got:\n%s", got)
+	}
+	warning := warnSanitizationIncidentScore(repo, []string{rel})
+	if !strings.Contains(warning, "incident_score=") {
+		t.Fatalf("expected incident-score warning, got:\n%s", warning)
+	}
+}
+
+func TestSanitizationIncidentScoreIgnoresLowScoreAndArchivedPaths(t *testing.T) {
+	repo := initTempGitRepo(t)
+	seedSanitizationRuntimeDB(t, repo, map[string]bool{
+		"plans/":          true,
+		"plans/archived/": false,
+	}, nil)
+	seedSanitizationPatterns(t, repo)
+
+	lowRel := "plans/active/route.md"
+	writeFile(t, filepath.Join(repo, lowRel), "route.workflow.travel-planning is reusable framework terminology.\n")
+	archivedRel := "plans/archived/incident.md"
+	writeFile(t, filepath.Join(repo, archivedRel), "Review `docs/20260606-private-flow.md` because user said \"please inspect this broken project flow\".\n")
+	stageAll(t, repo, lowRel, archivedRel)
+
+	if got := warnSanitizationIncidentScore(repo, []string{lowRel, archivedRel}); got != "" {
+		t.Fatalf("low-score and archived content should not warn, got:\n%s", got)
+	}
+}
+
 func seedSanitizationRuntimeDB(t *testing.T, repo string, topology map[string]bool, tokens []derivedForbiddenToken) {
 	t.Helper()
 	dbPath := filepath.Join(repo, "runtime", "runtime.db")
@@ -236,5 +273,26 @@ func seedSanitizationPatterns(t *testing.T, repo string) {
 		if _, err := db.Exec(`INSERT INTO sanitization_patterns (category, content) VALUES (?, ?)`, family["category"], runtimeJSON(family)); err != nil {
 			t.Fatal(err)
 		}
+	}
+	config := map[string]any{
+		"incident_score": map[string]any{
+			"enabled":                 true,
+			"warn_if_total_score_gte": 7,
+			"signals": map[string]any{
+				"filename_pattern": map[string]any{
+					"weight": 5,
+					"patterns": []map[string]any{{
+						"regex": "`?docs/[0-9]{8}-[^`<\\s]+\\.md`?",
+					}},
+				},
+				"quoted_user_text": map[string]any{"weight": 5, "min_runes": 6},
+				"domain_noun_cluster": map[string]any{
+					"weight": 1, "min_dash_terms": 3,
+				},
+			},
+		},
+	}
+	if _, err := db.Exec(`INSERT INTO sanitization_patterns (category, content) VALUES ('__config__', ?)`, runtimeJSON(config)); err != nil {
+		t.Fatal(err)
 	}
 }

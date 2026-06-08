@@ -231,11 +231,11 @@ git pre-commit hook
 
 補強 Phase 1 metadata-derived 抓不到的「無 private token 但明顯是 project incident」案例（連續的 domain-specific noun cluster、quoted user text、具體 dated filename 引用等）。**warn-only，不 block**，理由：heuristic 性質與 P4 attestation-prohibited 的 deterministic 精神有張力，降為 advisory 守住 deterministic-block 邊界。
 
-- [ ] 將 sibling plan §Phase 1 `incident_score` weighted-signal schema 整段搬入 `runtime/sanitization-patterns.yaml` `incident_score:` 區段（filename_pattern / quoted_user_text / artifact_string / domain_noun_cluster，weights 5 / 5 / 3 / 1，warn_if_total_score_gte: 7）
-- [ ] Scanner 在 Phase 1+2 全部 pass 時才執行 incident-score；任一 phase block → 跳過（避免 noise）
-- [ ] Output 為 `warning` 等級，commit 不 block；finding 寫入 stderr 供 agent / user 評估
-- [ ] Unit tests：sibling plan §incident_score `examples` 三個 case（leak 命中、registry 內合法描述放行、archived/feedback 路徑跳過）必須全部 pass
-- [ ] Acceptance：incident-score 不得對 Phase 1 已 derived_forbidden 的 token 重複 finding（避免雙報）
+- [x] 將 sibling plan §Phase 1 `incident_score` weighted-signal schema 整段搬入 `runtime/sanitization-patterns.yaml` `incident_score:` 區段（filename_pattern / quoted_user_text / artifact_string / domain_noun_cluster，weights 5 / 5 / 3 / 1，warn_if_total_score_gte: 7）
+- [x] Scanner 在 Phase 1+2 全部 pass 時才執行 incident-score；任一 phase block → 跳過（避免 noise）
+- [x] Output 為 `warning` 等級，commit 不 block；finding 寫入 stderr 供 agent / user 評估
+- [x] Unit tests：sibling plan §incident_score `examples` 三個 case（leak 命中、registry 內合法描述放行、archived/feedback 路徑跳過）必須全部 pass
+- [x] Acceptance：incident-score 不得對 Phase 1 已 derived_forbidden 的 token 重複 finding（避免雙報）
 
 ### Phase 3 — LLM Review Hook (Conditional, Deferred)
 
