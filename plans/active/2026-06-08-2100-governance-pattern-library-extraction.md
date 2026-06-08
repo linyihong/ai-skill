@@ -49,10 +49,23 @@ If not met → keep observation in plan body / lessons file; revisit when 5th + 
 
 Place draft analysis at: [`governance/lifecycle/governance-pattern-library-draft.md`](../../governance/lifecycle/governance-pattern-library-draft.md)
 
-- [ ] List the 4 current samples (column per 6-step phase, row per sample) — table form
-- [ ] Identify counter-samples or partial samples on main (likely candidates: `runtime-trigger-wiring` validator, `plan-tree-hierarchy` plan, `bootstrap-contract-yaml-migration`, `commit-time registry reference consistency` (spawn chip task_a068faa6))
-- [ ] For each sample, fill the 6 columns. Empty cell = step missing. Document which cells are empty for which samples.
-- [ ] Check whether the pattern is sequential (always Observation → ... → Validation) or has parallel/optional branches
+- [x] List the 4 current samples (column per 6-step phase, row per sample) — table form
+  - **Evidence**: draft §"Sample inventory" — 4-sample table filled with Observation / Rule / Registry / Projection / Executor / Validation cells per sample
+- [x] Identify counter-samples or partial samples on main (likely candidates: `runtime-trigger-wiring` validator, `plan-tree-hierarchy` plan, `bootstrap-contract-yaml-migration`, `commit-time registry reference consistency` (spawn chip task_a068faa6))
+  - **Evidence**: draft §"Counter-sample candidates (to inventory next)" — 4 candidates listed with the analysis question each one should answer. Analysis itself deferred to next Phase 0 pass when a 5th genuine sample lands (likely via Commit-Time Registry Reference Consistency chip).
+- [x] For each sample, fill the 6 columns. Empty cell = step missing. Document which cells are empty for which samples.
+  - **Evidence**: draft §"Per-step counts (N=4)" — sample #4 (Runtime Index Freshness) explicitly flagged as having `(implicit)` Rule cell. First soft signal that *Rule* step may be conditionally optional for structural invariants.
+- [x] Check whether the pattern is sequential (always Observation → ... → Validation) or has parallel/optional branches
+  - **Evidence**: draft §"Sequential vs. branching shape" — answered with three nuances: (1) Rule is conditionally optional (sample #4), (2) Executor has within-step branching (samples #2, #3 have multi-entry executors), (3) no feedback loop observed yet but Discovery Bridge Phase D may produce one. Working interpretation: "mostly sequential with a single optional step + within-step branching at Executor".
+
+**Phase 0 additional output (not in original plan, captured for completeness)**:
+
+- [x] **Parallel Reference Integrity family observation** captured in same draft as separate section
+  - 4 Reference Integrity samples inventoried (sanitization rule↔executor, workflow detector↔fallback, runtime-index content↔checksum, registry path↔pointer)
+  - Distinguished from 6-step family (build-time vs maintenance-time; rule promotion vs surface consistency)
+  - Independent acceptance gate (also at N≥5; same falsification discipline)
+  - 3 pre-emptive falsification candidates listed (conversation goal ledger, cognitive mode reporting, discovery advisory output) — each tests whether Reference Integrity is universal or narrower than 6-step
+  - This is **not** a scope expansion of this plan; it is a sibling observation sharing the same incubator surface. If either family passes its gate, they will be siblings in `governance/lifecycle/governance-pattern-library/` folder, not parent/child.
 
 ## Phase 1 — Gate decision
 
