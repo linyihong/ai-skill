@@ -336,10 +336,41 @@ Phase 2 result: stop hook now calls a host-neutral Feedback / Learning Report va
 
 ## Phase 3 — Feedback Learning Routing
 
-- [ ] Define how `feedback_decision: NEEDED` maps to durable targets: `feedback-history`, `intelligence`, `workflow`, `enforcement`, `project-docs`.
-- [ ] Define how `writeback_status` reports completed / deferred / unavailable writeback capability without tracking promotion lifecycle.
-- [ ] Update feedback / failure learning docs only if Phase 0 finds the existing rules insufficient.
-- [ ] Ensure report does not force writing low-value lessons.
+- [x] Define how `feedback_decision: NEEDED` maps to durable targets: `feedback-history`, `intelligence`, `workflow`, `enforcement`, `project-docs`.
+- [x] Define how `writeback_status` reports completed / deferred / unavailable writeback capability without tracking promotion lifecycle.
+- [x] Update feedback / failure learning docs only if Phase 0 finds the existing rules insufficient. Decision: no source update needed; existing `feedback/feedback-lessons.md`, `enforcement/failure-learning-system.md`, and `enforcement/reusable-guidance-boundary.md` already define storage and reusable/private evidence boundaries.
+- [x] Ensure report does not force writing low-value lessons.
+
+### Phase 3 Routing Contract
+
+`feedback_decision: NEEDED` names the smallest durable target that should receive the next writeback. It is a close-out routing decision, not a promotion lifecycle or quality classification.
+
+| Target | Use When | Writeback Boundary |
+| --- | --- | --- |
+| `feedback-history` | A reusable lesson, technique, or skill-local observation should be captured under `feedback/history/<domain>/`. | Follow `feedback/feedback-lessons.md`; choose domain/category before writing; sanitize project evidence. |
+| `intelligence` | The learning is reusable engineering reasoning, decision logic, validation model, architecture pattern, or anti-pattern. | Write generalized knowledge only; no project incident evidence or private paths. |
+| `workflow` | The learning changes task execution order, gates, checklists, validation flow, or review/release expectations. | Update workflow source/gate/checklist docs; do not encode one-off incident details as workflow law. |
+| `enforcement` | The learning is a repeated agent failure, missing mechanical guard, hook behavior, rule boundary, or prevention gate. | Use `enforcement/failure-learning-system.md`; add failure pattern / registry / hook binding only when appropriate. |
+| `project-docs` | The learning is project-specific evidence, runbook material, private incident data, host details, credentials handling, or local setup. | Keep private/project evidence out of reusable Ai-skill docs; report handoff target if the current agent cannot write it. |
+
+Target choice rules:
+
+- Prefer the smallest target that prevents recurrence.
+- If multiple targets are eventually needed, report the immediate durable target and mention linked follow-up separately; do not use this report to track promotion lifecycle.
+- `feedback_decision: NEEDED` requires a non-`none` `target`.
+- `feedback_decision: NONE` means no new durable writeback is warranted, including cases where existing rules already cover the lesson.
+- `feedback_decision: UNKNOWN` is for insufficient evidence, not for avoiding target selection.
+
+`writeback_status` only reports writeback capability/result for this turn:
+
+| Status | Use When | Not For |
+| --- | --- | --- |
+| `COMPLETED` | The durable target was updated in this turn and read back / validated. | Future promotion, downstream linked-update completion, or semantic quality scoring. |
+| `DEFERRED` | A durable target is known and writeback is possible, but intentionally left for later due scope, authorization, timing, or owner handoff. | Hiding uncertainty; use `UNKNOWN` only when evidence is insufficient. |
+| `UNAVAILABLE` | The agent cannot write the target in this environment, such as non-local repo, no permission, read-only host, or private project context unavailable. | Cases where writeback is possible but merely postponed. |
+| `N/A` | No writeback is applicable, typically `feedback_decision: NONE`; may also accompany `UNKNOWN` when no safe target can be named. | `feedback_decision: NEEDED`; use `COMPLETED`, `DEFERRED`, or `UNAVAILABLE` instead. |
+
+Phase 3 result: routing is defined without adding knowledge classification, promotion lifecycle, economics, memory, or linked-update completion tracking. Low-value lesson spam remains rejected: mandatory report does not mean mandatory feedback-history entry.
 
 ## Phase 4 — Validation Scenarios
 
