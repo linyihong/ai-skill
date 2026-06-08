@@ -12,7 +12,7 @@ priority: P2
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 software-delivery workflow hardening
 **建立日期**：2026-06-08
-**最後更新**：2026-06-08（v1 draft）
+**最後更新**：2026-06-08（Phase 2 loading surfaces wired）
 **Priority**：**P2**
 
 本 plan 將 UI/UX 風格治理納入 `workflow/software-delivery/`，新增 `sd-ui-governance` cognitive slice，讓現有 `sd-ui-contracts` 產出的 UI contract、screen state、ViewModel、Accessibility expectation 能進一步被 deterministic validator、visual regression evidence、以及 scoped AI visual review 消費。
@@ -108,6 +108,15 @@ Maturity layers:
 | L4 | Accessibility | block candidate | Objective accessibility expectations and scan/manual evidence path exist |
 | L5 | Behavior | warn → block | Pattern trigger and required state are objective |
 | L6 | Closure | block candidate | UI governance evidence is linked in DoD / review report |
+
+Observation: `Consumer / ViewModel` may later collapse under `Contract` rather than remain a parallel governance domain. ViewModel is often a contract projection (`Screen Contract` / `Consumer Contract` -> display model), not an independent governance area. Keep the separate row for Phase 1 because it helps implementation planning, but revisit after scenario evidence shows whether it should become a Contract subdomain:
+
+```text
+Contract
+  ├─ Screen Contract
+  ├─ Consumer Contract
+  └─ ViewModel Contract
+```
 
 Supported mechanisms:
 
@@ -326,43 +335,43 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 
 ## Phase 1 — Add `sd-ui-governance` Slice
 
-- [ ] Create `workflow/software-delivery/ui-governance.md`.
-- [ ] Add cognitive slice metadata: `id`, `purpose`, `type`, `tags`, `load_when`, `do_not_load_when`, `owner_layer`, `layer_justification`, `dependencies`, `dependency_budget`, `validation_signal`.
-- [ ] Define validator taxonomy and severity boundary:
-  - [ ] Governance domains: Contract, Behavior, Accessibility, DesignSystem.
-  - [ ] Validation mechanisms: Deterministic, ScreenshotDiff, AIReview, ManualReview.
-  - [ ] Evidence classes: contract, runtime, accessibility_scan, visual_diff, screenshot, ai_review, human_review.
-- [ ] State deterministic vs subjective validator policy explicitly.
-- [ ] State project-local-first design token policy explicitly.
-- [ ] State workflow-only scope and advisory runtime signal boundary explicitly.
+- [x] Create `workflow/software-delivery/ui-governance.md`.
+- [x] Add cognitive slice metadata: `id`, `purpose`, `type`, `tags`, `load_when`, `do_not_load_when`, `owner_layer`, `layer_justification`, `dependencies`, `dependency_budget`, `validation_signal`.
+- [x] Define validator taxonomy and severity boundary:
+  - [x] Governance domains: Contract, Behavior, Accessibility, DesignSystem.
+  - [x] Validation mechanisms: Deterministic, ScreenshotDiff, AIReview, ManualReview.
+  - [x] Evidence classes: contract, runtime, accessibility_scan, visual_diff, screenshot, ai_review, human_review.
+- [x] State deterministic vs subjective validator policy explicitly.
+- [x] State project-local-first design token policy explicitly.
+- [x] State workflow-only scope and advisory runtime signal boundary explicitly.
 
 ### Phase 1 Acceptance
 
-- [ ] `sd-ui-governance` passes workflow membership test.
-- [ ] `sd-ui-contracts` remains contract-focused and is not duplicated.
-- [ ] AI visual validation is scoped as warning/research unless objective criteria exist.
-- [ ] Governance domain and validation mechanism are not mixed.
-- [ ] Design token policy does not define a global token scale.
+- [x] `sd-ui-governance` passes workflow membership test.
+- [x] `sd-ui-contracts` remains contract-focused and is not duplicated.
+- [x] AI visual validation is scoped as warning/research unless objective criteria exist.
+- [x] Governance domain and validation mechanism are not mixed.
+- [x] Design token policy does not define a global token scale.
 
 ---
 
 ## Phase 2 — Wire Software-delivery Loading Surfaces
 
-- [ ] Update `workflow/software-delivery/execution-flow.md` thin index.
-- [ ] Update `workflow/software-delivery/README.md` entry flow and scope.
-- [ ] Update `workflow/software-delivery/execution-flow.yaml`:
-  - [ ] Add `workflow/software-delivery/ui-governance.md` to `required_sources`.
-  - [ ] Add `loading_surfaces.ui_governance`.
-  - [ ] Add or extend a workflow step between UI contracts and test strategy.
-  - [ ] Add gates such as `gate.software_delivery.ui_governance_complete`, `gate.software_delivery.ui_evidence_classified`, and `gate.software_delivery.ui_visual_validation_scoped`.
-  - [ ] Add required evidence for severity, token scope, accessibility scope, behavior pattern coverage, visual baseline status.
-  - [ ] Ensure runtime-lite signals remain advisory projections, not runtime governance rules.
+- [x] Update `workflow/software-delivery/execution-flow.md` thin index.
+- [x] Update `workflow/software-delivery/README.md` entry flow and scope.
+- [x] Update `workflow/software-delivery/execution-flow.yaml`:
+  - [x] Add `workflow/software-delivery/ui-governance.md` to `required_sources`.
+  - [x] Add `loading_surfaces.ui_governance`.
+  - [x] Add or extend a workflow step between UI contracts and test strategy.
+  - [x] Add gates such as `gate.software_delivery.ui_governance_complete`, `gate.software_delivery.ui_evidence_classified`, and `gate.software_delivery.ui_visual_validation_scoped`.
+  - [x] Add required evidence for severity, token scope, accessibility scope, behavior pattern coverage, visual baseline status.
+  - [x] Ensure runtime-lite signals remain advisory projections, not runtime governance rules.
 
 ### Phase 2 Acceptance
 
-- [ ] Route consumers can discover the new slice through the software-delivery primary source.
-- [ ] Executable YAML contract names the new loading surface and evidence.
-- [ ] Runtime refresh / validate passes after YAML changes.
+- [x] Route consumers can discover the new slice through the software-delivery primary source.
+- [x] Executable YAML contract names the new loading surface and evidence.
+- [x] Runtime refresh / validate passes after YAML changes.
 
 ---
 
@@ -435,6 +444,7 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 - [ ] Linked updates are reviewed and documented.
 - [ ] First landing remains doc + scenario only; no mechanical rule_class is added without a follow-up promotion decision.
 - [ ] No governance domain is represented solely by a validation mechanism.
+- [ ] No validation mechanism is owned by a single governance domain.
 - [ ] Plan Completion Closure executed when all phases are done.
 
 ---

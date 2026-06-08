@@ -39,6 +39,7 @@ required_sources:
   - workflow/software-delivery/intake.md
   - workflow/software-delivery/contracts.md
   - workflow/software-delivery/ui-contracts.md
+  - workflow/software-delivery/ui-governance.md
   - workflow/software-delivery/test-strategy.md
   - workflow/software-delivery/validation.md
   - workflow/software-delivery/closure.md
@@ -77,6 +78,13 @@ loading_surfaces:
       - provider and consumer teams or agents need to work in parallel from shared contracts
     do_not_load_when:
       - no consumer surface exists or the task is provider-internal only
+  ui_governance:
+    source: workflow/software-delivery/ui-governance.md
+    load_when:
+      - UI or consumer surface needs design-system enforcement, accessibility evidence, behavior pattern checks, visual baseline review, AI visual review scoping, or UI compliance completion evidence
+      - UI contract exists and the task needs to classify governance domain, validation mechanism, evidence class, severity, or project-local design-system policy
+    do_not_load_when:
+      - no user-visible consumer surface exists or the task only defines expected UI contracts without compliance evidence
   test_strategy:
     source: workflow/software-delivery/test-strategy.md
     load_when:
@@ -149,23 +157,36 @@ steps:
       - observable_behavior_change
     gates:
       - gate.software_delivery.bdd_closure_complete
-  - id: handle_sdk_defect_closure
+  - id: classify_ui_governance
     order: 7
+    action: Load the ui-governance surface when UI compliance evidence is needed, then classify governance domain, validation mechanism, evidence class, severity, project-local design-system policy, and advisory runtime projection boundary before test strategy or completion claims.
+    required_if:
+      - ui_compliance_claim
+      - design_system_policy_applies
+      - accessibility_evidence_required
+      - visual_validation_claim
+      - ai_visual_review_used
+    gates:
+      - gate.software_delivery.ui_governance_complete
+      - gate.software_delivery.ui_evidence_classified
+      - gate.software_delivery.ui_visual_validation_scoped
+  - id: handle_sdk_defect_closure
+    order: 8
     action: Reproduce SDK defects through supported public surfaces, sanitize evidence, and lock behavior with specs and regression tests when needed.
     required_if:
       - sdk_defect_reported
   - id: define_test_strategy
-    order: 8
+    order: 9
     action: Load the test-strategy surface, then define old behavior regression, new behavior proof, mutation/negative checks, persistence/integration tests, state visibility evidence chain, and hardware/performance evidence when relevant.
     gates:
       - gate.software_delivery.validation_target_defined
   - id: run_performance_gate
-    order: 9
+    order: 10
     action: Load the validation surface for performance-sensitive changes, then define latency, throughput, error-rate, and resource budgets plus load/stress/spike/soak evidence.
     required_if:
       - performance_sensitive_change_detected
   - id: validate_and_close
-    order: 10
+    order: 11
     action: Load validation and closure surfaces as needed, run validation at the required evidence depth, check blockers, update durable docs, feed reusable lessons when appropriate, and report scope honestly.
     gates:
       - gate.software_delivery.validation_complete
@@ -199,6 +220,25 @@ gates:
     pass_when:
       - owner contract, human-readable behavior spec, executable behavior test, implementation, and traceability move together
       - scoped documentation debt is explicitly recorded if any part is deferred
+  - id: gate.software_delivery.ui_governance_complete
+    blocks: ui_compliance_completion_claim
+    pass_when:
+      - UI governance domain is classified as Contract, Design System, Accessibility, Behavior, Closure, or not_applicable
+      - validation mechanism is classified separately as deterministic, screenshot_diff, ai_review, manual_review, or not_applicable
+      - no governance domain is represented solely by a validation mechanism
+      - no validation mechanism is owned by a single governance domain
+  - id: gate.software_delivery.ui_evidence_classified
+    blocks: ui_validation_claim
+    pass_when:
+      - evidence class is identified as contract, runtime, accessibility_scan, visual_diff, screenshot, ai_review, human_review, or not_applicable
+      - severity is identified as block_candidate, warn, research, or not_applicable
+      - project-local design-system policy is referenced when design-token or component-primitive compliance is claimed
+  - id: gate.software_delivery.ui_visual_validation_scoped
+    blocks: ai_visual_or_visual_regression_blocking_claim
+    pass_when:
+      - AI visual review remains warn/research unless project opt-in, objective rubric, deterministic capture, and review policy exist
+      - screenshot_diff claims name the baseline and capture determinism
+      - visual taste is not treated as a build-failure equivalent without objective criteria
   - id: gate.software_delivery.validation_target_defined
     blocks: validation_phase
     pass_when:
@@ -224,6 +264,8 @@ required_evidence:
   - parity inventory when replacing existing capability
   - BDD / contract / test traceability when behavior changes
   - Consumer / UI Behavior / Screen / ViewModel contract evidence when a consumer surface changes
+  - UI governance domain, validation mechanism, evidence class, severity, and project-local design-system policy when UI compliance is claimed
+  - advisory-only runtime projection boundary when UI governance signals are named before runtime/enforcement promotion
   - performance budget evidence when performance-sensitive
   - state visibility / evidence chain coverage when observed success may diverge from real state
   - independent observation when proxy-prone side effects are critical

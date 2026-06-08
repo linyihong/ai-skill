@@ -1165,6 +1165,7 @@ records:
       - workflow/software-delivery/intake.md
       - workflow/software-delivery/contracts.md
       - workflow/software-delivery/ui-contracts.md
+      - workflow/software-delivery/ui-governance.md
       - workflow/software-delivery/test-strategy.md
       - workflow/software-delivery/validation.md
       - workflow/software-delivery/closure.md

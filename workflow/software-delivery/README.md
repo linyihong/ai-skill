@@ -8,17 +8,18 @@
 
 進入方式：
 1. 讀取 [`execution-flow.md`](execution-flow.md) thin index 了解執行流程與 focused loading surfaces
-2. 依 task intent 載入需要的 execution surface：[`intake.md`](intake.md)、[`contracts.md`](contracts.md)、[`ui-contracts.md`](ui-contracts.md)、[`test-strategy.md`](test-strategy.md)、[`validation.md`](validation.md)、[`closure.md`](closure.md)、[`surgical-changes.md`](surgical-changes.md)
+2. 依 task intent 載入需要的 execution surface：[`intake.md`](intake.md)、[`contracts.md`](contracts.md)、[`ui-contracts.md`](ui-contracts.md)、[`ui-governance.md`](ui-governance.md)、[`test-strategy.md`](test-strategy.md)、[`validation.md`](validation.md)、[`closure.md`](closure.md)、[`surgical-changes.md`](surgical-changes.md)
 3. 依流程的 Start From Evidence / Change Intake 開始；新需求、重構、parity、缺失資訊或既有專案回填時載入 [`intake.md`](intake.md)
 4. 需要 artifact 規範時參考 [`artifact-gates.md`](artifact-gates.md)
 5. 需要審查檢查清單時參考 [`review-checklist.md`](review-checklist.md)
 6. 需要完整開發流程 overview 或 embedded / producer-consumer fallback 時參考 [`development-process.md`](development-process.md)
 7. 需要前端、行動、CLI、SDK 或其他 consumer surface 的 Screen Mapping、Consumer / UI Behavior / Screen / ViewModel Contract 或 Screen Traceability 時參考 [`ui-contracts.md`](ui-contracts.md)
-8. 需要 pre-build interrogation / product impact alignment / requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
-9. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
-10. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)；examples 預設 suppress，僅在明確要求範例或 ambiguity 時載入
-11. PR 觸動效能敏感路徑或含 AI 生成程式碼時，執行 [`perf-risk-gate.md`](perf-risk-gate.md) 的 5 步檢查（靜態 anti-pattern scan、hot-path micro-benchmark、reviewer perf checklist、pre-deploy observability gate、canary rollout）
-12. 當成功訊號可能不同於真實系統狀態時，載入 validation reasoning：[`state-visibility-gap.md`](../../intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md)、[`evidence-model.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-model.md)、[`evidence-chain-validation.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md)、[`evidence-depth.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-depth.md)
+8. 需要 UI compliance、design-system enforcement、accessibility evidence、behavior pattern checks、visual baseline review 或 AI visual review scoping 時參考 [`ui-governance.md`](ui-governance.md)
+9. 需要 pre-build interrogation / product impact alignment / requirements cognition / BDD-lite / acceptance criteria / ambiguity resolution 時參考 [`requirements/`](requirements/README.md)
+10. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
+11. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)；examples 預設 suppress，僅在明確要求範例或 ambiguity 時載入
+12. PR 觸動效能敏感路徑或含 AI 生成程式碼時，執行 [`perf-risk-gate.md`](perf-risk-gate.md) 的 5 步檢查（靜態 anti-pattern scan、hot-path micro-benchmark、reviewer perf checklist、pre-deploy observability gate、canary rollout）
+13. 當成功訊號可能不同於真實系統狀態時，載入 validation reasoning：[`state-visibility-gap.md`](../../intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md)、[`evidence-model.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-model.md)、[`evidence-chain-validation.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md)、[`evidence-depth.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-depth.md)
 
 ## Scope
 
@@ -30,6 +31,7 @@
 - **Architecture Stage**：domain architecture cognition，包含 DDD fit、bounded context discovery、consistency boundary design、architecture escalation。
 - **Contract-First Development Process**：從企劃書到實作的完整開發流程，包含 Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill 等。
 - **UI / Consumer Contract Process**：在 provider/consumer 平行實作前建立 Screen Mapping、Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract 與 Screen Traceability，避免 AI agent 只依 API shape 生成語意脫節的前端。
+- **UI Governance Process**：當 UI contract 需要 compliance evidence 時，分類 governance domain、validation mechanism、evidence class、severity 與 project-local design-system policy；visual regression / AI review 是 validation mechanisms，不是 governance domains，runtime signals 保持 advisory projection until separate promotion。
 - **Evidence-Oriented Validation**：當 API/adapter/UI 成功訊號不足以證明 persisted、external、identity-specific 或 user-observable state 時，依 engineering validation reasoning 建立 evidence chain、選擇 evidence depth，必要時要求 live system proof 與 independent observation。
 - **Refactor / Replacement Parity**：當新入口、平台遷移、工具改寫或架構重組要取代舊能力時，先建立新舊能力 parity inventory，逐項列出舊入口、現有能力、副作用、外部依賴、新入口、parity 狀態與測試證據。
 
@@ -83,6 +85,7 @@
 | [`intake.md`](intake.md) | `execution-flow.md` §1/§6 + `development-process.md` intake gates | Focused execution surface：需求接收、Change Intake、Pre-build Interrogation、Requirements Cognition、Parity Gate、Product Brief Validation、Missing Information、Backfill |
 | [`contracts.md`](contracts.md) | `development-process.md` contract gates | Focused execution surface：Required Contracts、Contract Governance、Traceability、Contract-First Rules |
 | [`ui-contracts.md`](ui-contracts.md) | `development-process.md` frontend / consumer contract gap | Focused execution surface：Screen Mapping、Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract、Screen Traceability |
+| [`ui-governance.md`](ui-governance.md) | `plans/active/2026-06-08-1408-ui-governance-workflow.md` Phase 1 | Focused execution surface：UI governance domains、validation mechanisms、evidence classes、severity policy、project-local design system boundary |
 | [`test-strategy.md`](test-strategy.md) | `execution-flow.md` §2/§4 子節 + `development-process.md` BDD/Test Strategy gates | Focused execution surface：Docs-first BDD closure、test strategy、mutation testing、test-first ordering |
 | [`validation.md`](validation.md) | `execution-flow.md` §5/§7 | Focused execution surface：validation、performance gate、old/new behavior proof、completion evidence |
 | [`closure.md`](closure.md) | `execution-flow.md` §8 + `development-process.md` DoR/DoD | Focused execution surface：Definition of Ready/Done、handoff、close-loop、reusable lesson feedback |
