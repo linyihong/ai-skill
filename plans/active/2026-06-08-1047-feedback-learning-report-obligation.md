@@ -9,6 +9,7 @@ created: 2026-06-08
 # Feedback / Learning Report Obligation
 
 **Status**: `draft`
+**Maturity**: Ready for Phase 0
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-08
 **Priority**：P1
@@ -193,6 +194,8 @@ Use full form when `FeedbackDecision: NEEDED`, `FeedbackDecision: UNKNOWN`, high
 
 ### Triggers for `UNKNOWN`
 
+`UNKNOWN` should be rare. It is an evidence state, not a safety fallback for cases where the agent is unsure what to report.
+
 - 無法確認必要 evidence。
 - Repo inaccessible 或 repo context unknown，且 task outcome 可能包含 reusable learning。
 - 只取得 chat evidence，沒有足夠 source / project docs 判斷 learning disposition。
@@ -330,7 +333,7 @@ Those belong to Runtime Cognitive State / Knowledge Acquisition / Economics / Me
 - [ ] New per-turn obligation exists in runtime contract.
 - [ ] Final close-out hook blocks or repairs missing Feedback / Learning Report.
 - [ ] Compact and full formats are documented.
-- [ ] Repo context, feedback decision, writeback status, and learning type are separate fields.
+- [ ] Repo context, feedback decision, and writeback status are separate dimensions.
 - [ ] Non-local repo can report `feedback_decision: NONE` when no learning exists.
 - [ ] Hook validates report presence/schema/enums only, not semantic correctness.
 - [ ] Commit message does not require Feedback / Learning Report.
