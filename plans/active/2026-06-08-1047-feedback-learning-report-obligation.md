@@ -321,7 +321,11 @@ Phase 1 result: runtime contract now owns the feedback report obligation, compac
   - Codex / generic AGENTS-aware tools: no current repo-local stop hook transport documented; rely on canonical final response obligation and repository validation until tool-specific enforcement exists.
   - Gemini CLI: no current repo-local stop hook transport documented; keep adapter thin and avoid Gemini-specific enforcement claims unless implemented.
   - GitHub Copilot: compatibility adapter only; instruction surfaces are not reliable hard enforcement, so hard guarantees remain repository hooks / CI / runtime validate.
-- [ ] Separate implementation into a host-neutral Feedback Report validator and host-specific renderers / fallback behavior.
+- [ ] The canonical obligation must remain valid even when a host provides no executable stop-hook transport. In such environments, enforce through agent instructions, runtime validation scenarios, repository audits, CI, or future host integrations.
+- [ ] Separate implementation into three layers:
+  - Canonical validator: presence, schema, enum values, and required field combinations.
+  - Host adapter: Cursor / Claude / Roo / Codex / Gemini / Copilot capability mapping.
+  - Host transport: `followup_message`, `decision:block`, warning-only, CI failure, repository audit, or future host-specific mechanism.
 - [ ] Do not describe Cursor `followup_message` behavior as universal stop-hook behavior.
 - [ ] Extend stop hook final response validation to require Feedback / Learning Report.
 - [ ] Add repair follow-up wording parallel to missing Cognitive Mode block.
