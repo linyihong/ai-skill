@@ -52,12 +52,12 @@ Parent meta-plan §Empirical Evidence 已將 sanitization 列為 instance #2；s
 
 | # | 原則 | 理由 |
 |---|---|---|
-| P1 | **Metadata-derived forbidden tokens** | 不掃描推導 visibility，而是 project 自己在 metadata 宣告 `visibility: private` + `private_tokens: [...]`。`ai-skill runtime compile` 把所有 project 的宣告 project metadata projection 為 `runtime.db.derived_forbidden_tokens`。Scanner 只查 projection，不做 absence inference。命名理由：早期用過「visibility-derived」一詞會誤導 reviewer 以為 scanner 自動推導 visibility（本 plan 明確否決該路線）；改為 metadata-derived 強調 token 是 project metadata 宣告，derivation 只發生在 case-variant 展開與 cross-project aggregation。 |
+| P1 | **Metadata-derived forbidden tokens** | 不掃描推導 visibility，而是 project 自己在 metadata 宣告 `visibility: private` + `private_entities: [...]`（每個 entity 含 `name` / `kind` / `match_tokens`）。`ai-skill runtime compile` 把所有 project 的 entity 宣告 projection 為 `runtime.db.derived_private_entities` (governance layer) + `runtime.db.derived_match_tokens` (execution layer)。Scanner 只查 `derived_match_tokens`，不做 absence inference。命名理由：早期用過「visibility-derived」一詞會誤導 reviewer 以為 scanner 自動推導 visibility（本 plan 明確否決該路線）；改為 metadata-derived 強調 token 是 project metadata 宣告，derivation 只發生在 case-variant 展開與 cross-project aggregation。**Entity vs token 分層 see Q8 resolution + §Phase 1A**。 |
 | P2 | **Staged-content scan，不 scan commit message** | `git diff --cached` 的內容；不檢查 `commit -m` 文字。Commit message 由 cognitive mode block + 既有 commit-msg validators 治理；本 plan 不重疊。 |
 | P3 | **覆蓋範圍：shared-layer classification（非 folder name classification）** | `runtime/` 與 `knowledge/runtime/` 邊界會持續模糊；用「該檔是否屬 shared / reusable layer」分類。**Topology surface 獨立於 enforcement**：新建 `runtime/repository-topology.yaml`（canonical），宣告 `shared_layer: true\|false` per source-tree subtree。Scanner 查 topology 而非硬編 folder glob。Topology 將被 sanitization / workflow activation / governance lint / dependency reading 等多個 subsystem 共用 — 不掛 `enforcement-registry.yaml` 避免它變超級桶。 |
 | P4 | **Attestation 禁止** | 不接受 commit body 內 "Sanitization: yes" / "[sanitized]" 自陳。Validator 只做 verification，不做 attestation。理由：自陳是 agent 主觀宣告，與本 plan 要解決的「自律失效」同根。**此原則為 cross-cutting governance，預期被其他 obligation 重用（Dependency Read / Test Executed / Coverage Reviewed 等）。** |
 | P5 | **Phase 順序：label registry → 通用 regex → LLM review (conditional)** | Phase 1 最便宜（純 token 比對）；Phase 2 涵蓋 email / phone / OS path / credential pattern 等可 regex 化的；Phase 3 為前兩階段 surface 不夠時才開（cost / determinism trade-off 留 Phase 3 自己 ADR）。 |
-| P6 | **Bootstrap-safe：forbidden 由 project metadata 宣告，非「reusable absent」反推** | 「reusable layer 不存在 → forbidden」會誤殺新概念（e.g. 首次 commit `ActivationBridgeV2` 時 reusable layer 還沒有）。Forbidden 判定改為單一條件：token 出現在某 project 宣告的 `private_tokens` 內。新 framework concept 不在任何 project private_tokens 內 → 自動豁免。完全不做 visibility inference，不做 absence inference。 |
+| P6 | **Bootstrap-safe：forbidden 由 project metadata 宣告，非「reusable absent」反推** | 「reusable layer 不存在 → forbidden」會誤殺新概念（e.g. 首次 commit `ActivationBridgeV2` 時 reusable layer 還沒有）。Forbidden 判定改為單一條件：token 出現在某 project 宣告的 `private_entities[*].match_tokens` 內。新 framework concept 不在任何 project entity 的 match_tokens 內 → 自動豁免。完全不做 visibility inference，不做 absence inference。**Schema canonical 見 §Phase 1A**（entity = governance layer，match_tokens = execution layer）。 |
 
 ### Decision
 
@@ -69,13 +69,16 @@ git pre-commit hook
   ├─ Scope filter: shared-layer classification from runtime/repository-topology.yaml
   │
   ├─ Phase 1: metadata-derived forbidden token scan
-  │     derived_forbidden_tokens = compile-time projection from
-  │       project metadata `private_tokens: [...]` across all known projects
-  │       (case-variant expansion: CamelCase / kebab-case / SCREAMING_SNAKE)
+  │     derived_private_entities  = compile-time projection of
+  │       project metadata `private_entities: [...]` (governance layer:
+  │       entity name + kind + owning project; NOT case-expanded)
+  │     derived_match_tokens      = case-variant expansion of every
+  │       entity's match_tokens (execution layer: scanner direct query)
   │     for each staged file content in shared layer:
-  │       for each token in derived_forbidden_tokens:
+  │       for each token in derived_match_tokens:
   │         if token literal/case-variant present:
-  │           emit finding (file, line, token, owning_project, suggested_placeholder)
+  │           emit finding (file, line, matched_token, entity_name,
+  │                         owning_project, suggested_placeholder)
   │
   ├─ Phase 2: generic regex pattern scan
   │     email | phone | OS absolute path (Windows / POSIX) | credential pattern
@@ -87,7 +90,7 @@ git pre-commit hook
 ```
 
 **Source-of-truth (deterministic, not inferred)**：
-- **Forbidden tokens 由 project metadata 宣告**：每個 project (含 `.agent-goals/` project-local 目錄、downstream consumer overlay) 在自身 metadata 內宣告 `private_tokens: [...]`。`ai-skill runtime compile` 把所有 known project 的 `private_tokens` projection 為 `runtime.db.derived_forbidden_tokens`（含 case-variant expansion + cross-project aggregation）。Scanner 比對該 table，**不做 absence inference、不做 visibility inference**。新 framework concept（如 `ActivationBridgeV2`）因不在任何 project private_tokens 內，bootstrap-safe 不誤殺。
+- **Forbidden tokens 由 project metadata 宣告**：每個 project (含 `.agent-goals/` project-local 目錄、downstream consumer overlay) 在自身 metadata 內宣告 `private_entities: [...]`（governance layer：entity 帶 `name` / `kind` / `match_tokens`）。`ai-skill runtime compile` projection 為兩張 table：`runtime.db.derived_private_entities`（governance query — entity name + kind + owning project）+ `runtime.db.derived_match_tokens`（execution layer：每 entity 的 match_tokens × case-variant expansion × cross-project aggregation 完全展開）。Scanner 比對 `derived_match_tokens`，**不做 absence inference、不做 visibility inference**。新 framework concept（如 `ActivationBridgeV2`）因不在任何 project entity 的 match_tokens 內，bootstrap-safe 不誤殺。
 - **Shared-layer classification**：canonical 來源是 **新建 `runtime/repository-topology.yaml`**（subtree → `shared_layer: true|false` map）。Topology 是 cross-subsystem surface（預期 sanitization / workflow activation / governance lint / dependency reading 共用），刻意不掛 `enforcement-registry.yaml` 避免該 registry 變超級桶。Scanner 從 topology projection 載入，硬編 folder glob 禁止。
 - **Phase 2 regex patterns**：canonical `runtime/sanitization-patterns.yaml`，與 `enforcement/sanitization.md` companion，single SOT。
 
@@ -109,8 +112,8 @@ git pre-commit hook
 
 | 角度 | Sibling `2026-05-31-2000` (allowlist-based) | This plan (metadata-derived) |
 |---|---|---|
-| Source-of-truth | `enforcement/sanitization.yaml` 中央 allowlist | 各 project metadata `private_tokens:` 宣告，projection 為 `derived_forbidden_tokens` |
-| Maintenance cost | 中央 allowlist 必須隨每個新 project 手動更新 | 只有 per-project metadata 維護（owner 在 project 端宣告 `private_tokens`）；framework 端零中央維護、無 cross-project allowlist drift |
+| Source-of-truth | `enforcement/sanitization.yaml` 中央 allowlist | 各 project metadata `private_entities[*].match_tokens` 宣告，projection 為 `derived_private_entities` (governance) + `derived_match_tokens` (execution) |
+| Maintenance cost | 中央 allowlist 必須隨每個新 project 手動更新 | 只有 per-project metadata 維護（owner 在 project 端宣告 `private_entities`）；framework 端零中央維護、無 cross-project allowlist drift |
 | Drift risk vs `sanitization.md` prose | 中高（dual SOT） | 低（無 dual SOT） |
 | 對 today's incident (214a415) | 若 allowlist 尚未含該 label → miss | 命中（label 在 project-local 出現、在 reusable 缺席） |
 | 與 sibling 共存？ | 兩個 executor 同 rule_class | 視 Q1 裁決 |
@@ -124,7 +127,7 @@ git pre-commit hook
 | 欄位 | 內容 |
 |---|---|
 | Candidate files | 新建 `runtime/sanitization-patterns.yaml`（canonical Phase 2 regex）；新建 `scripts/ai-skill-cli/internal/app/sanitization_scan.go`（scanner）；新建 validator entry in `scripts/ai-skill-cli/internal/app/hooks.go` pre-commit dispatcher；新建 `enforcement/sanitization-mechanical.md`（companion，philosophy + 與 prose `sanitization.md` 邊界）；`enforcement/enforcement-registry.yaml` 更新 `rule_classes[sanitization]` executors block（或新增 second executor entry，依 Q1） |
-| Source-of-truth | `enforcement/sanitization.md` 仍是 prose rule canonical；`runtime/sanitization-patterns.yaml` 是 Phase 2 regex canonical；Phase 1 forbidden tokens 由各 project metadata `private_tokens:` 宣告，projection 到 `runtime.db.derived_forbidden_tokens`（framework 端無中央 allowlist） |
+| Source-of-truth | `enforcement/sanitization.md` 仍是 prose rule canonical；`runtime/sanitization-patterns.yaml` 是 Phase 2 regex canonical；Phase 1 forbidden tokens 由各 project metadata `private_entities[*].match_tokens` 宣告，projection 到 `runtime.db.derived_private_entities` (governance) + `runtime.db.derived_match_tokens` (execution)（framework 端無中央 allowlist） |
 | Compiler / generated surfaces | `runtime/sanitization-patterns.yaml` 經 `ai-skill runtime compile` projection 到 `runtime.db.generated_surfaces`；scanner 從 runtime.db 載入 patterns |
 | Layer responsibility | enforcement-mechanical 屬 enforcement layer (rule_class executor)；scanner 屬 runtime layer；pre-commit hook 整合屬 ai-skill-cli layer |
 | 與現行架構衝突 | Q1 已裁決 supersede；sibling `2026-05-31-2000` 已在 `plans/archived/` 且 frontmatter `status: superseded` |
@@ -165,55 +168,127 @@ git pre-commit hook
 
 ### Phase 1 — Metadata-Derived Forbidden Token Scanner
 
-- [x] 定義 project metadata schema：`<PROJECT_ROOT>/.ai-skill-project.yaml`（Phase 1 implements direct metadata scan; overlay metadata remains future-compatible），欄位：
+> **Phase 1 拆分（2026-06-08 review）**：原始 Phase 1 把 4 個獨立 surface 塞在同一 phase（metadata schema / topology / projection / scanner）。Dependency 隱藏在文字下，commit 也會過大。拆成 1A/1B/1C/1D，依賴顯式：
+>
+> ```
+> 1A (Metadata Schema) ─┐
+>                        ├─→ 1C (Projection) ─→ 1D (Scanner)
+> 1B (Topology Surface) ─┘
+> ```
+>
+> 1A 與 1B 可平行 PR；1C 依賴前兩個但本身輕；1D 才是肉。每 phase 一個 focused commit。
+
+#### Phase 1A — Project Metadata Schema
+
+**Governance / execution layer 分層**（resolved Q8 2026-06-08）：治理層 declare **entities**（被保護的對象 — codename / customer / product 等 identity）；scanner 比對的是 **match tokens**（entity 的 alias、case variants）。Schema 直接做出分層，projection 也拆 governance table（`derived_private_entities`）與 execution table（`derived_match_tokens`）。
+
+- [x] 定義 project metadata schema：`<PROJECT_ROOT>/.ai-skill-project.yaml`（Phase 1A implements direct metadata scan; overlay metadata 維持 future-compatible）：
+
   ```yaml
   project:
     id: <project-slug>
     visibility: private | public
-    private_tokens:
-      - <ProjectName>
-      - <project-name>
-      - <PROJECT_NAME>
-      # case variants 自動 derive (CamelCase / kebab / SCREAMING_SNAKE)
+    private_entities:
+      - name: <canonical entity name>            # 治理層 ID（人讀；governance refers to this）
+        kind: codename | client | product | individual | other
+        match_tokens:                             # 實作層 matching surface（scanner 比對這個）
+          - "ProjectFoo"
+          - "project-foo"
+          - "PROJECT_FOO"
+        case_variants: auto                       # 或 manual: ["..."] 完全列舉
+        # 未來可擴：severity / expires_at / owner / related_entity
   ```
+
+  關鍵 design properties：
+  - **Entity ≠ Tokens 1:1** — 一個 entity 可多個 alias
+  - **Tokens 可 collision** — 兩個 entity 的 match_tokens 重疊 → governance lint 可偵測
+  - **Future-proof** — 加 entity-level metadata 不破 schema
+
+- [x] schema validation test：parser 接受合法 schema、拒絕缺 `kind` / 缺 `match_tokens` / `case_variants` 既非 `auto` 也非 list 等變形
+- [x] sample `.ai-skill-project.yaml` documentation（README in plan body example）
+
+#### Phase 1B — Repository Topology Surface
+
+**設計決策**（resolved 2026-06-08）：採 `schema_version: 2`，每 subtree 必須有 `owner` + `purpose`。**移除** flat `expected_consumers` list（容易 stale → 又一個 stale-reference 失效模式）；改寫死 `consumer_tracking.strategy: code_reference` 把治理決策 freeze，避免欄位 6 個月後復活。
+
 - [x] 新建 `runtime/repository-topology.yaml`（canonical cross-subsystem topology surface，**不掛 enforcement-registry**）：
+
   ```yaml
   # runtime/repository-topology.yaml
-  schema_version: 1
-  shared_layer_classification:
-    - subtree: plans/
-      shared: true
-    - subtree: workflow/
-      shared: true
-    - subtree: enforcement/
-      shared: true
-    - subtree: governance/
-      shared: true
-    - subtree: knowledge/
-      shared: true
-    - subtree: runtime/
-      shared: true   # reusable framework runtime
-    - subtree: scripts/
-      shared: false  # implementation
-    - subtree: validation/
-      shared: true   # reusable scenarios
-    - subtree: .agent-goals/
-      shared: false  # project-local
-  expected_consumers:
-    - sanitization (this plan)
-    - workflow_activation (path-signal context)
-    - governance_lint (future)
-    - dependency_reading (future)
+  schema_version: 2
+  consumer_tracking:
+    strategy: code_reference   # consumer list NOT manually maintained; derive via
+                                # grep of code that loads this file. See
+                                # governance/lifecycle/topology-consumers.md
+                                # (TBD; created on first dispute).
+    rationale: |
+      Manual consumer lists go stale (new subsystem reads topology but no one
+      updates the list). Code-reference derivation is the durable governance
+      decision. This block is intentionally permanent — do not re-add a
+      manual `expected_consumers:` field.
+
+  subtrees:
+    - path: plans/
+      shared_layer: true
+      owner: framework-maintainer
+      purpose: "Plan tracking; referenced by enforcement-registry child_plan"
+    - path: workflow/
+      shared_layer: true
+      owner: framework-maintainer
+      purpose: "Cross-skill workflow contracts and execution flows"
+    - path: enforcement/
+      shared_layer: true
+      owner: framework-maintainer
+      purpose: "Reusable enforcement rules and failure patterns"
+    - path: governance/
+      shared_layer: true
+      owner: framework-maintainer
+      purpose: "Lifecycle / promotion / ADR governance surfaces"
+    - path: knowledge/
+      shared_layer: true
+      owner: knowledge-maintainer
+      purpose: "Atom summaries, indexes, graphs, routing registry"
+    - path: runtime/
+      shared_layer: true
+      owner: framework-maintainer
+      purpose: "Compiled / projected runtime surfaces consumed by Go executor"
+    - path: validation/
+      shared_layer: true
+      owner: framework-maintainer
+      purpose: "Reusable validation scenarios and fixtures"
+    - path: scripts/
+      shared_layer: false
+      owner: tooling-maintainer
+      purpose: "CLI / runtime implementation; not consumed as reusable knowledge"
+    - path: .agent-goals/
+      shared_layer: false
+      owner: project-local
+      purpose: "Per-project ephemeral goal ledger; excluded from git"
   ```
-- [x] Topology projection target：`runtime.db.repository_topology`（query via `ai-skill runtime ...` CLI）
-- [x] `ai-skill runtime compile` 階段 projection：所有 known project metadata 的 `private_tokens` / `private_entities` → `runtime.db.derived_forbidden_tokens` table (含 case variants expansion)
-- [x] 實作 scanner core：staged file 落在 shared-layer subtree → 比對 derived_forbidden_tokens → emit finding
-- [x] **Bootstrap-safe guard**：scanner 不做「reusable layer 是否包含 token」inference；新 framework concept 只要不在任何 project private_tokens 內，自動通過
+
+- [x] **Backward-compat**：v1 schema (`shared_layer_classification:` 配 `subtree: / shared:`) 仍可解析作為 read-only fallback；compiler 寫入時一律 v2。Transition window 一個 minor release（之後可移除 v1 reader）。
+- [x] Topology projection target：`runtime.db.repository_topology`（query via `ai-skill runtime topology` CLI）
+- [x] Topology loader unit test：v1 read、v2 read、v2 write round-trip、缺 `owner`/`purpose` reject
+
+#### Phase 1C — Runtime Compile Projection
+
+- [x] `ai-skill runtime compile` 階段新增 projection rule：
+  - 1A `project.private_entities` （per project）→ `runtime.db.derived_private_entities` table（governance layer：保留 entity name / kind / 來源 project ID，**不**展開 case variants — 治理 query 用）
+  - `derived_private_entities` × `match_tokens` × case-variant expansion → `runtime.db.derived_match_tokens` table（execution layer：scanner 直接 query 這張 table，無需 join）
+  - 1B topology → `runtime.db.repository_topology` table
+- [x] 兩張 derived table 為 `runtime_compile` 階段重建（每次 compile 全量重 projection，不增量）
+- [x] Compiler unit test：fixture project metadata + fixture topology → 預期 `derived_private_entities` row count + `derived_match_tokens` 含 case variants 完全展開
+
+#### Phase 1D — Scanner Implementation
+
+- [x] 實作 scanner core：staged file 路徑落在 shared-layer subtree（query `runtime.db.repository_topology`）→ 比對 `runtime.db.derived_match_tokens` → emit finding
+- [x] **Bootstrap-safe guard**：scanner 不做「reusable layer 是否包含 token」inference；新 framework concept 只要不在任何 project `private_entities` 內，自動通過
 - [x] False-positive guardrail：`enforcement/sanitization.md` 自身的 example 段落 self-reference exception（Phase 1 以 metadata-derived scope 達成：未被 project metadata 宣告的 synthetic examples 不會觸發；真實 private token 仍會被擋）
 - [x] Unit tests：
   - fail case：synthetic reconstruction of private-token leak in shared-layer plan content
-  - pass case：same private token allowed in project-local `.agent-goals/` content
+  - pass case：同一 private token 允許在 project-local `.agent-goals/` content（topology shared=false）
   - bootstrap-safety case：首次提交一個全新 framework concept token，確認 0 finding
+  - entity vs token granularity case：兩個 entity 的 match_tokens 部分重疊 → finding 報 entity name（不只 token），便於 governance debug
 
 ### Phase 2 — Generic Regex Patterns (inherited from superseded plan)
 
@@ -272,7 +347,7 @@ git pre-commit hook
 | Q5 | ~~`[skip-sanitization-scan]` opt-out marker？~~ | — | **resolved 2026-06-06: reject** | 與 P4 attestation-prohibited 衝突。若未來需要 emergency override，須另開 ADR 設計 admin-override surface（含 owner / reason / time-boxed expiry），不採 commit-message marker。 |
 | Q6 | False-positive 處理機制：suggested_placeholder 是否自動 patch staged content？ | P2 | open | v1 不自動 patch；自動 patch 列 v2 評估。 |
 | Q7 | P4 attestation-prohibited 原則升級為 cross-cutting governance：何時抽出獨立 enforcement rule (`enforcement/verification-not-declaration.md`)，覆蓋 Dependency Read / Test Executed / Coverage Reviewed 等？ | P2 | open | 本 plan 內留 inline；累積 ≥3 個受益 obligation 後 promote 為獨立 rule，列入 parent meta-plan tracking。 |
-| Q8 | Metadata 欄位是否改名 `private_entities` 而非 `private_tokens`？ | P3 (naming) | open | 實際要保護的是 project identity / product names / customer names 等實體；token 是實作層。`private_entities` 語意較準，但 case-variant 展開後的物件仍是字串 token。**非架構級**，Phase 1 metadata schema 設計時收斂。 |
+| Q8 | Metadata 欄位是否改名 `private_entities` 而非 `private_tokens`？ | P1 (架構級) | **resolved 2026-06-08** | 不是 naming 問題，是 governance ≠ execution layer boundary 問題。決議：(a) schema 用 `private_entities:`（治理層 — entity 是 governance refers to 的對象，有 name / kind 身份）；(b) entity 含 `match_tokens:`（執行層 — scanner 比對的字串 surface）；(c) projection 也拆兩張 table — `derived_private_entities`（治理 query）+ `derived_match_tokens`（scanner direct query）。完整 schema 見 §Phase 1A。 |
 
 ---
 
@@ -314,7 +389,7 @@ git pre-commit hook
 | 段落 | 棄用理由 |
 |---|---|
 | `sanitization.yaml` 內 `incident_score` block-level threshold | 由 Phase 2.5 warn-level 取代 |
-| 任何 allowlist-style `private_project_names:` / `allowed_tokens:` 設計 | 被 metadata-derived `private_tokens` 取代 |
+| 任何 allowlist-style `private_project_names:` / `allowed_tokens:` 設計 | 被 metadata-derived `private_entities[*].match_tokens` 取代 |
 | `[skip-sanitization]` opt-out marker | P4 + Q5 reject |
 | `canonical_paths` / `not_canonical` 硬列清單 | 由 `shared_layer_classification` table 取代 |
 | PreToolUse Write/Edit warning hook | commit-diff-only 立場下不需要（避免 Edit `old_string` 誤判） |
