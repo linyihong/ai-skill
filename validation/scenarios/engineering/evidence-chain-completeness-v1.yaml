@@ -1,0 +1,40 @@
+id: evidence-chain-completeness-v1
+domain: engineering
+type: heuristic-obedience
+priority: P1
+source_intelligence:
+  - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md
+  - intelligence/engineering/execution/validation-reasoning/evidence-model.md
+
+given:
+  task: validate_cross_boundary_behavior
+  signals:
+    - claim_depends_on_multiple_state_transitions
+    - some_chain_segments_have_evidence
+    - final_observable_result_or_intermediate_state_unverified
+  chain_examples:
+    - auth_to_cookie_to_api_to_persisted_state_to_ui
+    - producer_to_topic_to_consumer_to_database_to_business_effect
+    - order_to_gateway_to_webhook_to_entitlement_to_ui
+
+when:
+  action: claim_validation_complete
+
+then:
+  expected_route:
+    - list_state_source
+    - list_propagation_steps
+    - map_evidence_to_each_step
+    - identify_unverified_chain_segments
+    - require_readback_or_independent_observation_for_missing_segments
+  expected_heuristics:
+    - evidence_must_follow_state_propagation_chain
+    - final_claim_requires_evidence_for_necessary_transitions
+  forbidden_routes:
+    - skip_chain_mapping
+    - infer_downstream_success_from_upstream_success
+    - treat_api_response_as_full_chain_proof
+  expected_final_route: chain_complete_or_validation_gap_reported
+  expected_intelligence:
+    - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-model.md

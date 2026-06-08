@@ -1,0 +1,41 @@
+id: evidence-collapse-point-v1
+domain: engineering
+type: heuristic-obedience
+priority: P2
+source_intelligence:
+  - intelligence/engineering/execution/validation-reasoning/evidence-collapse-point.md
+  - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md
+
+given:
+  task: diagnose_cross_boundary_validation_failure
+  signals:
+    - ordered_evidence_chain_available
+    - upstream_steps_confirmed
+    - downstream_steps_missing_or_failed
+    - one_intermediate_step_first_lacks_consistent_evidence
+  example_chain:
+    - producer_confirmed
+    - topic_confirmed
+    - consumer_missing
+    - database_missing
+    - business_effect_missing
+
+when:
+  action: choose_debugging_focus
+
+then:
+  expected_route:
+    - order_evidence_chain
+    - mark_each_node_confirmed_missing_or_contradicted
+    - identify_first_unverified_required_node
+    - focus_next_investigation_on_collapse_point
+  expected_heuristics:
+    - first_inconsistent_node_is_collapse_point
+    - downstream_failure_may_be_symptom_not_root
+  forbidden_routes:
+    - debug_final_ui_or_business_effect_first_without_chain_reasoning
+    - treat_all_downstream_failures_as_independent
+  expected_final_route: collapse_point_identified_or_evidence_needed
+  expected_intelligence:
+    - intelligence/engineering/execution/validation-reasoning/evidence-collapse-point.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md

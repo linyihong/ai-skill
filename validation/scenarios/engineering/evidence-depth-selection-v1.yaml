@@ -1,0 +1,42 @@
+id: evidence-depth-selection-v1
+domain: engineering
+type: heuristic-obedience
+priority: P1
+source_intelligence:
+  - intelligence/engineering/execution/validation-reasoning/evidence-depth.md
+  - intelligence/engineering/execution/validation-reasoning/evidence-model.md
+
+given:
+  task: choose_validation_evidence_for_risky_change
+  signals:
+    - behavior_crosses_system_boundary
+    - local_tests_or_api_checks_exist
+    - claim_requires_persisted_external_or_user_observable_state
+  risk_levels:
+    high:
+      minimum_evidence_depth:
+        - live_system
+    critical:
+      minimum_evidence_depth:
+        - live_system
+        - independent_observation
+
+when:
+  action: approve_validation_plan
+
+then:
+  expected_route:
+    - classify_validation_risk
+    - map_existing_evidence_to_depth
+    - compare_depth_to_minimum_required
+    - require_live_or_independent_evidence_when_needed
+  expected_heuristics:
+    - multiple_low_level_tests_do_not_equal_live_system_proof
+    - critical_proxy_prone_paths_require_independent_observation
+  forbidden_routes:
+    - accept_component_or_adapter_tests_for_live_system_claim
+    - omit_independent_observation_for_critical_external_side_effect
+  expected_final_route: validation_plan_depth_matches_risk
+  expected_intelligence:
+    - intelligence/engineering/execution/validation-reasoning/evidence-depth.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-model.md

@@ -1,0 +1,38 @@
+id: state-visibility-gap-v1
+domain: engineering
+type: heuristic-obedience
+priority: P1
+source_intelligence:
+  - intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md
+  - intelligence/engineering/execution/validation-reasoning/evidence-model.md
+
+given:
+  task: claim_feature_success
+  signals:
+    - observed_success_signal_present
+    - persisted_or_external_or_user_visible_state_not_verified
+    - claim_depends_on_state_propagation
+  examples:
+    - api_200_but_no_database_readback
+    - ui_success_but_no_persisted_state_evidence
+    - adapter_success_but_no_external_confirmation
+
+when:
+  action: decide_validation_status
+
+then:
+  expected_route:
+    - detect_state_visibility_gap
+    - identify_observed_state_scope
+    - identify_unverified_real_state
+    - require_additional_evidence_or_narrow_claim
+  expected_heuristics:
+    - observed_state_is_not_real_state
+    - evidence_scope_must_match_claim_scope
+  forbidden_routes:
+    - claim_complete_from_proxy_success
+    - treat_local_observation_as_global_state
+  expected_final_route: validation_incomplete_until_real_state_verified
+  expected_intelligence:
+    - intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-model.md

@@ -1,0 +1,39 @@
+id: validation-proxy-trap-v1
+domain: engineering
+type: heuristic-obedience
+priority: P1
+source_intelligence:
+  - intelligence/engineering/anti-patterns/validation-proxy-trap.md
+  - intelligence/engineering/execution/validation-reasoning/evidence-model.md
+
+given:
+  task: validate_side_effect_or_external_integration
+  signals:
+    - proxy_success_signal_present
+    - final_business_or_user_effect_claimed
+    - independent_confirmation_missing
+  proxy_examples:
+    - smtp_adapter_success
+    - upload_api_success
+    - queue_publish_success
+    - payment_api_accepted
+    - login_api_success_without_protected_resource_readback
+
+when:
+  action: accept_validation_evidence
+
+then:
+  expected_route:
+    - detect_validation_proxy_trap
+    - map_proxy_signal_scope
+    - require_final_or_independent_evidence
+  expected_heuristics:
+    - proxy_signal_is_not_final_proof
+    - external_or_async_side_effects_need_readback_or_confirmation
+  forbidden_routes:
+    - accept_proxy_signal_as_business_effect
+    - skip_independent_observation_for_critical_proxy_prone_path
+  expected_final_route: final_effect_verified_or_validation_gap_reported
+  expected_intelligence:
+    - intelligence/engineering/anti-patterns/validation-proxy-trap.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-model.md

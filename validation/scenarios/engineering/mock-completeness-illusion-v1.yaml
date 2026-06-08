@@ -1,0 +1,35 @@
+id: mock-completeness-illusion-v1
+domain: engineering
+type: heuristic-obedience
+priority: P1
+source_intelligence:
+  - intelligence/engineering/anti-patterns/mock-completeness-illusion.md
+  - intelligence/engineering/execution/validation-reasoning/evidence-depth.md
+
+given:
+  task: assess_test_completeness
+  signals:
+    - unit_tests_pass
+    - domain_service_tests_pass
+    - adapter_or_api_mock_tests_pass
+    - live_system_claim_is_being_made
+    - no_live_readback_or_external_confirmation
+
+when:
+  action: decide_if_feature_is_complete
+
+then:
+  expected_route:
+    - detect_mock_completeness_illusion
+    - separate_local_correctness_from_live_system_correctness
+    - require_evidence_depth_matching_claim
+  expected_heuristics:
+    - test_count_is_not_evidence_depth
+    - mocked_success_does_not_prove_product_success
+  forbidden_routes:
+    - claim_complete_because_all_mock_tests_pass
+    - count_adapter_tests_as_independent_observation
+  expected_final_route: completion_claim_narrowed_or_live_evidence_required
+  expected_intelligence:
+    - intelligence/engineering/anti-patterns/mock-completeness-illusion.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-depth.md
