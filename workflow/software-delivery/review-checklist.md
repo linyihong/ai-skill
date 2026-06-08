@@ -47,6 +47,8 @@
 - 變更/新程式碼覆蓋率與總專案覆蓋率分開檢查。
 - 突變測試、基於屬性的測試、不變量測試或負面案例涵蓋規則密集或安全敏感的邏輯。
 - 當狀態重要時，資料庫、儲存庫、遷移或持久化行為使用 fixtures 或整合測試驗證。
+- 當觀察到的成功訊號可能不同於真實狀態時，依 [`state-visibility-gap.md`](../../intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md) 與 [`evidence-chain-validation.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md) 驗證完整 state propagation chain。
+- Payment、email、external API、storage、queue、entitlement 或其他 proxy-prone path 不接受 API 200、adapter success、SMTP success 或 queue publish 作為 final proof；critical path 需要 independent observation。
 - 效能敏感變更包含適合風險的 load、stress、spike、soak 或 smoke-size 效能證據。
 - 效能證據報告 P95/P99 延遲、吞吐量、錯誤率和資源使用率；平均延遲不被視為足夠。
 - 嵌入式或硬體支援的行為區分主機可重複測試與僅目標或硬體在迴路中的證據。
@@ -143,6 +145,8 @@
 - 登出、密碼變更和風險事件使相關工作階段失效。
 - 令牌不會寫入除錯日誌、崩潰報告、分析或螢幕截圖。
 - 工作階段識別碼不用作長期裝置識別碼。
+- 依身份、權限、tenant、ownership、會員或 feature flag 改變的 UI/API/SSR 行為，以真實身份材料走產品路徑驗證 protected resource、persisted state 與 user-observable state 一致。
+- 忘記密碼、寄信、播放權限、收藏/追蹤、會員狀態或 entitlement 變更若產生 side effect，完成證據包含 live system proof 與必要的 DB/external/readback 驗證。
 
 ## Local Storage（本地儲存）
 
@@ -176,6 +180,7 @@
 ## Release Gate（發布關卡）
 
 - 審查者可以指向測試、建置檢查或記錄的證據，證明每個必要控制存在。
+- 若 release claim 涉及 state visibility gap，審查者可以指向 evidence chain 中每個必要 segment 的證據，且 claim scope 不超過 evidence scope。
 - 沒有影響行為、合約、錯誤、安全性、儲存、所有權或測試的未解決阻擋性問題。
 - 已知的殘留風險記錄在專案儲存庫中。
 - 可重複使用的課程僅在清理後才提升到此技能中。

@@ -20,3 +20,18 @@ Validation stage 負責 proof acquisition：behavior correctness、business inva
 ## 進入本 stage 前
 
 [`execution-flow.md`](../execution-flow.md) §4 測試策略定義 已確認測試策略；§7 驗證 執行 proof acquisition；§Test-First Ordering callout 確認 framework 升級已遵循順序。
+
+## Live Evidence Chain Guide
+
+當變更命中 [`state-visibility-gap.md`](../../../intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md) 時，validation stage 必須取得足以支持 claim 的 evidence chain，而不只是一個局部測試結果。
+
+建議步驟：
+
+1. 列出 state source：identity、entitlement、tenant、ownership、feature flag、payment state 或其他來源。
+2. 列出 propagation chain：API、domain logic、DB、queue、external system、SSR/API readback、UI 或 business observable result。
+3. 依 [`evidence-model.md`](../../../intelligence/engineering/execution/validation-reasoning/evidence-model.md) 標記每個證據的 confidence 與 scope。
+4. 依 [`evidence-depth.md`](../../../intelligence/engineering/execution/validation-reasoning/evidence-depth.md) 確認最低 depth；高風險用 live system，critical path 加 independent observation。
+5. 對 identity-coupled side effect flow，使用產品正式 API 或 UI/H5 path 取得真實身份材料，帶該身份呼叫 SSR/API readback，並驗證 DB/state、side effect 與 user-observable state 一致。
+6. 對 email、payment、queue、storage、external API 等 proxy-prone path，不接受 adapter success 作為 final proof；需有 provider/consumer/readback/independent confirmation。
+
+本機 email、SMTP、帳密、收件人、cookies、tokens 或測試環境細節必須留在 gitignored local env 或專案安全文件，不得寫入 reusable Ai-skill 文件。

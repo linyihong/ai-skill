@@ -23,10 +23,13 @@ activation:
     - refactor_or_replacement_requested
     - sdk_defect_reported
     - performance_sensitive_change_detected
+    - state_visibility_gap_detected
+    - proxy_prone_side_effect_detected
   required_when:
     - Work involves development, implementation, code modification, code review, design review, release review, security review, or contract governance review.
     - A change may alter observable behavior, public contract, domain invariant, error handling, storage, security, performance, or tests.
     - A refactor, migration, replacement, new entrypoint, tool rewrite, or architecture split may replace existing capability.
+    - A success signal may not prove persisted, external, identity-specific, or user-observable state.
 
 required_sources:
   - workflow/software-delivery/README.md
@@ -47,6 +50,12 @@ required_sources:
   - enforcement/evidence-hierarchy.md
   - enforcement/sanitization.md
   - enforcement/linked-updates.md
+  - intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md
+  - intelligence/engineering/execution/validation-reasoning/evidence-model.md
+  - intelligence/engineering/execution/validation-reasoning/evidence-depth.md
+  - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md
+  - intelligence/engineering/anti-patterns/mock-completeness-illusion.md
+  - intelligence/engineering/anti-patterns/validation-proxy-trap.md
 
 loading_surfaces:
   intake:
@@ -147,7 +156,7 @@ steps:
       - sdk_defect_reported
   - id: define_test_strategy
     order: 8
-    action: Load the test-strategy surface, then define old behavior regression, new behavior proof, mutation/negative checks, persistence/integration tests, and hardware/performance evidence when relevant.
+    action: Load the test-strategy surface, then define old behavior regression, new behavior proof, mutation/negative checks, persistence/integration tests, state visibility evidence chain, and hardware/performance evidence when relevant.
     gates:
       - gate.software_delivery.validation_target_defined
   - id: run_performance_gate
@@ -157,7 +166,7 @@ steps:
       - performance_sensitive_change_detected
   - id: validate_and_close
     order: 10
-    action: Load validation and closure surfaces as needed, run at least one validation method, check blockers, update durable docs, feed reusable lessons when appropriate, and report scope honestly.
+    action: Load validation and closure surfaces as needed, run validation at the required evidence depth, check blockers, update durable docs, feed reusable lessons when appropriate, and report scope honestly.
     gates:
       - gate.software_delivery.validation_complete
 
@@ -195,10 +204,14 @@ gates:
     pass_when:
       - old behavior protection and new behavior proof are separated
       - relevant contract, integration, fixture, mutation, property, persistence, generated-client, host, target, or hardware-in-loop checks are chosen
+      - state visibility gaps map observed signals to real state, evidence scope, and evidence chain segments
+      - proxy-prone side effects identify whether independent observation is required
   - id: gate.software_delivery.validation_complete
     blocks: final_completion_response
     pass_when:
       - at least one validation method ran or a blocker is reported
+      - state visibility gap claims have evidence depth matching risk
+      - critical payment, email, external API, storage, queue, or entitlement paths include independent observation or are reported as blocked
       - unresolved blockers affecting behavior, contract, error handling, security, storage, ownership, or tests are not hidden
       - completion claim scope matches evidence
 
@@ -212,6 +225,8 @@ required_evidence:
   - BDD / contract / test traceability when behavior changes
   - Consumer / UI Behavior / Screen / ViewModel contract evidence when a consumer surface changes
   - performance budget evidence when performance-sensitive
+  - state visibility / evidence chain coverage when observed success may diverge from real state
+  - independent observation when proxy-prone side effects are critical
   - validation result or blocker
 
 success_criteria:
@@ -220,6 +235,7 @@ success_criteria:
   - Behavior changes keep docs, BDD/contracts, tests, implementation, and traceability aligned.
   - Replacement and migration work preserves observable capability or records scoped gaps.
   - Validation distinguishes old behavior still protected from new behavior proven.
+  - Validation evidence follows the state propagation chain when observed success may diverge from real state.
   - Reusable lessons are sanitized and linked to the correct owner layer.
 
 failure_modes:
@@ -238,6 +254,12 @@ failure_modes:
   - id: performance_claim_without_budget
     detection: Agent says performance is fine from functional tests or average latency only.
     recovery: Define P95/P99, throughput, error-rate, resource budget, and appropriate performance test evidence.
+  - id: state_visibility_gap_unverified
+    detection: Agent accepts API, adapter, mock, or UI success without proving persisted, external, identity-specific, or user-observable state.
+    recovery: Load validation-reasoning evidence chain sources, map evidence scope, and require live_system or independent_observation evidence as appropriate.
+  - id: validation_proxy_trap
+    detection: Agent treats API 200, SMTP success, queue publish, upload success, or payment accepted as final proof of business/user effect.
+    recovery: Identify proxy signal scope and require final readback, provider/consumer evidence, or independent observation.
 
 final_status_report:
   required_fields:
@@ -247,4 +269,5 @@ final_status_report:
     - contracts_or_bdd_updated
     - parity_status
     - validation_performed
+    - evidence_depth_and_chain_scope
     - blockers_or_deferred_scope

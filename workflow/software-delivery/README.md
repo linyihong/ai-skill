@@ -18,6 +18,7 @@
 9. 需要 architecture fit analysis、DDD / CQRS / event sourcing / microservices decision 時參考 [`architecture/`](architecture/README.md)
 10. 需要 Simplicity First / Surgical Changes / Think Before Coding 的行為範例時參考 [`examples/EXAMPLES.md`](examples/EXAMPLES.md)；examples 預設 suppress，僅在明確要求範例或 ambiguity 時載入
 11. PR 觸動效能敏感路徑或含 AI 生成程式碼時，執行 [`perf-risk-gate.md`](perf-risk-gate.md) 的 5 步檢查（靜態 anti-pattern scan、hot-path micro-benchmark、reviewer perf checklist、pre-deploy observability gate、canary rollout）
+12. 當成功訊號可能不同於真實系統狀態時，載入 validation reasoning：[`state-visibility-gap.md`](../../intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md)、[`evidence-model.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-model.md)、[`evidence-chain-validation.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md)、[`evidence-depth.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-depth.md)
 
 ## Scope
 
@@ -29,6 +30,7 @@
 - **Architecture Stage**：domain architecture cognition，包含 DDD fit、bounded context discovery、consistency boundary design、architecture escalation。
 - **Contract-First Development Process**：從企劃書到實作的完整開發流程，包含 Default Flow、Required Contracts、Product Brief Validation Gate、Change Intake Gate、Contract Governance Gate、Traceability Gate、BDD Execution Closure、Test Strategy Gate、Embedded/Hardware Flow、Missing Information Gate、Existing Project Documentation Backfill 等。
 - **UI / Consumer Contract Process**：在 provider/consumer 平行實作前建立 Screen Mapping、Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract 與 Screen Traceability，避免 AI agent 只依 API shape 生成語意脫節的前端。
+- **Evidence-Oriented Validation**：當 API/adapter/UI 成功訊號不足以證明 persisted、external、identity-specific 或 user-observable state 時，依 engineering validation reasoning 建立 evidence chain、選擇 evidence depth，必要時要求 live system proof 與 independent observation。
 - **Refactor / Replacement Parity**：當新入口、平台遷移、工具改寫或架構重組要取代舊能力時，先建立新舊能力 parity inventory，逐項列出舊入口、現有能力、副作用、外部依賴、新入口、parity 狀態與測試證據。
 
 ### 審查類型
