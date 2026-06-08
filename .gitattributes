@@ -1,0 +1,75 @@
+# Repository-wide line-ending normalization.
+#
+# Why: the runtime-index checksum validator
+# (scripts/ai-skill-cli/internal/app/runtime.go::nativeRuntimeIndexChecksumsCheck)
+# computes sha256 over raw file bytes. Without normalization, a Windows
+# checkout with core.autocrlf=true produces CRLF content whose sha256 does
+# not match the LF-content checksum stored in
+# knowledge/runtime/sqlite/runtime-index.sqlite (refreshed on macOS/Linux).
+# That divergence broke Windows CI starting at run 152.
+#
+# Forcing LF on text files at checkout (eol=lf) makes the validator
+# portable without changing its semantics — no recomputation of stored
+# checksums needed. After this file lands, Windows contributors should
+# refresh their working tree once:
+#     git rm --cached -r .
+#     git reset --hard
+# so checkout materializes LF endings.
+#
+# Binary file types are marked explicitly so Git stops trying to diff /
+# normalize them. .sqlite / .db / .exe / .png / .pdf are the recurring
+# ones in this repo.
+
+# ── Text files: normalize to LF ─────────────────────────────────────────
+*.md          text eol=lf
+*.yaml        text eol=lf
+*.yml         text eol=lf
+*.json        text eol=lf
+*.go          text eol=lf
+*.py          text eol=lf
+*.ts          text eol=lf
+*.tsx         text eol=lf
+*.js          text eol=lf
+*.jsx         text eol=lf
+*.sh          text eol=lf
+*.bash        text eol=lf
+*.toml        text eol=lf
+*.txt         text eol=lf
+*.csv         text eol=lf
+*.tsv         text eol=lf
+*.html        text eol=lf
+*.css         text eol=lf
+*.scss        text eol=lf
+*.rb          text eol=lf
+*.rs          text eol=lf
+*.java        text eol=lf
+*.kt          text eol=lf
+*.swift       text eol=lf
+go.mod        text eol=lf
+go.sum        text eol=lf
+Makefile      text eol=lf
+*.mk          text eol=lf
+
+# ── Binary files: do not normalize / diff as binary ─────────────────────
+*.exe         binary
+*.dll         binary
+*.so          binary
+*.dylib       binary
+*.db          binary
+*.sqlite      binary
+*.sqlite3     binary
+*.png         binary
+*.jpg         binary
+*.jpeg        binary
+*.gif         binary
+*.webp        binary
+*.pdf         binary
+*.zip         binary
+*.gz          binary
+*.tar         binary
+*.tgz         binary
+*.ico         binary
+*.woff        binary
+*.woff2       binary
+*.ttf         binary
+*.otf         binary
