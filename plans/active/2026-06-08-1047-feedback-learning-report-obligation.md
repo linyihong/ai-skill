@@ -9,7 +9,7 @@ created: 2026-06-08
 # Feedback / Learning Report Obligation
 
 **Status**: `draft`
-**Maturity**: Ready for Phase 0
+**Maturity**: Phase 0 checked; ready for Phase 1
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-08
 **Priority**：P1
@@ -149,6 +149,13 @@ RepoContext: UNKNOWN
 Writeback: N/A
 ```
 
+Compact form uses fixed key order for simple schema validation:
+
+1. `FeedbackDecision`
+2. `RepoContext`
+3. `Writeback`
+4. `Target` only when `FeedbackDecision: NEEDED`
+
 ### Full Form
 
 Use full form when `FeedbackDecision: NEEDED`, `FeedbackDecision: UNKNOWN`, high-risk failure learning, or deferred/unavailable writeback:
@@ -259,10 +266,10 @@ Those belong to Runtime Cognitive State / Knowledge Acquisition / Economics / Me
 
 ## Open Questions
 
-- [ ] `repo_context: LOCAL` 的判斷是否要求 `git status` clean，還是只要求有 local repo root？
+- [x] `repo_context: LOCAL` 的判斷是否要求 `git status` clean，還是只要求有 local repo root？Resolved: local repo / project context is enough. Clean/pushed/readback belongs to execution close-loop or `writeback_status`, not `repo_context`.
 - [x] `feedback_decision: NONE` 是否允許在 non-local repo 出現？Resolved: yes. Repo context and feedback decision are orthogonal.
-- [ ] Stop hook 應 fail-closed 還是 fail-open？初步建議：Ai-skill repo 內 fail-closed；外部專案若找不到 Ai-skill repo，依現有 stop hook policy。
-- [ ] Compact block 是否需要固定行順序以便 schema validator 簡單檢查？
+- [x] Stop hook 應 fail-closed 還是 fail-open？Resolved: follow existing host-specific stop-hook behavior. Final assistant response present + missing required report loops/blocks; user-aborted, audit-only, non-final tool/status payloads fail-open; Cursor missing assistant text currently fail-opens, Claude missing assistant text blocks.
+- [x] Compact block 是否需要固定行順序以便 schema validator 簡單檢查？Resolved: yes. Fixed order is `FeedbackDecision` → `RepoContext` → `Writeback` → optional `Target`.
 - [x] Commit-msg 是否也要要求 Feedback report，或只要求 chat/session final response？Resolved: chat/session final response only. Commit message 不強制。
 
 ## Phase 0 — Preflight
@@ -271,27 +278,29 @@ Those belong to Runtime Cognitive State / Knowledge Acquisition / Economics / Me
 
 逐條核對本 plan §Open Questions，標記處置並回寫：
 
-- [ ] 已讀本 plan §Open Questions 全部條目
-- [ ] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
-- [ ] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
-- [ ] 若盤點新發現問題，已加入 §Open Questions
+- [x] 已讀本 plan §Open Questions 全部條目
+- [x] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
+- [x] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
+- [x] 若盤點新發現問題，已加入 §Open Questions
 
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
-| Repo local 判斷 | pending | Phase 0 inspect current stop hook / repo detection |
+| Repo local 判斷 | resolved | `hooks.go` separates local repo detection (`collectDirtyGitRepoReports`, `isAiSkillRepoRoot`) from dirty/ahead status; clean/pushed belongs to close-loop/writeback, not repo_context |
 | Non-local 是否允許 NONE | resolved | Repo context 與 feedback decision 正交；non-local 可為 NONE |
-| Stop hook fail policy | pending | Phase 0 compare Cursor / Claude adapters |
-| Compact line order | pending | Phase 0 validator design |
+| Stop hook fail policy | resolved | `hooks.go` and adapters show host-specific transport: Cursor uses followup loop, Claude uses `decision:block`; non-final / audit-only events fail-open |
+| Compact line order | resolved | Fixed order supports presence/schema/enum validation without semantic judgment |
 | Commit-msg 是否要求 | resolved | Chat/session final response only；commit message 不強制 |
 
 ### Phase 0.1 — Architecture Compatibility Preflight
 
-- [ ] 讀 `runtime/core-bootstrap.yaml` per-turn obligations。
-- [ ] 讀 stop hook implementation and tests：`scripts/ai-skill-cli/internal/app/hooks.go`、`hooks_test.go`。
-- [ ] 讀 tool adapters：`ai-tools/agent/cursor.md`、`ai-tools/agent/claude.md`、generic adapters as needed。
-- [ ] 讀 feedback learning rules：`enforcement/failure-learning-system.md`、`feedback/feedback-lessons.md`、`enforcement/reusable-guidance-boundary.md`。
-- [ ] 確認 report belongs to runtime obligation, not workflow-specific checklist。
-- [ ] 確認 linked updates：CORE_BOOTSTRAP companion、tool adapters、validation scenarios、CLI docs/tests。
+- [x] 讀 `runtime/core-bootstrap.yaml` per-turn obligations。
+- [x] 讀 stop hook implementation and tests：`scripts/ai-skill-cli/internal/app/hooks.go`、`hooks_test.go`。
+- [x] 讀 tool adapters：`ai-tools/agent/cursor.md`、`ai-tools/agent/claude.md`、generic adapters as needed。
+- [x] 讀 feedback learning rules：`enforcement/failure-learning-system.md`、`feedback/feedback-lessons.md`、`enforcement/reusable-guidance-boundary.md`。
+- [x] 確認 report belongs to runtime obligation, not workflow-specific checklist。
+- [x] 確認 linked updates：CORE_BOOTSTRAP companion、tool adapters、validation scenarios、CLI docs/tests。
+
+Phase 0 result: proceed to Phase 1. No architecture conflict found. Existing active plans overlap only at future knowledge acquisition/economics surfaces; this plan remains the narrow close-out reporting contract and should land before broader Runtime Cognitive State work.
 
 ## Phase 1 — Runtime Contract
 
