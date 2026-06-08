@@ -74,25 +74,96 @@ flowchart LR
 
 `sd-ui-governance` 承擔 enforcement-oriented responsibility：
 
-- UI Contract Validator：必備 screen states、labels、actions、loading/error/success、traceability。
-- Design Token Validator：typography、color、spacing、raw CSS/style ban、component primitive usage。
-- Accessibility Validator：keyboard、focus、semantics、labels、contrast/motion、assistive feedback。
-- UI Behavior Pattern Validator：submit loading、destructive confirmation、retry/end-of-list/offline/permission denied。
-- Visual Regression Validator：screenshot diff / golden baseline / deterministic render baseline。
-- AI Visual Validator：hierarchy、alignment、spacing consistency、visual dominance 等主觀或半主觀訊號，預設 warning / research，不直接 blocking。
+- 定義 governance domains：Contract、Behavior、Accessibility、DesignSystem。
+- 定義 validation mechanisms：Deterministic、ScreenshotDiff、AIReview、ManualReview。
+- 定義 evidence classes 與 severity policy，避免把工具或執行方式誤升成 governance domain。
 
-Validator maturity ladder:
+最重要的邊界是：**what is governed** 和 **how validation happens** 必須分開。不要把 `Playwright Validator`、`Storybook Validator`、`Chromatic Validator`、`Vision Validator` 這類 execution mechanism 變成 governance taxonomy。
 
-| 層級 | Validator | Default severity | Promotion condition |
+建議 shape：
+
+```yaml
+domain: accessibility
+mechanisms:
+  - deterministic
+  - ai_review
+evidence_class:
+  - accessibility_scan
+  - human_review
+```
+
+而不是：
+
+```yaml
+validator_type: ai_visual_validator
+```
+
+Maturity layers:
+
+| 層級 | Governance domain | Default severity | Promotion condition |
 |---|---|---|---|
-| L1 | Requirement / Screen Contract Validator | warn → block | Contract schema and required states are explicit |
-| L2 | ViewModel / Consumer Contract Validator | warn → block | Source fixture → expected view model fixture exists |
-| L3 | Design Token Validator | block candidate | Project design token policy is configured and deterministic |
-| L4 | Accessibility Validator | block candidate | axe / Lighthouse / Pa11y or equivalent objective checks exist |
-| L5 | UI Behavior Pattern Validator | warn → block | Pattern trigger and required state are objective |
-| L6 | Visual Regression Validator | warn → block | Golden baseline and deterministic screenshot capture exist |
-| L7 | AI Visual Validator | warn / research | Objective rubric, scoped criteria, and human review policy exist |
-| L8 | Closure Validator | block candidate | UI governance evidence is linked in DoD / review report |
+| L1 | Contract | warn → block | Screen / UI contract schema and required states are explicit |
+| L2 | Consumer / ViewModel | warn → block | Source fixture → expected view model fixture exists |
+| L3 | Design System | block candidate | Project-local token / component policy is configured and deterministic |
+| L4 | Accessibility | block candidate | Objective accessibility expectations and scan/manual evidence path exist |
+| L5 | Behavior | warn → block | Pattern trigger and required state are objective |
+| L6 | Closure | block candidate | UI governance evidence is linked in DoD / review report |
+
+Supported mechanisms:
+
+```yaml
+supported_mechanisms:
+  - deterministic
+  - screenshot_diff
+  - ai_review
+  - manual_review
+```
+
+Visual regression and AI review are mechanisms, not maturity layers. They may support multiple domains: for example, `screenshot_diff` can support Design System or Behavior, while `ai_review` can support Accessibility, Design System, or Closure when scoped by rubric.
+
+Severity principle:
+
+```yaml
+subjective_judgement:
+  default_severity: warn
+
+objective_judgement:
+  default_severity: block_candidate
+```
+
+This prevents the common failure mode where "AI thinks the UI looks bad" becomes equivalent to "build failed". Missing loading state, missing label, missing destructive confirmation, and raw design token violations can become blocking candidates; vague visual taste should remain warning / research until translated into objective criteria.
+
+Evidence Source Taxonomy:
+
+| Evidence class | Source examples | Relative trust / use |
+|---|---|---|
+| `contract` | Screen Contract, Consumer Contract, ViewModel Contract | Defines expected behavior; not execution proof by itself |
+| `runtime` | component state, route behavior, UI event path | Proves behavior exists in implementation |
+| `accessibility_scan` | axe, Lighthouse, Pa11y | Strong objective evidence for accessibility gates |
+| `visual_diff` | Percy, Applitools, Chromatic, screenshot golden diff | Strong when baseline and capture are deterministic |
+| `screenshot` | Playwright screenshot, manual capture | Useful input; weaker unless paired with baseline or rubric |
+| `ai_review` | vision model review output | Advisory by default; requires scoped criteria |
+| `human_review` | design review, UX heuristic review | Useful for subjective/strategic judgment; not mechanical by default |
+
+This taxonomy is currently UI-scoped. Promotion to shared validation reasoning requires evidence reuse across multiple governance domains, for example API governance, architecture governance, or runtime governance. Candidate future locations include `intelligence/engineering/execution/validation-reasoning/` or the shared software-delivery validation surface.
+
+Layer boundary statement:
+
+```text
+sd-ui-contracts
+  = What UI should be
+
+sd-ui-governance
+  = How UI compliance is evaluated
+
+sd-validation
+  = How evidence is executed
+
+runtime-governance
+  = How violations affect execution
+```
+
+Current scope: **workflow governance only**. Runtime signals in this plan are advisory projections. Promotion to runtime governance or enforcement registry requires a separate implementation decision, and ADR review if the promotion would make UI governance a durable cross-system runtime invariant.
 
 ### Alternatives Considered
 
@@ -104,7 +175,7 @@ Validator maturity ladder:
 
 ### Why Not an ADR Yet
 
-- `sd-ui-governance` 先是 software-delivery workflow extension，不是全系統不可逆架構決定。
+- `sd-ui-governance` 先是 software-delivery workflow extension，不是 runtime governance 或全系統不可逆架構決定。
 - Validator severity defaults、project-local design-token schema、AI screenshot review 的 objective criteria 尚需實作與實際使用驗證。
 - 是否 promotion 成 mechanical enforcement registry rule_class，需待 Phase 5 validation scenarios 與至少一輪 implementation evidence 後決定。
 
@@ -127,18 +198,20 @@ Validator maturity ladder:
 **負面**：
 
 - software-delivery workflow 多一個 slice，routing/loading surface 需要同步更新。
-- 若過早做 generic design-token schema，可能把 project-local design system 差異硬塞進全域規則。
+- 若過早做 generic design-token schema，可能把 project-local design system 差異硬塞進全域規則，讓 Ai-skill 從 governance framework 變成 framework opinion。
 - Screenshot / visual validation 有工具、環境、flake、baseline 維護成本。
 
 **風險**：
 
-- Validator class 太多導致 `sd-ui-governance` 變成 checklist dump。
+- Validator class 太多或 domain/mechanism 混合，導致 `sd-ui-governance` 變成 checklist dump。
 - Design token validator 若無 project-local configuration，容易誤判不同 framework / design system。
 - AI Visual Validator 若沒有 scoped criteria，容易把審美偏好偽裝成 governance failure。
+- UI governance runtime-lite signals 若未標明 advisory-only，可能和 `governance/ai-runtime-governance/software-delivery-governance.md` 複製規則。
 
 **Glossary Impact**: yes
-- Candidate terms: `sd-ui-governance`, `UI Governance`, `UI Contract Validator`, `Design Token Validator`, `UI Behavior Pattern Validator`, `AI Visual Validator`.
-- Phase 0 決定是否需要寫入 [`knowledge/glossary/ai-skill.md`](../../knowledge/glossary/ai-skill.md)；若只作 workflow-local terms，可先不 promotion。
+- Candidate terms for promotion: `UI Governance`, `UI Contract Validator`, `Design Token Validator`.
+- Workflow-local terms for now: `AI Visual Validator`, `Visual Regression Validator`, `UI Behavior Pattern Validator`, `Evidence Source Taxonomy`.
+- Phase 0 決定是否寫入 [`knowledge/glossary/ai-skill.md`](../../knowledge/glossary/ai-skill.md)；避免把尚未穩定命名的 AI visual review 概念太早 promotion。
 
 **Watch-Out List citation**: [`architecture/ai-native-cognitive-ecosystem-system.md`](../../architecture/ai-native-cognitive-ecosystem-system.md) §Watch-Out List — 對應 risks：validator overreach、subjective AI judgment becoming blocking gate、runtime surface without consumer、per-turn cost expansion。
 
@@ -197,9 +270,9 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
-| First landing scope | pending | Phase 0 decide doc-only + scenarios vs first mechanical rule_class |
-| Design token policy location | pending | Phase 0 inspect template / project-local config options |
-| AI screenshot severity | pending | Phase 0 decide global warn default + project opt-in conditions |
+| First landing scope | default resolved | Start with doc + validation scenarios only; do not add rule_class until taxonomy and evidence classes stabilize |
+| Design token policy location | default resolved | Project-local first; Ai-skill governs tokenized design requirement, not global token shape |
+| AI screenshot severity | default resolved | Global default is warn/research; block only with project opt-in, objective rules, and deterministic capture |
 
 ### Candidate Files
 
@@ -229,16 +302,25 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 | Linked updates | Update thin index, README, YAML contract, governance doc, taxonomy, routing registry, templates/checklist, validation scenarios as applicable. |
 | Runtime trigger wiring | Any new generated surface or route dependency must have named consumer or explicit manual activation annotation. |
 | Document sizing | Keep `ui-governance.md` focused; if templates/checklist growth becomes mixed-topic, add focused child template instead of bloating generic template. |
+| Governance boundary | Current scope remains workflow governance; runtime signals are advisory projections until a separate runtime/enforcement promotion decision lands. |
+| Taxonomy shape | Governance domain and validation mechanism must remain separate; tool names must not become top-level domains. |
 
 ---
 
 ## Open Questions
 
-- [ ] Should first landing be doc-only workflow governance plus validation scenarios, or should it include the first mechanical `ui_governance` rule_class immediately?
-- [ ] Should `Design Token Validator` live as project-local configurable policy first, or should Ai-skill define a generic token-policy schema now?
-- [ ] Should AI screenshot validation default to global `warn`, with project opt-in to `block` only when rules are objective and screenshot capture is deterministic?
-- [ ] Should UI governance evidence be added to `contract-template.md`, or should we create a focused `ui-governance-template.md` to avoid template bloat?
-- [ ] Which candidate terms deserve glossary promotion versus remaining workflow-local wording?
+- [x] Should first landing be doc-only workflow governance plus validation scenarios, or should it include the first mechanical `ui_governance` rule_class immediately?
+  - Default answer: **doc + scenario only**. Do not add rule_class in the first landing; validator taxonomy and evidence source taxonomy are still being stabilized.
+- [x] Should `Design Token Validator` live as project-local configurable policy first, or should Ai-skill define a generic token-policy schema now?
+  - Default answer: **project-local first**. Ai-skill should require tokenized design and prohibit raw style escape hatches when configured; it should not define global spacing/color/radius scales.
+- [x] Should AI screenshot validation default to global `warn`, with project opt-in to `block` only when rules are objective and screenshot capture is deterministic?
+  - Default answer: **global warn/research**. Blocking requires project opt-in, objective rubric, deterministic screenshot capture, and review policy.
+- [x] Should UI governance evidence be added to `contract-template.md`, or should we create a focused `ui-governance-template.md` to avoid template bloat?
+  - Default answer: create a focused `ui-governance-template.md`; keep `contract-template.md` contract-focused and link to the focused template.
+- [x] Which candidate terms deserve glossary promotion versus remaining workflow-local wording?
+  - Default answer: promote only `UI Governance`, `UI Contract Validator`, and `Design Token Validator` if Phase 0 confirms cross-plan stability. Keep `AI Visual Validator` workflow-local until naming stabilizes.
+- [x] Should Evidence Source Taxonomy live inside `ui-governance.md` only, or should a generalized evidence taxonomy later move into `sd-validation` / validation reasoning?
+  - Default answer: keep it UI-scoped in `ui-governance.md` for the first landing. Promote to shared validation reasoning only after the same taxonomy is reused across multiple governance domains.
 
 ---
 
@@ -247,19 +329,20 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 - [ ] Create `workflow/software-delivery/ui-governance.md`.
 - [ ] Add cognitive slice metadata: `id`, `purpose`, `type`, `tags`, `load_when`, `do_not_load_when`, `owner_layer`, `layer_justification`, `dependencies`, `dependency_budget`, `validation_signal`.
 - [ ] Define validator taxonomy and severity boundary:
-  - [ ] UI Contract Validator.
-  - [ ] Design Token Validator.
-  - [ ] Accessibility Validator.
-  - [ ] UI Behavior Pattern Validator.
-  - [ ] Visual Regression Validator.
-  - [ ] AI Visual Validator.
+  - [ ] Governance domains: Contract, Behavior, Accessibility, DesignSystem.
+  - [ ] Validation mechanisms: Deterministic, ScreenshotDiff, AIReview, ManualReview.
+  - [ ] Evidence classes: contract, runtime, accessibility_scan, visual_diff, screenshot, ai_review, human_review.
 - [ ] State deterministic vs subjective validator policy explicitly.
+- [ ] State project-local-first design token policy explicitly.
+- [ ] State workflow-only scope and advisory runtime signal boundary explicitly.
 
 ### Phase 1 Acceptance
 
 - [ ] `sd-ui-governance` passes workflow membership test.
 - [ ] `sd-ui-contracts` remains contract-focused and is not duplicated.
 - [ ] AI visual validation is scoped as warning/research unless objective criteria exist.
+- [ ] Governance domain and validation mechanism are not mixed.
+- [ ] Design token policy does not define a global token scale.
 
 ---
 
@@ -271,8 +354,9 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
   - [ ] Add `workflow/software-delivery/ui-governance.md` to `required_sources`.
   - [ ] Add `loading_surfaces.ui_governance`.
   - [ ] Add or extend a workflow step between UI contracts and test strategy.
-  - [ ] Add gates such as `gate.software_delivery.ui_governance_complete` and `gate.software_delivery.ui_visual_validation_scoped`.
+  - [ ] Add gates such as `gate.software_delivery.ui_governance_complete`, `gate.software_delivery.ui_evidence_classified`, and `gate.software_delivery.ui_visual_validation_scoped`.
   - [ ] Add required evidence for severity, token scope, accessibility scope, behavior pattern coverage, visual baseline status.
+  - [ ] Ensure runtime-lite signals remain advisory projections, not runtime governance rules.
 
 ### Phase 2 Acceptance
 
@@ -300,8 +384,8 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 
 ## Phase 4 — Governance, Routing, and Registry Integration
 
-- [ ] Update `governance/ai-runtime-governance/software-delivery-governance.md` with UI Governance runtime gate.
-- [ ] Add runtime-lite candidate signals:
+- [ ] Update `governance/ai-runtime-governance/software-delivery-governance.md` with UI Governance advisory projection boundary, not a blocking runtime gate.
+- [ ] Add runtime-lite advisory candidate signals:
   - [ ] `missing_ui_contract_state`
   - [ ] `raw_design_token_detected`
   - [ ] `destructive_action_missing_confirmation`
@@ -309,13 +393,15 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
   - [ ] `ai_visual_validator_without_scope`
 - [ ] Update `governance/cognitive-slice-taxonomy.md` software-delivery slice inventory.
 - [ ] Update `knowledge/runtime/routing-registry.yaml` dependencies and triggers if Phase 0 decides it is needed.
-- [ ] If mechanical enforcement enters scope, add or update `enforcement/enforcement-registry.yaml` with a `pending_implementation` rule_class and child plan.
+- [ ] Do not add `enforcement/enforcement-registry.yaml` rule_class in the first landing.
+- [ ] If mechanical enforcement later enters scope, open a separate child plan or ADR-backed promotion decision with named executor, evidence thresholds, and registry transition rationale.
 
 ### Phase 4 Acceptance
 
-- [ ] Runtime path names event → detector / route / query → loaded source → runtime action / blocker → evidence.
+- [ ] Runtime path names event → detector / route / query → loaded source → advisory projection → evidence.
 - [ ] No generated surface or rule_class is left without named consumer.
-- [ ] Registry updates, if any, obey enforcement registry transition rules.
+- [ ] No workflow rule is duplicated between `ui-governance.md` and `software-delivery-governance.md`.
+- [ ] Registry updates are explicitly out of scope unless a follow-up promotion plan is accepted.
 
 ---
 
@@ -325,8 +411,9 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 - [ ] Scenario: UI change with screen contract but missing loading/error state should load `sd-ui-governance` and block or warn according to severity.
 - [ ] Scenario: hard-coded color/font/spacing should surface design token validator evidence.
 - [ ] Scenario: delete action without confirmation should fail behavior pattern validation.
-- [ ] Scenario: visual quality claim without screenshot baseline should warn or block based on configured severity.
+- [ ] Scenario: visual quality claim without screenshot baseline should warn by default.
 - [ ] Scenario: AI visual validator finding without scoped criteria remains warning/research, not hard block.
+- [ ] Scenario: evidence classes distinguish `ai_review`, `visual_diff`, `accessibility_scan`, and `contract` rather than treating all UI findings as equal.
 - [ ] Run runtime validation/refresh and review generated surfaces.
 
 ### Phase 5 Acceptance
@@ -334,6 +421,7 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 - [ ] Scenarios fail by absence before source wiring when applicable.
 - [ ] Scenarios pass after source wiring.
 - [ ] Evidence distinguishes deterministic validators from AI-assisted visual warnings.
+- [ ] Evidence Source Taxonomy prevents Percy / axe / AI review / human review from collapsing into one undifferentiated validator result.
 
 ---
 
@@ -345,6 +433,8 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 - [ ] Validation scenarios cover loading, deterministic validator classes, and AI visual warning boundary.
 - [ ] Runtime refresh / validate passes.
 - [ ] Linked updates are reviewed and documented.
+- [ ] First landing remains doc + scenario only; no mechanical rule_class is added without a follow-up promotion decision.
+- [ ] No governance domain is represented solely by a validation mechanism.
 - [ ] Plan Completion Closure executed when all phases are done.
 
 ---
@@ -353,8 +443,9 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 
 - [ ] Accept `sd-ui-governance` as a separate workflow slice after `sd-ui-contracts`.
 - [ ] Accept deterministic validators as blocking candidates and AI visual validator as warning/research by default.
-- [ ] Decide whether first landing includes mechanical rule_class or stays workflow + scenario first.
-- [ ] Decide whether design token policy starts project-local or generic schema.
+- [ ] Accept first landing as workflow + scenario only, with mechanical rule_class deferred.
+- [ ] Accept design token policy as project-local first; Ai-skill governs tokenization requirement, not token scale.
+- [ ] Accept focused `ui-governance-template.md` instead of expanding the generic contract template.
 
 ---
 
