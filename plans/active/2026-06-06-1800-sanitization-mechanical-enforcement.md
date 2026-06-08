@@ -182,6 +182,8 @@ git pre-commit hook
 
 **Governance / execution layer 分層**（resolved Q8 2026-06-08）：治理層 declare **entities**（被保護的對象 — codename / customer / product 等 identity）；scanner 比對的是 **match tokens**（entity 的 alias、case variants）。Schema 直接做出分層，projection 也拆 governance table（`derived_private_entities`）與 execution table（`derived_match_tokens`）。
 
+**Phase 1A 落地 commit**（2026-06-08）：產出 `metadata/project/ai-skill-project-schema.yaml` (canonical) + `example-ai-skill-project.yaml` + `README.md` + `migration-notes.md` + `scripts/ai-skill-cli/internal/app/project_metadata.go` (canonical parser) + `project_metadata_test.go` (17/17 pass)。**嚴格未動** `sanitization_scan.go`（legacy reader 保留，Phase 1C 才動 projection、Phase 1D 才動 scanner pointer）。詳見 [`metadata/project/migration-notes.md`](../../metadata/project/migration-notes.md)。
+
 - [x] 定義 project metadata schema：`<PROJECT_ROOT>/.ai-skill-project.yaml`（Phase 1A implements direct metadata scan; overlay metadata 維持 future-compatible）：
 
   ```yaml

@@ -1,0 +1,56 @@
+# Example `.ai-skill-project.yaml` — place this file at the root of a
+# downstream project (or in `.agent-goals/<project-id>/` for per-project
+# metadata within a multi-project repository).
+#
+# Schema canonical: metadata/project/ai-skill-project-schema.yaml
+# Human-readable explanation: metadata/project/README.md
+#
+# This file is illustrative only. All entity names below are synthetic
+# placeholders — do NOT copy them verbatim into a real project.
+
+project:
+  id: example-project
+  visibility: private
+
+  private_entities:
+    # A codename entity with two aliases. case_variants: auto means
+    # Phase 1C projection expands match_tokens across CamelCase /
+    # kebab-case / SCREAMING_SNAKE etc automatically.
+    - name: ProjectAtlas
+      kind: codename
+      match_tokens:
+        - Atlas
+        - ProjectAtlas
+      case_variants: auto
+
+    # A client entity with explicit case variants (no auto-expansion).
+    # Use explicit list when auto-expansion would produce false positives
+    # (e.g. the canonical form is a common English word in one case but
+    # private in another).
+    - name: AcmeCorporation
+      kind: client
+      match_tokens:
+        - Acme
+        - AcmeCorp
+      case_variants:
+        - Acme
+        - ACME
+        - AcmeCorp
+        - acme-corp
+
+    # An individual — Phase 1A treats all kinds equivalently, but Phase 1C+
+    # may attach per-kind handling (e.g. expires_at on individuals).
+    - name: DrJaneSmith
+      kind: individual
+      match_tokens:
+        - JaneSmith
+        - "Dr. Smith"
+      case_variants: auto
+
+    # A product entity. match_tokens may include multi-word strings.
+    - name: AtlasMobile
+      kind: product
+      match_tokens:
+        - AtlasMobile
+        - "Atlas Mobile"
+      case_variants: auto

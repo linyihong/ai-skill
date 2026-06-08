@@ -1,0 +1,149 @@
+schema_version: ai-skill-project-schema/v1
+status: candidate
+owner_layer: metadata/project
+boundary: metadata-only
+
+# Canonical schema declaration for `<PROJECT_ROOT>/.ai-skill-project.yaml`.
+# Downstream projects that want sanitization mechanical enforcement to
+# protect their private entities declare them in a file conforming to this
+# schema. The framework parses the file via
+# scripts/ai-skill-cli/internal/app/project_metadata.go::LoadProjectMetadata.
+#
+# Plan reference: plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md §Phase 1A
+# Reviewer discipline: this file is the canonical schema; the legacy reader
+# in sanitization_scan.go::readProjectMetadata (flat `private_tokens` /
+# `private_entities []string`) will be retired in Phase 1C/1D. See
+# metadata/project/migration-notes.md.
+#
+# Boundary: this file describes the SHAPE of project metadata declarations.
+# It is NOT itself a project metadata instance. Project authors place
+# their declarations at `<PROJECT_ROOT>/.ai-skill-project.yaml` following
+# the example in `metadata/project/example-ai-skill-project.yaml`.
+
+declaration:
+  root_field: project
+  description: |
+    A project metadata declaration. The root must be a single mapping with
+    the key `project`. Multiple-project repositories that want per-subtree
+    metadata may place additional `.ai-skill-project.yaml` files in
+    sub-directories (e.g. `.agent-goals/<project-id>/.ai-skill-project.yaml`).
+
+  fields:
+    id:
+      type: string
+      required: true
+      pattern: "^[a-z0-9][a-z0-9-]*[a-z0-9]$"
+      description: |
+        Stable project identifier in kebab-case. Used as the `owning_project_id`
+        when projection rules emit findings. Must be unique within the
+        repository.
+
+    visibility:
+      type: enum
+      required: true
+      values: [private, public]
+      description: |
+        Governance visibility tier. Only `private` projects' entities are
+        projected into the forbidden-token / match-token tables. `public`
+        projects are parsed but their entity declarations are ignored at
+        projection time (useful for declaring intent without enforcement).
+
+    private_entities:
+      type: list_of_entity
+      required: false
+      default: []
+      description: |
+        Entities that must not appear in shared-layer content. Empty list is
+        valid — a project may declare itself private without listing entities
+        (e.g. before entity inventory is complete).
+
+  entity:
+    description: |
+      A single private entity declaration. Governance layer refers to the
+      entity by `name`; the scanner matches against `match_tokens`.
+
+    fields:
+      name:
+        type: string
+        required: true
+        description: |
+          Canonical human-readable identifier for the entity. Used in
+          governance discussion, audit logs, and finding messages. NOT the
+          string the scanner matches — that is `match_tokens`.
+
+      kind:
+        type: enum
+        required: true
+        values: [codename, client, product, individual, other]
+        description: |
+          Entity category. Drives future per-kind handling (e.g. `individual`
+          may warrant additional metadata such as expires_at; `codename` may
+          be subject to release-date sunset rules). Phase 1A treats all
+          kinds equivalently at the parser layer; differentiation is a
+          future extension.
+
+      match_tokens:
+        type: list_of_string
+        required: true
+        min_length: 1
+        description: |
+          The exact strings the scanner compares staged content against.
+          Each entry should be a distinct alias / abbreviation / form. The
+          parser accepts the list verbatim; case-variant expansion (CamelCase
+          / kebab / SCREAMING_SNAKE / lowercase) is performed by the Phase 1C
+          projection rule, not by the parser.
+
+          Constraint: at least one match_token is required. An entity with
+          no tokens cannot be matched and so cannot be enforced; the parser
+          rejects such declarations to surface the configuration error
+          early rather than silently.
+
+      case_variants:
+        type: case_variants_spec
+        required: false
+        default: auto
+        values_either: [auto, list_of_string]
+        description: |
+          How case variants of `match_tokens` should be generated.
+          - `auto` (default): Phase 1C expands each match_token across
+            CamelCase, camelCase, kebab-case, snake_case, SCREAMING_SNAKE_CASE,
+            and lowercase.
+          - explicit list: case-variant set is exactly the strings listed;
+            no auto-expansion. Use this when auto-expansion would produce
+            false positives.
+
+      # Future extension points (Phase 1A parser tolerates unknown fields
+      # at the entity level for forward-compat; lints will surface them
+      # but parser does not reject). Phase 1C+ may add:
+      #   severity, expires_at, owner, related_entity
+
+validation_rules:
+  - id: project.id.required
+    message: "project.id must be present and non-empty"
+  - id: project.id.kebab
+    message: "project.id must be kebab-case (lowercase letters, digits, hyphens; not starting or ending with hyphen)"
+  - id: project.visibility.enum
+    message: "project.visibility must be 'private' or 'public'"
+  - id: entity.name.required
+    message: "every private_entities[*].name must be present and non-empty"
+  - id: entity.kind.required
+    message: "every private_entities[*].kind must be one of [codename, client, product, individual, other]"
+  - id: entity.match_tokens.required
+    message: "every private_entities[*].match_tokens must contain at least one non-empty string"
+  - id: entity.case_variants.shape
+    message: "private_entities[*].case_variants must be the literal string 'auto' or a list of strings"
+
+# Future-compat note:
+#   Unknown top-level fields under `project:` and unknown fields under each
+#   entity are ALLOWED by the parser but emit a debug-level warning. This
+#   lets Phase 1C+ extend the schema (severity / expires_at / owner /
+#   related_entity at entity layer; declared_match_topology / consumer
+#   bindings at project layer) without breaking projects that adopt the
+#   v1 schema today.
+
+companion:
+  human_readme: metadata/project/README.md
+  example: metadata/project/example-ai-skill-project.yaml
+  parser: scripts/ai-skill-cli/internal/app/project_metadata.go
+  migration: metadata/project/migration-notes.md
+  plan: plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md
