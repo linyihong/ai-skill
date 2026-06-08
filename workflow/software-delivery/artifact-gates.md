@@ -52,6 +52,7 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 | 原始供應商文件、帳戶特定條款、憑證、沙箱/正式主機、私人 webhook 負載或真實客戶資料 | 專案儲存庫文件，附清理和存取控制 |
 | 生成的客戶端、SDK、fixtures 和提供者/消費者合約檢查 | `implementation/` 和專案儲存庫 |
 | Screen Mapping、Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract、Screen Traceability | [`ui-contracts.md`](ui-contracts.md)、templates 和專案儲存庫的 planning / contract artifacts |
+| UI governance evidence：governance domain、validation mechanism、evidence class、severity、project-local design-system policy、visual / AI review scope | [`ui-governance.md`](ui-governance.md)、[`templates/ui-governance-evidence-template.md`](templates/ui-governance-evidence-template.md) 和專案 review / validation artifacts |
 | Product Brief 驗證、Impact Map × Customer Journey Map 對齊、文件優先順序、可追溯性和 BDD 閉環流程 | `process/`、templates 和 checklists |
 | 重構、遷移、replacement 或新入口替代舊入口的新舊能力 parity inventory | 專案規劃文件、implementation plan 或專屬 parity inventory；若是可重用流程缺口，回饋到 `workflow/software-delivery/` |
 | 效能預算、負載/壓力/尖峰/浸泡策略、CI smoke 檢查和發布證據 | `process/`、`CHECKLIST.md`、templates 和專案儲存庫的測試或發布筆記 |
@@ -97,7 +98,22 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 - 已清理且不含目標特定細節。
 - 對 replacement / migration / refactor 類變更，能反查舊入口到新入口的能力覆蓋率、明確 deferred 項目與測試證據。
 - 對 consumer / UI 變更，能反查 BDD scenario、screen mapping、consumer needs、screen states、view model derivation、accessibility expectations、API / table ownership 與對應 contract / fixture / test。
+- 對 UI compliance claim，能反查 UI governance domain、validation mechanism、evidence class、severity、project-local design-system policy 與 visual / AI review scope；不要把 visual diff 或 AI review 當成 governance domain 本身。
 - 在需要效能證據時明確，包括指標、預算、環境、執行器和發布關卡。
+
+## 5.1 UI Governance Evidence Shape
+
+當 artifact 聲稱 UI compliance、design-system compliance、accessibility compliance、behavior pattern coverage、visual baseline 或 AI visual review 時，使用 focused UI governance evidence，而不是把 enforcement 細節塞回 UI contract。
+
+最小欄位：
+
+- **Owner layer**：`workflow` evidence；project-specific raw screenshots / scan outputs 留在專案 artifact。
+- **Governance domain**：Contract / Design System / Accessibility / Behavior / Closure / not_applicable。
+- **Validation mechanism**：deterministic / screenshot_diff / ai_review / manual_review / not_applicable。
+- **Evidence class**：contract / runtime / accessibility_scan / visual_diff / screenshot / ai_review / human_review / not_applicable。
+- **Severity**：block_candidate / warn / research / not_applicable，且 AI visual review 預設不升級為 hard block。
+- **Project-local policy**：design token 或 component primitive policy 的專案來源；本 workflow 不定義全域 token scale。
+- **Linked artifacts**：UI contract、test strategy、validation result、review decision 或 deferred scope。
 
 ## 6. 避免（Avoid）
 

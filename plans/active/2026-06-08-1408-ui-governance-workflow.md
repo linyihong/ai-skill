@@ -12,7 +12,7 @@ priority: P2
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 software-delivery workflow hardening
 **建立日期**：2026-06-08
-**最後更新**：2026-06-08（Phase 2 loading surfaces wired）
+**最後更新**：2026-06-08（Phase 3 artifacts and review gates wired）
 **Priority**：**P2**
 
 本 plan 將 UI/UX 風格治理納入 `workflow/software-delivery/`，新增 `sd-ui-governance` cognitive slice，讓現有 `sd-ui-contracts` 產出的 UI contract、screen state、ViewModel、Accessibility expectation 能進一步被 deterministic validator、visual regression evidence、以及 scoped AI visual review 消費。
@@ -377,17 +377,17 @@ If later phases add a dedicated `runtime/ui-governance*.yaml`, that phase must d
 
 ## Phase 3 — Update Artifacts, Templates, and Review Gates
 
-- [ ] Update `workflow/software-delivery/artifact-gates.md` with UI governance evidence.
-- [ ] Update `workflow/software-delivery/artifact-gates.yaml` required evidence / gates.
-- [ ] Update `workflow/software-delivery/templates/contract-template.md` or create a focused UI governance template.
-- [ ] Update `workflow/software-delivery/review-checklist.md` with a compact UI Governance Review section.
-- [ ] Check document sizing and split if needed.
+- [x] Update `workflow/software-delivery/artifact-gates.md` with UI governance evidence.
+- [x] Update `workflow/software-delivery/artifact-gates.yaml` required evidence / gates.
+- [x] Update `workflow/software-delivery/templates/contract-template.md` or create a focused UI governance template.
+- [x] Update `workflow/software-delivery/review-checklist.md` with a compact UI Governance Review section.
+- [x] Check document sizing and split if needed.
 
 ### Phase 3 Acceptance
 
-- [ ] UI governance artifacts have clear shape and owner layer.
-- [ ] Templates/checklists do not become mixed-topic dumping grounds.
-- [ ] Artifact gate contract includes UI governance evidence without duplicating `ui-contracts.md`.
+- [x] UI governance artifacts have clear shape and owner layer.
+- [x] Templates/checklists do not become mixed-topic dumping grounds.
+- [x] Artifact gate contract includes UI governance evidence without duplicating `ui-contracts.md`.
 
 ---
 
