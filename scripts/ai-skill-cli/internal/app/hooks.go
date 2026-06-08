@@ -657,11 +657,13 @@ func buildDiscoveryInputFromTranscript(transcript []DetectorMessage) DiscoveryIn
 }
 
 var artifactPathRE = regexp.MustCompile(`[A-Za-z0-9_\-./\\]+\.[A-Za-z0-9]{1,8}`)
+var urlLikeTokenRE = regexp.MustCompile(`[A-Za-z][A-Za-z0-9+.\-]*://\S+`)
 var versionRE = regexp.MustCompile(`^\d+(\.\d+){1,3}$`)
 
 func extractArtifactTokens(msg string) (basenames, paths, exts []string) {
 	seenBn, seenPath, seenExt := map[string]bool{}, map[string]bool{}, map[string]bool{}
-	for _, m := range artifactPathRE.FindAllString(msg, -1) {
+	sanitizedMsg := urlLikeTokenRE.ReplaceAllString(msg, " ")
+	for _, m := range artifactPathRE.FindAllString(sanitizedMsg, -1) {
 		if strings.Contains(m, "://") || strings.HasPrefix(m, ".") || strings.HasSuffix(m, ".") {
 			continue
 		}
