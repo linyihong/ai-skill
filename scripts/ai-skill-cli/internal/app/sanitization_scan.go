@@ -38,7 +38,21 @@ type derivedForbiddenToken struct {
 	SuggestedPlaceholder string
 }
 
+type sanitizationRuntimeData struct {
+	Topology map[string]bool
+	Tokens   []derivedForbiddenToken
+	Patterns []compiledSanitizationPattern
+}
+
+type compiledSanitizationPattern struct {
+	Category   string
+	ID         string
+	Regex      *regexp.Regexp
+	Suggestion string
+}
+
 const repositoryTopologyRuntimeTargetKey = "runtime.repository_topology.config"
+const sanitizationPatternsRuntimeTargetKey = "runtime.sanitization_patterns.config"
 
 func compileDerivedForbiddenTokens(repo string, db *sql.DB) error {
 	metadataFiles, err := discoverProjectMetadataFiles(repo)
@@ -87,8 +101,8 @@ func validateSanitizationStagedContent(root string, staged []string) string {
 	if root == "" || len(staged) == 0 {
 		return ""
 	}
-	topology, tokens, err := loadSanitizationRuntimeData(filepath.Join(root, "runtime", "runtime.db"))
-	if err != nil || len(topology) == 0 || len(tokens) == 0 {
+	data, err := loadSanitizationRuntimeData(filepath.Join(root, "runtime", "runtime.db"))
+	if err != nil || len(data.Topology) == 0 || (len(data.Tokens) == 0 && len(data.Patterns) == 0) {
 		return ""
 	}
 
@@ -98,14 +112,17 @@ func validateSanitizationStagedContent(root string, staged []string) string {
 	sort.Strings(stagedSorted)
 	for _, rel := range stagedSorted {
 		rel = filepath.ToSlash(rel)
-		if !sanitizationPathIsShared(rel, topology) {
+		if !sanitizationTextPath(rel) {
+			continue
+		}
+		if !sanitizationPathIsShared(rel, data.Topology) {
 			continue
 		}
 		content, err := resolver.Read(rel)
 		if err != nil {
 			continue
 		}
-		findings = append(findings, sanitizationFindingsForContent(rel, string(content), tokens)...)
+		findings = append(findings, sanitizationFindingsForContent(rel, string(content), data.Tokens, data.Patterns)...)
 	}
 	if len(findings) == 0 {
 		return ""
@@ -154,28 +171,35 @@ func readProjectMetadata(path string) (aiSkillProjectMetadataFile, error) {
 	return metadata, nil
 }
 
-func loadSanitizationRuntimeData(dbPath string) (map[string]bool, []derivedForbiddenToken, error) {
+func loadSanitizationRuntimeData(dbPath string) (sanitizationRuntimeData, error) {
 	if _, err := os.Stat(dbPath); err != nil {
-		return nil, nil, err
+		return sanitizationRuntimeData{}, err
 	}
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
-		return nil, nil, err
+		return sanitizationRuntimeData{}, err
 	}
 	defer db.Close()
 
 	if ok, err := generatedSurfaceTargetExists(db, repositoryTopologyRuntimeTargetKey); err == nil && !ok {
-		return nil, nil, fmt.Errorf("required runtime projection missing: %s", repositoryTopologyRuntimeTargetKey)
+		return sanitizationRuntimeData{}, fmt.Errorf("required runtime projection missing: %s", repositoryTopologyRuntimeTargetKey)
+	}
+	if ok, err := generatedSurfaceTargetExists(db, sanitizationPatternsRuntimeTargetKey); err == nil && !ok {
+		return sanitizationRuntimeData{}, fmt.Errorf("required runtime projection missing: %s", sanitizationPatternsRuntimeTargetKey)
 	}
 	topology, err := loadRepositoryTopology(db)
 	if err != nil {
-		return nil, nil, err
+		return sanitizationRuntimeData{}, err
 	}
 	tokens, err := loadDerivedForbiddenTokens(db)
 	if err != nil {
-		return nil, nil, err
+		return sanitizationRuntimeData{}, err
 	}
-	return topology, tokens, nil
+	patterns, err := loadSanitizationPatterns(db)
+	if err != nil {
+		return sanitizationRuntimeData{}, err
+	}
+	return sanitizationRuntimeData{Topology: topology, Tokens: tokens, Patterns: patterns}, nil
 }
 
 func generatedSurfaceTargetExists(db *sql.DB, targetKey string) (bool, error) {
@@ -239,6 +263,44 @@ func loadDerivedForbiddenTokens(db *sql.DB) ([]derivedForbiddenToken, error) {
 	return tokens, rows.Err()
 }
 
+func loadSanitizationPatterns(db *sql.DB) ([]compiledSanitizationPattern, error) {
+	rows, err := db.Query(`SELECT category, content FROM sanitization_patterns WHERE category != '__config__' ORDER BY category`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var patterns []compiledSanitizationPattern
+	for rows.Next() {
+		var category string
+		var raw string
+		if err := rows.Scan(&category, &raw); err != nil {
+			return nil, err
+		}
+		var family struct {
+			Category string `json:"category"`
+			Patterns []struct {
+				ID         string `json:"id"`
+				Regex      string `json:"regex"`
+				Suggestion string `json:"suggestion"`
+			} `json:"patterns"`
+		}
+		if err := json.Unmarshal([]byte(raw), &family); err != nil {
+			return nil, err
+		}
+		if family.Category != "" {
+			category = family.Category
+		}
+		for _, entry := range family.Patterns {
+			compiled, err := regexp.Compile(entry.Regex)
+			if err != nil {
+				return nil, fmt.Errorf("sanitization pattern %s/%s: %w", category, entry.ID, err)
+			}
+			patterns = append(patterns, compiledSanitizationPattern{Category: category, ID: entry.ID, Regex: compiled, Suggestion: entry.Suggestion})
+		}
+	}
+	return patterns, rows.Err()
+}
+
 func sanitizationPathIsShared(rel string, topology map[string]bool) bool {
 	bestLen := -1
 	shared := false
@@ -254,7 +316,7 @@ func sanitizationPathIsShared(rel string, topology map[string]bool) bool {
 	return bestLen >= 0 && shared
 }
 
-func sanitizationFindingsForContent(rel string, content string, tokens []derivedForbiddenToken) []string {
+func sanitizationFindingsForContent(rel string, content string, tokens []derivedForbiddenToken, patterns []compiledSanitizationPattern) []string {
 	var findings []string
 	lines := strings.Split(content, "\n")
 	for lineIndex, line := range lines {
@@ -264,8 +326,50 @@ func sanitizationFindingsForContent(rel string, content string, tokens []derived
 			}
 			findings = append(findings, fmt.Sprintf("%s:%d contains %q from %s; use %s", rel, lineIndex+1, token.Token, token.OwningProjectID, token.SuggestedPlaceholder))
 		}
+		if rel == "runtime/sanitization-patterns.yaml" {
+			continue
+		}
+		if sanitizationLineDocumentsPattern(line) {
+			continue
+		}
+		for _, pattern := range patterns {
+			match := pattern.Regex.FindString(line)
+			if match == "" || sanitizationAllowedPlaceholderMatch(match) {
+				continue
+			}
+			findings = append(findings, fmt.Sprintf("%s:%d matches %s/%s (%q); %s", rel, lineIndex+1, pattern.Category, pattern.ID, match, pattern.Suggestion))
+		}
 	}
 	return findings
+}
+
+func sanitizationTextPath(rel string) bool {
+	switch strings.ToLower(filepath.Ext(rel)) {
+	case ".md", ".yaml", ".yml", ".json", ".txt":
+		return true
+	default:
+		return false
+	}
+}
+
+func sanitizationLineDocumentsPattern(line string) bool {
+	lower := strings.ToLower(line)
+	if !strings.Contains(line, "[^") && !strings.Contains(line, `\+`) && !strings.Contains(line, `\\`) {
+		return false
+	}
+	return strings.Contains(lower, "regex") ||
+		strings.Contains(lower, "pattern") ||
+		strings.Contains(lower, "absolute path") ||
+		strings.Contains(lower, "credential pattern")
+}
+
+func sanitizationAllowedPlaceholderMatch(match string) bool {
+	for _, placeholder := range []string{"<USER>", "<PROJECT_ROOT>", "<AI_SKILL_REPO>", "<WORKSPACE>"} {
+		if strings.Contains(match, placeholder) {
+			return true
+		}
+	}
+	return false
 }
 
 func sanitizationTokenVariants(token string) []string {

@@ -217,15 +217,15 @@ git pre-commit hook
 
 ### Phase 2 — Generic Regex Patterns (inherited from superseded plan)
 
-- [ ] 新建 `runtime/sanitization-patterns.yaml`（canonical）+ companion section in `enforcement/sanitization-mechanical.md`
-- [ ] Pattern set：
+- [x] 新建 `runtime/sanitization-patterns.yaml`（canonical）+ companion section in `enforcement/sanitization-mechanical.md`
+- [x] Pattern set：
   - Email：`[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}`
   - Phone：國際 + 區域格式（保留 conservative，避免誤抓 plan timestamp）
   - OS absolute path：`/Users/[^/\s]+` / `/home/[^/\s]+` / `C:\\Users\\[^\\\s]+` / `\\\\\\\\?\\\\` UNC
   - Credential pattern：高熵字串 + 已知 prefix（`sk-` / `ghp_` / `xoxb-` 等）
-- [ ] Pattern allowlist override：placeholder forms `<USER>` / `<PROJECT_ROOT>` / `<AI_SKILL_REPO>` 必須被 pattern 排除
-- [ ] `ai-skill runtime compile` projection → `runtime.db.sanitization_patterns`
-- [ ] Unit tests：每 pattern ≥ 1 fail + 1 pass + 1 placeholder pass
+- [x] Pattern allowlist override：placeholder forms `<USER>` / `<PROJECT_ROOT>` / `<AI_SKILL_REPO>` 必須被 pattern 排除
+- [x] `ai-skill runtime compile` projection → `runtime.db.sanitization_patterns`
+- [x] Unit tests：每 pattern ≥ 1 fail + 1 pass + 1 placeholder pass
 
 ### Phase 2.5 — Incident-Score Heuristic (warn only, inherited from superseded plan)
 

@@ -112,7 +112,7 @@
 | [goal-action-validation.md](goal-action-validation.md) | 重要工作單元需要驗證 | ~500 | P2 |
 | [evidence-hierarchy.md](evidence-hierarchy.md) | evidence conflict、claim scope overreach、confidence decay、assumption 被當成 fact | ~900 | P1 |
 | [neutral-language.md](neutral-language.md) | 撰寫或審查文件用語 | ~300 | P2 |
-| [sanitization.md](sanitization.md) | 撰寫 feedback lesson | ~400 | P1 |
+| [sanitization.md](sanitization.md) / [sanitization-mechanical.md](sanitization-mechanical.md) | 撰寫 feedback lesson；pre-commit shared-layer sanitization scanner | ~400 | P1 |
 | [authorization-scope.md](authorization-scope.md) | 涉及授權邊界 | ~300 | P0 |
 | [cross-skill-references.md](cross-skill-references.md) | 引用其他 workflow | ~400 | P2 |
 | [feedback-lessons.md](feedback-lessons.md) | 撰寫或 promotion lesson | ~600 | P2 |

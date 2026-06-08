@@ -28,8 +28,11 @@ activation:
 
 required_sources:
   - enforcement/sanitization.md
+  - enforcement/sanitization-mechanical.md
   - enforcement/reusable-guidance-boundary.md
   - enforcement/authorization-scope.md
+  - runtime/repository-topology.yaml
+  - runtime/sanitization-patterns.yaml
 
 steps:
   - id: classify_content_surface
@@ -57,7 +60,7 @@ steps:
       - gate.sanitization.prompt_injection_removed
   - id: diff_review_before_commit
     order: 5
-    action: Review staged and unstaged diff for forbidden material before commit.
+    action: Review staged and unstaged diff for forbidden material before commit; mechanical pre-commit enforcement consumes runtime repository topology and sanitization pattern projections.
     required_if:
       - commit_preparation
     gates:
@@ -86,6 +89,7 @@ gates:
 required_evidence:
   - content surface classification
   - forbidden material scan result
+  - mechanical scanner result when commit preparation touches shared-layer content
   - placeholder replacement summary
   - web content sanitization summary when applicable
   - diff review summary before commit

@@ -12,6 +12,8 @@
 
 一律改用 `<AI_SKILL_REPO>`、`<PROJECT_ROOT>`、`<WORKSPACE>` 等占位符（見本庫 [README.md](../README.md)）。
 
+Mechanical pre-commit enforcement is documented in [`sanitization-mechanical.md`](sanitization-mechanical.md). The mechanical surfaces are [`../runtime/repository-topology.yaml`](../runtime/repository-topology.yaml) and [`../runtime/sanitization-patterns.yaml`](../runtime/sanitization-patterns.yaml).
+
 ## Prompt Injection Protection（網頁內容去敏）
 
 當從網頁提取內容傳遞給 AI 模型時，**必須** sanitize 以下類型的內容以防止 prompt injection：
