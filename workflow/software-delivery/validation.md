@@ -161,6 +161,34 @@ browser_review -> responsive_capture -> responsive validation
 
 Record both the acquisition method and the evaluation mechanism in validation evidence. If only acquisition ran and no evaluation happened, report the validation as incomplete or advisory rather than pass.
 
+### Validation Coverage Model Watch-List
+
+UI validation is starting to show three coverage dimensions:
+
+```yaml
+coverage:
+  state:
+    - loading
+    - success
+    - error
+  context:
+    - desktop
+    - mobile
+  evidence:
+    - screenshot
+    - dom_snapshot
+    - accessibility_scan
+```
+
+This is a watch-list concept, not an executable gate. Do not expand it into a Cartesian product. Prefer `required`, `optional`, and `high_risk` coverage dimensions when the validation target demands more than one state, context, or evidence class.
+
+Although this surfaced through UI responsive validation, the same shape may apply to API, runtime, or workflow validation:
+
+- API validation can require success, error, and timeout states across authenticated and anonymous contexts, with response, logs, and traces as evidence.
+- Runtime validation can require startup, steady-state, and shutdown states across single-node and multi-node contexts, with metrics, logs, and traces as evidence.
+
+If the model proves reusable outside UI, promote it through shared validation reasoning rather than keeping it local to software-delivery UI governance.
+
 ### State Visibility / Evidence Chain Gate
 
 「至少一種驗證方法」不適用於 state visibility gap。當觀察到的成功訊號可能不同於真實狀態時，依 [`state-visibility-gap.md`](../../intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md)、[`evidence-model.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-model.md)、[`evidence-chain-validation.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md) 與 [`evidence-depth.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-depth.md) 升級驗證。

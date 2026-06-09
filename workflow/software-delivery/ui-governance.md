@@ -84,7 +84,13 @@ supported_render_contexts:
 
 Use context names before tool or hardware names. A validation suite may implement `mobile` with a browser viewport, a device emulation profile, a simulator, or a real device, but the governance finding should remain `domain: Responsive` + `render_context: mobile` rather than `device_testing: iPhone`.
 
-Longer term, `render_context` may generalize into `experience_context` for low_bandwidth, offline, dark_mode, high_zoom, screen_reader, touch_only, and keyboard_only. Do not promote that broader taxonomy until scenarios show it is needed outside responsive UI validation.
+Longer term, `render_context` may become one family inside a typed context taxonomy, alongside interaction, accessibility, environment, appearance, or locale contexts. Do not promote that broader taxonomy until scenarios show it is needed outside responsive UI validation.
+
+Responsive domain downgrade watch:
+
+- Keep `Responsive` as a workflow-local governance domain while it helps route viewport-specific failures clearly.
+- Consider downgrading `Responsive` into a cross-cutting `context.render` dimension when most responsive failures are better explained as another governance domain evaluated under a render context, such as `domain: Accessibility` + `render_context: mobile`.
+- Do not introduce a broad context taxonomy until multiple context families and workflow domains consume it.
 
 ## Collection Methods
 

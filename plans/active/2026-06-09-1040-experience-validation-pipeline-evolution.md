@@ -266,23 +266,35 @@ Phase 1 evidence:
 
 ## Phase 2 — Coverage Model Watch-List
 
-- [ ] Add a short coverage model note: UI validation is trending toward State Coverage + Context Coverage + Evidence Coverage.
-- [ ] Record that Coverage Model likely belongs to shared Validation Reasoning if API / runtime / workflow validation show the same state-context-evidence shape.
-- [ ] Inventory at least one non-UI example before proposing any shared model:
+- [x] Add a short coverage model note: UI validation is trending toward State Coverage + Context Coverage + Evidence Coverage.
+- [x] Record that Coverage Model likely belongs to shared Validation Reasoning if API / runtime / workflow validation show the same state-context-evidence shape.
+- [x] Inventory at least one non-UI example before proposing any shared model:
   - API: success / error / timeout states; authenticated / anonymous contexts; response / logs / traces evidence.
   - Runtime: startup / steady-state / shutdown states; single-node / multi-node contexts; metrics / logs / traces evidence.
-- [ ] Document candidate coverage dimensions without adding executable gates:
+- [x] Document candidate coverage dimensions without adding executable gates:
   - state: loading / empty / success / error
   - context: desktop / mobile / dark_mode / offline / keyboard_only / screen_reader
   - evidence: screenshot / DOM snapshot / accessibility scan / interaction trace
-- [ ] Add guidance that validation matrix growth should use required / optional / high-risk contexts instead of a Cartesian product.
+- [x] Add guidance that validation matrix growth should use required / optional / high-risk contexts instead of a Cartesian product.
+
+Phase 2 evidence:
+
+- `workflow/software-delivery/validation.md` §Validation Coverage Model Watch-List now documents state / context / evidence coverage.
+- The note explicitly remains non-executable and points shared promotion toward validation reasoning if API / runtime / workflow examples prove reuse.
 
 ## Phase 3 — Responsive Domain Decision
 
-- [ ] Add a compact open question to `workflow/software-delivery/ui-governance.md`: Responsive domain vs cross-cutting context.render.
-- [ ] Inventory responsive scenarios and determine whether each is better modeled as `domain: Responsive` or another domain plus `context.render`.
-- [ ] When most Responsive failures are better explained as another governance domain evaluated under `context.render`, draft a downgrade path for `Responsive`.
-- [ ] If `Responsive` remains clearer for routing, keep it as a workflow-local domain and record why.
+- [x] Add a compact open question to `workflow/software-delivery/ui-governance.md`: Responsive domain vs cross-cutting context.render.
+- [x] Inventory responsive scenarios and determine whether each is better modeled as `domain: Responsive` or another domain plus `context.render`.
+- [x] When most Responsive failures are better explained as another governance domain evaluated under `context.render`, draft a downgrade path for `Responsive`.
+- [x] If `Responsive` remains clearer for routing, keep it as a workflow-local domain and record why.
+
+Phase 3 evidence:
+
+- `workflow/software-delivery/ui-governance.md` §Render Contexts now includes Responsive domain downgrade watch.
+- Current decision: keep `Responsive` as workflow-local domain while it helps route viewport-specific failures clearly.
+- Downgrade condition: when most responsive failures are better explained as another governance domain evaluated under `context.render`, draft the downgrade path.
+- Existing scenario pressure is mixed: mobile-only layout failures justify `Responsive`; mobile accessibility failure already suggests domain × context may become clearer later.
 
 ## Phase 4 — Typed Context Taxonomy Graduation Decision
 
