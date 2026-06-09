@@ -81,8 +81,8 @@ loading_surfaces:
   ui_governance:
     source: workflow/software-delivery/ui-governance.md
     load_when:
-      - UI or consumer surface needs design-system enforcement, accessibility evidence, behavior pattern checks, visual baseline review, AI visual review scoping, or UI compliance completion evidence
-      - UI contract exists and the task needs to classify governance domain, collection method, validation mechanism, evidence class, severity, or project-local design-system policy
+      - UI or consumer surface needs design-system enforcement, accessibility evidence, responsive evidence, behavior pattern checks, visual baseline review, AI visual review scoping, or UI compliance completion evidence
+      - UI contract exists and the task needs to classify governance domain, render context, collection method, validation mechanism, evidence class, severity, or project-local design-system policy
     do_not_load_when:
       - no user-visible consumer surface exists or the task only defines expected UI contracts without compliance evidence
   test_strategy:
@@ -159,17 +159,19 @@ steps:
       - gate.software_delivery.bdd_closure_complete
   - id: classify_ui_governance
     order: 7
-    action: Load the ui-governance surface when UI compliance evidence is needed, then classify governance domain, collection method, validation mechanism, evidence class, severity, project-local design-system policy, and advisory runtime projection boundary before test strategy or completion claims.
+    action: Load the ui-governance surface when UI compliance evidence is needed, then classify governance domain, render context, collection method, validation mechanism, evidence class, severity, project-local design-system policy, and advisory runtime projection boundary before test strategy or completion claims.
     required_if:
       - ui_compliance_claim
       - design_system_policy_applies
       - accessibility_evidence_required
       - visual_validation_claim
       - ai_visual_review_used
+      - responsive_validation_claim
     gates:
       - gate.software_delivery.ui_governance_complete
       - gate.software_delivery.ui_evidence_classified
       - gate.software_delivery.ui_visual_validation_scoped
+      - gate.software_delivery.responsive_validation_complete
   - id: handle_sdk_defect_closure
     order: 8
     action: Reproduce SDK defects through supported public surfaces, sanitize evidence, and lock behavior with specs and regression tests when needed.
@@ -223,7 +225,8 @@ gates:
   - id: gate.software_delivery.ui_governance_complete
     blocks: ui_compliance_completion_claim
     pass_when:
-      - UI governance domain is classified as Contract, Design System, Accessibility, Behavior, Closure, or not_applicable
+      - UI governance domain is classified as Contract, Design System, Accessibility, Responsive, Behavior, Closure, or not_applicable
+      - render context is classified as desktop, tablet, mobile, narrow_mobile, not_applicable, or project-declared equivalent
       - collection method is classified separately as contract_readback, static_analysis, runtime_trace, browser_review, human_observation, or not_applicable
       - validation mechanism is classified separately as deterministic, screenshot_diff, ai_review, manual_review, or not_applicable
       - no governance domain is represented solely by a validation mechanism
@@ -232,7 +235,7 @@ gates:
   - id: gate.software_delivery.ui_evidence_classified
     blocks: ui_validation_claim
     pass_when:
-      - evidence class is identified as contract, runtime, accessibility_scan, visual_diff, screenshot, ai_review, human_review, or not_applicable
+      - evidence class is identified as contract, runtime, accessibility_scan, visual_diff, screenshot, responsive_capture, ai_review, human_review, or not_applicable
       - severity is identified as block_candidate, warn, research, or not_applicable
       - project-local design-system policy is referenced when design-token or component-primitive compliance is claimed
       - evidence acquisition is distinguished from evaluation result when browser_review, screenshot, visual_diff, ai_review, or human_review is involved
@@ -243,6 +246,13 @@ gates:
       - screenshot_diff claims name the baseline and capture determinism
       - visual taste is not treated as a build-failure equivalent without objective criteria
       - browser_review is treated as evidence acquisition, not as a blocking validator
+  - id: gate.software_delivery.responsive_validation_complete
+    blocks: responsive_ui_completion_claim
+    pass_when:
+      - responsive claims name the governed render contexts rather than device SKUs
+      - browser_review responsive evidence includes at least desktop_capture and mobile_capture or equivalent wide/narrow contexts
+      - each required render context records screenshot, DOM snapshot or layout metrics, and interaction trace when user action, keyboard, focus, sticky chrome, modal, sidebar, safe-area, orientation, or touch target behavior is in scope
+      - desktop pass does not substitute for mobile, narrow_mobile, tablet, orientation, safe-area, or high-zoom evidence
   - id: gate.software_delivery.validation_target_defined
     blocks: validation_phase
     pass_when:
@@ -268,7 +278,8 @@ required_evidence:
   - parity inventory when replacing existing capability
   - BDD / contract / test traceability when behavior changes
   - Consumer / UI Behavior / Screen / ViewModel contract evidence when a consumer surface changes
-  - UI governance domain, collection method, validation mechanism, evidence class, severity, and project-local design-system policy when UI compliance is claimed
+  - UI governance domain, render context, collection method, validation mechanism, evidence class, severity, and project-local design-system policy when UI compliance is claimed
+  - responsive validation matrix with at least desktop and mobile evidence when responsive behavior is claimed
   - advisory-only runtime projection boundary when UI governance signals are named before runtime/enforcement promotion
   - performance budget evidence when performance-sensitive
   - state visibility / evidence chain coverage when observed success may diverge from real state
@@ -309,6 +320,9 @@ failure_modes:
   - id: ui_governance_acquisition_mechanism_collapse
     detection: Agent treats browser_review, screenshot capture, DOM snapshot, accessibility tree, or human observation as a validation mechanism or proof of compliance.
     recovery: Reclassify through ui-governance.md and validation.md; record collection method separately from validation mechanism, evidence class, severity, and project-local policy.
+  - id: responsive_context_evidence_missing
+    detection: Agent claims responsive validation from desktop-only evidence, names only device SKUs, or omits constrained render-context capture.
+    recovery: Reclassify as Responsive domain, record render_context, and collect at least desktop_capture plus mobile_capture or equivalent wide/narrow evidence before completion.
 
 final_status_report:
   required_fields:

@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-responsive-accessibility-failure
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: user-feedback-2026-06-09-responsive-validation-taxonomy
+source_phase: responsive-taxonomy-follow-up
+
+given:
+  task_intent: "Validate a form where accessibility checks pass on desktop but mobile keyboard covers the primary CTA and breaks focus recovery."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-contracts.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+  accessibility_contract:
+    keyboard: focus moves to first invalid field and CTA remains reachable
+    focus: submit failure returns focus to actionable error
+  validation_matrix:
+    desktop:
+      accessibility_result: pass
+      responsive_result: pass
+      evidence:
+        - accessibility_scan
+        - interaction_trace
+    mobile:
+      accessibility_result: fail
+      responsive_result: fail
+      evidence:
+        - accessibility_tree
+        - interaction_trace
+        - responsive_capture
+      finding: cta_blocked_by_keyboard
+
+when:
+  action: evaluate_responsive_accessibility_matrix
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-contracts.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+  expected_route:
+    - classify_failure_as_responsive_and_accessibility
+    - report_responsive_accessibility_fail
+    - keep_mobile_context_result_from_being_overridden_by_desktop_pass
+  expected_governance:
+    domain:
+      - Responsive
+      - Accessibility
+    render_context: mobile
+    collection_method: browser_review
+    validation_mechanism: deterministic
+    evidence_class:
+      - accessibility_scan
+      - responsive_capture
+    severity: block_candidate
+  forbidden_routes:
+    - pass_accessibility_because_desktop_scan_passed
+    - treat_mobile_keyboard_overlap_as_visual_taste
+    - omit_interaction_trace_for_keyboard_or_focus_claim
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-contracts.md#6. Accessibility Contract
+    - workflow/software-delivery/ui-governance.md#Governance Domains
+    - workflow/software-delivery/validation.md#Browser Evidence Collection

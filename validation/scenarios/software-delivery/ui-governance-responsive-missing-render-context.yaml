@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-responsive-missing-render-context
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: user-feedback-2026-06-09-responsive-validation-taxonomy
+source_phase: responsive-taxonomy-follow-up
+
+given:
+  task_intent: "Accept responsive UI validation from a desktop screenshot only."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  incomplete_evidence_claim:
+    domain: Responsive
+    render_contexts_declared:
+      - desktop
+      - mobile
+    evidence_present:
+      desktop:
+        - screenshot
+        - dom_snapshot
+    evidence_missing:
+      - mobile_capture
+      - responsive_capture
+
+when:
+  action: evaluate_responsive_completion_evidence
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md
+  expected_route:
+    - require_mobile_or_constrained_render_context_evidence
+    - report_missing_render_context_evidence
+    - keep_desktop_screenshot_as_partial_evidence
+  expected_governance:
+    domain: Responsive
+    render_context: mobile
+    collection_method: browser_review
+    validation_mechanism: deterministic
+    evidence_class: responsive_capture
+    severity: block_candidate
+  forbidden_routes:
+    - pass_responsive_validation_with_desktop_screenshot_only
+    - infer_mobile_capture_from_desktop_capture
+    - treat_browser_review_label_as_evidence_without_artifacts
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/execution-flow.yaml#gate.software_delivery.responsive_validation_complete
+    - workflow/software-delivery/artifact-gates.md#5.1 UI Governance Evidence Shape
+    - workflow/software-delivery/templates/ui-governance-evidence-template.md#Evidence Notes

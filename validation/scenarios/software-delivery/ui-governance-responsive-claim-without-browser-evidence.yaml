@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-responsive-claim-without-browser-evidence
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P2
+source_plan: user-feedback-2026-06-09-responsive-validation-taxonomy
+source_phase: responsive-taxonomy-follow-up
+
+given:
+  task_intent: "Claim the layout is responsive because CSS media queries exist, without browser evidence."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/test-strategy.md
+    - workflow/software-delivery/validation.md
+  responsive_claim:
+    domain: Responsive
+    collection_method: static_analysis
+    evidence_class: runtime
+    browser_evidence: missing
+    render_contexts:
+      - desktop
+      - mobile
+
+when:
+  action: classify_responsive_claim_without_browser_evidence
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/test-strategy.md
+    - workflow/software-delivery/validation.md
+  expected_route:
+    - keep_static_analysis_as_partial_evidence
+    - warn_responsive_claim_without_browser_evidence
+    - require_browser_review_before_responsive_completion_claim
+  expected_governance:
+    domain: Responsive
+    render_context: mobile
+    collection_method: static_analysis
+    validation_mechanism: deterministic
+    evidence_class: runtime
+    severity: warn
+  forbidden_routes:
+    - pass_responsive_validation_from_css_markers_only
+    - treat_media_query_presence_as_responsive_capture
+    - skip_browser_evidence_for_viewport_specific_claim
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-governance.md#Render Contexts
+    - workflow/software-delivery/test-strategy.md#3. Test Strategy Gate
+    - workflow/software-delivery/validation.md#Browser Evidence Collection

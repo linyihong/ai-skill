@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: ui-governance-responsive-mobile-failure
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: user-feedback-2026-06-09-responsive-validation-taxonomy
+source_phase: responsive-taxonomy-follow-up
+
+given:
+  task_intent: "Validate a user list screen where desktop browser review passes but mobile capture shows the modal extending outside the viewport."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - workflow/software-delivery/ui-contracts.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+  ui_contract:
+    screen: UserList
+    required_states:
+      - loading
+      - success
+      - error
+    render_contexts:
+      - desktop
+      - mobile
+  validation_matrix:
+    desktop:
+      result: pass
+      evidence:
+        - screenshot
+        - dom_snapshot
+    mobile:
+      result: fail
+      evidence:
+        - screenshot
+        - dom_snapshot
+        - responsive_capture
+      finding: modal_outside_viewport
+
+when:
+  action: evaluate_responsive_validation_matrix
+
+then:
+  expected_load:
+    - workflow/software-delivery/execution-flow.md
+    - workflow/software-delivery/ui-contracts.md
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md
+  expected_route:
+    - classify_domain_as_responsive
+    - preserve_render_context_specific_result
+    - report_responsive_validation_fail
+  expected_governance:
+    domain: Responsive
+    render_context: mobile
+    collection_method: browser_review
+    validation_mechanism: deterministic
+    evidence_class: responsive_capture
+    severity: block_candidate
+  forbidden_routes:
+    - pass_responsive_claim_because_desktop_passed
+    - collapse_mobile_failure_into_generic_contract_failure
+    - replace_render_context_with_device_sku
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-contracts.md#4. Screen Contract
+    - workflow/software-delivery/ui-governance.md#Render Contexts
+    - workflow/software-delivery/validation.md#Browser Evidence Collection

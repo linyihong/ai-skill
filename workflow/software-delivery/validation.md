@@ -82,7 +82,7 @@ Common collection methods:
 
 #### Browser Evidence Collection
 
-Use browser evidence collection when the claim depends on actual rendered UI, interaction state, responsive behavior, focus behavior, or visual output.
+Use browser evidence collection when the claim depends on actual rendered UI, interaction state, responsive behavior, focus behavior, or visual output. When the claim includes responsive behavior, collect evidence per declared `render_context`; one desktop screenshot cannot prove mobile, narrow mobile, safe-area, or orientation behavior.
 
 Outputs:
 
@@ -92,6 +92,28 @@ Outputs:
 - `accessibility_scan`
 - `interaction_trace`
 - `responsive_capture`
+
+Required responsive capture shape:
+
+```yaml
+validation_matrix:
+  desktop:
+    width: 1440
+    collect:
+      - screenshot
+      - dom_snapshot
+      - interaction_trace
+      - responsive_capture
+  mobile:
+    width: 390
+    collect:
+      - screenshot
+      - dom_snapshot
+      - interaction_trace
+      - responsive_capture
+```
+
+At least two render contexts are required before claiming responsive validation complete: a wide context such as `desktop` and a constrained context such as `mobile` or `narrow_mobile`. Add `tablet`, `landscape`, `safe_area`, `high_zoom`, `touch_only`, or `keyboard_only` when the UI contract declares them or the defect report depends on them.
 
 Consumers:
 
@@ -108,6 +130,7 @@ browser_review -> screenshot -> ai_review
 browser_review -> screenshot -> screenshot_diff
 browser_review -> accessibility_tree -> deterministic accessibility validation
 browser_review -> interaction_trace -> behavior validation
+browser_review -> responsive_capture -> responsive validation
 ```
 
 Record both the acquisition method and the evaluation mechanism in validation evidence. If only acquisition ran and no evaluation happened, report the validation as incomplete or advisory rather than pass.

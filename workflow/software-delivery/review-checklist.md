@@ -109,8 +109,9 @@
 ## UI Governance Review（UI 治理審查）
 
 - UI compliance claim 已連到 [`ui-governance.md`](ui-governance.md)，且沒有把 visual diff、screenshot 或 AI review 當成 governance domain。
-- Governance domain、collection method、validation mechanism、evidence class、severity 已分開記錄；需要 artifact 時使用 [`templates/ui-governance-evidence-template.md`](templates/ui-governance-evidence-template.md)。
+- Governance domain、render context、collection method、validation mechanism、evidence class、severity 已分開記錄；需要 artifact 時使用 [`templates/ui-governance-evidence-template.md`](templates/ui-governance-evidence-template.md)。
 - Browser Review、screenshot capture、DOM snapshot、accessibility tree 或 human observation 被記錄為 evidence acquisition，不被當成 validator 或 compliance proof。
+- Responsive claim 至少包含 desktop 與 mobile（或同等 wide / narrow render context）evidence；desktop pass 不替代 mobile、safe-area、keyboard、orientation 或 touch target 驗證。
 - Design-system claim 引用 project-local token / primitive / component policy；本 workflow 不要求全域 token scale。
 - Accessibility 或 behavior pattern blocker 只基於客觀 expectation；主觀 visual taste 和 AI visual review 預設是 warning / research，除非有專案 opt-in、客觀 rubric、deterministic capture 和 review policy。
 - Completion / DoD 沒有隱藏 unresolved UI governance blocker；deferred UI compliance scope 有 owner、理由和 follow-up。
