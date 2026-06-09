@@ -266,6 +266,7 @@ Phase 1 evidence:
 - Shared metadata belongs under `capture.metadata`; artifact-specific metadata is local only when it differs.
 - Capture Envelope is explicitly not a full runtime environment descriptor.
 - Metadata minimum and ownership are considered Phase 1 baseline decisions, not open design debates, unless future evidence introduces counterexamples.
+- Project feedback from an H5 fixed-bottom tab issue: required capture metadata stayed stable (`viewport_width`, `viewport_height`, `orientation`, `render_context`), but the claim needed optional visual viewport / bottom-frame evidence because `document` dimensions alone did not explain a user-visible iPhone browser frame problem. This supports keeping Capture Envelope evidence-scoped and adding claim-specific optional metadata instead of expanding a typed Context Taxonomy.
 
 ## Phase 2 — Coverage Model Watch-List
 
@@ -346,6 +347,7 @@ claim / task context
 Why this is not enough for promotion:
 
 - Browser Capture Envelope is centered on a single observation with shared capture metadata and multiple artifacts.
+- Fixed-bottom UI evidence showed a useful claim-specific extension: visual viewport and bottom-frame measurements can belong to the browser capture artifact/optional metadata without changing the required metadata set.
 - API / runtime / workflow examples need claim, propagation chain, trace, verification, scope, and confidence fields more than viewport-like metadata.
 - A generic Evidence Envelope would risk becoming too broad before non-browser examples prove a stable minimum schema.
 
