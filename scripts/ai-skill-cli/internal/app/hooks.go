@@ -848,6 +848,7 @@ func transcriptHasRequiredBootstrapReads(transcriptPath string, requiredSuffixes
 		if err := json.Unmarshal([]byte(line), &entry); err != nil {
 			continue
 		}
+		markTranscriptReadEvidence(entry, seen)
 		// Only assistant turns can carry tool_use blocks.
 		roleField := entry["type"]
 		if roleField == nil {
@@ -909,12 +910,7 @@ func transcriptHasRequiredBootstrapReads(transcriptPath string, requiredSuffixes
 			}
 			// Normalize path separators so a Windows-style "\\" path matches
 			// a POSIX-style "/" suffix and vice versa.
-			normalized := strings.ReplaceAll(fp, "\\", "/")
-			for suffix := range seen {
-				if !seen[suffix] && strings.HasSuffix(normalized, suffix) {
-					seen[suffix] = true
-				}
-			}
+			markSeenReadPath(fp, seen)
 		}
 	}
 
@@ -927,9 +923,73 @@ func transcriptHasRequiredBootstrapReads(transcriptPath string, requiredSuffixes
 	return len(missing) == 0, missing
 }
 
+func markTranscriptReadEvidence(entry map[string]json.RawMessage, seen map[string]bool) {
+	var value interface{}
+	buf, err := json.Marshal(entry)
+	if err != nil {
+		return
+	}
+	if err := json.Unmarshal(buf, &value); err != nil {
+		return
+	}
+	collectTranscriptReadEvidence(value, seen)
+}
+
+func collectTranscriptReadEvidence(value interface{}, seen map[string]bool) {
+	switch v := value.(type) {
+	case []interface{}:
+		for _, item := range v {
+			collectTranscriptReadEvidence(item, seen)
+		}
+	case map[string]interface{}:
+		if isTranscriptBootstrapReadTool(transcriptToolNameFromGenericMap(v)) {
+			if fp := transcriptPathFromGenericMap(v); fp != "" {
+				markSeenReadPath(fp, seen)
+			}
+		}
+		for _, child := range v {
+			collectTranscriptReadEvidence(child, seen)
+		}
+	}
+}
+
+func transcriptToolNameFromGenericMap(v map[string]interface{}) string {
+	for _, key := range []string{"name", "tool_name", "recipient_name"} {
+		if raw, ok := v[key].(string); ok {
+			return raw
+		}
+	}
+	return ""
+}
+
+func transcriptPathFromGenericMap(v map[string]interface{}) string {
+	for _, key := range []string{"file_path", "path"} {
+		if raw, ok := v[key].(string); ok && strings.TrimSpace(raw) != "" {
+			return raw
+		}
+	}
+	for _, key := range []string{"input", "parameters", "args"} {
+		if child, ok := v[key].(map[string]interface{}); ok {
+			if fp := transcriptPathFromGenericMap(child); fp != "" {
+				return fp
+			}
+		}
+	}
+	return ""
+}
+
+func markSeenReadPath(fp string, seen map[string]bool) {
+	normalized := strings.ReplaceAll(fp, "\\", "/")
+	for suffix := range seen {
+		if !seen[suffix] && strings.HasSuffix(normalized, suffix) {
+			seen[suffix] = true
+		}
+	}
+}
+
 func isTranscriptBootstrapReadTool(toolName string) bool {
 	switch strings.ToLower(strings.TrimSpace(toolName)) {
-	case "read", "readfile", "functions.readfile", "read_file":
+	case "read", "readfile", "functions.readfile", "read_file", "functions.read_file":
 		return true
 	default:
 		return false
@@ -1580,6 +1640,11 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 		appendLog(logFile, "exit_code: 0 (cursor user-aborted stop skips close-out loop)")
 		return ExitSuccess
 	}
+	if cursorStop && cursorPayloadHasNonFinalToolResponse(payload) {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_CURSOR_NON_FINAL_TOOL_RESPONSE")
+		appendLog(logFile, "exit_code: 0 (cursor stop payload is a non-final tool/status response)")
+		return ExitSuccess
+	}
 	if isCursorAfterAgentResponsePayload(payload) {
 		_, _ = fmt.Fprintln(stderr, "ALLOW_AFTER_AGENT_RESPONSE_AUDIT_ONLY")
 		appendLog(logFile, "exit_code: 0 (afterAgentResponse cannot block; stop hook enforces loopback)")
@@ -1882,6 +1947,39 @@ func isCursorNonFinalToolResponse(text string) bool {
 	return isCursorModeSwitchStatus(normalized)
 }
 
+func cursorPayloadHasNonFinalToolResponse(payload map[string]json.RawMessage) bool {
+	for _, raw := range payload {
+		var value interface{}
+		if err := json.Unmarshal(raw, &value); err != nil {
+			continue
+		}
+		if cursorValueHasNonFinalToolResponse(value) {
+			return true
+		}
+	}
+	return false
+}
+
+func cursorValueHasNonFinalToolResponse(value interface{}) bool {
+	switch v := value.(type) {
+	case string:
+		return isCursorNonFinalToolResponse(v)
+	case []interface{}:
+		for _, item := range v {
+			if cursorValueHasNonFinalToolResponse(item) {
+				return true
+			}
+		}
+	case map[string]interface{}:
+		for _, child := range v {
+			if cursorValueHasNonFinalToolResponse(child) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func isCursorModeSwitchStatus(normalized string) bool {
 	normalized = strings.TrimSuffix(strings.TrimSpace(normalized), ".")
 	modeSwitchPatterns := []string{
@@ -1897,6 +1995,8 @@ func isCursorModeSwitchStatus(normalized string) bool {
 		"switched composer mode from debug to agent",
 		"switched from plan to build mode",
 		"switched from build to plan mode",
+		"switched from plan mode to build mode",
+		"switched from build mode to plan mode",
 	}
 	for _, pattern := range modeSwitchPatterns {
 		if normalized == pattern {

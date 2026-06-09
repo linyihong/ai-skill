@@ -678,6 +678,7 @@ func TestRunStopHookAllowsCursorSwitchModeResponseWithoutCloseOutLoop(t *testing
 		"Switched composer mode from plan to agent",
 		"Switched composer mode from plan to build",
 		"Switched from Plan to Build mode.",
+		"Switched from Plan mode to Build mode.",
 		"Switched to Agent mode",
 		"Switched to Plan mode",
 		"Switched to Build mode",
@@ -710,6 +711,23 @@ func TestRunStopHookAllowsCursorSwitchModeResponseWithoutCloseOutLoop(t *testing
 				t.Fatalf("expected non-final tool response diagnostic, got %s", stderr.String())
 			}
 		})
+	}
+}
+
+func TestRunStopHookAllowsCursorNestedSwitchModePayloadWithoutCloseOutLoop(t *testing.T) {
+	setHookStdin(t, `{"hook_event_name":"stop","tool_result":{"output":"Switched from Plan mode to Build mode."}}`)
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(t.TempDir(), &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cursor stop to allow nested non-final switch-mode payload, got %d; stderr=%s", code, stderr.String())
+	}
+	if stdout.String() != "" {
+		t.Fatalf("expected no followup loop for nested non-final switch-mode payload, got %s", stdout.String())
+	}
+	if !strings.Contains(stderr.String(), "ALLOW_CURSOR_NON_FINAL_TOOL_RESPONSE") {
+		t.Fatalf("expected non-final payload diagnostic, got %s", stderr.String())
 	}
 }
 
@@ -902,6 +920,36 @@ func TestTranscriptHasRequiredBootstrapReadsAcceptsCursorReadFileTools(t *testin
 	ok, missing := transcriptHasRequiredBootstrapReads(path, bootstrapRequiredReadSuffixes)
 	if !ok || len(missing) != 0 {
 		t.Fatalf("expected Cursor ReadFile tool_use entries to satisfy bootstrap reads; ok=%v missing=%v", ok, missing)
+	}
+}
+
+func TestTranscriptHasRequiredBootstrapReadsAcceptsGenericToolCallShape(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "transcript.jsonl")
+	entries := []map[string]any{
+		{
+			"type": "assistant",
+			"tool_call": map[string]any{
+				"recipient_name": "functions.ReadFile",
+				"parameters": map[string]any{
+					"path": "/repo/workflow/software-delivery/execution-flow.md",
+				},
+			},
+		},
+	}
+	var lines []string
+	for _, entry := range entries {
+		buf, err := json.Marshal(entry)
+		if err != nil {
+			t.Fatalf("marshal transcript entry: %v", err)
+		}
+		lines = append(lines, string(buf))
+	}
+	writeFile(t, path, strings.Join(lines, "\n")+"\n")
+
+	ok, missing := transcriptHasRequiredBootstrapReads(path, []string{"workflow/software-delivery/execution-flow.md"})
+	if !ok || len(missing) != 0 {
+		t.Fatalf("expected generic tool call shape to satisfy read-log; ok=%v missing=%v", ok, missing)
 	}
 }
 
