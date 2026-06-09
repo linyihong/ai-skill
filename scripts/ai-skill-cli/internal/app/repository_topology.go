@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -37,14 +38,18 @@ import (
 // read — they have no equivalent on disk. The writer rejects empty
 // owner/purpose for any v2 write, ensuring a round-trip through
 // WriteRepositoryTopology always produces a complete v2 file.
+// This type is the in-memory normalized form. It is never directly
+// marshalled or unmarshalled by yaml.v3 — read goes through
+// rawTopologyFile, write goes through marshalV2's anonymous outFile.
+// Therefore no yaml tags appear on its fields.
 type RepositoryTopologyFile struct {
-	SchemaVersion    int                       // what was on disk: 1 or 2
-	Status           string                    // top-level `status:` (e.g. "active")
-	OwnerLayer       string                    // top-level `owner_layer:` (e.g. "runtime")
-	RuntimeProjection *RuntimeProjectionConfig `yaml:"runtime_projection,omitempty"`
-	ConsumerTracking *ConsumerTracking         // v2 only; nil after v1 read
-	Subtrees         []Subtree                 // normalized to v2 shape regardless of input
-	Invariants       []string                  // optional, both schemas
+	SchemaVersion     int                      // what was on disk: 1 or 2
+	Status            string                   // top-level `status:` (e.g. "active")
+	OwnerLayer        string                   // top-level `owner_layer:` (e.g. "runtime")
+	RuntimeProjection *RuntimeProjectionConfig // optional `runtime_projection:` block
+	ConsumerTracking  *ConsumerTracking        // v2 only; nil after v1 read
+	Subtrees          []Subtree                // normalized to v2 shape regardless of input
+	Invariants        []string                 // optional, both schemas
 }
 
 // Subtree is a single subtree classification entry. In v1 YAML the keys
@@ -361,13 +366,12 @@ func (e *RepositoryTopologyValidationError) Error() string {
 	return strings.Join(lines, "\n")
 }
 
-// IsRepositoryTopologyValidationError reports whether err is a
-// *RepositoryTopologyValidationError. Mirrors IsValidationError in the
-// project_metadata.go sibling parser.
+// IsRepositoryTopologyValidationError reports whether err is (or wraps)
+// a *RepositoryTopologyValidationError. Uses errors.As so callers that
+// wrap the validation error via fmt.Errorf("ctx: %w", err) still get the
+// right answer. Mirrors IsValidationError in the project_metadata.go
+// sibling parser.
 func IsRepositoryTopologyValidationError(err error) bool {
-	if err == nil {
-		return false
-	}
-	_, ok := err.(*RepositoryTopologyValidationError)
-	return ok
+	var v *RepositoryTopologyValidationError
+	return errors.As(err, &v)
 }

@@ -6,7 +6,7 @@
 
 ## `runtime/repository-topology.yaml` (currently v1, target v2)
 
-### v1 schema (canonical surface as of Phase 1A landing; in production)
+### v1 schema (canonical surface as of Phase 1B landing; Phase 1C migration pending)
 
 ```yaml
 schema_version: 1
@@ -87,6 +87,20 @@ invariants:
   # block above. Adding it back would re-introduce the stale-reference
   # failure pattern that v2 was designed to eliminate.
 ```
+
+### Schema version precedence (mixed-shape files)
+
+**Explicit `schema_version:` wins over shape inference.** If a YAML declares `schema_version: 1` but also contains v2-only fields (`subtrees:`, `consumer_tracking:`), the loader treats the file as v1 and **silently ignores the v2 fields**. The reverse is also true: `schema_version: 2` with `shared_layer_classification:` ignores the v1 fields.
+
+This is intentional. The author signalled their intent via the explicit version, and partial migration files (where both shapes co-exist) would otherwise produce undefined behaviour. The Phase 1C migration of `runtime/repository-topology.yaml` must therefore be **atomic**: bump `schema_version: 1` → `2` and add the v2 fields in the **same edit**. Splitting the migration into "add subtrees first, bump version later" would silently lose the new fields.
+
+If `schema_version:` is absent, the loader falls back to shape inference:
+
+1. Presence of `subtrees:` OR `consumer_tracking:` → v2
+2. Presence of `shared_layer_classification:` OR `expected_consumers:` → v1
+3. Empty file → v2 (writer-friendly default)
+
+Locked in by `TestLoadRepositoryTopology_ExplicitV1IgnoresV2Fields`.
 
 ### Schema deltas
 

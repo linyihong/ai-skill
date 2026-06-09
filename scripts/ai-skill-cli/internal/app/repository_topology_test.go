@@ -368,3 +368,127 @@ subtrees:
 		t.Errorf("expected path.required rule citation; got: %s", err.Error())
 	}
 }
+
+// TestLoadRepositoryTopology_RejectsV1SubtreeMissingPath (gap G1 from
+// 2026-06-09 review): verify the v1 read path also catches a subtree
+// entry with no `subtree:` field. The rule
+// `v1.shared_layer_classification.subtree.required` was defined in the
+// loader but had no test coverage before this commit.
+func TestLoadRepositoryTopology_RejectsV1SubtreeMissingPath(t *testing.T) {
+	body := []byte(`
+schema_version: 1
+shared_layer_classification:
+  - shared: true
+    # subtree: intentionally missing
+`)
+	_, err := ParseRepositoryTopology(body)
+	if err == nil {
+		t.Fatal("expected v1 subtree missing path to surface as validation error")
+	}
+	if !IsRepositoryTopologyValidationError(err) {
+		t.Errorf("expected RepositoryTopologyValidationError; got %T: %v", err, err)
+	}
+	if !strings.Contains(err.Error(), "v1.shared_layer_classification.subtree.required") {
+		t.Errorf("expected v1 subtree.required rule citation; got: %s", err.Error())
+	}
+}
+
+// TestLoadRepositoryTopology_V1SubtreeUnknownFieldTolerance (gap G2
+// from 2026-06-09 review): v1 subtree entries may carry forward-compat
+// fields that v1 didn't define. The rawSubtreeV1.Unknown map captures
+// them; this test asserts the capture path does not reject. Locks in
+// forward-compat for the v1 subtree level (top-level + v2 subtree are
+// covered by TestLoadRepositoryTopology_UnknownFieldTolerance).
+func TestLoadRepositoryTopology_V1SubtreeUnknownFieldTolerance(t *testing.T) {
+	body := []byte(`
+schema_version: 1
+shared_layer_classification:
+  - subtree: plans/
+    shared: true
+    future_owner_hint: someone   # not part of v1 schema; must be tolerated
+    future_purpose_hint: tracking
+`)
+	if _, err := ParseRepositoryTopology(body); err != nil {
+		t.Errorf("expected v1 subtree unknown fields to be tolerated; got: %v", err)
+	}
+}
+
+// TestLoadRepositoryTopology_IOErrorDistinctFromValidation (gap G5
+// from 2026-06-09 review; sibling of project_metadata_test.go's
+// TestLoadProjectMetadata_IOErrorDistinctFromValidation): a file-not-
+// found error must surface as a plain I/O error, NOT as a
+// RepositoryTopologyValidationError. Callers branch on the type to
+// distinguish "file is missing" from "file is malformed schema".
+func TestLoadRepositoryTopology_IOErrorDistinctFromValidation(t *testing.T) {
+	_, err := LoadRepositoryTopology(filepath.Join(t.TempDir(), "does-not-exist.yaml"))
+	if err == nil {
+		t.Fatal("expected I/O error for missing file")
+	}
+	if IsRepositoryTopologyValidationError(err) {
+		t.Errorf("expected I/O error not to surface as ValidationError, got: %v", err)
+	}
+}
+
+// TestLoadRepositoryTopology_ExplicitV1IgnoresV2Fields (gap G4 from
+// 2026-06-09 review): when a YAML declares `schema_version: 1` but
+// also contains v2-only fields (`subtrees:`, `consumer_tracking:`),
+// the v2 fields are SILENTLY DROPPED. This is intentional — the author
+// signalled v1 intent via the explicit version. Partial-migration files
+// (where both shapes co-exist) would otherwise produce undefined
+// behaviour.
+//
+// This test locks the behaviour so a future "convenience" refactor
+// (e.g. "auto-upgrade when v2 fields are present") cannot land
+// silently. Such a refactor would require an explicit schema_version
+// bump in this test or a v3 schema design.
+//
+// See runtime/repository-topology-migration.md §Schema version
+// precedence (mixed-shape files) for the prose rationale and the
+// Phase 1C migration discipline this protects.
+func TestLoadRepositoryTopology_ExplicitV1IgnoresV2Fields(t *testing.T) {
+	body := []byte(`
+schema_version: 1
+
+# v1 fields — these are honoured
+shared_layer_classification:
+  - subtree: plans/
+    shared: true
+
+# v2 fields — these MUST be silently ignored
+subtrees:
+  - path: workflow/
+    shared_layer: true
+    owner: ghost-owner
+    purpose: "should not appear in normalized output"
+consumer_tracking:
+  strategy: code_reference
+  rationale: "should not appear in normalized output"
+`)
+	file, err := ParseRepositoryTopology(body)
+	if err != nil {
+		t.Fatalf("mixed-shape v1 file should parse; got: %v", err)
+	}
+	if file.SchemaVersion != 1 {
+		t.Errorf("expected SchemaVersion=1 (explicit takes precedence); got %d", file.SchemaVersion)
+	}
+	// v1 subtree honoured.
+	if len(file.Subtrees) != 1 {
+		t.Fatalf("expected exactly 1 subtree (from v1 path); got %d: %+v", len(file.Subtrees), file.Subtrees)
+	}
+	if file.Subtrees[0].Path != "plans/" {
+		t.Errorf("expected v1 subtree plans/; got %q", file.Subtrees[0].Path)
+	}
+	// v2 subtree silently dropped — workflow/ must NOT appear.
+	for _, s := range file.Subtrees {
+		if s.Path == "workflow/" {
+			t.Errorf("v2 subtree leaked into v1 normalized output: %+v", s)
+		}
+		if s.Owner == "ghost-owner" {
+			t.Errorf("v2 owner field leaked into v1 normalized output")
+		}
+	}
+	// v2 consumer_tracking silently dropped.
+	if file.ConsumerTracking != nil {
+		t.Errorf("v2 consumer_tracking leaked into v1 normalized output: %+v", file.ConsumerTracking)
+	}
+}
