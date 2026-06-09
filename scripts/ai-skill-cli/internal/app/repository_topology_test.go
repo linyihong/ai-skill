@@ -248,23 +248,36 @@ shared_layer_classification:
 	}
 }
 
-func TestLoadRepositoryTopology_LiveV1FileParses(t *testing.T) {
-	// Regression guard: the live runtime/repository-topology.yaml
-	// (currently v1) must continue to parse via the canonical loader
-	// even though it has not been migrated. If this test fails after
-	// a future commit modifies the live YAML, that commit has likely
-	// reached into Phase 1C territory ahead of schedule.
+func TestLoadRepositoryTopology_LiveFileParses(t *testing.T) {
+	// Regression guard: the live runtime/repository-topology.yaml must
+	// continue to parse via the canonical loader. After Phase 1C₁
+	// (2026-06-09) the live file was upgraded from v1 to v2; this test
+	// now asserts v2. The test was renamed from LiveV1FileParses to
+	// LiveFileParses so future schema bumps can update the version
+	// assertion without renaming the test.
 	repo := discoveryRepoRoot(t)
 	path := filepath.Join(repo, "runtime", "repository-topology.yaml")
 	file, err := LoadRepositoryTopology(path)
 	if err != nil {
-		t.Fatalf("live v1 file must parse cleanly; got: %v", err)
+		t.Fatalf("live file must parse cleanly; got: %v", err)
 	}
-	if file.SchemaVersion != 1 {
-		t.Errorf("expected live file to be v1 (Phase 1B has not migrated it); got SchemaVersion=%d", file.SchemaVersion)
+	if file.SchemaVersion != 2 {
+		t.Errorf("expected live file to be v2 (Phase 1C₁ migrated it); got SchemaVersion=%d", file.SchemaVersion)
 	}
 	if len(file.Subtrees) == 0 {
 		t.Error("expected at least one subtree in live topology")
+	}
+	// v2 contract: every subtree must declare owner + purpose.
+	for _, s := range file.Subtrees {
+		if s.Owner == "" || s.Purpose == "" {
+			t.Errorf("live v2 subtree %q missing owner/purpose: %+v", s.Path, s)
+		}
+	}
+	// v2 contract: consumer_tracking must be present and frozen.
+	if file.ConsumerTracking == nil {
+		t.Error("expected ConsumerTracking on live v2 file")
+	} else if file.ConsumerTracking.Strategy != "code_reference" {
+		t.Errorf("expected ConsumerTracking.Strategy=code_reference; got %q", file.ConsumerTracking.Strategy)
 	}
 }
 

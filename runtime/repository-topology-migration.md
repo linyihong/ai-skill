@@ -4,9 +4,15 @@
 >
 > Update this file every time a consumer or producer migrates between schema versions, or when a new consumer is added to the runtime.
 
-## `runtime/repository-topology.yaml` (currently v1, target v2)
+## `runtime/repository-topology.yaml` (v2 in production as of Phase 1C₁)
 
-### v1 schema (canonical surface as of Phase 1B landing; Phase 1C migration pending)
+### Phase 1C₁ migration landed 2026-06-09
+
+The live `runtime/repository-topology.yaml` was upgraded from v1 to v2 in commit landing this section. `runtime_compiler.go` line 339's tuple-format projection rule was removed; the file is now compiled via `compileRepositoryTopology` in `repository_topology_compile.go`, which writes `repository_topology` rows with JSON content carrying BOTH v1 keys (`subtree`, `shared`) AND v2 keys (`path`, `shared_layer`, `owner`, `purpose`). The legacy `sanitization_scan.go::repositoryTopologyRow` continues to read the table unchanged; Phase 1D will retire its v1 dependency.
+
+The v1 / v2 sections below are kept as **historical reference** so future readers can see what the schema looked like before and after the upgrade. They are no longer prescriptive — the live state is v2.
+
+### v1 schema (historical; production through Phase 1B)
 
 ```yaml
 schema_version: 1
@@ -113,15 +119,15 @@ Locked in by `TestLoadRepositoryTopology_ExplicitV1IgnoresV2Fields`.
 | Per-subtree purpose | absent | `purpose` (required) |
 | Consumer list | `expected_consumers: [name, name, ...]` (manual) | `consumer_tracking: { strategy: code_reference, rationale: ... }` (frozen) |
 
-### Current framework runtime state
+### Current framework runtime state (as of Phase 1C₁ landing)
 
 | Surface | Schema in use | Reads via |
 | --- | --- | --- |
-| `runtime/repository-topology.yaml` (on disk) | v1 | — |
-| `runtime_compiler.go` line 339 projection rule | v1 (field names hard-coded) | direct YAML loader inside compiler |
-| `runtime.db.repository_topology` (projected table) | v1 row shape (subtree, content JSON) | populated by projection rule |
-| `sanitization_scan.go::repositoryTopologyRow` (legacy consumer) | v1 row shape | reads SQLite table, not YAML |
-| `scripts/ai-skill-cli/internal/app/repository_topology.go::LoadRepositoryTopology` (Phase 1B canonical) | reads BOTH v1 + v2; writes ONLY v2 | direct YAML I/O; **not yet wired into projection** |
+| `runtime/repository-topology.yaml` (on disk) | **v2** | — |
+| `runtime_compiler.go` projection wiring | calls `compileRepositoryTopology` (custom function) | — |
+| `repository_topology_compile.go::compileRepositoryTopology` | reads v2 via `LoadRepositoryTopology`; writes dual-shape JSON | direct YAML I/O via Phase 1B loader |
+| `runtime.db.repository_topology` (projected table) | rows have JSON with BOTH v1 keys (`subtree`, `shared`) AND v2 keys (`path`, `shared_layer`, `owner`, `purpose`) | populated by `compileRepositoryTopology` |
+| `sanitization_scan.go::repositoryTopologyRow` (legacy consumer) | reads `subtree` + `shared` from JSON content (still works via backward-compat dual-shape) | unchanged; will migrate in Phase 1D |
 
 ### Target state (Phase 1C + Phase 1D)
 
@@ -139,26 +145,32 @@ After Phase 1D lands:
 
 | Surface | Current schema | Target schema | Migration phase | Owner |
 | --- | --- | --- | --- | --- |
-| Schema spec (this file) | — | v2 documented | **Phase 1B (this commit)** | framework maintainer |
-| Loader `repository_topology.go` | — | v1 read + v2 read/write | **Phase 1B (this commit)** | framework maintainer |
-| Live YAML `runtime/repository-topology.yaml` | v1 | v2 | Phase 1C | framework maintainer |
-| Projection rule (compiler) | v1 hard-coded | calls `LoadRepositoryTopology` | Phase 1C | framework maintainer |
-| Live consumer `sanitization_scan.go` | reads `subtree` + `shared` from SQLite | reads v2 fields via join | Phase 1D | framework maintainer |
+| Schema spec (this file) | v2 documented | v2 documented | Phase 1B (landed) | framework maintainer |
+| Loader `repository_topology.go` | v1 read + v2 read/write | v1 read + v2 read/write | Phase 1B (landed) | framework maintainer |
+| Live YAML `runtime/repository-topology.yaml` | **v2** | v2 | **Phase 1C₁ (landed)** | framework maintainer |
+| Projection rule (compiler) | calls `compileRepositoryTopology` | calls `compileRepositoryTopology` | **Phase 1C₁ (landed)** | framework maintainer |
+| Live consumer `sanitization_scan.go` | reads `subtree` + `shared` from SQLite via backward-compat dual-shape JSON | reads v2 fields (`owner`/`purpose`) directly | Phase 1D | framework maintainer |
 | Registry / scenarios | — | enforcement-registry binding | Phase 4 | framework maintainer |
 
-### Why the v1 file still exists after Phase 1B
+### History — why Phase 1B kept the v1 file on disk
 
-The pre-existing `runtime/repository-topology.yaml` (v1) was committed in the same wave as the original sanitization scanner (commits `2ff3a01`, `1e97bcf`, `97ea413`). Phase 1B by deliberate scope discipline **does not upgrade the live YAML file** — even a one-field edit to add `owner` would either:
+Phase 1B (commits `b09359a` + `acf2693`) introduced the canonical loader (`LoadRepositoryTopology`) but explicitly did NOT upgrade the live YAML. The reason: `runtime_compiler.go` line 339 was a tuple-format projection rule hard-coded against v1 field names (`shared_layer_classification`, `subtree`). Upgrading the YAML in isolation would have broken projection.
 
-- Force the projection rule to also know about the new field (Phase 1C territory), OR
-- Break projection (the compiler iterates `shared_layer_classification` which would no longer exist)
+Phase 1C₁ (this section's landing commit) executes the upgrade ATOMICALLY:
 
-So Phase 1B introduces the canonical Go loader (`LoadRepositoryTopology` in `repository_topology.go`) that can read BOTH schemas. Phase 1C then upgrades the live YAML to v2 atomically with the projection rewrite.
+1. Live YAML upgraded v1 → v2 (in-place)
+2. `runtime_compiler.go` line 339 tuple entry removed
+3. New `compileRepositoryTopology` function added to the compile pipeline
+4. JSON content carries BOTH v1 and v2 keys so legacy scanner reads correctly
 
-Until Phase 1C lands, both shapes co-exist conceptually:
+The atomic discipline matches the migration-notes §Schema version precedence (mixed-shape files) rule: partial-shape transitions are silent-drop hazards; the migration must be one commit, not several.
 
-- v1: the actual content of `runtime/repository-topology.yaml`, consumed by the live projection rule
-- v2: the target shape, exercised by the new loader's tests against in-memory fixtures and by future migrations
+Until Phase 1D lands, the v1 keys in JSON content remain — they are the contract that lets `sanitization_scan.go::repositoryTopologyRow` keep reading without modification. Phase 1D will:
+
+- Either drop the v1 keys (and migrate the scanner's `repositoryTopologyRow` to read v2 keys directly)
+- Or keep the v1 keys but route the scanner through `LoadRepositoryTopology` for stronger typing
+
+The choice is deferred to Phase 1D's design pass.
 
 ### What this is NOT
 

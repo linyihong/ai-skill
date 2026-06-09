@@ -1,4 +1,4 @@
-schema_version: 1
+schema_version: 2
 status: active
 owner_layer: runtime
 source_plan: plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md
@@ -12,37 +12,70 @@ summary: >
   paths separately from project-local or implementation-only paths. Sanitization
   consumes this projection to decide where private project tokens are forbidden.
 
-shared_layer_classification:
-  - subtree: plans/
-    shared: true
-  - subtree: workflow/
-    shared: true
-  - subtree: enforcement/
-    shared: true
-  - subtree: governance/
-    shared: true
-  - subtree: knowledge/
-    shared: true
-  - subtree: runtime/
-    shared: true
-  - subtree: validation/
-    shared: true
-  - subtree: intelligence/
-    shared: true
-  - subtree: scripts/
-    shared: false
-  - subtree: ai-tools/
-    shared: true
-  - subtree: .agent-goals/
-    shared: false
+# Frozen governance decision (Phase 1A review 2026-06-08): consumer list is
+# DERIVED from code-reference, not manually maintained. This block is
+# intentionally permanent. Do NOT re-add a manual `expected_consumers:` field —
+# manual consumer lists go stale (new subsystem reads topology but no one
+# updates the list), which is the exact failure pattern this v2 was designed
+# to remove.
+consumer_tracking:
+  strategy: code_reference
+  rationale: |
+    Manual consumer lists go stale (new subsystem reads topology but no
+    one updates the list). Code-reference derivation is the durable
+    governance decision. This block is intentionally permanent — do not
+    re-add a manual `expected_consumers:` field.
 
-expected_consumers:
-  - sanitization
-  - workflow_activation
-  - governance_lint
-  - dependency_reading
+subtrees:
+  - path: plans/
+    shared_layer: true
+    owner: framework-maintainer
+    purpose: "Plan tracking; referenced by enforcement-registry child_plan"
+  - path: workflow/
+    shared_layer: true
+    owner: framework-maintainer
+    purpose: "Cross-skill workflow contracts and execution flows"
+  - path: enforcement/
+    shared_layer: true
+    owner: framework-maintainer
+    purpose: "Reusable enforcement rules and failure patterns"
+  - path: governance/
+    shared_layer: true
+    owner: framework-maintainer
+    purpose: "Lifecycle / promotion / ADR governance surfaces"
+  - path: knowledge/
+    shared_layer: true
+    owner: knowledge-maintainer
+    purpose: "Atom summaries, indexes, graphs, routing registry"
+  - path: runtime/
+    shared_layer: true
+    owner: framework-maintainer
+    purpose: "Compiled / projected runtime surfaces consumed by Go executor"
+  - path: validation/
+    shared_layer: true
+    owner: framework-maintainer
+    purpose: "Reusable validation scenarios and fixtures"
+  - path: intelligence/
+    shared_layer: true
+    owner: framework-maintainer
+    purpose: "Reusable intelligence atoms and engineering analysis"
+  - path: ai-tools/
+    shared_layer: true
+    owner: tooling-maintainer
+    purpose: "Tool adapters and integration documentation"
+  - path: scripts/
+    shared_layer: false
+    owner: tooling-maintainer
+    purpose: "CLI / runtime implementation; not consumed as reusable knowledge"
+  - path: .agent-goals/
+    shared_layer: false
+    owner: project-local
+    purpose: "Per-project ephemeral goal ledger; excluded from git"
 
 invariants:
   - Topology is a source-of-truth surface, not a detector heuristic.
   - Shared-layer classification must not infer project privacy by absence.
   - Project-local metadata remains the source of private token declarations.
+  # Note: `expected_consumers:` is intentionally absent. See consumer_tracking
+  # block above. Adding it back would re-introduce the stale-reference
+  # failure pattern that v2 was designed to eliminate.

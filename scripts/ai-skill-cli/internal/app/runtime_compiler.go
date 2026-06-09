@@ -304,6 +304,13 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB, docs map[string]ma
 	if err := compileDerivedForbiddenTokens(repo, db); err != nil {
 		return err
 	}
+	// Phase 1C₁ (2026-06-09): repository topology now uses a custom
+	// projection function because v2 schema's `subtrees:` + per-subtree
+	// owner/purpose fields do not fit the tuple-format pipeline.
+	// See scripts/ai-skill-cli/internal/app/repository_topology_compile.go.
+	if err := compileRepositoryTopology(repo, db); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -336,7 +343,11 @@ func runtimeConfigMappings() []runtimeConfigMapping {
 		{"runtime/recovery/state-repair.yaml", "state_repair", "procedure_id", "repair_procedures", []string{"name", "id"}},
 		{"runtime/recovery/obligation-rebuild.yaml", "obligation_rebuild", "procedure_id", "rebuild_procedures", []string{"name", "id"}},
 		{"runtime/recovery/phase-reconciliation.yaml", "phase_reconciliation", "procedure_id", "reconciliation_procedures", []string{"name", "id"}},
-		{"runtime/repository-topology.yaml", "repository_topology", "subtree", "shared_layer_classification", []string{"subtree"}},
+		// runtime/repository-topology.yaml moved out of tuple-driven projection in
+		// Phase 1C₁ (2026-06-09). The v2 schema's `subtrees:` + per-subtree
+		// owner/purpose/path fields do not fit the generic tuple format; the
+		// canonical projection now flows through
+		// repository_topology_compile.go::compileRepositoryTopology.
 		{"runtime/sanitization-patterns.yaml", "sanitization_patterns", "category", "pattern_families", []string{"category", "id", "name"}},
 		{"runtime/scheduler/execution-queue.yaml", "execution_queue", "queue_name", "queue_structure", []string{"name", "id"}},
 		{"runtime/scheduler/priority-scheduler.yaml", "priority_scheduler", "priority_level", "levels", []string{"name", "level"}},
@@ -356,6 +367,11 @@ func runtimeCanonicalDocumentPaths() []string {
 		"runtime/discovery/capability-checkpoints.yaml",
 		"runtime/transactions/transaction-templates.yaml",
 		"runtime/compiler/compiler-rules.yaml",
+		// Phase 1C₁: repository-topology.yaml moved out of runtimeConfigMappings
+		// because its v2 schema doesn't fit the tuple format; it still needs
+		// to appear in runtime_config_documents for introspection and drift
+		// checks, so it is listed explicitly here.
+		"runtime/repository-topology.yaml",
 	} {
 		paths = append(paths, rel)
 		seen[rel] = true

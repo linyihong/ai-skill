@@ -276,12 +276,27 @@ git pre-commit hook
 
 #### Phase 1C — Runtime Compile Projection
 
-- [x] `ai-skill runtime compile` 階段新增 projection rule：
-  - 1A `project.private_entities` （per project）→ `runtime.db.derived_private_entities` table（governance layer：保留 entity name / kind / 來源 project ID，**不**展開 case variants — 治理 query 用）
-  - `derived_private_entities` × `match_tokens` × case-variant expansion → `runtime.db.derived_match_tokens` table（execution layer：scanner 直接 query 這張 table，無需 join）
-  - 1B topology → `runtime.db.repository_topology` table
-- [x] 兩張 derived table 為 `runtime_compile` 階段重建（每次 compile 全量重 projection，不增量）
-- [x] Compiler unit test：fixture project metadata + fixture topology → 預期 `derived_private_entities` row count + `derived_match_tokens` 含 case variants 完全展開
+**Phase 1C 拆分為 1C₁ + 1C₂**（mirroring 1A/1B discipline success）：
+
+- **Phase 1C₁** — Topology projection migration（landed 2026-06-09，commit landing this section）
+  - `runtime/repository-topology.yaml` 升級 v1 → v2 in-place（11 subtrees with owner+purpose；`expected_consumers` 移除；`consumer_tracking.strategy: code_reference` frozen governance block）
+  - `runtime_compiler.go` line 339 tuple 移除；新 `repository_topology_compile.go::compileRepositoryTopology` 接 Phase 1B `LoadRepositoryTopology`
+  - 投影 JSON 內容 dual-shape — 同時帶 v1 keys (`subtree`, `shared`) + v2 keys (`path`, `shared_layer`, `owner`, `purpose`)；legacy `sanitization_scan.go::repositoryTopologyRow` 不破
+  - 2 compiler tests pass：`TestCompileRepositoryTopology_WritesBackwardCompatJSON` + `TestCompileRepositoryTopology_LegacyScannerCompat`
+  - `TestLoadRepositoryTopology_LiveFileParses` 更新斷言 v2 + 驗 owner/purpose 完整
+  - 完整 internal/app 測試套 (110s) 全 pass，無 regression
+  - 詳見 [`runtime/repository-topology-migration.md`](../../runtime/repository-topology-migration.md)
+
+- **Phase 1C₂** — Project metadata projection（additive，pending）
+  - 新 `derived_private_entities` + `derived_match_tokens` 兩張表（不取代既有 `derived_forbidden_tokens` — Phase 1D 才退役 legacy）
+  - 新 `compileDerivedPrivateEntities` + `compileDerivedMatchTokens` 函數 using `LoadProjectMetadata`
+  - case-variant expansion 在 projection 階段（不在 parser）
+  - Compiler unit test
+
+- [x] **1C₁** topology projection migration（landed this commit）
+- [ ] **1C₂** project metadata projection（additive，pending）
+- [x] Phase 1B/1A discipline 保持：1C₁ 不動 `sanitization_scan.go`，legacy reader/scanner 完全靠 backward-compat JSON 持續運作
+- [x] Compiler unit test（topology only — 1C₂ 補 project metadata 的 unit test）
 
 #### Phase 1D — Scanner Implementation
 
