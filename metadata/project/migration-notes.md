@@ -23,9 +23,9 @@ project:
 
 Governance layer (entity identity) and execution layer (match tokens) are **explicitly separated**. Reviewer discipline: any code touching this schema must respect that boundary — entity name flows into governance / audit / debug output; match_tokens flow into the scanner's matching pipeline. Mixing the two is the dual-source-of-truth trap this schema was designed to avoid.
 
-### Current framework runtime state (as of 2026-06-08, commit before this Phase 1A lands)
+### Current framework runtime state (as of Phase 1A landing; Phase 1C migration pending)
 
-The pre-existing scanner implementation in `scripts/ai-skill-cli/internal/app/sanitization_scan.go` (landed in commits `2ff3a01`, `1e97bcf`, `97ea413`) consumes a **legacy flat schema**:
+The pre-existing scanner implementation in `scripts/ai-skill-cli/internal/app/sanitization_scan.go` (landed in commits `2ff3a01`, `1e97bcf`, `97ea413`, before Phase 1A was designed) consumes a **legacy flat schema**:
 
 ```go
 // sanitization_scan.go (legacy, lines 21-26)

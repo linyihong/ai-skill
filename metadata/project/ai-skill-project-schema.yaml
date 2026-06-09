@@ -32,11 +32,17 @@ declaration:
     id:
       type: string
       required: true
-      pattern: "^[a-z0-9][a-z0-9-]*[a-z0-9]$"
+      pattern: "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
       description: |
         Stable project identifier in kebab-case. Used as the `owning_project_id`
         when projection rules emit findings. Must be unique within the
         repository.
+
+        Pattern matches `^[a-z0-9]([a-z0-9-]*[a-z0-9])?$` — at least one
+        lowercase letter or digit, optionally followed by additional
+        lowercase letters / digits / hyphens, and not ending in a hyphen.
+        Single-character ids (`a`, `0`, etc.) are accepted because the
+        constraint is uniqueness within the repo, not minimum length.
 
     visibility:
       type: enum
@@ -135,11 +141,17 @@ validation_rules:
 
 # Future-compat note:
 #   Unknown top-level fields under `project:` and unknown fields under each
-#   entity are ALLOWED by the parser but emit a debug-level warning. This
-#   lets Phase 1C+ extend the schema (severity / expires_at / owner /
+#   entity are silently tolerated by the parser. They are captured into an
+#   `Unknown` map but never inspected; no warning is emitted in Phase 1A.
+#   This lets Phase 1C+ extend the schema (severity / expires_at / owner /
 #   related_entity at entity layer; declared_match_topology / consumer
 #   bindings at project layer) without breaking projects that adopt the
 #   v1 schema today.
+#
+#   If a future phase needs a diagnostic channel for typo'd or unrecognized
+#   fields, design it as a separate metadata-diagnostics surface; do NOT
+#   patch a logging side-effect into the parser ad-hoc. The Phase 1A
+#   contract is "silently tolerated", and downstream tests rely on that.
 
 companion:
   human_readme: metadata/project/README.md

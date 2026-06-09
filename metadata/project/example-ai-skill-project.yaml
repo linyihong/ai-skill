@@ -16,6 +16,15 @@ project:
     # A codename entity with two aliases. case_variants: auto means
     # Phase 1C projection expands match_tokens across CamelCase /
     # kebab-case / SCREAMING_SNAKE etc automatically.
+    #
+    # NOTE — intentional collision demo: this entity's match_tokens
+    # include "Atlas", and the AtlasMobile entity (below) also includes
+    # "Atlas" via its own match_tokens. This collision is deliberate to
+    # exercise governance collision-detection in Phase 1C+ (a single
+    # matched token may map back to multiple entities). Do not de-dupe
+    # the overlap when copying this example for real use; instead,
+    # declare each entity's intended tokens and let the framework detect
+    # collisions explicitly.
     - name: ProjectAtlas
       kind: codename
       match_tokens:
@@ -40,6 +49,16 @@ project:
 
     # An individual — Phase 1A treats all kinds equivalently, but Phase 1C+
     # may attach per-kind handling (e.g. expires_at on individuals).
+    #
+    # WARNING — match_token false-positive risk: "Dr. Smith" contains
+    # a period and a space. Future scanners doing substring or word-
+    # boundary matching may flag any sentence containing "Dr." or any
+    # standalone "Smith" as a leak. For real projects, prefer match
+    # tokens that are unlikely to appear by accident in shared-layer
+    # prose (use a unique codename, e.g. "EngineerHandleSmith42", and
+    # link the real-name → codename mapping in project-local metadata
+    # only). This example keeps the natural form to demonstrate the
+    # schema shape, NOT as a recommended pattern.
     - name: DrJaneSmith
       kind: individual
       match_tokens:
@@ -48,6 +67,7 @@ project:
       case_variants: auto
 
     # A product entity. match_tokens may include multi-word strings.
+    # See the NOTE under ProjectAtlas for the intentional "Atlas" collision.
     - name: AtlasMobile
       kind: product
       match_tokens:

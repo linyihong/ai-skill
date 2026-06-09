@@ -343,6 +343,93 @@ project:
 	}
 }
 
+// TestLoadProjectMetadata_SingleCharIDAllowed locks in the Phase 1A
+// review decision (2026-06-08 follow-up): single-character project ids
+// (e.g. "a", "0") are accepted by both the canonical schema and the
+// parser. The schema pattern is the canonical SOT for this contract;
+// the parser regex MUST match it. If you tighten the regex to require
+// ≥2 chars, also update the schema pattern in
+// metadata/project/ai-skill-project-schema.yaml — they are paired.
+func TestLoadProjectMetadata_SingleCharIDAllowed(t *testing.T) {
+	body := []byte(`
+project:
+  id: a
+  visibility: private
+  private_entities: []
+`)
+	file, err := ParseProjectMetadata(body)
+	if err != nil {
+		t.Fatalf("expected single-char id to be accepted; got: %v", err)
+	}
+	if file.Project.ID != "a" {
+		t.Errorf("expected project.id=a, got %q", file.Project.ID)
+	}
+	// Digit form too.
+	body2 := []byte(`
+project:
+  id: "0"
+  visibility: private
+  private_entities: []
+`)
+	if _, err := ParseProjectMetadata(body2); err != nil {
+		t.Errorf("expected single-digit id to be accepted; got: %v", err)
+	}
+}
+
+// TestLoadProjectMetadata_UnknownFieldTolerance locks in the Phase 1A
+// review decision (2026-06-08 follow-up): unknown fields are silently
+// tolerated for forward-compat. The schema declares this contract; this
+// test ensures the parser actually honours it. If a future phase wants
+// diagnostics for typo'd / unrecognized fields, design it as a separate
+// metadata-diagnostics surface — do NOT change the parser behaviour
+// here without also revising the schema doc and removing this test.
+func TestLoadProjectMetadata_UnknownFieldTolerance(t *testing.T) {
+	// Top-level unknown sibling of `project:`.
+	body := []byte(`
+project:
+  id: example-project
+  visibility: private
+  private_entities: []
+unknown_top_level: anything
+also_unknown:
+  nested: ok
+`)
+	if _, err := ParseProjectMetadata(body); err != nil {
+		t.Errorf("expected top-level unknown fields to be tolerated; got: %v", err)
+	}
+
+	// Unknown field within `project:`.
+	body = []byte(`
+project:
+  id: example-project
+  visibility: private
+  private_entities: []
+  future_field: someday
+  another_future_one:
+    structured: true
+`)
+	if _, err := ParseProjectMetadata(body); err != nil {
+		t.Errorf("expected project-level unknown fields to be tolerated; got: %v", err)
+	}
+
+	// Unknown field within an entity.
+	body = []byte(`
+project:
+  id: example-project
+  visibility: private
+  private_entities:
+    - name: TestEntity
+      kind: codename
+      match_tokens:
+        - TestToken
+      severity: high          # future field (Phase 1C+)
+      expires_at: 2099-01-01  # future field (Phase 1C+)
+`)
+	if _, err := ParseProjectMetadata(body); err != nil {
+		t.Errorf("expected entity-level unknown fields to be tolerated; got: %v", err)
+	}
+}
+
 // TestLoadProjectMetadata_ExampleFileParsesCleanly ensures the example
 // fixture documented in metadata/project/example-ai-skill-project.yaml
 // stays valid. Doubles as a regression for the documented schema.
