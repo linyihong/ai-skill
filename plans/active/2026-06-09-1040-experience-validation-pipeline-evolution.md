@@ -1,7 +1,7 @@
 ---
 id: 2026-06-09-1040-experience-validation-pipeline-evolution
 plan_kind: main
-status: draft
+status: in-progress
 owner: linyihong
 created: 2026-06-09
 priority: P2
@@ -10,7 +10,7 @@ required_for_completion: false
 
 # Experience Validation Pipeline Evolution
 
-**Status**: `draft`
+**Status**: `in-progress`
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-09
 **Priority**：**P2**（taxonomy evolution / watch-list；不阻塞既有 responsive gate；Phase 1 metadata work 可獨立升 P1）
@@ -213,8 +213,8 @@ Runtime validation remains `ai-skill runtime compile`, `ai-skill runtime refresh
 
 - [ ] Should `Responsive` remain a governance domain, or become a cross-cutting `context.render` dimension composed with domains such as Accessibility, Behavior, Design System, and Contract?
 - [ ] Should the future context model be a typed `context` taxonomy with render / interaction / accessibility / environment / appearance / locale groups?
-- [ ] What is the minimum capture metadata required for browser evidence to remain reviewable: viewport width/height, user agent, emulation/device profile, orientation, DPR, safe-area, render_context, or all of the above?
-- [ ] Who owns evidence metadata: a shared Capture Envelope containing metadata plus artifacts, or per-artifact metadata under screenshot / DOM snapshot / accessibility scan / interaction trace?
+- [x] What is the minimum capture metadata required for browser evidence to remain reviewable: viewport width/height, user agent, emulation/device profile, orientation, DPR, safe-area, render_context, or all of the above? — resolved provisionally in Phase 1: required = viewport width/height, orientation, render context; optional = DPR, user agent, emulation profile, safe area.
+- [x] Who owns evidence metadata: a shared Capture Envelope containing metadata plus artifacts, or per-artifact metadata under screenshot / DOM snapshot / accessibility scan / interaction trace? — resolved provisionally in Phase 1: shared Capture Envelope owns common capture metadata; artifact-specific metadata remains local only when it differs.
 - [ ] Should validation coverage be modeled explicitly as State Coverage + Context Coverage + Evidence Coverage?
 - [ ] Does Validation Coverage Model belong to UI workflow, or should it graduate to shared Validation Reasoning once API / runtime / workflow validation show the same coverage pressure?
 - [ ] How should matrix explosion be controlled: `required_contexts`, `optional_contexts`, `high_risk_contexts`, risk-triggered expansion, or another shape?
@@ -225,34 +225,44 @@ Runtime validation remains `ai-skill runtime compile`, `ai-skill runtime refresh
 
 逐條核對本 plan §Open Questions，標記處置並回寫：
 
-- [ ] 已讀本 plan §Open Questions 全部條目
-- [ ] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
-- [ ] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
-- [ ] 若盤點新發現問題，已加入 §Open Questions
+- [x] 已讀本 plan §Open Questions 全部條目
+- [x] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
+- [x] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
+- [x] 若盤點新發現問題，已加入 §Open Questions
 
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
 | Responsive domain vs context.render dimension | still-open | Needs post-gate usage evidence |
 | typed context taxonomy graduation | still-open | Explicitly deferred until Phase 2+ examples exist |
-| capture metadata minimum | still-open | Needs browser evidence artifact examples |
-| evidence metadata ownership | still-open | Capture Envelope is favored, but not yet proven by artifact examples |
+| capture metadata minimum | resolved | Phase 1 defines required vs optional fields in `workflow/software-delivery/validation.md` |
+| evidence metadata ownership | resolved | Phase 1 chooses evidence-scoped Capture Envelope for shared metadata |
 | coverage dimensions model | still-open | Needs validation scenario pressure |
 | coverage model owner | still-open | Could remain UI-local or graduate to shared validation-reasoning |
 | matrix explosion control | still-open | Needs at least one expanded matrix example |
 
-- [ ] Read current `sd-ui-governance`, `sd-ui-contracts`, `sd-validation`, and `execution-flow.yaml`.
-- [ ] Confirm existing `responsive_validation_complete` gate remains correct and should not be weakened.
-- [ ] Confirm no new runtime surface is needed for Phase 0.
-- [ ] Update this plan if current sources already answer one open question.
+- [x] Read current `sd-ui-governance`, `sd-ui-contracts`, `sd-validation`, and `execution-flow.yaml`.
+  - Evidence: prior responsive gate landing read/updated all four surfaces; this execution reread `sd-validation` before editing.
+- [x] Confirm existing `responsive_validation_complete` gate remains correct and should not be weakened.
+  - Evidence: Phase 1 adds evidence metadata only; no semantic change to `workflow/software-delivery/execution-flow.yaml`.
+- [x] Confirm no new runtime surface is needed for Phase 0.
+  - Evidence: Phase 1 is doc-only on an existing workflow slice; no new runtime projection, route, validator, or scenario.
+- [x] Update this plan if current sources already answer one open question.
+  - Evidence: capture metadata minimum and metadata ownership are marked resolved provisionally after Phase 1.
 
 ## Phase 1 — Browser Evidence Metadata
 
-- [ ] Add browser evidence capture metadata note to `workflow/software-delivery/validation.md`.
-- [ ] Define provisional required metadata fields: `viewport_width`, `viewport_height`, `orientation`, `render_context`.
-- [ ] Define provisional optional metadata fields: `dpr`, `user_agent`, `emulation_profile`, `safe_area`.
-- [ ] Clarify evidence chain: Evidence → Metadata → Reviewability → Trust.
-- [ ] Decide whether metadata belongs in a shared Capture Envelope or under each artifact.
-- [ ] If Capture Envelope wins, define the provisional shape as `capture.metadata` + `capture.artifacts`.
+- [x] Add browser evidence capture metadata note to `workflow/software-delivery/validation.md`.
+- [x] Define provisional required metadata fields: `viewport_width`, `viewport_height`, `orientation`, `render_context`.
+- [x] Define provisional optional metadata fields: `dpr`, `user_agent`, `emulation_profile`, `safe_area`.
+- [x] Clarify evidence chain: Evidence → Metadata → Reviewability → Trust.
+- [x] Decide whether metadata belongs in a shared Capture Envelope or under each artifact.
+- [x] If Capture Envelope wins, define the provisional shape as `capture.metadata` + `capture.artifacts`.
+
+Phase 1 evidence:
+
+- `workflow/software-delivery/validation.md` §Browser Evidence Collection now defines evidence-scoped Capture Envelope.
+- Shared metadata belongs under `capture.metadata`; artifact-specific metadata is local only when it differs.
+- Capture Envelope is explicitly not a full runtime environment descriptor.
 
 ## Phase 2 — Coverage Model Watch-List
 

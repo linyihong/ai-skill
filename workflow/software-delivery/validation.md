@@ -93,6 +93,32 @@ Outputs:
 - `interaction_trace`
 - `responsive_capture`
 
+Capture metadata:
+
+Browser evidence should be recorded through an evidence-scoped Capture Envelope when multiple artifacts come from the same browser observation. Shared metadata belongs to `capture.metadata`; artifact-specific metadata belongs under the artifact only when it differs from the shared capture context.
+
+```yaml
+capture:
+  metadata:
+    required:
+      viewport_width: 390
+      viewport_height: 844
+      orientation: portrait
+      render_context: mobile
+    optional:
+      dpr: 3
+      user_agent: mobile
+      emulation_profile: project-defined-mobile
+      safe_area: present
+  artifacts:
+    screenshot: <link>
+    dom_snapshot: <link>
+    interaction_trace: <link>
+    accessibility_scan: <link>
+```
+
+Evidence metadata exists to make collected artifacts reviewable. Do not grow the Capture Envelope into a full runtime environment descriptor: browser version, operating system, locale, timezone, network, CPU, or memory belong only when a specific evidence claim needs that field.
+
 Required responsive capture shape:
 
 ```yaml
