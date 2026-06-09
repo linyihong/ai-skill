@@ -750,6 +750,43 @@ func TestRunStopHookAllowsCursorSwitchModeTranscriptWithoutCloseOutLoop(t *testi
 	}
 }
 
+func TestRunStopHookAllowsCursorAssistantToolUseTurnWithoutCloseOutLoop(t *testing.T) {
+	dir := t.TempDir()
+	transcriptPath := filepath.Join(dir, "transcript.jsonl")
+	entry := map[string]any{
+		"role": "assistant",
+		"message": map[string]any{
+			"content": []map[string]any{
+				{"type": "text", "text": "Plan mode 切換完成，現在建立測試計畫。"},
+				{"type": "tool_use", "name": "CreatePlan", "input": map[string]any{
+					"name":     "plan mode retest",
+					"overview": "Retest non-final plan creation.",
+					"plan":     "# Plan Mode Retest\n",
+				}},
+			},
+		},
+	}
+	buf, err := json.Marshal(entry)
+	if err != nil {
+		t.Fatalf("marshal transcript entry: %v", err)
+	}
+	writeFile(t, transcriptPath, string(buf)+"\n")
+	setHookStdin(t, fmt.Sprintf(`{"hook_event_name":"stop","cursor_version":"3.4.17","transcript_path":%q}`, transcriptPath))
+
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := runStopHook(dir, &stdout, &stderr)
+	if code != ExitSuccess {
+		t.Fatalf("expected Cursor stop to allow assistant tool-use turn, got %d; stderr=%s", code, stderr.String())
+	}
+	if stdout.String() != "" {
+		t.Fatalf("expected no followup loop for assistant tool-use turn, got %s", stdout.String())
+	}
+	if !strings.Contains(stderr.String(), "ALLOW_CURSOR_ASSISTANT_TOOL_USE_TURN") {
+		t.Fatalf("expected assistant tool-use diagnostic, got %s", stderr.String())
+	}
+}
+
 func TestRunStopHookDoesNotTreatFinalMentioningSwitchModeAsToolStatus(t *testing.T) {
 	setHookStdin(t, `{"hook_event_name":"stop","assistant_response":"The earlier Cursor message said Switched to Plan mode, but this is my final answer without a close-out block."}`)
 

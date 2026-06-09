@@ -1668,6 +1668,12 @@ func runStopHook(projectDir string, stdout io.Writer, stderr io.Writer) int {
 		return validateStopHookFinalTexts(projectDir, texts, stdout, stderr, logFile, cursorStop)
 	}
 
+	if cursorStop && transcriptLatestAssistantHasToolUse(transcriptPath) {
+		_, _ = fmt.Fprintln(stderr, "ALLOW_CURSOR_ASSISTANT_TOOL_USE_TURN")
+		appendLog(logFile, "exit_code: 0 (cursor assistant turn contains tool_use; not a final close-out)")
+		return ExitSuccess
+	}
+
 	texts := extractAssistantTexts(transcriptPath)
 	if len(texts) == 0 {
 		return blockStopHookMissingAssistantText(stdout, stderr, logFile, transcriptPath, cursorStop)
@@ -1688,6 +1694,84 @@ func blockStopHookMissingAssistantText(stdout io.Writer, stderr io.Writer, logFi
 	}
 	appendLog(logFile, "decision: block (missing assistant text)")
 	return renderClaudeStopDecision(stdout, hookDecision{Deny: true, Reason: message})
+}
+
+func transcriptLatestAssistantHasToolUse(transcriptPath string) bool {
+	f, err := os.Open(transcriptPath)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+
+	var latest map[string]json.RawMessage
+	scanner := bufio.NewScanner(f)
+	scanner.Buffer(make([]byte, 2*1024*1024), 2*1024*1024)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
+		var entry map[string]json.RawMessage
+		if err := json.Unmarshal([]byte(line), &entry); err != nil {
+			continue
+		}
+		roleField := entry["type"]
+		if roleField == nil {
+			roleField = entry["role"]
+		}
+		var role string
+		if roleField != nil {
+			_ = json.Unmarshal(roleField, &role)
+		}
+		if role == "assistant" {
+			latest = entry
+		}
+	}
+	if latest == nil {
+		return false
+	}
+	return entryContainsToolUse(latest)
+}
+
+func entryContainsToolUse(entry map[string]json.RawMessage) bool {
+	var value interface{}
+	buf, err := json.Marshal(entry)
+	if err != nil {
+		return false
+	}
+	if err := json.Unmarshal(buf, &value); err != nil {
+		return false
+	}
+	return valueContainsToolUse(value)
+}
+
+func valueContainsToolUse(value interface{}) bool {
+	switch v := value.(type) {
+	case []interface{}:
+		for _, item := range v {
+			if valueContainsToolUse(item) {
+				return true
+			}
+		}
+	case map[string]interface{}:
+		if rawType, ok := v["type"].(string); ok && rawType == "tool_use" {
+			return true
+		}
+		if name := transcriptToolNameFromGenericMap(v); name != "" && !isStopHookAssistantTextKey(name) {
+			if _, hasInput := v["input"]; hasInput {
+				return true
+			}
+			if _, hasParams := v["parameters"]; hasParams {
+				return true
+			}
+		}
+		for _, child := range v {
+			if valueContainsToolUse(child) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func validateStopHookFinalTexts(projectDir string, texts []string, stdout io.Writer, stderr io.Writer, logFile string, cursorStop bool) int {
