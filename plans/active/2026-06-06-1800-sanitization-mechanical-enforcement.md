@@ -213,6 +213,8 @@ git pre-commit hook
 
 **設計決策**（resolved 2026-06-08）：採 `schema_version: 2`，每 subtree 必須有 `owner` + `purpose`。**移除** flat `expected_consumers` list（容易 stale → 又一個 stale-reference 失效模式）；改寫死 `consumer_tracking.strategy: code_reference` 把治理決策 freeze，避免欄位 6 個月後復活。
 
+**Phase 1B 落地 commit**（2026-06-09）：產出 `runtime/repository-topology-migration.md`（schema spec + migration trajectory）+ `scripts/ai-skill-cli/internal/app/repository_topology.go` (canonical loader supports v1 read / v2 read / v2 write) + `repository_topology_test.go` (14/14 pass, including live `runtime/repository-topology.yaml` v1 parses regression guard)。**嚴格未動** `runtime/repository-topology.yaml`（仍 v1 in production）、`runtime_compiler.go` line 339 projection rule、`sanitization_scan.go::repositoryTopologyRow`。YAML v1→v2 在線升級由 Phase 1C 跟 projection rewrite 同 commit 做（rationale: compiler line 339 hard-codes v1 field names；單獨升 YAML 會破 projection）。詳見 [`runtime/repository-topology-migration.md`](../../runtime/repository-topology-migration.md)。
+
 - [x] 新建 `runtime/repository-topology.yaml`（canonical cross-subsystem topology surface，**不掛 enforcement-registry**）：
 
   ```yaml
