@@ -35,6 +35,8 @@ UI Contract
 
 本 plan 的目的不是立即擴張 taxonomy，而是把後續設計壓力、open questions 與安全演化順序記錄下來，避免剛落地的 responsive gate 直接膨脹成 device matrix 或 Cartesian product。
 
+Although this plan originates from UI responsive validation, the emerging Coverage Model may eventually become a shared Validation Reasoning concept rather than a UI-specific taxonomy. API validation, runtime validation, workflow validation, and UI validation can all face the same question: which states, contexts, and evidence classes are covered well enough to support the completion claim?
+
 ## Decision Rationale
 
 ### Problem & Why Now
@@ -98,6 +100,7 @@ context:
 
 - Browser evidence artifacts 需要 capture metadata，避免 screenshot、DOM snapshot、interaction trace 或 accessibility scan 失去證據語境。這是最接近現有 workflow 壓力的第一優先。
 - Metadata ownership 應優先評估 Capture Envelope，而不是讓每個 artifact 重複貼 viewport metadata。
+- Capture Envelope is evidence-scoped. It records only metadata required to interpret collected evidence; it is not intended to become a full runtime environment descriptor.
 - Validation coverage model 應朝 State Coverage + Context Coverage + Evidence Coverage 觀察，不急著新增 executable gate。
 - `Responsive` 可能降為 cross-cutting `context.render` dimension。
 - `experience_context` 不採用為 active 名稱；未來若需要，優先設計 typed `context` taxonomy。
@@ -145,6 +148,7 @@ context:
 #### 風險
 
 - 若過早新增 generic `experience_contexts`，workflow 可能變成過重且無結構的 matrix checklist。
+- 若 Capture Envelope 未限制為 evidence-scoped，可能膨脹成第二個 runtime context schema（browser version、OS、locale、timezone、network、CPU、memory 等都被塞進 capture metadata）。
 - 若不記錄 open question，未來可能把 `Responsive` 當永久 domain，導致 dark mode / offline 等也被錯誤 domain 化。
 
 ## Priority Order
@@ -179,6 +183,12 @@ capture:
 ```
 
 Reasoning: without `viewport_width` / `viewport_height` / `orientation` / `render_context`, reviewers cannot tell whether evidence actually represents mobile, desktop, landscape, or another governed context. `dpr`, `user_agent`, `emulation_profile`, and `safe_area` improve trust for specific issues, but many reviews can still proceed without them.
+
+Capture Envelope boundary:
+
+- Evidence-scoped only: include metadata required to interpret the collected artifacts.
+- Not a runtime environment descriptor: do not grow it into browser / OS / locale / timezone / network / CPU / memory inventory unless a specific evidence claim requires that field.
+- Shared ownership: metadata that applies to the whole browser capture belongs in `capture.metadata`; artifact-specific metadata should stay under the artifact only when it differs from the shared capture context.
 
 Glossary Impact: yes — candidate terms: `context_taxonomy`, `validation_matrix`, `coverage_dimensions`, `viewport_metadata`; do not register until Phase 1 proves they are stable framework vocabulary rather than local plan terms.
 
@@ -247,7 +257,10 @@ Runtime validation remains `ai-skill runtime compile`, `ai-skill runtime refresh
 ## Phase 2 — Coverage Model Watch-List
 
 - [ ] Add a short coverage model note: UI validation is trending toward State Coverage + Context Coverage + Evidence Coverage.
-- [ ] Record whether Coverage Model appears UI-local or a candidate for shared Validation Reasoning.
+- [ ] Record that Coverage Model likely belongs to shared Validation Reasoning if API / runtime / workflow validation show the same state-context-evidence shape.
+- [ ] Inventory at least one non-UI example before proposing any shared model:
+  - API: success / error / timeout states; authenticated / anonymous contexts; response / logs / traces evidence.
+  - Runtime: startup / steady-state / shutdown states; single-node / multi-node contexts; metrics / logs / traces evidence.
 - [ ] Document candidate coverage dimensions without adding executable gates:
   - state: loading / empty / success / error
   - context: desktop / mobile / dark_mode / offline / keyboard_only / screen_reader
@@ -265,7 +278,15 @@ Runtime validation remains `ai-skill runtime compile`, `ai-skill runtime refresh
 
 - [ ] Inventory future scenarios involving dark mode, high zoom, keyboard-only, screen reader, low bandwidth, offline, touch-only, or localization.
 - [ ] Decide whether each scenario is best represented as domain, typed context, coverage dimension, or evidence coverage.
-- [ ] If 3+ examples support shared context modeling, draft an active typed Context Taxonomy update:
+- [ ] Only draft an active typed Context Taxonomy update if promotion evidence meets all gates:
+  - at least 3 context families are represented
+  - each represented family has multiple scenarios
+  - at least 2 workflow domains consume the taxonomy
+- [ ] Candidate context families must demonstrate cross-domain use before promotion, for example:
+  - render used by responsive and accessibility
+  - appearance used by accessibility and design-system
+  - environment used by behavior and runtime validation
+- [ ] If promotion evidence passes, draft the active taxonomy with typed families:
   - render
   - interaction
   - accessibility
