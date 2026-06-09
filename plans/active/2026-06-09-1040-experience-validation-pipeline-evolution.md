@@ -213,11 +213,12 @@ Runtime validation remains `ai-skill runtime compile`, `ai-skill runtime refresh
 
 - [ ] Should `Responsive` remain a governance domain, or become a cross-cutting `context.render` dimension composed with domains such as Accessibility, Behavior, Design System, and Contract?
 - [ ] Should the future context model be a typed `context` taxonomy with render / interaction / accessibility / environment / appearance / locale groups?
-- [x] What is the minimum capture metadata required for browser evidence to remain reviewable: viewport width/height, user agent, emulation/device profile, orientation, DPR, safe-area, render_context, or all of the above? — resolved provisionally in Phase 1: required = viewport width/height, orientation, render context; optional = DPR, user agent, emulation profile, safe area.
-- [x] Who owns evidence metadata: a shared Capture Envelope containing metadata plus artifacts, or per-artifact metadata under screenshot / DOM snapshot / accessibility scan / interaction trace? — resolved provisionally in Phase 1: shared Capture Envelope owns common capture metadata; artifact-specific metadata remains local only when it differs.
+- [x] What is the minimum capture metadata required for browser evidence to remain reviewable: viewport width/height, user agent, emulation/device profile, orientation, DPR, safe-area, render_context, or all of the above? — resolved (Phase 1 baseline): required = viewport width/height, orientation, render context; optional = DPR, user agent, emulation profile, safe area. Reopen only if future evidence needs safe-area, DPR, browser-specific, or similar metadata as required.
+- [x] Who owns evidence metadata: a shared Capture Envelope containing metadata plus artifacts, or per-artifact metadata under screenshot / DOM snapshot / accessibility scan / interaction trace? — resolved (Phase 1 baseline): shared Capture Envelope owns common capture metadata; artifact-specific metadata remains local only when it differs. Reopen only if future artifact examples show shared capture metadata causes ambiguity.
 - [ ] Should validation coverage be modeled explicitly as State Coverage + Context Coverage + Evidence Coverage?
 - [ ] Does Validation Coverage Model belong to UI workflow, or should it graduate to shared Validation Reasoning once API / runtime / workflow validation show the same coverage pressure?
 - [ ] How should matrix explosion be controlled: `required_contexts`, `optional_contexts`, `high_risk_contexts`, risk-triggered expansion, or another shape?
+- [ ] Should Capture Envelope remain browser-specific, or evolve into a generic Evidence Envelope shared across UI, API, runtime, and workflow validation?
 
 ## Phase 0 — Plan and Current-State Alignment
 
@@ -234,11 +235,12 @@ Runtime validation remains `ai-skill runtime compile`, `ai-skill runtime refresh
 |---|---|---|
 | Responsive domain vs context.render dimension | still-open | Needs post-gate usage evidence |
 | typed context taxonomy graduation | still-open | Explicitly deferred until Phase 2+ examples exist |
-| capture metadata minimum | resolved | Phase 1 defines required vs optional fields in `workflow/software-delivery/validation.md` |
-| evidence metadata ownership | resolved | Phase 1 chooses evidence-scoped Capture Envelope for shared metadata |
+| capture metadata minimum | resolved (Phase 1 baseline) | Phase 1 defines required vs optional fields in `workflow/software-delivery/validation.md`; reopen only for concrete safe-area / DPR / browser-specific evidence pressure |
+| evidence metadata ownership | resolved (Phase 1 baseline) | Phase 1 chooses evidence-scoped Capture Envelope for shared metadata; reopen only if artifact examples show ambiguity |
 | coverage dimensions model | still-open | Needs validation scenario pressure |
 | coverage model owner | still-open | Could remain UI-local or graduate to shared validation-reasoning |
 | matrix explosion control | still-open | Needs at least one expanded matrix example |
+| Capture Envelope vs Evidence Envelope | still-open | Needs non-browser evidence examples from API, runtime, or workflow validation |
 
 - [x] Read current `sd-ui-governance`, `sd-ui-contracts`, `sd-validation`, and `execution-flow.yaml`.
   - Evidence: prior responsive gate landing read/updated all four surfaces; this execution reread `sd-validation` before editing.
@@ -263,6 +265,7 @@ Phase 1 evidence:
 - `workflow/software-delivery/validation.md` §Browser Evidence Collection now defines evidence-scoped Capture Envelope.
 - Shared metadata belongs under `capture.metadata`; artifact-specific metadata is local only when it differs.
 - Capture Envelope is explicitly not a full runtime environment descriptor.
+- Metadata minimum and ownership are considered Phase 1 baseline decisions, not open design debates, unless future evidence introduces counterexamples.
 
 ## Phase 2 — Coverage Model Watch-List
 
@@ -299,7 +302,9 @@ Phase 3 evidence:
 ## Phase 4 — Typed Context Taxonomy Graduation Decision
 
 - [ ] Inventory future scenarios involving dark mode, high zoom, keyboard-only, screen reader, low bandwidth, offline, touch-only, or localization.
+- [ ] Inventory non-browser evidence envelopes, such as API captures with endpoint/auth context, runtime captures with node/cluster context, or workflow captures with route/execution context.
 - [ ] Decide whether each scenario is best represented as domain, typed context, coverage dimension, or evidence coverage.
+- [ ] Decide whether browser-specific Capture Envelope should remain local or graduate into generic Evidence Envelope after non-browser examples exist.
 - [ ] Only draft an active typed Context Taxonomy update if promotion evidence meets all gates:
   - at least 3 context families are represented
   - each represented family has multiple scenarios
