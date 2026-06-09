@@ -99,6 +99,12 @@ Browser Review invariants:
 - A mechanism may consume evidence from multiple collection methods.
 - Evidence acquisition must not imply validation success by itself.
 
+Visual reference review:
+
+- When a UI change cites a screenshot, mock, product reference, or design artifact, evaluate layout by relative proportions and visual anchors before applying fixed pixel offsets. Compare edge insets, element-to-surface ratios, alignment to safe areas, and relationship to nearby content rather than asking only whether the element is visible.
+- For mobile or constrained surfaces, verify proportional decisions with real viewport metrics such as DOM bounding boxes, computed styles, or device emulation. Headless screenshots can be misleading when the browser viewport, screenshot crop, or device scale does not match the target surface.
+- Do not encode project-specific pixel values as reusable guidance. Preserve the transferable rule: derive spacing from the reference's proportions, then validate the chosen implementation against the target viewport and interaction constraints.
+
 Future refinement: `collection_method` may later split from `collection_channel` if browser / human / telemetry channels need separate treatment. Do not add that fifth taxonomy layer in Phase 1.
 
 ## Validation Mechanisms
