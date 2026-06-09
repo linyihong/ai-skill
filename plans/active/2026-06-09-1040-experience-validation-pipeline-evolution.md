@@ -218,7 +218,7 @@ Runtime validation remains `ai-skill runtime compile`, `ai-skill runtime refresh
 - [ ] Should validation coverage be modeled explicitly as State Coverage + Context Coverage + Evidence Coverage?
 - [ ] Does Validation Coverage Model belong to UI workflow, or should it graduate to shared Validation Reasoning once API / runtime / workflow validation show the same coverage pressure?
 - [ ] How should matrix explosion be controlled: `required_contexts`, `optional_contexts`, `high_risk_contexts`, risk-triggered expansion, or another shape?
-- [ ] Should Capture Envelope remain browser-specific, or evolve into a generic Evidence Envelope shared across UI, API, runtime, and workflow validation?
+- [ ] Should Capture Envelope remain browser-specific, or evolve into a generic Evidence Envelope shared across UI, API, runtime, and workflow validation? — initial Phase 4 spike answer: keep browser-specific for now; non-browser examples are promising but not stable enough for promotion.
 
 ## Phase 0 — Plan and Current-State Alignment
 
@@ -240,7 +240,7 @@ Runtime validation remains `ai-skill runtime compile`, `ai-skill runtime refresh
 | coverage dimensions model | still-open | Needs validation scenario pressure |
 | coverage model owner | still-open | Could remain UI-local or graduate to shared validation-reasoning |
 | matrix explosion control | still-open | Needs at least one expanded matrix example |
-| Capture Envelope vs Evidence Envelope | still-open | Needs non-browser evidence examples from API, runtime, or workflow validation |
+| Capture Envelope vs Evidence Envelope | deferred after initial spike | Non-browser examples exist, but common shape is not stable enough; keep browser Capture Envelope local for now |
 
 - [x] Read current `sd-ui-governance`, `sd-ui-contracts`, `sd-validation`, and `execution-flow.yaml`.
   - Evidence: prior responsive gate landing read/updated all four surfaces; this execution reread `sd-validation` before editing.
@@ -302,9 +302,16 @@ Phase 3 evidence:
 ## Phase 4 — Typed Context Taxonomy Graduation Decision
 
 - [ ] Inventory future scenarios involving dark mode, high zoom, keyboard-only, screen reader, low bandwidth, offline, touch-only, or localization.
-- [ ] Inventory non-browser evidence envelopes, such as API captures with endpoint/auth context, runtime captures with node/cluster context, or workflow captures with route/execution context.
+- [x] Inventory non-browser evidence envelopes, such as API captures with endpoint/auth context, runtime captures with node/cluster context, or workflow captures with route/execution context.
+  - Evidence: `intelligence/engineering/execution/validation-reasoning/evidence-model.md` defines evidence type / confidence / scope / proves for non-browser API/log/database/user-observable evidence.
+  - Evidence: `intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md` defines claim → chain → segment evidence → gap/depth reasoning.
+  - Evidence: `validation/scenarios/software-delivery/ui-governance-static-runtime-acquisition.yaml` and `ui-governance-contract-readback-acquisition.yaml` show static/runtime/contract readback acquisition shape.
+  - Evidence: `validation/scenarios/runtime/workflow-detector-deterministic-match-v1.yaml` and `workflow-detector-conflict-resolution-v1.yaml` show runtime scenario transcript / constraints / trace / verification shape.
 - [ ] Decide whether each scenario is best represented as domain, typed context, coverage dimension, or evidence coverage.
-- [ ] Decide whether browser-specific Capture Envelope should remain local or graduate into generic Evidence Envelope after non-browser examples exist.
+- [x] Decide whether browser-specific Capture Envelope should remain local or graduate into generic Evidence Envelope after non-browser examples exist.
+  - Initial decision: keep browser-specific Capture Envelope local for now.
+  - Reason: browser Capture Envelope is artifact-bundle oriented; validation reasoning examples are claim/chain/scope/confidence oriented; runtime scenarios are replay/trace/verification oriented.
+  - Promotion risk: a generic envelope now would flatten artifact vs evaluation vs finding, or become a second runtime context schema.
 - [ ] Only draft an active typed Context Taxonomy update if promotion evidence meets all gates:
   - at least 3 context families are represented
   - each represented family has multiple scenarios
@@ -321,6 +328,28 @@ Phase 3 evidence:
   - appearance
   - locale
 - [ ] If examples remain one-off, keep the current Responsive domain model and close the plan with no taxonomy expansion.
+
+### Phase 4 Initial Evidence Envelope Spike
+
+Initial result: **do not promote generic Evidence Envelope yet**.
+
+Observed partial common shape:
+
+```text
+claim / task context
+  -> acquisition or source
+  -> artifacts, observations, traces, or chain segments
+  -> evaluation / verification
+  -> scope / confidence / result
+```
+
+Why this is not enough for promotion:
+
+- Browser Capture Envelope is centered on a single observation with shared capture metadata and multiple artifacts.
+- API / runtime / workflow examples need claim, propagation chain, trace, verification, scope, and confidence fields more than viewport-like metadata.
+- A generic Evidence Envelope would risk becoming too broad before non-browser examples prove a stable minimum schema.
+
+Future promotion should happen in shared validation reasoning, not UI workflow, and only after at least 3 non-browser examples converge on a minimal envelope shape.
 
 ## Completion Criteria
 
