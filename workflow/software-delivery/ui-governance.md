@@ -5,10 +5,10 @@
 | slice 欄位 | 值 |
 |---|---|
 | `id` | `sd-ui-governance` |
-| `purpose` | 在 UI / consumer contract 已存在或正在建立時，定義 UI compliance 如何被分類：governance domain、render context、collection method、validation mechanism、evidence class、severity policy 與 runtime projection boundary |
+| `purpose` | 在 UI / consumer contract 已存在或正在建立時，定義 UI compliance 如何被分類：governance domain、collection method、validation mechanism、evidence class、severity policy 與 runtime projection boundary |
 | `type` | `execution` |
-| `tags` | artifact-gate, ui, design-system, accessibility, behavior-governance, responsive, visual-validation |
-| `load_when` | UI / consumer surface 需要 design-system enforcement、accessibility evidence、responsive evidence、behavior pattern checks、visual baseline review、AI visual review scoping，或 completion claim 依賴 UI compliance |
+| `tags` | artifact-gate, ui, design-system, accessibility, behavior-governance, visual-validation |
+| `load_when` | UI / consumer surface 需要 design-system enforcement、accessibility evidence、behavior pattern checks、visual baseline review、AI visual review scoping，或 completion claim 依賴 UI compliance |
 | `do_not_load_when` | 無 user-visible consumer surface、純 provider 內部變更、只修不影響 UI behavior / contract / design-system compliance 的小錯 |
 | `owner_layer` | workflow |
 | `layer_justification` | 規定「UI compliance 評估前要分類哪些 domain、collection method、mechanism、evidence、severity，並保持 runtime projection advisory-only」的 ordering / gate；通過 workflow membership test。Phase 1 只擁有 UI-local taxonomy usage；長期 shared taxonomy owner 可能是 validation-reasoning |
@@ -42,7 +42,7 @@ Current scope: workflow governance only. Runtime signals are advisory projection
 
 Phase 1 owner boundary:
 
-- `sd-ui-governance` owns local UI compliance classification: domain, render context, collection method, validation mechanism, evidence class, severity, and policy scope.
+- `sd-ui-governance` owns local UI compliance classification: domain, collection method, validation mechanism, evidence class, severity, and policy scope.
 - `sd-validation` owns execution: acquiring evidence, running evaluation, and recording results.
 - Future shared `validation-reasoning` may own the cross-governance taxonomy if the same model proves useful for Architecture, Runtime, Documentation, or Security governance.
 
@@ -55,7 +55,6 @@ Governance domains answer what is being governed. Do not replace these with tool
 | Contract | Required UI states, screen actions, labels, traceability, consumer needs, view model projection | Missing loading/error/success state, missing label, untraceable screen action, unstable ViewModel derivation |
 | Design System | Tokenized style usage, approved primitives, component variants, layout constraints | Raw color/spacing/font when project policy requires tokens, custom component bypassing required primitive |
 | Accessibility | Keyboard, focus, semantics, labels, assistive feedback, contrast/motion expectations | Missing label, broken focus flow, missing role, objective contrast violation |
-| Responsive | Whether the same UI contract remains valid across declared render contexts | Mobile-only overflow, modal outside viewport, CTA hidden by keyboard, sticky header covering content, sidebar cannot collapse, touch target too small, safe-area or orientation failure |
 | Behavior | Interaction state transitions, validation feedback, destructive confirmation, retry/end-of-list/offline handling | Submit without loading state, delete without confirmation, retry path missing, permission denied state missing |
 | Closure | Whether UI governance evidence is linked into review, DoD, tests, or deferred scope | Completion claim without evidence class, unresolved UI governance blocker hidden as done |
 
@@ -69,28 +68,6 @@ Contract
 ```
 
 Keep this open until scenarios show whether separate handling improves routing or only adds taxonomy cost.
-
-## Render Contexts
-
-`render_context` answers where the same UI contract must continue to hold. It is a presentation / experience context, not a device inventory.
-
-```yaml
-supported_render_contexts:
-  - desktop
-  - tablet
-  - mobile
-  - narrow_mobile
-```
-
-Use context names before tool or hardware names. A validation suite may implement `mobile` with a browser viewport, a device emulation profile, a simulator, or a real device, but the governance finding should remain `domain: Responsive` + `render_context: mobile` rather than `device_testing: iPhone`.
-
-Longer term, `render_context` may become one family inside a typed context taxonomy, alongside interaction, accessibility, environment, appearance, or locale contexts. Do not promote that broader taxonomy until scenarios show it is needed outside responsive UI validation.
-
-Responsive domain downgrade watch:
-
-- Keep `Responsive` as a workflow-local governance domain while it helps route viewport-specific failures clearly.
-- Consider downgrading `Responsive` into a cross-cutting `context.render` dimension when most responsive failures are better explained as another governance domain evaluated under a render context, such as `domain: Accessibility` + `render_context: mobile`.
-- Do not introduce a broad context taxonomy until multiple context families and workflow domains consume it.
 
 ## Collection Methods
 
@@ -110,7 +87,7 @@ supported_collection_methods:
 | `contract_readback` | Screen / Consumer / ViewModel / Accessibility contract rows, generated surface readback, declared policy | deterministic mechanism, Closure domain |
 | `static_analysis` | Code/config/lint/build assertions, token usage, component primitive usage | deterministic mechanism |
 | `runtime_trace` | Component state, route behavior, UI event path, interaction trace | deterministic or manual review mechanisms |
-| `browser_review` | Screenshot, DOM snapshot, accessibility tree, interaction trace, responsive capture, observed interaction state | screenshot_diff, ai_review, deterministic accessibility, responsive, or behavior validation |
+| `browser_review` | Screenshot, DOM snapshot, accessibility tree, responsive capture, observed interaction state | screenshot_diff, ai_review, deterministic accessibility or behavior validation |
 | `human_observation` | Designer / reviewer observation, UX heuristic note, manual behavior evidence | manual_review mechanism, human_review evidence |
 
 Browser Review invariants:
@@ -181,7 +158,6 @@ Phase 1 warning: this list is provisional. It currently mixes evidence bodies (`
 | `accessibility_scan` | axe, Lighthouse, Pa11y | Strong objective evidence for accessibility gates |
 | `visual_diff` | Percy, Applitools, Chromatic, screenshot golden diff | Strong when baseline and capture are deterministic |
 | `screenshot` | Playwright screenshot, manual capture | Useful input; weaker unless paired with baseline or rubric |
-| `responsive_capture` | Per-context screenshot, DOM snapshot, viewport metrics, layout bounds, safe-area/focus/keyboard evidence | Strong when at least two required render contexts are captured and evaluated |
 | `ai_review` | vision model review output | Advisory by default; requires scoped criteria |
 | `human_review` | design review, UX heuristic review | Useful for subjective or strategic judgment; not mechanical by default |
 
@@ -210,11 +186,10 @@ Before claiming UI compliance, classify:
 
 | Field | Required answer |
 |---|---|
-| Domain | Contract, Design System, Accessibility, Responsive, Behavior, Closure |
-| Render context | desktop, tablet, mobile, narrow_mobile, not_applicable, or project-declared equivalent |
+| Domain | Contract, Design System, Accessibility, Behavior, Closure |
 | Collection method | contract_readback, static_analysis, runtime_trace, browser_review, human_observation |
 | Mechanism | deterministic, screenshot_diff, ai_review, manual_review |
-| Evidence class | contract, runtime, accessibility_scan, visual_diff, screenshot, responsive_capture, ai_review, human_review |
+| Evidence class | contract, runtime, accessibility_scan, visual_diff, screenshot, ai_review, human_review |
 | Severity | block_candidate, warn, research, not_applicable |
 | Project policy | token policy, component primitive policy, accessibility target, screenshot baseline, or not configured |
 | Deferred scope | explicit owner and reason when evidence is missing |
@@ -223,7 +198,6 @@ Before claiming UI compliance, classify:
 
 - Do not define a global design-token scale.
 - Do not add a runtime/enforcement rule_class in the first landing.
-- Do not treat responsive validation as a device SKU checklist. Govern the render context first; map it to tooling only during evidence acquisition.
 - Do not treat visual regression or AI review as governance domains.
 - Do not treat Browser Review as a governance domain, validation mechanism, or standalone validator.
 - Do not make AI visual review blocking without objective rubric, deterministic capture, and project opt-in.
