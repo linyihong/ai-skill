@@ -1,4 +1,4 @@
-version=repo-871abcd
-source_commit=871abcd
-built_at=2026-06-08T14:32:26Z
+version=repo-f543ab3
+source_commit=f543ab3
+built_at=2026-06-09T00:05:51Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
