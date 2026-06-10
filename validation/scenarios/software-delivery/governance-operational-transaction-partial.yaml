@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: governance-operational-transaction-partial
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
+source_phase: phase-2-scenario-first-validation
+
+given:
+  task_intent: "Mark an operational change complete after a deploy, migration, backfill, or cache rebuild command was started."
+  routing_entry: route.workflow.software-delivery
+  operation:
+    kind: migration
+    transaction_state:
+      started: true
+      partial: true
+      interrupted: true
+      resumed: false
+      completed: unknown
+      verified: false
+  evidence_present:
+    - command_started_log
+    - partial_progress_log
+  evidence_missing:
+    - final_state_readback
+    - resume_or_rollback_decision
+    - independent_verification
+
+when:
+  action: evaluate_operational_completion_claim
+
+then:
+  expected_load:
+    - workflow/software-delivery/closure.md
+    - workflow/software-delivery/validation.md
+    - intelligence/engineering/execution/README.md
+  expected_route:
+    - classify_operational_transaction_state
+    - reject_started_as_completed
+    - require_verified_final_state
+    - record_shared_execution_reasoning_candidate
+  expected_result: operational_transaction_closure_fail
+  forbidden_routes:
+    - treat_command_started_as_transaction_closed
+    - mark_partial_interrupted_operation_complete
+    - hide_unknown_final_state_in_closeout
+
+pre_source_wiring_expectation:
+  before_shared_execution_reasoning: FAIL
+  reason: "No shared execution reasoning document currently owns transaction state across deploy, migration, backfill, cache rebuild, import, and batch job operations."
+
+evidence:
+  current_expected_result: FAIL_BY_ABSENCE
+  routing_evidence:
+    - workflow/software-delivery/closure.md
+    - workflow/software-delivery/validation.md
+    - intelligence/engineering/execution/README.md
+    - plans/active/2026-06-10-1718-software-delivery-governance-invariants.md#Phase 1 Result — Placement Matrix

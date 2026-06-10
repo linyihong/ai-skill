@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: governance-workflow-escalation-pressure
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
+source_phase: phase-2-scenario-first-validation
+
+given:
+  task_intent: "Patch a small UI issue, then evidence reveals browser capability, side-effect authority, and critical journey impact."
+  routing_entry: route.workflow.software-delivery
+  initial_scope: ui_css_fix
+  discovered_evidence:
+    runtime_capability: clipboard_write_unavailable
+    side_effect: share_counter_incremented_on_click
+    journey_scope: invite_acceptance
+  evidence_missing:
+    - escalation_checkpoint
+    - validation_depth_reassessment
+    - journey_validation_scope
+
+when:
+  action: evaluate_scope_escalation_after_new_evidence
+
+then:
+  expected_load:
+    - workflow/software-delivery/intake.md
+    - workflow/software-delivery/test-strategy.md
+    - workflow/software-delivery/validation.md
+    - plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+  expected_route:
+    - classify_as_escalation_pressure
+    - require_complexity_reassessment
+    - route_to_runtime_capability_side_effect_and_journey_validation_surfaces
+  expected_result: escalation_pressure_routing_fail
+  forbidden_routes:
+    - continue_ui_fast_path_after_runtime_side_effect_evidence
+    - treat_escalation_as_local_checklist_item
+
+evidence:
+  current_expected_result: FAIL_BY_ABSENCE
+  routing_evidence:
+    - workflow/software-delivery/intake.md
+    - workflow/software-delivery/validation.md
+    - plans/active/2026-06-10-1718-software-delivery-governance-invariants.md#Phase 1 Result — Placement Matrix

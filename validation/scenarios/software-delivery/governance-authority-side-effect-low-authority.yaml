@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: governance-authority-side-effect-low-authority
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
+source_phase: phase-2-scenario-first-validation
+
+given:
+  task_intent: "Declare a side-effect feature successful because a low-authority event incremented a counter."
+  routing_entry: route.workflow.software-delivery
+  side_effect_claim:
+    action: share_or_payment_like_event
+    claimed_business_truth: business_effect_completed
+    observed_event: button_click_counter_incremented
+    authority_level: low
+  evidence_present:
+    - client_click_event
+    - local_counter_increment
+  evidence_missing:
+    - business_truth_owner
+    - durable_state_readback
+    - external_or_user_observable_confirmation
+
+when:
+  action: evaluate_side_effect_success_claim
+
+then:
+  expected_load:
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-depth.md
+  expected_route:
+    - classify_low_authority_side_effect_signal
+    - require_business_truth_owner
+    - require_durable_or_independent_observation
+    - report_authority_evidence_shape_fail
+  expected_result: authority_coupled_side_effect_validation_fail
+  forbidden_routes:
+    - treat_click_or_adapter_success_as_business_truth
+    - increment_metric_before_authoritative_event
+    - hardcode_share_count_as_framework_rule
+
+evidence:
+  current_expected_result: FAIL_BY_ABSENCE
+  routing_evidence:
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md
+    - plans/active/2026-06-10-1718-software-delivery-governance-invariants.md#Phase 1 Result — Placement Matrix

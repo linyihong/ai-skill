@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: governance-configuration-readback-stale-runtime
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
+source_phase: phase-2-scenario-first-validation
+
+given:
+  task_intent: "Declare deployment configuration correct because the desired environment variable was edited."
+  routing_entry: route.workflow.software-delivery
+  configuration_claim:
+    desired_config: PUBLIC_BASE_URL=https://example.invalid
+    input_file_updated: true
+    runtime_state_read_back: false
+    deployed_state: stale_or_unknown
+  evidence_present:
+    - config_input_diff
+    - deployment_command_started
+  evidence_missing:
+    - runtime_config_readback
+    - deployed_endpoint_observation
+    - user_visible_or_api_state_confirmation
+
+when:
+  action: evaluate_configuration_applied_claim
+
+then:
+  expected_load:
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+    - intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md
+  expected_route:
+    - classify_configuration_readback_gap
+    - require_actual_runtime_state_readback
+    - keep_as_state_visibility_evidence_shape
+    - report_configuration_readback_validation_fail
+  expected_result: configuration_readback_validation_fail
+  forbidden_routes:
+    - treat_config_input_as_deployed_state
+    - treat_deploy_command_as_runtime_readback
+
+evidence:
+  current_expected_result: FAIL_BY_ABSENCE
+  routing_evidence:
+    - workflow/software-delivery/validation.md
+    - intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md
+    - plans/active/2026-06-10-1718-software-delivery-governance-invariants.md#Phase 1 Result — Placement Matrix

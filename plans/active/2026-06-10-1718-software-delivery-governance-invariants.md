@@ -352,17 +352,34 @@ Not applicable / missing source notes:
 
 ## Phase 2 — Scenario-First Validation
 
-- [ ] Add scenario: runtime capability assumed supported but unavailable fallback is missing -> expected `runtime-capability-validation` failure.
-- [ ] Add scenario: workflow exists but is not activated for a surface-level UI task -> expected activation pressure / routing failure routed to Workflow Activation Discovery Bridge.
-- [ ] Add scenario: task starts as UI but evidence reveals browser capability / side effect / journey scope and workflow does not escalate -> expected escalation pressure / routing failure.
-- [ ] Add scenario: patch is made without explicit root-cause hypothesis despite ambiguous evidence -> expected evidence acquisition / diagnostic checkpoint failure.
-- [ ] Add scenario: change set exceeds declared task scope before commit -> expected `task-scope-validation` failure.
-- [ ] Add scenario: change set crosses repo or owner boundary without explicit ownership awareness -> expected `ownership-awareness` failure.
-- [ ] Add scenario: side-effect counter increments on low-authority event while business truth is not confirmed -> expected authority evidence-shape failure.
-- [ ] Add scenario: deployment config input is correct but runtime readback shows stale/wrong value -> expected configuration readback evidence-shape failure.
-- [ ] Add scenario: deploy, migration, backfill, or cache rebuild is started/interrupted/partial without verified final state -> expected operational transaction closure placement evidence.
-- [ ] Add scenario: component/API smoke passes but post-deploy journey fails -> expected existing Journey Validation failure, not new journey taxonomy.
-- [ ] Verify scenarios fail-by-absence before workflow implementation, unless Phase 2 is explicitly marked doc-only spike.
+- [x] Add scenario: runtime capability assumed supported but unavailable fallback is missing -> expected `runtime-capability-validation` failure.
+- [x] Add scenario: workflow exists but is not activated for a surface-level UI task -> expected activation pressure / routing failure routed to Workflow Activation Discovery Bridge.
+- [x] Add scenario: task starts as UI but evidence reveals browser capability / side effect / journey scope and workflow does not escalate -> expected escalation pressure / routing failure.
+- [x] Add scenario: patch is made without explicit root-cause hypothesis despite ambiguous evidence -> expected evidence acquisition / diagnostic checkpoint failure.
+- [x] Add scenario: change set exceeds declared task scope before commit -> expected `task-scope-validation` failure.
+- [x] Add scenario: change set crosses repo or owner boundary without explicit ownership awareness -> expected `ownership-awareness` failure.
+- [x] Add scenario: side-effect counter increments on low-authority event while business truth is not confirmed -> expected authority evidence-shape failure.
+- [x] Add scenario: deployment config input is correct but runtime readback shows stale/wrong value -> expected configuration readback evidence-shape failure.
+- [x] Add scenario: deploy, migration, backfill, or cache rebuild is started/interrupted/partial without verified final state -> expected operational transaction closure placement evidence.
+- [x] Add scenario: component/API smoke passes but post-deploy journey fails -> expected existing Journey Validation failure, not new journey taxonomy.
+- [x] Verify scenarios fail-by-absence before workflow implementation, unless Phase 2 is explicitly marked doc-only spike.
+
+### Phase 2 Result — Scenario Files
+
+All Phase 2 scenarios are scenario-first inputs. They intentionally record `current_expected_result: FAIL_BY_ABSENCE` because Phase 3 workflow docs and any future executable gates have not been implemented yet.
+
+| Scenario | Covers | Expected failure |
+|---|---|---|
+| `validation/scenarios/software-delivery/governance-runtime-capability-missing-fallback.yaml` | runtime capability breadth / fallback | `runtime_capability_validation_fail` |
+| `validation/scenarios/software-delivery/governance-workflow-activation-pressure.yaml` | activation as routing pressure | `activation_pressure_routing_fail` |
+| `validation/scenarios/software-delivery/governance-workflow-escalation-pressure.yaml` | escalation as routing pressure | `escalation_pressure_routing_fail` |
+| `validation/scenarios/software-delivery/governance-root-cause-hypothesis-missing.yaml` | evidence acquisition / diagnostic discipline | `root_cause_hypothesis_missing` |
+| `validation/scenarios/software-delivery/governance-task-scope-overreach.yaml` | task scope overreach | `task_scope_validation_fail` |
+| `validation/scenarios/software-delivery/governance-ownership-awareness-cross-boundary.yaml` | ownership boundary awareness | `ownership_awareness_fail` |
+| `validation/scenarios/software-delivery/governance-authority-side-effect-low-authority.yaml` | authority-coupled side-effect evidence | `authority_coupled_side_effect_validation_fail` |
+| `validation/scenarios/software-delivery/governance-configuration-readback-stale-runtime.yaml` | configuration readback / State Visibility Gap | `configuration_readback_validation_fail` |
+| `validation/scenarios/software-delivery/governance-operational-transaction-partial.yaml` | operational transaction closure placement | `operational_transaction_closure_fail` |
+| `validation/scenarios/software-delivery/governance-post-deploy-journey-smoke-fail.yaml` | post-deploy journey validation via existing Journey Validation | `post_deploy_journey_validation_fail` |
 
 ## Phase 3 — Workflow Documentation Update
 
@@ -396,34 +413,34 @@ Not applicable / missing source notes:
 
 ## 完成條件
 
-- [ ] Incident feedback is transformed into reusable governance invariants rather than one-off rules.
-- [ ] Activation / escalation feedback is routed to the correct plan or represented only as evidence pressure here.
-- [ ] Explicit root-cause hypothesis has a placement decision and is not forced into software-delivery if shared evidence acquisition is the better owner.
-- [ ] Task scope and ownership boundary are merged or deliberately split with evidence.
-- [ ] `claim_validation` remains hypothesis-only unless structural identity is proven across at least three invariants.
+- [x] Incident feedback is transformed into reusable governance invariants rather than one-off rules.
+- [x] Activation / escalation feedback is routed to the correct plan or represented only as evidence pressure here.
+- [x] Explicit root-cause hypothesis has a placement decision and is not forced into software-delivery if shared evidence acquisition is the better owner.
+- [x] Task scope and ownership boundary are merged or deliberately split with evidence.
+- [x] `claim_validation` remains hypothesis-only unless structural identity is proven across at least three invariants.
 - [ ] `operational-transaction-closure` has a placement decision: software-delivery workflow, shared execution reasoning, or deferred.
-- [ ] Each invariant has an owner surface, a deferred reason, or a shared-reasoning promotion decision.
-- [ ] At least 3 validation scenarios cover distinct failure families before executable workflow changes.
-- [ ] Workflow docs do not duplicate existing State Visibility Gap, Journey Validation, or Evidence Chain guidance.
-- [ ] No generic runtime schema or context taxonomy is added without named consumers.
-- [ ] `plans/README.md` status row is updated.
+- [x] Each invariant has an owner surface, a deferred reason, or a shared-reasoning promotion decision.
+- [x] At least 3 validation scenarios cover distinct failure families before executable workflow changes.
+- [x] Workflow docs do not duplicate existing State Visibility Gap, Journey Validation, or Evidence Chain guidance.
+- [x] No generic runtime schema or context taxonomy is added without named consumers.
+- [x] `plans/README.md` status row is updated.
 
 ## Stakeholder 同意項目
 
-- [ ] Do not add per-browser-API fallback rules.
-- [ ] Do not add UI fast path as a bypass around workflow activation.
-- [ ] Treat activation / escalation as routing pressure unless Phase 0 proves they are software-delivery invariants.
-- [ ] Prefer workflow escalation / complexity reassessment over checklist sprawl.
-- [ ] Treat explicit root-cause hypothesis as evidence acquisition discipline unless Phase 0 places it elsewhere.
-- [ ] Do not assume task boundary and ownership boundary are the same concept; Phase 0 must decide whether to split them.
-- [ ] Do not introduce `claim_validation` as a parent abstraction unless at least three invariants share identical validation structure.
-- [ ] Treat evidence sufficiency as the check for whether validation proof is enough, not as another smoke-test checklist.
-- [ ] Extract `runtime-capability-validation` instead of `browser-capability-fallback`.
-- [ ] Extract `authority-coupled-side-effects` instead of low-level side-effect counter semantics.
-- [ ] Extract `configuration-readback-validation` instead of deploy-env input checks.
-- [ ] Extract task-scope / ownership-boundary guidance instead of nested-repo-only Git checks.
-- [ ] Keep `operational-transaction-closure` as a first-class candidate.
-- [ ] Treat browser smoke tests as journey-level post-deploy validation when a user flow is at stake.
+- [x] Do not add per-browser-API fallback rules.
+- [x] Do not add UI fast path as a bypass around workflow activation.
+- [x] Treat activation / escalation as routing pressure unless Phase 0 proves they are software-delivery invariants.
+- [x] Prefer workflow escalation / complexity reassessment over checklist sprawl.
+- [x] Treat explicit root-cause hypothesis as evidence acquisition discipline unless Phase 0 places it elsewhere.
+- [x] Do not assume task boundary and ownership boundary are the same concept; Phase 0 must decide whether to split them.
+- [x] Do not introduce `claim_validation` as a parent abstraction unless at least three invariants share identical validation structure.
+- [x] Treat evidence sufficiency as the check for whether validation proof is enough, not as another smoke-test checklist.
+- [x] Extract `runtime-capability-validation` instead of `browser-capability-fallback`.
+- [x] Extract `authority-coupled-side-effects` instead of low-level side-effect counter semantics.
+- [x] Extract `configuration-readback-validation` instead of deploy-env input checks.
+- [x] Extract task-scope / ownership-boundary guidance instead of nested-repo-only Git checks.
+- [x] Keep `operational-transaction-closure` as a first-class candidate.
+- [x] Treat browser smoke tests as journey-level post-deploy validation when a user flow is at stake.
 
 ## Per-surface consumer 表
 

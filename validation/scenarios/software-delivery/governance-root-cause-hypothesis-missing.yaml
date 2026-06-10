@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: governance-root-cause-hypothesis-missing
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P2
+source_plan: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
+source_phase: phase-2-scenario-first-validation
+
+given:
+  task_intent: "Patch an ambiguous production defect after observing only the downstream UI symptom."
+  routing_entry: route.workflow.software-delivery
+  diagnostic_state:
+    observed_symptom: ui_state_wrong
+    evidence_chain:
+      api: confirmed
+      database: missing
+      ssr: not_observed
+      ui: contradicted
+    collapse_point: database
+    root_cause_hypothesis: missing
+  evidence_present:
+    - downstream_symptom
+    - partial_evidence_chain
+  evidence_missing:
+    - explicit_root_cause_hypothesis
+    - evidence_supporting_hypothesis
+    - validation_plan_for_patch
+
+when:
+  action: evaluate_patch_before_diagnostic_hypothesis
+
+then:
+  expected_load:
+    - intelligence/engineering/execution/validation-reasoning/evidence-collapse-point.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md
+    - workflow/software-delivery/validation.md
+  expected_route:
+    - classify_as_evidence_acquisition_discipline
+    - require_hypothesis_before_patch
+    - reject_downstream_symptom_as_root_cause
+  expected_result: root_cause_hypothesis_missing
+  forbidden_routes:
+    - patch_ui_symptom_without_hypothesis
+    - treat_collapse_point_as_root_cause
+    - promote_root_cause_hypothesis_to_delivery_invariant
+
+evidence:
+  current_expected_result: FAIL_BY_ABSENCE
+  routing_evidence:
+    - intelligence/engineering/execution/validation-reasoning/evidence-collapse-point.md
+    - workflow/software-delivery/validation.md
+    - plans/active/2026-06-10-1718-software-delivery-governance-invariants.md#Phase 1 Result — Placement Matrix

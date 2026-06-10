@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: governance-post-deploy-journey-smoke-fail
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
+source_phase: phase-2-scenario-first-validation
+
+given:
+  task_intent: "Accept a release because component smoke tests and API health checks pass after deploy."
+  routing_entry: route.workflow.software-delivery
+  post_deploy_claim:
+    component_smoke: pass
+    api_health: pass
+    critical_journey: membership_purchase
+  journey_specification:
+    source: tests/bdd
+    journey:
+      name: membership_purchase
+      criticality: critical
+      criticality_reason:
+        - revenue
+        - entitlement
+      expected_outcomes:
+        - membership_active
+        - playback_allowed
+      observable_evidence:
+        - profile_membership_readback
+        - protected_resource_access
+  journey_execution:
+    membership_active: fail
+    playback_allowed: fail
+
+when:
+  action: evaluate_post_deploy_smoke_completion_claim
+
+then:
+  expected_load:
+    - workflow/software-delivery/test-strategy.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+    - workflow/software-delivery/review-checklist.md
+  expected_route:
+    - keep_component_smoke_as_partial_scope
+    - execute_existing_journey_validation
+    - report_post_deploy_journey_validation_fail
+  expected_result: post_deploy_journey_validation_fail
+  forbidden_routes:
+    - create_new_journey_taxonomy_for_smoke_tests
+    - treat_component_or_api_smoke_as_critical_journey_pass
+
+evidence:
+  current_expected_result: FAIL_BY_ABSENCE
+  routing_evidence:
+    - workflow/software-delivery/test-strategy.md#Journey Specification
+    - workflow/software-delivery/validation.md#Journey Validation
+    - workflow/software-delivery/artifact-gates.md#Journey Validation Evidence Shape
+    - plans/active/2026-06-10-1718-software-delivery-governance-invariants.md#Phase 1 Result — Placement Matrix

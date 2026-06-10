@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: governance-workflow-activation-pressure
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
+source_phase: phase-2-scenario-first-validation
+
+given:
+  task_intent: "Review a surface-level UI fix that actually changes a software-delivery workflow-owned surface."
+  routing_entry: route.workflow.software-delivery
+  detector_state: miss
+  workflow_needed:
+    - workflow/software-delivery/intake.md
+    - workflow/software-delivery/validation.md
+  evidence_present:
+    - user_mentions_ui_fix
+    - changed_file_is_consumer_surface
+  evidence_missing:
+    - software_delivery_workflow_loaded
+    - discovery_bridge_advisory
+
+when:
+  action: evaluate_missed_workflow_activation
+
+then:
+  expected_load:
+    - plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+    - workflow/software-delivery/execution-flow.yaml
+  expected_route:
+    - classify_as_routing_pressure
+    - route_detector_miss_to_discovery_bridge
+    - keep_software_delivery_plan_from_defining_local_activation_logic
+  expected_result: activation_pressure_routing_fail
+  forbidden_routes:
+    - create_software_delivery_local_activation_rule
+    - treat_activation_pressure_as_validation_invariant
+
+evidence:
+  current_expected_result: FAIL_BY_ABSENCE
+  routing_evidence:
+    - plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+    - workflow/software-delivery/execution-flow.yaml
+    - plans/active/2026-06-10-1718-software-delivery-governance-invariants.md#Phase 1 Result — Placement Matrix
