@@ -344,9 +344,9 @@ git pre-commit hook
 >
 > **Invariant（observation-stage）**：只有 compile-authoritative source（shared-layer / tracked / runtime-index `sources` row）可阻塞 compile；non-authoritative source（`shared_layer:false` / `owner:project-local` / untracked）只能 warn。分類靠 topology v2 —— 若 `shared_layer:true|false` 最終都 compile fail，topology 的 path-classification 治理價值在最該發揮的時刻被削弱。
 >
-> **落地時機**：待 Failure Authority invariant 成立後，於 **Phase 4**（authority classifier 首次接線處）讓 `.agent-goals/`-class malformed metadata 自然降級為 warning；**不採** sanitization scanner 內的 `.agent-goals/` 特例 hack。
+> **落地方向（dependency inversion，2026-06-10 確認）**：不從 Finding A 推導 classifier，而從 invariant 推導。Build order = (1) 寫完 Failure Authority family observation → (2) 由 invariant 定義 `isCompileAuthoritative(path)` classifier → (3) Finding A 作為該 classifier 的 **Executor #1** 落地。如此 Discovery / Runtime Index / 未來 compiler surface 共用同一 classifier，而非各自散落的 authority 判斷。**不採** sanitization scanner 內的 `.agent-goals/` 特例 hack。詳見 [`governance/lifecycle/governance-pattern-library-draft.md`](../../governance/lifecycle/governance-pattern-library-draft.md) §"Dependency inversion — Finding A is an executor"。
 
-- [ ] **Finding A 落地（Phase 4，blocked on Failure Authority invariant）**：`compileProjectMetadataDerived` 的 hard-fail 改 topology-scoped —— Class A（authoritative）hard-fail、Class B（non-authoritative）warn-only
+- [ ] **Finding A 落地（Failure Authority Executor #1，Phase 4 或 classifier 首次接線處）**：`compileProjectMetadataDerived` 改用 `isCompileAuthoritative(path)` —— authoritative → hard-fail、non-authoritative（`shared_layer:false` / `.agent-goals/`）→ warn-only。落地同時成為 family 第 4 個 sample，推進 N≥5 promotion gate。
 
 ### Phase 2 — Generic Regex Patterns (inherited from superseded plan)
 

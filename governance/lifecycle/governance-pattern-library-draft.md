@@ -182,6 +182,36 @@ pipeline halts" — regardless of whether the file is an authoritative input to
 > sources may block runtime compilation (or a commit gate). *Non-authoritative*
 > sources may emit warnings, but must not prevent runtime generation.
 
+Canonical decision shape (the recurring control flow, abstracted from any one subsystem):
+
+```
+event failure (invalid / drift / miss)
+        │
+        ▼
+classify authority of the SOURCE
+        │
+   ┌────┴────┐
+authoritative   non-authoritative
+   │                │
+ FAIL             WARN
+```
+
+Illustrative structured form (NOT a projected/canonical surface yet — promotion
+to a machine-readable invariant is gated; this is the shape it would take):
+
+```yaml
+# illustrative — lives in the draft until the gate passes
+invariant:
+  name: failure-authority
+  classify: source            # not: presence, not: validity
+  rule:
+    authoritative:     fail   # may block compile / commit
+    non_authoritative: warn   # may warn, must not block
+```
+
+The pivot is *classify the source's authority, not the input's validity*. A file
+can be 100% invalid and still have no standing to halt the pipeline.
+
 Source classification rides on **topology v2** (`runtime/repository-topology.yaml`),
 which is exactly what gives that classification governance value:
 
@@ -199,9 +229,13 @@ loses most of its governance value at the one moment it should matter most.
 
 | # | Subsystem | Authoritative source (may block) | Non-authoritative source (must not block) | Invariant currently holds? |
 |---|---|---|---|---|
-| 1 | Runtime Index Freshness | files with a `sources` row in `runtime-index.sqlite` | files *without* a source row ("outside this validator's freshness scope" — core-bootstrap.yaml runtime_index_freshness rationale) | ✅ holds — scoping is explicit |
-| 2 | Workflow Activation gate | a single locked `active_route` inside the repo | detector miss / multi-route conflict / routing registry unresolvable / running outside the repo → **fails open** | ✅ holds — fail-open is documented safety |
-| 3 | Sanitization metadata (Phase 1D) | malformed shared-layer `.ai-skill-project.yaml` | malformed `.agent-goals/…` (`shared_layer:false`) project-local metadata | ❌ **violated today** — hard-fail is repo-wide (Finding A) |
+| 1 | Workflow Activation / Discovery Bridge | a single locked `active_route` inside the repo | detector miss / multi-route conflict / routing registry unresolvable / running outside the repo → gate **fails open**; Discovery fallback is advisory-only and never blocks | ✅ holds — non-authoritative failure must not halt the system |
+| 2 | Runtime Index Freshness | files with a `sources` row in `runtime-index.sqlite` | files *without* a source row ("outside this validator's freshness scope" — core-bootstrap.yaml runtime_index_freshness rationale) | ✅ holds — not every source row has standing to fail compile; only registered ones |
+| 3 | Project Metadata Compile (Sanitization Phase 1D) | malformed shared-layer `.ai-skill-project.yaml` | malformed `.agent-goals/…` (`shared_layer:false`) project-local metadata | ❌ **violated today** — hard-fail is repo-wide (Finding A) |
+
+These are the three the framework has *already* surfaced; #1 and #2 honour the
+invariant, #3 violates it — confirming the rule is descriptive of existing
+intent, not invented for this one case.
 
 Sample #3 is the live counter-instance: the Phase 1D hard-fail (which correctly
 closed the silent-skip gap) currently blocks compile for *any* malformed
@@ -223,14 +257,52 @@ so #3 is the outlier to bring into line, not a new behaviour to invent.
 - [ ] **Bootstrap receipt gate**: is "no receipt" a Failure Authority decision (the session is authoritative) or a different family entirely?
 - [ ] Does Runtime Index sample #1 *really* warn (vs silently ignore) non-authoritative drift? If it silently ignores rather than warns, the invariant's "warn only" half is unproven and may need softening to "must not block (warning optional)".
 
-### Relationship to the binding decision
+### Dependency inversion — Finding A is an executor, not the cause
 
-The sanitization plan's Finding A is **not** resolved by editing the scanner in
-that plan. It is deferred to a Failure-Authority-governed decision: if this
-invariant holds up, `.agent-goals/`-class malformed metadata should *naturally*
-degrade to a warning, and the fix belongs at Phase 4 (or wherever the authority
-classifier is first wired), not as a one-off `.agent-goals/` special-case. See
-plan 2026-06-06-1800 §"Phase 1D review — Finding A".
+The direction of derivation matters more than the fix itself. The wrong order
+treats the classifier as a patch for one bug:
+
+```
+Finding A  →  Authority Classifier        (bug-driven; classifier is a special-case)
+```
+
+The right order derives the classifier from the invariant, and Finding A becomes
+the invariant's *first executor*:
+
+```
+Failure Authority invariant
+        ↓
+Authority Classifier            e.g. isCompileAuthoritative(path string) bool
+        ↓
+Executor #1: Project Metadata Compile   (the Finding A fix)
+Executor #2: (future) any new compiler / commit surface reuses the same classifier
+```
+
+So the materialised fix is not "special-case `.agent-goals/`", it is:
+
+```go
+if !isCompileAuthoritative(path) {
+    warn(...)
+    continue          // non-authoritative: may warn, must not block
+}
+return error          // authoritative: may fail
+```
+
+Consequence: Discovery, Runtime Index, and any future compiler surface inherit
+the *same* classifier rather than re-deciding "who may block" ad hoc. That is the
+ROI argument for building the invariant first — the alternative leaves three
+near-identical authority decisions scattered and divergent.
+
+**Sequencing (this is the agreed build order, not yet executed):**
+
+1. Complete this family observation (← this section; the invariant + 3 samples).
+2. Define the Authority Classifier *from the invariant* (topology-backed
+   `isCompileAuthoritative`), not from Finding A.
+3. Land Finding A as Executor #1 of the classifier. It then also becomes the 4th
+   sample that moves this family toward its N≥5 promotion gate.
+
+See plan 2026-06-06-1800 §"Phase 1D review — Finding A" for the deferred fix and
+plan 2026-06-08-2100 for the incubator gate.
 
 ### Cross-link forward
 
