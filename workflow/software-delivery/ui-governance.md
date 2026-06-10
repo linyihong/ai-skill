@@ -87,7 +87,7 @@ supported_collection_methods:
 | `contract_readback` | Screen / Consumer / ViewModel / Accessibility contract rows, generated surface readback, declared policy | deterministic mechanism, Closure domain |
 | `static_analysis` | Code/config/lint/build assertions, token usage, component primitive usage | deterministic mechanism |
 | `runtime_trace` | Component state, route behavior, UI event path, interaction trace | deterministic or manual review mechanisms |
-| `browser_review` | Screenshot, DOM snapshot, accessibility tree, responsive capture, observed interaction state | screenshot_diff, ai_review, deterministic accessibility or behavior validation |
+| `browser_review` | Screenshot, DOM snapshot, accessibility tree, responsive capture, observed interaction state, route/history trace, focus and navigation state | screenshot_diff, ai_review, deterministic accessibility or behavior validation |
 | `human_observation` | Designer / reviewer observation, UX heuristic note, manual behavior evidence | manual_review mechanism, human_review evidence |
 
 Browser Review invariants:
@@ -98,6 +98,7 @@ Browser Review invariants:
 - A collection method may support multiple mechanisms.
 - A mechanism may consume evidence from multiple collection methods.
 - Evidence acquisition must not imply validation success by itself.
+- When UI behavior changes navigation, route entry, modal-to-page transitions, deep-link fallback, or browser history expectations, browser review must acquire a route/history trace or equivalent E2E evidence; screenshots or static code markers are insufficient proof of back-stack behavior.
 
 Visual reference review:
 

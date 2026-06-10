@@ -269,6 +269,7 @@ Phase 1 evidence:
 - Capture Envelope is explicitly not a full runtime environment descriptor.
 - Metadata minimum and ownership are considered Phase 1 baseline decisions, not open design debates, unless future evidence introduces counterexamples.
 - Project feedback from an H5 fixed-bottom tab issue: required capture metadata stayed stable (`viewport_width`, `viewport_height`, `orientation`, `render_context`), but the claim needed optional visual viewport / bottom-frame evidence because `document` dimensions alone did not explain a user-visible iPhone browser frame problem. This supports keeping Capture Envelope evidence-scoped and adding claim-specific optional metadata instead of expanding a typed Context Taxonomy.
+- Project feedback from an H5 player-to-drama navigation issue: static route/component markers proved the contract existed, but did not prove browser history behavior. The useful evidence was a real browser interaction trace: open player, open episode sheet, click drama title, reach `/drama/:id`, click detail back, and verify return to the original `/player/:episodeId`. This supports treating route/history trace as a browser evidence artifact, not as screenshot/RWD-only evidence.
 
 ## Phase 2 — Coverage Model Watch-List
 
@@ -287,6 +288,7 @@ Phase 2 evidence:
 
 - `workflow/software-delivery/validation.md` §Validation Coverage Model Watch-List now documents state / context / evidence coverage.
 - The note explicitly remains non-executable and points shared promotion toward validation reasoning if API / runtime / workflow examples prove reuse.
+- The Vidoe-Test player-to-drama navigation pilot adds interaction-context pressure: the governed state is route/history/back-stack behavior, the high-risk context is a specific entrypoint (`player episode sheet -> drama detail`), and the evidence is a browser route/history interaction trace. This strengthens the Coverage Model watch-list without requiring a new runtime gate.
 
 ## Phase 3 — Responsive Domain Decision
 
@@ -304,7 +306,7 @@ Phase 3 evidence:
 
 ## Phase 4 — Typed Context Taxonomy Graduation Decision
 
-- [ ] Inventory future scenarios involving dark mode, high zoom, keyboard-only, screen reader, low bandwidth, offline, touch-only, or localization.
+- [ ] Inventory future scenarios involving dark mode, high zoom, keyboard-only, screen reader, low bandwidth, offline, touch-only, route/history back-stack behavior, or localization.
 - [x] Inventory non-browser evidence envelopes, such as API captures with endpoint/auth context, runtime captures with node/cluster context, or workflow captures with route/execution context.
   - Evidence: `intelligence/engineering/execution/validation-reasoning/evidence-model.md` defines evidence type / confidence / scope / proves for non-browser API/log/database/user-observable evidence.
   - Evidence: `intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md` defines claim → chain → segment evidence → gap/depth reasoning.
@@ -323,6 +325,7 @@ Phase 3 evidence:
   - render used by responsive and accessibility
   - appearance used by accessibility and design-system
   - environment used by behavior and runtime validation
+  - interaction used by UI behavior navigation and accessibility / input-modality validation
 - [ ] If promotion evidence passes, draft the active taxonomy with typed families:
   - render
   - interaction
@@ -350,6 +353,7 @@ Why this is not enough for promotion:
 
 - Browser Capture Envelope is centered on a single observation with shared capture metadata and multiple artifacts.
 - Fixed-bottom UI evidence showed a useful claim-specific extension: visual viewport and bottom-frame measurements can belong to the browser capture artifact/optional metadata without changing the required metadata set.
+- Player-to-drama navigation evidence showed another useful claim-specific extension: route/history trace can belong to the browser capture artifacts without turning Capture Envelope into a generic runtime context or environment schema.
 - API / runtime / workflow examples need claim, propagation chain, trace, verification, scope, and confidence fields more than viewport-like metadata.
 - A generic Evidence Envelope would risk becoming too broad before non-browser examples prove a stable minimum schema.
 
@@ -365,7 +369,7 @@ Observed result:
 - The pilot reinforced the Coverage Model direction: the journey consumed state coverage (`membership_active`, `playback_allowed`), context coverage (`authenticated_user`), and evidence coverage (DB readback, payment event, authenticated record/profile evidence, protected resource readback).
 - Evidence selection mattered more than context taxonomy expansion. Client Component HTML was not stable proof for `membership_active`; DB readback was the correct outcome proof. Protected HLS key / protected resource readback was stronger proof for `playback_allowed` than page HTML.
 - The browser Capture Envelope remains local to browser evidence. The journey pilot needed claim / side-effect chain / outcome proof / protected resource readback, which matches shared validation reasoning pressure more than browser capture metadata.
-- The generic Evidence Envelope remains deferred. The common shape is still claim → evidence chain → verification → scope/result, but the concrete minimum schema is not stable across browser captures, API/DB readback, runtime traces, and journey validation.
+- The generic Evidence Envelope remains deferred. The common shape is still claim -> evidence chain -> verification -> scope/result, but the concrete minimum schema is not stable across browser captures, API/DB readback, runtime traces, and journey validation.
 - Typed Context Taxonomy remains deferred. The new pressure is outcome/evidence depth, not new context families such as appearance, environment, interaction, or locale.
 
 Consequence:
