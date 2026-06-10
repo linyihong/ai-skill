@@ -336,6 +336,18 @@ git pre-commit hook
 - **驗證**：`go test ./...`（全模組）+ `go vet` clean；新增 `TestCompileProjectMetadataDerived_LegacyFlatShapeTolerated` + `_NewSchemaMalformedHardFails` + scanner entity-name 斷言；`ai-skill runtime compile + refresh + validate` 全 pass，live `runtime.db` 確認 `derived_forbidden_tokens` 已消失、兩張新表存在。
 - **未動**：`enforcement-registry.yaml` `coverage` 仍 `pending_implementation`（promote 到 `mechanical` + 加 blocking per-commit obligation 屬 Phase 4，本批不碰）。
 
+#### Phase 1D review — Finding A（hard-fail blast radius；綁 Failure Authority invariant）
+
+> **觀察（2026-06-10 Phase 1D self-review）**：shape-aware hard-fail 正確關閉了 silent-skip，但 `discoverProjectMetadataFiles` 掃全 repo（只跳 `.git`/`node_modules`/`vendor`），因此一個 malformed `.ai-skill-project.yaml` **不論落在哪一層都會 hard-fail compile** —— 包括 git-ignored、project-local 的 `.agent-goals/…`。等於把「silent under-protection」換成「對 ephemeral local 檔案 over-blocking」。
+>
+> **不在本 plan 直接實作修正**。這不是 sanitization 個案，而是一個 cross-cutting governance 問題「**誰有資格阻塞 compile？**」（與 Discovery fail-open、Runtime Index source-row scope 同類）。已抽為 incubator 第三 family：[`governance/lifecycle/governance-pattern-library-draft.md`](../../governance/lifecycle/governance-pattern-library-draft.md) §"Parallel observation: Failure Authority family"。
+>
+> **Invariant（observation-stage）**：只有 compile-authoritative source（shared-layer / tracked / runtime-index `sources` row）可阻塞 compile；non-authoritative source（`shared_layer:false` / `owner:project-local` / untracked）只能 warn。分類靠 topology v2 —— 若 `shared_layer:true|false` 最終都 compile fail，topology 的 path-classification 治理價值在最該發揮的時刻被削弱。
+>
+> **落地時機**：待 Failure Authority invariant 成立後，於 **Phase 4**（authority classifier 首次接線處）讓 `.agent-goals/`-class malformed metadata 自然降級為 warning；**不採** sanitization scanner 內的 `.agent-goals/` 特例 hack。
+
+- [ ] **Finding A 落地（Phase 4，blocked on Failure Authority invariant）**：`compileProjectMetadataDerived` 的 hard-fail 改 topology-scoped —— Class A（authoritative）hard-fail、Class B（non-authoritative）warn-only
+
 ### Phase 2 — Generic Regex Patterns (inherited from superseded plan)
 
 - [x] 新建 `runtime/sanitization-patterns.yaml`（canonical）+ companion section in `enforcement/sanitization-mechanical.md`

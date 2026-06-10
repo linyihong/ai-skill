@@ -148,4 +148,97 @@ Both families may eventually become entries in `governance/lifecycle/governance-
 - 6-step shape ↔ `rule-without-executor.md` + `validation-coverage-gap-executor-placement.md`
 - Reference Integrity ↔ `markdown-yaml-sync-drift.md` + `validation-coverage-gap-executor-placement.md` (the latter spans both families)
 
+---
+
+## Parallel observation: Failure Authority family
+
+> Surfaced in the 2026-06-10 Phase 1D review of the sanitization plan
+> (2026-06-06-1800). Captured here in the **same incubator** under the same
+> gate / falsification discipline as the other two families. It is a **third
+> independent family**, not a view of either above.
+
+### The question it asks
+
+The 6-step family asks *"how does a new mechanical rule get onboarded?"*.
+Reference Integrity asks *"do these two surfaces still agree?"*. This family
+asks a different question that kept recurring across Discovery, Runtime Index,
+and Sanitization:
+
+> **Who has standing to block compile/commit — and on the authority of which source?**
+
+The failure being named is the conflation of two separate things:
+
+```
+Metadata Presence  ⇒  Compile Authority
+```
+
+i.e. "this file exists and is invalid" silently becomes "therefore the whole
+pipeline halts" — regardless of whether the file is an authoritative input to
+`runtime.db` or an ephemeral, git-ignored, project-local scratch file.
+
+### The invariant (observation-stage; not yet normative)
+
+> **Failure Authority** — Only inputs originating from *compile-authoritative*
+> sources may block runtime compilation (or a commit gate). *Non-authoritative*
+> sources may emit warnings, but must not prevent runtime generation.
+
+Source classification rides on **topology v2** (`runtime/repository-topology.yaml`),
+which is exactly what gives that classification governance value:
+
+| Class | Examples | Topology signal | On invalid / drift |
+|---|---|---|---|
+| **A — Compile-authoritative** | shared-layer surfaces, git-tracked runtime projection sources, registered runtime-index `sources` rows | `shared_layer: true` / tracked / has source row | **hard fail** (correct) |
+| **B — Non-authoritative** | `.agent-goals/`, `scratch/`, project-local overlays, untracked notes | `shared_layer: false` / `owner: project-local` / no source row | **warn only** |
+
+Corollary that motivates promoting this rather than just documenting it: if
+`shared_layer: true` and `shared_layer: false` both ultimately `compile fail`,
+the topology v2 path-classification work (owner / purpose / shared_layer)
+loses most of its governance value at the one moment it should matter most.
+
+### Sample inventory (N=3, observation-stage)
+
+| # | Subsystem | Authoritative source (may block) | Non-authoritative source (must not block) | Invariant currently holds? |
+|---|---|---|---|---|
+| 1 | Runtime Index Freshness | files with a `sources` row in `runtime-index.sqlite` | files *without* a source row ("outside this validator's freshness scope" — core-bootstrap.yaml runtime_index_freshness rationale) | ✅ holds — scoping is explicit |
+| 2 | Workflow Activation gate | a single locked `active_route` inside the repo | detector miss / multi-route conflict / routing registry unresolvable / running outside the repo → **fails open** | ✅ holds — fail-open is documented safety |
+| 3 | Sanitization metadata (Phase 1D) | malformed shared-layer `.ai-skill-project.yaml` | malformed `.agent-goals/…` (`shared_layer:false`) project-local metadata | ❌ **violated today** — hard-fail is repo-wide (Finding A) |
+
+Sample #3 is the live counter-instance: the Phase 1D hard-fail (which correctly
+closed the silent-skip gap) currently blocks compile for *any* malformed
+`.ai-skill-project.yaml` repo-wide, including non-authoritative `.agent-goals/`.
+Samples #1 and #2 show the framework *already* honours the invariant elsewhere —
+so #3 is the outlier to bring into line, not a new behaviour to invent.
+
+### Acceptance gate (mirrors the other two families)
+
+| Criterion | Threshold | Current | Met? |
+|---|---|---|---|
+| Total samples | ≥ 5 | 3 | ❌ |
+| At least one non-fitting sample analysed | ≥ 1 | 1 (sample #3 violates — analysed) | ✅ |
+| Distinct authority signals | ≥ 3 | 3 (source-row / route-lock+repo-scope / shared_layer) | ✅ |
+
+### Pre-emptive falsification questions
+
+- [ ] **Commit-msg validators** (e.g. cognitive-mode block, plan-status-sync): do they ever block on staged files outside an authoritative scope, or is every staged file authoritative-by-definition (it's being committed)? If the latter, commit gates may be a degenerate case where Class B does not exist.
+- [ ] **Bootstrap receipt gate**: is "no receipt" a Failure Authority decision (the session is authoritative) or a different family entirely?
+- [ ] Does Runtime Index sample #1 *really* warn (vs silently ignore) non-authoritative drift? If it silently ignores rather than warns, the invariant's "warn only" half is unproven and may need softening to "must not block (warning optional)".
+
+### Relationship to the binding decision
+
+The sanitization plan's Finding A is **not** resolved by editing the scanner in
+that plan. It is deferred to a Failure-Authority-governed decision: if this
+invariant holds up, `.agent-goals/`-class malformed metadata should *naturally*
+degrade to a warning, and the fix belongs at Phase 4 (or wherever the authority
+classifier is first wired), not as a one-off `.agent-goals/` special-case. See
+plan 2026-06-06-1800 §"Phase 1D review — Finding A".
+
+### Cross-link forward
+
+If promoted, this becomes a third sibling in
+`governance/lifecycle/governance-pattern-library/` (folder), alongside the
+6-step and Reference Integrity families. Anti-pattern side (to author if a
+second violation reproduces): `enforcement/failure-patterns/` —
+"non-authoritative-source-blocks-pipeline" (not yet created; Finding A is the
+first instance).
+
 ← [Back to governance/lifecycle](README.md)

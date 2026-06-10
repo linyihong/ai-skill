@@ -67,6 +67,15 @@ Place draft analysis at: [`governance/lifecycle/governance-pattern-library-draft
   - 3 pre-emptive falsification candidates listed (conversation goal ledger, cognitive mode reporting, discovery advisory output) — each tests whether Reference Integrity is universal or narrower than 6-step
   - This is **not** a scope expansion of this plan; it is a sibling observation sharing the same incubator surface. If either family passes its gate, they will be siblings in `governance/lifecycle/governance-pattern-library/` folder, not parent/child.
 
+- [x] **Parallel Failure Authority family observation** captured in same draft as separate section (added 2026-06-10, from sanitization Phase 1D review)
+  - Invariant: only compile-authoritative sources (shared-layer / tracked / runtime-index `sources` row) may block runtime compilation; non-authoritative sources (`shared_layer:false`, `owner:project-local`, untracked) may warn only
+  - Names the conflation being fixed: `Metadata Presence ⇒ Compile Authority` (file existence + invalidity silently becomes pipeline halt regardless of source class)
+  - 3 samples inventoried (Runtime Index source-row scope ✅, Workflow gate fail-open ✅, Sanitization Phase 1D `.agent-goals/` hard-fail ❌ — the live violation = sanitization plan Finding A)
+  - Distinguished from the other two families: this is **enforcement-time / blast-radius authority**, not build-time onboarding (6-step) nor maintenance-time surface agreement (Reference Integrity)
+  - Rides on topology v2 path-classification — promoting it protects the governance value of the owner/purpose/shared_layer work
+  - Independent acceptance gate (N≥5; already has 1 analysed non-fitting sample); 3 falsification candidates listed
+  - **Resolution binding**: sanitization Finding A is deferred to a Failure-Authority-governed fix at Phase 4, NOT a one-off `.agent-goals/` special-case in the sanitization scanner
+
 ## Phase 1 — Gate decision
 
 - [ ] If 5+ samples found AND ≥3 samples per step AND 6-step shape consistent → proceed to Phase 2
