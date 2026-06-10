@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: journey-validation-ui-pass-journey-fail
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-10-0908-user-journey-validation-integration.md
+source_phase: phase-3-validation-scenarios
+
+given:
+  task_intent: "Accept a membership feature because individual login, membership, and payment screens render correctly."
+  routing_entry: route.workflow.software-delivery
+  ui_validation:
+    login_screen: pass
+    membership_screen: pass
+    payment_screen: pass
+    responsive_capture: pass
+  journey_specification:
+    source: tests/bdd
+    journey:
+      name: membership_purchase
+      criticality: critical
+      criticality_reason:
+        - revenue
+        - entitlement
+      expected_outcomes:
+        - membership_active
+        - playback_allowed
+      observable_evidence:
+        - profile_membership_badge
+        - protected_video_playback
+  journey_execution:
+    side_effect_chain:
+      order_created: pass
+      payment_event_recorded: pass
+      membership_updated: fail
+      playback_entitlement_granted: fail
+
+when:
+  action: evaluate_completion_claim_after_ui_validation_passes
+
+then:
+  expected_load:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/test-strategy.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+  expected_route:
+    - keep_ui_validation_pass_as_partial_scope
+    - evaluate_journey_execution_separately
+    - report_journey_validation_fail
+  expected_result: journey_validation_fail
+  forbidden_routes:
+    - treat_screen_level_ui_pass_as_journey_pass
+    - collapse_journey_failure_into_ui_governance_failure
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/ui-governance.md
+    - workflow/software-delivery/validation.md#Journey Validation

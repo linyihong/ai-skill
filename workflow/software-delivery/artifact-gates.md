@@ -53,6 +53,7 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 | 生成的客戶端、SDK、fixtures 和提供者/消費者合約檢查 | `implementation/` 和專案儲存庫 |
 | Screen Mapping、Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract、Screen Traceability | [`ui-contracts.md`](ui-contracts.md)、templates 和專案儲存庫的 planning / contract artifacts |
 | UI governance evidence：governance domain、render context、collection method、validation mechanism、evidence class、severity、project-local design-system policy、responsive / visual / AI review scope | [`ui-governance.md`](ui-governance.md)、[`templates/ui-governance-evidence-template.md`](templates/ui-governance-evidence-template.md) 和專案 review / validation artifacts |
+| Journey Specification / Journey Validation evidence：project-defined critical journey、BDD scenario ref、side-effect chain、expected outcomes、observable evidence、validation result | [`test-strategy.md`](test-strategy.md)、[`validation.md`](validation.md) 和專案 `tests/bdd` / validation artifacts |
 | Product Brief 驗證、Impact Map × Customer Journey Map 對齊、文件優先順序、可追溯性和 BDD 閉環流程 | `process/`、templates 和 checklists |
 | 重構、遷移、replacement 或新入口替代舊入口的新舊能力 parity inventory | 專案規劃文件、implementation plan 或專屬 parity inventory；若是可重用流程缺口，回饋到 `workflow/software-delivery/` |
 | 效能預算、負載/壓力/尖峰/浸泡策略、CI smoke 檢查和發布證據 | `process/`、`CHECKLIST.md`、templates 和專案儲存庫的測試或發布筆記 |
@@ -99,6 +100,7 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 - 對 replacement / migration / refactor 類變更，能反查舊入口到新入口的能力覆蓋率、明確 deferred 項目與測試證據。
 - 對 consumer / UI 變更，能反查 BDD scenario、screen mapping、consumer needs、screen states、view model derivation、accessibility expectations、API / table ownership 與對應 contract / fixture / test。
 - 對 UI compliance claim，能反查 UI governance domain、render context、collection method、validation mechanism、evidence class、severity、project-local design-system policy 與 responsive / visual / AI review scope；不要把 browser review、visual diff 或 AI review 當成 governance domain 本身。
+- 對 critical journey claim，能反查 BDD-owned Journey Specification、criticality reason、side-effect chain、expected outcomes、observable evidence 與 validation result；不要把 Journey 當成 `validation_domain` 或把 API success 當成 outcome proof。
 - 在需要效能證據時明確，包括指標、預算、環境、執行器和發布關卡。
 
 ## 5.1 UI Governance Evidence Shape
@@ -116,6 +118,23 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 - **Severity**：block_candidate / warn / research / not_applicable，且 AI visual review 預設不升級為 hard block。
 - **Project-local policy**：design token 或 component primitive policy 的專案來源；本 workflow 不定義全域 token scale。
 - **Linked artifacts**：UI contract、test strategy、validation result、review decision 或 deferred scope。
+
+## 5.2 Journey Validation Evidence Shape
+
+當 artifact 聲稱 critical user journey、membership / entitlement / identity flow、payment-like path、irreversible action 或其他 project-defined critical journey 已完成時，使用 Journey Validation evidence shape。
+
+最小欄位：
+
+- **Owner layer**：BDD owns Journey Specification；validation owns Journey Execution / Evidence Evaluation。
+- **Journey name**：project-defined name，不使用 framework canonical journey list。
+- **Criticality**：critical / optional；critical 需列出 revenue、identity、entitlement、security、irreversible_action 或 project-specific equivalent。
+- **BDD reference**：`tests/bdd` scenario、feature、manual evidence spec 或 pending runner state。
+- **Side-effect chain**：使用者 action 後預期發生的 state transition chain。
+- **Expected outcomes**：真實狀態或產品結果，例如 `membership_active`、`playback_allowed`。
+- **Observable evidence**：證明 expected outcomes 的 artifact / readback path，例如 DB readback、profile badge、protected resource access、event record。
+- **Validation result**：pass / fail / blocked，並記錄缺失 evidence 或 deferred scope。
+
+API 200、adapter success、mock pass、screen-level UI pass 或單一 screenshot 不能單獨完成 Journey Validation。
 
 ## 6. 避免（Avoid）
 

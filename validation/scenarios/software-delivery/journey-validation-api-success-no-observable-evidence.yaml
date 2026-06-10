@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: journey-validation-api-success-no-observable-evidence
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-10-0908-user-journey-validation-integration.md
+source_phase: phase-3-validation-scenarios
+
+given:
+  task_intent: "Accept a critical membership journey because the success callback API returned 200."
+  routing_entry: route.workflow.software-delivery
+  journey_specification:
+    source: tests/bdd
+    journey:
+      name: membership_purchase
+      criticality: critical
+      criticality_reason:
+        - revenue
+        - entitlement
+      action: confirm_membership_payment
+      expected_outcomes:
+        - membership_active
+        - playback_allowed
+      observable_evidence:
+        - profile_membership_badge
+        - protected_video_playback
+  evidence_present:
+    - api_response: 200
+  evidence_missing:
+    - db_readback
+    - profile_membership_badge
+    - protected_video_playback
+
+when:
+  action: evaluate_journey_completion_evidence
+
+then:
+  expected_load:
+    - workflow/software-delivery/test-strategy.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-model.md
+  expected_route:
+    - classify_journey_as_validation_scope
+    - reject_api_success_as_final_journey_proof
+    - require_observable_evidence_for_expected_outcomes
+    - report_journey_validation_fail
+  expected_result: journey_validation_fail
+  forbidden_routes:
+    - pass_journey_validation_with_api_success_only
+    - treat_api_response_as_membership_entitlement_proof
+    - collapse_expected_outcomes_into_observable_evidence
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/validation.md#Journey Validation
+    - workflow/software-delivery/test-strategy.md#Journey Specification

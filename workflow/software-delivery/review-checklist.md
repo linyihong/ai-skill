@@ -49,6 +49,7 @@
 - 當狀態重要時，資料庫、儲存庫、遷移或持久化行為使用 fixtures 或整合測試驗證。
 - 當觀察到的成功訊號可能不同於真實狀態時，依 [`state-visibility-gap.md`](../../intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md) 與 [`evidence-chain-validation.md`](../../intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md) 驗證完整 state propagation chain。
 - Payment、email、external API、storage、queue、entitlement 或其他 proxy-prone path 不接受 API 200、adapter success、SMTP success 或 queue publish 作為 final proof；critical path 需要 independent observation。
+- Critical journey claim 有 BDD-owned Journey Specification、project-defined criticality reason、side-effect chain、expected outcomes、observable evidence 和 validation result；不要把 API success、screen-level UI pass 或 screenshot-only evidence 當成 journey pass。
 - 效能敏感變更包含適合風險的 load、stress、spike、soak 或 smoke-size 效能證據。
 - 效能證據報告 P95/P99 延遲、吞吐量、錯誤率和資源使用率；平均延遲不被視為足夠。
 - 嵌入式或硬體支援的行為區分主機可重複測試與僅目標或硬體在迴路中的證據。
@@ -157,6 +158,7 @@
 - 工作階段識別碼不用作長期裝置識別碼。
 - 依身份、權限、tenant、ownership、會員或 feature flag 改變的 UI/API/SSR 行為，以真實身份材料走產品路徑驗證 protected resource、persisted state 與 user-observable state 一致。
 - 忘記密碼、寄信、播放權限、收藏/追蹤、會員狀態或 entitlement 變更若產生 side effect，完成證據包含 live system proof 與必要的 DB/external/readback 驗證。
+- 會員購買、權限啟用、protected playback、identity-specific private state 或 irreversible action 若被宣告為 critical journey，BDD 定義與 validation evidence 必須分開列出：expected outcomes 是真實產品狀態，observable evidence 是證明該狀態的 readback / artifact。
 
 ## Local Storage（本地儲存）
 

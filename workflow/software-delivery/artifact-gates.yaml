@@ -69,6 +69,14 @@ steps:
     action: Ensure guidance is executable, owner-layer clear, testable, honest about limits, sanitized, parity-aware, consumer/UI-aware when needed, UI-governance-aware when compliance or responsive claims are made, and performance-aware when needed.
     gates:
       - gate.artifact_gates.good_guidance
+  - id: check_journey_validation_evidence
+    order: 7
+    action: For critical journey claims, ensure artifacts name the BDD-owned Journey Specification, criticality reason, side-effect chain, expected outcomes, observable evidence, and validation result.
+    required_if:
+      - critical_journey_claim
+      - journey_validation_claim
+    gates:
+      - gate.artifact_gates.journey_validation_evidence_complete
 
 gates:
   - id: gate.artifact_gates.required_sections_present
@@ -102,12 +110,23 @@ gates:
       - consumer/UI changes can trace consumer needs, screen states, view model derivation, accessibility expectations, and relevant fixtures or tests
       - UI compliance claims classify governance domain, render context, collection method, validation mechanism, evidence class, severity, project-local design-system policy, and responsive / visual / AI review scope without duplicating UI contract definitions
       - replacement/parity and performance evidence are included when relevant
+  - id: gate.artifact_gates.journey_validation_evidence_complete
+    blocks: critical_journey_completion_claim
+    pass_when:
+      - Journey Specification is BDD-owned and references project-defined BDD, executable behavior test, fixture, or manual evidence spec
+      - journey name is project-defined, not selected from a framework canonical journey list
+      - criticality is classified as critical or optional, and critical journeys name a revenue, identity, entitlement, security, irreversible_action, or project-equivalent reason
+      - side-effect chain lists the expected state transitions after the user action
+      - expected outcomes are separated from observable evidence
+      - observable evidence includes readback or artifact coverage sufficient for the expected outcomes
+      - API success, adapter success, mock pass, screen-level UI pass, or screenshot-only evidence is not treated as full journey proof
 
 required_evidence:
   - artifact shape decision
   - owner layer decision
   - consumer/UI contract decision when a consumer surface exists
   - UI governance evidence decision with render context and collection method when UI compliance, design-system, accessibility, responsive behavior, behavior pattern, visual baseline, or AI visual review is claimed
+  - Journey Validation evidence with BDD reference, criticality reason, side-effect chain, expected outcomes, observable evidence, and validation result when a critical journey is claimed complete
   - sanitization review summary
   - linked update statement
   - validation method
@@ -118,6 +137,7 @@ success_criteria:
   - Reusable guidance contains generalized lessons and validation, not project incident raw evidence.
   - Content lands in the correct owner layer and updates linked indexes or docs.
   - UI governance artifacts name evidence shape, render context, and owner layer without turning UI contracts into enforcement checklists.
+  - Journey artifacts keep BDD-owned specification separate from validation-owned execution evidence.
   - Parity and performance evidence are required when the artifact makes replacement or performance claims.
   - Completion claims include validation and residual risk.
 
@@ -143,6 +163,9 @@ failure_modes:
   - id: responsive_context_evidence_missing
     detection: Responsive UI claim records only a desktop capture, no constrained render-context evidence, or a device SKU without the governed render context.
     recovery: Reclassify through ui-governance.md; record render_context and collect at least desktop_capture plus mobile_capture or equivalent wide/narrow evidence before claiming responsive validation complete.
+  - id: journey_validation_proxy_success
+    detection: Critical journey claim treats API 200, adapter success, mock pass, or screen-level UI pass as proof that expected outcomes occurred.
+    recovery: Load test-strategy.md and validation.md; map Journey Specification to side-effect chain, expected outcomes, and observable evidence before accepting the completion claim.
 
 final_status_report:
   required_fields:

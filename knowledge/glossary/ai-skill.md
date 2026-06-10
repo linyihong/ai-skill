@@ -246,6 +246,26 @@ related-terms:
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```
 
+## expected_outcomes
+
+```yaml
+term: expected_outcomes
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  Journey Validation 中要被證明成立的真實狀態或產品結果，例如 entitlement
+  active、playback allowed、account state changed。它描述 claim 的 outcome，
+  不描述用來證明 outcome 的 artifact。
+affects:
+  - workflow/software-delivery/test-strategy.md
+  - workflow/software-delivery/validation.md
+  - workflow/software-delivery/artifact-gates.md
+anti-meaning: >
+  Not screenshot evidence, not UI copy, not API status code, and not a generic
+  readback bucket. Observable proof belongs in observable_evidence.
+introduced-by: plans/active/2026-06-10-0908-user-journey-validation-integration.md
+```
+
 ## feedback_decision
 
 ```yaml
@@ -389,6 +409,48 @@ affects:
 introduced-by: plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
 ```
 
+## journey_specification
+
+```yaml
+term: journey_specification
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  BDD-owned definition of a project-defined multi-step user outcome, including
+  journey name, criticality, triggering action, expected side-effect chain,
+  expected outcomes, and observable evidence expectations.
+affects:
+  - workflow/software-delivery/test-strategy.md
+  - workflow/software-delivery/templates/bdd-scenario-template.md
+  - workflow/software-delivery/validation.md
+anti-meaning: >
+  Not a framework canonical journey list, not a UI governance domain, and not
+  proof that the journey executed. Execution evidence belongs to Journey
+  Validation.
+introduced-by: plans/active/2026-06-10-0908-user-journey-validation-integration.md
+```
+
+## journey_validation
+
+```yaml
+term: journey_validation
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  Validation-owned execution and evidence evaluation for a Journey Specification.
+  It verifies that the user action produces the expected state transition chain,
+  expected outcomes, and observable evidence at the required evidence depth.
+affects:
+  - workflow/software-delivery/validation.md
+  - workflow/software-delivery/execution-flow.yaml
+  - workflow/software-delivery/artifact-gates.yaml
+  - validation/scenarios/software-delivery/journey-validation-*.yaml
+anti-meaning: >
+  Not validation_domain, not screen-level UI validation, and not API success by
+  itself. It is scoped outcome validation over a project-defined journey.
+introduced-by: plans/active/2026-06-10-0908-user-journey-validation-integration.md
+```
+
 ## knowledge_mode
 
 ```yaml
@@ -426,6 +488,48 @@ affects:
 anti-meaning: >
   不是 LLM internal context memory；不是 RAM / disk 的硬體 memory。
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
+```
+
+## observable_evidence
+
+```yaml
+term: observable_evidence
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  Evidence artifact, readback path, or observable product surface used to prove
+  declared expected_outcomes in Journey Validation, such as DB readback,
+  profile badge, protected resource access, event record, or external
+  confirmation.
+affects:
+  - workflow/software-delivery/test-strategy.md
+  - workflow/software-delivery/validation.md
+  - workflow/software-delivery/artifact-gates.md
+anti-meaning: >
+  Not the expected outcome itself and not a catch-all readback field. It must
+  map to a specific outcome claim and evidence scope.
+introduced-by: plans/active/2026-06-10-0908-user-journey-validation-integration.md
+```
+
+## outcome_validation
+
+```yaml
+term: outcome_validation
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  Validation concern that asks whether the product or business outcome actually
+  happened, beyond local API, adapter, mock, or screen success signals. Journey
+  Validation is the current workflow-local expression of this pressure.
+affects:
+  - workflow/software-delivery/validation.md
+  - plans/active/2026-06-09-1040-experience-validation-pipeline-evolution.md
+  - plans/active/2026-06-10-0908-user-journey-validation-integration.md
+anti-meaning: >
+  Not a replacement for contract, behavior, accessibility, or responsive
+  validation. It complements those targets by requiring evidence that the
+  intended outcome materialized.
+introduced-by: plans/active/2026-06-10-0908-user-journey-validation-integration.md
 ```
 
 ## owner_layer
@@ -656,6 +760,26 @@ related-terms:
 introduced-by: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md
 ```
 
+## side_effect_chain
+
+```yaml
+term: side_effect_chain
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  Ordered sequence of state transitions expected after a user action in Journey
+  Validation, such as order created, payment event recorded, membership updated,
+  and entitlement granted.
+affects:
+  - workflow/software-delivery/test-strategy.md
+  - workflow/software-delivery/validation.md
+  - intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md
+anti-meaning: >
+  Not a list of pages visited and not proof by itself. Each important transition
+  still needs evidence appropriate to its risk and scope.
+introduced-by: plans/active/2026-06-10-0908-user-journey-validation-integration.md
+```
+
 ## sub_plan_reason
 
 ```yaml
@@ -690,6 +814,27 @@ affects:
   - runtime/cognitive-modes.yaml
   - plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
 introduced-by: plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
+```
+
+## validation_scope
+
+```yaml
+term: validation_scope
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  The bounded path, audience, journey, state slice, or context slice over which
+  validation evidence is claimed. For first Journey Validation landing, journey
+  is modeled as validation_scope consuming state, context, and evidence coverage.
+affects:
+  - workflow/software-delivery/validation.md
+  - workflow/software-delivery/execution-flow.yaml
+  - plans/active/2026-06-10-0908-user-journey-validation-integration.md
+anti-meaning: >
+  Not validation_domain and not a quality attribute. It selects what path or
+  slice is covered, while validation targets describe what quality or outcome is
+  being validated.
+introduced-by: plans/active/2026-06-10-0908-user-journey-validation-integration.md
 ```
 
 ## writeback_status

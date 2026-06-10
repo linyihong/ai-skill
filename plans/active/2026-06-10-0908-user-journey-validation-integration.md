@@ -1,7 +1,7 @@
 ---
 id: 2026-06-10-0908-user-journey-validation-integration
 plan_kind: main
-status: draft
+status: in-progress
 owner: linyihong
 created: 2026-06-10
 priority: P1
@@ -10,7 +10,7 @@ required_for_completion: false
 
 # User Journey Validation Integration
 
-**Status**: `draft`
+**Status**: `in-progress`
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-10
 **Priority**：**P1**（validation-layer workflow capability；以 evidence-backed outcome validation 補足 Experience Validation Pipeline）
@@ -249,13 +249,13 @@ Per-surface consumer table will be finalized before implementation. This plan do
 
 ## Open Questions
 
-- [ ] Is `journey_coverage` a stable coverage dimension, or should Journey become a `validation_scope` that consumes state/context/evidence coverage?
-- [ ] What criteria promote a project-defined journey into a critical journey?
-- [ ] What is the minimum evidence for `observable_evidence` across UI/API/DB/runtime outcomes?
-- [ ] Are `expected_outcomes` and `observable_evidence` sufficient to avoid mixing real state with evidence artifacts?
+- [x] Is `journey_coverage` a stable coverage dimension, or should Journey become a `validation_scope` that consumes state/context/evidence coverage? — resolved for first landing: use `validation_scope`; keep `journey_coverage` as watch-list vocabulary only until more workflow domains prove it is a stable coverage dimension.
+- [x] What criteria promote a project-defined journey into a critical journey? — resolved for first landing: criticality requires revenue, identity, entitlement, security, irreversible_action, or project-declared equivalent; convenience / cosmetic / informational paths default optional.
+- [x] What is the minimum evidence for `observable_evidence` across UI/API/DB/runtime outcomes? — resolved for first landing: evidence must prove the declared `expected_outcomes` at the required evidence depth; API 200, adapter success, mock pass, screen-level UI pass, or screenshot-only evidence is insufficient for critical journeys.
+- [x] Are `expected_outcomes` and `observable_evidence` sufficient to avoid mixing real state with evidence artifacts? — resolved for first landing: docs now require the split; reopen only if implementation examples need more structured evidence typing.
 - [ ] Should `side_effect_chain` stay plan-local vocabulary, or graduate into shared Validation Reasoning after multiple workflow domains consume it?
-- [ ] How should the workflow distinguish `behavior` domain failures from Journey scope / coverage failures?
-- [ ] Should Journey Validation be documented in the Experience Validation Pipeline plan as Outcome Validation, or remain only cross-linked?
+- [x] How should the workflow distinguish `behavior` domain failures from Journey scope / coverage failures? — resolved for first landing: `behavior` remains the quality/validation target; Journey is validation scope that selects the user path being exercised.
+- [x] Should Journey Validation be documented in the Experience Validation Pipeline plan as Outcome Validation, or remain only cross-linked? — resolved: cross-link as Outcome Validation pressure without absorbing this plan into Context Taxonomy work.
 
 ## Phase 0 — Open Questions Check + Architecture Compatibility Preflight
 
@@ -263,90 +263,90 @@ Per-surface consumer table will be finalized before implementation. This plan do
 
 逐條核對本 plan §Open Questions，標記處置並回寫：
 
-- [ ] 已讀本 plan §Open Questions 全部條目
-- [ ] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
-- [ ] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
-- [ ] 若盤點新發現問題，已加入 §Open Questions
+- [x] 已讀本 plan §Open Questions 全部條目
+- [x] 對每條標記 `resolved`（附 Phase 0 證據）/ `still-open` / `deferred`（附原因）
+- [x] `resolved` 的條目已同步勾選 / 附註於 §Open Questions
+- [x] 若盤點新發現問題，已加入 §Open Questions
 
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
-| `journey_coverage` vs `validation_scope` | pending | Phase 0 inventory needed |
-| critical journey selection criteria | pending | Phase 0 inventory needed |
-| minimum `observable_evidence` evidence | pending | Phase 0 inventory needed |
-| `expected_outcomes` / `observable_evidence` split | pending | Phase 0 inventory needed |
-| `side_effect_chain` vocabulary graduation | pending | Phase 0 inventory needed |
-| `behavior` vs Journey boundary | pending | Phase 0 inventory needed |
-| Experience Validation Pipeline placement | pending | Phase 0 inventory needed |
+| `journey_coverage` vs `validation_scope` | resolved | Use `validation_scope` for first landing; `journey_coverage` remains watch-list vocabulary. Evidence: `validation.md` §Journey Validation. |
+| critical journey selection criteria | resolved | Criticality criteria landed in `test-strategy.md`, `validation.md`, `artifact-gates.md`, and executable gates. |
+| minimum `observable_evidence` evidence | resolved | Evidence must prove expected outcomes at state-visibility / evidence-chain depth; API success alone forbidden. |
+| `expected_outcomes` / `observable_evidence` split | resolved | Provisional shape and gates separate real outcomes from evidence artifacts. |
+| `side_effect_chain` vocabulary graduation | deferred | Keep plan-local / workflow-local until multiple workflow domains consume it. |
+| `behavior` vs Journey boundary | resolved | Behavior remains validation target / quality; Journey is validation scope. |
+| Experience Validation Pipeline placement | resolved | Cross-link as Outcome Validation pressure; do not merge into context taxonomy plan. |
 
 ### Phase 0.1 — Preflight
 
-- [ ] Read current `workflow/software-delivery/validation.md`, `execution-flow.yaml`, `artifact-gates.yaml`, `artifact-gates.md`, and `review-checklist.md`.
-- [ ] Verify `ui-governance.md` remains out of scope except for explicit cross-reference if needed.
-- [ ] Inventory Vidoe-Test examples as evidence only; do not copy project-specific paths or private evidence into shared framework docs.
-- [ ] Inventory existing BDD guidance / `tests/bdd` conventions to decide where Journey Specification should be documented.
-- [ ] Confirm whether `responsive` / `render_context` references in executable sources remain consistent after prior UI governance narrowing.
-- [ ] Decide whether this plan should be a sibling plan to Experience Validation Pipeline or a sub-plan; default is sibling unless Phase 0 finds shared completion dependency.
+- [x] Read current `workflow/software-delivery/validation.md`, `execution-flow.yaml`, `artifact-gates.yaml`, `artifact-gates.md`, and `review-checklist.md`.
+- [x] Verify `ui-governance.md` remains out of scope except for explicit cross-reference if needed.
+- [x] Inventory Vidoe-Test examples as evidence only; do not copy project-specific paths or private evidence into shared framework docs.
+- [x] Inventory existing BDD guidance / `tests/bdd` conventions to decide where Journey Specification should be documented.
+- [x] Confirm whether `responsive` / `render_context` references in executable sources remain consistent after prior UI governance narrowing.
+- [x] Decide whether this plan should be a sibling plan to Experience Validation Pipeline or a sub-plan; default is sibling unless Phase 0 finds shared completion dependency.
 
 ## Phase 1 — Validation Contract Draft
 
-- [ ] Update `workflow/software-delivery/validation.md` with a `Journey Validation` section.
-- [ ] Include the invariant: user action -> expected observable state transition chain.
-- [ ] Define Journey Specification as BDD-owned and project-defined.
-- [ ] Define provisional shape for `journey_specification`, `side_effect_chain`, `expected_outcomes`, `observable_evidence`, and `validation.{state_coverage,context_coverage,journey_coverage,evidence_coverage}`.
-- [ ] Add Journey Selection criteria so projects do not mark every journey as critical.
-- [ ] Explicitly state that page navigation alone is insufficient evidence.
+- [x] Update `workflow/software-delivery/validation.md` with a `Journey Validation` section.
+- [x] Include the invariant: user action -> expected observable state transition chain.
+- [x] Define Journey Specification as BDD-owned and project-defined.
+- [x] Define provisional shape for `journey_specification`, `side_effect_chain`, `expected_outcomes`, `observable_evidence`, and `validation_scope`.
+- [x] Add Journey Selection criteria so projects do not mark every journey as critical.
+- [x] Explicitly state that page navigation alone is insufficient evidence.
 
 ## Phase 2 — Workflow Gates + Artifact Expectations
 
-- [ ] Update `workflow/software-delivery/execution-flow.yaml` with `journey_validation_complete` only if Phase 1 shape is stable enough.
-- [ ] Update `workflow/software-delivery/artifact-gates.yaml` and `artifact-gates.md` with evidence expectations for critical journey claims.
-- [ ] Keep Journey out of `validation_domain` and `ui-governance.md` as a UI governance domain.
-- [ ] Add or cross-link BDD guidance so `tests/bdd` owns Journey Specification.
-- [ ] Add glossary entries only if Phase 1–2 introduce stable framework vocabulary.
+- [x] Update `workflow/software-delivery/execution-flow.yaml` with `journey_validation_complete` only if Phase 1 shape is stable enough.
+- [x] Update `workflow/software-delivery/artifact-gates.yaml` and `artifact-gates.md` with evidence expectations for critical journey claims.
+- [x] Keep Journey out of `validation_domain` and `ui-governance.md` as a UI governance domain.
+- [x] Add or cross-link BDD guidance so `tests/bdd` owns Journey Specification.
+- [x] Add glossary entries only if Phase 1–2 introduce stable framework vocabulary.
 
 ## Phase 3 — Validation Scenarios
 
-- [ ] Add scenario: UI/responsive passes but membership purchase or playback access journey fails -> expected `journey_validation_fail`.
-- [ ] Add scenario: critical journey claim lacks live integration evidence -> expected `missing_journey_evidence`.
-- [ ] Add scenario: API success has no observable evidence for expected outcomes -> expected `journey_validation_fail` even when API validation passes.
-- [ ] Add scenario: project-defined membership purchase path proves order + membership + payment event + profile readback + playback access -> expected pass.
+- [x] Add scenario: UI/responsive passes but membership purchase or playback access journey fails -> expected `journey_validation_fail`.
+- [x] Add scenario: critical journey claim lacks live integration evidence -> expected `missing_journey_evidence`.
+- [x] Add scenario: API success has no observable evidence for expected outcomes -> expected `journey_validation_fail` even when API validation passes.
+- [x] Add scenario: project-defined membership purchase path proves order + membership + payment event + profile readback + playback access -> expected pass.
 
 ## Phase 4 — Experience Pipeline Cross-Link
 
-- [ ] Update `plans/active/2026-06-09-1040-experience-validation-pipeline-evolution.md` to reference User Journey Validation as evidence-backed Outcome Validation pressure.
-- [ ] Keep typed Context Taxonomy deferred; this work should not require new context families.
-- [ ] Record whether Journey should remain Coverage Model watch-list work or move to `validation_scope` while consuming State / Context / Evidence coverage.
+- [x] Update `plans/active/2026-06-09-1040-experience-validation-pipeline-evolution.md` to reference User Journey Validation as evidence-backed Outcome Validation pressure.
+- [x] Keep typed Context Taxonomy deferred; this work should not require new context families.
+- [x] Record whether Journey should remain Coverage Model watch-list work or move to `validation_scope` while consuming State / Context / Evidence coverage.
 
 ## Phase 5 — Validation + Runtime Refresh
 
-- [ ] Run lints / format checks for changed docs and scenarios.
-- [ ] Run `ai-skill runtime refresh`.
-- [ ] Run `ai-skill runtime validate`.
-- [ ] Run `git diff --check`.
+- [x] Run lints / format checks for changed docs and scenarios.
+- [x] Run `ai-skill runtime refresh`.
+- [x] Run `ai-skill runtime validate`.
+- [x] Run `git diff --check`.
 - [ ] Confirm `git status --short --branch` is clean after commit/push if implementation proceeds.
 
 ## 完成條件
 
-- [ ] Journey Validation is documented in the validation layer.
-- [ ] Critical journeys are project-defined; no framework canonical journey list is introduced.
-- [ ] Critical journey selection criteria distinguish critical journeys from optional journeys.
-- [ ] Journey Specification is BDD-owned; Journey Execution / Validation is validation-owned.
-- [ ] Journey is not modeled as `validation_domain`; Phase 0 records whether it remains `journey_coverage` or becomes `validation_scope`.
-- [ ] Expected outcomes are separated from observable evidence.
-- [ ] At least 3 validation scenarios exercise pass/fail distinctions, including API success without observable evidence.
-- [ ] Artifact gates and executable workflow references are consistent.
-- [ ] Experience Validation Pipeline plan is cross-linked without absorbing this plan into taxonomy work.
+- [x] Journey Validation is documented in the validation layer.
+- [x] Critical journeys are project-defined; no framework canonical journey list is introduced.
+- [x] Critical journey selection criteria distinguish critical journeys from optional journeys.
+- [x] Journey Specification is BDD-owned; Journey Execution / Validation is validation-owned.
+- [x] Journey is not modeled as `validation_domain`; Phase 0 records whether it remains `journey_coverage` or becomes `validation_scope`.
+- [x] Expected outcomes are separated from observable evidence.
+- [x] At least 3 validation scenarios exercise pass/fail distinctions, including API success without observable evidence.
+- [x] Artifact gates and executable workflow references are consistent.
+- [x] Experience Validation Pipeline plan is cross-linked without absorbing this plan into taxonomy work.
 
 ## Stakeholder 同意項目
 
-- [ ] Journey is not `validation_domain`.
-- [ ] BDD owns Journey Specification; validation owns Journey Execution.
-- [ ] Critical journeys are project-defined.
-- [ ] Criticality has selection criteria to prevent matrix explosion.
-- [ ] Journey validates observable state transition chains, not page navigation alone.
-- [ ] Phase 0 decides whether Journey is `journey_coverage` or `validation_scope`.
-- [ ] Expected outcomes and observable evidence stay separate.
-- [ ] API PASS / Journey FAIL is a first-class distinction.
+- [x] Journey is not `validation_domain`.
+- [x] BDD owns Journey Specification; validation owns Journey Execution.
+- [x] Critical journeys are project-defined.
+- [x] Criticality has selection criteria to prevent matrix explosion.
+- [x] Journey validates observable state transition chains, not page navigation alone.
+- [x] Phase 0 decides whether Journey is `journey_coverage` or `validation_scope`.
+- [x] Expected outcomes and observable evidence stay separate.
+- [x] API PASS / Journey FAIL is a first-class distinction.
 
 ## Per-surface consumer 表
 

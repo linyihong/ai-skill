@@ -203,4 +203,68 @@ If the model proves reusable outside UI, promote it through shared validation re
 
 禁止把 API 200、adapter success、SMTP success、queue publish 或 mock pass 當成最終完成證據；這些只是不完整 evidence chain 的局部訊號。
 
+### Journey Validation
+
+Journey Validation verifies that a BDD-owned Journey Specification actually executes through the expected state transition chain and reaches the expected outcome. It is validation-owned execution and evidence evaluation, not a UI governance domain and not a framework-canonical journey list.
+
+Invariant:
+
+```text
+User Journey Validation validates that a user action produces the expected observable state transition chain.
+```
+
+Use Journey as validation scope for the first landing. The scope consumes State Coverage, Context Coverage, and Evidence Coverage; it does not become `validation_domain`.
+
+```yaml
+validation_scope:
+  journey:
+    name: membership_purchase
+    criticality: critical
+    criticality_reason:
+      - revenue
+      - entitlement
+    consumes:
+      - state_coverage
+      - context_coverage
+      - evidence_coverage
+```
+
+Minimum execution evidence:
+
+```yaml
+journey_validation:
+  specification:
+    source: tests/bdd
+    journey: membership_purchase
+  execution:
+    action: create_membership_order
+    side_effect_chain:
+      - order_created
+      - payment_event_recorded
+      - membership_updated
+      - playback_entitlement_granted
+  expected_outcomes:
+    - membership_active
+    - playback_allowed
+  observable_evidence:
+    - db_readback
+    - profile_membership_badge
+    - protected_video_playback
+  result: pass | fail | blocked
+```
+
+Selection guardrail:
+
+- `critical` journeys require an explicit reason such as revenue, identity, entitlement, security, or irreversible action.
+- `optional` journeys include convenience, cosmetic, or informational paths unless the project raises their risk.
+- Do not mark every project journey as critical; if all journeys are critical, the project has not made a selection decision.
+
+Validation rules:
+
+- Screen-level UI pass does not prove journey pass.
+- API success does not prove expected outcomes.
+- Expected outcomes and observable evidence must stay separate.
+- Critical payment, entitlement, identity, storage, queue, email, or external API journeys require evidence depth matching the state visibility / evidence chain risk above.
+- If a journey claim lacks BDD specification, side-effect chain, expected outcomes, or observable evidence, report it as `missing_journey_evidence` or `journey_validation_fail` rather than pass.
+
 > **輸出模板**：Validate 完成後，使用 [`templates/review-report-template.md`](templates/review-report-template.md) 記錄審查報告。

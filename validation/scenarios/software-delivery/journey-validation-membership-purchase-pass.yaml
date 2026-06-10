@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: journey-validation-membership-purchase-pass
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-10-0908-user-journey-validation-integration.md
+source_phase: phase-3-validation-scenarios
+
+given:
+  task_intent: "Validate a project-defined critical membership purchase journey with complete outcome evidence."
+  routing_entry: route.workflow.software-delivery
+  journey_specification:
+    source: tests/bdd
+    journey:
+      name: membership_purchase
+      criticality: critical
+      criticality_reason:
+        - revenue
+        - entitlement
+      action: create_membership_order
+      side_effect_chain:
+        - order_created
+        - payment_event_recorded
+        - membership_updated
+        - playback_entitlement_granted
+      expected_outcomes:
+        - membership_active
+        - playback_allowed
+      observable_evidence:
+        - profile_membership_badge
+        - protected_video_playback
+  evidence_present:
+    - bdd_scenario_ref
+    - api_response
+    - db_readback
+    - payment_event_record
+    - profile_membership_badge
+    - protected_video_playback
+
+when:
+  action: evaluate_journey_completion_evidence
+
+then:
+  expected_load:
+    - workflow/software-delivery/test-strategy.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+  expected_route:
+    - confirm_bdd_owned_journey_specification
+    - confirm_validation_owned_journey_execution
+    - map_expected_outcomes_to_observable_evidence
+    - pass_journey_validation
+  expected_result: journey_validation_pass
+  forbidden_routes:
+    - require_framework_canonical_journey_names
+    - require_journey_as_validation_domain
+    - accept_missing_observable_evidence
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/test-strategy.md#Journey Specification
+    - workflow/software-delivery/validation.md#Journey Validation
+    - workflow/software-delivery/artifact-gates.md#Journey Validation Evidence Shape

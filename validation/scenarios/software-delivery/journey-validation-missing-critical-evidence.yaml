@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: journey-validation-missing-critical-evidence
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-10-0908-user-journey-validation-integration.md
+source_phase: phase-3-validation-scenarios
+
+given:
+  task_intent: "Mark a critical identity and entitlement journey complete without live integration evidence."
+  routing_entry: route.workflow.software-delivery
+  journey_specification:
+    source: tests/bdd
+    journey:
+      name: account_entitlement_refresh
+      criticality: critical
+      criticality_reason:
+        - identity
+        - entitlement
+      expected_outcomes:
+        - correct_user_entitlement_refreshed
+        - other_users_unchanged
+      observable_evidence:
+        - identity_specific_profile_readback
+  evidence_present:
+    - unit_test
+    - mocked_api_response
+  evidence_missing:
+    - live_system_proof
+    - identity_specific_db_readback
+    - user_observable_state
+
+when:
+  action: evaluate_critical_journey_validation_claim
+
+then:
+  expected_load:
+    - workflow/software-delivery/test-strategy.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/artifact-gates.md
+    - intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md
+    - intelligence/engineering/execution/validation-reasoning/evidence-depth.md
+  expected_route:
+    - require_critical_journey_selection_reason
+    - require_live_or_independent_evidence_for_critical_journey
+    - report_missing_journey_evidence
+  expected_result: missing_journey_evidence
+  forbidden_routes:
+    - treat_mocked_evidence_as_critical_journey_completion
+    - mark_all_project_journeys_critical_without_selection_criteria
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/validation.md#Journey Validation
+    - workflow/software-delivery/artifact-gates.md#Journey Validation Evidence Shape

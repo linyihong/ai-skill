@@ -56,6 +56,46 @@ Scenario: <observable behavior>
   Then <expected outcome>
 ```
 
+### Journey Specification（BDD-owned）
+
+When a BDD scenario describes a critical multi-step user outcome, treat it as a Journey Specification. BDD owns the business behavior definition; validation owns executing the journey and collecting evidence. Do not put Journey into `validation_domain`, and do not require framework-canonical names such as login, checkout, or payment.
+
+Journey Specification answers:
+
+```text
+user intent / precondition
+  -> user action
+  -> expected side-effect chain
+  -> expected outcomes
+```
+
+Minimum shape:
+
+```yaml
+journey_specification:
+  source: tests/bdd
+  journey:
+    name: project_defined
+    criticality: critical | optional
+    criticality_reason:
+      - revenue
+      - identity
+      - entitlement
+      - security
+      - irreversible_action
+    action: <user action>
+    side_effect_chain:
+      - <state transition>
+    expected_outcomes:
+      - <real state or product outcome>
+    observable_evidence:
+      - <evidence artifact or readback path>
+```
+
+Only promote a project-defined journey to `critical` when the path controls revenue, identity, entitlement, security, or irreversible action. Convenience, cosmetic, and informational paths are usually optional unless the project explicitly raises their risk.
+
+Keep `expected_outcomes` separate from `observable_evidence`: `membership_active` is an outcome; `profile_membership_badge` is evidence. Mixing them recreates a catch-all readback field and weakens validation review.
+
 ## 2. 文件優先 BDD 閉環（Docs-First BDD Closure Loop）
 
 當在行為由人類可讀規格加上可執行測試管理的儲存庫中工作時，在改變可觀察行為之前保持產出同步：

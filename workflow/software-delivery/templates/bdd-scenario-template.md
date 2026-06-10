@@ -15,6 +15,19 @@
 **When** <action>
 **Then** <expected outcome>
 
+## Journey Specification（optional; only for multi-step user outcomes）
+- **Journey name**: <project-defined journey name>
+- **Criticality**: critical | optional
+- **Criticality reason**: revenue | identity | entitlement | security | irreversible_action | project-defined | not_applicable
+- **Action**: <user action that starts the journey>
+- **Side-effect chain**:
+  - <state transition 1>
+  - <state transition 2>
+- **Expected outcomes**:
+  - <real state or product outcome>
+- **Observable evidence**:
+  - <readback path / artifact / protected resource access>
+
 ## Scenario: <title>
 - **Test ref**: <tests/path>::<test/scenario/checklist name>
 - **Code ref**: <implementation / contract / schema / adapter path>

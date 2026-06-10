@@ -37,6 +37,8 @@ UI Contract
 
 Although this plan originates from UI responsive validation, the emerging Coverage Model may eventually become a shared Validation Reasoning concept rather than a UI-specific taxonomy. API validation, runtime validation, workflow validation, and UI validation can all face the same question: which states, contexts, and evidence classes are covered well enough to support the completion claim?
 
+Follow-up execution in [`2026-06-10-0908-user-journey-validation-integration.md`](2026-06-10-0908-user-journey-validation-integration.md) adds evidence-backed Outcome Validation pressure: BDD owns Journey Specification, software-delivery validation owns Journey Execution, and the first landing models Journey as `validation_scope` rather than `validation_domain` or typed Context Taxonomy.
+
 ## Decision Rationale
 
 ### Problem & Why Now
@@ -156,7 +158,7 @@ context:
 | Priority | Focus | Rationale |
 |---|---|---|
 | P1 | Browser Evidence Metadata | 已有 screenshots / DOM snapshots / interaction traces；缺 viewport/capture metadata 會讓 evidence 無法 review。 |
-| P2 | Coverage Model | State Coverage + Context Coverage + Evidence Coverage 已有真實 workflow 壓力，但仍需先保持 doc/watch-list。 |
+| P2 | Coverage Model | State Coverage + Context Coverage + Evidence Coverage 已有真實 workflow 壓力；Journey follow-up adds Outcome Validation pressure while keeping Journey as `validation_scope` for the first landing. |
 | P3 | Responsive domain downgrade decision | 需要更多 usage evidence 判斷 `Responsive` 是否應降為 `context.render`。 |
 | P4 | Typed Context Taxonomy | render / interaction / accessibility / environment / appearance / locale 需要更多 scenarios，不能先做成 generic `experience_context`。 |
 

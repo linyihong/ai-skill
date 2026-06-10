@@ -25,11 +25,14 @@ activation:
     - performance_sensitive_change_detected
     - state_visibility_gap_detected
     - proxy_prone_side_effect_detected
+    - critical_journey_claim
+    - journey_validation_claim
   required_when:
     - Work involves development, implementation, code modification, code review, design review, release review, security review, or contract governance review.
     - A change may alter observable behavior, public contract, domain invariant, error handling, storage, security, performance, or tests.
     - A refactor, migration, replacement, new entrypoint, tool rewrite, or architecture split may replace existing capability.
     - A success signal may not prove persisted, external, identity-specific, or user-observable state.
+    - A project-defined critical journey is claimed complete or a BDD scenario defines a multi-step user outcome.
 
 required_sources:
   - workflow/software-delivery/README.md
@@ -88,13 +91,13 @@ loading_surfaces:
   test_strategy:
     source: workflow/software-delivery/test-strategy.md
     load_when:
-      - BDD closure, test strategy, mutation testing, or test-first ordering is needed
+      - BDD closure, Journey Specification, test strategy, mutation testing, or test-first ordering is needed
     do_not_load_when:
       - task does not touch behavior proof or test design
   validation:
     source: workflow/software-delivery/validation.md
     load_when:
-      - validation, evidence acquisition, performance gate, old/new behavior proof, or completion evidence is needed
+      - validation, Journey Validation, evidence acquisition, performance gate, old/new behavior proof, or completion evidence is needed
     do_not_load_when:
       - implementation has not reached validation or task is evidence-only analysis
   closure:
@@ -179,7 +182,7 @@ steps:
       - sdk_defect_reported
   - id: define_test_strategy
     order: 9
-    action: Load the test-strategy surface, then define old behavior regression, new behavior proof, mutation/negative checks, persistence/integration tests, state visibility evidence chain, and hardware/performance evidence when relevant.
+    action: Load the test-strategy surface, then define old behavior regression, new behavior proof, BDD-owned Journey Specification when a multi-step user outcome is in scope, mutation/negative checks, persistence/integration tests, state visibility evidence chain, and hardware/performance evidence when relevant.
     gates:
       - gate.software_delivery.validation_target_defined
   - id: run_performance_gate
@@ -189,9 +192,10 @@ steps:
       - performance_sensitive_change_detected
   - id: validate_and_close
     order: 11
-    action: Load validation and closure surfaces as needed, acquire evidence, run validation at the required evidence depth, check blockers, update durable docs, feed reusable lessons when appropriate, and report scope honestly.
+    action: Load validation and closure surfaces as needed, acquire evidence, run validation at the required evidence depth, validate critical journey execution against expected outcomes when applicable, check blockers, update durable docs, feed reusable lessons when appropriate, and report scope honestly.
     gates:
       - gate.software_delivery.validation_complete
+      - gate.software_delivery.journey_validation_complete
 
 gates:
   - id: gate.software_delivery.evidence_classified
@@ -260,6 +264,7 @@ gates:
       - relevant contract, integration, fixture, mutation, property, persistence, generated-client, host, target, or hardware-in-loop checks are chosen
       - state visibility gaps map observed signals to real state, evidence scope, and evidence chain segments
       - proxy-prone side effects identify whether independent observation is required
+      - critical journey claims have BDD-owned Journey Specification, project-defined journey name, criticality reason, side-effect chain, expected outcomes, and observable evidence plan
   - id: gate.software_delivery.validation_complete
     blocks: final_completion_response
     pass_when:
@@ -268,6 +273,16 @@ gates:
       - critical payment, email, external API, storage, queue, or entitlement paths include independent observation or are reported as blocked
       - unresolved blockers affecting behavior, contract, error handling, security, storage, ownership, or tests are not hidden
       - completion claim scope matches evidence
+  - id: gate.software_delivery.journey_validation_complete
+    blocks: critical_journey_completion_claim
+    pass_when:
+      - Journey is treated as validation scope, not validation_domain or UI governance domain
+      - Journey Specification is owned by BDD or an equivalent project behavior spec
+      - journey name and criticality are project-defined, with criticality reason recorded for critical journeys
+      - side-effect chain is listed from user action through expected state transitions
+      - expected outcomes are separated from observable evidence
+      - observable evidence proves the expected outcomes at the required evidence depth
+      - API success, adapter success, mock pass, screen-level UI pass, or screenshot-only evidence is not accepted as full journey proof
 
 required_evidence:
   - goal / action / validation statement
@@ -277,6 +292,7 @@ required_evidence:
   - framework source-of-truth and duplication risk evidence when framework/runtime/governance/workflow surfaces change
   - parity inventory when replacing existing capability
   - BDD / contract / test traceability when behavior changes
+  - Journey Specification and Journey Validation evidence when a project-defined critical journey is claimed complete
   - Consumer / UI Behavior / Screen / ViewModel contract evidence when a consumer surface changes
   - UI governance domain, render context, collection method, validation mechanism, evidence class, severity, and project-local design-system policy when UI compliance is claimed
   - responsive validation matrix with at least desktop and mobile evidence when responsive behavior is claimed
@@ -293,6 +309,7 @@ success_criteria:
   - Replacement and migration work preserves observable capability or records scoped gaps.
   - Validation distinguishes old behavior still protected from new behavior proven.
   - Validation evidence follows the state propagation chain when observed success may diverge from real state.
+  - Critical journey validation follows the BDD specification through side effects, expected outcomes, and observable evidence.
   - Reusable lessons are sanitized and linked to the correct owner layer.
 
 failure_modes:
@@ -323,6 +340,9 @@ failure_modes:
   - id: responsive_context_evidence_missing
     detection: Agent claims responsive validation from desktop-only evidence, names only device SKUs, or omits constrained render-context capture.
     recovery: Reclassify as Responsive domain, record render_context, and collect at least desktop_capture plus mobile_capture or equivalent wide/narrow evidence before completion.
+  - id: journey_validation_proxy_success
+    detection: Agent treats API 200, adapter success, mock pass, or screen-level UI pass as proof that a critical user journey completed.
+    recovery: Load test-strategy.md and validation.md; require BDD-owned Journey Specification, side-effect chain, expected outcomes, and observable evidence before completion.
 
 final_status_report:
   required_fields:

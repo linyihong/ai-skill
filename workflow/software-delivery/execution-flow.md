@@ -13,11 +13,11 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 > | 認知階段（cognitive phase） | 本檔對應段落 | slice id | load_when |
 > |---|---|---|---|
 > | Intake（需求接收 / parity） | **已抽出** → [`intake.md`](intake.md)（含 Start From Evidence、Change Intake、Pre-build Interrogation、Requirements Cognition、Parity Gate、Product Brief Validation、Missing Information、Backfill） | `sd-intake` | 接收新需求 / 變更 / 重構意圖 |
-> | Test strategy（測試策略 / BDD） | **已抽出** → [`test-strategy.md`](test-strategy.md)（含 BDD Closure / Docs-First Loop / Test Strategy Gate / Mutation / Test-First Ordering） | `sd-test-strategy` | 定義測試策略 / BDD 閉環 |
+> | Test strategy（測試策略 / BDD） | **已抽出** → [`test-strategy.md`](test-strategy.md)（含 BDD Closure / Journey Specification / Docs-First Loop / Test Strategy Gate / Mutation / Test-First Ordering） | `sd-test-strategy` | 定義測試策略 / BDD 閉環 / Journey Specification |
 > | UI contracts（Screen Mapping / Consumer / Screen / ViewModel） | **已抽出** → [`ui-contracts.md`](ui-contracts.md)（含 Screen Mapping、Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract、Screen Traceability） | `sd-ui-contracts` | 前端、行動、CLI、SDK 或其他 consumer surface 需要平行實作或 AI 生成 UI / state / tests |
 > | UI governance（UI compliance / design system / evidence） | **已抽出** → [`ui-governance.md`](ui-governance.md)（含 governance domain、render context、validation mechanism、evidence class、severity policy、project-local design-system boundary） | `sd-ui-governance` | UI / consumer surface 需要 design-system enforcement、accessibility evidence、responsive evidence、behavior pattern checks、visual baseline review、AI visual review scoping 或 UI compliance completion claim |
 > | Implementation（執行核心） | §3 SDK 缺陷閉環、§4 同工作階段閉環 | `sd-implementation` | 實際進行程式碼變更 |
-> | Validation（驗證 / 效能） | **已抽出** → [`validation.md`](validation.md)（含 Perf Gate + Validate） | `sd-validation` | 驗證變更 / 效能關卡 |
+> | Validation（驗證 / 效能） | **已抽出** → [`validation.md`](validation.md)（含 Perf Gate + Validate + Journey Validation） | `sd-validation` | 驗證變更 / 效能關卡 / Journey Validation |
 > | Closure（收尾 / 回饋） | **已抽出** → [`closure.md`](closure.md)（含 DoR / DoD / Feed Back Lessons） | `sd-closure` | 收尾、DoR/DoD 檢核、回饋可重用課程 |
 > | Surgical caveats（diff 紀律） | **已抽出** → [`surgical-changes.md`](surgical-changes.md) | `sd-surgical-caveats`（`type: failure`） | 外科手術式小改、控制 diff 純度 |
 >
@@ -33,7 +33,7 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 
 ## 2. 文件優先 BDD 閉環（Docs-First BDD Closure Loop）→ 已抽出為獨立 slice
 
-Docs-First BDD Closure Loop 連同 BDD Execution Closure、Test Strategy Gate、測試策略定義、Test-First Ordering 已抽出為 focused slice **[`test-strategy.md`](test-strategy.md)**（`sd-test-strategy`，`type: execution`，tags `artifact-gate, test, bdd`）。canonical content 在 `test-strategy.md`，此處不再保留正文以避免 dual source-of-truth。
+Docs-First BDD Closure Loop 連同 BDD Execution Closure、Journey Specification、Test Strategy Gate、測試策略定義、Test-First Ordering 已抽出為 focused slice **[`test-strategy.md`](test-strategy.md)**（`sd-test-strategy`，`type: execution`，tags `artifact-gate, test, bdd`）。canonical content 在 `test-strategy.md`，此處不再保留正文以避免 dual source-of-truth。
 
 定義測試策略 / BDD 閉環 / test-first ordering 時載入該 slice。
 
@@ -71,7 +71,7 @@ Docs-First BDD Closure Loop 連同 BDD Execution Closure、Test Strategy Gate、
 
 ## 5. 效能測試關卡（Performance Test Gate）→ 已抽出為獨立 slice
 
-效能測試關卡連同 §7 驗證已抽出為 focused slice **[`validation.md`](validation.md)**（`sd-validation`，`type: execution`，tags `artifact-gate, validation, performance`）。canonical content 在 `validation.md`，此處不再保留正文以避免 dual source-of-truth。
+效能測試關卡連同 §7 驗證與 Journey Validation 已抽出為 focused slice **[`validation.md`](validation.md)**（`sd-validation`，`type: execution`，tags `artifact-gate, validation, performance`）。canonical content 在 `validation.md`，此處不再保留正文以避免 dual source-of-truth。
 
 驗證變更 / 效能關卡時載入該 slice；尚未實作完成前不需載入。
 
