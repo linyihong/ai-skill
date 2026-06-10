@@ -1,7 +1,7 @@
 ---
 id: 2026-06-10-1718-software-delivery-governance-invariants
 plan_kind: main
-status: in-progress
+status: completed
 owner: linyihong
 created: 2026-06-10
 priority: P1
@@ -10,7 +10,7 @@ required_for_completion: false
 
 # Software Delivery Governance Invariants
 
-**Status**: `in-progress`
+**Status**: `completed`
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-10
 **Priority**：**P1**（software-delivery workflow hardening；把 incident feedback 提煉成 governance invariants）
@@ -132,16 +132,18 @@ This is not ready for ADR promotion. The invariant family is plausible, but need
 
 ### ADR Promotion Criteria（completed 時驗證）
 
-- [ ] At least 3 invariants land with clear workflow placement and no duplicated source-of-truth.
-- [ ] At least 3 validation scenarios prove the invariants catch distinct failure families.
-- [ ] Workflow activation / escalation concerns are cross-linked to the Workflow Activation Engine or explicitly deferred.
-- [ ] `explicit-root-cause-hypothesis` is either placed outside software-delivery or justified as a software-delivery checkpoint.
-- [ ] Task boundary and ownership boundary are evaluated separately; `ownership-boundary-validation` is kept only if Phase 0 proves it is one stable model.
-- [ ] Claim Validation is evaluated but not introduced unless at least three invariants share identical validation structure; similar concepts are not enough.
-- [ ] `authority-coupled-side-effects`, `configuration-readback-validation`, and `operational-transaction-closure` are either implemented or explicitly deferred with evidence.
-- [ ] Existing Journey Validation, State Visibility Gap, Evidence Chain Validation, and Failure Authority references remain consistent.
-- [ ] No new generic runtime schema is introduced without named consumers and validation scenarios.
-- [ ] If promoted beyond workflow, shared Validation Reasoning is evaluated before ADR.
+- [x] At least 3 invariants land with clear workflow placement and no duplicated source-of-truth.
+- [x] At least 3 validation scenarios prove the invariants catch distinct failure families.
+- [x] Workflow activation / escalation concerns are cross-linked to the Workflow Activation Engine or explicitly deferred.
+- [x] `explicit-root-cause-hypothesis` is either placed outside software-delivery or justified as a software-delivery checkpoint.
+- [x] Task boundary and ownership boundary are evaluated separately; `ownership-boundary-validation` is kept only if Phase 0 proves it is one stable model.
+- [x] Claim Validation is evaluated but not introduced unless at least three invariants share identical validation structure; similar concepts are not enough.
+- [x] `authority-coupled-side-effects`, `configuration-readback-validation`, and `operational-transaction-closure` are either implemented or explicitly deferred with evidence.
+- [x] Existing Journey Validation, State Visibility Gap, Evidence Chain Validation, and Failure Authority references remain consistent.
+- [x] No new generic runtime schema is introduced without named consumers and validation scenarios.
+- [x] If promoted beyond workflow, shared Validation Reasoning is evaluated before ADR.
+
+ADR decision: do not promote to ADR yet. The workflow evidence shapes are useful and documented, but no runtime gate, shared execution reasoning atom, or accepted architecture contract was introduced. `operational-transaction-closure` and `runtime-capability-validation` remain future promotion candidates.
 
 ### Consequences（預期）
 
@@ -208,19 +210,19 @@ This plan does not add a new `runtime/*.yaml` source and does not use deferred r
 
 ## Open Questions
 
-- [ ] Which invariants belong in `workflow/software-delivery`, and which should remain in shared Validation Reasoning?
+- [x] Which invariants belong in `workflow/software-delivery`, and which should remain in shared Validation Reasoning? Phase 4: authority/readback/task-scope/ownership landed as workflow evidence shapes; operational transaction and runtime capability remain future shared-reasoning candidates.
 - [x] Which activation/escalation concerns belong in this plan, and which should be deferred to Workflow Activation Discovery Bridge? Phase 0: defer routing mechanics to Workflow Activation Discovery Bridge; this plan only records routing pressure.
 - [x] Should activation/escalation be downgraded from invariant candidates to routing pressure only? Phase 0: yes, unless future scenario evidence proves a separate software-delivery invariant.
 - [x] Should `explicit-root-cause-hypothesis` be moved out of software-delivery into shared evidence acquisition / validation reasoning? Phase 0: yes for invariant placement; keep only as evidence-acquisition discipline / diagnostic checkpoint candidate.
 - [x] Is the boundary problem one concept, or should it split into `task-scope-validation` plus `ownership-awareness`? Phase 1: split for now; scenarios should test them separately.
 - [x] Do authority, readback, closure, and journey validation share identical validation structure, or are they only similar concepts? Phase 0: not proven; `claim_validation` remains hypothesis-only.
-- [ ] What evidence is sufficient to decide workflow escalation from UI -> runtime capability -> side effect -> journey validation?
+- [x] What evidence is sufficient to decide workflow escalation from UI -> runtime capability -> side effect -> journey validation? Phase 2/3: scenarios and evidence shapes require runtime capability, authority/readback, and journey evidence before expanding the completion claim.
 - [x] Should `authority-coupled-side-effects` become a workflow gate, an artifact evidence shape, or an intelligence atom first? Phase 1: artifact / validation evidence shape first; no executable gate before scenarios.
-- [ ] What is the minimum authority ladder for side effects without hardcoding domain-specific business events?
+- [x] What is the minimum authority ladder for side effects without hardcoding domain-specific business events? Phase 3: require business truth, authority event, observable proxy, durable/external evidence, and user/business readback; do not hardcode domain events.
 - [x] How should `configuration-readback-validation` relate to State Visibility Gap without duplicating it? Phase 0: treat as workflow evidence shape backed by State Visibility Gap / Evidence Chain, not a new shared reasoning atom yet.
-- [ ] Does `operational-transaction-closure` belong in software-delivery workflow, or should it graduate to shared execution reasoning for deploys, migrations, backfills, cache rebuilds, and similar operations? Phase 0: likely shared execution reasoning, but needs Phase 1 placement matrix and scenarios.
-- [ ] What validation scenarios are needed before any of these become executable gates?
-- [ ] Should runtime capability validation be limited to user-visible surfaces first, or include backend/platform runtime capabilities too?
+- [x] Does `operational-transaction-closure` belong in software-delivery workflow, or should it graduate to shared execution reasoning for deploys, migrations, backfills, cache rebuilds, and similar operations? Phase 4: defer promotion; keep workflow close-out evidence shape while gathering cross-operation evidence.
+- [x] What validation scenarios are needed before any of these become executable gates? Phase 2 added 10 scenario-first YAML files.
+- [x] Should runtime capability validation be limited to user-visible surfaces first, or include backend/platform runtime capabilities too? Phase 4: keep plan-local/workflow-local until browser/platform/filesystem/container/orchestration evidence proves whether the model splits.
 
 ## Phase 0 — Open Questions Check + Architecture Compatibility Preflight
 
@@ -250,10 +252,10 @@ This plan does not add a new `runtime/*.yaml` source and does not use deferred r
 
 Phase 0 should answer these four questions before expanding vocabulary:
 
-- [ ] Are activation and escalation only routing pressure for the Workflow Activation Engine?
-- [ ] Does root-cause hypothesis belong to evidence acquisition rather than software-delivery workflow?
-- [ ] Is boundary validation one concept, or should it split into task scope and ownership awareness?
-- [ ] Do authority, readback, closure, and journey validation share identical validation structure? If not, keep `claim_validation` as a hypothesis and do not introduce a parent abstraction.
+- [x] Are activation and escalation only routing pressure for the Workflow Activation Engine?
+- [x] Does root-cause hypothesis belong to evidence acquisition rather than software-delivery workflow?
+- [x] Is boundary validation one concept, or should it split into task scope and ownership awareness?
+- [x] Do authority, readback, closure, and journey validation share identical validation structure? If not, keep `claim_validation` as a hypothesis and do not introduce a parent abstraction.
 
 ### Phase 0.0b — Validation Targets
 
@@ -438,12 +440,12 @@ No shared reasoning document was created in Phase 4. The workflow evidence shape
 
 ## Phase 5 — Runtime Refresh + Closure
 
-- [ ] Run ReadLints for changed docs/scenarios.
-- [ ] Run `git diff --check`.
-- [ ] Run `ai-skill runtime refresh`.
-- [ ] Run `ai-skill runtime validate`.
-- [ ] Run `ai-skill plans tree --state active --format text`.
-- [ ] Confirm `git status --short --branch` is clean after commit/push if implementation proceeds.
+- [x] Run ReadLints for changed docs/scenarios.
+- [x] Run `git diff --check`.
+- [x] Run `ai-skill runtime refresh`.
+- [x] Run `ai-skill runtime validate`.
+- [x] Run `ai-skill plans tree --state active --format text`.
+- [x] Confirm `git status --short --branch` is clean after commit/push if implementation proceeds.
 
 ## 完成條件
 
@@ -452,7 +454,7 @@ No shared reasoning document was created in Phase 4. The workflow evidence shape
 - [x] Explicit root-cause hypothesis has a placement decision and is not forced into software-delivery if shared evidence acquisition is the better owner.
 - [x] Task scope and ownership boundary are merged or deliberately split with evidence.
 - [x] `claim_validation` remains hypothesis-only unless structural identity is proven across at least three invariants.
-- [ ] `operational-transaction-closure` has a placement decision: software-delivery workflow, shared execution reasoning, or deferred.
+- [x] `operational-transaction-closure` has a placement decision: software-delivery workflow, shared execution reasoning, or deferred.
 - [x] Each invariant has an owner surface, a deferred reason, or a shared-reasoning promotion decision.
 - [x] At least 3 validation scenarios cover distinct failure families before executable workflow changes.
 - [x] Workflow docs do not duplicate existing State Visibility Gap, Journey Validation, or Evidence Chain guidance.
@@ -480,7 +482,7 @@ No shared reasoning document was created in Phase 4. The workflow evidence shape
 
 | Generated surface key | Named consumer(s) | Consumer 類型 |
 |---|---|---|
-| n/a | n/a | Draft plan only; no runtime surface, route, validator, or generated projection added yet |
+| n/a | n/a | Completed plan; no new runtime surface, route, validator, or generated projection was added |
 
 ## 與其他 plans 的關係
 
@@ -488,4 +490,4 @@ No shared reasoning document was created in Phase 4. The workflow evidence shape
 - Builds on [`archived/2026-06-10-0908-user-journey-validation-integration`](../archived/2026-06-10-0908-user-journey-validation-integration.md): post-deploy smoke should become journey-level validation when the claim is a user flow.
 - Related to [`active/2026-06-09-1040-experience-validation-pipeline-evolution`](2026-06-09-1040-experience-validation-pipeline-evolution.md): this plan adds governance-invariant pressure but should not promote Typed Context Taxonomy or generic Evidence Envelope by itself.
 - Related to [`active/2026-06-06-1700-workflow-activation-discovery-bridge`](2026-06-06-1700-workflow-activation-discovery-bridge.md): workflow activation / escalation failures should feed that route/routing plan rather than becoming software-delivery-local routing logic.
-- Related to existing validation reasoning sources under `intelligence/engineering/execution/validation-reasoning/`; Phase 0 decides whether new shared reasoning documents are needed.
+- Related to existing validation reasoning sources under `intelligence/engineering/execution/validation-reasoning/`; Phase 4 decided not to create new shared reasoning documents yet.
