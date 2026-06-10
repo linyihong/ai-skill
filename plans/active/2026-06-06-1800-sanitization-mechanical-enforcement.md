@@ -287,16 +287,20 @@ git pre-commit hook
   - 完整 internal/app 測試套 (110s) 全 pass，無 regression
   - 詳見 [`runtime/repository-topology-migration.md`](../../runtime/repository-topology-migration.md)
 
-- **Phase 1C₂** — Project metadata projection（additive，pending）
-  - 新 `derived_private_entities` + `derived_match_tokens` 兩張表（不取代既有 `derived_forbidden_tokens` — Phase 1D 才退役 legacy）
-  - 新 `compileDerivedPrivateEntities` + `compileDerivedMatchTokens` 函數 using `LoadProjectMetadata`
-  - case-variant expansion 在 projection 階段（不在 parser）
-  - Compiler unit test
+- **Phase 1C₂** — Project metadata projection（additive，landed 2026-06-10）
+  - 新 `derived_private_entities`（governance：name / kind / owning_project / placeholder）+ `derived_match_tokens`（execution：token / canonical_token / entity_name / kind / owning_project / placeholder）兩張表，**additive** 不取代既有 `derived_forbidden_tokens`（Phase 1D 才退役 legacy）
+  - 新 `scripts/ai-skill-cli/internal/app/project_metadata_compile.go`：`compileProjectMetadataDerived`（walk + parse via `LoadProjectMetadata`）+ pure `projectMetadataDerivedRows` + `expandEntityMatchTokens`
+  - case-variant expansion 在 projection 階段（`auto` → `sanitizationTokenVariants`；`explicit` → verbatim 並抑制 auto）；parser 維持純讀
+  - cross-entity token collision 保留 entity identity（PK 含 entity_name），供 Phase 1D finding 報 entity 而非僅 token
+  - transition tolerance：新-schema validation 失敗的 project file 跳過（legacy 投影仍覆蓋），I/O 錯誤照常 propagate
+  - source-file 註冊交給 legacy 投影（避免 `runtime_source_files` source_path PK 衝突）
+  - `project_metadata_compile_test.go`（5/5 pass：auto expansion / explicit suppresses auto / cross-entity collision / public skip / DB integration + bootstrap-safety）
+  - 嚴格未動 `sanitization_scan.go`；live `ai-skill runtime compile` 驗證新表存在且 0 row（bootstrap-safe — 尚無 project 以新 schema 宣告 `private_entities`）
 
 - [x] **1C₁** topology projection migration（landed this commit）
-- [ ] **1C₂** project metadata projection（additive，pending）
-- [x] Phase 1B/1A discipline 保持：1C₁ 不動 `sanitization_scan.go`，legacy reader/scanner 完全靠 backward-compat JSON 持續運作
-- [x] Compiler unit test（topology only — 1C₂ 補 project metadata 的 unit test）
+- [x] **1C₂** project metadata projection（additive，landed 2026-06-10）
+- [x] Phase 1B/1A discipline 保持：1C₁/1C₂ 不動 `sanitization_scan.go`，legacy reader/scanner 完全靠 backward-compat JSON 持續運作
+- [x] Compiler unit test（topology + 1C₂ project metadata projection 各自 unit test 全 pass）
 
 #### Phase 1D — Scanner Implementation
 

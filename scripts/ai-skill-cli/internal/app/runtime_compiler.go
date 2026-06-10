@@ -106,6 +106,16 @@ func createGoRuntimeSchema(db *sql.DB) error {
 		`CREATE TABLE generated_surfaces (id INTEGER PRIMARY KEY AUTOINCREMENT, source_path TEXT NOT NULL, target_key TEXT NOT NULL, compile_rule TEXT NOT NULL, compiled_at TEXT NOT NULL, compiler_version TEXT NOT NULL, status TEXT NOT NULL, data TEXT NOT NULL, UNIQUE(source_path, target_key));`,
 		`CREATE TABLE repository_topology (subtree TEXT PRIMARY KEY, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE derived_forbidden_tokens (token TEXT NOT NULL, canonical_token TEXT NOT NULL, owning_project_id TEXT NOT NULL, source_metadata_path TEXT NOT NULL, suggested_placeholder TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), PRIMARY KEY (token, owning_project_id, source_metadata_path));`,
+		// Phase 1C₂ (2026-06-10): metadata-derived projection split into a
+		// governance layer (derived_private_entities — entity identity for
+		// findings/audit) and an execution layer (derived_match_tokens —
+		// case-variant-expanded surface the scanner compares against). These
+		// are ADDITIVE alongside the legacy derived_forbidden_tokens table;
+		// Phase 1D retires the legacy table once the scanner reads
+		// derived_match_tokens directly. See
+		// scripts/ai-skill-cli/internal/app/project_metadata_compile.go.
+		`CREATE TABLE derived_private_entities (entity_name TEXT NOT NULL, kind TEXT NOT NULL, owning_project_id TEXT NOT NULL, source_metadata_path TEXT NOT NULL, suggested_placeholder TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), PRIMARY KEY (entity_name, owning_project_id, source_metadata_path));`,
+		`CREATE TABLE derived_match_tokens (token TEXT NOT NULL, canonical_token TEXT NOT NULL, entity_name TEXT NOT NULL, kind TEXT NOT NULL, owning_project_id TEXT NOT NULL, source_metadata_path TEXT NOT NULL, suggested_placeholder TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), PRIMARY KEY (token, entity_name, owning_project_id, source_metadata_path));`,
 		`CREATE TABLE sanitization_patterns (category TEXT PRIMARY KEY, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE runtime_budget (id INTEGER PRIMARY KEY AUTOINCREMENT, model_name TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
 		`CREATE TABLE context_ttl_policy (id INTEGER PRIMARY KEY AUTOINCREMENT, ttl_type TEXT, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')));`,
@@ -302,6 +312,13 @@ func compileStructuredRuntimeSources(repo string, db *sql.DB, docs map[string]ma
 		return err
 	}
 	if err := compileDerivedForbiddenTokens(repo, db); err != nil {
+		return err
+	}
+	// Phase 1C₂ (2026-06-10): additive metadata-derived projection into
+	// derived_private_entities (governance) + derived_match_tokens
+	// (execution). Runs alongside the legacy projection above; the legacy
+	// table is retired by Phase 1D. See project_metadata_compile.go.
+	if err := compileProjectMetadataDerived(repo, db); err != nil {
 		return err
 	}
 	// Phase 1C₁ (2026-06-09): repository topology now uses a custom
