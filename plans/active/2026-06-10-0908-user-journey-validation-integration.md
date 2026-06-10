@@ -325,6 +325,14 @@ Per-surface consumer table will be finalized before implementation. This plan do
 - [x] Run `git diff --check`.
 - [ ] Confirm `git status --short --branch` is clean after commit/push if implementation proceeds.
 
+## Pilot Findings — Vidoe-Test
+
+- [x] Applied the Journey Validation model to `<VIDOE_TEST_PROJECT>` as a project-specific workflow upgrade.
+- [x] Confirmed `membership_purchase` is a good project-defined critical journey: `create_membership_order -> payment_event_recorded -> membership_active -> playback_allowed`.
+- [x] Confirmed API success is insufficient: the useful pass condition needs DB readback, payment event readback, authenticated record/profile evidence, and protected playback resource evidence.
+- [x] Refined evidence selection: Client Component HTML is not stable proof for `membership_active`; use DB readback for the outcome and protected HLS key / protected resource readback for `playback_allowed`.
+- [x] Refined test fixture ownership: journey validation should create and clean its own protected playback fixture when live seed data is not guaranteed.
+
 ## 完成條件
 
 - [x] Journey Validation is documented in the validation layer.
