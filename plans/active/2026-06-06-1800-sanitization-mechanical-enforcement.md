@@ -313,6 +313,21 @@ git pre-commit hook
   - bootstrap-safety case：首次提交一個全新 framework concept token，確認 0 finding
   - entity vs token granularity case：兩個 entity 的 match_tokens 部分重疊 → finding 報 entity name（不只 token），便於 governance debug
 
+#### Phase 1D — Shape-Aware Skip Remediation（bound 2026-06-10，源自 1C₂ self-review）
+
+> **背景（1C₂ self-review Finding 1）**：`compileProjectMetadataDerived`（`project_metadata_compile.go`）目前對 new-schema validation 失敗的 `.ai-skill-project.yaml` 採 **silent `continue`**，rationale 是「transition 期間 legacy flat-shape 檔案本來就會 validation fail，legacy `derived_forbidden_tokens` 投影仍覆蓋」。此 tolerance **僅在 legacy 表還活著時成立**。
+>
+> **為何綁 1D 而非更早**：1C₂ 階段 silent-skip 完全無害（scanner 仍吃 legacy，0 個 `.ai-skill-project.yaml` 存在）。真正咬人的時間點正是 **1D**——scanner pointer 改指 `derived_match_tokens` **且 legacy 表退役**的那一刻：「被 legacy 覆蓋」的豁免理由蒸發，此後任何 skip = 該 project 零保護、且靜默無聲，恰好是本 plan 要消滅的「rule 無 executor / 自律靜默失效」class。**硬截止點：1D 完成前必須處置；不得拖到 Phase 4 gate 打開（那時壞檔直接靜默放行）。**
+>
+> **正確修法（非單純 stderr warning）**：純 warning 無法區分「合法舊格式」vs「新格式打錯字」。1D 必須做 **shape-aware** 分流：
+> - 偵測檔案使用的是 new-schema 鍵（`private_entities` 物件陣列）還是 legacy flat 形（`private_tokens` / string-list `private_entities`）
+> - **legacy flat 形** → 容忍跳過（與當前行為一致）
+> - **new-schema 但 validation fail** → **hard error**（compile 失敗），不得 silent `continue`
+
+- [ ] **1D-remediation**：`compileProjectMetadataDerived` 改 shape-aware tolerance（legacy-flat 容忍／new-schema-malformed hard-fail），與 scanner pointer 遷移、legacy `derived_forbidden_tokens` 退役同批
+- [ ] Unit test：new-schema-malformed file（缺 `kind`）→ compile hard error；legacy-flat file → 容忍跳過 0 error
+- [ ] 移除 `project_metadata_compile.go` 內 `IsValidationError(err) { continue }` 的無條件 silent-skip，改判 shape 後分流
+
 ### Phase 2 — Generic Regex Patterns (inherited from superseded plan)
 
 - [x] 新建 `runtime/sanitization-patterns.yaml`（canonical）+ companion section in `enforcement/sanitization-mechanical.md`
