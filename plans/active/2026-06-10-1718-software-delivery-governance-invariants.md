@@ -406,14 +406,35 @@ Phase 3 intentionally did not add runtime gates, `execution-flow.yaml` gates, ro
 
 ## Phase 4 — Glossary / Shared Reasoning Decision
 
-- [ ] Decide whether candidate terms should be registered in `knowledge/glossary/ai-skill.md`.
-- [ ] Keep `claim_validation` as a hypothesis unless Phase 0 + scenarios prove at least three invariants share identical validation structure.
-- [ ] Decide whether `authority-coupled-side-effects`, `configuration-readback-validation`, or `operational-transaction-closure` should become shared Validation Reasoning documents instead of workflow-only guidance.
-- [ ] Decide whether `operational-transaction-closure` should graduate to shared execution reasoning rather than software-delivery workflow.
-- [ ] Decide whether `explicit-root-cause-hypothesis` belongs under shared evidence acquisition / validation reasoning instead of software-delivery.
-- [ ] If shared reasoning is chosen, create focused documents under `intelligence/engineering/execution/validation-reasoning/` and update indexes.
-- [ ] If workflow-only is chosen, explicitly state why the concept should not yet graduate.
-- [ ] If activation / escalation is deferred to Workflow Activation Discovery Bridge, update this plan with a cross-link instead of duplicating implementation.
+- [x] Decide whether candidate terms should be registered in `knowledge/glossary/ai-skill.md`.
+- [x] Keep `claim_validation` as a hypothesis unless Phase 0 + scenarios prove at least three invariants share identical validation structure.
+- [x] Decide whether `authority-coupled-side-effects`, `configuration-readback-validation`, or `operational-transaction-closure` should become shared Validation Reasoning documents instead of workflow-only guidance.
+- [x] Decide whether `operational-transaction-closure` should graduate to shared execution reasoning rather than software-delivery workflow.
+- [x] Decide whether `explicit-root-cause-hypothesis` belongs under shared evidence acquisition / validation reasoning instead of software-delivery.
+- [x] If shared reasoning is chosen, create focused documents under `intelligence/engineering/execution/validation-reasoning/` and update indexes.
+- [x] If workflow-only is chosen, explicitly state why the concept should not yet graduate.
+- [x] If activation / escalation is deferred to Workflow Activation Discovery Bridge, update this plan with a cross-link instead of duplicating implementation.
+
+### Phase 4 Result — Glossary / Shared Reasoning Decision
+
+Registered as glossary `candidate` terms because Phase 0–3 established stable concept boundaries and workflow evidence shapes:
+
+- `authority_coupled_side_effects`
+- `configuration_readback_validation`
+- `task_scope_validation`
+- `ownership_awareness`
+
+Kept plan-local / workflow-local for now:
+
+- `runtime-capability-validation` stays out of glossary because Phase 2 preserved the open question that browser/platform/filesystem/container/orchestration capability evidence may split into narrower models.
+- `operational-transaction-closure` stays out of glossary and shared reasoning for now because it is the strongest shared execution reasoning candidate, but still needs cross-operation evidence across deploy, migration, backfill, cache rebuild, import, and batch-job scenarios.
+- `explicit-root-cause-hypothesis` remains evidence acquisition / diagnostic discipline, expressed in `validation.md`, not a glossary term or software-delivery invariant.
+
+Explicitly not registered:
+
+- `claim_validation` remains hypothesis-only. Evidence Hierarchy already owns claim scope and confidence integrity; Phase 0–3 did not prove a common parent model across authority, readback, closure, and journey.
+
+No shared reasoning document was created in Phase 4. The workflow evidence shapes are useful enough to reference, but not yet proven stable enough to promote into `intelligence/engineering/execution/validation-reasoning/` or shared execution reasoning.
 
 ## Phase 5 — Runtime Refresh + Closure
 

@@ -10,6 +10,28 @@
 
 ---
 
+## authority_coupled_side_effects
+
+```yaml
+term: authority_coupled_side_effects
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  Software-delivery validation evidence shape for side-effect claims where a
+  low-authority proxy signal, such as a click, API 200, adapter success, log,
+  or local counter, must be distinguished from the authority event that owns
+  the business truth.
+affects:
+  - workflow/software-delivery/validation.md
+  - workflow/software-delivery/artifact-gates.md
+  - validation/scenarios/software-delivery/governance-authority-side-effect-low-authority.yaml
+anti-meaning: >
+  Not a rule that hardcodes a specific business event or counter. It requires
+  naming the business truth, authority event, observable proxy, and evidence
+  that proves the claim scope.
+introduced-by: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
+```
+
 ## activation_fitness
 
 ```yaml
@@ -100,6 +122,27 @@ affects:
 anti-meaning: >
   不是 gzip / zstd 等資料壓縮算法；不是 LLM context window 的硬上限。
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
+```
+
+## configuration_readback_validation
+
+```yaml
+term: configuration_readback_validation
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  Software-delivery validation evidence shape that separates desired
+  configuration input, applied state, actual runtime/deployed readback state,
+  and validation evidence before accepting a configuration-applied claim.
+affects:
+  - workflow/software-delivery/validation.md
+  - workflow/software-delivery/artifact-gates.md
+  - validation/scenarios/software-delivery/governance-configuration-readback-stale-runtime.yaml
+anti-meaning: >
+  Not a deploy-env checklist and not proof from editing a config file. It is an
+  application of State Visibility Gap / Evidence Chain reasoning to deployed
+  configuration claims.
+introduced-by: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
 ```
 
 ## context_cost
@@ -532,6 +575,29 @@ anti-meaning: >
 introduced-by: plans/active/2026-06-10-0908-user-journey-validation-integration.md
 ```
 
+## ownership_awareness
+
+```yaml
+term: ownership_awareness
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  Software-delivery intake and closure evidence shape that asks whether a
+  change crosses repo, module, security, platform, generated artifact, shared
+  library, or team ownership boundaries that require explicit review or
+  escalation.
+affects:
+  - workflow/software-delivery/intake.md
+  - workflow/software-delivery/closure.md
+  - workflow/software-delivery/review-checklist.md
+  - validation/scenarios/software-delivery/governance-ownership-awareness-cross-boundary.yaml
+anti-meaning: >
+  Not the same as task_scope_validation. A change can be inside the task scope
+  while crossing ownership boundaries, or outside task scope without crossing
+  owners.
+introduced-by: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
+```
+
 ## owner_layer
 
 ```yaml
@@ -799,6 +865,27 @@ anti-meaning: >
 related-terms:
   - { type: related_to, target: plan_tree }
 introduced-by: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/_plan.md
+```
+
+## task_scope_validation
+
+```yaml
+term: task_scope_validation
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  Software-delivery intake evidence shape that checks whether changed surfaces
+  still belong to the user-approved task scope, or whether the diff requires a
+  scope expansion decision, split, or narrowing before commit.
+affects:
+  - workflow/software-delivery/intake.md
+  - workflow/software-delivery/closure.md
+  - validation/scenarios/software-delivery/governance-task-scope-overreach.yaml
+anti-meaning: >
+  Not ownership_awareness. It answers whether the change belongs to this task,
+  not whether the touched surface belongs to another owner or governance
+  boundary.
+introduced-by: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
 ```
 
 ## thinking_cost
