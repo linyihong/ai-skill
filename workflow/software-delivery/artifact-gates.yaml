@@ -39,7 +39,7 @@ required_sources:
 steps:
   - id: choose_artifact_shape
     order: 1
-    action: Choose reusable note, product/process artifact, UI/consumer contract artifact, UI governance evidence, review report, parity inventory, performance evidence, or project-local evidence shape.
+    action: Choose reusable note, product/process artifact, UI/consumer contract artifact, UI governance evidence, governance invariant evidence shape, review report, parity inventory, performance evidence, or project-local evidence shape.
     outputs:
       - artifact_shape
   - id: fill_reusable_note_structure
@@ -109,6 +109,7 @@ gates:
       - residual risk and limits are stated
       - consumer/UI changes can trace consumer needs, screen states, view model derivation, accessibility expectations, and relevant fixtures or tests
       - UI compliance claims classify governance domain, render context, collection method, validation mechanism, evidence class, severity, project-local design-system policy, and responsive / visual / AI review scope without duplicating UI contract definitions
+      - governance invariant claims record runtime capability, authority-coupled side effect, configuration readback, operational transaction, or task/ownership evidence shape when relevant
       - replacement/parity and performance evidence are included when relevant
   - id: gate.artifact_gates.journey_validation_evidence_complete
     blocks: critical_journey_completion_claim
@@ -127,6 +128,10 @@ required_evidence:
   - consumer/UI contract decision when a consumer surface exists
   - UI governance evidence decision with render context and collection method when UI compliance, design-system, accessibility, responsive behavior, behavior pattern, visual baseline, or AI visual review is claimed
   - Journey Validation evidence with BDD reference, criticality reason, side-effect chain, expected outcomes, observable evidence, and validation result when a critical journey is claimed complete
+  - Runtime capability evidence with capability, runtime family, claim scope, readback, fallback evidence, and result when a runtime capability claim is made
+  - Authority-coupled side-effect evidence with business truth, authority event, observable proxy, durable/external evidence, and rejected proxy-only signals when a side-effect success claim is made
+  - Configuration readback evidence with desired state, applied state, readback state, validation evidence, and mismatch handling when a configuration applied claim is made
+  - Operational transaction closure evidence with operation, transaction state, final state readback, captured evidence, and residual unknowns when an operational completion claim is made
   - sanitization review summary
   - linked update statement
   - validation method
@@ -138,6 +143,7 @@ success_criteria:
   - Content lands in the correct owner layer and updates linked indexes or docs.
   - UI governance artifacts name evidence shape, render context, and owner layer without turning UI contracts into enforcement checklists.
   - Journey artifacts keep BDD-owned specification separate from validation-owned execution evidence.
+  - Governance invariant artifacts express reusable evidence shapes rather than incident-specific checklist rules.
   - Parity and performance evidence are required when the artifact makes replacement or performance claims.
   - Completion claims include validation and residual risk.
 
@@ -166,6 +172,9 @@ failure_modes:
   - id: journey_validation_proxy_success
     detection: Critical journey claim treats API 200, adapter success, mock pass, or screen-level UI pass as proof that expected outcomes occurred.
     recovery: Load test-strategy.md and validation.md; map Journey Specification to side-effect chain, expected outcomes, and observable evidence before accepting the completion claim.
+  - id: governance_invariant_proxy_success
+    detection: Runtime capability, side-effect authority, configuration readback, or operational transaction artifact uses a proxy signal as final proof.
+    recovery: Load validation.md and artifact-gates.md; record the matching evidence shape and narrow or block the completion claim until readback / authority / final-state evidence exists.
 
 final_status_report:
   required_fields:

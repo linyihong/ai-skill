@@ -136,6 +136,52 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 
 API 200、adapter success、mock pass、screen-level UI pass 或單一 screenshot 不能單獨完成 Journey Validation。
 
+## 5.3 Governance Invariant Evidence Shapes
+
+當 artifact 聲稱 runtime capability、authority-coupled side effect、configuration applied/readback、或 operational transaction 已完成時，使用 evidence shape，而不是新增 incident-specific checklist。
+
+### Runtime Capability
+
+最小欄位：
+
+- **Capability**：要證明的 runtime capability，例如 browser API、platform permission、filesystem access、container mount、service discovery。
+- **Runtime family**：browser / platform / filesystem / container / orchestration。
+- **Claim scope**：這個 capability 支撐哪個 feature、workflow 或 release claim。
+- **Capability readback**：feature detection、permission check、runtime probe、contract readback 或等效證據。
+- **Fallback evidence**：capability absent / denied / unavailable 時的 validated behavior。
+- **Result**：pass / fail / blocked。
+
+### Authority-Coupled Side Effect
+
+最小欄位：
+
+- **Business truth**：被宣稱完成的產品或業務狀態。
+- **Authority event**：有資格宣告 business truth 成立的事件或狀態。
+- **Observable proxy**：click、API 200、adapter success、log、local counter 等 proxy signal。
+- **Durable / external evidence**：DB、event record、provider/gateway confirmation、object/read model 或等效 readback。
+- **User / business observable readback**：使用者或業務結果可觀察證據。
+- **Rejected proxy-only signals**：不可作為 final proof 的訊號。
+
+### Configuration Readback
+
+最小欄位：
+
+- **Desired state**：輸入設定或期望設定值。
+- **Applied state**：部署、同步、生成或套用步驟。
+- **Readback state**：實際 runtime/deployed state 的 readback path。
+- **Validation evidence**：config input、runtime readback、user/API observable state。
+- **Mismatch handling**：desired/applied/readback 不一致時的 fail / blocked / rollback decision。
+
+### Operational Transaction Closure
+
+最小欄位：
+
+- **Operation**：deploy、migration、backfill、cache rebuild、data import、batch job 或 project-defined operation。
+- **Transaction state**：started、partial、interrupted、resumed、completed、verified。
+- **Final state readback**：runtime state、data count、version、health、business effect 或等效證據。
+- **Evidence captured**：start record、completion record、final-state verification。
+- **Residual unknowns**：若 final state 無法驗證，必須縮小完成宣告或標記 blocked。
+
 ## 6. 避免（Avoid）
 
 - 將未發布的工作流程映射到暗示性目錄名稱、列出開發者機器路徑或重複內部調查故事的追蹤 Markdown——這些屬於 gitignore 下的僅本機筆記，而非預設分支敘述。

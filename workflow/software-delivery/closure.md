@@ -48,6 +48,32 @@
 - 效能敏感變更已記錄 load、stress、spike、soak 或 smoke-size 效能證據，對照 agreed budget
 - 殘留的 unknowns 或延後的行為已在專案 repository 中記錄
 
+### Operational Transaction Close-Out
+
+When a task starts an operational transaction, do not close the work from a start signal alone. This guidance applies to deploys, migrations, backfills, cache rebuilds, data imports, batch jobs, or project-defined operations that can become partial or interrupted.
+
+Close-out evidence should record:
+
+```yaml
+operational_transaction_closeout:
+  operation: deploy | migration | backfill | cache_rebuild | data_import | batch_job
+  transaction_state:
+    started: true
+    partial: true | false
+    interrupted: true | false
+    resumed: true | false
+    completed: true | false | unknown
+    verified: true | false
+  final_state_readback: <runtime state, data count, version, health, or business effect>
+  closure_decision: complete | blocked | rolled_back | deferred_with_owner
+  evidence:
+    - start_record
+    - completion_record
+    - final_state_verification
+```
+
+If `completed` or `verified` is unknown, narrow the completion claim or mark the task blocked. If the same transaction-state shape proves reusable across deploy, migration, backfill, cache rebuild, import, and batch job scenarios, promote the reasoning to shared execution reasoning rather than expanding this workflow checklist.
+
 ## Feed Back Reusable Lessons（回饋可重複使用的課程）
 
 如果一個課程超越了一個產品：

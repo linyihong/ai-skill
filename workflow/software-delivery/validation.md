@@ -203,6 +203,112 @@ If the model proves reusable outside UI, promote it through shared validation re
 
 禁止把 API 200、adapter success、SMTP success、queue publish 或 mock pass 當成最終完成證據；這些只是不完整 evidence chain 的局部訊號。
 
+### Diagnostic Hypothesis Before Patch
+
+When a defect is ambiguous, state the diagnostic hypothesis before patching. This is evidence acquisition discipline, not a software-delivery invariant and not proof by itself.
+
+```yaml
+diagnostic_hypothesis:
+  observed_symptom: <what failed>
+  evidence_chain_status:
+    <segment>: confirmed | missing | contradicted | not_observed
+  collapse_point: <first missing or contradicted required segment>
+  root_cause_hypothesis: <claimed cause, still provisional>
+  supporting_evidence:
+    - <evidence that supports the hypothesis>
+  patch_target: <surface the hypothesis says should change>
+  validation_plan:
+    - <evidence that will confirm or reject the patch>
+```
+
+Do not treat the collapse point as root cause. If the hypothesis is missing, patching a downstream symptom should be reported as incomplete or blocked.
+
+### Governance Invariant Evidence Shapes
+
+Use these shapes when a software-delivery claim depends on runtime capability, side-effect authority, deployed configuration, or operational completion. They are workflow evidence shapes, not runtime gates. If a task only has a local or proxy signal, report the claim as incomplete instead of expanding the claim.
+
+#### Runtime Capability Validation
+
+Runtime capability validation checks whether the required runtime actually provides the capability and whether absence/fallback behavior is validated. Start with the narrow capability claim before promoting a broader environment model.
+
+```yaml
+runtime_capability_validation:
+  capability: navigator.share | clipboard | camera | filesystem | container_volume | service_discovery
+  runtime_family: browser | platform | filesystem | container | orchestration
+  required_for_claim: <feature or workflow claim>
+  capability_readback: <feature detection, permission check, runtime probe, or contract readback>
+  fallback_behavior: <unsupported-state behavior>
+  evidence:
+    - supported_runtime_case
+    - unsupported_runtime_case
+    - fallback_validation
+  result: pass | fail | blocked
+```
+
+Do not treat a rendered button, imported API, config value, or single happy-path browser run as proof that the runtime capability exists for the claim scope.
+
+#### Authority-Coupled Side Effects
+
+Authority-coupled side-effect validation identifies which event owns the business truth before accepting counters, logs, adapter success, or UI state as proof.
+
+```yaml
+authority_coupled_side_effect:
+  business_truth: <what product/business state is claimed>
+  authority_event: <event that is allowed to declare success>
+  observable_proxy: <click, API 200, adapter success, log, local counter>
+  evidence:
+    durable_state: <DB/read model/event record>
+    external_confirmation: <provider/gateway/inbox/object store when applicable>
+    user_or_business_readback: <observable result>
+  rejected_proxy_only_signals:
+    - <signals that cannot be final proof>
+  result: pass | fail | blocked
+```
+
+Examples should stay project-local. The reusable rule is the evidence shape: identify the authority event and reject proxy-only success.
+
+#### Configuration Readback Validation
+
+Configuration readback validation proves the actual runtime/deployed state, not only the desired input state.
+
+```yaml
+configuration_readback_validation:
+  desired_state: <configured value or intended setting>
+  applied_state: <deployment/config application step>
+  readback_state: <runtime endpoint, diagnostic, env readback, generated page, or service state>
+  validation_evidence:
+    - config_input
+    - runtime_readback
+    - user_or_api_observable_state
+  result: pass | fail | blocked
+```
+
+If desired state and readback state differ, follow State Visibility / Evidence Chain reasoning instead of treating the config input as authoritative.
+
+#### Operational Transaction Closure
+
+Operational transaction closure is still a placement candidate: it may graduate to shared execution reasoning if deploys, migrations, backfills, imports, cache rebuilds, and batch jobs share one transaction-state model. Until then, use this shape to avoid claiming completion from a started or partial operation.
+
+```yaml
+operational_transaction_closure:
+  operation: deploy | migration | backfill | cache_rebuild | data_import | batch_job
+  transaction_state:
+    started: true
+    partial: true | false
+    interrupted: true | false
+    resumed: true | false
+    completed: true | false | unknown
+    verified: true | false
+  final_state_readback: <runtime state, data count, version, health, or business effect>
+  evidence_captured:
+    - start_record
+    - completion_record
+    - final_state_verification
+  result: pass | fail | blocked
+```
+
+Do not treat command start, partial progress, or a green local log as transaction closure.
+
 ### Journey Validation
 
 Journey Validation verifies that a BDD-owned Journey Specification actually executes through the expected state transition chain and reaches the expected outcome. It is validation-owned execution and evidence evaluation, not a UI governance domain and not a framework-canonical journey list.

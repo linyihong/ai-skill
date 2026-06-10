@@ -191,6 +191,41 @@ Blocking rule：任何舊入口若狀態為 `deferred`、`not planned` 或 `tool
 
 任何 `deferred`、`not planned` 或 `tool-specific` 項目都要寫明不阻擋目前 phase 的理由；任何有副作用的舊能力都需要隔離測試或 dry-run 證據。
 
+### Task Scope / Ownership Awareness Check
+
+Before implementation or commit, separate task scope from ownership awareness. They often appear together, but they answer different questions:
+
+- **Task scope validation** asks whether the changed surfaces still belong to the user-approved task.
+- **Ownership awareness** asks whether the changed surfaces cross repo, module, security, platform, generated artifact, or team ownership boundaries that need explicit review.
+
+Use this shape in change brief, implementation plan, or review notes when a change starts expanding:
+
+```yaml
+change_boundary_review:
+  declared_task_scope:
+    - <surface or behavior the task is allowed to change>
+  changed_surfaces:
+    - <actual files/modules/repos/workflows touched>
+  task_scope_result: in_scope | expanded_with_approval | overreach | blocked
+  ownership_boundaries:
+    crossed:
+      - <owner boundary, repo, module, generated artifact, shared library, security/payment/platform area>
+    review_status: not_needed | owner_reviewed | owner_missing | blocked
+  required_action:
+    - narrow_diff
+    - update_scope
+    - ask_owner
+    - split_change
+    - document_deferred_scope
+```
+
+Examples:
+
+- Editing login, registration, profile, and settings for a "fix Login page" request is task-scope overreach even if one team owns all screens.
+- Editing shared auth, security framework, or payment adapters for a "fix Login API" request may be ownership-awareness failure even if the changes are technically related.
+
+Do not use same-owner as proof of scope, and do not use task relatedness as ownership permission.
+
 ## Missing Information Gate（缺失資訊關卡）
 
 在開發規劃或實作繼續之前，缺失資訊必須被明確處理：

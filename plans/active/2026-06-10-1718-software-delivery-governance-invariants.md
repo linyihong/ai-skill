@@ -383,13 +383,26 @@ All Phase 2 scenarios are scenario-first inputs. They intentionally record `curr
 
 ## Phase 3 — Workflow Documentation Update
 
-- [ ] Update `workflow/software-delivery/validation.md` with authority/readback validation guidance if Phase 1 places it there.
-- [ ] Update `workflow/software-delivery/intake.md` with explicit root-cause hypothesis, task-scope validation, or ownership-boundary awareness only if Phase 1 places them there.
-- [ ] Update `workflow/software-delivery/test-strategy.md` with runtime capability and post-deploy journey test selection if Phase 1 places it there.
-- [ ] Update `workflow/software-delivery/closure.md` with change ownership and operational transaction closure if Phase 1 places them there.
-- [ ] Update `workflow/software-delivery/artifact-gates.md` with minimum evidence shapes for authority, configuration readback, and operational transaction closure if needed.
-- [ ] Update `workflow/software-delivery/execution-flow.yaml` only if Phase 2 scenarios prove an executable gate is warranted.
-- [ ] Update `workflow/software-delivery/README.md` and `plans/README.md` with concise status/index changes.
+- [x] Update `workflow/software-delivery/validation.md` with authority/readback validation guidance if Phase 1 places it there.
+- [x] Update `workflow/software-delivery/intake.md` with explicit root-cause hypothesis, task-scope validation, or ownership-boundary awareness only if Phase 1 places them there.
+- [x] Update `workflow/software-delivery/test-strategy.md` with runtime capability and post-deploy journey test selection if Phase 1 places it there.
+- [x] Update `workflow/software-delivery/closure.md` with change ownership and operational transaction closure if Phase 1 places them there.
+- [x] Update `workflow/software-delivery/artifact-gates.md` with minimum evidence shapes for authority, configuration readback, and operational transaction closure if needed.
+- [x] Update `workflow/software-delivery/execution-flow.yaml` only if Phase 2 scenarios prove an executable gate is warranted.
+- [x] Update `workflow/software-delivery/README.md` and `plans/README.md` with concise status/index changes.
+
+### Phase 3 Result — Documentation / Evidence Shape Landing
+
+Phase 3 intentionally did not add runtime gates, `execution-flow.yaml` gates, routes, or automatic enforcement. The Phase 2 scenarios are still fail-by-absence with respect to executable enforcement; Phase 3 only gives agents and reviewers evidence shapes to use.
+
+| Surface | Documentation update |
+|---|---|
+| `workflow/software-delivery/validation.md` | Added evidence shapes for runtime capability validation, authority-coupled side effects, configuration readback validation, and operational transaction closure. |
+| `workflow/software-delivery/artifact-gates.md` | Added minimum artifact fields for runtime capability, authority-coupled side effect, configuration readback, and operational transaction closure. |
+| `workflow/software-delivery/intake.md` | Added Task Scope / Ownership Awareness Check and a structured change-boundary review shape. |
+| `workflow/software-delivery/test-strategy.md` | Added runtime capability test selection guidance for supported and absent/denied/unavailable cases. |
+| `workflow/software-delivery/closure.md` | Added operational transaction close-out evidence shape and retained shared execution reasoning as the promotion path if scenarios converge. |
+| `workflow/software-delivery/execution-flow.yaml` | No change; Phase 2 did not prove an executable gate is warranted yet. |
 
 ## Phase 4 — Glossary / Shared Reasoning Decision
 
