@@ -355,6 +355,25 @@ Why this is not enough for promotion:
 
 Future promotion should happen in shared validation reasoning, not UI workflow, and only after at least 3 non-browser examples converge on a minimal envelope shape.
 
+### Phase 4 Observation — Journey Validation Pilot
+
+Vidoe-Test `membership_purchase` pilot added useful pressure, but it does **not** justify promoting Typed Context Taxonomy or a generic Evidence Envelope yet.
+
+Observed result:
+
+- Journey / Outcome Validation should be treated as `validation_scope`, not as a new context family and not as a UI governance domain.
+- The pilot reinforced the Coverage Model direction: the journey consumed state coverage (`membership_active`, `playback_allowed`), context coverage (`authenticated_user`), and evidence coverage (DB readback, payment event, authenticated record/profile evidence, protected resource readback).
+- Evidence selection mattered more than context taxonomy expansion. Client Component HTML was not stable proof for `membership_active`; DB readback was the correct outcome proof. Protected HLS key / protected resource readback was stronger proof for `playback_allowed` than page HTML.
+- The browser Capture Envelope remains local to browser evidence. The journey pilot needed claim / side-effect chain / outcome proof / protected resource readback, which matches shared validation reasoning pressure more than browser capture metadata.
+- The generic Evidence Envelope remains deferred. The common shape is still claim → evidence chain → verification → scope/result, but the concrete minimum schema is not stable across browser captures, API/DB readback, runtime traces, and journey validation.
+- Typed Context Taxonomy remains deferred. The new pressure is outcome/evidence depth, not new context families such as appearance, environment, interaction, or locale.
+
+Consequence:
+
+- Keep this plan as an evolution watch-list.
+- Do not add `experience_context`, generic `context`, or generic `evidence_bundle` runtime schema from this pilot alone.
+- If multiple non-UI workflow domains later reuse `state/context/evidence coverage + validation_scope`, consider promoting that model under shared Validation Reasoning before considering UI-specific taxonomy changes.
+
 ## Completion Criteria
 
 - [ ] Open questions are either resolved or explicitly deferred with evidence.
