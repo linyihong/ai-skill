@@ -75,6 +75,8 @@ Place draft analysis at: [`governance/lifecycle/governance-pattern-library-draft
   - Rides on topology v2 path-classification — promoting it protects the governance value of the owner/purpose/shared_layer work
   - Independent acceptance gate (N≥5; already has 1 analysed non-fitting sample); 3 falsification candidates listed
   - **Resolution binding**: sanitization Finding A is deferred to a Failure-Authority-governed fix at Phase 4, NOT a one-off `.agent-goals/` special-case in the sanitization scanner
+  - **Conceptual core = Standing** (2026-06-10): the family's deepest framing is legal *standing* — `Validity ≠ Authority`. Many things can be wrong; not every wrong thing has the right to halt the process. Finding A proves it (100%-invalid metadata ≠ standing to halt compile). Recorded as the most valuable distinction of this family.
+  - **Authority Classification Contract layer inserted** (2026-06-10): chain is `invariant → Classification Contract → Classifier → Executor`. The contract is **subject-based** (`AuthoritySubject{kind: discovery-provider | runtime-index-row | metadata-file | generated-surface}`, `ClassifyFailureAuthority(subject)`), NOT path-based (`isCompileAuthoritative(path)` would weld authority:=path and break for non-file subjects). Contract specified docs-first, no Go, so the first classifier implementation conforms to a shared definition of standing reusable by ≥5 executors. Build order: family ✅ → contract ✅ → classifier impl ⏭ → Finding A executor.
 
 ## Phase 1 — Gate decision
 

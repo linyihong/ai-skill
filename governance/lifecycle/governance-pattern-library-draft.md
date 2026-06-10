@@ -212,18 +212,48 @@ invariant:
 The pivot is *classify the source's authority, not the input's validity*. A file
 can be 100% invalid and still have no standing to halt the pipeline.
 
-Source classification rides on **topology v2** (`runtime/repository-topology.yaml`),
-which is exactly what gives that classification governance value:
+### Conceptual core: Standing (the deepest framing)
 
-| Class | Examples | Topology signal | On invalid / drift |
-|---|---|---|---|
-| **A — Compile-authoritative** | shared-layer surfaces, git-tracked runtime projection sources, registered runtime-index `sources` rows | `shared_layer: true` / tracked / has source row | **hard fail** (correct) |
-| **B — Non-authoritative** | `.agent-goals/`, `scratch/`, project-local overlays, untracked notes | `shared_layer: false` / `owner: project-local` / no source row | **warn only** |
+The family's real subject is not "failure" — it is **standing**, in the legal
+sense: *who has the right to halt a proceeding.* The operative distinction:
 
-Corollary that motivates promoting this rather than just documenting it: if
-`shared_layer: true` and `shared_layer: false` both ultimately `compile fail`,
-the topology v2 path-classification work (owner / purpose / shared_layer)
-loses most of its governance value at the one moment it should matter most.
+```
+Validity   ≠   Authority (Standing)
+```
+
+> Many things can be wrong. **Not every wrong thing has standing to stop the
+> process.** A non-authoritative source raising a 100%-correct error still has no
+> right to block compile — its remedy is a warning, not a halt.
+
+Finding A is the proof case: a metadata file being *100% invalid* does **not**
+entail it has *standing to halt compile*. "Failure Authority" is the mechanism;
+**Standing is the principle.** Every executor below must answer the standing
+question (*does this subject have the right to block?*) before the validity
+question (*is this subject correct?*).
+
+### Authority is per-SUBJECT, not per-path
+
+A tempting shortcut is to make authority a function of file path (topology). But
+path is only the signal for *one* kind of subject. The three samples already use
+**three different authority sources**:
+
+| Sample | Subject kind | Authority signal (NOT universally "path") |
+|---|---|---|
+| Workflow / Discovery | `route` / `discovery-provider` | route-lock + in-repo scope; provider is advisory-by-contract |
+| Runtime Index | `runtime-index-row` | presence of a `sources` row |
+| Project Metadata (Finding A) | `metadata-file` | `repository-topology.yaml` → `shared_layer` / `owner` |
+
+Topology answers the standing question *for the metadata-file kind only*. Welding
+`authority := path-classification` would make the classifier silently wrong for
+the other two kinds — and would degrade into `if runtimeIndexRow… if discovery…`
+branching that no longer matches its own name. Hence the contract below is over a
+**subject**, not a path.
+
+Corollary that motivates promoting this rather than just documenting it: if, for
+the metadata-file kind, `shared_layer: true` and `shared_layer: false` both
+ultimately `compile fail`, the topology v2 classification work (owner / purpose /
+shared_layer) loses most of its governance value at the one moment it should
+matter most.
 
 ### Sample inventory (N=3, observation-stage)
 
@@ -257,6 +287,77 @@ so #3 is the outlier to bring into line, not a new behaviour to invent.
 - [ ] **Bootstrap receipt gate**: is "no receipt" a Failure Authority decision (the session is authoritative) or a different family entirely?
 - [ ] Does Runtime Index sample #1 *really* warn (vs silently ignore) non-authoritative drift? If it silently ignores rather than warns, the invariant's "warn only" half is unproven and may need softening to "must not block (warning optional)".
 
+### Authority Classification Contract (the missing layer — subject-based, docs-only)
+
+Inserting a layer the earlier sketch skipped. The chain is **not**
+`invariant → classifier → executor`; it is:
+
+```
+Failure Authority invariant          (principle: Standing; Validity ≠ Authority)
+        ↓
+Authority Classification Contract     (THIS section — subject-based, language-neutral)
+        ↓
+Authority Classifier                  (one implementation of the contract)
+        ↓
+Executor                              (a caller that obeys the classifier's verdict)
+```
+
+The contract is what lets *five future executors share one definition of standing*
+instead of each re-deciding it. It is written here as a specification first; no Go
+is implied yet.
+
+**Subject, not path.** Authority is resolved over an abstract *subject*:
+
+```
+AuthoritySubject:
+  kind:  discovery-provider | runtime-index-row | metadata-file | generated-surface | …
+  # kind-specific attributes the classifier may read:
+  path:         string   # when the kind is path-bound (metadata-file)
+  owner:        string   # e.g. project-local
+  shared_layer: bool     # from repository-topology (metadata-file kind)
+  registered:   bool     # e.g. has a runtime-index `sources` row
+  advisory:     bool     # e.g. discovery-provider is advisory-by-contract
+```
+
+**Standing rule, keyed by signal (not by path).** A subject is *authoritative*
+(may block) iff any authoritative signal holds and no override demotes it:
+
+```yaml
+# illustrative — draft contract, not a projected surface
+authority_classification:
+  authoritative:        # has standing to FAIL the process
+    - shared_layer: true
+    - registered: true            # runtime-index sources row, tracked runtime surface
+    - tracked_runtime_surface
+  non_authoritative:    # may WARN only, must not block
+    - shared_layer: false
+    - owner: project-local
+    - advisory: true              # discovery-provider, advisory hooks
+    - ephemeral / untracked
+```
+
+**Contract API shape (illustrative; the deliberate non-goal is `isCompileAuthoritative(path)`):**
+
+```go
+type AuthorityLevel int
+const (
+    NonAuthoritative AuthorityLevel = iota   // may warn, must not block
+    Authoritative                            // may fail
+)
+
+// The contract surface every executor calls:
+func ClassifyFailureAuthority(subject AuthoritySubject) AuthorityLevel
+```
+
+`isCompileAuthoritative(path)` is then **not** the contract — it is at most a thin
+convenience wrapper that constructs a `metadata-file` subject and delegates to
+`ClassifyFailureAuthority`. If it ever grows `if runtimeIndexRow… if discovery…`
+branches, that is the signal the path-shaped wrapper was mistaken for the contract.
+
+> Build constraint (this turn's decision): the **contract is specified before any
+> classifier code**, so the first implementation conforms to a shared definition
+> of standing rather than retrofitting one from Finding A's path check.
+
 ### Dependency inversion — Finding A is an executor, not the cause
 
 The direction of derivation matters more than the fix itself. The wrong order
@@ -266,22 +367,26 @@ treats the classifier as a patch for one bug:
 Finding A  →  Authority Classifier        (bug-driven; classifier is a special-case)
 ```
 
-The right order derives the classifier from the invariant, and Finding A becomes
-the invariant's *first executor*:
+The right order derives everything from the invariant, with the Classification
+Contract as the shared layer, and Finding A as the invariant's *first executor*:
 
 ```
 Failure Authority invariant
         ↓
-Authority Classifier            e.g. isCompileAuthoritative(path string) bool
+Authority Classification Contract       (subject-based; shared by all executors)
         ↓
-Executor #1: Project Metadata Compile   (the Finding A fix)
-Executor #2: (future) any new compiler / commit surface reuses the same classifier
+Authority Classifier                    ClassifyFailureAuthority(subject)
+        ↓
+Executor #1: Project Metadata Compile   (the Finding A fix, metadata-file subject)
+Executor #2..n: Discovery / Runtime Index / future surfaces reuse the SAME contract
 ```
 
-So the materialised fix is not "special-case `.agent-goals/`", it is:
+So the materialised fix is not "special-case `.agent-goals/`", it is a call into
+the shared contract (via a metadata-file subject):
 
 ```go
-if !isCompileAuthoritative(path) {
+subject := AuthoritySubject{Kind: "metadata-file", Path: rel, SharedLayer: shared, Owner: owner}
+if ClassifyFailureAuthority(subject) == NonAuthoritative {
     warn(...)
     continue          // non-authoritative: may warn, must not block
 }
@@ -293,13 +398,15 @@ the *same* classifier rather than re-deciding "who may block" ad hoc. That is th
 ROI argument for building the invariant first — the alternative leaves three
 near-identical authority decisions scattered and divergent.
 
-**Sequencing (this is the agreed build order, not yet executed):**
+**Sequencing (agreed build order):**
 
-1. Complete this family observation (← this section; the invariant + 3 samples).
-2. Define the Authority Classifier *from the invariant* (topology-backed
-   `isCompileAuthoritative`), not from Finding A.
-3. Land Finding A as Executor #1 of the classifier. It then also becomes the 4th
-   sample that moves this family toward its N≥5 promotion gate.
+1. ✅ Complete this family observation (the invariant + Standing core + 3 samples).
+2. ✅ Specify the **Authority Classification Contract** (← above; subject-based,
+   docs-only, no Go). The shared definition of standing.
+3. ⏭ Implement the Authority Classifier as the contract's first implementation
+   (`ClassifyFailureAuthority(subject)`), *from the contract*, not from Finding A.
+4. Land Finding A as Executor #1 (a `metadata-file` subject caller). It then also
+   becomes the 4th sample that moves this family toward its N≥5 promotion gate.
 
 See plan 2026-06-06-1800 §"Phase 1D review — Finding A" for the deferred fix and
 plan 2026-06-08-2100 for the incubator gate.
