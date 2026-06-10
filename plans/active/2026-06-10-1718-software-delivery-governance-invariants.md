@@ -212,10 +212,10 @@ This plan does not add a new `runtime/*.yaml` source and does not use deferred r
 - [x] Which activation/escalation concerns belong in this plan, and which should be deferred to Workflow Activation Discovery Bridge? Phase 0: defer routing mechanics to Workflow Activation Discovery Bridge; this plan only records routing pressure.
 - [x] Should activation/escalation be downgraded from invariant candidates to routing pressure only? Phase 0: yes, unless future scenario evidence proves a separate software-delivery invariant.
 - [x] Should `explicit-root-cause-hypothesis` be moved out of software-delivery into shared evidence acquisition / validation reasoning? Phase 0: yes for invariant placement; keep only as evidence-acquisition discipline / diagnostic checkpoint candidate.
-- [ ] Is the boundary problem one concept, or should it split into `task-scope-validation` plus `ownership-awareness`?
+- [x] Is the boundary problem one concept, or should it split into `task-scope-validation` plus `ownership-awareness`? Phase 1: split for now; scenarios should test them separately.
 - [x] Do authority, readback, closure, and journey validation share identical validation structure, or are they only similar concepts? Phase 0: not proven; `claim_validation` remains hypothesis-only.
 - [ ] What evidence is sufficient to decide workflow escalation from UI -> runtime capability -> side effect -> journey validation?
-- [ ] Should `authority-coupled-side-effects` become a workflow gate, an artifact evidence shape, or an intelligence atom first?
+- [x] Should `authority-coupled-side-effects` become a workflow gate, an artifact evidence shape, or an intelligence atom first? Phase 1: artifact / validation evidence shape first; no executable gate before scenarios.
 - [ ] What is the minimum authority ladder for side effects without hardcoding domain-specific business events?
 - [x] How should `configuration-readback-validation` relate to State Visibility Gap without duplicating it? Phase 0: treat as workflow evidence shape backed by State Visibility Gap / Evidence Chain, not a new shared reasoning atom yet.
 - [ ] Does `operational-transaction-closure` belong in software-delivery workflow, or should it graduate to shared execution reasoning for deploys, migrations, backfills, cache rebuilds, and similar operations? Phase 0: likely shared execution reasoning, but needs Phase 1 placement matrix and scenarios.
@@ -239,9 +239,9 @@ This plan does not add a new `runtime/*.yaml` source and does not use deferred r
 | activation / escalation placement | resolved | Workflow Activation Discovery Bridge owns detector miss -> advisory; software-delivery plan only records routing pressure |
 | activation / escalation layer | resolved | Treat as routing pressure, not validation-family invariants |
 | explicit root-cause hypothesis | resolved | Evidence Collapse Point says collapse point is not root cause; root-cause hypothesis belongs to evidence acquisition / diagnostic reasoning, not software-delivery invariant |
-| task scope vs ownership | still-open | `intake.md` and `review-checklist.md` cover task scope and ownership-adjacent concerns separately; Phase 1 must decide split vs one model |
+| task scope vs ownership | resolved | Phase 1 splits the working name into `task-scope-validation` and `ownership-awareness`; Phase 2 should test both failure families separately |
 | Claim Validation hypothesis | resolved | Evidence Hierarchy already owns claim scope; State Visibility / Evidence Chain / Evidence Depth own proof sufficiency; no parent taxonomy introduced |
-| authority side effects shape | still-open | Evidence Chain and Identity-Coupled Side Effect Validation cover part of the shape; Phase 1 must decide workflow evidence shape vs shared specialization |
+| authority side effects shape | resolved | Phase 1 places it as artifact / validation evidence shape first; no executable gate or shared intelligence atom before scenarios |
 | configuration readback boundary | resolved | Treat as State Visibility Gap / Evidence Chain application in `validation.md`, not a duplicate shared concept |
 | operational transaction placement | still-open | `closure.md` has DoD/close-loop, but no deploy/migration/backfill/cache rebuild transaction-state model exists under execution reasoning yet |
 | validation scenarios | still-open | Phase 2 must define scenarios before executable gates |
@@ -309,7 +309,7 @@ Not applicable / missing source notes:
 
 ## Phase 1 — Invariant Placement Draft
 
-- [ ] Create a placement matrix that separates validation-family invariants, routing pressure, and evidence acquisition discipline:
+- [x] Create a placement matrix that separates validation-family invariants, routing pressure, and evidence acquisition discipline:
   - workflow-activation
   - workflow-escalation
   - explicit-root-cause-hypothesis
@@ -320,24 +320,48 @@ Not applicable / missing source notes:
   - ownership-boundary-validation
   - operational-transaction-closure
   - journey-level-post-deploy-validation
-- [ ] Decide whether `ownership-boundary-validation` remains one model or splits into `task-scope-validation` plus `ownership-awareness`.
-- [ ] Evaluate whether authority, readback, operational closure, and journey validation share identical validation structure. Keep `claim_validation` hypothesis-only unless at least three invariants satisfy that threshold.
-- [ ] For each invariant, decide primary owner surface: `intake.md`, `validation.md`, `test-strategy.md`, `closure.md`, `artifact-gates.md`, `execution-flow.yaml`, Workflow Activation plan, shared validation reasoning, or defer.
-- [ ] Define non-goals so incident-specific examples do not become hardcoded framework rules.
-- [ ] Update this plan with the placement decision before editing workflow docs.
+- [x] Decide whether `ownership-boundary-validation` remains one model or splits into `task-scope-validation` plus `ownership-awareness`.
+- [x] Evaluate whether authority, readback, operational closure, and journey validation share identical validation structure. Keep `claim_validation` hypothesis-only unless at least three invariants satisfy that threshold.
+- [x] For each invariant, decide primary owner surface: `intake.md`, `validation.md`, `test-strategy.md`, `closure.md`, `artifact-gates.md`, `execution-flow.yaml`, Workflow Activation plan, shared validation reasoning, or defer.
+- [x] Define non-goals so incident-specific examples do not become hardcoded framework rules.
+- [x] Update this plan with the placement decision before editing workflow docs.
+
+### Phase 1 Result — Placement Matrix
+
+| Candidate / pressure | Layer decision | Primary owner surface | Phase 2 scenario? | Notes |
+|---|---|---|---|---|
+| `workflow-activation` | routing pressure | Workflow Activation Discovery Bridge | yes | Do not create software-delivery-local routing logic. Scenario should prove a workflow exists but was not activated. |
+| `workflow-escalation` | routing pressure | Workflow Activation Discovery Bridge + `workflow/software-delivery/execution-flow.yaml` as consumer | yes | Software-delivery may declare escalation evidence, but routing mechanics stay outside this plan. |
+| `explicit-root-cause-hypothesis` | evidence acquisition / diagnostic discipline | shared evidence acquisition / diagnostic reasoning; no software-delivery invariant yet | yes | Keep as a checkpoint candidate for ambiguous debugging, not a validation-family invariant. |
+| `evidence-sufficiency-validation` | existing shared reasoning | `enforcement/evidence-hierarchy.md` + validation reasoning sources | no new concept | Existing Claim Scope Gate and Evidence Chain already own sufficiency; this plan should reference, not duplicate. |
+| `runtime-capability-validation` | workflow validation evidence shape first | `workflow/software-delivery/test-strategy.md` + `workflow/software-delivery/validation.md` | yes | High-probability candidate. Start as workflow evidence shape; shared reasoning only if browser/platform/filesystem/container/orchestration scenarios prove common structure. |
+| `authority-coupled-side-effects` | workflow evidence shape backed by Evidence Chain | `workflow/software-delivery/validation.md` + `workflow/software-delivery/artifact-gates.md` | yes | Broader than identity-coupled side effects because business truth may be owned by payment gateway, DB settlement, provider acceptance, or user-observable result. |
+| `configuration-readback-validation` | workflow evidence shape backed by State Visibility Gap | `workflow/software-delivery/validation.md` + `workflow/software-delivery/artifact-gates.md` | yes | Do not create a separate shared atom unless later scenarios show structure beyond State Visibility / Evidence Chain. |
+| `ownership-boundary-validation` | split working name | `task-scope-validation` -> `workflow/software-delivery/intake.md`; `ownership-awareness` -> `intake.md`, `closure.md`, `review-checklist.md` | yes, split into two scenarios | Phase 1 rejects one combined invariant for now. Task boundary and ownership boundary can diverge. |
+| `operational-transaction-closure` | defer workflow placement; likely shared execution reasoning candidate | Phase 2/4 decision; possible future `intelligence/engineering/execution/` doc | yes | `closure.md` has DoD, but deploy/migration/backfill/cache rebuild transaction states need cross-operation evidence before workflow implementation. |
+| `journey-level-post-deploy-validation` | existing Journey Validation reference | `test-strategy.md`, `validation.md`, `artifact-gates.md`, `review-checklist.md` | yes only for post-deploy smoke claim | Do not create a new journey taxonomy; use existing BDD-owned Journey Specification and validation-owned execution. |
+| `claim_validation` | hypothesis-only | none | no | Similarity across authority/readback/closure/journey is not enough. Existing evidence hierarchy owns claim scope. |
+
+### Phase 1 Result — Non-Goals Before Workflow Docs
+
+- Do not add workflow gates until Phase 2 scenarios exist and fail-by-absence, unless a scenario is explicitly marked doc-only spike.
+- Do not introduce `claim_validation` as a document, glossary entry, route, runtime surface, or parent taxonomy in this plan phase.
+- Do not merge task scope and ownership awareness unless Phase 2 proves one model catches both failure families without ambiguity.
+- Do not duplicate State Visibility Gap, Evidence Chain, Evidence Depth, Evidence Hierarchy, Journey Validation, or Workflow Activation mechanics.
+- Do not hardcode incident examples such as `navigator.share`, localhost deploy config, nested repos, share count, or browser smoke tests as framework-canonical rules.
 
 ## Phase 2 — Scenario-First Validation
 
-- [ ] Add scenario: runtime capability assumed supported but unavailable fallback is missing -> expected validation failure.
-- [ ] Add scenario: workflow exists but is not activated for a surface-level UI task -> expected activation pressure / routing failure.
+- [ ] Add scenario: runtime capability assumed supported but unavailable fallback is missing -> expected `runtime-capability-validation` failure.
+- [ ] Add scenario: workflow exists but is not activated for a surface-level UI task -> expected activation pressure / routing failure routed to Workflow Activation Discovery Bridge.
 - [ ] Add scenario: task starts as UI but evidence reveals browser capability / side effect / journey scope and workflow does not escalate -> expected escalation pressure / routing failure.
-- [ ] Add scenario: patch is made without explicit root-cause hypothesis despite ambiguous evidence -> expected evidence acquisition / hypothesis failure.
-- [ ] Add scenario: change set exceeds declared task scope before commit -> expected task-scope failure.
-- [ ] Add scenario: change set crosses repo or owner boundary without explicit ownership awareness -> expected ownership-boundary failure.
-- [ ] Add scenario: side-effect counter increments on low-authority event while business truth is not confirmed -> expected authority failure.
-- [ ] Add scenario: deployment config input is correct but runtime readback shows stale/wrong value -> expected configuration readback failure.
-- [ ] Add scenario: deploy transaction is started/interrupted/partial without verified final state -> expected operational closure failure.
-- [ ] Add scenario: component/API smoke passes but post-deploy journey fails -> expected journey-level post-deploy validation failure.
+- [ ] Add scenario: patch is made without explicit root-cause hypothesis despite ambiguous evidence -> expected evidence acquisition / diagnostic checkpoint failure.
+- [ ] Add scenario: change set exceeds declared task scope before commit -> expected `task-scope-validation` failure.
+- [ ] Add scenario: change set crosses repo or owner boundary without explicit ownership awareness -> expected `ownership-awareness` failure.
+- [ ] Add scenario: side-effect counter increments on low-authority event while business truth is not confirmed -> expected authority evidence-shape failure.
+- [ ] Add scenario: deployment config input is correct but runtime readback shows stale/wrong value -> expected configuration readback evidence-shape failure.
+- [ ] Add scenario: deploy, migration, backfill, or cache rebuild is started/interrupted/partial without verified final state -> expected operational transaction closure placement evidence.
+- [ ] Add scenario: component/API smoke passes but post-deploy journey fails -> expected existing Journey Validation failure, not new journey taxonomy.
 - [ ] Verify scenarios fail-by-absence before workflow implementation, unless Phase 2 is explicitly marked doc-only spike.
 
 ## Phase 3 — Workflow Documentation Update
