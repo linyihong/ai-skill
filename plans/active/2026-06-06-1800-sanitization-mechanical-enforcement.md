@@ -324,9 +324,17 @@ git pre-commit hook
 > - **legacy flat 形** → 容忍跳過（與當前行為一致）
 > - **new-schema 但 validation fail** → **hard error**（compile 失敗），不得 silent `continue`
 
-- [ ] **1D-remediation**：`compileProjectMetadataDerived` 改 shape-aware tolerance（legacy-flat 容忍／new-schema-malformed hard-fail），與 scanner pointer 遷移、legacy `derived_forbidden_tokens` 退役同批
-- [ ] Unit test：new-schema-malformed file（缺 `kind`）→ compile hard error；legacy-flat file → 容忍跳過 0 error
-- [ ] 移除 `project_metadata_compile.go` 內 `IsValidationError(err) { continue }` 的無條件 silent-skip，改判 shape 後分流
+- [x] **1D-remediation**：`compileProjectMetadataDerived` 改 shape-aware tolerance（legacy-flat 容忍／new-schema-malformed hard-fail），與 scanner pointer 遷移、legacy `derived_forbidden_tokens` 退役同批
+- [x] Unit test：new-schema-malformed file（缺 `kind`）→ compile hard error；legacy-flat file → 容忍跳過 0 error
+- [x] 移除 `project_metadata_compile.go` 內 `IsValidationError(err) { continue }` 的無條件 silent-skip，改判 shape 後分流
+
+**Phase 1D 落地 commit**（2026-06-10）：scanner pointer migration + legacy retirement + shape-aware remediation 同批完成：
+
+- **Scanner migration**：`sanitization_scan.go` 的 `loadDerivedForbiddenTokens` → `loadDerivedMatchTokens`（query `derived_match_tokens`，含 `entity_name`/`kind`）；`derivedForbiddenToken` struct → `derivedMatchToken`；finding 字串改為 `contains "<token>" (entity "<name>" from <project>); use <placeholder>`，達成 entity-granularity 要求。
+- **Legacy retirement**：移除 `compileDerivedForbiddenTokens` / `readProjectMetadata` / legacy flat structs / `insertProjectMetadataSourceFile`；`runtime_compiler.go` 移除 `derived_forbidden_tokens` CREATE TABLE + projection call；`runtime.go::nativeRuntimeRequiredTables` 改列 `derived_private_entities` + `derived_match_tokens`。`compileProjectMetadataDerived` 成為唯一 project-metadata 投影，並接回 `runtime_source_files` 註冊（legacy 退役後無 PK 衝突）。
+- **Shape-aware remediation**：新增 `classifyProjectMetadataShape`（probe `yaml.Node`：`private_tokens` 或 scalar `private_entities` → legacy-flat；object `private_entities` → new-schema）。legacy-flat → stderr warning + 跳過；new-schema 但 validation fail → **hard error**（關閉 1C₂ self-review Finding 1 的 silent-skip 缺口）。
+- **驗證**：`go test ./...`（全模組）+ `go vet` clean；新增 `TestCompileProjectMetadataDerived_LegacyFlatShapeTolerated` + `_NewSchemaMalformedHardFails` + scanner entity-name 斷言；`ai-skill runtime compile + refresh + validate` 全 pass，live `runtime.db` 確認 `derived_forbidden_tokens` 已消失、兩張新表存在。
+- **未動**：`enforcement-registry.yaml` `coverage` 仍 `pending_implementation`（promote 到 `mechanical` + 加 blocking per-commit obligation 屬 Phase 4，本批不碰）。
 
 ### Phase 2 — Generic Regex Patterns (inherited from superseded plan)
 

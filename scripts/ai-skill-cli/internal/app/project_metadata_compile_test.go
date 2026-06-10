@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 )
 
@@ -214,5 +215,68 @@ project:
 	}
 	if leaked != 0 {
 		t.Errorf("undeclared framework concept must not be forbidden; got %d rows", leaked)
+	}
+}
+
+// freshSanitizationDB opens an in-repo runtime.db with the full schema, for
+// shape-aware compile tests.
+func freshSanitizationDB(t *testing.T, repo string) *sql.DB {
+	t.Helper()
+	db, err := sql.Open("sqlite", filepath.Join(repo, "runtime.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { db.Close() })
+	if err := createGoRuntimeSchema(db); err != nil {
+		t.Fatal(err)
+	}
+	return db
+}
+
+func TestCompileProjectMetadataDerived_LegacyFlatShapeTolerated(t *testing.T) {
+	repo := t.TempDir()
+	// Deprecated flat shape (private_tokens). Phase 1D tolerates + skips it
+	// rather than failing the compile.
+	writeFile(t, filepath.Join(repo, "old-app", ".ai-skill-project.yaml"), `
+project:
+  id: old-app
+  visibility: private
+  private_tokens:
+    - LegacySecret
+`)
+	db := freshSanitizationDB(t, repo)
+	if err := compileProjectMetadataDerived(repo, db); err != nil {
+		t.Fatalf("legacy flat shape must be tolerated, got error: %v", err)
+	}
+	var n int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM derived_match_tokens`).Scan(&n); err != nil {
+		t.Fatal(err)
+	}
+	if n != 0 {
+		t.Fatalf("legacy flat shape must project nothing, got %d match tokens", n)
+	}
+}
+
+func TestCompileProjectMetadataDerived_NewSchemaMalformedHardFails(t *testing.T) {
+	repo := t.TempDir()
+	// New-schema shape (private_entities object) but missing required `kind`.
+	// This must HARD-FAIL — silently skipping it is the protection gap the
+	// Phase 1D remediation closes.
+	writeFile(t, filepath.Join(repo, "typo-app", ".ai-skill-project.yaml"), `
+project:
+  id: typo-app
+  visibility: private
+  private_entities:
+    - name: Typo Customer
+      match_tokens:
+        - "TypoCustomer"
+`)
+	db := freshSanitizationDB(t, repo)
+	err := compileProjectMetadataDerived(repo, db)
+	if err == nil {
+		t.Fatal("malformed new-schema metadata must hard-fail the compile, got nil error")
+	}
+	if !strings.Contains(err.Error(), "typo-app") {
+		t.Fatalf("error should name the offending file, got: %v", err)
 	}
 }

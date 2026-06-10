@@ -12,10 +12,12 @@ func TestSanitizationScanBlocksPrivateTokenInSharedLayer(t *testing.T) {
 	seedSanitizationRuntimeDB(t, repo, map[string]bool{
 		"plans/":        true,
 		".agent-goals/": false,
-	}, []derivedForbiddenToken{
+	}, []derivedMatchToken{
 		{
 			Token:                "SecretProject",
 			CanonicalToken:       "SecretProject",
+			EntityName:           "Secret Project",
+			Kind:                 "codename",
 			OwningProjectID:      "secret-project",
 			SourceMetadataPath:   ".agent-goals/demo/.ai-skill-project.yaml",
 			SuggestedPlaceholder: "<SECRET_PROJECT>",
@@ -33,6 +35,10 @@ func TestSanitizationScanBlocksPrivateTokenInSharedLayer(t *testing.T) {
 	if !strings.Contains(got, `plans/active/example.md:3 contains "SecretProject"`) {
 		t.Fatalf("unexpected finding:\n%s", got)
 	}
+	// Finding must name the protected entity, not just the token (Phase 1D).
+	if !strings.Contains(got, `entity "Secret Project"`) {
+		t.Fatalf("finding should name the entity, got:\n%s", got)
+	}
 }
 
 func TestSanitizationScanAllowsPrivateTokenInProjectLocalLayer(t *testing.T) {
@@ -40,10 +46,12 @@ func TestSanitizationScanAllowsPrivateTokenInProjectLocalLayer(t *testing.T) {
 	seedSanitizationRuntimeDB(t, repo, map[string]bool{
 		"plans/":        true,
 		".agent-goals/": false,
-	}, []derivedForbiddenToken{
+	}, []derivedMatchToken{
 		{
 			Token:                "SecretProject",
 			CanonicalToken:       "SecretProject",
+			EntityName:           "Secret Project",
+			Kind:                 "codename",
 			OwningProjectID:      "secret-project",
 			SourceMetadataPath:   ".agent-goals/demo/.ai-skill-project.yaml",
 			SuggestedPlaceholder: "<SECRET_PROJECT>",
@@ -71,36 +79,6 @@ func TestSanitizationScanBootstrapSafeWithNoPrivateTokens(t *testing.T) {
 
 	if got := validateSanitizationStagedContent(repo, []string{rel}); got != "" {
 		t.Fatalf("new framework concepts must pass when no project metadata declares private tokens, got:\n%s", got)
-	}
-}
-
-func TestCompileDerivedForbiddenTokensProjectsPrivateMetadata(t *testing.T) {
-	repo := t.TempDir()
-	writeFile(t, filepath.Join(repo, ".agent-goals", "demo", ".ai-skill-project.yaml"), `project:
-  id: secret-project
-  visibility: private
-  private_tokens:
-    - SecretProject
-`)
-	dbPath := filepath.Join(repo, "runtime.db")
-	db, err := sql.Open("sqlite", dbPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
-	if err := createGoRuntimeSchema(db); err != nil {
-		t.Fatal(err)
-	}
-	if err := compileDerivedForbiddenTokens(repo, db); err != nil {
-		t.Fatal(err)
-	}
-
-	var count int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM derived_forbidden_tokens WHERE token IN ('SecretProject', 'secret-project', 'SECRET_PROJECT')`).Scan(&count); err != nil {
-		t.Fatal(err)
-	}
-	if count != 3 {
-		t.Fatalf("expected 3 token variants, got %d", count)
 	}
 }
 
@@ -203,7 +181,7 @@ func TestSanitizationIncidentScoreIgnoresLowScoreAndArchivedPaths(t *testing.T) 
 	}
 }
 
-func seedSanitizationRuntimeDB(t *testing.T, repo string, topology map[string]bool, tokens []derivedForbiddenToken) {
+func seedSanitizationRuntimeDB(t *testing.T, repo string, topology map[string]bool, tokens []derivedMatchToken) {
 	t.Helper()
 	dbPath := filepath.Join(repo, "runtime", "runtime.db")
 	mkParent(t, dbPath)
@@ -215,7 +193,7 @@ func seedSanitizationRuntimeDB(t *testing.T, repo string, topology map[string]bo
 	if _, err := db.Exec(`CREATE TABLE repository_topology (subtree TEXT PRIMARY KEY, content TEXT NOT NULL)`); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := db.Exec(`CREATE TABLE derived_forbidden_tokens (token TEXT NOT NULL, canonical_token TEXT NOT NULL, owning_project_id TEXT NOT NULL, source_metadata_path TEXT NOT NULL, suggested_placeholder TEXT NOT NULL)`); err != nil {
+	if _, err := db.Exec(`CREATE TABLE derived_match_tokens (token TEXT NOT NULL, canonical_token TEXT NOT NULL, entity_name TEXT NOT NULL, kind TEXT NOT NULL, owning_project_id TEXT NOT NULL, source_metadata_path TEXT NOT NULL, suggested_placeholder TEXT NOT NULL)`); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := db.Exec(`CREATE TABLE sanitization_patterns (category TEXT PRIMARY KEY, content TEXT NOT NULL)`); err != nil {
@@ -228,8 +206,8 @@ func seedSanitizationRuntimeDB(t *testing.T, repo string, topology map[string]bo
 		}
 	}
 	for _, token := range tokens {
-		if _, err := db.Exec(`INSERT INTO derived_forbidden_tokens (token, canonical_token, owning_project_id, source_metadata_path, suggested_placeholder) VALUES (?, ?, ?, ?, ?)`,
-			token.Token, token.CanonicalToken, token.OwningProjectID, token.SourceMetadataPath, token.SuggestedPlaceholder,
+		if _, err := db.Exec(`INSERT INTO derived_match_tokens (token, canonical_token, entity_name, kind, owning_project_id, source_metadata_path, suggested_placeholder) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+			token.Token, token.CanonicalToken, token.EntityName, token.Kind, token.OwningProjectID, token.SourceMetadataPath, token.SuggestedPlaceholder,
 		); err != nil {
 			t.Fatal(err)
 		}

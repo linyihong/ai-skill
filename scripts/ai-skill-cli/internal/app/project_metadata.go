@@ -16,18 +16,10 @@ import (
 // Plan reference: plans/active/2026-06-06-1800-sanitization-mechanical-
 // enforcement.md §Phase 1A.
 //
-// SCOPE DISCIPLINE — Phase 1A (this file) defines the canonical parser
-// only. It is NOT wired into any consumer. The legacy reader in
-// sanitization_scan.go::readProjectMetadata (flat `private_tokens` /
-// `private_entities []string`) remains the live consumer of project
-// metadata until Phase 1C lands the new projection rule. See
-// metadata/project/migration-notes.md for the full migration trajectory.
-//
-// Reviewer constraint: this file MUST NOT import from or reference
-// sanitization_scan.go symbols. Phase 1A scope explicitly forbids
-// touching the legacy reader; even a one-line cross-file dependency
-// would blur the 1A / 1C / 1D phase boundaries that the plan rewrite
-// of 2026-06-08 established.
+// This canonical parser is the sole reader of project metadata since
+// Phase 1D (2026-06-10) retired the legacy flat-shape reader. The
+// projection consumer is project_metadata_compile.go::compileProjectMetadataDerived.
+// See metadata/project/migration-notes.md for the full migration trajectory.
 
 // ProjectMetadataFile is the root structure of <PROJECT_ROOT>/.ai-skill-project.yaml.
 type ProjectMetadataFile struct {

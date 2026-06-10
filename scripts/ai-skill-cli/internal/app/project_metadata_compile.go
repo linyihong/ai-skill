@@ -3,45 +3,42 @@ package app
 import (
 	"database/sql"
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
-// project_metadata_compile.go — Phase 1C₂ projection rule for
+// project_metadata_compile.go — projection rule for
 // <PROJECT_ROOT>/.ai-skill-project.yaml.
 //
 // Plan reference: plans/active/2026-06-06-1800-sanitization-mechanical-
-// enforcement.md §Phase 1C₂.
+// enforcement.md §Phase 1C₂ (introduced the tables) + §Phase 1D
+// (this file became the SOLE projection; legacy derived_forbidden_tokens
+// retired and the scanner migrated to derived_match_tokens).
 //
-// This file wires the Phase 1A canonical parser (`LoadProjectMetadata`)
-// into the compile pipeline, projecting each project's `private_entities`
-// declarations into TWO tables that mirror the governance/execution layer
-// split the plan's Q8 resolution established:
+// Each project's `private_entities` declarations project into two tables
+// mirroring the governance/execution layer split (plan Q8):
 //
 //   - derived_private_entities (governance layer): one row per declared
-//     entity, carrying the human-readable identity (name + kind) the
-//     scanner's findings and audit output refer to.
+//     entity, carrying the human-readable identity (name + kind) findings
+//     and audit output refer to.
 //   - derived_match_tokens (execution layer): one row per case-variant of
-//     every entity's match_tokens — the literal surface the Phase 1D
-//     scanner compares staged content against. Case-variant expansion
-//     happens HERE (projection), never in the parser (Phase 1A is a pure
-//     reader).
+//     every entity's match_tokens — the literal surface the scanner
+//     (sanitization_scan.go::loadDerivedMatchTokens) compares staged
+//     content against. Case-variant expansion happens HERE, never in the
+//     parser (project_metadata.go is a pure reader).
 //
-// SCOPE DISCIPLINE — Phase 1C₂ is ADDITIVE. It does NOT touch:
-//   - sanitization_scan.go (the legacy reader/scanner; Phase 1D migrates
-//     the scanner's query from derived_forbidden_tokens to
-//     derived_match_tokens and retires the legacy table)
-//   - the legacy compileDerivedForbiddenTokens projection, which keeps
-//     populating derived_forbidden_tokens until Phase 1D
-//
-// The legacy and new projections walk the same .ai-skill-project.yaml
-// files. Source-file traceability registration is left to the legacy
-// projection (insertProjectMetadataSourceFile) to avoid a
-// runtime_source_files PRIMARY KEY (source_path) collision; .ai-skill-
-// project.yaml files are discovered project files, not runtime canonical
-// documents, so no assertRuntimeCanonicalDocumentsProjected invariant
-// applies to them.
+// SHAPE-AWARE TOLERANCE (Phase 1D, plan §"Phase 1D — Shape-Aware Skip
+// Remediation"): legacy flat-shape files (`private_tokens:` or a
+// `private_entities:` list of scalars) are a DEPRECATED schema with no
+// projection anymore — they are tolerated with an stderr warning and
+// skipped. A file that IS new-schema shape but fails validation is a
+// genuine misconfiguration and HARD-FAILS the compile, so a typo can never
+// silently drop a project's protected tokens (the silent-skip gap 1C₂'s
+// self-review flagged).
 
 // derivedPrivateEntityRow is one governance-layer row.
 type derivedPrivateEntityRow struct {
@@ -173,31 +170,87 @@ func expandEntityMatchTokens(entity ProjectEntity) map[string]string {
 	return out
 }
 
+// projectMetadataShape classifies a .ai-skill-project.yaml by the schema
+// generation it declares, so compileProjectMetadataDerived can apply
+// shape-aware tolerance.
+type projectMetadataShape int
+
+const (
+	// shapeNewSchema: `private_entities:` is a list of mappings (objects),
+	// or the file declares no private surface at all. Parsed strictly.
+	shapeNewSchema projectMetadataShape = iota
+	// shapeLegacyFlat: `private_tokens:` present, or `private_entities:` is
+	// a list of scalars. Deprecated; tolerated-and-skipped.
+	shapeLegacyFlat
+)
+
+// classifyProjectMetadataShape inspects the raw YAML structure (without the
+// strict v1 parser) to decide whether a file is new-schema or legacy-flat.
+// A YAML parse error is returned to the caller (categorically an I/O-class
+// failure, not a tolerated skip).
+func classifyProjectMetadataShape(body []byte) (projectMetadataShape, error) {
+	var probe struct {
+		Project struct {
+			PrivateTokens   yaml.Node `yaml:"private_tokens"`
+			PrivateEntities yaml.Node `yaml:"private_entities"`
+		} `yaml:"project"`
+	}
+	if err := yaml.Unmarshal(body, &probe); err != nil {
+		return shapeNewSchema, fmt.Errorf("parse project metadata yaml: %w", err)
+	}
+	if pt := probe.Project.PrivateTokens; pt.Kind == yaml.SequenceNode && len(pt.Content) > 0 {
+		return shapeLegacyFlat, nil
+	}
+	if pe := probe.Project.PrivateEntities; pe.Kind == yaml.SequenceNode && len(pe.Content) > 0 {
+		// Inspect the first element: scalar → legacy flat list of strings;
+		// mapping → new-schema entity objects.
+		if pe.Content[0].Kind == yaml.ScalarNode {
+			return shapeLegacyFlat, nil
+		}
+	}
+	return shapeNewSchema, nil
+}
+
 // compileProjectMetadataDerived walks every .ai-skill-project.yaml in the
-// repo, parses it with the Phase 1A canonical parser, and projects the
-// governance + execution rows.
+// repo and projects the governance + execution rows. This is the SOLE
+// project-metadata projection since Phase 1D retired the legacy
+// derived_forbidden_tokens path.
 //
-// Transition tolerance: a file that fails the v1 schema validation is
-// SKIPPED rather than aborting the whole compile. During the migration
-// window, legacy project files may use the flat `private_tokens` shape
-// that the new parser does not recognise; those files are still covered by
-// the legacy derived_forbidden_tokens projection, so skipping them here is
-// safe and additive. I/O errors (unreadable file, malformed YAML) are
-// still propagated, since they are categorically different from a
-// schema-shape mismatch.
+// Shape-aware tolerance:
+//   - legacy flat-shape file → stderr warning + skip (deprecated schema,
+//     no projection target anymore)
+//   - new-schema file that fails validation → HARD ERROR (a typo must not
+//     silently drop protected tokens)
+//   - I/O errors (unreadable file, malformed YAML) → propagated
 func compileProjectMetadataDerived(repo string, db *sql.DB) error {
 	metadataFiles, err := discoverProjectMetadataFiles(repo)
 	if err != nil {
 		return err
 	}
 	for _, rel := range metadataFiles {
-		metadata, err := LoadProjectMetadata(filepath.Join(repo, filepath.FromSlash(rel)))
+		body, err := os.ReadFile(filepath.Join(repo, filepath.FromSlash(rel)))
+		if err != nil {
+			return fmt.Errorf("read %s: %w", rel, err)
+		}
+		shape, err := classifyProjectMetadataShape(body)
+		if err != nil {
+			return fmt.Errorf("classify %s: %w", rel, err)
+		}
+		if shape == shapeLegacyFlat {
+			fmt.Fprintf(os.Stderr,
+				"sanitization: skipping deprecated flat-shape project metadata %s; migrate private_tokens / scalar private_entities to the private_entities object schema (metadata/project/ai-skill-project-schema.yaml)\n",
+				rel)
+			continue
+		}
+
+		metadata, err := ParseProjectMetadata(body)
 		if err != nil {
 			if IsValidationError(err) {
-				// Covered by the legacy projection during transition.
-				continue
+				// New-schema shape but malformed: fail loudly. Silent skip
+				// here is exactly the protection gap this remediation closes.
+				return fmt.Errorf("invalid project metadata %s: %w", rel, err)
 			}
-			return fmt.Errorf("read %s: %w", rel, err)
+			return fmt.Errorf("parse %s: %w", rel, err)
 		}
 
 		entities, tokens := projectMetadataDerivedRows(metadata, rel)
@@ -217,6 +270,21 @@ func compileProjectMetadataDerived(repo string, db *sql.DB) error {
 				return fmt.Errorf("insert derived_match_tokens row (%s/%s/%s): %w", rel, tok.EntityName, tok.Token, err)
 			}
 		}
+		// Traceability: register the source file now that the legacy
+		// projection (which previously owned this registration) is retired.
+		if err := insertProjectMetadataDerivedSourceFile(db, rel); err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+// insertProjectMetadataDerivedSourceFile records the .ai-skill-project.yaml
+// source file in runtime_source_files, targeting the execution-layer table.
+func insertProjectMetadataDerivedSourceFile(db *sql.DB, rel string) error {
+	_, err := db.Exec(
+		`INSERT OR REPLACE INTO runtime_source_files (source_path, source_kind, target_table, compile_rule, compiled_at, compiler_version, status) VALUES (?, 'project_metadata', 'derived_match_tokens', 'project_metadata_private_entities', datetime('now'), ?, 'synced')`,
+		rel, goRuntimeCompilerVersion,
+	)
+	return err
 }

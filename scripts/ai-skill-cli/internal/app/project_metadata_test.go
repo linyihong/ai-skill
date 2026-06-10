@@ -14,9 +14,9 @@ import (
 // schema、拒絕缺 kind / 缺 match_tokens / case_variants 既非 auto 也非
 // list 等變形".
 //
-// These tests exercise the v1 canonical parser ONLY. They MUST NOT
-// reference the legacy reader (sanitization_scan.go::readProjectMetadata)
-// or its types. Phase 1A scope discipline: parser surface is independent.
+// These tests exercise the v1 canonical parser ONLY (the legacy flat-shape
+// reader was retired in Phase 1D). Parser surface is independent of the
+// projection/scanner consumers.
 
 func TestLoadProjectMetadata_ValidMinimal(t *testing.T) {
 	body := []byte(`

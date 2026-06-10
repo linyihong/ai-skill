@@ -1858,7 +1858,7 @@ var nativeRuntimeRequiredTables = []string{
 	"discovery_checkpoints", "discovery_search_strategy",
 	"decision_recording", "runtime_config_documents", "runtime_config_projections",
 	"runtime_source_files", "generated_surfaces", "compiler_metadata",
-	"repository_topology", "derived_forbidden_tokens", "sanitization_patterns",
+	"repository_topology", "derived_private_entities", "derived_match_tokens", "sanitization_patterns",
 	"runtime_budget", "context_ttl_policy", "circuit_breaker", "context_pollution",
 	"context_health_score", "intelligence_routing", "obligation_ledger",
 	"language_policy", "output_rules", "governance_gates", "blocking_gates",

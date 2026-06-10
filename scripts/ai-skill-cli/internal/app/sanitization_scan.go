@@ -10,29 +10,22 @@ import (
 	"sort"
 	"strings"
 	"unicode"
-
-	"gopkg.in/yaml.v3"
 )
-
-type aiSkillProjectMetadataFile struct {
-	Project aiSkillProjectMetadata `yaml:"project"`
-}
-
-type aiSkillProjectMetadata struct {
-	ID              string   `yaml:"id"`
-	Visibility      string   `yaml:"visibility"`
-	PrivateTokens   []string `yaml:"private_tokens"`
-	PrivateEntities []string `yaml:"private_entities"`
-}
 
 type repositoryTopologyRow struct {
 	Subtree string `json:"subtree"`
 	Shared  bool   `json:"shared"`
 }
 
-type derivedForbiddenToken struct {
+// derivedMatchToken is one execution-layer row loaded from
+// runtime.db.derived_match_tokens. EntityName/Kind carry the governance
+// identity so findings can name the protected entity, not just the matched
+// token (plan §Phase 1D entity-granularity requirement).
+type derivedMatchToken struct {
 	Token                string
 	CanonicalToken       string
+	EntityName           string
+	Kind                 string
 	OwningProjectID      string
 	SourceMetadataPath   string
 	SuggestedPlaceholder string
@@ -40,7 +33,7 @@ type derivedForbiddenToken struct {
 
 type sanitizationRuntimeData struct {
 	Topology map[string]bool
-	Tokens   []derivedForbiddenToken
+	Tokens   []derivedMatchToken
 	Patterns []compiledSanitizationPattern
 	Incident incidentScoreConfig
 }
@@ -70,49 +63,6 @@ type incidentScoreSignal struct {
 
 const repositoryTopologyRuntimeTargetKey = "runtime.repository_topology.config"
 const sanitizationPatternsRuntimeTargetKey = "runtime.sanitization_patterns.config"
-
-func compileDerivedForbiddenTokens(repo string, db *sql.DB) error {
-	metadataFiles, err := discoverProjectMetadataFiles(repo)
-	if err != nil {
-		return err
-	}
-	for _, rel := range metadataFiles {
-		metadata, err := readProjectMetadata(filepath.Join(repo, filepath.FromSlash(rel)))
-		if err != nil {
-			return fmt.Errorf("read %s: %w", rel, err)
-		}
-		if strings.ToLower(strings.TrimSpace(metadata.Project.Visibility)) != "private" {
-			continue
-		}
-		projectID := strings.TrimSpace(metadata.Project.ID)
-		if projectID == "" {
-			projectID = strings.TrimSuffix(filepath.Base(filepath.Dir(rel)), string(filepath.Separator))
-		}
-		placeholder := projectPlaceholder(projectID)
-		for _, canonical := range append(metadata.Project.PrivateTokens, metadata.Project.PrivateEntities...) {
-			canonical = strings.TrimSpace(canonical)
-			if canonical == "" {
-				continue
-			}
-			for _, token := range sanitizationTokenVariants(canonical) {
-				if _, err := db.Exec(`INSERT OR REPLACE INTO derived_forbidden_tokens (token, canonical_token, owning_project_id, source_metadata_path, suggested_placeholder) VALUES (?, ?, ?, ?, ?)`,
-					token, canonical, projectID, rel, placeholder,
-				); err != nil {
-					return err
-				}
-			}
-		}
-		if err := insertProjectMetadataSourceFile(db, rel); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func insertProjectMetadataSourceFile(db *sql.DB, rel string) error {
-	_, err := db.Exec(`INSERT OR REPLACE INTO runtime_source_files (source_path, source_kind, target_table, compile_rule, compiled_at, compiler_version, status) VALUES (?, 'project_metadata', 'derived_forbidden_tokens', 'project_metadata_private_tokens', datetime('now'), ?, 'synced')`, rel, goRuntimeCompilerVersion)
-	return err
-}
 
 func validateSanitizationStagedContent(root string, staged []string) string {
 	if root == "" || len(staged) == 0 {
@@ -207,18 +157,6 @@ func discoverProjectMetadataFiles(repo string) ([]string, error) {
 	return files, err
 }
 
-func readProjectMetadata(path string) (aiSkillProjectMetadataFile, error) {
-	var metadata aiSkillProjectMetadataFile
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return metadata, err
-	}
-	if err := yaml.Unmarshal(content, &metadata); err != nil {
-		return metadata, err
-	}
-	return metadata, nil
-}
-
 func loadSanitizationRuntimeData(dbPath string) (sanitizationRuntimeData, error) {
 	if _, err := os.Stat(dbPath); err != nil {
 		return sanitizationRuntimeData{}, err
@@ -239,7 +177,7 @@ func loadSanitizationRuntimeData(dbPath string) (sanitizationRuntimeData, error)
 	if err != nil {
 		return sanitizationRuntimeData{}, err
 	}
-	tokens, err := loadDerivedForbiddenTokens(db)
+	tokens, err := loadDerivedMatchTokens(db)
 	if err != nil {
 		return sanitizationRuntimeData{}, err
 	}
@@ -296,16 +234,16 @@ func loadRepositoryTopology(db *sql.DB) (map[string]bool, error) {
 	return result, rows.Err()
 }
 
-func loadDerivedForbiddenTokens(db *sql.DB) ([]derivedForbiddenToken, error) {
-	rows, err := db.Query(`SELECT token, canonical_token, owning_project_id, source_metadata_path, suggested_placeholder FROM derived_forbidden_tokens ORDER BY token, owning_project_id, source_metadata_path`)
+func loadDerivedMatchTokens(db *sql.DB) ([]derivedMatchToken, error) {
+	rows, err := db.Query(`SELECT token, canonical_token, entity_name, kind, owning_project_id, source_metadata_path, suggested_placeholder FROM derived_match_tokens ORDER BY entity_name, token, owning_project_id, source_metadata_path`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var tokens []derivedForbiddenToken
+	var tokens []derivedMatchToken
 	for rows.Next() {
-		var token derivedForbiddenToken
-		if err := rows.Scan(&token.Token, &token.CanonicalToken, &token.OwningProjectID, &token.SourceMetadataPath, &token.SuggestedPlaceholder); err != nil {
+		var token derivedMatchToken
+		if err := rows.Scan(&token.Token, &token.CanonicalToken, &token.EntityName, &token.Kind, &token.OwningProjectID, &token.SourceMetadataPath, &token.SuggestedPlaceholder); err != nil {
 			return nil, err
 		}
 		if strings.TrimSpace(token.Token) != "" {
@@ -418,7 +356,7 @@ func sanitizationPathIsShared(rel string, topology map[string]bool) bool {
 	return bestLen >= 0 && shared
 }
 
-func sanitizationFindingsForContent(rel string, content string, tokens []derivedForbiddenToken, patterns []compiledSanitizationPattern) []string {
+func sanitizationFindingsForContent(rel string, content string, tokens []derivedMatchToken, patterns []compiledSanitizationPattern) []string {
 	var findings []string
 	lines := strings.Split(content, "\n")
 	for lineIndex, line := range lines {
@@ -426,7 +364,11 @@ func sanitizationFindingsForContent(rel string, content string, tokens []derived
 			if token.Token == "" || !strings.Contains(line, token.Token) {
 				continue
 			}
-			findings = append(findings, fmt.Sprintf("%s:%d contains %q from %s; use %s", rel, lineIndex+1, token.Token, token.OwningProjectID, token.SuggestedPlaceholder))
+			entity := token.EntityName
+			if entity == "" {
+				entity = token.OwningProjectID
+			}
+			findings = append(findings, fmt.Sprintf("%s:%d contains %q (entity %q from %s); use %s", rel, lineIndex+1, token.Token, entity, token.OwningProjectID, token.SuggestedPlaceholder))
 		}
 		if rel == "runtime/sanitization-patterns.yaml" {
 			continue
