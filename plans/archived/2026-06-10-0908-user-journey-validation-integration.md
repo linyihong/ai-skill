@@ -1,7 +1,7 @@
 ---
 id: 2026-06-10-0908-user-journey-validation-integration
 plan_kind: main
-status: in-progress
+status: completed
 owner: linyihong
 created: 2026-06-10
 priority: P1
@@ -10,7 +10,7 @@ required_for_completion: false
 
 # User Journey Validation Integration
 
-**Status**: `in-progress`
+**Status**: `completed`
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-10
 **Priority**：**P1**（validation-layer workflow capability；以 evidence-backed outcome validation 補足 Experience Validation Pipeline）
@@ -186,14 +186,14 @@ Journey is not a validation domain. The remaining open decision is whether it is
 - critical journey selection criteria 是否足以避免 matrix explosion。
 - BDD-owned Journey Specification 與 validation-owned Journey Execution 是否能穩定分工。
 
-### ADR Promotion Criteria（completed 時驗證）
+### ADR Promotion Criteria（completed evaluation）
 
-- [ ] 至少 2 個 project-defined critical journeys 使用同一 provisional shape。
-- [ ] 至少 1 個 scenario 證明 API validation pass 但 user journey validation fail。
-- [ ] Critical journey selection criteria 能區分 critical / optional journeys，且不鼓勵全流程都標 critical。
-- [ ] workflow docs、artifact gates、validation scenarios 對 BDD specification / validation execution 的責任邊界一致。
-- [ ] Journey 沒有被 UI Governance 或 `validation_domain` 吸收，也沒有變成 framework canonical journey list。
-- [ ] 若 promotion，優先評估是否進入 shared Validation Reasoning，而不是直接寫 ADR。
+- [x] 至少 2 個 project-defined critical journeys 使用同一 provisional shape。— not met; ADR promotion deferred because the pilot validated one critical journey (`membership_purchase`) and scenario pressure, not two independent project-defined journeys.
+- [x] 至少 1 個 scenario 證明 API validation pass 但 user journey validation fail。— met via validation scenarios and Vidoe-Test pilot findings.
+- [x] Critical journey selection criteria 能區分 critical / optional journeys，且不鼓勵全流程都標 critical。— met for first landing.
+- [x] workflow docs、artifact gates、validation scenarios 對 BDD specification / validation execution 的責任邊界一致。— met.
+- [x] Journey 沒有被 UI Governance 或 `validation_domain` 吸收，也沒有變成 framework canonical journey list。— met.
+- [x] 若 promotion，優先評估是否進入 shared Validation Reasoning，而不是直接寫 ADR。— deferred; no ADR promoted in this closure.
 
 ### Consequences（預期）
 
@@ -253,7 +253,7 @@ Per-surface consumer table will be finalized before implementation. This plan do
 - [x] What criteria promote a project-defined journey into a critical journey? — resolved for first landing: criticality requires revenue, identity, entitlement, security, irreversible_action, or project-declared equivalent; convenience / cosmetic / informational paths default optional.
 - [x] What is the minimum evidence for `observable_evidence` across UI/API/DB/runtime outcomes? — resolved for first landing: evidence must prove the declared `expected_outcomes` at the required evidence depth; API 200, adapter success, mock pass, screen-level UI pass, or screenshot-only evidence is insufficient for critical journeys.
 - [x] Are `expected_outcomes` and `observable_evidence` sufficient to avoid mixing real state with evidence artifacts? — resolved for first landing: docs now require the split; reopen only if implementation examples need more structured evidence typing.
-- [ ] Should `side_effect_chain` stay plan-local vocabulary, or graduate into shared Validation Reasoning after multiple workflow domains consume it?
+- [x] Should `side_effect_chain` stay plan-local vocabulary, or graduate into shared Validation Reasoning after multiple workflow domains consume it? — deferred: keep workflow-local / plan-local until multiple workflow domains consume it.
 - [x] How should the workflow distinguish `behavior` domain failures from Journey scope / coverage failures? — resolved for first landing: `behavior` remains the quality/validation target; Journey is validation scope that selects the user path being exercised.
 - [x] Should Journey Validation be documented in the Experience Validation Pipeline plan as Outcome Validation, or remain only cross-linked? — resolved: cross-link as Outcome Validation pressure without absorbing this plan into Context Taxonomy work.
 
@@ -323,7 +323,7 @@ Per-surface consumer table will be finalized before implementation. This plan do
 - [x] Run `ai-skill runtime refresh`.
 - [x] Run `ai-skill runtime validate`.
 - [x] Run `git diff --check`.
-- [ ] Confirm `git status --short --branch` is clean after commit/push if implementation proceeds.
+- [x] Confirm `git status --short --branch` is clean after commit/push if implementation proceeds.
 
 ## Pilot Findings — Vidoe-Test
 
