@@ -1231,17 +1231,22 @@ rule_classes:
       abstraction judgment (what is reusable, what is project-specific
       detail) that cannot be checked mechanically.
     sunset_decision:
-      revisit_when: "promotion pipeline gains a mechanical sanitization gate"
+      revisit_when: "an incident→pattern abstraction lint becomes feasible (a mechanical check for 'reusable vs project-specific' framing, beyond the sanitization token/PII gate)"
       success_criteria: |
         New entries to enforcement/failure-patterns/ pass a sanitization
         + abstraction lint before commit. Class then collapses to
         sanitization (existing class).
       revisit_owner: "framework maintainer"
-      last_reviewed_at: "2026-06-01"
+      last_reviewed_at: "2026-06-11"
       last_review_summary: |
-        Initial entry creation (round-4/5 schema). Incident→pattern
-        abstraction still judgment-based; sunset depends on sanitization
-        class reaching mechanical. Trigger unchanged.
+        2026-06-11 review (original trigger fired): sanitization reached
+        coverage=mechanical, so the sanitization HALF of the success_criteria
+        is satisfied — token/PII leaks in failure-pattern entries are now
+        mechanically blocked at pre-commit. The ABSTRACTION half (judging
+        whether an incident has been generalized to reusable form vs left
+        project-specific) remains judgment-based and is NOT covered by token
+        matching, so the class stays behavioral_only. Trigger refreshed to a
+        forward event (abstraction-lint feasibility) since the old one fired.
       depends_on_rule_classes: [sanitization]
 
   - id: reusable_guidance_boundary
@@ -1254,16 +1259,22 @@ rule_classes:
       incident?" is a writing-quality judgment. Lint can catch raw
       project paths but not framing.
     sunset_decision:
-      revisit_when: "sanitization rule_class promoted to mechanical"
+      revisit_when: "a framing/abstraction lint is prototyped, OR ≥ 3 mechanically-detectable framing-only boundary violations accumulate in enforcement/failure-patterns/"
       success_criteria: |
         Sanitization lint covers ≥ 80% of historical boundary
         violations. Remaining cases (framing-only) stay behavioral.
       revisit_owner: "framework maintainer"
-      last_reviewed_at: "2026-06-01"
+      last_reviewed_at: "2026-06-11"
       last_review_summary: |
-        Initial entry creation (round-4/5 schema). Reusable-vs-incident
-        framing judgment still behavioral; sunset depends on sanitization
-        class reaching mechanical. Trigger unchanged.
+        2026-06-11 review (original trigger fired): sanitization reached
+        coverage=mechanical. Raw token / project-path / PII boundary
+        violations are now mechanically blocked at pre-commit (the part the
+        rationale already conceded "lint can catch"). The FRAMING half
+        ("is this guidance reusable across projects, or specific to one
+        incident?") stays judgment-based per the success_criteria, so the
+        class remains behavioral_only. The ≥80% historical-coverage figure is
+        not yet measured (no labelled historical-violation dataset); trigger
+        refreshed to a forward event since the old one fired.
       depends_on_rule_classes: [sanitization]
 
   - id: document_sizing
