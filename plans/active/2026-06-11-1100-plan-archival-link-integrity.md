@@ -119,6 +119,7 @@ Gen 3 Runtime Hardening
 - [ ] pass/escaped parens in path：plan 含 `[text](../a\(b\).md)`，target 存在 → bounded parser 正確解析跳脫括號，0 finding（驗證 state machine 相對 regex 的主要價值）
 - [ ] **fail/multi-archive cross-reference**：同一 commit 內 A、B 都 archive，A 內有 `[B](../active/B.md)` 但未更新為 `../archived/B.md` → block（驗證 rename map 整批建立邏輯）
 - [ ] pass/multi-archive cross-reference resolved：同上但 A 已更新為 `B.md`（same-dir archived）→ 0 finding
+- [ ] **manual fixture run（Phase 3 wiring 前置）**：建臨時 git repo（`active/A.md` + `archived/A.md` + 引用檔），未接 dispatcher 也直接呼叫 `validatePlanArchivalLinkIntegrity` 跑一次，肉眼確認 finding payload 形狀（`Severity`/`Category`/`File`/`Line`/`Column`/`Target`/`SuggestedReplacement`）符合 contract。理由：很多 bug 不在 resolver，而在 finding renderer / dispatcher adapter / severity mapping
 
 ### Phase 3 — Registry & Bootstrap Integration
 
@@ -137,6 +138,17 @@ Gen 3 Runtime Hardening
 - Bare-id provenance mentions（無路徑語法）do not false-positive.
 - Multi-archive in same commit: cross-references between simultaneously-archived plans are correctly resolved against the batch rename map.
 - Unsupported markdown constructs (reference-style links, HTML anchors, autolinks) are **ignored, not partially interpreted**. Validator intentionally supports only the markdown subset used by framework plan documents.
+
+## Known Limitations / Technical Debt
+
+明列為 debt（不藏在 code TODO），以便未來 review / promotion 時 surface：
+
+| ID | Priority | 描述 | 影響 | 解決方向 |
+|---|---|---|---|---|
+| TD-1 | **High** | **Staged vs Worktree drift**：inbound scan 用 `os.ReadFile` 讀 worktree，不是 staged blob。`git add -p` 部分暫存時，worktree 可能 ≠ commit candidate。可能造成 false block（worktree 仍含舊 link 但 staged 已修）或 false pass（worktree 已修但 staged 未修）。 | Enforcement 語意應是 "what will be committed"，目前讀的是 working tree state，不對齊。 | 將 inbound scan 改成 `git show :<path>` 讀 staged blob；fallback 到 worktree 只限 untracked / 讀失敗時。先量真實 frequency 再決定是否要這次解。 |
+| TD-2 | Med | **Dispatcher 未接**：validator 不會在任何 commit 被呼叫，屬 dead code 風險（非 correctness）。 | 無實際觀測面、不會 false-block。 | Phase 3 完成。 |
+| TD-3 | Med | **無 integration test**：parser / rename map / resolver / finding 都有 unit test，但 end-to-end fixture 流程沒跑過。 | Renderer / dispatcher adapter / severity mapping bug 不會被 unit test 抓到。 | Phase 2 補 fixture-based integration test；Phase 3 wiring 前先做一次 manual fixture run（已加入 Phase 2 checklist）。 |
+| TD-4 | Low | **Performance 未量測**：inbound scan 對每個 repo `.md` 跑 bounded parser，可能掃幾百到上千檔。 | Archive event 低頻（非每次 save），實務上應可接受；但 unmeasured。 | 接 dispatcher 後加 telemetry payload (`files_scanned` / `links_scanned` / `rename_count` / `elapsed_ms`)，跑幾次後依數據決定是否做 basename pre-filter。**先量再優化**。 |
 
 ## Future Extensibility
 
