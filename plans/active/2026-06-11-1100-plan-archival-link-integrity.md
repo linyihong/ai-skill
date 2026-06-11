@@ -145,10 +145,27 @@ Gen 3 Runtime Hardening
 
 | ID | Priority | 描述 | 影響 | 解決方向 |
 |---|---|---|---|---|
-| TD-1 | **High** | **Staged vs Worktree drift**：inbound scan 用 `os.ReadFile` 讀 worktree，不是 staged blob。`git add -p` 部分暫存時，worktree 可能 ≠ commit candidate。可能造成 false block（worktree 仍含舊 link 但 staged 已修）或 false pass（worktree 已修但 staged 未修）。 | Enforcement 語意應是 "what will be committed"，目前讀的是 working tree state，不對齊。 | 將 inbound scan 改成 `git show :<path>` 讀 staged blob；fallback 到 worktree 只限 untracked / 讀失敗時。先量真實 frequency 再決定是否要這次解。 |
+| TD-1 | **High** | **Staged vs Worktree drift**：inbound scan 用 `os.ReadFile` 讀 worktree，不是 staged blob。`git add -p` 部分暫存時，worktree 可能 ≠ commit candidate。可能造成 false block（worktree 仍含舊 link 但 staged 已修）或 false pass（worktree 已修但 staged 未修）。 | Enforcement 語意應是 "what will be committed"，目前讀的是 working tree state，不對齊。 | 依下方 **TD-1 Resolution Gate** evidence-driven 決定；不在這裡單方面排程。 |
 | TD-2 | Med | **Dispatcher 未接**：validator 不會在任何 commit 被呼叫，屬 dead code 風險（非 correctness）。 | 無實際觀測面、不會 false-block。 | Phase 3 完成。 |
 | TD-3 | Med | **無 integration test**：parser / rename map / resolver / finding 都有 unit test，但 end-to-end fixture 流程沒跑過。 | Renderer / dispatcher adapter / severity mapping bug 不會被 unit test 抓到。 | Phase 2 補 fixture-based integration test；Phase 3 wiring 前先做一次 manual fixture run（已加入 Phase 2 checklist）。 |
 | TD-4 | Low | **Performance 未量測**：inbound scan 對每個 repo `.md` 跑 bounded parser，可能掃幾百到上千檔。 | Archive event 低頻（非每次 save），實務上應可接受；但 unmeasured。 | 接 dispatcher 後加 telemetry payload (`files_scanned` / `links_scanned` / `rename_count` / `elapsed_ms`)，跑幾次後依數據決定是否做 basename pre-filter。**先量再優化**。 |
+
+### TD-1 Resolution Gate（design decision — evidence-driven）
+
+正式設計決策，不是個人偏好：**TD-1 的處理時機由 evidence 決定，不由意見決定**。
+
+**Gate**: Phase 3 dispatcher integration 前，必須完成下列步驟：
+
+1. **Run staged/worktree divergence fixture**（屬於 Phase 2 manual fixture 的一個 case）：
+   - 建臨時 git repo，`plans/active/A.md` 在 worktree 修好 link，但只用 `git add -p` 暫存其他 hunk（保留舊 link 未暫存）
+   - 反向：worktree 留舊 link，但用 `git add` 把修好的版本暫存
+2. **Record observed behavior**：validator 對兩個 fixture 的實際 output（block / pass / wrong finding payload）寫進 fixture 的 expected.txt 或 plan 的 Validation 表
+3. **Decision**：
+   - 若 fixture 觀察到 false-block 或 false-pass → TD-1 promote 為 active scope，**插入 Phase 2.5**（內容：`readFileForScan` 改用 `git show :<path>`，fallback 限 untracked / read-fail），完成後才進 Phase 3
+   - 若觀察到 validator 行為符合 commit candidate semantics（例如 staged 為主、worktree 只在 staged 不存在時 fallback）→ TD-1 保留為 documented limitation，直接進 Phase 3
+4. **No silent deferral**：Gate 結果（promote / keep）必須寫進本 plan，不可只口頭裁決
+
+**Rationale**：避免「有人覺得應該修、有人覺得不用修」的反覆爭論。Reference Integrity 系統的 correctness 必須有 evidence backing。
 
 ## Future Extensibility
 
