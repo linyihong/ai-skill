@@ -100,13 +100,13 @@ Gen 3 Runtime Hardening
 ### Phase 1 — Implementation
 
 - [x] `scripts/ai-skill-cli/internal/app/markdown_links.go`（新檔）：實作 `extractMarkdownLinks(content []byte) []Link` bounded parser（state machine，40-80 行）
-- [ ] `scripts/ai-skill-cli/internal/app/hooks.go` 新增 `validatePlanArchivalLinkIntegrity`
-- [ ] 偵測 staged plan rename（`active/ ↔ archived/`）：跑 `git diff --cached --find-renames -M90 --name-status` 取所有 `R*` 條目，過濾 plan 路徑
-- [ ] **建立整批 rename map（必須在掃描前完成）**：multi-archive in same commit 時，A、B 同時 archive 且互相引用，每個檔的 resolve 都要看完整 rename map，不能逐檔處理
-- [ ] **Markdown link parsing**：使用 `extractMarkdownLinks()`（bounded parser，**非** regex、**非** markdown AST），取得 `Link{Target, Line, Column}`；避免 prose 中的路徑字串被誤判為 link
-- [ ] **解析**：對每個 link，從 link 所在檔案的 **新位置**（若該檔本身被 rename）或 **當前位置** resolve 相對路徑；target 不存在 → finding
+- [x] `scripts/ai-skill-cli/internal/app/plan_archival_link_integrity.go` 新增 `validatePlanArchivalLinkIntegrity`（拆成獨立檔，與 hooks.go 解耦；dispatcher 接入留 Phase 3）
+- [x] 偵測 staged plan rename（`active/ ↔ archived/`）：跑 `git diff --cached --find-renames=90% --name-status` 取所有 `R*` 條目，過濾 plan 路徑
+- [x] **建立整批 rename map（必須在掃描前完成）**：multi-archive in same commit 時，A、B 同時 archive 且互相引用，每個檔的 resolve 都要看完整 rename map，不能逐檔處理
+- [x] **Markdown link parsing**：使用 `extractMarkdownLinks()`（bounded parser，**非** regex、**非** markdown AST），取得 `Link{Target, Line, Column}`；避免 prose 中的路徑字串被誤判為 link
+- [x] **解析**：對每個 link，從 link 所在檔案的 **新位置**（若該檔本身被 rename）或 **當前位置** resolve 相對路徑；target 不存在 → finding
 - [ ] **Bare textual path scan**：對被 rename 檔案的舊路徑（`plans/active/<id>`）做 plain-text 搜尋，命中且不在 markdown link node 內 → finding。檢查命中行（與上一行）是否含 `<!-- archival-provenance -->`：有 → category `historical_provenance_reference` / severity `info`；無 → category `stale_textual_reference` / severity `warning`
-- [ ] **suggested_replacement**：finding payload 帶 `{old_path, new_path, suggested_replacement, category}`，old/new 從 rename map 反查
+- [x] **suggested_replacement**：finding payload 帶 `{old_path, new_path, suggested_replacement, category}`，old/new 從 rename map 反查
 
 ### Phase 2 — Tests
 
