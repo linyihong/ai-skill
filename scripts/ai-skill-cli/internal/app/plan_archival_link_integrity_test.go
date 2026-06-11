@@ -2,6 +2,7 @@ package app
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -130,6 +131,173 @@ func TestPosixRel(t *testing.T) {
 			t.Errorf("posixRel(%q, %q) = %q want %q", c.fromDir, c.toPath, got, c.want)
 		}
 	}
+}
+
+func TestIsLinkTargetContext(t *testing.T) {
+	cases := []struct {
+		name      string
+		line      string
+		pos       int
+		want      bool
+	}{
+		{name: "right after `](`", line: `See [foo](plans/active/a.md) here`, pos: 10, want: true},
+		{name: "with space after `](`", line: `[foo]( plans/active/a.md)`, pos: 7, want: true},
+		{name: "bare mention", line: `Archived from plans/active/a.md`, pos: 14, want: false},
+		{name: "start of line", line: `plans/active/a.md is the source`, pos: 0, want: false},
+		{name: "after parenthesised but not link", line: `(plans/active/a.md)`, pos: 1, want: false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got := isLinkTargetContext(c.line, c.pos)
+			if got != c.want {
+				t.Errorf("isLinkTargetContext(%q, %d) = %v want %v", c.line, c.pos, got, c.want)
+			}
+		})
+	}
+}
+
+func TestScanBareTextualReferences(t *testing.T) {
+	renames := []planRename{
+		{OldPath: "plans/active/foo.md", NewPath: "plans/archived/foo.md"},
+	}
+	tests := []struct {
+		name    string
+		content string
+		want    []linkFinding
+	}{
+		{
+			name:    "no mention, no findings",
+			content: "Unrelated content with no path references.\n",
+			want:    nil,
+		},
+		{
+			name:    "bare mention emits warning",
+			content: "Archived from plans/active/foo.md last week.\n",
+			want: []linkFinding{{
+				Severity:             "warning",
+				Category:             "stale_textual_reference",
+				File:                 "docs/x.md",
+				Line:                 1,
+				Column:               15,
+				Target:               "plans/active/foo.md",
+				SuggestedReplacement: "plans/archived/foo.md",
+			}},
+		},
+		{
+			name:    "link target context is skipped",
+			content: "See [source](plans/active/foo.md) for context.\n",
+			want:    nil,
+		},
+		{
+			name:    "provenance marker same line downgrades to info",
+			content: "Originally at plans/active/foo.md <!-- archival-provenance -->\n",
+			want: []linkFinding{{
+				Severity:             "info",
+				Category:             "historical_provenance_reference",
+				File:                 "docs/x.md",
+				Line:                 1,
+				Column:               15,
+				Target:               "plans/active/foo.md",
+				SuggestedReplacement: "plans/archived/foo.md",
+			}},
+		},
+		{
+			name:    "provenance marker previous line downgrades to info",
+			content: "<!-- archival-provenance -->\nOriginally at plans/active/foo.md.\n",
+			want: []linkFinding{{
+				Severity:             "info",
+				Category:             "historical_provenance_reference",
+				File:                 "docs/x.md",
+				Line:                 2,
+				Column:               15,
+				Target:               "plans/active/foo.md",
+				SuggestedReplacement: "plans/archived/foo.md",
+			}},
+		},
+		{
+			name:    "multiple mentions same line both reported",
+			content: "Compare plans/active/foo.md and plans/active/foo.md again.\n",
+			want: []linkFinding{
+				{
+					Severity:             "warning",
+					Category:             "stale_textual_reference",
+					File:                 "docs/x.md",
+					Line:                 1,
+					Column:               9,
+					Target:               "plans/active/foo.md",
+					SuggestedReplacement: "plans/archived/foo.md",
+				},
+				{
+					Severity:             "warning",
+					Category:             "stale_textual_reference",
+					File:                 "docs/x.md",
+					Line:                 1,
+					Column:               33,
+					Target:               "plans/active/foo.md",
+					SuggestedReplacement: "plans/archived/foo.md",
+				},
+			},
+		},
+		{
+			name:    "mix of link target and bare mention reports only bare",
+			content: "See [src](plans/active/foo.md) and prose plans/active/foo.md text.\n",
+			want: []linkFinding{{
+				Severity:             "warning",
+				Category:             "stale_textual_reference",
+				File:                 "docs/x.md",
+				Line:                 1,
+				Column:               42,
+				Target:               "plans/active/foo.md",
+				SuggestedReplacement: "plans/archived/foo.md",
+			}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := scanBareTextualReferences("docs/x.md", []byte(tt.content), renames)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("scanBareTextualReferences mismatch\n  got:  %#v\n  want: %#v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatLinkFindings(t *testing.T) {
+	t.Run("info-only suppressed", func(t *testing.T) {
+		findings := []linkFinding{{
+			Severity: "info", Category: "historical_provenance_reference",
+			File: "docs/x.md", Line: 3, Column: 1, Target: "plans/active/foo.md",
+			SuggestedReplacement: "plans/archived/foo.md",
+		}}
+		if got := formatLinkFindings(findings); got != "" {
+			t.Errorf("expected empty output for info-only findings, got: %q", got)
+		}
+	})
+	t.Run("block + warning separated", func(t *testing.T) {
+		findings := []linkFinding{
+			{Severity: "warning", Category: "stale_textual_reference",
+				File: "docs/x.md", Line: 5, Column: 10, Target: "plans/active/a.md"},
+			{Severity: "block", Category: "broken_outbound_link",
+				File: "plans/archived/a.md", Line: 1, Column: 1, Target: "../active/b.md",
+				SuggestedReplacement: "b.md"},
+		}
+		got := formatLinkFindings(findings)
+		if !strings.Contains(got, "blocking:") || !strings.Contains(got, "warnings:") {
+			t.Errorf("expected both sections, got: %q", got)
+		}
+		// blocking must come before warnings
+		if strings.Index(got, "blocking:") > strings.Index(got, "warnings:") {
+			t.Errorf("blocking section must precede warnings, got: %q", got)
+		}
+		if !strings.Contains(got, `suggested: "b.md"`) {
+			t.Errorf("expected suggestion in output, got: %q", got)
+		}
+	})
+	t.Run("empty findings yield empty output", func(t *testing.T) {
+		if got := formatLinkFindings(nil); got != "" {
+			t.Errorf("expected empty for empty findings, got: %q", got)
+		}
+	})
 }
 
 func TestSuggestReplacement(t *testing.T) {

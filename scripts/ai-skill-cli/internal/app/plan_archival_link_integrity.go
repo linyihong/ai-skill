@@ -44,10 +44,14 @@ type linkFinding struct {
 // archived plans resolve correctly.
 //
 // Bare textual references (non-link prose mentions of old paths) are
-// deferred to a follow-up step and not reported here.
+// also reported. They default to a warning (category
+// stale_textual_reference); when a same-line or preceding-line
+// <!-- archival-provenance --> marker is present the finding is
+// downgraded to info (category historical_provenance_reference) and
+// suppressed from validator output.
 //
 // Plan: plans/active/2026-06-11-1100-plan-archival-link-integrity.md
-// Phase: 1 (Implementation — outbound + inbound markdown link checks).
+// Phase: 1 (Implementation — outbound + inbound + bare textual scan).
 func validatePlanArchivalLinkIntegrity(text string, staged []string, root string) string {
 	for _, line := range strings.Split(text, "\n") {
 		if strings.TrimSpace(line) == "[skip-plan-archival-link-integrity]" {
@@ -67,41 +71,135 @@ func validatePlanArchivalLinkIntegrity(text string, staged []string, root string
 		movedNew[r.NewPath] = true
 	}
 
+	mdFiles := listRepoMarkdown(root)
+	inSet := make(map[string]bool, len(mdFiles))
+	for _, m := range mdFiles {
+		inSet[m] = true
+	}
+	for newPath := range movedNew {
+		if !inSet[newPath] {
+			mdFiles = append(mdFiles, newPath)
+			inSet[newPath] = true
+		}
+	}
+
 	var findings []linkFinding
-
-	for _, r := range renames {
-		content, err := readStagedFileContent(root, r.NewPath)
+	for _, mdPath := range mdFiles {
+		content, err := readFileForScan(root, mdPath, movedNew)
 		if err != nil {
 			continue
 		}
-		for _, link := range extractMarkdownLinks(content) {
-			f, ok := classifyLink(r.NewPath, link, renameMap, root, "broken_outbound_link")
-			if ok {
-				findings = append(findings, f)
-			}
-		}
-	}
-
-	for _, mdPath := range listRepoMarkdown(root) {
-		if movedNew[mdPath] {
-			continue
-		}
-		content, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(mdPath)))
-		if err != nil {
-			continue
+		isMoved := movedNew[mdPath]
+		kind := "broken_inbound_link"
+		if isMoved {
+			kind = "broken_outbound_link"
 		}
 		for _, link := range extractMarkdownLinks(content) {
-			f, ok := classifyLink(mdPath, link, renameMap, root, "broken_inbound_link")
-			if ok && f.SuggestedReplacement != "" {
-				findings = append(findings, f)
+			f, ok := classifyLink(mdPath, link, renameMap, root, kind)
+			if !ok {
+				continue
 			}
+			if !isMoved && f.SuggestedReplacement == "" {
+				continue
+			}
+			findings = append(findings, f)
 		}
+		findings = append(findings, scanBareTextualReferences(mdPath, content, renames)...)
 	}
 
-	if len(findings) == 0 {
-		return ""
-	}
 	return formatLinkFindings(findings)
+}
+
+// readFileForScan reads content for the inbound / textual scan. For
+// files staged with a rename to plans/archived/ the staged blob is
+// authoritative; for everything else we read the worktree (matches
+// validatePlanArchivalAudit's precedent and the typical commit flow
+// where worktree == staged for non-touched files).
+func readFileForScan(root, mdPath string, movedNew map[string]bool) ([]byte, error) {
+	if movedNew[mdPath] {
+		return readStagedFileContent(root, mdPath)
+	}
+	return os.ReadFile(filepath.Join(root, filepath.FromSlash(mdPath)))
+}
+
+// archivalProvenanceMarker is the explicit opt-in line that downgrades
+// a bare textual reference from warning to info. Authors intentionally
+// keeping historical paths in prose write this on the same line or the
+// line immediately above.
+const archivalProvenanceMarker = "<!-- archival-provenance -->"
+
+// scanBareTextualReferences finds plain-text mentions of any renamed
+// plan's old path that are NOT inside a markdown link target (those
+// are already covered by the inbound link check). Provenance-marked
+// occurrences are categorised as info.
+func scanBareTextualReferences(mdPath string, content []byte, renames []planRename) []linkFinding {
+	s := string(content)
+	hit := false
+	for _, r := range renames {
+		if strings.Contains(s, r.OldPath) {
+			hit = true
+			break
+		}
+	}
+	if !hit {
+		return nil
+	}
+	lines := strings.Split(s, "\n")
+	var findings []linkFinding
+	for lineIdx, line := range lines {
+		for _, r := range renames {
+			old := r.OldPath
+			start := 0
+			for {
+				pos := strings.Index(line[start:], old)
+				if pos < 0 {
+					break
+				}
+				abs := start + pos
+				start = abs + len(old)
+				if isLinkTargetContext(line, abs) {
+					continue
+				}
+				provenance := strings.Contains(line, archivalProvenanceMarker) ||
+					(lineIdx > 0 && strings.Contains(lines[lineIdx-1], archivalProvenanceMarker))
+				severity := "warning"
+				category := "stale_textual_reference"
+				if provenance {
+					severity = "info"
+					category = "historical_provenance_reference"
+				}
+				findings = append(findings, linkFinding{
+					Severity:             severity,
+					Category:             category,
+					File:                 mdPath,
+					Line:                 lineIdx + 1,
+					Column:               abs + 1,
+					Target:               old,
+					SuggestedReplacement: r.NewPath,
+				})
+			}
+		}
+	}
+	return findings
+}
+
+// isLinkTargetContext returns true when pos sits at the start of a
+// markdown link target, i.e. the preceding non-space characters are
+// `](`. Such hits belong to the markdown link path and are reported by
+// the inbound scan instead of as bare textual references.
+func isLinkTargetContext(line string, pos int) bool {
+	i := pos - 1
+	for i >= 0 && (line[i] == ' ' || line[i] == '\t') {
+		i--
+	}
+	if i < 0 || line[i] != '(' {
+		return false
+	}
+	i--
+	if i < 0 || line[i] != ']' {
+		return false
+	}
+	return true
 }
 
 // classifyLink resolves a link target against the current rename map
@@ -265,17 +363,46 @@ func posixRel(fromDir, toPath string) string {
 	return strings.Join(parts, "/")
 }
 
+// formatLinkFindings groups findings by severity and emits block + warning
+// sections. Info findings are intentionally suppressed from output — the
+// provenance marker exists precisely to silence them. Returns "" when
+// only info findings are present.
 func formatLinkFindings(findings []linkFinding) string {
-	var bullets []string
+	var blocks, warnings []linkFinding
 	for _, f := range findings {
-		loc := fmt.Sprintf("%s:%d:%d", f.File, f.Line, f.Column)
-		msg := fmt.Sprintf("%s [%s] target=%q", loc, f.Category, f.Target)
-		if f.SuggestedReplacement != "" {
-			msg += fmt.Sprintf("  → suggested: %q", f.SuggestedReplacement)
+		switch f.Severity {
+		case "block":
+			blocks = append(blocks, f)
+		case "warning":
+			warnings = append(warnings, f)
 		}
-		bullets = append(bullets, msg)
 	}
-	return "plan-archival-link-integrity: archive event leaves broken markdown link(s):\n    - " +
-		strings.Join(bullets, "\n    - ") +
-		"\n  Update each broken link to its suggested target, or add a standalone `[skip-plan-archival-link-integrity]` trailer for emergency archives."
+	if len(blocks) == 0 && len(warnings) == 0 {
+		return ""
+	}
+	var out strings.Builder
+	out.WriteString("plan-archival-link-integrity: archive event leaves references requiring attention:")
+	if len(blocks) > 0 {
+		out.WriteString("\n  blocking:")
+		for _, f := range blocks {
+			out.WriteString("\n    - " + formatFindingLine(f))
+		}
+	}
+	if len(warnings) > 0 {
+		out.WriteString("\n  warnings:")
+		for _, f := range warnings {
+			out.WriteString("\n    - " + formatFindingLine(f))
+		}
+	}
+	out.WriteString("\n  Update each reference, or add a standalone `[skip-plan-archival-link-integrity]` trailer for emergency archives.")
+	return out.String()
+}
+
+func formatFindingLine(f linkFinding) string {
+	loc := fmt.Sprintf("%s:%d:%d", f.File, f.Line, f.Column)
+	msg := fmt.Sprintf("%s [%s] target=%q", loc, f.Category, f.Target)
+	if f.SuggestedReplacement != "" {
+		msg += fmt.Sprintf("  → suggested: %q", f.SuggestedReplacement)
+	}
+	return msg
 }
