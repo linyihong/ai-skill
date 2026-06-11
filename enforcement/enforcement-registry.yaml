@@ -680,7 +680,7 @@ rule_classes:
   - id: plan_archival_link_integrity
     coverage: mechanical
     source_files:
-      - plans/active/2026-06-11-1100-plan-archival-link-integrity.md
+      - plans/archived/2026-06-11-1100-plan-archival-link-integrity.md
     executors:
       - file: scripts/ai-skill-cli/internal/app/plan_archival_link_integrity.go
         symbol: validatePlanArchivalLinkIntegrity

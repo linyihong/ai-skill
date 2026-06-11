@@ -50,7 +50,7 @@ type linkFinding struct {
 // downgraded to info (category historical_provenance_reference) and
 // suppressed from validator output.
 //
-// Plan: plans/active/2026-06-11-1100-plan-archival-link-integrity.md
+// Plan: plans/archived/2026-06-11-1100-plan-archival-link-integrity.md
 // Phase: 1 (Implementation — outbound + inbound + bare textual scan).
 func validatePlanArchivalLinkIntegrity(text string, staged []string, root string) string {
 	for _, line := range strings.Split(text, "\n") {
@@ -116,7 +116,7 @@ func validatePlanArchivalLinkIntegrity(text string, staged []string, root string
 // .md, or git not available) we fall back to the worktree.
 //
 // Resolves TD-1 (staged vs worktree drift) per the Resolution Gate
-// recorded in plans/active/2026-06-11-1100-plan-archival-link-integrity.md.
+// recorded in plans/archived/2026-06-11-1100-plan-archival-link-integrity.md.
 // The fixture run observed both directions of divergence (staged-has-fix
 // and staged-broken-worktree-fixed); the validator now reports against
 // what will actually be committed.

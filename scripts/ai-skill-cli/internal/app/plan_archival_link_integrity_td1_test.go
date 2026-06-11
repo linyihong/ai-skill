@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// TD-1 Resolution Gate fixture (plans/active/2026-06-11-1100-plan-archival-link-integrity.md).
+// TD-1 Resolution Gate fixture (plans/archived/2026-06-11-1100-plan-archival-link-integrity.md).
 //
 // These tests exercise staged-vs-worktree divergence to verify the
 // validator reports against the commit candidate (staged blob), not

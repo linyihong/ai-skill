@@ -13,7 +13,7 @@ import (
 // invokes the validator end-to-end (parser + rename detection + resolver
 // + textual scan + formatter).
 //
-// Plan: plans/active/2026-06-11-1100-plan-archival-link-integrity.md
+// Plan: plans/archived/2026-06-11-1100-plan-archival-link-integrity.md
 // Phase: 2 (Tests — integration / fixture-based).
 //
 // TD-1 staged-vs-worktree divergence fixture is intentionally NOT here;

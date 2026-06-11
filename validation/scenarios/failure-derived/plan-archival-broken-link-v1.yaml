@@ -13,7 +13,7 @@ priority: P1
 
 failure_source:
   class: reference-integrity-drift
-  origin_plan: plans/active/2026-06-11-1100-plan-archival-link-integrity.md
+  origin_plan: plans/archived/2026-06-11-1100-plan-archival-link-integrity.md
   origin_phase: Phase 1-3 implementation
   description: >
     Empirical: 2026-06-11 archiving plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md

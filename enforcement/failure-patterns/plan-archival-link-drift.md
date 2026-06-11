@@ -58,6 +58,6 @@ If any of the above recurs, treat it as a regression in `plan_archival_link_inte
 ## Related
 
 - Rule class: [`plan_archival_link_integrity`](../enforcement-registry.yaml) (mechanical).
-- Plan: [`plans/active/2026-06-11-1100-plan-archival-link-integrity.md`](../../plans/active/2026-06-11-1100-plan-archival-link-integrity.md) (Phase 1–3, TD-1 Resolution Gate).
+- Plan: [`plans/archived/2026-06-11-1100-plan-archival-link-integrity.md`](../../plans/archived/2026-06-11-1100-plan-archival-link-integrity.md) (Phase 1–3, TD-1 Resolution Gate).
 - Sibling family member: `runtime_index_freshness` (source ↔ index checksum drift).
 - Workflow-completeness sibling (different concern): `validatePlanArchivalAudit` under `plan_governance`.

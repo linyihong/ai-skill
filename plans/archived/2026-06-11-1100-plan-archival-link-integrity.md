@@ -42,7 +42,7 @@ Gen 3 Runtime Hardening
 1. **被移動檔案自身的 outbound link**：原本假設自己在 `plans/active/`，move 到 `plans/archived/` 後 `../archived/`、same-dir、`../active/` 全部要重算。
 2. **Repo 內其他檔案的 inbound link**：8 個 active 檔案（README、2 runtime yaml `source_plan`、2 failure-pattern、2 metadata、topology-migration）指向 `plans/active/<id>`，move 後變 stale。
 
-現有 `validatePlanArchivalAudit` 只檢查 unchecked `- [ ]`，**完全不看 link**。全靠手動 grep + 逐一修，正是「rule 無 executor」風險。
+現有 `validatePlanArchivalAudit` 只檢查 unchecked checkbox 項，**完全不看 link**。全靠手動 grep + 逐一修，正是「rule 無 executor」風險。
 
 ### The failure this prevents
 

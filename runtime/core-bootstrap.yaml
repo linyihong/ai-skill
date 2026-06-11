@@ -391,7 +391,7 @@ per_commit_obligations:
     validator: validatePlanArchivalLinkIntegrity
     severity: block
     opt_out_marker: "[skip-plan-archival-link-integrity]"
-    contract_source: plans/active/2026-06-11-1100-plan-archival-link-integrity.md (Phase 1-3)
+    contract_source: plans/archived/2026-06-11-1100-plan-archival-link-integrity.md (Phase 1-3)
     rationale: |
       Reference Integrity family executor. archival_audit verifies the
       archive *workflow* (checkbox completeness); this validator verifies

@@ -129,6 +129,21 @@ func TestExtractMarkdownLinks(t *testing.T) {
 			in:   `[outer [inner] text](./x.md)`,
 			want: []Link{{Target: "./x.md", Line: 1, Column: 1}},
 		},
+		{
+			name: "inline backtick code span ignored",
+			in:   "Example syntax: `[text](path)` for inline links.",
+			want: nil,
+		},
+		{
+			name: "mixed real link and code-span example",
+			in:   "See `[demo](demo.md)` for syntax, then [real](actual.md).",
+			want: []Link{{Target: "actual.md", Line: 1, Column: 40}},
+		},
+		{
+			name: "escaped backtick does not toggle span",
+			in:   "Text \\` then [real](r.md).",
+			want: []Link{{Target: "r.md", Line: 1, Column: 14}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

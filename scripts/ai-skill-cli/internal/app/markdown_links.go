@@ -17,7 +17,7 @@ type Link struct {
 // recognised but filtered out of the result.
 //
 // This is a bounded parser by design (see Parser Strategy in
-// plans/active/2026-06-11-1100-plan-archival-link-integrity.md):
+// plans/archived/2026-06-11-1100-plan-archival-link-integrity.md):
 //
 //	Supported:
 //	  - inline link [text](path)
@@ -70,11 +70,32 @@ func extractMarkdownLinks(content []byte) []Link {
 // Link text may not contain unescaped ']' or newlines (newlines are
 // impossible since we operate per-line). Reference-style and shortcut
 // links are recognised by the missing '(' after ']' and skipped.
+//
+// Inline code spans (`...`) are honoured: a `[text](path)` written
+// inside backticks is syntax-example prose, not an actual link, and
+// must be ignored. Backslash-escaped backticks (`\``) do not toggle
+// the span. Multi-backtick spans (``...``) are treated as single-
+// backtick state transitions; this matches the common-case behaviour
+// without adding a full CommonMark span parser.
 func scanLineForInlineLinks(line string, lineNum int) []Link {
 	var out []Link
 	n := len(line)
+	inBacktick := false
 	i := 0
 	for i < n {
+		if line[i] == '\\' && i+1 < n {
+			i += 2
+			continue
+		}
+		if line[i] == '`' {
+			inBacktick = !inBacktick
+			i++
+			continue
+		}
+		if inBacktick {
+			i++
+			continue
+		}
 		if line[i] != '[' {
 			i++
 			continue

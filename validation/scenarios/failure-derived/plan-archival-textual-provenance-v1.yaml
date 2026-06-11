@@ -16,7 +16,7 @@ priority: P2
 
 failure_source:
   class: reference-integrity-drift
-  origin_plan: plans/active/2026-06-11-1100-plan-archival-link-integrity.md
+  origin_plan: plans/archived/2026-06-11-1100-plan-archival-link-integrity.md
   origin_phase: Phase 1 step 3 — bare textual scan + D4 design decision
   description: >
     Distinguishing "stale prose still references the old path" (genuine
