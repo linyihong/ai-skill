@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Sanitization — Project-Local & Bootstrap-Safe Content Passes
+# 同一 private token 出現在 project-local (.agent-goals/, shared_layer:false) 內容
+# 應放行；全新 framework concept（無任何 project 宣告）亦放行（bootstrap-safe）。
+# 來源：
+#   - scripts/ai-skill-cli/internal/app/sanitization_scan.go
+#   - runtime/repository-topology.yaml (shared_layer classification)
+
+id: sanitization-metadata-derived-pass-v1
+domain: runtime
+type: heuristic-obedience
+priority: P1
+
+given:
+  task: scan_staged_content_respecting_topology_and_bootstrap_safety
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/sanitization_scan.go
+    - runtime/repository-topology.yaml
+  fixtures:
+    - path: .agent-goals/acme/.ai-skill-project.yaml
+      content: |
+        project:
+          id: acme-app
+          visibility: private
+          private_entities:
+            - name: Acme Secret Project
+              kind: codename
+              match_tokens:
+                - "AcmeSecretProject"
+    - path: .agent-goals/acme/incident.md
+      staged: true
+      content: |
+        # Local incident notes
+        AcmeSecretProject local evidence lives here.
+    - path: plans/active/new-concept.md
+      staged: true
+      content: |
+        # New framework concept
+        ActivationBridgeV2 is reusable framework terminology.
+  constraints:
+    - .agent-goals/ 屬 project-local（repository-topology shared_layer:false）
+    - ActivationBridgeV2 未被任何 project metadata 宣告
+    - scenario input 不提供 expected verdict（no answer leakage）
+
+when:
+  action: run_pre_commit_sanitization_scan
+
+then:
+  expected_route:
+    primary: pass_commit
+    steps:
+      - classify .agent-goals/acme/incident.md as project-local via topology → skip
+      - ActivationBridgeV2 not present in derived_match_tokens → no finding
+  reject:
+    - block_project_local: "project-local 內容含自家 private token 被誤擋"
+    - block_new_concept: "全新 framework concept 被當成 private token 誤擋"
+  trace_required:
+    - project_local_skipped: .agent-goals/acme/incident.md
+    - bootstrap_safe_token: ActivationBridgeV2
+  verification:
+    - "pre-commit hook returns ok（no sanitization finding）"
+    - "重跑相同 staged set 得相同放行結果（deterministic）"

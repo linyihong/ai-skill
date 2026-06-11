@@ -377,7 +377,9 @@ git pre-commit hook
 
 ### Phase 4 — Registry & Bootstrap Integration
 
-- [ ] 新建 `enforcement/failure-patterns/sanitization-leak-on-canonical-write.md`（inherited 規劃，empirical evidence: 214a415 + sibling plan v1-v4 累積 leak）
+> **Phase 4 拆 step**（2026-06-11）：step 1（可逆，已完成）= failure-pattern doc + 3 validation scenarios；step 2/3（promotion，待執行）= registry `coverage→mechanical` + 不可 opt-out blocking obligation + hooks 註冊。Step 1 先行因 registry Status Transition Matrix 要求 `scenario_exists`/`regression_exists` 才能合法升 mechanical。
+
+- [x] 新建 `enforcement/failure-patterns/sanitization-leak-on-canonical-write.md`（empirical evidence: 214a415 + sibling plan v1-v4 累積 leak；含 executor binding + Failure Authority 關係）
 - [ ] 更新 `enforcement/enforcement-registry.yaml` `rule_classes[sanitization]`：
   - 新增 executor entry: `file: scripts/ai-skill-cli/internal/app/sanitization_scan.go`, `symbol: scanStagedContentForSanitization`, `hook_phase: pre-commit`, `block_or_warn: block`
   - 若 Q1 裁決 supersede → 移除舊 allowlist executor entry
@@ -386,7 +388,7 @@ git pre-commit hook
 - [ ] `commitMsgValidatorRegistry` 在 hooks.go 註冊新 obligation
 - [ ] Companion `enforcement/sanitization-mechanical.md` cross-link to prose `sanitization.md`
 - [ ] Re-dry-run `ai-skill runtime compile` + enforcement coverage report
-- [ ] Validation scenarios：
+- [x] Validation scenarios（+ `validation/README.md` 索引）：
   - `validation/scenarios/runtime/sanitization-metadata-derived-pass-v1.yaml`
   - `validation/scenarios/runtime/sanitization-metadata-derived-fail-v1.yaml`（commit 214a415 reconstruction）
   - `validation/scenarios/runtime/sanitization-placeholder-allowed-v1.yaml`

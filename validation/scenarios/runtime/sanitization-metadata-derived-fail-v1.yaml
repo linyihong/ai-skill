@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Sanitization — Metadata-Derived Forbidden Token Blocks Shared-Layer Write
+# 重建 commit 214a415：某 project 在自身 .ai-skill-project.yaml 宣告 private
+# entity，其 match_token 出現在 shared-layer (plans/) 內容 → pre-commit 必須 block。
+# 使用合成 token（AcmeSecretProject），非任何真實 project 宣告，符合 self-reference
+# exception；真實 private token 不得寫入本 scenario。
+# 來源：
+#   - scripts/ai-skill-cli/internal/app/sanitization_scan.go (validateSanitizationStagedContent)
+#   - runtime.db.derived_match_tokens (project_metadata_compile.go)
+#   - enforcement/failure-patterns/sanitization-leak-on-canonical-write.md
+
+id: sanitization-metadata-derived-fail-v1
+domain: runtime
+type: regression
+priority: P1
+
+given:
+  task: scan_staged_shared_layer_content_for_private_tokens
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/sanitization_scan.go
+    - scripts/ai-skill-cli/internal/app/project_metadata_compile.go
+    - runtime/repository-topology.yaml
+  fixtures:
+    - path: .agent-goals/acme/.ai-skill-project.yaml
+      content: |
+        project:
+          id: acme-app
+          visibility: private
+          private_entities:
+            - name: Acme Secret Project
+              kind: codename
+              match_tokens:
+                - "AcmeSecretProject"
+    - path: plans/active/example-leak.md
+      staged: true
+      content: |
+        # Example plan
+        The AcmeSecretProject rollout incident is described here.
+  constraints:
+    - plans/ 屬 shared layer（repository-topology shared_layer:true）
+    - AcmeSecretProject 由 acme-app metadata 宣告為 private entity match_token
+    - scenario input 不提供 expected verdict（no answer leakage）
+
+when:
+  action: run_pre_commit_sanitization_scan
+
+then:
+  expected_route:
+    primary: block_commit
+    steps:
+      - compile derived_match_tokens from project metadata
+      - classify plans/active/example-leak.md as shared layer via topology
+      - match staged content against derived_match_tokens
+      - emit finding naming the entity and suggested placeholder
+  reject:
+    - pass: "shared-layer 內容含已宣告 private token 卻放行"
+    - silent: "未 emit finding"
+  trace_required:
+    - matched_token: AcmeSecretProject
+    - entity_name: Acme Secret Project
+    - owning_project: acme-app
+    - file: plans/active/example-leak.md
+  verification:
+    - "pre-commit hook returns blocked (sanitization_scan_failed)"
+    - "finding 包含 entity name 與 suggested placeholder"

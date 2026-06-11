@@ -73,6 +73,12 @@ validation/
 - `runtime/non-local-repo-feedback-none-allowed-v1.yaml` — non-local repo 仍可在沒有 reusable learning 時回報 `feedback_decision: NONE`。
 - `failure-derived/feedback-needed-but-not-reported-v1.yaml` — user correction / reusable runtime gap 後不得漏報 `feedback_decision: NEEDED`。
 
+## Sanitization Scenarios
+
+- `runtime/sanitization-metadata-derived-fail-v1.yaml` — shared-layer 內容含 project metadata 宣告的 private token（214a415 reconstruction）必須 block。
+- `runtime/sanitization-metadata-derived-pass-v1.yaml` — 同 token 在 project-local（`shared_layer:false`）放行；未宣告的 framework concept bootstrap-safe 放行。
+- `runtime/sanitization-placeholder-allowed-v1.yaml` — `<PROJECT_ROOT>` / `<USER>` 等 placeholder 形不得被 generic pattern 誤擋。
+
 ## Scenario 格式
 
 每個 scenario 定義在 `scenarios/<domain>/<id>.yaml`：

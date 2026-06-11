@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Sanitization — Placeholder Forms Allowed in Shared Layer
+# 佔位符 <PROJECT_ROOT> / <USER> / <AI_SKILL_REPO> 等在 shared-layer 內容必須放行，
+# 不得被 generic regex pattern（OS path / username 等）誤擋。
+# 來源：
+#   - scripts/ai-skill-cli/internal/app/sanitization_scan.go (sanitizationAllowedPlaceholderMatch)
+#   - runtime/sanitization-patterns.yaml
+
+id: sanitization-placeholder-allowed-v1
+domain: runtime
+type: heuristic-obedience
+priority: P1
+
+given:
+  task: scan_staged_shared_layer_content_with_placeholders
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/sanitization_scan.go
+    - runtime/sanitization-patterns.yaml
+  fixtures:
+    - path: plans/active/placeholders.md
+      staged: true
+      content: |
+        # Guidance
+        Use <PROJECT_ROOT> instead of a real absolute path.
+        Replace the home directory with <USER>.
+        The framework repo is <AI_SKILL_REPO>.
+  constraints:
+    - plans/ 屬 shared layer
+    - placeholder 形 <PROJECT_ROOT> / <USER> / <AI_SKILL_REPO> 為允許之 sanitized 形
+    - scenario input 不提供 expected verdict（no answer leakage）
+
+when:
+  action: run_pre_commit_sanitization_scan
+
+then:
+  expected_route:
+    primary: pass_commit
+    steps:
+      - generic regex 比對 OS path / username pattern
+      - placeholder forms 命中 allowlist override → 不 emit finding
+  reject:
+    - block_placeholder: "已 sanitized 的 placeholder 形被當成真實 path / username 誤擋"
+  trace_required:
+    - allowed_placeholders: ["<PROJECT_ROOT>", "<USER>", "<AI_SKILL_REPO>"]
+  verification:
+    - "pre-commit hook returns ok（no sanitization finding）"
+    - "真實的 macOS 使用者家目錄絕對路徑仍會被擋（placeholder override 不放寬真實 PII）"
