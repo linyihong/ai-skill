@@ -110,16 +110,18 @@ Gen 3 Runtime Hardening
 
 ### Phase 2 — Tests
 
-- [ ] fail/markdown link broken：archive A，A 內含 `[parent](../active/sibling.md)`（move 後相對路徑錯）→ block
-- [ ] fail/inbound markdown link broken：另一 active 檔含 `[source](plans/active/<moved-id>.md)` → block
-- [ ] warn/stale textual mention：另一檔 prose 寫 `Archived from plans/active/<moved-id>.md`（非 link 語法，無 provenance marker）→ warning，category `stale_textual_reference`
-- [ ] info/historical provenance：同上 prose，但同行/上一行有 `<!-- archival-provenance -->` → severity `info`，category `historical_provenance_reference`，不進 warning 列表
-- [ ] pass/clean archive：move 且所有 inbound/outbound markdown link 都已 retarget → 0 finding
-- [ ] pass/bare id provenance：純歷史 prose 提及 bare id（無路徑）→ 不誤報
-- [ ] pass/escaped parens in path：plan 含 `[text](../a\(b\).md)`，target 存在 → bounded parser 正確解析跳脫括號，0 finding（驗證 state machine 相對 regex 的主要價值）
-- [ ] **fail/multi-archive cross-reference**：同一 commit 內 A、B 都 archive，A 內有 `[B](../active/B.md)` 但未更新為 `../archived/B.md` → block（驗證 rename map 整批建立邏輯）
-- [ ] pass/multi-archive cross-reference resolved：同上但 A 已更新為 `B.md`（same-dir archived）→ 0 finding
-- [ ] **manual fixture run（Phase 3 wiring 前置）**：建臨時 git repo（`active/A.md` + `archived/A.md` + 引用檔），未接 dispatcher 也直接呼叫 `validatePlanArchivalLinkIntegrity` 跑一次，肉眼確認 finding payload 形狀（`Severity`/`Category`/`File`/`Line`/`Column`/`Target`/`SuggestedReplacement`）符合 contract。理由：很多 bug 不在 resolver，而在 finding renderer / dispatcher adapter / severity mapping
+- [x] fail/outbound markdown link broken：archive A，A 內含 `[parent](./sibling.md)`（move 後 same-dir resolve 失敗）→ block
+- [x] fail/inbound markdown link broken：另一 active 檔含 `[source](plans/active/<moved-id>.md)` → block
+- [x] warn/stale textual mention：另一檔 prose 寫 `see plans/active/<moved-id>.md`（非 link 語法，無 provenance marker）→ warning，category `stale_textual_reference`
+- [x] info/historical provenance：同上 prose，但同行/上一行有 `<!-- archival-provenance -->` → severity `info`，category `historical_provenance_reference`，不進 warning 列表
+- [x] pass/clean archive：move 且所有 inbound/outbound markdown link 都已 retarget → 0 finding
+- [x] pass/bare id provenance：純歷史 prose 提及 bare id（無路徑）→ 不誤報
+- [x] pass/escaped parens in path：plan 含 `[text](../a\(b\).md)`，target 存在 → bounded parser 正確解析跳脫括號，0 finding（驗證 state machine 相對 regex 的主要價值）
+- [x] **fail/multi-archive cross-reference**：同一 commit 內 A、B 都 archive，A 內有 `[B](../active/B.md)` 但未更新 → block（驗證 rename map 整批建立邏輯）
+- [x] pass/multi-archive cross-reference resolved：同上但 A 已更新為 `B.md`（same-dir archived）→ 0 finding
+- [x] opt-out trailer `[skip-plan-archival-link-integrity]` 抑制 findings（額外場景）
+- [x] no-archive commit 無 op（額外場景）
+- [ ] **TD-1 staged/worktree divergence fixture（Phase 3 wiring 前置 gate）**：建臨時 git repo（`active/A.md` + `archived/A.md` + 引用檔），跑 staged/worktree 不同步 fixture，依 TD-1 Resolution Gate 程序裁決 promote vs keep
 
 ### Phase 3 — Registry & Bootstrap Integration
 
