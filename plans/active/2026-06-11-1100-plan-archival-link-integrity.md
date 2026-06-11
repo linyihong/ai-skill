@@ -70,6 +70,11 @@ Gen 3 Runtime Hardening
   - markdown link syntax `](path)` 且解析失敗 → **block**（無論 inbound/outbound；客觀錯誤）
   - bare textual path 提及（prose / frontmatter 註解 / 歷史描述）→ **warning**（避免誤殺 provenance 文字）
   - opt-out: `[skip-plan-archival-link-integrity]`
+- [x] **D4 = textual finding 分 category + opt-in provenance marker**：避免「半年後 warning 一直不修，其實是故意保留歷史」的雜訊。
+  - default category = `stale_textual_reference`（warning）
+  - 若同行或上一行有 `<!-- archival-provenance -->` marker → category = `historical_provenance_reference`，severity = `info`（不進 warning 列表）
+  - 機械區分意圖比 NLP 猜 phrasing 可靠；責任落在寫 provenance 的人
+  - Finding payload 帶 `category` 欄位，下游工具可分流
 - [x] **D3 = `git diff --cached --find-renames -M90`**：吃 Git 算好的 rename intent，比自己重建對照少 edge case；threshold 90% 對 archive 場景合適（pure move，極少改動）。
 
 ### Phase 1 — Implementation
@@ -79,14 +84,15 @@ Gen 3 Runtime Hardening
 - [ ] **建立整批 rename map（必須在掃描前完成）**：multi-archive in same commit 時，A、B 同時 archive 且互相引用，每個檔的 resolve 都要看完整 rename map，不能逐檔處理
 - [ ] **Markdown link parsing**：用 goldmark 或等效 markdown AST 取 link node（不是 regex），避免 prose 中的路徑字串被誤判為 link
 - [ ] **解析**：對每個 link，從 link 所在檔案的 **新位置**（若該檔本身被 rename）或 **當前位置** resolve 相對路徑；target 不存在 → finding
-- [ ] **Bare textual path scan**：對被 rename 檔案的舊路徑（`plans/active/<id>`）做 plain-text 搜尋，命中且不在 markdown link node 內 → warning finding
-- [ ] **suggested_replacement**：finding payload 帶 `{old_path, new_path, suggested_replacement}`，old/new 從 rename map 反查
+- [ ] **Bare textual path scan**：對被 rename 檔案的舊路徑（`plans/active/<id>`）做 plain-text 搜尋，命中且不在 markdown link node 內 → finding。檢查命中行（與上一行）是否含 `<!-- archival-provenance -->`：有 → category `historical_provenance_reference` / severity `info`；無 → category `stale_textual_reference` / severity `warning`
+- [ ] **suggested_replacement**：finding payload 帶 `{old_path, new_path, suggested_replacement, category}`，old/new 從 rename map 反查
 
 ### Phase 2 — Tests
 
 - [ ] fail/markdown link broken：archive A，A 內含 `[parent](../active/sibling.md)`（move 後相對路徑錯）→ block
 - [ ] fail/inbound markdown link broken：另一 active 檔含 `[source](plans/active/<moved-id>.md)` → block
-- [ ] warn/stale textual mention：另一檔 prose 寫 `Archived from plans/active/<moved-id>.md`（非 link 語法）→ warning
+- [ ] warn/stale textual mention：另一檔 prose 寫 `Archived from plans/active/<moved-id>.md`（非 link 語法，無 provenance marker）→ warning，category `stale_textual_reference`
+- [ ] info/historical provenance：同上 prose，但同行/上一行有 `<!-- archival-provenance -->` → severity `info`，category `historical_provenance_reference`，不進 warning 列表
 - [ ] pass/clean archive：move 且所有 inbound/outbound markdown link 都已 retarget → 0 finding
 - [ ] pass/bare id provenance：純歷史 prose 提及 bare id（無路徑）→ 不誤報
 - [ ] **fail/multi-archive cross-reference**：同一 commit 內 A、B 都 archive，A 內有 `[B](../active/B.md)` 但未更新為 `../archived/B.md` → block（驗證 rename map 整批建立邏輯）
@@ -108,6 +114,20 @@ Gen 3 Runtime Hardening
 - Clean archive (all markdown links retargeted) passes with zero findings.
 - Bare-id provenance mentions（無路徑語法）do not false-positive.
 - Multi-archive in same commit: cross-references between simultaneously-archived plans are correctly resolved against the batch rename map.
+
+## Future Extensibility
+
+本 plan **不**抽象共用元件。先實作具體 executor，跑過一輪 telemetry 後再決定是否抽 `pkg/reference/` 共用層（`BuildRenameMap()` / `ResolveReference()` / `SuggestReplacement()`），給其他 rename-shaped 場景重用：
+
+```
+未來潛在共用 engine（不進本 plan）
+└─ ReferenceRewriteEngine
+   ├─ PlanArchivalLinkIntegrity       ← 本 plan，先具體後抽象
+   ├─ TopologyMigrationIntegrity      (potential)
+   └─ MetadataRelocationIntegrity     (potential)
+```
+
+過早抽象成本高於收益；以本 executor 的實際 finding 分佈為證據再決定。
 
 ## Validation
 
