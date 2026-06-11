@@ -37,7 +37,15 @@ func TestRepoLocalBinariesMatchChecksumsAndCurrentSource(t *testing.T) {
 		t.Fatalf("BUILDINFO missing source_commit")
 	}
 	latestSourceCommit := latestCLISourceCommit(t, moduleRoot)
-	if sourceCommit != latestSourceCommit {
+	// Compare by FULL commit SHA, not by abbreviated hash. git's %h / --short
+	// length is auto-sized by repository object count, so CI (a full-history
+	// fetch-depth:0 checkout) can abbreviate to more characters than a local
+	// clone. An exact-string compare of two independently-abbreviated hashes is
+	// therefore environment-fragile — it was the cause of the cross-OS CI
+	// failures (BUILDINFO stored a 7-char hash, CI's %h resolved to 8+). Both
+	// sides are resolved to the canonical full SHA so the parity invariant holds
+	// regardless of core.abbrev.
+	if resolveCommitSHA(t, moduleRoot, sourceCommit) != resolveCommitSHA(t, moduleRoot, latestSourceCommit) {
 		t.Fatalf("repo-local binaries built from %s, latest CLI source commit is %s; rebuild bin/", sourceCommit, latestSourceCommit)
 	}
 
@@ -105,9 +113,22 @@ func readBuildInfo(t *testing.T, path string) map[string]string {
 
 func latestCLISourceCommit(t *testing.T, moduleRoot string) string {
 	t.Helper()
-	output, err := exec.Command("git", "-C", moduleRoot, "log", "-1", "--format=%h", "--", "cmd", "internal", "go.mod", "go.sum").Output()
+	output, err := exec.Command("git", "-C", moduleRoot, "log", "-1", "--format=%H", "--", "cmd", "internal", "go.mod", "go.sum").Output()
 	if err != nil {
 		t.Fatal(err)
+	}
+	return strings.TrimSpace(string(output))
+}
+
+// resolveCommitSHA expands any commit-ish (a short hash from BUILDINFO, or a
+// full hash) to its canonical 40-char SHA, so commit comparisons are
+// independent of git's abbreviation length (which varies with object count and
+// therefore differs between a local clone and CI's full-history checkout).
+func resolveCommitSHA(t *testing.T, moduleRoot, ref string) string {
+	t.Helper()
+	output, err := exec.Command("git", "-C", moduleRoot, "rev-parse", "--verify", ref+"^{commit}").Output()
+	if err != nil {
+		t.Fatalf("resolve commit %q: %v", ref, err)
 	}
 	return strings.TrimSpace(string(output))
 }
