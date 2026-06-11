@@ -227,6 +227,15 @@ func compileProjectMetadataDerived(repo string, db *sql.DB) error {
 	if err != nil {
 		return err
 	}
+	// Load topology directly from the YAML (Phase 1B loader), NOT the projected
+	// runtime.db table: this projection runs BEFORE compileRepositoryTopology in
+	// the pipeline, so the table is not yet populated here. A load failure
+	// leaves topo nil → every subject resolves to SharedUnknown → authoritative
+	// (fail-safe: keep blocking power when topology can't be consulted).
+	var topo *RepositoryTopologyFile
+	if t, terr := LoadRepositoryTopology(filepath.Join(repo, "runtime", "repository-topology.yaml")); terr == nil {
+		topo = t
+	}
 	for _, rel := range metadataFiles {
 		body, err := os.ReadFile(filepath.Join(repo, filepath.FromSlash(rel)))
 		if err != nil {
@@ -245,9 +254,22 @@ func compileProjectMetadataDerived(repo string, db *sql.DB) error {
 
 		metadata, err := ParseProjectMetadata(body)
 		if err != nil {
+			// Executor #1 of the Failure Authority invariant (governance/
+			// lifecycle/governance-pattern-library-draft.md): a malformed
+			// metadata file only HARD-FAILS the compile if its source has
+			// standing. Non-authoritative sources (e.g. project-local
+			// .agent-goals/, shared_layer:false) warn and skip instead — a
+			// broken local file must not wedge everyone's compile. A new-schema
+			// file in a shared/authoritative subtree still hard-fails, so the
+			// Phase 1D silent-skip gap stays closed for the cases that matter.
+			subject := metadataFileAuthoritySubject(topo, rel)
+			if ClassifyFailureAuthority(subject) == NonAuthoritative {
+				fmt.Fprintf(os.Stderr,
+					"sanitization: skipping invalid non-authoritative project metadata %s (%s): %v\n",
+					rel, subject.Owner, err)
+				continue
+			}
 			if IsValidationError(err) {
-				// New-schema shape but malformed: fail loudly. Silent skip
-				// here is exactly the protection gap this remediation closes.
 				return fmt.Errorf("invalid project metadata %s: %w", rel, err)
 			}
 			return fmt.Errorf("parse %s: %w", rel, err)
@@ -277,6 +299,28 @@ func compileProjectMetadataDerived(repo string, db *sql.DB) error {
 		}
 	}
 	return nil
+}
+
+// metadataFileAuthoritySubject builds the Authority Classification Contract
+// subject for a metadata file from topology. This is the metadata-file kind's
+// executor-side adapter: it translates "a file path + repository topology" into
+// the language-neutral AuthoritySubject the classifier consumes. A topology
+// miss (or nil topo) leaves SharedLayer == SharedUnknown, which the classifier
+// treats as authoritative (fail-safe toward protection).
+func metadataFileAuthoritySubject(topo *RepositoryTopologyFile, rel string) AuthoritySubject {
+	subject := AuthoritySubject{Kind: SubjectMetadataFile, Path: rel}
+	if topo == nil {
+		return subject
+	}
+	if st, ok := topo.SubtreeForPath(rel); ok {
+		subject.Owner = st.Owner
+		if st.SharedLayer {
+			subject.SharedLayer = SharedTrue
+		} else {
+			subject.SharedLayer = SharedFalse
+		}
+	}
+	return subject
 }
 
 // insertProjectMetadataDerivedSourceFile records the .ai-skill-project.yaml

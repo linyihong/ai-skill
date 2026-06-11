@@ -366,6 +366,34 @@ func (e *RepositoryTopologyValidationError) Error() string {
 	return strings.Join(lines, "\n")
 }
 
+// SubtreeForPath returns the declared subtree that governs a repo-relative
+// path, by longest-prefix match (the most specific declared subtree wins), and
+// whether any subtree matched. Used by authority classification to resolve a
+// file's shared_layer / owner from topology. Matching is slash-normalized and
+// treats a subtree path as a directory prefix (with exact-path match allowed).
+func (f *RepositoryTopologyFile) SubtreeForPath(rel string) (Subtree, bool) {
+	rel = strings.ReplaceAll(strings.TrimSpace(rel), "\\", "/")
+	var best Subtree
+	bestLen := -1
+	for _, s := range f.Subtrees {
+		p := strings.ReplaceAll(strings.TrimSpace(s.Path), "\\", "/")
+		if p == "" {
+			continue
+		}
+		prefix := p
+		if !strings.HasSuffix(prefix, "/") {
+			prefix += "/"
+		}
+		if rel == strings.TrimSuffix(p, "/") || strings.HasPrefix(rel, prefix) {
+			if len(p) > bestLen {
+				best = s
+				bestLen = len(p)
+			}
+		}
+	}
+	return best, bestLen >= 0
+}
+
 // IsRepositoryTopologyValidationError reports whether err is (or wraps)
 // a *RepositoryTopologyValidationError. Uses errors.As so callers that
 // wrap the validation error via fmt.Errorf("ctx: %w", err) still get the

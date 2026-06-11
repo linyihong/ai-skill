@@ -255,30 +255,28 @@ ultimately `compile fail`, the topology v2 classification work (owner / purpose 
 shared_layer) loses most of its governance value at the one moment it should
 matter most.
 
-### Sample inventory (N=3, observation-stage)
+### Sample inventory (N=4, observation-stage)
 
 | # | Subsystem | Authoritative source (may block) | Non-authoritative source (must not block) | Invariant currently holds? |
 |---|---|---|---|---|
 | 1 | Workflow Activation / Discovery Bridge | a single locked `active_route` inside the repo | detector miss / multi-route conflict / routing registry unresolvable / running outside the repo → gate **fails open**; Discovery fallback is advisory-only and never blocks | ✅ holds — non-authoritative failure must not halt the system |
 | 2 | Runtime Index Freshness | files with a `sources` row in `runtime-index.sqlite` | files *without* a source row ("outside this validator's freshness scope" — core-bootstrap.yaml runtime_index_freshness rationale) | ✅ holds — not every source row has standing to fail compile; only registered ones |
-| 3 | Project Metadata Compile (Sanitization Phase 1D) | malformed shared-layer `.ai-skill-project.yaml` | malformed `.agent-goals/…` (`shared_layer:false`) project-local metadata | ❌ **violated today** — hard-fail is repo-wide (Finding A) |
+| 3 | Project Metadata Compile (Sanitization) | malformed shared-layer `.ai-skill-project.yaml` | malformed `.agent-goals/…` (`shared_layer:false`) project-local metadata | ✅ holds (since 2026-06-10) — now classifier-scoped via `ClassifyFailureAuthority` (Executor #1) |
+| 4 | Authority Classifier itself | — | — | ✅ the shared `ClassifyFailureAuthority(subject)` impl all three above will route through |
 
-These are the three the framework has *already* surfaced; #1 and #2 honour the
-invariant, #3 violates it — confirming the rule is descriptive of existing
-intent, not invented for this one case.
-
-Sample #3 is the live counter-instance: the Phase 1D hard-fail (which correctly
-closed the silent-skip gap) currently blocks compile for *any* malformed
-`.ai-skill-project.yaml` repo-wide, including non-authoritative `.agent-goals/`.
-Samples #1 and #2 show the framework *already* honours the invariant elsewhere —
-so #3 is the outlier to bring into line, not a new behaviour to invent.
+Sample #3 *was* the live counter-instance (the Phase 1D hard-fail blocked compile
+repo-wide, including non-authoritative `.agent-goals/`); it is now brought into
+line — `compileProjectMetadataDerived` builds a `metadata-file` subject from
+topology and only hard-fails when the subject is authoritative. Samples #1 and #2
+already honoured the invariant, so #3 was the outlier corrected, not a new
+behaviour invented.
 
 ### Acceptance gate (mirrors the other two families)
 
 | Criterion | Threshold | Current | Met? |
 |---|---|---|---|
-| Total samples | ≥ 5 | 3 | ❌ |
-| At least one non-fitting sample analysed | ≥ 1 | 1 (sample #3 violates — analysed) | ✅ |
+| Total samples | ≥ 5 | 4 | ❌ |
+| At least one non-fitting sample analysed | ≥ 1 | 1 (sample #3 was a violation — analysed and now corrected) | ✅ |
 | Distinct authority signals | ≥ 3 | 3 (source-row / route-lock+repo-scope / shared_layer) | ✅ |
 
 ### Pre-emptive falsification questions
@@ -426,8 +424,10 @@ near-identical authority decisions scattered and divergent.
    *from the contract*, not from Finding A. Unit-tested across all four subject
    kinds — proving it is genuinely multi-kind, not a path-welded special-case.
    No caller wired yet.
-4. ⏭ Land Finding A as Executor #1 (a `metadata-file` subject caller). It then
-   also becomes the 4th sample that moves this family toward its N≥5 gate.
+4. ✅ Land Finding A as Executor #1 (`compileProjectMetadataDerived` builds a
+   `metadata-file` subject from topology and calls `ClassifyFailureAuthority`;
+   non-authoritative → warn+skip, authoritative → hard-fail). Sample #3 moved
+   ❌→✅; family now N=4 toward the N≥5 gate.
 
 See plan 2026-06-06-1800 §"Phase 1D review — Finding A" for the deferred fix and
 plan 2026-06-08-2100 for the incubator gate.

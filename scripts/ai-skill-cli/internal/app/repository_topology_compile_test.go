@@ -193,3 +193,31 @@ subtrees:
 		t.Errorf("legacy reader missing .agent-goals/=false; got map=%+v", got)
 	}
 }
+
+func TestSubtreeForPath_LongestPrefixMatch(t *testing.T) {
+	f := &RepositoryTopologyFile{Subtrees: []Subtree{
+		{Path: "plans/", SharedLayer: true, Owner: "framework-maintainer"},
+		{Path: ".agent-goals/", SharedLayer: false, Owner: "project-local"},
+		{Path: "enforcement/", SharedLayer: true, Owner: "framework-maintainer"},
+	}}
+	cases := []struct {
+		rel        string
+		wantOK     bool
+		wantShared bool
+		wantOwner  string
+	}{
+		{".agent-goals/demo/.ai-skill-project.yaml", true, false, "project-local"},
+		{"enforcement/x/.ai-skill-project.yaml", true, true, "framework-maintainer"},
+		{"plans/active/p.md", true, true, "framework-maintainer"},
+		{"scripts/foo.go", false, false, ""},
+	}
+	for _, tc := range cases {
+		got, ok := f.SubtreeForPath(tc.rel)
+		if ok != tc.wantOK {
+			t.Fatalf("%s: ok=%v want %v", tc.rel, ok, tc.wantOK)
+		}
+		if ok && (got.SharedLayer != tc.wantShared || got.Owner != tc.wantOwner) {
+			t.Fatalf("%s: got shared=%v owner=%q want shared=%v owner=%q", tc.rel, got.SharedLayer, got.Owner, tc.wantShared, tc.wantOwner)
+		}
+	}
+}

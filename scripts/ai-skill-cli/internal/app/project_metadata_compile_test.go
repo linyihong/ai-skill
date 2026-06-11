@@ -280,3 +280,70 @@ project:
 		t.Fatalf("error should name the offending file, got: %v", err)
 	}
 }
+
+// seedTopologyYAML writes a minimal v2 repository-topology.yaml so
+// compileProjectMetadataDerived can resolve a file's authority.
+func seedTopologyYAML(t *testing.T, repo string) {
+	t.Helper()
+	writeFile(t, filepath.Join(repo, "runtime", "repository-topology.yaml"), `
+schema_version: 2
+status: active
+owner_layer: runtime
+consumer_tracking:
+  strategy: code_reference
+  rationale: "test"
+subtrees:
+  - path: enforcement/
+    shared_layer: true
+    owner: framework-maintainer
+    purpose: "shared rules"
+  - path: .agent-goals/
+    shared_layer: false
+    owner: project-local
+    purpose: "project-local"
+`)
+}
+
+func TestCompileProjectMetadataDerived_NonAuthoritativeMalformedWarnsNotFails(t *testing.T) {
+	repo := t.TempDir()
+	seedTopologyYAML(t, repo)
+	// New-schema shape but malformed (missing kind) in a NON-authoritative
+	// .agent-goals/ subtree → Executor #1 must warn + skip, not hard-fail.
+	writeFile(t, filepath.Join(repo, ".agent-goals", "demo", ".ai-skill-project.yaml"), `
+project:
+  id: local-demo
+  visibility: private
+  private_entities:
+    - name: Local Thing
+      match_tokens:
+        - "LocalThing"
+`)
+	db := freshSanitizationDB(t, repo)
+	if err := compileProjectMetadataDerived(repo, db); err != nil {
+		t.Fatalf("non-authoritative malformed metadata must NOT hard-fail, got: %v", err)
+	}
+}
+
+func TestCompileProjectMetadataDerived_AuthoritativeMalformedStillHardFails(t *testing.T) {
+	repo := t.TempDir()
+	seedTopologyYAML(t, repo)
+	// Same malformed new-schema file, but in a shared/authoritative subtree →
+	// must still hard-fail (Phase 1D protection preserved for what matters).
+	writeFile(t, filepath.Join(repo, "enforcement", "demo", ".ai-skill-project.yaml"), `
+project:
+  id: shared-demo
+  visibility: private
+  private_entities:
+    - name: Shared Thing
+      match_tokens:
+        - "SharedThing"
+`)
+	db := freshSanitizationDB(t, repo)
+	err := compileProjectMetadataDerived(repo, db)
+	if err == nil {
+		t.Fatal("authoritative malformed metadata must hard-fail, got nil")
+	}
+	if !strings.Contains(err.Error(), "shared-demo") && !strings.Contains(err.Error(), "enforcement/") {
+		t.Fatalf("error should name the offending shared-layer file, got: %v", err)
+	}
+}
