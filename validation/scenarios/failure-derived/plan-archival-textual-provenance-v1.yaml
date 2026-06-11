@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+# Plan Archival Textual / Provenance Distinction Scenario
+# Commit-time warning vs info: bare textual prose mentions of an archived
+# plan's old path default to warning (stale_textual_reference). When the
+# author intentionally retains a historical reference, an opt-in
+# `<!-- archival-provenance -->` marker on the same line or the
+# immediately preceding line downgrades the finding to info
+# (historical_provenance_reference), which is suppressed from validator
+# output. This isolates real "needs fixing" warnings from documented
+# historical mentions.
+
+id: plan-archival-textual-provenance-v1
+domain: runtime-governance
+type: heuristic-obedience
+priority: P2
+
+failure_source:
+  class: reference-integrity-drift
+  origin_plan: plans/active/2026-06-11-1100-plan-archival-link-integrity.md
+  origin_phase: Phase 1 step 3 — bare textual scan + D4 design decision
+  description: >
+    Distinguishing "stale prose still references the old path" (genuine
+    follow-up needed) from "this prose intentionally records historical
+    provenance" cannot be done reliably by NLP — phrasing varies too much
+    ("Originally at X" vs "Fixed in X" etc.). Without an explicit opt-in
+    marker, the warning would either over-fire (treating provenance text
+    as stale) or under-fire (treating stale prose as provenance). The
+    `<!-- archival-provenance -->` marker mechanically resolves intent.
+
+given:
+  task: stage_plan_archive_event
+  artifacts:
+    - plans/active/**
+    - plans/archived/**
+    - scripts/ai-skill-cli/internal/app/plan_archival_link_integrity.go
+  signals:
+    - staged diff contains R* rename between plans/active/ and plans/archived/
+    - one or more repo .md files contains a plain-text occurrence of the renamed plan's old path
+    - the occurrence is NOT inside a markdown link target context (isLinkTargetContext returns false)
+  constraints:
+    - default classification is warning + stale_textual_reference category
+    - presence of `<!-- archival-provenance -->` on the same line OR the line immediately above downgrades to severity=info + category=historical_provenance_reference
+    - info findings carry the same payload shape but are suppressed from validator output (the formatter drops them)
+    - finding payload still carries the SuggestedReplacement for downstream tools regardless of severity
+
+when:
+  action: invoke_commit_msg_validator_plan_archival_link_integrity
+
+then:
+  expected_route:
+    primary: warning_or_info_per_provenance_marker
+    steps:
+      - For each non-link occurrence of an old path: emit finding with category stale_textual_reference / severity warning unless marker present.
+      - When marker present on same or previous line: downgrade to category historical_provenance_reference / severity info; do not include in formatter output.
+      - Format groups remaining findings into `warnings:` section, separate from `blocking:` section.
+      - Author either retargets the textual mention, or adds `<!-- archival-provenance -->` opt-in marker if the historical reference is intentional, or relies on `[skip-plan-archival-link-integrity]` trailer for emergency archives.
+  forbidden_routes:
+    - mark_unmarked_prose_as_historical_provenance_to_silence_warning
+    - emit_info_finding_into_warnings_section_of_output
+    - apply_provenance_downgrade_when_marker_appears_more_than_one_line_above
+    - treat_in_link_target_context_occurrence_as_textual_reference  # already covered by inbound link scan
+  expected_intelligence:
+    - scripts/ai-skill-cli/internal/app/plan_archival_link_integrity.go
+    - scripts/ai-skill-cli/internal/app/plan_archival_link_integrity_test.go
+    - scripts/ai-skill-cli/internal/app/plan_archival_link_integrity_integration_test.go
+    - enforcement/failure-patterns/plan-archival-link-drift.md
+  validation:
+    - TestScanBareTextualReferences covers bare warning + same-line provenance info + previous-line provenance info + link-context skip
+    - TestFormatLinkFindings asserts info findings yield empty output (suppressed)
+    - TestValidatePlanArchivalLinkIntegrity_TextualWarning asserts category + severity at integration level
+    - TestValidatePlanArchivalLinkIntegrity_TextualWithProvenanceSuppressed asserts marker-driven suppression at integration level
+    - TestValidatePlanArchivalLinkIntegrity_BareIdProvenanceNoFalsePositive asserts bare id without path does not false-positive

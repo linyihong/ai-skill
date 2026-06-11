@@ -11,7 +11,7 @@ required_for_completion: false
 
 # Plan Archival Link Integrity
 
-**Status**: `implementation-complete`（剩 validation scenarios doc layer 為 follow-up）
+**Status**: `complete`（all phases landed; CI green at edf3f54; scenarios + failure pattern + registry + bootstrap + dispatcher + tests + executor all in place）
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 Runtime Hardening → Reference Integrity → Plan Archival Link Integrity
 **建立日期**：2026-06-11
@@ -131,7 +131,7 @@ Gen 3 Runtime Hardening
 - [x] `enforcement/failure-patterns/plan-archival-link-drift.md`（empirical: 2026-06-11 sanitization archive commit 3f7c4b4 手動修 8 inbound + 3 outbound link）
 - [x] `ai-skill runtime compile` 刷 runtime.db projection
 - [x] `ai-skill enforcement coverage` 確認 bucket：mechanical=19/40（含本 rule_class）
-- [ ] validation scenarios（scenarios/ 對應 test list）— deferred to follow-up（已有 14 個 fixture test 覆蓋；scenarios/ 是 spec-doc layer，不擋 Phase 3 closure）
+- [x] validation scenarios：[`plan-archival-broken-link-v1`](../../validation/scenarios/failure-derived/plan-archival-broken-link-v1.yaml)（block: outbound + inbound, multi-archive, TD-1 staged-blob, bounded-parser ignored constructs）+ [`plan-archival-textual-provenance-v1`](../../validation/scenarios/failure-derived/plan-archival-textual-provenance-v1.yaml)（warning vs info via `<!-- archival-provenance -->` opt-in marker）
 - [x] commit / push / readback（本 commit）
 
 ## Acceptance
