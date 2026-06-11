@@ -11,7 +11,7 @@ required_for_completion: false
 
 # Plan Archival Link Integrity
 
-**Status**: `ready`
+**Status**: `implementation-complete`（剩 validation scenarios doc layer 為 follow-up）
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 Runtime Hardening → Reference Integrity → Plan Archival Link Integrity
 **建立日期**：2026-06-11
@@ -125,12 +125,14 @@ Gen 3 Runtime Hardening
 
 ### Phase 3 — Registry & Bootstrap Integration
 
-- [ ] `enforcement/enforcement-registry.yaml`：新增 rule_class entry（`reference_integrity` 家族）+ executor 指向 validator + coverage = `mechanical`
-- [ ] `runtime/core-bootstrap.yaml` §per_commit_obligations：新增 `obligation.commit.plan_archival_link_integrity` + opt_out_marker + contract_source 指本 plan
-- [ ] `enforcement/failure-patterns/plan-archival-link-drift.md`（empirical: 2026-06-11 sanitization archive commit 3f7c4b4 手動修 8 inbound + 3 outbound link）
-- [ ] validation scenarios（scenarios/ 對應 test list）
-- [ ] `ai-skill enforcement coverage` 確認 bucket 從 `none` → `mechanical`
-- [ ] commit / push / readback
+- [x] `enforcement/enforcement-registry.yaml`：新增 rule_class entry（Reference Integrity 家族）+ executor 指向 validator + coverage = `mechanical`；`current_count` 38→40
+- [x] `runtime/core-bootstrap.yaml` §per_commit_obligations：新增 `obligation.commit.plan_archival_link_integrity` + opt_out_marker + contract_source 指本 plan
+- [x] `scripts/ai-skill-cli/internal/app/hooks.go` dispatcher（`commitMsgValidatorRegistry` + `defaultCommitMsgDispatchOrder`）接入
+- [x] `enforcement/failure-patterns/plan-archival-link-drift.md`（empirical: 2026-06-11 sanitization archive commit 3f7c4b4 手動修 8 inbound + 3 outbound link）
+- [x] `ai-skill runtime compile` 刷 runtime.db projection
+- [x] `ai-skill enforcement coverage` 確認 bucket：mechanical=19/40（含本 rule_class）
+- [ ] validation scenarios（scenarios/ 對應 test list）— deferred to follow-up（已有 14 個 fixture test 覆蓋；scenarios/ 是 spec-doc layer，不擋 Phase 3 closure）
+- [x] commit / push / readback（本 commit）
 
 ## Acceptance
 

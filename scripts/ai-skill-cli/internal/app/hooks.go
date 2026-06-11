@@ -3936,6 +3936,9 @@ var commitMsgValidatorRegistry = map[string]func(commitMsgCtx) string{
 	"obligation.commit.plan_archival_audit": func(c commitMsgCtx) string {
 		return validatePlanArchivalAudit(c.text, c.staged, c.root)
 	},
+	"obligation.commit.plan_archival_link_integrity": func(c commitMsgCtx) string {
+		return validatePlanArchivalLinkIntegrity(c.text, c.staged, c.root)
+	},
 	"obligation.commit.enforcement_registry_transition": func(c commitMsgCtx) string {
 		return validateEnforcementRegistryTransition(c.text, c.staged, c.root)
 	},
@@ -3985,6 +3988,7 @@ var defaultCommitMsgDispatchOrder = []string{
 	"obligation.commit.runtime_trigger_wiring",
 	"obligation.commit.evidence_hierarchy",
 	"obligation.commit.plan_archival_audit",
+	"obligation.commit.plan_archival_link_integrity",
 	"obligation.commit.enforcement_registry_transition",
 	"obligation.commit.enforcement_rule_registry_sync",
 	"obligation.commit.plan_tree_frontmatter",
