@@ -82,7 +82,7 @@ Common collection methods:
 
 #### Browser Evidence Collection
 
-Use browser evidence collection when the claim depends on actual rendered UI, interaction state, responsive behavior, focus behavior, or visual output. When the claim includes responsive behavior, collect evidence per declared `render_context`; one desktop screenshot cannot prove mobile, narrow mobile, safe-area, or orientation behavior. Use [`render-contexts`](../../intelligence/engineering/render-contexts/README.md) for shared context vocabulary and [`responsive-ui`](../../intelligence/engineering/governance/responsive-ui/validation-matrix.md) for responsive evidence shape.
+Use browser evidence collection when the claim depends on actual rendered UI, interaction state, responsive behavior, focus behavior, or visual output. When the claim includes responsive behavior, collect evidence per declared `render_context`; one desktop screenshot cannot prove mobile, narrow mobile, safe-area, or orientation behavior. Use [`render-contexts`](../../intelligence/engineering/render-contexts/README.md) for shared context vocabulary, [`responsive-ui`](../../intelligence/engineering/governance/responsive-ui/validation-matrix.md) for responsive evidence shape, and [`state-transition-validation`](../../intelligence/engineering/execution/validation-reasoning/state-transition-validation.md) when the defect depends on resize, reload, rotate, restore, or resume.
 
 Outputs:
 
@@ -140,6 +140,8 @@ validation_matrix:
 ```
 
 At least two render contexts are required before claiming responsive validation complete: a wide context such as `desktop` and a constrained context such as `mobile` or `narrow_mobile`. Add `tablet`, `landscape`, `safe_area`, or `dynamic_resize` when the UI contract declares them or the defect report depends on them. Use additional project-local context labels only when the shared library is insufficient and the reason is explicit.
+
+When stale layout measurement or competing layout authority is suspected, include a transition sequence such as `fresh_load -> resize -> reload` or `fresh_load -> rotate -> reload`. The evidence must show which authority updated: CSS layout engine, JavaScript measurement, scroll root, fixed surface, safe-area contract, or route shell.
 
 Consumers:
 

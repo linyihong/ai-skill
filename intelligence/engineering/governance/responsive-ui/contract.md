@@ -16,6 +16,13 @@ responsive_ui_contract:
     - primary_actions_visible_and_reachable
     - fixed_surfaces_align_to_content_shell
     - scroll_root_preserves_access_to_final_content
+  authority_model:
+    layout_source_of_truth: css
+    fixed_surface_position_source: css_layout_engine
+    viewport_measurement_source: observation_only
+    forbidden_sources:
+      - stale_viewport_measurement
+      - persisted_layout_measurement
   exception_policy:
     intended_horizontal_scrollers:
       - component_name_or_surface
@@ -27,6 +34,7 @@ responsive_ui_contract:
 
 - Render contexts describe constraints, not device names.
 - Every fixed, sticky, modal, sheet, or full-height scroll root must name its alignment and inset contract.
+- Every responsive contract must name layout authority when JavaScript, CSS, browser APIs, or persisted state can affect the same dimensions.
 - Intended overflow must be explicit and scoped to a component.
 - A desktop-only contract is valid only when the project states it explicitly.
 

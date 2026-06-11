@@ -12,3 +12,4 @@
 | [`evidence-chain-validation.md`](evidence-chain-validation.md) | Reasoning pattern：沿狀態傳播鏈驗證到最終可觀察結果。 |
 | [`evidence-collapse-point.md`](evidence-collapse-point.md) | Diagnostic reasoning：找出 evidence chain 第一個失去一致性的節點。 |
 | [`identity-coupled-side-effect-validation.md`](identity-coupled-side-effect-validation.md) | 特化案例：身份狀態與 side effect 同時存在時的 evidence chain。 |
+| [`state-transition-validation.md`](state-transition-validation.md) | Validation pattern：fresh load 之外，驗證 resize、reload、rotate、restore、resume 等 transition 中的 correctness。 |

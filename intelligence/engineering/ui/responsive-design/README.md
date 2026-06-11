@@ -1,6 +1,8 @@
 # Responsive Design Intelligence
 
-Responsive design intelligence captures framework-neutral layout principles. Bootstrap is useful evidence because it has encoded these economics for years, but the reusable primitive is not Bootstrap itself.
+Responsive design intelligence captures framework-neutral layout principles for adapting UI across constraints. Bootstrap is useful evidence because it has encoded these economics for years, but the reusable primitive is not Bootstrap itself.
+
+This directory covers traditional responsive design: mobile-first thinking, fluid containers, breakpoint strategy, safe areas, and overflow awareness. When the question is "who owns dimensions, position, insets, viewport state, scroll root behavior, or fixed-surface alignment," load [`../layout-authority-governance/`](../layout-authority-governance/README.md).
 
 ## Atoms
 
@@ -18,4 +20,4 @@ Responsive design intelligence captures framework-neutral layout principles. Boo
 
 Workflow documents may reference these atoms when defining UI contracts, responsive validation, or review checklists. Do not copy the full atom text into workflow files.
 
-For governance classification, authority mapping, severity, and closure checklist, use [`../../governance/responsive-ui/`](../../governance/responsive-ui/README.md). For shared context names, use [`../../render-contexts/`](../../render-contexts/README.md).
+For layout source-of-truth and viewport authority, use [`../layout-authority-governance/`](../layout-authority-governance/README.md). For governance classification, authority mapping, severity, and closure checklist, use [`../../governance/responsive-ui/`](../../governance/responsive-ui/README.md). For shared context names, use [`../../render-contexts/`](../../render-contexts/README.md).

@@ -21,6 +21,7 @@ responsive_validation:
     - shell_bounding_box
     - fixed_surface_bounding_box
     - primary_content_bounding_box
+    - layout_authority_readback
     - screenshot_or_dom_snapshot
 ```
 
@@ -31,6 +32,8 @@ responsive_validation:
 - Use render-context vocabulary from [`render-contexts/`](../../render-contexts/README.md).
 - Add `safe_area`, `landscape`, or `dynamic_resize` when the defect report or UI contract depends on them.
 - Record intended horizontal scrollers separately from unintended document overflow.
+- When layout authority is contested, record `layout_source_of_truth`, forbidden sources, and whether stale measurement was ruled out.
+- When the defect depends on a transition, include transition evidence rather than only final screenshots.
 
 ## Evidence Ownership
 

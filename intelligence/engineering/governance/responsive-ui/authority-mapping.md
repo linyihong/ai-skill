@@ -20,6 +20,9 @@ Authority mapping answers who can judge a responsive finding as failed, blocked,
 | `fixed_surface_drift` | validation | high | block candidate |
 | `safe_area_overlap` | validation | high | block candidate |
 | `dynamic_resize_staleness` | validation | high | block candidate |
+| `stale_viewport_measurement` | validation + layout_authority | high | block candidate |
+| `scroll_root_lockout` | validation + layout_authority | high | block candidate |
+| `fixed_bottom_overlap` | validation + layout_authority | high | block candidate |
 | `minor_typography_shift` | review | low | warning |
 | `density_collapse` | review + contract | medium | fix or defer |
 | `unsupported_context_claim` | contract + project_policy | not_applicable or high | no impact if explicit; block candidate if implicit |

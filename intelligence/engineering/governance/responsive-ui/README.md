@@ -1,12 +1,13 @@
 # Responsive UI Governance
 
-Responsive UI Governance defines how to classify and judge UI correctness across render contexts. It is governance knowledge, not a standalone workflow.
+Responsive UI Governance defines how to classify and judge UI correctness across render contexts. It is an application of [`layout-authority-governance`](../../ui/layout-authority-governance/README.md), not a standalone workflow.
 
 ## Read When
 
 - A UI claim depends on narrow mobile, mobile, tablet, desktop, landscape, safe-area, embedded, or dynamic resize behavior.
 - A defect report mentions clipping, horizontal overflow, fixed/sticky drift, browser chrome, safe area, or reload after viewport changes.
 - A project considers Bootstrap or another mature responsive framework as a design source.
+- A responsive defect appears to be caused by competing layout authorities rather than breakpoints.
 - A workflow needs objective severity and failure-authority mapping for responsive UI findings.
 
 ## Surfaces
@@ -23,6 +24,7 @@ Responsive UI Governance defines how to classify and judge UI correctness across
 ## Source Intelligence
 
 - [`responsive-design/`](../../ui/responsive-design/README.md)
+- [`layout-authority-governance/`](../../ui/layout-authority-governance/README.md)
 - [`render-contexts/`](../../render-contexts/README.md)
 - [`mobile-first-economics.md`](../../economics/mobile-first-economics.md)
 - [`responsive-cost-curve.md`](../../economics/responsive-cost-curve.md)

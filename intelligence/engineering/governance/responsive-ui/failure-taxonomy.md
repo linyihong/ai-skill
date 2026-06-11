@@ -11,6 +11,9 @@ This taxonomy names what failed. It does not decide who has authority or whether
 | `fixed_surface_drift` | Fixed or sticky UI does not align to the same container contract as content. |
 | `safe_area_overlap` | System UI, notch, or home indicator overlaps interactive content. |
 | `dynamic_resize_staleness` | Layout remains based on an old viewport after resize, reload, browser chrome change, or orientation change. |
+| `stale_viewport_measurement` | JavaScript or persisted measurement remains authoritative after layout reality changes. |
+| `scroll_root_lockout` | A scroll root disables or prevents scrolling while content requires vertical reachability. |
+| `fixed_bottom_overlap` | Bottom navigation or another fixed surface hides final content or primary actions. |
 | `density_collapse` | Text, cards, controls, or spacing no longer fit the declared context while preserving readable hierarchy. |
 | `unscoped_framework_mix` | A framework pattern or class set is introduced without matching project ownership, reset, spacing, or precedence rules. |
 
