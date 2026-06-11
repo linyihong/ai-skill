@@ -1,7 +1,8 @@
 ---
 id: 2026-06-06-1800-sanitization-mechanical-enforcement
 plan_kind: sub
-status: in-progress
+status: completed
+completed_on: 2026-06-11
 owner: linyihong
 created: 2026-06-06
 parent: 2026-05-31-2100-mechanical-enforcement-registry
@@ -23,16 +24,28 @@ sub_plan_reason: >
 
 # Sanitization: Mechanical Enforcement (Metadata-Derived)
 
-**Status**: `in-progress`
+**Status**: `completed`（2026-06-11；archived）
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 runtime hardening — sanitization 第三採樣
 **建立日期**：2026-06-06
-**最後更新**：2026-06-08（Phase 0 preflight complete）
+**最後更新**：2026-06-11（Phase 4 mechanical promotion 完成；archived）
+
+> ## Close-out（2026-06-11）
+>
+> `rule_classes[sanitization]` 已 **coverage=mechanical**：metadata-derived
+> projection（`derived_match_tokens`）+ topology-scoped pre-commit scanner
+> （`validateSanitizationStagedContent`，無 opt-out）端到端 enforcing（本 session
+> 內已實際擋下一次 OS 絕對路徑 pattern）。Phase 0–2 / 1A–1D / Phase 4 全部完成。
+>
+> **剩餘為被動/deferred，不阻擋 archive**：
+> - **Phase 3（LLM review）**：conditional，**deferred** 至 3 個月 miss-rate 量測；屆時另開 sub-plan（見 §Phase 3）。
+> - **`runtime_observed`**：30 天 production 觀察窗（registry verification ladder 最後一級）。
+> - 兩個 behavioral_only sunset（`reusable_guidance_boundary` / `failure_learning_system`）已 refresh 為 forward trigger（見 enforcement-registry commit 9e243f5）。
 **Priority**：**P1**（升自 P2，因 supersede sibling 並承擔 `rule_classes[sanitization]` canonical executor 職責）
-**Parent plan**：[`2026-05-31-2100-mechanical-enforcement-registry.md`](../archived/2026-05-31-2100-mechanical-enforcement-registry.md)
+**Parent plan**：[`2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md)
 **Sibling plans**：
-- [`../archived/2026-05-31-2000-mechanical-sanitization-validator.md`](../archived/2026-05-31-2000-mechanical-sanitization-validator.md) — superseded allowlist 路線；本 plan 是 canonical metadata-derived successor（見 Decision §Relationship to sibling）。
-- [`2026-06-06-1700-workflow-activation-discovery-bridge.md`](2026-06-06-1700-workflow-activation-discovery-bridge.md) — same-day sibling，同樣 third-sampling 同模式失效。
+- [`2026-05-31-2000-mechanical-sanitization-validator.md`](2026-05-31-2000-mechanical-sanitization-validator.md) — superseded allowlist 路線；本 plan 是 canonical metadata-derived successor（見 Decision §Relationship to sibling）。
+- [`../active/2026-06-06-1700-workflow-activation-discovery-bridge.md`](../active/2026-06-06-1700-workflow-activation-discovery-bridge.md) — same-day sibling，同樣 third-sampling 同模式失效。
 
 **Empirical trigger**：2026-06-06 session commit 214a415 — agent 將某 downstream project 的 label 七處寫入 `plans/active/` shared layer (該 plan 為 `2026-06-06-1700-workflow-activation-discovery-bridge` 的 v0 草稿)。`enforcement/sanitization.md` + `enforcement/reusable-guidance-boundary.md` 明文禁止「project incident 的具體 app / project 名稱」進入可重用文件，但無 mechanical executor 阻擋，agent 自律未生效，使用者手動指認後才 sanitize（commit 728282c）。
 

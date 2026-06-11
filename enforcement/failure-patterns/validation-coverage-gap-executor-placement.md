@@ -55,7 +55,7 @@ Class: `validation-coverage-gap` / `executor-placement`
 本 pattern 與下列 plan 是同一家族「**Rule exists → Validation exists → Wrong execution point → Failure**」：
 
 - [`plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md`](../../plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md) — detector miss 時 advisory 機制（補 mechanical floor at PreToolUse hook phase）
-- [`plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md`](../../plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md) — sanitization 從 prose / advisory 升 mechanical at commit phase
+- [`plans/archived/2026-06-06-1800-sanitization-mechanical-enforcement.md`](../../plans/archived/2026-06-06-1800-sanitization-mechanical-enforcement.md) — sanitization 從 prose / advisory 升 mechanical at commit phase
 
 差異：parent meta-plan [`2026-05-31-2100-mechanical-enforcement-registry`](../../plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md) 處理的是「executor 缺」，本 pattern 處理的是「executor placement 錯」。前者要寫新 validator，後者只要把既有 validator 接到正確 phase。
 

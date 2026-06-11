@@ -183,6 +183,6 @@ Do not promote this file to ADR. When all surfaces have migrated to v2, replace 
 - Live YAML: `runtime/repository-topology.yaml` (still v1; do not edit shape until Phase 1C)
 - Canonical loader: `scripts/ai-skill-cli/internal/app/repository_topology.go`
 - Loader tests: `scripts/ai-skill-cli/internal/app/repository_topology_test.go`
-- Parent plan: [`plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md`](../plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md) §Phase 1B
+- Parent plan: [`plans/archived/2026-06-06-1800-sanitization-mechanical-enforcement.md`](../plans/archived/2026-06-06-1800-sanitization-mechanical-enforcement.md) §Phase 1B
 - Sibling pattern: [`metadata/project/migration-notes.md`](../metadata/project/migration-notes.md) (Phase 1A migration notes, same trajectory shape applied to the project metadata schema)
 - Legacy consumer source: `scripts/ai-skill-cli/internal/app/sanitization_scan.go::repositoryTopologyRow` (DO NOT modify until Phase 1D)

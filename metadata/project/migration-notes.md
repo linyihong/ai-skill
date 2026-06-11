@@ -82,7 +82,7 @@ Do not promote this file to ADR or canonical philosophy. When all consumers have
 
 - Schema: [`ai-skill-project-schema.yaml`](ai-skill-project-schema.yaml)
 - Example: [`example-ai-skill-project.yaml`](example-ai-skill-project.yaml)
-- Parent plan: [`plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md`](../../plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md)
+- Parent plan: [`plans/archived/2026-06-06-1800-sanitization-mechanical-enforcement.md`](../../plans/archived/2026-06-06-1800-sanitization-mechanical-enforcement.md)
 - Legacy reader source: `scripts/ai-skill-cli/internal/app/sanitization_scan.go::readProjectMetadata` (DO NOT modify until Phase 1C)
 
 ← [Back to project metadata index](README.md)
