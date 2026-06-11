@@ -77,8 +77,29 @@ Gen 3 Runtime Hardening
   - Finding payload 帶 `category` 欄位，下游工具可分流
 - [x] **D3 = `git diff --cached --find-renames -M90`**：吃 Git 算好的 rename intent，比自己重建對照少 edge case；threshold 90% 對 archive 場景合適（pure move，極少改動）。
 
+### Parser Strategy（Design Note）
+
+本 validator **刻意**只支援 framework plan 文件實際使用的 markdown link 子集，不引入 markdown AST 依賴（goldmark 等）。理由：domain 是 **Plan Archive Event** + `plans/` 子樹，不是 universal markdown lint。引入完整 AST 對不存在的構造付成本。
+
+實作為 `extractMarkdownLinks()` 小型 state machine（char-by-char 掃描），不是散落的 regex，回傳 `Link{Target, Line, Column}` struct。
+
+**Supported（會被解析並驗證）**
+- inline link `[text](path)`
+- inline link with title `[text](path "title")`
+- escaped parens in path `[text](../a\(b\).md)`
+- code-fence exclusion（``` 與 ~~~ block 內整段跳過）
+- 相對路徑（絕對 URL / `mailto:` / `#anchor` 過濾）
+
+**Not supported（**ignored**，不部分解析）**
+- reference-style link `[text][ref]` + `[ref]: path`
+- HTML anchor `<a href="...">`
+- autolink `<https://...>`
+
+**Contract**: 不支援構造 **整段忽略**，不做部分解析。誤解析比漏報危險。
+
 ### Phase 1 — Implementation
 
+- [ ] `scripts/ai-skill-cli/internal/app/markdown_links.go`（新檔）：實作 `extractMarkdownLinks(content []byte) []Link` bounded parser（state machine，40-80 行）
 - [ ] `scripts/ai-skill-cli/internal/app/hooks.go` 新增 `validatePlanArchivalLinkIntegrity`
 - [ ] 偵測 staged plan rename（`active/ ↔ archived/`）：跑 `git diff --cached --find-renames -M90 --name-status` 取所有 `R*` 條目，過濾 plan 路徑
 - [ ] **建立整批 rename map（必須在掃描前完成）**：multi-archive in same commit 時，A、B 同時 archive 且互相引用，每個檔的 resolve 都要看完整 rename map，不能逐檔處理
@@ -114,6 +135,7 @@ Gen 3 Runtime Hardening
 - Clean archive (all markdown links retargeted) passes with zero findings.
 - Bare-id provenance mentions（無路徑語法）do not false-positive.
 - Multi-archive in same commit: cross-references between simultaneously-archived plans are correctly resolved against the batch rename map.
+- Unsupported markdown constructs (reference-style links, HTML anchors, autolinks) are **ignored, not partially interpreted**. Validator intentionally supports only the markdown subset used by framework plan documents.
 
 ## Future Extensibility
 
