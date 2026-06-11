@@ -103,7 +103,7 @@ Gen 3 Runtime Hardening
 - [ ] `scripts/ai-skill-cli/internal/app/hooks.go` 新增 `validatePlanArchivalLinkIntegrity`
 - [ ] 偵測 staged plan rename（`active/ ↔ archived/`）：跑 `git diff --cached --find-renames -M90 --name-status` 取所有 `R*` 條目，過濾 plan 路徑
 - [ ] **建立整批 rename map（必須在掃描前完成）**：multi-archive in same commit 時，A、B 同時 archive 且互相引用，每個檔的 resolve 都要看完整 rename map，不能逐檔處理
-- [ ] **Markdown link parsing**：用 goldmark 或等效 markdown AST 取 link node（不是 regex），避免 prose 中的路徑字串被誤判為 link
+- [ ] **Markdown link parsing**：使用 `extractMarkdownLinks()`（bounded parser，**非** regex、**非** markdown AST），取得 `Link{Target, Line, Column}`；避免 prose 中的路徑字串被誤判為 link
 - [ ] **解析**：對每個 link，從 link 所在檔案的 **新位置**（若該檔本身被 rename）或 **當前位置** resolve 相對路徑；target 不存在 → finding
 - [ ] **Bare textual path scan**：對被 rename 檔案的舊路徑（`plans/active/<id>`）做 plain-text 搜尋，命中且不在 markdown link node 內 → finding。檢查命中行（與上一行）是否含 `<!-- archival-provenance -->`：有 → category `historical_provenance_reference` / severity `info`；無 → category `stale_textual_reference` / severity `warning`
 - [ ] **suggested_replacement**：finding payload 帶 `{old_path, new_path, suggested_replacement, category}`，old/new 從 rename map 反查
@@ -116,6 +116,7 @@ Gen 3 Runtime Hardening
 - [ ] info/historical provenance：同上 prose，但同行/上一行有 `<!-- archival-provenance -->` → severity `info`，category `historical_provenance_reference`，不進 warning 列表
 - [ ] pass/clean archive：move 且所有 inbound/outbound markdown link 都已 retarget → 0 finding
 - [ ] pass/bare id provenance：純歷史 prose 提及 bare id（無路徑）→ 不誤報
+- [ ] pass/escaped parens in path：plan 含 `[text](../a\(b\).md)`，target 存在 → bounded parser 正確解析跳脫括號，0 finding（驗證 state machine 相對 regex 的主要價值）
 - [ ] **fail/multi-archive cross-reference**：同一 commit 內 A、B 都 archive，A 內有 `[B](../active/B.md)` 但未更新為 `../archived/B.md` → block（驗證 rename map 整批建立邏輯）
 - [ ] pass/multi-archive cross-reference resolved：同上但 A 已更新為 `B.md`（same-dir archived）→ 0 finding
 
@@ -157,5 +158,5 @@ Gen 3 Runtime Hardening
 |---|---|
 | Trigger | 2026-06-11 sanitization plan archive 親身踩到 inbound+outbound link 斷裂 |
 | Empirical evidence | commit 3f7c4b4（手動修 8 inbound + 3 outbound link） |
-| Required set | `scripts/ai-skill-cli/internal/app/hooks.go`（新 validator）/ markdown AST parser（goldmark 或同等）/ `enforcement/enforcement-registry.yaml` / `runtime/core-bootstrap.yaml` §per_commit_obligations |
+| Required set | `scripts/ai-skill-cli/internal/app/hooks.go`（新 validator）/ `scripts/ai-skill-cli/internal/app/markdown_links.go`（custom bounded link parser）/ `enforcement/enforcement-registry.yaml` / `runtime/core-bootstrap.yaml` §per_commit_obligations |
 | Deferred | auto-fix；非 plan link-rot；跨 repo link |
