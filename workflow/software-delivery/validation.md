@@ -82,7 +82,7 @@ Common collection methods:
 
 #### Browser Evidence Collection
 
-Use browser evidence collection when the claim depends on actual rendered UI, interaction state, responsive behavior, focus behavior, or visual output. When the claim includes responsive behavior, collect evidence per declared `render_context`; one desktop screenshot cannot prove mobile, narrow mobile, safe-area, or orientation behavior.
+Use browser evidence collection when the claim depends on actual rendered UI, interaction state, responsive behavior, focus behavior, or visual output. When the claim includes responsive behavior, collect evidence per declared `render_context`; one desktop screenshot cannot prove mobile, narrow mobile, safe-area, or orientation behavior. Use [`render-contexts`](../../intelligence/engineering/render-contexts/README.md) for shared context vocabulary and [`responsive-ui`](../../intelligence/engineering/governance/responsive-ui/validation-matrix.md) for responsive evidence shape.
 
 Outputs:
 
@@ -139,7 +139,7 @@ validation_matrix:
       - responsive_capture
 ```
 
-At least two render contexts are required before claiming responsive validation complete: a wide context such as `desktop` and a constrained context such as `mobile` or `narrow_mobile`. Add `tablet`, `landscape`, `safe_area`, `high_zoom`, `touch_only`, or `keyboard_only` when the UI contract declares them or the defect report depends on them.
+At least two render contexts are required before claiming responsive validation complete: a wide context such as `desktop` and a constrained context such as `mobile` or `narrow_mobile`. Add `tablet`, `landscape`, `safe_area`, or `dynamic_resize` when the UI contract declares them or the defect report depends on them. Use additional project-local context labels only when the shared library is insufficient and the reason is explicit.
 
 Consumers:
 

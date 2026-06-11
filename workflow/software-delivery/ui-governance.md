@@ -5,7 +5,7 @@
 | slice 欄位 | 值 |
 |---|---|
 | `id` | `sd-ui-governance` |
-| `purpose` | 在 UI / consumer contract 已存在或正在建立時，定義 UI compliance 如何被分類：governance domain、collection method、validation mechanism、evidence class、severity policy 與 runtime projection boundary |
+| `purpose` | 在 UI / consumer contract 已存在或正在建立時，定義 UI compliance 如何被分類與收口：governance domain、collection method、validation mechanism、evidence class、severity policy 與 runtime projection boundary |
 | `type` | `execution` |
 | `tags` | artifact-gate, ui, design-system, accessibility, behavior-governance, visual-validation |
 | `load_when` | UI / consumer surface 需要 design-system enforcement、accessibility evidence、behavior pattern checks、visual baseline review、AI visual review scoping，或 completion claim 依賴 UI compliance |
@@ -13,7 +13,7 @@
 | `owner_layer` | workflow |
 | `layer_justification` | 規定「UI compliance 評估前要分類哪些 domain、collection method、mechanism、evidence、severity，並保持 runtime projection advisory-only」的 ordering / gate；通過 workflow membership test。Phase 1 只擁有 UI-local taxonomy usage；長期 shared taxonomy owner 可能是 validation-reasoning |
 | `canonical_source` | 本檔 |
-| `dependencies` | `sd-ui-contracts`（UI contract expectations）、`sd-test-strategy`（proof target selection）、`sd-validation`（evidence acquisition / evaluation execution） |
+| `dependencies` | `sd-ui-contracts`（UI contract expectations）、`sd-test-strategy`（proof target selection）、`sd-validation`（evidence acquisition / evaluation execution）、[`responsive-ui`](../../intelligence/engineering/governance/responsive-ui/README.md)（responsive taxonomy / authority / severity）、[`render-contexts`](../../intelligence/engineering/render-contexts/README.md)（shared context vocabulary） |
 | `dependency_budget` | default `max_depth:2` / `max_runtime_dependencies:4` |
 | `validation_signal` | UI governance scenarios can prove domain/mechanism separation, evidence classification, and AI visual warning boundary before runtime/enforcement promotion |
 
@@ -38,11 +38,12 @@ runtime-governance
   = How violations affect execution
 ```
 
-Current scope: workflow governance only. Runtime signals are advisory projections until a separate promotion decision names an executor, consumer, evidence threshold, and registry transition path.
+Current scope: workflow governance only. Runtime signals are advisory projections until a separate promotion decision names an executor, consumer, evidence threshold, and registry transition path. Responsive UI taxonomy, authority mapping, severity, and contract vocabulary are shared governance knowledge in [`responsive-ui`](../../intelligence/engineering/governance/responsive-ui/README.md); this workflow slice decides when to use that knowledge during software delivery.
 
 Phase 1 owner boundary:
 
-- `sd-ui-governance` owns local UI compliance classification: domain, collection method, validation mechanism, evidence class, severity, and policy scope.
+- `sd-ui-governance` owns local UI compliance execution: when to classify, which evidence route to request, and how to close a UI compliance claim.
+- [`responsive-ui`](../../intelligence/engineering/governance/responsive-ui/README.md) owns responsive contract fields, failure taxonomy, authority mapping, severity policy, and checklist.
 - `sd-validation` owns execution: acquiring evidence, running evaluation, and recording results.
 - Future shared `validation-reasoning` may own the cross-governance taxonomy if the same model proves useful for Architecture, Runtime, Documentation, or Security governance.
 
@@ -192,6 +193,7 @@ Before claiming UI compliance, classify:
 | Mechanism | deterministic, screenshot_diff, ai_review, manual_review |
 | Evidence class | contract, runtime, accessibility_scan, visual_diff, screenshot, ai_review, human_review |
 | Severity | block_candidate, warn, research, not_applicable |
+| Failure authority | contract, validation, review, or project_policy when responsive governance is involved |
 | Project policy | token policy, component primitive policy, accessibility target, screenshot baseline, or not configured |
 | Deferred scope | explicit owner and reason when evidence is missing |
 

@@ -108,7 +108,7 @@ gates:
       - guidance can translate to code, config, test, or review checklist
       - residual risk and limits are stated
       - consumer/UI changes can trace consumer needs, screen states, view model derivation, accessibility expectations, and relevant fixtures or tests
-      - UI compliance claims classify governance domain, render context, collection method, validation mechanism, evidence class, severity, project-local design-system policy, and responsive / visual / AI review scope without duplicating UI contract definitions
+      - UI compliance claims classify governance domain, render context, collection method, validation mechanism, evidence class, severity, project-local design-system policy, and responsive / visual / AI review scope without duplicating UI contract definitions; responsive taxonomy / authority / severity come from intelligence/engineering/governance/responsive-ui
       - governance invariant claims record runtime capability, authority-coupled side effect, configuration readback, operational transaction, or task/ownership evidence shape when relevant
       - replacement/parity and performance evidence are included when relevant
   - id: gate.artifact_gates.journey_validation_evidence_complete
@@ -168,7 +168,7 @@ failure_modes:
     recovery: Reclassify the artifact through ui-governance.md and validation.md; record collection method separately from validation mechanism, evidence class, severity, and project-local policy.
   - id: responsive_context_evidence_missing
     detection: Responsive UI claim records only a desktop capture, no constrained render-context evidence, or a device SKU without the governed render context.
-    recovery: Reclassify through ui-governance.md; record render_context and collect at least desktop_capture plus mobile_capture or equivalent wide/narrow evidence before claiming responsive validation complete.
+    recovery: Reclassify through ui-governance.md and intelligence/engineering/governance/responsive-ui; record render_context from intelligence/engineering/render-contexts and collect at least desktop_capture plus mobile_capture or equivalent wide/narrow evidence before claiming responsive validation complete.
   - id: journey_validation_proxy_success
     detection: Critical journey claim treats API 200, adapter success, mock pass, or screen-level UI pass as proof that expected outcomes occurred.
     recovery: Load test-strategy.md and validation.md; map Journey Specification to side-effect chain, expected outcomes, and observable evidence before accepting the completion claim.
