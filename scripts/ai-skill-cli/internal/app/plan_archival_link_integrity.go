@@ -110,14 +110,23 @@ func validatePlanArchivalLinkIntegrity(text string, staged []string, root string
 	return formatLinkFindings(findings)
 }
 
-// readFileForScan reads content for the inbound / textual scan. For
-// files staged with a rename to plans/archived/ the staged blob is
-// authoritative; for everything else we read the worktree (matches
-// validatePlanArchivalAudit's precedent and the typical commit flow
-// where worktree == staged for non-touched files).
-func readFileForScan(root, mdPath string, movedNew map[string]bool) ([]byte, error) {
-	if movedNew[mdPath] {
-		return readStagedFileContent(root, mdPath)
+// readFileForScan reads content for the inbound / textual scan. The
+// staged blob is the canonical commit candidate, so we read via
+// `git show :<path>` first; if the file is not in the index (untracked
+// .md, or git not available) we fall back to the worktree.
+//
+// Resolves TD-1 (staged vs worktree drift) per the Resolution Gate
+// recorded in plans/active/2026-06-11-1100-plan-archival-link-integrity.md.
+// The fixture run observed both directions of divergence (staged-has-fix
+// and staged-broken-worktree-fixed); the validator now reports against
+// what will actually be committed.
+//
+// movedNew is retained on the signature for callsite readability but no
+// longer affects routing — the staged-first path covers renamed files
+// uniformly with non-renamed staged-modified files.
+func readFileForScan(root, mdPath string, _ map[string]bool) ([]byte, error) {
+	if data, err := readStagedFileContent(root, mdPath); err == nil {
+		return data, nil
 	}
 	return os.ReadFile(filepath.Join(root, filepath.FromSlash(mdPath)))
 }

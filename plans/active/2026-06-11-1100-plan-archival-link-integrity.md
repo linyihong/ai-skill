@@ -121,7 +121,7 @@ Gen 3 Runtime Hardening
 - [x] pass/multi-archive cross-reference resolved：同上但 A 已更新為 `B.md`（same-dir archived）→ 0 finding
 - [x] opt-out trailer `[skip-plan-archival-link-integrity]` 抑制 findings（額外場景）
 - [x] no-archive commit 無 op（額外場景）
-- [ ] **TD-1 staged/worktree divergence fixture（Phase 3 wiring 前置 gate）**：建臨時 git repo（`active/A.md` + `archived/A.md` + 引用檔），跑 staged/worktree 不同步 fixture，依 TD-1 Resolution Gate 程序裁決 promote vs keep
+- [x] **TD-1 staged/worktree divergence fixture（Phase 3 wiring 前置 gate）**：建臨時 git repo，跑 staged/worktree 不同步 fixture，依 TD-1 Resolution Gate 程序裁決 promote vs keep → **promoted**, Phase 2.5 已落地（見上方 TD 表 + Gate Outcome）
 
 ### Phase 3 — Registry & Bootstrap Integration
 
@@ -147,7 +147,7 @@ Gen 3 Runtime Hardening
 
 | ID | Priority | 描述 | 影響 | 解決方向 |
 |---|---|---|---|---|
-| TD-1 | **High** | **Staged vs Worktree drift**：inbound scan 用 `os.ReadFile` 讀 worktree，不是 staged blob。`git add -p` 部分暫存時，worktree 可能 ≠ commit candidate。可能造成 false block（worktree 仍含舊 link 但 staged 已修）或 false pass（worktree 已修但 staged 未修）。 | Enforcement 語意應是 "what will be committed"，目前讀的是 working tree state，不對齊。 | 依下方 **TD-1 Resolution Gate** evidence-driven 決定；不在這裡單方面排程。 |
+| TD-1 | **Resolved (Phase 2.5)** | **Staged vs Worktree drift**：inbound scan 用 `os.ReadFile` 讀 worktree，不是 staged blob。`git add -p` 部分暫存時，worktree 可能 ≠ commit candidate。可能造成 false block（worktree 仍含舊 link 但 staged 已修）或 false pass（worktree 已修但 staged 未修）。 | Enforcement 語意應是 "what will be committed"，目前讀的是 working tree state，不對齊。 | ✅ 已解：`readFileForScan` 改為 staged-first (`git show :<path>`) + worktree fallback（untracked / read-fail 才用）。3 個 TD-1 fixture test 鎖定 commit-candidate semantics。 |
 | TD-2 | Med | **Dispatcher 未接**：validator 不會在任何 commit 被呼叫，屬 dead code 風險（非 correctness）。 | 無實際觀測面、不會 false-block。 | Phase 3 完成。 |
 | TD-3 | Med | **無 integration test**：parser / rename map / resolver / finding 都有 unit test，但 end-to-end fixture 流程沒跑過。 | Renderer / dispatcher adapter / severity mapping bug 不會被 unit test 抓到。 | Phase 2 補 fixture-based integration test；Phase 3 wiring 前先做一次 manual fixture run（已加入 Phase 2 checklist）。 |
 | TD-4 | Low | **Performance 未量測**：inbound scan 對每個 repo `.md` 跑 bounded parser，可能掃幾百到上千檔。 | Archive event 低頻（非每次 save），實務上應可接受；但 unmeasured。 | 接 dispatcher 後加 telemetry payload (`files_scanned` / `links_scanned` / `rename_count` / `elapsed_ms`)，跑幾次後依數據決定是否做 basename pre-filter。**先量再優化**。 |
@@ -168,6 +168,16 @@ Gen 3 Runtime Hardening
 4. **No silent deferral**：Gate 結果（promote / keep）必須寫進本 plan，不可只口頭裁決
 
 **Rationale**：避免「有人覺得應該修、有人覺得不用修」的反覆爭論。Reference Integrity 系統的 correctness 必須有 evidence backing。
+
+#### Gate Outcome（2026-06-11）
+
+| 步驟 | 結果 |
+|---|---|
+| 1. Fixture | 建立 3 個 staged/worktree divergence fixture（forward / reverse / textual variant） |
+| 2. Observed | 用原 worktree-only 實作跑 fixture：forward case 觀察到 **false-pass**（staged broken 但 worktree fix → 報 clean，commit 會帶斷掉 link）；reverse case 觀察到 **false-block**（staged fix 但 worktree broken → 報 finding，commit 其實沒問題） |
+| 3. Decision | **Promote TD-1 → active scope**（false-pass / false-block 都成立） |
+| 4. Phase 2.5 | `readFileForScan` 改為 `git show :<path>` first，worktree fallback 只在 staged 不存在時（untracked / read-fail）。Movement parameter 保留 signature 但不再 route。同 commit 落地 + TD-1 fixture 改寫成 commit-candidate semantics assertion（3 case 全綠） |
+| 5. Status | **TD-1 resolved**；可進 Phase 3 dispatcher wiring |
 
 ## Future Extensibility
 
