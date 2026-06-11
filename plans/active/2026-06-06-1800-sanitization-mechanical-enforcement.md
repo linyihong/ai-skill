@@ -377,22 +377,19 @@ git pre-commit hook
 
 ### Phase 4 — Registry & Bootstrap Integration
 
-> **Phase 4 拆 step**（2026-06-11）：step 1（可逆，已完成）= failure-pattern doc + 3 validation scenarios；step 2/3（promotion，待執行）= registry `coverage→mechanical` + 不可 opt-out blocking obligation + hooks 註冊。Step 1 先行因 registry Status Transition Matrix 要求 `scenario_exists`/`regression_exists` 才能合法升 mechanical。
+> **Phase 4 拆 step**（2026-06-11，**已完成**）：step 1 = failure-pattern doc + 3 validation scenarios；step 2 = registry `coverage→mechanical`（R1 trailer + R3 symbol-exists）；step 3 = bootstrap integration，經實作 reality 修正為「executor 屬 pre-commit（已接線），不塞 commit-msg `per_commit_obligations`」。Step 1 先行因 registry Status Transition Matrix 要求 `scenario_exists`/`regression_exists` 才能合法升 mechanical。**剩餘**：Phase 3（LLM review，deferred）+ `runtime_observed` 30 天觀察窗 + 兩個 behavioral_only sunset 觸發的 follow-up。
 
 - [x] 新建 `enforcement/failure-patterns/sanitization-leak-on-canonical-write.md`（empirical evidence: 214a415 + sibling plan v1-v4 累積 leak；含 executor binding + Failure Authority 關係）
-- [ ] 更新 `enforcement/enforcement-registry.yaml` `rule_classes[sanitization]`：
-  - 新增 executor entry: `file: scripts/ai-skill-cli/internal/app/sanitization_scan.go`, `symbol: scanStagedContentForSanitization`, `hook_phase: pre-commit`, `block_or_warn: block`
-  - 若 Q1 裁決 supersede → 移除舊 allowlist executor entry
-  - `coverage` 視 promotion criteria 是否成立決定（pending_implementation → mechanical）
-- [ ] 更新 `runtime/core-bootstrap.yaml` `per_commit_obligations` 新增 `obligation.commit.sanitization_visibility_scan`（**無 opt_out_marker**，per P4 attestation-prohibited + Q5 reject）
-- [ ] `commitMsgValidatorRegistry` 在 hooks.go 註冊新 obligation
-- [ ] Companion `enforcement/sanitization-mechanical.md` cross-link to prose `sanitization.md`
-- [ ] Re-dry-run `ai-skill runtime compile` + enforcement coverage report
+- [x] 更新 `enforcement/enforcement-registry.yaml` `rule_classes[sanitization]`（2026-06-11）：`coverage: pending_implementation → mechanical`、`executors_planned → executors`（symbol `validateSanitizationStagedContent`，pre_commit_staged_content_scanner，block）、`verification_status` symbol/scenario/regression ✓、runtime_observed pending。Commit 帶 R1 `[registry-status-change]` trailer + `rationale:`；R3 symbol-exists 通過。`ai-skill enforcement coverage` clean，Mechanical 18 classes。
+- [x] ~~`runtime/core-bootstrap.yaml` `per_commit_obligations` 新增 obligation~~ → **不執行（category 修正）**：`per_commit_obligations` 是 commit-msg validator 清單；sanitization scanner 是 **pre-commit staged-content scanner**，非 commit-msg validator。塞進去會是 category error（暗示一個不存在的 commit-msg validator）。obligation 已由 registry mechanical binding + pre-commit 接線（`hooks.go::runPreCommitHook` line ~298）實際 enforce，且無 `[skip-]` 逃生口（符合 P4/Q5 原意）。
+- [x] ~~`commitMsgValidatorRegistry` 在 hooks.go 註冊~~ → **已是 pre-commit 接線**（非 commit-msg），`validateSanitizationStagedContent` 早已在 `runPreCommitHook` 呼叫；無需新增。
+- [x] Companion `enforcement/sanitization-mechanical.md` cross-link to prose `sanitization.md`（早已存在）。
+- [x] `ai-skill enforcement coverage` report：sanitization=mechanical、lint clean、no orphan。**Governance ripple**：`reusable_guidance_boundary` 與 `failure_learning_system` 兩個 behavioral_only class 的 `revisit_when`（「sanitization promoted to mechanical」）已被觸發，列入 follow-up（R4/R5 alert，非阻塞）。
 - [x] Validation scenarios（+ `validation/README.md` 索引）：
   - `validation/scenarios/runtime/sanitization-metadata-derived-pass-v1.yaml`
   - `validation/scenarios/runtime/sanitization-metadata-derived-fail-v1.yaml`（commit 214a415 reconstruction）
   - `validation/scenarios/runtime/sanitization-placeholder-allowed-v1.yaml`
-- [ ] Owner-grouped commit + push + readback
+- [x] Owner-grouped commit + push + readback（registry + plan，R1 trailer）
 
 ---
 

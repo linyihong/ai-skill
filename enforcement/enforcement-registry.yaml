@@ -1058,22 +1058,31 @@ rule_classes:
       runtime_observed: pending  # 30-day observation window starts at promotion (2026-06-04)
 
   - id: sanitization
-    coverage: pending_implementation
+    coverage: mechanical
     source_files:
       - enforcement/sanitization.yaml
-    executors_planned:
+      - enforcement/sanitization-mechanical.md
+      - runtime/sanitization-patterns.yaml
+    executors:
       - file: scripts/ai-skill-cli/internal/app/sanitization_scan.go
         symbol: validateSanitizationStagedContent
         executor_kind: pre_commit_staged_content_scanner
         hook_phase: pre-commit
         block_or_warn: block
-    child_plan: plans/active/2026-06-06-1800-sanitization-mechanical-enforcement.md
-    target_promotion: "child plan Phase 4 registry/bootstrap integration → coverage=mechanical"
+    rationale: |
+      Pre-commit scans staged shared-layer content for project-declared private
+      tokens (metadata-derived via runtime.db.derived_match_tokens) plus generic
+      PII/secret regex patterns (runtime.db.sanitization_patterns), blocking the
+      commit on any finding. Shared-layer scope resolved from
+      runtime/repository-topology.yaml. No opt-out marker (P4
+      attestation-prohibited / child-plan Q5 reject): unlike the 11 commit-msg
+      validators, this executor is a pre-commit staged-content scanner with no
+      `[skip-...]` escape.
     verification_status:
-      symbol_exists: pending
-      scenario_exists: pending
-      regression_exists: pending
-      runtime_observed: not_applicable_until_promoted
+      symbol_exists: ✓
+      scenario_exists: ✓
+      regression_exists: ✓
+      runtime_observed: pending  # 30-day observation window starts at promotion (2026-06-11)
 
   # F19 (round-4 T1): reclassified behavioral_only → pending_implementation.
   # coverage_evidence schema already exists; only the executor is missing
