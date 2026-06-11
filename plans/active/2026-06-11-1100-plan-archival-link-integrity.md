@@ -99,7 +99,7 @@ Gen 3 Runtime Hardening
 
 ### Phase 1 — Implementation
 
-- [ ] `scripts/ai-skill-cli/internal/app/markdown_links.go`（新檔）：實作 `extractMarkdownLinks(content []byte) []Link` bounded parser（state machine，40-80 行）
+- [x] `scripts/ai-skill-cli/internal/app/markdown_links.go`（新檔）：實作 `extractMarkdownLinks(content []byte) []Link` bounded parser（state machine，40-80 行）
 - [ ] `scripts/ai-skill-cli/internal/app/hooks.go` 新增 `validatePlanArchivalLinkIntegrity`
 - [ ] 偵測 staged plan rename（`active/ ↔ archived/`）：跑 `git diff --cached --find-renames -M90 --name-status` 取所有 `R*` 條目，過濾 plan 路徑
 - [ ] **建立整批 rename map（必須在掃描前完成）**：multi-archive in same commit 時，A、B 同時 archive 且互相引用，每個檔的 resolve 都要看完整 rename map，不能逐檔處理
