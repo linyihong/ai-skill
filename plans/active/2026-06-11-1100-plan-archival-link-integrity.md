@@ -1,82 +1,113 @@
 ---
 id: 2026-06-11-1100-plan-archival-link-integrity
 plan_kind: main
-status: draft
+status: ready
 owner: linyihong
 created: 2026-06-11
+updated: 2026-06-11
 priority: P2
 required_for_completion: false
 ---
 
 # Plan Archival Link Integrity
 
-**Status**: `draft`
+**Status**: `ready`
 Owner: framework maintainer (linyihong)
-**世代**：Gen 3 runtime hardening — Reference Integrity 機械化
+**世代**：Gen 3 Runtime Hardening → Reference Integrity → Plan Archival Link Integrity
 **建立日期**：2026-06-11
 
-> 把「plan archive 時 relative-link 斷裂」這個 2026-06-11 親身踩到的失誤模式機械化。
+> 把「plan archive 時 relative-link 斷裂」這個 2026-06-11 親身踩到的失誤模式機械化，作為 **Reference Integrity Engine** 家族的新成員。
 
 ## Decision Rationale
+
+### 家族定位
+
+本 check 不屬於 Plan Governance / Archival Audit 的擴張，而是 Reference Integrity 家族的新成員：
+
+```
+Gen 3 Runtime Hardening
+└─ Reference Integrity
+   ├─ runtime_index_freshness        （source ↔ index drift）
+   ├─ topology references            （layer 移動後引用 drift）
+   ├─ parent-child references        （plan tree frontmatter）
+   └─ plan_archival_link_integrity   ← 本 plan
+```
+
+`validatePlanArchivalAudit` 管的是 **Workflow Completeness**（archive 流程跑完沒：checkbox 勾完、audit 完成）；link 是否解析得到屬於 **Reference Integrity**。混在同一 validator 會讓 archival audit 變垃圾桶。
 
 ### Problem & Why Now
 
 2026-06-11 archive `2026-06-06-1800-sanitization-mechanical-enforcement`（`active/ → archived/`）時，手動發現 **兩側 relative-link 都斷**：
 
-1. **Inbound**：8 個 active 檔案（README、2 runtime yaml `source_plan`、2 failure-pattern、2 metadata、topology-migration）指向 `plans/active/<id>`，move 後變 stale。
-2. **Outbound**：被移動檔案**自身**的 relative-link（parent / sibling plan）原本假設自己在 `plans/active/`，move 到 `plans/archived/` 後 `../archived/`、same-dir、`../active/` 全部要重算。
+1. **被移動檔案自身的 outbound link**：原本假設自己在 `plans/active/`，move 到 `plans/archived/` 後 `../archived/`、same-dir、`../active/` 全部要重算。
+2. **Repo 內其他檔案的 inbound link**：8 個 active 檔案（README、2 runtime yaml `source_plan`、2 failure-pattern、2 metadata、topology-migration）指向 `plans/active/<id>`，move 後變 stale。
 
-現有 `validatePlanArchivalAudit` 只檢查 unchecked `- [ ]`，**完全不看 link**。這正是本 session 一直在處理的 **Reference Integrity** family 的一個未覆蓋 instance：move 是 surface-relocation，兩個 surface（檔案位置 ↔ 指向它/它指向的 link）之間 drift。全靠手動 grep + 逐一修，正是「rule 無 executor」風險。
+現有 `validatePlanArchivalAudit` 只檢查 unchecked `- [ ]`，**完全不看 link**。全靠手動 grep + 逐一修，正是「rule 無 executor」風險。
 
 ### The failure this prevents
 
-「archive 一個 plan → 連結默默斷掉 → 半年後有人點到 404 / 工具 resolve 失敗」。本 check 在 archive commit 當下就 surface。
+「archive 一個 plan → 連結默默斷掉 → 半年後有人點到 404 / 工具 resolve 失敗」。本 check 在 archive commit 當下就 surface，並提供 `suggested_replacement` 讓修復成本接近零。
 
 ## Scope
 
 **In scope**
-- 偵測 staged 內 plan 檔案的 `active/ ↔ archived/` rename（git `-M` rename detection）。
-- **Outbound check**：解析被移動檔案的 markdown relative-link `](relpath)`，從**新位置**resolve；target 不存在 → finding。
-- **Inbound check**：repo 內（active 檔案）是否仍有指向**舊路徑** `plans/active/<id>` / `active/<id>` 的 reference → finding。
+- 偵測 staged 內 plan 檔案的 `active/ ↔ archived/` rename，透過 `git diff --cached --find-renames -M90`（high similarity threshold；archive 通常 ≥90% 內容不變）。
+- **解析失敗檢查**：repo 內所有 staged + 受影響檔案的 markdown link `](relpath)`，從 **link 所在檔案的當前位置** resolve；target 不存在 → finding。
+- **Stale textual path mention**：bare 文字提及舊路徑（非 markdown link 語法）→ warning。
+- **suggested_replacement payload**：archive 場景 old→new 雙端已知，每個 finding 附 `suggested_replacement` 欄位（不自動修，但下游 IDE / auto-fix 可吃）。
 
 **Out of scope**
-- 自動修連結（只偵測 + 報告；auto-fix 列未來）。
-- 非 plan 檔案的一般 link-rot（更大題目，另議）。
+- 自動修連結（finding 帶 suggestion 即可；auto-fix 列未來）。
+- 非 plan 檔案的一般 link-rot（更大題目，另議；本 validator 只在 plan archive 事件觸發）。
 - 絕對 URL / 跨 repo link。
 
 ## Phase Plan
 
-### Phase 0 — Design decision（待裁決）
+### Phase 0 — Design decisions（已 resolved）
 
-- [ ] **D1 擴充 vs 新 validator**：(a) 擴充 `validatePlanArchivalAudit`（同 obligation `obligation.commit.plan_archival_audit`，less onboarding，但混兩種 concern）vs (b) 新 `validatePlanArchivalLinkIntegrity` + 新 obligation + registry entry（乾淨分離，較多 onboarding）。**傾向 (a)**：同屬 plan-archival concern，輸出分兩類 violation（unchecked / link-breakage）即可。
-- [ ] **D2 severity**：outbound（target 不存在，客觀）→ **block**；inbound（舊路徑殘留，可能是歷史 prose 提及）→ 先 **warning**（避免誤殺 provenance 文字），觀察後再考慮 promote。opt-out 沿用 `[skip-plan-archival-audit]`。
-- [ ] **D3 rename 偵測來源**：git `diff --cached --find-renames` 取 old→new；或比對 staged archived plan 是否在 HEAD 存在於 active/。
+- [x] **D1 = 新 validator**：建立 `validatePlanArchivalLinkIntegrity` + 新 obligation `obligation.commit.plan_archival_link_integrity` + `enforcement-registry.yaml` 入 `reference_integrity` rule_class。原因：archival audit 是 Workflow Completeness，link 是 Reference Integrity；分類乾淨優於合併。
+- [x] **D2 = severity 軸改為 resolvability，不分 direction**：
+  - markdown link syntax `](path)` 且解析失敗 → **block**（無論 inbound/outbound；客觀錯誤）
+  - bare textual path 提及（prose / frontmatter 註解 / 歷史描述）→ **warning**（避免誤殺 provenance 文字）
+  - opt-out: `[skip-plan-archival-link-integrity]`
+- [x] **D3 = `git diff --cached --find-renames -M90`**：吃 Git 算好的 rename intent，比自己重建對照少 edge case；threshold 90% 對 archive 場景合適（pure move，極少改動）。
 
 ### Phase 1 — Implementation
 
-- [ ] 在 hooks.go（或同檔 helper）實作 link-integrity check，接進 archival audit 路徑
-- [ ] Outbound：markdown link 解析 + 從新檔位置 resolve（同 repo 相對路徑），target 不存在 → finding
-- [ ] Inbound：掃 active 檔案對舊路徑的殘留 reference → warning finding
+- [ ] `scripts/ai-skill-cli/internal/app/hooks.go` 新增 `validatePlanArchivalLinkIntegrity`
+- [ ] 偵測 staged plan rename（`active/ ↔ archived/`）：跑 `git diff --cached --find-renames -M90 --name-status` 取所有 `R*` 條目，過濾 plan 路徑
+- [ ] **建立整批 rename map（必須在掃描前完成）**：multi-archive in same commit 時，A、B 同時 archive 且互相引用，每個檔的 resolve 都要看完整 rename map，不能逐檔處理
+- [ ] **Markdown link parsing**：用 goldmark 或等效 markdown AST 取 link node（不是 regex），避免 prose 中的路徑字串被誤判為 link
+- [ ] **解析**：對每個 link，從 link 所在檔案的 **新位置**（若該檔本身被 rename）或 **當前位置** resolve 相對路徑；target 不存在 → finding
+- [ ] **Bare textual path scan**：對被 rename 檔案的舊路徑（`plans/active/<id>`）做 plain-text 搜尋，命中且不在 markdown link node 內 → warning finding
+- [ ] **suggested_replacement**：finding payload 帶 `{old_path, new_path, suggested_replacement}`，old/new 從 rename map 反查
 
 ### Phase 2 — Tests
 
-- [ ] fail/outbound：move 一個含 `../active/sibling.md`（move 後該相對路徑錯）的 plan → block
-- [ ] fail/inbound：另一檔仍指 `plans/active/<moved-id>` → warning
-- [ ] pass：move 且所有 inbound/outbound 連結都已更新 → 0 finding
-- [ ] pass：純歷史 prose 提及 bare id（非 path link）→ 不誤報
+- [ ] fail/markdown link broken：archive A，A 內含 `[parent](../active/sibling.md)`（move 後相對路徑錯）→ block
+- [ ] fail/inbound markdown link broken：另一 active 檔含 `[source](plans/active/<moved-id>.md)` → block
+- [ ] warn/stale textual mention：另一檔 prose 寫 `Archived from plans/active/<moved-id>.md`（非 link 語法）→ warning
+- [ ] pass/clean archive：move 且所有 inbound/outbound markdown link 都已 retarget → 0 finding
+- [ ] pass/bare id provenance：純歷史 prose 提及 bare id（無路徑）→ 不誤報
+- [ ] **fail/multi-archive cross-reference**：同一 commit 內 A、B 都 archive，A 內有 `[B](../active/B.md)` 但未更新為 `../archived/B.md` → block（驗證 rename map 整批建立邏輯）
+- [ ] pass/multi-archive cross-reference resolved：同上但 A 已更新為 `B.md`（same-dir archived）→ 0 finding
 
 ### Phase 3 — Registry & Bootstrap Integration
 
-- [ ] 若採 D1(a)：更新 `enforcement-registry.yaml` `plan_governance`（或 archival 所屬 class）executor/說明；若採 (b)：新 rule_class + core-bootstrap per_commit_obligation
-- [ ] failure-pattern：`enforcement/failure-patterns/plan-archival-link-drift.md`（empirical: 2026-06-11 sanitization archive）
-- [ ] validation scenarios
-- [ ] coverage report + commit/push/readback
+- [ ] `enforcement/enforcement-registry.yaml`：新增 rule_class entry（`reference_integrity` 家族）+ executor 指向 validator + coverage = `mechanical`
+- [ ] `runtime/core-bootstrap.yaml` §per_commit_obligations：新增 `obligation.commit.plan_archival_link_integrity` + opt_out_marker + contract_source 指本 plan
+- [ ] `enforcement/failure-patterns/plan-archival-link-drift.md`（empirical: 2026-06-11 sanitization archive commit 3f7c4b4 手動修 8 inbound + 3 outbound link）
+- [ ] validation scenarios（scenarios/ 對應 test list）
+- [ ] `ai-skill enforcement coverage` 確認 bucket 從 `none` → `mechanical`
+- [ ] commit / push / readback
 
 ## Acceptance
 
-- Archiving a plan with a stale inbound path-link emits a warning; with a broken outbound relative-link emits a block (per D2).
-- Clean archive (all links retargeted) passes with zero findings.
-- Bare-id provenance mentions do not false-positive.
+- Archiving a plan with a broken markdown link (任一方向) emits a **block** finding with `suggested_replacement` payload.
+- Archiving a plan with a stale **textual** path mention (non-link prose) emits a **warning** finding.
+- Clean archive (all markdown links retargeted) passes with zero findings.
+- Bare-id provenance mentions（無路徑語法）do not false-positive.
+- Multi-archive in same commit: cross-references between simultaneously-archived plans are correctly resolved against the batch rename map.
 
 ## Validation
 
@@ -84,5 +115,5 @@ Owner: framework maintainer (linyihong)
 |---|---|
 | Trigger | 2026-06-11 sanitization plan archive 親身踩到 inbound+outbound link 斷裂 |
 | Empirical evidence | commit 3f7c4b4（手動修 8 inbound + 3 outbound link） |
-| Required set | `scripts/ai-skill-cli/internal/app/hooks.go`（validatePlanArchivalAudit）/ `scan_checkboxes.go` / `enforcement/enforcement-registry.yaml` |
-| Deferred | auto-fix；非 plan link-rot |
+| Required set | `scripts/ai-skill-cli/internal/app/hooks.go`（新 validator）/ markdown AST parser（goldmark 或同等）/ `enforcement/enforcement-registry.yaml` / `runtime/core-bootstrap.yaml` §per_commit_obligations |
+| Deferred | auto-fix；非 plan link-rot；跨 repo link |
