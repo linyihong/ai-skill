@@ -354,9 +354,27 @@ convenience wrapper that constructs a `metadata-file` subject and delegates to
 `ClassifyFailureAuthority`. If it ever grows `if runtimeIndexRow… if discovery…`
 branches, that is the signal the path-shaped wrapper was mistaken for the contract.
 
-> Build constraint (this turn's decision): the **contract is specified before any
-> classifier code**, so the first implementation conforms to a shared definition
-> of standing rather than retrofitting one from Finding A's path check.
+**Resolution precedence & safe defaults** (pinned by the first implementation,
+`scripts/ai-skill-cli/internal/app/failure_authority.go`):
+
+- **Demotion wins.** A non-authoritative signal (`owner: project-local`,
+  `shared_layer: false`) overrides any authoritative signal — a project-local
+  file has no standing even if it sits in a shared subtree.
+- **`shared_layer` is tri-state** (`unknown | true | false`), not a bool. On a
+  topology **miss** (`unknown`) a metadata-file *keeps* standing (fail-safe
+  toward protection): silently demoting a possibly-shared file would let a real
+  leak pass as a mere warning. A bare bool would default that case to the
+  dangerous direction.
+- **Unknown kind must earn standing.** A subject kind the contract has not
+  explicitly granted standing defaults to *non-authoritative*. Adding a new
+  *blocking* kind requires an explicit case — a grant is always conscious, never
+  accidental.
+
+> Build constraint (honoured): the **contract was specified before any classifier
+> code**, so the first implementation (`ClassifyFailureAuthority`, landed with
+> unit tests across metadata-file / runtime-index-row / discovery-provider /
+> unknown kinds) conformed to a shared definition of standing rather than
+> retrofitting one from Finding A's path check.
 
 ### Dependency inversion — Finding A is an executor, not the cause
 
@@ -403,10 +421,13 @@ near-identical authority decisions scattered and divergent.
 1. ✅ Complete this family observation (the invariant + Standing core + 3 samples).
 2. ✅ Specify the **Authority Classification Contract** (← above; subject-based,
    docs-only, no Go). The shared definition of standing.
-3. ⏭ Implement the Authority Classifier as the contract's first implementation
-   (`ClassifyFailureAuthority(subject)`), *from the contract*, not from Finding A.
-4. Land Finding A as Executor #1 (a `metadata-file` subject caller). It then also
-   becomes the 4th sample that moves this family toward its N≥5 promotion gate.
+3. ✅ Implement the Authority Classifier as the contract's first implementation
+   (`ClassifyFailureAuthority(subject)` in `scripts/ai-skill-cli/internal/app/failure_authority.go`),
+   *from the contract*, not from Finding A. Unit-tested across all four subject
+   kinds — proving it is genuinely multi-kind, not a path-welded special-case.
+   No caller wired yet.
+4. ⏭ Land Finding A as Executor #1 (a `metadata-file` subject caller). It then
+   also becomes the 4th sample that moves this family toward its N≥5 gate.
 
 See plan 2026-06-06-1800 §"Phase 1D review — Finding A" for the deferred fix and
 plan 2026-06-08-2100 for the incubator gate.
