@@ -1,4 +1,4 @@
-version=repo-ecb1d8d
-source_commit=ecb1d8d41a851ed8f3aaa22ebcf0557c521b01b8
-built_at=2026-06-11T12:31:15Z
+version=repo-7046b55
+source_commit=7046b553334335e4d307ebedaccedefe87186eb5
+built_at=2026-06-11T13:11:05Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
