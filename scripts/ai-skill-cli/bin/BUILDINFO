@@ -1,4 +1,4 @@
-version=repo-7046b55
-source_commit=7046b553334335e4d307ebedaccedefe87186eb5
-built_at=2026-06-11T13:11:05Z
+version=repo-e4256fc
+source_commit=e4256fc
+built_at=2026-06-12T00:02:34Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
