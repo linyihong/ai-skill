@@ -34,26 +34,49 @@ The hypothesis: recent successful governance subsystems all decompose into these
 | Executor | 5/5 | Universal so far |
 | Validation | 5/5 | Universal so far |
 
-**Two distinct optional-step signals now, on two different steps:**
+**The real result: the shape is not a 6-step invariant — it is a 4-step invariant core + 2 conditional steps.**
 
-1. **Rule** (sample #4): no explicit *Rule* layer. The rule is encoded directly in the executor (`nativeRuntimeIndexChecksumsCheck`) without a yaml/md surface declaring "checksum drift is forbidden." Signal: *Rule* is optional when the invariant is **structural** (matches a checksum) rather than **editorial** (matches a pattern).
-2. **Projection** (sample #5 / F19): no projected intermediate surface. The executor `LintValidationScenarios` calls `loadRegistrySnapshot` + `os.ReadFile` to read `enforcement-registry.yaml` and the referenced scenario yaml **directly** at compile time; there is no `runtime.db` table or other pre-digested surface between the canonical source and the executor.
+The acceptance gate was set up to test whether the 6-step chain is an invariant. The N=5 evidence answers that directly: **it is not** an invariant — but it is **not wrong** either. Four steps are invariant; two are conditional, each governed by its own falsifiable predicate.
 
-**Why F19 has no Projection — a load-bearing hypothesis (Projection ⇔ hot path):**
+```
+Original hypothesis (6-step invariant)        Result (N=5)
 
-Projection appears to exist precisely when the executor runs in a **hot path** and cannot afford to re-read+parse canonical yaml on every invocation:
+Observation                                   Observation  ┐
+   → Rule                                     Registry     │ invariant core
+   → Registry                                 Executor     │ (5/5 each)
+   → Projection                               Validation   ┘
+   → Executor
+   → Validation                               Rule        — conditional
+                                              Projection  — conditional
+```
 
-| # | Executor runs at | Projection present? | Surface |
+**Conditional predicate 1 — Rule** (the hole at sample #4, mature wording):
+
+> *Rule is conditionally required for **policy-derived** governance. It is optional when the invariant is **structural**.*
+
+A *structural* invariant needs no authored rule surface because the violation IS the structural inequality. "Checksum must match content" requires no `rule: { checksum_must_match: true }` — `A != B` is already the violation. A *policy-derived* invariant (what counts as a leak, what counts as a stale plan reference) is human-authored and therefore always carries a Rule surface. Sample #4 (`nativeRuntimeIndexChecksumsCheck`) is the structural case.
+
+**Conditional predicate 2 — Projection** (the hole at sample #5 / F19):
+
+> *Projection is conditionally required for **indirect-consumption** executors. It is optional when the executor can consume the authoritative registry/source surface **directly**.*
+
+This is deliberately framed at the contract level, **not** the implementation level. F19's executor happens to call `loadRegistrySnapshot` + `os.ReadFile` today; tomorrow it could be `yaml.Unmarshal`, the day after `registry.Load()`. The essence is invariant under all three: the executor reads the *authoritative source* and needs no intermediate surface. Projection only materialises when consumption must be **indirect** — i.e. the executor needs one of:
+
+- **high-frequency reads** (a hot path that cannot re-parse the source each call), or
+- **pre-digested data** (a derived form the source does not expose), or
+- **a unified query surface** (one shape over many heterogeneous sources).
+
+| # | Executor consumes source… | Projection present? | Surface |
 |---|---|---|---|
-| 1 Workflow | PreToolUse (every non-Read tool call) | ✅ | `runtime.db` routes |
-| 2 Discovery | tool-call / advisory time | ✅ | `runtime.discovery.config` |
-| 3 Sanitization | per-commit | ✅ | `derived_match_tokens` |
-| 4 Runtime Index | compile + commit | ✅ (but Registry *is* the db: `sources` table) | `sources` table |
-| 5 F19 | `runtime compile` only | ❌ | reads canonical yaml directly |
+| 1 Workflow | indirectly (high-frequency: every non-Read PreToolUse call) | ✅ | `runtime.db` routes |
+| 2 Discovery | indirectly (pre-digested capability map) | ✅ | `runtime.discovery.config` |
+| 3 Sanitization | indirectly (pre-digested match tokens) | ✅ | `derived_match_tokens` |
+| 4 Runtime Index | boundary — Registry *is* the db, so source-read and projection-read collapse into the `sources`-table read | ✅ (degenerate) | `sources` table |
+| 5 F19 | **directly** (reads the authoritative registry + scenario yaml) | ❌ | — |
 
-The pattern: **hot-path executors need a projection; a compile-time executor reading the canonical surface once per compile does not.** Sample #4 is the boundary case — it runs at compile time too, but its registry *is already* a SQLite db, so "reading the registry" and "reading a projection" collapse into the same `sources`-table read. F19 is the first sample where the registry is plain yaml and the executor is purely compile-time, so the Projection step has nothing to do and is genuinely absent — not skipped for convenience.
+So Projection is reclassified from a *governance-process step* to an **executor optimization layer**: present only when indirect consumption is required, absent when the executor can read the authoritative surface directly. Sample #4 is the boundary case — its registry already *is* a database, so the two collapse; F19 is the first clean case where the registry is plain yaml and the executor reads it directly, leaving Projection genuinely empty (not skipped for convenience, not documentation debt).
 
-This is the inverse relationship to the Rule signal: Rule drops out for **structural** invariants; Projection drops out for **compile-time-direct-read** executors. The two optional steps are governed by different conditions, which is stronger evidence than two holes on the *same* step would have been.
+**Why two holes on two different steps is the stronger result:** Rule and Projection are governed by *independent* predicates (policy-vs-structural; indirect-vs-direct consumption). Two holes on the *same* step would only have weakened that step; two holes on two steps, each with its own falsifiable condition, is what distinguishes "invariant core + conditional stages" from "6-step with some noise."
 
 ## Counter-sample candidates (to inventory next)
 
@@ -81,23 +104,17 @@ When filling each candidate's row:
 | At least one non-fitting sample analysed | ≥ 1 | 2 (#4 Rule-missing; #5/F19 Projection-missing) | ✅ |
 | ≥ 3 samples per step | ≥ 3 each | 4-5 each | ✅ |
 
-**All three gate criteria are now met.** But meeting the gate does **not** mean "promote the 6-step chain as-is." Per plan Phase 1, three branches exist, and the evidence points to the **middle** one:
+**All three gate criteria are met, and the Phase 1 decision is closed.** The gate's own decision tree resolves deterministically:
 
 > - If 5+ samples AND ≥3 per step AND 6-step shape **consistent** → Phase 2 as-is
-> - If samples found but **step coverage uneven** → **revise template shape (some steps optional, document variants)** ← we are here
+> - If samples found but **step coverage uneven** → **revise template shape (some steps optional, document variants)** ← resolved here
 > - If samples diverge significantly → abandon promotion
 
-Step coverage is uneven in a *principled* way: Observation / Registry / Executor / Validation are 5/5 (invariant core), while **Rule (4/5) and Projection (4/5) are each conditionally optional under different conditions** (structural-invariant; compile-time-direct-read). So the promotable artifact is not a rigid 6-step checklist but a **4-step invariant core + 2 conditional steps**:
+Coverage is **uneven but principled**, so the middle branch fires, and the revision is already performed: the promotable artifact is a **4-step invariant core** (Observation → Registry → Executor → Validation), with **Rule** conditionally required for policy-derived governance and **Projection** conditionally required for indirect-consumption executors. That makes Phase 1 a *closed decision*, not a pending one — what remains is Phase 2 **wording refinement**, not a branch choice.
 
-```
-Observation → [Rule?] → Registry → [Projection?] → Executor → Validation
-              structural-           hot-path-
-              invariant skips       executor adds
-```
+This is a stronger outcome than a clean 5th confirmation would have been: a clean fit would have left confirmation bias unrefuted, whereas reducing the hypothesis to a 4-step core + 2 falsifiable predicates is genuine new knowledge — it tells the eventual template *when* a step may be omitted instead of demanding all six unconditionally.
 
-This is a better outcome than a clean 5th confirmation would have been: a clean fit would have left confirmation-bias unrefuted, whereas two holes on two different steps, each with a falsifiable condition, is what lets the eventual template state *when* a step may be omitted instead of demanding all six unconditionally.
-
-Recommended Phase 1 disposition (for the plan author to confirm): proceed toward Phase 2 extraction, but author the template as **core + conditional steps**, and verify each conditional rule against the 6th sample before freezing the variant wording. Until the template lands, do not link this draft from `governance/lifecycle/README.md` and do not reference it as a normative pattern.
+**Phase 2 precondition (recommended, not gate-blocking):** before freezing the template wording, find a **6th sample chosen specifically to challenge the two conditional predicates** — i.e. a policy-derived governance with a structural twist (to test Rule-optional) and/or an indirect-consumption executor that nonetheless reads its source directly (to test Projection-optional). The point is not that the gate is short of evidence; it is that the two conditional predicates are now the *real* knowledge frontier, and a 6th sample that still obeys them raises the 4-step core's confidence materially above N=5. If the 6th sample *breaks* a predicate, the variant wording must absorb it before promotion. Until the template lands, do not link this draft from `governance/lifecycle/README.md` and do not reference it as a normative pattern.
 
 ## Why this draft matters even if the gate never passes
 
@@ -115,12 +132,12 @@ Even if the 6-step hypothesis is disproved, the analysis produces durable knowle
 
 **Current evidence (N=5) is sequential, but with four nuances**:
 
-1. **Two optional steps observed, on two different steps under two different conditions** — sample #4 (Runtime Index Freshness) has no explicit *Rule* layer (rule encoded structurally in `nativeRuntimeIndexChecksumsCheck`, a sha256 equality check); sample #5 (F19) has no *Projection* layer (executor reads canonical yaml directly at compile time). The governing conditions are independent: *Rule* drops out for **structural** invariants (mechanical equality, not editorial pattern); *Projection* drops out for **compile-time-direct-read** executors (no hot path → no need to pre-digest the canonical surface). See §"Per-step counts" for the Projection ⇔ hot-path table.
+1. **Two optional steps observed, on two different steps under two independent conditions** — sample #4 (Runtime Index Freshness) has no explicit *Rule* layer (rule encoded structurally in `nativeRuntimeIndexChecksumsCheck`, a sha256 equality check); sample #5 (F19) has no *Projection* layer (executor consumes the authoritative registry/scenario surface directly). The governing predicates are independent: *Rule* is conditionally required for **policy-derived** governance and optional for **structural** invariants; *Projection* is conditionally required for **indirect-consumption** executors and optional when the executor consumes the authoritative source **directly** (predicate stated at contract level, not implementation — `os.ReadFile` today, `registry.Load()` tomorrow, same essence). See §"Per-step counts" for the direct-vs-indirect consumption table.
 2. **Within-step parallelism in Executor** — samples #2 and #3 have executor pairs: Discovery Bridge has `discovery.go` core + advisory injector hook integration as two co-equal entry points; Sanitization Phase 1 (planned) has scanner core + commit-msg validator. F19 also shows the within-step structure but at a *single* placement: its executor is `runtime compile`-only, with commit-transaction dual-placement explicitly deferred (child plan Q6 + "Close and Observe" decision). The single "Executor" cell hides a sub-DAG whose *cardinality* itself varies (1 placement for F19, 2 for #2/#3); the template should say "Executor = core + integration points (placement count is a per-subsystem decision, see `validation-coverage-gap-executor-placement.md`)".
 3. **No observed re-entry / loop** — every sample so far is one-pass from Observation to Validation. No sample has a "Validation discovers gap → re-enter Rule" cycle yet, though Phase D of Discovery Bridge (3-week empirical) is essentially that. The shape may turn out to have a feedback loop annotation for subsystems with empirical iteration gates.
 4. **Observation can be a named failure pattern, not just an ad-hoc note** — F19's Observation cell points at a *promoted* failure pattern (`coverage-evidence-dangling-reference.md`), where samples #1–#4 had inline observations. This suggests the mature form of the Observation step is "a failure pattern in `enforcement/failure-patterns/`," and the 6-step (positive) family is the constructive dual of the failure-pattern (anti-pattern) family — consistent with the plan's "this captures the positive shape the anti-pattern violates against."
 
-**Working interpretation (updated N=5)**: the shape is **a 4-step invariant core (Observation → Registry → Executor → Validation) with two conditionally-optional steps (Rule, Projection) inserted under distinct conditions, plus within-step branching at Executor**. The two optional steps being governed by *different* falsifiable conditions — rather than two holes on the same step — is what upgrades this from "soft signal" to "document as variants" (plan Phase 1 middle branch). A 6th sample should be used to test the two conditions, not just to add another tally mark.
+**Working interpretation (updated N=5)**: the shape is **a 4-step invariant core (Observation → Registry → Executor → Validation), with Rule conditionally required for policy-derived governance and Projection conditionally required for indirect-consumption executors, plus within-step branching at Executor**. The two conditional steps being governed by *independent* falsifiable predicates — rather than two holes on the same step — is what upgrades this from "soft signal" to a closed Phase 1 decision (document as core + conditional). A 6th sample should be chosen to *challenge those two predicates*, not just to add another tally mark.
 
 ---
 

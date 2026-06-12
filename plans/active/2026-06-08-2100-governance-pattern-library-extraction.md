@@ -40,11 +40,11 @@ The 6-step shape fits all 4. **But 4 samples is not enough to confirm a framewor
 - [x] N ≥ 5 confirmed samples (one more genuine sample, not retrofitted)
   - **Evidence**: F19 (Validation Scenario Governance Executor, archived 2026-06-12) added as sample #5 in [`governance-pattern-library-draft.md`](../../governance/lifecycle/governance-pattern-library-draft.md) §"Sample inventory". Genuine, not retrofitted — F19 landed independently for its own promotion (`pending_implementation`→`mechanical`), not to fill this gate.
 - [x] At least one sample that DOES NOT fit perfectly — analyze why (essential signal: 6-step is correct, or 6-step has variants, or 6-step is wrong)
-  - **Evidence**: now **two** non-fitting samples on **two different steps**: #4 (Runtime Index) missing *Rule* (structural-invariant condition), #5 (F19) missing *Projection* (compile-time-direct-read condition). Analysed in draft §"Per-step counts" — Projection ⇔ hot-path hypothesis. Essential signal = **"6-step has variants"** (middle of the three).
+  - **Evidence**: now **two** non-fitting samples on **two different steps**: #4 (Runtime Index) missing *Rule* (optional for **structural** invariants), #5 (F19) missing *Projection* (optional when the executor **consumes the authoritative source directly**). Analysed in draft §"Per-step counts". Essential signal = **"6-step is not an invariant — it is a 4-step invariant core + 2 conditional stages"** (the variants branch, but stronger than "noise").
 - [x] Cross-check: the 6 steps each have ≥3 samples (each step's universality verified, not just the chain's)
   - **Evidence**: per-step counts (N=5) — Observation 5, Rule 4, Registry 5, Projection 4, Executor 5, Validation 5; all ≥4.
 
-**Gate met 2026-06-12.** Outcome is NOT "promote 6-step as-is" — the uneven (but principled) step coverage routes to Phase 1 middle branch: extract as a **4-step invariant core + 2 conditional steps**, not a rigid 6-step checklist.
+**Gate met 2026-06-12 — and the result is stronger than "gate passed".** The gate tested whether 6-step is an invariant; the answer is **no, but it is not wrong**: Observation / Registry / Executor / Validation are the invariant core (5/5), while **Rule** is conditionally required for *policy-derived* governance and **Projection** is conditionally required for *indirect-consumption* executors. The promotable artifact is a **4-step invariant core + 2 conditional steps**, not a rigid 6-step checklist.
 
 If the gate is met → extract to `governance/lifecycle/governance-pattern-template.md` as a positive template (sibling of failure patterns; failure patterns capture anti-patterns, this captures positive recurring shape).
 
@@ -84,12 +84,16 @@ Place draft analysis at: [`governance/lifecycle/governance-pattern-library-draft
   - **Authority Classification Contract layer inserted** (2026-06-10): chain is `invariant → Classification Contract → Classifier → Executor`. The contract is **subject-based** (`AuthoritySubject{kind: discovery-provider | runtime-index-row | metadata-file | generated-surface}`, `ClassifyFailureAuthority(subject)`), NOT path-based (`isCompileAuthoritative(path)` would weld authority:=path and break for non-file subjects). Contract specified docs-first, no Go, so the first classifier implementation conforms to a shared definition of standing reusable by ≥5 executors. Build order: family ✅ → contract ✅ → classifier impl ✅ → Finding A executor ⏭.
   - **Classifier landed** (2026-06-10): `scripts/ai-skill-cli/internal/app/failure_authority.go` — `ClassifyFailureAuthority(AuthoritySubject)` with tri-state `SharedLayer`, demotion-wins precedence, and unknown-kind-must-earn-standing default. Unit-tested across metadata-file / runtime-index-row / discovery-provider / unknown kinds (proving multi-kind, not path-welded). No caller wired yet; Finding A wiring is the next step and contributes the family's 4th sample.
 
-## Phase 1 — Gate decision
+## Phase 1 — Gate decision（completed 2026-06-12）
+
+**Status**: `completed`. The gate's decision tree resolves deterministically to the middle branch, and the shape revision is done, so Phase 1 is a closed decision — what remains is Phase 2 wording refinement, not a branch choice.
 
 - [ ] If 5+ samples found AND ≥3 samples per step AND 6-step shape consistent → proceed to Phase 2
 - [x] If samples found but step coverage uneven → revise template shape (e.g. some steps are optional, document variants)
-  - **Indicated branch (2026-06-12, pending owner confirmation)**: coverage is uneven in a principled way — Rule (4/5) and Projection (4/5) each conditionally optional under *distinct* falsifiable conditions (structural-invariant; compile-time-direct-read). Template should be **4-step invariant core + 2 conditional steps**, not rigid 6. Recommend confirming the two conditional rules against a 6th sample before freezing variant wording, then proceed to Phase 2.
+  - **Decision (2026-06-12)**: coverage is uneven but **principled** — Rule (4/5) optional for *policy-derived* governance vs structural invariants; Projection (4/5) optional when the executor *consumes the authoritative source directly* (predicate stated at contract level, not implementation). Revised shape = **4-step invariant core (Observation → Registry → Executor → Validation) + 2 conditional steps (Rule, Projection)**. This closes Phase 1.
 - [ ] If samples diverge significantly → abandon promotion; keep observation in draft only
+
+**Phase 2 precondition (recommended, not gate-blocking)**: before freezing template wording, find a 6th sample chosen specifically to *challenge* the two conditional predicates (Rule-optional, Projection-optional). The two predicates — not the sample count — are the real knowledge frontier; a 6th sample that still obeys them raises the 4-step core's confidence above N=5, and one that breaks a predicate must be absorbed into the variant wording before promotion.
 
 ## Phase 2 — Template extraction (only if gate passes)
 
