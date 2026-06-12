@@ -1,7 +1,7 @@
 ---
 id: 2026-06-01-0100-validation-scenario-governance-executor
 plan_kind: sub
-status: in-progress
+status: completed
 owner: linyihong
 created: 2026-06-01
 parent: 2026-05-31-2100-mechanical-enforcement-registry
@@ -16,11 +16,11 @@ sub_plan_reason: >
 
 # Validation Scenario Governance Executor
 
-**Status**: `in-progress`（Phase 0 preflight done, Phase 1 expanded 2026-06-12）
+**Status**: `completed`（archived 2026-06-12; F19 promoted to mechanical）
 **世代**：Gen 3 Layer 2.5 sub-deliverable
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-01
-**Source**: [`plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md`](../archived/2026-05-31-2100-mechanical-enforcement-registry.md) §Phase 3 Round-4 T1 / Round-5 U2
+**Source**: [`plans/archived/2026-05-31-2100-mechanical-enforcement-registry.md`](2026-05-31-2100-mechanical-enforcement-registry.md) §Phase 3 Round-4 T1 / Round-5 U2
 
 > **Stub Notice**：本 plan 為 stub，僅滿足 enforcement-registry `pending_implementation.child_plan_validity` 的最低門檻（Phase 0 outline + owner + Acceptance）。完整 Decision Rationale、Phase Plan 細節、Open Questions 待 implementation 啟動時擴充。
 
@@ -155,7 +155,7 @@ F19 從 `pending_implementation` 升 `mechanical` 的條件：
 
 - [x] 上述 Validation Plan 全項 checked
 - [x] F19 在 `enforcement-registry.yaml` 從 `pending_implementation` 改 `mechanical`
-- [ ] 本 plan 從 `plans/active/` 移至 `plans/archived/`，並更新 enforcement-registry parent plan 標示 F19 已 promote（archive step）
+- [x] 本 plan 從 `plans/active/` 移至 `plans/archived/`，並更新 enforcement-registry parent plan 標示 F19 已 promote（archived 2026-06-12; parent note added）
 
 ## Dependency Read Ledger
 
