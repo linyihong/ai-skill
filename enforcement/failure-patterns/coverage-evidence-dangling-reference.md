@@ -36,6 +36,28 @@ Class: `governance-drift` / `metadata-drift`
 「有 coverage_evidence」的假象比「沒有」更危險：reviewer 看到 `validation_scenarios: [...]`
 就假設覆蓋成立，不會去 `test -f` 每個路徑。dangling reference 可以存活數月而無人察覺。
 
+## 高階 Pattern：Declared Evidence ≠ Existing Evidence
+
+本檔不是 coverage_evidence 專屬的 path-lint，而是一個更高階治理 pattern 的 instance：
+
+> **任何「宣告自己有證據 / 有成員 / 有來源」的結構，其宣告與實存可以分岔。**
+> Declared Evidence ≠ Existing Evidence。
+
+`dangling_coverage_ref` 驗的不是「YAML 格式對不對」，而是「**這個宣稱是否屬實**」——
+它是 **Evidence Integrity check**，不是 syntax check。任何 declared-membership 結構都會遇到同型失效：
+
+| 結構類型 | 宣告 | 可能的 dangling 失效 |
+|---|---|---|
+| registry / catalog | rule_class → executor / scenario | symbol 或 scenario 檔不存在 |
+| inventory | 列出「應有」資產清單 | 清單項目從未 land（over-promise） |
+| index / manifest | path → resource | rename / move 後路徑斷鏈 |
+| coverage / evidence map | claim → proof artifact | proof 不存在或不可追溯 |
+
+通用防呆原則：**任何 declared reference 都必須有一個 mechanical resolver**（`test -f` /
+symbol grep / API probe），且 resolver 必須在 reference 進 main 前執行。沒有 resolver 的
+declared-membership 結構，本質上是「希望」而非「事實」。這與 `rule-without-executor`
+（規則無 executor）是同一條公理在不同層的展開：**宣稱必須可機械驗證，否則治理只是裝飾**。
+
 ### 2026-06-12 採樣
 
 - **Rule**：`enforcement-registry.yaml` `bootstrap_integrity.coverage_evidence.validation_scenarios`
@@ -55,6 +77,25 @@ Class: `governance-drift` / `metadata-drift`
 2. **Authoring 排在後面或被遺忘** — scenario 沒跟上，但 inventory 不會自我修正
 3. **Rename / archive 斷鏈** — plan/scenario 改名後 coverage_evidence 沒同步
 4. **沒有 `test -f` 機械門檻** — 全靠人工抽查，coverage_evidence 越長越沒人逐條驗
+
+## 未來演進與觀察（Future Evolution）
+
+本 executor 目前驗「證據是否存在 + 結構是否合格」，但 evidence governance 還有兩條
+未來演進路線（**不是現在要改**，列為 observation）：
+
+1. **Scenario Maturity Ladder（M0–M3）**：detection_command 改 WARNING（而非 FAIL）
+   後，structural lint 已天然分兩層——Layer 1「scenario 是否存在」（id/given/when/then
+   = FAIL）、Layer 2「scenario 是否成熟」（domain / detection_command = WARNING）。
+   這預留了 maturity 階梯：`M0 只有骨架 → M1 有 detection_command → M2 有 regression
+   linkage → M3 有可執行 validation`。未來可把 WARNING 升級為 per-level gate，而現有
+   設計不阻礙此路。
+
+2. **coverage_target_pct 的 Goodhart 風險**：目前 floor 只看「百分比」（<50 FAIL /
+   <80 WARNING）。但 percentage 會被 game——Rule A（10 scenarios）與 Rule B
+   （2 scenarios）都可宣告 100%，實際治理強度天差地遠。未來（Gen4/Gen5）應引入
+   **coverage count / diversity / criticality** 維度，而非單看 percentage。將
+   coverage_target_pct 當「可被 game 的代理指標」持續觀察，避免 metric 變成 target 後
+   失去意義。
 
 ## Required Agent Action
 
