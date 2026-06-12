@@ -1,4 +1,4 @@
-version=repo-e4256fc
-source_commit=e4256fc
-built_at=2026-06-12T00:02:34Z
+version=repo-8ea1723
+source_commit=8ea1723
+built_at=2026-06-12T04:52:35Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
