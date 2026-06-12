@@ -122,6 +122,21 @@ type registryRuleClass struct {
 	// `constitution/ADR-<NNN>-<slug>.md` (file must exist under <repo>).
 	AdrReference string `yaml:"adr_reference"`
 	DemotionRationale string `yaml:"demotion_rationale"`
+	// F19 (validation_scenario_governance): coverage_evidence binds a
+	// rule_class to the validation scenarios that prove its mechanical
+	// coverage. Parsed here (shared struct) and consumed by scenario_lint.go
+	// (LintValidationScenarios).
+	CoverageEvidence *registryCoverageEvidence `yaml:"coverage_evidence"`
+}
+
+// registryCoverageEvidence is the coverage_evidence block on a rule_class.
+// CoverageTargetPct is a pointer so the lint can distinguish "absent" (nil)
+// from an explicit 0.
+type registryCoverageEvidence struct {
+	ExpectedInstanceCount int      `yaml:"expected_instance_count"`
+	ValidationScenarios   []string `yaml:"validation_scenarios"`
+	RegressionScenarios   []string `yaml:"regression_scenarios"`
+	CoverageTargetPct     *int     `yaml:"coverage_target_pct"`
 }
 
 type registryExecutor struct {

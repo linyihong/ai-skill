@@ -1,0 +1,53 @@
+# Source: bootstrap-bypass-on-resume failure pattern (validated)
+# Dedicated regression scenario for the resume-non-exemption invariant. The
+# generic bootstrap-receipt-enforcement-v1 checks the obligation/gate rows +
+# clause presence; this scenario specifically locks that resume sessions are
+# NOT exempt from the Receipt obligation. Authored 2026-06-12 (F19 promotion).
+id: bootstrap-bypass-on-resume-v1
+domain: bootstrap
+type: failure-recovery
+priority: P1
+
+failure_source:
+  pattern: bootstrap-bypass-on-resume
+  class: process-gap
+  date: "2026-05-25"
+  description: |
+    Agent woken from a conversation summary ("Resume directly") treated the
+    chat-framing instruction as a runtime/governance bootstrap exemption, skipping
+    CORE_BOOTSTRAP.md + runtime.db query + Bootstrap Receipt. The resolution marks
+    obligation.bootstrap.receipt with resume_exempt: false and pairs it with
+    gate.bootstrap.receipt_present so resume cannot silently bypass bootstrap.
+
+given:
+  artifacts:
+    - runtime/core-bootstrap.yaml
+    - enforcement/failure-patterns/bootstrap-bypass-on-resume.md
+    - runtime/runtime.db (gates table)
+  signals:
+    - core-bootstrap.yaml declares resume_exempt false on the receipt obligation
+    - failure pattern bootstrap-bypass-on-resume.md exists
+    - gate.bootstrap.receipt_present row exists in runtime.db
+
+when:
+  action: resume_non_exemption_check
+
+then:
+  expected_route:
+    - core-bootstrap.yaml contains 'resume_exempt: false'
+    - failure pattern file exists
+    - gates table has row id=gate.bootstrap.receipt_present
+  forbidden_routes:
+    - treat_resume_directly_as_bootstrap_exemption
+    - claim_done_without_resume_exempt_false
+
+validation:
+  detection_command: |
+    re=$(grep -c 'resume_exempt: false' runtime/core-bootstrap.yaml 2>/dev/null)
+    fp=$(test -f enforcement/failure-patterns/bootstrap-bypass-on-resume.md && echo 1 || echo 0)
+    gt=$(sqlite3 runtime/runtime.db "SELECT COUNT(*) FROM gates WHERE id='gate.bootstrap.receipt_present';" 2>/dev/null)
+    { [ "${re:-0}" -ge 1 ] && [ "${fp:-0}" -ge 1 ] && [ "${gt:-0}" -ge 1 ]; } \
+      && echo "PASS" || echo "FAIL re=${re:-0} fp=${fp:-0} gt=${gt:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: PASS（resume_exempt:false + gate landed; scenario locks the invariant）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

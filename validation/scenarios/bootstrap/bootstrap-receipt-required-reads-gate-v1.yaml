@@ -1,0 +1,59 @@
+# Source: bootstrap receipt read-log requirement (landed 2026-05-30)
+# Regression for gate.bootstrap.receipt_present read_log_requirement: a Receipt
+# is only accepted when Read events for BOTH canonical bootstrap files appear
+# earlier in the transcript. Authored 2026-06-12 (F19 promotion) to fill the
+# coverage_evidence reference that the Phase 2 inventory promised but never created.
+id: bootstrap-receipt-required-reads-gate-v1
+domain: bootstrap
+type: failure-recovery
+priority: P1
+
+failure_source:
+  pattern: bootstrap-bypass-on-resume
+  class: governance-drift
+  date: "2026-05-30"
+  description: |
+    Pre-2026-05-30 the SessionStart hook injected a fully-rendered Receipt with
+    concrete numbers; agents copied it verbatim without ever Reading the canonical
+    bootstrap files, so gate.bootstrap.receipt_present fired on a fabricated Receipt.
+    The read_log_requirement (hooks.go transcriptHasRequiredBootstrapReads +
+    bootstrapRequiredReadSuffixes) makes the PreToolUse gate reject any Receipt
+    emitted without prior Read events for CORE_BOOTSTRAP.md AND
+    runtime/core-bootstrap.yaml.
+
+given:
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/hooks.go
+    - runtime/core-bootstrap.yaml
+  signals:
+    - hooks.go defines transcriptHasRequiredBootstrapReads
+    - hooks.go defines bootstrapRequiredReadSuffixes
+    - core-bootstrap.yaml documents read_log_requirement
+    - read_log_requirement names both CORE_BOOTSTRAP.md and runtime/core-bootstrap.yaml suffixes
+
+when:
+  action: receipt_required_reads_gate_check
+
+then:
+  expected_route:
+    - hooks.go contains transcriptHasRequiredBootstrapReads
+    - hooks.go contains bootstrapRequiredReadSuffixes
+    - core-bootstrap.yaml contains read_log_requirement
+    - read_log_requirement enumerates both canonical bootstrap file suffixes
+  forbidden_routes:
+    - accept_receipt_without_required_reads
+    - claim_gate_done_without_read_log_implementation
+
+validation:
+  detection_command: |
+    hk=scripts/ai-skill-cli/internal/app/hooks.go
+    f1=$(grep -c 'transcriptHasRequiredBootstrapReads' "$hk" 2>/dev/null)
+    f2=$(grep -c 'bootstrapRequiredReadSuffixes' "$hk" 2>/dev/null)
+    y1=$(grep -c 'read_log_requirement' runtime/core-bootstrap.yaml 2>/dev/null)
+    y2=$(grep -c 'CORE_BOOTSTRAP.md' runtime/core-bootstrap.yaml 2>/dev/null)
+    y3=$(grep -c 'runtime/core-bootstrap.yaml' runtime/core-bootstrap.yaml 2>/dev/null)
+    { [ "${f1:-0}" -ge 1 ] && [ "${f2:-0}" -ge 1 ] && [ "${y1:-0}" -ge 1 ] && [ "${y2:-0}" -ge 1 ] && [ "${y3:-0}" -ge 1 ]; } \
+      && echo "PASS" || echo "FAIL f1=${f1:-0} f2=${f2:-0} y1=${y1:-0} y2=${y2:-0} y3=${y3:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: PASS（read_log_requirement landed 2026-05-30; this scenario locks the invariant）
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

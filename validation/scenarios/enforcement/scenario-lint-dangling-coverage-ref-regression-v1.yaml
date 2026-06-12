@@ -1,0 +1,53 @@
+# Source: F19 validation_scenario_governance promotion (child plan
+# 2026-06-01-0100, Phase 1.2). Regression for the historical failure mode the
+# executor was built to catch: a rule_class coverage_evidence block referencing
+# a validation scenario yaml that does not exist.
+id: scenario-lint-dangling-coverage-ref-regression-v1
+domain: enforcement
+type: failure-recovery
+priority: P1
+
+failure_source:
+  pattern: validation-coverage-gap-executor-placement
+  class: governance-drift / metadata-drift
+  date: "2026-06-12"
+  description: |
+    The Phase 2 registry inventory (1b523fd) declared bootstrap_integrity
+    coverage_evidence.validation_scenarios pointing at two scenario files that
+    were never authored (bootstrap-receipt-required-reads-gate-v1.yaml,
+    bootstrap-bypass-on-resume-v1.yaml). For months coverage_evidence claimed
+    evidence that did not exist, with no mechanical detection. The F19 executor
+    adds dangling_coverage_ref (FAIL) so such over-promises block compile, and
+    the two scenarios were authored so the references resolve.
+
+given:
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/scenario_lint.go
+    - validation/scenarios/bootstrap/bootstrap-receipt-required-reads-gate-v1.yaml
+    - validation/scenarios/bootstrap/bootstrap-bypass-on-resume-v1.yaml
+  signals:
+    - scenario_lint.go implements a dangling_coverage_ref FAIL check
+    - the two historically-dangling bootstrap scenarios now exist
+
+when:
+  action: dangling_coverage_ref_regression_check
+
+then:
+  expected_route:
+    - scenario_lint.go contains the dangling_coverage_ref detector
+    - both previously-missing bootstrap scenarios resolve to real files
+  forbidden_routes:
+    - allow_coverage_evidence_to_reference_nonexistent_scenario
+    - reintroduce_aspirational_unbacked_reference
+
+validation:
+  detection_command: |
+    sl=scripts/ai-skill-cli/internal/app/scenario_lint.go
+    det=$(grep -c 'dangling_coverage_ref' "$sl" 2>/dev/null)
+    b1=$(test -f validation/scenarios/bootstrap/bootstrap-receipt-required-reads-gate-v1.yaml && echo 1 || echo 0)
+    b2=$(test -f validation/scenarios/bootstrap/bootstrap-bypass-on-resume-v1.yaml && echo 1 || echo 0)
+    { [ "${det:-0}" -ge 1 ] && [ "${b1:-0}" -ge 1 ] && [ "${b2:-0}" -ge 1 ]; } \
+      && echo "PASS" || echo "FAIL det=${det:-0} b1=${b1:-0} b2=${b2:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-1 (no dangling_coverage_ref detector; bootstrap refs dangling)
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

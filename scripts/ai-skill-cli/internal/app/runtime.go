@@ -729,7 +729,71 @@ func buildRuntimeCompileResult(opts runtimeOptions) Result {
 		return result
 	}
 
+	// F19 (validation_scenario_governance): compile-time lint of the
+	// validation scenarios bound to rule_classes via coverage_evidence.
+	// Same severity model as the registry lint (FAIL blocks, WARNING advises).
+	scenarioCheck, scenarioBlocks := buildValidationScenarioLintCheck(repo)
+	result.Checks = append(result.Checks, scenarioCheck)
+	if scenarioBlocks {
+		result.Status = "blocked"
+		result.ExitCode = ExitValidationFailed
+		result.Error = &CommandError{Code: "validation_scenario_lint_failed", Message: scenarioCheck.Message, Remediation: "Resolve FAIL findings in enforcement/enforcement-registry.yaml coverage_evidence / referenced validation scenarios (see lint output)."}
+		return result
+	}
+
 	return result
+}
+
+// buildValidationScenarioLintCheck runs the F19 scenario governance lint
+// (LintValidationScenarios) and renders a severity-aware summary mirroring
+// buildEnforcementRegistryLintCheck. Returns the Check plus whether the result
+// should block compile (any FAIL-severity finding).
+func buildValidationScenarioLintCheck(repo string) (Check, bool) {
+	errs, err := LintValidationScenarios(repo)
+	if err != nil {
+		return Check{Name: "validation_scenario_lint", Status: "failed", Message: err.Error()}, true
+	}
+	var fails, warns []EnforcementRegistryLintError
+	for _, e := range errs {
+		if e.IsFail() {
+			fails = append(fails, e)
+		} else {
+			warns = append(warns, e)
+		}
+	}
+	summary := formatValidationScenarioLintSummary(fails, warns)
+	if len(fails) > 0 {
+		return Check{Name: "validation_scenario_lint", Status: "failed", Message: summary}, true
+	}
+	if len(warns) > 0 {
+		return Check{Name: "validation_scenario_lint", Status: "warning", Message: summary}, false
+	}
+	return Check{Name: "validation_scenario_lint", Status: "ok", Message: "Validation Scenario Lint: FAIL 0 / WARNING 0"}, false
+}
+
+func formatValidationScenarioLintSummary(fails, warns []EnforcementRegistryLintError) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "Validation Scenario Lint\n\nFAIL:    %d\nWARNING: %d\n", len(fails), len(warns))
+	emit := func(title string, list []EnforcementRegistryLintError) {
+		if len(list) == 0 {
+			return
+		}
+		fmt.Fprintf(&b, "\n%s:\n", title)
+		for _, e := range list {
+			fmt.Fprintf(&b, "  [%s]\n", e.Type)
+			for _, f := range e.Fields {
+				fmt.Fprintf(&b, "    %s: %s\n", f.Key, f.Value)
+			}
+		}
+	}
+	emit("Failures", fails)
+	emit("Warnings", warns)
+	if len(fails) == 0 {
+		b.WriteString("\nCompile PASSED (warnings are advisory governance signals)")
+	} else {
+		b.WriteString("\nCompile BLOCKED — resolve FAIL findings above")
+	}
+	return b.String()
 }
 
 // buildEnforcementRegistryLintCheck runs the Phase 3 enforcement-registry

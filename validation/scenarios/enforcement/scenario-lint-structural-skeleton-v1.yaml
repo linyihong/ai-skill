@@ -1,0 +1,40 @@
+# Source: F19 validation_scenario_governance promotion (child plan
+# 2026-06-01-0100, Phase 1.1). Locks the severity split: BDD skeleton
+# (id/given/when/then) is FAIL, quality fields (domain, detection_command) are
+# WARNING — because detection_command is not a universal scenario invariant.
+id: scenario-lint-structural-skeleton-v1
+domain: enforcement
+type: heuristic-obedience
+priority: P1
+
+given:
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/scenario_lint.go
+  signals:
+    - structural lint emits referenced_scenario_structure findings
+    - id/given/when/then are checked at FAIL severity
+    - validation.detection_command is checked at WARNING severity (not FAIL)
+
+when:
+  action: scenario_structural_severity_check
+
+then:
+  expected_route:
+    - scenario_lint.go enforces id/given/when/then as FAIL skeleton
+    - scenario_lint.go treats validation.detection_command as WARNING
+  forbidden_routes:
+    - require_detection_command_as_fail
+    - drop_bdd_skeleton_enforcement
+
+validation:
+  detection_command: |
+    sl=scripts/ai-skill-cli/internal/app/scenario_lint.go
+    t=$(grep -c 'referenced_scenario_structure' "$sl" 2>/dev/null)
+    fid=$(grep -c 'fail("id")' "$sl" 2>/dev/null)
+    fg=$(grep -c 'fail("given")' "$sl" 2>/dev/null)
+    wdc=$(grep -c 'warn("validation.detection_command"' "$sl" 2>/dev/null)
+    { [ "${t:-0}" -ge 1 ] && [ "${fid:-0}" -ge 1 ] && [ "${fg:-0}" -ge 1 ] && [ "${wdc:-0}" -ge 1 ]; } \
+      && echo "PASS" || echo "FAIL t=${t:-0} fid=${fid:-0} fg=${fg:-0} wdc=${wdc:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-1 (no structural lint existed)
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

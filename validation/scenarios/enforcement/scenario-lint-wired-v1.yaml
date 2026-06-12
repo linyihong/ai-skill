@@ -1,0 +1,41 @@
+# Source: F19 validation_scenario_governance promotion (child plan
+# 2026-06-01-0100, Phase 1.5). Confirms the scenario governance executor exists
+# and is wired into the `runtime compile` pipeline.
+id: scenario-lint-wired-v1
+domain: enforcement
+type: routing-stability
+priority: P1
+
+given:
+  artifacts:
+    - scripts/ai-skill-cli/internal/app/scenario_lint.go
+    - scripts/ai-skill-cli/internal/app/runtime.go
+  signals:
+    - scenario_lint.go defines LintValidationScenarios
+    - runtime.go dispatches buildValidationScenarioLintCheck during compile
+    - compile emits a validation_scenario_lint Check
+
+when:
+  action: scenario_lint_wiring_check
+
+then:
+  expected_route:
+    - LintValidationScenarios is defined
+    - buildValidationScenarioLintCheck is called in the compile flow
+    - a validation_scenario_lint Check name is produced
+  forbidden_routes:
+    - claim_mechanical_without_executor_symbol
+    - claim_wired_without_compile_dispatch
+
+validation:
+  detection_command: |
+    sl=scripts/ai-skill-cli/internal/app/scenario_lint.go
+    rt=scripts/ai-skill-cli/internal/app/runtime.go
+    a=$(grep -c 'func LintValidationScenarios' "$sl" 2>/dev/null)
+    b=$(grep -c 'buildValidationScenarioLintCheck' "$rt" 2>/dev/null)
+    c=$(grep -c 'validation_scenario_lint' "$rt" 2>/dev/null)
+    { [ "${a:-0}" -ge 1 ] && [ "${b:-0}" -ge 1 ] && [ "${c:-0}" -ge 1 ]; } \
+      && echo "PASS" || echo "FAIL a=${a:-0} b=${b:-0} c=${c:-0}"
+  pass_criteria: detection_command outputs PASS
+  initial_state: FAIL pre-Phase-1 (scenario_lint.go did not exist)
+  reference_governance: governance/lifecycle/system-upgrade-governance.md §3 Rule 9

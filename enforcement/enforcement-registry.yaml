@@ -1111,26 +1111,49 @@ rule_classes:
       regression_exists: ✓
       runtime_observed: pending  # 30-day observation window starts at promotion (2026-06-11)
 
-  # F19 (round-4 T1): reclassified behavioral_only → pending_implementation.
-  # coverage_evidence schema already exists; only the executor is missing
-  # = known implementation gap, not "intentionally not mechanized".
+  # F19 (round-4 T1 → promoted 2026-06-12): was pending_implementation while
+  # the scenario lint executor was unwritten. Child plan
+  # 2026-06-01-0100-validation-scenario-governance-executor Phase 1 landed
+  # LintValidationScenarios (scenario_lint.go), wired into `runtime compile`.
   - id: validation_scenario_governance
-    coverage: pending_implementation
+    coverage: mechanical
     source_files:
       - governance/ai-runtime-governance/validation-scenario-governance.yaml
-    executors_planned:
+    executors:
       - file: scripts/ai-skill-cli/internal/app/scenario_lint.go
         symbol: LintValidationScenarios
         executor_kind: hook_dispatcher_entry
         hook_phase: "ai-skill runtime compile"
         block_or_warn: block
-    child_plan: plans/active/2026-06-01-0100-validation-scenario-governance-executor.md
-    target_promotion: "child plan Phase 1 land → coverage=mechanical (scenario lint enforces coverage_evidence.coverage_target_pct)"
+        notes: "compile-time lint dispatched from runtime.go buildValidationScenarioLintCheck (same placement as LintEnforcementRegistry). FAIL blocks compile; WARNING advisory. Commit-transaction dual-placement is a tracked follow-up (child plan §Follow-up)."
+    rationale: |
+      Enforces that validation scenarios bound to a rule_class via
+      coverage_evidence are real, well-formed governance evidence:
+      (1.1) referenced scenarios carry the BDD skeleton id/given/when/then
+      (FAIL) plus domain + validation.detection_command (WARNING — routing
+      scenarios legitimately use then.validation[] instead); (1.2) every
+      coverage_evidence validation_scenarios/regression_scenarios path
+      resolves to an existing file (FAIL dangling_coverage_ref); (1.3)
+      mechanical classes declaring coverage_target_pct clear the governance
+      floor (< 50 FAIL / 50-79 WARNING / >= 80 OK); (1.4) regression
+      scenarios link back to a failure pattern (WARNING). Structural lint is
+      scoped to registry-referenced scenarios, not the full 207-scenario
+      corpus (child plan Q1/Q2).
+    coverage_evidence:
+      expected_instance_count: 3
+      expected_instance_count_query: |
+        grep -c '^    coverage_evidence:' enforcement/enforcement-registry.yaml
+      validation_scenarios:
+        - validation/scenarios/enforcement/scenario-lint-wired-v1.yaml
+        - validation/scenarios/enforcement/scenario-lint-structural-skeleton-v1.yaml
+      coverage_target_pct: 100
+      regression_scenarios:
+        - validation/scenarios/enforcement/scenario-lint-dangling-coverage-ref-regression-v1.yaml
     verification_status:
-      symbol_exists: pending  # scenario_lint.go not yet written
-      scenario_exists: pending
-      regression_exists: pending
-      runtime_observed: not_applicable_until_promoted
+      symbol_exists: ✓   # LintValidationScenarios in scenario_lint.go
+      scenario_exists: ✓
+      regression_exists: ✓  # dangling_coverage_ref regression (historical bootstrap over-promise)
+      runtime_observed: pending  # 30-day observation window starts at promotion (2026-06-12)
 
   # ═══ BEHAVIORAL ONLY ══════════════════════════════════════════════
 
