@@ -22,39 +22,42 @@ The hypothesis: recent successful governance subsystems all decompose into these
 | 3 | Sanitization Mechanical Enforcement (plan 2026-06-06-1800, in design) | leak-on-canonical-write | `sanitization-patterns.yaml` + topology | `enforcement-registry` rule_class | `derived_match_tokens` | `sanitization_scan.go` | metadata-derived-fail/pass scenarios |
 | 4 | Runtime Index Freshness (commit c5874a8, landed) | source-tree checksum drift | (implicit) | `runtime-index.sqlite` | `sources` table | `nativeRuntimeIndexChecksumsCheck` + commit-msg validator | runtime-index-freshness tests |
 | 5 | Validation Scenario Governance Executor — F19 (plan 2026-06-01-0100, archived 2026-06-12) | declared coverage evidence unverified / dangling `coverage_evidence` refs (`coverage-evidence-dangling-reference.md`) | `coverage_evidence` schema in `enforcement-registry.yaml` (`validation_scenarios[]` / `regression_scenarios[]` / `coverage_target_pct`) | `enforcement-registry` F19 `validation_scenario_governance` rule_class + `executors[]` block | **(none — executor reads the registry yaml + scenario corpus directly at compile time)** | `scenario_lint.go` `LintValidationScenarios` wired into `runtime compile` | `scenario_lint_test.go` (5 tests, ≥1 fail+1 pass per check) + `scenario-lint-dangling-coverage-ref-regression-v1.yaml` |
+| 6 | Plan-Tree Hierarchy Governance (plan 2026-06-02-1200, mechanical) | plan-tree drift (broken parent pointer, id collision, archive mis-order) | frontmatter-schema **policy** (`01-frontmatter-schema.md`) — *but bundles one **structural** sub-invariant: `validatePlanTreeUniqueID` (id collision = `A==B`)* | `enforcement-registry` `plan_tree_governance` rule_class + 5 `executors[]` | **(none — 5 validators read staged/worktree plan files directly via `os.ReadFile`)** | `plan_tree.go` — **5** commit-msg validators (frontmatter / archive-order / parent-ref / unique-id / folder-convention) | `plan_tree_test.go` Go unit tests *(scenario-yaml sub-form `scenario_exists: pending`)* |
 
-### Per-step counts (N=5)
+### Per-step counts (N=6)
 
 | Step | Filled cells | Notes |
 |---|---|---|
-| Observation | 5/5 | Universal so far |
-| Rule | 4/5 | #4 has "(implicit)" — structural-invariant hole |
-| Registry | 5/5 | Universal so far |
-| Projection | 4/5 | **#5 (F19) empty** — compile-time-direct-read hole (new this pass) |
-| Executor | 5/5 | Universal so far |
-| Validation | 5/5 | Universal so far |
+| Observation | 6/6 | Universal so far |
+| Rule | 5/6 | #4 empty (implicit/structural). #6 *has* a rule but bundles a structural sub-invariant — see granularity note below |
+| Registry | 6/6 | Universal so far |
+| Projection | 4/6 | **#5 and #6 both empty** — Projection-optional now has **two** confirming direct-consumption cases |
+| Executor | 6/6 | Universal so far (#6 is the largest multi-entry executor yet: 5 validators) |
+| Validation | 6/6 | Universal so far; #6 surfaces a *sub-form* nuance (Go test vs scenario-yaml) — see below |
 
 **The real result: the shape is not a 6-step invariant — it is a 4-step invariant core + 2 conditional steps.**
 
-The acceptance gate was set up to test whether the 6-step chain is an invariant. The N=5 evidence answers that directly: **it is not** an invariant — but it is **not wrong** either. Four steps are invariant; two are conditional, each governed by its own falsifiable predicate.
+The acceptance gate was set up to test whether the 6-step chain is an invariant. The evidence (now N=6) answers that directly: **it is not** an invariant — but it is **not wrong** either. Four steps are invariant; two are conditional, each governed by its own falsifiable predicate.
 
 ```
-Original hypothesis (6-step invariant)        Result (N=5)
+Original hypothesis (6-step invariant)        Result (N=6)
 
 Observation                                   Observation  ┐
    → Rule                                     Registry     │ invariant core
-   → Registry                                 Executor     │ (5/5 each)
+   → Registry                                 Executor     │ (6/6 each)
    → Projection                               Validation   ┘
    → Executor
-   → Validation                               Rule        — conditional
-                                              Projection  — conditional
+   → Validation                               Rule        — conditional (5/6)
+                                              Projection  — conditional (4/6)
 ```
 
 **Conditional predicate 1 — Rule** (the hole at sample #4, mature wording):
 
 > *Rule is conditionally required for **policy-derived** governance. It is optional when the invariant is **structural**.*
 
-A *structural* invariant needs no authored rule surface because the violation IS the structural inequality. "Checksum must match content" requires no `rule: { checksum_must_match: true }` — `A != B` is already the violation. A *policy-derived* invariant (what counts as a leak, what counts as a stale plan reference) is human-authored and therefore always carries a Rule surface. Sample #4 (`nativeRuntimeIndexChecksumsCheck`) is the structural case.
+A *structural* invariant needs no authored rule surface because the violation IS the structural inequality. "Checksum must match content" requires no `rule: { checksum_must_match: true }` — `A != B` is already the violation. A *policy-derived* invariant (what counts as a leak, what counts as a stale plan reference) is human-authored and therefore always carries a Rule surface. Sample #4 (`nativeRuntimeIndexChecksumsCheck`) is the clean structural case.
+
+*Granularity refinement (from sample #6)*: the predicate operates at **rule_class granularity**, not per-validator. `plan_tree_governance` carries a Rule surface (the frontmatter-schema policy) because most of its five validators are policy-derived (parent-pointer semantics, folder convention) — yet one of them, `validatePlanTreeUniqueID`, is purely *structural* (id collision = `A==B`, no policy needed) and rides on the shared rule surface anyway. So the precise predicate is: **a rule_class carries a Rule surface iff it contains *any* policy-derived invariant; structural sub-invariants bundled into a policy rule_class inherit it.** Rule-optional in its clean standalone form is therefore still attested by only #4; #6 is corroborating-but-mixed, not a second clean case. Finding a rule_class that is *entirely* structural (and confirming it has no Rule surface) remains the strongest open test for predicate 1.
 
 **Conditional predicate 2 — Projection** (the hole at sample #5 / F19):
 
@@ -73,17 +76,20 @@ This is deliberately framed at the contract level, **not** the implementation le
 | 3 Sanitization | indirectly (pre-digested match tokens) | ✅ | `derived_match_tokens` |
 | 4 Runtime Index | boundary — Registry *is* the db, so source-read and projection-read collapse into the `sources`-table read | ✅ (degenerate) | `sources` table |
 | 5 F19 | **directly** (reads the authoritative registry + scenario yaml) | ❌ | — |
+| 6 Plan-Tree | **directly** (5 commit-msg validators `os.ReadFile` the staged/worktree plans) | ❌ | — |
 
-So Projection is reclassified from a *governance-process step* to an **executor optimization layer**: present only when indirect consumption is required, absent when the executor can read the authoritative surface directly. Sample #4 is the boundary case — its registry already *is* a database, so the two collapse; F19 is the first clean case where the registry is plain yaml and the executor reads it directly, leaving Projection genuinely empty (not skipped for convenience, not documentation debt).
+So Projection is reclassified from a *governance-process step* to an **executor optimization layer**: present only when indirect consumption is required, absent when the executor can read the authoritative surface directly. Sample #4 is the boundary case — its registry already *is* a database, so the two collapse; #5 (F19) and #6 (Plan-Tree) are the two clean cases where the source is plain yaml/markdown and the executor reads it directly, leaving Projection genuinely empty (not skipped for convenience, not documentation debt). **Predicate 2 now has two independent confirming samples (#5, #6)** — which is exactly the confidence lift the Phase 2 precondition asked for: a second direct-consumption-no-projection case, from a *different* executor kind (compile-time lint vs commit-msg validator), reading a *different* source type (registry yaml vs plan frontmatter).
 
 **Why two holes on two different steps is the stronger result:** Rule and Projection are governed by *independent* predicates (policy-vs-structural; indirect-vs-direct consumption). Two holes on the *same* step would only have weakened that step; two holes on two steps, each with its own falsifiable condition, is what distinguishes "invariant core + conditional stages" from "6-step with some noise."
+
+**Validation sub-form nuance (from sample #6):** Validation is still 6/6 (universal core), but #6 shows the step has *two interchangeable sub-forms* — **Go unit tests** (`plan_tree_test.go`) and **scenario-yaml** (`validation/scenarios/`). `plan_tree_governance` satisfies Validation via Go tests while its registry `scenario_exists` is still `pending`; the two are not the same axis. The template's Validation step should therefore read "executable proof (unit test **or** scenario yaml) that the executor detects the violation," and a governance subsystem can be Validation-complete in the test sub-form while its scenario-yaml coverage is independently tracked (and may legitimately lag). This means "Validation present" (core invariant) and "scenario-yaml coverage complete" (a separate governance metric, the very thing F19 itself enforces) must not be conflated.
 
 ## Counter-sample candidates (to inventory next)
 
 These are listed in the plan's Phase 0 checklist. They have NOT been analysed yet. The goal is to find samples that do not cleanly fit the 6-step shape, because a negative case is more informative than a fifth positive.
 
 - [ ] `runtime-trigger-wiring` validator — staged file routing; rule may be declarative, but is there a registry/projection split, or does the validator read source directly?
-- [ ] `plan-tree-hierarchy` plan — does plan frontmatter validation have a "Registry" step, or is it pure schema?
+- [x] `plan-tree-hierarchy` plan — **inventoried as sample #6** (2026-06-12). Has a Registry step (`plan_tree_governance` rule_class), not pure schema. Findings: confirms Projection-optional (2nd case), refines Rule predicate to rule_class granularity, surfaces Validation sub-form nuance. See sample inventory row 6 + predicate sections.
 - [ ] `bootstrap-contract-yaml-migration` — the migration itself: where does it sit on the 6 steps? Was it Observation → Rule → Projection → Validation, skipping Registry + Executor?
 - [ ] Commit-time registry reference consistency (spawn chip `task_a068faa6`) — currently a spawned task; once landed will be the 5th genuine sample.
 
@@ -100,9 +106,9 @@ When filling each candidate's row:
 
 | Criterion | Threshold | Current | Met? |
 |---|---|---|---|
-| Total samples | ≥ 5 | 5 (F19 added 2026-06-12) | ✅ |
-| At least one non-fitting sample analysed | ≥ 1 | 2 (#4 Rule-missing; #5/F19 Projection-missing) | ✅ |
-| ≥ 3 samples per step | ≥ 3 each | 4-5 each | ✅ |
+| Total samples | ≥ 5 | 6 (F19 #5 + Plan-Tree #6 added 2026-06-12) | ✅ |
+| At least one non-fitting sample analysed | ≥ 1 | 3 (#4 Rule-missing; #5/F19 + #6/Plan-Tree Projection-missing) | ✅ |
+| ≥ 3 samples per step | ≥ 3 each | 4-6 each | ✅ |
 
 **All three gate criteria are met, and the Phase 1 decision is closed.** The gate's own decision tree resolves deterministically:
 
@@ -114,7 +120,13 @@ Coverage is **uneven but principled**, so the middle branch fires, and the revis
 
 This is a stronger outcome than a clean 5th confirmation would have been: a clean fit would have left confirmation bias unrefuted, whereas reducing the hypothesis to a 4-step core + 2 falsifiable predicates is genuine new knowledge — it tells the eventual template *when* a step may be omitted instead of demanding all six unconditionally.
 
-**Phase 2 precondition (recommended, not gate-blocking):** before freezing the template wording, find a **6th sample chosen specifically to challenge the two conditional predicates** — i.e. a policy-derived governance with a structural twist (to test Rule-optional) and/or an indirect-consumption executor that nonetheless reads its source directly (to test Projection-optional). The point is not that the gate is short of evidence; it is that the two conditional predicates are now the *real* knowledge frontier, and a 6th sample that still obeys them raises the 4-step core's confidence materially above N=5. If the 6th sample *breaks* a predicate, the variant wording must absorb it before promotion. Until the template lands, do not link this draft from `governance/lifecycle/README.md` and do not reference it as a normative pattern.
+**Phase 2 precondition — partially discharged (2026-06-12).** The recommendation was to find a 6th sample chosen to *challenge* the two predicates rather than tally. Sample #6 (Plan-Tree Hierarchy Governance) did that:
+
+- **Projection-optional — strengthened.** #6 is a second, independent direct-consumption-no-projection case, from a different executor kind (commit-msg validator vs F19's compile-time lint) over a different source (plan frontmatter vs registry yaml). Predicate 2 now rests on two clean samples, not one.
+- **Rule-optional — refined, not yet independently re-confirmed.** #6's `validatePlanTreeUniqueID` is structural but rides on a policy rule_class's rule surface, which sharpened the predicate to **rule_class granularity** but did *not* add a second clean standalone structural-no-rule case. Predicate 1 still rests on #4 alone.
+- **New nuance — Validation sub-form.** #6 exposed that Validation has interchangeable Go-test / scenario-yaml sub-forms tracked on separate axes.
+
+**Remaining open test before freezing template wording:** an *entirely structural* rule_class confirmed to carry **no** Rule surface (clean second case for predicate 1). Candidate left: `runtime-trigger-wiring`. Until that lands and the template wording is frozen, do not link this draft from `governance/lifecycle/README.md` and do not reference it as a normative pattern.
 
 ## Why this draft matters even if the gate never passes
 
@@ -130,14 +142,15 @@ Even if the 6-step hypothesis is disproved, the analysis produces durable knowle
 
 > Resolves Phase 0 checklist item "Check whether the pattern is sequential (always Observation → ... → Validation) or has parallel/optional branches".
 
-**Current evidence (N=5) is sequential, but with four nuances**:
+**Current evidence (N=6) is sequential, but with five nuances**:
 
-1. **Two optional steps observed, on two different steps under two independent conditions** — sample #4 (Runtime Index Freshness) has no explicit *Rule* layer (rule encoded structurally in `nativeRuntimeIndexChecksumsCheck`, a sha256 equality check); sample #5 (F19) has no *Projection* layer (executor consumes the authoritative registry/scenario surface directly). The governing predicates are independent: *Rule* is conditionally required for **policy-derived** governance and optional for **structural** invariants; *Projection* is conditionally required for **indirect-consumption** executors and optional when the executor consumes the authoritative source **directly** (predicate stated at contract level, not implementation — `os.ReadFile` today, `registry.Load()` tomorrow, same essence). See §"Per-step counts" for the direct-vs-indirect consumption table.
-2. **Within-step parallelism in Executor** — samples #2 and #3 have executor pairs: Discovery Bridge has `discovery.go` core + advisory injector hook integration as two co-equal entry points; Sanitization Phase 1 (planned) has scanner core + commit-msg validator. F19 also shows the within-step structure but at a *single* placement: its executor is `runtime compile`-only, with commit-transaction dual-placement explicitly deferred (child plan Q6 + "Close and Observe" decision). The single "Executor" cell hides a sub-DAG whose *cardinality* itself varies (1 placement for F19, 2 for #2/#3); the template should say "Executor = core + integration points (placement count is a per-subsystem decision, see `validation-coverage-gap-executor-placement.md`)".
+1. **Two optional steps observed, on two different steps under two independent conditions** — sample #4 (Runtime Index Freshness) has no explicit *Rule* layer (rule encoded structurally in `nativeRuntimeIndexChecksumsCheck`, a sha256 equality check); samples #5 (F19) and #6 (Plan-Tree) have no *Projection* layer (executor consumes the authoritative source directly). The governing predicates are independent: *Rule* is conditionally required for **policy-derived** governance and optional for **structural** invariants (at rule_class granularity — see Rule predicate granularity note); *Projection* is conditionally required for **indirect-consumption** executors and optional when the executor consumes the authoritative source **directly** (predicate stated at contract level, not implementation — `os.ReadFile` today, `registry.Load()` tomorrow, same essence). See §"Per-step counts" for the direct-vs-indirect consumption table.
+2. **Within-step parallelism in Executor, with varying cardinality** — the single "Executor" cell hides a sub-DAG whose *cardinality* varies widely: 1 placement (#5 F19, `runtime compile`-only), 2 (#2 Discovery `discovery.go` + advisory injector; #3 Sanitization scanner + commit-msg), up to **5** (#6 Plan-Tree: frontmatter / archive-order / parent-ref / unique-id / folder-convention commit-msg validators). The template should say "Executor = core + integration points (count is a per-subsystem decision, see `validation-coverage-gap-executor-placement.md`)".
 3. **No observed re-entry / loop** — every sample so far is one-pass from Observation to Validation. No sample has a "Validation discovers gap → re-enter Rule" cycle yet, though Phase D of Discovery Bridge (3-week empirical) is essentially that. The shape may turn out to have a feedback loop annotation for subsystems with empirical iteration gates.
 4. **Observation can be a named failure pattern, not just an ad-hoc note** — F19's Observation cell points at a *promoted* failure pattern (`coverage-evidence-dangling-reference.md`), where samples #1–#4 had inline observations. This suggests the mature form of the Observation step is "a failure pattern in `enforcement/failure-patterns/`," and the 6-step (positive) family is the constructive dual of the failure-pattern (anti-pattern) family — consistent with the plan's "this captures the positive shape the anti-pattern violates against."
+5. **Validation has interchangeable sub-forms** — sample #6 satisfies Validation via Go unit tests (`plan_tree_test.go`) while its scenario-yaml coverage is still `pending`. Validation-the-core-step ("executable proof the executor detects the violation") is distinct from scenario-yaml-coverage (a separate governance metric). The two must not be conflated; a subsystem can be Validation-complete in the test sub-form with scenario-yaml lagging.
 
-**Working interpretation (updated N=5)**: the shape is **a 4-step invariant core (Observation → Registry → Executor → Validation), with Rule conditionally required for policy-derived governance and Projection conditionally required for indirect-consumption executors, plus within-step branching at Executor**. The two conditional steps being governed by *independent* falsifiable predicates — rather than two holes on the same step — is what upgrades this from "soft signal" to a closed Phase 1 decision (document as core + conditional). A 6th sample should be chosen to *challenge those two predicates*, not just to add another tally mark.
+**Working interpretation (updated N=6)**: the shape is **a 4-step invariant core (Observation → Registry → Executor → Validation), with Rule conditionally required for policy-derived governance (rule_class granularity) and Projection conditionally required for indirect-consumption executors, plus within-step branching at Executor and interchangeable sub-forms at Validation**. The two conditional steps being governed by *independent* falsifiable predicates — rather than two holes on the same step — is what upgrades this from "soft signal" to a closed Phase 1 decision (document as core + conditional). Predicate 2 (Projection) now has two confirming samples; predicate 1 (Rule) still needs an entirely-structural rule_class to re-confirm independently. The next sample should keep *challenging the predicates*, not just add a tally mark.
 
 ---
 

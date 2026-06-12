@@ -38,13 +38,13 @@ The 6-step shape fits all 4. **But 4 samples is not enough to confirm a framewor
 ## Acceptance gate (do NOT extract until met)
 
 - [x] N ≥ 5 confirmed samples (one more genuine sample, not retrofitted)
-  - **Evidence**: F19 (Validation Scenario Governance Executor, archived 2026-06-12) added as sample #5 in [`governance-pattern-library-draft.md`](../../governance/lifecycle/governance-pattern-library-draft.md) §"Sample inventory". Genuine, not retrofitted — F19 landed independently for its own promotion (`pending_implementation`→`mechanical`), not to fill this gate.
+  - **Evidence**: now **N=6** in [`governance-pattern-library-draft.md`](../../governance/lifecycle/governance-pattern-library-draft.md) §"Sample inventory". #5 = F19 (Validation Scenario Governance Executor, archived 2026-06-12), landed independently for its own promotion. #6 = Plan-Tree Hierarchy Governance (`plan_tree_governance`), added 2026-06-12 as a deliberate predicate-challenge sample. Neither retrofitted.
 - [x] At least one sample that DOES NOT fit perfectly — analyze why (essential signal: 6-step is correct, or 6-step has variants, or 6-step is wrong)
-  - **Evidence**: now **two** non-fitting samples on **two different steps**: #4 (Runtime Index) missing *Rule* (optional for **structural** invariants), #5 (F19) missing *Projection* (optional when the executor **consumes the authoritative source directly**). Analysed in draft §"Per-step counts". Essential signal = **"6-step is not an invariant — it is a 4-step invariant core + 2 conditional stages"** (the variants branch, but stronger than "noise").
+  - **Evidence**: **three** non-fitting samples: #4 (Runtime Index) missing *Rule* (structural invariant), #5 (F19) + #6 (Plan-Tree) missing *Projection* (executor consumes the authoritative source directly). Analysed in draft §"Per-step counts" + predicate sections. Essential signal = **"6-step is not an invariant — it is a 4-step invariant core + 2 conditional stages"** (the variants branch, stronger than "noise").
 - [x] Cross-check: the 6 steps each have ≥3 samples (each step's universality verified, not just the chain's)
-  - **Evidence**: per-step counts (N=5) — Observation 5, Rule 4, Registry 5, Projection 4, Executor 5, Validation 5; all ≥4.
+  - **Evidence**: per-step counts (N=6) — Observation 6, Rule 5, Registry 6, Projection 4, Executor 6, Validation 6; all ≥4.
 
-**Gate met 2026-06-12 — and the result is stronger than "gate passed".** The gate tested whether 6-step is an invariant; the answer is **no, but it is not wrong**: Observation / Registry / Executor / Validation are the invariant core (5/5), while **Rule** is conditionally required for *policy-derived* governance and **Projection** is conditionally required for *indirect-consumption* executors. The promotable artifact is a **4-step invariant core + 2 conditional steps**, not a rigid 6-step checklist.
+**Gate met 2026-06-12 — and the result is stronger than "gate passed".** The gate tested whether 6-step is an invariant; the answer is **no, but it is not wrong**: Observation / Registry / Executor / Validation are the invariant core (6/6), while **Rule** is conditionally required for *policy-derived* governance (rule_class granularity) and **Projection** is conditionally required for *indirect-consumption* executors (now 2 confirming samples). The promotable artifact is a **4-step invariant core + 2 conditional steps**, not a rigid 6-step checklist.
 
 If the gate is met → extract to `governance/lifecycle/governance-pattern-template.md` as a positive template (sibling of failure patterns; failure patterns capture anti-patterns, this captures positive recurring shape).
 
@@ -93,7 +93,12 @@ Place draft analysis at: [`governance/lifecycle/governance-pattern-library-draft
   - **Decision (2026-06-12)**: coverage is uneven but **principled** — Rule (4/5) optional for *policy-derived* governance vs structural invariants; Projection (4/5) optional when the executor *consumes the authoritative source directly* (predicate stated at contract level, not implementation). Revised shape = **4-step invariant core (Observation → Registry → Executor → Validation) + 2 conditional steps (Rule, Projection)**. This closes Phase 1.
 - [ ] If samples diverge significantly → abandon promotion; keep observation in draft only
 
-**Phase 2 precondition (recommended, not gate-blocking)**: before freezing template wording, find a 6th sample chosen specifically to *challenge* the two conditional predicates (Rule-optional, Projection-optional). The two predicates — not the sample count — are the real knowledge frontier; a 6th sample that still obeys them raises the 4-step core's confidence above N=5, and one that breaks a predicate must be absorbed into the variant wording before promotion.
+**Phase 2 precondition — partially discharged (2026-06-12)**: the 6th predicate-challenge sample (Plan-Tree Hierarchy Governance) is inventoried. Result:
+- **Projection-optional — confirmed twice.** #6 is a second independent direct-consumption-no-projection case (commit-msg validator over plan frontmatter vs F19's compile-time lint over registry yaml). Predicate 2 now rests on two clean samples.
+- **Rule-optional — refined, not independently re-confirmed.** #6's structural sub-invariant (`validatePlanTreeUniqueID`) rides on a policy rule_class's rule surface, sharpening the predicate to **rule_class granularity** but not adding a second clean standalone structural-no-rule case. Predicate 1 still rests on #4 alone.
+- **New nuance**: Validation has interchangeable Go-test / scenario-yaml sub-forms (#6 is Validation-complete via `plan_tree_test.go` while `scenario_exists: pending`).
+
+**Remaining open test before freezing template wording**: an *entirely structural* rule_class confirmed to carry **no** Rule surface (clean second case for predicate 1). Candidate: `runtime-trigger-wiring`. Not gate-blocking, but recommended before Phase 2 extraction freezes variant wording.
 
 ## Phase 2 — Template extraction (only if gate passes)
 
