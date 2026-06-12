@@ -52,16 +52,45 @@ type linkFinding struct {
 //
 // Plan: plans/archived/2026-06-11-1100-plan-archival-link-integrity.md
 // Phase: 1 (Implementation — outbound + inbound + bare textual scan).
+// validatePlanArchivalLinkIntegrity returns the BLOCK-severity findings only
+// (broken markdown links, in either direction). It is the commit-msg validator
+// registered in commitMsgValidatorRegistry, where the dispatcher blocks on any
+// non-empty return — so only objectively-broken links reach the gate.
+//
+// Warning-severity findings (stale bare textual references) are deliberately
+// NOT returned here: see warnPlanArchivalLinkIntegrity. This split resolves the
+// Acceptance Contract Violation where the three declared severities
+// (info/warning/block) collapsed to two (block / not-block) because the
+// dispatcher treats any non-empty string as a block — making "warning"
+// indistinguishable from "block" and defeating the provenance/low-friction
+// design. info/warning/block now map to: suppressed / advisory Check / gate.
 func validatePlanArchivalLinkIntegrity(text string, staged []string, root string) string {
+	return formatFindingsBySeverity(collectPlanArchivalLinkFindings(text, root), "block")
+}
+
+// warnPlanArchivalLinkIntegrity returns the WARNING-severity findings (stale
+// bare textual references to a renamed plan's old path). The commit-msg hook
+// surfaces this as a Check{Status:"warning"} — advisory only, NOT a block — so
+// an unmarked prose mention nudges without forcing a fix or an opt-out trailer.
+// Mirrors the non-blocking pattern of warnSanitizationIncidentScore.
+func warnPlanArchivalLinkIntegrity(text string, staged []string, root string) string {
+	return formatFindingsBySeverity(collectPlanArchivalLinkFindings(text, root), "warning")
+}
+
+// collectPlanArchivalLinkFindings detects staged plan-archive renames and
+// returns ALL findings (block + warning + info). Returns nil when the commit
+// opts out via the skip trailer or stages no plan archive rename. Shared by the
+// block validator and the advisory warning surface so both see identical scans.
+func collectPlanArchivalLinkFindings(text, root string) []linkFinding {
 	for _, line := range strings.Split(text, "\n") {
 		if strings.TrimSpace(line) == "[skip-plan-archival-link-integrity]" {
-			return ""
+			return nil
 		}
 	}
 
 	renames := detectPlanArchivalRenames(root)
 	if len(renames) == 0 {
-		return ""
+		return nil
 	}
 
 	renameMap := make(map[string]string, len(renames))
@@ -107,7 +136,7 @@ func validatePlanArchivalLinkIntegrity(text string, staged []string, root string
 		findings = append(findings, scanBareTextualReferences(mdPath, content, renames)...)
 	}
 
-	return formatLinkFindings(findings)
+	return findings
 }
 
 // readFileForScan reads content for the inbound / textual scan. The
@@ -221,7 +250,11 @@ func classifyLink(fromFile string, link Link, renameMap map[string]string, root,
 		return linkFinding{}, false
 	}
 	resolved := resolveRepoPath(fromFile, target)
-	if resolved == "" {
+	// A target that resolves to "" or escapes the repo root (leading "..")
+	// is out of scope: never treat it as a repo path. Without this guard the
+	// existence check would os.Stat a path OUTSIDE the repo, which can falsely
+	// report "exists" and silently pass a genuinely broken link (Finding 3).
+	if resolved == "" || resolved == ".." || strings.HasPrefix(resolved, "../") {
 		return linkFinding{}, false
 	}
 	if newPath, ok := renameMap[resolved]; ok {
@@ -372,38 +405,40 @@ func posixRel(fromDir, toPath string) string {
 	return strings.Join(parts, "/")
 }
 
-// formatLinkFindings groups findings by severity and emits block + warning
-// sections. Info findings are intentionally suppressed from output — the
-// provenance marker exists precisely to silence them. Returns "" when
-// only info findings are present.
-func formatLinkFindings(findings []linkFinding) string {
-	var blocks, warnings []linkFinding
+// formatFindingsBySeverity renders ONLY the findings of the requested severity
+// ("block" or "warning"). info findings are never rendered — the provenance
+// marker exists precisely to silence them. Returns "" when no finding of that
+// severity is present.
+//
+// The single-severity output is what lets warning-severity findings stay
+// non-blocking: validatePlanArchivalLinkIntegrity asks for "block" (and returns
+// "" for a warning-only archive, so the dispatcher does not block), while the
+// advisory surface asks for "warning".
+func formatFindingsBySeverity(findings []linkFinding, severity string) string {
+	var sel []linkFinding
 	for _, f := range findings {
-		switch f.Severity {
-		case "block":
-			blocks = append(blocks, f)
-		case "warning":
-			warnings = append(warnings, f)
+		if f.Severity == severity {
+			sel = append(sel, f)
 		}
 	}
-	if len(blocks) == 0 && len(warnings) == 0 {
+	if len(sel) == 0 {
 		return ""
 	}
 	var out strings.Builder
-	out.WriteString("plan-archival-link-integrity: archive event leaves references requiring attention:")
-	if len(blocks) > 0 {
-		out.WriteString("\n  blocking:")
-		for _, f := range blocks {
-			out.WriteString("\n    - " + formatFindingLine(f))
-		}
+	switch severity {
+	case "block":
+		out.WriteString("plan-archival-link-integrity: archive breaks markdown reference(s):")
+	default:
+		out.WriteString("plan-archival-link-integrity (advisory): stale textual reference(s):")
 	}
-	if len(warnings) > 0 {
-		out.WriteString("\n  warnings:")
-		for _, f := range warnings {
-			out.WriteString("\n    - " + formatFindingLine(f))
-		}
+	for _, f := range sel {
+		out.WriteString("\n    - " + formatFindingLine(f))
 	}
-	out.WriteString("\n  Update each reference, or add a standalone `[skip-plan-archival-link-integrity]` trailer for emergency archives.")
+	if severity == "block" {
+		out.WriteString("\n  Update each reference, or add a standalone `[skip-plan-archival-link-integrity]` trailer for emergency archives.")
+	} else {
+		out.WriteString("\n  Update the reference or add a `<!-- archival-provenance -->` marker. Advisory only — does NOT block the commit.")
+	}
 	return out.String()
 }
 

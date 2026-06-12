@@ -82,9 +82,6 @@ func TestValidatePlanArchivalLinkIntegrity_OutboundBroken(t *testing.T) {
 	if got == "" {
 		t.Fatalf("expected block finding for broken outbound link; got empty")
 	}
-	if !strings.Contains(got, "blocking:") {
-		t.Errorf("expected blocking section; got: %s", got)
-	}
 	if !strings.Contains(got, "broken_outbound_link") {
 		t.Errorf("expected broken_outbound_link category; got: %s", got)
 	}
@@ -117,6 +114,9 @@ func TestValidatePlanArchivalLinkIntegrity_InboundBroken(t *testing.T) {
 }
 
 func TestValidatePlanArchivalLinkIntegrity_TextualWarning(t *testing.T) {
+	// Acceptance Contract: a stale bare textual mention is WARNING severity —
+	// it must NOT block the commit. The block validator returns "" (so the
+	// dispatcher does not block); the advisory surface returns the warning.
 	root := setupArchivalRepo(t)
 	writeRepoFile(t, root, "plans/active/foo.md", "# foo\n")
 	writeRepoFile(t, root, "docs/notes.md", "Note: see plans/active/foo.md when you need context.\n")
@@ -124,18 +124,74 @@ func TestValidatePlanArchivalLinkIntegrity_TextualWarning(t *testing.T) {
 	runGitFixture(t, root, "commit", "-qm", "init", "--no-verify")
 	archivePlan(t, root, "plans/active/foo.md", "plans/archived/foo.md")
 
-	got := validatePlanArchivalLinkIntegrity("", nil, root)
-	if got == "" {
-		t.Fatalf("expected warning finding for bare textual mention; got empty")
+	if got := validatePlanArchivalLinkIntegrity("", nil, root); got != "" {
+		t.Fatalf("warning-only archive must NOT block (validator must return empty); got: %s", got)
 	}
-	if !strings.Contains(got, "warnings:") {
-		t.Errorf("expected warnings section; got: %s", got)
+	warn := warnPlanArchivalLinkIntegrity("", nil, root)
+	if warn == "" {
+		t.Fatalf("expected advisory warning for bare textual mention; got empty")
 	}
-	if !strings.Contains(got, "stale_textual_reference") {
-		t.Errorf("expected stale_textual_reference category; got: %s", got)
+	if !strings.Contains(warn, "stale_textual_reference") {
+		t.Errorf("expected stale_textual_reference category; got: %s", warn)
 	}
-	if strings.Contains(got, "historical_provenance_reference") {
-		t.Errorf("did not expect info category in output; got: %s", got)
+	if !strings.Contains(warn, "advisory") {
+		t.Errorf("expected advisory framing; got: %s", warn)
+	}
+	if strings.Contains(warn, "historical_provenance_reference") {
+		t.Errorf("did not expect info category in output; got: %s", warn)
+	}
+}
+
+// The three dispatcher-semantics E2E cases requested in the Finding-1 review:
+// the gate blocks iff there is a block-severity (broken-link) finding;
+// warning-only archives pass while still surfacing the advisory.
+
+func TestPlanArchivalLinkIntegrity_OnlyBlock_BlocksNoWarn(t *testing.T) {
+	root := setupArchivalRepo(t)
+	writeRepoFile(t, root, "plans/active/sibling.md", "# sibling\n")
+	writeRepoFile(t, root, "plans/active/foo.md", "# foo\n\nSee [parent](./sibling.md).\n")
+	runGitFixture(t, root, "add", ".")
+	runGitFixture(t, root, "commit", "-qm", "init", "--no-verify")
+	archivePlan(t, root, "plans/active/foo.md", "plans/archived/foo.md")
+
+	if got := validatePlanArchivalLinkIntegrity("", nil, root); got == "" {
+		t.Fatalf("broken outbound link must block (non-empty validator return)")
+	}
+	if warn := warnPlanArchivalLinkIntegrity("", nil, root); warn != "" {
+		t.Errorf("no textual reference present, warn channel must be empty; got: %s", warn)
+	}
+}
+
+func TestPlanArchivalLinkIntegrity_OnlyWarning_AllowedSurfaced(t *testing.T) {
+	root := setupArchivalRepo(t)
+	writeRepoFile(t, root, "plans/active/foo.md", "# foo\n")
+	writeRepoFile(t, root, "docs/notes.md", "Background: plans/active/foo.md described it.\n")
+	runGitFixture(t, root, "add", ".")
+	runGitFixture(t, root, "commit", "-qm", "init", "--no-verify")
+	archivePlan(t, root, "plans/active/foo.md", "plans/archived/foo.md")
+
+	if got := validatePlanArchivalLinkIntegrity("", nil, root); got != "" {
+		t.Fatalf("warning-only archive must be allowed (validator must return empty); got: %s", got)
+	}
+	if warn := warnPlanArchivalLinkIntegrity("", nil, root); warn == "" {
+		t.Errorf("advisory must still surface the stale textual reference")
+	}
+}
+
+func TestPlanArchivalLinkIntegrity_BlockPlusWarning_BlocksAndWarns(t *testing.T) {
+	root := setupArchivalRepo(t)
+	writeRepoFile(t, root, "plans/active/sibling.md", "# sibling\n")
+	writeRepoFile(t, root, "plans/active/foo.md", "# foo\n\nSee [parent](./sibling.md).\n")
+	writeRepoFile(t, root, "docs/notes.md", "Background: plans/active/foo.md described it.\n")
+	runGitFixture(t, root, "add", ".")
+	runGitFixture(t, root, "commit", "-qm", "init", "--no-verify")
+	archivePlan(t, root, "plans/active/foo.md", "plans/archived/foo.md")
+
+	if got := validatePlanArchivalLinkIntegrity("", nil, root); got == "" {
+		t.Fatalf("broken link present, validator must block")
+	}
+	if warn := warnPlanArchivalLinkIntegrity("", nil, root); warn == "" {
+		t.Errorf("textual reference present, advisory must also surface")
 	}
 }
 

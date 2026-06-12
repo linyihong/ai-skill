@@ -2336,6 +2336,17 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		return result
 	}
 
+	// Advisory (non-blocking) surface: stale bare textual references left by a
+	// plan archive. Block-level link breakage goes through the commit-msg
+	// validator registry (obligation.commit.plan_archival_link_integrity);
+	// warnings must NOT block — emitted as a Check{Status:"warning"} that rides
+	// to whichever return below. Resolves the warning-severity-that-blocked
+	// Acceptance Contract Violation. text/root are in scope; staged is
+	// recomputed internally via git, so nil is fine here.
+	if w := warnPlanArchivalLinkIntegrity(text, nil, root); w != "" {
+		result.Checks = append(result.Checks, Check{Name: "plan_archival_link_warnings", Status: "warning", Message: w})
+	}
+
 	// v2 compact form path: "Cognitive: <e>·<c>·<g>·<m> / V:<v> / Cost:<cost> / Sig:<sig>"
 	// Valid only when all 6 dims are at their default values. Non-default dims require full form.
 	for _, line := range strings.Split(text, "\n") {

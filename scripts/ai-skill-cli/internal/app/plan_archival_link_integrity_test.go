@@ -262,40 +262,55 @@ func TestScanBareTextualReferences(t *testing.T) {
 	}
 }
 
-func TestFormatLinkFindings(t *testing.T) {
-	t.Run("info-only suppressed", func(t *testing.T) {
-		findings := []linkFinding{{
-			Severity: "info", Category: "historical_provenance_reference",
+func TestFormatFindingsBySeverity(t *testing.T) {
+	mixed := []linkFinding{
+		{Severity: "info", Category: "historical_provenance_reference",
 			File: "docs/x.md", Line: 3, Column: 1, Target: "plans/active/foo.md",
-			SuggestedReplacement: "plans/archived/foo.md",
-		}}
-		if got := formatLinkFindings(findings); got != "" {
-			t.Errorf("expected empty output for info-only findings, got: %q", got)
+			SuggestedReplacement: "plans/archived/foo.md"},
+		{Severity: "warning", Category: "stale_textual_reference",
+			File: "docs/x.md", Line: 5, Column: 10, Target: "plans/active/a.md"},
+		{Severity: "block", Category: "broken_outbound_link",
+			File: "plans/archived/a.md", Line: 1, Column: 1, Target: "../active/b.md",
+			SuggestedReplacement: "b.md"},
+	}
+
+	t.Run("block severity renders only block findings", func(t *testing.T) {
+		got := formatFindingsBySeverity(mixed, "block")
+		if !strings.Contains(got, "broken_outbound_link") || !strings.Contains(got, `suggested: "b.md"`) {
+			t.Errorf("expected block finding rendered, got: %q", got)
+		}
+		if strings.Contains(got, "stale_textual_reference") || strings.Contains(got, "historical_provenance_reference") {
+			t.Errorf("block output must not include warning/info findings, got: %q", got)
 		}
 	})
-	t.Run("block + warning separated", func(t *testing.T) {
-		findings := []linkFinding{
-			{Severity: "warning", Category: "stale_textual_reference",
-				File: "docs/x.md", Line: 5, Column: 10, Target: "plans/active/a.md"},
-			{Severity: "block", Category: "broken_outbound_link",
-				File: "plans/archived/a.md", Line: 1, Column: 1, Target: "../active/b.md",
-				SuggestedReplacement: "b.md"},
+
+	t.Run("warning severity renders only warning findings (advisory header)", func(t *testing.T) {
+		got := formatFindingsBySeverity(mixed, "warning")
+		if !strings.Contains(got, "stale_textual_reference") || !strings.Contains(got, "advisory") {
+			t.Errorf("expected advisory warning finding rendered, got: %q", got)
 		}
-		got := formatLinkFindings(findings)
-		if !strings.Contains(got, "blocking:") || !strings.Contains(got, "warnings:") {
-			t.Errorf("expected both sections, got: %q", got)
-		}
-		// blocking must come before warnings
-		if strings.Index(got, "blocking:") > strings.Index(got, "warnings:") {
-			t.Errorf("blocking section must precede warnings, got: %q", got)
-		}
-		if !strings.Contains(got, `suggested: "b.md"`) {
-			t.Errorf("expected suggestion in output, got: %q", got)
+		if strings.Contains(got, "broken_outbound_link") {
+			t.Errorf("warning output must not include block findings, got: %q", got)
 		}
 	})
+
+	t.Run("info is never rendered at any severity", func(t *testing.T) {
+		infoOnly := []linkFinding{{Severity: "info", Category: "historical_provenance_reference",
+			File: "docs/x.md", Line: 3, Column: 1, Target: "plans/active/foo.md"}}
+		if got := formatFindingsBySeverity(infoOnly, "block"); got != "" {
+			t.Errorf("info-only block render must be empty, got: %q", got)
+		}
+		if got := formatFindingsBySeverity(infoOnly, "warning"); got != "" {
+			t.Errorf("info-only warning render must be empty, got: %q", got)
+		}
+	})
+
 	t.Run("empty findings yield empty output", func(t *testing.T) {
-		if got := formatLinkFindings(nil); got != "" {
-			t.Errorf("expected empty for empty findings, got: %q", got)
+		if got := formatFindingsBySeverity(nil, "block"); got != "" {
+			t.Errorf("expected empty for nil/block, got: %q", got)
+		}
+		if got := formatFindingsBySeverity(nil, "warning"); got != "" {
+			t.Errorf("expected empty for nil/warning, got: %q", got)
 		}
 	})
 }

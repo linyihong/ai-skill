@@ -137,11 +137,22 @@ Gen 3 Runtime Hardening
 ## Acceptance
 
 - Archiving a plan with a broken markdown link (任一方向) emits a **block** finding with `suggested_replacement` payload.
-- Archiving a plan with a stale **textual** path mention (non-link prose) emits a **warning** finding.
+- Archiving a plan with a stale **textual** path mention (non-link prose) emits a **warning** finding — **advisory only, does NOT block the commit**（見下方 Post-Archive Correction）。
 - Clean archive (all markdown links retargeted) passes with zero findings.
 - Bare-id provenance mentions（無路徑語法）do not false-positive.
 - Multi-archive in same commit: cross-references between simultaneously-archived plans are correctly resolved against the batch rename map.
 - Unsupported markdown constructs (reference-style links, HTML anchors, autolinks) are **ignored, not partially interpreted**. Validator intentionally supports only the markdown subset used by framework plan documents.
+
+## Post-Archive Correction（2026-06-12）— Acceptance Contract Violation 修正
+
+> Review（archive 後）發現 **Design ↔ Enforcement layer 斷裂**：plan 宣告三層 severity（`info` / `warning` / `block`），但 commit-msg dispatcher 的 contract 是 **「non-empty validator return = block」**。原始 `validatePlanArchivalLinkIntegrity` 把 block + warning 都放進同一個回傳字串，所以 **warning-severity（stale textual reference）實際上也 hard-block commit** —— `warning` 沒有執行語意，整個 provenance / low-friction 設計失效。且當時**無任何 end-to-end test** 斷言 dispatcher 行為，只測 formatter / scanner helper，所以漏掉。
+
+**修正（2026-06-12）**：
+- `validatePlanArchivalLinkIntegrity` 改為**只回 block-severity**（broken links）→ dispatcher block。
+- 新增 `warnPlanArchivalLinkIntegrity`（只回 warning-severity）→ commit-msg hook 以 `Check{Status:"warning"}` 非阻塞 surface（對齊 `warnSanitizationIncidentScore` pattern）。`formatLinkFindings` → `formatFindingsBySeverity`（單一 severity 渲染；`info` 永不渲染）。
+- 三個 dispatcher-semantics E2E：only-block → block / warn 空；only-warning → **不 block** + advisory surface；block+warning → block + advisory。
+- 順手修 Finding 3：`classifyLink` 對 resolve 後逃出 repo root（`..` 開頭）的 link 不做 out-of-repo `os.Stat`（避免 false "exists" 漏報）。
+- Framework 掃描確認：commit-msg registry 中**僅本 validator** 有此 warning-but-block 缺陷（其餘 warning 走 Check channel，genuine non-block）。
 
 ## Known Limitations / Technical Debt
 
