@@ -37,9 +37,14 @@ The 6-step shape fits all 4. **But 4 samples is not enough to confirm a framewor
 
 ## Acceptance gate (do NOT extract until met)
 
-- [ ] N ≥ 5 confirmed samples (one more genuine sample, not retrofitted)
-- [ ] At least one sample that DOES NOT fit perfectly — analyze why (essential signal: 6-step is correct, or 6-step has variants, or 6-step is wrong)
-- [ ] Cross-check: the 6 steps each have ≥3 samples (each step's universality verified, not just the chain's)
+- [x] N ≥ 5 confirmed samples (one more genuine sample, not retrofitted)
+  - **Evidence**: F19 (Validation Scenario Governance Executor, archived 2026-06-12) added as sample #5 in [`governance-pattern-library-draft.md`](../../governance/lifecycle/governance-pattern-library-draft.md) §"Sample inventory". Genuine, not retrofitted — F19 landed independently for its own promotion (`pending_implementation`→`mechanical`), not to fill this gate.
+- [x] At least one sample that DOES NOT fit perfectly — analyze why (essential signal: 6-step is correct, or 6-step has variants, or 6-step is wrong)
+  - **Evidence**: now **two** non-fitting samples on **two different steps**: #4 (Runtime Index) missing *Rule* (structural-invariant condition), #5 (F19) missing *Projection* (compile-time-direct-read condition). Analysed in draft §"Per-step counts" — Projection ⇔ hot-path hypothesis. Essential signal = **"6-step has variants"** (middle of the three).
+- [x] Cross-check: the 6 steps each have ≥3 samples (each step's universality verified, not just the chain's)
+  - **Evidence**: per-step counts (N=5) — Observation 5, Rule 4, Registry 5, Projection 4, Executor 5, Validation 5; all ≥4.
+
+**Gate met 2026-06-12.** Outcome is NOT "promote 6-step as-is" — the uneven (but principled) step coverage routes to Phase 1 middle branch: extract as a **4-step invariant core + 2 conditional steps**, not a rigid 6-step checklist.
 
 If the gate is met → extract to `governance/lifecycle/governance-pattern-template.md` as a positive template (sibling of failure patterns; failure patterns capture anti-patterns, this captures positive recurring shape).
 
@@ -82,7 +87,8 @@ Place draft analysis at: [`governance/lifecycle/governance-pattern-library-draft
 ## Phase 1 — Gate decision
 
 - [ ] If 5+ samples found AND ≥3 samples per step AND 6-step shape consistent → proceed to Phase 2
-- [ ] If samples found but step coverage uneven → revise template shape (e.g. some steps are optional, document variants)
+- [x] If samples found but step coverage uneven → revise template shape (e.g. some steps are optional, document variants)
+  - **Indicated branch (2026-06-12, pending owner confirmation)**: coverage is uneven in a principled way — Rule (4/5) and Projection (4/5) each conditionally optional under *distinct* falsifiable conditions (structural-invariant; compile-time-direct-read). Template should be **4-step invariant core + 2 conditional steps**, not rigid 6. Recommend confirming the two conditional rules against a 6th sample before freezing variant wording, then proceed to Phase 2.
 - [ ] If samples diverge significantly → abandon promotion; keep observation in draft only
 
 ## Phase 2 — Template extraction (only if gate passes)

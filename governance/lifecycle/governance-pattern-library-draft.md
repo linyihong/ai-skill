@@ -21,19 +21,39 @@ The hypothesis: recent successful governance subsystems all decompose into these
 | 2 | Discovery Bridge (plan 2026-06-06-1700, Phase A landed) | detector-miss-no-fallback | `discovery-bridge.yaml` | `capability_discovery` rule_class | `runtime.discovery.config` | `discovery.go` + advisory injector | `workflow-discovery-bridge-light-v1.yaml` scenario |
 | 3 | Sanitization Mechanical Enforcement (plan 2026-06-06-1800, in design) | leak-on-canonical-write | `sanitization-patterns.yaml` + topology | `enforcement-registry` rule_class | `derived_match_tokens` | `sanitization_scan.go` | metadata-derived-fail/pass scenarios |
 | 4 | Runtime Index Freshness (commit c5874a8, landed) | source-tree checksum drift | (implicit) | `runtime-index.sqlite` | `sources` table | `nativeRuntimeIndexChecksumsCheck` + commit-msg validator | runtime-index-freshness tests |
+| 5 | Validation Scenario Governance Executor — F19 (plan 2026-06-01-0100, archived 2026-06-12) | declared coverage evidence unverified / dangling `coverage_evidence` refs (`coverage-evidence-dangling-reference.md`) | `coverage_evidence` schema in `enforcement-registry.yaml` (`validation_scenarios[]` / `regression_scenarios[]` / `coverage_target_pct`) | `enforcement-registry` F19 `validation_scenario_governance` rule_class + `executors[]` block | **(none — executor reads the registry yaml + scenario corpus directly at compile time)** | `scenario_lint.go` `LintValidationScenarios` wired into `runtime compile` | `scenario_lint_test.go` (5 tests, ≥1 fail+1 pass per check) + `scenario-lint-dangling-coverage-ref-regression-v1.yaml` |
 
-### Per-step counts (N=4)
+### Per-step counts (N=5)
 
 | Step | Filled cells | Notes |
 |---|---|---|
-| Observation | 4/4 | Universal so far |
-| Rule | 3/4 | #4 has "(implicit)" — first warning sign |
-| Registry | 4/4 | Universal so far |
-| Projection | 4/4 | Universal so far |
-| Executor | 4/4 | Universal so far |
-| Validation | 4/4 | Universal so far |
+| Observation | 5/5 | Universal so far |
+| Rule | 4/5 | #4 has "(implicit)" — structural-invariant hole |
+| Registry | 5/5 | Universal so far |
+| Projection | 4/5 | **#5 (F19) empty** — compile-time-direct-read hole (new this pass) |
+| Executor | 5/5 | Universal so far |
+| Validation | 5/5 | Universal so far |
 
-**Already a soft signal**: sample #4 has no explicit *Rule* layer. The rule is encoded directly in the executor (`nativeRuntimeIndexChecksumsCheck`) without a yaml/md surface declaring "checksum drift is forbidden." This may indicate the *Rule* step is optional when the invariant is structural (matches a checksum), not editorial (matches a pattern).
+**Two distinct optional-step signals now, on two different steps:**
+
+1. **Rule** (sample #4): no explicit *Rule* layer. The rule is encoded directly in the executor (`nativeRuntimeIndexChecksumsCheck`) without a yaml/md surface declaring "checksum drift is forbidden." Signal: *Rule* is optional when the invariant is **structural** (matches a checksum) rather than **editorial** (matches a pattern).
+2. **Projection** (sample #5 / F19): no projected intermediate surface. The executor `LintValidationScenarios` calls `loadRegistrySnapshot` + `os.ReadFile` to read `enforcement-registry.yaml` and the referenced scenario yaml **directly** at compile time; there is no `runtime.db` table or other pre-digested surface between the canonical source and the executor.
+
+**Why F19 has no Projection — a load-bearing hypothesis (Projection ⇔ hot path):**
+
+Projection appears to exist precisely when the executor runs in a **hot path** and cannot afford to re-read+parse canonical yaml on every invocation:
+
+| # | Executor runs at | Projection present? | Surface |
+|---|---|---|---|
+| 1 Workflow | PreToolUse (every non-Read tool call) | ✅ | `runtime.db` routes |
+| 2 Discovery | tool-call / advisory time | ✅ | `runtime.discovery.config` |
+| 3 Sanitization | per-commit | ✅ | `derived_match_tokens` |
+| 4 Runtime Index | compile + commit | ✅ (but Registry *is* the db: `sources` table) | `sources` table |
+| 5 F19 | `runtime compile` only | ❌ | reads canonical yaml directly |
+
+The pattern: **hot-path executors need a projection; a compile-time executor reading the canonical surface once per compile does not.** Sample #4 is the boundary case — it runs at compile time too, but its registry *is already* a SQLite db, so "reading the registry" and "reading a projection" collapse into the same `sources`-table read. F19 is the first sample where the registry is plain yaml and the executor is purely compile-time, so the Projection step has nothing to do and is genuinely absent — not skipped for convenience.
+
+This is the inverse relationship to the Rule signal: Rule drops out for **structural** invariants; Projection drops out for **compile-time-direct-read** executors. The two optional steps are governed by different conditions, which is stronger evidence than two holes on the *same* step would have been.
 
 ## Counter-sample candidates (to inventory next)
 
@@ -57,11 +77,27 @@ When filling each candidate's row:
 
 | Criterion | Threshold | Current | Met? |
 |---|---|---|---|
-| Total samples | ≥ 5 | 4 | ❌ |
-| At least one non-fitting sample analysed | ≥ 1 | 0 (sample #4 partial) | ❌ |
-| ≥ 3 samples per step | ≥ 3 each | 3-4 each | ✅ |
+| Total samples | ≥ 5 | 5 (F19 added 2026-06-12) | ✅ |
+| At least one non-fitting sample analysed | ≥ 1 | 2 (#4 Rule-missing; #5/F19 Projection-missing) | ✅ |
+| ≥ 3 samples per step | ≥ 3 each | 4-5 each | ✅ |
 
-When all rows are ✅, proceed to Phase 2 of the plan. Until then, do not link this draft from `governance/lifecycle/README.md` and do not reference it as a normative pattern.
+**All three gate criteria are now met.** But meeting the gate does **not** mean "promote the 6-step chain as-is." Per plan Phase 1, three branches exist, and the evidence points to the **middle** one:
+
+> - If 5+ samples AND ≥3 per step AND 6-step shape **consistent** → Phase 2 as-is
+> - If samples found but **step coverage uneven** → **revise template shape (some steps optional, document variants)** ← we are here
+> - If samples diverge significantly → abandon promotion
+
+Step coverage is uneven in a *principled* way: Observation / Registry / Executor / Validation are 5/5 (invariant core), while **Rule (4/5) and Projection (4/5) are each conditionally optional under different conditions** (structural-invariant; compile-time-direct-read). So the promotable artifact is not a rigid 6-step checklist but a **4-step invariant core + 2 conditional steps**:
+
+```
+Observation → [Rule?] → Registry → [Projection?] → Executor → Validation
+              structural-           hot-path-
+              invariant skips       executor adds
+```
+
+This is a better outcome than a clean 5th confirmation would have been: a clean fit would have left confirmation-bias unrefuted, whereas two holes on two different steps, each with a falsifiable condition, is what lets the eventual template state *when* a step may be omitted instead of demanding all six unconditionally.
+
+Recommended Phase 1 disposition (for the plan author to confirm): proceed toward Phase 2 extraction, but author the template as **core + conditional steps**, and verify each conditional rule against the 6th sample before freezing the variant wording. Until the template lands, do not link this draft from `governance/lifecycle/README.md` and do not reference it as a normative pattern.
 
 ## Why this draft matters even if the gate never passes
 
@@ -77,13 +113,14 @@ Even if the 6-step hypothesis is disproved, the analysis produces durable knowle
 
 > Resolves Phase 0 checklist item "Check whether the pattern is sequential (always Observation → ... → Validation) or has parallel/optional branches".
 
-**Current evidence (N=4) is sequential, but with three nuances**:
+**Current evidence (N=5) is sequential, but with four nuances**:
 
-1. **Single optional step observed** — sample #4 (Runtime Index Freshness) has no explicit *Rule* layer; rule is encoded structurally in the executor (`nativeRuntimeIndexChecksumsCheck` matches sha256 against stored checksum). This is the first soft signal that *Rule* is conditionally optional: structural invariants (mechanical equality checks) may not need an editorial rule surface, while editorial invariants (what counts as a leak, what counts as a stale plan reference) always seem to.
-2. **Within-step parallelism in Executor** — samples #2 and #3 have executor pairs: Discovery Bridge has `discovery.go` core + advisory injector hook integration as two co-equal entry points; Sanitization Phase 1 (planned) has scanner core + commit-msg validator. The single "Executor" cell hides a sub-DAG. If 5th sample also shows multi-entry executors, the template should explicitly say "Executor = core + integration points" rather than a single function.
+1. **Two optional steps observed, on two different steps under two different conditions** — sample #4 (Runtime Index Freshness) has no explicit *Rule* layer (rule encoded structurally in `nativeRuntimeIndexChecksumsCheck`, a sha256 equality check); sample #5 (F19) has no *Projection* layer (executor reads canonical yaml directly at compile time). The governing conditions are independent: *Rule* drops out for **structural** invariants (mechanical equality, not editorial pattern); *Projection* drops out for **compile-time-direct-read** executors (no hot path → no need to pre-digest the canonical surface). See §"Per-step counts" for the Projection ⇔ hot-path table.
+2. **Within-step parallelism in Executor** — samples #2 and #3 have executor pairs: Discovery Bridge has `discovery.go` core + advisory injector hook integration as two co-equal entry points; Sanitization Phase 1 (planned) has scanner core + commit-msg validator. F19 also shows the within-step structure but at a *single* placement: its executor is `runtime compile`-only, with commit-transaction dual-placement explicitly deferred (child plan Q6 + "Close and Observe" decision). The single "Executor" cell hides a sub-DAG whose *cardinality* itself varies (1 placement for F19, 2 for #2/#3); the template should say "Executor = core + integration points (placement count is a per-subsystem decision, see `validation-coverage-gap-executor-placement.md`)".
 3. **No observed re-entry / loop** — every sample so far is one-pass from Observation to Validation. No sample has a "Validation discovers gap → re-enter Rule" cycle yet, though Phase D of Discovery Bridge (3-week empirical) is essentially that. The shape may turn out to have a feedback loop annotation for subsystems with empirical iteration gates.
+4. **Observation can be a named failure pattern, not just an ad-hoc note** — F19's Observation cell points at a *promoted* failure pattern (`coverage-evidence-dangling-reference.md`), where samples #1–#4 had inline observations. This suggests the mature form of the Observation step is "a failure pattern in `enforcement/failure-patterns/`," and the 6-step (positive) family is the constructive dual of the failure-pattern (anti-pattern) family — consistent with the plan's "this captures the positive shape the anti-pattern violates against."
 
-**Working interpretation**: the shape is **mostly sequential with a single optional step (Rule) and within-step branching at Executor**. Whether this holds against 5th + 6th samples will determine if the template captures the sequence as-is or with explicit branch / optional notation.
+**Working interpretation (updated N=5)**: the shape is **a 4-step invariant core (Observation → Registry → Executor → Validation) with two conditionally-optional steps (Rule, Projection) inserted under distinct conditions, plus within-step branching at Executor**. The two optional steps being governed by *different* falsifiable conditions — rather than two holes on the same step — is what upgrades this from "soft signal" to "document as variants" (plan Phase 1 middle branch). A 6th sample should be used to test the two conditions, not just to add another tally mark.
 
 ---
 
