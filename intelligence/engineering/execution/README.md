@@ -9,4 +9,5 @@
 | [`software-delivery-cognition/`](software-delivery-cognition/README.md) | 將 requirements / architecture cognition 轉成 delivery sequence。 |
 | [`task-decomposition/`](task-decomposition/README.md) | 將 contracts / scenarios / architecture decisions 拆成 work slices。 |
 | [`validation-reasoning/`](validation-reasoning/README.md) | 判斷 proof acquisition 是否足夠。 |
+| [`reference-reasoning/`](reference-reasoning/README.md) | Reference → explicit spec → implement（Reference-Driven Development）。 |
 | [`recovery-thinking/`](recovery-thinking/README.md) | delivery mismatch 時如何重建 execution graph。 |
