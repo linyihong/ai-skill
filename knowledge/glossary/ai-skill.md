@@ -805,8 +805,8 @@ meaning: >
   Validation is the current workflow-local expression of this pressure.
 affects:
   - workflow/software-delivery/validation.md
-  - plans/active/2026-06-09-1040-experience-validation-pipeline-evolution.md
-  - plans/active/2026-06-10-0908-user-journey-validation-integration.md
+  - plans/archived/2026-06-09-1040-experience-validation-pipeline-evolution.md
+  - plans/archived/2026-06-10-0908-user-journey-validation-integration.md
 anti-meaning: >
   Not a replacement for contract, behavior, accessibility, or responsive
   validation. It complements those targets by requiring evidence that the
