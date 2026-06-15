@@ -307,16 +307,16 @@ counterfactual: >
 - [x] OQ-5 resolved — reject token inheritance
 - [x] Decision: **Phase 0 complete**；**Phase 1 Ready** — 開始建 evidence-types catalog
 
-## Phase 1 — Evidence Taxonomy Catalog（Ready）
+## Phase 1 — Evidence Taxonomy Catalog ✅
 
-- [ ] 建立 `validation/evidence-types/README.md`（L3=Validation Capability + 三分法 + **OQ-5 reject inheritance**）
-- [ ] 建立 6 個 evidence_type 檔（含 `temporal-behavior.md`；**不含** `timing_gate`）
-- [ ] 每 type 檔含 `supported_collection_methods` / `supported_artifact_shapes`（禁止 inheritance 樹）
-- [ ] 更新 `validation/README.md` 與 `workflow/software-delivery/validation/README.md` 交叉引用
-- [ ] 新增 validation scenario stub：`validation/scenarios/software-delivery/evidence-type-projection-break-v1.yaml`
-- [ ] 更新 [`2026-06-09-1040-experience-validation-pipeline-evolution.md`](2026-06-09-1040-experience-validation-pipeline-evolution.md) §與其他 plans 的關係
+- [x] 建立 `validation/evidence-types/README.md`（L3=Validation Capability + 三分法 + **OQ-5 reject inheritance**）
+- [x] 建立 6 個 evidence_type 檔（含 `temporal-behavior.md`；**不含** `timing_gate`）
+- [x] 每 type 檔含 `supported_collection_methods` / `supported_artifact_shapes`（禁止 inheritance 樹）
+- [x] 更新 `validation/README.md` 與 `workflow/software-delivery/validation/README.md` 交叉引用
+- [x] 新增 validation scenario stub：`validation/scenarios/software-delivery/evidence-type-projection-break-v1.yaml`
+- [x] 更新 [`2026-06-09-1040-experience-validation-pipeline-evolution.md`](2026-06-09-1040-experience-validation-pipeline-evolution.md) §與其他 plans 的關係
 
-**Phase 1 完成條件**：6 個 evidence_type 可機械引用；README 明記 reject inheritance。
+**Phase 1 完成條件**：6 個 evidence_type 可機械引用；README 明記 reject inheritance。✅ **Downstream pilot**（preview-gate integration envelope）已消費 `user_visible` / `navigation` / `temporal_behavior`。
 
 ## Phase 2 — Authority + Gate Vocabulary（Framework + Project 並行）
 
@@ -348,7 +348,7 @@ counterfactual: >
 
 ## 完成條件（Plan-level）
 
-- [ ] Phase 1 evidence-types catalog 落地（6 types，含 `temporal_behavior`）
+- [x] Phase 1 evidence-types catalog 落地（6 types，含 `temporal_behavior`）
 - [ ] Phase 2 gate→claim→artifact trace 有 real closure example
 - [ ] Phase 3 cross-cutting experience-runtime 存在且**未**升 slice
 - [ ] Phase 4 至少 1 条 failure→authority→evolution catalog entry

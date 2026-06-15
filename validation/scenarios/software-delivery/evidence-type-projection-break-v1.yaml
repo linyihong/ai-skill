@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: evidence-type-projection-break-v1
+category: software-delivery
+domain: software-delivery
+version: v1
+type: routing-decision
+priority: P1
+source_plan: plans/active/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md
+source_phase: phase-1
+
+given:
+  task_intent: "Close out an immersive client UX change as validation complete."
+  routing_entry: route.workflow.software-delivery
+  artifacts:
+    - validation/evidence-types/README.md
+    - validation/evidence-types/user-visible.md
+    - validation/evidence-types/temporal-behavior.md
+    - workflow/software-delivery/validation/README.md
+  signals:
+    - bdd_or_contract_passes
+    - no_integration_envelope
+    - browser_review_activity_only
+  constraints:
+    - changed_surface_includes_time_bounded_client_transition
+
+when:
+  action: claim_ux_validation_complete
+
+then:
+  expected_load:
+    - validation/evidence-types/README.md
+    - validation/evidence-types/user-visible.md
+    - workflow/software-delivery/validation/README.md
+  expected_route:
+    - require_evidence_type_tokens_not_collection_method
+    - require_claim_linked_artifacts
+    - trace_chain_gate_claim_artifact
+    - reject_browser_review_as_gate_token
+  expected_governance:
+    domain: Closure
+    validation_mechanism: integration_envelope
+    evidence_class: user_visible
+    severity: block
+  forbidden_routes:
+    - approve_on_bdd_string_assert_only
+    - put_browser_observation_in_gate_requires
+    - claim_complete_with_screenshot_only_no_claim
+    - model_evidence_type_as_inheritance_tree
+
+pre_source_wiring_expectation:
+  before_evidence_types_catalog: FAIL
+  reason: "L2 behavior can pass while L3 validation capability and typed evidence are missing."
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - validation/evidence-types/README.md#Three-way-taxonomy
+    - validation/evidence-types/README.md#OQ-5-token-inheritance--reject
+    - workflow/software-delivery/validation/README.md#Evidence-Types-gate-vocabulary

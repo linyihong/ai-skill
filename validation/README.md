@@ -14,6 +14,7 @@
 
 ```
 validation/
+├── evidence-types/      # L3 evidence_type catalog（what was proven；gate requires 只用 type token）
 ├── scenarios/           # 測試情境（YAML）
 │   ├── apk-analysis/    # APK 分析領域
 │   ├── app-dev/         # App 開發領域
@@ -39,8 +40,19 @@ validation/
 | 驗證目標 | 文件完整性、路徑正確性 | Rule obedience、routing stability |
 | 執行時機 | Commit 前 | 架構變更後、模型升級後 |
 
+## Evidence Types Catalog
+
+L3 **Validation Capability** produces Evidence（artifact + proof shape）。`evidence_type` 只回答「證明了什麼」；`collection_method` 與 `artifact_shape` 不得作 gate token。
+
+- Catalog: [`evidence-types/README.md`](evidence-types/README.md)
+- Types: `source_contract`, `user_visible`, `navigation`, `state_persistence`, `media_playback`, `temporal_behavior`
+- Gate `requires:` 只列 `evidence:<type>`；trace chain：**gate → claim → artifact**
+- OQ-5 **reject inheritance** — 用各 type 檔內 `supported_collection_methods` / `supported_artifact_shapes` 對照，不建 subtype 樹
+- Scenario stub: [`scenarios/software-delivery/evidence-type-projection-break-v1.yaml`](scenarios/software-delivery/evidence-type-projection-break-v1.yaml)
+
 ## Software Delivery Scenarios
 
+- `software-delivery/evidence-type-projection-break-v1.yaml` — L2 behavior 已寫但 L3 evidence_type 缺失時不得宣稱 UX complete；`browser_review` 不得作 pass/fail token。
 - `software-delivery/requirement-contradiction.yaml` — requirement / BDD / tests 衝突時不得直接 implementation。
 - `software-delivery/product-impact-misalignment.yaml` — Impact Map 與 Customer Journey 不一致時不得直接產生 BDD 或 implementation plan。
 - `software-delivery/missing-validation-target.yaml` — acceptance criteria 缺 validation target 時不得宣稱 ready。

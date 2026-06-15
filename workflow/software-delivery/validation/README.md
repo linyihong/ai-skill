@@ -21,6 +21,17 @@ Validation stage 負責 proof acquisition：behavior correctness、business inva
 
 [`execution-flow.md`](../execution-flow.md) §4 測試策略定義 已確認測試策略；§7 驗證 執行 proof acquisition；§Test-First Ordering callout 確認 framework 升級已遵循順序。
 
+## Evidence Types（gate vocabulary）
+
+Gate `requires:` 只允許 **evidence_type** token（例如 `evidence:user_visible`）。`collection_method`（如 `browser_observation`）與 `artifact_shape`（如 `screenshot`）屬於 integration envelope 欄位，**不得**進 `requires:`。
+
+- Catalog: [`validation/evidence-types/README.md`](../../../validation/evidence-types/README.md)
+- Trace chain: **gate → claim → artifact**（禁止只有 artifact 無 claim）
+- `browser_review` = activity summary only；不是 pass/fail token
+- OQ-5: **reject token inheritance** — 見 catalog README
+
+Phase 2 將補 [`evidence-gate-vocabulary.md`](evidence-gate-vocabulary.md)（本檔先交叉引用 catalog）。
+
 ## Live Evidence Chain Guide
 
 當變更命中 [`state-visibility-gap.md`](../../../intelligence/engineering/execution/validation-reasoning/state-visibility-gap.md) 時，validation stage 必須取得足以支持 claim 的 evidence chain，而不只是一個局部測試結果。
