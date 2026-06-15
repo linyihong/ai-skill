@@ -1,7 +1,7 @@
 ---
 id: 2026-06-06-1700-workflow-activation-discovery-bridge
 plan_kind: sub
-status: draft
+status: active
 owner: linyihong
 created: 2026-06-06
 parent: 2026-05-31-1900-workflow-activation-engine
@@ -20,11 +20,11 @@ sub_plan_reason: >
 
 # Workflow Activation: Discovery Bridge
 
-**Status**: `draft`
+**Status**: `active`（Phase 0 + Phase A landed；Phase C governance closeout 2026-06-15；**Phase B deferred** to clean spike；Phase D = 三週 empirical time-gate）
 Owner: framework maintainer (linyihong)
 **世代**：Gen 3 runtime hardening — Workflow Activation Engine 第二採樣
 **建立日期**：2026-06-06
-**最後更新**：2026-06-06（v1 draft，rescope 自 v0 多 phase 草稿）
+**最後更新**：2026-06-15（Phase C governance closeout：failure pattern + governance 段 + glossary + registry stance；修復 Phase A.2/A.4/A.5 重複 checklist + status drift）
 **Priority**：**P2**
 **Parent plan**：[`2026-05-31-1900-workflow-activation-engine.md`](../archived/2026-05-31-1900-workflow-activation-engine.md)
 **Empirical trigger**：2026-06-05 session — 某消費 `route.workflow.travel-planning` 的 downstream project 內，使用者要求對一份命名遵循 project-local convention 的 dated artifact 進行 review。Detector miss（無 user keyword、無 path match），無 mechanical fallback，agent 直接憑常識做 review。文件命中 travel-planning artifact-gates 19 項中 7~10 項缺漏未被偵測。使用者三輪追問才暴露 gap，與 parent plan 2026-05-31 原 incident 為**同一結構性缺口的兩次採樣**。具體 project artifact、檔名與對話細節依 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) 留在原 project 文件。
@@ -317,29 +317,6 @@ PostToolUse:Read hook fires (artifact Read by agent)
 - [x] project overlay scan cache：per-session in-memory，cwd 改變時 invalidate
   - 實作為 `discovery.go::projectOverlayCache` map[cwd]→[]signalFact，per-session lifetime（runtime process 重啟即清）；cwd 改變透過 cache key 自然 isolation；TTL 30 分鐘 fallback（避免長 session 看不到 overlay 改動）。
 
-#### Phase A.2 — runtime.db schema + cache
-
-- [ ] `discovery_proposals` schema：`id` / `task_hash` / `route_candidates_json`（含 per-candidate `evidence_set`） / `signal_snapshot_json`（Phase A + 累積 Phase B 訊號快照，重算用）/ `scoring_version`（algorithm version tag，e.g. `light-v1`）/ `current_best_confidence`（derived, paired with scoring_version；單獨無語意）/ `status` (`awaiting_phase_b` / `advised` / `dismissed` / `rejected` / `expired`) / `created_at` / `updated_at`
-- [ ] **Per-candidate `evidence_set` 必須保留 top-N 具體 evidence items**（debug + governance 用），不只 score：
-  - 範例：`{route: travel-planning, score: 0.72, evidence: [{type: filename, value: "<dated-doc>.md"}, {type: token, value: "mapcode"}, {type: cwd_match, value: "<project-root>"}, {type: frontmatter_field, value: "declares_naming_pattern"}]}`
-  - 半年後若 Discovery 提出意外建議（e.g. suggested `software-delivery` for a travel task），無 evidence trace 就無法 debug
-  - N 預設 ≤ 5（避免 proposal row 失控），sanitization 保留（不存 raw private path / user data）
-- [ ] **Discovery 失敗分類（`miss_reason` enum）** — proposal 未生成 / 未達 threshold / 未注入 advisory 時必須記 reason 供 Phase D 量測分類：
-  - `no_artifact_reference` — user message 無 artifact 引用，Phase A signal 完全空
-  - `insufficient_signal` — 訊號有但對所有 route 都太弱（best score 接近 baseline）
-  - `confidence_below_threshold` — 有明顯 top candidate 但未過 threshold
-  - `cost_budget_exceeded` — Phase A/B p95 超預算 fail-open，未完成 scoring
-  - `manual_lock_bypass` — manual-lock active，按設計跳過 Discovery
-  - `eligibility_gate_fail` — discovery_bridge_eligibility 不滿足（user_msg 過短、24h 內已有同 task_hash proposal）
-  - 三週 Phase D 後依分類診斷：threshold 太高 vs signal source 不夠 vs eligibility 過嚴
-- [ ] **`dismissed` vs `rejected` 語意區隔**（telemetry 用，可量測 false positive）：
-  - `dismissed`：advisory 注入後 agent / user 未採納（沒 pivot），原因未知 — agent 可能本就掌握上下文、user 略過、advisory 不夠顯眼
-  - `rejected`：proposal 後續被證明 wrong — 例如 Phase B 重 score 後 candidate 從 top 跌出，或 manual-lock 鎖定其他 route，或 agent 顯式採納另一 route 的 primary_source
-  - Telemetry: `rejected / generated` ratio 直接量 false positive rate；`dismissed / advised` 量 advisory ergonomics 問題
-- [ ] **不可單獨儲存 confidence**：threshold / weight 變更後舊 `0.63 (v1)` ≠ `0.63 (v2)`。Phase D telemetry 必須以 `scoring_version` group-by，跨版本比較須走 re-score on `signal_snapshot_json`
-- [ ] TTL：預設 24h；可由 `runtime.discovery.config` 調
-- [ ] project overlay scan cache：per-session in-memory，cwd 改變時 invalidate
-
 #### Phase A.3 — Discovery 實作
 
 - [x] `discovery.go` 新建：function `RunLightDiscovery(taskInput, openFiles, cwd) []Candidate`
@@ -381,24 +358,6 @@ PostToolUse:Read hook fires (artifact Read by agent)
 - [x] Unit tests + regression scenario 綠 — 9/9 discovery test pass
 - [x] 2026-06-05 empirical trigger replay → Phase A 至少寫出 candidate — **MET**：proposal row 寫入 `discovery_proposals`，travel-planning 為 top candidate 之一，status=`awaiting_phase_b`
 
-#### Phase A.4 — Advisory injector
-
-- [ ] `hooks.go` PreToolUse pipeline：detector miss + proposal status=advised → 注入 advisory text
-- [ ] Advisory format：≤ 200 token、列 top-3 candidate + 各自 primary_source 路徑、明示「non-blocking, optional Read」
-- [ ] Cost 量測：p95 端到端 hook 延遲 ≤ 30ms（Phase A only）
-
-#### Phase A.5 — Regression scenario
-
-- [ ] `validation/scenarios/runtime/workflow-discovery-bridge-light-v1.yaml` 加 case：empirical trigger 的 task signature → expect Phase A advised travel-planning（若 confidence ≥ threshold）
-- [ ] Cross-project case：fake project + non-trivial task → expect Phase A non-trivial output
-
-**Phase A acceptance**：
-
-- 3 個 cross-project replay 至少 2 個 Phase A hit ≥ threshold
-- p95 hook 延遲 budget 達標
-- Unit tests + regression scenario 綠
-- 2026-06-05 empirical trigger replay → Phase A 至少寫出 candidate（即使未達 threshold，proposal 應存在）
-
 ### Phase B — Deep Discovery
 
 #### Phase B.1 — Read hijack 機制
@@ -433,12 +392,18 @@ PostToolUse:Read hook fires (artifact Read by agent)
 - 至少 2 個 cross-project replay 證明 Phase B 累積機制有效
 - 2026-06-05 incident replay 在 Phase A + B 組合下達到 advised 狀態
 
-### Phase C — Governance + Documentation
+### Phase C — Governance + Documentation（completed 2026-06-15）
 
-- [ ] `governance/workflow-activation-engine.md` 補 §Discovery Bridge 段落：Light/Deep 模型、scoring vs deterministic 區隔、advisory non-blocking 屬性、與 manual-lock 互動（manual-lock 時跳過 Discovery）
-- [ ] `enforcement/failure-patterns/detector-miss-no-fallback.md` 新建：empirical trigger + parent plan deferred 段 + Discovery Bridge 補強
-- [ ] `knowledge/glossary/ai-skill.md` 加 6 新 term（discovery_bridge / light_discovery / deep_discovery / discovery_proposal / advisory_injection / piggyback_read）
-- [ ] `enforcement/enforcement-registry.yaml` 評估是否加 `discovery_bridge_advisory` rule_class（advisory 不是 mechanical gate，可能不需要 registry entry — Phase 0.1 決策）
+- [x] `governance/workflow-activation-engine.md` 補 §Discovery Bridge 段落：Light/Deep 模型、scoring vs deterministic 區隔、advisory non-blocking 屬性、與 manual-lock 互動（manual-lock 時跳過 Discovery）
+  - **Evidence**: §"Discovery Bridge (miss-path advisory fallback)" + Scope Boundaries 更新 + Related links。含 advisory-never-a-gate / scoring-legal-because-advisory 兩條 invariant。
+- [x] `enforcement/failure-patterns/detector-miss-no-fallback.md` 新建：empirical trigger + parent plan deferred 段 + Discovery Bridge 補強
+  - **Evidence**: 檔案已建，Status validated，含 2-sample（2026-05-31 + 2026-06-05）、Half-Mechanized Gate 高階 pattern、registry README index row。
+- [x] `knowledge/glossary/ai-skill.md` 加 6 新 term（discovery_bridge / light_discovery / deep_discovery / discovery_proposal / advisory_injection / piggyback_read）
+  - **Evidence**: 6 term blocks added（status: candidate；無 sibling yaml，無 markdown_yaml_sync 連動；glossary README 為結構文件非 per-term index，無需更新）。
+- [x] `enforcement/enforcement-registry.yaml` 評估是否加 `discovery_bridge_advisory` rule_class（advisory 不是 mechanical gate，可能不需要 registry entry — Phase 0.1 決策）
+  - **決策：不登記。** Discovery 從不 block（advisory only），登成 `coverage: mechanical` rule_class 會把 advisory ranking 誤表成 enforcement gate，並招來 §Non-Goals 明文禁止的 auto-activation。被治理的對象是它緩解的 gap（`detector-miss-no-fallback` failure pattern），不是 advisory 本身；其效力以 Phase D empirical KPI 量測，而非 registry coverage cell 宣稱。Rationale 寫入 `governance/workflow-activation-engine.md` §Discovery Bridge。
+
+> **Phase A governance-complete, Phase B deferred.** Phase A（landed code）現已有治理文件背書：failure pattern + governance 段 + glossary + registry stance。Phase B（Read hijack spike）與 Phase D（三週 empirical）仍 open。
 
 ### Phase D — Empirical Validation（三週）
 

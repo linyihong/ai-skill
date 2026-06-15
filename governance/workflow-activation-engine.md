@@ -179,16 +179,63 @@ stays empty — the engine never auto-picks); `locked` → user manual-lock.
    topic shift. Keyword absence only updates `LastReinforcedAt` (optional soft
    warning), never auto-invalidates.
 
+## Discovery Bridge (miss-path advisory fallback)
+
+The deterministic detector covers the **hit path**: when a task matches a
+route's `activation_triggers`, the gate blocks until the route's
+`primary_source` is Read. The **miss path** (no trigger matches) is `fail-open`
+by design — activation must not depend on reading content (pre-Read
+circular-dependency break). But "fail-open" left the miss path with *no
+mechanical fallback at all*: the agent was expected to self-route by intuition,
+and when that failed the task completed with governance gates silently unmet
+(2026-06-05 incident; see
+[`enforcement/failure-patterns/detector-miss-no-fallback.md`](../enforcement/failure-patterns/detector-miss-no-fallback.md)).
+
+The **Discovery Bridge** is the miss-path fallback. On a detector miss it
+mechanically runs **Light Discovery** over pre-Read cheap signals (user message
+tokens, artifact basenames/paths/extensions, frontmatter head bytes, cwd,
+project-overlay metadata), scores the registry's routes, and — if the best
+candidate clears a confidence threshold — injects a PreToolUse **advisory**
+listing the top candidate route(s) and their `primary_source`. A deferred
+**Deep Discovery** phase piggybacks the agent's natural next Read to accumulate
+content signals. Landed surface: `scripts/ai-skill-cli/internal/app/discovery.go`
+(`RunDiscoveryBridge`); plan `2026-06-06-1700-workflow-activation-discovery-bridge`.
+
+Two invariants keep Discovery from corrupting the activation contract:
+
+- **Advisory, never a gate.** A Discovery proposal MUST NOT satisfy
+  `activation_triggers` and MUST NOT block a tool. Activation has exactly two
+  paths — (a) deterministic detector match, (b) user manual-lock — and Discovery
+  is never a third. `if proposal.confidence > X then auto_activate()` is
+  permanently forbidden in `detector.go` / `hooks.go` / `routing-registry.yaml`.
+- **Scoring is legal here precisely because it is advisory.** The
+  deterministic-rule / no-scoring requirement applies to the *activation gate*;
+  Discovery is *ranking*, not gating, so weighted scoring is appropriate and
+  must stay on the advisory side of the line.
+
+**Why Discovery Bridge is NOT a mechanical `enforcement-registry.yaml`
+rule_class.** Every `coverage: mechanical` rule_class binds an executor that
+*blocks* (compile/commit/PreToolUse deny). Discovery never blocks — it only
+advises — so registering it as a mechanical rule_class would misrepresent an
+advisory ranking as an enforcement gate, and would invite the very
+auto-activation the invariants above forbid. The Discovery Bridge is therefore
+deliberately *unregistered*; its governance lives here and in its plan, and its
+efficacy is measured empirically (Phase D KPI), not asserted by a registry
+coverage cell. The *gap it mitigates* (`detector-miss-no-fallback`) is the
+governed object; the advisory itself is not an enforcement obligation.
+
 ## Scope Boundaries
 
 **IS for**: the registry schema, the deterministic activation contract, the
-two-phase signal classification, and how a route's mode governs detector
-behavior.
+two-phase signal classification, how a route's mode governs detector behavior,
+and the Discovery Bridge's advisory contract + non-registration rationale.
 
 **NOT for**: the detector's Go implementation (Phase 3 — `detector.go`),
 in-memory `RuntimeContext` state (Phase 4), the per-turn obligation wiring
-(Phase 5), or the Discovery→Detector feedback loop (Phase 6). Those are tracked
-in the source plan and will link back here as they land.
+(Phase 5), or the Discovery Bridge's runtime implementation details and
+empirical tuning (Phase 6 — `discovery.go`; Phase A landed, Phase B deferred,
+Phase D = 3-week empirical). Those are tracked in the source plans and link
+back here as they land.
 
 ## Related
 
@@ -196,3 +243,6 @@ in the source plan and will link back here as they land.
 - [`constitution/ADR-012`](../constitution/ADR-012-route-type-activation-behavior-family.md) — `route_type` = activation behavior family
 - [`knowledge/runtime/routing-registry.yaml`](../knowledge/runtime/routing-registry.yaml) — canonical schema (`route_type_spec` / `activation_mode_spec` / `activation_triggers_spec`)
 - [`workflow/workflow-routing.md`](../workflow/workflow-routing.md) — Stage 2 ambiguity adjudication for multi-route hits
+- [`enforcement/failure-patterns/detector-miss-no-fallback.md`](../enforcement/failure-patterns/detector-miss-no-fallback.md) — the miss-path failure the Discovery Bridge mitigates
+- [`governance/lifecycle/capability-discovery-philosophy.md`](lifecycle/capability-discovery-philosophy.md) — Discovery→Detector feedback-loop philosophy
+- [`plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md`](../plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md) — Discovery Bridge plan (Phase A landed)

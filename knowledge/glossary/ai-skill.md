@@ -234,6 +234,153 @@ related-terms:
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```
 
+## discovery_bridge
+
+```yaml
+term: discovery_bridge
+status: candidate
+owner-layer: runtime-cognition
+meaning: >
+  The mechanical fallback on the workflow-activation detector's MISS path.
+  When deterministic activation finds no route, the Discovery Bridge runs
+  Light (pre-Read cheap signals) then optionally Deep (piggyback content)
+  discovery to rank candidate routes and inject a non-blocking advisory.
+  Converts "detector miss = silent total failure" into "detector miss =
+  advisory fallback", without ever becoming an activation path.
+affects:
+  - scripts/ai-skill-cli/internal/app/discovery.go
+  - governance/workflow-activation-engine.md
+  - enforcement/failure-patterns/detector-miss-no-fallback.md
+anti-meaning: >
+  Not an activation mechanism. A Discovery proposal never satisfies
+  activation_triggers and never blocks a tool; activation stays limited to
+  deterministic detector match or user manual-lock.
+related-terms:
+  - { type: related_to, target: discovery_signal }
+  - { type: part_of, target: light_discovery }
+  - { type: part_of, target: deep_discovery }
+introduced-by: plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+```
+
+## light_discovery
+
+```yaml
+term: light_discovery
+status: candidate
+owner-layer: runtime-cognition
+meaning: >
+  Phase A of the Discovery Bridge. On detector miss, scores registry routes
+  using only pre-Read cheap signals (user message tokens, artifact
+  basenames/paths/extensions, frontmatter head bytes ≤200B, cwd, project
+  overlay metadata) and emits top-3 candidates with a confidence score. Above
+  threshold → inject advisory; below → mark awaiting_phase_b.
+affects:
+  - scripts/ai-skill-cli/internal/app/discovery.go
+anti-meaning: >
+  Not a content scan — Light Discovery issues zero new Reads. Reading the
+  artifact body is Deep Discovery's job.
+related-terms:
+  - { type: part_of, target: discovery_bridge }
+  - { type: related_to, target: deep_discovery }
+introduced-by: plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+```
+
+## deep_discovery
+
+```yaml
+term: deep_discovery
+status: candidate
+owner-layer: runtime-cognition
+meaning: >
+  Phase B of the Discovery Bridge (deferred). Piggybacks the agent's natural
+  next artifact Read (hijacks the content stream, issues no new Read) to run a
+  content scan that refines the candidate set. Append-only evidence
+  accumulation with re-score across the full evidence set, not max() over
+  prior confidence, so early Light false positives can be overturned.
+affects:
+  - scripts/ai-skill-cli/internal/app/discovery.go
+anti-meaning: >
+  Does not initiate its own Read and does not overwrite prior proposals; it
+  accumulates evidence and re-ranks.
+related-terms:
+  - { type: part_of, target: discovery_bridge }
+  - { type: related_to, target: piggyback_read }
+  - { type: related_to, target: light_discovery }
+introduced-by: plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+```
+
+## discovery_proposal
+
+```yaml
+term: discovery_proposal
+status: candidate
+owner-layer: runtime-cognition
+meaning: >
+  A per-task Discovery Bridge record in runtime.db (`discovery_proposals`):
+  top-N candidate routes with scores + evidence_set, a signal_snapshot for
+  cross-version re-scoring, scoring_version, status
+  (awaiting_phase_b | advised | dismissed | rejected | expired), miss_reason
+  enum, and a 24h TTL. Confidence is never stored alone — always paired with
+  scoring_version + signal_snapshot.
+affects:
+  - scripts/ai-skill-cli/internal/app/discovery.go
+  - runtime/runtime.db
+anti-meaning: >
+  Not a routing decision and not a registry route. It is ephemeral runtime
+  state, never auto-promoted into routing-registry.yaml.
+related-terms:
+  - { type: part_of, target: discovery_bridge }
+  - { type: related_to, target: advisory_injection }
+introduced-by: plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+```
+
+## advisory_injection
+
+```yaml
+term: advisory_injection
+status: candidate
+owner-layer: runtime-cognition
+meaning: >
+  The Discovery Bridge's output mechanism: when a proposal clears threshold,
+  a ≤200-token, non-blocking advisory is written into the PreToolUse hook's
+  additionalContext, listing top candidate routes and their primary_source so
+  the agent may CHOOSE to Read the workflow. Explicitly marked optional /
+  non-blocking.
+affects:
+  - scripts/ai-skill-cli/internal/app/discovery.go
+  - scripts/ai-skill-cli/internal/app/hooks.go
+anti-meaning: >
+  Not a gate, not a deny, not a forced Read. The agent remains free to ignore
+  it; activation is never triggered by an advisory.
+related-terms:
+  - { type: related_to, target: discovery_proposal }
+  - { type: part_of, target: discovery_bridge }
+introduced-by: plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+```
+
+## piggyback_read
+
+```yaml
+term: piggyback_read
+status: candidate
+owner-layer: runtime-cognition
+meaning: >
+  Deep Discovery's zero-marginal-cost signal source: instead of issuing its
+  own Read, it subscribes to the agent's already-occurring artifact Read
+  (PostToolUse:Read) and scans that content stream. Each new Read appends
+  fresh evidence and triggers a re-score, making Discovery a stream-y,
+  append-only accumulation rather than a one-shot decision.
+affects:
+  - scripts/ai-skill-cli/internal/app/hooks.go
+  - scripts/ai-skill-cli/internal/app/discovery.go
+anti-meaning: >
+  Not a new file read initiated by the runtime; it only observes Reads the
+  agent was already going to perform.
+related-terms:
+  - { type: part_of, target: deep_discovery }
+introduced-by: plans/active/2026-06-06-1700-workflow-activation-discovery-bridge.md
+```
+
 ## ecosystem
 
 ```yaml
