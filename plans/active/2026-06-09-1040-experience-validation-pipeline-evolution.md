@@ -1,7 +1,7 @@
 ---
 id: 2026-06-09-1040-experience-validation-pipeline-evolution
 plan_kind: main
-status: in-progress
+status: completed
 owner: linyihong
 created: 2026-06-09
 priority: P2
@@ -10,7 +10,7 @@ required_for_completion: false
 
 # Experience Validation Pipeline Evolution
 
-**Status**: `in-progress`
+**Status**: `completed`（2026-06-15；Phase 4 Graduation Adjudication = Branch A：typed context taxonomy `rejected_for_now`，保留 watch-list reopen triggers）
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-09
 **Priority**：**P2**（taxonomy evolution / watch-list；不阻塞既有 responsive gate；Phase 1 metadata work 可獨立升 P1）
@@ -125,14 +125,16 @@ context:
 - `Responsive` 是否保留 domain 還有未解 open question。
 - Evidence metadata ownership 尚未決定：Capture Envelope vs per-artifact metadata。
 
-### ADR Promotion Criteria（completed 時驗證）
+### ADR Promotion Criteria（completed 時驗證 — evaluated 2026-06-15）
 
-- [ ] 至少 3 類 typed context（例如 render、appearance、environment、accessibility 或 interaction）產生真實 scenario 壓力。
-- [ ] 有至少 2 個例子顯示 domain × context 比獨立 domain 更清楚。
-- [ ] Validation Matrix 的 context selection 不再能靠 prose gate 管理，需要 formal artifact shape。
-- [ ] `viewport_metadata` / capture metadata 被至少一個 review artifact 實際消費。
-- [ ] Capture Envelope vs per-artifact metadata ownership 有清楚決策。
-- [ ] 沒有更輕量 promotion target（workflow note / validation scenario / template field）即可解決。
+評估結果：**6 條中只有 2 條成立，promotion 不通過 → Branch A**（見 §Phase 4 Graduation Adjudication）。
+
+- [x] 至少 3 類 typed context 產生真實 scenario 壓力 — **NOT met**：0/6 family 通過 3 題 gate。
+- [x] 有至少 2 個例子顯示 domain × context 比獨立 domain 更清楚 — **NOT met**：render/interaction 各僅單一 domain 消費。
+- [x] Validation Matrix 的 context selection 不再能靠 prose gate 管理，需要 formal artifact shape — **NOT met**：required/optional/high-risk prose gate 仍足夠（Phase 2）。
+- [x] `viewport_metadata` / capture metadata 被至少一個 review artifact 實際消費 — **MET**：H5 fixed-bottom review 消費了 viewport / visual-viewport / frame metadata（Phase 1）。
+- [x] Capture Envelope vs per-artifact metadata ownership 有清楚決策 — **MET**：shared Capture Envelope 擁有共通 metadata、artifact-specific 僅在差異時 local（Phase 1）。
+- [x] 沒有更輕量 promotion target（workflow note / validation scenario / template field）即可解決 — **NOT met**：更輕的 workflow note + coverage model + evidence selection 已能解，**不需** ADR-level taxonomy。
 
 ### Consequences（預期）
 
@@ -213,14 +215,14 @@ Runtime validation remains `ai-skill runtime compile`, `ai-skill runtime refresh
 
 ## Open Questions
 
-- [ ] Should `Responsive` remain a governance domain, or become a cross-cutting `context.render` dimension composed with domains such as Accessibility, Behavior, Design System, and Contract?
-- [ ] Should the future context model be a typed `context` taxonomy with render / interaction / accessibility / environment / appearance / locale groups?
+- [x] Should `Responsive` remain a governance domain, or become a cross-cutting `context.render` dimension composed with domains such as Accessibility, Behavior, Design System, and Contract? — **resolved (Phase 3 + Phase 4)**: keep `Responsive` as workflow-local domain; Phase 4 graduation inventory shows `render` does not meet the cross-domain typed-context gate. Reopen per Phase 4 Branch A triggers.
+- [x] Should the future context model be a typed `context` taxonomy with render / interaction / accessibility / environment / appearance / locale groups? — **resolved (Phase 4 Branch A)**: `rejected_for_now` — 0/6 families pass the 3-question gate; pressure was evidence-depth, not missing context families.
 - [x] What is the minimum capture metadata required for browser evidence to remain reviewable: viewport width/height, user agent, emulation/device profile, orientation, DPR, safe-area, render_context, or all of the above? — resolved (Phase 1 baseline): required = viewport width/height, orientation, render context; optional = DPR, user agent, emulation profile, safe area. Reopen only if future evidence needs safe-area, DPR, browser-specific, or similar metadata as required.
 - [x] Who owns evidence metadata: a shared Capture Envelope containing metadata plus artifacts, or per-artifact metadata under screenshot / DOM snapshot / accessibility scan / interaction trace? — resolved (Phase 1 baseline): shared Capture Envelope owns common capture metadata; artifact-specific metadata remains local only when it differs. Reopen only if future artifact examples show shared capture metadata causes ambiguity.
-- [ ] Should validation coverage be modeled explicitly as State Coverage + Context Coverage + Evidence Coverage?
-- [ ] Does Validation Coverage Model belong to UI workflow, or should it graduate to shared Validation Reasoning once API / runtime / workflow validation show the same coverage pressure?
-- [ ] How should matrix explosion be controlled: `required_contexts`, `optional_contexts`, `high_risk_contexts`, risk-triggered expansion, or another shape?
-- [ ] Should Capture Envelope remain browser-specific, or evolve into a generic Evidence Envelope shared across UI, API, runtime, and workflow validation? — initial Phase 4 spike answer: keep browser-specific for now; non-browser examples are promising but not stable enough for promotion.
+- [x] Should validation coverage be modeled explicitly as State Coverage + Context Coverage + Evidence Coverage? — **resolved (Phase 2)**: yes, as a non-executable watch-list note in `validation.md`; no executable gate added. Promotion to shared Validation Reasoning deferred (next OQ).
+- [x] Does Validation Coverage Model belong to UI workflow, or should it graduate to shared Validation Reasoning once API / runtime / workflow validation show the same coverage pressure? — **deferred with evidence (Phase 2/4)**: graduate to shared Validation Reasoning only after ≥3 non-UI domains reuse `state/context/evidence coverage + validation_scope`; the membership_purchase journey added outcome-depth pressure in that direction but is one domain.
+- [x] How should matrix explosion be controlled: `required_contexts`, `optional_contexts`, `high_risk_contexts`, risk-triggered expansion, or another shape? — **resolved (Phase 2)**: required / optional / high-risk contexts + risk-triggered expansion, not a Cartesian product.
+- [x] Should Capture Envelope remain browser-specific, or evolve into a generic Evidence Envelope shared across UI, API, runtime, and workflow validation? — **resolved (Phase 4 spike)**: keep browser-specific; generic Evidence Envelope deferred until ≥3 non-browser examples converge on a minimal schema (promote under validation reasoning, not UI workflow).
 
 ## Phase 0 — Plan and Current-State Alignment
 
@@ -306,34 +308,34 @@ Phase 3 evidence:
 
 ## Phase 4 — Typed Context Taxonomy Graduation Decision
 
-- [ ] Inventory future scenarios involving dark mode, high zoom, keyboard-only, screen reader, low bandwidth, offline, touch-only, route/history back-stack behavior, or localization.
+- [x] Inventory future scenarios involving dark mode, high zoom, keyboard-only, screen reader, low bandwidth, offline, touch-only, route/history back-stack behavior, or localization. — done; see §Phase 4 Graduation Adjudication (these are incidental or single-scenario in Vidoe-Test, no cross-domain family).
 - [x] Inventory non-browser evidence envelopes, such as API captures with endpoint/auth context, runtime captures with node/cluster context, or workflow captures with route/execution context.
   - Evidence: `intelligence/engineering/execution/validation-reasoning/evidence-model.md` defines evidence type / confidence / scope / proves for non-browser API/log/database/user-observable evidence.
   - Evidence: `intelligence/engineering/execution/validation-reasoning/evidence-chain-validation.md` defines claim → chain → segment evidence → gap/depth reasoning.
   - Evidence: `validation/scenarios/software-delivery/ui-governance-static-runtime-acquisition.yaml` and `ui-governance-contract-readback-acquisition.yaml` show static/runtime/contract readback acquisition shape.
   - Evidence: `validation/scenarios/runtime/workflow-detector-deterministic-match-v1.yaml` and `workflow-detector-conflict-resolution-v1.yaml` show runtime scenario transcript / constraints / trace / verification shape.
-- [ ] Decide whether each scenario is best represented as domain, typed context, coverage dimension, or evidence coverage.
+- [x] Decide whether each scenario is best represented as domain, typed context, coverage dimension, or evidence coverage. — see §Phase 4 Graduation Adjudication (render→`Responsive` domain; interaction→evidence-coverage; appearance→multi-theme contract; a11y/offline→evidence artifact / ungoverned).
 - [x] Decide whether browser-specific Capture Envelope should remain local or graduate into generic Evidence Envelope after non-browser examples exist.
   - Initial decision: keep browser-specific Capture Envelope local for now.
   - Reason: browser Capture Envelope is artifact-bundle oriented; validation reasoning examples are claim/chain/scope/confidence oriented; runtime scenarios are replay/trace/verification oriented.
   - Promotion risk: a generic envelope now would flatten artifact vs evaluation vs finding, or become a second runtime context schema.
-- [ ] Only draft an active typed Context Taxonomy update if promotion evidence meets all gates:
+- [x] Only draft an active typed Context Taxonomy update if promotion evidence meets all gates: — gate NOT met (0/6 families pass); no draft. See §Phase 4 Graduation Adjudication.
   - at least 3 context families are represented
   - each represented family has multiple scenarios
   - at least 2 workflow domains consume the taxonomy
-- [ ] Candidate context families must demonstrate cross-domain use before promotion, for example:
+- [x] Candidate context families must demonstrate cross-domain use before promotion, for example: — not demonstrated (render→UI governance only; interaction→UI validation only). See §Phase 4 Graduation Adjudication.
   - render used by responsive and accessibility
   - appearance used by accessibility and design-system
   - environment used by behavior and runtime validation
   - interaction used by UI behavior navigation and accessibility / input-modality validation
-- [ ] If promotion evidence passes, draft the active taxonomy with typed families:
+- [x] If promotion evidence passes, draft the active taxonomy with typed families: — N/A, promotion did not pass (Branch A). See §Phase 4 Graduation Adjudication.
   - render
   - interaction
   - accessibility
   - environment
   - appearance
   - locale
-- [ ] If examples remain one-off, keep the current Responsive domain model and close the plan with no taxonomy expansion.
+- [x] If examples remain one-off, keep the current Responsive domain model and close the plan with no taxonomy expansion. — **adopted (Branch A)**. See §Phase 4 Graduation Adjudication.
 
 ### Phase 4 Initial Evidence Envelope Spike
 
@@ -378,13 +380,61 @@ Consequence:
 - Do not add `experience_context`, generic `context`, or generic `evidence_bundle` runtime schema from this pilot alone.
 - If multiple non-UI workflow domains later reuse `state/context/evidence coverage + validation_scope`, consider promoting that model under shared Validation Reasoning before considering UI-specific taxonomy changes.
 
+### Phase 4 — Graduation Adjudication（2026-06-15）
+
+> **Reframe**：Phase 4 的工作不是發明 taxonomy，而是**嘗試推翻 promotion gate**。下表對每個
+> candidate family 問三題；**只有三題全 Yes 才升**（gate：≥3 families × 每 family ≥2 scenarios ×
+> ≥2 consuming domains × cross-domain）。Evidence base = Vidoe-Test pilots（fixed-bottom /
+> player→drama nav / membership_purchase journey）+ 該專案 frontend-contracts。
+
+| Family | ≥2 governed scenarios? | 被 ≥2 domains 消費? | 不做 typed context 會失去可判定性? | 升? |
+|---|---|---|---|---|
+| **render** | Yes（H5 fixed-bottom、mobile-only layout） | No（僅 UI governance） | No — 已有 `Responsive` domain + Capture Envelope metadata 判定 | ❌ |
+| **interaction** | No（1：player→drama→back route/history trace） | No | No — interaction-trace evidence 即可判定 | ❌ |
+| **appearance** | No（1：theme switch；`alt` 為 placeholder token，品牌未確認） | No（單一 multi-theme 前端契約） | No — `multi-theme.md` 契約直接治理 | ❌ |
+| **accessibility** | No（aria- 散見於 player tests；a11y-scan 是 **evidence artifact**，非 context family） | — | No | ❌ |
+| **locale** | No（i18n 是基礎設施，無 locale-**validation** scenarios；非 RTL/翻譯完整性治理） | — | No | ❌ |
+| **environment** | No（offline/network 散見、未治理） | — | No | ❌ |
+
+**裁決：0 個 family 通過三題。** 所有觀察到的壓力都被 **evidence depth / coverage / 既有 domain**
+解掉，不是被「缺 context family」造成。收斂結論：`Experience Validation Pipeline ≠ Context
+Explosion；≈ Coverage + Evidence Selection + Outcome Proof`。
+
+```yaml
+# Branch A（採用）— typed context taxonomy 不升
+decision:
+  typed_context_taxonomy: rejected_for_now
+reason:
+  - evidence pressure resolved by evidence depth (DB readback / protected-resource readback)
+  - coverage model (state/context/evidence) sufficient
+  - context families not converged (0/6 pass the 3-question gate)
+retain:
+  - Responsive (workflow-local domain)
+  - Capture Envelope (browser-evidence-scoped)
+promote_only:
+  - validation reasoning (state/context/evidence coverage), 待 ≥3 non-UI domains 復用後再議
+reopen_triggers:
+  - ≥3 context families each with ≥2 scenarios consumed by ≥2 domains
+  - a governed scenario that loses decidability without a typed context
+
+# Branch B（未觸發）— 保留以備將來
+decision:
+  typed_context_taxonomy: accepted
+requirements:
+  - ">=3 families"
+  - ">=2 domains"
+  - reusable artifact contract（render used by responsive+accessibility, etc.）
+```
+
+此裁決收束 §Phase 4 開頭的 6 個 open items（inventory / decide / gate / cross-domain / draft / close）為 **Branch A**；那 6 個 checkbox 已於原處勾選並指回本表。
+
 ## Completion Criteria
 
-- [ ] Open questions are either resolved or explicitly deferred with evidence.
-- [ ] Any docs changed by Phase 1 are validated with lints and `git diff --check`.
-- [ ] If runtime-indexed docs or scenarios change, runtime compile / refresh / validate pass.
-- [ ] `plans/README.md` status row is updated.
-- [ ] Commit / push completed if implementation phases are executed.
+- [x] Open questions are either resolved or explicitly deferred with evidence. — all 8 OQs resolved/deferred (see §Open Questions).
+- [x] Any docs changed by Phase 1 are validated with lints and `git diff --check`. — Phase 1 docs (`validation.md`) landed in prior commits; `git diff --check` clean (2026-06-15).
+- [x] If runtime-indexed docs or scenarios change, runtime compile / refresh / validate pass. — this closure touches only this plan md (not a runtime-indexed source); `ai-skill runtime validate` success.
+- [x] `plans/README.md` status row is updated. — status → completed; summary reflects Branch A closure.
+- [x] Commit / push completed if implementation phases are executed. — closure commit pushed (no runtime/code change; adjudication + bookkeeping only).
 
 ## Stakeholder 同意項目
 
