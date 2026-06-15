@@ -1,4 +1,4 @@
-version=repo-8ea1723
-source_commit=8ea1723
-built_at=2026-06-12T04:52:35Z
+version=repo-70024b2
+source_commit=70024b2
+built_at=2026-06-15T00:40:12Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
