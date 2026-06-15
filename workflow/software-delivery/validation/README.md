@@ -30,7 +30,8 @@ Gate `requires:` 只允許 **evidence_type** token（例如 `evidence:user_visib
 - `browser_review` = activity summary only；不是 pass/fail token
 - OQ-5: **reject token inheritance** — 見 catalog README
 
-Phase 2 將補 [`evidence-gate-vocabulary.md`](evidence-gate-vocabulary.md)（本檔先交叉引用 catalog）。
+- Gate vocabulary: [`evidence-gate-vocabulary.md`](evidence-gate-vocabulary.md)
+- Authority routing: [`authority-decision-table.md`](authority-decision-table.md)
 
 ## Live Evidence Chain Guide
 

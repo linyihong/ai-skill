@@ -48,7 +48,8 @@ L3 **Validation Capability** produces Evidence（artifact + proof shape）。`ev
 - Types: `source_contract`, `user_visible`, `navigation`, `state_persistence`, `media_playback`, `temporal_behavior`
 - Gate `requires:` 只列 `evidence:<type>`；trace chain：**gate → claim → artifact**
 - OQ-5 **reject inheritance** — 用各 type 檔內 `supported_collection_methods` / `supported_artifact_shapes` 對照，不建 subtype 樹
-- Scenario stub: [`scenarios/software-delivery/evidence-type-projection-break-v1.yaml`](scenarios/software-delivery/evidence-type-projection-break-v1.yaml)
+- Gate vocabulary: [`workflow/software-delivery/validation/evidence-gate-vocabulary.md`](../workflow/software-delivery/validation/evidence-gate-vocabulary.md)
+- Authority table: [`workflow/software-delivery/validation/authority-decision-table.md`](../workflow/software-delivery/validation/authority-decision-table.md)
 
 ## Software Delivery Scenarios
 

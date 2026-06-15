@@ -320,13 +320,13 @@ counterfactual: >
 
 ## Phase 2 — Authority + Gate Vocabulary（Framework + Project 並行）
 
-- [ ] 建立 `workflow/software-delivery/validation/evidence-gate-vocabulary.md`（只允許 `evidence_type` 進 `requires:`）
-- [ ] 建立 authority decision 對照表（framework / domain / implementation / env）
-- [ ] 定義 trace chain：**gate → claim → artifact**（禁止只有 artifact 無 claim）
-- [ ] 支援 downstream pilot 更新 project workflow validation gate
-- [ ] Close-out：`browser_review` = activity summary；envelope 含 claim + type + method + shape
+- [x] 建立 `workflow/software-delivery/validation/evidence-gate-vocabulary.md`（只允許 `evidence_type` 進 `requires:`）
+- [x] 建立 authority decision 對照表（framework / domain / implementation / env）
+- [x] 定義 trace chain：**gate → claim → artifact**（禁止只有 artifact 無 claim）
+- [x] 支援 downstream pilot 更新 project workflow validation gate
+- [x] Close-out：`browser_review` = activity summary；envelope 含 claim + type + method + shape
 
-**Phase 2 完成條件**：downstream pilot 以 projection contract 消費 taxonomy；至少 1 個 integration envelope 可追蹤 **gate → claim → artifact**。
+**Phase 2 完成條件**：downstream pilot 以 projection contract 消費 taxonomy；至少 1 個 integration envelope 可追蹤 **gate → claim → artifact**。✅ pilot envelope + workflow `claim_registry` + screen mapping。
 
 ## Phase 3 — Experience Runtime Cross-Cutting（P2，延後升 slice）
 
@@ -349,7 +349,7 @@ counterfactual: >
 ## 完成條件（Plan-level）
 
 - [x] Phase 1 evidence-types catalog 落地（6 types，含 `temporal_behavior`）
-- [ ] Phase 2 gate→claim→artifact trace 有 real closure example
+- [x] Phase 2 gate→claim→artifact trace 有 real closure example
 - [ ] Phase 3 cross-cutting experience-runtime 存在且**未**升 slice
 - [ ] Phase 4 至少 1 条 failure→authority→evolution catalog entry
 - [ ] Glossary candidate terms 已註冊或明確 defer
