@@ -40,11 +40,14 @@ transitions:
   - from: purchasing
     to: unlocked
     trigger: membership_active_readback
-    validation_status: deferred
+    evidence_claims:
+      - member_preview_episode_unlocked
+    validation_status: partial
   - from: unlocked
     to: restored
     trigger: return_to_same_episode
-    validation_status: deferred
+    validation_status: partial
+    note: DB entitlement only; full purchase webhook in membership-order integration
   - from: preview
     to: playing
     trigger: member_or_free_episode
@@ -54,9 +57,11 @@ transitions:
   - from: suspended
     to: restored
     trigger: return_with_session_prefs
+    evidence_claims:
+      - playback_prefs_persist_across_episode
     evidence_types:
       - state_persistence
-    validation_status: deferred
+    validation_status: complete
 
 required_validation_dimensions:
   - persistence
@@ -77,8 +82,13 @@ pilot_coverage:
     case: preview subscribe CTA navigates
     status: partial
   unlocked_to_restored:
-    status: deferred
-    note: P3 subscribe-unlock-resume journey
+    status: partial
+    integration: tests/integration/player-member-unlocked-playback.integration.mjs
+    note: DB membership entitlement; full purchase webhook in membership-order integration
+  session_prefs_persistence:
+    status: complete
+    integration: tests/integration/player-playback-prefs.integration.mjs
+    evidence_type: state_persistence
 
 dom_ownership:
   main_video: '[class*="playerStage"] video'

@@ -15,9 +15,15 @@ Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-12
 **Priority**：**P1**（taxonomy + gate vocabulary + authority layer；experience-runtime **cross-cutting** 先落地，升 slice 延後）
 **Phase 0**：✅ **完成**（vocabulary / ownership / authority / promotion 條件已收斂）
-**Phase 1**：**Ready**（開始建 `validation/evidence-types/` catalog，非探索期）
-**Review**：2026-06-12 stakeholder review — L3 命名、三分 taxonomy、authority layer、OQ-5 **reject inheritance**、experience-runtime cross-cutting、`timing_gate`→`temporal_behavior`
+**Phase 1**：✅ **完成**（evidence-types catalog + projection-break scenario stub）
+**Phase 2**：✅ **完成**（gate vocabulary + authority decision table）
+**Phase 3**：✅ **完成**（cross-cutting experience-runtime README + player.yaml）
+**Phase 4**：✅ **完成**（failure evolution catalog + failure-derived scenario）
+**Delivery**：✅ local closure（commits `6d029f3`–`c3e3200` + pending `player.yaml` sync）
+**Plan archive**：pending（glossary defer + Plan Completion Closure）
 **Pilot**：某 downstream project 的 immersive media player preview gate incident（2026-06）。具體 drama / episode / deploy host 依 [`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md) 留在專案 plan，不寫入本 plan。
+
+**Downstream pilot plan**（專案 repo，本機 `AI_SKILL_REPO` 同層或 `PROJECT_ROOT`）：`docs/plans/2026-06-12-1600-short-drama-player-validation-gaps.md` — 第一個消費本 plan 的 evidence taxonomy + gate tokens + cross-cutting alignment。
 
 ## Why this plan exists
 
@@ -222,7 +228,7 @@ counterfactual: >
 ### ADR Promotion Criteria（completed 時驗證）
 
 - [ ] foundational + cross-session + cross-project + expensive-to-reverse + explains-why 全中
-- [ ] 至少一個 downstream project 用 evidence tokens 完成 real task closure
+- [x] 至少一個 downstream project 用 evidence tokens 完成 real task closure — Vidoe-Test player pilot（P1–P3 integration + workflow `claim_registry`）
 - [ ] Open Questions 全解
 - [ ] 沒有更輕的 promotion target 適用
 - [ ] validation scenarios 與 project gate 真實引用 evidence types
@@ -261,15 +267,23 @@ counterfactual: >
 
 **Deferred Runtime Projection**：本 plan Phase 1 不 project 新 YAML 到 `runtime.db`。Graduation condition：downstream pilot 連續 2 次 player-class task 使用 evidence tokens 完成 closure 後，再開 follow-up plan 接 `gate.*.evidence_requirements` runtime-lite projection。
 
-**Per-surface consumer 表**：Phase 1 N/A（doc-only）。Phase 3 新增 scenario 時再填。
+**Per-surface consumer 表**（downstream pilot）：
+
+| Surface | Project consumer | Evidence types consumed | Integration |
+| --- | --- | --- | --- |
+| Immersive player preview gate | `docs/frontend-contracts/screen-mapping/player-preview-gate.md` | `user_visible`, `navigation`, `temporal_behavior` | `player-preview-gate.integration.mjs` |
+| Member unlock on preview episode | same screen mapping | `user_visible` | `player-member-unlocked-playback.integration.mjs` |
+| Session prefs persistence | same + `player-client-patterns.md` | `state_persistence` | `player-playback-prefs.integration.mjs` |
+
+Project plan alignment matrix：見 downstream plan §與 framework plan 對齊矩陣。
 
 ## Open Questions
 
 | # | Question | 處置 |
 |---|---|---|
-| OQ-1 | `evidence:*` tokens 是否進 Ai-skill runtime registry，或僅 project workflow？ | still-open — pilot 先 project-local |
-| OQ-2 | cross-cutting experience-runtime 與 journey / validation execution 的 boundary checklist？ | still-open — Phase 3 README 必答 |
-| OQ-3 | `temporal_behavior` 的最低 `artifact_shape` 是 poll log 還是錄影？ | still-open — player pilot 決定 |
+| OQ-1 | `evidence:*` tokens 是否進 Ai-skill runtime registry，或僅 project workflow？ | still-open — pilot 先 project-local；downstream 已用 workflow `requires:` |
+| OQ-2 | cross-cutting experience-runtime 與 journey / validation execution 的 boundary checklist？ | **resolved** — `workflow/cross-cutting/experience-runtime/README.md` §Boundary table |
+| OQ-3 | `temporal_behavior` 的最低 `artifact_shape` 是 poll log 還是錄影？ | **resolved — poll log** — downstream `player-preview-gate-poll-log.json`；錄影 non-goal for CI |
 | OQ-4 | failure evolution 的 authority 預設規則是否機械化？ | deferred — Phase 4 catalog 先 doc-only |
 | OQ-5 | evidence token 是否允許 inheritance？ | **resolved — reject inheritance**。`evidence_type` 不是 subtype system；type 與 method/shape 的關係只用各 type 檔內 `supported_collection_methods` / `supported_artifact_shapes` 對照表表達，禁止 `user_visible → screenshot` 繼承樹 |
 
@@ -293,9 +307,9 @@ counterfactual: >
 
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
-| OQ-1 runtime registry | still-open | 等 downstream pilot |
-| OQ-2 cross-cutting boundary | still-open | Phase 3 交付 |
-| OQ-3 temporal_behavior artifact_shape | still-open | preview-gate integration 實作時決定 |
+| OQ-1 runtime registry | still-open | downstream pilot uses project workflow only |
+| OQ-2 cross-cutting boundary | **resolved** | `experience-runtime/README.md` boundary table |
+| OQ-3 temporal_behavior artifact_shape | **resolved** | poll log JSON in preview-gate integration |
 | OQ-4 authority mechanization | deferred | Phase 4 catalog |
 | OQ-5 token inheritance | **resolved** | 2026-06-12 review：**reject inheritance**；supported_* 對照表 |
 
@@ -352,8 +366,24 @@ counterfactual: >
 - [x] Phase 2 gate→claim→artifact trace 有 real closure example
 - [x] Phase 3 cross-cutting experience-runtime 存在且**未**升 slice
 - [x] Phase 4 至少 1 条 failure→authority→evolution catalog entry
-- [ ] Glossary candidate terms 已註冊或明確 defer
+- [ ] Glossary candidate terms 已註冊或明確 defer — **deferred** to follow-up plan `projection-break-glossary-and-runtime-projection`（terms: `projection_break`, `validation_capability`, `evidence_type`, `artifact_shape`, `authority_decision`, `experience_runtime`）
 - [ ] 執行 Plan Completion Closure（validator + linked-updates + archive）
+
+## Downstream pilot closure（2026-06-12）
+
+| Framework 交付 | Downstream 證據 |
+|---|---|
+| 6 evidence types | preview + member + prefs integrations |
+| gate→claim→artifact | workflow `claim_registry` + `.tmp/evidence/` |
+| authority catalog | screen mapping → `failure-evolution-catalog.md` |
+| cross-cutting player.yaml | `player-client-patterns.md` + `pilot_coverage` sync |
+
+**Remaining pilot gaps**（documented in downstream plan，不阻斷 framework delivery）：
+
+- P1-3 profile 返回同 episode round-trip
+- BDD CSS pre-existing failures
+- Full PayUSDT purchase webhook journey
+- runtime.db `gate.*.evidence_requirements` projection（需第 2 個 player-class task）
 
 ## Stakeholder 同意項目
 
