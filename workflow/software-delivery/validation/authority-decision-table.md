@@ -71,4 +71,4 @@ Full catalog: [`failure-evolution-catalog.md`](failure-evolution-catalog.md).
 ## Related
 
 - [`evidence-gate-vocabulary.md`](evidence-gate-vocabulary.md)
-- Plan: [`2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md`](../../../plans/active/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md) §C.4
+- Plan: [`2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md`](../../../plans/archived/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md) §C.4

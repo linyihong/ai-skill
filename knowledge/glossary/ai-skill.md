@@ -10,6 +10,29 @@
 
 ---
 
+## artifact_shape
+
+```yaml
+term: artifact_shape
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  The proof carrier format for a validation claim, such as screenshot,
+  navigation_log, poll_log, or dom_assertion_log. Artifact shape describes
+  what the evidence looks like; it is not an evidence_type and must not
+  appear in gate requires tokens.
+affects:
+  - validation/evidence-types/README.md
+  - workflow/software-delivery/validation/evidence-gate-vocabulary.md
+anti-meaning: >
+  Not a gate token, not a collection_method, and not a subtype of
+  evidence_type. Reject inheritance trees between type and shape.
+introduced-by: plans/archived/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md
+related-terms:
+  - { type: related_to, target: evidence_type }
+  - { type: related_to, target: observable_evidence }
+```
+
 ## authority_coupled_side_effects
 
 ```yaml
@@ -30,6 +53,28 @@ anti-meaning: >
   naming the business truth, authority event, observable proxy, and evidence
   that proves the claim scope.
 introduced-by: plans/active/2026-06-10-1718-software-delivery-governance-invariants.md
+```
+
+## authority_decision
+
+```yaml
+term: authority_decision
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  The classification step that decides who may change what after a validation
+  or projection failure: framework invariant, domain pattern, implementation
+  defect, or env/deploy incident. Authority decision prevents every incident
+  from becoming a framework change.
+affects:
+  - workflow/software-delivery/validation/authority-decision-table.md
+  - workflow/software-delivery/validation/failure-evolution-catalog.md
+anti-meaning: >
+  Not blame assignment and not a substitute for root-cause analysis. It
+  selects the eligible writeback targets for evolution.
+introduced-by: plans/archived/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md
+related-terms:
+  - { type: related_to, target: projection_break }
 ```
 
 ## activation_fitness
@@ -436,6 +481,29 @@ related-terms:
 introduced-by: plans/archived/2026-05-22-1629-runtime-cognitive-modes-system.md
 ```
 
+## experience_runtime
+
+```yaml
+term: experience_runtime
+status: candidate
+owner-layer: workflow-orchestration
+meaning: >
+  Cross-cutting model for immersive client surfaces that span runtime state,
+  journey specification, validation execution, and UI contracts. Documented as
+  templates under workflow/cross-cutting/experience-runtime/; not a
+  software-delivery slice until multiple surface pilots converge.
+affects:
+  - workflow/cross-cutting/experience-runtime/README.md
+  - workflow/cross-cutting/experience-runtime/player.yaml
+anti-meaning: >
+  Not a replacement for journey BDD, not an integration runner, and not a
+  gate token namespace. Do not register sd-experience-runtime prematurely.
+introduced-by: plans/archived/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md
+related-terms:
+  - { type: related_to, target: journey_specification }
+  - { type: related_to, target: validation_scope }
+```
+
 ## expected_outcomes
 
 ```yaml
@@ -454,6 +522,30 @@ anti-meaning: >
   Not screenshot evidence, not UI copy, not API status code, and not a generic
   readback bucket. Observable proof belongs in observable_evidence.
 introduced-by: plans/active/2026-06-10-0908-user-journey-validation-integration.md
+```
+
+## evidence_type
+
+```yaml
+term: evidence_type
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  The validation dimension describing what must be proven for a completion
+  claim, such as user_visible, navigation, temporal_behavior, or
+  state_persistence. Gate requires tokens use evidence_type only
+  (evidence:<name>); collection_method and artifact_shape are separate layers.
+affects:
+  - validation/evidence-types/README.md
+  - workflow/software-delivery/validation/evidence-gate-vocabulary.md
+anti-meaning: >
+  Not collection_method, not artifact_shape, and not a browser_review
+  activity label. Reject token inheritance between type and method/shape.
+introduced-by: plans/archived/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md
+related-terms:
+  - { type: related_to, target: artifact_shape }
+  - { type: related_to, target: observable_evidence }
+  - { type: related_to, target: validation_capability }
 ```
 
 ## feedback_decision
@@ -889,6 +981,31 @@ related-terms:
 introduced-by: plans/archived/2026-05-22-0855-executable-yaml-contract-migration.md
 ```
 
+## projection_break
+
+```yaml
+term: projection_break
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  A structural gap where L2 project concretization (BDD, workflow YAML,
+  overlay rules) passes but L3 validation capability and evidence artifacts
+  do not exist or were not executed, so UX or runtime behavior can regress
+  undetected.
+affects:
+  - validation/evidence-types/README.md
+  - workflow/software-delivery/validation/failure-evolution-catalog.md
+  - validation/scenarios/failure-derived/projection-break-missing-browser-evidence-v1.yaml
+anti-meaning: >
+  Not a single bug class, not "missing unit test" alone, and not equivalent
+  to contract drift without a missing validation layer.
+introduced-by: plans/archived/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md
+related-terms:
+  - { type: related_to, target: validation_capability }
+  - { type: related_to, target: evidence_type }
+  - { type: related_to, target: authority_decision }
+```
+
 ## runtime_refresh
 
 ```yaml
@@ -1048,6 +1165,29 @@ affects:
   - runtime/cognitive-modes.yaml
   - plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
 introduced-by: plans/active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
+```
+
+## validation_capability
+
+```yaml
+term: validation_capability
+status: candidate
+owner-layer: validation-governance
+meaning: >
+  The executable layer that produces evidence for a behavior claim: browser
+  observation, timing poll, navigation readback, DB readback, or integration
+  envelope. Sits between Behavior (L2) and Evidence artifacts (L3 output).
+affects:
+  - validation/evidence-types/README.md
+  - workflow/software-delivery/validation/README.md
+anti-meaning: >
+  Not BDD source asserts alone, not journey specification text, and not
+  synonymous with evidence artifacts.
+introduced-by: plans/archived/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md
+related-terms:
+  - { type: related_to, target: projection_break }
+  - { type: related_to, target: evidence_type }
+  - { type: related_to, target: journey_validation }
 ```
 
 ## validation_scope

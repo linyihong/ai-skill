@@ -65,4 +65,4 @@ Naming rule: evidence types must answer **what was proven**, not **why it breaks
 
 ## Related plans
 
-- [`2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md`](../../plans/active/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md)
+- [`2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md`](../../plans/archived/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md)

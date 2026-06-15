@@ -54,4 +54,4 @@ Until then: **no** `route.workflow.experience-runtime`, **no** `sd-experience-ru
 
 - [`../software-delivery/validation/evidence-gate-vocabulary.md`](../software-delivery/validation/evidence-gate-vocabulary.md)
 - [`../software-delivery/validation/authority-decision-table.md`](../software-delivery/validation/authority-decision-table.md)
-- Plan: [`2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md`](../../plans/active/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md) §C.3
+- Plan: [`2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md`](../../plans/archived/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md) §C.3

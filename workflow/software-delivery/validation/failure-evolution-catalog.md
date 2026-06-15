@@ -73,4 +73,4 @@ enforcement_note: >
 
 - [`authority-decision-table.md`](authority-decision-table.md)
 - [`../cross-cutting/experience-runtime/README.md`](../cross-cutting/experience-runtime/README.md)
-- Plan Phase 4: [`2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md`](../../plans/active/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md)
+- Plan Phase 4: [`2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md`](../../plans/archived/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md)
