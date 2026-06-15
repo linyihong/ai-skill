@@ -50,6 +50,8 @@ L3 **Validation Capability** produces Evidence（artifact + proof shape）。`ev
 - OQ-5 **reject inheritance** — 用各 type 檔內 `supported_collection_methods` / `supported_artifact_shapes` 對照，不建 subtype 樹
 - Gate vocabulary: [`workflow/software-delivery/validation/evidence-gate-vocabulary.md`](../workflow/software-delivery/validation/evidence-gate-vocabulary.md)
 - Authority table: [`workflow/software-delivery/validation/authority-decision-table.md`](../workflow/software-delivery/validation/authority-decision-table.md)
+- Failure catalog: [`workflow/software-delivery/validation/failure-evolution-catalog.md`](../workflow/software-delivery/validation/failure-evolution-catalog.md)
+- Experience runtime (cross-cutting): [`workflow/cross-cutting/experience-runtime/README.md`](../workflow/cross-cutting/experience-runtime/README.md)
 
 ## Software Delivery Scenarios
 
@@ -63,6 +65,7 @@ L3 **Validation Capability** produces Evidence（artifact + proof shape）。`ev
 
 ## Cognitive State / Evidence Scenarios
 
+- `failure-derived/projection-break-missing-browser-evidence-v1.yaml` — BDD/contract pass but preview enforcement on wrong DOM; require evidence envelope + playerStage scoping before L3 closure.
 - `failure-derived/assumption-as-fact-v1.yaml` — unvalidated assumption 不得作為 execution fact。
 - `failure-derived/hook-log-overrides-ui-contradiction-v1.yaml` — hook/log success 不得覆蓋 live UI / contract contradiction。
 - `failure-derived/repeated-patch-autonomy-downgrade-v1.yaml` — repeated patch 無新證據時必須降 autonomy 或進 recovery。

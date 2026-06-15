@@ -328,30 +328,30 @@ counterfactual: >
 
 **Phase 2 完成條件**：downstream pilot 以 projection contract 消費 taxonomy；至少 1 個 integration envelope 可追蹤 **gate → claim → artifact**。✅ pilot envelope + workflow `claim_registry` + screen mapping。
 
-## Phase 3 — Experience Runtime Cross-Cutting（P2，延後升 slice）
+## Phase 3 — Experience Runtime Cross-Cutting ✅
 
-- [ ] 建立 `workflow/cross-cutting/experience-runtime/README.md`（**非** software-delivery slice）
-- [ ] 建立 `workflow/cross-cutting/experience-runtime/player.yaml` pilot template
-- [ ] 撰寫 cross-cutting 與 journey / validation / ui-contracts 的 boundary table
-- [ ] 明確記錄 slice promotion 條件（player + editor + onboarding）
+- [x] 建立 `workflow/cross-cutting/experience-runtime/README.md`（**非** software-delivery slice）
+- [x] 建立 `workflow/cross-cutting/experience-runtime/player.yaml` pilot template
+- [x] 撰寫 cross-cutting 與 journey / validation / ui-contracts 的 boundary table
+- [x] 明確記錄 slice promotion 條件（player + editor + onboarding）
 
-**Phase 3 完成條件**：player.yaml 作為 cross-cutting 模板可用；**不**註冊 `sd-experience-runtime` slice。
+**Phase 3 完成條件**：player.yaml 作為 cross-cutting 模板可用；**不**註冊 `sd-experience-runtime` slice。✅
 
-## Phase 4 — Failure → Authority → Evolution（P2/P3）
+## Phase 4 — Failure → Authority → Evolution ✅
 
-- [ ] 建立 failure catalog（必填：`failure` / `classification` / `authority` / `evolution_target` / `writeback` / **`counterfactual`**）
-- [ ] 首 entry: player preview gate（見 Decision C.4 範例）
-- [ ] 新增 scenario：`validation/scenarios/failure-derived/projection-break-missing-browser-evidence-v1.yaml`
-- [ ] 評估是否 promotion 成 enforcement advisory（非 mechanical rule_class）
+- [x] 建立 failure catalog（必填：`failure` / `classification` / `authority` / `evolution_target` / `writeback` / **`counterfactual`**）
+- [x] 首 entry: player preview gate（見 Decision C.4 範例）
+- [x] 新增 scenario：`validation/scenarios/failure-derived/projection-break-missing-browser-evidence-v1.yaml`
+- [x] 評估是否 promotion 成 enforcement advisory（**deferred** — catalog 註記 advisory only）
 
-**Phase 4 完成條件**：catalog entry 含 counterfactual；同類 failure 有 authority-aware evolution path。
+**Phase 4 完成條件**：catalog entry 含 counterfactual；同類 failure 有 authority-aware evolution path。✅
 
 ## 完成條件（Plan-level）
 
 - [x] Phase 1 evidence-types catalog 落地（6 types，含 `temporal_behavior`）
 - [x] Phase 2 gate→claim→artifact trace 有 real closure example
-- [ ] Phase 3 cross-cutting experience-runtime 存在且**未**升 slice
-- [ ] Phase 4 至少 1 条 failure→authority→evolution catalog entry
+- [x] Phase 3 cross-cutting experience-runtime 存在且**未**升 slice
+- [x] Phase 4 至少 1 条 failure→authority→evolution catalog entry
 - [ ] Glossary candidate terms 已註冊或明確 defer
 - [ ] 執行 Plan Completion Closure（validator + linked-updates + archive）
 

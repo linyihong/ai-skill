@@ -26,6 +26,7 @@
   - [`travel-planning/artifact-gates.yaml`](travel-planning/artifact-gates.yaml)：travel planning artifact gates executable contract。
 - [`documentation/`](documentation/README.md)：跨專案 **agent 友善文件** 的撰寫與分類流程（index-first、降低無效 token、與 `enforcement/` / `governance/` 對齊）。
   - [`documentation/execution-flow.yaml`](documentation/execution-flow.yaml)：documentation workflow 的 executable contract，包含 YAMLization decision gate。
+- [`cross-cutting/`](cross-cutting/README.md)：跨 slice 關注點模板（**非** `route.workflow.*` slice）。目前含 [`experience-runtime/`](cross-cutting/experience-runtime/README.md) pilot。
 
 ## 放什麼
 

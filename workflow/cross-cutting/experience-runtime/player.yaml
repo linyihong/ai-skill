@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=
+id: experience-runtime-player-pilot
+kind: cross_cutting_template
+status: pilot
+not_a_slice: true
+
+surface:
+  route: "/player/:episodeId"
+  class: immersive_client
+
+state_machine:
+  - idle
+  - loading
+  - preview
+  - gated
+  - purchasing
+  - unlocked
+  - playing
+  - suspended
+  - restored
+
+transitions:
+  - from: idle
+    to: loading
+    trigger: route_mount
+  - from: loading
+    to: preview
+    trigger: guest_time_preview_episode
+  - from: preview
+    to: gated
+    trigger: preview_limit_reached
+    evidence_claims:
+      - preview_overlay_shown
+      - preview_limit_enforced
+  - from: gated
+    to: purchasing
+    trigger: subscribe_cta_click
+    evidence_claims:
+      - subscribe_href_resolves
+  - from: purchasing
+    to: unlocked
+    trigger: membership_active_readback
+    validation_status: deferred
+  - from: unlocked
+    to: restored
+    trigger: return_to_same_episode
+    validation_status: deferred
+  - from: preview
+    to: playing
+    trigger: member_or_free_episode
+  - from: playing
+    to: suspended
+    trigger: tab_hidden_or_route_away
+  - from: suspended
+    to: restored
+    trigger: return_with_session_prefs
+    evidence_types:
+      - state_persistence
+    validation_status: deferred
+
+required_validation_dimensions:
+  - persistence
+  - interruption
+  - recovery
+
+pilot_coverage:
+  preview_to_gated:
+    integration: tests/integration/player-preview-gate.integration.mjs
+    gate: gate.short_drama.validation_complete
+    requires:
+      - evidence:user_visible
+      - evidence:navigation
+      - evidence:temporal_behavior
+    status: complete
+  gated_to_purchasing:
+    integration: tests/integration/player-preview-gate.integration.mjs
+    case: preview subscribe CTA navigates
+    status: partial
+  unlocked_to_restored:
+    status: deferred
+    note: P3 subscribe-unlock-resume journey
+
+dom_ownership:
+  main_video: '[class*="playerStage"] video'
+  adjacent_preload: adjacent vertical pages — no preview enforcement
+  failure_pattern: player_preview_gate_projection_break
+
+project_overlay:
+  rule: .ai-skill/project/rules/player-client-patterns.md
+  screen_mapping: docs/frontend-contracts/screen-mapping/player-preview-gate.md
+  spec: docs/frontend-contracts/ui-style-reference/specs/player-spec.md

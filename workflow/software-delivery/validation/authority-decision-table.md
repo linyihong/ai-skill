@@ -66,6 +66,8 @@ not_framework_invariant_because: >
 3. **Do** update gate vocabulary when the same `requires:` ambiguity appears in two projects (defer until then).
 4. Failure-derived scenario writeback → [`validation/scenarios/failure-derived/`](../../../validation/scenarios/failure-derived/) (Phase 4).
 
+Full catalog: [`failure-evolution-catalog.md`](failure-evolution-catalog.md).
+
 ## Related
 
 - [`evidence-gate-vocabulary.md`](evidence-gate-vocabulary.md)

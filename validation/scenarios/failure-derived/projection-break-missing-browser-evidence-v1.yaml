@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../../scenario.schema.json
+id: projection-break-missing-browser-evidence-v1
+category: failure-derived
+domain: software-delivery
+version: v1
+type: heuristic-obedience
+priority: P1
+source_plan: plans/active/2026-06-12-1600-projection-break-evidence-taxonomy-experience-runtime.md
+source_phase: phase-4
+failure_source:
+  pattern: player_preview_gate_projection_break
+  class: projection_break_L2_to_L3
+  date: "2026-06-12"
+  description: >
+    BDD and contract pass while preview enforcement acts on wrong DOM target;
+    completion claimed without evidence:user_visible integration envelope.
+
+given:
+  task: close_out_player_preview_ux_change
+  artifacts:
+    - validation/evidence-types/user-visible.md
+    - validation/evidence-types/temporal-behavior.md
+    - workflow/software-delivery/validation/evidence-gate-vocabulary.md
+    - workflow/software-delivery/validation/failure-evolution-catalog.md
+    - workflow/cross-cutting/experience-runtime/player.yaml
+  signals:
+    - bdd_source_assert_passed
+    - browser_overlay_missing_or_wrong_target
+    - no_integration_envelope_with_claims
+    - bare_document_querySelector_video_used
+
+when:
+  action: claim_player_preview_validation_complete
+
+then:
+  expected_load:
+    - validation/evidence-types/README.md
+    - workflow/software-delivery/validation/evidence-gate-vocabulary.md
+    - workflow/software-delivery/validation/authority-decision-table.md
+  expected_route:
+    - reject_bdd_only_as_L3_closure
+    - require_gate_claim_artifact_trace
+    - scope_dom_queries_to_main_runtime_target
+    - route_authority_to_domain_pattern_and_implementation_not_framework_invariant
+  expected_heuristics:
+    - local_evidence_is_not_global_correctness
+    - contract_string_is_not_runtime_ownership
+  forbidden_routes:
+    - approve_on_browser_review_activity_only
+    - promote_every_player_bug_to_framework_taxonomy
+    - use_document_querySelector_video_for_preview_enforcement_tests
+    - claim_complete_without_evidence_type_tokens
+  expected_final_route: integration_envelope_with_user_visible_and_temporal_behavior
+  expected_intelligence:
+    - workflow/software-delivery/validation/failure-evolution-catalog.md
+    - workflow/cross-cutting/experience-runtime/player.yaml
+
+evidence:
+  current_expected_result: PASS
+  routing_evidence:
+    - workflow/software-delivery/validation/failure-evolution-catalog.md#player_preview_gate_projection_break
+    - workflow/cross-cutting/experience-runtime/player.yaml#dom_ownership
