@@ -132,6 +132,39 @@ task input → detector(user_signals + context_signals(path)) miss
 
 ---
 
+## Evolution Ladder（Decision Record）
+
+> **定位**：這是 *decision / evolution constraints*，不是開發承諾。記下來是為了**避免未來重複繞回同一個誤區**（為了救「中性語句 + 非語意檔名」而擴張 activation），不是排期要做的功能。寫於 2026-06-15，承接該日 correctness 迭代收束後的方向討論。
+
+**Non-goal（保留原句）**：
+> The objective is not "make neutral prompts trigger", but "reduce false silence without expanding activation authority".
+
+**Goal**
+- 不追求 neutral-trigger（中性語句 + 非語意檔名「應自動進 workflow」**不是**目標）。
+- 不擴張 activation authority。
+
+**Current state**
+- **A — Discovery advisory 已 shipped**（Phase A.4 `tryDiscoveryAdvisory`）：detector miss → Light proposal → confidence ≥ threshold 才注入 advisory，`active_route` 不變。
+- **對零訊號 artifact 保持沉默是預期行為**，不是缺陷。`下関.md` + 中性語句沒看到 advisory，是因為 name/message 無旅遊訊號（訊號在內容），不是 A 未做。`A 已存在 ≠ 這個案例應該觸發 A`。
+
+**Preferred evolution**
+- **C — Phase B Piggyback evidence accumulation**：吸取 agent **本來就會做的 Read** 的內容訊號，零額外 Read。這是「中性語句 + 非語意檔名」的**唯一**正解（訊號只在內容）。
+
+**Conditional**
+- **B — Artifact Intent Hint（cheap metadata，如 frontmatter `kind: itinerary`）**：僅在 artifact 類型穩定時才划算；使用者亂命名（`final.md`/`new2.md`）時這層變 metadata 債。**opt-in，不預設做**；很可能最終 A + C 就足夠。
+
+**Rejected（明確封印）**
+- Semantic activation expansion（語意 detector v2）。
+- Detector ontology growth（`下関 → 九州 → 日本 → 旅遊 → activate`，把複雜度從 `O(route)` 推到 `O(route × semantic_surface)`）。
+- Proposal → activation coupling（proposal ≈ activation）。
+- 三者都會撞 Watch-Out wall #1「Discovery confused with Activation」。
+
+**Acceptance（演進不變式）**
+- **更多 evidence ≠ 更多 activation**：Discovery 累積證據只改 advisory ranking，永不改 `active_route`。
+- **Read 後重 score，不固定第一次判斷**：append-only evidence + 每次 Read re-score（即 reject Disc-2 的理由）。其治理根是 **Observation 不可變成 Authority**——與 [`governance/lifecycle/governance-pattern-library-draft.md`](../../governance/lifecycle/governance-pattern-library-draft.md) §Failure Authority family 的 `Validity ≠ Authority（Standing）` 同源：一個 observation（讀到的內容）有資格**提議**，但無資格**鎖定**路由。
+
+---
+
 ## Architecture Compatibility Preflight
 
 | 欄位 | 內容 |
