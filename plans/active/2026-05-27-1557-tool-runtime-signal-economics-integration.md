@@ -13,11 +13,12 @@ parent: null
 
 draft
 
-**目前執行入口（next）**：第一刀 = §Architecture Review & Reduction Agenda（2026-06-15）的
-**Phase 1（owner path）→ Phase 2（control/adaptation boundary）reduction**。先讀該 agenda 再進
-Phase 0。本輪是 architecture reduction（boundary decisions only：4 層 owner path 拍板 +
-`runtime/economics/` 砍除決策 + Surface→Surface 禁令成文），**不寫 economics 實作 / runtime /
-surface / code**；任何 surface 或 code 變更前停下來與 maintainer 對齊範圍。
+**目前執行入口（next）**：第一刀（Phase 1 owner path → Phase 2 control/adaptation boundary
+reduction）**已拍板**，記錄於 §Reduction Decisions（第一刀拍板, 2026-06-15）的 D1/D2/D3。
+下一步 = 與 maintainer 對齊後再決定是否進 Phase 3（ecosystem interaction boundary）或處理
+deferred 的 Finding 2 / 4 / 5（見 §Reduction Decisions「未納入第一刀」）。**任何 economics /
+ecosystem / generated_state 的實際 contract / YAML / surface / code 仍須另開範圍並與 maintainer
+對齊**；reduction phase 不寫實作。
 
 ## Summary
 
@@ -266,10 +267,10 @@ flowchart TD
 | Generated surface key | Named consumer(s) | Consumer 類型 |
 | --- | --- | --- |
 | `runtime.tool_routing.contract` | `runtime/cognitive-modes-discovery.yaml` Phase 7 signals + `validateToolRoutingProjection` (Phase 12 hook) + scenario `tool-routing-contract-projected-v1` | discovery signal + commit-msg validator + validation scenario |
-| `runtime.economics.token_costs` | `runtime/cognitive-modes-discovery.yaml` `economic_pressure_high` signal + scenario `economics-contract-projected-v1` | discovery signal + validation scenario |
-| `runtime.economics.tool_cost_model` | `runtime/cognitive-modes-discovery.yaml` `tool_usage_high_risk_mutation` + `tool_output_large` + `tool_loop_detected` signals + scenario `economics-contract-projected-v1` | discovery signals + validation scenario |
-| `runtime.economics.cognitive_budget_policy` | Cognitive Mode 報告 cost class derivation（commit-msg `cognitiveCost` validator） + scenario `cognitive-state-economics-fields-valid-v1` | commit-msg validator + scenario |
-| `runtime.economics.execution_feedback` | Phase 10 feedback contract + scenario `execution-feedback-loop-static-contract-v1` | static contract + scenario |
+| `ecosystem.economics.token_costs` | `runtime/cognitive-modes-discovery.yaml` `economic_pressure_high` signal + scenario `economics-contract-projected-v1` | discovery signal + validation scenario |
+| `ecosystem.economics.tool_cost_model` | `runtime/cognitive-modes-discovery.yaml` `tool_usage_high_risk_mutation` + `tool_output_large` + `tool_loop_detected` signals + scenario `economics-contract-projected-v1` | discovery signals + validation scenario |
+| `ecosystem.economics.cognitive_budget_policy` | Cognitive Mode 報告 cost class derivation（commit-msg `cognitiveCost` validator） + scenario `cognitive-state-economics-fields-valid-v1` | commit-msg validator + scenario |
+| `ecosystem.economics.execution_feedback` | Phase 10 feedback contract + scenario `execution-feedback-loop-static-contract-v1` | static contract + scenario |
 | `runtime.cognitive_state.telemetry_contract` | Cognitive Mode 報告 emit（commit-msg `cognitiveModeBlock` validator）+ scenario `cognitive-state-adaptation-rationale-valid-v1` | commit-msg validator + scenario |
 | `ecosystem.resource_interactions.contract` | Cognitive Mode discovery `memory_amplification_high` + `governance_overhead_high` signals + scenario `ecosystem-resource-interaction-contract-v1` | discovery signals + scenario |
 | `ecosystem.pressure_models.contract` | Cognitive Mode discovery `context_expansion_rate_high` + `compression_pressure_high` signals + scenario `ecosystem-pressure-models-contract-v1` | discovery signals + scenario |
@@ -278,6 +279,11 @@ flowchart TD
 | `ecosystem.knowledge_acquisition.contract` | `governance/lifecycle/knowledge-update-flow.md` writeback + scenarios `knowledge-acquisition-*-v1` (3 條) | governance flow + scenarios |
 
 任一 surface 完成 projection 但對應 consumer 尚未 wire 時，**不得宣稱該 surface 已 enter runtime**。
+
+**Invariant（§Reduction Decisions D3 成文）**：**No generated surface may depend on another
+generated surface** — 只允許 `Source → Surface`，禁止 `Surface → Surface`。上表每個 consumer 必須
+自己對 **source** join，不得 join 另一個 generated surface（杜絕 `ecosystem.economics.* →
+ecosystem.* → runtime.cognitive_state.*` 這類 hidden dependency graph）。
 
 ### Validation scenarios
 
@@ -660,6 +666,98 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 **Overall**：架構方向強、邊界意識成熟、可治理性高；**過度建模風險中高**；真正 blocker = owner 重疊；下一個該解 = Economics ↔ Ecosystem ownership。reduction phase 的 acceptance ≈「4 層 owner path 拍板 + `runtime/economics/` 砍除決策 + Surface→Surface 禁令成文」，**不寫 economics 實作**。
 
+## Reduction Decisions（第一刀拍板, 2026-06-15）
+
+> 本節是 reduction phase（第一刀）的 boundary decision record。對齊現行架構後拍板下列三項：
+> `runtime/economics/`、`ecosystem/`、`economics/`、`generated_state/` 目前**皆尚未建立**（純決策，
+> 無 code/surface 變更）；`runtime/README.md` §Owner-Layer Executable Contracts 第 3 行明定
+> 「`runtime/` 不接收 governance、enforcement 或 workflow source ownership…YAML contract 留在原
+> owner layer」。**本節不含 economics 實作 / surface / code**；Phase 4+ 的 contract 實作仍需另開
+> 範圍並與 maintainer 對齊。
+
+### D1 — Owner path：4 層收斂，砍掉 `runtime/economics/`
+
+- **拍板**：採 Finding 1 的 **4 層 owner path**，取代 §Architecture stack 原本的 5 層：
+  1. **Source Truth** — `models/` `tools/` `memory/` `workflow/`（各自 canonical，維持不變）
+  2. **Interaction / derived** — `ecosystem/{pressure,economics,adaptation}`（economics 歸此層）
+  3. **Runtime / execution** — `runtime/{orchestration,cognitive-modes}`（只執行，不擁有 economics）
+  4. **State / observable** — `generated_state/`（runtime introspection surface）
+- **`runtime/economics/` 砍除**：Alternative D（`runtime/economics/`）→ **reject**；Alternative G
+  （top-level `ecosystem/`）→ **accept as owner path**。
+  - 依據：`runtime/README.md` §Owner-Layer Executable Contracts —「`runtime/` 不接收…source
+    ownership」。Economics 是 derived/interaction 內容，既非 runtime internal mechanism config
+    （A 類，canonical-in-DB），亦非 runtime-mechanism-facing executable contract（B 類
+    cognitive-modes / core-bootstrap），故 **不得由 `runtime/` 擁有**。
+  - economics contract 仍透過 `runtime_projection.enabled: true` 投影到 `runtime.db
+    generated_surfaces`（沿用 B 類 source→projection 模式），但 **source 的 owner layer 是
+    `ecosystem/`，不是 `runtime/`**。
+- **解 Phase 0 owner-path 問題**：Phase 0「Confirm source-of-truth: `runtime/economics/`,
+  runtime-root YAML, top-level `economics/`, or top-level `ecosystem/`」→ 答 **top-level
+  `ecosystem/`**。
+- **避免雙 economics engine**（Finding 1 真正 blocker）：cost evaluation / pressure / adaptation /
+  recommendation / feedback 只在 Interaction(derived) 層算**一次**；Runtime/execution 層不得重算，
+  只消費 derived signal 並對 deterministic mode contract 做 validation。
+- **Guard — owner-path 決策 ≠ layer 已存在**：D1 拍板的是 owner **path**。`ecosystem/` 目前**尚未
+  建立**；其正式建立（含 §Phase 3「Decide whether `ecosystem/` is created now or deferred」與
+  「Define generated surface naming」）仍為 **Phase 3，未勾選**。本刀不得被解讀為 Phase 3 已完成或
+  ecosystem owner 已存在。
+
+### D1 推論 — generated-surface key namespace = owner layer
+
+- **既有慣例（查 `runtime.db generated_surfaces.target_key` 實證）**：key prefix == **source owner
+  layer**（例 `enforcement.dependency_reading.contract`、`governance.knowledge_update_flow.contract`、
+  `ai_tools.agent_claude.contract`），**不是** projection target（所有 surface 都投影進 `runtime.db`）。
+- **推論**：D1 把 economics owner 移到 `ecosystem/` 後，§Generated surfaces 表原 `runtime.economics.*`
+  4 個 key 屬 **mis-namespaced orphan**，已改名為 **`ecosystem.economics.*`**（token_costs /
+  tool_cost_model / cognitive_budget_policy / execution_feedback）。scenario id（`economics-contract-projected-v1`
+  等）非 surface key，維持不變。
+- **未由 D1/D2 唯一裁決、暫不改名（flag → Phase 3/4）**：
+  - `runtime.tool_routing.contract` — tool **routing/orchestration**（runtime）vs tool **cost**
+    （ecosystem economics）尚未拆分；owner 待 Phase 4 拍板。
+  - `runtime.cognitive_state.telemetry_contract` — 依 D2 report split，`runtime_state` 留 runtime、
+    `telemetry`/adaptation 歸 ecosystem；此 key 可能需拆分，owner 待 Phase 3/8 拍板。
+  - 上述 2 key **本刀不改名**，避免在 owner 未定下擅自決定 surface 命名（屬 implementation scope）。
+
+### D2 — Control plane vs Adaptation boundary（Phase 2）
+
+- **Runtime control plane（留在 `runtime/cognitive-modes*.yaml`）— deterministic「可以做什麼」**：
+  mode contracts、`allowed_depth`、`validation_requirement`、`discovery_policy`、`escalation_policy`、
+  `gate_activation`。
+- **Ecosystem adaptation（移到 `ecosystem/`）—「什麼情況值得這樣做」**：
+  economics、pressure、telemetry、`why_not_deeper` / `why_not_shallower` / `why_not_parallel` /
+  escalation rationale。
+- **Report split**：Runtime Cognitive State 報告拆成 `runtime_state` / `ecosystem_state` /
+  `adaptation` 三段，economics **不回塞** runtime core。
+- **Cognitive Mode core 不整搬**：Alternative H（整個搬到 ecosystem）→ reject；Alternative I
+  （runtime core + ecosystem adaptation 拆分）→ accept。runtime phase machine / execution
+  orchestration / validation gates / recovery flow 仍依賴 deterministic mode contract。
+
+### D3 — Surface→Surface 禁令（成文 invariant）
+
+- **Invariant（採 Finding 3）**：**No generated surface may depend on another generated surface.**
+  只允許 `Source → Surface`，**禁止 `Surface → Surface`**。
+- 每個 consumer（discovery signal / commit-msg validator / hook / scenario / governance flow）
+  自己對 **source** join，不得 join 另一個 generated surface。
+- 禁止 hidden dependency graph（例：`ecosystem.economics.* → ecosystem.* →
+  runtime.cognitive_state.*`）。
+- 約束 §Generated surfaces 表的 11 個 candidate key：promote 為 runtime contract 前，consumer
+  必須直接消費 source，不得跨 surface 依賴。
+
+### 第一刀 acceptance（對應 §Architecture Review acceptance）
+
+- [x] 4 層 owner path 拍板（D1）
+- [x] `runtime/economics/` 砍除決策（D1）
+- [x] Surface→Surface 禁令成文（D3）
+- [x] control / adaptation boundary 拍板（D2）
+
+### 未納入第一刀（deferred，避免 scope creep）
+
+- Finding 2（先定義 `knowledge_event` lifecycle 再衍生 mode）、Finding 4（Cognitive State 補
+  `confidence` 維度）、Finding 5（phase reorder：P7 State → P8 Signals → P10 Knowledge）屬後續
+  reduction / 實作範圍，本刀**不拍板**，僅記為 next。
+- 任何 economics / ecosystem / generated_state 的實際 contract / YAML / surface / code 一律
+  **deferred**，需另開範圍對齊 maintainer。
+
 ## Phase 0: Pre-Build Interrogation
 
 - [ ] Confirm scope: static economics contracts + signal wiring first; no full telemetry DB in v1.
@@ -679,7 +777,7 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 
 ## Phase 1: Define Runtime Economics Boundary
 
-- [ ] Decide owner path: `runtime/economics/`, runtime-root YAML, top-level `economics/`, or top-level `ecosystem/`
+- [x] Decide owner path: `runtime/economics/`, runtime-root YAML, top-level `economics/`, or top-level `ecosystem/` → **top-level `ecosystem/`**（見 §Reduction Decisions D1；`runtime/economics/` rejected）
 - [ ] Define economics contract inventory
 - [ ] Define generated surface keys
 - [ ] Define relationship to `runtime/cognitive-modes-token-budget.yaml`
@@ -687,24 +785,24 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
 - [ ] Define relationship to `models/`, `memory/`, and `workflow/`
 - [ ] Define relationship to current `runtime/cognitive-modes-cost-class.yaml`
 - [ ] Define compatibility path from `cognitive_cost` to split economics costs
-- [ ] Define runtime control plane vs ecosystem adaptation boundary
+- [x] Define runtime control plane vs ecosystem adaptation boundary → 見 §Reduction Decisions D2
 
 完成條件：
 
-- [ ] Plan records owner path decision and source-of-truth boundary
+- [x] Plan records owner path decision and source-of-truth boundary → §Reduction Decisions D1（4 層 owner path + `runtime/economics/` 砍除）
 
 ## Phase 2: Define Cognitive Core vs Ecosystem Adaptation Boundary
 
-- [ ] Define what stays in `runtime/cognitive-modes*.yaml`
-- [ ] Define what moves to ecosystem / economics / adaptation contracts
-- [ ] Define deterministic runtime fields: mode contracts, validation requirement, discovery policy, escalation policy, gate activation
-- [ ] Define adaptive ecosystem fields: economics, pressure, telemetry, why/why-not rationale
-- [ ] Define report split: runtime_state, ecosystem_state, adaptation
+- [x] Define what stays in `runtime/cognitive-modes*.yaml` → §Reduction Decisions D2（control plane）
+- [x] Define what moves to ecosystem / economics / adaptation contracts → §Reduction Decisions D2（adaptation）
+- [x] Define deterministic runtime fields: mode contracts, validation requirement, discovery policy, escalation policy, gate activation → §Reduction Decisions D2
+- [x] Define adaptive ecosystem fields: economics, pressure, telemetry, why/why-not rationale → §Reduction Decisions D2
+- [x] Define report split: runtime_state, ecosystem_state, adaptation → §Reduction Decisions D2
 
 完成條件：
 
-- [ ] Cognitive Mode core remains runtime control plane
-- [ ] Cognitive adaptation / economics / telemetry has a separate owner
+- [x] Cognitive Mode core remains runtime control plane → §Reduction Decisions D2（Alternative I accept, H reject）
+- [x] Cognitive adaptation / economics / telemetry has a separate owner → `ecosystem/`（§Reduction Decisions D1/D2）
 
 ## Phase 3: Define Ecosystem Interaction Boundary
 
