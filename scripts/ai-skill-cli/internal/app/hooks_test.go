@@ -2038,3 +2038,58 @@ func TestValidateGlossaryRetroOwn(t *testing.T) {
 		t.Fatalf("expected no enforcement on non-cognitive-modes runtime yaml, got %q", v)
 	}
 }
+
+// TestExtractArtifactTokens_CJKFilenames is the regression for the CJK
+// artifact-extraction bug: artifactPathRE was ASCII-only, so non-English
+// filenames produced zero basename/path/ext signal (systematic Discovery
+// recall loss). Verifies THREE layers so a layer-1 fix is not confused with a
+// layer-2 (tokenize) problem: (1) artifactPathRE capture, (2) extractArtifact
+// Tokens output, (3) tokenize already handles CJK (must NOT need changing).
+func TestExtractArtifactTokens_CJKFilenames(t *testing.T) {
+	positives := []struct {
+		msg, wantBasename, wantExt, cjkProbe string
+	}{
+		{"幫我看一下這份文件 20260531-下関.md 給意見", "20260531-下関.md", ".md", "下"},
+		{"看看 20260615-大阪行程.md 有沒有問題", "20260615-大阪行程.md", ".md", "大"},
+		{"幫我 review 東京-trip.md 對照", "東京-trip.md", ".md", "東"},
+		{"這份 旅行計畫_v2.md 要修", "旅行計畫_v2.md", ".md", "旅"},
+	}
+	for _, tc := range positives {
+		// Layer 1 — artifactPathRE must capture the token.
+		if !artifactPathRE.MatchString(tc.msg) {
+			t.Errorf("layer1 artifactPathRE failed to capture in %q", tc.msg)
+		}
+		// Layer 1.5 — extractArtifactTokens output.
+		bn, _, exts := extractArtifactTokens(tc.msg)
+		if len(bn) == 0 || bn[0] != tc.wantBasename {
+			t.Errorf("extractArtifactTokens(%q) basenames=%v want [%q]", tc.msg, bn, tc.wantBasename)
+			continue
+		}
+		gotExt := ""
+		if len(exts) > 0 {
+			gotExt = exts[0]
+		}
+		if gotExt != tc.wantExt {
+			t.Errorf("extractArtifactTokens(%q) ext=%q want %q", tc.msg, gotExt, tc.wantExt)
+		}
+		// Layer 2 — tokenize already handles CJK (proves no tokenizer change).
+		joined := strings.Join(tokenize(tc.wantBasename), "")
+		if !strings.Contains(joined, tc.cjkProbe) {
+			t.Errorf("layer2 tokenize(%q)=%q lost CJK probe %q", tc.wantBasename, joined, tc.cjkProbe)
+		}
+	}
+
+	// Negative (1): relative-escape path must NOT leak — the "." prefix guard
+	// skips it entirely, so no basename/path is emitted for the secret dir.
+	if bn, paths, _ := extractArtifactTokens("打開 ../秘密/旅行計畫.md 看"); len(bn) != 0 || len(paths) != 0 {
+		t.Errorf("relative-escape path should be skipped (no leak), got bn=%v paths=%v", bn, paths)
+	}
+	// Negative (2): multi-extension archive must take the LAST ext, not explode.
+	bn, _, exts := extractArtifactTokens("備份 旅遊.final.backup.tar.gz 一下")
+	if len(bn) == 0 || bn[0] != "旅遊.final.backup.tar.gz" {
+		t.Errorf("multi-ext basename=%v want [旅遊.final.backup.tar.gz]", bn)
+	}
+	if len(exts) == 0 || exts[0] != ".gz" {
+		t.Errorf("multi-ext ext=%v want [.gz]", exts)
+	}
+}

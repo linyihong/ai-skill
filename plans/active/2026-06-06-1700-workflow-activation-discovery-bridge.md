@@ -358,6 +358,23 @@ PostToolUse:Read hook fires (artifact Read by agent)
 - [x] Unit tests + regression scenario 綠 — 9/9 discovery test pass
 - [x] 2026-06-05 empirical trigger replay → Phase A 至少寫出 candidate — **MET**：proposal row 寫入 `discovery_proposals`，travel-planning 為 top candidate 之一，status=`awaiting_phase_b`
 
+#### Phase A empirical findings（2026-06-15 mechanism replay）
+
+跑真實 detector（`BuildRuntimeContext`）+ Discovery（`RunLightDiscovery`，用 production input builder `buildDiscoveryInputFromTranscript` 的等價邏輯）對一份真實 CJK 旅遊 artifact（`下関.md`）做 neutral vs keyword 對照。**框架定義（影響日後 Phase D telemetry 解讀）**：neutral 版不是「workflow 能力上限不足」，而是**在目前 signal pipeline 下可預期 fail-open；測到的是 pipeline coverage，不是 capability ceiling**。
+
+| Prompt | Detector | Discovery 最高分 | 判讀 |
+|---|---|---|---|
+| keyword（含「行程」） | **hit** `route.workflow.travel-planning` | n/a（detector 已鎖，Discovery 不跑） | hit path 正常：gate 強制讀 workflow primary_source |
+| neutral（無關鍵字） | miss | travel 連 top-3 都沒進；全 < 0.5 | miss path 預期 fail-open（Phase B 未做）+ 下列兩個 correctness bug |
+
+replay 過程暴露**兩個 correctness bug（皆已修，非 i18n/enhancement）**，並確認一個訊號分層：
+
+- **frontmatter_head 是 calibration bug（P1，已修 70024b2）**：scorer 有 branch + reserved weight 0.10 但 `buildDiscoveryInputFromTranscript` 從不填 `FrontmatterHead` → 永不產出的 feature 留在分母，把 effective max score 壓在 0.90、threshold 0.5 失真。修法＝dormant-feature 機制 + invariant（不進分母、不輸出 evidence、telemetry 標 inactive），reserved weight 保留，Phase B 接 producer 時翻 `enabled` 即可。**producer 連接刻意 deferred 到 Phase B**（與 CJK path 抽取 + 「hook 是否讀 referenced file」糾纏），避免污染 Phase D 觀測。
+- **CJK artifact extraction 是 P1 correctness bug（已修，本批）**：`artifactPathRE` body 為 ASCII-only，對非英文檔名**兩種失效**——(a) leading-CJK 完全 miss（`下関.md` → `basenames=[]`）；(b) CJK+ASCII **截斷成錯誤 basename**（`東京-trip.md` → `-trip.md`）。兩者都讓 basename/path/ext 訊號歸零或失真 → systematic recall loss，且會污染 calibration。修法＝body 放寬到 `\p{L}\p{N}`、ext 維持 ASCII（單點，不動 tokenize）。regression `TestExtractArtifactTokens_CJKFilenames` 驗三層（regex capture → extract → tokenize）+ 2 negative fixtures（relative-escape 不外溢、multi-ext 取最後 ext）。
+- **tokenize（layer 2）本來就 CJK-aware**（`tokenRE` 含 `\p{Han}\p{Hiragana}\p{Katakana}`）→ 確認 fix 收斂在 layer 1，不需動 tokenizer。
+
+> **這兩個 bug 的意義**：neutral replay 之所以 miss，不只是「Phase B 未做」，而是輸入訊號 pipeline 先殘缺（frontmatter 死訊號壓低所有分數 + CJK 檔名抽不到訊號）。**先修這兩個 correctness bug，Phase D 的 baseline 才可信**；否則三週 telemetry 會建在偏移的基準上。Phase B（Deep Discovery + frontmatter producer）排在 correctness 修正之後。
+
 ### Phase B — Deep Discovery
 
 #### Phase B.1 — Read hijack 機制

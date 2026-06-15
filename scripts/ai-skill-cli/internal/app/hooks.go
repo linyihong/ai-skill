@@ -670,7 +670,15 @@ func buildDiscoveryInputFromTranscript(transcript []DetectorMessage) DiscoveryIn
 	return input
 }
 
-var artifactPathRE = regexp.MustCompile(`[A-Za-z0-9_\-./\\]+\.[A-Za-z0-9]{1,8}`)
+// artifactPathRE matches a file/path token ending in an extension. The path
+// BODY allows any Unicode letter/number (\p{L}\p{N}) so non-English filenames
+// (e.g. 下関.md, 東京-trip.md) are captured — an ASCII-only body silently
+// dropped or truncated CJK names, zeroing Discovery's basename/path/ext signal.
+// The EXTENSION stays ASCII ([A-Za-z0-9]{1,8}) on purpose: real extensions are
+// ASCII, and bounding it prevents the body from greedily eating across a
+// trailing CJK run. Whitespace is excluded from both, so the token stays
+// bounded by spaces (no path overflow).
+var artifactPathRE = regexp.MustCompile(`[\p{L}\p{N}_\-./\\]+\.[A-Za-z0-9]{1,8}`)
 var urlLikeTokenRE = regexp.MustCompile(`[A-Za-z][A-Za-z0-9+.\-]*://\S+`)
 var versionRE = regexp.MustCompile(`^\d+(\.\d+){1,3}$`)
 
