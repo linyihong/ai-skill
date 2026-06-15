@@ -224,3 +224,73 @@ func TestRenderAdvisory_RespectsTokenCap(t *testing.T) {
 		t.Errorf("advisory exceeded cap: %d words", len(strings.Fields(out)))
 	}
 }
+
+// TestActiveWeights_DormantExcludedAndRenormalized verifies the mechanical half
+// of the Dormant-Feature Invariant: a dormant feature's reserved weight is
+// dropped from the denominator and the remaining weights renormalize to 1.0.
+func TestActiveWeights_DormantExcludedAndRenormalized(t *testing.T) {
+	cfg := defaultDiscoveryConfig()
+	if _, ok := cfg.PhaseALight.DormantFeatures["frontmatter_head"]; !ok {
+		t.Fatalf("precondition: frontmatter_head should be dormant by default")
+	}
+	w := activeWeights(cfg)
+	if _, ok := w["frontmatter_head"]; ok {
+		t.Errorf("dormant frontmatter_head must be absent from active weights")
+	}
+	sum := 0.0
+	for _, v := range w {
+		sum += v
+	}
+	if sum < 0.999 || sum > 1.001 {
+		t.Errorf("active weights must renormalize to 1.0, got %.6f", sum)
+	}
+	// user_msg_term 0.30 / (1.0 - 0.10 dormant) = 0.3333…
+	if got := w["user_msg_term"]; got < 0.332 || got > 0.334 {
+		t.Errorf("user_msg_term expected ~0.3333 after renormalize, got %.4f", got)
+	}
+}
+
+// TestDormantFeatureInvariant_NoScoreNoEvidence proves a dormant feature emits
+// no evidence even when its match condition WOULD fire. The control case
+// (frontmatter_head re-enabled) confirms the head genuinely matches, so the
+// absence in the dormant case is the dormancy mechanism, not a non-match.
+func TestDormantFeatureInvariant_NoScoreNoEvidence(t *testing.T) {
+	repo := discoveryRepoRoot(t)
+	registry, err := readRuntimeRoutingRegistry(filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"))
+	if err != nil {
+		t.Fatalf("registry: %v", err)
+	}
+	summaries := LoadDiscoverySummaries(repo)
+	// Keyword msg so travel-planning scores via live features; head contains the
+	// route tail ("travel-planning") so frontmatterHit WOULD match if reached.
+	input := DiscoveryInput{
+		UserMessage:     "幫我規劃京都旅遊行程 itinerary 看看",
+		FrontmatterHead: map[string]string{"trip.md": "notes about travel-planning"},
+	}
+
+	// (a) Default cfg: frontmatter_head dormant → no frontmatter evidence.
+	candDormant, _ := RunLightDiscovery(input, registry, summaries, defaultDiscoveryConfig(), repo)
+	for _, c := range candDormant {
+		for _, e := range c.Evidence {
+			if e.Type == "frontmatter_head" {
+				t.Fatalf("dormant invariant violated: frontmatter_head evidence emitted on %s", c.Route)
+			}
+		}
+	}
+
+	// (b) Control — re-enable frontmatter_head → evidence now appears.
+	cfgOn := defaultDiscoveryConfig()
+	cfgOn.PhaseALight.DormantFeatures = map[string]string{}
+	candOn, _ := RunLightDiscovery(input, registry, summaries, cfgOn, repo)
+	found := false
+	for _, c := range candOn {
+		for _, e := range c.Evidence {
+			if e.Type == "frontmatter_head" {
+				found = true
+			}
+		}
+	}
+	if !found {
+		t.Fatalf("control failed: with frontmatter_head enabled the head should have matched; cannot prove dormancy")
+	}
+}

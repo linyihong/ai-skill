@@ -31,16 +31,28 @@ phase_a_light:
   evidence_per_candidate_cap: 5
 
   # Signal weights — see plan §Phase A.1 scoring formula.
-  # Sum is 1.0 by convention; individual match values are normalized [0,1]
-  # so the resulting score lives in [0, ~1.0+] (co-occurring matches add).
+  # Declared weights sum to 1.0. ACTIVE weights (after removing dormant_features
+  # below) are renormalized to sum to 1.0 at scoring time — see
+  # discovery.go::activeWeights. Individual match values are normalized [0,1].
   weights:
     user_msg_term: 0.30
     summary_match: 0.25
     basename_term: 0.15
     path_segment: 0.10
     extension_hint: 0.05
-    frontmatter_head: 0.10
+    frontmatter_head: 0.10   # reserved; dormant (see dormant_features)
     cwd_overlay: 0.05
+
+  # Dormant-Feature Invariant: a feature listed here has a reserved weight above
+  # but NO live producer. It is excluded from the score denominator, contributes
+  # no score, and emits no evidence. This keeps `threshold` calibrated against
+  # only features that actually produce a signal. Re-enable by deleting the
+  # entry once a producer is wired.
+  #   frontmatter_head: buildDiscoveryInputFromTranscript never populates
+  #   DiscoveryInput.FrontmatterHead → connecting a producer is a Phase B item
+  #   (tracked separately from this correctness fix).
+  dormant_features:
+    frontmatter_head: producer_not_connected
 
   # Extension → route kind hint (used by extension_hint match).
   # Routes whose primary_source path contains the kind segment get a +1

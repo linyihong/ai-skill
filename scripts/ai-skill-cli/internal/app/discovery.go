@@ -66,6 +66,13 @@ type DiscoveryConfig struct {
 		TopNCandidates         int                `yaml:"top_n_candidates"`
 		EvidencePerCandidate   int                `yaml:"evidence_per_candidate_cap"`
 		Weights                map[string]float64 `yaml:"weights"`
+		// DormantFeatures maps a feature name → reason for being inactive. A
+		// dormant feature has a declared (reserved) weight but no live producer.
+		// Per the Dormant-Feature Invariant it is excluded from the score
+		// denominator, contributes no score, and emits no evidence — see
+		// activeWeights + scoreRoute. Keeps the threshold calibrated against
+		// only features that actually produce a signal.
+		DormantFeatures        map[string]string  `yaml:"dormant_features"`
 		ExtensionRouteHints    map[string]string  `yaml:"extension_route_hints"`
 	} `yaml:"phase_a_light"`
 	Eligibility struct {
@@ -99,8 +106,19 @@ func defaultDiscoveryConfig() DiscoveryConfig {
 		"basename_term":    0.15,
 		"path_segment":     0.10,
 		"extension_hint":   0.05,
-		"frontmatter_head": 0.10,
+		"frontmatter_head": 0.10, // reserved weight; dormant until Phase B wires a producer
 		"cwd_overlay":      0.05,
+	}
+	// frontmatter_head has a scorer branch + reserved weight (0.10) but NO
+	// producer — buildDiscoveryInputFromTranscript never populates
+	// DiscoveryInput.FrontmatterHead, so the branch could never fire in prod.
+	// Left un-marked it was a calibration bug: the reserved 0.10 sat in the
+	// denominator, capping the effective max score below the declared 1.0 and
+	// silently miscalibrating the threshold. Marking it dormant excludes it
+	// from the denominator (see activeWeights). Phase B re-enables it by
+	// deleting this entry once a producer is connected.
+	c.PhaseALight.DormantFeatures = map[string]string{
+		"frontmatter_head": "producer_not_connected",
 	}
 	c.PhaseALight.ExtensionRouteHints = map[string]string{
 		".py": "software-delivery", ".ts": "software-delivery", ".tsx": "software-delivery",
@@ -372,6 +390,15 @@ func RunLightDiscovery(input DiscoveryInput, registry runtimeRoutingRegistry, su
 		snapshot["overlay_facts"] = overlayFacts
 	}
 
+	// Telemetry half of the Dormant-Feature Invariant: record which features
+	// were inactive (reserved weight, no producer) and the normalized active
+	// weight set actually used, so Phase D telemetry can group by feature
+	// activity and never mistakes a dormant feature for a zero-scoring one.
+	if len(cfg.PhaseALight.DormantFeatures) > 0 {
+		snapshot["dormant_features"] = cfg.PhaseALight.DormantFeatures
+	}
+	snapshot["active_weights"] = activeWeights(cfg)
+
 	userTokens := map[string]bool{}
 	for _, t := range tokenize(input.UserMessage) {
 		userTokens[t] = true
@@ -434,10 +461,7 @@ func scoreRoute(rec runtimeRouteRecord, summaryByRoute map[string]discoverySumma
 	userTokens, basenameTokens, pathSegments map[string]bool,
 	input DiscoveryInput, cfg DiscoveryConfig, overlayFacts []EvidenceItem) (float64, []EvidenceItem) {
 
-	w := cfg.PhaseALight.Weights
-	if w == nil {
-		w = defaultDiscoveryConfig().PhaseALight.Weights
-	}
+	w := activeWeights(cfg)
 
 	// Route keyword set: task_intent + activation user_signals + summary
 	// keywords. Lower-cased and tokenized.
@@ -484,55 +508,111 @@ func scoreRoute(rec runtimeRouteRecord, summaryByRoute map[string]discoverySumma
 	score := 0.0
 	evidence := []EvidenceItem{}
 
-	// user_msg_term match — fraction of route keywords present in user msg.
-	if hits := intersectCount(userTokens, keywordTokens); hits > 0 {
-		match := normalizeMatch(hits, len(keywordTokens))
-		score += w["user_msg_term"] * match
-		evidence = append(evidence, EvidenceItem{Type: "user_msg_term", Value: fmt.Sprintf("%d/%d", hits, len(keywordTokens))})
+	// Every branch is guarded by presence in the active-weights map. A dormant
+	// feature is absent from w (activeWeights drops it), so its branch is
+	// skipped entirely — no score contribution AND no evidence emitted. This is
+	// the Dormant-Feature Invariant: a dormant feature must not appear in the
+	// denominator, the score, or the evidence set.
+
+	// user_msg_term — fraction of route keywords present in user msg.
+	if wv, ok := w["user_msg_term"]; ok {
+		if hits := intersectCount(userTokens, keywordTokens); hits > 0 {
+			match := normalizeMatch(hits, len(keywordTokens))
+			score += wv * match
+			evidence = append(evidence, EvidenceItem{Type: "user_msg_term", Value: fmt.Sprintf("%d/%d", hits, len(keywordTokens))})
+		}
 	}
 
 	// summary_match — substring presence of summary text in user msg /
-	// basenames. Counts as full match (binary) when at least one notable
-	// summary phrase appears.
-	if hasSummary && summarySubstringHit(input, summary) {
-		score += w["summary_match"] * 1.0
-		evidence = append(evidence, EvidenceItem{Type: "summary_match", Value: discoveryTruncate(summary.Summary, 60)})
-	}
-
-	if hits := intersectCount(basenameTokens, keywordTokens); hits > 0 {
-		match := normalizeMatch(hits, len(keywordTokens))
-		score += w["basename_term"] * match
-		var sampleBn string
-		if len(input.Basenames) > 0 {
-			sampleBn = input.Basenames[0]
-		}
-		evidence = append(evidence, EvidenceItem{Type: "basename_term", Value: sampleBn})
-	}
-
-	if hits := intersectCount(pathSegments, keywordTokens); hits > 0 {
-		match := normalizeMatch(hits, len(keywordTokens))
-		score += w["path_segment"] * match
-		if len(input.Paths) > 0 {
-			evidence = append(evidence, EvidenceItem{Type: "path_segment", Value: lastTwoSegments(input.Paths[0])})
+	// basenames. Binary full match when at least one notable phrase appears.
+	if wv, ok := w["summary_match"]; ok {
+		if hasSummary && summarySubstringHit(input, summary) {
+			score += wv * 1.0
+			evidence = append(evidence, EvidenceItem{Type: "summary_match", Value: discoveryTruncate(summary.Summary, 60)})
 		}
 	}
 
-	if hint := extensionHit(rec, input.Extensions, cfg); hint != "" {
-		score += w["extension_hint"] * 1.0
-		evidence = append(evidence, EvidenceItem{Type: "extension_hint", Value: hint})
+	if wv, ok := w["basename_term"]; ok {
+		if hits := intersectCount(basenameTokens, keywordTokens); hits > 0 {
+			match := normalizeMatch(hits, len(keywordTokens))
+			score += wv * match
+			var sampleBn string
+			if len(input.Basenames) > 0 {
+				sampleBn = input.Basenames[0]
+			}
+			evidence = append(evidence, EvidenceItem{Type: "basename_term", Value: sampleBn})
+		}
 	}
 
-	if val := frontmatterHit(rec, input.FrontmatterHead); val != "" {
-		score += w["frontmatter_head"] * 1.0
-		evidence = append(evidence, EvidenceItem{Type: "frontmatter_head", Value: val})
+	if wv, ok := w["path_segment"]; ok {
+		if hits := intersectCount(pathSegments, keywordTokens); hits > 0 {
+			match := normalizeMatch(hits, len(keywordTokens))
+			score += wv * match
+			if len(input.Paths) > 0 {
+				evidence = append(evidence, EvidenceItem{Type: "path_segment", Value: lastTwoSegments(input.Paths[0])})
+			}
+		}
 	}
 
-	if val := overlayHit(rec, overlayFacts); val != "" {
-		score += w["cwd_overlay"] * 1.0
-		evidence = append(evidence, EvidenceItem{Type: "cwd_overlay", Value: val})
+	if wv, ok := w["extension_hint"]; ok {
+		if hint := extensionHit(rec, input.Extensions, cfg); hint != "" {
+			score += wv * 1.0
+			evidence = append(evidence, EvidenceItem{Type: "extension_hint", Value: hint})
+		}
+	}
+
+	// frontmatter_head is dormant (no producer) → absent from w → this whole
+	// branch is skipped: frontmatterHit is never even called, so no phantom
+	// evidence can be emitted.
+	if wv, ok := w["frontmatter_head"]; ok {
+		if val := frontmatterHit(rec, input.FrontmatterHead); val != "" {
+			score += wv * 1.0
+			evidence = append(evidence, EvidenceItem{Type: "frontmatter_head", Value: val})
+		}
+	}
+
+	if wv, ok := w["cwd_overlay"]; ok {
+		if val := overlayHit(rec, overlayFacts); val != "" {
+			score += wv * 1.0
+			evidence = append(evidence, EvidenceItem{Type: "cwd_overlay", Value: val})
+		}
 	}
 
 	return score, evidence
+}
+
+// activeWeights returns the scoring weights with dormant features removed and
+// the remaining (active) weights renormalized to sum to 1.0. Dormant features
+// (cfg.PhaseALight.DormantFeatures) carry a reserved weight that is excluded
+// from the denominator. This is the mechanical half of the Dormant-Feature
+// Invariant: a feature with a reserved weight but no live producer must not sit
+// in the denominator (which would cap the effective max score below 1.0 and
+// miscalibrate the threshold). Re-enabling a feature = delete it from
+// DormantFeatures; the threshold philosophy is unchanged.
+func activeWeights(cfg DiscoveryConfig) map[string]float64 {
+	raw := cfg.PhaseALight.Weights
+	if raw == nil {
+		raw = defaultDiscoveryConfig().PhaseALight.Weights
+	}
+	dormant := cfg.PhaseALight.DormantFeatures
+	sum := 0.0
+	for k, v := range raw {
+		if _, off := dormant[k]; off {
+			continue
+		}
+		sum += v
+	}
+	out := map[string]float64{}
+	if sum <= 0 {
+		return out
+	}
+	for k, v := range raw {
+		if _, off := dormant[k]; off {
+			continue
+		}
+		out[k] = v / sum
+	}
+	return out
 }
 
 func intersectCount(a, b map[string]bool) int {
