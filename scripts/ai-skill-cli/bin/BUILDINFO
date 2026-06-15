@@ -1,4 +1,4 @@
-version=repo-70024b2
-source_commit=70024b2
-built_at=2026-06-15T00:40:12Z
+version=repo-ec3206a
+source_commit=ec3206a
+built_at=2026-06-15T00:46:34Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
