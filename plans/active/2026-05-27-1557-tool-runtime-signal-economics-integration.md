@@ -13,6 +13,12 @@ parent: null
 
 draft
 
+**目前執行入口（next）**：第一刀 = §Architecture Review & Reduction Agenda（2026-06-15）的
+**Phase 1（owner path）→ Phase 2（control/adaptation boundary）reduction**。先讀該 agenda 再進
+Phase 0。本輪是 architecture reduction（boundary decisions only：4 層 owner path 拍板 +
+`runtime/economics/` 砍除決策 + Surface→Surface 禁令成文），**不寫 economics 實作 / runtime /
+surface / code**；任何 surface 或 code 變更前停下來與 maintainer 對齊範圍。
+
 ## Summary
 
 把 `tools/` 從 document / routing index layer 升級為 runtime-readable signal source，並補上 execution economics layer，讓 runtime 能機械使用 tool cost、risk、activation、compression、recursion、latency、retry 與 context expansion signals。
