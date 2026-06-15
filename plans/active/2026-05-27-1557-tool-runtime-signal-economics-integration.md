@@ -626,6 +626,34 @@ This is not meant to make every chat response verbose. The output can remain com
 
 The existing `cognitive_cost` can remain as a public summary / compatibility field, derived from split costs.
 
+## Architecture Review & Reduction Agenda（2026-06-15, maintainer）
+
+> **定位**：把第一刀當成 **architecture reduction phase（不是 implementation）**。最大風險已
+> 不是「缺東西」，而是「開始長出兩套 runtime」。**First cut = Phase 1（owner path）→ Phase 2
+> （control/adaptation boundary）**，目標是解 Economics ↔ Ecosystem ownership 重疊；任何
+> surface/code 變更前先停下來對齊範圍。以下 5 條是 reduction 的 agenda（maintainer direction，
+> 由 reduction phase 對齊現行架構後落實，不是已套用的改動）。
+
+**Finding 1 — Decision Stack duplication（最大風險 / 真正 blocker）**
+- 目前 5 層（Source-of-truth → Runtime Economics → Ecosystem Interaction → Runtime Orchestration → Cognitive State）中，**Runtime Economics 與 Ecosystem Interaction 重疊**：兩者都在做 cost evaluation / pressure / adaptation / recommendation / feedback → 雙 economics engine 風險（runtime 算一次、ecosystem 再算一次）。
+- **Reduction：收斂成 4 層** — Source Truth（`models/` `tools/` `memory/` `workflow/`）→ Interaction/derived（`ecosystem/{pressure,economics,adaptation}`）→ Runtime/execution（`runtime/{orchestration,cognitive-modes}`）→ State/observable（`generated_state/`）。
+- **砍掉 `runtime/economics/`**：Runtime 不擁有 economics，只執行；economics 歸 Interaction(derived) 層。直接回答 Phase 0 的 owner-path 問題。
+
+**Finding 2 — Knowledge Acquisition 是 lifecycle event，不是 economics/state**
+- 不要先定義 `knowledge_mode` / `discovery_mode` / `intelligence_mode`（state-like）。先定義 `knowledge_event`（discovered / reused / promoted / rejected）+ `knowledge_source` + `knowledge_decision` + `promotion_target`，**再衍生 mode**。
+- 流程：`execution → observation → knowledge_event → governance → writeback`。避免「mode 無 writeback = fake observability」（呼應 plan 自己提的 fake observability 警告）。
+
+**Finding 3 — Projection Inflation（11 surfaces / 15 signals 已近治理臨界）**
+- 加一條 invariant：**No generated surface may depend on another generated surface**。只允許 `Source → Surface`，**禁止 `Surface → Surface`**。每個 consumer 自己 join，避免 hidden dependency graph（如 `runtime.economics.* → ecosystem.* → runtime.cognitive_state.*`）。
+
+**Finding 4 — Cognitive State 缺 Confidence 維度**
+- 加 `confidence: { evidence_quality, source_count, assumption_level, contract_confidence }`。否則 `economics.thinking_cost: HIGH` 沒有可信度 → 「高成本 + 低信心」不可見。
+
+**Finding 5 — Phase reorder（State 先於 Signals 先於 Knowledge）**
+- 改為：P4 Tool Contract → P5 Economics → P6 Pressure → **P7 State → P8 Signals** → P9 Feedback → **P10 Knowledge**。理由：State 要先存在，Signal 才知 emit 到哪；**Knowledge 是 consumer，不是 producer**，排最後。
+
+**Overall**：架構方向強、邊界意識成熟、可治理性高；**過度建模風險中高**；真正 blocker = owner 重疊；下一個該解 = Economics ↔ Ecosystem ownership。reduction phase 的 acceptance ≈「4 層 owner path 拍板 + `runtime/economics/` 砍除決策 + Surface→Surface 禁令成文」，**不寫 economics 實作**。
+
 ## Phase 0: Pre-Build Interrogation
 
 - [ ] Confirm scope: static economics contracts + signal wiring first; no full telemetry DB in v1.
