@@ -139,6 +139,25 @@ Governance invariant（consumer）：`observable_outcome_must_survive_owner_refr
 
 ---
 
+## Evidence Rule
+
+> Machine-readable evidence-rule（schema `evidence-rule-v1`），索引於
+> [`governance/evidence-candidates/evidence-rules/interaction-hazard.pointer.yaml`](../../governance/evidence-candidates/evidence-rules/interaction-hazard.pointer.yaml)。
+> **Phase 1A Step 2（consumer attach）**：本 section 成立 = consumer hook 建立；criterion 內容是
+> **Step 3（criteria authoring）**，下方刻意留 placeholder。rule 定義 owner = 本 plan。acceptance-gate
+> 形狀候選 `pilot_complete + criteria_pass >= 6`；證據可跨 repo（下游 Vidoe-Test commit）。notify
+> 屬 acceptance-gate（gate projection），不在 evidence_rule。設計來源見
+> [`evidence-candidate-system`](2026-06-16-1131-evidence-candidate-system.md)。
+
+```yaml
+evidence_rule:
+  collect: true
+  match:
+    artifact_types: []   # Step 3
+    criteria: []         # Step 3（候選方向：四欄 trust table case / downstream pilot gate / field survival）
+  exclusions: []         # Step 3
+```
+
 ## Roadmap
 
 ```text

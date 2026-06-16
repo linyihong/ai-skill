@@ -117,6 +117,25 @@ Place draft analysis at: [`governance/lifecycle/governance-pattern-library-draft
 - [ ] Update `governance/lifecycle/README.md` to index this template
 - [ ] Archive `governance-pattern-library-draft.md` once template lands
 
+## Evidence Rule
+
+> Machine-readable evidence-rule（schema `evidence-rule-v1`），索引於
+> [`governance/evidence-candidates/evidence-rules/governance-pattern.pointer.yaml`](../../governance/evidence-candidates/evidence-rules/governance-pattern.pointer.yaml)。
+> **Phase 1A Step 2（consumer attach）**：本 section 成立 = consumer hook 建立；criterion 內容是
+> **Step 3（criteria authoring）**，下方刻意留 placeholder。rule 定義 owner = 本 plan。acceptance-gate
+> 形狀候選 `sample_count >= 5 + falsification >= 1`（notify 達 gate = 「可 review」≠「已 promotion」），
+> 屬 acceptance-gate，不在 evidence_rule。設計來源見
+> [`evidence-candidate-system`](2026-06-16-1131-evidence-candidate-system.md)。
+
+```yaml
+evidence_rule:
+  collect: true
+  match:
+    artifact_types: []   # Step 3
+    criteria: []         # Step 3（候選方向：6-step / Reference Integrity / Failure Authority sample inventory）
+  exclusions: []         # Step 3
+```
+
 ## Out of scope
 
 - 不立刻寫 template（這正是本 plan 的重點 — 等樣本足夠）

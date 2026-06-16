@@ -1044,6 +1044,25 @@ scenario / validator / report / diff / commit / issue）；`strength` ∈ `hard`
 - [ ] Add or update scenarios that prevent knowledge acquisition from becoming unclosed "interesting finding" logs
 - [ ] Execute Plan Completion Closure if all phases complete
 
+## Evidence Rule
+
+> Machine-readable evidence-rule（schema `evidence-rule-v1`），索引於
+> [`governance/evidence-candidates/evidence-rules/economics.pointer.yaml`](../../governance/evidence-candidates/evidence-rules/economics.pointer.yaml)。
+> **Phase 1A Step 2（consumer attach）**：本 section 成立 = consumer hook 建立；criterion 內容是
+> **Step 3（criteria authoring）**，下方刻意留 placeholder。rule 定義 owner = 本 plan（evidence-candidates/
+> 只 index，不複製內容）。`collect: true` 但 `notify` 預設 false（economics 由 maintainer 自己看）；
+> `notify` 屬 acceptance-gate（gate projection），不在 evidence_rule。設計來源見
+> [`evidence-candidate-system`](2026-06-16-1131-evidence-candidate-system.md)。
+
+```yaml
+evidence_rule:
+  collect: true
+  match:
+    artifact_types: []   # Step 3
+    criteria: []         # Step 3（候選方向：§Evidence Log 的 A/B/C class observation）
+  exclusions: []         # Step 3
+```
+
 ## Open Questions
 
 - Should economics live under `runtime/economics/`, runtime-root YAML files, a new top-level `economics/`, or a broader top-level `ecosystem/` owner layer?

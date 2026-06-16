@@ -3,6 +3,6 @@ plan_ref: active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
 schema: evidence-rule-v1
 source:
   embedded_section:
-    - Evidence Rule        # section 尚未建立（Phase 1A Step 2 consumer attach）；Phase 1A 允許 placeholder
-status: section_pending    # section_pending | resolved
+    - Evidence Rule        # section 已建立（Phase 1A Step 2）；criteria 內容待 Step 3
+status: resolved           # section_pending | resolved
 notes: economics 設 collect 但 notify 預設 false（maintainer 自己看，見設計 plan §Decision）

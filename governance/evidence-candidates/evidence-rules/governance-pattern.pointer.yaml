@@ -3,6 +3,6 @@ plan_ref: active/2026-06-08-2100-governance-pattern-library-extraction.md
 schema: evidence-rule-v1
 source:
   embedded_section:
-    - Evidence Rule        # section 尚未建立（Phase 1A Step 2 consumer attach）；Phase 1A 允許 placeholder
-status: section_pending    # section_pending | resolved
+    - Evidence Rule        # section 已建立（Phase 1A Step 2）；criteria 內容待 Step 3
+status: resolved           # section_pending | resolved
 notes: gate 形狀候選 sample_count>=5 + falsification>=1（criteria authoring 為 Step 3，本檔不寫內容）
