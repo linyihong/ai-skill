@@ -1,0 +1,11 @@
+# Pointer only — rule 定義在 consuming repo plan（Vidoe-Test），本檔僅 index
+plan_ref: external/Vidoe-Test/docs/plans/2026-06-16-design-contract-validation-pilot.md
+schema: evidence-rule-v1
+source:
+  embedded_section:
+    - Evidence Rule (extraction candidates)
+status: section_pending
+notes: >
+  evidence_rule embedded in Vidoe-Test
+  docs/plans/2026-06-16-design-contract-validation-pilot.md#evidence-rule-extraction-candidates.
+  Cross-repo candidate per ECS Q5 v0 (manual downstream artifact).
