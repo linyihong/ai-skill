@@ -1058,9 +1058,16 @@ scenario / validator / report / diff / commit / issue）；`strength` ∈ `hard`
 evidence_rule:
   collect: true
   match:
-    artifact_types: []   # Step 3
-    criteria: []         # Step 3（候選方向：§Evidence Log 的 A/B/C class observation）
-  exclusions: []         # Step 3
+    artifact_types: [commit, plan, scenario, validator, report, diff, issue]
+    criteria:                          # 對齊 §Evidence Log 的 A/B/C class + reopen triggers
+      - id: owner_ambiguity            # class A
+        description: 新 plan / scenario / validator 不知該放 runtime/ 還 ecosystem/（如 compression_policy / memory_pressure / routing_feedback）
+      - id: state_cannot_describe_failure   # class B
+        description: 報告出現 high cost + decision accepted，但無法回答「這判斷可信嗎」（缺 confidence / evidence-authority 維度）
+      - id: phase_order_rework         # class C
+        description: 「先定 signal、後面 state 裝不下」或 knowledge phase 重寫前面 phase
+  exclusions:
+    - 純該專案 app 問題（observation 必須是關於 Ai-skill 架構的三類，不是下游 app 自身 bug）
 ```
 
 ## Open Questions

@@ -153,9 +153,19 @@ Governance invariant（consumer）：`observable_outcome_must_survive_owner_refr
 evidence_rule:
   collect: true
   match:
-    artifact_types: []   # Step 3
-    criteria: []         # Step 3（候選方向：四欄 trust table case / downstream pilot gate / field survival）
-  exclusions: []         # Step 3
+    artifact_types: [commit, screen-mapping-doc, test, bdd, adr]   # commit 含下游 repo（跨 repo 證據）
+    criteria:
+      - id: trust_transition_case
+        description: 新的 invalidate↔recover 案例可用四欄 Ownership Map（State|Owner|Invalidation|Recovery）不改字表達
+      - id: field_survival
+        description: 四欄在 rename pressure（換域、不換列名）下仍成立 —— primitive 有生命力（criterion 5）
+      - id: predictive_prevention
+        description: ≥1 previously-unknown prevention，非已上線 bug 的事後解釋（criterion 4）
+      - id: downstream_pilot_evidence
+        description: 下游 consuming 專案（如 Vidoe-Test）commit/diff 驗證 trust transition —— 跨 repo 證據
+  exclusions:
+    - post-hoc 解釋已 ship 的 bug（非 predictive interception）
+    - 每案都要改栏位的 abstraction（abstraction noise，非 primitive）
 ```
 
 ## Roadmap

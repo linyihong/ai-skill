@@ -131,9 +131,16 @@ Place draft analysis at: [`governance/lifecycle/governance-pattern-library-draft
 evidence_rule:
   collect: true
   match:
-    artifact_types: []   # Step 3
-    criteria: []         # Step 3（候選方向：6-step / Reference Integrity / Failure Authority sample inventory）
-  exclusions: []         # Step 3
+    artifact_types: [plan, commit, validator, scenario]
+    criteria:
+      - id: new_6step_sample
+        description: 新 land 的 governance subsystem 呈現 4-step invariant core（Observation→Registry→Executor→Validation）+ 條件 Rule/Projection 形狀
+      - id: nonfitting_sample
+        description: 缺某步（Rule 或 Projection）的樣本 —— falsification 訊號，比命中更有價值
+      - id: sibling_family_sample
+        description: Reference Integrity / Failure Authority 等 sibling family 的新樣本（各有獨立 N≥5 gate）
+  exclusions:
+    - retrofitted sample（為套形狀硬塞 / 因讀了其他樣本而 confirmation bias，非自然出現）
 ```
 
 ## Out of scope
