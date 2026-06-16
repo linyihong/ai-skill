@@ -141,7 +141,9 @@ Session → Task Output → Evidence Candidate Store → (人工 Accept) → Pla
 
 **Memory 只存三種東西**：(1) 有哪些 plan 正在收集中、(2) 有哪些待 review 的通知、(3) 最近做到哪步。
 **不存**：candidate 明細、證據內容、sample 數量、gate 狀態 —— 那些都屬於 evidence/candidate store。
-亦即 `memory += pending_observation_pointer`，**不是** `memory += evidence`。
+亦即 `memory += work_continuation_pointer`，**不是** `memory += evidence`。（用 `work_continuation`
+不用 `observation`：這個 pointer 已不只是觀察，它含「哪些 plan 在收集 / 哪些通知待 review / 最近做到
+哪步」，比較像 workflow continuation。）
 
 這讓 Candidate Store 成為 **memory of observations ≠ memory of conclusions**：記「發生過什麼、指向
 哪裡」，不記「已成立、已抽象成功、已升級」。正好不踩 governance-pattern 一直在防的 premature
@@ -169,9 +171,21 @@ governance-pattern plan 的紀律。現在升 ADR = 自己違反自己。schema 
 
 ### ADR Promotion Criteria（completed 時驗證）
 
-- [ ] 累積 ≥20 candidate（跨 session）
-- [ ] 人工接受率 >50%（不是大量誤報的 noise queue）
-- [ ] **`candidate_age_p95 < 30d`** — 累積多但都沒人處理不是成功，是 backlog；用 p95 處理延遲區分
+Phase 2 gate（要不要蓋更多基礎設施）— **四項全過才算 working system，不是 backlog / 垃圾桶**：
+
+```yaml
+phase2_gate:
+  candidate_count   >= 20      # 跨 session 累積量
+  reviewed_ratio    >= 80%     # (accept + discard) / created；expire 不算 reviewed → 大量 expire 會 fail
+  accepted_ratio    >  50%     # accept / (accept + discard)，只在「看過的」裡算，避免 expire 稀釋
+  candidate_age_p95 <  30d     # 處理延遲；防 backlog
+```
+
+> 為什麼 `reviewed_ratio` 和 `accepted_ratio` 要分開：只看 accept rate 會被「20 個 candidate 只處理
+> 3 個但都 accept」騙過（rate 漂亮但其實沒人在看）。`reviewed_ratio` 管「有沒有人在看」，
+> `accepted_ratio` 管「看了之後採納比例」，兩者分母不同（見上方公式），缺一不可。
+
+- [ ] 上述 `phase2_gate` 四項全過
 - [ ] 沒有大量誤報（false-positive 率可接受，具體門檻待 Phase 1 觀察後定）
 - [ ] 至少 2 個 plan 真的用 evidence-rule + acceptance-gate 各自判定（證明非 economics-only 特例）
 - [ ] 沒有更輕的 promotion target（per ADR-007）
@@ -236,7 +250,7 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 - [ ] 三個 plan 各長出 machine-readable `evidence-rule + acceptance-gate`（Phase 1 第一 artifact）
 - [ ] candidate `inbox/` gitignored 建立；accept 寫回 plan evidence（無永久 committed 中間態）
 - [ ] agent-invoked scanner v0 可掃當前 session diff 比對 criteria 產生 candidate（輸出 `criteria_hits[]`，無 confidence 數字）
-- [ ] 累積觀察期後評估 §ADR Promotion Criteria（≥20 / >50% accept / `candidate_age_p95 < 30d`）→ 決定是否進 Phase 2
+- [ ] 累積觀察期後評估 §ADR `phase2_gate`（count≥20 / reviewed_ratio≥80% / accepted_ratio>50% / age_p95<30d）→ 決定是否進 Phase 2
 - [ ] 全程未滑入 Enforcement / Promotion 自動化（§Watch-Out 護欄成立）
 
 ## Phase 0: Pre-Build Interrogation
@@ -273,11 +287,20 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 - [x] Q2 拍板：candidate **不 committed**（inbox gitignored；accept 寫回 plan）
 - [x] notify → 收進 acceptance-gate（不獨立 notify-rule，避免第二個 state machine）
 - [ ] Q3 拍板：scanner 觸發模型（傾向 agent-invoked）
-- [ ] 定義 candidate 生命週期：**create → accept → discard**（accept 寫回 plan evidence；discard 丟棄；無永久 committed 中間態）
-- [ ] freeze candidate schema：`id` / `source{repo,artifact,commit}` / `matched_plans[]` / `criteria_hits[]` / `status{create|accepted|discarded}`
+- [x] 定義 candidate 生命週期：**create → { accept | discard | expire }**
+  - `accept` = 看過、採納 → 寫回 plan evidence
+  - `discard` = 看過、不採納（= reject）
+  - `expire` = **沒處理但過期**（≠ discard）；`reason ∈ {plan_closed, artifact_stale, exceeded_retention}`
+  - 為什麼要 `expire`：沒它的話，「沒人看、90 天還在 inbox」會被誤算進 accept rate 分母而失真。expire
+    不算 reviewed（見 §ADR `phase2_gate`），大量 expire 會讓 `reviewed_ratio` fail —— 正好抓「把 inbox 當垃圾桶」。
+- [x] **Invariant — candidate 不可指向 candidate**：`candidate.source` MUST reference 原始 artifact
+  （commit / ADR / test / doc / issue）；MUST NOT reference 另一個 candidate。否則觀察層會自我繁殖
+  （C14 → scanner 又掃到 → C22）。鏈只允許 `artifact → candidate → plan evidence`。（對齊 economics
+  plan D3 的 surface→surface 禁令。）
+- [ ] freeze candidate schema：`id` / `source{repo,artifact,commit}` / `matched_plans[]` / `criteria_hits[]` / `status{create|accepted|discarded|expired}`
 
 完成條件：
-- [ ] schema 凍結並記錄；Q1/Q2/notify/lifecycle 全拍板，Q3 拍板後才進 Phase 1
+- [ ] schema 凍結並記錄；Q1/Q2/notify/lifecycle/invariant 全拍板，Q3 拍板後才進 Phase 1
 
 ## Phase 1: Evidence Candidate System（被動）
 
@@ -285,7 +308,7 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 - [ ] 建 candidate `inbox/`（gitignored）+ 在合適位置標明 observation-only + economics 三條規則
 - [ ] 用 Phase 0.5 凍結的 candidate schema（含 `criteria_hits[]`，無 confidence）
 - [ ] agent-invoked scanner v0：掃當前 session diff/artifact → 比對 criteria → 產生 candidate（不自動寫入 plan）
-- [ ] 人工 Accept 流程：accept → 寫回該 plan evidence；discard → 丟棄；（defer = 留在 inbox）
+- [ ] 人工 Accept 流程：accept → 寫回該 plan evidence；discard → 丟棄（看過不採納）；expire → 過期（retention / plan_closed，未處理）；defer = 留在 inbox 待後續
 
 規則（Phase 1 不可違反）：
 - 不自動寫入 plan
