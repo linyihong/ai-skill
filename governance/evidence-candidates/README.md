@@ -34,19 +34,28 @@ governance/evidence-candidates/
     governance-pattern.pointer.yaml
     interaction-hazard.pointer.yaml
   inbox/                           # gitignored — candidate 本機暫存，永不 commit
-  scanner-v0.py                    # ASSEMBLER（stateless；非 ai-skill CLI、非 hook）
   README.md
 ```
 
-## scanner-v0（Assembler）
+scanner 程式碼依 Go-first script policy 放 toolchain：
+[`scripts/ai-skill-cli/cmd/evidencecandidate/`](../../scripts/ai-skill-cli/cmd/evidencecandidate/)（Go，**非 ai-skill dispatch target**、非 hook、非 runtime）。
 
-`scanner-v0.py` 是 standalone stateless **assembler**，不接 ai-skill CLI / hook / runtime。
+## scanner v0（Assembler）
+
+Go standalone **assembler**（`cmd/evidencecandidate`）。三件事分開：implementation language（Go）/
+toolchain placement（`cmd/`，discoverable）/ authority（none，**非 routable**）。
 input：artifact + **明確 criteria_hits**（`criteria_source.actor` 標於 scanner 外）+ rule registry；
 output：`candidate{status: create}` 寫入 `inbox/`。
 做 schema validate / pointer resolve / dedupe（content-hash id，idempotent）/ invariant check / persist；
-**不做** infer / match / classify / score / rank / accept / expire。
-真正的 match-by-pattern 是 Phase 2（`criteria_source.actor: matcher-v2`），scanner 永不自產 criteria。
-用法：`python3 scanner-v0.py < artifact.json`。
+**不做** infer / match / classify / score / rank / accept / expire。matcher 是 Phase 2，scanner 永不自產 criteria。
+
+**三條硬護欄**：
+1. **removable**：刪掉它 repo 不壞；無 `route.*` / `runtime.db` / build pipeline / commit hook / generated surface 依賴它。
+2. **output = artifact 非 state**：side effect 只有 stdout + `inbox/<id>.json`；不改 runtime.db / registry / plan / memory（accept 永遠另外做）。
+3. **exit code ≠ 成熟度**：只有 `0`=assembled、`1`=invalid input；不編碼 accepted / matured。
+
+用法（從 module dir `scripts/ai-skill-cli/`）：
+`go run ./cmd/evidencecandidate -base ../../governance/evidence-candidates < artifact.json`
 
 ## Invariants
 
