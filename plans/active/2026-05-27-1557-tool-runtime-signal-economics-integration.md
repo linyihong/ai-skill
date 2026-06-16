@@ -806,6 +806,10 @@ lifecycle 會重開 ownership）。
 scenario / validator / report / diff / commit / issue）；`strength` ∈ `hard` / `soft`；
 `decision_blocked` ∈ `yes` / `no`（當下是否卡到做不下去）。
 
+**證據來源可跨 repo**：observation 可來自下游 consuming 專案（Ai-skill-wired 的真實工作專案），
+此時 `artifact` 填該下游 repo 的 report / commit / diff ref；但 `observation` 仍須是關於 Ai-skill
+架構的三類，**不是該專案自身的 app 問題**。
+
 **規則（只有三條）**：
 
 1. **只記實例，不記結論** —— 寫「看到什麼」，不寫「應該開第二刀」。
