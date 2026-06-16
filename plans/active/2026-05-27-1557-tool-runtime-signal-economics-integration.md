@@ -786,11 +786,39 @@ trigger:                           # 出現任一才開第二刀（對應下表 
 | **B — State 無法描述失敗** | 報告出現 `thinking_cost: HIGH` + `execution_cost: HIGH` + `decision: accepted`，但無法回答「這判斷可信嗎」 | **Finding 4**（Cognitive State `confidence` 維度） |
 | **C — Phase 順序造成返工** | 「先定 signal、後面 state 裝不下」或「knowledge phase 重寫前面 phase」 | **Finding 5**（phase reorder：P7 State → P8 Signals → P10 Knowledge） |
 
-**Null-result 也是訊號**：若約 2 週內（~2026-06-30）三類證據皆未出現，代表 reduction 可能已切到足夠
-薄，**不需要第二刀**；屆時應考慮把 plan 推進 closure 評估，而非再加抽象層。
+**Null-result 也是訊號**：若一段觀察期後三類證據皆未出現，代表 reduction 可能已切到足夠薄、**不需要
+第二刀**。是否因此推進 closure 是**人工判斷**——不設固定截止日、不自動觸發（threshold / deadline /
+reopen automation 先不寫，理由見 §Evidence Log）。
 
 **Finding 2** 仍 defer：其 reopen 需 Evidence A 先穩定（先解 owner ambiguity，否則 knowledge_event
 lifecycle 會重開 ownership）。
+
+### Evidence Log（observation only）
+
+純被動載體，**不是 gate engine**。存在的唯一理由：沒有累積載體，observation-only 跨 session 等於失憶。
+出現一筆寫一筆，靠它數，不靠回憶。
+
+| date | class | artifact | observation | strength | decision_blocked |
+| --- | --- | --- | --- | --- | --- |
+| _(尚無實例；出現時新增一列，不要在此寫結論)_ | | | | | |
+
+**欄位**：`class` ∈ A / B / C（見上方「三類證據」表）；`artifact` 必須指向**真實物件**（plan /
+scenario / validator / report / diff / commit / issue）；`strength` ∈ `hard` / `soft`；
+`decision_blocked` ∈ `yes` / `no`（當下是否卡到做不下去）。
+
+**規則（只有三條）**：
+
+1. **只記實例，不記結論** —— 寫「看到什麼」，不寫「應該開第二刀」。
+2. **一筆證據必須指向真實 artifact**，不收抽象感想。
+3. **Evidence Log 不自動觸發 reopen** —— reopen 永遠是人工 decision。
+
+**為什麼有 `decision_blocked`**：`ownership_ambiguity ×2 / decision_blocked=no` 不一定值得 reopen；
+但 `×1 / decision_blocked=yes`（不決定就做不下去）可能當下就要開刀。strength + decision_blocked
+一起看，比純計數準。
+
+**現在刻意不寫**：threshold（≥N = reopen）、closure 截止日、reopen automation。理由：還不知道 A
+是否高頻 / B 是否根本不發生 / C 是否一筆就夠；現在寫死會滑回 governance、變「為收集而收集」。等真的
+累積 **3–5 筆**，再回頭評估要不要升級成 gate。
 
 ## Phase 0: Pre-Build Interrogation
 
