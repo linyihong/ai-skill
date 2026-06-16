@@ -13,8 +13,9 @@ required_for_completion: false
 **Status**: `draft` — **promotion discipline / decision framework**（非 workflow 设计稿）
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-16
-**最後修訂**：2026-06-16（review #3：Recovery Boundary；trust transition 验题；B.5 rename pressure；template field survival ADR；do not optimize for primitive）
+**最後修訂**：2026-06-16（review #4：downstream pilot gate 勾选；Vidoe-Test 证据回写 A0–B.5 + C partial）
 **Priority**：**P1**
+**Downstream pilot**（canonical evidence consumer — 细节不复制进本 plan）：Vidoe-Test `docs/plans/2026-06-16-state-trust-transition-pilot.md`；commits `bcce737`（A0 overlay）、`6665b77`（A1/B/B.5 + C BDD partial）
 
 ## Executive summary
 
@@ -42,10 +43,36 @@ primitive → evidence → consumer → 是否值得升 workflow
 
 **Blocking decision**（O1 = future promotion only）：
 
-| Path | 选 when |
-|---|---|
-| **O2 — Conditional gate** | B + B.5 失败：栏位不能跨域复用 |
-| **O3 — Generic trust transition model** | B + B.5 通过：四栏不改字可套 rollback + websocket |
+| Path | 选 when | Pilot status (2026-06-16) |
+|---|---|---|
+| **O2 — Conditional gate** | B + B.5 失败：栏位不能跨域复用 | not selected |
+| **O3 — Generic trust transition model** | B + B.5 通过：四栏不改字可套 rollback + websocket | **tentative lean** — see §Downstream pilot gate |
+
+---
+
+## Downstream pilot gate
+
+Phase 勾选 **不以 Ai-skill 自证**；以 downstream validation pilot 产物 + commit 为准（[`reusable-guidance-boundary.md`](../../enforcement/reusable-guidance-boundary.md)）。
+
+| Phase | Gate pass when | Downstream evidence | Status |
+|---|---|---|---|
+| A0 | 四栏 + Recovery Boundary 定稿并 sync 到 consumer workflow | Vidoe-Test `bcce737` — `framework-development-workflow.yaml`, `interaction-hazard-review.md` | **pass** |
+| A1 | Coupon 四栏 trust table | Vidoe-Test `6665b77` — `screen-mapping/episode-coupon-redeem-journey.md` | **pass** |
+| B | 非 player invalidate↔recover 闭环 | Vidoe-Test `6665b77` — `screen-mapping/membership-payment-sync-trust-journey.md` | **pass** |
+| B.5 | 四栏不改字压力测试 | Vidoe-Test `6665b77` — `screen-mapping/websocket-subscription-trust-journey.md` | **pass** |
+| C | field survival scenario + predictive prevention | Vidoe-Test `6665b77` — `tests/bdd/state-trust-transition-pilot.test.mjs` (5/5); predictive **pending** | **partial** |
+| D | 全部 ADR criteria | — | **blocked** (criteria 4, 6; integration journey pending) |
+
+**Promotion gate summary**（ADR criteria 1–6）：
+
+| # | Criterion | Status |
+|---|---|---|
+| 1 | ≥2 cases, four-column table | **pass** (coupon + payment sync) |
+| 2 | ≥1 validation scenario consumes trust evidence | **partial** (BDD field survival; Ai-skill validation YAML ids pending) |
+| 3 | O2 or O3 resolved | **tentative O3** (B + B.5 pass) |
+| 4 | ≥1 previously unknown prevention | **pending** |
+| 5 | template field survives renaming | **pass** (B.5 websocket, same headers) |
+| 6 | no rubber-stamp | **ongoing** |
 
 ---
 
@@ -125,38 +152,38 @@ E  — Project overlay advisory
 F  — Mechanical promotion（deferred）
 ```
 
-### A0 — Template + Recovery Boundary（当前）
+### A0 — Template + Recovery Boundary
 
 - [x] 四栏定义写入本 plan
-- [ ] Downstream project overlay / screen-mapping sync Recovery Boundary
-- [ ] Side Effect Chain：`invalidation_events` + **`recovery_evidence`** per step where applicable
+- [x] Downstream project overlay / screen-mapping sync Recovery Boundary — Vidoe-Test `bcce737`
+- [x] Side Effect Chain：`invalidation_events` + **`recovery_evidence`** per step — downstream workflow yaml + screen mappings
 
 ### A1 — Coupon
 
-- [ ] 四栏填 coupon（Appendix A）
-- [ ] Counterfactual：A0 前能否 predict unmount + recovery（grant readback / refresh window）
+- [x] 四栏填 coupon — Vidoe-Test `episode-coupon-redeem-journey.md` (`6665b77`); aligns Appendix A
+- [x] Counterfactual documented — coupon unmount hazard + recovery (post-ship fix recorded; predictive record pending criterion 4)
 
-### B — Optimistic rollback
+### B — Optimistic rollback / payment sync trust
 
-- [ ] Primary：rollback invalidate + server sync recovery 是否自然落入四栏
-- [ ] 验 **trust transition 闭环**，非仅「三栏够不够」
+- [x] Primary：invalidate + server sync recovery 落入四栏 — membership payment sync mapping (`6665b77`)
+- [x] 验 **trust transition 闭环** — pending UI vs sync + `router.refresh` recovery boundary
 
 ### B.5 — Rename pressure test
 
-- [ ] **不用同名案例** — 例如 websocket reconnect / handshake complete
-- [ ] 问：四栏能否 **不改字** 套用？
-- [ ] **不能 ⇒ 先别 O3**
+- [x] **不用同名案例** — websocket subscription sketch (`6665b77`)
+- [x] 四栏 **不改字** 套用 — BDD `template field survival` test passes
+- [x] **B.5 pass ⇒ tentative O3**（非最终 Phase D graduation）
 
 ### C — Scenario spike
 
-- [ ] ≥1 previously unknown prevention
-- [ ] ≥1 scenario asserts template field survival across cases
-- [ ] Draft ids：`state-trust-transition-invalidate-recover-v1`、`observable-outcome-survives-owner-refresh-v1`、`temporal-behavior-ownership-subshape-v1`
+- [ ] ≥1 previously unknown prevention — **gate blocked**
+- [x] ≥1 scenario asserts template field survival — Vidoe-Test `state-trust-transition-pilot.test.mjs` (`6665b77`)
+- [ ] Draft ids promoted to Ai-skill `validation/scenarios/` — deferred; downstream BDD equivalent green
 
 ### D — Graduation
 
-- O2 / O3 only；O1 optional future promotion
-- **Do not** register runtime surface until criteria 4+5 met
+- [ ] O2 / O3 **final** written decision — tentative O3 only; ADR 4 incomplete
+- [ ] **Do not** register runtime surface until criteria 4 + integration journey evidence met
 
 ---
 
@@ -180,16 +207,17 @@ Many primitives are **not designed** — they are **pulled out by three or four 
 | #1 | scenario→slice；evidence 不膨胀 |
 | #2 | O2 vs O3；Invalidation Event；predictive ADR |
 | #3 | Recovery Boundary；trust transition 验题；B.5 rename pressure；field survival ADR；anti optimize-for-primitive |
+| #4 | Downstream pilot gate 回写；A0–B.5 pass；C partial；tentative O3 |
 
 ---
 
 ## 完成条件
 
-- [ ] A0 四栏 synced
-- [ ] A1 + B + B.5 填表
-- [ ] C scenario（predictive + field survival）
-- [ ] O2/O3 书面决策
-- [ ] Phase D only if full ADR criteria
+- [x] A0 四栏 synced（downstream `bcce737`）
+- [x] A1 + B + B.5 填表（downstream `6665b77`）
+- [ ] C scenario complete — partial: field survival **pass**; predictive prevention **pending**
+- [ ] O2/O3 **final** 书面决策 — tentative O3 documented; await criterion 4
+- [ ] Phase D — **blocked** until full ADR criteria
 
 ---
 
