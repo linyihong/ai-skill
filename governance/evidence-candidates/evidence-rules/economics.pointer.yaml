@@ -1,0 +1,8 @@
+# Pointer only — rule 定義在 plan，本檔僅 index（見 ../README.md invariant 1）
+plan_ref: active/2026-05-27-1557-tool-runtime-signal-economics-integration.md
+schema: evidence-rule-v1
+source:
+  embedded_section:
+    - Evidence Rule        # section 尚未建立（Phase 1A Step 2 consumer attach）；Phase 1A 允許 placeholder
+status: section_pending    # section_pending | resolved
+notes: economics 設 collect 但 notify 預設 false（maintainer 自己看，見設計 plan §Decision）

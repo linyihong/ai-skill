@@ -1,0 +1,8 @@
+# Pointer only — rule 定義在 plan，本檔僅 index（見 ../README.md invariant 1）
+plan_ref: active/2026-06-16-1030-interaction-hazard-review-workflow.md
+schema: evidence-rule-v1
+source:
+  embedded_section:
+    - Evidence Rule        # section 尚未建立（Phase 1A Step 2 consumer attach）；Phase 1A 允許 placeholder
+status: section_pending    # section_pending | resolved
+notes: gate 形狀候選 pilot_complete + criteria_pass>=6；證據可跨 repo（下游 Vidoe-Test commit）

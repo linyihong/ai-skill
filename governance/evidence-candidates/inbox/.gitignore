@@ -1,0 +1,4 @@
+# Candidate inbox = local-only observation state (Phase 1B). Never commit candidates.
+# Directory is tracked (empty) via this file; all candidate contents are ignored.
+*
+!.gitignore

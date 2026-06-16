@@ -346,8 +346,9 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 ## Phase 1 Entry Check（implementation property — 進 Phase 1 execution 前）
 
 - [x] **location 決策已拍板：`governance/evidence-candidates/`**（2026-06-16；observation infra owned by governance — 不升 top-level repo capability、不與 consumer 綁死）
-- [ ] `governance/evidence-candidates/schema/candidate-schema.md` 建立且可被 parse
-- [ ] `governance/evidence-candidates/schema/evidence-rule-schema.md` 空殼可被 parse
+- [x] `governance/evidence-candidates/schema/candidate-schema.md` 建立且可被 parse（yaml block 驗證通過）
+- [x] `governance/evidence-candidates/schema/evidence-rule-schema.md` 空殼可被 parse（yaml block 驗證通過）
+- [x] `evidence-rules/*.pointer.yaml` resolve（3 個 plan_ref 全部存在；`embedded_section` 允許 missing）
 
 ### Location 決策（resolved 2026-06-16）— `governance/evidence-candidates/`
 
@@ -395,24 +396,40 @@ evidence    → enters plan
 > **範圍控制**：先證明 `artifact → candidate → plan evidence` 這條鏈真的存在（人工即可），
 > 再做偵測。連人工 candidate 都跑不順，scanner 一定過早。
 
-### Phase 1A — Contract only（推薦先做；定 contract，不做推論）
+### Phase 1A — Contract only（定 contract，不做推論）— 三步
 
-完成物：
-- [ ] `governance/evidence-candidates/schema/candidate-schema.md`（candidate schema 文件化）
-- [ ] `governance/evidence-candidates/schema/evidence-rule-schema.md`（evidence-rule 空殼）
-- [ ] `governance/evidence-candidates/README.md` + `evidence-rules/{economics,governance-pattern,interaction-hazard}.pointer.yaml`（pointer only）
-- [ ] 三個 plan 各加一個 `Evidence Rule` 內嵌 section（rule 定義 owner = plan；pointer 指向它）
+maintainer 三步切分（避免「為驗證 contract 被迫提前寫實作」）：
 
-限制：定欄位 + 各 plan 表達自己的 criterion（id + description）；**不寫 matching 邏輯、不做 scanner**；
-evidence-rules/ **只放 pointer**。
+> **Step 1** schema + registry resolve → **Step 2** consumer attach（加 `## Evidence Rule` section）→
+> **Step 3** criteria authoring（寫實際 criterion 內容）。加 `## Evidence Rule` section 本身**不等於**
+> 開始寫 criterion。
+>
+> **護欄**：`pointer MAY reference missing embedded_section during Phase 1A` —— 不為了 pointer 合法
+> 被迫先改 plan。
+
+#### Step 1 — schema + registry resolve ✅（done 2026-06-16，skeleton 已建，未碰任何 plan）
+- [x] `governance/evidence-candidates/schema/candidate-schema.md`（shape only）
+- [x] `governance/evidence-candidates/schema/evidence-rule-schema.md`（空殼）
+- [x] `governance/evidence-candidates/README.md` + `evidence-rules/{economics,governance-pattern,interaction-hazard}.pointer.yaml`（pointer only，`status: section_pending`）
+- [x] `inbox/.gitignore`（dir tracked、內容 ignored）
+- [x] Entry Check 通過：兩 schema parse + 3 pointer resolve + inbox 確認 ignored
+
+#### Step 2 — consumer attach（之後做；才開始碰三個 plan）
+- [ ] economics / governance-pattern / interaction-hazard 各加一個 `## Evidence Rule` 內嵌 section（rule 定義 owner = plan）
+- [ ] pointer `status: section_pending → resolved`
+
+#### Step 3 — criteria authoring（最後）
+- [ ] 各 plan 在自己的 section 寫實際 criterion（id + description）
+
+限制：定欄位 + criterion 識別；**不寫 matching 邏輯、不做 scanner**；evidence-rules/ **只放 pointer**。
 
 成功條件：
-- [ ] 三個 plan 能各自表達自己的 criterion（不要求 matching）；pointer 解析得到 plan section
+- [ ] （Step 3 完）三個 plan 能各自表達自己的 criterion；pointer 解析得到 plan section
 
 ### Phase 1B — Candidate inbox（人工，不自動）
 
 完成物：
-- [ ] `governance/evidence-candidates/inbox/`（gitignored）
+- [x] `governance/evidence-candidates/inbox/`（gitignored；隨 Step 1 skeleton 一併建立）
 
 限制：人工新增；**不自動掃、不通知**。
 
