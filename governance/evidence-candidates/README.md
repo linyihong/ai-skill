@@ -34,8 +34,19 @@ governance/evidence-candidates/
     governance-pattern.pointer.yaml
     interaction-hazard.pointer.yaml
   inbox/                           # gitignored — candidate 本機暫存，永不 commit
+  scanner-v0.py                    # ASSEMBLER（stateless；非 ai-skill CLI、非 hook）
   README.md
 ```
+
+## scanner-v0（Assembler）
+
+`scanner-v0.py` 是 standalone stateless **assembler**，不接 ai-skill CLI / hook / runtime。
+input：artifact + **明確 criteria_hits**（`criteria_source.actor` 標於 scanner 外）+ rule registry；
+output：`candidate{status: create}` 寫入 `inbox/`。
+做 schema validate / pointer resolve / dedupe（content-hash id，idempotent）/ invariant check / persist；
+**不做** infer / match / classify / score / rank / accept / expire。
+真正的 match-by-pattern 是 Phase 2（`criteria_source.actor: matcher-v2`），scanner 永不自產 criteria。
+用法：`python3 scanner-v0.py < artifact.json`。
 
 ## Invariants
 
@@ -44,10 +55,13 @@ governance/evidence-candidates/
    `plan.md → rule copy → registry` 雙 source。
 2. **candidate 不可指向 candidate**：`candidate.source` 只能 reference 原始 artifact，鏈為
    `artifact → candidate → plan evidence`。
-3. **scanner MUST be stateless**：掃當前 artifact → 產 candidate → 結束；不記狀態、不增量 cache。
+3. **scanner MUST be stateless**：掃當前 artifact → 產 candidate → 結束；不記狀態、不增量 cache、不長 ontology。
 4. **inbox 永不 commit**：candidate 是本機 observation state（gitignored），accept 才寫回 plan。
+5. **`criteria_hits` MUST originate outside scanner**：candidate 必帶 `criteria_source.actor`（`human` 等）；
+   scanner 自身被拒。scanner v0 是 assembler，不自產 criteria（matcher 是 Phase 2）。
 
 ## 狀態
 
-Phase 1A — contract establishment（skeleton）。scanner（Phase 1C）尚未實作；目前無自動掃描，
-candidate 由人工放入 `inbox/`。詳見設計 plan。
+Phase 1 完成：1A（schema + attach + criteria）、1B（round-trip + lifecycle proof）、1C（assembler
+scanner-v0）。scanner 為 assembler：candidate 由人工標 `criteria_hits` 後經 scanner 組裝進 `inbox/`；
+真正的 auto-detection（matcher）與 Phase 2 accumulation runtime 皆 deferred。詳見設計 plan。
