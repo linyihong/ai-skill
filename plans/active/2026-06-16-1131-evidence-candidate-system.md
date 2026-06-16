@@ -1,7 +1,7 @@
 ---
 id: 2026-06-16-1131-evidence-candidate-system
 plan_kind: main
-status: draft
+status: in-progress
 owner: linyihong
 created: 2026-06-16
 priority: P2
@@ -11,10 +11,16 @@ required_for_completion: false
 
 # Evidence Candidate System（跨 plan 候選證據層）
 
-**Status**: `draft` — 設計記錄（design record），**尚未進 runtime，未寫任何 code/surface**
+**Status**: `in-progress` — **Phase 1（observation infrastructure）完成**；現進入 **observation period**，
+Phase 2（matcher + accumulation runtime）gated on `phase2_gate`（不主動建）。
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-16
 **Priority**：**P2**（observation-stage；不阻擋其他工作）
+**目前執行入口（next）**：**不是繼續 build**。Phase 1 已交付 schema + registry（pointer-only）+ 三個 plan
+的 evidence-rule + 人工 round-trip 證明 + Go assembler scanner（`cmd/evidencecandidate`）。下一步是
+**累積真實（人工標註）candidate**，靠 `phase2_gate`（count≥20 / reviewed≥80% / accepted>50% /
+age_p95<30d）的真實數據決定是否開 Phase 2。在 gate 未達前主動建 matcher / accumulation runtime ＝
+違反本系統一路守的 observation-gate 紀律（呼應 economics plan 的 `observation_only`）。
 **Glossary Impact**: yes（候選新詞 `evidence_candidate` / `candidate_registry` / `notify_rule`；**尚未**註冊到 `knowledge/glossary/ai-skill.md`，待 gate 通過再決定）
 
 ## Executive summary
