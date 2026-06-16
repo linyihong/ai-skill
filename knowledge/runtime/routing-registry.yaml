@@ -153,6 +153,43 @@ activation_triggers_spec:
     No weighting, no scoring, no thresholds (NO weighted scoring — plan
     invariant). Multi-route hits route to workflow/workflow-routing.md Stage 2
     ambiguity adjudication; the detector never auto-picks among conflicts.
+  known_limitations:
+    layered_parent_child_abstain:
+      observed: 2026-06-16
+      summary: >
+        When a parent ENTRY route (e.g. route.workflow.apk-analysis) and its own
+        SUB-LAYER route (e.g. route.analysis.apk.workflows, whose
+        required_dependencies include the parent's primary_source) both fire on
+        INDEPENDENT, non-duplicated signals, the symmetric multiple-positive ->
+        abstain rule yields no lock. Example: "用 frida 逆向操作" hits the parent
+        via `frida` and the sub-layer via `逆向操作`.
+      not_caused_by: >
+        trigger duplication. The 2026-06-16 de-dup already removed the
+        duplicate-signal class (抓包 + frida/apk globs had been owned by BOTH
+        routes); this residual is genuine dual-intent ambiguity, not overlap.
+      do_not_auto_resolve: >
+        Do NOT demote the sub-layer to advisory — regression proved it must stay
+        an independent candidate (it correctly locks alone for "API 文件化" /
+        "hook flow"). And do NOT auto-pick the parent yet: there is no evidence
+        that frida+reverse should ALWAYS prefer the workflow entry over a direct
+        analysis intent.
+      escalation_threshold: >
+        Open a detector tie-break decision only when EITHER (1) >= 3 distinct
+        layered parent/child pairs exhibit this abstain, OR (2) a real user case
+        shows the abstain caused a failure. A single hand-built sentence is below
+        threshold.
+    latent_capability_dependency_as_routing_authority:
+      summary: >
+        A parent/child relationship is already DERIVABLE from existing data: a
+        sub-layer route's required_dependencies contains the parent route's
+        primary_source. A future detector COULD read this edge to break
+        {parent, its-own-child} conflicts WITHOUT any new schema field
+        (no subordinate_to / precedence needed).
+      do_not_consume_yet: >
+        Consuming required_dependencies for routing would upgrade it from a
+        CONTENT relation into a ROUTING AUTHORITY — a semantic change that
+        deserves its own decision/ADR. Recorded here as latent capability only;
+        not wired into the detector.
   backward_compat:
     # accepted_format != canonical_format. The legacy flat form is permanently
     # ACCEPTED (always parseable, always runnable) but is NOT a second
@@ -1474,19 +1511,24 @@ records:
     activation_mode: auto-detect
     task_intent: 執行 APK 分析操作流程（Frida hook、API 文件化、local proxy、media HLS）
     activation_triggers:
+      # De-duped 2026-06-16: the broad entry signals (抓包 + the frida/apk file
+      # globs) are owned ONLY by the parent entry route.workflow.apk-analysis.
+      # This route is the analysis SUB-LAYER (its required_dependencies point back
+      # at workflow/apk-analysis/execution-flow.md), so it keeps only its
+      # DISTINCTIVE operation signals. Rationale: a generic "frida 抓包" prompt
+      # previously hit both routes → symmetric multiple-positive → abstain (no
+      # lock). Removing the duplicated broad signals lets the parent entry route
+      # lock alone, while this route stays an independent candidate for its own
+      # operation intents (API 文件化 / hook flow / local proxy / HLS / analysis/apk paths).
       activation_any_of:
         user_signals:
           - Frida hook
-          - 抓包
           - API 文件化
           - local proxy
           - HLS
           - 逆向操作
           - hook flow
         context_signals:
-          - "**/scripts/frida/**"
-          - "**/frida/**"
-          - "**/*.apk"
           - "**/analysis/apk/**"
       reinforcement_any_of:
         artifact_signals:
