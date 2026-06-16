@@ -139,8 +139,20 @@ activation_triggers_spec:
           does NOT retroactively rewrite activation history.
   shared_fields:
     task_intents: >
-      coarse intent tags (existing field, retained at activation_triggers top
-      level — orthogonal to the two phases, used for intent matching).
+      Coarse human-readable intent tags retained at the activation_triggers top
+      level, orthogonal to the two phases. NOT a runtime match signal: the
+      detector's normalizeRouteTriggers (scripts/ai-skill-cli/internal/app/detector.go)
+      folds only user_signals + file_change_globs (-> activation_any_of.user_signals
+      / context_signals) and reinforcement_any_of.artifact_signals; task_intents is
+      never matched against the transcript. Its only code consumers are the
+      presence/validation helpers runtimeRouteTriggersConfigured /
+      runtimeRouteTriggersPresent (runtime.go). Verified 2026-06-16 via git history:
+      task_intents was never wired into any matcher (introduced in "Validate routing
+      registry gates" as a struct + validation field), so the prior "used for intent
+      matching" wording was spec-ahead-of-implementation, not a removed capability.
+      To make an intent word actually activate a route, add it to user_signals
+      (mind keyword inflation for generic terms like "hook" / "capture"); do not
+      rely on task_intents to trigger activation.
     file_change_globs:
       deprecated_alias_of: activation_any_of.context_signals
       note: >
