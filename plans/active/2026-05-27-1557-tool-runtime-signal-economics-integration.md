@@ -13,12 +13,13 @@ parent: null
 
 draft
 
-**目前執行入口（next）**：第一刀（Phase 1 owner path → Phase 2 control/adaptation boundary
-reduction）**已拍板**，記錄於 §Reduction Decisions（第一刀拍板, 2026-06-15）的 D1/D2/D3。
-下一步 = 與 maintainer 對齊後再決定是否進 Phase 3（ecosystem interaction boundary）或處理
-deferred 的 Finding 2 / 4 / 5（見 §Reduction Decisions「未納入第一刀」）。**任何 economics /
-ecosystem / generated_state 的實際 contract / YAML / surface / code 仍須另開範圍並與 maintainer
-對齊**；reduction phase 不寫實作。
+**目前執行入口（next）**：Reduction **Round 1 complete**（D1/D2/D3，見 §Reduction Decisions）。
+下一步**不是繼續切 boundary**，而是進入 **evidence-accumulation period（`next_mode:
+observation_only`）**：暫停新增抽象層，讓 D1/D3 既有決策承受真實使用壓力。**第二刀只在 §Round 1
+結案 + Evidence-Accumulation Gate 列出的 trigger（A owner ambiguity / B state-can't-describe-
+failure / C phase-order rework）真實出現時才開**；在那之前不主動切 Phase 3 / Finding 4 / Finding 5。
+Finding 2 維持 defer。**任何 economics / ecosystem / generated_state 的實際 contract / YAML /
+surface / code 仍須另開範圍並與 maintainer 對齊**；reduction phase 不寫實作。
 
 ## Summary
 
@@ -757,6 +758,39 @@ The existing `cognitive_cost` can remain as a public summary / compatibility fie
   reduction / 實作範圍，本刀**不拍板**，僅記為 next。
 - 任何 economics / ecosystem / generated_state 的實際 contract / YAML / surface / code 一律
   **deferred**，需另開範圍對齊 maintainer。
+
+### Round 1 結案 + Evidence-Accumulation Gate（2026-06-16, maintainer）
+
+> **判準已被 D1/D3 改變**：economics ownership（D1）與 surface→surface 投影（D3）兩個原始問題已有
+> 明確決策。此時若繼續切（Finding 4 / Finding 5 / Finding 2），執行順序會從「證據 → 決策」**倒轉**成
+> 「先定結論 → 再找場景證明」。因此 Round 1 **結案**，進入 **observation-only**：不是停工，而是暫停
+> 新增抽象層，讓既有薄切片承受真實使用壓力，再由證據決定（或否決）第二刀。
+
+```yaml
+status:
+  reduction: complete_round_1      # D1 owner-path / D2 control-adaptation / D3 surface-ban
+next_mode:
+  observation_only                 # 暫停新增抽象層，不主動切 boundary
+trigger:                           # 出現任一才開第二刀（對應下表 reopen target）
+  - contradiction
+  - ownership_ambiguity
+  - validator_friction
+  - scenario_duplication
+```
+
+**三類證據 → reopen target**（只在訊號真實出現時才開對應切口）：
+
+| 證據 | 觀察訊號 | reopen target |
+| --- | --- | --- |
+| **A — owner ambiguity（優先）** | 新 plan / scenario / validator 開始不知道該放 `runtime/` 還 `ecosystem/`（例 `compression_policy`、`memory_pressure`、`routing_feedback` 放哪都不順） | **Phase 3**（ecosystem interaction boundary）+ 第一刀 flag 的 2 個 ambiguous key（`runtime.tool_routing.contract`、`runtime.cognitive_state.telemetry_contract`） |
+| **B — State 無法描述失敗** | 報告出現 `thinking_cost: HIGH` + `execution_cost: HIGH` + `decision: accepted`，但無法回答「這判斷可信嗎」 | **Finding 4**（Cognitive State `confidence` 維度） |
+| **C — Phase 順序造成返工** | 「先定 signal、後面 state 裝不下」或「knowledge phase 重寫前面 phase」 | **Finding 5**（phase reorder：P7 State → P8 Signals → P10 Knowledge） |
+
+**Null-result 也是訊號**：若約 2 週內（~2026-06-30）三類證據皆未出現，代表 reduction 可能已切到足夠
+薄，**不需要第二刀**；屆時應考慮把 plan 推進 closure 評估，而非再加抽象層。
+
+**Finding 2** 仍 defer：其 reopen 需 Evidence A 先穩定（先解 owner ambiguity，否則 knowledge_event
+lifecycle 會重開 ownership）。
 
 ## Phase 0: Pre-Build Interrogation
 
