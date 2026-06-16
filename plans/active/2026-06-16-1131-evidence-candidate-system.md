@@ -250,6 +250,7 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 | Q4 | 前置物：三個 plan 是否先各自長出 machine-readable `evidence-rule`？scanner 無此則只能比關鍵字。 | 是——這是 Phase 1 的第一個、也是最小的 artifact。 | proposed |
 | Q5 | cross-repo evidence（下游 consuming 專案的 commit/diff）如何被 scanner 看見？目前 economics / interaction-hazard 是**人工**從下游搬。 | v0 維持人工搬下游 artifact 進 candidate；scanner 先只掃本 repo session。 | deferred to Phase 2 |
 | Q6 | criterion membership 該**只在 accept-time** 驗，還是當 **local plan metadata 存在時也 static check**？（由 EL-1 真實案例觸發） | **Phase 1C: warn-only（僅 local plan）/ Phase 2: evaluate enforcement**。仍非 matching —— 只是 `criterion_id ∈ declared criterion ids`，與 assembler 不衝突；external/section_pending plan 本地驗不到，故只能 warn。 | open |
+| Q7 | pointer consumability —— **plan 可不可以被引用**（被當 candidate target）？（由 EL-2 觸發；與 Q6 **不同層**：Q6 驗 criterion_id ∈ plan criteria，Q7 驗 plan 本身可否被消費） | **resolved（Phase 1C blocker）2026-06-16** —— resolve = `exists AND status==resolved`；section_pending → not resolvable / not candidate_target / not countable（WARN, no-emit, exit 0）。已落地 scanner status-aware resolve。 | **resolved** |
 
 ## Evidence Log（observation only）
 
@@ -259,6 +260,7 @@ ECS 自己的 observation 載體（記關於本系統架構的真實案例，非
 | id | date | surface | artifact | observation | strength | decision_blocked |
 |---|---|---|---|---|---|---|
 | EL-1 | 2026-06-16 | acceptance-boundary | candidate `C-9945b55a`（source: Vidoe-Test `docs/plans/2026-06-16-design-contract-cold-sign-off-packet.md`）+ 本 session | Assembler emit 了一筆 schema/pointer/invariant 皆合法的 candidate，但其 `criteria_hits=[independent_reviewer_same_outcome]` **不屬於** 其 `matched_plans=[governance-pattern]` 宣告的 criteria（後者只有 new_6step/nonfitting/sibling）。criterion membership **目前只在 accept-time 驗，assemble-time 不驗**（assembler 不擁有 criterion，Guard）。即 **合法 candidate ≠ 正確 candidate** —— 此設計選擇第一次被真實 cross-repo 案例撞到。未造成錯誤接受（candidate 已 defer）。觸發 Q6。 | soft | no |
+| EL-2 | 2026-06-16 | resolve-consumability | scanner `cmd/evidencecandidate` pointer-resolve（`os.Stat` only）+ 新 committed pointer `design-contract-validation-pilot.pointer.yaml`（status `section_pending`）+ live probe | scanner resolve 原本**只檢查檔案存在**，不看 `status`。實測：把 `section_pending` 的 pointer 當 matched_plan → **EMIT(exit 0)**。即 **consumer 把「存在性」當「可消費性」**（`index ≠ consumable`），撞到 ECS authority 分層。**已修**：status-aware resolve（exists AND status==resolved；section_pending → WARN no-emit）。觸發並 resolve Q7。 | hard | no |
 
 **欄位**：`surface` = 撞到的系統面；`artifact` 指向真實物件；`strength ∈ hard/soft`；`decision_blocked ∈ yes/no`。
 **規則同 economics Evidence Log**：只記實例、指向真實 artifact、不自動觸發 reopen/phase 推進。
@@ -518,8 +520,22 @@ scanner 從 description 推論，就引入 `description → ontology → matcher
 
 **成功重定義**：`scanner 成功 = 不扭曲人工標註`（**不是**「發現候選」）。
 
+**Status-aware resolve（Phase 1C blocker fix，2026-06-16）— `index ≠ consumable`**：
+EL-2 實測發現 scanner 的 pointer-resolve 原本只 `os.Stat()`（檔案存在），把 **section_pending pointer
+當成可消費**。修正：resolve 條件改為 `pointer 存在 AND status == resolved`。
+
+```yaml
+pointer_state:
+  resolved:         { resolvable: true }
+  section_pending:  { resolvable: false, candidate_target: false, countable: false }
+```
+
+scanner 行為：matched_plan pointer **missing → REJECT(exit 1)**；**section_pending → WARN「index !=
+consumable」+ NO EMIT + exit 0**（非錯誤）；**resolved → emit**。這是 blocker（不是 enhancement）：
+consumer 不得把「存在」當「可消費」。與 Q7 同源、與 Q6 不同層（見 §Open Questions）。
+
 完成物：
-- [x] `scripts/ai-skill-cli/cmd/evidencecandidate/main.go`（Go assembler）+ `main_test.go`（8 unit tests）；`go vet` / `go build` / `go test` 通過
+- [x] `scripts/ai-skill-cli/cmd/evidencecandidate/main.go`（Go assembler，**status-aware resolve**）+ `main_test.go`（9 unit tests 含 section_pending-not-consumable）；`go vet` / `go test` 通過；live: resolved→EMIT(0)、section_pending→WARN no-emit(0)
 
 #### Phase 1C Exit Criteria（maintainer 2026-06-16）— 全通過
 - [x] scanner 輸出 candidate（`status: create`），**不可直接 accepted**（T1 emit；無 accept 路徑）

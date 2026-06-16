@@ -52,6 +52,8 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -85,40 +87,72 @@ type candidate struct {
 	Status         string         `json:"status"`
 }
 
-// assemble validates the input, enforces invariants, resolves registry pointers
-// under base, and returns the candidate to persist. It performs no inference,
-// matching, ranking, or lifecycle transition (Guard 2/3).
-func assemble(in input, base string) (candidate, error) {
+// pointerStatus reads a registry pointer's declared status (e.g. "resolved" /
+// "section_pending"). Pointer files are pointer-only YAML.
+func pointerStatus(path string) (string, error) {
+	body, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	var p struct {
+		Status string `yaml:"status"`
+	}
+	if err := yaml.Unmarshal(body, &p); err != nil {
+		return "", err
+	}
+	return p.Status, nil
+}
+
+// assemble validates the input, enforces invariants, and does a STATUS-AWARE
+// pointer resolve. "index != consumable": a pointer's mere existence does not
+// make a plan a candidate target. A matched_plan whose pointer is missing is a
+// hard reject (error). A pointer whose status != "resolved" (e.g.
+// section_pending) is NOT consumable — the candidate is not emitted and the
+// plan id is returned in `pending` (caller WARNs, exit 0, no error). No
+// inference, matching, ranking, or lifecycle transition (Guard 2/3).
+func assemble(in input, base string) (candidate, []string, error) {
 	var c candidate
 	if in.Source.Repo == "" {
-		return c, fmt.Errorf("source.repo required")
+		return c, nil, fmt.Errorf("source.repo required")
 	}
 	if in.Source.Artifact == "" {
-		return c, fmt.Errorf("source.artifact required")
+		return c, nil, fmt.Errorf("source.artifact required")
 	}
 	if len(in.MatchedPlans) == 0 {
-		return c, fmt.Errorf("matched_plans must be non-empty")
+		return c, nil, fmt.Errorf("matched_plans must be non-empty")
 	}
 	if len(in.CriteriaHits) == 0 {
-		return c, fmt.Errorf("criteria_hits must be non-empty")
+		return c, nil, fmt.Errorf("criteria_hits must be non-empty")
 	}
 	if in.CriteriaSource.Actor == "" {
-		return c, fmt.Errorf("criteria_source.actor required (criteria_hits MUST originate outside scanner)")
+		return c, nil, fmt.Errorf("criteria_source.actor required (criteria_hits MUST originate outside scanner)")
 	}
 	// invariant: criteria_hits originate outside the scanner
 	if scannerActors[in.CriteriaSource.Actor] {
-		return c, fmt.Errorf("criteria_source.actor=%q is the scanner itself; criteria_hits must come from outside (human / matcher-v2=Phase 2)", in.CriteriaSource.Actor)
+		return c, nil, fmt.Errorf("criteria_source.actor=%q is the scanner itself; criteria_hits must come from outside (human / matcher-v2=Phase 2)", in.CriteriaSource.Actor)
 	}
 	// invariant: source must be an original artifact, not another candidate
 	if candidateIDRe.MatchString(in.Source.Artifact) || strings.Contains(in.Source.Artifact, "evidence-candidates/inbox") {
-		return c, fmt.Errorf("source.artifact %q looks like a candidate; candidate MUST NOT reference another candidate", in.Source.Artifact)
+		return c, nil, fmt.Errorf("source.artifact %q looks like a candidate; candidate MUST NOT reference another candidate", in.Source.Artifact)
 	}
-	// pointer resolve: every matched_plan must have a registry pointer
+	// status-aware pointer resolve
+	var pending []string
 	for _, plan := range in.MatchedPlans {
 		ptr := filepath.Join(base, "evidence-rules", plan+".pointer.yaml")
 		if _, err := os.Stat(ptr); err != nil {
-			return c, fmt.Errorf("no registry pointer for matched_plan %q (%s)", plan, ptr)
+			return c, nil, fmt.Errorf("no registry pointer for matched_plan %q (%s)", plan, ptr)
 		}
+		st, err := pointerStatus(ptr)
+		if err != nil {
+			return c, nil, fmt.Errorf("cannot read pointer status for %q: %v", plan, err)
+		}
+		if st != "resolved" {
+			pending = append(pending, fmt.Sprintf("%s(status=%s)", plan, st))
+		}
+	}
+	if len(pending) > 0 {
+		// section_pending (or any non-resolved) pointer is not a candidate target.
+		return c, pending, nil
 	}
 	c.ID = deterministicID(in)
 	c.Source = in.Source
@@ -126,7 +160,7 @@ func assemble(in input, base string) (candidate, error) {
 	c.CriteriaHits = in.CriteriaHits
 	c.CriteriaSource = in.CriteriaSource
 	c.Status = "create" // scanner never sets accept/discard/expire
-	return c, nil
+	return c, pending, nil
 }
 
 // deterministicID hashes the order-independent content so the same artifact +
@@ -159,10 +193,16 @@ func main() {
 		fmt.Fprintf(os.Stderr, "REJECT: input is not valid JSON: %v\n", err)
 		os.Exit(1)
 	}
-	c, err := assemble(in, *base)
+	c, pending, err := assemble(in, *base)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "REJECT: %v\n", err)
 		os.Exit(1)
+	}
+	if len(pending) > 0 {
+		// index != consumable: pointer exists but is not resolved -> not a
+		// candidate target. Not an error; warn and exit 0 without emitting.
+		fmt.Fprintf(os.Stderr, "WARN: not emitted; matched_plan pointer(s) not resolved (index != consumable): %s\n", strings.Join(pending, ", "))
+		return
 	}
 	inbox := filepath.Join(*base, "inbox")
 	if err := os.MkdirAll(inbox, 0o755); err != nil {
