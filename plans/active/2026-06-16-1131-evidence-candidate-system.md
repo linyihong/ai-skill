@@ -249,6 +249,19 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 | Q3 | scanner 觸發模型：**agent-invoked**（手動掃當前 session）還是 task-completion hook（自動）？ | — | **resolved（agent-invoked）2026-06-16** — 見 §Phase 0.5 `scanner_trigger`。三條理由：R1 維持 authority 邊界（scanner 只提 candidate，不自決何時掃）/ R2 避免 evidence inflation（hook 每次完成都掃 → 候選數反映活動量而非訊號）/ R3 保留觀察窗口（maintainer 決定這次 session 值不值得觀察）。hook 是**未來 promotion**，不是預設能力。 |
 | Q4 | 前置物：三個 plan 是否先各自長出 machine-readable `evidence-rule`？scanner 無此則只能比關鍵字。 | 是——這是 Phase 1 的第一個、也是最小的 artifact。 | proposed |
 | Q5 | cross-repo evidence（下游 consuming 專案的 commit/diff）如何被 scanner 看見？目前 economics / interaction-hazard 是**人工**從下游搬。 | v0 維持人工搬下游 artifact 進 candidate；scanner 先只掃本 repo session。 | deferred to Phase 2 |
+| Q6 | criterion membership 該**只在 accept-time** 驗，還是當 **local plan metadata 存在時也 static check**？（由 EL-1 真實案例觸發） | **Phase 1C: warn-only（僅 local plan）/ Phase 2: evaluate enforcement**。仍非 matching —— 只是 `criterion_id ∈ declared criterion ids`，與 assembler 不衝突；external/section_pending plan 本地驗不到，故只能 warn。 | open |
+
+## Evidence Log（observation only）
+
+ECS 自己的 observation 載體（記關於本系統架構的真實案例，非 consumer 證據）。出現一筆寫一筆，
+靠它數不靠回憶。**只記實例不記結論；指向真實 artifact；不自動觸發任何 phase 推進。**
+
+| id | date | surface | artifact | observation | strength | decision_blocked |
+|---|---|---|---|---|---|---|
+| EL-1 | 2026-06-16 | acceptance-boundary | candidate `C-9945b55a`（source: Vidoe-Test `docs/plans/2026-06-16-design-contract-cold-sign-off-packet.md`）+ 本 session | Assembler emit 了一筆 schema/pointer/invariant 皆合法的 candidate，但其 `criteria_hits=[independent_reviewer_same_outcome]` **不屬於** 其 `matched_plans=[governance-pattern]` 宣告的 criteria（後者只有 new_6step/nonfitting/sibling）。criterion membership **目前只在 accept-time 驗，assemble-time 不驗**（assembler 不擁有 criterion，Guard）。即 **合法 candidate ≠ 正確 candidate** —— 此設計選擇第一次被真實 cross-repo 案例撞到。未造成錯誤接受（candidate 已 defer）。觸發 Q6。 | soft | no |
+
+**欄位**：`surface` = 撞到的系統面；`artifact` 指向真實物件；`strength ∈ hard/soft`；`decision_blocked ∈ yes/no`。
+**規則同 economics Evidence Log**：只記實例、指向真實 artifact、不自動觸發 reopen/phase 推進。
 
 ## 完成條件
 
