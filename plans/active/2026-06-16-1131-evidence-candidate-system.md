@@ -240,7 +240,7 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 |---|---|---|---|
 | Q1 | candidate 要不要輸出 per-plan **confidence 數字**（如 `governance-pattern (0.81)`）？ | — | **resolved（禁止）2026-06-16** — 不輸出 confidence 數字，改用 `criteria_hits[]`（命中哪幾條 criterion）。數字會 anchor 人的判斷且無訓練資料；未來真要分級用 `support_level: weak/medium/strong`。 |
 | Q2 | candidate store committed 與否？ | — | **resolved（不 committed）2026-06-16** — candidate `inbox/` **gitignored**（本機跨 session 持久，不是 governance surface）；accept 後**寫回對應 plan 的 evidence**（唯一 committed 證據面），不保留永久 committed 中間態。子問：是否另設 `accepted/` audit dir → 暫不設，靠 plan + git history 即可（若日後需要再議）。 |
-| Q3 | scanner 觸發模型：**agent-invoked**（手動掃當前 session）還是 task-completion hook（自動）？ | 傾向先 agent-invoked，避免膨脹成 infra；criteria 穩了再評估 hook。 | proposed → Phase 0.5 拍板 |
+| Q3 | scanner 觸發模型：**agent-invoked**（手動掃當前 session）還是 task-completion hook（自動）？ | — | **resolved（agent-invoked）2026-06-16** — 見 §Phase 0.5 `scanner_trigger`。三條理由：R1 維持 authority 邊界（scanner 只提 candidate，不自決何時掃）/ R2 避免 evidence inflation（hook 每次完成都掃 → 候選數反映活動量而非訊號）/ R3 保留觀察窗口（maintainer 決定這次 session 值不值得觀察）。hook 是**未來 promotion**，不是預設能力。 |
 | Q4 | 前置物：三個 plan 是否先各自長出 machine-readable `evidence-rule`？scanner 無此則只能比關鍵字。 | 是——這是 Phase 1 的第一個、也是最小的 artifact。 | proposed |
 | Q5 | cross-repo evidence（下游 consuming 專案的 commit/diff）如何被 scanner 看見？目前 economics / interaction-hazard 是**人工**從下游搬。 | v0 維持人工搬下游 artifact 進 candidate；scanner 先只掃本 repo session。 | deferred to Phase 2 |
 
@@ -268,7 +268,7 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 |---|---|---|
 | Q1 confidence 數字 | **resolved（禁止）** | maintainer review 2026-06-16；改用 `criteria_hits[]` |
 | Q2 store 形態 | **resolved（不 committed）** | inbox gitignored + accept 寫回 plan |
-| Q3 scanner 觸發 | proposed → Phase 0.5 | 傾向 agent-invoked |
+| Q3 scanner 觸發 | **resolved（agent-invoked）** | R1 authority / R2 anti-inflation / R3 觀察窗口；hook 留作 promotion |
 | Q4 evidence-rule 前置 | proposed | Phase 1 第一 artifact |
 | Q5 cross-repo 掃描 | deferred | v0 人工搬下游 artifact |
 
@@ -286,7 +286,29 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 - [x] Q1 拍板：**禁止 confidence 數字**，candidate 輸出 `criteria_hits[]`（未來分級才用 `support_level`）
 - [x] Q2 拍板：candidate **不 committed**（inbox gitignored；accept 寫回 plan）
 - [x] notify → 收進 acceptance-gate（不獨立 notify-rule，避免第二個 state machine）
-- [ ] Q3 拍板：scanner 觸發模型（傾向 agent-invoked）
+- [x] **Q3 拍板：`scanner_trigger.mode = agent_invoked`**
+
+  ```yaml
+  scanner_trigger:
+    mode: agent_invoked        # 不是 task-completion hook
+  ```
+
+  理由：
+  - **R1 維持 authority 邊界**：scanner 只能提 candidate，不能自決何時掃描。
+  - **R2 避免 evidence inflation**：hook 每次完成都掃 → 候選數反映**活動量**而非**訊號**。
+  - **R3 保留觀察窗口**：maintainer 決定這次 session 值不值得觀察。
+
+  ```yaml
+  promote_to_hook_when:        # hook = 未來 promotion，不是預設能力
+    - candidate_count >= 20
+    - reviewed_ratio >= 80%
+    - false_positive acceptable
+    - at_least_two_plans_using_rules
+  ```
+- [x] **Invariant — scanner MUST be stateless**：允許「掃當前 artifact → 產 candidate → 結束」；
+  禁止「記住上次掃到哪 / 維護增量 cache / 追蹤 repo 狀態」。一旦 scanner 有狀態，就長出第二條
+  authority 鏈（scanner → candidate → scanner state → decision）。與「candidate 不可指向 candidate」
+  同源：觀察層不得自我累積狀態。
 - [x] 定義 candidate 生命週期：**create → { accept | discard | expire }**
   - `accept` = 看過、採納 → 寫回 plan evidence
   - `discard` = 看過、不採納（= reject）
@@ -298,9 +320,25 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
   （C14 → scanner 又掃到 → C22）。鏈只允許 `artifact → candidate → plan evidence`。（對齊 economics
   plan D3 的 surface→surface 禁令。）
 - [ ] freeze candidate schema：`id` / `source{repo,artifact,commit}` / `matched_plans[]` / `criteria_hits[]` / `status{create|accepted|discarded|expired}`
+- [ ] freeze `evidence_rule` schema **空殼**（只凍結形狀，**不填三個 plan 的內容** — 那是 Phase 1）：
 
-完成條件：
-- [ ] schema 凍結並記錄；Q1/Q2/notify/lifecycle/invariant 全拍板，Q3 拍板後才進 Phase 1
+  ```yaml
+  evidence_rule:
+    collect: bool
+    match:
+      artifact_types: []
+      criteria:
+        - id:
+          description:
+    exclusions: []
+  ```
+
+  完成條件：**三個 plan 都能 parse 這個空殼**，不要求有實際 rule 內容。
+
+完成條件（Phase 0.5 關門）：
+- [ ] candidate schema + `evidence_rule` 空殼凍結並記錄
+- [x] Q1 / Q2 / Q3 / notify→gate / lifecycle / 兩條 invariant（candidate 不指 candidate、scanner stateless）全拍板
+- [ ] 空殼 parse 通過後才進 Phase 1（**不在 Phase 0.5 起草實際 evidence-rule 內容**）
 
 ## Phase 1: Evidence Candidate System（被動）
 
