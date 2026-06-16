@@ -246,10 +246,11 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 
 ## 完成條件
 
-- [ ] Phase 0.5 schema freeze 完成（Q1 禁止 confidence ✓ / Q2 不 committed ✓ / Q3 scanner 觸發 / notify→gate 合併 ✓ / candidate 生命週期定義）
-- [ ] 三個 plan 各長出 machine-readable `evidence-rule + acceptance-gate`（Phase 1 第一 artifact）
-- [ ] candidate `inbox/` gitignored 建立；accept 寫回 plan evidence（無永久 committed 中間態）
-- [ ] agent-invoked scanner v0 可掃當前 session diff 比對 criteria 產生 candidate（輸出 `criteria_hits[]`，無 confidence 數字）
+- [x] **Phase 0.5 設計凍結完成**（Q1/Q2/Q3 + notify→gate + lifecycle + 兩條 invariant + schema 形狀 + promotion boundary 全拍板；design property only）
+- [ ] Phase 1 Entry Check 通過（schema.md / evidence_rule 空殼 parse + location 決策）
+- [ ] Phase 1A：三個 plan 各表達自己的 criterion（contract only，不做 matching/scanner）
+- [ ] Phase 1B：candidate `inbox/` gitignored；手動 candidate → accept → 寫回 plan evidence（證明鏈存在）
+- [ ] Phase 1C：agent-invoked stateless scanner v0 產生候選（≠ 自動接受）
 - [ ] 累積觀察期後評估 §ADR `phase2_gate`（count≥20 / reviewed_ratio≥80% / accepted_ratio>50% / age_p95<30d）→ 決定是否進 Phase 2
 - [ ] 全程未滑入 Enforcement / Promotion 自動化（§Watch-Out 護欄成立）
 
@@ -319,8 +320,8 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
   （commit / ADR / test / doc / issue）；MUST NOT reference 另一個 candidate。否則觀察層會自我繁殖
   （C14 → scanner 又掃到 → C22）。鏈只允許 `artifact → candidate → plan evidence`。（對齊 economics
   plan D3 的 surface→surface 禁令。）
-- [ ] freeze candidate schema：`id` / `source{repo,artifact,commit}` / `matched_plans[]` / `criteria_hits[]` / `status{create|accepted|discarded|expired}`
-- [ ] freeze `evidence_rule` schema **空殼**（只凍結形狀，**不填三個 plan 的內容** — 那是 Phase 1）：
+- [x] freeze candidate schema **形狀**（design property — 在本 plan 定義即算凍結）：`id` / `source{repo,artifact,commit}` / `matched_plans[]` / `criteria_hits[]` / `status{create|accepted|discarded|expired}`
+- [x] freeze `evidence_rule` schema **形狀**（design property — 只凍形狀，**不填三個 plan 的內容**）：
 
   ```yaml
   evidence_rule:
@@ -333,22 +334,63 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
     exclusions: []
   ```
 
-  完成條件：**三個 plan 都能 parse 這個空殼**，不要求有實際 rule 內容。
-
-完成條件（Phase 0.5 關門）：
-- [ ] candidate schema + `evidence_rule` 空殼凍結並記錄
+完成條件（Phase 0.5 關門 — **全為 design property，不依賴任何實作**）：
 - [x] Q1 / Q2 / Q3 / notify→gate / lifecycle / 兩條 invariant（candidate 不指 candidate、scanner stateless）全拍板
-- [ ] 空殼 parse 通過後才進 Phase 1（**不在 Phase 0.5 起草實際 evidence-rule 內容**）
+- [x] candidate schema + `evidence_rule` 形狀已在 plan 凍結並記錄
+- [x] promotion boundary（`phase2_gate` / `promote_to_hook_when`）已凍結
 
-## Phase 1: Evidence Candidate System（被動）
+> **設計凍結 ✅**。parse / 建檔屬 implementation property，**移到 Phase 1 Entry Check**（不當 0.5 完成條件）。
+> 區分理由：phase 完成應可在不跑、不建任何東西的情況下 assert；parse 依賴第一個實作，故不屬 design 關門。
 
-- [ ] 三個 plan 各加 machine-readable `evidence-rule + acceptance-gate`（collect / 命中 criterion / gate + notify projection）
-- [ ] 建 candidate `inbox/`（gitignored）+ 在合適位置標明 observation-only + economics 三條規則
-- [ ] 用 Phase 0.5 凍結的 candidate schema（含 `criteria_hits[]`，無 confidence）
-- [ ] agent-invoked scanner v0：掃當前 session diff/artifact → 比對 criteria → 產生 candidate（不自動寫入 plan）
-- [ ] 人工 Accept 流程：accept → 寫回該 plan evidence；discard → 丟棄（看過不採納）；expire → 過期（retention / plan_closed，未處理）；defer = 留在 inbox 待後續
+## Phase 1 Entry Check（implementation property — 進 Phase 1 execution 前）
 
-規則（Phase 1 不可違反）：
+- [ ] `candidate/schema.md` 建立且可被 parse
+- [ ] `evidence_rule` 空殼可被 parse
+- [ ] **location 決策已拍板**（candidate/ 與 per-plan evidence-rule 放哪 — 見 §Phase 1A 開頭 open decision）
+
+## Phase 1: Evidence Candidate System（被動）— 1A → 1B → 1C，scanner 最後
+
+> **範圍控制**：先證明 `artifact → candidate → plan evidence` 這條鏈真的存在（人工即可），
+> 再做偵測。連人工 candidate 都跑不順，scanner 一定過早。
+
+### Phase 1A — Contract only（推薦先做；定 contract，不做推論）
+
+**Open decision（execution 前須拍）**：evidence-rule / candidate 檔案放哪？sketch 的
+`plans/<name>/evidence-rule.md` 與現行單檔 plan（`plans/active/2026-...md`）不符；top-level
+`candidate/` 是新 surface（觸及 owner-layer 規則）。候選：(a) top-level `candidate/` + 各 plan 旁
+evidence-rule、(b) 收在 `governance/evidence-candidates/`、(c) evidence-rule 內嵌各 plan section。
+**不自行發明 owner layer**，待 maintainer 拍板。
+
+完成物（路徑待 location 決策）：
+- [ ] `candidate/schema.md`（candidate schema 文件化）
+- [ ] economics / governance-pattern / interaction-hazard 各一份 `evidence-rule`（用凍結 schema）
+
+限制：只能定欄位 + 各 plan 表達自己的 criterion（id + description）；**不寫 matching 邏輯、不做 scanner**。
+
+成功條件：
+- [ ] 三個 plan 能各自表達自己的 criterion（不要求 matching）
+
+### Phase 1B — Candidate inbox（人工，不自動）
+
+完成物：
+- [ ] `candidate/inbox/`（gitignored）
+
+限制：人工新增；**不自動掃、不通知**。
+
+成功條件：
+- [ ] 手動放一筆 candidate → accept → **寫回對應 plan evidence**（證明鏈存在）
+
+### Phase 1C — scanner v0（最後才做）
+
+完成物：
+- [ ] `scan(current_artifact) → candidate[]`
+
+限制：stateless / agent-invoked / 不跨 repo / 不 cache / 不 commit。
+
+成功條件：
+- [ ] 產生候選 ≠ 自動接受（仍須人工 accept）
+
+規則（Phase 1 全程不可違反）：
 - 不自動寫入 plan
 - 不計數成「成熟」
 - 不改任何 gate
@@ -356,7 +398,8 @@ artifact），不是 hook 自動觸發、不是 standing daemon。
 - 只通知（且通知語意 = 可以 review，非已升級）
 
 完成條件：
-- [ ] candidate 能被產生、列出、人工處置；accept 後出現在對應 plan evidence
+- [ ] 1A/1B/1C 依序完成；accept 後 candidate 出現在對應 plan evidence
+- [ ] memory 只多了 pointer 類條目，未含 candidate 明細
 - [ ] memory 只多了 pointer 類條目，未含 candidate 明細
 
 ## Phase 2: Evidence Accumulation Runtime（deferred）
