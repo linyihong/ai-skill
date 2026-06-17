@@ -265,7 +265,14 @@ ECS 自己的 observation 載體（記關於本系統架構的真實案例，非
 
 > **EL-3 不是 candidate**：目前**沒有 criterion 能乾淨描述它**（既非 6-step、ownership 未穩），所以它是 observation，不是 candidate。三域（ECS `index≠consumable` / economics `observation≠decision` / perf `stability≠decisionable`）**「很像」尚未等於 same family**；保持 `not_promoted`，靠 `next_check` 累積，不提前抽 invariant。
 >
-> **發現方法（否決測試）**：EL-3 是用「**把 domain metrics 拿掉，治理形狀還成立嗎？**」這個測試濾出來的——形狀存活 → 不是純 telemetry；但存活的形狀與 6-step 不同 → 不硬貼 criterion。此測試屬**方法層、可跨 perf/economics/interaction/governance-pattern 重用，canonical home 待定（不放進 ECS）**，見本輪 maintainer 拍板。
+> **發現方法（否決測試）= falsification heuristic，不是 admission gate（2026-06-16 maintainer）**：
+> 「**把 domain metrics 拿掉，治理形狀還成立嗎？**」**非對稱**——
+> - shape **消失** → probably domain artifact（可證偽，可剔除）。
+> - shape **存活** → **不**等於 governance structure；仍須另過 `owner + criterion + recurrence` 三關。
+>
+> 所以它只能剔除、不能 admit；不可長成萬用檢測器/admission gate（否則方法自己變 authority）。
+> **Placement**：`provisional_home: governance/lifecycle/methodology/`（**provisional，非 canonical；不放進 ECS、不塞 enforcement/、不急著併 governance-pattern**）。升 canonical 的條件 = 再遇 ≥1 個不同領域案例 **且** 有人真的用過此測試。
+> 本輪收斂：**Observation accepted / Method retained (as heuristic) / Pattern rejected / Invariant deferred**。
 
 **欄位**：`surface` = 撞到的系統面；`artifact` 指向真實物件；`strength ∈ hard/soft`；`decision_blocked ∈ yes/no`。
 **規則同 economics Evidence Log**：只記實例、指向真實 artifact、不自動觸發 reopen/phase 推進。
