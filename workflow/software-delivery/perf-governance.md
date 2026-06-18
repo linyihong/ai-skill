@@ -19,14 +19,21 @@
 ```yaml
 status: candidate
 evidence_scope:
-  incidents: 1          # Vidoe-Test pagination pilot (747fade)
+  incidents: 2          # pagination (747fade) + player aggregation
+  incident_classes: [pagination, aggregation]
   environments: 1       # http://16.163.215.93/h5
+  cross_time_probe: closed   # P2.7 T0–T3 (2026-06-18)
   confidence: exploratory
+promotion:
+  p4b: discussable      # cross-incident met; not auto-promote
+  cross_time: satisfied # P2.7 closed
 ```
 
-**不是 canonical promote**。P4b 门槛：`2+ incident` **且** 至少 `1` 次非 pagination 类。见 consuming plan §7.3。
+**不是 canonical promote**（P4b **discussable**）。团队须显式同意后才 `candidate` → `active`。
 
 **Pilot pointer**：[`perf-governance-pilot.pointer.yaml`](../../governance/evidence-candidates/evidence-rules/perf-governance-pilot.pointer.yaml) → Vidoe-Test plan + evidence。
+
+**P2.7 结案（2026-06-18）**：**Stability labels are execution-context sensitive.** T0 6/17 下午为 transient shared-environment noise；早+晚皆 STABLE。见 external `docs/evidence/perf/reports/2026-06-18-p27-closeout.md`。
 
 ---
 
@@ -134,9 +141,27 @@ stability:
     require_confirmation_runs: 2
   merge_policy:
     hard_gate: false
+  execution_context_required: true   # P2.7 — record started_at, time_window, weekday, env
 ```
 
+**模型（P2.7 验证）**：`stability ≈ f(service variance, shared load, execution timing)` — **不是** `f(api quality)`。
+
+**不能说**：「早上比较快 / 比较准」→ **只能说**：「这次 run 的 stability 标签受 execution context 影响」。
+
 单次 `unstable` **不具有决策权**。不可因单次 UNSTABLE 优化 API 或未经校准调 threshold。
+
+**execution_context**（summary / report 须记录；runner 实现待 project）：
+
+```yaml
+execution_context:
+  started_at: ISO-8601
+  time_window: morning | afternoon | evening
+  weekday: <day>
+  env: <base_url>
+  # 预留：host_load, cache_state
+```
+
+**延后**：load/stress/soak — 共享环境噪音可让 smoke 翻盘；先收稳 execution context + baseline。
 
 **本 candidate 明确不 promote 的数值/结论**（留在 project evidence）：
 
@@ -191,5 +216,7 @@ Canonical theory（本档 candidate）         ← 流程与语义；未达 prom
 - [`test-strategy.md`](test-strategy.md) — load/stress/spike/soak 选型
 - Vidoe-Test pilot plan（external）：`docs/plans/2026-06-17-1400-performance-validation-architecture-pilot.md`
 - P3 review（external）：`docs/evidence/perf/reports/2026-06-17-p3-review-final.md`
+- P2.7 close-out（external）：`docs/evidence/perf/reports/2026-06-18-p27-closeout.md`
+- Player generalization（external）：`docs/evidence/perf/reports/2026-06-17-player-episode-generalization.md`
 
 ← [Back to software-delivery workflow](README.md)

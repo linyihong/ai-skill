@@ -4,11 +4,14 @@ schema: evidence-rule-v1
 source:
   embedded_section:
     - "§7 Ai-skill 回填（P4）"
+    - "§5.6 P2.7"
     - "§9.2 Evidence index"
 status: section_pending
 notes: >
-  Performance Governance Pilot (fetch-based pagination, 2026-06-17). Runner:
-  external/Vidoe-Test/tests/perf/perf-smoke.mjs. P3 review:
-  external/Vidoe-Test/docs/evidence/perf/reports/2026-06-17-p3-review-final.md.
-  P4a candidate slice only — canonical promote (P4b) blocked until 2+ incidents
-  with at least one non-pagination class. Cross-repo candidate per ECS Q5 v0.
+  Performance Governance Pilot. Runner: external/Vidoe-Test/tests/perf/perf-smoke.mjs.
+  P4a candidate slice in workflow/software-delivery/perf-governance.md (not active).
+  Incidents: pagination (747fade) + player aggregation. P2.7 closed 2026-06-18 —
+  stability labels are execution-context sensitive; see
+  external/Vidoe-Test/docs/evidence/perf/reports/2026-06-18-p27-closeout.md.
+  P4b discussable; canonical promote requires explicit team consent. Cross-repo
+  candidate per ECS Q5 v0.
