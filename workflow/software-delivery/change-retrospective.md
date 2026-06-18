@@ -15,7 +15,7 @@
 | `canonical_source` | 本檔 |
 | `dependencies` | `sd-closure`（DoD passed）、`sd-ui-incident-governance`、[`layer-ownership-matrix.md`](layer-ownership-matrix.md) |
 | `dependency_budget` | default `max_depth:2` / `max_runtime_dependencies:4` |
-| `validation_signal` | Retrospective record 存在且 promotion 建議 ∈ {keep local, promote project, candidate canonical} |
+| `validation_signal` | Retrospective 存在；promotion ∈ {keep local, promote project, candidate canonical}；**allowed_outputs ≤ 1** |
 
 ---
 
@@ -32,14 +32,41 @@ Execute                              ← Contract · Implementation · Verificat
   ↓
 Ship                                 ← sd-closure DoD
   ↓
-Retrospective                        ← this file
+Retrospective                        ← this file（決定知識去哪 — 非第二個 governance hub）
 ```
+
+**Closure 語意變更**：Ship 不是終點 — closure = 交付完成 **+** 決定知識去向（project · feedback · canonical 三出口正式拆分）。
+
+**Learning system boundary**: Retrospective 是 **learning outlet**，不是 accumulation hub。一次变更一条主去向。
 
 **Forbidden**:
 
 ```text
 Ship → 直接新增 overlay / 直接 canonical promote / 新 abstraction hub
+Ship → 同時 promote project + candidate canonical + feedback（知識分叉）
 ```
+
+---
+
+## allowed_outputs ≤ 1（硬规则）
+
+一次变更的 Retrospective **只能有一个主去向**：
+
+| 主去向 | 允许写入 |
+| --- | --- |
+| **keep local** | plan § / incident note only |
+| **promote project** | `.ai-skill/project/rules/` **或** `feedback/` — 择一 primary |
+| **candidate canonical** | `feedback/history/` lesson + plan pointer |
+
+**Forbidden in same retrospective**:
+
+- promote project **and** candidate canonical
+- candidate canonical **and** new project overlay body
+- 多个 parallel promotion 动作
+
+Supporting artifacts（G4 sheet、commit、drill memo）不算 second output — 它们是 evidence，不是 knowledge destination。
+
+若 lesson 值得记录但主去向是 keep local，可在 incident note 内嵌 «rejected promote» 理由 — **不**另开 feedback 文件。
 
 ---
 
@@ -63,7 +90,7 @@ Greenfield features without incident decision chain may use [`closure.md`](closu
 | **哪層刻意沒改** | Layers considered and rejected (with reason) |
 | **有沒有新增 vocabulary** | yes/no — terms added; if yes, list and check synonymy |
 | **有沒有新增 consumer** | yes/no — consumer #N; if yes, does not alone justify abstraction |
-| **promotion 建議** | **exactly one** of below |
+| **promotion 建議** | **exactly one** primary output — `allowed_outputs ≤ 1` |
 
 ---
 
@@ -92,15 +119,17 @@ Canonical promotion path: [`decision-promotion-pipeline.md`](../../governance/li
 
 - Incident / task ref:
 - Ship evidence: (commit, deploy, drill sign-off)
+- Primary output (exactly one): keep local | promote project | candidate canonical
 
 | Question | Answer |
 | --- | --- |
 | Layer modified | |
-| Layers deliberately not changed | |
+| Layers deliberately not changed | (from Select Layer rejection table) |
 | New vocabulary | |
 | New consumer | |
-| Promotion suggestion | keep local \| promote project \| candidate canonical |
+| Promotion suggestion | (must match Primary output above) |
 
+- Rejected promotion paths: (e.g. «did not promote project — single consumer»)
 - Notes for next incident:
 ```
 

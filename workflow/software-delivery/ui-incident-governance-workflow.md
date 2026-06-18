@@ -124,15 +124,28 @@ Use [`layer-ownership-matrix.md`](layer-ownership-matrix.md) to constrain allowe
 
 ### Artifact — layer selection record
 
+Record **chosen** layer and **rejected** layers with reasons — rejections are high-value training data (e.g. did not promote invariant, runtime, or canonical).
+
 ```markdown
 ## Layer selection
 
 - Primary layer: Contract | Overlay | Verification | Integration
 - Single-layer convergence: YES | NO
-- If NO: see verification expansion exception (below) — not «open new plan» by default
-- Rejected: new abstraction / invariant promote / hub expand
+
+| Layer / surface | Decision | Reason |
+| --- | --- | --- |
+| Contract | chosen \| rejected | e.g. vocabulary unchanged |
+| Overlay | chosen \| rejected | e.g. sequence unchanged |
+| Verification | chosen \| rejected | |
+| Integration | chosen \| rejected | |
+| Abstraction / Runtime hub | rejected | e.g. evidence insufficient — required |
+| Canonical promote | rejected | e.g. one pilot only — required when tempted |
+
+- If NO convergence: verification expansion plan (not new plan/abstraction)
 - Opens: (contract path | overlay path | test path | code path)
 ```
+
+Exactly one row must be `chosen` for primary layer. **Abstraction / Runtime / Canonical** rows must be `rejected` with reason when those paths were considered.
 
 ### Single-layer convergence — NO exception
 

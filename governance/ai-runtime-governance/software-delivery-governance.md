@@ -47,8 +47,8 @@ source_intelligence:
 | Same-session closure | Code、docs、contracts、BDD、tests、generated clients、fixtures 與 linked updates 在同一批次閉環，或留下明確 owner 與 scoped debt。 |
 | Incident observation | UI / consumer incident 已完成 incident card（symptom、timeline、observable per step）；未讀 hook / storage / PR 來跳過 observable。Workflow: [`incident-observation.md`](../../workflow/software-delivery/incident-observation.md)。 |
 | Incident classification | 恰好一個 domain：Navigation \| Continuation \| Recovery \| Out-of-scope；禁止雙 domain 或 implementation-first classify。Workflow: [`ui-incident-governance-workflow.md`](../../workflow/software-delivery/ui-incident-governance-workflow.md) §Stage 1。 |
-| Incident layer selection | 恰好一個 primary modification layer：Contract \| Overlay \| Verification \| Integration；對照 [`layer-ownership-matrix.md`](../../workflow/software-delivery/layer-ownership-matrix.md)。**Single-layer convergence**: YES → 允許進入 Execute（Contract / Implementation）；NO → **允許僅擴 verification**（integration、evidence sheet）；⚠️ overlay 需 review；**禁止**升 contract、新 abstraction / hub；禁止以「不能改」開新 plan 代替驗證。 |
-| Change retrospective | Ship 後已填 retrospective：哪層被改、哪層未改、vocabulary/consumer、promotion 建議 ∈ {keep local, promote project, candidate canonical}；**禁止** direct canonical promote。Workflow: [`change-retrospective.md`](../../workflow/software-delivery/change-retrospective.md)。 |
+| Incident layer selection | 恰好一個 primary modification layer；**layer selection record 含 rejection table**（每层 chosen/rejected + reason；Abstraction/Runtime/Canonical 若曾考虑须 rejected）。对照 [`layer-ownership-matrix.md`](../../workflow/software-delivery/layer-ownership-matrix.md)。**Single-layer convergence**: YES → Execute；NO → 仅扩 verification（见 workflow §NO exception）。 |
+| Change retrospective | Ship 后已填 retrospective；**allowed_outputs ≤ 1**（keep local \| promote project \| candidate canonical 择一主去向）；禁止 parallel promote + 禁止 direct canonical。Workflow: [`change-retrospective.md`](../../workflow/software-delivery/change-retrospective.md)。 |
 
 ## 分層判斷
 

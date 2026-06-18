@@ -6,7 +6,7 @@
 
 Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](../../governance/ai-runtime-governance/software-delivery-governance.md)；本 workflow 保留執行順序、模板選擇與交付流程。
 
-> **Incident path (2026-06)**: 對未知 UI incident，software-delivery 從線性「需求驅動交付」擴展為 **證據驅動變更** 決策鏈：Discover → Observe → Classify → Select Layer → Execute → Ship → Retrospective。見 [`incident-observation.md`](incident-observation.md)、[`ui-incident-governance-workflow.md`](ui-incident-governance-workflow.md)、[`change-retrospective.md`](change-retrospective.md)。
+> **Incident path (2026-06)**: 對未知 UI incident，software-delivery 從 execution system 擴展為 **learning system** 決策鏈：delivery produces evidence → evidence decides change → change produces knowledge。Discover → Observe → Classify → Select Layer → Execute → Ship → Retrospective。見 [`incident-observation.md`](incident-observation.md)、[`ui-incident-governance-workflow.md`](ui-incident-governance-workflow.md)、[`change-retrospective.md`](change-retrospective.md)。
 
 > ## Cognitive Slice 導航（thin index）
 >
