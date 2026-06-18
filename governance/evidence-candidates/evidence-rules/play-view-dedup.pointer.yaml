@@ -1,0 +1,14 @@
+# Pointer only — plan + evidence in Vidoe-Test; canonical slice deferred
+plan_ref: external/Vidoe-Test/docs/plans/2026-06-18-1430-play-view-dedup-event-db.md
+schema: evidence-rule-v1
+source:
+  embedded_section:
+    - "§7 验收清单"
+    - "Phase F capacity report"
+status: section_pending
+notes: >
+  Play-view dedup v1 (Event + PostgreSQL, 2026-06-18). Second perf generalization
+  incident after pagination-pilot: POST burst via play-view-dedup-burst.mjs.
+  Phase E Redis not triggered (staging F1 p95 213ms, single increment under burst).
+  Lesson: API/SQL pass insufficient for user-visible KPI — browser DOM gate required
+  (feedback/history/.../2026-06-18_play-view-kpi-sql-pass-dom-fail-browser-gate.md).
