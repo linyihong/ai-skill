@@ -62,6 +62,7 @@ L3 **Validation Capability** produces Evidence（artifact + proof shape）。`ev
 - `software-delivery/stale-acceptance-criteria.yaml` — domain invariant 改變後舊 acceptance baseline 必須刷新。
 - `software-delivery/behavior-scope-overclaim.yaml` — single scenario pass 不得宣稱 global feature correctness。
 - `software-delivery/mutation-testing-effectiveness.yaml` — high coverage 不得直接等同測試有效；高風險邏輯用 targeted mutants / negative checks 驗證測試能抓錯。
+- `software-delivery/perf-smoke-gate.yaml` — 效能敏感变更须 L0 intake + L1 smoke + L2 summary；`result` 可决策、`stability` 仅 advisory；禁止单次 UNSTABLE block merge。
 
 ## Cognitive State / Evidence Scenarios
 

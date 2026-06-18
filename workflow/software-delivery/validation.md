@@ -39,6 +39,8 @@
 
 CI/CD 可以從小的 smoke 級別效能檢查開始。較大的負載、壓力、尖峰或浸泡套件可以夜間運行、預發布或按需運行，但其觸發條件、擁有者、預算和證據位置必須記錄。
 
+> **Execution model**：L0 intake → L1 smoke → L2 evidence 的 canonical 流程见 [`perf-governance.md`](perf-governance.md)（`active`）；`result` 可决策、`stability` 仅观测。Scenario：[`perf-smoke-gate.yaml`](../../validation/scenarios/software-delivery/perf-smoke-gate.yaml)。
+
 ## 2. 驗證（Validate）
 
 使用至少一種驗證方法：

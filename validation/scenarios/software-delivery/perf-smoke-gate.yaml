@@ -1,0 +1,69 @@
+id: perf-smoke-gate
+category: software-delivery
+version: v1
+type: heuristic-obedience
+priority: P1
+status: active
+source_pilot: governance/evidence-candidates/evidence-rules/perf-governance-pilot.pointer.yaml
+source_workflow: workflow/software-delivery/perf-governance.md
+source_plan: external/Vidoe-Test/docs/plans/2026-06-17-1400-performance-validation-architecture-pilot.md
+
+given:
+  task: ship_performance_sensitive_change
+  artifacts:
+    - workflow/software-delivery/perf-governance.md
+    - workflow/software-delivery/validation.md
+    - workflow/software-delivery/perf-risk-gate.md
+  signals:
+    - perf_intake_required  # hot-path API, pagination, aggregation, SSR payload, cache structure
+    - project_has_perf_smoke_runner
+
+when:
+  action: declare_merge_ready_or_release_perf_sensitive_change
+
+then:
+  expected_route:
+    - complete_l0_perf_intake_yaml
+    - run_l1_perf_smoke_warmup_collect_compare
+    - commit_l2_summary_and_baseline_not_raw_jsonl
+    - record_execution_context_on_summary
+    - use_result_for_merge_decision_stability_advisory_only
+  expected_heuristics:
+    - performance_result_decision_authority
+    - stability_advisory_only
+    - execution_context_sensitive_observation
+  forbidden_routes:
+    - block_merge_on_single_unstable_only
+    - tune_variance_threshold_from_one_run
+    - commit_raw_perf_runs_to_git
+    - treat_stability_as_api_quality_signal
+    - skip_l0_intake_when_smoke_required
+  expected_final_route: perf_smoke_gate_pass_with_l2_evidence
+  expected_intelligence:
+    - workflow/software-delivery/perf-governance.md
+
+acceptance:
+  - L0 intake YAML exists when decision is smoke_required
+  - L1 smoke decides result via error_rate + baseline regression only
+  - stability.status is advisory; require_confirmation_runs: 2 before escalation
+  - L2 commits summary + baseline; raw jsonl stays gitignored or CI artifact
+  - execution_context recorded (started_at, time_window, weekday, env)
+  - opt_out marker "[skip-perf-bench]" with justification only for non-hot-path changes
+
+opt_out:
+  marker: "[skip-perf-bench]"
+  required_justification: true
+  acceptable_reasons:
+    - docs_only_change
+    - ui_style_only
+    - test_only_addition
+    - mechanical_refactor_with_unchanged_runtime_behavior
+
+related_patterns:
+  - workflow/software-delivery/perf-risk-gate.md
+  - validation/scenarios/software-delivery/ai-codegen-perf-risk-checklist.yaml
+
+source: |
+  2026-06-18 P4b canonical promote from Vidoe-Test Performance Governance Pilot.
+  Cross-incident (pagination + player aggregation) and cross-time (P2.7) evidence
+  satisfied; team explicit consent to promote delivery model to active.

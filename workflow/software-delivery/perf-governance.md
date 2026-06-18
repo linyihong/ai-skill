@@ -1,4 +1,4 @@
-# Performance Governance（Delivery Model — candidate）
+# Performance Governance（Delivery Model — active）
 
 `workflow/software-delivery/perf-governance.md` 是 **execution 产品化** slice：把「何时测、怎么跑、怎么存证、如何决策」从 theory（[`validation.md`](validation.md)）与 PR gate（[`perf-risk-gate.md`](perf-risk-gate.md)）拆出来。
 
@@ -11,29 +11,30 @@
 | `load_when` | 效能敏感变更需要 L0 intake + L1 smoke + L2 summary |
 | `do_not_load_when` | 纯文档、纯样式、尚未有 project-local runner 的 repo |
 | `owner_layer` | workflow |
-| `canonical_source` | 本檔（candidate）；来源 pilot 见下方 `evidence_scope` |
+| `canonical_source` | 本檔（active）；来源 pilot 见下方 `evidence_scope` |
 | `dependencies` | `sd-validation`（指标理论）、`sd-test-strategy`（测试类型选型）、`perf-risk-gate`（PR 热路径 gate） |
 
 ## Status
 
 ```yaml
-status: candidate
+status: active
 evidence_scope:
   incidents: 2          # pagination (747fade) + player aggregation
   incident_classes: [pagination, aggregation]
   environments: 1       # http://16.163.215.93/h5
   cross_time_probe: closed   # P2.7 T0–T3 (2026-06-18)
-  confidence: exploratory
+  confidence: validated
 promotion:
-  p4b: discussable      # cross-incident met; not auto-promote
-  cross_time: satisfied # P2.7 closed
+  p4b: promoted         # 2026-06-18 team consent
+  cross_time: satisfied
+scenario: validation/scenarios/software-delivery/perf-smoke-gate.yaml
 ```
 
-**不是 canonical promote**（P4b **discussable**）。团队须显式同意后才 `candidate` → `active`。
+**P4b canonical promote（2026-06-18）**：cross-incident + cross-time 门槛已满足；团队显式同意 `candidate` → `active`。
 
 **Pilot pointer**：[`perf-governance-pilot.pointer.yaml`](../../governance/evidence-candidates/evidence-rules/perf-governance-pilot.pointer.yaml) → Vidoe-Test plan + evidence。
 
-**P2.7 结案（2026-06-18）**：**Stability labels are execution-context sensitive.** T0 6/17 下午为 transient shared-environment noise；早+晚皆 STABLE。见 external `docs/evidence/perf/reports/2026-06-18-p27-closeout.md`。
+**P2.7 结案**：**Stability labels are execution-context sensitive.** T0 6/17 下午为 transient shared-environment noise；早+晚皆 STABLE。见 external `docs/evidence/perf/reports/2026-06-18-p27-closeout.md`。
 
 ---
 
@@ -48,7 +49,7 @@ promotion:
 ```text
 validation.md (theory sufficient)
         ↓
-perf-governance.md (execution productization)   ← candidate
+perf-governance.md (execution productization)   ← active
         ↓
 project runner + docs/evidence/perf/            ← Vidoe-Test 实证
 ```
@@ -124,7 +125,7 @@ Summary 须含 `schema_version`、`env`、`comparison` per target、`variance_so
 
 ---
 
-## 信息模型（governance principle — candidate）
+## 信息模型（governance principle — active）
 
 > **Performance result 可决策；stability 仅观测。**
 
@@ -163,7 +164,7 @@ execution_context:
 
 **延后**：load/stress/soak — 共享环境噪音可让 smoke 翻盘；先收稳 execution context + baseline。
 
-**本 candidate 明确不 promote 的数值/结论**（留在 project evidence）：
+**本档明确不 promote 的数值/结论**（留在 project evidence）：
 
 - variance threshold 具体百分比
 - tail detector / `tail_ratio` 标定
@@ -185,7 +186,7 @@ execution_context:
 | G5-5 | summary 含 env + auth 说明 |
 | G5-6 | 参与者 < 10 min 可跑完并解释 |
 
-G5 Pass → project-local governance **值得继续**；不等于 Ai-skill canonical promote。
+G5 Pass → project-local governance **值得继续**；P4b promote 后 canonical 拥有流程与语义，数值标定仍留在 project evidence。
 
 ---
 
@@ -202,7 +203,7 @@ Evidence（project docs/evidence/perf/）     ← 审计链，保留数字与 ru
         ↓
 Project governance（runner + plan）        ← 已验证
         ↓
-Canonical theory（本档 candidate）         ← 流程与语义；未达 promote 门槛
+Canonical theory（本档 active）         ← 流程与语义；P4b promoted 2026-06-18
 ```
 
 **可迁移知识**：如何把 performance **验证产品化** — 不是某个 `threshold = 15%`。
@@ -212,7 +213,8 @@ Canonical theory（本档 candidate）         ← 流程与语义；未达 prom
 ## Related
 
 - [`validation.md`](validation.md) — 指标与测试类型 theory
-- [`perf-risk-gate.md`](perf-risk-gate.md) — PR 阶段 perf gate（`candidate`）
+- [`perf-risk-gate.md`](perf-risk-gate.md) — PR 阶段 perf gate（`active`）
+- [`perf-smoke-gate.yaml`](../../validation/scenarios/software-delivery/perf-smoke-gate.yaml) — L1 pass/fail scenario
 - [`test-strategy.md`](test-strategy.md) — load/stress/spike/soak 选型
 - Vidoe-Test pilot plan（external）：`docs/plans/2026-06-17-1400-performance-validation-architecture-pilot.md`
 - P3 review（external）：`docs/evidence/perf/reports/2026-06-17-p3-review-final.md`
