@@ -12,3 +12,7 @@ notes: >
   Phase E Redis not triggered (staging F1 p95 213ms, single increment under burst).
   Lesson: API/SQL pass insufficient for user-visible KPI — browser DOM gate required
   (feedback/history/.../2026-06-18_play-view-kpi-sql-pass-dom-fail-browser-gate.md).
+  Promoted to workflow/software-delivery/test-strategy.md + validation.md (2026-06-18).
+promoted_to:
+  - workflow/software-delivery/test-strategy.md
+  - workflow/software-delivery/validation.md

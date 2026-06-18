@@ -205,6 +205,37 @@ If the model proves reusable outside UI, promote it through shared validation re
 
 禁止把 API 200、adapter success、SMTP success、queue publish 或 mock pass 當成最終完成證據；這些只是不完整 evidence chain 的局部訊號。
 
+### User-Visible Counter Depth Gate
+
+當爭議是 **顯示中的** 計數或 KPI 標籤（不是寫入是否成功）時，升級驗證深度。Layer N 通過 **不** 代表 layer N+1 已證明。
+
+最低 shape：
+
+```yaml
+user_visible_counter_depth:
+  entity_id: <same id across layers>
+  user_path: <search | category_load_more | detail | ...>
+  layers:
+    durable_state: pass | fail | not_run
+    api_or_listing_sql: pass | fail | not_run
+    browser_dom: pass | fail | not_run
+  classification: integration | projection_cache | write_failure | inconclusive
+```
+
+規則：
+
+| Layer | 驗什麼 |
+| --- | --- |
+| Durable state | Counter columns、dedup 表、authority event 後的 read model |
+| API / listing SQL | 與產品 contract 相同的展示公式 |
+| Browser DOM | 同 entity id、**使用者實際走路徑** 上渲染的標籤 |
+
+當頁面使用 tab keep-alive、sessionStorage continuation、SSR 首屏 + client load-more 合併 view model 時，**必須** 在爭議 path 上取得 browser DOM 證據後才可結案 display incident。BDD source-string assert 或 API 200 不足以關閉 user-visible KPI 爭議。
+
+若 API 已正確而使用者回報仍錯，先分類 **projection / client cache**（L3），再決定 patch target；勿預設為 SQL 或 deploy 漏做。
+
+Feedback lesson：[`2026-06-18_play-view-kpi-sql-pass-dom-fail-browser-gate.md`](../../feedback/history/development-guidance/common/2026-06-18_play-view-kpi-sql-pass-dom-fail-browser-gate.md)（Vidoe-Test play-view-dedup v1）。
+
 ### Diagnostic Hypothesis Before Patch
 
 When a defect is ambiguous, state the diagnostic hypothesis before patching. This is evidence acquisition discipline, not a software-delivery invariant and not proof by itself.

@@ -33,6 +33,7 @@ Gate `requires:` 只允許 **evidence_type** token（例如 `evidence:user_visib
 - Gate vocabulary: [`evidence-gate-vocabulary.md`](evidence-gate-vocabulary.md)
 - Authority routing: [`authority-decision-table.md`](authority-decision-table.md)
 - Failure catalog: [`failure-evolution-catalog.md`](failure-evolution-catalog.md)
+- User-visible KPI depth gate: [`../validation.md`](../validation.md) § User-Visible Counter Depth Gate
 - Experience runtime template: [`../../cross-cutting/experience-runtime/player.yaml`](../../cross-cutting/experience-runtime/player.yaml)
 
 ## Live Evidence Chain Guide

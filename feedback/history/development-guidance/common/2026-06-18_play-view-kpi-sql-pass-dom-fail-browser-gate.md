@@ -69,3 +69,4 @@ Passing layer N does not imply layer N+1 without an explicit gate.
 
 - Project lesson: `external/Vidoe-Test/.ai-skill/project/feedback/play-view-display-api-vs-dom-gate.md`
 - Perf second incident pointer: `governance/evidence-candidates/evidence-rules/play-view-dedup.pointer.yaml` (optional index)
+- **Promoted (2026-06-18)**: `workflow/software-delivery/test-strategy.md` (KPI / counter + L2→L3 rows); `workflow/software-delivery/validation.md` § User-Visible Counter Depth Gate
