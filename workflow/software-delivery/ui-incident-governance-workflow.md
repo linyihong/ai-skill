@@ -21,6 +21,8 @@
 
 ## Placement in software-delivery lifecycle
 
+**Architecture shift**: incident path is **evidence-driven change**, not linear requirement-driven delivery.
+
 ```text
 Discover          ← sd-intake (Change Intake: bug)
   ↓
@@ -28,15 +30,13 @@ Observe           ← sd-incident-observation (incident card)
   ↓
 Classify          ← this file §Stage 1
   ↓
-Select Layer      ← this file §Stage 2 + software-delivery-governance gate
+Select Layer      ← this file §Stage 2 + layer-ownership-matrix + governance gate
   ↓
-Contract          ← sd-contracts / sd-ui-contracts
+Execute           ← Contract · Implementation · Verification (sd-contracts / sd-implementation / sd-validation)
   ↓
-Implementation    ← sd-implementation
+Ship              ← sd-closure DoD
   ↓
-Verification      ← sd-validation
-  ↓
-Ship              ← sd-closure
+Retrospective     ← change-retrospective.md (keep local | promote project | candidate canonical)
 ```
 
 **Anti-pattern (blocked)**:
@@ -128,12 +128,27 @@ Use [`layer-ownership-matrix.md`](layer-ownership-matrix.md) to constrain allowe
 ## Layer selection
 
 - Primary layer: Contract | Overlay | Verification | Integration
-- Single-layer convergence: YES | NO → review required
+- Single-layer convergence: YES | NO
+- If NO: see verification expansion exception (below) — not «open new plan» by default
 - Rejected: new abstraction / invariant promote / hub expand
 - Opens: (contract path | overlay path | test path | code path)
 ```
 
----
+### Single-layer convergence — NO exception
+
+When convergence is **NO** (evidence insufficient to pick one primary fix layer):
+
+| Action | Allowed |
+| --- | --- |
+| Add integration test / G4 evidence sheet | ✅ |
+| Expand verification only | ✅ |
+| Add project overlay | ⚠️ review — not default |
+| Promote / change contract | ❌ |
+| New abstraction / runtime hub | ❌ |
+
+**Rationale**: insufficient evidence ≠ cannot expand verification. Forbidden escape: «cannot change → new plan / new abstraction».
+
+Governance gate: [`software-delivery-governance.md`](../../governance/ai-runtime-governance/software-delivery-governance.md) §Incident layer selection.
 
 ## Promotion boundary
 

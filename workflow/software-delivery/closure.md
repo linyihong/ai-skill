@@ -76,6 +76,8 @@ If `completed` or `verified` is unknown, narrow the completion claim or mark the
 
 ## Feed Back Reusable Lessons（回饋可重複使用的課程）
 
+**Incident-driven path**: after Ship, run [`change-retrospective.md`](change-retrospective.md) first — promotion 僅 `keep local` | `promote project` | `candidate canonical`；禁止 direct canonical promote。
+
 如果一個課程超越了一個產品：
 
 1. 在匹配的 `feedback_history/<category>/` 或跨領域的 `feedback_history/common/` 下添加一個檔案。

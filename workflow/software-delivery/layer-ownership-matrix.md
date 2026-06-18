@@ -1,5 +1,17 @@
 # Layer Ownership Matrix — UI Incident Authorities
 
+**Core capability (Phase B)**: answers not «where is broken» but **who may modify which layer**.
+
+```text
+domain (classify)
+  ↓
+owner (authority → domain owner)
+  ↓
+allowed modifications (matrix row)
+```
+
+Navigation / Continuation / Recovery classify **scope**; this matrix governs **modification rights**. Select Layer is the new gate — Classify alone is insufficient.
+
 Maps **which authority broke first** → **domain owner** → **allowed modification layers**. Used after [`incident-observation.md`](incident-observation.md) and during [`ui-incident-governance-workflow.md`](ui-incident-governance-workflow.md) Stage 2.
 
 **Scope**: UI / consumer continuity and navigation incidents during software delivery. Not security control owner layers (see [`analysis/development-guidance/risk-translation.md`](../../analysis/development-guidance/risk-translation.md)).

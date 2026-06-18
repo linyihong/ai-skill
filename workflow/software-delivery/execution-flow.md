@@ -6,6 +6,8 @@
 
 Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](../../governance/ai-runtime-governance/software-delivery-governance.md)；本 workflow 保留執行順序、模板選擇與交付流程。
 
+> **Incident path (2026-06)**: 對未知 UI incident，software-delivery 從線性「需求驅動交付」擴展為 **證據驅動變更** 決策鏈：Discover → Observe → Classify → Select Layer → Execute → Ship → Retrospective。見 [`incident-observation.md`](incident-observation.md)、[`ui-incident-governance-workflow.md`](ui-incident-governance-workflow.md)、[`change-retrospective.md`](change-retrospective.md)。
+
 > ## Cognitive Slice 導航（thin index）
 >
 > 本檔是 software-delivery **execution-order lifecycle** 的 canonical 入口。Slice taxonomy 見 [`governance/cognitive-slice-taxonomy.md`](../../governance/cognitive-slice-taxonomy.md) §7。依 task intent 載入對應段落 / slice，不需整份載入：
@@ -15,6 +17,7 @@ Software-delivery 的 AI runtime gate 見 [`software-delivery-governance.md`](..
 > | Intake（需求接收 / parity） | **已抽出** → [`intake.md`](intake.md)（含 Start From Evidence、Change Intake、Pre-build Interrogation、Requirements Cognition、Parity Gate、Product Brief Validation、Missing Information、Backfill） | `sd-intake` | 接收新需求 / 變更 / 重構意圖 |
 > | Incident observe（UI incident observable） | **已抽出** → [`incident-observation.md`](incident-observation.md) | `sd-incident-observation` | 未知 UI incident；需 incident card；禁止 implementation-first |
 > | Incident classify + layer（UI incident 治理） | **已抽出** → [`ui-incident-governance-workflow.md`](ui-incident-governance-workflow.md) + [`layer-ownership-matrix.md`](layer-ownership-matrix.md) | `sd-ui-incident-governance` | Navigation / Continuation / Recovery 未決；選 primary modification layer |
+> | Change retrospective（Ship 後學習出口） | **已抽出** → [`change-retrospective.md`](change-retrospective.md) | `sd-change-retrospective` | Incident 路徑 Ship 後；promotion 三選一；禁止 direct canonical |
 > | Test strategy（測試策略 / BDD） | **已抽出** → [`test-strategy.md`](test-strategy.md)（含 BDD Closure / Journey Specification / Docs-First Loop / Test Strategy Gate / Mutation / Test-First Ordering） | `sd-test-strategy` | 定義測試策略 / BDD 閉環 / Journey Specification |
 > | UI contracts（Screen Mapping / Consumer / Screen / ViewModel） | **已抽出** → [`ui-contracts.md`](ui-contracts.md)（含 Screen Mapping、Consumer Contract、UI Behavior Contract、Screen Contract、Frontend ViewModel Contract、Accessibility Contract、Screen Traceability） | `sd-ui-contracts` | 前端、行動、CLI、SDK 或其他 consumer surface 需要平行實作或 AI 生成 UI / state / tests |
 > | UI governance（UI compliance / design system / evidence） | **已抽出** → [`ui-governance.md`](ui-governance.md)（含 governance domain、render context、validation mechanism、evidence class、severity policy、project-local design-system boundary） | `sd-ui-governance` | UI / consumer surface 需要 design-system enforcement、accessibility evidence、responsive evidence、behavior pattern checks、visual baseline review、AI visual review scoping 或 UI compliance completion claim |
