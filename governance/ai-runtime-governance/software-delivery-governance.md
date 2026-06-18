@@ -12,8 +12,11 @@ source_intelligence:
 - [`workflow/software-delivery/development-process.md`](../../workflow/software-delivery/development-process.md)
 - [`workflow/software-delivery/ui-contracts.md`](../../workflow/software-delivery/ui-contracts.md)
 - [`workflow/software-delivery/ui-governance.md`](../../workflow/software-delivery/ui-governance.md)
+- [`workflow/software-delivery/incident-observation.md`](../../workflow/software-delivery/incident-observation.md)
+- [`workflow/software-delivery/ui-incident-governance-workflow.md`](../../workflow/software-delivery/ui-incident-governance-workflow.md)
+- [`workflow/software-delivery/layer-ownership-matrix.md`](../../workflow/software-delivery/layer-ownership-matrix.md)
 
-本文件把 pre-build interrogation、product alignment、requirements cognition、docs-first BDD closure、contract-first development 與 development guidance 的風險翻譯方法轉譯成 AI runtime software-delivery governance。原始 intelligence 回答「如何確認產品方向、穩定 observable behavior、acceptance、traceability 與 validation target」；本文件定義 change intake、pre-build interrogation、product alignment、requirements cognition、contract precedence、BDD closure、artifact completeness、performance evidence 與 same-session documentation closure 的治理 gate。
+本文件把 pre-build interrogation、product alignment、requirements cognition、docs-first BDD closure、contract-first development、UI incident layer selection 與 development guidance 的風險翻譯方法轉譯成 AI runtime software-delivery governance。原始 intelligence 回答「如何確認產品方向、穩定 observable behavior、acceptance、traceability 與 validation target」；本文件定義 change intake、pre-build interrogation、product alignment、requirements cognition、contract precedence、BDD closure、artifact completeness、performance evidence 與 same-session documentation closure 的治理 gate。
 
 ## 觸發時機
 
@@ -23,6 +26,7 @@ source_intelligence:
 - 變更可能影響 observable behavior、public contract、domain invariant、API/schema、UI / consumer surface、error handling、storage、安全性、ownership、tests 或 performance。
 - Product brief、BDD、contract、implementation 或 tests 之間出現 mismatch。
 - 回填已實作專案的 BDD、contract、test plan、hardware/embedded evidence 或 traceability。
+- UI / consumer incident（Navigation / Continuation / Recovery 未決）且 agent 可能直接跳至 implementation。
 
 ## Runtime Gate
 
@@ -41,6 +45,9 @@ source_intelligence:
 | Test strategy | 新行為與舊行為 regression 分開驗證；contract、fixture、integration、property、targeted mutation check 或 hardware-in-loop evidence 依風險選擇。 |
 | Performance evidence | 影響 latency、throughput、資源、concurrency、external-call fan-out 時，不以功能測試取代 performance budget / smoke / load / stress / spike / soak evidence。 |
 | Same-session closure | Code、docs、contracts、BDD、tests、generated clients、fixtures 與 linked updates 在同一批次閉環，或留下明確 owner 與 scoped debt。 |
+| Incident observation | UI / consumer incident 已完成 incident card（symptom、timeline、observable per step）；未讀 hook / storage / PR 來跳過 observable。Workflow: [`incident-observation.md`](../../workflow/software-delivery/incident-observation.md)。 |
+| Incident classification | 恰好一個 domain：Navigation \| Continuation \| Recovery \| Out-of-scope；禁止雙 domain 或 implementation-first classify。Workflow: [`ui-incident-governance-workflow.md`](../../workflow/software-delivery/ui-incident-governance-workflow.md) §Stage 1。 |
+| Incident layer selection | 恰好一個 primary modification layer：Contract \| Overlay \| Verification \| Integration；對照 [`layer-ownership-matrix.md`](../../workflow/software-delivery/layer-ownership-matrix.md)。**Single-layer convergence**: YES → 允許進入 Contract / Implementation；NO → review，禁止以「新 abstraction / invariant / hub」收斂。 |
 
 ## 分層判斷
 
@@ -62,6 +69,9 @@ source_intelligence:
 - [`workflow/software-delivery/development-process.md`](../../workflow/software-delivery/development-process.md) — contract-first development process and detailed gates。
 - [`workflow/software-delivery/ui-contracts.md`](../../workflow/software-delivery/ui-contracts.md) — expected UI / consumer behavior contracts。
 - [`workflow/software-delivery/ui-governance.md`](../../workflow/software-delivery/ui-governance.md) — UI compliance classification surface for domains, mechanisms, evidence, severity, and advisory runtime projection boundary。
+- [`workflow/software-delivery/incident-observation.md`](../../workflow/software-delivery/incident-observation.md) — Stage 0 Observe: incident card before classify。
+- [`workflow/software-delivery/ui-incident-governance-workflow.md`](../../workflow/software-delivery/ui-incident-governance-workflow.md) — Stage 1 Classify + Stage 2 Select Layer workflow。
+- [`workflow/software-delivery/layer-ownership-matrix.md`](../../workflow/software-delivery/layer-ownership-matrix.md) — authority → domain owner → allowed modifications。
 - [`workflow/software-delivery/artifact-gates.md`](../../workflow/software-delivery/artifact-gates.md) — reusable note structure and artifact quality gates。
 - [`analysis/development-guidance/README.md`](../../analysis/development-guidance/README.md) — development guidance analysis methods。
 
@@ -77,6 +87,9 @@ source_intelligence:
 - `missing_validation_target`：acceptance criteria 沒有可執行或可審查的 proof target。
 - `stale_acceptance_criteria`：product intent、domain invariant 或 implementation truth 改變後，acceptance baseline 未同步。
 - `behavior_scope_overclaim`：local scenario pass 被宣稱為 global feature correctness。
+- `implementation_first_incident_classify`：未產出 incident card 或未寫 primary layer 就開 hook / storage / code。
+- `incident_layer_not_converged`：primary layer 無法單層收斂卻仍宣稱 ready to implement。
+- `authority_layer_mismatch`：scroll / viewport 問題直接改 contract，或 route 問題直接改 continuation overlay，違反 layer-ownership-matrix。
 
 任何 promotion 都必須另開 plan，確認 compiler / generated surface；預設維持 metadata-only。
 

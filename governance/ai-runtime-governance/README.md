@@ -41,6 +41,7 @@ intelligence source
 | [`linked-update-governance.md`](linked-update-governance.md) | [`linked-updates-completeness.md`](../../intelligence/engineering/agent-architecture/linked-updates-completeness.md) | 將 reference discovery、owner surface update、generated surface decision 與 explicit non-update 轉成 linked-update completeness gate。 |
 | [`software-delivery-governance.md`](software-delivery-governance.md) | [`docs-first-bdd-closure.md`](../../intelligence/engineering/development/docs-first-bdd-closure.md) | 將 change intake、contract precedence、BDD closure、artifact completeness、test strategy 與 performance evidence 轉成 software delivery gate。 |
 | [`software-delivery-architecture-governance.md`](software-delivery-architecture-governance.md) | [`architectural-fit/`](../../intelligence/engineering/architecture/architectural-fit/README.md), [`domain-modeling/`](../../intelligence/engineering/architecture/domain-modeling/README.md) | 將 architecture fit analysis、DDD Lite / Full DDD selection、minimality 與 overengineering detection 轉成 software-delivery architecture gate；不 promotion 成 runtime invariant。 |
+| Incident layer selection (workflow refs) | [`incident-observation.md`](../../workflow/software-delivery/incident-observation.md), [`ui-incident-governance-workflow.md`](../../workflow/software-delivery/ui-incident-governance-workflow.md), [`layer-ownership-matrix.md`](../../workflow/software-delivery/layer-ownership-matrix.md) | UI incident：Observe → Classify → Select Layer gate；single-layer convergence before implementation。 |
 
 Executable governance contracts:
 
