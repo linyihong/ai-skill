@@ -37,7 +37,7 @@ When login seems to require existing session:
 #### Agent Action
 
 1. 專案 evidence 記錄 login form + response JSON paths。
-2. 交叉引用 `142500`（partial SDK）、`141700`（sign gate）。
+2. 交叉引用 `142500`（partial SDK）、`141700`（sign gate）、`143500`（entitlement vs session type）。
 3. Ai-skill 不寫真實 session 值。
 
 #### Goal / Action / Validation

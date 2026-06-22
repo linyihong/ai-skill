@@ -41,6 +41,7 @@
 | `http-api/2026-06-22_143200-custom-f3aes-label-may-still-be-standard-aes128-cbc-with-rodata-key-iv` | Custom crypto label may still be standard AES after key hook |
 | `http-api/2026-06-22_143300-native-decrypt-mode-may-reuse-encrypt-mode-key-material` | Decrypt mode N may share encrypt mode N keys |
 | `http-api/2026-06-22_143400-login-may-bootstrap-with-sentinel-uid-session-headers` | Login may bootstrap with sentinel uid/session |
+| `http-api/2026-06-22_143500-paywall-entitlement-may-bind-to-account-session-not-guest-bootstrap` | Paywall grant may need account session, not guest |
 
 ## 來源
 
