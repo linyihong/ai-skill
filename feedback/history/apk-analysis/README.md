@@ -21,6 +21,9 @@
 | `http-api/2026-06-22_130000-in-session-api-host-differs-from-cold-start-primary` | Cold vs in-session API host failover |
 | `common/2026-06-22_130100-r8-obfuscated-okhttp-response-needs-converter-hook` | Obfuscated Response / converter hook |
 | `common/2026-06-22_131000-retrofit-gson-fromjson-hook-api-response-plaintext` | Gson.fromJson API JSON capture |
+| `http-api/2026-06-22_141500-static-list-endpoint-zero-hit-check-detail-embedded-catalog` | List path 0 hit → check embedded catalog |
+| `http-api/2026-06-22_141600-static-waterfall-path-zero-hit-check-shelf-layout-gating` | Waterfall path 0 hit → shelf layout gating |
+| `http-api/2026-06-22_141700-custom-request-signatures-block-standalone-sdk-until-re-or-relay` | Custom sign blocks standalone SDK |
 
 ## 來源
 
