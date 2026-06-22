@@ -6,11 +6,11 @@ Status: candidate
 
 #### One-line Summary
 
-Native 函數名/字串（如 `F3AES`）暗示自訂實作，但 **hook `0x763d4` 讀入的 16B key/IV 常可直接用標準 AES-128-CBC + PKCS7** 還原 wire blob。不要因 custom label 跳過標準 cipher 驗證。
+Native 函數名/字串（如 `F3AES`）暗示自訂實作，但 **hook key-setup 讀入的 16B key/IV 常可直接用標準 AES-128-CBC + PKCS7** 還原 wire blob。不要因 custom label 跳過標準 cipher 驗證。
 
 #### Human Explanation
 
-`requestTime` encrypt core 標記 `F3AES`，初試 rodata 字串當 key 用 PyCryptodome 失敗（key/IV 順序或字串解碼錯誤）。Frida hook key-setup 得到實際 `key`/`iv` 字串後，標準 AES-128-CBC 與 80-byte raw / Base64 wire **完全一致**。教訓：custom crypto label ≠ non-standard algorithm；先抓 runtime key material 再驗證標準 primitive。
+Native encrypt core 可能標記自訂 label（如 `F3AES`），初試 rodata 字串當 key 用標準庫失敗（key/IV 順序或字串解碼錯誤）。Frida hook key-setup 得到實際 key/IV 後，標準 AES-128-CBC 與固定長度 wire blob **完全一致**。教訓：custom crypto label ≠ non-standard algorithm；先抓 runtime key material 再驗證標準 primitive。**offset、key 值、欄位名**留在專案。
 
 #### Trigger
 
@@ -22,7 +22,7 @@ Native 函數名/字串（如 `F3AES`）暗示自訂實作，但 **hook `0x763d4
 
 - Tool: Frida hook key-setup + PyCryptodome encrypt/decrypt round-trip
 - Sanitized excerpt: `match True` on captured plaintext/ciphertext pair
-- Evidence path: `<PROJECT_ROOT>/api/signing-re.md` §requestTime
+- Evidence path: `<PROJECT_ROOT>/api/signing-re.md`（專案 encrypt RE）
 
 #### Generalized Lesson
 
