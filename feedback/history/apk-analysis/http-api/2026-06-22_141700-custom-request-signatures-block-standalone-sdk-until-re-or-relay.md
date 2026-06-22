@@ -45,7 +45,7 @@ Standalone SDK readiness gate:
 #### Goal / Action / Validation
 
 - Goal: 防止低估 SDK 工作量或誤用 CDN URL 當授權。
-- Action: 與 `wire-path-vs-signing-canonical-path`、`sha256-hash-verify-python-not-shell` 交叉引用。
+- Action: 與 `wire-path-vs-signing-canonical-path`、`sha256-hash-verify-python-not-shell`、`141800` sorted-map canonical、`141900` plain-hash verify gate 交叉引用。
 - Validation: gap matrix 標 sign=blocking；relay 可重放至少 1 業務 path 後再談離線 SDK。
 
 #### Applies When

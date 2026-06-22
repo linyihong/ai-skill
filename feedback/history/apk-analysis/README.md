@@ -24,6 +24,11 @@
 | `http-api/2026-06-22_141500-static-list-endpoint-zero-hit-check-detail-embedded-catalog` | List path 0 hit → check embedded catalog |
 | `http-api/2026-06-22_141600-static-waterfall-path-zero-hit-check-shelf-layout-gating` | Waterfall path 0 hit → shelf layout gating |
 | `http-api/2026-06-22_141700-custom-request-signatures-block-standalone-sdk-until-re-or-relay` | Custom sign blocks standalone SDK |
+| `http-api/2026-06-22_141800-okhttp-interceptor-sorted-map-canonical-sign-pattern` | Interceptor sorted-map canonical for sign |
+| `common/2026-06-22_141900-crypto-util-name-sha256-does-not-imply-plain-sha256` | sha256* name ≠ plain SHA256 verify gate |
+| `common/2026-06-22_142000-jni-dynamic-registernatives-no-standard-java-com-export` | Dynamic JNI / no Java_com_* export |
+| `http-api/2026-06-22_142100-encrypted-request-time-double-native-call-second-value-in-sign-map` | requestTime double native call |
+| `common/2026-06-22_142200-frida-enumerate-loaded-classes-causes-script-load-timeout` | Avoid enumerateLoadedClasses timeout |
 
 ## 來源
 
