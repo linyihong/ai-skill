@@ -71,7 +71,7 @@ delegation:
 | Q5 delegation 最小契約 | still-open | Phase 1 設計 nested `delegation`（enabled/modes/brief/constraints），避免 assignable↔brief 綁死 |
 | Q6 tool-neutral vs 綁工具 | still-open | Phase 1 brief tool-neutral，工具細節歸 constraints/ai-tools |
 
-### Phase 0.1 — 架構盤點（**依賴 01 portable core 邊界**）
+### Phase 0.1 — 架構盤點（需與 01 對齊 frontmatter schema；**不依賴外部 repo 能力**）
 - [ ] 讀 `plan_tree.go` `PlanFrontmatter` struct + `validatePlanTreeFrontmatter`，確認新增 optional 欄位不破壞既有 5 validators。
 - [ ] 與 01 對齊：delegation 欄位是否進 `plan_profile`（外部 repo 也能用），還是 Ai-skill-only。
 - [ ] 確認新欄位為 **optional**（不破壞既有 sub-plan，未宣告 = 不可委派 / 不變）。

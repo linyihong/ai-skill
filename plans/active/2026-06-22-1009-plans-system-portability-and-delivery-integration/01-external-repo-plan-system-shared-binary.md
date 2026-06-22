@@ -95,13 +95,14 @@ validator engine package          ← 核心，read-only，吃 (root, staged-set
   - [ ] tmp fixture repo：engine + CLI pass / fail 輸出
   - [ ] 一個**真實的非 Ai-skill repo**：實裝 shim，真實 commit 觸發一次 pass + 一次 block
   - [ ] **跨 binary 版本驗一次**：升一次共用 binary（或改一次 `plan_schema` version），確認外部 repo 相容行為符合 Q3 策略
+  - [ ] **rollback evidence（回應 review #6）**：外部 repo 可移除 integration（remove hook shim + config）並恢復 clean，證明接入非侵入、可逆
 
 ## 完成條件
 - [ ] portable 分類表 + `plan_profile` / `plan_schema` 邊界落地（Q2 resolved，且由分類表推導）
 - [ ] validator engine package + thin consumers（hook / CLI）+ 測試通過
 - [ ] 既有 commit-msg hook 行為不變（重構回歸驗證）
 - [ ] 外部 repo 使用說明 + shim 範例落地
-- [ ] Acceptance evidence 三項（tmp / 真實 repo / 跨版本）齊備
+- [ ] Acceptance evidence 四項（tmp / 真實 repo / 跨版本 / rollback 可逆）齊備
 - [ ] Q1 / Q3 resolved 或 deferred 並回寫
 
 ## Glossary Impact

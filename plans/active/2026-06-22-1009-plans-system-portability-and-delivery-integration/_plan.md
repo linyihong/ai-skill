@@ -77,7 +77,7 @@ scope 仍會隨 Phase 0 盤點調整（特別是 01 的跨 repo 強制機制、0
 
 本 main plan 為 **規劃容器**，自身不直接接入 runtime；具體 runtime / workflow / validation 改動由各 sub-plan 宣告：
 
-- **01** 可能新增 `ai-skill plans validate --root` 子命令（CLI consumer）與外部 repo git hook shim；若新增 commit-msg validator 行為或 `route.*`，須在 01 自己的 Runtime Execution Path + Per-surface consumer 表宣告，並由 `validateRuntimeTriggerWiring` 機械驗證。
+- **01** 核心是 **validator engine**（consumed by hook / CI / CLI / future API — 不以任一 consumer 為標準入口；CLI `plans validate` 只是其中一個 surface）。若新增 commit-msg validator 行為或 `route.*`，須在 01 自己的 Runtime Execution Path + Per-surface consumer 表宣告，並由 `validateRuntimeTriggerWiring` 機械驗證。
 - **02** 預期僅改 `workflow/software-delivery/` 文件（intake ordering）+ 可能新增 validation scenario；若不接 runtime，須在 02 明寫 doc-only + 未來接入條件。
 - **03** 預期改 plan-tree frontmatter schema + 可能擴充 `validatePlanTreeFrontmatter`（新增 optional delegation 欄位驗證）；若擴充 validator 須宣告 trigger flow。
 
@@ -87,16 +87,21 @@ scope 仍會隨 Phase 0 盤點調整（特別是 01 的跨 repo 強制機制、0
 
 ## Open Questions
 
-> 本表是 canonical Open Questions registry；sub-plan 的「已讀 §Open Questions」核對與其 Phase 0 公版 checklist 以此表為錨。每條由 `Resolved By` 指定的 sub-plan 在其 Phase 0 標記處置並回寫此表的 `Status`。
+> 本表是 canonical Open Questions registry；sub-plan 的「已讀 §Open Questions」核對與其 Phase 0 公版 checklist 以此表為錨。
+>
+> **關閉規則（避免 `resolved = 作者覺得差不多`）**：
+> - **誰可關閉**：僅 `Resolved By` 指定的 sub-plan owner 可把 Status 改 `resolved`。
+> - **何時可關閉**：`Closed Criteria` 全部成立時，不早於該 sub-plan 對應 Phase 完成。
+> - **關閉證據去哪**：`Resolution Evidence` 必須指向具體 commit / 檔案 / 測試（非「已討論」）；其他 sub-plan 對結論有異議時，在此表加 `disputed` 註記而非各自繞過。
 
-| ID | Question | Owner | Status | Resolved By |
-|----|----------|-------|--------|-------------|
-| Q1 | 外部 repo 跑 plan validators 的最薄強制機制（validator engine package 被 git hook shim / CI / CLI 哪些 consumer 呼叫）？ | 01 | open | 01 |
-| Q2 | portable 邊界如何**推導**（不是預設 plan-tree 5 + archival 2）？需先建 validator → contract_source → runtime_dependency → portable 分類模型再分類 | 01 | open | 01 |
-| Q3 | schema / 版本相容策略（外部 repo pin 哪個 binary、frontmatter schema version 怎麼宣告與演進）？ | 01 | open | 01 |
-| Q4 | plan-first 與既有 pre-build-interrogation / Architecture Compatibility Preflight 的分工（plan 是 artifact 不是 stage；preflight 會回改 plan，需 loop 不是線性）？ | 02 | open | 02 |
-| Q5 | delegation 最小契約：nested `delegation: { enabled, modes:[human,agent], brief, constraints }`，避免 `assignable` 與 `brief 存在` 綁死、支援 manual/agent/hybrid/forbidden 不破 schema | 03 | open | 03 |
-| Q6 | tool-neutral 邊界：brief 契約只定義「自足執行所需資訊」，agent 工具細節（Task/Agent / worktree）放 `ai-tools/` 不進 schema | 03 | open | 03 |
+| ID | Question | Owner / Resolved By | Status | Closed Criteria | Resolution Evidence |
+|----|----------|---------------------|--------|-----------------|---------------------|
+| Q1 | 外部 repo 跑 plan validators 的最薄強制機制（validator engine 被哪些 consumer 呼叫）？ | 01 | open | engine→consumer 抽象落地 + shim/CI 路徑文件化 | <commit / docs path> |
+| Q2 | portable 邊界如何**推導**（非預設 plan-tree 5 + archival 2）？ | 01 | open | validator classification table committed + 邊界 review 通過 | <commit + table path> |
+| Q3 | schema / 版本相容策略（pin 哪個 binary、schema version 怎麼宣告與演進）？ | 01 | open | `plan_schema` version 宣告 + 跨版本 acceptance pass | <commit + cross-version evidence> |
+| Q4 | plan-first 與 pre-build-interrogation / Preflight 分工（plan 是 artifact、preflight 回改 plan，loop 非線性）？ | 02 | open | intake loop 段落落地 + 一次真實 intake 含 preflight 回改實例 | <commit + intake evidence> |
+| Q5 | delegation 最小契約：nested `delegation: { enabled, modes, brief, constraints }`，不綁死、支援 manual/agent/hybrid/forbidden？ | 03 | open | schema + validator + 測試 committed | <commit + test path> |
+| Q6 | tool-neutral 邊界：brief 只定義自足資訊，工具細節歸 `constraints` / `ai-tools/` 不進 schema？ | 03 | open | brief 契約文件化 tool-neutral + 雙路徑 SOP | <commit + ai-tools path> |
 
 ---
 
@@ -137,18 +142,24 @@ scope 仍會隨 Phase 0 盤點調整（特別是 01 的跨 repo 強制機制、0
 
 實作步驟拆進三條 sub-plan，各自有 Phase 0 / Phase 1-N / 完成條件：
 
-| Sub-plan | 主題 | required_for_completion | 建議 sequencing |
+> **Sequencing 是 recommended，不是 hard dependency（回應 review #7，避免不必要 serialization）**：三條無強制先後。01 先做只是因為它產出的 `plan_schema` frontmatter 共識對 03 有幫助；02 **完全獨立**（純 workflow doc，不依賴 portable 邊界）；03 只需與 01 對齊 frontmatter schema，**不依賴外部 repo 能力**。可並行開工。
+
+| Sub-plan | 主題 | required_for_completion | Sequencing（recommended，非依賴） |
 |---|---|---|---|
-| [`01-external-repo-plan-system-shared-binary.md`](01-external-repo-plan-system-shared-binary.md) | 外部 repo 經共用 binary 使用 plans 系統 + portable core 邊界 | true | 先做（解 Q2 portable core 邊界，後兩條依賴此邊界） |
-| [`02-software-delivery-plan-first-ordering.md`](02-software-delivery-plan-first-ordering.md) | software-delivery plan-first workflow ordering（advisory） | true | 可與 01 並行（純 workflow doc） |
-| [`03-subplan-agent-delegation.md`](03-subplan-agent-delegation.md) | sub-plan 委派 schema（人工 + agent 雙路徑） | true | 排在 01 之後（依賴 frontmatter schema 共識） |
+| [`01-external-repo-plan-system-shared-binary.md`](01-external-repo-plan-system-shared-binary.md) | 外部 repo 經共用 binary 使用 plans 系統 + portable 邊界 | true | recommended first（產 `plan_schema` 共識，利於 03） |
+| [`02-software-delivery-plan-first-ordering.md`](02-software-delivery-plan-first-ordering.md) | software-delivery plan-first workflow ordering（advisory） | true | independent（可隨時開工） |
+| [`03-subplan-agent-delegation.md`](03-subplan-agent-delegation.md) | sub-plan 委派 schema（人工 + agent 雙路徑） | true | 需與 01 對齊 frontmatter schema；不依賴外部 repo |
 
 ## Stakeholder 同意項目
 
-- [ ] 外部化採「共用 binary」而非 init-project 抽取（使用者 2026-06-22 已選）
-- [ ] plan-first 採 workflow ordering advisory 而非機械 block（使用者 2026-06-22 已選）
-- [ ] 委派同時支援人工與 agent 雙路徑（使用者 2026-06-22 已選）
-- [ ] 分階段交付，dogfood plan tree（使用者 2026-06-22 已選）
+> 描述**現行選定策略**（治理現況），非聊天紀錄。改方向時直接更新本表，不視為「推翻歷史決策」。
+
+| 決策面 | Current selected strategy |
+|--------|---------------------------|
+| 外部化機制 | shared binary（非 init-project 抽取；抽取保留為 future option） |
+| plan-first gate | workflow ordering advisory（非機械 block；保留 maturity-ladder 升級候選） |
+| 委派路徑 | human + agent 雙路徑（nested `delegation.modes`，依專案選用或並用） |
+| 交付節奏 | 分階段、dogfood plan tree |
 
 ## Glossary Impact
 

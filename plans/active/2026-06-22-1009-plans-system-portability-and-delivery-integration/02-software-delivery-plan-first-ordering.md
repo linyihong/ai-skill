@@ -69,6 +69,7 @@ Discover → Interrogate → Draft Plan ⟲ Preflight → Execute
 
 ## Phase 1 — Plan-first ordering 文件化
 - [ ] 在 intake 段新增「Plan-First Ordering」小節：明文「會導向 code/workflow/governance/runtime 改動的任務，實作前須有對應 `plans/active/` plan（可 inline 小 plan 或 plan-tree）」。
+- [ ] **明文一句防 loop 被忘（回應 review #4）**：「Plan artifact 可於 preflight 中更新，不要求單次生成」——避免讀者把 intake 順序誤讀成 `Interrogate → Plan → Preflight` 線性。
 - [ ] **用 loop 模型描述（非線性三段）**：`Discover → Interrogate → Draft Plan ⟲ Preflight → Execute`；明寫 plan 是 artifact、preflight 可回改 plan，避免讀者誤以為 plan 一次生成後不再變。
 - [ ] 分工說明：interrogation 餵入 / plan 為中心 artifact / preflight 反覆驗證並回饋（Q4）。
 - [ ] 規模分級：< 1 session / 純文件補強 / surgical 小修補的豁免條件（接 plan-tree「何時不開 sub-plan」既有規則）。
