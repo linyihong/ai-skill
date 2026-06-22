@@ -83,9 +83,29 @@ type ValidationContext struct {
 | Q2 portable 邊界 | still-open | Phase 1 先建分類表（contract/dependency/context）再推導，非預設清單 |
 | Q3 schema/版本相容 | still-open | Phase 2 `plan_schema` version 宣告 + Phase 3 跨版本 evidence |
 
-### Phase 0.1 — 架構盤點
-- [ ] 讀 `hooks.go` `runCommitMsgHook`：哪些 validators 依賴 Ai-skill repo-local 狀態（routing-registry / runtime.db / commit context），哪些只吃 (root, staged-set)？
-- [ ] 確認 validators 是否已可在不依賴 commit context 下執行（決定 engine 抽取成本）。
+### Phase 0.1 — 架構盤點 ✅（2026-06-22 完成）
+- [x] 讀 `hooks.go` `runCommitMsgHook`：哪些 validators 依賴 Ai-skill repo-local 狀態（routing-registry / runtime.db / commit context），哪些只吃 (root, staged-set)？
+- [x] 確認 validators 是否已可在不依賴 commit context 下執行（決定 engine 抽取成本）。
+
+#### 盤點發現（survey findings）
+
+| validator | input | 內容來源 | commit-context 耦合 | runtime.db / routing | 抽取分級 |
+|---|---|---|---|---|---|
+| `validatePlanTreeFrontmatter` | `(text, staged, root)` | `scanAllPlanFrontmatter(root)` walk **working-tree**（`os.ReadFile`） | 僅 opt-out marker 來自 `text` | 無 | **context-free core** |
+| `validatePlanTreeArchiveOrder` | 同上 | 同上（filesystem walk） | 僅 opt-out marker | 無 | context-free core |
+| `validatePlanTreeParentReference` | 同上 | 同上 | 僅 opt-out marker | 無 | context-free core |
+| `validatePlanTreeUniqueID` | 同上 | 同上 | 僅 opt-out marker | 無 | context-free core |
+| `validatePlanTreeFolderConvention` | 同上 | 同上 | 僅 opt-out marker | 無 | context-free core |
+| `validatePlanArchivalAudit` | `(text, staged, root)` | `findArchivedPlans(staged)` + filesystem | opt-out **與 body-justification** 皆讀 `text` | 無 | core，但 text-coupled |
+| `validatePlanArchivalLinkIntegrity` | `(text, staged, root)` | `readStagedFileContent` = `git show :<path>` **有 working-tree fallback** | **staged-blob 讀取**（可降級） | 無 | core，需 ExecutionMode 決定 staged vs worktree |
+
+**三點結論：**
+
+1. **engine 抽取低風險（解 Q1 大半）**：所有 plan validators 的核心邏輯已近乎 context-free（filesystem walk @ root + changedSet）。**無任何 plan validator 觸碰 routing-registry / runtime.db** → portable core 與 Ai-skill governance overlay（`route.*` / `validateRuntimeTriggerWiring` 等）在**依賴層就乾淨可分**，Q2 分類可行。
+2. **僅兩處 commit-context 耦合，且正好對應 round-4 的 `ValidationContext` 欄位**：(a) link-integrity 的 staged-blob 讀取（→ `ExecutionMode` 決定 `git show` vs working-tree）；(b) opt-out marker / archival body-justification 讀 commit message（→ `Metadata` / `ExecutionMode`）。這兩處正是「不可鎖 `(root, staged-set)` tuple」的實證理由。
+3. **opt-out transport 是最大跨 consumer 設計含意**：`[skip-plan-tree-*]` 與 archival body-justification 在 commit mode 來自 commit message；CI / manual mode **沒有 commit message**，opt-out 須改走 config / flag transport。Phase 1 分類表的 `consumer_surface` 欄需明確標示此差異，Phase 2 engine 須把 opt-out 解析下放到 consumer adapter，不寫死在 engine。
+
+> Q1 在 §Open Questions 仍標 `open`（依關閉規則，需待 engine→consumer 抽象實際落地 + shim/CI 路徑文件化才可 close）；本盤點為其 Resolution Evidence 的前置證據。
 
 ## Phase 1 — Portable 分類模型 + 邊界推導（先模型後分類）
 - [ ] 先產**分類表**，每個 commit-msg validator 一列，**從 contract 推導 portable**，不從類型直覺。**含 `consumer_surface` 欄（回應 review #2：portable ≠ reusable）**：
