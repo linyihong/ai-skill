@@ -7,11 +7,11 @@ created: 2026-06-22
 parent: 2026-06-22-1009-plans-system-portability-and-delivery-integration
 required_for_completion: true
 sub_plan_reason: >
-  外部化是三件事的地基：必須先切出 portable core vs Ai-skill governance
-  overlay 的邊界（哪些 validator 屬 plan_profile），02 / 03 才知道
-  自己改的東西算 portable 還是 Ai-skill-only。獨立成 sub-plan 以便先 graduate
-  邊界共識（Q2）與跨 repo 強制機制（Q1/Q3），且其 acceptance（外部 repo
-  真實跑過 validate）可獨立 sign-off。
+  本 sub-plan 切出 portable core vs Ai-skill governance overlay 的邊界
+  （哪些 validator 屬 plan_profile）。此邊界**有助於** 03 後續判斷新欄位
+  是否 portable（非硬依賴 — 03 可平行設計 schema，僅與本 plan 對齊 frontmatter；
+  02 完全獨立）。獨立成 sub-plan 以便 graduate 邊界共識（Q2）與跨 repo
+  強制機制（Q1/Q3），且其 acceptance（外部 repo 真實跑過 validate）可獨立 sign-off。
 ---
 
 # External-repo Plan System via Shared Binary（sub-plan）
@@ -35,16 +35,34 @@ sub_plan_reason: >
 **抽象層決定（回應 review #3）：要抽的不是 CLI command，而是 validator engine。**
 
 ```
-validator engine package          ← 核心，read-only，吃 (root, staged-set)
+plan artifact (frontmatter + checkbox)
+        ↓
+schema compatibility layer    ← normalize / version-resolve（plan_schema 住這層）
+        ↓ normalized model
+validator engine              ← 核心，read-only，吃 ValidationContext，不吃 raw tuple
         ↓ consumers (薄)
   ├── commit-msg hook (本 repo 既有)
   ├── git hook shim   (外部 repo, 放 ai-tools/)
   ├── CI              (任何 repo, 直接呼叫)
-  └── plans validate  (CLI surface, 也只是 consumer)
+  ├── plans validate  (CLI surface, 也只是 consumer)
   └── future API
 ```
 
-若把 `ai-skill plans validate` 當核心，半年後它會長成另一個 orchestration layer（CLI 累積 flag / 狀態 / 隱性 contract）。因此 CLI 只是其中一個薄 consumer。
+**engine contract 不過早固定（回應 review #1）**：Q1（context 最小集合）尚未解，**不鎖 `(root, staged-set)` tuple**，否則 Q1 一解就破 API。改用可演化 struct：
+
+```go
+type ValidationContext struct {
+    Root          string            // repo root
+    ChangedSet    []string          // staged / changed files
+    ExecutionMode string            // commit | ci | manual
+    SchemaVersion string            // 由 compat layer 解析後填入
+    Metadata      map[string]string // HEAD / working-tree state 等，演化用
+}
+```
+
+**schema version 放對層（回應 review #3）**：`plan_schema` version **不屬 engine**，屬其上的 **schema compatibility layer**；engine 只吃 normalized model。否則 engine v4 ↔ schema v2 會綁死。
+
+若把 `ai-skill plans validate` 當核心，半年後它會長成另一個 orchestration layer（CLI 累積 flag / 狀態 / 隱性 contract）。因此 CLI 只是其中一個薄 consumer。**（候選治理原則：Consumer Thinness Rule — surface = transport only / logic = engine；現不 promote，記為 deferred candidate，待 N≥5 consumer 再評估抽共用規則。）**
 
 **portable 邊界（回應 review #2）：不預設「plan-tree 5 + archival 2 = portable」**。portable 不是看 validator 類型，而是看 contract → dependency → execution context。Phase 1 必須**先建分類模型再分類**，否則會變「先決定 portable 再找理由」。
 
@@ -70,22 +88,26 @@ validator engine package          ← 核心，read-only，吃 (root, staged-set
 - [ ] 確認 validators 是否已可在不依賴 commit context 下執行（決定 engine 抽取成本）。
 
 ## Phase 1 — Portable 分類模型 + 邊界推導（先模型後分類）
-- [ ] 先產**分類表**，每個 commit-msg validator 一列，**從 contract 推導 portable**，不從類型直覺：
+- [ ] 先產**分類表**，每個 commit-msg validator 一列，**從 contract 推導 portable**，不從類型直覺。**含 `consumer_surface` 欄（回應 review #2：portable ≠ reusable）**：
 
   ```
-  | validator | contract_source | runtime_dependency | execution_context | portable | reason |
+  | validator | contract_source | runtime_dependency | execution_context | consumer_surface | portable | reason |
   ```
 
-- [ ] 依分類表決定 `plan_profile`（哪些 validator 對外部 repo 適用）與排除清單；`plan_schema` 記錄 frontmatter schema + version。
+  `consumer_surface` 例：`hook, cli, ci` / `ci only` / `internal only`。沒有此欄，`plan_profile` 會混入 execution 維度，又回到 review #7（上一輪）剛拆掉的「capability + execution 污染」問題。
+- [ ] 依分類表決定 `plan_profile`（capability：哪些 validator 對外部 repo 適用）與排除清單；`consumer_surface` 獨立記錄 execution 維度，不併入 `plan_profile`；`plan_schema` 記錄 frontmatter schema + version（住 compat layer，非 engine）。
 - [ ] 文件化於 `plans/README.md` 或新 `governance/lifecycle/plan-profile.md`。
 - [ ] 完成條件：分類表 + 邊界 review 通過，Q2 標 resolved（且邊界由分類表推導，非預設）。
 
-## Phase 2 — Validator engine package（核心）+ thin consumers
-- [ ] **抽出 validator engine package**：read-only，input = (root, staged-set)，output = findings；不依賴 commit context、不綁特定 hook。
+## Phase 2 — Validator engine package（核心）+ schema compat layer + thin consumers
+- [ ] **抽出 validator engine package**：read-only，input = `ValidationContext`（演化 struct，**非固定 tuple**），output = findings；吃 normalized model，不依賴 commit context、不綁特定 hook。
+- [ ] **schema compatibility layer**（engine 之上）：解析 / normalize plan artifact，`plan_schema` version 住此層；engine 只見 normalized model（避免 engine ↔ schema 版本綁死，Q3）。
 - [ ] 既有 commit-msg hook 改為呼叫 engine（重構，行為不變；保護既有測試）。
-- [ ] CLI `plans validate --root <path> [--format text|json]` 作為**薄 consumer**呼叫 engine（CLI 不持有驗證邏輯）。
-- [ ] schema version 宣告（`plan_schema`）以支援版本相容（Q3）。
-- [ ] 測試：engine 單元測試（合法 tree + 各 violation）≥ 5 case；CLI consumer smoke test。
+- [ ] CLI `plans validate --root <path> [--format text|json]` 作為**薄 consumer**呼叫 engine（CLI = transport only，不持有驗證邏輯）。
+- [ ] 測試：
+  - [ ] **engine integration test（no CLI，回應 review #4）**：直接餵 `ValidationContext`（root / context / 各 violation），驗 findings，證明 engine 不依賴 CLI 可重用。
+  - [ ] engine 單元測試（合法 tree + 各 violation）≥ 5 case。
+  - [ ] CLI consumer smoke test。
 - [ ] **若新增 `route.*` 或 runtime surface，補 Runtime Execution Path + Per-surface consumer 表**（否則明寫 engine/CLI-only，無新 route）。
 
 ## Phase 3 — 外部 repo consumer 路徑（git hook shim / CI）
@@ -93,16 +115,16 @@ validator engine package          ← 核心，read-only，吃 (root, staged-set
 - [ ] 提供薄 `commit-msg` shim 範例（呼叫共用 binary，tool-neutral）。
 - [ ] **Acceptance evidence（回應 review #6，收緊）**：
   - [ ] tmp fixture repo：engine + CLI pass / fail 輸出
-  - [ ] 一個**真實的非 Ai-skill repo**：實裝 shim，真實 commit 觸發一次 pass + 一次 block
+  - [ ] 一個**真實的非 Ai-skill repo**：實裝 shim，真實 commit 觸發一次 pass + 一次 block。**記錄維護中繼資料（回應 review #5，不寫 repo 名）**：`repo_owner` / `repo_type: internal|public|fixture` / `removal_policy`，避免一年後 repo 不存在無法追溯。
   - [ ] **跨 binary 版本驗一次**：升一次共用 binary（或改一次 `plan_schema` version），確認外部 repo 相容行為符合 Q3 策略
-  - [ ] **rollback evidence（回應 review #6）**：外部 repo 可移除 integration（remove hook shim + config）並恢復 clean，證明接入非侵入、可逆
+  - [ ] **rollback evidence（回應 review #6）**：外部 repo 可移除 integration（remove hook shim + config）並恢復 clean，且 **no schema residue** — 移除後 plan frontmatter 不需 migration、檔案格式不被永久改變，證明接入非侵入、完全可逆
 
 ## 完成條件
-- [ ] portable 分類表 + `plan_profile` / `plan_schema` 邊界落地（Q2 resolved，且由分類表推導）
-- [ ] validator engine package + thin consumers（hook / CLI）+ 測試通過
+- [ ] portable 分類表（含 `consumer_surface` 欄）+ `plan_profile`（capability）/ `plan_schema`（compat）邊界落地（Q2 resolved，由分類表推導，capability 與 execution 維度分離）
+- [ ] validator engine（吃 `ValidationContext`）+ schema compat layer + thin consumers（hook / CLI）+ 測試通過（含 no-CLI engine integration test）
 - [ ] 既有 commit-msg hook 行為不變（重構回歸驗證）
 - [ ] 外部 repo 使用說明 + shim 範例落地
-- [ ] Acceptance evidence 四項（tmp / 真實 repo / 跨版本 / rollback 可逆）齊備
+- [ ] Acceptance evidence 四項（tmp / 真實 repo＋維護中繼資料 / 跨版本 / rollback 可逆＋no schema residue）齊備
 - [ ] Q1 / Q3 resolved 或 deferred 並回寫
 
 ## Glossary Impact
