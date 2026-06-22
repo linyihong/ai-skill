@@ -32,7 +32,9 @@ Status: candidate
 libapp.so 存在？
   是 → Flutter/Dart AOT 主線（blutter + Dart Frida）
   否 → Java/Kotlin 主線
-        ├─ okhttp3 / ktor / retrofit → Java/Ktor MITM + hook
+        ├─ okhttp3 / retrofit / ktor（靜態皆為候選，非單選）
+        │     動態：OkHttp chain hook 看 retrofit2.Invocation tag；
+        │     Ktor hook 為次要，0 命中不否定 API
         ├─ player/downloader native libs → 媒體：控制面 API vs CDN 分線
         └─ protect/armor 類 native → 預留 pinning / anti-tamper 排查
 ```
@@ -42,7 +44,7 @@ libapp.so 存在？
 #### Agent Action
 
 1. 靜態 triage 前：`unzip -l | grep -E 'libapp|libflutter'` — 結果決定主線。
-2. 原生主線：jadx + OkHttp/Ktor Frida；path 線索用 dex strings 的 **prefix 模式**，完整 route 寫 project API docs。
+2. 原生主線：jadx + OkHttp chain Frida（混淆 Request 需 probe overload）；path 線索用 dex strings 的 **prefix 模式**，完整 route 寫 project API docs。靜態見 Ktor 時仍須動態確認是否 Retrofit 主線（見 `http-api/2026-06-22_120200-static-ktor-strings-not-dynamic-business-api-client.md`）。
 3. 寫入 Ai-skill 時只保留決策樹與工具選擇；**不得**寫入 target 專屬 host、service 名、簽章材料或 capture 片段。
 
 #### Goal / Action / Validation
