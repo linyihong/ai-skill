@@ -97,11 +97,12 @@ scope 仍會隨 Phase 0 盤點調整（特別是 01 的跨 repo 強制機制、0
 | ID | Question | Owner / Resolved By | Status | Closed Criteria | Resolution Evidence |
 |----|----------|---------------------|--------|-----------------|---------------------|
 | Q1 | 外部 repo 跑 plan validators 的最薄強制機制（validator engine 被哪些 consumer 呼叫）？ | 01 | open（盤點完成） | engine→consumer 抽象落地 + shim/CI 路徑文件化 | 前置證據：01 §Phase 0.1 survey（validators 近乎 context-free，僅 2 處耦合）；待 engine 落地補 commit |
-| Q2 | portable 邊界如何**推導**（非預設 plan-tree 5 + archival 2）？ | 01 | open（盤點完成） | validator classification table committed + 邊界 review 通過 | 前置證據：01 §Phase 0.1 確認 plan validators 全無 runtime.db/routing 依賴，與 overlay 依賴層可分；待 Phase 1 分類表補 commit |
+| Q2 | portable 邊界如何**推導**（非預設 plan-tree 5 + archival 2）？ | 01 | open（Phase 1 分類完成，待 consumer 驗證） | **收緊**：Layer A facts 完整 + Layer B decisions review + `plan_profile` committed **+ 至少一個 consumer 成功執行**（taxonomy ≠ 驗證 portable） | 01 §Phase 1 兩層分類表已落地；待 consumer 成功跑 |
 | Q3 | schema / 版本相容策略（pin 哪個 binary、schema version 怎麼宣告與演進）？ | 01 | open | `plan_schema` version 宣告 + 跨版本 acceptance pass | <commit + cross-version evidence> |
 | Q4 | plan-first 與 pre-build-interrogation / Preflight 分工（plan 是 artifact、preflight 回改 plan，loop 非線性）？ | 02 | open | intake loop 段落落地 + 一次真實 intake 含 preflight 回改實例 | <commit + intake evidence> |
 | Q5 | delegation 最小契約：nested `delegation: { enabled, modes, brief, constraints }`，不綁死、支援 manual/agent/hybrid/forbidden？ | 03 | open | schema + validator + 測試 committed | <commit + test path> |
 | Q6 | tool-neutral 邊界：brief 只定義自足資訊，工具細節歸 `constraints` / `ai-tools/` 不進 schema？ | 03 | open | brief 契約文件化 tool-neutral + 雙路徑 SOP | <commit + ai-tools path> |
+| Q7 | **validator failure semantics 是 contract 不是 consumer detail**：同一 engine 在 hook→block / CI→fail / manual→warning，severity 映射歸誰？（Phase 1 facts 已碰 severity + opt-out，依升格準則正式立案） | 01 | open | failure-semantics 映射在 engine contract 層定義（severity 為 engine 輸出，consumer 只決定 transport 行為） | Phase 1 Layer A 含 severity(block/warn) + opt-out transport → 觸發升格 |
 
 ---
 

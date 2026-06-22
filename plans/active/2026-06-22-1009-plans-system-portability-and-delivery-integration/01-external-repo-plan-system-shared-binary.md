@@ -67,7 +67,7 @@ type ValidationContext struct {
 **portable 邊界（回應 review #2）：不預設「plan-tree 5 + archival 2 = portable」**。portable 不是看 validator 類型，而是看 contract → dependency → execution context。Phase 1 必須**先建分類模型再分類**，否則會變「先決定 portable 再找理由」。
 
 ## Open Questions（本 sub）
-- Q1（跨 repo 強制機制）/ Q2（portable core 成員）/ Q3（版本相容）— 見 main plan §Open Questions。
+- Q1（跨 repo 強制機制）/ Q2（portable 邊界）/ Q3（版本相容）/ **Q7（validator failure semantics — severity 映射歸 engine contract）** — 見 main plan §Open Questions。Q7 於 Phase 1 facts 碰到 severity + opt-out 後正式立案。
 
 ## Phase 0 — Pre-Build Interrogation
 
@@ -107,23 +107,48 @@ type ValidationContext struct {
 
 > Q1 在 §Open Questions 仍標 `open`（依關閉規則，需待 engine→consumer 抽象實際落地 + shim/CI 路徑文件化才可 close）；本盤點為其 Resolution Evidence 的前置證據。
 
-## Phase 1 — Portable 分類模型 + 邊界推導（先模型後分類）
-- [ ] 先產**分類表**，每個 commit-msg validator 一列，**從 contract 推導 portable**，不從類型直覺。**含 `consumer_surface` 欄（回應 review #2：portable ≠ reusable）**：
+## Phase 1 — Portable 分類（兩層：先 facts 後 decisions）
 
-  ```
-  | validator | contract_source | runtime_dependency | execution_context | consumer_surface | portable | reason |
-  ```
+> **拆兩層（回應 review）**：不直接從一張表推 `portable`，否則 `consumer_surface=CI → portable=no` 這種錯誤會偷偷發生。Layer A 只寫**觀察事實**、不下結論；Layer B 才**推導**。
+>
+> **opt-out 治理句（這輪升格）**：`engine receives effective policy / consumer resolves policy source` — opt-out（`[skip-*]`）與 archival body-justification 是 **transport concern 不是 engine concern**：commit→message、ci→config、manual→flag；engine 只接收已解析的 effective policy，由 consumer adapter 解析來源。commit / ci / api 因此不互相污染。
 
-  `consumer_surface` 例：`hook, cli, ci` / `ci only` / `internal only`。沒有此欄，`plan_profile` 會混入 execution 維度，又回到 review #7（上一輪）剛拆掉的「capability + execution 污染」問題。
-- [ ] 依分類表決定 `plan_profile`（capability：哪些 validator 對外部 repo 適用）與排除清單；`consumer_surface` 獨立記錄 execution 維度，不併入 `plan_profile`；`plan_schema` 記錄 frontmatter schema + version（住 compat layer，非 engine）。
+### Layer A — Facts inventory（觀察，不下結論；Phase 0.1 已驗證 9 列）
+
+| validator | contract_source | runtime_dependency | execution_context | consumer_surface |
+|---|---|---|---|---|
+| `validatePlanTreeFrontmatter` | plan-tree-hierarchy plan | none | working-tree walk + changedSet；opt-out 來自 text | hook, cli, ci |
+| `validatePlanTreeArchiveOrder` | 同上 | none | 同上 | hook, cli, ci |
+| `validatePlanTreeParentReference` | 同上 | none | 同上 | hook, cli, ci |
+| `validatePlanTreeUniqueID` | 同上 | none | 同上 | hook, cli, ci |
+| `validatePlanTreeFolderConvention`(warn) | 同上 | none | 同上 | hook, cli, ci |
+| `validatePlanArchivalAudit` | archival-audit plan | none | filesystem；opt-out **+ body-justification** 來自 text | hook, ci(降級) |
+| `validatePlanArchivalLinkIntegrity` | archival-link-integrity plan | none | **staged-blob (git show)** + worktree fallback | hook, ci, cli（ExecutionMode-gated） |
+| `validatePlanCheckboxSync` | gen3 plan | none | **commit-message 解析 plan refs** + staged diff | hook only |
+| `validatePlanStatusSync` | plan-status-sync-enforcement.yaml | none | **commit-message 解析 phase/refs** + staged | hook only |
+| _governance overlay group_（cognitive 家族 9 + repo-structure 10：CLIDocSync / GlossaryRetroOwn / RuntimeYamlProjects / RuntimeTriggerWiring / RuntimeIndexFreshness / EvidenceHierarchy / …） | cognitive-modes*.yaml / cli-modification-policy / enforcement-registry / runtime 等 Ai-skill 治理 | **部分讀 routing-registry / runtime.db**（如 RuntimeTriggerWiring 讀 routing-registry，已驗證） | commit-message / Ai-skill repo 結構耦合 | internal only |
+
+- [ ] **Layer A 殘留**：governance overlay group 目前以 contract_source 群組記錄；final freeze 前須**逐一 empirically 驗證** runtime_dependency（不只信 contract_source），避免漏網的 plan 相關 validator。
+
+### Layer B — Decisions（推導，引用 Layer A）
+
+| validator | portable_candidate | profile | excluded_reason |
+|---|---|---|---|
+| 5 個 plan-tree validators | yes | `plan_profile.core` | — |
+| `validatePlanArchivalAudit` / `LinkIntegrity` | yes（ExecutionMode-gated） | `plan_profile.archival` | body-justification / staged-blob 須由 ExecutionMode 決定 transport |
+| `validatePlanCheckboxSync` / `validatePlanStatusSync` | **no** | — | **commit-message discipline**：解析 commit text，CI/manual 無 commit message 無法轉移（≠ plan 結構驗證） |
+| governance overlay group | no | — | Ai-skill 治理 contract / 部分 runtime.db / routing 依賴 |
+
+- [ ] 依 Layer B 決定 `plan_profile`（capability）與排除清單；`consumer_surface` 獨立記錄 execution 維度，不併入 `plan_profile`；`plan_schema` 記錄 frontmatter schema + version（住 compat layer，非 engine）。
 - [ ] 文件化於 `plans/README.md` 或新 `governance/lifecycle/plan-profile.md`。
-- [ ] 完成條件：分類表 + 邊界 review 通過，Q2 標 resolved（且邊界由分類表推導，非預設）。
+- [ ] **完成條件**：Layer A facts 完整（含殘留驗證）+ Layer B decisions review 通過 + `plan_profile` committed。**Q2 不在此 close**（見 §Open Questions 收緊後的關閉條件：尚需一個 consumer 成功執行）。
 
 ## Phase 2 — Validator engine package（核心）+ schema compat layer + thin consumers
 - [ ] **抽出 validator engine package**：read-only，input = `ValidationContext`（演化 struct，**非固定 tuple**），output = findings；吃 normalized model，不依賴 commit context、不綁特定 hook。
 - [ ] **schema compatibility layer**（engine 之上）：解析 / normalize plan artifact，`plan_schema` version 住此層；engine 只見 normalized model（避免 engine ↔ schema 版本綁死，Q3）。
 - [ ] 既有 commit-msg hook 改為呼叫 engine（重構，行為不變；保護既有測試）。
 - [ ] CLI `plans validate --root <path> [--format text|json]` 作為**薄 consumer**呼叫 engine（CLI = transport only，不持有驗證邏輯）。
+- [ ] **failure semantics 在 engine contract 層（Q7）**：engine 為每個 finding 輸出 `severity`（block/warn/info）；hook→block、CI→fail、manual→warning 的對應是 **consumer transport 行為**，engine 不寫死；與 opt-out 治理句「engine receives effective policy」一致。
 - [ ] 測試：
   - [ ] **engine integration test（no CLI，回應 review #4）**：直接餵 `ValidationContext`（root / context / 各 violation），驗 findings，證明 engine 不依賴 CLI 可重用。
   - [ ] engine 單元測試（合法 tree + 各 violation）≥ 5 case。
