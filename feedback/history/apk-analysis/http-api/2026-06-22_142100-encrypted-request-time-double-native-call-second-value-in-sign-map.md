@@ -39,7 +39,7 @@ requestTime RE:
 #### Agent Action
 
 1. Project docs 記 seed 類型與 double-call（無 live path）。
-2. Ai-skill 只寫 pattern；不寫 blob 樣本。
+2. Ai-skill 只寫 pattern；不寫 blob 樣本。連續呼叫快取語意見 `142800`。
 3. SDK gap matrix：`requestTime` = blocking separate from `sign` crypto。
 
 #### Goal / Action / Validation

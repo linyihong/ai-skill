@@ -34,6 +34,8 @@
 | `http-api/2026-06-22_142500-partial-offline-sign-hmac-solved-requesttime-session-remain-relay` | Hybrid SDK when sign offline, requestTime native |
 | `common/2026-06-22_142600-frida-python-attach-java-bridge-use-cli-subprocess-for-rpc` | Python attach Java undefined → Frida CLI RPC |
 | `http-api/2026-06-22_142700-opaque-api-blob-native-decrypt-secondary-compression-json` | play_info blob → decryptStr + zlib → JSON |
+| `http-api/2026-06-22_142800-requesttime-native-getter-cache-first-rotates-consecutive-same` | requestTime 1st rotates, 2nd+ same in burst |
+| `http-api/2026-06-22_142900-wire-json-field-names-differ-from-gson-bean-paths` | Wire JSON keys ≠ Gson bean field names |
 
 ## 來源
 
