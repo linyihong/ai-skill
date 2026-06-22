@@ -33,6 +33,7 @@
 | `common/2026-06-22_142400-system-loadlibrary-name-overrides-static-so-assumption` | loadLibrary name vs wrong protection .so |
 | `http-api/2026-06-22_142500-partial-offline-sign-hmac-solved-requesttime-session-remain-relay` | Hybrid SDK when sign offline, requestTime native |
 | `common/2026-06-22_142600-frida-python-attach-java-bridge-use-cli-subprocess-for-rpc` | Python attach Java undefined → Frida CLI RPC |
+| `http-api/2026-06-22_142700-opaque-api-blob-native-decrypt-secondary-compression-json` | play_info blob → decryptStr + zlib → JSON |
 
 ## 來源
 
