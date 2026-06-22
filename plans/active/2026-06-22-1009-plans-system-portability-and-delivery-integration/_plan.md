@@ -13,7 +13,7 @@ parent: null
 **Owner**: linyihong
 **建立日期**: 2026-06-22
 **Source**: 2026-06-22 對話 — 使用者觀察 plans 系統（plan-tree + 驗證機制 + 子計畫）已足夠成熟，希望 (1) 讓外部 repo 也能使用、(2) 把 software-delivery 接入「開發前先寫 plan」、(3) 用子計畫系統讓一個 sub-plan 可交給其他 agent 執行。
-**Glossary Impact**: yes — 預期新引入 framework vocabulary：`plan_system_profile`（portable core vs governance overlay 邊界）、`agent_assignable` / `delegation_brief`（子計畫委派）。落地前須註冊到 `knowledge/glossary/ai-skill.md`；本 main plan 階段先宣告，sub-plan graduate 時才註冊。
+**Glossary Impact**: yes — 預期新引入 framework vocabulary，**刻意拆成單一責任術語避免概念漂移**：`plan_profile`（capability / portable core 邊界：哪些 validator 對外部 repo 適用）、`plan_schema`（frontmatter schema + version 相容契約）、`delegation`（子計畫委派 schema：modes + brief + constraints）。落地前須註冊到 `knowledge/glossary/ai-skill.md`；本 main plan 階段先宣告，sub-plan graduate 時才註冊。
 
 > **Watch-Out List citation**：本 plan 對應 [`architecture/ai-native-cognitive-ecosystem-system.md`](../../../architecture/ai-native-cognitive-ecosystem-system.md) §Watch-Out List 的「process bloat」「premature abstraction」「over-engineering」防呆 — plan-first 採 advisory workflow ordering 而非機械 block（避免誤擋小修補）；委派只先做 schema + 雙路徑（人工 / agent），不建自動 orchestrator；外部化採共用 binary 而非整套治理搬遷，避免外部 repo 被 Ai-skill governance 綁架。
 
@@ -33,9 +33,9 @@ plans 系統目前的價值（plan-tree 階層、frontmatter 單一 source-of-tr
 
 開一個 **plan tree（main + 3 sub-plan）**，dogfood plan-tree 本身，分階段 graduate：
 
-- **Sub-plan 01 — External-repo plan system via shared binary**：外部 repo 透過**共用 ai-skill binary**（非 init-project 抽取安裝）使用 plans 系統。核心缺口是 commit-time 強制跨 repo：設計外部 repo 用共用 binary 跑 plan-tree / archival validators 的路徑（薄 git hook shim 或 `ai-skill plans validate --root` 子命令）。同時釐清 **portable core vs Ai-skill governance overlay** 邊界（`plan_system_profile`）。
+- **Sub-plan 01 — External-repo plan system via shared binary**：外部 repo 透過**共用 ai-skill binary**（非 init-project 抽取安裝）使用 plans 系統。核心缺口是 commit-time 強制跨 repo。**抽象層關鍵：要抽的是 validator engine package（被 git hook shim / CI / CLI / 未來 API 共用），CLI `plans validate` 只是其中一個 consumer，不是核心**，否則半年後 `plans validate` 會長成另一個 orchestration layer。同時以**分類模型推導** portable 邊界（`plan_profile` capability + `plan_schema` 相容契約），不預設「哪些 validator 屬 portable」。
 - **Sub-plan 02 — software-delivery plan-first ordering**：把 plan-first 寫進 `workflow/software-delivery/` intake 段，接在 pre-build-interrogation / Test-First Ordering 之後，**advisory + review 檢查，不做機械 block**。
-- **Sub-plan 03 — Sub-plan agent delegation**：在 sub-plan frontmatter 加 delegation 欄位（`agent_assignable` + 自足 `delegation_brief`），**同時支援人工派發與 Agent/Task 工具派發**（依專案需求二選一或並用），執行端兩條路都通。
+- **Sub-plan 03 — Sub-plan agent delegation**：在 sub-plan frontmatter 加 **nested `delegation` 物件**（`enabled` + `modes:[human, agent]` + `brief` + `constraints`），避免把「可委派」與「brief 存在」綁死，並支援 manual-only / agent-only / hybrid / forbidden 不破 schema。**同時支援人工派發與 Agent/Task 工具派發**（依專案需求選用或並用），執行端兩條路都通。
 
 ### Alternatives Considered
 
@@ -68,7 +68,7 @@ scope 仍會隨 Phase 0 盤點調整（特別是 01 的跨 repo 強制機制、0
 - delegation schema 增加 sub-plan frontmatter 表面積。
 
 #### 風險
-- portable core 與 governance overlay 邊界若沒切乾淨，外部 repo 仍會踩到 Ai-skill 專屬 validator（如 runtime trigger wiring）→ 01 Phase 0 必須先把「哪些 validator 屬 portable core」列清楚。
+- portable 邊界若用「validator 類型」直覺切而非用 contract/dependency/execution-context 分類模型推導，會變成「先決定 portable 再找理由」→ 01 Phase 1 必須先產分類表（validator → contract_source → runtime_dependency → portable → reason）再分類。
 - plan-first ordering 若沒接好既有 pre-build-interrogation，會變成重複 gate（process bloat）。
 
 ---
@@ -87,14 +87,16 @@ scope 仍會隨 Phase 0 盤點調整（特別是 01 的跨 repo 強制機制、0
 
 ## Open Questions
 
-| # | Question | 處置 | 歸屬 sub-plan |
-|---|----------|------|---------------|
-| 1 | 外部 repo 跑 plan-tree validators 的最薄機制是什麼（git hook shim vs `plans validate` 子命令 vs 兩者）？ | still-open | 01 |
-| 2 | portable core 到底包含哪幾個 validator？哪些是 Ai-skill governance overlay 必須排除？ | still-open | 01 |
-| 3 | 共用 binary 的版本相容策略（外部 repo pin 哪個 binary、frontmatter schema 版本怎麼宣告）？ | still-open | 01 |
-| 4 | plan-first ordering 與既有 pre-build-interrogation / Architecture Compatibility Preflight 如何不重複？ | still-open | 02 |
-| 5 | delegation schema 欄位最小集合（`agent_assignable` / `delegation_brief` / context pack 指標）？人工與 agent 兩路徑共用同一份 brief 是否可行？ | still-open | 03 |
-| 6 | agent 派發是否綁定特定工具（Task/Agent / worktree isolation），或保持 tool-neutral 只定義 brief 契約？ | still-open | 03 |
+> 本表是 canonical Open Questions registry；sub-plan 的「已讀 §Open Questions」核對與其 Phase 0 公版 checklist 以此表為錨。每條由 `Resolved By` 指定的 sub-plan 在其 Phase 0 標記處置並回寫此表的 `Status`。
+
+| ID | Question | Owner | Status | Resolved By |
+|----|----------|-------|--------|-------------|
+| Q1 | 外部 repo 跑 plan validators 的最薄強制機制（validator engine package 被 git hook shim / CI / CLI 哪些 consumer 呼叫）？ | 01 | open | 01 |
+| Q2 | portable 邊界如何**推導**（不是預設 plan-tree 5 + archival 2）？需先建 validator → contract_source → runtime_dependency → portable 分類模型再分類 | 01 | open | 01 |
+| Q3 | schema / 版本相容策略（外部 repo pin 哪個 binary、frontmatter schema version 怎麼宣告與演進）？ | 01 | open | 01 |
+| Q4 | plan-first 與既有 pre-build-interrogation / Architecture Compatibility Preflight 的分工（plan 是 artifact 不是 stage；preflight 會回改 plan，需 loop 不是線性）？ | 02 | open | 02 |
+| Q5 | delegation 最小契約：nested `delegation: { enabled, modes:[human,agent], brief, constraints }`，避免 `assignable` 與 `brief 存在` 綁死、支援 manual/agent/hybrid/forbidden 不破 schema | 03 | open | 03 |
+| Q6 | tool-neutral 邊界：brief 契約只定義「自足執行所需資訊」，agent 工具細節（Task/Agent / worktree）放 `ai-tools/` 不進 schema | 03 | open | 03 |
 
 ---
 
@@ -120,7 +122,9 @@ scope 仍會隨 Phase 0 盤點調整（特別是 01 的跨 repo 強制機制、0
 
 | Open Question | 處置 | 證據 / 原因 |
 |---|---|---|
-| Q1-Q6 | still-open | 待各 sub-plan Phase 0 盤點解決 |
+| Q1 / Q2 / Q3 | open | 由 01 Phase 0 盤點解決並回寫 §Open Questions Status |
+| Q4 | open | 由 02 Phase 0 解決 |
+| Q5 / Q6 | open | 由 03 Phase 0 解決 |
 
 ### Phase 0.1 — 架構相容性 preflight（main 層）
 
@@ -148,7 +152,7 @@ scope 仍會隨 Phase 0 盤點調整（特別是 01 的跨 repo 強制機制、0
 
 ## Glossary Impact
 
-Glossary Impact: yes — 預期新增 `plan_system_profile`、`agent_assignable`、`delegation_brief`；本 main plan 階段僅宣告，實際註冊由 sub-plan graduate 時落地（避免提前註冊未定稿術語）。
+Glossary Impact: yes — 預期新增 `plan_profile`、`plan_schema`、`delegation`（各為單一責任術語，避免 `plan_system_profile` 一詞同時背 capability / validator set / 相容契約 / schema version 四個責任）；本 main plan 階段僅宣告，實際註冊由 sub-plan graduate 時落地（避免提前註冊未定稿術語）。
 
 ## 與其他 plans 的關係
 

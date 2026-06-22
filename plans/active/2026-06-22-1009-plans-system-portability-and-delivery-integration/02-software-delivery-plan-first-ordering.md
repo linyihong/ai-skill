@@ -27,7 +27,18 @@ sub_plan_reason: >
 - **Affected**：`workflow/software-delivery/intake.md`、`workflow/software-delivery/execution-flow.md`（導航）、可能 `workflow/software-delivery/test-strategy.md`（Test-First Ordering 接點）、可能新增 validation scenario。
 
 ## Decision Rationale（sub 層）
-現有 intake 已有 pre-build-interrogation（goal/scope/non-goals/acceptance/source-of-truth/duplication risk）與 Test-First Ordering（framework/runtime/governance 升級強制順序）。plan-first **不是新 gate，而是把「實作前先有 plan artifact」明文化為 intake 順序的一環**，並連到 plans 系統（`plans/active/` + plan-tree）。關鍵是**不重複** pre-build-interrogation（Q4）：pre-build-interrogation 是需求拷問；plan-first 是「拷問結果要落成 plan artifact 才進實作」。
+現有 intake 已有 pre-build-interrogation（goal/scope/non-goals/acceptance/source-of-truth/duplication risk）與 Test-First Ordering（framework/runtime/governance 升級強制順序）。plan-first **不是新 gate，而是把「實作前先有 plan artifact」明文化為 intake 的一環**，並連到 plans 系統（`plans/active/` + plan-tree）。
+
+**關鍵修正（回應 review #4）：plan 是 artifact，不是一個一次性 stage。** 線性「interrogation → plan → preflight → implement」是錯的，因為 preflight 會**回改 plan**（架構相容性檢查發現衝突就更新 plan）。正確模型是 plan 在 preflight 間反覆收斂：
+
+```
+Discover → Interrogate → Draft Plan ⟲ Preflight → Execute
+                              └──────────┘
+                         preflight 可回改 plan
+                         （plan 非一次生成）
+```
+
+不重複 pre-build-interrogation（Q4）的分工：pre-build-interrogation = 需求拷問（產出 plan 的輸入）；plan-first = 拷問結果落成可收斂的 plan artifact；Architecture Compatibility Preflight = 對 draft plan 做相容檢查並回饋修正。三者不是序列三段，而是 interrogation 餵入、plan 為中心 artifact、preflight 反覆驗證。
 
 ### Alternatives
 - A. 硬機械 gate：reject（本輪）— 易誤擋小修補，使用者已選 advisory。
@@ -58,7 +69,8 @@ sub_plan_reason: >
 
 ## Phase 1 — Plan-first ordering 文件化
 - [ ] 在 intake 段新增「Plan-First Ordering」小節：明文「會導向 code/workflow/governance/runtime 改動的任務，實作前須有對應 `plans/active/` plan（可 inline 小 plan 或 plan-tree）」。
-- [ ] 明確分工：pre-build-interrogation = 需求拷問；plan-first = 拷問結果落成 plan artifact；preflight = 執行前架構相容（三者順序：interrogation → plan artifact → preflight → implement）。
+- [ ] **用 loop 模型描述（非線性三段）**：`Discover → Interrogate → Draft Plan ⟲ Preflight → Execute`；明寫 plan 是 artifact、preflight 可回改 plan，避免讀者誤以為 plan 一次生成後不再變。
+- [ ] 分工說明：interrogation 餵入 / plan 為中心 artifact / preflight 反覆驗證並回饋（Q4）。
 - [ ] 規模分級：< 1 session / 純文件補強 / surgical 小修補的豁免條件（接 plan-tree「何時不開 sub-plan」既有規則）。
 - [ ] advisory 語氣（「應 / 建議」而非 commit-time block）。
 
@@ -68,10 +80,11 @@ sub_plan_reason: >
 - [ ] 更新 `execution-flow.md` 導航指向新小節。
 
 ## 完成條件
-- [ ] intake plan-first ordering 小節落地，與 pre-build-interrogation / preflight 分工清楚（Q4 resolved）
+- [ ] intake plan-first ordering 小節落地，用 loop 模型、與 pre-build-interrogation / preflight 分工清楚（Q4 resolved）
 - [ ] 規模分級豁免條件落地
 - [ ] review checklist 更新
 - [ ] doc-only 宣告明確（若未接 runtime gate）
+- [ ] **Acceptance evidence（回應 review #6）**：至少一次**真實的 software-delivery intake** 走過 plan-first loop（含一次 preflight 回改 plan 的實例），而非僅文件範例
 - [ ] linked-updates 檢查（README / 導航 / checklist 同步）
 
 ## Glossary Impact
