@@ -29,6 +29,9 @@
 | `common/2026-06-22_142000-jni-dynamic-registernatives-no-standard-java-com-export` | Dynamic JNI / no Java_com_* export |
 | `http-api/2026-06-22_142100-encrypted-request-time-double-native-call-second-value-in-sign-map` | requestTime double native call |
 | `common/2026-06-22_142200-frida-enumerate-loaded-classes-causes-script-load-timeout` | Avoid enumerateLoadedClasses timeout |
+| `common/2026-06-22_142300-hmac-sha256-per-mode-keys-in-native-rodata` | Plain SHA256 fail → HMAC + per-mode rodata keys |
+| `common/2026-06-22_142400-system-loadlibrary-name-overrides-static-so-assumption` | loadLibrary name vs wrong protection .so |
+| `http-api/2026-06-22_142500-partial-offline-sign-hmac-solved-requesttime-session-remain-relay` | Hybrid SDK when sign offline, requestTime native |
 
 ## 來源
 

@@ -38,7 +38,7 @@ After canonical string is known:
 #### Agent Action
 
 1. Project docs 標註「plain SHA256 ruled out」與 verify 方法。
-2. Ai-skill 不寫 crack key 步驟；只寫 verification gate。
+2. Ai-skill 不寫 crack key 步驟；只寫 verification gate。plain hash 失敗後下一分支見 `142300`（HMAC + per-mode rodata）。
 3. 交叉引用 `sha256-hash-verify-python-not-shell`（用 Python 驗證，非 shell）。
 
 #### Goal / Action / Validation
