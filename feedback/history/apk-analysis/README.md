@@ -36,6 +36,9 @@
 | `http-api/2026-06-22_142700-opaque-api-blob-native-decrypt-secondary-compression-json` | play_info blob → decryptStr + zlib → JSON |
 | `http-api/2026-06-22_142800-requesttime-native-getter-cache-first-rotates-consecutive-same` | requestTime 1st rotates, 2nd+ same in burst |
 | `http-api/2026-06-22_142900-wire-json-field-names-differ-from-gson-bean-paths` | Wire JSON keys ≠ Gson bean field names |
+| `http-api/2026-06-22_143000-requesttime-encrypt-plaintext-is-millis-plus-device-fingerprint-not-apk-path` | requestTime plaintext = millis + fingerprint, not apk path |
+| `http-api/2026-06-22_143100-requesttime-fingerprint-is-sha1-of-apk-signing-cert-der-colon-hex` | Fingerprint = SHA1(signing cert DER) colon-hex |
+| `http-api/2026-06-22_143200-custom-f3aes-label-may-still-be-standard-aes128-cbc-with-rodata-key-iv` | F3AES label may still be AES-128-CBC after key hook |
 
 ## 來源
 
