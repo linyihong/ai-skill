@@ -1,4 +1,4 @@
-version=repo-42d5fff
-source_commit=42d5fff
-built_at=2026-06-23T02:25:23Z
+version=repo-88201fa
+source_commit=88201fa
+built_at=2026-06-23T04:08:23Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
