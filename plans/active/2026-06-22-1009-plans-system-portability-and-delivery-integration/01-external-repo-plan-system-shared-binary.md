@@ -163,10 +163,10 @@ type ValidationContext struct {
 > **package 位置**：新 `scripts/ai-skill-cli/internal/planvalidate/`（不在 `internal/app/` 下 → 不觸發 `validateCLIDocSync`）。
 > **暫不碰外部 repo**（Phase 3 太早）。
 
-### Phase 2.0 — `ValidationContext` contract（= Gate A）
-- [ ] 新 package `internal/planvalidate/`：定義 `ValidationContext{ Root, ChangedSet, ExecutionMode, Metadata }` + 具名型別（`ChangedSet` / `ExecutionMode` enum: commit|ci|manual / `ValidationMetadata`）。**types only，無 method、無 parsing、無 schema、無 SchemaVersion 欄**。
-- [ ] 測試證明 **hook / cli / ci 三邊都能 construct**（三個 construction site，斷言欄位）。
-- [ ] `go build ./... && go test ./...` 綠。
+### Phase 2.0 — `ValidationContext` contract（= Gate A）✅（2026-06-22）
+- [x] 新 package `internal/planvalidate/`（`context.go`）：定義 `ValidationContext{ Root, ChangedSet, ExecutionMode, Metadata }` + 具名型別（`ChangedSet` / `ExecutionMode` enum: commit|ci|manual / `ValidationMetadata`）。**types only，無 method、無 parsing、無 schema、無 SchemaVersion 欄**（Gate B 修正已落實）。
+- [x] 測試證明 **hook / cli / ci 三邊都能 construct**（`context_test.go` 三個 construction site，斷言欄位 + 各 mode 的 opt-out transport metadata）。
+- [x] `go build ./...` 綠 + `go test ./...` 全 suite 綠（planvalidate 3 PASS，app/audit/glossary/pathutil 未受影響）。Gate A 通過：contract 可被三 consumer 餵。
 
 ### Phase 2.1 — schema compatibility layer（= Gate B，獨立 commit）
 - [ ] schema loader：讀 plan artifact → `NormalizedPlanModel`；`plan_schema` version 解析住此層。
