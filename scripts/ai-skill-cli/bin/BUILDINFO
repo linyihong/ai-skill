@@ -1,4 +1,4 @@
-version=repo-88201fa
-source_commit=88201fa
-built_at=2026-06-23T04:08:23Z
+version=repo-df8c650
+source_commit=df8c650
+built_at=2026-06-23T06:56:48Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
