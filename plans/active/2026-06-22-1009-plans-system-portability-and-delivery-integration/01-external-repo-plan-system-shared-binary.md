@@ -150,17 +150,42 @@ type ValidationContext struct {
 - [ ] **canonical `governance/lifecycle/plan-profile.md` 暫不建（避免 premature canonical surface）**：frozen membership 先留在本 plan；待 Phase 2 engine 抽出 + **一個 consumer 成功跑**（Q2 close 條件）再 promote 成 canonical doc。符合 maturity ladder（observation → runtime）。
 - [ ] **完成條件**：Layer A facts 完整（✅ 含殘留驗證）+ Layer B decisions review 通過（✅ membership frozen）+ canonical promote 待 consumer。**Q2 不在此 close**（見 §Open Questions 收緊後條件：尚需一個 consumer 成功執行）。
 
-## Phase 2 — Validator engine package（核心）+ schema compat layer + thin consumers
-- [ ] **抽出 validator engine package**：read-only，input = `ValidationContext`（演化 struct，**非固定 tuple**），output = findings；吃 normalized model，不依賴 commit context、不綁特定 hook。
-- [ ] **schema compatibility layer**（engine 之上）：解析 / normalize plan artifact，`plan_schema` version 住此層；engine 只見 normalized model（避免 engine ↔ schema 版本綁死，Q3）。
-- [ ] 既有 commit-msg hook 改為呼叫 engine（重構，行為不變；保護既有測試）。
-- [ ] CLI `plans validate --root <path> [--format text|json]` 作為**薄 consumer**呼叫 engine（CLI = transport only，不持有驗證邏輯）。
-- [ ] **failure semantics 在 engine contract 層（Q7）**：engine 為每個 finding 輸出 `severity`（block/warn/info）；hook→block、CI→fail、manual→warning 的對應是 **consumer transport 行為**，engine 不寫死；與 opt-out 治理句「engine receives effective policy」一致。
-- [ ] 測試：
-  - [ ] **engine integration test（no CLI，回應 review #4）**：直接餵 `ValidationContext`（root / context / 各 violation），驗 findings，證明 engine 不依賴 CLI 可重用。
-  - [ ] engine 單元測試（合法 tree + 各 violation）≥ 5 case。
-  - [ ] CLI consumer smoke test。
+## Phase 2 — Engine 抽取（gated sub-phases 2.0→2.4）
+
+> **Architecture Compatibility Gates（2026-06-22 review，動 Go 前必過）**：
+> - **Gate A**：先立 `ValidationContext` contract，**不寫 engine / 不實作 method / 不解析 commit / 不碰 schema**；證明 hook / cli / ci 三邊都能餵。卡住 = engine contract 未成熟。
+> - **Gate B**：schema compat layer 與 engine **分開（不同 commit）**；順序 schema loader → normalized plan model → engine。驗收：**engine 不知道 frontmatter version**。
+> - **Gate C**：commit hook **不直接替換**，先 shadow path（legacy ‖ engine-shadow），比對 findings equality 至少 pass / fail / opt-out 三組（opt-out 最易被重構掉行為）。
+> - **Gate D**：第一個 consumer **不是 CLI**，是 engine integration test（fixture → context → findings），再接 CLI（CLI 易把 transport 細節偷帶進 engine）。
+>
+> **Gate B 修正 round-4**：`SchemaVersion` **不放** `ValidationContext`（engine 不該知道 version）；改由 compat layer 解析成 normalized model。
+>
+> **package 位置**：新 `scripts/ai-skill-cli/internal/planvalidate/`（不在 `internal/app/` 下 → 不觸發 `validateCLIDocSync`）。
+> **暫不碰外部 repo**（Phase 3 太早）。
+
+### Phase 2.0 — `ValidationContext` contract（= Gate A）
+- [ ] 新 package `internal/planvalidate/`：定義 `ValidationContext{ Root, ChangedSet, ExecutionMode, Metadata }` + 具名型別（`ChangedSet` / `ExecutionMode` enum: commit|ci|manual / `ValidationMetadata`）。**types only，無 method、無 parsing、無 schema、無 SchemaVersion 欄**。
+- [ ] 測試證明 **hook / cli / ci 三邊都能 construct**（三個 construction site，斷言欄位）。
+- [ ] `go build ./... && go test ./...` 綠。
+
+### Phase 2.1 — schema compatibility layer（= Gate B，獨立 commit）
+- [ ] schema loader：讀 plan artifact → `NormalizedPlanModel`；`plan_schema` version 解析住此層。
+- [ ] 驗收：engine 介面只見 `NormalizedPlanModel`，**不出現 version 字眼**。
+
+### Phase 2.2 — engine + integration test（= Gate D；Q2 close 點）
+- [ ] engine：input = `ValidationContext` + `NormalizedPlanModel`，output = findings（每筆帶 `severity` block/warn/info — Q7：severity 是 engine 輸出，transport 由 consumer 決定）。
+- [ ] **第一個 consumer = engine integration test（no CLI）**：fixture → context → findings；plan_profile.core/archival 各 violation ≥ 5 case。
+- [ ] **Q2 close**：分類 + `plan_profile` committed + 此 integration test（=首個 consumer）綠 → 回寫 §Open Questions Q2 resolved。
+
+### Phase 2.3 — shadow hook（= Gate C）
+- [ ] commit-msg hook 加 engine-shadow path（不替換 legacy）；比對 legacy vs engine findings equality。
+- [ ] 至少 pass / fail / **opt-out** 三組比對一致才允許後續切換。
+
+### Phase 2.4 — CLI consumer
+- [ ] CLI `plans validate --root <path> [--format text|json]` 作為薄 consumer（transport only）。
 - [ ] **若新增 `route.*` 或 runtime surface，補 Runtime Execution Path + Per-surface consumer 表**（否則明寫 engine/CLI-only，無新 route）。
+
+**Q-close 映射**：Q2 → Phase 2.2 後可 close；Q1 → Phase 3；Q3 → 跨版本 evidence。
 
 ## Phase 3 — 外部 repo consumer 路徑（git hook shim / CI）
 - [ ] `ai-tools/` 或 `scripts/ai-skill-cli/docs/` 寫外部 repo 使用說明（共用 binary 路徑、engine 接 CI / git hook）。
