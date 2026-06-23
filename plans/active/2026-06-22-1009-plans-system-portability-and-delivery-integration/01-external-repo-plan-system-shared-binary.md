@@ -215,6 +215,17 @@ type ValidationContext struct {
 **Q-close 映射**：Q2 → Phase 2.2 後可 close；Q1 → Phase 3；Q3 → 跨版本 evidence。
 
 ## Phase 3 — 外部 repo consumer 路徑（git hook shim / CI）
+
+### External Pressure Samples（壓力樣本，**非** acceptance samples）
+> Vidoe-Test 定位為 **pressure sample**（揭露邊界），不是 acceptance sample。本表記 **coverage**，**不寫 pass/fail**——這不是 correctness 問題。
+
+| Repo | Loader | Schema Match | Engine Coverage | Notes |
+|------|--------|-------------|-----------------|-------|
+| Ai-skill | native | full | 4/4 | baseline |
+| Vidoe-Test | read-only（assessed 2026-06-23） | partial | 1/4 applicable | **current loader produced only 1 applicable rule**（`unique_id`）；其餘 3 條未觸發。inert 來源**尚未歸因**（schema / loader / normalization / applicability rules 皆可能）——證據不足，不提前歸因到 engine。 |
+
+**Boundary finding**：**portable ≠ schema-agnostic**。01 目前完成的是 `shared engine + portable profile + same plan contract`，**不是** universal plan language / interoperability framework。Vidoe-Test（無 `plan_kind`/`parent`/`required_for_completion`，status 自由值，`upstream_plan` 取代 parent）是不同 dialect。是否支援由 **Q8（deferred-to-phase-3）** 三選一（adoption / normalization / explicit-unsupported）決定——**不在本 phase 決，也不現在做 mapping**（目前只有 `absence`，無 `semantic mismatch`，證據不足以支撐 normalize）。
+
 - [ ] `ai-tools/` 或 `scripts/ai-skill-cli/docs/` 寫外部 repo 使用說明（共用 binary 路徑、engine 接 CI / git hook）。
 - [ ] 提供薄 `commit-msg` shim 範例（呼叫共用 binary，tool-neutral）。
 - [ ] **Acceptance evidence（回應 review #6，收緊）**：
