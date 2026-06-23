@@ -168,9 +168,12 @@ type ValidationContext struct {
 - [x] 測試證明 **hook / cli / ci 三邊都能 construct**（`context_test.go` 三個 construction site，斷言欄位 + 各 mode 的 opt-out transport metadata）。
 - [x] `go build ./...` 綠 + `go test ./...` 全 suite 綠（planvalidate 3 PASS，app/audit/glossary/pathutil 未受影響）。Gate A 通過：contract 可被三 consumer 餵。
 
-### Phase 2.1 — schema compatibility layer（= Gate B，獨立 commit）
-- [ ] schema loader：讀 plan artifact → `NormalizedPlanModel`；`plan_schema` version 解析住此層。
-- [ ] 驗收：engine 介面只見 `NormalizedPlanModel`，**不出現 version 字眼**。
+### Phase 2.1 — schema compatibility layer（= Gate B）✅（2026-06-23）
+- [x] schema loader（`schema.go`）：`RawPlan`（唯一帶 `SchemaVersion`）→ `Normalize()` → `NormalizedPlanModel`（version-free）。`plan_schema` version 解析**只**住此層。
+- [x] **B.1**：engine-facing `NormalizedPlanModel` **無 version 欄**——reflection test `TestNormalizedPlanModel_HasNoVersionField` 機械鎖；grep `version` 僅命中 `Normalize` 區域變數。
+- [x] **B.2**：所有版本判斷集中於 `Normalize`（unsupported version 在此 reject），validator 永不 `if plan.Version`。
+- [x] **B.3**：雙向 fixture `TestNormalize_AbsentAndExplicitVersionProduceSameModel`——「無 `schema_version`（既有 plan）」與「顯式 `schema_version: "1"`」normalize 成同一 model。誠實起點：今天唯一真實相容邊界是 absent==baseline，非捏造 v2。
+- [ ] **延後（記，不做）— CompatibilityResult{ Model, Warnings }**：未來出現 deprecated-but-tolerated 欄位時，須區分 **missing field vs deprecated field**，並回 warnings 讓 hook/CI/CLI 各自決定（不是 error-only）。目前 `Normalize` 回 `(model, error)`，warning channel 保留待第二個 schema version 落地再加（避免 over-build）。
 
 ### Phase 2.2 — engine + integration test（= Gate D；Q2 close 點）
 - [ ] engine：input = `ValidationContext` + `NormalizedPlanModel`，output = findings（每筆帶 `severity` block/warn/info — Q7：severity 是 engine 輸出，transport 由 consumer 決定）。
