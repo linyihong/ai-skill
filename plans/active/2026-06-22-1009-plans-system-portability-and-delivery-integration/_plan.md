@@ -97,7 +97,7 @@ scope 仍會隨 Phase 0 盤點調整（特別是 01 的跨 repo 強制機制、0
 | ID | Question | Owner / Resolved By | Status | Closed Criteria | Resolution Evidence |
 |----|----------|---------------------|--------|-----------------|---------------------|
 | Q1 | 外部 repo 跑 plan validators 的最薄強制機制（validator engine 被哪些 consumer 呼叫）？ | 01 | open（盤點完成） | engine→consumer 抽象落地 + shim/CI 路徑文件化 | 前置證據：01 §Phase 0.1 survey（validators 近乎 context-free，僅 2 處耦合）；待 engine 落地補 commit |
-| Q2 | portable 邊界如何**推導**（非預設 plan-tree 5 + archival 2）？ | 01 | open（Phase 1 分類完成，待 consumer 驗證） | **收緊**：Layer A facts 完整 + Layer B decisions review + `plan_profile` committed **+ 至少一個 consumer 成功執行**（taxonomy ≠ 驗證 portable） | 01 §Phase 1 兩層分類表已落地；待 consumer 成功跑 |
+| Q2 | portable 邊界如何**推導**（非預設 plan-tree 5 + archival 2）？ | 01 | open（分類+freeze 完成，僅剩 consumer） | **收緊**：Layer A facts 完整 + Layer B decisions review + `plan_profile` committed **+ 至少一個 consumer 成功執行**（taxonomy ≠ 驗證 portable） | 01 §Phase 1：兩層分類 + Layer A 殘留 empirically 驗證 + `plan_profile` membership frozen（core / archival / excluded，附 evidence）；僅剩 consumer 成功跑 |
 | Q3 | schema / 版本相容策略（pin 哪個 binary、schema version 怎麼宣告與演進）？ | 01 | open | `plan_schema` version 宣告 + 跨版本 acceptance pass | <commit + cross-version evidence> |
 | Q4 | plan-first 與 pre-build-interrogation / Preflight 分工（plan 是 artifact、preflight 回改 plan，loop 非線性）？ | 02 | open | intake loop 段落落地 + 一次真實 intake 含 preflight 回改實例 | <commit + intake evidence> |
 | Q5 | delegation 最小契約：nested `delegation: { enabled, modes, brief, constraints }`，不綁死、支援 manual/agent/hybrid/forbidden？ | 03 | open | schema + validator + 測試 committed | <commit + test path> |

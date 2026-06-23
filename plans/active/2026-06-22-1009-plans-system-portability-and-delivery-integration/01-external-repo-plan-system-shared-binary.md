@@ -126,9 +126,12 @@ type ValidationContext struct {
 | `validatePlanArchivalLinkIntegrity` | archival-link-integrity plan | none | **staged-blob (git show)** + worktree fallback | hook, ci, cli（ExecutionMode-gated） |
 | `validatePlanCheckboxSync` | gen3 plan | none | **commit-message 解析 plan refs** + staged diff | hook only |
 | `validatePlanStatusSync` | plan-status-sync-enforcement.yaml | none | **commit-message 解析 phase/refs** + staged | hook only |
-| _governance overlay group_（cognitive 家族 9 + repo-structure 10：CLIDocSync / GlossaryRetroOwn / RuntimeYamlProjects / RuntimeTriggerWiring / RuntimeIndexFreshness / EvidenceHierarchy / …） | cognitive-modes*.yaml / cli-modification-policy / enforcement-registry / runtime 等 Ai-skill 治理 | **部分讀 routing-registry / runtime.db**（如 RuntimeTriggerWiring 讀 routing-registry，已驗證） | commit-message / Ai-skill repo 結構耦合 | internal only |
+| overlay — cognitive 家族（ExecutionModeFloors / GovernanceModeConsistency / MemoryModeSubdir / CognitiveCost / ActivationSignals / CapabilitySnippet / TokenBudget / AdaptiveTriggers / CognitiveContractFormat） | cognitive-modes*.yaml | **runtime.db**（讀 `generated_surfaces[runtime.cognitive_modes.discovery]` @ hooks.go:2934；fresh-clone fallback） | 解析 commit-message cognitive block + staged | internal only |
+| overlay — runtime/routing wiring（RuntimeTriggerWiring / RuntimeYamlProjects / RuntimeIndexFreshness） | system-upgrade-governance / runtime | **routing-registry**（hooks.go:3624/3761）/ **runtime.db / runtime index** | staged yaml/registry + 投影狀態 | internal only |
+| overlay — Ai-skill repo-structure（CLIDocSync / GlossaryRetroOwn / BootstrapEntryThinness / MarkdownYamlSync / EvidenceHierarchy / EnforcementRegistry*） | cli-modification-policy / glossary / enforcement-registry | repo-local 檔（CLI docs / glossary / enforcement registry / sibling yaml）；無 runtime.db | Ai-skill 專屬路徑結構 | internal only |
+| overlay — safety（SanitizationStagedContent / NoNewShellScripts） | sanitization / go-first policy | metadata-derived forbidden tokens（Ai-skill 政策清單） | staged content scan | internal only |
 
-- [ ] **Layer A 殘留**：governance overlay group 目前以 contract_source 群組記錄；final freeze 前須**逐一 empirically 驗證** runtime_dependency（不只信 contract_source），避免漏網的 plan 相關 validator。
+- [x] **Layer A 殘留已驗證（2026-06-22）**：逐一 empirically 確認 overlay validators 的 runtime_dependency（不只信 contract_source）。結論：**無任何 overlay validator 驗證 plan-tree 結構**；cognitive 家族經 runtime.db、wiring 群組經 routing-registry/runtime.db、repo-structure 群組經 Ai-skill 專屬路徑——全部 `internal only`。**修正先前 Layer A 把 cognitive 家族標 `none` 的錯誤**（實際讀 runtime.db discovery surface）。無漏網的 plan 相關 validator。
 
 ### Layer B — Decisions（推導，引用 Layer A）
 
@@ -139,9 +142,13 @@ type ValidationContext struct {
 | `validatePlanCheckboxSync` / `validatePlanStatusSync` | **no** | — | **commit-message discipline**：解析 commit text，CI/manual 無 commit message 無法轉移（≠ plan 結構驗證） |
 | governance overlay group | no | — | Ai-skill 治理 contract / 部分 runtime.db / routing 依賴 |
 
-- [ ] 依 Layer B 決定 `plan_profile`（capability）與排除清單；`consumer_surface` 獨立記錄 execution 維度，不併入 `plan_profile`；`plan_schema` 記錄 frontmatter schema + version（住 compat layer，非 engine）。
-- [ ] 文件化於 `plans/README.md` 或新 `governance/lifecycle/plan-profile.md`。
-- [ ] **完成條件**：Layer A facts 完整（含殘留驗證）+ Layer B decisions review 通過 + `plan_profile` committed。**Q2 不在此 close**（見 §Open Questions 收緊後的關閉條件：尚需一個 consumer 成功執行）。
+- [x] **`plan_profile` membership frozen（2026-06-22，pending consumer validation）**：
+  - `plan_profile.core` = 5 plan-tree validators（frontmatter / archive-order / parent-ref / unique-id / folder-convention）
+  - `plan_profile.archival` = archival-audit / link-integrity（ExecutionMode-gated：staged-blob vs worktree、body-justification transport）
+  - **excluded**（evidence in Layer A）：checkbox-sync / status-sync（commit-message discipline，hook-only）、cognitive 家族（runtime.db）、wiring 群組（routing-registry/runtime.db）、repo-structure（Ai-skill 路徑）、safety（policy tokens）
+  - `consumer_surface` 為獨立 execution 維度，**不併入** `plan_profile`；`plan_schema`（frontmatter schema + version）住 compat layer，非 engine。
+- [ ] **canonical `governance/lifecycle/plan-profile.md` 暫不建（避免 premature canonical surface）**：frozen membership 先留在本 plan；待 Phase 2 engine 抽出 + **一個 consumer 成功跑**（Q2 close 條件）再 promote 成 canonical doc。符合 maturity ladder（observation → runtime）。
+- [ ] **完成條件**：Layer A facts 完整（✅ 含殘留驗證）+ Layer B decisions review 通過（✅ membership frozen）+ canonical promote 待 consumer。**Q2 不在此 close**（見 §Open Questions 收緊後條件：尚需一個 consumer 成功執行）。
 
 ## Phase 2 — Validator engine package（核心）+ schema compat layer + thin consumers
 - [ ] **抽出 validator engine package**：read-only，input = `ValidationContext`（演化 struct，**非固定 tuple**），output = findings；吃 normalized model，不依賴 commit context、不綁特定 hook。
