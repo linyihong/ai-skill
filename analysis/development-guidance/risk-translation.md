@@ -68,7 +68,7 @@
 | Dart、Kotlin/Java、Swift、TypeScript 或執行時期特定陷阱 | `languages/` |
 | 具體可建置的模式或操作指南 | `implementation/` |
 | 重複出現的設計、PR、發布或 API 審查步驟 | `checklists/` |
-| 可重用但仍在浮現中的教訓 | `feedback_history/<category>/` 或 `feedback_history/common/` |
+| 可重用但仍在浮現中的教訓 | `feedback/history/development-guidance/<category>/` 或 `feedback/history/development-guidance/common/` |
 | 可複製的文件形狀 | `templates/` |
 | 已實作專案中遺失的開發文件 | `process/` 和 `templates/initial-development-docs.md` |
 | 缺少需求或合約的阻礙問題 | `process/` 和當前規劃文件 |

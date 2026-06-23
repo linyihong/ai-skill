@@ -61,7 +61,7 @@
 12. 以 buffer、備案、支援停靠點、反折返檢查與時間可行性檢查規劃路線順序。
 13. 若使用者可能匯入 calendar、地圖清單、提醒 app、筆記 app、旅遊規劃 app 或離線地圖，加入 calendar/app-ready 欄位。
 14. 清楚標記信心程度與尚未解決的檢查。
-15. 當新的規劃經驗可泛化時，轉成 `feedback_history/` 的可重用 lesson。
+15. 當新的規劃經驗可泛化時，轉成 `feedback/history/travel-planning/` 的可重用 lesson。
 
 ## 與其他層的關係
 

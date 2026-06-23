@@ -35,7 +35,7 @@
 
 ## 14. Feedback Lesson Writing Tips
 
-寫入 `feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md` 時，請避免只有工具名與短結論。每條技巧都應包含：
+寫入 `feedback/history/apk-analysis/<category>/YYYY-MM-DD_HHMMSS-<slug>.md` 時，請避免只有工具名與短結論。每條技巧都應包含：
 
 - `One-line Summary`：一句話講重點。
 - `Human Explanation`：給人看的背景與誤判風險。
@@ -70,7 +70,7 @@ Agent Action:
 - 解碼規則回填協議/解密文件。
 - SDK 或 client 行為回填 BDD / tests。
 - 若分析文件要用來做 app 工具、SDK、client、mock、fixture-driven implementation、contract test 或重建功能，同輪自動啟用 `app-development-guidance` 並交出 Feature Reconstruction Handoff；不要讓開發規格停留在 APK 分析文件內。
-- 通用技巧回填 `feedback_history/<category>/` 或 `feedback_history/common/`（新檔），驗證後再整理到主文件或對應 `techniques/<category>/`。
+- 通用技巧回填 `feedback/history/apk-analysis/<category>/` 或 `feedback/history/apk-analysis/common/`（新檔），驗證後再整理到主文件或對應 `techniques/<category>/`。
 - App 開發 guidance 回填 `app-development-guidance`；不要把產品開發 checklist 長期堆在 `apk-analysis`。
 
 ---

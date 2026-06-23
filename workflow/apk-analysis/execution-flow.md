@@ -103,7 +103,7 @@
    - Offline decoders or fixtures。
    - API/schema docs。
    - Contract tests（若專案有 SDK/client implementation）。
-9. **Automatic skill feedback**：每次學到新 reusable technique 時，在同一輪寫入 `feedback_history/`。
+9. **Automatic skill feedback**：每次學到新 reusable technique 時，在同一輪寫入 `feedback/history/apk-analysis/`。
 
 ## 3. 分析結束定義
 
@@ -118,7 +118,7 @@
 - 有文件回填位置。
 - **若下游要程式化取數／接 SDK／寫 integration：** 專案內已有或可指向的 Domain/runtime baseline。缺則視為收口不完整。
 - **若要開始開發 live-facing SDK/client/app tool：** baseline 必須通過 development readiness gate。
-- 有新的 reusable lesson，或使用者/reviewer 提出可泛化改進時，已在 `feedback_history/` 新增對應檔案。
+- 有新的 reusable lesson，或使用者/reviewer 提出可泛化改進時，已在 `feedback/history/apk-analysis/` 新增對應檔案。
 
 詳細完成門檻請參考 [`runtime/onboarding/apk-analysis-completion.md`](../../runtime/onboarding/apk-analysis-completion.md)。
 
@@ -170,14 +170,14 @@ Use placeholders：
 
 若分析發現新的 reusable idea，或使用者/reviewer 建議可泛化的改進：
 
-1. 在 `feedback_history/<category>/YYYY-MM-DD_HHMMSS-<slug>.md` 建立 dated lesson（同輪，除非缺證據）。
+1. 在 `feedback/history/apk-analysis/<category>/YYYY-MM-DD_HHMMSS-<slug>.md` 建立 dated lesson（同輪，除非缺證據）。
 2. 泛化，使其不限於單一 APK。
 3. 加入 evidence 與 validation criteria。
 4. 驗證後 promotion 到 `WORKFLOW.md`、`TOOLS.md`、`DOCUMENTATION.md` 或 `techniques/<category>/`。
 
 **Root-cause check when feedback did not trigger：** 判斷 trigger 是否太隱晦、idea 被誤判為 project-only、validation uncertainty 阻擋了 candidate lesson、或 writeback transaction 未開啟。強化對應 trigger/checklist 後完成 sync/commit/push。
 
-**Agent checklist before ending an APK-analysis task：** 是否有新的 generalized lesson？若有 → `feedback_history/<category>/` 或 `feedback_history/common/` 有新檔（minimum）；optional promotion 到主文件。
+**Agent checklist before ending an APK-analysis task：** 是否有新的 generalized lesson？若有 → `feedback/history/apk-analysis/<category>/` 或 `feedback/history/apk-analysis/common/` 有新檔（minimum）；optional promotion 到主文件。
 
 ## 7. 文件分層
 
@@ -196,7 +196,7 @@ Use placeholders：
 - 解碼規則回填協議/解密文件。
 - SDK/client 行為回填 BDD/tests。
 - 若分析文件要用於 app 工具/SDK/client/mock/contract test，同輪啟用 `app-development-guidance` 並交出 Feature Reconstruction Handoff。
-- 通用技巧回填 `feedback_history/<category>/` 或 `feedback_history/common/`。
+- 通用技巧回填 `feedback/history/apk-analysis/<category>/` 或 `feedback/history/apk-analysis/common/`。
 - App 開發 guidance 回填 `app-development-guidance/`。
 
 ---

@@ -45,7 +45,7 @@ Artifact completeness 與 same-session closure 的治理 gate 見 [`software-del
 | 語言/執行時期特定的陷阱 | `languages/` |
 | 具體的可建置實作模式 | `implementation/` |
 | 可重複的審查流程 | `checklists/` |
-| 尚未提升的可重複使用開發原則 | 匹配的 `feedback_history/<category>/`，或跨領域的 `feedback_history/common/` |
+| 尚未提升的可重複使用開發原則 | 匹配的 `feedback/history/development-guidance/<category>/`，或跨領域的 `feedback/history/development-guidance/common/` |
 | APK 分析方法或 hook 技術 | `analysis/apk/`、`workflow/apk-analysis/` |
 | 專案特定的板子接線、校準日誌、韌體 dump、bench 測量、裝置識別碼或目標硬體結論 | 專案儲存庫文件 |
 | 產品特定的 API 主機、端點、schema 或令牌細節 | 專案儲存庫文件 |

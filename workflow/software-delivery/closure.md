@@ -80,7 +80,7 @@ If `completed` or `verified` is unknown, narrow the completion claim or mark the
 
 如果一個課程超越了一個產品：
 
-1. 在匹配的 `feedback_history/<category>/` 或跨領域的 `feedback_history/common/` 下添加一個檔案。
+1. 在匹配的 `feedback/history/development-guidance/<category>/` 或跨領域的 `feedback/history/development-guidance/common/` 下添加一個檔案。
 2. 連結共享規則而不是複製它們。
 3. 將已驗證的指引提升到結構化資料夾、檢查清單或此工作流程中。
 
