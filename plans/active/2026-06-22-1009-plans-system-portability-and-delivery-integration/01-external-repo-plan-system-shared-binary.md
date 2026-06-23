@@ -193,9 +193,22 @@ type ValidationContext struct {
 - [x] **Gate C.3**：divergence 分 5 桶 `same / missing / extra / transport / context`——opt-out 差異歸 **Transport**（engine policy-free 仍出 finding，legacy 經 `[skip-*]` 抑制）、staged/worktree/execmode 歸 **Context**；只有 missing/extra 算真 gap（`Converged()`）。
 - [x] 行為測試覆蓋 pass(valid) / fail(genuine gap) / **opt-out→transport** / context 四情境。
 - [x] **live evidence**：本 plan 的 commit 會觸發 shadow（plans staged + full-table），commit hook 輸出 `planvalidate_shadow: ok engine parity ...` 即首個真實 hook-context parity 證據。
-- [ ] **收斂門檻（待觀察）**：累積數次真實 commit，確認 missing/extra 恆為空（transport/context 可非空），達門檻後才允許 2.3→切換評估（仍不在本 phase 切換）。
+- [ ] **收斂門檻移至 Phase 2.3b 觀察**（見下）。
+
+> **Observation（記，不升 governance）**：2.3 真正建立的不是 shadow 功能本身，而是 **observability before replacement** ——在切換實作前先有 production-grade 比對通道。先記為 observation；N≥? 再考慮是否抽成 reusable pattern，本輪不 promote。
+
+### Phase 2.3b — Shadow Confidence Window（觀察窗，非新功能）
+> 不接 CLT、不切換 hook；只收集真實 commit 的 shadow 輸出，避免太早關掉觀測窗口。
+
+- [ ] **證據量（最少）**：normal commit ≥3、真違規 commit ≥1、opt-out commit ≥1。
+- [ ] **收斂門檻（唯一硬條件）**：`missing=0 ∧ extra=0`。**不要求 same=100%**：transport（opt-out 預期）、context（ExecutionMode 差異）允許非空。
+- [ ] **收斂規則（強化，回應 review）**：transport / context 的每個 entry **必須可解釋**，不得「非 genuine 就自動忽略」。機械保證：`Compare` 只在 hint（`OptedOut` / `ContextSensitive`）命中時才歸 transport/context，無 hint 一律 genuine（`compare_test.go` `GenuineGaps` / `OptOutBecomesTransport` / `ContextBucket` 已鎖）。
+- [ ] **不人造 commit 湊數**：靠自然 commit 流量；若長期無真違規 / opt-out 自然出現，最多用 **fixture replay** 補，不污染主線。
+- [ ] **觀察記錄**：累積 shadow Check 輸出（commit hash + 5 桶）於本節，達門檻後才允許評估進 2.4。
+- 進度：normal #1 = commit `403fa73`（`same=- missing=- extra=- transport=- context=-`，valid plan parity）。
 
 ### Phase 2.4 — CLI consumer
+> **Gate：須先過 Phase 2.3b 收斂門檻**（`missing=0 ∧ extra=0` + 證據量達標）才開工，避免太早關掉 shadow 觀測窗口。
 - [ ] CLI `plans validate --root <path> [--format text|json]` 作為薄 consumer（transport only）。
 - [ ] **若新增 `route.*` 或 runtime surface，補 Runtime Execution Path + Per-surface consumer 表**（否則明寫 engine/CLI-only，無新 route）。
 
