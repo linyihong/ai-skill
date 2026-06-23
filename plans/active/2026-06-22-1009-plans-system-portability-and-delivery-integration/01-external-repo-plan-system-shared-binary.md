@@ -184,11 +184,16 @@ type ValidationContext struct {
 - [x] **Gate D.4 negative evidence**：`TestEngine_CannotExpressExcludedValidators` — `NormalizedPlanModel` 無 route/registry/commit/message/runtime/discovery/diff 欄，excluded validators（runtime-trigger-wiring、checkbox/status-sync）**結構上無法表達** → portable 邊界 by construction 成立。
 - [x] **doc 補**：engine.go 明寫「Finding transport policy DEFERRED」，防後人見 `Blocking` 就加 Warning/Info。
 - [x] **Q2 close**：分類 + `plan_profile` frozen + 首個 consumer（integration test）綠 + negative evidence → §Open Questions Q2 標 resolved。
-- [ ] **2.2 殘留**：`plan_profile.core` 的 folder-convention（warning）**非純 over model**（需 dir listing），未在此實作；archival 規則需 `ctx.ExecutionMode`（staged-blob vs worktree），待接 consumer 時補。
+- [ ] **supplemental input rule（非「殘留」，回應 review）**：folder-convention（warning）**不是 NormalizedPlanModel 不夠完整**，而是 **rule needs additional context**（dir listing）。**禁止把 filesystem 搬進 model**；未來若支援，走 `ValidationContext{ Root, ChangedSet, SupplementalInputs }`，不污染 model。archival 規則的 staged-blob vs worktree 同類，由 `ctx.ExecutionMode` + supplemental input 提供，待接 consumer 時補。
 
-### Phase 2.3 — shadow hook（= Gate C）
-- [ ] commit-msg hook 加 engine-shadow path（不替換 legacy）；比對 legacy vs engine findings equality。
-- [ ] 至少 pass / fail / **opt-out** 三組比對一致才允許後續切換。
+### Phase 2.3 — shadow hook（= Gate C）✅（2026-06-23）
+- [x] `planvalidate.Compare(legacy, engine, hints) Divergence` + `planValidateShadowCheck` 接入 `runCommitMsgHook`（不替換 legacy；只 append 一個 informational Check）。
+- [x] **Gate C.1**：shadow **不影響 exit code** — helper 只回傳 `Check`，從不 set `result.ExitCode/Status`；commit 結果維持 legacy-only。既有 app 測試全綠（行為未變）。
+- [x] **Gate C.2**：equality 比 `RuleID + Blocking`，**忽略 Message**（`TestCompare_IgnoresMessage`）。
+- [x] **Gate C.3**：divergence 分 5 桶 `same / missing / extra / transport / context`——opt-out 差異歸 **Transport**（engine policy-free 仍出 finding，legacy 經 `[skip-*]` 抑制）、staged/worktree/execmode 歸 **Context**；只有 missing/extra 算真 gap（`Converged()`）。
+- [x] 行為測試覆蓋 pass(valid) / fail(genuine gap) / **opt-out→transport** / context 四情境。
+- [x] **live evidence**：本 plan 的 commit 會觸發 shadow（plans staged + full-table），commit hook 輸出 `planvalidate_shadow: ok engine parity ...` 即首個真實 hook-context parity 證據。
+- [ ] **收斂門檻（待觀察）**：累積數次真實 commit，確認 missing/extra 恆為空（transport/context 可非空），達門檻後才允許 2.3→切換評估（仍不在本 phase 切換）。
 
 ### Phase 2.4 — CLI consumer
 - [ ] CLI `plans validate --root <path> [--format text|json]` 作為薄 consumer（transport only）。
