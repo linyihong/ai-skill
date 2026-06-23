@@ -1,0 +1,122 @@
+package app
+
+import (
+	"fmt"
+	"sort"
+	"strings"
+
+	"github.com/linyihong/Ai-skill/scripts/ai-skill-cli/internal/planvalidate"
+)
+
+// Phase 2.3 (Gate C): non-blocking engine shadow.
+//
+// planValidateShadowCheck runs the new planvalidate engine ALONGSIDE the legacy
+// commit-msg plan-tree validators and reports their divergence as an
+// informational Check. It deliberately returns a Check and nothing else, so the
+// caller cannot let it influence the exit code: the commit outcome stays
+// "legacy only" until divergence converges (Gate C.1).
+//
+// Equality is by RuleID + Blocking, never message text (Gate C.2). Divergence is
+// bucketed into same/missing/extra/transport/context (Gate C.3) so expected,
+// benign differences (opt-out transport; execution context) are not reported as
+// genuine mismatches.
+//
+// Scope note: the 4 legacy core validators mirrored here read the working tree
+// via scanAllPlanFrontmatter, so the engine (fed from the same scan) should
+// match. The known intentional divergence is opt-out: the engine is policy-free
+// and still emits a finding the legacy path suppresses via a [skip-*] trailer,
+// which is reclassified to the Transport bucket.
+
+// legacyRuleID maps a legacy validator to the engine RuleID it mirrors.
+var planTreeLegacyMirror = []struct {
+	ruleID    string
+	optOut    string
+	runLegacy func(text string, staged []string, root string) string
+}{
+	{"plan_tree.frontmatter", "[skip-plan-tree-frontmatter]", validatePlanTreeFrontmatter},
+	{"plan_tree.unique_id", "[skip-plan-tree-unique-id]", validatePlanTreeUniqueID},
+	{"plan_tree.parent_reference", "[skip-plan-tree-parent-reference]", validatePlanTreeParentReference},
+	{"plan_tree.archive_order", "[skip-plan-tree-archive-order]", validatePlanTreeArchiveOrder},
+}
+
+func stagedTouchesPlans(staged []string) bool {
+	for _, s := range staged {
+		if (strings.HasPrefix(s, "plans/active/") || strings.HasPrefix(s, "plans/archived/")) && strings.HasSuffix(s, ".md") {
+			return true
+		}
+	}
+	return false
+}
+
+func planValidateShadowCheck(ctx commitMsgCtx) Check {
+	if !stagedTouchesPlans(ctx.staged) {
+		return Check{Name: "planvalidate_shadow", Status: "skipped", Message: "no plan files staged"}
+	}
+
+	// Legacy findings: which mirrored validators fire (presence, not count).
+	var legacy []planvalidate.Finding
+	hints := planvalidate.CompareHints{OptedOut: map[string]bool{}}
+	for _, m := range planTreeLegacyMirror {
+		if hasOptOutTrailer(ctx.text, m.optOut) {
+			hints.OptedOut[m.ruleID] = true
+		}
+		if m.runLegacy(ctx.text, ctx.staged, ctx.root) != "" {
+			legacy = append(legacy, planvalidate.Finding{RuleID: m.ruleID, Blocking: true})
+		}
+	}
+
+	// Engine findings: normalize the working-tree plan set and run the engine.
+	var models []planvalidate.NormalizedPlanModel
+	for _, fm := range scanAllPlanFrontmatter(ctx.root) {
+		if !fm.HasFrontmatter {
+			continue
+		}
+		raw := planvalidate.RawPlan{
+			Path:     fm.Path,
+			Location: planLocation(fm.Path),
+			Fields: map[string]string{
+				"id":              fm.ID,
+				"plan_kind":       fm.PlanKind,
+				"status":          fm.Status,
+				"parent":          fm.Parent,
+				"sub_plan_reason": fm.SubPlanReason,
+			},
+		}
+		if fm.RequiredForCompletion != nil {
+			if *fm.RequiredForCompletion {
+				raw.Fields["required_for_completion"] = "true"
+			} else {
+				raw.Fields["required_for_completion"] = "false"
+			}
+		}
+		model, err := planvalidate.Normalize(raw)
+		if err != nil {
+			// A normalize error is itself a genuine divergence signal; surface it
+			// as a synthetic finding so it is not silently dropped.
+			models = append(models, planvalidate.NormalizedPlanModel{Path: fm.Path})
+			continue
+		}
+		models = append(models, model)
+	}
+	engine := planvalidate.Validate(planvalidate.ValidationContext{
+		Root:          ctx.root,
+		ExecutionMode: planvalidate.ModeCommit,
+	}, models)
+
+	d := planvalidate.Compare(legacy, engine, hints)
+
+	msg := fmt.Sprintf("same=%v missing=%v extra=%v transport=%v context=%v",
+		compact(d.Same), compact(d.Missing), compact(d.Extra), compact(d.Transport), compact(d.Context))
+	if d.Converged() {
+		return Check{Name: "planvalidate_shadow", Status: "ok", Message: "engine parity (no genuine divergence) — " + msg}
+	}
+	return Check{Name: "planvalidate_shadow", Status: "warning", Message: "engine divergence (non-blocking, exit code unaffected) — " + msg}
+}
+
+func compact(s []string) string {
+	if len(s) == 0 {
+		return "-"
+	}
+	sort.Strings(s)
+	return strings.Join(s, ",")
+}

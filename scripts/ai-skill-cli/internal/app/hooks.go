@@ -2446,6 +2446,13 @@ func runCommitMsgHook(result Result, root string, positional []string) Result {
 		// runtime.db is unavailable or not yet projected (e.g. fresh clone
 		// before first `runtime compile`).
 		ctx := commitMsgCtx{text: text, staged: staged, root: root, modes: modes}
+
+		// Phase 2.3 (Gate C): non-blocking engine shadow. Records legacy-vs-engine
+		// plan-tree parity as an informational Check only — it never sets
+		// result.ExitCode / result.Status, so the commit outcome stays "legacy
+		// only" until divergence converges.
+		result.Checks = append(result.Checks, planValidateShadowCheck(ctx))
+
 		v2Violations := []string{}
 		if v := validateCognitiveCost(ctx.modes); v != "" {
 			v2Violations = append(v2Violations, v)
