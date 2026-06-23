@@ -147,6 +147,7 @@ type ValidationContext struct {
   - `plan_profile.archival` = archival-audit / link-integrity（ExecutionMode-gated：staged-blob vs worktree、body-justification transport）
   - **excluded**（evidence in Layer A）：checkbox-sync / status-sync（commit-message discipline，hook-only）、cognitive 家族（runtime.db）、wiring 群組（routing-registry/runtime.db）、repo-structure（Ai-skill 路徑）、safety（policy tokens）
   - `consumer_surface` 為獨立 execution 維度，**不併入** `plan_profile`；`plan_schema`（frontmatter schema + version）住 compat layer，非 engine。
+  - **`plan_profile` FROZEN（回應 review）**：membership 凍結。**只有三種事件可重開**：(1) shadow 出現 `missing`、(2) shadow 出現 `extra`、(3) Phase 3 acceptance 被卡住。其餘一律當 observation。**禁止**因 Vidoe-Test 發現（folder-convention / loader / dialect）回頭擴 `plan_profile.core`。
 - [ ] **canonical `governance/lifecycle/plan-profile.md` 暫不建（避免 premature canonical surface）**：frozen membership 先留在本 plan；待 Phase 2 engine 抽出 + **一個 consumer 成功跑**（Q2 close 條件）再 promote 成 canonical doc。符合 maturity ladder（observation → runtime）。
 - [ ] **完成條件**：Layer A facts 完整（✅ 含殘留驗證）+ Layer B decisions review 通過（✅ membership frozen）+ canonical promote 待 consumer。**Q2 不在此 close**（見 §Open Questions 收緊後條件：尚需一個 consumer 成功執行）。
 
@@ -203,7 +204,7 @@ type ValidationContext struct {
 - [ ] **證據量（最少）**：normal commit ≥3、真違規 commit ≥1、opt-out commit ≥1。
 - [ ] **收斂門檻（唯一硬條件）**：`missing=0 ∧ extra=0`。**不要求 same=100%**：transport（opt-out 預期）、context（ExecutionMode 差異）允許非空。
 - [ ] **收斂規則（強化，回應 review）**：transport / context 的每個 entry **必須可解釋**，不得「非 genuine 就自動忽略」。機械保證：`Compare` 只在 hint（`OptedOut` / `ContextSensitive`）命中時才歸 transport/context，無 hint 一律 genuine（`compare_test.go` `GenuineGaps` / `OptOutBecomesTransport` / `ContextBucket` 已鎖）。
-- [ ] **不人造 commit 湊數**：靠自然 commit 流量；若長期無真違規 / opt-out 自然出現，最多用 **fixture replay** 補，不污染主線。
+- [ ] **不人造 commit 湊數**：靠自然 commit 流量。**14 天 fallback（回應 review）**：若自 2.3b 開啟（2026-06-23）起 **14 天內（至 2026-07-07）** 自然流量仍未出現 violation / opt-out，**允許 fixture replay**（不進主線）補齊樣本——目的是讓窗口能關，不是湊數。fixture replay 仍屬 observability（shadow），非行為驗證。
 - [ ] **觀察記錄**：累積 shadow Check 輸出（commit hash + 5 桶）於本節，達門檻後才允許評估進 2.4。
 - 進度：normal #1 = commit `403fa73`（`same=- missing=- extra=- transport=- context=-`，valid plan parity）。
 
