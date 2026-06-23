@@ -175,10 +175,16 @@ type ValidationContext struct {
 - [x] **B.3**：雙向 fixture `TestNormalize_AbsentAndExplicitVersionProduceSameModel`——「無 `schema_version`（既有 plan）」與「顯式 `schema_version: "1"`」normalize 成同一 model。誠實起點：今天唯一真實相容邊界是 absent==baseline，非捏造 v2。
 - [ ] **延後（記，不做）— CompatibilityResult{ Model, Warnings }**：未來出現 deprecated-but-tolerated 欄位時，須區分 **missing field vs deprecated field**，並回 warnings 讓 hook/CI/CLI 各自決定（不是 error-only）。目前 `Normalize` 回 `(model, error)`，warning channel 保留待第二個 schema version 落地再加（避免 over-build）。
 
-### Phase 2.2 — engine + integration test（= Gate D；Q2 close 點）
-- [ ] engine：input = `ValidationContext` + `NormalizedPlanModel`，output = findings（每筆帶 `severity` block/warn/info — Q7：severity 是 engine 輸出，transport 由 consumer 決定）。
-- [ ] **第一個 consumer = engine integration test（no CLI）**：fixture → context → findings；plan_profile.core/archival 各 violation ≥ 5 case。
-- [ ] **Q2 close**：分類 + `plan_profile` committed + 此 integration test（=首個 consumer）綠 → 回寫 §Open Questions Q2 resolved。
+### Phase 2.2 — engine + integration test（= Gate D；Q2 close 點）✅（2026-06-23）
+- [x] engine（`engine.go`）：`Validate(ValidationContext, []NormalizedPlanModel) []Finding`。
+  - **Gate D.1**：`Finding{ RuleID, Message, Blocking bool }` — **minimal，不開 severity enum**（修正先前「severity block/warn/info」草案；Q7 未成熟，transport policy 不寫進 engine）。
+  - **Gate D.2**：collect-all，無 fail-fast（`TestEngine_Mixed_CollectsAllFindings` 一次回多個 rule class）。
+  - 實作 4 條純 core 規則：frontmatter / unique-id / parent-reference / archive-order。
+- [x] **第一個 consumer = engine integration test（no CLI，Gate D）**：`engine_test.go` **按行為分組（Gate D.3）**：valid / missing / broken_link / archive_required / opt_out / mixed。opt-out 證明為 **consumer-side**（engine 仍出 finding，consumer filter 套 effective policy）。
+- [x] **Gate D.4 negative evidence**：`TestEngine_CannotExpressExcludedValidators` — `NormalizedPlanModel` 無 route/registry/commit/message/runtime/discovery/diff 欄，excluded validators（runtime-trigger-wiring、checkbox/status-sync）**結構上無法表達** → portable 邊界 by construction 成立。
+- [x] **doc 補**：engine.go 明寫「Finding transport policy DEFERRED」，防後人見 `Blocking` 就加 Warning/Info。
+- [x] **Q2 close**：分類 + `plan_profile` frozen + 首個 consumer（integration test）綠 + negative evidence → §Open Questions Q2 標 resolved。
+- [ ] **2.2 殘留**：`plan_profile.core` 的 folder-convention（warning）**非純 over model**（需 dir listing），未在此實作；archival 規則需 `ctx.ExecutionMode`（staged-blob vs worktree），待接 consumer 時補。
 
 ### Phase 2.3 — shadow hook（= Gate C）
 - [ ] commit-msg hook 加 engine-shadow path（不替換 legacy）；比對 legacy vs engine findings equality。
