@@ -44,16 +44,75 @@ baseline_ref: 2026-06-23-1500-adr-004-migration-drift-diagnosis
 
 ## Phase 0 — Migration Inventory (Step 0)
 
-**目標**：完成 99-file classification + intent map（baseline 已點名但未展開）。
+> **排序鐵則：`inventory discovers / classification interprets`，不可反向。**
+> 先定 A/B/C/D 再掃，會讓「分類先存在 → inventory 被迫塞進分類 → 新型 consumer 被忽略」——
+> 這與本次 drift（fixture 先定義世界 → indexer 證明 fixture）同型。故拆三步，分類放最後。
+>
+> **掃描單位 = consumer，不是 string occurrence。** 且必須掃 **intent equivalence**，不只字面路徑：
+> `feedback_history` / `feedback/history` / `MATCH 'feedback'`(FTS) / `route.feedback.*`(registry key) /
+> README reference / generated path / helper function。教訓：沒有地方明寫舊路徑，系統仍消費舊世界觀。
+>
+> **Phase 0 成功條件（一句）：Every consumer must be enumerable before it becomes enforceable.**
 
-**產出**：
-- [ ] Consumer Matrix（每個 consumer：path、讀法、Path 1/2、是否 load-bearing）
-- [ ] Canonical Path Usage Table（誰宣告 path、誰消費 path）
-- [ ] Class A/B/C/D 分類（A=doc 文字、D=code/fixture… <TODO: 鎖定分類定義>）
+### Step 0A — Reference Census（read-only · 只列舉不判讀）
+
+固定欄位，**禁止**分級 / 打 P0 / 決定 owner / 判定 load-bearing：
+
+| field | 說明 |
+| --- | --- |
+| file | 檔案 |
+| location | line / symbol |
+| reference | 命中的 path / token |
+| access_mode | glob / FTS / registry / direct read / fixture / docs |
+| intent | read / validate / route / describe / seed |
+| execution_surface | runtime / test / docs / tooling |
+| candidate_world | old / new / mixed |
+| consumer_id | 暫時編號 |
+
+**0A 種子（2026-06-24 sweep；尚未 resolve，僅 census）：**
+
+| consumer_id | file:location | reference | access_mode | intent | surface | world |
+| --- | --- | --- | --- | --- | --- | --- |
+| C-01 | `runtime.go:1212` `runtimeIndexFeedbackRecords` | `skills/*/feedback_history` | glob | read | runtime | old |
+| C-02 | `runtime.go:1146-1152` index assembly | feedback records append | direct read | read | runtime | (derives C-01) |
+| C-03 | `runtime.go:1876,1894` `nativeRuntimeIndexFTSCheck` | `MATCH 'feedback'` | FTS | validate | runtime | mixed |
+| C-04 | `runtime.go:1379-1422` `runtime query` FTS | `MATCH ?` keyword | FTS | read | runtime | (Path 2) |
+| C-05 | `runtime_test.go:244,625,640` | `skills/demo/feedback_history/...` | fixture | seed/validate | test | old |
+| C-06 | `close_loop.go:468` | `HasPrefix(path,"feedback/")` | direct read | route | tooling | new |
+| C-07 | `hooks.go:1861-2017` `validateFeedbackLearningReport*` | token "feedback" (Report obligation) | n/a | validate | tooling | independent (NAME COLLISION) |
+| C-08 | `router_proposals.go:107` | "Discovery feedback loop" | n/a | describe | tooling | independent (NAME COLLISION) |
+| C-09 | `routing-registry.yaml:1951` `route.feedback.history` | `feedback/history/README.md` | registry | route | tooling | new |
+| C-10 | `routing-registry.yaml:941-958` `route.feedback.promotion-pipeline` | `feedback/promotion/...` | registry | route | tooling | new |
+| C-11 | `metadata/rules/feedback-lessons.yaml` | `feedback/history/<domain>/` | direct read | describe | docs | new |
+| C-12 | `enforcement/feedback-lessons.md`, `content-layering.md` | sink declaration | direct read | describe | docs | new |
+| C-13 | `knowledge/summaries/feedback-promotion-pipeline.md:16` | `保留原 feedback_history/` | docs | describe | docs | old |
+| C-14 | `enforcement/failure-learning-system.md:115,201` | `feedback_history/` durable loc | docs | describe | docs | old |
+| C-15 | `intelligence/engineering/agent-architecture/failure-recovery.md:56` | `feedback_history/` | docs | describe | docs | old |
+| C-16 | `validation/scenarios/failure-derived/feedback-history-consolidation-v1.yaml` | `feedback/history/<domain>/` | docs | validate | test | new |
+| C-17 | `traces/failure-derived/...-2026-05-13.yaml` | `舊路徑...仍存在（向後相容）` | docs | describe | docs | old (now false) |
+
+> 種子未盡：`feedback/history` 新世界 doc reference 共 308 hits（按 top-dir：feedback 58 / intelligence 19 /
+> enforcement 12 / workflow 10 / knowledge 10 …），多為 docs，待 0A 補齊 consumer 收斂。
+> **NAME COLLISION 提醒**：token `feedback` 橫跨 lesson / Learning-Report obligation / Discovery loop
+> 三 domain（C-07/C-08）→ 直接解釋 C-03 為何在任何 `feedback` 出現時都綠。
+
+### Step 0B — Consumer Resolution（消除假 consumer）
+
+| field | 說明 |
+| --- | --- |
+| real_consumer | Y/N（如 C-03 health-check ≠ consumer，是 validator） |
+| load_bearing | required / latent / dead |
+| authority_source | constitution / contract / registry / local |
+| path_group | Path1 / Path2 / independent |
+| replacement | canonical target |
+
+### Step 0C — Classification（最後，長在證據上）
+
+等 0A census 穩、0B resolve 完才定 Class A/B/C/D；分類是**結論不是前提**。
 
 **Gate（未過不得進 Phase 1）**：
-- [ ] 無 Unknown Consumer（每個觸及 feedback path 的點都已分類）
-- [ ] 每個 consumer 有 owner
+- [ ] 無 Unknown Consumer（每個觸及 intent-equivalent feedback 的點都已 census + resolve）
+- [ ] 每個 real_consumer 有 authority_source + owner
 
 ---
 
@@ -187,7 +246,8 @@ Constitution
 
 | 項目 | 狀態 |
 | --- | --- |
-| Phase 0 分類定義（Class A/B/C/D 邊界） | pending |
+| Phase 0 分類定義（Class A/B/C/D 邊界） | pending（0C，等 census 穩） |
+| 0A census 若成長超過約一屏 → 拆 companion evidence 檔（單一 census 尚不值得新檔/新 ref edge，見 N2） | trigger-watch |
 | Out of Scope 補足 | pending |
 | contract 命名（`<name>.yaml`） | pending |
 | 各 phase 的 validator 實作細節 | pending（進 phase 時展開） |
