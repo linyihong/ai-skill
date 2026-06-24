@@ -267,9 +267,17 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
   reference 只是 apk-analysis recovery reload set 的一個 pointer，sink 消失只降低 recovery 品質、不阻斷 →
   **C-18 = observer，非 required**。證明 `authority unknown + impact unknown` 收斂為 observer（不確定 ≠ 重要）。
   B-2 不新增 gate → 不改 sequencing。
-  > **副帶範圍外發現（已分流，不在本計畫修）**：`metadata/recovery/domain-policies.yaml` 的 `source_path`
+  > **副帶範圍外觀察 — Observation Status: REFUTED 2026-06-24**
+  > *Originally observed*：`metadata/recovery/domain-policies.yaml` 的 `source_path`
   > 與所有 inbound 引用均指向不存在的 `metadata/recovery/n.yaml`（rename 後 link 未更新）——獨立
   > reference-integrity drift，與 feedback sink 無關。
+  > *Verification（current HEAD inspected）*：`source_path` 已是 `metadata/recovery/domain-policies.yaml`；
+  > 全部 inbound 引用（routing-registry、model-checklists、escalation-levels、README、workflow-routing、
+  > apk execution-flow、software-delivery intake、validation scenarios）皆解析到 `domain-policies.yaml`；
+  > `rg '\bn\.yaml\b'` 全庫唯一命中即本段；`git log --all -- metadata/recovery/n.yaml` 為空（`n.yaml` 從未存在，
+  > 無 rename 歷史）。平行的 `metadata/evidence/domain-policies.yaml` 同樣已收斂、無 drift。
+  > *Disposition*：No action required。原 observation 為 **observation drift**（分析記錄脫離實際 repo 狀態，
+  > 尚未進入 authority chain），非 integrity drift；標記為 refuted observation，excluded from Phase scope，不新增 blocker。
 
 **Closure Rule 檢查**：required 集合 {C-09, C-10, C-11, C-16/19/20} 已全部列舉與 resolve。
 inventory closure 的定義是 **「無未解 executable consumer」**，**不是「blocker 已清」**——故 B-1（C-09/C-11 的
