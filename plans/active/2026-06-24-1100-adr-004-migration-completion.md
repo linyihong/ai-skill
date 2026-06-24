@@ -200,7 +200,7 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
 | C-10 | `route.feedback.promotion-pipeline` primary_source 失效 | discovery（Path 1） |
 | C-11 | feedback-lessons 規則指向的寫入位置失效 → 規則 stale | enforcement（治理寫入位置） |
 | C-16/19/20 | scenario 期望路由/寫入 sink → 行為錯會 fail | enforcement（validation guard） |
-| C-18 | recovery navigation source（README）缺失 → recovery 流程降級 | dependency（recovery nav） |
+| C-18 | recovery reload set 少一個 pointer → 降低 recovery 品質、**不阻斷**（B-2 verified） | observer（非 dependency） |
 | C-12/21 | 僅描述/單筆舉例，sink 消失不阻擋任何人 | observability / describe（候選 out） |
 | C-07/C-08 | 與 sink 無關（token 同形、語意獨立） | OUT（name collision，非 consumer） |
 
@@ -236,7 +236,7 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
 | C-04 | consumes（透過 index） | — | Path2 | registry（間接） | 同 C-01（index 修好即恢復） |
 | C-03 | — | — | independent | local（自證 token） | n/a（observability；P0-A 改 provenance 檢查） |
 | C-16/19/20 | asserts（驗證期望） | — | independent（validation） | derived（from registry/contract） | 對齊 contract location 後重新 seed |
-| C-18 | consumes（recovery nav） | — | Path1-adjacent | registry/local（待查 recovery loader） | sink README via registry |
+| C-18 | references（reload pointer，非 owner） | — | independent（recovery reload set） | reference-first（path 仍應 derive from registry） | sink README via registry（B-2: observer） |
 
 > `replacement ≠ owner` 已遵守：`authority_source` 記治理來源，`replacement_target` 記遷移去向，兩欄不混。
 > C-11 是唯一同時觸兩軸者——其 location 主張是 overlap 來源，permission 主張是它的正當核心。
@@ -253,7 +253,7 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
 | C-04 | none（index 空→回空集） | registry（間接） | planned（C-01 修好即恢復） | **latent**（effectively dead until C-01 repoint） | Y（starved） |
 | C-03 | none（不依賴 sink；只回報且說謊） | local（自證 token） | n/a | **out**（observability illusion；P0-A 改 provenance） | N |
 | C-16/19/20 | high if enforcement active | derived（from registry/contract） | planned（對齊 contract 後 re-seed） | **required if enforcement active** | Y |
-| C-18 | med（recovery nav 降級） | **ambiguous**（未驗證 recovery loader 是否 runtime-consume domain-policies.yaml） | planned | required（pending）⚠ | Y? |
+| C-18 | low（reload set 少一 pointer，品質降級不阻斷） | reference-first（無 Go loader；path 應 derive from registry） | planned | **observer**（B-2 verified；非 required） | N（非 sink dependency） |
 | C-06/07/08 / C-12/21 | — | — | — | **out** | N |
 
 **Phase 0 Closure — 觸發 2 個 blocker（不帶進實作）：**
@@ -263,13 +263,43 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
   → 命中 P0 blocker 規則。**若不先把 location authority 收斂成單一 owner（registry；rule 改 derive），
   P0-B 把 indexer repoint 只會再複製一份路徑字串 = 下一輪 drift。** 故 **Phase 4 contract 的 location
   收斂必須先於（或同步於）P0-B**，不可先 repoint。
-- **B-2（verify · minor）**：C-18 `authority_source` 未定——需先確認 `metadata/recovery/domain-policies.yaml`
-  是否真被 runtime recovery loader 消費，再決定 required/observer。未驗證前不蓋 required 章。
+- **B-2（verify · minor）— RESOLVED 2026-06-24**：C-18 無 Go loader（reference-first agent 讀）；其 feedback
+  reference 只是 apk-analysis recovery reload set 的一個 pointer，sink 消失只降低 recovery 品質、不阻斷 →
+  **C-18 = observer，非 required**。證明 `authority unknown + impact unknown` 收斂為 observer（不確定 ≠ 重要）。
+  B-2 不新增 gate → 不改 sequencing。
+  > **副帶範圍外發現（已分流，不在本計畫修）**：`metadata/recovery/domain-policies.yaml` 的 `source_path`
+  > 與所有 inbound 引用均指向不存在的 `metadata/recovery/n.yaml`（rename 後 link 未更新）——獨立
+  > reference-integrity drift，與 feedback sink 無關。
 
 **Closure Rule 檢查**：required 集合 {C-09, C-10, C-11, C-16/19/20} 中，C-09/C-11 的 authority 因 B-1 尚未
 single-owned → **Phase 0 inventory 標記為「enumerable 完成、closure 受 B-1 阻擋」**：consumer 已全部列舉與
 resolve，但 required-without-clean-authority 必須先由 B-1 收斂才算正式關閉。B-1 是 Phase 0 交給 implementation
 的第一個 gate，而非 Phase 2 的內部細節。
+
+### Phase 0 → Implementation：Phase Dependency（B-2 後正式重畫）
+
+> **重畫前置已達**：C-18 resolve 為 observer，不新增 gate → C-18 未改 sequencing。
+> 證據僅支持 `contract.location → gate P0-B`，**不**支持整個 Phase 4 上移。
+> 守界：是 location slice gate，不是 `Phase 4 → Phase 2`。
+
+```
+Phase 1  P0-A observability            （無 path-authority 依賴 → 可先行/並行）
+   │
+   ▼
+GATE   Location Authority Resolution    ← B-1（Phase 4 的 location slice）
+   │     registry = 唯一 authority_of_location；C-11 rule 改 derive、只留 permission
+   ▼
+Phase 2  P0-B repair（indexer repoint，registry-derived）
+   │
+   ▼
+Phase 3  P0-C alignment（fixtures / negative tests）
+   │
+   ▼
+Phase 4  remaining contract extraction（location slice 已在 B-1 gate 先行）
+```
+
+- **phase dependency ≠ consumer dependency**：本圖是從目前已 resolve 的 consumer 推導，非結構先驗。
+- 唯一新增的硬邊是 **B-1 location gate**；其餘維持 diagnosis 的 observability-before-repair 序。
 
 ### Step 0C — Classification（最後，長在證據上）
 
