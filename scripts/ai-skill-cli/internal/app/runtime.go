@@ -560,6 +560,11 @@ func buildRuntimeValidateResult(opts runtimeOptions) Result {
 		return result
 	}
 
+	// P0-A reported-red (Option A): truthful feedback-provenance signal, surfaced
+	// but NOT part of the blocked aggregation and not affecting ExitCode. See
+	// nativeRuntimeIndexProvenanceCheck for the Gate Promotion Rule.
+	result.Checks = append(result.Checks, nativeRuntimeIndexProvenanceCheck(repo, filepath.Join(repo, "knowledge", "runtime", "sqlite", "runtime-index.sqlite")))
+
 	knowledgeRuntimeCheck := nativeKnowledgeRuntimeValidation(repo)
 	result.Checks = append(result.Checks, knowledgeRuntimeCheck)
 	if knowledgeRuntimeCheck.Status != "ok" {
@@ -665,6 +670,11 @@ func buildRuntimeRefreshResult(opts runtimeOptions) Result {
 			return result
 		}
 	}
+
+	// P0-A reported-red (Option A): truthful feedback-provenance signal, surfaced
+	// in the refresh result but NOT gating — does not set blocked / change
+	// ExitCode. Gate Promotion Rule lives on nativeRuntimeIndexProvenanceCheck.
+	result.Checks = append(result.Checks, nativeRuntimeIndexProvenanceCheck(repo, nativeIndexPath))
 
 	return result
 }
@@ -1896,6 +1906,72 @@ LIMIT 1`, runtimeFTSMatchLiteral("feedback")).Scan(&rankedRoute)
 		return fmt.Errorf("expected ranked query result")
 	}
 	return nil
+}
+
+// feedbackCanonicalSink derives the canonical feedback-lesson sink prefix from
+// the routing registry (route.feedback.history.primary_source), so the sink is
+// never hardcoded. Returns e.g. "feedback/history/".
+func feedbackCanonicalSink(repo string) (string, error) {
+	registry, err := readRuntimeRoutingRegistry(filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"))
+	if err != nil {
+		return "", err
+	}
+	for _, record := range registry.Records {
+		if record.ID == "route.feedback.history" {
+			ps := strings.TrimSpace(record.PrimarySource)
+			if ps == "" {
+				return "", fmt.Errorf("route.feedback.history has empty primary_source")
+			}
+			dir := filepath.ToSlash(filepath.Dir(ps))
+			if dir == "." || dir == "" {
+				return "", fmt.Errorf("route.feedback.history primary_source %q has no directory", ps)
+			}
+			return dir + "/", nil
+		}
+	}
+	return "", fmt.Errorf("route.feedback.history not found in routing registry")
+}
+
+// nativeRuntimeIndexProvenanceCheck implements ADR-004 Migration Completion Plan
+// Phase 1 (P0-A): truthful observability of feedback-lesson discovery (Path 2).
+//
+// Unlike nativeRuntimeIndexFTSCheck (which token-matches "feedback" and is the
+// masking gate the frozen diagnosis named), this check asserts PROVENANCE: it
+// counts indexed lesson atoms (type "feedback-pattern") whose source_path sits
+// under the canonical sink, which is DERIVED from the routing registry, never
+// hardcoded. A route atom (type "route") that merely points at
+// feedback/history/README.md is excluded by the type filter, so route presence
+// can never be mistaken for lesson presence.
+//
+// Option A disposition (reported-red, NOT blocking): callers append this Check
+// to result.Checks for visibility but MUST NOT include it in the blocked
+// aggregation or change the refresh exit code. Gate Promotion Rule: it may be
+// promoted from reported-red to blocking-red ONLY after P0-B completes AND
+// authority_of_location is resolved (ADR-004 Completion Plan Phase 2 / B-1). It
+// must not be downgraded to a warning, must not swallow a failed status, and a
+// route atom carrying the "feedback" token must never satisfy it.
+func nativeRuntimeIndexProvenanceCheck(repo string, path string) Check {
+	name := "runtime_index_feedback_provenance"
+	sink, err := feedbackCanonicalSink(repo)
+	if err != nil {
+		return Check{Name: name, Status: "failed", Message: "cannot derive canonical feedback sink from registry: " + err.Error()}
+	}
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		return Check{Name: name, Status: "failed", Message: err.Error()}
+	}
+	defer db.Close()
+	var provenanceHits int
+	if err := db.QueryRow(
+		`SELECT COUNT(*) FROM atoms WHERE type = 'feedback-pattern' AND source_path LIKE ?`,
+		sink+"%",
+	).Scan(&provenanceHits); err != nil {
+		return Check{Name: name, Status: "failed", Message: err.Error()}
+	}
+	if provenanceHits == 0 {
+		return Check{Name: name, Status: "failed", Message: fmt.Sprintf("no feedback lesson atoms under canonical sink %q (Path 2 empty; expected until P0-B repoint)", sink)}
+	}
+	return Check{Name: name, Status: "ok", Message: fmt.Sprintf("feedback lesson provenance ok: %d atom(s) under %q", provenanceHits, sink)}
 }
 
 func nativeRuntimeIndexGitIgnoreCheck(repo string, path string, git string) Check {
