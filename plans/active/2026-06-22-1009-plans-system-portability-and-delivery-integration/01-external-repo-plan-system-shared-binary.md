@@ -217,8 +217,20 @@ type ValidationContext struct {
 
 ## Phase 3 — 外部 repo consumer 路徑（git hook shim / CI）
 
-### External Pressure Samples（壓力樣本，**非** acceptance samples）
-> Vidoe-Test 定位為 **pressure sample**（揭露邊界），不是 acceptance sample。本表記 **coverage**，**不寫 pass/fail**——這不是 correctness 問題。
+### External Evidence（3 個獨立 bucket，**不可互相污染**）
+> 證據分三桶，**各自獨立、不可推導彼此**（回應 review：避免「adoption-pass → adoption selected」偷跑）：
+>
+> | Bucket | Meaning | 來源 | 掛點 |
+> |---|---|---|---|
+> | **adoption-pass** | 外部採 canonical schema → engine 直接可用 | canonical external **plan tree**（findings=0） | **Phase 3 acceptance evidence anchor**（**非** Q8） |
+> | **dialect-pressure** | 非 canonical metadata → 觀察到 mismatch | Vidoe-Test flat plans（semantic mismatch：parent path vs id） | Q8 證據（揭露邊界，**不**決策） |
+> | **compatibility-policy** | adoption / normalization / explicit-unsupported 三選一 | — | **Q8 = deferred**（尚未決） |
+>
+> 三桶現況：adoption evidence = yes／dialect evidence = yes／**policy decision = no**。`adoption-pass` 只證明「一個 branch 可行」，**不等於**「該選 adoption」——policy 仍 deferred。
+>
+> **排除**：runtime-index refresh（commit `612909c`）屬 **environment maintenance**，**不計入** 01 externalization evidence（避免污染進度）。
+>
+> 下表為 dialect-pressure 桶的 coverage（記 coverage，不寫 pass/fail）：
 
 | Repo | Loader | Schema Match | Engine Coverage | Notes |
 |------|--------|-------------|-----------------|-------|
@@ -247,7 +259,9 @@ type ValidationContext struct {
 3. 仍是**單一 main plan**，未涵蓋 sub-plan tree 規則；完整外部 coverage 需一份外部 **plan tree（main+sub）** 以 canonical schema 撰寫。
 4. 仍 throwaway、非 shadow → 不動 `plan_profile` FROZEN、不提前決 Q8（此為 adoption-path 正向證據，非強制決策）。
 
-#### Canonical external **plan tree**（DECISIVE acceptance evidence，measured 2026-06-24）
+#### [bucket: adoption-pass] Canonical external **plan tree** — Phase 3 acceptance anchor（measured 2026-06-24）
+> **掛點 = Phase 3 acceptance evidence anchor，非 Q8**。意義限定為「canonical schema 這條 branch 可行（engine 直接乾淨驗過）」，**不**蘊含「該選 adoption」——compatibility-policy 仍 Q8-deferred。不因此重開 `plan_profile`、不提前決 a/b。
+
 外部團隊把 h5 plan **升級成 plan tree**：`_plan.md`（main, `parent: null`）+ 4 sub（`plan_kind: sub` / `parent`=main id / `required_for_completion: true` / `sub_plan_reason` / `schema_version "1"`）。補上先前缺的「外部 plan tree」coverage。
 
 - **修後重跑**：external tree `parsed=5 findings=0` → **CLEAN**。4 條規則全被真實外部 tree 觸發（4 sub frontmatter pass、4 parent→main id resolve、unique_id pass、archive_order inert）。這是目前最強的 **Phase 3 acceptance-style 證據**：真實外部 repo、canonical schema、完整 tree、engine 乾淨驗過。
