@@ -215,10 +215,17 @@ type ValidationContext struct {
 
 → **2.3b 收窗完成**，accounting path 已 exercised。**解除 2.4 gate**。
 
-### Phase 2.4 — CLI consumer
-> **Gate ✅ 已解除（2026-06-24）**：Phase 2.3b 收窗完成（`missing=0 ∧ extra=0`、transport/context/parity-on-violation path 已 exercised）。可開工。
-- [ ] CLI `plans validate --root <path> [--format text|json]` 作為薄 consumer（transport only）。
-- [ ] **若新增 `route.*` 或 runtime surface，補 Runtime Execution Path + Per-surface consumer 表**（否則明寫 engine/CLI-only，無新 route）。
+### Phase 2.4 — CLI consumer ✅（2026-06-24，scope A）
+> **Gate ✅ 已解除**：2.3b 收窗完成。**Scope A 鎖定**：CLI = transport surface，非 external interoperability。
+
+- [x] CLI `plans validate --root <path> [--format text|json]`（`plans.go runPlansValidate`）：薄 consumer，呼叫 engine entrypoint `planvalidate.Validate`，**零驗證邏輯**。
+- [x] **Discovery 固定 `<root>/plans/active|archived`**，reuse `scanAllPlanFrontmatter`（抽共用 `normalizedPlansFromRoot`，shadow + CLI 共用，**無新 traversal abstraction**）。
+- [x] **Explicit non-goals**（未做、明文排除）：custom plans dir / schema dialect / loader plugins / external path convention / filtering / policy → 屬 Q8 / Phase 3。
+- [x] Output `text | json`；blocking finding → exit 30（manual consumer transport），否則 0。
+- [x] **Acceptance（CLI 不碰 validator internals，只呼叫 engine entrypoint）**：`TestPlansValidateCLI_MatchesEngineEntrypoint`（CLI json findings == `planvalidate.Validate` projection）、`_ValidTreeExitZero`、`_ViolationThreeWayEquivalence`。
+- [x] **完整閉環達成（same repo / same tree / same findings）**：同一 canonical tree 上 **hook(legacy) ≡ engine(shadow) ≡ CLI(manual)** findings 等價——`ViolationThreeWayEquivalence` 驗 legacy validator 與 CLI 同 fire `parent_reference`；shadow 已驗 legacy≡engine。**hook / ci-able / manual 三 consumer → 同一 engine**。
+- [x] command-contract.md 同步（`plans tree` + `plans validate`）；無新 `route.*` / runtime surface（engine/CLI-only，免 Runtime Execution Path 表）。
+- smoke：`plans validate --root <Ai-skill>` → plans=30 findings=0。
 
 **Q-close 映射**：Q2 → Phase 2.2 後可 close；Q1 → Phase 3；Q3 → 跨版本 evidence。
 
