@@ -1,4 +1,4 @@
-version=repo-9acbe20
-source_commit=9acbe20
-built_at=2026-06-24T01:14:53Z
+version=repo-361d1fa
+source_commit=361d1fa
+built_at=2026-06-24T23:57:58Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
