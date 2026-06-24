@@ -175,7 +175,18 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
    先假設正交；只有當**兩元件都宣稱同一軸**才叫 overlap。再補 `path_group`（Path1 / Path2 / independent）。
    migration 欄位拆開且 **`replacement ≠ owner`**（replacement 是遷移方向，不是治理來源）：
    `authority_source`（registry / rule / contract / local）+ `replacement_target`（遷移去向）。
-3. **0B-3 Criticality Resolution** — 最後才下 real_consumer / load_bearing。因為 **load-bearing = impact × authority**，不是讀路徑就算。
+3. **0B-3 Criticality Resolution** — 最後才下 real_consumer / load_bearing。三因子：
+   **criticality = impact × authority × replaceability**（高 impact + 高 authority 但**可完全替代** → 未必 required）。
+   新增欄位 `replaceability`（none / planned / immediate）。criticality enum：
+   - `required` — 高 impact + authority + **不可替代**
+   - `transitional` — 現在承載，但已有接替方向（如未來 Contract→Registry 接手）
+   - `latent` — 能力存在但未承載
+   - `dead` — 已失效
+   - `out` — 非 consumer
+   **Phase 0 Closure Rule**：*Every required consumer must have a declared authority source and a
+   declared replacement path.*（required 卻無 replacement 很容易長成下一輪 drift。）
+   **P0 blocker 規則**：若某 consumer 同時 `required` 且 `authority_source = ambiguous`，列為 **P0 blocker**，
+   **不帶進實作**。
 
 #### 0B-1 Capability Resolution（2026-06-24；capability only）
 
@@ -231,6 +242,35 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
 > C-11 是唯一同時觸兩軸者——其 location 主張是 overlap 來源，permission 主張是它的正當核心。
 > **未蓋 criticality 章**（real_consumer / load_bearing 留 0B-3：load-bearing = impact × authority）。
 
+#### 0B-3 Criticality Resolution（2026-06-24；criticality = impact × authority × replaceability）
+
+| consumer_id | impact | authority | replaceability | **criticality** | real_consumer |
+| --- | --- | --- | --- | --- | --- |
+| C-09 | high（sink 消失→Path1 斷） | registry（location，**但與 C-11 overlap**） | none（reference-first 為憲法預設，registry 穩定 owner） | **required** ⚠ | Y |
+| C-10 | med-high（promotion route） | registry | none | required | Y |
+| C-11 | high（治理寫入位置/schema） | **permission: owns（正當）**；location: 過度主張 | permission=none；location=planned（改 derive） | **required**（permission）⚠ | Y |
+| C-01 | none（目前 globs 舊路徑） | registry（應 derive，現未） | planned（P0-B repoint） | **dead** | Y（待修） |
+| C-04 | none（index 空→回空集） | registry（間接） | planned（C-01 修好即恢復） | **latent**（effectively dead until C-01 repoint） | Y（starved） |
+| C-03 | none（不依賴 sink；只回報且說謊） | local（自證 token） | n/a | **out**（observability illusion；P0-A 改 provenance） | N |
+| C-16/19/20 | high if enforcement active | derived（from registry/contract） | planned（對齊 contract 後 re-seed） | **required if enforcement active** | Y |
+| C-18 | med（recovery nav 降級） | **ambiguous**（未驗證 recovery loader 是否 runtime-consume domain-policies.yaml） | planned | required（pending）⚠ | Y? |
+| C-06/07/08 / C-12/21 | — | — | — | **out** | N |
+
+**Phase 0 Closure — 觸發 2 個 blocker（不帶進實作）：**
+
+- **B-1（P0 blocker · gates Phase 2 / P0-B）**：`authority_of_location` 目前**雙重擁有**（C-09 registry +
+  C-11 rule 各 hardcode 路徑）。C-09 與 C-11 皆 `required` 且其依賴的 location authority = **ambiguous**
+  → 命中 P0 blocker 規則。**若不先把 location authority 收斂成單一 owner（registry；rule 改 derive），
+  P0-B 把 indexer repoint 只會再複製一份路徑字串 = 下一輪 drift。** 故 **Phase 4 contract 的 location
+  收斂必須先於（或同步於）P0-B**，不可先 repoint。
+- **B-2（verify · minor）**：C-18 `authority_source` 未定——需先確認 `metadata/recovery/domain-policies.yaml`
+  是否真被 runtime recovery loader 消費，再決定 required/observer。未驗證前不蓋 required 章。
+
+**Closure Rule 檢查**：required 集合 {C-09, C-10, C-11, C-16/19/20} 中，C-09/C-11 的 authority 因 B-1 尚未
+single-owned → **Phase 0 inventory 標記為「enumerable 完成、closure 受 B-1 阻擋」**：consumer 已全部列舉與
+resolve，但 required-without-clean-authority 必須先由 B-1 收斂才算正式關閉。B-1 是 Phase 0 交給 implementation
+的第一個 gate，而非 Phase 2 的內部細節。
+
 ### Step 0C — Classification（最後，長在證據上）
 
 等 0A census 穩、0B resolve 完才定 Class A/B/C/D；分類是**結論不是前提**。
@@ -264,6 +304,10 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
 ## Phase 2 — Runtime Repair (P0-B)
 
 > **原則：Registry-derived indexing only.**
+>
+> **Entry gate（B-1，來自 Phase 0 0B-3）**：進入 P0-B 前，`authority_of_location` 必須已收斂成單一 owner
+> （registry；C-11 rule 改 derive）。**否則 repoint indexer 只是再複製一份路徑 = 下一輪 drift。**
+> 即 Phase 4 contract 的 location 收斂必須先於（或同步於）本 phase。
 
 **交付**：
 - [ ] index repoint：`skills/*/feedback_history` → canonical sink（路徑由 registry 提供）
