@@ -149,6 +149,13 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
 > 影響答出來，分類通常自己掉出來。
 > （Discovery / Enforcement / Observability / Shadow 的型別定義目前是**假說、不落文件**；本文件只落
 > 判準矩陣、0B-1/2/3 staging 與 capability 結果。）
+>
+> **0B Invariant（由 C-06 升級）：Path access alone does not establish consumer status.**
+> 讀了 canonical path ≠ 是 consumer（C-06 讀 `feedback/` 但 impact=0）。此 invariant 預期可擋掉一整類誤報。
+>
+> **0B 工作假設（升級自 0B-1）：目前真正 load-bearing 的不是 discovery abstraction，而是
+> registry-backed direct read（Path 1）。** 故問題不是「Path 2 壞→修 Path 2→恢復系統」，而是
+> 「Path 1 活、Path 2 死→修 Path 2→恢復一致性」——不同問題。
 
 **Capability 判準矩陣（0B-1 instrument）：**
 
@@ -162,7 +169,12 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
 
 **Resolution staging（不可跳序）：**
 1. **0B-1 Capability Resolution** — 只填 dependency / observer / discovery / enforcement / observability。**不填** real_consumer / load_bearing。
-2. **0B-2 Authority Resolution** — 補 authority_source（constitution / contract / registry / local）、path_group（Path1 / Path2 / independent）、replacement。
+2. **0B-2 Authority Resolution** — **目標是 resolve authority dimensions，不是 pick one owner**。authority 拆**兩軸**：
+   - `authority_of_location`（誰決定東西**應放哪**？where）
+   - `authority_of_permission`（誰決定東西**允不允許存在**？whether／schema／promotion）
+   先假設正交；只有當**兩元件都宣稱同一軸**才叫 overlap。再補 `path_group`（Path1 / Path2 / independent）。
+   migration 欄位拆開且 **`replacement ≠ owner`**（replacement 是遷移方向，不是治理來源）：
+   `authority_source`（registry / rule / contract / local）+ `replacement_target`（遷移去向）。
 3. **0B-3 Criticality Resolution** — 最後才下 real_consumer / load_bearing。因為 **load-bearing = impact × authority**，不是讀路徑就算。
 
 #### 0B-1 Capability Resolution（2026-06-24；capability only）
@@ -189,6 +201,35 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
 > **未決（留 0B-2/0B-3）**：authority_source / path_group / replacement 尚未填；real_consumer /
 > load_bearing 尚未蓋章。C-11/C-16/19/20 的 enforcement 是「治理寫入/驗證」而非「消費 lesson 內容」，
 > 其 authority 歸屬待 0B-2 對照 Contract Ownership 鏈再定。
+
+#### 0B-2 Authority Resolution（2026-06-24；兩軸，未蓋 criticality 章）
+
+**C-09 vs C-11 正交假說檢驗結果**（讀 `metadata/rules/feedback-lessons.yaml` + `routing-registry.yaml:1951`）：
+
+| 軸 | 主張者 | 判定 |
+| --- | --- | --- |
+| authority_of_permission（檔名/模板/schema/promotion/品質） | **C-11 rule 獨有** | ✅ 正交 |
+| authority_of_location（lessons 放哪） | **C-09 registry + C-11 rule 都 textually hardcode `feedback/history/<domain>/`** | ❌ **真 overlap** |
+
+> 結構訊號：`route.feedback.history.required_dependencies` 已指向 `enforcement/feedback-lessons.md`（registry→rule
+> 有向引用），但兩者仍**各自 hardcode 路徑字串**——這就是 diagnosis「Source of Truth 未機械化」的具體形態。
+> **收斂方向（Phase 4 contract）**：registry 為唯一 `authority_of_location`；rule 改為 **derive 路徑**、只留
+> `authority_of_permission`。符合 Contract Ownership 鏈「path 唯一 owner = registry」。
+
+| consumer_id | authority_of_location | authority_of_permission | path_group | authority_source | replacement_target |
+| --- | --- | --- | --- | --- | --- |
+| C-09 | **claims（canonical）** | — | Path1 | registry | —（已是 location owner / 遷移去向本身） |
+| C-10 | claims（canonical） | — | Path1 | registry | — |
+| C-11 | claims（**應撤**，改 derive） | **owns** | independent | rule（permission）/ registry（location） | location 主張 → derive from `contract.feedback.location`（待 Phase 4 命名） |
+| C-01 | consumes（須由 registry 取得） | — | Path2 | registry | `route.feedback.history.primary_source` 提供的 sink glob |
+| C-04 | consumes（透過 index） | — | Path2 | registry（間接） | 同 C-01（index 修好即恢復） |
+| C-03 | — | — | independent | local（自證 token） | n/a（observability；P0-A 改 provenance 檢查） |
+| C-16/19/20 | asserts（驗證期望） | — | independent（validation） | derived（from registry/contract） | 對齊 contract location 後重新 seed |
+| C-18 | consumes（recovery nav） | — | Path1-adjacent | registry/local（待查 recovery loader） | sink README via registry |
+
+> `replacement ≠ owner` 已遵守：`authority_source` 記治理來源，`replacement_target` 記遷移去向，兩欄不混。
+> C-11 是唯一同時觸兩軸者——其 location 主張是 overlap 來源，permission 主張是它的正當核心。
+> **未蓋 criticality 章**（real_consumer / load_bearing 留 0B-3：load-bearing = impact × authority）。
 
 ### Step 0C — Classification（最後，長在證據上）
 
