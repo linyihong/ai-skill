@@ -144,13 +144,51 @@ seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolv
 
 ### Step 0B — Consumer Resolution（消除假 consumer）
 
-| field | 說明 |
+> **0B 鐵則：先定義失效影響，再定義 consumer 類型。** 否則「誰讀」與「誰受 drift 影響」會混淆
+> （本次 drift 同型陷阱）。對每個候選先問：**「若 `feedback/history` 消失，它會讓誰做不成事？」**
+> 影響答出來，分類通常自己掉出來。
+> （Discovery / Enforcement / Observability / Shadow 的型別定義目前是**假說、不落文件**；本文件只落
+> 判準矩陣、0B-1/2/3 staging 與 capability 結果。）
+
+**Capability 判準矩陣（0B-1 instrument）：**
+
+| 問題 | Yes 代表 |
 | --- | --- |
-| real_consumer | Y/N（如 C-03 health-check ≠ consumer，是 validator） |
-| load_bearing | required / latent / dead |
-| authority_source | constitution / contract / registry / local |
-| path_group | Path1 / Path2 / independent |
-| replacement | canonical target |
+| 若 sink 消失，功能失效？ | dependency |
+| 若資料缺失，只降低品質？ | observer |
+| 是否產生使用者可見發現結果？ | discovery |
+| 是否阻止錯誤進入系統？ | enforcement |
+| 是否只描述/回報現況？ | observability |
+
+**Resolution staging（不可跳序）：**
+1. **0B-1 Capability Resolution** — 只填 dependency / observer / discovery / enforcement / observability。**不填** real_consumer / load_bearing。
+2. **0B-2 Authority Resolution** — 補 authority_source（constitution / contract / registry / local）、path_group（Path1 / Path2 / independent）、replacement。
+3. **0B-3 Criticality Resolution** — 最後才下 real_consumer / load_bearing。因為 **load-bearing = impact × authority**，不是讀路徑就算。
+
+#### 0B-1 Capability Resolution（2026-06-24；capability only）
+
+| consumer_id | 「sink 消失→誰做不成事」 | capability |
+| --- | --- | --- |
+| C-06 | 無人——`closeLoopGroupForPath` 只把 staged path top-dir 歸 commit owner-group；`feedback/` 是 ~13 prefix 之一，sink 消失即 no-op | **resolved OUT**（非 sink consumer，generic path classifier） |
+| C-01 | （repoint 後）indexer 索引空 → 餵不到 Path 2 | dependency-provider（latent/目前 dead，globs 舊路徑） |
+| C-04 | `runtime query` 對 lesson 回空 → 使用者可見 retrieval 能力下降 | discovery |
+| C-03 | 不會失效——`MATCH 'feedback'` 仍命中 route/report/loop token；只回報現況且**目前說謊** | observability |
+| C-09 | agent 經 `route.feedback.history` 直接讀的 primary_source 失效 → **Path 1 discovery 斷** | discovery（Path 1，目前真正 load-bearing） |
+| C-10 | `route.feedback.promotion-pipeline` primary_source 失效 | discovery（Path 1） |
+| C-11 | feedback-lessons 規則指向的寫入位置失效 → 規則 stale | enforcement（治理寫入位置） |
+| C-16/19/20 | scenario 期望路由/寫入 sink → 行為錯會 fail | enforcement（validation guard） |
+| C-18 | recovery navigation source（README）缺失 → recovery 流程降級 | dependency（recovery nav） |
+| C-12/21 | 僅描述/單筆舉例，sink 消失不阻擋任何人 | observability / describe（候選 out） |
+| C-07/C-08 | 與 sink 無關（token 同形、語意獨立） | OUT（name collision，非 consumer） |
+
+> **0B-1 關鍵發現（capability 級，非 criticality 蓋章）**：impact lens 翻轉了 diagnosis 的重心——
+> 真正「sink 消失會斷」的 discovery 是 **C-09 Path 1（registry direct-read）**；C-01→C-04（Path 2）
+> 目前 dead。故 P0-B 修復的 consistency 目標是「讓已 dead 的 Path 2 重新與 load-bearing 的 Path 1 對齊」，
+> 不是反向。C-06 / C-07 / C-08 三者由 impact lens 乾淨判出局，inventory 噪音下降。
+>
+> **未決（留 0B-2/0B-3）**：authority_source / path_group / replacement 尚未填；real_consumer /
+> load_bearing 尚未蓋章。C-11/C-16/19/20 的 enforcement 是「治理寫入/驗證」而非「消費 lesson 內容」，
+> 其 authority 歸屬待 0B-2 對照 Contract Ownership 鏈再定。
 
 ### Step 0C — Classification（最後，長在證據上）
 
