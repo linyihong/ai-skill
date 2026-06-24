@@ -154,6 +154,35 @@ Constitution
 
 ---
 
+## Deferred Design Notes（記錄，禁止現在實作）
+
+> 這些是本計畫討論中露出、但**刻意不現在做**的抽象。固定觸發條件，避免 (a) 在單一案例上過早抽象，
+> (b) 兩天後忘記為何當初不做。每條都附「何時值得重啟」的 falsifiable 條件。
+
+### N1 — Linkage 雙圖模型（已決定，僅記錄）
+- `tree parent` = ownership / decomposition（execution graph）；`baseline_ref` = authority /
+  derivation（reference graph）。兩者語義不同，**不可**收斂成單一 `parent`。
+- 現況：`baseline_ref` 表達 *implementation derives from diagnosis*，非 *belongs to*。
+
+### N2 — `relations:` 多型連結抽象（DEFER）
+- 形狀（未來可能，**非現在**）：
+  ```
+  relations:
+    - type: derives_from
+      target: <id>
+    - type: decomposes
+      target: <id>
+  ```
+- **不現在做的理由**：目前只有一個 evidence→implementation 案例，不值得 enum surface。
+- **重啟觸發（任一反覆出現 ≥2 次）**：`ADR → completion`、`spike → adoption`、
+  `incident → remediation`、`RFC → rollout`。出現重複才升級成 typed relations。
+
+### N3 — `baseline_ref` 完整性弱規則（DEFER）
+- 規則（未來 completion validator，**非現在**）：
+  `baseline_ref exists → referenced document status ∈ {frozen, accepted}`。
+- 目的：防止 reference graph 退化成另一種 drift——completion 不得 reference 一份 mutable draft。
+- 現況已部分人工滿足：本計畫的 baseline `status: frozen`。
+
 ## Document TODO
 
 | 項目 | 狀態 |
