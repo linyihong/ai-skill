@@ -96,6 +96,52 @@ baseline_ref: 2026-06-23-1500-adr-004-migration-drift-diagnosis
 > **NAME COLLISION 提醒**：token `feedback` 橫跨 lesson / Learning-Report obligation / Discovery loop
 > 三 domain（C-07/C-08）→ 直接解釋 C-03 為何在任何 `feedback` 出現時都綠。
 
+### Step 0A-completeness — Intent Reduction（機械收斂，非全文人工閱讀）
+
+> **目標**：eliminate hidden executable references。**非目標**：classify consumers。
+> 對 census 候選先機械補三欄，再依 Exit Rule 收斂：
+
+| field | 說明 |
+| --- | --- |
+| evidence_kind | read / validate / route / seed / describe / mention |
+| authority_claim | canonical / derived / descriptive / none |
+| executable | Y / N |
+
+**0A Exit Rule（停止條件）**：
+> **If a reference cannot execute and cannot assert authority, it does not block inventory closure.**
+> 即 0A 關閉條件**不是**「所有 feedback 字串都被看過」，而是「沒有剩餘
+> *executable + authority-claim* 的未分類引用」。允許 `describe` / `mention` / historical note 留在 census 外，
+> 否則 inventory 永遠關不掉。
+
+**Reduction funnel（2026-06-24 sweep）**：148 files（308 occ）→ 135 `.md`（describe/mention，
+非 executable，依 Exit Rule 出局）+ 13 `.yaml` + code。executable+authority-claim 收斂後，
+seed 外新發現的 **hidden executable refs**（僅 enumerate，**不** resolve）：
+
+| consumer_id | file:location | reference | access_mode | evidence_kind | authority_claim | executable | world |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| C-18 | `metadata/recovery/domain-policies.yaml:36` | `source: feedback/history/apk-analysis/README.md` | direct read | route/read | derived | Y | new |
+| C-19 | `validation/scenarios/failure-derived/runtime-recovery-navigation-mismatch.yaml:58` | `feedback/history/apk-analysis/README.md` | fixture/scenario | validate | derived | Y | new |
+| C-20 | `validation/scenarios/failure-derived/skill-local-feedback-bypass-v1.yaml` | `feedback/history/<domain>/` 寫入期望 | fixture/scenario | validate | derived | Y | new |
+| C-21 | `validation/scenarios/software-delivery/slice-load-scenario-d-placement-negative.yaml:23` | `feedback/history/manual-observation-...md` | fixture/scenario | describe | none | Y(scenario) | new |
+| (note) | `hooks.go:1990,1993` `isAllowedFeedbackValue("feedback-history"…)` | Learning-Report **Target enum** | n/a | validate | independent | Y | NAME COLLISION (≠ sink) |
+| (note) | `detector.go:73` `"feedback":"advisory"` | route_type weight | n/a | route | independent | Y | NAME COLLISION (≠ sink) |
+
+> C-21 是 `describe` + authority `none` → 依 Exit Rule **不阻擋** 0A 關閉（仍登錄以利追蹤）。
+> code 已全掃，無其餘 executable sink-path 引用；135 `.md` 為 doc 描述，出局。
+> **0A 可關閉條件已達**：無剩餘 *executable + authority-claim* 未登錄引用。
+
+### Step 0B 預備觀察（記錄，禁止現在 resolve）
+
+0A census 已自然露出**三種不同的東西**，但 0A 不判讀，留給 0B：
+
+| 暫稱 | 例 | 0B 待答 |
+| --- | --- | --- |
+| real consumer | `runtimeIndexFeedbackRecords`(C-01)、`runtime query`(C-04) | 真的依賴 lesson？ |
+| shadow consumer | `close_loop` path prefix(C-06) | **保留問號**：讀新路徑 ≠ 一定是 discovery consumer；discovery-consumer 與 enforcement-consumer 不一定同一件事 |
+| authority illusion | health-check(C-03)、docs、validator、name-collision enum | 看似相關，實則不依賴/不主張 sink authority |
+
+> C-06 刻意維持問號，不在 0A 叫它 consumer。real / shadow / illusion 的切分是 0B 的工作。
+
 ### Step 0B — Consumer Resolution（消除假 consumer）
 
 | field | 說明 |
