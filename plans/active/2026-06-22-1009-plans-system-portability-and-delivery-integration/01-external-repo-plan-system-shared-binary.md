@@ -231,6 +231,22 @@ type ValidationContext struct {
 - 對 Q8——上輪「只有 absence、無 semantic mismatch，證據不足以支撐 normalize」的前提**已被此證據更新**；mapping 不再因「缺證據」被排除，但 **a/b/explicit-unsupported 決定仍 deferred-to-phase-3**，本輪不決、不做 mapping。
 - 此為 **external throwaway 量測**，**非 shadow** → **不觸發 `plan_profile` reopen**（reopen 只認 shadow missing/extra 或 Phase 3 blocked）。`plan_profile` 維持 FROZEN，純當 Q8 observation。
 
+#### Canonical-authored external sample（acceptance-leaning，measured 2026-06-24）
+外部團隊改用**我們 schema 結構**新寫 `Vidoe-Test/docs/plans/2026-06-22-1600-h5-redis-read-cache.md`（採 `schema_version: "1"`、`status: draft`、完整必填 sections：Decision Rationale 全子節 / Open Questions / Phase 0.0 公版 / Stakeholder / 完成条件 / Runtime Execution Path）。
+
+| 性質 | 實測 |
+|---|---|
+| 解析 | 成功（dir 15 files → 14 parsed，README 跳過），normalizeErr=0 |
+| 此 plan 的 findings | **0（乾淨、無 false-positive）**——無 top-level `parent:`（用 nested `upstream` id+path），故不像 2 個舊 path-parent plan 觸發假陽性 |
+| 規則覆蓋 | 單一 main plan → frontmatter/parent/archive **正確 inert**（applicability，非 mismatch）；unique_id pass |
+| 定位 | **acceptance-leaning**（不再只是 pressure sample）：首個外部 repo 以 canonical 結構撰寫、engine 乾淨驗過 → 支撐 Q8 的 **adoption** path 可行 |
+
+**誠實 caveat（不可誇大）**：
+1. 本次 throwaway **未把 `schema_version` 接進 `Normalize` 的 version 路徑**（只當 absent→baseline 正規化）→「compat layer 接受顯式 `schema_version: "1"`」**尚未機械證明**，留待真實 loader（2.4 / Phase 3）。
+2. 觀測到 raw 值為 `"1"`（**含 YAML 引號**）。真實 loader 必須 strip quote（`"1"` ↔ `1`），否則對 `currentSchemaVersion` 比對會誤拒——**記為 Q3 / loader 需求**。
+3. 仍是**單一 main plan**，未涵蓋 sub-plan tree 規則；完整外部 coverage 需一份外部 **plan tree（main+sub）** 以 canonical schema 撰寫。
+4. 仍 throwaway、非 shadow → 不動 `plan_profile` FROZEN、不提前決 Q8（此為 adoption-path 正向證據，非強制決策）。
+
 - [ ] `ai-tools/` 或 `scripts/ai-skill-cli/docs/` 寫外部 repo 使用說明（共用 binary 路徑、engine 接 CI / git hook）。
 - [ ] 提供薄 `commit-msg` shim 範例（呼叫共用 binary，tool-neutral）。
 - [ ] **Acceptance evidence（回應 review #6，收緊）**：
