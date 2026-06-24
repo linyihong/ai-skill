@@ -247,6 +247,15 @@ type ValidationContext struct {
 3. 仍是**單一 main plan**，未涵蓋 sub-plan tree 規則；完整外部 coverage 需一份外部 **plan tree（main+sub）** 以 canonical schema 撰寫。
 4. 仍 throwaway、非 shadow → 不動 `plan_profile` FROZEN、不提前決 Q8（此為 adoption-path 正向證據，非強制決策）。
 
+#### Canonical external **plan tree** + caught fidelity bug（DECISIVE，measured 2026-06-24）
+外部團隊把 h5 plan **升級成 plan tree**：`_plan.md`（main, `parent: null`）+ 4 sub（`plan_kind: sub` / `parent`=main id / `required_for_completion: true` / `sub_plan_reason` / `schema_version "1"`）。補上先前缺的「外部 plan tree」coverage。
+
+- **首跑抓到 1 個 false-positive**：main 的 `parent: null` 被當字串 "null" → `parent_reference` 判不 resolve。**真 engine fidelity bug**（legacy 用 `HasParentField`/null 處理，engine port 漏了）。
+- **依 Gate B 修在 compat layer**：`Normalize` 加 `normalizeNullScalar`（null/~/Null/NULL → 空），engine 維持不看 YAML idiom；加測試 `TestNormalize_ParentNullIsEmpty`（含 tree-level Validate）。
+- **修後重跑**：external tree `parsed=5 findings=0` → **CLEAN**。4 條規則全被真實外部 tree 觸發（4 sub frontmatter pass、4 parent→main id resolve、unique_id pass、archive_order inert）。
+- **意義**：目前最強的 **Phase 3 acceptance-style 證據**——真實外部 repo、canonical schema、完整 tree、engine 乾淨驗過；且外部真實資料**當場抓到 replacement fidelity bug**（正是用外部素材的價值）。bug 屬 compat-layer normalization 家族（與 `"1"` 引號同類）。
+- **護欄**：此為 compat-layer **correctness fix**，非 `plan_profile` membership 變更 → FROZEN 不受影響；Q8 仍 deferred。
+
 - [ ] `ai-tools/` 或 `scripts/ai-skill-cli/docs/` 寫外部 repo 使用說明（共用 binary 路徑、engine 接 CI / git hook）。
 - [ ] 提供薄 `commit-msg` shim 範例（呼叫共用 binary，tool-neutral）。
 - [ ] **Acceptance evidence（回應 review #6，收緊）**：
