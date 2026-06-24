@@ -230,12 +230,15 @@ type ValidationContext struct {
 >
 > **排除**：runtime-index refresh（commit `612909c`）屬 **environment maintenance**，**不計入** 01 externalization evidence（避免污染進度）。
 >
-> 下表為 dialect-pressure 桶的 coverage（記 coverage，不寫 pass/fail）：
+> **全 corpus 評斷（遞迴整個 `docs/plans`，measured 2026-06-24，throwaway 未 commit）**：files=20 → parsed=19（README 跳過）、normalizeErr=0。**canonical=6**（h5 tree：1 main + 5 sub）／**dialect=13**（flat plans）。全 corpus **findings=2，全部來自 dialect 的 path-parent**；canonical 6 個全 clean。
+>
+> 下表 coverage（記 coverage，不寫 pass/fail）：
 
-| Repo | Loader | Schema Match | Engine Coverage | Notes |
-|------|--------|-------------|-----------------|-------|
-| Ai-skill | native | full | 4/4 | baseline |
-| Vidoe-Test | read-only throwaway harness（**measured 2026-06-24**，未 commit） | partial | 13/14 parsed（README 跳過），normalizeErr=0；**2/4 rules exercised** | **實測修正先前「1/4」預測**。`unique_id` 跑（0 findings）；`parent_reference` 跑出 **2 findings**。schema 欄位實測：plan_kind=0 / parent=**2** / required_for_completion=0 / sub_plan_reason=0 → frontmatter & archive_order inert（欄位缺）。**inert 來源已歸因 = schema/semantics，非 loader**（loader 0 error 解析 13 個）。 |
+| Bucket | Plans | Loader | Engine 結果 |
+|--------|-------|--------|------------|
+| baseline | Ai-skill native | native | 4/4 rules |
+| **adoption-pass**（canonical） | Vidoe-Test h5 tree：6（1 main+5 sub） | read-only harness | **findings=0**；4 rules exercised（sub frontmatter pass、parent→main id resolve、unique_id、archive_order inert） |
+| **dialect-pressure** | Vidoe-Test flat：13 | read-only harness | **findings=2**（2 plan 的 `parent` 持 path → semantic mismatch false-positive）；其餘 inert（plan_kind/required/sub_reason 欄缺）。inert 來源 = schema/semantics，非 loader |
 
 **Boundary finding**：**portable ≠ schema-agnostic**。01 目前完成的是 `shared engine + portable profile + same plan contract`，**不是** universal plan language / interoperability framework。
 
@@ -262,9 +265,9 @@ type ValidationContext struct {
 #### [bucket: adoption-pass] Canonical external **plan tree** — Phase 3 acceptance anchor（measured 2026-06-24）
 > **掛點 = Phase 3 acceptance evidence anchor，非 Q8**。意義限定為「canonical schema 這條 branch 可行（engine 直接乾淨驗過）」，**不**蘊含「該選 adoption」——compatibility-policy 仍 Q8-deferred。不因此重開 `plan_profile`、不提前決 a/b。
 
-外部團隊把 h5 plan **升級成 plan tree**：`_plan.md`（main, `parent: null`）+ 4 sub（`plan_kind: sub` / `parent`=main id / `required_for_completion: true` / `sub_plan_reason` / `schema_version "1"`）。補上先前缺的「外部 plan tree」coverage。
+外部團隊把 h5 plan **升級成 plan tree**：`_plan.md`（main, `parent: null`）+ **5 sub**（`plan_kind: sub` / `parent`=main id / `required_for_completion: true` / `sub_plan_reason` / `schema_version "1"`；含後加的 `05-load-stress-redis-cache`）。補上先前缺的「外部 plan tree」coverage。
 
-- **修後重跑**：external tree `parsed=5 findings=0` → **CLEAN**。4 條規則全被真實外部 tree 觸發（4 sub frontmatter pass、4 parent→main id resolve、unique_id pass、archive_order inert）。這是目前最強的 **Phase 3 acceptance-style 證據**：真實外部 repo、canonical schema、完整 tree、engine 乾淨驗過。
+- **全 corpus 重跑（遞迴）**：6-node tree `findings=0` → **CLEAN**（5 sub frontmatter pass、5 parent→main id resolve、unique_id pass、archive_order inert）。全 `docs/plans` 19 parsed 中，**唯二 findings 來自 dialect path-parent，canonical 6 個全綠**。這是目前最強的 **Phase 3 acceptance-style 證據**：真實外部 repo、canonical schema、完整 tree、engine 乾淨驗過。
 - **throwaway 量測的 false-positive（歸因更正，不可誇大）**：首跑時 main 的 `parent: null` 被判不 resolve——但這是**我 throwaway naive parser 的產物，非真 pipeline bug**。app 的真實 parser（`plan_tree.go:147`）**已**把 `parent: null/~/""`→`Parent=""`，所以 **shadow pipeline 從不受影響**。（草稿一度誤寫成「engine 漏了 legacy 有的東西」，已更正。）
 - **fix 保留為 defense-in-depth（非 bug 修補）**：`Normalize` 加 `normalizeNullScalar`，讓 engine **不依賴任一 loader 的 null-awareness**（未來真實外部 loader 若 naive 也安全），與 app 一致、Gate B 不讓 engine 看 YAML idiom；測試 `TestNormalize_ParentNullIsEmpty`。屬 compat-layer normalization 家族（與 `"1"` 引號同類）。
 - **護欄**：compat-layer 變更，非 `plan_profile` membership 變更 → FROZEN 不受影響；Q8 仍 deferred。
