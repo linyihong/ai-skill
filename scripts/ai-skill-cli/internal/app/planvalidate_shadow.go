@@ -39,6 +39,51 @@ var planTreeLegacyMirror = []struct {
 	{"plan_tree.archive_order", "[skip-plan-tree-archive-order]", validatePlanTreeArchiveOrder},
 }
 
+// normalizedPlansFromRoot is the shared loader: it scans <root>/plans/active and
+// <root>/plans/archived via the existing scanAllPlanFrontmatter (no new traversal
+// abstraction — Phase 2.4 scope (A)), maps each plan to the planvalidate compat
+// input, and normalizes it. Both the commit-msg shadow and the `plans validate`
+// CLI consumer use this so they feed the engine identical models.
+//
+// Scope note (2.4 / Q8 boundary): discovery is fixed to plans/active|archived.
+// Custom plans dirs, external path conventions, and schema dialects are explicit
+// non-goals here; they belong to Q8 / Phase 3, not the CLI transport surface.
+func normalizedPlansFromRoot(root string) []planvalidate.NormalizedPlanModel {
+	var models []planvalidate.NormalizedPlanModel
+	for _, fm := range scanAllPlanFrontmatter(root) {
+		if !fm.HasFrontmatter {
+			continue
+		}
+		raw := planvalidate.RawPlan{
+			Path:     fm.Path,
+			Location: planLocation(fm.Path),
+			Fields: map[string]string{
+				"id":              fm.ID,
+				"plan_kind":       fm.PlanKind,
+				"status":          fm.Status,
+				"parent":          fm.Parent,
+				"sub_plan_reason": fm.SubPlanReason,
+			},
+		}
+		if fm.RequiredForCompletion != nil {
+			if *fm.RequiredForCompletion {
+				raw.Fields["required_for_completion"] = "true"
+			} else {
+				raw.Fields["required_for_completion"] = "false"
+			}
+		}
+		model, err := planvalidate.Normalize(raw)
+		if err != nil {
+			// A normalize error is itself a divergence signal; surface a minimal
+			// model so it is not silently dropped.
+			models = append(models, planvalidate.NormalizedPlanModel{Path: fm.Path})
+			continue
+		}
+		models = append(models, model)
+	}
+	return models
+}
+
 func stagedTouchesPlans(staged []string) bool {
 	for _, s := range staged {
 		if (strings.HasPrefix(s, "plans/active/") || strings.HasPrefix(s, "plans/archived/")) && strings.HasSuffix(s, ".md") {
@@ -66,42 +111,10 @@ func planValidateShadowCheck(ctx commitMsgCtx) Check {
 	}
 
 	// Engine findings: normalize the working-tree plan set and run the engine.
-	var models []planvalidate.NormalizedPlanModel
-	for _, fm := range scanAllPlanFrontmatter(ctx.root) {
-		if !fm.HasFrontmatter {
-			continue
-		}
-		raw := planvalidate.RawPlan{
-			Path:     fm.Path,
-			Location: planLocation(fm.Path),
-			Fields: map[string]string{
-				"id":              fm.ID,
-				"plan_kind":       fm.PlanKind,
-				"status":          fm.Status,
-				"parent":          fm.Parent,
-				"sub_plan_reason": fm.SubPlanReason,
-			},
-		}
-		if fm.RequiredForCompletion != nil {
-			if *fm.RequiredForCompletion {
-				raw.Fields["required_for_completion"] = "true"
-			} else {
-				raw.Fields["required_for_completion"] = "false"
-			}
-		}
-		model, err := planvalidate.Normalize(raw)
-		if err != nil {
-			// A normalize error is itself a genuine divergence signal; surface it
-			// as a synthetic finding so it is not silently dropped.
-			models = append(models, planvalidate.NormalizedPlanModel{Path: fm.Path})
-			continue
-		}
-		models = append(models, model)
-	}
 	engine := planvalidate.Validate(planvalidate.ValidationContext{
 		Root:          ctx.root,
 		ExecutionMode: planvalidate.ModeCommit,
-	}, models)
+	}, normalizedPlansFromRoot(ctx.root))
 
 	d := planvalidate.Compare(legacy, engine, hints)
 

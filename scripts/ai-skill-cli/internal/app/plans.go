@@ -20,21 +20,99 @@ import (
 	"io"
 	"sort"
 	"strings"
+
+	"github.com/linyihong/Ai-skill/scripts/ai-skill-cli/internal/planvalidate"
 )
+
+// runPlansValidate is Phase 2.4: a THIN CLI consumer of the planvalidate engine.
+//
+// It is transport only — it owns no validation logic. It loads the plan set via
+// the shared loader (normalizedPlansFromRoot, fixed to <root>/plans/active and
+// <root>/plans/archived — scope (A)), calls the engine entrypoint
+// planvalidate.Validate, and renders the findings as text or JSON. Exit code is
+// the manual consumer's transport mapping: non-zero iff a blocking finding exists.
+//
+// Explicit non-goals (do NOT add here): custom plans dir, schema dialect
+// handling, loader plugins, external path conventions, filtering/policy. Those
+// are Q8 / Phase 3, not the consumer surface.
+func runPlansValidate(args []string, stdout io.Writer, stderr io.Writer) int {
+	opts := struct{ root, format string }{}
+	fs := newFlagSet("plans validate", stderr)
+	fs.StringVar(&opts.root, "root", ".", "repository root (default: current directory)")
+	fs.StringVar(&opts.format, "format", "text", "render format: text | json")
+	if err := fs.Parse(args); err != nil {
+		return ExitInvalidUsage
+	}
+	switch opts.format {
+	case "text", "json":
+	default:
+		_, _ = fmt.Fprintf(stderr, "invalid --format %q (want: text | json)\n", opts.format)
+		return ExitInvalidUsage
+	}
+
+	models := normalizedPlansFromRoot(opts.root)
+	findings := planvalidate.Validate(planvalidate.ValidationContext{
+		Root:          opts.root,
+		ExecutionMode: planvalidate.ModeManual,
+	}, models)
+
+	blocking := 0
+	for _, f := range findings {
+		if f.Blocking {
+			blocking++
+		}
+	}
+
+	if opts.format == "json" {
+		type jsonFinding struct {
+			RuleID   string `json:"rule_id"`
+			Message  string `json:"message"`
+			Blocking bool   `json:"blocking"`
+		}
+		payload := struct {
+			Root     string        `json:"root"`
+			Plans    int           `json:"plans"`
+			Blocking int           `json:"blocking"`
+			Findings []jsonFinding `json:"findings"`
+		}{Root: opts.root, Plans: len(models), Blocking: blocking, Findings: []jsonFinding{}}
+		for _, f := range findings {
+			payload.Findings = append(payload.Findings, jsonFinding{f.RuleID, f.Message, f.Blocking})
+		}
+		b, _ := json.MarshalIndent(payload, "", "  ")
+		_, _ = fmt.Fprintln(stdout, string(b))
+	} else {
+		for _, f := range findings {
+			tag := "warn"
+			if f.Blocking {
+				tag = "BLOCK"
+			}
+			_, _ = fmt.Fprintf(stdout, "[%s] %s: %s\n", tag, f.RuleID, f.Message)
+		}
+		_, _ = fmt.Fprintf(stdout, "plans=%d findings=%d blocking=%d\n", len(models), len(findings), blocking)
+	}
+
+	if blocking > 0 {
+		return ExitValidationFailed
+	}
+	return ExitSuccess
+}
 
 func runPlans(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		_, _ = fmt.Fprintln(stderr, "usage: ai-skill plans <tree> [flags]")
+		_, _ = fmt.Fprintln(stderr, "usage: ai-skill plans <tree|validate> [flags]")
 		return ExitInvalidUsage
 	}
 	switch args[0] {
 	case "tree":
 		return runPlansTree(args[1:], stdout, stderr)
+	case "validate":
+		return runPlansValidate(args[1:], stdout, stderr)
 	case "help", "-h", "--help":
-		_, _ = fmt.Fprintln(stdout, "usage: ai-skill plans <tree> [flags]")
+		_, _ = fmt.Fprintln(stdout, "usage: ai-skill plans <tree|validate> [flags]")
 		_, _ = fmt.Fprintln(stdout, "")
 		_, _ = fmt.Fprintln(stdout, "subcommands:")
-		_, _ = fmt.Fprintln(stdout, "  tree    render plan tree built from frontmatter parent pointers")
+		_, _ = fmt.Fprintln(stdout, "  tree      render plan tree built from frontmatter parent pointers")
+		_, _ = fmt.Fprintln(stdout, "  validate  run the plan_profile.core engine over <root>/plans (thin consumer)")
 		return ExitSuccess
 	default:
 		_, _ = fmt.Fprintf(stderr, "unknown plans subcommand: %s\n", args[0])
