@@ -1,7 +1,8 @@
 ---
 id: 2026-06-23-1500-adr-004-migration-drift-diagnosis
 plan_kind: main
-status: draft
+status: frozen
+execution_status: deferred
 owner: linyihong
 created: 2026-06-23
 parent: null
@@ -108,9 +109,14 @@ Validator 並沒有驗證錯 implementation，而是驗證了**錯誤的 success
 `route.feedback.history`（route atom）與 `feedback/history/apk/lesson-001.md`（lesson）在語義上
 不是同種證據，但 `MATCH 'feedback'` 把兩者視為同一證據。
 
-### Knowledge Source Drift（上位模式）
-ADR / Runtime / Fixture / Health-Check 在不同地方共享同一個錯誤認知 → Source of Truth 沒有真正被
-機械化。三處 mental model 互證，使 ADR 的世界更新無法傳播到 runtime/validation。
+### Canonical Knowledge Propagation Failure（上位模式）
+> 命名修正：原為 *Knowledge Source Drift*，但 source 並沒有錯——`constitution/ADR-004` 與
+> `feedback/history/` 都正確。錯的是 **propagation**：正確的 source-of-truth 更新無法傳播到
+> runtime / fixture / validator。失效點是「傳播」，不是「來源」。
+
+ADR / Runtime / Fixture / Health-Check 在不同地方共享同一個**已退役**的認知 → Source of Truth 沒有真正被
+機械化、單向傳播。三處 mental model 互證，形成封閉 loop，使 ADR 的世界更新無法傳播到 runtime/validation。
+（本次 drift loop 本身就是 propagation 的失效證據——見上方 masking chain。）
 
 ### 可重用模式（未來一定會再出現）
 ```
@@ -119,6 +125,21 @@ Constitution Drift → Fixture Drift → Validation Drift → Green CI → Knowl
 本次實例是 `feedback_history`；下次可能是 promotion status enum / routing taxonomy /
 enforcement registry / runtime schema。
 
+### Invariant（可重用治理資產）
+
+把本次最關鍵的那句（「loop 內沒有任何節點查 Constitution」）從敘述升成 invariant，
+讓它不只服務 ADR-004，而能直接套用於上述任一未來實例：
+
+> **Canonical-Path Derivation Invariant**
+> No runtime / validator / fixture may derive canonical paths without passing
+> through the contract or the registry.
+> （任何 runtime / validator / fixture 都不得自行推導 canonical path；必須經由
+> contract 或 registry 取得。）
+
+這條 invariant 是上方 *Contract Ownership* 鏈的可驗證表述：違反它＝出現一個繞過 registry 的
+path 宣告＝drift loop 的入口。未來只要某層直接 hard-code 路徑（如本次 `skills/*/feedback_history`
+死 glob），即違反此 invariant，應在 review / 機械化檢查階段被攔截。
+
 ## P0 順序調整（observability before repair）
 
 | 新序 | 項目 | 理由 |
@@ -126,6 +147,11 @@ enforcement registry / runtime schema。
 | **P0-A** | Health-check tightening（`nativeRuntimeIndexFTSCheck`，`runtime.go:1879`）：由 `MATCH 'feedback' > 0` 改為「≥1 atom 且其 `source_path` 在 canonical lesson sink 之下」（provenance，非 token） | 目前最大風險不是「Path 2 壞」，而是「Path 2 壞但看起來正常」。沒有可靠量測，後續所有修復皆不可觀測。 |
 | **P0-B** | Runtime indexer repoint（`runtime.go:1213`）：`skills/*/feedback_history` → `feedback/history/<domain>/**`，路徑改由 registry 提供 | 修復 Path 2（次要低 token path）；恢復兩條 discovery path 的一致性。 |
 | **P0-C** | Test reality alignment（`runtime_test.go:244,625,640`）：seed `feedback/history/<domain>/`；新增 negative test 確保舊路徑**不**被索引 | 停止 fixture 對 deleted world 的教學；鎖門防回歸。 |
+
+> **P0-A 不保證 repair。** Success of P0-A only establishes truthful observability;
+> it does NOT imply feedback lessons are indexed. P0-A 修的是「量測正確性」
+> (measurement correctness)，不是「runtime 正確性」(runtime correctness)——health-check
+> 綠燈在 P0-B/C 落地前，只代表「我們現在能誠實看到 Path 2 仍是空的」，不代表 lesson 已可被 query。
 
 （原序為 runtime.go → test → health-check；調整理由＝Observability 先於 Repair。）
 
@@ -142,6 +168,28 @@ enforcement/ validator implementation        ← executable enforcement（執行
 
 Validator / runtime / docs / tests 一律讀 contract（與其指向的 canonical-path registry），
 不直接耦合 ADR；未來改 sink 只動一處。此 contract layer 補上 loop 缺的那條邊：`Constitution ⊨ Runtime`。
+
+### Contract Ownership（避免 contract 自己再 drift）
+
+四個 source（ADR / runtime contract / routing registry / validator yaml）若各自宣告 canonical path，
+contract layer 本身就會變成下一個 drift 點。因此 **ownership 必須寫死、單向 derive**——
+**Contract Owner = Runtime Registry**：
+
+```
+constitution/ADR-004              （human-readable 知識）
+        │ derives
+        ▼
+knowledge/runtime/contracts/<name>.yaml   （machine-readable contract）
+        │ materializes
+        ▼
+knowledge/runtime/routing-registry.yaml   （canonical-path registry · 唯一 path owner）
+        │ consumed by
+        ▼
+runtime / validator / tests       （只讀，不得自行宣告 path）
+```
+
+關鍵：path 的唯一擁有者是 registry，contract 只 materialize 不 fork；runtime/validator/tests 一律
+下游消費，禁止平行宣告。這把「四個 source 各自為政」收斂成一條單向 derive 鏈。
 
 ## 證據錨點（file:line）
 
