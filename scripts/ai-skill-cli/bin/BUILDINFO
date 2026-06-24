@@ -1,4 +1,4 @@
-version=repo-60dc554
-source_commit=60dc554
-built_at=2026-06-24T01:07:01Z
+version=repo-9acbe20
+source_commit=9acbe20
+built_at=2026-06-24T01:14:53Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
