@@ -59,6 +59,26 @@ func TestNormalize_UnsupportedVersionRejected(t *testing.T) {
 	}
 }
 
+// Gate B / fidelity: a main plan's `parent: null` must normalize to empty so the
+// engine does not emit a false-positive unresolved-parent finding. Surfaced by
+// the Vidoe-Test external plan tree (2026-06-24).
+func TestNormalize_ParentNullIsEmpty(t *testing.T) {
+	for _, nullish := range []string{"null", "Null", "NULL", "~"} {
+		m, _ := Normalize(RawPlan{Fields: map[string]string{"id": "main", "plan_kind": "main", "parent": nullish}})
+		if m.Parent != "" {
+			t.Fatalf("parent %q should normalize to empty, got %q", nullish, m.Parent)
+		}
+	}
+	// And the engine must produce no parent_reference finding for a null-parent main.
+	models := []NormalizedPlanModel{
+		{ID: "main", PlanKind: "main", Parent: normalizeNullScalar("null")},
+		{ID: "sub", PlanKind: "sub", Parent: "main", RequiredForCompletion: b(true), SubPlanReason: "r"},
+	}
+	if n := ruleIDs(Validate(ValidationContext{}, models))["plan_tree.parent_reference"]; n != 0 {
+		t.Fatalf("null-parent main must not trigger parent_reference, got %d", n)
+	}
+}
+
 // required_for_completion is three-state: absent (nil), true, false. Confirm the
 // compat layer preserves the distinction for the engine.
 func TestNormalize_RequiredForCompletionTriState(t *testing.T) {

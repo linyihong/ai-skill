@@ -63,6 +63,20 @@ type NormalizedPlanModel struct {
 // model (a CompatibilityResult{ Model, Warnings }) so each consumer (hook / CI /
 // CLI) decides what to do. Not built now — Normalize returns (model, error) and
 // the warning channel is reserved for when a second schema version lands.
+// normalizeNullScalar maps YAML null idioms to the empty string. A main plan
+// declares `parent: null`; without this the engine would treat the literal
+// string "null" as an unresolved parent id and emit a false positive. This is a
+// compat-layer concern (Gate B): the engine consumes a clean model and must
+// never see YAML idioms. Surfaced by the Vidoe-Test external plan tree
+// (2026-06-24); same family as the quoted-scalar requirement (Q3).
+func normalizeNullScalar(v string) string {
+	switch v {
+	case "null", "Null", "NULL", "~":
+		return ""
+	}
+	return v
+}
+
 func Normalize(raw RawPlan) (NormalizedPlanModel, error) {
 	version := raw.SchemaVersion
 	if version == "" {
@@ -79,7 +93,7 @@ func Normalize(raw RawPlan) (NormalizedPlanModel, error) {
 		ID:            raw.Fields["id"],
 		PlanKind:      raw.Fields["plan_kind"],
 		Status:        raw.Fields["status"],
-		Parent:        raw.Fields["parent"],
+		Parent:        normalizeNullScalar(raw.Fields["parent"]),
 		SubPlanReason: raw.Fields["sub_plan_reason"],
 	}
 	if rfc, ok := raw.Fields["required_for_completion"]; ok {
