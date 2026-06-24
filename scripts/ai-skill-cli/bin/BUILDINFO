@@ -1,4 +1,4 @@
-version=repo-df8c650
-source_commit=df8c650
-built_at=2026-06-23T06:56:48Z
+version=repo-03aae8b
+source_commit=03aae8b
+built_at=2026-06-24T00:28:09Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64
