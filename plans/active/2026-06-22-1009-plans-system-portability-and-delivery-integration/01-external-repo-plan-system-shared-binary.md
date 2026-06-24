@@ -227,29 +227,9 @@ type ValidationContext struct {
 - [x] command-contract.md 同步（`plans tree` + `plans validate`）；無新 `route.*` / runtime surface（engine/CLI-only，免 Runtime Execution Path 表）。
 - smoke：`plans validate --root <Ai-skill>` → plans=30 findings=0。
 
-### Phase 2.5 — Soak checkpoint（非 phase、不開 plan、不寫 shim）
-> Phase 2 已回答「能否抽出可重用 engine」。**Phase 3 是換問題**：「another repo can adopt this without importing governance」——非自然延伸。故先讓已完成的抽象**活幾天看有沒有反噬**，不缺證據，缺 soak。
-
-- **時間**：3–7 天 或 直到下一次真實使用需求（先到為準）。
-- **觀察**：
-  | Signal | 想看什麼 |
-  |---|---|
-  | CLI 使用 | `plans validate` 有沒有真的取代人工檢查 |
-  | Shadow | 還有沒有 unexpected transport/context（missing/extra 必須維持 0） |
-  | Engine API | 有沒有 consumer 想要求 engine 加 flag |
-- **退出條件（硬）**：soak 期間 **沒有新增 engine surface**。若出現「CLI 想加 policy」或「hook 想特判」→ **先修 consumer，不碰 engine**。
-- soak 平穩 → 才開 Phase 3（需先過 Phase 3.0 preflight，見下）。
-
-### Phase 3.0 — Preflight（Phase 3 開工前必過，先不要碰 shim）
-- [ ] **先定 consumer contract**（早於任何 shim）：engine input / engine output / opt-out transport / exit semantics / integration shape。
-- [ ] **允許的 integration 僅**：git hook shim、CI wrapper。
-- [ ] **禁止**：daemon / service / background sync。
-- [ ] **rollback proof 先行**：證明 `remove shim → repo returns clean`（no residue）**再**做 adoption。
-
 **Q-close 映射**：Q2 → Phase 2.2 後可 close；Q1 → Phase 3；Q3 → 跨版本 evidence。
 
 ## Phase 3 — 外部 repo consumer 路徑（git hook shim / CI）
-> **Gated**：須先 (1) Phase 2.5 soak 平穩（無新增 engine surface）+ (2) Phase 3.0 preflight 通過（consumer contract 定義、rollback proof 先行）才開工。Phase 3 換的是新問題「adopt without importing governance」，非 Phase 2 自然延伸。Q1（跨 repo 強制）/ Q3（跨版本）在此關；Q8（external schema policy）仍 deferred。
 
 ### External Evidence（3 個獨立 bucket，**不可互相污染**）
 > 證據分三桶，**各自獨立、不可推導彼此**（回應 review：避免「adoption-pass → adoption selected」偷跑）：
