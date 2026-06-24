@@ -223,9 +223,13 @@ type ValidationContext struct {
 | Repo | Loader | Schema Match | Engine Coverage | Notes |
 |------|--------|-------------|-----------------|-------|
 | Ai-skill | native | full | 4/4 | baseline |
-| Vidoe-Test | read-only（assessed 2026-06-23） | partial | 1/4 applicable | **current loader produced only 1 applicable rule**（`unique_id`）；其餘 3 條未觸發。inert 來源**尚未歸因**（schema / loader / normalization / applicability rules 皆可能）——證據不足，不提前歸因到 engine。 |
+| Vidoe-Test | read-only throwaway harness（**measured 2026-06-24**，未 commit） | partial | 13/14 parsed（README 跳過），normalizeErr=0；**2/4 rules exercised** | **實測修正先前「1/4」預測**。`unique_id` 跑（0 findings）；`parent_reference` 跑出 **2 findings**。schema 欄位實測：plan_kind=0 / parent=**2** / required_for_completion=0 / sub_plan_reason=0 → frontmatter & archive_order inert（欄位缺）。**inert 來源已歸因 = schema/semantics，非 loader**（loader 0 error 解析 13 個）。 |
 
-**Boundary finding**：**portable ≠ schema-agnostic**。01 目前完成的是 `shared engine + portable profile + same plan contract`，**不是** universal plan language / interoperability framework。Vidoe-Test（無 `plan_kind`/`parent`/`required_for_completion`，status 自由值，`upstream_plan` 取代 parent）是不同 dialect。是否支援由 **Q8（deferred-to-phase-3）** 三選一（adoption / normalization / explicit-unsupported）決定——**不在本 phase 決，也不現在做 mapping**（目前只有 `absence`，無 `semantic mismatch`，證據不足以支撐 normalize）。
+**Boundary finding**：**portable ≠ schema-agnostic**。01 目前完成的是 `shared engine + portable profile + same plan contract`，**不是** universal plan language / interoperability framework。
+
+**新證據（measured，回應「能否按我們流程跑」）**：Vidoe-Test 架構**機械上跑得動**（loader 解析 13/13、engine 執行），但輸出含 **2 個 false-positive**：其 `parent:` 欄持有 **path**（`docs/plans/xxx.md`），我們 engine 契約期待 **id** → 判不解析。這是 **semantic mismatch on a shared field name**（同名 `parent`、語意不同），**不再只是 absence**。意涵：
+- 對 Q8——上輪「只有 absence、無 semantic mismatch，證據不足以支撐 normalize」的前提**已被此證據更新**；mapping 不再因「缺證據」被排除，但 **a/b/explicit-unsupported 決定仍 deferred-to-phase-3**，本輪不決、不做 mapping。
+- 此為 **external throwaway 量測**，**非 shadow** → **不觸發 `plan_profile` reopen**（reopen 只認 shadow missing/extra 或 Phase 3 blocked）。`plan_profile` 維持 FROZEN，純當 Q8 observation。
 
 - [ ] `ai-tools/` 或 `scripts/ai-skill-cli/docs/` 寫外部 repo 使用說明（共用 binary 路徑、engine 接 CI / git hook）。
 - [ ] 提供薄 `commit-msg` shim 範例（呼叫共用 binary，tool-neutral）。
