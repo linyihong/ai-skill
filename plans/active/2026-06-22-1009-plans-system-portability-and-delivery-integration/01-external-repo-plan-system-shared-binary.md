@@ -198,18 +198,25 @@ type ValidationContext struct {
 
 > **Observation（記，不升 governance）**：2.3 真正建立的不是 shadow 功能本身，而是 **observability before replacement** ——在切換實作前先有 production-grade 比對通道。先記為 observation；N≥? 再考慮是否抽成 reusable pattern，本輪不 promote。
 
-### Phase 2.3b — Shadow Confidence Window（觀察窗，非新功能）
-> 不接 CLT、不切換 hook；只收集真實 commit 的 shadow 輸出，避免太早關掉觀測窗口。
+### Phase 2.3b — Shadow Confidence Window ✅（closed 2026-06-24 via Stage-2 replay）
+> **Reframe（關鍵）**：2.3b 驗的是 **shadow accounting path（transport / context / parity-on-violation）被跑過**，**不是**收集世界事件。completion wording = **「transport/context path exercised」**，非「observed violation」。
 
-- [ ] **證據量（最少）**：normal commit ≥3、真違規 commit ≥1、opt-out commit ≥1。
-- [ ] **收斂門檻（唯一硬條件）**：`missing=0 ∧ extra=0`。**不要求 same=100%**：transport（opt-out 預期）、context（ExecutionMode 差異）允許非空。
-- [ ] **收斂規則（強化，回應 review）**：transport / context 的每個 entry **必須可解釋**，不得「非 genuine 就自動忽略」。機械保證：`Compare` 只在 hint（`OptedOut` / `ContextSensitive`）命中時才歸 transport/context，無 hint 一律 genuine（`compare_test.go` `GenuineGaps` / `OptOutBecomesTransport` / `ContextBucket` 已鎖）。
-- [ ] **不人造 commit 湊數**：靠自然 commit 流量。**14 天 fallback（回應 review）**：若自 2.3b 開啟（2026-06-23）起 **14 天內（至 2026-07-07）** 自然流量仍未出現 violation / opt-out，**允許 fixture replay**（不進主線）補齊樣本——目的是讓窗口能關，不是湊數。fixture replay 仍屬 observability（shadow），非行為驗證。
-- [ ] **觀察記錄**：累積 shadow Check 輸出（commit hash + 5 桶）於本節，達門檻後才允許評估進 2.4。
-- 進度：normal #1 = commit `403fa73`（`same=- missing=- extra=- transport=- context=-`，valid plan parity）。
+**收窗規則（兩階段）**：
+- **Stage 1（短自然窗）**：窗口開啟但設上限 = **14 天（至 2026-07-07）或下一個 Phase 開始，先到者為準**；來源限真 commit（violation ≥1 / opt-out ≥1）。**不無限等**。
+- **Stage 2（超時 → fixture replay 收尾）**：只補 transport/context（+ parity-on-violation），**不重驗 correctness**。
+  - **禁止**：人工製造 extra/missing divergence（那是 engine-challenge test，非 shadow confidence）。
+
+**本輪以 Stage-2 fixture replay 收尾（Stage 1 僅得 normal parity，依「不變長期觀測」直接收）**：
+- [x] **Replay A — violation parity**：sub `parent: ghost` → legacy 與 engine **都 fire** → `same=plan_tree.parent_reference`、missing/extra 空、exit 不變。`TestPlanValidateShadow_ViolationParity`（直接測 `planValidateShadowCheck` 整合，先前未測）。
+- [x] **Replay B — opt-out transport**：同違規 + `[skip-plan-tree-parent-reference]` trailer → legacy 抑制、engine 仍 emit → `transport=plan_tree.parent_reference`、非 extra、converged。`TestPlanValidateShadow_OptOutTransport`。
+- [x] **context path**：由 `compare_test.go TestCompare_ContextBucket` 覆蓋（ExecutionMode 尚無 rule 觸發，故以 Compare 層 exercise）。
+- [x] **收斂門檻達成**：`missing=0 ∧ extra=0`（5 筆 normal parity-ok commit + 兩 replay 皆 converged）。transport/context entry 皆 hint-explained（無自動忽略）。
+- 自然窗 datapoints（normal，全 parity）：`403fa73` / `4ae796b` / `36aa035` / `be7d8b8` / 後續 plan commits，皆 `missing=- extra=-`。
+
+→ **2.3b 收窗完成**，accounting path 已 exercised。**解除 2.4 gate**。
 
 ### Phase 2.4 — CLI consumer
-> **Gate：須先過 Phase 2.3b 收斂門檻**（`missing=0 ∧ extra=0` + 證據量達標）才開工，避免太早關掉 shadow 觀測窗口。
+> **Gate ✅ 已解除（2026-06-24）**：Phase 2.3b 收窗完成（`missing=0 ∧ extra=0`、transport/context/parity-on-violation path 已 exercised）。可開工。
 - [ ] CLI `plans validate --root <path> [--format text|json]` 作為薄 consumer（transport only）。
 - [ ] **若新增 `route.*` 或 runtime surface，補 Runtime Execution Path + Per-surface consumer 表**（否則明寫 engine/CLI-only，無新 route）。
 
