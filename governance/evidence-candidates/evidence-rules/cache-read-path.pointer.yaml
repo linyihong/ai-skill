@@ -1,0 +1,29 @@
+# Pointer only — rule / evidence 定義在 consuming repo（Vidoe-Test），本檔僅 index
+
+plan_ref: external/Vidoe-Test/docs/plans/2026-06-22-1600-h5-redis-read-cache/_plan.md
+
+schema: evidence-rule-v1
+
+status: observed
+
+classification:
+  domain: performance
+  family: cache-read-path
+  maturity: candidate
+
+source:
+  embedded_section:
+    - "(consuming-plan section — pin when promoted)"
+
+notes: >
+  Third performance incident candidate; family cache-read-path
+  (Redis / memory / CDN / edge-KV 都映射到此 family).
+  Project-local L1.5 advisory load pilot via
+  tests/perf/redis-read-cache-load.mjs;
+  Redis enabled vs bypass.
+
+  Generalization:
+  docs/evidence/perf/reports/2026-06-22-redis-cache-load-generalization.md.
+
+  Not promoted to canonical governance.
+  Cross-repo candidate per ECS Q5 v0.
