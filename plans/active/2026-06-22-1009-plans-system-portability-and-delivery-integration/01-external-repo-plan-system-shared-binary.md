@@ -240,6 +240,9 @@ type ValidationContext struct {
 - **退出條件（硬）**：soak 期間 **沒有新增 engine surface**。若出現「CLI 想加 policy」或「hook 想特判」→ **先修 consumer，不碰 engine**。
 - soak 平穩 → 才開 Phase 3（需先過 Phase 3.0 preflight，見下）。
 
+**Soak observations（持續記）**：
+- **2026-06-25 — 第 2 個外部 repo 真實採用（positive signal）**：`unwrapping/apk-analysis-sdk/docs/plans/integration/2026-06-24-1748-sdk-platform-sqlite-identity-pool`（1 main + **8 sub**，全 canonical schema）engine 量測 `parsed=9 findings=0` → **CLEAN**。**未觸發任何 engine surface 變更需求** → soak 退出條件維持。第二個獨立外部 repo 採 canonical schema 即乾淨通過，adoption-pass 由 N=1 → **N=2**。（throwaway 量測，非 shadow；plan_profile FROZEN、Q8 deferred 不變。）
+
 ### Phase 3.0 — Preflight（Phase 3 開工前必過，先不要碰 shim）
 - [ ] **先定 consumer contract**（早於任何 shim）：engine input / engine output / opt-out transport / exit semantics / integration shape。
 - [ ] **允許的 integration 僅**：git hook shim、CI wrapper。
@@ -256,7 +259,7 @@ type ValidationContext struct {
 >
 > | Bucket | Meaning | 來源 | 掛點 |
 > |---|---|---|---|
-> | **adoption-pass** | 外部採 canonical schema → engine 直接可用 | canonical external **plan tree**（findings=0） | **Phase 3 acceptance evidence anchor**（**非** Q8） |
+> | **adoption-pass** | 外部採 canonical schema → engine 直接可用 | **2 external repos**：Vidoe-Test h5 tree（6-node）+ apk-analysis-sdk identity-pool tree（9-node），皆 findings=0 | **Phase 3 acceptance evidence anchor**（**非** Q8） |
 > | **dialect-pressure** | 非 canonical metadata → 觀察到 mismatch | Vidoe-Test flat plans（semantic mismatch：parent path vs id） | Q8 證據（揭露邊界，**不**決策） |
 > | **compatibility-policy** | adoption / normalization / explicit-unsupported 三選一 | — | **Q8 = deferred**（尚未決） |
 >
