@@ -527,6 +527,16 @@ Constitution
 - 目的：防止 reference graph 退化成另一種 drift——completion 不得 reference 一份 mutable draft。
 - 現況已部分人工滿足：本計畫的 baseline `status: frozen`。
 
+### N4 — EL-3A（ECS plan）classified: no ADR-004 impact（append-only, 主線不動）
+- 來源：`plans/active/2026-06-16-1131-evidence-candidate-system.md` Evidence Log `EL-3A`（2026-06-24，maintainer）——
+  關於 Vidoe-Test perf-governance evidence system 的觀察，**與 feedback migration 無關**。
+- 分類（read → classify，**未** merge）：對 ADR-004 **authority / consumer / sequencing 三者皆無影響** →
+  consumer census、location/permission 兩軸、B-1 gate、phase 依賴全部不動。
+- 方法論 analogy（**不 promote**）：EL-3A 的 `Observation→Registry→Executor→Validation+Rule` 4-step core 與本計畫
+  Contract Ownership 鏈（`Constitution→Contract→Registry→Consumers`）形狀相近，但 `analogy ≠ same family`；
+  EL-3A 自身在 ECS 仍 `status: unresolved / family 未定`。故僅記為 deferred，不抽跨域 invariant、不開 candidate。
+- 處置：deferred。不重開 ADR-004 架構搜尋（P0-A 已 ship、Phase 0 已 closed）。
+
 ## Document TODO
 
 | 項目 | 狀態 |
