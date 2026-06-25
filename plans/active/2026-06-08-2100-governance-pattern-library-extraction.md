@@ -108,14 +108,43 @@ Place draft analysis at: [`governance/lifecycle/governance-pattern-library-draft
 
 ## Phase 2 — Template extraction (only if gate passes)
 
-- [ ] Create `governance/lifecycle/governance-pattern-template.md` as **positive template**
-- [ ] 6-step checklist with canonical example link per step
-- [ ] Cross-link to relevant failure patterns:
-  - Step 5 Executor → `enforcement/failure-patterns/validation-coverage-gap-executor-placement.md` (placement variants)
-  - Step 3 Registry → `enforcement/failure-patterns/rule-without-executor.md` (executor missing variant)
-- [ ] R1/R2/R3 self-governance lint rules (e.g. new mechanical rule_class must declare each of the 6 steps OR explicitly justify the missing one)
-- [ ] Update `governance/lifecycle/README.md` to index this template
+Phase 2 is being landed as **three sequenced transactions** (decision 2026-06-25,
+reviewer-directed) rather than one commit, because the three carry different
+risk and different reversibility:
+
+- **T1 — Extract** (artifact; the only strictly-necessary step): the template as
+  a consumable asset. Draft is preserved.
+- **T2 — Attach** (wiring): README index + failure-pattern cross-links so the
+  template begins to be referenced. No lint introduced.
+- **T3 — Govern** (DEFERRED): R1/R2/R3 self-governance lint + archive the draft.
+  Deliberately held until the template has been *used by ≥1 new governance
+  subsystem AND produced one lint pass* — otherwise archiving the draft would
+  hide the falsification context, and the lint could mis-flag a justified
+  omission (Rule-optional / Projection-optional) as a violation before that
+  exemption path is proven against a real case.
+
+### T1 — Extract (landed 2026-06-25)
+
+- [x] Create `governance/lifecycle/governance-pattern-template.md` as **positive template**
+  - **Evidence**: file created. Normative (not a copy of the draft); draft retained as evidence log. Thesis = **invariant core + justified omissions**, not a fixed 6-step pipeline.
+- [x] Step checklist with canonical example link per step
+  - **Evidence**: per-step contract table (invariant core: Observation / Registry / Executor / Validation; conditional: Rule / Projection with predicate + omittable column), each with a canonical-example link to a real sample.
+- [x] **Template Exit Criteria** (added per reviewer 2026-06-25 — was missing from original checklist)
+  - **Evidence**: explicit acceptable-omission predicates (Rule absent → pure structural invariant; Projection absent → direct authoritative consumption) and forbidden omissions (Observation / Registry / Executor / Validation). This is the load-bearing half — it encodes the real finding (governance pattern = invariant core + justified omissions) so the template cannot regress into "treat shape as law".
+- [x] Decision tree (per-subsystem walk; each conditional omission must record its justification)
+
+### T2 — Attach (landed 2026-06-25)
+
+- [x] Cross-link to relevant failure patterns (authored inside the template's "Relationship to failure patterns" section):
+  - Step 5 Executor → `enforcement/failure-patterns/validation-coverage-gap-executor-placement.md` (placement variants) + `rule-without-executor.md`
+  - Step 1 Observation → failure-pattern library as the mature Observation form
+- [x] Update `governance/lifecycle/README.md` to index this template
+
+### T3 — Govern (DEFERRED — do NOT execute until exit condition met)
+
+- [ ] R1/R2/R3 self-governance lint rules (e.g. new mechanical rule_class must declare each invariant-core step OR record a predicate-justified omission for Rule/Projection)
 - [ ] Archive `governance-pattern-library-draft.md` once template lands
+- **Exit condition for T3**: ≥1 new governance subsystem has used the template AND a lint pass has succeeded without mis-flagging a justified Rule/Projection omission. Until then the draft stays live (preserves falsification context) and no lint is wired.
 
 ## Evidence Rule
 

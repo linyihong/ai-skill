@@ -43,6 +43,17 @@
 
 Lifecycle executable contracts include [`directory-structure-governance.yaml`](directory-structure-governance.yaml), [`system-upgrade-governance.yaml`](system-upgrade-governance.yaml), [`knowledge-update-flow.yaml`](knowledge-update-flow.yaml), [`executable-contract-boundary.yaml`](executable-contract-boundary.yaml), and [`executable-contract-inventory.yaml`](executable-contract-inventory.yaml).
 
+## Governance Pattern Template（治理模式正向模板）
+
+[`governance-pattern-template.md`](governance-pattern-template.md) 是新增 **mechanical governance 子系統**（schema 檢查、reference resolvability、drift 偵測、coverage gate 等可由程式碼偵測違規的規則）時的正向模板。它是 `enforcement/failure-patterns/` 的建設性對偶：failure pattern 捕捉 anti-pattern，本模板捕捉應有的正向形狀。
+
+核心命題：治理模式不是固定的六步 pipeline，而是 **invariant core + justified omissions**：
+
+- **Invariant core（缺一即缺陷）**：Observation → Registry → Executor → Validation。
+- **Conditional（僅在 predicate 成立時省略，且須記錄理由）**：Rule（near-universal；唯 pure structural invariant 可省）、Projection（direct-consumption executor 可省）。
+
+證據紀錄（7 個樣本、兩條 falsifiable predicate）保留在 [`governance-pattern-library-draft.md`](governance-pattern-library-draft.md)：讀模板取契約，讀 draft 取「為何某步 invariant / 為何可省」的證明。兩個尚在 incubation 的 sibling family（Reference Integrity、Failure Authority）仍記在 draft，各有獨立 N≥5 gate，未 promote。
+
 ## 持久目標邊界（Durable Goal Boundary）
 
 長期生命週期狀態應放在持久規劃檔案中，而不是 `.agent-goals/`。
