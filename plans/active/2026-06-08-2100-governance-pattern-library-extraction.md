@@ -117,11 +117,9 @@ risk and different reversibility:
 - **T2 — Attach** (wiring): README index + failure-pattern cross-links so the
   template begins to be referenced. No lint introduced.
 - **T3 — Govern** (DEFERRED): R1/R2/R3 self-governance lint + archive the draft.
-  Deliberately held until the template has been *used by ≥1 new governance
-  subsystem AND produced one lint pass* — otherwise archiving the draft would
-  hide the falsification context, and the lint could mis-flag a justified
-  omission (Rule-optional / Projection-optional) as a violation before that
-  exemption path is proven against a real case.
+  These are two actions on **two independent gates** (see T3 section) — the lint
+  is gated on template stabilization; the archive is gated on the draft being
+  *emptied*, not on the template landing.
 
 ### T1 — Extract (landed 2026-06-25)
 
@@ -140,11 +138,45 @@ risk and different reversibility:
   - Step 1 Observation → failure-pattern library as the mature Observation form
 - [x] Update `governance/lifecycle/README.md` to index this template
 
-### T3 — Govern (DEFERRED — do NOT execute until exit condition met)
+### T3 — Govern (DEFERRED — two actions, two independent gates)
 
-- [ ] R1/R2/R3 self-governance lint rules (e.g. new mechanical rule_class must declare each invariant-core step OR record a predicate-justified omission for Rule/Projection)
-- [ ] Archive `governance-pattern-library-draft.md` once template lands
-- **Exit condition for T3**: ≥1 new governance subsystem has used the template AND a lint pass has succeeded without mis-flagging a justified Rule/Projection omission. Until then the draft stays live (preserves falsification context) and no lint is wired.
+> **Correction (2026-06-25, reviewer)**: the draft is **not** a template staging
+> area — it is *simultaneously* an **incubation surface**. It currently carries
+> three things, only one of which is promoted:
+> 1. promoted family — **Governance Pattern** (now lives in `governance-pattern-template.md`)
+> 2. incubating sibling — **Reference Integrity** (N=5, gate NOT met: no non-fitting sample)
+> 3. incubating sibling — **Failure Authority** (N=4, gate NOT met: below N≥5)
+>
+> Therefore the two T3 actions cannot share one gate. Binding `archive` to the
+> template gate alone would seal the two un-promoted observations away as if they
+> were finished. `archive` is gated on the draft being **emptied**, not on the
+> template stabilizing.
+
+**Action A — wire R1/R2/R3 self-governance lint** (new mechanical rule_class must
+declare each invariant-core step OR record a predicate-justified omission for
+Rule/Projection).
+
+- [ ] **Gate A — Template governance gate** (all three):
+  - [ ] ≥1 new governance subsystem has actually *used* the template
+  - [ ] ≥1 lint pass has succeeded
+  - [ ] that lint did **not** mis-flag a justified omission (Rule-optional / Projection-optional)
+- Rationale: do not let the lint constrain future subsystems until its exemption
+  path is proven against one real case; otherwise it regresses the template into
+  "shape as law" — the exact failure the Exit Criteria were written to prevent.
+
+**Action B — archive `governance-pattern-library-draft.md`.**
+
+- [ ] **Gate B — dual gate (Gate A AND Incubator closure gate):**
+  - [ ] Gate A satisfied (template stabilized), **AND**
+  - [ ] **Incubator closure gate** — every remaining family in the draft has reached a terminal state:
+    - [ ] Reference Integrity → one of: promotion (relocate to `governance-pattern-library/`) · rejection (record falsification + close) · split (own draft)
+    - [ ] Failure Authority → same three-way terminal choice
+- Only when **`template stabilized` AND `draft emptied`** may the draft be
+  archived. Until both hold, the draft stays live so neither the falsification
+  context nor the un-promoted observations are sealed away.
+
+> Until Gate A holds the draft stays live and no lint is wired. Until Gate B
+> holds the draft is not archived even if Gate A already passed.
 
 ## Evidence Rule
 
