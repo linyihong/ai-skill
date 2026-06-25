@@ -243,11 +243,41 @@ type ValidationContext struct {
 **Soak observations（持續記）**：
 - **2026-06-25 — 第 2 個外部 repo 真實採用（positive signal）**：`unwrapping/apk-analysis-sdk/docs/plans/integration/2026-06-24-1748-sdk-platform-sqlite-identity-pool`（1 main + **8 sub**，全 canonical schema）engine 量測 `parsed=9 findings=0` → **CLEAN**。**未觸發任何 engine surface 變更需求** → soak 退出條件維持。第二個獨立外部 repo 採 canonical schema 即乾淨通過，adoption-pass 由 N=1 → **N=2**。（throwaway 量測，非 shadow；plan_profile FROZEN、Q8 deferred 不變。）
 
-### Phase 3.0 — Preflight（Phase 3 開工前必過，先不要碰 shim）
-- [ ] **先定 consumer contract**（早於任何 shim）：engine input / engine output / opt-out transport / exit semantics / integration shape。
-- [ ] **允許的 integration 僅**：git hook shim、CI wrapper。
-- [ ] **禁止**：daemon / service / background sync。
-- [ ] **rollback proof 先行**：證明 `remove shim → repo returns clean`（no residue）**再**做 adoption。
+**Soak verdict（2026-06-25）✅ 收尾**：engine stability = **pass**（退出條件「no new engine surface」達成：2 外部 repo、更大 tree、0 findings、0 engine requests——穩定性訊號，非 correctness 證明）。
+- **關鍵拆分（這輪最大收穫）**：現在證明的是 **engine portability**，**不是** delivery portability。**不可把 engine success 當 externalization success**。
+  - **已證**：engine + schema-compat + 三 consumer 閉環 + 2 外部 repo canonical 乾淨。
+  - **未證（屬 delivery）**：shim / install path / invocation contract / upgrade(version) behavior / rollback。
+- adoption-pass ×2 + dialect-pressure ×1 **仍不能推出 `choose adoption`** → **Q8 維持 deferred**（理由反而更強）。
+- → **允許開 Phase 3.0 preflight（定義 only）**；**不**直接做 Phase 3 impl；**不**關 Q1/Q3。
+
+### Phase 3.0 — Preflight ◑（OPEN 2026-06-25，**定義 only，禁 impl**）
+> 範圍：**只定義契約**。**禁止**：git hook shim implementation / CI implementation / binary packaging / daemon / service / background sync。先回答「**What exactly is being externalized?**」。
+
+**0. What is externalized（邊界）**
+- **Externalized**：(a) validation **engine**（`planvalidate` package：`ValidationContext` + `Normalize` + `Validate`）、(b) **invocation contract**（如何呼叫），**經共用 binary**（`ai-skill plans validate`）——**非 vendored code、非 governance**。
+- **NOT externalized**：governance overlay、runtime.db、routing-registry、cognitive modes、commit-msg 治理 validators。
+- 即：外部 repo 取得的是「**一個會驗 plan 結構的可呼叫 engine**」，不是「一套治理系統」。
+
+**1. Consumer contract（每個 consumer 必須滿足）**
+- **input**：`ValidationContext{ Root, ChangedSet, ExecutionMode(commit|ci|manual), Metadata }` + plan set（scope A：`<root>/plans/active|archived`）。
+- **output**：`[]Finding{ RuleID, Message, Blocking }`（engine 唯一輸出；無 severity enum，Q7 deferred）。
+- **opt-out transport**：consumer 解析來源（commit msg / config / flag）→ 傳 **effective policy**；engine policy-free（「engine receives effective policy / consumer resolves source」）。
+- **exit semantics**：blocking finding → consumer 自決 transport（hook→block / ci→fail / manual→exit 30）。engine 不決定 exit。
+- **integration shape**：consumer = **transport only**，呼叫 engine entrypoint，**零驗證邏輯**（Consumer Thinness）。
+
+**2. Integration shape（允許形態）**
+- 允許：**git hook shim**（外部 repo commit-msg 呼叫共用 binary）、**CI wrapper**（CI step 呼叫共用 binary）、manual CLI（已存在）。
+- 禁止：daemon / service / background sync / 任何常駐。
+
+**3. Rollback criteria（adoption 前必先證）**
+- `remove shim + remove config → repo returns clean`（`git status` clean、no residue）。
+- **no schema residue**：integration 不得改 plan frontmatter / 檔案格式（移除後不需 migration）。
+- uninstall = 單一可逆步驟。
+
+- [x] 0/1/2/3 契約定義完成（本輪，定義 only）。
+- [ ] **（Phase 3 impl，禁於 3.0）**：shim / CI wrapper / cross-version / 真實外部 repo acceptance + rollback proof 執行 → 關 **Q1（跨 repo 強制機制）** + **Q3（跨版本）**。
+
+**Q-close 映射**：Q2 ✅（Phase 2.2）；Q1 / Q3 → Phase 3 impl（**非** 3.0）；Q8 → deferred。
 
 **Q-close 映射**：Q2 → Phase 2.2 後可 close；Q1 → Phase 3；Q3 → 跨版本 evidence。
 
