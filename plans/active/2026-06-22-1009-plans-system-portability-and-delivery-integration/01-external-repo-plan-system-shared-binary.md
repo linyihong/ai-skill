@@ -250,8 +250,9 @@ type ValidationContext struct {
 - adoption-pass ×2 + dialect-pressure ×1 **仍不能推出 `choose adoption`** → **Q8 維持 deferred**（理由反而更強）。
 - → **允許開 Phase 3.0 preflight（定義 only）**；**不**直接做 Phase 3 impl；**不**關 Q1/Q3。
 
-### Phase 3.0 — Preflight ◑（OPEN 2026-06-25，**定義 only，禁 impl**）
+### Phase 3.0 — Preflight ✅（PASSED 2026-06-25，**定義 only，禁 impl**）
 > 範圍：**只定義契約**。**禁止**：git hook shim implementation / CI implementation / binary packaging / daemon / service / background sync。先回答「**What exactly is being externalized?**」。
+> **Review verdict（2026-06-25）**：contract PASS、externalized object 定義正確（validation capability + invocation contract，非 whole governance）。Consumer contract / Integration shape / Rollback 三項 PASS（含 review 收緊：no persistent state、remove binary reference、三面 clean）。可開始寫 **Phase 3 impl plan（不是 code）**；**未授權** shim/CI 落地；Q1/Q3 不提前關；Q8 不碰。先補 §Phase 3.1 再開工。
 
 **0. What is externalized（邊界）**
 - **Externalized**：(a) validation **engine**（`planvalidate` package：`ValidationContext` + `Normalize` + `Validate`）、(b) **invocation contract**（如何呼叫），**經共用 binary**（`ai-skill plans validate`）——**非 vendored code、非 governance**。
@@ -268,16 +269,27 @@ type ValidationContext struct {
 **2. Integration shape（允許形態）**
 - 允許：**git hook shim**（外部 repo commit-msg 呼叫共用 binary）、**CI wrapper**（CI step 呼叫共用 binary）、manual CLI（已存在）。
 - 禁止：daemon / service / background sync / 任何常駐。
+- **no persistent installation state（review 補）**：不得有 local db / cache daemon / managed worker。外部 repo 生命週期必須是：`clone → add shim → validate → remove shim → disappear`（裝/卸都不留狀態）。
 
 **3. Rollback criteria（adoption 前必先證）**
-- `remove shim + remove config → repo returns clean`（`git status` clean、no residue）。
+- `remove shim + remove config + **remove binary reference**（review 補）→ repo returns clean`。驗三面乾淨：**git status clean + runtime clean + hook clean**（rollback 最易漏的是 **toolchain residue**）。
 - **no schema residue**：integration 不得改 plan frontmatter / 檔案格式（移除後不需 migration）。
 - uninstall = 單一可逆步驟。
 
-- [x] 0/1/2/3 契約定義完成（本輪，定義 only）。
+- [x] 0/1/2/3 契約定義完成 + review 收緊（本輪，定義 only）。
 - [ ] **（Phase 3 impl，禁於 3.0）**：shim / CI wrapper / cross-version / 真實外部 repo acceptance + rollback proof 執行 → 關 **Q1（跨 repo 強制機制）** + **Q3（跨版本）**。
 
-**Q-close 映射**：Q2 ✅（Phase 2.2）；Q1 / Q3 → Phase 3 impl（**非** 3.0）；Q8 → deferred。
+### Phase 3.1 — Success Contract（impl 開工前必補；非 implementation）
+> **成功的定義**（review 新增，唯一一句）：success **≠** `external repo passed`；success **=** `external repo adopted AND removed without residue`。賣的是 **reversible adoption**，不是 works-on-my-repo。
+
+- **Acceptance 必含四段（缺一不算過）**：
+  1. **install** — 加 shim / wrapper（無持久狀態）。
+  2. **validate** — 真實 commit 觸發、findings 行為符合 consumer contract。
+  3. **upgrade once** — 升一次共用 binary（或 `plan_schema` version），相容行為符合 Q3 策略。
+  4. **rollback** — 移除 shim+config+binary reference → git/runtime/hook 三面 clean、no schema residue。
+- 四段缺任一 → Phase 3 **不算完成**，Q1/Q3 **不得 close**。
+
+**Q-close 映射**：Q2 ✅（Phase 2.2）；Q1 / Q3 → Phase 3 impl 且**須通過 3.1 四段**（非 3.0）；Q8 → deferred。
 
 **Q-close 映射**：Q2 → Phase 2.2 後可 close；Q1 → Phase 3；Q3 → 跨版本 evidence。
 
