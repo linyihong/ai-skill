@@ -55,7 +55,7 @@
 | --- | --- |
 | 當前未完成修復、owner、lock、next action | `<PROJECT_ROOT>/.agent-goals/` |
 | 跨 skill 可重用 failure pattern | `enforcement/failure-patterns/` |
-| Skill-specific technique 或 failure lesson | `feedback/history/<domain>/` |
+| Skill-specific technique 或 failure lesson | `route.feedback.history` 宣告的 canonical sink（不複述字面路徑；契約 `knowledge/runtime/contracts/feedback-location.yaml`） |
 | Tool-specific reminder、hook、prompt 或 UI detail | `ai-tools/<tool>.md` 或 tool config |
 | Project incident evidence、raw logs、exact private paths、hosts、tokens | Project docs、issue tracker 或 private evidence，不進 reusable docs |
 

@@ -5,7 +5,7 @@ schema_version: enforcement-rule/v1
 type: rule
 layer: enforcement
 source_path: enforcement/feedback-lessons.md
-summary: 定義 feedback lesson 的檔名規則、模板、agent 行為、索引；所有 lesson 統一放在 feedback/history/<domain>/。
+summary: 定義 feedback lesson 的檔名規則、模板、agent 行為、索引；lesson sink 由 route.feedback.history（routing-registry，authority_of_location）宣告，本檔不複述字面路徑。
 domains:
   - repo-governance
 tags:
@@ -24,7 +24,7 @@ context_cost:
   ttl:
     task: 1
 when_to_read: 撰寫或 promotion lesson 時
-validation: feedback/history/ 目錄結構與 feedback-lessons.md 規範一致
+validation: canonical sink（route.feedback.history）目錄結構與 feedback-lessons.md 規範一致
 complexity: low
 depends:
   - enforcement/sanitization.md
@@ -41,9 +41,9 @@ models:
 checklist:
   - 確認 lesson 的 domain 歸屬
   - 使用正確檔名格式
-  - 寫入 feedback/history/<domain>/ 下
+  - 寫入 route.feedback.history 宣告的 canonical sink 對應 domain 下
 runtime_notes: Lazy-load，P2 優先權
-governance_notes: 新增 domain 時需同步更新 feedback/history/ 目錄結構
+governance_notes: 新增 domain 時需同步更新 canonical sink（route.feedback.history）目錄結構
 
 activation_conditions:
   when:

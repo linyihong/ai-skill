@@ -17,7 +17,7 @@
 | 全工具**對話目標閉環規則**（active goals、優先權、parallelization mode、owner/lock 決策、plan/todo links、missing/decision/strengthen、拆解、轉移、multi-agent lock、完成後刪除；多步驟 / todo / dirty files / 繼續前任務時先 status/init；長期目標需落到 durable planning 文件） | **[`conversation-goal-ledger.md`](conversation-goal-ledger.md)**（全庫唯一正文）；每個專案的暫存狀態放 `<PROJECT_ROOT>/.agent-goals/`，不進 git |
 | 全庫**依賴讀取鐵則、dependency read ledger 與 writeback transaction gate**（發現 workflow/rule/template/lesson 更新時必須讀相關依賴，重讀 workflow 時列出已讀/不適用/阻塞項，寫入 Ai-skill 時必須先定位 canonical repo，不把工具 mirror 當 source，並完成 sync/commit/push/readback/clean status） | **[`dependency-reading.md`](dependency-reading.md)**（全庫唯一正文） |
 | 全庫**可重用規則與專案證據邊界**（incident 只能抽象成通用原因、規則與驗證；具體證據留專案） | **[`reusable-guidance-boundary.md`](reusable-guidance-boundary.md)**（全庫唯一正文） |
-| 可重用的**單一技巧、lesson 全文** | **`feedback/history/<domain>/`**（統一目標路徑）；舊結構 `skills/<skill-name>/feedback_history/` 已於 2026-05-13 刪除，所有 lesson 已搬遷至 `feedback/history/<domain>/`。成熟 lesson 可 promotion 到 `intelligence/<domain>/` 或 `workflow/<domain>/` |
+| 可重用的**單一技巧、lesson 全文** | lesson 的 canonical sink 由 `route.feedback.history`（routing-registry，唯一 `authority_of_location`；契約見 [`knowledge/runtime/contracts/feedback-location.yaml`](../knowledge/runtime/contracts/feedback-location.yaml)）宣告——**本表不複述字面路徑**（舊 `skills/*/feedback_history/` 已於 2026-05-13 刪除）。成熟 lesson 可 promotion 到 `intelligence/<domain>/` 或 `workflow/<domain>/` |
 | **intelligence 內部：entry vs solution 分層** | 見下方 [Intelligence Entry/Solution 分層](#intelligence-entrysolution-分層) |
 | 某 workflow 的**工具策略 adapter**（同一 workflow 在某 AI 工具上的執行差異） | `ai-tools/<tool>.md` 或 workflow 明確連結的 adapter 說明。只寫該工具差異並連回核心 workflow，工具全域設定仍放 `ai-tools/<tool>.md` |
 | **如何**下筆、命名、模板 | **[`feedback-lessons.md`](feedback-lessons.md)**（全庫唯一） |

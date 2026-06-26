@@ -1,0 +1,43 @@
+# Minimal contract materialization — ADR-004 Completion Plan, B-1 execution.
+# Scope: authority_of_location for feedback lessons ONLY. Permission / schema /
+# promotion stay with enforcement/feedback-lessons.md (orthogonal authority; see
+# the Completion Plan 0B-2 location-vs-permission split). Reference-only contract:
+# NOT compiled into runtime.db; consumers and docs read it as the formal record.
+schema_version: contract/v1
+id: contract.feedback.location
+status: active
+owner_layer: knowledge/runtime/contracts
+
+# 1. canonical location 由誰宣告 (owner) — single machine authority_of_location
+owner: knowledge/runtime/routing-registry.yaml#route.feedback.history.primary_source
+
+# 2. consumer 怎麼取得 (derive)
+derive:
+  mechanical: >
+    Consumers MUST read the sink prefix from the registry route's primary_source
+    (its directory); never hardcode "feedback/history/". Reference implementation:
+    feedbackCanonicalSink() in scripts/ai-skill-cli/internal/app/runtime.go.
+  docs: >
+    Documentation references route.feedback.history as the location authority and
+    does NOT restate the literal sink path (pointer-only; no derived-display copy,
+    to avoid re-seeding an authority illusion).
+
+# 3. owner 變更如何失效 (invalidation)
+invalidation: >
+  If route.feedback.history.primary_source changes or is removed, every derived
+  consumer must re-resolve. Any hardcoded location path is a violation of the
+  Canonical-Path Derivation Invariant and is treated as drift.
+
+# Exemptions — apex / frozen, not mutable owners:
+exemptions:
+  - path: constitution/ADR-004-feedback-promotion-pipeline.md
+    reason: apex intent; the registry materializes from it, not vice versa.
+  - path: plans/active/2026-06-23-1500-adr-004-migration-drift-diagnosis.md
+    reason: frozen evidence baseline (historical), not a live owner.
+
+# Out of scope — different sink / orthogonal authority:
+out_of_scope:
+  - id: route.feedback.promotion-pipeline
+    reason: primary_source feedback/promotion/, a different sink.
+  - path: enforcement/feedback-lessons.md
+    reason: authority_of_permission only; declares no location.
