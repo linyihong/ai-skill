@@ -280,14 +280,15 @@ type ValidationContext struct {
 - [ ] **（Phase 3 impl，禁於 3.0）**：shim / CI wrapper / cross-version / 真實外部 repo acceptance + rollback proof 執行 → 關 **Q1（跨 repo 強制機制）** + **Q3（跨版本）**。
 
 ### Phase 3 — Success Contract（**完成唯一標準**；非 slice、非 implementation）
-> **成功的定義**（review 新增，唯一一句）：success **≠** `external repo passed`；success **=** `external repo adopted AND removed without residue`。賣的是 **reversible adoption**，不是 works-on-my-repo。此四段是 Phase 3 完成的唯一標準，於 slice **3.4** 一次完整 realize。
+> **成功的定義**（review 新增，唯一一句）：success **≠** `external repo passed`；success **=** `external repo adopted AND removed without residue **with preserved validation semantics**`。賣的是 **reversible adoption**，不是 works-on-my-repo。此標準於 slice **3.4** 一次完整 realize。
 
 - **Acceptance 必含四段（缺一不算過）**：
-  1. **install** — 加 shim / wrapper（無持久狀態）。
+  1. **install** — 加 invocation adapter（無持久狀態）。
   2. **validate** — 真實 commit 觸發、findings 行為符合 consumer contract。
   3. **upgrade once** — 升一次共用 binary（或 `plan_schema` version），相容行為符合 Q3 策略。
-  4. **rollback** — 移除 shim+config+binary reference → git/runtime/hook 三面 clean、no schema residue。
-- 四段缺任一 → Phase 3 **不算完成**，Q1/Q3 **不得 close**。
+  4. **rollback** — 移除 adapter+config+binary reference → git/runtime/hook 三面 clean、no schema residue。
+- **+ preserved validation semantics（review 補）**：upgrade 前後 **findings 的 meaning 不得變**（RuleID / Blocking / opt-out 語意一致）。**rollback 乾淨但 upgrade 偷改 Blocking/opt-out 也不算成功**——乾淨 ≠ 語意保真。
+- 四段 + 語意保真，缺任一 → Phase 3 **不算完成**，Q1/Q3 **不得 close**。
 
 **Q-close 映射（evidence-slice 版）**：Q2 ✅（Phase 2.2）；**Q3 → slice 3.2（upgrade once）**；**Q1 → slice 3.3（consumer equivalence）**；Phase 3 complete → slice 3.4（四段 acceptance）；Q8 → deferred。
 
@@ -352,15 +353,16 @@ type ValidationContext struct {
 - **護欄**：compat-layer 變更，非 `plan_profile` membership 變更 → FROZEN 不受影響；Q8 仍 deferred。
 
 ### Phase 3 impl plan — **evidence slices**（plan-only，**未授權落地** shim/CI/真實 repo）
-> **切法（回應 review）：按 evidence stage 切，不按技術元件（shim/CI/wrapper）切**——避免 transport 反客為主、升格成 architecture。shim/CI 只是**證據載體**，掛在 slice 底下。
+> **🔒 骨架 FROZEN（2026-06-25，review 通過）**：不再拆 slice；evidence flow 不得切回技術分層。
+> **切法（回應 review）：按 evidence stage 切，不按技術元件（shim/CI/wrapper）切**——避免 transport 反客為主、升格成 architecture。shim/CI 只是**證據載體（invocation adapter，replaceable，contract 不入 engine）**，掛在 slice 底下。
 >
 > **Phase 3 Non-goal（鎖死，外部化最易偷長）**：**不得新增 external registry、不得新增 external runtime state、不得新增 external plan metadata**。外部 repo 取得的永遠是「可呼叫的 engine」，不是一套新狀態。
 
 | Slice | 目標 | 產物（載體） | 關閉 |
 |---|---|---|---|
-| **3.1 Adoption Slice**（install → validate） | 證外部 repo **可採用且不留狀態** | shim（或等價 transport）、install/remove 指南、validate evidence | reversible adoption 成立、rollback clean 成立；**不關 Q3** |
+| **3.1 Adoption Slice**（install → validate） | 證外部 repo **可採用且不留狀態** | **invocation adapter**（git hook shim / CI wrapper / equivalent，**必須 replaceable；adapter contract 不得寫入 engine**）、install/remove 指南、validate evidence | reversible adoption 成立、rollback clean 成立；**不關 Q3** |
 | **3.2 Compatibility Slice**（upgrade once） | 證 invocation contract **穩定非碰巧** | binary 升版一次、schema 相容證據、compatibility notes | **Q3 close** |
-| **3.3 Consumer Equivalence** | 同 repo 同 tree：**manual ≡ hook ≡ CI** | findings equality、transport 差異歸因 | **Q1 close** |
+| **3.3 Consumer Equivalence** | 同 repo 同 tree：**manual ≡ hook ≡ CI**；且 **equivalence ≠ coupling** | findings equality、transport 差異歸因、**removal-independence proof：移除任一 consumer 不得要求 engine 或其他 consumer 改動**（驗 consumer equality ≠ interdependence，防加 CI 時把 exit/policy 搬回 engine） | **Q1 close** |
 | **3.4 Real Repo Acceptance** | 完整四段 **install → validate → upgrade → rollback** | acceptance evidence、rollback proof、residue check（git/runtime/hook） | **Phase 3 complete** |
 
 **原 checklist 收編對照**：shim design → 3.1；CI wrapper → 3.1 / 3.3；cross-version → 3.2；rollback proof → 3.4；real repo acceptance → 3.4。真實外部 repo 維護中繼資料（`repo_owner` / `repo_type` / `removal_policy`，不寫 repo 名）掛 3.4。
