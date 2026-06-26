@@ -279,8 +279,8 @@ type ValidationContext struct {
 - [x] 0/1/2/3 契約定義完成 + review 收緊（本輪，定義 only）。
 - [ ] **（Phase 3 impl，禁於 3.0）**：shim / CI wrapper / cross-version / 真實外部 repo acceptance + rollback proof 執行 → 關 **Q1（跨 repo 強制機制）** + **Q3（跨版本）**。
 
-### Phase 3.1 — Success Contract（impl 開工前必補；非 implementation）
-> **成功的定義**（review 新增，唯一一句）：success **≠** `external repo passed`；success **=** `external repo adopted AND removed without residue`。賣的是 **reversible adoption**，不是 works-on-my-repo。
+### Phase 3 — Success Contract（**完成唯一標準**；非 slice、非 implementation）
+> **成功的定義**（review 新增，唯一一句）：success **≠** `external repo passed`；success **=** `external repo adopted AND removed without residue`。賣的是 **reversible adoption**，不是 works-on-my-repo。此四段是 Phase 3 完成的唯一標準，於 slice **3.4** 一次完整 realize。
 
 - **Acceptance 必含四段（缺一不算過）**：
   1. **install** — 加 shim / wrapper（無持久狀態）。
@@ -289,12 +289,12 @@ type ValidationContext struct {
   4. **rollback** — 移除 shim+config+binary reference → git/runtime/hook 三面 clean、no schema residue。
 - 四段缺任一 → Phase 3 **不算完成**，Q1/Q3 **不得 close**。
 
-**Q-close 映射**：Q2 ✅（Phase 2.2）；Q1 / Q3 → Phase 3 impl 且**須通過 3.1 四段**（非 3.0）；Q8 → deferred。
+**Q-close 映射（evidence-slice 版）**：Q2 ✅（Phase 2.2）；**Q3 → slice 3.2（upgrade once）**；**Q1 → slice 3.3（consumer equivalence）**；Phase 3 complete → slice 3.4（四段 acceptance）；Q8 → deferred。
 
 **Q-close 映射**：Q2 → Phase 2.2 後可 close；Q1 → Phase 3；Q3 → 跨版本 evidence。
 
 ## Phase 3 — 外部 repo consumer 路徑（git hook shim / CI）
-> **Gated**：須先 (1) Phase 2.5 soak 平穩（無新增 engine surface）+ (2) Phase 3.0 preflight 通過（consumer contract 定義、rollback proof 先行）才開工。Phase 3 換的是新問題「adopt without importing governance」，非 Phase 2 自然延伸。Q1（跨 repo 強制）/ Q3（跨版本）在此關；Q8（external schema policy）仍 deferred。
+> **Gated**：須先 (1) Phase 2.5 soak 平穩（無新增 engine surface）+ (2) Phase 3.0 preflight ✅ 通過 + Success Contract 補上才開工。Phase 3 換的是新問題「adopt without importing governance」，非 Phase 2 自然延伸。**按 evidence slice 切（見下 impl plan）**：Q3 → slice 3.2、Q1 → slice 3.3；Q8（external schema policy）仍 deferred。**impl 未授權落地**。
 
 ### External Evidence（3 個獨立 bucket，**不可互相污染**）
 > 證據分三桶，**各自獨立、不可推導彼此**（回應 review：避免「adoption-pass → adoption selected」偷跑）：
@@ -351,21 +351,31 @@ type ValidationContext struct {
 - **fix 保留為 defense-in-depth（非 bug 修補）**：`Normalize` 加 `normalizeNullScalar`，讓 engine **不依賴任一 loader 的 null-awareness**（未來真實外部 loader 若 naive 也安全），與 app 一致、Gate B 不讓 engine 看 YAML idiom；測試 `TestNormalize_ParentNullIsEmpty`。屬 compat-layer normalization 家族（與 `"1"` 引號同類）。
 - **護欄**：compat-layer 變更，非 `plan_profile` membership 變更 → FROZEN 不受影響；Q8 仍 deferred。
 
-- [ ] `ai-tools/` 或 `scripts/ai-skill-cli/docs/` 寫外部 repo 使用說明（共用 binary 路徑、engine 接 CI / git hook）。
-- [ ] 提供薄 `commit-msg` shim 範例（呼叫共用 binary，tool-neutral）。
-- [ ] **Acceptance evidence（回應 review #6，收緊）**：
-  - [ ] tmp fixture repo：engine + CLI pass / fail 輸出
-  - [ ] 一個**真實的非 Ai-skill repo**：實裝 shim，真實 commit 觸發一次 pass + 一次 block。**記錄維護中繼資料（回應 review #5，不寫 repo 名）**：`repo_owner` / `repo_type: internal|public|fixture` / `removal_policy`，避免一年後 repo 不存在無法追溯。
-  - [ ] **跨 binary 版本驗一次**：升一次共用 binary（或改一次 `plan_schema` version），確認外部 repo 相容行為符合 Q3 策略
-  - [ ] **rollback evidence（回應 review #6）**：外部 repo 可移除 integration（remove hook shim + config）並恢復 clean，且 **no schema residue** — 移除後 plan frontmatter 不需 migration、檔案格式不被永久改變，證明接入非侵入、完全可逆
+### Phase 3 impl plan — **evidence slices**（plan-only，**未授權落地** shim/CI/真實 repo）
+> **切法（回應 review）：按 evidence stage 切，不按技術元件（shim/CI/wrapper）切**——避免 transport 反客為主、升格成 architecture。shim/CI 只是**證據載體**，掛在 slice 底下。
+>
+> **Phase 3 Non-goal（鎖死，外部化最易偷長）**：**不得新增 external registry、不得新增 external runtime state、不得新增 external plan metadata**。外部 repo 取得的永遠是「可呼叫的 engine」，不是一套新狀態。
+
+| Slice | 目標 | 產物（載體） | 關閉 |
+|---|---|---|---|
+| **3.1 Adoption Slice**（install → validate） | 證外部 repo **可採用且不留狀態** | shim（或等價 transport）、install/remove 指南、validate evidence | reversible adoption 成立、rollback clean 成立；**不關 Q3** |
+| **3.2 Compatibility Slice**（upgrade once） | 證 invocation contract **穩定非碰巧** | binary 升版一次、schema 相容證據、compatibility notes | **Q3 close** |
+| **3.3 Consumer Equivalence** | 同 repo 同 tree：**manual ≡ hook ≡ CI** | findings equality、transport 差異歸因 | **Q1 close** |
+| **3.4 Real Repo Acceptance** | 完整四段 **install → validate → upgrade → rollback** | acceptance evidence、rollback proof、residue check（git/runtime/hook） | **Phase 3 complete** |
+
+**原 checklist 收編對照**：shim design → 3.1；CI wrapper → 3.1 / 3.3；cross-version → 3.2；rollback proof → 3.4；real repo acceptance → 3.4。真實外部 repo 維護中繼資料（`repo_owner` / `repo_type` / `removal_policy`，不寫 repo 名）掛 3.4。
+
+**好處**：(a) transport 不升格 architecture；(b) Q-close 更乾淨——**Q3 在 upgrade 完即關（3.2），不等真實 repo**；**Q1 在 consumer equivalence 關（3.3）**；(c) `install→validate→upgrade→rollback` 四段 acceptance **只出現一次（3.4）**，前面都是鋪路。
+
+- [ ] **（全部 plan-only，未授權落地）**：3.1–3.4 的 shim/CI/真實 repo 整合**待授權**才寫 code。
 
 ## 完成條件
 - [ ] portable 分類表（含 `consumer_surface` 欄）+ `plan_profile`（capability）/ `plan_schema`（compat）邊界落地（Q2 resolved，由分類表推導，capability 與 execution 維度分離）
 - [ ] validator engine（吃 `ValidationContext`）+ schema compat layer + thin consumers（hook / CLI）+ 測試通過（含 no-CLI engine integration test）
 - [ ] 既有 commit-msg hook 行為不變（重構回歸驗證）
-- [ ] 外部 repo 使用說明 + shim 範例落地
-- [ ] Acceptance evidence 四項（tmp / 真實 repo＋維護中繼資料 / 跨版本 / rollback 可逆＋no schema residue）齊備
-- [ ] Q1 / Q3 resolved 或 deferred 並回寫
+- [ ] Phase 3 evidence slices：3.1 Adoption（reversible adoption + rollback clean）/ 3.2 Compatibility（→ Q3 close）/ 3.3 Consumer Equivalence（manual≡hook≡CI → Q1 close）/ 3.4 Real Repo Acceptance（四段 install→validate→upgrade→rollback，唯一完成標準）
+- [ ] Phase 3 Non-goal 守住：無 external registry / external runtime state / external plan metadata
+- [ ] Q1 / Q3 依 slice 3.3 / 3.2 close 並回寫；Q8 deferred
 
 ## Glossary Impact
 Glossary Impact: yes — 新增 `plan_profile`（capability / portable 邊界）與 `plan_schema`（frontmatter schema + version 相容契約），刻意拆成兩個單一責任術語；Phase 1 落地時註冊到 `knowledge/glossary/ai-skill.md`。
