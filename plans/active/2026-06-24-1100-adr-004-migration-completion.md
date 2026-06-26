@@ -439,11 +439,44 @@ contract.feedback.location:
 
 **例外掃描**：唯一原則性豁免是 `constitution/ADR-004`（apex；registry 由它 materialize）——這是 Contract Ownership 鏈設計本身，不是 drift。無其他「derive 不出」的 claimant。
 
-> **Readiness Verdict：READY — 0 unresolved claimants.**
-> 每個 location claimant 都 derives（registry pointer）、exits（mention / 不同 sink）、或是 owner/apex。
-> 機械 consumer 已有 derive 範式（P0-A），doc claimant 可轉 authority-pointer。
-> → 滿足「Every location claimant either derives or exits」→ **B-1 execution 可開** → 解鎖 P0-B。
-> （依使用者拍板開 execution；本 review 止於此，不跨 gate。）
+> **⚠ SUPERSEDED（2026-06-24，by wider claimant scan）** — 下方原 verdict **在當時枚舉範圍內成立**，
+> 但 B-1 execution 後對 success-condition 做全庫 rescan，發現 claimant 枚舉範圍不足（漏 operational
+> workflow + generated/derived views + describe/historical）。**這是 review-completeness 問題，不是
+> implementation 問題**，故標 *superseded*（保留歷史），**非 revoke**。實際 disposition 見下方
+> 「Residue Disposition」。
+>
+> ~~**Readiness Verdict：READY — 0 unresolved claimants.**~~（superseded）
+> ~~每個 location claimant 都 derives（registry pointer）、exits（mention / 不同 sink）、或是 owner/apex。~~
+> ~~機械 consumer 已有 derive 範式（P0-A），doc claimant 可轉 authority-pointer。~~
+> ~~→ 滿足「Every location claimant either derives or exits」→ B-1 execution 可開 → 解鎖 P0-B。~~
+
+#### B-1 Execution — Residue Disposition（2026-06-24 wider rescan）
+
+**已 converge（primary authority owners → registry pointer，commit `3d6daba`）**：
+`metadata/rules/feedback-lessons.yaml`、`enforcement/content-layering.md`、`enforcement/failure-learning-system.md`
++ minimal contract `knowledge/runtime/contracts/feedback-location.yaml`。
+
+**Residue 重新分類（maintainer 拍板）**：
+
+| 類 | 檔案 | 處置 |
+| --- | --- | --- |
+| operational workflow | `governance/lifecycle/knowledge-update-flow.md`/`.yaml` | **KEEP → operational projection**（見下規則；非 blocker） |
+| derived views（generated/index 鏡射 registry） | `knowledge/runtime/model-checklists.md`、`runtime-report.md`、`indexes/README.md`、`sqlite/README.md` | **EXIT → regenerate under P0-B**（隨 indexer repoint 重生） |
+| describe / historical | `architecture/ai-native-*.md`、`system-upgrade-governance.md`、`intelligence-extraction-pipeline.md`、`validation/README.md`、`failure-patterns/*` | **EXIT**（mention，不動） |
+
+**Operational Projection Rule（maintainer 2026-06-24）**：
+> `authority_of_location` **只**存在 registry。Workflow **允許呈現** resolved sink，但必須：
+> (1) 顯式標 `derived`；(2) 不可作為 source of truth；(3) 不可被其他文件引用為 authority；(4) 不可手寫同步。
+> 形式：不要寫「write to `feedback/history/<domain>`」；要寫「resolve sink from `route.feedback.history` →
+> example（derived）：`feedback/history/<domain>`」。**路徑存在，但只是執行投影，不是 owner。**
+
+> **B-1 狀態：READY\*** ——`*` = **owner convergence proven**（primary owners 已 converge + contract 落地）/
+> **workflow projection pending**（operational workflow 待套 projection rule；derived views 併 P0-B）。
+> READY\* **非 blocker**，**不**打回 DESIGNED。residue 關掉後才正式進 B-1 execution 收尾。
+
+> **方法論教訓（留方法論，不升工具）**：*enumeration scope must derive from the success condition, not the
+> previous census.* 本 review 把「0A census seed」當「完整 claimant 集」，導致 verdict 早熟。未來任一
+> enumerable-completeness 檢查，枚舉範圍必須對 success-condition 重新全掃，不繼承上一步的 seed。
 
 ---
 
