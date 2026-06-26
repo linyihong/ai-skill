@@ -287,8 +287,12 @@ type ValidationContext struct {
   2. **validate** — 真實 commit 觸發、findings 行為符合 consumer contract。
   3. **upgrade once** — 升一次共用 binary（或 `plan_schema` version），相容行為符合 Q3 策略。
   4. **rollback** — 移除 adapter+config+binary reference → git/runtime/hook 三面 clean、no schema residue。
-- **+ preserved validation semantics（review 補）**：upgrade 前後 **findings 的 meaning 不得變**（RuleID / Blocking / opt-out 語意一致）。**rollback 乾淨但 upgrade 偷改 Blocking/opt-out 也不算成功**——乾淨 ≠ 語意保真。
-- 四段 + 語意保真，缺任一 → Phase 3 **不算完成**，Q1/Q3 **不得 close**。
+- **+ preserved validation semantics（review 補）**：upgrade 前後 **findings 的 meaning 不得變**。驗收明確拆**三層**（防「RuleID 沒變就說 semantics preserved」但 Blocking 已變）：
+  - **Structural**：same RuleID set。
+  - **Behavioral**：same Blocking result。
+  - **Policy**：same opt-out interpretation。
+- **+ removal must be monotonic（review ④）**：`remove adapter → no new validation errors → only capability disappears`。rollback 不得反而留下新錯（preserved semantics 的逆向版）。
+- 四段 + 三層語意保真 + monotonic removal，缺任一 → Phase 3 **不算完成**，Q1/Q3 **不得 close**。
 
 **Q-close 映射（evidence-slice 版）**：Q2 ✅（Phase 2.2）；**Q3 → slice 3.2（upgrade once）**；**Q1 → slice 3.3（consumer equivalence）**；Phase 3 complete → slice 3.4（四段 acceptance）；Q8 → deferred。
 
@@ -369,7 +373,18 @@ type ValidationContext struct {
 
 **好處**：(a) transport 不升格 architecture；(b) Q-close 更乾淨——**Q3 在 upgrade 完即關（3.2），不等真實 repo**；**Q1 在 consumer equivalence 關（3.3）**；(c) `install→validate→upgrade→rollback` 四段 acceptance **只出現一次（3.4）**，前面都是鋪路。
 
-- [ ] **（全部 plan-only，未授權落地）**：3.1–3.4 的 shim/CI/真實 repo 整合**待授權**才寫 code。
+- [x] **3.1 Adoption Slice — STARTED & demonstrated（authorized 2026-06-25）**（見下）。
+- [ ] **（3.2–3.4 仍 plan-only，未授權落地）**：upgrade / consumer-equivalence / 真實 repo 四段**待授權**才寫 code。
+
+#### Phase 3.1 — Adoption Slice evidence（2026-06-25）
+- **Preflight finding（go-first 相容）**：`validateNoNewShellScripts` 擋任何新 `.sh` → **adapter 以 documented template 交付（guide 內 shim snippet），不在 Ai-skill commit `.sh`**；外部 repo 自行 materialize。同時滿足 no-new-shell / no persistent state（Ai-skill 端）/ replaceable / contract 不入 engine。
+- **產物**：[`scripts/ai-skill-cli/docs/external-plan-validation.md`](../../../scripts/ai-skill-cli/docs/external-plan-validation.md)——invocation contract + adapter（git hook shim / CI wrapper）+ install/remove 指南 + non-goals。
+- **Fixture evidence（真實 external git repo，throwaway）**：install 薄 commit-msg adapter（呼叫共用 binary `plans validate --root`）→
+  - **validate PASS**：valid canonical tree `plans=2 findings=0 blocking=0`，commit exit 0。
+  - **validate BLOCK**：注入 `parent: ghost` 違規 → `[BLOCK] plan_tree.parent_reference ... "ghost" does not resolve`、`blocking=1` → commit **aborted**。
+  - **monotonic removal**：移除 adapter 後同一違規 commit exit 0 → **只有 capability 消失、無新 validation error**（符合 Success Contract removal-monotonic）。
+  - **no residue**：hook 消失、plan frontmatter 未被改寫（no schema residue）、`git status` clean。
+- **達成 3.1 關閉條件**：reversible adoption 成立、rollback clean 成立。**不關 Q3**（upgrade-once 屬 3.2）；此為 fixture，真實長期 repo + 四段完整在 3.4。
 
 ## 完成條件
 - [ ] portable 分類表（含 `consumer_surface` 欄）+ `plan_profile`（capability）/ `plan_schema`（compat）邊界落地（Q2 resolved，由分類表推導，capability 與 execution 維度分離）
