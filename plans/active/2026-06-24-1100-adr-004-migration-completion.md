@@ -415,6 +415,36 @@ contract.feedback.location:
 > 註：P0-A 的 `feedbackCanonicalSink()` 已是此 derive rule 的第一個 consumer（read-only），
 > 但 B-1 的「rule 撤回 location 主張」收斂仍屬 Phase 2 entry gate，未在本 slice 執行。
 
+### B-1 Readiness Review（read-only · 證明 location convergence 可執行）
+
+> 目標一句：**證明 location convergence 可執行**。範圍：rule 撤回 location 主張後誰受影響（C-09/C-10/C-11）、
+> registry 成唯一 owner 要補哪些 derive edge、有無 derive 不出的例外。**禁止** contract/registry/runtime/
+> validator/migration 改動（本 review 純讀取）。成功條件：**Every location claimant either derives or exits.**
+
+**Dependency table（feedback/history location claimants，2026-06-24 read-only sweep）：**
+
+| claimant | 性質 | 現況 | 處置 | derive edge / 例外 |
+| --- | --- | --- | --- | --- |
+| `routing-registry.yaml` `route.feedback.history` | registry | **OWNER**（primary_source: feedback/history/README.md） | — sole machine owner（derive 目標源） | n/a（被 derive 的源） |
+| `constitution/ADR-004` §Vocabulary Evolution L89 | constitution | 宣告 canonical sink | **APEX / EXEMPT**：registry 由它 materialize，非反向（Contract Ownership 鏈頂） | 設計性豁免，非 drift |
+| `metadata/rules/feedback-lessons.yaml`（C-11） | rule metadata | hardcode `feedback/history/<domain>/`（summary/checklist/governance_notes） | **DERIVES** → 改為指向 route.feedback.history 為 location authority | doc pointer（可行） |
+| `enforcement/content-layering.md:20`（C-12） | doc | 宣告「統一目標路徑」 | **DERIVES** → reference registry，path 降為 derived-display | doc pointer（可行） |
+| `enforcement/failure-learning-system.md:58` | guidance table | 重述 location | **DERIVES/EXIT** → pointer 或移除字面路徑 | doc pointer（可行） |
+| `knowledge/indexes/README.md:58` | index | 鏡射 route | **DERIVES** → index of registry（本就該映射 route） | derived view（可行） |
+| `validation/README.md:290` | scenario 描述 | mention 路徑 | **EXIT**（描述測試，非 authority） | n/a（mention 出局） |
+| `enforcement/feedback-lessons.md`（rule 正文） | rule | **不 hardcode location**（只管 permission） | 已 clean | ✓ 已 derive-free |
+| `route.feedback.promotion-pipeline`（C-10） | registry | primary_source: **feedback/promotion/**（不同 sink） | **EXIT scope**（非 feedback/history claimant） | 不同 sink，出局 |
+
+**Mechanical vs doc derive（唯一需注意的 nuance，非 blocker）**：唯一**機械** deriver 是 Go（`feedbackCanonicalSink` ✓ 已存在；P0-B indexer 待接）。doc/rule claimant 的「derive」是 documentation-pointer 意義（authority 移到 registry，字面路徑降為 derived-display）。是否允許保留 derived-display copy 是 B-1 execution 的 doc-governance 選擇——**兩種選法 authority 都收斂到 registry**，故非 blocker。
+
+**例外掃描**：唯一原則性豁免是 `constitution/ADR-004`（apex；registry 由它 materialize）——這是 Contract Ownership 鏈設計本身，不是 drift。無其他「derive 不出」的 claimant。
+
+> **Readiness Verdict：READY — 0 unresolved claimants.**
+> 每個 location claimant 都 derives（registry pointer）、exits（mention / 不同 sink）、或是 owner/apex。
+> 機械 consumer 已有 derive 範式（P0-A），doc claimant 可轉 authority-pointer。
+> → 滿足「Every location claimant either derives or exits」→ **B-1 execution 可開** → 解鎖 P0-B。
+> （依使用者拍板開 execution；本 review 止於此，不跨 gate。）
+
 ---
 
 ## Phase 2 — Runtime Repair (P0-B)
