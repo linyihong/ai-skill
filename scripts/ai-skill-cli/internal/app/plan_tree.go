@@ -44,6 +44,7 @@ type PlanFrontmatter struct {
 	RequiredForCompletion *bool
 	HasReasonField        bool
 	SubPlanReason         string // raw trimmed value; empty string = block
+	SchemaVersion         string // declared schema_version (quotes stripped); "" = absent
 }
 
 var (
@@ -163,6 +164,10 @@ func assignField(pf *PlanFrontmatter, key, val string) {
 	case "sub_plan_reason":
 		pf.HasReasonField = true
 		pf.SubPlanReason = strings.TrimSpace(val)
+	case "schema_version":
+		// Quotes already stripped above ("1" -> 1), satisfying the Q3 loader
+		// requirement; carried into RawPlan.SchemaVersion for the compat layer.
+		pf.SchemaVersion = strings.TrimSpace(val)
 	}
 }
 

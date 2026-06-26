@@ -46,9 +46,11 @@ func TestPlansValidateCLI_MatchesEngineEntrypoint(t *testing.T) {
 	cli, _ := runValidateJSON(t, tmp)
 
 	// Engine entrypoint, computed independently in the test.
+	models, compat := normalizedPlansFromRoot(tmp)
 	engine := planvalidate.Validate(
 		planvalidate.ValidationContext{Root: tmp, ExecutionMode: planvalidate.ModeManual},
-		normalizedPlansFromRoot(tmp))
+		models)
+	engine = append(engine, compat...)
 
 	if len(cli.Findings) != len(engine) {
 		t.Fatalf("CLI findings=%d != engine findings=%d", len(cli.Findings), len(engine))
@@ -61,6 +63,36 @@ func TestPlansValidateCLI_MatchesEngineEntrypoint(t *testing.T) {
 		if !got[f.RuleID] {
 			t.Fatalf("engine finding %q missing from CLI projection", f.RuleID)
 		}
+	}
+}
+
+// Phase 3.2 end-to-end (loader -> compat layer -> consumer): a supported
+// schema_version flows and validates clean; an unsupported one is a deterministic,
+// diagnosable blocking reject surfaced by the CLI (not silently degraded).
+func TestPlansValidateCLI_SchemaVersionEndToEnd(t *testing.T) {
+	// supported version "2" (quoted, as real frontmatter) -> clean, exit 0
+	sup := t.TempDir()
+	makePlan(t, sup, "plans/active/_plan.md",
+		"---\nid: m\nplan_kind: main\nstatus: draft\nowner: t\ncreated: 2026-06-25\nparent: null\nschema_version: \"2\"\n---")
+	if cli, code := runValidateJSON(t, sup); code != ExitSuccess || len(cli.Findings) != 0 {
+		t.Fatalf("supported schema_version 2 should be clean exit 0, got code=%d findings=%d", code, len(cli.Findings))
+	}
+	// unsupported version "99" -> blocking compat reject, exit 30
+	uns := t.TempDir()
+	makePlan(t, uns, "plans/active/_plan.md",
+		"---\nid: m\nplan_kind: main\nstatus: draft\nowner: t\ncreated: 2026-06-25\nparent: null\nschema_version: \"99\"\n---")
+	cli, code := runValidateJSON(t, uns)
+	if code != ExitValidationFailed {
+		t.Fatalf("unsupported schema_version should exit ExitValidationFailed, got %d", code)
+	}
+	found := false
+	for _, f := range cli.Findings {
+		if f.RuleID == "compat.unsupported_schema_version" && f.Blocking {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("expected blocking compat.unsupported_schema_version finding, got %+v", cli.Findings)
 	}
 }
 

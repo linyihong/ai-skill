@@ -50,11 +50,12 @@ func runPlansValidate(args []string, stdout io.Writer, stderr io.Writer) int {
 		return ExitInvalidUsage
 	}
 
-	models := normalizedPlansFromRoot(opts.root)
+	models, compat := normalizedPlansFromRoot(opts.root)
 	findings := planvalidate.Validate(planvalidate.ValidationContext{
 		Root:          opts.root,
 		ExecutionMode: planvalidate.ModeManual,
 	}, models)
+	findings = append(findings, compat...) // compat-layer rejects (e.g. unsupported schema_version)
 
 	blocking := 0
 	for _, f := range findings {

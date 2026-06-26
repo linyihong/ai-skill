@@ -23,7 +23,31 @@ import "fmt"
 // existing plans (which carry no schema_version field) normalize identically to
 // plans that declare it explicitly. This is the first real compatibility
 // boundary and the anchor for plan_schema versioning (Open Question Q3).
+// currentSchemaVersion is the version an absent schema_version resolves to.
 const currentSchemaVersion = "1"
+
+// supportedSchemaVersions is the accepted set. Phase 3.2 (Compatibility Slice,
+// subject=artifact): the set is intentionally EXTENSIBLE — adding a version here
+// must not change findings for existing plans. Versions "1" and "2" currently
+// normalize identically (no shape divergence yet); "2" is reserved to prove the
+// acceptance set extends without semantic drift, NOT to encode a real migration.
+// When a real shape change lands, Normalize gains per-version mapping; the
+// engine-facing NormalizedPlanModel and its consumers stay unchanged (Gate B).
+var supportedSchemaVersions = map[string]bool{"1": true, "2": true}
+
+// CompatError is a typed, classified rejection from the compatibility layer so a
+// reject is DIAGNOSABLE (Phase 3.2 patch): the same unsupported case must reject
+// at the same Stage with the same ReasonClass on every run (no diagnostic drift).
+// Consumers classify on Stage/ReasonClass, never on the message string.
+type CompatError struct {
+	Stage       string // where rejection happened, e.g. "normalize"
+	ReasonClass string // stable class, e.g. "unsupported_schema_version"
+	Detail      string // human detail (not for classification)
+}
+
+func (e *CompatError) Error() string {
+	return e.Stage + "/" + e.ReasonClass + ": " + e.Detail
+}
 
 // RawPlan is the un-normalized frontmatter a schema loader extracts from a plan
 // file, before any version resolution. It is the ONLY type in this package that
@@ -82,9 +106,13 @@ func Normalize(raw RawPlan) (NormalizedPlanModel, error) {
 	if version == "" {
 		version = currentSchemaVersion // absent == baseline
 	}
-	if version != currentSchemaVersion {
-		return NormalizedPlanModel{}, fmt.Errorf(
-			"unsupported plan schema_version %q (supported: %q)", version, currentSchemaVersion)
+	if !supportedSchemaVersions[version] {
+		// Deterministic, diagnosable reject: same stage + reason class every run.
+		return NormalizedPlanModel{}, &CompatError{
+			Stage:       "normalize",
+			ReasonClass: "unsupported_schema_version",
+			Detail:      fmt.Sprintf("schema_version %q not in supported set", version),
+		}
 	}
 
 	m := NormalizedPlanModel{

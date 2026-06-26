@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -48,15 +49,21 @@ var planTreeLegacyMirror = []struct {
 // Scope note (2.4 / Q8 boundary): discovery is fixed to plans/active|archived.
 // Custom plans dirs, external path conventions, and schema dialects are explicit
 // non-goals here; they belong to Q8 / Phase 3, not the CLI transport surface.
-func normalizedPlansFromRoot(root string) []planvalidate.NormalizedPlanModel {
+// normalizedPlansFromRoot returns the normalized models plus any compat-layer
+// findings (e.g. unsupported schema_version). A compat reject is surfaced as a
+// BLOCKING finding keyed by the CompatError's ReasonClass so it is deterministic
+// and diagnosable end-to-end (Phase 3.2) — never silently degraded.
+func normalizedPlansFromRoot(root string) ([]planvalidate.NormalizedPlanModel, []planvalidate.Finding) {
 	var models []planvalidate.NormalizedPlanModel
+	var compat []planvalidate.Finding
 	for _, fm := range scanAllPlanFrontmatter(root) {
 		if !fm.HasFrontmatter {
 			continue
 		}
 		raw := planvalidate.RawPlan{
-			Path:     fm.Path,
-			Location: planLocation(fm.Path),
+			Path:          fm.Path,
+			Location:      planLocation(fm.Path),
+			SchemaVersion: fm.SchemaVersion, // end-to-end: loader carries declared version into compat layer
 			Fields: map[string]string{
 				"id":              fm.ID,
 				"plan_kind":       fm.PlanKind,
@@ -74,14 +81,19 @@ func normalizedPlansFromRoot(root string) []planvalidate.NormalizedPlanModel {
 		}
 		model, err := planvalidate.Normalize(raw)
 		if err != nil {
-			// A normalize error is itself a divergence signal; surface a minimal
-			// model so it is not silently dropped.
-			models = append(models, planvalidate.NormalizedPlanModel{Path: fm.Path})
-			continue
+			var ce *planvalidate.CompatError
+			if errors.As(err, &ce) {
+				compat = append(compat, planvalidate.Finding{
+					RuleID:   "compat." + ce.ReasonClass,
+					Message:  fm.Path + ": " + ce.Error(),
+					Blocking: true,
+				})
+			}
+			continue // do not emit a degraded model
 		}
 		models = append(models, model)
 	}
-	return models
+	return models, compat
 }
 
 func stagedTouchesPlans(staged []string) bool {
@@ -111,10 +123,12 @@ func planValidateShadowCheck(ctx commitMsgCtx) Check {
 	}
 
 	// Engine findings: normalize the working-tree plan set and run the engine.
+	models, compat := normalizedPlansFromRoot(ctx.root)
 	engine := planvalidate.Validate(planvalidate.ValidationContext{
 		Root:          ctx.root,
 		ExecutionMode: planvalidate.ModeCommit,
-	}, normalizedPlansFromRoot(ctx.root))
+	}, models)
+	engine = append(engine, compat...)
 
 	d := planvalidate.Compare(legacy, engine, hints)
 
