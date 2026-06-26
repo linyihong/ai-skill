@@ -365,7 +365,7 @@ type ValidationContext struct {
 | Slice | 目標 | 產物（載體） | 關閉 |
 |---|---|---|---|
 | **3.1 Adoption Slice**（install → validate） | 證外部 repo **可採用且不留狀態** | **invocation adapter**（git hook shim / CI wrapper / equivalent，**必須 replaceable；adapter contract 不得寫入 engine**）、install/remove 指南、validate evidence | reversible adoption 成立、rollback clean 成立；**不關 Q3** |
-| **3.2 Compatibility Slice**（upgrade once） | 證 invocation contract **穩定非碰巧** | binary 升版一次、schema 相容證據、compatibility notes | **Q3 close** |
+| **3.2 Compatibility Slice**（upgrade once） | 證 invocation contract **穩定非碰巧**（非 fixture compatibility 而是 consumer compatibility） | **single-axis** upgrade（**禁 binary+schema 同升**，保歸因）、supported→findings preserved（語意三層）、**unsupported→deterministic reject**、3-axis compatibility notes | **Q3 close**（見 §Phase 3.2 Preflight） |
 | **3.3 Consumer Equivalence** | 同 repo 同 tree：**manual ≡ hook ≡ CI**；且 **equivalence ≠ coupling** | findings equality、transport 差異歸因、**removal-independence proof：移除任一 consumer 不得要求 engine 或其他 consumer 改動**（驗 consumer equality ≠ interdependence，防加 CI 時把 exit/policy 搬回 engine） | **Q1 close** |
 | **3.4 Real Repo Acceptance** | 完整四段 **install → validate → upgrade → rollback** | acceptance evidence、rollback proof、residue check（git/runtime/hook） | **Phase 3 complete** |
 
@@ -384,7 +384,25 @@ type ValidationContext struct {
   - **validate BLOCK**：注入 `parent: ghost` 違規 → `[BLOCK] plan_tree.parent_reference ... "ghost" does not resolve`、`blocking=1` → commit **aborted**。
   - **monotonic removal**：移除 adapter 後同一違規 commit exit 0 → **只有 capability 消失、無新 validation error**（符合 Success Contract removal-monotonic）。
   - **no residue**：hook 消失、plan frontmatter 未被改寫（no schema residue）、`git status` clean。
-- **達成 3.1 關閉條件**：reversible adoption 成立、rollback clean 成立。**不關 Q3**（upgrade-once 屬 3.2）；此為 fixture，真實長期 repo + 四段完整在 3.4。
+- **3.1 = CLOSED**：reversible adoption 成立、rollback clean 成立、monotonic removal + no residue 成立。**Q3 OPEN**（upgrade-once 屬 3.2）。
+- **邊界（review 補）**：此證據是 **fixture compatibility**，**不是 consumer compatibility**——同一機器、同一 binary、throwaway repo。真實長期 consumer + 四段完整在 3.4。此差別直接影響 3.2 的歸因（見 3.2 Preflight）。
+
+#### Phase 3.2 — Preflight（定義 only，**先不升 binary**）
+> 第一次拿到「成功 adoption 證據」後最易把 compatibility 當單純升版測試。先拆軸，否則 3.2 測出綠燈卻不知哪層相容。**doc 內現存三個 version 必須分開**：binary version / `plan_schema` version / invocation-contract version（目前隱含）。
+
+**三軸（升級前先回答）**：
+- **Axis A — 什麼被升級？** binary / schema / both。
+- **Axis B — 誰持有版本宣告？** adapter / CLI / `plan_schema`。
+- **Axis C — 何時判不相容？** load / validate / invoke。
+
+**3.2 Success Contract（收緊）**：`upgrade once` **AND** `single compatibility axis changed` **AND** `same validation semantics`（三層：Structural/Behavioral/Policy）。
+- **禁止 binary + schema 同升**（會失去歸因）。
+
+**3.2 Acceptance（≥2 例，含拒絕）**：
+- **supported upgrade → findings preserved**（語意三層不變）。
+- **unsupported combination → deterministic reject**（不得退步——現行 `Normalize` 已集中 unsupported-version reject，須維持且為 deterministic）。
+
+- [ ] **（3.2 impl 未授權）**：先補完 3.2 Preflight 三軸 + reject timing 才評估升 binary。
 
 ## 完成條件
 - [ ] portable 分類表（含 `consumer_surface` 欄）+ `plan_profile`（capability）/ `plan_schema`（compat）邊界落地（Q2 resolved，由分類表推導，capability 與 execution 維度分離）
