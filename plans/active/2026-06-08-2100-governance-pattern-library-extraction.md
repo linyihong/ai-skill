@@ -1,7 +1,8 @@
 ---
 id: 2026-06-08-2100-governance-pattern-library-extraction
 plan_kind: main
-status: in-progress
+status: active
+execution_status: deferred
 owner: linyihong
 created: 2026-06-08
 priority: P2
@@ -10,10 +11,29 @@ required_for_completion: false
 
 # Governance Pattern Library Extraction
 
-**Status**: `in-progress`
+**Status**: `active (monitoring)` · **Execution**: `deferred — paused by design`
 Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-08
-**Priority**：**P2**（observation-stage；尚未通過 acceptance gate，不阻擋其他工作）
+**Priority**：**P2**（off critical path；不阻擋其他工作）
+
+> ## Execution state — paused by design (2026-06-25)
+>
+> This plan is **not technical debt and not stalled work**. T1 (extract) and T2
+> (attach) landed; the template is live and indexed; the draft is preserved.
+> What remains (T3) is **gated on new evidence, not new documents** — see T3's
+> dual gate. The plan stays in `plans/active/` deliberately, as an **observer**.
+>
+> **Do NOT, until the gate evidence arrives naturally:**
+> - resume Phase 2 authoring (the template is done — do not re-edit to "improve" it)
+> - wire the T3 lint (needs a first real consumption proving the omission path survives)
+> - archive the draft (needs the incubator emptied — both sibling families terminal)
+> - manufacture sibling-family samples to hit N≥5 (promotion is by *falsification*, not *repetition*)
+>
+> **Resume trigger**: a *naturally occurring* next governance subsystem (new plan /
+> new validator / new runtime wiring) that the author reaches for the template to
+> shape. When that happens, observe two things — (a) was the template used
+> unprompted, (b) was a justified Rule/Projection omission ever mis-read as a
+> defect — and only then evaluate opening T3 Gate A.
 
 ## Why this plan exists, not an immediate write-up
 
