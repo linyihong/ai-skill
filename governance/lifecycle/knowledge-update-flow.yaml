@@ -127,6 +127,8 @@ steps:
     read:
       - feedback/feedback-lessons.md
     writes:
+      # authority_of_location: route.feedback.history (resolve sink before write)
+      # example (derived · not authoritative — reflects current resolution of route.feedback.history):
       - feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md
     required_fields:
       - One-line Summary

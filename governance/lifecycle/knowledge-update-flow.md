@@ -312,7 +312,18 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 **來源**：[`feedback/feedback-lessons.md`](../../feedback/feedback-lessons.md) §模板、§檔名規則
 
-**位置**：`feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`
+**位置（operational projection）**
+
+**Authority** — sink owner = `route.feedback.history`
+
+**Resolution** — resolve sink from `route.feedback.history` before write
+
+**Example (derived · example only · not authoritative)** —
+`feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`
+
+This example reflects the current resolution of `route.feedback.history`.
+
+> 本 workflow 其餘出現的 sink 路徑，同屬 `route.feedback.history` 的 derived operational projection，非 authority。
 
 **必須包含**：
 - One-line Summary

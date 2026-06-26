@@ -470,9 +470,12 @@ contract.feedback.location:
 > 形式：不要寫「write to `feedback/history/<domain>`」；要寫「resolve sink from `route.feedback.history` →
 > example（derived）：`feedback/history/<domain>`」。**路徑存在，但只是執行投影，不是 owner。**
 
-> **B-1 狀態：READY\*** ——`*` = **owner convergence proven**（primary owners 已 converge + contract 落地）/
-> **workflow projection pending**（operational workflow 待套 projection rule；derived views 併 P0-B）。
-> READY\* **非 blocker**，**不**打回 DESIGNED。residue 關掉後才正式進 B-1 execution 收尾。
+> **B-1 狀態：READY（projection syntax validated）**（maintainer label）——owner convergence proven
+> （primary owners 已 converge + minimal contract 落地）+ operational projection 語法已驗證並套用於
+> `knowledge-update-flow.md`/`.yaml` Step 4（Authority/Resolution/Example(derived) 三段式 + file-scope
+> derived-marker；無 contract 提前引用、無 dual 表示、無 fallback/OR）。**剩餘僅 derived views**
+> （model-checklists / runtime-report / indexes / sqlite README）→ 歸 **P0-B regenerate**，不在 B-1 收尾內。
+> 不打回 DESIGNED。
 
 > **方法論教訓（留方法論，不升工具）**：*enumeration scope must derive from the success condition, not the
 > previous census.* 本 review 把「0A census seed」當「完整 claimant 集」，導致 verdict 早熟。未來任一
