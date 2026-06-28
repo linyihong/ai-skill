@@ -508,6 +508,54 @@ contract.feedback.location:
 **禁止**：
 - 禁止任何 hardcoded canonical path（違反 Canonical-Path Derivation Invariant）。
 
+### P0-B Preflight（status: AUTHORIZED FOR PREFLIGHT · read-only · 不寫 code）
+
+> **P0-B 成功條件（鐵律，勿丟）**：不是「runtime query returns lessons」，而是
+> **Path 2 capability truth converges to Path 1 — without changing Path 1.**
+> Path 1（reference-first 經 route.feedback.history 直讀 `feedback/history/`）**不得被 P0-B 觸碰**；
+> P0-B 只動 indexer（Path 2），讓 Path 2 的 lesson 集合收斂到 Path 1 的真實集合。
+
+**1. Blast radius**
+
+| surface | 受影響方式 |
+| --- | --- |
+| indexer `runtimeIndexFeedbackRecords`（runtime.go:1222） | **核心改點**。不只換 glob——它用 `parts[1]` 抽 skill（假設 `skills/<skill>/feedback_history/<cat>/`）。新路徑 `feedback/history/<domain>/<cat>/` 的 `parts[1]="history"` → **domain/category 解析必須一併改**，否則 atom 的 domain/tags 會錯。 |
+| tests `runtime_test.go:244,625,640` | seed 舊 `skills/demo/feedback_history/` → repoint 後**不再被索引**，相關斷言會破 → 屬 P0-C realignment（本 preflight 不改）。 |
+| generated views（model-checklists.md:73 / runtime-report.md:58 / indexes/README.md / sqlite/README.md） | index 內容改變後需 **regenerate**（derived，隨 refresh 重生）。 |
+| refresh validation `nativeRuntimeIndexValidation` | provenance check 由**紅轉綠**（收斂訊號）；FTS masking check 不變；counts/checksums check：新 atom 的 source_path 指向真實 lesson 檔，可驗。 |
+| runtime query（FTS，runtime.go:1377-1422） | Path 2 開始回傳 lesson（capability 恢復）。 |
+
+**2. Derive graph**
+
+```
+routing-registry.yaml  route.feedback.history.primary_source  (= feedback/history/README.md)
+        │  dir → "feedback/history/"
+        ▼
+feedbackCanonicalSink(repo)            ← resolver（已存在，P0-A；唯一 sink 解析點）
+        │
+        ▼
+runtimeIndexFeedbackRecords            ← repoint glob + 修 domain/category 解析（唯一改點）
+        │  emit type=feedback-pattern, source_path under sink
+        ▼
+atoms / fts
+        ├─► runtime query              （Path 2 consumer）
+        └─► nativeRuntimeIndexProvenanceCheck（health-check：red→green）
+```
+無新 owner：indexer 從 `feedbackCanonicalSink`（→ registry）取 sink，registry 仍唯一 `authority_of_location`。
+
+**3. Rollback unit**
+
+- **最小可逆單位 = `runtimeIndexFeedbackRecords` 一個 function 的 source 改動。** revert 它 → 回到 dead glob → provenance 自動轉紅。
+- generated index sqlite 是 **derived**（refresh 重建），不是獨立 rollback 單位——revert source + 重跑 refresh 即還原。
+- 獨立可撤回的失敗點：
+  1. **indexer repoint**（核心）：若解析錯/atom 錯 → 單獨 revert 此 function。
+  2. **test realignment（P0-C）**：獨立 commit，獨立 revert。
+  3. **generated-view regenerate**：idempotent，重建即可，無需手撤。
+- Path 1 不在任何 rollback 單位內（P0-B 不碰），故 rollback 不影響 reference-first discovery。
+
+> **Preflight 完成度**：本輸出回答了 blast radius / derive graph / rollback unit 三題。**未**含 implementation
+> plan、未寫 code、未碰 regenerate。正式進 EXECUTION 仍需 maintainer 另行授權。
+
 ---
 
 ## Phase 3 — Reality Alignment (P0-C)
