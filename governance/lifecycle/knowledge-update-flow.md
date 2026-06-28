@@ -323,7 +323,10 @@ Step 11: Commit / Push / Readback ─ 關閉 writeback transaction
 
 This example reflects the current resolution of `route.feedback.history`.
 
-> 本 workflow 其餘出現的 sink 路徑，同屬 `route.feedback.history` 的 derived operational projection，非 authority。
+> 本 workflow 其餘出現的 **`feedback/history/…` 路徑**（即 `route.feedback.history` 的 sink 投影）同屬
+> derived operational projection、非 authority。**此 marker 僅罩 feedback sink**——不含其他層路徑
+> （`intelligence/` `workflow/` `analysis/` `enforcement/` `runtime/` `.agent-goals/` `ai-tools/`
+> `failure-patterns/`、promotion target 等，各有自身 owner，不受本 marker 降權）。
 
 **必須包含**：
 - One-line Summary

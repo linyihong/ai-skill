@@ -470,12 +470,17 @@ contract.feedback.location:
 > 形式：不要寫「write to `feedback/history/<domain>`」；要寫「resolve sink from `route.feedback.history` →
 > example（derived）：`feedback/history/<domain>`」。**路徑存在，但只是執行投影，不是 owner。**
 
-> **B-1 狀態：READY（projection syntax validated）**（maintainer label）——owner convergence proven
-> （primary owners 已 converge + minimal contract 落地）+ operational projection 語法已驗證並套用於
+> **B-1 狀態：READY**（星已摘除，maintainer 拍板 2026-06-24）——owner convergence proven
+> （primary owners 已 converge + minimal contract 落地）+ operational projection 已套用於
 > `knowledge-update-flow.md`/`.yaml` Step 4（Authority/Resolution/Example(derived) 三段式 + file-scope
-> derived-marker；無 contract 提前引用、無 dual 表示、無 fallback/OR）。**剩餘僅 derived views**
-> （model-checklists / runtime-report / indexes / sqlite README）→ 歸 **P0-B regenerate**，不在 B-1 收尾內。
-> 不打回 DESIGNED。
+> derived-marker）。**file-scope marker scope = EXACT**：僅罩 `feedback/history/…`（route.feedback.history
+> 投影），其他層路徑（intelligence/ workflow/ analysis/ enforcement/ runtime/ .agent-goals/ ai-tools/
+> failure-patterns/ promotion target）顯式排除、各保有自身 owner（read-only acceptance 驗證通過）。
+> 無 contract 提前引用、無 dual 表示、無 fallback/OR。**剩餘僅 derived views** → 歸 **P0-B regenerate**，不在 B-1 內。
+>
+> **B-1 → READY ≠ P0-B 自動開始**：進 P0-B 前 preflight 一句——*indexer 能否只從 registry derive sink、不引入
+> 新 owner？* 初答：**能**（P0-B 沿用 P0-A 的 `feedbackCanonicalSink`，已讀 route.feedback.history.primary_source；
+> repoint glob 不新增 owner，registry 仍唯一 authority_of_location）。正式 preflight 待 P0-B 開啟時執行。
 
 > **方法論教訓（留方法論，不升工具）**：*enumeration scope must derive from the success condition, not the
 > previous census.* 本 review 把「0A census seed」當「完整 claimant 集」，導致 verdict 早熟。未來任一
