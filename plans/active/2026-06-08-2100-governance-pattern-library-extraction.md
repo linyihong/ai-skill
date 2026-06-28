@@ -16,24 +16,31 @@ Owner: framework maintainer (linyihong)
 **建立日期**：2026-06-08
 **Priority**：**P2**（off critical path；不阻擋其他工作）
 
-> ## Execution state — paused by design (2026-06-25)
+> ## Execution state — shadow-govern foundation defined; enforcement still deferred (2026-06-25)
 >
 > This plan is **not technical debt and not stalled work**. T1 (extract) and T2
 > (attach) landed; the template is live and indexed; the draft is preserved.
-> What remains (T3) is **gated on new evidence, not new documents** — see T3's
-> dual gate. The plan stays in `plans/active/` deliberately, as an **observer**.
+> **T3A (Shadow Govern) is now opened**: its R1/R2/R3 advisory contract and the
+> typed `governance_exemptions` schema are defined (the foundation that stops the
+> lint degrading into prose review). What stays deferred is **enforcement and
+> archival (T3B)** — gated on real evidence, not new documents.
 >
-> **Do NOT, until the gate evidence arrives naturally:**
-> - resume Phase 2 authoring (the template is done — do not re-edit to "improve" it)
-> - wire the T3 lint (needs a first real consumption proving the omission path survives)
-> - archive the draft (needs the incubator emptied — both sibling families terminal)
+> **Permitted now (T3A, advisory only):** define/refine the lint contract and the
+> typed exemption schema; later, run the lint **report-only** to *collect*
+> hit-rate / false-positive / justification-quality evidence.
+>
+> **Do NOT:**
+> - re-author the template itself to "improve" it (it is done)
+> - enforce the lint — no CI fail, no merge block, no commit/compile gate (that is T3B, behind Gate A)
+> - implement the lint before the **exemption declaration site** is decided AND there is a real subsystem to lint against (otherwise the false-positive log is synthetic-only) — see T3A open decision
+> - archive the draft (needs the incubator emptied — both sibling families terminal; T3B Gate B)
 > - manufacture sibling-family samples to hit N≥5 (promotion is by *falsification*, not *repetition*)
 >
-> **Resume trigger**: a *naturally occurring* next governance subsystem (new plan /
-> new validator / new runtime wiring) that the author reaches for the template to
-> shape. When that happens, observe two things — (a) was the template used
-> unprompted, (b) was a justified Rule/Projection omission ever mis-read as a
-> defect — and only then evaluate opening T3 Gate A.
+> **Resume trigger for T3B Gate A**: a *naturally occurring* next governance
+> subsystem (new plan / new validator / new runtime wiring) the author reaches
+> for the template to shape. Observe (a) was the template used unprompted, (b)
+> did the shadow lint mis-flag any typed Rule/Projection exemption — and only
+> then evaluate flipping the lint to enforcing.
 
 ## Why this plan exists, not an immediate write-up
 
@@ -136,10 +143,17 @@ risk and different reversibility:
   a consumable asset. Draft is preserved.
 - **T2 — Attach** (wiring): README index + failure-pattern cross-links so the
   template begins to be referenced. No lint introduced.
-- **T3 — Govern** (DEFERRED): R1/R2/R3 self-governance lint + archive the draft.
-  These are two actions on **two independent gates** (see T3 section) — the lint
-  is gated on template stabilization; the archive is gated on the draft being
-  *emptied*, not on the template landing.
+- **T3 — Govern**: split (2026-06-25, reviewer) into two sub-transactions on
+  different risk profiles:
+  - **T3A — Shadow Govern** (MAY start now): advisory / report-only lint that
+    *measures* the template instead of enforcing it. Its whole purpose is to
+    generate the evidence Gate A needs (hit-rate, false-positive, justification
+    quality). Does **not** fail CI, block merge, or archive anything.
+  - **T3B — Promote Govern** (DEFERRED): turn the shadow lint into enforcement
+    (CI fail / merge block) **and** archive the draft. Two actions on two
+    independent gates — enforcement is gated on Gate A (template proven
+    governable); archive is gated on Gate B (Gate A **and** the draft emptied of
+    its un-promoted sibling families).
 
 ### T1 — Extract (landed 2026-06-25)
 
@@ -158,28 +172,67 @@ risk and different reversibility:
   - Step 1 Observation → failure-pattern library as the mature Observation form
 - [x] Update `governance/lifecycle/README.md` to index this template
 
-### T3 — Govern (DEFERRED — two actions, two independent gates)
+### T3A — Shadow Govern (advisory; MAY start now)
 
-> **Correction (2026-06-25, reviewer)**: the draft is **not** a template staging
-> area — it is *simultaneously* an **incubation surface**. It currently carries
-> three things, only one of which is promoted:
-> 1. promoted family — **Governance Pattern** (now lives in `governance-pattern-template.md`)
-> 2. incubating sibling — **Reference Integrity** (N=5, gate NOT met: no non-fitting sample)
-> 3. incubating sibling — **Failure Authority** (N=4, gate NOT met: below N≥5)
->
-> Therefore the two T3 actions cannot share one gate. Binding `archive` to the
-> template gate alone would seal the two un-promoted observations away as if they
-> were finished. `archive` is gated on the draft being **emptied**, not on the
-> template stabilizing.
+> **Decision (2026-06-25, reviewer)**: T3 may *begin*, but as **shadow govern**,
+> not enforcement. The lint runs advisory / report-only — it measures the
+> template's governability instead of imposing it. This is what generates the
+> Gate A evidence (the deferral was never "wait idly"; it was "wait for
+> evidence" — shadow mode *is* the evidence-collection mechanism).
 
-**Action A — wire R1/R2/R3 self-governance lint** (new mechanical rule_class must
-declare each invariant-core step OR record a predicate-justified omission for
-Rule/Projection).
+**The real unknown is justification quality, not the template.** A free-text
+exemption reason ("no projection because not needed") degrades the lint into
+text review. So the **foundation of T3A is typing the exemptions**, not writing
+the lint. Declare exemptions structurally:
 
-- [ ] **Gate A — Template governance gate** (all three):
+```yaml
+# proposed schema — declared by each governance subsystem that omits a conditional step
+governance_exemptions:
+  - step: projection
+    reason: direct-authoritative-consumption   # enum, not prose
+  - step: rule
+    reason: pure-structural-invariant          # enum, not prose
+```
+
+Allowed `reason` enum is closed and maps 1:1 to the template's Exit Criteria
+predicates:
+
+| step | allowed reason (enum) | maps to Exit Criterion |
+|---|---|---|
+| `projection` | `direct-authoritative-consumption` | Projection absent → executor reads the authoritative source directly |
+| `rule` | `pure-structural-invariant` | Rule absent → pure structural (in)equality, no human-authored relation |
+
+An omission with **no** `governance_exemptions` entry, or with a `reason` outside
+the enum, is what the lint flags — *not* the omission itself. This keeps the
+lint checking **structure** (is the omission declared with a valid typed
+reason?), never adjudicating prose.
+
+**T3A deliverables:**
+
+- [x] Define the R1/R2/R3 advisory check contract (this section):
+  - **R1** — declares all invariant-core steps (Observation / Registry / Executor / Validation) present.
+  - **R2** — if Rule omitted → a `governance_exemptions` entry `step: rule, reason: pure-structural-invariant` exists.
+  - **R3** — if Projection omitted → a `governance_exemptions` entry `step: projection, reason: direct-authoritative-consumption` exists.
+- [x] Specify the typed `governance_exemptions` schema + closed `reason` enum (above).
+- [ ] **Open decision — exemption declaration site** (blocks lint implementation): where does `governance_exemptions` live? Candidates: (a) the subsystem's `enforcement-registry.yaml` rule_class entry, (b) plan frontmatter, (c) a field on the template-conformance record. Must be decided before the lint can parse it; it is the difference between linting a registry surface vs scanning prose. **Not** to be guessed.
+- [ ] Implement the advisory lint (report-only) — **deferred within T3A** until either (i) the declaration site is decided AND a real subsystem exists to lint against, or (ii) explicit go-ahead to dry-run against the template's own examples. Cost is **not** low (declaration-site parse + runtime-compile advisory wiring + report artifacts), and with no live subsystem yet the false-positive log would be synthetic-only — low evidentiary value.
+- [ ] Outputs (once implemented): `lint_report` (per-subsystem R1/R2/R3 status) + `false_positive_log` (omissions correctly exempted that an enforcing lint *would* have flagged).
+
+**T3A hard constraints** (what makes it "shadow", not enforcement):
+
+- Does **not** fail CI · does **not** block merge · does **not** archive the draft · does **not** enable any commit-msg/compile gate.
+
+### T3B — Promote Govern (DEFERRED — enforcement + archive)
+
+> Promotion from advisory to enforcing, **and** draft archival. Two actions on
+> two independent gates; neither runs until its gate holds.
+
+**Action A — enforce the lint** (flip R1/R2/R3 from advisory to CI/compile-blocking).
+
+- [ ] **Gate A — Template governance gate** (all three, fed by T3A's shadow data):
   - [ ] ≥1 new governance subsystem has actually *used* the template
-  - [ ] ≥1 lint pass has succeeded
-  - [ ] that lint did **not** mis-flag a justified omission (Rule-optional / Projection-optional)
+  - [ ] ≥1 shadow lint pass has succeeded on that real case
+  - [ ] `false_positive_log` shows **0** justified omissions (typed Rule/Projection exemptions) mis-flagged
 - Rationale: do not let the lint constrain future subsystems until its exemption
   path is proven against one real case; otherwise it regresses the template into
   "shape as law" — the exact failure the Exit Criteria were written to prevent.
@@ -187,16 +240,16 @@ Rule/Projection).
 **Action B — archive `governance-pattern-library-draft.md`.**
 
 - [ ] **Gate B — dual gate (Gate A AND Incubator closure gate):**
-  - [ ] Gate A satisfied (template stabilized), **AND**
+  - [ ] Gate A satisfied (template proven governable), **AND**
   - [ ] **Incubator closure gate** — every remaining family in the draft has reached a terminal state:
     - [ ] Reference Integrity → one of: promotion (relocate to `governance-pattern-library/`) · rejection (record falsification + close) · split (own draft)
     - [ ] Failure Authority → same three-way terminal choice
-- Only when **`template stabilized` AND `draft emptied`** may the draft be
+- Only when **`template proven governable` AND `draft emptied`** may the draft be
   archived. Until both hold, the draft stays live so neither the falsification
   context nor the un-promoted observations are sealed away.
 
-> Until Gate A holds the draft stays live and no lint is wired. Until Gate B
-> holds the draft is not archived even if Gate A already passed.
+> Until Gate A holds the lint stays advisory (T3A). Until Gate B holds the draft
+> is not archived even if Gate A already passed.
 
 ## Evidence Rule
 
