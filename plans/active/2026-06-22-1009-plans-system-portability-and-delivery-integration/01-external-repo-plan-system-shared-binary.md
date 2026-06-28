@@ -366,7 +366,7 @@ type ValidationContext struct {
 |---|---|---|---|
 | **3.1 Adoption Slice**（install → validate） | 證外部 repo **可採用且不留狀態** | **invocation adapter**（git hook shim / CI wrapper / equivalent，**必須 replaceable；adapter contract 不得寫入 engine**）、install/remove 指南、validate evidence | reversible adoption 成立、rollback clean 成立；**不關 Q3** |
 | **3.2 Compatibility Slice**（upgrade once）✅ DONE | 證 invocation contract **穩定非碰巧**（consumer compatibility，非 fixture） | **1 axis × 1 subject** upgrade（禁混升）、supported→preserved（三層）、unsupported→**deterministic + diagnosable** reject（same stage+reason class）、**no-change baseline**（negative proof）、3-axis+subject notes | **Q3 ✅ CLOSED**（見 §Phase 3.2 Preflight） |
-| **3.3 Consumer Equivalence** | 同 repo 同 tree：**manual ≡ hook ≡ CI**；且 **equivalence ≠ coupling** | findings equality、transport 差異歸因、**removal-independence proof：移除任一 consumer 不得要求 engine 或其他 consumer 改動**（驗 consumer equality ≠ interdependence，防加 CI 時把 exit/policy 搬回 engine） | **Q1 close** |
+| **3.3 Consumer Equivalence**（見 §Phase 3.3 Preflight matrix）| 同 repo 同 tree：**manual ≡ hook ≡ CI**（比 observation boundary 非 execution trace）；**equivalence ≠ coupling ≠ execution identity** | 依 Equivalence Matrix 驗（RuleID/Blocking/opt-out/discovery-scope MUST equal；exit/mode/input-snapshot MAY differ）、**removal-independence proof**、**≥1 consumer replaced without engine change** | **Q1 close（收緊，見 Q1 row）** |
 | **3.4 Real Repo Acceptance** | 完整四段 **install → validate → upgrade → rollback** | acceptance evidence、rollback proof、residue check（git/runtime/hook） | **Phase 3 complete** |
 
 **原 checklist 收編對照**：shim design → 3.1；CI wrapper → 3.1 / 3.3；cross-version → 3.2；rollback proof → 3.4；real repo acceptance → 3.4。真實外部 repo 維護中繼資料（`repo_owner` / `repo_type` / `removal_policy`，不寫 repo 名）掛 3.4。
@@ -389,6 +389,26 @@ type ValidationContext struct {
 
 #### Phase 3.2 — Compatibility ✅ DONE（impl landed 2026-06-25，commit `2c26f6e`；Q3 CLOSED）
 > **impl evidence**：compat layer 改 `supportedSchemaVersions` set（可擴充，{1,2} shape-identical 證 extensible 不破 findings）+ `CompatError{Stage,ReasonClass}` typed reject；**端到端 wire**：`PlanFrontmatter.SchemaVersion`（parser 已 strip quote → Q3 引號需求滿足）→ `normalizedPlansFromRoot` 帶進 `RawPlan.SchemaVersion`，unsupported 轉成 **blocking `compat.unsupported_schema_version` finding**（非默默降級）。測試：supported 1→2 preserved、unsupported deterministic+diagnosable reject、no-change baseline、CLI end-to-end（v2 clean / v99 exit 30 + blocking）。subject=artifact、axis=schema、單軸單 subject。
+
+#### Phase 3.3 — Preflight 🟡 READY（definition only，**impl NOT YET**）
+> **核心澄清（review）**：Consumer Equivalence **≠ Consumer Execution Identity**。equivalence 比的是 **observation boundary（findings）**，**不是 execution trace**。否則會誤收 hook(staged set+commit metadata) / CLI(worktree snapshot) / CI(checkout snapshot) 因輸入不同而出 finding 差異，最後有人把 context 搬回 engine。
+
+**Consumer Equivalence Matrix（definition only）**：
+| Dimension | Required? |
+|---|---|
+| RuleID set | **MUST equal** |
+| Blocking | **MUST equal** |
+| Opt-out effect | **MUST equal** |
+| Discovery scope | **MUST equal**（都只看 `plans/active\|archived`） |
+| Exit semantics | MAY differ |
+| ExecutionMode | MAY differ |
+| Input snapshot | MAY differ（hook=staged / CLI=worktree / CI=checkout） |
+| Message text | IGNORE |
+| Timing | IGNORE |
+
+最重要兩條：**Discovery scope MUST equal**（同一發現面）+ **Input snapshot MAY differ**（輸入快照可不同，因為比的是 observation 不是 trace）。
+
+**Reject 條件**：`若 equivalence 需要把 consumer-specific context 搬進 engine → FAIL 3.3`（守 engine=capability / consumer=transport，3.3 最易在此倒退）。
 
 > 第一次拿到「成功 adoption 證據」後最易把 compatibility 當單純升版測試。先拆軸，否則 3.2 測出綠燈卻不知哪層相容。**doc 內現存三個 version 必須分開**：binary version / `plan_schema` version / invocation-contract version（目前隱含）。
 
