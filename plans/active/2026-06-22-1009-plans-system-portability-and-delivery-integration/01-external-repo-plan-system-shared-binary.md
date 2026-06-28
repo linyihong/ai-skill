@@ -410,6 +410,27 @@ type ValidationContext struct {
 
 **Reject 條件**：`若 equivalence 需要把 consumer-specific context 搬進 engine → FAIL 3.3`（守 engine=capability / consumer=transport，3.3 最易在此倒退）。
 
+**Preflight ✅ APPROVED（2026-06-25）→ impl 可開始（3.3a 起）。** 再補兩條 acceptance（impl 遵守）：
+
+- **E.1 — Canonical Observation Record (COR)**：三 consumer 的比較資料先收斂成同一 record 再比，避免 transport 資訊混進 equivalence：
+  ```
+  ObservationRecord { Findings[](RuleID+Blocking), OptOutEffect, DiscoveryScope }
+  // 明確排除：ExitCode / ExecutionMode / SnapshotOrigin / Timing / Message
+  ```
+- **E.2 — Replacement must be directional**（收緊 replaceability）：`replace consumer → engine unchanged → remaining consumers unchanged → observation preserved`。**不接受** `replace consumer → patch engine → patch other consumer → pass`（那是整體重編，非 adapter replaceable）。
+
+**3.3 子順序（不一次三向）**：
+- **3.3a** manual ↔ hook（已有 2.3/2.4 大量前期證據）。
+- **3.3b** hook ↔ CI（CI 是新 transport）。
+- **3.3c** replacement proof（最後驗，避免把 CI 接入問題誤歸因 engine）。
+- **Q1 維持 OPEN 到 3.3c 結束才關。**
+
+##### 3.3a — manual ↔ hook ✅（2026-06-25）
+- **COR 落地**：`ObservationRecord{ Findings(RuleID+Blocking), OptOutEffect, DiscoveryScope }`（`observation.go`），**結構上無 transport 欄**（reflection test `TestObservationRecord_ExcludesTransport` 鎖 exit/mode/snapshot/timing/message）。
+- **manual(engine)↔hook(legacy) 等價**：三情境 COR `reflect.DeepEqual` 相等——valid（皆空）、violation（皆 `{parent_reference:true}`）、opt-out（皆 Findings 空 + `OptOutEffect{parent_reference}`）。engine policy-free：consumer 自行從 transport 解析 opt-out 再套用。
+- DiscoveryScope 兩者同為 `plans/active|archived`（by construction equal）。
+- **未做**：3.3b（hook↔CI）、3.3c（directional replacement proof）。Q1 仍 OPEN。
+
 > 第一次拿到「成功 adoption 證據」後最易把 compatibility 當單純升版測試。先拆軸，否則 3.2 測出綠燈卻不知哪層相容。**doc 內現存三個 version 必須分開**：binary version / `plan_schema` version / invocation-contract version（目前隱含）。
 
 **三軸（升級前先回答）**：
