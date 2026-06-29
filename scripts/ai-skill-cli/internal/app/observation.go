@@ -34,6 +34,36 @@ func planTreeDiscoveryScope() []string {
 	return []string{"plans/active", "plans/archived"}
 }
 
+// ruleApplicability reports, per core RuleID, whether the rule had any input to
+// evaluate over the model set. Phase 3.3c ONLY (R.3): it distinguishes "rule
+// applicable and passed" from "rule silently inapplicable" — two states that both
+// yield zero findings but are NOT observation-preserving. Deliberately NOT part
+// of the COR (does not pollute the 3.3a/3.3b equivalence surface).
+func ruleApplicability(models []planvalidate.NormalizedPlanModel) map[string]bool {
+	ap := map[string]bool{
+		"plan_tree.frontmatter":      false,
+		"plan_tree.unique_id":        false,
+		"plan_tree.parent_reference": false,
+		"plan_tree.archive_order":    false,
+	}
+	for _, m := range models {
+		if m.PlanKind == "sub" {
+			ap["plan_tree.frontmatter"] = true
+		}
+		if m.ID != "" {
+			ap["plan_tree.unique_id"] = true
+		}
+		if m.Parent != "" {
+			ap["plan_tree.parent_reference"] = true
+		}
+		isMain := m.PlanKind == "main" || (m.PlanKind == "" && m.Parent == "")
+		if isMain && m.Location == "archived" {
+			ap["plan_tree.archive_order"] = true
+		}
+	}
+	return ap
+}
+
 // legacyObservation builds the COR for the commit-msg hook consumer (the legacy
 // plan-tree validators). Opt-out is resolved from the commit message (the hook's
 // transport); a suppressed validator records OptOutEffect, not a Finding.
