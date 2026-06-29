@@ -42,6 +42,10 @@
 
 **檢視**：`ai-skill plans tree`（`--state active|archived|all`，`--format text|json|markdown`）純讀 frontmatter 動態建樹，顯示 status / 進度 / blocker。
 
+**扁平多檔 → 資料夾（情境 A）**：若**同一 plan** 在 `plans/active/` 頂層出現 `<slug>.md` 與 `<slug>-<companion>.md`（例如 dogfood evidence），應收斂為 `<slug>/_plan.md` + `NN-<companion>.md`（companion 不必是 sub-plan）。`validatePlanTreeFolderConvention` 對 staged cluster 發 warning；機械遷移：`ai-skill plans folderize --cluster <slug> --dry-run` / `--apply`。範例：[`active/2026-06-29-1430-preparatory-refactoring-workflow/`](active/2026-06-29-1430-preparatory-refactoring-workflow/_plan.md)。
+
+**不是扁平多檔 cluster（情境 C）**：兩個**不同 `id`**、不同 timestamp-slug 的 main plan（例如 frozen diagnosis + implementation completion），即使主題相關也**維持各自頂層檔**，用 `baseline_ref` 或 prose 連結即可——**不要** folderize。反例：[`2026-06-23-1500-adr-004-migration-drift-diagnosis.md`](active/2026-06-23-1500-adr-004-migration-drift-diagnosis.md) 與 [`2026-06-24-1100-adr-004-migration-completion.md`](active/2026-06-24-1100-adr-004-migration-completion.md)。完整決策表見 [`governance/lifecycle/plan-tree-hierarchy.md`](../governance/lifecycle/plan-tree-hierarchy.md) §計畫切檔決策。
+
 ## Plan 模板必填章節
 
 任何涉及架構變更、新流程、跨層改動的 plan 必須包含下列章節（簡單修補類 plan 可省略 Decision Rationale）：

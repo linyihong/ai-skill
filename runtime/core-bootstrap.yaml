@@ -445,6 +445,21 @@ per_commit_obligations:
     severity: warning
     opt_out_marker: "[skip-plan-tree-folder-convention]"
     contract_source: plans/active/2026-06-02-1200-plan-tree-hierarchy-governance/02-validator-implementation.md (Phase 2)
+    rationale: |
+      UI convention advisories (non-blocking): in-folder `_plan.md` / `NN-`
+      prefix / depth limits; plus flat multi-file cluster detection at
+      plans/{active,archived}/ top level.
+
+      Flat cluster (folderize candidate): same timestamp-slug `<slug>.md` plus
+      `<slug>-<companion>.md` for ONE plan (e.g. dogfood evidence). Migrate
+      with `ai-skill plans folderize --cluster <slug> --dry-run|--apply` to
+      `<slug>/_plan.md` + `NN-<companion>.md`. Companions need not be sub-plans.
+
+      NOT a flat cluster: two separate main plans with different ids/slugs
+      (e.g. frozen diagnosis + completion plan linked via baseline_ref) —
+      keep as sibling top-level files; use plan tree (parent/sub) only when
+      independent acceptance requires it. Decision table:
+      governance/lifecycle/plan-tree-hierarchy.md §計畫切檔決策.
   - id: obligation.commit.runtime_index_freshness
     fires: every_commit_staging_markdown_other_than_runtime_index_only
     validator: validateRuntimeIndexFreshness

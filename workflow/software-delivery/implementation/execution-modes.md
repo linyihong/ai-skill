@@ -15,7 +15,7 @@
 | `dependencies` | `sd-intake`（change_kind / blocked_by_structure）、`sd-test-strategy`（intent → validation）、`sd-surgical-caveats`（feature intent scope）、`sd-validation`（完成證據） |
 | `dependency_budget` | default `max_depth:2` / `max_runtime_dependencies:4` |
 
-Plan source：[`plans/active/2026-06-29-1430-preparatory-refactoring-workflow.md`](../../../plans/active/2026-06-29-1430-preparatory-refactoring-workflow.md) Phase 1。
+Plan source：[`plans/active/2026-06-29-1430-preparatory-refactoring-workflow/_plan.md`](../../../plans/active/2026-06-29-1430-preparatory-refactoring-workflow/_plan.md) Phase 1。
 
 ## 1. Execution modes（非新 lifecycle stage）
 

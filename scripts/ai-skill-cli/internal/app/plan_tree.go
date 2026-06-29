@@ -524,6 +524,7 @@ func validatePlanTreeFolderConvention(text string, staged []string, root string)
 			}
 		}
 	}
+	warnings = append(warnings, flatClusterWarningsForStaged(staged, root)...)
 	if len(warnings) == 0 {
 		return ""
 	}

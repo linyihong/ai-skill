@@ -19,4 +19,4 @@ change_kind: feature + blocked_by_structure?
   no  → execution_mode: direct_change（預設）
 ```
 
-Plan：[`plans/active/2026-06-29-1430-preparatory-refactoring-workflow.md`](../../../plans/active/2026-06-29-1430-preparatory-refactoring-workflow.md)
+Plan：[`plans/active/2026-06-29-1430-preparatory-refactoring-workflow/_plan.md`](../../../plans/active/2026-06-29-1430-preparatory-refactoring-workflow/_plan.md)

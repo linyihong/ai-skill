@@ -63,10 +63,22 @@ Spike：等同 sub-plan，建議 `required_for_completion: false`。
 | `validatePlanTreeArchiveOrder` | block | 主計畫 archive 時，所有 `parent == <main>` 且 `required_for_completion: true` 的 sub-plan 必須 `status: completed`。**只看 status，不看 location** |
 | `validatePlanTreeParentReference` | block | sub-plan `parent` 指向的 id 必須存在於 active + archived 全集；防 orphan node |
 | `validatePlanTreeUniqueID` | block | 全 repo plan `id` 必須唯一；防 parent pointer 指錯 |
-| `validatePlanTreeFolderConvention` | warning | folder 缺 `_plan.md` / 檔名不符 `NN-` 前綴 / 深度 ≥ 3 |
+| `validatePlanTreeFolderConvention` | warning | folder 缺 `_plan.md` / 檔名不符 `NN-` 前綴 / 深度 ≥ 3 / **頂層 flat multi-file cluster**（同 `<slug>` 前綴多檔） |
 
 Sub-plan 之間的依賴（`depends_on` → DAG）目前 **不在治理範圍**；
 promotion gate：≥ 3 個自然發生的 C-depends-on-A 案例後再評估。
+
+## 計畫切檔決策（同一主題，三種合法形狀）
+
+Agent 或作者在 plan 變長、要拆檔時，先判斷屬於哪一類——**不要**把「相關的兩個 main plan」誤當成「同一 plan 的多檔 companion」。
+
+| 情境 | 判斷訊號 | 儲存形狀 | 範例 |
+| --- | --- | --- | --- |
+| **A. 同一 plan 的附檔** | 檔名為 `<slug>.md` + `<slug>-<companion>.md`；同一 `id` 語意；companion 無獨立 acceptance | `<slug>/_plan.md` + `NN-<companion>.md` | [`2026-06-29-1430-preparatory-refactoring-workflow/`](../plans/active/2026-06-29-1430-preparatory-refactoring-workflow/_plan.md)（dogfood evidence） |
+| **B. 獨立 acceptance 的支線** | 需獨立 sign-off / archive / multi-phase gate；有獨立 `id` | plan tree：`parent` + `plan_kind: sub`；可選 folder + `NN-` | [`2026-06-22-1009-plans-system-portability-and-delivery-integration/`](../plans/active/2026-06-22-1009-plans-system-portability-and-delivery-integration/_plan.md) |
+| **C. 序貫的兩個 main plan** | 不同 `id`、不同 timestamp-slug；後者引用前者 baseline，但各自是 main | **維持**兩個頂層 `.md`；用 frontmatter / prose 連結，**不** folderize | diagnosis [`2026-06-23-1500-adr-004-migration-drift-diagnosis`](../plans/active/2026-06-23-1500-adr-004-migration-drift-diagnosis.md) → completion [`2026-06-24-1100-adr-004-migration-completion`](../plans/active/2026-06-24-1100-adr-004-migration-completion.md)（`baseline_ref`） |
+
+**機械偵測**：`validatePlanTreeFolderConvention` 只對 **A** 發 flat-cluster warning；`ai-skill plans folderize --dry-run` 預覽遷移。**B** 走 sub-plan frontmatter；**C** 不觸發 folderize（`plans folderize --dry-run` 全 repo 掃描為空）。
 
 ## 與其他 governance rule 的關係
 

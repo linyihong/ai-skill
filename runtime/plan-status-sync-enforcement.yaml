@@ -41,6 +41,10 @@ trigger:
     - regex: 'phase\s+\d+(?:\.\d+)?(?:[\.-][A-Za-z]+)?'
 
   plan_path_regex: 'plans/active/[^\s)"\]]+\.md'
+  # Matches top-level plans and folder layouts (_plan.md, NN-companion.md).
+  # When splitting ONE plan into multiple files, use folder layout per
+  # governance/lifecycle/plan-tree-hierarchy.md §計畫切檔決策 (folderize).
+  # Separate main plans with different ids stay as sibling top-level files.
 
   composition: |
     Trigger fires when:

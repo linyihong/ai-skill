@@ -100,7 +100,7 @@ func runPlansValidate(args []string, stdout io.Writer, stderr io.Writer) int {
 
 func runPlans(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		_, _ = fmt.Fprintln(stderr, "usage: ai-skill plans <tree|validate> [flags]")
+		_, _ = fmt.Fprintln(stderr, "usage: ai-skill plans <tree|validate|folderize> [flags]")
 		return ExitInvalidUsage
 	}
 	switch args[0] {
@@ -108,12 +108,15 @@ func runPlans(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runPlansTree(args[1:], stdout, stderr)
 	case "validate":
 		return runPlansValidate(args[1:], stdout, stderr)
+	case "folderize":
+		return runPlansFolderize(args[1:], stdout, stderr)
 	case "help", "-h", "--help":
-		_, _ = fmt.Fprintln(stdout, "usage: ai-skill plans <tree|validate> [flags]")
+		_, _ = fmt.Fprintln(stdout, "usage: ai-skill plans <tree|validate|folderize> [flags]")
 		_, _ = fmt.Fprintln(stdout, "")
 		_, _ = fmt.Fprintln(stdout, "subcommands:")
 		_, _ = fmt.Fprintln(stdout, "  tree      render plan tree built from frontmatter parent pointers")
 		_, _ = fmt.Fprintln(stdout, "  validate  run the plan_profile.core engine over <root>/plans (thin consumer)")
+		_, _ = fmt.Fprintln(stdout, "  folderize convert flat multi-file plan clusters into folder layout (_plan.md + NN-<suffix>.md)")
 		return ExitSuccess
 	default:
 		_, _ = fmt.Fprintf(stderr, "unknown plans subcommand: %s\n", args[0])
