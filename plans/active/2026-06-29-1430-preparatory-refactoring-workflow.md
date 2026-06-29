@@ -244,7 +244,7 @@ force_exit_when:
 
 ### Why Not an ADR Yet
 
-- Change Intent Lock schema 未 dogfood
+- Change Intent Lock schema 未 dogfood → **dogfood 2026-06-29**（見 dogfood-evidence；advisory illegal transition）
 - `change_kind` × `execution_mode` 雙軸與 change-brief 對齊方式未實測
 - Stop condition 是否需 advisory validator 未驗證
 
@@ -410,13 +410,15 @@ compatibility:
 
 ## Phase 4 — Dogfood & optional scenario
 
-- [ ] **必填（validator 前置 gate）**：≥1 真實任務走 `change_kind: feature` + `execution_mode: preparatory_refactoring`
-- [ ] **有效證據路徑（任一即可）**：
+- [x] **必填（validator 前置 gate）**：≥1 真實任務走 `change_kind: feature` + `execution_mode: preparatory_refactoring`
+- [x] **有效證據路徑（任一即可）**：
   - **Happy path**：structure → checkpoint → stop (`exit_when`) → feature
   - **Stop 設計驗證 path**：structure → structure → `force_exit_when` → 縮 scope / direct_change — **同樣算好證據**（代表 stop 抓到現場）
-- [ ] 記錄：change_kind、execution_mode、intent 序列、transition 理由（含 illegal transition 有無）、checkpoint、exit_when / force_exit_when 觸發理由
-- [ ] Dogfood 通過後才開 maturity ladder（優先 **illegal transition** validator，非「有沒有 structure」）— 本 phase **不** runtime 化
+- [x] 記錄：change_kind、execution_mode、intent 序列、transition 理由（含 illegal transition 有無）、checkpoint、exit_when / force_exit_when 觸發理由
+- [x] Dogfood 通過後才開 maturity ladder（優先 **illegal transition** validator，非「有沒有 structure」）— 本 phase **不** runtime 化
 - [ ] （可選）`validation/scenarios/software-delivery/implementation-mode-preparatory-refactoring.yaml`
+
+**Evidence**: [`2026-06-29-1430-preparatory-refactoring-workflow-dogfood-evidence.md`](2026-06-29-1430-preparatory-refactoring-workflow-dogfood-evidence.md)（force_exit path；advisory `DetectIllegalIntentTransitions` in planvalidate）
 
 ---
 
@@ -436,7 +438,7 @@ compatibility:
 - [ ] Stop condition（exit_when + force_exit_when）+ avoid + Intent Transition Rule 在正文與 review checklist
 - [ ] Compatibility default 在 implementation-plan template 或正文
 - [ ] Observable Equivalence Checkpoint 定義（不綁 no-op）
-- [ ] ≥1 dogfood evidence
+- [x] ≥1 dogfood evidence
 - [ ] doc-only 宣告；無 runtime projection 本輪
 
 ---
