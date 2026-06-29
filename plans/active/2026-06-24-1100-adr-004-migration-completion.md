@@ -574,17 +574,47 @@ atoms / fts
 
 ## Phase 4 — Contract Extraction
 
-把 baseline 的 Contract Ownership 鏈從文字落為可執行 artifact。
+把 baseline 的 Contract Ownership 鏈從文字落為可執行 artifact。**不整包開**：先 4A（feedback.location only），
+4B 候選只觀察不抽。
+
+### Phase 4A — Extraction Preflight（read-only · 2026-06-24）
+
+> 目的：**證明 feedback.location 是第一個、不是特例**（不擴 scope、不抽）。問題一句：除了 feedback.location，
+> repo 還有哪些「single owner + multi-derive」已成立但**未命名成 contract**？
+
+候選盤點（**OBSERVED，不抽**）：
+
+| 候選 family | 結構 | owner | derivers | 狀態 |
+| --- | --- | --- | --- | --- |
+| **P1 route-ownership** | registry route primary_source → derived surfaces | routing-registry `route.*` | `runtime-report.md` / `model-checklists.md`（generated；runtime.go:2542/2634）+ runtime index + runtime query | **已機械化（via 生成），未命名**。instances：`route.feedback.history`（=feedback.location，即將命名）、`route.feedback.promotion-pipeline`（未命名） |
+| **P2 obligation-enum** | single concept, multi-declared | （概念）obligation contract | `runtime/core-bootstrap.yaml` + `hooks.go`（Feedback Report enums 各宣告一份） | **DRIFT shape（multi-declare，未 single-owner）**——與 feedback_history 同型，未收斂 |
+| P3 layer taxonomy | path→layer 映射 | `runtimeLayerFor`（單一 Go function） | indexer / route atoms | 已 single-owner，可命名但低優先 |
+
+> **Verdict**：feedback.location **不是特例**——它是 **P1 route-ownership 結構的第一個「被命名」instance**；該結構
+> **早已存在且部分機械化**（generated views 本就 derive registry），只是沒被抽成 contract。P1 ≥2 instances
+> （feedback.history / promotion）、P2 是**同型 drift 的獨立 family（未收斂）** → 證明 feedback.location 是
+> **first-of-pattern**，extraction = 「為已成立的收斂正式命名」，非孤例。
+> **約束守住**：候選僅 OBSERVED，**不抽**（P2/P3 留 4B）；不搬 registry、不改 runtime。
+
+### Phase 4A — Contract Extraction（feedback.location only）
+
+> 目標一句：把已存在的單一 authority 關係，**抽成可命名 contract，不改行為**。
+> 輸入（已存在）：`route.feedback.history.primary_source` / `feedbackCanonicalSink` / operational projection 語法 /
+> P0-B indexer derive graph。輸出（新增但不改 runtime）：`contract.feedback.location` 的 owner / derive rule /
+> invalidation rule / examples（non-authoritative）。B-1 已 materialize 最小 `knowledge/runtime/contracts/feedback-location.yaml`；4A = 正式化補完。
 
 **交付**：
-- [ ] `knowledge/runtime/contracts/<name>.yaml`（machine-readable contract）
+- [ ] `knowledge/runtime/contracts/feedback-location.yaml`（補完：owner / derive / invalidation / examples）
 - [ ] contract → routing-registry 的 single-direction materialize 連結（registry = 唯一 path owner）
 
-**成功條件**：以下全部 **derive**（不得平行宣告 path）：
-- [ ] runtime
-- [ ] validator
-- [ ] docs
-- [ ] tests
+**禁止**：不搬 registry / 不改 runtime / 不補 validator / 不重做 inventory / 不新增第二 owner。
+
+**驗收方向**：`registry → contract → {runtime, docs}`，**不得** `contract → registry`。
+
+### Phase 4B — Contract Coverage（之後，先不抽）
+
+問：還有沒有隱性 contract 沒抽出？候選（preflight 已觀察）：P1 promotion、P2 obligation-enum（permission）、
+P3 layer/routing taxonomy。**先不抽**——等 feedback.location 命名穩定、出現第二個值得命名的真實需求再做。
 
 ---
 
