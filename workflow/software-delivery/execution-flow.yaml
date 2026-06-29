@@ -47,6 +47,8 @@ required_sources:
   - workflow/software-delivery/validation.md
   - workflow/software-delivery/closure.md
   - workflow/software-delivery/surgical-changes.md
+  - workflow/software-delivery/implementation/README.md
+  - workflow/software-delivery/implementation/execution-modes.md
   - workflow/software-delivery/requirements/README.md
   - workflow/software-delivery/requirements/pre-build-interrogation.md
   - workflow/software-delivery/architecture/README.md
@@ -112,6 +114,12 @@ loading_surfaces:
       - surgical change discipline, diff purity, or orphan cleanup boundary is needed
     do_not_load_when:
       - large greenfield implementation or evidence-only analysis
+  implementation:
+    source: workflow/software-delivery/implementation/execution-modes.md
+    load_when:
+      - code change in implementation phase; feature blocked by structure; execution_mode selection, Change Intent Lock, or structure preparation needed
+    do_not_load_when:
+      - pure intake, contract-only, validation-only, or evidence-only analysis; replacement or migration parity inventory work
   examples:
     source: workflow/software-delivery/examples/EXAMPLES.md
     default_load: false

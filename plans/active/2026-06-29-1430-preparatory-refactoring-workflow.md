@@ -362,15 +362,15 @@ compatibility:
 
 ## Phase 1 — Implementation execution mode 正文
 
-- [ ] 撰寫 `workflow/software-delivery/implementation/` canonical 正文（README 或 execution-modes.md）
-- [ ] 定義 `direct_change` vs `preparatory_refactoring`
-- [ ] 定義 Change Intent Lock schema（structure / feature + behavior_change.allowed）
-- [ ] 定義 Intent Transition Rule（structure → feature 需 equivalence；feature → structure 需 explicit_reopen_reason）
-- [ ] 定義 Observable Equivalence Checkpoint
-- [ ] 收錄 Fowler 八步為 **structure mode recommended_recipe**（advisory checklist，非 mandatory order）
-- [ ] 定義 stop condition（exit_when + force_exit_when + avoid）
-- [ ] 定義 compatibility default（未宣告 execution_mode → direct_change）
-- [ ] §Failure modes：infinite refactor、intent oscillation、intent 混用、誤用 replacement parity、skip checkpoint
+- [x] 撰寫 `workflow/software-delivery/implementation/` canonical 正文（README 或 execution-modes.md）
+- [x] 定義 `direct_change` vs `preparatory_refactoring`
+- [x] 定義 Change Intent Lock schema（structure / feature + behavior_change.allowed）
+- [x] 定義 Intent Transition Rule（structure → feature 需 equivalence；feature → structure 需 explicit_reopen_reason）
+- [x] 定義 Observable Equivalence Checkpoint
+- [x] 收錄 Fowler 八步為 **structure mode recommended_recipe**（advisory checklist，非 mandatory order）
+- [x] 定義 stop condition（exit_when + force_exit_when + avoid）
+- [x] 定義 compatibility default（未宣告 execution_mode → direct_change）
+- [x] §Failure modes：infinite refactor、intent oscillation、intent 混用、誤用 replacement parity、skip checkpoint
 
 **完成條件**：agent 在 implementation 階段可選 mode，不需載入額外 lifecycle slice。
 
