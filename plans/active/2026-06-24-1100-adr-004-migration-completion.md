@@ -678,6 +678,27 @@ Constitution
 - [ ] `Path 1 == Path 2`
 - [ ] baseline diagnosis 仍 frozen、未被本計畫修改
 
+### Exit Criteria 5-layer 驗證（2026-06-24，read-only）
+
+> **驗收語句（鎖死）**：*Every operational location is explainable by a single authority chain.*（只驗 explainability。）
+
+| 層 | 問題 | 結果 |
+| --- | --- | --- |
+| **L1 Constitution** | 是否仍只有**一個** location authority？ | ❌ **FAIL** — `feedback/feedback-lessons.md`（13KB canonical「唯一正文」lesson rule，**≠** `enforcement/feedback-lessons.md` 343B）**獨立宣告** location authority：L24「`feedback/history/` 是 lesson 的唯一目標路徑」+ L5/21/33-35 hard-direct writes。**從未 converge**。→ 存在**第二個** location authority，single-chain 不成立。 |
+| **L2 Contract** | contract 是否純 extraction（無 runtime reader）？ | ✅ PASS（無 code/build/validator 讀 contract） |
+| **L3 Registry** | registry 是否仍 operational owner？ | ✅ PASS（delete-test：刪 registry → 系統不能跑） |
+| **L4 Consumers** | 所有 consumer 都 derive、無偷持 owner？ | ✅ PASS（Go 端無 hardcode sink；皆經 `feedbackCanonicalSink`） |
+| **L5 Runtime Observation** | Path1==Path2 / provenance 揭 drift / deleted world 不復活？ | ✅ PASS（Path2=199 atoms、provenance check 在、deleted-world negative test 在） |
+
+> **Exit Verdict：BLOCKED（L1 FAIL）。ADR-004 尚未 closure-ready。**
+> **Root cause（執行誤判，須記錄）**：B-1 readiness 把 location rule 認成 `enforcement/feedback-lessons.md`（343B，clean），
+> 但**真正的 canonical lesson rule 是 `feedback/feedback-lessons.md`（13KB）**——它是 location authority，全程未被檢出/converge。
+> 這是第三次「claimant enumeration 把局部當全集」的同型失誤（0A seed→readiness→此處），凸顯
+> *enumeration scope must derive from success condition* 在 Exit 層才被真正逼出。
+> **Fix（implementation，待授權）**：把 `feedback/feedback-lessons.md` 的 location 宣告 converge 成 derive（pointer
+> 或 operational projection，引 route.feedback.history / contract.feedback.location），permission/template 部分不動。
+> 完成後重跑 L1。**不在本 read-only 驗證輪執行。**
+
 ---
 
 ## Deferred Design Notes（記錄，禁止現在實作）
