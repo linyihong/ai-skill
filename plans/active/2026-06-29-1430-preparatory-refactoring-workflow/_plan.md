@@ -10,10 +10,22 @@ required_for_completion: false
 
 # Software-Delivery Implementation Execution Mode — Structure Preparation
 
-**Status**: `draft` — **觀察期**（execution governance **雙路徑已觀察**；happy path **尚未可獨立稽核**；Phase 3 / 5 / validator 延後）
+**Status**: `draft` — **觀察期**
+
+**Execution Governance snapshot**（stakeholder 2026-06-29）：
+
+| Field | Value |
+|-------|-------|
+| **Status** | Observed Across Dual Paths |
+| **Confidence** | stop path → **verified** (`01`); happy path → **partial-verified** (`02`) |
+| **Enforcement** | disabled（no ai-skill validator / commit-msg hook） |
+| **Promotion** | pending independent audit（pointer/SHA → **Promoted**, not Verified） |
+
+Phase 3 / 5 / validator hook **延後**。最有價值資產：evidence maturity 語言穩定，非再擴文件。
+
 **Owner**: linyihong
 **建立日期**: 2026-06-29
-**最後修訂**: 2026-06-29（evidence maturity ladder：`01` verified + `02` partial-verified；Gate A/B 收斂）
+**最後修訂**: 2026-06-29（maturity ladder 分層：Verified = behavior proven；Promoted = independently auditable）
 **Priority**: P1
 **Scope**: workflow advisory + dogfood 產物（planvalidate advisory scan，`Blocking=false`）；**不**接入 commit-msg block / runtime projection / enforcement
 
@@ -423,23 +435,32 @@ compatibility:
 ### Evidence maturity ladder（Phase 4 收斂）
 
 ```text
-Observed → Partial Verified → Verified → Promoted
+Observed → Partial Verified → Verified (behavior proven) → Promoted (independently auditable)
 ```
 
-| Evidence | Class | Path |
+| Evidence | Class | Role |
 |----------|-------|------|
-| [`01-dogfood-evidence.md`](01-dogfood-evidence.md) | **verified** | `force_exit` / partial-failure teaching |
-| [`02-vidoe-test-project-dogfood-evidence.md`](02-vidoe-test-project-dogfood-evidence.md) | **partial-verified** | happy / structure-transition only |
+| [`01-dogfood-evidence.md`](01-dogfood-evidence.md) | **verified** | stop / `force_exit` 機制有效 |
+| [`02-vidoe-test-project-dogfood-evidence.md`](02-vidoe-test-project-dogfood-evidence.md) | **partial-verified** | structure→transition 可運作；equivalence 未證明 |
 
 **Phase 4 status (do not over-read)**:
 
 - [x] dual evidence path **collected**
 - [x] `force_exit` path **verified** (`01`)
-- [ ] happy path **completed** — **no**; happy path **partial-verified** only (`02`)
-- [ ] happy path **Verified** (Gate A equivalence + Gate B exit_when + pointer) — pending Vidoe-Test regression + SHA
+- [ ] happy path **completed** — **no**
+- [x] happy path **partial-verified** (`02`)
+- [ ] happy path **Verified** — pending Gate A（equivalence / behavior proven）
+- [ ] happy path **Promoted** — pending pointer/SHA + independent audit (+ future validator wiring)
 
-**Gate A (blocking for `02` → Verified)**: `checkpoint_valid` / `observable_equivalence_passed` — not proven by artifact existence alone.  
-**Gate B (blocking for `02` → Verified)**: canonical `exit_when` recorded — **`target_test_becomes_expressible`** (primary) in `02`; equivalence still open.
+**Upgrade gates**（collection ≠ promotion）:
+
+| Gate | Blocks | Meaning |
+|------|--------|---------|
+| **Gate A** — `checkpoint_valid` / observable equivalence | **Verified** | `checkpoint_exists` ≠ `checkpoint_valid`; regression proof required |
+| **Gate B** — canonical `exit_when` | **Partial Verified** (recorded) | `02` primary: `target_test_becomes_expressible` — already mapped |
+| **Pointer / SHA** — external reproducibility | **Promoted** | not blocking Phase 4 collected; not blocking Verified |
+
+> dogfood 完成 ≠ 證據完成 ≠ 治理完成。Partial = 語意清楚（transition observed, equivalence open），不是「還沒做完 vs 做完沒證明」的模糊地帶。
 
 ---
 
@@ -476,7 +497,7 @@ Observed → Partial Verified → Verified → Promoted
 - [x] 雙軸 taxonomy（Q6 resolved，2026-06-29 第三輪）
 - [x] 主結構可進 Phase 0 / Phase 1，無需再大改（2026-06-29 第三輪）
 - [x] **第一輪閉環完成；進入觀察期，不進 enforcement**（2026-06-29）
-- [x] **Evidence maturity 收斂**（2026-06-29）— `01` verified / `02` partial-verified；happy path 未標 completed；Gate A/B 為 `02`→Verified 門檻
+- [x] **Evidence maturity 收斂**（2026-06-29）— Verified = behavior proven；Promoted = independently auditable；pointer 不擋 Verified
 
 ---
 
@@ -485,7 +506,7 @@ Observed → Partial Verified → Verified → Promoted
 | Plan | 關係 |
 |------|------|
 | [`02-software-delivery-plan-first-ordering`](2026-06-22-1009-plans-system-portability-and-delivery-integration/02-software-delivery-plan-first-ordering.md) | plan artifact ⟲ preflight；本 plan 定義 implementation plan 內 intent schema |
-| **Vidoe-Test landscape player** | project-layer dogfood — [`02-vidoe-test-project-dogfood-evidence.md`](02-vidoe-test-project-dogfood-evidence.md) (**partial-verified**); Gate A/B pending for Verified |
+| **Vidoe-Test landscape player** | project-layer dogfood — [`02`](02-vidoe-test-project-dogfood-evidence.md) (**partial-verified**); Gate A → Verified; pointer → Promoted |
 | [`gen3-workflow-analysis-cognitive-slice-decomposition`](../archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) | 延續 sd-implementation retained；**不**新增 slice id |
 | Recovery / Release 擴充 | out of scope |
 
@@ -506,5 +527,5 @@ Observed → Partial Verified → Verified → Promoted
 | 2026-06-29 | 第二輪：Intent Transition Rule、force_exit_when、compatibility default、dogfood-before-validator、Q6 命名 | stakeholder maturity review | 本對話 |
 | 2026-06-29 | Phase 4 force_exit dogfood；觀察期 sign-off；enforcement 延後 | stakeholder：dogfood 驗 contract 站得住 | 本對話 |
 | 2026-06-29 | Phase 1 落地 execution-modes.md + execution-flow 導航；Phase 2 intake 雙軸 + templates intent 欄位 | implementation execution governance | agent |
-| 2026-06-29 | Evidence maturity ladder：`01` verified、`02` partial-verified；Gate A/B；不標 happy completed | stakeholder evidence classification | 本對話 |
+| 2026-06-29 | Maturity ladder refine: Verified=behavior proven; Promoted=independently auditable; pointer blocks Promoted only | stakeholder gate semantics | 本對話 |
 | 2026-06-29 | Vidoe-Test project-layer dogfood **partial-verified** | landscape Phase 0 guard + structure-transition | [`02-vidoe-test-project-dogfood-evidence.md`](02-vidoe-test-project-dogfood-evidence.md) |

@@ -7,6 +7,8 @@
 
 Pair with [`02-vidoe-test-project-dogfood-evidence.md`](02-vidoe-test-project-dogfood-evidence.md) (**partial-verified** — happy path / structure-transition only).
 
+**Maturity**: `verified` = behavior/stop mechanism proven in-repo; `promoted` = not claimed (no ai-skill validator wiring).
+
 ## Canonical example（abstraction orphan + force_exit）
 
 > **建議作為教學預設案例**（比「成功案例」更有治理價值）：prep-02 全量 `ImplementationPlanParser` 在 force_exit 後 **無保留義務** — 建立 seam ≠ 必須交付 abstraction。對照 `execution-modes.md` §`abstraction_not_used_by_next_feature` 與 §8 `abstraction orphan`。

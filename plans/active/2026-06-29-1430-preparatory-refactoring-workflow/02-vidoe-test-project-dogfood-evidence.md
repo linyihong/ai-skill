@@ -13,12 +13,18 @@ Complements [`01-dogfood-evidence.md`](01-dogfood-evidence.md) (**verified** —
 
 ## Evidence maturity (this file)
 
+```text
+Observed → Partial Verified → Verified (behavior proven) → Promoted (independently auditable)
+```
+
 | Level | Meaning | This file |
 |-------|---------|-----------|
 | Observed | Narrative + artifacts named | yes |
-| Partial Verified | Structure transition + project guard observed; equivalence not independently proven | **current** |
-| Verified | Equivalence + exit_when + reproducible pointer | **not yet** |
-| Promoted | Wired to ai-skill validator / scenario | **explicitly no** (observation period) |
+| Partial Verified | Structure transition + guard observed; canonical `exit_when` mapped | **current** |
+| Verified | Observable equivalence / behavior proven (Gate A) | **not yet** |
+| Promoted | Independently auditable pointer + ai-skill validator/scenario wiring | **explicitly no** (observation period) |
+
+**Upgrade gates**: Gate A → **Verified**; pointer/SHA → **Promoted** (not blocking collection or Verified).
 
 ---
 
@@ -110,7 +116,9 @@ player-spec §Landscape -> ok
 
 ---
 
-## Gate B — exit_when（blocking for Verified）
+## Gate B — exit_when（recorded at Partial Verified)
+
+Canonical vocabulary from [`execution-modes.md`](../../../workflow/software-delivery/implementation/execution-modes.md) §4. Satisfied for **partial-verified**; does not alone satisfy **Verified** (see Gate A).
 
 Canonical vocabulary from [`execution-modes.md`](../../../workflow/software-delivery/implementation/execution-modes.md) §4:
 
@@ -156,7 +164,7 @@ Simulated bad commit (staged markdown with `Vidoe-Test`) blocked by sibling `ser
 
 ---
 
-## External pointer（可補強，非 Phase 4 blocking）
+## External pointer（blocking for Promoted only)
 
 | Field | Value |
 |-------|-------|
@@ -164,6 +172,8 @@ Simulated bad commit (staged markdown with `Vidoe-Test`) blocked by sibling `ser
 | Commit SHA | *TBD — attach when Phase 0 artifacts land on remote* |
 | Verifier | *TBD — name + date + command for guard simulation* |
 | Reproducibility | **not independently reproducible from Ai-skill repo alone** (disclosed) |
+
+**Not** blocking Phase 4 collected. **Not** blocking **Verified** (behavior can be proven without full pointer). **Blocks Promoted** until independently auditable.
 
 ---
 
