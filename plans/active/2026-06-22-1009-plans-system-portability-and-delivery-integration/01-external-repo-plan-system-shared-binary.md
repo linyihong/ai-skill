@@ -483,11 +483,20 @@ type ValidationContext struct {
   - ✅ **dedicated acceptance repo，用 canonical `plans/active|archived` layout**（sidestep mismatch、角色乾淨、persist、可 time-box）——**recommended**。
   - ⚠️ 在外部 repo 把 plans 搬到 `plans/active|archived`（invasive，改其 layout，違 Entry Gate #3 精神）。
   - ⛔ 給 CLI 加 `--plans-dir docs/plans` discovery option（location-convention policy，**Q8-adjacent → deferred**，不現在做）。
-- [ ] **selection 結論**：不選 Vidoe-Test / apk-analysis-sdk as-is；建議 **dedicated canonical-layout acceptance repo**。待使用者決定 repo 位置（outward / 環境決策）後記 rollback checkpoint baseline。
-- [ ] **不安裝 adapter**（避免把 repo 選擇混進 adoption 證據）。
+- [x] **selection 結論（2026-06-25，使用者覆寫 ❌）**：**選 Vidoe-Test**（使用者授權修改 + 提供「plan 完成狀態不確定」當測試材料）。
+  - **checkpoint baseline 已捕捉（read-only）**：`git status CLEAN` / **commit-msg hook absent** / **validation baseline `plans=0`**（scope-A 尚無 `plans/active|archived`）。rollback 後須回到此三者。
+  - **caveat 1 — 高 churn（169/14d）= 使用者正在密集使用**：commit-msg adapter **不可裝著不動**（會攔截真實 commit）；必須 **tight-window**（install→一次測試 commit→remove）。validate 主力走 **CLI/CI adapter**（`plans validate --root`，不攔 commit）。
+  - **caveat 2 — 角色 overload**：Vidoe-Test 已是 dialect-pressure + adoption-pass；3.4 acceptance evidence 須**明確標為獨立角色**（acceptance = install/upgrade/rollback 機制 + 可逆，**不**重算 adoption/dialect）。
+  - **location-gap 修法**：在 Vidoe-Test **新增可逆 acceptance artifact** `plans/active/`（放 canonical 測試 plans），不動其 `docs/plans/`；rollback 連 `plans/active/` 一併移除 → 回 baseline。
+- [ ] **不安裝 adapter**（3.4a 仍只 selection；adapter install 屬 3.4b）。
 
-**3.4b — Install → Validate → Upgrade → Rollback（⛔ execution NOT YET AUTHORIZED）**
-- [ ] install adapter → 真實 commit validate → upgrade once（單軸單 subject，per 3.2）→ rollback（remove adapter+config+binary ref → git/runtime/hook clean + no schema residue + monotonic，回到 3.4a checkpoint）。
+**3.4b — Install → Validate → Upgrade → Rollback（target = Vidoe-Test；outward writes 待最終 go）**
+> **非侵入式**（因高 churn）：validate 主力走 **CLI/CI adapter**（不攔 commit）；**commit-msg hook 只 tight-window 驗一次**（install→1 test commit→remove）。
+- [ ] **setup（可逆）**：在 Vidoe-Test 新增 `plans/active/`（canonical 測試 plans，含「完成狀態不確定」的樣本）。
+- [ ] **validate**：`plans validate --root <Vidoe-Test>` → 預期能 discover（plans>0）並就「**plan 完成狀態**」給 findings（archive_order：archived main 有未完成 required sub 則 block；frontmatter/parent/unique 同步）——這正是使用者要的「哪些 plan 沒完成」測試。
+- [ ] **hook tight-window**：暫裝 commit-msg adapter → 一次測試 commit 驗 block/pass → 立即 remove（不留著攔真實 commit）。
+- [ ] **upgrade once**：單軸單 subject（per 3.2，例：schema_version）→ findings 三層保真。
+- [ ] **rollback**：remove adapter + `plans/active/` + config + binary ref → git/runtime/hook clean + no schema residue + monotonic → **回 3.4a checkpoint（status clean / no hook / plans=0）**。
 - [ ] acceptance metadata：`repo_owner` / `repo_type: internal|public|fixture` / `removal_policy`（不寫 repo 名）。
 - [ ] plurality（Close Note B，observation-only，不升 Q）。
 - **完成 = Phase 3 complete**（Success Contract 四段 + 三層保真 + monotonic 全達成）。
