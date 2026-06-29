@@ -627,8 +627,18 @@ atoms / fts
 
 **交付**：
 - [x] 第一個 commit：Contract Extraction Matrix（本表，PASS）
-- [ ] 第二個 commit：`knowledge/runtime/contracts/feedback-location.yaml`（補完 sink root / derive / invalidation / examples；**不含** source_of_truth_gate）
-- [ ] contract → routing-registry 的 single-direction materialize 連結（registry = 唯一 path owner）
+- [x] 第二個 commit（`05037f5`）：`knowledge/runtime/contracts/feedback-location.yaml` 寫成 **extraction artifact**
+  （3 句型 Ownership/Derivation/Invalidation；examples 明確 non-authoritative；**排除** source_of_truth_gate /
+  activation / lifecycle / enforcement / runtime-algorithm）
+- [x] contract → registry single-direction：artifact 宣告 `materialized_from: route.feedback.history`，registry 為唯一 owner
+
+**Materialization post-check（registry → materialize(contract) → explain(runtime)；禁 contract → configure(runtime)）— 全 PASS（empirical）**：
+- [x] 刪 contract → runtime 不變：無任何 code/build/validator 讀此檔（grep 空）
+- [x] 改 contract → runtime 不變：無 reader，且**非** runtime-index source（0 sources / 0 atoms）
+- [x] 改 registry → contract stale：artifact 以 `materialized_from` + snapshot examples 宣告，registry 改即過期需 re-materialize
+
+> **Phase 4A：DONE**（extraction，非 invention；contract 解釋系統、不驅動系統）。activation 維度（source_of_truth_gate）
+> 由矩陣攔下，留為 4B/未來 activation contract 種子。下一步：Phase 4B（observed，不抽）或 Exit Criteria（5-layer derive）。
 
 **禁止**：不搬 registry / 不改 runtime / 不補 validator / 不重做 inventory / 不新增第二 owner。
 
