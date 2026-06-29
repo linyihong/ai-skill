@@ -431,6 +431,21 @@ type ValidationContext struct {
 - DiscoveryScope 兩者同為 `plans/active|archived`（by construction equal）。
 - **未做**：3.3b（hook↔CI）、3.3c（directional replacement proof）。Q1 仍 OPEN。
 
+##### 3.3b — hook ↔ CI ✅（2026-06-25）
+- **F.1 CI=adapter 非新 authority**：CI consumer = engine-backed（build ValidationContext → 同 engine entrypoint → consumer policy → render），不持 validation/schema、不 mutate findings。判定用 **CI COR == hook COR**（非 exit）。
+- **F.2 snapshot normalization 在 adapter 不進 engine**：CI 讀 checkout 全樹由 loader normalize；guard test `TestValidationContext_NoSnapshotOriginField`（engine input 無 snapshot/origin/staged 欄）。
+- **F.3 asymmetric proof**：violation tree 上 **raw CI（naive staged-empty）≠ hook**（漏看 violation）、**normalized CI == hook**（`{parent_reference}`）→ 證 equivalence 是 contract 非雙空巧合。三情境（valid/violation/opt-out）COR DeepEqual。
+- **未做**：3.3c。Q1 仍 OPEN。
+
+##### 3.3c — directional replacement（close 規則，待做）
+> **Q1 關閉 evidence 至少**（不要求三個都換，但 ≥1 真 replace，非 mock）：
+> ```
+> replace manual transport → hook+CI unchanged
+> replace hook transport   → manual+CI unchanged
+> replace CI transport     → manual+hook unchanged
+> ```
+> 每次 replace：engine unchanged + remaining consumers unchanged + observation preserved（E.2 directional）。Q1 在 3.3c 通過後才 close。
+
 > 第一次拿到「成功 adoption 證據」後最易把 compatibility 當單純升版測試。先拆軸，否則 3.2 測出綠燈卻不知哪層相容。**doc 內現存三個 version 必須分開**：binary version / `plan_schema` version / invocation-contract version（目前隱含）。
 
 **三軸（升級前先回答）**：
