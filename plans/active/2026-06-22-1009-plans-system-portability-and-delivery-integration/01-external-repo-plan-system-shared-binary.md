@@ -367,7 +367,7 @@ type ValidationContext struct {
 | **3.1 Adoption Slice**（install → validate） | 證外部 repo **可採用且不留狀態** | **invocation adapter**（git hook shim / CI wrapper / equivalent，**必須 replaceable；adapter contract 不得寫入 engine**）、install/remove 指南、validate evidence | reversible adoption 成立、rollback clean 成立；**不關 Q3** |
 | **3.2 Compatibility Slice**（upgrade once）✅ DONE | 證 invocation contract **穩定非碰巧**（consumer compatibility，非 fixture） | **1 axis × 1 subject** upgrade（禁混升）、supported→preserved（三層）、unsupported→**deterministic + diagnosable** reject（same stage+reason class）、**no-change baseline**（negative proof）、3-axis+subject notes | **Q3 ✅ CLOSED**（見 §Phase 3.2 Preflight） |
 | **3.3 Consumer Equivalence**（見 §Phase 3.3 Preflight matrix）| 同 repo 同 tree：**manual ≡ hook ≡ CI**（比 observation boundary 非 execution trace）；**equivalence ≠ coupling ≠ execution identity** | 依 Equivalence Matrix 驗（RuleID/Blocking/opt-out/discovery-scope MUST equal；exit/mode/input-snapshot MAY differ）、**removal-independence proof**、**≥1 consumer replaced without engine change** | **Q1 close（收緊，見 Q1 row）** |
-| **3.4 Real Repo Acceptance** | 完整四段 **install → validate → upgrade → rollback** | acceptance evidence、rollback proof、residue check（git/runtime/hook） | **Phase 3 complete** |
+| **3.4 Real Repo Acceptance**（🟢 authorized；orchestration 非 architecture） | 完整四段 **install → validate → upgrade → rollback (→ remove)** on a **persistent** real repo（**MUST persist，禁 throwaway**——需時間維度非僅狀態維度） | acceptance evidence、rollback proof、residue check（git/runtime/hook）、acceptance metadata（`repo_owner`/`repo_type`/`removal_policy`，不寫 repo 名） | **Phase 3 complete** |
 
 **原 checklist 收編對照**：shim design → 3.1；CI wrapper → 3.1 / 3.3；cross-version → 3.2；rollback proof → 3.4；real repo acceptance → 3.4。真實外部 repo 維護中繼資料（`repo_owner` / `repo_type` / `removal_policy`，不寫 repo 名）掛 3.4。
 
@@ -453,7 +453,17 @@ type ValidationContext struct {
 | contract stability | 3.3c R.2 | ✅ fingerprint |
 | observation preserved（含 applicability） | 3.3c R.3 | ✅ |
 
-→ **Q1 ready-to-close**，狀態留 OPEN 待 review package 後正式關。
+→ **Q1 ✅ CLOSED（2026-06-25，review 通過）**。四層獨立鏈成立。Close Note A：fingerprint=guard 非 compatibility authority（meaning 保真靠 COR/applicability，勿當 version system）。Close Note B：未證 plurality（多外部 consumer 並存）→ 留 3.4，不升新 Q。
+
+#### Phase 3.4 — Real Repo Acceptance（orchestration；authorized 2026-06-25）
+> **重心轉移**：3.3 後已非 architecture work，3.4 是 **acceptance orchestration**。**不回頭重抽 engine、不再加 consumer、不提前處理 Q8。**
+> **persistence 限制（review）**：acceptance repo **MUST persist（禁 throwaway tmp）**——3.4 驗 `install → validate → upgrade → rollback → remove`，需**時間維度**（跨 commit / 跨 session），非單次狀態。
+
+- [ ] **指定 persistent acceptance repo**（候選：既有 canonical-tree 外部 repo `Vidoe-Test` / `apk-analysis-sdk`，或新建專用 repo）+ 確認可安裝 adapter（outward action，須使用者授權目標 repo）。
+- [ ] **四段（時間維度）**：install adapter → 真實 commit validate → upgrade once（單軸單 subject，per 3.2）→ rollback（remove adapter+config+binary ref → git/runtime/hook clean + no schema residue + monotonic）。
+- [ ] **acceptance metadata**：`repo_owner` / `repo_type: internal|public|fixture` / `removal_policy`（不寫 repo 名）。
+- [ ] **plurality（Close Note B，留此不升 Q）**：若順帶觀察多 consumer 並存，記為 observation；非 3.4 完成必要條件。
+- **完成 = Phase 3 complete**（Success Contract 四段 + 三層保真 + monotonic 全達成）。
 
 > 第一次拿到「成功 adoption 證據」後最易把 compatibility 當單純升版測試。先拆軸，否則 3.2 測出綠燈卻不知哪層相容。**doc 內現存三個 version 必須分開**：binary version / `plan_schema` version / invocation-contract version（目前隱含）。
 
