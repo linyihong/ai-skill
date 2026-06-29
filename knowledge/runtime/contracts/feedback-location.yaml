@@ -1,43 +1,64 @@
-# Minimal contract materialization — ADR-004 Completion Plan, B-1 execution.
-# Scope: authority_of_location for feedback lessons ONLY. Permission / schema /
-# promotion stay with enforcement/feedback-lessons.md (orthogonal authority; see
-# the Completion Plan 0B-2 location-vs-permission split). Reference-only contract:
-# NOT compiled into runtime.db; consumers and docs read it as the formal record.
-schema_version: contract/v1
+# Extraction artifact — ADR-004 Completion Plan, Phase 4A.
+#
+# This is NOT a schema and NOT runtime config. It EXTRACTS and EXPLAINS an
+# authority relationship that already exists in system behaviour (the
+# route-ownership family; this is its first named instance). It explains the
+# system; it does not drive it:
+#   - delete this artifact  -> runtime reasoning is unchanged
+#   - modify this artifact  -> runtime is unchanged
+#   - modify the registry   -> this artifact is stale (re-materialize from registry)
+# Materialization direction: registry -> materialize(contract) -> explain(runtime).
+# The reverse (contract -> configure(runtime)) is forbidden and would mean the
+# extraction failed.
+#
+# Holds only three sentence kinds: Ownership / Derivation / Invalidation.
 id: contract.feedback.location
+kind: extraction-artifact
 status: active
-owner_layer: knowledge/runtime/contracts
+materialized_from: knowledge/runtime/routing-registry.yaml#route.feedback.history
 
-# 1. canonical location 由誰宣告 (owner) — single machine authority_of_location
-owner: knowledge/runtime/routing-registry.yaml#route.feedback.history.primary_source
+ownership:
+  owner: >
+    The single authority_of_location for feedback lessons is the registry route
+    route.feedback.history, via its primary_source. The registry is the
+    operational authority; this artifact only explains it.
+  not_owner:
+    - who: constitution/ADR-004-feedback-promotion-pipeline.md
+      why: apex intent that the registry materializes FROM; not a mutable owner.
+    - who: plans/active/2026-06-23-1500-adr-004-migration-drift-diagnosis.md
+      why: frozen historical evidence, not a live owner.
+    - who: route.feedback.promotion-pipeline
+      why: a different sink (feedback/promotion/); outside this location's ownership.
+    - who: enforcement/feedback-lessons.md
+      why: authority_of_permission only (filename / schema / promotion); declares no location.
 
-# 2. consumer 怎麼取得 (derive)
-derive:
-  mechanical: >
-    Consumers MUST read the sink prefix from the registry route's primary_source
-    (its directory); never hardcode "feedback/history/". Reference implementation:
-    feedbackCanonicalSink() in scripts/ai-skill-cli/internal/app/runtime.go.
-  docs: >
-    Documentation references route.feedback.history as the location authority and
-    does NOT restate the literal sink path (pointer-only; no derived-display copy,
-    to avoid re-seeding an authority illusion).
+derivation:
+  resolve: >
+    Consumers obtain the sink from the registry route's primary_source directory.
+    The reference resolver is feedbackCanonicalSink — this artifact names where
+    resolution happens; it does not define the resolver's behaviour.
+  projection_surfaces: >
+    The runtime index, runtime query, the generated views (runtime-report.md,
+    model-checklists.md) and the operational-workflow path renderings are all
+    DERIVED projections of the registry sink — non-authoritative. They display
+    the resolution; they do not own it.
 
-# 3. owner 變更如何失效 (invalidation)
-invalidation: >
-  If route.feedback.history.primary_source changes or is removed, every derived
-  consumer must re-resolve. Any hardcoded location path is a violation of the
-  Canonical-Path Derivation Invariant and is treated as drift.
+invalidation:
+  on_owner_change: >
+    If route.feedback.history.primary_source changes or is removed, every derived
+    projection is stale and must re-resolve from the registry.
+  re_resolve: >
+    Re-resolution reads the registry route again; no value is carried in this
+    artifact as truth. A hardcoded location path anywhere is, by definition,
+    drift (Canonical-Path Derivation Invariant).
 
-# Exemptions — apex / frozen, not mutable owners:
-exemptions:
-  - path: constitution/ADR-004-feedback-promotion-pipeline.md
-    reason: apex intent; the registry materializes from it, not vice versa.
-  - path: plans/active/2026-06-23-1500-adr-004-migration-drift-diagnosis.md
-    reason: frozen evidence baseline (historical), not a live owner.
+# Examples — NON-AUTHORITATIVE. A snapshot of the current resolution, kept only to
+# make the artifact readable; stale-on-registry-change by design.
+examples:
+  current_resolution: feedback/history/                                  # derived, example only
+  lesson_path_shape: feedback/history/<domain>/<category>/<file>.md      # derived, example only
 
-# Out of scope — different sink / orthogonal authority:
-out_of_scope:
-  - id: route.feedback.promotion-pipeline
-    reason: primary_source feedback/promotion/, a different sink.
-  - path: enforcement/feedback-lessons.md
-    reason: authority_of_permission only; declares no location.
+# Explicitly NOT in this artifact (separate authority dimensions; do not fold in):
+#   - activation: route.feedback.history.source_of_truth_gate answers "is it
+#     live?", not "where?" — a separate (future) activation contract.
+#   - lifecycle / promotion / enforcement / runtime algorithm.
