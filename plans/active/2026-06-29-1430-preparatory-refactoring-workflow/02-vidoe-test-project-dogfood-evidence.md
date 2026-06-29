@@ -1,10 +1,24 @@
 # Dogfood Evidence — Vidoe-Test project-layer (Change Intent Lock pilot)
 
 **Plan**: [`_plan.md`](_plan.md) Phase 4 (second evidence path)  
-**Date**: 2026-06-25 (pilot design) · **verified** 2026-06-29  
-**Repo**: `Vidoe-Test` (project-layer; **not** Ai-skill `plans/active/`)
+**Date**: 2026-06-25 (pilot design) · **observed / partial-verified** 2026-06-29  
+**Repo**: `Vidoe-Test` (project-layer; **not** Ai-skill `plans/active/`)  
+**Evidence class**: **partial-verified** (happy path / structure-transition only)
 
-Complements [`01-dogfood-evidence.md`](01-dogfood-evidence.md) (Ai-skill planvalidate `force_exit` path). This file records **cross-repo** evidence that `preparatory_refactoring` + Change Intent Lock can constrain real H5 work without commit-msg runtime projection.
+Complements [`01-dogfood-evidence.md`](01-dogfood-evidence.md) (**verified** — `force_exit` path). This file records **cross-repo** evidence that `preparatory_refactoring` + Change Intent Lock can constrain real H5 work without ai-skill commit-msg runtime projection.
+
+> **Not** a success-story completion claim. Phase 1 feature work remains in progress; this evidence validates **execution contract classification** (structure → transition → feature started), not full feature delivery.
+
+---
+
+## Evidence maturity (this file)
+
+| Level | Meaning | This file |
+|-------|---------|-----------|
+| Observed | Narrative + artifacts named | yes |
+| Partial Verified | Structure transition + project guard observed; equivalence not independently proven | **current** |
+| Verified | Equivalence + exit_when + reproducible pointer | **not yet** |
+| Promoted | Wired to ai-skill validator / scenario | **explicitly no** (observation period) |
 
 ---
 
@@ -15,14 +29,16 @@ change_kind: feature
 blocked_by_structure: true
 # Rationale: ImmersivePlayerFrame is preview-gated, swipe-mutex, tab-shell z-index,
 # and HLS metadata coupling — feature cannot land safely without contracts first.
-execution_mode: preparatory_refactoring   # project analog; plan uses Phase 0/1 wording
+execution_mode: preparatory_refactoring   # project analog; native plan uses Phase 0/1 wording
 ```
 
 **Not** `replacement` / `migration` — no parity inventory; orthogonal per `intake.md`.
 
 ---
 
-## Implementation plan (as designed + partially executed)
+## Implementation plan (retrospective mapping)
+
+> **Retro-map declaration**: Implementation YAML shown below is **retrospective mapping for evidence review**; it is **not** native Vidoe-Test plan schema. The authoritative project plan is prose Phase 0 / Phase 1 in `docs/plans/2026-06-25-landscape-horizontal-player-mode.md`.
 
 Project plan: `Vidoe-Test/docs/plans/2026-06-25-landscape-horizontal-player-mode.md`
 
@@ -37,7 +53,7 @@ steps:
     checkpoint:
       observable_equivalence:
         required: true
-        evidence: existing portrait player + vertical-snap + preview-gate integrations unchanged
+        # Intent (not yet proven): portrait + vertical-snap + preview-gate unchanged
 
   - id: phase-1-mvp
     intent: feature
@@ -53,19 +69,60 @@ steps:
     action: integration green + claim_registry + plan status completed
 ```
 
-**Intent transition**: `structure → feature` only after Phase 0 artifacts exist (mechanical + human gate).
+**Intent transition**: `structure → feature` allowed after Phase 0 artifacts exist (project file_exists + human gate). **Not** the same as `observable_equivalence_passed` until regression evidence is attached (see Gate A).
 
 ---
 
 ## Path classification
 
-| Segment | Classification | Status (2026-06-29 verify) |
-|---------|----------------|----------------------------|
-| Phase 0 contracts | structure + observable equivalence intent | **done** — see artifacts below |
-| Phase 1 implementation | feature | **in progress** — WIP in Vidoe-Test root working tree (not yet server_doc commit) |
-| force_exit | N/A | Not triggered — contracts unblocked local feature work |
+| Segment | Classification | Status (2026-06-29) |
+|---------|----------------|---------------------|
+| Phase 0 contracts | structure intent | **observed** — artifacts exist |
+| Structure → feature transition | transition gate | **partial-verified** — guard + mapping/spec gate |
+| Phase 1 implementation | feature | **in progress** — WIP; not independently auditable from Ai-skill |
+| force_exit | N/A | Not triggered — contracts reduced local feature cost |
 
-**Valid evidence path**: **Happy path (partial)** — structure checkpoint met → feature work started. Differs from `01-dogfood` force_exit teaching case.
+**Valid evidence path**: **Happy path (partial)** — structure phase + transition observed → feature work started. Differs from [`01-dogfood-evidence.md`](01-dogfood-evidence.md) (`force_exit` teaching case).
+
+---
+
+## Gate A — observable_equivalence（blocking for Verified）
+
+Per [`execution-modes.md`](../../../workflow/software-delivery/implementation/execution-modes.md): **checkpoint ≠ observable equivalence**.
+
+| Claim level | What we have | Status |
+|-------------|--------------|--------|
+| `checkpoint_exists` | mapping file + spec §Landscape + integration scaffold | **yes** (2026-06-29) |
+| `checkpoint_valid` | portrait / snap / preview **regression executed and green** | **no** — not recorded in this evidence file |
+
+**Do not conflate** project guard `file_exists` checks with `observable_equivalence_passed`.
+
+**Verified 2026-06-29 (artifact gate only)**:
+
+```text
+screen-mapping/player-landscape-mode.md -> ok
+player-spec §Landscape -> ok
+```
+
+**Pending for Verified upgrade**: command + date + pass/fail for portrait-player regression / integration owned by Phase 0 checkpoint intent.
+
+**Failure lens**: aligns with §8 `fake equivalence` if we claimed Valid without regression proof.
+
+---
+
+## Gate B — exit_when（blocking for Verified）
+
+Canonical vocabulary from [`execution-modes.md`](../../../workflow/software-delivery/implementation/execution-modes.md) §4:
+
+| `exit_when` candidate | Applies? | Evidence |
+|-----------------------|----------|----------|
+| `target_change_becomes_local` | **partial** | Phase 0 contracts + guard unblocked **starting** ImmersivePlayerFrame work; feature not closed |
+| `target_test_becomes_expressible` | **yes (primary)** | `player-landscape-mode.integration.mjs` + fixture scaffold exist — landscape acceptance can be expressed before/alongside implementation |
+| `new_abstraction_created` | no | No new seam/abstraction retained for feature to consume |
+
+**Recorded exit_when (partial-verified)**: **`target_test_becomes_expressible`** — integration scaffold + fixture make landscape behavior testable; structure phase exited into feature intent on that basis **plus** artifact gate, **not** on equivalence proof (Gate A gap).
+
+`force_exit_when`: **none** (happy partial path).
 
 ---
 
@@ -79,23 +136,15 @@ steps:
 | BDD | `Vidoe-Test/tests/bdd/plan-phase-guard.test.mjs` |
 | Opt-out | `PLAN_PHASE_GUARD_SKIP=1` |
 
-**Guard rule**: staging `server_doc/.../ImmersivePlayerFrame.tsx` or player `page.module.css` **denies commit** until:
+**Guard rule**: staging `server_doc/.../ImmersivePlayerFrame.tsx` or player `page.module.css` **denies commit** until mapping + spec §Landscape exist.
 
-- `docs/frontend-contracts/screen-mapping/player-landscape-mode.md` exists
-- `docs/frontend-contracts/ui-style-reference/specs/player-spec.md` contains `landscape`
+Simulated bad commit (staged markdown with `Vidoe-Test`) blocked by sibling `server_doc` sanitization guard in same hook script.
 
-**Verified 2026-06-29**:
-
-```text
-screen-mapping/player-landscape-mode.md -> ok
-player-spec §Landscape -> ok
-```
-
-Simulated bad commit (staged markdown with `Vidoe-Test`) still blocked by sibling `server_doc` sanitization guard in same hook script.
+**Ai-skill posture**: project overlay only; aligns with observation-period **no ai-skill commit-msg validator** decision.
 
 ---
 
-## Phase 0 artifacts (structure checkpoint)
+## Phase 0 artifacts (structure phase)
 
 | Artifact | Path |
 |----------|------|
@@ -107,28 +156,28 @@ Simulated bad commit (staged markdown with `Vidoe-Test`) still blocked by siblin
 
 ---
 
+## External pointer（可補強，非 Phase 4 blocking）
+
+| Field | Value |
+|-------|-------|
+| Repo | `Vidoe-Test` (external; not vendored in Ai-skill workspace) |
+| Commit SHA | *TBD — attach when Phase 0 artifacts land on remote* |
+| Verifier | *TBD — name + date + command for guard simulation* |
+| Reproducibility | **not independently reproducible from Ai-skill repo alone** (disclosed) |
+
+---
+
 ## Failure-mode review lens
 
 | failure | Project observation |
 |---------|---------------------|
 | intent oscillation | Plan orders Phase 0 → 1 → 3; guard blocks implementation-first commits |
 | structure inflation | Phase 0 scoped to mapping + spec regions, not broad player rewrite |
-| fake equivalence | Checkpoint cites **non-regression** of portrait / snap / preview paths — integration-owned |
-| abstraction orphan | N/A — no unused parser/seam left behind (contrast `01-dogfood` prep-02) |
+| fake equivalence | **Gate A open** — artifact gate ≠ portrait regression proof |
+| abstraction orphan | N/A — no unused parser/seam (contrast `01` prep-02) |
+| compatibility collapse | Native plan uses Phase 0/1; no forced `execution_mode` on legacy plans |
 | replacement parity misuse | Plan explicitly frontend-only; no replacement inventory |
-| illegal transition | Not yet wired — would need `steps[]` YAML in project plan for planvalidate |
-
----
-
-## Secondary pilots (same pattern family)
-
-| Pilot | Maps to | Evidence |
-|-------|---------|----------|
-| Navigation Phase B (`2026-06-18-1030-ui-continuation-runtime-pilot.md`) | bounded structure refactor before feature closure | **completed** — contracts split before code churn |
-| Design Contract B0 (`2026-06-16-design-contract-validation-pilot.md`) | structure stub before scanner/feature | **completed** — authority stub before static enforcement |
-| Plan-first ordering README | contract-before-implementation culture | `docs/plans/README.md` §Plan Phase 0 guard |
-
-**Out of scope for this plan**: `server_doc` sanitization (documentation boundary governance — different failure family).
+| illegal transition | Not wired — would need native `steps[]` YAML + planvalidate advisory |
 
 ---
 
@@ -136,10 +185,10 @@ Simulated bad commit (staged markdown with `Vidoe-Test`) still blocked by siblin
 
 | Plan section | Supported? | Notes |
 |--------------|------------|-------|
-| Phase 4 dogfood | **yes** — second path | Project-layer happy/partial path vs ai-skill force_exit |
-| Phase 3 routing cross-links | **partial** | Vidoe-Test consumes `execution-modes` **concept** via project plan wording, not ai-skill `loading_surfaces` |
-| Phase 5 glossary | **no** | Project uses `Phase 0/1`; glossary terms not registered in Vidoe-Test |
-| Validator hook / enforcement | **explicitly no** | Aligns with observation-period decision — mechanical guard is **project overlay**, not ai-skill commit-msg |
+| Phase 4 dual path collected | **yes** | Happy **partial** complements `01` force_exit **verified** |
+| Phase 3 routing cross-links | **partial** | Concept via project plan wording, not ai-skill `loading_surfaces` |
+| Phase 5 glossary | **no** | Project uses Phase 0/1 labels |
+| Validator hook / enforcement | **explicitly no** | Project overlay ≠ ai-skill promotion |
 
 ---
 
@@ -149,8 +198,24 @@ Simulated bad commit (staged markdown with `Vidoe-Test`) still blocked by siblin
 |-------|-------|
 | change_kind | feature |
 | execution_mode | preparatory_refactoring (project analog) |
+| evidence_class | partial-verified |
 | intent sequence | structure (Phase 0) → feature (Phase 1+, in progress) |
-| transitions | Phase 0 complete → Phase 1 allowed (human + file_exists gate) |
+| transitions | structure → feature after artifact gate; equivalence **not** verified |
+| exit_when | `target_test_becomes_expressible` (primary); `target_change_becomes_local` (partial) |
 | force_exit trigger | none |
-| checkpoint | portrait player regression suite + spec/mapping existence |
-| blocking | project Cursor hook only; `Blocking=false` for ai-skill planvalidate |
+| checkpoint | `checkpoint_exists` yes; `checkpoint_valid` **pending** |
+| blocking | project Cursor hook; ai-skill planvalidate `Blocking=false` |
+
+---
+
+## Appendix — related pilots (not equally mapped)
+
+Same pattern **family** only; not submitted as Phase 4 evidence with equal rigor.
+
+| Pilot | Maps to | Notes |
+|-------|---------|-------|
+| Navigation Phase B | structure before feature closure | completed; no retro-map in this file |
+| Design Contract B0 | structure stub before enforcement | completed; pointer in ai-skill evidence-candidates |
+| Plan-first ordering README | contract-before-implementation culture | `docs/plans/README.md` §Plan Phase 0 guard |
+
+**Out of scope**: `server_doc` sanitization (documentation boundary — different failure family).

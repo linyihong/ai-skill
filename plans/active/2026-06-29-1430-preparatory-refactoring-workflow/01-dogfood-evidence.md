@@ -2,7 +2,10 @@
 
 **Plan**: [`_plan.md`](_plan.md) Phase 4  
 **Date**: 2026-06-29  
+**Evidence class**: **verified** (`force_exit` / stop-design path)  
 **Task**: Advisory `illegal_transition` scan for implementation-plan `steps[]` YAML (dogfood-before-validator)
+
+Pair with [`02-vidoe-test-project-dogfood-evidence.md`](02-vidoe-test-project-dogfood-evidence.md) (**partial-verified** — happy path / structure-transition only).
 
 ## Canonical example（abstraction orphan + force_exit）
 
