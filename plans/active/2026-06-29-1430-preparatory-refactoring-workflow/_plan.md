@@ -399,12 +399,14 @@ compatibility:
 
 ## Phase 3 — Routing & cross-links（不新增 lifecycle step）
 
-- [ ] [`execution-flow.md`](../../workflow/software-delivery/execution-flow.md)：sd-implementation 列更新 — 指向 implementation execution modes
-- [ ] [`execution-flow.yaml`](../../workflow/software-delivery/execution-flow.yaml)：`loading_surfaces.implementation`（若缺則加）；**不**加新 ordered step
+- [x] [`execution-flow.md`](../../workflow/software-delivery/execution-flow.md)：sd-implementation 列更新 — 指向 implementation execution modes（Phase 1 已落地；見 §Phase 2 進度 2026-06-29）
+- [x] [`execution-flow.yaml`](../../workflow/software-delivery/execution-flow.yaml)：`loading_surfaces.implementation`（`source: implementation/execution-modes.md`；**不**加新 ordered step）
 - [ ] [`README.md`](../../workflow/software-delivery/README.md) 進入方式
 - [ ] [`test-strategy.md`](../../workflow/software-delivery/test-strategy.md) cross-link：intent → validation 分流
 - [ ] [`surgical-changes.md`](../../workflow/software-delivery/surgical-changes.md) reconciliation 一節
 - [ ] [`review-checklist.md`](../../workflow/software-delivery/review-checklist.md)：intent lock + stop condition 檢查
+
+**Phase 3 進度（2026-06-29）**：routing surface 已在 execution-flow 接通；README / test-strategy / surgical-changes / review-checklist 四檔仍待補 cross-link（觀察期內可完成，不阻塞 dogfood 結論）。
 
 ---
 
@@ -418,15 +420,22 @@ compatibility:
 - [x] Dogfood 通過後才開 maturity ladder（優先 **illegal transition** validator，非「有沒有 structure」）— 本 phase **不** runtime 化
 - [ ] （可選）`validation/scenarios/software-delivery/implementation-mode-preparatory-refactoring.yaml`
 
-**Evidence**: [`01-dogfood-evidence.md`](01-dogfood-evidence.md)（force_exit path；advisory `DetectIllegalIntentTransitions` in planvalidate）
+**Evidence**:
+
+| Path | Role |
+|------|------|
+| [`01-dogfood-evidence.md`](01-dogfood-evidence.md) | Ai-skill repo — `force_exit` + advisory `DetectIllegalIntentTransitions` |
+| [`02-vidoe-test-project-dogfood-evidence.md`](02-vidoe-test-project-dogfood-evidence.md) | **Vidoe-Test project-layer** — landscape player Phase 0 guard + partial happy path (verified 2026-06-29) |
 
 ---
 
 ## Phase 5 — Glossary & closeout
 
-- [ ] glossary 註冊新詞彙
+- [ ] glossary 註冊新詞彙（**注意**：既有 `execution_mode` 詞條指 cognitive FAST/NORMAL/DEEP；implementation mode 需用 `implementation_execution_mode` 或 `preparatory_refactoring` 獨立詞條，避免 collision）
 - [ ] linked-updates 檢查
 - [ ] archive plan + dogfood evidence
+
+**Phase 5 阻塞說明（2026-06-29）**：dogfood 已雙路徑（`01` ai-skill + `02` Vidoe-Test）；glossary / linked-updates / archive 仍待觀察期結束或 Phase 3 四檔 cross-link 補齊後一次收口。
 
 ---
 
@@ -438,7 +447,7 @@ compatibility:
 - [ ] Stop condition（exit_when + force_exit_when）+ avoid + Intent Transition Rule 在正文與 review checklist
 - [ ] Compatibility default 在 implementation-plan template 或正文
 - [ ] Observable Equivalence Checkpoint 定義（不綁 no-op）
-- [x] ≥1 dogfood evidence
+- [x] ≥1 dogfood evidence（雙路徑：`01` ai-skill force_exit + `02` Vidoe-Test happy/partial）
 - [ ] doc-only 宣告；無 runtime projection 本輪
 
 ---
@@ -461,6 +470,7 @@ compatibility:
 | Plan | 關係 |
 |------|------|
 | [`02-software-delivery-plan-first-ordering`](2026-06-22-1009-plans-system-portability-and-delivery-integration/02-software-delivery-plan-first-ordering.md) | plan artifact ⟲ preflight；本 plan 定義 implementation plan 內 intent schema |
+| **Vidoe-Test landscape player** | project-layer dogfood — [`02-vidoe-test-project-dogfood-evidence.md`](02-vidoe-test-project-dogfood-evidence.md)；`active-plan-phase-guards.json` + Phase 0→1 ordering |
 | [`gen3-workflow-analysis-cognitive-slice-decomposition`](../archived/2026-05-29-0916-gen3-workflow-analysis-cognitive-slice-decomposition.md) | 延續 sd-implementation retained；**不**新增 slice id |
 | Recovery / Release 擴充 | out of scope |
 
@@ -481,3 +491,4 @@ compatibility:
 | 2026-06-29 | 第二輪：Intent Transition Rule、force_exit_when、compatibility default、dogfood-before-validator、Q6 命名 | stakeholder maturity review | 本對話 |
 | 2026-06-29 | Phase 4 force_exit dogfood；觀察期 sign-off；enforcement 延後 | stakeholder：dogfood 驗 contract 站得住 | 本對話 |
 | 2026-06-29 | Phase 1 落地 execution-modes.md + execution-flow 導航；Phase 2 intake 雙軸 + templates intent 欄位 | implementation execution governance | agent |
+| 2026-06-29 | Vidoe-Test project-layer dogfood verified | landscape Phase 0 guard + partial happy path | [`02-vidoe-test-project-dogfood-evidence.md`](02-vidoe-test-project-dogfood-evidence.md) |
