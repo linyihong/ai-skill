@@ -437,14 +437,23 @@ type ValidationContext struct {
 - **F.3 asymmetric proof**：violation tree 上 **raw CI（naive staged-empty）≠ hook**（漏看 violation）、**normalized CI == hook**（`{parent_reference}`）→ 證 equivalence 是 contract 非雙空巧合。三情境（valid/violation/opt-out）COR DeepEqual。
 - **未做**：3.3c。Q1 仍 OPEN。
 
-##### 3.3c — directional replacement（close 規則，待做）
-> **Q1 關閉 evidence 至少**（不要求三個都換，但 ≥1 真 replace，非 mock）：
-> ```
-> replace manual transport → hook+CI unchanged
-> replace hook transport   → manual+CI unchanged
-> replace CI transport     → manual+hook unchanged
-> ```
-> 每次 replace：engine unchanged + remaining consumers unchanged + observation preserved（E.2 directional）。Q1 在 3.3c 通過後才 close。
+##### 3.3c — directional replacement ✅（2026-06-25；Q1 close package assembled）
+- **真 replacement（非 mock）**：manual consumer 的兩個**真實 adapter** 互換——CLI `plans validate`（`runPlansValidate` via `Run`）↔ direct engine（`engineObservation`），皆過同一 engine entrypoint。`TestDirectionalReplacement_ManualAdapterSwap`：observation（COR + applicability）preserved。
+- **R.1 removal-independence**：移除/不呼叫 manual → hook & CI COR 不變、無 fallback/shared-state（`TestDirectionalReplacement_RemovalIndependence`）。
+- **R.2 contract stability**：consumer-facing contract fingerprint（`ValidationContext` + `Finding` 欄位集）== golden → engine 內部演化（同 contract）不需改 adapter（`TestDirectionalReplacement_ContractStable`）。
+- **R.3 applicability（防雙空作弊）**：observation preservation ≠ set-equality；新增 `ruleApplicability`（3.3c-only，不入 COR）。`ApplicabilityNotSetEquality`：parent_reference「applicable+pass」vs「silently inapplicable」兩者 findings 皆空但 applicability 不同 → 非 preserved。
+
+**Q1 close package（assembled，待 review 一起看；本輪不自行 close）**：
+| 證據 | slice | 狀態 |
+|---|---|---|
+| equivalence proven（manual≡hook） | 3.3a | ✅ COR DeepEqual |
+| equivalence proven（hook≡CI）+ asymmetric | 3.3b | ✅ + F.3 |
+| removal-independence | 3.3c R.1 | ✅ |
+| replaceability（≥1 真 replace） | 3.3c swap | ✅ CLI↔direct |
+| contract stability | 3.3c R.2 | ✅ fingerprint |
+| observation preserved（含 applicability） | 3.3c R.3 | ✅ |
+
+→ **Q1 ready-to-close**，狀態留 OPEN 待 review package 後正式關。
 
 > 第一次拿到「成功 adoption 證據」後最易把 compatibility 當單純升版測試。先拆軸，否則 3.2 測出綠燈卻不知哪層相容。**doc 內現存三個 version 必須分開**：binary version / `plan_schema` version / invocation-contract version（目前隱含）。
 
