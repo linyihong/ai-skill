@@ -378,8 +378,8 @@ compatibility:
 
 ## Phase 2 — Intake taxonomy & templates
 
-- [ ] [`intake.md`](../../workflow/software-delivery/intake.md)：`change_kind` 表 + `blocked_by_structure` → `execution_mode` 路由 + 與 replacement 正交說明
-- [ ] 雙軸對照表（修訂）：
+- [x] [`intake.md`](../../workflow/software-delivery/intake.md)：`change_kind` 表 + `blocked_by_structure` → `execution_mode` 路由 + 與 replacement 正交說明
+- [x] 雙軸對照表（修訂）：
 
   | change_kind | blocked_by_structure? | parity? | execution_mode |
   |-------------|----------------------|---------|----------------|
@@ -389,11 +389,11 @@ compatibility:
   | `feature` | true | 否 | `preparatory_refactoring` |
   | `bugfix` | 視情況 | 否 | 預設 `direct_change` |
 
-- [ ] [`templates/implementation-plan-template.md`](../../workflow/software-delivery/templates/implementation-plan-template.md)：
+- [x] [`templates/implementation-plan-template.md`](../../workflow/software-delivery/templates/implementation-plan-template.md)：
   - `execution_mode: direct_change | preparatory_refactoring`
   - `steps[]` with `intent` + `behavior_change` + optional `checkpoint`
   - Stop condition checklist
-- [ ] [`templates/change-brief-template.md`](../../workflow/software-delivery/templates/change-brief-template.md)：`change_kind` 對齊
+- [x] [`templates/change-brief-template.md`](../../workflow/software-delivery/templates/change-brief-template.md)：`change_kind` 對齊
 
 ---
 
@@ -430,9 +430,9 @@ compatibility:
 
 ## 完成條件
 
-- [ ] Implementation execution mode 正文落地（非獨立 lifecycle slice）
-- [ ] Change Intent Lock 在 implementation-plan template 可機械填寫
-- [ ] Intake 雙軸（`change_kind` × `execution_mode`）與 replacement 邊界清楚
+- [x] Implementation execution mode 正文落地（非獨立 lifecycle slice）
+- [x] Change Intent Lock 在 implementation-plan template 可機械填寫
+- [x] Intake 雙軸（`change_kind` × `execution_mode`）與 replacement 邊界清楚
 - [ ] Stop condition（exit_when + force_exit_when）+ avoid + Intent Transition Rule 在正文與 review checklist
 - [ ] Compatibility default 在 implementation-plan template 或正文
 - [ ] Observable Equivalence Checkpoint 定義（不綁 no-op）
@@ -476,4 +476,4 @@ compatibility:
 | 2026-06-29 | 初稿：獨立 preparatory-refactoring slice | workflow gap 分析 | agent draft |
 | 2026-06-29 | 重寫：implementation execution mode + Change Intent Lock + intake taxonomy + stop condition | stakeholder review | 本對話 |
 | 2026-06-29 | 第二輪：Intent Transition Rule、force_exit_when、compatibility default、dogfood-before-validator、Q6 命名 | stakeholder maturity review | 本對話 |
-| 2026-06-29 | 第三輪：change_kind × execution_mode 雙軸（Q6 resolved）；no_structure_progress_detected 取代 N-step；Phase 4 有效證據路徑；illegal transition validator 方向 | stakeholder 可實施 sign-off | 本對話 |
+| 2026-06-29 | Phase 1 落地 execution-modes.md + execution-flow 導航；Phase 2 intake 雙軸 + templates intent 欄位 | implementation execution governance | agent |

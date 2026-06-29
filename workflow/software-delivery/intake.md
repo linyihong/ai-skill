@@ -13,7 +13,7 @@
 | `owner_layer` | workflow |
 | `layer_justification` | 規定「接收變更要先做什麼分類 / 過哪些 gate / 缺資訊如何處置」的 ordering / gate；通過 workflow membership test，不承載 evidence 取得方法（非 analysis），不論證長期模式（非 intelligence） |
 | `canonical_source` | 本檔（原 `execution-flow.md` §1 從證據開始 + §6 回填規則；`development-process.md` §Initial Documentation Pack / §Product Brief Validation Gate / §Change Intake Gate / §Missing Information Gate / §Existing Project Documentation Backfill） |
-| `dependencies` | [`requirements/README.md`](requirements/README.md)、[`requirements/pre-build-interrogation.md`](requirements/pre-build-interrogation.md)、[`templates/change-brief-template.md`](templates/change-brief-template.md)、`sd-contracts`（intake 後產出 contract） |
+| `dependencies` | [`requirements/README.md`](requirements/README.md)、[`requirements/pre-build-interrogation.md`](requirements/pre-build-interrogation.md)、[`templates/change-brief-template.md`](templates/change-brief-template.md)、[`implementation/execution-modes.md`](implementation/execution-modes.md)（`blocked_by_structure` 路由後）、`sd-contracts`（intake 後產出 contract） |
 | `dependency_budget` | default `max_depth:2` / `max_runtime_dependencies:4` |
 | `validation_signal` | Phase 4 Scenario A（execution-only：已有明確 contract 的小改時本 slice 應 **不** 載入，列於 forbidden_load） |
 
@@ -42,7 +42,7 @@
 | Product brief 本身是否已驗證？ | 根據證據或明確決策檢查目標、使用者、範圍、non-goals、假設、限制、依賴、風險和成功標準。將每個主要聲明標記為 `validated`（已驗證）、`assumption`（假設）、`open question`（開放問題）、`scoped out`（排除範圍）或 `invalidated`（無效） |
 | 這是新需求還是行為變更？ | 先執行 [`requirements/`](requirements/README.md) stage：product-impact discovery、behavior-driven discovery、acceptance definition、ambiguity resolution；再更新規劃文件、BDD、合約、實作切片和測試 |
 | 這是 bug 修復？ | 確認預期行為 vs 實際行為、重現/證據、受影響的 BDD 或缺失 scenario、受影響的合約/錯誤和回歸測試 |
-| 這是重構？ | 先分類是純內部重構、架構重組、平台遷移、工具替換或舊系統 replacement。若會替代既有功能、腳本、API、資料流程、UI flow、runtime surface 或操作流程，必須在實作前建立新舊能力 parity inventory：舊入口、現有功能、輸入、輸出 / 副作用、外部依賴、目標新入口、parity 狀態、測試 / fixture 證據與 deferred / not planned 理由。只有純內部重構且不改變 observable behavior、public contract 或操作能力時，才可只確認沒有行為變更。 |
+| 這是重構？ | 先以 `change_kind` 分類：`internal_refactor`（純內部、行為不變）、`replacement`、`migration`，或其實是 `feature` / `bugfix` 被結構 block（見上方雙軸路由，**不要**誤標為 replacement）。若會替代既有功能、腳本、API、資料流程、UI flow、runtime surface 或操作流程，必須在實作前建立 parity inventory（見下方 Parity Gate）。只有 `internal_refactor` 且不改變 observable behavior、public contract 或操作能力時，才可只確認沒有行為變更。 |
 | 這是強化？ | 確認威脅/故障模式、擁有者層、驗證和連結的檢查清單/控制更新 |
 | 這是架構決策或 domain model 變更？ | 先確認 requirements stage 已有 behavior boundary / acceptance criteria / ambiguity disposition，再執行 [`architecture/architecture-fit-analysis.md`](architecture/architecture-fit-analysis.md)，確認 CRUD / DDD Lite / Full DDD / event-driven / microservices 的 fit evidence；不得預設套用 DDD、CQRS 或 event sourcing |
 | 這個變更是否影響延遲、吞吐量、資源使用、啟動、背景工作、資料庫存取、批次處理或外部呼叫量？ | 在程式碼之前定義效能預算和必要的效能測試類型。不要依賴「功能正確」作為變更可發布的證明 |
@@ -54,7 +54,59 @@
 
 如果 product brief 存在但包含影響行為、合約、風險、測試、所有權、時程或發布關卡的未驗證聲明，在實作之前將這些聲明視為阻擋項。對於純規劃答案，引用參考來源或推理邊界，而不是假裝 brief 已驗證。
 
-> **輸出模板**：Change Intake 完成後，使用 [`templates/change-brief-template.md`](templates/change-brief-template.md) 記錄變更簡報。
+> **輸出模板**：Change Intake 完成後，使用 [`templates/change-brief-template.md`](templates/change-brief-template.md) 記錄變更簡報（含 `change_kind` 與 `blocked_by_structure`）。
+
+### change_kind × execution_mode 雙軸（Implementation 路由）
+
+Intake 分類 **本質**（軸 1）；implementation 選 **做法**（軸 2）。`preparatory_refactoring` 是 **execution mode**，不是 `change_kind`。
+
+```yaml
+# 軸 1 — intake：這次變更的本質
+change_kind:
+  - feature
+  - bugfix
+  - replacement
+  - migration
+  - internal_refactor   # 行為不變、不為特定 feature 服務
+
+# 軸 2 — implementation（見 implementation/execution-modes.md）
+execution_mode:
+  - direct_change
+  - preparatory_refactoring
+```
+
+**路由規則**（`change_kind: feature` 且被既有結構 block — untestable、god method、缺 seam 等）：
+
+```yaml
+if:
+  change_kind: feature
+  blocked_by_structure: true
+then:
+  execution_mode: preparatory_refactoring
+  load: implementation/execution-modes.md
+  do_not_classify_as:
+    - replacement
+    - migration
+else_if:
+  change_kind: feature
+  blocked_by_structure: false
+then:
+  execution_mode: direct_change   # 預設
+```
+
+**雙軸對照表**：
+
+| change_kind | blocked_by_structure? | parity? | execution_mode |
+|-------------|----------------------|---------|----------------|
+| `internal_refactor` | n/a | 否 | `direct_change` 或 structure-only batch（無 feature intent） |
+| `replacement` / `migration` | n/a | **是** | intake parity gate；通常 **非** preparatory mode |
+| `feature` | false | 否 | `direct_change` |
+| `feature` | true | 否 | `preparatory_refactoring` |
+| `bugfix` | 視情況 | 否 | 預設 `direct_change`；若修復需先拆 seam 再改行為，可標 `blocked_by_structure: true` |
+
+**與 replacement parity 正交**：`change_kind: feature` + `execution_mode: preparatory_refactoring` **不**觸發下方 Parity Gate 的 replacement inventory；那是為取代舊入口 / 遷移能力。若實際在 replacement 舊系統，改標 `change_kind: replacement` 或 `migration` 並走 parity。
+
+`change-brief` 的 `Change Type` 與 `change_kind` 對齊見 [`templates/change-brief-template.md`](templates/change-brief-template.md)。未宣告 `execution_mode` 的既有 plan 預設 `direct_change`（opt-in enrichment）。
 
 ### Pre-build Interrogation Gate
 
