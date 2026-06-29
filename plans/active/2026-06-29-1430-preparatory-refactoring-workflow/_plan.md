@@ -10,12 +10,12 @@ required_for_completion: false
 
 # Software-Delivery Implementation Execution Mode — Structure Preparation
 
-**Status**: `draft` — **可進 Phase 0 / Phase 1**（主結構已收斂；第三輪僅雙軸 taxonomy + progress 非數值化）
+**Status**: `draft` — **第一輪閉環完成；觀察期**（contract → dogfood → hold enforcement；Phase 3 / 5 / validator hook 延後）
 **Owner**: linyihong
 **建立日期**: 2026-06-29
-**最後修訂**: 2026-06-29（第三輪：change_kind × execution_mode 雙軸；Q6 resolved；no_structure_progress_detected；Phase 4 有效證據路徑）
+**最後修訂**: 2026-06-29（Phase 4 force_exit dogfood；stakeholder 觀察期 sign-off；validator 明確延後）
 **Priority**: P1
-**Scope**: workflow doc-only（advisory）；本輪不接入 commit-msg block / runtime projection
+**Scope**: workflow advisory + dogfood 產物（planvalidate advisory scan，`Blocking=false`）；**不**接入 commit-msg block / runtime projection / enforcement
 
 ## Executive summary
 
@@ -449,9 +449,10 @@ compatibility:
 - [x] 不新增 lifecycle stage / top-level slice
 - [x] Change Intent Lock + Intent Transition Rule 方向 sign-off（2026-06-29 第二輪）
 - [x] Stop condition（含 force_exit_when）方向 sign-off（2026-06-29 第二輪）
-- [ ] Dogfood 任務選定
+- [x] Dogfood 任務選定 — illegal-transition advisory scan；force_exit path（2026-06-29）
 - [x] 雙軸 taxonomy（Q6 resolved，2026-06-29 第三輪）
 - [x] 主結構可進 Phase 0 / Phase 1，無需再大改（2026-06-29 第三輪）
+- [x] **第一輪閉環完成；進入觀察期，不進 enforcement**（2026-06-29）— dogfood 驗 contract 可約束行為，非證理論；Phase 3 / 5 / validator hook 凍結至下一輪 evidence
 
 ---
 
@@ -478,4 +479,5 @@ compatibility:
 | 2026-06-29 | 初稿：獨立 preparatory-refactoring slice | workflow gap 分析 | agent draft |
 | 2026-06-29 | 重寫：implementation execution mode + Change Intent Lock + intake taxonomy + stop condition | stakeholder review | 本對話 |
 | 2026-06-29 | 第二輪：Intent Transition Rule、force_exit_when、compatibility default、dogfood-before-validator、Q6 命名 | stakeholder maturity review | 本對話 |
+| 2026-06-29 | Phase 4 force_exit dogfood；觀察期 sign-off；enforcement 延後 | stakeholder：dogfood 驗 contract 站得住 | 本對話 |
 | 2026-06-29 | Phase 1 落地 execution-modes.md + execution-flow 導航；Phase 2 intake 雙軸 + templates intent 欄位 | implementation execution governance | agent |

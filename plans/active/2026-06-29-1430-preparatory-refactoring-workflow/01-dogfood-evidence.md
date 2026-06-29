@@ -4,6 +4,12 @@
 **Date**: 2026-06-29  
 **Task**: Advisory `illegal_transition` scan for implementation-plan `steps[]` YAML (dogfood-before-validator)
 
+## Canonical example（abstraction orphan + force_exit）
+
+> **建議作為教學預設案例**（比「成功案例」更有治理價值）：prep-02 全量 `ImplementationPlanParser` 在 force_exit 後 **無保留義務** — 建立 seam ≠ 必須交付 abstraction。對照 `execution-modes.md` §`abstraction_not_used_by_next_feature` 與 §8 `abstraction orphan`。
+
+**Deferred（觀察期，非本輪）**：`observable_equivalence.confidence: automated | reviewed` — 區分 checkpoint 存在 vs checkpoint 可信；見 stakeholder 2026-06-29。
+
 ## Intake routing
 
 ```yaml
