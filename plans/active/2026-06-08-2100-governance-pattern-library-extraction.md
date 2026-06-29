@@ -214,7 +214,13 @@ reason?), never adjudicating prose.
   - **R2** — if Rule omitted → a `governance_exemptions` entry `step: rule, reason: pure-structural-invariant` exists.
   - **R3** — if Projection omitted → a `governance_exemptions` entry `step: projection, reason: direct-authoritative-consumption` exists.
 - [x] Specify the typed `governance_exemptions` schema + closed `reason` enum (above).
-- [ ] **Open decision — exemption declaration site** (blocks lint implementation): where does `governance_exemptions` live? Candidates: (a) the subsystem's `enforcement-registry.yaml` rule_class entry, (b) plan frontmatter, (c) a field on the template-conformance record. Must be decided before the lint can parse it; it is the difference between linting a registry surface vs scanning prose. **Not** to be guessed.
+- [ ] **T3A first decision — "Authority Surface Decision"** (NOT YET DECIDED; blocks lint implementation; resolve only when the first real consumer arrives — do not pre-decide for a system that does not exist yet). Where does `governance_exemptions` get *declared*, and where does enforcement *read* it from?
+  - **Candidate A** — `rule_class` in `enforcement-registry.yaml` → registry-authoritative.
+  - **Candidate B** — plan frontmatter → author-local.
+  - **Candidate C** — template-conformance record → a derived artifact.
+  - **Recorded leaning (2026-06-25, reviewer; tentative)**: a **split** — *author declares* the exemption on an authoring surface (plan / registry, i.e. A and/or B), the lint *produces* a conformance record (C as a **derived** artifact), and enforcement *reads only the conformance record*.
+  - **Rationale — `Validity ≠ Authority`** (the Failure Authority family's core principle): if the exemption is allowed to live *inside* the lint's own record, the validator silently becomes the authority owner of what is exempt. Keeping declaration on the authoring surface and the conformance record strictly *derived* preserves the separation — the lint verifies standing, it does not grant it.
+  - Difference this decides: linting a *structured authoring surface* vs scanning prose; and who owns the exemption truth (author vs validator).
 - [ ] Implement the advisory lint (report-only) — **deferred within T3A** until either (i) the declaration site is decided AND a real subsystem exists to lint against, or (ii) explicit go-ahead to dry-run against the template's own examples. Cost is **not** low (declaration-site parse + runtime-compile advisory wiring + report artifacts), and with no live subsystem yet the false-positive log would be synthetic-only — low evidentiary value.
 - [ ] Outputs (once implemented): `lint_report` (per-subsystem R1/R2/R3 status) + `false_positive_log` (omissions correctly exempted that an enforcing lint *would* have flagged).
 
