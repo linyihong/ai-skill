@@ -1220,24 +1220,30 @@ func runtimeIndexRouteRecords(repo string) ([]runtimeIndexAtom, error) {
 }
 
 func runtimeIndexFeedbackRecords(repo string) ([]runtimeIndexAtom, error) {
-	roots, err := filepath.Glob(filepath.Join(repo, "skills", "*", "feedback_history"))
+	// Guard 1 (resolver boundary): the sink root comes from the registry-derived
+	// resolver. This indexer never knows "feedback/history" literally and never
+	// parses the registry itself — it only consumes a resolved sink root.
+	sink, err := feedbackCanonicalSink(repo)
 	if err != nil {
-		return nil, err
+		// No resolvable sink → index nothing (mirrors the prior glob-miss empty set).
+		return []runtimeIndexAtom{}, nil
 	}
+	sink = strings.TrimSuffix(filepath.ToSlash(sink), "/")
 	paths := []string{}
-	for _, root := range roots {
-		if err := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if entry.IsDir() || filepath.Ext(path) != ".md" {
+	if err := filepath.WalkDir(filepath.Join(repo, filepath.FromSlash(sink)), func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			if os.IsNotExist(err) {
 				return nil
 			}
-			paths = append(paths, path)
-			return nil
-		}); err != nil {
-			return nil, err
+			return err
 		}
+		if entry.IsDir() || filepath.Ext(path) != ".md" {
+			return nil
+		}
+		paths = append(paths, path)
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 	sort.Strings(paths)
 	records := []runtimeIndexAtom{}
@@ -1255,14 +1261,18 @@ func runtimeIndexFeedbackRecords(repo string) ([]runtimeIndexAtom, error) {
 			return nil, err
 		}
 		relative = filepath.ToSlash(relative)
-		parts := strings.Split(relative, "/")
-		skill := ""
-		if len(parts) > 1 {
-			skill = parts[1]
-		}
+		// Guard 2 (parse from meaning, not absolute index): interpret the path
+		// RELATIVE TO THE SINK — shape <sink>/<domain>/<category...>/<file>.md —
+		// not by absolute path segment number (which coupled to the old skills/ tree).
+		relToSink := strings.TrimPrefix(relative, sink+"/")
+		segs := strings.Split(relToSink, "/")
+		domain := ""
 		category := ""
-		if len(parts) > 4 {
-			category = strings.Join(parts[3:len(parts)-1], "/")
+		if len(segs) >= 2 {
+			domain = segs[0]
+			if len(segs) > 2 {
+				category = strings.Join(segs[1:len(segs)-1], "/")
+			}
 		}
 		status := regexp.MustCompile(`(?m)^Status:\s*([^\n]+)`).FindStringSubmatch(content)
 		statusValue := ""
@@ -1282,10 +1292,10 @@ func runtimeIndexFeedbackRecords(repo string) ([]runtimeIndexAtom, error) {
 			title = strings.TrimSuffix(filepath.Base(relative), ".md")
 		}
 		records = append(records, runtimeIndexAtom{
-			ID: "feedback." + skill + "." + strings.TrimSuffix(filepath.Base(relative), ".md"), SourcePath: relative, Layer: "skills", Type: "feedback-pattern",
-			Status: statusValue, Priority: "P2", Confidence: confidence, ContextCost: "medium", Tags: strings.Join(nonEmptyStrings(skill, "feedback", category), ","),
-			Domains: skill, Title: title, Summary: firstRuntimeHeadingAfter(content, "#### One-line Summary"),
-			WhenToRead: "Feedback lesson lookup for " + skill + ".", ValidationSignal: "Open canonical feedback lesson at " + relative + ".",
+			ID: "feedback." + domain + "." + strings.TrimSuffix(filepath.Base(relative), ".md"), SourcePath: relative, Layer: runtimeLayerFor(relative), Type: "feedback-pattern",
+			Status: statusValue, Priority: "P2", Confidence: confidence, ContextCost: "medium", Tags: strings.Join(nonEmptyStrings(domain, "feedback", category), ","),
+			Domains: domain, Title: title, Summary: firstRuntimeHeadingAfter(content, "#### One-line Summary"),
+			WhenToRead: "Feedback lesson lookup for " + domain + ".", ValidationSignal: "Open canonical feedback lesson at " + relative + ".",
 		})
 	}
 	return records, nil
