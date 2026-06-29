@@ -1,4 +1,4 @@
-version=repo-3898c22
-source_commit=3898c22
-built_at=2026-06-29T00:01:11Z
+version=repo-e0bdb7d
+source_commit=e0bdb7d5d227c5abb0a4f77b5f015a2538b21694
+built_at=2026-06-29T00:54:00Z
 targets=windows/amd64,darwin/amd64,darwin/arm64,linux/amd64,linux/arm64

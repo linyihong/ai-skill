@@ -241,7 +241,8 @@ func TestRuntimeRefreshDefaultNativeDoesNotNeedRuby(t *testing.T) {
 	writeFile(t, filepath.Join(repo, "CORE_BOOTSTRAP.md"), "# Core\n")
 	writeFile(t, filepath.Join(repo, "workflow", "test.md"), "# Workflow Test\n")
 	writeFile(t, filepath.Join(repo, "knowledge", "summaries", "README.md"), "# knowledge summaries\n")
-	writeFile(t, filepath.Join(repo, "skills", "demo", "feedback_history", "lesson.md"), "# Feedback\n\n### Feedback Lesson\n\n#### One-line Summary\nfeedback route lesson\n")
+	writeFile(t, filepath.Join(repo, "feedback", "history", "README.md"), "# Feedback History\n")
+	writeFile(t, filepath.Join(repo, "feedback", "history", "demo", "lesson.md"), "# Feedback\n\n### Feedback Lesson\n\n#### One-line Summary\nfeedback route lesson\n")
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -621,8 +622,8 @@ func TestNativeRuntimeSQLiteIndexHasStableInvariants(t *testing.T) {
 
 func TestNativeRuntimeSQLiteIndexIncludesRecursiveFeedback(t *testing.T) {
 	repo := t.TempDir()
-	writeFile(t, filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"), "records: []\n")
-	writeFile(t, filepath.Join(repo, "skills", "demo", "feedback_history", "nested", "lesson.md"), `# Feedback Lesson
+	writeFeedbackHistoryRouteFixture(t, repo)
+	writeFile(t, filepath.Join(repo, "feedback", "history", "demo", "nested", "lesson.md"), `# Feedback Lesson
 
 ### Recursive Feedback Title
 
@@ -637,7 +638,39 @@ Recursive feedback summary.
 	if err := buildNativeRuntimeSQLiteIndex(repo, goPath); err != nil {
 		t.Fatal(err)
 	}
-	assertSQLiteScalar(t, goPath, "SELECT COUNT(*) FROM atoms WHERE id = 'feedback.demo.lesson' AND source_path = 'skills/demo/feedback_history/nested/lesson.md'", "nonzero")
+	assertSQLiteScalar(t, goPath, "SELECT COUNT(*) FROM atoms WHERE id = 'feedback.demo.lesson' AND source_path = 'feedback/history/demo/nested/lesson.md'", "nonzero")
+}
+
+func TestNativeRuntimeSQLiteIndexExcludesDeletedWorldFeedbackPath(t *testing.T) {
+	repo := t.TempDir()
+	writeFeedbackHistoryRouteFixture(t, repo)
+	writeFile(t, filepath.Join(repo, "feedback", "history", "README.md"), "# Feedback History\n")
+	writeFile(t, filepath.Join(repo, "feedback", "history", "demo", "lesson.md"), `# Feedback Lesson
+
+### Canonical Feedback Title
+
+Status: promoted
+
+#### One-line Summary
+Canonical feedback summary.
+`)
+	writeFile(t, filepath.Join(repo, "skills", "demo", "feedback_history", "lesson.md"), `# Feedback Lesson
+
+### Deleted World Feedback Title
+
+Status: promoted
+
+#### One-line Summary
+Deleted world feedback summary.
+`)
+	temp := t.TempDir()
+	goPath := filepath.Join(temp, "go-deleted-world.sqlite")
+
+	if err := buildNativeRuntimeSQLiteIndex(repo, goPath); err != nil {
+		t.Fatal(err)
+	}
+	assertSQLiteScalar(t, goPath, "SELECT COUNT(*) FROM atoms WHERE source_path = 'feedback/history/demo/lesson.md'", "nonzero")
+	assertSQLiteScalarZero(t, goPath, "SELECT COUNT(*) FROM atoms WHERE source_path = 'skills/demo/feedback_history/lesson.md'")
 }
 
 func TestRuntimeUnsupportedSubcommandReturnsInvalidUsage(t *testing.T) {
@@ -830,9 +863,34 @@ func fakeRuntimeRepo(t *testing.T) string {
 	return repo
 }
 
+func writeFeedbackHistoryRouteFixture(t *testing.T, repo string) {
+	t.Helper()
+	writeFile(t, filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"), `records:
+  - id: route.feedback.history
+    route_type: feedback
+    task_intent: feedback lesson lookup
+    primary_source: feedback/history/README.md
+`)
+}
+
 func writeRuntimeNativeReportSourceFixture(t *testing.T, repo string) {
 	t.Helper()
 	writeFile(t, filepath.Join(repo, "knowledge", "runtime", "routing-registry.yaml"), `records:
+  - id: route.feedback.history
+    route_type: feedback
+    task_intent: feedback lesson lookup
+    primary_source: feedback/history/README.md
+    source_of_truth_gate: feedback-history-active
+    ranking_reason: feedback/history is the canonical lesson sink.
+    validation_signal: feedback lesson indexed under canonical sink.
+    metadata:
+      priority: P2
+      confidence: medium
+      compatibility_state: test-active
+    model:
+      profile: small
+      compression_level: index-only
+      reason: feedback route for refresh fixture
   - id: route.test.small
     task_intent: test small route
     primary_source: README.md
@@ -1148,6 +1206,22 @@ func assertSQLiteScalar(t *testing.T, path string, query string, expectation str
 	}
 	if expectation == "nonzero" && count == 0 {
 		t.Fatalf("query returned zero: %s", query)
+	}
+}
+
+func assertSQLiteScalarZero(t *testing.T, path string, query string) {
+	t.Helper()
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	var count int
+	if err := db.QueryRow(query).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	if count != 0 {
+		t.Fatalf("query expected zero, got %d: %s", count, query)
 	}
 }
 
