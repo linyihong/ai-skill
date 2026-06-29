@@ -306,7 +306,7 @@ type ValidationContext struct {
 >
 > | Bucket | Meaning | 來源 | 掛點 |
 > |---|---|---|---|
-> | **adoption-pass** | 外部採 canonical schema → engine 直接可用 | **2 external repos**：Vidoe-Test h5 tree（6-node）+ apk-analysis-sdk identity-pool tree（9-node），皆 findings=0 | **Phase 3 acceptance evidence anchor**（**非** Q8） |
+> | **adoption-pass** | 外部採 canonical **schema** → engine 乾淨驗（**caveat**：經 path-override EXT_PLANS_DIR=docs/plans 量測；scope-A CLI 需 `plans/active\|archived` layout，外部 repo 用 docs/plans → CLI `plans=0`，見 §3.4a location-convention gap） | **2 external repos**：Vidoe-Test h5 tree（6-node）+ apk-analysis-sdk identity-pool tree（9-node），皆 findings=0 | **Phase 3 acceptance evidence anchor**（**非** Q8） |
 > | **dialect-pressure** | 非 canonical metadata → 觀察到 mismatch | Vidoe-Test flat plans（semantic mismatch：parent path vs id） | Q8 證據（揭露邊界，**不**決策） |
 > | **compatibility-policy** | adoption / normalization / explicit-unsupported 三選一 | — | **Q8 = deferred**（尚未決） |
 >
@@ -473,8 +473,17 @@ type ValidationContext struct {
 - ❌ `Vidoe-Test`（已提供 dialect pressure，角色乾淨，不混用）。
 
 **3.4a — Acceptance Environment Selection（plan / selection only，🟢 authorized；不裝 adapter）**
-- [ ] 選定 persistent acceptance repo（過 Entry Gate 4 條）。
-- [ ] 定 rollback checkpoint：記 `git status clean` / `hooks absent` / `validation baseline`。
+- [x] **候選評估（2026-06-25，read-only）**：
+  | repo | 14d churn | releases | 既有 evidence 角色 | scope-A `plans validate` | 判定 |
+  |---|---|---|---|---|---|
+  | Vidoe-Test | **169**（極高）| 0 | dialect-pressure + adoption-pass | `plans=0` | ❌ churn 違反 time-box + 角色已滿 |
+  | apk-analysis-sdk | 27（中）| 0 | adoption-pass #2 | `plans=0` | ⚠️ churn OK，但仍 plans=0 |
+- [x] **BLOCKER finding（selection 攔截，未裝 adapter）**：兩 repo plans 皆在 **`docs/plans/`**，scope-A CLI 固定 discover **`plans/active|archived`** → 實跑 `plans=0`。**先前 adoption-pass 是 path-override（EXT_PLANS_DIR→docs/plans）量測**，真實 scope-A CLI/adapter 掃不到。→ **兩 repo 皆非 acceptance-ready as-is**。
+- **這是 location-convention gap（Q8 的 sibling，非 dialect）**：外部 repo 採了 canonical **schema** 但用了自己的 **location**（docs/plans）。修法選項：
+  - ✅ **dedicated acceptance repo，用 canonical `plans/active|archived` layout**（sidestep mismatch、角色乾淨、persist、可 time-box）——**recommended**。
+  - ⚠️ 在外部 repo 把 plans 搬到 `plans/active|archived`（invasive，改其 layout，違 Entry Gate #3 精神）。
+  - ⛔ 給 CLI 加 `--plans-dir docs/plans` discovery option（location-convention policy，**Q8-adjacent → deferred**，不現在做）。
+- [ ] **selection 結論**：不選 Vidoe-Test / apk-analysis-sdk as-is；建議 **dedicated canonical-layout acceptance repo**。待使用者決定 repo 位置（outward / 環境決策）後記 rollback checkpoint baseline。
 - [ ] **不安裝 adapter**（避免把 repo 選擇混進 adoption 證據）。
 
 **3.4b — Install → Validate → Upgrade → Rollback（⛔ execution NOT YET AUTHORIZED）**
