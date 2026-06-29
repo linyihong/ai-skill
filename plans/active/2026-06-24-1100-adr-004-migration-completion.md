@@ -603,8 +603,31 @@ atoms / fts
 > P0-B indexer derive graph。輸出（新增但不改 runtime）：`contract.feedback.location` 的 owner / derive rule /
 > invalidation rule / examples（non-authoritative）。B-1 已 materialize 最小 `knowledge/runtime/contracts/feedback-location.yaml`；4A = 正式化補完。
 
+#### 4A 第一個 commit — Contract Extraction Matrix（先矩陣，後檔；證明是抽取非發明）
+
+> **discipline**：第一個 commit **不是** contract 檔，是本矩陣。stop-conditions（任一成立 → 停、不落檔）：
+> `owner > 1` ／ `derives_from = runtime` ／ `invalidates = unclear`。
+
+| field | owner | derives_from | invalidates | 判定 |
+| --- | --- | --- | --- | --- |
+| **sink root** | registry `route.feedback.history.primary_source`（單一） | `constitution/ADR-004`（apex；registry materialize 之） | registry 改/移 → 所有 deriver（`feedbackCanonicalSink`/indexer/generated views/docs）re-resolve | **IN** ✓ |
+| **source_of_truth_gate** | registry `route.feedback.history.source_of_truth_gate`（registry 靜態宣告，runtime 只讀不擁有） | registry（**activation** 宣告） | 管 activation、**不**管 location → 對 location `invalidates = unclear` | **OUT**（命中 stop-condition；activation 非 location，排除，留未來 activation contract） |
+| **example rendering** | contract `examples` 欄（明確 non-authoritative） | sink root（registry）之 rendered snapshot；**非** runtime authority | registry sink 改 → snapshot stale（cosmetic，因 non-authoritative） | **IN（non-authoritative）** ✓ |
+| **projection usage** | contract `derive.docs` rule（operational projection 慣例） | sink root（registry）via projection | registry 改 → projection re-resolve | **IN** ✓ |
+
+> **Matrix verdict：PASS（3 IN / 1 OUT）**。無 `owner>1`、無 `derives_from=runtime`；唯一 `invalidates=unclear` 的
+> `source_of_truth_gate` 被**正確排除**（activation 非 location）→ 證明矩陣沒 over-extract，contract 是抽取不是發明。
+>
+> **4A 唯一驗收（delete test）**：
+> - 刪 `contract.feedback.location` → 系統**仍能跑**（runtime 經 `feedbackCanonicalSink` 直讀 registry），但失去可說明性。
+> - 刪 registry `route.feedback.history` → 系統**不能跑**（resolver error → indexer 空 → Path 2 dead）。
+> → **contract = extracted authority（說明層）／registry = operational authority**。未反向 → 未抽過頭。
+>
+> 矩陣 PASS 後，**第二個 commit** 才落 `feedback-location.yaml`（只含 3 IN 欄，排除 source_of_truth_gate）。
+
 **交付**：
-- [ ] `knowledge/runtime/contracts/feedback-location.yaml`（補完：owner / derive / invalidation / examples）
+- [x] 第一個 commit：Contract Extraction Matrix（本表，PASS）
+- [ ] 第二個 commit：`knowledge/runtime/contracts/feedback-location.yaml`（補完 sink root / derive / invalidation / examples；**不含** source_of_truth_gate）
 - [ ] contract → routing-registry 的 single-direction materialize 連結（registry = 唯一 path owner）
 
 **禁止**：不搬 registry / 不改 runtime / 不補 validator / 不重做 inventory / 不新增第二 owner。
