@@ -76,7 +76,7 @@ Agent 或作者在 plan 變長、要拆檔時，先判斷屬於哪一類——**
 | --- | --- | --- | --- |
 | **A. 同一 plan 的附檔** | 檔名為 `<slug>.md` + `<slug>-<companion>.md`；同一 `id` 語意；companion 無獨立 acceptance | `<slug>/_plan.md` + `NN-<companion>.md` | [`2026-06-29-1430-preparatory-refactoring-workflow/`](../plans/active/2026-06-29-1430-preparatory-refactoring-workflow/_plan.md)（dogfood evidence） |
 | **B. 獨立 acceptance 的支線** | 需獨立 sign-off / archive / multi-phase gate；有獨立 `id` | plan tree：`parent` + `plan_kind: sub`；可選 folder + `NN-` | [`2026-06-22-1009-plans-system-portability-and-delivery-integration/`](../plans/active/2026-06-22-1009-plans-system-portability-and-delivery-integration/_plan.md) |
-| **C. 序貫的兩個 main plan** | 不同 `id`、不同 timestamp-slug；後者引用前者 baseline，但各自是 main | **維持**兩個頂層 `.md`；用 frontmatter / prose 連結，**不** folderize | diagnosis [`2026-06-23-1500-adr-004-migration-drift-diagnosis`](../plans/active/2026-06-23-1500-adr-004-migration-drift-diagnosis.md) → completion [`2026-06-24-1100-adr-004-migration-completion`](../plans/active/2026-06-24-1100-adr-004-migration-completion.md)（`baseline_ref`） |
+| **C. 序貫的兩個 main plan** | 不同 `id`、不同 timestamp-slug；後者引用前者 baseline，但各自是 main | **維持**兩個頂層 `.md`；用 frontmatter / prose 連結，**不** folderize | diagnosis [`2026-06-23-1500-adr-004-migration-drift-diagnosis`](../plans/active/2026-06-23-1500-adr-004-migration-drift-diagnosis.md) → completion [`2026-06-24-1100-adr-004-migration-completion`](../plans/archived/2026-06-24-1100-adr-004-migration-completion.md)（`baseline_ref`；已 closed/archived） |
 
 **機械偵測**：`validatePlanTreeFolderConvention` 只對 **A** 發 flat-cluster warning；`ai-skill plans folderize --dry-run` 預覽遷移。**B** 走 sub-plan frontmatter；**C** 不觸發 folderize（`plans folderize --dry-run` 全 repo 掃描為空）。
 

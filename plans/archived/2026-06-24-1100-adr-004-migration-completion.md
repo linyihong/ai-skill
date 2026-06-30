@@ -13,7 +13,7 @@ baseline_ref: 2026-06-23-1500-adr-004-migration-drift-diagnosis
 # ADR-004 Migration Completion Plan
 
 > **這是 implementation plan，不是 diagnosis。** 診斷已於
-> [`2026-06-23-1500-adr-004-migration-drift-diagnosis.md`](2026-06-23-1500-adr-004-migration-drift-diagnosis.md)
+> [`2026-06-23-1500-adr-004-migration-drift-diagnosis.md`](../active/2026-06-23-1500-adr-004-migration-drift-diagnosis.md)
 > 凍結（`status: frozen`）。本文件把那份 frozen diagnosis 當 **immutable baseline**，
 > **不重述**證據、loop 圖或失效模式命名；只引用其錨點，並把 P0-A/B/C 與 Contract Layer
 > 展開為可執行 phase。命名刻意是 *Completion*（讓 migration 真正完成）而非 *Repair*（修 bug）。
