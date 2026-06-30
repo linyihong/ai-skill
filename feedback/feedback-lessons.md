@@ -178,6 +178,6 @@ Status: candidate | validated | deprecated | promoted | experimental
 
 - **索引**：維護者可定期整理 **`feedback/history/<domain>/README.md`**（表格：檔名、Status、標題、一句話摘要，或 category index）；若該 domain 已有索引，agent 新增 lesson 檔後**必須**追加表格列或明確說明為何暫不更新。已分類 domain 同時更新對應 **`feedback/history/<domain>/<category>/README.md`**。
 - **Git**：**`feedback/history/`** 版本控制；不要提交含機密的原始 log。
-- **歷史**：✅ `skills/<name>/feedback_history/` 下的既有 lesson 已於 2026-05-13 全部搬遷至 `feedback/history/<domain>/`，舊目錄已刪除。新 lesson 一律寫入 `feedback/history/`。
+- **歷史**：✅ `skills/<name>/feedback_history/` 下的既有 lesson 已於 2026-05-13 全部搬遷至 `feedback/history/<domain>/`，舊目錄已刪除。新 lesson 寫入目前位置 `feedback/history/`（derived from `route.feedback.history`）。
 
 ← [回到 enforcement 共用規則索引](../enforcement/README.md)

@@ -11,14 +11,14 @@
 
 ## 不放什麼
 
-- 單一 lesson 正文；統一放在 `feedback/history/<domain>/`。
+- 單一 lesson 正文；目前位置為 `feedback/history/<domain>/`（derived from `route.feedback.history`）。
 - 全庫可執行 feedback lesson 檔名與模板規則；放到 `./feedback-lessons.md`。
 - Failure pattern 的可執行 prevention gate；放到 `enforcement/failure-patterns/` 或相關 enforcement rule。
 - 專案 raw evidence 或未去敏資料；留在業務專案。
 
 ## 與既有層的關係
 
-- `feedback/history/` 是 lesson 的統一目標路徑。
+- lesson 目前位置為 `feedback/history/`（derived from `route.feedback.history`；authority 見該 route）。
 - `skills/*/feedback_history/` 已於 2026-05-13 刪除（apk-analysis、app-development-guidance、travel-planning），所有 lesson 已搬遷至 `feedback/history/`。
 - `enforcement/failure-learning-system.md` 與 `./feedback-lessons.md` 仍是可執行規則。
 - `intelligence/` 承接成熟的工程智慧。

@@ -710,6 +710,26 @@ Constitution
 > 不算 competing authority）——此版下 L1 其實已綠（machine owner 唯一 = registry；docs 已非 operational owner）。
 > **待 maintainer 裁 criterion；本輪不擴 scope、不續 converge。**
 
+> **Criterion 裁定 = (a′) Single Declarative Authority（maintainer）**：任何 doc 可**重述**結果
+> （reference / projection / description，如「目前位置為 feedback/history/…（derived from route.feedback.history）」），
+> 但**禁止 owner / normative 宣告句**（`統一放在｜唯一目標路徑｜一律寫入｜標準位置`）。即 **human-facing docs 可重述
+> 結果、不可宣告規則**。角色：registry→authority／contract→explanation／workflow→instruction／README→description。
+>
+> **Bounded L1 remediation（a′，限 3 檔）已執行**：`feedback/feedback-lessons.md`（line 5/24/181）、
+> `feedback/README.md`（line 14/21）、`enforcement/README.md`（line 158）的 authority verbs 已降為 descriptive
+> （commit 待推）。3 檔 grep `統一放在｜唯一目標路徑｜一律寫入｜標準位置` 已 **CLEAN**。
+>
+> **L1 re-run（a′ 後）：仍 RED（界外）** — `feedback/history/README.md` 仍含「新 lesson 一律寫入…」（normative 句型）。
+> 依 maintainer 規則「**還紅 → 不再修 README、不找第六個 claimant**」：
+> **→ ADR-004 Exit SUSPENDED（L1 criterion under-specified）。不 close、不續修。**
+>
+> **Under-specification root**：(a′) 的 forbidden verb 清單把 **authority declaration** 與 **normative operational
+> instruction** 混在同一組動詞（「一律寫入」既像 owner 宣告、又像合法的操作指令）。要乾淨判 L1，criterion 需再分一層：
+> 「宣告 location 為規則」vs「指示寫入動作」。此分層待 maintainer 定義，非再掃 claimant。
+>
+> **本輪抽出的可重用規則**（user-named）：`authoritative sentence ≠ authoritative artifact` ＋
+> `descriptive mention ≠ authority claim`。前者治 discovery 污染，後者治 remediation 過度。
+
 ---
 
 ## Deferred Design Notes（記錄，禁止現在實作）
