@@ -2,7 +2,7 @@
 
 「怎麼寫回饋、檔名怎麼取、模板長怎樣」**全部**在本檔維護；各 skill **不再**另存一份 `FEEDBACK.md` 正文（`apk-analysis` 目錄下僅保留極短入口檔，指向本檔）。
 
-**每一條 lesson 全文**統一放在 **`feedback/history/<domain>/`** 之下（對應 skill 領域名稱，如 `apk-analysis/`、`development-guidance/`、`travel-planning/`），**不要**再把 lesson 分散到 `workflow/<name>/feedback_history/`、`analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/` 或 `skills/<name>/feedback_history/` 等舊路徑。
+**每一條 lesson 全文**的 location 由 **`route.feedback.history`** 決定（唯一 authority）；新 lesson 寫入目前解析出的 sink（示例 derived · not authoritative：`feedback/history/<domain>/`，對應 skill 領域名稱，如 `apk-analysis/`、`development-guidance/`、`travel-planning/`），**不要**再寫到舊 `workflow|analysis|intelligence|skills/<name>/feedback_history/` 等路徑。
 
 ## 原則
 
@@ -21,7 +21,9 @@
 | **每一條獨立 lesson（所有 skill，無論遷移狀態）** | **`feedback/history/<domain>/<category>/YYYY-MM-DD_HHMMSS-<slug>.md`** |
 | **條目總覽表**（可選） | **`feedback/history/<domain>/README.md`** 與必要的 **`feedback/history/<domain>/<category>/README.md`** |
 
-> **重要：** `feedback/history/` 是 lesson 的唯一目標路徑。舊的 `skills/<name>/feedback_history/`、`workflow/<name>/feedback_history/`、`analysis/<name>/feedback_history/`、`intelligence/<name>/feedback_history/` 路徑已於 2026-05-13 刪除（`skills/` 下的 `feedback_history/` 已全部搬遷完畢），**新 lesson 一律寫入 `feedback/history/<domain>/`**。
+> **重要：** Lesson location 由 `route.feedback.history` 決定（唯一 authority）。新 lesson 寫入目前解析出的 sink。
+> 目前解析結果示例（derived · not authoritative）：`feedback/history/<domain>/`。
+> 舊 `skills|workflow|analysis|intelligence/<name>/feedback_history/` 已於 2026-05-13 刪除，不再支援。
 
 ### 判斷流程
 
