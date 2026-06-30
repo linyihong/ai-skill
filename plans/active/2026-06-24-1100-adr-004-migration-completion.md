@@ -699,6 +699,17 @@ Constitution
 > 或 operational projection，引 route.feedback.history / contract.feedback.location），permission/template 部分不動。
 > 完成後重跑 L1。**不在本 read-only 驗證輪執行。**
 
+> **L1 re-run（post-remediation 2026-06-24）：仍 RED → 依「L1 還紅 → 停」停手。**
+> `feedback/feedback-lessons.md` 的 authority 句（line 5/24）已 converge（`6725027`），但重跑發現**同一 authority
+> 句型分散在更多 doc**：`enforcement/README.md:158`（「所有 lesson 統一放在 feedback/history/<domain>/」）、
+> `feedback/README.md:14,21`（「統一放在…」「feedback/history/ 是 lesson 的統一目標路徑」）。
+> **結構修正**：location authority **不是單一「第二 owner」，而是分散式 convention**——authoritative 句型在多個
+> human-facing README/index 重述。逐檔 converge 是 whack-a-mole。**closure 需要先決定 L1 criterion**：
+> (a) 把所有「defines-as-rule」的 authority 句都 converge 成 registry-pointer（scope 擴大，跨多檔）；或
+> (b) 收窄 L1 = 「無 **machine/operational** location owner outside registry」（human doc 重述 convention 視為 describe，
+> 不算 competing authority）——此版下 L1 其實已綠（machine owner 唯一 = registry；docs 已非 operational owner）。
+> **待 maintainer 裁 criterion；本輪不擴 scope、不續 converge。**
+
 ---
 
 ## Deferred Design Notes（記錄，禁止現在實作）
