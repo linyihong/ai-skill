@@ -1,8 +1,9 @@
 ---
 id: 2026-06-24-1100-adr-004-migration-completion
 plan_kind: main
-status: draft
-execution_status: active
+status: closed
+execution_status: closed
+closure: ADR-004 CLOSED — criterion finalized during exit validation (2026-06-24)
 owner: linyihong
 created: 2026-06-24
 parent: null
@@ -673,10 +674,40 @@ Constitution
   ⊨ Validation
 ```
 
-- [ ] 五層 derive 鏈全綠
-- [ ] Canonical-Path Derivation Invariant 無違反（無繞過 registry 的 path 宣告）
-- [ ] `Path 1 == Path 2`
-- [ ] baseline diagnosis 仍 frozen、未被本計畫修改
+- [x] 五層 derive 鏈全綠
+- [x] Canonical-Path Derivation Invariant 無違反（無繞過 registry 的 path 宣告）
+- [x] `Path 1 == Path 2`
+- [x] baseline diagnosis 仍 frozen、未被本計畫修改
+
+### L1 — Single Declarative Authority（最終 criterion，maintainer 2026-06-24）
+
+> 判定單位是**句子的語義角色**，不是動詞。兩個 falsification test：
+> - ❌ **Authority declaration**：「**拿掉這句，讀者還知道該寫哪裡嗎？**」否 → 它在持有 authority（禁止）。
+>   例：「feedback/history/ 是唯一目標路徑」「所有 lesson 統一放在…」「標準位置為…」。
+> - ✅ **Operational instruction**：「**把路徑換成 `<resolved-sink>`，句子仍成立嗎？**」是 → 非 owner（允許）。
+>   例：「新 lesson 一律寫入 <resolved-sink>」「將 lesson 寫入目前解析出的 sink」「更新對應 README」。
+> - ✅ **Descriptive mention**：只描述現況/示例（「目前位置為…（derived…）」）。
+>
+> 套用：`feedback/history/README.md` 的「新 lesson 一律寫入 X」→ 換 `<resolved-sink>` 仍成立 → **operational，非 authority**
+> → **不列為 L1 fail**。故**不修該檔**。
+
+### Exit Verdict（最終）
+
+| 層 | 結果 |
+| --- | --- |
+| L1 Constitution（Single Declarative Authority） | ✅ PASS |
+| L2 Contract（pure extraction，無 runtime reader） | ✅ PASS |
+| L3 Registry（operational owner） | ✅ PASS |
+| L4 Consumers（皆 derive，無偷持 owner） | ✅ PASS |
+| L5 Runtime Observation（Path1==Path2 / provenance / deleted-world 不復活） | ✅ PASS |
+
+> **ADR-004 Exit = PASS → ADR-004 CLOSED — criterion finalized during exit validation.**
+> Exit 不只驗收，還在過程中收斂了規格。本次留下的三條可重用規則：
+> 1. `Referenced authority ≠ authoritative artifact`（治 discovery 污染）
+> 2. `Descriptive mention ≠ authority claim`（治 remediation 過度）
+> 3. `Operational instruction ≠ declarative authority`（L1 最終判準的核心）
+>
+> 不再掃 repo、不再修 README、不再擴 forbidden verbs、不新增 Phase 4B。`feedback/history/README.md` 維持原狀。
 
 ### Exit Criteria 5-layer 驗證（2026-06-24，read-only）
 
