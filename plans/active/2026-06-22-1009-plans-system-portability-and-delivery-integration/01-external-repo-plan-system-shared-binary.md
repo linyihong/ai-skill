@@ -490,7 +490,17 @@ type ValidationContext struct {
   - **location-gap 修法**：在 Vidoe-Test **新增可逆 acceptance artifact** `plans/active/`（放 canonical 測試 plans），不動其 `docs/plans/`；rollback 連 `plans/active/` 一併移除 → 回 baseline。
 - [ ] **不安裝 adapter**（3.4a 仍只 selection；adapter install 屬 3.4b）。
 
-**3.4b — Install → Validate → Upgrade → Rollback（target = Vidoe-Test；outward writes 待最終 go）**
+##### Batch A′ — canonical h5 tree reversible acceptance ✅（2026-06-25，Vidoe-Test，net-zero）
+> 範圍鎖死：僅 h5-redis canonical tree；**不碰 frontmatter / 不 canonicalize dialect / 不加 schema_version / 不改 parent / 不修 unrelated refs**。全程未 commit Vidoe-Test、結尾 restore。dialect plans 原地不動。
+- **完成 required subs 確認**：main + 5 subs 皆 `status: completed`、`required_for_completion: true`。inbound ref 僅 README（docs 索引，restore 後即還原，未動）。
+- **可逆 round-trip evidence**（filesystem move，非 commit）：
+  - baseline（未移）`plans=0` → move→`plans/active/` `plans=6 findings=0`（discover + clean）→ move→`plans/archived/` `plans=6 findings=0`（**archive_order 生效**：全 required subs completed → gate 通過、無誤擋）→ rollback restore `plans=0`。
+  - **residue check**：Vidoe-Test `git status` clean、tree 回 `docs/plans/` 原位、`plans/` 目錄移除 → **零殘留**。
+- **證明（Success Contract 子集）**：reversible adoption ✅ + archive_order 當 completion gate ✅（真 repo）+ monotonic removal/no-residue ✅。
+- **本批未含**：adapter(commit-msg hook) install + **upgrade once**（屬完整 3.4b 四段；archive_order「抓未完成」由 unit test 覆蓋，本批因全 completed 故 gate pass 非 block）。
+- **Batch B（dialect plans canonicalize）= ⛔ BLOCKED BY Q8**（adoption / normalization / explicit-unsupported 未決），不碰。
+
+**3.4b（完整四段：含 adapter install + upgrade）— Install → Validate → Upgrade → Rollback（target = Vidoe-Test；outward writes 待最終 go）**
 > **非侵入式**（因高 churn）：validate 主力走 **CLI/CI adapter**（不攔 commit）；**commit-msg hook 只 tight-window 驗一次**（install→1 test commit→remove）。
 - [ ] **setup（可逆）**：在 Vidoe-Test 新增 `plans/active/`（canonical 測試 plans，含「完成狀態不確定」的樣本）。
 - [ ] **validate**：`plans validate --root <Vidoe-Test>` → 預期能 discover（plans>0）並就「**plan 完成狀態**」給 findings（archive_order：archived main 有未完成 required sub 則 block；frontmatter/parent/unique 同步）——這正是使用者要的「哪些 plan 沒完成」測試。
