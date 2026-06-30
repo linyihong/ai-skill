@@ -17,6 +17,26 @@ parent: null
 
 > **Watch-Out List citation**：本 plan 對應 [`architecture/ai-native-cognitive-ecosystem-system.md`](../../../architecture/ai-native-cognitive-ecosystem-system.md) §Watch-Out List 的「process bloat」「premature abstraction」「over-engineering」防呆 — plan-first 採 advisory workflow ordering 而非機械 block（避免誤擋小修補）；委派只先做 schema + 雙路徑（人工 / agent），不建自動 orchestrator；外部化採共用 binary 而非整套治理搬遷，避免外部 repo 被 Ai-skill governance 綁架。
 
+## 現況總結（2026-06-25，本段結案）
+
+> **防誤讀（最重要）**：本段完成的是 **externalization，不是 productization**。
+> - **已證**：validation capability 可被外部 repo 採用，且**撤回後不留治理殘留**（real repo 可逆 acceptance）。
+> - **未證**：長期運營 / 跨時間 / 跨節奏 / 跨演進的**持續使用**（= operational acceptance debt，3.4b）。
+
+| 項目 | 狀態 |
+|---|---|
+| Engine extraction | ✅ |
+| Schema isolation | ✅ |
+| Consumer decoupling | ✅ |
+| Cross-version compatibility | ✅（Q3） |
+| External reversible adoption | ✅（3.4a real repo） |
+| Operational persistence | ⏸（3.4b deferred） |
+| External schema policy | ⏸（Q8 deferred） |
+
+**Q8 克制狀態（維持）**：adoption-pass ×2 + dialect-pressure ×1 + semantic mismatch（parent path vs id）→ 支持「canonical adoption 可行」「dialect 差異真存在」「normalize 理論可行」，**但不足以推出**「必 normalization / 必 require-canonical / 必 explicit-unsupported」→ deferred 合理。
+
+**回來時的優先序**：3.4b（低 churn 窗口）→ Q8（累積外部 dialect）→ 02（plan-first ordering）→ 03（delegation schema）。
+
 ---
 
 ## Decision Rationale
