@@ -459,7 +459,13 @@ type ValidationContext struct {
 > **重心轉移**：3.3 後已非 architecture work，3.4 是 **acceptance orchestration**。**不回頭重抽 engine、不再加 consumer、不提前處理 Q8。**
 > **persistence 限制（review）**：acceptance repo **MUST persist（禁 throwaway tmp）**——3.4 驗 `install → validate → upgrade → rollback → remove`，需**時間維度**（跨 commit / 跨 session），非單次狀態。
 
-**狀態（review 2026-06-25）**：3.4 → **AUTHORIZED FOR REPO SELECTION ONLY**；**execution（outward install）NOT YET AUTHORIZED**。
+**正式 split + 結論（review 2026-06-25，收在 Batch A′）**：
+- **3.4a Real Repo Lifecycle Evidence → ✅ DONE**（adopt / validate / archive gate / rollback / monotonic removal，real repo、net-zero）。**未覆蓋**：invocation adapter、time-window install、upgrade-once、persistence across consumer transport。
+- **3.4b Operational Acceptance → ⏸ DEFERRED**。**條件**：有明確窗口 + repo churn 降低 + 可控制 install/remove 時機。**覆蓋**：adapter install、real commit interception、upgrade-once、preserved semantics across operation。
+- **Batch B（dialect canonicalize）→ ⛔ BLOCKED BY Q8**。
+
+> **判定**：**Phase 3 不宣告 complete**；但 **architecture externalization 已完成**，剩下的是 **operational acceptance debt**（3.4b）+ schema policy（Q8）。
+> **原則**：不為了完成階段而改變正在觀察的系統（同 soak 邏輯）——高 churn 期不裝 adapter；等低 churn 窗口再做 3.4b。
 
 **3.4 Entry Gate（acceptance guard，非新 phase；acceptance repo 必須先滿足）**：
 1. **非生產交付 repo**：不承擔正式 release；可接受 hook/workflow 暫時存在。
@@ -500,7 +506,8 @@ type ValidationContext struct {
 - **本批未含**：adapter(commit-msg hook) install + **upgrade once**（屬完整 3.4b 四段；archive_order「抓未完成」由 unit test 覆蓋，本批因全 completed 故 gate pass 非 block）。
 - **Batch B（dialect plans canonicalize）= ⛔ BLOCKED BY Q8**（adoption / normalization / explicit-unsupported 未決），不碰。
 
-**3.4b（完整四段：含 adapter install + upgrade）— Install → Validate → Upgrade → Rollback（target = Vidoe-Test；outward writes 待最終 go）**
+**3.4b — Operational Acceptance ⏸ DEFERRED（target = Vidoe-Test；entry conditions：明確窗口 + repo churn 降低 + 可控制 install/remove 時機）**
+> 覆蓋：adapter install / real commit interception / upgrade-once / preserved semantics across operation。**不為了完成階段而改變正在觀察的系統**——高 churn 期不裝 adapter，等低 churn 窗口再做。
 > **非侵入式**（因高 churn）：validate 主力走 **CLI/CI adapter**（不攔 commit）；**commit-msg hook 只 tight-window 驗一次**（install→1 test commit→remove）。
 - [ ] **setup（可逆）**：在 Vidoe-Test 新增 `plans/active/`（canonical 測試 plans，含「完成狀態不確定」的樣本）。
 - [ ] **validate**：`plans validate --root <Vidoe-Test>` → 預期能 discover（plans>0）並就「**plan 完成狀態**」給 findings（archive_order：archived main 有未完成 required sub 則 block；frontmatter/parent/unique 同步）——這正是使用者要的「哪些 plan 沒完成」測試。
