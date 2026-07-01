@@ -25,7 +25,7 @@ ownership:
   not_owner:
     - who: constitution/ADR-004-feedback-promotion-pipeline.md
       why: apex intent that the registry materializes FROM; not a mutable owner.
-    - who: plans/active/2026-06-23-1500-adr-004-migration-drift-diagnosis.md
+    - who: plans/archived/2026-06-23-1500-adr-004-migration-drift-diagnosis.md
       why: frozen historical evidence, not a live owner.
     - who: route.feedback.promotion-pipeline
       why: a different sink (feedback/promotion/); outside this location's ownership.
